@@ -177,7 +177,7 @@ struct ProgramParametersLayout::Impl: public CacheHolder, public DebugIdHolder
       memset (&desc, 0, sizeof (desc));
 
       desc.parameters_count = new_parameters.size ();
-      desc.parameters       = new_parameters.empty () ? &default_parameter : &parameters [0];
+      desc.parameters       = new_parameters.empty () ? &default_parameter : &new_parameters [0];
 
         //נאסק¸ע ץ‎רא
 
@@ -388,9 +388,9 @@ LowLevelProgramParametersLayoutPtr& ProgramParametersLayout::DeviceLayout ()
       
     if (impl->settings->HasDebugLog ())
       impl->log.Printf ("Creating low-level layout for program parameters layout (id=%u)", impl->Id ());
-
+printf ("%s(%u)\n", __FILE__, __LINE__); fflush (stdout);
     impl->device_layout = LowLevelProgramParametersLayoutPtr (impl->device->CreateProgramParametersLayout (impl->desc), false);                    
-      
+printf ("%s(%u)\n", __FILE__, __LINE__); fflush (stdout);      
     return impl->device_layout;
   }
   catch (xtl::exception& e)

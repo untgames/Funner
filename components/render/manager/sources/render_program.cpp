@@ -536,6 +536,7 @@ const LowLevelProgramPtr& Program::LowLevelProgram ()
       memset (&desc, 0, sizeof (desc));      
       
       desc.name             = shader.Name ();  
+      desc.profile          = shader.Profile ();
       desc.source_code_size = shader.SourceCodeSize ();
       desc.source_code      = shader.SourceCode ();
       desc.options          = options.c_str ();

@@ -260,7 +260,7 @@ EffectRenderer::EffectRenderer (const EffectPtr& effect, const DeviceManagerPtr&
 
         operation = RenderEffectOperationPtr (new RenderEffectOperation (instantiated_effect), false);
       }            
-      else throw xtl::format_operation_exception ("", "Wrong effect operation %u. Operation may have pass or effect", i);
+      else throw xtl::format_operation_exception ("", "Wrong effect operation %u. Operation may have pass or effect", i);     
       
       impl->operations.push_back (operation);      
     }
@@ -294,17 +294,17 @@ void EffectRenderer::AddOperations
     
   RenderPassMap& passes = impl->passes;
     
-  const RendererOperation* operation = operations_desc.operations;
+  const RendererOperation* operation = operations_desc.operations;    
     
   for (size_t i=0, count=operations_desc.operations_count; i!=count; i++, operation++)
   {
-    size_t        tags_count = operation->primitive->tags_count;
+    size_t        tags_count = operation->primitive->tags_count;    
     const size_t* tag        = operation->primitive->tags;
 
     for (size_t j=0; j!=tags_count; j++, tag++)
     {
       stl::pair<RenderPassMap::iterator, RenderPassMap::iterator> range = passes.equal_range (*tag);
-
+      
       for (;range.first!=range.second; ++range.first)
       {
         RenderPass& pass = *range.first->second;
@@ -316,7 +316,7 @@ void EffectRenderer::AddOperations
 
         PassOperation& result_operation = pass.operations.back ();
         
-        pass.operation_ptrs.push_back (&result_operation);
+        pass.operation_ptrs.push_back (&result_operation);        
 
         pass.last_operation = operation;
       }
@@ -379,8 +379,6 @@ void EffectRenderer::RemoveAllOperations ()
       operation.effect->last_frame = 0;
     }
   }
-
-  impl->operations.clear ();
 }
 
 /*
@@ -393,7 +391,8 @@ void EffectRenderer::ExecuteOperations (RenderingContext& context)
   {
     render::low_level::IDevice& device                     = impl->device_manager->Device ();
     ProgramParametersManager&   program_parameters_manager = impl->device_manager->ProgramParametersManager ();
-    ShaderOptionsCache&         frame_shader_options_cache = context.ShaderOptionsCache ();
+    FrameImpl&                  frame                      = context.Frame ();
+    ShaderOptionsCache&         frame_shader_options_cache = frame.ShaderOptionsCache ();
 
     for (RenderEffectOperationArray::iterator iter=impl->operations.begin (), end=impl->operations.end (); iter!=end; ++iter)
     {
@@ -424,7 +423,7 @@ void EffectRenderer::ExecuteOperations (RenderingContext& context)
         if (!pass.color_targets.IsEmpty ())        
         {
           RenderTargetDescPtr desc = context.FindRenderTarget (pass.color_targets [0]);
-
+          
           if (desc && desc->render_target)
           {
             render_target_view = &desc->render_target->View ();
@@ -518,6 +517,18 @@ void EffectRenderer::ExecuteOperations (RenderingContext& context)
         }
         
         //TODO: check scissor enabled???
+        
+          //очистка экрана
+          
+        size_t src_clear_flags = context.Frame ().ClearFlags (), dst_clear_flags = 0;
+        
+        if (src_clear_flags & ClearFlag_RenderTarget) dst_clear_flags |= render::low_level::ClearFlag_RenderTarget;
+        if (src_clear_flags & ClearFlag_Depth)        dst_clear_flags |= render::low_level::ClearFlag_Depth;
+        if (src_clear_flags & ClearFlag_Stencil)      dst_clear_flags |= render::low_level::ClearFlag_Stencil;
+        if (src_clear_flags & ClearFlag_ViewportOnly) dst_clear_flags |= render::low_level::ClearFlag_ViewportOnly;        
+        
+        if (dst_clear_flags)
+          device.ClearViews (dst_clear_flags, (render::low_level::Color4f&)frame.ClearColor (), frame.ClearDepthValue (), frame.ClearStencilIndex ());
                         
           //выполнение операций
 
@@ -526,22 +537,22 @@ void EffectRenderer::ExecuteOperations (RenderingContext& context)
           const PassOperation&     operation                   = **iter;
           const RendererPrimitive& primitive                   = *operation.primitive;
           ShaderOptionsCache&      entity_shader_options_cache = *operation.shader_options_cache;
-          
+printf ("%s(%u)\n", __FILE__, __LINE__); fflush (stdout);          
             //поиск программы (TODO: кэширование поиска по адресам кэшей, FIFO)
             
           Program* program = &*primitive.material->Program ();
-          
+printf ("%s(%u)\n", __FILE__, __LINE__); fflush (stdout);          
           if (!program)
             continue;
-            
+printf ("%s(%u)\n", __FILE__, __LINE__); fflush (stdout);            
           program = &program->DerivedProgram (frame_shader_options_cache, entity_shader_options_cache);
-          
+printf ("%s(%u)\n", __FILE__, __LINE__); fflush (stdout);          
           device.SSSetProgram (program->LowLevelProgram ().get ());
-          
+printf ("%s(%u)\n", __FILE__, __LINE__); fflush (stdout);          
             //применение состояния операции
 
           operation.state_block->Apply ();
-                    
+printf ("%s(%u)\n", __FILE__, __LINE__); fflush (stdout);                    
             //установка локальных текстур
           
           if (program->HasFramemaps ())
@@ -560,18 +571,19 @@ void EffectRenderer::ExecuteOperations (RenderingContext& context)
               //device.SSSetTexture (texmap.channel, ???????);
             }
           }
-                    
+printf ("%s(%u)\n", __FILE__, __LINE__); fflush (stdout);                    
             //установка расположения параметров
             //TODO: кэшировать по entity (FIFO)
 
           ProgramParametersLayoutPtr program_parameters_layout = program_parameters_manager.GetParameters (&pass.parameters_layout, operation.entity_parameters_layout, operation.frame_entity_parameters_layout);
-
+printf ("%s(%u)\n", __FILE__, __LINE__); fflush (stdout);
           device.SSSetProgramParametersLayout (&*program_parameters_layout->DeviceLayout ());
-
+printf ("%s(%u)\n", __FILE__, __LINE__); fflush (stdout);
             //рисование
 
           if (primitive.indexed) device.DrawIndexed (primitive.type, primitive.first, primitive.count, 0); //TODO: media::geometry::Primitive::base_vertex
           else                   device.Draw        (primitive.type, primitive.first, primitive.count);
+printf ("%s(%u)\n", __FILE__, __LINE__); fflush (stdout);          
         }
       }
 

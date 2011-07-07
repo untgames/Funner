@@ -12,6 +12,8 @@
 
 #include <render/manager.h>
 
+#include <math/utility.h>
+
 #include <media/image.h>
 #include <media/rfx/material_library.h>
 
@@ -54,7 +56,6 @@ class Test: private xtl::trackable, private TestLogFilter
       , render_window (CreateRenderWindow ())
     {    
       window.SetTitle (title);
-//      window.Show ();
       
       connect_tracker (window.RegisterEventHandler (syslib::WindowEvent_OnClose, xtl::bind (&Test::OnWindowClose, this)));
     }
@@ -65,9 +66,23 @@ class Test: private xtl::trackable, private TestLogFilter
       return render_manager;
     }
     
+///Получение окна
+    render::Window Window ()
+    {
+      return render_window;
+    }
+    
+///Показ окна
+    void ShowWindow ()
+    {
+      window.Show ();
+    }    
+    
 ///Главный цикл
     int Run ()
     {
+      window.Show ();    
+    
       syslib::Application::Run ();
 
       return syslib::Application::GetExitCode ();
@@ -82,7 +97,7 @@ class Test: private xtl::trackable, private TestLogFilter
     
   private:
 ///Создание окна рендеринга
-    Window CreateRenderWindow ()
+    render::Window CreateRenderWindow ()
     {
       connect_tracker (render_manager.RegisterWindowEventHandler (RenderManagerWindowEvent_OnAdded, xtl::bind (&Test::OnWindowAdded, this, _2)));
       connect_tracker (render_manager.RegisterWindowEventHandler (RenderManagerWindowEvent_OnRemoved, xtl::bind (&Test::OnWindowRemoved, this, _2)));
@@ -96,7 +111,7 @@ class Test: private xtl::trackable, private TestLogFilter
     }
     
 ///Обработка события добавления окна
-    void OnWindowAdded (Window& window)
+    void OnWindowAdded (render::Window& window)
     {
       printf ("window %ux%u added\n", window.Width (), window.Height ());
       
@@ -104,13 +119,13 @@ class Test: private xtl::trackable, private TestLogFilter
     }
     
 ///Обработка события удаления окна
-    void OnWindowRemoved (Window& window)
+    void OnWindowRemoved (render::Window& window)
     {
       printf ("window %ux%u removed\n", window.Width (), window.Height ());
     }
     
 ///Обработка события изменения размеров окна
-    void OnWindowResize (Window& window)
+    void OnWindowResize (render::Window& window)
     {
       printf ("window resize %ux%u\n", window.Width (), window.Height ());
     }
@@ -126,7 +141,7 @@ class Test: private xtl::trackable, private TestLogFilter
   private:
     syslib::Window         window;
     render::RenderManager  render_manager;
-    Window                 render_window;
+    render::Window         render_window;
 };
 
 #endif

@@ -415,6 +415,23 @@ size_t WindowImpl::Height ()
 }
 
 /*
+    Принудительное обновление содержимого окна (обмен буферов)
+*/
+
+void WindowImpl::SwapBuffers ()
+{
+  try
+  {
+    impl->swap_chain->Present ();
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::Window::SwapBuffers");
+    throw;
+  }
+}
+
+/*
     Регистрация обработчиков событий
 */
 

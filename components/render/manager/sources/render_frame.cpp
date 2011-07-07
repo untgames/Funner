@@ -54,7 +54,7 @@ struct EffectHolder: public CacheSource
   {
     try
     {
-      cached_effect = effect.Resource ();
+      cached_effect = effect.Resource ();      
       
       if (!cached_effect)
         return;
@@ -149,6 +149,8 @@ struct FrameImpl::Impl: public CacheHolder
   {
     try
     {
+      effect_holder->UpdateCache ();
+      
       cached_properties = properties.Buffer ();
     }
     catch (xtl::exception& e)
@@ -709,6 +711,8 @@ void FrameImpl::Draw (RenderingContext* previous_context)
 {
   try
   {
+    UpdateCache ();
+    
     RenderingContext context (*this, previous_context);
     
     if (!impl->effect_holder->effect_renderer)

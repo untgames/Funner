@@ -39,6 +39,11 @@ class WindowImpl: public Object, public xtl::trackable
     typedef Window::EventHandler EventHandler;
 
     xtl::connection RegisterEventHandler (WindowEvent event, const EventHandler& handler) const;
+    
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Принудительное обновление содержимого окна (обмен буферов)
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void SwapBuffers ();    
 
   private:
     struct Impl;

@@ -60,6 +60,11 @@ xtl::connection Window::RegisterEventHandler (WindowEvent event, const EventHand
   return impl->RegisterEventHandler (event, handler);
 }
 
+void Window::SwapBuffers ()
+{
+  impl->SwapBuffers ();
+}
+
 void Window::Swap (Window& window)
 {
   stl::swap (impl, window.impl);

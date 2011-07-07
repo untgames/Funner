@@ -16,9 +16,9 @@ class RenderingContext: public xtl::noncopyable
     RenderTargetDescPtr FindRenderTarget (const char* name);
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Кэш опций кадра
+///Фрейм
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    render::ShaderOptionsCache& ShaderOptionsCache () { return frame.ShaderOptionsCache (); }
+    FrameImpl& Frame () { return frame; }
 
   private:
     FrameImpl&        frame;    //кадр

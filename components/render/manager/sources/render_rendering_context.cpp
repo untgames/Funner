@@ -23,6 +23,9 @@ TexturePtr RenderingContext::FindLocalTexture (const char* name)
     
   TexturePtr texture = frame.FindLocalTexture (name);
   
+  if (texture)
+    return texture;
+  
   if (!texture && previous)
     return previous->FindLocalTexture (name);
     
@@ -35,6 +38,9 @@ RenderTargetDescPtr RenderingContext::FindRenderTarget (const char* name)
     return RenderTargetDescPtr ();
     
   RenderTargetDescPtr desc = frame.FindRenderTargetDesc (name);
+  
+  if (desc)
+    return desc;
   
   if (!desc && previous)
     return previous->FindRenderTarget (name);

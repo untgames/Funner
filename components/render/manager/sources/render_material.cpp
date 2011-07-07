@@ -366,7 +366,12 @@ void MaterialImpl::Update (const media::rfx::Material& material)
 
       new_texmaps.push_back (new_texmap);
     }
-
+    
+    TagHashArray new_tag_hashes (material.TagHashes (), material.TagHashes () + material.TagsCount ());
+    
+    if (new_tag_hashes.empty ())
+      impl->log.Printf ("Warning: material '%s' has no tags. Will not be displayed", material.Name ());
+    
     ProgramParametersLayoutPtr new_layout = impl->device_manager->ProgramParametersManager ().GetParameters (ProgramParametersSlot_Material, new_properties.Layout ());
 
     new_program.AttachCacheHolder (*impl);
@@ -378,6 +383,7 @@ void MaterialImpl::Update (const media::rfx::Material& material)
     impl->properties.SetProperties (new_properties);
 
     impl->texmaps.swap (new_texmaps);
+    impl->tags.swap (new_tag_hashes);
 
     impl->material_properties_layout = new_layout;
     impl->cached_state_block         = LowLevelStateBlockPtr ();
