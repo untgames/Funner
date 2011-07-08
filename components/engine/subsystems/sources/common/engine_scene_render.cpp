@@ -73,10 +73,12 @@ class SceneRenderSubsystem : public ISubsystem, public IAttachmentRegistryListen
 
           if (get<bool> (*iter, "IdleRender", true))
           {
-            size_t update_frequency = get<size_t> (*iter, "RenderFrequency", 0);
+            size_t      update_frequency = get<size_t> (*iter, "RenderFrequency", 0);
+            stl::string on_after_update  = get<const char*> (*iter, "OnAfterUpdate", "");
+            stl::string on_before_update = get<const char*> (*iter, "OnBeforeUpdate", "");
 
-            idle_render_targets.push_back (RenderTargetDesc (render.RenderTarget (render_target_index), update_frequency));
-          }
+            idle_render_targets.push_back (RenderTargetDesc (render.RenderTarget (render_target_index), update_frequency, on_before_update, on_after_update));
+          }          
         }
 
         AttachmentRegistry::Attach<render::Screen> (this, AttachmentRegistryAttachMode_ForceNotify);
@@ -204,10 +206,13 @@ class SceneRenderSubsystem : public ISubsystem, public IAttachmentRegistryListen
           //обновление цели рендеринга
           
         iter->last_update_time = current_time;          
-
-        manager.Execute ("lua:RenderTargetUpdated()");                
+        if (!iter->on_before_update.empty ())
+          manager.Execute (iter->on_before_update.c_str ());
 
         iter->target.Update ();
+        
+        if (!iter->on_after_update.empty ())
+          manager.Execute (iter->on_after_update.c_str ());        
         
         size_t end_time = common::milliseconds ();        
         
@@ -230,11 +235,15 @@ class SceneRenderSubsystem : public ISubsystem, public IAttachmentRegistryListen
     struct RenderTargetDesc
     {
       render::RenderTarget target;
+      stl::string          on_before_update;
+      stl::string          on_after_update;
       size_t               update_delay;
       size_t               last_update_time;
       
-      RenderTargetDesc (const render::RenderTarget& in_target, size_t in_update_frequency)
+      RenderTargetDesc (const render::RenderTarget& in_target, size_t in_update_frequency, const stl::string& in_on_before_update, const stl::string& in_on_after_update)
         : target (in_target)
+        , on_before_update (in_on_before_update)
+        , on_after_update (in_on_after_update)
         , update_delay (in_update_frequency ? 1000 / in_update_frequency : 0)
         , last_update_time (0)
       {
