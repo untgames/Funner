@@ -25,23 +25,41 @@
 /* to disable FTP */
 /* #undef CURL_DISABLE_FTP */
 
+/* to disable Gopher */
+/* #undef CURL_DISABLE_GOPHER */
+
 /* to disable HTTP */
 /* #undef CURL_DISABLE_HTTP */
 
+/* to disable IMAP */
+/* #undef CURL_DISABLE_IMAP */
+
 /* to disable LDAP */
-/* #undef CURL_DISABLE_LDAP */
+#define CURL_DISABLE_LDAP 1
 
 /* to disable LDAPS */
 #define CURL_DISABLE_LDAPS 1
 
+/* to disable POP3 */
+/* #undef CURL_DISABLE_POP3 */
+
 /* to disable proxies */
 /* #undef CURL_DISABLE_PROXY */
+
+/* to disable RTSP */
+/* #undef CURL_DISABLE_RTSP */
+
+/* to disable SMTP */
+/* #undef CURL_DISABLE_SMTP */
 
 /* to disable TELNET */
 /* #undef CURL_DISABLE_TELNET */
 
 /* to disable TFTP */
 /* #undef CURL_DISABLE_TFTP */
+
+/* to disable TLS-SRP authentication */
+/* #undef CURL_DISABLE_TLS_SRP */
 
 /* to disable verbose strings */
 /* #undef CURL_DISABLE_VERBOSE_STRINGS */
@@ -52,23 +70,17 @@
 /* to enable hidden symbols */
 /* #undef CURL_HIDDEN_SYMBOLS */
 
-/* W$ LDAP with non-W$ compiler */
-/* #undef CURL_LDAP_HYBRID */
-
-/* Use W$ LDAP implementation */
+/* Use Windows LDAP implementation */
 /* #undef CURL_LDAP_WIN */
 
 /* when not building a shared library */
 /* #undef CURL_STATICLIB */
 
-/* Set to explicitly specify we don't want to use thread-safe functions */
-/* #undef DISABLED_THREADSAFE */
-
 /* your Entropy Gathering Daemon socket pathname */
 /* #undef EGD_SOCKET */
 
 /* Define if you want to enable IPv6 support */
-#define ENABLE_IPV6 1
+/* #undef ENABLE_IPV6 */
 
 /* Define to the type qualifier of arg 1 for getnameinfo. */
 #define GETNAMEINFO_QUAL_ARG1 const
@@ -101,12 +113,12 @@
 #define HAVE_ARPA_INET_H 1
 
 /* Define to 1 if you have the <arpa/tftp.h> header file. */
-#define HAVE_ARPA_TFTP_H 1
+/* #undef HAVE_ARPA_TFTP_H */
 
 /* Define to 1 if you have the <assert.h> header file. */
 #define HAVE_ASSERT_H 1
 
-/* Define to 1 if you have the `basename' function. */
+/* Define to 1 if you have the basename function. */
 #define HAVE_BASENAME 1
 
 /* Define to 1 if bool is an available type. */
@@ -135,6 +147,9 @@
 
 /* Define to 1 if you have the <dlfcn.h> header file. */
 #define HAVE_DLFCN_H 1
+
+/* Define to 1 if you have the `ENGINE_cleanup' function. */
+/* #undef HAVE_ENGINE_CLEANUP */
 
 /* Define to 1 if you have the `ENGINE_load_builtin_engines' function. */
 /* #undef HAVE_ENGINE_LOAD_BUILTIN_ENGINES */
@@ -166,11 +181,26 @@
 /* Define to 1 if you have the freeifaddrs function. */
 #define HAVE_FREEIFADDRS 1
 
+/* Define to 1 if you have the fsetxattr function. */
+#define HAVE_FSETXATTR 1
+
+/* fsetxattr() takes 5 args */
+/* #undef HAVE_FSETXATTR_5 */
+
+/* fsetxattr() takes 6 args */
+#define HAVE_FSETXATTR_6 1
+
 /* Define to 1 if you have the ftruncate function. */
 #define HAVE_FTRUNCATE 1
 
+/* Define to 1 if you have the gai_strerror function. */
+#define HAVE_GAI_STRERROR 1
+
 /* Define to 1 if you have a working getaddrinfo function. */
 #define HAVE_GETADDRINFO 1
+
+/* Define to 1 if the getaddrinfo function is threadsafe. */
+#define HAVE_GETADDRINFO_THREADSAFE 1
 
 /* Define to 1 if you have the `geteuid' function. */
 #define HAVE_GETEUID 1
@@ -240,6 +270,9 @@
 
 /* Define to 1 if you have a working gmtime_r function. */
 #define HAVE_GMTIME_R 1
+
+/* if you have the function gnutls_srp_verifier */
+/* #undef HAVE_GNUTLS_SRP */
 
 /* if you have the gssapi libraries */
 /* #undef HAVE_GSSAPI */
@@ -330,13 +363,16 @@
 /* #undef HAVE_KRB_H */
 
 /* Define to 1 if you have the lber.h header file. */
-#define HAVE_LBER_H 1
+/* #undef HAVE_LBER_H */
 
 /* Define to 1 if you have the ldapssl.h header file. */
 /* #undef HAVE_LDAPSSL_H */
 
 /* Define to 1 if you have the ldap.h header file. */
-#define HAVE_LDAP_H 1
+/* #undef HAVE_LDAP_H */
+
+/* Define to 1 if you have the `ldap_init_fd' function. */
+/* #undef HAVE_LDAP_INIT_FD */
 
 /* Use LDAPS implementation */
 /* #undef HAVE_LDAP_SSL */
@@ -345,7 +381,10 @@
 /* #undef HAVE_LDAP_SSL_H */
 
 /* Define to 1 if you have the `ldap_url_parse' function. */
-#define HAVE_LDAP_URL_PARSE 1
+/* #undef HAVE_LDAP_URL_PARSE */
+
+/* Define to 1 if you have the `gcrypt' library (-lgcrypt). */
+/* #undef HAVE_LIBGCRYPT */
 
 /* Define to 1 if you have the <libgen.h> header file. */
 #define HAVE_LIBGEN_H 1
@@ -359,11 +398,26 @@
 /* Define to 1 if you have the `resolve' library (-lresolve). */
 /* #undef HAVE_LIBRESOLVE */
 
+/* Define to 1 if you have the <librtmp/rtmp.h> header file. */
+/* #undef HAVE_LIBRTMP_RTMP_H */
+
 /* Define to 1 if you have the `ssh2' library (-lssh2). */
 /* #undef HAVE_LIBSSH2 */
 
+/* Define to 1 if you have the `libssh2_exit' function. */
+/* #undef HAVE_LIBSSH2_EXIT */
+
 /* Define to 1 if you have the <libssh2.h> header file. */
 /* #undef HAVE_LIBSSH2_H */
+
+/* Define to 1 if you have the `libssh2_init' function. */
+/* #undef HAVE_LIBSSH2_INIT */
+
+/* Define to 1 if you have the `libssh2_scp_send64' function. */
+/* #undef HAVE_LIBSSH2_SCP_SEND64 */
+
+/* Define to 1 if you have the `libssh2_session_handshake' function. */
+/* #undef HAVE_LIBSSH2_SESSION_HANDSHAKE */
 
 /* Define to 1 if you have the `libssh2_version' function. */
 /* #undef HAVE_LIBSSH2_VERSION */
@@ -394,6 +448,9 @@
 
 /* Define to 1 if you have the memory.h header file. */
 #define HAVE_MEMORY_H 1
+
+/* Define to 1 if you have the memrchr function or macro. */
+/* #undef HAVE_MEMRCHR */
 
 /* Define to 1 if you have the MSG_NOSIGNAL flag. */
 /* #undef HAVE_MSG_NOSIGNAL */
@@ -465,6 +522,9 @@
 /* Define to 1 if you have a working POSIX-style strerror_r function. */
 #define HAVE_POSIX_STRERROR_R 1
 
+/* if you have <pthread.h> */
+/* #undef HAVE_PTHREAD_H */
+
 /* Define to 1 if you have the <pwd.h> header file. */
 #define HAVE_PWD_H 1
 
@@ -511,7 +571,7 @@
 /* #undef HAVE_SETSOCKOPT_SO_NONBLOCK */
 
 /* Define to 1 if you have the <sgtty.h> header file. */
-#define HAVE_SGTTY_H 1
+/* #undef HAVE_SGTTY_H */
 
 /* Define to 1 if you have the sigaction function. */
 #define HAVE_SIGACTION 1
@@ -535,7 +595,7 @@
 /* #undef HAVE_SIG_ATOMIC_T_VOLATILE */
 
 /* Define to 1 if struct sockaddr_in6 has the sin6_scope_id member */
-#define HAVE_SOCKADDR_IN6_SIN6_SCOPE_ID 1
+/* #undef HAVE_SOCKADDR_IN6_SIN6_SCOPE_ID */
 
 /* Define to 1 if you have the socket function. */
 #define HAVE_SOCKET 1
@@ -545,6 +605,9 @@
 
 /* Define this if you have the SPNEGO library fbopenssl */
 /* #undef HAVE_SPNEGO */
+
+/* if you have the function SRP_Calc_client_key */
+/* #undef HAVE_SSLEAY_SRP */
 
 /* Define to 1 if you have the `SSL_get_shutdown' function. */
 /* #undef HAVE_SSL_GET_SHUTDOWN */
@@ -663,6 +726,9 @@
 /* Define to 1 if you have the <sys/utime.h> header file. */
 /* #undef HAVE_SYS_UTIME_H */
 
+/* Define to 1 if you have the <sys/xattr.h> header file. */
+#define HAVE_SYS_XATTR_H 1
+
 /* Define to 1 if you have the <termios.h> header file. */
 #define HAVE_TERMIOS_H 1
 
@@ -712,7 +778,7 @@
 /* #undef HAVE_WINSOCK_H */
 
 /* Define this symbol if your OS supports changing the contents of argv */
-#define HAVE_WRITABLE_ARGV 1
+/* #undef HAVE_WRITABLE_ARGV */
 
 /* Define to 1 if you have the writev function. */
 #define HAVE_WRITEV 1
@@ -733,9 +799,6 @@
 /* Define to 1 if you are building a native Windows target. */
 /* #undef NATIVE_WINDOWS */
 
-/* If you lack a fine basename() prototype */
-/* #undef NEED_BASENAME_PROTO */
-
 /* Define to 1 if you need the lber.h header file even with ldap.h */
 /* #undef NEED_LBER_H */
 
@@ -748,29 +811,38 @@
 /* Define to 1 if _REENTRANT preprocessor symbol must be defined. */
 /* #undef NEED_REENTRANT */
 
+/* Define to 1 if _THREAD_SAFE preprocessor symbol must be defined. */
+/* #undef NEED_THREAD_SAFE */
+
 /* cpu-machine-OS */
-#define OS "i386-apple-darwin9.7.0"
+#define OS "arm-apple-darwin10"
 
 /* Name of package */
 #define PACKAGE "curl"
 
 /* Define to the address where bug reports for this package should be sent. */
-/* #undef PACKAGE_BUGREPORT */
+#define PACKAGE_BUGREPORT "a suitable curl mailing list: http://curl.haxx.se/mail/"
 
 /* Define to the full name of this package. */
 #define PACKAGE_NAME "curl"
 
 /* Define to the full name and version of this package. */
-/* #undef PACKAGE_STRING */
+#define PACKAGE_STRING "curl -"
 
 /* Define to the one symbol short name of this package. */
-/* #undef PACKAGE_TARNAME */
+#define PACKAGE_TARNAME "curl"
+
+/* Define to the home page for this package. */
+#define PACKAGE_URL ""
 
 /* Define to the version of this package. */
-/* #undef PACKAGE_VERSION */
+#define PACKAGE_VERSION "-"
 
 /* a suitable file to read random data from */
 /* #undef RANDOM_FILE */
+
+/* Define to the type qualifier pointed by arg 5 for recvfrom. */
+#define RECVFROM_QUAL_ARG5 
 
 /* Define to the type of arg 1 for recvfrom. */
 #define RECVFROM_TYPE_ARG1 int
@@ -862,6 +934,9 @@
 /* The size of `off_t', as computed by sizeof. */
 #define SIZEOF_OFF_T 8
 
+/* The size of `short', as computed by sizeof. */
+#define SIZEOF_SHORT 2
+
 /* The size of `size_t', as computed by sizeof. */
 #define SIZEOF_SIZE_T 4
 
@@ -880,14 +955,23 @@
 /* Define to 1 if you can safely include both <sys/time.h> and <time.h>. */
 #define TIME_WITH_SYS_TIME 1
 
-/* Define if you want to enable c-ares support */
+/* Define to enable c-ares support */
 /* #undef USE_ARES */
+
+/* if axTLS is enabled */
+/* #undef USE_AXTLS */
 
 /* Define to disable non-blocking sockets. */
 /* #undef USE_BLOCKING_SOCKETS */
 
+/* if CyaSSL is enabled */
+/* #undef USE_CYASSL */
+
 /* if GnuTLS is enabled */
 /* #undef USE_GNUTLS */
+
+/* if librtmp is in use */
+/* #undef USE_LIBRTMP */
 
 /* if libSSH2 is in use */
 /* #undef USE_LIBSSH2 */
@@ -898,15 +982,31 @@
 /* if NSS is enabled */
 /* #undef USE_NSS */
 
+/* Use OpenLDAP-specific code */
+/* #undef USE_OPENLDAP */
+
 /* if OpenSSL is in use */
 /* #undef USE_OPENSSL */
+
+/* if PolarSSL is enabled */
+/* #undef USE_POLARSSL */
 
 /* if SSL is enabled */
 /* #undef USE_SSLEAY */
 
+/* if you want POSIX threaded DNS lookup */
+/* #undef USE_THREADS_POSIX */
+
+/* Use TLS-SRP authentication */
+/* #undef USE_TLS_SRP */
+
+/* Define to 1 if you are building a Windows target with large file support.
+   */
+/* #undef USE_WIN32_LARGE_FILES */
+
 /* Define to 1 if you are building a Windows target without large file
    support. */
-/* #undef USE_WIN32_LARGE_FILES */
+/* #undef USE_WIN32_SMALL_FILES */
 
 /* to enable SSPI support */
 /* #undef USE_WINDOWS_SSPI */
@@ -915,7 +1015,7 @@
 /* #undef USE_YASSLEMUL */
 
 /* Version number of package */
-#define VERSION "7.19.6"
+#define VERSION "-"
 
 /* Define to avoid automatic inclusion of winsock.h */
 /* #undef WIN32_LEAN_AND_MEAN */
@@ -930,9 +1030,6 @@
 
 /* Define for large files, on AIX-style hosts. */
 /* #undef _LARGE_FILES */
-
-/* define this if you need it to compile thread-safe code */
-/* #undef _THREAD_SAFE */
 
 /* Define to empty if `const' does not conform to ANSI C. */
 /* #undef const */
