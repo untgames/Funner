@@ -11,7 +11,11 @@
 #include <xtl/common_exceptions.h>
 #include <xtl/function.h>
 
+#include <common/component.h>
+#include <common/file.h>
 #include <common/log.h>
+#include <common/strlib.h>
+#include <common/xml_writer.h>
 
 #include <syslib/application_delegate.h>
 #include <syslib/timer.h>

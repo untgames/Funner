@@ -76,6 +76,7 @@ typedef stl::vector <IWindowListener*> ListenerArray;
     WindowEventContext *event_context;        //контекст, передаваемый обработчикам событий
     UIViewController   *root_view_controller; //корневой контроллер
     int                allowed_orientations;  //разрешенные ориентации окна
+    bool               has_ios_4_0;           //версия операционной системы >= 4.0
 }
 
 @property (nonatomic, assign) WindowImpl* window_impl;
@@ -216,7 +217,7 @@ typedef stl::vector <IWindowListener*> ListenerArray;
 
 -(CGFloat)contentScaleFactor
 {
-  if ([[[UIDevice currentDevice] systemVersion] compare:@"4.0" options:NSNumericSearch] != NSOrderedAscending)
+  if (has_ios_4_0)
     return super.contentScaleFactor;
 
   return 1;
@@ -250,6 +251,7 @@ typedef stl::vector <IWindowListener*> ListenerArray;
     return nil;
 
   allowed_orientations = InterfaceOrientation_Portrait;
+  has_ios_4_0          = [[[UIDevice currentDevice] systemVersion] compare:@"4.0" options:NSNumericSearch] != NSOrderedAscending;
 
   try
   {
