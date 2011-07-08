@@ -3,6 +3,8 @@
 using namespace render;
 using namespace render::low_level;
 
+//TODO: FlushUnusedMaterials issue needs to be fixed, crash
+
 namespace
 {
 
