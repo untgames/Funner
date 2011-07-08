@@ -37,10 +37,11 @@ class SceneRenderSubsystem : public ISubsystem, public IAttachmentRegistryListen
 {
   public:
 ///Конструктор
-    SceneRenderSubsystem (common::ParseNode& node)
+    SceneRenderSubsystem (common::ParseNode& node, SubsystemManager& in_manager)
       : log (LOG_NAME),
         render (get<const char*> (node, "DriverMask"), get<const char*> (node, "RendererMask"), get<const char*> (node, "RenderPathMasks", "*")),
-        idle_connection (syslib::Application::RegisterEventHandler (syslib::ApplicationEvent_OnIdle, xtl::bind (&SceneRenderSubsystem::OnIdle, this)))
+        idle_connection (syslib::Application::RegisterEventHandler (syslib::ApplicationEvent_OnIdle, xtl::bind (&SceneRenderSubsystem::OnIdle, this))),
+        manager (in_manager)
     {
       try
       {
@@ -201,10 +202,16 @@ class SceneRenderSubsystem : public ISubsystem, public IAttachmentRegistryListen
         }
 
           //обновление цели рендеринга
+          
+        iter->last_update_time = current_time;          
+
+        manager.Execute ("lua:RenderTargetUpdated()");                
 
         iter->target.Update ();
         
-        iter->last_update_time = current_time;
+        size_t end_time = common::milliseconds ();        
+        
+        iter->last_update_time -= (end_time - current_time);
 
         ++iter;
       }
@@ -244,6 +251,7 @@ class SceneRenderSubsystem : public ISubsystem, public IAttachmentRegistryListen
     ScreenMap                                        screen_map;          //соответствие экранов и рендер-таргетов
     xtl::auto_connection                             idle_connection;     //соединение обновления рендер-таргетов
     RenderTargetArray                                idle_render_targets; //список автоматически обновляемых целей рендеринга
+    SubsystemManager&                                manager;
 };
 
 /*
@@ -263,7 +271,7 @@ class SceneRenderComponent
     {
       try
       {
-        xtl::com_ptr<SceneRenderSubsystem> subsystem (new SceneRenderSubsystem (node), false);
+        xtl::com_ptr<SceneRenderSubsystem> subsystem (new SceneRenderSubsystem (node, manager), false);
 
         manager.Add (SUBSYSTEM_NAME, subsystem.get ());
       }
