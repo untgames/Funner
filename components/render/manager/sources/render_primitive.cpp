@@ -65,7 +65,7 @@ struct MeshPrimitive: public xtl::reference_counter, public CacheHolder
       
       cached_material = material.Resource ();
       
-      LowLevelStateBlockPtr material_state_block = cached_material ? cached_material->StateBlock ().get () : (render::low_level::IStateBlock*)0;
+      LowLevelStateBlockPtr material_state_block = cached_material ? cached_material->StateBlock () : LowLevelStateBlockPtr ();
       
       render::low_level::IDevice& device = common_data.device_manager->Device ();
         
@@ -73,7 +73,7 @@ struct MeshPrimitive: public xtl::reference_counter, public CacheHolder
 
       if (material_state_block)
       {
-        material_state_block->Apply ();                
+        material_state_block->Apply ();
         material_state_block->GetMask (mask);
       }
         

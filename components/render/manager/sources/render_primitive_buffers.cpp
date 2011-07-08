@@ -166,7 +166,7 @@ LowLevelBufferPtr PrimitiveBuffersImpl::CreateVertexStream (const media::geometr
         throw xtl::make_argument_exception ("", "usage", usage);
     }
     
-    LowLevelBufferPtr buffer (impl->device_manager->Device ().CreateBuffer (desc), false);
+    LowLevelBufferPtr buffer (impl->device_manager->Device ().CreateBuffer (desc), false);    
 
     buffer->SetData (0, desc.size, vs.Data ());
     
@@ -255,7 +255,7 @@ LowLevelBufferPtr PrimitiveBuffersImpl::CreateIndexBuffer (const media::geometry
     
     LowLevelBufferPtr buffer (impl->device_manager->Device ().CreateBuffer (desc), false);
 
-    buffer->SetData (0, desc.size, ib.Data ());
+    buffer->SetData (0, desc.size, ib.Data ());    
     
     if (impl->cache_state)
       impl->index_buffers_cache.insert_pair (ib.Id (), buffer);

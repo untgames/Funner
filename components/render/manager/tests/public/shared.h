@@ -6,9 +6,11 @@
 
 #include <xtl/bind.h>
 #include <xtl/function.h>
+#include <xtl/ref.h>
 #include <xtl/trackable.h>
 
 #include <common/log.h>
+#include <common/time.h>
 
 #include <render/manager.h>
 
@@ -41,7 +43,7 @@ struct TestLogFilter
   TestLogFilter (bool logging)
   {
     if (logging)
-      log_filter = stl::auto_ptr<common::LogFilter> (new common::LogFilter ("*", &log_print));
+      log_filter = stl::auto_ptr<common::LogFilter> (new common::LogFilter ("render.manager*", &log_print));
   }
 };
 

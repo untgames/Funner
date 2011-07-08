@@ -589,7 +589,7 @@ class EffectLoader
 ///Разбор прохода рендеринга
     static SortMode ParseSortMode (const ParseNode& node)
     {
-      const char* value = get<const char*> (node, "", "default");
+      const char* value = get<const char*> (node, "sort", "default");
 
       if (!xtl::xstrcmp (value, "default"))       return SortMode_Default;
       if (!xtl::xstrcmp (value, "states"))        return SortMode_StateSwitch;
@@ -600,6 +600,27 @@ class EffectLoader
       raise_parser_exception (node, "Unexpected sort mode '%s'", value);
       
       return SortMode_Default;      
+    }
+    
+    static render::ClearFlag ParseClearFlags (const ParseNode& node, const char* node_name)
+    {
+      size_t flags = render::ClearFlag_ViewportOnly;
+      
+      for (Parser::AttributeIterator params_iter = make_attribute_iterator (node.First (node_name)); params_iter; ++params_iter)      
+      {
+        if      (!xtl::xstrcmp (*params_iter, "render_targets"))       flags |= render::ClearFlag_RenderTarget;
+        else if (!xtl::xstrcmp (*params_iter, "depth_stencil_target")) flags |= render::ClearFlag_DepthStencil;
+        else if (!xtl::xstrcmp (*params_iter, "depth"))                flags |= render::ClearFlag_Depth;
+        else if (!xtl::xstrcmp (*params_iter, "stencil"))              flags |= render::ClearFlag_Stencil;
+        else if (!xtl::xstrcmp (*params_iter, "color"))                flags |= render::ClearFlag_RenderTarget;
+        else if (!xtl::xstrcmp (*params_iter, "all"))                  flags |= render::ClearFlag_All;
+        else
+        {
+          raise_parser_exception (node, "Unknown clear flag '%s'", *params_iter);
+        }
+      }
+      
+      return (render::ClearFlag)flags;
     }
 
     void ParseNamedPass (Parser::Iterator iter)
@@ -620,6 +641,7 @@ class EffectLoader
         common::StringArray tags                     = ParseTags (*iter, "tags");
         common::StringArray color_targets            = ParseTags (*iter, "color_targets", false);
         SortMode            sort_mode                = ParseSortMode (*iter);
+        render::ClearFlag   clear_flags              = ParseClearFlags (*iter, "clear");        
         const char*         depth_stencil_target     = get<const char*> (*iter, "depth_stencil_target", "null");
         const char*         depth_stencil_state_name = get<const char*> (*iter, "depth_stencil_state", "");
         const char*         blend_state_name         = get<const char*> (*iter, "blend_state", "");
@@ -638,6 +660,7 @@ class EffectLoader
         pass->SetBlendState         (blend_state);
         pass->SetDepthStencilState  (depth_stencil_state);
         pass->SetRasterizerState    (rasterizer_state);
+        pass->SetClearFlags         (clear_flags);
         
         if (ParseNode depth_range_node = iter->First ("depth_range"))
         {

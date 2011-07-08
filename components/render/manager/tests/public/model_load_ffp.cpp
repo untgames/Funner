@@ -19,6 +19,51 @@ math::mat4f get_ortho_proj (float left, float right, float bottom, float top, fl
   return proj_matrix;
 }
 
+void idle (Test& test, Entity& entity, Frame& frame)
+{
+  static size_t last = 0;
+  static float angle;
+
+  static size_t last_fps = 0;
+  static size_t frames_count = 0;
+
+  float dt = float (common::milliseconds () - last) / 1000.f;
+
+  if (common::milliseconds () - last > 25)
+  {
+    last = common::milliseconds ();
+    return;
+  }
+
+  if (common::milliseconds () - last_fps > 1000)
+  {
+    printf ("FPS: %.2f\n", float (frames_count)/float (common::milliseconds () - last_fps)*1000.f);
+
+    last_fps = common::milliseconds ();
+    frames_count = 0;
+    return;
+  }
+  
+  frames_count++;
+  
+  common::PropertyMap frame_properties = frame.Properties ();
+  common::PropertyMap entity_properties = entity.Properties ();  
+
+  angle += 0.5f*dt;
+  
+  entity_properties.SetProperty ("myObjectMatrix", math::rotate (math::radian (angle), math::vec3f (0, 0, 1)) *
+    math::rotate (math::radian (angle*0.2f), math::vec3f (1, 0, 0)));
+    
+  math::vec3f light_pos = math::vec3f (40 * cos (angle), 40 * sin (angle), 0.0f);
+    
+  frame_properties.SetProperty ("lightPos", light_pos);
+  frame_properties.SetProperty ("lightDir", -math::normalize (light_pos));
+
+  frame.Draw ();
+    
+  test.Window ().SwapBuffers ();
+}
+
 int main ()
 {
   printf ("Results of model_load_ffp_test:\n");
@@ -41,7 +86,7 @@ int main ()
     
     RectArea viewport;
     
-    viewport.SetRect (0, 0, 400, 300);
+    viewport.SetRect (0, 0, test.Window ().ColorBuffer ().Width (), test.Window ().ColorBuffer ().Height ());
         
     frame.SetRenderTarget ("main_color_target", test.Window ().ColorBuffer (), viewport);
     frame.SetRenderTarget ("main_depth_stencil_target", test.Window ().DepthStencilBuffer ());
@@ -59,10 +104,8 @@ int main ()
     
     test.ShowWindow ();
     
-    frame.Draw ();
-    
-    test.Window ().SwapBuffers ();
-        
+    syslib::Application::RegisterEventHandler (syslib::ApplicationEvent_OnIdle, xtl::bind (&idle, xtl::ref (test), xtl::ref (entity), xtl::ref (frame)));
+            
     return test.Run ();
   }
   catch (std::exception& e)

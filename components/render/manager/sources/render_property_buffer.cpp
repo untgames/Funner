@@ -75,10 +75,7 @@ void PropertyBuffer::OnPropertiesUpdated ()
     
   impl->need_update = true;    
     
-  bool need_recreate_buffer = impl->properties.BufferSize () > impl->cached_buffer_size;
-  
-  if (need_recreate_buffer)
-    ResetCache ();
+  ResetCache ();
 }
 
 /*
@@ -93,6 +90,26 @@ const LowLevelBufferPtr& PropertyBuffer::Buffer ()
       return impl->buffer;
 
     UpdateCache ();
+        
+    return impl->buffer;
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::PropertyBuffer::Buffer");
+    throw;
+  }
+}
+
+/*
+    Обновление кэша
+*/
+
+void PropertyBuffer::UpdateCacheCore ()
+{
+  try
+  {
+    if (!impl->need_update)
+      return;
     
     size_t buffer_size = impl->properties.BufferSize ();
     
@@ -117,13 +134,11 @@ const LowLevelBufferPtr& PropertyBuffer::Buffer ()
     
     impl->buffer->SetData (0, buffer_size, impl->properties.BufferData ());
     
-    impl->need_update = false;
-    
-    return impl->buffer;
+    impl->need_update = false;    
   }
   catch (xtl::exception& e)
   {
-    e.touch ("render::PropertyBuffer::Buffer");
+    e.touch ("render::PropertyBuffer::UpdateCacheCore");
     throw;
   }
 }

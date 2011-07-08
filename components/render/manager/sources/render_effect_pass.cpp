@@ -21,6 +21,7 @@ struct EffectPass::Impl
   bool                         state_block_need_update; //блок состояний требует обновления
   float                        viewport_min_depth;      //минимальное значение глубины области вывода
   float                        viewport_max_depth;      //максимальное значение глубины области вывода
+  size_t                       clear_flags;             //флаги очистки
   common::StringArray          tags;                    //тэги прохода
   TagHashArray                 tag_hashes;              //хэши тэгов  
   
@@ -31,6 +32,7 @@ struct EffectPass::Impl
     , state_block_need_update (true)
     , viewport_min_depth (0.0f)
     , viewport_max_depth (1.0f)
+    , clear_flags (ClearFlag_ViewportOnly)
   {
     try
     {
@@ -267,4 +269,18 @@ void EffectPass::SetViewportMinDepth (float value)
 void EffectPass::SetViewportMaxDepth (float value)
 {
   impl->viewport_max_depth = value;
+}
+
+/*
+    Флаги очистки
+*/
+
+void EffectPass::SetClearFlags (size_t clear_flags)
+{
+  impl->clear_flags = clear_flags;
+}
+
+size_t EffectPass::ClearFlags ()
+{
+  return impl->clear_flags;
 }

@@ -101,6 +101,7 @@ struct RenderPass: public xtl::reference_counter
   ProgramParametersLayout  parameters_layout;     //расположение параметров
   float                    viewport_min_depth;    //минимальное значение глубины области вывода
   float                    viewport_max_depth;    //максимальное значение глубины области вывода
+  size_t                   clear_flags;           //флаги очистки экрана
   OperationArray           operations;            //операции рендеринга
   OperationPtrArray        operation_ptrs;        //указатели на операции
   const RendererOperation* last_operation;        //последняя добавленная операция
@@ -111,6 +112,7 @@ struct RenderPass: public xtl::reference_counter
     , parameters_layout (&device_manager->Device (), &device_manager->Settings ())
     , viewport_min_depth (0.0f)
     , viewport_max_depth (1.0f)
+    , clear_flags (ClearFlag_All)
     , last_operation (0)
   {
     operations.reserve (RESERVE_OPERATION_ARRAY);
@@ -241,6 +243,7 @@ EffectRenderer::EffectRenderer (const EffectPtr& effect, const DeviceManagerPtr&
         pass->state_block          = src_pass->StateBlock ();
         pass->viewport_min_depth   = src_pass->ViewportMinDepth ();
         pass->viewport_max_depth   = src_pass->ViewportMaxDepth ();
+        pass->clear_flags          = src_pass->ClearFlags ();
 
         if (parent_layout)
           pass->parameters_layout.Attach (*parent_layout);
@@ -521,7 +524,7 @@ void EffectRenderer::ExecuteOperations (RenderingContext& context)
         
           //очистка экрана
           
-        size_t src_clear_flags = context.Frame ().ClearFlags (), dst_clear_flags = 0;
+        size_t src_clear_flags = context.Frame ().ClearFlags () & pass.clear_flags, dst_clear_flags = 0;
         
         if (src_clear_flags & ClearFlag_RenderTarget) dst_clear_flags |= render::low_level::ClearFlag_RenderTarget;
         if (src_clear_flags & ClearFlag_Depth)        dst_clear_flags |= render::low_level::ClearFlag_Depth;
@@ -535,7 +538,7 @@ void EffectRenderer::ExecuteOperations (RenderingContext& context)
           
         device.SSSetConstantBuffer (ProgramParametersSlot_Frame, frame_property_buffer.get ());
                         
-          //выполнение операций
+          //выполнение операций                    
 
         for (OperationPtrArray::iterator iter=pass.operation_ptrs.begin (), end=pass.operation_ptrs.end (); iter!=end; ++iter)
         {
@@ -556,7 +559,12 @@ void EffectRenderer::ExecuteOperations (RenderingContext& context)
 
             //применение состояния операции
 
+          primitive.state_block->Apply ();
           operation.state_block->Apply ();
+          
+          render::low_level::StateBlockMask mask;      
+          
+          primitive.state_block->GetMask (mask);          
           
             //установка локальных текстур
           

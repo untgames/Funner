@@ -94,7 +94,7 @@ class EntityLodCommonData: public CacheHolder, public DebugIdHolder
       if (!material->HasDynamicTextures ())
       {        
         if (properties.Properties ().Size () == 0)
-          return material->StateBlock ();
+          return LowLevelStateBlockPtr ();
           
         return default_state_block;
       }
@@ -173,14 +173,15 @@ class EntityLodCommonData: public CacheHolder, public DebugIdHolder
       {
         if (device_manager->Settings ().HasDebugLog ())
           Log ().Printf ("Update entity cache (id=%u)", Id ());
-        
-        FlushUnusedMaterials ();
-
+        printf ("%s(%u)\n", __FILE__, __LINE__); fflush (stdout);
+//        FlushUnusedMaterials ();!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!TODO!!!!!!!!!!!!!!!!!!!!!!11
+        printf ("%s(%u)\n", __FILE__, __LINE__); fflush (stdout);
         dynamic_textures.FlushUnusedTextures ();
-        
+        printf ("%s(%u)\n", __FILE__, __LINE__); fflush (stdout);        
         device_manager->Device ().SSSetConstantBuffer (ProgramParametersSlot_Entity, properties.Buffer ().get ());
-        
+        printf ("%s(%u)\n", __FILE__, __LINE__); fflush (stdout);        
         default_state_block->Capture ();
+        printf ("%s(%u)\n", __FILE__, __LINE__); fflush (stdout);        
       }
       catch (xtl::exception& e)
       {
@@ -740,6 +741,7 @@ const RendererOperationList& EntityImpl::RendererOperations (size_t level_of_det
     if (!lod)
       throw xtl::make_argument_exception ("", "level_of_detail", level_of_detail, "Lod primitive is not set");
       
+    impl->Properties ().UpdateCache ();
     lod->UpdateCache ();
 
     return lod->cached_operation_list;
@@ -757,6 +759,8 @@ const RendererOperationList& EntityImpl::RendererOperations (size_t level_of_det
 
 void EntityImpl::UpdateCache ()
 {
+  impl->Properties ().UpdateCache ();
+
   impl->UpdateCache ();
   
   for (EntityLodArray::iterator iter=impl->lods.begin (), end=impl->lods.end (); iter!=end; ++iter)
@@ -765,6 +769,8 @@ void EntityImpl::UpdateCache ()
 
 void EntityImpl::ResetCache ()
 {
+  impl->Properties ().ResetCache ();
+
   impl->ResetCache ();
   
   for (EntityLodArray::iterator iter=impl->lods.begin (), end=impl->lods.end (); iter!=end; ++iter)
