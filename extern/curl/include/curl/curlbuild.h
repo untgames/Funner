@@ -523,6 +523,24 @@
 #  define CURL_SIZEOF_CURL_SOCKLEN_T 4
 
 /* ===================================== */
+/*    ARM                                */
+/* ===================================== */
+
+#elif defined(ARM)
+#  define CURL_SIZEOF_LONG           4
+#  define CURL_TYPEOF_CURL_OFF_T     long long
+#  define CURL_FORMAT_CURL_OFF_T     "lld"
+#  define CURL_FORMAT_CURL_OFF_TU    "llu"
+#  define CURL_FORMAT_OFF_T          "%lld"
+#  define CURL_SIZEOF_CURL_OFF_T     8
+#  define CURL_SUFFIX_CURL_OFF_T     LL
+#  define CURL_SUFFIX_CURL_OFF_TU    ULL
+#  define CURL_TYPEOF_CURL_SOCKLEN_T socklen_t
+#  define CURL_SIZEOF_CURL_SOCKLEN_T 4
+#  define CURL_PULL_SYS_TYPES_H      1
+#  define CURL_PULL_SYS_SOCKET_H     1
+
+/* ===================================== */
 /*    KEEP GENERIC GCC THE LAST ENTRY    */
 /* ===================================== */
 
