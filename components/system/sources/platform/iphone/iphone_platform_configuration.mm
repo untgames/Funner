@@ -30,6 +30,7 @@ class PlatformConfigurationComponent
 
         NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
 
+        SaveProperty (writer, "OS", "ios");
         SaveProperty (writer, "Platform", UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad ? "ipad" : "iphone");
         SaveProperty (writer, "Language", [((NSString*)[[NSLocale preferredLanguages] objectAtIndex:0]) UTF8String]);
 

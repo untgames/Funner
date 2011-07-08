@@ -647,7 +647,7 @@ void IPhoneWindowManager::SetWindowFlag (window_t handle, WindowFlag flag, bool 
 
         break;
       case WindowFlag_Maximized:
-        wnd.frame = [UIScreen mainScreen].applicationFrame;
+        wnd.bounds = [UIScreen mainScreen].applicationFrame;
         break;
       case WindowFlag_Minimized:
         throw xtl::format_operation_exception ("", "Can't minimize window");
@@ -677,7 +677,14 @@ bool IPhoneWindowManager::GetWindowFlag (window_t handle, WindowFlag flag)
       case WindowFlag_Focus:
         return wnd.rootViewController.view.userInteractionEnabled == YES;
       case WindowFlag_Maximized:
-        return CGRectEqualToRect (wnd.frame, [UIScreen mainScreen].applicationFrame);
+      {
+        CGRect maximized_rect = [UIScreen mainScreen].applicationFrame;
+
+        maximized_rect.origin.x = 0;
+        maximized_rect.origin.y = 0;
+
+        return CGRectEqualToRect (wnd.frame, maximized_rect);
+      }
       case WindowFlag_Minimized:
         throw xtl::format_operation_exception ("", "Can't get window flag %d value", flag);
       default:
