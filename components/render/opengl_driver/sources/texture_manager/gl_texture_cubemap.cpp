@@ -74,8 +74,13 @@ TextureCubemap::TextureCubemap  (const ContextManager& manager, const TextureDes
     //настройка расположения данных в буфере    
 
   glPixelStorei (GL_UNPACK_ALIGNMENT,   1);    //выравнивание начала строк
+
+#ifndef OPENGL_ES_SUPPORT
+
   glPixelStorei (GL_UNPACK_SKIP_ROWS,   0);    //количество пропускаемых строк
   glPixelStorei (GL_UNPACK_SKIP_PIXELS, 0);    //количество пропускаемых пикселей
+
+#endif
 
     //создание mip-уровней
     
@@ -109,8 +114,12 @@ TextureCubemap::TextureCubemap  (const ContextManager& manager, const TextureDes
       }
       else
       {
+#ifndef OPENGL_ES_SUPPORT
+
         glPixelStorei (GL_UNPACK_ROW_LENGTH, level_desc.width); //длина строки в пикселях (для нулевого mip-уровня)
         
+#endif
+
         if (is_compressed_data && level_data.data)
         {
           unpack_dxt (tex_desc.format, level_desc.width, level_desc.height, level_data.data, unpacked_buffer.data ());
