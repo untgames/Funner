@@ -1,0 +1,23 @@
+Results of program_parameters_layout_test:
+render.manager: Creating render window
+render.manager: Create device manager (driver='*', adapter='*', init_string='')
+render.manager: ...device manager and swap chain have been successfully created
+render.manager: Initialize render targets for swap chain
+render.manager: ...render targets for swap chain created
+window 784x562 added
+render.manager: Program parameters layout created (id=1)
+render.manager: Updating program parameters layout with 0 parameters (id=1):
+render.manager: ...program parameters layout updated (hash=ffffffff)
+render.manager: Creating low-level layout for program parameters layout (id=1)
+render.manager: Program parameters layout created (id=2)
+render.manager: Updating program parameters layout with 5 parameters (id=2):
+render.manager: ...slot[3]: hash=99d5bc85, parameters_count=5
+render.manager: ......name='A', type=integer, offset=0
+render.manager: ......name='B', type=vector, offset=4
+render.manager: ......name='C', type=matrix, offset=20
+render.manager: ......name='D', type=float, offset=84
+render.manager: ...program parameters layout updated (hash=2b3ecb4e)
+render.manager: Creating low-level layout for program parameters layout (id=2)
+render.manager: Program parameters layout destroyed (id=2)
+render.manager: Program parameters layout destroyed (id=1)
+window 784x562 removed

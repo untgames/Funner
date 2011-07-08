@@ -55,6 +55,7 @@ struct ShaderOptionsCache::Impl: public xtl::trackable
     : properties_update_handler (xtl::bind (&Impl::OnPropertiesUpdate, this))
     , need_invalidate_cache (false)
   {
+    on_properties_update  = properties.RegisterEventHandler (common::PropertyMapEvent_OnUpdate, properties_update_handler); 
   }
   
 ///Обработчик события обновления свойств

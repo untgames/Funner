@@ -28,8 +28,7 @@ struct PropertyBuffer::Impl
     , need_update (true)
     , cached_buffer_size (0)
   {
-  }
-  
+  }  
 };
 
 /*
@@ -39,6 +38,7 @@ struct PropertyBuffer::Impl
 PropertyBuffer::PropertyBuffer (const DeviceManagerPtr& device_manager)
   : impl (new Impl (device_manager))
 {
+  impl->update_connection = impl->properties.RegisterEventHandler (PropertyMapEvent_OnUpdate, xtl::bind (&PropertyBuffer::OnPropertiesUpdated, this));
 }
 
 PropertyBuffer::~PropertyBuffer ()

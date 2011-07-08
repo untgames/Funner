@@ -25,8 +25,6 @@ int main ()
   
   try
   {
-    common::LogFilter log_filter ("render.manager*", &log_print);    
-    
     Test test (L"Model load FFP", true);
 
     RenderManager render_manager = test.RenderManager ();

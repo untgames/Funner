@@ -416,42 +416,42 @@ Program& Program::DerivedProgram (ShaderOptionsCache& cache1, ShaderOptionsCache
   {
     size_t options_count1 = cache1.Properties ().Size (),
            options_count2 = cache2.Properties ().Size ();
-           
+
       //обработка частных случаев
-    
+
     if (!options_count1 && options_count2)
       return *this;
-      
+
     if (!options_count1)
       return DerivedProgram (cache2);
-      
+
     if (!options_count2)
       return DerivedProgram (cache1);
-      
+
       //обработка общего случая
       
     const ShaderOptions& options1 = cache1.GetShaderOptions (impl->common_data->dynamic_options_layout);
     const ShaderOptions& options2 = cache2.GetShaderOptions (impl->common_data->dynamic_options_layout);    
-    
+
     OptionsCacheCombinationKey key (options1.options_hash, options2.options_hash);
-    
+
     OptionsCacheCombinationMap::iterator iter = impl->options_cache_combinations.find (key);
-    
+
     if (iter != impl->options_cache_combinations.end ())
       return *iter->second->program;
-    
+
     ShaderOptions derived_options;
     
     derived_options.options      = options1.options + " " + options2.options;
     derived_options.options_hash = common::strhash (derived_options.options.c_str ());
-    
+
     OptionsCacheCombinationValuePtr value (new OptionsCacheCombinationValue, false);
-    
+
     value->options = derived_options;
     value->program = &DerivedProgram (derived_options);
-    
+
     impl->options_cache_combinations.insert_pair (key, value);
-    
+
     return *value->program;
   }
   catch (xtl::exception& e)

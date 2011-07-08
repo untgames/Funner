@@ -111,6 +111,20 @@ struct ProgramParametersLayout::Impl: public CacheHolder, public DebugIdHolder
       for (LayoutArray::iterator iter=layouts.begin (), end=layouts.end (); iter!=end; ++iter)
       {
         const render::low_level::ProgramParametersLayoutDesc& layout_desc = (*iter)->Parameters ();
+        
+        if (has_debug_log)
+        {
+          log.Printf ("...layout[%u]: parameters_count=%u", iter - layouts.begin (), layout_desc.parameters_count);
+          
+          for (size_t i=0; i<layout_desc.parameters_count; i++)
+          {
+            const render::low_level::ProgramParameter& parameter = layout_desc.parameters [i];
+                        
+            if (parameter.count != 1) log.Printf ("......name='%s', slot=%u, type=%sx%u, offset=%u", parameter.name, parameter.slot, get_name (parameter.type), parameter.count, parameter.offset);
+            else                      log.Printf ("......name='%s', slot=%u, type=%s, offset=%u", parameter.name, parameter.slot, get_name (parameter.type), parameter.offset);
+            
+          }
+        }
 
         new_parameters.insert (new_parameters.end (), layout_desc.parameters, layout_desc.parameters + layout_desc.parameters_count);
       }            
@@ -213,12 +227,13 @@ struct ProgramParametersLayout::Impl: public CacheHolder, public DebugIdHolder
   }  
 
 ///Оповещение об обновлении свойств
-  void OnPropertiesUpdated (ProgramParametersSlot slot)
+  void OnPropertiesUpdated (ProgramParametersSlot slot, const common::PropertyMap& properties)
   {
-    if (slots [slot].layout_hash == slots [slot].layout.Hash ())
+    if (slots [slot].layout_hash == properties.Layout ().Hash ())
       return;
 
-    slots [slot].layout_hash = slots [slot].layout.Hash ();
+    slots [slot].layout      = properties.Layout ();
+    slots [slot].layout_hash = slots [slot].layout.Hash ();        
 
     ResetCacheCore ();
   }
@@ -274,7 +289,7 @@ void ProgramParametersLayout::SetSlot (ProgramParametersSlot slot, const common:
   impl->slots [slot].layout_hash = layout.Hash ();
 
   impl->slots [slot].update_connection.disconnect ();
-  
+
   impl->slots [slot].layout.Capture ();
   
   impl->need_rebuild = true;
@@ -288,7 +303,7 @@ void ProgramParametersLayout::AttachSlot (ProgramParametersSlot slot, const comm
   impl->slots [slot].layout      = map.Layout ();
   impl->slots [slot].layout_hash = map.Layout ().Hash ();
 
-  impl->slots [slot].update_connection = map.RegisterEventHandler (common::PropertyMapEvent_OnUpdate, xtl::bind (&Impl::OnPropertiesUpdated, &*impl, slot));
+  impl->slots [slot].update_connection = map.RegisterEventHandler (common::PropertyMapEvent_OnUpdate, xtl::bind (&Impl::OnPropertiesUpdated, &*impl, slot, map));
 
   impl->need_rebuild = true;
 }
@@ -388,9 +403,9 @@ LowLevelProgramParametersLayoutPtr& ProgramParametersLayout::DeviceLayout ()
       
     if (impl->settings->HasDebugLog ())
       impl->log.Printf ("Creating low-level layout for program parameters layout (id=%u)", impl->Id ());
-printf ("%s(%u)\n", __FILE__, __LINE__); fflush (stdout);
+
     impl->device_layout = LowLevelProgramParametersLayoutPtr (impl->device->CreateProgramParametersLayout (impl->desc), false);                    
-printf ("%s(%u)\n", __FILE__, __LINE__); fflush (stdout);      
+
     return impl->device_layout;
   }
   catch (xtl::exception& e)

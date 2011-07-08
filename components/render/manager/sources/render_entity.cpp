@@ -35,6 +35,8 @@ class EntityLodCommonData: public CacheHolder, public DebugIdHolder
       
       default_state_block = LowLevelStateBlockPtr (device_manager->Device ().CreateStateBlock (mask), false);            
       
+      entity_parameters_layout.AttachSlot (ProgramParametersSlot_Entity, properties.Properties ());
+      
       if (device_manager->Settings ().HasDebugLog ())
         Log ().Printf ("Entity created (id=%u)", Id ());
     }
@@ -82,7 +84,7 @@ class EntityLodCommonData: public CacheHolder, public DebugIdHolder
     LowLevelStateBlockPtr GetStateBlock (MaterialImpl* material)
     {
       if (!material)
-        return LowLevelStateBlockPtr ();
+        return LowLevelStateBlockPtr ();        
       
       LowLevelStateBlockPtr result = FindStateBlock (material);
       
@@ -90,9 +92,9 @@ class EntityLodCommonData: public CacheHolder, public DebugIdHolder
         return result;
         
       if (!material->HasDynamicTextures ())
-      {
+      {        
         if (properties.Properties ().Size () == 0)
-          return LowLevelStateBlockPtr ();
+          return material->StateBlock ();
           
         return default_state_block;
       }
@@ -114,7 +116,18 @@ class EntityLodCommonData: public CacheHolder, public DebugIdHolder
       StateMap::iterator iter = states.find (material);
       
       if (iter == states.end ())
-        return ProgramParametersLayoutPtr ();
+      {
+        if (properties.Properties ().Size () == 0)
+          return material->ParametersLayout ();
+        
+        StatePtr state (new MaterialState (*this, material), false);
+        
+        states.insert_pair (material, state);
+        
+        state->UpdateCache ();
+
+        return state->parameters_layout;        
+      }
         
       MaterialState& state = *iter->second;
 
@@ -380,7 +393,7 @@ struct EntityLod: public xtl::reference_counter, public CacheHolder, public Debu
 
           operation.state_block              = common_data.GetStateBlock (material).get ();
           operation.entity_parameters_layout = common_data.GetProgramParametersLayout (material).get ();
-          operation.shader_options_cache     = &ShaderOptionsCache ();
+          operation.shader_options_cache     = &common_data.ShaderOptionsCache ();
 
           cached_operations.push_back (operation);
         }

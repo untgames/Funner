@@ -393,6 +393,7 @@ void EffectRenderer::ExecuteOperations (RenderingContext& context)
     ProgramParametersManager&   program_parameters_manager = impl->device_manager->ProgramParametersManager ();
     FrameImpl&                  frame                      = context.Frame ();
     ShaderOptionsCache&         frame_shader_options_cache = frame.ShaderOptionsCache ();
+    LowLevelBufferPtr           frame_property_buffer      = frame.DevicePropertyBuffer ();
 
     for (RenderEffectOperationArray::iterator iter=impl->operations.begin (), end=impl->operations.end (); iter!=end; ++iter)
     {
@@ -529,6 +530,10 @@ void EffectRenderer::ExecuteOperations (RenderingContext& context)
         
         if (dst_clear_flags)
           device.ClearViews (dst_clear_flags, (render::low_level::Color4f&)frame.ClearColor (), frame.ClearDepthValue (), frame.ClearStencilIndex ());
+          
+          //установка константного буфера кадра
+          
+        device.SSSetConstantBuffer (ProgramParametersSlot_Frame, frame_property_buffer.get ());
                         
           //выполнение операций
 
@@ -537,22 +542,22 @@ void EffectRenderer::ExecuteOperations (RenderingContext& context)
           const PassOperation&     operation                   = **iter;
           const RendererPrimitive& primitive                   = *operation.primitive;
           ShaderOptionsCache&      entity_shader_options_cache = *operation.shader_options_cache;
-printf ("%s(%u)\n", __FILE__, __LINE__); fflush (stdout);          
+
             //поиск программы (TODO: кэширование поиска по адресам кэшей, FIFO)
             
           Program* program = &*primitive.material->Program ();
-printf ("%s(%u)\n", __FILE__, __LINE__); fflush (stdout);          
+
           if (!program)
             continue;
-printf ("%s(%u)\n", __FILE__, __LINE__); fflush (stdout);            
+            
           program = &program->DerivedProgram (frame_shader_options_cache, entity_shader_options_cache);
-printf ("%s(%u)\n", __FILE__, __LINE__); fflush (stdout);          
+
           device.SSSetProgram (program->LowLevelProgram ().get ());
-printf ("%s(%u)\n", __FILE__, __LINE__); fflush (stdout);          
+
             //применение состояния операции
 
           operation.state_block->Apply ();
-printf ("%s(%u)\n", __FILE__, __LINE__); fflush (stdout);                    
+          
             //установка локальных текстур
           
           if (program->HasFramemaps ())
@@ -571,19 +576,18 @@ printf ("%s(%u)\n", __FILE__, __LINE__); fflush (stdout);
               //device.SSSetTexture (texmap.channel, ???????);
             }
           }
-printf ("%s(%u)\n", __FILE__, __LINE__); fflush (stdout);                    
+
             //установка расположения параметров
             //TODO: кэшировать по entity (FIFO)
 
           ProgramParametersLayoutPtr program_parameters_layout = program_parameters_manager.GetParameters (&pass.parameters_layout, operation.entity_parameters_layout, operation.frame_entity_parameters_layout);
-printf ("%s(%u)\n", __FILE__, __LINE__); fflush (stdout);
+
           device.SSSetProgramParametersLayout (&*program_parameters_layout->DeviceLayout ());
-printf ("%s(%u)\n", __FILE__, __LINE__); fflush (stdout);
+
             //рисование
 
           if (primitive.indexed) device.DrawIndexed (primitive.type, primitive.first, primitive.count, 0); //TODO: media::geometry::Primitive::base_vertex
           else                   device.Draw        (primitive.type, primitive.first, primitive.count);
-printf ("%s(%u)\n", __FILE__, __LINE__); fflush (stdout);          
         }
       }
 

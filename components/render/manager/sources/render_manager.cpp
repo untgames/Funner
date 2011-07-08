@@ -128,6 +128,11 @@ const char* RenderManagerImpl::Description ()
     Менеджеры ресурсов
 */
 
+DeviceManager& RenderManagerImpl::DeviceManager ()
+{
+  return impl->DeviceManager ();
+}
+
 TextureManager& RenderManagerImpl::TextureManager ()
 {
   try

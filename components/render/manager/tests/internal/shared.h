@@ -41,7 +41,7 @@ struct TestLogFilter
   TestLogFilter (bool logging)
   {
     if (logging)
-      log_filter = stl::auto_ptr<common::LogFilter> (new common::LogFilter ("*", &log_print));
+      log_filter = stl::auto_ptr<common::LogFilter> (new common::LogFilter ("render.manager*", &log_print));
   }
 };
 

@@ -129,6 +129,8 @@ struct FrameImpl::Impl: public CacheHolder
     AttachCacheSource (*effect_holder);
     AttachCacheSource (properties);
     
+    effect_holder->properties_layout.AttachSlot (ProgramParametersSlot_Frame, properties.Properties ());
+    
     entities.reserve (RESERVED_ENTITIES_COUNT);
     frames.reserve (RESERVED_FRAMES_COUNT);
   }
@@ -545,8 +547,7 @@ void FrameImpl::SetProperties (const common::PropertyMap& properties)
   {
     impl->properties.SetProperties (properties);
 
-    if (impl->effect_holder)
-      impl->effect_holder->properties_layout.AttachSlot (ProgramParametersSlot_Frame, properties);
+    impl->effect_holder->properties_layout.AttachSlot (ProgramParametersSlot_Frame, properties);
   }
   catch (xtl::exception& e)
   {
@@ -558,6 +559,25 @@ void FrameImpl::SetProperties (const common::PropertyMap& properties)
 const common::PropertyMap& FrameImpl::Properties ()
 {
   return impl->properties.Properties ();
+}
+
+/*
+    Получение буфера свойств
+*/
+
+const LowLevelBufferPtr& FrameImpl::DevicePropertyBuffer ()
+{
+  try
+  {
+    impl->UpdateCache ();
+    
+    return impl->cached_properties;
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::FrameImpl::DevicePropertyBuffer");
+    throw;
+  }
 }
 
 /*
