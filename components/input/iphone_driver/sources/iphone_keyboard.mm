@@ -164,8 +164,8 @@ struct IPhoneKeyboard::Impl : public KeyboardListener
     {
       CGRect frame_rect;
 
-      frame_rect.origin.x    = -2;
-      frame_rect.origin.y    = -2;
+      frame_rect.origin.x    = 0;
+      frame_rect.origin.y    = -100;
       frame_rect.size.width  = 1;
       frame_rect.size.height = 1;
 
@@ -173,6 +173,8 @@ struct IPhoneKeyboard::Impl : public KeyboardListener
 
       if (!text_field)
         throw xtl::format_operation_exception ("", "Can't create needed text field");
+
+      text_field.autocorrectionType = UITextAutocorrectionTypeNo;
 
       [[UIApplication sharedApplication].keyWindow addSubview:text_field];
 
