@@ -1,0 +1,61 @@
+1. TODO
+
+1.1. Тестирование
+  1.1. Internal тесты для большинства внутренних классов
+    1.1.1. class DeviceManager
+    1.1.2. class DynamicTextureImpl
+    1.1.3. class Effect
+    1.1.4. class EffectLoaderLibrary
+    1.1.5. class EffectManager
+    1.1.6. class EffectPass
+    1.1.7. class EffectRenderer
+    1.1.8. class MaterialManager
+    1.1.9. class PrimitiveManager
+    1.1.10. class Program
+    1.1.11. class ProgramManager
+    1.1.12. class ProgramParametersLayout
+    1.1.13. class RenderingContext
+    1.1.14. class Settings
+    1.1.15. class ShaderOptionsCache
+    1.1.16. class TextureManager
+    1.1.17. class InstantiatedEffect
+    1.1.18. Сделать полный список внутренних классов
+  1.2. Public тесты для большинства публичных классов
+    1.2.1. class Rect
+    1.2.2. class IDynamicTexture
+    1.2.3. class Entity;
+    1.2.4. class RectArea
+    1.2.5. class Frame
+    1.2.6. class RenderManager
+    1.2.7. class Material
+    1.2.8. class PrimitiveBuffers
+    1.2.9. class Primitive
+    1.2.10. class RenderTarget
+    1.2.11. class Texture
+    1.2.12. class Window
+  1.3. Комплексные тесты использования компонента
+    1.3.1. Визуализация объекта с FFP шейдером
+    1.3.2. Визуализация объекта с GLSL шейдером 
+    1.3.3. Визуализация спрайтов (+scissor)
+
+1.2. Настройка производительности
+  1.2.1. Проверить корректность работы кэшей: кэши не  должны  сбрасываться  на
+  каждом кадре. Проверить корректность зависимостей  кэшей  -  обновление  кэша
+  должно осуществляться только при изменении значимых зависимых параметров
+  1.2.2.  Оптимизировать  кэширование  переключения  состояний  при   рисовании
+  в EffectRenderer. Использовать для кэширования  RedningContext  (общую  часть
+  для всей цепочки отрисовок)
+
+1.3. Функциональность
+  1.3.1. Sprites/Lines batch rendering
+    - группировать спрайты и линии в буферы для отрисовки
+    - в случае малого числа спрайтов  в  примитиве  группировать  примитивы  (как
+      это сочетается с отсутствием трансформаций в Entity?)
+  1.3.2. Entity skinning
+    - добавить  возможность  software/hardware  skinning  по  параметру skinning  в  блоке
+    program {} (rfx)  
+  1.3.3. Instancing
+    - добавить возможность группировки примитивов по параметру instancing в блоке
+    program {}
+    
+1.4. Проектирование
