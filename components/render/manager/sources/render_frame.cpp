@@ -699,7 +699,9 @@ void FrameImpl::Prerender (EntityDrawFunction entity_draw_handler)
       
     if (has_entity_draw_handler)
     {
-      entity_draw_handler (frame, Wrappers::Wrap<Entity> (desc.entity), entity_draw_params);
+      Entity entity_wrap = Wrappers::Wrap<Entity> (desc.entity);
+
+      entity_draw_handler (frame, entity_wrap, entity_draw_params);
       
         //заполнение константного буфера соответствующего паре frame-entity
       

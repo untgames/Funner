@@ -17,7 +17,7 @@ struct ShaderOptionsCacheEntry: public ShaderOptions, public xtl::reference_coun
   bool   is_valid;      //является ли данный элемент корректным
   
 ///Конструктор
-  ShaderOptionsCacheEntry () : is_valid (false), layout_hash (0xffffffff), options_count (0) {}
+  ShaderOptionsCacheEntry () : layout_hash (0xffffffff), options_count (0), is_valid (false) {}
   
 ///Обновление кэша
   void UpdateCache (const common::PropertyMap& properties, ShaderOptionsLayout& layout)

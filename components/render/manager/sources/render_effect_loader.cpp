@@ -666,7 +666,7 @@ class EffectLoader
         {
           Parser::AttributeIterator attr_iter = make_attribute_iterator (depth_range_node);
           
-          float min_depth = get<float> (attr_iter), max_depth = get<float> (attr_iter);
+          float min_depth = xtl::io::get<float> (attr_iter), max_depth = xtl::io::get<float> (attr_iter);
           
           pass->SetViewportMinDepth (min_depth);
           pass->SetViewportMaxDepth (max_depth);

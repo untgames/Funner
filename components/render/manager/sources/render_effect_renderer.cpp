@@ -422,7 +422,7 @@ void EffectRenderer::ExecuteOperations (RenderingContext& context)
           
         render::low_level::IView *render_target_view = 0, *depth_stencil_view = 0;
         RectAreaPtr              viewport, scissor;
-        int                      target_width = 0, target_height = 0;
+        size_t                   target_width = 0, target_height = 0;
 
         if (!pass.color_targets.IsEmpty ())        
         {

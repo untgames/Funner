@@ -472,9 +472,9 @@ void TextureImpl::Capture (size_t mip_level, media::Image& image)
     
     for (size_t i=0; i<mip_level; i++)
     {
-      width  = stl::max (width / 2, 1u);
-      height = stl::max (height / 2, 1u);
-      depth  = impl->dimension == TextureDimension_Cubemap ? depth : stl::max (depth / 2, 1u);
+      width  = stl::max (width / 2, (size_t)1);
+      height = stl::max (height / 2, (size_t)1);
+      depth  = impl->dimension == TextureDimension_Cubemap ? depth : stl::max (depth / 2, (size_t)1);
     }
 
     media::Image result_image (width, height, depth, image_format);
