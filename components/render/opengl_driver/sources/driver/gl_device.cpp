@@ -557,6 +557,8 @@ void Device::Bind (size_t base_vertex, size_t base_index, IndicesLayout* out_ind
 {
   try
   {
+    bool is_program_validate_needed = false;
+    
       //установка состояния менеджера целевых буферов отрисовки
       
     if (context_manager.NeedStageRebind (Stage_RenderTargetManager))
@@ -564,6 +566,8 @@ void Device::Bind (size_t base_vertex, size_t base_index, IndicesLayout* out_ind
       render_target_manager.Bind ();
 
       context_manager.StageRebindNotify (Stage_Output); //сделать внутреннее кэширование состояния has_render_target/has_depth_stencil!!!
+      
+      is_program_validate_needed = true;
     }
     
       //установка состояния входного уровня
@@ -585,6 +589,8 @@ void Device::Bind (size_t base_vertex, size_t base_index, IndicesLayout* out_ind
 
         memset (&cached_indices_layout, 0, sizeof cached_indices_layout);
       }
+      
+      is_program_validate_needed = true;      
     }
     else
     {
@@ -595,21 +601,38 @@ void Device::Bind (size_t base_vertex, size_t base_index, IndicesLayout* out_ind
       //установка состояния менеджера текстур
 
     if (context_manager.NeedStageRebind (Stage_TextureManager))
+    {
       texture_manager.Bind ();
+      
+      is_program_validate_needed = true;      
+    }
 
       //установка состояния шейдерного уровня
 
     if (context_manager.NeedStageRebind (Stage_Shading))
+    {
       shader_stage.Bind ();            
+      
+      is_program_validate_needed = true;      
+    }
 
       //установка состояния выходного уровня
 
     if (context_manager.NeedStageRebind (Stage_Output))
+    {
       output_stage.Bind (render_target_manager.GetRenderTargetView () != 0, render_target_manager.GetDepthStencilView () != 0);
+      
+      is_program_validate_needed = true;      
+    }
 
       //очистка флагов ребиндинга
 
     context_manager.ResetRebindNotifications ();
+    
+      //валидация текущей программы
+      
+    if (is_program_validate_needed)
+      shader_stage.ValidateBindedProgram ();
   }
   catch (xtl::exception& exception)
   {

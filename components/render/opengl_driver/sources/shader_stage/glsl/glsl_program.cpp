@@ -10,7 +10,8 @@ using namespace render::low_level::opengl;
 
 GlslProgram::GlslProgram (const ContextManager& manager, size_t shaders_count, IShader** in_shaders, const LogFunction& error_log)
   : ContextObject (manager),
-    handle (0)
+    handle (0),
+    last_bindable_program_id (0)
 {
   static const char* METHOD_NAME = "render::low_level::opengl::GlslProgram::GlslProgram";
 
@@ -61,20 +62,97 @@ GlslProgram::GlslProgram (const ContextManager& manager, size_t shaders_count, I
 
     GetProgramLog (log_buffer);
     error_log     (common::format ("linker: %s", log_buffer.c_str ()).c_str ());
-
-      //проверка состояния программы
-
-/*    if (link_status)
-    {
-      if (glValidateProgram) glValidateProgram    (handle);
-      else                   glValidateProgramARB (handle);
-
-      if (glGetProgramiv) glGetProgramiv            (handle, GL_OBJECT_VALIDATE_STATUS_ARB, &link_status);
-      else                glGetObjectParameterivARB (handle, GL_OBJECT_VALIDATE_STATUS_ARB, &link_status);
-
-      GetProgramLog (log_buffer);
-      error_log     (log_buffer.c_str ());
-    }*/
+    
+      //получение описания параметров программы
+    
+    GLint parameters_count = 0, max_parameter_name_length = 0;
+    
+    glGetObjectParameterivARB (handle, GL_OBJECT_ACTIVE_UNIFORMS_ARB, &parameters_count);
+    glGetObjectParameterivARB (handle, GL_OBJECT_ACTIVE_UNIFORM_MAX_LENGTH_ARB, &max_parameter_name_length);
+    
+    parameters.reserve (parameters_count);        
+    
+    stl::string parameter_name;    
+    
+    for (GLint location=0; location<parameters_count; location++)
+    {            
+      parameter_name.fast_resize (max_parameter_name_length);      
+      
+      GLint  name_length = 0, elements_count = 0;
+      GLenum type = 0;
+      
+      glGetActiveUniformARB (handle, location, parameter_name.size (), &name_length, &elements_count, &type, &parameter_name [0]);
+      
+      if ((size_t)name_length > parameter_name.size ())
+        name_length = parameter_name.size ();
+        
+      if (name_length < 0)
+        name_length = 0;
+        
+      parameter_name.fast_resize (name_length);
+      
+      Parameter parameter;
+      
+      parameter.name           = parameter_name;
+      parameter.name_hash      = common::strhash (parameter.name.c_str ());
+      parameter.elements_count = (size_t)elements_count;
+      
+      switch (type)
+      {
+        case GL_FLOAT:
+          parameter.type = ProgramParameterType_Float;
+          break;
+        case GL_FLOAT_VEC2_ARB:
+          parameter.type = ProgramParameterType_Float2;
+          break;
+        case GL_FLOAT_VEC3_ARB:
+          parameter.type = ProgramParameterType_Float3;
+          break;
+        case GL_FLOAT_VEC4_ARB:
+          parameter.type = ProgramParameterType_Float4;
+          break;
+        case GL_INT:
+          parameter.type = ProgramParameterType_Int;
+          break;
+        case GL_INT_VEC2_ARB:
+          parameter.type = ProgramParameterType_Int2;
+          break;        
+        case GL_INT_VEC3_ARB:
+          parameter.type = ProgramParameterType_Int3;
+          break;        
+        case GL_INT_VEC4_ARB:
+          parameter.type = ProgramParameterType_Int4;
+          break;
+        case GL_BOOL_ARB:
+        case GL_BOOL_VEC2_ARB:
+        case GL_BOOL_VEC3_ARB:
+        case GL_BOOL_VEC4_ARB:
+          throw xtl::format_not_supported_exception (METHOD_NAME, "GLboolean uniform '%s' not supported (type=%04x)", parameter.name.c_str (), type);
+        case GL_FLOAT_MAT2_ARB:
+          parameter.type = ProgramParameterType_Float2x2;
+          break;
+        case GL_FLOAT_MAT3_ARB:
+          parameter.type = ProgramParameterType_Float3x3;
+          break;
+        case GL_FLOAT_MAT4_ARB:
+          parameter.type = ProgramParameterType_Float4x4;
+          break;
+        case GL_SAMPLER_1D_ARB:
+        case GL_SAMPLER_2D_ARB:
+        case GL_SAMPLER_3D_ARB:
+        case GL_SAMPLER_CUBE_ARB:
+        case GL_SAMPLER_1D_SHADOW_ARB:
+        case GL_SAMPLER_2D_SHADOW_ARB:
+        case GL_SAMPLER_2D_RECT_ARB:
+        case GL_SAMPLER_2D_RECT_SHADOW_ARB:
+          parameter.type = ProgramParameterType_Int;
+          break;                
+        default:
+          throw xtl::format_operation_exception (METHOD_NAME, "Unknown uniform '%s' type %04x with %u element(s)", parameter.name.c_str (), type, elements_count);
+      }
+      
+      parameters.push_back (parameter);
+    }    
 
       //проверка ошибок
 
@@ -200,4 +278,18 @@ IBindableProgram* GlslProgram::CreateBindableProgram (ProgramParametersLayout* l
     exception.touch ("render::low_level::opengl::GlslProgram::CreateBindableProgram");
     throw;
   }
+}
+
+/*
+    Получение параметров программы
+*/
+
+size_t GlslProgram::GetParametersCount ()
+{
+  return parameters.size ();
+}
+
+const GlslProgram::Parameter* GlslProgram::GetParameters ()
+{
+  return parameters.empty () ? (const Parameter*)0 : &parameters [0];
 }

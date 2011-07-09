@@ -166,7 +166,8 @@ struct ShaderStage::Impl: public ContextObject, public ShaderStageState
 ///Конструктор
     Impl (const ContextManager& context_manager)
       : ContextObject (context_manager),
-        ShaderStageState (static_cast<ContextObject*> (this))
+        ShaderStageState (static_cast<ContextObject*> (this)),
+        current_binded_program (0)
     {
       try
       {
@@ -238,6 +239,10 @@ struct ShaderStage::Impl: public ContextObject, public ShaderStageState
           //установка программы в контекст OpenGL
 
         bindable_program.Bind (GetConstantBuffers ());
+        
+          //сохранение текущей программы
+          
+        current_binded_program = &bindable_program;
       }
       catch (xtl::exception& exception)
       {
@@ -245,6 +250,23 @@ struct ShaderStage::Impl: public ContextObject, public ShaderStageState
         throw;
       }
     }       
+    
+///Проверка корректности установленной программы
+    void ValidateBindedProgram ()
+    {
+      try
+      {
+        if (!current_binded_program)
+          return;
+          
+        current_binded_program->Validate ();
+      }
+      catch (xtl::exception& e)
+      {
+        e.touch ("render::low_level::opengl::ShaderStage::Impl::ValidateBindedProgram");
+        throw;
+      }
+    }
 
 ///Создание программы
     ICompiledProgram* CreateProgram (size_t shaders_count, const ShaderDesc* shader_descs, const LogFunction& error_log)
@@ -518,7 +540,7 @@ struct ShaderStage::Impl: public ContextObject, public ShaderStageState
     
 ///Удаление программы, устанавливаемой в контекст OpenGL
     void RemoveBindableProgram (ICompiledProgram* program, ProgramParametersLayout* layout)
-    {
+    {            
       for (BindableProgramMap::iterator iter = bindable_programs.begin (), end = bindable_programs.end (); iter != end;)
       {
         if (iter->first.program == program || iter->first.parameters_layout == layout)
@@ -526,6 +548,9 @@ struct ShaderStage::Impl: public ContextObject, public ShaderStageState
           BindableProgramMap::iterator next = iter;
 
           ++next;
+          
+          if (&*iter->second == current_binded_program)
+            current_binded_program = 0;
 
           bindable_programs.erase (iter);
 
@@ -546,11 +571,12 @@ struct ShaderStage::Impl: public ContextObject, public ShaderStageState
     }
 
   private:
-    ShaderMap          shaders;            //скомпилированные шейдеры
-    BindableProgramMap bindable_programs;  //карта программ шейдинга с возможностью установки в контекст OpenGL
-    ProfileMap         profiles;           //соответствие профиль -> менеджер шейдеров
-    ProgramPtr         default_program;    //программа "по умолчанию"
-    stl::string        supported_profiles; //поддерживаемые профили шейдеров
+    ShaderMap          shaders;                //скомпилированные шейдеры
+    BindableProgramMap bindable_programs;      //карта программ шейдинга с возможностью установки в контекст OpenGL
+    ProfileMap         profiles;               //соответствие профиль -> менеджер шейдеров
+    ProgramPtr         default_program;        //программа "по умолчанию"
+    stl::string        supported_profiles;     //поддерживаемые профили шейдеров
+    IBindableProgram*  current_binded_program; //текущая программа, установленная в контекст OpenGL
 };
 
 /*
@@ -692,4 +718,13 @@ IBuffer* ShaderStage::GetConstantBuffer (size_t buffer_slot) const
 const char* ShaderStage::GetShaderProfilesString () const
 {
   return impl->GetShaderProfilesString ();
+}
+
+/*
+    Валидация текущей программы перед отрисовкой
+*/
+
+void ShaderStage::ValidateBindedProgram ()
+{  
+  impl->ValidateBindedProgram ();
 }
