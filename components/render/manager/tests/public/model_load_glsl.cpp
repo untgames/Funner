@@ -23,19 +23,8 @@ void idle (Test& test, Entity& entity, Frame& frame)
 {
   try
   {
-    static size_t last = 0;
-    static float angle;
-
     static size_t last_fps = 0;
     static size_t frames_count = 0;
-
-    float dt = float (common::milliseconds () - last) / 1000.f;
-
-    if (common::milliseconds () - last > 25)
-    {
-      last = common::milliseconds ();
-      return;
-    }
 
     if (common::milliseconds () - last_fps > 1000)
     {
@@ -52,7 +41,7 @@ void idle (Test& test, Entity& entity, Frame& frame)
     common::PropertyMap frame_properties = frame.Properties ();
     common::PropertyMap entity_properties = entity.Properties ();  
 
-    angle += 0.01f*dt;
+    float angle = common::milliseconds () / 10000.0f;
     
     entity_properties.SetProperty ("ObjectMatrix", math::rotate (math::radian (angle), math::vec3f (0, 0, 1)) * math::rotate (math::radian (angle*0.2f), math::vec3f (1, 0, 0)));
       
@@ -112,7 +101,7 @@ int main ()
     math::vec4f light_dir [2] = {math::vec4f (0, 0, -1, 0), math::vec4f (0, -1, 0, 0)};
     
     frame_properties.SetProperty ("ProjectionMatrix", get_ortho_proj (-10, 10, -10, 10, -1000, 1000));
-    frame_properties.SetProperty ("ViewMatrix", math::mat4f (1.0f));//inverse (math::lookat (math::vec3f (0, 400, 0), math::vec3f (0.0f), math::vec3f (0, 0, 1))));
+    frame_properties.SetProperty ("ViewMatrix", inverse (math::lookat (math::vec3f (0, 400, 0), math::vec3f (0.0f), math::vec3f (0, 0, 1))));
     frame_properties.SetProperty ("DirectLightColor", 2, light_color);
     frame_properties.SetProperty ("DirectLightWorldDirection", 2, light_dir);
     

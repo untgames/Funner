@@ -100,14 +100,14 @@ effect "main"
   }
 
   //render wireframe transaparent geometry
-  pass
-  {
-    tags                  "solid"                       //render only non-transparent geometry
-    sort                  states                        //sort geometry for decrease state switches
-    color_targets         "main_color_target"           //render to effect color buffer
-    depth_stencil_target  "main_depth_stencil_target"   //render to effect depth stencil buffer
-    blend_state           "additive"                    //use blend stage settings for translucent geometry
-    depth_stencil_state   "no_z_test"                   //use depth stencil stage settings for translucent geometry
-    rasterizer_state      "back_wire"                   //use back rasterizer
-  }
+//  pass
+//  {
+//    tags                  "solid"                       //render only non-transparent geometry
+//    sort                  states                        //sort geometry for decrease state switches
+//    color_targets         "main_color_target"           //render to effect color buffer
+//    depth_stencil_target  "main_depth_stencil_target"   //render to effect depth stencil buffer
+//    blend_state           "additive"                    //use blend stage settings for translucent geometry
+//    depth_stencil_state   "no_z_test"                   //use depth stencil stage settings for translucent geometry
+//    rasterizer_state      "back_wire"                   //use back rasterizer
+//  }
 }

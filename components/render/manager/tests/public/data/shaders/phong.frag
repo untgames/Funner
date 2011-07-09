@@ -69,9 +69,6 @@ void main (void)
     normal = Normal;
   }
 
-  float fog_depth  = (gl_FragCoord.z / gl_FragCoord.w) / 100000.0;
-  float fog_factor = max (min (1.0-fog_depth*fog_depth, 1.0), 0.0);
-
   vec3 tex_specular_color = vec3 (0.0),
        tex_diffuse_color  = vec3 (0.0);
 
@@ -98,13 +95,11 @@ void main (void)
     vec3 light_dir     = DirectLightDirection [i];
 
     lighted_color += ComputeDiffuseColor (normal, light_dir, tex_diffuse_color);
-    lighted_color += ComputeSpecularColor (normal, light_dir, eye_dir, tex_specular_color) * fog_factor;
+    lighted_color += ComputeSpecularColor (normal, light_dir, eye_dir, tex_specular_color);
     lighted_color *= DirectLightColor [i].rgb;
 
     color += lighted_color;
   }
-
-  color = mix (color, vec3 (0.29, 0.39, 0.54), 1.0-fog_factor);
     
   gl_FragColor = vec4 (color, Transparency * diffuse_transparency);
 }
