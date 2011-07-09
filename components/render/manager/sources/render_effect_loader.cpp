@@ -536,7 +536,7 @@ class EffectLoader
         
       size_t channel = 0;
         
-      for (Parser::Iterator texmap_iter=iter->First (); texmap_iter; ++texmap_iter, ++channel)
+      for (Parser::Iterator texmap_iter=iter->First (); texmap_iter; ++texmap_iter)
       {
         if (strcmp (texmap_iter->Name (), "texmap") && strcmp (texmap_iter->Name (), "framemap"))
           continue;
@@ -548,6 +548,8 @@ class EffectLoader
         bool        is_framemap = strcmp (texmap_iter->Name (), "framemap") == 0;
         
         program->AddTexmap (channel, semantic, param_name, is_framemap);
+        
+        ++channel;
       }        
 
       try

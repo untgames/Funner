@@ -131,7 +131,7 @@ void PropertyBuffer::UpdateCacheCore ()
       impl->buffer             = LowLevelBufferPtr (impl->device_manager->Device ().CreateBuffer (desc), false);
       impl->cached_buffer_size = desc.size;
     }
-    
+
     impl->buffer->SetData (0, buffer_size, impl->properties.BufferData ());
     
     impl->need_update = false;    

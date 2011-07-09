@@ -560,7 +560,7 @@ void EffectRenderer::ExecuteOperations (RenderingContext& context)
             //применение состояния операции
 
           primitive.state_block->Apply ();
-          operation.state_block->Apply ();
+          operation.state_block->Apply ();          
           
           render::low_level::StateBlockMask mask;      
           
@@ -592,7 +592,7 @@ void EffectRenderer::ExecuteOperations (RenderingContext& context)
 
           device.SSSetProgramParametersLayout (&*program_parameters_layout->DeviceLayout ());
 
-            //рисование
+            //рисование            
 
           if (primitive.indexed) device.DrawIndexed (primitive.type, primitive.first, primitive.count, 0); //TODO: media::geometry::Primitive::base_vertex
           else                   device.Draw        (primitive.type, primitive.first, primitive.count);

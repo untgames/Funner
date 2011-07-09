@@ -173,7 +173,7 @@ struct MaterialImpl::Impl: public CacheHolder, public DebugIdHolder
           if (texmap.cached_device_texture)
           {
             device.SSSetTexture (i, texmap.cached_device_texture.get ());
-            
+
             mask.ss_textures [i] = true;
           }
           

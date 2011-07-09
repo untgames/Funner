@@ -482,7 +482,8 @@ struct ShaderCompilerLog
     static const char* IGNORE_MESSAGES [] = {
       "*: No errors.",
       "Fragment shader(s) linked, vertex shader(s) linked*",
-      "*shader was successfully compiled to run on hardware."
+      "*shader was successfully compiled to run on hardware.",
+      "Fragment shader(s) linked, vertex shader(s) linked."
     };
     
     static const size_t IGNORE_MESSAGES_COUNT = sizeof (IGNORE_MESSAGES) / sizeof (*IGNORE_MESSAGES);
@@ -539,7 +540,7 @@ const LowLevelProgramPtr& Program::LowLevelProgram ()
       desc.profile          = shader.Profile ();
       desc.source_code_size = shader.SourceCodeSize ();
       desc.source_code      = shader.SourceCode ();
-      desc.options          = options.c_str ();
+      desc.options          = options.c_str ();      
       
       shaders.push_back (desc);
     }
@@ -550,6 +551,8 @@ const LowLevelProgramPtr& Program::LowLevelProgram ()
     impl->common_data->log.Printf ("Build program '%s'...", impl->common_data->name.c_str ());
 
     LowLevelProgramPtr program (device.CreateProgram (shaders.size (), &shaders [0], ShaderCompilerLog (*impl->common_data)), false);
+    
+    impl->common_data->log.Printf ("...program '%s' successfully built", impl->common_data->name.c_str ());
       
     impl->low_level_program = program;
   

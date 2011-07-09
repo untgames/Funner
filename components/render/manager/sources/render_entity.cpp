@@ -175,15 +175,16 @@ class EntityLodCommonData: public CacheHolder, public DebugIdHolder
       {
         if (device_manager->Settings ().HasDebugLog ())
           Log ().Printf ("Update entity cache (id=%u)", Id ());
+          
         printf ("%s(%u)\n", __FILE__, __LINE__); fflush (stdout);
 //        FlushUnusedMaterials ();!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!TODO!!!!!!!!!!!!!!!!!!!!!!11
         printf ("%s(%u)\n", __FILE__, __LINE__); fflush (stdout);
+
         dynamic_textures.FlushUnusedTextures ();
-        printf ("%s(%u)\n", __FILE__, __LINE__); fflush (stdout);        
+
         device_manager->Device ().SSSetConstantBuffer (ProgramParametersSlot_Entity, properties.Buffer ().get ());
-        printf ("%s(%u)\n", __FILE__, __LINE__); fflush (stdout);        
+
         default_state_block->Capture ();
-        printf ("%s(%u)\n", __FILE__, __LINE__); fflush (stdout);        
       }
       catch (xtl::exception& e)
       {

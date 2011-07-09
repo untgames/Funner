@@ -1,43 +1,34 @@
-uniform mat4  ProjectionMatrix;
-uniform mat4  ViewMatrix;
-uniform vec3  ViewLightPosition;
-uniform vec3  ViewLightDirection;
+#define DIRECT_LIGHTS_COUNT 2
+
 uniform float Reflectivity;
 uniform float Transparency;
 uniform float Shininess;
 uniform float BumpAmount;
-uniform float HighlightAmount;
 uniform vec4  DiffuseColor;
 uniform vec4  AmbientColor;
 uniform vec4  SpecularColor;
 uniform vec4  EmissionColor;
-uniform vec3  ShadowColor;
-uniform vec3  LightColor;
 
-uniform int HasDiffuseTexture;
-uniform int HasAmbientTexture;
-uniform int HasBumpTexture;
-uniform int HasSpecularTexture;
-uniform int HasEmissionTexture;
+uniform vec4 DirectLightColor [DIRECT_LIGHTS_COUNT];
+
+#define HasDiffuseTexture  1
+#define HasAmbientTexture  0
+#define HasBumpTexture     1
+#define HasSpecularTexture 1
+#define HasEmissionTexture 0
 
 uniform sampler2D   DiffuseTexture;
 uniform sampler2D   BumpTexture;
 uniform sampler2D   SpecularTexture;
-uniform sampler2D   EmissionTexture;
-uniform sampler2D   AmbientTexture;
-uniform sampler2D   ReflectionTexture;
-uniform sampler2D   ShadowTexture;
-uniform samplerCube GlobalAmbientTexture;
 
 varying vec4 DiffuseTexcoord;
 varying vec4 BumpTexcoord;
 varying vec4 SpecularTexcoord;
-varying vec4 ShadowTexcoord;
 varying vec3 GlobalAmbientTexcoord;
-varying vec3 LightDirection;
 varying vec3 EyeDirection;
 varying vec3 ReflectionDirection;
 varying vec3 Normal;
+varying vec3 DirectLightDirection [DIRECT_LIGHTS_COUNT];
 
 vec2 SphereMap (const in vec3 r)
 {
@@ -49,44 +40,14 @@ vec2 SphereMap (const in vec3 r)
   return f.xy*0.5 + 0.5;
 }
 
-vec3 ComputeReflectionColor (const in vec3 reflection)
+vec3 ComputeDiffuseColor (const in vec3 normal, const in vec3 light_dir, const in vec3 tex_diffuse_color)
 {
-  vec2 reflection_texcoord = SphereMap (reflection);
-
-  return vec3 (texture2D (ReflectionTexture, reflection_texcoord));
+  return (tex_diffuse_color + DiffuseColor.rgb) * max (dot (light_dir, normal), 0.2);
 }
 
-vec3 ComputeReflectionColor (const in vec3 normal, const in vec3 eye_dir, const in vec3 tex_specular_color)
+vec3 ComputeSpecularColor (const in vec3 normal, const in vec3 light_dir, const in vec3 eye_dir, const in vec3 tex_specular_color)
 {
-  return ComputeReflectionColor (normalize (reflect (eye_dir, normal))) * Reflectivity * tex_specular_color;
-}
-
-vec3 ComputeEmissionColor ()
-{
-  vec3 color = vec3 (0.0);
-
-  if (HasEmissionTexture != 0)
-    color += vec3 (texture2D (EmissionTexture, DiffuseTexcoord.xy));
-
-  return color;
-}
-
-vec3 ComputeSpecularColor (const in vec3 normal, const in vec3 light_dir, const in vec3 eye_dir, out vec3 tex_specular_color)
-{
-//#ifndef BLINN_SHADING
   float shininess = Shininess + 1.0;
-//#else
-//  float shininess = 1.0 / Shininess;
-//#endif
-
-  if (HasSpecularTexture != 0)
-  {
-    tex_specular_color = vec3 (texture2D (SpecularTexture, SpecularTexcoord.xy));
-  }
-  else
-  {
-    tex_specular_color = vec3 (0.0);
-  }
 
   float specular_factor = pow (clamp (dot (reflect (-light_dir, normal), eye_dir), 0.0, 1.0), shininess);
 
@@ -95,13 +56,9 @@ vec3 ComputeSpecularColor (const in vec3 normal, const in vec3 light_dir, const 
 
 void main (void)
 {
-//  float dist_sqr    = dot (LightDirection, LightDirection);
-  float dist_sqr             = dot (EyeDirection, EyeDirection);
-  float attenuation          = clamp (1.0 - sqrt (dist_sqr) / 6000.0, 0.0, 1.0);
-  vec3  light_dir            = LightDirection;// * inversesqrt (dist_sqr);
-  vec3  eye_dir              = normalize (EyeDirection);
-  vec3  normal               = vec3 (0.0);
-  float diffuse_transparency = 1.0;
+  float dist_sqr = dot (EyeDirection, EyeDirection);
+  vec3  eye_dir  = normalize (EyeDirection);
+  vec3  normal   = vec3 (0.0);
 
   if (HasBumpTexture != 0)
   {
@@ -112,33 +69,42 @@ void main (void)
     normal = Normal;
   }
 
-  vec3 lighted_color = vec3 (0.0), tex_specular_color = vec3 (0.0);
+  float fog_depth  = (gl_FragCoord.z / gl_FragCoord.w) / 100000.0;
+  float fog_factor = max (min (1.0-fog_depth*fog_depth, 1.0), 0.0);
 
-  lighted_color += ComputeSpecularColor (normal, light_dir, eye_dir, tex_specular_color) * 0.4;
-  lighted_color += ComputeReflectionColor (normal, eye_dir, tex_specular_color);
-  lighted_color *= LightColor;
-  lighted_color += ComputeEmissionColor ();
-  
-  lighted_color.r += HighlightAmount;
+  vec3 tex_specular_color = vec3 (0.0),
+       tex_diffuse_color  = vec3 (0.0);
 
-  vec3 tex_diffuse_color = vec3 (texture2D (DiffuseTexture, DiffuseTexcoord.xy));  
-  vec3 self_color        = (EmissionColor.rgb + ShadowColor) * tex_diffuse_color;
-  
-  vec4 shadow_texcoord = ShadowTexcoord.xyzw / ShadowTexcoord.w;
+  float diffuse_transparency = 1.0;
 
-  float shadow_depth = texture2D (ShadowTexture, shadow_texcoord.st).x + 0.005,
-        shade        = 0.0;
-
-  if (ShadowTexcoord.w > 0.0)
+  if (HasDiffuseTexture != 0)
   {
-    if (shadow_texcoord.x < 0.0 || shadow_texcoord.x > 1.0 || shadow_texcoord.y < 0.0 || shadow_texcoord.y > 1.0)
-      shade = 1.0;
-    else if (shadow_depth < shadow_texcoord.z)
-      shade = 1.0 - (shadow_texcoord.z - shadow_depth);
+    vec4 diffuse_color = texture2D (DiffuseTexture, DiffuseTexcoord.xy);
+
+    tex_diffuse_color += diffuse_color.xyz;
+    diffuse_transparency = diffuse_color.w;
   }
 
-  vec3 color = mix (lighted_color, self_color, shade);
-//  vec3 color = lighted_color;
+  if (HasSpecularTexture != 0)
+  {
+    tex_specular_color = vec3 (texture2D (SpecularTexture, SpecularTexcoord.xy));
+  }
+
+  vec3 color = vec3 (0.0);
+
+  for (int i=0; i<DIRECT_LIGHTS_COUNT; i++)
+  {
+    vec3 lighted_color = vec3 (0);
+    vec3 light_dir     = DirectLightDirection [i];
+
+    lighted_color += ComputeDiffuseColor (normal, light_dir, tex_diffuse_color);
+    lighted_color += ComputeSpecularColor (normal, light_dir, eye_dir, tex_specular_color) * fog_factor;
+    lighted_color *= DirectLightColor [i].rgb;
+
+    color += lighted_color;
+  }
+
+  color = mix (color, vec3 (0.29, 0.39, 0.54), 1.0-fog_factor);
     
   gl_FragColor = vec4 (color, Transparency * diffuse_transparency);
 }

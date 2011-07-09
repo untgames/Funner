@@ -38,6 +38,7 @@ void idle (Test& test, Entity& entity, Frame& frame)
   if (common::milliseconds () - last_fps > 1000)
   {
     printf ("FPS: %.2f\n", float (frames_count)/float (common::milliseconds () - last_fps)*1000.f);
+    fflush (stdout);
 
     last_fps = common::milliseconds ();
     frames_count = 0;
@@ -49,7 +50,7 @@ void idle (Test& test, Entity& entity, Frame& frame)
   common::PropertyMap frame_properties = frame.Properties ();
   common::PropertyMap entity_properties = entity.Properties ();  
 
-  angle += 0.5f*dt;
+  angle += 0.05f*dt;
   
   entity_properties.SetProperty ("myObjectMatrix", math::rotate (math::radian (angle), math::vec3f (0, 0, 1)) *
     math::rotate (math::radian (angle*0.2f), math::vec3f (1, 0, 0)));
