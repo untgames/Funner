@@ -7,10 +7,8 @@ const char* SOURCE_IMAGE_NAME                  = "data/pic1.jpg";
 const char* RESULTS_DIR                        = "results";
 const char* RESULT_POWER_OF_TWO_ATLAS_NAME     = "/io/stdout/power_of_two_atlas.xatlas";
 const char* RESULT_NON_POWER_OF_TWO_ATLAS_NAME = "/io/stdout/non_power_of_two_atlas.xatlas";
-const char* RESULT_EMPTY_ATLAS_NAME            = "/io/stdout/empty_atlas.xatlas";
 const char* RESULT_POWER_OF_TWO_IMAGE_NAME     = "results/power_of_two_image.bmp";
 const char* RESULT_NON_POWER_OF_TWO_IMAGE_NAME = "results/non_power_of_two_image.bmp";
-const char* RESULT_EMPTY_IMAGE_NAME            = "results/empty_image.bmp";
 
 const size_t SOURCE_IMAGE_WIDTH  = 123;
 const size_t SOURCE_IMAGE_HEIGHT = 61;
@@ -45,11 +43,17 @@ int main ()
 
     AtlasBuilder atlas_builder;
 
-    printf ("Atlas image name is '%s'\n", atlas_builder.AtlasImageName ());
+    printf ("Atlas margin is %d\n", atlas_builder.Margin ());
+    printf ("Atlas max image size is %d\n", atlas_builder.MaxImageSize ());
+    printf ("Atlas pack flags is %d\n", atlas_builder.PackFlags ());
 
-    atlas_builder.SetAtlasImageName ("atlas_image");
+    atlas_builder.SetMargin (0);
+    atlas_builder.SetMaxImageSize (4096);
+    atlas_builder.SetPackFlags (AtlasPackFlag_PowerOfTwoEdges);
 
-    printf ("Atlas image name is '%s'\n", atlas_builder.AtlasImageName ());
+    printf ("Atlas margin is %d\n", atlas_builder.Margin ());
+    printf ("Atlas max image size is %d\n", atlas_builder.MaxImageSize ());
+    printf ("Atlas pack flags is %d\n", atlas_builder.PackFlags ());
 
     atlas_builder.Insert (SOURCE_IMAGE_NAME);
 
@@ -62,16 +66,23 @@ int main ()
 
     atlas_builder.Insert (image);
 
+    printf ("Atlases count = %u\n", atlas_builder.AtlasesCount ());
+
     Atlas result_atlas;
     Image result_image;
 
-    atlas_builder.Build (result_atlas, result_image, 0, AtlasPackFlag_PowerOfTwoEdges);
+    atlas_builder.BuildAtlas (0, RESULT_POWER_OF_TWO_IMAGE_NAME, result_atlas);
+    atlas_builder.BuildAtlasImage (0, result_image);
 
     printf ("Saving power of two atlas\n");
+
     result_atlas.Save (RESULT_POWER_OF_TWO_ATLAS_NAME);
     result_image.Save (RESULT_POWER_OF_TWO_IMAGE_NAME);
 
-    atlas_builder.Build (result_atlas, result_image, 0, 0);
+    atlas_builder.SetPackFlags (0);
+
+    atlas_builder.BuildAtlas (0, RESULT_NON_POWER_OF_TWO_IMAGE_NAME, result_atlas);
+    atlas_builder.BuildAtlasImage (0, result_image);
 
     printf ("Saving non power of two atlas\n");
     result_atlas.Save (RESULT_NON_POWER_OF_TWO_ATLAS_NAME);
@@ -79,15 +90,12 @@ int main ()
 
     atlas_builder.Reset ();
 
-    atlas_builder.Build (result_atlas, result_image, 0, AtlasPackFlag_PowerOfTwoEdges);
+    atlas_builder.SetPackFlags (AtlasPackFlag_PowerOfTwoEdges);
 
-    printf ("Saving emty atlas\n");
-    result_atlas.Save (RESULT_EMPTY_ATLAS_NAME);
-    result_image.Save (RESULT_EMPTY_IMAGE_NAME);
+    printf ("Atlases count = %u\n", atlas_builder.AtlasesCount ());
 
     dump_hash (RESULT_POWER_OF_TWO_IMAGE_NAME);
     dump_hash (RESULT_NON_POWER_OF_TWO_IMAGE_NAME);
-//    dump_hash (RESULT_EMPTY_IMAGE_NAME);
   }
   catch (std::exception& exception)
   {

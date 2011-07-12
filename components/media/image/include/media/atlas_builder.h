@@ -31,10 +31,10 @@ enum AtlasBuilderInsertMode
 enum AtlasPackFlag
 {
   AtlasPackFlag_PowerOfTwoEdges = 1,  //стороны степени двойки
-  AtlasPackFlag_InvertTilesX    = 2,  //инвертировать расположение тайлов по оси X
-  AtlasPackFlag_InvertTilesY    = 4,  //инвертировать расположение тайлов по оси Y
+  AtlasPackFlag_InvertTilesX    = 2,  //инвертировать расположение тайлов по оси X, обрабатывается в AtlasBuilder
+  AtlasPackFlag_InvertTilesY    = 4,  //инвертировать расположение тайлов по оси Y, обрабатывается в AtlasBuilder
   AtlasPackFlag_SwapAxises      = 8,  //изменить расположение осей при размещении тайлов
-  AtlasPackFlag_SquareAxises    = 16, //равные размер осей
+  AtlasPackFlag_SquareAxises    = 16, //равные размеры осей
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -53,16 +53,28 @@ class AtlasBuilder
     ~AtlasBuilder ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Установка имени атласной картинки (полной)
+///Установка/получение максимального размера одного атласа
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void        SetAtlasImageName (const char* name);
-    const char* AtlasImageName    () const;
+    void   SetMaxImageSize (size_t max_image_size);
+    size_t MaxImageSize    () const;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Установка/получение размера поля
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void   SetMargin (size_t margin);
+    size_t Margin    () const;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Установка/получение флагов упаковки
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void   SetPackFlags (size_t pack_flags);
+    size_t PackFlags    () const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Добавление изображений
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void Insert (media::Image&, AtlasBuilderInsertMode mode = AtlasBuilderInsertMode_Default);
-    void Insert (const char* image_name);
+    void Insert (const char* image_name, bool keep_in_memory = true);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Сброс
@@ -70,10 +82,11 @@ class AtlasBuilder
     void Reset ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Построение карты/получение размеров результирующей картинки без формирования
+///Получение результатов упаковки
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void Build           (media::Atlas& out_atlas, media::Image& out_atlas_image, size_t margin, size_t pack_flags);
-    void GetBuildResults (size_t& image_width, size_t& image_height, size_t margin, size_t pack_flags);
+    size_t AtlasesCount    ();
+    void   BuildAtlas      (size_t index, const char* atlas_image_name, Atlas& result);
+    void   BuildAtlasImage (size_t index, Image& result);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Обмен

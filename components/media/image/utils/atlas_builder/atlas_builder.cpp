@@ -223,38 +223,90 @@ void validate (Params& params)
 }
 
 //построение атласа
+void format_atlas_names (Params& params, size_t atlas_index, bool is_single_atlas, stl::string& atlas_file_name, stl::string& layout_atlas_file_name)
+{
+  if (is_single_atlas)
+  {
+    atlas_file_name        = common::format (params.atlas_file_format.c_str (), atlas_index);
+    layout_atlas_file_name = common::format (params.layout_atlas_file_format.c_str (), atlas_index);
+  }
+  else
+  {
+    stl::string atlas_file_format, layout_atlas_file_format;
+
+    if (params.atlas_file_format.find ("%") == stl::string::npos)
+      atlas_file_format = common::format ("%s%%u%s", common::basename (params.atlas_file_format).c_str (), common::suffix (params.atlas_file_format).c_str ());
+    else
+      atlas_file_format = params.atlas_file_format;
+
+    atlas_file_name = common::format (atlas_file_format.c_str (), atlas_index);
+
+    if (params.layout_atlas_file_format.find ("%") == stl::string::npos)
+      layout_atlas_file_format = common::format ("%s%%u%s", common::basename (params.layout_atlas_file_format).c_str (), common::suffix (params.layout_atlas_file_format).c_str ());
+    else
+      layout_atlas_file_format = params.layout_atlas_file_format;
+
+    layout_atlas_file_name = common::format (layout_atlas_file_format.c_str (), atlas_index);
+  }
+}
+
+void save_builder_results (Params& params, bool is_single_atlas, media::AtlasBuilder& builder, size_t& atlas_index, media::Atlas& result_atlas)
+{
+  stl::string atlas_file_name, layout_atlas_file_name;
+
+  for (size_t i = 0, count = builder.AtlasesCount (); i < count; i++, atlas_index++)
+  {
+    format_atlas_names (params, atlas_index, is_single_atlas, atlas_file_name, layout_atlas_file_name);
+
+    media::Atlas atlas;
+    media::Image atlas_image;
+
+    builder.BuildAtlas (i, layout_atlas_file_name.c_str (), atlas);
+    builder.BuildAtlasImage (i, atlas_image);
+
+    if (!params.silent)
+      printf ("Build atlas %ux%u\n", atlas_image.Width (), atlas_image.Height ());
+
+    for (size_t j = 0, tiles_count = atlas.TilesCount (); j < tiles_count; j++)
+      result_atlas.Insert (atlas.Tile (j));
+
+    result_atlas.SetImageSize (layout_atlas_file_name.c_str (), atlas.ImageSize (layout_atlas_file_name.c_str ()));
+
+    if (!params.silent)
+      printf ("Save atlas '%s'\n", atlas_file_name.c_str ());
+
+    try
+    {
+      atlas_image.Save (atlas_file_name.c_str ());
+    }
+    catch (...)
+    {
+      if (!params.silent)
+        printf (" - Fail!\n");
+
+      throw;
+    }
+  }
+}
+
 void build (Params& params)
 {
   try
   {
-      //загрузка картинок
-    stl::hash_map<stl::hash_key<const char*>, media::Image> images;
-
-    if (!params.dont_store_images)
-      for (size_t i = 0, count = params.sources.Size (); i < count; i++)
-        images.insert_pair (params.sources [i], media::Image (params.sources [i]));
-
-      //конфигурирование построителя атласа
-
-    media::AtlasBuilder builder;
-    media::Image        atlas_image;
-    media::Atlas        atlas, result_atlas;
-    size_t              pack_flags  = 0,
-                        atlas_index = 0;
-    StringArray         sources_to_process = params.sources;
-
       //обработка изолированных изображений
       
     common::StringArray isolated_images_wildcard_list = common::split (params.isolated_images_wildcard.c_str ());
-      
-    stl::hash_set<stl::hash_key<const char*> > is_isolated_image;      
 
-    for (size_t i=0, count=sources_to_process.Size (); i<count; i++)
+    typedef stl::hash_map<stl::hash_key<const char*>, const char*> NameMap;
+
+    NameMap isolated_images;
+
+    for (size_t i = 0, count = params.sources.Size (); i < count; i++)
     {
-      const char* source       = sources_to_process [i];      
+      const char* source       = params.sources [i];
       bool        need_isolate = false;
 
-      for (size_t i=0, count=isolated_images_wildcard_list.Size (); i<count; i++)
+      for (size_t i = 0, count = isolated_images_wildcard_list.Size (); i < count; i++)
       {
         const char* mask = isolated_images_wildcard_list [i];        
 
@@ -268,160 +320,54 @@ void build (Params& params)
       if (!need_isolate)
         continue;        
 
-      is_isolated_image.insert (source);
+      isolated_images.insert_pair (source, source);
     }
     
       //построение атласов
-      
+
+    size_t pack_flags = 0;
+
     if (params.need_pot_rescale) pack_flags |= media::AtlasPackFlag_PowerOfTwoEdges;
     if (params.invert_x)         pack_flags |= media::AtlasPackFlag_InvertTilesX;
     if (params.invert_y)         pack_flags |= media::AtlasPackFlag_InvertTilesY;
     if (params.swap_axises)      pack_flags |= media::AtlasPackFlag_SwapAxises;      
     if (params.square_axises)    pack_flags |= media::AtlasPackFlag_SquareAxises;
       
-    while (!sources_to_process.IsEmpty ())
-    {
-      if (!params.silent)
-        printf ("Build atlas ");
+    media::AtlasBuilder builder;
 
+    builder.SetMargin (params.margin);
+    builder.SetMaxImageSize (params.max_image_size);
+    builder.SetPackFlags (pack_flags);
+
+    for (size_t i = 0, count = params.sources.Size (); i < count; i++)
+    {
+      const char* source      = params.sources [i];
+      bool        is_isolated = isolated_images.find (source) != isolated_images.end ();
+
+      if (is_isolated) //изолированное изображение всегда кладётся в атлас одно
+        continue;
+
+      builder.Insert (source, !params.dont_store_images);
+    }
+
+      //сохранение атласа
+    media::Atlas result_atlas;
+
+    size_t atlas_index = 0;
+    bool   is_single_atlas = builder.AtlasesCount () + isolated_images.size () == 1;
+
+    save_builder_results (params, is_single_atlas, builder, atlas_index, result_atlas);
+
+    for (NameMap::iterator iter = isolated_images.begin (), end = isolated_images.end (); iter != end; ++iter)
+    {
       builder.Reset ();
 
-      typedef stl::pair<media::Image, size_t> SourceDescPair;
-      typedef stl::list<SourceDescPair>       ProcessedSourcesList;
+      builder.SetMaxImageSize (params.max_image_size);
+      builder.SetPackFlags (pack_flags);
 
-      ProcessedSourcesList processed_sources;
+      builder.Insert (iter->second, !params.dont_store_images);
 
-      for (size_t i = 0, count = sources_to_process.Size (); i < count; i++)
-      {
-        const char* source      = sources_to_process [i];
-        bool        is_isolated = is_isolated_image.find (source) != is_isolated_image.end ();
-        
-        if (is_isolated && !processed_sources.empty ()) //изолированное изображение всегда кладётся в атлас одно
-          continue;
-
-          //попытка добавить изображение в текущий атлас
-
-        try
-        {
-          if (params.dont_store_images)
-            builder.Insert (source);
-          else
-            builder.Insert (images [source], media::AtlasBuilderInsertMode_Reference);
-        }
-        catch (...)
-        {
-          if (!params.silent)
-            printf ("- Fail!\n");
-
-          throw;
-        }
-
-        size_t result_image_width = 0, result_image_height = 0;
-
-        try
-        {
-          builder.GetBuildResults (result_image_width, result_image_height, params.margin, pack_flags);
-        }
-        catch (...)
-        {
-          if (!params.silent)
-            printf ("- Fail!\n");
-
-          throw;
-        }        
-
-        if (result_image_width > params.max_image_size || result_image_height > params.max_image_size)
-        {         
-          builder.Reset ();
-
-          for (ProcessedSourcesList::iterator iter = processed_sources.begin (), end = processed_sources.end (); iter != end; ++iter)
-            builder.Insert (iter->first, media::AtlasBuilderInsertMode_Reference);
-        }
-        else
-        {
-          if (params.dont_store_images)
-            processed_sources.push_back (SourceDescPair (media::Image (sources_to_process [i]), i));
-          else
-            processed_sources.push_back (SourceDescPair (images [sources_to_process [i]], i));
-          
-          if (is_isolated)
-            break; //если изолированное изображение может быть добавлено - кладём его в атлас одно
-        }
-      }
-
-      if (processed_sources.empty ())
-        throw xtl::format_operation_exception ("build", "Can't build atlas, image '%s' size greater than maximum atlas image size %u",
-          params.sources [0], params.max_image_size);
-
-        //сохранение атласа
-
-      stl::string atlas_file_name, layout_atlas_file_name;
-
-      if (atlas_index || processed_sources.size () != params.sources.Size ())
-      {
-        stl::string atlas_file_format, layout_atlas_file_format;
-        
-        if (params.atlas_file_format.find ("%") == stl::string::npos)
-          atlas_file_format = common::format ("%s%%u%s", common::basename (params.atlas_file_format).c_str (), common::suffix (params.atlas_file_format).c_str ());          
-        else
-          atlas_file_format = params.atlas_file_format;
-
-        atlas_file_name = common::format (atlas_file_format.c_str (), atlas_index);
-        
-        if (params.layout_atlas_file_format.find ("%") == stl::string::npos)
-          layout_atlas_file_format = common::format ("%s%%u%s", common::basename (params.layout_atlas_file_format).c_str (), common::suffix (params.layout_atlas_file_format).c_str ());                  
-        else
-          layout_atlas_file_format = params.layout_atlas_file_format;
-          
-        layout_atlas_file_name = common::format (layout_atlas_file_format.c_str (), atlas_index);
-      }
-      else
-      {
-        atlas_file_name        = common::format (params.atlas_file_format.c_str (), atlas_index);
-        layout_atlas_file_name = common::format (params.layout_atlas_file_format.c_str (), atlas_index);
-      }
-
-      builder.SetAtlasImageName (layout_atlas_file_name.c_str ());
-
-      try
-      {
-        builder.Build (atlas, atlas_image, params.margin, pack_flags);
-
-        for (size_t i = 0, count = atlas.TilesCount (); i < count; i++)
-          result_atlas.Insert (atlas.Tile (i));
-          
-        result_atlas.SetImageSize (layout_atlas_file_name.c_str (), atlas.ImageSize (layout_atlas_file_name.c_str ()));
-      }
-      catch (...)
-      {
-        if (!params.silent)
-          printf ("- Fail!\n");
-
-        throw;
-      }
-
-      if (!params.silent)
-        printf ("%ux%u\n", atlas_image.Width (), atlas_image.Height ());
-
-      if (!params.silent)
-        printf ("Save atlas '%s'\n", atlas_file_name.c_str ());
-
-      try
-      {
-        atlas_image.Save (atlas_file_name.c_str ());
-      }
-      catch (...)
-      {
-        if (!params.silent)
-          printf (" - Fail!\n");
-
-        throw;
-      }
-
-      for (ProcessedSourcesList::reverse_iterator iter = processed_sources.rbegin (), end = processed_sources.rend (); iter != end; ++iter)
-        sources_to_process.Remove (iter->second);
-
-      atlas_index++;
+      save_builder_results (params, is_single_atlas, builder, atlas_index, result_atlas);
     }
 
     try
