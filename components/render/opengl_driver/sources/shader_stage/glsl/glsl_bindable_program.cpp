@@ -213,9 +213,9 @@ void GlslBindableProgram::Bind (ConstantBufferPtr* constant_buffers)
         case ProgramParameterType_Float3:   caps.glUniform3fv_fn       (parameter.location, parameter.count, (float*)parameter_data);    break;
         case ProgramParameterType_Int4:     caps.glUniform4iv_fn       (parameter.location, parameter.count, (GLint*)parameter_data);    break;
         case ProgramParameterType_Float4:   caps.glUniform4fv_fn       (parameter.location, parameter.count, (float*)parameter_data);    break;
-        case ProgramParameterType_Float2x2: caps.glUniformMatrix2fv_fn (parameter.location, parameter.count, 0, (float*)parameter_data); break;
-        case ProgramParameterType_Float3x3: caps.glUniformMatrix3fv_fn (parameter.location, parameter.count, 0, (float*)parameter_data); break;
-        case ProgramParameterType_Float4x4: caps.glUniformMatrix4fv_fn (parameter.location, parameter.count, 0, (float*)parameter_data); break;
+        case ProgramParameterType_Float2x2: caps.glUniformMatrix2fv_fn (parameter.location, parameter.count, GL_TRUE, (float*)parameter_data); break;
+        case ProgramParameterType_Float3x3: caps.glUniformMatrix3fv_fn (parameter.location, parameter.count, GL_TRUE, (float*)parameter_data); break;
+        case ProgramParameterType_Float4x4: caps.glUniformMatrix4fv_fn (parameter.location, parameter.count, GL_TRUE, (float*)parameter_data); break;
         default: break;
       }
     }

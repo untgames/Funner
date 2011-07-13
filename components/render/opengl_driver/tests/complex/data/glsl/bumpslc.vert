@@ -26,14 +26,14 @@ void main(void)
     // Do standard vertex stuff
 
 //    gl_Position  = gl_ModelViewProjectionMatrix * Transform * gl_Vertex;
-    gl_Position  = gl_ModelViewProjectionMatrix * gl_Vertex;
+    gl_Position  = gl_Vertex;
 //    gl_TexCoord[0] = gl_MultiTexCoord0;
     gl_TexCoord[0] = vec4 (gl_Vertex.x + 1.0, gl_Vertex.y + 1.0, 0, 0) / 2.0;
 
     // Compute the binormal
 
-    n = normalize(gl_NormalMatrix * gl_Normal);
-    t = normalize(gl_NormalMatrix * vec3 (gl_Color));
+    n = normalize(gl_Normal);
+    t = normalize(vec3 (gl_Color));
     b = cross(n, t);
 
     // Transform light position into surface local coordinates
@@ -47,7 +47,7 @@ void main(void)
     lightDir = normalize(v);
 
 //    pos      = vec3 (gl_ModelViewMatrix * Transform * gl_Vertex);
-    pos      = vec3 (gl_ModelViewMatrix * gl_Vertex);
+    pos      = gl_Vertex.xyz;
 
     v.x = dot(pos, t);
     v.y = dot(pos, b);
