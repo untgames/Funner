@@ -199,6 +199,7 @@ struct MaterialImpl::Impl: public CacheHolder, public DebugIdHolder
   
   using CacheHolder::UpdateCache;  
   using CacheHolder::ResetCache;
+  using CacheHolder::InvalidateCache;
 };
 
 /*
@@ -389,7 +390,7 @@ void MaterialImpl::Update (const media::rfx::Material& material)
     impl->cached_state_block         = LowLevelStateBlockPtr ();
     impl->has_dynamic_textures       = new_has_dynamic_textures;
     
-    ResetCache ();
+    impl->InvalidateCache (); //TODO: режим сброса
   }
   catch (xtl::exception& e)
   {

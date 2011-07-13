@@ -49,8 +49,8 @@ void idle (Test& test, Entity& entity, Frame& frame)
     math::mat4f model_view_tm      = frame_properties.GetMatrix ("ViewMatrix") * entity_properties.GetMatrix ("ObjectMatrix");
     math::mat4f model_view_proj_tm = frame_properties.GetMatrix ("ProjectionMatrix") * model_view_tm;
       
-    frame_properties.SetProperty ("ModelViewMatrix", transpose (model_view_tm));
-    frame_properties.SetProperty ("ModelViewProjectionMatrix", transpose (model_view_proj_tm));
+    frame_properties.SetProperty ("ModelViewMatrix", model_view_tm);
+    frame_properties.SetProperty ("ModelViewProjectionMatrix", model_view_proj_tm);
     
     frame.Draw ();
       

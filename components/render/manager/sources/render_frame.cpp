@@ -70,6 +70,7 @@ struct EffectHolder: public CacheSource
     
   using CacheHolder::UpdateCache;
   using CacheHolder::ResetCache;
+  using CacheHolder::InvalidateCache;
 };
 
 /*
@@ -504,7 +505,7 @@ void FrameImpl::SetEffect (const char* name)
     
     impl->effect_holder->effect = impl->effect_holder->effect_manager->GetEffectProxy (name);    
     
-    impl->effect_holder->ResetCache ();
+    impl->effect_holder->InvalidateCache ();
   }
   catch (xtl::exception& e)
   {

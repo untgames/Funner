@@ -139,6 +139,7 @@ void DynamicTextureMaterialStorage::UpdateCacheCore ()
       dynamic_textures_count++;
     }
     
+    impl->dynamic_textures.clear ();
     impl->dynamic_textures.reserve (dynamic_textures_count);
     
     DynamicTextureEntityStorage& cache = impl->owner.DynamicTextureStorage ();

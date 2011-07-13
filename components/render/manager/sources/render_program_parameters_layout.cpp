@@ -235,7 +235,9 @@ struct ProgramParametersLayout::Impl: public CacheHolder, public DebugIdHolder
     slots [slot].layout      = properties.Layout ();
     slots [slot].layout_hash = slots [slot].layout.Hash ();        
 
-    ResetCacheCore ();
+    InvalidateCache ();
+    
+    need_rebuild = true;
   }
 };
 

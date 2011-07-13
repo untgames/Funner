@@ -71,11 +71,11 @@ const common::PropertyMap& PropertyBuffer::Properties ()
 void PropertyBuffer::OnPropertiesUpdated ()
 {
   if (impl->need_update)
-    return;      
+    return;
     
-  impl->need_update = true;    
+  impl->need_update = true;
     
-  ResetCache ();
+  InvalidateCache (false);
 }
 
 /*
@@ -130,6 +130,8 @@ void PropertyBuffer::UpdateCacheCore ()
       
       impl->buffer             = LowLevelBufferPtr (impl->device_manager->Device ().CreateBuffer (desc), false);
       impl->cached_buffer_size = desc.size;
+      
+      InvalidateCacheDependencies ();
     }
 
     impl->buffer->SetData (0, buffer_size, impl->properties.BufferData ());

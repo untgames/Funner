@@ -3,8 +3,6 @@
 using namespace render;
 using namespace render::low_level;
 
-//TODO: FlushUnusedMaterials issue needs to be fixed, crash
-
 namespace
 {
 
@@ -148,8 +146,8 @@ class EntityLodCommonData: public CacheHolder, public DebugIdHolder
   protected:
     void FlushUnusedMaterials ()
     {
-      for (StateMap::iterator iter=states.begin (), end=states.end (); iter!=end; ++iter)
-        if (iter->second->use_count () == 1)
+      for (StateMap::iterator iter=states.begin (), end=states.end (); iter!=end;)
+        if (iter->second->material->use_count () == 1)
         {
           StateMap::iterator next = iter;
           
@@ -175,10 +173,8 @@ class EntityLodCommonData: public CacheHolder, public DebugIdHolder
       {
         if (device_manager->Settings ().HasDebugLog ())
           Log ().Printf ("Update entity cache (id=%u)", Id ());
-          
-        printf ("%s(%u)\n", __FILE__, __LINE__); fflush (stdout);
-//        FlushUnusedMaterials ();!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!TODO!!!!!!!!!!!!!!!!!!!!!!11
-        printf ("%s(%u)\n", __FILE__, __LINE__); fflush (stdout);
+
+        FlushUnusedMaterials ();
 
         dynamic_textures.FlushUnusedTextures ();
 
@@ -372,6 +368,7 @@ struct EntityLod: public xtl::reference_counter, public CacheHolder, public Debu
       for (size_t i=0; i<groups_count; i++)
         operations_count += groups [i].primitives_count;
         
+      cached_operations.clear ();
       cached_operations.reserve (operations_count);
       
         //построение списка операций
@@ -743,8 +740,9 @@ const RendererOperationList& EntityImpl::RendererOperations (size_t level_of_det
 
     if (!lod)
       throw xtl::make_argument_exception ("", "level_of_detail", level_of_detail, "Lod primitive is not set");
-      
-    impl->Properties ().UpdateCache ();
+
+    impl->Properties ().UpdateCache (); //TODO: убрать!!!
+
     lod->UpdateCache ();
 
     return lod->cached_operation_list;

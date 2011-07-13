@@ -13,7 +13,8 @@ using namespace render;
 */
 
 CacheHolder::CacheHolder ()
-  : need_update (true)
+  : state (CacheState_Reset)
+  , need_update_this (true)  
 {
 }
 
@@ -38,9 +39,9 @@ void CacheHolder::AttachCacheSource (CacheHolder& source)
   
   try
   {
-    source.parent_holders.push_back (this);
+    source.dependencies.push_back (this);
 
-    ResetCache ();
+    InvalidateCache (false);
   }
   catch (...)
   {
@@ -52,7 +53,9 @@ void CacheHolder::AttachCacheSource (CacheHolder& source)
 void CacheHolder::DetachCacheSource (CacheHolder& source)
 {
   sources.remove (&source);
-  source.parent_holders.remove (this);
+  source.dependencies.remove (this);
+  
+  InvalidateCache (false);
 }
 
 void CacheHolder::DetachAllCacheSources ()
@@ -60,8 +63,10 @@ void CacheHolder::DetachAllCacheSources ()
   while (!sources.empty ())
     DetachCacheSource (*sources.back ());
 
-  while (!parent_holders.empty ())
-    parent_holders.back ()->DetachCacheSource (*this);
+  while (!dependencies.empty ())
+    dependencies.back ()->DetachCacheSource (*this);
+    
+  InvalidateCache (false);
 }
 
 /*
@@ -83,19 +88,77 @@ bool CacheHolder::IsParentOf (CacheHolder& child)
 }
 
 /*
+    Установка флага необходимости обновления кэша / зависимых кэшей
+*/
+
+void CacheHolder::InvalidateFlags ()
+{
+  switch (state)
+  {
+    case CacheState_Valid:
+      break;
+    case CacheState_Reset:
+    case CacheState_Invalid:
+    case CacheState_Broken:
+      return;
+  }
+
+  for (HolderList::iterator iter=dependencies.begin (), end=dependencies.end (); iter!=end; ++iter)
+    (*iter)->InvalidateFlags ();
+
+  state = CacheState_Invalid;
+}
+
+void CacheHolder::InvalidateCache (bool invalidate_dependencies)
+{
+  if (need_update_this)
+    return;
+    
+  need_update_this = true;
+  
+  if (invalidate_dependencies)
+  {
+    for (HolderList::iterator iter=dependencies.begin (), end=dependencies.end (); iter!=end; ++iter)
+      (*iter)->need_update_this = true;  
+  }
+
+  InvalidateFlags ();
+}
+
+/*
     Отметка о необходимости обновления кэша источника
 */
 
 void CacheHolder::ResetCache ()
 {
-  if (need_update)
-    return;
-    
-  need_update = true;
+  switch (state)
+  {
+    case CacheState_Valid:
+    case CacheState_Invalid:
+    case CacheState_Broken:
+      break;
+    case CacheState_Reset:
+      return;
+  }    
   
-  ResetCacheCore ();
+  need_update_this = true;
+      
+  try
+  {
+    ResetCacheCore ();
+  }
+  catch (std::exception& e)
+  {
+    Log ().Printf ("Unexpected exception: %s\n    at render::CacheHolder::ResetCache", e.what ());
+  }
+  catch (...)
+  {
+    Log ().Printf ("Unexpected exception at render::CacheHolder::ResetCache");
+  }
   
-  for (HolderList::iterator iter=parent_holders.begin (), end=parent_holders.end (); iter!=end; ++iter)
+  state = CacheState_Reset;
+  
+  for (HolderList::iterator iter=dependencies.begin (), end=dependencies.end (); iter!=end; ++iter)
     (*iter)->ResetCache ();
 }
 
@@ -105,12 +168,37 @@ void CacheHolder::ResetCache ()
 
 void CacheHolder::UpdateCache ()
 {
-  if (!need_update)
-    return;
+  switch (state)
+  {    
+    case CacheState_Invalid:
+    case CacheState_Reset:    
+      break;
+    case CacheState_Broken:
+    case CacheState_Valid:   
+      return;
+  }    
+
+  for (HolderList::iterator iter=sources.begin (), end=sources.end (); iter!=end; ++iter)
+    (*iter)->UpdateCache ();
     
-  UpdateCacheCore ();
-  
-  need_update = false;
+  if (need_update_this)
+  {   
+    try
+    {
+      UpdateCacheCore ();
+    }
+    catch (...)
+    {
+      state            = CacheState_Broken;
+      need_update_this = false;
+
+      throw;
+    }
+    
+    need_update_this = false;
+  } 
+    
+  state = CacheState_Valid;
 }
 
 /*
@@ -120,7 +208,7 @@ void CacheHolder::UpdateCache ()
 */
 
 /*
-    Кэшируемый источник требует обновления кэша.
+    Кэшируемый источник требует обновления кэша
 */
 
 void CacheSource::UpdateCacheCore ()
@@ -129,5 +217,4 @@ void CacheSource::UpdateCacheCore ()
 
 void CacheSource::ResetCacheCore ()
 {
-  UpdateCache ();
 }

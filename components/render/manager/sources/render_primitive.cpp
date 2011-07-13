@@ -147,6 +147,7 @@ struct Mesh: public xtl::reference_counter, public MeshCommonData, public CacheH
   {
     try
     {
+      cached_primitives.clear ();
       cached_primitives.reserve (primitives.size ());
       
       for (MeshPrimitiveArray::iterator iter=primitives.begin (), end=primitives.end (); iter!=end; ++iter)
@@ -335,7 +336,7 @@ size_t PrimitiveImpl::AddMesh (const media::geometry::Mesh& source, MeshBufferUs
       
     impl->meshes.push_back (mesh);
     
-    ResetCache ();
+    InvalidateCache ();
     
     return impl->meshes.size () - 1;
   }
@@ -356,14 +357,14 @@ void PrimitiveImpl::RemoveMeshes (size_t first_mesh, size_t meshes_count)
 
   impl->meshes.erase (impl->meshes.begin () + first_mesh, impl->meshes.begin () + first_mesh + meshes_count);
 
-  ResetCache ();  
+  InvalidateCache ();  
 }
 
 void PrimitiveImpl::RemoveAllMeshes ()
 {
   impl->meshes.clear ();
   
-  ResetCache ();  
+  InvalidateCache ();  
 }
 
 /*
@@ -452,6 +453,7 @@ void PrimitiveImpl::UpdateCacheCore ()
 {
   try
   {
+    impl->render_groups.clear ();
     impl->render_groups.reserve (impl->meshes.size ());
     
     for (MeshArray::iterator iter=impl->meshes.begin (), end=impl->meshes.end (); iter!=end; ++iter)
