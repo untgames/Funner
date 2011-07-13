@@ -90,6 +90,9 @@ GlslProgram::GlslProgram (const ContextManager& manager, size_t shaders_count, I
         name_length = 0;
         
       parameter_name.fast_resize (name_length);
+
+      if (strstr (parameter_name.c_str (), "[0]") == parameter_name.end () - 3)  //Обход особенности именования массивов в драйверах nVidia
+        parameter_name.fast_resize (parameter_name.size () - 3);
       
       Parameter parameter;
       
