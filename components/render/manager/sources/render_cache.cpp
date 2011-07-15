@@ -96,10 +96,10 @@ void CacheHolder::InvalidateFlags ()
   switch (state)
   {
     case CacheState_Valid:
+    case CacheState_Broken:    
       break;
     case CacheState_Reset:
     case CacheState_Invalid:
-    case CacheState_Broken:
       return;
   }
 
