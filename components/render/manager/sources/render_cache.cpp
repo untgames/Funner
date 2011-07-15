@@ -189,6 +189,8 @@ void CacheHolder::UpdateCache ()
     }
     catch (...)
     {
+      InvalidateCacheDependencies ();
+      
       state            = CacheState_Broken;
       need_update_this = false;
 

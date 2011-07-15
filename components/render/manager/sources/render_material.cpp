@@ -20,7 +20,6 @@ const char* DEFAULT_PROGRAM_NAME = ""; //имя программы по умолчанию
 
 struct Texmap: public xtl::reference_counter, public CacheHolder
 {
-  MaterialImpl&           material;              //обратная ссылка на материал
   TextureProxy            texture;               //прокси текстуры
   SamplerProxy            sampler;               //сэмплер текстуры
   bool                    is_dynamic;            //является ли текстура динамической  
@@ -28,9 +27,8 @@ struct Texmap: public xtl::reference_counter, public CacheHolder
   LowLevelSamplerStatePtr cached_sampler;        //закэшированный сэмплер
   LowLevelTexturePtr      cached_device_texture; //закэшированная текстура
   
-  Texmap (MaterialImpl& in_material, const TextureProxy& in_texture_proxy, const SamplerProxy& in_sampler_proxy, bool in_is_dynamic)
-    : material (in_material)
-    , texture (in_texture_proxy)
+  Texmap (MaterialImpl& material, const TextureProxy& in_texture_proxy, const SamplerProxy& in_sampler_proxy, bool in_is_dynamic)
+    : texture (in_texture_proxy)
     , sampler (in_sampler_proxy)
     , is_dynamic (in_is_dynamic)
   {
@@ -51,9 +49,21 @@ struct Texmap: public xtl::reference_counter, public CacheHolder
   {
     try
     {
-      cached_texture        = is_dynamic ? TexturePtr () : texture.Resource ();
-      cached_device_texture = cached_texture ? cached_texture->DeviceTexture () : LowLevelTexturePtr (); 
-      cached_sampler        = sampler.Resource ();
+      TexturePtr              new_cached_texture        = is_dynamic ? TexturePtr () : texture.Resource ();                         
+      LowLevelSamplerStatePtr new_cached_sampler        = sampler.Resource ();
+      LowLevelTexturePtr      new_cached_device_texture = new_cached_texture ? new_cached_texture->DeviceTexture () : LowLevelTexturePtr ();
+      
+      if (!new_cached_sampler)
+        throw xtl::format_operation_exception ("", "Null sampler for texmap: texture='%s' sampler='%s'", texture.Name (), sampler.Name ());
+            
+      if (new_cached_texture == cached_texture && new_cached_sampler == cached_sampler && new_cached_device_texture == cached_device_texture)
+        return;
+      
+      cached_texture        = new_cached_texture;
+      cached_device_texture = new_cached_device_texture;      
+      cached_sampler        = new_cached_sampler;
+
+      InvalidateCache ();
     }
     catch (xtl::exception& e)
     {
@@ -125,6 +135,7 @@ struct MaterialImpl::Impl: public CacheHolder, public DebugIdHolder
     cached_properties_layout = ProgramParametersLayoutPtr ();
     cached_program           = ProgramPtr ();
     cached_properties        = LowLevelBufferPtr ();
+    cached_state_block       = LowLevelStateBlockPtr ();
   }
   
   void UpdateCacheCore ()
@@ -135,12 +146,15 @@ struct MaterialImpl::Impl: public CacheHolder, public DebugIdHolder
       
       if (has_debug_log)
         log.Printf ("Update material cache (id=%u)", Id ());
-                
+        
       cached_program    = program.Resource ();
       cached_properties = properties.Buffer ();
       
       if (cached_program)
+      {
         cached_properties_layout = device_manager->ProgramParametersManager ().GetParameters (&*material_properties_layout, &*cached_program->ParametersLayout (), 0);
+      }
+      else throw xtl::format_operation_exception ("", "Null program for material '%s' (id=%u)", id.c_str (), Id ());
       
       render::low_level::IDevice& device = device_manager->Device ();
 
@@ -162,33 +176,34 @@ struct MaterialImpl::Impl: public CacheHolder, public DebugIdHolder
         mask.ss_constant_buffers [ProgramParametersSlot_Material] = true;
         mask.ss_constant_buffers [ProgramParametersSlot_Program]  = true;
         
-        cached_state_block = LowLevelStateBlockPtr (device_manager->Device ().CreateStateBlock (mask), false);        
-        
         for (size_t i=0, count=stl::min (texmaps.size (), DEVICE_SAMPLER_SLOTS_COUNT); i<count; i++)
         {
-          Texmap& texmap = *texmaps [i];
-          
-          texmap.UpdateCache ();
-
-          if (texmap.cached_device_texture)
-          {
-            device.SSSetTexture (i, texmap.cached_device_texture.get ());
-
-            mask.ss_textures [i] = true;
-          }
-          
-          device.SSSetSampler (i, texmap.cached_sampler.get ());
-          
+          mask.ss_textures [i] = !texmaps [i]->is_dynamic;
           mask.ss_samplers [i] = true;
         }
-          
-        cached_state_block = LowLevelStateBlockPtr (device.CreateStateBlock (mask), false);
+        
+        cached_state_block = LowLevelStateBlockPtr (device.CreateStateBlock (mask), false);        
+      }
+      
+      for (size_t i=0, count=stl::min (texmaps.size (), DEVICE_SAMPLER_SLOTS_COUNT); i<count; i++)
+      {
+        Texmap& texmap = *texmaps [i];
+        
+        texmap.UpdateCache ();
+        
+        if (texmap.IsBroken ())
+          throw xtl::format_operation_exception ("", "Texmap[%u] of material '%s' (id=%u) is broken. Material will be broken too", i, id.c_str (), Id ());
+
+        if (texmap.cached_device_texture)
+          device.SSSetTexture (i, texmap.cached_device_texture.get ());
+        
+        device.SSSetSampler (i, texmap.cached_sampler.get ());
       }
 
       cached_state_block->Capture ();
 
       if (has_debug_log)
-        log.Printf ("...cached updated");
+        log.Printf ("...material cache updated");
     }
     catch (xtl::exception& e)
     {

@@ -78,9 +78,9 @@ render.manager: Update entity lod cache (entity_id=8, id=10)
 render.manager: Update material cache (id=3)
 render.manager: Program parameters layout created (id=11)
 render.manager: Program parameters layout created (id=12)
-render.manager: ...cached updated
+render.manager: ...material cache updated
 render.manager: Update material cache (id=4)
-render.manager: ...cached updated
+render.manager: ...material cache updated
 Entity created successfull
 render.manager: Entity lod destroyed (entity_id=8, id=10)
 render.manager: Entity destroyed (id=8)

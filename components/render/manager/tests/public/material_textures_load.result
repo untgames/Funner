@@ -55,7 +55,7 @@ render.manager: ...created texture 1024x1024x1@dxt1
 render.manager: Update material cache (id=4)
 render.manager: Program parameters layout created (id=8)
 render.manager: Program parameters layout created (id=9)
-render.manager: ...cached updated
+render.manager: ...material cache updated
 All resources have loaded
 window 784x562 removed
 render.manager: Material destroyed (id=5)
