@@ -16,7 +16,7 @@ render.manager: Effect rasterizer 'wireframe' loaded
 render.manager: Effect rasterizer 'overlays' loaded
 render.manager: Effect texture sampler 'default' loaded
 render.manager: Effect texture sampler 'repeat' loaded
-render.manager: Effect shaders library 'data/shaders/*' loaded (6 shaders loaded)
+render.manager: Effect shaders library 'data/shaders/*' loaded (7 shaders loaded)
 render.manager: Effect program 'phong' loaded
 render.manager: Effect program 'shadow_map' loaded
 render.manager: Effect program 'helper' loaded

@@ -29,7 +29,7 @@
   </layouts>
   <texmaps/>
   <materials>
-    <material id="canyon.archway_1" name="archway_1" program="phong" layout="layout#1">
+    <material id="canyon.archway_1" name="archway_1" program="phong" layout="layout#1" tags="solid">
       <property name="Reflectivity" value="0"/>
       <property name="Transparency" value="1"/>
       <property name="Shininess" value="10"/>
@@ -51,7 +51,7 @@
       <texmap semantic="diffuse" image="data/pic1.dds" sampler="repeat"/>
       <texmap semantic="bump" image="data/bottom.jpg" sampler="repeat"/>
     </material>
-    <material id="canyon.stn_1" name="stn_1" program="phong" layout="layout#1">
+    <material id="canyon.stn_1" name="stn_1" program="phong" layout="layout#1" tags="solid">
       <property name="Reflectivity" value="0"/>
       <property name="Transparency" value="1"/>
       <property name="Shininess" value="10"/>
@@ -73,7 +73,7 @@
       <texmap semantic="diffuse" image="data/pic1.dds" sampler="repeat"/>
       <texmap semantic="bump" image="data/pic1.dds" sampler="repeat"/>
     </material>
-    <material id="canyon.stn_2" name="stn_2" program="phong" layout="layout#1">
+    <material id="canyon.stn_2" name="stn_2" program="phong" layout="layout#1" tags="solid">
       <property name="Reflectivity" value="0"/>
       <property name="Transparency" value="1"/>
       <property name="Shininess" value="10"/>
@@ -95,7 +95,7 @@
       <texmap semantic="diffuse" image="data/pic1.dds" sampler="repeat"/>
       <texmap semantic="bump" image="data/bottom.jpg" sampler="repeat"/>
     </material>
-    <material id="canyon.Material__195" name="Material__195" program="phong" layout="layout#1">
+    <material id="canyon.Material__195" name="Material__195" program="phong" layout="layout#1" tags="solid">
       <property name="Reflectivity" value="0"/>
       <property name="Transparency" value="1"/>
       <property name="Shininess" value="10"/>
