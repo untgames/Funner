@@ -1,5 +1,5 @@
 Results of state_block_test:
-Mask 'mask1':
+Mask 'mask1' (hash=dd5a416c):
 ISInpoutLayout: 0
 ISVertexBuffers[0]: 0
 ISVertexBuffers[1]: 0
@@ -44,7 +44,7 @@ OSDepthStencilState: 0
 OSRenderTargetView: 0
 OSDepthStencilView: 0
 Predication: 0
-Mask 'mask2':
+Mask 'mask2' (hash=0497d64e):
 ISInpoutLayout: 1
 ISVertexBuffers[0]: 1
 ISVertexBuffers[1]: 1
@@ -89,7 +89,7 @@ OSDepthStencilState: 1
 OSRenderTargetView: 1
 OSDepthStencilView: 1
 Predication: 1
-Mask 'mask3':
+Mask 'mask3' (hash=a5160ec1):
 ISInpoutLayout: 1
 ISVertexBuffers[0]: 1
 ISVertexBuffers[1]: 1

@@ -38,7 +38,7 @@ const char* get_name (UsageMode param)
   }
 }
 
-//сгенерировано автоматически, не изменять руками (см. утилиту get_name_bind_flags_gen.cpp)
+//ёухэхЁшЁютрэю ртЄюьрЄшўхёъш, эх шчьхэ Є№ Ёєърьш (ёь. єЄшышЄє get_name_bind_flags_gen.cpp)
 const char* get_name (BindFlag param)
 {
   switch (param)
@@ -144,6 +144,7 @@ const char* get_name (PixelFormat param)
     case PixelFormat_D16:         return "PixelFormat_D16";
     case PixelFormat_D24X8:       return "PixelFormat_D24X8";
     case PixelFormat_D24S8:       return "PixelFormat_D24S8";
+    case PixelFormat_D32:         return "PixelFormat_D32";
     case PixelFormat_S8:          return "PixelFormat_S8";
     default:
       throw xtl::make_argument_exception ("render::low_level::get_name(PixelFormat)", "param", param);
@@ -408,10 +409,10 @@ const char* get_name (PrimitiveType param)
 }
 
 /*
-    Получение параметров формата пикселей
+    ╧юыєўхэшх ярЁрьхЄЁют ЇюЁьрЄр яшъёхыхщ
 */
 
-//получение размеров несжатого текселя
+//яюыєўхэшх ЁрчьхЁют эхёцрЄюую Єхъёхы 
 size_t get_texel_size (PixelFormat format)
 {
   switch (format)
@@ -424,7 +425,8 @@ size_t get_texel_size (PixelFormat format)
     case PixelFormat_RGB8:  return 3;
     case PixelFormat_RGBA8:
     case PixelFormat_D24X8:
-    case PixelFormat_D24S8: return 4;
+    case PixelFormat_D24S8:
+    case PixelFormat_D32:   return 4;
     case PixelFormat_DXT1:
     case PixelFormat_DXT3:
     case PixelFormat_DXT5:
@@ -438,11 +440,10 @@ size_t get_texel_size (PixelFormat format)
   }
 }
 
-//получение размера изображения
+//яюыєўхэшх ЁрчьхЁр шчюсЁрцхэш 
 size_t get_image_size (size_t width, size_t height, size_t depth, PixelFormat format)
 {
   static const size_t DXT_BLOCK_SIZE = 16;
-  static const size_t DXT_EDGE_SIZE  = 4;  
 
   switch (format)
   {
@@ -454,10 +455,11 @@ size_t get_image_size (size_t width, size_t height, size_t depth, PixelFormat fo
     case PixelFormat_RGB8:
     case PixelFormat_RGBA8:
     case PixelFormat_D24X8:
-    case PixelFormat_D24S8:        return width * height * depth * get_texel_size (format);
-    case PixelFormat_DXT1:         return stl::max (width, DXT_EDGE_SIZE) * stl::max (height, DXT_EDGE_SIZE) * depth * 8 / DXT_BLOCK_SIZE;
-    case PixelFormat_DXT3:         return stl::max (width, DXT_EDGE_SIZE) * stl::max (height, DXT_EDGE_SIZE) * depth * 16 / DXT_BLOCK_SIZE;
-    case PixelFormat_DXT5:         return stl::max (width, DXT_EDGE_SIZE) * stl::max (height, DXT_EDGE_SIZE) * depth * 16 / DXT_BLOCK_SIZE;
+    case PixelFormat_D24S8:
+    case PixelFormat_D32:          return width * height * depth * get_texel_size (format);
+    case PixelFormat_DXT1:         return width * height * depth * 8 / DXT_BLOCK_SIZE;
+    case PixelFormat_DXT3:         return width * height * depth * 16 / DXT_BLOCK_SIZE;
+    case PixelFormat_DXT5:         return width * height * depth * 16 / DXT_BLOCK_SIZE;     
     case PixelFormat_RGB_PVRTC2:
     case PixelFormat_RGBA_PVRTC2:
       if (width < 16) width  = 16;
@@ -485,7 +487,7 @@ size_t get_image_size (size_t width, PixelFormat format)
   return get_image_size (width, 1, 1, format);
 }
 
-//проверка является ли формат сжатым
+//яЁютхЁър  ты хЄё  ыш ЇюЁьрЄ ёцрЄ√ь
 bool is_compressed (PixelFormat format)
 {
   switch (format)
@@ -507,19 +509,20 @@ bool is_compressed (PixelFormat format)
     case PixelFormat_D16:
     case PixelFormat_D24X8:
     case PixelFormat_D24S8:
+    case PixelFormat_D32:
       return false;  
     default:
       throw xtl::make_argument_exception ("render::low_level::is_compressed", "format", format);
   }
 }
 
-//проверка является ли формат несжатым
+//яЁютхЁър  ты хЄё  ыш ЇюЁьрЄ эхёцрЄ√ь
 bool is_uncompressed (PixelFormat format)
 {
   return !is_compressed (format);
 }
 
-//проверка на форматы буфера глубина-трафарет
+//яЁютхЁър эр ЇюЁьрЄ√ сєЇхЁр уыєсшэр-ЄЁрЇрЁхЄ
 bool is_depth_stencil (PixelFormat format)
 {
   switch (format)
@@ -527,7 +530,8 @@ bool is_depth_stencil (PixelFormat format)
     case PixelFormat_S8:
     case PixelFormat_D16:
     case PixelFormat_D24X8:
-    case PixelFormat_D24S8: return true;   
+    case PixelFormat_D24S8:
+    case PixelFormat_D32:   return true;
     case PixelFormat_DXT1:
     case PixelFormat_DXT3:
     case PixelFormat_DXT5:
@@ -545,13 +549,13 @@ bool is_depth_stencil (PixelFormat format)
   }
 }
 
-//проверка является ли формат "цветовым"
+//яЁютхЁър  ты хЄё  ыш ЇюЁьрЄ "ЎтхЄют√ь"
 bool is_color (PixelFormat format)
 {
   return !is_depth_stencil (format);
 }
 
-//возвращает распакованный эквивалент переданного формата
+//тючтЁр∙рхЄ Ёрёяръютрээ√щ ¤ътштрыхэЄ яхЁхфрээюую ЇюЁьрЄр
 PixelFormat get_uncompressed_format (PixelFormat format)
 {
   switch (format)
@@ -564,6 +568,7 @@ PixelFormat get_uncompressed_format (PixelFormat format)
     case PixelFormat_D16:
     case PixelFormat_D24X8:
     case PixelFormat_D24S8:
+    case PixelFormat_D32:
     case PixelFormat_S8:          return format;
     case PixelFormat_RGB_PVRTC2:
     case PixelFormat_RGB_PVRTC4:    
@@ -577,13 +582,13 @@ PixelFormat get_uncompressed_format (PixelFormat format)
   }
 }
 
-//получение размеров распакованного текселя
+//яюыєўхэшх ЁрчьхЁют Ёрёяръютрээюую Єхъёхы 
 size_t get_uncompressed_texel_size (PixelFormat format)
 {
   return get_texel_size (get_uncompressed_format (format));
 }
 
-//получение размера изображения после распаковки
+//яюыєўхэшх ЁрчьхЁр шчюсЁрцхэш  яюёых Ёрёяръютъш
 size_t get_uncompressed_image_size (size_t width, PixelFormat format)
 {
   return get_image_size (width, get_uncompressed_format (format));
@@ -600,7 +605,7 @@ size_t get_uncompressed_image_size (size_t width, size_t height, size_t depth, P
 }
 
 /*
-    Получение количества mip-уровней
+    ╧юыєўхэшх ъюышўхёЄтр mip-єЁютэхщ
 */
 
 namespace
@@ -615,7 +620,7 @@ size_t get_max_size (size_t a, size_t b)
 
 size_t get_mips_count (size_t size)
 {
-  return (size_t)(log ((float)size) / log (2.f)) + 1;
+  return (size_t)(log ((double)size) / log (2.0)) + 1;
 }
 
 size_t get_mips_count (size_t width, size_t height)

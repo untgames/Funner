@@ -14,4 +14,5 @@ get_uncompressed_format(PixelFormat_RGBA_PVRTC4)=PixelFormat_RGBA8
 get_uncompressed_format(PixelFormat_D16)=PixelFormat_D16
 get_uncompressed_format(PixelFormat_D24X8)=PixelFormat_D24X8
 get_uncompressed_format(PixelFormat_D24S8)=PixelFormat_D24S8
+get_uncompressed_format(PixelFormat_D32)=PixelFormat_D32
 get_uncompressed_format(PixelFormat_S8)=PixelFormat_S8
