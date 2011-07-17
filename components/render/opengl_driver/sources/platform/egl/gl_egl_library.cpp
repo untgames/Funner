@@ -167,6 +167,69 @@ DefaultEntry default_entries [] = {
 
 const size_t DEFAULT_ENTRIES_COUNT = sizeof (default_entries) / sizeof (*default_entries);
 
+#ifdef ANDROID
+
+///Dynamic library wrapper for Android
+class DynamicLibrary
+{
+  public:
+    DynamicLibrary (const char* path) : handle (dlopen (path, RTLD_NOW | RTLD_GLOBAL))
+    {
+      if (!handle)
+        throw xtl::format_operation_exception ("render::low_level::opengl::egl::DynamicLibrary::DynamicLibrary", "Library not found '%s'", path);              
+    }
+    
+    ~DynamicLibrary ()
+    {
+      dlclose (handle);
+    }      
+    
+    void* GetProcAddress (const char* name)
+    {
+      if (!name)
+        return 0;
+        
+      return (void*)dlsym (handle, name);
+    }
+
+  private:
+    DynamicLibrary (const DynamicLibrary&); //no impl
+    DynamicLibrary& operator = (const DynamicLibrary&); //no impl
+    
+  private:
+    void* handle;
+};
+
+class GlesLibrary
+{
+  public:
+    GlesLibrary ()
+      : library ("libGLESv1_CM.so")
+    {
+    }
+    
+    void* GetProcAddress (const char* name)
+    {
+      return library.GetProcAddress (name);
+    }
+
+  private:
+    DynamicLibrary library;
+};
+
+#else
+
+class GlesLibrary
+{
+  public:
+    void GetProcAddress (const char*)
+    {
+      return 0;
+    }
+};
+
+#endif
+
 }
 
 /*
@@ -177,8 +240,9 @@ typedef stl::hash_map<stl::hash_key<const char*>, const void*> EntryMap;
 
 struct Library::Impl
 {
-  NativeDisplayType display; //соединение с дисплеем
-  EntryMap          entries; //карта стандартных точек входа
+  NativeDisplayType display;      //соединение с дисплеем
+  EntryMap          entries;      //карта стандартных точек входа
+  GlesLibrary       gles_library; //динамическая библиотека GLES
 
 ///Конструктор
   Impl ()
@@ -235,7 +299,12 @@ const void* Library::GetProcAddress (const char* name, size_t search_flags)
   const void* address = 0;
 
   if (!address && (search_flags & EntrySearch_Context))
+  {
     address = (void*)eglGetProcAddress (name);    
+    
+    if (!address)
+      address = impl->gles_library.GetProcAddress (name);
+  }
 
   if (address)
     return address;
@@ -245,7 +314,7 @@ const void* Library::GetProcAddress (const char* name, size_t search_flags)
     EntryMap::iterator iter = impl->entries.find (name);
 
     address = iter != impl->entries.end () ? iter->second : 0;
-  }
+  }  
 
   if (address)
     return address;

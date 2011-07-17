@@ -10,7 +10,7 @@ using namespace render::low_level::opengl;
    Конструктор / деструктор
 */
 
-Texture1D::Texture1D (const ContextManager& manager, const TextureDesc& tex_desc, const TextureData* data)
+Texture1D::Texture1D (const ContextManager& manager, const TextureDesc& tex_desc, const TextureData* data, bool ignore_null_data)
   : Texture (manager, tex_desc, GL_TEXTURE_1D, get_mips_count (tex_desc.width))
 {
   const char* METHOD_NAME = "render::low_level::opengl::Texture1D::Texture1D";
@@ -38,22 +38,25 @@ Texture1D::Texture1D (const ContextManager& manager, const TextureDesc& tex_desc
 
   if (!proxy_width)
     throw xtl::format_not_supported_exception (METHOD_NAME, "Can't create 1D texture %u@%s. Reason: proxy texure fail", tex_desc.width, get_name (tex_desc.format));*/
-
-    //создание текстуры
-
-  TextureDataSelector data_selector (tex_desc, data);
-
-  for (size_t i=0; i<GetMipsCount (); i++)
+    
+  if (data || !ignore_null_data)
   {
-    size_t level_width = tex_desc.width >> i;
-    
-    TextureLevelData level_data;
-    
-    data_selector.GetLevelData (level_width, 1, 1, level_data);
+      //создание текстуры        
 
-    glTexImage1D (GL_TEXTURE_1D, i, gl_internal_format, level_width, 0, gl_format, gl_type, level_data.data);
+    TextureDataSelector data_selector (tex_desc, data);
 
-    data_selector.Next ();
+    for (size_t i=0; i<GetMipsCount (); i++)
+    {
+      size_t level_width = tex_desc.width >> i;
+      
+      TextureLevelData level_data;
+      
+      data_selector.GetLevelData (level_width, 1, 1, level_data);
+
+      glTexImage1D (GL_TEXTURE_1D, i, gl_internal_format, level_width, 0, gl_format, gl_type, level_data.data);
+
+      data_selector.Next ();
+    }
   }
 
     //проверка ошибок

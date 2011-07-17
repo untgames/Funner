@@ -35,6 +35,7 @@
 #include <common/strlib.h>
 
 #include <media/image.h>
+#include <media/compressed_image.h>
 
 /*
     Получение смещения поля в структуре (аналог offsetof, компилируемый без предупреждений на gcc)

@@ -44,24 +44,24 @@ bool TextureDataSelector::GetLevelData (size_t width, size_t height, size_t dept
 
     return false;    
   }
-  
+
   size_t size = get_image_size (width, height, depth, format);  
 
   if (data->sizes && data->sizes [index] >= size)
-    size = data->sizes [index];
+    size = data->sizes [index];    
 
   data_size = size;  
-  
+
   out.size = data_size;
   out.data = (char*)data->data + offset;
-  
+
   return true;
 }
 
 void TextureDataSelector::Next ()
 {
   offset += data_size;
-
+  
   index++;
 
   if (index == images_count)

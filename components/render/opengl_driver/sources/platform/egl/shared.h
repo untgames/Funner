@@ -17,6 +17,15 @@
   #include <syslib/platform/x11.h>
 #endif
 
+#ifdef ANDROID
+  #include <jni.h>
+  #include <dlfcn.h>
+  
+  #include <xtl/type_traits>  
+  
+  #include <syslib/platform/android.h>
+#endif
+
 #include <shared/log.h>
 #include <shared/object.h>
 #include <shared/platform.h>
@@ -313,8 +322,9 @@ class Context: virtual public IContext, public Object
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Проверка ошибок
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-void check_errors (const char* source);
-void raise_error  (const char* source);
+void        check_errors      (const char* source);
+void        raise_error       (const char* source);
+const char* get_error_message (EGLint status);
 
 #ifdef BEAGLEBOARD
 
@@ -358,6 +368,11 @@ class DisplayLock
 };
 
 #endif
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Создание экранной поверхности (для Android)
+///////////////////////////////////////////////////////////////////////////////////////////////////
+EGLSurface eglCreateWindowSurfaceAndroid (EGLDisplay display, EGLConfig config, const void* window, EGLint format);
 
 }
 

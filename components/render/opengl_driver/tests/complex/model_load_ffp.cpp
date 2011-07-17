@@ -396,7 +396,7 @@ size_t frames_count = 0;
 void redraw (Test& test)
 {
   Model& model = *model_ptr;
-
+  
   model.Draw ();
 
   frames_count++;
@@ -406,50 +406,52 @@ void idle (Test& test)
 {
   if (test.window.IsClosed ())
     return;
-
+    
   static size_t last = 0;
   static float angle;
 
-  static size_t last_fps = 0;
-
-  float dt = float (common::milliseconds () - last) / 1000.f;
-
+  static size_t last_fps = 0;  
+  
   if (common::milliseconds () - last > 25)
   {
+    float dt = (common::milliseconds () - last) / 1000.0f;
+    
+    MyShaderParameters my_shader_parameters;
+
+    IBuffer* cb = test.device->SSGetConstantBuffer (0);
+
+    if (!cb)
+    {
+      printf ("Null constant buffer #0\n");
+      return;
+    }
+
+    cb->GetData (0, sizeof my_shader_parameters, &my_shader_parameters);
+
+    angle += 0.5f * dt;
+
+    my_shader_parameters.object_tm = math::rotate (math::radian (angle), math::vec3f (0, 0, 1)) *
+                                     math::rotate (math::radian (angle*0.2f), math::vec3f (1, 0, 0));
+
+    my_shader_parameters.light_pos = math::vec3f (40 * cos (angle), 40 * sin (angle), 0.0f);
+    my_shader_parameters.light_dir = -normalize (my_shader_parameters.light_pos);
+
+    cb->SetData (0, sizeof my_shader_parameters, &my_shader_parameters);    
+    
     last = common::milliseconds ();
+    
     return;
-  }
+  }  
 
   if (common::milliseconds () - last_fps > 1000)
   {
     printf ("FPS: %.2f\n", float (frames_count)/float (common::milliseconds () - last_fps)*1000.f);
+    fflush (stdout);
 
     last_fps = common::milliseconds ();
     frames_count = 0;
     return;
   }
-
-  MyShaderParameters my_shader_parameters;
-
-  IBuffer* cb = test.device->SSGetConstantBuffer (0);
-
-  if (!cb)
-  {
-    printf ("Null constant buffer #0\n");
-    return;
-  }
-
-  cb->GetData (0, sizeof my_shader_parameters, &my_shader_parameters);
-
-  angle += 0.5f*dt;
-
-  my_shader_parameters.object_tm = math::rotate (math::radian (angle), math::vec3f (0, 0, 1)) *
-                                   math::rotate (math::radian (angle*0.2f), math::vec3f (1, 0, 0));
-
-  my_shader_parameters.light_pos = math::vec3f (40 * cos (angle), 40 * sin (angle), 0.0f);
-  my_shader_parameters.light_dir = -normalize (my_shader_parameters.light_pos);
-
-  cb->SetData (0, sizeof my_shader_parameters, &my_shader_parameters);
 
 //  test.window.Invalidate ();
   test.OnRedraw ();

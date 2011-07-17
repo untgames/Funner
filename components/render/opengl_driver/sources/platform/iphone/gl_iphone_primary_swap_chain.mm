@@ -6,24 +6,99 @@
 using namespace render::low_level;
 using namespace render::low_level::opengl::iphone;
 
+namespace
+{
+
+//Интерфейс реакции на события изменения размеров View
+class IViewSizeChangeListener
+{
+  public:
+    virtual void OnViewSizeChanged () = 0;
+
+  protected:
+    virtual ~IViewSizeChangeListener () {}
+};
+
+}
+
+@interface ViewSizeChangeHandler : UIView
+{
+  @private
+    IViewSizeChangeListener* listener;
+}
+
+@end
+
+@implementation ViewSizeChangeHandler
+
+-(id)init
+{
+  self = [super init];
+  [self release];
+
+  [NSException raise:@"Invalid operation" format:@"Can't initialize class without superview and listener"];
+
+  return nil;
+}
+
+-(id)initWithFrame:(CGRect)frame
+{
+  self = [super init];
+  [self release];
+
+  [NSException raise:@"Invalid operation" format:@"Can't initialize class without superview and listener"];
+
+  return nil;
+}
+
+-(id)initWithSuperview:(UIView*)superview listener:(IViewSizeChangeListener*)inListener
+{
+  self = [super initWithFrame:superview.bounds];
+
+  if (!self)
+    return nil;
+
+  listener = inListener;
+
+  [superview addSubview:self];
+
+  self.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+  self.hidden           = true;
+
+  return self;
+}
+
+-(void)setFrame:(CGRect)newFrame
+{
+  if (!listener)
+    return;
+
+  [super setFrame:newFrame];
+
+  listener->OnViewSizeChanged ();
+}
+
+@end
+
 /*
     Описание реализации PrimarySwapChain
 */
 
 typedef xtl::com_ptr<Adapter> AdapterPtr;
 
-struct PrimarySwapChain::Impl
+struct PrimarySwapChain::Impl : public IViewSizeChangeListener
 {
-  Log             log;                       //протокол
-  AdapterPtr      adapter;                   //адаптер цепочки обмена
-  SwapChainDesc   desc;                      //дескриптор цепочки обмена
-  Context*        context;                   //установленный контекст
-  EAGLContext*    eagl_context;              //установленный контекст
-  ISwapChain*     swap_chain;                //цепочка обмена
-  GLuint          frame_buffer;              //буфер кадра
-  GLuint          render_buffer;             //буфер рендеринга
-  GLuint          depth_buffer;              //буфер глубины
-  GLuint          stencil_buffer;            //буфер шаблона
+  Log                    log;                       //протокол
+  AdapterPtr             adapter;                   //адаптер цепочки обмена
+  SwapChainDesc          desc;                      //дескриптор цепочки обмена
+  Context*               context;                   //установленный контекст
+  EAGLContext*           eagl_context;              //установленный контекст
+  ISwapChain*            swap_chain;                //цепочка обмена
+  GLuint                 frame_buffer;              //буфер кадра
+  GLuint                 render_buffer;             //буфер рендеринга
+  GLuint                 depth_buffer;              //буфер глубины
+  GLuint                 stencil_buffer;            //буфер шаблона
+  ViewSizeChangeHandler* view_size_change_handler;  //обработчик изменения размеров view
 
 ///Конструктор
   Impl (const SwapChainDesc& in_desc, Adapter* in_adapter, ISwapChain *in_swap_chain)
@@ -39,7 +114,9 @@ struct PrimarySwapChain::Impl
 
     memset (&desc, 0, sizeof (desc));
 
-    CGRect window_frame = ((UIWindow*)in_desc.window_handle).rootViewController.view.frame;
+    UIView* draw_view = [((UIWindow*)in_desc.window_handle).rootViewController.view retain];
+
+    CGRect window_frame = draw_view.frame;
 
     desc.frame_buffer.width        = window_frame.size.width;
     desc.frame_buffer.height       = window_frame.size.height;
@@ -57,12 +134,16 @@ struct PrimarySwapChain::Impl
     log.Printf ("...choose pixel format (RGB/A: %u/%u, D/S: %u/%u, Samples: %u)",
       desc.frame_buffer.color_bits, desc.frame_buffer.alpha_bits, desc.frame_buffer.depth_bits,
       desc.frame_buffer.stencil_bits, desc.samples_count);
+
+    view_size_change_handler = [[ViewSizeChangeHandler alloc] initWithSuperview:draw_view listener:this];
   }
 
 ///Деструктор
   ~Impl ()
   {
     log.Printf ("...release resources");
+
+    [view_size_change_handler release];
   }
 
   ///Установка нового контекста
@@ -217,6 +298,23 @@ struct PrimarySwapChain::Impl
 
       throw;
     }
+  }
+
+  void OnViewSizeChanged ()
+  {
+    if (!context)
+      return;
+
+    CGSize draw_view_size = ((UIWindow*)desc.window_handle).rootViewController.view.bounds.size;
+
+    if (draw_view_size.width == desc.frame_buffer.width && draw_view_size.height == desc.frame_buffer.height)
+      return;
+
+    Context*     stored_context      = context;
+    EAGLContext* stored_eagl_context = eagl_context;
+
+    DoneForContext ();
+    InitializeForContext (stored_eagl_context, stored_context);
   }
 
   private:

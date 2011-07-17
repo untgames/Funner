@@ -46,9 +46,9 @@ int main ()
     output->SetGammaRamp (table2);
     output->GetGammaRamp (table2);
     printf ("New gamma ramp:\n");
-    print_gamma_ramp (table2);
+//    print_gamma_ramp (table2);
 
-    output->SetGammaRamp (table);
+//    output->SetGammaRamp (table);
     output->GetGammaRamp (table);
     printf ("Restored gamma ramp:\n");
     print_gamma_ramp (table);

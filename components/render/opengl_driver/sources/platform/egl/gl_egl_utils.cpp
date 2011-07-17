@@ -16,9 +16,6 @@ namespace egl
     Проверка ошибок
 */
 
-namespace
-{
-
 const char* get_error_message (EGLint status)
 {
   switch (status)
@@ -40,8 +37,6 @@ const char* get_error_message (EGLint status)
     case EGL_CONTEXT_LOST:         return "Context is lost";
     default:                       return 0;
   }
-}
-
 }
 
 void check_errors (const char* source)

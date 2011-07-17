@@ -4,17 +4,6 @@ using namespace render::low_level;
 using namespace render::low_level::opengl;
 using namespace render::low_level::opengl::glx;
 
-namespace
-{
-
-/*
-    Константы
-*/
-
-const size_t CONFIG_MAX_ATTRIBUTES = 128; //максимальное количество атрибутов в конфигурации
-
-}
-
 /*
     Описание реализации первичной цепочки обмена
 */
@@ -24,108 +13,68 @@ typedef Output::Pointer       OutputPtr;
 
 struct PrimarySwapChain::Impl
 {
-  AdapterPtr    adapter;     //адаптер, которому принадлежит устройство
-  Log           log;         //протокол
-  Display*      display;     //соединение с дисплеем
-  SwapChainDesc desc;        //дескриптор цепочки обмена
-  PropertyList  properties;  //свойства цепочки обмена
+  Log                 log;                     //протокол
+  AdapterPtr          adapter;                 //адаптер, которому принадлежит устройство
+  AdapterLibraryPtr   library;                 //библиотека адаптера
+  GlxExtensionEntries glx_extension_entries;   //таблица WGL-расширений
+  int                 pixel_format_index;      //индекс формата пикселей устройства вывода
+  SwapChainDesc       desc;                    //дескриптор цепочки обмена
+  Display*            display;                 //соединение с дисплеем
+  Window              window;                  //окно
+  GLXFBConfig         glx_fb_config;           //конфигурация буфера кадра
+  PropertyList        properties;              //свойства цепочки обмена
 
 ///Конструктор
-  Impl (Adapter* in_adapter, const SwapChainDesc& in_desc)
-    : adapter (in_adapter)
+  Impl (const SwapChainDesc& in_desc, const PixelFormatDesc& pixel_format)
+    : adapter (pixel_format.adapter)
+    , library (&adapter->GetLibrary ())
+    , pixel_format_index (pixel_format.pixel_format_index)
     , display (DisplayManager::DisplayHandle ())
+    , window  ((Window)in_desc.window_handle)
   {
     try
     {
-        //проверка возможности работы GLX
-        
-      int error_base, event_base;        
-        
-      if (!glXQueryExtension (display, &error_base, &event_base ) )
+        //инициализация таблицы расширений
+
+      if (pixel_format.glx_extension_entries)
       {
-          fprintf(stderr, "glxsimple: %s\n", "X server has no OpenGL GLX extension");
-          exit(1);
+        glx_extension_entries = *pixel_format.glx_extension_entries;
       }
-        
-      
-        //выбор конфигурации
-
-      GLint config_attributes [CONFIG_MAX_ATTRIBUTES], *attr = config_attributes;
-      
-      *attr++ = GL_BUFFER_SIZE;
-      *attr++ = in_desc.frame_buffer.color_bits;
-      *attr++ = GLX_ALPHA_SIZE;
-      *attr++ = in_desc.frame_buffer.alpha_bits;      
-      *attr++ = GLX_DEPTH_SIZE;
-      *attr++ = in_desc.frame_buffer.depth_bits;
-//      *attr++ = GL_STENCIL_SIZE; //for tests only!!!!!!!
-//      *attr++ = in_desc.frame_buffer.stencil_bits;
-      *attr++ = GL_SAMPLES;
-      *attr++ = in_desc.samples_count;
-      
-      switch (in_desc.swap_method)
+      else
       {
-        case SwapMethod_Discard:
-        case SwapMethod_Flip:
-        case SwapMethod_Copy:
-          break;
-        default:
-          throw xtl::make_argument_exception ("", "desc.swap_method", desc.swap_method);
-      }            
+        memset (&glx_extension_entries, 0, sizeof glx_extension_entries);
+      }
+
+        //установка состояния FullScreen
+
+      if (in_desc.fullscreen)
+      {
+        log.Printf ("...set fullscreen mode");
+        
+        SetFullscreenState (true);
+      }
       
-/*      *attr++ = GLX_SURFACE_TYPE;
-      *attr++ = GLX_WINDOW_BIT;
-      *attr++ = GL_NONE;
-
-      GLint configs_count = 0;
-
-      if (!glxChooseFBConfig (display, config_attributes, &glx_config, 1, &configs_count))
-        raise_error ("::glxChooseConfig");
-
-      if (!configs_count)
-        throw xtl::format_operation_exception ("", "Bad glx configuration (RGB/A: %u/%u, D/S: %u/%u, Samples: %u)",
-          in_desc.frame_buffer.color_bits, in_desc.frame_buffer.alpha_bits, in_desc.frame_buffer.depth_bits,
-          in_desc.frame_buffer.stencil_bits, in_desc.samples_count);
+        //инициализация конфигурации буфера кадра
         
-      log.Printf ("...choose configuration #%u (RGB/A: %u/%u, D/S: %u/%u, Samples: %u)",
-        glx_config, in_desc.frame_buffer.color_bits, in_desc.frame_buffer.alpha_bits, in_desc.frame_buffer.depth_bits,
-        in_desc.frame_buffer.stencil_bits, in_desc.samples_count);
+      glx_fb_config = pixel_format.config;
+            
+        //инициализация дескриптора цепочки обмена
         
-      log.Printf ("...create window surface");
-        
-        //создание поверхности отрисовки
-
-      glx_surface = glxCreateWindowSurface (glx_display, glx_config, (NativeWindowType)output->GetWindowHandle (), 0);
-      
-      if (!glx_surface)
-        raise_error ("::glxCreateWindowSurface");
-
-        //сохранение дескриптора устройства
-
-      desc = in_desc;
-
-      desc.frame_buffer.width        = GetSurfaceAttribute (GL_WIDTH);
-      desc.frame_buffer.height       = GetSurfaceAttribute (GL_HEIGHT);
-      desc.frame_buffer.color_bits   = GetConfigAttribute (GL_BUFFER_SIZE);
-      desc.frame_buffer.alpha_bits   = GetConfigAttribute (GL_ALPHA_SIZE);
-      desc.frame_buffer.depth_bits   = GetConfigAttribute (GL_DEPTH_SIZE);
-      desc.frame_buffer.stencil_bits = GetConfigAttribute (GL_STENCIL_SIZE);
-      desc.samples_count             = GetConfigAttribute (GL_SAMPLES);
-      desc.buffers_count             = 1;
-      desc.fullscreen                = false;
-      
-        //установка свойств цепочки обмена
-        
-      properties.AddProperty ("GL_vendor",      GetGLString (GL_VENDOR));
-      properties.AddProperty ("GL_version",     GetGLString (GL_VERSION));
-      properties.AddProperty ("GL_extensions",  GetGLString (GL_EXTENSIONS));
-      properties.AddProperty ("GL_client_apis", GetGLString (GL_CLIENT_APIS));*/
+      desc.frame_buffer.width        = XWidthOfScreen (get_screen (window));
+      desc.frame_buffer.height       = XHeightOfScreen (get_screen (window));
+      desc.frame_buffer.color_bits   = pixel_format.color_bits;
+      desc.frame_buffer.alpha_bits   = pixel_format.alpha_bits;
+      desc.frame_buffer.depth_bits   = pixel_format.depth_bits;
+      desc.frame_buffer.stencil_bits = pixel_format.stencil_bits;
+      desc.samples_count             = pixel_format.samples_count;
+      desc.buffers_count             = pixel_format.buffers_count;
+      desc.swap_method               = pixel_format.swap_method;
+      desc.fullscreen                = in_desc.fullscreen;
+      desc.vsync                     = in_desc.vsync;
+      desc.window_handle             = in_desc.window_handle;
     }
     catch (...)
     {
-/*      if (glx_surface)
-        glxDestroySurface (glx_display, glx_surface);*/
-
       throw;
     }
   }
@@ -133,41 +82,87 @@ struct PrimarySwapChain::Impl
 ///Деструктор
   ~Impl ()
   {
-//    glxDestroySurface (glx_display, glx_surface);
+    log.Printf ("...release resources");
   }
   
-///Получение атрибута
-  GLint GetConfigAttribute (GLint attribute)
+///Получение устройства вывода с максимальным размером области перекрытия
+  IOutput* GetContainingOutput ()
   {
-    GLint value = 0;
-    
-//    if (!glxGetConfigAttrib (glx_display, glx_config, attribute, &value))
- //     raise_error ("::glxGetConfigAttrib");
-      
-    return value;
+    return adapter->GetOutput (window).get ();
   }
   
-///Получение значения атрибута поверхности отрисовки
-  GLint GetSurfaceAttribute (GLint attribute)
+  void SetFullscreenState (bool state)
   {
-    GLint value = 0;
-    
-//    if (!glxQuerySurface (glx_display, glx_surface, attribute, &value))
-//      raise_error ("::glxQuerySurface");
+    static const char* METHOD_NAME = "render::low_level::opengl::glx::PrimarySwapChain::impl::SetFullscreenState";
+
+    if (GetFullscreenState () == state)
+      return;
       
-    return value;
+    OutputPtr output = adapter->GetOutput (window);
+    
+    if (!output)
+      return;
+      
+    if (state)
+    {
+      DisplayLock lock (display);
+      
+      Window root_return = 0;
+      int x_return = 0, y_return = 0;
+      unsigned int width_return = 0, height_return = 0, border_width_return = 0, depth_return = 0;
+                
+      if (!XGetGeometry (display, window, &root_return, &x_return, &y_return, &width_return, &height_return, &border_width_return, &depth_return))
+        throw xtl::format_operation_exception (METHOD_NAME, "XGetGeometry failed");
+                                
+      OutputModeDesc mode_desc;
+      
+      output->GetCurrentMode (mode_desc);
+      
+      mode_desc.width  = width_return;
+      mode_desc.height = height_return;
+      
+      output->SetCurrentMode (mode_desc);
+    }
+    else
+    {    
+      output->RestoreDefaultMode ();      
+    }
   }
   
-///Получение строкового свойства glx
-  const char* GetGLString (GLint name)
+  bool GetFullscreenState ()
   {
-/*    const char* value = glxQueryString (glx_display, name);
+    static const char* METHOD_NAME = "render::low_level::opengl::glx::PrimarySwapChain::impl::GetFullscreenState";
     
-    if (!value)
-      raise_error ("::glxQueryString");
+    OutputPtr output = adapter->GetOutput (window);
+
+    if (!output)
+      return false;
+
+    OutputModeDesc mode_desc;
+    
+    output->GetCurrentMode (mode_desc);
+    
+    Window root_return = 0;
+    int x_return = 0, y_return = 0;
+    unsigned int width_return = 0, height_return = 0, border_width_return = 0, depth_return = 0;
+                
+    if (!XGetGeometry (display, window, &root_return, &x_return, &y_return, &width_return, &height_return, &border_width_return, &depth_return))
+      throw xtl::format_operation_exception (METHOD_NAME, "XGetGeometry failed");    
       
-    return value;*/
-    return "";
+    return x_return == 0 && y_return == 0 && width_return == mode_desc.width && height_return == mode_desc.height;
+  }
+  
+  void Present ()
+  {  
+    try
+    {
+      library->SwapBuffers (display, window);
+    }
+    catch (xtl::exception& exception)
+    {
+      exception.touch ("render::low_level::opengl::glx::PrimarySwapChain::impl::Present");
+      throw;
+    }
   }
 };
 
@@ -175,16 +170,13 @@ struct PrimarySwapChain::Impl
     Конструктор / деструктор
 */
 
-PrimarySwapChain::PrimarySwapChain (Adapter* adapter, const SwapChainDesc& desc)
+PrimarySwapChain::PrimarySwapChain (const SwapChainDesc& sc_desc, const PixelFormatDesc& pf_desc)
 {
   try
   {
-    if (!adapter)
-      throw xtl::make_null_argument_exception ("", "adapter");
-    
-    impl = new Impl (adapter, desc);        
+    impl = new Impl (sc_desc, pf_desc);
 
-    impl->log.Printf ("...swap chain successfully created");
+    impl->log.Printf ("...primary swap chain (id=%u) successfully created", GetId ());
   }
   catch (xtl::exception& exception)
   {
@@ -206,6 +198,47 @@ IAdapter* PrimarySwapChain::GetAdapter ()
   return impl->adapter.get ();
 }
 
+Adapter* PrimarySwapChain::GetAdapterImpl ()
+{
+  return &*impl->adapter;
+}
+
+/*
+    Устройство отображения для текущего контекста
+*/
+
+Display* PrimarySwapChain::GetDisplay ()
+{
+  return impl->display;
+}
+
+/*
+    Окно отрисовки
+*/
+
+Window PrimarySwapChain::GetWindow ()
+{
+  return impl->window;
+}
+
+/*
+    Получение таблицы GLX-расширений
+*/
+
+const GlxExtensionEntries& PrimarySwapChain::GetGlxExtensionEntries ()
+{
+  return impl->glx_extension_entries;
+}
+
+/*
+    Конфигурация буфера кадра
+*/
+
+GLXFBConfig PrimarySwapChain::GetFBConfig ()
+{
+  return impl->glx_fb_config;
+}
+
 /*
     Получение дескриптора
 */
@@ -221,8 +254,7 @@ void PrimarySwapChain::GetDesc (SwapChainDesc& out_desc)
 
 IOutput* PrimarySwapChain::GetContainingOutput ()
 {
-  throw xtl::make_not_implemented_exception ("render::low_level::opengl::glx::PrimarySwapChain::GetContainingOutput");
-//  return impl->output.get ();
+  return impl->GetContainingOutput ();
 }
 
 /*
@@ -231,12 +263,12 @@ IOutput* PrimarySwapChain::GetContainingOutput ()
 
 void PrimarySwapChain::SetFullscreenState (bool state)
 {
-  throw xtl::make_not_implemented_exception ("render::low_level::opengl::glx::PrimarySwapChain::SetFullscreenState");
+  impl->SetFullscreenState (state);
 }
 
 bool PrimarySwapChain::GetFullscreenState ()
 {
-  throw xtl::make_not_implemented_exception ("render::low_level::opengl::glx::PrimarySwapChain::GetFullscreenState");
+  return impl->GetFullscreenState ();
 }
 
 /*
@@ -245,17 +277,7 @@ bool PrimarySwapChain::GetFullscreenState ()
 
 void PrimarySwapChain::Present ()
 {
-  throw xtl::make_not_implemented_exception ("render::low_level::opengl::glx::PrimarySwapChain::Present");
-/*  try
-  {
-    if (!glxSwapBuffers (impl->glx_display, impl->glx_surface))
-      raise_error ("::glxSwapBuffers");
-  }
-  catch (xtl::exception& exception)
-  {
-    exception.touch ("render::low_level::opengl::glx::PrimarySwapChain::Present");
-    throw;
-  }*/
+  impl->Present ();
 }
 
 /*

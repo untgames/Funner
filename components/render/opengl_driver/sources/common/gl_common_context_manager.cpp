@@ -122,8 +122,11 @@ class ContextImpl: public xtl::reference_counter, private IContextListener
             extensions.Set (version_entries [i].extension, true);
 
         const ExtensionSet& required_extensions = context_settings.RequiredExtensions ();
+        ExtensionSet        enabled_extensions  = context_settings.EnabledExtensions ();
 
-        extensions &= context_settings.EnabledExtensions ();
+        enabled_extensions |= ExtensionSet::BugExtensions ();
+
+        extensions &= enabled_extensions;
 
         for (size_t id=0, count=ExtensionSet::Size (); id<count; id++)
           if (required_extensions.Get (id) && !extensions.Get (id))

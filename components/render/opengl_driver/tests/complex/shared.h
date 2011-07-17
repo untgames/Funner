@@ -101,7 +101,8 @@ struct Test
     TestLogFilterSingleton::Instance (); //инициализация фильтра протокольных сообщений
 
     window.SetTitle (title);
-    window.Show ();
+    window.Maximize ();
+//    window.Show ();
 
     SwapChainDesc desc;
 
@@ -109,7 +110,7 @@ struct Test
 
     desc.frame_buffer.color_bits   = 16;
 //    desc.frame_buffer.alpha_bits   = 8;
-    desc.frame_buffer.depth_bits   = 24;
+    desc.frame_buffer.depth_bits   = 16;
 //    desc.frame_buffer.stencil_bits = 8;
     desc.buffers_count             = 2;
 //    desc.samples_count             = 4;
