@@ -33,7 +33,7 @@ struct PrimarySwapChain::Impl
 ///Конструктор
   Impl (Adapter* in_adapter, const SwapChainDesc& in_desc)
     : adapter (in_adapter)
-    , display ((Display*)syslib::x11::DisplayManager::DisplayHandle ())
+    , display (DisplayManager::DisplayHandle ())
   {
     try
     {
