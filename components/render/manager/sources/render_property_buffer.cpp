@@ -57,6 +57,8 @@ void PropertyBuffer::SetProperties (const common::PropertyMap& in_properties)
   impl->update_connection = in_properties.RegisterEventHandler (PropertyMapEvent_OnUpdate, xtl::bind (&PropertyBuffer::OnPropertiesUpdated, this));
   impl->properties        = in_properties;  
   impl->need_update       = true;
+  
+  InvalidateCache (false);
 }                    
 
 const common::PropertyMap& PropertyBuffer::Properties ()
@@ -73,7 +75,7 @@ void PropertyBuffer::OnPropertiesUpdated ()
   if (impl->need_update)
     return;
     
-  impl->need_update = true;
+  impl->need_update = true;  
     
   InvalidateCache (false);
 }
@@ -109,9 +111,9 @@ void PropertyBuffer::UpdateCacheCore ()
   try
   {
     if (!impl->need_update)
-      return;
+      return;      
     
-    size_t buffer_size = impl->properties.BufferSize ();
+    size_t buffer_size = impl->properties.BufferSize ();    
     
     bool need_recreate_buffer = !impl->buffer || buffer_size > impl->cached_buffer_size;
     
@@ -129,13 +131,13 @@ void PropertyBuffer::UpdateCacheCore ()
       desc.access_flags = render::low_level::AccessFlag_ReadWrite;
       
       impl->buffer             = LowLevelBufferPtr (impl->device_manager->Device ().CreateBuffer (desc), false);
-      impl->cached_buffer_size = desc.size;
+      impl->cached_buffer_size = desc.size;      
       
       InvalidateCacheDependencies ();
     }
 
     impl->buffer->SetData (0, buffer_size, impl->properties.BufferData ());
-    
+
     impl->need_update = false;    
   }
   catch (xtl::exception& e)

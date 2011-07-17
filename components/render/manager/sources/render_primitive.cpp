@@ -23,7 +23,7 @@ struct MeshCommonData
   }
 };
 
-struct MeshPrimitive: public xtl::reference_counter, public CacheHolder
+struct MeshPrimitive: public xtl::reference_counter, public CacheHolder, public DebugIdHolder
 {
   MeshCommonData&                  common_data;                  //общие данные для примитива
   render::low_level::PrimitiveType type;                         //тип примитива
@@ -32,6 +32,7 @@ struct MeshPrimitive: public xtl::reference_counter, public CacheHolder
   size_t                           first;                        //индекс первой вершины/индекса
   size_t                           count;                        //количество примитивов
   MaterialProxy                    material;                     //материал
+  Log                              log;                          //поток протоколирования
   MaterialPtr                      cached_material;              //закэшированный материал
   RendererPrimitive                cached_primitive;             //примитив закэшированный для рендеринга
   size_t                           cached_state_block_mask_hash; //хэш маски закэшированного блока состояний
@@ -50,10 +51,22 @@ struct MeshPrimitive: public xtl::reference_counter, public CacheHolder
     material.AttachCacheHolder (*this);
     
     memset (&cached_primitive, 0, sizeof (cached_primitive));    
+    
+    if (common_data.device_manager->Settings ().HasDebugLog ())
+      log.Printf ("Mesh primitive created (id=%u)", Id ());
+  }
+  
+  ~MeshPrimitive ()
+  {
+    if (common_data.device_manager->Settings ().HasDebugLog ())
+      log.Printf ("Mesh primitive destroyed (id=%u)", Id ());    
   }
   
   void ResetCacheCore ()
   {
+    if (common_data.device_manager->Settings ().HasDebugLog ())
+      log.Printf ("Reset mesh primitive cache (id=%u)", Id ());        
+    
     cached_material = MaterialPtr ();   
   }
   
@@ -61,6 +74,11 @@ struct MeshPrimitive: public xtl::reference_counter, public CacheHolder
   {
     try
     {
+      bool has_debug_log = common_data.device_manager->Settings ().HasDebugLog ();
+      
+      if (has_debug_log)
+        log.Printf ("Update mesh primitive cache (id=%u)", Id ());
+      
       memset (&cached_primitive, 0, sizeof (cached_primitive));
       
       cached_material = material.Resource ();
@@ -110,6 +128,9 @@ struct MeshPrimitive: public xtl::reference_counter, public CacheHolder
       cached_primitive.count       = count;
       cached_primitive.tags_count  = cached_material ? cached_material->TagsCount () : 0;
       cached_primitive.tags        = cached_material ? cached_material->Tags () : (const size_t*)0;
+      
+      if (has_debug_log)
+        log.Printf ("...mesh primitive cache updated");      
     }
     catch (xtl::exception& e)
     {
@@ -446,7 +467,28 @@ void PrimitiveImpl::ReserveSprites (size_t sprites_count)
 }
 
 /*
-    Обновление кэша примитива
+    Группы римитивов рендеринга
+*/
+
+size_t PrimitiveImpl::RendererPrimitiveGroupsCount ()
+{
+  UpdateCache ();
+  
+  return impl->render_groups.size ();
+}
+
+RendererPrimitiveGroup* PrimitiveImpl::RendererPrimitiveGroups ()
+{
+  UpdateCache ();
+  
+  if (impl->render_groups.empty ())
+    return 0;
+  
+  return &impl->render_groups [0];
+}
+
+/*
+    Управление кэшированием
 */
 
 void PrimitiveImpl::UpdateCacheCore ()
@@ -474,46 +516,6 @@ void PrimitiveImpl::UpdateCacheCore ()
 
 void PrimitiveImpl::ResetCacheCore ()
 {
-  impl->render_groups.clear ();
-}
-
-/*
-    Группы римитивов рендеринга
-*/
-
-size_t PrimitiveImpl::RendererPrimitiveGroupsCount ()
-{
-  UpdateCache ();
-  
-  return impl->render_groups.size ();
-}
-
-RendererPrimitiveGroup* PrimitiveImpl::RendererPrimitiveGroups ()
-{
-  UpdateCache ();
-  
-  if (impl->render_groups.empty ())
-    return 0;
-  
-  return &impl->render_groups [0];
-}
-
-/*
-    Управление кэшированием
-*/
-
-void PrimitiveImpl::UpdateCache ()
-{
-  CacheSource::UpdateCache ();
-
-  for (MeshArray::iterator iter=impl->meshes.begin (), end=impl->meshes.end (); iter!=end; ++iter)
-    (*iter)->UpdateCache ();
-}
-
-void PrimitiveImpl::ResetCache ()
-{
-  CacheSource::ResetCache ();
-
   for (MeshArray::iterator iter=impl->meshes.begin (), end=impl->meshes.end (); iter!=end; ++iter)
   {
     Mesh& mesh = **iter;        

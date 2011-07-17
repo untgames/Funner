@@ -73,6 +73,7 @@ class CacheHolder: public xtl::noncopyable
 ///Внутренние методы
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void InvalidateFlags ();
+    void UpdateCacheAfterReset ();
 
   private:
     typedef stl::list<CacheHolder*> HolderList;

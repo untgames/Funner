@@ -269,9 +269,10 @@ void TextureManager::UnloadTexture (const char* name)
   ProxyMap::iterator iter = impl->loaded_textures.find (name);
   
   if (iter == impl->loaded_textures.end ())
-    return;
+    return;    
     
   iter->second.SetResource (TexturePtr ());
+  iter->second.ResetCache ();
     
   impl->loaded_textures.erase (iter);
 }

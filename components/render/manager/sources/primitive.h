@@ -83,12 +83,12 @@ class PrimitiveImpl: public Object, public CacheSource
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Управление кэшированием
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void UpdateCache ();
-    void ResetCache  ();
-    
+    using CacheSource::UpdateCache;
+    using CacheSource::ResetCache;
+      
   private:
     void UpdateCacheCore ();
-    void ResetCacheCore  ();
+    void ResetCacheCore ();
     
   private:
     struct Impl;

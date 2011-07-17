@@ -34,7 +34,7 @@ void CacheHolder::AttachCacheSource (CacheHolder& source)
     
   if (source.IsParentOf (*this))
     throw xtl::format_operation_exception ("render::CacheHolder::AttachCacheSource", "Cache source is a parent of this cache holder");  
-
+    
   sources.push_back (&source);
   
   try
@@ -54,7 +54,7 @@ void CacheHolder::DetachCacheSource (CacheHolder& source)
 {
   sources.remove (&source);
   source.dependencies.remove (this);
-  
+
   InvalidateCache (false);
 }
 
@@ -66,7 +66,7 @@ void CacheHolder::DetachAllCacheSources ()
   while (!dependencies.empty ())
     dependencies.back ()->DetachCacheSource (*this);
     
-  InvalidateCache (false);
+  InvalidateCache (false);    
 }
 
 /*
@@ -93,6 +93,9 @@ bool CacheHolder::IsParentOf (CacheHolder& child)
 
 void CacheHolder::InvalidateFlags ()
 {
+  for (HolderList::iterator iter=dependencies.begin (), end=dependencies.end (); iter!=end; ++iter)
+    (*iter)->InvalidateFlags ();
+
   switch (state)
   {
     case CacheState_Valid:
@@ -103,19 +106,16 @@ void CacheHolder::InvalidateFlags ()
       return;
   }
 
-  for (HolderList::iterator iter=dependencies.begin (), end=dependencies.end (); iter!=end; ++iter)
-    (*iter)->InvalidateFlags ();
-
   state = CacheState_Invalid;
 }
 
 void CacheHolder::InvalidateCache (bool invalidate_dependencies)
 {
-  if (need_update_this)
+  if (need_update_this && !invalidate_dependencies)
     return;
-    
+
   need_update_this = true;
-  
+
   if (invalidate_dependencies)
   {
     for (HolderList::iterator iter=dependencies.begin (), end=dependencies.end (); iter!=end; ++iter)
@@ -126,7 +126,7 @@ void CacheHolder::InvalidateCache (bool invalidate_dependencies)
 }
 
 /*
-    Отметка о необходимости обновления кэша источника
+    Сброс кэша
 */
 
 void CacheHolder::ResetCache ()
@@ -141,25 +141,47 @@ void CacheHolder::ResetCache ()
       return;
   }    
   
-  need_update_this = true;
-      
+  if (state != CacheState_Reset)
+  {
+    need_update_this = true;
+        
+    try
+    {
+      ResetCacheCore ();
+    }
+    catch (std::exception& e)
+    {
+      Log ().Printf ("Unexpected exception: %s\n    at render::CacheHolder::ResetCache", e.what ());
+    }
+    catch (...)
+    {
+      Log ().Printf ("Unexpected exception at render::CacheHolder::ResetCache");
+    }
+    
+    state = CacheState_Reset;
+    
+    for (HolderList::iterator iter=dependencies.begin (), end=dependencies.end (); iter!=end; ++iter)
+      (*iter)->UpdateCacheAfterReset ();    
+  }
+}
+
+void CacheHolder::UpdateCacheAfterReset ()
+{
   try
   {
-    ResetCacheCore ();
+    UpdateCache ();
   }
   catch (std::exception& e)
   {
-    Log ().Printf ("Unexpected exception: %s\n    at render::CacheHolder::ResetCache", e.what ());
+    Log ().Printf ("Unexpected exception: %s\n    at render::CacheHolder::UpdateCacheAfterReset", e.what ());
   }
   catch (...)
   {
-    Log ().Printf ("Unexpected exception at render::CacheHolder::ResetCache");
-  }
-  
-  state = CacheState_Reset;
-  
+    Log ().Printf ("Unexpected exception at render::CacheHolder::UpdateCacheAfterReset");
+  }    
+
   for (HolderList::iterator iter=dependencies.begin (), end=dependencies.end (); iter!=end; ++iter)
-    (*iter)->ResetCache ();
+    (*iter)->UpdateCacheAfterReset ();
 }
 
 /*

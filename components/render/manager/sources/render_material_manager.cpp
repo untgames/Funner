@@ -87,6 +87,7 @@ struct MaterialManager::Impl
         MaterialPtr material (new MaterialImpl (device_manager, texture_manager, program_manager), false);
 
         material->Update (*iter);
+        material->SetId (id);
 
         MaterialProxy proxy = proxy_manager.GetProxy (id);
 

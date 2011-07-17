@@ -53,7 +53,7 @@ template <class Ptr> struct ResourceProxyImpl: public xtl::reference_counter, pu
   
 ///Деструктор
   ~ResourceProxyImpl ()
-  {
+  {   
     if (proxy_position != manager->proxies.end ())
       manager->proxies.erase (proxy_position);
   }
@@ -61,12 +61,14 @@ template <class Ptr> struct ResourceProxyImpl: public xtl::reference_counter, pu
 ///Переопределение методов кэша
   void UpdateCacheCore ()
   {
+    InvalidateCacheDependencies ();
   }
   
   void ResetCacheCore ()
   {
   }
   
+  using CacheHolder::UpdateCache;
   using CacheHolder::ResetCache;
   using CacheHolder::InvalidateCache;
 };
@@ -149,36 +151,27 @@ bool ResourceProxy<Ptr>::IsDefaultResource ()
 template <class Ptr>
 typename ResourceProxy<Ptr>::Pointer ResourceProxy<Ptr>::Resource ()
 {
-  if (impl->resource)
-    return impl->resource;
-    
-  throw xtl::format_operation_exception ("render::ResourceProxy<Ptr>::Resource", "Resource '%s' not found. Default resource hasn't set", impl->name.c_str ());
+  return impl->resource;
 }
 
 namespace
 {
 
-template <class T, T t> struct SfinaeHelper {};
-
-template <class T>
-void detach_cache_holder (T& resource, CacheHolder& proxy, SfinaeHelper<void (T::*)(CacheHolder&), &T::Detach>* = 0)
+inline void detach_cache_holder (CacheHolder* resource, CacheHolder* proxy)
 {
-  proxy.DetachCacheSource (resource);
+  proxy->DetachCacheSource (*resource);
 }
 
-template <class T>
-void detach_cache_holder (T& resource, CacheHolder& proxy, ...)
+inline void detach_cache_holder (void* resource, CacheHolder* proxy)
 {
 }
 
-template <class T>
-void attach_cache_holder (T& resource, CacheHolder& proxy, SfinaeHelper<void (T::*)(CacheHolder&), &T::Attach>* = 0)
+inline void attach_cache_holder (CacheHolder* resource, CacheHolder* proxy)
 {
-  proxy.AttachCacheSource (resource);
+  proxy->AttachCacheSource (*resource);
 }
 
-template <class T>
-void attach_cache_holder (T& resource, CacheHolder& proxy, ...)
+inline void attach_cache_holder (void* resource, CacheHolder* proxy)
 {
 }
 
@@ -187,11 +180,14 @@ void attach_cache_holder (T& resource, CacheHolder& proxy, ...)
 template <class Ptr>
 void ResourceProxy<Ptr>::SetResource (const Pointer& ptr)
 {
-  if (ptr)
-    attach_cache_holder (*ptr, *impl);
+  if (ptr != impl->resource)
+  {
+    if (ptr)
+      attach_cache_holder (&*ptr, &*impl);
 
-  if (impl->resource)
-    detach_cache_holder (*impl->resource, *impl);
+    if (impl->resource)
+      detach_cache_holder (&*impl->resource, &*impl);
+  }
 
   impl->resource   = ptr;
   impl->is_default = !ptr;
@@ -227,6 +223,38 @@ template <class Ptr>
 void ResourceProxy<Ptr>::DetachCacheHolder (CacheHolder& holder)
 {
   holder.DetachCacheSource (*impl);
+}
+
+/*
+    Обновления кэша / сброс кэша
+*/
+
+template <class Ptr>
+void ResourceProxy<Ptr>::UpdateCache ()
+{
+  impl->UpdateCache ();
+}
+
+template <class Ptr>
+void ResourceProxy<Ptr>::ResetCache ()
+{
+  impl->ResetCache ();
+}
+
+/*
+    Сравнение
+*/
+
+template <class Ptr>
+bool ResourceProxy<Ptr>::operator == (const ResourceProxy& proxy)
+{
+  return impl == proxy.impl;
+}
+
+template <class Ptr>
+bool ResourceProxy<Ptr>::operator != (const ResourceProxy& proxy)
+{
+  return !(*this == proxy);
 }
 
 /*

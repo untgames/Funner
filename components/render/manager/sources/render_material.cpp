@@ -27,12 +27,12 @@ struct Texmap: public xtl::reference_counter, public CacheHolder
   LowLevelSamplerStatePtr cached_sampler;        //закэшированный сэмплер
   LowLevelTexturePtr      cached_device_texture; //закэшированная текстура
   
-  Texmap (MaterialImpl& material, const TextureProxy& in_texture_proxy, const SamplerProxy& in_sampler_proxy, bool in_is_dynamic)
+  Texmap (CacheHolder& owner, const TextureProxy& in_texture_proxy, const SamplerProxy& in_sampler_proxy, bool in_is_dynamic)
     : texture (in_texture_proxy)
     , sampler (in_sampler_proxy)
     , is_dynamic (in_is_dynamic)
   {
-    material.AttachCacheSource (*this);
+    owner.AttachCacheSource (*this);
     
     texture.AttachCacheHolder (*this);
     sampler.AttachCacheHolder (*this);
@@ -53,16 +53,13 @@ struct Texmap: public xtl::reference_counter, public CacheHolder
       LowLevelSamplerStatePtr new_cached_sampler        = sampler.Resource ();
       LowLevelTexturePtr      new_cached_device_texture = new_cached_texture ? new_cached_texture->DeviceTexture () : LowLevelTexturePtr ();
       
-      if (!new_cached_sampler)
-        throw xtl::format_operation_exception ("", "Null sampler for texmap: texture='%s' sampler='%s'", texture.Name (), sampler.Name ());
-            
       if (new_cached_texture == cached_texture && new_cached_sampler == cached_sampler && new_cached_device_texture == cached_device_texture)
-        return;
+        return;                      
       
       cached_texture        = new_cached_texture;
       cached_device_texture = new_cached_device_texture;      
       cached_sampler        = new_cached_sampler;
-
+      
       InvalidateCache ();
     }
     catch (xtl::exception& e)
@@ -88,21 +85,21 @@ typedef stl::vector<size_t>        TagHashArray;
 
 struct MaterialImpl::Impl: public CacheHolder, public DebugIdHolder
 {
-  DeviceManagerPtr           device_manager;             //менеджер устройства отрисовки
-  TextureManagerPtr          texture_manager;            //менеджер текстур
-  ProgramManagerPtr          program_manager;            //менеджер программ
-  stl::string                id;                         //идентификатор материала
-  TagHashArray               tags;                       //тэги материала
-  ProgramProxy               program;                    //прокси программы
-  PropertyBuffer             properties;                 //свойства материала
-  ProgramParametersLayoutPtr material_properties_layout; //расположение свойств материала
-  TexmapArray                texmaps;                    //текстурные карты
-  bool                       has_dynamic_textures;       //есть ли в материале динамические текстуры  
-  ProgramPtr                 cached_program;             //закэшированная программа
-  LowLevelBufferPtr          cached_properties;          //закэшированный буфер констант
-  LowLevelStateBlockPtr      cached_state_block;         //закэшированный блок состояний
-  ProgramParametersLayoutPtr cached_properties_layout;   //расположение свойств материала и программы  
-  Log                        log;                        //протокол отладочных сообщений
+  DeviceManagerPtr           device_manager;               //менеджер устройства отрисовки
+  TextureManagerPtr          texture_manager;              //менеджер текстур
+  ProgramManagerPtr          program_manager;              //менеджер программ
+  stl::string                id;                           //идентификатор материала
+  TagHashArray               tags;                         //тэги материала
+  ProgramProxy               program;                      //прокси программы
+  PropertyBuffer             properties;                   //свойства материала
+  ProgramParametersLayoutPtr material_properties_layout;   //расположение свойств материала
+  TexmapArray                texmaps;                      //текстурные карты
+  bool                       has_dynamic_textures;         //есть ли в материале динамические текстуры  
+  size_t                     cached_state_block_mask_hash; //хэш закэшированной маски блока состояний материала
+  ProgramPtr                 cached_program;               //закэшированная программа
+  LowLevelStateBlockPtr      cached_state_block;           //закэшированный блок состояний
+  ProgramParametersLayoutPtr cached_properties_layout;     //расположение свойств материала и программы  
+  Log                        log;                          //протокол отладочных сообщений
   
 ///Конструктор
   Impl (const DeviceManagerPtr& in_device_manager, const TextureManagerPtr& in_texture_manager, const ProgramManagerPtr& in_program_manager)
@@ -112,6 +109,7 @@ struct MaterialImpl::Impl: public CacheHolder, public DebugIdHolder
     , program (program_manager->GetProgramProxy (DEFAULT_PROGRAM_NAME))
     , properties (in_device_manager)
     , has_dynamic_textures (false)
+    , cached_state_block_mask_hash (0)
   {
     AttachCacheSource (properties);
     
@@ -134,7 +132,6 @@ struct MaterialImpl::Impl: public CacheHolder, public DebugIdHolder
 
     cached_properties_layout = ProgramParametersLayoutPtr ();
     cached_program           = ProgramPtr ();
-    cached_properties        = LowLevelBufferPtr ();
     cached_state_block       = LowLevelStateBlockPtr ();
   }
   
@@ -142,65 +139,106 @@ struct MaterialImpl::Impl: public CacheHolder, public DebugIdHolder
   {
     try
     {
+      bool need_invalidate_deps = false; //флаг необходимости обновления зависимых от материала кэшей
+      
       bool has_debug_log = device_manager->Settings ().HasDebugLog ();
       
       if (has_debug_log)
         log.Printf ("Update material cache (id=%u)", Id ());
         
-      cached_program    = program.Resource ();
-      cached_properties = properties.Buffer ();
+        //кэширование программы рендеринга
+
+      ProgramPtr old_program = cached_program;
+
+      cached_program       = program.Resource ();
+      need_invalidate_deps = need_invalidate_deps || old_program != cached_program;
       
       if (cached_program)
       {
+        ProgramParametersLayoutPtr old_layout = cached_properties_layout;
+        
         cached_properties_layout = device_manager->ProgramParametersManager ().GetParameters (&*material_properties_layout, &*cached_program->ParametersLayout (), 0);
+        need_invalidate_deps     = need_invalidate_deps || old_layout != cached_properties_layout;
       }
       else throw xtl::format_operation_exception ("", "Null program for material '%s' (id=%u)", id.c_str (), Id ());
       
+        //кэширование константного буфера материала
+      
+      LowLevelBufferPtr device_properties = properties.Buffer ();      
+      
       render::low_level::IDevice& device = device_manager->Device ();
+      
+        //установка константного буфера и сброс программы рендеринга в устройстве отрисовки
 
-      device.SSSetConstantBuffer (ProgramParametersSlot_Material, cached_properties.get ());
+      device.SSSetConstantBuffer (ProgramParametersSlot_Material, device_properties.get ());
       device.SSSetConstantBuffer (ProgramParametersSlot_Program, 0);
+      
+        //применение настроек программы к состоянию устройства отрисовки (для объединения их с настройками материала)
+        
+      StateBlockMask mask;        
 
       if (cached_program)
       {
         LowLevelStateBlockPtr program_state_block = cached_program->StateBlock ();
 
         if (program_state_block)
-          program_state_block->Apply ();
-      }            
-
-      if (!cached_state_block)
-      {
-        StateBlockMask mask;
-        
-        mask.ss_constant_buffers [ProgramParametersSlot_Material] = true;
-        mask.ss_constant_buffers [ProgramParametersSlot_Program]  = true;
-        
-        for (size_t i=0, count=stl::min (texmaps.size (), DEVICE_SAMPLER_SLOTS_COUNT); i<count; i++)
         {
-          mask.ss_textures [i] = !texmaps [i]->is_dynamic;
-          mask.ss_samplers [i] = true;
+            //получение маски флагов программы рендеринга
+
+          program_state_block->GetMask (mask);
+
+            //применение настроек программы рендеринга
+
+          program_state_block->Apply ();
         }
+      }
+
+        //определение настроек материала
+
+      mask.ss_constant_buffers [ProgramParametersSlot_Material] = true;
+      mask.ss_constant_buffers [ProgramParametersSlot_Program]  = true;
+
+      for (size_t i=0, count=stl::min (texmaps.size (), DEVICE_SAMPLER_SLOTS_COUNT); i<count; i++)
+      {
+        mask.ss_textures [i] = !texmaps [i]->is_dynamic;
+        mask.ss_samplers [i] = true;
+      }
+
+        //проверка необходимости пересоздания блока состояний материала
         
-        cached_state_block = LowLevelStateBlockPtr (device.CreateStateBlock (mask), false);        
+      size_t state_block_mask_hash = mask.Hash ();
+      
+      if (!cached_state_block || cached_state_block_mask_hash != state_block_mask_hash) 
+      {
+        cached_state_block           = LowLevelStateBlockPtr (device.CreateStateBlock (mask), false);
+        cached_state_block_mask_hash = state_block_mask_hash;
+        need_invalidate_deps         = true;
       }
       
+        //установка статических текстурных карт и их сэмплеров в контекст устройства отрисовки
+
       for (size_t i=0, count=stl::min (texmaps.size (), DEVICE_SAMPLER_SLOTS_COUNT); i<count; i++)
       {
         Texmap& texmap = *texmaps [i];
         
-        texmap.UpdateCache ();
-        
-        if (texmap.IsBroken ())
-          throw xtl::format_operation_exception ("", "Texmap[%u] of material '%s' (id=%u) is broken. Material will be broken too", i, id.c_str (), Id ());
+        if (!texmap.cached_device_texture)        
+          log.Printf ("Texmap[%u] for material '%s' will be ignored. Bad texture '%s'", i, id.c_str (), texmap.texture.Name ());          
 
-        if (texmap.cached_device_texture)
-          device.SSSetTexture (i, texmap.cached_device_texture.get ());
+        if (!texmap.cached_sampler)        
+          log.Printf ("Texmap[%u] for material '%s' will be ignored. Bad sampler '%s'", i, id.c_str (), texmap.sampler.Name ());
         
+        device.SSSetTexture (i, texmap.cached_device_texture.get ());
         device.SSSetSampler (i, texmap.cached_sampler.get ());
       }
 
+        //сохранение состояния контекста устройства отрисовки
+
       cached_state_block->Capture ();
+
+        //обновление зависимых кэшей
+
+      if (need_invalidate_deps)
+        InvalidateCacheDependencies ();
 
       if (has_debug_log)
         log.Printf ("...material cache updated");
@@ -254,14 +292,14 @@ void MaterialImpl::SetId (const char* id)
 
 size_t MaterialImpl::TagsCount ()
 {
-  impl->UpdateCache ();
+  UpdateCache ();
   
   return impl->tags.size ();
 }
 
 const size_t* MaterialImpl::Tags ()
 {
-  impl->UpdateCache ();
+  UpdateCache ();
   
   if (impl->tags.empty ())
     return 0;
@@ -275,7 +313,7 @@ const size_t* MaterialImpl::Tags ()
 
 LowLevelStateBlockPtr MaterialImpl::StateBlock ()
 {
-  impl->UpdateCache ();
+  UpdateCache ();
   
   return impl->cached_state_block;
 }
@@ -359,8 +397,12 @@ void MaterialImpl::Update (const media::rfx::Material& material)
 {
   try
   {
+      //сохранение свойств материала, получение прокси-программы материала
+    
     common::PropertyMap new_properties = material.Properties ();
     ProgramProxy        new_program    = impl->program_manager->GetProgramProxy (material.Program ());    
+    
+      //создание текстурных карт      
     
     TexmapArray new_texmaps;
 
@@ -372,29 +414,40 @@ void MaterialImpl::Update (const media::rfx::Material& material)
     {
       const media::rfx::Texmap& texmap = material.Texmap (i);
       
+        //определение является ли текстура динамической производится по префиксу её имени и потому может быть выполнено однократно      
+      
       bool is_dynamic_image = impl->texture_manager->IsDynamicTexture (texmap.Image ());
 
       if (is_dynamic_image)
-        new_has_dynamic_textures = true;
+        new_has_dynamic_textures = true;        
       
-      TexmapPtr new_texmap (new Texmap (*this, impl->texture_manager->GetTextureProxy (texmap.Image ()),
+      TexmapPtr new_texmap (new Texmap (*impl, impl->texture_manager->GetTextureProxy (texmap.Image ()),
         impl->texture_manager->GetSamplerProxy (texmap.Sampler ()), is_dynamic_image), false);
 
       new_texmaps.push_back (new_texmap);
     }
     
+      //копирование тэгов материала
+    
     TagHashArray new_tag_hashes (material.TagHashes (), material.TagHashes () + material.TagsCount ());
     
     if (new_tag_hashes.empty ())
       impl->log.Printf ("Warning: material '%s' has no tags. Will not be displayed", material.Name ());
+      
+      //получение объекта расположения свойств материала
     
     ProgramParametersLayoutPtr new_layout = impl->device_manager->ProgramParametersManager ().GetParameters (ProgramParametersSlot_Material, new_properties.Layout ());
+    
+      //регистрация обновлений
 
-    new_program.AttachCacheHolder (*impl);
+    if (new_program != impl->program)
+    {
+      new_program.AttachCacheHolder (*impl);
 
-    impl->program.DetachCacheHolder (*impl);
-
-    impl->program = new_program;
+      impl->program.DetachCacheHolder (*impl);
+      
+      impl->program = new_program;      
+    }
 
     impl->properties.SetProperties (new_properties);
 
@@ -402,10 +455,11 @@ void MaterialImpl::Update (const media::rfx::Material& material)
     impl->tags.swap (new_tag_hashes);
 
     impl->material_properties_layout = new_layout;
-    impl->cached_state_block         = LowLevelStateBlockPtr ();
     impl->has_dynamic_textures       = new_has_dynamic_textures;
     
-    impl->InvalidateCache (); //TODO: режим сброса
+      //обновление кэша с зависимостями (поскольку может измениться состояние тэгов и динамических текстур)    
+      
+    impl->InvalidateCache ();
   }
   catch (xtl::exception& e)
   {
@@ -422,7 +476,7 @@ ProgramParametersLayoutPtr MaterialImpl::ParametersLayout ()
 {
   try
   {
-    impl->UpdateCache ();
+    UpdateCache ();
     
     return impl->cached_properties_layout;
   }
@@ -437,17 +491,15 @@ ProgramParametersLayoutPtr MaterialImpl::ParametersLayout ()
     Управление кэшированием
 */
 
-void MaterialImpl::UpdateCache ()
+void MaterialImpl::UpdateCacheCore ()
 {
-  CacheSource::UpdateCache ();
+    //обновление зависимых кэшей (реакция на Impl::InvalidateCacheDependencies)
 
-  impl->UpdateCache ();
+  InvalidateCacheDependencies ();
 }
 
-void MaterialImpl::ResetCache ()
+void MaterialImpl::ResetCacheCore ()
 {
-  CacheSource::ResetCache ();
-
   impl->ResetCache ();
   
   for (TexmapArray::iterator iter=impl->texmaps.begin (), end=impl->texmaps.end (); iter!=end; ++iter)

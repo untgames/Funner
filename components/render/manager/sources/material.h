@@ -59,8 +59,12 @@ class MaterialImpl: public Object, public CacheSource
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Управление кэшированием
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void UpdateCache ();
-    void ResetCache  ();
+    using CacheSource::UpdateCache;
+    using CacheSource::ResetCache;
+    
+  private:
+    void UpdateCacheCore ();
+    void ResetCacheCore ();    
 
   private:
     struct Impl;
