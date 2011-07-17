@@ -97,6 +97,7 @@ void ContextCaps::Init (const ExtensionSet& available_extension_set, const Exten
                    ARB_multisample                = "GL_ARB_multisample",
                    ARB_multitexture               = "GL_ARB_multitexture",
                    ARB_occlusion_query            = "GL_ARB_occlusion_query",
+                   ARB_seamless_cube_map          = "GL_ARB_seamless_cube_map",
                    ARB_shader_objects             = "GL_ARB_shader_objects",
                    ARB_shading_language_100       = "GL_ARB_shading_language_100",
                    ARB_shadow                     = "GL_ARB_shadow",
@@ -148,6 +149,7 @@ void ContextCaps::Init (const ExtensionSet& available_extension_set, const Exten
   has_arb_multisample                = ext.Get (ARB_multisample);
   has_arb_multitexture               = ext.Get (ARB_multitexture);  
   has_arb_occlusion_query            = ext.Get (ARB_occlusion_query);
+  has_arb_seamless_cube_map          = ext.Get (ARB_seamless_cube_map);
   has_arb_shader_objects             = ext.Get (ARB_shader_objects);
   has_arb_shading_language_100       = has_arb_shader_objects && ext.Get (ARB_shading_language_100);
   has_arb_shadow                     = ext.Get (ARB_shadow);
@@ -217,6 +219,7 @@ void ContextCaps::Init (const ExtensionSet& available_extension_set, const Exten
     glFramebufferTexture2D_fn                = glFramebufferTexture2DEXT;
     glFramebufferTexture3D_fn                = glFramebufferTexture3DEXT;
     glGetFramebufferAttachmentParameteriv_fn = glGetFramebufferAttachmentParameterivEXT;
+    glGenerateMipmap_fn                      = glGenerateMipmapEXT;
   }
   
   if (has_arb_transpose_matrix)
@@ -241,6 +244,26 @@ void ContextCaps::Init (const ExtensionSet& available_extension_set, const Exten
     glUniformMatrix3fv_fn        = glUniformMatrix3fv ? glUniformMatrix3fv : glUniformMatrix3fvARB;
     glUniformMatrix4fv_fn        = glUniformMatrix4fv ? glUniformMatrix4fv : glUniformMatrix4fvARB;
     glUseProgram_fn              = glUseProgram ? glUseProgram : (PFNGLUSEPROGRAMPROC)glUseProgramObjectARB;
+  }
+
+  if (has_ffp)
+  {
+    if (has_arb_multitexture) glGetIntegerv (GL_MAX_TEXTURE_UNITS, (GLint*)&texture_units_count);
+    else                      texture_units_count = 1;
+  }
+  else
+  {
+    if (has_arb_vertex_shader)
+    {
+      int vertex_shader_texture_units_count, pixel_shader_texture_units_count;
+
+      glGetIntegerv (GL_MAX_VERTEX_TEXTURE_IMAGE_UNITS_ARB, (GLint*)&vertex_shader_texture_units_count);
+      glGetIntegerv (GL_MAX_TEXTURE_IMAGE_UNITS_ARB, (GLint*)&pixel_shader_texture_units_count);
+
+      texture_units_count = stl::min (vertex_shader_texture_units_count, pixel_shader_texture_units_count);
+    }
+    else
+      texture_units_count = 1;
   }
   
 #else
@@ -297,7 +320,10 @@ void ContextCaps::Init (const ExtensionSet& available_extension_set, const Exten
     glFramebufferRenderbuffer_fn             = glFramebufferRenderbufferOES;
     glFramebufferTexture2D_fn                = glFramebufferTexture2DOES;
     glGetFramebufferAttachmentParameteriv_fn = glGetFramebufferAttachmentParameterivOES;
+    glGenerateMipmap_fn                      = glGenerateMipmapOES;
   }
+
+  glGetIntegerv (GL_MAX_TEXTURE_UNITS, (GLint*)&texture_units_count);  //has_arb_multitexture always true
 
 #endif
 

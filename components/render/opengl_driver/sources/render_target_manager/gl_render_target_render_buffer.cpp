@@ -155,6 +155,7 @@ RenderBuffer::RenderBuffer (const ContextManager& context_manager, const Texture
     case PixelFormat_D16:
     case PixelFormat_D24X8:
     case PixelFormat_D24S8:
+    case PixelFormat_D32:
     case PixelFormat_S8:
       target_type = RenderTargetType_DepthStencil;
       break;
@@ -259,6 +260,7 @@ GLenum get_glformat (PixelFormat format, const char* source, const char* param)
     case PixelFormat_D16:
     case PixelFormat_D24X8:
     case PixelFormat_D24S8:
+    case PixelFormat_D32:
     case PixelFormat_S8:
       throw xtl::format_not_supported_exception (source, "Unsupported %s=%s", param, get_name (format));
     default:
@@ -395,6 +397,8 @@ void RenderBuffer::SetData (size_t layer, size_t mip_level, size_t x, size_t y, 
 
           break;
         }
+        case PixelFormat_D32:
+          glDrawPixels (width, height, GL_DEPTH_COMPONENT, GL_UNSIGNED_INT, buffer);
         case PixelFormat_S8:
           glDrawPixels (width, height, GL_STENCIL_INDEX, GL_UNSIGNED_BYTE, buffer);
           break;
@@ -534,6 +538,9 @@ void RenderBuffer::GetData (size_t layer, size_t mip_level, size_t x, size_t y, 
 
           break;
         }
+        case PixelFormat_D32:
+          glReadPixels (x, y, width, height, GL_DEPTH_COMPONENT, GL_UNSIGNED_INT, buffer);
+          break;
         case PixelFormat_S8:
           glReadPixels (x, y, width, height, GL_STENCIL_INDEX, GL_UNSIGNED_BYTE, buffer);
           break;

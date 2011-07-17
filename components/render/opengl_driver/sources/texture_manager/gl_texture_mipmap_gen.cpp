@@ -6,6 +6,7 @@ namespace
 typedef unsigned char  uchar;
 typedef unsigned short uint16;
 typedef unsigned int   r24g8_t;
+typedef unsigned int   uint32;
 typedef int            fixed;
 
 struct two_color8_t
@@ -47,6 +48,11 @@ void scale_pixel (uchar& dest,uchar s1,uchar s2,uchar s3,uchar s4)
 void scale_pixel (uint16& dest, uint16 s1, uint16 s2, uint16 s3, uint16 s4)
 {
   dest = (size_t)(s1 + s2 + s3 + s4) >> 2;
+}
+
+void scale_pixel (uint32& dest, uint32 s1, uint32 s2, uint32 s3, uint32 s4)
+{
+  dest = (unsigned long long int)(s1 + s2 + s3 + s4) >> 2;
 }
 
 void scale_pixel (depth24_stencil8& dest, const depth24_stencil8& s1, const depth24_stencil8& s2, const depth24_stencil8& s3, const depth24_stencil8& s4)
@@ -182,6 +188,7 @@ void scale_image_2x_down (PixelFormat format, size_t width, size_t height, const
     case PixelFormat_RGBA8: scale_image_2x_down_impl<rgba8_t>      (width, height, src, dest); break;
     case PixelFormat_D24S8:
     case PixelFormat_D24X8: scale_image_2x_down_impl<depth24_stencil8> (width, height, src, dest); break;
+    case PixelFormat_D32:   scale_image_2x_down_impl<uint32>           (width, height, src, dest); break;
     case PixelFormat_DXT1:
     case PixelFormat_DXT3:
     case PixelFormat_DXT5:
@@ -206,7 +213,8 @@ void scale_image (PixelFormat format, size_t width, size_t height, size_t new_wi
     case PixelFormat_RGB8:  scale_image_impl <rgb8_t>       (width, height, src, new_width, new_height, dest); break;
     case PixelFormat_RGBA8: scale_image_impl <rgba8_t>      (width, height, src, new_width, new_height, dest); break;
     case PixelFormat_D24S8:
-    case PixelFormat_D24X8: scale_image_impl <depth24_stencil8>      (width, height, src, new_width, new_height, dest); break;
+    case PixelFormat_D24X8: scale_image_impl <depth24_stencil8> (width, height, src, new_width, new_height, dest); break;
+    case PixelFormat_D32:   scale_image_impl <uint32>           (width, height, src, new_width, new_height, dest); break;
     case PixelFormat_DXT1:
     case PixelFormat_DXT3:
     case PixelFormat_DXT5:

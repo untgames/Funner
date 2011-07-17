@@ -16,6 +16,7 @@ size_t get_pixel_size (PixelFormat format)
     case PixelFormat_D16:    return 2;
     case PixelFormat_D24X8:  return 4;
     case PixelFormat_D24S8:  return 4;
+    case PixelFormat_D32:    return 4;
     case PixelFormat_S8:     return 1;
     default:                 return 0;
   }

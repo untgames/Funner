@@ -51,6 +51,7 @@ RenderTargetType get_target_type (IView* view)
       case PixelFormat_D16:
       case PixelFormat_D24X8:
       case PixelFormat_D24S8:
+      case PixelFormat_D32:
       case PixelFormat_S8:
         return RenderTargetType_DepthStencil;
       default:

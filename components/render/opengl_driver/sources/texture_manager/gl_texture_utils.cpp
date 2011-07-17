@@ -35,6 +35,7 @@ GLint get_gl_internal_format (PixelFormat format)
     case PixelFormat_D16:         return GL_DEPTH_COMPONENT16_ARB;
     case PixelFormat_D24X8:       return GL_DEPTH_COMPONENT24_ARB;
     case PixelFormat_D24S8:       return GL_DEPTH24_STENCIL8_EXT;
+    case PixelFormat_D32:         return GL_DEPTH_COMPONENT32_ARB;
     case PixelFormat_S8:
       throw xtl::format_not_supported_exception (METHOD_NAME, "Stencil textures not supported");
     case PixelFormat_RGB_PVRTC2:
@@ -63,7 +64,8 @@ GLenum get_gl_format (PixelFormat format)
     case PixelFormat_RGB8:  return GL_RGB;
     case PixelFormat_RGBA8: return GL_RGBA;
     case PixelFormat_D16:
-    case PixelFormat_D24X8: return GL_DEPTH_COMPONENT;
+    case PixelFormat_D24X8:
+    case PixelFormat_D32:   return GL_DEPTH_COMPONENT;
     case PixelFormat_D24S8: return GL_DEPTH_STENCIL_EXT;
     case PixelFormat_S8:
       throw xtl::format_not_supported_exception (METHOD_NAME, "Stencil textures not supported");
@@ -94,7 +96,8 @@ GLenum get_gl_type (PixelFormat format)
     case PixelFormat_DXT3:
     case PixelFormat_DXT5:   return GL_UNSIGNED_BYTE;
     case PixelFormat_D16:    return GL_UNSIGNED_SHORT;
-    case PixelFormat_D24X8:  return GL_UNSIGNED_INT;
+    case PixelFormat_D24X8:
+    case PixelFormat_D32:    return GL_UNSIGNED_INT;
     case PixelFormat_D24S8:  return GL_UNSIGNED_INT_24_8_EXT;
     case PixelFormat_RGB_PVRTC2:
     case PixelFormat_RGB_PVRTC4:
@@ -122,6 +125,7 @@ PixelFormat get_pixel_format (GLenum gl_format)
     case GL_DEPTH_COMPONENT16:             return PixelFormat_D16;
     case GL_DEPTH_COMPONENT24:             return PixelFormat_D24X8;
     case GL_DEPTH24_STENCIL8_EXT:          return PixelFormat_D24S8;
+    case GL_DEPTH_COMPONENT32:             return PixelFormat_D32;
     default:
       throw xtl::format_not_supported_exception ("render::low_level::get_pixel_format", "Unknown gl_format=%04x", gl_format);
   }
@@ -148,6 +152,7 @@ GLint get_gl_internal_format (PixelFormat format)
     case PixelFormat_D16:         return GL_DEPTH_COMPONENT16_OES;
     case PixelFormat_D24X8:       return GL_DEPTH_COMPONENT24_OES;
     case PixelFormat_D24S8:       return GL_DEPTH_STENCIL_OES; 
+    case PixelFormat_D32:         return GL_DEPTH_COMPONENT32_OES;
     case PixelFormat_S8:
       throw xtl::format_not_supported_exception (METHOD_NAME, "Stencil textures not supported.");
     default:
@@ -169,6 +174,7 @@ GLenum get_gl_format (PixelFormat format)
     case PixelFormat_RGBA8:       return GL_RGBA;
     case PixelFormat_D16:
     case PixelFormat_D24X8:       return GL_DEPTH_COMPONENT24_OES;
+    case PixelFormat_D32:         return GL_DEPTH_COMPONENT32_OES;
     case PixelFormat_D24S8:       return GL_DEPTH_STENCIL_OES;
     case PixelFormat_RGB_PVRTC2:
     case PixelFormat_RGB_PVRTC4:
@@ -205,6 +211,8 @@ GLenum get_gl_type (PixelFormat format)
     case PixelFormat_D24X8:
     case PixelFormat_D24S8:
       throw xtl::format_not_supported_exception (METHOD_NAME, "Depth24 component not supported");
+    case PixelFormat_D32:
+      throw xtl::format_not_supported_exception (METHOD_NAME, "Depth32 component not supported");
     default:
       throw xtl::make_argument_exception (METHOD_NAME, "format", format);
   }
@@ -222,6 +230,7 @@ PixelFormat get_pixel_format (GLenum gl_format)
     case GL_LUMINANCE_ALPHA:                  return PixelFormat_LA8;
     case GL_DEPTH_COMPONENT16_OES:            return PixelFormat_D16;
     case GL_DEPTH_COMPONENT24_OES:            return PixelFormat_D24X8;
+    case GL_DEPTH_COMPONENT32_OES:            return PixelFormat_D32;
     case GL_DEPTH_STENCIL_OES:                return PixelFormat_D24S8;
     case GL_COMPRESSED_RGB_PVRTC_2BPPV1_IMG:  return PixelFormat_RGB_PVRTC2;
     case GL_COMPRESSED_RGB_PVRTC_4BPPV1_IMG:  return PixelFormat_RGB_PVRTC4;

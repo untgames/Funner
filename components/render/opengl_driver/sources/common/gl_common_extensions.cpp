@@ -47,6 +47,7 @@ const char* extensions [] = {
   "GL_ARB_pixel_buffer_object",
   "GL_ARB_point_parameters",
   "GL_ARB_point_sprite",
+  "GL_ARB_seamless_cube_map",
   "GL_ARB_shader_objects",
   "GL_ARB_shading_language_100",
   "GL_ARB_shadow",

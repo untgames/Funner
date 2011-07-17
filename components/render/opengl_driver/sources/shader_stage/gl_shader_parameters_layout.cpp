@@ -119,13 +119,16 @@ void ProgramParametersLayout::SetDesc (const ProgramParametersLayoutDesc& in_des
       current_slot         = src_param.slot;
     }
   }  
-  
-    //подсчёт количества параметров в группах
 
-  for (GroupArray::iterator iter=new_groups.begin (), end=new_groups.end ()-1; iter!=end; ++iter)
-    iter->count = iter [1].parameters - iter [0].parameters;
+  if (!new_groups.empty ())  
+  {
+      //подсчёт количества параметров в группах
 
-  new_groups.back ().count = new_parameters.end () - new_groups.back ().parameters;
+    for (GroupArray::iterator iter=new_groups.begin (), end=new_groups.end ()-1; iter!=end; ++iter)
+      iter->count = iter [1].parameters - iter [0].parameters;
+
+    new_groups.back ().count = new_parameters.end () - new_groups.back ().parameters;
+  }
 
     //обмен
     

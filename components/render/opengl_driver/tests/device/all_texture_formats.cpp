@@ -31,6 +31,7 @@ const char* get_short_name (PixelFormat param)
     case PixelFormat_D16:   return " D16 ";
     case PixelFormat_D24X8: return "D24X8";
     case PixelFormat_D24S8: return "D24S8";
+    case PixelFormat_D32:   return " D32 ";
     case PixelFormat_S8:    return "  S8 ";
     default:                return "?????";
   }
@@ -202,6 +203,7 @@ TestStatus test_texture_format (ITexture* texture, PixelFormat test_format)
             case PixelFormat_RGBA8:
             case PixelFormat_D24X8:
             case PixelFormat_D24S8: 
+            case PixelFormat_D32:
               data_size *= 4; 
               texel_size = 4; 
               break;
