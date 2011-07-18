@@ -3,8 +3,6 @@
 using namespace render;
 using namespace render::low_level;
 
-//TODO: SetId - register as named material
-
 namespace
 {
 
@@ -88,7 +86,7 @@ struct MaterialImpl::Impl: public CacheHolder, public DebugIdHolder
   DeviceManagerPtr           device_manager;               //менеджер устройства отрисовки
   TextureManagerPtr          texture_manager;              //менеджер текстур
   ProgramManagerPtr          program_manager;              //менеджер программ
-  stl::string                id;                           //идентификатор материала
+  stl::string                name;                         //имя материала
   TagHashArray               tags;                         //тэги материала
   ProgramProxy               program;                      //прокси программы
   PropertyBuffer             properties;                   //свойства материала
@@ -102,7 +100,7 @@ struct MaterialImpl::Impl: public CacheHolder, public DebugIdHolder
   Log                        log;                          //протокол отладочных сообщений
   
 ///Конструктор
-  Impl (const DeviceManagerPtr& in_device_manager, const TextureManagerPtr& in_texture_manager, const ProgramManagerPtr& in_program_manager)
+  Impl (const DeviceManagerPtr& in_device_manager, const TextureManagerPtr& in_texture_manager, const ProgramManagerPtr& in_program_manager, const char* in_name)
     : device_manager (in_device_manager)
     , texture_manager (in_texture_manager)
     , program_manager (in_program_manager)
@@ -111,17 +109,29 @@ struct MaterialImpl::Impl: public CacheHolder, public DebugIdHolder
     , has_dynamic_textures (false)
     , cached_state_block_mask_hash (0)
   {
+    if (!in_name)
+      throw xtl::make_null_argument_exception ("render::MaterialImpl::Impl::Impl", "name");
+      
+    name = in_name;
+    
     AttachCacheSource (properties);
     
     if (device_manager->Settings ().HasDebugLog ())
-      log.Printf ("Material created (id=%u)", Id ());
+      log.Printf ("Material '%s' created (id=%u)", name.c_str (), Id ());
   }
   
 ///Деструктор
   ~Impl ()
   {
+      //предварительная очистка коллекция для возможности отслеживать порядок удаления объектов до и после удаления данного    
+      
+    cached_program               = ProgramPtr ();
+    cached_properties_layout     = ProgramParametersLayoutPtr ();
+    cached_state_block           = LowLevelStateBlockPtr ();
+    cached_state_block_mask_hash = 0;
+    
     if (device_manager->Settings ().HasDebugLog ())
-      log.Printf ("Material destroyed (id=%u)", Id ());
+      log.Printf ("Material '%s' destroyed (id=%u)", name.c_str (), Id ());
   }
   
 ///Работа с кэшем
@@ -130,9 +140,10 @@ struct MaterialImpl::Impl: public CacheHolder, public DebugIdHolder
     if (device_manager->Settings ().HasDebugLog ())
       log.Printf ("Reset material cache (id=%u)", Id ());
 
-    cached_properties_layout = ProgramParametersLayoutPtr ();
-    cached_program           = ProgramPtr ();
-    cached_state_block       = LowLevelStateBlockPtr ();
+    cached_properties_layout     = ProgramParametersLayoutPtr ();
+    cached_program               = ProgramPtr ();
+    cached_state_block           = LowLevelStateBlockPtr ();
+    cached_state_block_mask_hash = 0;
   }
   
   void UpdateCacheCore ()
@@ -144,7 +155,7 @@ struct MaterialImpl::Impl: public CacheHolder, public DebugIdHolder
       bool has_debug_log = device_manager->Settings ().HasDebugLog ();
       
       if (has_debug_log)
-        log.Printf ("Update material cache (id=%u)", Id ());
+        log.Printf ("Update material '%s' cache (id=%u)", name.c_str (), Id ());
         
         //кэширование программы рендеринга
 
@@ -160,7 +171,7 @@ struct MaterialImpl::Impl: public CacheHolder, public DebugIdHolder
         cached_properties_layout = device_manager->ProgramParametersManager ().GetParameters (&*material_properties_layout, &*cached_program->ParametersLayout (), 0);
         need_invalidate_deps     = need_invalidate_deps || old_layout != cached_properties_layout;
       }
-      else throw xtl::format_operation_exception ("", "Null program for material '%s' (id=%u)", id.c_str (), Id ());
+      else throw xtl::format_operation_exception ("", "Null program for material '%s' (id=%u)", name.c_str (), Id ());
       
         //кэширование константного буфера материала
       
@@ -210,6 +221,9 @@ struct MaterialImpl::Impl: public CacheHolder, public DebugIdHolder
       
       if (!cached_state_block || cached_state_block_mask_hash != state_block_mask_hash) 
       {
+        if (has_debug_log)
+          log.Printf ("...create state block for material");
+                
         cached_state_block           = LowLevelStateBlockPtr (device.CreateStateBlock (mask), false);
         cached_state_block_mask_hash = state_block_mask_hash;
         need_invalidate_deps         = true;
@@ -222,10 +236,10 @@ struct MaterialImpl::Impl: public CacheHolder, public DebugIdHolder
         Texmap& texmap = *texmaps [i];
         
         if (!texmap.cached_device_texture)        
-          log.Printf ("Texmap[%u] for material '%s' will be ignored. Bad texture '%s'", i, id.c_str (), texmap.texture.Name ());          
+          log.Printf ("Texmap[%u] for material '%s' will be ignored. Bad texture '%s'", i, name.c_str (), texmap.texture.Name ());          
 
         if (!texmap.cached_sampler)        
-          log.Printf ("Texmap[%u] for material '%s' will be ignored. Bad sampler '%s'", i, id.c_str (), texmap.sampler.Name ());
+          log.Printf ("Texmap[%u] for material '%s' will be ignored. Bad sampler '%s'", i, name.c_str (), texmap.sampler.Name ());
         
         device.SSSetTexture (i, texmap.cached_device_texture.get ());
         device.SSSetSampler (i, texmap.cached_sampler.get ());
@@ -259,8 +273,8 @@ struct MaterialImpl::Impl: public CacheHolder, public DebugIdHolder
     Конструктор / деструктор
 */
 
-MaterialImpl::MaterialImpl (const DeviceManagerPtr& device_manager, const TextureManagerPtr& texture_manager, const ProgramManagerPtr& program_manager)
-  : impl (new Impl (device_manager, texture_manager, program_manager))
+MaterialImpl::MaterialImpl (const DeviceManagerPtr& device_manager, const TextureManagerPtr& texture_manager, const ProgramManagerPtr& program_manager, const char* name)
+  : impl (new Impl (device_manager, texture_manager, program_manager, name))
 {
   AttachCacheSource (*impl);
 }
@@ -270,20 +284,23 @@ MaterialImpl::~MaterialImpl ()
 }
 
 /*
-    Идентификатор материала
+    Имя
 */
 
-const char* MaterialImpl::Id ()
+const char* MaterialImpl::Name ()
 {
-  return impl->id.c_str ();
+  return impl->name.c_str ();
 }
 
-void MaterialImpl::SetId (const char* id)
+void MaterialImpl::SetName (const char* name)
 {
-  if (!id)
-    throw xtl::make_null_argument_exception ("render::MaterialImpl::SetId", "id");
+  if (!name)
+    throw xtl::make_null_argument_exception ("render::MaterialImpl::SetName", "name");
     
-  impl->id = id;
+  if (impl->device_manager->Settings ().HasDebugLog ())
+    impl->log.Printf ("Material '%s' name changed to '%s' (id=%u)", impl->name.c_str (), name, impl->Id ());
+    
+  impl->name = name;
 }
 
 /*

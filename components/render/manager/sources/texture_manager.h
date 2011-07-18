@@ -13,11 +13,11 @@ class TextureManager: public Object
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Создание текстур
 ///////////////////////////////////////////////////////////////////////////////////////////////////    
-    TexturePtr CreateTexture (const media::Image& image, bool generate_mipmaps);
-    TexturePtr CreateTexture (const media::Image& image, TextureDimension dimension, bool generate_mipmaps);
-    TexturePtr CreateTexture (const media::CompressedImage& image);
-    TexturePtr CreateTexture (const media::CompressedImage& image, TextureDimension dimension);
-    TexturePtr CreateTexture (TextureDimension dimension, size_t width, size_t height, size_t depth, PixelFormat format, bool generate_mipmaps);
+    TexturePtr CreateTexture (const media::Image& image, bool generate_mipmaps, const char* name = "");
+    TexturePtr CreateTexture (const media::Image& image, TextureDimension dimension, bool generate_mipmaps, const char* name = "");
+    TexturePtr CreateTexture (const media::CompressedImage& image, const char* name = "");
+    TexturePtr CreateTexture (const media::CompressedImage& image, TextureDimension dimension, const char* name = "");
+    TexturePtr CreateTexture (TextureDimension dimension, size_t width, size_t height, size_t depth, PixelFormat format, bool generate_mipmaps, const char* name = "");
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Проверка: является ли ресурс текстурой

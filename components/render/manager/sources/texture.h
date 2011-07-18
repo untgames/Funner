@@ -13,12 +13,20 @@ class TextureImpl: public Object
                   size_t                  height,
                   size_t                  depth,
                   PixelFormat             format,
-                  bool                    generate_mipmaps);
+                  bool                    generate_mipmaps,
+                  const char*             name = "");
     TextureImpl  (const DeviceManagerPtr&       manager,
                   TextureDimension              dimension,
-                  const media::CompressedImage& image);
+                  const media::CompressedImage& image,
+                  const char*                   name = "");
     ~TextureImpl ();
     
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Имя текстуры
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    const char* Name    ();
+    void        SetName (const char* id);
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Низкоуровневый объект текстуры
 ///////////////////////////////////////////////////////////////////////////////////////////////////

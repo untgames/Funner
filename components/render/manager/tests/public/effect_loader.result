@@ -17,11 +17,23 @@ render.manager: Effect rasterizer 'overlays' loaded
 render.manager: Effect texture sampler 'default' loaded
 render.manager: Effect texture sampler 'repeat' loaded
 render.manager: Effect shaders library 'data/shaders/*' loaded (7 shaders loaded)
+render.manager: Program 'phong' common data created (id=2)
+render.manager: Program 'phong' created (id=1)
 render.manager: Effect program 'phong' loaded
+render.manager: Program 'shadow_map' common data created (id=4)
+render.manager: Program 'shadow_map' created (id=3)
 render.manager: Effect program 'shadow_map' loaded
+render.manager: Program 'helper' common data created (id=6)
+render.manager: Program 'helper' created (id=5)
 render.manager: Effect program 'helper' loaded
 render.manager: Effect 'main' loaded
 render.manager: Effect 'shadow' loaded
 render.manager: Effect 'lighting' loaded
 Effects loaded
 window 784x562 removed
+render.manager: Program 'helper' destroyed for options = '' (id=5)
+render.manager: Program 'helper' common data destroyed (id=6)
+render.manager: Program 'shadow_map' destroyed for options = '' (id=3)
+render.manager: Program 'shadow_map' common data destroyed (id=4)
+render.manager: Program 'phong' destroyed for options = '' (id=1)
+render.manager: Program 'phong' common data destroyed (id=2)

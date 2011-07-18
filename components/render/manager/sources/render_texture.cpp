@@ -56,9 +56,10 @@ struct TextureImpl::Impl: public DebugIdHolder
   size_t                         height;         //высота текстуры
   size_t                         depth;          //глубина текстуры либо количество слоёв
   RenderTargetArray              render_targets; //цели рендеринга
+  stl::string                    name;           //имя текстуры
 
 ///Конструктор
-  Impl (const DeviceManagerPtr& in_device_manager, TextureDimension in_dimension, PixelFormat in_format, render::low_level::PixelFormat in_target_format)
+  Impl (const DeviceManagerPtr& in_device_manager, TextureDimension in_dimension, PixelFormat in_format, render::low_level::PixelFormat in_target_format, const char* in_name)
     : device_manager (in_device_manager)
     , dimension (in_dimension)
     , format (in_format)
@@ -67,15 +68,20 @@ struct TextureImpl::Impl: public DebugIdHolder
     , height (0)
     , depth (0)
   {
+    if (!in_name)
+      throw xtl::make_null_argument_exception ("render::TextureImpl::Impl::Impl", "name");
+      
+    name = in_name;
+    
     if (device_manager->Settings ().HasDebugLog ())
-      Log ().Printf  ("Texture created (id=%u)", Id ());
+      Log ().Printf  ("Texture '%s' created (id=%u)", name.c_str (), Id ());
   }
   
 ///Деструктор
   ~Impl ()
   {
     if (device_manager->Settings ().HasDebugLog ())
-      Log ().Printf  ("Texture destroyed (id=%u)", Id ());
+      Log ().Printf  ("Texture '%s' destroyed (id=%u)", name.c_str (), Id ());
   }
   
 ///Получение цели рендеринга
@@ -108,7 +114,8 @@ TextureImpl::TextureImpl
   size_t                   height,
   size_t                   depth,
   render::PixelFormat      format,
-  bool                     generate_mips_enable)
+  bool                     generate_mips_enable,
+  const char*              name)
 {
   try
   {
@@ -172,7 +179,7 @@ TextureImpl::TextureImpl
     desc.bind_flags           = BindFlag_Texture | BindFlag_RenderTarget;
     desc.usage_mode           = UsageMode_Static;
 
-    impl = new Impl (device_manager, dimension, format, target_format);
+    impl = new Impl (device_manager, dimension, format, target_format, name);
 
     impl->width   = width;
     impl->height  = height;
@@ -186,7 +193,7 @@ TextureImpl::TextureImpl
   }
 }
 
-TextureImpl::TextureImpl (const DeviceManagerPtr& device_manager, render::TextureDimension dimension, const media::CompressedImage& image)
+TextureImpl::TextureImpl (const DeviceManagerPtr& device_manager, render::TextureDimension dimension, const media::CompressedImage& image, const char* name)
 {
   try
   {
@@ -257,7 +264,7 @@ TextureImpl::TextureImpl (const DeviceManagerPtr& device_manager, render::Textur
         throw xtl::format_operation_exception ("", "Wrong compressed image pixel format %s", get_name (target_format));
     }    
 
-    impl = new Impl (device_manager, dimension, format, target_format);
+    impl = new Impl (device_manager, dimension, format, target_format, name);
         
     impl->width   = desc.width;
     impl->height  = desc.height;
@@ -273,6 +280,26 @@ TextureImpl::TextureImpl (const DeviceManagerPtr& device_manager, render::Textur
 
 TextureImpl::~TextureImpl ()
 {
+}
+
+/*
+    Имя текстуры
+*/
+
+const char* TextureImpl::Name ()
+{
+  return impl->name.c_str ();
+}
+
+void TextureImpl::SetName (const char* name)
+{
+  if (!name)
+    throw xtl::make_null_argument_exception ("render::TextureImpl::SetName", "name");
+    
+  if (impl->device_manager->Settings ().HasDebugLog ())
+    Log ().Printf ("Texture '%s' name changed to '%s' (id=%u)", impl->name.c_str (), name, impl->Id ());  
+
+  impl->name = name;
 }
 
 /*

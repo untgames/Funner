@@ -84,10 +84,9 @@ struct MaterialManager::Impl
         
         log.Printf ("...loading material '%s'", id);
         
-        MaterialPtr material (new MaterialImpl (device_manager, texture_manager, program_manager), false);
+        MaterialPtr material (new MaterialImpl (device_manager, texture_manager, program_manager, id), false);
 
         material->Update (*iter);
-        material->SetId (id);
 
         MaterialProxy proxy = proxy_manager.GetProxy (id);
 

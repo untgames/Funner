@@ -10,10 +10,12 @@ using namespace render::low_level;
 namespace
 {
 
+///Общие данные мешей
 struct MeshCommonData
 {
   DeviceManagerPtr   device_manager; //менеджер устройства отрисовки
   LowLevelBufferPtr  index_buffer;   //индексный буфер
+  stl::string        name;           //имя мэша  
   
   MeshCommonData (const DeviceManagerPtr& in_device_manager)
     : device_manager (in_device_manager)
@@ -23,9 +25,11 @@ struct MeshCommonData
   }
 };
 
+///Примитив меша
 struct MeshPrimitive: public xtl::reference_counter, public CacheHolder, public DebugIdHolder
 {
   MeshCommonData&                  common_data;                  //общие данные для примитива
+  size_t                           primitive_index;              //индекс примитива в меше
   render::low_level::PrimitiveType type;                         //тип примитива
   VertexBufferPtr                  vertex_buffer;                //вершинный буфер
   LowLevelInputLayoutPtr           layout;                       //лэйаут примитива
@@ -38,8 +42,10 @@ struct MeshPrimitive: public xtl::reference_counter, public CacheHolder, public 
   size_t                           cached_state_block_mask_hash; //хэш маски закэшированного блока состояний
   LowLevelStateBlockPtr            cached_state_block;           //закэшированный блок состояний  
   
-  MeshPrimitive (CacheHolder& parent_holder, const MaterialProxy& in_material, MeshCommonData& in_common_data)
+///Конструктор
+  MeshPrimitive (CacheHolder& parent_holder, size_t in_primitive_index, const MaterialProxy& in_material, MeshCommonData& in_common_data)
     : common_data (in_common_data)
+    , primitive_index (in_primitive_index)
     , type (PrimitiveType_PointList)
     , first (0)
     , count (0)    
@@ -53,23 +59,34 @@ struct MeshPrimitive: public xtl::reference_counter, public CacheHolder, public 
     memset (&cached_primitive, 0, sizeof (cached_primitive));    
     
     if (common_data.device_manager->Settings ().HasDebugLog ())
-      log.Printf ("Mesh primitive created (id=%u)", Id ());
+      log.Printf ("Mesh '%s' primitive #%u created (id=%u)", common_data.name.c_str (), primitive_index, Id ());
   }
   
+///Деструктор
   ~MeshPrimitive ()
   {
+      //предварительная очистка коллекция для возможности отслеживать порядок удаления объектов до и после удаления данного    
+    
+    cached_material              = MaterialPtr ();
+    cached_state_block           = LowLevelStateBlockPtr ();
+    cached_state_block_mask_hash = 0;
+    
     if (common_data.device_manager->Settings ().HasDebugLog ())
-      log.Printf ("Mesh primitive destroyed (id=%u)", Id ());    
+      log.Printf ("Mesh '%s' primitive #%u destroyed (id=%u)", common_data.name.c_str (), primitive_index, Id ());    
   }
   
+///Сброс кэша
   void ResetCacheCore ()
   {
     if (common_data.device_manager->Settings ().HasDebugLog ())
-      log.Printf ("Reset mesh primitive cache (id=%u)", Id ());        
+      log.Printf ("Reset mesh '%s' primitive #%u cache (id=%u)", common_data.name.c_str (), primitive_index, Id ());        
     
-    cached_material = MaterialPtr ();   
+    cached_material              = MaterialPtr ();   
+    cached_state_block           = LowLevelStateBlockPtr ();
+    cached_state_block_mask_hash = 0;
   }
   
+///Обновление кэша
   void UpdateCacheCore ()
   {
     try
@@ -77,9 +94,11 @@ struct MeshPrimitive: public xtl::reference_counter, public CacheHolder, public 
       bool has_debug_log = common_data.device_manager->Settings ().HasDebugLog ();
       
       if (has_debug_log)
-        log.Printf ("Update mesh primitive cache (id=%u)", Id ());
+        log.Printf ("Update mesh '%s' primitive #%u cache (id=%u)", common_data.name.c_str (), primitive_index, Id ());
       
       memset (&cached_primitive, 0, sizeof (cached_primitive));
+      
+        //запрос состояния материала
       
       cached_material = material.Resource ();
       
@@ -94,6 +113,8 @@ struct MeshPrimitive: public xtl::reference_counter, public CacheHolder, public 
         material_state_block->Apply ();
         material_state_block->GetMask (mask);
       }
+      
+        //установка вершинных/индексного буфера
         
       mask.is_index_buffer = true; //0 index buffer is need to be set
       mask.is_layout       = true;
@@ -110,27 +131,38 @@ struct MeshPrimitive: public xtl::reference_counter, public CacheHolder, public 
       device.ISSetInputLayout  (layout.get ());
       device.ISSetIndexBuffer  (common_data.index_buffer.get ());
       
+        //обновление блока состояний примитива
+      
       size_t mask_hash = mask.Hash ();
       
       if (cached_state_block_mask_hash != mask_hash)
       {
+        if (has_debug_log)
+          log.Printf ("...create state block for mesh primitive");
+        
         cached_state_block           = LowLevelStateBlockPtr (device.CreateStateBlock (mask), false);
         cached_state_block_mask_hash = mask_hash;
       }
       
       cached_state_block->Capture ();
       
+        //кэширование параметров примитива для отрисовки
+      
       cached_primitive.material    = cached_material.get ();
       cached_primitive.state_block = cached_state_block.get ();
-      cached_primitive.indexed     = common_data.index_buffer != LowLevelBufferPtr (); 
+      cached_primitive.indexed     = common_data.index_buffer != LowLevelBufferPtr ();
       cached_primitive.type        = type;
       cached_primitive.first       = first;
       cached_primitive.count       = count;
       cached_primitive.tags_count  = cached_material ? cached_material->TagsCount () : 0;
       cached_primitive.tags        = cached_material ? cached_material->Tags () : (const size_t*)0;
       
+        //обновление зависимостей всегда, поскольку любые изменения материала/примитива должны быть отображены на зависимые кэши
+        
+      InvalidateCacheDependencies ();
+      
       if (has_debug_log)
-        log.Printf ("...mesh primitive cache updated");      
+        log.Printf ("...mesh primitive cache updated");
     }
     catch (xtl::exception& e)
     {
@@ -147,36 +179,72 @@ typedef xtl::intrusive_ptr<MeshPrimitive> MeshPrimitivePtr;
 typedef stl::vector<MeshPrimitivePtr>     MeshPrimitiveArray;
 typedef stl::vector<RendererPrimitive>    RendererPrimitiveArray;
 
-struct Mesh: public xtl::reference_counter, public MeshCommonData, public CacheHolder
+///Мэш
+struct Mesh: public xtl::reference_counter, public MeshCommonData, public CacheHolder, public DebugIdHolder
 {
-  MeshPrimitiveArray     primitives;
-  RendererPrimitiveArray cached_primitives;
-  RendererPrimitiveGroup cached_group;
+  MeshPrimitiveArray     primitives;         //список примитивов мэша
+  RendererPrimitiveArray cached_primitives;  //закэшированные примитивы
+  RendererPrimitiveGroup cached_group;       //группы закэшированных примитивов
+  Log                    log;                //поток протоколирования
   
-  Mesh (CacheHolder& parent_holder, const DeviceManagerPtr& device_manager)
-    : MeshCommonData (device_manager)
+///Конструктор
+  Mesh (CacheHolder& parent_holder, const char* in_name, const DeviceManagerPtr& device_manager)
+    : MeshCommonData (device_manager)    
   {
+    if (!in_name)
+      throw xtl::make_null_argument_exception ("render::Mesh::Mesh", "name");
+
+    name = in_name;
+    
     parent_holder.AttachCacheSource (*this);
+    
+    if (device_manager->Settings ().HasDebugLog ())
+      log.Printf ("Mesh '%s' created (id=%u)", name.c_str (), Id ());
   }
   
+///Деструктор
+  ~Mesh ()
+  {
+      //предварительная очистка коллекция для возможности отслеживать порядок удаления объектов до и после удаления данного
+      
+    memset (&cached_group, 0, sizeof (cached_group));      
+
+    cached_primitives.clear ();
+    primitives.clear ();
+    
+    if (device_manager->Settings ().HasDebugLog ())
+      log.Printf ("Mesh '%s' destroyed (id=%u)", name.c_str (), Id ());    
+  }
+  
+///Сброс кэша
   void ResetCacheCore ()
   {
+    if (device_manager->Settings ().HasDebugLog ())
+      log.Printf ("Reset mesh '%s' cache (id=%u)", name.c_str (), Id ());        
+        
     cached_primitives.clear ();   
   }
   
+///Обновление кэша
   void UpdateCacheCore ()
   {
     try
     {
+      bool has_debug_log = device_manager->Settings ().HasDebugLog ();
+      
+      if (has_debug_log)
+        log.Printf ("Update mesh '%s' cache (id=%u)", name.c_str (), Id ());
+      
       cached_primitives.clear ();
       cached_primitives.reserve (primitives.size ());
       
       for (MeshPrimitiveArray::iterator iter=primitives.begin (), end=primitives.end (); iter!=end; ++iter)
       {
         MeshPrimitive& src_primitive = **iter;
-        
-        src_primitive.UpdateCache ();
-        
+
+        if (!src_primitive.IsValid ())
+          continue;        
+
         cached_primitives.push_back (src_primitive.cached_primitive);
       }
       
@@ -186,6 +254,13 @@ struct Mesh: public xtl::reference_counter, public MeshCommonData, public CacheH
       
       if (!cached_primitives.empty ())
         cached_group.primitives = &cached_primitives [0];
+        
+        //обновление зависимостей всегда, поскольку любые изменения материала/примитива должны быть отображены на зависимые кэши
+        
+      InvalidateCacheDependencies ();        
+        
+      if (has_debug_log)
+        log.Printf ("...mesh cache updated");        
     }
     catch (xtl::exception& e)
     {
@@ -204,16 +279,18 @@ typedef stl::vector<RendererPrimitiveGroup> RenderPrimitiveGroupsArray;
 
 }
 
-struct PrimitiveImpl::Impl
+struct PrimitiveImpl::Impl: public DebugIdHolder
 {
   DeviceManagerPtr           device_manager;   //менеджер устройства
   MaterialManagerPtr         material_manager; //менеджер материалов
   BuffersPtr                 buffers;          //буферы примитива
   MeshArray                  meshes;           //меши
-  RenderPrimitiveGroupsArray render_groups;    //группы
+  stl::string                name;             //имя примитива
+  RenderPrimitiveGroupsArray render_groups;    //группы  
+  Log                        log;              //поток протоколирования
 
 ///Конструктор
-  Impl (const DeviceManagerPtr& in_device_manager, const MaterialManagerPtr& in_material_manager, const BuffersPtr& in_buffers)
+  Impl (const DeviceManagerPtr& in_device_manager, const MaterialManagerPtr& in_material_manager, const BuffersPtr& in_buffers, const char* in_name)
     : device_manager (in_device_manager)
     , material_manager (in_material_manager)
     , buffers (in_buffers)
@@ -225,6 +302,26 @@ struct PrimitiveImpl::Impl
 
     if (!buffers)
       throw xtl::make_null_argument_exception (METHOD_NAME, "buffers");
+      
+    if (!in_name)
+      throw xtl::make_null_argument_exception (METHOD_NAME, "name");
+      
+    name = in_name;
+      
+    if (device_manager->Settings ().HasDebugLog ())
+      log.Printf ("Primitive '%s' created (id=%u)", name.c_str (), Id ());
+  }
+
+///Деструктор
+  ~Impl ()
+  {
+      //предварительная очистка коллекция для возможности отслеживать порядок удаления объектов до и после удаления данного    
+    
+    meshes.clear ();
+    render_groups.clear ();
+    
+    if (device_manager->Settings ().HasDebugLog ())
+      log.Printf ("Primitive '%s' destroyed (id=%u)", name.c_str (), Id ());
   }
 };
 
@@ -232,11 +329,11 @@ struct PrimitiveImpl::Impl
     Конструктор / деструктор
 */
 
-PrimitiveImpl::PrimitiveImpl (const DeviceManagerPtr& device_manager, const MaterialManagerPtr& material_manager, const BuffersPtr& buffers)
+PrimitiveImpl::PrimitiveImpl (const DeviceManagerPtr& device_manager, const MaterialManagerPtr& material_manager, const BuffersPtr& buffers, const char* name)
 {
   try
   {
-    impl = new Impl (device_manager, material_manager, buffers);
+    impl = new Impl (device_manager, material_manager, buffers, name);
   }
   catch (xtl::exception& e)
   {
@@ -247,6 +344,26 @@ PrimitiveImpl::PrimitiveImpl (const DeviceManagerPtr& device_manager, const Mate
 
 PrimitiveImpl::~PrimitiveImpl ()
 {
+}
+
+/*
+    Имя
+*/
+
+const char* PrimitiveImpl::Name ()
+{
+  return impl->name.c_str ();
+}
+
+void PrimitiveImpl::SetName (const char* name)
+{
+  if (!name)
+    throw xtl::make_null_argument_exception ("render::PrimitiveImpl::SetName", "name");
+    
+  if (impl->device_manager->Settings ().HasDebugLog ())
+    impl->log.Printf ("Primitive '%s' name changed to '%s' (id=%u)", impl->name.c_str (), name, impl->Id ());
+    
+  impl->name = name;    
 }
 
 /*
@@ -271,7 +388,7 @@ size_t PrimitiveImpl::AddMesh (const media::geometry::Mesh& source, MeshBufferUs
 {
   try
   {
-    MeshPtr mesh (new Mesh (*this, impl->device_manager), false);
+    MeshPtr mesh (new Mesh (*this, source.Name (), impl->device_manager), false);
     
       //конвертация вершинных буферов
              
@@ -314,7 +431,7 @@ size_t PrimitiveImpl::AddMesh (const media::geometry::Mesh& source, MeshBufferUs
     {
       const media::geometry::Primitive& src_primitive = source.Primitive (i);
       
-      MeshPrimitivePtr dst_primitive (new MeshPrimitive (*mesh, impl->material_manager->GetMaterialProxy (src_primitive.material), *mesh), false);
+      MeshPrimitivePtr dst_primitive (new MeshPrimitive (*mesh, i, impl->material_manager->GetMaterialProxy (src_primitive.material), *mesh), false);
 
       switch (src_primitive.type)
       {
@@ -495,6 +612,11 @@ void PrimitiveImpl::UpdateCacheCore ()
 {
   try
   {
+    bool has_debug_log = impl->device_manager->Settings ().HasDebugLog ();
+     
+    if (has_debug_log)
+      impl->log.Printf ("Update primitive '%s' cache (id=%u)", impl->name.c_str (), impl->Id ());    
+    
     impl->render_groups.clear ();
     impl->render_groups.reserve (impl->meshes.size ());
     
@@ -502,10 +624,16 @@ void PrimitiveImpl::UpdateCacheCore ()
     {
       Mesh& mesh = **iter;
       
-      mesh.UpdateCache ();
-      
+      if (!mesh.IsValid ())
+        continue;
+
       impl->render_groups.push_back (mesh.cached_group);
     }
+    
+    InvalidateCacheDependencies ();
+    
+    if (has_debug_log)
+      impl->log.Printf ("...primitive cache updated");
   }
   catch (xtl::exception& e)
   {
@@ -516,6 +644,11 @@ void PrimitiveImpl::UpdateCacheCore ()
 
 void PrimitiveImpl::ResetCacheCore ()
 {
+  bool has_debug_log = impl->device_manager->Settings ().HasDebugLog ();
+     
+  if (has_debug_log)
+    impl->log.Printf ("Reset primitive '%s' cache (id=%u)", impl->name.c_str (), impl->Id ());
+
   for (MeshArray::iterator iter=impl->meshes.begin (), end=impl->meshes.end (); iter!=end; ++iter)
   {
     Mesh& mesh = **iter;        

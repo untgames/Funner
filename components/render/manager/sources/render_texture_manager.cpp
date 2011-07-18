@@ -71,7 +71,7 @@ TextureManager::~TextureManager ()
     Создание текстур
 */
 
-TexturePtr TextureManager::CreateTexture (const media::Image& image, bool generate_mips_enable)
+TexturePtr TextureManager::CreateTexture (const media::Image& image, bool generate_mips_enable, const char* name)
 {
   try
   {
@@ -90,7 +90,7 @@ TexturePtr TextureManager::CreateTexture (const media::Image& image, bool genera
         break;
     }
 
-    return CreateTexture (image, dimension, generate_mips_enable);
+    return CreateTexture (image, dimension, generate_mips_enable, name);
   }
   catch (xtl::exception& e)
   {
@@ -99,7 +99,7 @@ TexturePtr TextureManager::CreateTexture (const media::Image& image, bool genera
   }
 }
 
-TexturePtr TextureManager::CreateTexture (const media::Image& image, render::TextureDimension dimension, bool generate_mips_enable)
+TexturePtr TextureManager::CreateTexture (const media::Image& image, render::TextureDimension dimension, bool generate_mips_enable, const char* name)
 {
   try
   {
@@ -132,7 +132,7 @@ TexturePtr TextureManager::CreateTexture (const media::Image& image, render::Tex
         throw xtl::format_not_supported_exception ("", "Unsupported image '%s' format '%s'", image.Name (), media::get_format_name (image.Format ()));
     }
 
-    TexturePtr texture = CreateTexture (dimension, image.Width (), image.Height (), image.Depth (), format, generate_mips_enable);
+    TexturePtr texture = CreateTexture (dimension, image.Width (), image.Height (), image.Depth (), format, generate_mips_enable, name);
 
     texture->Update (image);
 
@@ -145,7 +145,7 @@ TexturePtr TextureManager::CreateTexture (const media::Image& image, render::Tex
   }
 }
 
-TexturePtr TextureManager::CreateTexture (const media::CompressedImage& image)
+TexturePtr TextureManager::CreateTexture (const media::CompressedImage& image, const char* name)
 {
   try
   {
@@ -164,7 +164,7 @@ TexturePtr TextureManager::CreateTexture (const media::CompressedImage& image)
         break;
     }
 
-    return CreateTexture (image, dimension);
+    return CreateTexture (image, dimension, name);
   }
   catch (xtl::exception& e)
   {
@@ -173,11 +173,11 @@ TexturePtr TextureManager::CreateTexture (const media::CompressedImage& image)
   }
 }
 
-TexturePtr TextureManager::CreateTexture (const media::CompressedImage& image, render::TextureDimension dimension)
+TexturePtr TextureManager::CreateTexture (const media::CompressedImage& image, render::TextureDimension dimension, const char* name)
 {
   try
   {
-    return TexturePtr (new TextureImpl (impl->device_manager, dimension, image), false);
+    return TexturePtr (new TextureImpl (impl->device_manager, dimension, image, name), false);
   }
   catch (xtl::exception& e)
   {
@@ -192,11 +192,12 @@ TexturePtr TextureManager::CreateTexture
   size_t                   height,
   size_t                   depth,
   render::PixelFormat      format,
-  bool                     generate_mips_enable)
+  bool                     generate_mips_enable,
+  const char*              name)
 {
   try
   {
-    return TexturePtr (new TextureImpl (impl->device_manager, dimension, width, height, depth, format, generate_mips_enable), false);
+    return TexturePtr (new TextureImpl (impl->device_manager, dimension, width, height, depth, format, generate_mips_enable, name), false);
   }
   catch (xtl::exception& e)
   {
@@ -236,13 +237,13 @@ void TextureManager::LoadTexture (const char* name)
     {
       media::CompressedImage image (name);
       
-      texture = CreateTexture (image);
+      texture = CreateTexture (image, name);
     }
     else
     {
       media::Image image (name);
 
-      texture = CreateTexture (image, true);
+      texture = CreateTexture (image, true, name);
     }
 
     TextureProxy proxy = impl->texture_proxy_manager.GetProxy (name);

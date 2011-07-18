@@ -25,6 +25,16 @@ Primitive& Primitive::operator = (const Primitive& primitive)
   return *this;
 }
 
+const char* Primitive::Name () const
+{
+  return impl->Name ();
+}
+
+void Primitive::SetName (const char* name)
+{
+  impl->SetName (name);
+}
+
 PrimitiveBuffers Primitive::Buffers () const
 {
   return Wrappers::Wrap<PrimitiveBuffers> (impl->Buffers ());

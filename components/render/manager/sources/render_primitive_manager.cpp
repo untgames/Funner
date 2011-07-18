@@ -80,7 +80,7 @@ struct PrimitiveManager::Impl
       
       for (media::geometry::MeshLibrary::ConstIterator iter=library.CreateIterator (); iter; ++iter)
       {
-        PrimitivePtr primitive (new PrimitiveImpl (device_manager, material_manager, primitive_buffers), false);
+        PrimitivePtr primitive (new PrimitiveImpl (device_manager, material_manager, primitive_buffers, common::format ("%s(%s)", iter->Name (), library.Name ()).c_str ()), false);
         
         primitive->AddMesh (*iter, MeshBufferUsage_Default, MeshBufferUsage_Default);
         

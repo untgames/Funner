@@ -14,7 +14,7 @@ namespace
 typedef stl::vector<media::rfx::Shader> ShaderArray;
 typedef stl::vector<TexmapDesc>         TexmapDescArray;
 
-struct ProgramCommonData: public xtl::reference_counter
+struct ProgramCommonData: public xtl::reference_counter, public DebugIdHolder
 {
   DeviceManagerPtr           device_manager;         //менеджер устройства отрисовки
   stl::string                name;                   //имя программы
@@ -31,7 +31,7 @@ struct ProgramCommonData: public xtl::reference_counter
   LowLevelStateBlockPtr      state_block;            //блок данных параметров
   
 ///Конструктор
-  ProgramCommonData (const DeviceManagerPtr& in_device_manager)
+  ProgramCommonData (const DeviceManagerPtr& in_device_manager, const char* in_name)
     : device_manager (in_device_manager)
     , need_update (true)
     , has_framemaps (false)
@@ -42,17 +42,32 @@ struct ProgramCommonData: public xtl::reference_counter
       if (!device_manager)
         throw xtl::make_null_argument_exception ("", "device_manager");
         
+      if (!in_name)
+        throw xtl::make_null_argument_exception ("", "name");
+        
+      name = in_name;        
+
       render::low_level::StateBlockMask mask;
-        
+
       mask.ss_constant_buffers [ProgramParametersSlot_Program] = true;
-        
+
       state_block = LowLevelStateBlockPtr (device_manager->Device ().CreateStateBlock (mask), false);
+      
+      if (device_manager->Settings ().HasDebugLog ())
+        log.Printf ("Program '%s' common data created (id=%u)", name.c_str (), Id ());
     }
     catch (xtl::exception& e)
     {
       e.touch ("render::ProgramCommonData::ProgramCommonData");
       throw;
     }
+  }
+  
+///Деструктор
+  ~ProgramCommonData ()
+  {
+    if (device_manager->Settings ().HasDebugLog ())
+      log.Printf ("Program '%s' common data destroyed (id=%u)", name.c_str (), Id ());    
   }
   
 ///Обновление текстурных карт
@@ -143,7 +158,7 @@ typedef stl::hash_map<OptionsCacheCombinationKey, OptionsCacheCombinationValuePt
 
 typedef stl::hash_map<size_t, ProgramPtr> ProgramMap;
 
-struct Program::Impl
+struct Program::Impl: public DebugIdHolder
 {
   ProgramCommonDataPtr        common_data;               //общие данные программы
   ShaderOptions               options;                   //опции данного экземпляра программы
@@ -153,20 +168,16 @@ struct Program::Impl
   
 ///Конструктор
   Impl (const DeviceManagerPtr& device_manager, const char* name, const char* static_options, const char* dynamic_options)
-    : common_data (new ProgramCommonData (device_manager), false)
+    : common_data (new ProgramCommonData (device_manager, name), false)
   {
     try
     {
-      if (!name)
-        throw xtl::make_null_argument_exception ("", "name");
-      
       if (!static_options)
         throw xtl::make_null_argument_exception ("", "static_options");
         
       if (!dynamic_options)
         throw xtl::make_null_argument_exception ("", "dynamic_options");
         
-      common_data->name            = name;
       common_data->static_options  = static_options;      
       common_data->dynamic_options = dynamic_options;
       
@@ -176,6 +187,9 @@ struct Program::Impl
       
       for (size_t i=0, count=option_array.Size (); i<count; i++)
         layout.Add (option_array [i]);
+        
+      if (common_data->device_manager->Settings ().HasDebugLog ())
+        common_data->log.Printf ("Program '%s' created (id=%u)", common_data->name.c_str (), Id ());        
     }
     catch (xtl::exception& e)
     {
@@ -191,6 +205,16 @@ struct Program::Impl
     options.options      += " ";
     options.options      += in_options.options;
     options.options_hash  = common::strhash (options.options.c_str ());
+    
+    if (common_data->device_manager->Settings ().HasDebugLog ())
+      common_data->log.Printf ("Program '%s' created for options = '%s' (id=%u)", common_data->name.c_str (), options.options.c_str (), Id ());    
+  }
+  
+///Деструктор
+  ~Impl ()
+  {
+    if (common_data->device_manager->Settings ().HasDebugLog ())
+      common_data->log.Printf ("Program '%s' destroyed for options = '%s' (id=%u)", common_data->name.c_str (), options.options.c_str (), Id ());
   }
 };
 

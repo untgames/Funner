@@ -25,14 +25,14 @@ Material& Material::operator = (const Material& material)
   return *this;
 }
 
-const char* Material::Id () const
+const char* Material::Name () const
 {
-  return impl->Id ();
+  return impl->Name ();
 }
 
-void Material::SetId (const char* id)
+void Material::SetName (const char* name)
 {
-  impl->SetId (id);
+  impl->SetName (name);
 }
 
 void Material::Update (const media::rfx::Material& material)

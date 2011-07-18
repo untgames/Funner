@@ -1,4 +1,4 @@
-Results of cache_material_test:
+Results of cache_mesh_test:
 --- Create device ---
 render.manager: Creating render window
 render.manager: Create device manager (driver='*', adapter='*', init_string='')
@@ -70,8 +70,7 @@ render.manager: ...created texture 512x512x1@rgb8
 render.manager: Loading texture 'data/pic1.dds'
 render.manager: Texture 'data/pic1.dds' created (id=15)
 render.manager: ...created texture 1024x1024x1@dxt1
---- Create primitive & material ---
---- Update primitive cache ---
+--- Create primitive & entity ---
 render.manager: Update material 'canyon.stn_1' cache (id=7)
 render.manager: Program parameters layout created (id=16)
 render.manager: Program parameters layout created (id=17)
@@ -90,71 +89,81 @@ render.manager: Update mesh 'mesh2' cache (id=2)
 render.manager: ...mesh cache updated
 render.manager: Update primitive 'mesh2(data/test.xmesh)' cache (id=1)
 render.manager: ...primitive cache updated
---- Update full material state ---
-render.manager: Program parameters layout created (id=18)
-render.manager: Update material 'canyon.stn_2' cache (id=8)
 render.manager: Program parameters layout created (id=19)
+render.manager: Entity created (id=18)
+render.manager: Entity lod created (entity_id=18, id=20)
+render.manager: Update entity cache (id=18)
+render.manager: Update entity lod cache (entity_id=18, id=20)
+--- Update primitive ---
+render.manager: Mesh 'my mesh' created (id=21)
+render.manager: Mesh 'my mesh' primitive #0 created (id=22)
+render.manager: Create input layout:
+render.manager: ...index type: InputDataType_UInt
+render.manager: ...index buffer offset: 0
+render.manager: ...4 vertex attributes:
+render.manager: ......semantic=VertexAttributeSemantic_Position, type=float3, slot=0, offset=0, stride=36
+render.manager: ......semantic=VertexAttributeSemantic_Normal, type=float3, slot=0, offset=12, stride=36
+render.manager: ......semantic=VertexAttributeSemantic_Color, type=ubyte4, slot=0, offset=24, stride=36
+render.manager: ......semantic=VertexAttributeSemantic_TexCoord0, type=float2, slot=0, offset=28, stride=36
+render.manager: ...layout created (hash=69c8efc8)
+render.manager: Mesh 'my mesh' primitive #1 created (id=23)
+render.manager: Update material 'canyon.Material__195' cache (id=9)
 render.manager: ...create state block for material
 render.manager: ...material cache updated
+render.manager: Update mesh 'my mesh' primitive #0 cache (id=22)
+render.manager: ...create state block for mesh primitive
+render.manager: ...mesh primitive cache updated
+render.manager: Update mesh 'my mesh' primitive #1 cache (id=23)
+render.manager: ...create state block for mesh primitive
+render.manager: ...mesh primitive cache updated
+render.manager: Update mesh 'my mesh' cache (id=21)
+render.manager: ...mesh cache updated
+render.manager: Update primitive 'mesh2(data/test.xmesh)' cache (id=1)
+render.manager: ...primitive cache updated
+render.manager: Update entity lod cache (entity_id=18, id=20)
+--- Unload materials ---
+render.manager: Unloading material library 'data/test.xmtl'
+render.manager: Material 'canyon.archway_1' destroyed (id=5)
+render.manager: Update mesh 'mesh2' primitive #0 cache (id=3)
+render.manager: Material 'canyon.stn_1' destroyed (id=7)
+render.manager: ...create state block for mesh primitive
+render.manager: ...mesh primitive cache updated
 render.manager: Update mesh 'mesh2' primitive #1 cache (id=4)
+render.manager: Material 'canyon.stn_2' destroyed (id=8)
 render.manager: ...create state block for mesh primitive
 render.manager: ...mesh primitive cache updated
 render.manager: Update mesh 'mesh2' cache (id=2)
 render.manager: ...mesh cache updated
-render.manager: Update primitive 'mesh2(data/test.xmesh)' cache (id=1)
-render.manager: ...primitive cache updated
---- Update material properties (with same layout) ---
---- Update material properties (with new layout) ---
-render.manager: Update material 'canyon.stn_2' cache (id=8)
-render.manager: ...material cache updated
---- Unload texture ---
-render.manager: Update material 'canyon.archway_1' cache (id=5)
-render.manager: ...create state block for material
-render.manager: Texmap[1] for material 'canyon.archway_1' will be ignored. Bad texture 'data/bottom.jpg'
-render.manager: ...material cache updated
-render.manager: Texture 'data/bottom.jpg' destroyed (id=14)
-render.manager: Update material 'canyon.stn_2' cache (id=8)
-render.manager: Texmap[0] for material 'canyon.stn_2' will be ignored. Bad texture 'data/bottom.jpg'
-render.manager: ...material cache updated
---- Load texture ---
-render.manager: Loading texture 'data/bottom.jpg'
-render.manager: Texture 'data/bottom.jpg' created (id=20)
-render.manager: ...created texture 512x512x1@rgb8
-render.manager: Update material 'canyon.stn_2' cache (id=8)
-render.manager: ...material cache updated
---- Update program ---
-render.manager: Program parameters layout created (id=21)
-render.manager: Update material 'canyon.stn_2' cache (id=8)
-render.manager: Program parameters layout created (id=22)
-render.manager: Program parameters layout created (id=23)
-render.manager: ...material cache updated
-render.manager: Update mesh 'mesh2' primitive #1 cache (id=4)
+render.manager: Update mesh 'my mesh' primitive #0 cache (id=22)
+render.manager: ...create state block for mesh primitive
 render.manager: ...mesh primitive cache updated
-render.manager: Update mesh 'mesh2' cache (id=2)
+render.manager: Update mesh 'my mesh' primitive #1 cache (id=23)
+render.manager: Material 'canyon.Material__195' destroyed (id=9)
+render.manager: ...create state block for mesh primitive
+render.manager: ...mesh primitive cache updated
+render.manager: Update mesh 'my mesh' cache (id=21)
 render.manager: ...mesh cache updated
 render.manager: Update primitive 'mesh2(data/test.xmesh)' cache (id=1)
 render.manager: ...primitive cache updated
+render.manager: Update entity lod cache (entity_id=18, id=20)
 --- Exiting... ---
+render.manager: Entity lod destroyed (entity_id=18, id=20)
+render.manager: Entity destroyed (id=18)
+render.manager: Program parameters layout destroyed (id=19)
 window 784x562 removed
+render.manager: Program 'helper' destroyed for options = '' (id=12)
+render.manager: Program 'helper' common data destroyed (id=13)
+render.manager: Program 'phong' destroyed for options = '' (id=10)
+render.manager: Program 'phong' common data destroyed (id=11)
 render.manager: Mesh 'mesh2' primitive #0 destroyed (id=3)
 render.manager: Mesh 'mesh2' primitive #1 destroyed (id=4)
 render.manager: Mesh 'mesh2' destroyed (id=2)
+render.manager: Mesh 'my mesh' primitive #0 destroyed (id=22)
+render.manager: Mesh 'my mesh' primitive #1 destroyed (id=23)
+render.manager: Mesh 'my mesh' destroyed (id=21)
 render.manager: Primitive 'mesh2(data/test.xmesh)' destroyed (id=1)
-render.manager: Material 'canyon.Material__195' destroyed (id=9)
-render.manager: Program 'helper' destroyed for options = '' (id=12)
-render.manager: Program 'helper' common data destroyed (id=13)
-render.manager: Material 'canyon.stn_2' destroyed (id=8)
-render.manager: Material 'canyon.stn_1' destroyed (id=7)
-render.manager: Program 'phong' destroyed for options = '' (id=10)
-render.manager: Program 'phong' common data destroyed (id=11)
-render.manager: Material 'canyon.archway_1' destroyed (id=5)
+render.manager: Texture 'data/bottom.jpg' destroyed (id=14)
 render.manager: Texture 'data/pic1.dds' destroyed (id=15)
-render.manager: Texture 'data/bottom.jpg' destroyed (id=20)
 render.manager: Program parameters layout destroyed (id=17)
 render.manager: Program parameters layout destroyed (id=6)
-render.manager: Program parameters layout destroyed (id=19)
-render.manager: Program parameters layout destroyed (id=18)
 render.manager: Program parameters layout destroyed (id=16)
-render.manager: Program parameters layout destroyed (id=23)
-render.manager: Program parameters layout destroyed (id=21)
-render.manager: Program parameters layout destroyed (id=22)
