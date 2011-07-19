@@ -670,16 +670,6 @@ class EffectLoader
         pass->SetRasterizerState    (rasterizer_state);
         pass->SetClearFlags         (clear_flags);
         
-        if (ParseNode depth_range_node = iter->First ("depth_range"))
-        {
-          Parser::AttributeIterator attr_iter = make_attribute_iterator (depth_range_node);
-          
-          float min_depth = xtl::io::get<float> (attr_iter), max_depth = xtl::io::get<float> (attr_iter);
-          
-          pass->SetViewportMinDepth (min_depth);
-          pass->SetViewportMaxDepth (max_depth);
-        }
-
         return pass;
       }
       catch (std::exception& e)

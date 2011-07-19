@@ -200,15 +200,15 @@ FrameImpl::~FrameImpl ()
 
 void FrameImpl::SetRenderTarget (const char* name, const RenderTargetPtr& target)
 {
-  SetRenderTarget (name, target, RectAreaPtr (), RectAreaPtr ());
+  SetRenderTarget (name, target, ViewportPtr (), RectAreaPtr ());
 }
 
-void FrameImpl::SetRenderTarget (const char* name, const RenderTargetPtr& target, const RectAreaPtr& viewport)
+void FrameImpl::SetRenderTarget (const char* name, const RenderTargetPtr& target, const ViewportPtr& viewport)
 {
   SetRenderTarget (name, target, viewport, RectAreaPtr ());
 }
 
-void FrameImpl::SetRenderTarget (const char* name, const RenderTargetPtr& target, const RectAreaPtr& viewport, const RectAreaPtr& scissor)
+void FrameImpl::SetRenderTarget (const char* name, const RenderTargetPtr& target, const ViewportPtr& viewport, const RectAreaPtr& scissor)
 {
   try
   {
@@ -259,12 +259,12 @@ RenderTargetPtr FrameImpl::FindRenderTarget (const char* name)
   return desc->render_target;
 }
 
-RectAreaPtr FrameImpl::FindViewport (const char* name)
+ViewportPtr FrameImpl::FindViewport (const char* name)
 {
   RenderTargetDescPtr desc = FindRenderTargetDesc (name);
   
   if (!desc)
-    return RectAreaPtr ();
+    return ViewportPtr ();
     
   return desc->viewport;
 }
@@ -307,17 +307,17 @@ RenderTargetPtr FrameImpl::RenderTarget (const char* name)
   throw xtl::make_argument_exception (METHOD_NAME, "name", name, "Render target not found");
 }
 
-RectAreaPtr FrameImpl::Viewport (const char* name)
+ViewportPtr FrameImpl::Viewport (const char* name)
 {
   static const char* METHOD_NAME = "render::FrameImpl::Viewport";
   
   if (!name)
     throw xtl::make_null_argument_exception (METHOD_NAME, "name");
     
-  RectAreaPtr area = FindViewport (name);
+  ViewportPtr viewport = FindViewport (name);
   
-  if (area)
-    return area;
+  if (viewport)
+    return viewport;
     
   throw xtl::make_argument_exception (METHOD_NAME, "name", name, "Viewport not found");
 }

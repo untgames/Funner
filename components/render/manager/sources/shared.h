@@ -86,6 +86,7 @@ typedef xtl::intrusive_ptr<RenderTargetDesc>        RenderTargetDescPtr;
 typedef xtl::intrusive_ptr<Settings>                SettingsPtr;
 typedef xtl::intrusive_ptr<TextureImpl>             TexturePtr;
 typedef xtl::intrusive_ptr<TextureManager>          TextureManagerPtr;
+typedef xtl::intrusive_ptr<ViewportImpl>            ViewportPtr;
 typedef xtl::intrusive_ptr<WindowImpl>              WindowPtr;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -203,6 +204,7 @@ class DebugIdHolder: public xtl::noncopyable
 #include "shader_options.h"
 #include "texture.h"
 #include "texture_manager.h"
+#include "viewport.h"
 #include "window.h"
 
 }

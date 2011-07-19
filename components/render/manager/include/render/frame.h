@@ -12,6 +12,7 @@ namespace render
 
 //implementation forwards
 class FrameImpl;
+class ViewportImpl;
 class Wrappers;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -27,6 +28,59 @@ enum ClearFlag
   ClearFlag_DepthStencil = ClearFlag_Depth | ClearFlag_Stencil,
   ClearFlag_All          = ClearFlag_DepthStencil | ClearFlag_RenderTarget
 };
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Область вывода
+///////////////////////////////////////////////////////////////////////////////////////////////////
+class Viewport
+{
+  friend class Wrappers;
+  public:
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Конструкторы / деструктор / присваивание
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    Viewport  ();
+    Viewport  (const render::Rect& rect, float min_depth = 0.0f, float max_depth = 1.0f);
+    ~Viewport ();
+    
+    Viewport& operator = (const Viewport&);
+    
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Размеры области
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void                SetRect (const render::Rect& rect);
+    void                SetRect (int x, int y, size_t width, size_t height);
+    RectArea            Area    () const;
+    const render::Rect& Rect    () const;
+    int                 X       () const;
+    int                 Y       () const;
+    size_t              Width   () const;
+    size_t              Height  () const;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Диапазон глубины для области вывода
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    float MinDepth    () const;
+    float MaxDepth    () const;
+    void  SetMinDepth (float value);
+    void  SetMaxDepth (float value);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Обмен
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void Swap (Viewport&);
+  
+  private:
+    Viewport (ViewportImpl*);
+    
+  private:
+    ViewportImpl* impl;
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Обмен
+///////////////////////////////////////////////////////////////////////////////////////////////////
+void swap (Viewport&, Viewport&);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Параметры отрисовки объекта
@@ -56,8 +110,8 @@ class Frame
 ///Регистрация целевых буферов отрисовки
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void SetRenderTarget        (const char* name, const render::RenderTarget& target);
-    void SetRenderTarget        (const char* name, const render::RenderTarget& target, const RectArea& viewport);
-    void SetRenderTarget        (const char* name, const render::RenderTarget& target, const RectArea& viewport, const RectArea& scissor);
+    void SetRenderTarget        (const char* name, const render::RenderTarget& target, const render::Viewport& viewport);
+    void SetRenderTarget        (const char* name, const render::RenderTarget& target, const render::Viewport& viewport, const RectArea& scissor);
     void RemoveRenderTarget     (const char* name);
     void RemoveAllRenderTargets ();
 
@@ -66,7 +120,7 @@ class Frame
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     bool                  HasRenderTarget (const char* name) const;
     render::RenderTarget  RenderTarget    (const char* name) const;
-    RectArea              Viewport        (const char* name) const;
+    render::Viewport      Viewport        (const char* name) const;
     RectArea              Scissor         (const char* name) const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

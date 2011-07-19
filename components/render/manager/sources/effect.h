@@ -71,14 +71,6 @@ class EffectPass: public Object
     void             SetSortMode (render::SortMode mode);
     render::SortMode SortMode    ();
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Диапазон глубины для области вывода
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    float ViewportMinDepth    ();
-    float ViewportMaxDepth    ();
-    void  SetViewportMinDepth (float value);
-    void  SetViewportMaxDepth (float value);    
-
   private:
     struct Impl;
     stl::auto_ptr<Impl> impl;

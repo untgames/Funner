@@ -30,15 +30,14 @@ void Frame::SetRenderTarget (const char* name, const render::RenderTarget& targe
   impl->SetRenderTarget (name, Wrappers::Unwrap<RenderTargetImpl> (target));
 }
 
-void Frame::SetRenderTarget (const char* name, const render::RenderTarget& target, const RectArea& viewport)
+void Frame::SetRenderTarget (const char* name, const render::RenderTarget& target, const render::Viewport& viewport)
 {
-  impl->SetRenderTarget (name, Wrappers::Unwrap<RenderTargetImpl> (target), Wrappers::Unwrap<RectAreaImpl> (viewport));
+  impl->SetRenderTarget (name, Wrappers::Unwrap<RenderTargetImpl> (target), Wrappers::Unwrap<ViewportImpl> (viewport));
 }
 
-void Frame::SetRenderTarget (const char* name, const render::RenderTarget& target, const RectArea& viewport, const RectArea& scissor)
+void Frame::SetRenderTarget (const char* name, const render::RenderTarget& target, const render::Viewport& viewport, const RectArea& scissor)
 {
-  impl->SetRenderTarget (name, Wrappers::Unwrap<RenderTargetImpl> (target), Wrappers::Unwrap<RectAreaImpl> (viewport), 
-    Wrappers::Unwrap<RectAreaImpl> (scissor));
+  impl->SetRenderTarget (name, Wrappers::Unwrap<RenderTargetImpl> (target), Wrappers::Unwrap<ViewportImpl> (viewport), Wrappers::Unwrap<RectAreaImpl> (scissor));
 }
 
 void Frame::RemoveRenderTarget (const char* name)
@@ -61,9 +60,9 @@ RenderTarget Frame::RenderTarget (const char* name) const
   return Wrappers::Wrap<render::RenderTarget> (impl->RenderTarget (name));
 }
 
-RectArea Frame::Viewport (const char* name) const
+Viewport Frame::Viewport (const char* name) const
 {
-  return Wrappers::Wrap<RectArea> (impl->Viewport (name));
+  return Wrappers::Wrap<render::Viewport> (impl->Viewport (name));
 }
 
 RectArea Frame::Scissor (const char* name) const

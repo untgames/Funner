@@ -84,12 +84,8 @@ int main ()
     entity.SetPrimitive ("u1.polySurface2.mesh#0");
     
     Frame frame = render_manager.CreateFrame ();
-    
-    RectArea viewport;
-    
-    viewport.SetRect (0, 0, test.Window ().ColorBuffer ().Width (), test.Window ().ColorBuffer ().Height ());
-        
-    frame.SetRenderTarget ("main_color_target", test.Window ().ColorBuffer (), viewport);
+           
+    frame.SetRenderTarget ("main_color_target", test.Window ().ColorBuffer ());
     frame.SetRenderTarget ("main_depth_stencil_target", test.Window ().DepthStencilBuffer ());
     frame.SetEffect ("main");
     frame.SetClearColor (math::vec4f (0.0f, 0.0f, 1.0f, 1.0f));

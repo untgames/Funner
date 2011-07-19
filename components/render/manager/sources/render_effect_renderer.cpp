@@ -101,8 +101,6 @@ struct RenderPass: public xtl::reference_counter
   LowLevelStateBlockPtr    scissor_off_state_block; //блок состояний прохода
   LowLevelStateBlockPtr    scissor_on_state_block;  //блок состояний прохода с включенным тестом отсечения
   ProgramParametersLayout  parameters_layout;       //расположение параметров
-  float                    viewport_min_depth;      //минимальное значение глубины области вывода
-  float                    viewport_max_depth;      //максимальное значение глубины области вывода
   size_t                   clear_flags;             //флаги очистки экрана
   OperationArray           operations;              //операции рендеринга
   OperationPtrArray        operation_ptrs;          //указатели на операции
@@ -112,8 +110,6 @@ struct RenderPass: public xtl::reference_counter
   RenderPass (const DeviceManagerPtr& device_manager)
     : sort_mode (SortMode_Default)
     , parameters_layout (&device_manager->Device (), &device_manager->Settings ())
-    , viewport_min_depth (0.0f)
-    , viewport_max_depth (1.0f)
     , clear_flags (ClearFlag_All)
     , last_operation (0)
   {
@@ -244,8 +240,6 @@ EffectRenderer::EffectRenderer (const EffectPtr& effect, const DeviceManagerPtr&
         pass->sort_mode               = src_pass->SortMode ();
         pass->scissor_off_state_block = src_pass->StateBlock (false);
         pass->scissor_on_state_block  = src_pass->StateBlock (true);
-        pass->viewport_min_depth      = src_pass->ViewportMinDepth ();
-        pass->viewport_max_depth      = src_pass->ViewportMaxDepth ();
         pass->clear_flags             = src_pass->ClearFlags ();
 
         if (parent_layout)
@@ -419,7 +413,8 @@ void EffectRenderer::ExecuteOperations (RenderingContext& context)
           throw xtl::format_not_supported_exception ("", "MRT not supported");
           
         render::low_level::IView *render_target_view = 0, *depth_stencil_view = 0;
-        RectAreaPtr              viewport, scissor;
+        ViewportPtr              viewport;
+        RectAreaPtr              scissor;
         size_t                   target_width = 0, target_height = 0;
 
         if (!pass.color_targets.IsEmpty ())        
@@ -444,7 +439,7 @@ void EffectRenderer::ExecuteOperations (RenderingContext& context)
           {
             depth_stencil_view = &desc->render_target->View ();
             
-            if (desc->viewport && viewport && viewport->Rect () != desc->viewport->Rect ())
+            if (desc->viewport && viewport && viewport->Area ().Rect () != desc->viewport->Area ().Rect ())
               throw xtl::format_operation_exception ("", "Different viewport rect areas for color target and depth-stencil target");
               
             if (!viewport && desc->viewport)
@@ -472,7 +467,7 @@ void EffectRenderer::ExecuteOperations (RenderingContext& context)
         if (viewport)
         {
           render::low_level::Viewport viewport_desc;
-          const Rect&                 rect = viewport->Rect ();
+          const Rect&                 rect = viewport->Area ().Rect ();
           
           memset (&viewport_desc, 0, sizeof (viewport_desc));
           
@@ -480,8 +475,8 @@ void EffectRenderer::ExecuteOperations (RenderingContext& context)
           viewport_desc.y         = rect.y;
           viewport_desc.width     = rect.width;
           viewport_desc.height    = rect.height;
-          viewport_desc.min_depth = pass.viewport_min_depth;
-          viewport_desc.max_depth = pass.viewport_max_depth;
+          viewport_desc.min_depth = viewport->MinDepth ();
+          viewport_desc.max_depth = viewport->MaxDepth ();
 
           device.RSSetViewport (viewport_desc);
         }
@@ -495,8 +490,8 @@ void EffectRenderer::ExecuteOperations (RenderingContext& context)
           viewport_desc.y         = 0;
           viewport_desc.width     = target_width;
           viewport_desc.height    = target_height;
-          viewport_desc.min_depth = pass.viewport_min_depth;
-          viewport_desc.max_depth = pass.viewport_max_depth;
+          viewport_desc.min_depth = 0.0f;
+          viewport_desc.max_depth = 1.0f;
           
           device.RSSetViewport (viewport_desc);
         }
@@ -541,7 +536,7 @@ void EffectRenderer::ExecuteOperations (RenderingContext& context)
         if (src_clear_flags & ClearFlag_RenderTarget) dst_clear_flags |= render::low_level::ClearFlag_RenderTarget;
         if (src_clear_flags & ClearFlag_Depth)        dst_clear_flags |= render::low_level::ClearFlag_Depth;
         if (src_clear_flags & ClearFlag_Stencil)      dst_clear_flags |= render::low_level::ClearFlag_Stencil;
-        if (src_clear_flags & ClearFlag_ViewportOnly) dst_clear_flags |= render::low_level::ClearFlag_ViewportOnly;        
+        if (src_clear_flags & ClearFlag_ViewportOnly) dst_clear_flags |= render::low_level::ClearFlag_ViewportOnly;
         
         if (dst_clear_flags)
           device.ClearViews (dst_clear_flags, (render::low_level::Color4f&)frame.ClearColor (), frame.ClearDepthValue (), frame.ClearStencilIndex ());
