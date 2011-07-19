@@ -2,6 +2,8 @@
 
 using namespace render;
 
+//TODO: сброс кэша неиспользованных буферов
+
 namespace
 {
 
