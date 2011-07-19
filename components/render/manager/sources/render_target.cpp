@@ -9,11 +9,12 @@ using namespace render::low_level;
 
 struct RenderTargetImpl::Impl
 {
-  DeviceManagerPtr    device_manager; //менеджер устройства отрисовки
-  LowLevelTexturePtr  texture;        //целевая текстура
-  LowLevelViewPtr     view;           //отображение для рендеринга в текстуру
-  size_t              width;          //ширина цели рендеринга
-  size_t              height;         //высота цели рендеринга
+  DeviceManagerPtr    device_manager;  //менеджер устройства отрисовки
+  LowLevelTexturePtr  texture;         //целевая текстура
+  LowLevelViewPtr     view;            //отображение для рендеринга в текстуру
+  size_t              width;           //ширина цели рендеринга
+  size_t              height;          //высота цели рендеринга
+  math::vec2ui        viewport_offset; //смещение облсти вывода
   
   Impl (const DeviceManagerPtr& in_device_manager)
     : device_manager (in_device_manager)
@@ -125,6 +126,20 @@ size_t RenderTargetImpl::Width ()
 size_t RenderTargetImpl::Height ()
 {
   return impl->height;
+}
+
+/*
+    Смещение области вывода от начала координат цели рендеринга
+*/
+
+void RenderTargetImpl::SetViewportOffset (const math::vec2ui& offset)
+{
+  impl->viewport_offset = offset;
+}
+
+const math::vec2ui& RenderTargetImpl::ViewportOffset ()
+{
+  return impl->viewport_offset;
 }
 
 /*

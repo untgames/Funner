@@ -216,6 +216,40 @@ struct WindowImpl::Impl: public xtl::trackable
       log.Printf ("unknown exception\n    at render::WindowImpl::Impl::OnChangeHandle");
     }
   }
+  
+///Обработчик события изменения области вывода
+  void OnChangeViewport (syslib::Window& window)
+  {
+    try
+    {
+      syslib::Rect viewport = window.Viewport ();            
+      
+      size_t width  = viewport.right - viewport.left,
+             height = viewport.bottom - viewport.top;      
+      
+      log.Printf ("Window viewport changed: x=%d, y=%d, widht=%u, height=%u", viewport.left, viewport.top, width, height);
+      
+      if (color_buffer)
+      {
+        color_buffer->Resize (width, height);
+        color_buffer->SetViewportOffset (math::vec2ui (viewport.left, viewport.top));
+      }
+      
+      if (depth_stencil_buffer)
+      {
+        depth_stencil_buffer->Resize (width, height);
+        depth_stencil_buffer->SetViewportOffset (math::vec2ui (viewport.left, viewport.top));
+      }
+    }
+    catch (std::exception& e)
+    {
+      log.Printf ("%s\n    at render::WindowImpl::Impl::OnChangeViewport", e.what ());      
+    }
+    catch (...)
+    {
+      log.Printf ("unknown exception\n    at render::WindowImpl::Impl::OnChangeViewport");
+    }
+  }  
 };
 
 /*
@@ -338,6 +372,7 @@ WindowImpl::WindowImpl (const DeviceManagerPtr& device_manager, syslib::Window& 
     impl->connect_tracker (window.RegisterEventHandler (syslib::WindowEvent_OnSize, xtl::bind (&Impl::OnResize, &*impl, _1)));
     impl->connect_tracker (window.RegisterEventHandler (syslib::WindowEvent_OnChangeHandle, xtl::bind (&Impl::OnChangeHandle, &*impl, _1)));
     impl->connect_tracker (window.RegisterEventHandler (syslib::WindowEvent_OnPaint, xtl::bind (&Impl::OnUpdate, &*impl)));
+    impl->connect_tracker (window.RegisterEventHandler (syslib::WindowEvent_OnChangeViewport, xtl::bind (&Impl::OnChangeViewport, &*impl, _1)));
     
       //создание целей рендеринга
       

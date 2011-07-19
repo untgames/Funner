@@ -3,7 +3,6 @@
 using namespace render;
 
 //TODO: check scissor enabled???
-//TODO: учёт Window::Viewport
 //TODO: set local textures
 //TODOL ExecuteOperations refactoring
 
@@ -416,6 +415,7 @@ void EffectRenderer::ExecuteOperations (RenderingContext& context)
         ViewportPtr              viewport;
         RectAreaPtr              scissor;
         size_t                   target_width = 0, target_height = 0;
+        math::vec2ui             viewport_offset;
 
         if (!pass.color_targets.IsEmpty ())        
         {
@@ -428,6 +428,7 @@ void EffectRenderer::ExecuteOperations (RenderingContext& context)
             scissor            = desc->scissor;
             target_width       = desc->render_target->Width ();
             target_height      = desc->render_target->Height ();
+            viewport_offset    = desc->render_target->ViewportOffset ();
           }
         }
         
@@ -456,6 +457,10 @@ void EffectRenderer::ExecuteOperations (RenderingContext& context)
               if (desc->render_target->Width () != target_width || desc->render_target->Height () != target_height)
                 throw xtl::format_operation_exception ("", "Different render target sizes: render target sizes (%u, %u) mismatch depth-stencil sizes (%u, %u)",
                   target_width, target_height, desc->render_target->Width (), desc->render_target->Height ());
+
+              if (viewport_offset != desc->render_target->ViewportOffset ())
+                throw xtl::format_operation_exception ("", "Different viewport offsets: render target offset (%u, %u) mismatch depth-stencil offset (%u, %u)",
+                  viewport_offset.x, viewport_offset.y, desc->render_target->ViewportOffset ().x, desc->render_target->ViewportOffset ().y);
             }
           }                    
         }
@@ -471,8 +476,8 @@ void EffectRenderer::ExecuteOperations (RenderingContext& context)
           
           memset (&viewport_desc, 0, sizeof (viewport_desc));
           
-          viewport_desc.x         = rect.x;
-          viewport_desc.y         = rect.y;
+          viewport_desc.x         = rect.x + viewport_offset.x;
+          viewport_desc.y         = rect.y + viewport_offset.y;
           viewport_desc.width     = rect.width;
           viewport_desc.height    = rect.height;
           viewport_desc.min_depth = viewport->MinDepth ();
@@ -486,8 +491,8 @@ void EffectRenderer::ExecuteOperations (RenderingContext& context)
           
           memset (&viewport_desc, 0, sizeof (viewport_desc));
           
-          viewport_desc.x         = 0;
-          viewport_desc.y         = 0;
+          viewport_desc.x         = viewport_offset.x;
+          viewport_desc.y         = viewport_offset.y;
           viewport_desc.width     = target_width;
           viewport_desc.height    = target_height;
           viewport_desc.min_depth = 0.0f;
