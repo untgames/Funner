@@ -28,6 +28,7 @@ class EntityLodCommonData: public CacheHolder, public DebugIdHolder
       , texture_manager (in_texture_manager)
       , properties (in_device_manager)
       , entity_parameters_layout (&in_device_manager->Device (), &in_device_manager->Settings ())
+      , scissor_state (false)
     {
       StateBlockMask mask;
       
@@ -139,6 +140,29 @@ class EntityLodCommonData: public CacheHolder, public DebugIdHolder
 ///Кэш опций шейдера
     render::ShaderOptionsCache& ShaderOptionsCache () { return shader_options_cache; }
     
+///Режим отсечения
+    void SetScissorState (bool state)
+    {
+      if (state == scissor_state)
+        return;
+      
+      scissor_state = state;
+      
+      InvalidateCache (false);
+    }
+    
+    bool ScissorState () { return scissor_state; }
+    
+///Область отсечения
+    void SetScissor (const RectArea& rect)
+    {
+      scissor_rect = rect;
+      
+      InvalidateCache (false);
+    }
+    
+    const RectArea& Scissor () { return scissor_rect; }
+
 ///Управление кэшированием
     using CacheHolder::UpdateCache;
     using CacheHolder::ResetCache;
@@ -181,6 +205,8 @@ class EntityLodCommonData: public CacheHolder, public DebugIdHolder
         device_manager->Device ().SSSetConstantBuffer (ProgramParametersSlot_Entity, properties.Buffer ().get ());
 
         default_state_block->Capture ();
+        
+        InvalidateCacheDependencies (); //TODO: проверить необходимость
       }
       catch (xtl::exception& e)
       {
@@ -291,6 +317,8 @@ class EntityLodCommonData: public CacheHolder, public DebugIdHolder
     StateMap                    states;                   //карта состояний
     DynamicTextureEntityStorage dynamic_textures;         //хранилище динамических текстур объекта рендеринга
     render::ShaderOptionsCache  shader_options_cache;     //кэш опций шейдера
+    bool                        scissor_state;            //состояние режима отсечения
+    RectArea                    scissor_rect;             //область отсечения
     LowLevelStateBlockPtr       default_state_block;      //блок состояний по умолчанию
 };
 
@@ -371,6 +399,8 @@ struct EntityLod: public xtl::reference_counter, public CacheHolder, public Debu
       cached_operations.clear ();
       cached_operations.reserve (operations_count);
       
+      const RectArea* scissor = common_data.ScissorState () ? &common_data.Scissor () : (const RectArea*)0;
+      
         //построение списка операций
         
       for (size_t i=0; i<groups_count; i++)
@@ -395,6 +425,7 @@ struct EntityLod: public xtl::reference_counter, public CacheHolder, public Debu
           operation.state_block              = common_data.GetStateBlock (material).get ();
           operation.entity_parameters_layout = common_data.GetProgramParametersLayout (material).get ();
           operation.shader_options_cache     = &common_data.ShaderOptionsCache ();
+          operation.scissor                  = scissor;
 
           cached_operations.push_back (operation);
         }
@@ -402,6 +433,8 @@ struct EntityLod: public xtl::reference_counter, public CacheHolder, public Debu
         
       cached_operation_list.operations_count = cached_operations.size ();
       cached_operation_list.operations       = cached_operations.empty () ? (RendererOperation*)0 : &cached_operations [0];
+      
+      InvalidateCacheDependencies ();
     }
     catch (xtl::exception& e)
     {
@@ -412,6 +445,7 @@ struct EntityLod: public xtl::reference_counter, public CacheHolder, public Debu
   
   using CacheHolder::UpdateCache;
   using CacheHolder::ResetCache;  
+  using CacheHolder::InvalidateCache;
 };
 
 typedef xtl::intrusive_ptr<EntityLod> EntityLodPtr;
@@ -487,7 +521,7 @@ struct EntityImpl::Impl: public EntityLodCommonData
     
     return index != -1 ? lods [index] : EntityLodPtr ();
   }  
-  
+    
   using CacheHolder::UpdateCache;
 };
 
@@ -726,6 +760,30 @@ void EntityImpl::SetLodPoint (const math::vec3f& p)
 const math::vec3f& EntityImpl::LodPoint ()
 {
   return impl->lod_point;
+}
+
+/*
+    Управление областью отсечения объекта
+*/
+
+void EntityImpl::SetScissor (const RectArea& scissor)
+{
+  impl->SetScissor (scissor);
+}
+
+const RectArea& EntityImpl::Scissor ()
+{
+  return impl->Scissor ();
+}
+
+void EntityImpl::SetScissorState (bool state)
+{
+  impl->SetScissorState (state);
+}
+
+bool EntityImpl::ScissorState ()
+{
+  return impl->ScissorState ();
 }
 
 /*

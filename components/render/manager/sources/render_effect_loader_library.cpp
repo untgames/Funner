@@ -138,14 +138,15 @@ template class EffectLoaderLibrary::Library<EffectPtr>;
 
 struct EffectLoaderLibrary::Impl
 {
-  RasterizerStateLibrary     rasterizer_states;     //библиотека состояний растеризатора
-  BlendStateLibrary          blend_states;          //библиотека состояний уровня смешивания цветов
-  DepthStencilStateLibrary   depth_stencil_states;  //библиотека состояний уровня отсечения
-  SamplerStateLibrary        sampler_states;        //библиотека состояний текстурных сэмплеров
-  ProgramLibrary             programs;              //библиотека программ
-  media::rfx::ShaderLibrary  shaders;               //библиотека шейдеров
-  EffectPassLibrary          effect_passes;         //библиотека проходов эффекта
-  EffectLibrary              effects;
+  RasterizerStateLibrary     rasterizer_states;           //библиотека состояний растеризатора
+  RasterizerStateLibrary     rasterizer_scissor_states;   //библиотека состояний растеризатора с включенным тестом отсечения
+  BlendStateLibrary          blend_states;                //библиотека состояний уровня смешивания цветов
+  DepthStencilStateLibrary   depth_stencil_states;        //библиотека состояний уровня отсечения
+  SamplerStateLibrary        sampler_states;              //библиотека состояний текстурных сэмплеров
+  ProgramLibrary             programs;                    //библиотека программ
+  media::rfx::ShaderLibrary  shaders;                     //библиотека шейдеров
+  EffectPassLibrary          effect_passes;               //библиотека проходов эффекта
+  EffectLibrary              effects;                     //библиотека эффектов
 };
 
 /*
@@ -168,6 +169,11 @@ EffectLoaderLibrary::~EffectLoaderLibrary ()
 EffectLoaderLibrary::RasterizerStateLibrary& EffectLoaderLibrary::RasterizerStates ()
 {
   return impl->rasterizer_states;
+}
+
+EffectLoaderLibrary::RasterizerStateLibrary& EffectLoaderLibrary::RasterizerScissorStates ()
+{
+  return impl->rasterizer_scissor_states;
 }
 
 EffectLoaderLibrary::BlendStateLibrary& EffectLoaderLibrary::BlendStates ()

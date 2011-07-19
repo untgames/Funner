@@ -115,6 +115,26 @@ const math::vec3f& Entity::LodPoint () const
   return impl->LodPoint ();
 }
 
+void Entity::SetScissor (const RectArea& scissor)
+{
+  impl->SetScissor (scissor);
+}
+
+const RectArea& Entity::Scissor () const
+{
+  return impl->Scissor ();
+}
+
+void Entity::SetScissorState (bool state)
+{
+  impl->SetScissorState (state);
+}
+
+bool Entity::ScissorState () const
+{
+  return impl->ScissorState ();
+}
+
 void Entity::Swap (Entity& entity)
 {
   stl::swap (impl, entity.impl);

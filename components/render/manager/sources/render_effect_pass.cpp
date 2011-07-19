@@ -10,20 +10,22 @@ typedef stl::vector<size_t> TagHashArray;
 
 struct EffectPass::Impl
 {
-  DeviceManagerPtr             device_manager;          //менеджер устройства отрисовки
-  common::StringArray          color_targets;           //целевые буферы цвета
-  stl::string                  depth_stencil_target;    //целевой буфер глубины
-  render::SortMode             sort_mode;               //режим сортировки
-  LowLevelDepthStencilStatePtr depth_stencil_state;     //состояние уровня отсечения
-  LowLevelBlendStatePtr        blend_state;             //состояние уровня смешивания цветов
-  LowLevelRasterizerStatePtr   rasterizer_state;        //состояние уровня растеризации  
-  LowLevelStateBlockPtr        state_block;             //блок состояний
-  bool                         state_block_need_update; //блок состояний требует обновления
-  float                        viewport_min_depth;      //минимальное значение глубины области вывода
-  float                        viewport_max_depth;      //максимальное значение глубины области вывода
-  size_t                       clear_flags;             //флаги очистки
-  common::StringArray          tags;                    //тэги прохода
-  TagHashArray                 tag_hashes;              //хэши тэгов  
+  DeviceManagerPtr             device_manager;           //менеджер устройства отрисовки
+  common::StringArray          color_targets;            //целевые буферы цвета
+  stl::string                  depth_stencil_target;     //целевой буфер глубины
+  render::SortMode             sort_mode;                //режим сортировки
+  LowLevelDepthStencilStatePtr depth_stencil_state;      //состояние уровня отсечения
+  LowLevelBlendStatePtr        blend_state;              //состояние уровня смешивания цветов
+  LowLevelRasterizerStatePtr   rasterizer_state;         //состояние уровня растеризации  
+  LowLevelRasterizerStatePtr   rasterizer_scissor_state; //состояние уровня растеризации с включенным тестом отсечения
+  LowLevelStateBlockPtr        scissor_off_state_block;  //блок состояний
+  LowLevelStateBlockPtr        scissor_on_state_block;   //блок состояний с включенным тестом отсечения
+  bool                         state_block_need_update;  //блок состояний требует обновления
+  float                        viewport_min_depth;       //минимальное значение глубины области вывода
+  float                        viewport_max_depth;       //максимальное значение глубины области вывода
+  size_t                       clear_flags;              //флаги очистки
+  common::StringArray          tags;                     //тэги прохода
+  TagHashArray                 tag_hashes;               //хэши тэгов  
   
 ///Конструктор
   Impl (const DeviceManagerPtr& in_device_manager)
@@ -45,7 +47,8 @@ struct EffectPass::Impl
       mask.os_blend_state         = true;
       mask.os_depth_stencil_state = true;
       
-      state_block = LowLevelStateBlockPtr (device_manager->Device ().CreateStateBlock (mask), false);
+      scissor_on_state_block  = LowLevelStateBlockPtr (device_manager->Device ().CreateStateBlock (mask), false);
+      scissor_off_state_block = LowLevelStateBlockPtr (device_manager->Device ().CreateStateBlock (mask), false);
     }
     catch (xtl::exception& e)
     {
@@ -117,6 +120,12 @@ void EffectPass::SetRasterizerState (const LowLevelRasterizerStatePtr& state)
   impl->state_block_need_update = true;
 }
 
+void EffectPass::SetRasterizerScissorState (const LowLevelRasterizerStatePtr& state)
+{
+  impl->rasterizer_scissor_state = state;
+  impl->state_block_need_update  = true;
+}
+
 const LowLevelBlendStatePtr& EffectPass::BlendState ()
 {
   return impl->blend_state;
@@ -132,26 +141,35 @@ const LowLevelRasterizerStatePtr& EffectPass::RasterizerState ()
   return impl->rasterizer_state;
 }
 
+const LowLevelRasterizerStatePtr& EffectPass::RasterizerScissorState ()
+{
+  return impl->rasterizer_scissor_state;
+}
+
 /*
     Блок состояний эффекта
 */
 
-LowLevelStateBlockPtr EffectPass::StateBlock ()
+LowLevelStateBlockPtr EffectPass::StateBlock (bool scissor_enable)
 {
   try
   {
-    if (!impl->state_block_need_update)
-      return impl->state_block;
+    if (impl->state_block_need_update)
+    {      
+      render::low_level::IDevice& device = impl->device_manager->Device ();
       
-    render::low_level::IDevice& device = impl->device_manager->Device ();
+      device.OSSetBlendState        (impl->blend_state.get ());
+      device.OSSetDepthStencilState (impl->depth_stencil_state.get ());
+      device.RSSetState             (impl->rasterizer_state.get ());
+      
+      impl->scissor_off_state_block->Capture ();
+      
+      device.RSSetState (impl->rasterizer_scissor_state.get ());
+
+      impl->scissor_on_state_block->Capture ();
+    }    
     
-    device.OSSetBlendState        (impl->blend_state.get ());
-    device.OSSetDepthStencilState (impl->depth_stencil_state.get ());
-    device.RSSetState             (impl->rasterizer_state.get ());
-    
-    impl->state_block->Capture ();
-    
-    return impl->state_block;
+    return scissor_enable ? impl->scissor_on_state_block : impl->scissor_off_state_block;
   }
   catch (xtl::exception& e)
   {

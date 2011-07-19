@@ -241,6 +241,15 @@ effect "shadow"
   }
 }
 
+texture "shadow_map"
+{
+  dimension 2
+  width     2048
+  height    2048
+  format    d32
+  bind      texture depth_stencil
+}
+
 effect "lighting"
 {
   tags "lighting"

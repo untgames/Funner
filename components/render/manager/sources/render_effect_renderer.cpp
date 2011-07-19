@@ -3,6 +3,7 @@
 using namespace render;
 
 //TODO: check scissor enabled???
+//TODO: учёт Window::Viewport
 //TODO: set local textures
 //TODOL ExecuteOperations refactoring
 
@@ -94,17 +95,18 @@ struct StateSwitchComparator
 ///Проход рендеринга
 struct RenderPass: public xtl::reference_counter
 {  
-  common::StringArray      color_targets;         //имя целевых буферов цвета
-  stl::string              depth_stencil_target;  //имя целевого буфера отсечения
-  SortMode                 sort_mode;             //режим сортировки
-  LowLevelStateBlockPtr    state_block;           //блок состояний прохода
-  ProgramParametersLayout  parameters_layout;     //расположение параметров
-  float                    viewport_min_depth;    //минимальное значение глубины области вывода
-  float                    viewport_max_depth;    //максимальное значение глубины области вывода
-  size_t                   clear_flags;           //флаги очистки экрана
-  OperationArray           operations;            //операции рендеринга
-  OperationPtrArray        operation_ptrs;        //указатели на операции
-  const RendererOperation* last_operation;        //последняя добавленная операция
+  common::StringArray      color_targets;           //имя целевых буферов цвета
+  stl::string              depth_stencil_target;    //имя целевого буфера отсечения
+  SortMode                 sort_mode;               //режим сортировки
+  LowLevelStateBlockPtr    scissor_off_state_block; //блок состояний прохода
+  LowLevelStateBlockPtr    scissor_on_state_block;  //блок состояний прохода с включенным тестом отсечения
+  ProgramParametersLayout  parameters_layout;       //расположение параметров
+  float                    viewport_min_depth;      //минимальное значение глубины области вывода
+  float                    viewport_max_depth;      //максимальное значение глубины области вывода
+  size_t                   clear_flags;             //флаги очистки экрана
+  OperationArray           operations;              //операции рендеринга
+  OperationPtrArray        operation_ptrs;          //указатели на операции
+  const RendererOperation* last_operation;          //последняя добавленная операция
 
 ///Конструктор
   RenderPass (const DeviceManagerPtr& device_manager)
@@ -237,13 +239,14 @@ EffectRenderer::EffectRenderer (const EffectPtr& effect, const DeviceManagerPtr&
           impl->passes.insert_pair (hash, &*pass);
         }
         
-        pass->color_targets        = src_pass->ColorTargets ().Clone ();
-        pass->depth_stencil_target = src_pass->DepthStencilTarget ();
-        pass->sort_mode            = src_pass->SortMode ();
-        pass->state_block          = src_pass->StateBlock ();
-        pass->viewport_min_depth   = src_pass->ViewportMinDepth ();
-        pass->viewport_max_depth   = src_pass->ViewportMaxDepth ();
-        pass->clear_flags          = src_pass->ClearFlags ();
+        pass->color_targets           = src_pass->ColorTargets ().Clone ();
+        pass->depth_stencil_target    = src_pass->DepthStencilTarget ();
+        pass->sort_mode               = src_pass->SortMode ();
+        pass->scissor_off_state_block = src_pass->StateBlock (false);
+        pass->scissor_on_state_block  = src_pass->StateBlock (true);
+        pass->viewport_min_depth      = src_pass->ViewportMinDepth ();
+        pass->viewport_max_depth      = src_pass->ViewportMaxDepth ();
+        pass->clear_flags             = src_pass->ClearFlags ();
 
         if (parent_layout)
           pass->parameters_layout.Attach (*parent_layout);
@@ -404,12 +407,7 @@ void EffectRenderer::ExecuteOperations (RenderingContext& context)
       
       if (operation.pass)
       {        
-        RenderPass& pass = *operation.pass;
-        
-          //применение состояния прохода
-        
-        if (pass.state_block)
-          pass.state_block->Apply ();
+        RenderPass& pass = *operation.pass;        
           
           //сортировка операций
           
@@ -509,18 +507,32 @@ void EffectRenderer::ExecuteOperations (RenderingContext& context)
         {
           render::low_level::Rect dst_rect;
           const Rect&             src_rect = scissor->Rect ();
-          
+
           memset (&dst_rect, 0, sizeof (dst_rect));
-          
+
           dst_rect.x      = src_rect.x;
           dst_rect.y      = src_rect.y;
           dst_rect.width  = src_rect.width;
           dst_rect.height = src_rect.height;
-          
+
           device.RSSetScissor (dst_rect);
         }
+        else
+        {
+        }
         
-        //TODO: check scissor enabled???
+          //применение состояния прохода
+
+        if (scissor)
+        {
+          if (pass.scissor_on_state_block)
+            pass.scissor_on_state_block->Apply ();
+        }
+        else
+        {
+          if (pass.scissor_off_state_block)
+            pass.scissor_off_state_block->Apply ();
+        }        
         
           //очистка экрана
           
@@ -564,7 +576,11 @@ void EffectRenderer::ExecuteOperations (RenderingContext& context)
           
           render::low_level::StateBlockMask mask;      
           
-          primitive.state_block->GetMask (mask);          
+          primitive.state_block->GetMask (mask);
+          
+            //обработка области отсечения объекта
+            
+          ///?????????
           
             //установка локальных текстур
           
@@ -579,7 +595,7 @@ void EffectRenderer::ExecuteOperations (RenderingContext& context)
               if (!texmap.is_framemap)
                 continue;
                               
-               ///???????????????            
+               ///???????????????
              
               //device.SSSetTexture (texmap.channel, ???????);
             }

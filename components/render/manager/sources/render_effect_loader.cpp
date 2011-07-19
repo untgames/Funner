@@ -361,6 +361,12 @@ class EffectLoader
       
         library.RasterizerStates ().Add (id, state);
         
+        desc.scissor_enable = true;
+
+        state = LowLevelRasterizerStatePtr (device_manager->Device ().CreateRasterizerState (desc), false);
+
+        library.RasterizerScissorStates ().Add (id, state);
+
         log.Printf ("Effect rasterizer '%s' loaded", id);        
       }
       catch (std::exception& e)

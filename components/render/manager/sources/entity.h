@@ -10,6 +10,7 @@ struct RendererOperation
   ProgramParametersLayout*        entity_parameters_layout;       //расположение параметров объекта
   const RendererPrimitive*        primitive;                      //примитив
   ShaderOptionsCache*             shader_options_cache;           //кэш опций шейдера
+  const RectArea*                 scissor;                        //область отсечения (может быть null)
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -80,6 +81,14 @@ class EntityImpl: public Object
 ///////////////////////////////////////////////////////////////////////////////////////////////////
    void               SetLodPoint (const math::vec3f&);
    const math::vec3f& LodPoint    ();
+   
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Управление областью отсечения объекта
+///////////////////////////////////////////////////////////////////////////////////////////////////
+   void            SetScissor      (const RectArea& scissor);
+   const RectArea& Scissor         ();
+   void            SetScissorState (bool state);
+   bool            ScissorState    ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Получение операций рендеринга

@@ -40,17 +40,19 @@ class EffectPass: public Object
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Состояния уровней устройства отрисовки
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void                                SetBlendState        (const LowLevelBlendStatePtr&);
-    void                                SetDepthStencilState (const LowLevelDepthStencilStatePtr&);
-    void                                SetRasterizerState   (const LowLevelRasterizerStatePtr&);
-    const LowLevelBlendStatePtr&        BlendState           ();
-    const LowLevelDepthStencilStatePtr& DepthStencilState    ();
-    const LowLevelRasterizerStatePtr&   RasterizerState      ();    
+    void                                SetBlendState             (const LowLevelBlendStatePtr&);
+    void                                SetDepthStencilState      (const LowLevelDepthStencilStatePtr&);
+    void                                SetRasterizerState        (const LowLevelRasterizerStatePtr&);
+    void                                SetRasterizerScissorState (const LowLevelRasterizerStatePtr&);    
+    const LowLevelBlendStatePtr&        BlendState                ();
+    const LowLevelDepthStencilStatePtr& DepthStencilState         ();
+    const LowLevelRasterizerStatePtr&   RasterizerState           ();
+    const LowLevelRasterizerStatePtr&   RasterizerScissorState    ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Блок состояний эффекта
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    LowLevelStateBlockPtr StateBlock ();
+    LowLevelStateBlockPtr StateBlock (bool scissor_enable);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Тэги примитивов, которые войдут в проход
@@ -68,14 +70,14 @@ class EffectPass: public Object
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void             SetSortMode (render::SortMode mode);
     render::SortMode SortMode    ();
-    
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Диапазон глубины для области вывода
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     float ViewportMinDepth    ();
     float ViewportMaxDepth    ();
     void  SetViewportMinDepth (float value);
-    void  SetViewportMaxDepth (float value);
+    void  SetViewportMaxDepth (float value);    
 
   private:
     struct Impl;

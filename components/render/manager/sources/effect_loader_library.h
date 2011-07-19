@@ -64,14 +64,15 @@ class EffectLoaderLibrary: public xtl::noncopyable
     typedef Library<EffectPassPtr>                 EffectPassLibrary;
     typedef Library<EffectPtr>                     EffectLibrary;
     
-    RasterizerStateLibrary&    RasterizerStates   ();
-    BlendStateLibrary&         BlendStates        ();
-    DepthStencilStateLibrary&  DepthStencilStates ();
-    SamplerStateLibrary&       SamplerStates      ();
-    ProgramLibrary&            Programs           ();
-    media::rfx::ShaderLibrary& Shaders            ();
-    EffectPassLibrary&         EffectPasses       ();
-    EffectLibrary&             Effects            ();
+    RasterizerStateLibrary&    RasterizerStates        ();
+    RasterizerStateLibrary&    RasterizerScissorStates ();    
+    BlendStateLibrary&         BlendStates             ();
+    DepthStencilStateLibrary&  DepthStencilStates      ();
+    SamplerStateLibrary&       SamplerStates           ();
+    ProgramLibrary&            Programs                ();
+    media::rfx::ShaderLibrary& Shaders                 ();
+    EffectPassLibrary&         EffectPasses            ();
+    EffectLibrary&             Effects                 ();
     
   private:
     struct Impl;
