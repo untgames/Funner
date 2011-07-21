@@ -17,14 +17,14 @@ class QueryManagerState: public IStageState
     QueryManagerState (QueryManagerState* in_main_state = 0) : main_state (in_main_state) {}
 
 ///Установка предиката отрисовки
-    void SetPredication (IAsyncPredicate* in_predicate, bool in_predicate_value)
+    void SetPredication (IPredicate* in_predicate, bool in_predicate_value)
     {
       predicate       = in_predicate;
       predicate_value = in_predicate_value;
     }
 
 ///Получение предиката отрисовки
-    IAsyncPredicate* GetPredicate () { return predicate.get (); }
+    IPredicate* GetPredicate () { return predicate.get (); }
 
 ///Получение сравниваемого значения предиката отрисовки
     bool GetPredicateValue () { return predicate_value; }
@@ -65,11 +65,11 @@ class QueryManagerState: public IStageState
 
   private:
     typedef xtl::trackable_ptr<QueryManagerState> QueryManagerStatePtr;
-    typedef xtl::trackable_ptr<IAsyncPredicate>   AsyncPredicatePtr;
+    typedef xtl::trackable_ptr<IPredicate>        PredicatePtr;
 
   private:
     QueryManagerStatePtr main_state;       //основное состояние уровня
-    AsyncPredicatePtr    predicate;        //предикат
+    PredicatePtr         predicate;        //предикат
     bool                 predicate_value;  //сравниваемое значение
 };
 
@@ -162,13 +162,12 @@ void QueryManager::SetPredication (IPredicate* predicate, bool predicate_value)
 {
   static const char* METHOD_NAME = "render::low_level::opengl::QueryManager::SetPredication";
 
-  IAsyncPredicate* casted_predicate = cast_object<IAsyncPredicate> (predicate, METHOD_NAME, "predicate");
-  ContextObject*   casted_object    = dynamic_cast<ContextObject*> (predicate);
+  ContextObject* casted_object = dynamic_cast<ContextObject*> (predicate);
 
   if (casted_object && !casted_object->IsCompatible (impl->GetContextManager ()))
     throw xtl::format_exception<xtl::bad_argument> (METHOD_NAME, "Argument 'predicate' is incompatible with target IDevice");
 
-  impl->SetPredication (casted_predicate, predicate_value);
+  impl->SetPredication (predicate, predicate_value);
 }
 
 IPredicate* QueryManager::GetPredicate ()
