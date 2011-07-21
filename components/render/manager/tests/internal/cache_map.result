@@ -1,0 +1,12 @@
+Results of cache_map_test:
+--- Insert elements in cache ---
+A(0)
+A(1)
+A(2)
+--- Flush cache (frame_delay = 1) ---
+--- Flush cache (frame_delay = 1, next frame) ---
+--- Flush cache (frame_delay = 1, next next frame) ---
+~A(0)
+~A(2)
+--- All done ---
+~A(1)

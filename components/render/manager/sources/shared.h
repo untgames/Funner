@@ -19,6 +19,7 @@
 #include <common/log.h>
 #include <common/parser.h>
 #include <common/strlib.h>
+#include <common/time.h>
 
 #include <media/image.h>
 #include <media/compressed_image.h>
@@ -38,6 +39,7 @@ namespace render
 
 
 //implementation forwards
+class CacheManager;
 class DeviceManager;
 class DynamicTextureImpl;
 class Effect;
@@ -62,6 +64,7 @@ struct ShaderOptions;
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Указатели на объекты рендера среднего уровня
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+typedef xtl::intrusive_ptr<CacheManager>            CacheManagerPtr;
 typedef xtl::intrusive_ptr<DeviceManager>           DeviceManagerPtr;
 typedef xtl::intrusive_ptr<DynamicTextureImpl>      DynamicTexturePtr;
 typedef xtl::intrusive_ptr<EffectPass>              EffectPassPtr;
@@ -174,9 +177,11 @@ class DebugIdHolder: public xtl::noncopyable
 #include "object.h"
 #include "device_manager.h"
 #include "log.h"
-#include "cache.h"
+#include "cache_holder.h"
 #include "resource_proxy.h"
 
+#include "cache_manager.h"
+#include "cache_map.h"
 #include "dynamic_texture.h"
 #include "effect.h"
 #include "effect_loader.h"
