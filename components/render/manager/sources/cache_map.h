@@ -34,6 +34,11 @@ class CacheMap: public Cache
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void Clear ();
     
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Перебор элементов
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    template <class Fn> void ForEach (Fn fn);
+    
   private:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Сброс закэшированных элементов
@@ -51,12 +56,11 @@ class CacheMap: public Cache
     typedef stl::hash_map<Key, Item>     ItemMap;    
     typedef stl::list<typename ItemMap::iterator> ItemList;
     
-    struct Item
+    struct Item: public Value
     {
       size_t                      last_use_frame; //кадр последнего использования элемента
       size_t                      last_use_time;  //время последнего использования элемента
       typename ItemList::iterator position;       //положение в списке элементов      
-      Value                       value;          //значение
     };        
 
   private:
@@ -111,7 +115,7 @@ Value* CacheMap<Key, Value>::Find (const Key& key)
   
   item_list.splice (item_list.begin (), item_list, iter->second.position);
   
-  return &iter->second.value;
+  return &iter->second;
 }
 
 template <class Key, class Value>
@@ -134,7 +138,8 @@ Value& CacheMap<Key, Value>::AddCore (const Key& key, const Value& value)
   
   item.last_use_time  = CurrentTime ();
   item.last_use_frame = CurrentFrame ();
-  item.value          = value;
+  
+  static_cast<Value&> (item) = value;
   
   stl::pair<typename ItemMap::iterator, bool> result = item_map.insert_pair (key, item);
   
@@ -147,7 +152,7 @@ Value& CacheMap<Key, Value>::AddCore (const Key& key, const Value& value)
   
     result.first->second.position = item_list.begin ();
     
-    return result.first->second.value;
+    return result.first->second;
   }
   catch (...)
   {
@@ -188,6 +193,17 @@ void CacheMap<Key, Value>::Clear ()
 {
   item_map.clear ();
   item_list.clear ();
+}
+
+/*
+    Итераторы
+*/
+
+template <class Key, class Value> template <class Fn>
+void CacheMap<Key, Value>::ForEach (Fn fn)
+{
+  for (typename ItemMap::iterator iter=item_map.begin (); iter!=item_map.end (); ++iter)
+    fn (iter->first, iter->second);
 }
 
 /*

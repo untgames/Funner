@@ -36,6 +36,7 @@ class RenderManagerImpl: public Object
 ///Менеджеры ресурсов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     render::DeviceManager&    DeviceManager    ();
+    render::CacheManager&     CacheManager     ();
     render::TextureManager&   TextureManager   ();
     render::PrimitiveManager& PrimitiveManager ();
     render::ProgramManager&   ProgramManager   ();

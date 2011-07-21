@@ -1,7 +1,5 @@
 #include "shared.h"
 
-//TODO: сброс кэша
-
 using namespace render;
 
 namespace
@@ -75,13 +73,39 @@ struct ShaderOptionsBuilder: public xtl::reference_counter
 
 typedef xtl::intrusive_ptr<ShaderOptionsBuilder> ShaderOptionsBuilderPtr;
 
+/*
+    Ключ поиска объекта построения опций шейдера
+*/
+
+struct ShaderOptionsBuilderKey
+{
+  size_t layout_hash;      //хэш лэйаута
+  size_t properties_count; //количество свойств
+  
+  ShaderOptionsBuilderKey (size_t in_layout_hash, size_t in_properties_count)
+    : layout_hash (in_layout_hash)
+    , properties_count (in_properties_count)
+  {
+  }
+  
+  bool operator == (const ShaderOptionsBuilderKey& key) const
+  {
+    return layout_hash == key.layout_hash && properties_count == key.properties_count;
+  }
+};
+
+size_t hash (const ShaderOptionsBuilderKey& key)
+{
+  return key.layout_hash * key.properties_count;
+}
+
 }
 
 /*
     Описание реализации списка макро-определений шейдера
 */
 
-typedef stl::hash_multimap<size_t, ShaderOptionsBuilderPtr> ShaderOptionsBuilderMap;
+typedef CacheMap<ShaderOptionsBuilderKey, ShaderOptionsBuilderPtr> ShaderOptionsBuilderMap;
 
 struct ShaderOptionsLayout::Impl: public xtl::trackable
 {
@@ -92,15 +116,16 @@ struct ShaderOptionsLayout::Impl: public xtl::trackable
   bool                    need_flush;      //кэш требуется сбросить
   
 ///Конструктор
-  Impl ()
+  Impl (const CacheManagerPtr& cache_manager)
     : need_flush (false)
+    , builders (cache_manager)
   {
   }
   
 ///Сброс кэша
   void FlushCache ()
   {
-    builders.clear ();
+    builders.Clear ();
     
     default_options.options.clear ();
     
@@ -124,9 +149,17 @@ struct ShaderOptionsLayout::Impl: public xtl::trackable
     Конструктор / деструктор
 */
 
-ShaderOptionsLayout::ShaderOptionsLayout ()
-  : impl (new Impl)
+ShaderOptionsLayout::ShaderOptionsLayout (const CacheManagerPtr& cache_manager)
 {
+  try
+  {
+    impl = new Impl (cache_manager);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::ShaderOptionsLayout::ShaderOptionsLayout");
+    throw;
+  }
 }
 
 ShaderOptionsLayout::~ShaderOptionsLayout ()
@@ -142,7 +175,7 @@ size_t ShaderOptionsLayout::CachedShaderBuildersCount ()
   if (impl->need_flush)
     impl->FlushCache ();
 
-  return impl->builders.size ();
+  return impl->builders.Size ();
 }
 
 /*
@@ -201,20 +234,18 @@ void ShaderOptionsLayout::GetShaderOptions (const common::PropertyMap& defines, 
   {
     if (impl->need_flush)
       impl->FlushCache ();
+      
+    ShaderOptionsBuilderKey key (defines.Layout ().Hash (), defines.Layout ().Size ());
     
-    size_t hash = defines.Layout ().Hash ();
-    
-    ShaderOptionsBuilderMap::iterator iter = impl->builders.find (hash);
-    
-    if (iter != impl->builders.end ())
+    if (ShaderOptionsBuilderPtr* builder = impl->builders.Find (key))
     {
-      iter->second->GetShaderOptions (defines, out_options, impl->value_buffer);
+      (*builder)->GetShaderOptions (defines, out_options, impl->value_buffer);
       return;
     }
     
     ShaderOptionsBuilderPtr builder (new ShaderOptionsBuilder (defines.Layout (), impl->defines), false);
     
-    impl->builders.insert_pair (hash, builder);
+    impl->builders.Add (key, builder);
     
     builder->GetShaderOptions (defines, out_options, impl->value_buffer);
   }

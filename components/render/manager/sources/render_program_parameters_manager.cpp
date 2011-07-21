@@ -3,14 +3,12 @@
 using namespace render;
 using namespace render::low_level;
 
-//TODO: flush cache of composite layouts after N frames
-
 /*
     Описание реализации менеджера параметров программ шэйдинга
 */
 
 typedef stl::hash_multimap<size_t, ProgramParametersLayout*> LayoutMap;
-typedef stl::hash_map<size_t, ProgramParametersLayoutPtr>    CompositeLayoutMap;
+typedef CacheMap<size_t, ProgramParametersLayoutPtr>         CompositeLayoutMap;
 
 struct ProgramParametersManager::Impl: public xtl::trackable
 {
@@ -20,9 +18,10 @@ struct ProgramParametersManager::Impl: public xtl::trackable
   SettingsPtr         settings;          //настройки менеджера рендеринга
 
 ///Конструктор
-  Impl (const LowLevelDevicePtr& in_device, const SettingsPtr& in_settings)
+  Impl (const LowLevelDevicePtr& in_device, const SettingsPtr& in_settings, const CacheManagerPtr& cache_manager)
     : device (in_device)
     , settings (in_settings)
+    , composite_layouts (cache_manager)
   {
     static const char* METHOD_NAME = "render::ProgramParametersManager::Impl";
     
@@ -30,14 +29,14 @@ struct ProgramParametersManager::Impl: public xtl::trackable
       throw xtl::make_null_argument_exception (METHOD_NAME, "device");
       
     if (!settings)
-      throw xtl::make_null_argument_exception (METHOD_NAME, "settings");    
+      throw xtl::make_null_argument_exception (METHOD_NAME, "settings");
   }
 
 ///Деструктор
   ~Impl ()
   {
     layouts.clear ();
-    composite_layouts.clear ();
+    composite_layouts.Clear ();
   }
 
 ///Удаление лэйаута
@@ -59,9 +58,17 @@ struct ProgramParametersManager::Impl: public xtl::trackable
     Конструктор / деструктор
 */
 
-ProgramParametersManager::ProgramParametersManager (const LowLevelDevicePtr& device, const SettingsPtr& settings)
-  : impl (new Impl (device, settings))
+ProgramParametersManager::ProgramParametersManager (const LowLevelDevicePtr& device, const SettingsPtr& settings, const CacheManagerPtr& cache_manager)
 {
+  try
+  {
+    impl = new Impl (device, settings, cache_manager);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::ProgramParametersManager::ProgramParametersManager");
+    throw;
+  }
 }
 
 ProgramParametersManager::~ProgramParametersManager ()
@@ -112,10 +119,8 @@ ProgramParametersLayoutPtr ProgramParametersManager::GetParameters
     if (layout2) hash = common::crc32 (&layout2, sizeof (layout2), hash);
     if (layout1) hash = common::crc32 (&layout1, sizeof (layout1), hash);
 
-    CompositeLayoutMap::iterator iter = impl->composite_layouts.find (hash);
-    
-    if (iter != impl->composite_layouts.end ())
-      return iter->second;
+    if (ProgramParametersLayoutPtr* layout = impl->composite_layouts.Find (hash))
+      return *layout;
 
     ProgramParametersLayoutPtr result_layout (new ProgramParametersLayout (impl->device, impl->settings), false);
 
@@ -123,7 +128,7 @@ ProgramParametersLayoutPtr ProgramParametersManager::GetParameters
     if (layout2) result_layout->Attach (*layout2);
     if (layout3) result_layout->Attach (*layout3);
 
-    impl->composite_layouts.insert_pair (hash, result_layout);
+    impl->composite_layouts.Add (hash, result_layout);
 
     return result_layout;    
   }

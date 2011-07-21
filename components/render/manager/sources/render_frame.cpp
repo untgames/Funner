@@ -122,6 +122,7 @@ struct FrameImpl::Impl: public CacheHolder
     : effect_holder (new EffectHolder (effect_manager, device_manager))
     , properties (device_manager)
     , entities_properties (device_manager)
+    , shader_options_cache (&device_manager->CacheManager ())
     , scissor_state (false)
     , clear_flags (ClearFlag_All)
     , clear_depth_value (1.0f)

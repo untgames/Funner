@@ -33,8 +33,8 @@ struct ShaderOptionsCacheEntry: public ShaderOptions, public xtl::reference_coun
   }
 };
 
-typedef xtl::intrusive_ptr<ShaderOptionsCacheEntry>                     ShaderOptionsCacheEntryPtr;
-typedef stl::hash_map<ShaderOptionsLayout*, ShaderOptionsCacheEntryPtr> ShaderOptionsCacheEntryMap;
+typedef xtl::intrusive_ptr<ShaderOptionsCacheEntry>                ShaderOptionsCacheEntryPtr;
+typedef CacheMap<ShaderOptionsLayout*, ShaderOptionsCacheEntryPtr> ShaderOptionsCacheEntryMap;
 
 }
 
@@ -51,8 +51,9 @@ struct ShaderOptionsCache::Impl: public xtl::trackable
   bool                              need_invalidate_cache;     //кэш требуется обновить
   
 ///Конструктор
-  Impl ()
+  Impl (const CacheManagerPtr& cache_manager)
     : properties_update_handler (xtl::bind (&Impl::OnPropertiesUpdate, this))
+    , cache (cache_manager)
     , need_invalidate_cache (false)
   {
     on_properties_update  = properties.RegisterEventHandler (common::PropertyMapEvent_OnUpdate, properties_update_handler); 
@@ -67,7 +68,7 @@ struct ShaderOptionsCache::Impl: public xtl::trackable
 ///Обработчик события удаления расположения опций шейдера
   void OnLayoutDeleted (ShaderOptionsLayout* layout)
   {
-    cache.erase (layout);
+    cache.Remove (layout);
   }
 };
 
@@ -75,8 +76,8 @@ struct ShaderOptionsCache::Impl: public xtl::trackable
     Конструктор / деструктор
 */
 
-ShaderOptionsCache::ShaderOptionsCache ()
-  : impl (new Impl)
+ShaderOptionsCache::ShaderOptionsCache (const CacheManagerPtr& cache_manager)
+  : impl (new Impl (cache_manager))
 {
 }
 
@@ -90,7 +91,7 @@ ShaderOptionsCache::~ShaderOptionsCache ()
 
 size_t ShaderOptionsCache::CachedLayoutsCount ()
 {
-  return impl->cache.size ();
+  return impl->cache.Size ();
 }
 
 /*
@@ -113,6 +114,19 @@ const common::PropertyMap& ShaderOptionsCache::Properties ()
     Получение опций шейдера
 */
 
+namespace
+{
+
+struct InvalidateCacheEntry
+{
+  void operator () (ShaderOptionsLayout*, const ShaderOptionsCacheEntryPtr& entry) const
+  {
+    entry->is_valid = false;
+  }
+};
+
+}
+
 const ShaderOptions& ShaderOptionsCache::GetShaderOptions (ShaderOptionsLayout& layout)
 {
   try
@@ -126,20 +140,17 @@ const ShaderOptions& ShaderOptionsCache::GetShaderOptions (ShaderOptionsLayout& 
     
     if (impl->need_invalidate_cache)
     {
-      for (ShaderOptionsCacheEntryMap::iterator iter=impl->cache.begin (), end=impl->cache.end (); iter!=end; ++iter)
-        iter->second->is_valid = false;
+      impl->cache.ForEach (InvalidateCacheEntry ());
         
       impl->need_invalidate_cache = false;
     }
      
       //поиск в кэше
       
-    ShaderOptionsCacheEntryMap::iterator iter = impl->cache.find (&layout);
-    
-    if (iter != impl->cache.end ())
+    if (ShaderOptionsCacheEntryPtr* entry = impl->cache.Find (&layout))
     {
-      iter->second->UpdateCache (impl->properties, layout);
-      return *iter->second;
+      (*entry)->UpdateCache (impl->properties, layout);
+      return **entry;
     }
     
       //добавление элемента кэша
@@ -150,7 +161,7 @@ const ShaderOptions& ShaderOptionsCache::GetShaderOptions (ShaderOptionsLayout& 
     
     try
     {
-      impl->cache.insert_pair (&layout, entry);
+      impl->cache.Add (&layout, entry);
       
       entry->UpdateCache (impl->properties, layout);
       

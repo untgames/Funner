@@ -139,20 +139,21 @@ void CacheManager::RemoveCache (Cache& cache)
 */
 
 Cache::Cache (const CacheManagerPtr& in_manager)
-{
-  if (!in_manager)
-    throw xtl::make_null_argument_exception ("render::Cache::Cache", "manager");
-    
-  manager       = in_manager;
-  current_frame = manager->impl->current_frame;
-  current_time  = manager->impl->current_time;
+  : manager (in_manager)
+{  
+  if (manager)
+  {
+    current_frame = manager->impl->current_frame;
+    current_time  = manager->impl->current_time;
   
-  manager->AddCache (*this);
+    manager->AddCache (*this);
+  }
 }
 
 Cache::~Cache ()
 {
-  manager->RemoveCache (*this);
+  if (manager)
+    manager->RemoveCache (*this);
 }
 
 /*
@@ -161,10 +162,10 @@ Cache::~Cache ()
 
 size_t Cache::TimeDelay ()
 {
-  return manager->TimeDelay ();
+  return manager ? manager->TimeDelay () : 0;
 }
 
 size_t Cache::FrameDelay ()
 {
-  return manager->FrameDelay ();
+  return manager ? manager->FrameDelay () : 0;
 }

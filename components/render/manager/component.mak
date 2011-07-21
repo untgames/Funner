@@ -4,11 +4,12 @@
 TARGETS := RENDER.MANAGER.SOURCES RENDER.MANAGER.TESTS
 
 #Öåëü ¹1 - RENDER system sources
-RENDER.MANAGER.SOURCES.TYPE             := static-lib
-RENDER.MANAGER.SOURCES.NAME             := funner.render.manager
-RENDER.MANAGER.SOURCES.SOURCE_DIRS      := sources
-RENDER.MANAGER.SOURCES.IMPORTS          := compile.render.manager compile.media.image compile.media.geometry \
-                                           compile.media.rfx compile.system compile.render.low_level
+RENDER.MANAGER.SOURCES.TYPE                 := static-lib
+RENDER.MANAGER.SOURCES.NAME                 := funner.render.manager
+RENDER.MANAGER.SOURCES.SOURCE_DIRS          := sources
+RENDER.MANAGER.SOURCES.IMPORTS              := compile.render.manager compile.media.image compile.media.geometry \
+                                               compile.media.rfx compile.system compile.render.low_level
+RENDER.MANAGER.SOURCES.msvc.COMPILER_CFLAGS := -wd4503                                               
 
 #Öåëü ¹2 - RENDER system tests
 RENDER.MANAGER.TESTS.TYPE             := test-suite

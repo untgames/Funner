@@ -277,7 +277,7 @@ const char* get_string_property (const common::PropertyMap& properties, const ch
 
 }
 
-WindowImpl::WindowImpl (const DeviceManagerPtr& device_manager, syslib::Window& window, const common::PropertyMap& properties, const SettingsPtr& settings)
+WindowImpl::WindowImpl (const DeviceManagerPtr& device_manager, syslib::Window& window, const common::PropertyMap& properties, const SettingsPtr& settings, const CacheManagerPtr& cache_manager)
 {
   try
   {
@@ -349,7 +349,7 @@ WindowImpl::WindowImpl (const DeviceManagerPtr& device_manager, syslib::Window& 
       if (!adapter)
         throw xtl::format_operation_exception ("", "Null adapter after render::low_level::DriverManager::CreateSwapChainAndDevice");
 
-      impl->device_manager = DeviceManagerPtr (new render::DeviceManager (device, driver, settings), false);
+      impl->device_manager = DeviceManagerPtr (new render::DeviceManager (device, driver, settings, cache_manager), false);
       impl->adapter        = impl->swap_chain->GetAdapter ();
       
       log.Printf ("...device manager and swap chain have been successfully created");

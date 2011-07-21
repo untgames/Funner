@@ -1,7 +1,5 @@
 #include "shared.h"
 
-//TODO: cache flush, common cache for all render objects
-
 using namespace render;
 
 namespace
@@ -33,18 +31,13 @@ struct ProgramCommonData: public xtl::reference_counter, public DebugIdHolder
 ///Конструктор
   ProgramCommonData (const DeviceManagerPtr& in_device_manager, const char* in_name)
     : device_manager (in_device_manager)
+    , dynamic_options_layout (&in_device_manager->CacheManager ())
     , need_update (true)
     , has_framemaps (false)
     , properties (in_device_manager)
   {
     try
-    {
-      if (!device_manager)
-        throw xtl::make_null_argument_exception ("", "device_manager");
-        
-      if (!in_name)
-        throw xtl::make_null_argument_exception ("", "name");
-        
+    {        
       name = in_name;        
 
       render::low_level::StateBlockMask mask;
@@ -147,8 +140,8 @@ size_t hash (const OptionsCacheCombinationKey& key)
   return key.hash1 * key.hash2;
 }
 
-typedef xtl::intrusive_ptr<OptionsCacheCombinationValue>                           OptionsCacheCombinationValuePtr;
-typedef stl::hash_map<OptionsCacheCombinationKey, OptionsCacheCombinationValuePtr> OptionsCacheCombinationMap;
+typedef xtl::intrusive_ptr<OptionsCacheCombinationValue>                      OptionsCacheCombinationValuePtr;
+typedef CacheMap<OptionsCacheCombinationKey, OptionsCacheCombinationValuePtr> OptionsCacheCombinationMap;
 
 }
 
@@ -168,16 +161,12 @@ struct Program::Impl: public DebugIdHolder
   
 ///Конструктор
   Impl (const DeviceManagerPtr& device_manager, const char* name, const char* static_options, const char* dynamic_options)
-    : common_data (new ProgramCommonData (device_manager, name), false)
+    : options_cache_combinations (&device_manager->CacheManager ())
   {
     try
     {
-      if (!static_options)
-        throw xtl::make_null_argument_exception ("", "static_options");
-        
-      if (!dynamic_options)
-        throw xtl::make_null_argument_exception ("", "dynamic_options");
-        
+      common_data = ProgramCommonDataPtr (new ProgramCommonData (device_manager, name), false);      
+              
       common_data->static_options  = static_options;      
       common_data->dynamic_options = dynamic_options;
       
@@ -200,6 +189,7 @@ struct Program::Impl: public DebugIdHolder
   
   Impl (const Impl& impl, const ShaderOptions& in_options)
     : common_data (impl.common_data)
+    , options_cache_combinations (&common_data->device_manager->CacheManager ())
     , options (impl.options)
   {
     options.options      += " ";
@@ -223,8 +213,28 @@ struct Program::Impl: public DebugIdHolder
 */
 
 Program::Program (const DeviceManagerPtr& device_manager, const char* name, const char* static_options, const char* dynamic_options)
-  : impl (new Impl (device_manager, name, static_options, dynamic_options))
 {
+  try
+  {
+    if (!static_options)
+      throw xtl::make_null_argument_exception ("", "static_options");
+      
+    if (!dynamic_options)
+      throw xtl::make_null_argument_exception ("", "dynamic_options");
+
+    if (!device_manager)
+      throw xtl::make_null_argument_exception ("", "device_manager");    
+      
+    if (!name)
+      throw xtl::make_null_argument_exception ("", "name");
+    
+    impl = new Impl (device_manager, name, static_options, dynamic_options); 
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::Program::Program");
+    throw;
+  }
 }
 
 Program::Program (Program& parent, const ShaderOptions& options)
@@ -459,10 +469,8 @@ Program& Program::DerivedProgram (ShaderOptionsCache& cache1, ShaderOptionsCache
 
     OptionsCacheCombinationKey key (options1.options_hash, options2.options_hash);
 
-    OptionsCacheCombinationMap::iterator iter = impl->options_cache_combinations.find (key);
-
-    if (iter != impl->options_cache_combinations.end ())
-      return *iter->second->program;
+    if (OptionsCacheCombinationValuePtr* result = impl->options_cache_combinations.Find (key))
+      return *(*result)->program;
 
     ShaderOptions derived_options;
     
@@ -474,7 +482,7 @@ Program& Program::DerivedProgram (ShaderOptionsCache& cache1, ShaderOptionsCache
     value->options = derived_options;
     value->program = &DerivedProgram (derived_options);
 
-    impl->options_cache_combinations.insert_pair (key, value);
+    impl->options_cache_combinations.Add (key, value);
 
     return *value->program;
   }

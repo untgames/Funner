@@ -28,6 +28,7 @@ class EntityLodCommonData: public CacheHolder, public DebugIdHolder
       , texture_manager (in_texture_manager)
       , properties (in_device_manager)
       , entity_parameters_layout (&in_device_manager->Device (), &in_device_manager->Settings ())
+      , shader_options_cache (&in_device_manager->CacheManager ())
       , scissor_state (false)
     {
       StateBlockMask mask;

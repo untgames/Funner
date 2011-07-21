@@ -27,6 +27,7 @@ struct RenderManagerImpl::Impl: public xtl::trackable
   SettingsPtr         settings;                                      //настройки рендеринга
   Log                 log;                                           //протокол сообщений
   DeviceManagerPtr    device_manager;                                //менеджер устройства отрисовки
+  CacheManagerPtr     cache_manager;                                 //менеджер кэширования
   WindowSignal        window_signals [RenderManagerWindowEvent_Num]; //оконные сигналы
   WindowArray         windows;                                       //окна
   TextureManagerPtr   textures;                                      //текстуры
@@ -39,6 +40,7 @@ struct RenderManagerImpl::Impl: public xtl::trackable
   Impl (RenderManagerImpl* in_owner)
     : owner (in_owner)
     , settings (new render::Settings, false)
+    , cache_manager (new render::CacheManager, false)
   {
     windows.reserve (WINDOW_ARRAY_RESERVE_SIZE);
   }
@@ -133,6 +135,11 @@ DeviceManager& RenderManagerImpl::DeviceManager ()
   return impl->DeviceManager ();
 }
 
+CacheManager& RenderManagerImpl::CacheManager ()
+{
+  return *impl->cache_manager;
+}
+
 TextureManager& RenderManagerImpl::TextureManager ()
 {
   try
@@ -221,7 +228,7 @@ WindowPtr RenderManagerImpl::CreateWindow (syslib::Window& sys_window, common::P
 {
   try
   {
-    WindowPtr window (new WindowImpl (impl->device_manager, sys_window, properties, impl->settings), false);
+    WindowPtr window (new WindowImpl (impl->device_manager, sys_window, properties, impl->settings, impl->cache_manager), false);
     
     window->connect_tracker (xtl::bind (&Impl::OnWindowDestroy, &*impl, &*window), *impl);
 
