@@ -29,7 +29,7 @@ struct PrimarySwapChain::Impl
     : adapter (pixel_format.adapter)
     , library (&adapter->GetLibrary ())
     , pixel_format_index (pixel_format.pixel_format_index)
-    , display ((Display*)syslib::x11::DisplayManager::DisplayHandle ())
+    , display (DisplayManager::DisplayHandle ())
     , window  ((Window)in_desc.window_handle)
   {
     try
