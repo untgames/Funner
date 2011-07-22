@@ -114,7 +114,7 @@ struct ProgramCommonData: public xtl::reference_counter, public DebugIdHolder
 typedef xtl::intrusive_ptr<ProgramCommonData> ProgramCommonDataPtr;
 
 /*
-    Программа соответствующая паре кэшей
+    Программа, соответствующая паре кэшей
 */
 
 struct OptionsCacheCombinationKey
@@ -131,8 +131,8 @@ struct OptionsCacheCombinationKey
 
 struct OptionsCacheCombinationValue: public xtl::reference_counter
 {
-  ShaderOptions options;
-  ProgramPtr    program;
+  ShaderOptions options; //список опций программы
+  ProgramPtr    program; //программа    
 };
 
 size_t hash (const OptionsCacheCombinationKey& key)
@@ -471,6 +471,9 @@ Program& Program::DerivedProgram (ShaderOptionsCache& cache1, ShaderOptionsCache
 
     if (OptionsCacheCombinationValuePtr* result = impl->options_cache_combinations.Find (key))
       return *(*result)->program;
+
+    if (impl->common_data->device_manager->Settings ().HasDebugLog ())
+      impl->common_data->log.Printf ("Create derived program '%s' for options '%s' + '%s'", Name (), options1.options.c_str (), options2.options.c_str ());
 
     ShaderOptions derived_options;
     

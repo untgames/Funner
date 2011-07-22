@@ -16,6 +16,7 @@ struct ProgramParametersManager::Impl: public xtl::trackable
   LayoutMap           layouts;           //лэйауты параметров различной конфигурации
   CompositeLayoutMap  composite_layouts; //составные лэйауты параметров различной конфигурации
   SettingsPtr         settings;          //настройки менеджера рендеринга
+  Log                 log;               //поток отладочного протоколирования
 
 ///Конструктор
   Impl (const LowLevelDevicePtr& in_device, const SettingsPtr& in_settings, const CacheManagerPtr& cache_manager)
@@ -121,6 +122,9 @@ ProgramParametersLayoutPtr ProgramParametersManager::GetParameters
 
     if (ProgramParametersLayoutPtr* layout = impl->composite_layouts.Find (hash))
       return *layout;
+      
+    if (impl->settings->HasDebugLog ())
+      impl->log.Printf ("Create composite program parameters layout for hash %08x", hash);
 
     ProgramParametersLayoutPtr result_layout (new ProgramParametersLayout (impl->device, impl->settings), false);
 
