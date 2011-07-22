@@ -104,7 +104,7 @@ struct FrameImpl::Impl: public CacheHolder
   EntityArray                 entities;                //список объектов, отображаемых в кадре
   FrameArray                  frames;                  //список вложенных кадров
   PropertyBuffer              properties;              //свойства кадра
-  PropertyCache               entities_properties;     //динамические свойства объектов
+  PropertyCachePtr            entities_properties;     //динамические свойства объектов
   render::ShaderOptionsCache  shader_options_cache;    //кэш опций шейдера
   RenderTargetDescMap         render_targets;          //целевые буферы отрисовки
   TextureMap                  textures;                //локальные текстуры фрейма
@@ -118,10 +118,10 @@ struct FrameImpl::Impl: public CacheHolder
   EntityDrawParams            entity_draw_params;      //параметры рисования объектов (кэш)
 
 ///Конструктор
-  Impl (const DeviceManagerPtr& device_manager, const EffectManagerPtr& effect_manager)
+  Impl (const DeviceManagerPtr& device_manager, const EffectManagerPtr& effect_manager, const PropertyCachePtr& in_property_cache)
     : effect_holder (new EffectHolder (effect_manager, device_manager))
     , properties (device_manager)
-    , entities_properties (device_manager)
+    , entities_properties (in_property_cache)
     , shader_options_cache (&device_manager->CacheManager ())
     , scissor_state (false)
     , clear_flags (ClearFlag_All)
@@ -172,7 +172,7 @@ struct FrameImpl::Impl: public CacheHolder
    Конструктор / деструктор
 */
 
-FrameImpl::FrameImpl (const DeviceManagerPtr& device_manager, const EffectManagerPtr& effect_manager)
+FrameImpl::FrameImpl (const DeviceManagerPtr& device_manager, const EffectManagerPtr& effect_manager, const PropertyCachePtr& property_cache)
 {
   try
   {
@@ -181,8 +181,11 @@ FrameImpl::FrameImpl (const DeviceManagerPtr& device_manager, const EffectManage
     
     if (!device_manager)
       throw xtl::make_null_argument_exception ("", "device_manager");
+      
+    if (!property_cache)
+      throw xtl::make_null_argument_exception ("", "property_cache");
     
-    impl = new Impl (device_manager, effect_manager);    
+    impl = new Impl (device_manager, effect_manager, property_cache);
   }
   catch (xtl::exception& e)
   {
@@ -626,7 +629,6 @@ void FrameImpl::AddEntity (const EntityPtr& entity)
 void FrameImpl::RemoveAllEntities ()
 {
   impl->entities.clear ();
-  impl->entities_properties.Flush ();  
 }
 
 /*
@@ -674,7 +676,7 @@ void FrameImpl::Prerender (EntityDrawFunction entity_draw_handler)
   Frame                   frame                   = Wrappers::Wrap<Frame> (this);
   bool                    has_entity_draw_handler = entity_draw_handler;
   EntityDrawParams&       entity_draw_params      = impl->entity_draw_params;
-  PropertyCache&          entities_properties     = impl->entities_properties;
+  PropertyCache&          entities_properties     = *impl->entities_properties;
   
   renderer.RemoveAllOperations ();
   
@@ -735,26 +737,60 @@ void FrameImpl::Draw (RenderingContext* previous_context)
 {
   try
   {
+      //обновление кэша
+    
     UpdateCache ();
     
-    RenderingContext context (*this, previous_context);
+      //обновление маркеров отрисовки для корневых кадров
     
-    if (!impl->effect_holder->effect_renderer)
-      throw xtl::format_operation_exception ("", "No effect assigned");
+    if (!previous_context)
+      impl->effect_holder->device_manager->CacheManager ().UpdateMarkers ();
       
-      //построение списка операций
+    try
+    {
+        //формирование контекста отрисовки
       
-    Prerender (impl->entity_draw_handler);
+      RenderingContext context (*this, previous_context);
       
-      //выполнение операций рендеринга
+      if (!impl->effect_holder->effect_renderer)
+        throw xtl::format_operation_exception ("", "No effect assigned");
+        
+        //построение списка операций
+        
+      Prerender (impl->entity_draw_handler);
+        
+        //выполнение операций рендеринга
 
-    impl->effect_holder->effect_renderer->ExecuteOperations (context);
+      impl->effect_holder->effect_renderer->ExecuteOperations (context);
+      
+        //очистка временных данных
+      
+      if (!previous_context)
+        Cleanup ();
+    }
+    catch (...)
+    {
+      if (!previous_context)
+        Cleanup ();      
+
+      throw;
+    }
   }
   catch (xtl::exception& e)
   {
     e.touch ("render::FrameImpl::Draw");
     throw;
   }
+}
+
+/*
+    Очистка после рисования кадра
+*/
+
+void FrameImpl::Cleanup ()
+{
+  impl->entities_properties->Reset ();
+  impl->effect_holder->device_manager->CacheManager ().FlushCaches ();    
 }
 
 /*

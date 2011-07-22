@@ -223,7 +223,7 @@ void CacheMap<Key, Value>::FlushCache ()
     Item& item = item_list.back ()->second;
     
     if (current_time - item.last_use_time <= time_delay && current_frame - item.last_use_frame <= frame_delay)
-      return;
+      return;      
       
     item_map.erase (item_list.back ());
     item_list.pop_back ();

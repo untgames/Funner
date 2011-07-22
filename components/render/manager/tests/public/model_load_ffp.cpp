@@ -77,7 +77,7 @@ int main ()
 
     render_manager.LoadResource ("data/spy.xmesh");
     render_manager.LoadResource ("data/spy.xmtl");
-    render_manager.LoadResource ("data/spy.rfx");
+    render_manager.LoadResource ("data/spy.rfx");    
     
     Entity entity = render_manager.CreateEntity ();
     

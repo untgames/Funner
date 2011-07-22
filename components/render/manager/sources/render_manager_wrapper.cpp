@@ -239,6 +239,26 @@ void RenderManager::ResetCache ()
   impl->ResetCache ();
 }
 
+void RenderManager::SetCacheTimeDelay (size_t milliseconds)
+{
+  impl->CacheManager ().SetTimeDelay (milliseconds);
+}
+
+void RenderManager::SetCacheFrameDelay (size_t frames_count)
+{
+  impl->CacheManager ().SetFrameDelay (frames_count);
+}
+
+size_t RenderManager::CacheTimeDelay () const
+{
+  return impl->CacheManager ().TimeDelay ();
+}
+
+size_t RenderManager::CacheFrameDelay () const
+{
+  return impl->CacheManager ().FrameDelay ();
+}
+
 xtl::connection RenderManager::RegisterWindowEventHandler (RenderManagerWindowEvent event, const WindowEventHandler& handler) const
 {
   return impl->RegisterWindowEventHandler (event, handler);

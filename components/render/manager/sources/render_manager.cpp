@@ -28,6 +28,7 @@ struct RenderManagerImpl::Impl: public xtl::trackable
   Log                 log;                                           //протокол сообщений
   DeviceManagerPtr    device_manager;                                //менеджер устройства отрисовки
   CacheManagerPtr     cache_manager;                                 //менеджер кэширования
+  PropertyCachePtr    property_cache;                                //кэш буферов свойств
   WindowSignal        window_signals [RenderManagerWindowEvent_Num]; //оконные сигналы
   WindowArray         windows;                                       //окна
   TextureManagerPtr   textures;                                      //текстуры
@@ -52,6 +53,15 @@ struct RenderManagerImpl::Impl: public xtl::trackable
       throw xtl::format_operation_exception ("render::RenderManagerImpl::Impl::DeviceManager", "Device not initialized. Create rendering window first");
       
     return *device_manager;
+  }
+
+///Получение кэша буферов свойств
+  render::PropertyCache& PropertyCache ()
+  {
+    if (!property_cache)
+      property_cache = PropertyCachePtr (new render::PropertyCache (&DeviceManager ()), false);
+
+    return *property_cache;
   }
   
 ///Оповещение об удалении окна
@@ -355,7 +365,7 @@ FramePtr RenderManagerImpl::CreateFrame ()
 {
   try
   {
-    return FramePtr (new FrameImpl (impl->device_manager, &EffectManager ()), false);
+    return FramePtr (new FrameImpl (&impl->DeviceManager (), &EffectManager (), &impl->PropertyCache ()), false);
   }
   catch (xtl::exception& e)
   {
@@ -368,7 +378,7 @@ EntityPtr RenderManagerImpl::CreateEntity ()
 {
   try
   {
-    return EntityPtr (new EntityImpl (impl->device_manager, impl->textures, impl->primitives), false);
+    return EntityPtr (new EntityImpl (&impl->DeviceManager (), &TextureManager (), &PrimitiveManager ()), false);
   }
   catch (xtl::exception& e)
   {
