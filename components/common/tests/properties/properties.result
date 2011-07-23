@@ -2,12 +2,12 @@ Results of properties_test:
 create properties
 map has 0 properties (hash=ffffffff, layout_hash=ffffffff):
 add properties
-map has 3 properties (hash=e5aeb685, layout_hash=59761f01):
+map has 3 properties (hash=5a5fdf84, layout_hash=f790e824):
  #0: name='X', type=string, value='1'
  #1: name='Y', type=string, value='3.14'
  #2: name='Z', type=string, value='hello world'
 remove properties
-map has 2 properties (hash=d7f47097, layout_hash=464f5a08):
+map has 2 properties (hash=d4c9d839, layout_hash=ba565b70):
  #0: name='X', type=string, value='1'
  #1: name='Z', type=string, value='hello world'
 clear
@@ -16,7 +16,7 @@ change property name
 exception: Invalid argument <property_name>='UnknownProperty'. There is no property with this name
     at common::PropertyLayout::SetPropertyName(const char*,const char*)
     at common::PropertyMap::SetPropertyName(const char*,const char*)
-map has 3 properties (hash=6f7ca18c, layout_hash=3658e884):
+map has 3 properties (hash=18382e4e, layout_hash=50dbace6):
  #0: name='X', type=string, value='1'
  #1: name='Y', type=string, value='3.14'
  #2: name='NewZ', type=string, value='hello world'
@@ -25,12 +25,12 @@ exception: Could not convert property 'NewZ' from string='hello world' to vector
     at common::PropertyMap::Impl::ReadValueToProperty(const char*,PropertyDesc&)
     at common::PropertyMap::SetPropertyType(size_t,PropertyType)
     at common::PropertyMap::SetPropertyType(const char*,PropertyType)
-map has 3 properties (hash=bdeafae5, layout_hash=e5c1109e):
+map has 3 properties (hash=6a351382, layout_hash=1dea3343):
  #0: name='X', type=float, value='1'
  #1: name='Y', type=string, value='3.14'
  #2: name='NewZ', type=string, value='hello world'
 clone
-map has 3 properties (hash=bdeafae5, layout_hash=e5c1109e):
+map has 3 properties (hash=6a351382, layout_hash=1dea3343):
  #0: name='X', type=float, value='1'
  #1: name='Y', type=string, value='3.14'
  #2: name='NewZ', type=string, value='hello world'

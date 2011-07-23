@@ -6,10 +6,10 @@ mips_count:   7
 format:       'rgb_pvrtc4'
 layers:
   layer0:
-    mip0: size=2048, crc32=20940f24
-    mip1: size=512, crc32=e7fb5177
-    mip2: size=128, crc32=0da91b58
-    mip3: size=32, crc32=09e1e569
-    mip4: size=32, crc32=47aee8bc
-    mip5: size=32, crc32=e7530ec0
-    mip6: size=32, crc32=2ad353ea
+    mip0: size=2048, crc32=ec65f861
+    mip1: size=512, crc32=d59387de
+    mip2: size=128, crc32=d11f1961
+    mip3: size=32, crc32=1de0df3d
+    mip4: size=32, crc32=e536f15a
+    mip5: size=32, crc32=c285606a
+    mip6: size=32, crc32=d8432862

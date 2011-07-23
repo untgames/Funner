@@ -12,14 +12,14 @@ Load 11 mips:
   level09: size=8
   level10: size=8
 Set 11 mips:
-  level00: width=1024, height=256, hash=d9272bf6
-  level01: width=512, height=128, hash=aa984fca
-  level02: width=256, height=64, hash=8aa1b0dc
-  level03: width=128, height=32, hash=60fe7c5b
-  level04: width=64, height=16, hash=91c65391
-  level05: width=32, height=8, hash=72770f6d
-  level06: width=16, height=4, hash=3f493524
-  level07: width=8, height=2, hash=67ac4575
-  level08: width=4, height=1, hash=7adfff82
-  level09: width=2, height=1, hash=0e0f4bea
-  level10: width=1, height=1, hash=00be26ed
+  level00: width=1024, height=256, hash=fcd42ed4
+  level01: width=512, height=128, hash=970f27d4
+  level02: width=256, height=64, hash=17a4f527
+  level03: width=128, height=32, hash=617cfc5d
+  level04: width=64, height=16, hash=7858e7d6
+  level05: width=32, height=8, hash=886b1f6d
+  level06: width=16, height=4, hash=93053416
+  level07: width=8, height=2, hash=c5f64c2f
+  level08: width=4, height=1, hash=545581e0
+  level09: width=2, height=1, hash=aa7ab40b
+  level10: width=1, height=1, hash=9f9b5c85

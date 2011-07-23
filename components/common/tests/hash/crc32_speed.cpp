@@ -6,6 +6,7 @@
 using namespace common;
 
 const size_t TEST_ARRAY_SIZE = 1024 * 1024 * 128;
+const size_t CORRECT_HASH    = 2716519439;
 
 int main ()
 {
@@ -24,7 +25,7 @@ int main ()
 
   size_t end_time = common::milliseconds ();
 
-  printf ("Data hash %u, crc speed = %f MB/s\n", crc_value, TEST_ARRAY_SIZE / ((end_time - start_time) / 1000.f) / 1024 / 1024);
+  printf ("Data hash correct %c, crc speed = %f MB/s\n", crc_value == CORRECT_HASH ? 'y' : 'n', TEST_ARRAY_SIZE / ((end_time - start_time) / 1000.f) / 1024 / 1024);
 
   delete [] test_array;
 
