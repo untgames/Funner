@@ -86,28 +86,28 @@ inline size_t crc32 (wchar_t data, size_t crc)
   return crc32 (c [1], crc32 (c [0], crc));
 }
 
-#include <nmmintrin.h>
+//#include <nmmintrin.h>
 
-size_t crc32 (const void* data,size_t size,size_t crc)
+size_t crc32 (const void* data, size_t data_size, size_t crc)
 {
   //msvc 2010 x86 version
 
 /*  size_t *cur_data = (size_t*)data;
 
-  for (size_t i = 0, count = size / sizeof (size_t); i < count; i++, cur_data++)
+  for (size_t i = 0, count = data_size / sizeof (size_t); i < count; i++, cur_data++)
     crc = _mm_crc32_u32 (crc, *cur_data);
 
   unsigned char* cur_data_char = (unsigned char*)cur_data;
 
-  for (size_t i = 0, count = size % sizeof (size_t); i < count; i++, cur_data_char++)
+  for (size_t i = 0, count = data_size % sizeof (size_t); i < count; i++, cur_data_char++)
     crc = _mm_crc32_u8 (crc, *cur_data_char);
 
   return crc;*/
 
 /* gcc version
 
-  unsigned int  quotient  = size / sizeof (unsigned long);
-  unsigned int  remainder = size % sizeof (unsigned long);
+  unsigned int  quotient  = data_size / sizeof (unsigned long);
+  unsigned int  remainder = data_size % sizeof (unsigned long);
   unsigned long *cur_data = (unsigned long*)data;
 
   while (quotient--)
@@ -140,7 +140,140 @@ size_t crc32 (const void* data,size_t size,size_t crc)
 
   return crc;*/
 
-  for (const unsigned char* p=(const unsigned char*)data;size--;crc=crc32 (*p++,crc));
+/* // Скорость идентична с С-кодом // Register use:
+  //      eax - CRC32 value
+  //      ebx - a lot of things
+  //      ecx - CRC32 value
+  //      edx - address of end of buffer
+  //      esi - address of start of buffer
+  //      edi - CRC32 table
+
+  if (!data_size)
+    return crc;
+
+  __asm
+  {
+      // Save the esi and edi registers
+      push esi
+      push edi
+
+      mov ecx, crc                // load crc
+
+      mov esi, data               // Load data
+      mov edx, data_size          // Load data_size
+
+  crc32loop:
+      xor eax, eax                // Clear the eax register
+      mov bl, byte ptr [esi]      // Load the current source byte
+
+      mov al, cl                  // Copy crc value into eax
+
+      xor al, bl                  // Create the index into the CRC32 table
+      shr ecx, 8
+
+      xor ecx, [edi + eax * 4]    // xor with the current byte
+
+      inc esi                     // Advance the source pointer
+      dec edx
+      jnz crc32loop
+
+      // Restore the edi and esi registers
+      pop edi
+      pop esi
+
+      mov [crc], ecx              // Write the result
+  }
+
+  return crc;*/
+
+/* в 2,5 раза медленнее интринсиков
+ *     size_t *cur_data = (size_t*)data;
+
+    for (size_t i = 0, count = data_size / sizeof (size_t); i < count; i++, cur_data++)
+    {
+      __asm
+      {
+        mov esi, cur_data
+        mov eax, crc
+        CRC32 eax, dword ptr [esi]
+        mov [crc], eax
+      }
+    }
+
+    unsigned char* cur_data_char = (unsigned char*)cur_data;
+
+    for (size_t i = 0, count = data_size % sizeof (size_t); i < count; i++, cur_data_char++)
+    {
+      __asm
+      {
+        mov esi, cur_data_char
+        mov eax, crc
+        CRC32 eax, byte ptr [esi]
+        mov [crc], eax
+      }
+    }
+
+    return crc;*/
+
+/* Скорость идентична интринсинкам
+
+    size_t dwords_count = data_size / sizeof (size_t);
+
+    if (dwords_count)
+    {
+      __asm
+      {
+          push esi
+
+          mov eax, crc
+
+          mov esi, data
+          mov edx, dwords_count
+
+      mainLoop:
+          CRC32 eax, dword ptr [esi]
+
+          add esi, 4
+          dec edx
+          jnz mainLoop
+
+          pop esi
+
+          mov [crc], eax              // Write the result
+      }
+    }
+
+    size_t remainder_count = data_size % sizeof (size_t);
+
+    if (remainder_count)
+    {
+      char* char_data = (char*)data + dwords_count * sizeof (size_t);
+
+      __asm
+      {
+          push esi
+
+          mov eax, crc
+
+          mov esi, char_data
+          mov edx, remainder_count
+
+      remainderLoop:
+          CRC32 eax, byte ptr [esi]
+
+          inc esi
+          dec edx
+          jnz remainderLoop
+
+          pop esi
+
+          mov [crc], eax              // Write the result
+      }
+    }
+
+    return crc;*/
+
+  for (const unsigned char* p=(const unsigned char*)data;data_size--;crc=crc32 (*p++,crc));
   return crc;
 }
 
