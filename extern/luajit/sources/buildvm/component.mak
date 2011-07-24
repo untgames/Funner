@@ -13,3 +13,9 @@ EXTERN.LUAJIT_BUILDVM.OUT_DIR             := $(LUAJIT_BUILD_INTERNALS_DIR)
 EXTERN.LUAJIT_BUILDVM.SOURCE_DIRS         := .
 EXTERN.LUAJIT_BUILDVM.INCLUDE_DIRS        := ../../include ../ljit
 EXTERN.LUAJIT_BUILDVM.g++.COMPILER_CFLAGS := -fomit-frame-pointer
+
+#По идее тоже самое должно быть для armv7, но armv7 сейчас не поддерживается в luajit
+#Сборка идет в папку мака, конфликт версий!!!!!!!!
+ifeq (iphone-device-armv6,$(LUAJIT_BUILDVM_TOOLSET))
+EXTERN.LUAJIT_BUILDVM.COMPILER_CFLAGS := -fomit-frame-pointer -DLUAJIT_OS=LUAJIT_OS_OSX -DLUAJIT_TARGET=LUAJIT_ARCH_arm
+endif
