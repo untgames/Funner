@@ -24,6 +24,11 @@ enum PixelFormat
   PixelFormat_RGB_PVRTC4,
   PixelFormat_RGBA_PVRTC2,
   PixelFormat_RGBA_PVRTC4,
+  PixelFormat_D16,
+  PixelFormat_D24X8,
+  PixelFormat_D24S8,
+  PixelFormat_D32,
+  PixelFormat_S8,
 
   PixelFormat_Num
 };

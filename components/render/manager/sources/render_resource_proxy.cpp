@@ -360,12 +360,14 @@ typename ResourceProxyManager<Ptr>::Pointer ResourceProxyManager<Ptr>::DefaultRe
 
 template class ResourceProxy<TexturePtr>;
 template class ResourceProxy<LowLevelSamplerStatePtr>;
+template class ResourceProxy<LowLevelTextureDescPtr>;
 template class ResourceProxy<MaterialPtr>;
 template class ResourceProxy<PrimitivePtr>;
 template class ResourceProxy<ProgramPtr>;
 template class ResourceProxy<EffectPtr>;
 template class ResourceProxyManager<TexturePtr>;
 template class ResourceProxyManager<LowLevelSamplerStatePtr>;
+template class ResourceProxyManager<LowLevelTextureDescPtr>;
 template class ResourceProxyManager<MaterialPtr>;
 template class ResourceProxyManager<PrimitivePtr>;
 template class ResourceProxyManager<ProgramPtr>;

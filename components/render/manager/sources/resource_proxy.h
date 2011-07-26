@@ -105,12 +105,14 @@ template <class Ptr> class ResourceProxyManager: public xtl::noncopyable
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 typedef ResourceProxy<TexturePtr>              TextureProxy;
 typedef ResourceProxy<LowLevelSamplerStatePtr> SamplerProxy;
+typedef ResourceProxy<LowLevelTextureDescPtr>  TextureDescProxy;
 typedef ResourceProxy<PrimitivePtr>            PrimitiveProxy;
 typedef ResourceProxy<MaterialPtr>             MaterialProxy;
 typedef ResourceProxy<ProgramPtr>              ProgramProxy;
 typedef ResourceProxy<EffectPtr>               EffectProxy;
 typedef TextureProxy::Manager                  TextureProxyManager;
 typedef SamplerProxy::Manager                  SamplerProxyManager;
+typedef TextureDescProxy::Manager              TextureDescProxyManager;
 typedef PrimitiveProxy::Manager                PrimitiveProxyManager;
 typedef MaterialProxy::Manager                 MaterialProxyManager;
 typedef ProgramProxy::Manager                  ProgramProxyManager;

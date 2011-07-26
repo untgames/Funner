@@ -73,6 +73,7 @@ render.manager: ...created texture 1024x1024x1@dxt1
 --- Create primitive & entity ---
 render.manager: Update material 'canyon.stn_1' cache (id=7)
 render.manager: Program parameters layout created (id=16)
+render.manager: Create composite program parameters layout for <6,16,0>
 render.manager: Program parameters layout created (id=17)
 render.manager: ...create state block for material
 render.manager: ...material cache updated

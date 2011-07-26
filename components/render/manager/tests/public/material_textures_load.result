@@ -39,6 +39,9 @@ render.manager: Effect rasterizer 'wireframe' loaded
 render.manager: Effect rasterizer 'overlays' loaded
 render.manager: Effect texture sampler 'default' loaded
 render.manager: Effect texture sampler 'repeat' loaded
+render.manager: Effect auxilary texture description 'mirror' loaded
+render.manager: Effect auxilary texture description 'shadow_map' loaded
+render.manager: Effect auxilary texture description 'depth_stencil_render_buffer' loaded
 render.manager: Effect shaders library 'data/shaders/*' loaded (7 shaders loaded)
 render.manager: Program 'phong' common data created (id=7)
 render.manager: Program 'phong' created (id=6)
@@ -60,6 +63,7 @@ render.manager: Texture 'data/pic1.dds' created (id=13)
 render.manager: ...created texture 1024x1024x1@dxt1
 render.manager: Update material 'canyon.stn_2' cache (id=4)
 render.manager: Program parameters layout created (id=14)
+render.manager: Create composite program parameters layout for <2,14,0>
 render.manager: Program parameters layout created (id=15)
 render.manager: ...create state block for material
 render.manager: ...material cache updated

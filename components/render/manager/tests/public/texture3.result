@@ -1,4 +1,4 @@
-Results of effect_loader_test:
+Results of local_texture_test:
 render.manager: Creating render window
 render.manager: Create device manager (driver='*', adapter='*', init_string='')
 render.manager: ...device manager and swap chain have been successfully created
@@ -32,7 +32,13 @@ render.manager: Effect program 'helper' loaded
 render.manager: Effect 'main' loaded
 render.manager: Effect 'shadow' loaded
 render.manager: Effect 'lighting' loaded
-Effects loaded
+render.manager: Texture 'shadow_map' created (id=7)
+Texture:
+  width:  2048
+  height: 2048
+  depth:  0
+  format: d32
+render.manager: Texture 'shadow_map' destroyed (id=7)
 window 784x562 removed
 render.manager: Program 'helper' destroyed for options = '' (id=5)
 render.manager: Program 'helper' common data destroyed (id=6)

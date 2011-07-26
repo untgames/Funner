@@ -65,6 +65,9 @@ render.manager: Effect rasterizer 'wireframe' loaded
 render.manager: Effect rasterizer 'overlays' loaded
 render.manager: Effect texture sampler 'default' loaded
 render.manager: Effect texture sampler 'repeat' loaded
+render.manager: Effect auxilary texture description 'mirror' loaded
+render.manager: Effect auxilary texture description 'shadow_map' loaded
+render.manager: Effect auxilary texture description 'depth_stencil_render_buffer' loaded
 render.manager: Effect shaders library 'data/shaders/*' loaded (7 shaders loaded)
 render.manager: Program 'phong' common data created (id=15)
 render.manager: Program 'phong' created (id=14)
@@ -90,6 +93,7 @@ render.manager: Entity lod created (entity_id=22, id=24)
 render.manager: Update entity cache (id=22)
 render.manager: Update material 'canyon.stn_1' cache (id=11)
 render.manager: Program parameters layout created (id=25)
+render.manager: Create composite program parameters layout for <10,25,0>
 render.manager: Program parameters layout created (id=26)
 render.manager: ...create state block for material
 render.manager: ...material cache updated

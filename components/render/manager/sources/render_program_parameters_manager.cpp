@@ -124,7 +124,7 @@ ProgramParametersLayoutPtr ProgramParametersManager::GetParameters
       return *layout;
       
     if (impl->settings->HasDebugLog ())
-      impl->log.Printf ("Create composite program parameters layout for hash %08x", hash);
+      impl->log.Printf ("Create composite program parameters layout for <%d,%d,%d>", layout1 ? layout1->Id () : 0, layout2 ? layout2->Id () : 0, layout3 ? layout3->Id () : 0);
 
     ProgramParametersLayoutPtr result_layout (new ProgramParametersLayout (impl->device, impl->settings), false);
 

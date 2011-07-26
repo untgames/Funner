@@ -41,12 +41,13 @@ typedef stl::hash_map<stl::hash_key<const char*>, TextureProxy> ProxyMap;
 
 struct TextureManager::Impl
 {
-  DeviceManagerPtr       device_manager;        //менеджер устройства отрисовки
-  TextureProxyManager    texture_proxy_manager; //менеджер прокси текстур
-  SamplerProxyManager    sampler_proxy_manager; //менеджер прокси сэмплеров
-  ProxyMap               loaded_textures;       //загруженные текстуры
-  DynamicTextureDescList dynamic_texture_descs; //реестр дескрипторов динамических текстур  
-  Log                    log;                   //протокол сообщений  
+  DeviceManagerPtr        device_manager;             //менеджер устройства отрисовки
+  TextureProxyManager     texture_proxy_manager;      //менеджер прокси текстур
+  TextureDescProxyManager texture_desc_proxy_manager; //менеджер прокси описателей текстур  
+  SamplerProxyManager     sampler_proxy_manager;      //менеджер прокси сэмплеров
+  ProxyMap                loaded_textures;            //загруженные текстуры
+  DynamicTextureDescList  dynamic_texture_descs;      //реестр дескрипторов динамических текстур  
+  Log                     log;                        //протокол сообщений  
   
   Impl (const DeviceManagerPtr& in_device_manager)
     : device_manager (in_device_manager)
@@ -70,6 +71,42 @@ TextureManager::~TextureManager ()
 /*
     Создание текстур
 */
+
+TexturePtr TextureManager::CreateTexture (const char* name)
+{
+  try
+  {
+    if (!name)
+      throw xtl::make_null_argument_exception ("", "name");
+    
+    LowLevelTextureDescPtr desc = FindTextureDesc (name);
+    
+    if (desc)
+    {
+      return TexturePtr (new TextureImpl (impl->device_manager, *desc, name), false);
+    }
+    else
+    {
+      if (media::CompressedImageManager::FindLoader (name, common::SerializerFindMode_ByName))
+      {
+        media::CompressedImage image (name);
+        
+        return CreateTexture (image, name);
+      }
+      else
+      {
+        media::Image image (name);
+
+        return CreateTexture (image, true, name);
+      }
+    }
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::TextureManager::CreateTexture(const char*)");
+    throw;
+  }
+}
 
 TexturePtr TextureManager::CreateTexture (const media::Image& image, bool generate_mips_enable, const char* name)
 {
@@ -229,7 +266,7 @@ void TextureManager::LoadTexture (const char* name)
     impl->log.Printf ("Loading texture '%s'", name);
       
     if (impl->loaded_textures.find (name) != impl->loaded_textures.end ())
-      throw xtl::format_operation_exception ("", "Texture '%s' has been already loaded", name);
+      throw xtl::format_operation_exception ("", "Texture '%s' has been already loaded", name);            
       
     TexturePtr texture;
 
@@ -318,6 +355,11 @@ TextureProxy TextureManager::GetTextureProxy (const char* name)
   return impl->texture_proxy_manager.GetProxy (name);
 }
 
+TextureDescProxy TextureManager::GetTextureDescProxy (const char* name)
+{
+  return impl->texture_desc_proxy_manager.GetProxy (name);
+}
+
 SamplerProxy TextureManager::GetSamplerProxy (const char* name)
 {
   return impl->sampler_proxy_manager.GetProxy (name);
@@ -330,6 +372,11 @@ SamplerProxy TextureManager::GetSamplerProxy (const char* name)
 TexturePtr TextureManager::FindTexture (const char* name)
 {
   return impl->texture_proxy_manager.FindResource (name);
+}
+
+LowLevelTextureDescPtr TextureManager::FindTextureDesc (const char* name)
+{
+  return impl->texture_desc_proxy_manager.FindResource (name);
 }
 
 LowLevelSamplerStatePtr TextureManager::FindSampler (const char* name)
@@ -422,6 +469,16 @@ void TextureManager::SetDefaultTexture (const TexturePtr& texture)
 TexturePtr TextureManager::DefaultTexture ()
 {
   return impl->texture_proxy_manager.DefaultResource ();
+}
+
+void TextureManager::SetDefaultTextureDesc (const LowLevelTextureDescPtr& texture)
+{
+  impl->texture_desc_proxy_manager.SetDefaultResource (texture);
+}
+
+LowLevelTextureDescPtr TextureManager::DefaultTextureDesc ()
+{
+  return impl->texture_desc_proxy_manager.DefaultResource ();
 }
 
 void TextureManager::SetDefaultSampler (const LowLevelSamplerStatePtr& sampler)

@@ -267,7 +267,7 @@ const render::low_level::ProgramParametersLayoutDesc& ProgramParametersLayout::P
 }
 
 /*
-    Хэш
+    Хэш / отладочный идентификатор
 */
 
 size_t ProgramParametersLayout::Hash () const
@@ -276,6 +276,11 @@ size_t ProgramParametersLayout::Hash () const
     impl->Rebuild ();
     
   return impl->hash;
+}
+
+size_t ProgramParametersLayout::Id () const
+{
+  return impl->Id ();
 }
 
 /*

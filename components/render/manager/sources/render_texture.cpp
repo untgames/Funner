@@ -104,7 +104,7 @@ struct TextureImpl::Impl: public DebugIdHolder
 };
 
 /*
-    Конструктор / деструктор / присваивание
+    Конструкторы / деструктор / присваивание
 */
 
 TextureImpl::TextureImpl 
@@ -143,6 +143,15 @@ TextureImpl::TextureImpl
         break;
       case PixelFormat_LA8:
         target_format = low_level::PixelFormat_LA8;
+        break;
+      case PixelFormat_D16:
+        target_format = low_level::PixelFormat_D16;
+        break;
+      case PixelFormat_D24X8:
+        target_format = low_level::PixelFormat_D24X8;
+        break;
+      case PixelFormat_D24S8:
+        target_format = low_level::PixelFormat_D24S8;
         break;
       default:
         throw xtl::make_argument_exception ("", "format", format);
@@ -188,7 +197,86 @@ TextureImpl::TextureImpl
   }
   catch (xtl::exception& e)
   {
-    e.touch ("render::TextureImpl::TextureImpl(const DeviceManagerPtr&,render::TextureDimension,size_t,size_t,size_t,render::PixelFormat,bool)");
+    e.touch ("render::TextureImpl::TextureImpl(const DeviceManagerPtr&,render::TextureDimension,size_t,size_t,size_t,render::PixelFormat,bool,const char*)");
+    throw;
+  }
+}
+
+TextureImpl::TextureImpl 
+ (const DeviceManagerPtr&       device_manager,
+  const low_level::TextureDesc& desc,
+  const char*                   name)
+{
+  try
+  {
+      //преобразование аргументов
+      
+    if (!device_manager)
+      throw xtl::make_null_argument_exception ("", "device_manager");
+    
+    PixelFormat      format;
+    TextureDimension dimension;
+    
+    switch (desc.format)
+    {
+      case low_level::PixelFormat_RGB8:
+        format = PixelFormat_RGB8;
+        break;
+      case low_level::PixelFormat_RGBA8:
+        format = PixelFormat_RGBA8;
+        break;
+      case low_level::PixelFormat_L8:
+        format = PixelFormat_L8;
+        break;
+      case low_level::PixelFormat_A8:
+        format = PixelFormat_A8;
+        break;
+      case low_level::PixelFormat_LA8:
+        format = PixelFormat_LA8;
+        break;
+      case low_level::PixelFormat_D16:
+        format = PixelFormat_D16;
+        break;
+      case low_level::PixelFormat_D24X8:
+        format = PixelFormat_D24X8;
+        break;
+      case low_level::PixelFormat_D24S8:
+        format = PixelFormat_D24S8;
+        break;
+      case low_level::PixelFormat_D32:
+        format = PixelFormat_D32;
+        break;
+      default:
+        throw xtl::make_argument_exception ("", "desc.format", desc.format);
+    }
+    
+    switch (desc.dimension)
+    {
+      case low_level::TextureDimension_2D:
+        dimension = TextureDimension_2D;
+        break;
+      case low_level::TextureDimension_3D:
+        dimension = TextureDimension_3D;
+        break;
+      case low_level::TextureDimension_Cubemap:
+        dimension = TextureDimension_Cubemap;
+        break;
+      default:
+        throw xtl::make_argument_exception ("", "desc.dimension", desc.dimension);
+    }
+
+      //создание текстуры
+      
+    impl = new Impl (device_manager, dimension, format, desc.format, name);
+
+    impl->width   = desc.width;
+    impl->height  = desc.height;
+    impl->depth   = desc.layers;
+    impl->texture = LowLevelTexturePtr (device_manager->Device ().CreateTexture (desc), false);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::TextureImpl::TextureImpl(const DeviceManagerPtr&,const render::low_level::TextureDesc&,const char*)");
     throw;
   }
 }
@@ -273,7 +361,7 @@ TextureImpl::TextureImpl (const DeviceManagerPtr& device_manager, render::Textur
   }
   catch (xtl::exception& e)
   {
-    e.touch ("render::TextureImpl::TextureImpl(const DeviceManagerPtr&,render::TextureDimension,const media::CompressedImage&)");
+    e.touch ("render::TextureImpl::TextureImpl(const DeviceManagerPtr&,render::TextureDimension,const media::CompressedImage&,const char*)");
     throw;
   }
 }

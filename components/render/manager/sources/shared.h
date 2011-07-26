@@ -12,6 +12,7 @@
 #include <xtl/intrusive_ptr.h>
 #include <xtl/iterator.h>
 #include <xtl/ref.h>
+#include <xtl/shared_ptr.h>
 #include <xtl/signal.h>
 #include <xtl/trackable.h>
 
@@ -113,6 +114,7 @@ typedef xtl::com_ptr<low_level::IStateBlock>              LowLevelStateBlockPtr;
 typedef xtl::com_ptr<low_level::IProgram>                 LowLevelProgramPtr;
 typedef xtl::com_ptr<low_level::IProgramParametersLayout> LowLevelProgramParametersLayoutPtr;
 typedef xtl::com_ptr<low_level::IPredicate>               LowLevelPredicatePtr;
+typedef xtl::shared_ptr<low_level::TextureDesc>           LowLevelTextureDescPtr;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///ќбЄртки

@@ -74,6 +74,7 @@ render.manager: ...created texture 1024x1024x1@dxt1
 --- Update primitive cache ---
 render.manager: Update material 'canyon.stn_1' cache (id=7)
 render.manager: Program parameters layout created (id=16)
+render.manager: Create composite program parameters layout for <6,16,0>
 render.manager: Program parameters layout created (id=17)
 render.manager: ...create state block for material
 render.manager: ...material cache updated
@@ -93,6 +94,7 @@ render.manager: ...primitive cache updated
 --- Update full material state ---
 render.manager: Program parameters layout created (id=18)
 render.manager: Update material 'canyon.stn_2' cache (id=8)
+render.manager: Create composite program parameters layout for <18,16,0>
 render.manager: Program parameters layout created (id=19)
 render.manager: ...create state block for material
 render.manager: ...material cache updated
@@ -126,6 +128,7 @@ render.manager: ...material cache updated
 render.manager: Program parameters layout created (id=21)
 render.manager: Update material 'canyon.stn_2' cache (id=8)
 render.manager: Program parameters layout created (id=22)
+render.manager: Create composite program parameters layout for <21,22,0>
 render.manager: Program parameters layout created (id=23)
 render.manager: ...material cache updated
 render.manager: Update mesh 'mesh2' primitive #1 cache (id=4)

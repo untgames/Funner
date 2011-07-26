@@ -126,6 +126,7 @@ template class EffectLoaderLibrary::Library<LowLevelRasterizerStatePtr>;
 template class EffectLoaderLibrary::Library<LowLevelBlendStatePtr>;
 template class EffectLoaderLibrary::Library<LowLevelDepthStencilStatePtr>;
 template class EffectLoaderLibrary::Library<LowLevelSamplerStatePtr>;
+template class EffectLoaderLibrary::Library<LowLevelTextureDescPtr>;
 template class EffectLoaderLibrary::Library<ProgramPtr>;
 template class EffectLoaderLibrary::Library<EffectPassPtr>;
 template class EffectLoaderLibrary::Library<EffectPtr>;
@@ -143,6 +144,7 @@ struct EffectLoaderLibrary::Impl
   BlendStateLibrary          blend_states;                //библиотека состояний уровня смешивания цветов
   DepthStencilStateLibrary   depth_stencil_states;        //библиотека состояний уровня отсечения
   SamplerStateLibrary        sampler_states;              //библиотека состояний текстурных сэмплеров
+  TextureDescLibrary         texture_descs;               //библиотека описателей текстур
   ProgramLibrary             programs;                    //библиотека программ
   media::rfx::ShaderLibrary  shaders;                     //библиотека шейдеров
   EffectPassLibrary          effect_passes;               //библиотека проходов эффекта
@@ -189,6 +191,11 @@ EffectLoaderLibrary::DepthStencilStateLibrary& EffectLoaderLibrary::DepthStencil
 EffectLoaderLibrary::SamplerStateLibrary& EffectLoaderLibrary::SamplerStates ()
 {
   return impl->sampler_states;
+}
+
+EffectLoaderLibrary::TextureDescLibrary& EffectLoaderLibrary::TextureDescs ()
+{
+  return impl->texture_descs;
 }
 
 EffectLoaderLibrary::ProgramLibrary& EffectLoaderLibrary::Programs ()

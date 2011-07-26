@@ -1,6 +1,5 @@
 //TODO: techniques / condition passes/subframes
 //TODO: templates for all states/program/frames/passes (general implementation)
-//TODO: temporary render targets
 
 library "data/shaders/*"
 
@@ -163,6 +162,32 @@ program "helper"
   shader  "debug" "glsl.vs" "glsl.ps" //reference to shader source
 }
 
+//auxilary texture description for mirror texture
+texture "mirror"
+{
+  dimension            auto                     //possible values: texture2d, texture3d, cubemap, auto
+  size                 2048 2048                //texture sizes
+  format               rgba8                    //pixel format
+  generate_mips_enable false                    //is mips generation enabled
+  bind_flags           texture render_target    //list of flags: texture, render_target, depth_stencil
+}
+
+//auxilary texture description for shadow texture
+texture "shadow_map"
+{
+  size       2048 2048
+  format     d32
+  bind_flags texture depth_stencil
+}
+
+//auxilary texture description for depth-stencil buffer
+texture "depth_stencil_render_buffer"
+{
+  size       2048 2048
+  format     rgba8
+  bind_flags depth_stencil
+}
+
 //description of effects rendering
 effect "main"
 {
@@ -237,15 +262,6 @@ effect "shadow"
     rasterizer_state      "default"     //rasterizer stage settings
     program               "shadow_map"  //this program overrides material programs
   }
-}
-
-texture "shadow_map"
-{
-  dimension 2
-  width     2048
-  height    2048
-  format    d32
-  bind      texture depth_stencil
 }
 
 effect "lighting"

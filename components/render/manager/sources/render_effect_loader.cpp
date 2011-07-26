@@ -68,6 +68,7 @@ class EffectLoader
       for_each_child (*iter, "depth_stencil", xtl::bind (&EffectLoader::ParseDepthStencilState, this, _1));
       for_each_child (*iter, "rasterizer",    xtl::bind (&EffectLoader::ParseRasterizerState, this, _1));
       for_each_child (*iter, "sampler",       xtl::bind (&EffectLoader::ParseSamplerState, this, _1));
+      for_each_child (*iter, "texture",       xtl::bind (&EffectLoader::ParseTextureDesc, this, _1));      
       for_each_child (*iter, "library",       xtl::bind (&EffectLoader::ParseShaderLibrary, this, _1));
       for_each_child (*iter, "program",       xtl::bind (&EffectLoader::ParseProgram, this, _1));
       for_each_child (*iter, "pass",          xtl::bind (&EffectLoader::ParseNamedPass, this, _1));
@@ -379,7 +380,7 @@ class EffectLoader
 ///Разбор фильтра минимизации текстур
     static TexMinFilter ParseTexMinFilter (const ParseNode& node)
     {
-      const char* value = get<const char*> (node, "", "Default");
+      const char* value = get<const char*> (node, "", "default");
       
       struct Tag2Value
       {
@@ -475,6 +476,160 @@ class EffectLoader
         parser.Log ().Error (*iter, "%s", e.what ());
         throw;
       }
+    }
+    
+///Разбор формата пикселей
+    static low_level::PixelFormat ParsePixelFormat (const ParseNode& node)
+    {
+      const char* value = get<const char*> (node, "");
+      
+      struct Tag2Value
+      {
+        const char*            tag;
+        low_level::PixelFormat value;
+      };
+      
+      static Tag2Value values [] = {
+        {"rgb8",            low_level::PixelFormat_RGB8},
+        {"rgba8",           low_level::PixelFormat_RGBA8},
+        {"l8",              low_level::PixelFormat_L8},
+        {"a8",              low_level::PixelFormat_A8},
+        {"la8",             low_level::PixelFormat_LA8},
+        {"dxt1",            low_level::PixelFormat_DXT1},
+        {"dxt3",            low_level::PixelFormat_DXT3},
+        {"dxt5",            low_level::PixelFormat_DXT5},
+        {"rgb_pvrtc2",      low_level::PixelFormat_RGB_PVRTC2},
+        {"rgb_pvrtc4",      low_level::PixelFormat_RGB_PVRTC4},
+        {"rgba_pvrtc2",     low_level::PixelFormat_RGBA_PVRTC2},
+        {"rgba_pvrtc4",     low_level::PixelFormat_RGBA_PVRTC4},
+        {"d16",             low_level::PixelFormat_D16},
+        {"d24x8",           low_level::PixelFormat_D24X8},
+        {"d24s8",           low_level::PixelFormat_D24S8},
+        {"d32",             low_level::PixelFormat_D32},
+        {"s8",              low_level::PixelFormat_S8},
+      };
+
+      static const size_t values_count = sizeof (values) / sizeof (*values);
+      
+      for (size_t i=0; i<values_count; i++)
+        if (!strcmp (values [i].tag, value))
+          return values [i].value;
+
+      raise_parser_exception (node, "Unexpected pixel format '%s'", value);
+      
+      return low_level::PixelFormat_RGBA8; 
+    }
+    
+///Разбор размерности текстуры
+    static low_level::TextureDimension ParseTextureDimension (const ParseNode& node)
+    {
+      const char* value = get<const char*> (node, "");
+      
+      struct Tag2Value
+      {
+        const char*                 tag;
+        low_level::TextureDimension value;
+      };
+      
+      static Tag2Value values [] = {
+        {"texture2d", low_level::TextureDimension_2D},
+        {"texture3d", low_level::TextureDimension_3D},
+        {"cubemap",   low_level::TextureDimension_Cubemap},
+      };
+
+      static const size_t values_count = sizeof (values) / sizeof (*values);
+      
+      for (size_t i=0; i<values_count; i++)
+        if (!strcmp (values [i].tag, value))
+          return values [i].value;
+
+      raise_parser_exception (node, "Unexpected texture dimension '%s'", value);
+      
+      return low_level::TextureDimension_2D;
+    }
+    
+///Разбор размера текстуры
+    static math::vec3ui ParseTextureSize (const ParseNode& node)
+    {
+      math::vec3ui result;
+      size_t       index = 0;
+
+      for (Parser::AttributeIterator params_iter = make_attribute_iterator (node); params_iter && index < 3; ++params_iter, ++index)
+        result [index] = xtl::io::get<size_t> (*params_iter);
+
+      return result;
+    }
+    
+///Разбор флагов биндинга
+    static size_t ParseBindFlags (const ParseNode& node)
+    {
+      size_t flags = 0;
+      
+      for (Parser::AttributeIterator params_iter = make_attribute_iterator (node); params_iter; ++params_iter)
+      {
+        const char* value = *params_iter;
+        
+        if      (!strcmp (value, "texture"))       flags |= BindFlag_Texture;
+        else if (!strcmp (value, "render_target")) flags |= BindFlag_RenderTarget;
+        else if (!strcmp (value, "depth_stencil")) flags |= BindFlag_DepthStencil;
+      }
+
+      return flags;
+    }
+    
+///Разбор описателя текстуры
+    void ParseTextureDesc (Parser::Iterator iter)
+    {
+      const char* id = get<const char*> (*iter, "");
+      
+      LowLevelTextureDescPtr desc (new low_level::TextureDesc);
+      
+      memset (&*desc, 0, sizeof (low_level::TextureDesc));
+      
+      if (!iter->First ("size"))
+        raise_parser_exception (*iter, "Texture must have size (use 'size' tag)");
+        
+      if (!iter->First ("bind_flags"))
+        raise_parser_exception (*iter, "Texture must have bind flags (use 'bind_flags' tag)");
+        
+      math::vec3ui size = ParseTextureSize (iter->First ("size"));
+      
+      desc->width  = size.x;
+      desc->height = size.y;
+      desc->layers = size.z;
+      
+      ParseNode dimension_node = iter->First ("dimension");
+      
+      if (!dimension_node || strcmp (get<const char*> (dimension_node, "", "auto"), "auto") == 0)
+      {
+        if      (desc->layers <= 1 && desc->height >= 1 && desc->width >= 1) desc->dimension = low_level::TextureDimension_2D;
+        else if (desc->layers >= 1 && desc->height >= 1 && desc->width >= 1) desc->dimension = low_level::TextureDimension_3D;
+        else
+        {
+          raise_parser_exception (dimension_node, "Can't detect texture dimension for size %ux%ux%u", desc->width, desc->height, desc->layers);
+        }
+      }
+      else
+      {
+        desc->dimension = ParseTextureDimension (dimension_node);
+      }
+      
+      desc->bind_flags           = ParseBindFlags (iter->First ("bind_flags"));
+      desc->format               = ParsePixelFormat (iter->First ("format"));
+      desc->generate_mips_enable = strcmp (get<const char*> (*iter, "generate_mips_enable", "false"), "true") == 0;
+      desc->access_flags         = low_level::AccessFlag_ReadWrite;
+      
+      try
+      {
+        library.TextureDescs ().Add (id, desc);
+        
+        log.Printf ("Effect auxilary texture description '%s' loaded", id);        
+      }
+      catch (std::exception& e)
+      {
+        parser.Log ().Error (*iter, "%s", e.what ());
+        throw;
+      }      
     }
     
 ///Лог-функтор загрузки шейдеров

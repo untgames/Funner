@@ -90,6 +90,11 @@ Frame RenderManager::CreateFrame ()
   return Wrappers::Wrap<Frame> (impl->CreateFrame ());
 }
 
+Texture RenderManager::CreateTexture (const char* name)
+{
+  return Wrappers::Wrap<Texture> (impl->TextureManager ().CreateTexture (name));
+}
+
 Texture RenderManager::CreateTexture (const media::Image& image, bool generate_mips_enable)
 {
   return Wrappers::Wrap<Texture> (impl->TextureManager ().CreateTexture (image, generate_mips_enable));

@@ -13,6 +13,7 @@ class TextureManager: public Object
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Создание текстур
 ///////////////////////////////////////////////////////////////////////////////////////////////////    
+    TexturePtr CreateTexture (const char* name);
     TexturePtr CreateTexture (const media::Image& image, bool generate_mipmaps, const char* name = "");
     TexturePtr CreateTexture (const media::Image& image, TextureDimension dimension, bool generate_mipmaps, const char* name = "");
     TexturePtr CreateTexture (const media::CompressedImage& image, const char* name = "");
@@ -34,14 +35,16 @@ class TextureManager: public Object
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Получение прокси
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    TextureProxy GetTextureProxy (const char* name); //создание прокси в случае отсутствия
-    SamplerProxy GetSamplerProxy (const char* name); //создание прокси в случае отсутствия
+    TextureProxy     GetTextureProxy     (const char* name); //создание прокси в случае отсутствия
+    TextureDescProxy GetTextureDescProxy (const char* name); //создание прокси в случае отсутствия
+    SamplerProxy     GetSamplerProxy     (const char* name); //создание прокси в случае отсутствия
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Поиск загруженной текстуры / сэмплера
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    TexturePtr              FindTexture (const char* name);
-    LowLevelSamplerStatePtr FindSampler (const char* name);
+    TexturePtr              FindTexture     (const char* name);
+    LowLevelTextureDescPtr  FindTextureDesc (const char* name);
+    LowLevelSamplerStatePtr FindSampler     (const char* name);
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Создание динамической текстуры
@@ -61,10 +64,12 @@ class TextureManager: public Object
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Установка текстуры по умолчанию / сэмплера по умолчанию
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void                    SetDefaultTexture (const TexturePtr& texture);
-    void                    SetDefaultSampler (const LowLevelSamplerStatePtr& sampler);
-    TexturePtr              DefaultTexture    ();
-    LowLevelSamplerStatePtr DefaultSampler    ();
+    void                    SetDefaultTexture     (const TexturePtr& texture);
+    void                    SetDefaultTextureDesc (const LowLevelTextureDescPtr& desc);
+    void                    SetDefaultSampler     (const LowLevelSamplerStatePtr& sampler);
+    TexturePtr              DefaultTexture        ();
+    LowLevelTextureDescPtr  DefaultTextureDesc    ();
+    LowLevelSamplerStatePtr DefaultSampler        ();
   
   private:
     struct Impl;

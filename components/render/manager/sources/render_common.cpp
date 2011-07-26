@@ -59,7 +59,12 @@ const char* get_name (PixelFormat format)
     case PixelFormat_RGB_PVRTC2:  return "rgb_pvrtc2";
     case PixelFormat_RGB_PVRTC4:  return "rgb_pvrtc4";
     case PixelFormat_RGBA_PVRTC2: return "rgba_pvrtc2";
-    case PixelFormat_RGBA_PVRTC4: return "rgba_pvrtc4";    
+    case PixelFormat_RGBA_PVRTC4: return "rgba_pvrtc4";
+    case PixelFormat_D16:         return "d16";
+    case PixelFormat_D24X8:       return "d24x8";
+    case PixelFormat_D24S8:       return "d24s8";
+    case PixelFormat_D32:         return "d32";
+    case PixelFormat_S8:          return "s8";    
     default:
       throw xtl::make_argument_exception ("render::get_name(render::PixelFormat)", "format", format);
   }

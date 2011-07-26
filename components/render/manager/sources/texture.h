@@ -16,6 +16,9 @@ class TextureImpl: public Object
                   bool                    generate_mipmaps,
                   const char*             name = "");
     TextureImpl  (const DeviceManagerPtr&       manager,
+                  const low_level::TextureDesc& desc,
+                  const char*                   name = "");                  
+    TextureImpl  (const DeviceManagerPtr&       manager,
                   TextureDimension              dimension,
                   const media::CompressedImage& image,
                   const char*                   name = "");

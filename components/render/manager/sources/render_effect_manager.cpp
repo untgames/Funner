@@ -5,16 +5,18 @@ using namespace render;
 namespace
 {
 
-typedef stl::vector<EffectProxy>  EffectProxyList;
-typedef stl::vector<SamplerProxy> SamplerProxyList;
-typedef stl::vector<ProgramProxy> ProgramProxyList;
+typedef stl::vector<EffectProxy>      EffectProxyList;
+typedef stl::vector<SamplerProxy>     SamplerProxyList;
+typedef stl::vector<ProgramProxy>     ProgramProxyList;
+typedef stl::vector<TextureDescProxy> TextureDescProxyList;
 
 struct EffectLibraryEntry: public xtl::reference_counter
 {
-  stl::string      resource_name;  //имя ресурса
-  EffectProxyList  effects;        //эффекты библиотеки
-  SamplerProxyList samplers;       //сэмплеры библиотеки
-  ProgramProxyList programs;       //программы библиотеки
+  stl::string          resource_name;  //имя ресурса
+  EffectProxyList      effects;        //эффекты библиотеки
+  SamplerProxyList     samplers;       //сэмплеры библиотеки
+  TextureDescProxyList texture_descs;  //описатели текстур
+  ProgramProxyList     programs;       //программы библиотеки
 
   EffectLibraryEntry () {}
 
@@ -22,6 +24,7 @@ struct EffectLibraryEntry: public xtl::reference_counter
   {
     Clear (effects);
     Clear (samplers);
+    Clear (texture_descs);
     Clear (programs);
   }
   
@@ -51,7 +54,16 @@ struct EffectLibraryEntry: public xtl::reference_counter
     
     samplers.push_back (proxy);
   }
-  
+
+  void AddTextureDesc (const char* id, const LowLevelTextureDescPtr& texture_desc, const TextureManagerPtr& texture_manager)
+  {
+    TextureDescProxy proxy = texture_manager->GetTextureDescProxy (id);
+    
+    proxy.SetResource (texture_desc);
+    
+    texture_descs.push_back (proxy);
+  }
+    
   template <class T> void Clear (stl::vector<ResourceProxy<T> >& items)
   {
     while (!items.empty ())
@@ -160,6 +172,7 @@ void EffectManager::LoadEffectLibrary (const char* name)
     library.Effects ().ForEach       (xtl::bind (&EffectLibraryEntry::AddEffect, &*entry, _1, _2, xtl::ref (impl->proxy_manager)));
     library.Programs ().ForEach      (xtl::bind (&EffectLibraryEntry::AddProgram, &*entry, _1, _2, xtl::ref (impl->program_manager)));
     library.SamplerStates ().ForEach (xtl::bind (&EffectLibraryEntry::AddSampler, &*entry, _1, _2, xtl::ref (impl->texture_manager)));
+    library.TextureDescs ().ForEach  (xtl::bind (&EffectLibraryEntry::AddTextureDesc, &*entry, _1, _2, xtl::ref (impl->texture_manager)));
 
       //регистрация библиотеки
       

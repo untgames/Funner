@@ -1,6 +1,5 @@
 //TODO: techniques / condition passes/subframes
 //TODO: templates for all states/program/frames/passes (general implementation)
-//TODO: temporary render targets
 
 library "data/shaders/*"
 
