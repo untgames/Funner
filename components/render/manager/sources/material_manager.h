@@ -26,7 +26,13 @@ class MaterialManager: public Object
     void LoadMaterialLibrary   (const char* name);
     void LoadMaterialLibrary   (const media::rfx::MaterialLibrary&);
     void UnloadMaterialLibrary (const char* name);
-    void UnloadMaterialLibrary (const media::rfx::MaterialLibrary&);    
+    void UnloadMaterialLibrary (const media::rfx::MaterialLibrary&);
+    
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Регистрация совместно используемых материалов
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void ShareMaterial   (const char* name, const MaterialPtr& material);
+    void UnshareMaterial (const char* name);
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Получение прокси

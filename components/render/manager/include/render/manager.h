@@ -92,6 +92,7 @@ class RenderManager
     PrimitiveBuffers CreatePrimitiveBuffers (MeshBufferUsage lines_usage = MeshBufferUsage_Stream, MeshBufferUsage sprites_usage = MeshBufferUsage_Stream);    
     Frame            CreateFrame            ();
     Entity           CreateEntity           ();
+    Texture          CreateTexture          (const char* name);
     Texture          CreateTexture          (const media::Image& image, bool generate_mipmaps = true);
     Texture          CreateTexture          (const media::Image& image, TextureDimension dimension, bool generate_mipmaps = true);
     Texture          CreateTexture          (const media::CompressedImage& image);
@@ -102,12 +103,25 @@ class RenderManager
     Material         CreateMaterial         ();
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Создание совместно используемых ресурсов
+///Создание/поиск совместно используемых ресурсов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     Texture   CreateSharedTexture   (const char* name);
     Material  CreateSharedMaterial  (const char* name);
     Primitive CreateSharedPrimitive (const char* name);
+    bool      HasSharedTexture      (const char* name);
+    bool      HasSharedMaterial     (const char* name);
+    bool      HasSharedPrimitive    (const char* name);
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Регистрация совместно используемых ресурсов
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void ShareTexture     (const char* name, const Texture& texture);
+    void ShareMaterial    (const char* name, const Material& material);
+    void SharePrimitive   (const char* name, const Primitive& primitive);
+    void UnshareTexture   (const char* name);
+    void UnshareMaterial  (const char* name);
+    void UnsharePrimitive (const char* name);
+    
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Загрузка ресурсов
 ///////////////////////////////////////////////////////////////////////////////////////////////////

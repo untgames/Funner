@@ -30,8 +30,9 @@ struct MaterialLibraryEntry: public xtl::reference_counter
   }
 };
 
-typedef xtl::intrusive_ptr<MaterialLibraryEntry> MaterialLibraryEntryPtr;
-typedef stl::list<MaterialLibraryEntryPtr>       MaterialLibraryList;
+typedef xtl::intrusive_ptr<MaterialLibraryEntry>                 MaterialLibraryEntryPtr;
+typedef stl::list<MaterialLibraryEntryPtr>                       MaterialLibraryList;
+typedef stl::hash_map<stl::hash_key<const char*>, MaterialProxy> MaterialProxyMap;
 
 }
 
@@ -42,6 +43,7 @@ struct MaterialManager::Impl
   ProgramManagerPtr     program_manager;  //менеджер программ
   MaterialProxyManager  proxy_manager;    //менеджер прокси объектов
   MaterialLibraryList   loaded_libraries; //список загруженных библиотек
+  MaterialProxyMap      shared_materials; //список совместно используемых материалов
   Log                   log;              //протокол сообщений
   
 ///Конструктор
@@ -212,6 +214,54 @@ void MaterialManager::UnloadMaterialLibrary (const char* name)
 void MaterialManager::UnloadMaterialLibrary (const media::rfx::MaterialLibrary& library)
 {
   impl->UnloadMaterialLibrary (&library, 0);
+}
+
+/*
+    Регистрация совместно используемых материалов
+*/
+
+void MaterialManager::ShareMaterial (const char* name, const MaterialPtr& material)
+{
+  try
+  {
+    if (!name)
+      throw xtl::make_null_argument_exception ("", "name");
+      
+    if (!material)
+      throw xtl::make_null_argument_exception ("", "material");
+      
+    impl->log.Printf ("Share material '%s'", name);
+      
+    if (impl->shared_materials.find (name) != impl->shared_materials.end ())
+      throw xtl::format_operation_exception ("", "Material '%s' has been already loaded", name);
+
+    MaterialProxy proxy = impl->proxy_manager.GetProxy (name);
+
+    proxy.SetResource (material);
+    
+    impl->shared_materials.insert_pair (name, proxy);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::MaterialManager::ShareMaterial");
+    throw;
+  }
+}
+
+void MaterialManager::UnshareMaterial (const char* name)
+{
+  if (!name)
+    return;
+    
+  MaterialProxyMap::iterator iter = impl->shared_materials.find (name);
+  
+  if (iter == impl->shared_materials.end ())
+    return;    
+    
+  iter->second.SetResource (MaterialPtr ());
+  iter->second.ResetCache ();
+    
+  impl->shared_materials.erase (iter);  
 }
 
 /*

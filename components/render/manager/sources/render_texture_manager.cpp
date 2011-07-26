@@ -262,6 +262,37 @@ void TextureManager::LoadTexture (const char* name)
   }
 }
 
+void TextureManager::ShareTexture (const char* name, const TexturePtr& texture)
+{
+  try
+  {
+    if (!name)
+      throw xtl::make_null_argument_exception ("", "name");
+      
+    if (!texture)
+      throw xtl::make_null_argument_exception ("", "texture");
+      
+    impl->log.Printf ("Share texture '%s'", name);
+      
+    if (impl->loaded_textures.find (name) != impl->loaded_textures.end ())
+      throw xtl::format_operation_exception ("", "Texture '%s' has been already loaded", name);
+      
+    TextureProxy proxy = impl->texture_proxy_manager.GetProxy (name);
+
+    proxy.SetResource (texture);
+
+    impl->loaded_textures.insert_pair (name, proxy);
+    
+    if (impl->device_manager->Settings ().HasDebugLog ())
+      impl->log.Printf ("...shared texture %ux%ux%u@%s", texture->Width (), texture->Height (), texture->Depth (), get_name (texture->Format ()));
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::TextureManager::ShareTexture");
+    throw;
+  }
+}
+
 void TextureManager::UnloadTexture (const char* name)
 {
   if (!name)

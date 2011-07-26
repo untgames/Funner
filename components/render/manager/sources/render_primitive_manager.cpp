@@ -29,17 +29,20 @@ struct MeshLibraryEntry: public xtl::reference_counter
   }
 };
 
-typedef xtl::intrusive_ptr<MeshLibraryEntry> MeshLibraryEntryPtr;
-typedef stl::list<MeshLibraryEntryPtr>       MeshLibraryList;
+typedef xtl::intrusive_ptr<MeshLibraryEntry>                      MeshLibraryEntryPtr;
+typedef stl::list<MeshLibraryEntryPtr>                            MeshLibraryList;
+typedef stl::hash_map<stl::hash_key<const char*>, PrimitiveProxy> PrimitiveProxyMap;
 
 }
 
 struct PrimitiveManager::Impl
 {
-  DeviceManagerPtr      device_manager;   //менеджер устройства отрисовки
-  MaterialManagerPtr    material_manager; //менеджер материалов
-  PrimitiveProxyManager proxy_manager;    //менеджер прокси объектов
-  MeshLibraryList       loaded_libraries; //список загруженных библиотек
+  DeviceManagerPtr      device_manager;    //менеджер устройства отрисовки
+  MaterialManagerPtr    material_manager;  //менеджер материалов
+  PrimitiveProxyManager proxy_manager;     //менеджер прокси объектов
+  MeshLibraryList       loaded_libraries;  //список загруженных библиотек
+  PrimitiveProxyMap     shared_primitives; //список совместно используемых примитивов
+  Log                   log;               //поток протоколирования
   
 ///Конструктор
   Impl (const DeviceManagerPtr& in_device_manager, const MaterialManagerPtr& in_material_manager)
@@ -234,6 +237,54 @@ void PrimitiveManager::UnloadMeshLibrary (const char* name)
 void PrimitiveManager::UnloadMeshLibrary (const media::geometry::MeshLibrary& library)
 {
   impl->UnloadMeshLibrary (&library, 0);
+}
+
+/*
+    Регистрация совместно используемых примитивов
+*/
+
+void PrimitiveManager::SharePrimitive (const char* name, const PrimitivePtr& primitive)
+{
+  try
+  {
+    if (!name)
+      throw xtl::make_null_argument_exception ("", "name");
+      
+    if (!primitive)
+      throw xtl::make_null_argument_exception ("", "primitive");
+      
+    impl->log.Printf ("Share primitive '%s'", name);
+      
+    if (impl->shared_primitives.find (name) != impl->shared_primitives.end ())
+      throw xtl::format_operation_exception ("", "Primitive '%s' has been already loaded", name);
+
+    PrimitiveProxy proxy = impl->proxy_manager.GetProxy (name);
+
+    proxy.SetResource (primitive);
+    
+    impl->shared_primitives.insert_pair (name, proxy);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::PrimitiveManager::SharePrimitive");
+    throw;
+  }
+}
+
+void PrimitiveManager::UnsharePrimitive (const char* name)
+{
+  if (!name)
+    return;
+    
+  PrimitiveProxyMap::iterator iter = impl->shared_primitives.find (name);
+  
+  if (iter == impl->shared_primitives.end ())
+    return;    
+    
+  iter->second.SetResource (PrimitivePtr ());
+  iter->second.ResetCache ();
+    
+  impl->shared_primitives.erase (iter);  
 }
 
 /*

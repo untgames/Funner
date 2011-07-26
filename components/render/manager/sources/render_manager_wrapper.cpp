@@ -199,6 +199,75 @@ Primitive RenderManager::CreateSharedPrimitive (const char* name)
   return Wrappers::Wrap<Primitive> (primitive);
 }
 
+bool RenderManager::HasSharedTexture (const char* name)
+{
+  return name && impl->TextureManager ().FindTexture (name) != TexturePtr ();
+}
+
+bool RenderManager::HasSharedMaterial (const char* name)
+{
+  return name && impl->MaterialManager ().FindMaterial (name) != MaterialPtr ();
+}
+
+bool RenderManager::HasSharedPrimitive (const char* name)
+{
+  return name && impl->PrimitiveManager ().FindPrimitive (name) != PrimitivePtr ();
+}
+
+void RenderManager::ShareTexture (const char* name, const Texture& texture)
+{
+  try
+  {
+    impl->TextureManager ().ShareTexture (name, Wrappers::Unwrap<TextureImpl> (texture));
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::RenderManager::ShareTexture");
+    throw;
+  }
+}
+
+void RenderManager::ShareMaterial (const char* name, const Material& material)
+{
+  try
+  {
+    impl->MaterialManager ().ShareMaterial (name, Wrappers::Unwrap<MaterialImpl> (material));
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::RenderManager::ShareMaterial");
+    throw;
+  }
+}
+
+void RenderManager::SharePrimitive (const char* name, const Primitive& primitive)
+{
+  try
+  {
+    impl->PrimitiveManager ().SharePrimitive (name, Wrappers::Unwrap<PrimitiveImpl> (primitive));
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::RenderManager::SharePrimitive");
+    throw;
+  }  
+}
+
+void RenderManager::UnshareTexture (const char* name)
+{
+  impl->TextureManager ().UnloadTexture (name);
+}
+
+void RenderManager::UnshareMaterial (const char* name)
+{
+  impl->MaterialManager ().UnshareMaterial (name);
+}
+
+void RenderManager::UnsharePrimitive (const char* name)
+{
+  impl->PrimitiveManager ().UnsharePrimitive (name);
+}
+
 void RenderManager::LoadResource (const char* resource_name)
 {
   impl->LoadResource (resource_name);

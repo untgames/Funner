@@ -28,7 +28,13 @@ class PrimitiveManager: public Object
     void LoadMeshLibrary   (const char* name);
     void LoadMeshLibrary   (const media::geometry::MeshLibrary&);
     void UnloadMeshLibrary (const char* name);
-    void UnloadMeshLibrary (const media::geometry::MeshLibrary&);    
+    void UnloadMeshLibrary (const media::geometry::MeshLibrary&);
+    
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Регистрация совместно используемых примитивов
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void SharePrimitive   (const char* name, const PrimitivePtr& primitive);
+    void UnsharePrimitive (const char* name);
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Получение прокси
