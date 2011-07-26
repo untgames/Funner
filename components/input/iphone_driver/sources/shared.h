@@ -27,13 +27,26 @@ namespace low_level
 namespace iphone_driver
 {
 
+enum KeyboardType
+{
+  KeyboardType_ASCII,
+  KeyboardType_NumberPad,
+  KeyboardType_NumbersAndPunctuation
+};
+
+enum AutocapitalizationType
+{
+  AutocapitalizationType_None,
+  AutocapitalizationType_Sentences
+};
+
 class IPhoneKeyboard: virtual public input::low_level::IDevice, public xtl::reference_counter
 {
   public:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструктор/деструктор
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    IPhoneKeyboard  (const char* name, const char* full_name);
+    IPhoneKeyboard  (const char* name, const char* full_name, KeyboardType keyboard_type, AutocapitalizationType autocapitalization_type);
     ~IPhoneKeyboard ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
