@@ -19,6 +19,18 @@ math::mat4f get_ortho_proj (float left, float right, float bottom, float top, fl
   return proj_matrix;
 }
 
+void update_entity_frame_transformations (Frame& frame, Entity& entity, EntityDrawParams& out_params)
+{
+  PropertyMap properties = out_params.properties;
+  
+  math::mat4f model_view_tm = frame.Properties ().GetMatrix ("ViewMatrix") * entity.Properties ().GetMatrix ("ObjectMatrix");  
+
+  out_params.mvp_matrix = frame.Properties ().GetMatrix ("ProjectionMatrix") * model_view_tm;
+
+  properties.SetProperty ("ModelViewMatrix", model_view_tm);
+  properties.SetProperty ("ModelViewProjectionMatrix", out_params.mvp_matrix);
+}
+
 void idle (Test& test, Entity& entity, Frame& frame)
 {
   try
@@ -43,15 +55,15 @@ void idle (Test& test, Entity& entity, Frame& frame)
 
     float angle = common::milliseconds () / 10000.0f;
     
-    entity_properties.SetProperty ("ObjectMatrix", math::rotate (math::radian (angle), math::vec3f (0, 0, 1)) * math::rotate (math::radian (angle*0.2f), math::vec3f (1, 0, 0)));
+    entity_properties.SetProperty ("ObjectMatrix", math::rotate (math::radian (angle), math::vec3f (0, 0, 1)) * math::rotate (math::radian (angle*0.2f), math::vec3f (1, 0, 0)));        
       
-    math::vec3f light_pos          = math::vec3f (40 * cos (angle), 40 * sin (angle), 0.0f);  
-    math::mat4f model_view_tm      = frame_properties.GetMatrix ("ViewMatrix") * entity_properties.GetMatrix ("ObjectMatrix");
-    math::mat4f model_view_proj_tm = frame_properties.GetMatrix ("ProjectionMatrix") * model_view_tm;
-      
-    frame_properties.SetProperty ("ModelViewMatrix", model_view_tm);
-    frame_properties.SetProperty ("ModelViewProjectionMatrix", model_view_proj_tm);
+    math::vec4f light_dir [2] = {
+      normalize (math::vec4f (cos (angle), sin (angle), 0.0f, 0.0f)),
+      normalize (math::vec4f (sin (angle), 0.0f, cos (angle), 0.0f))
+    };
     
+    frame_properties.SetProperty ("DirectLightWorldDirection", 2, light_dir);    
+        
     frame.Draw ();
       
     test.Window ().SwapBuffers ();
@@ -89,6 +101,7 @@ int main ()
     frame.SetRenderTarget ("main_depth_stencil_target", test.Window ().DepthStencilBuffer ());
     frame.SetEffect ("main");
     frame.SetClearColor (math::vec4f (0.0f, 0.0f, 1.0f, 1.0f));
+    frame.SetEntityDrawHandler (&update_entity_frame_transformations);
     
     common::PropertyMap frame_properties = frame.Properties ();
     common::PropertyMap entity_properties = entity.Properties ();

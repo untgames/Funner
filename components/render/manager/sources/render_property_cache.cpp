@@ -2,8 +2,6 @@
 
 using namespace render;
 
-//TODO: сброс кэша неиспользованных буферов
-
 namespace
 {
 
@@ -117,10 +115,15 @@ struct BufferPool: public xtl::reference_counter, private Cache
     for (BufferArray::iterator iter=buffers.end ()-1, end=buffers.begin ()-1; iter!=end; --iter)
       if (current_time - iter->last_use_time <= time_delay && current_frame - iter->last_use_frame <= frame_delay)
       {
-        if (settings->HasDebugLog ())
-          log.Printf ("Property cache %u buffers destroyed with size %u", buffers.end () - iter - 1, buffer_desc.size);
+        size_t buffers_count = buffers.end () - iter - 1;
+        
+        if (buffers_count)
+        {
+          if (settings->HasDebugLog ())
+            log.Printf ("Property cache %u buffers destroyed with size %u", buffers_count, buffer_desc.size);
 
-        buffers.erase (iter+1, buffers.end ());
+          buffers.erase (iter+1, buffers.end ());
+        }
 
         return;
       }

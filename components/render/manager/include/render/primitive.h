@@ -1,8 +1,7 @@
 #ifndef RENDER_MANAGER_PRIMITIVE_HEADER
 #define RENDER_MANAGER_PRIMITIVE_HEADER
 
-//добавить генерацию стандартных примитивов!!!
-//TODO: fonts & text
+//TODO: добавить генерацию стандартных примитивов!!!
 
 #include <render/material.h>
 

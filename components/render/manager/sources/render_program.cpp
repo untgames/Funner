@@ -473,7 +473,7 @@ Program& Program::DerivedProgram (ShaderOptionsCache& cache1, ShaderOptionsCache
       return *(*result)->program;
 
     if (impl->common_data->device_manager->Settings ().HasDebugLog ())
-      impl->common_data->log.Printf ("Create derived program '%s' for options '%s' + '%s'", Name (), options1.options.c_str (), options2.options.c_str ());
+      impl->common_data->log.Printf ("Create derived program '%s' for options '%s' + '%s'", impl->common_data->name.c_str (), options1.options.c_str (), options2.options.c_str ());
 
     ShaderOptions derived_options;
     

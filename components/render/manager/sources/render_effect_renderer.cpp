@@ -679,7 +679,7 @@ struct RenderOperationsExecutor
       //применение состояния операции
 
     primitive.state_block->Apply ();
-    operation.state_block->Apply ();          
+    operation.state_block->Apply ();                  
 
     render::low_level::StateBlockMask mask;      
 
@@ -716,6 +716,7 @@ struct RenderOperationsExecutor
     ProgramParametersLayoutPtr program_parameters_layout = program_parameters_manager.GetParameters (&pass.parameters_layout, operation.entity_parameters_layout, operation.frame_entity_parameters_layout);
 
     device.SSSetProgramParametersLayout (&*program_parameters_layout->DeviceLayout ());
+    device.SSSetConstantBuffer (ProgramParametersSlot_FrameEntity, operation.frame_entity_parameters_buffer);
 
       //рисование            
 
