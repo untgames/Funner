@@ -43,18 +43,18 @@ typedef stl::vector<CheckFile> CheckFileArray;
 //параметры запуска
 struct Params
 {
-  const Option* options;            //массив опций
-  size_t        options_count;      //количество опций
-  stl::string   result_license;     //файл генерируемой лицензии
-  time_t        since_date;         //дата начала действия лицензии
-  time_t        till_date;          //дата окончания действия лицензии
-  StringArray   allowed_components; //список разрешенных компонентов
+  const Option*  options;            //массив опций
+  size_t         options_count;      //количество опций
+  stl::string    result_license;     //файл генерируемой лицензии
+  time_t         since_date;         //дата начала действия лицензии
+  time_t         till_date;          //дата окончания действия лицензии
+  StringArray    allowed_components; //список разрешенных компонентов
   CheckFileArray check_files;        //список файлов для хеширования
-  PropertyMap   properties;         //свойства
-  bool          force;              //игнорирование ошибок неправильного указания времени
-  bool          silent;             //отключение предупреждений
-  bool          unlimited;          //лицензия не ограничена по времени
-  bool          print_help;         //печатать ли справку
+  PropertyMap    properties;         //свойства
+  bool           force;              //игнорирование ошибок неправильного указания времени
+  bool           silent;             //отключение предупреждений
+  bool           unlimited;          //лицензия не ограничена по времени
+  bool           print_help;         //печатать ли справку
 };
 
 void parse_date (const char* date_string, time_t& result_date)
@@ -281,7 +281,7 @@ void add_node_properties (Params& params, ParseNode node, const char* base_name)
     stl::string property_value;
 
     for (size_t i = 0, count = node.AttributesCount (); i < count; i++)
-      property_value += node.Attribute (i);
+      property_value += node.Attribute (i);      
 
     params.properties.SetProperty (node_full_name.c_str (), property_value.c_str ());
   }
@@ -322,11 +322,20 @@ void generate_license (Params& params)
     for (size_t j = 0, components_count = property_name_components.Size (); j < components_count - 1; j++)
       scope_stack.push (ScopePtr (new XmlWriter::Scope (writer, property_name_components [j])));
 
-    writer.WriteAttribute (property_name_components [property_name_components.Size () - 1], params.properties.GetString (i));
+    const char* name = property_name_components [property_name_components.Size () - 1];
+    
+    if (!strcmp (name, "#text"))
+    {
+      writer.WriteCData (params.properties.GetString (i));
+    }
+    else
+    {
+      writer.WriteAttribute (name, params.properties.GetString (i));
+    }
 
     while (!scope_stack.empty ())
       scope_stack.pop ();
-  }
+  }    
 
   if (!params.check_files.empty ())
   {
@@ -397,10 +406,19 @@ int main (int argc, const char *argv[])
 
       // --help только печатает сообщение помощи
     if (params.print_help)
-      return 0;
+      return 0;            
 
     if (command_line.ParamsCount () > 1)
       throw xtl::format_operation_exception ("", "No more than one input file allowed");
+      
+    if (!params.unlimited)
+    {
+      stl::string since_date_string = date_to_string (params.since_date),
+                  till_date_string  = date_to_string (params.till_date);
+
+      params.properties.SetProperty ("SinceDate", since_date_string.c_str ());
+      params.properties.SetProperty ("TillDate",  till_date_string.c_str ());
+    }
 
     if (command_line.ParamsCount ())
     {
@@ -440,7 +458,7 @@ int main (int argc, const char *argv[])
           throw xtl::format_operation_exception ("", "Till date already setted in source xml");
 
         command_line_till_date (till_date_string, params);
-      }
+      }            
 
       for (Parser::NamesakeIterator component_iter = root.First ("AllowedComponents.Component"); component_iter; ++component_iter)
         params.allowed_components.Add (common::get<const char*> (*component_iter, "Wildcard"));
@@ -462,15 +480,6 @@ int main (int argc, const char *argv[])
 
       //проверка корректности ввода
     validate (params);
-
-    if (!params.unlimited)
-    {
-      stl::string since_date_string = date_to_string (params.since_date),
-                  till_date_string  = date_to_string (params.till_date);
-
-      params.properties.SetProperty ("SinceDate", since_date_string.c_str ());
-      params.properties.SetProperty ("TillDate",  till_date_string.c_str ());
-    }
 
       //Генерация лицензии
     generate_license (params);
