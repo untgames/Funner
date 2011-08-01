@@ -857,6 +857,7 @@ endef
 define import_variables
 #  $$(warning src='$1' dst='$2' path='$3')  
 
+  $2.TYPE                 := $$(if $$($2.TYPE),$$($2.TYPE),$$($1.TYPE))
   $2.INCLUDE_DIRS         := $$($2.INCLUDE_DIRS) $$($1.INCLUDE_DIRS:%=$3%)
   $2.INCLUDE_FILES        := $$($2.INCLUDE_FILES) $$($1.INCLUDE_FILES)
   $2.SOURCE_DIRS          := $$($2.SOURCE_DIRS) $$($1.SOURCE_DIRS:%=$3%)
