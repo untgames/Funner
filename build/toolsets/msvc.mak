@@ -69,6 +69,7 @@ DLL_PREFIX     :=
 PROFILES                += msvc win32 has_windows x86 vcx86 x86_win32
 COMMON_LINK_FLAGS       += -stack:128000 /MACHINE:X86
 SOURCE_PROCESS_MACROSES += process_idl process_rc
+SOURCE_FILES_SUFFIXES   += asm
 
 ###################################################################################################
 #Конфигурация переменных расположения библиотек
@@ -92,7 +93,8 @@ export LIB
 ###################################################################################################
 define tools.c++compile
 export PATH="$(MSVS_COMMON_PATH);$(MSVC_PATH)/bin;$$PATH" \
-&& "$(MSVC_BIN_PATH)/cl" -c -Fo"$4\\" $(patsubst %,-I"%",$2) $(patsubst %,-FI"%",$3) $(COMMON_CFLAGS) $6 $(if $(filter -clr,$6),$(foreach dir,$8 $(DIST_BIN_DIR),-AI $(dir)) -MD,-EHsc -MT) $(foreach def,$5,-D$(subst %,$(SPACE),$(def))) $(filter %.c,$1) $(filter %.cpp,$1) $(if $7,-FI"$7" -Yc"$7" -Fp"$4\\")
+$(if $(filter %.c,$1)$(filter %.cpp,$1),&& "$(MSVC_BIN_PATH)/cl" -c -Fo"$4\\" $(patsubst %,-I"%",$2) $(patsubst %,-FI"%",$3) $(COMMON_CFLAGS) $6 $(if $(filter -clr,$6),$(foreach dir,$8 $(DIST_BIN_DIR),-AI $(dir)) -MD,-EHsc -MT) $(foreach def,$5,-D$(subst %,$(SPACE),$(def))) $(filter %.c,$1) $(filter %.cpp,$1) $(if $7,-FI"$7" -Yc"$7" -Fp"$4\\")) \
+$(if $(filter %.asm,$1),&& "$(MSVC_BIN_PATH)/ml" -nologo -c -Fo"$4\\" $(patsubst %,-I"%",$2) $6 $(foreach def,$5,-D$(subst %,$(SPACE),$(def))) $(filter %.asm,$1))
 endef
 
 ###################################################################################################
@@ -107,7 +109,7 @@ endef
 #Сборка библиотеки (имя выходного файла, список файлов)
 ###################################################################################################
 define tools.lib
-export PATH="$(MSVS_COMMON_PATH);$$PATH" && "$(MSVC_BIN_PATH)/lib" -nologo -out:$1 $2
+export PATH="$(MSVS_COMMON_PATH);$$PATH" && echo -nologo -out:$1 $2 > $1.commandline && "$(MSVC_BIN_PATH)/lib" @$1.commandline && rm -f $1.commandline
 endef
 
 ###################################################################################################

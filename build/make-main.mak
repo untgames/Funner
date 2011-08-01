@@ -23,7 +23,7 @@ DOXYGEN_TEMPLATE_CFG_FILE_SHORT_NAME    := template.cfg  #Имя шаблонного файла с
 DOXYGEN_TAGS_DIR_SHORT_NAME             := ~DOXYGEN_TAGS #Имя каталога с тэгами документации
 EXPORT_VAR_PREFIX                       := export        #Префикс имени переменной экспортирования настроек компонента
 BATCH_COMPILE_FLAG_FILE_SHORT_NAME      := batch-flag    #Базовое имя файла-флага пакетной компиляции
-VALID_TARGET_TYPES                      := static-lib dynamic-lib application test-suite package doxygen-info sdk #Допустимые типы целей
+VALID_TARGET_TYPES                      := static-lib dynamic-lib application test-suite package doxygen-info sdk ignore #Допустимые типы целей
 PACKAGE_COMMANDS                        := build clean test check run install export #Команды, делегируемые компонентам пакета
 COMPILE_TOOL                            := tools.c++compile     #Имя макроса утилиты компиляции C++ файлов
 LINK_TOOL                               := tools.link           #Имя макроса утилиты редактора связей
@@ -523,6 +523,10 @@ define process_target_with_sources
   
   $$($1.INSTALLATION_FLAG): $$($1.INSTALLATION_FILES)
 		@touch $$@
+endef
+
+#Игнорирование цели
+define process_target.ignore
 endef
 
 #Обработка цели static-lib (имя цели)
