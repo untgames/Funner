@@ -3,3 +3,7 @@
 #else
   #include "config-unistd.h"
 #endif
+
+#ifdef __GNUC__
+  #define HAVE__BOOL 1
+#endif

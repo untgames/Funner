@@ -714,7 +714,3 @@
 #else
 # define DLL_VARIABLE
 #endif
-
-#ifdef __GNUC__
-  #define HAVE__BOOL 1
-#endif
