@@ -8,13 +8,14 @@ TARGETS += EXTERN.ICONV.TESTS
 #Öåëü ¹1 - ICONV library
 EXTERN.LIBICONV.TYPE             := static-lib
 EXTERN.LIBICONV.NAME             := funner.extern.iconv
-EXTERN.LIBICONV.INCLUDE_DIRS     := include sources sources/srclib sources/wrappers
+EXTERN.LIBICONV.INCLUDE_DIRS     := include sources sources/srclib
 EXTERN.LIBICONV.SOURCE_DIRS      := sources/lib sources/srclib sources/srclib/uniwidth sources/libcharset
 EXTERN.LIBICONV.LIB_DIRS         :=
 EXTERN.LIBICONV.LIBS             :=
 EXTERN.LIBICONV.COMPILER_DEFINES := DLL=0 NO_NLS=1 DEBUG=0 HAVE_CONFIG_H EXEEXT='"exe"'
 EXTERN.LIBICONV.COMPILER_CFLAGS  :=
 EXTERN.LIBICONV.msvc.COMPILER_CFLAGS  := -wd4116 -wd4018 -wd4090
+EXTERN.LIBICONV.g++.COMPILER_CFLAGS   := --no-warn
 
 #Öåëü ¹2 - ICONV utility
 EXTERN.ICONV.SOURCES.TYPE             := application
@@ -25,8 +26,9 @@ EXTERN.ICONV.SOURCES.LIB_DIRS         :=
 EXTERN.ICONV.SOURCES.LIBS             :=
 EXTERN.ICONV.SOURCES.COMPILER_DEFINES := INSTALLPREFIX='"."' INSTALLDIR='"."'
 EXTERN.ICONV.SOURCES.COMPILER_CFLAGS  :=
-EXTERN.ICONV.SOURCES.msvc.COMPILER_CFLAGS  := -wd4013 -wd4018
 EXTERN.ICONV.SOURCES.IMPORTS          := link.extern.iconv
+EXTERN.ICONV.SOURCES.msvc.COMPILER_CFLAGS  := -wd4013 -wd4018
+EXTERN.ICONV.SOURCES.g++.COMPILER_CFLAGS   := --no-warn
 
 #Öåëü ¹3 - ICONV tests
 EXTERN.ICONV.TESTS.TYPE              := test-suite

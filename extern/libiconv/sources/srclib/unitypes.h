@@ -18,7 +18,7 @@
 #define _UNITYPES_H
 
 /* Get uint8_t, uint16_t, uint32_t.  */
-#if !defined(_WIN32) && !defined(__WIN32__)
+#ifndef _MSC_VER
 #include <stdint.h>
 #else
 #include "stdint_.h"

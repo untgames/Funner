@@ -77,7 +77,7 @@
   /* A compiler known to have 'bool'.  */
   /* If the compiler already has both 'bool' and '_Bool', we can assume they
      are the same types.  */
-# if !@HAVE__BOOL@
+# if !HAVE__BOOL
 typedef bool _Bool;
 # endif
 #else
@@ -104,7 +104,7 @@ typedef bool _Bool;
 #  define _Bool signed char
 # else
    /* With this compiler, trust the _Bool type if the compiler has it.  */
-#  if !@HAVE__BOOL@
+#  if !HAVE__BOOL
 typedef enum { _Bool_must_promote_to_int = -1, false = 0, true = 1 } _Bool;
 #  endif
 # endif
