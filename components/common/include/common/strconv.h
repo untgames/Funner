@@ -76,12 +76,12 @@ void swap (StringConverter&, StringConverter&);
 class StringConverterSystem
 {
   public:
-    typedef xtl::function<IStringConverter* ()> ConverterFn;
+    typedef xtl::function<IStringConverter* (const char* source_encoding, const char* destination_encoding)> ConverterFn;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Регистраци конвертеров строк
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    static bool RegisterConverter       (const char* source_encoding,
+    static void RegisterConverter       (const char* source_encoding,
                                          const char* destination_encoding,
                                          const ConverterFn& converter);
     static void UnregisterConverter     (const char* source_encoding, const char* destination_encoding);

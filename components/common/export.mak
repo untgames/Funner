@@ -41,4 +41,9 @@ export.link.common.zip_file_system.LIBS          := funner.common.zip_file_syste
 export.link.common.zip_file_system.LINK_INCLUDES := ZipFileSystem
 export.link.common.zip_file_system.IMPORTS       := link.common link.extern.zlib link.extern.zzip run.extern.zzip
 
+# ICONV converters
+export.link.common.iconv.LIBS          := funner.common.iconv
+export.link.common.iconv.LINK_INCLUDES := IconvConverter
+export.link.common.iconv.IMPORTS       := link.common link.extern.iconv
+
 export.info.common.CHMS := funner.common
