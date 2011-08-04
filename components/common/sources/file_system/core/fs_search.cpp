@@ -49,14 +49,26 @@ void FileSearchHelper::Search (ICustomFileSystemPtr _file_system,const char* dir
 
 void FileSearchHelper::InsertRecursive (const char* file_name,const FileInfo& info)
 {
+
   if (!file_name)
     return;
+
+printf("----------InsertRecursive =%s\n",file_name);
+fflush(stdout);
 
   if (wcimatch (file_name,full_mask.c_str ()))
     Insert (file_name,info);
 
+printf("----------InsertRecursive 1 %d\n",info.is_dir);
+fflush(stdout);
+printf("------str = %s\n",format ("%s/*",file_name).c_str ());
+fflush(stdout);
+
   if (info.is_dir)
     file_system->Search (format ("%s/*",file_name).c_str (),SearchHandler (bind (&FileSearchHelper::InsertRecursive, this, _1, _2)));
+
+printf("----------InsertRecursive end\n");
+fflush(stdout);
 }
 
 void FileSearchHelper::Insert (const char* file_name,const FileInfo& info)
