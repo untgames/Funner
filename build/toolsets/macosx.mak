@@ -24,6 +24,8 @@ MACOSX_SDK_PATH := /Developer/SDKs/MacOSX10.6.sdk
 
 COMMON_CFLAGS     += -msse3 -isysroot $(MACOSX_SDK_PATH) -mmacosx-version-min=$(MACOSX_VERSION) -arch i386
 COMMON_LINK_FLAGS += -isysroot $(MACOSX_SDK_PATH) -mmacosx-version-min=$(MACOSX_VERSION) -arch i386
+COMPILER_GCC      := /usr/bin/gcc-4.2
+LINKER_GCC        := /usr/bin/g++-4.2
 
 include $(TOOLSETS_DIR)/g++.mak
 
