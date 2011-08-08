@@ -11,6 +11,8 @@
 
 using namespace common;
 
+extern "C" size_t iconv_wrapper (iconv_t cd, const char* * inbuf, size_t *inbytesleft, char* * outbuf, size_t *outbytesleft);
+
 namespace
 {
 
@@ -64,7 +66,7 @@ class IconvStringConverter: public xtl::reference_counter, public IStringConvert
     {
       try
       {        
-        size_t result = iconv (cd, reinterpret_cast<char**> (const_cast<void**> (&source_buffer_ptr)), &source_buffer_size, reinterpret_cast<char**> (&destination_buffer_ptr), &destination_buffer_size);
+        size_t result = iconv_wrapper (cd, reinterpret_cast<const char**> (&source_buffer_ptr), &source_buffer_size, reinterpret_cast<char**> (&destination_buffer_ptr), &destination_buffer_size);
       
         if (result == (size_t)-1 && errno != E2BIG)
           throw xtl::format_operation_exception ("::iconv", "ICONV error: %s", strerror (errno));
