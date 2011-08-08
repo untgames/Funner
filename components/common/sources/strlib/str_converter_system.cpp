@@ -7,6 +7,7 @@
 
 #include <common/component.h>
 #include <common/singleton.h>
+#include <common/strlib.h>
 #include <common/strconv.h>
 #include <common/strlib.h>
 #include <common/utf_converter.h>

@@ -13,7 +13,7 @@ COMMON.SOURCES.SOURCE_DIRS                := sources/file_system/core sources/st
                                              sources/utils sources/log sources/properties sources/licensing/core sources/platform/default
 COMMON.SOURCES.DOCUMENTATION_DIRS         := include
 COMMON.SOURCES.COMPILER_DEFINES           := PCRE_STATIC
-COMMON.SOURCES.IMPORTS                    := compile.math.vecmath
+COMMON.SOURCES.IMPORTS                    := compile.math.vecmath compile.extern.iconv
 COMMON.SOURCES.unistd.SOURCE_DIRS         := sources/platform/unistd
 COMMON.SOURCES.cocoa.SOURCE_DIRS          := sources/platform/cocoa
 COMMON.SOURCES.cocoa_desktop.SOURCE_DIRS  := sources/platform/cocoa_desktop
@@ -21,10 +21,6 @@ COMMON.SOURCES.iphone.SOURCE_DIRS         := sources/platform/cocoa_iphone
 COMMON.SOURCES.win32.SOURCE_DIRS          := sources/platform/win32
 COMMON.SOURCES.bada.SOURCE_DIRS           := sources/platform/bada
 COMMON.SOURCES.bada.IMPORTS               := compile.extern.bada
-
-ifeq (,$(filter has_iconv,$(PROFILES)))
-COMMON.SOURCES.IMPORTS := compile.extern.iconv
-endif
 
 #Цель - WxfParser
 COMMON.WXF_PARSER.TYPE             := static-lib
@@ -54,8 +50,8 @@ COMMON.AES.IMPORTS          := compile.common
 #Цель - CommonLib iconv sources
 COMMON.ICONV.TYPE             := static-lib
 COMMON.ICONV.NAME             := funner.common.iconv
+COMMON.ICONV.INCLUDE_DIRS     := include ../xtl/include
 COMMON.ICONV.SOURCE_DIRS      := sources/strlib/iconv
-COMMON.ICONV.IMPORTS          := compile.common
 
 ifeq (,$(filter has_iconv,$(PROFILES)))
 COMMON.ICONV.IMPORTS := compile.extern.iconv

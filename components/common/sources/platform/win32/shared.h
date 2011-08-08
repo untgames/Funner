@@ -10,6 +10,7 @@
 #include <shlobj.h>
 
 #include <xtl/common_exceptions.h>
+#include <xtl/function.h>
 
 #include <common/component.h>
 #include <common/file.h>
@@ -19,7 +20,7 @@
 #include <platform/platform.h>
 
 #if defined(WINCE)
-   #include "common\utf_converter.h"
+   #include "common/utf_converter.h"
 #endif
 
 namespace common
