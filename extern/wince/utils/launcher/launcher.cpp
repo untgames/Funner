@@ -90,6 +90,21 @@ int wmain (int argc, wchar_t* argv [])
   wchar_t* log_to_start = argv [2];
   wchar_t* current_dir  = argv [3];
 
+  for (unsigned int i=0;i<wcslen(exe_to_start);i++)
+    if (exe_to_start[i]=='/')
+      exe_to_start[i]='\\';
+
+  for (unsigned int i=0;i<wcslen(log_to_start);i++)
+    if (log_to_start[i]=='/')
+      log_to_start[i]='\\';
+
+  for (unsigned int i=0;i<wcslen(current_dir);i++)
+    if (current_dir[i]=='/')
+      current_dir[i]='\\';
+
+//exe_to_start=L"\\funner\\tmp\\winmobile6\\XTL.STL.TESTS\\tests\\stl\\accum1.exe";
+//log_to_start=L"\\funner\\tmp\\winmobile6\\XTL.STL.TESTS\\tests\\stl\\accum1.exe.stdout";
+//current_dir=L"\\funner\\tests\\stl";
     //инициализация telnet
     
   HINSTANCE core_dll = LoadLibraryW (L"Coredll.dll");
@@ -103,7 +118,7 @@ int wmain (int argc, wchar_t* argv [])
   }
   
   SetStdioPathWFunc  SetStdioPathW        = (SetStdioPathWFunc)GetProcAddress (core_dll, L"SetStdioPathW");    
-  SetCurrentDirWFunc SetCurrentDirectoryW = (SetCurrentDirWFunc)GetProcAddress (core_dll, L"SetCurrentDirectoryW");
+//  SetCurrentDirWFunc SetCurrentDirectoryW = (SetCurrentDirWFunc)GetProcAddress (core_dll, L"SetCurrentDirectoryW");
 
   if (!SetStdioPathW)
   {
@@ -115,7 +130,7 @@ int wmain (int argc, wchar_t* argv [])
     return -1;
   }
 
-  if (!SetCurrentDirectoryW)
+/*  if (!SetCurrentDirectoryW)
   {
     printf ("No 'SetCurrentDirW' entry in 'coredll.dll' found\n");
 
@@ -134,7 +149,7 @@ int wmain (int argc, wchar_t* argv [])
     
     return -1;
   }
-
+*/
     //перенаправление ввода / вывода
 
   DeleteFileW (log_to_start);
@@ -292,8 +307,15 @@ int wmain (int argc, wchar_t* argv [])
   
     //ожидание завершения процесса - перенаправление вывода в сокет
      
-  HANDLE file = CreateFileW (log_to_start, GENERIC_READ, FILE_SHARE_READ, 0, OPEN_ALWAYS, 0, 0);
-  
+  HANDLE file = CreateFileW (log_to_start, GENERIC_READ, FILE_SHARE_READ|FILE_SHARE_WRITE, 0, OPEN_ALWAYS, 0, 0);
+ /* int err=GetLastError();
+  while (file==INVALID_HANDLE_VALUE)
+  {
+	  printf("-------------@@@@@@@@@@@-------------------");
+	  Sleep(3000);
+	  file = CreateFileW (log_to_start, GENERIC_READ, FILE_SHARE_READ|FILE_SHARE_WRITE, 0, OPEN_ALWAYS, 0, 0);
+  }*/
+
   if (!file)
   {
     sock_printf (sendrecv_socket, "Can't open log file '%S'\n", log_to_start);
@@ -320,7 +342,7 @@ int wmain (int argc, wchar_t* argv [])
       DWORD bytes_read = 0;
 
       ReadFile (file, buffer, sizeof (buffer), &bytes_read, 0);
-
+      printf("---handle=%p  bytes=%d\n",file,bytes_read);
       if (!bytes_read)
         break;
 

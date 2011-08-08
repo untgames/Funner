@@ -104,7 +104,12 @@ endef
 #Выполнение команды (команда, каталог запуска, дополнительные пути поиска библиотек и приложений)
 ###################################################################################################
 define tools.run
-   "$(RAPISTART)" $(subst /,\\,$(WINCE_LAUNCHER)) "$(subst /,\\,$(strip $1))" "$(subst /,\\,$(strip $1).stdout)" "$(REMOTE_INSTALL_DIR)\\$(subst /,\\,$(patsubst ./%,%,$2))" && \
+   export ROOT_SUBSTRING=$$(cd $(ROOT) && pwd)/ && \
+   export SUBST_DIR_STRING=$$(cd $2 && pwd) && export SUBST_DIR_RESULT=$(REMOTE_INSTALL_DIR)/$${SUBST_DIR_STRING/#$$ROOT_SUBSTRING/} && \
+   export PATH_SEARCH="$(foreach path,$3,$$(export SUBST_PATH_STRING=$$(cd $(path) && pwd) && echo $(REMOTE_INSTALL_DIR)/$${SUBST_PATH_STRING/#$$ROOT_SUBSTRING/}))" && \
+   export PATH_SEARCH=$${PATH_SEARCH/\ /:} && \
+   export SUBST_CMD_STRING=$$(cd $(dir $(firstword $1)) && pwd)/$(notdir $(firstword $1)) && export SUBST_COMMAND=$(REMOTE_INSTALL_DIR)/$${SUBST_CMD_STRING/#$$ROOT_SUBSTRING/} && \
+   "$(RAPISTART)" $(subst /,\\,$(WINCE_LAUNCHER)) "$$(echo $$SUBST_COMMAND)" "$(REMOTE_INSTALL_DIR)\\$(subst /,\\,$2/$(strip $1).stdout)" "$(REMOTE_INSTALL_DIR)\\$(subst /,\\,$(patsubst ./%,%,$2))" > nul && \
    plink -P 1663 -telnet $(WINMOBILE_HOST)
 endef
 

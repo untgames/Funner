@@ -12,6 +12,7 @@ using namespace stl;
 
 Win32FileSystem::file_t Win32FileSystem::FileOpen (const char* file_name,filemode_t mode,size_t size)
 {
+printf("----------------%s\n",file_name);
   OFSTRUCT ofstruct;
   HFILE hFile;
   UINT style;
@@ -25,6 +26,10 @@ Win32FileSystem::file_t Win32FileSystem::FileOpen (const char* file_name,filemod
 
   if(mode&FileMode_Create)
     style|=OF_CREATE;
+
+  if((mode&FileMode_Write)&&(!IsFileExist (file_name)))
+    style|=OF_CREATE;
+
   try
   {
     hFile=OpenFile(file_name,&ofstruct,style);
@@ -309,9 +314,6 @@ void Win32FileSystem::Search (const char* mask,const FileSearchHandler& handler)
 {
   throw xtl::format_exception<xtl::bad_platform> ("common::Win32FileSystem::Search","Not implementated");
 
-printf("-----------search start--- %s   %d\n",mask,sizeof(TCHAR));
-fflush(stdout);
-
   WIN32_FIND_DATA FindFileData;
   FileInfo info;
   
@@ -321,25 +323,13 @@ fflush(stdout);
 
   FindDataToFileInfo(&FindFileData, &info);
 
-printf("-----------search 2------ %p  %s\n",handler,FindFileData.cFileName);
-fflush(stdout);
-
   handler(FindFileData.cFileName, info);
 //  handler("aksdjalksdjaskldjalksd", info);
                                   
-printf("-----------search 3----------------\n");
-fflush(stdout);
-
   while(!FindNextFile (handle,&FindFileData) )
   {
-printf("-----------search 3a----------------\n");
-fflush(stdout);
     FindDataToFileInfo(&FindFileData, &info);
     handler(FindFileData.cFileName, info);
   }
   CloseHandle( handle );
-
-printf("-----------search end----------------\n");
-fflush(stdout);
-
 }
