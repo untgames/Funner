@@ -1,4 +1,5 @@
 #include <stl/hash_map>
+#include <stl/string>
 
 #include <xtl/function.h>
 #include <xtl/bind.h>
@@ -7,6 +8,7 @@
 #include <common/component.h>
 #include <common/singleton.h>
 #include <common/strconv.h>
+#include <common/strlib.h>
 #include <common/utf_converter.h>
 
 using namespace stl;
