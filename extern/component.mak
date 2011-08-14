@@ -35,3 +35,7 @@ endif
 ifneq (,$(filter wince,$(PROFILES)))
   FUNNER_EXTERN_LIBS.COMPONENT_DIRS := wcecompat wince $(FUNNER_EXTERN_LIBS.COMPONENT_DIRS)
 endif
+
+ifeq (,$(filter has_iconv,$(PROFILES)))
+  FUNNER_EXTERN_LIBS.COMPONENTS += libiconv
+endif
