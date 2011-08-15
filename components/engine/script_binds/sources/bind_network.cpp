@@ -28,9 +28,12 @@ class ScriptTcpClient: public TcpClient, public xtl::dynamic_cast_root
 ///Приём данных
     stl::string Receive ()
     {
-      stl::string result;
+      stl::string result;      
       
-      result.fast_resize (TcpClient::ReceiveAvailable ());
+      if (!TcpClient::ReceiveAvailable ())
+        return result;
+      
+      result.fast_resize (TcpClient::ReceiveAvailable ());      
       
       if (!ReceiveExactly (&result [0], result.size (), 1000))
         return stl::string ();
