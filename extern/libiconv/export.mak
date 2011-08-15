@@ -8,6 +8,9 @@ export.link.extern.iconv.LIBS := funner.extern.iconv
 
 else
 
+# Compile exports
+export.compile.extern.iconv.INCLUDE_DIRS :=
+
 # Link exports
 export.link.extern.iconv.LIBS := iconv
 
