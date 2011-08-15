@@ -1,9 +1,14 @@
 #include <ctype.h>
 #include <stdlib.h>
+#include <wctype.h>
+
+#if defined _MSC_VER && defined SSE_4_2_SUPPORTED
+  #include <nmmintrin.h>
+#endif
 
 #include <common/hash.h>
 
-namespace common
+namespace
 {
 
 //Взято из https://database.cs.brown.edu/svn/hstore/trunk/src/dtxn/logging/crc32ctables.cc
@@ -408,9 +413,10 @@ static const unsigned int crc_tableil8_o88[256] =
  0xE54C35A1, 0xAC704886, 0x7734CFEF, 0x3E08B2C8, 0xC451B7CC, 0x8D6DCAEB, 0x56294D82, 0x1F1530A5
 };
 
-#if defined _MSC_VER && defined SSE_4_2_SUPPORTED
-  #include <nmmintrin.h>
-#endif
+}
+
+namespace common
+{
 
 inline size_t crc32 (unsigned char data,size_t crc)
 {
@@ -435,10 +441,40 @@ inline size_t crc32 (unsigned char data,size_t crc)
 
 inline size_t crc32 (wchar_t data, size_t crc)
 { 
+  //???? что делать с 4-байтовыми wchar???
+
   unsigned char* c = (unsigned char*)&data;
   
   return crc32 (c [1], crc32 (c [0], crc));
 }
+
+}
+
+namespace
+{
+
+template <class T=wchar_t, size_t wchar_size = sizeof (T)> struct selector {};
+
+template <class T>
+size_t strnhash_impl (const wchar_t* s, size_t length, size_t init_hash, selector<T, 2>)
+{
+  return common::crc32 (s, length * sizeof (wchar_t), init_hash);
+}
+
+template <class T>
+size_t strnhash_impl (const wchar_t* s, size_t length, size_t init_hash, selector<T, 4>)
+{
+  size_t hash = init_hash;
+
+  for (size_t i = 0; i < length; i++, s++) hash = common::crc32 (*s, hash);
+
+  return hash;
+}
+
+}
+
+namespace common
+{
 
 size_t crc32 (const void* data, size_t data_size, size_t crc)
 {
@@ -458,11 +494,9 @@ size_t crc32 (const void* data, size_t data_size, size_t crc)
   #endif
 
   #ifdef __GNUC__
-    unsigned int  quotient  = data_size / sizeof (unsigned long);
-    unsigned int  remainder = data_size % sizeof (unsigned long);
-    unsigned long *cur_data = (unsigned long*)data;
+    size_t *cur_data = (size_t*)data;
 
-    while (quotient--)
+    for (size_t i = 0, count = data_size / sizeof (size_t); i < count; i++, cur_data++)
     {
       __asm__ __volatile__(
         ".byte 0xf2, 0xf, 0x38, 0xf1, 0xf1;"
@@ -470,24 +504,17 @@ size_t crc32 (const void* data, size_t data_size, size_t crc)
         :"=S"(crc)
         :"0"(crc), "c"(*cur_data)
       );
-
-      cur_data++;
     }
 
-    if (remainder)
+    unsigned char* cur_data_char = (unsigned char*)cur_data;
+
+    for (size_t i = 0, count = data_size % sizeof (size_t); i < count; i++, cur_data_char++)
     {
-      unsigned char* cur_data_char = (unsigned char*)cur_data;
-
-      while (remainder--)
-      {
-        __asm__ __volatile__(
-          ".byte 0xf2, 0xf, 0x38, 0xf0, 0xf1"
-          :"=S"(crc)
-          :"0"(crc), "c"(*cur_data_char)
-        );
-
-        cur_data_char++;
-      }
+      __asm__ __volatile__(
+        ".byte 0xf2, 0xf, 0x38, 0xf0, 0xf1"
+        :"=S"(crc)
+        :"0"(crc), "c"(*cur_data_char)
+      );
     }
 
     return crc;
@@ -557,7 +584,7 @@ size_t crc32 (const void* data, size_t data_size, size_t crc)
   return crc;
 }
 
-size_t strhash (const char* s,size_t init_hash)
+size_t strhash (const char* s, size_t init_hash)
 {
   if (!s)
     return 0;
@@ -569,7 +596,7 @@ size_t strhash (const char* s,size_t init_hash)
   return hash;
 }
 
-size_t strhash (const wchar_t* s,size_t init_hash)
+size_t strhash (const wchar_t* s, size_t init_hash)
 {
   if (!s)
     return 0;
@@ -581,7 +608,7 @@ size_t strhash (const wchar_t* s,size_t init_hash)
   return hash;
 }
 
-size_t strihash (const char* s,size_t init_hash)
+size_t strihash (const char* s, size_t init_hash)
 {
   if (!s)
     return 0;
@@ -593,9 +620,7 @@ size_t strihash (const char* s,size_t init_hash)
   return hash;
 }
 
-#ifndef __GNUC__
-
-size_t strihash (const wchar_t* s,size_t init_hash)
+size_t strihash (const wchar_t* s, size_t init_hash)
 {
   if (!s)
     return 0;
@@ -607,9 +632,7 @@ size_t strihash (const wchar_t* s,size_t init_hash)
   return hash;
 }
 
-#endif
-
-size_t strnhash (const char* s,size_t length,size_t init_hash)
+size_t strnhash (const char* s, size_t length, size_t init_hash)
 {
   if (!s)
     return 0;
@@ -617,15 +640,15 @@ size_t strnhash (const char* s,size_t length,size_t init_hash)
   return crc32 (s,length,init_hash);
 }
 
-size_t strnhash (const wchar_t* s,size_t length,size_t init_hash)
+size_t strnhash (const wchar_t* s, size_t length, size_t init_hash)
 {
   if (!s)
     return 0;
 
-  return crc32 (s,length*sizeof (wchar_t),init_hash);
+  return strnhash_impl (s, length, init_hash, selector<> ());
 }
 
-size_t strnihash (const char* s,size_t size,size_t init_hash)
+size_t strnihash (const char* s, size_t size, size_t init_hash)
 {
   if (!s)
     return 0;
@@ -637,9 +660,7 @@ size_t strnihash (const char* s,size_t size,size_t init_hash)
   return hash;
 }
 
-#ifndef __GNUC__
-
-size_t strnihash (const wchar_t* s,size_t size,size_t init_hash)
+size_t strnihash (const wchar_t* s, size_t size, size_t init_hash)
 {
   if (!s)
     return 0;
@@ -650,7 +671,5 @@ size_t strnihash (const wchar_t* s,size_t size,size_t init_hash)
 
   return hash;
 }
-
-#endif
 
 }

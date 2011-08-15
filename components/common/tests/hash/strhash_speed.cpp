@@ -10,7 +10,7 @@ const size_t TEST_SIZE           = 1024 * 1024 * 1024;
 const size_t TEST_BUFFER_SIZE    = 1024 + 3;
 const size_t TEST_ARRAY_SIZES [] = { 1, 4, 16, 35, 64, 256, 1024 };
 const size_t TESTS_COUNT         = sizeof (TEST_ARRAY_SIZES) / sizeof (*TEST_ARRAY_SIZES);
-const size_t CORRECT_HASHES []   = { 3431280286, 280021180, 1742029617, 2281313115, 2057480750, 421823093, 3922288482 };
+const size_t CORRECT_HASHES []   = { 3431280286u, 280021180u, 1742029617u, 2281313115u, 2057480750u, 421823093u, 3922288482u };
 
 int main ()
 {
