@@ -11,28 +11,35 @@ Win32FileSystem::file_t Win32FileSystem::FileOpen (const char* file_name, filemo
 {
   try
   {
-    UINT style = 0;
+    UINT style = OF_SHARE_DENY_NONE;
 
-    if (mode & FileMode_Read)                   style  = OF_READ;
-    if (mode & FileMode_Write)                  style  = OF_WRITE;
-    if (mode &(FileMode_Read | FileMode_Write)) style  = OF_READWRITE;
-    if (mode&FileMode_Create)                   style |= OF_CREATE;
+    if ((mode & (FileMode_Read | FileMode_Write)) == (FileMode_Read | FileMode_Write))
+    {
+      style |= OF_READWRITE;
+    }
+    else
+    {
+      if (mode & FileMode_Read)  style |= OF_READ;
+      if (mode & FileMode_Write) style |= OF_WRITE;
+    }
 
     if ((mode & FileMode_Write) && (!Win32FileSystem::IsFileExist (file_name)))
-      style |= OF_CREATE;    
+      style |= OF_CREATE;
 
-    OFSTRUCT ofstruct;        
+    if (mode & FileMode_Create) style |= OF_CREATE;
+
+    OFSTRUCT ofstruct;
 
     HFILE file = OpenFile (file_name, &ofstruct, style);
 
     if (file == HFILE_ERROR)
-      raise_error ("::OpenFile");
+      raise_error ("::OpenFile");      
 
     return (file_t)file;
   }
   catch (xtl::exception& exception)
   {
-    exception.touch ("common::Win32Platform::FileOpen");
+    exception.touch ("common::Win32Platform::FileOpen('%s',%s)", file_name, strfilemode (mode).c_str ());
     throw;
   }
 }
@@ -40,7 +47,7 @@ Win32FileSystem::file_t Win32FileSystem::FileOpen (const char* file_name, filemo
 void Win32FileSystem::FileClose (file_t file)
 {
   try
-  {
+  {    
     if (!CloseHandle (file))
       raise_error ("::CloseHandle");
   }
