@@ -93,6 +93,7 @@ int main (int argc, char* argv [])
   catch (std::exception& exception)
   {
     printf ("exception: %s\n", exception.what ());
+    return 1;
   }
 
   return 0;
