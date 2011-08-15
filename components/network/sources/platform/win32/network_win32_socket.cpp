@@ -487,7 +487,7 @@ class WinSocket : public SocketImpl, public xtl::reference_counter
         timeout.tv_usec = (timeout_in_milliseconds % 1000) * 1000;
 
         SetSocketOption<timeval> (SO_RCVTIMEO, timeout);
-
+        
         int received_bytes = recv (socket, (char*)buffer, size, 0);
 
         if (received_bytes < 0)
@@ -560,11 +560,11 @@ class WinSocket : public SocketImpl, public xtl::reference_counter
     {
       try
       {
-        u_long return_value;
+        u_long return_value = 0;
 
         if (ioctlsocket (socket, FIONREAD, &return_value))
           raise_error ("::ioctlsocket");
-
+          
         return return_value;
       }
       catch (xtl::exception& e)
