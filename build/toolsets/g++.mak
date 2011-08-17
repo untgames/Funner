@@ -14,7 +14,7 @@ DLL_LIB_SUFFIX        ?= .a
 LIB_PREFIX            ?= lib
 COMPILER_GCC          ?= gcc
 LINKER_GCC            ?= g++
-LIB_GCC               ?= ar
+LIB_GCC               ?= libtool
 PROFILES              += g++
 DEFAULT_LIBS          +=
 COMMON_CFLAGS         := -Os -Wall -Wno-format $(COMMON_CFLAGS)
@@ -65,9 +65,15 @@ endef
 ###################################################################################################
 #—борка библиотеки (им€ выходного файла, список файлов)
 ###################################################################################################
-define tools.g++.lib
-$(LIB_GCC) rcus $1 $2
-endef
+ifneq (,$(filter libtool,$(LIB_GCC)))
+  define tools.g++.lib
+    $(LIB_GCC) -static -o $1 $2
+  endef
+else
+  define tools.g++.lib
+    $(LIB_GCC) rcus $1 $2
+  endef
+endif
 
 define tools.c++compile
 $(call tools.g++.c++compile,$1,$2,$3,$4,$5,$6,$7,$8,$9)

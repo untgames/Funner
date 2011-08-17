@@ -73,7 +73,7 @@ size_t StdioIOSystem::FileWrite (file_t file,const void* buf,size_t size)
 {
   for (size_t i = 0; i < size; i++)
   {
-    if (printf ("%c", ((char*)buf) [i]) != 1)
+    if (printf ("%c", ((char*)buf) [i]) < 1) //llvm на Mac возвращает значения больше 1
       throw xtl::format_operation_exception ("common::StdioIOSystem::FileWrite", "Can't write to file, error '%s'", common::strerror (errno));
   }
 
