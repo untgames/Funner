@@ -2,7 +2,7 @@
 
 #define TEST(X) try { X; }catch (std::exception& e) { printf ("exception: %s\n", e.what ()); }
 
-void test (NodeProperties& properties, const char* name)
+void test (common::PropertyMap& properties, const char* name)
 {
   TEST
   (
@@ -106,9 +106,9 @@ int main ()
   {
     Node::Pointer node (Node::Create ());       
     
-    node->SetProperties (NodeProperties::Create ());    
+    node->SetProperties (common::PropertyMap ());
     
-    NodeProperties& properties = *node->Properties ();
+    common::PropertyMap& properties = *node->Properties ();
 
     properties.SetProperty ("String",                "hello world");
     properties.SetProperty ("EmptyString",           "");

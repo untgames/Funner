@@ -24,6 +24,7 @@
 
 #include <common/component.h>
 #include <common/log.h>
+#include <common/property_map.h>
 #include <common/singleton.h>
 #include <common/strlib.h>
 #include <common/utf_converter.h>
@@ -37,7 +38,6 @@
 #include <sg/light.h>
 #include <sg/listener.h>
 #include <sg/node_array.h>
-#include <sg/node_properties.h>
 #include <sg/particle_emitter.h>
 #include <sg/physics.h>
 #include <sg/scene.h>

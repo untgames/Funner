@@ -10,10 +10,10 @@ void dump_properties (const Node& node)
     return;
   }
 
-  const NodeProperties& properties = *node.Properties ();  
+  const common::PropertyMap& properties = *node.Properties ();  
   
-  printf ("node has %u properties (hash=%08x, structure_hash=%08x, data_hash=%08x):\n",
-    properties.Size (), properties.Hash (), properties.StructureHash (), properties.DataHash ());    
+  printf ("node has %u properties (hash=%08x, structure_hash=%08x):\n",
+    properties.Size (), properties.Hash (), properties.LayoutHash ());    
     
   for (size_t i=0, count=properties.Size (); i<count; i++)
   {  
@@ -37,13 +37,13 @@ int main ()
     
     printf ("create properties\n");
     
-    node->SetProperties (NodeProperties::Create ());
+    node->SetProperties (common::PropertyMap ());
     
     dump_properties (*node);
     
     printf ("add properties\n");
     
-    NodeProperties& properties1 = *node->Properties ();
+    common::PropertyMap& properties1 = *node->Properties ();
 
     properties1.SetProperty ("X", "1");
     properties1.SetProperty ("Y", "3.14");
@@ -53,7 +53,7 @@ int main ()
     
     printf ("remove properties\n");
     
-    properties1.Remove ("Y");
+    properties1.RemoveProperty ("Y");
 
     dump_properties (*node);
     
@@ -77,14 +77,14 @@ int main ()
     
     printf ("change type\n");
     
-    TEST (properties1.SetPropertyType ("X", NodePropertyType_Float));
-    TEST (properties1.SetPropertyType ("NewZ", NodePropertyType_Vector));
+    TEST (properties1.SetPropertyType ("X", common::PropertyType_Float));
+    TEST (properties1.SetPropertyType ("NewZ", common::PropertyType_Vector));
     
     dump_properties (*node);
     
     printf ("clone\n");
     
-    NodeProperties::Pointer properties2 = properties1.Clone ();
+    common::PropertyMap properties2 = properties1.Clone ();
     
     node->SetProperties (0);
     node->SetProperties (properties2);
@@ -93,8 +93,8 @@ int main ()
     
     printf ("is_present\n");
     
-    printf ("is_present('%s'): %s\n", "Y", properties2->IsPresent ("Y") ? "true" : "false");
-    printf ("is_present('%s'): %s\n", "Y1", properties2->IsPresent ("Y1") ? "true" : "false");
+    printf ("is_present('%s'): %s\n", "Y", properties2.IsPresent ("Y") ? "true" : "false");
+    printf ("is_present('%s'): %s\n", "Y1", properties2.IsPresent ("Y1") ? "true" : "false");
   }
   catch (std::exception& e)
   {
