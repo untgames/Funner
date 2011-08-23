@@ -41,9 +41,27 @@ void idle (Test& test, Entity& entity, Frame& frame)
     fflush (stdout);
 
     last_fps = common::milliseconds ();
-    frames_count = 0;
+    frames_count = 0;        
+    
     return;
   }
+  
+  static size_t last_settings_change = 0;
+  
+  if (common::milliseconds () - last_settings_change > 5000)
+  {
+    static bool state = false;
+    
+    common::PropertyMap settings;
+    
+    settings.SetProperty ("FrontCounterClockwise", state ? "true" : "false");
+    
+    test.RenderManager ().ChangeSettings (settings);    
+    
+    state = !state;
+    
+    last_settings_change = common::milliseconds ();
+  }    
   
   frames_count++;
   
@@ -74,6 +92,12 @@ int main ()
     Test test (L"Model load FFP", true);
 
     RenderManager render_manager = test.RenderManager ();
+    
+    common::PropertyMap settings;
+    
+    settings.SetProperty ("FrontCounterClockwise", "false");
+    
+    render_manager.ChangeSettings (settings);
 
     render_manager.LoadResource ("data/spy.xmesh");
     render_manager.LoadResource ("data/spy.xmtl");
