@@ -75,6 +75,7 @@ class RenderView
     virtual void PropertiesUpdateNotify () {}
     virtual void ViewportUpdateNotify   () {}
     virtual void ScreenUpdateNotify     () {}
+    //TODO: add callbacks from screen/viewport/etc.
     
   private:
     struct Impl;
