@@ -19,15 +19,15 @@ class IViewportListener
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///События
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    virtual void OnChangeName       (const char* new_name) {}
-    virtual void OnChangeArea       (const Rect& new_area) {}
-    virtual void OnChangeCamera     (Camera* new_camera) {}
-    virtual void OnChangeZOrder     (int new_z_order) {}
-    virtual void OnChangeActive     (bool new_state) {}
-    virtual void OnChangeBackground (bool new_state, const math::vec4f& new_color) {}
-    virtual void OnChangeRenderPath (const char* new_path_name) {}
-    virtual void OnChangeProperties (const common::PropertyMap& properties) {}
-    virtual void OnDestroy          () {}
+    virtual void OnViewportChangeName       (const char* new_name) {}
+    virtual void OnViewportChangeArea       (const Rect& new_area) {}
+    virtual void OnViewportChangeCamera     (Camera* new_camera) {}
+    virtual void OnViewportChangeZOrder     (int new_z_order) {}
+    virtual void OnViewportChangeActive     (bool new_state) {}
+    virtual void OnViewportChangeBackground (bool new_state, const math::vec4f& new_color) {}
+    virtual void OnViewportChangeRenderer   (const char* new_renderer) {}
+    virtual void OnViewportChangeProperties (const common::PropertyMap& properties) {}
+    virtual void OnViewportDestroy          () {}
 
   protected:
     virtual ~IViewportListener () {}
@@ -60,10 +60,10 @@ class Viewport
     size_t Id () const;
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Установка пути рендеринга содержимого области вывода
+///Путь рендеринга
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void        SetRenderPath  (const char* path_name);
-    const char* RenderPath     () const;
+    void        SetRenderer (const char* renderer);
+    const char* Renderer    () const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Границы области вывода

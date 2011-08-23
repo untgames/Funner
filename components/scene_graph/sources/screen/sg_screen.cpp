@@ -61,32 +61,32 @@ struct Screen::Impl: public xtl::reference_counter
   
   void ChangeNameNotify ()
   {
-    Notify (xtl::bind (&IScreenListener::OnChangeName, _1, name.c_str ()));
+    Notify (xtl::bind (&IScreenListener::OnScreenChangeName, _1, name.c_str ()));
   }
   
   void ChangeAreaNotify ()
   {
-    Notify (xtl::bind (&IScreenListener::OnChangeArea, _1, area));
+    Notify (xtl::bind (&IScreenListener::OnScreenChangeArea, _1, area));
   }
   
   void ChangeBackgroundNotify ()
   {
-    Notify (xtl::bind (&IScreenListener::OnChangeBackground, _1, has_background, xtl::cref (background_color)));
+    Notify (xtl::bind (&IScreenListener::OnScreenChangeBackground, _1, has_background, xtl::cref (background_color)));
   }
   
   void AttachViewportNotify (scene_graph::Viewport& viewport)
   {
-    Notify (xtl::bind (&IScreenListener::OnAttachViewport, _1, xtl::ref (viewport)));
+    Notify (xtl::bind (&IScreenListener::OnScreenAttachViewport, _1, xtl::ref (viewport)));
   }
   
   void DetachViewportNotify (scene_graph::Viewport& viewport)
   {
-    Notify (xtl::bind (&IScreenListener::OnDetachViewport, _1, xtl::ref (viewport)));
+    Notify (xtl::bind (&IScreenListener::OnScreenDetachViewport, _1, xtl::ref (viewport)));
   }  
 
   void DestroyNotify ()
   {
-    Notify (xtl::bind (&IScreenListener::OnDestroy, _1));    
+    Notify (xtl::bind (&IScreenListener::OnScreenDestroy, _1));    
   }  
 };
 

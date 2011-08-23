@@ -4,32 +4,32 @@
 class MyScreenListener: public IScreenListener
 {
   public:
-    void OnChangeName (const char* new_name)
+    void OnScreenChangeName (const char* new_name)
     {
       printf ("OnChangeName(%s)\n", new_name);
     }
     
-    void OnChangeArea (const Rect& rect)
+    void OnScreenChangeArea (const Rect& rect)
     {
       printf ("OnChangeArea(%d, %d, %u, %u)\n", rect.x, rect.y, rect.width, rect.height);
     }
     
-    void OnChangeBackground (bool new_state, const math::vec4f& new_color)
+    void OnScreenChangeBackground (bool new_state, const math::vec4f& new_color)
     {
       printf ("OnChangeBackground(%s, %.2f, %.2f, %.2f, %.2f)\n", new_state ? "true" : "false", new_color.x, new_color.y, new_color.z, new_color.w);
     }
 
-    void OnAttachViewport (Viewport& viewport)
+    void OnScreenAttachViewport (Viewport& viewport)
     {
       printf ("OnAttachViewport(%s)\n", viewport.Name ());
     }
 
-    void OnDetachViewport (Viewport& viewport)
+    void OnScreenDetachViewport (Viewport& viewport)
     {
       printf ("OnDetachViewport(%s)\n", viewport.Name ());
     }
     
-    void OnDestroy ()
+    void OnScreenDestroy ()
     {
       printf ("OnDestroy()\n");
     }

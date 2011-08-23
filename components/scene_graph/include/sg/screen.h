@@ -15,12 +15,12 @@ class IScreenListener
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///События
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    virtual void OnChangeName       (const char* new_name) {}
-    virtual void OnChangeArea       (const Rect&) {}
-    virtual void OnChangeBackground (bool state, const math::vec4f& new_color) {}
-    virtual void OnAttachViewport   (Viewport&) {}
-    virtual void OnDetachViewport   (Viewport&) {}
-    virtual void OnDestroy          () {}
+    virtual void OnScreenChangeName       (const char* new_name) {}
+    virtual void OnScreenChangeArea       (const Rect&) {}
+    virtual void OnScreenChangeBackground (bool state, const math::vec4f& new_color) {}
+    virtual void OnScreenAttachViewport   (Viewport&) {}
+    virtual void OnScreenDetachViewport   (Viewport&) {}
+    virtual void OnScreenDestroy          () {}
 
   protected:
     virtual ~IScreenListener () {}

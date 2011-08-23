@@ -23,7 +23,7 @@ struct Viewport::Impl: public xtl::reference_counter
 {
   stl::string          name;              //имя области вывода
   scene_graph::Camera* camera;            //камера
-  stl::string          path_name;         //имя пути рендеринга
+  stl::string          renderer;          //имя пути рендеринга
   Rect                 rect;              //границы области вывода
   bool                 is_active;         //флаг активности области вывода  
   int                  z_order;           //порядок отрисовки области вывода
@@ -79,47 +79,47 @@ struct Viewport::Impl: public xtl::reference_counter
     
   void ChangeNameNotify ()
   {
-    Notify (xtl::bind (&IViewportListener::OnChangeName, _1, name.c_str ()));
+    Notify (xtl::bind (&IViewportListener::OnViewportChangeName, _1, name.c_str ()));
   }
   
   void ChangeAreaNotify ()
   {
-    Notify (xtl::bind (&IViewportListener::OnChangeArea, _1, xtl::cref (rect)));
+    Notify (xtl::bind (&IViewportListener::OnViewportChangeArea, _1, xtl::cref (rect)));
   }
   
   void ChangeCameraNotify ()
   {
-    Notify (xtl::bind (&IViewportListener::OnChangeCamera, _1, camera));
+    Notify (xtl::bind (&IViewportListener::OnViewportChangeCamera, _1, camera));
   }
   
   void ChangeZOrderNotify ()
   {
-    Notify (xtl::bind (&IViewportListener::OnChangeZOrder, _1, z_order));
+    Notify (xtl::bind (&IViewportListener::OnViewportChangeZOrder, _1, z_order));
   }
   
   void ChangeActiveNotify ()
   {
-    Notify (xtl::bind (&IViewportListener::OnChangeActive, _1, is_active));
+    Notify (xtl::bind (&IViewportListener::OnViewportChangeActive, _1, is_active));
   }
   
   void ChangeBackgroundNotify ()
   {
-    Notify (xtl::bind (&IViewportListener::OnChangeBackground, _1, has_background, xtl::cref (background_color)));
+    Notify (xtl::bind (&IViewportListener::OnViewportChangeBackground, _1, has_background, xtl::cref (background_color)));
   }  
   
-  void ChangeRenderPathNotify ()
+  void ChangeRendererNotify ()
   {
-    Notify (xtl::bind (&IViewportListener::OnChangeRenderPath, _1, path_name.c_str ()));
+    Notify (xtl::bind (&IViewportListener::OnViewportChangeRenderer, _1, renderer.c_str ()));
   }
   
   void ChangePropertiesNotify (const common::PropertyMap& properties)
   {
-    Notify (xtl::bind (&IViewportListener::OnChangeProperties, _1, properties));
+    Notify (xtl::bind (&IViewportListener::OnViewportChangeProperties, _1, properties));
   }  
   
   void DestroyNotify ()
   {
-    Notify (xtl::bind (&IViewportListener::OnDestroy, _1));    
+    Notify (xtl::bind (&IViewportListener::OnViewportDestroy, _1));    
   }
 };
 
@@ -182,25 +182,25 @@ size_t Viewport::Id () const
 }
 
 /*
-    Установка пути рендеринга содержимого области вывода
+    Путь рендеринга
 */
 
-void Viewport::SetRenderPath (const char* path_name)
+void Viewport::SetRenderer (const char* renderer)
 {
-  if (!path_name)
-    throw xtl::make_null_argument_exception ("scene_graph::Viewport::SetRenderPath", "path_name");
+  if (!renderer)
+    throw xtl::make_null_argument_exception ("scene_graph::Viewport::SetRenderer", "renderer");
     
-  if (impl->path_name == path_name)
+  if (impl->renderer == renderer)
     return;
     
-  impl->path_name = path_name;
+  impl->renderer = renderer;
   
-  impl->ChangeRenderPathNotify ();
+  impl->ChangeRendererNotify ();
 }
 
-const char* Viewport::RenderPath () const
+const char* Viewport::Renderer () const
 {
-  return impl->path_name.c_str ();
+  return impl->renderer.c_str ();
 }
 
 /*
