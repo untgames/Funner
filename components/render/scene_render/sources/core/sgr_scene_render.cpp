@@ -6,15 +6,35 @@ using namespace render;
     Описание реализации рендера сцены
 */
 
-struct SceneRender::Impl: public xtl::reference_counter
+struct SceneRender::Impl: public xtl::reference_counter, public scene_graph::IScreenListener
 {
-  render::RenderManager* manager;       //менеджер рендеринга связанный с ренедром сцены
-  scene_graph::Screen*   screen;        //экран
+  render::RenderManager* manager; //менеджер рендеринга связанный с ренедром сцены
+  scene_graph::Screen*   screen;  //экран
   
 ///Конструктор
   Impl ()
     : manager (0)
     , screen (0)
+  {
+  }
+  
+///Параметры заднего фона экрана изменены
+  void OnScreenChangeBackground (bool state, const math::vec4f& new_color)
+  {
+  }
+
+///Присоединена область вывода
+  void OnScreenAttachViewport (Viewport& viewport)
+  {
+  }
+
+///Отсоединена область вывода
+  void OnScreenDetachViewport (Viewport& viewport)
+  {
+  }
+
+///Экран удален
+  void OnScreenDestroy ()
   {
   }
 };
