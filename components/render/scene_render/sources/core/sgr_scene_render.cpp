@@ -2,78 +2,20 @@
 
 using namespace render;
 
-namespace
-{
-
 /*
-    Константы
+    Описание реализации рендера сцены
 */
 
-const size_t DEFAULT_MAX_DRAW_DEPTH = 16; //максимальный уровень вложенности рендеринга по умолчанию
-
-}
-
-/*
-    Описание реализации SceneRender
-*/
-
-typedef stl::auto_ptr<RenderManager> RenderManagerPtr;
-
-struct SceneRender::Impl
+struct SceneRender::Impl: public xtl::reference_counter
 {
-  RenderManagerPtr         render_manager; //менеджер рендеринга
-  QueryManager             query_manager;  //менеджер запросов рендеринга
-  SceneRender::LogFunction log_handler;    //функция отладочного протоколирования
-  size_t                   max_draw_depth; //максимальный уровень вложенности рендеринга
-
+  render::RenderManager* manager;       //менеджер рендеринга связанный с ренедром сцены
+  scene_graph::Screen*   screen;        //экран
+  
 ///Конструктор
-  Impl () : max_draw_depth (DEFAULT_MAX_DRAW_DEPTH) {}
-
-///Создание запроса рендеринга
-  IRenderQuery* CreateRenderQuery
-    (mid_level::IRenderTarget* render_target,
-     mid_level::IRenderTarget* depth_stencil_target,
-     const char*               query_string)
+  Impl ()
+    : manager (0)
+    , screen (0)
   {
-    if (!render_manager)
-      throw xtl::format_operation_exception ("render::SceneRender::Impl::CreateRenderQuery", "Null render manager");
-
-    return query_manager.CreateQuery (render_target, depth_stencil_target, query_string, *render_manager);
-  }
-
-    //отладочное протоколирование
-  void LogMessage (const char* message)
-  {
-    if (!log_handler)
-      return;
-
-    try
-    {
-      log_handler (message);
-    }
-    catch (...)
-    {
-      //подавление всех исключений
-    }
-  }
-
-  void LogPrintf (const char* format, ...)
-  {
-    if (!log_handler)
-      return;
-
-    va_list args;
-
-    va_start (args, format);
-
-    try
-    {
-      log_handler (common::vformat (format, args).c_str ());
-    }
-    catch (...)
-    {
-      //подавление всех исключений
-    }
   }
 };
 
@@ -86,188 +28,118 @@ SceneRender::SceneRender ()
 {
 }
 
-SceneRender::SceneRender (const char* driver_name_mask, const char* renderer_name_mask, const char* render_path_masks)
-  : impl (new Impl)
+SceneRender::SceneRender (const SceneRender& render)
+  : impl (render.impl)
 {
-  try
-  {
-    SetRenderer (driver_name_mask, renderer_name_mask, render_path_masks);
-  }
-  catch (xtl::exception& exception)
-  {
-    exception.touch ("render::SceneRender::SceneRender");
-    throw;
-  }
+  addref (impl);
 }
 
 SceneRender::~SceneRender ()
 {
+  release (impl);
+}
+
+SceneRender& SceneRender::operator = (const SceneRender& render)
+{
+  SceneRender (render).Swap (*this);
+  
+  return *this;
 }
 
 /*
-    Установка/получение системы рендеринга
+    Установка / сброс системы рендеринга
 */
 
-void SceneRender::SetRenderer
- (const char* driver_name_mask,   //маска имени драйвера системы рендеринга
-  const char* renderer_name_mask, //маска имени системы рендеринга в драйвере
-  const char* render_path_masks)  //список масок имён требуемых путей рендеринга (разделитель - пробел)
+void SceneRender::SetRenderManager (render::RenderManager* manager)
 {
-  try
-  {
-    RenderManagerPtr new_manager (new RenderManager (driver_name_mask, renderer_name_mask, render_path_masks,
-      xtl::bind (&Impl::LogMessage, &*impl, _1), xtl::bind (&Impl::CreateRenderQuery, &*impl, _1, _2, _3)));
-
-    new_manager->DrawTransactionManager ().SetMaxDrawDepth (impl->max_draw_depth);
-
-    impl->render_manager = new_manager;
-  }
-  catch (xtl::exception& exception)
-  {
-    exception.touch ("render::SceneRender::SetRenderer");
-    throw;
-  }
+  throw xtl::make_not_implemented_exception ("render::SceneRender::SetRenderManager");
 }
 
-void SceneRender::ResetRenderer ()
+render::RenderManager* SceneRender::RenderManager () const
 {
-  impl->render_manager = 0;
-}
-
-const char* SceneRender::RendererDescription () const
-{
-  return impl->render_manager ? impl->render_manager->Renderer ().GetDescription () : "";
-}
-
-const char* SceneRender::RenderPaths () const
-{
-  return impl->render_manager ? impl->render_manager->RenderPaths () : "";
-}
-
-bool SceneRender::HasRenderPath (const char* path_name) const
-{
-  return impl->render_manager ? impl->render_manager->HasRenderPath (path_name) : false;
+  return impl->manager;
 }
 
 /*
-    Работа с ресурсами
+    Проверка связи цели рендеринга с рендером
 */
 
-void SceneRender::LoadResource (const char* tag, const char* file_name)
+bool SceneRender::IsBindedToRenderer () const
 {
-  if (!impl->render_manager)
-    throw xtl::format_operation_exception ("render::SceneRender::LoadResource", "Null render manager");
-
-  impl->render_manager->LoadResource (tag, file_name);
-}
-
-void SceneRender::UnloadResource (const char* tag, const char* file_name)
-{
-  if (!impl->render_manager)
-    throw xtl::format_operation_exception ("render::SceneRender::UnloadResource", "Null render manager");
-
-  impl->render_manager->UnloadResource (tag, file_name);
+  return impl->manager && impl->screen;
 }
 
 /*
-    Перебор доступных целей рендеринга
+    Экран (политика владения - weak-ref)
 */
 
-size_t SceneRender::RenderTargetsCount () const
+void SceneRender::SetScreen (scene_graph::Screen* screen)
 {
-  return impl->render_manager ? impl->render_manager->RenderTargetsCount () : 0;
+  throw xtl::make_not_implemented_exception ("render::SceneRender::SetScreen");
 }
 
-RenderTarget SceneRender::RenderTarget (size_t index) const
+scene_graph::Screen* SceneRender::Screen () const
 {
-  if (!impl->render_manager)
-    throw xtl::make_range_exception ("render::SceneRender::RenderTarget", "index", index, 0u);
-
-  return ConstructableRenderTarget (impl->render_manager->RenderTarget (index));
+  return impl->screen;
 }
 
 /*
-    Регистрация функций обработки запросов рендеринга (дочерний рендеринг)
+    Регистрация целевых буферов отрисовки
 */
 
-void SceneRender::RegisterQueryHandler (const char* query_string_mask, const QueryFunction& handler)
+void SceneRender::SetRenderTarget (const char* name, const render::RenderTarget& target)
 {
-  try
-  {
-    impl->query_manager.RegisterQueryHandler (query_string_mask, handler);
-  }
-  catch (xtl::exception& exception)
-  {
-    exception.touch ("render::SceneRender::RegisterQueryHandler");
-    throw;
-  }
+  throw xtl::make_not_implemented_exception ("render::SceneRender::SetRenderTarget");
 }
 
-void SceneRender::UnregisterQueryHandler (const char* query_string_mask)
+void SceneRender::RemoveRenderTarget (const char* name)
 {
-  impl->query_manager.UnregisterQueryHandler (query_string_mask);
+  throw xtl::make_not_implemented_exception ("render::SceneRender::RemoveRenderTarget");
 }
 
-void SceneRender::UnregisterAllQueryHandlers ()
+void SceneRender::RemoveAllRenderTargets ()
 {
-  impl->query_manager.UnregisterAllQueryHandlers ();
+  throw xtl::make_not_implemented_exception ("render::SceneRender::RemoveAllRenderTargets");
 }
 
 /*
-    Максимальный уровень вложенности рендеринга
+    Получение целевых буферов отрисовки
 */
 
-void SceneRender::SetMaxDrawDepth (size_t level)
+bool SceneRender::HasRenderTarget (const char* name) const
 {
-  impl->max_draw_depth = level;
-
-  if (impl->render_manager)
-    impl->render_manager->DrawTransactionManager ().SetMaxDrawDepth (level);
+  throw xtl::make_not_implemented_exception ("render::SceneRender::HasRenderTarget");
 }
 
-size_t SceneRender::MaxDrawDepth () const
+RenderTarget SceneRender::RenderTarget (const char* name) const
 {
-  return impl->max_draw_depth;
+  throw xtl::make_not_implemented_exception ("render::SceneRender::RenderTarget");
 }
 
 /*
-    Установка функции отладочного протоколирования
+    Обновление
 */
 
-void SceneRender::SetLogHandler (const LogFunction& log)
+void SceneRender::Update ()
 {
-  impl->log_handler = log;
-}
-
-const SceneRender::LogFunction& SceneRender::LogHandler () const
-{
-  return impl->log_handler;
+  throw xtl::make_not_implemented_exception ("render::SceneRender::Update");
 }
 
 /*
-    Отладочное протоколирование
+    Обмен
 */
+
+void SceneRender::Swap (SceneRender& render)
+{
+  stl::swap (impl, render.impl);
+}
 
 namespace render
 {
 
-void log_printf (const SceneRender::LogFunction& log_handler, const char* format, ...)
+void swap (SceneRender& render1, SceneRender& render2)
 {
-  if (!log_handler || !format)
-    return;
-
-  va_list args;
-
-  va_start (args, format);
-
-  try
-  {
-    log_handler (common::vformat (format, args).c_str ());
-  }
-  catch (...)
-  {
-    //подавление всех исключений
-  }
+  render1.Swap (render2);
 }
 
 }
