@@ -6,7 +6,7 @@ using namespace render;
     Описание реализации рендера сцены
 */
 
-struct SceneRender::Impl: public xtl::reference_counter, public scene_graph::IScreenListener
+struct SceneRender::Impl: public xtl::reference_counter, public scene_graph::IScreenListener, public scene_graph::IViewportListener
 {
   render::RenderManager* manager; //менеджер рендеринга связанный с ренедром сцены
   scene_graph::Screen*   screen;  //экран
@@ -35,6 +35,11 @@ struct SceneRender::Impl: public xtl::reference_counter, public scene_graph::ISc
 
 ///Экран удален
   void OnScreenDestroy ()
+  {
+  }
+  
+///Порядок вывода изменен
+  void OnViewportChangeZOrder (int)
   {
   }
 };
