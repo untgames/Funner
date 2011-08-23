@@ -1,0 +1,9 @@
+Results of parse_concat_test:
+Parse of 2 files successfull
+root (source='', line=0): {}
+ node (source='data/test4.wxf', line=1): {A}
+  node (source='data/test4.wxf', line=3): {B, test0 {test1 } { test2} { test3 } {{test5} test4}
+  node (source='data/test4.wxf', line=4): {C, _test1 {_test2} _test3}
+ A (source='data/test5.wxf', line=1): {}
+  B (source='data/test5.wxf', line=3): {{A.C} {A.D}}
+  C (source='data/test5.wxf', line=4): {Hello world}

@@ -175,6 +175,12 @@ ParseNode resolve_references (const ParseNode& source_tree, const xtl::function<
 ParseNode resolve_references (const ParseNode& source_tree, const ParseNode& reference_values);
 ParseNode resolve_references (const ParseNode& source_tree, const PropertyMap& reference_values);
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Объединение деревьев
+///////////////////////////////////////////////////////////////////////////////////////////////////
+ParseNode concat (size_t nodes_count, const ParseNode* nodes);
+ParseNode concat (const ParseNode& node1, const ParseNode& node2);
+
 }
 
 #endif

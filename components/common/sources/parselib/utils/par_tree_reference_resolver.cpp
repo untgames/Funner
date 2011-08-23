@@ -88,7 +88,7 @@ struct ParseResolver
     
     for (ParseNode child=source_node.First (); child; child=child.Next ())
     {
-      if (strcmp (source_node.Source (), builder.Source ()))
+      if (strcmp (child.Source (), builder.Source ()))
       {
         builder.SetSource (child.Source ());
       }

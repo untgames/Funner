@@ -17,11 +17,11 @@ updated map has 2 properties (hash=d7f47097, layout_hash=464f5a08):
  #1: name='Z', type=string, value='hello world'
 change layout type
 rename property 'Z' to 'NewZ'
-updated map has 2 properties (hash=52dc2498, layout_hash=5426de09):
+updated map has 2 properties (hash=557257f6, layout_hash=074dc7ab):
  #0: name='X', type=string, value='1'
  #1: name='NewZ', type=string, value='hello world'
 change property 'X' type
-updated map has 2 properties (hash=eae53dd8, layout_hash=6ce3d31c):
+updated map has 2 properties (hash=ed4b4eb6, layout_hash=3f88cabe):
  #0: name='X', type=float, value='1'
  #1: name='NewZ', type=string, value='hello world'
 clear properties
