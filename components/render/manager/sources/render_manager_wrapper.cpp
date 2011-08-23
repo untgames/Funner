@@ -333,9 +333,24 @@ size_t RenderManager::CacheFrameDelay () const
   return impl->CacheManager ().FrameDelay ();
 }
 
+void RenderManager::ChangeSettings (const common::PropertyMap& settings)
+{
+  impl->EffectManager ().ChangeSettings (settings);
+}
+
+common::ParseNode RenderManager::Configuration () const
+{
+  return impl->EffectManager ().Configuration ();
+}
+
 xtl::connection RenderManager::RegisterWindowEventHandler (RenderManagerWindowEvent event, const WindowEventHandler& handler) const
 {
   return impl->RegisterWindowEventHandler (event, handler);
+}
+
+xtl::connection RenderManager::RegisterEventHandler (RenderManagerEvent event, const EventHandler& handler) const
+{
+  return impl->RegisterEventHandler (event, handler);
 }
 
 void RenderManager::SetLogLevel (render::LogLevel level)

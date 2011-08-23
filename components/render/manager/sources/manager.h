@@ -69,8 +69,10 @@ class RenderManagerImpl: public Object
 ///Регистрация на события
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     typedef RenderManager::WindowEventHandler WindowEventHandler;
+    typedef RenderManager::EventHandler EventHandler;
 
     xtl::connection RegisterWindowEventHandler (RenderManagerWindowEvent event, const WindowEventHandler& handler) const;
+    xtl::connection RegisterEventHandler       (RenderManagerEvent event, const EventHandler& handler) const;    
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Настройки менеджера рендеринга

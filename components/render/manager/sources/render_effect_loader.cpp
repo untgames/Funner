@@ -4,16 +4,8 @@ using namespace common;
 using namespace render::low_level;
 using namespace render;
 
-//TODO: templates for all blocks: shading, blend, depth_stencil, etc.
-
 namespace
 {
-
-/*
-    Константы
-*/
-
-const char* RFX_FILE_SUFFIX = ".rfx"; //суффикс имени файла описания библиотеки эффектов
 
 /*
     Загрузчик эффектов
@@ -23,17 +15,17 @@ class EffectLoader
 {
   public:
 ///Конструктор  
-    EffectLoader (const DeviceManagerPtr& in_device_manager, const char* file_name, EffectLoaderLibrary& in_library)
-      : parser (file_name, "wxf")
+    EffectLoader (const DeviceManagerPtr& in_device_manager, const char* name, const common::ParseNode& in_root, EffectLoaderLibrary& in_library)
+      : root (in_root)
       , library (in_library)
       , device_manager (in_device_manager)
     {
       try
       {
-        ParseRoot (parser.Root ());
-        
-        if (parser.Log ().HasErrors ())
-          throw xtl::format_operation_exception ("render::EffectLoader::EffectLoader", "Error at parsing effect file '%s'", file_name);
+        ParseRoot (root);
+
+        if (root.Log ().HasErrors ())
+          throw xtl::format_operation_exception ("render::EffectLoader::EffectLoader", "Error at parsing effect file '%s'", name);
       }
       catch (...)
       {
@@ -48,7 +40,7 @@ class EffectLoader
 ///Печать лога
     void PrintLog ()
     {
-      const common::ParseLog& parse_log = parser.Log ();
+      const common::ParseLog& parse_log = root.Log ();
 
       try
       {  
@@ -181,7 +173,7 @@ class EffectLoader
       }
       catch (std::exception& e)
       {
-        parser.Log ().Error (*iter, "%s", e.what ());
+        root.Log ().Error (*iter, "%s", e.what ());
         throw;
       }
     }
@@ -307,7 +299,7 @@ class EffectLoader
       }
       catch (std::exception& e)
       {
-        parser.Log ().Error (*iter, "%s", e.what ());
+        root.Log ().Error (*iter, "%s", e.what ());
         throw;
       }
     }
@@ -372,7 +364,7 @@ class EffectLoader
       }
       catch (std::exception& e)
       {
-        parser.Log ().Error (*iter, "%s", e.what ());
+        root.Log ().Error (*iter, "%s", e.what ());
         throw;
       }
     }
@@ -473,7 +465,7 @@ class EffectLoader
       }
       catch (std::exception& e)
       {
-        parser.Log ().Error (*iter, "%s", e.what ());
+        root.Log ().Error (*iter, "%s", e.what ());
         throw;
       }
     }
@@ -627,7 +619,7 @@ class EffectLoader
       }
       catch (std::exception& e)
       {
-        parser.Log ().Error (*iter, "%s", e.what ());
+        root.Log ().Error (*iter, "%s", e.what ());
         throw;
       }      
     }
@@ -659,7 +651,7 @@ class EffectLoader
     {
       const char* file_mask = get<const char*> (*iter, "");
 
-      library.Shaders ().Load (file_mask, "", ShaderLoaderLog (*iter, parser.Log ()));
+      library.Shaders ().Load (file_mask, "", ShaderLoaderLog (*iter, root.Log ()));
 
       log.Printf ("Effect shaders library '%s' loaded (%u shaders loaded)", file_mask, library.Shaders ().Size ());
     }
@@ -721,7 +713,7 @@ class EffectLoader
       }
       catch (std::exception& e)
       {
-        parser.Log ().Error (*iter, "%s", e.what ());
+        root.Log ().Error (*iter, "%s", e.what ());
         throw;
       }            
     }
@@ -829,7 +821,7 @@ class EffectLoader
       }
       catch (std::exception& e)
       {
-        parser.Log ().Error (*iter, "%s", e.what ());
+        root.Log ().Error (*iter, "%s", e.what ());
         throw;
       }
     }
@@ -903,13 +895,13 @@ class EffectLoader
       }
       catch (std::exception& e)
       {
-        parser.Log ().Error (*iter, "%s", e.what ());
+        root.Log ().Error (*iter, "%s", e.what ());
         throw;
       }
     }    
   
   private:
-    common::Parser       parser;         //парсер файла эффектов
+    common::ParseNode    root;           //корневой узел
     EffectLoaderLibrary& library;        //библиотека загрузки эффектов
     render::Log          log;            //протокол рендера
     DeviceManagerPtr     device_manager; //менеджер устройства отрисовки
@@ -920,17 +912,9 @@ class EffectLoader
 namespace render
 {
 
-void parse_effect_library (const DeviceManagerPtr& device_manager, const char* file_name, EffectLoaderLibrary& library)
+void parse_effect_library (const DeviceManagerPtr& device_manager, const common::ParseNode& node, const char* name, EffectLoaderLibrary& library)
 {
-  EffectLoader loader (device_manager, file_name, library);
-}
-
-bool is_effect_library_file (const char* file_name)
-{
-  if (!file_name)
-    return false;
-    
-  return xtl::xstricmp (common::suffix (file_name).c_str (), RFX_FILE_SUFFIX) == 0;
+  EffectLoader loader (device_manager, name, node, library);
 }
 
 }

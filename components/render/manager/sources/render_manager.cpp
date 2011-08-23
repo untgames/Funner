@@ -19,9 +19,10 @@ const size_t WINDOW_ARRAY_RESERVE_SIZE = 8; //резервируемое число окон
 */
 
 typedef xtl::signal<void (RenderManager&, Window&)> WindowSignal;
+typedef xtl::signal<void (RenderManager&)>          Signal;
 typedef stl::vector<WindowImpl*>                    WindowArray;
 
-struct RenderManagerImpl::Impl: public xtl::trackable
+struct RenderManagerImpl::Impl: public xtl::trackable, public IEffectManagerListener
 {
   RenderManagerImpl*  owner;                                         //владелец
   SettingsPtr         settings;                                      //настройки рендеринга
@@ -30,6 +31,7 @@ struct RenderManagerImpl::Impl: public xtl::trackable
   CacheManagerPtr     cache_manager;                                 //менеджер кэширования
   PropertyCachePtr    property_cache;                                //кэш буферов свойств
   WindowSignal        window_signals [RenderManagerWindowEvent_Num]; //оконные сигналы
+  Signal              signals [RenderManagerEvent_Num];              //сигналы менеджера
   WindowArray         windows;                                       //окна
   TextureManagerPtr   textures;                                      //текстуры
   PrimitiveManagerPtr primitives;                                    //примитивы
@@ -92,10 +94,36 @@ struct RenderManagerImpl::Impl: public xtl::trackable
       
       window_signals [event](manager, window);
     }
+    catch (std::exception& e)
+    {
+      log.Printf ("%s\n    at render::RenderManagerImpl::Impl::WindowEventNotify", e.what ());
+    }
     catch (...)
     {
-      //подавление всех исключений
+      log.Printf ("unknown exception\n    at render::RenderManagerImpl::Impl::WindowEventNotify");
     }
+  }
+  
+///Оповещение об обновлении кофигурации эффектов
+  void OnConfigurationChanged ()
+  {
+    if (signals [RenderManagerEvent_OnConfigurationChanged].empty ())
+      return;
+
+    try
+    {      
+      RenderManager manager = Wrappers::Wrap<RenderManager> (owner);
+      
+      signals [RenderManagerEvent_OnConfigurationChanged] (manager);
+    }
+    catch (std::exception& e)
+    {
+      log.Printf ("%s\n    at render::RenderManagerImpl::Impl::OnConfigurationChanged", e.what ());
+    }
+    catch (...)
+    {
+      log.Printf ("unknown exception\n    at render::RenderManagerImpl::Impl::OnConfigurationChanged");
+    }    
   }
 };
 
@@ -219,7 +247,7 @@ EffectManager& RenderManagerImpl::EffectManager ()
   try
   {
     if (!impl->effects)
-      impl->effects = EffectManagerPtr (new render::EffectManager (&impl->DeviceManager (), &TextureManager (), &ProgramManager ()), false);
+      impl->effects = EffectManagerPtr (new render::EffectManager (&impl->DeviceManager (), &TextureManager (), &ProgramManager (), &*impl), false);
 
     return *impl->effects;
   }
@@ -534,6 +562,17 @@ xtl::connection RenderManagerImpl::RegisterWindowEventHandler (RenderManagerWind
       return impl->window_signals [event].connect (handler);
     default:
       throw xtl::make_argument_exception ("render::RenderManagerImpl::RegisterWindowEventHandler", "event", event);
+  }
+}
+
+xtl::connection RenderManagerImpl::RegisterEventHandler (RenderManagerEvent event, const EventHandler& handler) const
+{
+  switch (event)
+  {
+    case RenderManagerEvent_OnConfigurationChanged:
+      return impl->signals [event].connect (handler);
+    default:
+      throw xtl::make_argument_exception ("render::RenderManagerImpl::RegisterEventHandler", "event", event);
   }
 }
 
