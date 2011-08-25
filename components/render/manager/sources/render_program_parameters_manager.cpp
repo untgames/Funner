@@ -21,8 +21,8 @@ struct ProgramParametersManager::Impl: public xtl::trackable
 ///Конструктор
   Impl (const LowLevelDevicePtr& in_device, const SettingsPtr& in_settings, const CacheManagerPtr& cache_manager)
     : device (in_device)
-    , settings (in_settings)
     , composite_layouts (cache_manager)
+    , settings (in_settings)
   {
     static const char* METHOD_NAME = "render::ProgramParametersManager::Impl";
     

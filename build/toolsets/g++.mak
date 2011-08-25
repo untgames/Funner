@@ -14,7 +14,7 @@ DLL_LIB_SUFFIX        ?= .a
 LIB_PREFIX            ?= lib
 COMPILER_GCC          ?= gcc
 LINKER_GCC            ?= g++
-LIB_GCC               ?= ar
+LIB_GCC               ?= libtool
 PROFILES              += g++
 DEFAULT_LIBS          +=
 COMMON_CFLAGS         := -Os -Wall -Wno-format $(COMMON_CFLAGS)
@@ -43,12 +43,16 @@ define tools.link.dll
 -shared -Wl,--out-implib,$(dir $1)$(LIB_PREFIX)$(notdir $(basename $1))$(LIB_SUFFIX)
 endef
 
+define tools.link.deffile
+-Wl,--output-def,$1
+endef
+
 ###################################################################################################
 #Линковка файлов (имя выходного файла, список файлов, список каталогов со статическими библиотеками,
-#список подключаемых символов линковки, флаги линковки)
+#список подключаемых символов линковки, флаги линковки, def-файл, файл ошибок)
 ###################################################################################################
 define tools.g++.link
-$(LINKER_GCC) -o "$1" $(if $(filter %$(DLL_SUFFIX),$1),$(call tools.link.dll,$1)) $(filter-out lib%.a,$2) $(foreach dir,$3,-L$(dir)) $(patsubst lib%.a,-l%,$(filter lib%.a,$(filter-out $(EXCLUDE_LIBS:%=lib%.a),$2)) $(DEFAULT_LIBS) $(COMMON_LINK_FLAGS) $5 $(patsubst %,-u _%,$4)) && chmod u+x "$1"
+$(LINKER_GCC) -o "$1" $(if $(filter %$(DLL_SUFFIX),$1),$(call tools.link.dll,$1)) $(filter-out lib%.a,$2) $(foreach dir,$3,-L$(dir)) $(patsubst lib%.a,-l%,$(filter lib%.a,$(filter-out $(EXCLUDE_LIBS:%=lib%.a),$2)) $(DEFAULT_LIBS) $(COMMON_LINK_FLAGS) $5 $(patsubst %,-u _%,$4)) $(if $6,$(call tools.link.deffile,$6)) $(if $7, 2> $7) && chmod u+x "$1"
 endef
 
 ###################################################################################################
@@ -61,9 +65,15 @@ endef
 ###################################################################################################
 #Сборка библиотеки (имя выходного файла, список файлов)
 ###################################################################################################
-define tools.g++.lib
-$(LIB_GCC) rcus $1 $2
-endef
+ifneq (,$(filter libtool,$(LIB_GCC)))
+  define tools.g++.lib
+    $(LIB_GCC) -static -o $1 $2
+  endef
+else
+  define tools.g++.lib
+    $(LIB_GCC) rcus $1 $2
+  endef
+endif
 
 define tools.c++compile
 $(call tools.g++.c++compile,$1,$2,$3,$4,$5,$6,$7,$8,$9)

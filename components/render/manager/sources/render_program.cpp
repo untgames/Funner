@@ -82,8 +82,6 @@ struct ProgramCommonData: public xtl::reference_counter, public DebugIdHolder
         
       common::PropertyMap new_properties;
       
-      size_t channel = 0;
-      
       for (TexmapDescArray::iterator iter=texmaps.begin (), end=texmaps.end (); iter!=end; ++iter)
       {
         TexmapDesc& desc = *iter;        
@@ -153,11 +151,11 @@ typedef stl::hash_map<size_t, ProgramPtr> ProgramMap;
 
 struct Program::Impl: public DebugIdHolder
 {
-  ProgramCommonDataPtr        common_data;               //общие данные программы
-  ShaderOptions               options;                   //опции данного экземпл€ра программы
-  ProgramMap                  derived_programs;          //производные программы  
+  ProgramCommonDataPtr        common_data;                //общие данные программы
+  ShaderOptions               options;                    //опции данного экземпл€ра программы
+  ProgramMap                  derived_programs;           //производные программы
   OptionsCacheCombinationMap  options_cache_combinations; //комбинации кэшей опций
-  LowLevelProgramPtr          low_level_program;         //низкоуровнева€ программа
+  LowLevelProgramPtr          low_level_program;          //низкоуровнева€ программа
   
 /// онструктор
   Impl (const DeviceManagerPtr& device_manager, const char* name, const char* static_options, const char* dynamic_options)
@@ -189,8 +187,8 @@ struct Program::Impl: public DebugIdHolder
   
   Impl (const Impl& impl, const ShaderOptions& in_options)
     : common_data (impl.common_data)
-    , options_cache_combinations (&common_data->device_manager->CacheManager ())
     , options (impl.options)
+    , options_cache_combinations (&common_data->device_manager->CacheManager ())
   {
     options.options      += " ";
     options.options      += in_options.options;
@@ -364,8 +362,6 @@ void Program::SetTexmap (size_t index, size_t channel, const char* semantic, con
 
 size_t Program::AddTexmap (size_t channel, const char* semantic, const char* param_name, bool is_framemap)
 {
-  static const char* METHOD_NAME = "render::Program::SetTexmap";
-  
   impl->common_data->texmaps.push_back ();
   
   size_t index = impl->common_data->texmaps.size () - 1;

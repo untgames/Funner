@@ -117,8 +117,8 @@ struct ShaderOptionsLayout::Impl: public xtl::trackable
   
 ///Конструктор
   Impl (const CacheManagerPtr& cache_manager)
-    : need_flush (false)
-    , builders (cache_manager)
+    : builders (cache_manager)
+    , need_flush (false)
   {
   }
   

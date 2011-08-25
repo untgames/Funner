@@ -20,7 +20,7 @@ namespace
 {
 
 /*
-    Љ®­бв ­вл
+    Константы
 */
 
 const char* COMPONENT_NAME             = "script.binds.Engine";
@@ -29,7 +29,7 @@ const char* ATTACHMENT_REGISTRY_PREFIX = "Engine";
 const char* SUBSYSTEM_MANAGER_LIBRARY  = "Engine.SubsystemManagerClass";
 
 /*
-    ђҐЈЁбва жЁп ЎЁЎ«Ё®вҐЄ
+    Регистрация библиотек
 */
 
 template <class T> void register_attachment (const char* name, T& value)
@@ -108,7 +108,6 @@ template <class T> void bind_attachment_methods (Environment& environment, const
 
 void bind_attachment_registry_library (Environment& environment)
 {
-  bind_attachment_methods<render::Screen>        (environment, "Screens");
   bind_attachment_methods<scene_graph::Listener> (environment, "Listeners");
 
   typedef xtl::function<void (const char*)> InputHandler;
@@ -129,7 +128,7 @@ void bind_subsystem_manager_library (Environment& environment)
 }
 
 /*
-    Љ®¬Ї®­Ґ­в
+    Компонент
 */
 
 class Component

@@ -13,7 +13,7 @@ EXE_SUFFIX     :=
 DLL_SUFFIX     := .dylib
 DLL_LIB_SUFFIX := .dylib
 
-PROFILES += iphone cocoa unistd has_windows haswchar gles no_dll
+PROFILES += iphone cocoa unistd has_windows haswchar gles no_dll has_iconv
 DLL_PATH := DYLD_LIBRARY_PATH
 
 COMMON_CFLAGS     += -Os -isysroot $(IPHONE_SDK_PATH) -DIPHONE
@@ -71,7 +71,7 @@ define process_target.fat-static-lib
 
   $$($1.LIB_FILE): $$($1.LIBS)
 		@echo Create fat static library $$(notdir $$($1.LIB_FILE))..
-		libtool -c -o $$@ $$($1.LIBS)
+		@libtool -c -o $$@ $$(sort $$($1.LIBS))
 endef
 
 #Обработка цели объединения библиотек, собранных для разных архитектур (имя цели)

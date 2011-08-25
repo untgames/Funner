@@ -651,7 +651,9 @@ class EffectLoader
     {
       const char* file_mask = get<const char*> (*iter, "");
 
-      library.Shaders ().Load (file_mask, "", ShaderLoaderLog (*iter, root.Log ()));
+      ParseLog parse_log (root.Log ());
+
+      library.Shaders ().Load (file_mask, "", ShaderLoaderLog (*iter, parse_log));
 
       log.Printf ("Effect shaders library '%s' loaded (%u shaders loaded)", file_mask, library.Shaders ().Size ());
     }

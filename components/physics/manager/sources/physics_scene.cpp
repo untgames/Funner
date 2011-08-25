@@ -588,8 +588,6 @@ struct Scene::Impl : public xtl::reference_counter, public xtl::trackable
 
   void RayTest (const math::vec3f& ray_origin, const math::vec3f& ray_end, RayTestMode mode, const RayTestCallback& callback)
   {
-    static const char* METHOD_NAME = "physics::Scene::RayTest (const math::vec3f&, const math::vec3f&, RayTestMode, const RayTestCallback&)";
-
     scene->RayTest (ray_origin, ray_end, ConvertRayTestMode (mode), xtl::bind (&Scene::Impl::RayTestCallbackHandler, this, _1, _2, _3, callback));
   }
 
@@ -636,7 +634,9 @@ struct Scene::Impl : public xtl::reference_counter, public xtl::trackable
     if (!body_impl)
       throw xtl::format_operation_exception ("physics::Scene::Impl::RayTestCallbackHandler", "Can't find body");
 
-    callback (RigidBodyImplProvider::CreateRigidBody (body_impl), position, normal);
+    RigidBody body_wrap (RigidBodyImplProvider::CreateRigidBody (body_impl));
+
+    callback (body_wrap, position, normal);
   }
 };
 
