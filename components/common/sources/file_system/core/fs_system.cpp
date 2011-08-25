@@ -788,12 +788,15 @@ FileImplPtr FileSystemImpl::OpenFile (const char* src_file_name,filemode_t mode_
       base_file = FileImplPtr (new CryptoFileImpl (base_file, buffer_size, params.ReadMethod (), params.WriteMethod (), params.Key (), params.KeyBits ()), false);
     }
 
-    size_t self_buffer_size = base_file->GetBufferSize ();
+    size_t self_buffer_size = base_file->GetBufferSize (), preferred_buffer_size = GetFileBufferSize (src_file_name);
+    
+    if (preferred_buffer_size > buffer_size)
+      buffer_size = preferred_buffer_size;
 
     if (!buffer_size || self_buffer_size >= buffer_size || (self_buffer_size >= base_file->Size () && !(base_file->Mode () & FileMode_Resize)))
       return base_file;
 
-    if (base_file->Size () < default_file_buffer_size && !(mode_flags & (FileMode_Resize|FileMode_Write)))
+    if (base_file->Size () <= buffer_size && !(mode_flags & (FileMode_Resize|FileMode_Write)))
       return FileImplPtr (new MemFileImpl (base_file), false);
 
     return FileImplPtr (new BufferedFileImpl (base_file,buffer_size), false);
@@ -815,6 +818,33 @@ FileImplPtr FileSystemImpl::OpenFile (const char* src_file_name,filemode_t mode_
 void FileSystemImpl::SetDefaultFileBufferSize (size_t buffer_size)
 {
   default_file_buffer_size = buffer_size;
+}
+
+void FileSystemImpl::SetFileBufferSize (const char* file_name, size_t buffer_size)
+{
+  if (!file_name)
+    throw xtl::make_null_argument_exception ("common::FileSystem::SetFileBufferSize", "file_name");
+    
+  if (!buffer_size)
+  {
+    file_buffer_sizes.erase (file_name);
+    return;
+  }
+  
+  file_buffer_sizes [file_name] = buffer_size;
+}
+
+size_t FileSystemImpl::GetFileBufferSize (const char* file_name) const
+{
+  if (!file_name)
+    throw xtl::make_null_argument_exception ("common::FileSystem::SetFileBufferSize", "file_name");
+    
+  FileBufferSizeMap::const_iterator iter = file_buffer_sizes.find (file_name);
+  
+  if (iter == file_buffer_sizes.end ())
+    return GetDefaultFileBufferSize ();
+    
+  return iter->second;
 }
 
 size_t FileSystemImpl::GetDefaultFileBufferSize () const
@@ -1099,6 +1129,16 @@ void FileSystem::SetDefaultFileBufferSize (size_t buffer_size)
 size_t FileSystem::GetDefaultFileBufferSize ()
 {
   return FileSystemSingleton::Instance ()->GetDefaultFileBufferSize ();
+}
+
+void FileSystem::SetFileBufferSize (const char* file_name, size_t buffer_size)
+{
+  FileSystemSingleton::Instance ()->SetFileBufferSize (file_name, buffer_size);
+}
+
+size_t FileSystem::GetFileBufferSize (const char* file_name)
+{
+  return FileSystemSingleton::Instance ()->GetFileBufferSize (file_name);
 }
 
 void FileSystem::SetCurrentDir (const char* path)
