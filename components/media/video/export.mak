@@ -10,3 +10,5 @@ export.link.media.video.IMPORTS := link.common link.media.image
 export.link.media.video.theora.LIBS          := funner.media.video.theora
 export.link.media.video.theora.LINK_INCLUDES := TheoraDecoder
 export.link.media.video.theora.IMPORTS       := link.media.video link.extern.theora
+
+export.info.media.video.CHMS := funner.media.video
