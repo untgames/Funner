@@ -46,6 +46,19 @@ class FileSystem : public ISubsystem, public xtl::reference_counter
           common::FileSystem::SetCryptoParameters (file_name, crypto_parameters);
         }
       }
+      
+        //чтение параметров кэширования
+        
+      if (ParseNode cache_node = node.First ("Cache"))
+      {
+        for (Parser::NamesakeIterator iter=cache_node.First ("File"); iter; ++iter)
+        {
+          const char* file_name    = get<const char*> (*iter, "Name");
+          size_t      buffer_size  = get<size_t> (*iter, "BufferSize");
+
+          common::FileSystem::SetFileBufferSize (file_name, buffer_size);
+        }
+      }
         
         //монтирование путей
         
@@ -87,7 +100,7 @@ class FileSystem : public ISubsystem, public xtl::reference_counter
         const char* path = paths [i];
 
         common::FileSystem::AddSearchPath (path, log_handler);
-      }
+      }      
     }
 
     ~FileSystem ()
