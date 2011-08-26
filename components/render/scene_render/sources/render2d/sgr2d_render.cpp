@@ -41,7 +41,7 @@ class VideoTexturePrerender: public IRenderablePrerequisite
   public:
     VideoTexturePrerender (Renderable* in_renderable, const char* video_file_name, render::mid_level::renderer2d::IRenderer& renderer)
       : renderable (in_renderable)
-      , stream (video_file_name)
+      , stream (video_file_name, media::VideoQuality_Low)
       , buffer (stream.Width (), stream.Height (), 1, media::PixelFormat_RGBA8)
       , texture (renderer.CreateTexture (buffer), false)
       , current_frame (stream.FramesCount ())
