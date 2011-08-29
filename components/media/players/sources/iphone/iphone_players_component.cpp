@@ -3,7 +3,10 @@
 using namespace media::players;
 using namespace media::players::iphone;
 
-namespace
+namespace components
+{
+
+namespace iphone_players
 {
 
 const char* MUSIC_TARGET_NAME                  = "music";
@@ -45,11 +48,8 @@ class PlayersComponent
     }
 };
 
+extern "C" common::ComponentRegistrator<PlayersComponent> IPhonePlayers ("media.players.stream.iphone");
+
 }
-
-extern "C"
-{
-
-common::ComponentRegistrator<PlayersComponent> IPhonePlayers ("media.players.stream.iphone");
 
 }
