@@ -56,6 +56,7 @@
 	#define BigDouble(d) iSwapDouble(d)
 #endif
 
+#ifdef NOINLINE
 void   iSwapUShort(ILushort *s);
 void   iSwapShort(ILshort *s);
 void   iSwapUInt(ILuint *i);
@@ -86,6 +87,7 @@ ILubyte SaveBigUInt(ILuint i);
 ILubyte SaveBigInt(ILint i);
 ILubyte SaveBigFloat(ILfloat f);
 ILubyte SaveBigDouble(ILdouble d);
+#endif
 
 #ifdef IL_ENDIAN_C
 #undef NOINLINE

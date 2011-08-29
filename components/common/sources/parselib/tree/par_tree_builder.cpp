@@ -438,7 +438,7 @@ void ParseTreeBuilder::Swap (ParseTreeBuilder& builder)
   stl::swap (impl, builder.impl);
 }
 
-namespace
+namespace common
 {
 
 void swap (ParseTreeBuilder& builder1, ParseTreeBuilder& builder2)

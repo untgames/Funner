@@ -72,9 +72,11 @@ extern const ILdouble	IL_DEGCONV;
 #endif
 
 // Internal functions
+#ifdef NOINLINE
 ILfloat ilCos(ILfloat Angle);
 ILfloat ilSin(ILfloat Angle);
 ILint ilRound(ILfloat Num);
+#endif
 
 #ifndef NOINLINE
 INLINE ILfloat ilCos(ILfloat Angle) {
