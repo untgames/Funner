@@ -26,7 +26,7 @@ template <class T, class Allocator>
 inline uninitialized_storage<T, Allocator>::~uninitialized_storage ()
 {
   if (start)
-    deallocate (start, end_of_storage - start);
+    this->deallocate (start, end_of_storage - start);
 }
 
 /*
@@ -110,13 +110,13 @@ inline void uninitialized_storage<T, Allocator>::reserve (size_type new_size, bo
   if (new_size <= size)
     return;    
     
-  pointer new_buffer = allocate (new_size);
+  pointer new_buffer = this->allocate (new_size);
   
   if (need_copy && start)
     memcpy (new_buffer, start, (finish - start) * sizeof (T));
 
   if (start)
-    deallocate (start, end_of_storage - start);
+    this->deallocate (start, end_of_storage - start);
 
   finish         = new_buffer + (finish - start);
   start          = new_buffer;  

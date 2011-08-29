@@ -292,7 +292,7 @@ inline map<Key,T,Compare,Allocator>::map (Iter first,Iter last,const key_compare
 template <class Key,class T,class Compare,class Allocator>
 inline T& map<Key,T,Compare,Allocator>::operator [] (const key_type& k) 
 {
-  iterator i = lower_bound (k); //i->first is greater than or equivalent to k
+  iterator i = this->lower_bound (k); //i->first is greater than or equivalent to k
     
   if (i == tree.end () || key_comp () (k,i->first))
     i = insert (i,value_type (k,T ()));
