@@ -80,7 +80,10 @@ IRenderer* Driver::CreateRenderer (const char* name)
   return new renderer2d::Renderer;
 }
 
-namespace
+namespace components
+{
+
+namespace debug_renderer_driver
 {
 
 /*
@@ -96,11 +99,8 @@ class DebugDriverComponent
     }
 };
 
+extern "C" common::ComponentRegistrator<DebugDriverComponent> DebugRendererDriver (DRIVER_COMPONENT_NAME);
+
 }
-
-extern "C"
-{
-
-common::ComponentRegistrator<DebugDriverComponent> DebugRendererDriver (DRIVER_COMPONENT_NAME);
 
 }
