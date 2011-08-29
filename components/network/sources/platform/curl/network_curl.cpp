@@ -22,7 +22,10 @@
 
 using namespace network;
 
-namespace
+namespace components
+{
+
+namespace curl_stream_manager
 {
 
 /*
@@ -481,11 +484,8 @@ class CurlStreamManagerComponent
     }
 };
 
+extern "C" common::ComponentRegistrator<CurlStreamManagerComponent> CurlStreamManager ("network.url_stream.curl");
+
 }
-
-extern "C"
-{
-
-common::ComponentRegistrator<CurlStreamManagerComponent> CurlStreamManager ("network.url_stream.curl");
 
 }

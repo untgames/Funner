@@ -3,7 +3,10 @@
 using namespace common;
 using namespace network;
 
-namespace
+namespace components
+{
+
+namespace url_file_system
 {
 
 /*
@@ -467,11 +470,8 @@ class UrlFileSystemComponent
     }
 };
 
+extern "C" common::ComponentRegistrator<UrlFileSystemComponent> UrlFileSystem ("common.file_systems.url_file_system");
+
 }
-
-extern "C"
-{
-
-common::ComponentRegistrator<UrlFileSystemComponent> UrlFileSystem ("common.file_systems.url_file_system");
 
 }
