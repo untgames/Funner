@@ -186,7 +186,10 @@ Shape* Driver::CreateCompoundShape (size_t shapes_count, IShape** shapes, Transf
     Компонент драйвера
 */
 
-namespace
+namespace components
+{
+
+namespace bullet_driver
 {
 
 class BulletDriverComponent
@@ -198,11 +201,8 @@ class BulletDriverComponent
     }
 };
 
+extern "C" common::ComponentRegistrator<BulletDriverComponent> BulletDriver (COMPONENT_NAME);
+
 }
-
-extern "C"
-{
-
-common::ComponentRegistrator<BulletDriverComponent> BulletDriver (COMPONENT_NAME);
 
 }
