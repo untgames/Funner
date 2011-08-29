@@ -4,7 +4,10 @@ using namespace common;
 using namespace media::physics;
 using namespace media::physics::shapes;
 
-namespace
+namespace components
+{
+
+namespace xphys_saver
 {
 
 /*
@@ -309,11 +312,8 @@ class XPhysSaverComponent
     }
 };
 
+extern "C" ComponentRegistrator<XPhysSaverComponent> XPhysSaver ("media.physics.savers.XPhysSaver");
+
 }
-
-extern "C"
-{
-
-ComponentRegistrator<XPhysSaverComponent> XPhysSaver ("media.physics.savers.XPhysSaver");
 
 }

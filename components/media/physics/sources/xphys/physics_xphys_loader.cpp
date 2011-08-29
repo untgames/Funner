@@ -4,7 +4,10 @@ using namespace common;
 using namespace media::physics;
 using namespace media::physics::shapes;
 
-namespace
+namespace components
+{
+
+namespace xphys_loader
 {
 
 /*
@@ -347,11 +350,8 @@ class XPhysLoaderComponent
     }
 };
 
+extern "C" ComponentRegistrator<XPhysLoaderComponent> XPhysLoader ("media.physics.loaders.XPhysLoader");
+
 }
-
-extern "C"
-{
-
-ComponentRegistrator<XPhysLoaderComponent> XPhysLoader ("media.physics.loaders.XPhysLoader");
 
 }
