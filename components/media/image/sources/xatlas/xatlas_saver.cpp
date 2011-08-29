@@ -3,7 +3,10 @@
 using namespace media;
 using namespace common;
 
-namespace
+namespace components
+{
+
+namespace xatlas_saver
 {
 
 /*
@@ -90,10 +93,7 @@ class XAtlasSaverComponent
     }
 };
 
-extern "C"
-{
-
-ComponentRegistrator<XAtlasSaverComponent> XAtlasSaver ("media.image.atlas.savers.xatlas");
+extern "C" ComponentRegistrator<XAtlasSaverComponent> XAtlasSaver ("media.image.atlas.savers.xatlas");
 
 }
 

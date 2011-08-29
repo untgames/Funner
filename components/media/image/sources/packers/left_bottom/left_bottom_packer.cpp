@@ -19,7 +19,10 @@ using namespace stl;
 using namespace math;
 using namespace bound_volumes;
 
-namespace
+namespace components
+{
+
+namespace left_bottom_packer
 {
 
 const size_t PACK_TRY_COUNT = 10;
@@ -291,10 +294,7 @@ class LeftBottomPackerComponent
     }
 };
 
-extern "C"
-{
-
-common::ComponentRegistrator<LeftBottomPackerComponent> LeftBottomPacker ("media.image.atlas_builder.packers.left_bottom");
+extern "C" common::ComponentRegistrator<LeftBottomPackerComponent> LeftBottomPacker ("media.image.atlas_builder.packers.left_bottom");
 
 }
 

@@ -18,11 +18,14 @@
 using namespace common;
 using namespace media;
 
-namespace
+namespace components
+{
+
+namespace dds_loader
 {
 
 /*
-    Описание формата PVR
+    Описание формата DDS
  */
 
 #if !defined(MAKEFOURCC)
@@ -777,10 +780,7 @@ class Component
     }
 };
 
-extern "C"
-{
-
-common::ComponentRegistrator<Component> DdsLoader ("media.compressed_image.dds_loader");
+extern "C" common::ComponentRegistrator<Component> DdsLoader ("media.compressed_image.dds_loader");
 
 }
 

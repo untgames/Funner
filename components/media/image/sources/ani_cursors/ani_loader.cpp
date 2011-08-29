@@ -3,7 +3,10 @@
 using namespace media;
 using namespace media::ani_cursors;
 
-namespace
+namespace components
+{
+
+namespace ani_cursor_loader
 {
 
 /*
@@ -244,10 +247,7 @@ class Component
     }
 };
 
-extern "C"
-{
-
-common::ComponentRegistrator<Component> AniCursorLoader ("media.image.loaders.ani_cursor");
+extern "C" common::ComponentRegistrator<Component> AniCursorLoader ("media.image.loaders.ani_cursor");
 
 }
 
