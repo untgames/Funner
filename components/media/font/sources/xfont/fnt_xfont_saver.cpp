@@ -3,7 +3,10 @@
 using namespace media;
 using namespace common;
 
-namespace
+namespace components
+{
+
+namespace xfont_saver
 {
 
 /*
@@ -126,10 +129,7 @@ class XFontSaverComponent
     }
 };
 
-extern "C"
-{
-
-ComponentRegistrator<XFontSaverComponent> XFontSaver ("media.font.savers.xfont");
+extern "C" ComponentRegistrator<XFontSaverComponent> XFontSaver ("media.font.savers.xfont");
 
 }
 
