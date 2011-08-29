@@ -3,7 +3,10 @@
 using namespace input;
 using namespace common;
 
-namespace
+namespace components
+{
+
+namespace xkeymap_saver
 {
 
 void translation_map_saver (const char* file_name, const TranslationMap& source_map)
@@ -41,10 +44,7 @@ class KeymapSaverComponent
     }
 };
 
-extern "C"
-{
-
-ComponentRegistrator<KeymapSaverComponent> XKeymapSaver ("input.savers.xkeymap");
+extern "C" ComponentRegistrator<KeymapSaverComponent> XKeymapSaver ("input.savers.xkeymap");
 
 }
 

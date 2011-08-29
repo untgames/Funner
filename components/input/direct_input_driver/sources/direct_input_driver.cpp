@@ -303,7 +303,10 @@ BOOL FAR PASCAL enum_devices_callback (LPCDIDEVICEINSTANCE device_instance, LPVO
     Компонент драйвера
 */
 
-namespace
+namespace components
+{
+
+namespace direct_input8_driver
 {
 
 class DirectInputDriverComponent
@@ -315,11 +318,8 @@ class DirectInputDriverComponent
     }
 };
 
+extern "C" common::ComponentRegistrator<DirectInputDriverComponent> DirectInput8Driver (COMPONENT_NAME);
+
 }
-
-extern "C"
-{
-
-common::ComponentRegistrator<DirectInputDriverComponent> DirectInput8Driver (COMPONENT_NAME);
 
 }

@@ -3,7 +3,10 @@
 using namespace input;
 using namespace common;
 
-namespace
+namespace components
+{
+
+namespace xkeyreg_loader
 {
 
 void translation_map_registry_loader (const char* file_name, TranslationMapRegistry& target_registry)
@@ -53,10 +56,7 @@ class KeyregLoaderComponent
     }
 };
 
-extern "C"
-{
-
-ComponentRegistrator<KeyregLoaderComponent> XKeyregLoader ("input.loaders.xkeyreg");
+extern "C" ComponentRegistrator<KeyregLoaderComponent> XKeyregLoader ("input.loaders.xkeyreg");
 
 }
 

@@ -157,7 +157,10 @@ class Driver: virtual public IDriver, public xtl::reference_counter
     Компонент драйвера
 */
 
-namespace
+namespace components
+{
+
+namespace iphone_input_driver
 {
 
 class IPhoneDriverComponent
@@ -169,11 +172,8 @@ class IPhoneDriverComponent
     }
 };
 
+extern "C" common::ComponentRegistrator<IPhoneDriverComponent> IPhoneInputDriver (COMPONENT_NAME);
+
 }
-
-extern "C"
-{
-
-common::ComponentRegistrator<IPhoneDriverComponent> IPhoneInputDriver (COMPONENT_NAME);
 
 }
