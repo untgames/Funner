@@ -6,7 +6,10 @@ using namespace stl;
 using namespace common;
 using namespace engine;
 
-namespace
+namespace components
+{
+
+namespace math_script_bind
 {
 
 /*
@@ -610,10 +613,7 @@ class Component
     }
 };
 
-extern "C"
-{
-
-common::ComponentRegistrator<Component> MathScriptBind (COMPONENT_NAME);
+extern "C" common::ComponentRegistrator<Component> MathScriptBind (COMPONENT_NAME);
 
 }
 

@@ -30,7 +30,10 @@
 using namespace common;
 using namespace engine;
 
-namespace
+namespace components
+{
+
+namespace window_manager_subsytem
 {
 
 /*
@@ -643,10 +646,7 @@ class WindowManagerComponent
     }
 };
 
-extern "C"
-{
-
-ComponentRegistrator<WindowManagerComponent> WindowManagerSubsystem (COMPONENT_NAME);
+extern "C" ComponentRegistrator<WindowManagerComponent> WindowManagerSubsystem (COMPONENT_NAME);
 
 }
 

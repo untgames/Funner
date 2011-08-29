@@ -14,7 +14,10 @@ using namespace engine;
 using namespace common;
 using namespace input::low_level;
 
-namespace
+namespace components
+{
+
+namespace input_manager_subystem
 {
 
 const char* SUBSYSTEM_NAME = "InputManager";
@@ -301,10 +304,7 @@ class InputManagerComponent
     }
 };
 
-extern "C"
-{
-
-ComponentRegistrator<InputManagerComponent> InputManagerSubsystem (COMPONENT_NAME);
+extern "C" ComponentRegistrator<InputManagerComponent> InputManagerSubsystem (COMPONENT_NAME);
 
 }
 

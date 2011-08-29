@@ -7,7 +7,10 @@ using namespace media::rms;
 using namespace script;
 using namespace xtl;
 
-namespace
+namespace components
+{
+
+namespace rms_script_bind
 {
 
 /*
@@ -170,10 +173,7 @@ class Component
     }
 };
 
-extern "C"
-{
-
-common::ComponentRegistrator<Component> RmsScriptBind (COMPONENT_NAME);
+extern "C" common::ComponentRegistrator<Component> RmsScriptBind (COMPONENT_NAME);
 
 }
 

@@ -3,7 +3,10 @@
 using namespace engine;
 using namespace common;
 
-namespace
+namespace components
+{
+
+namespace log_subsystem
 {
 
 /*
@@ -141,10 +144,7 @@ class LogComponent
     }
 };
 
-extern "C"
-{
-
-ComponentRegistrator<LogComponent> LogSubsystem (COMPONENT_NAME);
+extern "C" ComponentRegistrator<LogComponent> LogSubsystem (COMPONENT_NAME);
 
 }
 

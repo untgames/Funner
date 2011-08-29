@@ -19,7 +19,10 @@
 using namespace engine;
 using namespace common;
 
-namespace
+namespace components
+{
+
+namespace window_input_driver_subsystem
 {
 
 /*
@@ -140,10 +143,7 @@ class WindowInputDriverComponent
     }
 };
 
-extern "C"
-{
-
-ComponentRegistrator<WindowInputDriverComponent> WindowInputDriverSubsystem (COMPONENT_NAME);
+extern "C" ComponentRegistrator<WindowInputDriverComponent> WindowInputDriverSubsystem (COMPONENT_NAME);
 
 }
 

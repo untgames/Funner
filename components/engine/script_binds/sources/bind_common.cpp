@@ -7,7 +7,10 @@ using namespace script;
 using namespace common;
 using namespace xtl;
 
-namespace
+namespace components
+{
+
+namespace common_script_bind
 {
 
 /*
@@ -41,10 +44,7 @@ class Component
     }
 };
 
-extern "C"
-{
-
-common::ComponentRegistrator<Component> CommonScriptBind (COMPONENT_NAME);
+extern "C" common::ComponentRegistrator<Component> CommonScriptBind (COMPONENT_NAME);
 
 }
 

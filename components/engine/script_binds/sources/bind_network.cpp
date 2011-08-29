@@ -5,7 +5,10 @@
 using namespace script;
 using namespace network;
 
-namespace
+namespace components
+{
+
+namespace network_script_bind
 {
 
 /*
@@ -88,8 +91,6 @@ void bind_network_library (Environment& environment)
   bind_tcp_client_library (environment);
 }
 
-}
-
 /*
     Компонент
 */
@@ -109,9 +110,8 @@ class Component
     }
 };
 
-extern "C"
-{
+extern "C" common::ComponentRegistrator<Component> NetworkScriptBind (COMPONENT_NAME);
 
-common::ComponentRegistrator<Component> NetworkScriptBind (COMPONENT_NAME);
+}
 
 }

@@ -48,7 +48,10 @@ const char* COMPONENT_NAME                            = "script.binds.SceneGraph
 
 }
 
-namespace
+namespace components
+{
+
+namespace scene_graph_script_bind
 {
 
 /*
@@ -104,10 +107,7 @@ class Component
     }
 };
 
-extern "C"
-{
-
-common::ComponentRegistrator<Component> SceneGraphScriptBind (COMPONENT_NAME);
+extern "C"  common::ComponentRegistrator<Component> SceneGraphScriptBind (COMPONENT_NAME);
 
 }
 

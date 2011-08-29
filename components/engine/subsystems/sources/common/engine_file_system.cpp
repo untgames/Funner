@@ -3,7 +3,10 @@
 using namespace engine;
 using namespace common;
 
-namespace
+namespace components
+{
+
+namespace file_system
 {
 
 /*
@@ -151,10 +154,7 @@ class FileSystemComponent
     }
 };
 
-extern "C"
-{
-
-ComponentRegistrator<FileSystemComponent> FileSystem (COMPONENT_NAME);
+extern "C" ComponentRegistrator<FileSystemComponent> FileSystem (COMPONENT_NAME);
 
 }
 

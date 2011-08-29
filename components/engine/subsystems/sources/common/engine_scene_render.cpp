@@ -16,7 +16,10 @@ using namespace common;
   #pragma warning (disable : 4355) //'this' : used in base member initializer list
 #endif
 
-namespace
+namespace components
+{
+
+namespace scene_render_subsystem
 {
 
 /*
@@ -292,10 +295,7 @@ class SceneRenderComponent
     }
 };
 
-extern "C"
-{
-
-ComponentRegistrator<SceneRenderComponent> SceneRenderSubsystem (COMPONENT_NAME);
+extern "C" ComponentRegistrator<SceneRenderComponent> SceneRenderSubsystem (COMPONENT_NAME);
 
 }
 

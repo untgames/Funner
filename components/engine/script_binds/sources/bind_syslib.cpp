@@ -6,7 +6,10 @@
 using namespace script;
 using namespace syslib;
 
-namespace
+namespace components
+{
+
+namespace system_script_bind
 {
 
 /*
@@ -167,10 +170,7 @@ class Component
     }
 };
 
-extern "C"
-{
-
-common::ComponentRegistrator<Component> SystemScriptBind (COMPONENT_NAME);
+extern "C" common::ComponentRegistrator<Component> SystemScriptBind (COMPONENT_NAME);
 
 }
 

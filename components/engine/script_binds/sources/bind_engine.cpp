@@ -18,7 +18,10 @@
 using namespace engine;
 using namespace script;
 
-namespace
+namespace common
+{
+
+namespace engine_script_bind
 {
 
 /*
@@ -165,10 +168,7 @@ class Component
     }
 };
 
-extern "C"
-{
-
-common::ComponentRegistrator<Component> EngineScriptBind (COMPONENT_NAME);
+extern "C" common::ComponentRegistrator<Component> EngineScriptBind (COMPONENT_NAME);
 
 }
 

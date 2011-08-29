@@ -7,7 +7,10 @@ using namespace math;
 using namespace xtl;
 using namespace bound_volumes;
 
-namespace
+namespace components
+{
+
+namespace bind_volumes_script_bind
 {
 
 /*
@@ -146,10 +149,7 @@ class Component
     }
 };
 
-extern "C"
-{
-
-common::ComponentRegistrator<Component> BoundVolumesScriptBind (COMPONENT_NAME);
+extern "C" common::ComponentRegistrator<Component> BoundVolumesScriptBind (COMPONENT_NAME);
 
 }
 

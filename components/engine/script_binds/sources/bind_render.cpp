@@ -9,7 +9,10 @@ using namespace render;
 using namespace script;
 using namespace xtl;
 
-namespace
+namespace components
+{
+
+namespace render_script_bind
 {
 
 /*
@@ -197,10 +200,7 @@ class Component
     }
 };
 
-extern "C"
-{
-
-common::ComponentRegistrator<Component> RenderScriptBind (COMPONENT_NAME);
+extern "C" common::ComponentRegistrator<Component> RenderScriptBind (COMPONENT_NAME);
 
 }
 
