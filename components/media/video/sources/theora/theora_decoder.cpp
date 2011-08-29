@@ -11,7 +11,10 @@
 
 using namespace media;
 
-namespace
+namespace components
+{
+
+namespace theora_decoder
 {
 
 const char* LOG_NAME = "media.TheoraDecoder";
@@ -554,10 +557,7 @@ class TheoraDecoderComponent
     }
 };
 
-extern "C"
-{
-
-common::ComponentRegistrator<TheoraDecoderComponent> TheoraDecoder ("media.video.decoders.theora");
+extern "C" common::ComponentRegistrator<TheoraDecoderComponent> TheoraDecoder ("media.video.decoders.theora");
 
 }
 
