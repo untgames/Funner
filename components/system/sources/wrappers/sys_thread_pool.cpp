@@ -7,7 +7,10 @@
 using namespace common;
 using namespace syslib;
 
-namespace
+namespace components
+{
+
+namespace thread_pool
 {
 
 /*
@@ -208,11 +211,8 @@ class Component
     }
 };
 
+extern "C" ComponentRegistrator<Component> ThreadPool ("common.action_queue.thread_pool");
+
 }
-
-extern "C"
-{
-
-ComponentRegistrator<Component> ThreadPool ("common.action_queue.thread_pool");
 
 }
