@@ -3,7 +3,10 @@
 using namespace common;
 using namespace media;
 
-namespace
+namespace components
+{
+
+namespace wav_loader
 {
 
 class WavInputStream : public media::ISoundInputStream, public xtl::reference_counter 
@@ -110,10 +113,7 @@ class WavLoaderComponent
     }
 };
 
-extern "C"
-{
-
-ComponentRegistrator<WavLoaderComponent> WavLoader ("media.sound.loaders.Wav");
+extern "C" ComponentRegistrator<WavLoaderComponent> WavLoader ("media.sound.loaders.Wav");
 
 }
 

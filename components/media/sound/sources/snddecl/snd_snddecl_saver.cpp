@@ -3,7 +3,10 @@
 using namespace media;
 using namespace common;
 
-namespace
+namespace components
+{
+
+namespace snddecl_saver
 {
 
 /*
@@ -116,10 +119,7 @@ class SnddeclSaverComponent
     }
 };
 
-extern "C"
-{
-
-ComponentRegistrator<SnddeclSaverComponent> SnddeclSaver ("media.sound.savers.snddecl");
+extern "C" ComponentRegistrator<SnddeclSaverComponent> SnddeclSaver ("media.sound.savers.snddecl");
 
 }
 

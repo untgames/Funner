@@ -3,7 +3,10 @@
 using namespace media;
 using namespace common;
 
-namespace
+namespace components
+{
+
+namespace ogg_loader
 {
 
 /*
@@ -248,10 +251,7 @@ class OggLoaderComponent
     }
 };
 
-extern "C"
-{
-
-ComponentRegistrator<OggLoaderComponent> OggLoader ("media.sound.loaders.Ogg");
+extern "C" ComponentRegistrator<OggLoaderComponent> OggLoader ("media.sound.loaders.Ogg");
 
 }
 
