@@ -63,7 +63,10 @@ inline bool read (xtl::io::token_iterator<Token, BaseIter>& iter, VertexWeight& 
 
 }
 
-namespace
+namespace components
+{
+
+namespace xmesh_loader
 {
 
 /*
@@ -436,11 +439,8 @@ class XMeshLoaderComponent
     }
 };
 
+extern "C" ComponentRegistrator<XMeshLoaderComponent> XMeshLoader ("media.geometry.loaders.XMeshLoader");
+
 }
-
-extern "C"
-{
-
-ComponentRegistrator<XMeshLoaderComponent> XMeshLoader ("media.geometry.loaders.XMeshLoader");
 
 }

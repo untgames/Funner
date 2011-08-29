@@ -42,7 +42,10 @@ void write (OutputTextStream& stream, const VertexInfluence& influence)
 
 }
 
-namespace
+namespace components
+{
+
+namespace xmesh_saver
 {
 
 /*
@@ -366,11 +369,8 @@ class XMeshSaverComponent
     }
 };
 
+extern "C" ComponentRegistrator<XMeshSaverComponent> XMeshSaver ("media.geometry.savers.XMeshSaver");
+
 }
-
-extern "C"
-{
-
-ComponentRegistrator<XMeshSaverComponent> XMeshSaver ("media.geometry.savers.XMeshSaver");
 
 }
