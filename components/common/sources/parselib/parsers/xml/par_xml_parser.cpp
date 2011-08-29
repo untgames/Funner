@@ -2,9 +2,12 @@
 
 using namespace common;
 
-//ввести режимы лексического разбора (см. ParseContentText)!!!
+//TODO: ввести режимы лексического разбора (см. ParseContentText)!!!
 
-namespace
+namespace components
+{
+
+namespace xml_parser
 {
 
 /*
@@ -649,11 +652,8 @@ class XmlParserComponent
     }
 };
 
+extern "C" ComponentRegistrator<XmlParserComponent> XmlParser (XML_PARSER_COMPONENT_NAME);
+
 }
-
-extern "C"
-{
-
-ComponentRegistrator<XmlParserComponent> XmlParser (XML_PARSER_COMPONENT_NAME);
 
 }

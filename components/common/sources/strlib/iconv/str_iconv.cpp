@@ -13,7 +13,10 @@ using namespace common;
 
 extern "C" size_t iconv_wrapper (iconv_t cd, const char* * inbuf, size_t *inbytesleft, char* * outbuf, size_t *outbytesleft);
 
-namespace
+namespace components
+{
+
+namespace iconv_converter
 {
 
 /*
@@ -105,11 +108,8 @@ class Component
     }
 };
 
+extern "C" ComponentRegistrator<Component> IconvConverter (ICONV_CONVERTER_NAME);
+
 }
-
-extern "C"
-{
-
-ComponentRegistrator<Component> IconvConverter (ICONV_CONVERTER_NAME);
 
 }

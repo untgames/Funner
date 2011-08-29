@@ -20,7 +20,10 @@
 using namespace common;
 using namespace stl;
 
-namespace
+namespace components
+{
+
+namespace zip_file_system
 {
 
 /*
@@ -639,11 +642,8 @@ class ZipFileSystemComponent
     }
 };
 
+extern "C" ComponentRegistrator<ZipFileSystemComponent> ZipFileSystem ("common.file_systems.ZipFileSystem");
+
 }
-
-extern "C"
-{
-
-ComponentRegistrator<ZipFileSystemComponent> ZipFileSystem ("common.file_systems.ZipFileSystem");
 
 }

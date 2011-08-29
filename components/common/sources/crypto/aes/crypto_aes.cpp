@@ -13,7 +13,10 @@ typedef unsigned char byte;
 
 using namespace common;
 
-namespace
+namespace components
+{
+
+namespace aes_crypto
 {
 
 /*
@@ -352,11 +355,8 @@ class AesComponent
     }
 };
 
+extern "C" ComponentRegistrator<AesComponent> AesCrypto ("common.crypto.aes");
+
 }
-
-extern "C"
-{
-
-ComponentRegistrator<AesComponent> AesCrypto ("common.crypto.aes");
 
 }

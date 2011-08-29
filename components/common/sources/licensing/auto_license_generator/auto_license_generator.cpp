@@ -4,7 +4,10 @@
 
 using namespace common;
 
-namespace
+namespace components
+{
+
+namespace auto_license_generator
 {
 
 const char* ALLOWED_COMPONENT = "*";
@@ -72,11 +75,8 @@ class AutoLicenseGeneratorComponent
     }
 };
 
+extern "C" ComponentRegistrator<AutoLicenseGeneratorComponent> AutoLicenseGenerator (COMPONENT_NAME);
+
 }
-
-extern "C"
-{
-
-ComponentRegistrator<AutoLicenseGeneratorComponent> AutoLicenseGenerator (COMPONENT_NAME);
 
 }
