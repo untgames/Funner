@@ -3,7 +3,10 @@
 using namespace common;
 using namespace media::animation;
 
-namespace
+namespace components
+{
+
+namespace xanim_saver
 {
 
 /*
@@ -256,11 +259,8 @@ class XAnimSaverComponent
     }
 };
 
+extern "C" ComponentRegistrator<XAnimSaverComponent> XAnimSaver ("media.animation.savers.XAnimSaver");
+
 }
-
-extern "C"
-{
-
-ComponentRegistrator<XAnimSaverComponent> XAnimSaver ("media.animation.savers.XAnimSaver");
 
 }

@@ -16,7 +16,10 @@ using namespace media::animation;
  * channel format: array<char> parameter_name; array<char> target_name; array<char> track_type; array<channel_key> keys;
  */
 
-namespace
+namespace components
+{
+
+namespace bin_anim_loader
 {
 
 /*
@@ -265,11 +268,8 @@ class BinAnimLoaderComponent
     }
 };
 
+extern "C" ComponentRegistrator<BinAnimLoaderComponent> BinAnimLoader ("media.animation.loaders.BinAnimLoader");
+
 }
-
-extern "C"
-{
-
-ComponentRegistrator<BinAnimLoaderComponent> BinAnimLoader ("media.animation.loaders.BinAnimLoader");
 
 }

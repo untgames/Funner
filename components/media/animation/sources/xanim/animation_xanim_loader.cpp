@@ -3,7 +3,10 @@
 using namespace common;
 using namespace media::animation;
 
-namespace
+namespace components
+{
+
+namespace xanim_loader
 {
 
 /*
@@ -230,11 +233,8 @@ class XAnimLoaderComponent
     }
 };
 
+extern "C" ComponentRegistrator<XAnimLoaderComponent> XAnimLoader ("media.animation.loaders.XAnimLoader");
+
 }
-
-extern "C"
-{
-
-ComponentRegistrator<XAnimLoaderComponent> XAnimLoader ("media.animation.loaders.XAnimLoader");
 
 }
