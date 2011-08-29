@@ -7,7 +7,10 @@ using namespace common;
     ¬спомогательные классы дл€ сохранени€ материалов
 */
 
-namespace
+namespace components
+{
+
+namespace xmtl_saver
 {
 
 typedef stl::hash_multimap<const Material*, stl::string> MaterialIdMap;
@@ -208,11 +211,8 @@ class XmlMaterialLibrarySaverComponent
     }
 };
 
+extern "C" ComponentRegistrator<XmlMaterialLibrarySaverComponent> XMtlSaver ("media.rfx.savers.XMtl");
+
 }
-
-extern "C"
-{
-
-ComponentRegistrator<XmlMaterialLibrarySaverComponent> XMtlSaver ("media.rfx.savers.XMtl");
 
 }

@@ -7,7 +7,10 @@ using namespace common;
     Вспомогательный класс загрузки библиотеки материалов
 */
 
-namespace
+namespace components
+{
+
+namespace xmtl_loader
 {
 
 class XmlMaterialLibraryLoader
@@ -207,11 +210,8 @@ class XmlMaterialLibraryLoaderComponent
     }
 };
 
+extern "C" ComponentRegistrator<XmlMaterialLibraryLoaderComponent> XMtlLoader ("media.rfx.loaders.XMtl");
+
 }
-
-extern "C"
-{
-
-ComponentRegistrator<XmlMaterialLibraryLoaderComponent> XMtlLoader ("media.rfx.loaders.XMtl");
 
 }
