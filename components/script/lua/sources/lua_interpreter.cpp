@@ -352,7 +352,10 @@ const char* Interpreter::ProfileFlatState (size_t max_lines)
   return profile_info_string.c_str ();
 }
 
-namespace
+namespace components
+{
+
+namespace lua_interpreter
 {
 
 /*
@@ -378,12 +381,8 @@ class LuaInterpreterComponent
     }
 };
 
-extern "C"
-{
-
-ComponentRegistrator<LuaInterpreterComponent> LuaInterpreter ("script.interpreters.lua");
+extern "C" ComponentRegistrator<LuaInterpreterComponent> LuaInterpreter ("script.interpreters.lua");
 
 }
-
 
 }
