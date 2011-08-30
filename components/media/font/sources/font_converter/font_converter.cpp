@@ -178,6 +178,8 @@ void convert (const FontDesc& font_desc, Font& result_font, Image& result_image)
 
   media::GlyphInfo *current_glyph = font.Glyphs ();
 
+  memset (current_glyph, 0, sizeof (media::GlyphInfo) * font.GlyphsTableSize ());
+
   BitmapHashMap   bitmap_map;
   DuplicateGlyphs duplicate_glyphs;
 

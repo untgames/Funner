@@ -113,9 +113,10 @@ class XmlMaterialLibraryLoader
         //создание материала
 
       Material::Pointer material;
-      Parser::Iterator  profile_iter;
+      Parser::Iterator  profile_iter = mtl_iter->First ("sprite_profile");
 
-      if (profile_iter = mtl_iter->First ("sprite_profile"))    material = ParseSpriteMaterial (profile_iter);
+      if (profile_iter)
+        material = ParseSpriteMaterial (profile_iter);
       else
       {
         log.Error (*mtl_iter, "Unknown profile at load material '%s'", id);

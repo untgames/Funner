@@ -244,7 +244,7 @@ void command_line_pot (const char*, Params& params)
 //установка параметра обрезания по прозрачности
 void command_line_crop_alpha (const char* value_string, Params& params)
 {
-  size_t value = (size_t)atoi (value_string);
+  int value = atoi (value_string);
 
   params.crop_alpha      = value < 0 ? 0 : value > 256 ? 256 : value;
   params.need_crop_alpha = true;

@@ -22,7 +22,7 @@ export MACOSX_DEPLOYMENT_TARGET
 
 MACOSX_SDK_PATH := /Developer/SDKs/MacOSX10.6.sdk
 
-COMMON_CFLAGS     += -msse3 -isysroot $(MACOSX_SDK_PATH) -mmacosx-version-min=$(MACOSX_VERSION) -arch i386
+COMMON_CFLAGS     += -msse3 -isysroot $(MACOSX_SDK_PATH) -mmacosx-version-min=$(MACOSX_VERSION) -arch i386 -Wno-ambiguous-member-template
 COMMON_LINK_FLAGS += -isysroot $(MACOSX_SDK_PATH) -mmacosx-version-min=$(MACOSX_VERSION) -arch i386
 COMPILER_GCC      := /usr/bin/clang
 LINKER_GCC        := /usr/bin/clang++
