@@ -186,7 +186,12 @@ class Component
     }
 };
 
-extern "C" common::ComponentRegistrator<Component> MediaPlayersScriptBind (COMPONENT_NAME);
+extern "C"
+{
+
+common::ComponentRegistrator<Component> MediaPlayersScriptBind (COMPONENT_NAME);
+
+}
 
 }
 

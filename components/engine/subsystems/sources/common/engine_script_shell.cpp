@@ -150,7 +150,12 @@ class Component
     }
 };
 
-extern "C" ComponentRegistrator<Component> ShellSubsystem (COMPONENT_NAME);
+extern "C"
+{
+
+ComponentRegistrator<Component> ShellSubsystem (COMPONENT_NAME);
+
+}
 
 }
 

@@ -168,7 +168,12 @@ class Component
     }
 };
 
-extern "C" common::ComponentRegistrator<Component> EngineScriptBind (COMPONENT_NAME);
+extern "C"
+{
+
+common::ComponentRegistrator<Component> EngineScriptBind (COMPONENT_NAME);
+
+}
 
 }
 

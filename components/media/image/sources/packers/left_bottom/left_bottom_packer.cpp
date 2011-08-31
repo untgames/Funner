@@ -294,7 +294,12 @@ class LeftBottomPackerComponent
     }
 };
 
-extern "C" common::ComponentRegistrator<LeftBottomPackerComponent> LeftBottomPacker ("media.image.atlas_builder.packers.left_bottom");
+extern "C"
+{
+
+common::ComponentRegistrator<LeftBottomPackerComponent> LeftBottomPacker ("media.image.atlas_builder.packers.left_bottom");
+
+}
 
 }
 

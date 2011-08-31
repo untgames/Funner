@@ -304,7 +304,12 @@ class InputManagerComponent
     }
 };
 
-extern "C" ComponentRegistrator<InputManagerComponent> InputManagerSubsystem (COMPONENT_NAME);
+extern "C"
+{
+
+ComponentRegistrator<InputManagerComponent> InputManagerSubsystem (COMPONENT_NAME);
+
+}
 
 }
 

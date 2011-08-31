@@ -352,8 +352,13 @@ class DevILComponent
     }
 };
 
-extern "C" ComponentRegistrator<DevILComponent<DevILComponentType_Loaders> > DevILLoaders ("media.image.loaders.DevIL");
-extern "C" ComponentRegistrator<DevILComponent<DevILComponentType_Savers> > DevILSavers ("media.image.savers.DevIL");
+extern "C"
+{
+
+ComponentRegistrator<DevILComponent<DevILComponentType_Loaders> > DevILLoaders ("media.image.loaders.DevIL");
+ComponentRegistrator<DevILComponent<DevILComponentType_Savers> > DevILSavers ("media.image.savers.DevIL");
+
+}
 
 }
 

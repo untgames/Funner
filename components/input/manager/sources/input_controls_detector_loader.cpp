@@ -57,7 +57,12 @@ class KeydetLoaderComponent
     }
 };
 
-extern "C" ComponentRegistrator<KeydetLoaderComponent> XKeydetLoader ("input.loaders.xkeydet");
+extern "C"
+{
+
+ComponentRegistrator<KeydetLoaderComponent> XKeydetLoader ("input.loaders.xkeydet");
+
+}
 
 }
 

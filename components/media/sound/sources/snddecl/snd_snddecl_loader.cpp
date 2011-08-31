@@ -91,7 +91,12 @@ class SnddeclLoaderComponent
     }
 };
 
-extern "C" ComponentRegistrator<SnddeclLoaderComponent> SnddeclLoader ("media.sound.loaders.snddecl");
+extern "C"
+{
+
+ComponentRegistrator<SnddeclLoaderComponent> SnddeclLoader ("media.sound.loaders.snddecl");
+
+}
 
 }
 

@@ -259,7 +259,12 @@ class XAnimSaverComponent
     }
 };
 
-extern "C" ComponentRegistrator<XAnimSaverComponent> XAnimSaver ("media.animation.savers.XAnimSaver");
+extern "C"
+{
+
+ComponentRegistrator<XAnimSaverComponent> XAnimSaver ("media.animation.savers.XAnimSaver");
+
+}
 
 }
 

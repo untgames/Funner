@@ -780,7 +780,12 @@ class Component
     }
 };
 
-extern "C" common::ComponentRegistrator<Component> DdsLoader ("media.compressed_image.dds_loader");
+extern "C"
+{
+
+common::ComponentRegistrator<Component> DdsLoader ("media.compressed_image.dds_loader");
+
+}
 
 }
 

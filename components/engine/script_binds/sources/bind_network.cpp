@@ -110,7 +110,12 @@ class Component
     }
 };
 
-extern "C" common::ComponentRegistrator<Component> NetworkScriptBind (COMPONENT_NAME);
+extern "C"
+{
+
+common::ComponentRegistrator<Component> NetworkScriptBind (COMPONENT_NAME);
+
+}
 
 }
 

@@ -40,7 +40,12 @@ class KeydetSaverComponent
     }
 };
 
-extern "C" ComponentRegistrator<KeydetSaverComponent> XKeydetSaver ("input.savers.xkeydet");
+extern "C"
+{
+
+ComponentRegistrator<KeydetSaverComponent> XKeydetSaver ("input.savers.xkeydet");
+
+}
 
 }
 

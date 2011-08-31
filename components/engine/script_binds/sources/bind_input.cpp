@@ -75,7 +75,12 @@ class Component
     }
 };
 
-extern "C" common::ComponentRegistrator<Component> InputScriptBind (COMPONENT_NAME);
+extern "C"
+{
+
+common::ComponentRegistrator<Component> InputScriptBind (COMPONENT_NAME);
+
+}
 
 }
 

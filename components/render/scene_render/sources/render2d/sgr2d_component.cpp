@@ -35,7 +35,12 @@ class SceneRender2dComponent
     }
 };
 
-extern "C" common::ComponentRegistrator<SceneRender2dComponent> SceneRender2d (COMPONENT_NAME);
+extern "C"
+{
+
+common::ComponentRegistrator<SceneRender2dComponent> SceneRender2d (COMPONENT_NAME);
+
+}
 
 }
 

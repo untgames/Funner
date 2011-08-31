@@ -52,7 +52,12 @@ class KeyregSaverComponent
     }
 };
 
-extern "C" ComponentRegistrator<KeyregSaverComponent> XKeyregSaver ("input.savers.xkeyreg");
+extern "C"
+{
+
+ComponentRegistrator<KeyregSaverComponent> XKeyregSaver ("input.savers.xkeyreg");
+
+}
 
 }
 

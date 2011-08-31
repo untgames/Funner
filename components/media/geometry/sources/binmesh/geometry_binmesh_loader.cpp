@@ -487,7 +487,12 @@ class BinMeshLoaderComponent
     }
 };
 
-extern "C" ComponentRegistrator<BinMeshLoaderComponent> BinMeshLoader ("media.geometry.loaders.BinMeshLoader");
+extern "C"
+{
+
+ComponentRegistrator<BinMeshLoaderComponent> BinMeshLoader ("media.geometry.loaders.BinMeshLoader");
+
+}
 
 }
 

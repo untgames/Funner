@@ -251,7 +251,12 @@ class OggLoaderComponent
     }
 };
 
-extern "C" ComponentRegistrator<OggLoaderComponent> OggLoader ("media.sound.loaders.Ogg");
+extern "C"
+{
+
+ComponentRegistrator<OggLoaderComponent> OggLoader ("media.sound.loaders.Ogg");
+
+}
 
 }
 

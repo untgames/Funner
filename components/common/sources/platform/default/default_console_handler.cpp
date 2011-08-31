@@ -35,7 +35,12 @@ class DefaultConsoleHandlerComponent
     xtl::auto_connection on_print_line_connection;
 };
 
-extern "C" common::ComponentRegistrator<DefaultConsoleHandlerComponent> DefaultConsoleHandler ("common.console.DefaultConsoleHandler");
+extern "C"
+{
+
+common::ComponentRegistrator<DefaultConsoleHandlerComponent> DefaultConsoleHandler ("common.console.DefaultConsoleHandler");
+
+}
 
 }
 

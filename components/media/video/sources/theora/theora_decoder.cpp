@@ -557,7 +557,12 @@ class TheoraDecoderComponent
     }
 };
 
-extern "C" common::ComponentRegistrator<TheoraDecoderComponent> TheoraDecoder ("media.video.decoders.theora");
+extern "C"
+{
+
+common::ComponentRegistrator<TheoraDecoderComponent> TheoraDecoder ("media.video.decoders.theora");
+
+}
 
 }
 

@@ -613,7 +613,12 @@ class Component
     }
 };
 
-extern "C" common::ComponentRegistrator<Component> MathScriptBind (COMPONENT_NAME);
+extern "C"
+{
+
+common::ComponentRegistrator<Component> MathScriptBind (COMPONENT_NAME);
+
+}
 
 }
 

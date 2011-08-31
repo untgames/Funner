@@ -56,7 +56,12 @@ class KeyregLoaderComponent
     }
 };
 
-extern "C" ComponentRegistrator<KeyregLoaderComponent> XKeyregLoader ("input.loaders.xkeyreg");
+extern "C"
+{
+
+ComponentRegistrator<KeyregLoaderComponent> XKeyregLoader ("input.loaders.xkeyreg");
+
+}
 
 }
 

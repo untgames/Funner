@@ -642,7 +642,12 @@ class ZipFileSystemComponent
     }
 };
 
-extern "C" ComponentRegistrator<ZipFileSystemComponent> ZipFileSystem ("common.file_systems.ZipFileSystem");
+extern "C"
+{
+
+ComponentRegistrator<ZipFileSystemComponent> ZipFileSystem ("common.file_systems.ZipFileSystem");
+
+}
 
 }
 

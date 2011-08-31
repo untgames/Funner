@@ -143,7 +143,12 @@ class WindowInputDriverComponent
     }
 };
 
-extern "C" ComponentRegistrator<WindowInputDriverComponent> WindowInputDriverSubsystem (COMPONENT_NAME);
+extern "C"
+{
+
+ComponentRegistrator<WindowInputDriverComponent> WindowInputDriverSubsystem (COMPONENT_NAME);
+
+}
 
 }
 

@@ -129,7 +129,12 @@ class XFontSaverComponent
     }
 };
 
-extern "C" ComponentRegistrator<XFontSaverComponent> XFontSaver ("media.font.savers.xfont");
+extern "C"
+{
+
+ComponentRegistrator<XFontSaverComponent> XFontSaver ("media.font.savers.xfont");
+
+}
 
 }
 

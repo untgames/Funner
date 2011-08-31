@@ -484,7 +484,12 @@ class CurlStreamManagerComponent
     }
 };
 
-extern "C" common::ComponentRegistrator<CurlStreamManagerComponent> CurlStreamManager ("network.url_stream.curl");
+extern "C"
+{
+
+common::ComponentRegistrator<CurlStreamManagerComponent> CurlStreamManager ("network.url_stream.curl");
+
+}
 
 }
 

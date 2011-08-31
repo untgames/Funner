@@ -470,7 +470,12 @@ class UrlFileSystemComponent
     }
 };
 
-extern "C" common::ComponentRegistrator<UrlFileSystemComponent> UrlFileSystem ("common.file_systems.url_file_system");
+extern "C"
+{
+
+common::ComponentRegistrator<UrlFileSystemComponent> UrlFileSystem ("common.file_systems.url_file_system");
+
+}
 
 }
 

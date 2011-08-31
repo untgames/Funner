@@ -439,7 +439,12 @@ class XMeshLoaderComponent
     }
 };
 
-extern "C" ComponentRegistrator<XMeshLoaderComponent> XMeshLoader ("media.geometry.loaders.XMeshLoader");
+extern "C"
+{
+
+ComponentRegistrator<XMeshLoaderComponent> XMeshLoader ("media.geometry.loaders.XMeshLoader");
+
+}
 
 }
 

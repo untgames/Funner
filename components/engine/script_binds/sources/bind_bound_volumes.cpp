@@ -149,7 +149,12 @@ class Component
     }
 };
 
-extern "C" common::ComponentRegistrator<Component> BoundVolumesScriptBind (COMPONENT_NAME);
+extern "C"
+{
+
+common::ComponentRegistrator<Component> BoundVolumesScriptBind (COMPONENT_NAME);
+
+}
 
 }
 

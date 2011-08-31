@@ -44,7 +44,12 @@ class Component
     }
 };
 
-extern "C" common::ComponentRegistrator<Component> CommonScriptBind (COMPONENT_NAME);
+extern "C"
+{
+
+common::ComponentRegistrator<Component> CommonScriptBind (COMPONENT_NAME);
+
+}
 
 }
 

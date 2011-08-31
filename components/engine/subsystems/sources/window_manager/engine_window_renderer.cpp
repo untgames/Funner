@@ -94,7 +94,12 @@ class WindowRendererComponent
     }
 };
 
-extern "C" ComponentRegistrator<WindowRendererComponent> WindowRendererSubsystem (COMPONENT_NAME);
+extern "C"
+{
+
+ComponentRegistrator<WindowRendererComponent> WindowRendererSubsystem (COMPONENT_NAME);
+
+}
 
 }
 

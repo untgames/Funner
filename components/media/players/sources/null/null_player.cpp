@@ -116,7 +116,12 @@ class PlayerComponent
     }
 };
 
-extern "C" common::ComponentRegistrator<PlayerComponent> NullPlayer ("media.players.stream.null");
+extern "C"
+{
+
+common::ComponentRegistrator<PlayerComponent> NullPlayer ("media.players.stream.null");
+
+}
 
 }
 

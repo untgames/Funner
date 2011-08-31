@@ -173,7 +173,12 @@ class Component
     }
 };
 
-extern "C" common::ComponentRegistrator<Component> RmsScriptBind (COMPONENT_NAME);
+extern "C"
+{
+
+common::ComponentRegistrator<Component> RmsScriptBind (COMPONENT_NAME);
+
+}
 
 }
 

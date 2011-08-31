@@ -463,7 +463,12 @@ class BinMeshSaverComponent
     }
 };
 
-extern "C" ComponentRegistrator<BinMeshSaverComponent> BinMeshSaver ("media.geometry.savers.BinMeshSaver");
+extern "C"
+{
+
+ComponentRegistrator<BinMeshSaverComponent> BinMeshSaver ("media.geometry.savers.BinMeshSaver");
+
+}
 
 }
 

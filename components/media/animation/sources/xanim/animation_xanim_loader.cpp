@@ -233,7 +233,12 @@ class XAnimLoaderComponent
     }
 };
 
-extern "C" ComponentRegistrator<XAnimLoaderComponent> XAnimLoader ("media.animation.loaders.XAnimLoader");
+extern "C"
+{
+
+ComponentRegistrator<XAnimLoaderComponent> XAnimLoader ("media.animation.loaders.XAnimLoader");
+
+}
 
 }
 

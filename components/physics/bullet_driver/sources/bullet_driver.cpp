@@ -201,7 +201,12 @@ class BulletDriverComponent
     }
 };
 
-extern "C" common::ComponentRegistrator<BulletDriverComponent> BulletDriver (COMPONENT_NAME);
+extern "C"
+{
+
+common::ComponentRegistrator<BulletDriverComponent> BulletDriver (COMPONENT_NAME);
+
+}
 
 }
 

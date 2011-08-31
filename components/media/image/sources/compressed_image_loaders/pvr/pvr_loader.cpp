@@ -249,7 +249,12 @@ class Component
     }
 };
 
-extern "C" common::ComponentRegistrator<Component> PvrLoader ("media.compressed_image.pvr_loader");
+extern "C"
+{
+
+common::ComponentRegistrator<Component> PvrLoader ("media.compressed_image.pvr_loader");
+
+}
 
 }
 

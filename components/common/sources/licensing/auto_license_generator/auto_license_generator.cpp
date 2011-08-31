@@ -75,7 +75,12 @@ class AutoLicenseGeneratorComponent
     }
 };
 
-extern "C" ComponentRegistrator<AutoLicenseGeneratorComponent> AutoLicenseGenerator (COMPONENT_NAME);
+extern "C"
+{
+
+ComponentRegistrator<AutoLicenseGeneratorComponent> AutoLicenseGenerator (COMPONENT_NAME);
+
+}
 
 }
 

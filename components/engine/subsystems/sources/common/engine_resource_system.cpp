@@ -88,7 +88,12 @@ class ResourceSystemComponent
     }
 };
 
-extern "C" ComponentRegistrator<ResourceSystemComponent> ResourceSystem (COMPONENT_NAME);
+extern "C"
+{
+
+ComponentRegistrator<ResourceSystemComponent> ResourceSystem (COMPONENT_NAME);
+
+}
 
 }
 

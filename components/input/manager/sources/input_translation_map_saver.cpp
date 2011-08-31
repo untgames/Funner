@@ -44,7 +44,12 @@ class KeymapSaverComponent
     }
 };
 
-extern "C" ComponentRegistrator<KeymapSaverComponent> XKeymapSaver ("input.savers.xkeymap");
+extern "C"
+{
+
+ComponentRegistrator<KeymapSaverComponent> XKeymapSaver ("input.savers.xkeymap");
+
+}
 
 }
 

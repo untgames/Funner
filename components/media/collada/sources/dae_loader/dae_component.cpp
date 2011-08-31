@@ -24,7 +24,12 @@ class DaeLoaderComponent
     }
 };
 
-extern "C" common::ComponentRegistrator<DaeLoaderComponent> DaeLoader ("media.collada.loaders.DAE");
+extern "C"
+{
+
+common::ComponentRegistrator<DaeLoaderComponent> DaeLoader ("media.collada.loaders.DAE");
+
+}
 
 }
 

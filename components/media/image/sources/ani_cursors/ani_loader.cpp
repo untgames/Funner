@@ -247,7 +247,12 @@ class Component
     }
 };
 
-extern "C" common::ComponentRegistrator<Component> AniCursorLoader ("media.image.loaders.ani_cursor");
+extern "C"
+{
+
+common::ComponentRegistrator<Component> AniCursorLoader ("media.image.loaders.ani_cursor");
+
+}
 
 }
 

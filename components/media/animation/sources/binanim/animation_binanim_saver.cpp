@@ -243,7 +243,12 @@ class BinAnimSaverComponent
     }
 };
 
-extern "C" ComponentRegistrator<BinAnimSaverComponent> BinAnimSaver ("media.animation.savers.BinAnimSaver");
+extern "C"
+{
+
+ComponentRegistrator<BinAnimSaverComponent> BinAnimSaver ("media.animation.savers.BinAnimSaver");
+
+}
 
 }
 

@@ -126,7 +126,12 @@ class OpenALComponent
     }
 };
 
-extern "C" common::ComponentRegistrator<OpenALComponent> OpenAL (COMPONENT_NAME);
+extern "C"
+{
+
+common::ComponentRegistrator<OpenALComponent> OpenAL (COMPONENT_NAME);
+
+}
 
 }
 

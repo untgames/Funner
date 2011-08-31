@@ -25,7 +25,12 @@ class Component
     }
 };
 
-extern "C" ComponentRegistrator<Component> StandardFilePathsMount ("common.file_systems.StandardFilePathsMount");
+extern "C"
+{
+
+ComponentRegistrator<Component> StandardFilePathsMount ("common.file_systems.StandardFilePathsMount");
+
+}
 
 }
 

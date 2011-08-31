@@ -211,7 +211,12 @@ class XmlMaterialLibraryLoaderComponent
     }
 };
 
-extern "C" ComponentRegistrator<XmlMaterialLibraryLoaderComponent> XMtlLoader ("media.rfx.loaders.XMtl");
+extern "C"
+{
+
+ComponentRegistrator<XmlMaterialLibraryLoaderComponent> XMtlLoader ("media.rfx.loaders.XMtl");
+
+}
 
 }
 

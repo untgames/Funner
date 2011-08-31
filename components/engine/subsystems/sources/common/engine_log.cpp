@@ -144,7 +144,12 @@ class LogComponent
     }
 };
 
-extern "C" ComponentRegistrator<LogComponent> LogSubsystem (COMPONENT_NAME);
+extern "C"
+{
+
+ComponentRegistrator<LogComponent> LogSubsystem (COMPONENT_NAME);
+
+}
 
 }
 

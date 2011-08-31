@@ -134,7 +134,12 @@ class IPhoneConfigurationComponent
     }
 };
 
-extern "C" ComponentRegistrator<IPhoneConfigurationComponent> IPhoneConfigurationSubsystem (COMPONENT_NAME);
+extern "C"
+{
+
+ComponentRegistrator<IPhoneConfigurationComponent> IPhoneConfigurationSubsystem (COMPONENT_NAME);
+
+}
 
 }
 

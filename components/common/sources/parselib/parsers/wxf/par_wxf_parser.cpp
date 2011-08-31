@@ -481,7 +481,12 @@ class WxfParserComponent
     }
 };
 
-extern "C" ComponentRegistrator<WxfParserComponent> WxfParser (WXF_PARSER_COMPONENT_NAME);
+extern "C"
+{
+
+ComponentRegistrator<WxfParserComponent> WxfParser (WXF_PARSER_COMPONENT_NAME);
+
+}
 
 }
 

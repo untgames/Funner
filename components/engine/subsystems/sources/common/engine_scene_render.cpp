@@ -295,7 +295,12 @@ class SceneRenderComponent
     }
 };
 
-extern "C" ComponentRegistrator<SceneRenderComponent> SceneRenderSubsystem (COMPONENT_NAME);
+extern "C"
+{
+
+ComponentRegistrator<SceneRenderComponent> SceneRenderSubsystem (COMPONENT_NAME);
+
+}
 
 }
 

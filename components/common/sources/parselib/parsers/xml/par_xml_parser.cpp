@@ -652,7 +652,12 @@ class XmlParserComponent
     }
 };
 
-extern "C" ComponentRegistrator<XmlParserComponent> XmlParser (XML_PARSER_COMPONENT_NAME);
+extern "C"
+{
+
+ComponentRegistrator<XmlParserComponent> XmlParser (XML_PARSER_COMPONENT_NAME);
+
+}
 
 }
 

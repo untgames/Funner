@@ -206,7 +206,12 @@ class OpenGLDriverComponent
     }
 };
 
-extern "C" common::ComponentRegistrator<OpenGLDriverComponent> OpenGLDriver (COMPONENT_NAME);
+extern "C"
+{
+
+common::ComponentRegistrator<OpenGLDriverComponent> OpenGLDriver (COMPONENT_NAME);
+
+}
 
 }
 

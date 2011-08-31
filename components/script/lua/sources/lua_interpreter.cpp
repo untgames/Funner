@@ -381,7 +381,12 @@ class LuaInterpreterComponent
     }
 };
 
-extern "C" ComponentRegistrator<LuaInterpreterComponent> LuaInterpreter ("script.interpreters.lua");
+extern "C"
+{
+
+ComponentRegistrator<LuaInterpreterComponent> LuaInterpreter ("script.interpreters.lua");
+
+}
 
 }
 

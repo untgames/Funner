@@ -138,7 +138,12 @@ class XFontLoaderComponent
     }
 };
 
-extern "C" ComponentRegistrator<XFontLoaderComponent> XFontLoader ("media.font.loaders.xfont");
+extern "C"
+{
+
+ComponentRegistrator<XFontLoaderComponent> XFontLoader ("media.font.loaders.xfont");
+
+}
 
 }
 

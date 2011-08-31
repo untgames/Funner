@@ -172,7 +172,12 @@ class IPhoneDriverComponent
     }
 };
 
-extern "C" common::ComponentRegistrator<IPhoneDriverComponent> IPhoneInputDriver (COMPONENT_NAME);
+extern "C"
+{
+
+common::ComponentRegistrator<IPhoneDriverComponent> IPhoneInputDriver (COMPONENT_NAME);
+
+}
 
 }
 

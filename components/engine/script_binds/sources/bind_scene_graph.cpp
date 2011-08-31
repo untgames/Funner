@@ -107,7 +107,12 @@ class Component
     }
 };
 
-extern "C"  common::ComponentRegistrator<Component> SceneGraphScriptBind (COMPONENT_NAME);
+extern "C"
+{
+
+common::ComponentRegistrator<Component> SceneGraphScriptBind (COMPONENT_NAME);
+
+}
 
 }
 

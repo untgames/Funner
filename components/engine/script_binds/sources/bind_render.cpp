@@ -200,7 +200,12 @@ class Component
     }
 };
 
-extern "C" common::ComponentRegistrator<Component> RenderScriptBind (COMPONENT_NAME);
+extern "C"
+{
+
+common::ComponentRegistrator<Component> RenderScriptBind (COMPONENT_NAME);
+
+}
 
 }
 

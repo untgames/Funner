@@ -99,7 +99,12 @@ class XAtlasLoaderComponent
     }
 };
 
-extern "C" ComponentRegistrator<XAtlasLoaderComponent> XAtlasLoader ("media.image.atlas.loaders.xatlas");
+extern "C"
+{
+
+ComponentRegistrator<XAtlasLoaderComponent> XAtlasLoader ("media.image.atlas.loaders.xatlas");
+
+}
 
 }
 

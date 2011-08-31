@@ -99,7 +99,12 @@ class DebugDriverComponent
     }
 };
 
-extern "C" common::ComponentRegistrator<DebugDriverComponent> DebugRendererDriver (DRIVER_COMPONENT_NAME);
+extern "C"
+{
+
+common::ComponentRegistrator<DebugDriverComponent> DebugRendererDriver (DRIVER_COMPONENT_NAME);
+
+}
 
 }
 

@@ -30,7 +30,7 @@ int main ()
     A a ("A1");
 
     stack.PushSymbol ("dummy");
-    stack.Push (xtl::ref (a));
+    stack.Push (xtl::any (xtl::ref (a)));
     stack.Push (3.0f);
     stack.Push ("Hello world");
 

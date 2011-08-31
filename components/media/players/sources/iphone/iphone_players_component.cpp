@@ -48,7 +48,12 @@ class PlayersComponent
     }
 };
 
-extern "C" common::ComponentRegistrator<PlayersComponent> IPhonePlayers ("media.players.stream.iphone");
+extern "C"
+{
+
+common::ComponentRegistrator<PlayersComponent> IPhonePlayers ("media.players.stream.iphone");
+
+}
 
 }
 

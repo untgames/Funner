@@ -350,7 +350,12 @@ class XPhysLoaderComponent
     }
 };
 
-extern "C" ComponentRegistrator<XPhysLoaderComponent> XPhysLoader ("media.physics.loaders.XPhysLoader");
+extern "C"
+{
+
+ComponentRegistrator<XPhysLoaderComponent> XPhysLoader ("media.physics.loaders.XPhysLoader");
+
+}
 
 }
 

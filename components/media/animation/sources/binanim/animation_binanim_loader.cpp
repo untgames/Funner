@@ -268,7 +268,12 @@ class BinAnimLoaderComponent
     }
 };
 
-extern "C" ComponentRegistrator<BinAnimLoaderComponent> BinAnimLoader ("media.animation.loaders.BinAnimLoader");
+extern "C"
+{
+
+ComponentRegistrator<BinAnimLoaderComponent> BinAnimLoader ("media.animation.loaders.BinAnimLoader");
+
+}
 
 }
 

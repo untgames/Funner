@@ -211,7 +211,12 @@ class XmlMaterialLibrarySaverComponent
     }
 };
 
-extern "C" ComponentRegistrator<XmlMaterialLibrarySaverComponent> XMtlSaver ("media.rfx.savers.XMtl");
+extern "C"
+{
+
+ComponentRegistrator<XmlMaterialLibrarySaverComponent> XMtlSaver ("media.rfx.savers.XMtl");
+
+}
 
 }
 

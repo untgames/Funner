@@ -355,7 +355,12 @@ class AesComponent
     }
 };
 
-extern "C" ComponentRegistrator<AesComponent> AesCrypto ("common.crypto.aes");
+extern "C"
+{
+
+ComponentRegistrator<AesComponent> AesCrypto ("common.crypto.aes");
+
+}
 
 }
 

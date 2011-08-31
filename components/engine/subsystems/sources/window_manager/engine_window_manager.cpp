@@ -646,7 +646,12 @@ class WindowManagerComponent
     }
 };
 
-extern "C" ComponentRegistrator<WindowManagerComponent> WindowManagerSubsystem (COMPONENT_NAME);
+extern "C"
+{
+
+ComponentRegistrator<WindowManagerComponent> WindowManagerSubsystem (COMPONENT_NAME);
+
+}
 
 }
 

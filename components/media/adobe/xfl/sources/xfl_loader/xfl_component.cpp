@@ -31,7 +31,12 @@ class XflLoaderComponent
     }
 };
 
-extern "C" common::ComponentRegistrator<XflLoaderComponent> XflLoader ("media.adobe.xfl.loaders.xfl");
+extern "C"
+{
+
+common::ComponentRegistrator<XflLoaderComponent> XflLoader ("media.adobe.xfl.loaders.xfl");
+
+}
 
 }
 

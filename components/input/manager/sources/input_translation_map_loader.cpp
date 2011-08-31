@@ -57,7 +57,12 @@ class KeymapLoaderComponent
     }
 };
 
-extern "C" ComponentRegistrator<KeymapLoaderComponent> XKeymapLoader ("input.loaders.xkeymap");
+extern "C"
+{
+
+ComponentRegistrator<KeymapLoaderComponent> XKeymapLoader ("input.loaders.xkeymap");
+
+}
 
 }
 

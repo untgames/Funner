@@ -312,7 +312,12 @@ class XPhysSaverComponent
     }
 };
 
-extern "C" ComponentRegistrator<XPhysSaverComponent> XPhysSaver ("media.physics.savers.XPhysSaver");
+extern "C"
+{
+
+ComponentRegistrator<XPhysSaverComponent> XPhysSaver ("media.physics.savers.XPhysSaver");
+
+}
 
 }
 

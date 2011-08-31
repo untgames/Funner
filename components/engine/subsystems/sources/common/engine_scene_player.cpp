@@ -178,7 +178,12 @@ class ScenePlayerComponent
     }
 };
 
-extern "C" ComponentRegistrator<ScenePlayerComponent> ScenePlayerSubsystem (COMPONENT_NAME);
+extern "C"
+{
+
+ComponentRegistrator<ScenePlayerComponent> ScenePlayerSubsystem (COMPONENT_NAME);
+
+}
 
 }
 

@@ -369,7 +369,12 @@ class XMeshSaverComponent
     }
 };
 
-extern "C" ComponentRegistrator<XMeshSaverComponent> XMeshSaver ("media.geometry.savers.XMeshSaver");
+extern "C"
+{
+
+ComponentRegistrator<XMeshSaverComponent> XMeshSaver ("media.geometry.savers.XMeshSaver");
+
+}
 
 }
 
