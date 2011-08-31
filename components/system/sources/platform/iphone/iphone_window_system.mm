@@ -741,7 +741,8 @@ void IPhoneWindowManager::SetBackgroundColor (window_t window, const Color& colo
 
   UIColor *background_color = [[UIColor alloc] initWithRed:color.red / 255.f green:color.green / 255.f blue:color.blue / 255.f alpha:1];
 
-  view.background_color    = color;
+  [view setBackground_color:color];
+
   view.ui_background_color = background_color;
 
   if (view.background_state)
