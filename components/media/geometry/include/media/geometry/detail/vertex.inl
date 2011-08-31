@@ -24,7 +24,7 @@ template <> struct attribute_type<math::vector<unsigned char, 4> > : public attr
     ѕолучение смещени€ пол€ в структуре (аналог offsetof, компилируемый без предупреждений на gcc)
 */
 
-#ifdef _MSC_VER
+#if defined (_MSC_VER) || defined (__APPLE_CC__)
   #define GEOMETRY_OFFSETOF(X,Y) offsetof(X,Y)
 #else
   #define GEOMETRY_OFFSETOF(X,Y) (reinterpret_cast<size_t> (&(static_cast<X*> (0)->*(&X::Y))))
