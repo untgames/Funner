@@ -91,3 +91,22 @@ ISceneRenderPtr SceneRenderManagerImpl::CreateRender (RenderManager& manager, co
     throw;
   }
 }
+
+/*
+    SceneRenderManager
+*/
+
+void SceneRenderManager::RegisterRender (const char* renderer, const RenderCreator& creator)
+{
+  SceneRenderManagerSingleton::Instance ()->RegisterRender (renderer, creator);
+}
+
+void SceneRenderManager::UnregisterRender (const char* renderer)
+{
+  SceneRenderManagerSingleton::Instance ()->UnregisterRender (renderer);
+}
+
+void SceneRenderManager::UnregisterAllRenders ()
+{
+  SceneRenderManagerSingleton::Instance ()->UnregisterAllRenders ();
+}
