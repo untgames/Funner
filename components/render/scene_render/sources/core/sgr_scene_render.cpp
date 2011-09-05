@@ -2,6 +2,7 @@
 
 using namespace render;
 
+//TODO: RenderManager destroy trackable
 //TODO: change screen background
 
 namespace
@@ -339,13 +340,16 @@ void SceneRender::SetScreen (scene_graph::Screen* screen)
   {
     if (screen == impl->screen)
       return;
-      
+
     impl->screen = 0;
-    
+
     impl->Destroy ();
-    
+
     impl->screen = screen;
-    
+
+    if (screen)
+      screen->AttachListener (impl);
+
     try
     {
       impl->Initialize ();
@@ -353,6 +357,10 @@ void SceneRender::SetScreen (scene_graph::Screen* screen)
     catch (...)
     {
       impl->screen = 0;
+      
+      if (screen)
+        screen->DetachListener (impl);
+      
       throw;
     }
   }
