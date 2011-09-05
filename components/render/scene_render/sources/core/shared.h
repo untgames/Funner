@@ -1,6 +1,7 @@
 #ifndef RENDER_SCENE_RENDER_CORE_SHARED_HEADER
 #define RENDER_SCENE_RENDER_CORE_SHARED_HEADER
 
+#include <stl/algorithm>
 #include <stl/hash_map>
 
 #include <xtl/bind.h>
@@ -11,6 +12,7 @@
 #include <xtl/reference_counter.h>
 
 #include <common/component.h>
+#include <common/log.h>
 #include <common/singleton.h>
 #include <common/strlib.h>
 
@@ -67,6 +69,12 @@ class RenderableView: public xtl::reference_counter
     ~RenderableView ();
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+///Область вывода / экран
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    const scene_graph::Viewport& Viewport ();
+    const scene_graph::Screen&   Screen   ();
+    
+///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Регистрация целевых буферов отрисовки
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void SetRenderTarget    (const char* name, const RenderTarget& target);
@@ -81,6 +89,8 @@ class RenderableView: public xtl::reference_counter
     struct Impl;
     stl::auto_ptr<Impl> impl;
 };
+
+typedef xtl::intrusive_ptr<RenderableView> RenderableViewPtr;
 
 }
 

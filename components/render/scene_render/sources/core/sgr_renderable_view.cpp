@@ -85,6 +85,20 @@ RenderableView::~RenderableView ()
 }
 
 /*
+    Область вывода / экран
+*/
+
+const scene_graph::Viewport& RenderableView::Viewport ()
+{
+  return impl->viewport;
+}
+
+const scene_graph::Screen& RenderableView::Screen ()
+{
+  return impl->screen;
+}
+
+/*
     Регистрация целевых буферов отрисовки
 */
 
