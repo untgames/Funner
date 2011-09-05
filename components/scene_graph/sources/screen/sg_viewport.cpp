@@ -366,7 +366,7 @@ const common::PropertyMap& Viewport::Properties () const
     Работа со слушателями
 */
 
-void Viewport::AttachListener (IViewportListener* listener)
+void Viewport::AttachListener (IViewportListener* listener) const
 {
   if (!listener)
     throw xtl::make_null_argument_exception ("scene_graph::Viewport::AttachListener", "listener");
@@ -374,7 +374,7 @@ void Viewport::AttachListener (IViewportListener* listener)
   impl->listeners.push_back (listener);
 }
 
-void Viewport::DetachListener (IViewportListener* listener)
+void Viewport::DetachListener (IViewportListener* listener) const
 {
   if (!listener)
     return;
@@ -382,7 +382,7 @@ void Viewport::DetachListener (IViewportListener* listener)
   impl->listeners.erase (stl::remove (impl->listeners.begin (), impl->listeners.end (), listener), impl->listeners.end ());
 }
 
-void Viewport::DetachAllListeners ()
+void Viewport::DetachAllListeners () const
 {
   impl->listeners.clear ();
 }

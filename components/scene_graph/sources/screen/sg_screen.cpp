@@ -306,7 +306,7 @@ const scene_graph::Viewport& Screen::Viewport (size_t index) const
     Работа со слушателями
 */
 
-void Screen::AttachListener (IScreenListener* listener)
+void Screen::AttachListener (IScreenListener* listener) const
 {
   if (!listener)
     throw xtl::make_null_argument_exception ("scene_graph::Screen::AttachListener", "listener");
@@ -314,7 +314,7 @@ void Screen::AttachListener (IScreenListener* listener)
   impl->listeners.push_back (listener);
 }
 
-void Screen::DetachListener (IScreenListener* listener)
+void Screen::DetachListener (IScreenListener* listener) const
 {
   if (!listener)
     return;
@@ -322,7 +322,7 @@ void Screen::DetachListener (IScreenListener* listener)
   impl->listeners.erase (stl::remove (impl->listeners.begin (), impl->listeners.end (), listener), impl->listeners.end ());
 }
 
-void Screen::DetachAllListeners ()
+void Screen::DetachAllListeners () const
 {
   impl->listeners.clear ();
 }
