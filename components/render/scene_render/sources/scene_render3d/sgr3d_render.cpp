@@ -48,9 +48,12 @@ typedef common::Singleton<RenderManagerRegistry> RenderManagerSingleton;
     Описание реализации рендера
 */
 
+typedef stl::hash_map<scene_graph::Scene*, Scene*> SceneMap;
+
 struct Render::Impl
 {
   RenderManager manager; //менеджер рендеринга
+  SceneMap      scenes;  //карта сцен
   Log           log;     //поток протоколирования  
   
 ///Конструктор
@@ -95,6 +98,42 @@ Render::~Render ()
   catch (...)
   {
     //подавление всех исключений
+  }
+}
+
+/*
+    Регистрация сцен
+*/
+
+void Render::RegisterScene (scene_graph::Scene& src_scene, Scene& render_scene)
+{
+  impl->scenes.insert_pair (&src_scene, &render_scene);
+}
+
+void Render::UnregisterScene (scene_graph::Scene& src_scene)
+{
+  impl->scenes.erase (&src_scene);
+}
+
+/*
+    Получение сцены
+*/
+
+ScenePtr Render::GetScene (scene_graph::Scene& scene)
+{
+  try
+  {
+    SceneMap::iterator iter = impl->scenes.find (&scene);
+    
+    if (iter != impl->scenes.end ())
+      return iter->second;
+      
+    return ScenePtr (new Scene (scene, this), false);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::scene_render3d::Render::GetScene");
+    throw;
   }
 }
     

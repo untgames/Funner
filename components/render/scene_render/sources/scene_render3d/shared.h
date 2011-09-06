@@ -36,9 +36,10 @@ typedef xtl::intrusive_ptr<View>   ViewPtr;
 typedef xtl::intrusive_ptr<Scene>  ScenePtr;
 
 //includes
-#include "view.h"
-#include "render.h"
 #include "log.h"
+#include "render.h"
+#include "scene.h"
+#include "view.h"
 
 }
 
