@@ -1,8 +1,11 @@
 #include "shared.h"
 
+#ifdef _MSC_VER
+  #pragma warning (disable : 4355) // this used in base initializer list
+#endif
+
 using namespace render;
 
-//TODO: RenderManager destroy trackable
 //TODO: change screen background
 
 namespace
@@ -25,26 +28,40 @@ typedef stl::vector<RenderableViewPtr>           ViewList;
 
 struct SceneRender::Impl: public xtl::reference_counter, public scene_graph::IScreenListener, public scene_graph::IViewportListener
 {
-  render::RenderManager* manager;         //менеджер рендеринга связанный с ренедром сцены
-  scene_graph::Screen*   screen;          //экран
-  RenderTargetMap        render_targets;  //целевые буферы рендеринга
-  ViewList               views;           //список областей вывода
-  bool                   need_sort_views; //области вывода требуют сортировки
-  common::Log            log;             //поток протоколирования
+  render::RenderManager*     manager;                    //менеджер рендеринга связанный с ренедром сцены
+  scene_graph::Screen*       screen;                     //экран
+  RenderTargetMap            render_targets;             //целевые буферы рендеринга
+  ViewList                   views;                      //список областей вывода
+  bool                       need_sort_views;            //области вывода требуют сортировки
+  common::Log                log;                        //поток протоколирования
+  xtl::trackable::slot_type  on_destroy_manager;         //обработчик удаления менеджера рендеринга
+  xtl::auto_connection       destroy_manager_connection; //соединение с обработчиком удаления менеджера рендеринга
 
 ///Конструктор
   Impl ()
-    : manager (0)
-    , screen (0)
+    : manager ()
+    , screen ()
     , need_sort_views (false)
     , log (LOG_NAME)
+    , on_destroy_manager (xtl::bind (&Impl::OnDestroyManager, this))
   {    
   }
 
 ///Деструктор
   ~Impl ()
-  {
-    RemoveAllRenderTargets ();
+  {    
+    try
+    {
+      Destroy ();
+
+      RemoveAllRenderTargets ();          
+
+      if (screen)
+        screen->DetachListener (this);
+    }
+    catch (...)
+    {      
+    }
   }
 
 ///Установка целевого буфера
@@ -86,7 +103,9 @@ struct SceneRender::Impl: public xtl::reference_counter, public scene_graph::ISc
       RenderTargetMap::iterator iter = render_targets.find (name);
       
       if (iter == render_targets.end ())
-        return;
+        return;        
+        
+      render_targets.erase (iter);
       
       for (ViewList::iterator iter=views.begin (), end=views.end (); iter!=end; ++iter)
         (*iter)->RemoveRenderTarget (name);
@@ -211,6 +230,14 @@ struct SceneRender::Impl: public xtl::reference_counter, public scene_graph::ISc
       throw;
     }
   }
+  
+///Оповещение об удалении менеджера рендеринга
+  void OnDestroyManager ()
+  {
+    manager = 0;
+
+    Destroy ();
+  }    
 
 ///Экран удален
   void OnScreenDestroy ()
@@ -297,15 +324,31 @@ void SceneRender::SetRenderManager (render::RenderManager* manager)
       
     impl->Destroy ();
     
-    impl->manager = manager;        
+    impl->manager = manager;    
 
     try
     {
+      if (manager)
+      {
+        try
+        {
+          impl->destroy_manager_connection = get_trackable (*manager).connect_tracker (impl->on_destroy_manager);
+        }
+        catch (...)
+        {
+          impl->manager = 0;
+          throw;
+        }
+      }
+      
       impl->Initialize ();
     }
     catch (...)
     {
+      impl->destroy_manager_connection.disconnect ();
+
       impl->manager = 0;
+
       throw;
     }
   }
@@ -340,6 +383,17 @@ void SceneRender::SetScreen (scene_graph::Screen* screen)
   {
     if (screen == impl->screen)
       return;
+      
+    if (impl->screen)
+    {
+      try
+      {
+        impl->screen->DetachListener (impl);
+      }
+      catch (...)
+      {
+      }
+    }
 
     impl->screen = 0;
 
