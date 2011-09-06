@@ -31,7 +31,7 @@ class Component
   private:
     static ISceneRender* CreateRender (RenderManager& manager, const char*)
     {
-      return new Render (manager);
+      return new View (manager);
     }
 };
 

@@ -25,6 +25,18 @@ namespace render
 namespace scene_render3d
 {
 
+//forwards
+class Render;
+class View;
+class Scene;
+
+//pointers
+typedef xtl::intrusive_ptr<Render> RenderPtr;
+typedef xtl::intrusive_ptr<View>   ViewPtr;
+typedef xtl::intrusive_ptr<Scene>  ScenePtr;
+
+//includes
+#include "view.h"
 #include "render.h"
 #include "log.h"
 

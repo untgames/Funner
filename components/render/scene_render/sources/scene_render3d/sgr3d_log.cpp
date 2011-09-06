@@ -10,7 +10,7 @@ namespace
     Константы
 */
 
-const char* LOG_NAME = "render.scene_render3d";
+const char* LOG_NAME = "render.scene_render";
 
 }
 
