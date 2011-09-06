@@ -363,6 +363,11 @@ LogLevel RenderManager::LogLevel () const
   return impl->Settings ().LogLevel ();
 }
 
+xtl::trackable& RenderManager::GetTrackable () const
+{
+  return *impl;
+}
+
 void RenderManager::Swap (RenderManager& manager)
 {
   stl::swap (impl, manager.impl);
@@ -374,6 +379,11 @@ namespace render
 void swap (RenderManager& manager1, RenderManager& manager2)
 {
   manager1.Swap (manager2);
+}
+
+xtl::trackable& get_trackable (const RenderManager& manager)
+{
+  return manager.GetTrackable ();
 }
 
 }
