@@ -6,8 +6,6 @@
 
 #include <sg/listener.h>
 
-#include <render/scene_render.h>
-
 #include <input/cursor.h>
 
 #include <engine/attachments.h>

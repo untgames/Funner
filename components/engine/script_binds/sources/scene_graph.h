@@ -109,7 +109,6 @@ extern const char* SCENE_CONTROLLER_WATER_LIBRARY;
 
 void bind_scene_library                 (script::Environment&);
 void bind_node_library                  (script::Environment&);
-void bind_node_properties_library       (script::Environment&);
 void bind_node_array_library            (script::Environment&);
 void bind_controller_owner_mode_library (script::Environment&);  
 void bind_controller_library            (script::Environment&);

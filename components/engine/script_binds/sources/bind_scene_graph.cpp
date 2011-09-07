@@ -60,7 +60,6 @@ void bind_scene_graph_library (Environment& environment)
 {
   bind_scene_library                 (environment);
   bind_node_library                  (environment);
-  bind_node_properties_library       (environment);
   bind_node_array_library            (environment);
   bind_controller_owner_mode_library (environment);  
   bind_controller_library            (environment);

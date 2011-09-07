@@ -16,6 +16,7 @@
 #include <common/console.h>
 #include <common/file.h>
 #include <common/log.h>
+#include <common/property_map.h>
 #include <common/singleton.h>
 #include <common/strlib.h>
 
@@ -31,6 +32,7 @@ void bind_common_string_tree  (script::Environment&);
 void bind_common_signals      (script::Environment&);
 void bind_common_action_queue (script::Environment&);
 void bind_common_timer        (script::Environment&);
+void bind_common_property_map (script::Environment&);
 
 }
 
