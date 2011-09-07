@@ -10,12 +10,18 @@
 #include <xtl/function.h>
 #include <xtl/intrusive_ptr.h>
 #include <xtl/reference_counter.h>
+#include <xtl/visitor.h>
 
 #include <common/component.h>
 #include <common/log.h>
 #include <common/property_map.h>
 #include <common/singleton.h>
 #include <common/strlib.h>
+
+#include <sg/light.h>
+#include <sg/camera.h>
+#include <sg/scene.h>
+#include <sg/visual_model.h>
 
 #include <render/scene_render.h>
 
@@ -27,19 +33,23 @@ namespace scene_render3d
 
 //forwards
 class Render;
-class View;
+class Renderable;
 class Scene;
+class View;
 
 //pointers
-typedef xtl::intrusive_ptr<Render> RenderPtr;
-typedef xtl::intrusive_ptr<View>   ViewPtr;
-typedef xtl::intrusive_ptr<Scene>  ScenePtr;
+typedef xtl::intrusive_ptr<Render>     RenderPtr;
+typedef xtl::intrusive_ptr<Renderable> RenderablePtr;
+typedef xtl::intrusive_ptr<Scene>      ScenePtr;
+typedef xtl::intrusive_ptr<View>       ViewPtr;
 
 //includes
 #include "log.h"
 #include "render.h"
+#include "renderable.h"
 #include "scene.h"
 #include "view.h"
+#include "visual_model.h"
 
 }
 
