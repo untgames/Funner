@@ -40,20 +40,12 @@ MySceneRender::UpdateCamera(0)
 MySceneRender::UpdateProperties()
 MySceneRender::UpdateFrame(Camera2):
   viewport: x=78, y=56, width=392, height=281
-render.scene_render: No effect assigned
-    at render::FrameImpl::Draw
-    at render::RenderableView::Update
-    at render::SceneRender::Update
 render.manager: Program parameters layout created (id=2)
 MySceneRender::MySceneRender
 MySceneRender::UpdateCamera(0)
 MySceneRender::UpdateProperties()
 MySceneRender::UpdateFrame(Camera1):
   viewport: x=0, y=0, width=784, height=562
-render.scene_render: No effect assigned
-    at render::FrameImpl::Draw
-    at render::RenderableView::Update
-    at render::SceneRender::Update
 Changing screen...
 MySceneRender::~MySceneRender
 render.manager: Program parameters layout destroyed (id=2)
@@ -65,20 +57,12 @@ MySceneRender::UpdateCamera(0)
 MySceneRender::UpdateProperties()
 MySceneRender::UpdateFrame(Camera2):
   viewport: x=78, y=56, width=392, height=281
-render.scene_render: No effect assigned
-    at render::FrameImpl::Draw
-    at render::RenderableView::Update
-    at render::SceneRender::Update
 render.manager: Program parameters layout created (id=4)
 MySceneRender::MySceneRender
 MySceneRender::UpdateCamera(0)
 MySceneRender::UpdateProperties()
 MySceneRender::UpdateFrame(Camera1):
   viewport: x=0, y=0, width=784, height=562
-render.scene_render: No effect assigned
-    at render::FrameImpl::Draw
-    at render::RenderableView::Update
-    at render::SceneRender::Update
 Destroy render manager...
 MySceneRender::~MySceneRender
 render.manager: Program parameters layout destroyed (id=4)
