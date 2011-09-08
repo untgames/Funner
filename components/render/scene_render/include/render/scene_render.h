@@ -122,12 +122,13 @@ class ISceneRender
 class SceneRenderManager
 {
   public:
-    typedef xtl::function<ISceneRender* (RenderManager& manager, const char* renderer)> RenderCreator;
+    typedef xtl::function<ISceneRender* (RenderManager& manager, const char* technique)> RenderCreator;
+    typedef xtl::function<bool (RenderManager& manager, const char* technique)> RenderChecker;    
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Регистрация рендеров
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    static void RegisterRender       (const char* renderer, const RenderCreator& creator);
+    static void RegisterRender       (const char* renderer, const RenderChecker& checker, const RenderCreator& creator);
     static void UnregisterRender     (const char* renderer);
     static void UnregisterAllRenders ();
 };

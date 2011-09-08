@@ -32,6 +32,28 @@ class RenderManagerRegistry
 
       return RenderPtr (new Render (manager), false);
     }
+    
+///Проверка доступности техники
+    bool CheckTechnique (const RenderManager& manager, const char* technique)
+    {
+      if (!technique)
+        return false;
+        
+      RenderMap::iterator iter = renders.find (&manager);
+
+      if (iter != renders.end ())
+        return iter->second->HasTechnique (technique);         
+
+      for (common::Parser::NamesakeIterator iter=manager.Configuration ().First ("technique"); iter; ++iter)
+      {
+        const char* technique_name = common::get<const char*> (*iter, "", "");
+                
+        if (!xtl::xstrcmp (technique_name, technique))
+          return true;
+      }
+
+      return false;
+    }
 
   private:
     typedef stl::hash_map<const RenderManager*, Render*> RenderMap;
@@ -152,4 +174,26 @@ RenderPtr Render::GetRender (const RenderManager& manager)
     e.touch ("render::scene_render3d::Render::GetRender");
     throw;
   }
+}
+
+/*
+    Проверка доступности техники
+*/
+
+bool Render::CheckTechnique (const RenderManager& manager, const char* technique)
+{
+  try
+  {
+    return RenderManagerSingleton::Instance ()->CheckTechnique (manager, technique);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::scene_render3d::Render::CheckTechnique");
+    throw;
+  }
+}
+
+bool Render::HasTechnique (const char* technique)
+{
+  return true; //???????TODO
 }

@@ -147,10 +147,10 @@ struct RenderableView::Impl: public scene_graph::IViewportListener, public scene
       {        
         renderer = ISceneRenderPtr ();
 
-        renderer = SceneRenderManagerSingleton::Instance ()->CreateRender (manager, viewport.Renderer ());
+        renderer = SceneRenderManagerSingleton::Instance ()->CreateRender (manager, viewport.Technique ());
         
         if (!renderer)
-          throw xtl::format_operation_exception ("", "Can't create renderer '%s'", viewport.Renderer ());
+          throw xtl::format_operation_exception ("", "Can't create sce render for technique '%s'", viewport.Technique ());
         
         need_update_renderer       = false;
         need_update_render_targets = true;

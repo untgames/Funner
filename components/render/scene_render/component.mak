@@ -32,4 +32,6 @@ RENDER.SCENE_RENDER.RENDER3D.TESTS.SOURCE_DIRS := tests/scene_render3d
 RENDER.SCENE_RENDER.RENDER3D.TESTS.IMPORTS     := compile.render.scene_render link.render.scene_render \
                                                   compile.scene_graph.core compile.common compile.system link.system \
                                                   link.render.low_level.opengl_driver run.render.low_level.opengl_driver \
-                                                  link.render.scene_render.render3d
+                                                  link.render.scene_render.render3d \
+                                                  link.media.image.dds link.media.rfx link.media.rfx.default_serializers \
+                                                  link.media.geometry.binmesh link.media.geometry.xmesh

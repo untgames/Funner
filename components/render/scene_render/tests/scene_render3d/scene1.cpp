@@ -10,6 +10,8 @@ int main ()
     
     RenderManager manager = test.RenderManager ();
     
+    manager.LoadResource ("data/render.rfx");
+    
     SceneRender render;
     
     render.SetRenderManager (&manager);
@@ -29,9 +31,9 @@ int main ()
     
     scene_graph::Viewport vp;
 
-    vp.SetArea     (0, 0, 100, 100);
-    vp.SetCamera   (&*camera);
-    vp.SetRenderer ("render3d");
+    vp.SetArea      (0, 0, 100, 100);
+    vp.SetCamera    (&*camera);
+    vp.SetTechnique ("default");
     
     screen.Attach (vp);
     

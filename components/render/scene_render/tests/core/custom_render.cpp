@@ -66,6 +66,12 @@ class MySceneRender: public ISceneRender, public xtl::reference_counter
     {
       return new MySceneRender (manager);
     }
+    
+///Проверяющая функция
+    static bool Check (RenderManager&, const char*)
+    {
+      return true;
+    }
 
   private:
     render::Frame        frame;
@@ -84,7 +90,7 @@ int main ()
     {
       Test test (L"Window1 test");
       
-      SceneRenderManager::RegisterRender ("MySceneRender", &MySceneRender::Create);    
+      SceneRenderManager::RegisterRender ("MySceneRender", &MySceneRender::Check, &MySceneRender::Create);    
       
       RenderManager manager = test.RenderManager ();
       
@@ -108,19 +114,19 @@ int main ()
       
       scene_graph::Viewport vp1;
 
-      vp1.SetArea     (0, 0, 100, 100);
-      vp1.SetCamera   (&*camera1);
-      vp1.SetRenderer ("MySceneRender");
-      vp1.SetZOrder   (2);
+      vp1.SetArea      (0, 0, 100, 100);
+      vp1.SetCamera    (&*camera1);
+      vp1.SetTechnique ("Technique1");
+      vp1.SetZOrder    (2);
       
       screen.Attach (vp1);
 
       scene_graph::Viewport vp2;
 
-      vp2.SetArea     (10, 10, 50, 50);
-      vp2.SetCamera   (&*camera2);
-      vp2.SetRenderer ("MySceneRender");
-      vp2.SetZOrder   (1);
+      vp2.SetArea      (10, 10, 50, 50);
+      vp2.SetCamera    (&*camera2);
+      vp2.SetTechnique ("Technique2");
+      vp2.SetZOrder    (1);
       
       screen.Attach (vp2);
       

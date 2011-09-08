@@ -25,13 +25,18 @@ class Component
   public:
     Component ()
     {
-      SceneRenderManager::RegisterRender (RENDER_NAME, &Component::CreateRender);
+      SceneRenderManager::RegisterRender (RENDER_NAME, &Component::CheckRender, &Component::CreateRender);
     }
     
   private:
-    static ISceneRender* CreateRender (RenderManager& manager, const char*)
+    static ISceneRender* CreateRender (RenderManager& manager, const char* technique)
     {
-      return new View (manager);
+      return new View (manager, technique);
+    }
+    
+    static bool CheckRender (RenderManager& manager, const char* technique)
+    {
+      return Render::CheckTechnique (manager, technique);
     }
 };
 

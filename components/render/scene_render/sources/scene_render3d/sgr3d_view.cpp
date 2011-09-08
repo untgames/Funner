@@ -9,22 +9,24 @@ using namespace render::scene_render3d;
 
 struct View::Impl
 {
-  RenderPtr      render;  //рендер
-  render::Frame  frame;   //кадр
-  Log            log;     //поток протоколировани€
+  RenderPtr      render;    //рендер
+  stl::string    technique; //техника рендеринга
+  render::Frame  frame;     //кадр
+  Log            log;       //поток протоколировани€
 
 /// онструктор
-  Impl (RenderManager& in_manager)
+  Impl (RenderManager& in_manager, const char* in_technique)
     : render (Render::GetRender (in_manager))
-    , frame (in_manager.CreateFrame ())
+    , technique (in_technique)
+    , frame (in_manager.CreateFrame ())    
   {
-    log.Printf ("View created");
+    log.Printf ("View created for technique '%s'", technique.c_str ());
   }
   
 ///ƒеструктор
   ~Impl ()
   {
-    log.Printf ("View destroyed");
+    log.Printf ("View destroyed for technique '%s'", technique.c_str ());
   }
 };
 
@@ -32,11 +34,14 @@ struct View::Impl
      онструктор / деструктор
 */
 
-View::View (RenderManager& manager)
+View::View (RenderManager& manager, const char* technique)
 {
   try
   {
-    impl = new Impl (manager);
+    if (!technique)
+      throw xtl::make_null_argument_exception ("", "technique");
+    
+    impl = new Impl (manager, technique);
   }
   catch (xtl::exception& e)
   {

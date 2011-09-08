@@ -14,6 +14,7 @@
 
 #include <common/component.h>
 #include <common/log.h>
+#include <common/parser.h>
 #include <common/property_map.h>
 #include <common/singleton.h>
 #include <common/strlib.h>
@@ -35,12 +36,14 @@ namespace scene_render3d
 class Render;
 class Renderable;
 class Scene;
+class Technique;
 class View;
 
 //pointers
 typedef xtl::intrusive_ptr<Render>     RenderPtr;
 typedef xtl::intrusive_ptr<Renderable> RenderablePtr;
 typedef xtl::intrusive_ptr<Scene>      ScenePtr;
+typedef xtl::intrusive_ptr<Technique>  TechniquePtr;
 typedef xtl::intrusive_ptr<View>       ViewPtr;
 
 //includes
@@ -48,6 +51,7 @@ typedef xtl::intrusive_ptr<View>       ViewPtr;
 #include "render.h"
 #include "renderable.h"
 #include "scene.h"
+#include "technique.h"
 #include "view.h"
 #include "visual_model.h"
 

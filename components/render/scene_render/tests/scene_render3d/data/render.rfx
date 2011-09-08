@@ -294,3 +294,11 @@ effect "lighting"
     texmap                "shadow" "default"            //define texture for framemap "shadow" with "default" sampler
   }
 }
+
+technique 'default'
+{
+  for_each_light
+  {
+    effect 'lighting'
+  }
+}

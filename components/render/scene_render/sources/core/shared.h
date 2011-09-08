@@ -32,6 +32,7 @@ class SceneRenderManagerImpl: public xtl::noncopyable
 {
   public:
     typedef SceneRenderManager::RenderCreator RenderCreator;
+    typedef SceneRenderManager::RenderChecker RenderChecker;
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструкторы / деструктор
@@ -42,14 +43,14 @@ class SceneRenderManagerImpl: public xtl::noncopyable
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Регистрация рендеров
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void RegisterRender       (const char* renderer, const RenderCreator& creator);
+    void RegisterRender       (const char* renderer, const RenderChecker& checker, const RenderCreator& creator);
     void UnregisterRender     (const char* renderer);
     void UnregisterAllRenders ();
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Создание рендера
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    ISceneRenderPtr CreateRender (RenderManager& manager, const char* renderer);    
+    ISceneRenderPtr CreateRender (RenderManager& manager, const char* renderer);
     
   private:
     struct Impl;
