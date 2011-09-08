@@ -27,6 +27,10 @@ int main ()
     
     scene_graph::OrthoCamera::Pointer camera = scene_graph::OrthoCamera::Create ();
     
+    scene_graph::Scene scene;
+    
+    camera->BindToScene (scene);
+    
       //настройка области вывода
     
     scene_graph::Viewport vp;

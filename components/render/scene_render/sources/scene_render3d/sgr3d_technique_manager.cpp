@@ -7,6 +7,16 @@ namespace
 {
 
 /*
+    Обобщенная порождающая функция
+*/
+
+template <class T>
+Technique* create_technique (RenderManager& manager, common::ParseNode& configuration)
+{
+  return new T (manager, configuration);
+}
+
+/*
     Список доступных техник
 */
 
@@ -19,7 +29,7 @@ struct TechniqueDesc
 };
 
 TechniqueDesc technique_descs [] = {
-  {0, 0} ///TODO: out!
+  {"for_each_light", &create_technique<ForEachLightTechnique>}
 };
 
 const size_t techniques_count = sizeof (technique_descs) / sizeof (*technique_descs);

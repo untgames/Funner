@@ -55,6 +55,9 @@ typedef xtl::intrusive_ptr<View>       ViewPtr;
 #include "view.h"
 #include "visual_model.h"
 
+//include techinques
+#include "techniques/for_each_light.h"
+
 }
 
 }

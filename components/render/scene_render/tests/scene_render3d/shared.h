@@ -17,6 +17,7 @@
 #include <render/scene_render.h>
 
 #include <sg/camera.h>
+#include <sg/scene.h>
 
 #include <math/utility.h>
 
