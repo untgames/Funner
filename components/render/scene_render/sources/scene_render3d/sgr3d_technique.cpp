@@ -9,7 +9,15 @@ using namespace render::scene_render3d;
 
 struct Technique::Impl
 {
-  stl::string name; //имя техники
+  stl::string                        name;               //имя техники
+  scene_graph::Camera*               camera;             //текущая камера
+  stl::auto_ptr<common::PropertyMap> default_properties; //свойства по умолчанию
+  
+///Конструктор
+  Impl ()
+    : camera ()
+  {
+  }
 };
 
 /*
@@ -43,21 +51,69 @@ const char* Technique::Name ()
 }
 
 /*
-    Обновление камеры
+    Камера
 */
 
-void Technique::UpdateCamera (scene_graph::Camera* camera)
+void Technique::SetCamera (scene_graph::Camera* camera)
 {
-  throw xtl::make_not_implemented_exception ("render::scene_render3d::Technique::UpdateCamera");
+  impl->camera = camera;
 }
+
+scene_graph::Camera* Technique::Camera ()
+{
+  return impl->camera;
+}
+
+/*
+    Установка свойств по умолчанию
+*/
+
+void Technique::SetDefaultProperties (const common::PropertyMap& properties)
+{
+  if (!impl->default_properties.get ())
+  {
+    impl->default_properties = stl::auto_ptr<common::PropertyMap> (new common::PropertyMap (properties.Clone ()));
+  }
+  else
+  {
+    *impl->default_properties = properties.Clone ();
+  }
+}
+
+void Technique::SetDefaultProperties (const common::ParseNode& node)
+{
+  throw xtl::make_not_implemented_exception ("render::scene_render3d::Technique::SetDefaultProperties");
+}
+
+const common::PropertyMap Technique::DefaultProperties ()
+{
+  if (!impl->default_properties.get ())
+    return common::PropertyMap ();
+    
+  return *impl->default_properties;
+}
+
 
 /*
     Обновление свойств ренедринга
 */
 
-void Technique::UpdateProperties (const common::PropertyMap&)
+void Technique::UpdateProperties (const common::PropertyMap& properties)
 {
-  throw xtl::make_not_implemented_exception ("render::scene_render3d::Technique::UpdateProperties");
+  try
+  {
+    ResetPropertiesCore ();
+
+    if (impl->default_properties.get ())  
+      UpdatePropertiesCore (*impl->default_properties);
+      
+    UpdatePropertiesCore (properties);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::scene_render3d::Technique::UpdateProperties");
+    throw;
+  }
 }
 
 /*
@@ -66,5 +122,13 @@ void Technique::UpdateProperties (const common::PropertyMap&)
 
 void Technique::UpdateFrame (Scene& scene, Frame& frame)
 {
-  throw xtl::make_not_implemented_exception ("render::scene_render3d::Technique::Draw");
+  try
+  {
+    UpdateFrameCore (scene, frame);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::scene_render3d::Technique::UpdateFrame");
+    throw;
+  }
 }

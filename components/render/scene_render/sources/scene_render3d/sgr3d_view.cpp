@@ -242,7 +242,7 @@ void View::UpdateFrame ()
       {
         try
         {
-          (*iter)->UpdateCamera (impl->camera);
+          (*iter)->SetCamera (impl->camera);
           
           ++iter;
           
