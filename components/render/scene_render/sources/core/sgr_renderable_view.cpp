@@ -354,9 +354,14 @@ void RenderableView::UpdateFrame (Frame* parent_frame)
     impl->renderer->UpdateFrame ();
     
       //отрисовка
-
-    if (parent_frame) parent_frame->AddFrame (impl->renderer->Frame ());
-    else              impl->renderer->Frame ().Draw ();    
+      
+    Frame& frame = impl->renderer->Frame ();
+    
+    if (frame.EntitiesCount () || frame.FramesCount ())
+    {
+      if (parent_frame) parent_frame->AddFrame (frame);
+      else              frame.Draw ();    
+    }
   }
   catch (xtl::exception& e)
   {

@@ -44,8 +44,7 @@ class View: public xtl::noncopyable, public xtl::reference_counter, public IScen
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Управление техниками рендеринга
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void AddTechnique        (const TechniquePtr& technique);
-    void RemoveAllTechniques ();
+    void ResetTechniqueCache ();
 
   private:
     struct Impl;

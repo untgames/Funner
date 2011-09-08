@@ -9,6 +9,7 @@ using namespace render::scene_render3d;
 
 struct Technique::Impl
 {
+  stl::string name; //имя техники
 };
 
 /*
@@ -22,6 +23,23 @@ Technique::Technique ()
 
 Technique::~Technique ()
 {
+}
+
+/*
+    Имя техники
+*/
+
+void Technique::SetName (const char* name)
+{
+  if (!name)
+    throw xtl::make_null_argument_exception ("render::scene_render3d::Technique::SetName", "name");
+    
+  impl->name = name;
+}
+
+const char* Technique::Name ()
+{
+  return impl->name.c_str ();
 }
 
 /*

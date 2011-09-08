@@ -10,7 +10,7 @@ namespace
     Константы
 */
 
-const size_t TECHNIQUE_ARRAY_RESERVE = 8; //резервируемое количество техник рендеринга
+const size_t SUB_TECHNIQUE_ARRAY_RESERVE = 8; //резервируемое количество техник рендеринга
 
 }
 
@@ -22,27 +22,31 @@ typedef stl::vector<TechniquePtr> TechniqueArray;
 
 struct View::Impl
 {
-  RenderPtr            render;                    //рендер
-  stl::string          technique_name;            //имя техники рендеринга
-  TechniqueArray       techniques;                //техники
-  render::Frame        frame;                     //кадр
-  scene_graph::Camera* camera;                    //текущая камера
-  common::PropertyMap  properties;                //свойства рендеринга
-  ScenePtr             scene;                     //текущая сцена
-  bool                 need_update_properties;    //необходимо обновить свойства рендеринга
-  bool                 need_update_camera;        //необходимо обновить камеру
-  Log                  log;                       //поток протоколирования
+  RenderPtr            render;                     //рендер
+  RenderManager        manager;                    //менеджер рендеринга
+  stl::string          technique_name;             //имя техники рендеринга
+  TechniqueArray       sub_techniques;             //вложенные техники
+  render::Frame        frame;                      //кадр
+  scene_graph::Camera* camera;                     //текущая камера
+  common::PropertyMap  properties;                 //свойства рендеринга
+  ScenePtr             scene;                      //текущая сцена
+  bool                 need_update_properties;     //необходимо обновить свойства рендеринга
+  bool                 need_update_camera;         //необходимо обновить камеру
+  bool                 need_update_sub_techniques; //необходимо обновить техники рендеринга
+  Log                  log;                        //поток протоколирования
 
 ///Конструктор
   Impl (RenderManager& in_manager, const char* in_technique)
     : render (Render::GetRender (in_manager))
+    , manager (in_manager)
     , technique_name (in_technique)
     , frame (in_manager.CreateFrame ())
     , camera ()
     , need_update_properties (true)
     , need_update_camera (true)
+    , need_update_sub_techniques (true)
   {
-    techniques.reserve (TECHNIQUE_ARRAY_RESERVE);
+    sub_techniques.reserve (SUB_TECHNIQUE_ARRAY_RESERVE);
     
     log.Printf ("View created for technique '%s'", technique_name.c_str ());
   }
@@ -51,6 +55,60 @@ struct View::Impl
   ~Impl ()
   {
     log.Printf ("View destroyed for technique '%s'", technique_name.c_str ());
+  }
+  
+///Обновление техник
+  void UpdateSubTechniques ()
+  {
+    try
+    {
+      if (!need_update_sub_techniques)
+        return;
+        
+        //загрузка конфигурации
+        
+      sub_techniques.clear ();
+      
+      for (common::Parser::NamesakeIterator iter=manager.Configuration ().First ("technique"); iter; ++iter)
+      {
+        const char* technique = common::get<const char*> (*iter, "", "");
+        
+        if (!xtl::xstrcmp (technique, technique_name.c_str ()))
+          continue;
+          
+        common::ParseNode parent_technique_node = *iter;
+          
+        for (common::Parser::Iterator iter=parent_technique_node.First (); iter; ++iter)
+        {
+          try
+          {
+            TechniquePtr technique = TechniqueManager::CreateTechnique (iter->Name (), manager, *iter);
+            
+            if (!technique)
+              throw xtl::format_operation_exception ("", "Can't create technique '%s'", iter->Name ());
+            
+            technique->SetName (iter->Name ());
+
+            sub_techniques.push_back (technique);
+          }
+          catch (std::exception& e)
+          {
+            log.Printf ("%s\n    at create sub-technique '%s' for technique '%s'", e.what (), iter->Name (), technique_name.c_str ());
+          }
+          catch (...)
+          {
+            log.Printf ("unknown exception\n    at create sub-technique '%s' for technique '%s'", iter->Name (), technique_name.c_str ());
+          }
+        }
+      }              
+        
+      need_update_sub_techniques = false;
+    }
+    catch (xtl::exception& e)
+    {
+      e.touch ("render::scene_render3d::View::Impl::UpdateSubTechniques");
+      throw;
+    }    
   }
 };
 
@@ -125,12 +183,38 @@ void View::UpdateFrame ()
 {
   try
   {
+      //проверка необходимости обновления техник рендеринга
+      
+    if (impl->need_update_sub_techniques)
+      impl->UpdateSubTechniques ();
+    
       //проверка необходимости обновления свойств рендеринга
       
     if (impl->need_update_properties)
     {
-      for (TechniqueArray::iterator iter=impl->techniques.begin (), end=impl->techniques.end (); iter!=end; ++iter)
-        (*iter)->UpdateProperties (impl->properties);
+      for (TechniqueArray::iterator iter=impl->sub_techniques.begin (), end=impl->sub_techniques.end (); iter!=end;)
+      {
+        try
+        {
+          (*iter)->UpdateProperties (impl->properties);
+          
+           ++iter;
+           
+           continue;
+        }
+        catch (std::exception& e)
+        {
+          impl->log.Printf ("%s\n    at update sub-technique '%s' properties for technique '%s'", e.what (), (*iter)->Name (), impl->technique_name.c_str ());
+        }
+        catch (...)
+        {
+          impl->log.Printf ("unknown exception\n    at update sub-technique '%s' properties for technique '%s'", (*iter)->Name (), impl->technique_name.c_str ());
+        }
+        
+        impl->sub_techniques.erase (iter);
+        
+        end = impl->sub_techniques.end ();
+      }      
 
       impl->need_update_properties = false;
     }
@@ -152,8 +236,29 @@ void View::UpdateFrame ()
         
         //оповещение техник
       
-      for (TechniqueArray::iterator iter=impl->techniques.begin (), end=impl->techniques.end (); iter!=end; ++iter)
-        (*iter)->UpdateCamera (impl->camera);
+      for (TechniqueArray::iterator iter=impl->sub_techniques.begin (), end=impl->sub_techniques.end (); iter!=end;)
+      {
+        try
+        {
+          (*iter)->UpdateCamera (impl->camera);
+          
+          ++iter;
+          
+          continue;
+        }
+        catch (std::exception& e)
+        {
+          impl->log.Printf ("%s\n    at update sub-technique '%s' camera for technique '%s'", e.what (), (*iter)->Name (), impl->technique_name.c_str ());          
+        }
+        catch (...)
+        {
+          impl->log.Printf ("unknown exception\n    at update sub-technique '%s' camera for technique '%s'", (*iter)->Name (), impl->technique_name.c_str ());
+        }
+                
+        impl->sub_techniques.erase (iter);
+        
+        end = impl->sub_techniques.end ();        
+      }
 
       impl->need_update_camera = false;
     }        
@@ -162,8 +267,29 @@ void View::UpdateFrame ()
       
     if (impl->scene)
     {
-      for (TechniqueArray::iterator iter=impl->techniques.begin (), end=impl->techniques.end (); iter!=end; ++iter)
-        (*iter)->UpdateFrame (*impl->scene, impl->frame);
+      for (TechniqueArray::iterator iter=impl->sub_techniques.begin (), end=impl->sub_techniques.end (); iter!=end;)
+      {
+        try
+        {
+          (*iter)->UpdateFrame (*impl->scene, impl->frame);
+          
+          ++iter;
+          
+          continue;
+        }
+        catch (std::exception& e)
+        {
+          impl->log.Printf ("%s\n    at update sub-technique '%s' frame for technique '%s'", e.what (), (*iter)->Name (), impl->technique_name.c_str ());          
+        }
+        catch (...)
+        {
+          impl->log.Printf ("unknown exception\n    at update sub-technique '%s' frame for technique '%s'", (*iter)->Name (), impl->technique_name.c_str ());
+        }
+
+        impl->sub_techniques.erase (iter);
+
+        end = impl->sub_techniques.end ();
+      }
     }
   }
   catch (xtl::exception& e)
@@ -200,12 +326,9 @@ const char* View::TechniqueName ()
     Управление техниками рендеринга
 */
 
-void View::AddTechnique (const TechniquePtr& technique)
+void View::ResetTechniqueCache ()
 {
-  impl->techniques.push_back (technique);
-}
-
-void View::RemoveAllTechniques ()
-{
-  impl->techniques.clear ();
+  impl->sub_techniques.clear ();
+  
+  impl->need_update_sub_techniques = true;
 }

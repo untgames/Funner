@@ -100,35 +100,7 @@ struct Render::Impl
   void ResetTechniqueCaches ()
   {
     for (ViewList::iterator iter=views.begin (), end=views.end (); iter!=end; ++iter)
-      (*iter)->RemoveAllTechniques ();    
-  }
-  
-///Переконцигурация
-  void Reconfigure ()
-  {
-    try
-    {
-        //сброс кэшей
-
-      ResetTechniqueCaches ();
-
-        //загрузка конфигурации
-      
-      for (common::Parser::NamesakeIterator iter=manager.Configuration ().First ("technique"); iter; ++iter)
-      {
-        const char* technique = common::get<const char*> (*iter, "", "");
-        
-        if (!*technique)
-          continue;
-          
-        //TODO: parse technique
-      }      
-    }
-    catch (xtl::exception& e)
-    {
-      e.touch ("render::scene_render3d::Render::Impl::Reconfigure");
-      throw;
-    }
+      (*iter)->ResetTechniqueCache ();
   }
   
 ///Обработчик изменения конфигурации
