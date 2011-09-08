@@ -71,17 +71,22 @@ typedef common::Singleton<RenderManagerRegistry> RenderManagerSingleton;
 */
 
 typedef stl::hash_map<scene_graph::Scene*, Scene*> SceneMap;
+typedef stl::list<View*>                           ViewList;
 
 struct Render::Impl
 {
-  RenderManager manager; //менеджер рендеринга
-  SceneMap      scenes;  //карта сцен
-  Log           log;     //поток протоколирования  
+  RenderManager        manager;                          //менеджер рендеринга
+  ViewList             views;                            //список областей вывода
+  SceneMap             scenes;                           //карта сцен
+  xtl::auto_connection configuration_changed_connection; //соединение с обработчиком изменения конфигурации
+  Log                  log;                              //поток протоколирования  
   
 ///Конструктор
   Impl (const RenderManager& in_manager)
     : manager (in_manager)
   {
+    configuration_changed_connection = manager.RegisterEventHandler (RenderManagerEvent_OnConfigurationChanged, xtl::bind (&Impl::OnConfigurationChanged, this));
+    
     log.Printf ("Render created");
   }
   
@@ -89,6 +94,47 @@ struct Render::Impl
   ~Impl ()
   {
     log.Printf ("Render destroyed");    
+  }
+  
+///Сброс кешей техник
+  void ResetTechniqueCaches ()
+  {
+    for (ViewList::iterator iter=views.begin (), end=views.end (); iter!=end; ++iter)
+      (*iter)->RemoveAllTechniques ();    
+  }
+  
+///Переконцигурация
+  void Reconfigure ()
+  {
+    try
+    {
+        //сброс кэшей
+
+      ResetTechniqueCaches ();
+
+        //загрузка конфигурации
+      
+      for (common::Parser::NamesakeIterator iter=manager.Configuration ().First ("technique"); iter; ++iter)
+      {
+        const char* technique = common::get<const char*> (*iter, "", "");
+        
+        if (!*technique)
+          continue;
+          
+        //TODO: parse technique
+      }      
+    }
+    catch (xtl::exception& e)
+    {
+      e.touch ("render::scene_render3d::Render::Impl::Reconfigure");
+      throw;
+    }
+  }
+  
+///Обработчик изменения конфигурации
+  void OnConfigurationChanged ()
+  {
+    ResetTechniqueCaches ();
   }
 };
 
@@ -121,6 +167,24 @@ Render::~Render ()
   {
     //подавление всех исключений
   }
+}
+
+/*
+    Регистрация областей вывода
+*/
+
+void Render::RegisterView (View& view)
+{
+  for (ViewList::iterator iter=impl->views.begin (), end=impl->views.end (); iter!=end; ++iter)
+    if (*iter == &view)
+      return;
+      
+  impl->views.push_back (&view);
+}
+
+void Render::UnregisterView (View& view)
+{
+  impl->views.remove (&view);
 }
 
 /*
