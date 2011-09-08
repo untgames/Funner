@@ -71,10 +71,10 @@ struct View::Impl
       
       for (common::Parser::NamesakeIterator iter=manager.Configuration ().First ("technique"); iter; ++iter)
       {
-        const char* technique = common::get<const char*> (*iter, "", "");
+        const char* technique = common::get<const char*> (*iter, "", "");        
         
-        if (!xtl::xstrcmp (technique, technique_name.c_str ()))
-          continue;
+        if (xtl::xstrcmp (technique, technique_name.c_str ()))
+          continue;          
           
         common::ParseNode parent_technique_node = *iter;
           
@@ -93,11 +93,13 @@ struct View::Impl
           }
           catch (std::exception& e)
           {
-            log.Printf ("%s\n    at create sub-technique '%s' for technique '%s'", e.what (), iter->Name (), technique_name.c_str ());
+            log.Printf ("%s\n    at create sub-technique '%s' for technique '%s'\n    at render::scene_render3d::View::Impl::UpdateSubTechniques\n    at render::scene_render3d::View::UpdateFrame",
+              e.what (), iter->Name (), technique_name.c_str ());
           }
           catch (...)
           {
-            log.Printf ("unknown exception\n    at create sub-technique '%s' for technique '%s'", iter->Name (), technique_name.c_str ());
+            log.Printf ("unknown exception\n    at create sub-technique '%s' for technique '%s'\n    at render::scene_render3d::View::Impl::UpdateSubTechniques\n    at render::scene_render3d::View::UpdateFrame",
+              iter->Name (), technique_name.c_str ());
           }
         }
       }              
@@ -204,11 +206,11 @@ void View::UpdateFrame ()
         }
         catch (std::exception& e)
         {
-          impl->log.Printf ("%s\n    at update sub-technique '%s' properties for technique '%s'", e.what (), (*iter)->Name (), impl->technique_name.c_str ());
+          impl->log.Printf ("%s\n    at update sub-technique '%s' properties for technique '%s'\n    at render::scene_render3d::View::UpdateFrame\n    at render::scene_render3d::View::UpdateFrame", e.what (), (*iter)->Name (), impl->technique_name.c_str ());
         }
         catch (...)
         {
-          impl->log.Printf ("unknown exception\n    at update sub-technique '%s' properties for technique '%s'", (*iter)->Name (), impl->technique_name.c_str ());
+          impl->log.Printf ("unknown exception\n    at update sub-technique '%s' properties for technique '%s'\n    at render::scene_render3d::View::UpdateFrame", (*iter)->Name (), impl->technique_name.c_str ());
         }
         
         impl->sub_techniques.erase (iter);
@@ -248,11 +250,11 @@ void View::UpdateFrame ()
         }
         catch (std::exception& e)
         {
-          impl->log.Printf ("%s\n    at update sub-technique '%s' camera for technique '%s'", e.what (), (*iter)->Name (), impl->technique_name.c_str ());          
+          impl->log.Printf ("%s\n    at update sub-technique '%s' camera for technique '%s'\n    at render::scene_render3d::View::UpdateFrame", e.what (), (*iter)->Name (), impl->technique_name.c_str ());          
         }
         catch (...)
         {
-          impl->log.Printf ("unknown exception\n    at update sub-technique '%s' camera for technique '%s'", (*iter)->Name (), impl->technique_name.c_str ());
+          impl->log.Printf ("unknown exception\n    at update sub-technique '%s' camera for technique '%s'\n    at render::scene_render3d::View::UpdateFrame", (*iter)->Name (), impl->technique_name.c_str ());
         }
                 
         impl->sub_techniques.erase (iter);
@@ -279,11 +281,11 @@ void View::UpdateFrame ()
         }
         catch (std::exception& e)
         {
-          impl->log.Printf ("%s\n    at update sub-technique '%s' frame for technique '%s'", e.what (), (*iter)->Name (), impl->technique_name.c_str ());          
+          impl->log.Printf ("%s\n    at update sub-technique '%s' frame for technique '%s'\n    at render::scene_render3d::View::UpdateFrame", e.what (), (*iter)->Name (), impl->technique_name.c_str ());          
         }
         catch (...)
         {
-          impl->log.Printf ("unknown exception\n    at update sub-technique '%s' frame for technique '%s'", (*iter)->Name (), impl->technique_name.c_str ());
+          impl->log.Printf ("unknown exception\n    at update sub-technique '%s' frame for technique '%s'\n    at render::scene_render3d::View::UpdateFrame", (*iter)->Name (), impl->technique_name.c_str ());
         }
 
         impl->sub_techniques.erase (iter);
