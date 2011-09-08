@@ -1,7 +1,7 @@
 Results of viewport_test:
 OnChangeName(viewport1)
 OnChangeZOrder(12)
-OnChangeRenderer(RenderPath1)
+OnChangeTechnique(RenderPath1)
 OnChangeArea(0, 0, 100, 200)
 OnChangeActive(false)
 OnChangeCamera()
@@ -12,7 +12,7 @@ OnChangeCamera(null)
 OnChangeProperties()
 Viewport 'viewport1':
   z-order:     12
-  renderer:    'RenderPath1'
+  technique:   'RenderPath1'
   area:        (0, 0, 100, 200)
   state:       off
   camera:      'null'

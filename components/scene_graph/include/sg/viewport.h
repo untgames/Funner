@@ -25,7 +25,7 @@ class IViewportListener
     virtual void OnViewportChangeZOrder     (int new_z_order) {}
     virtual void OnViewportChangeActive     (bool new_state) {}
     virtual void OnViewportChangeBackground (bool new_state, const math::vec4f& new_color) {}
-    virtual void OnViewportChangeRenderer   (const char* new_renderer) {}
+    virtual void OnViewportChangeTechnique  (const char* new_technique) {}
     virtual void OnViewportChangeProperties (const common::PropertyMap& properties) {}
     virtual void OnViewportDestroy          () {}
 
@@ -60,10 +60,10 @@ class Viewport
     size_t Id () const;
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Путь рендеринга
+///Техника рендеринга
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void        SetRenderer (const char* renderer);
-    const char* Renderer    () const;
+    void        SetTechnique (const char* name);
+    const char* Technique    () const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Границы области вывода

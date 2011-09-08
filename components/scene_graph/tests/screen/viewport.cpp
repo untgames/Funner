@@ -34,9 +34,9 @@ class MyViewportListener: public IViewportListener
       printf ("OnChangeBackground(%s, %.2f, %.2f, %.2f, %.2f)\n", new_state ? "true" : "false", new_color.x, new_color.y, new_color.z, new_color.w);
     }        
 
-    void OnViewportChangeRenderer (const char* new_renderer)
+    void OnViewportChangeTechnique (const char* new_technique)
     {
-      printf ("OnChangeRenderer(%s)\n", new_renderer);
+      printf ("OnChangeTechnique(%s)\n", new_technique);
     }
 
     void OnViewportChangeProperties (const common::PropertyMap&)
@@ -71,7 +71,7 @@ int main ()
 
     viewport.SetName ("viewport1");
     viewport.SetZOrder (12);
-    viewport.SetRenderer ("RenderPath1");
+    viewport.SetTechnique ("RenderPath1");
     viewport.SetArea (0, 0, 100, 200);
     viewport.Deactivate ();
     viewport.SetCamera (camera.get ());
@@ -92,7 +92,7 @@ int main ()
       
     printf ("Viewport '%s':\n", viewport.Name ());
     printf ("  z-order:     %d\n", viewport.ZOrder ());
-    printf ("  renderer:    '%s'\n", viewport.Renderer ());
+    printf ("  technique:   '%s'\n", viewport.Technique ());
     
     const Rect& vp_rect = viewport.Area ();
     

@@ -23,7 +23,7 @@ struct Viewport::Impl: public xtl::reference_counter
 {
   stl::string          name;              //имя области вывода
   scene_graph::Camera* camera;            //камера
-  stl::string          renderer;          //имя пути рендеринга
+  stl::string          technique;         //имя техники рендеринга
   Rect                 rect;              //границы области вывода
   bool                 is_active;         //флаг активности области вывода  
   int                  z_order;           //порядок отрисовки области вывода
@@ -107,9 +107,9 @@ struct Viewport::Impl: public xtl::reference_counter
     Notify (xtl::bind (&IViewportListener::OnViewportChangeBackground, _1, has_background, xtl::cref (background_color)));
   }  
   
-  void ChangeRendererNotify ()
+  void ChangeTechniqueNotify ()
   {
-    Notify (xtl::bind (&IViewportListener::OnViewportChangeRenderer, _1, renderer.c_str ()));
+    Notify (xtl::bind (&IViewportListener::OnViewportChangeTechnique, _1, technique.c_str ()));
   }
   
   void ChangePropertiesNotify (const common::PropertyMap& properties)
@@ -182,25 +182,25 @@ size_t Viewport::Id () const
 }
 
 /*
-    Путь рендеринга
+    Техника рендеринга
 */
 
-void Viewport::SetRenderer (const char* renderer)
+void Viewport::SetTechnique (const char* name)
 {
-  if (!renderer)
-    throw xtl::make_null_argument_exception ("scene_graph::Viewport::SetRenderer", "renderer");
+  if (!name)
+    throw xtl::make_null_argument_exception ("scene_graph::Viewport::SetTechnique", "name");
     
-  if (impl->renderer == renderer)
+  if (impl->technique == name)
     return;
     
-  impl->renderer = renderer;
+  impl->technique = name;
   
-  impl->ChangeRendererNotify ();
+  impl->ChangeTechniqueNotify ();
 }
 
-const char* Viewport::Renderer () const
+const char* Viewport::Technique () const
 {
-  return impl->renderer.c_str ();
+  return impl->technique.c_str ();
 }
 
 /*
