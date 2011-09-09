@@ -53,7 +53,7 @@ void VisualModel::VisitCore (IVisitor& visitor)
     Отрисовка и обновление
 */
 
-void VisualModel::UpdateCore (Frame& frame)
+void VisualModel::UpdateCore ()
 {
 }
 

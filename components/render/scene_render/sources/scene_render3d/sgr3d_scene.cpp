@@ -14,11 +14,50 @@ namespace
     Фабрика объектов
 */
 
-struct EntityFactory: public xtl::visitor<Node*, scene_graph::VisualModel>
+struct EntityFactory: public xtl::visitor<Node*, scene_graph::VisualModel, scene_graph::PointLight, scene_graph::DirectLight, scene_graph::SpotLight>
 {
   Scene& scene;  
   
   EntityFactory (Scene& in_scene) : scene (in_scene) {}
+  
+  Node* visit (scene_graph::PointLight& entity)
+  {
+    try
+    {
+      return new Light (scene, entity);
+    }
+    catch (xtl::exception& e)
+    {
+      e.touch ("render::scene_render3d::EntityFactory::visit(scene_graph::PointLight&)");
+      throw;
+    }
+  }  
+  
+  Node* visit (scene_graph::SpotLight& entity)
+  {
+    try
+    {
+      return new Light (scene, entity);
+    }
+    catch (xtl::exception& e)
+    {
+      e.touch ("render::scene_render3d::EntityFactory::visit(scene_graph::SpotLight&)");
+      throw;
+    }
+  }  
+  
+  Node* visit (scene_graph::DirectLight& entity)
+  {
+    try
+    {
+      return new Light (scene, entity);
+    }
+    catch (xtl::exception& e)
+    {
+      e.touch ("render::scene_render3d::EntityFactory::visit(scene_graph::DirectLight&)");
+      throw;
+    }
+  }  
   
   Node* visit (scene_graph::VisualModel& entity)
   {

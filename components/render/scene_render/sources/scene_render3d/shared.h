@@ -54,6 +54,7 @@ typedef xtl::intrusive_ptr<View>       ViewPtr;
 
 //includes
 #include "node.h"
+#include "light.h"
 #include "log.h"
 #include "render.h"
 #include "renderable.h"
