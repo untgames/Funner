@@ -17,7 +17,9 @@
 #include <render/scene_render.h>
 
 #include <sg/camera.h>
+#include <sg/light.h>
 #include <sg/scene.h>
+#include <sg/visual_model.h>
 
 #include <math/utility.h>
 

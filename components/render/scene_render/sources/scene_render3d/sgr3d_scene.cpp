@@ -7,6 +7,8 @@
 using namespace render;
 using namespace render::scene_render3d;
 
+      //TODO: защита от неизвестных типов объектов!!!!!!!!!!!!!!!!!
+
 namespace
 {
 
@@ -14,17 +16,18 @@ namespace
     Фабрика объектов
 */
 
-struct EntityFactory: public xtl::visitor<Node*, scene_graph::VisualModel, scene_graph::PointLight, scene_graph::DirectLight, scene_graph::SpotLight>
+struct EntityFactory: public xtl::visitor<void, scene_graph::VisualModel, scene_graph::PointLight, scene_graph::DirectLight, scene_graph::SpotLight>
 {
-  Scene& scene;  
+  Scene& scene;
+  Node*  result;
   
-  EntityFactory (Scene& in_scene) : scene (in_scene) {}
+  EntityFactory (Scene& in_scene) : scene (in_scene), result () {}
   
-  Node* visit (scene_graph::PointLight& entity)
+  void visit (scene_graph::PointLight& entity)
   {
     try
     {
-      return new Light (scene, entity);
+      result = new Light (scene, entity);
     }
     catch (xtl::exception& e)
     {
@@ -33,11 +36,11 @@ struct EntityFactory: public xtl::visitor<Node*, scene_graph::VisualModel, scene
     }
   }  
   
-  Node* visit (scene_graph::SpotLight& entity)
+  void visit (scene_graph::SpotLight& entity)
   {
     try
     {
-      return new Light (scene, entity);
+      result = new Light (scene, entity);
     }
     catch (xtl::exception& e)
     {
@@ -46,11 +49,11 @@ struct EntityFactory: public xtl::visitor<Node*, scene_graph::VisualModel, scene
     }
   }  
   
-  Node* visit (scene_graph::DirectLight& entity)
+  void visit (scene_graph::DirectLight& entity)
   {
     try
     {
-      return new Light (scene, entity);
+      result = new Light (scene, entity);
     }
     catch (xtl::exception& e)
     {
@@ -59,11 +62,11 @@ struct EntityFactory: public xtl::visitor<Node*, scene_graph::VisualModel, scene
     }
   }  
   
-  Node* visit (scene_graph::VisualModel& entity)
+  void visit (scene_graph::VisualModel& entity)
   {
     try
     {
-      return new VisualModel (scene, entity);
+      result = new VisualModel (scene, entity);
     }
     catch (xtl::exception& e)
     {
@@ -72,11 +75,15 @@ struct EntityFactory: public xtl::visitor<Node*, scene_graph::VisualModel, scene
     }
   }
   
-  Node* CreateNode (scene_graph::Entity& entity)
+  Node* CreateNode (scene_graph::Node& entity)
   {
     try
     {
-      return (*this)(entity);
+      result = 0;
+      
+      entity.Accept (*this);
+      
+      return result;
     }
     catch (xtl::exception& e)
     {
@@ -92,7 +99,7 @@ struct EntityFactory: public xtl::visitor<Node*, scene_graph::VisualModel, scene
     Описание реализации сцены рендеринга
 */
 
-typedef stl::hash_map<scene_graph::Entity*, NodePtr> EntityMap;
+typedef stl::hash_map<scene_graph::Node*, NodePtr> EntityMap;
 
 struct Scene::Impl
 {
@@ -168,12 +175,12 @@ Scene::~Scene ()
     Регистрация объектов
 */
 
-void Scene::RegisterEntity (scene_graph::Entity& scene_node, Node& node)
+void Scene::RegisterEntity (scene_graph::Node& scene_node, Node& node)
 {
   impl->entities.insert_pair (&scene_node, &node);
 }
 
-void Scene::UnregisterEntity (scene_graph::Entity& scene_node)
+void Scene::UnregisterEntity (scene_graph::Node& scene_node)
 {
   impl->entities.erase (&scene_node);
 }
@@ -182,20 +189,81 @@ void Scene::UnregisterEntity (scene_graph::Entity& scene_node)
     Получение объекта сцены
 */
 
-NodePtr Scene::GetEntity (scene_graph::Entity& entity)
+Node* Scene::GetEntity (scene_graph::Node& entity)
 {
   try
   {
     EntityMap::iterator iter = impl->entities.find (&entity);
     
     if (iter != impl->entities.end ())
-      return iter->second;
+      return &*iter->second;
       
-    return NodePtr (impl->factory.CreateNode (entity), false);
+    NodePtr node (impl->factory.CreateNode (entity), false); //будет автоматически сохранен в карте entities    
+    
+    if (!node)
+    {
+      //TODO: защита от неизвестных типов объектов!!!!!!!!!!!!!!!!!
+      
+      return 0;
+    }
+    
+    return &*node;
   }
   catch (xtl::exception& e)
   {
     e.touch ("render::scene_render3d::Scene::GetEntity");
     throw;
   }
+}
+
+/*
+    Обход сцены
+*/
+
+namespace
+{
+
+struct SceneCollector: public scene_graph::INodeTraverser
+{
+  public:
+    SceneCollector (Scene& in_scene, CollectionVisitor& in_visitor)
+      : scene (in_scene)
+      , visitor (in_visitor)
+    {
+    }
+  
+    void operator () (scene_graph::Node& scene_node)
+    {
+      Node* node = scene.GetEntity (scene_node);
+      
+      if (!node)
+        return;                
+
+      node->Visit (visitor);
+    }
+    
+  private:
+    Scene&             scene;
+    CollectionVisitor& visitor;
+};
+
+}
+
+void Scene::Traverse (const bound_volumes::plane_listf& frustum, TraverseResults& results, size_t filter)
+{
+  results.Clear ();
+
+  if (!impl->scene)
+    return;
+
+  CollectionVisitor visitor (results, filter);
+
+  SceneCollector collector (*this, visitor);
+
+  impl->scene->Traverse (frustum, collector);
+}
+
+void Scene::Traverse (const bound_volumes::plane_listf& frustum, TraverseResults& results)
+{
+  Traverse (frustum, results, Collect_All);
 }

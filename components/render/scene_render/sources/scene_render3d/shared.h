@@ -33,15 +33,16 @@ namespace scene_render3d
 {
 
 //forwards
-class Light;
-class Node;
-class Render;
-class Renderable;
-class Scene;
-class Technique;
-class View;
-class VisualModel;
-class IVisitor;
+class  Light;
+class  Node;
+class  Render;
+class  Renderable;
+class  Scene;
+class  Technique;
+struct TraverseResults;
+class  View;
+class  VisualModel;
+class  IVisitor;
 
 //pointers
 typedef xtl::intrusive_ptr<Light>      LightPtr;
