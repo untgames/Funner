@@ -33,13 +33,19 @@ namespace scene_render3d
 {
 
 //forwards
+class Light;
+class Node;
 class Render;
 class Renderable;
 class Scene;
 class Technique;
 class View;
+class VisualModel;
+class IVisitor;
 
 //pointers
+typedef xtl::intrusive_ptr<Light>      LightPtr;
+typedef xtl::intrusive_ptr<Node>       NodePtr;
 typedef xtl::intrusive_ptr<Render>     RenderPtr;
 typedef xtl::intrusive_ptr<Renderable> RenderablePtr;
 typedef xtl::intrusive_ptr<Scene>      ScenePtr;
@@ -47,12 +53,14 @@ typedef xtl::intrusive_ptr<Technique>  TechniquePtr;
 typedef xtl::intrusive_ptr<View>       ViewPtr;
 
 //includes
+#include "node.h"
 #include "log.h"
 #include "render.h"
 #include "renderable.h"
 #include "scene.h"
 #include "technique.h"
 #include "view.h"
+#include "visitor.h"
 #include "visual_model.h"
 
 //include techinques

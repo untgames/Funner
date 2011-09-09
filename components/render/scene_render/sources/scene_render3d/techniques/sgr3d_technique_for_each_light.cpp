@@ -30,7 +30,24 @@ ForEachLightTechnique::~ForEachLightTechnique ()
 
 void ForEachLightTechnique::UpdateFrameCore (Scene& scene, Frame& frame)
 {
-  throw xtl::make_not_implemented_exception ("render::scene_render3d::ForEachLightTechnique::UpdateFrameCore");
+  try
+  {
+    if (!Camera ())
+      return;
+      
+      //получение камеры
+      
+    scene_graph::Camera& camera = *Camera ();
+    
+      //определение списка источников, попадающих в камеру
+    
+//    camera.Scene ()->Traverse (camera.Frustum (), );
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::scene_render3d::ForEachLightTechnique::UpdateFrameCore");
+    throw;
+  }
 }
 
 /*

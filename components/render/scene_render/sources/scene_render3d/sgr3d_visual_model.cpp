@@ -41,6 +41,15 @@ VisualModel::~VisualModel ()
 }
 
 /*
+    Обход
+*/
+
+void VisualModel::VisitCore (IVisitor& visitor)
+{
+  visitor.Visit (*this);
+}
+
+/*
     Отрисовка и обновление
 */
 
@@ -48,6 +57,6 @@ void VisualModel::UpdateCore (Frame& frame)
 {
 }
 
-void VisualModel::DrawCore (Frame& frame)
+void VisualModel::UpdateFrameCore (Frame& frame)
 {
 }

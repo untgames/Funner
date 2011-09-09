@@ -14,13 +14,13 @@ namespace
     Фабрика объектов
 */
 
-struct RenderableFactory: public xtl::visitor<Renderable*, scene_graph::VisualModel>
+struct EntityFactory: public xtl::visitor<Node*, scene_graph::VisualModel>
 {
   Scene& scene;  
   
-  RenderableFactory (Scene& in_scene) : scene (in_scene) {}
+  EntityFactory (Scene& in_scene) : scene (in_scene) {}
   
-  Renderable* visit (scene_graph::VisualModel& entity)
+  Node* visit (scene_graph::VisualModel& entity)
   {
     try
     {
@@ -28,12 +28,12 @@ struct RenderableFactory: public xtl::visitor<Renderable*, scene_graph::VisualMo
     }
     catch (xtl::exception& e)
     {
-      e.touch ("render::scene_render3d::RenderableFactory::visit(scene_graph::VisualModel&)");
+      e.touch ("render::scene_render3d::EntityFactory::visit(scene_graph::VisualModel&)");
       throw;
     }
   }
   
-  Renderable* CreateRenderable (scene_graph::Entity& entity)
+  Node* CreateNode (scene_graph::Entity& entity)
   {
     try
     {
@@ -41,7 +41,7 @@ struct RenderableFactory: public xtl::visitor<Renderable*, scene_graph::VisualMo
     }
     catch (xtl::exception& e)
     {
-      e.touch ("render::scene_render3d::RenderableFactory::CreateRenderable");
+      e.touch ("render::scene_render3d::EntityFactory::CreateNode");
       throw;
     }
   }
@@ -53,15 +53,15 @@ struct RenderableFactory: public xtl::visitor<Renderable*, scene_graph::VisualMo
     Описание реализации сцены рендеринга
 */
 
-typedef stl::hash_map<scene_graph::Entity*, RenderablePtr> RenderableMap;
+typedef stl::hash_map<scene_graph::Entity*, NodePtr> EntityMap;
 
 struct Scene::Impl
 {
   RenderPtr            render;                     //рендер
   scene_graph::Scene*  scene;                      //исходная сцена
   xtl::auto_connection scene_destroyed_connection; //соединение с обработчиком события удаления сцены
-  RenderableMap        renderables;                //карта объектов
-  RenderableFactory    factory;                    //фабрика объектов
+  EntityMap            entities;                   //карта объектов
+  EntityFactory        factory;                    //фабрика объектов
   Log                  log;                        //поток протоколирования
 
 ///Конструктор
@@ -129,34 +129,34 @@ Scene::~Scene ()
     Регистрация объектов
 */
 
-void Scene::RegisterRenderable (scene_graph::Entity& entity, Renderable& renderable)
+void Scene::RegisterEntity (scene_graph::Entity& scene_node, Node& node)
 {
-  impl->renderables.insert_pair (&entity, &renderable);
+  impl->entities.insert_pair (&scene_node, &node);
 }
 
-void Scene::UnregisterRenderable (scene_graph::Entity& entity)
+void Scene::UnregisterEntity (scene_graph::Entity& scene_node)
 {
-  impl->renderables.erase (&entity);
+  impl->entities.erase (&scene_node);
 }
 
 /*
     Получение объекта сцены
 */
 
-RenderablePtr Scene::GetRenderable (scene_graph::Entity& entity)
+NodePtr Scene::GetEntity (scene_graph::Entity& entity)
 {
   try
   {
-    RenderableMap::iterator iter = impl->renderables.find (&entity);
+    EntityMap::iterator iter = impl->entities.find (&entity);
     
-    if (iter != impl->renderables.end ())
+    if (iter != impl->entities.end ())
       return iter->second;
       
-    return RenderablePtr (impl->factory.CreateRenderable (entity), false);
+    return NodePtr (impl->factory.CreateNode (entity), false);
   }
   catch (xtl::exception& e)
   {
-    e.touch ("render::scene_render3d::Scene::GetRenderable");
+    e.touch ("render::scene_render3d::Scene::GetEntity");
     throw;
   }
 }
