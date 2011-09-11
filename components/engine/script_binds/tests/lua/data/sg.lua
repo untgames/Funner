@@ -296,7 +296,7 @@ end
 
 function test_node_properties ()
   local node       = Scene.Node.Create ()
-  local properties = Scene.NodeProperties.Create ()
+  local properties = Common.PropertyMap.Create ()
   
   node.Properties = properties
 
@@ -315,7 +315,7 @@ function test_node_properties ()
   print (string.format ("result: string='%s' int=%d float=%.3f vec=[%.3f %.3f %.3f %.3f] det(matrix)=%.3f",
     string_result, int_result, float_result, vec_result.x, vec_result.y, vec_result.z, vec_result.w, matrix_result:det ()))
 
-  node.Properties:Remove ("Float")
+  node.Properties:RemoveProperty ("Float")
 
   print ("is_present(Float)=" .. tostring (node.Properties:IsPresent ("Float")))
   print ("is_present(String)=" .. tostring (node.Properties:IsPresent ("String")))
