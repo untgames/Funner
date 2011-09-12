@@ -17,8 +17,6 @@ using namespace syslib;
 namespace
 {
 
-const char* LOG_NAME = "syslib.Platform";
-
 const OSType WINDOW_PROPERTY_CREATOR     = 'untg';  //тег приложения
 const OSType FULLSCREEN_PROPERTY_TAG     = 'fscr';  //тег свойства полноэкранности
 const OSType CURSOR_VISIBLE_PROPERTY_TAG = 'hcrs';  //тег видимости курсора (если истина - курсор виден)
