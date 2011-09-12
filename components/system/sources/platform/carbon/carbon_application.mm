@@ -8,14 +8,26 @@ using namespace syslib;
 namespace
 {
 
-const double RECEIVE_EVENT_TIMEOUT = 0.000000001;
+const char* LOG_NAME = "syslib.CarbonApplication";
+
+const double RECEIVE_EVENT_TIMEOUT        = 0.000000001;
+const UInt32 UNTGS_EVENT_CLASS            = 'untg';      //класс событий приложени€
+const UInt32 APPLICATION_LOOP_START_EVENT = 'alse';      //событие входа в цикл обработки
+
+OSStatus application_event_handler_func (EventHandlerCallRef event_handler_call_ref, EventRef event, void* application_delegate);
 
 class CarbonApplicationDelegate: public IApplicationDelegate, public xtl::reference_counter
 {
   public:
 /// онструктор
     CarbonApplicationDelegate ()
-      : idle_enabled (false), is_exited (false), listener (0), main_thread_id (0), dummy_event (0)
+      : idle_enabled (false)
+      , is_exited (false)
+      , listener (0)
+      , main_thread_id (0)
+      , dummy_event (0)
+      , application_event_handler (0)
+      , application_event_handler_proc (0)
     {
       check_event_manager_error (CreateEvent (0, 0, 0, 0, kEventAttributeNone, &dummy_event), "::CreateEvent", "Can't create dummy event");
     }
@@ -24,10 +36,62 @@ class CarbonApplicationDelegate: public IApplicationDelegate, public xtl::refere
     {
       if (dummy_event)
         ReleaseEvent (dummy_event);
+
+      if (application_event_handler)
+        RemoveEventHandler (application_event_handler);
+
+      if (application_event_handler_proc)
+        DisposeEventHandlerUPP (application_event_handler_proc);
     }
 
 ///«апуск цикла обработки сообщений
     void Run ()
+    {
+      static const char* METHOD_NAME = "syslib::CarbonApplicationDelegate::Run";
+
+      if (application_event_handler)
+        throw xtl::format_operation_exception (METHOD_NAME, "Application already runned");
+
+      EventRef first_event = 0;
+
+      try
+      {
+        EventTypeSpec application_handled_event_types [] = {
+          { UNTGS_EVENT_CLASS, APPLICATION_LOOP_START_EVENT },
+          { kEventClassApplication, kEventAppQuit },
+        };
+
+        EventHandlerRef application_event_handler;
+
+        EventHandlerUPP application_event_handler_proc = NewEventHandlerUPP (&application_event_handler_func);
+
+        check_event_manager_error (InstallApplicationEventHandler (application_event_handler_proc,
+                                   sizeof (application_handled_event_types) / sizeof (application_handled_event_types[0]),
+                                   application_handled_event_types, this, &application_event_handler),
+                                   "::InstallApplicationEventHandler", "Can't install event handler");
+
+        check_event_manager_error (CreateEvent (0, UNTGS_EVENT_CLASS, APPLICATION_LOOP_START_EVENT, 0, kEventAttributeNone, &first_event),
+                                   "::CreateEvent", "Can't create first event");
+        check_event_manager_error (PostEventToQueue (GetMainEventQueue (), first_event, kEventPriorityStandard),
+                                   "::PostEventToQueue", "Can't post first event");
+
+        RunApplicationEventLoop ();
+      }
+      catch (xtl::exception& e)
+      {
+        if (first_event)
+          ReleaseEvent (first_event);
+
+        e.touch (METHOD_NAME);
+        throw;
+      }
+
+      if (first_event)
+        ReleaseEvent (first_event);
+    }
+
+    //—тарт главного цикла
+    void OnApplicationEventLoopStarted ()
     {
       NSApplicationLoad ();
 
@@ -36,7 +100,7 @@ class CarbonApplicationDelegate: public IApplicationDelegate, public xtl::refere
       try
       {
         main_thread_id = Platform::GetCurrentThreadId ();
-        
+
         if (listener)
           listener->OnInitialized ();
 
@@ -46,7 +110,7 @@ class CarbonApplicationDelegate: public IApplicationDelegate, public xtl::refere
 
           ReceiveNextEvent (0, 0, RECEIVE_EVENT_TIMEOUT, false, &next_event);
 
-          while (!IsMessageQueueEmpty ())
+          while (!is_exited && !IsMessageQueueEmpty ())
             DoNextEvent ();
 
            //если нет обработчиков OnIdle - приостанавливаем приложение
@@ -67,15 +131,25 @@ class CarbonApplicationDelegate: public IApplicationDelegate, public xtl::refere
       }
       catch (xtl::exception& e)
       {
-        [pool release];
-        e.touch ("syslib::CarbonApplicationDelegate::Run");
-        throw;
+        common::Log (LOG_NAME).Printf ("%s\n    at syslib::CarbonApplicationDelegate::OnApplicationEventLoopStarted", e.what ());
+        QuitApplicationEventLoop ();
+      }
+      catch (...)
+      {
+        common::Log (LOG_NAME).Printf ("Unknown exception\n    at syslib::CarbonApplicationDelegate::OnApplicationEventLoopStarted");
+        QuitApplicationEventLoop ();
       }
 
       [pool release];
     }
 
-///¬ыход из приложени€
+    //—обытие выхода из приложени€
+    void OnExit ()
+    {
+      is_exited = true;
+    }
+
+    //¬ыход из приложени€
     void Exit (int code)
     {
       EventRef application_exit_event = 0;
@@ -157,27 +231,7 @@ class CarbonApplicationDelegate: public IApplicationDelegate, public xtl::refere
       if (!event)
         return;
 
-      if (GetEventClass (event) == kEventClassApplication)
-        if (GetEventKind (event) == kEventAppQuit)
-        {
-          ReleaseEvent (event);
-          is_exited = true;
-          return;
-        }
-
-      try
-      {
-        OSStatus operation_result = SendEventToEventTarget (event, GetEventDispatcherTarget ());
-
-        if (operation_result != eventNotHandledErr)
-          check_event_manager_error (operation_result, "::SendEventToEventTarget", "Can't dispatch event");
-      }
-      catch (xtl::exception& exception)
-      {
-        ReleaseEvent (event);
-
-        throw xtl::format_operation_exception ("syslib::CarbonApplicationDelegate::DoNextEvent", "%s", exception.what ());
-      }
+      SendEventToEventTargetWithOptions (event, GetEventDispatcherTarget (), kEventTargetSendToAllHandlers); //ignore operation result, because it returns -1708 with RunApplicationEventLoop
 
       ReleaseEvent (event);
     }
@@ -187,8 +241,29 @@ class CarbonApplicationDelegate: public IApplicationDelegate, public xtl::refere
     bool                  is_exited;
     IApplicationListener* listener;
     size_t                main_thread_id;
-    EventRef              dummy_event;     //событие, посылаемое дл€ пробуждени€ нити
+    EventRef              dummy_event;                       //событие, посылаемое дл€ пробуждени€ нити
+    EventHandlerRef       application_event_handler;
+    EventHandlerUPP       application_event_handler_proc;
 };
+
+//ќбработка первого событи€ приложени€ с целью запуска главного цикла
+OSStatus application_event_handler_func (EventHandlerCallRef event_handler_call_ref, EventRef event, void* application_delegate)
+{
+  CarbonApplicationDelegate* delegate = (CarbonApplicationDelegate*)application_delegate;
+
+  if (GetEventClass (event) == kEventClassApplication && GetEventKind (event) == kEventAppQuit)
+  {
+    delegate->OnExit ();
+    return eventNotHandledErr;
+  }
+
+  if (GetEventClass (event) != UNTGS_EVENT_CLASS || GetEventKind (event) != APPLICATION_LOOP_START_EVENT)
+    return eventNotHandledErr;
+
+  delegate->OnApplicationEventLoopStarted ();
+
+  return noErr;
+}
 
 }
 
