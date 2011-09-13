@@ -58,6 +58,8 @@ int main ()
     ReadFileContent (SOURCE_FILE);    
 
       //удаление скопированного файла
+      
+    FileSystem::RemoveSearchPath (SEARCH_PATH);
 
     FileSystem::Remove (DESTINATION_CRYPTO_FILE_NAME);
   }
