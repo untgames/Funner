@@ -285,7 +285,7 @@ void FileSystemImpl::AddSearchPath (const char* _path,const LogHandler& log_hand
   string path = FileSystem::GetNormalizedFileName (_path), mount_path;
 
   ICustomFileSystemPtr owner_file_system = FindFileSystem (path.c_str (),mount_path);
-  FileInfo           file_info;
+  FileInfo             file_info;
   
   if (!owner_file_system || !owner_file_system->GetFileInfo (mount_path.c_str (),file_info))
   {

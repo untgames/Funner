@@ -273,6 +273,9 @@ class CocoaFileSystem: public StdioFileSystem
         return;
       }
 
+      if (dir_name == "./")
+        dir_name = "";
+
 #if defined IPHONE || __MAC_OS_X_VERSION_MIN_REQUIRED >= 1050
       NSError* error = nil;
 
