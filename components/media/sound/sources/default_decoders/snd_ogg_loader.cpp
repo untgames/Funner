@@ -164,27 +164,33 @@ void check_vorbis_file_error (int error_code, const char* source, const char* me
 OggInputStream::OggInputStream (const char* file_name, SoundSampleInfo& sound_sample_info)
   : file (file_name)
 {
-  static const char* METHOD_NAME = "media::sound::OggInputStream::OggInputStream";
+  try
+  {
+    ov_callbacks callbacks = {ogg_read_func, ogg_seek_func, 0, ogg_tell_func};
 
-  ov_callbacks callbacks = {ogg_read_func, ogg_seek_func, 0, ogg_tell_func};
+    check_vorbis_file_error (ov_open_callbacks (&file, &vf, NULL, 0, callbacks), "::ov_open_callbacks", "Can't open vorbis file");
 
-  check_vorbis_file_error (ov_open_callbacks (&file, &vf, NULL, 0, callbacks), METHOD_NAME, "Can't open vorbis file, error at ::ov_open_callbacks");
+    vorbis_info *vi = ov_info (&vf, -1);
 
-  vorbis_info *vi = ov_info (&vf, -1);
+    if (!vi)
+      throw xtl::format_operation_exception ("::ov_info", "Can't get vorbis file info");
 
-  if (!vi)
-    throw xtl::format_operation_exception (METHOD_NAME, "Can't get vorbis file info, error at ::ov_info");
+    sound_sample_info.frequency       = vi->rate;
+    sound_sample_info.channels        = channels_count = vi->channels;
+    sound_sample_info.bits_per_sample = 16;
 
-  sound_sample_info.frequency       = vi->rate;
-  sound_sample_info.channels        = channels_count = vi->channels;
-  sound_sample_info.bits_per_sample = 16;
+    ogg_int64_t samples_count = ov_pcm_total (&vf, -1);
 
-  ogg_int64_t samples_count = ov_pcm_total (&vf, -1);
+    if (samples_count == OV_EINVAL)
+      throw xtl::format_operation_exception ("", "Can't get samples count, the requested bitstream did not exist or the bitstream is unseekable");
 
-  if (samples_count == OV_EINVAL)
-    throw xtl::format_operation_exception (METHOD_NAME, "Can't get samples count, the requested bitstream did not exist or the bitstream is unseekable");
-
-  sound_sample_info.samples_count = samples_count;
+    sound_sample_info.samples_count = samples_count;
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("media::sound::OggInputStream::OggInputStream (%s)", file_name);
+    throw;
+  }
 }
 
 size_t OggInputStream::Read (size_t first_sample, size_t samples_count, void* data)
