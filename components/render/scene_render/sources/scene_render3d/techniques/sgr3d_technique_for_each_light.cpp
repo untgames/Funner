@@ -10,8 +10,7 @@ namespace
     Константы
 */
 
-const size_t LIGHTS_RESERVE_SIZE      = 64;   //резервируемое количество источников света
-const size_t RENDERABLES_RESERVE_SIZE = 1024; //резервируемое количество визуализируемых объектов
+const size_t LIGHTS_RESERVE_SIZE = 64;   //резервируемое количество источников света
 
 }
 
@@ -23,17 +22,13 @@ typedef stl::vector<Frame> FrameArray;
 
 struct ForEachLightTechnique::Impl
 {
-  RenderManager   manager;          //менеджер рендеринга
-  TraverseResults traverse_results; //результаты обхода сцены
-  FrameArray      light_frames;     //фреймы источников света  
+  RenderManager manager;         //менеджер рендеринга
+  FrameArray    light_frames;    //фреймы источников света  
   
 ///Конструктор
   Impl (RenderManager& in_manager, common::ParseNode& cfg_node)
     : manager (in_manager)
   {
-    traverse_results.lights.reserve (LIGHTS_RESERVE_SIZE);
-    traverse_results.renderables.reserve (RENDERABLES_RESERVE_SIZE);
-
     light_frames.reserve (LIGHTS_RESERVE_SIZE);
   }    
   
@@ -51,7 +46,7 @@ struct ForEachLightTechnique::Impl
   }
   
 ///Обновление кадра из источника света
-  void UpdateFromLight (Scene& scene, Frame& parent_frame, Light& light, size_t light_index)
+  void UpdateFromLight (Scene& scene, Frame& parent_frame, Light& light, TraverseResult& result, size_t light_index)
   {
       //резервирование вложенного фрейма
       
@@ -63,7 +58,7 @@ struct ForEachLightTechnique::Impl
     
       //обновление визуализируемых объектов
 
-    for (TraverseResults::RenderableArray::iterator iter=traverse_results.renderables.begin (), end=traverse_results.renderables.end (); iter!=end; ++iter)
+    for (TraverseResult::RenderableArray::iterator iter=result.renderables.begin (), end=result.renderables.end (); iter!=end; ++iter)
     {
       Renderable& renderable = **iter;
       
@@ -93,7 +88,7 @@ ForEachLightTechnique::~ForEachLightTechnique ()
     Обновление кадра
 */
 
-void ForEachLightTechnique::UpdateFrameCore (Scene& scene, Frame& frame)
+void ForEachLightTechnique::UpdateFrameCore (Scene& scene, Frame& frame, ITraverseResultCache& traverse_result_cache)
 {
   try
   {
@@ -106,14 +101,14 @@ void ForEachLightTechnique::UpdateFrameCore (Scene& scene, Frame& frame)
 
       //определение списка источников и визуализируемых объектов, попадающих в камеру
     
-    scene.Traverse (camera.Frustum (), impl->traverse_results, Collect_All);
+    TraverseResult& result = traverse_result_cache.Result ();
 
       //обход источников
       
     size_t light_index = 0;
 
-    for (TraverseResults::LightArray::iterator iter=impl->traverse_results.lights.begin (), end=impl->traverse_results.lights.end (); iter!=end; ++iter, ++light_index)
-      impl->UpdateFromLight (scene, frame, **iter, light_index);
+    for (TraverseResult::LightArray::iterator iter=result.lights.begin (), end=result.lights.end (); iter!=end; ++iter, ++light_index)
+      impl->UpdateFromLight (scene, frame, **iter, result, light_index);
   }
   catch (xtl::exception& e)
   {

@@ -120,11 +120,11 @@ void Technique::UpdateProperties (const common::PropertyMap& properties)
     Отрисовка
 */
 
-void Technique::UpdateFrame (Scene& scene, Frame& frame)
+void Technique::UpdateFrame (Scene& scene, Frame& frame, ITraverseResultCache& traverse_result_cache)
 {
   try
   {
-    UpdateFrameCore (scene, frame);
+    UpdateFrameCore (scene, frame, traverse_result_cache);
   }
   catch (xtl::exception& e)
   {

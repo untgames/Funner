@@ -39,10 +39,11 @@ class  Render;
 class  Renderable;
 class  Scene;
 class  Technique;
-struct TraverseResults;
+struct TraverseResult;
 class  View;
 class  VisualModel;
 class  IVisitor;
+class  ITraverseResultCache;
 
 //pointers
 typedef xtl::intrusive_ptr<Light>      LightPtr;

@@ -249,21 +249,21 @@ struct SceneCollector: public scene_graph::INodeTraverser
 
 }
 
-void Scene::Traverse (const bound_volumes::plane_listf& frustum, TraverseResults& results, size_t filter)
+void Scene::Traverse (const bound_volumes::plane_listf& frustum, TraverseResult& result, size_t filter)
 {
-  results.Clear ();
+  result.Clear ();
 
   if (!impl->scene)
     return;
 
-  CollectionVisitor visitor (results, filter);
+  CollectionVisitor visitor (result, filter);
 
   SceneCollector collector (*this, visitor);
 
   impl->scene->Traverse (frustum, collector);
 }
 
-void Scene::Traverse (const bound_volumes::plane_listf& frustum, TraverseResults& results)
+void Scene::Traverse (const bound_volumes::plane_listf& frustum, TraverseResult& result)
 {
-  Traverse (frustum, results, Collect_All);
+  Traverse (frustum, result, Collect_All);
 }

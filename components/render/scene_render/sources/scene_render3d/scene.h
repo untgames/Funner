@@ -24,8 +24,8 @@ class Scene: public xtl::noncopyable, public xtl::reference_counter
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Обход сцены
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void Traverse (const bound_volumes::plane_listf& frustum, TraverseResults& results);
-    void Traverse (const bound_volumes::plane_listf& frustum, TraverseResults& results, size_t filter);
+    void Traverse (const bound_volumes::plane_listf& frustum, TraverseResult& result);
+    void Traverse (const bound_volumes::plane_listf& frustum, TraverseResult& result, size_t filter);
 
   private:
     struct Impl;

@@ -10,7 +10,9 @@ namespace
     Константы
 */
 
-const size_t SUB_TECHNIQUE_ARRAY_RESERVE = 8; //резервируемое количество техник рендеринга
+const size_t SUB_TECHNIQUE_ARRAY_RESERVE              = 8;    //резервируемое количество техник рендеринга
+const size_t TRAVERSE_RESULT_LIGHTS_RESERVE_SIZE      = 64;   //резервируемое количество источников света
+const size_t TRAVERSE_RESULT_RENDERABLES_RESERVE_SIZE = 1024; //резервируемое количество визуализируемых объектов
 
 }
 
@@ -30,6 +32,7 @@ struct View::Impl
   scene_graph::Camera* camera;                     //текущая камера
   common::PropertyMap  properties;                 //свойства рендеринга
   ScenePtr             scene;                      //текущая сцена
+  TraverseResult       camera_traverse_result;     //результат обхода сцены из камеры
   bool                 need_update_properties;     //необходимо обновить свойства рендеринга
   bool                 need_update_camera;         //необходимо обновить камеру
   bool                 need_update_sub_techniques; //необходимо обновить техники рендеринга
@@ -47,6 +50,8 @@ struct View::Impl
     , need_update_sub_techniques (true)
   {
     sub_techniques.reserve (SUB_TECHNIQUE_ARRAY_RESERVE);
+    camera_traverse_result.renderables.reserve (TRAVERSE_RESULT_RENDERABLES_RESERVE_SIZE);
+    camera_traverse_result.lights.reserve (TRAVERSE_RESULT_LIGHTS_RESERVE_SIZE);    
     
     log.Printf ("View created for technique '%s'", technique_name.c_str ());
   }
@@ -111,7 +116,7 @@ struct View::Impl
       e.touch ("render::scene_render3d::View::Impl::UpdateSubTechniques");
       throw;
     }    
-  }
+  }  
 };
 
 /*
@@ -180,6 +185,54 @@ void View::UpdateProperties (const common::PropertyMap& properties)
 /*
     Обновление содержимого кадра
 */
+
+namespace
+{
+
+/// Кэш результата обхода сцены 
+struct CameraTraverseResult: public ITraverseResultCache
+{
+  scene_graph::Camera* camera;   //камера
+  Scene*               scene;    //сцена
+  TraverseResult&      result;   //результат обхода
+  bool                 computed; //результат рассчитан
+  
+///Конструктор
+  CameraTraverseResult (scene_graph::Camera* in_camera, Scene* in_scene, TraverseResult& in_result)
+    : camera (in_camera)
+    , scene (in_scene)
+    , result (in_result)
+    , computed (false) { }
+  
+///Получение результата
+  TraverseResult& Result ()
+  {
+    try
+    {
+      if (computed)
+        return result;
+        
+      if (!camera)
+        throw xtl::format_operation_exception ("", "Camera is null");
+        
+      if (!scene)
+        throw xtl::format_operation_exception ("", "Scene is null");
+
+      scene->Traverse (camera->Frustum (), result, Collect_All);
+       
+      computed = true;
+      
+      return result;
+    }
+    catch (xtl::exception& e)
+    {
+      e.touch ("render::scene_render3d::CameraTraverseResult::Result");
+      throw;
+    }
+  }
+};
+
+}
 
 void View::UpdateFrame ()
 {
@@ -265,6 +318,10 @@ void View::UpdateFrame ()
       impl->need_update_camera = false;
     }        
     
+      //подготовка кэша результатов обхода сцены
+      
+    CameraTraverseResult camera_traverse_result (impl->camera, &*impl->scene, impl->camera_traverse_result);
+    
       //обновление кадра
       
     if (impl->scene)
@@ -273,7 +330,7 @@ void View::UpdateFrame ()
       {
         try
         {
-          (*iter)->UpdateFrame (*impl->scene, impl->frame);
+          (*iter)->UpdateFrame (*impl->scene, impl->frame, camera_traverse_result);
           
           ++iter;
           
