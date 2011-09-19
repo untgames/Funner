@@ -1,5 +1,9 @@
 #include "../shared.h"
 
+#ifdef _MSC_VER
+  #pragma warning (disable : 4355) // this used in base initializer list
+#endif
+
 using namespace render;
 using namespace render::scene_render3d;
 
@@ -22,14 +26,16 @@ typedef stl::vector<Frame> FrameArray;
 
 struct ForEachLightTechnique::Impl
 {
-  RenderManager manager;         //менеджер рендеринга
-  FrameArray    light_frames;    //фреймы источников света  
+  RenderManager             manager;             //менеджер рендеринга
+  FrameArray                light_frames;        //фреймы источников света  
+  Frame::EntityDrawFunction entity_draw_handler; //обработчик отрисовки объектов
   
 ///Конструктор
   Impl (RenderManager& in_manager, common::ParseNode& cfg_node)
     : manager (in_manager)
+    , entity_draw_handler (xtl::bind (&Impl::EntityDrawHandler, this, _1, _2, _3))
   {
-    light_frames.reserve (LIGHTS_RESERVE_SIZE);
+    light_frames.reserve (LIGHTS_RESERVE_SIZE);    
   }    
   
 ///Резервирование фрейма
@@ -39,6 +45,8 @@ struct ForEachLightTechnique::Impl
       return light_frames [light_index];    
     
     Frame frame = manager.CreateFrame ();
+    
+    frame.SetEntityDrawHandler (entity_draw_handler);
       
     light_frames.push_back (frame);
       
@@ -68,6 +76,19 @@ struct ForEachLightTechnique::Impl
       //добавление вложенного фрейма в родительский
 
     parent_frame.AddFrame (frame);
+  }
+  
+///Обработчик отрисовки объектов
+  void EntityDrawHandler (Frame& frame, Entity& entity, EntityDrawParams& out_params)
+  {
+//    common::PropertyMap& properties = out_params.properties;
+    
+//    math::mat4f model_view_tm = frame.Properties ().GetMatrix ("ViewMatrix") * entity.Properties ().GetMatrix ("ObjectMatrix");  
+
+//    out_params.mvp_matrix = frame.Properties ().GetMatrix ("ProjectionMatrix") * model_view_tm;
+
+//    properties.SetProperty ("ModelViewMatrix", model_view_tm);
+//    properties.SetProperty ("ModelViewProjectionMatrix", out_params.mvp_matrix);    
   }
 };
 

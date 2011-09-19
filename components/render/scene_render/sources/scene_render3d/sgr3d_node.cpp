@@ -18,6 +18,7 @@ struct Node::Impl
   xtl::auto_connection on_entity_destroy_connection; //оповещение об удалении объекта
   xtl::auto_connection on_entity_update_connection;  //оповещение об обновлении объекта
   bool                 need_update;                  //объект требует обновления
+  math::mat4f          world_tm;                     //мировая матрица преобразований  
 
 ///Конструктор
   Impl (Scene& in_scene, scene_graph::Entity& in_entity)
@@ -26,6 +27,7 @@ struct Node::Impl
     , on_entity_destroy_connection (entity->RegisterEventHandler (scene_graph::NodeEvent_BeforeDestroy, xtl::bind (&Impl::OnDestroyEntity, this)))
     , on_entity_update_connection (entity->RegisterEventHandler (scene_graph::NodeEvent_AfterUpdate, xtl::bind (&Impl::OnUpdateEntity, this)))
     , need_update (true)
+    , world_tm (in_entity.WorldTM ())
   {
   }
 
@@ -102,7 +104,9 @@ void Node::Update ()
 
   if (impl->need_update)
   {
-    UpdateCore ();
+    impl->world_tm = impl->entity->WorldTM ();
+    
+    UpdateCore ();    
 
     impl->need_update = false;
   }
@@ -110,4 +114,15 @@ void Node::Update ()
 
 void Node::UpdateCore ()
 {
+}
+
+/*
+    Положение в пространстве
+*/
+
+const math::mat4f& Node::WorldTM ()
+{
+  Update ();
+
+  return impl->world_tm;
 }

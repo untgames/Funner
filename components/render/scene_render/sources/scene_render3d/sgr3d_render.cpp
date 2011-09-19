@@ -38,11 +38,6 @@ class RenderManagerRegistry
     {
       if (!technique)
         return false;
-        
-      RenderMap::iterator iter = renders.find (&manager);
-
-      if (iter != renders.end ())
-        return iter->second->HasTechnique (technique);         
 
       for (common::Parser::NamesakeIterator iter=manager.Configuration ().First ("technique"); iter; ++iter)
       {
@@ -142,6 +137,15 @@ Render::~Render ()
 }
 
 /*
+    Менеджер рендеринга
+*/
+
+RenderManager& Render::Manager ()
+{
+  return impl->manager;
+}
+
+/*
     Регистрация областей вывода
 */
 
@@ -227,9 +231,4 @@ bool Render::CheckTechnique (const RenderManager& manager, const char* technique
     e.touch ("render::scene_render3d::Render::CheckTechnique");
     throw;
   }
-}
-
-bool Render::HasTechnique (const char* technique)
-{
-  return true; //???????TODO
 }

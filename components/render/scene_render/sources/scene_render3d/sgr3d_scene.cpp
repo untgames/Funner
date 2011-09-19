@@ -172,6 +172,15 @@ Scene::~Scene ()
 }
 
 /*
+    Менеджер рендеринга
+*/
+
+RenderManager& Scene::Manager ()
+{
+  return impl->render->Manager ();
+}
+
+/*
     Регистрация объектов
 */
 

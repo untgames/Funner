@@ -9,11 +9,15 @@ using namespace render::scene_render3d;
 
 struct VisualModel::Impl
 {
-  scene_graph::VisualModel& model; //визуализируемая модель
+  scene_graph::VisualModel& model;          //визуализируемая модель
+  Entity                    entity;         //объект рендеринга, соответствующий модели
+  size_t                    mesh_name_hash; //хэш имени мэша
   
 ///Конструктор
-  Impl (scene_graph::VisualModel& in_model)
+  Impl (Scene& scene, scene_graph::VisualModel& in_model)
     : model (in_model)
+    , entity (scene.Manager ().CreateEntity ())
+    , mesh_name_hash (~0u)
   {
   }
 };
@@ -27,7 +31,7 @@ VisualModel::VisualModel (Scene& scene, scene_graph::VisualModel& entity)
 {
   try  
   {    
-    impl = new Impl (entity);
+    impl = new Impl (scene, entity);
   }
   catch (xtl::exception& e)
   {
@@ -55,8 +59,15 @@ void VisualModel::VisitCore (IVisitor& visitor)
 
 void VisualModel::UpdateCore ()
 {
+  if (impl->mesh_name_hash != impl->model.MeshNameHash ())
+  {
+    impl->entity.SetPrimitive (impl->model.MeshName ());
+    
+    impl->mesh_name_hash = impl->model.MeshNameHash ();
+  }
 }
 
 void VisualModel::UpdateFrameCore (Frame& frame)
 {
+  frame.AddEntity (impl->entity);
 }
