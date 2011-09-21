@@ -510,12 +510,12 @@ void* Heap::Impl::AllocLargeBlock (size_t size)
   
   LargeAllocBlock* block = (LargeAllocBlock*)((char*)page + sizeof (MemPage));
 
-  return block - sizeof (MediumAllocBlock);
+  return block - sizeof (LargeAllocBlock);
 }
 
 void Heap::Impl::FreeLargeBlock (void* p)
 {
-  LargeAllocBlock* block = (LargeAllocBlock*)((char*)p + sizeof (MediumAllocBlock));  
+  LargeAllocBlock* block = (LargeAllocBlock*)((char*)p + sizeof (LargeAllocBlock));
   MemPage*         page  = (MemPage*)((unsigned char*)block - sizeof (MemPage));
 
   HeapInternalStat& stat       = default_node.stat;
