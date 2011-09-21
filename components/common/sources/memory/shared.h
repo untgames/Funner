@@ -23,7 +23,11 @@ const size_t MEDIUM_TREE_COUNT             = 32;               //количество дере
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Идентификаторы маркера блока
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-typedef unsigned char BlockTag;
+#ifdef ARM
+  typedef unsigned int BlockTag;
+#else
+  typedef unsigned char BlockTag;
+#endif
 
 const BlockTag BLOCK_ID_MASK    = 3; //маска идентификатора типа распределителя блока
 const BlockTag SMALL_BLOCK_ID   = 1; //идентификатор блока малого размера
