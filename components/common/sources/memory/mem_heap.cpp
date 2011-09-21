@@ -510,7 +510,7 @@ void* Heap::Impl::AllocLargeBlock (size_t size)
   
   LargeAllocBlock* block = (LargeAllocBlock*)((char*)page + sizeof (MemPage));
 
-  return block + sizeof (LargeAllocBlock) - sizeof (BlockTag);
+  return (char*)block + sizeof (LargeAllocBlock) - sizeof (BlockTag);
 }
 
 void Heap::Impl::FreeLargeBlock (void* p)
