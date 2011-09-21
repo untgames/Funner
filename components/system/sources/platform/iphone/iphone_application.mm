@@ -5,13 +5,13 @@
 
 #import <UIKit/UIApplication.h>
 
+#import <QuartzCore/CADisplayLink.h>
+
 using namespace syslib;
 using namespace syslib::iphone;
 
 namespace
 {
-
-const size_t IDLE_TIMER_PERIOD = 1000 / 70; //ограничение в 70 fps
 
 class ApplicationDelegateImpl;
 
@@ -109,12 +109,6 @@ class ApplicationDelegateImpl: public IApplicationDelegate, public xtl::referenc
     syslib::IApplicationListener* listener;
 };
 
-void idle_handler (Timer& timer)
-{
-  if (application_delegate)
-    application_delegate->OnIdle ();
-}
-
 }
 
 typedef stl::vector<syslib::iphone::IApplicationListener*> ListenerArray;
@@ -123,7 +117,7 @@ typedef stl::vector<syslib::iphone::IApplicationListener*> ListenerArray;
 {
   @private
     ListenerArray *listeners;  //слушатели событий
-    Timer         *idle_timer; //таймер вызова OnIdle
+    CADisplayLink *idle_timer; //таймер вызова OnIdle
 }
 
 -(id) init;
@@ -136,28 +130,39 @@ typedef stl::vector<syslib::iphone::IApplicationListener*> ListenerArray;
 
 @implementation ApplicationDelegate
 
+-(void)initIdleTimer
+{
+  [idle_timer invalidate];
+  [idle_timer release];
+
+  idle_timer = [[CADisplayLink displayLinkWithTarget:self selector:@selector (onIdle:)] retain];
+
+  [idle_timer addToRunLoop:[NSRunLoop mainRunLoop] forMode:NSDefaultRunLoopMode];
+}
+
 -(id) init
 {
   self = [super init];
 
-  if (self)
+  if (!self)
+    return nil;
+
+  try
   {
-    listeners  = 0;
-    idle_timer = 0;
+    listeners = new ListenerArray ();
 
-    try
-    {
-      listeners  = new ListenerArray ();
-      idle_timer = new Timer (&idle_handler, IDLE_TIMER_PERIOD, TimerState_Paused);
-    }
-    catch (...)
-    {
-      delete idle_timer;
-      delete listeners;
+    [self initIdleTimer];
 
-      [self release];
-      return nil;
-    }
+    idle_timer.paused = YES;
+  }
+  catch (...)
+  {
+    [idle_timer invalidate];
+    [idle_timer release];
+    delete listeners;
+
+    [self release];
+    return nil;
   }
 
   return self;
@@ -167,10 +172,18 @@ typedef stl::vector<syslib::iphone::IApplicationListener*> ListenerArray;
 {
   application_launched = false;
 
-  delete idle_timer;
+  [idle_timer invalidate];
+  [idle_timer release];
+
   delete listeners;
 
   [super dealloc];
+}
+
+-(void) onIdle:(CADisplayLink*)sender
+{
+  if (application_delegate)
+    application_delegate->OnIdle ();
 }
 
 -(void) applicationWillFinishLaunching:(UIApplication*)application
@@ -183,12 +196,13 @@ typedef stl::vector<syslib::iphone::IApplicationListener*> ListenerArray;
   
   application_delegate->OnInitialized ();
 
-  idle_timer->Run ();  
+  idle_timer.paused = NO;
 }
 
 -(void) applicationWillTerminate:(UIApplication*)application
 {
-  idle_timer->Pause ();
+  [idle_timer invalidate];
+  idle_timer.paused = YES;
 
   application_delegate->OnExit ();
 }
@@ -203,12 +217,17 @@ typedef stl::vector<syslib::iphone::IApplicationListener*> ListenerArray;
 {
   for (ListenerArray::iterator iter = listeners->begin (), end = listeners->end (); iter != end; ++iter)
     (*iter)->OnInactive ();
+
+  idle_timer.paused = YES;
+  [idle_timer invalidate];
 }
 
 -(void) applicationDidBecomeActive:(UIApplication*)application
 {
   for (ListenerArray::iterator iter = listeners->begin (), end = listeners->end (); iter != end; ++iter)
     (*iter)->OnActive ();
+
+  [self initIdleTimer];
 }
 
 /*

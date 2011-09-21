@@ -1,8 +1,8 @@
 ###################################################################################################
-#—борка под iPhone Device 3.0 g++ armv6 (iPhone, iPhone3G, iPod Touch, iPod Touch 2G)
+#—борка под iPhone Device 3.1 g++ armv6 (iPhone, iPhone3G, iPod Touch, iPod Touch 2G)
 ###################################################################################################
 
-IPHONEOS_DEPLOYMENT_TARGET := 3.0
+IPHONEOS_DEPLOYMENT_TARGET := 3.1
 
 export IPHONEOS_DEPLOYMENT_TARGET
 
