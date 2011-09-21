@@ -5,7 +5,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 #define ALIGN_SIZE 8
 
-#pragma pack(ALIGN_SIZE)
+#pragma pack(8)
 
 #ifdef _MSC_VER
 #define ALIGN_STRUCT __declspec(align(ALIGN_SIZE))
