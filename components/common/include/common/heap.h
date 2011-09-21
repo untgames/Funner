@@ -62,7 +62,6 @@ class AllocationContext
 {
   friend class Heap;
   public:
-    AllocationContext  (Heap&,const char* name);
     AllocationContext  (const AllocationContext&);
     ~AllocationContext ();
 
@@ -187,9 +186,6 @@ class Heap
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Работа с контекстами распределения
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void              SetCurrentContext (const AllocationContext&);
-    AllocationContext GetCurrentContext () const;
-    AllocationContext GetContext        (const char* name); //поиск или создание контекста распределения
     AllocationContext GetDefaultContext () const; //контекст распределения по умолчанию
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

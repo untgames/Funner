@@ -3,7 +3,8 @@
 #include <stdio.h>
 #include <cstdlib>
 
-const size_t MAX_SIZE = 1024 * 16;
+const size_t MAX_SIZE   = 1024*1024;
+const size_t ALIGN_SIZE = 8;
 
 using namespace common;
 
@@ -34,7 +35,7 @@ int main ()
 
     allocated_memory += block_size;
 
-    if (!check_align (p, 4))
+    if (!check_align (p, ALIGN_SIZE))
       printf ("align failed at size=%u, pointer is %p\n", block_size, p);
   }
 
