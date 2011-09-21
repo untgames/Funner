@@ -111,11 +111,6 @@ Heap::Impl::~Impl ()
     Распределение страниц памяти    
 */
 
-inline bool check_align (void* p,size_t align)
-{
-  return (((size_t)p) & (align-1)) == 0;
-}
-
 MemPage* Heap::Impl::AllocPage (BlockTag tag,size_t min_size,size_t recommended_size)
 {  
   min_size         += sizeof (MemPage) + ALIGN_SIZE;
@@ -142,9 +137,7 @@ MemPage* Heap::Impl::AllocPage (BlockTag tag,size_t min_size,size_t recommended_
     if      (size - min_size >= min_size)  size /= 2;
     else if (size != min_size)             size  = min_size;
     else                                   return NULL;
-  }
-  
-  printf ("buf check: %d offset=%u\n", check_align (buf, 8), sizeof (MemPage));
+  }  
   
   MemPage* page = (MemPage*)AlignPtr (buf,ALIGN_SIZE,sizeof (MemPage));
 
@@ -162,17 +155,13 @@ MemPage* Heap::Impl::AllocPage (BlockTag tag,size_t min_size,size_t recommended_
     page->next->prev = page;
 
   sys_allocate_count++;
-  sys_allocate_size += size;
-  
-  printf ("page check: %d\n", check_align (page, 8));  
+  sys_allocate_size += size;  
 
   return page;
 }
 
 void Heap::Impl::FreePage (MemPage* page)
 {
-  printf ("page check: %d\n", check_align (page, 8));  
-
   if (page->next_free || page->prev_free)
     RemoveFreePage (page);
 
