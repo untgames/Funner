@@ -116,10 +116,10 @@ inline bool check_align (void* p,size_t align)
   return (((size_t)p) & (align-1)) == 0;
 }
 
-MemPage* Heap::Impl::AllocPage (BlockTag tag,size_t min_size,size_t recommended_size,size_t align,size_t offset)
+MemPage* Heap::Impl::AllocPage (BlockTag tag,size_t min_size,size_t recommended_size)
 {  
-  min_size         += sizeof (MemPage) + align + offset;
-  recommended_size += sizeof (MemPage) + align + offset;  
+  min_size         += sizeof (MemPage) + ALIGN_SIZE;
+  recommended_size += sizeof (MemPage) + ALIGN_SIZE;
   
   size_t allocated_size = sys_allocate_size - sys_deallocate_size;
   
@@ -144,13 +144,13 @@ MemPage* Heap::Impl::AllocPage (BlockTag tag,size_t min_size,size_t recommended_
     else                                   return NULL;
   }
   
-  printf ("buf check: %d offset=%u\n", check_align (buf, 8), sizeof (MemPage)+offset);
+  printf ("buf check: %d offset=%u\n", check_align (buf, 8), sizeof (MemPage));
   
-  MemPage* page = (MemPage*)AlignPtr (buf,align,sizeof (MemPage)+offset);
+  MemPage* page = (MemPage*)AlignPtr (buf,ALIGN_SIZE,sizeof (MemPage));
 
   page->tag           = tag;
   page->base          = buf;
-  page->size          = size - sizeof (MemPage) - align;
+  page->size          = size - sizeof (MemPage) - ALIGN_SIZE;
   page->reserved_size = size;
   page->prev          = NULL;
   page->next          = first_page;
@@ -501,12 +501,14 @@ void Heap::Impl::FreeMediumBlock (void* p)
     Выделение блоков большого размера
 */
 
-void* Heap::Impl::AllocLargeBlock (size_t size,size_t align,size_t offset)
+void* Heap::Impl::AllocLargeBlock (size_t size)
 {
-  MemPage* page = AllocPage (LARGE_BLOCK_ID,size,size,align,offset);
+  size += sizeof (LargeAllocBlock);
+
+  MemPage* page = AllocPage (LARGE_BLOCK_ID,size,size);
   
   if (!page)
-    return NULL;
+    return NULL;    
 
   HeapInternalStat& stat       = default_node.stat;
   size_t            tree_index = GetTreeIndex (page->reserved_size);  
@@ -516,13 +518,16 @@ void* Heap::Impl::AllocLargeBlock (size_t size,size_t align,size_t offset)
 
   if (page->size > stat.max_block_size) stat.max_block_size = page->reserved_size;
   if (page->size < stat.min_block_size) stat.min_block_size = page->reserved_size;
+  
+  LargeAllocBlock* block = (LargeAllocBlock*)((char*)page + sizeof (MemPage));
 
-  return (unsigned char*)page + sizeof (MemPage);
+  return block - sizeof (MediumAllocBlock);
 }
 
 void Heap::Impl::FreeLargeBlock (void* p)
 {
-  MemPage* page = (MemPage*)((unsigned char*)p - sizeof (MemPage));
+  LargeAllocBlock* block = (LargeAllocBlock*)((char*)p + sizeof (MediumAllocBlock));  
+  MemPage*         page  = (MemPage*)((unsigned char*)block - sizeof (MemPage));
 
   HeapInternalStat& stat       = default_node.stat;
   size_t            tree_index = GetTreeIndex (page->reserved_size);
@@ -646,7 +651,7 @@ void* Heap::TryAllocate (size_t size)
   }
   else
   {
-    p   = (unsigned char*)impl->AllocLargeBlock (size, ALIGN_SIZE, sizeof (BlockTag));
+    p   = (unsigned char*)impl->AllocLargeBlock (size);
     tag = LARGE_BLOCK_ID;
   }  
 
@@ -666,37 +671,28 @@ void* Heap::TryAllocate (size_t size,size_t align,size_t offset)
   if (align < ALIGN_SIZE)
     align = ALIGN_SIZE;
   
-  offset += sizeof (BlockTag);  
+  offset += sizeof (BlockTag) + sizeof (size_t); 
   
   size_t full_size = size + align + offset;
-
-  if (full_size > impl->medium_max_block_size)
-  {
-    unsigned char* p = (unsigned char*)impl->AllocLargeBlock (size,align,offset);
-    
-    if (!p)
-      return NULL;
-    
-    *(BlockTag*)p = LARGE_BLOCK_ID;
-      
-    return p + sizeof (BlockTag);       
-  }
-  
-  offset += sizeof (size_t);
   
   void*    buf;
-  BlockTag tag;  
+  BlockTag tag;
 
   if (full_size < MEDIUM_MIN_BLOCK_SIZE)
   {
     buf = impl->AllocSmallBlock (full_size);
     tag = SMALL_BLOCK_ID|ALIGNED_BLOCK_ID;
   }
-  else
+  else if (full_size <= impl->medium_max_block_size)
   {
     buf = impl->AllocMediumBlock (full_size);
     tag = MEDIUM_BLOCK_ID|ALIGNED_BLOCK_ID;
-  }  
+  }
+  else
+  {
+    buf = (unsigned char*)impl->AllocLargeBlock (full_size);
+    tag = LARGE_BLOCK_ID|ALIGNED_BLOCK_ID;
+  }
   
   if (!buf)
     return NULL;
@@ -766,6 +762,9 @@ void Heap::Deallocate (void* p)
     case MEDIUM_BLOCK_ID|ALIGNED_BLOCK_ID:
       impl->FreeMediumBlock ((void*)*(size_t*)(block - sizeof (size_t)));
       break;
+    case LARGE_BLOCK_ID|ALIGNED_BLOCK_ID:
+      impl->FreeLargeBlock ((void*)*(size_t*)(block - sizeof (size_t)));
+      break;      
     default:
      //call user handler
      break;
