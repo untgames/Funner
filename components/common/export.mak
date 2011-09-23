@@ -2,13 +2,16 @@
 export.link.common.auto_license_generator.LIBS          := funner.common.auto_license_generator funner.common.parsers.xml
 export.link.common.auto_license_generator.LINK_INCLUDES := AutoLicenseGenerator XmlParser
 
+# Memory manager override
+export.link.common.memory_manager_override.LIBS := funner.common.memory_manager_override
+
 # Compile exports for
 export.compile.common.INCLUDE_DIRS     := include ../xtl/include
 export.compile.common.COMPILER_DEFINES :=
 
 # Link exports
 export.link.common.LIBS                        := funner.common funner.extern.pcre
-export.link.common.IMPORTS                     := link.common.auto_license_generator
+export.link.common.IMPORTS                     := link.common.auto_license_generator link.common.memory_manager_override
 export.link.common.LINK_INCLUDES               := StandardFilePathsMount
 export.link.common.mingw.LIBS                  := shell32
 export.link.common.vcx86.LIBS                  := shell32

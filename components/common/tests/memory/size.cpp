@@ -5,9 +5,9 @@ using namespace common;
 
 struct TestSample
 {
-  size_t      size;
-  size_t      align;
-  size_t      offset;
+  size_t size;
+  size_t align;
+  size_t offset;
 };
 
 TestSample test_samples [] = {

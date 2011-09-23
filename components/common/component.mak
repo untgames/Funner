@@ -1,7 +1,7 @@
 ###################################################################################################
 #Определения и константы
 ###################################################################################################
-TARGETS := COMMON.SOURCES COMMON.WXF_PARSER COMMON.XML_PARSER COMMON.ZIP_FILE_SYSTEM COMMON.AES COMMON.ICONV \
+TARGETS := COMMON.SOURCES COMMON.WXF_PARSER COMMON.XML_PARSER COMMON.ZIP_FILE_SYSTEM COMMON.AES COMMON.ICONV COMMON.MEMORY_MANAGER_OVERRIDE \
   COMMON.AUTO_LICENSE_GENERATOR COMMON.TESTS COMMON.UTILS.FILE_CRYPTER COMMON.UTILS.LICENSE_GENERATOR COMMON.INFO  
 
 #Цель - CommonLib sources
@@ -21,6 +21,12 @@ COMMON.SOURCES.iphone.SOURCE_DIRS         := sources/platform/cocoa_iphone
 COMMON.SOURCES.win32.SOURCE_DIRS          := sources/platform/win32
 COMMON.SOURCES.bada.SOURCE_DIRS           := sources/platform/bada
 COMMON.SOURCES.bada.IMPORTS               := compile.extern.bada
+
+#Цель - Memory manager override
+COMMON.MEMORY_MANAGER_OVERRIDE.TYPE         := static-lib
+COMMON.MEMORY_MANAGER_OVERRIDE.INCLUDE_DIRS := include ../xtl/include
+COMMON.MEMORY_MANAGER_OVERRIDE.NAME         := funner.common.memory_manager_override
+COMMON.MEMORY_MANAGER_OVERRIDE.SOURCE_DIRS  := sources/memory/memory_manager_override
 
 #Цель - WxfParser
 COMMON.WXF_PARSER.TYPE             := static-lib

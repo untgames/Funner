@@ -773,9 +773,13 @@ size_t Heap::Size (void* p) const
   switch (info_tag)
   {
     case ALIGNED_BLOCK_ID:
-      block        = (unsigned char*)*(size_t*)(block - sizeof (size_t));
-      header_size += sizeof (size_t);
+    {
+      unsigned char* start = (unsigned char*)*(size_t*)(block - sizeof (size_t));
+      
+      header_size += block - start;
+      block        = start;
       break;    
+    }
     case 0: //no info
       break;
     default:
@@ -788,9 +792,9 @@ size_t Heap::Size (void* p) const
     case SMALL_BLOCK_ID:
       return size_t (block [-1]+1) * ALIGN_SIZE - sizeof (unsigned char) - header_size;
     case MEDIUM_BLOCK_ID:
-      return ((MediumAllocBlock*)(block - sizeof (MediumAllocBlock)))->size - sizeof (MediumAllocBlock) - header_size;
+      return ((MediumAllocBlock*)(block - sizeof (MediumAllocBlock) + sizeof (BlockTag)))->size - sizeof (MediumAllocBlock) - header_size;
     case LARGE_BLOCK_ID:
-      return ((MemPage*)(block - sizeof (MemPage)))->size - header_size;
+      return ((MemPage*)((char*)((LargeAllocBlock*)(block - sizeof (LargeAllocBlock) + sizeof (BlockTag)))-sizeof (MemPage)))->size - header_size - sizeof (LargeAllocBlock);
     default:
      //call user handler
      return 0;
