@@ -96,7 +96,7 @@ data/error_test2.xml(9): error: unexpected EOF (unclosed tag 'Configuration')
 root (source='', line=0): {}
  test (source='data/character_reference_test.xml', line=2): {}
   numeric (source='data/character_reference_test.xml', line=3): {}
-   attr (source='data/character_reference_test.xml', line=3): {<aa}
+   attr (source='data/character_reference_test.xml', line=3): {薩<aa}
    attr2 (source='data/character_reference_test.xml', line=3): {<}
    #text (source='data/character_reference_test.xml', line=3): {<aa, <}
   cdata_numeric (source='data/character_reference_test.xml', line=4): {}

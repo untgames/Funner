@@ -227,7 +227,7 @@ class XmlParser
         return;
       }  
       
-      if (xtl::xstrnicmp ("xml", lexer.Token (), 3))
+      if (xtl::xstrcmp ("xml", lexer.Token ()))
       {
         Error ("processing directive must start from 'xml' prefix");
         return;
