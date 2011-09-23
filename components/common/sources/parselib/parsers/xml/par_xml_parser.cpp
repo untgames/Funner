@@ -262,7 +262,11 @@ class XmlParser
           case XmlLexem_CData:
           case XmlLexem_Equal:
           case XmlLexem_Undefined:
-            AddAttribute (lexer.Token ());
+            if (lexer.Status () != XmlLexerStatus_NoError)
+              ProcessLexError ();
+            else
+              AddAttribute (lexer.Token ());
+
             break;
           default:
             FlushAttributes ();

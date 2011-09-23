@@ -193,7 +193,7 @@ void XmlLexer::ReadSymbolReference (char* write_position)
   }
 }
 
-void XmlLexer::ReadString (char border, char* terminators, size_t terminators_count)
+void XmlLexer::ReadString (char border, char* terminators, size_t terminators_count, bool content)
 {
   current_token = position;
   current_lexem = XmlLexem_String;
@@ -228,6 +228,18 @@ void XmlLexer::ReadString (char border, char* terminators, size_t terminators_co
       case '&':
         ReadSymbolReference (write_position);
         break;
+      case ']':
+        if (content && (position [1] == ']' && position [2] == '>'))
+        {
+          SetError (XmlLexerStatus_WrongChar, position);
+
+          erased_char          = *position;
+          erased_char_position = position;
+          *position            = '\0';
+
+          position += 3;
+          return;
+        }
       default:
         if (*position == border)
         {
@@ -247,7 +259,7 @@ void XmlLexer::ReadContentString ()
 {
   char terminators [] = { ' ', '<', '\n', '\t', '\r', '\0' };
 
-  ReadString (0, terminators, sizeof (terminators) / sizeof (*terminators));
+  ReadString (0, terminators, sizeof (terminators) / sizeof (*terminators), true);
 }
 
 void XmlLexer::ReadCData ()
@@ -459,17 +471,19 @@ XmlLexem XmlLexer::NextLexem (bool content)
       case '\n':
         NextLine ();
         break;
-      case '&':
+      default:
         if (content)
         {
           ReadContentString ();
-          break;
         }
-      default:
-        erased_char_position = position;
-        erased_char          = *position;
+        else
+        {
+          erased_char_position = position;
+          erased_char          = *position;
 
-        SetError (XmlLexerStatus_WrongChar, position++);
+          SetError (XmlLexerStatus_WrongChar, position++);
+        }
+
         break;
     }
   }

@@ -106,3 +106,44 @@ root (source='', line=0): {}
    #text (source='data/character_reference_test.xml', line=5): {<start, frame="111">}
   cdata_symbolic (source='data/character_reference_test.xml', line=6): {}
    #text (source='data/character_reference_test.xml', line=6): {&lt;start frame=&quot;111&quot;&gt;}
+root (source='', line=0): {}
+ Configuration (source='data/error_test3.xml', line=2): {}
+  Attribute (source='data/error_test3.xml', line=2): {correct_attribute_data]]>}
+  #text (source='data/error_test3.xml', line=3): {}
+data/error_test3.xml(3): error: wrong character on line ']' (at position 22)
+root (source='', line=0): {}
+ NAME (source='data/test-utf8.xml', line=2): {}
+  NAME (source='data/test-utf8.xml', line=2): {First WM}
+  VERSION (source='data/test-utf8.xml', line=2): {0.1}
+  MATERIAL (source='data/test-utf8.xml', line=20): {}
+   NAME (source='data/test-utf8.xml', line=21): {Русский материал}
+   COLOR (source='data/test-utf8.xml', line=22): {00//0099}
+   EPS (source='data/test-utf8.xml', line=23): {//10}
+   MU (source='data/test-utf8.xml', line=24): {1//}
+   SIGMA (source='data/test-utf8.xml', line=25): {100}
+  #text (source='data/test-utf8.xml', line=26): {//ad///sa//}
+  New1 (source='data/test-utf8.xml', line=27): {}
+   #text (source='data/test-utf8.xml', line=28): {薩<沙是在高速公路和吸乾, 1.001, 2.001, 3.001, 4.001, Русский, материал}
+   New2 (source='data/test-utf8.xml', line=31): {}
+    ChineseAttribute (source='data/test-utf8.xml', line=31): {薩沙是在高速公路和吸乾}
+  #text (source='data/test-utf8.xml', line=34): {1.0, 2.0, bla-bla-bla}
+  LAYER (source='data/test-utf8.xml', line=36): {}
+   NAME (source='data/test-utf8.xml', line=37): {Layer1}
+   MATERIAL (source='data/test-utf8.xml', line=38): {Mat2}
+   X (source='data/test-utf8.xml', line=39): {0.2}
+   WIDTH (source='data/test-utf8.xml', line=40): {0.7}
+  #text (source='data/test-utf8.xml', line=42): {CDATA test Русский материал 薩沙是在高速公路和吸乾 CDATA test/}
+  LAYER (source='data/test-utf8.xml', line=44): {}
+   NAME (source='data/test-utf8.xml', line=45): {Layer2}
+   MATERIAL (source='data/test-utf8.xml', line=46): {Mat1}
+   X (source='data/test-utf8.xml', line=47): {0.0}
+   WIDTH (source='data/test-utf8.xml', line=48): {0.1}
+  GAUSSGENERATOR (source='data/test-utf8.xml', line=50): {}
+   NAME (source='data/test-utf8.xml', line=51): {Gen1}
+   X (source='data/test-utf8.xml', line=52): {0.15}
+  SONDE (source='data/test-utf8.xml', line=54): {}
+   NAME (source='data/test-utf8.xml', line=55): {Sonde1}
+   X (source='data/test-utf8.xml', line=56): {0.5}
+  New (source='data/test-utf8.xml', line=58): {}
+   Tag (source='data/test-utf8.xml', line=59): {}
+    #text (source='data/test-utf8.xml', line=59): {text}
