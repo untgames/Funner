@@ -42,7 +42,7 @@ int main ()
   printf ("TextLine horizontal alignment = '%s', vertical_alignment = '%s'\n", get_name (text_line->HorizontalAlignment ()), get_name (text_line->VerticalAlignment ()));
 
   text_line->SetColor (0.1f, 0.2f, 0.3f, 0.4f);
-  text_line->SetText ("Non-unicode text");
+  text_line->SetTextUtf8 ("Non-unicode text");
   text_line->SetFont  ("font");
   text_line->SetAlignment (TextLineAlignment_Center, TextLineAlignment_Bottom);
 
@@ -55,7 +55,7 @@ int main ()
   
   stl::basic_string<unsigned int> result = toutf32 (L"Unicode text");
 
-  text_line->SetText (result.c_str (), result.size ());
+  text_line->SetTextUtf32 (result.c_str (), result.size ());
 
   printf ("TextLine text = '%s'\n", text_line->TextUtf8 ());
   printf ("TextLine unicode text = '%S'\n", towstring (*text_line).c_str ());

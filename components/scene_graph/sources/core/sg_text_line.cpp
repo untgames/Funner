@@ -193,10 +193,10 @@ void TextLine::CharsColors (size_t first, size_t count, math::vec4f* colors) con
    Установка/получение текста
 */
 
-void TextLine::SetText (const char* text)
+void TextLine::SetTextUtf8 (const char* text)
 {
   if (!text)
-    throw xtl::make_null_argument_exception ("scene_graph::TextLine::SetText(const char*)", "text");
+    throw xtl::make_null_argument_exception ("scene_graph::TextLine::SetTextUtf8", "text");
 
   impl->text_utf8              = text;
   impl->text_utf8_hash         = common::strhash (impl->text_utf8.c_str ());  
@@ -209,7 +209,7 @@ void TextLine::SetText (const char* text)
   UpdateNotify ();
 }
 
-void TextLine::SetText (const unsigned int* text, size_t length)
+void TextLine::SetTextUtf32 (const unsigned int* text, size_t length)
 {  
   if (length && !text)
     throw xtl::make_null_argument_exception ("scene_graph::TextLine::SetText(const unsigned int*,size_t)", "text");

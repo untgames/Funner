@@ -16,7 +16,7 @@ int main ()
   
   printf ("Set text\n");
 
-  text_line->SetText ("Hello world");
+  text_line->SetTextUtf8 ("Hello world");
   
   print_hashes (*text_line);  
   
@@ -24,7 +24,7 @@ int main ()
   
   stl::basic_string<unsigned int> result = toutf32 (L"Hello world");
 
-  text_line->SetText (result.c_str (), result.size ());    
+  text_line->SetTextUtf32 (result.c_str (), result.size ());    
   
   print_hashes (*text_line);
   

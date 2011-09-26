@@ -40,7 +40,7 @@ int main ()
   print_chars_colors (text_line);
 
   text_line->SetColor (0.9f, 0.9f, 0.9f, 0.9f);
-  text_line->SetText  ("some text");
+  text_line->SetTextUtf8  ("some text");
 
   printf ("TextLine color = [%.2f %.2f %.2f %.2f]\n", text_line->Color ().x, text_line->Color ().y, text_line->Color ().z, text_line->Color ().w);
   print_chars_colors (text_line);
@@ -65,7 +65,7 @@ int main ()
   
   stl::basic_string<unsigned int> result = toutf32 (L"Unicode text");
 
-  text_line->SetText (result.c_str (), result.size ());  
+  text_line->SetTextUtf32 (result.c_str (), result.size ());  
 
   printf ("TextLine color = [%.2f %.2f %.2f %.2f]\n", text_line->Color ().x, text_line->Color ().y, text_line->Color ().z, text_line->Color ().w);
   print_chars_colors (text_line);
