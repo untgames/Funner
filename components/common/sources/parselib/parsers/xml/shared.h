@@ -4,13 +4,17 @@
 #include <cctype>
 #include <cstring>
 
+#include <stl/string>
 #include <stl/vector>
 
+#include <xtl/common_exceptions.h>
 #include <xtl/function.h>
 #include <xtl/string.h>
+#include <xtl/uninitialized_storage.h>
 
 #include <common/component.h>
 #include <common/parser.h>
+#include <common/strconv.h>
 #include <common/utf_converter.h>
 
 namespace common
