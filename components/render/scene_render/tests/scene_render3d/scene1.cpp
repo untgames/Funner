@@ -49,12 +49,17 @@ int main ()
       //настройка области вывода
     
     scene_graph::Viewport vp;
+    
+    common::PropertyMap properties;
 
-    vp.SetArea      (0, 0, 100, 100);
-    vp.SetCamera    (&*camera);
-    vp.SetTechnique ("default");
+    vp.SetArea       (0, 0, 100, 100);
+    vp.SetCamera     (&*camera);
+    vp.SetTechnique  ("default");
+    vp.SetProperties (properties);    
     
     screen.Attach (vp);
+    
+    properties.SetProperty ("user_defined", "1.2");
     
     render.Update ();
 

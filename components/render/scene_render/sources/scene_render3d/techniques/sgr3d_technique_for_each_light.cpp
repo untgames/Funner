@@ -29,6 +29,7 @@ struct ForEachLightTechnique::Impl
   RenderManager             manager;             //менеджер рендеринга
   FrameArray                light_frames;        //фреймы источников света  
   Frame::EntityDrawFunction entity_draw_handler; //обработчик отрисовки объектов
+  Log                       log;                 //протокол вывода
   
 ///Конструктор
   Impl (RenderManager& in_manager, common::ParseNode& cfg_node)
@@ -99,6 +100,7 @@ struct ForEachLightTechnique::Impl
 ForEachLightTechnique::ForEachLightTechnique (RenderManager& manager, common::ParseNode& node)
   : impl (new Impl (manager, node))
 {
+  SetDefaultProperties (node);
 }
 
 ForEachLightTechnique::~ForEachLightTechnique ()
@@ -114,7 +116,7 @@ void ForEachLightTechnique::UpdateFrameCore (Scene& scene, Frame& frame, ITraver
   try
   {
     if (!Camera ())
-      return;
+      return;      
       
       //получение камеры
 
@@ -144,8 +146,21 @@ void ForEachLightTechnique::UpdateFrameCore (Scene& scene, Frame& frame, ITraver
 
 void ForEachLightTechnique::ResetPropertiesCore ()
 {
+  impl->log.Printf ("%s", __FUNCTION__);
 }
 
-void ForEachLightTechnique::UpdatePropertiesCore (const common::PropertyMap&)
+void ForEachLightTechnique::UpdatePropertiesCore (const common::PropertyMap& properties)
 {
+  impl->log.Printf ("%s:", __FUNCTION__);
+  
+  for (size_t i=0, count=properties.Size (); i<count; i++)
+  {
+    const char* name = properties.PropertyName (i);
+    
+    stl::string value;
+    
+    properties.GetProperty (name, value);
+    
+    impl->log.Printf ("  %s=%s", name, value.c_str ());
+  }
 }

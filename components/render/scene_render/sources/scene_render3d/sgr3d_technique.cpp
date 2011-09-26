@@ -82,7 +82,15 @@ void Technique::SetDefaultProperties (const common::PropertyMap& properties)
 
 void Technique::SetDefaultProperties (const common::ParseNode& node)
 {
-  throw xtl::make_not_implemented_exception ("render::scene_render3d::Technique::SetDefaultProperties");
+  try
+  {
+    SetDefaultProperties (to_properties (node));
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::scene_render3d::Technique::SetDefaultProperties(const common::ParseNode&)");
+    throw;
+  }
 }
 
 const common::PropertyMap Technique::DefaultProperties ()
@@ -104,10 +112,11 @@ void Technique::UpdateProperties (const common::PropertyMap& properties)
   {
     ResetPropertiesCore ();
 
-    if (impl->default_properties.get ())  
+    if (impl->default_properties.get () && impl->default_properties->Size ()) 
       UpdatePropertiesCore (*impl->default_properties);
       
-    UpdatePropertiesCore (properties);
+    if (properties.Size ())
+      UpdatePropertiesCore (properties);
   }
   catch (xtl::exception& e)
   {

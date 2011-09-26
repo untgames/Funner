@@ -62,6 +62,7 @@ typedef xtl::intrusive_ptr<View>       ViewPtr;
 #include "renderable.h"
 #include "scene.h"
 #include "technique.h"
+#include "utils.h"
 #include "view.h"
 #include "visitor.h"
 #include "visual_model.h"
