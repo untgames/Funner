@@ -78,7 +78,7 @@ struct RenderableTextLine::Impl
 
         //определение необходимости обновления текста
 
-      bool need_update_text = renderable_font != current_renderable_font || text_line->TextUnicodeHash () != current_text_hash;
+      bool need_update_text = renderable_font != current_renderable_font || text_line->TextUtf32Hash () != current_text_hash;
 
         //определение необходимости обновления смещения текста
 
@@ -124,7 +124,7 @@ struct RenderableTextLine::Impl
       {
           //инициализация параметров рендеринга текста
 
-        const wchar_t*          text_unicode      = text_line->TextUnicode ();
+        const unsigned int*     text_unicode      = text_line->TextUtf32 ();
         const media::Font&      font              = renderable_font->GetFont ();
         const media::GlyphInfo* glyphs            = font.Glyphs ();
         size_t                  glyphs_count      = font.GlyphsTableSize (),
@@ -141,7 +141,7 @@ struct RenderableTextLine::Impl
 
           //формирование массива спрайтов
 
-        const wchar_t*                 pos              = text_unicode;
+        const unsigned int*            pos              = text_unicode;
         size_t                         prev_glyph_index = 0;
         mid_level::renderer2d::Sprite* dst_sprite       = sprites_buffer.data ();
 
@@ -229,7 +229,7 @@ struct RenderableTextLine::Impl
 
         current_text_dimensions = text_dimensions;
         current_renderable_font = renderable_font;
-        current_text_hash       = text_line->TextUnicodeHash ();
+        current_text_hash       = text_line->TextUtf32Hash ();
 
           //обновление флагов
 

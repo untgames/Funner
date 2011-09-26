@@ -25,9 +25,9 @@ int main ()
     text_line2->BindToScene (scene, NodeBindMode_WeakRef);
     camera->BindToScene (scene, NodeBindMode_WeakRef);
 
-    text_line1->SetText ("Sample");
+    text_line1->SetTextUtf8 ("Sample");
     text_line1->SetFont ("data/times_new_roman.xfont");
-    text_line2->SetText ("Sample");
+    text_line2->SetTextUtf8 ("Sample");
     text_line2->SetFont ("data/times_new_roman.xfont");
 
     sprite1->SetScale (0.f, 1.f, 1.f);
