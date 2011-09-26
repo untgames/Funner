@@ -62,9 +62,10 @@ int main ()
     dump (chars_colors.data () [i]);
     printf ("\n");
   }
+  
+  stl::basic_string<unsigned int> result = toutf32 (L"Unicode text");
 
-
-  text_line->SetText (L"Unicode text");
+  text_line->SetText (result.c_str (), result.size ());  
 
   printf ("TextLine color = [%.2f %.2f %.2f %.2f]\n", text_line->Color ().x, text_line->Color ().y, text_line->Color ().z, text_line->Color ().w);
   print_chars_colors (text_line);

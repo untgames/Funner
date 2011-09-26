@@ -15,6 +15,7 @@
 
 #include <common/hash.h>
 #include <common/log.h>
+#include <common/utf_converter.h>
 
 #include <sg/camera.h>
 #include <sg/controller.h>
@@ -109,6 +110,22 @@ inline void dump_scale (Node& node)
   dump   (node.Scale ());
   printf (" world=");
   dump   (node.WorldScale ());
+}
+
+stl::basic_string<unsigned int> toutf32 (const wchar_t* string)
+{
+  stl::basic_string<unsigned int> result;
+  
+  result.fast_resize (xtl::xstrlen (string));
+
+  const void* source           = string;
+  size_t      source_size      = result.size () * sizeof (wchar_t);
+  void*       destination      = &result [0];
+  size_t      destination_size = result.size () * sizeof (unsigned int);
+
+  convert_encoding (common::Encoding_UTF16LE, source, source_size, common::Encoding_UTF32LE, destination, destination_size);  
+  
+  return result;
 }
 
 #endif

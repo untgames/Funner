@@ -26,16 +26,19 @@ vec4f clamp (const vec4f& color)
     Описание реализации TextLine
 */
 
+typedef xtl::uninitialized_storage<unsigned int> Utf32Buffer;
+
 struct TextLine::Impl
 {
   typedef stl::vector <math::vec4f> CharsColors;
 
-  stl::string       text;
-  stl::wstring      text_unicode;
-  size_t            text_hash;
-  size_t            text_unicode_hash;
-  bool              text_need_update;
-  bool              text_unicode_need_update;
+  stl::string       text_utf8;
+  Utf32Buffer       text_utf32;
+  size_t            length;
+  size_t            text_utf8_hash;
+  size_t            text_utf32_hash;
+  bool              text_utf8_need_update;
+  bool              text_utf32_need_update;
   stl::string       font_name;
   vec4f             color;
   vec4f             last_asked_char_color;    //переменная для хранения возвращаемого значения
@@ -46,10 +49,11 @@ struct TextLine::Impl
   bool              chars_colors_need_update;
 
   Impl ()
-   : text_hash (common::strhash ("")),
-     text_unicode_hash (common::strhash (L"")),
-     text_need_update (false),
-     text_unicode_need_update (false),
+   : text_utf8_hash (common::strhash ("")),
+     length (0),
+     text_utf32_hash (common::strhash (L"")),     
+     text_utf8_need_update (false),
+     text_utf32_need_update (false),
      color (1.f, 1.f, 1.f, 1.f), 
      horizontal_alignment (TextLineAlignment_Left),
      vertical_alignment (TextLineAlignment_Top),
@@ -192,85 +196,146 @@ void TextLine::CharsColors (size_t first, size_t count, math::vec4f* colors) con
 void TextLine::SetText (const char* text)
 {
   if (!text)
-    throw xtl::make_null_argument_exception ("scene_graph::TextLine::SetText", "text");
+    throw xtl::make_null_argument_exception ("scene_graph::TextLine::SetText(const char*)", "text");
 
-  impl->text                     = text;
-  impl->text_hash                = common::strhash (impl->text.c_str ());  
-  impl->text_need_update         = false;
-  impl->text_unicode_need_update = true;
-
-  impl->OnTextChanged ();
-
-  UpdateNotify ();
-}
-
-void TextLine::SetText (const wchar_t* text)
-{
-  if (!text)
-    throw xtl::make_null_argument_exception ("scene_graph::TextLine::SetText", "text");
-
-  impl->text_unicode             = text;
-  impl->text_unicode_hash        = common::strhash (impl->text_unicode.c_str ());
-  impl->text_unicode_need_update = false;
-  impl->text_need_update         = true;
+  impl->text_utf8              = text;
+  impl->text_utf8_hash         = common::strhash (impl->text_utf8.c_str ());  
+  impl->length                 = impl->text_utf8.size ();
+  impl->text_utf8_need_update  = false;
+  impl->text_utf32_need_update = true;  
 
   impl->OnTextChanged ();
 
   UpdateNotify ();
 }
 
-const char* TextLine::Text () const
-{
-  if (impl->text_need_update)
+void TextLine::SetText (const unsigned int* text, size_t length)
+{  
+  if (length && !text)
+    throw xtl::make_null_argument_exception ("scene_graph::TextLine::SetText(const unsigned int*,size_t)", "text");
+
+  impl->text_utf32.resize (length, false);
+
+  impl->length = length;
+
+  if (length)
   {
-    impl->text             = common::tostring (impl->text_unicode);
-    impl->text_hash        = common::strhash (impl->text.c_str ());
-    impl->text_need_update = false;
+    memcpy (impl->text_utf32.data (), text, length * sizeof (size_t));
+
+    impl->text_utf32_hash = common::crc32 (impl->text_utf32.data (), length * sizeof (size_t));
+  }
+  else
+  {
+    impl->text_utf32_hash = ~0u;
   }
 
-  return impl->text.c_str ();
+  impl->text_utf32_need_update = false;  
+  impl->text_utf8_need_update       = true;
+
+  impl->OnTextChanged ();
+
+  UpdateNotify ();
 }
 
-const wchar_t* TextLine::TextUnicode () const
+const char* TextLine::TextUtf8 () const
 {
-  if (impl->text_unicode_need_update)
+  if (impl->text_utf8_need_update)
   {
-    impl->text_unicode             = common::towstring (impl->text);
-    impl->text_unicode_hash        = common::strhash (impl->text_unicode.c_str ());    
-    impl->text_unicode_need_update = false;
+    try
+    {
+      if (!impl->text_utf32_need_update)
+      {      
+        impl->text_utf8.fast_resize (impl->length);
+        
+        const void* source           = impl->text_utf32.data ();
+        size_t      source_size      = impl->text_utf32.size () * sizeof (unsigned int);
+        void*       destination      = &impl->text_utf8 [0];
+        size_t      destination_size = impl->text_utf8.size ();
+
+        convert_encoding (common::Encoding_UTF32LE, source, source_size, common::Encoding_UTF8, destination, destination_size);
+
+        if (source_size || destination_size)
+          throw xtl::format_operation_exception ("", "Internal error: buffer not enough (source_size=%u, destination_size=%u)", source_size, destination_size);
+      }
+      else
+      {
+        throw xtl::format_operation_exception ("", "Internal error: no base text representation for conversion");
+      }
+
+      impl->text_utf8_hash        = common::strhash (impl->text_utf8.c_str ());
+      impl->text_utf8_need_update = false;
+    }
+    catch (xtl::exception& e)
+    {
+      e.touch ("scene_graph::TextLine::Text");
+      throw;
+    }
   }
 
-  return impl->text_unicode.c_str ();
+  return impl->text_utf8.c_str ();
+}
+
+const unsigned int* TextLine::TextUtf32 () const
+{
+  if (impl->text_utf32_need_update)
+  {
+    try
+    {
+      if (!impl->text_utf8_need_update)
+      {      
+        impl->text_utf32.resize (impl->length, false);
+        
+        const void* source           = impl->text_utf8.c_str ();
+        size_t      source_size      = impl->text_utf8.size ();
+        void*       destination      = impl->text_utf32.data ();
+        size_t      destination_size = impl->text_utf32.size () * sizeof (unsigned int);
+
+        convert_encoding (common::Encoding_UTF8, source, source_size, common::Encoding_UTF32LE, destination, destination_size);
+
+        if (source_size || destination_size)
+          throw xtl::format_operation_exception ("", "Internal error: buffer not enough (source_size=%u, destination_size=%u)", source_size, destination_size);
+      }
+      else
+      {
+        throw xtl::format_operation_exception ("", "Internal error: no base text representation for conversion");
+      }
+
+      impl->text_utf32_hash        = common::crc32 (impl->text_utf32.data (), impl->text_utf32.size () * sizeof (unsigned int));
+      impl->text_utf32_need_update = false;
+    }
+    catch (xtl::exception& e)
+    {
+      e.touch ("scene_graph::TextLine::TextUtf32");
+      throw;
+    }
+  }
+
+  return impl->text_utf32.data ();
 }
 
 size_t TextLine::TextLength  () const
 {
-  if (!impl->text_need_update)
-    return impl->text.length ();
-  else if (!impl->text_need_update)
-    return impl->text_unicode.length ();
-  else
-    return xtl::xstrlen (Text ());
+  return impl->length;
 }
 
 /*
     Хэш текста
 */
 
-size_t TextLine::TextHash () const
+size_t TextLine::TextUtf8Hash () const
 {
-  if (impl->text_need_update)
-    Text (); //обновление хэша
+  if (impl->text_utf8_need_update)
+    TextUtf8 (); //обновление хэша
 
-  return impl->text_hash;
+  return impl->text_utf8_hash;
 }
 
-size_t TextLine::TextUnicodeHash () const
+size_t TextLine::TextUtf32Hash () const
 {
-  if (impl->text_unicode_need_update)
-    TextUnicode (); //обновление хэша
+  if (impl->text_utf32_need_update)
+    TextUtf32 (); //обновление хэша
 
-  return impl->text_unicode_hash;
+  return impl->text_utf32_hash;
 }
 
 /*
