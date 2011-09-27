@@ -3,6 +3,12 @@
 using namespace scene_graph;
 using namespace math;
 
+#ifdef __BIG_ENDIAN__
+const common::Encoding UTF32_ENCODING = common::Encoding_UTF32BE;
+#else
+const common::Encoding UTF32_ENCODING = common::Encoding_UTF32LE;
+#endif
+
 namespace
 {
 
@@ -214,23 +220,28 @@ void TextLine::SetTextUtf32 (const unsigned int* text, size_t length)
   if (length && !text)
     throw xtl::make_null_argument_exception ("scene_graph::TextLine::SetText(const unsigned int*,size_t)", "text");
 
-  impl->text_utf32.resize (length, false);
+  impl->text_utf32.resize (length + 1, false);
 
   impl->length = length;
 
   if (length)
   {
-    memcpy (impl->text_utf32.data (), text, length * sizeof (size_t));
+    size_t size = length * sizeof (unsigned int);
 
-    impl->text_utf32_hash = common::crc32 (impl->text_utf32.data (), length * sizeof (size_t));
+    memcpy (impl->text_utf32.data (), text, size);
+    memset (impl->text_utf32.data () + length, 0, sizeof (unsigned int));
+
+    impl->text_utf32_hash = common::crc32 (impl->text_utf32.data (), size);
   }
   else
   {
+    memset (impl->text_utf32.data (), 0, sizeof (unsigned int));    
+
     impl->text_utf32_hash = ~0u;
   }
 
   impl->text_utf32_need_update = false;  
-  impl->text_utf8_need_update       = true;
+  impl->text_utf8_need_update  = true;
 
   impl->OnTextChanged ();
 
@@ -245,17 +256,26 @@ const char* TextLine::TextUtf8 () const
     {
       if (!impl->text_utf32_need_update)
       {      
-        impl->text_utf8.fast_resize (impl->length);
-        
-        const void* source           = impl->text_utf32.data ();
-        size_t      source_size      = impl->text_utf32.size () * sizeof (unsigned int);
-        void*       destination      = &impl->text_utf8 [0];
-        size_t      destination_size = impl->text_utf8.size ();
+        if (impl->text_utf32.size () != 0)
+        {
+          impl->text_utf8.fast_resize (impl->length);          
+          
+          const void* source           = impl->text_utf32.data ();
+          size_t      source_size      = (impl->text_utf32.size () - 1) * sizeof (unsigned int);
+          void*       destination      = &impl->text_utf8 [0];
+          size_t      destination_size = impl->text_utf8.size ();
 
-        convert_encoding (common::Encoding_UTF32LE, source, source_size, common::Encoding_UTF8, destination, destination_size);
+          convert_encoding (UTF32_ENCODING, source, source_size, common::Encoding_UTF8, destination, destination_size);
 
-        if (source_size || destination_size)
-          throw xtl::format_operation_exception ("", "Internal error: buffer not enough (source_size=%u, destination_size=%u)", source_size, destination_size);
+          if (source_size)
+            throw xtl::format_operation_exception ("", "Internal error: buffer not enough (source_size=%u, destination_size=%u)", source_size, destination_size);
+
+          *(char*)destination = '\0';
+        }
+        else
+        {
+          impl->text_utf8.clear ();
+        }
       }
       else
       {
@@ -283,24 +303,35 @@ const unsigned int* TextLine::TextUtf32 () const
     {
       if (!impl->text_utf8_need_update)
       {      
-        impl->text_utf32.resize (impl->length, false);
-        
-        const void* source           = impl->text_utf8.c_str ();
-        size_t      source_size      = impl->text_utf8.size ();
-        void*       destination      = impl->text_utf32.data ();
-        size_t      destination_size = impl->text_utf32.size () * sizeof (unsigned int);
+        if (!impl->text_utf8.empty ())
+        {
+          impl->text_utf32.resize (impl->length + 1, false);
 
-        convert_encoding (common::Encoding_UTF8, source, source_size, common::Encoding_UTF32LE, destination, destination_size);
+          const void* source           = impl->text_utf8.c_str ();
+          size_t      source_size      = impl->text_utf8.size ();
+          void*       destination      = impl->text_utf32.data ();
+          size_t      destination_size = impl->text_utf32.size () * sizeof (unsigned int);
 
-        if (source_size || destination_size)
-          throw xtl::format_operation_exception ("", "Internal error: buffer not enough (source_size=%u, destination_size=%u)", source_size, destination_size);
+          convert_encoding (common::Encoding_UTF8, source, source_size, UTF32_ENCODING, destination, destination_size);
+
+          if (source_size || destination_size < sizeof (unsigned int))
+            throw xtl::format_operation_exception ("", "Internal error: buffer not enough (source_size=%u, destination_size=%u)", source_size, destination_size);
+
+          memset (destination, 0, sizeof (unsigned int));
+        }
+        else        
+        {
+          impl->text_utf32.resize (1, false);
+
+          memset (impl->text_utf32.data (), 0, sizeof (unsigned int));
+        }
       }
       else
       {
         throw xtl::format_operation_exception ("", "Internal error: no base text representation for conversion");
       }
 
-      impl->text_utf32_hash        = common::crc32 (impl->text_utf32.data (), impl->text_utf32.size () * sizeof (unsigned int));
+      impl->text_utf32_hash        = impl->text_utf32.size () == 0 ? ~0u : common::crc32 (impl->text_utf32.data (), (impl->text_utf32.size () - 1) * sizeof (unsigned int));
       impl->text_utf32_need_update = false;
     }
     catch (xtl::exception& e)
@@ -367,6 +398,7 @@ void TextLine::SetAlignment (TextLineAlignment horizontal, TextLineAlignment ver
 
   if (horizontal >= TextLineAlignment_Num)
     throw xtl::make_argument_exception (METHOD_NAME, "horizontal", horizontal, "Unknown TextLineAlignment");
+
   if (vertical >= TextLineAlignment_Num)
     throw xtl::make_argument_exception (METHOD_NAME, "vertical", vertical, "Unknown TextLineAlignment");
 
