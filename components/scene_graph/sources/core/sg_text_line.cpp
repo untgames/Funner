@@ -222,7 +222,7 @@ void TextLine::SetTextUtf32 (const unsigned int* text, size_t length)
 
   impl->text_utf32.resize (length + 1, false);
 
-  impl->length = length;
+  impl->length = 0;
 
   if (length)
   {
@@ -242,6 +242,7 @@ void TextLine::SetTextUtf32 (const unsigned int* text, size_t length)
 
   impl->text_utf32_need_update = false;  
   impl->text_utf8_need_update  = true;
+  impl->length                 = length;
 
   impl->OnTextChanged ();
 
@@ -258,8 +259,8 @@ const char* TextLine::TextUtf8 () const
       {      
         if (impl->text_utf32.size () != 0)
         {
-          impl->text_utf8.fast_resize (impl->length);          
-          
+          impl->text_utf8.fast_resize (impl->length * 4);          
+
           const void* source           = impl->text_utf32.data ();
           size_t      source_size      = (impl->text_utf32.size () - 1) * sizeof (unsigned int);
           void*       destination      = &impl->text_utf8 [0];
@@ -305,7 +306,7 @@ const unsigned int* TextLine::TextUtf32 () const
       {      
         if (!impl->text_utf8.empty ())
         {
-          impl->text_utf32.resize (impl->length + 1, false);
+          impl->text_utf32.resize (impl->text_utf8.size () + 1, false);
 
           const void* source           = impl->text_utf8.c_str ();
           size_t      source_size      = impl->text_utf8.size ();
@@ -318,10 +319,14 @@ const unsigned int* TextLine::TextUtf32 () const
             throw xtl::format_operation_exception ("", "Internal error: buffer not enough (source_size=%u, destination_size=%u)", source_size, destination_size);
 
           memset (destination, 0, sizeof (unsigned int));
+
+          impl->length = (unsigned int*)destination - impl->text_utf32.data ();                    
         }
         else        
         {
           impl->text_utf32.resize (1, false);
+
+          impl->length = 0;
 
           memset (impl->text_utf32.data (), 0, sizeof (unsigned int));
         }
@@ -332,6 +337,7 @@ const unsigned int* TextLine::TextUtf32 () const
       }
 
       impl->text_utf32_hash        = impl->text_utf32.size () == 0 ? ~0u : common::crc32 (impl->text_utf32.data (), (impl->text_utf32.size () - 1) * sizeof (unsigned int));
+
       impl->text_utf32_need_update = false;
     }
     catch (xtl::exception& e)
@@ -346,6 +352,9 @@ const unsigned int* TextLine::TextUtf32 () const
 
 size_t TextLine::TextLength  () const
 {
+  if (impl->text_utf32_need_update)
+    TextUtf32 (); //обновление длины
+
   return impl->length;
 }
 
