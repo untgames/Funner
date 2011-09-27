@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding = "windows-1251"?>
+<?xml version="1.0" encoding = "utf-8"?>
 <RootNode Name="Root Node Name" Property1="Property1">
   <ChildLevelOne>
     <Array>0 1 2 3 4 5</Array>   

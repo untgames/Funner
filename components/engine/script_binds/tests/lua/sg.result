@@ -214,17 +214,14 @@ Entities count = 1
 Entities count = 1
 TextLine test
 Text = 
-TextUnicode = 
 Font = 
 Color = 1 1 1 1
 Horizontal aligment = Left/Top vertical aligment = Left/Top
 Text = text
-TextUnicode = text
 Font = font
 Color = 0.1 0.2 0.3 0.4
 Horizontal aligment = Center vertical aligment = Right/Bottom
 Text = Non-unicode text
-TextUnicode = Non-unicode text
 Color = 0.4 0.3 0.2 0.1
 Color = 0.1 0.2 0.3 0.1
 Horizontal aligment = Right/Bottom vertical aligment = Center
