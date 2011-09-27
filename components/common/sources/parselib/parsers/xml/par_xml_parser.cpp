@@ -118,7 +118,7 @@ class XmlParser
       size_t text_offset = 0;
 
       encoding = DetectEncoding ((unsigned char*)buffer, buffer_size, text_offset);
-
+      
       if (encoding != XmlEncoding_Unknown && encoding != XmlEncoding_UTF8)
       {
         const char* source_encoding;
@@ -139,11 +139,11 @@ class XmlParser
             break;
           default:
             throw xtl::format_operation_exception (METHOD_NAME, "Unknown encoding %d", encoding);
-        }
+        }        
+        
+        Warning (0, "non utf-8 encoding %s used (this decreases parsing perfomance)", source_encoding);
 
-        utf8_buffer.resize (buffer_size + 4 - text_offset, false);
-
-        memset (utf8_buffer.data (), 0, utf8_buffer.size ());
+        utf8_buffer.resize (buffer_size + sizeof (unsigned char) - text_offset, false);
 
         StringConverter string_converter (source_encoding, "UTF-8");
 
@@ -154,8 +154,11 @@ class XmlParser
 
         string_converter.Convert (source_buffer, source_buffer_size, destination_buffer, destination_buffer_size);
 
-        if (source_buffer_size)
-          throw xtl::format_operation_exception (METHOD_NAME, "Can't convert buffer from '%s' to UTF-8\n", source_encoding);
+        if (source_buffer_size || destination_buffer_size < sizeof (unsigned char))
+          throw xtl::format_operation_exception (METHOD_NAME, "Can't convert buffer from '%s' to UTF-8 (source_buffer_size=%u, destination_buffer_size=%u)\n", source_encoding,
+            source_buffer_size, destination_buffer_size);
+          
+        *(char*)destination_buffer = '\0';
 
         buffer = utf8_buffer.data ();
       }
@@ -182,11 +185,11 @@ class XmlParser
 ///Рестарт парсинга документа с конвертирование буфера в utf-8
     void ResetLexer (const char* encoding)
     {
+      Warning (0, "non utf-8 encoding %s used (this decreases parsing perfomance)", encoding);
+      
       size_t buffer_length = xtl::xstrlen (buffer);      
 
-      utf8_buffer.resize (buffer_length * 4, false);
-
-      memset (utf8_buffer.data (), 0, utf8_buffer.size ());
+      utf8_buffer.resize (buffer_length * 4 + 1, false);      
 
       StringConverter string_converter (encoding, "UTF-8");
 
@@ -197,8 +200,11 @@ class XmlParser
 
       string_converter.Convert (source_buffer, source_buffer_size, destination_buffer, destination_buffer_size);
 
-      if (source_buffer_size)
-        throw xtl::format_operation_exception ("common::XmlParser::RestartParsing", "Can't convert buffer from '%s' to UTF-8\n", encoding);
+      if (source_buffer_size || destination_buffer_size < sizeof (unsigned char))
+        throw xtl::format_operation_exception ("common::XmlParser::RestartParsing", "Can't convert buffer from '%s' to UTF-8 (source_buffer_size=%u, destination_buffer_size=%u)\n", encoding,
+          source_buffer_size, destination_buffer_size);
+          
+      *(char*)destination_buffer = '\0';
 
       buffer = utf8_buffer.data ();
 

@@ -34,6 +34,7 @@ root (source='', line=0): {}
   New (source='data/test1.xml', line=57): {}
    Tag (source='data/test1.xml', line=58): {}
     #text (source='data/test1.xml', line=58): {text}
+data/test1.xml(0): warning: non utf-8 encoding windows-1251 used (this decreases parsing perfomance)
 root (source='', line=0): {}
  Uncorrect_tag_property_name (source='data/error_test1.xml', line=4): {}
   Tag (source='data/error_test1.xml', line=6): {}
@@ -44,6 +45,7 @@ root (source='', line=0): {}
  MUST (source='data/error_test1.xml', line=42): {}
  Unclosed (source='data/error_test1.xml', line=44): {}
   No_name_tag (source='data/error_test1.xml', line=46): {}
+data/error_test1.xml(0): warning: non utf-8 encoding windows-1251 used (this decreases parsing perfomance)
 data/error_test1.xml(6): error: syntax error. Unexpected token '1property'
 data/error_test1.xml(11): error: There is no support of DTD in this version of parser
 data/error_test1.xml(11): error: syntax error. Unexpected '['. Tag expected
@@ -90,6 +92,7 @@ root (source='', line=0): {}
     WindowRenderer (source='data/error_test2.xml', line=5): {}
      RendererName (source='data/error_test2.xml', line=5): {MyRenderer}
    #text (source='data/error_test2.xml', line=7): {/>}
+data/error_test2.xml(0): warning: non utf-8 encoding windows-1251 used (this decreases parsing perfomance)
 data/error_test2.xml(8): error: syntax error. Closing tag 'Configuration' without opening. Expected 'WindowManager'.
 data/error_test2.xml(9): error: unexpected EOF (unclosed tag 'WindowManager')
 data/error_test2.xml(9): error: unexpected EOF (unclosed tag 'Configuration')
@@ -110,6 +113,7 @@ root (source='', line=0): {}
  Configuration (source='data/error_test3.xml', line=2): {}
   Attribute (source='data/error_test3.xml', line=2): {correct_attribute_data]]>}
   #text (source='data/error_test3.xml', line=3): {}
+data/error_test3.xml(0): warning: non utf-8 encoding windows-1251 used (this decreases parsing perfomance)
 data/error_test3.xml(3): error: wrong character on line ']' (at position 22)
 root (source='', line=0): {}
  NAME (source='data/test-utf8.xml', line=2): {}
@@ -183,6 +187,7 @@ root (source='', line=0): {}
   New (source='data/test-cp1251.xml', line=41): {}
    Tag (source='data/test-cp1251.xml', line=42): {}
     #text (source='data/test-cp1251.xml', line=42): {text}
+data/test-cp1251.xml(0): warning: non utf-8 encoding Cp1251 used (this decreases parsing perfomance)
 root (source='', line=0): {}
  NAME (source='data/test-utf16.xml', line=2): {}
   NAME (source='data/test-utf16.xml', line=2): {First WM}
@@ -219,6 +224,7 @@ root (source='', line=0): {}
   New (source='data/test-utf16.xml', line=41): {}
    Tag (source='data/test-utf16.xml', line=42): {}
     #text (source='data/test-utf16.xml', line=42): {text}
+data/test-utf16.xml(0): warning: non utf-8 encoding UTF-16LE used (this decreases parsing perfomance)
 root (source='', line=0): {}
  NAME (source='data/test-utf16be.xml', line=2): {}
   NAME (source='data/test-utf16be.xml', line=2): {First WM}
@@ -255,6 +261,7 @@ root (source='', line=0): {}
   New (source='data/test-utf16be.xml', line=41): {}
    Tag (source='data/test-utf16be.xml', line=42): {}
     #text (source='data/test-utf16be.xml', line=42): {text}
+data/test-utf16be.xml(0): warning: non utf-8 encoding UTF-16BE used (this decreases parsing perfomance)
 root (source='', line=0): {}
  NAME (source='data/test-utf16le.xml', line=2): {}
   NAME (source='data/test-utf16le.xml', line=2): {First WM}
@@ -291,6 +298,7 @@ root (source='', line=0): {}
   New (source='data/test-utf16le.xml', line=41): {}
    Tag (source='data/test-utf16le.xml', line=42): {}
     #text (source='data/test-utf16le.xml', line=42): {text}
+data/test-utf16le.xml(0): warning: non utf-8 encoding UTF-16LE used (this decreases parsing perfomance)
 root (source='', line=0): {}
  NAME (source='data/test-utf32.xml', line=2): {}
   NAME (source='data/test-utf32.xml', line=2): {First WM}
@@ -327,6 +335,7 @@ root (source='', line=0): {}
   New (source='data/test-utf32.xml', line=41): {}
    Tag (source='data/test-utf32.xml', line=42): {}
     #text (source='data/test-utf32.xml', line=42): {text}
+data/test-utf32.xml(0): warning: non utf-8 encoding UCS-4BE used (this decreases parsing perfomance)
 root (source='', line=0): {}
  NAME (source='data/test-utf32be.xml', line=2): {}
   NAME (source='data/test-utf32be.xml', line=2): {First WM}
@@ -363,6 +372,7 @@ root (source='', line=0): {}
   New (source='data/test-utf32be.xml', line=41): {}
    Tag (source='data/test-utf32be.xml', line=42): {}
     #text (source='data/test-utf32be.xml', line=42): {text}
+data/test-utf32be.xml(0): warning: non utf-8 encoding UCS-4BE used (this decreases parsing perfomance)
 root (source='', line=0): {}
  NAME (source='data/test-utf32le.xml', line=2): {}
   NAME (source='data/test-utf32le.xml', line=2): {First WM}
@@ -399,3 +409,4 @@ root (source='', line=0): {}
   New (source='data/test-utf32le.xml', line=41): {}
    Tag (source='data/test-utf32le.xml', line=42): {}
     #text (source='data/test-utf32le.xml', line=42): {text}
+data/test-utf32le.xml(0): warning: non utf-8 encoding UCS-4LE used (this decreases parsing perfomance)
