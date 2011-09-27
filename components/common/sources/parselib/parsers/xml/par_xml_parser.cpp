@@ -20,12 +20,12 @@ enum XmlEncoding
 
 struct PrologDesc
 {
-  const char* prolog;
-  size_t      length;
+  const unsigned char* prolog;
+  size_t              length;
 
   template <size_t Length>
-  PrologDesc (const char (& in_prolog) [Length])
-    : prolog ((const char*)&in_prolog)
+  PrologDesc (const unsigned char (& in_prolog) [Length])
+    : prolog ((const unsigned char*)&in_prolog)
     , length (Length)
     {}
 };
@@ -70,26 +70,26 @@ class XmlParser
 ///Автоматическое определение возможности разбора парсером
     static bool Check (size_t buffer_size, const char* buffer)
     {
-      static const char PROLOG_UCS4BE []      = { 0x00, 0x00, 0x00, 0x3c, 0x00, 0x00, 0x00, 0x3f, 0x00, 0x00, 0x00, 0x78, 0x00, 0x00, 0x00, 0x6d, 0x00, 0x00, 0x00, 0x6c };
-      static const char PROLOG_UCS4LE []      = { 0x3c, 0x00, 0x00, 0x00, 0x3f, 0x00, 0x00, 0x00, 0x78, 0x00, 0x00, 0x00, 0x6d, 0x00, 0x00, 0x00, 0x6c, 0x00, 0x00, 0x00 };
-      static const char PROLOG_UTF8 []        = { 0x3c, 0x3f, 0x78, 0x6d, 0x6c };
-      static const char PROLOG_UTF16LE []     = { 0x3c, 0x00, 0x3f, 0x00, 0x78, 0x00, 0x6d, 0x00, 0x6c, 0x00 };
-      static const char PROLOG_UTF16BE []     = { 0x00, 0x3c, 0x00, 0x3f, 0x00, 0x78, 0x00, 0x6d, 0x00, 0x6c };
-      static const char PROLOG_UTF8_BOM []    = { 0xef, 0xbb, 0xbf, 0x3c, 0x3f, 0x78, 0x6d, 0x6c };
-      static const char PROLOG_UTF16BE_BOM [] = { 0xfe, 0xff, 0x00, 0x3c, 0x00, 0x3f, 0x00, 0x78, 0x00, 0x6d, 0x00, 0x6c };
-      static const char PROLOG_UTF16LE_BOM [] = { 0xff, 0xfe, 0x3c, 0x00, 0x3f, 0x00, 0x78, 0x00, 0x6d, 0x00, 0x6c, 0x00 };
-      static const char PROLOG_UCS4BE_BOM []  = { 0x00, 0x00, 0xfe, 0xff, 0x00, 0x00, 0x00, 0x3c, 0x00, 0x00, 0x00, 0x3f, 0x00, 0x00, 0x00, 0x78, 0x00, 0x00, 0x00, 0x6d, 0x00, 0x00, 0x00, 0x6c };
-      static const char PROLOG_UCS4LE_BOM []  = { 0x00, 0x00, 0xff, 0xfe, 0x3c, 0x00, 0x00, 0x00, 0x3f, 0x00, 0x00, 0x00, 0x78, 0x00, 0x00, 0x00, 0x6d, 0x00, 0x00, 0x00, 0x6c, 0x00, 0x00, 0x00 };
+      static const unsigned char PROLOG_UCS4BE []      = { 0x00, 0x00, 0x00, 0x3c, 0x00, 0x00, 0x00, 0x3f, 0x00, 0x00, 0x00, 0x78, 0x00, 0x00, 0x00, 0x6d, 0x00, 0x00, 0x00, 0x6c };
+      static const unsigned char PROLOG_UCS4LE []      = { 0x3c, 0x00, 0x00, 0x00, 0x3f, 0x00, 0x00, 0x00, 0x78, 0x00, 0x00, 0x00, 0x6d, 0x00, 0x00, 0x00, 0x6c, 0x00, 0x00, 0x00 };
+      static const unsigned char PROLOG_UTF8 []        = { 0x3c, 0x3f, 0x78, 0x6d, 0x6c };
+      static const unsigned char PROLOG_UTF16LE []     = { 0x3c, 0x00, 0x3f, 0x00, 0x78, 0x00, 0x6d, 0x00, 0x6c, 0x00 };
+      static const unsigned char PROLOG_UTF16BE []     = { 0x00, 0x3c, 0x00, 0x3f, 0x00, 0x78, 0x00, 0x6d, 0x00, 0x6c };
+      static const unsigned char PROLOG_UTF8_BOM []    = { 0xef, 0xbb, 0xbf, 0x3c, 0x3f, 0x78, 0x6d, 0x6c };
+      static const unsigned char PROLOG_UTF16BE_BOM [] = { 0xfe, 0xff, 0x00, 0x3c, 0x00, 0x3f, 0x00, 0x78, 0x00, 0x6d, 0x00, 0x6c };
+      static const unsigned char PROLOG_UTF16LE_BOM [] = { 0xff, 0xfe, 0x3c, 0x00, 0x3f, 0x00, 0x78, 0x00, 0x6d, 0x00, 0x6c, 0x00 };
+      static const unsigned char PROLOG_UCS4BE_BOM []  = { 0x00, 0x00, 0xfe, 0xff, 0x00, 0x00, 0x00, 0x3c, 0x00, 0x00, 0x00, 0x3f, 0x00, 0x00, 0x00, 0x78, 0x00, 0x00, 0x00, 0x6d, 0x00, 0x00, 0x00, 0x6c };
+      static const unsigned char PROLOG_UCS4LE_BOM []  = { 0x00, 0x00, 0xff, 0xfe, 0x3c, 0x00, 0x00, 0x00, 0x3f, 0x00, 0x00, 0x00, 0x78, 0x00, 0x00, 0x00, 0x6d, 0x00, 0x00, 0x00, 0x6c, 0x00, 0x00, 0x00 };
 
       static const PrologDesc PROLOGS [] = { PROLOG_UCS4BE, PROLOG_UCS4LE, PROLOG_UTF8, PROLOG_UTF16LE,
                                              PROLOG_UTF16BE, PROLOG_UTF8_BOM, PROLOG_UTF16BE_BOM,
-                                             PROLOG_UTF16LE_BOM, PROLOG_UCS4BE_BOM, PROLOG_UCS4LE_BOM};
+                                             PROLOG_UTF16LE_BOM, PROLOG_UCS4BE_BOM, PROLOG_UCS4LE_BOM};                                             
 
       for (size_t i = 0, count = sizeof (PROLOGS) / sizeof (*PROLOGS); i < count; i++)
       {
         const PrologDesc& prolog = PROLOGS [i];
 
-        if (prolog.length < buffer_size)
+        if (prolog.length > buffer_size)
           continue;
 
         if (!memcmp (buffer, prolog.prolog, prolog.length))
@@ -119,8 +119,6 @@ class XmlParser
 
       encoding = DetectEncoding ((unsigned char*)buffer, buffer_size, text_offset);
 
-      xtl::uninitialized_storage<char> utf8_buffer;
-
       if (encoding != XmlEncoding_Unknown && encoding != XmlEncoding_UTF8)
       {
         const char* source_encoding;
@@ -143,7 +141,7 @@ class XmlParser
             throw xtl::format_operation_exception (METHOD_NAME, "Unknown encoding %d", encoding);
         }
 
-        utf8_buffer.resize (buffer_size + 4 - text_offset);
+        utf8_buffer.resize (buffer_size + 4 - text_offset, false);
 
         memset (utf8_buffer.data (), 0, utf8_buffer.size ());
 
@@ -184,9 +182,9 @@ class XmlParser
 ///Рестарт парсинга документа с конвертирование буфера в utf-8
     void ResetLexer (const char* encoding)
     {
-      size_t buffer_length = xtl::xstrlen (buffer);
+      size_t buffer_length = xtl::xstrlen (buffer);      
 
-      xtl::uninitialized_storage<char> utf8_buffer (buffer_length * 4);
+      utf8_buffer.resize (buffer_length * 4, false);
 
       memset (utf8_buffer.data (), 0, utf8_buffer.size ());
 
@@ -953,14 +951,15 @@ class XmlParser
     typedef stl::vector<const char*> AttributeCache;
 
   private:
-    ParseTreeBuilder& builder;          //построитель дерева грамматического разбора
-    ParseLog&         log;              //протокол грамматического разбора
-    XmlLexer          lexer;            //лексический анализатор
-    XmlEncoding       encoding;         //кодировка разбираемого буфера
-    char*             buffer;           //разбираемый буфер
-    const char*       name;             //имя разбираемого буфера
-    AttributeCache    attributes;       //кеш атрибутов
-    size_t            attributes_count; //количество атрибутов в кеше
+    ParseTreeBuilder&                builder;          //построитель дерева грамматического разбора
+    ParseLog&                        log;              //протокол грамматического разбора
+    XmlLexer                         lexer;            //лексический анализатор
+    XmlEncoding                      encoding;         //кодировка разбираемого буфера
+    char*                            buffer;           //разбираемый буфер
+    const char*                      name;             //имя разбираемого буфера
+    AttributeCache                   attributes;       //кеш атрибутов
+    size_t                           attributes_count; //количество атрибутов в кеше
+    xtl::uninitialized_storage<char> utf8_buffer;      //буфер после конвертации в UTF-8
 };
 
 /*

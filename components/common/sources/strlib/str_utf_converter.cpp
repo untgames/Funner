@@ -320,12 +320,12 @@ bool decoder<Encoding_UTF32LE> (const void*& src_char, size_t& src_size, void*& 
   const size_t* src_ptr = (const size_t*) src_char;
   size_t* dst_ptr = (size_t*) dst_char;
 
-  if (src_size < sizeof(size_t))
+  if (src_size < sizeof(unsigned int))
     return false;
 
   *dst_ptr = *src_ptr;
   src_ptr++;
-  src_size -= sizeof(size_t);
+  src_size -= sizeof(unsigned int);
 
   src_char = src_ptr;
   return true;
@@ -337,7 +337,7 @@ bool decoder<Encoding_UTF32BE> (const void*& src_char, size_t& src_size, void*& 
   const size_t* src_ptr = (const size_t*) src_char;
   size_t* dst_ptr = (size_t*) dst_char;
 
-  if (src_size < sizeof(size_t))
+  if (src_size < sizeof(unsigned int))
     return false;
 
   *dst_ptr = ((*src_ptr & 0xFF) << 24) +
@@ -346,7 +346,7 @@ bool decoder<Encoding_UTF32BE> (const void*& src_char, size_t& src_size, void*& 
              ((*src_ptr & 0xFF000000) >> 24);
 
   src_ptr++;
-  src_size -= sizeof(size_t);
+  src_size -= sizeof(unsigned int);
 
   src_char = src_ptr;
   return true;
@@ -516,13 +516,13 @@ bool encoder<Encoding_UTF32LE> (const void*& src_char, size_t& src_size, void*& 
   const size_t* src_ptr = (const size_t*) src_char;
   size_t* dst_ptr = (size_t*) dst_char;
 
-  if (dst_size < sizeof(size_t))
+  if (dst_size < sizeof(unsigned int))
     return false;
 
   *dst_ptr = *src_ptr;
 
   dst_ptr++;
-  dst_size -= sizeof(size_t);
+  dst_size -= sizeof(unsigned int);
 
   dst_char = dst_ptr;
   return true;
@@ -534,7 +534,7 @@ bool encoder<Encoding_UTF32BE> (const void*& src_char, size_t& src_size, void*& 
   const size_t* src_ptr = (const size_t*) src_char;
   size_t* dst_ptr = (size_t*) dst_char;
 
-  if (dst_size < sizeof(size_t))
+  if (dst_size < sizeof(unsigned int))
     return false;
 
   *dst_ptr = ((*src_ptr & 0xFF) << 24) +
@@ -543,7 +543,7 @@ bool encoder<Encoding_UTF32BE> (const void*& src_char, size_t& src_size, void*& 
              ((*src_ptr & 0xFF000000) >> 24);
 
   dst_ptr++;
-  dst_size -= sizeof(size_t);
+  dst_size -= sizeof(unsigned int);
 
   dst_char = dst_ptr;
   return true;
