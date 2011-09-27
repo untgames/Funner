@@ -22,7 +22,7 @@ export.link.engine.launcher_shared.IMPORTS := link.common.default_console_handle
                                 link.engine.subsystems.input_manager link.engine.subsystems.shell \
                                 link.engine.subsystems.log link.engine.subsystems.file_system \
                                 link.engine.subsystems.resource_system \
-                                link.media.video.theora link.network
+                                link.media.video.theora link.network link.common.iconv
 
 export.link.engine.launcher.IMPORTS := link.engine.launcher_shared
 export.link.engine.launcher.LINK_INCLUDES := FunnerInit FunnerMain
