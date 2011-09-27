@@ -716,8 +716,14 @@ class XmlParser
                         case XmlEncoding_UTF8:
                         case XmlEncoding_Unknown:
                           encoding = XmlEncoding_FromPI;
-                          ResetLexer (value);
-                          return true;
+
+                          if (xtl::xstrcmp (value, "utf-8")) //не нужно конвертировать из utf8 в utf8
+                          {
+                            ResetLexer (value);
+                            return true;
+                          }
+                          else
+                            return false;
                         case XmlEncoding_UCS4BE:
                           if (xtl::xstrcmp (value, "utf-32be") && xtl::xstrcmp (value, "utf-32"))
                             Error (line, "File encoding is utf-32be but declaration encoding is '%s'", value);
