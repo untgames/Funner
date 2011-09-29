@@ -13,6 +13,7 @@
 #include <xtl/signal.h>
 
 #include <common/component.h>
+#include <common/heap.h>
 #include <common/log.h>
 
 #include <render/debug_render.h>

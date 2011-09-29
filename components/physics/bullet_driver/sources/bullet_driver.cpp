@@ -182,6 +182,21 @@ Shape* Driver::CreateCompoundShape (size_t shapes_count, IShape** shapes, Transf
   return new Shape (compound_shape);
 }
 
+namespace
+{
+
+void* bullet_allocate (size_t size, int alignment)
+{
+  return MemoryManager::Allocate (size, alignment);
+}
+
+void bullet_deallocate (void* memblock)
+{
+  return MemoryManager::Deallocate (memblock);
+}
+
+}
+
 /*
     Компонент драйвера
 */
@@ -197,6 +212,8 @@ class BulletDriverComponent
   public:
     BulletDriverComponent ()
     {
+//      btAlignedAllocSetCustomAligned (&bullet_allocate, &bullet_deallocate);
+
       DriverManager::RegisterDriver (DRIVER_NAME, xtl::com_ptr<Driver> (new Driver, false).get ());
     }
 };

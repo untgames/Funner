@@ -224,6 +224,7 @@ class MemoryManager
 ///Врапперы для упрощения выделения памяти из основного менеджера
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     static void* Allocate   (size_t size);
+    static void* Allocate   (size_t size, size_t align, size_t offset = 0);
     static void  Deallocate (void* p);
 };
 
