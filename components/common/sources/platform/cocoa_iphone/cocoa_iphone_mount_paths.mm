@@ -57,7 +57,7 @@ void CocoaIPhonePlatform::MountSystemSpecificPaths ()
 
   NSArray* paths;
 
-  paths = NSSearchPathForDirectoriesInDomains (NSDocumentDirectory, NSUserDomainMask, YES);
+  paths = NSSearchPathForDirectoriesInDomains (NSLibraryDirectory, NSUserDomainMask, YES);
   
   NSFileManager* file_manager = [NSFileManager defaultManager];
 
@@ -92,8 +92,7 @@ void CocoaIPhonePlatform::MountSystemSpecificPaths ()
   NSString* cocoa_temp_path = NSTemporaryDirectory ();
 
   if (check_dir (file_manager, cocoa_temp_path, true))
-  {  
-    stl::string temp_path = common::format ("/std/%s", [cocoa_temp_path cStringUsingEncoding:NSUTF8StringEncoding]);
+  {    stl::string temp_path = common::format ("/std/%s", [cocoa_temp_path cStringUsingEncoding:NSUTF8StringEncoding]);
 
     FileSystem::Mount ("/system/temp", temp_path.c_str ());
   }
