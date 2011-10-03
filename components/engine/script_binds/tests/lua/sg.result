@@ -126,18 +126,18 @@ IsInfiniteBounds = true
 WireColor = 0 0 0
 WireColor = 1 0 0
 WireColor = 0 0 1
-local bb minimum = -1e+08 -1e+08 -1e+08
-local bb maximum = 1e+08 1e+08 1e+08
-world bb minimum = -1e+08 -1e+08 -1e+08
-world bb maximum = 1e+08 1e+08 1e+08
-children bb minimum = -1e+08 -1e+08 -1e+08
-children bb maximum = 1e+08 1e+08 1e+08
-full bb minimum = -1e+08 -1e+08 -1e+08
-full bb maximum = 1e+08 1e+08 1e+08
-world children bb minimum = -1e+08 -1e+08 -1e+08
-world children bb maximum = 1e+08 1e+08 1e+08
-world full bb minimum = -1e+08 -1e+08 -1e+08
-world full bb maximum = 1e+08 1e+08 1e+08
+local bb minimum = -1e+008 -1e+008 -1e+008
+local bb maximum = 1e+008 1e+008 1e+008
+world bb minimum = -1e+008 -1e+008 -1e+008
+world bb maximum = 1e+008 1e+008 1e+008
+children bb minimum = -1e+008 -1e+008 -1e+008
+children bb maximum = 1e+008 1e+008 1e+008
+full bb minimum = -1e+008 -1e+008 -1e+008
+full bb maximum = 1e+008 1e+008 1e+008
+world children bb minimum = -1e+008 -1e+008 -1e+008
+world children bb maximum = 1e+008 1e+008 1e+008
+world full bb minimum = -1e+008 -1e+008 -1e+008
+world full bb maximum = 1e+008 1e+008 1e+008
 Intersections test
 entity1 has 2 intersections:
   entity2

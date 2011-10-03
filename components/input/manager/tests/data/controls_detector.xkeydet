@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding = "windows-1251"?>
+<?xml version="1.0" encoding = "utf-8"?>
 <ControlsDetector>
   <Filter Action="Action1" InputEventMask="* axis *" Replacement="action1 {2}"/>
   <Filter Action="Action1" InputEventMask="* down"   Replacement="action1 1"/>

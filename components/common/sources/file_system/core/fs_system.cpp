@@ -1225,7 +1225,7 @@ void FileSystem::GetFileHash (const char* file_name,size_t max_hash_size,FileHas
   {
     InputFile file (file_name);
 
-    InternalGetFileHash (file,~0u,hash);
+    InternalGetFileHash (file, max_hash_size, hash);
   }
   catch (xtl::exception& exception)
   {

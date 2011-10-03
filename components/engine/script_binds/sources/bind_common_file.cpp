@@ -141,6 +141,36 @@ AsyncResult async_load_string (const char* file_name, xtl::function<void (const 
   return async_invoke<stl::string> (xtl::bind (&load_file, stl::string (file_name)), ActionThread_Current, AsyncLoadCallback (callback));
 }
 
+stl::string file_hash_string (const FileHash& file_hash)
+{
+  stl::string return_value;
+
+  return_value.reserve (sizeof (file_hash.md5) * 2);
+
+  for (size_t i = 0; i < sizeof (file_hash.md5); i++)
+    return_value.append (common::format ("%02x", file_hash.md5 [i]));
+
+  return return_value;
+}
+
+stl::string file_hash (const char* file_name, size_t max_hash_size)
+{
+  FileHash file_hash;
+
+  FileSystem::GetFileHash (file_name, max_hash_size, file_hash);
+
+  return file_hash_string (file_hash);
+}
+
+stl::string file_hash (const char* file_name)
+{
+  FileHash file_hash;
+
+  FileSystem::GetFileHash (file_name, file_hash);
+
+  return file_hash_string (file_hash);
+}
+
 }
 
 namespace engine
@@ -151,6 +181,8 @@ void bind_common_file_library (Environment& environment)
   InvokerRegistry lib = environment.CreateLibrary (COMMON_FILE_LIBRARY);
 
   lib.Register ("AddSearchPath",       make_invoker (&add_search_path));
+  lib.Register ("FileHash",            make_invoker (make_invoker (xtl::implicit_cast<stl::string (*) (const char*, size_t)> (&file_hash)),
+                                                     make_invoker (xtl::implicit_cast<stl::string (*) (const char*)> (&file_hash))));
   lib.Register ("LoadString",          make_invoker (implicit_cast<stl::string (*)(const char*)> (&FileSystem::LoadTextFile)));
   lib.Register ("LoadStringFilterOut", make_invoker (&load_string_filter_out));
   lib.Register ("PostString",          make_invoker (&post_string));

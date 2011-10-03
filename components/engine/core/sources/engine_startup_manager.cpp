@@ -9,8 +9,9 @@ namespace
     Константы
 */
 
-const char* LOG_PREFIX               = "engine";               //имя потока протоколирования
-const char* REGISTRY_COMPONENTS_MASK = "engine.subsystems.*";  //маска имени автоматически загружаемых компонентов
+const char* LOG_NAME                 = "engine.startup_manager"; //имя потока протоколирования
+const char* LOG_PREFIX               = "engine";                 //префикс имени потока протоколирования
+const char* REGISTRY_COMPONENTS_MASK = "engine.subsystems.*";    //маска имени автоматически загружаемых компонентов
 
 }
 
@@ -80,7 +81,7 @@ struct StartupManagerImpl::Impl
       common::Log log (common::format ("%s.%s", LOG_PREFIX, manager.Name ()).c_str ());      
       
       common::StringArray masks = common::split (subsystems_name_mask);
-      
+
       for (common::ParseNode iter=node.First (); iter; iter=iter.Next ())
       {
         const char* node_name = iter.Name ();
@@ -164,7 +165,8 @@ struct StartupManagerImpl::Impl
           return;
 
         common::Parser parser (file_name);
-        common::Log log (LOG_PREFIX);
+
+        common::Log log (LOG_NAME);
 
         parser.Log ().Print (xtl::bind (&common::Log::Print, &log, _1));
 

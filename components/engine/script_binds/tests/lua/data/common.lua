@@ -21,6 +21,10 @@ function test_files()
   else
     print ("File '" .. NOT_EXISTING_FILE .. "' not exist")
   end
+  
+  print ("File hash = " .. Common.File.FileHash ("data/text_file.txt"))
+  print ("File part hash = " .. Common.File.FileHash ("data/text_file.txt", 4))
+  print ("File full part hash = " .. Common.File.FileHash ("data/text_file.txt", 1024))
 end
 
 function test_post()
