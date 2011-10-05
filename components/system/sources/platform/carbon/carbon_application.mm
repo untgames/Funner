@@ -16,27 +16,22 @@ const UInt32 APPLICATION_LOOP_START_EVENT = 'alse';      //событие входа в цикл 
 
 OSStatus application_event_handler_func (EventHandlerCallRef event_handler_call_ref, EventRef event, void* application_delegate);
 
-class CarbonApplicationDelegate: public IApplicationDelegate, public xtl::reference_counter
+class CarbonApplicationDelegate: public IApplicationDelegate, public common::Lockable, public xtl::reference_counter
 {
   public:
 ///Конструктор
     CarbonApplicationDelegate ()
       : idle_enabled (false)
       , is_exited (false)
+      , event_loop_started (false)
       , listener (0)
       , main_thread_id (0)
-      , dummy_event (0)
       , application_event_handler (0)
       , application_event_handler_proc (0)
-    {
-      check_event_manager_error (CreateEvent (0, 0, 0, 0, kEventAttributeNone, &dummy_event), "::CreateEvent", "Can't create dummy event");
-    }
+      {}
 
     ~CarbonApplicationDelegate ()
     {
-      if (dummy_event)
-        ReleaseEvent (dummy_event);
-
       if (application_event_handler)
         RemoveEventHandler (application_event_handler);
 
@@ -93,6 +88,8 @@ class CarbonApplicationDelegate: public IApplicationDelegate, public xtl::refere
     //Старт главного цикла
     void OnApplicationEventLoopStarted ()
     {
+      common::Lock lock (*this);
+
       NSApplicationLoad ();
 
       NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
@@ -100,6 +97,8 @@ class CarbonApplicationDelegate: public IApplicationDelegate, public xtl::refere
       try
       {
         main_thread_id = Platform::GetCurrentThreadId ();
+
+        event_loop_started = true;
 
         if (listener)
           listener->OnInitialized ();
@@ -178,11 +177,24 @@ class CarbonApplicationDelegate: public IApplicationDelegate, public xtl::refere
 ///Установка необходимости вызова событий idle
     void SetIdleState (bool state)
     {
+      common::Lock lock (*this);
+
+      if (idle_enabled == state)
+        return;
+
       idle_enabled = state;
 
-      if (state && IsMessageQueueEmpty ())
-        check_event_manager_error (PostEventToQueue (GetCurrentEventQueue (), dummy_event, kEventPriorityStandard),
+      if (state && event_loop_started && IsMessageQueueEmpty ()) //Нельзя добавлять сообщения в очередь до старта главного цикла (иногда события блокируются)
+      {
+        EventRef dummy_event;
+
+        check_event_manager_error (CreateEvent (0, 0, 0, 0, kEventAttributeNone, &dummy_event), "::CreateEvent", "Can't create dummy event");
+
+        check_event_manager_error (PostEventToQueue (GetMainEventQueue (), dummy_event, kEventPriorityStandard),
                                    "::PostEventToQueue", "Can't post dummy event");
+
+        ReleaseEvent (dummy_event);
+      }
     }
 
 ///Установка слушателя событий приложения
@@ -209,7 +221,7 @@ class CarbonApplicationDelegate: public IApplicationDelegate, public xtl::refere
       if (is_exited)
         return true;
 
-      return GetNumEventsInQueue (GetCurrentEventQueue ()) == 0;
+      return GetNumEventsInQueue (GetMainEventQueue ()) == 0;
     }
 
 ///Ожидание события
@@ -239,9 +251,9 @@ class CarbonApplicationDelegate: public IApplicationDelegate, public xtl::refere
   private:
     bool                  idle_enabled;
     bool                  is_exited;
+    bool                  event_loop_started;
     IApplicationListener* listener;
     size_t                main_thread_id;
-    EventRef              dummy_event;                       //событие, посылаемое для пробуждения нити
     EventHandlerRef       application_event_handler;
     EventHandlerUPP       application_event_handler_proc;
 };
