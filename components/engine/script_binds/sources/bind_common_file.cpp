@@ -133,7 +133,7 @@ stl::string load_file (const stl::string& name)
   return FileSystem::LoadTextFile (name.c_str ());
 }
 
-AsyncResult async_load_string (const char* file_name, xtl::function<void (const stl::string&)>& callback)
+AsyncResult async_load_string (const char* file_name, xtl::function<void (const char*)>& callback)
 {
   if (!file_name)
     throw xtl::make_null_argument_exception ("engine::script_binds::async_load_string", "file_name");
