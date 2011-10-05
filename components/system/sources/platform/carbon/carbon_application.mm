@@ -16,7 +16,7 @@ const UInt32 APPLICATION_LOOP_START_EVENT = 'alse';      //событие входа в цикл 
 
 OSStatus application_event_handler_func (EventHandlerCallRef event_handler_call_ref, EventRef event, void* application_delegate);
 
-class CarbonApplicationDelegate: public IApplicationDelegate, public common::Lockable, public xtl::reference_counter
+class CarbonApplicationDelegate: public IApplicationDelegate, public xtl::reference_counter
 {
   public:
 ///Конструктор
@@ -88,8 +88,6 @@ class CarbonApplicationDelegate: public IApplicationDelegate, public common::Loc
     //Старт главного цикла
     void OnApplicationEventLoopStarted ()
     {
-      common::Lock lock (*this);
-
       NSApplicationLoad ();
 
       NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
@@ -177,8 +175,6 @@ class CarbonApplicationDelegate: public IApplicationDelegate, public common::Loc
 ///Установка необходимости вызова событий idle
     void SetIdleState (bool state)
     {
-      common::Lock lock (*this);
-
       if (idle_enabled == state)
         return;
 

@@ -5,7 +5,6 @@
 #include <xtl/reference_counter.h>
 
 #include <common/file.h>
-#include <common/lockable.h>
 #include <common/log.h>
 
 #include <shared/platform.h>
