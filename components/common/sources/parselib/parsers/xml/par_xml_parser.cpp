@@ -766,7 +766,7 @@ class XmlParser
             return false;
           default:
             ProcessLexError ();
-            break;
+            return false;
         }
 
         lexer.NextLexem ();
