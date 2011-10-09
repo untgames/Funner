@@ -80,9 +80,9 @@ template <class T> inline T tanh  (T x)        { return ::tanh  (x); }
 template <> inline float       abs (float  x)        { return fabsf (x); }
 template <> inline double      abs (double x)        { return fabs  (x); }
 template <> inline long double abs (long double x)   { return fabs (x); }
-template <> inline int         abs (int x)           { return ::abs ((long)x); }
-template <> inline short       abs (short x)         { return (short)::abs ((long)x); }
-template <> inline signed char abs (signed char x)   { return (signed char)::abs ((long)x); }
+template <> inline int         abs (int x)           { return ::abs (x); }
+template <> inline short       abs (short x)         { return (short)::abs ((int)x); }
+template <> inline signed char abs (signed char x)   { return (signed char)::abs ((int)x); }
 
 template <class T,class T1> inline T pow (T x,T1 y)  { return ::pow (x,y); }
 template <class T>          inline T pow (T x,int y) { return ipow  (x,y); }
