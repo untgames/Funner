@@ -17,7 +17,7 @@ COMPILER_GCC      := $(NCLIENT_GCC)/bin/nacl-gcc
 LINKER_GCC        := $(NCLIENT_GCC)/bin/nacl-g++
 LIB_GCC           := $(NCLIENT_GCC)/bin/nacl-ar
 COMMON_CPPFLAGS   += -fexceptions -frtti
-COMMON_CFLAGS     += -Wall -Wno-long-long -pthread -Werror -m32 -O2 -DNATIVE_CLIENT "-I$(NCLIENT_GCC)/nacl/include"
+COMMON_CFLAGS     += -Wall -Wno-long-long -pthread -m32 -O2 -DNATIVE_CLIENT "-I$(NCLIENT_GCC)/nacl/include"
 COMMON_LINK_FLAGS += -lppruntime -lppapi_cpp -lplatform -lgio -lpthread -lsrpc -m32 "-I$(NCLIENT_GCC)/nacl/lib"
 CYGWIN            := nodosfilewarning
 
