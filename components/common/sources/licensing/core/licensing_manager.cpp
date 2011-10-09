@@ -286,7 +286,7 @@ class LicenseManagerImpl
       tm_date.tm_year = atoi (date_string) - 1900;
 
 
-#if defined (ANDROID) || defined (__MINGW32__) || defined (WINCE)
+#if defined (ANDROID) || defined (__MINGW32__) || defined (WINCE) || defined (TABLETOS)
       time_t date = mktime (&tm_date);
 #elif defined (_MSC_VER)
       time_t date = _mkgmtime32 (&tm_date);
