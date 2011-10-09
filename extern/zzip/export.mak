@@ -7,6 +7,7 @@ export.compile.extern.zzip.mingw.COMPILER_DEFINES         := ZZIP_2_H
 export.compile.extern.zzip.bada.COMPILER_DEFINES          := ZZIP_3_H
 export.compile.extern.zzip.psp.COMPILER_DEFINES           := ZZIP_4_H
 export.compile.extern.zzip.native_client.COMPILER_DEFINES := ZZIP_1_H
+export.compile.extern.zzip.tabletos.COMPILER_DEFINES      := ZZIP_1_H
 export.compile.extern.zzip.alchemy.COMPILER_DEFINES       := ZZIP_1_H
 
 ifeq (,$(filter no_dll,$(PROFILES)))

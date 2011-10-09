@@ -49,6 +49,10 @@
 #  endif
 #endif
 
+#ifdef TABLETOS
+#  include "config-tabletos.h"
+#endif
+
 #if defined(macintosh) && defined(__MRC__)
 #  include "config-mac.h"
 #elif defined (__IPHONE__)
