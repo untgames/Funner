@@ -80,9 +80,33 @@ struct stat
 	time_t			st_ctime;
 };
 
+struct _stat
+{
+	_dev_t			st_dev;
+	_ino_t			st_ino;
+	unsigned short	st_mode;
+	short			st_nlink;
+	short			st_uid;
+	short			st_gid;
+	_dev_t			st_rdev;
+	_off_t			st_size;
+	time_t			st_atime;
+	time_t			st_mtime;
+	time_t			st_ctime;
+};
 
 int __cdecl stat(const char *filename, struct stat *buf);
+__inline int __cdecl _stat(const char *filename, struct _stat *buf)
+{
+  return stat(filename,(struct stat*)buf);
+} 
+
+
 int fstat(int file, struct stat *sbuf);
+__inline int _fstat(int file, struct _stat *sbuf)
+{
+  return fstat(file,(struct stat*)sbuf);
+}
 
 #ifdef __cplusplus
 }
