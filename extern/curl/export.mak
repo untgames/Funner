@@ -12,4 +12,4 @@ export.link.extern.curl.linux.LIBS       := rt
 export.link.extern.curl.linux.IMPORTS    := link.extern.zlib
 export.link.extern.curl.tabletos.LIBS    := socket
 export.link.extern.curl.tabletos.IMPORTS := link.extern.zlib
-
+export.link.extern.curl.wince.IMPORTS    := link.extern.wcecompat
