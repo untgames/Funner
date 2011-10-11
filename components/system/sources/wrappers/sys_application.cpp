@@ -417,3 +417,29 @@ stl::string Application::GetEnvironmentVariable (const char* name)
     throw;
   }  
 }
+
+void Application::SetScreenSaverState (bool state)
+{
+  try
+  {
+    return Platform::SetScreenSaverState (state);
+  }
+  catch (xtl::exception& exception)
+  {
+    exception.touch ("syslib::Application::SetScreenSaverState");
+    throw;
+  }  
+}
+
+bool Application::GetScreenSaverState ()
+{
+  try
+  {
+    return Platform::GetScreenSaverState ();
+  }
+  catch (xtl::exception& exception)
+  {
+    exception.touch ("syslib::Application::GetScreenSaverState");
+    throw;
+  }  
+}

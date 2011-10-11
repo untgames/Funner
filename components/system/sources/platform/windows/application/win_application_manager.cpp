@@ -157,6 +157,73 @@ class Win32ApplicationDelegate: public IApplicationDelegate, public xtl::referen
     DWORD                 main_thread_id;
 };
 
+static const UINT   SCREEN_SAVER_GET_LIST [] = {SPI_GETLOWPOWERTIMEOUT, SPI_GETPOWEROFFTIMEOUT, SPI_GETSCREENSAVETIMEOUT};
+static const UINT   SCREEN_SAVER_SET_LIST [] = {SPI_SETLOWPOWERTIMEOUT, SPI_SETPOWEROFFTIMEOUT, SPI_SETSCREENSAVETIMEOUT};
+static const size_t SCREEN_SAVER_LIST_SIZE   = sizeof (SCREEN_SAVER_GET_LIST) / sizeof (*SCREEN_SAVER_GET_LIST);
+
+///Данные приложения
+class ApplicationImpl
+{
+  public:  
+///Конструктор
+    ApplicationImpl ()
+      : screen_saver_state (true)
+    {
+      memset (&screen_saver_saved_state [0], 0, sizeof (screen_saver_saved_state));
+    }
+
+    ///Деструктор
+    ~ApplicationImpl ()
+    {
+      try
+      {
+        if (!screen_saver_state)
+          SetScreenSaverState (true);
+      }
+      catch (...)
+      {
+      }
+    }
+
+///Установка состояния скрин-сейвера
+    void SetScreenSaverState (bool state)
+    {
+      if (state == screen_saver_state)
+        return;
+        
+      if (state)
+      {      
+        for (int i=0; i<SCREEN_SAVER_LIST_SIZE; i++)
+        {
+          if (!SystemParametersInfo (SCREEN_SAVER_SET_LIST [i], 0, &screen_saver_saved_state [i], SPIF_SENDWININICHANGE))
+            throw xtl::format_operation_exception ("syslib::ApplicationImpl::SetScreenSaverState", "SystemParametersInfo failed for screen saver state change");          
+        }
+      }
+      else
+      {
+        for (int i=0; i<SCREEN_SAVER_LIST_SIZE; i++)
+        {
+          if (!SystemParametersInfo (SCREEN_SAVER_GET_LIST [i], 0, &screen_saver_saved_state [i], 0))
+            throw xtl::format_operation_exception ("syslib::ApplicationImpl::SetScreenSaverState", "SystemParametersInfo failed for get screen saver state");        
+            
+          if (!SystemParametersInfo (SCREEN_SAVER_SET_LIST [i], 0, 0, SPIF_SENDWININICHANGE))
+            throw xtl::format_operation_exception ("syslib::ApplicationImpl::SetScreenSaverState", "SystemParametersInfo failed for screen saver state change");        
+            
+        }      
+      }
+
+      screen_saver_state = state;
+    }
+    
+    bool GetScreenSaverState () { return screen_saver_state; }
+  
+  private:
+    bool screen_saver_state;                                //состояние скрин-сейвера
+    int  screen_saver_saved_state [SCREEN_SAVER_LIST_SIZE]; //сохраненное состояние скрин-сейвера    
+};
+
+typedef common::Singleton<ApplicationImpl> ApplicationSingleton;
+
 }
 
 /*
@@ -237,7 +304,6 @@ void WindowsApplicationManager::OpenUrl (const char* url)
   }
 }
 
-
 /*
     Получение значения переменной среды
 */
@@ -279,5 +345,23 @@ stl::string WindowsApplicationManager::GetEnvironmentVariable (const char* name)
   {
     e.touch ("syslib::WindowsApplicationManager::GetEnvironmentVariable");
     throw;
-  }  
+  }
+}
+
+void WindowsApplicationManager::SetScreenSaverState (bool state)
+{
+  try
+  {
+    ApplicationSingleton::Instance ()->SetScreenSaverState (state);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("syslib::WindowsApplicationManager::GetEnvironmentVariable");
+    throw;
+  }
+}
+
+bool WindowsApplicationManager::GetScreenSaverState ()
+{
+  return ApplicationSingleton::Instance ()->GetScreenSaverState ();
 }

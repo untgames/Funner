@@ -4,8 +4,8 @@
 #include <stl/auto_ptr.h>
 
 #include <xtl/dynamic_cast_root.h>
-#include <xtl/functional_fwd>
 #include <xtl/exception.h>
+#include <xtl/functional_fwd>
 
 #include <syslib/keydefs.h>
 

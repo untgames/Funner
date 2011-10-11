@@ -70,6 +70,14 @@ class Application
     typedef xtl::function<void ()> EventHandler;
 
     static xtl::connection RegisterEventHandler (ApplicationEvent event, const EventHandler& handler);
+    
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Управление энергосбережением
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    static void SetScreenSaverState (bool state);
+    static void EnableScreenSaver   () { SetScreenSaverState (true); }
+    static void DisableScreenSaver  () { SetScreenSaverState (false); }    
+    static bool GetScreenSaverState ();
 };
 
 }

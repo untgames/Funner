@@ -111,3 +111,17 @@ stl::string DefaultApplicationManager::GetEnvironmentVariable (const char* name)
 
   return result;
 }
+
+/*
+    Управление энергосбережением
+*/
+
+void DefaultApplicationManager::SetScreenSaverState (bool state)
+{
+  throw xtl::format_not_supported_exception ("syslib::DefaultApplicationManager::SetScreenSaverState", "No screen saver support for this platform");
+}
+
+bool DefaultApplicationManager::GetScreenSaverState ()
+{
+  return true;
+}
