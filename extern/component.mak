@@ -6,7 +6,7 @@ TARGETS := FUNNER_EXTERN_LIBS
 #Цель - external libraries
 FUNNER_EXTERN_LIBS.TYPE       := package
 FUNNER_EXTERN_LIBS.COMPONENTS := zlib zzip pcre jpeg tiff libpng devil ogg vorbis vorbisfile lua \
-                                 freetype libpsd bullet theora mongoose shiny libiconv
+                                 freetype libpsd theora shiny libiconv
 
 ifeq (,$(filter beagleboard,$(PROFILES))$(filter android,$(PROFILES))$(filter webos,$(PROFILES)))
   FUNNER_EXTERN_LIBS.COMPONENTS += curl
@@ -34,6 +34,8 @@ endif
 
 ifneq (,$(filter wince,$(PROFILES)))
   FUNNER_EXTERN_LIBS.COMPONENT_DIRS := wcecompat wince $(FUNNER_EXTERN_LIBS.COMPONENT_DIRS)
+else
+  FUNNER_EXTERN_LIBS.COMPONENT_DIRS += bullet mongoose
 endif
 
 ifeq (,$(filter has_iconv,$(PROFILES)))
