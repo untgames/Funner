@@ -1,0 +1,16 @@
+Results of rect_test:
+r1: x=0, y=0, width=0, height=0
+r2: x=1, y=2, width=3, height=4
+r1: x=5, y=0, width=0, height=0
+r2: x=5, y=0, width=0, height=0
+r1 == r2: true
+r1 != r2: false
+r1 == r2: false
+r1 != r2: true
+r1: x=1, y=2, width=3, height=4
+r4: x=1, y=2, width=3, height=4
+left=1, top=2, right=4, bottom=6
+r1: x=1, y=2, width=3, height=4
+r2: x=5, y=30, width=0, height=40
+r1: x=5, y=30, width=0, height=40
+r2: x=1, y=2, width=3, height=4
