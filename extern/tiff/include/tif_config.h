@@ -30,11 +30,9 @@
 
 /* Define to 1 if you have the `bsearch' function. */
 #define HAVE_BSEARCH 1
-#define bsearch wceex_bsearch
 
 /* Define to 1 if you have the `lfind' function. */
-#define HAVE_LFIND 1
-#define lfind wceex_lfind
+//#define HAVE_LFIND 1
 
 /* The size of a `int', as computed by sizeof. */
 #define SIZEOF_INT 4
@@ -44,6 +42,12 @@
 
 /* Set the native cpu bit order */
 #define HOST_FILLORDER FILLORDER_LSB2MSB
+
+#ifdef lfind
+#undef lfind
+#endif
+
+void * lfind (const void *key, const void *base, unsigned int *num, unsigned int width, int (*compare)(const void *, const void *));
 
 #else
 
@@ -110,7 +114,7 @@ static int _wopen (const void* name, int mode, ...)
 
 #endif
 
-#if defined (_WIN32) && !defined(lfind)
+#if defined (_WIN32) && !defined(lfind) && !defined (_WIN32_WCE)
   #define lfind _lfind
 #endif
 

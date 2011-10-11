@@ -1,4 +1,4 @@
-#ifdef ANDROID
+#if defined (ANDROID) || defined (_WIN32_WCE)
 
 void * lfind (const void *key, const void *base, unsigned int *num, unsigned int width, int (*compare)(const void *, const void *))
 {
