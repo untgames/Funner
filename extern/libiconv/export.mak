@@ -5,6 +5,7 @@ export.compile.extern.iconv.INCLUDE_DIRS := include
 
 # Link exports
 export.link.extern.iconv.LIBS := funner.extern.iconv
+export.link.extern.iconv.wince.IMPORTS   := link.extern.wcecompat
 
 else
 

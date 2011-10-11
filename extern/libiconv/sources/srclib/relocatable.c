@@ -46,6 +46,7 @@
 #if defined _WIN32 || defined __WIN32__ || defined __CYGWIN__
 # define WIN32_LEAN_AND_MEAN
 # include <windows.h>
+#include <winbase.h>
 #endif
 
 #if DEPENDS_ON_LIBCHARSET

@@ -31,6 +31,7 @@ EXTERN.ICONV.SOURCES.IMPORTS          := link.extern.iconv
 EXTERN.ICONV.SOURCES.msvc.COMPILER_CFLAGS  := -wd4013 -wd4018
 EXTERN.ICONV.SOURCES.g++.COMPILER_CFLAGS   := --no-warn
 EXTERN.ICONV.SOURCES.has_iconv.TYPE        := ignore
+EXTERN.ICONV.SOURCES.LINK_FLAGS       := 
 
 #Цель №3 - ICONV tests
 EXTERN.ICONV.TESTS.TYPE              := test-suite

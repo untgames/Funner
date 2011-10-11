@@ -43,6 +43,7 @@
 #if defined WIN32_NATIVE || defined __CYGWIN__
 # define WIN32_LEAN_AND_MEAN
 # include <windows.h>
+#include <winbase.h>
 #endif
 
 #include "canonicalize.h"
