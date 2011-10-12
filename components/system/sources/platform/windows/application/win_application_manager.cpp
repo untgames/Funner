@@ -348,6 +348,10 @@ stl::string WindowsApplicationManager::GetEnvironmentVariable (const char* name)
   }
 }
 
+/*
+   Управление энергосбережением
+*/
+
 void WindowsApplicationManager::SetScreenSaverState (bool state)
 {
   try
@@ -356,7 +360,7 @@ void WindowsApplicationManager::SetScreenSaverState (bool state)
   }
   catch (xtl::exception& e)
   {
-    e.touch ("syslib::WindowsApplicationManager::GetEnvironmentVariable");
+    e.touch ("syslib::WindowsApplicationManager::SetScreenSaverState");
     throw;
   }
 }

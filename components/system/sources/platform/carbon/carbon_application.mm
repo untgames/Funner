@@ -10,9 +10,10 @@ namespace
 
 const char* LOG_NAME = "syslib.CarbonApplication";
 
-const double RECEIVE_EVENT_TIMEOUT        = 0.000000001;
-const UInt32 UNTGS_EVENT_CLASS            = 'untg';      //класс событий приложения
-const UInt32 APPLICATION_LOOP_START_EVENT = 'alse';      //событие входа в цикл обработки
+const double RECEIVE_EVENT_TIMEOUT         = 0.000000001;
+const UInt32 UNTGS_EVENT_CLASS             = 'untg';      //класс событий приложения
+const UInt32 APPLICATION_LOOP_START_EVENT  = 'alse';      //событие входа в цикл обработки
+const size_t UPDATE_SYSTEM_ACTIVITY_PERIOD = 30 * 1000;   //период обновления активности системы для предотвращения запуска хранителя экрана
 
 OSStatus application_event_handler_func (EventHandlerCallRef event_handler_call_ref, EventRef event, void* application_delegate);
 
@@ -273,6 +274,63 @@ OSStatus application_event_handler_func (EventHandlerCallRef event_handler_call_
   return noErr;
 }
 
+///Данные приложения
+class ApplicationImpl
+{
+  public:
+///Конструктор
+    ApplicationImpl ()
+      : screen_saver_state (true)
+      , activity_update_timer (xtl::bind (&ApplicationImpl::UpdateActivity, this), UPDATE_SYSTEM_ACTIVITY_PERIOD, TimerState_Paused)
+      {}
+
+    ///Деструктор
+    ~ApplicationImpl ()
+    {
+      try
+      {
+        if (!screen_saver_state)
+          SetScreenSaverState (true);
+      }
+      catch (...)
+      {
+      }
+    }
+
+///Установка состояния скрин-сейвера
+    void SetScreenSaverState (bool state)
+    {
+      if (state == screen_saver_state)
+        return;
+
+      if (state)
+      {
+        activity_update_timer.Pause ();
+      }
+      else
+      {
+        activity_update_timer.Run ();
+        UpdateActivity ();
+      }
+
+      screen_saver_state = state;
+    }
+
+    bool GetScreenSaverState () { return screen_saver_state; }
+
+  private:
+    void UpdateActivity ()
+    {
+      UpdateSystemActivity (OverallAct);
+    }
+
+  private:
+    bool  screen_saver_state;     //состояние скрин-сейвера
+    Timer activity_update_timer;  //таймер обновления активности приложения для предотвращения запуска скрин-сейвера
+};
+
+typedef common::Singleton<ApplicationImpl> ApplicationSingleton;
+
 }
 
 /*
@@ -300,4 +358,26 @@ void CarbonApplicationManager::OpenUrl (const char* url)
 
   if (!result)
     throw xtl::format_operation_exception ("::NSWorkspace::openURL", "Can't open URL '%s'", url);
+}
+
+/*
+   Управление энергосбережением
+*/
+
+void CarbonApplicationManager::SetScreenSaverState (bool state)
+{
+  try
+  {
+    ApplicationSingleton::Instance ()->SetScreenSaverState (state);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("syslib::CarbonApplicationManager::SetScreenSaverState");
+    throw;
+  }
+}
+
+bool CarbonApplicationManager::GetScreenSaverState ()
+{
+  return ApplicationSingleton::Instance ()->GetScreenSaverState ();
 }

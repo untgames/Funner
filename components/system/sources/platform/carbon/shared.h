@@ -1,15 +1,19 @@
 #include <stl/string>
 
+#include <xtl/bind.h>
 #include <xtl/common_exceptions.h>
+#include <xtl/function.h>
 #include <xtl/intrusive_ptr.h>
 #include <xtl/reference_counter.h>
 
 #include <common/file.h>
 #include <common/log.h>
+#include <common/singleton.h>
 
 #include <shared/platform.h>
 
 #include <syslib/application.h>
+#include <syslib/timer.h>
 
 #include <Carbon/Carbon.h>
 #include <CoreServices/CoreServices.h>
