@@ -894,8 +894,9 @@ stl::string  to_utf8_string  (const wchar_t* string, int length)
   stl::string result;
 
   result.fast_resize (length);
+
   const void* source           = string;
-  size_t      source_size      = length* sizeof(wchar_t);
+  size_t      source_size      = length * sizeof(wchar_t);
   void*       destination      = &result [0];
   size_t      destination_size = length;
 
@@ -933,7 +934,7 @@ stl::wstring to_wstring_from_utf8 (const char* string, int length)
 
   stl::wstring result;
 
-  result.fast_resize (length * sizeof(wchar_t));
+  result.fast_resize (length);
 
   const void* source           = string;
   size_t      source_size      = length;
