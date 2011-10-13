@@ -40,7 +40,7 @@ int main (int argc, const char* argv [], const char* env [])
 
     if (![[NSFileManager defaultManager] changeCurrentDirectoryPath:resources_path])
     {
-      NSLog (@"Can't set current dir '%@'\n", resources_path);
+      NSLog (@"Can't set current dir '%@'", resources_path);
       [pool release];
       return 1;
     }
@@ -56,7 +56,7 @@ int main (int argc, const char* argv [], const char* env [])
 
   if (!library)
   {
-    printf ("Can't load engine library\n");
+    printf ("Can't load engine library, error '%s'\n", dlerror ());
     return 1;
   }
   
