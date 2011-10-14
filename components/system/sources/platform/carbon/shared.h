@@ -6,9 +6,11 @@
 #include <xtl/intrusive_ptr.h>
 #include <xtl/reference_counter.h>
 
+#include <common/component.h>
 #include <common/file.h>
 #include <common/log.h>
 #include <common/singleton.h>
+#include <common/xml_writer.h>
 
 #include <shared/platform.h>
 
