@@ -29,13 +29,13 @@ ifneq (,$(filter psp,$(PROFILES)))
 endif
 
 ifneq (,$(filter bada,$(PROFILES)))
-  FUNNER_EXTERN_LIBS.COMPONENT_DIRS := bada $(FUNNER_EXTERN_LIBS.COMPONENT_DIRS)
+  FUNNER_EXTERN_LIBS.COMPONENTS := bada $(FUNNER_EXTERN_LIBS.COMPONENTS)
 endif
 
 ifneq (,$(filter wince,$(PROFILES)))
-  FUNNER_EXTERN_LIBS.COMPONENT_DIRS := wcecompat wince $(FUNNER_EXTERN_LIBS.COMPONENT_DIRS)
+  FUNNER_EXTERN_LIBS.COMPONENTS := wcecompat wince $(FUNNER_EXTERN_LIBS.COMPONENTS)
 else
-  FUNNER_EXTERN_LIBS.COMPONENT_DIRS += bullet mongoose
+  FUNNER_EXTERN_LIBS.COMPONENTS += bullet mongoose
 endif
 
 ifeq (,$(filter has_iconv,$(PROFILES)))
