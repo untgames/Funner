@@ -137,13 +137,25 @@ void bind_attachment_registry_library (Environment& environment)
   bind_attachment_methods<syslib::Window> (environment, "Windows");
 }
 
+namespace
+{
+
+const char* get_subsystem_name (SubsystemManager& manager, size_t index)
+{
+  return manager.Subsystem (index).Name ();
+}
+
+}
+
 void bind_subsystem_manager_library (Environment& environment)
 {
   InvokerRegistry lib = environment.Library (SUBSYSTEM_MANAGER_LIBRARY);
 
-  lib.Register ("Start",   make_invoker (xtl::implicit_cast<void (SubsystemManager::*) (const char*, const char*)> (&SubsystemManager::Start)));
-  lib.Register ("Restart", make_invoker (xtl::implicit_cast<void (SubsystemManager::*) (const char*, const char*)> (&SubsystemManager::Restart)));
-  lib.Register ("Remove",  make_invoker (xtl::implicit_cast<void (SubsystemManager::*) (const char*)>              (&SubsystemManager::Remove)));
+  lib.Register ("Start",               make_invoker (xtl::implicit_cast<void (SubsystemManager::*) (const char*, const char*)> (&SubsystemManager::Start)));
+  lib.Register ("Restart",             make_invoker (xtl::implicit_cast<void (SubsystemManager::*) (const char*, const char*)> (&SubsystemManager::Restart)));
+  lib.Register ("Remove",              make_invoker (xtl::implicit_cast<void (SubsystemManager::*) (const char*)>              (&SubsystemManager::Remove)));
+  lib.Register ("get_SubsystemsCount", make_invoker (&SubsystemManager::SubsystemsCount));
+  lib.Register ("SubsystemName",       make_invoker (get_subsystem_name));
 
   environment.RegisterType<SubsystemManager> (SUBSYSTEM_MANAGER_LIBRARY);
 }
