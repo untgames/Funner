@@ -12,6 +12,7 @@
 #include <shared/iphone.h>
 #include <shared/linux.h>
 #include <shared/macosx.h>
+#include <shared/tabletos.h>
 #include <shared/windows.h>
 
 namespace syslib
@@ -35,7 +36,7 @@ namespace syslib
 #elif defined MEEGO
   typedef LinuxPlatform Platform;  
 #elif defined TABLETOS
-  typedef UnistdPlatform Platform;
+  typedef TabletOsPlatform Platform;
 #elif defined LINUX
   typedef LinuxPlatform Platform;  
 #elif defined __GNUC__
