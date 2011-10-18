@@ -40,3 +40,6 @@ split 'hello (my world}world' (delimiters=' }', spaces=' \t', brackets='(}') on 
 split 'hello ' world '' (delimiters=' ', spaces=' \t', brackets='''\"\"') on 2 tokens:
     'hello'
     ' world '
+split '. windows' (delimiters=' ', spaces=' \t', brackets='') on 2 tokens:
+    '.'
+    'windows'

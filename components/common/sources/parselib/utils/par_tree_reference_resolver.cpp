@@ -31,7 +31,7 @@ struct ParseResolver
         continue;
       }
       
-      stl::string destination_attribute;
+      stl::string destination_attribute (source_attribute, source_iter);
       
       while (source_iter)
       {      
