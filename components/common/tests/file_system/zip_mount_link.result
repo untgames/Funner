@@ -1,2 +1,2 @@
 Results of zip_mount_link_test:
-IsFileExist(/mounted/test_zip.txt): true
+IsFileExist(file.c): true

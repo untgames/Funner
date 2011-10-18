@@ -1,6 +1,6 @@
 #include "test.h"
 
-const char* CHECK_FILE = "/mounted/test_zip.txt";
+const char* CHECK_FILE = "file.c";
 
 int main ()
 {
@@ -8,8 +8,8 @@ int main ()
   
   try
   {
-    FileSystem::MountLink ("/mounted", "search");
     FileSystem::AddSearchPath ("data");
+    FileSystem::AddSearchPath ("crash_test");
 
     printf ("IsFileExist(%s): %s\n", CHECK_FILE, FileSystem::IsFileExist (CHECK_FILE) ? "true" : "false");
   }
