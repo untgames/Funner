@@ -26,6 +26,9 @@ class PlatformConfigurationComponent
         writer.BeginNode ("Properties");
 
         SaveProperty (writer, "OS", "windows");
+        SaveProperty (writer, "ExecutableSuffix", ".exe");
+        SaveProperty (writer, "SharedLibrarySuffix", ".dll");
+        SaveProperty (writer, "SharedLibraryPrefix", "");
 
         char language_name_buffer [16];
 

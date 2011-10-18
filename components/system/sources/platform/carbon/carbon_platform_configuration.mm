@@ -28,6 +28,9 @@ class PlatformConfigurationComponent
         NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
 
         SaveProperty (writer, "OS", "macosx");
+        SaveProperty (writer, "ExecutableSuffix", "");
+        SaveProperty (writer, "SharedLibrarySuffix", ".dylib");
+        SaveProperty (writer, "SharedLibraryPrefix", "");
 
         NSArray* languages = [[NSUserDefaults standardUserDefaults] objectForKey:@"AppleLanguages"];
 
