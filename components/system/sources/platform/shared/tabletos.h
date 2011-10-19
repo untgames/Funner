@@ -106,7 +106,7 @@ class TabletOsPlatform
  , public UnistdApplicationManager 
  , public DefaultThreadManager 
  , public UnistdLibraryManager
-
+ , public DefaultScreenManager
 {
 };
 

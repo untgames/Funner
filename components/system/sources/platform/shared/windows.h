@@ -233,6 +233,7 @@ class WindowsPlatform
  , public WindowsLibraryManager
  , public WindowsTimerManager
  , public WindowsApplicationManager
+ , public DefaultScreenManager
 {
 };
 

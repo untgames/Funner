@@ -108,7 +108,7 @@ class LinuxPlatform
  , public UnistdTimerManager  
  , public UnistdLibraryManager
  , public UnistdApplicationManager
- 
+ , public DefaultScreenManager 
 {
 };
 

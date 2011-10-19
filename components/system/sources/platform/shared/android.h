@@ -76,7 +76,7 @@ class AndroidPlatform
  , public UnistdTimerManager 
  , public UnistdApplicationManager 
  , public UnistdLibraryManager
-
+ , public DefaultScreenManager
 {
 };
 

@@ -145,7 +145,7 @@ class BadaPlatform
  , public BadaApplicationManager 
  , public BadaThreadManager 
  , public UnistdLibraryManager
-
+ , public DefaultScreenManager
 {
 };
 

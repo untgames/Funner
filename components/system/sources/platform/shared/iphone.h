@@ -123,7 +123,7 @@ class IPhonePlatform
  , public IPhoneApplicationManager 
  , public IPhoneThreadManager 
  , public UnistdLibraryManager
-
+ , public DefaultScreenManager
 {
 };
 

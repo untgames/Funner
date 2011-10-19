@@ -63,6 +63,7 @@ class UnistdPlatform
  , public PThreadManager 
  , public UnistdLibraryManager
  , public UnistdApplicationManager
+ , public DefaultScreenManager 
 {
 };
 

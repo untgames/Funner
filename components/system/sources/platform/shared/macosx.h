@@ -156,7 +156,7 @@ class MacOsPlatform
  , public CarbonApplicationManager 
  , public MacOsThreadManager 
  , public UnistdLibraryManager
-
+ , public DefaultScreenManager
 {
 };
 
