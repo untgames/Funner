@@ -179,6 +179,19 @@ void Screen::SetCurrentMode (const ScreenModeDesc& mode_desc)
   }
 }
 
+void Screen::RestoreDefaultMode ()
+{
+  try
+  {
+    Platform::RestoreScreenDefaultMode (screen_index);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("syslib::Screen::RestoreDefaultMode");
+    throw;
+  }
+}
+
 void Screen::GetCurrentMode (ScreenModeDesc& mode_desc) const
 {
   try

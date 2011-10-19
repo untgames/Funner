@@ -61,6 +61,11 @@ void DefaultScreenManager::SetScreenCurrentMode (screen_t, const ScreenModeDesc&
   raise ("syslib::DefaultScreenManager::SetScreenCurrentMode");
 }
 
+void DefaultScreenManager::RestoreScreenDefaultMode (screen_t)
+{
+  raise ("syslib::DefaultScreenManager::RestoreScreenDefaultMode");
+}
+
 void DefaultScreenManager::GetScreenCurrentMode (screen_t, ScreenModeDesc&)
 {
   raise ("syslib::DefaultScreenManager::GetScreenCurrentMode");
@@ -78,4 +83,15 @@ void DefaultScreenManager::SetScreenGammaRamp (screen_t, const Color3f table [25
 void DefaultScreenManager::GetScreenGammaRamp (screen_t, Color3f table [256])
 {
   raise ("syslib::DefaultScreenManager::GetScreenGammaRamp");
+}
+
+/*
+    Поиск экрана вмещающего окно
+*/
+
+screen_t DefaultScreenManager::FindContainingScreen (const void*)
+{
+  raise ("syslib::DefaultScreenManager::FindContainingScreen");
+  
+  return 0;
 }

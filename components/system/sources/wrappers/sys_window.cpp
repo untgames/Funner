@@ -1206,6 +1206,36 @@ void Window::Invalidate ()
 }
 
 /*
+    Поиск экрана вмещающего окно
+*/
+
+Screen Window::ContainingScreen () const
+{
+  try
+  {
+    return Screen (Platform::FindContainingScreen (Platform::GetNativeWindowHandle (impl->CheckedHandle ())));
+  }
+  catch (xtl::exception& exception)
+  {
+    exception.touch ("syslib::Window::ContainingScreen()");
+    throw;
+  }
+}
+
+Screen Window::ContainingScreen (const void* native_handle)
+{
+  try
+  {
+    return Screen (Platform::FindContainingScreen (native_handle));
+  }
+  catch (xtl::exception& exception)
+  {
+    exception.touch ("syslib::Window::ContainingScreen(const void*)");
+    throw;
+  }
+}
+
+/*
     Подписка на события окна
 */
 

@@ -13,10 +13,11 @@
 #include <common/log.h>
 #include <common/time.h>
 
-#include <syslib/window.h>
 #include <syslib/application.h>
-#include <syslib/timer.h>
 #include <syslib/dll.h>
+#include <syslib/screen.h>
+#include <syslib/timer.h>
+#include <syslib/window.h>
 
 using namespace syslib;
 using namespace xtl;
