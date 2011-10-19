@@ -1,6 +1,7 @@
 #include "shared.h"
 
 using namespace syslib;
+using namespace syslib::tabletos;
 
 /*
     Генерация исключения: работа с окнами невозможна для платформы по умолчанию
@@ -14,40 +15,60 @@ void raise (const char* method_name)
   throw xtl::format_not_supported_exception (method_name, "No window support for this platform");
 }
 
-}
-
 /*
     Окно
 */
 
-struct syslib::window_handle
+struct WindowImpl
 {
-  screen_context_t screen_cxt; // 
-  screen_window_t* pwin;       //
+  screen_context_t screen_context; //экранный контекст
+  screen_window_t  window;         //экно
+  screen_display_t screen_display; //дисплей
   
 ///Конструктор
-  window_handle ()
+  WindowImpl ()
+    : window (0)
   {
-    //Create a screen context that will be used to create an EGL surface to to receive libscreen events.
-    if (0 < screen_create_context (&screen_cxt, 0))
-      throw xtl::format_operation_exception ("", "Can't create context. An error occurred (%s).", strerror (errno));
-          
-    //Creates a window that can be used to make graphical content visible on a display
-    if (0 < screen_create_window (pwin, screen_cxt))
-      throw xtl::format_operation_exception ("", "Can't create window. An error occurred (%s).", strerror (errno));
+    try
+    {
+      platform_initialize ();
+      
+        //create a screen context that will be used to create an EGL surface to to receive libscreen events.
+        
+      if (screen_create_context (&screen_context, 0) != BPS_SUCCESS)
+        raise_error ("::screen_create_context");                    
 
+        //creates a window that can be used to make graphical content visible on a display
+        
+      if (screen_create_window (&window, screen_context) != BPS_SUCCESS)
+        raise_error ("::screen_create_window");
+
+        //get display
+
+      if (screen_get_window_property_pv (window, SCREEN_PROPERTY_DISPLAY, (void**)&screen_display) != BPS_SUCCESS)
+        raise_error ("::screen_get_window_property_pv");              
+    }
+    catch (xtl::exception& e)
+    {
+      e.touch ("syslib::tabletos::WindowImpl::WindowImpl");
+      throw;
+    }
   }
   
 ///Деструктор
-  ~window_handle ()
+  ~WindowImpl ()
   {
-    //Destroys a window and free associated resources
-    screen_destroy_window(*pwin);
+      //destroys a window and free associated resources
+      
+    screen_destroy_window (window);
 
-    //
-    screen_destroy_context(screen_cxt);
+      //destroys screen context
+      
+    screen_destroy_context (screen_context);
   }
 };
+
+}
 
 /*
     Создание/закрытие/уничтожение окна
@@ -72,9 +93,9 @@ window_t TabletOsWindowManager::CreateWindow (WindowStyle style, WindowMessageHa
       
       //создание и инициализация окна
 
-    stl::auto_ptr<window_handle> handle (new window_handle);
+    stl::auto_ptr<WindowImpl> handle (new WindowImpl);
     
-    return handle.release ();
+    return (window_t)handle.release ();
   }
   catch (xtl::exception& e)
   {
@@ -97,18 +118,40 @@ void TabletOsWindowManager::DestroyWindow (window_t)
     Получение платформо-зависимого дескриптора окна
 */
 
-const void* TabletOsWindowManager::GetNativeWindowHandle (window_t)
+const void* TabletOsWindowManager::GetNativeWindowHandle (window_t handle)
 {
-  raise ("syslib::TabletOsWindowManager::GetNativeWindowHandle");
-  
-  return 0;
+  try
+  {
+    if (!handle)
+      throw xtl::make_null_argument_exception ("", "handle");
+      
+    WindowImpl* window = (WindowImpl*)handle;
+      
+    return &window->window;
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("syslib::TabletOsWindowManager::GetNativeWindowHandle");
+    throw;
+  }
 }
 
-const void* TabletOsWindowManager::GetNativeDisplayHandle (window_t)
+const void* TabletOsWindowManager::GetNativeDisplayHandle (window_t handle)
 {
-  raise ("syslib::TabletOsWindowManager::GetNativeDisplayHandle");
-  
-  return 0;
+  try
+  {
+    if (!handle)
+      throw xtl::make_null_argument_exception ("", "handle");
+      
+    WindowImpl* window = (WindowImpl*)handle;
+    
+    return &window->screen_display;
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("syslib::TabletOsWindowManager::GetNativeWindowHandle");
+    throw;
+  }
 }
 
 /*
