@@ -10,7 +10,7 @@ endif
 ###################################################################################################
 QNX_TARGET               := $(TABLETOS_NDK)/target/qnx6
 QNX_HOST                 := $(TABLETOS_NDK)/host/win32/x86
-PROFILES                 += unistd tabletos has_windows has_iconv
+PROFILES                 += unistd tabletos has_windows has_iconv gles egl
 REMOTE_DEBUG_DIR         ?= //accounts/devuser/funner
 EXE_SUFFIX               :=
 DLL_SUFFIX               := .so
@@ -22,7 +22,7 @@ COMPILER_GCC             := $(TABLETOS_NDK_GCC)/bin/$(TABLETOS_NDK_TOOL_PREFIX)g
 LINKER_GCC               := $(TABLETOS_NDK_GCC)/bin/$(TABLETOS_NDK_TOOL_PREFIX)g++
 LIB_GCC                  := $(TABLETOS_NDK_GCC)/bin/$(TABLETOS_NDK_TOOL_PREFIX)ar
 COMMON_CPPFLAGS          += -fexceptions -frtti
-COMMON_CFLAGS            += -DTABLETOS -O2 -Wno-strict-aliasing
+COMMON_CFLAGS            += -DTABLETOS -O2 -Wno-strict-aliasing -I$(TABLETOS_NDK)/target/target-override/usr/include
 COMMON_LINK_FLAGS        += -Wl,-L,$(DIST_BIN_DIR)
 TABLETOS_HOST            := $(strip $(TABLETOS_HOST))
 TABLETOS_USER            := $(strip $(TABLETOS_USER))
@@ -47,7 +47,7 @@ export PATH=$(BUILD_PATHS):$$PATH && $(call tools.g++.c++compile,$1,$2,$3,$4,$5,
 endef
 
 define tools.link
-export PATH=$(BUILD_PATHS):$$PATH && $(call tools.g++.link,$1,$2,$3,,$5 $(foreach link,$4,-Wl,-u,_$(link)))
+export PATH=$(BUILD_PATHS):$$PATH && $(call tools.g++.link,$1,$2,$3,,$5 $(foreach link,$4,-Wl,-u,$(link)))
 endef
 
 define tools.lib
