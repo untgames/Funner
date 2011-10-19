@@ -16,18 +16,23 @@ void raise (const char* method_name)
 }
 
 /*
-    Окно
+    Window implementation
 */
 
 struct WindowImpl
 {
-  screen_context_t screen_context; //экранный контекст
-  screen_window_t  window;         //экно
-  screen_display_t screen_display; //дисплей
+  screen_context_t screen_context; // A context encapsulates the connection to the windowing system
+  screen_window_t  screen_window;  // The window is the most basic drawing surface.
+  screen_display_t screen_display; // A display represents the physical display hardware such as a touch screen display.
+  int              usage;          //
+  int              format;         //
+  int              nbuffers;       // count of buffers
   
-///Конструктор
+///Constructor
   WindowImpl ()
-    : window (0)
+    : screen_window (0)
+    , format (SCREEN_FORMAT_RGBX8888)
+    , nbuffers (2)
   {
     try
     {
@@ -35,18 +40,34 @@ struct WindowImpl
       
         //create a screen context that will be used to create an EGL surface to to receive libscreen events.
         
-      if (screen_create_context (&screen_context, 0) != BPS_SUCCESS)
-        raise_error ("::screen_create_context");                    
+      if (screen_create_context (&screen_context, SCREEN_APPLICATION_CONTEXT) != BPS_SUCCESS)
+        raise_error ("::screen_create_context");
 
         //creates a window that can be used to make graphical content visible on a display
         
-      if (screen_create_window (&window, screen_context) != BPS_SUCCESS)
+      if (screen_create_window (&screen_window, screen_context) != BPS_SUCCESS)
         raise_error ("::screen_create_window");
+       
+        //
+        
+      if (screen_set_window_property_iv (screen_window, SCREEN_PROPERTY_FORMAT, &format))
+        raise_error ("::screen_set_window_property_iv(SCREEN_PROPERTY_FORMAT)");
+        
+        //
+
+      if (screen_set_window_property_iv (screen_window, SCREEN_PROPERTY_USAGE, &usage))
+        raise_error ("screen_set_window_property_iv(SCREEN_PROPERTY_USAGE)");
 
         //get display
 
-      if (screen_get_window_property_pv (window, SCREEN_PROPERTY_DISPLAY, (void**)&screen_display) != BPS_SUCCESS)
-        raise_error ("::screen_get_window_property_pv");              
+      if (screen_get_window_property_pv (screen_window, SCREEN_PROPERTY_DISPLAY, (void**)&screen_display) != BPS_SUCCESS)
+        raise_error ("::screen_get_window_property_pv(SCREEN_PROPERTY_DISPLAY)");
+        
+        //
+
+      if (screen_create_window_buffers (screen_window, nbuffers))
+        raise_error ("::screen_create_window_buffers");
+        
     }
     catch (xtl::exception& e)
     {
@@ -55,12 +76,12 @@ struct WindowImpl
     }
   }
   
-///Деструктор
+///Destructor
   ~WindowImpl ()
   {
       //destroys a window and free associated resources
       
-    screen_destroy_window (window);
+    screen_destroy_window (screen_window);
 
       //destroys screen context
       
@@ -127,7 +148,7 @@ const void* TabletOsWindowManager::GetNativeWindowHandle (window_t handle)
       
     WindowImpl* window = (WindowImpl*)handle;
       
-    return &window->window;
+    return window->screen_window;
   }
   catch (xtl::exception& e)
   {
@@ -145,7 +166,7 @@ const void* TabletOsWindowManager::GetNativeDisplayHandle (window_t handle)
       
     WindowImpl* window = (WindowImpl*)handle;
     
-    return &window->screen_display;
+    return window->screen_display;
   }
   catch (xtl::exception& e)
   {
@@ -158,52 +179,193 @@ const void* TabletOsWindowManager::GetNativeDisplayHandle (window_t handle)
     Заголовок окна
 */
 
-void TabletOsWindowManager::SetWindowTitle (window_t, const wchar_t*)
+void TabletOsWindowManager::SetWindowTitle (window_t handle, const wchar_t* buffer)
 {
-  raise ("syslib::TabletOsWindowManager::SetWindowTitle");
+  try
+  {
+    screen_window_t screen_window = (screen_window_t) GetNativeWindowHandle (handle);
+    
+    stl::string title = common::tostring (buffer);
+
+    if (screen_get_window_property_cv (screen_window, SCREEN_PROPERTY_ID_STRING, title.length (), &title[0]) != BPS_SUCCESS)
+      raise_error ("::screen_get_window_property_cv(SCREEN_PROPERTY_ID_STRING)");
+  }
+  catch (xtl::exception& exception)
+  {
+    exception.touch ("syslib::TabletOsWindowManager::SetWindowTitle");
+    throw;
+  }
 }
 
-void TabletOsWindowManager::GetWindowTitle (window_t, size_t, wchar_t*)
+void TabletOsWindowManager::GetWindowTitle (window_t handle, size_t buffer_size, wchar_t* buffer)
 {
-  raise ("syslib::TabletOsWindowManager::GetWindowTitle");
+  try
+  {
+    screen_window_t screen_window = (screen_window_t) GetNativeWindowHandle (handle);
+
+    char title[buffer_size];
+
+    if (screen_get_window_property_cv (screen_window, SCREEN_PROPERTY_ID_STRING, buffer_size, title) != BPS_SUCCESS)
+      raise_error ("::screen_get_window_property_cv(SCREEN_PROPERTY_ID_STRING)");
+
+    stl::wstring result = common::towstring (title, buffer_size);
+
+    xtl::xstrncpy (buffer, result.c_str(), buffer_size);
+  }
+  catch (xtl::exception& exception)
+  {
+    exception.touch ("syslib::TabletOsWindowManager::GetWindowTitle");
+    throw;
+  }
+
 }
 
 /*
     Область окна / клиентская область
 */
 
-void TabletOsWindowManager::SetWindowRect (window_t, const Rect&)
+void TabletOsWindowManager::SetWindowRect (window_t handle, const Rect& rect)
 {
-  raise ("syslib::TabletOsWindowManager::SetWindowRect");
+  try
+  {
+    screen_window_t screen_window = (screen_window_t) GetNativeWindowHandle (handle);
+    
+    int buffer_size[2] = {rect.right, rect.bottom};
+    
+    if (screen_set_window_property_iv (screen_window, SCREEN_PROPERTY_BUFFER_SIZE, buffer_size) != BPS_SUCCESS)
+      raise_error ("::screen_set_window_property_iv(SCREEN_PROPERTY_BUFFER_SIZE)");
+  }
+  catch (xtl::exception& exception)
+  {
+    exception.touch ("syslib::TabletOsWindowManager::SetWindowRect");
+    throw;
+  }
 }
 
-void TabletOsWindowManager::SetClientRect (window_t, const Rect&)
+void TabletOsWindowManager::SetClientRect (window_t handle, const Rect& rect)
 {
-  raise ("syslib::TabletOsWindowManager::SetClientRect");
+  try
+  {
+    screen_window_t screen_window = (screen_window_t) GetNativeWindowHandle (handle);
+    
+    int buffer_size[2] = {rect.right, rect.bottom};
+    
+    if (screen_set_window_property_iv (screen_window, SCREEN_PROPERTY_BUFFER_SIZE, buffer_size) != BPS_SUCCESS)
+      raise_error ("::screen_set_window_property_iv(SCREEN_PROPERTY_BUFFER_SIZE)");
+  }
+  catch (xtl::exception& exception)
+  {
+    exception.touch ("syslib::TabletOsWindowManager::SetClientRect");
+    throw;
+  }
 }
 
-void TabletOsWindowManager::GetWindowRect (window_t, Rect&)
+void TabletOsWindowManager::GetWindowRect (window_t handle, Rect& rect)
 {
-  raise ("syslib::TabletOsWindowManager::GetWindowRect");
+  try
+  {
+    screen_window_t screen_window = (screen_window_t) GetNativeWindowHandle (handle);
+    
+    int buffer_size[2] = {0, 0};
+    
+    if (screen_get_window_property_iv (screen_window, SCREEN_PROPERTY_BUFFER_SIZE, buffer_size) != BPS_SUCCESS)
+      raise_error ("::screen_get_window_property_iv(SCREEN_PROPERTY_BUFFER_SIZE)");
+
+    rect.left   = 0;
+    rect.right  = buffer_size[0];
+    rect.top    = 0;
+    rect.bottom = buffer_size[1];
+  }
+  catch (xtl::exception& exception)
+  {
+    exception.touch ("syslib::TabletOsWindowManager::GetWindowRect");
+    throw;
+  }
 }
 
-void TabletOsWindowManager::GetClientRect (window_t, Rect&)
+void TabletOsWindowManager::GetClientRect (window_t handle, Rect& rect)
 {
-  raise ("syslib::TabletOsWindowManager::GetClientRect");
+  try
+  {
+    screen_window_t screen_window = (screen_window_t) GetNativeWindowHandle (handle);
+    
+    int buffer_size[2] = {0, 0};
+    
+    if (screen_get_window_property_iv (screen_window, SCREEN_PROPERTY_BUFFER_SIZE, buffer_size) != BPS_SUCCESS)
+      raise_error ("::screen_get_window_property_iv(SCREEN_PROPERTY_BUFFER_SIZE)");
+
+    rect.left   = 0;
+    rect.right  = buffer_size[0];
+    rect.top    = 0;
+    rect.bottom = buffer_size[1];
+  }
+  catch (xtl::exception& exception)
+  {
+    exception.touch ("syslib::TabletOsWindowManager::GetClientRect");
+    throw;
+  }
 }
 
 /*
     Установка флагов окна
 */
 
-void TabletOsWindowManager::SetWindowFlag (window_t, WindowFlag, bool)
+void TabletOsWindowManager::SetWindowFlag (window_t handle, WindowFlag flag, bool state)
 {
-  raise ("syslib::TabletOsWindowManager::SetWindowFlag");
+  screen_window_t screen_window = (screen_window_t) GetNativeWindowHandle (handle);
+
+  try
+  {
+    switch (flag)
+    {
+      case WindowFlag_Visible:
+        break;
+      case WindowFlag_Active:
+        break;
+      case WindowFlag_Focus:
+        break;
+      case WindowFlag_Maximized:
+        break;
+      case WindowFlag_Minimized:
+        break;
+      default:
+        throw xtl::make_argument_exception ("", "flag", flag);
+    }
+  }
+  catch (xtl::exception& exception)
+  {
+    exception.touch ("syslib::WindowsWindowManager::SetWindowFlag");
+    throw;
+  }
 }
 
-bool TabletOsWindowManager::GetWindowFlag (window_t, WindowFlag)
+bool TabletOsWindowManager::GetWindowFlag (window_t handle, WindowFlag flag)
 {
-  raise ("syslib::TabletOsWindowManager::GetWindowFlag");
+  screen_window_t screen_window = (screen_window_t) GetNativeWindowHandle (handle);
+
+  try
+  {
+    switch (flag)
+    {
+      case WindowFlag_Visible:
+        break;
+      case WindowFlag_Active:
+        break;
+      case WindowFlag_Focus:
+        break;
+      case WindowFlag_Maximized:
+        break;
+      case WindowFlag_Minimized:
+        break;
+      default:
+        throw xtl::make_argument_exception ("", "flag", flag);
+    }
+  }
+  catch (xtl::exception& exception)
+  {
+    exception.touch ("syslib::WindowsWindowManager::SetWindowFlag");
+    throw;
+  }
 
   return false;
 }
@@ -228,13 +390,13 @@ const void* TabletOsWindowManager::GetParentWindowHandle (window_t child)
    Установка multitouch режима для окна
 */
 
-void TabletOsWindowManager::SetMultitouchEnabled (window_t window, bool enabled)
+void TabletOsWindowManager::SetMultitouchEnabled (window_t handle, bool enabled)
 {
-  if (enabled)
-    raise ("syslib::TabletOsWindowManager::SetMultitouchEnabled");      
+//  if (enabled)
+//    raise ("syslib::TabletOsWindowManager::SetMultitouchEnabled");      
 }
 
-bool TabletOsWindowManager::IsMultitouchEnabled (window_t window)
+bool TabletOsWindowManager::IsMultitouchEnabled (window_t handle)
 {
   return false;
 }

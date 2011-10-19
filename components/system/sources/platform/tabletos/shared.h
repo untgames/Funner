@@ -7,9 +7,11 @@
 
 #include <xtl/common_exceptions.h>
 #include <xtl/reference_counter.h>
+#include <xtl/string.h>
 
 #include <common/singleton.h>
 #include <common/time.h>
+#include <common/utf_converter.h>
 
 #include <shared/platform.h>
 
