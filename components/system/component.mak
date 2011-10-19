@@ -31,7 +31,6 @@ SYSTEMLIB.SOURCES.bada_device.SOURCE_DIRS           := sources/platform/no_threa
 SYSTEMLIB.SOURCES.beagleboard.IMPORTS               := compile.extern.beagleboard
 SYSTEMLIB.SOURCES.meego.IMPORTS                     := compile.extern.meego
 SYSTEMLIB.SOURCES.tabletos.SOURCE_DIRS              := sources/platform/tabletos
-SYSTEMLIB.SOURCES.tabletos.LIBS              				:= screen
 
 #Öåëü ¹2 - System library tests
 SYSTEMLIB.TESTS.TYPE             := test-suite
