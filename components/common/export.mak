@@ -1,5 +1,5 @@
 # Auto license generator link exports
-export.link.common.auto_license_generator.LIBS          := funner.common.auto_license_generator funner.common.parsers.xml
+export.link.common.auto_license_generator.LIBS          := funner.common.auto_license_generator funner.common.parsers.xml funner.common
 export.link.common.auto_license_generator.LINK_INCLUDES := AutoLicenseGenerator XmlParser
 
 # Memory manager override
