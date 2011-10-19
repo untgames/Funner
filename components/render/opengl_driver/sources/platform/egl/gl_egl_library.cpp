@@ -162,7 +162,7 @@ DefaultEntry default_entries [] = {
   {"glTranslatex", (const void*)&glTranslatex},
   {"glVertexPointer", (const void*)&glVertexPointer},
   {"glViewport", (const void*)&glViewport},
-  {"glPointSizePointerOES", (const void*)&glPointSizePointerOES},
+//  {"glPointSizePointerOES", (const void*)&glPointSizePointerOES},
 };
 
 const size_t DEFAULT_ENTRIES_COUNT = sizeof (default_entries) / sizeof (*default_entries);
@@ -222,7 +222,7 @@ class GlesLibrary
 class GlesLibrary
 {
   public:
-    void GetProcAddress (const char*)
+    void* GetProcAddress (const char*)
     {
       return 0;
     }

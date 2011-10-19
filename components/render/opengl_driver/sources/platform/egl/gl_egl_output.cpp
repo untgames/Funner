@@ -181,6 +181,19 @@ struct Output::Impl
   void PlatformDone ()
   {
   }
+  
+#elif defined TABLETOS
+
+///Платформо-зависимая инициализация
+  void PlatformInitialize ()
+  {
+    native_display = EGL_DEFAULT_DISPLAY;    
+  }
+  
+///Платформо-зависимое освобождение ресурсов
+  void PlatformDone ()
+  {
+  }
 
 #else
   #error Unknown platform!
