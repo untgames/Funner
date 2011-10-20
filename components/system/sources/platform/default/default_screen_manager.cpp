@@ -26,6 +26,22 @@ size_t DefaultScreenManager::GetScreensCount ()
 }
 
 /*
+    Создание / удаление экрана
+*/
+
+screen_t DefaultScreenManager::CreateScreen  (size_t screen_index)
+{
+  raise ("syslib::DefaultScreenManager::CreateScreen");
+  
+  return 0;
+}
+
+void DefaultScreenManager::DestroyScreen (screen_t)
+{
+  raise ("syslib::DefaultScreenManager::DestroyScreen");
+}
+
+/*
     Имя экрана
 */
 
@@ -99,4 +115,24 @@ screen_t DefaultScreenManager::FindContainingScreen (const void*)
   raise ("syslib::DefaultScreenManager::FindContainingScreen");
   
   return 0;
+}
+
+/*
+    Получение платформо-зависимого дескриптора экрана
+*/
+
+const void* DefaultScreenManager::GetNativeScreenHandle (screen_t)
+{
+  raise ("syslib::DefaultScreenManager::GetNativeScreenHandle");
+  
+  return 0;
+}
+
+/*
+    Получение платформо-зависимых свойств экрана
+*/
+
+void DefaultScreenManager::GetScreenProperties (screen_t, common::PropertyMap& properties)
+{
+  raise ("syslib::DefaultScreenManager::GetScreenProperties");
 }
