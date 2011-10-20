@@ -28,6 +28,15 @@ Screen::Screen (size_t in_screen_index)
 }
 
 /*
+    Индекс экрана
+*/
+
+size_t Screen::Index () const
+{
+  return screen_index;
+}
+
+/*
     Имя
 */
 
