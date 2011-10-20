@@ -9,16 +9,52 @@ using namespace syslib;
 */
 
 /*
-    Конструктор
+    Описание реализации экрана
 */
 
-Screen::Screen (size_t in_screen_index)
-  : screen_index (in_screen_index)
+struct Screen::Impl: public xtl::reference_counter
+{
+  screen_t handle; //платформо-зависимый дескриптор экрана
+  
+///Конструкторы
+  Impl (size_t index)
+    : handle ()
+  {
+    handle = Platform::CreateScreen (index);
+    
+    if (!handle)
+      throw xtl::format_operation_exception ("", "Internal error: can't create screen (handle is null)");
+  }
+  
+  Impl (screen_t in_handle)
+    : handle (in_handle)
+  {
+    if (!handle)
+      throw xtl::format_operation_exception ("", "Internal error: can't create screen (handle is null)");
+  }
+  
+///Деструктор
+  ~Impl ()
+  {
+    try
+    {
+      Platform::DestroyScreen (handle);
+    }
+    catch (...)
+    {
+    }
+  }
+};
+
+/*
+    Конструкторы / деструктор / присваивание
+*/
+
+Screen::Screen (size_t screen_index)
 {
   try
   {
-    if (screen_index > Platform::GetScreensCount ())
-      throw xtl::make_range_exception ("", "screen_index", screen_index, Platform::GetScreensCount ());
+    impl = new Impl (screen_index);
   }
   catch (xtl::exception& e)
   {
@@ -27,13 +63,27 @@ Screen::Screen (size_t in_screen_index)
   }
 }
 
-/*
-    Индекс экрана
-*/
-
-size_t Screen::Index () const
+Screen::Screen (Impl* in_impl)
+  : impl (in_impl)
 {
-  return screen_index;
+}
+
+Screen::Screen (const Screen& screen)
+  : impl (screen.impl)
+{
+  addref (impl);
+}
+
+Screen::~Screen ()
+{
+  release (impl);
+}
+
+Screen& Screen::operator = (const Screen& screen)
+{
+  Screen (screen).Swap (*this);
+
+  return *this;
 }
 
 /*
@@ -44,7 +94,7 @@ const char* Screen::Name () const
 {
   try
   {
-    return Platform::GetScreenName (screen_index);
+    return Platform::GetScreenName (impl->handle);
   }
   catch (xtl::exception& e)
   {
@@ -149,7 +199,7 @@ size_t Screen::ModesCount () const
 {
   try
   {
-    return Platform::GetScreenModesCount (screen_index);    
+    return Platform::GetScreenModesCount (impl->handle);    
   }
   catch (xtl::exception& e)
   {
@@ -162,7 +212,7 @@ void Screen::GetMode (size_t mode_index, ScreenModeDesc& mode_desc) const
 {
   try
   {
-    Platform::GetScreenMode (screen_index, mode_index, mode_desc);
+    Platform::GetScreenMode (impl->handle, mode_index, mode_desc);
   }
   catch (xtl::exception& e)
   {
@@ -179,7 +229,7 @@ void Screen::SetCurrentMode (const ScreenModeDesc& mode_desc)
 {
   try
   {
-    Platform::SetScreenCurrentMode (screen_index, mode_desc);
+    Platform::SetScreenCurrentMode (impl->handle, mode_desc);
   }
   catch (xtl::exception& e)
   {
@@ -192,7 +242,7 @@ void Screen::RestoreDefaultMode ()
 {
   try
   {
-    Platform::RestoreScreenDefaultMode (screen_index);
+    Platform::RestoreScreenDefaultMode (impl->handle);
   }
   catch (xtl::exception& e)
   {
@@ -205,7 +255,7 @@ void Screen::GetCurrentMode (ScreenModeDesc& mode_desc) const
 {
   try
   {
-    Platform::GetScreenCurrentMode (screen_index, mode_desc);
+    Platform::GetScreenCurrentMode (impl->handle, mode_desc);
   }
   catch (xtl::exception& e)
   {
@@ -218,7 +268,7 @@ void Screen::GetDefaultMode (ScreenModeDesc& mode_desc) const
 {
   try
   {
-    Platform::GetScreenDefaultMode (screen_index, mode_desc);
+    Platform::GetScreenDefaultMode (impl->handle, mode_desc);
   }
   catch (xtl::exception& e)
   {
@@ -235,7 +285,7 @@ void Screen::SetGammaRamp (const Color3f table [256])
 {
   try
   {
-    Platform::SetScreenGammaRamp (screen_index, table);
+    Platform::SetScreenGammaRamp (impl->handle, table);
   }
   catch (xtl::exception& e)
   {
@@ -248,11 +298,64 @@ void Screen::GetGammaRamp (Color3f table [256]) const
 {
   try
   {
-    Platform::GetScreenGammaRamp (screen_index, table);
+    Platform::GetScreenGammaRamp (impl->handle, table);
   }
   catch (xtl::exception& e)
   {
     e.touch ("syslib::Screen::GetGammaRamp");
+    throw;
+  }
+}
+
+/*
+    Платформо-зависимый дескриптор экрана
+*/
+
+const void* Screen::Handle () const
+{
+  try
+  {
+    return Platform::GetNativeScreenHandle (impl->handle);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("syslib::Screen::Handle");
+    throw;
+  }
+}
+
+/*
+    Получение платформо-зависимых свойств экрана
+*/
+
+void Screen::GetProperties (common::PropertyMap& properties)
+{
+  try
+  {
+    properties.Clear ();
+    
+    return Platform::GetScreenProperties (impl->handle, properties);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("syslib::Screen::GetProperties");
+    throw;
+  }
+}
+
+/*
+    Поиск экрана вмещающего окно
+*/
+
+Screen Screen::ContainingScreen (const void* window_native_handle)
+{
+  try
+  {
+    return Screen (new Impl (Platform::FindContainingScreen (window_native_handle)));
+  }
+  catch (xtl::exception& exception)
+  {
+    exception.touch ("syslib::Screen::ContainingScreen(const void*)");
     throw;
   }
 }
@@ -263,7 +366,7 @@ void Screen::GetGammaRamp (Color3f table [256]) const
 
 void Screen::Swap (Screen& screen)
 {
-  stl::swap (screen_index, screen.screen_index);
+  stl::swap (impl, screen.impl);
 }
 
 namespace syslib

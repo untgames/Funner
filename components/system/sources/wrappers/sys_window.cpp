@@ -1213,7 +1213,7 @@ Screen Window::ContainingScreen () const
 {
   try
   {
-    return Screen (Platform::FindContainingScreen (Platform::GetNativeWindowHandle (impl->CheckedHandle ())));
+    return ContainingScreen (Platform::GetNativeWindowHandle (impl->CheckedHandle ()));
   }
   catch (xtl::exception& exception)
   {
@@ -1226,7 +1226,7 @@ Screen Window::ContainingScreen (const void* native_handle)
 {
   try
   {
-    return Screen (Platform::FindContainingScreen (native_handle));
+    return Screen::ContainingScreen (native_handle);
   }
   catch (xtl::exception& exception)
   {
