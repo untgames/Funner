@@ -71,6 +71,11 @@ void DefaultScreenManager::GetScreenCurrentMode (screen_t, ScreenModeDesc&)
   raise ("syslib::DefaultScreenManager::GetScreenCurrentMode");
 }
 
+void DefaultScreenManager::GetScreenDefaultMode (screen_t, ScreenModeDesc&)
+{
+  raise ("syslib::DefaultScreenManager::GetScreenDefaultMode");
+}
+
 /*
     Управление гамма-коррекцией экрана
 */

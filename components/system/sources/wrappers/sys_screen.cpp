@@ -205,6 +205,19 @@ void Screen::GetCurrentMode (ScreenModeDesc& mode_desc) const
   }
 }
 
+void Screen::GetDefaultMode (ScreenModeDesc& mode_desc) const
+{
+  try
+  {
+    Platform::GetScreenDefaultMode (screen_index, mode_desc);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("syslib::Screen::GetDefaultMode");
+    throw;
+  }
+}
+
 /*
     Управление гамма-коррекцией
 */
