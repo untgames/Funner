@@ -22,6 +22,7 @@
 
 #include <input/cursor.h>
 
+#include <syslib/application.h>
 #include <syslib/window.h>
 
 #include <engine/attachments.h>
@@ -62,6 +63,8 @@ class WindowManagerSubsystem: public ISubsystem, private media::rms::ICustomServ
 ///Конструктор
     WindowManagerSubsystem (ParseNode& node)
       : log (LOG_NAME)
+      , need_restore_screen_saver (false)
+      , screen_saver_saved_state (true)
     {
       try
       {
@@ -72,6 +75,16 @@ class WindowManagerSubsystem: public ISubsystem, private media::rms::ICustomServ
           WindowPtr window (create_window (*iter, *this), false);
 
           windows.push_back (window);
+        }
+        
+        if (ParseNode screen_saver_node = node.First ("ScreenSaver"))
+        {
+          screen_saver_saved_state  = syslib::Application::GetScreenSaverState ();          
+          need_restore_screen_saver = true;
+          
+          bool screen_saver_state = get<int> (screen_saver_node, "", 1) != 0;                    
+          
+          syslib::Application::SetScreenSaverState (screen_saver_state);
         }
       }
       catch (xtl::exception& e)
@@ -84,7 +97,16 @@ class WindowManagerSubsystem: public ISubsystem, private media::rms::ICustomServ
 ///Деструктор
     ~WindowManagerSubsystem ()
     {
-      resource_server.reset ();
+      try
+      {
+        resource_server.reset ();
+        
+        if (need_restore_screen_saver)
+          syslib::Application::SetScreenSaverState (screen_saver_saved_state);
+      }
+      catch (...)
+      {
+      }
     }
     
 ///Поиск курсора
@@ -255,7 +277,9 @@ class WindowManagerSubsystem: public ISubsystem, private media::rms::ICustomServ
     WindowList                                       windows;    
     stl::auto_ptr<media::rms::ServerGroupAttachment> resource_server;
     HotspotMap                                       hotspots;
-    CursorMap                                        cursors;    
+    CursorMap                                        cursors;
+    bool                                             need_restore_screen_saver;
+    bool                                             screen_saver_saved_state;
 };
 
 /*
