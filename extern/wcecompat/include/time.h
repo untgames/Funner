@@ -23,6 +23,8 @@
 
 #include <stdlib.h>		// time_t defined there
 
+char *asctime(const struct tm *timeptr);
+
 _CRTIMP char * __cdecl ctime(const time_t *);
 
 extern size_t wcsftime(wchar_t *, size_t, const char *,const struct tm *);

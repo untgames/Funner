@@ -25,6 +25,7 @@
 #include <winsock2.h>
 #include <errno.h>
 #include "internal.h"
+#include "time_strings.h"
 
 // Contains the time zone string
 //
@@ -36,27 +37,27 @@ static struct tm st_tm;
 
 // Contains the days of the week abreviation
 //
-static char *aday[] = {
+char *aday[] = {
 	"", "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"
 };
 
 // Contains the days of the week full name
 //
-static char *day[] = {
+char *day [] = {
 	"", "Sunday", "Monday", "Tuesday", "Wednesday",
 	"Thursday", "Friday", "Saturday"
 };
 
 // Contains the months of the year abreviation
 //
-static char *amonth[] = {
+char *amonth[] = {
 	"", "Jan", "Feb", "Mar", "Apr", "May", "Jun",
 	"Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
 };
 
 // Contains the months of the year full name
 //
-static char *month[] = {
+char *month[] = {
 	"", "January", "February", "March", "April", "May", "June",
 	"July", "August", "September", "October", "November", "December"
 };
