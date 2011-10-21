@@ -383,6 +383,20 @@ void swap (Screen& screen1, Screen& screen2)
 }
 
 /*
+    Сравнение
+*/
+
+bool Screen::operator == (const Screen& screen) const
+{
+  return impl->handle == screen.impl->handle;
+}
+
+bool Screen::operator != (const Screen& screen) const
+{
+  return !(*this == screen);
+}
+
+/*
 ===================================================================================================
     Менеджер экранов
 ===================================================================================================
