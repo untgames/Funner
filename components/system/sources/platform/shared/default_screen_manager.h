@@ -41,10 +41,9 @@ class DefaultScreenManager
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Установка текущего видео-режима экрана
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    static void SetScreenCurrentMode     (screen_t, const ScreenModeDesc&);
-    static void RestoreScreenDefaultMode (screen_t);
-    static void GetScreenCurrentMode     (screen_t, ScreenModeDesc&);
-    static void GetScreenDefaultMode     (screen_t, ScreenModeDesc&);
+    static void SetScreenCurrentMode (screen_t, const ScreenModeDesc&);
+    static void GetScreenCurrentMode (screen_t, ScreenModeDesc&);
+    static void GetScreenDefaultMode (screen_t, ScreenModeDesc&);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Управление гамма-коррекцией экрана

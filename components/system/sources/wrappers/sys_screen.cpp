@@ -242,7 +242,10 @@ void Screen::RestoreDefaultMode ()
 {
   try
   {
-    Platform::RestoreScreenDefaultMode (impl->handle);
+    ScreenModeDesc mode;
+
+    GetDefaultMode (mode);
+    SetCurrentMode (mode);
   }
   catch (xtl::exception& e)
   {

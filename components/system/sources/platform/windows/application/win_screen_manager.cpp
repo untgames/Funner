@@ -69,11 +69,6 @@ void WindowsScreenManager::SetScreenCurrentMode (screen_t, const ScreenModeDesc&
   throw xtl::make_not_implemented_exception ("syslib::WindowsScreenManager::SetScreenCurrentMode");
 }
 
-void WindowsScreenManager::RestoreScreenDefaultMode (screen_t)
-{
-  throw xtl::make_not_implemented_exception ("syslib::WindowsScreenManager::RestoreScreenDefaultMode");
-}
-
 void WindowsScreenManager::GetScreenCurrentMode (screen_t, ScreenModeDesc&)
 {
   throw xtl::make_not_implemented_exception ("syslib::WindowsScreenManager::GetScreenCurrentMode");

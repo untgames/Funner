@@ -77,11 +77,6 @@ void DefaultScreenManager::SetScreenCurrentMode (screen_t, const ScreenModeDesc&
   raise ("syslib::DefaultScreenManager::SetScreenCurrentMode");
 }
 
-void DefaultScreenManager::RestoreScreenDefaultMode (screen_t)
-{
-  raise ("syslib::DefaultScreenManager::RestoreScreenDefaultMode");
-}
-
 void DefaultScreenManager::GetScreenCurrentMode (screen_t, ScreenModeDesc&)
 {
   raise ("syslib::DefaultScreenManager::GetScreenCurrentMode");
