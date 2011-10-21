@@ -12,7 +12,7 @@ int main ()
       return 0;
     }
 
-    Screen screen (0u);
+    Screen screen ((size_t)0);
     
     printf ("change mode...\n");
 

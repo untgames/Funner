@@ -3,6 +3,9 @@
 namespace syslib
 {
 
+namespace macosx
+{
+
 //Преобразование процесса к приложению
 void transform_process_type ()
 {
@@ -16,6 +19,8 @@ void transform_process_type ()
 
     transformed = true;
   }
+}
+
 }
 
 }

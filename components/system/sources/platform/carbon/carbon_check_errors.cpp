@@ -82,6 +82,9 @@ const char* get_quartz_error_name (CGError error)
 namespace syslib
 {
 
+namespace macosx
+{
+
 void check_event_manager_error (OSStatus error_code, const char* source, const char* message)
 {
   if (error_code != noErr)
@@ -101,6 +104,8 @@ void check_quartz_error (CGError error_code, const char* source, const char* mes
   if (error_code != kCGErrorSuccess)
     throw xtl::format_operation_exception (source, "%s. Quartz error: %s (code %d)", message,
                                            get_quartz_error_name (error_code), error_code);
+}
+
 }
 
 }

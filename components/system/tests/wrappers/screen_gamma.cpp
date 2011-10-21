@@ -18,7 +18,7 @@ int main ()
       return 0;
     }
 
-    Screen screen (0u);
+    Screen screen ((size_t)0);
 
     Color3f table [256], table2[256];
 
@@ -42,6 +42,8 @@ int main ()
 
     screen.SetGammaRamp (table);
     
+    Application::Sleep (1000);
+
     printf ("Restored gamma ramp:\n");
     print_gamma_ramp (table);
   }

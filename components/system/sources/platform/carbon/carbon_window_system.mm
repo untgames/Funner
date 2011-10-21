@@ -13,6 +13,7 @@
 #include "shared.h"
 
 using namespace syslib;
+using namespace syslib::macosx;
 
 namespace
 {
