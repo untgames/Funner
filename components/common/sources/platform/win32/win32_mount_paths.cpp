@@ -30,13 +30,13 @@ stl::string GetFolderPath (int csidl)
 
 stl::string GetTempDirPath ()
 {
-  stl::string result;
+  stl::wstring result;
   
   result.fast_resize (MAX_PATH);
   
-  GetTempPath (result.size (), &result [0]);
+  GetTempPathW (result.size (), &result [0]);
   
-  return result;
+  return tostring (result);
 }
 
 }

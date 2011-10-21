@@ -11,28 +11,27 @@ Win32FileSystem::file_t Win32FileSystem::FileOpen (const char* file_name, filemo
 {
   try
   {
-    UINT style = OF_SHARE_DENY_NONE;
+    UINT style = 0; //OF_SHARE_DENY_NONE;
 
     if ((mode & (FileMode_Read | FileMode_Write)) == (FileMode_Read | FileMode_Write))
     {
-      style |= OF_READWRITE;
+      style |= GENERIC_READ | GENERIC_WRITE;
     }
     else
     {
-      if (mode & FileMode_Read)  style |= OF_READ;
-      if (mode & FileMode_Write) style |= OF_WRITE;
+      if (mode & FileMode_Read)  style |= GENERIC_READ;
+      if (mode & FileMode_Write) style |= GENERIC_WRITE;
     }
 
+    UINT dwCreationDisposition = 0;
     if ((mode & FileMode_Write) && (!Win32FileSystem::IsFileExist (file_name)))
-      style |= OF_CREATE;
+      dwCreationDisposition |= CREATE_ALWAYS;
+   
+    if (mode & FileMode_Create) dwCreationDisposition |= CREATE_ALWAYS;
+ 
+    HANDLE file = CreateFileW (to_wstring_from_utf8 (file_name).c_str (),style,FILE_SHARE_READ,NULL,dwCreationDisposition,FILE_ATTRIBUTE_NORMAL, NULL);
 
-    if (mode & FileMode_Create) style |= OF_CREATE;
-
-    OFSTRUCT ofstruct;
-
-    HFILE file = OpenFile (file_name, &ofstruct, style);
-
-    if (file == HFILE_ERROR)
+    if (file == INVALID_HANDLE_VALUE)
       raise_error ("::OpenFile");      
 
     return (file_t)file;
@@ -202,7 +201,7 @@ void Win32FileSystem::Remove (const char* file_name)
 {
   try
   {
-    if (!DeleteFile (file_name))
+    if (!DeleteFileW (to_wstring_from_utf8 (file_name).c_str ()))
       raise_error ("::DeleteFile ");
   }
   catch (xtl::exception& exception)
@@ -216,7 +215,7 @@ void Win32FileSystem::Rename (const char* file_name, const char* new_name)
 {
   try
   {
-    if (!MoveFile (file_name, new_name))
+    if (!MoveFileW (to_wstring_from_utf8(file_name).c_str (), to_wstring_from_utf8(new_name).c_str ()))
       raise_error ("::MoveFile ");
   }
   catch (xtl::exception& exception)
@@ -230,7 +229,7 @@ void Win32FileSystem::Mkdir (const char* dir_name)
 {
   try
   {
-    if (!CreateDirectory (dir_name, 0))
+    if (!CreateDirectoryW (to_wstring_from_utf8 (dir_name).c_str (), 0))
       raise_error ("::CreateDirectory ");
   }
   catch (xtl::exception& exception)
@@ -246,7 +245,7 @@ void Win32FileSystem::Mkdir (const char* dir_name)
 
 bool Win32FileSystem::IsFileExist (const char* file_name)
 {
-  return GetFileAttributes (file_name) != INVALID_FILE_ATTRIBUTES;
+  return GetFileAttributesW ( to_wstring_from_utf8(file_name).c_str () ) != INVALID_FILE_ATTRIBUTES;
 }
 
 namespace
@@ -263,7 +262,7 @@ bool Win32FileSystem::GetFileInfo (const char* file_name, FileInfo& info)
 {
   try
   {
-    DWORD attrib = GetFileAttributes (file_name);
+    DWORD attrib = GetFileAttributesW ( to_wstring_from_utf8(file_name).c_str () );
 
     if (attrib == INVALID_FILE_ATTRIBUTES)
       return false;
@@ -272,7 +271,7 @@ bool Win32FileSystem::GetFileInfo (const char* file_name, FileInfo& info)
  
     WIN32_FILE_ATTRIBUTE_DATA file_info;
 
-    if (!GetFileAttributesEx (file_name, GetFileExInfoStandard, &file_info))
+    if (!GetFileAttributesExW ( to_wstring_from_utf8 (file_name).c_str (), GetFileExInfoStandard, &file_info))
        return false;
 
     info.time_create = make_time (file_info.ftCreationTime);
@@ -301,7 +300,7 @@ void Win32FileSystem::Search (const char* mask, const FileSearchHandler& handler
 
   FileInfo info;
 
-  HANDLE handle = FindFirstFile (mask, &find_file_data);
+  HANDLE handle = FindFirstFileW ( to_wstring_from_utf8(mask).c_str(), &find_file_data);
 
   if (handle == INVALID_HANDLE_VALUE)
     return;
@@ -313,7 +312,7 @@ void Win32FileSystem::Search (const char* mask, const FileSearchHandler& handler
 
   do
   {
-    if (strcmp (find_file_data.cFileName, ".") && strcmp (find_file_data.cFileName, "..") && !(find_file_data.dwFileAttributes & FILE_ATTRIBUTE_HIDDEN))
+    if (wcscmp ( find_file_data.cFileName, L".") && wcscmp ( find_file_data.cFileName, L"..") && !(find_file_data.dwFileAttributes & FILE_ATTRIBUTE_HIDDEN))
     {
       info.is_dir      = (find_file_data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) != 0;
       info.time_create = make_time (find_file_data.ftCreationTime);
@@ -322,9 +321,9 @@ void Win32FileSystem::Search (const char* mask, const FileSearchHandler& handler
       info.size        = find_file_data.nFileSizeLow;
 
       if (!dir_name.empty ()) handler (format ("%s%s", dir_name.c_str (), find_file_data.cFileName).c_str (), info);
-      else                    handler (find_file_data.cFileName,info);
+      else                    handler (tostring (find_file_data.cFileName).c_str (),info);
     }
-  } while (FindNextFile (handle, &find_file_data));
+  } while (FindNextFileW (handle, &find_file_data));
 
   CloseHandle (handle);
 }
