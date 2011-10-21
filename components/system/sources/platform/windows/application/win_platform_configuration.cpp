@@ -1,5 +1,9 @@
 #include "../shared.h"
 
+#ifndef LOCALE_SNAME
+#define LOCALE_SNAME 0x0000005c   // locale name (ie: en-us)
+#endif
+
 namespace
 {
 

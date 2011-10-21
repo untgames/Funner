@@ -193,7 +193,7 @@ class ApplicationImpl
         
       if (state)
       {      
-        for (int i=0; i<SCREEN_SAVER_LIST_SIZE; i++)
+        for (size_t i=0; i<SCREEN_SAVER_LIST_SIZE; i++)
         {
           if (!SystemParametersInfo (SCREEN_SAVER_SET_LIST [i], 0, &screen_saver_saved_state [i], SPIF_SENDWININICHANGE))
             throw xtl::format_operation_exception ("syslib::ApplicationImpl::SetScreenSaverState", "SystemParametersInfo failed for screen saver state change");          
@@ -201,7 +201,7 @@ class ApplicationImpl
       }
       else
       {
-        for (int i=0; i<SCREEN_SAVER_LIST_SIZE; i++)
+        for (size_t i=0; i<SCREEN_SAVER_LIST_SIZE; i++)
         {
           if (!SystemParametersInfo (SCREEN_SAVER_GET_LIST [i], 0, &screen_saver_saved_state [i], 0))
             throw xtl::format_operation_exception ("syslib::ApplicationImpl::SetScreenSaverState", "SystemParametersInfo failed for get screen saver state");        
