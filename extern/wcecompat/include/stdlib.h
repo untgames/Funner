@@ -26,6 +26,7 @@
 #include "malloc.h"
 #include "memory.h"
 #include "float.h"
+#include "shellapi.h"
 
 #ifdef __cplusplus
 extern "C" {

@@ -52,17 +52,18 @@ typedef struct _SHELLEXECUTEINFO
 #endif
 #endif // WINSHELLAPI
 
-BOOL WINAPI ShellExecuteEx(LPSHELLEXECUTEINFO lpExecInfo);
-
-BOOL WINAPI SHGetSpecialFolderPath(HWND hwndOwner, LPTSTR lpszPath,    
-                                      int nFolder, BOOL fCreate );
-int system(const char *command);
-
 #include <pshpack1.h>
 
 #ifdef __cplusplus
 extern "C" {            /* Assume C declarations for C++ */
 #endif  /* __cplusplus */
+
+BOOL WINAPI ShellExecuteEx(LPSHELLEXECUTEINFO lpExecInfo);
+
+BOOL WINAPI SHGetSpecialFolderPath(HWND hwndOwner, LPTSTR lpszPath,    
+                                      int nFolder, BOOL fCreate );
+
+int system(const char *command);
 
 
 // @CESYSGEN IF GWES_ICONCMN

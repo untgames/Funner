@@ -32,6 +32,7 @@
 #define _INC_WCHAR
 
 #include <stdlib.h>
+#include <string.h>
 
 #ifdef  _MSC_VER
 #pragma pack(push,8)
@@ -125,7 +126,8 @@ inline wchar_t *wmemset(wchar_t *_S, wchar_t _C, size_t _N)
                 *_Su = _C;
         return (_S); }
 }       /* end of extern "C" */
-inline wchar_t *wmemchr(wchar_t *_S, wchar_t _C, size_t _N)
+
+/*inline wchar_t *wmemchr(wchar_t *_S, wchar_t _C, size_t _N)
         {return ((wchar_t *)wmemchr((const wchar_t *)_S, _C, _N)); }
 inline wchar_t *wcschr(wchar_t *_S, wchar_t _C)
         {return ((wchar_t *)wcschr((const wchar_t *)_S, _C)); }
@@ -135,6 +137,7 @@ inline wchar_t *wcsrchr(wchar_t *_S, wchar_t _C)
         {return ((wchar_t *)wcsrchr((const wchar_t *)_S, _C)); }
 inline wchar_t *wcsstr(wchar_t *_S, const wchar_t *_P)
         {return ((wchar_t *)wcsstr((const wchar_t *)_S, _P)); }
+*/
 /* Old name */
 #define wcswcs wcsstr
 
