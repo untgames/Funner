@@ -20,6 +20,7 @@ export.link.common.linux.LIBS                  := rt
 export.link.common.cocoa.LINK_FLAGS            := -framework CoreFoundation -framework Foundation
 export.link.common.cocoa_desktop.LINK_FLAGS    := -framework AppKit
 export.link.common.pthread_static_library.LIBS := pthread
+export.link.common.wince.IMPORTS               := link.extern.wcecompat
 
 # AES link exports
 export.link.common.aes.LIBS          := funner.common.aes
