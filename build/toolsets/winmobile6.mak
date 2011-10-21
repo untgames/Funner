@@ -33,7 +33,7 @@ MSVC_PATH          := $(call convert_path,$(MSVC_PATH))
 MSVC_BIN_PATH      := $(MSVC_PATH)/bin/x86_arm
 MSVS_COMMON_PATH   := $(call convert_path,$(MSVS_COMMON_PATH))
 COMMON_CFLAGS      += -W3 -Ox -wd4996 -nologo -FC -D "_WIN32_WCE=0x502" -D "UNDER_CE" -D "WIN32_PLATFORM_PSPC" -D "WINCE" -D "ARM" -D "_ARM_" -D "POCKETPC2003_UI_MODEL" -D "UNICODE"
-COMMON_LINK_FLAGS  += -NODEFAULTLIB:oldnames.lib coredll.lib corelibc.lib
+COMMON_LINK_FLAGS  += -NODEFAULTLIB:oldnames.lib corelibc.lib
 CPU_ARCH           := armv4i
 REMOTE_INSTALL_DIR := \\funner
 WINCE_POWERTOYS    := $(call convert_path,$(WINCE_POWERTOYS))
@@ -84,7 +84,7 @@ endef
 #список подключаемых символов линковки, флаги линковки, def файл)
 ###################################################################################################
 define tools.link
-export PATH="$(MSVS_COMMON_PATH);$$PATH" && "$(MSVC_BIN_PATH)/link" -nologo -out:"$1" $(if $(filter %.dll,$1),-dll,-entry:mainACRTStartup) $(patsubst %,-libpath:"%",$3) $(patsubst %,-include:"_%",$4) $5 $2 $(COMMON_LINK_FLAGS) $(if $(map),-MAP:$(basename $1).map -MAPINFO:EXPORTS) $(if $6,-DEF:"$6")
+export PATH="$(MSVS_COMMON_PATH);$$PATH" && "$(MSVC_BIN_PATH)/link" -nologo -out:"$1" $(if $(filter %.dll,$1),-dll,-entry:mainACRTStartup) $(patsubst %,-libpath:"%",$3) $(patsubst %,-include:"%",$4) $5 $2 $(COMMON_LINK_FLAGS) $(if $(map),-MAP:$(basename $1).map -MAPINFO:EXPORTS) $(if $6,-DEF:"$6")
 endef
 
 ###################################################################################################
