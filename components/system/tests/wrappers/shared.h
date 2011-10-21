@@ -11,6 +11,7 @@
 #include <common/action_queue.h>
 #include <common/file.h>
 #include <common/log.h>
+#include <common/property_map.h>
 #include <common/time.h>
 
 #include <syslib/application.h>
