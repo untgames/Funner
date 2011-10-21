@@ -93,7 +93,7 @@ struct PrimarySwapChain::Impl
       *attr++ = AGL_FULLSCREEN;
 #ifdef AGL_DISPLAY_MASK  //MacOSX 10.5 и старше
       *attr++ = AGL_DISPLAY_MASK;
-      *attr++ = CGDisplayIDToOpenGLDisplayMask (containing_output->GetDisplayID ());
+      *attr++ = CGDisplayIDToOpenGLDisplayMask ((CGDirectDisplayID)containing_output->Handle ());
 #endif
     }
 

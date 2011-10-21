@@ -14,9 +14,6 @@ RENDER.OPENGL_DRIVER.UTILS.IMPORTS     := compile.common link.common
 RENDER.OPENGL_DRIVER.SOURCES.TYPE                   := static-lib
 RENDER.OPENGL_DRIVER.SOURCES.NAME                   := funner.render.low_level.opengl_driver
 RENDER.OPENGL_DRIVER.SOURCES.INCLUDE_DIRS           := sources
-RENDER.OPENGL_DRIVER.SOURCES.macosx.COMPILER_CFLAGS := -I$(MACOSX_SDK_PATH)/System/Library/Frameworks/ApplicationServices.framework/Frameworks/CoreGraphics.framework/Headers/ \
-                                                       -I$(MACOSX_SDK_PATH)/System/Library/Frameworks/IOKit.framework/Headers/graphics/ \
-                                                       -I$(MACOSX_SDK_PATH)/System/Library/Frameworks/AGL.framework/Headers/
 RENDER.OPENGL_DRIVER.SOURCES.SOURCE_DIRS            += sources/common
 RENDER.OPENGL_DRIVER.SOURCES.SOURCE_DIRS            += sources/driver
 RENDER.OPENGL_DRIVER.SOURCES.SOURCE_DIRS            += sources/render_target_manager
