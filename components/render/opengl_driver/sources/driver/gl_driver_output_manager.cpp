@@ -245,9 +245,10 @@ IPropertyList* Output::GetProperties ()
 typedef xtl::com_ptr<Output>   OutputPtr;
 typedef stl::vector<OutputPtr> OutputArray;
 
-struct OutputManager::Impl
+struct OutputManager::Impl: public xtl::reference_counter
 {
-  OutputArray outputs; //устройства вывода
+  OutputArray  outputs;  //устройства вывода
+  static Impl* instance; //глобальный экземпляр реализации менеджера устройств вывода  
   
 ///Конструктор
   Impl ()
@@ -258,8 +259,18 @@ struct OutputManager::Impl
     
     for (size_t i=0; i<screens_count; i++)
       outputs.push_back (OutputPtr (new Output (ScreenManager::Screen (i)), false));
+      
+    instance = this;      
   }
+
+///Деструктор  
+  ~Impl ()
+  {
+    instance = 0;
+  }  
 };
+
+OutputManager::Impl* OutputManager::Impl::instance = 0;
 
 /*
     Конструктор / деструктор
@@ -269,7 +280,10 @@ OutputManager::OutputManager ()
 {
   try
   {
-    impl = new Impl;
+    impl = OutputManager::Impl::instance;
+
+    if (!impl) impl = new Impl;
+    else       addref (impl);
   }
   catch (xtl::exception& e)
   {
@@ -280,6 +294,7 @@ OutputManager::OutputManager ()
 
 OutputManager::~OutputManager ()
 {
+  release (impl);
 }
 
 /*
