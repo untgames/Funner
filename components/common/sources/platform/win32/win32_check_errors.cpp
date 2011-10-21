@@ -12,7 +12,7 @@ stl::string get_error_message (DWORD error_code)
   void* buffer = 0;
 
   FormatMessageW (FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
-                 0, error_code, MAKELANGID (LANG_NEUTRAL, SUBLANG_DEFAULT), (LPTSTR)&buffer, 0, 0);                 
+                 0, error_code, MAKELANGID (LANG_NEUTRAL, SUBLANG_DEFAULT), (LPWSTR)&buffer, 0, 0);                 
 
   if (!buffer)
   {
@@ -45,7 +45,7 @@ stl::string get_error_message (DWORD error_code)
         }
       }
 
-    stl::string message = common::format ("Win32 error %u. %s", error_code, tostring( (const wchar_t *)buffer ));        
+    stl::string message = common::format ("Win32 error %u. %s", error_code, common::tostring((const wchar_t*)buffer).c_str ());
 
     LocalFree (buffer);
 

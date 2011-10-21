@@ -176,7 +176,7 @@ void Win32FileSystem::FileResize (file_t file, filesize_t new_size)
 
 bool Win32FileSystem::FileEof (file_t file)
 {
-  return (Win32FileSystem::FileTell (file) == Win32FileSystem::FileSize (file));
+  return Win32FileSystem::FileTell (file) == (filepos_t)Win32FileSystem::FileSize (file);
 }
 
 void Win32FileSystem::FileFlush (file_t file)
@@ -294,13 +294,13 @@ bool Win32FileSystem::GetFileInfo (const char* file_name, FileInfo& info)
 
 void Win32FileSystem::Search (const char* mask, const FileSearchHandler& handler)
 {
-  WIN32_FIND_DATA find_file_data;
+  WIN32_FIND_DATAW find_file_data;
   
   memset (&find_file_data, 0, sizeof (find_file_data));
 
   FileInfo info;
 
-  HANDLE handle = FindFirstFileW ( to_wstring_from_utf8(mask).c_str(), &find_file_data);
+  HANDLE handle = FindFirstFileW (to_wstring_from_utf8 (mask).c_str(), &find_file_data);
 
   if (handle == INVALID_HANDLE_VALUE)
     return;

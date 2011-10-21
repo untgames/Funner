@@ -16,12 +16,9 @@
 #include <common/file.h>
 #include <common/singleton.h>
 #include <common/strlib.h>
+#include <common/utf_converter.h>
 
 #include <platform/platform.h>
-
-#if defined(WINCE)
-   #include "common/utf_converter.h"
-#endif
 
 namespace common
 {
