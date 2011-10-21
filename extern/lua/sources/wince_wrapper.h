@@ -11,11 +11,6 @@ inline FILE* tmpfile ()
   return 0;
 }
 
-inline int system  (const char*)
-{
-  return 1;
-}
-
 inline int remove (const char*)
 {
   return 1;
