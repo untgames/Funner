@@ -59,15 +59,17 @@ class ScreenManagerImpl
         check_quartz_error (CGGetActiveDisplayList (displays_count, display_list.data (), &displays_count), "::CGGetActiveDisplayList",
                             "Can't get active display list");
 
-        screens.erase (display);
-
         CGDirectDisplayID *current_display = display_list.data ();
 
         for (size_t i = 0; i < displays_count; i++, current_display++)
         {
           if (*current_display == display)
           {
-            screens.insert_pair (display, CarbonScreen (*current_display));
+            ScreenMap::iterator iter = screens.find (display);
+
+            if (iter == screens.end ())
+              screens.insert_pair (display, CarbonScreen (display));
+
             break;
           }
         }
