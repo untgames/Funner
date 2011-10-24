@@ -23,6 +23,7 @@
 #include <input/cursor.h>
 
 #include <syslib/application.h>
+#include <syslib/screen.h>
 #include <syslib/window.h>
 
 #include <engine/attachments.h>
@@ -312,6 +313,8 @@ class Window: public IAttachmentRegistryListener<syslib::Window>, public IAttach
         cursor (0),
         aspect_ratio (0)
     {
+      static const char* METHOD_NAME = "engine::Window::Window";
+
         //создание окна
 
       const char* title = get<const char*> (node, "Title", (const char*)0);
@@ -399,7 +402,7 @@ class Window: public IAttachmentRegistryListener<syslib::Window>, public IAttach
       }
       else if (maximized && minimized)
       {
-        throw xtl::format_operation_exception ("engine::Window::Window", "Window can't be maximized and minimized at one time");
+        throw xtl::format_operation_exception (METHOD_NAME, "Window can't be maximized and minimized at one time");
       }
       else if (maximized)
       {
@@ -410,6 +413,55 @@ class Window: public IAttachmentRegistryListener<syslib::Window>, public IAttach
       {
         window.Minimize ();
         window.SetActive (false);
+      }
+
+      if (node.First ("MinDesktopWidth") || node.First ("MinDesktopHeight"))
+      {
+        size_t min_desktop_width  = get<size_t> (node, "MinDesktopWidth", 0),
+               min_desktop_height = get<size_t> (node, "MinDesktopHeight", 0);
+
+        syslib::Screen window_screen = syslib::Screen::ContainingScreen (window.Handle ());
+
+        if (window_screen.Width () < min_desktop_width || window_screen.Height () < min_desktop_height)
+        {
+          syslib::ScreenModeDesc best_mode;
+
+          memset (&best_mode, 0, sizeof (best_mode));
+
+          for (size_t i = 0, count = window_screen.ModesCount (); i < count; i++)
+          {
+            syslib::ScreenModeDesc current_mode;
+
+            window_screen.GetMode (i, current_mode);
+
+              //поиск режима с максимальным разрешением, частотой развертки и цветностью
+            if (current_mode.width < best_mode.width || current_mode.height < best_mode.height)
+              continue;
+
+            if (current_mode.width >= min_desktop_width && current_mode.height >= min_desktop_height)
+            {
+              if (current_mode.width > best_mode.width || current_mode.height > best_mode.height)
+                best_mode = current_mode;
+              else
+              {
+                if (current_mode.refresh_rate > best_mode.refresh_rate)
+                  best_mode = current_mode;
+                else if (current_mode.refresh_rate == best_mode.refresh_rate && current_mode.color_bits > best_mode.color_bits)
+                  best_mode = current_mode;
+              }
+            }
+          }
+
+          if (!best_mode.width)
+            log.Printf ("Can't find screen mode with minimum size %ux%u", min_desktop_width, min_desktop_height);
+          else
+          {
+            window_screen.SetCurrentMode (best_mode);
+
+            if (maximized)
+              window.Maximize ();
+          }
+        }
       }
       
         //видимость курсора
