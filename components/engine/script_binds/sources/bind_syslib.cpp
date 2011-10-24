@@ -1,6 +1,7 @@
 #include "shared.h"
 
 #include <syslib/application.h>
+#include <syslib/screen.h>
 #include <syslib/window.h>
 
 using namespace script;
@@ -19,6 +20,8 @@ namespace system_script_bind
 const char* APPLICATION_LIBRARY       = "System.Application";
 const char* APPLICATION_EVENT_LIBRARY = "System.ApplicationEvent";
 const char* WINDOW_LIBRARY            = "System.Window";
+const char* SCREEN_LIBRARY            = "System.Screen";
+const char* SCREEN_MANAGER_LIBRARY    = "System.ScreenManager";
 const char* COMPONENT_NAME            = "script.binds.System";
 const char* BINDER_NAME               = "System";
 
@@ -144,11 +147,74 @@ void bind_window_library (Environment& environment)
   environment.RegisterType<Window> (WINDOW_LIBRARY);
 }
 
+size_t get_screen_default_width (const syslib::Screen& screen)
+{
+  syslib::ScreenModeDesc desc;
+  
+  screen.GetDefaultMode (desc);
+
+  return desc.width;
+}
+
+size_t get_screen_default_height (const syslib::Screen& screen)
+{
+  syslib::ScreenModeDesc desc;
+  
+  screen.GetDefaultMode (desc);
+
+  return desc.height;
+}
+
+size_t get_screen_default_color_bits (const syslib::Screen& screen)
+{
+  syslib::ScreenModeDesc desc;
+  
+  screen.GetDefaultMode (desc);
+
+  return desc.color_bits;
+}
+
+size_t get_screen_default_refresh_rate (const syslib::Screen& screen)
+{
+  syslib::ScreenModeDesc desc;
+  
+  screen.GetDefaultMode (desc);
+
+  return desc.refresh_rate;
+}
+
+void bind_screen_library (Environment& environment)
+{
+  InvokerRegistry lib = environment.Library (SCREEN_LIBRARY);
+  
+  lib.Register ("get_Name",               make_invoker (&syslib::Screen::Name));
+  lib.Register ("get_CurrentWidth",       make_invoker (&syslib::Screen::Width));
+  lib.Register ("get_CurrentHeight",      make_invoker (&syslib::Screen::Height));
+  lib.Register ("get_CurrentColorBits",   make_invoker (&syslib::Screen::ColorBits));
+  lib.Register ("get_CurrentRefreshRate", make_invoker (&syslib::Screen::RefreshRate));
+  lib.Register ("get_DefaultWidth",       make_invoker (&get_screen_default_width));
+  lib.Register ("get_DefaultHeight",      make_invoker (&get_screen_default_height));
+  lib.Register ("get_DefaultColorBits",   make_invoker (&get_screen_default_color_bits));
+  lib.Register ("get_DefaultRefreshRate", make_invoker (&get_screen_default_refresh_rate));
+
+  environment.RegisterType<syslib::Screen> (SCREEN_LIBRARY);
+}
+
+void bind_screen_manager_library (Environment& environment)
+{
+  InvokerRegistry lib = environment.Library (SCREEN_MANAGER_LIBRARY);
+  
+  lib.Register ("get_ScreensCount", make_invoker (&syslib::ScreenManager::ScreensCount));
+  lib.Register ("Screen",           make_invoker (&syslib::ScreenManager::Screen));
+}
+
 void bind_syslib_library (Environment& environment)
 {
   bind_application_events_library (environment);
   bind_application_library        (environment);
   bind_window_library             (environment);
+  bind_screen_library             (environment);
+  bind_screen_manager_library     (environment);  
 }
 
 /*
