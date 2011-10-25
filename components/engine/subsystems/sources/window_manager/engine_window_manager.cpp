@@ -425,6 +425,7 @@ class Window: public IAttachmentRegistryListener<syslib::Window>, public IAttach
         if (window_screen.Width () < min_desktop_width || window_screen.Height () < min_desktop_height)
         {
           syslib::ScreenModeDesc best_mode;
+          size_t                 best_mode_resolution = 0;
 
           memset (&best_mode, 0, sizeof (best_mode));
 
@@ -434,14 +435,19 @@ class Window: public IAttachmentRegistryListener<syslib::Window>, public IAttach
 
             window_screen.GetMode (i, current_mode);
 
+            size_t current_mode_resolution = current_mode.width * current_mode.height;
+
               //поиск режима с максимальным разрешением, частотой развертки и цветностью
-            if (current_mode.width < best_mode.width || current_mode.height < best_mode.height)
+            if (current_mode_resolution < best_mode_resolution)
               continue;
 
             if (current_mode.width >= min_desktop_width && current_mode.height >= min_desktop_height)
             {
-              if (current_mode.width > best_mode.width || current_mode.height > best_mode.height)
-                best_mode = current_mode;
+              if (current_mode_resolution > best_mode_resolution)
+              {
+                best_mode            = current_mode;
+                best_mode_resolution = current_mode_resolution;
+              }
               else
               {
                 if (current_mode.refresh_rate > best_mode.refresh_rate)
