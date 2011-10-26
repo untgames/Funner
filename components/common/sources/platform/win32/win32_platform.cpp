@@ -8,6 +8,9 @@ using namespace common;
 
 ICustomFileSystem* Win32Platform::GetFileSystem ()
 {
+#ifdef WINCE
+  return &*Singleton<Win32FileSystem>::Instance ();
+#else
   return DefaultPlatform::GetFileSystem ();
-//  return &*Singleton<Win32FileSystem>::Instance ();
+#endif
 }
