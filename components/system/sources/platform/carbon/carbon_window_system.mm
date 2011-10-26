@@ -15,6 +15,35 @@
 using namespace syslib;
 using namespace syslib::macosx;
 
+@interface WindowDisposer : NSObject
+{
+  @private
+    WindowRef window;
+}
+
+@end
+
+@implementation WindowDisposer
+
+-(id)initWithWindow:(WindowRef)in_window
+{
+  self = [super init];
+
+  if (!self)
+    return nil;
+
+  window = in_window;
+
+  return self;
+}
+
+-(void)dispose
+{
+  DisposeWindow (window);
+}
+
+@end
+
 namespace
 {
 
@@ -22,6 +51,8 @@ const OSType WINDOW_PROPERTY_CREATOR     = 'untg';  //тег приложения
 const OSType FULLSCREEN_PROPERTY_TAG     = 'fscr';  //тег свойства полноэкранности
 const OSType CURSOR_VISIBLE_PROPERTY_TAG = 'hcrs';  //тег видимости курсора (если истина - курсор виден)
 const OSType WINDOW_IMPL_PROPERTY        = 'impl';  //указатель на реализацию данного окна
+//const UInt32 UNTGS_EVENT_CLASS           = 'untg';  //класс событий приложения
+//const UInt32 DELETE_WINDOW_EVENT         = 'dwnd';  //событие удаления окна
 
 const size_t CHAR_CODE_BUFFER_SIZE = 4;  //размер буффера для декодированного имени символа
 
@@ -46,6 +77,7 @@ struct WindowImpl
   WindowGroupRef       window_group;
   bool                 is_maximized;                            //окно находится в полноэкранном режиме
   bool                 is_multitouch_enabled;                   //включен ли multitouch
+  bool                 collapsed_by_user;                       //было ли окно свернуто пользователем
 
   WindowImpl (WindowMessageHandler handler, void* in_user_data)
     : user_data (in_user_data)
@@ -61,6 +93,7 @@ struct WindowImpl
     , window_group (0)
     , is_maximized (false)
     , is_multitouch_enabled (false)
+    , collapsed_by_user (false)
     {}
 
   ~WindowImpl ()
@@ -77,8 +110,15 @@ struct WindowImpl
     if (carbon_application_event_handler_proc)
       DisposeEventHandlerUPP (carbon_application_event_handler_proc);
 
-    if (carbon_window)
-      DisposeWindow (carbon_window);
+    if (carbon_window) //удаление окна по таймеру, так как если удалить окно во время деактивации к нему идет обращение со стороны системы
+    {
+      WindowDisposer *disposer = [[WindowDisposer alloc] initWithWindow:carbon_window];
+
+      [NSTimer scheduledTimerWithTimeInterval:0.1 target:disposer selector:@selector (dispose) userInfo:nil repeats:NO];
+
+      [disposer release];
+//      DisposeWindow (carbon_window);
+    }
 
     if (window_group)
       ReleaseWindowGroup (window_group);
@@ -268,7 +308,8 @@ OSStatus window_message_handler (EventHandlerCallRef event_handler_call_ref, Eve
   UInt32             event_kind      = GetEventKind (event);
   WindowImpl*        window_impl     = (WindowImpl*)impl;
   WindowRef          wnd             = window_impl->carbon_window;
-  window_t window_handle   = (window_t)wnd;
+  window_t           window_handle   = (window_t)wnd;
+//  bool               window_deleted  = false;
 
   try
   {
@@ -321,18 +362,52 @@ OSStatus window_message_handler (EventHandlerCallRef event_handler_call_ref, Eve
       case kEventClassWindow:
         switch (event_kind)
         {
+          case kEventWindowClickCollapseRgn:
+            window_impl->collapsed_by_user = true;
+            break;
+          case kEventWindowExpanded:
+            window_impl->collapsed_by_user = false;
+            break;
           case kEventWindowClose: //попытка закрытия окна
             window_impl->Notify (window_handle, WindowEvent_OnClose, context);
             break;
-          case kEventWindowClosed: //окно закрыто
+          case kEventWindowDispose: //окно закрыто
+          {
+/*            EventRef delete_window_event = 0;
+
+            try
+            {
+              check_event_manager_error (CreateEvent (0, UNTGS_EVENT_CLASS, DELETE_WINDOW_EVENT, 0, kEventAttributeNone, &delete_window_event),
+                                         "::CreateEvent", "Can't create window delete event");
+
+              check_event_manager_error (SetEventParameter (delete_window_event, 0, 0, sizeof (window_impl), &window_impl), "::SetEventParameter", "Can't set event parameter");
+
+              check_event_manager_error (PostEventToQueue (GetMainEventQueue (), delete_window_event, kEventPriorityStandard),
+                                         "::PostEventToQueue", "Can't send delete window event");
+            }
+            catch (xtl::exception& exception)
+            {
+              if (delete_window_event)
+                ReleaseEvent (delete_window_event);
+              throw;
+            }
+
+            if (delete_window_event)
+              ReleaseEvent (delete_window_event);*/
+
             window_impl->Notify (window_handle, WindowEvent_OnDestroy, context);
 
             delete window_impl;
+
             break;
+          }
           case kEventWindowDrawContent: //перерисовка окна
             window_impl->Notify (window_handle, WindowEvent_OnPaint, context);
             break;
           case kEventWindowActivated: //окно стало активным
+            if (window_impl->is_maximized)
+              check_window_manager_error (SetSystemUIMode (kUIModeAllHidden, 0), "::SetSystemUIMode", "Can't set required system UI mode");
+
             if (is_cursor_in_client_region (wnd))
             {
               CarbonWindowManager::SetCursorVisible (window_handle, CarbonWindowManager::GetCursorVisible (window_handle));
@@ -345,6 +420,9 @@ OSStatus window_message_handler (EventHandlerCallRef event_handler_call_ref, Eve
             window_impl->Notify (window_handle, WindowEvent_OnActivate, context);
             break;
           case kEventWindowDeactivated: //окно стало неактивным
+            if (window_impl->is_maximized)
+              check_window_manager_error (SetSystemUIMode (kUIModeNormal, 0), "::SetSystemUIMode", "Can't set required system UI mode");
+
             window_impl->Notify (window_handle, WindowEvent_OnDeactivate, context);
             break;
           case kEventWindowShown: //окно стало видимым
@@ -558,10 +636,14 @@ OSStatus window_message_handler (EventHandlerCallRef event_handler_call_ref, Eve
 
     if (event_processed)
     {
-      OSStatus operation_result = CallNextEventHandler (event_handler_call_ref, event);
+//      if (!window_deleted)
+//      {
+        OSStatus operation_result = CallNextEventHandler (event_handler_call_ref, event);
 
-      if (operation_result != eventNotHandledErr)
-        check_event_manager_error (operation_result, "::CallNextEventHandler", "Can't call next event handler");
+        if (operation_result != eventNotHandledErr)
+          check_event_manager_error (operation_result, "::CallNextEventHandler", "Can't call next event handler");
+//      }
+
       return noErr;
     }
     else
@@ -592,6 +674,75 @@ OSStatus application_message_handler (EventHandlerCallRef event_handler_call_ref
   try
   {
     is_fullscreen = check_fullscreen (wnd);
+
+    UInt32 event_kind = GetEventKind (event);
+
+    switch (GetEventClass (event))
+    {
+/*      case UNTGS_EVENT_CLASS:
+        if (event_kind == DELETE_WINDOW_EVENT)
+        {
+          WindowImpl* destroyed_window;
+
+          check_event_manager_error (GetEventParameter (event, 0, 0, 0, sizeof (WindowImpl*), 0, &destroyed_window),
+                                     "::GetEventParameter", "Can't get destroyed window");
+
+          if (destroyed_window == window_impl)
+            delete window_impl;
+        }
+
+        break;*/
+      case kEventClassMouse:
+        if (window_impl->is_cursor_in_window)  //обработка выхода мышки за пределы окна
+        {
+          switch (event_kind)
+          {
+            case kEventMouseMoved:
+            case kEventMouseDragged:
+            {
+              //получение контекста события
+
+              WindowEventContext context;
+
+              GetEventContext (wnd, context);
+
+              if (!is_cursor_in_client_region (wnd))
+              {
+                window_t window_handle = (window_t)wnd;
+
+                window_impl->is_cursor_in_window = false;
+                window_impl->Notify (window_handle, WindowEvent_OnMouseLeave, context);
+
+                if (!CarbonWindowManager::GetCursorVisible (window_handle)) //если курсор невидим - показываем его при выходе из окна
+                  while (!CGCursorIsVisible ())
+                    CGDisplayShowCursor (kCGDirectMainDisplay);
+
+                [[NSCursor arrowCursor] set];
+              }
+
+              break;
+            }
+            default:
+              break;
+          }
+        }
+
+        break;
+      case kEventClassApplication:
+        if (GetEventKind (event) == kEventAppActivated)
+        {
+          WindowRef activated_window;
+
+          check_event_manager_error (GetEventParameter (event, kEventParamWindowRef, typeWindowRef, 0,
+                                                        sizeof (WindowRef), 0, &activated_window),
+                                     "::GetEventParameter", "Can't get activated_window");
+
+          if ((!activated_window || activated_window == wnd) && !window_impl->collapsed_by_user)
+            CarbonWindowManager::SetWindowFlag ((window_handle*)wnd, WindowFlag_Minimized, false);
+        }
+
+        break;
+    }
   }
   catch (std::exception& exception)
   {
@@ -600,40 +751,6 @@ OSStatus application_message_handler (EventHandlerCallRef event_handler_call_ref
   catch (...)
   {
     printf ("Exception at processing event in ::application_message_handler : unknown exception\n");
-  }
-
-  if (window_impl->is_cursor_in_window && GetEventClass (event) == kEventClassMouse)  //обработка выхода мышки за пределы окна
-  {
-    switch (GetEventKind (event))
-    {
-      case kEventMouseMoved:
-      case kEventMouseDragged:
-      {
-        //получение контекста события
-
-        WindowEventContext context;
-
-        GetEventContext (wnd, context);
-
-        if (!is_cursor_in_client_region (wnd))
-        {
-          window_t window_handle = (window_t)wnd;
-
-          window_impl->is_cursor_in_window = false;
-          window_impl->Notify (window_handle, WindowEvent_OnMouseLeave, context);
-
-          if (!CarbonWindowManager::GetCursorVisible (window_handle)) //если курсор невидим - показываем его при выходе из окна
-            while (!CGCursorIsVisible ())
-              CGDisplayShowCursor (kCGDirectMainDisplay);
-
-          [[NSCursor arrowCursor] set];
-        }
-
-        break;
-      }
-      default:
-        break;
-    }
   }
 
   if (is_fullscreen)
@@ -686,6 +803,8 @@ window_t CarbonWindowManager::CreateWindow (WindowStyle style, WindowMessageHand
       check_window_manager_error (CreateNewWindow (window_class, window_attributes, &window_rect, &new_window), "::CreateNewWindow",
                                   "Can't create window");
 
+      check_window_manager_error (HIWindowChangeFeatures (new_window, kWindowCanCollapse, 0), "::HIWindowChangeFeatures", "Can't set window collapsable");
+
       window_impl->carbon_window = new_window;
 
       bool initial_cursor_visibility = true;
@@ -703,7 +822,7 @@ window_t CarbonWindowManager::CreateWindow (WindowStyle style, WindowMessageHand
 
       EventTypeSpec window_handled_event_types [] = {
         { kEventClassWindow,    kEventWindowClose },
-        { kEventClassWindow,    kEventWindowClosed },
+        { kEventClassWindow,    kEventWindowDispose },
         { kEventClassWindow,    kEventWindowDrawContent },
         { kEventClassWindow,    kEventWindowActivated },
         { kEventClassWindow,    kEventWindowDeactivated },
@@ -712,6 +831,8 @@ window_t CarbonWindowManager::CreateWindow (WindowStyle style, WindowMessageHand
         { kEventClassWindow,    kEventWindowBoundsChanged },
         { kEventClassWindow,    kEventWindowFocusAcquired },
         { kEventClassWindow,    kEventWindowFocusRelinquish },
+        { kEventClassWindow,    kEventWindowClickCollapseRgn },
+        { kEventClassWindow,    kEventWindowExpanded },
 #ifdef MACOSX_10_5_SUPPORTED
         { kEventClassWindow,    kEventWindowFocusLost },
         { kEventClassWindow,    kEventWindowFocusRestored },
@@ -741,11 +862,13 @@ window_t CarbonWindowManager::CreateWindow (WindowStyle style, WindowMessageHand
       EventHandlerUPP application_event_handler_proc = NewEventHandlerUPP (&application_message_handler);
 
       EventTypeSpec application_handled_event_types [] = {
-        { kEventClassMouse,     kEventMouseDown },
-        { kEventClassMouse,     kEventMouseUp },
-        { kEventClassMouse,     kEventMouseMoved },
-        { kEventClassMouse,     kEventMouseDragged },
-        { kEventClassMouse,     kEventMouseWheelMoved },
+        { kEventClassMouse,       kEventMouseDown },
+        { kEventClassMouse,       kEventMouseUp },
+        { kEventClassMouse,       kEventMouseMoved },
+        { kEventClassMouse,       kEventMouseDragged },
+        { kEventClassMouse,       kEventMouseWheelMoved },
+        { kEventClassApplication, kEventAppActivated },
+//        { UNTGS_EVENT_CLASS,      DELETE_WINDOW_EVENT },
       };
 
       check_event_manager_error (InstallEventHandler (GetApplicationEventTarget (), application_event_handler_proc,
@@ -830,7 +953,7 @@ void CarbonWindowManager::DestroyWindow (window_t handle)
 
   try
   {
-    check_event_manager_error (CreateEvent (0, kEventClassWindow, kEventWindowClosed, 0, kEventAttributeNone, &closed_window_event),
+    check_event_manager_error (CreateEvent (0, kEventClassWindow, kEventWindowDispose, 0, kEventAttributeNone, &closed_window_event),
                                "::CreateEvent", "Can't create window closed event");
 
     check_event_manager_error (SendEventToEventTarget (closed_window_event, GetWindowEventTarget ((WindowRef)handle)),
@@ -1005,7 +1128,7 @@ void CarbonWindowManager::SetWindowFlag (window_t handle, WindowFlag flag, bool 
 
           if (state)
           {
-            SetSystemUIMode (kUIModeAllHidden, 0);
+            check_window_manager_error (SetSystemUIMode (kUIModeAllHidden, 0), "::SetSystemUIMode", "Can't set required system UI mode");
 
             impl->is_maximized = true;
 
@@ -1023,7 +1146,7 @@ void CarbonWindowManager::SetWindowFlag (window_t handle, WindowFlag flag, bool 
           {
             if (impl->is_maximized)
             {
-              SetSystemUIMode (kUIModeNormal, 0);
+              check_window_manager_error (SetSystemUIMode (kUIModeNormal, 0), "::SetSystemUIMode", "Can't set required system UI mode");
               impl->is_maximized = false;
             }
           }
