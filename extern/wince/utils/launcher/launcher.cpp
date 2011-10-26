@@ -292,6 +292,7 @@ int wmain (int argc, wchar_t* argv [])
 
   memset (&process_information, 0, sizeof (process_information));
 
+
   if (!CreateProcessW (exe_to_start, exe_to_start, 0, 0, FALSE, 0, 0, 0, 0, &process_information))
   {
     sock_printf (sendrecv_socket, "Can't create process for '%S'\n", exe_to_start);
