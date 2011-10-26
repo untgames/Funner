@@ -209,6 +209,8 @@ typedef stl::vector <IWindowListener*> ListenerArray;
 
 -(void) dealloc
 {
+  [[NSNotificationCenter defaultCenter] removeObserver:self];
+
   delete listeners;
   delete event_context;
 
@@ -274,12 +276,25 @@ typedef stl::vector <IWindowListener*> ListenerArray;
   self.rootViewController = [[UIViewControllerWrapper alloc] init];
   [self.rootViewController release];
 
+  [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector (onShow) name:UIWindowDidBecomeVisibleNotification object:self];
+  [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector (onHide) name:UIWindowDidBecomeHiddenNotification object:self];
+
   return self;
 }
 
--(void) onPaint
+-(void)onPaint
 {
   window_impl->Notify (WindowEvent_OnPaint, [self getEventContext]);
+}
+
+-(void)onShow
+{
+  window_impl->Notify (WindowEvent_OnShow, [self getEventContext]);
+}
+
+-(void)onHide
+{
+  window_impl->Notify (WindowEvent_OnHide, [self getEventContext]);
 }
 
 -(WindowEventContext&) getEventContext
