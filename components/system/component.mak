@@ -52,5 +52,6 @@ SYSTEMLIB.UTILS.ANDROID_LAUNCHER.RES_DIR       := utils/android_launcher/res
 SYSTEMLIB.UTILS.TABLETOS_LAUNCHER.TYPE          := tabletos-bar
 SYSTEMLIB.UTILS.TABLETOS_LAUNCHER.NAME          := funner.application
 SYSTEMLIB.UTILS.TABLETOS_LAUNCHER.SOURCE_DIRS   := utils/tabletos_launcher
+SYSTEMLIB.UTILS.TABLETOS_LAUNCHER.LIBS          := socket
 SYSTEMLIB.UTILS.TABLETOS_LAUNCHER.RES_DIR       := utils/tabletos_launcher/res
 SYSTEMLIB.UTILS.TABLETOS_LAUNCHER.MANIFEST_FILE := utils/tabletos_launcher/res/bar-descriptor.xml
