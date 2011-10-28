@@ -269,7 +269,7 @@ LRESULT CALLBACK WindowMessageHandler (HWND wnd, UINT message, WPARAM wparam, LP
   GetEventContext (wnd, context, client_rect);
 
     //обработка сообщений
-
+    
   switch (message)
   {
     case WM_DESTROY: //уничтожение окна
@@ -501,7 +501,7 @@ LRESULT CALLBACK WindowMessageHandler (HWND wnd, UINT message, WPARAM wparam, LP
       return 0;
   }
 
-    //обработка сообщений по умолчанию
+    //обработка сообщений по умолчанию    
 
   return DefWindowProc (wnd, message, wparam, lparam);
 }
@@ -836,7 +836,8 @@ void WindowsWindowManager::SetWindowFlag (window_t handle, WindowFlag flag, bool
         }
         else
         {
-          ShowWindow (wnd, SW_MINIMIZE);
+          ShowWindow (wnd, SW_HIDE);
+          ShowWindow (wnd, SW_SHOWNOACTIVATE);
           check_errors ("::ShowWindow");
         }
 
