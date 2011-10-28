@@ -40,10 +40,6 @@ sphere body state:
 Body world transform:
   position = -8; -13; 0
   orientation = 0.1; -0.2; 0.4; 0.8
-capsule body state:
-Body world transform:
-  position = -11; -13; -1
-  orientation = 0.4; 0.8; 0.0; 0.1
 convex body state:
 Body world transform:
   position = 0; -14; 1
