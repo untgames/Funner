@@ -3,7 +3,8 @@
 ###################################################################################################
 TARGETS := SYSTEMLIB.SOURCES SYSTEMLIB.TESTS
 
-TARGETS.android += SYSTEMLIB.UTILS.ANDROID_LAUNCHER
+TARGETS.android  += SYSTEMLIB.UTILS.ANDROID_LAUNCHER
+TARGETS.tabletos += SYSTEMLIB.UTILS.TABLETOS_LAUNCHER
 
 #Öåëü ¹1 - System library sources
 SYSTEMLIB.SOURCES.TYPE                              := static-lib
@@ -38,7 +39,7 @@ SYSTEMLIB.TESTS.SOURCE_DIRS      := tests/wrappers tests/thread
 SYSTEMLIB.TESTS.IMPORTS          := compile.system link.system link.common.zip_file_system
 SYSTEMLIB.TESTS.x11.IMPORTS      := link.media.image.ani_cursor_loader
 
-#Öåëü ¹4 - Android launcher
+#Öåëü ¹3 - Android launcher
 SYSTEMLIB.UTILS.ANDROID_LAUNCHER.TYPE          := android-pak
 SYSTEMLIB.UTILS.ANDROID_LAUNCHER.NAME          := funner.application
 SYSTEMLIB.UTILS.ANDROID_LAUNCHER.DLL_DIRS       = $(PLATFORM_DIR)/arch-arm/usr/lib
@@ -46,3 +47,10 @@ SYSTEMLIB.UTILS.ANDROID_LAUNCHER.DLLS          := android
 SYSTEMLIB.UTILS.ANDROID_LAUNCHER.SOURCE_DIRS   := utils/android_launcher
 SYSTEMLIB.UTILS.ANDROID_LAUNCHER.MANIFEST_FILE := utils/android_launcher/AndroidManifest.xml
 SYSTEMLIB.UTILS.ANDROID_LAUNCHER.RES_DIR       := utils/android_launcher/res
+
+#Öåëü ¹4 - Tabletos launcher
+SYSTEMLIB.UTILS.TABLETOS_LAUNCHER.TYPE          := tabletos-bar
+SYSTEMLIB.UTILS.TABLETOS_LAUNCHER.NAME          := funner.application
+SYSTEMLIB.UTILS.TABLETOS_LAUNCHER.SOURCE_DIRS   := utils/tabletos_launcher
+SYSTEMLIB.UTILS.TABLETOS_LAUNCHER.RES_DIR       := utils/tabletos_launcher/res
+SYSTEMLIB.UTILS.TABLETOS_LAUNCHER.MANIFEST_FILE := utils/tabletos_launcher/res/bar-descriptor.xml
