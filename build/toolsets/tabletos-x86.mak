@@ -10,7 +10,7 @@ endif
 ###################################################################################################
 QNX_TARGET               := $(TABLETOS_NDK)/target/qnx6
 QNX_HOST                 := $(TABLETOS_NDK)/host/win32/x86
-PROFILES                 += unistd tabletos has_windows has_iconv gles egl
+PROFILES                 += unistd tabletos has_windows has_iconv gles egl no_dll
 REMOTE_DEBUG_DIR         ?= //accounts/devuser/funner
 EXE_SUFFIX               :=
 DLL_SUFFIX               := .so
@@ -30,6 +30,7 @@ TABLETOS_HOST            := $(strip $(TABLETOS_HOST))
 TABLETOS_USER            := $(strip $(TABLETOS_USER))
 TABLETOS_PORT            := $(strip $(TABLETOS_PORT))
 VALID_TARGET_TYPES       += tabletos-bar
+TESTS_LAUNCHER           := $(DIST_BIN_DIR)/funner.application.bar
 
 ifneq (,$(filter Win%,$(OS)))
 TABLETOS_KEY         := $(BUILD_DIR)/platforms/tabletos/id_rsa.ppk
@@ -81,6 +82,17 @@ export PATH_SEARCH="$(foreach path,$3,$$(export SUBST_PATH_STRING=$$(cd $(path) 
 export PATH_SEARCH=$${PATH_SEARCH/\ /:} && \
 export SUBST_CMD_STRING=$$(cd $(dir $(firstword $1)) && pwd)/$(notdir $(firstword $1)) && export SUBST_COMMAND=$(REMOTE_DEBUG_DIR)/$${SUBST_CMD_STRING/#$$ROOT_SUBSTRING/} && \
 $(call ssh_run,"export PATH=\$\$$PATH:\.:$$PATH_SEARCH LD_LIBRARY_PATH=\$\$$LD_LIBRARY_PATH:\.:$$PATH_SEARCH && mkdir -p $$(echo $$SUBST_DIR_RESULT) && cd $$(echo $$SUBST_DIR_RESULT) && $$(echo $$SUBST_COMMAND) $(subst $(firstword $1),,$1)",$(TABLETOS_USER)@$(TABLETOS_HOST),,$(TABLETOS_PORT),$(TABLETOS_KEY))
+endef
+
+#Выполнение команды из пакета (команда, каталог запуска, дополнительные пути поиска библиотек и приложений, список динамических библиотек)
+define tools.run.tabletos_package
+export ROOT_SUBSTRING=$$(cd $(ROOT) && pwd)/ && \
+export SUBST_DIR_STRING=$$(cd $2 && pwd) && export SUBST_DIR_RESULT=$(REMOTE_DEBUG_DIR)/$${SUBST_DIR_STRING/#$$ROOT_SUBSTRING/} && \
+export PATH_SEARCH="$(foreach path,$3,$$(export SUBST_PATH_STRING=$$(cd $(path) && pwd) && echo $(REMOTE_DEBUG_DIR)/$${SUBST_PATH_STRING/#$$ROOT_SUBSTRING/}))" && \
+export PATH_SEARCH=$${PATH_SEARCH/\ /:} && \
+export SUBST_CMD_STRING=$$(cd $(dir $(firstword $1)) && pwd)/$(notdir $(firstword $1)) && export SUBST_COMMAND=$(REMOTE_DEBUG_DIR)/$${SUBST_CMD_STRING/#$$ROOT_SUBSTRING/} && \
+export PATH=$$PATH:/$(subst :,,$(call convert_path,$(TABLETOS_NDK_GCC)/bin)) && $(notdir $(DEPLOYER)) -launchApp -device $(TABLETOS_HOST) -password $(TABLETOS_PASSWORD) -package $(TESTS_LAUNCHER) && \
+echo "$$(echo $$SUBST_COMMAND) $$(echo $$SUBST_DIR_RESULT) $(args)" | plink -P 1663 -raw $(TABLETOS_HOST)
 endef
 
 ###################################################################################################
@@ -144,6 +156,6 @@ define process_target.tabletos-bar
   
   RUN.$1: INSTALL.$1
 		@export PATH=$$$$PATH:/$(subst :,,$(call convert_path,$(TABLETOS_NDK_GCC)/bin)) && $(notdir $(DEPLOYER)) -launchApp -device $(TABLETOS_HOST) -password $(TABLETOS_PASSWORD) -package $$($1.BAR_FILE)
-		@echo "/accounts/devuser/funner/tmp/tabletos-x86/XTL.STL.TESTS/tests/stl/accum1 /accounts/devuser/funner/tmp/tabletos-x86/XTL.STL.TESTS  " | plink -P 1663 -raw $(TABLETOS_HOST)
+#		@echo "/accounts/devuser/funner/tmp/tabletos-x86/XTL.STL.TESTS/tests/stl/accum1 /accounts/devuser/funner/tmp/tabletos-x86/XTL.STL.TESTS  " | plink -P 1663 -raw $(TABLETOS_HOST)
 
 endef
