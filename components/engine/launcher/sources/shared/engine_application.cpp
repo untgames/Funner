@@ -228,6 +228,23 @@ class Application: public IEngine
       }      
     }
 
+    ///Запуск главного цикла
+    void Execute (const char* command)
+    {
+      try
+      {
+        manager.Execute (command);
+      }
+      catch (std::exception& exception)
+      {
+        printf ("exception at Application::Execute: %s\n", exception.what ());
+      }
+      catch (...)
+      {
+        printf ("unknown exception at Application::Execute\n");
+      }
+    }
+
   private:
 ///Обработчик старта приложения
     void StartupHandler (common::ParseNode config_node)

@@ -120,6 +120,9 @@ class IEngine
 
     ///Создание интерфейса поддержки внешних окон
     virtual IWindow* CreateWindow (const char* name) = 0;
+
+    ///Запуск главного цикла
+    virtual void Execute (const char* command) = 0;
 };
 
 }
