@@ -9,7 +9,7 @@ using namespace physics::low_level;
 
 typedef xtl::com_ptr<IDriver> DriverPtr;
 
-struct PhysicsManager::Impl
+struct PhysicsManager::Impl: public xtl::trackable
 {
   DriverPtr                      driver;   //драйвер
   media::physics::PhysicsLibrary library;  //библиотека описаний объектов
@@ -213,4 +213,23 @@ void PhysicsManager::UnloadLibrary (const char* name)
     e.touch ("physics::PhysicsManager::UnloadLibrary");
     throw;
   }
+}
+
+/*
+    Получение объекта оповещения об удалении менеджера
+*/
+
+xtl::trackable& PhysicsManager::Trackable () const
+{
+  return *impl;
+}
+
+namespace physics
+{
+
+xtl::trackable& get_trackable (const PhysicsManager& manager)
+{
+  return manager.Trackable ();
+}
+
 }
