@@ -144,6 +144,6 @@ define process_target.tabletos-bar
   
   RUN.$1: INSTALL.$1
 		@export PATH=$$$$PATH:/$(subst :,,$(call convert_path,$(TABLETOS_NDK_GCC)/bin)) && $(notdir $(DEPLOYER)) -launchApp -device $(TABLETOS_HOST) -password $(TABLETOS_PASSWORD) -package $$($1.BAR_FILE)
-		@plink -P 1663 -telnet $(TABLETOS_HOST)
+		@echo "/accounts/devuser/funner/tmp/tabletos-x86/XTL.STL.TESTS/tests/stl/accum1 /accounts/devuser/funner/tmp/tabletos-x86/XTL.STL.TESTS  " | plink -P 1663 -raw $(TABLETOS_HOST)
 
 endef
