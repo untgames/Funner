@@ -22,6 +22,7 @@ COMPILER_GCC             := $(TABLETOS_NDK_GCC)/bin/$(TABLETOS_NDK_TOOL_PREFIX)g
 LINKER_GCC               := $(TABLETOS_NDK_GCC)/bin/$(TABLETOS_NDK_TOOL_PREFIX)g++
 LIB_GCC                  := $(TABLETOS_NDK_GCC)/bin/$(TABLETOS_NDK_TOOL_PREFIX)ar
 PACKAGER                 := $(TABLETOS_NDK_GCC)/bin/blackberry-nativepackager
+DEPLOYER                 := $(TABLETOS_NDK_GCC)/bin/blackberry-deploy
 COMMON_CPPFLAGS          += -fexceptions -frtti
 COMMON_CFLAGS            += -DTABLETOS -O2 -Wno-strict-aliasing -I$(TABLETOS_NDK)/target/target-override/usr/include
 COMMON_LINK_FLAGS        += -Wl,-L,$(DIST_BIN_DIR)
@@ -118,4 +119,30 @@ define process_target.tabletos-bar
   $$($1.BAR_FILE): $$($1.EXE_FILE) $$($1.RES_FILES) $$($1.MANIFEST_FILE)
 		@echo Packaging $$(notdir $$@)...
 		@export PATH=$$$$PATH:/$(subst :,,$(call convert_path,$(TABLETOS_NDK_GCC)/bin)) && $(notdir $(PACKAGER)) -package $$@ -devMode $$($1.MANIFEST_FILE) -C $$($1.TMP_DIR) $$($1.EXE_FILE) -C $$($1.RES_DIR) $$($1.RES_FILES)
+		
+#Install package
+  install: INSTALL.$1
+  uninstall: UNINSTALL.$1
+
+  .PHONY: INSTALL.$1 UNINSTALL.$1
+
+  INSTALL.$1: $$($1.TMP_DIR) $$($1.INSTALLATION_FLAG)
+
+  $$($1.INSTALLATION_FLAG): $$($1.BAR_FILE)
+		@echo Installing $$(notdir $$<)...
+		@export PATH=$$$$PATH:/$(subst :,,$(call convert_path,$(TABLETOS_NDK_GCC)/bin)) && $(notdir $(DEPLOYER)) -uninstallApp -device $(TABLETOS_HOST) -password $(TABLETOS_PASSWORD) -package $$($1.BAR_FILE)
+		@export PATH=$$$$PATH:/$(subst :,,$(call convert_path,$(TABLETOS_NDK_GCC)/bin)) && $(notdir $(DEPLOYER)) -installApp -device $(TABLETOS_HOST) -password $(TABLETOS_PASSWORD) -package $$($1.BAR_FILE)
+		@touch $$@
+
+  $1.UNINSTALL:
+		@export PATH=$$$$PATH:/$(subst :,,$(call convert_path,$(TABLETOS_NDK_GCC)/bin)) && $(notdir $(DEPLOYER)) -uninstallApp -device $(TABLETOS_HOST) -password $(TABLETOS_PASSWORD) -package $$($1.BAR_FILE)  
+		
+#Run package
+  run: RUN.$1
+  
+  .PHONY: RUN.$1
+  
+  RUN.$1: INSTALL.$1
+		@export PATH=$$$$PATH:/$(subst :,,$(call convert_path,$(TABLETOS_NDK_GCC)/bin)) && $(notdir $(DEPLOYER)) -launchApp -device $(TABLETOS_HOST) -password $(TABLETOS_PASSWORD) -package $$($1.BAR_FILE)
+
 endef
