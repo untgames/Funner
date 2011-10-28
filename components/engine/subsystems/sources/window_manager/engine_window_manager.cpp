@@ -463,6 +463,8 @@ class Window: public IAttachmentRegistryListener<syslib::Window>, public IAttach
           else
           {
             window_screen.SetCurrentMode (best_mode);
+            
+            saved_window_screen = stl::auto_ptr<syslib::Screen> (new syslib::Screen (window_screen));
 
             if (maximized)
               window.Maximize ();
@@ -523,10 +525,20 @@ class Window: public IAttachmentRegistryListener<syslib::Window>, public IAttach
 ///Деструктор
     ~Window ()
     {
-      BindCursor (0);
-      AttachmentRegistry::Unregister (attachment_name.c_str (), window);
-      AttachmentRegistry::Detach (static_cast<IAttachmentRegistryListener<syslib::Window>*> (this));
-      AttachmentRegistry::Detach (static_cast<IAttachmentRegistryListener<input::Cursor>*> (this));
+      try
+      {
+        if (saved_window_screen)
+          saved_window_screen->RestoreDefaultMode ();
+        
+        BindCursor (0);
+        
+        AttachmentRegistry::Unregister (attachment_name.c_str (), window);
+        AttachmentRegistry::Detach (static_cast<IAttachmentRegistryListener<syslib::Window>*> (this));
+        AttachmentRegistry::Detach (static_cast<IAttachmentRegistryListener<input::Cursor>*> (this));
+      }
+      catch (...)
+      {
+      }
     }
     
 ///Имя курсора
@@ -673,15 +685,16 @@ class Window: public IAttachmentRegistryListener<syslib::Window>, public IAttach
     }
 
   private:
-    Log                     log;
-    WindowManagerSubsystem& manager;
-    syslib::Window          window;
-    input::Cursor*          cursor;
-    stl::string             attachment_name;
-    stl::string             parent_window_name;
-    stl::string             cursor_attachment_name;
-    math::vec2f             cached_cursor_position;
-    double                  aspect_ratio;
+    Log                           log;
+    WindowManagerSubsystem&       manager;
+    syslib::Window                window;
+    stl::auto_ptr<syslib::Screen> saved_window_screen;
+    input::Cursor*                cursor;
+    stl::string                   attachment_name;
+    stl::string                   parent_window_name;
+    stl::string                   cursor_attachment_name;
+    math::vec2f                   cached_cursor_position;
+    double                        aspect_ratio;
 };
 
 Window* create_window (ParseNode& node, WindowManagerSubsystem& manager)
