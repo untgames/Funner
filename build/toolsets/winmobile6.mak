@@ -109,7 +109,7 @@ define tools.run
    export PATH_SEARCH="$(foreach path,$3,$$(export SUBST_PATH_STRING=$$(cd $(path) && pwd) && echo $(REMOTE_INSTALL_DIR)/$${SUBST_PATH_STRING/#$$ROOT_SUBSTRING/}))" && \
    export PATH_SEARCH=$${PATH_SEARCH/\ /:} && \
    export SUBST_CMD_STRING=$$(cd $(dir $(firstword $1)) && pwd)/$(notdir $(firstword $1)) && export SUBST_COMMAND="$(REMOTE_INSTALL_DIR)/$${SUBST_CMD_STRING/#$$ROOT_SUBSTRING/}" && \
-   "$(RAPISTART)" $(subst /,\\,$(WINCE_LAUNCHER)) "$$(echo '"'$$SUBST_COMMAND'"')" '"'"$(REMOTE_INSTALL_DIR)\\$(subst /,\\,$2/$(strip $1).stdout)"'"' '"'"$(REMOTE_INSTALL_DIR)\\$(subst /,\\,$(patsubst ./%,%,$2))"'"' > nul && \
+   "$(RAPISTART)" $(subst /,\\,$(WINCE_LAUNCHER)) "$$(echo '"'$$SUBST_COMMAND'"')" "$$(echo '"'$$SUBST_COMMAND'"'.stdout)" '"'"$$(echo $$SUBST_DIR_RESULT)"'"' > nul && \
    plink -P 1663 -telnet $(WINMOBILE_HOST)
 endef
 
