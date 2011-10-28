@@ -36,8 +36,11 @@ void sock_send (int socket, const char* buffer, size_t length)
   {
     int send_size = send (socket, pos, buffer + length - pos, 0);
     
-    if (send_size <= 0)
+    if (send_size == SOCKET_ERROR)
+    {
+      printf ("sock_send error\n");
       break;
+    }
      
     pos    += send_size;
     length -= send_size;
@@ -89,6 +92,10 @@ int wmain (int argc, wchar_t* argv [])
   wchar_t* exe_to_start = argv [1];
   wchar_t* log_to_start = argv [2];
   wchar_t* current_dir  = argv [3];
+
+printf("exe_to_start=%S\n",exe_to_start);
+printf("log_to_start=%S\n",log_to_start);
+printf(" current_dir=%S\n",current_dir);
 
   for (unsigned int i=0;i<wcslen(exe_to_start);i++)
     if (exe_to_start[i]=='/')
@@ -292,7 +299,6 @@ int wmain (int argc, wchar_t* argv [])
 
   memset (&process_information, 0, sizeof (process_information));
 
-
   if (!CreateProcessW (exe_to_start, exe_to_start, 0, 0, FALSE, 0, 0, 0, 0, &process_information))
   {
     sock_printf (sendrecv_socket, "Can't create process for '%S'\n", exe_to_start);
@@ -308,7 +314,6 @@ int wmain (int argc, wchar_t* argv [])
   
     //ожидание завершения процесса - перенаправление вывода в сокет
      
-  HANDLE file = CreateFileW (log_to_start, GENERIC_READ, FILE_SHARE_READ|FILE_SHARE_WRITE, 0, OPEN_ALWAYS, 0, 0);
  /* int err=GetLastError();
   while (file==INVALID_HANDLE_VALUE)
   {
@@ -316,47 +321,52 @@ int wmain (int argc, wchar_t* argv [])
 	  Sleep(3000);
 	  file = CreateFileW (log_to_start, GENERIC_READ, FILE_SHARE_READ|FILE_SHARE_WRITE, 0, OPEN_ALWAYS, 0, 0);
   }*/
-
-  if (!file)
-  {
-    sock_printf (sendrecv_socket, "Can't open log file '%S'\n", log_to_start);
-
-    closesocket (sendrecv_socket);
-    closesocket (listen_socket);
-    WSACleanup  ();    
-    CloseHandle (core_dll);
-    CloseHandle (duplicate_launch_event);    
-
-    return -1;
-  }
     
+  DWORD file_pos=0;  
   for (;;)
   {
     static const size_t CLOSE_TIMEOUT = 100;    
     
     DWORD wait_result = WaitForSingleObject ((HANDLE)process_information.dwProcessId, CLOSE_TIMEOUT);
-    
+
     char buffer [100];            
     
+    HANDLE file = CreateFileW (log_to_start, GENERIC_READ, FILE_SHARE_READ|FILE_SHARE_WRITE, 0, OPEN_ALWAYS, 0, 0);
+    if (!file)
+    {
+      sock_printf (sendrecv_socket, "Can't open log file '%S'\n", log_to_start);
+
+      closesocket (sendrecv_socket);
+      closesocket (listen_socket);
+      WSACleanup  ();    
+      CloseHandle (core_dll);
+      CloseHandle (duplicate_launch_event);    
+
+      return -1;
+    }
+ 
+    SetFilePointer (file, file_pos, 0, FILE_BEGIN);
     for (;;)
     {
       DWORD bytes_read = 0;
 
       ReadFile (file, buffer, sizeof (buffer), &bytes_read, 0);
-      printf("---handle=%p  bytes=%d\n",file,bytes_read);
+      printf("---handle=%p  bytes=%d  filesize=%d\n",file,bytes_read,GetFileSize(file,0));
       if (!bytes_read)
         break;
 
+      file_pos+=bytes_read;
       sock_send (sendrecv_socket, buffer, bytes_read);
     }
+    CloseHandle (file);
 
-    if (wait_result != WAIT_TIMEOUT)
+printf("----------wait_result=%d\n",wait_result);
+    if (wait_result == 0)
       break;
   }
 
     //освобождение ресурсов
        
-  CloseHandle (file);
   closesocket (sendrecv_socket);
   closesocket (listen_socket);
   WSACleanup  ();    
