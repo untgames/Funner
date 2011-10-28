@@ -27,3 +27,4 @@ export.link.system.android.LINK_INCLUDES  := JNI_OnLoad
 export.link.system.android.LINK_TOOL      := tools.link.shared-lib
 export.link.system.android.RUN_TOOL       := tools.run.android_package
 export.link.system.tabletos.LIBS          := screen bps
+export.link.system.tabletos.RUN_TOOL      := tools.run.tabletos_package

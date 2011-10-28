@@ -248,10 +248,18 @@ int main ()
     
   ArgReader arg_reader (newsockfd);
     
-  std::string app_name = arg_reader.Read (),
-              cur_dir  = arg_reader.Read (),
-              args     = arg_reader.Read ();              
-  
+  std::string app_name     = arg_reader.Read (),
+              cur_dir      = arg_reader.Read (),
+              args         = arg_reader.Read ();              
+              
+  if (app_name.size () >= 2 && app_name [0] == '/' && app_name [1] == '/')
+    app_name = app_name.substr (1);
+
+  if (cur_dir.size () >= 2 && cur_dir [0] == '/' && cur_dir [1] == '/')
+    cur_dir = cur_dir.substr (1);
+
+  chdir (cur_dir.c_str ()); 
+
     //перенаправление стандартного вывода
 
   int stdout_file = redirect_stdout ();
@@ -261,14 +269,14 @@ int main ()
     
   fcntl (stdout_file, F_SETFL, O_NONBLOCK);  
   
-  printf ("app_name='%s' cur_dir='%s' args='%s'\n", app_name.c_str (), cur_dir.c_str (), args.c_str ());  
-  fflush (stdout);
+//  printf ("app_name='%s' cur_dir='%s' args='%s'\n", app_name.c_str (), cur_dir.c_str (), args.c_str ());  
+//  fflush (stdout);
 
     //запуск  
     
   std::auto_ptr<LaunchInfo> info (new LaunchInfo);
   
-  info->app_name    = "/accounts/devuser/funner/tmp/tabletos-x86/XTL.STL.TESTS/tests/stl/accum1";
+  info->app_name    = app_name;
   info->launching   = 1;
   info->newsockfd   = newsockfd;
   info->stdout_file = stdout_file;
