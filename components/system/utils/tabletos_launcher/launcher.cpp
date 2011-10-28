@@ -6,6 +6,7 @@
 #include <fcntl.h>
 #include <sys/types.h>
 #include <sys/socket.h>
+#include <sys/time.h>
 #include <netinet/in.h>
 #include <pthread.h>
 
@@ -37,6 +38,77 @@ struct LaunchInfo
   volatile bool launching;
   int           stdout_file;
   int           newsockfd;
+};
+
+struct ArgReader
+{
+  int   socket;
+  char  buffer [512];
+  char* read_pos;
+  char* write_pos;
+  
+  ArgReader (int in_socket)
+    : socket (in_socket)
+    , read_pos (buffer)
+    , write_pos (buffer)
+  {
+    timeval tv;
+    
+    memset (&tv, 0, sizeof (tv));
+    
+    tv.tv_sec = 1;
+    
+    if (setsockopt (socket, SOL_SOCKET, SO_RCVTIMEO, (char*)&tv, sizeof tv))
+    {
+      perror ("ERROR setsockopt");
+      exit (1);
+    }
+  }
+
+  std::string Read ()
+  {
+    std::string result;
+    
+    for (;;)
+    {
+      if (write_pos == buffer + sizeof (buffer))
+      {
+        size_t shift_offset = read_pos - buffer;
+        
+        if (!shift_offset)
+        {
+          perror ("Command not found\n");
+          exit (1);
+        }
+        
+        memmove (buffer, read_pos, write_pos - read_pos);
+        
+        write_pos -= shift_offset;
+        read_pos  -= shift_offset;
+      }
+      
+      if (read_pos == write_pos)
+      {
+        int read_count = recv (socket, write_pos, buffer + sizeof (buffer) - write_pos, 0);
+
+        if (read_count > 0)
+          write_pos += read_count;
+      }
+
+      for (char* p=read_pos; p!=write_pos; p++)
+        if (*p == ' ' || *p == '\n')
+        {
+          result.assign (read_pos, p);
+
+          read_pos = p + 1;
+
+          if (read_pos > buffer + sizeof (buffer))
+            read_pos = buffer + sizeof (buffer);
+
+          return result;
+        }
+    }
+  }
 };
 
 /*
@@ -76,7 +148,7 @@ void sock_printf (int socket, const char* format, ...)
   sock_send (socket, buffer, length);
 }
 
-int redirectStdOut(void)
+int redirect_stdout(void)
 {
   int pipePair [2];
 
@@ -118,8 +190,6 @@ void* dump (void* data)
 
   while (info->launching)
   {
-    static const size_t CLOSE_TIMEOUT = 100;
-    
     char buffer [100];
     
     while (info->launching)
@@ -174,29 +244,25 @@ int main ()
     return 1;
   }  
   
-    //пропуск настроек (сделать поддержку сессии)
-  
-  char skip_buffer [100];
-
-  for (;;)
-  {
-    int read_count = recv (newsockfd, skip_buffer, 100, 0);
+    //чтение параметров запуска
     
-//    if (read_count <= 0)
-//      break;
-
-    if (read_count < 100)
-      break;
-  }    
+  ArgReader arg_reader (newsockfd);
+    
+  std::string app_name = arg_reader.Read (),
+              cur_dir  = arg_reader.Read (),
+              args     = arg_reader.Read ();              
   
     //перенаправление стандартного вывода
 
-  int stdout_file = redirectStdOut ();
+  int stdout_file = redirect_stdout ();
   
   if (stdout_file < 0)  
     return 1;
     
-  fcntl (stdout_file, F_SETFL, O_NONBLOCK);
+  fcntl (stdout_file, F_SETFL, O_NONBLOCK);  
+  
+  printf ("app_name='%s' cur_dir='%s' args='%s'\n", app_name.c_str (), cur_dir.c_str (), args.c_str ());  
+  fflush (stdout);
 
     //запуск  
     
