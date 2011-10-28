@@ -14,7 +14,7 @@ export.link.engine.script_binds.common.IMPORTS       := link.engine.script_binds
 # Link engine exports
 export.link.engine.script_binds.engine.LINK_INCLUDES := EngineScriptBind
 export.link.engine.script_binds.engine.IMPORTS       := link.engine.script_binds link.engine.core link.scene_graph.core link.render.scene_render \
-                                                        link.input.manager link.render.scene_render
+                                                        link.input.manager link.render.scene_render link.physics.manager
 
 # Link input exports
 export.link.engine.script_binds.input.LINK_INCLUDES := InputScriptBind
@@ -51,3 +51,7 @@ export.link.engine.script_binds.system.IMPORTS       := link.engine.script_binds
 # Link system exports
 export.link.engine.script_binds.network.LINK_INCLUDES := NetworkScriptBind
 export.link.engine.script_binds.network.IMPORTS       := link.engine.script_binds link.network
+
+# Link system exports
+export.link.engine.script_binds.physics.LINK_INCLUDES := PhysicsScriptBind
+export.link.engine.script_binds.physics.IMPORTS       := link.engine.script_binds link.physics.scene_physics
