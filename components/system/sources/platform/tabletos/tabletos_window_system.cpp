@@ -24,15 +24,10 @@ struct WindowImpl
   screen_context_t screen_context; // A context encapsulates the connection to the windowing system
   screen_window_t  screen_window;  // The window is the most basic drawing surface.
   screen_display_t screen_display; // A display represents the physical display hardware such as a touch screen display.
-  int              usage;          //
-  int              format;         //
-  int              nbuffers;       // count of buffers
   
 ///Constructor
   WindowImpl ()
     : screen_window (0)
-    , format (SCREEN_FORMAT_RGBX8888)
-    , nbuffers (2)
   {
     try
     {
@@ -50,10 +45,14 @@ struct WindowImpl
        
         //
         
+      int format = SCREEN_FORMAT_RGBX8888;
+        
       if (screen_set_window_property_iv (screen_window, SCREEN_PROPERTY_FORMAT, &format))
         raise_error ("::screen_set_window_property_iv(SCREEN_PROPERTY_FORMAT)");
         
         //
+        
+      int usage = SCREEN_USAGE_OPENGL_ES2 | SCREEN_USAGE_OPENGL_ES1 | SCREEN_USAGE_ROTATION;
 
       if (screen_set_window_property_iv (screen_window, SCREEN_PROPERTY_USAGE, &usage))
         raise_error ("screen_set_window_property_iv(SCREEN_PROPERTY_USAGE)");
@@ -62,10 +61,10 @@ struct WindowImpl
 
       if (screen_get_window_property_pv (screen_window, SCREEN_PROPERTY_DISPLAY, (void**)&screen_display) != BPS_SUCCESS)
         raise_error ("::screen_get_window_property_pv(SCREEN_PROPERTY_DISPLAY)");
-        
+
         //
 
-      if (screen_create_window_buffers (screen_window, nbuffers))
+      if (screen_create_window_buffers (screen_window, 2))
         raise_error ("::screen_create_window_buffers");
         
     }
@@ -246,12 +245,7 @@ void TabletOsWindowManager::SetClientRect (window_t handle, const Rect& rect)
 {
   try
   {
-    screen_window_t screen_window = (screen_window_t) GetNativeWindowHandle (handle);
-    
-    int buffer_size[2] = {rect.right, rect.bottom};
-    
-    if (screen_set_window_property_iv (screen_window, SCREEN_PROPERTY_BUFFER_SIZE, buffer_size) != BPS_SUCCESS)
-      raise_error ("::screen_set_window_property_iv(SCREEN_PROPERTY_BUFFER_SIZE)");
+    SetWindowRect (handle, rect);
   }
   catch (xtl::exception& exception)
   {
@@ -287,17 +281,7 @@ void TabletOsWindowManager::GetClientRect (window_t handle, Rect& rect)
 {
   try
   {
-    screen_window_t screen_window = (screen_window_t) GetNativeWindowHandle (handle);
-    
-    int buffer_size[2] = {0, 0};
-    
-    if (screen_get_window_property_iv (screen_window, SCREEN_PROPERTY_BUFFER_SIZE, buffer_size) != BPS_SUCCESS)
-      raise_error ("::screen_get_window_property_iv(SCREEN_PROPERTY_BUFFER_SIZE)");
-
-    rect.left   = 0;
-    rect.right  = buffer_size[0];
-    rect.top    = 0;
-    rect.bottom = buffer_size[1];
+    GetWindowRect (handle, rect);
   }
   catch (xtl::exception& exception)
   {
@@ -318,8 +302,15 @@ void TabletOsWindowManager::SetWindowFlag (window_t handle, WindowFlag flag, boo
   {
     switch (flag)
     {
-      case WindowFlag_Visible:
+      case WindowFlag_Visible:    
+      {
+        int value = state;
+      
+        if (screen_set_window_property_iv (screen_window, SCREEN_PROPERTY_VISIBLE, &value) != BPS_SUCCESS)
+          raise_error ("::screen_set_window_property_i(SCREEN_PROPERTY_VISIBLE)");
+
         break;
+      }
       case WindowFlag_Active:
         break;
       case WindowFlag_Focus:
@@ -348,7 +339,14 @@ bool TabletOsWindowManager::GetWindowFlag (window_t handle, WindowFlag flag)
     switch (flag)
     {
       case WindowFlag_Visible:
-        break;
+      {
+        int state = 0;
+        
+        if (screen_get_window_property_iv (screen_window, SCREEN_PROPERTY_VISIBLE, &state) != BPS_SUCCESS)
+          raise_error ("::screen_get_window_property_iv(SCREEN_PROPERTY_VISIBLE)");        
+        
+        return state != 0;
+      }
       case WindowFlag_Active:
         break;
       case WindowFlag_Focus:
@@ -407,73 +405,7 @@ bool TabletOsWindowManager::IsMultitouchEnabled (window_t handle)
 
 void TabletOsWindowManager::InvalidateWindow (window_t)
 {
-  raise ("syslib::TabletOsWindowManager::InvalidateWindow");
-}
-
-/*
-    Положение курсора
-*/
-
-void TabletOsWindowManager::SetCursorPosition (const Point&)
-{
-  //ignore
-//  raise ("syslib::TabletOsWindowManager::SetCursorPosition");
-}
-
-Point TabletOsWindowManager::GetCursorPosition ()
-{
-//  raise ("syslib::TabletOsWindowManager::GetCursorPosition");
-
-  return Point ();
-}
-
-void TabletOsWindowManager::SetCursorPosition (window_t, const Point& client_position)
-{
-  //ignore
-//  throw xtl::make_not_implemented_exception ("syslib::TabletOsWindowManager::SetCursorPosition (window_t, const Point&)");
-}
-
-Point TabletOsWindowManager::GetCursorPosition (window_t)
-{
-//  throw xtl::make_not_implemented_exception ("syslib::TabletOsWindowManager::GetCursorPosition (window_t)");
-
-  return Point ();
-}
-
-/*
-    Видимость курсора
-*/
-
-void TabletOsWindowManager::SetCursorVisible (window_t, bool state)
-{
-  if (state)
-    raise ("syslib::TabletOsWindowManager::SetCursorVisible");  
-}
-
-bool TabletOsWindowManager::GetCursorVisible (window_t)
-{
-  return false;
-}
-
-/*
-    Изображение курсора
-*/
-
-cursor_t TabletOsWindowManager::CreateCursor (const char*, int, int)
-{
-  raise ("syslib::TabletOsWindowManager::CreateCursor");
-  
-  return 0;
-}
-
-void TabletOsWindowManager::DestroyCursor (cursor_t)
-{
-  raise ("syslib::TabletOsWindowManager::DestroyCursor");
-}
-
-void TabletOsWindowManager::SetCursor (window_t, cursor_t)
-{
-  raise ("syslib::TabletOsWindowManager::SetCursor");
+//  raise ("syslib::TabletOsWindowManager::InvalidateWindow");
 }
 
 /*
@@ -502,27 +434,4 @@ bool TabletOsWindowManager::GetBackgroundState (window_t window)
   raise ("syslib::TabletOsWindowManager::GetBackgroundState");
   
   return false;
-}
-
-/*
-    Получение имени клавиши
-*/
-
-//возвращается длина строки без учёта '\0'
-size_t TabletOsWindowManager::GetKeyName (ScanCode scan_code, size_t buffer_size, char* buffer)
-{
-  static const char* METHOD_NAME = "syslib::TabletOsWindowManager::GetKeyName";
-
-  if (scan_code < 0 || scan_code >= ScanCode_Num)
-    throw xtl::make_argument_exception (METHOD_NAME, "scan_code", scan_code);
-
-  if (!buffer && buffer_size)
-    throw xtl::make_null_argument_exception (METHOD_NAME, "buffer");
-
-  if (!buffer_size)
-    return 0;
-    
-  strncpy (buffer, "Unknown", buffer_size);
-
-  return strlen (buffer);
 }

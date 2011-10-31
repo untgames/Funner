@@ -1,8 +1,10 @@
 #include <ctime>
 
 #include <errno.h>
+#include <dlfcn.h>
 
 #include <bps/bps.h>
+#include <bps/navigator.h>
 #include <screen/screen.h>
 
 #include <xtl/common_exceptions.h>

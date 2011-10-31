@@ -9,9 +9,13 @@
 #include <sys/time.h>
 #include <netinet/in.h>
 #include <pthread.h>
+#include <dlfcn.h>
 
 #include <string>
 #include <memory>
+
+#include <bps/navigator.h>
+#include <bps/bps.h>
 
 /*
     Константы
@@ -38,6 +42,10 @@ struct LaunchInfo
   volatile bool launching;
   int           stdout_file;
   int           newsockfd;
+  int           argc;
+  char**        argv;
+  char**        env;
+  int           result;
 };
 
 struct ArgReader
@@ -173,7 +181,31 @@ void* launch (void* data)
     return 0;
   }
   
-  system (info->app_name.c_str ());
+  const char* lib_name = info->app_name.c_str ();
+
+  void* library = dlopen (lib_name, RTLD_NOW | RTLD_GLOBAL);
+  
+  if (!library)
+  {
+    printf ("Can't open library '%s'. %s\n", lib_name, dlerror ());
+    fflush (stdout);
+    return 0;
+  }
+  
+  typedef int (*startup_fn)(void* library, int argc, char** argv, char** env);
+  
+  static const char* ENTRY_SYMBOL = "tabletos_startup";
+  
+  startup_fn startup = (startup_fn)dlsym (library, ENTRY_SYMBOL);
+  
+  if (!startup)
+  {
+    printf ("Can't find symbol '%s' in library '%s'\n", ENTRY_SYMBOL, lib_name);
+    fflush (stdout);    
+    return 0;
+  }
+  
+  info->result = startup (library, info->argc, info->argv, info->env);
   
   return 0;
 }
@@ -206,7 +238,7 @@ void* dump (void* data)
   return 0;
 }
 
-int main ()
+int main (int argc, char** argv, char** env)
 {  
     //инициализация telnet
   
@@ -280,13 +312,21 @@ int main ()
   info->launching   = 1;
   info->newsockfd   = newsockfd;
   info->stdout_file = stdout_file;
+  info->argc        = argc;
+  info->argv        = argv;
+  info->env         = env;
+  info->result      = 0;
   
   pthread_t launch_thread, dump_thread;
   
   pthread_create (&launch_thread, 0, &launch, &*info);
-  pthread_create (&dump_thread, 0, &dump, &*info);
+  pthread_create (&dump_thread, 0, &dump, &*info);  
 
   pthread_join (launch_thread, 0);
+  
+  fflush (stdout);
+  
+  sleep (1);
 
   info->launching = 0;
 
@@ -294,6 +334,5 @@ int main ()
 
   close (newsockfd);
 
-  return 0;
+  return info->result;
 }
-

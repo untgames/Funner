@@ -48,35 +48,8 @@
     <!--  The category where the application appears. Either core.games or core.media. -->
     <category>core.games</category>
     <asset path="icon.png">icon.png</asset>
-    <configuration id="com.qnx.qcc.configuration.exe.debug.30575971" name="Device-Debug">
-       <asset path="Device-Debug/funner.application" entry="true" type="Qnx/Elf">funner.application</asset>
-       <asset path="${QNX_TARGET}\..\target-override\armle-v7\usr\lib\libbps.so" type="Qnx/Elf">lib/libbps.so.1</asset>
-    </configuration>
-    <configuration id="com.qnx.qcc.configuration.exe.release.1334665716" name="Device-Release">
-       <asset path="Device-Release/funner.application" entry="true" type="Qnx/Elf">funner.application</asset>
-       <asset path="${QNX_TARGET}\..\target-override\armle-v7\usr\lib\libbps.so" type="Qnx/Elf">lib/libbps.so.1</asset>
-    </configuration>
-    <configuration id="com.qnx.qcc.configuration.exe.profile.1993397900" name="Device-Profile">
-       <asset path="Device-Profile/funner.application" entry="true" type="Qnx/Elf">funner.application</asset>
-       <asset path="${QNX_TARGET}\..\target-override\armle-v7\usr\lib\libbps.so" type="Qnx/Elf">lib/libbps.so.1</asset>
-    </configuration>
-    <configuration id="com.qnx.qcc.configuration.exe.profile.coverage.109525306" name="Device-Coverage">
-       <asset path="Device-Coverage/funner.application" entry="true" type="Qnx/Elf">funner.application</asset>
-       <asset path="${QNX_TARGET}\..\target-override\armle-v7\usr\lib\libbps.so" type="Qnx/Elf">lib/libbps.so.1</asset>
-    </configuration>
-    <configuration id="com.qnx.qcc.configuration.exe.debug.1860161308" name="Simulator">
-       <asset path="Simulator/funner.application" entry="true" type="Qnx/Elf">funner.application</asset>
-       <asset path="${QNX_TARGET}\..\target-override\x86\usr\lib\libbps.so" type="Qnx/Elf">lib/libbps.so.1</asset>
-    </configuration>
-    <configuration id="com.qnx.qcc.configuration.exe.profile.908587952" name="Simulator-Profile">
-       <asset path="Simulator-Profile/funner.application" entry="true" type="Qnx/Elf">funner.application</asset>
-       <asset path="${QNX_TARGET}\..\target-override\x86\usr\lib\libbps.so" type="Qnx/Elf">lib/libbps.so.1</asset>
-    </configuration>
-    <configuration id="com.qnx.qcc.configuration.exe.profile.coverage.1632104390" name="Simulator-Coverage">
-       <asset path="Simulator-Coverage/funner.application" entry="true" type="Qnx/Elf">funner.application</asset>
-       <asset path="${QNX_TARGET}\..\target-override\x86\usr\lib\libbps.so" type="Qnx/Elf">lib/libbps.so.1</asset>
-    </configuration>
-    
+    <asset path="funner.application" entry="true" type="Qnx/Elf">funner.application</asset>    
+    <asset path="lib/libbps.so.1" type="Qnx/Elf">lib/libbps.so.1</asset>
     <!--  The icon for the application, which should be 86x86. -->
     <icon>
         <image>icon.png</image>
@@ -87,6 +60,7 @@
 
     <!-- Request permission to execute native code.  Required for native applications. -->
     <action system="true">run_native</action>
+    <env var="LD_LIBRARY_PATH" value="app/native/lib"/>
     
     <!--  The permissions requested by your application. -->
     <!--  <action>access_shared</action> -->
