@@ -10,10 +10,6 @@ JointBind::JointBind (const RigidBody& in_body, const math::vec3f& in_anchor, co
   : body (in_body), anchor (in_anchor), axis (in_axis)
   {}
 
-JointBind::JointBind (const RigidBody& in_body, const math::vec3f& in_axis)
-  : body (in_body), axis (in_axis)
-  {}
-
 /*
    Соединение тел
 */
