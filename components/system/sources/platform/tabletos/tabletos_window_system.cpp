@@ -52,7 +52,8 @@ struct WindowImpl
         
         //
         
-      int usage = SCREEN_USAGE_OPENGL_ES2 | SCREEN_USAGE_OPENGL_ES1 | SCREEN_USAGE_ROTATION;
+//      int usage = SCREEN_USAGE_OPENGL_ES2 | SCREEN_USAGE_OPENGL_ES1 | SCREEN_USAGE_ROTATION;
+      int usage = SCREEN_USAGE_OPENGL_ES1;
 
       if (screen_set_window_property_iv (screen_window, SCREEN_PROPERTY_USAGE, &usage))
         raise_error ("screen_set_window_property_iv(SCREEN_PROPERTY_USAGE)");
@@ -297,9 +298,13 @@ void TabletOsWindowManager::GetClientRect (window_t handle, Rect& rect)
 void TabletOsWindowManager::SetWindowFlag (window_t handle, WindowFlag flag, bool state)
 {
   screen_window_t screen_window = (screen_window_t) GetNativeWindowHandle (handle);
-
+  WindowImpl*     window        = (WindowImpl*)handle;  
+  
   try
   {
+    if (!window)
+      throw xtl::make_null_argument_exception ("", "handle");    
+    
     switch (flag)
     {
       case WindowFlag_Visible:    
@@ -316,7 +321,19 @@ void TabletOsWindowManager::SetWindowFlag (window_t handle, WindowFlag flag, boo
       case WindowFlag_Focus:
         break;
       case WindowFlag_Maximized:
+      {
+        int screen_resolution [2] = {0, 0};
+        
+        if (screen_get_display_property_iv (window->screen_display, SCREEN_PROPERTY_SIZE, screen_resolution))
+          raise_error ("::screen_get_window_property_iv");
+          
+        int buffer_size [2] = {screen_resolution [0], screen_resolution [1]};          
+          
+        if (screen_set_window_property_iv (window->screen_window, SCREEN_PROPERTY_BUFFER_SIZE, buffer_size))
+          raise_error ("::screen_set_window_property_iv");
+        
         break;
+      }
       case WindowFlag_Minimized:
         break;
       default:
