@@ -206,13 +206,13 @@ class OpenGLDriverComponent
     }
 };
 
+}
+
+}
+
 extern "C"
 {
 
-common::ComponentRegistrator<OpenGLDriverComponent> OpenGLDriver (COMPONENT_NAME);
-
-}
-
-}
+common::ComponentRegistrator<components::opengl_driver::OpenGLDriverComponent> OpenGLDriver (COMPONENT_NAME);
 
 }
