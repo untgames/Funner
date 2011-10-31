@@ -24,6 +24,10 @@
 
 #include <syslib/application.h>
 
+#include <physics/manager.h>
+
+#include <engine/attachments.h>
+
 using namespace script;
 using namespace math;
 

@@ -2,6 +2,8 @@ function test ()
   print ("Axis aligned box test")
 
   local aabox1 = BoundVolumes.AxisAlignedBox.Create ()
+  local aabox2 = BoundVolumes.AxisAlignedBox.Create (vec3 (1, 2, 3), vec3 (4, 5, 6))
+  local aabox3 = BoundVolumes.AxisAlignedBox.Create (1, 2, 3, 4, 5, 6)
 
   print ("minimum = " .. tostring (aabox1.Minimum))
   print ("maximum = " .. tostring (aabox1.Maximum))
