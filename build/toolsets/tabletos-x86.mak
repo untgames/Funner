@@ -19,18 +19,18 @@ TABLETOS_NDK_TOOL_PREFIX := i486-pc-nto-qnx6.5.0-
 TABLETOS_NDK             := $(subst \,/,$(TABLETOS_NDK))
 TABLETOS_NDK_GCC         := $(TABLETOS_NDK)/host/win32/x86/usr
 COMPILER_GCC             := $(TABLETOS_NDK_GCC)/bin/$(TABLETOS_NDK_TOOL_PREFIX)gcc
-LINKER_GCC               := $(TABLETOS_NDK_GCC)/bin/$(TABLETOS_NDK_TOOL_PREFIX)g++
+LINKER_GCC               := $(TABLETOS_NDK_GCC)/bin/$(TABLETOS_NDK_TOOL_PREFIX)g++ 
 LIB_GCC                  := $(TABLETOS_NDK_GCC)/bin/$(TABLETOS_NDK_TOOL_PREFIX)ar
 PACKAGER                 := $(TABLETOS_NDK_GCC)/bin/blackberry-nativepackager
 DEPLOYER                 := $(TABLETOS_NDK_GCC)/bin/blackberry-deploy
 COMMON_CPPFLAGS          += -fexceptions -frtti
-COMMON_CFLAGS            += -DTABLETOS -O2 -Wno-strict-aliasing -I$(TABLETOS_NDK)/target/target-override/usr/include
-COMMON_LINK_FLAGS        += -Wl,-L,$(DIST_BIN_DIR)
+COMMON_CFLAGS            += -fPIC -DTABLETOS -O2 -Wno-strict-aliasing -I$(TABLETOS_NDK)/target/target-override/usr/include -I$(TABLETOS_NDK)/target/qnx6/usr/include/freetype2
+COMMON_LINK_FLAGS        += -L$(TABLETOS_NDK)/target/target-override/x86/lib -L$(TABLETOS_NDK)/target/target-override/x86/usr/lib -Wl,-L,$(DIST_BIN_DIR)
 TABLETOS_HOST            := $(strip $(TABLETOS_HOST))
 TABLETOS_USER            := $(strip $(TABLETOS_USER))
 TABLETOS_PORT            := $(strip $(TABLETOS_PORT))
 VALID_TARGET_TYPES       += tabletos-bar
-TESTS_LAUNCHER           := $(DIST_BIN_DIR)/funner.application.bar
+TESTS_LAUNCHER           := $(DIST_LIB_DIR)/funner.application.bar
 
 ifneq (,$(filter Win%,$(OS)))
 TABLETOS_KEY         := $(BUILD_DIR)/platforms/tabletos/id_rsa.ppk
@@ -52,6 +52,10 @@ endef
 
 define tools.link
 export PATH=$(BUILD_PATHS):$$PATH && $(call tools.g++.link,$1,$2,$3,,$5 $(foreach link,$4,-Wl,-u,$(link)))
+endef
+
+define tools.link.shared-lib
+export PATH=$(BUILD_PATHS):$$PATH && $(call tools.g++.link,$1,$2,,,$5 $(foreach dir,$3,-Wl,-L,$(dir)) -shared $(foreach link,$4,-Wl,-u,$(link)))
 endef
 
 define tools.lib
@@ -112,7 +116,7 @@ define process_target.tabletos-bar
   $1.EXE_FILE      := $$($1.TMP_DIR)/$$($1.NAME)$(EXE_SUFFIX)
   TARGET_FILES     := $$(TARGET_FILES) $$($1.EXE_FILE)
   $1.TARGET_DLLS   := $$($1.DLLS:%=$$($1.OUT_DIR)/$(DLL_PREFIX)%$(DLL_SUFFIX))
-  $1.BAR_FILE      := $$(DIST_BIN_DIR)/$$($1.NAME).bar
+  $1.BAR_FILE      := $$(DIST_LIB_DIR)/$$($1.NAME).bar
   DIST_DIRS        := $$(DIST_DIRS) $$(dir $$($1.BAR_FILE))
   $1.RES_DIR       := $$(COMPONENT_DIR)$$($1.RES_DIR)
   $1.MANIFEST_FILE := $$(COMPONENT_DIR)$$($1.MANIFEST_FILE)
@@ -130,7 +134,7 @@ define process_target.tabletos-bar
 		
   $$($1.BAR_FILE): $$($1.EXE_FILE) $$($1.RES_FILES) $$($1.MANIFEST_FILE)
 		@echo Packaging $$(notdir $$@)...
-		@export PATH=$$$$PATH:/$(subst :,,$(call convert_path,$(TABLETOS_NDK_GCC)/bin)) && $(notdir $(PACKAGER)) -package $$@ -devMode $$($1.MANIFEST_FILE) -C $$($1.TMP_DIR) $$($1.EXE_FILE) -C $$($1.RES_DIR) $$($1.RES_FILES)
+		@export PATH=$$$$PATH:/$(subst :,,$(call convert_path,$(TABLETOS_NDK_GCC)/bin)) && $(notdir $(PACKAGER)) -package $$@ -devMode $$($1.MANIFEST_FILE) -C $$($1.TMP_DIR) $$($1.EXE_FILE) -C $$($1.RES_DIR) $$($1.RES_FILES) -e $(TABLETOS_NDK)/target/target-override/x86/usr/lib/libbps.so lib/libbps.so.1
 		
 #Install package
   install: INSTALL.$1
