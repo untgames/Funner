@@ -23,9 +23,10 @@ LINKER_GCC               := $(TABLETOS_NDK_GCC)/bin/$(TABLETOS_NDK_TOOL_PREFIX)g
 LIB_GCC                  := $(TABLETOS_NDK_GCC)/bin/$(TABLETOS_NDK_TOOL_PREFIX)ar
 PACKAGER                 := $(TABLETOS_NDK_GCC)/bin/blackberry-nativepackager
 DEPLOYER                 := $(TABLETOS_NDK_GCC)/bin/blackberry-deploy
+CONNECTOR                := $(TABLETOS_NDK_GCC)/bin/blackberry-connect
 COMMON_CPPFLAGS          += -fexceptions -frtti
 COMMON_CFLAGS            += -fPIC -DTABLETOS -O2 -Wno-strict-aliasing -I$(TABLETOS_NDK)/target/target-override/usr/include -I$(TABLETOS_NDK)/target/qnx6/usr/include/freetype2
-COMMON_LINK_FLAGS        += -L$(TABLETOS_NDK)/target/target-override/x86/lib -L$(TABLETOS_NDK)/target/target-override/x86/usr/lib -Wl,-L,$(DIST_BIN_DIR)
+COMMON_LINK_FLAGS        += -Wl,--no-undefined -L$(TABLETOS_NDK)/target/target-override/x86/lib -L$(TABLETOS_NDK)/target/target-override/x86/usr/lib -Wl,-L,$(DIST_BIN_DIR)
 TABLETOS_HOST            := $(strip $(TABLETOS_HOST))
 TABLETOS_USER            := $(strip $(TABLETOS_USER))
 TABLETOS_PORT            := $(strip $(TABLETOS_PORT))
@@ -134,7 +135,7 @@ define process_target.tabletos-bar
 		
   $$($1.BAR_FILE): $$($1.EXE_FILE) $$($1.RES_FILES) $$($1.MANIFEST_FILE)
 		@echo Packaging $$(notdir $$@)...
-		@export PATH=$$$$PATH:/$(subst :,,$(call convert_path,$(TABLETOS_NDK_GCC)/bin)) && $(notdir $(PACKAGER)) -package $$@ -devMode $$($1.MANIFEST_FILE) -C $$($1.TMP_DIR) $$($1.EXE_FILE) -C $$($1.RES_DIR) $$($1.RES_FILES) -e $(TABLETOS_NDK)/target/target-override/x86/usr/lib/libbps.so lib/libbps.so.1
+		@export PATH=$$$$PATH:/$(subst :,,$(call convert_path,$(TABLETOS_NDK_GCC)/bin)) && $(notdir $(PACKAGER)) -package $$@ -devMode $$($1.MANIFEST_FILE) -C $$($1.TMP_DIR) $$($1.EXE_FILE) -C $$($1.RES_DIR) $$($1.RES_FILES) -e $(TABLETOS_NDK)/target/target-override/x86/usr/lib/libbps.so lib/libbps.so.1 -e $(TABLETOS_NDK)/target/target-override/x86/usr/lib/libOpenAL.so lib/libOpenAL.so.1
 		
 #Install package
   install: INSTALL.$1
@@ -163,3 +164,9 @@ define process_target.tabletos-bar
 #		@echo "/accounts/devuser/funner/tmp/tabletos-x86/XTL.STL.TESTS/tests/stl/accum1 /accounts/devuser/funner/tmp/tabletos-x86/XTL.STL.TESTS  " | plink -P 1663 -raw $(TABLETOS_HOST)
 
 endef
+
+.PHONY: connect
+
+connect:
+		@echo Connecting to TabletOS device...
+		@$(CONNECTOR) $(if $(TABLETOS_PASSWORD),-devicePassword $(TABLETOS_PASSWORD)) -targetHost $(TABLETOS_HOST) -sshPublicKey $(BUILD_DIR)/platforms/tabletos/id_rsa.pub
