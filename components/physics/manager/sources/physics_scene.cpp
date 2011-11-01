@@ -514,6 +514,9 @@ struct Scene::Impl : public xtl::reference_counter, public xtl::trackable
 
       CollisionHandlerPtr handler (new ::CollisionHandler (group1_mask, group2_mask, event_type, callback_handler), false);
 
+      for (CollisionGroupsMap::iterator iter = collision_groups.begin (), end = collision_groups.end (); iter != end; ++iter)
+        handler->OnNewGroupRegistered (collision_groups, iter->second);
+
       registered_collision_handlers.insert (handler.get ());
 
       handler->connect_tracker (xtl::bind (&Scene::Impl::OnCollisionHandlerDestroy, this, handler.get ()), *this);
