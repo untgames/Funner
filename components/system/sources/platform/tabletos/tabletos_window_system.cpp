@@ -19,7 +19,7 @@ void raise (const char* method_name)
     Window implementation
 */
 
-struct WindowImpl
+struct WindowImpl//: public IWindowImpl
 {
   screen_context_t screen_context; // A context encapsulates the connection to the windowing system
   screen_window_t  screen_window;  // The window is the most basic drawing surface.
@@ -68,6 +68,7 @@ struct WindowImpl
       if (screen_create_window_buffers (screen_window, 2))
         raise_error ("::screen_create_window_buffers");
         
+//      WindowRegistry::RegisterWindow (handle, this);
     }
     catch (xtl::exception& e)
     {
@@ -79,6 +80,8 @@ struct WindowImpl
 ///Destructor
   ~WindowImpl ()
   {
+//    WindowRegistry::UnregisterWindow (handle);
+    
       //destroys a window and free associated resources
       
     screen_destroy_window (screen_window);

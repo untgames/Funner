@@ -49,7 +49,7 @@
     <category>core.games</category>
     <asset path="icon.png">icon.png</asset>
     <asset path="funner.application" entry="true" type="Qnx/Elf">funner.application</asset>    
-    <asset path="lib/libbps.so.1" type="Qnx/Elf">lib/libbps.so.1</asset>
+<!--    <asset path="lib/libbps.so.1" type="Qnx/Elf">lib/libbps.so.1</asset> -->
     <!--  The icon for the application, which should be 86x86. -->
     <icon>
         <image>icon.png</image>

@@ -30,6 +30,22 @@ void platform_initialize ();
 void check_errors (const char* source);
 void raise_error  (const char* source);
 
+/*
+class IWindowImpl
+{
+  public:
+    virtual void onTouch (float x, float y) = 0;
+};
+
+class WindowRegistry
+{
+  public:
+    static void RegisterWindow   (T window, IWindowImpl* impl);
+    static void UnregisterWindow (T window);    
+    
+    static IWindowImpl* FindWindow (T window);
+};
+*/
 }
 
 }

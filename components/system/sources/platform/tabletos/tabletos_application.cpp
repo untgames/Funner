@@ -39,6 +39,19 @@ class TabletOsApplicationDelegate: public IApplicationDelegate, public xtl::refe
           
         if (event)
         {
+          /*
+          void* handle = ...;
+          
+          IWindowImpl* window = WindowRegistry::FindWindow (handle);
+          
+          if (!window)
+            continue;
+            
+            ....
+            
+          window->onTouch (x, y);
+          */
+          
           //TODO: handle event
         }
         
