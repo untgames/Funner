@@ -27,6 +27,8 @@
 #include <math/quat.h>
 #include <math/vector.h>
 
+#include <sg/controllers/sync_physics_to_node.h>
+
 #include <physics/manager.h>
 
 #include <script/bind.h>

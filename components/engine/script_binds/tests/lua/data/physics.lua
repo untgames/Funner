@@ -1,3 +1,7 @@
+function print_node (node)
+  print ("Node position = " .. tostring (node.WorldPosition))
+end
+
 function print_bind (bind)
   print ("Bind anchor = " .. tostring (bind.Anchor) .. " axis = " .. tostring (bind.Axis))
 end
@@ -202,8 +206,20 @@ function test_physics()
   local callback_connection       = scene:RegisterCollisionCallback ("*", "*", Physics.CollisionEventType.Begin, Physics.Scene.CreateCollisionCallback (collision_callback))
   local body_transform_connection = body1:RegisterTransformUpdateCallback (Physics.RigidBody.CreateTransformUpdateCallback (body_update_transform_callback))
   local body_collision_connection = body1:RegisterCollisionCallback ("*", Physics.CollisionEventType.Begin, Physics.RigidBody.CreateCollisionCallback (body_collision_callback))
+
+  local node = Scene.Node.Create ()
+  
+  print_node (node)
   
   scene:PerformSimulation (1)
+
+  local node_controller = Scene.Controllers.SyncPhysicsToNode.Create (node, body1)
+
+  print_node (node)
+
+  node:Update (0.1)
+
+  print_node (node)
 end
 
 function test ()

@@ -17,12 +17,14 @@ export.link.engine.launcher_shared.IMPORTS := link.common.default_console_handle
                                 link.engine.script_binds.input link.engine.script_binds.lua_override \
                                 link.engine.script_binds.system link.engine.script_binds.common link.engine.script_binds.network \
                                 link.engine.script_binds.rms link.engine.script_binds.media.players \
+                                link.engine.script_binds.physics \
                                 link.sound.low_level.openal_driver run.sound.low_level.openal_driver \
                                 link.engine.subsystems.scene_render link.engine.subsystems.scene_player \
                                 link.engine.subsystems.input_manager link.engine.subsystems.shell \
                                 link.engine.subsystems.log link.engine.subsystems.file_system \
-                                link.engine.subsystems.resource_system \
-                                link.media.video.theora link.network link.common.iconv
+                                link.engine.subsystems.resource_system link.engine.subsystems.physics_manager \
+                                link.media.video.theora link.network link.common.iconv \
+                                link.physics.low_level.bullet_driver
 
 export.link.engine.launcher.IMPORTS := link.engine.launcher_shared
 export.link.engine.launcher.LINK_INCLUDES := FunnerInit FunnerMain

@@ -21,8 +21,10 @@ int main ()
     env.BindLibraries ("Common");    
     env.BindLibraries ("Engine");
     env.BindLibraries ("Math");
+    env.BindLibraries ("SceneGraph");
     env.BindLibraries ("Physics");
-    load_script        (*script, SCRIPT_FILE_NAME);
+
+    load_script (*script, SCRIPT_FILE_NAME);
 
     printf ("Test library:\n");
 

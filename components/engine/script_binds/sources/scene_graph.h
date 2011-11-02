@@ -143,7 +143,6 @@ void bind_linear_acceleration_evaluator_library (script::Environment&);
 
 using namespace engine::scene_graph_script_binds;
 using namespace script;
-using namespace scene_graph;
 using namespace scene_graph::controllers;
 using namespace math;
 using namespace xtl;

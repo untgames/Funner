@@ -115,6 +115,7 @@ Bind anchor = 1 2 3 axis = 0 0 1
 Bind anchor = 2 3 4 axis = 1 0 0
 Bind anchor = 3 4 5 axis = 0 1 0
 hinge joint bodies count = 2
+Node position = 0 0 0
 Collision filter called
 Body collision callback called for event Begin at point 1 1 1
 Collision callback called for event Begin at point 1 1 1
@@ -128,3 +129,5 @@ body transform updated
 body transform updated
 body transform updated
 body transform updated
+Node position = 0 0 0
+Node position = 2 3 4

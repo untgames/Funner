@@ -1,5 +1,7 @@
 #include "scene_graph.h"
 
+using namespace scene_graph;
+
 namespace
 {
 
