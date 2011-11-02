@@ -26,4 +26,6 @@
 #include <media/rms/manager.h>
 #include <media/rms/server.h>
 
+#include <physics/manager.h>
+
 #endif

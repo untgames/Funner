@@ -55,3 +55,7 @@ export.link.engine.subsystems.window_manager.IMPORTS       := link.engine.subsys
 # Link window renderer exports
 export.link.engine.subsystems.window_renderer.LINK_INCLUDES := WindowRendererSubsystem
 export.link.engine.subsystems.window_renderer.IMPORTS       := link.engine.subsystems link.render.mid_level.window_driver
+
+# Link physics manager exports
+export.link.engine.subsystems.physics_manager.LINK_INCLUDES := PhysicsManagerSubsystem
+export.link.engine.subsystems.physics_manager.IMPORTS       := link.engine.subsystems link.physics.manager

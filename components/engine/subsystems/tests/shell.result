@@ -1,5 +1,6 @@
 Results of shell_test:
 engine.SubsystemManager1: Add subsystem 'Log'
+engine.SubsystemManager1: Add subsystem 'PhysicsManager'
 engine.lua: included_fn
 engine.lua: Node test
 engine.lua: Name = 
@@ -49,8 +50,10 @@ engine.lua: Scale = 1 1 1
 engine.lua: WorldOrtX = 1 0 0
 engine.lua: WorldOrtY = 0 0 -1
 engine.lua: WorldOrtZ = 0 1 0
+engine.lua: Manager description is 'physics::low_level::bullet::Driver'
 engine.SubsystemManager1: Add subsystem 'Shell'
 engine.SubsystemManager1: Subsystems successfully started
 engine.lua: Hello world
 engine.SubsystemManager1: Remove subsystem 'Shell'
+engine.SubsystemManager1: Remove subsystem 'PhysicsManager'
 engine.SubsystemManager1: Remove subsystem 'Log'
