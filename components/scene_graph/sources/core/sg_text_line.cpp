@@ -55,8 +55,8 @@ struct TextLine::Impl
   bool              chars_colors_need_update;
 
   Impl ()
-   : text_utf8_hash (common::strhash ("")),
-     length (0),
+   : length (0),
+     text_utf8_hash (common::strhash ("")),
      text_utf32_hash (common::strhash (L"")),     
      text_utf8_need_update (false),
      text_utf32_need_update (false),
