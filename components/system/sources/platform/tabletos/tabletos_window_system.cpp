@@ -89,9 +89,9 @@ typedef common::Singleton<WindowRegistryImpl> WindowRegistrySingleton;
 
 struct WindowImpl: public IWindowImpl
 {
-  screen_context_t screen_context; // A context encapsulates the connection to the windowing system
-  screen_window_t  screen_window;  // The window is the most basic drawing surface.
-  screen_display_t screen_display; // A display represents the physical display hardware such as a touch screen display.
+  screen_context_t screen_context;   // A context encapsulates the connection to the windowing system
+  screen_window_t  screen_window;    // The window is the most basic drawing surface.
+  screen_display_t screen_display;   // A display represents the physical display hardware such as a touch screen display.
   
 ///Constructor
   WindowImpl ()
@@ -101,24 +101,29 @@ struct WindowImpl: public IWindowImpl
     {
       platform_initialize ();
       
-        //create a screen context that will be used to create an EGL surface to to receive libscreen events.
+        //Create a screen context that will be used to create an EGL surface to to receive libscreen events.
         
       if (screen_create_context (&screen_context, SCREEN_APPLICATION_CONTEXT) != BPS_SUCCESS)
         raise_error ("::screen_create_context");
+        
+        //Signal BPS library that screen events will be requested
 
-        //creates a window that can be used to make graphical content visible on a display
+      if (screen_request_events (screen_context) != BPS_SUCCESS)
+        raise_error ("::screen_request_events");
+
+        //Creates a window that can be used to make graphical content visible on a display
         
       if (screen_create_window (&screen_window, screen_context) != BPS_SUCCESS)
         raise_error ("::screen_create_window");
        
-        //
+        //Set pixel format
         
       int format = SCREEN_FORMAT_RGBX8888;
         
       if (screen_set_window_property_iv (screen_window, SCREEN_PROPERTY_FORMAT, &format))
         raise_error ("::screen_set_window_property_iv(SCREEN_PROPERTY_FORMAT)");
         
-        //
+        //Set usage
         
 //      int usage = SCREEN_USAGE_OPENGL_ES2 | SCREEN_USAGE_OPENGL_ES1 | SCREEN_USAGE_ROTATION;
       int usage = SCREEN_USAGE_OPENGL_ES1;
@@ -126,16 +131,16 @@ struct WindowImpl: public IWindowImpl
       if (screen_set_window_property_iv (screen_window, SCREEN_PROPERTY_USAGE, &usage))
         raise_error ("screen_set_window_property_iv(SCREEN_PROPERTY_USAGE)");
 
-        //get display
+        //Get display
 
       if (screen_get_window_property_pv (screen_window, SCREEN_PROPERTY_DISPLAY, (void**)&screen_display) != BPS_SUCCESS)
         raise_error ("::screen_get_window_property_pv(SCREEN_PROPERTY_DISPLAY)");
 
-        //
+        //Create window buffers
 
       if (screen_create_window_buffers (screen_window, 2))
         raise_error ("::screen_create_window_buffers");
-        
+
       WindowRegistry::RegisterWindow (screen_window, this);
     }
     catch (xtl::exception& e)
@@ -159,10 +164,23 @@ struct WindowImpl: public IWindowImpl
     screen_destroy_context (screen_context);
   }
   
+///  
+  void GetEventContext (WindowEventContext& context)
+  {
+    memset (&context, 0, sizeof (context));
+
+    context.handle = screen_window;
+  }
+
+  
 ///Screen window event
   void OnWindowEvent (int event_type, screen_event_t event)
   {
+    WindowEventContext context;
     
+    GetEventContext (context);
+    
+    printf ("event_type = %d\n", event_type); fflush (stdout);
   }
 };
 
@@ -390,6 +408,8 @@ void TabletOsWindowManager::SetWindowFlag (window_t handle, WindowFlag flag, boo
       
         if (screen_set_window_property_iv (screen_window, SCREEN_PROPERTY_VISIBLE, &value) != BPS_SUCCESS)
           raise_error ("::screen_set_window_property_i(SCREEN_PROPERTY_VISIBLE)");
+          
+        InvalidateWindow (handle);
 
         break;
       }
@@ -497,33 +517,55 @@ bool TabletOsWindowManager::IsMultitouchEnabled (window_t handle)
     Обновление окна
 */
 
-void TabletOsWindowManager::InvalidateWindow (window_t)
+void TabletOsWindowManager::InvalidateWindow (window_t handle)
 {
-//  raise ("syslib::TabletOsWindowManager::InvalidateWindow");
+  screen_window_t screen_window = (screen_window_t) GetNativeWindowHandle (handle);
+
+  screen_buffer_t screen_buffer[2];
+
+  screen_get_window_property_pv (screen_window, SCREEN_PROPERTY_RENDER_BUFFERS, (void **)screen_buffer);
+
+  int rect[4] = {0, 0, 1, 1};
+
+  if (screen_get_window_property_iv (screen_window, SCREEN_PROPERTY_BUFFER_SIZE, rect+2) != BPS_SUCCESS)
+    raise_error ("::screen_get_window_property_iv(SCREEN_PROPERTY_BUFFER_SIZE)");
+    
+  printf ("%d %d %d %d\n", rect[0], rect[1], rect[2], rect[3]); fflush (stdout);
+
+  if (screen_post_window (screen_window, screen_buffer[0], 1, rect, 0)!= BPS_SUCCESS)
+    raise_error ("::screen_post_window");
 }
 
 /*
     Цвет фона
 */
 
-void TabletOsWindowManager::SetBackgroundColor (window_t window, const Color& color)
+void TabletOsWindowManager::SetBackgroundColor (window_t handle, const Color& color)
 {
-  raise ("syslib::TabletOsWindowManager::SetBackgroundColor");
+  screen_window_t screen_window = (screen_window_t) GetNativeWindowHandle (handle);
+
+  int nativeColor = 0xff0000ff;
+
+  screen_set_window_property_iv (screen_window, SCREEN_PROPERTY_COLOR, &nativeColor);
 }
 
-void TabletOsWindowManager::SetBackgroundState (window_t window, bool state)
+void TabletOsWindowManager::SetBackgroundState (window_t handle, bool state)
 {
   raise ("syslib::TabletOsWindowManager::SetBackgroundState");
 }
 
-Color TabletOsWindowManager::GetBackgroundColor (window_t window)
+Color TabletOsWindowManager::GetBackgroundColor (window_t handle)
 {
-  raise ("syslib::TabletOsWindowManager::GetBackgroundColor");
+  screen_window_t screen_window = (screen_window_t) GetNativeWindowHandle (handle);
 
+  int color = 0;
+
+  screen_get_window_property_iv (screen_window, SCREEN_PROPERTY_COLOR, &color);
+  
   return Color (0, 0, 0);
 }
 
-bool TabletOsWindowManager::GetBackgroundState (window_t window)
+bool TabletOsWindowManager::GetBackgroundState (window_t handle)
 {
   raise ("syslib::TabletOsWindowManager::GetBackgroundState");
   

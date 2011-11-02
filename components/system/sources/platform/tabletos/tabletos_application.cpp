@@ -20,7 +20,7 @@ class TabletOsApplicationDelegate: public IApplicationDelegate, public xtl::refe
 ///Запуск цикла обработки сообщений
     void Run ()
     {
-      platform_initialize ();      
+      platform_initialize ();
       
       if (navigator_request_events (0) != BPS_SUCCESS)
         raise_error ("::navigator_request_events");
@@ -34,19 +34,21 @@ class TabletOsApplicationDelegate: public IApplicationDelegate, public xtl::refe
         
         bps_event_t *event = 0;
 
-        if (bps_get_event (&event, timeout_ms) != 0)
+        if (bps_get_event (&event, timeout_ms) != BPS_SUCCESS)
           raise_error ("::bps_get_event");
-          
+
         if (event)
         {
           int domain = bps_event_get_domain (event);
-          
+
           if (domain == screen_get_domain())
           {
+              printf ("screen_domain = %d\n", domain); fflush (stdout);
               HandleScreenEvent (event);
           }
           else if (domain == navigator_get_domain())
           {
+              printf ("navigator_domain = %d\n", domain); fflush (stdout);
               HandleNavigatorEvent (event);
           }
         }
@@ -108,12 +110,14 @@ class TabletOsApplicationDelegate: public IApplicationDelegate, public xtl::refe
         {
           screen_window_t window_handle;
           screen_get_event_property_pv (screen_event, SCREEN_PROPERTY_WINDOW, (void**)&window_handle);
-          
+
           IWindowImpl* window = WindowRegistry::FindWindow (window_handle);
           
+          printf ("found window = %p\n", window); fflush (stdout);
+
           if (!window)
             break;
-            
+
           window->OnWindowEvent (event_type, screen_event);
           
           break;
