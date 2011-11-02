@@ -12,3 +12,4 @@ export.link.network.iphone.LINK_INCLUDES := CurlStreamManager UrlFileSystem
 export.link.network.win32.IMPORTS        := link.extern.curl
 export.link.network.macosx.IMPORTS       := link.extern.curl
 export.link.network.iphone.IMPORTS       := link.extern.curl
+export.link.network.tabletos.LIBS        := socket

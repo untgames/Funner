@@ -4,7 +4,13 @@
 #include <unistd.h>
 
 #include <netinet/tcp.h>
+#include <sys/types.h>
 #include <sys/socket.h>
+
+#ifdef TABLETOS
+#include <sys/time.h>
+#include <netinet/in.h>
+#endif
 
 #include <xtl/common_exceptions.h>
 #include <xtl/reference_counter.h>
