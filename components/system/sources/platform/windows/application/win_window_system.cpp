@@ -79,6 +79,7 @@ struct WindowImpl
   Color                background_color;      //цвет заднего фона
   bool                 background_state;      //включен ли задний фон
   bool                 is_multitouch_enabled; //включен ли multitouch
+  void*                locked_session;        //заблокированна€ сесси€
 
   WindowImpl (WindowMessageHandler handler, void* in_user_data)
     : user_data (in_user_data)
@@ -90,6 +91,7 @@ struct WindowImpl
     , background_brush (CreateSolidBrush (RGB (0, 0, 0)))
     , background_state (false)
     , is_multitouch_enabled (false)
+    , locked_session (0)
   {
     if (!background_brush)
       raise_error ("::CreateSolidBrush");
@@ -499,6 +501,32 @@ LRESULT CALLBACK WindowMessageHandler (HWND wnd, UINT message, WPARAM wparam, LP
       mbtowc (&context.char_code, (char*)&wparam, 1);
       impl->Notify (window_handle, WindowEvent_OnChar, context);
       return 0;
+    case WM_WTSSESSION_CHANGE: //состо€ние сессии изменилось              
+      switch (wparam)
+      {
+        case WTS_SESSION_LOCK:
+          if (!impl->locked_session)
+          {        
+            impl->locked_session = (void*)lparam;
+
+            impl->Notify (window_handle, WindowEvent_OnScreenLock, context);
+          }
+
+          return 0;
+        case WTS_SESSION_UNLOCK:
+          if ((void*)lparam == impl->locked_session)
+          {        
+            impl->locked_session = 0;
+
+            impl->Notify (window_handle, WindowEvent_OnScreenUnlock, context);
+          }
+
+          return 0;
+        default:
+          break;
+      }
+
+      break;      
   }
 
     //обработка сообщений по умолчанию    
@@ -583,6 +611,9 @@ window_t WindowsWindowManager::CreateWindow (WindowStyle style, WindowMessageHan
     {
       HWND wnd = CreateWindowA (WINDOW_CLASS_NAME, "", win_style, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT,
                                 (HWND)parent_handle, 0, GetApplicationInstance (), window_impl);
+
+      if (!WTSRegisterSessionNotification (wnd, NOTIFY_FOR_THIS_SESSION))
+        raise_error ("::WTSRegisterSessionNotification");
 
       if (!wnd)
         raise_error ("::CreateWindow");

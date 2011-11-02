@@ -21,6 +21,7 @@
 
 #define _WIN32_WINNT 0x0600 //для использования WM_MOUSEWHEEL
 #include <windows.h>
+#include <Wtsapi32.h>
 
 namespace syslib
 {

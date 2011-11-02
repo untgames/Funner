@@ -72,6 +72,8 @@ enum WindowEvent
   WindowEvent_OnKeyDown,                 //нажата клавиша клавиатуры
   WindowEvent_OnKeyUp,                   //отпущена клавиша клавиатуры
   WindowEvent_OnChar,                    //в буфере ввода окна появился символ
+  WindowEvent_OnScreenLock,              //экран заблокирован
+  WindowEvent_OnScreenUnlock,            //экран разблокирован
   
   WindowEvent_Num
 };

@@ -140,6 +140,8 @@ void print_event (Window& window, WindowEvent event, const WindowEventContext& c
     case WindowEvent_OnPaint:        printf ("Window paint event\n");          break;
     case WindowEvent_OnMove:         printf ("Window move event\n");           break;
     case WindowEvent_OnSize:         printf ("Window size event\n");           break;
+    case WindowEvent_OnScreenLock:   printf ("Window screen lock event\n");    break;
+    case WindowEvent_OnScreenUnlock: printf ("Window screen unlock event\n");  break;
     default: return;
   }
   
@@ -215,7 +217,9 @@ int main ()
                     connection35 = window.RegisterEventHandler (WindowEvent_OnTouchesBegan, &touch_event),
                     connection36 = window.RegisterEventHandler (WindowEvent_OnTouchesDoubletap, &touch_event),
                     connection37 = window.RegisterEventHandler (WindowEvent_OnTouchesMoved, &touch_event),
-                    connection38 = window.RegisterEventHandler (WindowEvent_OnTouchesEnded, &touch_event);
+                    connection38 = window.RegisterEventHandler (WindowEvent_OnTouchesEnded, &touch_event),
+                    connection39 = window.RegisterEventHandler (WindowEvent_OnScreenLock, &print_event),
+                    connection40 = window.RegisterEventHandler (WindowEvent_OnScreenUnlock, &print_event);
 
     window.SetDebugLog (&print);
     window.SetMultitouchEnabled (true);
