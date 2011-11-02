@@ -16,10 +16,78 @@ void raise (const char* method_name)
 }
 
 /*
+    Window registry implmentation
+*/
+
+struct WindowRegistryImpl
+{
+  public:
+    //Конструктор/деструктор
+    WindowRegistryImpl ()
+    {
+    }
+
+    ~WindowRegistryImpl ()
+    {
+    }
+  
+    //Регистрация окна
+    void RegisterWindow (screen_window_t window, IWindowImpl* impl)
+    {
+      if (!window)
+        throw xtl::make_null_argument_exception ("", "window");
+      
+      if (!impl)
+        throw xtl::make_null_argument_exception ("", "impl");
+      
+      windows.insert_pair (window, impl);
+    }
+    
+    //Отмена регистрации
+    void UnregisterWindow (screen_window_t window)
+    {
+      if (!window)
+        throw xtl::make_null_argument_exception ("", "window");
+
+      windows.erase (window);
+    }
+    
+    IWindowImpl* FindWindow (screen_window_t window)
+    {
+      try
+      {
+        WindowMap::iterator iter = windows.find (window);
+
+        if (iter == windows.end ())
+          return 0;
+
+        return iter->second;
+      }
+      catch (xtl::exception& e)
+      {
+        e.touch ("syslib::tabletos::WindowRegistryImpl::FindWindow (window)");
+        throw;
+      }
+    }
+    
+  private:
+    WindowRegistryImpl (const WindowRegistryImpl&);             //no impl
+    WindowRegistryImpl& operator = (const WindowRegistryImpl&); //no impl
+
+  private:
+    typedef stl::hash_map<screen_window_t, IWindowImpl*> WindowMap;
+
+  private:
+    WindowMap windows;
+};
+
+typedef common::Singleton<WindowRegistryImpl> WindowRegistrySingleton;
+
+/*
     Window implementation
 */
 
-struct WindowImpl//: public IWindowImpl
+struct WindowImpl: public IWindowImpl
 {
   screen_context_t screen_context; // A context encapsulates the connection to the windowing system
   screen_window_t  screen_window;  // The window is the most basic drawing surface.
@@ -68,7 +136,7 @@ struct WindowImpl//: public IWindowImpl
       if (screen_create_window_buffers (screen_window, 2))
         raise_error ("::screen_create_window_buffers");
         
-//      WindowRegistry::RegisterWindow (handle, this);
+      WindowRegistry::RegisterWindow (screen_window, this);
     }
     catch (xtl::exception& e)
     {
@@ -80,7 +148,7 @@ struct WindowImpl//: public IWindowImpl
 ///Destructor
   ~WindowImpl ()
   {
-//    WindowRegistry::UnregisterWindow (handle);
+    WindowRegistry::UnregisterWindow (screen_window);
     
       //destroys a window and free associated resources
       
@@ -89,6 +157,12 @@ struct WindowImpl//: public IWindowImpl
       //destroys screen context
       
     screen_destroy_context (screen_context);
+  }
+  
+///Screen window event
+  void OnWindowEvent (int event_type, screen_event_t event)
+  {
+    
   }
 };
 
@@ -455,3 +529,23 @@ bool TabletOsWindowManager::GetBackgroundState (window_t window)
   
   return false;
 }
+
+/*
+    Window registry (used for )
+*/
+
+void WindowRegistry::RegisterWindow (screen_window_t window, IWindowImpl* impl)
+{
+  WindowRegistrySingleton::Instance ()->RegisterWindow (window, impl);
+}
+
+void WindowRegistry::UnregisterWindow (screen_window_t window)
+{
+  WindowRegistrySingleton::Instance ()->UnregisterWindow (window);
+}
+
+IWindowImpl* WindowRegistry::FindWindow (screen_window_t window)
+{
+  return WindowRegistrySingleton::Instance ()->FindWindow (window);
+}
+

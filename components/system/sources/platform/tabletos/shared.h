@@ -6,6 +6,11 @@
 #include <bps/bps.h>
 #include <bps/navigator.h>
 #include <screen/screen.h>
+#include <bps/screen.h>
+#include <bps/bps.h>
+#include <bps/event.h>
+
+#include <stl/hash_map>
 
 #include <xtl/common_exceptions.h>
 #include <xtl/reference_counter.h>
@@ -30,22 +35,22 @@ void platform_initialize ();
 void check_errors (const char* source);
 void raise_error  (const char* source);
 
-/*
+
 class IWindowImpl
 {
   public:
-    virtual void onTouch (float x, float y) = 0;
+    virtual void OnWindowEvent (int event_type, screen_event_t event) = 0;
 };
 
 class WindowRegistry
 {
   public:
-    static void RegisterWindow   (T window, IWindowImpl* impl);
-    static void UnregisterWindow (T window);    
-    
-    static IWindowImpl* FindWindow (T window);
+    static void RegisterWindow   (screen_window_t window, IWindowImpl* impl);
+    static void UnregisterWindow (screen_window_t window);    
+
+    static IWindowImpl* FindWindow (screen_window_t window);
 };
-*/
+
 }
 
 }
