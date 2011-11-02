@@ -1,4 +1,4 @@
-#include "scene_graph.h"
+#include "shared.h"
 
 using namespace script;
 using namespace physics;
@@ -10,19 +10,18 @@ namespace
     Константы
 */
 
-const char* COLLISION_EVENT_TYPE_LIBRARY                  = "Physics.CollisionEventType";
-const char* JOINT_BIND_LIBRARY                            = "Physics.JointBind";
-const char* JOINT_LIBRARY                                 = "Physics.Joint";
-const char* MANAGER_LIBRARY                               = "Physics.Manager";
-const char* MATERIAL_LIBRARY                              = "Physics.Material";
-const char* RIGID_BODY_LIBRARY                            = "Physics.RigidBody";
-const char* RIGID_BODY_FLAGS_LIBRARY                      = "Physics.RigidBodyFlag";
-const char* SCENE_CONTROLLER_SYNC_PHYSICS_TO_NODE_LIBRARY = "Scene.Controllers.SyncPhysicsToNode";
-const char* SCENE_LIBRARY                                 = "Physics.Scene";
-const char* SHAPE_LIBRARY                                 = "Physics.Shape";
-const char* SHAPE_LIST_LIBRARY                            = "Physics.ShapeList";
-const char* COMPONENT_NAME                                = "script.binds.Physics";
-const char* BINDER_NAME                                   = "Physics";
+const char* COLLISION_EVENT_TYPE_LIBRARY = "Physics.CollisionEventType";
+const char* JOINT_BIND_LIBRARY           = "Physics.JointBind";
+const char* JOINT_LIBRARY                = "Physics.Joint";
+const char* MANAGER_LIBRARY              = "Physics.Manager";
+const char* MATERIAL_LIBRARY             = "Physics.Material";
+const char* RIGID_BODY_LIBRARY           = "Physics.RigidBody";
+const char* RIGID_BODY_FLAGS_LIBRARY     = "Physics.RigidBodyFlag";
+const char* SCENE_LIBRARY                = "Physics.Scene";
+const char* SHAPE_LIBRARY                = "Physics.Shape";
+const char* SHAPE_LIST_LIBRARY           = "Physics.ShapeList";
+const char* COMPONENT_NAME               = "script.binds.Physics";
+const char* BINDER_NAME                  = "Physics";
 
 void bind_manager_library (Environment& environment)
 {
@@ -324,21 +323,6 @@ void bind_rigid_body_flags_library (Environment& environment)
   lib.Register ("get_Kinematic",         make_const (RigidBodyFlag_Kinematic));
 }
 
-void bind_controller_sync_physics_to_node_library (Environment& environment)
-{
-  InvokerRegistry lib = environment.CreateLibrary (SCENE_CONTROLLER_SYNC_PHYSICS_TO_NODE_LIBRARY);
-
-    //наследование
-
-  lib.Register (environment, SCENE_CONTROLLER_LIBRARY);
-
-  lib.Register ("Create",           make_invoker (&SyncPhysicsToNode::Create));
-  lib.Register ("get_AttachedBody", make_invoker (&SyncPhysicsToNode::AttachedBody));
-
-  environment.RegisterType<AlignWithNode> (SCENE_CONTROLLER_SYNC_PHYSICS_TO_NODE_LIBRARY);
-}
-
-
 void bind_physics_library (Environment& environment)
 {
   bind_manager_library (environment);
@@ -351,7 +335,6 @@ void bind_physics_library (Environment& environment)
   bind_material_library (environment);
   bind_rigid_body_library (environment);
   bind_rigid_body_flags_library (environment);
-  bind_controller_sync_physics_to_node_library (environment);
 }
 
 }

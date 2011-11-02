@@ -5,10 +5,11 @@ using namespace scene_graph;
 namespace
 {
 
-const char* SCENE_CONTROLLER_ALIGN_WITH_NODE_LIBRARY    = "Scene.Controllers.AlignWithNode";
-const char* SCENE_CONTROLLER_LOOK_TO_NODE_POINT_LIBRARY = "Scene.Controllers.LookToNodePoint";
-const char* SCENE_CONTROLLER_MOVE_TO_NODE_POINT_LIBRARY = "Scene.Controllers.MoveToNodePoint";
-const char* SCENE_CONTROLLER_WATER_LIBRARY              = "Scene.Controllers.Water";
+const char* SCENE_CONTROLLER_ALIGN_WITH_NODE_LIBRARY      = "Scene.Controllers.AlignWithNode";
+const char* SCENE_CONTROLLER_LOOK_TO_NODE_POINT_LIBRARY   = "Scene.Controllers.LookToNodePoint";
+const char* SCENE_CONTROLLER_MOVE_TO_NODE_POINT_LIBRARY   = "Scene.Controllers.MoveToNodePoint";
+const char* SCENE_CONTROLLER_SYNC_PHYSICS_TO_NODE_LIBRARY = "Scene.Controllers.SyncPhysicsToNode";
+const char* SCENE_CONTROLLER_WATER_LIBRARY                = "Scene.Controllers.Water";
 
 }
 
@@ -135,6 +136,20 @@ void bind_controller_align_with_node_library (Environment& environment)
     //регистрация типа данных
 
   environment.RegisterType<AlignWithNode> (SCENE_CONTROLLER_ALIGN_WITH_NODE_LIBRARY);
+}
+
+void bind_controller_sync_physics_to_node_library (Environment& environment)
+{
+  InvokerRegistry lib = environment.CreateLibrary (SCENE_CONTROLLER_SYNC_PHYSICS_TO_NODE_LIBRARY);
+
+    //наследование
+
+  lib.Register (environment, SCENE_CONTROLLER_LIBRARY);
+
+  lib.Register ("Create",           make_invoker (&SyncPhysicsToNode::Create));
+  lib.Register ("get_AttachedBody", make_invoker (&SyncPhysicsToNode::AttachedBody));
+
+  environment.RegisterType<AlignWithNode> (SCENE_CONTROLLER_SYNC_PHYSICS_TO_NODE_LIBRARY);
 }
 
 }

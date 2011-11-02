@@ -110,32 +110,33 @@ extern const char* SCENE_HEIGHT_MAP_LIBRARY;
     Функции биндинга библиотек
 */
 
-void bind_scene_library                         (script::Environment&);
-void bind_node_library                          (script::Environment&);
-void bind_node_properties_library               (script::Environment&);
-void bind_node_array_library                    (script::Environment&);
-void bind_controller_owner_mode_library         (script::Environment&);
-void bind_controller_library                    (script::Environment&);
-void bind_entity_library                        (script::Environment&);
-void bind_perspective_camera_library            (script::Environment&);
-void bind_ortho_camera_library                  (script::Environment&);
-void bind_light_library                         (script::Environment&);
-void bind_direct_light_library                  (script::Environment&);
-void bind_spot_light_library                    (script::Environment&);
-void bind_point_light_library                   (script::Environment&);
-void bind_box_helper_library                    (script::Environment&);
-void bind_listener_library                      (script::Environment&);
-void bind_sound_emitter_library                 (script::Environment&);
-void bind_sprite_model_library                  (script::Environment&);
-void bind_sprite_library                        (script::Environment&);
-void bind_text_line_library                     (script::Environment&);
-void bind_visual_model_library                  (script::Environment&);
-void bind_height_map_library                    (script::Environment&);
-void bind_controller_water_library              (script::Environment&);
-void bind_controller_move_to_node_point_library (script::Environment&);
-void bind_controller_look_to_node_point_library (script::Environment&);
-void bind_controller_align_with_node_library    (script::Environment&);
-void bind_linear_acceleration_evaluator_library (script::Environment&);
+void bind_scene_library                           (script::Environment&);
+void bind_node_library                            (script::Environment&);
+void bind_node_properties_library                 (script::Environment&);
+void bind_node_array_library                      (script::Environment&);
+void bind_controller_owner_mode_library           (script::Environment&);
+void bind_controller_library                      (script::Environment&);
+void bind_entity_library                          (script::Environment&);
+void bind_perspective_camera_library              (script::Environment&);
+void bind_ortho_camera_library                    (script::Environment&);
+void bind_light_library                           (script::Environment&);
+void bind_direct_light_library                    (script::Environment&);
+void bind_spot_light_library                      (script::Environment&);
+void bind_point_light_library                     (script::Environment&);
+void bind_box_helper_library                      (script::Environment&);
+void bind_listener_library                        (script::Environment&);
+void bind_sound_emitter_library                   (script::Environment&);
+void bind_sprite_model_library                    (script::Environment&);
+void bind_sprite_library                          (script::Environment&);
+void bind_text_line_library                       (script::Environment&);
+void bind_visual_model_library                    (script::Environment&);
+void bind_height_map_library                      (script::Environment&);
+void bind_controller_water_library                (script::Environment&);
+void bind_controller_move_to_node_point_library   (script::Environment&);
+void bind_controller_look_to_node_point_library   (script::Environment&);
+void bind_controller_align_with_node_library      (script::Environment&);
+void bind_linear_acceleration_evaluator_library   (script::Environment&);
+void bind_controller_sync_physics_to_node_library (script::Environment&);
 
 }
 
