@@ -420,7 +420,16 @@ class Window: public IAttachmentRegistryListener<syslib::Window>, public IAttach
         size_t min_desktop_width  = get<size_t> (node, "MinDesktopWidth", 0),
                min_desktop_height = get<size_t> (node, "MinDesktopHeight", 0);
 
-        syslib::Screen window_screen = syslib::Screen::ContainingScreen (window.Handle ());
+        syslib::Screen window_screen ((size_t)0);
+
+        try
+        {
+          window_screen = syslib::Screen::ContainingScreen (window.Handle ());
+        }
+        catch (xtl::exception& e)
+        {
+          log.Printf ("Can't find containing screen for window, using screen 0, exception: '%s'", e.what ());
+        }
 
         if (window_screen.Width () < min_desktop_width || window_screen.Height () < min_desktop_height)
         {
