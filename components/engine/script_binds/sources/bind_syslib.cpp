@@ -19,6 +19,7 @@ namespace system_script_bind
 
 const char* APPLICATION_LIBRARY       = "System.Application";
 const char* APPLICATION_EVENT_LIBRARY = "System.ApplicationEvent";
+const char* WINDOW_STYLE_LIBRARY      = "System.WindowStyle";
 const char* WINDOW_LIBRARY            = "System.Window";
 const char* SCREEN_LIBRARY            = "System.Screen";
 const char* SCREEN_MANAGER_LIBRARY    = "System.ScreenManager";
@@ -35,6 +36,14 @@ void bind_application_events_library (Environment& environment)
 
   lib.Register ("get_OnExit", make_const (ApplicationEvent_OnExit));
   lib.Register ("get_OnIdle", make_const (ApplicationEvent_OnIdle));
+}
+
+void bind_window_styles_library (Environment& environment)
+{
+  InvokerRegistry lib = environment.Library (WINDOW_STYLE_LIBRARY);
+
+  lib.Register ("get_Overlapped", make_const (WindowStyle_Overlapped));
+  lib.Register ("get_PopUp",      make_const (WindowStyle_PopUp));
 }
 
 void bind_application_library (Environment& environment)
@@ -215,6 +224,7 @@ void bind_syslib_library (Environment& environment)
 {
   bind_application_events_library (environment);
   bind_application_library        (environment);
+  bind_window_styles_library      (environment);  
   bind_window_library             (environment);
   bind_screen_library             (environment);
   bind_screen_manager_library     (environment);  
