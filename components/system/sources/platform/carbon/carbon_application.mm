@@ -1,4 +1,5 @@
 #import <AppKit/NSApplication.h>
+#import <AppKit/NSWindow.h>
 #import <Foundation/NSAutoreleasePool.h>
 
 #include "shared.h"
@@ -93,6 +94,8 @@ class CarbonApplicationDelegate: public IApplicationDelegate, public xtl::refere
       NSApplicationLoad ();
 
       NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
+
+      [[[NSWindow alloc] init] release]; //хак для включения работы NSCursor на Mac 10.4
 
       try
       {
