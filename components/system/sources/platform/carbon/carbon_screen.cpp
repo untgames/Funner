@@ -28,7 +28,51 @@ bool get_screen_mode_desc (const CFDictionaryRef& mode_dictionary, ScreenModeDes
                            kCFNumberIntType, &mode_desc.refresh_rate);
 }
 
+bool get_screen_mode_desc (const CGDisplayModeRef& mode, ScreenModeDesc& mode_desc)
+{
+  mode_desc.width        = CGDisplayModeGetWidth (mode);
+  mode_desc.height       = CGDisplayModeGetHeight (mode);
+  mode_desc.refresh_rate = (size_t)CGDisplayModeGetRefreshRate (mode);
+  mode_desc.color_bits   = 0;
+
+  CFStringRef pixel_encoding = CGDisplayModeCopyPixelEncoding (mode);
+
+  if (!pixel_encoding)
+    return false;
+
+  if (CFStringCompare (pixel_encoding, CFSTR (IO32BitDirectPixels), kCFCompareCaseInsensitive) == kCFCompareEqualTo)
+    mode_desc.color_bits = 32;
+  else if (CFStringCompare (pixel_encoding, CFSTR (IO16BitDirectPixels), kCFCompareCaseInsensitive) == kCFCompareEqualTo)
+    mode_desc.color_bits = 16;
+  else if (CFStringCompare (pixel_encoding, CFSTR (IO8BitIndexedPixels), kCFCompareCaseInsensitive) == kCFCompareEqualTo)
+    mode_desc.color_bits = 8;
+  else
+    return false;
+
+  CFRelease (pixel_encoding);
+
+  return true;
+}
+
 typedef stl::vector<ScreenModeEntry> ScreenModeArray;
+
+const char* get_gestalt_manager_error_name (OSErr error)
+{
+  switch (error)
+  {
+    case gestaltUndefSelectorErr: return "Undefined selector was passed to the Gestalt Manager";
+    case gestaltDupSelectorErr:   return "Tried to add an entry that already existed";
+    case gestaltLocationErr:      return "Gestalt function ptr was not in the system heap";
+    default:                      return "Unknown error";
+  }
+}
+
+void check_gestalt_manager_error (OSErr error_code, const char* source, const char* message)
+{
+  if (error_code != noErr)
+    throw xtl::format_operation_exception (source, "%s. Gestalt error: %s (code %d)", message,
+                                           get_gestalt_manager_error_name (error_code), error_code);
+}
 
 }
 
@@ -41,7 +85,7 @@ struct CarbonScreen::Impl : public xtl::reference_counter
   CGDirectDisplayID display_id;
   stl::string       name;
   ScreenModeArray   modes;        //поддерживаемые режимы
-  ScreenModeEntry   default_mode; //режим по умолчанию
+  ScreenModeDesc    default_mode; //режим по умолчанию
 
   Impl (CGDirectDisplayID in_display_id)
     : display_id (in_display_id)
@@ -105,29 +149,43 @@ struct CarbonScreen::Impl : public xtl::reference_counter
 
   void GetCurrentMode (ScreenModeDesc& current_mode)
   {
-    ScreenModeEntry mode_entry;
+    static const char* METHOD_NAME = "syslib::macosx::CarbonScreen::GetCurrentMode";
 
-    GetCurrentMode (mode_entry);
+    SInt32 os_version_major, os_version_minor;
 
-    current_mode = mode_entry.mode_desc;
-  }
+    try
+    {
+      check_gestalt_manager_error (Gestalt (gestaltSystemVersionMajor, &os_version_major), "::Gestalt", "Can't get OS major version");
+      check_gestalt_manager_error (Gestalt (gestaltSystemVersionMinor, &os_version_minor), "::Gestalt", "Can't get OS minor version");
+    }
+    catch (xtl::exception& e)
+    {
+      e.touch (METHOD_NAME);
+      throw;
+    }
 
-  void GetCurrentMode (ScreenModeEntry& current_mode)
-  {
-    static const char* METHOD_NAME = "syslib::macosx::CarbonWindow::GetCurrentMode";
+    if ((os_version_major == 10 && os_version_minor > 5) || os_version_major > 10)
+    {
+      CGDisplayModeRef cg_current_mode = CGDisplayCopyDisplayMode (display_id);
 
-    CFDictionaryRef cf_current_mode = CGDisplayCurrentMode (display_id);
+      if (!cg_current_mode)
+        throw xtl::format_operation_exception (METHOD_NAME, "Can't get current mode, unknown exception");
 
-    if (!cf_current_mode)
-      throw xtl::format_operation_exception (METHOD_NAME, "Can't get current mode, unknown exception");
+      if (!get_screen_mode_desc (cg_current_mode, current_mode))
+        throw xtl::format_operation_exception (METHOD_NAME, "Can't get current mode, unknown exception");
 
-    ScreenModeDesc temp_mode_desc;
+      CGDisplayModeRelease (cg_current_mode);
+    }
+    else
+    {
+      CFDictionaryRef cf_current_mode = CGDisplayCurrentMode (display_id);
 
-    if (!get_screen_mode_desc (cf_current_mode, temp_mode_desc))
-      throw xtl::format_operation_exception (METHOD_NAME, "Can't get current mode, unknown exception");
+      if (!cf_current_mode)
+        throw xtl::format_operation_exception (METHOD_NAME, "Can't get current mode, unknown exception");
 
-    current_mode.mode_desc       = temp_mode_desc;
-    current_mode.mode_dictionary = cf_current_mode;
+      if (!get_screen_mode_desc (cf_current_mode, current_mode))
+        throw xtl::format_operation_exception (METHOD_NAME, "Can't get current mode, unknown exception");
+    }
   }
 };
 
@@ -240,7 +298,7 @@ void CarbonScreen::GetCurrentMode (ScreenModeDesc& mode_desc)
 
 void CarbonScreen::GetDefaultMode (ScreenModeDesc& mode_desc)
 {
-  mode_desc = impl->default_mode.mode_desc;
+  mode_desc = impl->default_mode;
 }
 
 /*
