@@ -161,7 +161,7 @@ class TabletOsApplicationDelegate: public IApplicationDelegate, public xtl::refe
         case NAVIGATOR_BACK:
         case NAVIGATOR_WINDOW_ACTIVE:
         case NAVIGATOR_WINDOW_INACTIVE:
-        case NAVIGATOR_ORIENTATION_RESULT:
+//        case NAVIGATOR_ORIENTATION_RESULT:
         default:
           break;
       }

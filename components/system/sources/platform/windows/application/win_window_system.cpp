@@ -527,6 +527,11 @@ LRESULT CALLBACK WindowMessageHandler (HWND wnd, UINT message, WPARAM wparam, LP
       }
 
       break;      
+    case WM_SYSCOMMAND:
+      if (wparam == SC_SCREENSAVE && !Application::GetScreenSaverState ())
+        return 0;
+
+      break;
   }
 
     //обработка сообщений по умолчанию    
