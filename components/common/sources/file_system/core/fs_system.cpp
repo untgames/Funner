@@ -686,7 +686,7 @@ ICustomFileSystemPtr FileSystemImpl::FindFileSystem (const char* src_file_name,s
 
     if (!return_value)
       throw xtl::make_argument_exception (METHOD_NAME, "src_file_name", src_file_name, "Can't find mount file system for this file");
-      
+
     if (prefix_name)
       *prefix_name = "";
 
@@ -988,7 +988,6 @@ bool FileSystemImpl::IsFileExist (const char* src_file_name)
 
     if (!src_file_name)
       return false;
-
     ICustomFileSystemPtr file_system = FindFileSystem (src_file_name,file_name);
 
     if (!file_system)        
@@ -1287,9 +1286,9 @@ string FileSystem::GetNormalizedFileName (const char* file_name)
   for (string::iterator i=res.begin ();i!=res.end ();++i)
     switch (*i)
     {
-      case '\\':
-        *i = '/';
-        break;
+//      case '\\':
+//        *i = '/';
+//        break;
       case '<': //замена шаблона <VarName> на значение переменной VarName
       {
         string::iterator end = strchr (i, '>');
