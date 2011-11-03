@@ -803,24 +803,6 @@ size_t strftime(char *s, size_t maxs, const char *f, const struct tm *t)
 	return p - s;
 }
 
-time_t mktime(struct tm* pt)
-{
-	SYSTEMTIME ss, ls, s;
-	FILETIME   sf, lf, f;
-	__int64 diff;
-
-	GetSystemTime(&ss);
-	GetLocalTime(&ls);
-	SystemTimeToFileTime( &ss, &sf );
-	SystemTimeToFileTime( &ls, &lf );
-
-	diff = (wce_FILETIME2int64(lf)-wce_FILETIME2int64(sf))/_onesec_in100ns;
-
-	s = wce_tm2SYSTEMTIME(pt);
-	SystemTimeToFileTime( &s, &f );
-	return wce_FILETIME2time_t(&f) - (time_t)diff;
-}
-
 void _tzset ()
 {
 
