@@ -7,6 +7,7 @@
 #endif
 
 #include <windows.h>
+#include <stdlib.h>
 #include <shlobj.h>
 
 #include <xtl/common_exceptions.h>
@@ -14,6 +15,7 @@
 
 #include <common/component.h>
 #include <common/file.h>
+#include <common/property_map.h>
 #include <common/singleton.h>
 #include <common/strlib.h>
 #include <common/utf_converter.h>
@@ -28,7 +30,13 @@ namespace common
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 class Win32FileSystem: public ICustomFileSystem
 {
+  protected:
+    char path_prefix[MAX_PATH];
+    stl::wstring Win32FileSystem::GetFullFileName(const char* file_name);
+
   public:
+    Win32FileSystem::Win32FileSystem ();
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Работа с файлом
 ///////////////////////////////////////////////////////////////////////////////////////////////////
