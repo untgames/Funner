@@ -38,6 +38,15 @@ void DefaultWindowManager::DestroyWindow (window_t)
 }
 
 /*
+    Попытка изменения стиля окна (может быть проигнорирована)
+*/
+
+bool DefaultWindowManager::ChangeWindowStyle (window_t window, WindowStyle style)
+{
+  return false;
+}
+
+/*
     Получение платформо-зависимого дескриптора окна
 */
 

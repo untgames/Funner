@@ -54,6 +54,10 @@ void keys (Window& window, WindowEvent event, const WindowEventContext& context)
     case WindowEvent_OnXButton2Up:
     case WindowEvent_OnXButton2DoubleClick:
       printf ("%s x=%lu y=%lu\n", get_event_name (event), context.cursor_position.x, context.cursor_position.y);
+      
+      if (event == WindowEvent_OnLeftButtonDoubleClick)
+        window.SetStyle (window.Style () == WindowStyle_Overlapped ? WindowStyle_PopUp : WindowStyle_Overlapped);
+      
       break;
     case WindowEvent_OnChar:
       printf ("char '%C'\n", context.char_code);
@@ -175,6 +179,8 @@ int main ()
     common::LogFilter log_filter ("*", &log_print);
     
     Window window (WindowStyle_Overlapped, 400, 300);
+    
+    window.SetBackgroundState (true);
 
     window.SetTitle ("Test window");
     window.Show ();

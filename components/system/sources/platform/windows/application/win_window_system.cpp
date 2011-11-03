@@ -561,15 +561,7 @@ void RegisterWindowClass ()
     raise_error ("::RegisterClass");
 }
 
-}
-
-/*
-    —оздание/закрытие/уничтожение окна
-*/
-
-#undef CreateWindow
-
-window_t WindowsWindowManager::CreateWindow (WindowStyle style, WindowMessageHandler handler, const void* parent_handle, const char* init_string, void* user_data)
+UINT get_window_style (WindowStyle style, bool has_parent)
 {
     //определение стил€ окна
 
@@ -581,19 +573,36 @@ window_t WindowsWindowManager::CreateWindow (WindowStyle style, WindowMessageHan
 //      win_style = WS_OVERLAPPEDWINDOW;
       win_style = WS_OVERLAPPED | WS_CAPTION | WS_MINIMIZEBOX | WS_SYSMENU;
 
-      if (parent_handle)
+      if (has_parent)
         win_style |= WS_CHILD | WS_CLIPSIBLINGS;
 
       break;
     case WindowStyle_PopUp:
-      win_style = parent_handle ? WS_CHILD  | WS_CLIPSIBLINGS : WS_POPUP;
+      win_style = has_parent ? WS_CHILD  | WS_CLIPSIBLINGS : WS_POPUP;
       break;
     default:
       throw xtl::make_argument_exception ("", "style", style);
   }
+  
+  return win_style;
+}
 
+}
+
+/*
+    —оздание/закрытие/уничтожение окна
+*/
+
+#undef CreateWindow
+
+window_t WindowsWindowManager::CreateWindow (WindowStyle style, WindowMessageHandler handler, const void* parent_handle, const char* init_string, void* user_data)
+{  
   try
   {
+      //определение стил€ окна
+
+    UINT win_style = get_window_style (style, parent_handle != 0);
+    
     static bool is_window_class_registered = false;
 
       //регистраци€ оконного класса
@@ -675,6 +684,43 @@ void WindowsWindowManager::DestroyWindow (window_t handle)
 }
 
 /*
+    ѕопытка изменени€ стил€ окна (может быть проигнорирована)
+*/
+
+bool WindowsWindowManager::ChangeWindowStyle (window_t handle, WindowStyle style)
+{
+  try
+  {
+    HWND wnd       = (HWND)handle;    
+    LONG win_style = get_window_style (style, GetParentWindowHandle (handle) != 0);
+    
+    if (!SetWindowLongPtr (wnd, GWL_STYLE, win_style))
+      raise_error ("::SetWindowLongPtr");
+      
+    HWND prev_window = GetNextWindow (wnd, GW_HWNDPREV);
+    
+    if (!prev_window)
+      prev_window = HWND_TOP;
+      
+    RECT window_rect;
+
+    if (!::GetWindowRect (wnd, &window_rect))
+      raise_error ("::GetWindowRect");    
+      
+    if (!SetWindowPos (wnd, prev_window, window_rect.left, window_rect.top, window_rect.right - window_rect.left, 
+      window_rect.bottom - window_rect.top, SWP_FRAMECHANGED|SWP_SHOWWINDOW))
+      raise_error ("::SetWindowPos");
+
+    return true;    
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("syslib::WindowsWindowManager::ChangeWindowStyle");
+    throw;
+  }
+}
+
+/*
     ѕолучение платформо-зависимого дескриптора окна
 */
 
@@ -701,7 +747,7 @@ void WindowsWindowManager::SetWindowTitle (window_t handle, const wchar_t* title
 
     HWND wnd = (HWND)handle;
 
-    if (!SetWindowTextW (wnd, title))
+    if (!SetWindowTextW (wnd, title))    
       raise_error ("::SetWindowTextW");
   }
   catch (xtl::exception& exception)

@@ -89,6 +89,8 @@ struct Window::Impl: public xtl::trackable
     
 ///Стиль окна
     WindowStyle Style () const { return style; }
+    
+    void SetStyle (WindowStyle in_style) { style = in_style; }
 
 ///Низкоуровневый дескриптор окна
     window_t Handle () const { return handle; }
@@ -524,15 +526,37 @@ WindowStyle Window::Style () const
 void Window::SetStyle (WindowStyle style)
 {
   try
-  {
+  {        
     if (impl->Handle ())
     {
       if (style == impl->Style ())
         return;
         
-      Rect window_rect = WindowRect ();
+        //попытка изменения стиля
+        
+      switch (style)
+      {
+        case WindowStyle_Overlapped:
+        case WindowStyle_PopUp:
+          break;
+        default:
+          throw xtl::make_argument_exception ("", "style", style);
+      }
+        
+      if (Platform::ChangeWindowStyle (impl->Handle (), style))
+      {
+        impl->SetStyle (style);
+        
+        impl->Notify (WindowEvent_OnChangeHandle);
+      }
+      else
+      {        
+          //пересоздания окна
+        
+        Rect window_rect = WindowRect ();
 
-      impl->Init (style, impl->ParentHandle (), IsVisible (), &window_rect);
+        impl->Init (style, impl->ParentHandle (), IsVisible (), &window_rect);
+      }
     }
     else
     {
