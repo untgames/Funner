@@ -546,8 +546,6 @@ void Window::SetStyle (WindowStyle style)
       if (Platform::ChangeWindowStyle (impl->Handle (), style))
       {
         impl->SetStyle (style);
-        
-        impl->Notify (WindowEvent_OnChangeHandle);
       }
       else
       {        
@@ -555,8 +553,10 @@ void Window::SetStyle (WindowStyle style)
         
         Rect window_rect = WindowRect ();
 
-        impl->Init (style, impl->ParentHandle (), IsVisible (), &window_rect);
+        impl->Init (style, impl->ParentHandle (), IsVisible (), &window_rect);                
       }
+      
+      impl->Notify (WindowEvent_OnChangeStyle);      
     }
     else
     {

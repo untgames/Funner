@@ -74,6 +74,7 @@ enum WindowEvent
   WindowEvent_OnChar,                    //в буфере ввода окна появился символ
   WindowEvent_OnScreenLock,              //экран заблокирован
   WindowEvent_OnScreenUnlock,            //экран разблокирован
+  WindowEvent_OnChangeStyle,             //окно изменило стиль
   
   WindowEvent_Num
 };
