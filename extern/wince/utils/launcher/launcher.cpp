@@ -109,6 +109,30 @@ printf(" current_dir=%S\n",current_dir);
     if (current_dir[i]=='/')
       current_dir[i]='\\';
 
+  wchar_t filename[MAX_PATH+50];
+  wsprintf (filename,L"%s.env",exe_to_start);
+printf("currentdir_file=%S\n",filename);
+  HANDLE currentdir_file = CreateFileW (filename, GENERIC_WRITE, FILE_SHARE_READ|FILE_SHARE_WRITE, 0, CREATE_ALWAYS, 0, 0);
+  if( !currentdir_file)
+  {
+    printf ("Can't create environment variables file\n");
+    
+    CloseHandle (duplicate_launch_event);    
+    return -1;
+  }
+
+  DWORD len=0;
+  wsprintf (filename,L"CurrentDir='%s'",current_dir);
+  BOOL res=WriteFile (currentdir_file,filename,wcslen(filename)*sizeof(wchar_t),&len,0);
+  if( !res )
+  {
+    printf ("Can't write environment variables file\n");
+    
+    CloseHandle (duplicate_launch_event);    
+    CloseHandle (currentdir_file);
+    return -1;
+  }
+
 //exe_to_start=L"\\funner\\tmp\\winmobile6\\XTL.STL.TESTS\\tests\\stl\\accum1.exe";
 //log_to_start=L"\\funner\\tmp\\winmobile6\\XTL.STL.TESTS\\tests\\stl\\accum1.exe.stdout";
 //current_dir=L"\\funner\\tests\\stl";
@@ -351,7 +375,6 @@ printf(" current_dir=%S\n",current_dir);
       DWORD bytes_read = 0;
 
       ReadFile (file, buffer, sizeof (buffer), &bytes_read, 0);
-      printf("---handle=%p  bytes=%d  filesize=%d\n",file,bytes_read,GetFileSize(file,0));
       if (!bytes_read)
         break;
 
@@ -360,7 +383,6 @@ printf(" current_dir=%S\n",current_dir);
     }
     CloseHandle (file);
 
-printf("----------wait_result=%d\n",wait_result);
     if (wait_result == 0)
       break;
   }
