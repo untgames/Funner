@@ -759,6 +759,32 @@ OSStatus application_message_handler (EventHandlerCallRef event_handler_call_ref
   return eventNotHandledErr;
 }
 
+WindowClass get_window_class (WindowStyle style)
+{
+  switch (style)
+  {
+    case WindowStyle_Overlapped:
+      return kDocumentWindowClass;
+    case WindowStyle_PopUp:
+      return kSheetWindowClass;
+    default:
+      throw xtl::make_argument_exception ("::get_window_class", "style", style);
+  }
+}
+
+UInt32 get_window_attributes (WindowStyle style)
+{
+  switch (style)
+  {
+    case WindowStyle_Overlapped:
+      return kWindowStandardDocumentAttributes | kWindowStandardHandlerAttribute | kWindowLiveResizeAttribute;
+    case WindowStyle_PopUp:
+      return kWindowStandardHandlerAttribute | kWindowLiveResizeAttribute;
+    default:
+      throw xtl::make_argument_exception ("::get_window_attributes", "style", style);
+  }
+}
+
 }
 
 
@@ -768,28 +794,11 @@ OSStatus application_message_handler (EventHandlerCallRef event_handler_call_ref
 
 window_t CarbonWindowManager::CreateWindow (WindowStyle style, WindowMessageHandler handler, const void* parent_handle, const char* init_string, void* user_data)
 {
-  static const char* METHOD_NAME = "syslib::CarbonWindowManager::CreateWindow";
-
-  WindowClass window_class;
-  UInt32      window_attributes;
-
-  switch (style)
-  {
-    case WindowStyle_Overlapped:
-      window_class = kDocumentWindowClass;
-      window_attributes = kWindowStandardDocumentAttributes | kWindowStandardHandlerAttribute | kWindowLiveResizeAttribute;
-      break;
-    case WindowStyle_PopUp:
-      window_class = kSheetWindowClass;
-      window_attributes = kWindowStandardHandlerAttribute | kWindowLiveResizeAttribute;
-      break;
-    default:
-      throw xtl::make_argument_exception (METHOD_NAME, "style", style);
-      return 0;
-  }
-
   try
   {
+    WindowClass window_class      = get_window_class (style);
+    UInt32      window_attributes = get_window_attributes (style);
+
     WindowImpl* window_impl = new WindowImpl (handler, user_data);
 
     try
@@ -914,7 +923,7 @@ window_t CarbonWindowManager::CreateWindow (WindowStyle style, WindowMessageHand
   }
   catch (xtl::exception& exception)
   {
-    exception.touch (METHOD_NAME);
+    exception.touch ("syslib::CarbonWindowManager::CreateWindow");
 
     throw;
   }
@@ -970,6 +979,30 @@ void CarbonWindowManager::DestroyWindow (window_t handle)
 
   if (closed_window_event)
     ReleaseEvent (closed_window_event);
+}
+
+/*
+   Попытка изменения стиля окна (может быть проигнорирована)
+*/
+
+bool CarbonWindowManager::ChangeWindowStyle (window_t handle, WindowStyle style)
+{
+  WindowRef wnd = (WindowRef)handle;
+
+  try
+  {
+    UInt32 new_attributes = get_window_attributes (style);
+
+    check_window_manager_error (SetWindowClass (wnd, get_window_class (style)), "::SetWindowClass", "Can't change window class");
+    check_window_manager_error (ChangeWindowAttributes (wnd, new_attributes, ~new_attributes), "::ChangeWindowAttributes", "Can't change window attributes");
+
+    return true;
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("syslib::CarbonWindowManager::ChangeWindowStyle");
+    throw;
+  }
 }
 
 /*
@@ -1157,7 +1190,8 @@ void CarbonWindowManager::SetWindowFlag (window_t handle, WindowFlag flag, bool 
         break;
       }
       case WindowFlag_Minimized:
-        check_window_manager_error (CollapseWindow (wnd, state), "::CollapseWindow", "Can't minimize window");
+        if (IsWindowCollapsed (wnd) != state)
+          check_window_manager_error (CollapseWindow (wnd, state), "::CollapseWindow", "Can't minimize window");
         break;
       default:
         throw xtl::make_argument_exception ("", "flag", flag);
