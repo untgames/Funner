@@ -676,7 +676,7 @@ ICustomFileSystemPtr FileSystemImpl::FindFileSystem (const char* src_file_name,s
         iter = symbolic_links.begin ();
     }    
     else ++iter;
-  }
+  }  
   
     //пытаемс€ найти файл не использу€ путей поиска
 
@@ -709,30 +709,20 @@ ICustomFileSystemPtr FileSystemImpl::FindFileSystem (const char* src_file_name,s
       swap (result_file_name,mount_name);
       
       if (prefix_name)
-        *prefix_name = i->path + '/';
+        *prefix_name = i->path + '/';        
       
       return owner_file_system;
     }
   }
 
     //пытаемс€ найти файл в списке пак-файлов
-
-  for (PackFileList::iterator i=pack_files.begin ();i!=pack_files.end ();++i)
-    if (i->file_system->IsFileExist (file_name.c_str ()))
-    {
-      swap (result_file_name,file_name);
-            
-      if (prefix_name)
-        *prefix_name = "";
-      
-      return i->file_system;
-    }
     
   for (SearchPathList::iterator iter=search_paths.begin ();iter!=search_paths.end ();++iter)
   {
-    full_name = format ("%s/%s",iter->path.c_str (),file_name.c_str ());
+    full_name = format ("%s/%s",iter->path.c_str (),file_name.c_str ());    
     
     for (PackFileList::iterator i=pack_files.begin ();i!=pack_files.end ();++i)
+    {
       if (i->file_system->IsFileExist (full_name.c_str ()))
       {
         swap (full_name,result_file_name);
@@ -742,7 +732,19 @@ ICustomFileSystemPtr FileSystemImpl::FindFileSystem (const char* src_file_name,s
           
         return i->file_system;
       }
+    }
   }
+  
+  for (PackFileList::iterator i=pack_files.begin ();i!=pack_files.end ();++i)
+    if (i->file_system->IsFileExist (file_name.c_str ()))
+    {
+      swap (result_file_name,file_name);
+            
+      if (prefix_name)
+        *prefix_name = "";
+      
+      return i->file_system;
+    }  
   
     //пытаемс€ найти файл по дефолтному пути поиска
     
