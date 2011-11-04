@@ -692,24 +692,10 @@ ICustomFileSystemPtr FileSystemImpl::FindFileSystem (const char* src_file_name,s
 
     return return_value;
   }
-
-    //пытаемся найти файл по дефолтному пути поиска
-
-  string               full_name         = format ("%s/%s",default_path.c_str (),file_name.c_str ()), mount_name;
-  ICustomFileSystemPtr owner_file_system = FindMountFileSystem (full_name.c_str (),mount_name);
+    
+  string full_name, mount_name;
   
-  if (owner_file_system && owner_file_system->IsFileExist (mount_name.c_str ()))
-  {
-    swap (result_file_name,mount_name);
-    
-    if (prefix_name)
-      *prefix_name = default_path + '/';
-    
-    return owner_file_system;
-  }
-
-  string               default_mount_name  = mount_name;
-  ICustomFileSystemPtr default_file_system = owner_file_system;
+  ICustomFileSystemPtr owner_file_system;
 
     //пытаемся найти файл в списке путей поиска
 
@@ -757,18 +743,33 @@ ICustomFileSystemPtr FileSystemImpl::FindFileSystem (const char* src_file_name,s
         return i->file_system;
       }
   }
+  
+    //пытаемся найти файл по дефолтному пути поиска
+    
+  full_name         = format ("%s/%s",default_path.c_str (),file_name.c_str ());
+  owner_file_system = FindMountFileSystem (full_name.c_str (),mount_name);
+  
+  if (owner_file_system && owner_file_system->IsFileExist (mount_name.c_str ()))
+  {
+    swap (result_file_name,mount_name);
+    
+    if (prefix_name)
+      *prefix_name = default_path + '/';
+    
+    return owner_file_system;
+  }  
 
     //возвращаем ссылку на файловую систему включающую путь по умолчанию
 
-  if (!default_file_system)
+  if (!owner_file_system)
     throw format_operation_exception (METHOD_NAME, "File '%s' does not belong to any file system",src_file_name);
 
-  swap (result_file_name,default_mount_name);
+  swap (result_file_name,mount_name);
   
   if (prefix_name)
     *prefix_name = default_path + '/';
 
-  return default_file_system;
+  return owner_file_system;
 }
 
 /*
