@@ -580,38 +580,6 @@ struct tm* localtime(const time_t* clock)
 	return &st_tm;
 }
 
-
-struct tm* gmtime(const time_t* clock)
-{
-	FILETIME	ftUtc;
-	SYSTEMTIME stUtc;
-
-	if (clock == NULL)
-		return NULL;
-
-	// convert time_t to FILETIME
-	UnixTimeToFileTime(*clock,&ftUtc);
-
-	// convert to SYSTEMTIME
-	if (!FileTimeToSystemTime(&ftUtc, &stUtc))
-		return NULL;
-
-	stUtc.wMilliseconds = 500;
-	// fill return structure
-	st_tm.tm_sec = stUtc.wSecond;
-	st_tm.tm_min = stUtc.wMinute;
-	st_tm.tm_hour = stUtc.wHour;
-	st_tm.tm_mday = stUtc.wDay;
-	st_tm.tm_mon = stUtc.wMonth;
-	st_tm.tm_year = stUtc.wYear;
-	st_tm.tm_wday = stUtc.wDayOfWeek;
-	st_tm.tm_yday = dayOfYear(stUtc.wYear, stUtc.wMonth-1, stUtc.wDay);
-	st_tm.tm_isdst = 0;
-
-	return &st_tm;
-
-}
-
 // static void strfmt(char *str, char *fmt);
 // 
 // simple sprintf for strftime

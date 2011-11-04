@@ -6,7 +6,7 @@ const int _ytab[2][12] =
   {31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31}
 };
 
-#define YEAR0                   0
+#define YEAR0                   1900
 #define EPOCH_YR                1970
 #define SECS_DAY                (24L * 60L * 60L)
 #define LEAPYEAR(year)          (!((year) % 4) && (((year) % 100) || !((year) % 400)))
@@ -21,13 +21,8 @@ long _dstbias = 0;                  // Offset for Daylight Saving Time
 long _timezone = 0;                 // Difference in seconds between GMT and local time
 char *_tzname[2] = {"GMT", "GMT"};  // Standard/daylight savings time zone names
 
-time_t mktime(struct tm *tminbuf)
+time_t mktime(struct tm *tmbuf)
 {
-  tm tmdata;
-  tm *tmbuf=&tmdata;
-  memcpy(tmbuf,tminbuf,sizeof(tm));
-  tmbuf->tm_mon--;
-
   long day, year;
   int tm_year;
   int yday, month;
@@ -139,4 +134,42 @@ time_t mktime(struct tm *tminbuf)
 
   if ((time_t) seconds != seconds) return (time_t) -1;
   return (time_t) seconds;
+}
+
+struct tm *gmtime_r(const time_t *timer, struct tm *tmbuf)
+{
+  time_t time = *timer;
+  unsigned long dayclock, dayno;
+  int year = EPOCH_YR;
+
+  dayclock = (unsigned long) time % SECS_DAY;
+  dayno = (unsigned long) time / SECS_DAY;
+
+  tmbuf->tm_sec = dayclock % 60;
+  tmbuf->tm_min = (dayclock % 3600) / 60;
+  tmbuf->tm_hour = dayclock / 3600;
+  tmbuf->tm_wday = (dayno + 4) % 7; // Day 0 was a thursday
+  while (dayno >= (unsigned long) YEARSIZE(year)) 
+  {
+    dayno -= YEARSIZE(year);
+    year++;
+  }
+  tmbuf->tm_year = year - YEAR0;
+  tmbuf->tm_yday = dayno;
+  tmbuf->tm_mon = 0;
+  while (dayno >= (unsigned long) _ytab[LEAPYEAR(year)][tmbuf->tm_mon]) 
+  {
+    dayno -= _ytab[LEAPYEAR(year)][tmbuf->tm_mon];
+    tmbuf->tm_mon++;
+  }
+  tmbuf->tm_mday = dayno + 1;
+  tmbuf->tm_isdst = 0;
+
+  return tmbuf;
+}
+
+tm tmbuf;
+struct tm *gmtime(const time_t *timer)
+{
+  return gmtime_r(timer, &tmbuf);
 }

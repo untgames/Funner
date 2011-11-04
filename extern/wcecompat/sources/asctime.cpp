@@ -55,6 +55,6 @@ char *asctime(const struct tm *timeptr)
                             , timeptr->tm_min, 1)
                     , timeptr->tm_sec, 1);
 
-        four_digits(pb, timeptr->tm_year + 1900);
+        four_digits(pb, timeptr->tm_year);
         return buf;
 }
