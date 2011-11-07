@@ -30,6 +30,10 @@ int main ()
     printf ("Test quatf library:\n");
     
     invoke<void> (*script, "test_quat", quatf (1));
+
+    printf ("Test utility library:\n");
+
+    invoke<void> (*script, "test_utility");
   }
   catch (xtl::bad_any_cast& exception)
   {
