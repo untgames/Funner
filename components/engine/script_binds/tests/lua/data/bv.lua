@@ -39,6 +39,11 @@ function test ()
   print ("box3 minimum = " .. tostring (aabox3.Minimum))
   print ("box3 maximum = " .. tostring (aabox3.Maximum))
 
+  aabox3 = aabox1 * Math.to_quat (90, 0, 0)
+
+  print ("box3 minimum = " .. tostring (aabox3.Minimum))
+  print ("box3 maximum = " .. tostring (aabox3.Maximum))
+
   aabox1:Reset (vec3 (1, 1, 1))
 
   print ("box3 volume = " .. tostring (aabox3.Volume))
@@ -50,6 +55,8 @@ function test ()
   aabox3:SetExtents (vec3 (-5, -5, -5), vec3 (4, 4, 4))
   print ("is transformed box2 intersects box3 ? " .. tostring (BoundVolumes.AxisAlignedBox.Intersects (aabox2, aabox3)))
   print ("is transformed box2 contatins box3 ? " .. tostring (BoundVolumes.AxisAlignedBox.Contains (aabox2, aabox3)))
+  print ("is transformed box2 contatins point 1 1 1 ? " .. tostring (aabox2:Contains (vec3 (1))))
+  print ("is transformed box2 contatins point 6 6 6 ? " .. tostring (aabox2:Contains (vec3 (6))))
 
   aabox3:SetExtents (vec3 (-6, -6, -6), vec3 (14, 14, 14))
 
