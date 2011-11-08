@@ -991,10 +991,12 @@ bool CarbonWindowManager::ChangeWindowStyle (window_t handle, WindowStyle style)
 
   try
   {
-    UInt32 new_attributes = get_window_attributes (style);
+    UInt32 new_attributes = get_window_attributes (style),
+           current_attributes;
 
+    check_window_manager_error (GetWindowAttributes (wnd, &current_attributes), "::GetWindowAttributes", "Can't get window attributes");
     check_window_manager_error (SetWindowClass (wnd, get_window_class (style)), "::SetWindowClass", "Can't change window class");
-    check_window_manager_error (ChangeWindowAttributes (wnd, new_attributes, ~new_attributes), "::ChangeWindowAttributes", "Can't change window attributes");
+    check_window_manager_error (ChangeWindowAttributes (wnd, new_attributes & ~current_attributes, current_attributes & ~new_attributes), "::ChangeWindowAttributes", "Can't change window attributes");
 
     return true;
   }

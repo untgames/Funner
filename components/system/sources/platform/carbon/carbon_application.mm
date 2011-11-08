@@ -148,6 +148,9 @@ class CarbonApplicationDelegate: public IApplicationDelegate, public xtl::refere
     //Событие выхода из приложения
     void OnExit ()
     {
+      if (listener)
+        listener->OnExit (0);
+
       is_exited = true;
     }
 
