@@ -7,6 +7,8 @@ mutex_t PThreadManager::CreateMutex ()
 {
   try
   {
+    thread_init ();
+    
     stl::auto_ptr<mutex_handle> handle (new mutex_handle);
     
     pthread_mutexattr_t attr;
@@ -64,7 +66,7 @@ void PThreadManager::LockMutex (mutex_t handle)
   try
   {
     if (!handle)
-      throw xtl::make_null_argument_exception ("", "mutex");
+      throw xtl::make_null_argument_exception ("", "mutex");      
 
     int status = pthread_mutex_lock (&handle->mutex);
 

@@ -9,9 +9,14 @@ namespace
 void* thread_run (void* data)
 {
   if (!data)
-    return 0;
+    return 0;    
 
   xtl::com_ptr<IThreadCallback> callback (reinterpret_cast<IThreadCallback*> (data));
+
+  thread_init ();
+
+  pthread_cleanup_push  (&thread_done, 0);
+  
 
   try
   {
@@ -19,7 +24,11 @@ void* thread_run (void* data)
   }
   catch (...)
   {
+    thread_done (0);    
+
   }
+
+  pthread_cleanup_pop (1);
 
   return 0;
 }
@@ -40,6 +49,10 @@ thread_t PThreadManager::CreateThread (IThreadCallback* in_callback)
       throw xtl::make_null_argument_exception ("", "callback");
 
     xtl::com_ptr<IThreadCallback> callback (in_callback);
+
+      //инициализации библиотеки
+
+    thread_init ();
 
       //создание нити
 
@@ -79,6 +92,8 @@ void PThreadManager::JoinThread (thread_t thread)
   {
     if (!thread)
       throw xtl::make_null_argument_exception ("", "thread");
+
+    thread_init ();
 
     void* exit_code = 0;
 

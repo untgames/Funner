@@ -14,6 +14,8 @@ semaphore_t PThreadManager::CreateSemaphore (size_t initial_value)
 {
   try
   {
+    thread_init ();
+    
     stl::auto_ptr<semaphore_handle> handle (new semaphore_handle);
 
     int status = sem_init (&handle->semaphore, 0, initial_value);

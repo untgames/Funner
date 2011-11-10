@@ -73,6 +73,8 @@ tls_t PThreadManager::CreateTls (IThreadCleanupCallback* cleanup)
 {
   try
   {
+    thread_init ();              
+    
     return (tls_t)new TlsKeyImpl (cleanup);
   }
   catch (xtl::exception& exception)

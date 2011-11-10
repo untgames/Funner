@@ -12,6 +12,8 @@ condition_t PThreadManager::CreateCondition ()
 {
   try
   {
+    thread_init ();
+    
     stl::auto_ptr<condition_handle> handle (new condition_handle);
 
     int status = pthread_cond_init (&handle->condition, 0);
@@ -32,9 +34,9 @@ condition_t PThreadManager::CreateCondition ()
 void PThreadManager::DestroyCondition (condition_t handle)
 {
   try
-  {
+  {    
     if (!handle)
-      throw xtl::make_null_argument_exception ("", "condition");
+      throw xtl::make_null_argument_exception ("", "condition");      
 
     int status = pthread_cond_destroy (&handle->condition);
 
@@ -55,10 +57,10 @@ void PThreadManager::WaitCondition (condition_t handle, mutex_t mutex_handle)
   try
   {
     if (!handle)
-      throw xtl::make_null_argument_exception ("", "condition");
+      throw xtl::make_null_argument_exception ("", "condition");            
 
     if (!mutex_handle)
-      throw xtl::make_null_argument_exception ("", "mutex");
+      throw xtl::make_null_argument_exception ("", "mutex");      
       
     int status = pthread_cond_wait (&handle->condition, &mutex_handle->mutex);    
 
@@ -80,7 +82,7 @@ bool PThreadManager::WaitCondition (condition_t handle, mutex_t mutex_handle, si
       throw xtl::make_null_argument_exception ("", "condition");
 
     if (!mutex_handle)
-      throw xtl::make_null_argument_exception ("", "mutex");
+      throw xtl::make_null_argument_exception ("", "mutex");      
       
     timespec end_time;
     
@@ -122,7 +124,7 @@ void PThreadManager::NotifyCondition (condition_t handle, bool broadcast)
   try
   {
     if (!handle)
-      throw xtl::make_null_argument_exception ("", "condition");
+      throw xtl::make_null_argument_exception ("", "condition");      
     
     if (broadcast)
     {
