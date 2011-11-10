@@ -95,6 +95,7 @@ libLinearMath_la_SOURCES	= \
 		LinearMath/btAlignedAllocator.cpp \
 		LinearMath/btSerializer.cpp \
 		LinearMath/btConvexHull.cpp \
+		LinearMath/btConvexHullComputer.cpp \
 		LinearMath/btHashMap.h \
 		LinearMath/btConvexHull.h \
 		LinearMath/btAabbUtil2.h \
@@ -128,6 +129,7 @@ libBulletCollision_la_SOURCES = \
 		BulletCollision/NarrowPhaseCollision/btGjkConvexCast.cpp \
 		BulletCollision/NarrowPhaseCollision/btPersistentManifold.cpp \
 		BulletCollision/NarrowPhaseCollision/btConvexCast.cpp \
+		BulletCollision/NarrowPhaseCollision/btPolyhedralContactClipping.cpp \
 		BulletCollision/NarrowPhaseCollision/btContinuousConvexCollision.cpp \
 		BulletCollision/NarrowPhaseCollision/btGjkPairDetector.cpp \
 		BulletCollision/NarrowPhaseCollision/btGjkEpa2.cpp \
@@ -160,6 +162,7 @@ libBulletCollision_la_SOURCES = \
 		BulletCollision/CollisionShapes/btMinkowskiSumShape.cpp \
 		BulletCollision/CollisionShapes/btCompoundShape.cpp \
 		BulletCollision/CollisionShapes/btConeShape.cpp \
+		BulletCollision/CollisionShapes/btConvexPolyhedron.cpp \
 		BulletCollision/CollisionShapes/btMultiSphereShape.cpp \
 		BulletCollision/CollisionShapes/btUniformScalingShape.cpp \
 		BulletCollision/CollisionShapes/btSphereShape.cpp \
@@ -302,7 +305,6 @@ libBulletCollision_la_SOURCES = \
                 BulletCollision/Gimpact/gim_tri_collision.cpp
 
 libBulletDynamics_la_SOURCES = \
-		BulletDynamics/Dynamics/btContinuousDynamicsWorld.cpp \
 		BulletDynamics/Dynamics/btRigidBody.cpp \
 		BulletDynamics/Dynamics/btSimpleDynamicsWorld.cpp \
 		BulletDynamics/Dynamics/Bullet-C-API.cpp \
@@ -325,7 +327,6 @@ libBulletDynamics_la_SOURCES = \
 		BulletDynamics/Character/btKinematicCharacterController.h \
 		BulletDynamics/Character/btCharacterControllerInterface.h \
 		BulletDynamics/Dynamics/btActionInterface.h \
-		BulletDynamics/Dynamics/btContinuousDynamicsWorld.h \
 		BulletDynamics/Dynamics/btSimpleDynamicsWorld.h \
 		BulletDynamics/Dynamics/btRigidBody.h \
 		BulletDynamics/Dynamics/btDiscreteDynamicsWorld.h \
@@ -386,7 +387,6 @@ nobase_bullet_include_HEADERS += \
 	BulletDynamics/Vehicle/btWheelInfo.h \
 	BulletDynamics/Vehicle/btVehicleRaycaster.h \
 	BulletDynamics/Dynamics/btActionInterface.h \
-	BulletDynamics/Dynamics/btContinuousDynamicsWorld.h \
 	BulletDynamics/Dynamics/btRigidBody.h \
 	BulletDynamics/Dynamics/btDynamicsWorld.h \
 	BulletDynamics/Dynamics/btSimpleDynamicsWorld.h \

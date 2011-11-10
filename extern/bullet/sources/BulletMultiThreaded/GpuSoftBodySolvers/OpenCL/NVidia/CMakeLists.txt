@@ -1,12 +1,18 @@
 
+ADD_DEFINITIONS(-DUSE_NVIDIA_OPENCL)
+ADD_DEFINITIONS(-DCL_PLATFORM_NVIDIA)
+
 INCLUDE_DIRECTORIES(
 	${BULLET_PHYSICS_SOURCE_DIR}/src
 	${NVIDIA_OPENCL_INCLUDES}
 )
 
 
+
 SET(BulletSoftBodyOpenCLSolvers_SRCS
 	../btSoftBodySolver_OpenCL.cpp
+	../btSoftBodySolver_OpenCLSIMDAware.cpp
+	../btSoftBodySolverOutputCLtoGL.cpp
 )
 
 SET(BulletSoftBodyOpenCLSolvers_HDRS
@@ -15,7 +21,10 @@ SET(BulletSoftBodyOpenCLSolvers_HDRS
 	../btSoftBodySolverVertexData_OpenCL.h
 	../btSoftBodySolverTriangleData_OpenCL.h
 	../btSoftBodySolverLinkData_OpenCL.h
+	../btSoftBodySolverLinkData_OpenCLSIMDAware.h
 	../btSoftBodySolverBuffer_OpenCL.h
+	../btSoftBodySolverVertexBuffer_OpenGL.h
+	../btSoftBodySolverOutputCLtoGL.h
 )
 
 # OpenCL and HLSL Shaders.

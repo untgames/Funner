@@ -22,7 +22,7 @@ box3 minimum = -20 -48 14.9
 box3 maximum = 34 64 29.18
 box3 minimum = -10 -14.59 -24
 box3 maximum = 17 -7.45 32
-box3 volume = 10795.680664062
+box3 volume = 10795.68
 box1 volume = 0
 is box2 intersects box3 ? false
 is box2 contatins box3 ? false

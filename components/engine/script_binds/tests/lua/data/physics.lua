@@ -1,5 +1,5 @@
 function print_node (node)
-  print ("Node position = " .. tostring (node.WorldPosition))
+  print (string.format ("Node position = [%.2f %.2f %.2f]", node.WorldPosition.x, node.WorldPosition.y, node.WorldPosition.z))
 end
 
 function print_bind (bind)

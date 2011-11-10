@@ -32,6 +32,12 @@ false filter called for bodies from group 0 and 2
 true filter called for bodies from group 0 and 3
 true filter called for bodies from group 0 and 4
 default filter called for bodies from group 0 and 5
+false filter called for bodies from group 0 and 0
+false filter called for bodies from group 0 and 1
+false filter called for bodies from group 0 and 2
+true filter called for bodies from group 0 and 3
+true filter called for bodies from group 0 and 4
+default filter called for bodies from group 0 and 5
 new collision event detected: 
   type is ColisionEventType_Begin
   position is -24.00 0.93 0.00
@@ -91,7 +97,10 @@ new collision event detected:
   position is -15.00 0.97 0.00
 false filter called for bodies from group 0 and 0
 false filter called for bodies from group 0 and 1
+false filter called for bodies from group 0 and 2
+true filter called for bodies from group 0 and 3
 true filter called for bodies from group 0 and 4
+default filter called for bodies from group 0 and 5
 new collision event detected: 
   type is ColisionEventType_Process
   position is -24.00 0.98 0.00
@@ -103,10 +112,7 @@ new collision event detected:
   position is -15.00 0.98 0.00
 false filter called for bodies from group 0 and 0
 false filter called for bodies from group 0 and 1
-false filter called for bodies from group 0 and 2
-true filter called for bodies from group 0 and 3
 true filter called for bodies from group 0 and 4
-default filter called for bodies from group 0 and 5
 new collision event detected: 
   type is ColisionEventType_Process
   position is -24.00 0.98 0.00
@@ -219,12 +225,14 @@ default filter called for bodies from group 0 and 5
 false filter called for bodies from group 0 and 0
 default filter called for bodies from group 0 and 5
 false filter called for bodies from group 0 and 0
+default filter called for bodies from group 0 and 5
 false filter called for bodies from group 0 and 0
 false filter called for bodies from group 0 and 0
 false filter called for bodies from group 0 and 0
 false filter called for bodies from group 0 and 0
 false filter called for bodies from group 0 and 0
 default filter called for bodies from group 0 and 5
+false filter called for bodies from group 0 and 0
 false filter called for bodies from group 0 and 0
 false filter called for bodies from group 0 and 0
 false filter called for bodies from group 0 and 0

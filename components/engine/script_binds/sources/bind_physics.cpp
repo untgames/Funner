@@ -15,6 +15,7 @@ const char* JOINT_BIND_LIBRARY           = "Physics.JointBind";
 const char* JOINT_LIBRARY                = "Physics.Joint";
 const char* MANAGER_LIBRARY              = "Physics.Manager";
 const char* MATERIAL_LIBRARY             = "Physics.Material";
+const char* RAY_TEST_MODE_LIBRARY        = "Physics.RayTestMode";
 const char* RIGID_BODY_LIBRARY           = "Physics.RigidBody";
 const char* RIGID_BODY_FLAGS_LIBRARY     = "Physics.RigidBodyFlag";
 const char* SCENE_LIBRARY                = "Physics.Scene";
@@ -44,6 +45,20 @@ void bind_manager_library (Environment& environment)
   ));
 
   environment.RegisterType<PhysicsManager> (MANAGER_LIBRARY);
+}
+
+void bind_ray_test_mode_library (Environment& environment)
+{
+  InvokerRegistry lib = environment.Library (RAY_TEST_MODE_LIBRARY);
+
+  lib.Register ("get_Nearest",  make_const (RayTestMode_Nearest));
+  lib.Register ("get_Farthest", make_const (RayTestMode_Farthest));
+  lib.Register ("get_All",      make_const (RayTestMode_All));
+}
+
+void group_ray_test (Scene& scene, const math::vec3f& ray_origin, const math::vec3f& ray_end, const char* group, RayTestMode mode, const Scene::RayTestCallback& callback)
+{
+  scene.RayTest (ray_origin, ray_end, 1, &group, mode, callback);
 }
 
 void bind_scene_library (Environment& environment)
@@ -78,6 +93,11 @@ void bind_scene_library (Environment& environment)
   lib.Register ("RemoveAllCollisionFilters", make_invoker (&Scene::RemoveAllCollisionFilters));
   lib.Register ("CreateCollisionCallback",   make_callback_invoker<CollisionCallback::signature_type> ());
   lib.Register ("RegisterCollisionCallback", make_invoker (&Scene::RegisterCollisionCallback));
+  lib.Register ("CreateRayTestCallback",     make_callback_invoker<Scene::RayTestCallback::signature_type> ());
+  lib.Register ("RayTest",                   make_invoker (
+    make_invoker (&group_ray_test),
+    make_invoker (xtl::implicit_cast<void (Scene::*) (const math::vec3f&, const math::vec3f&, RayTestMode, const Scene::RayTestCallback&)> (&Scene::RayTest))
+  ));
 
   environment.RegisterType<Scene> (SCENE_LIBRARY);
 }
@@ -300,6 +320,7 @@ void bind_rigid_body_library (Environment& environment)
       make_invoker<void (RigidBody&, const math::vec3f&)> (xtl::bind (&RigidBody::AddImpulse, _1, _2, math::vec3f (0.f)))
   ));
   lib.Register ("AddTorque",                       make_invoker (&RigidBody::AddTorque));
+  lib.Register ("AddTorqueImpulse",                make_invoker (&RigidBody::AddTorqueImpulse));
   lib.Register ("CreateTransformUpdateCallback",   make_callback_invoker<RigidBody::TransformUpdateCallback::signature_type> ());
   lib.Register ("RegisterTransformUpdateCallback", make_invoker (&RigidBody::RegisterTransformUpdateCallback));
   lib.Register ("CreateCollisionCallback",         make_callback_invoker<CollisionCallback::signature_type> ());
@@ -326,6 +347,7 @@ void bind_rigid_body_flags_library (Environment& environment)
 void bind_physics_library (Environment& environment)
 {
   bind_manager_library (environment);
+  bind_ray_test_mode_library (environment);
   bind_scene_library (environment);
   bind_joint_bind_library (environment);
   bind_joint_library (environment);

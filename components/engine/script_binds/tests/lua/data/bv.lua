@@ -46,7 +46,7 @@ function test ()
 
   aabox1:Reset (vec3 (1, 1, 1))
 
-  print ("box3 volume = " .. tostring (aabox3.Volume))
+  print (string.format ("box3 volume = %.2f", aabox3.Volume))
   print ("box1 volume = " .. tostring (aabox1.Volume))
 
   print ("is box2 intersects box3 ? " .. tostring (BoundVolumes.AxisAlignedBox.Intersects (aabox2, aabox3)))

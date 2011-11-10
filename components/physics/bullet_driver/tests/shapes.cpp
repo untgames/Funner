@@ -40,7 +40,7 @@ int main ()
     ShapePtr compound_shape (bullet_driver->CreateCompoundShape (compounding_shapes_count, compounding_shapes, compounding_shapes_transforms));
 
     RigidBodyPtr box_body           (scene->CreateRigidBody (box_shape.get (), 1),           false),
-                 sphere_body        (scene->CreateRigidBody (sphere_shape.get (), 1),        false),
+                 sphere_body        (scene->CreateRigidBody (sphere_shape.get (), 2),        false),
                  capsule_body       (scene->CreateRigidBody (capsule_shape.get (), 1),       false),
                  plane_body         (scene->CreateRigidBody (plane_shape.get (), 0),         false),
                  convex_body        (scene->CreateRigidBody (convex_shape.get (), 1),        false),
@@ -89,9 +89,9 @@ int main ()
     dump_body_position (compound_body.get ());
 
     for (size_t i = 0; i < 10; i++)
-      scene->PerformSimulation (1.f);
+      scene->PerformSimulation (0.2f);
 
-    printf ("Simulating ten seconds\n");
+    printf ("Simulating five seconds\n");
 
     printf ("plane body state:\n");
     dump_body_position (plane_body.get ());
@@ -99,8 +99,8 @@ int main ()
     dump_body_position (box_body.get ());
     printf ("sphere body state:\n");
     dump_body_position (sphere_body.get ());
-//    printf ("capsule body state:\n");               //разные результаты на mac и windows
-//    dump_body_position (capsule_body.get ());
+    printf ("capsule body state:\n");               //разные результаты на mac и windows
+    dump_body_position (capsule_body.get ());
     printf ("convex body state:\n");
     dump_body_position (convex_body.get ());
     printf ("triangle mesh body state:\n");

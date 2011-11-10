@@ -409,6 +409,11 @@ void RigidBody::AddTorque (const math::vec3f& torque)
   impl->LowLevelBody ()->AddTorque (torque);
 }
 
+void RigidBody::AddTorqueImpulse (const math::vec3f& torque)
+{
+  impl->LowLevelBody ()->AddTorqueImpulse (torque);
+}
+
 /*
    Управление линейной/угловой скоростями
 */

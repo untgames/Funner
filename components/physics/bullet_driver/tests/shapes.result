@@ -27,28 +27,32 @@ compound body state:
 Body world transform:
   position = 5; 0; 0
   orientation = 0.0; 0.0; 0.0; 1.0
-Simulating ten seconds
+Simulating five seconds
 plane body state:
 Body world transform:
   position = 0; -15; 0
   orientation = 0.0; 0.0; 0.0; 1.0
 box body state:
 Body world transform:
-  position = -10; -13; 0
-  orientation = 0.0; 0.0; 0.0; 0.9
+  position = -9; -13; 0
+  orientation = 0.0; 0.0; 0.0; 1.0
 sphere body state:
 Body world transform:
-  position = -8; -13; 0
-  orientation = 0.1; -0.2; 0.4; 0.8
+  position = -7; -13; 0
+  orientation = 0.0; 0.0; 0.0; 1.0
+capsule body state:
+Body world transform:
+  position = -4; -13; 0
+  orientation = 0.3; 0.2; 0.3; 0.8
 convex body state:
 Body world transform:
-  position = 0; -14; 1
-  orientation = -0.2; 0.5; 0.7; 0.2
+  position = 0; -13; 0
+  orientation = 0.0; 0.0; -0.2; 0.9
 triangle mesh body state:
 Body world transform:
-  position = 6; -13; 0
-  orientation = -0.5; 0.3; 0.7; 0.2
+  position = 3; -12; 0
+  orientation = 0.0; 0.1; -0.2; 0.9
 compound body state:
 Body world transform:
-  position = 7; -13; 0
-  orientation = 0.3; 0.0; 0.6; 0.6
+  position = 5; -10; 0
+  orientation = 0.0; 0.0; 0.4; 0.8
