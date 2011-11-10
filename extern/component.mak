@@ -33,7 +33,7 @@ ifneq (,$(filter bada,$(PROFILES)))
 endif
 
 ifneq (,$(filter wince,$(PROFILES)))
-  FUNNER_EXTERN_LIBS.COMPONENTS := wcecompat wince $(FUNNER_EXTERN_LIBS.COMPONENTS)
+  FUNNER_EXTERN_LIBS.COMPONENTS := wcecompat wince $(FUNNER_EXTERN_LIBS.COMPONENTS) pthreads_wince
 else
   FUNNER_EXTERN_LIBS.COMPONENTS += bullet mongoose
 endif
