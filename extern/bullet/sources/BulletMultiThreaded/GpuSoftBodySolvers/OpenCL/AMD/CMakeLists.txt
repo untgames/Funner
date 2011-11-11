@@ -28,25 +28,6 @@ SET(BulletSoftBodyOpenCLSolvers_HDRS
 	../btSoftBodySolverOutputCLtoGL.h
 )
 
-# OpenCL and HLSL Shaders.
-# Build rules generated to stringify these into headers
-# which are needed by some of the sources
-SET(BulletSoftBodyOpenCLSolvers_Shaders
-#	OutputToVertexArray
-	UpdateNormals
-	Integrate
-	UpdatePositions
-	UpdateNodes
-	SolvePositions
-	UpdatePositionsFromVelocities
-	ApplyForces
-	PrepareLinks
-	VSolveLinks
-)
-
-foreach(f ${BulletSoftBodyOpenCLSolvers_Shaders})
-    LIST(APPEND BulletSoftBodyOpenCLSolvers_OpenCLC "../OpenCLC/${f}.cl")
-endforeach(f) 
 
 
 
