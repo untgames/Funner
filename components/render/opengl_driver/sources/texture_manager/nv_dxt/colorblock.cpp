@@ -5,10 +5,33 @@
 #include <string.h> // memcpy
 #include <algorithm>
 
-using namespace nv;
+#ifdef max
+#undef max
+#endif
+
+#ifdef min
+#undef min
+#endif
+
+//using namespace nv;
 using namespace std;
 
+namespace nv
+{
+
 namespace {
+
+    template <class T>
+    inline const T& min (const T& a, const T& b)
+    {
+        return a < b ? a : b;
+    }
+    
+    template <class T>
+    inline const T& max (const T& a, const T& b)
+    {
+        return a > b ? a : b;
+    }    
 
     // Get approximate luminance.
     inline static nv::uint colorLuminance(Color32 c)
@@ -25,11 +48,10 @@ namespace {
     template <class T>
     inline T clamp (T value, T min, T max)
     {
-      return std::min (std::max (value, min), max);
+      return nv::min (nv::max (value, min), max);
     }
 
 } // namespace`
-
 
 /// Default constructor.
 ColorBlock::ColorBlock()
@@ -433,3 +455,5 @@ float ColorBlock::volume() const
 
     return bounds.volume();
 }*/
+
+}
