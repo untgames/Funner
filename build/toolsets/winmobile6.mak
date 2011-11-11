@@ -50,7 +50,7 @@ EXE_SUFFIX              := .exe
 DLL_SUFFIX              := .dll
 DLL_LIB_SUFFIX          := .lib
 DLL_PREFIX              :=
-PROFILES                += msvc wince win32 has_windows arm
+PROFILES                += msvc wince win32 has_windows arm gles egl
 COMMON_LINK_FLAGS       += -subsystem:windowsce
 
 ###################################################################################################
