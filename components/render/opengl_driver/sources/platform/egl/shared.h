@@ -36,6 +36,10 @@
   #include <common/utf_converter.h>
 #endif
 
+#ifdef _WIN32
+  #include <windows.h>
+#endif
+
 #ifdef BADA
   #include <FUiControl.h>
 

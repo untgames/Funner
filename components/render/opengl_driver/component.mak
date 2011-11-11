@@ -47,6 +47,7 @@ RENDER.OPENGL_DRIVER.SOURCES.macosx.SOURCE_DIRS := sources/platform/macosx
 else
 
 RENDER.OPENGL_DRIVER.SOURCES.win32.IMPORTS  := compile.extern.gles_win32
+RENDER.OPENGL_DRIVER.SOURCES.wince.IMPORTS  := compile.extern.gles_wince
 
 endif
 
