@@ -38,6 +38,10 @@
 
 #ifdef _WIN32
   #include <windows.h>
+  
+  HDC WINAPI GetDC (HWND hwnd);  
+  int WINAPI ReleaseDC (HWND hwnd, HDC hdc);
+  int WINAPI GetWindowTextA (HWND hWnd, LPSTR lpString, int nMaxCount);
 #endif
 
 #ifdef BADA
