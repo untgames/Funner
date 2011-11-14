@@ -19,10 +19,14 @@ ENGINE.FUNNER_SHARED_LIBRARY.IMPORTS           := compile.engine.core compile.co
 ENGINE.FUNNER_SHARED_LIBRARY.EXCLUDE_IMPORTS := link.common.auto_license_generator                                             
                                              
 #Цель - сборка движка
-ifneq (,$(filter no_dll,$(PROFILES)))
-ENGINE.FUNNER_LIBRARY.TYPE                := fat-static-lib
-else
+ifeq (,$(filter no_dll,$(PROFILES)))
 ENGINE.FUNNER_LIBRARY.TYPE                := dynamic-lib
+endif
+ifneq (,$(filter iphone,$(PROFILES)))
+ENGINE.FUNNER_LIBRARY.TYPE                := fat-static-lib
+endif
+ifneq (,$(filter android,$(PROFILES)))
+ENGINE.FUNNER_LIBRARY.TYPE                := ignore
 endif
 ENGINE.FUNNER_LIBRARY.NAME                := funner
 #ENGINE.FUNNER_LIBRARY.win32.LINK_FLAGS    := -noentry
@@ -52,6 +56,9 @@ ENGINE.LAUNCHER.SOURCES.iphone.SOURCE_DIRS      := sources/platform/iphone
 ENGINE.LAUNCHER.SOURCES.iphone.LIBS             := funner
 ENGINE.LAUNCHER.SOURCES.linux.SOURCE_DIRS       := sources/platform/linux
 ENGINE.LAUNCHER.SOURCES.linux.LIBS              := dl
+ENGINE.LAUNCHER.SOURCES.android.SOURCE_DIRS     := sources/platform/android
+ENGINE.LAUNCHER.SOURCES.android.IMPORTS         := compile.engine.core link.engine.launcher
+ENGINE.LAUNCHER.SOURCES.android.EXCLUDE_IMPORTS := link.common.auto_license_generator
 
 #Цель - console application
 ENGINE.CLAUNCHER.SOURCES.TYPE                := application
