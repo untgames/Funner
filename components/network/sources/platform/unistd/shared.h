@@ -12,6 +12,11 @@
 #include <netinet/in.h>
 #endif
 
+#ifdef ANDROID
+#include <linux/in.h>
+#include <linux/in6.h>
+#endif
+
 #include <xtl/common_exceptions.h>
 #include <xtl/reference_counter.h>
 
