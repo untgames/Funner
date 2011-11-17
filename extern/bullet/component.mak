@@ -1,12 +1,13 @@
 TARGETS := EXTERN.BULLET
 
-EXTERN.BULLET.TYPE                 := static-lib
-EXTERN.BULLET.NAME                 := funner.extern.bullet
-EXTERN.BULLET.SOURCE_DIRS          := sources/LinearMath sources/BulletCollision/BroadphaseCollision sources/BulletCollision/CollisionDispatch \
-                                      sources/BulletCollision/CollisionShapes sources/BulletCollision/Gimpact \
-                                      sources/BulletCollision/NarrowPhaseCollision sources/BulletDynamics/Character \
-                                      sources/BulletDynamics/ConstraintSolver sources/BulletDynamics/Dynamics sources/BulletDynamics/Vehicle
-EXTERN.BULLET.IMPORTS              := compile.extern.bullet
-EXTERN.BULLET.g++.COMPILER_CFLAGS  := --no-warn
-EXTERN.BULLET.msvc.COMPILER_CFLAGS := -wd4305
-EXTERN.BULLET.bada.IMPORTS        := compile.extern.bada
+EXTERN.BULLET.TYPE                   := static-lib
+EXTERN.BULLET.NAME                   := funner.extern.bullet
+EXTERN.BULLET.SOURCE_DIRS            := sources/LinearMath sources/BulletCollision/BroadphaseCollision sources/BulletCollision/CollisionDispatch \
+                                        sources/BulletCollision/CollisionShapes sources/BulletCollision/Gimpact \
+                                        sources/BulletCollision/NarrowPhaseCollision sources/BulletDynamics/Character \
+                                        sources/BulletDynamics/ConstraintSolver sources/BulletDynamics/Dynamics sources/BulletDynamics/Vehicle
+EXTERN.BULLET.IMPORTS                := compile.extern.bullet
+EXTERN.BULLET.g++.COMPILER_CFLAGS    := -O1        #начиная с bullet 2.79 не компилируется с более высокой оптимизацией
+EXTERN.BULLET.iphone.COMPILER_CFLAGS := --no-warn
+EXTERN.BULLET.msvc.COMPILER_CFLAGS   := -wd4305
+EXTERN.BULLET.bada.IMPORTS           := compile.extern.bada
