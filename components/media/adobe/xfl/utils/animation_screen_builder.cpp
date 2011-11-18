@@ -979,9 +979,39 @@ void process_sprite_common
 
     //сохранение угла
     
-  const PropertyAnimation *angle_track = animation.Properties ().Find ("headContainer.Basic_Motion.Rotation_Z");
+  const PropertyAnimation *angle_track = animation.Properties ().Find ("headContainer.Basic_Motion.Rotation_Z"),
+                          *skewx_track = animation.Properties ().Find ("headContainer.Transformation.Skew_X"),
+                          *skewy_track = animation.Properties ().Find ("headContainer.Transformation.Skew_Y");
+                                       
+  bool angle_in_skew = (!angle_track || angle_track && angle_track->Keyframes ().Size () <= 1) &&
+                       skewx_track && skewy_track && skewx_track->Keyframes ().Size () == skewy_track->Keyframes ().Size ();
+
+  if (angle_in_skew)
+  {
+    for (size_t i=0, count=skewx_track->Keyframes ().Size (); i<count; i++)
+    {
+      const PropertyAnimationKeyframe &xframe = skewx_track->Keyframes ()[i],
+                                      &yframe = skewy_track->Keyframes ()[i];
+
+      static const float EPS = 0.01f;
+
+      if (fabs (xframe.time - yframe.time) > EPS || fabs (xframe.value - yframe.value) > EPS)
+      {
+        angle_in_skew = false;
+        break;
+      }
+    }
+  }
   
-  if (angle_track)
+  if (angle_in_skew)
+  {
+    XmlWriter::Scope scope (*data.scene_writer, "Track");
+
+    data.scene_writer->WriteAttribute ("Name", "angle");
+
+    write_track (data, *skewx_track, -1.0f);
+  }
+  else if (angle_track)
   {
     XmlWriter::Scope scope (*data.scene_writer, "Track");
 
