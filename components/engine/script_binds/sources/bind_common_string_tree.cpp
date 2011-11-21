@@ -10,6 +10,7 @@
 #include <common/xml_writer.h>
 
 using namespace common;
+using namespace engine;
 using namespace script;
 using namespace xtl;
 
@@ -31,509 +32,692 @@ Log& get_log ()
   return log;
 }
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
+}
+
 ///Узел дерева строк
-///////////////////////////////////////////////////////////////////////////////////////////////////
-class StringNode: public xtl::reference_counter, public xtl::dynamic_cast_root
+struct StringNode::Impl
 {
-  public:
-    typedef xtl::intrusive_ptr<StringNode> Pointer;
+  Impl ()
+    : ref_count (1)
+    {}
 
-  public:
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Создание копии
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    Pointer Clone ()
+  ///Работа с атрибутами
+  size_t AttributesCapacity () const
+  {
+    return attribute_offsets.capacity ();
+  }
+
+  size_t AttributesCount () const
+  {
+    return attribute_offsets.size ();
+  }
+
+  void ReserveAttributes (size_t new_size)
+  {
+    attribute_offsets.reserve (new_size);
+    attributes.reserve (new_size * 8);
+  }
+
+  const char* Attribute (size_t index) const
+  {
+    if (index >= AttributesCount ())
+      throw xtl::make_range_exception ("script::binds::StringNode::Attribute", "index", index, 0u, AttributesCount ());
+
+    return attributes.data () + attribute_offsets [index];
+  }
+
+  void SetAttribute (size_t index, const char* value)
+  {
+    static const char* METHOD_NAME = "script::binds::StringNode::Attribute";
+
+    if (!value)
+      throw xtl::make_null_argument_exception (METHOD_NAME, "value");
+
+    if (index >= AttributesCount ())
+      throw xtl::make_range_exception (METHOD_NAME, "index", index, 0u, AttributesCount ());
+      
+    size_t value_length = xtl::xstrlen (value);
+
+    if (index < AttributesCount () - 1)
     {
-      Pointer return_value (new StringNode, false);
+      if (value_length < (attribute_offsets [index + 1] - attribute_offsets [index]))
+      {
+        xtl::xstrncpy (&attributes [attribute_offsets [index]], value, value_length);
+        attributes [value_length] = 0;
 
-      return_value->name              = name;
-      return_value->attributes        = attributes;
-      return_value->attribute_offsets = attribute_offsets;
+        return;
+      }
+    }
+
+    attributes.reserve (attributes.length () + value_length + 1);
+
+    size_t offset = attributes.length ();
+
+    attributes                += value;
+    attributes                += '\0';
+    attribute_offsets [index]  = offset;
+  }
+
+  size_t AddAttribute (const char* value)
+  {
+    if (!value)
+      throw xtl::make_null_argument_exception ("script::binds::StringNode::AddAttribute", "value");
+
+    attributes.reserve (attributes.length () + xtl::xstrlen (value) + 1);
+
+    attribute_offsets.push_back (attributes.length ());
+    attributes += value;
+    attributes += '\0';
+
+    return attribute_offsets.size () - 1;
+  }
+
+  void AddAttribute (size_t index, const char* value)
+  {
+    static const char* METHOD_NAME = "script::binds::StringNode::AddAttribute";
+
+    if (!value)
+      throw xtl::make_null_argument_exception (METHOD_NAME, "value");
+
+    if (index > AttributesCount ())
+      throw xtl::make_range_exception (METHOD_NAME, "index", index, 0u, AttributesCount () + 1);
+
+    attributes.reserve (attributes.length () + xtl::xstrlen (value) + 1);
+
+    attribute_offsets.insert (attribute_offsets.begin () + index, attributes.length ());
+    attributes += value;
+    attributes += '\0';
+  }
+
+  void RemoveAttribute (size_t index)
+  {
+    if (index >= AttributesCount ())
+      return;
+
+    attribute_offsets.erase (attribute_offsets.begin () + index);
+
+    if (attribute_offsets.empty ())
+      attributes.clear ();
+  }
+
+  void RemoveAllAttributes ()
+  {
+    attribute_offsets.clear ();
+    attributes.clear ();
+  }
+
+  ///Работа с детьмя
+  size_t ChildrenCapacity () const
+  {
+    return childs.capacity ();
+  }
+
+  size_t ChildrenCount () const
+  {
+    return childs.size ();
+  }
+
+  void ReserveChildren (size_t new_size)
+  {
+    childs.reserve (new_size);
+  }
+
+  Pointer Child (size_t index) const
+  {
+    if (index >= ChildrenCount ())
+      throw xtl::make_range_exception ("script::binds::StringNode::Child", "index", index, 0u, ChildrenCount ());
+
+    return childs [index];
+  }
+
+  size_t AddChild (StringNode& new_child)
+  {
+    AddChild (ChildrenCount (), new_child);
+
+    return childs.size () - 1;
+  }
+
+  void AddChild (size_t index, StringNode& new_child)
+  {
+    static const char* METHOD_NAME = "script::binds::StringNode::AddChild";
+
+    if (index > ChildrenCount ())
+      throw xtl::make_range_exception (METHOD_NAME, "index", index, 0u, ChildrenCount () + 1);
+
+    if (new_child.impl->HasNode (this))
+      throw xtl::format_operation_exception (METHOD_NAME, "Can't add child because it contains this node");
+
+    childs.insert (childs.begin () + index, Pointer (&new_child));
+  }
+
+  void RemoveChild (size_t index)
+  {
+    if (index >= ChildrenCount ())
+      return;
+
+    childs.erase (childs.begin () + index);
+  }
+
+  void RemoveAllChildren ()
+  {
+    childs.clear ();
+  }
+
+  ///Загрузка/сохранение
+  static Pointer LoadXml (const char* file_name)
+  {
+    static const char* METHOD_NAME = "script::binds::StringNode::LoadXml";
+
+    if (!file_name)
+      throw xtl::make_null_argument_exception (METHOD_NAME, "file_name");
+
+    if (strstr (file_name, "<?xml"))
+      return LoadXmlFromString (file_name);
+
+    return LoadXmlFromFile (file_name);
+  }
+
+  static Pointer LoadXmlFromFile (const char* file_name)
+  {
+    static const char* METHOD_NAME = "script::binds::StringNode::LoadXmlFromFile";
+
+    if (!file_name)
+      throw xtl::make_null_argument_exception (METHOD_NAME, "file_name");
+
+    Pointer return_value (new StringNode, false);
+
+    Parser parser (file_name);
+    ParseLog parse_log = parser.Log ();
+
+    for (size_t i = 0; i < parse_log.MessagesCount (); i++)
+      switch (parse_log.MessageType (i))
+      {
+        case ParseLogMessageType_Error:
+        case ParseLogMessageType_FatalError:
+          get_log ().Printf ("Parser error: '%s'", parse_log.Message (i));
+          break;
+        default:
+          break;
+      }
+
+    ParseNode iter = parser.Root ().First ();
+
+    if (!iter)
+      throw xtl::format_operation_exception (METHOD_NAME, "There is no root node in file '%s'", file_name);
+
+    ProcessNode (return_value, iter);
+
+    return return_value;
+  }
+
+  static Pointer LoadXmlFromString (const char* string)
+  {
+    static const char* METHOD_NAME = "script::binds::StringNode::LoadXmlFromString";
+
+    if (!string)
+      throw xtl::make_null_argument_exception (METHOD_NAME, "file_name");
+
+    Pointer return_value (new StringNode, false);
+
+    Parser parser (string);
+    ParseLog parse_log = parser.Log ();
+
+    for (size_t i = 0; i < parse_log.MessagesCount (); i++)
+      switch (parse_log.MessageType (i))
+      {
+        case ParseLogMessageType_Error:
+        case ParseLogMessageType_FatalError:
+          get_log ().Printf ("Parser error: '%s'", parse_log.Message (i));
+          break;
+        default:
+          break;
+      }
+
+    ParseNode iter = parser.Root ().First ();
+
+    if (!iter)
+      throw xtl::format_operation_exception (METHOD_NAME, "There is no root node in string '%s'", string);
+
+    ProcessNode (return_value, iter);
+
+    return return_value;
+  }
+
+  void SaveXml (const char* file_name)
+  {
+    if (!file_name)
+      throw xtl::make_null_argument_exception ("script::binds::StringNode::SaveXml", "file_name");
+
+    XmlWriter writer (file_name);
+
+    SaveNode (writer);
+  }
+
+  ///Поиск узла
+  Pointer FindNode (const char* name_to_find, const char* value, bool create_if_not_exist)
+  {
+    if (!name_to_find)
+      throw xtl::make_null_argument_exception ("script::binds::StringNode::FindNode", "name");
+
+    const char* subname = strchr (name_to_find, '.');
+
+    if (subname)
+    {
+      size_t base_name_len = subname - name_to_find;
 
       for (ChildArray::iterator iter = childs.begin (), end = childs.end (); iter != end; ++iter)
-        return_value->AddChild (*(*iter)->Clone ());
-
-      return return_value;
+        if (!xstrncmp (name_to_find, (*iter)->Name (), base_name_len))
+          return (*iter)->FindNode (subname + 1, value, create_if_not_exist);
     }
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Получение имени/переименование
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    const char* Name () const
+    else
     {
-      return name.c_str ();
-    }
-
-    void SetName (const char* new_name)
-    {
-      if (!new_name)
-        throw xtl::make_null_argument_exception ("script::binds::StringNode::SetName", "new_name");
-
-      name = new_name;
-    }
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Работа с атрибутами
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    size_t AttributesCapacity () const
-    {
-      return attribute_offsets.capacity ();
-    }
-
-    size_t AttributesCount () const
-    {
-      return attribute_offsets.size ();
-    }
-
-    void ReserveAttributes (size_t new_size)
-    {
-      attribute_offsets.reserve (new_size);
-      attributes.reserve (new_size * 8);
-    }
-
-    const char* Attribute (size_t index) const
-    {
-      if (index >= AttributesCount ())
-        throw xtl::make_range_exception ("script::binds::StringNode::Attribute", "index", index, 0u, AttributesCount ());
-
-      return attributes.data () + attribute_offsets [index];
-    }
-
-    void SetAttribute (size_t index, const char* value)
-    {
-      static const char* METHOD_NAME = "script::binds::StringNode::Attribute";
-
-      if (!value)
-        throw xtl::make_null_argument_exception (METHOD_NAME, "value");
-
-      if (index >= AttributesCount ())
-        throw xtl::make_range_exception (METHOD_NAME, "index", index, 0u, AttributesCount ());        
-        
-      size_t value_length = xtl::xstrlen (value);        
-
-      if (index < AttributesCount () - 1)
+      for (ChildArray::iterator iter = childs.begin (), end = childs.end (); iter != end; ++iter)
       {
-        if (value_length < (attribute_offsets [index + 1] - attribute_offsets [index]))
+        if (!xstrcmp (name_to_find, (*iter)->Name ()))
         {
-          xtl::xstrncpy (&attributes [attribute_offsets [index]], value, value_length);
-          attributes [value_length] = 0;
-          
-          return;
-        }
-      }
-
-      attributes.reserve (attributes.length () + value_length + 1);
-      
-      size_t offset = attributes.length ();
-
-      attributes                += value;
-      attributes                += '\0';
-      attribute_offsets [index]  = offset;
-    }
-
-    size_t AddAttribute (const char* value)
-    {
-      if (!value)
-        throw xtl::make_null_argument_exception ("script::binds::StringNode::AddAttribute", "value");
-
-      attributes.reserve (attributes.length () + xtl::xstrlen (value) + 1);
-
-      attribute_offsets.push_back (attributes.length ());
-      attributes += value;
-      attributes += '\0';
-
-      return attribute_offsets.size () - 1;
-    }
-
-    void AddAttribute (size_t index, const char* value)
-    {
-      static const char* METHOD_NAME = "script::binds::StringNode::AddAttribute";
-
-      if (!value)
-        throw xtl::make_null_argument_exception (METHOD_NAME, "value");
-
-      if (index > AttributesCount ())
-        throw xtl::make_range_exception (METHOD_NAME, "index", index, 0u, AttributesCount () + 1);
-
-      attributes.reserve (attributes.length () + xtl::xstrlen (value) + 1);
-
-      attribute_offsets.insert (attribute_offsets.begin () + index, attributes.length ());
-      attributes += value;
-      attributes += '\0';
-    }
-
-    void RemoveAttribute (size_t index)
-    {
-      if (index >= AttributesCount ())
-        return;
-
-      attribute_offsets.erase (attribute_offsets.begin () + index);
-
-      if (attribute_offsets.empty ())
-        attributes.clear ();
-    }
-
-    void RemoveAllAttributes ()
-    {
-      attribute_offsets.clear ();
-      attributes.clear ();
-    }
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Работа с детьмя
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    size_t ChildrenCapacity () const
-    {
-      return childs.capacity ();
-    }
-
-    size_t ChildrenCount () const
-    {
-      return childs.size ();
-    }
-
-    void ReserveChildren (size_t new_size)
-    {
-      childs.reserve (new_size);
-    }
-
-    Pointer Child (size_t index) const
-    {
-      if (index >= ChildrenCount ())
-        throw xtl::make_range_exception ("script::binds::StringNode::Child", "index", index, 0u, ChildrenCount ());
-
-      return childs [index];
-    }
-
-    size_t AddChild (StringNode& new_child)
-    {
-      AddChild (ChildrenCount (), new_child);
-
-      return childs.size () - 1;
-    }
-
-    void AddChild (size_t index, StringNode& new_child)
-    {
-      static const char* METHOD_NAME = "script::binds::StringNode::AddChild";
-
-      if (index > ChildrenCount ())
-        throw xtl::make_range_exception (METHOD_NAME, "index", index, 0u, ChildrenCount () + 1);
-
-      if (!new_child)
-        throw xtl::make_null_argument_exception (METHOD_NAME, "new_child");
-
-      if (new_child.HasNode (this))
-        throw xtl::format_operation_exception (METHOD_NAME, "Can't add child because it contains this node");
-
-      childs.insert (childs.begin () + index, Pointer (&new_child));
-    }
-
-    void RemoveChild (size_t index)
-    {
-      if (index >= ChildrenCount ())
-        return;
-
-      childs.erase (childs.begin () + index);
-    }
-
-    void RemoveAllChildren ()
-    {
-      childs.clear ();
-    }
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Загрузка/сохранение
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    static Pointer LoadXml (const char* file_name)
-    {
-      static const char* METHOD_NAME = "script::binds::StringNode::LoadXml";
-
-      if (!file_name)
-        throw xtl::make_null_argument_exception (METHOD_NAME, "file_name");
-        
-      if (strstr (file_name, "<?xml"))
-        return LoadXmlFromString (file_name);
-
-      return LoadXmlFromFile (file_name);
-    }
-    
-    static Pointer LoadXmlFromFile (const char* file_name)
-    {
-      static const char* METHOD_NAME = "script::binds::StringNode::LoadXmlFromFile";
-
-      if (!file_name)
-        throw xtl::make_null_argument_exception (METHOD_NAME, "file_name");        
-
-      Pointer return_value (new StringNode, false);
-
-      Parser parser (file_name);      
-      ParseLog parse_log = parser.Log ();
-
-      for (size_t i = 0; i < parse_log.MessagesCount (); i++)
-        switch (parse_log.MessageType (i))
-        {
-          case ParseLogMessageType_Error:
-          case ParseLogMessageType_FatalError:
-            get_log ().Printf ("Parser error: '%s'", parse_log.Message (i));
-            break;
-          default:
-            break;
-        }
-
-      ParseNode iter = parser.Root ().First ();
-
-      if (!iter)
-        throw xtl::format_operation_exception (METHOD_NAME, "There is no root node in file '%s'", file_name);
-
-      ProcessNode (return_value, iter);
-
-      return return_value;
-    }    
-    
-    static Pointer LoadXmlFromString (const char* string)
-    {
-      static const char* METHOD_NAME = "script::binds::StringNode::LoadXmlFromString";
-
-      if (!string)
-        throw xtl::make_null_argument_exception (METHOD_NAME, "file_name");
-
-      Pointer return_value (new StringNode, false);
-
-      Parser parser (string);      
-      ParseLog parse_log = parser.Log ();
-
-      for (size_t i = 0; i < parse_log.MessagesCount (); i++)
-        switch (parse_log.MessageType (i))
-        {
-          case ParseLogMessageType_Error:
-          case ParseLogMessageType_FatalError:
-            get_log ().Printf ("Parser error: '%s'", parse_log.Message (i));
-            break;
-          default:
-            break;
-        }
-
-      ParseNode iter = parser.Root ().First ();
-
-      if (!iter)
-        throw xtl::format_operation_exception (METHOD_NAME, "There is no root node in string '%s'", string);
-
-      ProcessNode (return_value, iter);
-
-      return return_value;
-    }    
-
-    void SaveXml (const char* file_name)
-    {
-      if (!file_name)
-        throw xtl::make_null_argument_exception ("script::binds::StringNode::SaveXml", "file_name");
-
-      XmlWriter writer (file_name);
-
-      SaveNode (writer);
-    }
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Создание нового узла
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    static Pointer Create ()
-    {
-      return Pointer (new StringNode, false);
-    }
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Поиск узла
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    Pointer FindNode (const char* name_to_find, const char* value, bool create_if_not_exist)
-    {
-      if (!name_to_find)
-        throw xtl::make_null_argument_exception ("script::binds::StringNode::FindNode", "name");
-
-      const char* subname = strchr (name_to_find, '.');
-
-      if (subname)
-      {    
-        size_t base_name_len = subname - name_to_find;
-
-        for (ChildArray::iterator iter = childs.begin (), end = childs.end (); iter != end; ++iter)
-          if (!xstrncmp (name_to_find, (*iter)->Name (), base_name_len))
-            return (*iter)->FindNode (subname + 1, value, create_if_not_exist);
-      }
-      else
-      {
-        for (ChildArray::iterator iter = childs.begin (), end = childs.end (); iter != end; ++iter)
-        {
-          if (!xstrcmp (name_to_find, (*iter)->Name ()))
+          if (value)
           {
-            if (value)
-            {
-              const char* attr = (*iter)->Attribute (0);
-              
-              if (attr && !xstrcmp (value, attr))
-                return *iter;
-            }
-            else
-            {
+            const char* attr = (*iter)->Attribute (0);
+
+            if (attr && !xstrcmp (value, attr))
               return *iter;
-            }
+          }
+          else
+          {
+            return *iter;
           }
         }
       }
-
-      if (create_if_not_exist)
-        return CreateNode (name_to_find);
-
-      return 0;
     }
 
-  private:
-    static void ProcessNode (StringNode::Pointer string_node, const ParseNode& node)
+    if (create_if_not_exist)
+      return CreateNode (name_to_find);
+
+    return 0;
+  }
+
+  static void ProcessNode (StringNode::Pointer string_node, const ParseNode& node)
+  {
+    string_node->SetName (node.Name ());
+
+    string_node->ReserveAttributes (node.AttributesCount ());
+
+    for (size_t i = 0; i < node.AttributesCount (); i++)
+      string_node->AddAttribute (node.Attribute (i));
+
+    size_t children_count = 0;
+
+    for (ParseNode iter = node.First (); iter; iter = iter.Next ())
+      children_count++;
+
+    string_node->ReserveChildren (children_count);
+
+    for (ParseNode iter = node.First (); iter; iter = iter.Next ())
     {
-      string_node->SetName (node.Name ());
-
-      string_node->ReserveAttributes (node.AttributesCount ());
-
-      for (size_t i = 0; i < node.AttributesCount (); i++)
-        string_node->AddAttribute (node.Attribute (i));
-
-      size_t children_count = 0;
-
-      for (ParseNode iter = node.First (); iter; iter = iter.Next ())
-        children_count++;
-
-      string_node->ReserveChildren (children_count);
-
-      for (ParseNode iter = node.First (); iter; iter = iter.Next ())
+      if (!xstrcmp ("#text", iter.Name ()))
       {
-        if (!xstrcmp ("#text", iter.Name ()))
-        {
-          for (size_t i = 0; i < iter.AttributesCount (); i++)
-            string_node->AddAttribute (iter.Attribute (i));
-        
-          continue;
-        }
+        for (size_t i = 0; i < iter.AttributesCount (); i++)
+          string_node->AddAttribute (iter.Attribute (i));
 
-        StringNode::Pointer child = StringNode::Create ();
-
-        ProcessNode (child, iter);
-
-        string_node->AddChild (*child);
+        continue;
       }
+
+      StringNode::Pointer child = StringNode::Create ();
+
+      ProcessNode (child, iter);
+
+      string_node->AddChild (*child);
+    }
+  }
+
+  void SaveNode (XmlWriter& writer)
+  {
+    if (name.empty ())
+    {
+      get_log ().Print ("Can't save node, empty name");
+      return;
     }
 
-    void SaveNode (XmlWriter& writer)
+    if ((attribute_offsets.size () == 1) && (childs.empty ()))
     {
-      if (name.empty ())
-      {
-        get_log ().Print ("Can't save node, empty name");
-        return;
-      }
-
-      if ((attribute_offsets.size () == 1) && (childs.empty ()))
-      {
-        writer.WriteAttribute (name.c_str (), attributes.data () + attribute_offsets[0]);
-        return;
-      }
-
-      XmlWriter::Scope scope (writer, name.c_str ());
-      
-      for (ChildArray::iterator iter = childs.begin (), end = childs.end (); iter != end; ++iter)
-        if ((*iter)->attribute_offsets.size () == 1)
-          (*iter)->SaveNode (writer);
-
-      if (attribute_offsets.size () > 1)
-      {
-        AttributeIterator start (&attribute_offsets [0], attributes.c_str ()),
-                          finish (&*attribute_offsets.end (), attributes.c_str ());
-                          
-        writer.WriteData (xtl::make_const_ref (xtl::make_iterator_range (start, finish)));
-      }
-
-      for (ChildArray::iterator iter = childs.begin (), end = childs.end (); iter != end; ++iter)
-        if ((*iter)->attribute_offsets.size () != 1)
-          (*iter)->SaveNode (writer);
+      writer.WriteAttribute (name.c_str (), attributes.data () + attribute_offsets[0]);
+      return;
     }
 
-    bool HasNode (StringNode* node)
+    XmlWriter::Scope scope (writer, name.c_str ());
+
+    for (ChildArray::iterator iter = childs.begin (), end = childs.end (); iter != end; ++iter)
+      if ((*iter)->impl->attribute_offsets.size () == 1)
+        (*iter)->impl->SaveNode (writer);
+
+    if (attribute_offsets.size () > 1)
     {
-      if (this == node)
+      AttributeIterator start (&attribute_offsets [0], attributes.c_str ()),
+                        finish (&*attribute_offsets.end (), attributes.c_str ());
+
+      writer.WriteData (xtl::make_const_ref (xtl::make_iterator_range (start, finish)));
+    }
+
+    for (ChildArray::iterator iter = childs.begin (), end = childs.end (); iter != end; ++iter)
+      if ((*iter)->impl->attribute_offsets.size () != 1)
+        (*iter)->impl->SaveNode (writer);
+  }
+
+  bool HasNode (StringNode::Impl* node)
+  {
+    if (this == node)
+      return true;
+
+    for (ChildArray::iterator iter = childs.begin (), end = childs.end (); iter != end; ++iter)
+      if ((*iter)->impl->HasNode (node))
         return true;
 
-      for (ChildArray::iterator iter = childs.begin (), end = childs.end (); iter != end; ++iter)
-        if ((*iter)->HasNode (node))
-          return true;
+    return false;
+  }
 
-      return false;
-    }
+  Pointer CreateNode (const char* node_name)
+  {
+    const char* subname = strchr (node_name, '.');
 
-    Pointer CreateNode (const char* node_name)
+    if (subname)
     {
-      const char* subname = strchr (node_name, '.');
+      Pointer new_child = Create ();
 
-      if (subname)
-      {
-        Pointer new_child = Create ();
+      new_child->impl->name = stl::string (node_name, subname - node_name);
 
-        new_child->name = stl::string (node_name, subname - node_name);
+      Pointer result = new_child->impl->CreateNode (subname + 1);
 
-        Pointer result = new_child->CreateNode (subname + 1);        
+      AddChild (*new_child);
 
-        AddChild (*new_child);
-
-        return result;
-      }
-      else
-      {
-        Pointer new_child = Create ();
-      
-        new_child->name = node_name;
-
-        AddChild (*new_child);
-
-        return new_child;
-      }
+      return result;
     }
-
-  private:
-    typedef stl::vector<size_t>  AttributeOffsetArray;
-    typedef stl::vector<Pointer> ChildArray;
-    
-    struct AttributeIterator: public stl::iterator<stl::forward_iterator_tag, const char*>
+    else
     {
-      public:
-        AttributeIterator (const size_t* in_offset, const char* in_attributes) : offset (in_offset), attributes (in_attributes) {}
+      Pointer new_child = Create ();
 
-        AttributeIterator& operator ++ () {
-          offset++;
+      new_child->impl->name = node_name;
 
-          return *this;
-        }
+      AddChild (*new_child);
 
-        AttributeIterator operator ++ (int) {
-          AttributeIterator tmp = *this;
+      return new_child;
+    }
+  }
 
-          ++*this;
+  typedef stl::vector<size_t>  AttributeOffsetArray;
+  typedef stl::vector<Pointer> ChildArray;
 
-          return tmp;
-        }
+  struct AttributeIterator: public stl::iterator<stl::forward_iterator_tag, const char*>
+  {
+    public:
+      AttributeIterator (const size_t* in_offset, const char* in_attributes) : offset (in_offset), attributes (in_attributes) {}
 
-        const char* operator * () const { return attributes + *offset; }
+      AttributeIterator& operator ++ () {
+        offset++;
 
-        bool operator == (const AttributeIterator& iter) const { return offset == iter.offset; }
-        bool operator != (const AttributeIterator& iter) const { return offset != iter.offset; }
+        return *this;
+      }
 
-      private:
-        const size_t* offset;
-        const char*   attributes;
-    };    
+      AttributeIterator operator ++ (int) {
+        AttributeIterator tmp = *this;
 
-  private:
-    stl::string          name;                 //имя узла
-    stl::string          attributes;           //значения атрибутов
-    AttributeOffsetArray attribute_offsets;    //массив смещений атрибутов
-    ChildArray           childs;               //дети
+        ++*this;
+
+        return tmp;
+      }
+
+      const char* operator * () const { return attributes + *offset; }
+
+      bool operator == (const AttributeIterator& iter) const { return offset == iter.offset; }
+      bool operator != (const AttributeIterator& iter) const { return offset != iter.offset; }
+
+    private:
+      const size_t* offset;
+      const char*   attributes;
+  };
+
+  stl::string          name;                 //имя узла
+  stl::string          attributes;           //значения атрибутов
+  AttributeOffsetArray attribute_offsets;    //массив смещений атрибутов
+  ChildArray           childs;               //дети
+  size_t               ref_count;            //количество ссылок
 };
+
+/*
+   Конструктор/деструктор
+*/
+
+StringNode::StringNode ()
+  : impl (new Impl)
+  {}
+
+StringNode::~StringNode ()
+{
+  delete impl;
+}
+
+/*
+   Создание нового узла
+*/
+
+StringNode::Pointer StringNode::Create ()
+{
+  return Pointer (new StringNode, false);
+}
+
+/*
+   Создание копии
+*/
+
+StringNode::Pointer StringNode::Clone ()
+{
+  Pointer return_value (new StringNode, false);
+
+  return_value->impl->name              = impl->name;
+  return_value->impl->attributes        = impl->attributes;
+  return_value->impl->attribute_offsets = impl->attribute_offsets;
+
+  for (Impl::ChildArray::iterator iter = impl->childs.begin (), end = impl->childs.end (); iter != end; ++iter)
+    return_value->AddChild (*(*iter)->Clone ());
+
+  return return_value;
+}
+
+/*
+   Получение имени/переименование
+*/
+
+const char* StringNode::Name () const
+{
+  return impl->name.c_str ();
+}
+
+void StringNode::SetName (const char* new_name)
+{
+  if (!new_name)
+    throw xtl::make_null_argument_exception ("script::binds::StringNode::SetName", "new_name");
+
+  impl->name = new_name;
+}
+
+/*
+   Работа с атрибутами
+*/
+
+size_t StringNode::AttributesCapacity () const
+{
+  return impl->AttributesCapacity ();
+}
+
+size_t StringNode::AttributesCount () const
+{
+  return impl->AttributesCount ();
+}
+
+void StringNode::ReserveAttributes (size_t new_size)
+{
+  impl->ReserveAttributes (new_size);
+}
+
+const char* StringNode::Attribute (size_t index) const
+{
+  return impl->Attribute (index);
+}
+
+void StringNode::SetAttribute (size_t index, const char* value)
+{
+  impl->SetAttribute (index, value);
+}
+
+size_t StringNode::AddAttribute (const char* value)
+{
+  return impl->AddAttribute (value);
+}
+
+void StringNode::AddAttribute (size_t index, const char* value)
+{
+  impl->AddAttribute (index, value);
+}
+
+void StringNode::RemoveAttribute (size_t index)
+{
+  impl->RemoveAttribute (index);
+}
+
+void StringNode::RemoveAllAttributes ()
+{
+  impl->RemoveAllAttributes ();
+}
+
+/*
+   Работа с детьмя
+*/
+
+size_t StringNode::ChildrenCapacity () const
+{
+  return impl->ChildrenCapacity ();
+}
+
+size_t StringNode::ChildrenCount () const
+{
+  return impl->ChildrenCount ();
+}
+
+void StringNode::ReserveChildren (size_t new_size)
+{
+  impl->ReserveChildren (new_size);
+}
+
+StringNode::Pointer StringNode::Child (size_t index) const
+{
+  return impl->Child (index);
+}
+
+size_t StringNode::AddChild (StringNode& new_child)
+{
+  return impl->AddChild (new_child);
+}
+
+void StringNode::AddChild (size_t index, StringNode& new_child)
+{
+  impl->AddChild (index, new_child);
+}
+
+void StringNode::RemoveChild (size_t index)
+{
+  impl->RemoveChild (index);
+}
+
+void StringNode::RemoveAllChildren ()
+{
+  impl->RemoveAllChildren ();
+}
+
+/*
+   Загрузка/сохранение
+*/
+
+StringNode::Pointer StringNode::LoadXml (const char* file_name)
+{
+  return Impl::LoadXml (file_name);
+}
+
+StringNode::Pointer StringNode::LoadXmlFromFile (const char* file_name)
+{
+  return Impl::LoadXmlFromFile (file_name);
+}
+
+StringNode::Pointer StringNode::LoadXmlFromString (const char* string)
+{
+  return Impl::LoadXmlFromString (string);
+}
+
+void StringNode::SaveXml (const char* file_name)
+{
+  impl->SaveXml (file_name);
+}
+
+/*
+   Поиск узла
+*/
+
+StringNode::Pointer StringNode::FindNode (const char* name_to_find, const char* value, bool create_if_not_exist)
+{
+  return impl->FindNode (name_to_find, value, create_if_not_exist);
+}
+
+/*
+   Подсчёт ссылок
+*/
+
+void StringNode::AddRef () const
+{
+  if (impl->ref_count)
+    impl->ref_count++;
+}
+
+void StringNode::Release () const
+{
+    //защита от повторного удаления в обработчике
+
+  if (!impl->ref_count)
+    return;
+
+  if (!--impl->ref_count)
+    delete this;
+}
+
+/*
+   Получение значения нулевого атрибута дочернего узла с именем name
+*/
+
+const char* StringNode::Get (const char* name)
+{
+  StringNode::Pointer find_node = FindNode (name, 0, false);
+
+  if (!find_node)
+    throw xtl::format_operation_exception ("script::binds::get (StringNode, const char*)", "There is no node '%s'", name);
+
+  if (!find_node->AttributesCount ())
+    throw xtl::format_operation_exception ("script::binds::get (StringNode, const char*)", "Node '%s' hasn't attributes", name);
+
+  return find_node->Attribute (0);
+}
+
+const char* StringNode::Get (const char* name, const char* default_value)
+{
+  StringNode::Pointer find_node = FindNode (name, 0, false);
+
+  if (!find_node)
+    return default_value;
+
+  if (!find_node->AttributesCount ())
+    return default_value;
+
+  return find_node->Attribute (0);
+}
+
+namespace
+{
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Поиск дочернего узла по имени
@@ -546,35 +730,6 @@ StringNode::Pointer find (StringNode& node, const char* name)
 StringNode::Pointer find (StringNode& node, const char* name, const char* value)
 {
   return node.FindNode (name, value, false);
-}
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Получение значения нулевого атрибута дочернего узла с именем name
-///////////////////////////////////////////////////////////////////////////////////////////////////
-const char* get (StringNode& node, const char* name)
-{
-  StringNode::Pointer find_node = node.FindNode (name, 0, false);
-
-  if (!find_node)
-    throw xtl::format_operation_exception ("script::binds::get (StringNode, const char*)", "There is no node '%s'", name);
-
-  if (!find_node->AttributesCount ())
-    throw xtl::format_operation_exception ("script::binds::get (StringNode, const char*)", "Node '%s' hasn't attributes", name);
-
-  return find_node->Attribute (0);
-}
-
-const char* get (StringNode& node, const char* name, const char* default_value)
-{
-  StringNode::Pointer find_node = node.FindNode (name, 0, false);
-
-  if (!find_node)
-    return default_value;
-
-  if (!find_node->AttributesCount ())
-    return default_value;
-
-  return find_node->Attribute (0);
 }
 
 void set (StringNode& node, const char* name, const char* value)
@@ -636,8 +791,8 @@ void bind_common_string_tree (Environment& environment)
                                                      make_invoker ((StringNode::Pointer (*)(StringNode&, const char*, const char*))&find),
                                                      make_invoker ((StringNode::Pointer (*)(StringNode&, const char*))&find)
                                                     ));
-  lib.Register ("Get",                 make_invoker (make_invoker (implicit_cast<const char* (*) (StringNode&, const char*, const char*)> (&get)),
-                                                     make_invoker (implicit_cast<const char* (*) (StringNode&, const char*)> (&get))));
+  lib.Register ("Get",                 make_invoker (make_invoker (implicit_cast<const char* (StringNode::*) (const char*, const char*)> (&StringNode::Get)),
+                                                     make_invoker (implicit_cast<const char* (StringNode::*) (const char*)> (&StringNode::Get))));
   lib.Register ("Set",                 make_invoker (&set));
 
     //регистрация типов данных

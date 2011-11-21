@@ -219,8 +219,8 @@ void bind_shape_list_library (Environment& environment)
       make_invoker<void (ShapeList&, const Shape&, const math::vec3f&)> (xtl::bind (xtl::implicit_cast<void (ShapeList::*)(const Shape&, const math::vec3f&, const math::quatf&)> (&ShapeList::Add), _1, _2, _3, math::quatf ())),
       make_invoker<void (ShapeList&, const Shape&)> (xtl::bind (xtl::implicit_cast<void (ShapeList::*)(const Shape&, const math::vec3f&, const math::quatf&)> (&ShapeList::Add), _1, _2, math::vec3f (), math::quatf ()))
   ));
-  lib.Register ("Remove",              make_invoker (&ShapeList::Remove));
-  lib.Register ("Clear",               make_invoker (&ShapeList::Clear));
+  lib.Register ("Remove",           make_invoker (&ShapeList::Remove));
+  lib.Register ("Clear",            make_invoker (&ShapeList::Clear));
   lib.Register ("Shape",            make_invoker (&get_shape_list_shape));
   lib.Register ("ShapePosition",    make_invoker (&get_shape_list_shape_position));
   lib.Register ("ShapeOrientation", make_invoker (&get_shape_list_shape_orientation));

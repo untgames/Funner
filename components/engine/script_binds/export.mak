@@ -26,7 +26,11 @@ export.link.engine.script_binds.lua_override.IMPORTS       := link.engine.script
 
 # Link math exports
 export.link.engine.script_binds.math.LINK_INCLUDES := MathScriptBind
-export.link.engine.script_binds.math.IMPORTS       := link.engine.script_binds
+export.link.engine.script_binds.math.IMPORTS       := link.engine.script_binds.common
+
+# Link math exports
+export.link.engine.script_binds.math.spline_loader.LINK_INCLUDES := MathSplineLoaderScriptBind
+export.link.engine.script_binds.math.spline_loader.IMPORTS       := link.engine.script_binds
 
 # Link render exports
 export.link.engine.script_binds.render.LINK_INCLUDES := RenderScriptBind
