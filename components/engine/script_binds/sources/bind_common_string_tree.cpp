@@ -311,6 +311,15 @@ struct StringNode::Impl
       }
 
       common::FileSystem::Rename (tmp_file_name.c_str (), file_name);
+
+      try
+      {
+        common::FileSystem::Remove (tmp_file_name.c_str ());
+      }
+      catch (...)
+      {
+        //подавление всех исключений
+      }            
     }
     catch (xtl::exception& e)
     {
