@@ -38,7 +38,17 @@ linear_splinef load_linear_float_spline (const StringNode& node, const char* key
     if (xtl::xstrcmp (child->Name (), key_node))
       continue;
 
-    return_value.add_key (atof (child->Get (time_attribute)), atof (child->Get (value_attribute)));
+    float time;
+
+    if (!xtl::io::read (child->Get (time_attribute), time))
+      throw xtl::format_operation_exception (METHOD_NAME, "Key %u has invalid time value '%s'", i, child->Get (time_attribute));
+
+    float value;
+
+    if (!xtl::io::read (child->Get (value_attribute), value))
+      throw xtl::format_operation_exception (METHOD_NAME, "Key %u has invalid value '%s'", i, child->Get (value_attribute));
+
+    return_value.add_key (time, value);
   }
 
   return return_value;
