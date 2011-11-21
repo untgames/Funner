@@ -71,16 +71,36 @@ linear_spline2f load_linear_vec2f_spline (const StringNode& node, const char* ke
     if (xtl::xstrcmp (child->Name (), key_node))
       continue;
 
+    float time;
+
+    if (!xtl::io::read (child->Get (time_attribute), time))
+      throw xtl::format_operation_exception (METHOD_NAME, "Key %u has invalid time value '%s'", i, child->Get (time_attribute));
+
     common::StringArray tokens = common::split (child->Get (value_attribute), delimeters);
 
     switch (tokens.Size ())
     {
       case 1:
-        return_value.add_key (atof (child->Get (time_attribute)), vec2f (atof (tokens [0])));
+      {
+        float value;
+
+        if (!xtl::io::read (tokens [0], value))
+          throw xtl::format_operation_exception (METHOD_NAME, "Key %u has invalid value '%s'", i, child->Get (value_attribute));
+
+        return_value.add_key (time, value);
         break;
+      }
       case 2:
-        return_value.add_key (atof (child->Get (time_attribute)), vec2f (atof (tokens [0]), atof (tokens [1])));
+      {
+        math::vec2f v (0.0f);
+
+        for (size_t i = 0; i < 2; i++)
+          if (!xtl::io::read (tokens [i], v [i]))
+            throw xtl::format_operation_exception (METHOD_NAME, "Key %u has invalid value '%s'", i, child->Get (value_attribute));
+
+        return_value.add_key (time, v);
         break;
+      }
       default:
         throw xtl::format_operation_exception (METHOD_NAME, "Key %u value %s has invalid tokens count", i, child->Get (value_attribute));
     }
@@ -116,16 +136,36 @@ linear_spline3f load_linear_vec3f_spline (const StringNode& node, const char* ke
     if (xtl::xstrcmp (child->Name (), key_node))
       continue;
 
+    float time;
+
+    if (!xtl::io::read (child->Get (time_attribute), time))
+      throw xtl::format_operation_exception (METHOD_NAME, "Key %u has invalid time value '%s'", i, child->Get (time_attribute));
+
     common::StringArray tokens = common::split (child->Get (value_attribute), delimeters);
 
     switch (tokens.Size ())
     {
       case 1:
-        return_value.add_key (atof (child->Get (time_attribute)), vec3f (atof (tokens [0])));
+      {
+        float value;
+
+        if (!xtl::io::read (tokens [0], value))
+          throw xtl::format_operation_exception (METHOD_NAME, "Key %u has invalid value '%s'", i, child->Get (value_attribute));
+
+        return_value.add_key (time, value);
         break;
+      }
       case 3:
-        return_value.add_key (atof (child->Get (time_attribute)), vec3f (atof (tokens [0]), atof (tokens [1]), atof (tokens [2])));
+      {
+        math::vec3f v (0.0f);
+
+        for (size_t i = 0; i < 3; i++)
+          if (!xtl::io::read (tokens [i], v [i]))
+            throw xtl::format_operation_exception (METHOD_NAME, "Key %u has invalid value '%s'", i, child->Get (value_attribute));
+
+        return_value.add_key (time, v);
         break;
+      }
       default:
         throw xtl::format_operation_exception (METHOD_NAME, "Key %u value %s has invalid tokens count", i, child->Get (value_attribute));
     }
@@ -161,18 +201,38 @@ linear_spline4f load_linear_vec4f_spline (const StringNode& node, const char* ke
     if (xtl::xstrcmp (child->Name (), key_node))
       continue;
 
+    float time;
+
+    if (!xtl::io::read (child->Get (time_attribute), time))
+      throw xtl::format_operation_exception (METHOD_NAME, "Key %u has invalid time value '%s'", i, child->Get (time_attribute));
+
     common::StringArray tokens = common::split (child->Get (value_attribute), delimeters);
 
     switch (tokens.Size ())
     {
       case 1:
-        return_value.add_key (atof (child->Get (time_attribute)), vec4f (atof (tokens [0])));
+      {
+        float value;
+
+        if (!xtl::io::read (tokens [0], value))
+          throw xtl::format_operation_exception (METHOD_NAME, "Key %u has invalid value '%s'", i, child->Get (value_attribute));
+
+        return_value.add_key (time, value);
         break;
+      }
       case 4:
-        return_value.add_key (atof (child->Get (time_attribute)), vec4f (atof (tokens [0]), atof (tokens [1]), atof (tokens [2]), atof (tokens [3])));
+      {
+        math::vec4f v (0.0f);
+
+        for (size_t i = 0; i < 4; i++)
+          if (!xtl::io::read (tokens [i], v [i]))
+            throw xtl::format_operation_exception (METHOD_NAME, "Key %u has invalid value '%s'", i, child->Get (value_attribute));
+
+        return_value.add_key (time, v);
         break;
+      }
       default:
-      throw xtl::format_operation_exception (METHOD_NAME, "Key %u value %s has invalid tokens count", i, child->Get (value_attribute));
+        throw xtl::format_operation_exception (METHOD_NAME, "Key %u value %s has invalid tokens count", i, child->Get (value_attribute));
     }
   }
 
