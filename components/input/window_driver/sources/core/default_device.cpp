@@ -96,7 +96,9 @@ struct DefaultDevice::Impl : private xtl::trackable
                                       WindowEvent_OnShow,
                                       WindowEvent_OnHide,
                                       WindowEvent_OnSetFocus,
-                                      WindowEvent_OnLostFocus
+                                      WindowEvent_OnLostFocus,
+                                      WindowEvent_OnScreenLock,
+                                      WindowEvent_OnScreenUnlock,
       };
 
       static size_t events_num = sizeof (events) / sizeof (*events);
@@ -368,6 +370,12 @@ struct DefaultDevice::Impl : private xtl::trackable
         break;
       case WindowEvent_OnLostFocus:
         Notify ("Window lost_focus");
+        break;
+      case WindowEvent_OnScreenLock:
+        Notify ("Window screen_lock");
+        break;
+      case WindowEvent_OnScreenUnlock:
+        Notify ("Window screen_unlock");
         break;
       default:
         break;
