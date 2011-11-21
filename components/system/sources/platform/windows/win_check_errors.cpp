@@ -66,7 +66,15 @@ void check_errors (const char* source)
 
 void raise_error (const char* source)
 {
-  check_errors (source);
+  try
+  {
+    check_errors (source);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch (source);
+    throw;
+  }
 
   throw xtl::format_operation_exception (source, "Invalid operation");
 }

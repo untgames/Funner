@@ -7,6 +7,7 @@ namespace
 {
 
 const char* WINDOW_CLASS_NAME = "Default window class";
+const char* LOG_NAME          = "system.windows";
 
 /*
     Получение экземпляра приложения
@@ -626,14 +627,21 @@ window_t WindowsWindowManager::CreateWindow (WindowStyle style, WindowMessageHan
       HWND wnd = CreateWindowA (WINDOW_CLASS_NAME, "", win_style, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT,
                                 (HWND)parent_handle, 0, GetApplicationInstance (), window_impl);
 
-      if (!WTSRegisterSessionNotification (wnd, NOTIFY_FOR_THIS_SESSION))
-        raise_error ("::WTSRegisterSessionNotification");
-
       if (!wnd)
-        raise_error ("::CreateWindow");
+        raise_error ("::CreateWindow");                
 
       if (!UpdateWindow (wnd))
         raise_error ("::UpdateWindow");
+        
+      try
+      {
+        if (!WTSRegisterSessionNotification (wnd, NOTIFY_FOR_THIS_SESSION))
+          raise_error ("::WTSRegisterSessionNotification");  
+      }
+      catch (std::exception& e)
+      {
+        common::Log (LOG_NAME).Printf ("%s", e.what ());
+      }
 
       return (window_t)wnd;
     }
