@@ -242,9 +242,6 @@ struct StringNode::Impl
 
     ParseNode iter = parser.Root ().First ();
 
-    if (!iter)
-      throw xtl::format_operation_exception (METHOD_NAME, "There is no root node in file '%s'", file_name);
-
     ProcessNode (return_value, iter);
 
     return return_value;
@@ -292,6 +289,35 @@ struct StringNode::Impl
 
     SaveNode (writer);
   }
+  
+  void SafeSaveXml (const char* file_name)
+  {
+    try
+    {
+      if (!file_name)
+        throw xtl::make_null_argument_exception ("", "file_name");
+
+      stl::string tmp_file_name = common::format ("%s.tmp", file_name);
+
+      SaveXml (tmp_file_name.c_str ());
+      
+      try
+      {
+        common::FileSystem::Remove (file_name);
+      }
+      catch (...)
+      {
+        //подавление всех исключений
+      }
+
+      common::FileSystem::Rename (tmp_file_name.c_str (), file_name);
+    }
+    catch (xtl::exception& e)
+    {
+      e.touch ("script::binds::StringNode::SafeSaveXml");
+      throw;
+    }
+  }  
 
   ///Поиск узла
   Pointer FindNode (const char* name_to_find, const char* value, bool create_if_not_exist)
@@ -338,6 +364,9 @@ struct StringNode::Impl
 
   static void ProcessNode (StringNode::Pointer string_node, const ParseNode& node)
   {
+    if (!node)
+      return;
+    
     string_node->SetName (node.Name ());
 
     string_node->ReserveAttributes (node.AttributesCount ());
@@ -656,6 +685,11 @@ void StringNode::SaveXml (const char* file_name)
   impl->SaveXml (file_name);
 }
 
+void StringNode::SafeSaveXml (const char* file_name)
+{
+  impl->SafeSaveXml (file_name);
+}
+
 /*
    Поиск узла
 */
@@ -787,6 +821,7 @@ void bind_common_string_tree (Environment& environment)
   lib.Register ("LoadXmlFromString",   make_invoker (&StringNode::LoadXmlFromString));
   lib.Register ("LoadXmlFromString",   make_invoker (&StringNode::LoadXmlFromFile));
   lib.Register ("SaveXml",             make_invoker (&StringNode::SaveXml));
+  lib.Register ("SafeSaveXml",         make_invoker (&StringNode::SafeSaveXml));  
   lib.Register ("Find",                make_invoker (
                                                      make_invoker ((StringNode::Pointer (*)(StringNode&, const char*, const char*))&find),
                                                      make_invoker ((StringNode::Pointer (*)(StringNode&, const char*))&find)

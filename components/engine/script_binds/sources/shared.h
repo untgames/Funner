@@ -96,6 +96,7 @@ class StringNode: public xtl::dynamic_cast_root
     static Pointer LoadXmlFromFile   (const char* file_name);
     static Pointer LoadXmlFromString (const char* string);
            void    SaveXml           (const char* file_name);
+           void    SafeSaveXml       (const char* file_name);           
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Поиск узла
