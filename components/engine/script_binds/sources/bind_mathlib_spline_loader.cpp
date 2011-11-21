@@ -44,9 +44,10 @@ linear_splinef load_linear_float_spline (const StringNode& node, const char* key
   return return_value;
 }
 
-linear_spline2f load_linear_vec2f_spline (const StringNode& node, const char* key_node, const char* time_attribute, const char* value_attribute, const char* delimeters)
+template <class T, size_t Size>
+basic_spline<spline_linear_key<vector<T, Size> > > load_linear_spline_vector_keys (const StringNode& node, const char* key_node, const char* time_attribute, const char* value_attribute, const char* delimeters)
 {
-  static const char* METHOD_NAME = "script::binds::load_linear_vec2f_spline";
+  static const char* METHOD_NAME = "script::binds::load_linear_vector_spline";
 
   if (!key_node)
     throw xtl::make_null_argument_exception (METHOD_NAME, "key_node");
@@ -60,7 +61,7 @@ linear_spline2f load_linear_vec2f_spline (const StringNode& node, const char* ke
   if (!delimeters)
     throw xtl::make_null_argument_exception (METHOD_NAME, "delimeters");
 
-  linear_spline2f return_value;
+  basic_spline<spline_linear_key<vector<T, Size> > > return_value;
 
   return_value.reserve (node.ChildrenCount ());
 
@@ -90,141 +91,11 @@ linear_spline2f load_linear_vec2f_spline (const StringNode& node, const char* ke
         return_value.add_key (time, value);
         break;
       }
-      case 2:
+      case Size:
       {
-        math::vec2f v (0.0f);
+        math::vector <float, Size> v;
 
-        for (size_t i = 0; i < 2; i++)
-          if (!xtl::io::read (tokens [i], v [i]))
-            throw xtl::format_operation_exception (METHOD_NAME, "Key %u has invalid value '%s'", i, child->Get (value_attribute));
-
-        return_value.add_key (time, v);
-        break;
-      }
-      default:
-        throw xtl::format_operation_exception (METHOD_NAME, "Key %u value %s has invalid tokens count", i, child->Get (value_attribute));
-    }
-  }
-
-  return return_value;
-}
-
-linear_spline3f load_linear_vec3f_spline (const StringNode& node, const char* key_node, const char* time_attribute, const char* value_attribute, const char* delimeters)
-{
-  static const char* METHOD_NAME = "script::binds::load_linear_vec3f_spline";
-
-  if (!key_node)
-    throw xtl::make_null_argument_exception (METHOD_NAME, "key_node");
-
-  if (!time_attribute)
-    throw xtl::make_null_argument_exception (METHOD_NAME, "time_attribute");
-
-  if (!value_attribute)
-    throw xtl::make_null_argument_exception (METHOD_NAME, "value_attribute");
-
-  if (!delimeters)
-    throw xtl::make_null_argument_exception (METHOD_NAME, "delimeters");
-
-  linear_spline3f return_value;
-
-  return_value.reserve (node.ChildrenCount ());
-
-  for (size_t i = 0, count = node.ChildrenCount (); i < count; i++)
-  {
-    StringNode::Pointer child = node.Child (i);
-
-    if (xtl::xstrcmp (child->Name (), key_node))
-      continue;
-
-    float time;
-
-    if (!xtl::io::read (child->Get (time_attribute), time))
-      throw xtl::format_operation_exception (METHOD_NAME, "Key %u has invalid time value '%s'", i, child->Get (time_attribute));
-
-    common::StringArray tokens = common::split (child->Get (value_attribute), delimeters);
-
-    switch (tokens.Size ())
-    {
-      case 1:
-      {
-        float value;
-
-        if (!xtl::io::read (tokens [0], value))
-          throw xtl::format_operation_exception (METHOD_NAME, "Key %u has invalid value '%s'", i, child->Get (value_attribute));
-
-        return_value.add_key (time, value);
-        break;
-      }
-      case 3:
-      {
-        math::vec3f v (0.0f);
-
-        for (size_t i = 0; i < 3; i++)
-          if (!xtl::io::read (tokens [i], v [i]))
-            throw xtl::format_operation_exception (METHOD_NAME, "Key %u has invalid value '%s'", i, child->Get (value_attribute));
-
-        return_value.add_key (time, v);
-        break;
-      }
-      default:
-        throw xtl::format_operation_exception (METHOD_NAME, "Key %u value %s has invalid tokens count", i, child->Get (value_attribute));
-    }
-  }
-
-  return return_value;
-}
-
-linear_spline4f load_linear_vec4f_spline (const StringNode& node, const char* key_node, const char* time_attribute, const char* value_attribute, const char* delimeters)
-{
-  static const char* METHOD_NAME = "script::binds::load_linear_vec4f_spline";
-
-  if (!key_node)
-    throw xtl::make_null_argument_exception (METHOD_NAME, "key_node");
-
-  if (!time_attribute)
-    throw xtl::make_null_argument_exception (METHOD_NAME, "time_attribute");
-
-  if (!value_attribute)
-    throw xtl::make_null_argument_exception (METHOD_NAME, "value_attribute");
-
-  if (!delimeters)
-    throw xtl::make_null_argument_exception (METHOD_NAME, "delimeters");
-
-  linear_spline4f return_value;
-
-  return_value.reserve (node.ChildrenCount ());
-
-  for (size_t i = 0, count = node.ChildrenCount (); i < count; i++)
-  {
-    StringNode::Pointer child = node.Child (i);
-
-    if (xtl::xstrcmp (child->Name (), key_node))
-      continue;
-
-    float time;
-
-    if (!xtl::io::read (child->Get (time_attribute), time))
-      throw xtl::format_operation_exception (METHOD_NAME, "Key %u has invalid time value '%s'", i, child->Get (time_attribute));
-
-    common::StringArray tokens = common::split (child->Get (value_attribute), delimeters);
-
-    switch (tokens.Size ())
-    {
-      case 1:
-      {
-        float value;
-
-        if (!xtl::io::read (tokens [0], value))
-          throw xtl::format_operation_exception (METHOD_NAME, "Key %u has invalid value '%s'", i, child->Get (value_attribute));
-
-        return_value.add_key (time, value);
-        break;
-      }
-      case 4:
-      {
-        math::vec4f v (0.0f);
-
-        for (size_t i = 0; i < 4; i++)
+        for (size_t i = 0; i < Size; i++)
           if (!xtl::io::read (tokens [i], v [i]))
             throw xtl::format_operation_exception (METHOD_NAME, "Key %u has invalid value '%s'", i, child->Get (value_attribute));
 
@@ -250,16 +121,16 @@ void bind_math_spline_loader_library (script::Environment& environment)
 
   lib.Register ("LoadLinearFloatSpline", make_invoker (&load_linear_float_spline));
   lib.Register ("LoadLinearVec2fSpline", make_invoker (
-      make_invoker (&load_linear_vec2f_spline),
-      make_invoker<linear_spline2f (const StringNode&, const char*, const char*, const char*)> (xtl::bind (&load_linear_vec2f_spline, _1, _2, _3, _4, " "))
+      make_invoker (&load_linear_spline_vector_keys<float, 2>),
+      make_invoker<linear_spline2f (const StringNode&, const char*, const char*, const char*)> (xtl::bind (&load_linear_spline_vector_keys<float, 2>, _1, _2, _3, _4, " "))
   ));
   lib.Register ("LoadLinearVec3fSpline", make_invoker (
-      make_invoker (&load_linear_vec3f_spline),
-      make_invoker<linear_spline3f (const StringNode&, const char*, const char*, const char*)> (xtl::bind (&load_linear_vec3f_spline, _1, _2, _3, _4, " "))
+      make_invoker (&load_linear_spline_vector_keys<float, 3>),
+      make_invoker<linear_spline3f (const StringNode&, const char*, const char*, const char*)> (xtl::bind (&load_linear_spline_vector_keys<float, 3>, _1, _2, _3, _4, " "))
   ));
   lib.Register ("LoadLinearVec4fSpline", make_invoker (
-      make_invoker (&load_linear_vec4f_spline),
-      make_invoker<linear_spline4f (const StringNode&, const char*, const char*, const char*)> (xtl::bind (&load_linear_vec4f_spline, _1, _2, _3, _4, " "))
+      make_invoker (&load_linear_spline_vector_keys<float, 4>),
+      make_invoker<linear_spline4f (const StringNode&, const char*, const char*, const char*)> (xtl::bind (&load_linear_spline_vector_keys<float, 4>, _1, _2, _3, _4, " "))
   ));
 }
 
