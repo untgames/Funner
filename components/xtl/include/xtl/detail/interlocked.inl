@@ -150,7 +150,7 @@
   
 #elif defined (ARM)
 
-#if defined (BEAGLEBOARD)
+#if defined (BEAGLEBOARD) || defined (TABLETOS)
 
 inline int __sync_fetch_and_add (volatile int *ptr, volatile int val)
 {
