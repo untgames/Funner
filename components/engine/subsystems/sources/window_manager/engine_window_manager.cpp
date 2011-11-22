@@ -420,29 +420,42 @@ class Window: public IAttachmentRegistryListener<syslib::Window>, public IAttach
         size_t min_desktop_width  = get<size_t> (node, "MinDesktopWidth", 0),
                min_desktop_height = get<size_t> (node, "MinDesktopHeight", 0);
 
-        syslib::Screen window_screen ((size_t)0);
+        stl::auto_ptr<syslib::Screen> window_screen;        
 
         try
         {
-          window_screen = syslib::Screen::ContainingScreen (window.Handle ());
+          window_screen.reset (new syslib::Screen (syslib::Screen::ContainingScreen (window.Handle ())));
         }
-        catch (xtl::exception& e)
+        catch (std::exception& e)
         {
           log.Printf ("Can't find containing screen for window, using screen 0, exception: '%s'", e.what ());
+          
+          try
+          {
+            window_screen.reset (new syslib::Screen ((size_t)0));
+          }
+          catch (std::exception& e)
+          {
+            log.Printf ("Can't find screen 0, exception: '%s'", e.what ());
+          }
+          catch (...)
+          {
+            log.Printf ("Can't find screen 0");
+          }
         }
 
-        if (window_screen.Width () < min_desktop_width || window_screen.Height () < min_desktop_height)
+        if (window_screen && (window_screen->Width () < min_desktop_width || window_screen->Height () < min_desktop_height))
         {
           syslib::ScreenModeDesc best_mode;
           size_t                 best_mode_resolution = 0;
 
           memset (&best_mode, 0, sizeof (best_mode));
 
-          for (size_t i = 0, count = window_screen.ModesCount (); i < count; i++)
+          for (size_t i = 0, count = window_screen->ModesCount (); i < count; i++)
           {
             syslib::ScreenModeDesc current_mode;
 
-            window_screen.GetMode (i, current_mode);
+            window_screen->GetMode (i, current_mode);
 
             size_t current_mode_resolution = current_mode.width * current_mode.height;
 
@@ -471,9 +484,9 @@ class Window: public IAttachmentRegistryListener<syslib::Window>, public IAttach
             log.Printf ("Can't find screen mode with minimum size %ux%u", min_desktop_width, min_desktop_height);
           else
           {
-            window_screen.SetCurrentMode (best_mode);
+            window_screen->SetCurrentMode (best_mode);
             
-            saved_window_screen = stl::auto_ptr<syslib::Screen> (new syslib::Screen (window_screen));
+            saved_window_screen = window_screen;
 
             if (maximized)
               window.Maximize ();
