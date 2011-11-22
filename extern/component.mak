@@ -7,6 +7,7 @@ TARGETS := FUNNER_EXTERN_LIBS
 FUNNER_EXTERN_LIBS.TYPE       := package
 FUNNER_EXTERN_LIBS.COMPONENTS := zlib zzip pcre jpeg tiff libpng devil ogg vorbis vorbisfile lua \
                                  freetype libpsd theora shiny libiconv
+FUNNER_EXTERN_LIBS.x86.COMPONENTS := geekinfo
 
 ifeq (,$(filter beagleboard,$(PROFILES))$(filter android,$(PROFILES))$(filter webos,$(PROFILES)))
   FUNNER_EXTERN_LIBS.COMPONENTS += curl

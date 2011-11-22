@@ -7,3 +7,7 @@ endif
 ifneq (,$(filter bada,$(PROFILES)))
   COMPONENT_DIRS += bada
 endif
+
+ifneq (,$(filter x86,$(PROFILES)))
+  COMPONENT_DIRS += geekinfo
+endif
