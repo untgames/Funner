@@ -107,6 +107,8 @@ static int GetIntFromDictionaryForKey(CFDictionaryRef desc, CFStringRef key)
 {
   CFNumberRef value;
   int num = 0;
+  if (!desc || !key)
+    return 0;
   if ((value = (CFNumberRef)CFDictionaryGetValue(desc, key)) == NULL || CFGetTypeID(value) != CFNumberGetTypeID()) {
     return 0;
   }
