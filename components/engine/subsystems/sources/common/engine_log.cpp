@@ -89,9 +89,7 @@ class LogSubsystem : public ISubsystem, public xtl::reference_counter
         
         if (need_dump_sys_info)
         {
-          Log log ("engine.log");
-          
-          log.Printf ("System information:");
+          Log log ("engine.log.sysinfo");
           
           common::PropertyMap properties = syslib::Application::SystemProperties ();        
 
@@ -101,7 +99,7 @@ class LogSubsystem : public ISubsystem, public xtl::reference_counter
             
             properties.GetProperty (i, value);
             
-            log.Printf ("  %s='%s'\n", properties.PropertyName (i), value.c_str ());
+            log.Printf ("%s='%s'", properties.PropertyName (i), value.c_str ());
           }        
         }
       }
