@@ -1,3 +1,4 @@
+#if 0
 #include <common/heap.h>
 
 using namespace common;
@@ -21,3 +22,4 @@ void operator delete [] (void* p)
 {
   MemoryManager::Deallocate (p);
 }
+#endif

@@ -13,25 +13,28 @@ stl::string GetFolderPath (int csidl)
   result.fast_resize (MAX_PATH);
 
   if (!SHGetSpecialFolderPath (0, &result [0], csidl, FALSE))
-    raise_error ("::SHGetSpecialFolderPath");
-#else  
-  stl::string result;
-  
-  result.fast_resize (MAX_PATH);
-
-  if (!SHGetSpecialFolderPathA (0, &result [0], csidl, FALSE)) //unicode-версия возвращает некорректные результаты в случае русского имени пользователя
-    raise_error ("::SHGetSpecialFolderPathA");
-#endif
+    raise_error ("::SHGetSpecialFolderPathW");
 
   result.resize (xtl::xstrlen (result.c_str ()));
 
   if (!result.empty () && result [result.size ()-1] == L'\\')
     result.pop_back ();
 
-#ifdef WINCE
-  return tostring (result);
-#else  
-  return result;
+  return tostring(result);
+#else
+  stl::string result;
+  
+  result.fast_resize (MAX_PATH);
+
+  if (!SHGetSpecialFolderPathA (0, &result [0], csidl, FALSE))
+    raise_error ("::SHGetSpecialFolderPathA");
+
+  result.resize (xtl::xstrlen (result.c_str ()));
+
+  if (!result.empty () && result [result.size ()-1] == L'\\')
+    result.pop_back ();
+
+  return result; 
 #endif
 }
 
