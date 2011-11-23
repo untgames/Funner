@@ -25,7 +25,7 @@ The above copyright notice and this permission notice shall be included in
 #include "win32system.h"
 #include "platform.h"
 #include <intrin.h>
-#include <sstream>	
+#include <sstream>  
 
 #if !defined(PLATFORM_WINDOWS)
   #error Wrong platform
@@ -35,20 +35,21 @@ extern "C" {
   #include "intel/cputopology.h"
 }
 
+//#define _WIN32_WINNT 0x600
 #include <windows.h>
 #include "win32cpucount.h"
 #include "win32wmi.h"
 
 struct Registers {
-  uint32	eax;
-  uint32	ebx;
-  uint32 	ecx;
-  uint32 	edx;
+  uint32  eax;
+  uint32  ebx;
+  uint32  ecx;
+  uint32  edx;
 };
 
 static Registers cpuID(uint32 level)
 {
-  Registers	r;
+  Registers r;
 
   __cpuid((int *)&r, level);
 
@@ -58,7 +59,7 @@ static Registers cpuID(uint32 level)
 static std::string cpu()
 {
   std::string result;
-  Registers	r; // r.eax, r.ebx, r.ecx, r.edx;
+  Registers r; // r.eax, r.ebx, r.ecx, r.edx;
 
   r = cpuID(0x80000000);
   if (r.eax & 0x80000000 && r.eax >= 0x80000004) {
@@ -93,12 +94,12 @@ static std::string cpu()
 static std::string cpuid()
 {
   std::ostringstream  s;
-  Registers			r;
+  Registers     r;
   uint32              family; //, extendedFamily;
   uint32              model; //, extendedModel;
   uint32              stepping;
-  uint32				vendor[4];
-  char *				p;
+  uint32        vendor[4];
+  char *        p;
 
   r = cpuID(1);
   family = (r.eax & 0xf00) >> 8;
@@ -125,7 +126,7 @@ static std::string cpuid()
 
 static bool cpusse()
 {
-  Registers	r;
+  Registers r;
 
   r = cpuID(0x00000001);
   if (r.edx & 0x02000000) {
@@ -163,7 +164,7 @@ std::string Win32System::model()
   WmiStrMap           wmiMap;
 
   if (getWmiClass("Win32_ComputerSystem", wmiMap)) {
-    std::string	manufacturer = wmiMap[ "Manufacturer" ];
+    std::string manufacturer = wmiMap[ "Manufacturer" ];
     std::string model = wmiMap[ "Model" ];
 
     if (manufacturer.length() == 0 && model.length() == 0) {
@@ -276,7 +277,7 @@ uint64 Win32System::cpu_physical_count()
 uint64 Win32System::cpu_frequency()
 {
   WmiIntMap           wmiMap;
-  uint64				result = 0;
+  uint64        result = 0;
 
   if (getWmiClass("Win32_Processor", wmiMap)) {
     result = wmiMap[ "MaxClockSpeed" ] * 1000000;
@@ -287,7 +288,7 @@ uint64 Win32System::cpu_frequency()
 static uint32 getL1Dcache()
 {
   uint32 result;
-  Registers	r; // r.eax, r.ebx, r.ecx, r.edx;
+  Registers r; // r.eax, r.ebx, r.ecx, r.edx;
 
   r = cpuID(0x80000000);
   if (r.eax & 0x80000000 && r.eax >= 0x80000005) {
@@ -301,7 +302,7 @@ static uint32 getL1Dcache()
 static uint32 getL1Ccache()
 {
   uint32 result;
-  Registers	r; // r.eax, r.ebx, r.ecx, r.edx;
+  Registers r; // r.eax, r.ebx, r.ecx, r.edx;
 
   r = cpuID(0x80000000);
   if (r.eax & 0x80000000 && r.eax >= 0x80000005) {
@@ -315,7 +316,7 @@ static uint32 getL1Ccache()
 static uint32 getL2cache()
 {
   uint32    result;
-  Registers	r; // r.eax, r.ebx, r.ecx, r.edx;
+  Registers r; // r.eax, r.ebx, r.ecx, r.edx;
 
   r = cpuID(0x80000000);
   if (r.eax & 0x80000000 && r.eax >= 0x80000006) {
@@ -329,7 +330,7 @@ static uint32 getL2cache()
 static uint32 getL3cache()
 {
   uint32    result;
-  Registers	r; // r.eax, r.ebx, r.ecx, r.edx;
+  Registers r; // r.eax, r.ebx, r.ecx, r.edx;
 
   r = cpuID(0x80000000);
   if (r.eax & 0x80000000 && r.eax >= 0x80000006) {
@@ -343,7 +344,7 @@ static uint32 getL3cache()
 uint64 Win32System::cpu_l1_inst_cache()
 {
   WmiIntMap wmiMap;
-  uint64		result = 0;
+  uint64    result = 0;
 
   if (runWmiQuery("SELECT InstalledSize FROM Win32_CacheMemory WHERE CacheType = 3 AND Level = 3", wmiMap)) {
     result = wmiMap[ "InstalledSize" ] * 1024;
@@ -365,7 +366,7 @@ return result;
 uint64 Win32System::cpu_l1_data_cache()
 {
   WmiIntMap wmiMap;
-  uint64		result = 0;
+  uint64    result = 0;
 
   if (runWmiQuery("SELECT InstalledSize FROM Win32_CacheMemory WHERE CacheType = 4 AND Level = 3", wmiMap)) {
     result = wmiMap[ "InstalledSize" ] * 1024;
@@ -387,8 +388,8 @@ return result;
 uint64 Win32System::cpu_l2_cache()
 {
   WmiIntMap           wmiMap;
-  uint64				result = 0;
-  HMODULE				hMod;
+  uint64        result = 0;
+  HMODULE       hMod;
 
   if (runWmiQuery("SELECT InstalledSize FROM Win32_CacheMemory WHERE Level = 4", wmiMap)) {
     result = wmiMap[ "InstalledSize" ] * 1024;
@@ -405,7 +406,7 @@ uint64 Win32System::cpu_l2_cache()
 uint64 Win32System::cpu_l3_cache()
 {
   WmiIntMap           wmiMap;
-  uint64				result = 0;
+  uint64        result = 0;
 
   if (runWmiQuery("SELECT InstalledSize FROM Win32_CacheMemory WHERE Level = 5", wmiMap)) {
     result = wmiMap[ "InstalledSize" ] * 1024;
@@ -421,7 +422,7 @@ uint64 Win32System::cpu_l3_cache()
 uint64 Win32System::bus_frequency()
 {
   WmiIntMap           wmiMap;
-  uint64				result = 0;
+  uint64        result = 0;
 
   if (getWmiClass("Win32_Processor", wmiMap)) {
     result = wmiMap[ "ExtClock" ] * 1000000;
@@ -432,7 +433,7 @@ uint64 Win32System::bus_frequency()
 
 uint64 Win32System::memory_size()
 {
-  MEMORYSTATUSEX	ms;
+  MEMORYSTATUSEX  ms;
 
   memset(&ms, 0, sizeof(MEMORYSTATUSEX));
   ms.dwLength = sizeof(MEMORYSTATUSEX);
@@ -442,15 +443,15 @@ uint64 Win32System::memory_size()
 }
 
 std::string Win32System::memory_type()
-{	
-  std::ostringstream	result;
+{ 
+  std::ostringstream  result;
   WmiIntMap           wmiMap;
 
   if (getWmiClass("Win32_PhysicalMemory", wmiMap)) {
     switch(wmiMap[ "MemoryType" ]) {
       case 17:
       result << "SDRAM ";
-      break;	
+      break;  
       case 18:
       result << "SGRAM ";
       break;
@@ -470,8 +471,8 @@ std::string Win32System::memory_type()
 
 uint64 Win32System::memory_free()
 {
-  uint64				result = 0;
-  MEMORYSTATUSEX		statex;
+  uint64        result = 0;
+  MEMORYSTATUSEX    statex;
 
   statex.dwLength = sizeof (statex);
   GlobalMemoryStatusEx(&statex);

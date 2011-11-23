@@ -1,5 +1,5 @@
 /*
-	Processor.cpp
+  Processor.cpp
 
   Copyright (c) 2006-2009 Primate Labs
 
@@ -30,6 +30,10 @@
 
 #include "platform.h"
 
+#ifdef __GNUC__
+#undef PLATFORM_WINDOWS
+#endif
+
 #if defined(PLATFORM_WINDOWS)
 #include <intrin.h>
 #endif
@@ -40,16 +44,16 @@ namespace {
 #if defined(ARCH_X86) 
 
 struct Registers {
-	unsigned int eax;
-	unsigned int ebx;
-	unsigned int ecx;
-	unsigned int edx;
+  unsigned int eax;
+  unsigned int ebx;
+  unsigned int ecx;
+  unsigned int edx;
 };
 
 Registers call_cpuid(unsigned int level)
 {
-	Registers	r;
-	
+  Registers r;
+  
 #if defined(PLATFORM_WINDOWS)
   __cpuid((int*)&r, level);
 #else
@@ -62,7 +66,7 @@ Registers call_cpuid(unsigned int level)
   );
 #endif
 
-	return r;
+  return r;
 }
 
 Registers call_cpuid(unsigned int level, unsigned int op)
@@ -81,7 +85,7 @@ Registers call_cpuid(unsigned int level, unsigned int op)
   );
 #endif
 
-	return r;
+  return r;
 }
 
 std::string parse_vendor_string(const Registers& r)
