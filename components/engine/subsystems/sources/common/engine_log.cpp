@@ -28,59 +28,87 @@ class LogSubsystem : public ISubsystem, public xtl::reference_counter
     LogSubsystem (common::ParseNode& node)
       : need_flush (false)
     {
-      ParseNode file_node = node.First ("File");
-
-      if (file_node)
+      try
       {
-        const char *file_name              = get<const char*> (file_node, "FileName", DEFAULT_FILE_NAME),
-                   *file_log_filters_masks = get<const char*> (file_node, "Filters", "*");
+        ParseNode file_node = node.First ("File");
 
-        need_flush = get<bool> (file_node, "Flush", true);
-
-        if (*file_log_filters_masks && *file_name)
+        if (file_node)
         {
-          StringArray log_filters_masks = split (file_log_filters_masks);
+          const char *file_name              = get<const char*> (file_node, "FileName", DEFAULT_FILE_NAME),
+                     *file_log_filters_masks = get<const char*> (file_node, "Filters", "*");
 
-          console_log_filters.reserve (log_filters_masks.Size ());
+          need_flush = get<bool> (file_node, "Flush", true);
 
-          for (size_t i = 0; i < log_filters_masks.Size (); i++)
-            file_log_filters.push_back (LogFilter (log_filters_masks[i], xtl::bind (&LogSubsystem::FileLogHandler, this, _1, _2)));
-
-          output_file.AddFilter ("*", "{log}: {message}");
-
-          output_file.SetFile (OutputFile (file_name));
-
-          for (ParseNamesakeIterator iter = file_node.First ("OutputFormat"); iter; ++iter)
+          if (*file_log_filters_masks && *file_name)
           {
-            const char *replacement = get<const char*> (*iter, "Replacement");
+            StringArray log_filters_masks = split (file_log_filters_masks);
 
-            size_t sort_order = get<size_t> (*iter, "SortOrder", ~0);
+            console_log_filters.reserve (log_filters_masks.Size ());
 
-            for (ParseNamesakeIterator filter_iter = iter->First ("Filter"); filter_iter; ++filter_iter)
+            for (size_t i = 0; i < log_filters_masks.Size (); i++)
+              file_log_filters.push_back (LogFilter (log_filters_masks[i], xtl::bind (&LogSubsystem::FileLogHandler, this, _1, _2)));
+
+            output_file.AddFilter ("*", "{log}: {message}");
+
+            output_file.SetFile (OutputFile (file_name));
+
+            for (ParseNamesakeIterator iter = file_node.First ("OutputFormat"); iter; ++iter)
             {
-              const char *wildcard = get<const char*> (*filter_iter, "Wildcard");
+              const char *replacement = get<const char*> (*iter, "Replacement");
 
-              output_file.AddFilter (wildcard, replacement, sort_order);
+              size_t sort_order = get<size_t> (*iter, "SortOrder", ~0);
+
+              for (ParseNamesakeIterator filter_iter = iter->First ("Filter"); filter_iter; ++filter_iter)
+              {
+                const char *wildcard = get<const char*> (*filter_iter, "Wildcard");
+
+                output_file.AddFilter (wildcard, replacement, sort_order);
+              }
             }
           }
         }
-      }
 
-      ParseNode console_node = node.First ("Console");
+        ParseNode console_node = node.First ("Console");
 
-      if (console_node)
-      {
-        const char* console_log_filters_masks = get<const char*> (console_node, "Filters", "*");
-
-        if (*console_log_filters_masks)
+        if (console_node)
         {
-          StringArray log_filters_masks = split (console_log_filters_masks);
+          const char* console_log_filters_masks = get<const char*> (console_node, "Filters", "*");
 
-          console_log_filters.reserve (log_filters_masks.Size ());
+          if (*console_log_filters_masks)
+          {
+            StringArray log_filters_masks = split (console_log_filters_masks);
 
-          for (size_t i = 0; i < log_filters_masks.Size (); i++)
-            console_log_filters.push_back (LogFilter (log_filters_masks[i], xtl::bind (&LogSubsystem::ConsoleLogHandler, this, _1, _2)));
+            console_log_filters.reserve (log_filters_masks.Size ());
+
+            for (size_t i = 0; i < log_filters_masks.Size (); i++)
+              console_log_filters.push_back (LogFilter (log_filters_masks[i], xtl::bind (&LogSubsystem::ConsoleLogHandler, this, _1, _2)));
+          }
         }
+        
+        bool need_dump_sys_info = get<bool> (node, "DumpSystemInformation", false);
+        
+        if (need_dump_sys_info)
+        {
+          Log log ("engine.log");
+          
+          log.Printf ("System information:");
+          
+          common::PropertyMap properties = syslib::Application::SystemProperties ();        
+
+          for (size_t i=0; i<properties.Size (); i++)
+          {
+            stl::string value;
+            
+            properties.GetProperty (i, value);
+            
+            log.Printf ("  %s='%s'\n", properties.PropertyName (i), value.c_str ());
+          }        
+        }
+      }
+      catch (xtl::exception& e)
+      {
+        e.touch ("engine::LogSubsystem::LogSubsystem");
+        throw;
       }
     }
 
