@@ -19,7 +19,7 @@ stl::string GetFolderPath (int csidl)
   
   result.fast_resize (MAX_PATH);
 
-  if (!SHGetSpecialFolderPathA (0, &result [0], csidl, FALSE))
+  if (!SHGetSpecialFolderPathA (0, &result [0], csidl, FALSE)) //unicode-версия возвращает некорректные результаты в случае русского имени пользователя
     raise_error ("::SHGetSpecialFolderPathA");
 #endif
 
