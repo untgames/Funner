@@ -8,6 +8,7 @@ export.link.system.IMPORTS                := link.common
 export.link.system.LINK_INCLUDES          := ThreadPool
 export.link.system.win32.LIBS             := user32 gdi32
 export.link.system.x86_win32.LIBS         := wtsapi32
+export.link.system.x86.IMPORTS            := link.extern.geekinfo
 export.link.system.macosx.LINK_FLAGS      := -framework CoreFoundation -framework AppKit -framework Carbon -framework IOKit
 export.link.system.iphone.LINK_FLAGS      := -framework CoreFoundation -framework Foundation -framework UIKit -framework QuartzCore -framework CoreGraphics
 export.link.system.macosx.LINK_INCLUDES   := PlatformConfiguration

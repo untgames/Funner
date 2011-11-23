@@ -8,6 +8,14 @@
 
 #include <syslib/application_delegate.h>
 
+namespace common
+{
+
+//forward declaration
+class PropertyMap;
+
+}
+
 namespace syslib
 {
 
@@ -78,6 +86,11 @@ class Application
     static void EnableScreenSaver   () { SetScreenSaverState (true); }
     static void DisableScreenSaver  () { SetScreenSaverState (false); }    
     static bool GetScreenSaverState ();
+    
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Получение платформо-зависимых системных свойств
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    static common::PropertyMap SystemProperties ();
 };
 
 }

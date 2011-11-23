@@ -443,3 +443,24 @@ bool Application::GetScreenSaverState ()
     throw;
   }  
 }
+
+/*
+    Получение платформо-зависимых системных свойств
+*/
+
+common::PropertyMap Application::SystemProperties ()
+{
+  try
+  {
+    common::PropertyMap properties;
+    
+    Platform::GetSystemProperties (properties);
+    
+    return properties;
+  }
+  catch (xtl::exception& exception)
+  {
+    exception.touch ("syslib::Application::SystemProperties");
+    throw;
+  }
+}

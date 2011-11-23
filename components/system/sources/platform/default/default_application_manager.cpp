@@ -125,3 +125,23 @@ bool DefaultApplicationManager::GetScreenSaverState ()
 {
   return true;
 }
+
+/*
+    Получение системных свойств
+*/
+
+void DefaultApplicationManager::GetSystemProperties (common::PropertyMap& properties)
+{
+#ifdef HAS_GEEK_INFO
+  try
+  {
+    for (int i=(int)kSystemMetricPlatform; i!=kSystemMetricCount; i++)
+      properties.SetProperty (systemMetricName((SystemMetricType)i).c_str (), systemMetric((SystemMetricType)i).c_str ());
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("syslib::DefaultApplicationManager::GetSystemProperties");
+    throw;
+  }
+#endif
+}

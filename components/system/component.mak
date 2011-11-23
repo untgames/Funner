@@ -16,6 +16,7 @@ SYSTEMLIB.SOURCES.SOURCE_DIRS                       += sources/platform/default
 SYSTEMLIB.SOURCES.IMPORTS                           := compile.system
 SYSTEMLIB.SOURCES.win32.SOURCE_DIRS                 := sources/platform/windows sources/platform/windows/application sources/platform/windows/non_unistd
 SYSTEMLIB.SOURCES.x86_win32.SOURCE_DIRS             := sources/platform/windows/thread
+SYSTEMLIB.SOURCES.x86.IMPORTS                       := compile.extern.geekinfo
 SYSTEMLIB.SOURCES.wince.SOURCE_DIRS                 := sources/platform/pthread
 SYSTEMLIB.SOURCES.unistd.SOURCE_DIRS                := sources/platform/pthread sources/platform/unistd sources/platform/message_queue
 SYSTEMLIB.SOURCES.msvc.COMPILER_CFLAGS              := -wd4355
