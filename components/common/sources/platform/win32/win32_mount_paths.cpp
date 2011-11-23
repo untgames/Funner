@@ -7,16 +7,20 @@ namespace
 
 stl::string GetFolderPath (int csidl)
 {
+#ifdef WINCE
   stl::wstring result;
   
   result.fast_resize (MAX_PATH);
 
-#ifdef WINCE
   if (!SHGetSpecialFolderPath (0, &result [0], csidl, FALSE))
-    raise_error ("::SHGetSpecialFolderPathW");
+    raise_error ("::SHGetSpecialFolderPath");
 #else  
-  if (!SHGetSpecialFolderPathW (0, &result [0], csidl, FALSE))
-    raise_error ("::SHGetSpecialFolderPathW");
+  stl::string result;
+  
+  result.fast_resize (MAX_PATH);
+
+  if (!SHGetSpecialFolderPathA (0, &result [0], csidl, FALSE))
+    raise_error ("::SHGetSpecialFolderPathA");
 #endif
 
   result.resize (xtl::xstrlen (result.c_str ()));
@@ -24,7 +28,11 @@ stl::string GetFolderPath (int csidl)
   if (!result.empty () && result [result.size ()-1] == L'\\')
     result.pop_back ();
 
-  return tostring(result);
+#ifdef WINCE
+  return tostring (result);
+#else  
+  return result;
+#endif
 }
 
 stl::string GetTempDirPath ()
