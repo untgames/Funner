@@ -7,7 +7,7 @@ EXTERN.BULLET.SOURCE_DIRS            := sources/LinearMath sources/BulletCollisi
                                         sources/BulletCollision/NarrowPhaseCollision sources/BulletDynamics/Character \
                                         sources/BulletDynamics/ConstraintSolver sources/BulletDynamics/Dynamics sources/BulletDynamics/Vehicle
 EXTERN.BULLET.IMPORTS                := compile.extern.bullet
-EXTERN.BULLET.g++.COMPILER_CFLAGS    := -O1        #начиная с bullet 2.79 не компилируется с более высокой оптимизацией
-EXTERN.BULLET.iphone.COMPILER_CFLAGS := --no-warn
+EXTERN.BULLET.g++.COMPILER_CFLAGS    := --no-warn
+EXTERN.BULLET.iphone.COMPILER_CFLAGS := -O1        #начиная с bullet 2.79 не компилируется с более высокой оптимизацией
 EXTERN.BULLET.msvc.COMPILER_CFLAGS   := -wd4305
 EXTERN.BULLET.bada.IMPORTS           := compile.extern.bada
