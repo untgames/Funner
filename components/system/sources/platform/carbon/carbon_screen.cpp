@@ -90,6 +90,8 @@ struct CarbonScreen::Impl : public xtl::reference_counter
   Impl (CGDirectDisplayID in_display_id)
     : display_id (in_display_id)
   {
+    static const char* METHOD_NAME = "syslib::macosx::CarbonScreen::CarbonScreen";
+
       //получение имени устройства
 
     io_connect_t display_port = CGDisplayIOServicePort (display_id);
@@ -98,6 +100,13 @@ struct CarbonScreen::Impl : public xtl::reference_counter
     {
       CFDictionaryRef dictionary = IODisplayCreateInfoDictionary (display_port, 0);
       CFDictionaryRef names      = (CFDictionaryRef)CFDictionaryGetValue (dictionary, CFSTR(kDisplayProductName));
+
+      if (!names)
+      {
+        CFRelease (dictionary);
+
+        throw xtl::format_operation_exception (METHOD_NAME, "Can't get display name");
+      }
 
       CFIndex names_count = CFDictionaryGetCount (names);
 
