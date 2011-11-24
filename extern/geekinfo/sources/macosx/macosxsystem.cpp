@@ -440,7 +440,7 @@ std::string MacOSXSystem::display()
     }
     CFRelease(vramProp);
   }
-  IOObjectRelease(dspPort);
+//  IOObjectRelease(dspPort);
 
   CFDictionaryRef displayModeDict = CGDisplayCurrentMode(kCGDirectMainDisplay);
   int horiRes = 0, vertRes = 0, refreshRate = 0;
