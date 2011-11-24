@@ -1,3 +1,5 @@
+#ifndef _MSC_VER
+
 #include "shared.h"
 
 using namespace common;
@@ -375,3 +377,5 @@ void Win32FileSystem::Search (const char* mask, const FileSearchHandler& handler
 
   CloseHandle (handle);
 }
+
+#endif
