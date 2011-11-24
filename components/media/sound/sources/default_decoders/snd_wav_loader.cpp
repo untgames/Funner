@@ -68,8 +68,10 @@ WavInputStream::WavInputStream (const char* file_name, SoundSampleInfo& sound_sa
     throw xtl::format_not_supported_exception (METHOD_NAME, "No 'fmt ' chunk in file.");
     
   file.Read (read_buffer, 16);
+
+  short* format_tag = (short*)read_buffer;
   
-  if (*(short*)(read_buffer) != 1)
+  if (*format_tag != 1)
     throw xtl::format_not_supported_exception (METHOD_NAME, "Compressed wav currently not supported.");
     
   sound_sample_info.channels        = *(short*)(read_buffer + 2);

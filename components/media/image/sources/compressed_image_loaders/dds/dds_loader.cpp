@@ -271,7 +271,7 @@ class DdsCompressedImage: public ICustomCompressedImage
 
         DdsHeader     header;
         DdsHeaderDx10 header_dx10;        
-        bool          has_dx10_header = false;
+//        bool          has_dx10_header = false;
 
         read (file, file_name, header);
 
@@ -281,7 +281,7 @@ class DdsCompressedImage: public ICustomCompressedImage
 
           read (file, file_name, header_dx10);
 
-          has_dx10_header = true;
+  //        has_dx10_header = true;
         }
 
         //проверка корректности

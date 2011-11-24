@@ -983,7 +983,7 @@ void process_sprite_common
                           *skewx_track = animation.Properties ().Find ("headContainer.Transformation.Skew_X"),
                           *skewy_track = animation.Properties ().Find ("headContainer.Transformation.Skew_Y");
                                        
-  bool angle_in_skew = (!angle_track || angle_track && angle_track->Keyframes ().Size () <= 1) &&
+  bool angle_in_skew = (!angle_track || (angle_track && angle_track->Keyframes ().Size () <= 1)) &&
                        skewx_track && skewy_track && skewx_track->Keyframes ().Size () == skewy_track->Keyframes ().Size ();
 
   if (angle_in_skew)
