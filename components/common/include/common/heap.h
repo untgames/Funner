@@ -1,7 +1,9 @@
 #ifndef COMMONLIB_HEAP_HEADER
 #define COMMONLIB_HEAP_HEADER
 
+#include <cstddef>
 #include <new>
+
 #include <xtl/functional_fwd>
 
 namespace common

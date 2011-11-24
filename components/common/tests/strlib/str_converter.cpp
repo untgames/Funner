@@ -78,7 +78,7 @@ int main ()
 
   try
   {
-    const char* source_file_name [4] = {"data\\ansi.txt", "data\\utf8.txt", "data\\utf16le.txt","data\\utf16be.txt"};
+    const char* source_file_name [4] = {"data/ansi.txt", "data/utf8.txt", "data/utf16le.txt","data/utf16be.txt"};
     const char* encoding [4] = {"ASCII7", "UTF8", "UTF16LE", "UTF16BE"};
 
     for (size_t i=0; i<4; i++)
