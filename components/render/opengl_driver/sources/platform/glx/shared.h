@@ -107,7 +107,7 @@ struct PixelFormatDesc
   size_t                     max_pbuffer_width;       //максимальная ширина PBuffer
   size_t                     max_pbuffer_height;      //максимальная высота PBuffer
   size_t                     max_pbuffer_pixels;      //максимальное количество пикселей для PBuffer
-  bool                       support_stereo;          //поддержка стерео-рендеринга  
+  bool                       support_stereo;          //поддержка стерео-рендеринга
   bool                       support_draw_to_window;  //поддержка рисования в Window
   bool                       support_draw_to_pbuffer; //поддержка рисования в PBuffer
 };

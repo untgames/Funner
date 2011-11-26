@@ -199,7 +199,9 @@ void Output::SetGammaRamp (const render::low_level::Color3f table [256])
   {
     typedef syslib::Color3f SysColorArray [256];
     
-    impl->screen.SetGammaRamp (*reinterpret_cast<SysColorArray*> (&table));
+    SysColorArray* sys_table = reinterpret_cast<SysColorArray*> (&table);
+
+    impl->screen.SetGammaRamp (*sys_table);
   }
   catch (xtl::exception& e)
   {
@@ -214,7 +216,9 @@ void Output::GetGammaRamp (render::low_level::Color3f table [256])
   {
     typedef syslib::Color3f SysColorArray [256];
     
-    impl->screen.GetGammaRamp (*reinterpret_cast<SysColorArray*> (&table));    
+    SysColorArray* sys_table = reinterpret_cast<SysColorArray*> (&table);
+
+    impl->screen.GetGammaRamp (*sys_table);
   }
   catch (xtl::exception& e)
   {
@@ -248,7 +252,7 @@ typedef stl::vector<OutputPtr> OutputArray;
 struct OutputManager::Impl: public xtl::reference_counter
 {
   OutputArray  outputs;  //устройства вывода
-  static Impl* instance; //глобальный экземпл€р реализации менеджера устройств вывода  
+  static Impl* instance; //глобальный экземпл€р реализации менеджера устройств вывода
   
 /// онструктор
   Impl ()
@@ -263,7 +267,7 @@ struct OutputManager::Impl: public xtl::reference_counter
     instance = this;      
   }
 
-///ƒеструктор  
+///ƒеструктор
   ~Impl ()
   {
     instance = 0;

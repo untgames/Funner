@@ -27,10 +27,10 @@ int main ()
   SpotLight::Pointer light (SpotLight::Create ());
 
   light->SetAngle (degree (30.4f));
-  printf ("Spot angle: %f\n", degree (light->Angle ()));
+  printf ("Spot angle: %.2f\n", degree (light->Angle ()));
 
   light->SetExponent (0.19f);
-  printf ("Spot exponent: %f\n", light->Exponent ());
+  printf ("Spot exponent: %.2f\n", light->Exponent ());
 
   light->SetRange (10.f);
 

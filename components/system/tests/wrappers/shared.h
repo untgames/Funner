@@ -3,9 +3,9 @@
 
 #include <stl/string>
 
-#include <xtl/signal.h>
 #include <xtl/bind.h>
 #include <xtl/ref.h>
+#include <xtl/signal.h>
 #include <xtl/trackable_ptr.h>
 
 #include <common/action_queue.h>

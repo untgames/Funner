@@ -12,7 +12,7 @@ void on_do_events (common::Action& action)
   }
 }
 
-void on_exit (common::Action&)
+void on_exit_action (common::Action&)
 {
   printf ("exit\n");
   Application::Exit (0);
@@ -25,7 +25,7 @@ int main ()
   try
   {
     common::ActionQueue::PushAction (&on_do_events, common::ActionThread_Current, 0, 0);    
-    common::ActionQueue::PushAction (&on_exit, common::ActionThread_Background, 2.0);
+    common::ActionQueue::PushAction (&on_exit_action, common::ActionThread_Background, 2.0);
 
     Application::Run ();            
   }  

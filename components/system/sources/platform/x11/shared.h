@@ -4,13 +4,9 @@
 #include <X11/Xatom.h>
 #include <X11/keysym.h>
 
-#ifdef DestroyAll
 #undef DestroyAll
-#endif
-
-#ifdef DisplayString
 #undef DisplayString
-#endif
+#undef DisableScreenSaver
 
 #include <stl/hash_map>
 

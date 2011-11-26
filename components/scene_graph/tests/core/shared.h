@@ -59,6 +59,14 @@ class TestEntity: public Entity
     }
 };
 
+float prepare_float (float v)
+{
+  if (fabs (v) < 0.001f)
+    return 0.f;
+
+  return v;
+}
+
 /*
     Вспомогательные утилиты вывода состояния объекта
 */
@@ -85,7 +93,7 @@ inline void dump (const quatf& q)
 
   printf ("[%+.1f %+.1f %+.1f]", pitch, yaw, roll);*/
   
-  printf ("[%+.1f %+.1f %+.1f %+.1f]", q.w, q.x, q.y, q.z);
+  printf ("[%+.1f %+.1f %+.1f %+.1f]", prepare_float (q.w), prepare_float (q.x), prepare_float (q.y), prepare_float (q.z));
 }
 
 inline void dump_position (Node& node)
