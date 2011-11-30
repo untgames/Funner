@@ -50,29 +50,30 @@ struct Option
 //параметры запуска
 struct Params
 {
-  const Option* options;                           //массив опций
-  size_t        options_count;                     //количество опций
-  stl::string   xfl_name;                          //имя исходного файла или папки
-  stl::string   output_textures_dir_name;          //имя каталога с сохранёнными текстурами
-  stl::string   output_material_textures_dir_name; //имя каталога с текстурами, используемое при генерации материала
-  stl::string   output_textures_format;            //формат имён файлов в папке с текстурами
-  stl::string   output_materials_file_name;        //имя файла с материалами
-  stl::string   output_scene_file_name;            //имя файла с анимациями
-  stl::string   material_name_pattern;             //строка шаблона поиска имени материала
-  stl::string   material_name_replacement;         //строка преобразования имени материала
-  stl::string   sprite_name_pattern;               //строка шаблона поиска имени спрайта
-  stl::string   sprite_name_replacement;           //строка преобразования имени спрайта
-  stl::string   crop_exclude;                      //необрезаемые слои
-  stl::string   layers_exclude;                    //неэкспортируемые слои
-  size_t        crop_alpha;                        //коэффициент обрезания по прозрачности
-  bool          silent;                            //минимальное число сообщений
-  bool          print_help;                        //нужно ли печатать сообщение помощи
-  bool          need_pot_extent;                   //нужно ли расширять изображения до ближайшей степени двойки
-  bool          need_crop_alpha;                   //нужно ли обрезать картинку по нулевой прозрачности
-  bool          need_inverse_x;                    //нужно ли инвертировать знак оси X
-  bool          need_inverse_y;                    //нужно ли инвертировать знак оси Y
-  bool          need_relative;                     //нужно генерировать данные в относительной системе координат
-  bool          ignore_image_size;                 //игнорировать размер картинок
+  const Option*       options;                           //массив опций
+  size_t              options_count;                     //количество опций
+  stl::string         xfl_name;                          //имя исходного файла или папки
+  stl::string         output_textures_dir_name;          //имя каталога с сохранёнными текстурами
+  stl::string         output_material_textures_dir_name; //имя каталога с текстурами, используемое при генерации материала
+  stl::string         output_textures_format;            //формат имён файлов в папке с текстурами
+  stl::string         output_materials_file_name;        //имя файла с материалами
+  stl::string         output_scene_file_name;            //имя файла с анимациями
+  stl::string         material_name_pattern;             //строка шаблона поиска имени материала
+  stl::string         material_name_replacement;         //строка преобразования имени материала
+  stl::string         sprite_name_pattern;               //строка шаблона поиска имени спрайта
+  stl::string         sprite_name_replacement;           //строка преобразования имени спрайта
+  stl::string         crop_exclude;                      //необрезаемые слои
+  stl::string         layers_exclude;                    //неэкспортируемые слои
+  common::StringArray loop_sprites;                      //спрайты, требующие лупа
+  size_t              crop_alpha;                        //коэффициент обрезания по прозрачности
+  bool                silent;                            //минимальное число сообщений
+  bool                print_help;                        //нужно ли печатать сообщение помощи
+  bool                need_pot_extent;                   //нужно ли расширять изображения до ближайшей степени двойки
+  bool                need_crop_alpha;                   //нужно ли обрезать картинку по нулевой прозрачности
+  bool                need_inverse_x;                    //нужно ли инвертировать знак оси X
+  bool                need_inverse_y;                    //нужно ли инвертировать знак оси Y
+  bool                need_relative;                     //нужно генерировать данные в относительной системе координат
+  bool                ignore_image_size;                 //игнорировать размер картинок
 };
 
 //прямоугольная область
@@ -299,6 +300,12 @@ void command_line_ignore_image_size (const char*, Params& params)
   params.ignore_image_size = true;
 }
 
+//установка списка луповых спрайтов
+void command_line_loop_sprites (const char* value, Params& params)
+{
+  params.loop_sprites = common::split (value, " ", " \t", "''\"\"");
+}
+
 //разбор командной строки
 void command_line_parse (int argc, const char* argv [], Params& params)
 {
@@ -313,6 +320,7 @@ void command_line_parse (int argc, const char* argv [], Params& params)
     {command_line_layers_exclude,               "layers-exclude",              0,  "wildcards",  "exclude selected layers from export"},
     {command_line_material_replacement,         "material-replacement",        0,     "string",  "set material name replacement string separated by ','"},
     {command_line_sprite_name_replacement,      "sprite-replacement",          0,     "string",  "set sprite name replacement string separated by ','"},
+    {command_line_loop_sprites,                 "loop-sprites",                0,     "string",  "set looped sprite names/masks string separated by ' '"},    
     {command_line_pot,                          "pot",                         0,            0,  "extent textures size to nearest greater power of two"},
     {command_line_inverse_x,                    "inverse-x",                   0,            0,  "inverse X ort"},
     {command_line_inverse_y,                    "inverse-y",                   0,            0,  "inverse Y ort"},
@@ -938,6 +946,7 @@ void process_sprite_common
   ConvertData&       data,
   const Frame&       frame,
   const char*        name,
+  bool               looped,
   const math::vec2f& position = math::vec2f (0.0f),
   const math::vec2f& scale = math::vec2f (1.0f))
 {
@@ -955,6 +964,9 @@ void process_sprite_common
     XmlWriter::Scope scope (*data.scene_writer, "Track");
     
     data.scene_writer->WriteAttribute ("Name", params.need_relative ? "offset" : "position");
+    
+    if (looped)
+      data.scene_writer->WriteAttribute ("Loop", "true");
 
     write_track (data, *x_track, *y_track, name, params.need_relative ? math::vec2f (0.0f) : position,
       math::vec2f (params.need_inverse_x ? -1.0f : 1.0f, params.need_inverse_y ? -1.0f : 1.0f) * scale);
@@ -964,6 +976,9 @@ void process_sprite_common
     XmlWriter::Scope track_scope (*data.scene_writer, "Track");
     
     data.scene_writer->WriteAttribute ("Name", "position");
+    
+    if (looped)
+      data.scene_writer->WriteAttribute ("Loop", "true");    
 
     XmlWriter::Scope key_scope (*data.scene_writer, "Key");
 
@@ -982,6 +997,9 @@ void process_sprite_common
     XmlWriter::Scope scope (*data.scene_writer, "Track");
     
     data.scene_writer->WriteAttribute ("Name", "scale");
+    
+    if (looped)
+      data.scene_writer->WriteAttribute ("Loop", "true");    
     
     write_track (data, *x_scale_track, *y_scale_track, name, math::vec2f (0.0f), math::vec2f (0.01f));
   }
@@ -1017,6 +1035,9 @@ void process_sprite_common
     XmlWriter::Scope scope (*data.scene_writer, "Track");
 
     data.scene_writer->WriteAttribute ("Name", "angle");
+    
+    if (looped)
+      data.scene_writer->WriteAttribute ("Loop", "true");    
 
     write_track (data, *skewx_track, -1.0f);
   }
@@ -1025,6 +1046,9 @@ void process_sprite_common
     XmlWriter::Scope scope (*data.scene_writer, "Track");
 
     data.scene_writer->WriteAttribute ("Name", "angle");
+    
+    if (looped)
+      data.scene_writer->WriteAttribute ("Loop", "true");    
 
     write_track (data, *angle_track, -1.0f);
   }
@@ -1039,12 +1063,15 @@ void process_sprite_common
     
     data.scene_writer->WriteAttribute ("Name", "alpha");
     
+    if (looped)
+      data.scene_writer->WriteAttribute ("Loop", "true");    
+    
     write_track (data, *alpha_track, 0.01f);
   }
 }
 
 ///обработка спрайта
-void process_sprite (Params& params, ConvertData& data, const Frame& frame, const char* name, const char* parent)
+void process_sprite (Params& params, ConvertData& data, const Frame& frame, const char* name, const char* parent, bool looped)
 {
   const FrameElement& element = frame.Elements ()[(size_t)0];
 
@@ -1125,11 +1152,11 @@ void process_sprite (Params& params, ConvertData& data, const Frame& frame, cons
   math::vec2f position = element.Translation () + math::vec2f (image_desc.width / 2.0f, image_desc.height / 2.0f) +
     math::vec2f (float (image_desc.x), float (image_desc.y));
   
-  process_sprite_common (params, data, frame, name, position);
+  process_sprite_common (params, data, frame, name, looped, position);
 }
 
 ///обработка группы спрайтов
-void process_sprite_group (Params& params, ConvertData& data, const Layer::FrameList& frames, const char* name_prefix)
+void process_sprite_group (Params& params, ConvertData& data, const Layer::FrameList& frames, const char* name_prefix, bool looped)
 {
   size_t frame_index = 1;
   
@@ -1137,7 +1164,7 @@ void process_sprite_group (Params& params, ConvertData& data, const Layer::Frame
   {
     const Frame& frame = *frame_iter;
 
-    process_sprite (params, data, frame, common::format ("%s.frame%u", name_prefix, frame_index).c_str (), "");
+    process_sprite (params, data, frame, common::format ("%s.frame%u", name_prefix, frame_index).c_str (), "", looped);
   }
   
     //сохранение группы
@@ -1152,10 +1179,27 @@ void process_sprite_group (Params& params, ConvertData& data, const Layer::Frame
 //  process_sprite_common (data, frame, name_prefix);
 }
 
+//является ли спрайт луповым
+bool is_sprite_looped (const char* name, Params& params)
+{
+  if (!name)
+    return false;
+    
+  for (size_t i=0; i<params.loop_sprites.Size (); i++)
+  {
+    const char* mask = params.loop_sprites [i];
+    
+    if (common::wcmatch (name, mask))
+      return true;
+  }
+  
+  return false;
+}
+
 float process_timeline (Params& params, ConvertData& data, const Timeline& timeline, const char* name_prefix, EventList& events);
 
 ///обработка вложенного символа (возвращает время окончания анимации включая все вложения)
-float process_symbol_instance (Params& params, ConvertData& data, const Frame& frame, const char* name_prefix)
+float process_symbol_instance (Params& params, ConvertData& data, const Frame& frame, const char* name_prefix, bool looped)
 {
   const FrameElement& element     = frame.Elements ()[(size_t)0];
   const char*         symbol_name = element.Name ();
@@ -1194,7 +1238,7 @@ float process_symbol_instance (Params& params, ConvertData& data, const Frame& f
   data.scene_writer->WriteAttribute ("ScalePivotEnabled", "true");
   data.scene_writer->WriteAttribute ("OrientationPivotEnabled", "true");
 
-  process_sprite_common (params, data, frame, name_prefix, element.Translation ());
+  process_sprite_common (params, data, frame, name_prefix, looped, element.Translation ());
   write_timeline_sprite_tracks (params, data, events);
 
   return end_time;
@@ -1217,11 +1261,13 @@ float process_timeline (Params& params, ConvertData& data, const Timeline& timel
     
     stl::string name_prefix = *parent_name ? common::format ("%s.%s", parent_name, layer.Name ()) : stl::string (layer.Name ());
     
+    bool is_looped = is_sprite_looped (name_prefix.c_str (), params);    
+    
     switch (layer_type)
     {
       case LayerType_SpriteGroup:
       {
-        process_sprite_group (params, data, layer.Frames (), name_prefix.c_str ());
+        process_sprite_group (params, data, layer.Frames (), name_prefix.c_str (), is_looped);
         
           //регистрация события запуска
           
@@ -1249,7 +1295,7 @@ float process_timeline (Params& params, ConvertData& data, const Timeline& timel
       }
       case LayerType_Sprite:
       {
-        process_sprite (params, data, layer.Frames ()[0u], name_prefix.c_str (), parent_name);
+        process_sprite (params, data, layer.Frames ()[0u], name_prefix.c_str (), parent_name, is_looped);
         
           //регистрация события запуска
         
@@ -1260,9 +1306,9 @@ float process_timeline (Params& params, ConvertData& data, const Timeline& timel
         event.time   = frame.FirstFrame () / data.document.FrameRate ();
         event.action = common::format ("ActivateSprite ('%s')", name_prefix.c_str ());
         
-        events.push_back (event);
+        events.push_back (event);        
         
-        if (frame.Duration () > 1)
+        if (frame.Duration () > 1 && !is_looped)
         {
           event.time   += frame.Duration () / data.document.FrameRate ();
           event.action  = common::format ("DeactivateSprite ('%s')", name_prefix.c_str ());
@@ -1277,7 +1323,7 @@ float process_timeline (Params& params, ConvertData& data, const Timeline& timel
       }
       case LayerType_Instance:
       {
-        float symbol_end_time = process_symbol_instance (params, data, layer.Frames ()[0u], name_prefix.c_str ());        
+        float symbol_end_time = process_symbol_instance (params, data, layer.Frames ()[0u], name_prefix.c_str (), is_looped);
         
         if (symbol_end_time > end_time)
           end_time = symbol_end_time;
@@ -1292,8 +1338,8 @@ float process_timeline (Params& params, ConvertData& data, const Timeline& timel
         event.action = common::format ("ActivateSprite ('%s')", name_prefix.c_str ());
         
         events.push_back (event);
-        
-        if (frame.Duration () > 1)
+                
+        if (frame.Duration () > 1 && !is_looped)
         {
           event.time   += frame.Duration () / data.document.FrameRate ();
           event.action  = common::format ("DeactivateSprite ('%s')", name_prefix.c_str ());
