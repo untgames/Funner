@@ -72,6 +72,7 @@ struct Params
   bool          need_inverse_x;                    //нужно ли инвертировать знак оси X
   bool          need_inverse_y;                    //нужно ли инвертировать знак оси Y
   bool          need_relative;                     //нужно генерировать данные в относительной системе координат
+  bool          ignore_image_size;                 //игнорировать размер картинок
 };
 
 //прямоугольная область
@@ -292,6 +293,12 @@ void command_line_relative (const char*, Params& params)
   params.need_relative = true;
 }
 
+//установка флага необходимости игнорирования размеров картинки
+void command_line_ignore_image_size (const char*, Params& params)
+{
+  params.ignore_image_size = true;
+}
+
 //разбор командной строки
 void command_line_parse (int argc, const char* argv [], Params& params)
 {
@@ -310,6 +317,7 @@ void command_line_parse (int argc, const char* argv [], Params& params)
     {command_line_inverse_x,                    "inverse-x",                   0,            0,  "inverse X ort"},
     {command_line_inverse_y,                    "inverse-y",                   0,            0,  "inverse Y ort"},
     {command_line_relative,                     "relative",                    0,            0,  "relative coordinates"},
+    {command_line_ignore_image_size,            "ignore-image-size",           0,            0,  "do not write image size to output scene"},
     {command_line_silent,                       "silent",                    's',            0,  "quiet mode"},
     {command_line_help,                         "help",                      '?',            0,  "print help message"},    
   };
@@ -898,8 +906,9 @@ void write_events_track (ConvertData& data, const EventList& events)
 }
 
 //запись треков таймлайн-спрйта
-void write_timeline_sprite_tracks (ConvertData& data, const EventList& events)
+void write_timeline_sprite_tracks (Params& params, ConvertData& data, const EventList& events)
 {
+  if (!params.ignore_image_size)
   {
     XmlWriter::Scope size_scope (*data.scene_writer, "Track");
     
@@ -1099,7 +1108,7 @@ void process_sprite (Params& params, ConvertData& data, const Frame& frame, cons
   
     //сохранение размера
   
-  if (!params.need_relative)
+  if (!params.need_relative && !params.ignore_image_size)
   {
     XmlWriter::Scope track_scope (*data.scene_writer, "Track");
     
@@ -1186,7 +1195,7 @@ float process_symbol_instance (Params& params, ConvertData& data, const Frame& f
   data.scene_writer->WriteAttribute ("OrientationPivotEnabled", "true");
 
   process_sprite_common (params, data, frame, name_prefix, element.Translation ());
-  write_timeline_sprite_tracks (data, events);
+  write_timeline_sprite_tracks (params, data, events);
 
   return end_time;
 }
@@ -1337,7 +1346,7 @@ void process_timeline (Params& params, ConvertData& data)
   XmlWriter::Scope sprite_scope (*data.scene_writer, "Sprite");
 
   write_timeline_sprite_data (data, data.document.Timelines ()[(size_t)0].Name ());
-  write_timeline_sprite_tracks (data, events);
+  write_timeline_sprite_tracks (params, data, events);
 }
 
 //построение списка используемых символов
@@ -1444,6 +1453,7 @@ int main (int argc, const char *argv[])
     params.need_inverse_x    = false;
     params.need_inverse_y    = false;
     params.need_relative     = false;
+    params.ignore_image_size = false;
 
       //разбор командной строки
     command_line_parse (argc, argv, params);
