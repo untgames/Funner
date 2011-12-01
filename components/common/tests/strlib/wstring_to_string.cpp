@@ -10,11 +10,12 @@ using namespace common;
 int main()
 {
   printf("Results of wstring_to_string:\n");
+
   try
   {
-    stl::wstring str = L"Hello World!!!";
-
-    printf ("wchar->char %s\n", to_utf8_string (str).c_str());
+    static const wchar_t* s = L"Hello World!!!";
+    
+    printf ("wchar->char %s\n", to_utf8_string (stl::wstring (s)).c_str());
   }
   catch (std::exception& exception)
   {
