@@ -4,6 +4,7 @@
 TARGETS := SYSTEMLIB.SOURCES SYSTEMLIB.TESTS
 
 TARGETS.android  += SYSTEMLIB.UTILS.ANDROID_LAUNCHER
+TARGETS.android  += SYSTEMLIB.UTILS.ANDROID_LAUNCHER_COMMON
 TARGETS.tabletos += SYSTEMLIB.UTILS.TABLETOS_LAUNCHER
 
 #Цель №1 - System library sources
@@ -50,6 +51,11 @@ SYSTEMLIB.UTILS.ANDROID_LAUNCHER.DLLS          := android
 SYSTEMLIB.UTILS.ANDROID_LAUNCHER.SOURCE_DIRS   := utils/android_launcher
 SYSTEMLIB.UTILS.ANDROID_LAUNCHER.MANIFEST_FILE := utils/android_launcher/AndroidManifest.xml
 SYSTEMLIB.UTILS.ANDROID_LAUNCHER.RES_DIR       := utils/android_launcher/res
+
+#Цель №3 - Android launcher common
+SYSTEMLIB.UTILS.ANDROID_LAUNCHER_COMMON.TYPE         := android-jar
+SYSTEMLIB.UTILS.ANDROID_LAUNCHER_COMMON.NAME         := funner.application
+SYSTEMLIB.UTILS.ANDROID_LAUNCHER_COMMON.SOURCE_DIRS  := utils/android_launcher
 
 #Цель №4 - Tabletos launcher
 SYSTEMLIB.UTILS.TABLETOS_LAUNCHER.TYPE          := tabletos-bar

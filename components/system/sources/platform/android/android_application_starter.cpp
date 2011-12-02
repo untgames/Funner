@@ -18,6 +18,7 @@ namespace
 
 const char* THREAD_NAME             = "system.android.launcher";                     //имя нити приложения
 const char* ENGINE_UTILS_CLASS_NAME = "com/untgames/funner/application/EngineUtils"; //имя класса java утилит
+const char* APK_FULL_PATH           = "APK_FULL_PATH";                               //имя переменной пути к APK-файлу
 
 /// Контекст запуска приложения
 ApplicationContext application_context;
@@ -26,9 +27,12 @@ ApplicationContext application_context;
 struct ApplicationStartArgs
 {
   common::StringArray args;
+  common::PropertyMap env_vars;
   
-  ApplicationStartArgs (const char* program_name, const char* in_args)
+  ApplicationStartArgs (const char* program_name, const char* in_args, const char* in_env_vars)
   {
+    env_vars = common::parse_init_string (in_env_vars);
+    
       //разбор параметров запуска
       
     args.Add (program_name);
@@ -41,20 +45,20 @@ class ApplicationThread: private ApplicationStartArgs
 {
   public:
 /// Метод запуска нити приложения
-    static void Start (const char* program_name, const char* args)
+    static void Start (const char* program_name, const char* args, const char* env_vars)
     {
       static stl::auto_ptr<ApplicationThread> instance;
       
       if (instance)
         throw xtl::format_operation_exception ("syslib::android::ApplicationThread::Start", "Application thread has already started");
         
-      instance = stl::auto_ptr<ApplicationThread> (new ApplicationThread (program_name, args));
+      instance = stl::auto_ptr<ApplicationThread> (new ApplicationThread (program_name, args, env_vars));
     }
 
   private:
 /// Конструктор
-    ApplicationThread (const char* program_name, const char* in_args)
-      : ApplicationStartArgs (program_name, in_args)
+    ApplicationThread (const char* program_name, const char* in_args, const char* in_env_vars)
+      : ApplicationStartArgs (program_name, in_args, in_env_vars)
       , thread (THREAD_NAME, syslib::Thread::Function (xtl::bind (&ApplicationThread::ThreadRoutine, this)))
     {
     }
@@ -79,6 +83,23 @@ class ApplicationThread: private ApplicationStartArgs
         
         try
         {
+            //формирование окружения
+          
+          for (size_t i=0, count=env_vars.Size (); i<count; i++)
+          {
+            const char* name  = env_vars.PropertyName (i);
+            const char* value = env_vars.GetString (i);
+            
+            if (putenv (common::format ("%s=%s", name, value).c_str ()))
+              throw xtl::format_operation_exception ("", "::putenv failed for '%s=%s'", name, value);
+          }
+          
+            //предварительные действия
+            
+          Preinit ();
+          
+            //запуск
+
           exit_code = main (args.Size (), args.Data ());          
 
 //          get_vm ()->DetachCurrentThread ();
@@ -112,6 +133,26 @@ class ApplicationThread: private ApplicationStartArgs
     {
       exit (code);
     }
+    
+  private:
+///Предварительные действия
+    void Preinit ()
+    {
+      try
+      {
+        const char* apk_path = getenv (APK_FULL_PATH);
+        
+        if (apk_path)
+        {
+          common::FileSystem::AddSearchPath (common::format ("/std/%s", apk_path).c_str ());
+        }
+      }
+      catch (xtl::exception& e)
+      {
+        e.touch ("syslib::android::ApplicationThread::Preinit");
+        throw;
+      }
+    }
   
   private:
     syslib::Thread       thread;
@@ -127,7 +168,7 @@ namespace android
 {
 
 /// точка входа в приложение
-void start_application (JavaVM* vm, jobject activity, const char* program_name, const char* args)
+void start_application (JavaVM* vm, jobject activity, const char* program_name, const char* args, const char* env_vars)
 {
   static const char* METHOD_NAME = "syslib::android::start_application";
   
@@ -140,10 +181,13 @@ void start_application (JavaVM* vm, jobject activity, const char* program_name, 
     throw xtl::make_null_argument_exception (METHOD_NAME, "activity");    
     
   if (!program_name)
-    throw xtl::make_null_argument_exception (METHOD_NAME, "program_name");
+    throw xtl::make_null_argument_exception (METHOD_NAME, "program_name");       
     
   if (!args)
     throw xtl::make_null_argument_exception (METHOD_NAME, "args");
+
+  if (!env_vars)
+    throw xtl::make_null_argument_exception (METHOD_NAME, "env_vars"); 
     
     //сохранение контекста запуска приложения
 
@@ -157,7 +201,7 @@ void start_application (JavaVM* vm, jobject activity, const char* program_name, 
   
     //запуск нити приложения
     
-  ApplicationThread::Start (program_name, args);
+  ApplicationThread::Start (program_name, args, env_vars);
 }
 
 /// получение контекста запуска приложения

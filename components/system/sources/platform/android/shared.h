@@ -19,6 +19,8 @@
 #include <xtl/intrusive_ptr.h>
 #include <xtl/reference_counter.h>
 
+#include <common/file.h>
+#include <common/property_map.h>
 #include <common/singleton.h>
 #include <common/strlib.h>
 
@@ -185,7 +187,7 @@ struct ApplicationContext
 };
 
 /// точка входа в приложение
-void start_application (JavaVM* vm, jobject activity, const char* program_name, const char* args);
+void start_application (JavaVM* vm, jobject activity, const char* program_name, const char* args, const char* env_vars);
 
 /// регистрация методов обратного вызова окна
 void register_window_callbacks (JNIEnv* env);

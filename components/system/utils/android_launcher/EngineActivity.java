@@ -5,6 +5,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.os.Bundle;
 import android.os.Looper;
+import android.content.pm.ApplicationInfo;
 import android.util.*;
 import java.io.*;
 
@@ -49,6 +50,22 @@ public class EngineActivity extends Activity
 
     String programArgs     = extras.getString ("args");
     String librariesString = extras.getString ("libraries");
+    
+    ApplicationInfo appInfo = getApplicationInfo ();
+    
+    if (appInfo == null)
+    {
+      System.out.println ("No ApplicationInfo attached");
+      System.exit (0);      
+
+      return;
+    }
+    
+    String envVars   = "";    
+    
+    String sourceApk = appInfo.sourceDir;
+    
+    envVars = envVars + " " + "APK_FULL_PATH='" + sourceApk + "'";
 
     try
     {
@@ -62,13 +79,14 @@ public class EngineActivity extends Activity
         for (String library : libraries)
         {
           if (library != "")
-            System.load (library);
+            System.loadLibrary (library);
         }
-      }
-        
-      System.load (programName);
+      }              
+      
+      if (programName != "")
+        System.load (programName);
 
-      if (startApplication (programName, workDir, programArgs != null ? programArgs : "") == 0)
+      if (startApplication (programName, workDir, programArgs != null ? programArgs : "", envVars) == 0)
         System.exit (0);
     }
     catch (Throwable e)
@@ -80,10 +98,10 @@ public class EngineActivity extends Activity
     }       
     
     super.onCreate (savedInstanceState);
-  }
+  }  
   
 /// Точка входа в native код
-  public native int startApplication (String programName, String workDir, String programArgs);
+  public native int startApplication (String programName, String workDir, String programArgs, String envVars);
   
 /// Создание окна
   public View createEngineView (String initString)
