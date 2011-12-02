@@ -101,12 +101,15 @@ define tools.link.shared-lib
 export PATH=$(BUILD_PATHS):$$PATH && $(call tools.g++.link,$1,$2,,,$5 $(foreach dir,$3,-Wl,-L,$(dir)) $(ANDROID_SO_LINK_FLAGS) $(foreach link,$4,-Wl,-u,$(link)),$6,$7,$8,$9)
 endef
 
+define tools.link.exe
+export PATH=$(BUILD_PATHS):$$PATH && $(call tools.g++.link,$1,$2,,,$5 $(foreach dir,$3,-Wl,-L,$(dir)) $(ANDROID_EXE_LINK_FLAGS) $(foreach link,$4,-Wl,-u,$(link)),$6,$7,$8,$9)
+endef
+
 define tools.link.dll
-$(ANDROID_SO_LINK_FLAGS)
 endef
 
 define tools.link
-export PATH=$(BUILD_PATHS):$$PATH && $(call tools.g++.link,$1,$2,,,$5 $(foreach dir,$3,-Wl,-L,$(dir)) $(if $(filter %$(DLL_SUFFIX),$1),,$(ANDROID_EXE_LINK_FLAGS)) $(foreach link,$4,-Wl,-u,$(link)),$6,$7,$8,$9)
+$(if $(filter %$(DLL_SUFFIX),$1),$(call tools.link.shared-lib,$1,$2,$3,$4,$5,$6,$7,$8,$9),$(call tools.link.exe,$1,$2,$3,$4,$5,$6,$7,$8,$9))
 endef
 
 define tools.lib
