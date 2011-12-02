@@ -41,10 +41,17 @@ ENGINE.FUNNER_LIBRARY_LIPO.LIBS     := funner
 ENGINE.FUNNER_LIBRARY_LIPO.PROFILES := iphone-device-armv6 iphone-device-armv7 iphone-simulator
 
 #Цель - application
-ENGINE.LAUNCHER.SOURCES.TYPE                    := application
+ifneq (,$(filter android,$(PROFILES)))
+ENGINE.LAUNCHER.SOURCES.NAME                    := funner
+ENGINE.LAUNCHER.SOURCES.TYPE                    := dynamic-lib
+else
 ENGINE.LAUNCHER.SOURCES.NAME                    := launcher
+ENGINE.LAUNCHER.SOURCES.TYPE                    := application
+endif
 ENGINE.LAUNCHER.SOURCES.INCLUDE_DIRS            := include
 ENGINE.LAUNCHER.SOURCES.EXECUTION_DIR           := sources
+ENGINE.LAUNCHER.SOURCES.LINK_INCLUDES           :=
+ENGINE.LAUNCHER.SOURCES.LIBS                    :=
 ENGINE.LAUNCHER.SOURCES.macosx.LINK_FLAGS       := -framework Foundation -framework AppKit
 ENGINE.LAUNCHER.SOURCES.iphone.LINK_FLAGS       := -framework OpenAL -framework UIKit -framework Foundation \
                                                    -framework OpenGLES -framework MediaPlayer -framework AVFoundation \
@@ -56,8 +63,11 @@ ENGINE.LAUNCHER.SOURCES.iphone.SOURCE_DIRS      := sources/platform/iphone
 ENGINE.LAUNCHER.SOURCES.iphone.LIBS             := funner
 ENGINE.LAUNCHER.SOURCES.linux.SOURCE_DIRS       := sources/platform/linux
 ENGINE.LAUNCHER.SOURCES.linux.LIBS              := dl
+ifneq (,$(filter android,$(PROFILES)))
+ENGINE.LAUNCHER.SOURCES.LIBS                    := funner.system #for duplicate JNI_OnLoad in OpenAL32 & system
+endif
 ENGINE.LAUNCHER.SOURCES.android.SOURCE_DIRS     := sources/platform/android
-ENGINE.LAUNCHER.SOURCES.android.IMPORTS         := compile.engine.core link.engine.launcher
+ENGINE.LAUNCHER.SOURCES.android.IMPORTS         := compile.engine.core link.engine.launcher 
 ENGINE.LAUNCHER.SOURCES.android.EXCLUDE_IMPORTS := link.common.auto_license_generator
 
 #Цель - console application
