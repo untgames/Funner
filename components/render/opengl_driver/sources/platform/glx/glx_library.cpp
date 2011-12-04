@@ -168,7 +168,7 @@ struct AdapterLibrary::Impl
       log.Printf ("...get default GLX-entries");
       
         //инициализация точек входа
-        
+
       GetSymbol ("glXCreateNewContext",       fglXCreateNewContext);
       GetSymbol ("glXDestroyContext",         fglXDestroyContext);
       GetSymbol ("glXMakeCurrent",            fglXMakeCurrent);
@@ -282,7 +282,7 @@ AdapterLibraryPtr AdapterLibrary::LoadLibrary (const char* path)
   {
     Log log;        
     
-      //загрузка динамической библиотеки    
+      //загрузка динамической библиотеки
       
     log.Printf ("...load library '%s'", path);
       

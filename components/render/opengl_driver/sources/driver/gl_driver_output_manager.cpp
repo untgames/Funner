@@ -197,11 +197,7 @@ void Output::SetGammaRamp (const render::low_level::Color3f table [256])
 {
   try
   {
-    typedef syslib::Color3f SysColorArray [256];
-    
-    SysColorArray* sys_table = reinterpret_cast<SysColorArray*> (&table);
-
-    impl->screen.SetGammaRamp (*sys_table);
+    impl->screen.SetGammaRamp ((syslib::Color3f*)table);
   }
   catch (xtl::exception& e)
   {
@@ -214,11 +210,7 @@ void Output::GetGammaRamp (render::low_level::Color3f table [256])
 {
   try
   {
-    typedef syslib::Color3f SysColorArray [256];
-    
-    SysColorArray* sys_table = reinterpret_cast<SysColorArray*> (&table);
-
-    impl->screen.GetGammaRamp (*sys_table);
+    impl->screen.GetGammaRamp ((syslib::Color3f*)table);
   }
   catch (xtl::exception& e)
   {
