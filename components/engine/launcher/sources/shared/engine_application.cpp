@@ -126,13 +126,13 @@ class Application: public IEngine
             commands.Add (argument);
           }
         }
-        
+
           //сохранение переменных среды при запуске
         
         common::FileSystem::Rename (environment_variables_file.Path (), STARTUP_ENV_VARS_FILE_NAME);
-        
+
         common::XmlWriter writer (STARTUP_ENV_VARS_FILE_NAME);
-        
+
         common::XmlWriter::Scope xml_root (writer, "Properties");
         
         if (env)
@@ -151,16 +151,18 @@ class Application: public IEngine
             writer.WriteAttribute ("Value", value);
           }
         }        
-        
+
         return true;
       }
       catch (std::exception& exception)
       {
         printf ("exception: %s\n", exception.what ());
+        fflush (stdout);
       }
       catch (...)
       {
         printf ("unknown exception at Application::ParseCommandLineEntry\n");
+        fflush (stdout);        
       }      
       
       return false;
@@ -188,7 +190,7 @@ class Application: public IEngine
         if (!need_print_help && !need_print_version)
         {
             //загрузка лицензии
-          
+
           common::Parser p (configuration_name.c_str ());
 
           if (p.Root ().First ("Configuration.LicenseFile"))
@@ -198,6 +200,7 @@ class Application: public IEngine
           else
           {
             printf ("There is no license information in configuration\n");
+            fflush (stdout);
           }
             
             //регистрация обработчика старта приложения
@@ -205,7 +208,7 @@ class Application: public IEngine
           syslib::Application::RegisterEventHandler (syslib::ApplicationEvent_OnInitialized, xtl::bind (&Application::StartupHandler, this, p.Root ().First ("Configuration")));            
           
             //запуск основного цикла
-  
+
           syslib::Application::Run ();          
         }
         else if (need_print_version)
@@ -221,10 +224,12 @@ class Application: public IEngine
       catch (std::exception& exception)
       {
         printf ("exception: %s\n", exception.what ());
+        fflush (stdout);
       }
       catch (...)
       {
         printf ("unknown exception at Application::RunEntry\n");
+        fflush (stdout);
       }      
     }
 
@@ -238,10 +243,12 @@ class Application: public IEngine
       catch (std::exception& exception)
       {
         printf ("exception at Application::Execute: %s\n", exception.what ());
+        fflush (stdout);
       }
       catch (...)
       {
         printf ("unknown exception at Application::Execute\n");
+        fflush (stdout);
       }
     }
 
@@ -290,10 +297,12 @@ class Application: public IEngine
       catch (std::exception& exception)
       {
         printf ("exception: %s\n", exception.what ());
+        fflush (stdout);
       }
       catch (...)
       {
         printf ("unknown exception at engine::Application::StartupTimerHandler\n");
+        fflush (stdout);        
       }      
     }
 
@@ -328,10 +337,12 @@ FUNNER_C_API IEngine* FunnerInit ()
   catch (std::exception& exception)
   {
     printf ("exception: %s\n", exception.what ());
+    fflush (stdout);
   }
   catch (...)
   {
     printf ("unknown exception at FunnerInit\n");
+    fflush (stdout);
   }
 
   return 0;

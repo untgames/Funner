@@ -21,4 +21,6 @@ int main (int argc, const char* argv [], const char* env [])
     return 1;
 
   funner->Run ();
+
+  return 0;
 }
