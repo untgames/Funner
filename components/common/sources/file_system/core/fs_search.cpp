@@ -49,7 +49,6 @@ void FileSearchHelper::Search (ICustomFileSystemPtr _file_system,const char* dir
 
 void FileSearchHelper::InsertRecursive (const char* file_name,const FileInfo& info)
 {
-
   if (!file_name)
     return;
 
@@ -162,11 +161,22 @@ FileList FileSystemImpl::Search (const char* src_mask,size_t flags)
       //поиск в паках
       
     if (!(flags & FileSearch_NoPacks))
-    {
+    {      
+      for (SearchPathList::iterator iter=search_paths.begin ();iter!=search_paths.end ();++iter)
+      {
+        FileSearchHelper search_helper (builder,mask.c_str (),flags);
+        
+        builder.SetTruncateSize (iter->path.size () + 1);
+        builder.SetPrefix ("");
+
+        for (PackFileList::iterator i=pack_files.begin ();i!=pack_files.end ();++i)
+          search_helper.Search (i->file_system,format ("%s/%s", iter->path.c_str (), src_prefix.c_str ()).c_str ());
+      }
+      
       FileSearchHelper search_helper (builder,mask.c_str (),flags);
       
       builder.SetTruncateSize (0);
-      builder.SetPrefix ("");
+      builder.SetPrefix ("");      
 
       for (PackFileList::iterator i=pack_files.begin ();i!=pack_files.end ();++i)
         search_helper.Search (i->file_system,src_prefix.c_str ());
