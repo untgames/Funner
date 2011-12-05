@@ -5,6 +5,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.os.Bundle;
 import android.os.Looper;
+import android.content.ContextWrapper;
 import android.content.pm.ApplicationInfo;
 import android.util.*;
 import java.io.*;
@@ -61,11 +62,20 @@ public class EngineActivity extends Activity
       return;
     }
     
-    String envVars   = "";    
+    String envVars = extras.getString ("envvars"); 
+    
+    if (envVars == null)
+      envVars = "";
+      
+    ContextWrapper wrapper = new ContextWrapper (this);
     
     String sourceApk = appInfo.sourceDir;
+    String dataDir   = appInfo.dataDir;
+    String tmpDir    = wrapper.getCacheDir ().getPath ();
     
     envVars = envVars + " " + "APK_FULL_PATH='" + sourceApk + "'";
+    envVars = envVars + " " + "HOME='" + dataDir + "'";
+    envVars = envVars + " " + "TEMP='" + tmpDir + "'";
 
     try
     {
@@ -104,14 +114,14 @@ public class EngineActivity extends Activity
   public native int startApplication (String programName, String workDir, String programArgs, String envVars);
   
 /// Создание окна
-  public View createEngineView (String initString)
+  public View createEngineView (String initString, final long windowRef)
   {
-    final Activity activity = this;
+    final Activity activity = this;    
     
     return (View)UiDispatch.run (this, new UiRunnable () {
       public Object run ()
       {
-        View view = new EngineView (activity);
+        View view = new EngineView (activity, windowRef);
         
         getWindow ().addContentView (view, new ViewGroup.LayoutParams (ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));        
         

@@ -19,6 +19,7 @@ namespace
 const char* THREAD_NAME             = "system.android.launcher";                     //имя нити приложения
 const char* ENGINE_UTILS_CLASS_NAME = "com/untgames/funner/application/EngineUtils"; //имя класса java утилит
 const char* APK_FULL_PATH           = "APK_FULL_PATH";                               //имя переменной пути к APK-файлу
+const char* SEARCH_PATHS            = "SEARCH_PATHS";                                //имя переменной списка путей поиска файлов
 
 /// Контекст запуска приложения
 ApplicationContext application_context;
@@ -84,7 +85,7 @@ class ApplicationThread: private ApplicationStartArgs
         try
         {
             //формирование окружения
-          
+
           for (size_t i=0, count=env_vars.Size (); i<count; i++)
           {
             const char* name  = env_vars.PropertyName (i);
@@ -93,15 +94,15 @@ class ApplicationThread: private ApplicationStartArgs
             if (putenv (common::format ("%s=%s", name, value).c_str ()))
               throw xtl::format_operation_exception ("", "::putenv failed for '%s=%s'", name, value);
           }
-          
+
             //предварительные действия
-            
+
           Preinit ();
-          
+
             //запуск
 
-          exit_code = main (args.Size (), args.Data ());          
-
+          exit_code = main (args.Size (), args.Data (), environ);          
+          
 //          get_vm ()->DetachCurrentThread ();
         }
         catch (...)
@@ -143,8 +144,16 @@ class ApplicationThread: private ApplicationStartArgs
         const char* apk_path = getenv (APK_FULL_PATH);
         
         if (apk_path)
-        {
           common::FileSystem::AddSearchPath (common::format ("/std/%s", apk_path).c_str ());
+          
+        const char* search_paths = getenv (SEARCH_PATHS);
+        
+        if (search_paths)
+        {
+          common::StringArray paths = common::split (search_paths);
+          
+          for (size_t i=0, count=paths.Size (); i<count; i++)
+            common::FileSystem::AddSearchPath (paths [i]);
         }
       }
       catch (xtl::exception& e)

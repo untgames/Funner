@@ -36,9 +36,13 @@ public class EngineView extends SurfaceView implements SurfaceHolder.Callback
     }
   }
   
-  public EngineView (Context context)
+  private volatile long windowRef;  
+  
+  public EngineView (Context context, long windowRef)
   {    
     super (context);
+    
+    this.windowRef = windowRef;
 
     gesture_detector = new GestureDetector (context, new DoubletapListener (this)); 
     
@@ -46,6 +50,11 @@ public class EngineView extends SurfaceView implements SurfaceHolder.Callback
     setFocusableInTouchMode (true);
     
     getHolder ().addCallback (this);
+  }
+  
+  public long getWindowRef ()
+  {
+    return windowRef;
   }
   
   public Surface getSurfaceThreadSafe ()

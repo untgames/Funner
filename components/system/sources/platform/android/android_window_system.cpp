@@ -312,7 +312,7 @@ class JniWindowManager
         if (!activity_class)
           throw xtl::format_operation_exception ("", "JNIEnv::GetObjectClass failed");
           
-        create_view_method = find_method (&get_env (), activity_class.get (), "createEngineView", "(Ljava/lang/String;)Landroid/view/View;");
+        create_view_method = find_method (&get_env (), activity_class.get (), "createEngineView", "(Ljava/lang/String;J)Landroid/view/View;");
       }
       catch (xtl::exception& e)
       {
@@ -322,77 +322,50 @@ class JniWindowManager
     }
     
 ///Создание окна
-    local_ref<jobject> CreateView (const char* init_string)
+    local_ref<jobject> CreateView (const char* init_string, void* window_ref)
     {
       const ApplicationContext& context = get_context ();     
       
-      local_ref<jobject> view = check_errors (get_env ().CallObjectMethod (context.activity.get (), create_view_method, tojstring (init_string)));
-      
+      local_ref<jobject> view = check_errors (get_env ().CallObjectMethod (context.activity.get (), create_view_method, tojstring (init_string), window_ref));
+
       if (!view)
         throw xtl::format_operation_exception ("", "EngineActivity::createEngineView failed");
         
       return view;
     }
     
-///Регистрация дескриптора окна
-    void RegisterWindow (jobject view, window_t window)
-    {
-      if (FindWindow (view))
-        throw xtl::format_operation_exception ("syslib::android::JniWindowManager::RegisterWindow", "Window have already registered");
-        
-      windows.push_back (WindowEntry (view, window));
-    }
-    
-    void UnregisterWindow (jobject view)
-    {
-      if (!view)
-        return;
-      
-      JNIEnv& env = get_env ();
-      
-      for (WindowEntryList::iterator iter=windows.begin (), end=windows.end (); iter!=end; ++iter)
-        if (env.IsSameObject (view, iter->view.get ()))
-        {
-          windows.erase (iter);
-          
-          return;
-        }
-    }
-    
 ///Поиск дескриптора окна
-    window_t FindWindow (jobject view) const
+    static window_t FindWindow (jobject view)
     {
-      if (!view)
-        return 0;
-      
-      JNIEnv& env = get_env ();
-      
-      for (WindowEntryList::const_iterator iter=windows.begin (), end=windows.end (); iter!=end; ++iter)
-        if (env.IsSameObject (view, iter->view.get ()))
-          return iter->window;
-          
-      return 0;
+      try
+      {
+        if (!view)
+          return 0;
+
+        JNIEnv& env = get_env ();
+
+        local_ref<jclass> view_class = env.GetObjectClass (view);
+
+        if (!view_class)
+          throw xtl::format_operation_exception ("", "JNIEnv::GetObjectClass failed (for View)");
+        
+        jmethodID get_window_ref = env.GetMethodID (view_class.get (), "getWindowRef", "()J");
+
+        if (!get_window_ref)
+          return 0;
+
+        return (window_t)check_errors (env.CallLongMethod (view, get_window_ref));
+      }
+      catch (xtl::exception& e)
+      {
+        e.touch ("syslib::AndroidWindowManager::FindWindow");
+        throw;
+      }
     }
     
-  private:
-    struct WindowEntry
-    {
-      global_ref<jobject> view;
-      window_t  window;
-      
-      WindowEntry (jobject in_view, window_t in_window)
-        : view (in_view)
-        , window (in_window)
-      {
-      }
-    };
-  
-    typedef stl::list<WindowEntry> WindowEntryList;
-
   private:
     global_ref<jclass> activity_class;
     jmethodID          create_view_method;
-    WindowEntryList    windows;
 };
 
 typedef common::Singleton<JniWindowManager> JniWindowManagerSingleton;
@@ -422,11 +395,11 @@ template <class Fn> void push_message (jobject view, const Fn& fn)
 {
   try
   {
-    window_t window = JniWindowManagerSingleton::Instance ()->FindWindow (view);
-    
+    window_t window = JniWindowManager::FindWindow (view);
+
     if (!window)
       return;
-    
+
     MessageQueueSingleton::Instance ()->PushMessage (window, MessageQueue::MessagePtr (new WindowMessage<Fn> (window, fn), false));
   }
   catch (...)
@@ -482,9 +455,7 @@ void on_surface_created_callback (JNIEnv& env, jobject view)
     push_message (view, xtl::bind (&window_handle::OnSurfaceCreatedCallback, _1));
     push_message (view, xtl::bind (&window_handle::OnDrawCallback, _1));
 
-    JniWindowManagerSingleton::Instance instance;
-
-    window_t window = instance->FindWindow (view);
+    window_t window = JniWindowManager::FindWindow (view);
 
     if (!window)
       return;    
@@ -520,15 +491,15 @@ window_t AndroidWindowManager::CreateWindow (WindowStyle, WindowMessageHandler h
       throw xtl::make_null_argument_exception ("", "handler");
       
     stl::auto_ptr<window_handle> window (new window_handle);
-    
-    window->view            = JniWindowManagerSingleton::Instance ()->CreateView (init_string);
+
+    window->view            = JniWindowManagerSingleton::Instance ()->CreateView (init_string, window.get ());
     window->message_handler = handler;
     window->user_data       = user_data;
-    
+
       //получение методов
     
     JNIEnv& env = get_env ();
-    
+
     local_ref<jclass> view_class = env.GetObjectClass (window->view.get ());
         
     if (!view_class)
@@ -547,47 +518,35 @@ window_t AndroidWindowManager::CreateWindow (WindowStyle, WindowMessageHandler h
     window->maximize_method             = find_method (&env, view_class.get (), "maximizeThreadSafe", "()V");
     window->get_surface_method          = find_method (&env, view_class.get (), "getSurfaceThreadSafe", "()Landroid/view/Surface;");
     window->post_invalidate_method      = find_method (&env, view_class.get (), "postInvalidate", "()V");
-    
+
       //получение дескриптора поверхности
     
     local_ref<jobject> surface = check_errors (env.CallObjectMethod (window->view.get (), window->get_surface_method));
-    
+
     if (!surface)
       throw xtl::format_operation_exception ("", "EngineView::getSurfaceThreadSafe failed");      
-      
-      //регистрация обработчика окна
-    
-    JniWindowManagerSingleton::Instance ()->RegisterWindow (window->view.get (), window.get ());
 
-    try
+      //ожидание создания поверхности
+            
+    for (;;)
     {
-        //ожидание создания поверхности
-              
-      for (;;)
+      if (window->is_native_handle_received)
       {
-        if (window->is_native_handle_received)
-        {        
-          window->window.native_window = ANativeWindow_fromSurface (&env, surface.get ());
-          window->window.view          = window->view.get ();
+        window->window.native_window = ANativeWindow_fromSurface (&env, surface.get ());
+        window->window.view          = window->view.get ();
 
-          if (!window->window.native_window)
-            throw xtl::format_operation_exception ("", "::ANativeWindow_fromSurface failed");
+        if (!window->window.native_window)
+          throw xtl::format_operation_exception ("", "::ANativeWindow_fromSurface failed");
 
-          break;
-        }
-        
-        static const size_t WAIT_TIME_IN_MICROSECONDS = 100*1000; //100 milliseconds
-        
-        usleep (WAIT_TIME_IN_MICROSECONDS);
+        break;
       }
-    
-      return window.release ();
+      
+      static const size_t WAIT_TIME_IN_MICROSECONDS = 100*1000; //100 milliseconds
+      
+      usleep (WAIT_TIME_IN_MICROSECONDS);
     }
-    catch (...)
-    {
-      JniWindowManagerSingleton::Instance ()->UnregisterWindow (window->view.get ());  
-      throw;
-    }
+  
+    return window.release ();
   }
   catch (xtl::exception& e)
   {
