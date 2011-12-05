@@ -7,7 +7,6 @@ using namespace common;
 
 void AndroidPlatform::MountSystemSpecificPaths ()
 {
-printf ("%s(%u)", __FILE__, __LINE__); fflush (stdout);
   const char* home_dir = getenv ("HOME");
   const char* tmp_dir  = getenv ("TEMP");  
   
@@ -21,7 +20,5 @@ printf ("%s(%u)", __FILE__, __LINE__); fflush (stdout);
   FileSystem::MountLink ("/system/profile", (stl::string ("/std/") + home_dir).c_str ());
   FileSystem::MountLink ("/system/personal", (stl::string ("/std/") + home_dir).c_str ());
   FileSystem::MountLink ("/system/inetcache", (stl::string ("/std/") + tmp_dir).c_str ());
-  FileSystem::MountLink ("/system/temp", (stl::string ("/std/") + tmp_dir).c_str ());
-  
-printf ("%s(%u)", __FILE__, __LINE__); fflush (stdout);  
+  FileSystem::MountLink ("/system/temp", (stl::string ("/std/") + tmp_dir).c_str ());  
 }
