@@ -101,8 +101,8 @@ Key VirtualKey2SystemKey (KeySym vkey)
     case XK_F7:           return Key_F7;
     case XK_F8:           return Key_F8;
     case XK_F9:           return Key_F9;
-    case XK_F10:          return Key_F11;
-    case XK_F11:          return Key_F12;
+    case XK_F10:          return Key_F10;
+    case XK_F11:          return Key_F11;
     case XK_F12:          return Key_F12;
     case XK_Shift_R:
     case XK_Shift_L:      return Key_Shift;
