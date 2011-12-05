@@ -15,6 +15,7 @@ COMMON.SOURCES.DOCUMENTATION_DIRS         := include
 COMMON.SOURCES.COMPILER_DEFINES           := PCRE_STATIC
 COMMON.SOURCES.IMPORTS                    := compile.math.vecmath compile.extern.iconv
 COMMON.SOURCES.unistd.SOURCE_DIRS         := sources/platform/unistd
+COMMON.SOURCES.android.SOURCE_DIRS        := sources/platform/android
 COMMON.SOURCES.cocoa.SOURCE_DIRS          := sources/platform/cocoa
 COMMON.SOURCES.cocoa_desktop.SOURCE_DIRS  := sources/platform/cocoa_desktop
 COMMON.SOURCES.iphone.SOURCE_DIRS         := sources/platform/cocoa_iphone
