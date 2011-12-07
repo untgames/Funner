@@ -9,6 +9,7 @@
 #include <xtl/bind.h>
 #include <xtl/common_exceptions.h>
 #include <xtl/iterator.h>
+#include <xtl/token_iterator.h>
 
 #include <math/vector.h>
 
@@ -66,6 +67,8 @@ struct Params
   stl::string         layers_exclude;                    //неэкспортируемые слои
   common::StringArray loop_sprites;                      //спрайты, требующие лупа
   size_t              crop_alpha;                        //коэффициент обрезания по прозрачности
+  math::vec2f         total_scale;                       //общий коэффициент сжатия по осям
+  math::vec2f         total_offset;                      //общее смещение по осям
   bool                silent;                            //минимальное число сообщений
   bool                print_help;                        //нужно ли печатать сообщение помощи
   bool                need_pot_extent;                   //нужно ли расширять изображения до ближайшей степени двойки
@@ -306,6 +309,22 @@ void command_line_loop_sprites (const char* value, Params& params)
   params.loop_sprites = common::split (value, " ", " \t", "''\"\"");
 }
 
+//установка общего смещения
+void command_line_total_offset (const char* value, Params& params)
+{
+  common::StringArray tokens = common::split (value, ";", " \t");
+
+  params.total_offset = xtl::io::get<math::vec2f> (xtl::io::make_token_iterator (tokens.Data (), tokens.Data () + tokens.Size ()));
+}
+
+//установка общего масштаба
+void command_line_total_scale (const char* value, Params& params)
+{
+  common::StringArray tokens = common::split (value, ";", " \t");
+
+  params.total_scale = xtl::io::get<math::vec2f> (xtl::io::make_token_iterator (tokens.Data (), tokens.Data () + tokens.Size ()));
+}
+
 //разбор командной строки
 void command_line_parse (int argc, const char* argv [], Params& params)
 {
@@ -326,6 +345,8 @@ void command_line_parse (int argc, const char* argv [], Params& params)
     {command_line_inverse_y,                    "inverse-y",                   0,            0,  "inverse Y ort"},
     {command_line_relative,                     "relative",                    0,            0,  "relative coordinates"},
     {command_line_ignore_image_size,            "ignore-image-size",           0,            0,  "do not write image size to output scene"},
+    {command_line_total_scale,                  "total-scale",                 0,            0,  "total scale for animation"},
+    {command_line_total_offset,                 "total-offset",                0,            0,  "total offset for animation"},
     {command_line_silent,                       "silent",                    's',            0,  "quiet mode"},
     {command_line_help,                         "help",                      '?',            0,  "print help message"},    
   };
@@ -913,7 +934,7 @@ void write_events_track (ConvertData& data, const EventList& events)
   }
 }
 
-//запись треков таймлайн-спрйта
+//запись треков таймлайн-спрайта
 void write_timeline_sprite_tracks (Params& params, ConvertData& data, const EventList& events)
 {
   if (!params.ignore_image_size)
@@ -968,8 +989,8 @@ void process_sprite_common
     if (looped)
       data.scene_writer->WriteAttribute ("Loop", "true");
 
-    write_track (data, *x_track, *y_track, name, params.need_relative ? math::vec2f (0.0f) : position,
-      math::vec2f (params.need_inverse_x ? -1.0f : 1.0f, params.need_inverse_y ? -1.0f : 1.0f) * scale);
+    write_track (data, *x_track, *y_track, name, params.need_relative ? math::vec2f (0.0f) : position + params.total_offset / params.total_scale,
+      math::vec2f (params.need_inverse_x ? -1.0f : 1.0f, params.need_inverse_y ? -1.0f : 1.0f) * scale * params.total_scale);
   }
   else if (!equal (position, math::vec2f (.0f), EPSILON) && !params.need_relative)
   {
@@ -983,8 +1004,9 @@ void process_sprite_common
     XmlWriter::Scope key_scope (*data.scene_writer, "Key");
 
     data.scene_writer->WriteAttribute ("Time", 0.0f);
-    data.scene_writer->WriteAttribute ("Value", common::format ("%.3f; %.3f", params.need_inverse_x ? -position.x : position.x,
-      params.need_inverse_y ? -position.y : position.y).c_str ());    
+    data.scene_writer->WriteAttribute ("Value", common::format ("%.3f; %.3f", 
+      params.total_offset.x + params.total_scale.x * (params.need_inverse_x ? -position.x : position.x),
+      params.total_offset.y + params.total_scale.y * (params.need_inverse_y ? -position.y : position.y)).c_str ());    
   }
 
     //сохранение масштаба
@@ -1144,7 +1166,7 @@ void process_sprite (Params& params, ConvertData& data, const Frame& frame, cons
     XmlWriter::Scope key_scope (*data.scene_writer, "Key");    
     
     data.scene_writer->WriteAttribute ("Time",  0.0f);
-    data.scene_writer->WriteAttribute ("Value", common::format ("%u; %u", image_desc.width, image_desc.height).c_str ());
+    data.scene_writer->WriteAttribute ("Value", common::format ("%g; %g", params.total_scale.x * image_desc.width, params.total_scale.y * image_desc.height).c_str ());
   }
   
     //сохранение общей части
@@ -1500,6 +1522,7 @@ int main (int argc, const char *argv[])
     params.need_inverse_y    = false;
     params.need_relative     = false;
     params.ignore_image_size = false;
+    params.total_scale       = math::vec2f (1.0f);
 
       //разбор командной строки
     command_line_parse (argc, argv, params);
