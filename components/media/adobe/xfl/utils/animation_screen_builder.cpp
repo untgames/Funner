@@ -345,8 +345,8 @@ void command_line_parse (int argc, const char* argv [], Params& params)
     {command_line_inverse_y,                    "inverse-y",                   0,            0,  "inverse Y ort"},
     {command_line_relative,                     "relative",                    0,            0,  "relative coordinates"},
     {command_line_ignore_image_size,            "ignore-image-size",           0,            0,  "do not write image size to output scene"},
-    {command_line_total_scale,                  "total-scale",                 0,            0,  "total scale for animation"},
-    {command_line_total_offset,                 "total-offset",                0,            0,  "total offset for animation"},
+    {command_line_total_scale,                  "total-scale",                 0,       "vec2",  "total scale for animation"},
+    {command_line_total_offset,                 "total-offset",                0,       "vec2",  "total offset for animation"},
     {command_line_silent,                       "silent",                    's',            0,  "quiet mode"},
     {command_line_help,                         "help",                      '?',            0,  "print help message"},    
   };
@@ -988,9 +988,10 @@ void process_sprite_common
     
     if (looped)
       data.scene_writer->WriteAttribute ("Loop", "true");
+      
+    math::vec3f track_scale = math::vec2f (params.need_inverse_x ? -1.0f : 1.0f, params.need_inverse_y ? -1.0f : 1.0f) * scale * params.total_scale;
 
-    write_track (data, *x_track, *y_track, name, params.need_relative ? math::vec2f (0.0f) : position + params.total_offset / params.total_scale,
-      math::vec2f (params.need_inverse_x ? -1.0f : 1.0f, params.need_inverse_y ? -1.0f : 1.0f) * scale * params.total_scale);
+    write_track (data, *x_track, *y_track, name, params.need_relative ? math::vec2f (0.0f) : position + params.total_offset / track_scale, track_scale);
   }
   else if (!equal (position, math::vec2f (.0f), EPSILON) && !params.need_relative)
   {
@@ -1006,7 +1007,7 @@ void process_sprite_common
     data.scene_writer->WriteAttribute ("Time", 0.0f);
     data.scene_writer->WriteAttribute ("Value", common::format ("%.3f; %.3f", 
       params.total_offset.x + params.total_scale.x * (params.need_inverse_x ? -position.x : position.x),
-      params.total_offset.y + params.total_scale.y * (params.need_inverse_y ? -position.y : position.y)).c_str ());    
+      params.total_offset.y + params.total_scale.y * (params.need_inverse_y ? -position.y : position.y)).c_str ());
   }
 
     //сохранение масштаба
@@ -1253,6 +1254,9 @@ float process_symbol_instance (Params& params, ConvertData& data, const Frame& f
 
   if (params.need_inverse_y)
     transformation_point.y *= -1.0f;  
+    
+  transformation_point *= params.total_scale;
+  transformation_point += params.total_offset;
 
   stl::string pivot_value_string = common::format ("%.3f;%.3f", transformation_point.x, transformation_point.y);
 
