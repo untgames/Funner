@@ -1006,8 +1006,8 @@ void process_sprite_common
 
     data.scene_writer->WriteAttribute ("Time", 0.0f);
     data.scene_writer->WriteAttribute ("Value", common::format ("%.3f; %.3f", 
-      params.total_offset.x + params.total_scale.x * (params.need_inverse_x ? -position.x : position.x),
-      params.total_offset.y + params.total_scale.y * (params.need_inverse_y ? -position.y : position.y)).c_str ());
+      params.total_scale.x * (params.need_inverse_x ? -position.x : position.x),
+      params.total_scale.y * (params.need_inverse_y ? -position.y : position.y)).c_str ());
   }
 
     //сохранение масштаба
@@ -1256,7 +1256,7 @@ float process_symbol_instance (Params& params, ConvertData& data, const Frame& f
     transformation_point.y *= -1.0f;  
     
   transformation_point *= params.total_scale;
-  transformation_point += params.total_offset;
+//  transformation_point += params.total_offset;
 
   stl::string pivot_value_string = common::format ("%.3f;%.3f", transformation_point.x, transformation_point.y);
 
