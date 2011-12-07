@@ -69,6 +69,7 @@ struct Params
   size_t              crop_alpha;                        //коэффициент обрезания по прозрачности
   math::vec2f         total_scale;                       //общий коэффициент сжатия по осям
   math::vec2f         total_offset;                      //общее смещение по осям
+  stl::string         root_sprite;                       //имя корневого спрайта
   bool                silent;                            //минимальное число сообщений
   bool                print_help;                        //нужно ли печатать сообщение помощи
   bool                need_pot_extent;                   //нужно ли расширять изображения до ближайшей степени двойки
@@ -1006,8 +1007,8 @@ void process_sprite_common
 
     data.scene_writer->WriteAttribute ("Time", 0.0f);
     data.scene_writer->WriteAttribute ("Value", common::format ("%.3f; %.3f", 
-      params.total_scale.x * (params.need_inverse_x ? -position.x : position.x),
-      params.total_scale.y * (params.need_inverse_y ? -position.y : position.y)).c_str ());
+      params.need_inverse_x ? -position.x : position.x,
+      params.need_inverse_y ? -position.y : position.y).c_str ());
   }
 
     //сохранение масштаба
@@ -1255,14 +1256,24 @@ float process_symbol_instance (Params& params, ConvertData& data, const Frame& f
   if (params.need_inverse_y)
     transformation_point.y *= -1.0f;  
     
-  transformation_point *= params.total_scale;
-//  transformation_point += params.total_offset;
-
   stl::string pivot_value_string = common::format ("%.3f;%.3f", transformation_point.x, transformation_point.y);
 
   data.scene_writer->WriteAttribute ("PivotPosition", pivot_value_string.c_str ());
   data.scene_writer->WriteAttribute ("ScalePivotEnabled", "true");
   data.scene_writer->WriteAttribute ("OrientationPivotEnabled", "true");
+  
+  if (!params.root_sprite.empty ())
+  {
+    data.scene_writer->WriteAttribute ("Parent", params.root_sprite);
+    data.scene_writer->WriteAttribute ("ScaleInherit", "false");
+    data.scene_writer->WriteAttribute ("OrientationInherit", "true");
+    data.scene_writer->WriteAttribute ("PositionSpace", "local");
+    data.scene_writer->WriteAttribute ("ScaleSpace", "local");
+    data.scene_writer->WriteAttribute ("OrientationSpace", "local");
+    data.scene_writer->WriteAttribute ("BindSpace", "parent");
+    data.scene_writer->WriteAttribute ("ScalePivotEnabled", "false");
+    data.scene_writer->WriteAttribute ("OrientationPivotEnabled", "true");
+  }
 
   process_sprite_common (params, data, frame, name_prefix, looped, element.Translation ());
   write_timeline_sprite_tracks (params, data, events);
@@ -1410,9 +1421,52 @@ void process_timeline (Params& params, ConvertData& data)
   data.scene_writer = stl::auto_ptr<XmlWriter> (new XmlWriter (params.output_scene_file_name.c_str ()));
   
   XmlWriter::Scope scope (*data.scene_writer, "AnimationScreenPart");
-  
-  EventList events;
 
+  EventList events;          
+    
+  if (!math::equal (params.total_scale, math::vec2f (1.0f), 0.1f) || !math::equal (params.total_offset, math::vec2f (0.0f), 0.1f))
+  {
+    XmlWriter::Scope sprite_scope (*data.scene_writer, "Sprite");
+    
+    params.root_sprite = common::format ("%s.%s", data.document.Timelines ()[(size_t)0].Name (), "__total_modifier");
+    
+    data.scene_writer->WriteAttribute ("Name", params.root_sprite);
+    data.scene_writer->WriteAttribute ("Material", "transparent");
+    data.scene_writer->WriteAttribute ("Z", "0");
+//    data.scene_writer->WriteAttribute ("Active", "false");
+    
+    if (!math::equal (params.total_scale, math::vec2f (1.0f), 0.1f))
+    {
+      XmlWriter::Scope scale_scope (*data.scene_writer, "Track");
+      
+      data.scene_writer->WriteAttribute ("Name", "size");
+
+      XmlWriter::Scope key_scope (*data.scene_writer, "Key");
+
+      data.scene_writer->WriteAttribute ("Time", "0");
+      data.scene_writer->WriteAttribute ("Value", common::format ("%g;%g", params.total_scale.x, params.total_scale.y));
+    }
+    
+    if (!math::equal (params.total_offset, math::vec2f (0.0f), 0.1f))
+    {
+      XmlWriter::Scope scale_scope (*data.scene_writer, "Track");
+      
+      data.scene_writer->WriteAttribute ("Name", "position");
+
+      XmlWriter::Scope key_scope (*data.scene_writer, "Key");
+
+      data.scene_writer->WriteAttribute ("Time", "0");
+      data.scene_writer->WriteAttribute ("Value", common::format ("%g;%g", params.total_offset.x, params.total_offset.y));
+    }
+    
+//    Event event;
+    
+//    event.time   = 0.0f;
+//    event.action = common::format ("ActivateSprite ('%s')", params.root_sprite.c_str ());
+    
+//    events.push_back (event);
+  }
+  
   process_timeline (params, data, data.document.Timelines ()[(size_t)0], data.document.Timelines ()[(size_t)0].Name (), events);
   
   XmlWriter::Scope sprite_scope (*data.scene_writer, "Sprite");
@@ -1485,15 +1539,15 @@ void export_data (Params& params)
     build_used_symbols (params, *iter, data.used_symbols);
     
     //обработка текстур
-    
+
   process_textures (params, data);
-  
+
     //обработка таймлайна
-    
+
   process_timeline (params, data);
-    
+
     //обработка материалов
-    
+
   process_materials (params, data);
 }
 
