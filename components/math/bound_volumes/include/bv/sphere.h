@@ -103,6 +103,7 @@ template <class T> sphere<T>           operator * (const math::quat<T>&, const s
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 template <class T> bool intersects (const sphere<T>&, const sphere<T>&);
 template <class T> bool intersects (const sphere<T>&, const axis_aligned_box<T>&);
+template <class T> bool intersects (const sphere<T>&, const plane_list<T>&);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Проверка: содержит ли ограничивающая сфера различные примитивы

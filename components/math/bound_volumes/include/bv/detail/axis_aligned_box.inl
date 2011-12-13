@@ -113,11 +113,13 @@ inline T axis_aligned_box<T>::radius () const
 template <class T>
 inline bool axis_aligned_box<T>::empty () const
 {
+  size_t counter = 0;
+
   for (size_t i=0; i<3; i++)
     if (min_extent [i] >= max_extent [i])
-      return true;
+      counter++;
 
-  return false;
+  return counter == 3;
 }
 
 /*
@@ -242,9 +244,14 @@ inline axis_aligned_box<T> axis_aligned_box<T>::operator * (const math::matrix<T
 {
   axis_aligned_box box;
   
-  box.min_extent = box.max_extent = tm * min_extent;
+  vec_type corners [8];
 
-  box += tm * max_extent;
+  get_corners (corners);
+
+  box.reset (tm * corners [0]);
+
+  for (size_t i = 1; i < 6; i++)
+    box += tm * corners [i];
 
   return box;
 }
@@ -254,7 +261,7 @@ inline axis_aligned_box<T> axis_aligned_box<T>::operator * (const math::quat<T>&
 {
   axis_aligned_box box;
 
-  box.min_extent = box.max_extent = q * min_extent;
+  box.min_extent = box.max_extent = q * min_extent;   //WRONG!!!!!!!
 
   box += q * max_extent;
 
@@ -314,6 +321,12 @@ template <class T>
 inline bool intersects (const axis_aligned_box<T>& box, const sphere<T>& sphere)
 {
   return intersects (sphere, box);
+}
+
+template <class T>
+inline bool intersects (const axis_aligned_box<T>& box, const plane_list<T>& plane)
+{
+  return intersects (plane, box);
 }
 
 /*

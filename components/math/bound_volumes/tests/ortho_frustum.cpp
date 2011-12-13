@@ -29,6 +29,7 @@ int main()
 
   printf ("intersects with box1: %s\n", intersects (p1, aaboxf (15.f, 20.f)) ? "true" : "false");
   printf ("intersects with box2: %s\n", intersects (p1, aaboxf (5.f, 15.f)) ? "true" : "false");
+  printf ("intersects with box3: %s\n", intersects (p1, aaboxf (vec3f (-5.f, -5.f, 0.f), vec3f (5.f, 5.f, 0.f))) ? "true" : "false");
   printf ("intersects with sphere1: %s\n", intersects (p1, spheref (vec3f (20.f, 0.f, 0.f), 5.f)) ? "true" : "false");
   printf ("intersects with sphere2: %s\n", intersects (p1, spheref (vec3f (20.f, 0.f, 0.f), 15.f)) ? "true" : "false");
   printf ("contains box1: %s\n", contains (p1, aaboxf (5.f, 15.f)) ? "true" : "false");

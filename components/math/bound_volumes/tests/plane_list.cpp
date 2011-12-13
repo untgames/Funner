@@ -45,10 +45,12 @@ int main()
   p1.add (planef (vec3f (-1.f, 0.f, 0.f), 1.f));
 
   printf ("intersects with box1: %s\n", intersects (p1, aaboxf (1.5f, 2.f)) ? "true" : "false");
+  printf ("swap intersects with box1: %s\n", intersects (aaboxf (1.5f, 2.f), p1) ? "true" : "false");
   printf ("intersects with box2: %s\n", intersects (p1, aaboxf (0.5f, 1.5f)) ? "true" : "false");
   printf ("intersects with box3: %s\n", intersects (p1, aaboxf (1.5f, 2.f), 0.6f) ? "true" : "false");
   printf ("intersects with empty box: %s\n", intersects (p1, aaboxf ()) ? "true" : "false");
   printf ("intersects with sphere1: %s\n", intersects (p1, spheref (vec3f (2.f, 0.f, 0.f), 0.5f)) ? "true" : "false");
+  printf ("swap intersects with sphere1: %s\n", intersects (spheref (vec3f (2.f, 0.f, 0.f), 0.5f), p1) ? "true" : "false");
   printf ("intersects with sphere2: %s\n", intersects (p1, spheref (vec3f (2.f, 0.f, 0.f), 1.5f)) ? "true" : "false");
   printf ("intersects with sphere3: %s\n", intersects (p1, spheref (vec3f (2.f, 0.f, 0.f), 0.5f), 0.6f) ? "true" : "false");
   printf ("intersects with empty sphere: %s\n", intersects (p1, aaboxf ()) ? "true" : "false");

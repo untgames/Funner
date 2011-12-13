@@ -233,6 +233,12 @@ inline bool intersects (const sphere<T>& s, const axis_aligned_box<T>& box)
   return min_distance < detail::sqr (s.radius ());
 }
 
+template <class T>
+inline bool intersects (const sphere<T>& s, const plane_list<T>& p)
+{
+  return intersects (p, s);
+}
+
 /*
     Проверка: содержит ли ограничивающая сфера различные примитивы
 */
