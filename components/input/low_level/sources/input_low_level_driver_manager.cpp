@@ -191,8 +191,8 @@ IDevice* DriverManagerImpl::CreateDevice (const char* driver_mask, const char* d
     {
       for (size_t i = 0; i < iter->driver->GetDevicesCount (); i++)
       {
-        if (wcimatch (iter->driver->GetDeviceName (i), device_mask))
-          return iter->driver->CreateDevice (iter->driver->GetDeviceName (i), init_string);
+        if (wcimatch (iter->driver->GetDeviceFullName (i), device_mask))
+          return iter->driver->CreateDevice (iter->driver->GetDeviceFullName (i), init_string);
       }
     }
     

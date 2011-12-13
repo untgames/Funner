@@ -68,7 +68,7 @@ int main ()
     {
       printf ("  %u: name is '%s'", i + 1, direct_input_driver->GetDeviceName (i));
 
-      devices.push_back (DevicePtr (DriverManager::CreateDevice ("*", direct_input_driver->GetDeviceName (i), "buffer_size=0"), false));
+      devices.push_back (DevicePtr (DriverManager::CreateDevice ("*", direct_input_driver->GetDeviceFullName (i), "buffer_size=0"), false));
 
       devices.back ()->RegisterEventHandler (xtl::bind (&input_event_handler, devices.back ().get (), _1));
 

@@ -5,3 +5,5 @@ export.compile.input.low_level.IMPORTS	    := compile.common
 # Link exports
 export.link.input.low_level.LIBS    := funner.input.low_level
 export.link.input.low_level.IMPORTS := link.common
+
+export.info.input.low_level.CHMS := funner.input.low_level

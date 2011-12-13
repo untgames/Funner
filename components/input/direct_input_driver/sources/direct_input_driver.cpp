@@ -171,7 +171,7 @@ class Driver: virtual public IDriver, public xtl::reference_counter
         init_string = "";
 
       for (DeviceEntries::iterator iter = device_entries.begin (), end = device_entries.end (); iter != end; ++iter)
-        if (!xtl::xstrcmp ((*iter)->device_name.c_str (), name))
+        if (!xtl::xstrcmp ((*iter)->device_full_name.c_str (), name))
         {
           HRESULT create_result;
 

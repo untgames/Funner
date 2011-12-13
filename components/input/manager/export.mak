@@ -17,3 +17,6 @@ export.link.input.manager.xkeymap.IMPORTS       := link.input.manager link.commo
 # xkeyreg link exports
 export.link.input.manager.xkeyreg.LINK_INCLUDES := XKeyregLoader XKeyregSaver
 export.link.input.manager.xkeyreg.IMPORTS       := link.input.manager link.common.xml
+
+export.info.input.manager.CHMS := funner.input.manager
+
