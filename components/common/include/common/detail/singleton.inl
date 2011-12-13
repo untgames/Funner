@@ -59,7 +59,7 @@ inline void SingletonCreateUsingMalloc<T>::Destroy (T* object)
 template <class T>
 inline T* SingletonStatic<T>::Create ()
 {
-  struct Test;
+  struct UndefinedClassForMemberPointers;
   union  MaxAlign
   {
     char        object_buffer [sizeof (T)];
@@ -69,8 +69,8 @@ inline T* SingletonStatic<T>::Create ()
     float       float_value;
     double      double_value;
     long double long_double_value;
-    int         Test::*member_ptr;
-    int         (Test::*member_function_ptr)(int);
+    int         UndefinedClassForMemberPointers::*member_ptr;
+    int         (UndefinedClassForMemberPointers::*member_function_ptr)(int);
   };
 
   static MaxAlign static_buffer;

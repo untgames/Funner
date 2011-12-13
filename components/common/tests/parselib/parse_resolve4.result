@@ -1,4 +1,4 @@
 Results of parse_resolve4_test:
 Parse successfull
 root (source='', line=0): {}
- A (source='', line=1): {. windows}
+ A (source='data/test6.wxf', line=1): {. windows}
