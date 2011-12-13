@@ -41,7 +41,7 @@ const char* get_name (UsageMode param)
 //сгенерировано автоматически, не изменять руками (см. утилиту get_name_bind_flags_gen.cpp)
 const char* get_name (BindFlag param)
 {
-  switch (param)
+  switch ((int)param)
   {
     case 0: return "0";
     case BindFlag_VertexBuffer: return "BindFlag_VertexBuffer";
@@ -114,7 +114,7 @@ const char* get_name (BindFlag param)
 
 const char* get_name (AccessFlag param)
 {
-  switch (param)
+  switch ((int)param)
   {
     case 0:                                  return "no_access";
     case AccessFlag_Read:                    return "read";
@@ -225,7 +225,7 @@ const char* get_name (BlendArgument param)
 
 const char* get_name (ColorWriteFlag param)
 {
-  switch (param)
+  switch ((int)param)
   {
     case 0:                                                                 return "empty";
     case ColorWriteFlag_Red:                                                return "red";
