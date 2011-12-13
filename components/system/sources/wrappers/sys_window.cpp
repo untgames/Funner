@@ -10,7 +10,7 @@ const size_t MAX_TITLE_LENGTH = 256;
     Описание реализации Window
 */
 
-struct Window::Impl
+struct Window::Impl: public xtl::trackable
 {
   public:
 ///Конструктор
@@ -50,7 +50,7 @@ struct Window::Impl
         style         = in_style;
         parent_handle = parent;
         
-        Platform::window_t new_handle = Platform::CreateWindow (style, &MessageHandler, parent, init_string.c_str (), this);
+        window_t new_handle = Platform::CreateWindow (style, &MessageHandler, parent, init_string.c_str (), this);
 
         SetHandle (new_handle);
 
@@ -89,11 +89,13 @@ struct Window::Impl
     
 ///Стиль окна
     WindowStyle Style () const { return style; }
+    
+    void SetStyle (WindowStyle in_style) { style = in_style; }
 
 ///Низкоуровневый дескриптор окна
-    Platform::window_t Handle () const { return handle; }
+    window_t Handle () const { return handle; }
 
-    Platform::window_t CheckedHandle () const
+    window_t CheckedHandle () const
     {
       if (!handle)
         throw xtl::message_exception<ClosedWindowException> ("syslib::Window::Impl::CheckedHandle", "Closed window exception");
@@ -105,12 +107,12 @@ struct Window::Impl
     WindowCursor& Cursor () { return cursor; }
 
 ///Установка низкоуровневого дескриптора окна
-    void SetHandle (Platform::window_t new_handle)
+    void SetHandle (window_t new_handle)
     {
       if (handle == new_handle)
         return;
 
-      handle = new_handle;
+      handle = new_handle;      
 
       Notify (WindowEvent_OnChangeHandle);
     }
@@ -179,7 +181,7 @@ struct Window::Impl
           new_viewport = Rect (0, 0, client_rect.right - client_rect.left, client_rect.bottom - client_rect.top);
         }
 
-          //обновление кэша                  
+          //обновление кэша
         
         need_update_viewport = false;
         viewport             = new_viewport;
@@ -266,14 +268,14 @@ struct Window::Impl
 
       memset (&context, 0, sizeof (context));
 
-      context.handle = handle;
+      context.handle = Platform::GetNativeWindowHandle (handle);
 
       Notify (event, context);    
     }
 
   private:
 ///Обработчик событий окна
-    static void MessageHandler (Platform::window_t wnd, WindowEvent event, const WindowEventContext& context, void* user_data)
+    static void MessageHandler (window_t wnd, WindowEvent event, const WindowEventContext& context, void* user_data)
     {
       Impl* impl = reinterpret_cast<Impl*> (user_data);
       
@@ -297,49 +299,15 @@ struct Window::Impl
 
             break;
           }
-          case WindowEvent_OnChangeHandle:  //изменение дескриптора окна, фактически создание окна
-            impl->SetHandle ((Platform::window_t)context.handle);
-            break;
           case WindowEvent_OnDestroy: //окно уничтожено
             impl->SetHandle (0);
             break;
-          case WindowEvent_OnActivate:                //окно стало активным
-          case WindowEvent_OnDeactivate:              //окно перестало быть активным
-          case WindowEvent_OnShow:                    //окно стало видимым
-          case WindowEvent_OnHide:                    //окно стало не видимым
-          case WindowEvent_OnSetFocus:                //окно получило фокус ввода
-          case WindowEvent_OnLostFocus:               //окно потеряло фокус ввода
-          case WindowEvent_OnPaint:                   //необходима перерисовка
-          case WindowEvent_OnMove:                    //изменилось положение окна
-          case WindowEvent_OnMouseMove:               //курсор мыши переместился над областью окна
-          case WindowEvent_OnMouseLeave:              //курсор мыши вышел за пределы области окна
-          case WindowEvent_OnMouseVerticalWheel:      //изменилось положение вертикального колеса мыши
-          case WindowEvent_OnMouseHorisontalWheel:    //изменилось положение горизонтального колеса мыши
-          case WindowEvent_OnLeftButtonDown:          //нажата левая кнопка мыши
-          case WindowEvent_OnLeftButtonUp:            //отпущена левая кнопка мыши
-          case WindowEvent_OnLeftButtonDoubleClick:   //двойной щелчок левой кнопкой мыши
-          case WindowEvent_OnRightButtonDown:         //нажата правая кнопка мыши
-          case WindowEvent_OnRightButtonUp:           //отпущена правая кнопка мыши
-          case WindowEvent_OnRightButtonDoubleClick:  //двойной щелчок правой кнопкой мыши
-          case WindowEvent_OnMiddleButtonDown:        //нажата средняя кнопка мыши
-          case WindowEvent_OnMiddleButtonUp:          //отпущена средняя кнопка мыши
-          case WindowEvent_OnMiddleButtonDoubleClick: //двойной щелчок средней кнопкой мыши
-          case WindowEvent_OnXButton1Down:            //нажата первая Х кнопка мыши
-          case WindowEvent_OnXButton1Up:              //отпущена первая Х кнопка мыши
-          case WindowEvent_OnXButton1DoubleClick:     //двойной щелчок первой Х кнопкой мыши
-          case WindowEvent_OnXButton2Down:            //нажата вторая Х кнопка мыши
-          case WindowEvent_OnXButton2Up:              //отпущена вторая Х кнопка мыши
-          case WindowEvent_OnXButton2DoubleClick:     //двойной щелчок второй Х кнопкой мыши
-          case WindowEvent_OnKeyDown:                 //нажата клавиша клавиатуры
-          case WindowEvent_OnKeyUp:                   //отпущена клавиша клавиатуры
-          case WindowEvent_OnChar:                    //в буфере ввода окна появился символ
-            impl->Notify (event, context);
-            break;
-          case WindowEvent_OnSize:                    //изменились размеры окна          
+          case WindowEvent_OnSize:    //изменились размеры окна
             impl->InvalidateViewport ();
             impl->Notify (event, context);
             break;          
           default:          
+            impl->Notify (event, context);
             break;
         }
       }
@@ -354,7 +322,7 @@ struct Window::Impl
 
   private:
     Window*               window;                             //указатель на владельца
-    Platform::window_t    handle;                             //низкоуровневый дескриптор окна
+    window_t              handle;                             //низкоуровневый дескриптор окна
     const void*           parent_handle;                      //низкоуровневый дескриптор родительского окна
     WindowStyle           style;                              //стиль окна
     stl::string           init_string;                        //строка инициализации окна
@@ -558,15 +526,37 @@ WindowStyle Window::Style () const
 void Window::SetStyle (WindowStyle style)
 {
   try
-  {
+  {        
     if (impl->Handle ())
     {
       if (style == impl->Style ())
         return;
         
-      Rect window_rect = WindowRect ();
+        //попытка изменения стиля
+        
+      switch (style)
+      {
+        case WindowStyle_Overlapped:
+        case WindowStyle_PopUp:
+          break;
+        default:
+          throw xtl::make_argument_exception ("", "style", style);
+      }
+        
+      if (Platform::ChangeWindowStyle (impl->Handle (), style))
+      {
+        impl->SetStyle (style);
+      }
+      else
+      {        
+          //пересоздания окна
+        
+        Rect window_rect = WindowRect ();
 
-      impl->Init (style, impl->ParentHandle (), IsVisible (), &window_rect);
+        impl->Init (style, impl->ParentHandle (), IsVisible (), &window_rect);                
+      }
+      
+      impl->Notify (WindowEvent_OnChangeStyle);      
     }
     else
     {
@@ -970,7 +960,7 @@ void Window::SetCursor (const WindowCursor& cursor)
 {
   try
   {
-    Platform::SetCursor (impl->CheckedHandle (), (Platform::cursor_t)cursor.Handle ());
+    Platform::SetCursor (impl->CheckedHandle (), (cursor_t)cursor.Handle ());
     
     impl->Cursor () = cursor;
   }
@@ -984,6 +974,36 @@ void Window::SetCursor (const WindowCursor& cursor)
 WindowCursor Window::Cursor () const
 {
   return impl->Cursor ();
+}
+
+/*
+   Установка/получение multitouch режима для окна
+*/
+
+void Window::SetMultitouchEnabled (bool state)
+{
+  try
+  {
+    Platform::SetMultitouchEnabled (impl->CheckedHandle (), state);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("syslib::Window::SetMultitouchEnabled");
+    throw;
+  }
+}
+
+bool Window::IsMultitouchEnabled () const
+{
+  try
+  {
+    return Platform::IsMultitouchEnabled (impl->CheckedHandle ());
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("syslib::Window::SetMultitouchEnabled");
+    throw;
+  }
 }
 
 /*
@@ -1210,6 +1230,36 @@ void Window::Invalidate ()
 }
 
 /*
+    Поиск экрана вмещающего окно
+*/
+
+Screen Window::ContainingScreen () const
+{
+  try
+  {
+    return ContainingScreen (Platform::GetNativeWindowHandle (impl->CheckedHandle ()));
+  }
+  catch (xtl::exception& exception)
+  {
+    exception.touch ("syslib::Window::ContainingScreen()");
+    throw;
+  }
+}
+
+Screen Window::ContainingScreen (const void* native_handle)
+{
+  try
+  {
+    return Screen::ContainingScreen (native_handle);
+  }
+  catch (xtl::exception& exception)
+  {
+    exception.touch ("syslib::Window::ContainingScreen(const void*)");
+    throw;
+  }
+}
+
+/*
     Подписка на события окна
 */
 
@@ -1246,4 +1296,23 @@ void Window::SetDebugLog (const LogHandler& debug_log)
 const Window::LogHandler& Window::DebugLog () const
 {
   return impl->DebugLog ();
+}
+
+/*
+    Получение объекта оповещения об удалении окна
+*/
+
+xtl::trackable& Window::Trackable () const
+{
+  return *impl;
+}
+
+namespace syslib
+{
+
+xtl::trackable& get_trackable (const Window& window)
+{
+  return window.Trackable ();
+}
+
 }

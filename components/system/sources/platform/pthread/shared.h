@@ -15,17 +15,29 @@
 
 #include <syslib/thread.h>
 
-#include <platform/platform.h>
+#include <shared/platform.h>
 
 namespace syslib
 {
 
-struct Platform::mutex_handle
+struct mutex_handle
 {
   pthread_mutex_t mutex;
 };
 
 //генерация исключения с кодом ошибки
 void pthread_raise_error (const char* source, int status);
+
+#ifdef _WIN32
+
+void thread_init ();      //функция инициализации библиотеки
+void thread_done (void*); //функция деинициализации библиотеки
+
+#else
+
+inline void thread_init () {}
+inline void thread_done (void*) {}
+
+#endif
 
 }

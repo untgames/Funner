@@ -9,9 +9,9 @@ using namespace common;
 
 struct DynamicLibrary::Impl
 {
-  Platform::dll_t handle;       //дескриптор библиотеки
-  stl::string     name;         //имя библиотеки
-  stl::wstring    name_unicode; //unicode имя библиотеки
+  dll_t        handle;       //дескриптор библиотеки
+  stl::string  name;         //имя библиотеки
+  stl::wstring name_unicode; //unicode имя библиотеки
   
   Impl () : handle (0) {}
 };

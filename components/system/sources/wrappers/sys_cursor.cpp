@@ -9,8 +9,8 @@ using namespace syslib;
 
 struct WindowCursor::Impl: public xtl::reference_counter
 {
-  stl::string        image_name;   //имя курсора
-  Platform::cursor_t handle;       //дескриптор курсора
+  stl::string  image_name;   //имя курсора
+  cursor_t     handle;       //дескриптор курсора
   
   Impl () : handle (0) {}
   

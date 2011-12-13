@@ -4,16 +4,18 @@
 
 using namespace syslib;
 
-struct Platform::semaphore_handle
+struct syslib::semaphore_handle
 {
   sem_t semaphore;
 };
 
 //создание семафора
-Platform::semaphore_t Platform::CreateSemaphore (size_t initial_value)
+semaphore_t PThreadManager::CreateSemaphore (size_t initial_value)
 {
   try
   {
+    thread_init ();
+    
     stl::auto_ptr<semaphore_handle> handle (new semaphore_handle);
 
     int status = sem_init (&handle->semaphore, 0, initial_value);
@@ -25,13 +27,13 @@ Platform::semaphore_t Platform::CreateSemaphore (size_t initial_value)
   }
   catch (xtl::exception& exception)
   {
-    exception.touch ("syslib::PThreadPlatform::CreateSemaphore");
+    exception.touch ("syslib::PThreadManager::CreateSemaphore");
     throw;
   }
 }
 
 //уничтожение семафора
-void Platform::DestroySemaphore (semaphore_t handle)
+void PThreadManager::DestroySemaphore (semaphore_t handle)
 {
   try
   {
@@ -44,13 +46,13 @@ void Platform::DestroySemaphore (semaphore_t handle)
   }
   catch (xtl::exception& exception)
   {
-    exception.touch ("syslib::PThreadPlatform::DestroySemaphore");
+    exception.touch ("syslib::PThreadManager::DestroySemaphore");
     throw;
   }
 }
 
 //ожидание следующей задачи
-void Platform::WaitSemaphore (semaphore_t handle)
+void PThreadManager::WaitSemaphore (semaphore_t handle)
 {
   try
   {
@@ -61,19 +63,19 @@ void Platform::WaitSemaphore (semaphore_t handle)
   }
   catch (xtl::exception& exception)
   {
-    exception.touch ("syslib::PThreadPlatform::WaitSemaphore(semaphore_t)");
+    exception.touch ("syslib::PThreadManager::WaitSemaphore(semaphore_t)");
     throw;
   }
 }
 
 //ожидание следующей задачи с таймаутом
-bool Platform::WaitSemaphore (semaphore_t handle, size_t wait_in_milliseconds)
+bool PThreadManager::WaitSemaphore (semaphore_t handle, size_t wait_in_milliseconds)
 {
-  throw xtl::make_not_implemented_exception ("syslib::PThreadPlatform::WaitSemaphore(semaphore_t, size_t)");
+  throw xtl::make_not_implemented_exception ("syslib::PThreadManager::WaitSemaphore(semaphore_t, size_t)");
 }
 
 //попытка ожидания следующей задачи
-bool Platform::TryWaitSemaphore (semaphore_t handle)
+bool PThreadManager::TryWaitSemaphore (semaphore_t handle)
 {
   try
   {
@@ -90,13 +92,13 @@ bool Platform::TryWaitSemaphore (semaphore_t handle)
   }
   catch (xtl::exception& exception)
   {
-    exception.touch ("syslib::PThreadPlatform::TryWaitSemaphore");
+    exception.touch ("syslib::PThreadManager::TryWaitSemaphore");
     throw;
   }
 }
 
 //посылка следующей задачи
-void Platform::PostSemaphore (semaphore_t handle)
+void PThreadManager::PostSemaphore (semaphore_t handle)
 {
   try
   {
@@ -107,7 +109,7 @@ void Platform::PostSemaphore (semaphore_t handle)
   }
   catch (xtl::exception& exception)
   {
-    exception.touch ("syslib::PThreadPlatform::PostSemaphore");
+    exception.touch ("syslib::PThreadManager::PostSemaphore");
     throw;
   }
 }

@@ -13,16 +13,46 @@
 #include "shared.h"
 
 using namespace syslib;
+using namespace syslib::macosx;
+
+@interface WindowDisposer : NSObject
+{
+  @private
+    WindowRef window;
+}
+
+@end
+
+@implementation WindowDisposer
+
+-(id)initWithWindow:(WindowRef)in_window
+{
+  self = [super init];
+
+  if (!self)
+    return nil;
+
+  window = in_window;
+
+  return self;
+}
+
+-(void)dispose
+{
+  DisposeWindow (window);
+}
+
+@end
 
 namespace
 {
-
-const char* LOG_NAME = "syslib.Platform";
 
 const OSType WINDOW_PROPERTY_CREATOR     = 'untg';  //тег приложения
 const OSType FULLSCREEN_PROPERTY_TAG     = 'fscr';  //тег свойства полноэкранности
 const OSType CURSOR_VISIBLE_PROPERTY_TAG = 'hcrs';  //тег видимости курсора (если истина - курсор виден)
 const OSType WINDOW_IMPL_PROPERTY        = 'impl';  //указатель на реализацию данного окна
+//const UInt32 UNTGS_EVENT_CLASS           = 'untg';  //класс событий приложения
+//const UInt32 DELETE_WINDOW_EVENT         = 'dwnd';  //событие удаления окна
 
 const size_t CHAR_CODE_BUFFER_SIZE = 4;  //размер буффера для декодированного имени символа
 
@@ -32,22 +62,24 @@ const size_t CHAR_CODE_BUFFER_SIZE = 4;  //размер буффера для декодированного им
 
 struct WindowImpl
 {
-  void*                          user_data;                               //указатель на пользовательские данные
-  Platform::WindowMessageHandler message_handler;                         //функция обработки сообщений окна
-  EventHandlerRef                carbon_window_event_handler;             //обработчик сообщений окна
-  EventHandlerUPP                carbon_window_event_handler_proc;        //обработчик сообщений окна
-  EventHandlerRef                carbon_application_event_handler;        //обработчик сообщений приложения
-  EventHandlerUPP                carbon_application_event_handler_proc;   //обработчик сообщений приложения
-  WindowRef                      carbon_window;                           //окно
-  UniChar                        char_code_buffer[CHAR_CODE_BUFFER_SIZE]; //буффер для получения имени введенного символа
-  bool                           is_cursor_in_window;                     //находится ли курсор в окне
-  NSCursor                       *cursor;                                 //курсор отображаемый над окном
-  bool                           background_state;                        //включен ли задний фон
-  Color                          background_color;                        //цвет заднего фона
-  WindowGroupRef                 window_group;
-  bool                           is_maximized;                            //окно находится в полноэкранном режиме
+  void*                user_data;                               //указатель на пользовательские данные
+  WindowMessageHandler message_handler;                         //функция обработки сообщений окна
+  EventHandlerRef      carbon_window_event_handler;             //обработчик сообщений окна
+  EventHandlerUPP      carbon_window_event_handler_proc;        //обработчик сообщений окна
+  EventHandlerRef      carbon_application_event_handler;        //обработчик сообщений приложения
+  EventHandlerUPP      carbon_application_event_handler_proc;   //обработчик сообщений приложения
+  WindowRef            carbon_window;                           //окно
+  UniChar              char_code_buffer[CHAR_CODE_BUFFER_SIZE]; //буффер для получения имени введенного символа
+  bool                 is_cursor_in_window;                     //находится ли курсор в окне
+  NSCursor             *cursor;                                 //курсор отображаемый над окном
+  bool                 background_state;                        //включен ли задний фон
+  Color                background_color;                        //цвет заднего фона
+  WindowGroupRef       window_group;
+  bool                 is_maximized;                            //окно находится в полноэкранном режиме
+  bool                 is_multitouch_enabled;                   //включен ли multitouch
+  bool                 collapsed_by_user;                       //было ли окно свернуто пользователем
 
-  WindowImpl (Platform::WindowMessageHandler handler, void* in_user_data)
+  WindowImpl (WindowMessageHandler handler, void* in_user_data)
     : user_data (in_user_data)
     , message_handler (handler)
     , carbon_window_event_handler (0)
@@ -60,6 +92,8 @@ struct WindowImpl
     , background_state (false)
     , window_group (0)
     , is_maximized (false)
+    , is_multitouch_enabled (false)
+    , collapsed_by_user (false)
     {}
 
   ~WindowImpl ()
@@ -76,8 +110,15 @@ struct WindowImpl
     if (carbon_application_event_handler_proc)
       DisposeEventHandlerUPP (carbon_application_event_handler_proc);
 
-    if (carbon_window)
-      DisposeWindow (carbon_window);
+    if (carbon_window) //удаление окна по таймеру, так как если удалить окно во время деактивации к нему идет обращение со стороны системы
+    {
+      WindowDisposer *disposer = [[WindowDisposer alloc] initWithWindow:carbon_window];
+
+      [NSTimer scheduledTimerWithTimeInterval:0.1 target:disposer selector:@selector (dispose) userInfo:nil repeats:NO];
+
+      [disposer release];
+//      DisposeWindow (carbon_window);
+    }
 
     if (window_group)
       ReleaseWindowGroup (window_group);
@@ -88,7 +129,7 @@ struct WindowImpl
     [cursor release];
   }
 
-  void Notify (Platform::window_t window, WindowEvent event, const WindowEventContext& context)
+  void Notify (window_t window, WindowEvent event, const WindowEventContext& context)
   {
     try
     {
@@ -195,7 +236,7 @@ void GetEventContext (WindowRef wnd, WindowEventContext& context)
 
   context.handle = wnd;
 
-  context.cursor_position = Platform::GetCursorPosition ((Platform::window_t)wnd);
+  context.cursor_position = CarbonWindowManager::GetCursorPosition ((window_t)wnd);
 
   UInt32 key_modifiers = GetCurrentEventKeyModifiers ();
 
@@ -267,7 +308,8 @@ OSStatus window_message_handler (EventHandlerCallRef event_handler_call_ref, Eve
   UInt32             event_kind      = GetEventKind (event);
   WindowImpl*        window_impl     = (WindowImpl*)impl;
   WindowRef          wnd             = window_impl->carbon_window;
-  Platform::window_t window_handle   = (Platform::window_t)wnd;
+  window_t           window_handle   = (window_t)wnd;
+//  bool               window_deleted  = false;
 
   try
   {
@@ -320,21 +362,67 @@ OSStatus window_message_handler (EventHandlerCallRef event_handler_call_ref, Eve
       case kEventClassWindow:
         switch (event_kind)
         {
+          case kEventWindowClickCollapseRgn:
+            window_impl->collapsed_by_user = true;
+            break;
+          case kEventWindowExpanded:
+            window_impl->collapsed_by_user = false;
+            break;
           case kEventWindowClose: //попытка закрытия окна
             window_impl->Notify (window_handle, WindowEvent_OnClose, context);
             break;
-          case kEventWindowClosed: //окно закрыто
+          case kEventWindowDispose: //окно закрыто
+          {
+/*            EventRef delete_window_event = 0;
+
+            try
+            {
+              check_event_manager_error (CreateEvent (0, UNTGS_EVENT_CLASS, DELETE_WINDOW_EVENT, 0, kEventAttributeNone, &delete_window_event),
+                                         "::CreateEvent", "Can't create window delete event");
+
+              check_event_manager_error (SetEventParameter (delete_window_event, 0, 0, sizeof (window_impl), &window_impl), "::SetEventParameter", "Can't set event parameter");
+
+              check_event_manager_error (PostEventToQueue (GetMainEventQueue (), delete_window_event, kEventPriorityStandard),
+                                         "::PostEventToQueue", "Can't send delete window event");
+            }
+            catch (xtl::exception& exception)
+            {
+              if (delete_window_event)
+                ReleaseEvent (delete_window_event);
+              throw;
+            }
+
+            if (delete_window_event)
+              ReleaseEvent (delete_window_event);*/
+
             window_impl->Notify (window_handle, WindowEvent_OnDestroy, context);
 
             delete window_impl;
+
             break;
+          }
           case kEventWindowDrawContent: //перерисовка окна
             window_impl->Notify (window_handle, WindowEvent_OnPaint, context);
             break;
           case kEventWindowActivated: //окно стало активным
+            if (window_impl->is_maximized)
+              check_window_manager_error (SetSystemUIMode (kUIModeAllHidden, 0), "::SetSystemUIMode", "Can't set required system UI mode");
+
+            if (is_cursor_in_client_region (wnd))
+            {
+              CarbonWindowManager::SetCursorVisible (window_handle, CarbonWindowManager::GetCursorVisible (window_handle));
+
+              [window_impl->cursor set];
+
+              window_impl->is_cursor_in_window = true;
+            }
+
             window_impl->Notify (window_handle, WindowEvent_OnActivate, context);
             break;
           case kEventWindowDeactivated: //окно стало неактивным
+            if (window_impl->is_maximized)
+              check_window_manager_error (SetSystemUIMode (kUIModeNormal, 0), "::SetSystemUIMode", "Can't set required system UI mode");
+
             window_impl->Notify (window_handle, WindowEvent_OnDeactivate, context);
             break;
           case kEventWindowShown: //окно стало видимым
@@ -346,7 +434,7 @@ OSStatus window_message_handler (EventHandlerCallRef event_handler_call_ref, Eve
             window_impl->Notify (window_handle, WindowEvent_OnHide, context);
             break;
           case kEventWindowBoundsChanged: //окно изменило размеры или положение
-            Platform::InvalidateWindow (window_handle);
+            CarbonWindowManager::InvalidateWindow (window_handle);
             window_impl->Notify (window_handle, WindowEvent_OnSize, context);
             window_impl->Notify (window_handle, WindowEvent_OnMove, context);
             break;
@@ -391,7 +479,7 @@ OSStatus window_message_handler (EventHandlerCallRef event_handler_call_ref, Eve
                   syslib::Application::Exit (0);
                   break;
                 case Key_W:
-                  Platform::CloseWindow (window_handle);
+                  CarbonWindowManager::CloseWindow (window_handle);
                   break;
                 case Key_M:
                   if (IsWindowCollapsable (wnd))
@@ -424,7 +512,7 @@ OSStatus window_message_handler (EventHandlerCallRef event_handler_call_ref, Eve
       {
         bool mouse_in_client_rect = is_cursor_in_client_region (wnd);
 
-        context.cursor_position = Platform::GetCursorPosition (window_handle);
+        context.cursor_position = CarbonWindowManager::GetCursorPosition (window_handle);
 
         switch (event_kind)
         {
@@ -497,7 +585,7 @@ OSStatus window_message_handler (EventHandlerCallRef event_handler_call_ref, Eve
             if (!mouse_in_client_rect)
               break;
 
-            if (!Platform::GetCursorVisible (window_handle) && CGCursorIsVisible ()) //если курсор невидим - прячем его при входе в окно
+            if (!CarbonWindowManager::GetCursorVisible (window_handle) && CGCursorIsVisible ()) //если курсор невидим - прячем его при входе в окно
               check_quartz_error (CGDisplayHideCursor (kCGDirectMainDisplay), "::CGDisplayHideCursor", "Can't hide cursor");
             else
               [window_impl->cursor set];
@@ -548,10 +636,14 @@ OSStatus window_message_handler (EventHandlerCallRef event_handler_call_ref, Eve
 
     if (event_processed)
     {
-      OSStatus operation_result = CallNextEventHandler (event_handler_call_ref, event);
+//      if (!window_deleted)
+//      {
+        OSStatus operation_result = CallNextEventHandler (event_handler_call_ref, event);
 
-      if (operation_result != eventNotHandledErr)
-        check_event_manager_error (operation_result, "::CallNextEventHandler", "Can't call next event handler");
+        if (operation_result != eventNotHandledErr)
+          check_event_manager_error (operation_result, "::CallNextEventHandler", "Can't call next event handler");
+//      }
+
       return noErr;
     }
     else
@@ -582,6 +674,75 @@ OSStatus application_message_handler (EventHandlerCallRef event_handler_call_ref
   try
   {
     is_fullscreen = check_fullscreen (wnd);
+
+    UInt32 event_kind = GetEventKind (event);
+
+    switch (GetEventClass (event))
+    {
+/*      case UNTGS_EVENT_CLASS:
+        if (event_kind == DELETE_WINDOW_EVENT)
+        {
+          WindowImpl* destroyed_window;
+
+          check_event_manager_error (GetEventParameter (event, 0, 0, 0, sizeof (WindowImpl*), 0, &destroyed_window),
+                                     "::GetEventParameter", "Can't get destroyed window");
+
+          if (destroyed_window == window_impl)
+            delete window_impl;
+        }
+
+        break;*/
+      case kEventClassMouse:
+        if (window_impl->is_cursor_in_window)  //обработка выхода мышки за пределы окна
+        {
+          switch (event_kind)
+          {
+            case kEventMouseMoved:
+            case kEventMouseDragged:
+            {
+              //получение контекста события
+
+              WindowEventContext context;
+
+              GetEventContext (wnd, context);
+
+              if (!is_cursor_in_client_region (wnd))
+              {
+                window_t window_handle = (window_t)wnd;
+
+                window_impl->is_cursor_in_window = false;
+                window_impl->Notify (window_handle, WindowEvent_OnMouseLeave, context);
+
+                if (!CarbonWindowManager::GetCursorVisible (window_handle)) //если курсор невидим - показываем его при выходе из окна
+                  while (!CGCursorIsVisible ())
+                    CGDisplayShowCursor (kCGDirectMainDisplay);
+
+                [[NSCursor arrowCursor] set];
+              }
+
+              break;
+            }
+            default:
+              break;
+          }
+        }
+
+        break;
+      case kEventClassApplication:
+        if (GetEventKind (event) == kEventAppActivated)
+        {
+          WindowRef activated_window;
+
+          check_event_manager_error (GetEventParameter (event, kEventParamWindowRef, typeWindowRef, 0,
+                                                        sizeof (WindowRef), 0, &activated_window),
+                                     "::GetEventParameter", "Can't get activated_window");
+
+          if ((!activated_window || activated_window == wnd) && !window_impl->collapsed_by_user)
+            CarbonWindowManager::SetWindowFlag ((window_handle*)wnd, WindowFlag_Minimized, false);
+        }
+
+        break;
+    }
   }
   catch (std::exception& exception)
   {
@@ -592,44 +753,36 @@ OSStatus application_message_handler (EventHandlerCallRef event_handler_call_ref
     printf ("Exception at processing event in ::application_message_handler : unknown exception\n");
   }
 
-  if (window_impl->is_cursor_in_window && GetEventClass (event) == kEventClassMouse)  //обработка выхода мышки за пределы окна
-  {
-    switch (GetEventKind (event))
-    {
-      case kEventMouseMoved:
-      case kEventMouseDragged:
-      {
-        //получение контекста события
-
-        WindowEventContext context;
-
-        GetEventContext (wnd, context);
-
-        if (!is_cursor_in_client_region (wnd))
-        {
-          Platform::window_t window_handle = (Platform::window_t)wnd;
-
-          window_impl->is_cursor_in_window = false;
-          window_impl->Notify (window_handle, WindowEvent_OnMouseLeave, context);
-
-          if (!Platform::GetCursorVisible (window_handle)) //если курсор невидим - показываем его при выходе из окна
-            while (!CGCursorIsVisible ())
-              CGDisplayShowCursor (kCGDirectMainDisplay);
-
-          [[NSCursor arrowCursor] set];
-        }
-
-        break;
-      }
-      default:
-        break;
-    }
-  }
-
   if (is_fullscreen)
     return window_message_handler (event_handler_call_ref, event, impl);
 
   return eventNotHandledErr;
+}
+
+WindowClass get_window_class (WindowStyle style)
+{
+  switch (style)
+  {
+    case WindowStyle_Overlapped:
+      return kDocumentWindowClass;
+    case WindowStyle_PopUp:
+      return kSheetWindowClass;
+    default:
+      throw xtl::make_argument_exception ("::get_window_class", "style", style);
+  }
+}
+
+UInt32 get_window_attributes (WindowStyle style)
+{
+  switch (style)
+  {
+    case WindowStyle_Overlapped:
+      return kWindowStandardDocumentAttributes | kWindowStandardHandlerAttribute | kWindowLiveResizeAttribute;
+    case WindowStyle_PopUp:
+      return kWindowStandardHandlerAttribute | kWindowLiveResizeAttribute;
+    default:
+      throw xtl::make_argument_exception ("::get_window_attributes", "style", style);
+  }
 }
 
 }
@@ -639,30 +792,13 @@ OSStatus application_message_handler (EventHandlerCallRef event_handler_call_ref
     Создание/закрытие/уничтожение окна
 */
 
-Platform::window_t Platform::CreateWindow (WindowStyle style, WindowMessageHandler handler, const void* parent_handle, const char* init_string, void* user_data)
+window_t CarbonWindowManager::CreateWindow (WindowStyle style, WindowMessageHandler handler, const void* parent_handle, const char* init_string, void* user_data)
 {
-  static const char* METHOD_NAME = "syslib::CarbonPlatform::CreateWindow";
-
-  WindowClass window_class;
-  UInt32      window_attributes;
-
-  switch (style)
-  {
-    case WindowStyle_Overlapped:
-      window_class = kDocumentWindowClass;
-      window_attributes = kWindowStandardDocumentAttributes | kWindowStandardHandlerAttribute | kWindowLiveResizeAttribute;
-      break;
-    case WindowStyle_PopUp:
-      window_class = kSheetWindowClass;
-      window_attributes = kWindowStandardHandlerAttribute | kWindowLiveResizeAttribute;
-      break;
-    default:
-      throw xtl::make_argument_exception (METHOD_NAME, "style", style);
-      return 0;
-  }
-
   try
   {
+    WindowClass window_class      = get_window_class (style);
+    UInt32      window_attributes = get_window_attributes (style);
+
     WindowImpl* window_impl = new WindowImpl (handler, user_data);
 
     try
@@ -675,6 +811,8 @@ Platform::window_t Platform::CreateWindow (WindowStyle style, WindowMessageHandl
 
       check_window_manager_error (CreateNewWindow (window_class, window_attributes, &window_rect, &new_window), "::CreateNewWindow",
                                   "Can't create window");
+
+      check_window_manager_error (HIWindowChangeFeatures (new_window, kWindowCanCollapse, 0), "::HIWindowChangeFeatures", "Can't set window collapsable");
 
       window_impl->carbon_window = new_window;
 
@@ -693,7 +831,7 @@ Platform::window_t Platform::CreateWindow (WindowStyle style, WindowMessageHandl
 
       EventTypeSpec window_handled_event_types [] = {
         { kEventClassWindow,    kEventWindowClose },
-        { kEventClassWindow,    kEventWindowClosed },
+        { kEventClassWindow,    kEventWindowDispose },
         { kEventClassWindow,    kEventWindowDrawContent },
         { kEventClassWindow,    kEventWindowActivated },
         { kEventClassWindow,    kEventWindowDeactivated },
@@ -702,6 +840,8 @@ Platform::window_t Platform::CreateWindow (WindowStyle style, WindowMessageHandl
         { kEventClassWindow,    kEventWindowBoundsChanged },
         { kEventClassWindow,    kEventWindowFocusAcquired },
         { kEventClassWindow,    kEventWindowFocusRelinquish },
+        { kEventClassWindow,    kEventWindowClickCollapseRgn },
+        { kEventClassWindow,    kEventWindowExpanded },
 #ifdef MACOSX_10_5_SUPPORTED
         { kEventClassWindow,    kEventWindowFocusLost },
         { kEventClassWindow,    kEventWindowFocusRestored },
@@ -731,11 +871,13 @@ Platform::window_t Platform::CreateWindow (WindowStyle style, WindowMessageHandl
       EventHandlerUPP application_event_handler_proc = NewEventHandlerUPP (&application_message_handler);
 
       EventTypeSpec application_handled_event_types [] = {
-        { kEventClassMouse,     kEventMouseDown },
-        { kEventClassMouse,     kEventMouseUp },
-        { kEventClassMouse,     kEventMouseMoved },
-        { kEventClassMouse,     kEventMouseDragged },
-        { kEventClassMouse,     kEventMouseWheelMoved },
+        { kEventClassMouse,       kEventMouseDown },
+        { kEventClassMouse,       kEventMouseUp },
+        { kEventClassMouse,       kEventMouseMoved },
+        { kEventClassMouse,       kEventMouseDragged },
+        { kEventClassMouse,       kEventMouseWheelMoved },
+        { kEventClassApplication, kEventAppActivated },
+//        { UNTGS_EVENT_CLASS,      DELETE_WINDOW_EVENT },
       };
 
       check_event_manager_error (InstallEventHandler (GetApplicationEventTarget (), application_event_handler_proc,
@@ -781,7 +923,7 @@ Platform::window_t Platform::CreateWindow (WindowStyle style, WindowMessageHandl
   }
   catch (xtl::exception& exception)
   {
-    exception.touch (METHOD_NAME);
+    exception.touch ("syslib::CarbonWindowManager::CreateWindow");
 
     throw;
   }
@@ -789,7 +931,7 @@ Platform::window_t Platform::CreateWindow (WindowStyle style, WindowMessageHandl
   return 0;
 }
 
-void Platform::CloseWindow (window_t handle)
+void CarbonWindowManager::CloseWindow (window_t handle)
 {
   EventRef close_window_event = 0;
 
@@ -806,7 +948,7 @@ void Platform::CloseWindow (window_t handle)
     if (close_window_event)
       ReleaseEvent (close_window_event);
 
-    exception.touch ("syslib::CarbonPlatform::CloseWindow");
+    exception.touch ("syslib::CarbonWindowManager::CloseWindow");
     throw;
   }
 
@@ -814,13 +956,13 @@ void Platform::CloseWindow (window_t handle)
     ReleaseEvent (close_window_event);
 }
 
-void Platform::DestroyWindow (window_t handle)
+void CarbonWindowManager::DestroyWindow (window_t handle)
 {
   EventRef closed_window_event = 0;
 
   try
   {
-    check_event_manager_error (CreateEvent (0, kEventClassWindow, kEventWindowClosed, 0, kEventAttributeNone, &closed_window_event),
+    check_event_manager_error (CreateEvent (0, kEventClassWindow, kEventWindowDispose, 0, kEventAttributeNone, &closed_window_event),
                                "::CreateEvent", "Can't create window closed event");
 
     check_event_manager_error (SendEventToEventTarget (closed_window_event, GetWindowEventTarget ((WindowRef)handle)),
@@ -831,7 +973,7 @@ void Platform::DestroyWindow (window_t handle)
     if (closed_window_event)
       ReleaseEvent (closed_window_event);
 
-    exception.touch ("syslib::CarbonPlatform::DestroyWindow");
+    exception.touch ("syslib::CarbonWindowManager::DestroyWindow");
     throw;
   }
 
@@ -840,15 +982,41 @@ void Platform::DestroyWindow (window_t handle)
 }
 
 /*
+   Попытка изменения стиля окна (может быть проигнорирована)
+*/
+
+bool CarbonWindowManager::ChangeWindowStyle (window_t handle, WindowStyle style)
+{
+  WindowRef wnd = (WindowRef)handle;
+
+  try
+  {
+    UInt32 new_attributes = get_window_attributes (style),
+           current_attributes;
+
+    check_window_manager_error (GetWindowAttributes (wnd, &current_attributes), "::GetWindowAttributes", "Can't get window attributes");
+    check_window_manager_error (SetWindowClass (wnd, get_window_class (style)), "::SetWindowClass", "Can't change window class");
+    check_window_manager_error (ChangeWindowAttributes (wnd, new_attributes & ~current_attributes, current_attributes & ~new_attributes), "::ChangeWindowAttributes", "Can't change window attributes");
+
+    return true;
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("syslib::CarbonWindowManager::ChangeWindowStyle");
+    throw;
+  }
+}
+
+/*
     Получение платформо-зависимого дескриптора окна
 */
 
-const void* Platform::GetNativeWindowHandle (window_t handle)
+const void* CarbonWindowManager::GetNativeWindowHandle (window_t handle)
 {
   return reinterpret_cast<const void*> (handle);
 }
 
-const void* Platform::GetNativeDisplayHandle (window_t)
+const void* CarbonWindowManager::GetNativeDisplayHandle (window_t)
 {
   return 0;
 }
@@ -857,7 +1025,7 @@ const void* Platform::GetNativeDisplayHandle (window_t)
     Заголовок окна
 */
 
-void Platform::SetWindowTitle (window_t handle, const wchar_t* title)
+void CarbonWindowManager::SetWindowTitle (window_t handle, const wchar_t* title)
 {
   CFStringRef new_title = 0;
 
@@ -894,7 +1062,7 @@ void Platform::SetWindowTitle (window_t handle, const wchar_t* title)
   }
   catch (xtl::exception& exception)
   {
-    exception.touch ("syslib::CarbonPlatform::SetWindowTitle");
+    exception.touch ("syslib::CarbonWindowManager::SetWindowTitle");
     CFRelease (new_title);
     throw;
   }
@@ -902,7 +1070,7 @@ void Platform::SetWindowTitle (window_t handle, const wchar_t* title)
   CFRelease (new_title);
 }
 
-void Platform::GetWindowTitle (window_t handle, size_t buffer_size_in_chars, wchar_t* buffer)
+void CarbonWindowManager::GetWindowTitle (window_t handle, size_t buffer_size_in_chars, wchar_t* buffer)
 {
   CFStringRef window_title;
 
@@ -920,7 +1088,7 @@ void Platform::GetWindowTitle (window_t handle, size_t buffer_size_in_chars, wch
   }
   catch (xtl::exception& exception)
   {
-    exception.touch ("syslib::CarbonPlatform::GetWindowTitle");
+    exception.touch ("syslib::CarbonWindowManager::GetWindowTitle");
     CFRelease (window_title);
     throw;
   }
@@ -932,24 +1100,24 @@ void Platform::GetWindowTitle (window_t handle, size_t buffer_size_in_chars, wch
     Область окна / клиентская область
 */
 
-void Platform::SetWindowRect (window_t handle, const Rect& rect)
+void CarbonWindowManager::SetWindowRect (window_t handle, const Rect& rect)
 {
-  set_rect ((WindowRef)handle, kWindowStructureRgn, rect, "syslib::CarbonPlatform::SetWindowRect");
+  set_rect ((WindowRef)handle, kWindowStructureRgn, rect, "syslib::CarbonWindowManager::SetWindowRect");
 }
 
-void Platform::SetClientRect (window_t handle, const Rect& rect)
+void CarbonWindowManager::SetClientRect (window_t handle, const Rect& rect)
 {
-  set_rect ((WindowRef)handle, kWindowContentRgn, rect, "syslib::CarbonPlatform::SetWindowRect");
+  set_rect ((WindowRef)handle, kWindowContentRgn, rect, "syslib::CarbonWindowManager::SetWindowRect");
 }
 
-void Platform::GetWindowRect (window_t handle, Rect& rect)
+void CarbonWindowManager::GetWindowRect (window_t handle, Rect& rect)
 {
-  get_rect ((WindowRef)handle, kWindowStructureRgn, rect, "syslib::CarbonPlatform::GetWindowRect");
+  get_rect ((WindowRef)handle, kWindowStructureRgn, rect, "syslib::CarbonWindowManager::GetWindowRect");
 }
 
-void Platform::GetClientRect (window_t handle, Rect& rect)
+void CarbonWindowManager::GetClientRect (window_t handle, Rect& rect)
 {
-  get_rect ((WindowRef)handle, kWindowContentRgn, rect, "syslib::CarbonPlatform::GetClientRect");
+  get_rect ((WindowRef)handle, kWindowContentRgn, rect, "syslib::CarbonWindowManager::GetClientRect");
 
   rect.bottom -= rect.top;
   rect.right  -= rect.left;
@@ -961,7 +1129,7 @@ void Platform::GetClientRect (window_t handle, Rect& rect)
     Установка флагов окна
 */
 
-void Platform::SetWindowFlag (window_t handle, WindowFlag flag, bool state)
+void CarbonWindowManager::SetWindowFlag (window_t handle, WindowFlag flag, bool state)
 {
   WindowRef wnd = (WindowRef)handle;
 
@@ -995,7 +1163,7 @@ void Platform::SetWindowFlag (window_t handle, WindowFlag flag, bool state)
 
           if (state)
           {
-            SetSystemUIMode (kUIModeAllHidden, 0);
+            check_window_manager_error (SetSystemUIMode (kUIModeAllHidden, 0), "::SetSystemUIMode", "Can't set required system UI mode");
 
             impl->is_maximized = true;
 
@@ -1013,7 +1181,7 @@ void Platform::SetWindowFlag (window_t handle, WindowFlag flag, bool state)
           {
             if (impl->is_maximized)
             {
-              SetSystemUIMode (kUIModeNormal, 0);
+              check_window_manager_error (SetSystemUIMode (kUIModeNormal, 0), "::SetSystemUIMode", "Can't set required system UI mode");
               impl->is_maximized = false;
             }
           }
@@ -1024,7 +1192,8 @@ void Platform::SetWindowFlag (window_t handle, WindowFlag flag, bool state)
         break;
       }
       case WindowFlag_Minimized:
-        check_window_manager_error (CollapseWindow (wnd, state), "::CollapseWindow", "Can't minimize window");
+        if (IsWindowCollapsed (wnd) != state)
+          check_window_manager_error (CollapseWindow (wnd, state), "::CollapseWindow", "Can't minimize window");
         break;
       default:
         throw xtl::make_argument_exception ("", "flag", flag);
@@ -1033,12 +1202,12 @@ void Platform::SetWindowFlag (window_t handle, WindowFlag flag, bool state)
   }
   catch (xtl::exception& exception)
   {
-    exception.touch ("syslib::CarbonPlatform::SetWindowFlag");
+    exception.touch ("syslib::CarbonWindowManager::SetWindowFlag");
     throw;
   }
 }
 
-bool Platform::GetWindowFlag (window_t handle, WindowFlag flag)
+bool CarbonWindowManager::GetWindowFlag (window_t handle, WindowFlag flag)
 {
   WindowRef wnd = (WindowRef)handle;
 
@@ -1063,7 +1232,7 @@ bool Platform::GetWindowFlag (window_t handle, WindowFlag flag)
   }
   catch (xtl::exception& exception)
   {
-    exception.touch ("syslib::CarbonPlatform::GetWindowFlag");
+    exception.touch ("syslib::CarbonWindowManager::GetWindowFlag");
     throw;
   }
 }
@@ -1072,7 +1241,7 @@ bool Platform::GetWindowFlag (window_t handle, WindowFlag flag)
     Установка родительского окна
 */
 
-void Platform::SetParentWindowHandle (window_t child, const void* parent)
+void CarbonWindowManager::SetParentWindowHandle (window_t child, const void* parent)
 {
   try
   {
@@ -1100,21 +1269,21 @@ void Platform::SetParentWindowHandle (window_t child, const void* parent)
   }
   catch (xtl::exception& exception)
   {
-    exception.touch ("syslib::CarbonPlatform::SetParentWindow");
+    exception.touch ("syslib::CarbonWindowManager::SetParentWindow");
     throw;
   }
 }
 
-const void* Platform::GetParentWindowHandle (window_t child)
+const void* CarbonWindowManager::GetParentWindowHandle (window_t child)
 {
-  throw xtl::make_not_implemented_exception ("syslib::CarbonPlatform::GetParentWindow");
+  throw xtl::make_not_implemented_exception ("syslib::CarbonWindowManager::GetParentWindow");
 }
 
 /*
     Обновление окна
 */
 
-void Platform::InvalidateWindow (window_t handle)
+void CarbonWindowManager::InvalidateWindow (window_t handle)
 {
   try
   {
@@ -1126,7 +1295,7 @@ void Platform::InvalidateWindow (window_t handle)
   }
   catch (xtl::exception& exception)
   {
-    exception.touch ("syslib::CarbonPlatform::InvalidateWindow");
+    exception.touch ("syslib::CarbonWindowManager::InvalidateWindow");
     throw;
   }
 }
@@ -1135,7 +1304,7 @@ void Platform::InvalidateWindow (window_t handle)
     Положение курсора
 */
 
-void Platform::SetCursorPosition (const Point& position)
+void CarbonWindowManager::SetCursorPosition (const Point& position)
 {
   CGPoint new_cursor_position = { position.x, position.y };
 
@@ -1152,12 +1321,12 @@ void Platform::SetCursorPosition (const Point& position)
   }
   catch (xtl::exception& exception)
   {
-    exception.touch ("syslib::CarbonPlatform::SetCursorPosition (const Point&)");
+    exception.touch ("syslib::CarbonWindowManager::SetCursorPosition (const Point&)");
     throw;
   }
 }
 
-syslib::Point Platform::GetCursorPosition ()
+syslib::Point CarbonWindowManager::GetCursorPosition ()
 {
   ::Point mouse_position;
 
@@ -1166,7 +1335,7 @@ syslib::Point Platform::GetCursorPosition ()
   return syslib::Point (mouse_position.h, mouse_position.v);
 }
 
-void Platform::SetCursorPosition (window_t handle, const Point& client_position)
+void CarbonWindowManager::SetCursorPosition (window_t handle, const Point& client_position)
 {
   Rect  client_rect;
   Point new_cursor_position = client_position;
@@ -1190,16 +1359,16 @@ void Platform::SetCursorPosition (window_t handle, const Point& client_position)
   }
   catch (xtl::exception& exception)
   {
-    exception.touch ("syslib::CarbonPlatform::SetCursorPosition (window_t, const Point&)");
+    exception.touch ("syslib::CarbonWindowManager::SetCursorPosition (window_t, const Point&)");
     throw;
   }
 }
 
-syslib::Point Platform::GetCursorPosition (window_t handle)
+syslib::Point CarbonWindowManager::GetCursorPosition (window_t handle)
 {
   Rect client_rect;
 
-  get_rect ((WindowRef)handle, kWindowContentRgn, client_rect, "syslib::CarbonPlatform::GetCursorPosition (window_t)");
+  get_rect ((WindowRef)handle, kWindowContentRgn, client_rect, "syslib::CarbonWindowManager::GetCursorPosition (window_t)");
 
   ::Point mouse_position;
 
@@ -1221,11 +1390,11 @@ syslib::Point Platform::GetCursorPosition (window_t handle)
     Видимость курсора
 */
 
-void Platform::SetCursorVisible (window_t handle, bool state)
+void CarbonWindowManager::SetCursorVisible (window_t handle, bool state)
 {
   try
   {
-    if (is_cursor_in_client_region ((WindowRef)handle))
+    if (GetWindowFlag (handle, WindowFlag_Active) && is_cursor_in_client_region ((WindowRef)handle))
     {
       if (state)
       {
@@ -1244,12 +1413,12 @@ void Platform::SetCursorVisible (window_t handle, bool state)
   }
   catch (xtl::exception& exception)
   {
-    exception.touch ("syslib::CarbonPlatform::SetCursorVisible");
+    exception.touch ("syslib::CarbonWindowManager::SetCursorVisible");
     throw;
   }
 }
 
-bool Platform::GetCursorVisible (window_t handle)
+bool CarbonWindowManager::GetCursorVisible (window_t handle)
 {
   bool return_value;
 
@@ -1263,7 +1432,7 @@ bool Platform::GetCursorVisible (window_t handle)
     Изображение курсора
 */
 
-Platform::cursor_t Platform::CreateCursor (const char* file_name, int hotspot_x, int hotspot_y)
+cursor_t CarbonWindowManager::CreateCursor (const char* file_name, int hotspot_x, int hotspot_y)
 {
   try
   {
@@ -1316,21 +1485,21 @@ Platform::cursor_t Platform::CreateCursor (const char* file_name, int hotspot_x,
     if (!cursor)
       throw xtl::format_operation_exception ("[NSCursor initWithImage:hotSpot:]", "Can't create cursor");
 
-    return reinterpret_cast<Platform::cursor_t> (cursor);
+    return reinterpret_cast<cursor_t> (cursor);
   }
   catch (xtl::exception& exception)
   {
-    exception.touch ("syslib::CarbonPlatform::CreateCursor");
+    exception.touch ("syslib::CarbonWindowManager::CreateCursor");
     throw;
   }
 }
 
-void Platform::DestroyCursor (cursor_t cursor)
+void CarbonWindowManager::DestroyCursor (cursor_t cursor)
 {
   [(NSCursor*)cursor release];
 }
 
-void Platform::SetCursor (window_t handle, cursor_t cursor)
+void CarbonWindowManager::SetCursor (window_t handle, cursor_t cursor)
 {
   try
   {
@@ -1351,16 +1520,46 @@ void Platform::SetCursor (window_t handle, cursor_t cursor)
   }
   catch (xtl::exception& exception)
   {
-    exception.touch ("syslib::CarbonPlatform::SetCursor");
+    exception.touch ("syslib::CarbonWindowManager::SetCursor");
     throw;
   }
+}
+
+/*
+   Установка/получение multitouch режима
+*/
+
+void CarbonWindowManager::SetMultitouchEnabled (window_t handle, bool state)
+{
+  if (!handle)
+    throw xtl::make_null_argument_exception ("", "handle");
+
+  WindowImpl *impl;
+
+  check_window_manager_error (GetWindowProperty ((WindowRef)handle, WINDOW_PROPERTY_CREATOR, WINDOW_IMPL_PROPERTY,
+                              sizeof (impl), 0, &impl), "::GetWindowProperty", "Can't get window property");
+
+  impl->is_multitouch_enabled = state;
+}
+
+bool CarbonWindowManager::IsMultitouchEnabled (window_t handle)
+{
+  if (!handle)
+    throw xtl::make_null_argument_exception ("", "handle");
+
+  WindowImpl *impl;
+
+  check_window_manager_error (GetWindowProperty ((WindowRef)handle, WINDOW_PROPERTY_CREATOR, WINDOW_IMPL_PROPERTY,
+                              sizeof (impl), 0, &impl), "::GetWindowProperty", "Can't get window property");
+
+  return impl->is_multitouch_enabled;
 }
 
 /*
    Цвет фона
 */
 
-void Platform::SetBackgroundColor (window_t window, const Color& color)
+void CarbonWindowManager::SetBackgroundColor (window_t window, const Color& color)
 {
   try
   {
@@ -1384,12 +1583,12 @@ void Platform::SetBackgroundColor (window_t window, const Color& color)
   }
   catch (xtl::exception& e)
   {
-    e.touch ("syslib::CarbonPlatform::SetBackgroundColor");
+    e.touch ("syslib::CarbonWindowManager::SetBackgroundColor");
     throw;
   }
 }
 
-void Platform::SetBackgroundState (window_t window, bool state)
+void CarbonWindowManager::SetBackgroundState (window_t window, bool state)
 {
   try
   {
@@ -1414,12 +1613,12 @@ void Platform::SetBackgroundState (window_t window, bool state)
   }
   catch (xtl::exception& exception)
   {
-    exception.touch ("syslib::CarbonPlatform::SetBackgroundState");
+    exception.touch ("syslib::CarbonWindowManager::SetBackgroundState");
     throw;
   }
 }
 
-Color Platform::GetBackgroundColor (window_t window)
+Color CarbonWindowManager::GetBackgroundColor (window_t window)
 {
   try
   {
@@ -1440,12 +1639,12 @@ Color Platform::GetBackgroundColor (window_t window)
   }
   catch (xtl::exception& e)
   {
-    e.touch ("syslib::CarbonPlatform::SetBackgroundColor");
+    e.touch ("syslib::CarbonWindowManager::SetBackgroundColor");
     throw;
   }
 }
 
-bool Platform::GetBackgroundState (window_t window)
+bool CarbonWindowManager::GetBackgroundState (window_t window)
 {
   try
   {
@@ -1461,7 +1660,7 @@ bool Platform::GetBackgroundState (window_t window)
   }
   catch (xtl::exception& exception)
   {
-    exception.touch ("syslib::CarbonPlatform::GetBackgroundState");
+    exception.touch ("syslib::CarbonWindowManager::GetBackgroundState");
     throw;
   }
 }

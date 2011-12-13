@@ -1,19 +1,24 @@
 #include <cstdio>
 #include <cmath>
 
-#include <xtl/signal.h>
+#include <stl/string>
+
 #include <xtl/bind.h>
 #include <xtl/ref.h>
+#include <xtl/signal.h>
+#include <xtl/trackable_ptr.h>
 
 #include <common/action_queue.h>
 #include <common/file.h>
 #include <common/log.h>
+#include <common/property_map.h>
 #include <common/time.h>
 
-#include <syslib/window.h>
 #include <syslib/application.h>
-#include <syslib/timer.h>
 #include <syslib/dll.h>
+#include <syslib/screen.h>
+#include <syslib/timer.h>
+#include <syslib/window.h>
 
 using namespace syslib;
 using namespace xtl;

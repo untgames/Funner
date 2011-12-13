@@ -3,11 +3,15 @@
 
 #include <cstdio>
 
+#include <stl/string>
+
+#include <xtl/bind.h>
 #include <xtl/common_exceptions.h>
 #include <xtl/function.h>
 #include <xtl/shared_ptr.h>
 
 #include <common/action_queue.h>
+#include <common/async.h>
 #include <common/lockable.h>
 #include <common/log.h>
 #include <common/time.h>

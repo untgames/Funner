@@ -54,6 +54,10 @@ void keys (Window& window, WindowEvent event, const WindowEventContext& context)
     case WindowEvent_OnXButton2Up:
     case WindowEvent_OnXButton2DoubleClick:
       printf ("%s x=%lu y=%lu\n", get_event_name (event), context.cursor_position.x, context.cursor_position.y);
+      
+      if (event == WindowEvent_OnLeftButtonDoubleClick)
+        window.SetStyle (window.Style () == WindowStyle_Overlapped ? WindowStyle_PopUp : WindowStyle_Overlapped);
+      
       break;
     case WindowEvent_OnChar:
       printf ("char '%C'\n", context.char_code);
@@ -79,12 +83,45 @@ void mousemove (Window& window, WindowEvent, const WindowEventContext& context)
   fflush (stdout);  
 }
 
+void touch_event (Window& window, WindowEvent event, const WindowEventContext& context)
+{
+  printf ("window '%s': touch event ", window.Title ());
+
+  switch (event)
+  {
+    case WindowEvent_OnTouchesBegan:
+      printf ("TouchesBegan");
+      break;
+    case WindowEvent_OnTouchesMoved:
+      printf ("TouchesMoved");
+      break;
+    case WindowEvent_OnTouchesDoubletap:
+      printf ("TouchesDoubletap");
+      break;
+    case WindowEvent_OnTouchesEnded:
+      printf ("TouchesEnded");
+      break;
+    default:
+      printf ("Unknown");
+      break;
+  }
+
+  printf (". %u touches in event:\n", context.touches_count);
+
+  for (size_t i = 0; i < context.touches_count; i++)
+  {
+    const Touch& touch = context.touches [i];
+
+    printf ("  touch %u position %u %u\n", touch.touch_id, touch.position.x, touch.position.y);
+  }
+
+  fflush (stdout);
+}
+
 void destroy (Window& window, WindowEvent, const WindowEventContext&)
 {
   printf ("window '%s': destroyed\n", window.Title ());
   fflush (stdout);  
-
-  Application::Exit (0);
 
   throw std::bad_alloc (); //тестирование распространения исключений в обработчиках событий
 }
@@ -93,7 +130,10 @@ void print_event (Window& window, WindowEvent event, const WindowEventContext& c
 {
   switch (event)
   {
-    case WindowEvent_OnClose:        printf ("Window close event\n");          break;
+    case WindowEvent_OnClose:
+      printf ("Window close event\n");
+      Application::Exit (0);      
+      break;
     case WindowEvent_OnChangeHandle: printf ("Window changed handle to %p event\n", context.handle); break;
     case WindowEvent_OnActivate:     printf ("Window activate event\n");       break;
     case WindowEvent_OnDeactivate:   printf ("Window deactivate event\n");     break;
@@ -104,6 +144,8 @@ void print_event (Window& window, WindowEvent event, const WindowEventContext& c
     case WindowEvent_OnPaint:        printf ("Window paint event\n");          break;
     case WindowEvent_OnMove:         printf ("Window move event\n");           break;
     case WindowEvent_OnSize:         printf ("Window size event\n");           break;
+    case WindowEvent_OnScreenLock:   printf ("Window screen lock event\n");    break;
+    case WindowEvent_OnScreenUnlock: printf ("Window screen unlock event\n");  break;
     default: return;
   }
   
@@ -137,9 +179,12 @@ int main ()
     common::LogFilter log_filter ("*", &log_print);
     
     Window window (WindowStyle_Overlapped, 400, 300);
+    
+    window.SetBackgroundState (true);
 
     window.SetTitle ("Test window");
     window.Show ();
+    window.SetFocus ();
 
     auto_connection connection1  = window.RegisterEventHandler (WindowEvent_OnKeyDown, &keys),
                     connection2  = window.RegisterEventHandler (WindowEvent_OnKeyUp, &keys),
@@ -174,9 +219,16 @@ int main ()
                     connection31 = window.RegisterEventHandler (WindowEvent_OnPaint, &print_event),
                     connection32 = window.RegisterEventHandler (WindowEvent_OnMove, &print_event),
                     connection33 = window.RegisterEventHandler (WindowEvent_OnSize, &print_event),
-                    connection34 = window.RegisterEventHandler (WindowEvent_OnChangeHandle, &print_event);
+                    connection34 = window.RegisterEventHandler (WindowEvent_OnChangeHandle, &print_event),
+                    connection35 = window.RegisterEventHandler (WindowEvent_OnTouchesBegan, &touch_event),
+                    connection36 = window.RegisterEventHandler (WindowEvent_OnTouchesDoubletap, &touch_event),
+                    connection37 = window.RegisterEventHandler (WindowEvent_OnTouchesMoved, &touch_event),
+                    connection38 = window.RegisterEventHandler (WindowEvent_OnTouchesEnded, &touch_event),
+                    connection39 = window.RegisterEventHandler (WindowEvent_OnScreenLock, &print_event),
+                    connection40 = window.RegisterEventHandler (WindowEvent_OnScreenUnlock, &print_event);
 
     window.SetDebugLog (&print);
+    window.SetMultitouchEnabled (true);
     
     fflush (stdout);    
 

@@ -8,8 +8,8 @@ using namespace syslib;
 
 struct ThreadLocalStorage::Impl: public IThreadCleanupCallback
 {
-  Platform::tls_t key;     //ключ локальных данных нити
-  CleanupHandler  cleanup; //очищающий функционал
+  tls_t          key;     //ключ локальных данных нити
+  CleanupHandler cleanup; //очищающий функционал
   
 ///Конструктор
   Impl (const CleanupHandler& in_cleanup) : cleanup (in_cleanup)

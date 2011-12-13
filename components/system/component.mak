@@ -3,31 +3,39 @@
 ###################################################################################################
 TARGETS := SYSTEMLIB.SOURCES SYSTEMLIB.TESTS SYSTEMLIB.INFO
 
-TARGETS.android := SYSTEMLIB.UTILS.ANDROID_LAUNCHER
+TARGETS.android  += SYSTEMLIB.UTILS.ANDROID_LAUNCHER
+TARGETS.android  += SYSTEMLIB.UTILS.ANDROID_LAUNCHER_COMMON
+TARGETS.tabletos += SYSTEMLIB.UTILS.TABLETOS_LAUNCHER
 
 #Цель №1 - System library sources
 SYSTEMLIB.SOURCES.TYPE                              := static-lib
 SYSTEMLIB.SOURCES.NAME                              := funner.system
-SYSTEMLIB.SOURCES.INCLUDE_DIRS                      := sources
-SYSTEMLIB.SOURCES.SOURCE_DIRS                       := sources/wrappers
+SYSTEMLIB.SOURCES.INCLUDE_DIRS                      += sources
+SYSTEMLIB.SOURCES.INCLUDE_DIRS                      += sources/platform
+SYSTEMLIB.SOURCES.SOURCE_DIRS                       += sources/wrappers
+SYSTEMLIB.SOURCES.SOURCE_DIRS                       += sources/platform/default
 SYSTEMLIB.SOURCES.IMPORTS                           := compile.system
-SYSTEMLIB.SOURCES.win32.SOURCE_DIRS                 := sources/platform/win32 sources/platform/win32/application sources/platform/win32/thread sources/platform/win32/non_unistd
-SYSTEMLIB.SOURCES.unistd.SOURCE_DIRS                := sources/platform/pthread sources/platform/unistd
+SYSTEMLIB.SOURCES.win32.SOURCE_DIRS                 := sources/platform/windows sources/platform/windows/application sources/platform/windows/non_unistd
+SYSTEMLIB.SOURCES.x86_win32.SOURCE_DIRS             := sources/platform/windows/thread
+SYSTEMLIB.SOURCES.x86.IMPORTS                       := compile.extern.geekinfo
+SYSTEMLIB.SOURCES.wince.SOURCE_DIRS                 := sources/platform/pthread
+SYSTEMLIB.SOURCES.unistd.SOURCE_DIRS                := sources/platform/pthread sources/platform/unistd sources/platform/message_queue
 SYSTEMLIB.SOURCES.msvc.COMPILER_CFLAGS              := -wd4355
 SYSTEMLIB.SOURCES.no_windows.SOURCE_DIRS            := sources/platform/no_windows
-SYSTEMLIB.SOURCES.android.SOURCE_DIRS               := sources/platform/no_windows #!!!
+SYSTEMLIB.SOURCES.android.SOURCE_DIRS               := sources/platform/android sources/platform/message_queue
 SYSTEMLIB.SOURCES.carbon.SOURCE_DIRS                := sources/platform/carbon
 SYSTEMLIB.SOURCES.carbon.COMPILER_DEFINES           := NO_PTHREAD_SEMAPHORES
 SYSTEMLIB.SOURCES.iphone.SOURCE_DIRS                := sources/platform/iphone
 SYSTEMLIB.SOURCES.iphone.COMPILER_DEFINES           := NO_PTHREAD_SEMAPHORES
 SYSTEMLIB.SOURCES.x11.SOURCE_DIRS                   := sources/platform/x11
 SYSTEMLIB.SOURCES.x11.IMPORTS                       := compile.media.image
-SYSTEMLIB.SOURCES.bada_simulator.SOURCE_DIRS        := sources/platform/win32 sources/platform/win32/thread sources/platform/win32/non_unistd sources/platform/bada/startup_simulator
-SYSTEMLIB.SOURCES.bada_simulator.COMPILER_DEFINES   := #SHP USE_FBASE_ALLOCATOR BUILD_DLL WIN32
+SYSTEMLIB.SOURCES.bada_simulator.SOURCE_DIRS        := sources/platform/windows sources/platform/windows/thread sources/platform/windows/non_unistd sources/platform/bada/startup_simulator
 #SYSTEMLIB.SOURCES.bada_device.SOURCE_DIRS           := sources/platform/pthread
 SYSTEMLIB.SOURCES.bada.SOURCE_DIRS                  := sources/platform/bada
-SYSTEMLIB.SOURCES.bada_device.SOURCE_DIRS           := sources/platform/no_threads
+SYSTEMLIB.SOURCES.bada_device.SOURCE_DIRS           := sources/platform/no_threads sources/platform/bada/startup_device
 SYSTEMLIB.SOURCES.beagleboard.IMPORTS               := compile.extern.beagleboard
+SYSTEMLIB.SOURCES.meego.IMPORTS                     := compile.extern.meego
+SYSTEMLIB.SOURCES.tabletos.SOURCE_DIRS              := sources/platform/tabletos
 
 #Цель №2 - System library tests
 SYSTEMLIB.TESTS.TYPE             := test-suite
@@ -37,15 +45,28 @@ SYSTEMLIB.TESTS.x11.IMPORTS      := link.media.image.ani_cursor_loader
 
 #Цель №3 - Android launcher
 SYSTEMLIB.UTILS.ANDROID_LAUNCHER.TYPE          := android-pak
-SYSTEMLIB.UTILS.ANDROID_LAUNCHER.NAME          := funner_launcher
-#SYSTEMLIB.UTILS.ANDROID_LAUNCHER.PACKAGE_NAME  := com.untgames.funner_launcher
+SYSTEMLIB.UTILS.ANDROID_LAUNCHER.NAME          := funner.application
+SYSTEMLIB.UTILS.ANDROID_LAUNCHER.DLL_DIRS       = $(PLATFORM_DIR)/arch-arm/usr/lib
+SYSTEMLIB.UTILS.ANDROID_LAUNCHER.DLLS          := android
 SYSTEMLIB.UTILS.ANDROID_LAUNCHER.SOURCE_DIRS   := utils/android_launcher
 SYSTEMLIB.UTILS.ANDROID_LAUNCHER.MANIFEST_FILE := utils/android_launcher/AndroidManifest.xml
 SYSTEMLIB.UTILS.ANDROID_LAUNCHER.RES_DIR       := utils/android_launcher/res
+
+#Цель №3 - Android launcher common
+SYSTEMLIB.UTILS.ANDROID_LAUNCHER_COMMON.TYPE         := android-jar
+SYSTEMLIB.UTILS.ANDROID_LAUNCHER_COMMON.NAME         := funner.application
+SYSTEMLIB.UTILS.ANDROID_LAUNCHER_COMMON.SOURCE_DIRS  := utils/android_launcher
+
+#Цель №4 - Tabletos launcher
+SYSTEMLIB.UTILS.TABLETOS_LAUNCHER.TYPE          := tabletos-bar
+SYSTEMLIB.UTILS.TABLETOS_LAUNCHER.NAME          := funner.application
+SYSTEMLIB.UTILS.TABLETOS_LAUNCHER.SOURCE_DIRS   := utils/tabletos_launcher
+SYSTEMLIB.UTILS.TABLETOS_LAUNCHER.LIBS          := socket EGL GLESv1_CM png freetype screen bps pps OpenAL asound
+SYSTEMLIB.UTILS.TABLETOS_LAUNCHER.RES_DIR       := utils/tabletos_launcher/res
+SYSTEMLIB.UTILS.TABLETOS_LAUNCHER.MANIFEST_FILE := utils/tabletos_launcher/res/bar-descriptor.xml
 
 #Цель - сборка документации
 SYSTEMLIB.INFO.TYPE        := doxygen-info
 SYSTEMLIB.INFO.CHM_NAME    := funner.system
 SYSTEMLIB.INFO.SOURCE_DIRS := include
 SYSTEMLIB.INFO.IMPORTS     := compile.system
-

@@ -40,6 +40,12 @@ int main ()
     printf ("after deactivate\n");
     printf ("is_active: %d\n", window.IsActive ());
 
+    printf ("is multitouch enabled: %d\n", window.IsMultitouchEnabled ());
+
+    window.SetMultitouchEnabled (true);
+
+    printf ("is multitouch enabled: %d\n", window.IsMultitouchEnabled ());
+
     auto_connection connection = window.RegisterEventHandler (WindowEvent_OnClose, &destroy);
 
     window.Close ();

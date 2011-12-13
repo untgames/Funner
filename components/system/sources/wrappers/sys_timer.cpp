@@ -12,11 +12,11 @@ using namespace syslib;
 
 struct Timer::Impl
 {
-  Timer&            timer;      //таймер
-  TickHandler       handler;    //обработчик срабатываний таймера
-  size_t            period;     //период срабатываний (в милисекундах)
-  Platform::timer_t sys_timer;  //дескриптор системного таймера
-  size_t            start_time; //время старта таймера
+  Timer&       timer;      //таймер
+  TickHandler  handler;    //обработчик срабатываний таймера
+  size_t       period;     //период срабатываний (в милисекундах)
+  timer_t      sys_timer;  //дескриптор системного таймера
+  size_t       start_time; //время старта таймера
 
   Impl  (Timer& in_timer, const TickHandler& in_handler);
   ~Impl ();

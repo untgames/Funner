@@ -12,7 +12,7 @@
 #elif defined (BADA)
   const char* LIBRARY_NAME = "libdl.so";
   const char* SYMBOL_NAME  = "dlopen";
-#elif defined (ANDROID)
+#elif defined (ANDROID) || defined (TABLETOS)
   const char* LIBRARY_NAME = "libdl.so";
   const char* SYMBOL_NAME  = "dlopen";  
 #else

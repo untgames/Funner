@@ -2,16 +2,6 @@
 
 using namespace syslib;
 
-struct Platform::thread_handle
-{
-  pthread_t thread;
-  bool      default_scheduling_getted;
-  int       scheduling_policy;
-  int       normal_priority;
-
-  thread_handle () : default_scheduling_getted (false) {}
-};
-
 namespace
 {
 
@@ -19,9 +9,14 @@ namespace
 void* thread_run (void* data)
 {
   if (!data)
-    return 0;
+    return 0;    
 
   xtl::com_ptr<IThreadCallback> callback (reinterpret_cast<IThreadCallback*> (data));
+
+  thread_init ();
+
+  pthread_cleanup_push  (&thread_done, 0);
+  
 
   try
   {
@@ -29,7 +24,11 @@ void* thread_run (void* data)
   }
   catch (...)
   {
+    thread_done (0);    
+
   }
+
+  pthread_cleanup_pop (1);
 
   return 0;
 }
@@ -40,7 +39,7 @@ void* thread_run (void* data)
     Создание / удаление нити
 */
 
-Platform::thread_t Platform::CreateThread (IThreadCallback* in_callback)
+thread_t PThreadManager::CreateThread (IThreadCallback* in_callback)
 {
   try
   {
@@ -51,37 +50,84 @@ Platform::thread_t Platform::CreateThread (IThreadCallback* in_callback)
 
     xtl::com_ptr<IThreadCallback> callback (in_callback);
 
+      //инициализации библиотеки
+
+    thread_init ();
+
       //создание нити
 
-    stl::auto_ptr<thread_handle> handle (new thread_handle);
+    stl::auto_ptr<pthread_t> handle (new pthread_t);
 
-    int status = pthread_create (&handle->thread, 0, &thread_run, callback.get ());
+    int status = pthread_create (handle.get (), 0, &thread_run, callback.get ());
 
     if (status)
       pthread_raise_error ("::pthread_create", status);
-
-    return handle.release ();
+      
+    return (thread_t)handle.release ();
   }
   catch (xtl::exception& exception)
   {
-    exception.touch ("syslib::PThreadPlatform::CreateThread");
+    exception.touch ("syslib::PThreadManager::CreateThread");
     throw;
   }
 }
 
-void Platform::DestroyThread (thread_t thread)
+void PThreadManager::DestroyThread (thread_t thread)
 {
-  if (!thread || !thread->thread)
+  if (!thread)
     return;    
 
-  delete thread;
+  pthread_t* handle = (pthread_t*)thread;    
+
+  delete handle;
+}
+
+/*
+    Ожидание завершения нити
+*/
+
+void PThreadManager::JoinThread (thread_t thread)
+{
+  try
+  {
+    if (!thread)
+      throw xtl::make_null_argument_exception ("", "thread");
+
+    thread_init ();
+
+    void* exit_code = 0;
+
+    int status = pthread_join (*(pthread_t*)thread, &exit_code);
+
+    if (status)
+      pthread_raise_error ("::pthread_join", status);
+  }
+  catch (xtl::exception& exception)
+  {
+    exception.touch ("syslib::PThreadManager::JoinThread");
+    throw;
+  }
+}
+
+/*
+   Получение идентификатора нити
+*/
+
+size_t PThreadManager::GetThreadId (thread_t thread)
+{
+  return (size_t)*(pthread_t*)thread;
+}
+
+size_t PThreadManager::GetCurrentThreadId ()
+{
+  return (size_t)pthread_self ();
 }
 
 /*
    Установка приоритета нити
 */
 
-void Platform::SetThreadPriority (thread_t thread, ThreadPriority thread_priority)
+void PThreadManager:SetThreadPriority (thread_t thread, ThreadPriority thread_priority)
 {
   try
   {
@@ -146,46 +192,7 @@ void Platform::SetThreadPriority (thread_t thread, ThreadPriority thread_priorit
   }
   catch (xtl::exception& exception)
   {
-    exception.touch ("syslib::PThreadPlatform::SetThreadPriority");
+    exception.touch ("syslib::PThreadManager::SetThreadPriority");
     throw;
   }
-}
-
-/*
-    Ожидание завершения нити
-*/
-
-void Platform::JoinThread (thread_t thread)
-{
-  try
-  {
-    if (!thread || !thread->thread)
-      throw xtl::make_null_argument_exception ("", "thread");
-
-    void* exit_code = 0;
-
-    int status = pthread_join ((pthread_t)thread->thread, &exit_code);
-
-    if (status)
-      pthread_raise_error ("::pthread_join", status);
-  }
-  catch (xtl::exception& exception)
-  {
-    exception.touch ("syslib::PThreadPlatform::JoinThread");
-    throw;
-  }
-}
-
-/*
-   Получение идентификатора нити
-*/
-
-size_t Platform::GetThreadId (thread_t thread)
-{
-  return (size_t)thread->thread;
-}
-
-size_t Platform::GetCurrentThreadId ()
-{
-  return (size_t)pthread_self ();
 }

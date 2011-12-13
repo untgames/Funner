@@ -7,7 +7,10 @@
 using namespace common;
 using namespace syslib;
 
-namespace
+namespace components
+{
+
+namespace thread_pool
 {
 
 /*
@@ -180,7 +183,7 @@ class BackgroundThread: public xtl::reference_counter
       }      
 
       return 0;
-    }
+    }    
 
   private:
     Log           log;
@@ -208,11 +211,13 @@ class Component
     }
 };
 
-}
-
 extern "C"
 {
 
 ComponentRegistrator<Component> ThreadPool ("common.action_queue.thread_pool");
+
+}
+
+}
 
 }

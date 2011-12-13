@@ -11,7 +11,7 @@
 #include <syslib/window.h>
 #include <syslib/platform/bada.h>
 
-#include <platform/platform.h>
+#include <shared/platform.h>
 
 #include <FBase.h>
 #include <FApp.h>

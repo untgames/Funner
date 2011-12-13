@@ -8,7 +8,7 @@ using namespace syslib;
 
 struct Semaphore::Impl
 {
-  Platform::semaphore_t handle; //дескриптор семафора
+  semaphore_t handle; //дескриптор семафора
 
 ///Конструктор
   Impl (size_t initial_value) : handle (Platform::CreateSemaphore (initial_value)) {}
