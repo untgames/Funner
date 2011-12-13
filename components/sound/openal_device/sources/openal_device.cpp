@@ -76,7 +76,9 @@ OpenALDevice::OpenALDevice (const char* driver_name, const char* device_name, co
     listener_action = common::ActionQueue::PushAction (xtl::bind (&OpenALDevice::ListenerUpdate, this), common::ActionThread_Current, 0, DEFAULT_LISTENER_PROPERTIES_UPDATE_PERIOD);
     source_action   = common::ActionQueue::PushAction (xtl::bind (&OpenALDevice::SourceUpdate, this), common::ActionThread_Current, 0, DEFAULT_SOURCE_PROPERTIES_UPDATE_PERIOD);
   
-    context.MakeCurrent ();
+    OpenALContextManager::Instance context_manager;
+
+    context_manager->SetCurrentContext (context);
     
       //формирование имени устройства
 
@@ -162,7 +164,9 @@ void OpenALDevice::ClearALData ()
 
   if (al_buffers_pool_size)
   {
-    context.MakeCurrent ();
+    OpenALContextManager::Instance context_manager;
+
+    context_manager->SetCurrentContext (context);
 
     context.alDeleteBuffers (al_buffers_pool_size, al_buffers_pool);
   }
@@ -571,7 +575,9 @@ void OpenALDevice::ListenerUpdate ()
     float orientation [6] = {listener.direction.x, listener.direction.y, listener.direction.z,
                              listener.up.x,        listener.up.y,        listener.up.z};
 
-    context.MakeCurrent ();
+    OpenALContextManager::Instance context_manager;
+
+    context_manager->SetCurrentContext (context);
 
     context.alListenerfv (AL_POSITION,    &listener.position [0]);
     context.alListenerfv (AL_VELOCITY,    &listener.velocity [0]);
@@ -673,7 +679,9 @@ void OpenALDevice::SetStringParam (const char* name, const char* value)
 
   if (!xstrcmp (name, "AL_DISTANCE_MODEL"))
   {
-    context.MakeCurrent ();
+    OpenALContextManager::Instance context_manager;
+
+    context_manager->SetCurrentContext (context);
 
     if (!xstrcmp (value, "AL_NONE"))
       context.alDistanceModel (AL_NONE);
@@ -705,7 +713,9 @@ const char* OpenALDevice::GetStringParam (const char* name)
 
   if (!xstrcmp (name, "al_distance_model"))
   {
-    context.MakeCurrent ();
+    OpenALContextManager::Instance context_manager;
+
+    context_manager->SetCurrentContext (context);
 
     switch (context.alGetInteger (AL_DISTANCE_MODEL))
     {
@@ -740,7 +750,9 @@ ALuint OpenALDevice::AllocateSourceBuffer ()
 
   ALuint buffer = WRONG_BUFFER_ID;
 
-  context.MakeCurrent ();
+  OpenALContextManager::Instance context_manager;
+
+  context_manager->SetCurrentContext (context);
 
   context.alGenBuffers (1, &buffer);
 
@@ -758,7 +770,9 @@ void OpenALDevice::DeallocateSourceBuffer (ALuint buffer)
   {
     size_t flush_size = DEVICE_BUFFERS_POOL_SIZE / 2 + 1;
 
-    context.MakeCurrent ();
+    OpenALContextManager::Instance context_manager;
+
+    context_manager->SetCurrentContext (context);
 
     context.alDeleteBuffers (flush_size, al_buffers_pool + DEVICE_BUFFERS_POOL_SIZE - flush_size);
 
