@@ -1,0 +1,407 @@
+#include "shared.h"
+
+using namespace scene_graph;
+
+/*
+     онстанты
+*/
+
+namespace
+{
+
+const size_t LISTENER_ARRAY_RESERVE_SIZE = 16; //резервируемый размер массива слушателей
+
+}
+
+/*
+    ќписание реализации Viewport
+*/
+
+typedef stl::vector<IViewportListener*> ListenerArray;
+
+struct Viewport::Impl: public xtl::reference_counter
+{
+  stl::string          name;              //им€ области вывода
+  scene_graph::Camera* camera;            //камера
+  stl::string          technique;         //им€ техники рендеринга
+  Rect                 rect;              //границы области вывода
+  bool                 is_active;         //флаг активности области вывода  
+  int                  z_order;           //пор€док отрисовки области вывода
+  math::vec4f          background_color;  //цвет фона
+  bool                 has_background;    //наличие фона
+  common::PropertyMap  properties;        //переменные рендеринга
+  ListenerArray        listeners;         //слушатели событий области вывода
+  xtl::auto_connection on_destroy_camera; //слот соединени€ с сигналом оповещени€ об удалении камеры
+
+  Impl () : camera (0), is_active (true), z_order (INT_MAX), has_background (false)
+  {
+    listeners.reserve (LISTENER_ARRAY_RESERVE_SIZE);
+  }
+
+  ~Impl ()
+  {
+    DestroyNotify ();
+  }
+
+  void SetCamera (scene_graph::Camera* in_camera)
+  {
+    if (camera == in_camera)
+      return;
+    
+    on_destroy_camera.disconnect ();
+
+    camera = in_camera;
+
+    if (camera)
+    {
+      on_destroy_camera = camera->RegisterEventHandler (scene_graph::NodeEvent_AfterDestroy,
+        xtl::bind (&Impl::SetCamera, this, (scene_graph::Camera*)0));
+    }
+
+    ChangeCameraNotify ();
+  }
+
+  template <class Fn>
+  void Notify (Fn fn)
+  {
+    for (ListenerArray::iterator volatile iter=listeners.begin (), end=listeners.end (); iter!=end; ++iter)
+    {
+      try
+      {
+        fn (*iter);
+      }
+      catch (...)
+      {
+        //подавление всех исключений
+      }
+    }    
+  }
+    
+  void ChangeNameNotify ()
+  {
+    Notify (xtl::bind (&IViewportListener::OnViewportChangeName, _1, name.c_str ()));
+  }
+  
+  void ChangeAreaNotify ()
+  {
+    Notify (xtl::bind (&IViewportListener::OnViewportChangeArea, _1, xtl::cref (rect)));
+  }
+  
+  void ChangeCameraNotify ()
+  {
+    Notify (xtl::bind (&IViewportListener::OnViewportChangeCamera, _1, camera));
+  }
+  
+  void ChangeZOrderNotify ()
+  {
+    Notify (xtl::bind (&IViewportListener::OnViewportChangeZOrder, _1, z_order));
+  }
+  
+  void ChangeActiveNotify ()
+  {
+    Notify (xtl::bind (&IViewportListener::OnViewportChangeActive, _1, is_active));
+  }
+  
+  void ChangeBackgroundNotify ()
+  {
+    Notify (xtl::bind (&IViewportListener::OnViewportChangeBackground, _1, has_background, xtl::cref (background_color)));
+  }  
+  
+  void ChangeTechniqueNotify ()
+  {
+    Notify (xtl::bind (&IViewportListener::OnViewportChangeTechnique, _1, technique.c_str ()));
+  }
+  
+  void ChangePropertiesNotify (const common::PropertyMap& properties)
+  {
+    Notify (xtl::bind (&IViewportListener::OnViewportChangeProperties, _1, properties));
+  }  
+  
+  void DestroyNotify ()
+  {
+    Notify (xtl::bind (&IViewportListener::OnViewportDestroy, _1));    
+  }
+};
+
+/*
+     онструкторы / деструктор / присваивание
+*/
+
+Viewport::Viewport ()
+  : impl (new Impl)
+{
+}
+
+Viewport::Viewport (const Viewport& vp)
+  : impl (vp.impl)
+{
+  addref (impl);
+}
+
+Viewport::~Viewport ()
+{
+  release (impl);
+}
+
+Viewport& Viewport::operator = (const Viewport& vp)
+{
+  Viewport (vp).Swap (*this);
+  
+  return *this;
+}
+
+/*
+    »м€ области вывода
+*/
+
+void Viewport::SetName (const char* name)
+{
+  if (!name)
+    throw xtl::make_null_argument_exception ("scene_graph::Viewport::SetName", "name");
+    
+  if (name == impl->name)
+    return;
+    
+  impl->name = name;
+  
+  impl->ChangeNameNotify ();
+}
+
+const char* Viewport::Name () const
+{
+  return impl->name.c_str ();
+}
+
+/*
+    »дентификатор области вывода
+*/
+
+size_t Viewport::Id () const
+{
+  return reinterpret_cast<size_t> (impl);
+}
+
+/*
+    “ехника рендеринга
+*/
+
+void Viewport::SetTechnique (const char* name)
+{
+  if (!name)
+    throw xtl::make_null_argument_exception ("scene_graph::Viewport::SetTechnique", "name");
+    
+  if (impl->technique == name)
+    return;
+    
+  impl->technique = name;
+  
+  impl->ChangeTechniqueNotify ();
+}
+
+const char* Viewport::Technique () const
+{
+  return impl->technique.c_str ();
+}
+
+/*
+    √раницы области вывода
+*/
+
+void Viewport::SetArea (const Rect& rect)
+{
+  if (impl->rect == rect)
+    return;
+
+  impl->rect = rect;
+
+  impl->ChangeAreaNotify ();
+}
+
+void Viewport::SetArea (int left, int top, int width, int height)
+{
+  SetArea (Rect (left, top, width, height));
+}
+
+void Viewport::SetOrigin (int left, int top)
+{
+  Rect new_rect = impl->rect;
+  
+  new_rect.x = left;
+  new_rect.y  = top;
+  
+  SetArea (new_rect);
+}
+
+void Viewport::SetSize (int width, int height)
+{
+  Rect new_rect = impl->rect;
+  
+  new_rect.width  = width;
+  new_rect.height = height;
+
+  SetArea (new_rect);
+}
+
+const Rect& Viewport::Area () const
+{
+  return impl->rect;
+}
+
+/*
+    ”правление пор€дком отрисовки областей вывода (отрисовка от наименьших номеров по увеличению номера)
+*/
+
+void Viewport::SetZOrder (int z_order)
+{
+  if (z_order == impl->z_order)
+    return;
+
+  impl->z_order = z_order;
+  
+  impl->ChangeZOrderNotify ();
+}
+
+int Viewport::ZOrder () const
+{
+  return impl->z_order;
+}
+
+/*
+     амера, св€занна€ с областью вывода (политика владени€ - weak-reference)
+*/
+
+void Viewport::SetCamera (scene_graph::Camera* camera)
+{
+  impl->SetCamera (camera);
+}
+
+const scene_graph::Camera* Viewport::Camera () const
+{
+  return impl->camera;
+}
+
+scene_graph::Camera* Viewport::Camera ()
+{
+  return impl->camera;
+}
+
+/*
+    ”правление активностью области вывода (неакивные области не участвуют в отрисовке)
+*/
+
+void Viewport::SetActive (bool state)
+{
+  if (state == impl->is_active)
+    return;
+
+  impl->is_active = state;
+  
+  impl->ChangeActiveNotify ();
+}
+
+bool Viewport::IsActive () const
+{
+  return impl->is_active;
+}
+
+/*
+    Ќастройка фона
+*/
+
+void Viewport::SetBackgroundColor (const math::vec4f& color)
+{
+  if (impl->background_color == color)
+    return;
+
+  impl->background_color = color;
+  
+  impl->ChangeBackgroundNotify ();
+}
+
+void Viewport::SetBackgroundColor (float red, float green, float blue, float alpha)
+{
+  SetBackgroundColor (math::vec4f (red, green, blue, alpha));
+}
+
+const math::vec4f& Viewport::BackgroundColor () const
+{
+  return impl->background_color;
+}
+
+void Viewport::SetBackgroundState (bool state)
+{
+  if (state == impl->has_background)
+    return;
+
+  impl->has_background = state;
+
+  impl->ChangeBackgroundNotify ();
+}
+
+bool Viewport::BackgroundState () const
+{
+  return impl->has_background;
+}
+
+/*
+    ”становка переменных рендеринга
+*/
+
+void Viewport::SetProperties (const common::PropertyMap& properties)
+{
+  if (impl->properties.Id () == properties.Id ())
+    return;
+    
+  impl->properties = properties;
+  
+  impl->ChangePropertiesNotify (properties);
+}
+
+const common::PropertyMap& Viewport::Properties () const
+{
+  return impl->properties;
+}
+
+/*
+    –абота со слушател€ми
+*/
+
+void Viewport::AttachListener (IViewportListener* listener) const
+{
+  if (!listener)
+    throw xtl::make_null_argument_exception ("scene_graph::Viewport::AttachListener", "listener");
+
+  impl->listeners.push_back (listener);
+}
+
+void Viewport::DetachListener (IViewportListener* listener) const
+{
+  if (!listener)
+    return;
+
+  impl->listeners.erase (stl::remove (impl->listeners.begin (), impl->listeners.end (), listener), impl->listeners.end ());
+}
+
+void Viewport::DetachAllListeners () const
+{
+  impl->listeners.clear ();
+}
+
+/*
+    ќбмен
+*/
+
+void Viewport::Swap (Viewport& vp)
+{
+  stl::swap (impl, vp.impl);
+}
+
+namespace render
+{
+    
+void swap (Viewport& vp1, Viewport& vp2)
+{
+  vp1.Swap (vp2);
+}
+
+}

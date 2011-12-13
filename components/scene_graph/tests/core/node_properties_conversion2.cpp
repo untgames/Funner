@@ -2,7 +2,7 @@
 
 #define TEST(X) try { printf ("SetProperty ('%s', %s): ", name, #X); properties.SetProperty (name, X); stl::string result; properties.GetProperty (name, result), printf ("%s\n", result.c_str ()); }catch (std::exception& e) { printf ("exception: %s\n", e.what ()); }
 
-void test (NodeProperties& properties, const char* name)
+void test (common::PropertyMap& properties, const char* name)
 {
   TEST ("");
   TEST ("hello world");
@@ -25,9 +25,9 @@ int main ()
   {
     Node::Pointer node (Node::Create ());          
     
-    node->SetProperties (NodeProperties::Create ());       
+    node->SetProperties (common::PropertyMap ());       
     
-    NodeProperties& properties = *node->Properties ();
+    common::PropertyMap& properties = *node->Properties ();
     
     properties.SetProperty ("String",  "");
     properties.SetProperty ("Integer", int (0));

@@ -9,7 +9,13 @@
 #include <xtl/dynamic_cast_root.h>
 #include <xtl/intrusive_ptr.h>
 
-#include <sg/node_properties.h>
+namespace common
+{
+
+//forward declaration
+class PropertyMap;
+
+}
 
 namespace xtl
 {
@@ -153,9 +159,10 @@ class Node: public xtl::dynamic_cast_root
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Свойства узла (могут быть NULL)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    NodeProperties::Pointer      Properties    ();
-    NodeProperties::ConstPointer Properties    () const;
-    void                         SetProperties (const NodeProperties::Pointer& properties);
+    common::PropertyMap*       Properties    ();
+    const common::PropertyMap* Properties    () const;
+    void                       SetProperties (common::PropertyMap* properties);
+    void                       SetProperties (const common::PropertyMap& properties);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Подсчёт ссылок

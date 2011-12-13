@@ -1,5 +1,6 @@
 Results of light_common_test:
 Light color: [+0.00 +0.40 +0.17]
+Light intensity: 0.50
 Light attenuation: [+0.00 +1.40 -2.00]
 Light range: 17.600000
 light '' bound:

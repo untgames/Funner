@@ -36,6 +36,12 @@ int main ()
   printf ("traverse nodes in frustum:\n");
   
   scene.Traverse (camera->Frustum (), &print);
+  
+  camera->Translate (math::vec3f (-6.0f, 0.0f, 0.0f));
+  
+  printf ("traverse nodes in frustum after camera move:\n");
+  
+  scene.Traverse (camera->Frustum (), &print);  
 
   return 0;
 }
