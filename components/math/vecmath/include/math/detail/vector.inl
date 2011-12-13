@@ -310,6 +310,13 @@ struct vec_cross_product {
 #endif
 };
 
+template <class T>
+inline void init_data (T* start, T* end)
+{
+  for (; start < end; start++)
+    *start = T ();
+}
+
 }
 
 /*
@@ -364,10 +371,7 @@ vector<T, Size>::vector (const T& x1, const T& x2, const T& x3, const T& x4)
   switch (Size)
   {
     default:
-    {
-      for (unsigned int i=0; i<Size-4; i++)
-        (*this)[i+4] = T();
-    }  
+      detail::init_data (&this->x + 4, &this->x + Size);
     case 4: (*this)[3] = x4;
     case 3: (*this)[2] = x3;
     case 2: (*this)[1] = x2;
