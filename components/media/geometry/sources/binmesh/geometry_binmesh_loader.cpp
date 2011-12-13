@@ -23,7 +23,10 @@ using namespace common;
  * primitive format: PrimitiveType type; array<char> material; size_t vertex_buffer; size_t first; size_t count
  */
 
-namespace
+namespace components
+{
+
+namespace bin_mesh_loader
 {
 
 /*
@@ -488,11 +491,13 @@ class BinMeshLoaderComponent
     }
 };
 
-}
-
 extern "C"
 {
 
 ComponentRegistrator<BinMeshLoaderComponent> BinMeshLoader ("media.geometry.loaders.BinMeshLoader");
+
+}
+
+}
 
 }

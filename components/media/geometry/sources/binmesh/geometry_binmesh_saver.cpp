@@ -23,7 +23,10 @@ using namespace media::geometry;
  * primitive format: PrimitiveType type; array<char> material; size_t vertex_buffer; size_t first; size_t count
  */
 
-namespace
+namespace components
+{
+
+namespace bin_mesh_saver
 {
 
 /*
@@ -464,11 +467,13 @@ class BinMeshSaverComponent
     }
 };
 
-}
-
 extern "C"
 {
 
 ComponentRegistrator<BinMeshSaverComponent> BinMeshSaver ("media.geometry.savers.BinMeshSaver");
+
+}
+
+}
 
 }
