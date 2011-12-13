@@ -43,7 +43,7 @@ data/test.xmesh(65): warning: node 'primitive': Empty primitive
     </vertex_buffer>
   </vertex_buffers>
   <index_buffers>
-    <index_buffer id="ib#1" indices_count="5">
+    <index_buffer id="ib#1" indices_count="5" type="uint32">
       0 1 2 3 4
     </index_buffer>
   </index_buffers>

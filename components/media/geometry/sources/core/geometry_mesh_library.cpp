@@ -210,3 +210,17 @@ void swap (MeshLibrary& model1, MeshLibrary& model2)
 }
 
 }
+
+/*
+    Регистрация сериализаторов по умолчанию
+*/
+
+void MeshLibrary::RegisterDefaultSavers ()
+{
+  static ComponentLoader loader ("media.geometry.savers.*");
+}
+
+void MeshLibrary::RegisterDefaultLoaders ()
+{
+  static ComponentLoader loader ("media.geometry.loaders.*");
+}

@@ -140,6 +140,134 @@ template <class Vertex, class T, size_t Size> struct vertex_format<Vertex, TexCo
   }
 };
 
+template <class Vertex, class T> struct vertex_format<Vertex, TexTangent<0, T> >
+{
+  static void get_format (VertexFormat& format)
+  {
+    format.AddAttribute (VertexAttributeSemantic_TexTangent0, attribute_type<math::vector<T, 3> >::value, GEOMETRY_OFFSETOF (Vertex, textangent0));
+  }
+};
+
+template <class Vertex, class T> struct vertex_format<Vertex, TexTangent<1, T> >
+{
+  static void get_format (VertexFormat& format)
+  {
+    format.AddAttribute (VertexAttributeSemantic_TexTangent1, attribute_type<math::vector<T, 3> >::value, GEOMETRY_OFFSETOF (Vertex, textangent1));
+  }
+};
+
+template <class Vertex, class T> struct vertex_format<Vertex, TexTangent<2, T> >
+{
+  static void get_format (VertexFormat& format)
+  {
+    format.AddAttribute (VertexAttributeSemantic_TexTangent2, attribute_type<math::vector<T, 3> >::value, GEOMETRY_OFFSETOF (Vertex, textangent2));
+  }
+};
+
+template <class Vertex, class T> struct vertex_format<Vertex, TexTangent<3, T> >
+{
+  static void get_format (VertexFormat& format)
+  {
+    format.AddAttribute (VertexAttributeSemantic_TexTangent3, attribute_type<math::vector<T, 3> >::value, GEOMETRY_OFFSETOF (Vertex, textangent3));
+  }
+};
+
+template <class Vertex, class T> struct vertex_format<Vertex, TexTangent<4, T> >
+{
+  static void get_format (VertexFormat& format)
+  {
+    format.AddAttribute (VertexAttributeSemantic_TexTangent4, attribute_type<math::vector<T, 3> >::value, GEOMETRY_OFFSETOF (Vertex, textangent4));
+  }
+};
+
+template <class Vertex, class T> struct vertex_format<Vertex, TexTangent<5, T> >
+{
+  static void get_format (VertexFormat& format)
+  {
+    format.AddAttribute (VertexAttributeSemantic_TexTangent5, attribute_type<math::vector<T, 3> >::value, GEOMETRY_OFFSETOF (Vertex, textangent5));
+  }    
+};
+
+template <class Vertex, class T> struct vertex_format<Vertex, TexTangent<6, T> >
+{
+  static void get_format (VertexFormat& format)
+  {
+    format.AddAttribute (VertexAttributeSemantic_TexTangent6, attribute_type<math::vector<T, 3> >::value, GEOMETRY_OFFSETOF (Vertex, textangent6));
+  }
+};
+
+template <class Vertex, class T> struct vertex_format<Vertex, TexTangent<7, T> >
+{
+  static void get_format (VertexFormat& format)
+  {
+    format.AddAttribute (VertexAttributeSemantic_TexTangent7, attribute_type<math::vector<T, 3> >::value, GEOMETRY_OFFSETOF (Vertex, textangent7));
+  }
+};
+
+template <class Vertex, class T> struct vertex_format<Vertex, TexBinormal<0, T> >
+{
+  static void get_format (VertexFormat& format)
+  {
+    format.AddAttribute (VertexAttributeSemantic_TexBinormal0, attribute_type<math::vector<T, 3> >::value, GEOMETRY_OFFSETOF (Vertex, texbinormal0));
+  }
+};
+
+template <class Vertex, class T> struct vertex_format<Vertex, TexBinormal<1, T> >
+{
+  static void get_format (VertexFormat& format)
+  {
+    format.AddAttribute (VertexAttributeSemantic_TexBinormal1, attribute_type<math::vector<T, 3> >::value, GEOMETRY_OFFSETOF (Vertex, texbinormal1));
+  }
+};
+
+template <class Vertex, class T> struct vertex_format<Vertex, TexBinormal<2, T> >
+{
+  static void get_format (VertexFormat& format)
+  {
+    format.AddAttribute (VertexAttributeSemantic_TexBinormal2, attribute_type<math::vector<T, 3> >::value, GEOMETRY_OFFSETOF (Vertex, texbinormal2));
+  }
+};
+
+template <class Vertex, class T> struct vertex_format<Vertex, TexBinormal<3, T> >
+{
+  static void get_format (VertexFormat& format)
+  {
+    format.AddAttribute (VertexAttributeSemantic_TexBinormal3, attribute_type<math::vector<T, 3> >::value, GEOMETRY_OFFSETOF (Vertex, texbinormal3));
+  }
+};
+
+template <class Vertex, class T> struct vertex_format<Vertex, TexBinormal<4, T> >
+{
+  static void get_format (VertexFormat& format)
+  {
+    format.AddAttribute (VertexAttributeSemantic_TexBinormal4, attribute_type<math::vector<T, 3> >::value, GEOMETRY_OFFSETOF (Vertex, texbinormal4));
+  }
+};
+
+template <class Vertex, class T> struct vertex_format<Vertex, TexBinormal<5, T> >
+{
+  static void get_format (VertexFormat& format)
+  {
+    format.AddAttribute (VertexAttributeSemantic_TexBinormal5, attribute_type<math::vector<T, 3> >::value, GEOMETRY_OFFSETOF (Vertex, texbinormal5));
+  }    
+};
+
+template <class Vertex, class T> struct vertex_format<Vertex, TexBinormal<6, T> >
+{
+  static void get_format (VertexFormat& format)
+  {
+    format.AddAttribute (VertexAttributeSemantic_TexBinormal6, attribute_type<math::vector<T, 3> >::value, GEOMETRY_OFFSETOF (Vertex, texbinormal6));
+  }
+};
+
+template <class Vertex, class T> struct vertex_format<Vertex, TexBinormal<7, T> >
+{
+  static void get_format (VertexFormat& format)
+  {
+    format.AddAttribute (VertexAttributeSemantic_TexBinormal7, attribute_type<math::vector<T, 3> >::value, GEOMETRY_OFFSETOF (Vertex, texbinormal7));
+  }
+};
+
 template <class Vertex> struct vertex_format<Vertex, VertexInfluence>
 {
   static void get_format (VertexFormat& format)

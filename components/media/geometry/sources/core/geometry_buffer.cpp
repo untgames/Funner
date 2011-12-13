@@ -61,3 +61,10 @@ void Buffer::Reserve (size_t new_size)
   start          = new_buffer;  
   end_of_storage = new_buffer + new_size;
 }
+
+void Buffer::Swap (Buffer& buffer)
+{
+  stl::swap (start, buffer.start);
+  stl::swap (finish, buffer.finish);
+  stl::swap (end_of_storage, buffer.end_of_storage);
+}

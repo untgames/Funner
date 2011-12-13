@@ -361,19 +361,35 @@ const char* get_semantic_name (VertexAttributeSemantic semantic)
 {
   switch (semantic)
   {
-    case VertexAttributeSemantic_Position:  return "position";
-    case VertexAttributeSemantic_Normal:    return "normal";
-    case VertexAttributeSemantic_Color:     return "color";
-    case VertexAttributeSemantic_Tangent:   return "tangent";
-    case VertexAttributeSemantic_Binormal:  return "binormal";
-    case VertexAttributeSemantic_TexCoord0: return "texcoord0";
-    case VertexAttributeSemantic_TexCoord1: return "texcoord1";
-    case VertexAttributeSemantic_TexCoord2: return "texcoord2";
-    case VertexAttributeSemantic_TexCoord3: return "texcoord3";
-    case VertexAttributeSemantic_TexCoord4: return "texcoord4";
-    case VertexAttributeSemantic_TexCoord5: return "texcoord5";
-    case VertexAttributeSemantic_TexCoord6: return "texcoord6";
-    case VertexAttributeSemantic_TexCoord7: return "texcoord7";
+    case VertexAttributeSemantic_Position:     return "position";
+    case VertexAttributeSemantic_Normal:       return "normal";
+    case VertexAttributeSemantic_Color:        return "color";
+    case VertexAttributeSemantic_Tangent:      return "tangent";
+    case VertexAttributeSemantic_Binormal:     return "binormal";
+    case VertexAttributeSemantic_TexCoord0:    return "texcoord0";
+    case VertexAttributeSemantic_TexCoord1:    return "texcoord1";
+    case VertexAttributeSemantic_TexCoord2:    return "texcoord2";
+    case VertexAttributeSemantic_TexCoord3:    return "texcoord3";
+    case VertexAttributeSemantic_TexCoord4:    return "texcoord4";
+    case VertexAttributeSemantic_TexCoord5:    return "texcoord5";
+    case VertexAttributeSemantic_TexCoord6:    return "texcoord6";
+    case VertexAttributeSemantic_TexCoord7:    return "texcoord7";
+    case VertexAttributeSemantic_TexTangent0:  return "textangent0";
+    case VertexAttributeSemantic_TexTangent1:  return "textangent1";
+    case VertexAttributeSemantic_TexTangent2:  return "textangent2";
+    case VertexAttributeSemantic_TexTangent3:  return "textangent3";
+    case VertexAttributeSemantic_TexTangent4:  return "textangent4";
+    case VertexAttributeSemantic_TexTangent5:  return "textangent5";
+    case VertexAttributeSemantic_TexTangent6:  return "textangent6";
+    case VertexAttributeSemantic_TexTangent7:  return "textangent7";
+    case VertexAttributeSemantic_TexBinormal0: return "texbinormal0";
+    case VertexAttributeSemantic_TexBinormal1: return "texbinormal1";
+    case VertexAttributeSemantic_TexBinormal2: return "texbinormal2";
+    case VertexAttributeSemantic_TexBinormal3: return "texbinormal3";
+    case VertexAttributeSemantic_TexBinormal4: return "texbinormal4";
+    case VertexAttributeSemantic_TexBinormal5: return "texbinormal5";
+    case VertexAttributeSemantic_TexBinormal6: return "texbinormal6";
+    case VertexAttributeSemantic_TexBinormal7: return "texbinormal7";    
     case VertexAttributeSemantic_Influence: return "influence";
     default:                                throw xtl::make_argument_exception ("media::geometry::get_semantic_name(VertexAttributeSemantic)", "semantic", semantic);
   }
@@ -394,20 +410,36 @@ VertexAttributeSemantic get_vertex_attribute_semantic (const char* name, VertexA
   };
   
   static Map map [] = {
-    {"position",  VertexAttributeSemantic_Position},
-    {"normal",    VertexAttributeSemantic_Normal},
-    {"color",     VertexAttributeSemantic_Color},
-    {"tangent",   VertexAttributeSemantic_Tangent},
-    {"binormal",  VertexAttributeSemantic_Binormal},
-    {"texcoord0", VertexAttributeSemantic_TexCoord0},
-    {"texcoord1", VertexAttributeSemantic_TexCoord1},
-    {"texcoord2", VertexAttributeSemantic_TexCoord2},
-    {"texcoord3", VertexAttributeSemantic_TexCoord3},
-    {"texcoord4", VertexAttributeSemantic_TexCoord4},
-    {"texcoord5", VertexAttributeSemantic_TexCoord5},
-    {"texcoord6", VertexAttributeSemantic_TexCoord6},
-    {"texcoord7", VertexAttributeSemantic_TexCoord7},
-    {"influence", VertexAttributeSemantic_Influence}
+    {"position",     VertexAttributeSemantic_Position},
+    {"normal",       VertexAttributeSemantic_Normal},
+    {"color",        VertexAttributeSemantic_Color},
+    {"tangent",      VertexAttributeSemantic_Tangent},
+    {"binormal",     VertexAttributeSemantic_Binormal},
+    {"texcoord0",    VertexAttributeSemantic_TexCoord0},
+    {"texcoord1",    VertexAttributeSemantic_TexCoord1},
+    {"texcoord2",    VertexAttributeSemantic_TexCoord2},
+    {"texcoord3",    VertexAttributeSemantic_TexCoord3},
+    {"texcoord4",    VertexAttributeSemantic_TexCoord4},
+    {"texcoord5",    VertexAttributeSemantic_TexCoord5},
+    {"texcoord6",    VertexAttributeSemantic_TexCoord6},
+    {"texcoord7",    VertexAttributeSemantic_TexCoord7},
+    {"textangent0",  VertexAttributeSemantic_TexTangent0},
+    {"textangent1",  VertexAttributeSemantic_TexTangent1},
+    {"textangent2",  VertexAttributeSemantic_TexTangent2},
+    {"textangent3",  VertexAttributeSemantic_TexTangent3},
+    {"textangent4",  VertexAttributeSemantic_TexTangent4},
+    {"textangent5",  VertexAttributeSemantic_TexTangent5},
+    {"textangent6",  VertexAttributeSemantic_TexTangent6},
+    {"textangent7",  VertexAttributeSemantic_TexTangent7},
+    {"texbinormal0", VertexAttributeSemantic_TexBinormal0},
+    {"texbinormal1", VertexAttributeSemantic_TexBinormal1},
+    {"texbinormal2", VertexAttributeSemantic_TexBinormal2},
+    {"texbinormal3", VertexAttributeSemantic_TexBinormal3},
+    {"texbinormal4", VertexAttributeSemantic_TexBinormal4},
+    {"texbinormal5", VertexAttributeSemantic_TexBinormal5},
+    {"texbinormal6", VertexAttributeSemantic_TexBinormal6},
+    {"texbinormal7", VertexAttributeSemantic_TexBinormal7},    
+    {"influence",    VertexAttributeSemantic_Influence}
   };
   
   static const size_t map_size = sizeof (map) / sizeof (*map);
@@ -501,6 +533,22 @@ bool is_compatible (VertexAttributeSemantic semantic, VertexAttributeType type)
         case VertexAttributeType_UByte4: return true;
         default:                         return false;
       }
+    case VertexAttributeSemantic_TexTangent0:
+    case VertexAttributeSemantic_TexTangent1:
+    case VertexAttributeSemantic_TexTangent2:
+    case VertexAttributeSemantic_TexTangent3:
+    case VertexAttributeSemantic_TexTangent4:
+    case VertexAttributeSemantic_TexTangent5:
+    case VertexAttributeSemantic_TexTangent6:
+    case VertexAttributeSemantic_TexTangent7:
+    case VertexAttributeSemantic_TexBinormal0:
+    case VertexAttributeSemantic_TexBinormal1:
+    case VertexAttributeSemantic_TexBinormal2:
+    case VertexAttributeSemantic_TexBinormal3:
+    case VertexAttributeSemantic_TexBinormal4:
+    case VertexAttributeSemantic_TexBinormal5:
+    case VertexAttributeSemantic_TexBinormal6:
+    case VertexAttributeSemantic_TexBinormal7:
     case VertexAttributeSemantic_Normal:
     case VertexAttributeSemantic_Tangent:
     case VertexAttributeSemantic_Binormal:
