@@ -3,7 +3,10 @@
 using namespace input;
 using namespace common;
 
-namespace
+namespace components
+{
+
+namespace xkeyreg_saver
 {
 
 class TranslationMapRegistrySaver : public TranslationMapRegistry::IEnumerator
@@ -53,6 +56,8 @@ extern "C"
 {
 
 ComponentRegistrator<KeyregSaverComponent> XKeyregSaver ("input.savers.xkeyreg");
+
+}
 
 }
 

@@ -157,15 +157,15 @@ struct IPhoneKeyboard::Impl : public KeyboardListener
   TextFieldListener *text_field_listener;  //слушатель сообщений текстового пол€
 
   /// онструктор / деструктор
-  Impl (const char* in_name, const char* in_full_name)
+  Impl (const char* in_name, const char* in_full_name, KeyboardType keyboard_type, AutocapitalizationType autocapitalization_type)
     : name (in_name), full_name (in_full_name), text_field (0), text_field_listener (0)
   {
     try
     {
       CGRect frame_rect;
 
-      frame_rect.origin.x    = 1000;
-      frame_rect.origin.y    = 1000;
+      frame_rect.origin.x    = 0;
+      frame_rect.origin.y    = -100;
       frame_rect.size.width  = 1;
       frame_rect.size.height = 1;
 
@@ -173,6 +173,41 @@ struct IPhoneKeyboard::Impl : public KeyboardListener
 
       if (!text_field)
         throw xtl::format_operation_exception ("", "Can't create needed text field");
+
+      UITextAutocapitalizationType ui_autocapitalization_type;
+
+      switch (autocapitalization_type)
+      {
+        case AutocapitalizationType_None:
+          ui_autocapitalization_type = UITextAutocapitalizationTypeNone;
+          break;
+        case AutocapitalizationType_Sentences:
+          ui_autocapitalization_type = UITextAutocapitalizationTypeSentences;
+          break;
+        default:
+          throw xtl::make_argument_exception ("", "autocapitalization_type", autocapitalization_type);
+      }
+
+      UIKeyboardType ui_keyboard_type;
+
+      switch (keyboard_type)
+      {
+        case KeyboardType_ASCII:
+          ui_keyboard_type = UIKeyboardTypeASCIICapable;
+          break;
+        case KeyboardType_NumberPad:
+          ui_keyboard_type = UIKeyboardTypeNumberPad;
+          break;
+        case KeyboardType_NumbersAndPunctuation:
+          ui_keyboard_type = UIKeyboardTypeNumbersAndPunctuation;
+          break;
+        default:
+          throw xtl::make_argument_exception ("", "keyboard_type", keyboard_type);
+      }
+
+      text_field.autocapitalizationType = ui_autocapitalization_type;
+      text_field.autocorrectionType     = UITextAutocorrectionTypeNo;
+      text_field.keyboardType           = ui_keyboard_type;
 
       [[UIApplication sharedApplication].keyWindow addSubview:text_field];
 
@@ -239,8 +274,8 @@ struct IPhoneKeyboard::Impl : public KeyboardListener
     онструктор/деструктор
 */
 
-IPhoneKeyboard::IPhoneKeyboard (const char* name, const char* full_name)
-  : impl (new Impl (name, full_name))
+IPhoneKeyboard::IPhoneKeyboard (const char* name, const char* full_name, KeyboardType keyboard_type, AutocapitalizationType autocapitalization_type)
+  : impl (new Impl (name, full_name, keyboard_type, autocapitalization_type))
   {}
 
 IPhoneKeyboard::~IPhoneKeyboard ()

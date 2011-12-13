@@ -3,7 +3,10 @@
 using namespace input;
 using namespace common;
 
-namespace
+namespace components
+{
+
+namespace xkeydet_saver
 {
 
 void controls_detector_saver (const char* file_name, const ControlsDetector& source_detector)
@@ -41,6 +44,8 @@ extern "C"
 {
 
 ComponentRegistrator<KeydetSaverComponent> XKeydetSaver ("input.savers.xkeydet");
+
+}
 
 }
 

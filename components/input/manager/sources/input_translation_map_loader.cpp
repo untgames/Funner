@@ -3,7 +3,10 @@
 using namespace input;
 using namespace common;
 
-namespace
+namespace components
+{
+
+namespace xkeymap_loader
 {
 
 void translation_map_loader (const char* file_name, TranslationMap& target_map)
@@ -58,6 +61,8 @@ extern "C"
 {
 
 ComponentRegistrator<KeymapLoaderComponent> XKeymapLoader ("input.loaders.xkeymap");
+
+}
 
 }
 

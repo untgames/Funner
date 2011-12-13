@@ -3,7 +3,10 @@
 using namespace input;
 using namespace common;
 
-namespace
+namespace components
+{
+
+namespace xkeydet_loader
 {
 
 void controls_detector_loader (const char* file_name, ControlsDetector& target_detector)
@@ -58,6 +61,8 @@ extern "C"
 {
 
 ComponentRegistrator<KeydetLoaderComponent> XKeydetLoader ("input.loaders.xkeydet");
+
+}
 
 }
 

@@ -14,10 +14,16 @@ struct DeviceDesc
   const char* full_name;
 };
 
-const DeviceDesc ACCELEROMETER_DEVICE_DESC = { "iphone_accelerometer", "accelerometer.iphone_accelerometer" };
-const DeviceDesc KEYBOARD_DEVICE_DESC      = { "iphone_keyboard", "keyboard.iphone_keyboard" };
+const DeviceDesc ACCELEROMETER_DEVICE_DESC                  = { "iphone_accelerometer", "accelerometer.iphone_accelerometer" };
+const DeviceDesc APPLICATION_DEVICE_DESC                    = { "iphone_application", "application.iphone_application" };
+const DeviceDesc ASCII_KEYBOARD_DEVICE_DESC                 = { "ascii_keyboard", "keyboard.ascii_keyboard" };
+const DeviceDesc ASCII_AUTOCAPITALIZED_KEYBOARD_DEVICE_DESC = { "ascii_autocapitalized_keyboard", "keyboard.ascii_autocapitalized_keyboard" };
+const DeviceDesc NUMBER_KEYBOARD_DEVICE_DESC                = { "number_keyboard", "keyboard.number_keyboard" };
+const DeviceDesc NUMBER_PUNCTUATION_KEYBOARD_DEVICE_DESC    = { "number_punctuation_keyboard", "keyboard.number_punctuation_keyboard" };
 
-const DeviceDesc SUPPORTED_DEVICES [] = { ACCELEROMETER_DEVICE_DESC, KEYBOARD_DEVICE_DESC };
+const DeviceDesc SUPPORTED_DEVICES [] = { ACCELEROMETER_DEVICE_DESC, APPLICATION_DEVICE_DESC, ASCII_KEYBOARD_DEVICE_DESC,
+                                          ASCII_AUTOCAPITALIZED_KEYBOARD_DEVICE_DESC, NUMBER_KEYBOARD_DEVICE_DESC,
+                                          NUMBER_PUNCTUATION_KEYBOARD_DEVICE_DESC };
 
 }
 
@@ -96,8 +102,16 @@ class Driver: virtual public IDriver, public xtl::reference_counter
 
         if (!xtl::xstrcmp (full_device_name, name))
         {
-          if (!xtl::xstrcmp (full_device_name, KEYBOARD_DEVICE_DESC.full_name))
-            return new IPhoneKeyboard (KEYBOARD_DEVICE_DESC.name, KEYBOARD_DEVICE_DESC.full_name);
+          if (!xtl::xstrcmp (device_name, ASCII_KEYBOARD_DEVICE_DESC.name))
+            return new IPhoneKeyboard (ASCII_KEYBOARD_DEVICE_DESC.name, ASCII_KEYBOARD_DEVICE_DESC.full_name, KeyboardType_ASCII, AutocapitalizationType_None);
+          else if (!xtl::xstrcmp (device_name, ASCII_AUTOCAPITALIZED_KEYBOARD_DEVICE_DESC.name))
+            return new IPhoneKeyboard (ASCII_AUTOCAPITALIZED_KEYBOARD_DEVICE_DESC.name, ASCII_AUTOCAPITALIZED_KEYBOARD_DEVICE_DESC.full_name, KeyboardType_ASCII, AutocapitalizationType_Sentences);
+          else if (!xtl::xstrcmp (device_name, NUMBER_KEYBOARD_DEVICE_DESC.name))
+            return new IPhoneKeyboard (NUMBER_KEYBOARD_DEVICE_DESC.name, NUMBER_KEYBOARD_DEVICE_DESC.full_name, KeyboardType_NumberPad, AutocapitalizationType_None);
+          else if (!xtl::xstrcmp (device_name, NUMBER_PUNCTUATION_KEYBOARD_DEVICE_DESC.name))
+            return new IPhoneKeyboard (NUMBER_PUNCTUATION_KEYBOARD_DEVICE_DESC.name, NUMBER_PUNCTUATION_KEYBOARD_DEVICE_DESC.full_name, KeyboardType_NumbersAndPunctuation, AutocapitalizationType_None);
+          else if (!xtl::xstrcmp (device_name, APPLICATION_DEVICE_DESC.name))
+            return new IPhoneApplication (APPLICATION_DEVICE_DESC.name, APPLICATION_DEVICE_DESC.full_name);
           else if (!xtl::xstrcmp (full_device_name, ACCELEROMETER_DEVICE_DESC.full_name))
             return new IPhoneAccelerometer (ACCELEROMETER_DEVICE_DESC.name, ACCELEROMETER_DEVICE_DESC.full_name);
         }
@@ -143,7 +157,10 @@ class Driver: virtual public IDriver, public xtl::reference_counter
     Компонент драйвера
 */
 
-namespace
+namespace components
+{
+
+namespace iphone_input_driver
 {
 
 class IPhoneDriverComponent
@@ -155,11 +172,13 @@ class IPhoneDriverComponent
     }
 };
 
-}
-
 extern "C"
 {
 
 common::ComponentRegistrator<IPhoneDriverComponent> IPhoneInputDriver (COMPONENT_NAME);
+
+}
+
+}
 
 }
