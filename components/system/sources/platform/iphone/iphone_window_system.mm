@@ -16,6 +16,8 @@ using namespace syslib::iphone;
 namespace
 {
 
+const size_t DEFAULT_TOUCH_BUFFER_SIZE = 4;  //размер буфера для хранения информации о касаниях
+
 InterfaceOrientation get_interface_orientation (UIInterfaceOrientation interface_orientation)
 {
   switch (interface_orientation)
@@ -33,13 +35,13 @@ InterfaceOrientation get_interface_orientation (UIInterfaceOrientation interface
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 struct WindowImpl
 {
-  void*                user_data;       //указатель на пользовательские данные
-  WindowMessageHandler message_handler; //функция обработки сообщений окна
-  window_t             cocoa_window;    //окно
+  void*                          user_data;       //указатель на пользовательские данные
+  Platform::WindowMessageHandler message_handler; //функция обработки сообщений окна
+  Platform::window_t             cocoa_window;    //окно
 
   //Конструктор/деструктор
-  WindowImpl (WindowMessageHandler handler, void* in_user_data, void* new_window)
-    : user_data (in_user_data), message_handler (handler), cocoa_window ((window_t)new_window)
+  WindowImpl (Platform::WindowMessageHandler handler, void* in_user_data, void* new_window)
+    : user_data (in_user_data), message_handler (handler), cocoa_window ((Platform::window_t)new_window)
     {}
 
   ~WindowImpl ()
@@ -63,7 +65,8 @@ struct WindowImpl
 
 }
 
-typedef stl::vector <IWindowListener*> ListenerArray;
+typedef stl::vector <IWindowListener*>                ListenerArray;
+typedef xtl::uninitialized_storage <TouchDescription> TouchDescriptionArray;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Распределитель событий окна
@@ -71,12 +74,12 @@ typedef stl::vector <IWindowListener*> ListenerArray;
 @interface UIWindowWrapper : UIWindow
 {
   @private
-    WindowImpl         *window_impl;          //окно
-    ListenerArray      *listeners;            //подписчика на события
-    WindowEventContext *event_context;        //контекст, передаваемый обработчикам событий
-    UIViewController   *root_view_controller; //корневой контроллер
-    int                allowed_orientations;  //разрешенные ориентации окна
-    bool               has_ios_4_0;           //версия операционной системы >= 4.0
+    WindowImpl            *window_impl;          //окно
+    ListenerArray         *listeners;            //подписчика на события
+    TouchDescriptionArray *touch_descriptions;   //массив для хранения описаний текущего события
+    WindowEventContext    *event_context;        //контекст, передаваемый обработчикам событий
+    UIViewController      *root_view_controller; //корневой контроллер
+    int                   allowed_orientations;  //разрешенные ориентации окна
 }
 
 @property (nonatomic, assign) WindowImpl* window_impl;
@@ -147,12 +150,46 @@ typedef stl::vector <IWindowListener*> ListenerArray;
   [(UIWindowWrapper*)self.window onPaint];
 }
 
+-(void) touchesBegan:(NSSet*)touches withEvent:(UIEvent*)event
+{
+  [(UIWindowWrapper*)self.window touchesBegan:touches withEvent:event];
+}
+
+-(void) touchesEnded:(NSSet*)touches withEvent:(UIEvent*)event
+{
+  [(UIWindowWrapper*)self.window touchesEnded:touches withEvent:event];
+}
+
+-(void) touchesMoved:(NSSet*)touches withEvent:(UIEvent*)event
+{
+  [(UIWindowWrapper*)self.window touchesMoved:touches withEvent:event];
+}
+
+-(void) touchesCancelled:(NSSet*)touches withEvent:(UIEvent*)event
+{
+  [(UIWindowWrapper*)self.window touchesCancelled:touches withEvent:event];
+}
+
+-(void) motionBegan:(UIEventSubtype)motion withEvent:(UIEvent*)event
+{
+  [(UIWindowWrapper*)self.window motionBegan:motion withEvent:event];
+}
+
+-(void) motionEnded:(UIEventSubtype)motion withEvent:(UIEvent*)event
+{
+  [(UIWindowWrapper*)self.window motionEnded:motion withEvent:event];
+}
+
+-(void) motionCancelled:(UIEventSubtype)motion withEvent:(UIEvent*)event
+{
+  [(UIWindowWrapper*)self.window motionCancelled:motion withEvent:event];
+}
+
 @end
 
 /*
    Класс, отвечающий за управление ориентацией окна
 */
-
 @interface UIViewControllerWrapper : UIViewController
 {
 }
@@ -209,8 +246,7 @@ typedef stl::vector <IWindowListener*> ListenerArray;
 
 -(void) dealloc
 {
-  [[NSNotificationCenter defaultCenter] removeObserver:self];
-
+  delete touch_descriptions;
   delete listeners;
   delete event_context;
 
@@ -219,7 +255,7 @@ typedef stl::vector <IWindowListener*> ListenerArray;
 
 -(CGFloat)contentScaleFactor
 {
-  if (has_ios_4_0)
+  if ([[[UIDevice currentDevice] systemVersion] compare:@"4.0" options:NSNumericSearch] != NSOrderedAscending)
     return super.contentScaleFactor;
 
   return 1;
@@ -252,21 +288,20 @@ typedef stl::vector <IWindowListener*> ListenerArray;
   if (!self)
     return nil;
 
-  allowed_orientations = InterfaceOrientation_Portrait;
-  has_ios_4_0          = [[[UIDevice currentDevice] systemVersion] compare:@"4.0" options:NSNumericSearch] != NSOrderedAscending;
-
   try
   {
     event_context = new WindowEventContext;
 
     event_context->handle = self;
 
-    listeners = new ListenerArray;
+    listeners          = new ListenerArray;
+    touch_descriptions = new TouchDescriptionArray (DEFAULT_TOUCH_BUFFER_SIZE);
   }
   catch (...)
   {
     delete event_context;
     delete listeners;
+    delete touch_descriptions;
 
     [self release];
 
@@ -276,86 +311,77 @@ typedef stl::vector <IWindowListener*> ListenerArray;
   self.rootViewController = [[UIViewControllerWrapper alloc] init];
   [self.rootViewController release];
 
-  [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector (onShow) name:UIWindowDidBecomeVisibleNotification object:self];
-  [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector (onHide) name:UIWindowDidBecomeHiddenNotification object:self];
-
   return self;
-}
-
--(void)onPaint
-{
-  window_impl->Notify (WindowEvent_OnPaint, [self getEventContext]);
-}
-
--(void)onShow
-{
-  window_impl->Notify (WindowEvent_OnShow, [self getEventContext]);
-}
-
--(void)onHide
-{
-  window_impl->Notify (WindowEvent_OnHide, [self getEventContext]);
 }
 
 -(WindowEventContext&) getEventContext
 {
-  event_context->touches_count = 0;
-
   return *event_context;
 }
 
--(WindowEventContext&)getEventContextWithTouches:(NSSet*)touches
+-(void) onPaint
 {
-  if ([touches count] > MAX_TOUCHES_COUNT)
-    @throw [NSException exceptionWithName:@"Invalid operation" reason:@"Touches event occured with touches count more than maximum" userInfo:nil];
+  window_impl->Notify (WindowEvent_OnPaint, [self getEventContext]);
+}
 
-  WindowEventContext& return_value = [self getEventContext];
-
-  return_value.touches_count = [touches count];
+-(void) fillTouchDescriptionsBuffer:(NSSet*)touches
+{
+  if ([touches count] > touch_descriptions->size ())
+    touch_descriptions->resize ([touches count], false);
 
   UIView                 *view              = self.rootViewController.view;
   NSEnumerator           *enumerator        = [touches objectEnumerator];
-  Touch                  *touch_description = return_value.touches;
+  TouchDescription       *touch_description = touch_descriptions->data ();
   CGSize                 view_size          = view.frame.size;
+  UIInterfaceOrientation ui_orientation     = self.rootViewController.interfaceOrientation;
 
   for (UITouch *iter = [enumerator nextObject]; iter; iter = [enumerator nextObject], touch_description++)
   {
     CGPoint current_location = [iter locationInView:view];
 
-    touch_description->touch_id   = (size_t)iter;
-    touch_description->position.x = current_location.x * [self contentScaleFactor];
-    touch_description->position.y = current_location.y * [self contentScaleFactor];
-  }
+    switch (ui_orientation)
+    {
+      case UIInterfaceOrientationLandscapeLeft:
+      case UIInterfaceOrientationLandscapeRight:
+      {
+        current_location.x = current_location.x / view_size.height * view_size.width;
+        current_location.y = current_location.y / view_size.width * view_size.height;
 
-  return return_value;
+        break;
+      }
+      default:
+        break;
+    }
+
+    touch_description->touch     = (touch_t)iter;
+    touch_description->x         = current_location.x / view_size.width;
+    touch_description->y         = current_location.y / view_size.height;
+    touch_description->tap_count = iter.tapCount;
+  }
 }
 
 -(void) touchesBegan:(NSSet*)touches withEvent:(UIEvent*)event
 {
-  window_impl->Notify (WindowEvent_OnTouchesBegan, [self getEventContextWithTouches:touches]);
+  [self fillTouchDescriptionsBuffer:touches];
 
-  NSMutableSet* doubletap_touches = [[NSMutableSet alloc] initWithCapacity:[touches count]];
-
-  for (UITouch* touch in touches)
-  {
-    if (!(touch.tapCount % 2))
-      [doubletap_touches addObject:touch];
-  }
-
-  if ([doubletap_touches count])
-    window_impl->Notify (WindowEvent_OnTouchesDoubletap, [self getEventContextWithTouches:doubletap_touches]);
-
-  [doubletap_touches release];
+  for (ListenerArray::iterator iter = listeners->begin (), end = listeners->end (); iter != end; ++iter)
+    (*iter)->OnTouchesBegan ([touches count], touch_descriptions->data ());
 }
 
 -(void) touchesEnded:(NSSet*)touches withEvent:(UIEvent*)event
 {
-  window_impl->Notify (WindowEvent_OnTouchesEnded, [self getEventContextWithTouches:touches]);
+  [self fillTouchDescriptionsBuffer:touches];
+
+  for (ListenerArray::iterator iter = listeners->begin (), end = listeners->end (); iter != end; ++iter)
+    (*iter)->OnTouchesEnded ([touches count], touch_descriptions->data ());
 }
 
 -(void) touchesMoved:(NSSet*)touches withEvent:(UIEvent*)event
 {
-  window_impl->Notify (WindowEvent_OnTouchesMoved, [self getEventContextWithTouches:touches]);
+  [self fillTouchDescriptionsBuffer:touches];
+
+  for (ListenerArray::iterator iter = listeners->begin (), end = listeners->end (); iter != end; ++iter)
+    (*iter)->OnTouchesMoved ([touches count], touch_descriptions->data ());
 }
 
 -(void) touchesCancelled:(NSSet*)touches withEvent:(UIEvent*)event
@@ -396,8 +422,6 @@ typedef stl::vector <IWindowListener*> ListenerArray;
 {
   for (ListenerArray::iterator iter = listeners->begin (), end = listeners->end (); iter != end; ++iter)
     (*iter)->OnInterfaceOrientationChanged (from_orientation, to_orientation);
-
-  window_impl->Notify (WindowEvent_OnSize, [self getEventContext]);
 }
 
 /*
@@ -420,9 +444,9 @@ typedef stl::vector <IWindowListener*> ListenerArray;
     Создание/закрытие/уничтожение окна
 */
 
-window_t IPhoneWindowManager::CreateWindow (WindowStyle window_style, WindowMessageHandler handler, const void* parent_handle, const char* init_string, void* user_data)
+Platform::window_t Platform::CreateWindow (WindowStyle window_style, WindowMessageHandler handler, const void* parent_handle, const char* init_string, void* user_data)
 {
-  static const char* METHOD_NAME = "syslib::IPhoneWindowManager::CreateWindow";
+  static const char* METHOD_NAME = "syslib::iPhonePlatform::CreateWindow";
 
   if (!is_in_run_loop ())
     throw xtl::format_operation_exception (METHOD_NAME, "Can't create window before entering run loop");
@@ -449,14 +473,14 @@ window_t IPhoneWindowManager::CreateWindow (WindowStyle window_style, WindowMess
   return (window_t)new_window;
 }
 
-void IPhoneWindowManager::CloseWindow (window_t handle)
+void Platform::CloseWindow (window_t handle)
 {
   WindowImpl* window = ((UIWindowWrapper*)handle).window_impl;
 
   window->Notify (WindowEvent_OnClose, [(UIWindowWrapper*)handle getEventContext]);
 }
 
-void IPhoneWindowManager::DestroyWindow (window_t handle)
+void Platform::DestroyWindow (window_t handle)
 {
   WindowImpl* window = ((UIWindowWrapper*)handle).window_impl;
 
@@ -469,31 +493,26 @@ void IPhoneWindowManager::DestroyWindow (window_t handle)
     Получение платформо-зависимого дескриптора окна
 */
 
-const void* IPhoneWindowManager::GetNativeWindowHandle (window_t handle)
+const void* Platform::GetNativeWindowHandle (window_t handle)
 {
   return reinterpret_cast<const void*> (handle);
-}
-
-const void* IPhoneWindowManager::GetNativeDisplayHandle (window_t)
-{
-  return 0;
 }
 
 /*
     Заголовок окна
 */
 
-void IPhoneWindowManager::SetWindowTitle (window_t, const wchar_t*)
+void Platform::SetWindowTitle (window_t, const wchar_t*)
 {
 }
 
-void IPhoneWindowManager::GetWindowTitle (window_t, size_t size, wchar_t* buffer)
+void Platform::GetWindowTitle (window_t, size_t size, wchar_t* buffer)
 {
   if (!size)
     return;
 
   if (!buffer)
-    throw xtl::make_null_argument_exception ("syslib::IPhoneWindowManager::GetWindowTitle", "buffer");
+    throw xtl::make_null_argument_exception ("syslib::iPhonePlatform::GetWindowTitle", "buffer");
 
   *buffer = L'\0';
 }
@@ -502,10 +521,10 @@ void IPhoneWindowManager::GetWindowTitle (window_t, size_t size, wchar_t* buffer
     Область окна / клиентская область
 */
 
-void IPhoneWindowManager::SetWindowRect (window_t window, const Rect& rect)
+void Platform::SetWindowRect (window_t window, const Rect& rect)
 {
   if (!window)
-    throw xtl::make_null_argument_exception ("syslib::IPhoneWindowManager::SetWindowRect", "window");
+    throw xtl::make_null_argument_exception ("syslib::iPhonePlatform::SetWindowRect", "window");
 
   UIWindowWrapper* wnd = (UIWindowWrapper*)window;
 
@@ -518,29 +537,6 @@ void IPhoneWindowManager::SetWindowRect (window_t window, const Rect& rect)
   frame.origin.x    = rect.left / scale_factor;
   frame.origin.y    = rect.top / scale_factor;
 
-  UIInterfaceOrientation ui_orientation = wnd.rootViewController.interfaceOrientation;
-
-  switch (ui_orientation)
-  {
-    case UIInterfaceOrientationLandscapeLeft:
-    case UIInterfaceOrientationLandscapeRight:
-    {
-      float temp = frame.size.width;
-
-      frame.size.width  = frame.size.height;
-      frame.size.height = temp;
-
-      temp = frame.origin.x;
-
-      frame.origin.x = frame.origin.y;
-      frame.origin.y = temp;
-
-      break;
-    }
-    default:
-      break;
-  }
-
   wnd.frame = frame;
 
   WindowImpl* window_impl = wnd.window_impl;
@@ -551,18 +547,17 @@ void IPhoneWindowManager::SetWindowRect (window_t window, const Rect& rect)
   window_impl->Notify (WindowEvent_OnSize, dummy_context);
 }
 
-void IPhoneWindowManager::SetClientRect (window_t handle, const Rect& rect)
+void Platform::SetClientRect (window_t handle, const Rect& rect)
 {
   SetWindowRect (handle, rect);
 }
 
-void IPhoneWindowManager::GetWindowRect (window_t window, Rect& rect)
+void Platform::GetWindowRect (window_t window, Rect& rect)
 {
   if (!window)
-    throw xtl::make_null_argument_exception ("syslib::IPhoneWindowManager::GetWindowRect", "window");
+    throw xtl::make_null_argument_exception ("syslib::iPhonePlatform::GetWindowRect", "window");
 
-  UIWindow               *wnd           = (UIWindow*)window;
-  UIInterfaceOrientation ui_orientation = wnd.rootViewController.interfaceOrientation;
+  UIWindow* wnd = (UIWindow*)window;
 
   float scale_factor = wnd.contentScaleFactor;
 
@@ -572,30 +567,9 @@ void IPhoneWindowManager::GetWindowRect (window_t window, Rect& rect)
   rect.right  = (frame.origin.x + frame.size.width) * scale_factor;
   rect.top    = frame.origin.y * scale_factor;
   rect.left   = frame.origin.x * scale_factor;
-
-  switch (ui_orientation)
-  {
-    case UIInterfaceOrientationLandscapeLeft:
-    case UIInterfaceOrientationLandscapeRight:
-    {
-      float temp = rect.bottom;
-
-      rect.bottom = rect.right;
-      rect.right  = temp;
-
-      temp = rect.top;
-
-      rect.top  = rect.left;
-      rect.left = rect.top;
-
-      break;
-    }
-    default:
-      break;
-  }
 }
 
-void IPhoneWindowManager::GetClientRect (window_t handle, Rect& target_rect)
+void Platform::GetClientRect (window_t handle, Rect& target_rect)
 {
   GetWindowRect (handle, target_rect);
 }
@@ -604,7 +578,7 @@ void IPhoneWindowManager::GetClientRect (window_t handle, Rect& target_rect)
     Установка флагов окна
 */
 
-void IPhoneWindowManager::SetWindowFlag (window_t handle, WindowFlag flag, bool state)
+void Platform::SetWindowFlag (window_t handle, WindowFlag flag, bool state)
 {
   if (state == GetWindowFlag (handle, flag))
     return;
@@ -662,7 +636,7 @@ void IPhoneWindowManager::SetWindowFlag (window_t handle, WindowFlag flag, bool 
 
         break;
       case WindowFlag_Maximized:
-        wnd.bounds = [UIScreen mainScreen].applicationFrame;
+        wnd.frame = [UIScreen mainScreen].applicationFrame;
         break;
       case WindowFlag_Minimized:
         throw xtl::format_operation_exception ("", "Can't minimize window");
@@ -672,12 +646,12 @@ void IPhoneWindowManager::SetWindowFlag (window_t handle, WindowFlag flag, bool 
   }
   catch (xtl::exception& exception)
   {
-    exception.touch ("syslib::IPhoneWindowManager::SetWindowFlag");
+    exception.touch ("syslib::iPhonePlatform::SetWindowFlag");
     throw;
   }
 }
 
-bool IPhoneWindowManager::GetWindowFlag (window_t handle, WindowFlag flag)
+bool Platform::GetWindowFlag (window_t handle, WindowFlag flag)
 {
   UIWindow* wnd = (UIWindow*)handle;
 
@@ -692,14 +666,7 @@ bool IPhoneWindowManager::GetWindowFlag (window_t handle, WindowFlag flag)
       case WindowFlag_Focus:
         return wnd.rootViewController.view.userInteractionEnabled == YES;
       case WindowFlag_Maximized:
-      {
-        CGRect maximized_rect = [UIScreen mainScreen].applicationFrame;
-
-        maximized_rect.origin.x = 0;
-        maximized_rect.origin.y = 0;
-
-        return CGRectEqualToRect (wnd.frame, maximized_rect);
-      }
+        return CGRectEqualToRect (wnd.frame, [UIScreen mainScreen].applicationFrame);
       case WindowFlag_Minimized:
         throw xtl::format_operation_exception ("", "Can't get window flag %d value", flag);
       default:
@@ -708,56 +675,107 @@ bool IPhoneWindowManager::GetWindowFlag (window_t handle, WindowFlag flag)
   }
   catch (xtl::exception& exception)
   {
-    exception.touch ("syslib::IPhoneWindowManager::GetWindowFlag");
+    exception.touch ("syslib::iPhonePlatform::GetWindowFlag");
     throw;
   }
+}
+
+/*
+    Установка родительского окна
+*/
+
+void Platform::SetParentWindowHandle (window_t, const void*)
+{
+  throw xtl::format_not_supported_exception ("syslib::iPhonePlatform::SetParentWindow", "Parent windows not supported for iPhone platform");
+}
+
+const void* Platform::GetParentWindow (window_t child)
+{
+  throw xtl::format_not_supported_exception ("syslib::iPhonePlatform::GetParentWindow", "Parent windows not supported for iPhone platform");
 }
 
 /*
     Обновление окна
 */
 
-void IPhoneWindowManager::InvalidateWindow (window_t handle)
+void Platform::InvalidateWindow (window_t handle)
 {
   [((UIWindowWrapper*)handle).rootViewController.view setNeedsDisplay];
 }
 
 /*
-   Установка multitouch режима для окна
+    Положение курсора
 */
 
-void IPhoneWindowManager::SetMultitouchEnabled (window_t window, bool enabled)
+void Platform::SetCursorPosition (const Point&)
 {
-  if (!window)
-    throw xtl::make_null_argument_exception ("syslib::IPhoneWindowManager::SetMultitouchEnabled", "window");
-
-  ((UIWindowWrapper*)window).rootViewController.view.multipleTouchEnabled = enabled;
+  throw xtl::format_not_supported_exception ("syslib::iPhonePlatform::SetCursorPosition", "No cursor for iPhone platform");
 }
 
-bool IPhoneWindowManager::IsMultitouchEnabled (window_t window)
+syslib::Point Platform::GetCursorPosition ()
 {
-  if (!window)
-    throw xtl::make_null_argument_exception ("syslib::IPhoneWindowManager::IsMultitouchEnabled", "window");
+  throw xtl::format_not_supported_exception ("syslib::iPhonePlatform::GetCursorPosition", "No cursor for iPhone platform");
+}
 
-  return ((UIWindowWrapper*)window).rootViewController.view.multipleTouchEnabled;
+void Platform::SetCursorPosition (window_t, const Point& client_position)
+{
+  throw xtl::format_not_supported_exception ("syslib::iPhonePlatform::SetCursorPosition", "No cursor for iPhone platform");
+}
+
+syslib::Point Platform::GetCursorPosition (window_t)
+{
+  throw xtl::format_not_supported_exception ("syslib::iPhonePlatform::GetCursorPosition", "No cursor for iPhone platform");
+}
+
+/*
+    Видимость курсора
+*/
+
+void Platform::SetCursorVisible (window_t, bool state)
+{
+  if (state)
+    throw xtl::format_not_supported_exception ("syslib::iPhonePlatform::SetCursorPosition", "No cursor for iPhone platform");
+}
+
+bool Platform::GetCursorVisible (window_t)
+{
+  return false;
+}
+
+/*
+    Изображение курсора
+*/
+
+Platform::cursor_t Platform::CreateCursor (const char*, int, int)
+{
+  throw xtl::format_not_supported_exception ("syslib::iPhonePlatform::CreateCursor", "No cursor for iPhone platform");
+}
+
+void Platform::DestroyCursor (cursor_t)
+{
+  throw xtl::format_not_supported_exception ("syslib::iPhonePlatform::DestroyCursor", "No cursor for iPhone platform");
+}
+
+void Platform::SetCursor (window_t, cursor_t)
+{
+  throw xtl::format_not_supported_exception ("syslib::iPhonePlatform::CreateCursor", "No cursor for iPhone platform");
 }
 
 /*
    Цвет фона
 */
 
-void IPhoneWindowManager::SetBackgroundColor (window_t window, const Color& color)
+void Platform::SetBackgroundColor (window_t window, const Color& color)
 {
   if (!window)
-    throw xtl::make_null_argument_exception ("syslib::IPhoneWindowManager::SetBackgroundColor", "window");
+    throw xtl::make_null_argument_exception ("syslib::iPhonePlatform::SetBackgroundColor", "window");
 
   UIWindow*      wnd  = (UIWindow*)window;
   UIViewWrapper* view = (UIViewWrapper*)wnd.rootViewController.view;
 
   UIColor *background_color = [[UIColor alloc] initWithRed:color.red / 255.f green:color.green / 255.f blue:color.blue / 255.f alpha:1];
 
-  [view setBackground_color:color];
-
+  view.background_color    = color;
   view.ui_background_color = background_color;
 
   if (view.background_state)
@@ -766,10 +784,10 @@ void IPhoneWindowManager::SetBackgroundColor (window_t window, const Color& colo
   [background_color release];
 }
 
-void IPhoneWindowManager::SetBackgroundState (window_t window, bool state)
+void Platform::SetBackgroundState (window_t window, bool state)
 {
   if (!window)
-    throw xtl::make_null_argument_exception ("syslib::IPhoneWindowManager::SetBackgroundState", "window");
+    throw xtl::make_null_argument_exception ("syslib::iPhonePlatform::SetBackgroundState", "window");
 
   UIWindow*      wnd  = (UIWindow*)window;
   UIViewWrapper* view = (UIViewWrapper*)wnd.rootViewController.view;
@@ -779,10 +797,10 @@ void IPhoneWindowManager::SetBackgroundState (window_t window, bool state)
   view.background_state           = state;
 }
 
-Color IPhoneWindowManager::GetBackgroundColor (window_t window)
+Color Platform::GetBackgroundColor (window_t window)
 {
   if (!window)
-    throw xtl::make_null_argument_exception ("syslib::IPhoneWindowManager::GetBackgroundColor", "window");
+    throw xtl::make_null_argument_exception ("syslib::iPhonePlatform::GetBackgroundColor", "window");
 
   UIWindow*      wnd  = (UIWindow*)window;
   UIViewWrapper *view = (UIViewWrapper*)wnd.rootViewController.view;
@@ -790,10 +808,10 @@ Color IPhoneWindowManager::GetBackgroundColor (window_t window)
   return view.ui_background_color ? view.background_color : Color ();
 }
 
-bool IPhoneWindowManager::GetBackgroundState (window_t window)
+bool Platform::GetBackgroundState (window_t window)
 {
   if (!window)
-    throw xtl::make_null_argument_exception ("syslib::IPhoneWindowManager::GetBackgroundState", "window");
+    throw xtl::make_null_argument_exception ("syslib::iPhonePlatform::GetBackgroundState", "window");
 
   return ((UIViewWrapper*)((UIWindow*)window).rootViewController.view).background_state;
 }
@@ -823,6 +841,20 @@ void WindowManager::DetachWindowListener (const Window& window, IWindowListener*
     return;
 
   [(UIWindowWrapper*)(window.Handle ()) detachListener:listener];
+}
+
+/*
+   Установка multitouch режима для окна
+*/
+
+void WindowManager::SetMultitouchEnabled (const Window& window, bool enabled)
+{
+  ((UIWindowWrapper*)window.Handle ()).rootViewController.view.multipleTouchEnabled = enabled;
+}
+
+bool WindowManager::GetMultitouchEnabled (const Window& window)
+{
+  return ((UIWindowWrapper*)window.Handle ()).rootViewController.view.multipleTouchEnabled;
 }
 
 /*

@@ -33,3 +33,4 @@ export.link.system.tabletos.LIBS          := EGL GLESv1_CM png freetype screen b
 export.link.system.tabletos.LINK_INCLUDES := tabletos_startup main
 export.link.system.tabletos.LINK_TOOL     := tools.link.shared-lib
 export.link.system.tabletos.RUN_TOOL      := tools.run.tabletos_package
+export.info.system.CHMS                   := funner.system

@@ -59,8 +59,6 @@ bool BadaThreadManager::WaitSemaphore (semaphore_t handle, size_t wait_in_millis
 
     if (IsFailed (r))
       raise ("Osp::Base::Runtime::Semaphore::Acquire", r);
-      
-    return true;
   }
   catch (xtl::exception& exception)
   {

@@ -122,3 +122,77 @@ size_t PThreadManager::GetCurrentThreadId ()
 {
   return (size_t)pthread_self ();
 }
+
+/*
+   Установка приоритета нити
+*/
+
+void PThreadManager:SetThreadPriority (thread_t thread, ThreadPriority thread_priority)
+{
+  try
+  {
+    if (!thread || !thread->thread)
+      throw xtl::make_null_argument_exception ("", "thread");
+
+    if (!thread->default_scheduling_getted)
+    {
+      sched_param default_scheduling_param;
+
+      int status = pthread_getschedparam (thread->thread, &thread->scheduling_policy, &default_scheduling_param);
+
+      if (status)
+        pthread_raise_error ("::pthread_getschedparam", status);
+
+      thread->normal_priority = default_scheduling_param.sched_priority;
+
+      thread->default_scheduling_getted = true;
+    }
+
+#ifdef __APPLE__
+    int scheduling_policy = SCHED_RR;
+#else
+    int scheduling_policy = thread->scheduling_policy;
+#endif
+
+    sched_param scheduling_param;
+
+    switch (thread_priority)
+    {
+      case ThreadPriority_Low:
+      {
+        int min_priority = sched_get_priority_min (scheduling_policy);
+
+        if (min_priority == -1)
+          pthread_raise_error ("::sched_get_priority_min", errno);
+
+        scheduling_param.sched_priority = min_priority;
+        break;
+      }
+      case ThreadPriority_Normal:
+        scheduling_param.sched_priority = thread->normal_priority;
+        break;
+      case ThreadPriority_High:
+      {
+        int max_priority = sched_get_priority_max (scheduling_policy);
+
+        if (max_priority == -1)
+          pthread_raise_error ("::sched_get_priority_max", errno);
+
+        scheduling_param.sched_priority = max_priority;
+        break;
+      }
+      default:
+        throw xtl::make_argument_exception ("", "thread_priority", thread_priority);
+    }
+
+    int status = pthread_setschedparam ((pthread_t)thread->thread, scheduling_policy, &scheduling_param);
+
+    if (status)
+      pthread_raise_error ("::pthread_setshedparam", status);
+  }
+  catch (xtl::exception& exception)
+  {
+    exception.touch ("syslib::PThreadManager::SetThreadPriority");
+    throw;
+  }
+}

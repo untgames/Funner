@@ -56,8 +56,6 @@ bool BadaThreadManager::LockMutex (mutex_t handle, size_t wait_in_milliseconds)
 
     if (IsFailed (r))
       raise ("Osp::Base::Runtime::Mutex::Acquire", r);
-      
-    return true;
   }
   catch (xtl::exception& exception)
   {

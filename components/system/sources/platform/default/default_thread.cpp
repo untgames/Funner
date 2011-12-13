@@ -54,3 +54,12 @@ size_t DefaultThreadManager::GetCurrentThreadId ()
 {
   return 0;
 }
+
+/*
+    Установка приоритета нити
+*/
+
+void DefaultThreadManager::SetThreadPriority (thread_t thread, ThreadPriority thread_priority)
+{
+  raise ("syslib::DefaultThreadManager::SetThreadPriority");
+}

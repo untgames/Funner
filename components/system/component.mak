@@ -1,7 +1,7 @@
 ###################################################################################################
 #Определения и константы
 ###################################################################################################
-TARGETS := SYSTEMLIB.SOURCES SYSTEMLIB.TESTS
+TARGETS := SYSTEMLIB.SOURCES SYSTEMLIB.TESTS SYSTEMLIB.INFO
 
 TARGETS.android  += SYSTEMLIB.UTILS.ANDROID_LAUNCHER
 TARGETS.android  += SYSTEMLIB.UTILS.ANDROID_LAUNCHER_COMMON
@@ -64,3 +64,9 @@ SYSTEMLIB.UTILS.TABLETOS_LAUNCHER.SOURCE_DIRS   := utils/tabletos_launcher
 SYSTEMLIB.UTILS.TABLETOS_LAUNCHER.LIBS          := socket EGL GLESv1_CM png freetype screen bps pps OpenAL asound
 SYSTEMLIB.UTILS.TABLETOS_LAUNCHER.RES_DIR       := utils/tabletos_launcher/res
 SYSTEMLIB.UTILS.TABLETOS_LAUNCHER.MANIFEST_FILE := utils/tabletos_launcher/res/bar-descriptor.xml
+
+#Цель - сборка документации
+SYSTEMLIB.INFO.TYPE        := doxygen-info
+SYSTEMLIB.INFO.CHM_NAME    := funner.system
+SYSTEMLIB.INFO.SOURCE_DIRS := include
+SYSTEMLIB.INFO.IMPORTS     := compile.system
