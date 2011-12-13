@@ -10,6 +10,10 @@
   #if _MSC_VER < 1400
     #define XTL_NO_WCHAR
   #endif
+  
+  #ifdef _WIN32_WCE
+    #define XTL_NO_WCHAR
+  #endif
 #endif
 
 #endif

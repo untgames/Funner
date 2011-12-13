@@ -2,6 +2,18 @@ namespace detail
 {
 
 /*
+    Преобразование скалярных типов
+*/
+
+inline mpl::list<signed char, unsigned char, short, unsigned short, int, unsigned int, long, unsigned long,
+  mpl::list<float, double, long double>::type>::type
+ get_cast_types (long double)
+{
+  return mpl::list<signed char, unsigned char, short, unsigned short, int, unsigned int, long, unsigned long,
+      mpl::list<float, double, long double>::type>::type ();
+}
+
+/*
     Реализация преобразователя типов
 */
 
@@ -77,6 +89,8 @@ template <class T, class TList> struct type_converters_storage: private mpl::gen
   
   enum { converters_count = base::converters_count };
   
+  using base::register_converter;
+
   type_converters_storage ()
   {
     register_converter (converters_count, items);
@@ -196,18 +210,6 @@ const type_converter_item* find_converter ()
     return 0;
     
   return item;
-}
-
-/*
-    Преобразование скалярных типов
-*/
-
-inline mpl::list<signed char, unsigned char, short, unsigned short, int, unsigned int, long, unsigned long, 
-  mpl::list<float, double, long double>::type>::type
- get_cast_types (long double)
-{
-  return mpl::list<signed char, unsigned char, short, unsigned short, int, unsigned int, long, unsigned long, 
-      mpl::list<float, double, long double>::type>::type ();
 }
 
 /*

@@ -48,7 +48,7 @@ class any
     any  (const any&);
     ~any ();
                        
-    template <class T> any (const T& value, bool ref_counted=false);
+    template <class T> explicit any (const T& value, bool ref_counted=false);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Присваивание

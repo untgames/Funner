@@ -12,6 +12,7 @@
 #include <cstring>
 
 #include <stl/config.h>
+#include <stl/iterator_traits.h>
 
 #ifdef _MSC_VER 
   #pragma warning (push)  

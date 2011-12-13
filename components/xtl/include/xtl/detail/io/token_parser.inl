@@ -130,6 +130,8 @@ inline bool read (const char* string, long double& value)
   return read_and_cast<double> (string, value);
 }
 
+#ifndef XTL_NO_WCHAR
+
 namespace detail
 {
 
@@ -201,8 +203,6 @@ inline bool read (const wchar_t* string, unsigned short& result_value)
   return detail::read_wchar_string (string, result_value);
 }
 
-#ifndef XTL_NO_WCHAR
-
 inline bool read (const wchar_t* string, wchar_t& result_value)
 {
   if (!string || !*string || wcslen (string) != 1)
@@ -212,8 +212,6 @@ inline bool read (const wchar_t* string, wchar_t& result_value)
 
   return true;
 }
-
-#endif
 
 inline bool read (const wchar_t* string, int& result_value)
 {
@@ -249,6 +247,8 @@ inline bool read (const wchar_t* string, long double& result_value)
 {
   return detail::read_wchar_string (string, result_value);
 }
+
+#endif
 
 /*
     Чтение токенов с приведением типов

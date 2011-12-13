@@ -1,6 +1,7 @@
 #ifndef __MYSTL__HASH_FUN__
 #define __MYSTL__HASH_FUN__
 
+#include <string.h>
 #include <wchar.h> //cwchar имеет проблемы компиляции на mingw 3.4.5
 
 #include <stl/config.h>
@@ -14,14 +15,6 @@ namespace stl
 
 //forward declaration
 template <class T1, class T2> struct pair;
-
-//////////////////////////////////////////////////////////////////////////////////////////////////
-///Функтор хэширования
-//////////////////////////////////////////////////////////////////////////////////////////////////
-template <class Key> struct hash_fun
-{
-  size_t operator () (const Key& x) const { return hash (x); }
-};
 
 //////////////////////////////////////////////////////////////////////////////////////////////////
 ///Ключ хэширования
@@ -70,6 +63,14 @@ template <class T> size_t hash (const T&, size_t previous_hash);
 
 //получение хэша пары
 template <class T1, class T2> size_t hash (const pair<T1, T2>&);
+
+//////////////////////////////////////////////////////////////////////////////////////////////////
+///Функтор хэширования
+//////////////////////////////////////////////////////////////////////////////////////////////////
+template <class Key> struct hash_fun
+{
+  size_t operator () (const Key& x) const { return hash (x); }
+};
 
 #include <stl/detail/hash.inl>
 

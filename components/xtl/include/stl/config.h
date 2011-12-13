@@ -22,6 +22,10 @@ template <class T> struct default_string_allocator { typedef allocator<T> alloca
   #if _MSC_VER < 1400
     #define NO_WCHAR
   #endif
+  
+  #ifdef _WIN32_WCE
+    #define NO_WCHAR  
+  #endif
 #endif
 
 }

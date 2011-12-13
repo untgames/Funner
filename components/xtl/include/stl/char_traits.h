@@ -1,9 +1,8 @@
 #ifndef __MYSTL_CHAR_TRAITS__
 #define __MYSTL_CHAR_TRAITS__
 
+#include <string.h>
 #include <wchar.h> //cwchar имеет проблемы компил€ции на mingw 3.4.5
-
-#include <cstring>
 
 #include <stl/functional>
 

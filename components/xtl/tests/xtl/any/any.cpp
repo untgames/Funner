@@ -100,7 +100,7 @@ void test_default_ctor()
 void test_converting_ctor()
 {
     stl::string text = "test message";
-    any value = text;
+    any value (text);
 
     check_false(value.empty(), "empty");
     check_equal(value.type(), typeid(stl::string), "type");
@@ -117,7 +117,7 @@ void test_converting_ctor()
 void test_copy_ctor()
 {
     stl::string text = "test message";
-    any original = text, copy = original;
+    any original (text), copy = original;
 
     check_false(copy.empty(), "empty");
     check_equal(original.type(), copy.type(), "type");
@@ -136,7 +136,7 @@ void test_copy_ctor()
 void test_copy_assign()
 {
     stl::string text = "test message";
-    any original = text, copy;
+    any original (text), copy;
     any * assign_result = &(copy = original);
 
     check_false(copy.empty(), "empty");
@@ -177,7 +177,7 @@ void test_converting_assign()
 void test_bad_cast()
 {
     stl::string text = "test message";
-    any value = text;
+    any value (text);
     
     try
     {
@@ -192,7 +192,7 @@ void test_bad_cast()
 void test_swap()
 {
     stl::string text = "test message";
-    any original = text, swapped;
+    any original (text), swapped;
     stl::string * original_ptr = any_cast<stl::string>(&original);
     any * swap_result = &original.swap(swapped);
 

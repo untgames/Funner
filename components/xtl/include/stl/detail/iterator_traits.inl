@@ -12,11 +12,56 @@ inline typename iterator_traits<Iter>::iterator_category iterator_category ()
     Advance & distance
 */
 
+namespace detail
+{
+
 template <class Iter, class Distance>
-inline void advance (Iter& i, Distance n) 
+inline void advance_impl (Iter& i, Distance n)
 {
   if (n >= 0) while (n--) ++i;
   else        while (n++) --i;
+}
+
+template <class Iter>
+inline void advance_impl (Iter& i, unsigned int n)
+{
+  while (n--) ++i;
+}
+
+#ifdef __GNUC__
+
+template <class Iter>
+inline void advance_impl (Iter& i, unsigned long long n)
+{
+  while (n--) ++i;
+}
+
+#endif
+
+template <class Iter>
+inline void advance_impl (Iter& i, unsigned long n)
+{
+  while (n--) ++i;
+}
+
+template <class Iter>
+inline void advance_impl (Iter& i, unsigned short n)
+{
+  while (n--) ++i;
+}
+
+template <class Iter>
+inline void advance_impl (Iter& i, unsigned char n)
+{
+  while (n--) ++i;
+}
+
+}
+
+template <class Iter, class Distance>
+inline void advance (Iter& i, Distance n)
+{
+  detail::advance_impl (i, n);
 }
 
 template <class T, class Distance>
