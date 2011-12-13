@@ -8,7 +8,10 @@ using namespace stl;
     Загрузка карты картинок
 */
 
-namespace
+namespace components
+{
+
+namespace xatlas_loader
 {
 
 bool test (const ParseNode& node, const char* name)
@@ -100,6 +103,8 @@ extern "C"
 {
 
 ComponentRegistrator<XAtlasLoaderComponent> XAtlasLoader ("media.image.atlas.loaders.xatlas");
+
+}
 
 }
 

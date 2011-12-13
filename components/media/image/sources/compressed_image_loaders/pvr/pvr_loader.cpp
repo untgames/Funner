@@ -16,7 +16,10 @@
 using namespace common;
 using namespace media;
 
-namespace
+namespace components
+{
+
+namespace pvr_loader
 {
 
 /*
@@ -250,6 +253,8 @@ extern "C"
 {
 
 common::ComponentRegistrator<Component> PvrLoader ("media.compressed_image.pvr_loader");
+
+}
 
 }
 

@@ -18,11 +18,14 @@
 using namespace common;
 using namespace media;
 
-namespace
+namespace components
+{
+
+namespace dds_loader
 {
 
 /*
-    Описание формата PVR
+    Описание формата DDS
  */
 
 #if !defined(MAKEFOURCC)
@@ -268,7 +271,7 @@ class DdsCompressedImage: public ICustomCompressedImage
 
         DdsHeader     header;
         DdsHeaderDx10 header_dx10;        
-        bool          has_dx10_header = false;
+//        bool          has_dx10_header = false;
 
         read (file, file_name, header);
 
@@ -278,7 +281,7 @@ class DdsCompressedImage: public ICustomCompressedImage
 
           read (file, file_name, header_dx10);
 
-          has_dx10_header = true;
+  //        has_dx10_header = true;
         }
 
         //проверка корректности
@@ -781,6 +784,8 @@ extern "C"
 {
 
 common::ComponentRegistrator<Component> DdsLoader ("media.compressed_image.dds_loader");
+
+}
 
 }
 

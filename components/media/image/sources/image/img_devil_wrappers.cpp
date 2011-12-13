@@ -3,7 +3,10 @@
 using namespace common;
 using namespace media;
 
-namespace
+namespace components
+{
+
+namespace devil_serializers
 {
 
 /*
@@ -297,7 +300,7 @@ class DevILComponent
     {
       if (!devil_init_count++)
       {
-  //      ilSetMemory (&devil_allocate, &devil_deallocate); //Необходимо вызывать до вызова ilInit ();
+//        ilSetMemory (&devil_allocate, &devil_deallocate); //Необходимо вызывать до вызова ilInit ();
 
         ilInit ();
 
@@ -354,6 +357,8 @@ extern "C"
 
 ComponentRegistrator<DevILComponent<DevILComponentType_Loaders> > DevILLoaders ("media.image.loaders.DevIL");
 ComponentRegistrator<DevILComponent<DevILComponentType_Savers> > DevILSavers ("media.image.savers.DevIL");
+
+}
 
 }
 

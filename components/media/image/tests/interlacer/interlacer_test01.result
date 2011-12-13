@@ -1,0 +1,4 @@
+Results of interlacer_test01:
+interlacer [<OPTIONS>] <SOURCE> ...
+  use: atlas-builder --help
+error: no input files

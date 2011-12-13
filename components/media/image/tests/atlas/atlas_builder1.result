@@ -1,10 +1,15 @@
 Results of atlas_builder1 test:
-Atlas image name is ''
-Atlas image name is 'atlas_image'
+Atlas margin is 0
+Atlas max image size is -1
+Atlas pack flags is 0
+Atlas margin is 0
+Atlas max image size is 4096
+Atlas pack flags is 1
+Atlases count = 1
 Saving power of two atlas
 <?xml version="1.0" encoding="utf-8"?>
 <Atlas>
-  <Image Name="atlas_image" Width="256" Height="256">
+  <Image Name="results/power_of_two_image.bmp" Width="256" Height="256">
     <Tile Name="data/pic1.jpg" Left="0" Bottom="0" Width="171" Height="128"/>
     <Tile Name="" Left="0" Bottom="128" Width="123" Height="61"/>
   </Image>
@@ -12,13 +17,11 @@ Saving power of two atlas
 Saving non power of two atlas
 <?xml version="1.0" encoding="utf-8"?>
 <Atlas>
-  <Image Name="atlas_image" Width="294" Height="128">
+  <Image Name="results/non_power_of_two_image.bmp" Width="294" Height="128">
     <Tile Name="data/pic1.jpg" Left="0" Bottom="0" Width="171" Height="128"/>
     <Tile Name="" Left="171" Bottom="0" Width="123" Height="61"/>
   </Image>
 </Atlas>
-Saving emty atlas
-<?xml version="1.0" encoding="utf-8"?>
-<Atlas/>
+Atlases count = 0
 File 'results/power_of_two_image.bmp' hash: {ef,94,0b,70,1a,f0,ba,75,53,1d,b7,34,fe,c5,ef,c9}
 File 'results/non_power_of_two_image.bmp' hash: {8a,7f,dd,f6,9f,5e,17,d0,07,6c,4c,20,91,5a,e5,5d}

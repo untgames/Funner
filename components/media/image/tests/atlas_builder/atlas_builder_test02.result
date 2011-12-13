@@ -15,4 +15,5 @@ atlas-builder [<OPTIONS>] <SOURCE> ...
     --swap-axises              swap axises at layout tiles
     --isolated-images=<wildcard> set wildcard for standalone images which will be isolate from general atlases
     --square                   square axises
+    --dont-store-images        dont store all images in memory
 successfull!
