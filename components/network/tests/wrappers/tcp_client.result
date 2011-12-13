@@ -1,0 +1,7 @@
+Results of tcp_client_test:
+Received text 'First hell'
+Received text 'o from soc'
+Received text 'ket!Last h'
+Received text 'ello from '
+Receive failed. Received 7 bytes
+Received text 'socket!'

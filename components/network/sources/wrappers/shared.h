@@ -12,9 +12,11 @@
 
 #include <common/component.h>
 #include <common/file.h>
+#include <common/lockable.h>
 #include <common/log.h>
 #include <common/singleton.h>
 #include <common/strlib.h>
+#include <common/time.h>
 
 #include <syslib/condition.h>
 #include <syslib/mutex.h>
@@ -23,6 +25,7 @@
 #include <network/inet_address.h>
 #include <network/socket.h>
 #include <network/socket_address.h>
+#include <network/tcp_client.h>
 #include <network/url.h>
 #include <network/url_connection.h>
 

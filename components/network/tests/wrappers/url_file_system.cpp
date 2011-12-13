@@ -10,7 +10,9 @@ int main ()
     
     TestHttpServer http_server;
     
-    common::FileSystem::CopyFile ("http://localhost:84/test.txt", "/io/stdout");
+    stl::string source_file_path = common::format ("http://localhost:%u/test.txt", SERVER_PORT);
+
+    common::FileSystem::CopyFile (source_file_path.c_str (), "/io/stdout");
   }
   catch (std::exception& e)
   {

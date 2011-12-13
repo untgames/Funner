@@ -15,7 +15,9 @@ int main ()
     
     TestHttpServer http_server;
     
-    common::FileSystem::AddSearchPath ("http://localhost:82/test.zip", &print_search_log);
+    stl::string source_file_path = common::format ("http://localhost:%u/test.zip", SERVER_PORT);
+
+    common::FileSystem::AddSearchPath (source_file_path.c_str (), &print_search_log);
     
     common::FileSystem::CopyFile ("test.txt", "/io/stdout");
   }
