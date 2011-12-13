@@ -191,7 +191,10 @@ const LogFunction& Driver::GetDebugLog ()
     Компонент драйвера
 */
 
-namespace
+namespace components
+{
+
+namespace opengl_driver
 {
 
 class OpenGLDriverComponent
@@ -205,9 +208,11 @@ class OpenGLDriverComponent
 
 }
 
+}
+
 extern "C"
 {
 
-common::ComponentRegistrator<OpenGLDriverComponent> OpenGLDriver (COMPONENT_NAME);
+common::ComponentRegistrator<components::opengl_driver::OpenGLDriverComponent> OpenGLDriver (COMPONENT_NAME);
 
 }

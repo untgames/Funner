@@ -3,7 +3,7 @@
 namespace
 {
 
-typedef unsigned char  uchar;
+typedef unsigned char  ubyte;
 typedef unsigned short uint16;
 typedef unsigned int   r24g8_t;
 typedef unsigned int   uint32;
@@ -11,23 +11,23 @@ typedef int            fixed;
 
 struct two_color8_t
 {
-  uchar red;
-  uchar green;
+  ubyte red;
+  ubyte green;
 };
 
 struct rgb8_t
 {
-  uchar red;
-  uchar green;
-  uchar blue;
+  ubyte red;
+  ubyte green;
+  ubyte blue;
 };
 
 struct rgba8_t
 {
-  uchar red;
-  uchar green;
-  uchar blue;
-  uchar alpha;
+  ubyte red;
+  ubyte green;
+  ubyte blue;
+  ubyte alpha;
 };
 
 struct depth24_stencil8
@@ -40,7 +40,7 @@ struct depth24_stencil8
     Быстрое масштабирование изображений по размерам кратным двойке
 */
 
-void scale_pixel (uchar& dest,uchar s1,uchar s2,uchar s3,uchar s4)
+void scale_pixel (ubyte& dest,ubyte s1,ubyte s2,ubyte s3,ubyte s4)
 {
   dest = (s1 + s2 + s3 + s4) >> 2;
 }
@@ -181,7 +181,7 @@ void scale_image_2x_down (PixelFormat format, size_t width, size_t height, const
   {
     case PixelFormat_L8:
     case PixelFormat_A8:
-    case PixelFormat_S8:    scale_image_2x_down_impl<uchar>        (width, height, src, dest); break;
+    case PixelFormat_S8:    scale_image_2x_down_impl<ubyte>        (width, height, src, dest); break;
     case PixelFormat_LA8:   scale_image_2x_down_impl<two_color8_t> (width, height, src, dest); break;
     case PixelFormat_D16:   scale_image_2x_down_impl<uint16>       (width, height, src, dest); break;
     case PixelFormat_RGB8:  scale_image_2x_down_impl<rgb8_t>       (width, height, src, dest); break;
@@ -207,7 +207,7 @@ void scale_image (PixelFormat format, size_t width, size_t height, size_t new_wi
   {
     case PixelFormat_L8:
     case PixelFormat_A8:
-    case PixelFormat_S8:    scale_image_impl <uchar>        (width, height, src, new_width, new_height, dest); break;
+    case PixelFormat_S8:    scale_image_impl <ubyte>        (width, height, src, new_width, new_height, dest); break;
     case PixelFormat_LA8:   scale_image_impl <two_color8_t> (width, height, src, new_width, new_height, dest); break;
     case PixelFormat_D16:   scale_image_impl <uint16>       (width, height, src, new_width, new_height, dest); break;
     case PixelFormat_RGB8:  scale_image_impl <rgb8_t>       (width, height, src, new_width, new_height, dest); break;

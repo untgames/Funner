@@ -2,8 +2,9 @@
 export.link.render.low_level.opengl_driver.LIBS                := funner.render.low_level.opengl_driver
 export.link.render.low_level.opengl_driver.LINK_INCLUDES       := OpenGLDriver
 export.link.render.low_level.opengl_driver.IMPORTS             := link.render.low_level link.common.wxf
-export.link.render.low_level.opengl_driver.win32.LIBS          := gdi32
-export.link.render.low_level.opengl_driver.macosx.LINK_FLAGS   := -framework IOKit -framework AGL
+export.link.render.low_level.opengl_driver.x86_win32.LIBS      := gdi32
+export.link.render.low_level.opengl_driver.win32.IMPORTS       := link.system
+export.link.render.low_level.opengl_driver.macosx.LINK_FLAGS   := -framework AGL
 export.link.render.low_level.opengl_driver.iphone.LINK_FLAGS   := -framework OpenGLES
 export.link.render.low_level.opengl_driver.bada.LIBS           := FGraphicsEgl FGraphicsOpengl
 #export.link.render.low_level.opengl_driver.linux.LIBS         := Xrandr Xxf86vm
@@ -12,6 +13,7 @@ export.link.render.low_level.opengl_driver.beagleboard.IMPORTS := link.extern.be
 export.link.render.low_level.opengl_driver.meego_ia32.IMPORTS  := link.extern.meego_ia32
 export.link.render.low_level.opengl_driver.beagleboard.LIBS    := EGL GLES_CM srv_um IMGegl
 export.link.render.low_level.opengl_driver.android.LIBS        := EGL GLESv1_CM
+export.link.render.low_level.opengl_driver.tabletos.LIBS       := EGL GLESv1_CM
 
 ifneq (meego-ia32,$(TOOLSET))
 #export.link.render.low_level.opengl_driver.linux.LIBS := Xrandr Xxf86vm
@@ -24,4 +26,5 @@ export.run.render.low_level.opengl_driver.IMPORTS :=
 ifneq (,$(filter gles,$(PROFILES)))
 export.link.render.low_level.opengl_driver.win32.IMPORTS := link.extern.gles_win32
 export.run.render.low_level.opengl_driver.win32.IMPORTS  := run.extern.gles_win32
+export.link.render.low_level.opengl_driver.wince.IMPORTS := link.extern.gles_wince
 endif

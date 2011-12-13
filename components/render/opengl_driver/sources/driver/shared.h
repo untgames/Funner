@@ -10,12 +10,16 @@
 #include <xtl/intrusive_ptr.h>
 
 #include <common/component.h>
+#include <common/property_map.h>
+
+#include <syslib/screen.h>
 
 #include <render/low_level/device.h>
 #include <render/low_level/driver.h>
 #include <render/low_level/utils.h>
 
 #include <shared/context_manager.h>
+#include <shared/driver_output_manager.h>
 #include <shared/input_stage.h>
 #include <shared/object.h>
 #include <shared/output_stage.h>

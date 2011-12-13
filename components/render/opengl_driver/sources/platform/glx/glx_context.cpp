@@ -111,7 +111,7 @@ Context::Context (ISwapChain* in_swap_chain)
     
     DisplayLock lock (impl->display);
 
-      //создание контекста            
+      //создание контекста
 
     impl->log.Printf ("Create context (id=%d)...", GetId ());
     
@@ -128,7 +128,7 @@ Context::Context (ISwapChain* in_swap_chain)
   }
   catch (xtl::exception& exception)
   {
-    exception.touch ("render::low_level::opengl::egl::Context::Context");
+    exception.touch ("render::low_level::opengl::glx::Context::Context");
     throw;
   }
 }
@@ -208,7 +208,7 @@ void Context::MakeCurrent (ISwapChain* swap_chain)
   }
   catch (xtl::exception& exception)
   {
-    exception.touch ("render::low_level::opengl::egl::Context::OQMakeCurrent");
+    exception.touch ("render::low_level::opengl::glx::Context::MakeCurrent");
     throw;
   }
 
@@ -228,7 +228,7 @@ bool Context::IsCompatible (ISwapChain* in_swap_chain)
   }
   catch (xtl::exception& exception)
   {
-    exception.touch ("render::low_level::opengl::egl::Context::IsCompatible");
+    exception.touch ("render::low_level::opengl::glx::Context::IsCompatible");
     throw;
   }
 }
