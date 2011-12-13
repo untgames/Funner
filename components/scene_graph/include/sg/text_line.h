@@ -54,17 +54,17 @@ class TextLine: public Entity
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Установка/получение текста
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void           SetText     (const char* text);
-    void           SetText     (const wchar_t* text);
-    const char*    Text        () const;
-    const wchar_t* TextUnicode () const;
-    size_t         TextLength  () const;
+    void                SetTextUtf8   (const char* text_utf8);
+    void                SetTextUtf32  (const unsigned int* text_utf32, size_t length);
+    const char*         TextUtf8      () const;
+    const unsigned int* TextUtf32     () const;
+    size_t              TextLength    () const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Хэш текста
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    size_t TextHash        () const;
-    size_t TextUnicodeHash () const;
+    size_t TextUtf8Hash  () const;
+    size_t TextUtf32Hash () const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Установка/получение имени шрифта

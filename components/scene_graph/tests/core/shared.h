@@ -15,6 +15,7 @@
 
 #include <common/hash.h>
 #include <common/log.h>
+#include <common/utf_converter.h>
 #include <common/property_map.h>
 
 #include <sg/camera.h>
@@ -59,6 +60,14 @@ class TestEntity: public Entity
     }
 };
 
+float prepare_float (float v)
+{
+  if (fabs (v) < 0.001f)
+    return 0.f;
+
+  return v;
+}
+
 /*
     Вспомогательные утилиты вывода состояния объекта
 */
@@ -85,7 +94,7 @@ inline void dump (const quatf& q)
 
   printf ("[%+.1f %+.1f %+.1f]", pitch, yaw, roll);*/
   
-  printf ("[%+.1f %+.1f %+.1f %+.1f]", q.w, q.x, q.y, q.z);
+  printf ("[%+.1f %+.1f %+.1f %+.1f]", prepare_float (q.w), prepare_float (q.x), prepare_float (q.y), prepare_float (q.z));
 }
 
 inline void dump_position (Node& node)
@@ -110,6 +119,22 @@ inline void dump_scale (Node& node)
   dump   (node.Scale ());
   printf (" world=");
   dump   (node.WorldScale ());
+}
+
+stl::basic_string<unsigned int> toutf32 (const wchar_t* string)
+{
+  stl::basic_string<unsigned int> result;
+  
+  result.fast_resize (xtl::xstrlen (string));
+
+  const void* source           = string;
+  size_t      source_size      = result.size () * sizeof (wchar_t);
+  void*       destination      = &result [0];
+  size_t      destination_size = result.size () * sizeof (unsigned int);
+
+  convert_encoding (common::Encoding_UTF16LE, source, source_size, common::Encoding_UTF32LE, destination, destination_size);  
+  
+  return result;
 }
 
 #endif
