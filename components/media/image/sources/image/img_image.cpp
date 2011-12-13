@@ -346,6 +346,20 @@ void swap (Image& image1,Image& image2)
 }
 
 /*
+    Регистрация сериализаторов по умолчанию
+*/
+
+void Image::RegisterDefaultSavers ()
+{
+  static ComponentLoader loader ("media.image.savers.*");
+}
+
+void Image::RegisterDefaultLoaders ()
+{
+  static ComponentLoader loader ("media.image.loaders.*");
+}
+
+/*
     ImageImpl
 */
 
