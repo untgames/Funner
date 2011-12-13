@@ -1,6 +1,6 @@
 /*
-** Error handling and debugging support.
-** Copyright (C) 2005-2010 Mike Pall. See Copyright Notice in luajit.h
+** Error handling.
+** Copyright (C) 2005-2011 Mike Pall. See Copyright Notice in luajit.h
 */
 
 #ifndef _LJ_ERR_H
@@ -17,12 +17,15 @@ typedef enum {
   LJ_ERR__MAX
 } ErrMsg;
 
+LJ_DATA const char *lj_err_allmsg;
+#define err2msg(em)	(lj_err_allmsg+(int)(em))
+
 LJ_FUNC GCstr *lj_err_str(lua_State *L, ErrMsg em);
 LJ_FUNCA_NORET void LJ_FASTCALL lj_err_throw(lua_State *L, int errcode);
 LJ_FUNC_NORET void lj_err_mem(lua_State *L);
 LJ_FUNC_NORET void lj_err_run(lua_State *L);
 LJ_FUNC_NORET void lj_err_msg(lua_State *L, ErrMsg em);
-LJ_FUNC_NORET void lj_err_lex(lua_State *L, const char *src, const char *tok,
+LJ_FUNC_NORET void lj_err_lex(lua_State *L, GCstr *src, const char *tok,
 			      BCLine line, ErrMsg em, va_list argp);
 LJ_FUNC_NORET void lj_err_optype(lua_State *L, cTValue *o, ErrMsg opm);
 LJ_FUNC_NORET void lj_err_comp(lua_State *L, cTValue *o1, cTValue *o2);
@@ -34,8 +37,5 @@ LJ_FUNC_NORET void lj_err_arg(lua_State *L, int narg, ErrMsg em);
 LJ_FUNC_NORET void lj_err_argv(lua_State *L, int narg, ErrMsg em, ...);
 LJ_FUNC_NORET void lj_err_argtype(lua_State *L, int narg, const char *xname);
 LJ_FUNC_NORET void lj_err_argt(lua_State *L, int narg, int tt);
-
-LJ_FUNC void lj_err_pushloc(lua_State *L, GCproto *pt, BCPos pc);
-LJ_FUNC cTValue *lj_err_getframe(lua_State *L, int level, int *size);
 
 #endif

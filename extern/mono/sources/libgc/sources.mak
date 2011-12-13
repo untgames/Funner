@@ -1,0 +1,1 @@
+SOURCE_FILES := allchblk.c alloc.c backgraph.c blacklst.c checksums.c dbg_mlc.c dyn_load.c finalize.c gc_dlopen.c gcj_mlc.c headers.c mach_dep.c malloc.c mallocx.c mark.c mark_rts.c misc.c new_hblk.c obj_map.c os_dep.c pcr_interface.c ptr_chck.c real_malloc.c reclaim.c setjmp_t.c specific.c stubborn.c typd_mlc.c 

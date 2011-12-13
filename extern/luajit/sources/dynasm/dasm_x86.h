@@ -1,6 +1,6 @@
 /*
 ** DynASM x86 encoding engine.
-** Copyright (C) 2005-2010 Mike Pall. All rights reserved.
+** Copyright (C) 2005-2011 Mike Pall. All rights reserved.
 ** Released under the MIT/X license. See dynasm.lua for full copyright notice.
 */
 
@@ -46,6 +46,9 @@ enum {
 #define DASM_SEC2POS(sec)	((sec)<<24)
 #define DASM_POS2SEC(pos)	((pos)>>24)
 #define DASM_POS2PTR(D, pos)	(D->sections[DASM_POS2SEC(pos)].rbuf + (pos))
+
+/* Action list type. */
+typedef const unsigned char *dasm_ActList;
 
 /* Per-section structure. */
 typedef struct dasm_Section {
@@ -132,11 +135,11 @@ void dasm_growpc(Dst_DECL, unsigned int maxpc)
 }
 
 /* Setup encoder. */
-void dasm_setup(Dst_DECL, dasm_ActList actionlist)
+void dasm_setup(Dst_DECL, const void *actionlist)
 {
   dasm_State *D = Dst_REF;
   int i;
-  D->actionlist = actionlist;
+  D->actionlist = (dasm_ActList)actionlist;
   D->status = DASM_S_OK;
   D->section = &D->sections[0];
   memset((void *)D->lglabels, 0, D->lgsize);
@@ -151,10 +154,10 @@ void dasm_setup(Dst_DECL, dasm_ActList actionlist)
 #ifdef DASM_CHECKS
 #define CK(x, st) \
   do { if (!(x)) { \
-    D->status = DASM_S_##st|(p-D->actionlist-1); return; } } while (0)
+    D->status = DASM_S_##st|(int)(p-D->actionlist-1); return; } } while (0)
 #define CKPL(kind, st) \
   do { if ((size_t)((char *)pl-(char *)D->kind##labels) >= D->kind##size) { \
-    D->status = DASM_S_RANGE_##st|(p-D->actionlist-1); return; } } while (0)
+    D->status=DASM_S_RANGE_##st|(int)(p-D->actionlist-1); return; } } while (0)
 #else
 #define CK(x, st)	((void)0)
 #define CKPL(kind, st)	((void)0)
@@ -460,7 +463,7 @@ int dasm_checkstep(Dst_DECL, int secmatch)
   }
   if (D->status == DASM_S_OK && secmatch >= 0 &&
       D->section != &D->sections[secmatch])
-    D->status = DASM_S_MATCH_SEC|(D->section-D->sections);
+    D->status = DASM_S_MATCH_SEC|(int)(D->section-D->sections);
   return D->status;
 }
 #endif

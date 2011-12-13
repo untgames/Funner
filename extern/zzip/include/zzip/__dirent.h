@@ -64,12 +64,12 @@
 
 struct dirent
 {
-	long		d_ino;		/* Always zero. */
-	unsigned short	d_reclen;	/* Always zero. */
-	unsigned short	d_namlen;	/* Length of name in d_name. */
-	char*		d_name;		/* File name. */
-	/* NOTE: The name in the dirent structure points to the name in the
-	 *       finddata_t structure in the DIR. */
+  long    d_ino;    /* Always zero. */
+  unsigned short  d_reclen; /* Always zero. */
+  unsigned short  d_namlen; /* Length of name in d_name. */
+  char*   d_name;   /* File name. */
+  /* NOTE: The name in the dirent structure points to the name in the
+   *       finddata_t structure in the DIR. */
 };
 
 /*
@@ -78,27 +78,27 @@ struct dirent
  */
 typedef struct
 {
-	/* disk transfer area for this dir */
-	struct _finddata_t	dd_dta;
+  /* disk transfer area for this dir */
+  struct _finddata_t  dd_dta;
 
-	/* dirent struct to return from dir (NOTE: this makes this thread
-	 * safe as long as only one thread uses a particular DIR struct at
-	 * a time) */
-	struct dirent		dd_dir;
+  /* dirent struct to return from dir (NOTE: this makes this thread
+   * safe as long as only one thread uses a particular DIR struct at
+   * a time) */
+  struct dirent   dd_dir;
 
-	/* _findnext handle */
-	long			dd_handle;
+  /* _findnext handle */
+  long      dd_handle;
 
-	/*
+  /*
          * Status of search:
-	 *   0 = not started yet (next entry to read is first entry)
-	 *  -1 = off the end
-	 *   positive = 0 based index of next entry
-	 */
-	short			dd_stat;
+   *   0 = not started yet (next entry to read is first entry)
+   *  -1 = off the end
+   *   positive = 0 based index of next entry
+   */
+  short     dd_stat;
 
-	/* given path for dir with search pattern (struct is extended) */
-	char			dd_name[1];
+  /* given path for dir with search pattern (struct is extended) */
+  char      dd_name[1];
 } DIR;
 
 /*
@@ -120,11 +120,11 @@ typedef struct
 #include <string.h>
 #include <sys/stat.h>
 
-#define win32_SUFFIX	"*"
-#define	win32_SLASH	"\\"
+#define win32_SUFFIX  "*"
+#define win32_SLASH "\\"
 
 #ifndef S_ISDIR
-#define S_ISDIR(m)	((m & S_IFMT) == S_IFDIR)	/* is a directory */
+#define S_ISDIR(m)  ((m & S_IFMT) == S_IFDIR) /* is a directory */
 #endif  S_ISDIR
 
 
@@ -143,36 +143,36 @@ win32_opendir (const char *szPath)
     errno = 0;
     
     if (!szPath) {
-	errno = EFAULT;
-	return (DIR *) 0;
+  errno = EFAULT;
+  return (DIR *) 0;
     }
 
     if (szPath[0] == '\0') {
-	errno = ENOTDIR;
-	return (DIR *) 0;
+  errno = ENOTDIR;
+  return (DIR *) 0;
     }
     
     /* Attempt to determine if the given path really is a directory. */
     if (_stat (szPath, &statDir)) {
-	/* Error, stat should have set an error value. */
-	return (DIR *) 0;
+  /* Error, stat should have set an error value. */
+  return (DIR *) 0;
     }
     
     if (!S_ISDIR (statDir.st_mode)) {
-	/* Error, stat reports not a directory. */
-	errno = ENOTDIR;
-	return (DIR *) 0;
+  /* Error, stat reports not a directory. */
+  errno = ENOTDIR;
+  return (DIR *) 0;
     }
 
     /* Allocate enough space to store DIR structure and the complete *
        directory path given. */
     nd = (DIR *) calloc (1, sizeof (DIR) + strlen (szPath) 
-			 + strlen (win32_SLASH) + strlen (win32_SUFFIX));
+       + strlen (win32_SLASH) + strlen (win32_SUFFIX));
     
     if (!nd) {
-	/* Error, out of memory. */
-	errno = ENOMEM;
-	return (DIR *) 0;
+  /* Error, out of memory. */
+  errno = ENOMEM;
+  return (DIR *) 0;
     }
 
     /* Create the search expression. */
@@ -180,9 +180,9 @@ win32_opendir (const char *szPath)
     
     /* Add on a slash if the path does not end with one. */
     if (nd->dd_name[0] != '\0' &&
-	nd->dd_name[strlen (nd->dd_name) - 1] != '/' &&
-	nd->dd_name[strlen (nd->dd_name) - 1] != '\\') {
-	strcat (nd->dd_name, win32_SLASH);
+  nd->dd_name[strlen (nd->dd_name) - 1] != '/' &&
+  nd->dd_name[strlen (nd->dd_name) - 1] != '\\') {
+  strcat (nd->dd_name, win32_SLASH);
     }
     
     /* Add on the search pattern */
@@ -219,49 +219,49 @@ win32_readdir (DIR * dirp)
     
     /* Check for valid DIR struct. */
     if (!dirp) {
-	errno = EFAULT;
-	return (struct dirent *) 0;
+  errno = EFAULT;
+  return (struct dirent *) 0;
     }
     
     if (dirp->dd_dir.d_name != dirp->dd_dta.name) {
-	/* The structure does not seem to be set up correctly. */
-	errno = EINVAL;
-	return (struct dirent *) 0;
+  /* The structure does not seem to be set up correctly. */
+  errno = EINVAL;
+  return (struct dirent *) 0;
     }
 
     if (dirp->dd_stat < 0) {
-	/* We have already returned all files in the directory * (or the
-	   structure has an invalid dd_stat). */
-	return (struct dirent *) 0;
+  /* We have already returned all files in the directory * (or the
+     structure has an invalid dd_stat). */
+  return (struct dirent *) 0;
     } else if (dirp->dd_stat == 0) {
-	/* We haven't started the search yet. */
-	/* Start the search */
-	dirp->dd_handle = _findfirst (dirp->dd_name, &(dirp->dd_dta));
-	
-	if (dirp->dd_handle == -1) {
-	    /* Whoops! Seems there are no files in that * directory. */
-	    dirp->dd_stat = -1;
-	} else {
-	    dirp->dd_stat = 1;
-	}
+  /* We haven't started the search yet. */
+  /* Start the search */
+  dirp->dd_handle = _findfirst (dirp->dd_name, &(dirp->dd_dta));
+  
+  if (dirp->dd_handle == -1) {
+      /* Whoops! Seems there are no files in that * directory. */
+      dirp->dd_stat = -1;
+  } else {
+      dirp->dd_stat = 1;
+  }
     } else {
-	/* Get the next search entry. */
-	if (_findnext (dirp->dd_handle, &(dirp->dd_dta))) {
-	    /* We are off the end or otherwise error. */
-	    _findclose (dirp->dd_handle);
-	    dirp->dd_handle = -1;
-	    dirp->dd_stat = -1;
-	} else {
-	    /* Update the status to indicate the correct * number. */
-	    dirp->dd_stat++;
-	}
+  /* Get the next search entry. */
+  if (_findnext (dirp->dd_handle, &(dirp->dd_dta))) {
+      /* We are off the end or otherwise error. */
+      _findclose (dirp->dd_handle);
+      dirp->dd_handle = -1;
+      dirp->dd_stat = -1;
+  } else {
+      /* Update the status to indicate the correct * number. */
+      dirp->dd_stat++;
+  }
     }
     
     if (dirp->dd_stat > 0) {
-	/* Successfully got an entry. Everything about the file is * already
-	   appropriately filled in except the length of the * file name. */
-	dirp->dd_dir.d_namlen = (unsigned short) strlen (dirp->dd_dir.d_name);
-	return &dirp->dd_dir;
+  /* Successfully got an entry. Everything about the file is * already
+     appropriately filled in except the length of the * file name. */
+  dirp->dd_dir.d_namlen = (unsigned short) strlen (dirp->dd_dir.d_name);
+  return &dirp->dd_dir;
     }
     
     return (struct dirent *) 0;
@@ -281,12 +281,12 @@ win32_closedir (DIR * dirp)
     rc = 0;
 
     if (!dirp) {
-	errno = EFAULT;
-	return -1;
+  errno = EFAULT;
+  return -1;
     }
     
     if (dirp->dd_handle != -1) {
-	rc = _findclose (dirp->dd_handle);
+  rc = _findclose (dirp->dd_handle);
     }
     
     /* Delete the dir structure. */
@@ -307,12 +307,12 @@ win32_rewinddir (DIR * dirp)
     errno = 0;
 
     if (!dirp) {
-	errno = EFAULT;
-	return;
+  errno = EFAULT;
+  return;
     }
     
     if (dirp->dd_handle != -1) {
-	_findclose (dirp->dd_handle);
+  _findclose (dirp->dd_handle);
     }
     
     dirp->dd_handle = -1;
@@ -331,8 +331,8 @@ win32_telldir (DIR * dirp)
     errno = 0;
 
     if (!dirp) {
-	errno = EFAULT;
-	return -1;
+  errno = EFAULT;
+  return -1;
     }
     return dirp->dd_stat;
 }
@@ -352,26 +352,26 @@ win32_seekdir (DIR * dirp, long lPos)
     errno = 0;
     
     if (!dirp) {
-	errno = EFAULT;
-	return;
+  errno = EFAULT;
+  return;
     }
     
     if (lPos < -1) {
-	/* Seeking to an invalid position. */
-	errno = EINVAL;
-	return;
+  /* Seeking to an invalid position. */
+  errno = EINVAL;
+  return;
     } else if (lPos == -1) {
-	/* Seek past end. */
-	if (dirp->dd_handle != -1) {
-	    _findclose (dirp->dd_handle);
-	}
-	dirp->dd_handle = -1;
-	dirp->dd_stat = -1;
+  /* Seek past end. */
+  if (dirp->dd_handle != -1) {
+      _findclose (dirp->dd_handle);
+  }
+  dirp->dd_handle = -1;
+  dirp->dd_stat = -1;
     } else {
-	/* Rewind and read forward to the appropriate index. */
-	win32_rewinddir (dirp);
-	
-	while ((dirp->dd_stat < lPos) && win32_readdir (dirp));
+  /* Rewind and read forward to the appropriate index. */
+  win32_rewinddir (dirp);
+  
+  while ((dirp->dd_stat < lPos) && win32_readdir (dirp));
     }
 }
 

@@ -1,13 +1,24 @@
-/*****************************************************************************
+/***************************************************************************
  *                                  _   _ ____  _
  *  Project                     ___| | | |  _ \| |
  *                             / __| | | | |_) | |
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * $Id: lib533.c,v 1.16 2008-09-20 04:26:57 yangtse Exp $
- */
-
+ * Copyright (C) 1998 - 2011, Daniel Stenberg, <daniel@haxx.se>, et al.
+ *
+ * This software is licensed as described in the file COPYING, which
+ * you should have received as part of this distribution. The terms
+ * are also available at http://curl.haxx.se/docs/copyright.html.
+ *
+ * You may opt to use, copy, modify, merge, publish, distribute and/or sell
+ * copies of the Software, and permit persons to whom the Software is
+ * furnished to do so, under the terms of the COPYING file.
+ *
+ * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
+ * KIND, either express or implied.
+ *
+ ***************************************************************************/
 /* used for test case 533, 534 and 535 */
 
 #include "test.h"
@@ -28,7 +39,7 @@ int test(char *URL)
   CURL *curl;
   int running;
   char done=FALSE;
-  CURLM *m;
+  CURLM *m = NULL;
   int current=0;
   struct timeval ml_start;
   struct timeval mp_start;
@@ -46,9 +57,9 @@ int test(char *URL)
     return TEST_ERR_MAJOR_BAD;
   }
 
-  curl_easy_setopt(curl, CURLOPT_URL, URL);
-  curl_easy_setopt(curl, CURLOPT_VERBOSE, 1);
-  curl_easy_setopt(curl, CURLOPT_FAILONERROR, 1);
+  test_setopt(curl, CURLOPT_URL, URL);
+  test_setopt(curl, CURLOPT_VERBOSE, 1);
+  test_setopt(curl, CURLOPT_FAILONERROR, 1);
 
   if ((m = curl_multi_init()) == NULL) {
     fprintf(stderr, "curl_multi_init() failed\n");
@@ -79,7 +90,7 @@ int test(char *URL)
     interval.tv_sec = 1;
     interval.tv_usec = 0;
 
-    if (tutil_tvdiff(tutil_tvnow(), ml_start) > 
+    if (tutil_tvdiff(tutil_tvnow(), ml_start) >
         MAIN_LOOP_HANG_TIMEOUT) {
       ml_timedout = TRUE;
       break;
@@ -89,7 +100,7 @@ int test(char *URL)
 
     while (res == CURLM_CALL_MULTI_PERFORM) {
       res = (int)curl_multi_perform(m, &running);
-      if (tutil_tvdiff(tutil_tvnow(), mp_start) > 
+      if (tutil_tvdiff(tutil_tvnow(), mp_start) >
           MULTI_PERFORM_HANG_TIMEOUT) {
         mp_timedout = TRUE;
         break;
@@ -103,9 +114,9 @@ int test(char *URL)
           /* make us re-use the same handle all the time, and try resetting
              the handle first too */
           curl_easy_reset(curl);
-          curl_easy_setopt(curl, CURLOPT_URL, libtest_arg2);
-          curl_easy_setopt(curl, CURLOPT_VERBOSE, 1);
-          curl_easy_setopt(curl, CURLOPT_FAILONERROR, 1);
+          test_setopt(curl, CURLOPT_URL, libtest_arg2);
+          test_setopt(curl, CURLOPT_VERBOSE, 1);
+          test_setopt(curl, CURLOPT_FAILONERROR, 1);
 
           /* re-add it */
           res = (int)curl_multi_add_handle(m, curl);
@@ -156,8 +167,11 @@ int test(char *URL)
     res = TEST_ERR_RUNS_FOREVER;
   }
 
+test_cleanup:
+
   curl_easy_cleanup(curl);
-  curl_multi_cleanup(m);
+  if(m)
+    curl_multi_cleanup(m);
   curl_global_cleanup();
 
   return res;

@@ -1,6 +1,6 @@
 /*
 ** Definitions for target CPU.
-** Copyright (C) 2005-2010 Mike Pall. See Copyright Notice in luajit.h
+** Copyright (C) 2005-2011 Mike Pall. See Copyright Notice in luajit.h
 */
 
 #ifndef _LJ_TARGET_H
@@ -125,8 +125,18 @@ typedef uint32_t RegCost;
 
 #if LJ_TARGET_X86ORX64
 #include "lj_target_x86.h"
+#elif LJ_TARGET_ARM
+#include "lj_target_arm.h"
 #else
 #error "Missing include for target CPU"
 #endif
+
+/* Return the address of an exit stub. */
+static LJ_AINLINE MCode *exitstub_addr(jit_State *J, ExitNo exitno)
+{
+  lua_assert(J->exitstubgroup[exitno / EXITSTUBS_PER_GROUP] != NULL);
+  return (MCode *)((char *)J->exitstubgroup[exitno / EXITSTUBS_PER_GROUP] +
+		   EXITSTUB_SPACING*(exitno % EXITSTUBS_PER_GROUP));
+}
 
 #endif

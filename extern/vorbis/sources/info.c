@@ -5,13 +5,13 @@
  * GOVERNED BY A BSD-STYLE SOURCE LICENSE INCLUDED WITH THIS SOURCE *
  * IN 'COPYING'. PLEASE READ THESE TERMS BEFORE DISTRIBUTING.       *
  *                                                                  *
- * THE OggVorbis SOURCE CODE IS (C) COPYRIGHT 1994-2009             *
+ * THE OggVorbis SOURCE CODE IS (C) COPYRIGHT 1994-2010             *
  * by the Xiph.Org Foundation http://www.xiph.org/                  *
  *                                                                  *
  ********************************************************************
 
  function: maintain the info structure, info <-> header packets
- last mod: $Id: info.c 16243 2009-07-10 02:49:31Z xiphmont $
+ last mod: $Id: info.c 17584 2010-11-01 19:26:16Z xiphmont $
 
  ********************************************************************/
 
@@ -31,8 +31,8 @@
 #include "misc.h"
 #include "os.h"
 
-#define GENERAL_VENDOR_STRING "Xiph.Org libVorbis 1.2.3"
-#define ENCODE_VENDOR_STRING "Xiph.Org libVorbis I 20090709"
+#define GENERAL_VENDOR_STRING "Xiph.Org libVorbis 1.3.2"
+#define ENCODE_VENDOR_STRING "Xiph.Org libVorbis I 20101101 (Schaufenugget)"
 
 /* helpers */
 static int ilog2(unsigned int v){
@@ -278,8 +278,8 @@ static int _vorbis_unpack_books(vorbis_info *vi,oggpack_buffer *opb){
   ci->books=oggpack_read(opb,8)+1;
   if(ci->books<=0)goto err_out;
   for(i=0;i<ci->books;i++){
-    ci->book_param[i]=_ogg_calloc(1,sizeof(*ci->book_param[i]));
-    if(vorbis_staticbook_unpack(opb,ci->book_param[i]))goto err_out;
+    ci->book_param[i]=vorbis_staticbook_unpack(opb);
+    if(!ci->book_param[i])goto err_out;
   }
 
   /* time backend settings; hooks are unused */
@@ -628,12 +628,12 @@ int vorbis_analysis_headerout(vorbis_dsp_state *v,
   oggpack_writeclear(&opb);
   return(0);
  err_out:
-  oggpack_writeclear(&opb);
   memset(op,0,sizeof(*op));
   memset(op_comm,0,sizeof(*op_comm));
   memset(op_code,0,sizeof(*op_code));
 
   if(b){
+    oggpack_writeclear(&opb);
     if(b->header)_ogg_free(b->header);
     if(b->header1)_ogg_free(b->header1);
     if(b->header2)_ogg_free(b->header2);
@@ -645,9 +645,18 @@ int vorbis_analysis_headerout(vorbis_dsp_state *v,
 }
 
 double vorbis_granule_time(vorbis_dsp_state *v,ogg_int64_t granulepos){
-  if(granulepos>=0)
+  if(granulepos == -1) return -1;
+
+  /* We're not guaranteed a 64 bit unsigned type everywhere, so we
+     have to put the unsigned granpo in a signed type. */
+  if(granulepos>=0){
     return((double)granulepos/v->vi->rate);
-  return(-1);
+  }else{
+    ogg_int64_t granuleoff=0xffffffff;
+    granuleoff<<=31;
+    granuleoff|=0x7ffffffff;
+    return(((double)granulepos+2+granuleoff+granuleoff)/v->vi->rate);
+  }
 }
 
 const char *vorbis_version_string(void){

@@ -23,6 +23,36 @@
 /* The size of a `long', as computed by sizeof. */
 #define SIZEOF_LONG 4
 
+#if defined (_WIN32_WCE) || defined(_WIN32)
+
+/* Signed 64-bit type formatter */
+#define TIFF_INT64_FORMAT "%I64d"
+
+/* Signed 64-bit type */
+#define TIFF_INT64_T signed __int64
+
+/* Unsigned 64-bit type formatter */
+#define TIFF_UINT64_FORMAT "%I64u"
+
+/* Unsigned 64-bit type */
+#define TIFF_UINT64_T unsigned __int64
+
+#else
+
+/* Signed 64-bit type formatter */
+#define TIFF_INT64_FORMAT "%lld"
+
+/* Signed 64-bit type */
+#define TIFF_INT64_T signed long long
+
+/* Unsigned 64-bit type formatter */
+#define TIFF_UINT64_FORMAT "%llu"
+
+/* Unsigned 64-bit type */
+#define TIFF_UINT64_T unsigned long long
+
+#endif
+
 /* Compatibility stuff. */
 
 /* Define as 0 or 1 according to the floating point format suported by the

@@ -1,0 +1,46 @@
+LIBRARY   wcecompat
+EXPORTS
+
+;ctype.h exports
+  _isctype
+  iswctype
+  towupper
+  towlower
+
+
+;direct.h exports
+  _getcwd
+  _mkdir
+  _rmdir
+
+;float.h exports
+
+;io.h exports
+  _wceaccess
+  _wceunlink
+  _wcerename
+  _wceopen
+  _wceread
+  _wcewrite
+  _wcelseek
+  _wceclose
+  _wcefdopen
+
+
+  abort
+  getenv
+  time
+  errno
+  WinMain
+  perror
+  strerror
+  localtime
+  _getpid
+  gmtime
+  stat
+  clock
+  _kbhit
+  _ftime
+  _fmode
+
+

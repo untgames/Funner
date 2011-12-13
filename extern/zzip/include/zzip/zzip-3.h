@@ -17,15 +17,7 @@
 
 #ifdef BADA_SIMULATOR
 
-#ifndef ZZIP_HAVE_DIRECT_H
-#define ZZIP_HAVE_DIRECT_H  1
-#endif
-
-/* Define to 1 if you have the <dirent.h> header file, and it defines `DIR'.
-   */
-#ifndef ZZIP_HAVE_DIRENT_H
-#define ZZIP_HAVE_DIRENT_H  1
-#endif
+//TODO: bada simulator defines
 
 #endif
 

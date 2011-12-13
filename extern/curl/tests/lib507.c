@@ -1,13 +1,24 @@
-/*****************************************************************************
+/***************************************************************************
  *                                  _   _ ____  _
  *  Project                     ___| | | |  _ \| |
  *                             / __| | | | |_) | |
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * $Id: lib507.c,v 1.17 2008-09-20 04:26:57 yangtse Exp $
- */
-
+ * Copyright (C) 1998 - 2011, Daniel Stenberg, <daniel@haxx.se>, et al.
+ *
+ * This software is licensed as described in the file COPYING, which
+ * you should have received as part of this distribution. The terms
+ * are also available at http://curl.haxx.se/docs/copyright.html.
+ *
+ * You may opt to use, copy, modify, merge, publish, distribute and/or sell
+ * copies of the Software, and permit persons to whom the Software is
+ * furnished to do so, under the terms of the COPYING file.
+ *
+ * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
+ * KIND, either express or implied.
+ *
+ ***************************************************************************/
 #include "test.h"
 
 #include "testutil.h"
@@ -22,8 +33,9 @@ int test(char *URL)
   CURLM* multi;
   int still_running;
   int i = -1;
+  int res = 0;
   CURLMsg *msg;
-  CURLMcode res;
+  CURLMcode ret;
   struct timeval ml_start;
   struct timeval mp_start;
   char ml_timedout = FALSE;
@@ -47,11 +59,12 @@ int test(char *URL)
     return TEST_ERR_MAJOR_BAD;
   }
 
-  curl_easy_setopt(curls, CURLOPT_URL, URL);
+  test_setopt(curls, CURLOPT_URL, URL);
+  test_setopt(curls, CURLOPT_HEADER, 1L);
 
-  if ((res = curl_multi_add_handle(multi, curls)) != CURLM_OK) {
+  if ((ret = curl_multi_add_handle(multi, curls)) != CURLM_OK) {
     fprintf(stderr, "curl_multi_add_handle() failed, "
-            "with code %d\n", res);
+            "with code %d\n", ret);
     curl_easy_cleanup(curls);
     curl_multi_cleanup(multi);
     curl_global_cleanup();
@@ -62,13 +75,13 @@ int test(char *URL)
   mp_start = tutil_tvnow();
 
   do {
-    res = curl_multi_perform(multi, &still_running);
-    if (tutil_tvdiff(tutil_tvnow(), mp_start) > 
+    ret = curl_multi_perform(multi, &still_running);
+    if (tutil_tvdiff(tutil_tvnow(), mp_start) >
         MULTI_PERFORM_HANG_TIMEOUT) {
       mp_timedout = TRUE;
       break;
     }
-  } while (res == CURLM_CALL_MULTI_PERFORM);
+  } while (ret == CURLM_CALL_MULTI_PERFORM);
 
   ml_timedout = FALSE;
   ml_start = tutil_tvnow();
@@ -87,7 +100,7 @@ int test(char *URL)
     timeout.tv_sec = 1;
     timeout.tv_usec = 0;
 
-    if (tutil_tvdiff(tutil_tvnow(), ml_start) > 
+    if (tutil_tvdiff(tutil_tvnow(), ml_start) >
         MAIN_LOOP_HANG_TIMEOUT) {
       ml_timedout = TRUE;
       break;
@@ -103,13 +116,13 @@ int test(char *URL)
         mp_timedout = FALSE;
         mp_start = tutil_tvnow();
         do {
-          res = curl_multi_perform(multi, &still_running);
-          if (tutil_tvdiff(tutil_tvnow(), mp_start) > 
+          ret = curl_multi_perform(multi, &still_running);
+          if (tutil_tvdiff(tutil_tvnow(), mp_start) >
               MULTI_PERFORM_HANG_TIMEOUT) {
             mp_timedout = TRUE;
             break;
           }
-        } while (res == CURLM_CALL_MULTI_PERFORM);
+        } while (ret == CURLM_CALL_MULTI_PERFORM);
         break;
     }
   }
@@ -128,9 +141,14 @@ int test(char *URL)
       i = msg->data.result;
   }
 
+test_cleanup:
+
   curl_multi_cleanup(multi);
   curl_easy_cleanup(curls);
   curl_global_cleanup();
+
+  if(res)
+    i = res;
 
   return i; /* return the final return code */
 }

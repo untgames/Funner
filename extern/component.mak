@@ -5,20 +5,40 @@ TARGETS := FUNNER_EXTERN_LIBS
 
 #Цель - external libraries
 FUNNER_EXTERN_LIBS.TYPE       := package
-FUNNER_EXTERN_LIBS.COMPONENTS := zlib zzip pcre jpeg tiff libpng devil ogg vorbis vorbisfile lua freetype libpsd bullet theora mongoose
+FUNNER_EXTERN_LIBS.COMPONENTS := zlib zzip pcre jpeg tiff libpng devil ogg vorbis vorbisfile lua \
+                                 freetype libpsd theora shiny libiconv
+FUNNER_EXTERN_LIBS.x86.COMPONENTS := geekinfo
 
-ifeq (,$(filter iphone,$(PROFILES))$(filter beagleboard,$(PROFILES))$(filter android,$(PROFILES)))
+ifeq (,$(filter beagleboard,$(PROFILES))$(filter android,$(PROFILES))$(filter webos,$(PROFILES)))
   FUNNER_EXTERN_LIBS.COMPONENTS += curl
 endif
 
-ifneq (,$(filter win32,$(PROFILES)))
-  FUNNER_EXTERN_LIBS.COMPONENTS += luajit
-endif
+#ifneq (,$(filter win32,$(PROFILES)))
+#  FUNNER_EXTERN_LIBS.COMPONENTS += luajit
+#endif
 
 ifneq (,$(filter linux,$(PROFILES)))
   FUNNER_EXTERN_LIBS.COMPONENTS += openalsdk
 endif
 
-ifeq (,$(filter android,$(PROFILES)))
+ifneq (,$(filter android,$(PROFILES)))
   FUNNER_EXTERN_LIBS.COMPONENTS += openalsdk
+endif
+
+ifneq (,$(filter psp,$(PROFILES)))
+  FUNNER_EXTERN_LIBS.COMPONENTS := psp_addons $(FUNNER_EXTERN_LIBS.COMPONENTS)
+endif
+
+ifneq (,$(filter bada,$(PROFILES)))
+  FUNNER_EXTERN_LIBS.COMPONENTS := bada $(FUNNER_EXTERN_LIBS.COMPONENTS)
+endif
+
+ifneq (,$(filter wince,$(PROFILES)))
+  FUNNER_EXTERN_LIBS.COMPONENTS := wcecompat wince $(FUNNER_EXTERN_LIBS.COMPONENTS) pthreads_wince
+else
+  FUNNER_EXTERN_LIBS.COMPONENTS += bullet mongoose
+endif
+
+ifeq (,$(filter has_iconv,$(PROFILES)))
+  FUNNER_EXTERN_LIBS.COMPONENTS += libiconv
 endif

@@ -1,6 +1,6 @@
 #ifndef _ZZIP__CONFIG_H
 #define _ZZIP__CONFIG_H 1
- 
+
 /* zzip/_config.h. Generated automatically at end of configure. */
 /* config.h.  Generated from config.h.in by configure.  */
 /* config.h.in.  Generated from configure.ac by autoheader.  */

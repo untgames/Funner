@@ -16,3 +16,5 @@ EXTERN.ZZIP.IMPORTS                    := compile.extern.zzip compile.extern.zli
 EXTERN.ZZIP.msvc.COMPILER_CFLAGS       :=  -wd4244                        #Флаги сборки (зависят от конфигурации)
 EXTERN.ZZIP.msvc.COMPILER_DEFINES      := _CRT_SECURE_NO_DEPRECATE        #Определения сборки
 EXTERN.ZZIP.g++.COMPILER_CFLAGS        := --no-warn                       #Флаги сборки (зависят от конфигурации)
+EXTERN.ZZIP.wince.IMPORTS              := link.extern.wcecompat
+EXTERN.ZZIP.wince.COMPILER_CFLAGS      := -FIdirect.h

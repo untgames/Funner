@@ -1,0 +1,15 @@
+Resutls of iconv01_test:
+Test CP1255... Ok
+Test CP1258... Ok
+Test ISO-2022-CN-EXT... Ok
+Test ISO-2022-CN... Ok
+Test ISO-2022-JP-1... Ok
+Test ISO-2022-JP-2... Ok
+Test ISO-2022-JP... Ok
+Test ISO-2022-KR... Ok
+Test UTF-16BE... Ok
+Test UTF-16LE... Ok
+Test UTF-32... Ok
+Test UTF-32BE... Ok
+Test UTF-32LE... Ok
+Test UTF-7... Ok

@@ -163,7 +163,19 @@
 #include <io.h>
 #endif
 
-#ifdef _MSC_VER
+#ifdef _WIN32_WCE
+# if !__STDC__
+#  ifndef _zzip_lseek
+#  define _zzip_lseek lseek
+#  endif
+#  ifndef _zzip_read
+#  define _zzip_read read
+#  endif
+#  ifndef _zzip_write
+#  define _zzip_write write
+#  endif
+# endif /* !__STDC__ */
+#elif defined(_MSC_VER)
 # if !__STDC__
 #  ifndef _zzip_lseek
 #  define _zzip_lseek _lseek

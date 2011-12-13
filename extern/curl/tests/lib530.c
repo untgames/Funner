@@ -1,13 +1,24 @@
-/*****************************************************************************
+/***************************************************************************
  *                                  _   _ ____  _
  *  Project                     ___| | | |  _ \| |
  *                             / __| | | | |_) | |
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * $Id: lib530.c,v 1.18 2008-09-20 04:26:57 yangtse Exp $
- */
-
+ * Copyright (C) 1998 - 2011, Daniel Stenberg, <daniel@haxx.se>, et al.
+ *
+ * This software is licensed as described in the file COPYING, which
+ * you should have received as part of this distribution. The terms
+ * are also available at http://curl.haxx.se/docs/copyright.html.
+ *
+ * You may opt to use, copy, modify, merge, publish, distribute and/or sell
+ * copies of the Software, and permit persons to whom the Software is
+ * furnished to do so, under the terms of the COPYING file.
+ *
+ * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
+ * KIND, either express or implied.
+ *
+ ***************************************************************************/
 #include "test.h"
 
 #ifdef HAVE_SYS_TYPES_H
@@ -69,13 +80,47 @@ int test(char *URL)
     }
     sprintf(target_url, "%s%04i", URL, i + 1);
     target_url[sizeof(target_url) - 1] = '\0';
-    curl_easy_setopt(curl[i], CURLOPT_URL, target_url);
+
+    res = curl_easy_setopt(curl[i], CURLOPT_URL, target_url);
+    if(res) {
+      fprintf(stderr, "curl_easy_setopt() failed "
+              "on handle #%d\n", i);
+      for (j=i; j >= 0; j--) {
+        curl_multi_remove_handle(m, curl[j]);
+        curl_easy_cleanup(curl[j]);
+      }
+      curl_multi_cleanup(m);
+      curl_global_cleanup();
+      return TEST_ERR_MAJOR_BAD + i;
+    }
 
     /* go verbose */
-    curl_easy_setopt(curl[i], CURLOPT_VERBOSE, 1L);
+    res = curl_easy_setopt(curl[i], CURLOPT_VERBOSE, 1L);
+    if(res) {
+      fprintf(stderr, "curl_easy_setopt() failed "
+              "on handle #%d\n", i);
+      for (j=i; j >= 0; j--) {
+        curl_multi_remove_handle(m, curl[j]);
+        curl_easy_cleanup(curl[j]);
+      }
+      curl_multi_cleanup(m);
+      curl_global_cleanup();
+      return TEST_ERR_MAJOR_BAD + i;
+    }
 
     /* include headers */
-    curl_easy_setopt(curl[i], CURLOPT_HEADER, 1L);
+    res = curl_easy_setopt(curl[i], CURLOPT_HEADER, 1L);
+    if(res) {
+      fprintf(stderr, "curl_easy_setopt() failed "
+              "on handle #%d\n", i);
+      for (j=i; j >= 0; j--) {
+        curl_multi_remove_handle(m, curl[j]);
+        curl_easy_cleanup(curl[j]);
+      }
+      curl_multi_cleanup(m);
+      curl_global_cleanup();
+      return TEST_ERR_MAJOR_BAD + i;
+    }
 
     /* add handle to multi */
     if ((res = (int)curl_multi_add_handle(m, curl[i])) != CURLM_OK) {
@@ -107,7 +152,7 @@ int test(char *URL)
     interval.tv_sec = 1;
     interval.tv_usec = 0;
 
-    if (tutil_tvdiff(tutil_tvnow(), ml_start) > 
+    if (tutil_tvdiff(tutil_tvnow(), ml_start) >
         MAIN_LOOP_HANG_TIMEOUT) {
       ml_timedout = TRUE;
       break;
@@ -117,7 +162,7 @@ int test(char *URL)
 
     while (res == CURLM_CALL_MULTI_PERFORM) {
       res = (int)curl_multi_perform(m, &running);
-      if (tutil_tvdiff(tutil_tvnow(), mp_start) > 
+      if (tutil_tvdiff(tutil_tvnow(), mp_start) >
           MULTI_PERFORM_HANG_TIMEOUT) {
         mp_timedout = TRUE;
         break;
@@ -162,6 +207,8 @@ int test(char *URL)
             "that it would have run forever.\n");
     res = TEST_ERR_RUNS_FOREVER;
   }
+
+/* test_cleanup: */
 
   /* cleanup NUM_HANDLES easy handles */
   for(i=0; i < NUM_HANDLES; i++) {

@@ -1,6 +1,6 @@
 /*
 ** LuaJIT common internal definitions.
-** Copyright (C) 2005-2010 Mike Pall. See Copyright Notice in luajit.h
+** Copyright (C) 2005-2011 Mike Pall. See Copyright Notice in luajit.h
 */
 
 #ifndef _LJ_DEF_H
@@ -8,7 +8,7 @@
 
 #include "lua.h"
 
-#ifdef _MSC_VER
+#if defined(_MSC_VER)
 /* MSVC is stuck in the last century and doesn't have C99's stdint.h. */
 typedef __int8 int8_t;
 typedef __int16 int16_t;
@@ -25,6 +25,18 @@ typedef unsigned __int64 uintptr_t;
 typedef __int32 intptr_t;
 typedef unsigned __int32 uintptr_t;
 #endif
+#elif defined(__symbian__)
+/* Cough. */
+typedef signed char int8_t;
+typedef short int int16_t;
+typedef int int32_t;
+typedef long long int64_t;
+typedef unsigned char uint8_t;
+typedef unsigned short int uint16_t;
+typedef unsigned int uint32_t;
+typedef unsigned long long uint64_t;
+typedef int intptr_t;
+typedef unsigned int uintptr_t;
 #else
 #include <stdint.h>
 #endif
@@ -62,7 +74,7 @@ typedef unsigned __int32 uintptr_t;
 #define LJ_MIN_SBUF	32		/* Min. string buffer length. */
 #define LJ_MIN_VECSZ	8		/* Min. size for growable vectors. */
 #define LJ_MIN_IRSZ	32		/* Min. size for growable IR. */
-#define LJ_MIN_KNUMSZ	16		/* Min. size for chained KNUM array. */
+#define LJ_MIN_K64SZ	16		/* Min. size for chained K64Array. */
 
 /* JIT compiler limits. */
 #define LJ_MAX_JSLOTS	250		/* Max. # of stack slots for a trace. */
@@ -74,14 +86,7 @@ typedef unsigned __int32 uintptr_t;
 #define UNUSED(x)	((void)(x))	/* to avoid warnings */
 #endif
 
-#ifndef cast
-#define cast(t, exp)	((t)(exp))
-#endif
-
 #define U64x(hi, lo)	(((uint64_t)0x##hi << 32) + (uint64_t)0x##lo)
-#define cast_byte(i)	cast(uint8_t, (i))
-#define cast_num(i)	cast(lua_Number, (i))
-#define cast_int(i)	cast(int, (i))
 #define i32ptr(p)	((int32_t)(intptr_t)(void *)(p))
 #define u32ptr(p)	((uint32_t)(intptr_t)(void *)(p))
 
@@ -89,11 +94,13 @@ typedef unsigned __int32 uintptr_t;
 #define checku8(x)	((x) == (int32_t)(uint8_t)(x))
 #define checki16(x)	((x) == (int32_t)(int16_t)(x))
 #define checku16(x)	((x) == (int32_t)(uint16_t)(x))
+#define checki32(x)	((x) == (int32_t)(x))
+#define checku32(x)	((x) == (uint32_t)(x))
 #define checkptr32(x)	((uintptr_t)(x) == (uint32_t)(uintptr_t)(x))
 
 /* Every half-decent C compiler transforms this into a rotate instruction. */
-#define lj_rol(x, n)	(((x)<<(n)) | ((x)>>(32-(n))))
-#define lj_ror(x, n)	(((x)<<(32-(n))) | ((x)>>(n)))
+#define lj_rol(x, n)	(((x)<<(n)) | ((x)>>(8*sizeof(x)-(n))))
+#define lj_ror(x, n)	(((x)<<(8*sizeof(x)-(n))) | ((x)>>(n)))
 
 /* A really naive Bloom filter. But sufficient for our needs. */
 typedef uintptr_t BloomFilter;
@@ -104,10 +111,6 @@ typedef uintptr_t BloomFilter;
 
 #if defined(__GNUC__)
 
-#if (__GNUC__ < 3) || ((__GNUC__ == 3) && __GNUC_MINOR__ < 4)
-#error "sorry, need GCC 3.4 or newer"
-#endif
-
 #define LJ_NORET	__attribute__((noreturn))
 #define LJ_ALIGN(n)	__attribute__((aligned(n)))
 #define LJ_INLINE	inline
@@ -115,7 +118,9 @@ typedef uintptr_t BloomFilter;
 #define LJ_NOINLINE	__attribute__((noinline))
 
 #if defined(__ELF__) || defined(__MACH__)
+#if !((defined(__sun__) && defined(__svr4__)) || defined(__solaris__))
 #define LJ_NOAPI	extern __attribute__((visibility("hidden")))
+#endif
 #endif
 
 /* Note: it's only beneficial to use fastcall on x86 and then only for up to
@@ -140,14 +145,80 @@ static LJ_AINLINE uint32_t lj_fls(uint32_t x)
 #define lj_fls(x)	((uint32_t)(__builtin_clz(x)^31))
 #endif
 
-#if defined(__i386__) || defined(__x86_64__)
+#if defined(__arm__)
+static LJ_AINLINE uint32_t lj_bswap(uint32_t x)
+{
+  uint32_t r;
+#if __ARM_ARCH_6__ || __ARM_ARCH_6J__ || __ARM_ARCH_6T2__ || __ARM_ARCH_6Z__ ||\
+    __ARM_ARCH_6ZK__ || __ARM_ARCH_7__ || __ARM_ARCH_7A__ || __ARM_ARCH_7R__
+  __asm__("rev %0, %1" : "=r" (r) : "r" (x));
+  return r;
+#else
+#ifdef __thumb__
+  r = x ^ lj_ror(x, 16);
+#else
+  __asm__("eor %0, %1, %1, ror #16" : "=r" (r) : "r" (x));
+#endif
+  return ((r & 0xff00ffffu) >> 8) ^ lj_ror(x, 8);
+#endif
+}
+
+static LJ_AINLINE uint64_t lj_bswap64(uint64_t x)
+{
+  return ((uint64_t)lj_bswap((uint32_t)x)<<32) | lj_bswap((uint32_t)(x>>32));
+}
+#elif (__GNUC__ > 4) || (__GNUC__ == 4 && __GNUC_MINOR__ >= 3)
+static LJ_AINLINE uint32_t lj_bswap(uint32_t x)
+{
+  return (uint32_t)__builtin_bswap32((int32_t)x);
+}
+
+static LJ_AINLINE uint64_t lj_bswap64(uint64_t x)
+{
+  return (uint64_t)__builtin_bswap64((int64_t)x);
+}
+#elif defined(__i386__) || defined(__x86_64__)
 static LJ_AINLINE uint32_t lj_bswap(uint32_t x)
 {
   uint32_t r; __asm__("bswap %0" : "=r" (r) : "0" (x)); return r;
 }
+
+#if defined(__i386__)
+static LJ_AINLINE uint64_t lj_bswap64(uint64_t x)
+{
+  return ((uint64_t)lj_bswap((uint32_t)x)<<32) | lj_bswap((uint32_t)(x>>32));
+}
+#else
+static LJ_AINLINE uint64_t lj_bswap64(uint64_t x)
+{
+  uint64_t r; __asm__("bswap %0" : "=r" (r) : "0" (x)); return r;
+}
+#endif
 #else
 #error "missing define for lj_bswap()"
 #endif
+
+typedef union __attribute__((packed)) Unaligned16 {
+  uint16_t u;
+  uint8_t b[2];
+} Unaligned16;
+
+typedef union __attribute__((packed)) Unaligned32 {
+  uint32_t u;
+  uint8_t b[4];
+} Unaligned32;
+
+/* Unaligned load of uint16_t. */
+static LJ_AINLINE uint16_t lj_getu16(const void *p)
+{
+  return ((const Unaligned16 *)p)->u;
+}
+
+/* Unaligned load of uint32_t. */
+static LJ_AINLINE uint32_t lj_getu32(const void *p)
+{
+  return ((const Unaligned32 *)p)->u;
+}
 
 #elif defined(_MSC_VER)
 
@@ -171,6 +242,11 @@ static LJ_AINLINE uint32_t lj_fls(uint32_t x)
 }
 
 #define lj_bswap(x)	(_byteswap_ulong((x)))
+#define lj_bswap64(x)	(_byteswap_uint64((x)))
+
+/* MSVC is only supported on x86/x64, where unaligned loads are always ok. */
+#define lj_getu16(p)	(*(uint16_t *)(p))
+#define lj_getu32(p)	(*(uint32_t *)(p))
 
 #else
 #error "missing defines for your compiler"
@@ -218,7 +294,12 @@ static LJ_AINLINE uint32_t lj_fls(uint32_t x)
 /* Static assertions. */
 #define LJ_ASSERT_NAME2(name, line)	name ## line
 #define LJ_ASSERT_NAME(line)		LJ_ASSERT_NAME2(lj_assert_, line)
+#ifdef __COUNTER__
+#define LJ_STATIC_ASSERT(cond) \
+  extern void LJ_ASSERT_NAME(__COUNTER__)(int STATIC_ASSERTION_FAILED[(cond)?1:-1])
+#else
 #define LJ_STATIC_ASSERT(cond) \
   extern void LJ_ASSERT_NAME(__LINE__)(int STATIC_ASSERTION_FAILED[(cond)?1:-1])
+#endif
 
 #endif

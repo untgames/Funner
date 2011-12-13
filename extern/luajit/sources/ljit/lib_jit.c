@@ -1,6 +1,6 @@
 /*
 ** JIT library.
-** Copyright (C) 2005-2010 Mike Pall. See Copyright Notice in luajit.h
+** Copyright (C) 2005-2011 Mike Pall. See Copyright Notice in luajit.h
 */
 
 #define lib_jit_c
@@ -13,13 +13,16 @@
 #include "lj_arch.h"
 #include "lj_obj.h"
 #include "lj_err.h"
+#include "lj_debug.h"
 #include "lj_str.h"
 #include "lj_tab.h"
 #include "lj_bc.h"
 #if LJ_HASJIT
 #include "lj_ir.h"
 #include "lj_jit.h"
+#include "lj_ircall.h"
 #include "lj_iropt.h"
+#include "lj_target.h"
 #endif
 #include "lj_dispatch.h"
 #include "lj_vm.h"
@@ -52,7 +55,7 @@ static int setjitmode(lua_State *L, int mode)
     if ((mode & LUAJIT_MODE_MASK) == LUAJIT_MODE_ENGINE)
       lj_err_caller(L, LJ_ERR_NOJIT);
   err:
-    lj_err_arg(L, 1, LJ_ERR_NOLFUNC);
+    lj_err_argt(L, 1, LUA_TFUNCTION);
   }
   return 0;
 }
@@ -70,11 +73,10 @@ LJLIB_CF(jit_off)
 LJLIB_CF(jit_flush)
 {
 #if LJ_HASJIT
-  if (L->base < L->top && (tvisnum(L->base) || tvisstr(L->base))) {
+  if (L->base < L->top && !tvisnil(L->base)) {
     int traceno = lj_lib_checkint(L, 1);
-    setboolV(L->top-1,
-	     luaJIT_setmode(L, traceno, LUAJIT_MODE_FLUSH|LUAJIT_MODE_TRACE));
-    return 1;
+    luaJIT_setmode(L, traceno, LUAJIT_MODE_FLUSH|LUAJIT_MODE_TRACE);
+    return 0;
   }
 #endif
   return setjitmode(L, LUAJIT_MODE_FLUSH);
@@ -115,8 +117,11 @@ LJLIB_CF(jit_attach)
   GCstr *s = lj_lib_optstr(L, 2);
   luaL_findtable(L, LUA_REGISTRYINDEX, LJ_VMEVENTS_REGKEY, LJ_VMEVENTS_HSIZE);
   if (s) {  /* Attach to given event. */
+    const uint8_t *p = (const uint8_t *)strdata(s);
+    uint32_t h = s->len;
+    while (*p) h = h ^ (lj_rol(h, 6) + *p++);
     lua_pushvalue(L, 1);
-    lua_rawseti(L, -2, VMEVENT_HASHIDX(s->hash));
+    lua_rawseti(L, -2, VMEVENT_HASHIDX(h));
     G(L)->vmevmask = VMEVENT_NOCACHE;  /* Invalidate cache. */
   } else {  /* Detach if no event given. */
     setnilV(L->top++);
@@ -131,6 +136,7 @@ LJLIB_CF(jit_attach)
   return 0;
 }
 
+LJLIB_PUSH(top-5) LJLIB_SET(os)
 LJLIB_PUSH(top-4) LJLIB_SET(arch)
 LJLIB_PUSH(top-3) LJLIB_SET(version_num)
 LJLIB_PUSH(top-2) LJLIB_SET(version)
@@ -175,8 +181,8 @@ LJLIB_CF(jit_util_funcinfo)
     GCtab *t;
     lua_createtable(L, 0, 16);  /* Increment hash size if fields are added. */
     t = tabV(L->top-1);
-    setintfield(L, t, "linedefined", proto_line(pt, 0));
-    setintfield(L, t, "lastlinedefined", pt->lastlinedefined);
+    setintfield(L, t, "linedefined", pt->firstline);
+    setintfield(L, t, "lastlinedefined", pt->firstline + pt->numline);
     setintfield(L, t, "stackslots", pt->framesize);
     setintfield(L, t, "params", pt->numparams);
     setintfield(L, t, "bytecodes", (int32_t)pt->sizebc);
@@ -184,13 +190,14 @@ LJLIB_CF(jit_util_funcinfo)
     setintfield(L, t, "nconsts", (int32_t)pt->sizekn);
     setintfield(L, t, "upvalues", (int32_t)pt->sizeuv);
     if (pc < pt->sizebc)
-      setintfield(L, t, "currentline",
-		  proto_lineinfo(pt) ? proto_line(pt, pc) : 0);
-    lua_pushboolean(L, (pt->flags & PROTO_IS_VARARG));
+      setintfield(L, t, "currentline", lj_debug_line(pt, pc));
+    lua_pushboolean(L, (pt->flags & PROTO_VARARG));
     lua_setfield(L, -2, "isvararg");
+    lua_pushboolean(L, (pt->flags & PROTO_CHILD));
+    lua_setfield(L, -2, "children");
     setstrV(L, L->top++, proto_chunkname(pt));
     lua_setfield(L, -2, "source");
-    lj_err_pushloc(L, pt, pc);
+    lj_debug_pushloc(L, pt, pc);
     lua_setfield(L, -2, "loc");
   } else {
     GCfunc *fn = funcV(L->base);
@@ -199,8 +206,8 @@ LJLIB_CF(jit_util_funcinfo)
     t = tabV(L->top-1);
     if (!iscfunc(fn))
       setintfield(L, t, "ffid", fn->c.ffid);
-    setnumV(lj_tab_setstr(L, t, lj_str_newlit(L, "addr")),
-	    cast_num((intptr_t)fn->c.f));
+    setintptrV(lj_tab_setstr(L, t, lj_str_newlit(L, "addr")),
+	       (intptr_t)(void *)fn->c.f);
     setintfield(L, t, "upvalues", fn->c.nupvalues);
   }
   return 1;
@@ -230,13 +237,13 @@ LJLIB_CF(jit_util_funck)
   ptrdiff_t idx = (ptrdiff_t)lj_lib_checkint(L, 2);
   if (idx >= 0) {
     if (idx < (ptrdiff_t)pt->sizekn) {
-      setnumV(L->top-1, proto_knum(pt, idx));
+      copyTV(L, L->top-1, proto_knumtv(pt, idx));
       return 1;
     }
   } else {
     if (~idx < (ptrdiff_t)pt->sizekgc) {
       GCobj *gc = proto_kgc(pt, idx);
-      setgcV(L, L->top-1, &gc->gch, ~gc->gch.gct);
+      setgcV(L, L->top-1, gc, ~gc->gch.gct);
       return 1;
     }
   }
@@ -249,7 +256,7 @@ LJLIB_CF(jit_util_funcuvname)
   GCproto *pt = check_Lproto(L, 0);
   uint32_t idx = (uint32_t)lj_lib_checkint(L, 2);
   if (idx < pt->sizeuv) {
-    setstrV(L, L->top-1, proto_uvname(pt, idx));
+    setstrV(L, L->top-1, lj_str_newz(L, lj_debug_uvname(pt, idx)));
     return 1;
   }
   return 0;
@@ -260,27 +267,35 @@ LJLIB_CF(jit_util_funcuvname)
 #if LJ_HASJIT
 
 /* Check trace argument. Must not throw for non-existent trace numbers. */
-static Trace *jit_checktrace(lua_State *L)
+static GCtrace *jit_checktrace(lua_State *L)
 {
   TraceNo tr = (TraceNo)lj_lib_checkint(L, 1);
   jit_State *J = L2J(L);
   if (tr > 0 && tr < J->sizetrace)
-    return J->trace[tr];
+    return traceref(J, tr);
   return NULL;
 }
+
+/* Names of link types. ORDER LJ_TRLINK */
+static const char *const jit_trlinkname[] = {
+  "none", "root", "loop", "tail-recursion", "up-recursion", "down-recursion",
+  "interpreter", "return"
+};
 
 /* local info = jit.util.traceinfo(tr) */
 LJLIB_CF(jit_util_traceinfo)
 {
-  Trace *T = jit_checktrace(L);
+  GCtrace *T = jit_checktrace(L);
   if (T) {
     GCtab *t;
-    lua_createtable(L, 0, 4);  /* Increment hash size if fields are added. */
+    lua_createtable(L, 0, 8);  /* Increment hash size if fields are added. */
     t = tabV(L->top-1);
     setintfield(L, t, "nins", (int32_t)T->nins - REF_BIAS - 1);
     setintfield(L, t, "nk", REF_BIAS - (int32_t)T->nk);
     setintfield(L, t, "link", T->link);
     setintfield(L, t, "nexit", T->nsnap);
+    setstrV(L, L->top++, lj_str_newz(L, jit_trlinkname[T->linktype]));
+    lua_setfield(L, -2, "linktype");
     /* There are many more fields. Add them only when needed. */
     return 1;
   }
@@ -290,7 +305,7 @@ LJLIB_CF(jit_util_traceinfo)
 /* local m, ot, op1, op2, prev = jit.util.traceir(tr, idx) */
 LJLIB_CF(jit_util_traceir)
 {
-  Trace *T = jit_checktrace(L);
+  GCtrace *T = jit_checktrace(L);
   IRRef ref = (IRRef)lj_lib_checkint(L, 2) + REF_BIAS;
   if (T && ref >= REF_BIAS && ref < T->nins) {
     IRIns *ir = &T->ir[ref];
@@ -308,7 +323,7 @@ LJLIB_CF(jit_util_traceir)
 /* local k, t [, slot] = jit.util.tracek(tr, idx) */
 LJLIB_CF(jit_util_tracek)
 {
-  Trace *T = jit_checktrace(L);
+  GCtrace *T = jit_checktrace(L);
   IRRef ref = (IRRef)lj_lib_checkint(L, 2) + REF_BIAS;
   if (T && ref >= T->nk && ref < REF_BIAS) {
     IRIns *ir = &T->ir[ref];
@@ -330,7 +345,7 @@ LJLIB_CF(jit_util_tracek)
 /* local snap = jit.util.tracesnap(tr, sn) */
 LJLIB_CF(jit_util_tracesnap)
 {
-  Trace *T = jit_checktrace(L);
+  GCtrace *T = jit_checktrace(L);
   SnapNo sn = (SnapNo)lj_lib_checkint(L, 2);
   if (T && sn < T->nsnap) {
     SnapShot *snap = &T->snap[sn];
@@ -352,10 +367,10 @@ LJLIB_CF(jit_util_tracesnap)
 /* local mcode, addr, loop = jit.util.tracemc(tr) */
 LJLIB_CF(jit_util_tracemc)
 {
-  Trace *T = jit_checktrace(L);
+  GCtrace *T = jit_checktrace(L);
   if (T && T->mcode != NULL) {
     setstrV(L, L->top-1, lj_str_new(L, (const char *)T->mcode, T->szmcode));
-    setnumV(L->top++, cast_num((intptr_t)T->mcode));
+    setintptrV(L->top++, (intptr_t)(void *)T->mcode);
     setintV(L->top++, T->mcloop);
     return 3;
   }
@@ -368,7 +383,18 @@ LJLIB_CF(jit_util_traceexitstub)
   ExitNo exitno = (ExitNo)lj_lib_checkint(L, 1);
   jit_State *J = L2J(L);
   if (exitno < EXITSTUBS_PER_GROUP*LJ_MAX_EXITSTUBGR) {
-    setnumV(L->top-1, cast_num((intptr_t)exitstub_addr(J, exitno)));
+    setintptrV(L->top-1, (intptr_t)(void *)exitstub_addr(J, exitno));
+    return 1;
+  }
+  return 0;
+}
+
+/* local addr = jit.util.ircalladdr(idx) */
+LJLIB_CF(jit_util_ircalladdr)
+{
+  uint32_t idx = (uint32_t)lj_lib_checkint(L, 1);
+  if (idx < IRCALL__MAX) {
+    setintptrV(L->top-1, (intptr_t)(void *)lj_ir_callinfo[idx].func);
     return 1;
   }
   return 0;
@@ -387,6 +413,7 @@ static int trace_nojit(lua_State *L)
 #define lj_cf_jit_util_tracesnap	trace_nojit
 #define lj_cf_jit_util_tracemc		trace_nojit
 #define lj_cf_jit_util_traceexitstub	trace_nojit
+#define lj_cf_jit_util_ircalladdr	trace_nojit
 
 #endif
 
@@ -447,11 +474,14 @@ static int jitopt_param(jit_State *J, const char *str)
   int i;
   for (i = 0; i < JIT_P__MAX; i++) {
     size_t len = *(const uint8_t *)lst;
-    TValue tv;
     lua_assert(len != 0);
-    if (strncmp(str, lst+1, len) == 0 && str[len] == '=' &&
-	lj_str_numconv(&str[len+1], &tv)) {
-      J->param[i] = lj_num2int(tv.n);
+    if (strncmp(str, lst+1, len) == 0 && str[len] == '=') {
+      int32_t n = 0;
+      const char *p = &str[len+1];
+      while (*p >= '0' && *p <= '9')
+	n = n*10 + (*p++ - '0');
+      if (*p) return 0;  /* Malformed number. */
+      J->param[i] = n;
       if (i == JIT_P_hotloop)
 	lj_dispatch_init_hotcount(J2G(J));
       return 1;  /* Ok. */
@@ -500,6 +530,10 @@ JIT_PARAMDEF(JIT_PARAMINIT)
 };
 #endif
 
+#if LJ_TARGET_ARM && LJ_TARGET_LINUX
+#include <sys/utsname.h>
+#endif
+
 /* Arch-dependent CPU detection. */
 static uint32_t jit_cpudetect(lua_State *L)
 {
@@ -515,6 +549,7 @@ static uint32_t jit_cpudetect(lua_State *L)
     flags |= ((features[3] >> 15)&1) * JIT_F_CMOV;
     flags |= ((features[3] >> 26)&1) * JIT_F_SSE2;
 #if LJ_HASJIT
+    flags |= ((features[2] >> 0)&1) * JIT_F_SSE3;
     flags |= ((features[2] >> 19)&1) * JIT_F_SSE4_1;
     if (vendor[2] == 0x6c65746e) {  /* Intel. */
       if ((features[0] & 0x0ff00f00) == 0x00000f00)  /* P4. */
@@ -541,10 +576,34 @@ static uint32_t jit_cpudetect(lua_State *L)
     luaL_error(L, "CPU does not support SSE2 (recompile without -DLUAJIT_CPU_SSE2)");
 #endif
 #endif
-  UNUSED(L);
+#elif LJ_TARGET_ARM
+  /* Compile-time ARM CPU detection. */
+#if __ARM_ARCH_7__ || __ARM_ARCH_7A__ || __ARM_ARCH_7R__
+  flags |= JIT_F_ARMV6|JIT_F_ARMV6T2|JIT_F_ARMV7;
+#elif __ARM_ARCH_6T2__
+  flags |= JIT_F_ARMV6|JIT_F_ARMV6T2;
+#elif __ARM_ARCH_6__ || __ARM_ARCH_6J__ || __ARM_ARCH_6Z__ || __ARM_ARCH_6ZK__
+  flags |= JIT_F_ARMV6;
+#endif
+  /* Runtime ARM CPU detection. */
+#if LJ_TARGET_LINUX
+  if (!(flags & JIT_F_ARMV7)) {
+    struct utsname ut;
+    uname(&ut);
+    if (strncmp(ut.machine, "armv", 4) == 0) {
+      if (ut.machine[4] >= '7')
+	flags |= JIT_F_ARMV6|JIT_F_ARMV6T2|JIT_F_ARMV7;
+      else if (ut.machine[4] == '6')
+	flags |= JIT_F_ARMV6;
+    }
+  }
+#endif
+#elif LJ_TARGET_PPC || LJ_TARGET_PPCSPE
+  /* Nothing to do. */
 #else
 #error "Missing CPU detection for this architecture"
 #endif
+  UNUSED(L);
   return flags;
 }
 
@@ -568,14 +627,15 @@ static void jit_init(lua_State *L)
 
 LUALIB_API int luaopen_jit(lua_State *L)
 {
+  lua_pushliteral(L, LJ_OS_NAME);
   lua_pushliteral(L, LJ_ARCH_NAME);
   lua_pushinteger(L, LUAJIT_VERSION_NUM);
   lua_pushliteral(L, LUAJIT_VERSION);
-  LJ_LIB_REG(L, jit);
+  LJ_LIB_REG(L, LUA_JITLIBNAME, jit);
 #ifndef LUAJIT_DISABLE_JITUTIL
-  LJ_LIB_REG_(L, "jit.util", jit_util);
+  LJ_LIB_REG(L, "jit.util", jit_util);
 #endif
-  LJ_LIB_REG_(L, "jit.opt", jit_opt);
+  LJ_LIB_REG(L, "jit.opt", jit_opt);
   L->top -= 2;
   jit_init(L);
   return 1;
