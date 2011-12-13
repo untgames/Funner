@@ -16,6 +16,16 @@ namespace
 
 const size_t LIGHTS_RESERVE_SIZE = 64;   //резервируемое количество источников света
 
+/*
+    Настройки
+*/
+
+struct Settings
+{
+//  stl::string first_light_effect;
+//  stl::string others_light_effect;
+};
+
 }
 
 /*
