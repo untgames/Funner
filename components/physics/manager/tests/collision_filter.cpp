@@ -52,8 +52,7 @@ int main ()
     Scene scene (manager.CreateScene ());
 
     xtl::connection collision_begin_connection   = scene.RegisterCollisionCallback ("*", "*", CollisionEventType_Begin, &collision_event_handler),
-                    collision_process_connection = scene.RegisterCollisionCallback ("*", "*", CollisionEventType_Process, &collision_event_handler),
-                    collision_end_connection     = scene.RegisterCollisionCallback ("*", "*", CollisionEventType_End, &collision_event_handler);
+                    collision_process_connection = scene.RegisterCollisionCallback ("*", "*", CollisionEventType_Process, &collision_event_handler);
 
     scene.AddCollisionFilter ("0", "0", true, &false_filter);
 
@@ -99,6 +98,8 @@ int main ()
     body_transform.position.y = 0;
 
     ground_plane.SetWorldTransform (body_transform);
+
+    xtl::connection collision_end_connection = scene.RegisterCollisionCallback ("*", "*", CollisionEventType_End, &collision_event_handler);
 
     scene.PerformSimulation (1.f);
 

@@ -3,6 +3,7 @@
 
 #include <xtl/functional_fwd>
 
+#include <physics/material.h>
 #include <physics/shape.h>
 
 namespace physics
