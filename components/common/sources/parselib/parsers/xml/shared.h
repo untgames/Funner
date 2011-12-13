@@ -4,13 +4,18 @@
 #include <cctype>
 #include <cstring>
 
+#include <stl/string>
 #include <stl/vector>
 
+#include <xtl/common_exceptions.h>
 #include <xtl/function.h>
 #include <xtl/string.h>
+#include <xtl/uninitialized_storage.h>
 
 #include <common/component.h>
 #include <common/parser.h>
+#include <common/strconv.h>
+#include <common/utf_converter.h>
 
 namespace common
 {
@@ -92,8 +97,8 @@ class XmlLexer
     void SkipBlockComment ();
     void NextLine ();
     void ReadContentString ();
-    void ReadString (char border, char* terminators = 0, size_t terminators_count = 0);  //если встречается border - он заменяется нулем и текущая позиция переводится на следующий символ, если встречается терминатор - разбор строки останавливается
-    void ReadSymbolReference (char* write_position);
+    void ReadString (char border, char* terminators = 0, size_t terminators_count = 0, bool content = false);  //если встречается border - он заменяется нулем и текущая позиция переводится на следующий символ, если встречается терминатор - разбор строки останавливается
+    void ReadSymbolReference (char*& write_position);
     void ReadCData ();
     void ReadIdentifier (bool identifier);
     void SetError (XmlLexerStatus error, const char* position);

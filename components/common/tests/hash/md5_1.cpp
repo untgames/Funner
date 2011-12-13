@@ -1,5 +1,4 @@
 // Тест хеширования пустой строки 
-//                      (c) Gred
 
 #include <common/hash.h>
 #include <stdio.h>

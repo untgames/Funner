@@ -8,6 +8,7 @@ Components:
   component 'common.licensing.loaders.AutoLicenseGenerator' not loaded
   component 'common.parsers.wxf' not loaded
   component 'common.parsers.xml' not loaded
+  component 'common.string.converters.iconv' not loaded
   component 'common.tests.MyComponent' not loaded
 Load MyComponent
 After load
@@ -19,6 +20,7 @@ Components:
   component 'common.licensing.loaders.AutoLicenseGenerator' loaded
   component 'common.parsers.wxf' loaded
   component 'common.parsers.xml' loaded
+  component 'common.string.converters.iconv' loaded
   component 'common.tests.MyComponent' loaded
 Unload MyComponent
 Components:
@@ -29,6 +31,7 @@ Components:
   component 'common.licensing.loaders.AutoLicenseGenerator' not loaded
   component 'common.parsers.wxf' not loaded
   component 'common.parsers.xml' not loaded
+  component 'common.string.converters.iconv' not loaded
   component 'common.tests.MyComponent' not loaded
 After unregister
 Components:
@@ -39,5 +42,6 @@ Components:
   component 'common.licensing.loaders.AutoLicenseGenerator' not loaded
   component 'common.parsers.wxf' not loaded
   component 'common.parsers.xml' not loaded
+  component 'common.string.converters.iconv' not loaded
 After unregister all
 Components:

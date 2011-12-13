@@ -9,8 +9,9 @@ namespace
     ¬спомогательные переменные
 */
 
-char DUMMY_CHAR = ' '; //символ используемый дл€ фиктивного затирани€ при лексическом разборе
-char IDENTIFIER_CHAR_MAP [256]; //карта разрешенных символов разбора идентификатора
+char         IDENTIFIER_CHAR_MAP [256]; //карта разрешенных символов разбора идентификатора
+char         DUMMY_CHAR         = ' ';  //символ используемый дл€ фиктивного затирани€ при лексическом разборе
+const size_t MAX_UTF8_CHAR_SIZE = 6;    //максимальный размер представлени€ одного символа в utf-8 кодировке
 
 }
 
@@ -133,7 +134,7 @@ void XmlLexer::Skip ()
     }
 }
 
-void XmlLexer::ReadSymbolReference (char* write_position)
+void XmlLexer::ReadSymbolReference (char*& write_position)
 {
   if (position [1] == '#')
   {
@@ -149,14 +150,39 @@ void XmlLexer::ReadSymbolReference (char* write_position)
     char*         symbol_code_end = 0;
     unsigned long symbol_code     = strtoul (symbol_code_start, &symbol_code_end, base);
 
-    if (!symbol_code || !symbol_code_end || *symbol_code_end != ';' || symbol_code > 255)
+    if (!symbol_code || !symbol_code_end || *symbol_code_end != ';')
       SetError (XmlLexerStatus_InvalidCharacterReference, current_token);
     else
     {
       position = symbol_code_end;
 
-      unsigned char* unsigned_write_position = (unsigned char*)write_position;
-      unsigned_write_position [0] = (unsigned char)symbol_code;
+      unsigned char utf8_buffer [MAX_UTF8_CHAR_SIZE];
+
+      size_t source_size      = sizeof (symbol_code),
+             destination_size = sizeof (utf8_buffer);
+
+#ifdef __BIG_ENDIAN__
+      Encoding source_encoding = Encoding_UTF32BE;
+#else
+      Encoding source_encoding = Encoding_UTF32LE;
+#endif
+
+      const void* source = &symbol_code;
+      void* destination  = utf8_buffer;
+
+      convert_encoding (source_encoding, source, source_size, Encoding_UTF8, destination, destination_size);
+
+      if (destination_size == sizeof (utf8_buffer))
+      {
+        SetError (XmlLexerStatus_InvalidCharacterReference, current_token);
+        return;
+      }
+
+      size_t converted_size = sizeof (utf8_buffer) - destination_size;
+
+      memcpy (write_position, utf8_buffer, converted_size);
+
+      write_position += converted_size - 1;
     }
   }
   else
@@ -167,7 +193,7 @@ void XmlLexer::ReadSymbolReference (char* write_position)
       char        replacement;
     };
 
-    static Marker       markers []    = {{"lt;", '<'}, {"gt;", '>'}, {"amp;", '&'}, {"aposition;", '\''}, {"quot;", '"'}};
+    static Marker       markers []    = {{"lt;", '<'}, {"gt;", '>'}, {"amp;", '&'}, {"quot;", '"'}};
     static const size_t markers_count = sizeof markers / sizeof *markers;
 
     const Marker* m = markers;
@@ -193,7 +219,7 @@ void XmlLexer::ReadSymbolReference (char* write_position)
   }
 }
 
-void XmlLexer::ReadString (char border, char* terminators, size_t terminators_count)
+void XmlLexer::ReadString (char border, char* terminators, size_t terminators_count, bool content)
 {
   current_token = position;
   current_lexem = XmlLexem_String;
@@ -228,6 +254,18 @@ void XmlLexer::ReadString (char border, char* terminators, size_t terminators_co
       case '&':
         ReadSymbolReference (write_position);
         break;
+      case ']':
+        if (content && (position [1] == ']' && position [2] == '>'))
+        {
+          SetError (XmlLexerStatus_WrongChar, position);
+
+          erased_char          = *position;
+          erased_char_position = position;
+          *position            = '\0';
+
+          position += 3;
+          return;
+        }
       default:
         if (*position == border)
         {
@@ -247,7 +285,7 @@ void XmlLexer::ReadContentString ()
 {
   char terminators [] = { ' ', '<', '\n', '\t', '\r', '\0' };
 
-  ReadString (0, terminators, sizeof (terminators) / sizeof (*terminators));
+  ReadString (0, terminators, sizeof (terminators) / sizeof (*terminators), true);
 }
 
 void XmlLexer::ReadCData ()
@@ -459,17 +497,19 @@ XmlLexem XmlLexer::NextLexem (bool content)
       case '\n':
         NextLine ();
         break;
-      case '&':
+      default:
         if (content)
         {
           ReadContentString ();
-          break;
         }
-      default:
-        erased_char_position = position;
-        erased_char          = *position;
+        else
+        {
+          erased_char_position = position;
+          erased_char          = *position;
 
-        SetError (XmlLexerStatus_WrongChar, position++);
+          SetError (XmlLexerStatus_WrongChar, position++);
+        }
+
         break;
     }
   }

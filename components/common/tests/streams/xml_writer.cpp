@@ -30,11 +30,14 @@ int main ()
     writer.WriteAttribute  ("float", math::constf::pi);
     writer.WriteAttribute  ("double", math::constd::pi);
     writer.WriteAttribute  ("long_double", math::constants<long double>::pi);
+    writer.WriteAttribute  ("escaped_symbols", "<>&\"");
     writer.WriteNode       ("string", "Hello world");
     writer.WriteNode       ("char", 'x');
     writer.BeginNode       ("text");
+    writer.WriteData       ("<>&\"");
     writer.WriteData       ("Hello world!");
     writer.WriteCData      ("Hello world!");
+    writer.WriteCData      ("<>&\"");
     writer.WriteData       ("Hello world!");
     writer.EndNode         ();
     writer.EndNode         ();

@@ -6,7 +6,10 @@ void DefaultPlatform::MountSystemSpecificPaths ()
 {
 }
 
-namespace
+namespace components
+{
+
+namespace standard_file_paths_mount
 {
 
 /*
@@ -22,11 +25,13 @@ class Component
     }
 };
 
-}
-
 extern "C"
 {
 
 ComponentRegistrator<Component> StandardFilePathsMount ("common.file_systems.StandardFilePathsMount");
+
+}
+
+}
 
 }

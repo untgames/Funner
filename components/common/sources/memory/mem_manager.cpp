@@ -46,6 +46,16 @@ void* MemoryManager::Allocate (size_t size)
   return p;
 }
 
+void* MemoryManager::Allocate (size_t size, size_t align, size_t offset)
+{
+  void* p = MemoryManagerSingleton::Instance ()->heap.Allocate (size, align, offset);
+
+  if (!p)
+    throw std::bad_alloc ();
+
+  return p;
+}
+
 void MemoryManager::Deallocate (void* p)
 {  
   if (p && MemoryManagerSingleton::IsInitialized ())

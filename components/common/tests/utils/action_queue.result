@@ -10,7 +10,7 @@ time=00, action:
   wait 100 milliseconds
   wait: true
   after perform action: completed
-time=01, action: empty
+time=01, action: completed empty
 pop action from thread 0
 time=02, action:
   exception: Exception occured during executing of action 2
@@ -23,21 +23,21 @@ time=03, action:
   wait 100 milliseconds
   wait: false
   after perform action:
-time=04, action: empty
+time=04, action: completed empty
 pop action from thread 0
 time=05, action:
   action 3 executed
   wait 100 milliseconds
   wait: false
   after perform action:
-time=06, action: empty
-time=07, action: empty
+time=06, action: completed empty
+time=07, action: completed empty
 pop action from thread 0
 time=08, action:
   action 3 executed
   wait 100 milliseconds
   wait: false
   after perform action: canceled
-time=09, action: empty
+time=09, action: completed empty
 -- cleanup current thread --
 exit

@@ -2,9 +2,40 @@
 
 using namespace common;
 
-//ввести режимы лексического разбора (см. ParseContentText)!!!
+//TODO: ввести режимы лексического разбора (см. ParseContentText)!!!
 
 namespace
+{
+
+enum XmlEncoding
+{
+  XmlEncoding_Unknown,
+  XmlEncoding_UCS4BE,
+  XmlEncoding_UCS4LE,
+  XmlEncoding_UTF8,
+  XmlEncoding_UTF16LE,
+  XmlEncoding_UTF16BE,
+  XmlEncoding_FromPI
+};
+
+struct PrologDesc
+{
+  const unsigned char* prolog;
+  size_t              length;
+
+  template <size_t Length>
+  PrologDesc (const unsigned char (& in_prolog) [Length])
+    : prolog ((const unsigned char*)&in_prolog)
+    , length (Length)
+    {}
+};
+
+}
+
+namespace components
+{
+
+namespace xml_parser
 {
 
 /*
@@ -23,37 +54,163 @@ class XmlParser
 {
   public:
 ///Грамматический разбор
-    static void Parse (ParseTreeBuilder& builder, ParseLog& log, const char* name, size_t, char* buffer)
+    static void Parse (ParseTreeBuilder& builder, ParseLog& log, const char* name, size_t buffer_size, char* buffer)
     {
-      XmlParser (builder, log, name, buffer);
+      try
+      {
+        XmlParser (builder, log, name, buffer_size, buffer);
+      }
+      catch (xtl::exception& e)
+      {
+        e.touch ("common::XmlParser::Parse");
+        throw;
+      }
     }
 
 ///Автоматическое определение возможности разбора парсером
-    static bool Check (size_t, const char* buffer)
+    static bool Check (size_t buffer_size, const char* buffer)
     {
-      static const char*  PROLOG        = "<?xml";
-      static const size_t PROLOG_LENGTH = strlen (PROLOG);      
+      static const unsigned char PROLOG_UCS4BE []      = { 0x00, 0x00, 0x00, 0x3c, 0x00, 0x00, 0x00, 0x3f, 0x00, 0x00, 0x00, 0x78, 0x00, 0x00, 0x00, 0x6d, 0x00, 0x00, 0x00, 0x6c };
+      static const unsigned char PROLOG_UCS4LE []      = { 0x3c, 0x00, 0x00, 0x00, 0x3f, 0x00, 0x00, 0x00, 0x78, 0x00, 0x00, 0x00, 0x6d, 0x00, 0x00, 0x00, 0x6c, 0x00, 0x00, 0x00 };
+      static const unsigned char PROLOG_UTF8 []        = { 0x3c, 0x3f, 0x78, 0x6d, 0x6c };
+      static const unsigned char PROLOG_UTF16LE []     = { 0x3c, 0x00, 0x3f, 0x00, 0x78, 0x00, 0x6d, 0x00, 0x6c, 0x00 };
+      static const unsigned char PROLOG_UTF16BE []     = { 0x00, 0x3c, 0x00, 0x3f, 0x00, 0x78, 0x00, 0x6d, 0x00, 0x6c };
+      static const unsigned char PROLOG_UTF8_BOM []    = { 0xef, 0xbb, 0xbf, 0x3c, 0x3f, 0x78, 0x6d, 0x6c };
+      static const unsigned char PROLOG_UTF16BE_BOM [] = { 0xfe, 0xff, 0x00, 0x3c, 0x00, 0x3f, 0x00, 0x78, 0x00, 0x6d, 0x00, 0x6c };
+      static const unsigned char PROLOG_UTF16LE_BOM [] = { 0xff, 0xfe, 0x3c, 0x00, 0x3f, 0x00, 0x78, 0x00, 0x6d, 0x00, 0x6c, 0x00 };
+      static const unsigned char PROLOG_UCS4BE_BOM []  = { 0x00, 0x00, 0xfe, 0xff, 0x00, 0x00, 0x00, 0x3c, 0x00, 0x00, 0x00, 0x3f, 0x00, 0x00, 0x00, 0x78, 0x00, 0x00, 0x00, 0x6d, 0x00, 0x00, 0x00, 0x6c };
+      static const unsigned char PROLOG_UCS4LE_BOM []  = { 0x00, 0x00, 0xff, 0xfe, 0x3c, 0x00, 0x00, 0x00, 0x3f, 0x00, 0x00, 0x00, 0x78, 0x00, 0x00, 0x00, 0x6d, 0x00, 0x00, 0x00, 0x6c, 0x00, 0x00, 0x00 };
 
-      return strncmp (buffer, PROLOG, PROLOG_LENGTH) == 0;
+      static const PrologDesc PROLOGS [] = { PROLOG_UCS4BE, PROLOG_UCS4LE, PROLOG_UTF8, PROLOG_UTF16LE,
+                                             PROLOG_UTF16BE, PROLOG_UTF8_BOM, PROLOG_UTF16BE_BOM,
+                                             PROLOG_UTF16LE_BOM, PROLOG_UCS4BE_BOM, PROLOG_UCS4LE_BOM};                                             
+
+      for (size_t i = 0, count = sizeof (PROLOGS) / sizeof (*PROLOGS); i < count; i++)
+      {
+        const PrologDesc& prolog = PROLOGS [i];
+
+        if (prolog.length > buffer_size)
+          continue;
+
+        if (!memcmp (buffer, prolog.prolog, prolog.length))
+          return true;
+      }
+
+      return false;
     }
 
   private:    
 ///Конструктор
-    XmlParser (ParseTreeBuilder& in_builder, ParseLog& in_log, const char* in_name, char* buffer)
-      : builder (in_builder),
-        log (in_log),
-        name (in_name),
-        attributes (ATTRIBUTES_CACHE_SIZE),
-        attributes_count (0)
+    XmlParser (ParseTreeBuilder& in_builder, ParseLog& in_log, const char* in_name, size_t buffer_size, char* in_buffer)
+      : builder (in_builder)
+      , log (in_log)
+      , encoding (XmlEncoding_Unknown)
+      , buffer (in_buffer)
+      , name (in_name)
+      , attributes (ATTRIBUTES_CACHE_SIZE)
+      , attributes_count (0)
     {
+      static const char* METHOD_NAME = "common::XmlParser::XmlParser";
+
       if (!buffer)
         return;
 
+      size_t text_offset = 0;
+
+      encoding = DetectEncoding ((unsigned char*)buffer, buffer_size, text_offset);
+      
+      if (encoding != XmlEncoding_Unknown && encoding != XmlEncoding_UTF8)
+      {
+        const char* source_encoding;
+
+        switch (encoding)
+        {
+          case XmlEncoding_UCS4BE:
+            source_encoding = "UCS-4BE";
+            break;
+          case XmlEncoding_UCS4LE:
+            source_encoding = "UCS-4LE";
+            break;
+          case XmlEncoding_UTF16LE:
+            source_encoding = "UTF-16LE";
+            break;
+          case XmlEncoding_UTF16BE:
+            source_encoding = "UTF-16BE";
+            break;
+          default:
+            throw xtl::format_operation_exception (METHOD_NAME, "Unknown encoding %d", encoding);
+        }        
+        
+        Warning (0, "non utf-8 encoding %s used (this decreases parsing perfomance)", source_encoding);
+
+        utf8_buffer.resize (buffer_size + sizeof (unsigned char) - text_offset, false);
+
+        StringConverter string_converter (source_encoding, "UTF-8");
+
+        const void* source_buffer           = buffer + text_offset;
+        void*       destination_buffer      = utf8_buffer.data ();
+        size_t      source_buffer_size      = buffer_size - 1 - text_offset,
+                    destination_buffer_size = utf8_buffer.size ();
+
+        string_converter.Convert (source_buffer, source_buffer_size, destination_buffer, destination_buffer_size);
+
+        if (source_buffer_size || destination_buffer_size < sizeof (unsigned char))
+          throw xtl::format_operation_exception (METHOD_NAME, "Can't convert buffer from '%s' to UTF-8 (source_buffer_size=%u, destination_buffer_size=%u)\n", source_encoding,
+            source_buffer_size, destination_buffer_size);
+          
+        *(char*)destination_buffer = '\0';
+
+        buffer = utf8_buffer.data ();
+      }
+
       lexer.Reset (buffer);
+
+      const char* prolog_end = strstr (buffer, "?>");
+
+      if (prolog_end)
+      {
+        size_t prolog_length = prolog_end - buffer + 2;
+
+        stl::string first_line (buffer, prolog_length);
+
+        lexer.Reset (&first_line [0]);
+
+        if (!FindEncoding ())
+          lexer.Reset (buffer);
+      }
 
       ParseDocument ();
     }
     
+///Рестарт парсинга документа с конвертирование буфера в utf-8
+    void ResetLexer (const char* encoding)
+    {
+      Warning (0, "non utf-8 encoding %s used (this decreases parsing perfomance)", encoding);
+      
+      size_t buffer_length = xtl::xstrlen (buffer);      
+
+      utf8_buffer.resize (buffer_length * 4 + 1, false);      
+
+      StringConverter string_converter (encoding, "UTF-8");
+
+      const void* source_buffer           = buffer;
+      void*       destination_buffer      = utf8_buffer.data ();
+      size_t      source_buffer_size      = buffer_length,
+                  destination_buffer_size = utf8_buffer.size ();
+
+      string_converter.Convert (source_buffer, source_buffer_size, destination_buffer, destination_buffer_size);
+
+      if (source_buffer_size || destination_buffer_size < sizeof (unsigned char))
+        throw xtl::format_operation_exception ("common::XmlParser::RestartParsing", "Can't convert buffer from '%s' to UTF-8 (source_buffer_size=%u, destination_buffer_size=%u)\n", encoding,
+          source_buffer_size, destination_buffer_size);
+          
+      *(char*)destination_buffer = '\0';
+
+      buffer = utf8_buffer.data ();
+
+      lexer.Reset (buffer);
+    }
+
 ///Работа с атрибутами
     void AddAttribute (const char* attribute)
     {
@@ -224,13 +381,13 @@ class XmlParser
         return;
       }  
       
-      if (xtl::xstrnicmp ("xml", lexer.Token (), 3))
+      if (xtl::xstrcmp ("xml", lexer.Token ()))
       {
         Error ("processing directive must start from 'xml' prefix");
         return;
       }
 
-      if (lexer.NextLexem () == XmlLexem_Identifier) 
+      if (lexer.NextLexem () == XmlLexem_Identifier)
         ParseInstructionList ();
 
       for (;;lexer.NextLexem ())
@@ -259,7 +416,11 @@ class XmlParser
           case XmlLexem_CData:
           case XmlLexem_Equal:
           case XmlLexem_Undefined:
-            AddAttribute (lexer.Token ());
+            if (lexer.Status () != XmlLexerStatus_NoError)
+              ProcessLexError ();
+            else
+              AddAttribute (lexer.Token ());
+
             break;
           default:
             FlushAttributes ();
@@ -518,6 +679,103 @@ class XmlParser
         lexer.NextLexem ();
       }
     }
+
+    bool FindEncoding ()
+    {
+      lexer.NextLexem ();
+
+      for (;;)
+      {
+        switch (lexer.Lexem ())
+        {
+          case XmlLexem_InstructionBeginBracket:
+            lexer.NextLexem ();
+
+            if (lexer.Lexem () != XmlLexem_Identifier)
+            {
+              Error ("syntax error. Expected processing directive identifier");
+              return false;
+            }
+
+            if (xtl::xstrcmp ("xml", lexer.Token ()))
+            {
+              Error ("processing directive must start from 'xml' prefix");
+              return false;
+            }
+
+            if (lexer.NextLexem () == XmlLexem_Identifier)
+            {
+              const char *name = 0, *value = 0;
+              size_t      line = 0;
+
+              for (;;lexer.NextLexem ())
+              {
+                switch (lexer.Lexem ())
+                {
+                  case XmlLexem_Identifier:
+                    if (ReadAttribute (name, value, line) && !xtl::xstrcmp (name, "encoding"))
+                    {
+                      switch (encoding)
+                      {
+                        case XmlEncoding_UTF8:
+                        case XmlEncoding_Unknown:
+                          encoding = XmlEncoding_FromPI;
+
+                          if (xtl::xstrcmp (value, "utf-8")) //не нужно конвертировать из utf8 в utf8
+                          {
+                            ResetLexer (value);
+                            return true;
+                          }
+                          else
+                            return false;
+                        case XmlEncoding_UCS4BE:
+                          if (xtl::xstrcmp (value, "utf-32be") && xtl::xstrcmp (value, "utf-32"))
+                            Error (line, "File encoding is utf-32be but declaration encoding is '%s'", value);
+
+                          return false;
+                        case XmlEncoding_UCS4LE:
+                          if (xtl::xstrcmp (value, "utf-32le") && xtl::xstrcmp (value, "utf-32"))
+                            Error (line, "File encoding is utf-32le but declaration encoding is '%s'", value);
+
+                          return false;
+                        case XmlEncoding_UTF16LE:
+                          if (xtl::xstrcmp (value, "utf-16le") && xtl::xstrcmp (value, "utf-16"))
+                            Error (line, "File encoding is utf-16le but declaration encoding is '%s'", value);
+
+                          return false;
+                        case XmlEncoding_UTF16BE:
+                          if (xtl::xstrcmp (value, "utf-16be") && xtl::xstrcmp (value, "utf-16"))
+                            Error (line, "File encoding is utf-16be but declaration encoding is '%s'", value);
+
+                          return false;
+                        case XmlEncoding_FromPI:
+                          return false;
+                      }
+                    }
+
+                    break;
+                  default:
+                    ProcessError ();
+                  case XmlLexem_InstructionEndBracket:
+                    Warning (0, "Encoding is not specified, defaulting to utf-8");
+                    return false;
+                }
+              }
+            }
+
+            return false;
+          default:
+            ProcessLexError ();
+            return false;
+        }
+
+        lexer.NextLexem ();
+      }
+
+      Warning (0, "Encoding is not specified, defaulting to utf-8");
+
+      return false;
+    }
     
     void ProcessInstruction (const char* name, const char* value, size_t line)
     {
@@ -575,7 +833,6 @@ class XmlParser
           break;
         }
         case XmlInstruction_Encoding:
-//          Warning (line, "not yet implement. Encoding='%s'", value);
           break;
         case XmlInstruction_Standalone:
         {
@@ -610,6 +867,7 @@ class XmlParser
       size_t      line = 0;
 
       for (;;lexer.NextLexem ())
+      {
         switch (lexer.Lexem ())
         {
           case XmlLexem_Identifier:
@@ -621,19 +879,93 @@ class XmlParser
             ProcessError ();
           case XmlLexem_InstructionEndBracket:
             return;
-        }      
+        }
+      }
     }    
+
+    XmlEncoding DetectEncoding (const unsigned char* buffer, int buffer_size, size_t& text_offset)
+    {
+        if (!buffer)
+          return XmlEncoding_Unknown;
+
+        if (buffer_size >= 4)
+        {
+          if ((buffer [0] == 0x00) && (buffer [1] == 0x00) && (buffer [2] == 0x00) && (buffer [3] == 0x3C))
+            return XmlEncoding_UCS4BE;
+          if ((buffer [0] == 0x3C) && (buffer [1] == 0x00) && (buffer [2] == 0x00) && (buffer [3] == 0x00))
+            return XmlEncoding_UCS4LE;
+          if ((buffer [0] == 0x3C) && (buffer [1] == 0x3F) && (buffer [2] == 0x78) && (buffer [3] == 0x6D))
+            return XmlEncoding_UTF8;
+
+          /*
+           * Although not part of the recommendation, we also
+           * attempt an "auto-recognition" of UTF-16LE and
+           * UTF-16BE encodings.
+           */
+          if ((buffer [0] == 0x3C) && (buffer [1] == 0x00) && (buffer [2] == 0x3F) && (buffer [3] == 0x00))
+            return XmlEncoding_UTF16LE;
+          if ((buffer [0] == 0x00) && (buffer [1] == 0x3C) && (buffer [2] == 0x00) && (buffer [3] == 0x3F))
+            return XmlEncoding_UTF16BE;
+
+          /* For UTF-32 we can recognize by the BOM */
+          if ((buffer [0] == 0x00) && (buffer [1] == 0x00) && (buffer [2] == 0xFE) && (buffer [3] == 0xFF))
+          {
+            text_offset = 4;
+            return XmlEncoding_UCS4BE;
+          }
+
+          if ((buffer [0] == 0x00) && (buffer [1] == 0x00) && (buffer [2] == 0xFF) && (buffer [3] == 0xFE))
+          {
+            text_offset = 4;
+            return XmlEncoding_UCS4LE;
+          }
+        }
+
+        if (buffer_size >= 3)
+        {
+          /*
+           * Errata on XML-1.0 June 20 2001
+           * We now allow an UTF8 encoded BOM
+           */
+          if ((buffer [0] == 0xEF) && (buffer [1] == 0xBB) && (buffer [2] == 0xBF))
+          {
+            text_offset = 3;
+            return XmlEncoding_UTF8;
+          }
+        }
+
+        /* For UTF-16 we can recognize by the BOM */
+        if (buffer_size >= 2)
+        {
+          if ((buffer [0] == 0xFE) && (buffer [1] == 0xFF))
+          {
+            text_offset = 2;
+            return XmlEncoding_UTF16BE;
+          }
+
+          if ((buffer [0] == 0xFF) && (buffer [1] == 0xFE))
+          {
+            text_offset = 2;
+            return XmlEncoding_UTF16LE;
+          }
+        }
+
+        return XmlEncoding_Unknown;
+    }
 
   private:
     typedef stl::vector<const char*> AttributeCache;
 
   private:
-    ParseTreeBuilder& builder;          //построитель дерева грамматического разбора
-    ParseLog&         log;              //протокол грамматического разбора
-    XmlLexer          lexer;            //лексический анализатор
-    const char*       name;             //имя разбираемого буфера
-    AttributeCache    attributes;       //кеш атрибутов
-    size_t            attributes_count; //количество атрибутов в кеше
+    ParseTreeBuilder&                builder;          //построитель дерева грамматического разбора
+    ParseLog&                        log;              //протокол грамматического разбора
+    XmlLexer                         lexer;            //лексический анализатор
+    XmlEncoding                      encoding;         //кодировка разбираемого буфера
+    char*                            buffer;           //разбираемый буфер
+    const char*                      name;             //имя разбираемого буфера
+    AttributeCache                   attributes;       //кеш атрибутов
+    size_t                           attributes_count; //количество атрибутов в кеше
+    xtl::uninitialized_storage<char> utf8_buffer;      //буфер после конвертации в UTF-8
 };
 
 /*
@@ -649,11 +981,13 @@ class XmlParserComponent
     }
 };
 
-}
-
 extern "C"
 {
 
 ComponentRegistrator<XmlParserComponent> XmlParser (XML_PARSER_COMPONENT_NAME);
+
+}
+
+}
 
 }

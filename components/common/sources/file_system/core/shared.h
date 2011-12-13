@@ -521,6 +521,12 @@ class FileSystemImpl
     size_t GetDefaultFileBufferSize () const;
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+///Установка размера буфера файла
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void   SetFileBufferSize (const char* file_name, size_t buffer_size);
+    size_t GetFileBufferSize (const char* file_name) const;
+    
+///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Удаление / переименование файла, создание каталога
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void Remove (const char* file_name);
@@ -548,7 +554,7 @@ class FileSystemImpl
 ///Определение файловой системы ассоциированной с указанным путём
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     ICustomFileSystemPtr FindMountFileSystem (const char* path,stl::string& result_file_name);
-    ICustomFileSystemPtr FindFileSystem      (const char* path,stl::string& result_file_name);
+    ICustomFileSystemPtr FindFileSystem      (const char* path,stl::string& result_file_name,stl::string* prefix_name = 0);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Добавление пак-файла
@@ -573,6 +579,7 @@ class FileSystemImpl
     typedef stl::hash_map<stl::hash_key<const char*>, FileCryptoParameters> CryptoMap;
     typedef xtl::intrusive_ptr<AnonymousFileSystem>                         AnonymousFileSystemPtr;
     typedef stl::list<SymbolicLink>                                         SymbolicLinkList;
+    typedef stl::hash_map<stl::hash_key<const char*>, size_t>               FileBufferSizeMap;
 
   private:    
     PackFileTypeList       pack_types;               //список типов пак-файлов
@@ -586,6 +593,7 @@ class FileSystemImpl
     stl::string            default_path;             //путь по умолчанию (аналог текущего каталога)
     stl::string            compress_path;            //буфер для формирования сокращённого пути
     size_t                 default_file_buffer_size; //размер буфера файла по умолчанию
+    FileBufferSizeMap      file_buffer_sizes;        //уточнения размеров буфера файла для различных файлов
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

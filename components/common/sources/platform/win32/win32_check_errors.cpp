@@ -11,8 +11,8 @@ stl::string get_error_message (DWORD error_code)
 {
   void* buffer = 0;
 
-  FormatMessage (FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
-                 0, error_code, MAKELANGID (LANG_NEUTRAL, SUBLANG_DEFAULT), (LPSTR)&buffer, 0, 0);                 
+  FormatMessageW (FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
+                 0, error_code, MAKELANGID (LANG_NEUTRAL, SUBLANG_DEFAULT), (LPWSTR)&buffer, 0, 0);                 
 
   if (!buffer)
   {
@@ -22,9 +22,9 @@ stl::string get_error_message (DWORD error_code)
   {    
       //отсечение завершающих \n и пробелов
 
-    char* iter = (char*)buffer;
+    wchar_t* iter = (wchar_t*)buffer;
     
-    iter += strlen (iter);    
+    iter += xtl::xstrlen (iter);    
     
     if (iter == buffer)
       return "";      
@@ -45,7 +45,7 @@ stl::string get_error_message (DWORD error_code)
         }
       }
 
-    stl::string message = common::format ("Win32 error %u. %s", error_code, buffer);        
+    stl::string message = common::format ("Win32 error %u. %s", error_code, common::tostring((const wchar_t*)buffer).c_str ());
 
     LocalFree (buffer);
 

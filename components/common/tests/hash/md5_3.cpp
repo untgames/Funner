@@ -1,5 +1,4 @@
 // Тест хеширования файла блоками произвольного размера с использованием MD5Context
-//                      (c) Gred
 
 #include <common/hash.h>
 #include <common/file.h>

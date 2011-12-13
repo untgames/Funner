@@ -8,7 +8,8 @@ using namespace common;
 
 void remove_all ()
 {
-  system ("rm -rf results");
+  if (system ("rm -rf results"))
+    printf ("Can't remove results\n");
 }
 
 int main ()

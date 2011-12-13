@@ -1,7 +1,9 @@
 #ifndef COMMONLIB_HEAP_HEADER
 #define COMMONLIB_HEAP_HEADER
 
+#include <cstddef>
 #include <new>
+
 #include <xtl/functional_fwd>
 
 namespace common
@@ -62,7 +64,6 @@ class AllocationContext
 {
   friend class Heap;
   public:
-    AllocationContext  (Heap&,const char* name);
     AllocationContext  (const AllocationContext&);
     ~AllocationContext ();
 
@@ -187,9 +188,6 @@ class Heap
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///–абота с контекстами распределени€
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void              SetCurrentContext (const AllocationContext&);
-    AllocationContext GetCurrentContext () const;
-    AllocationContext GetContext        (const char* name); //поиск или создание контекста распределени€
     AllocationContext GetDefaultContext () const; //контекст распределени€ по умолчанию
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -228,6 +226,7 @@ class MemoryManager
 ///¬рапперы дл€ упрощени€ выделени€ пам€ти из основного менеджера
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     static void* Allocate   (size_t size);
+    static void* Allocate   (size_t size, size_t align, size_t offset = 0);
     static void  Deallocate (void* p);
 };
 

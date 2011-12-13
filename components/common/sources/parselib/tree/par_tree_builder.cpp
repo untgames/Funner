@@ -241,7 +241,7 @@ void ParseTreeBuilder::SetSource (const char* name)
 
   size_t size   = strlen (name) + 1,
          offset = impl->front_offset - impl->buffer.data ();
-  char*  dst    = impl->AllocFront (size);
+  char*  dst    = impl->AllocFront (get_aligned_size (size, ALIGN_SIZE));
 
   strcpy (dst, name);
 
@@ -274,7 +274,7 @@ void ParseTreeBuilder::BeginNode (const char* name, size_t line_number)
 
   size_t name_size   = strlen (name) + 1,
          node_offset = impl->front_offset - impl->buffer.data (),
-         node_size   = sizeof (ParseNodeImpl) + name_size;
+         node_size   = sizeof (ParseNodeImpl) + get_aligned_size (name_size, ALIGN_SIZE);
 
   ParseNodeImpl* node = reinterpret_cast<ParseNodeImpl*> (impl->AllocFront (node_size));
 
@@ -412,7 +412,7 @@ ParseNode ParseTreeBuilder::BuildCore (const ParseLog* log)
 
   xtl::intrusive_ptr<ParseTree> tree (new ParseTree (impl->buffer, log), false);
 
-  ParseNode node (tree.get (), sizeof (ParseNodeImpl) + strlen (DUMMY_NODE_NAME) + 1);
+  ParseNode node (tree.get (), sizeof (ParseNodeImpl) + get_aligned_size (strlen (DUMMY_NODE_NAME) + 1, ALIGN_SIZE));
 
   new_builder.Swap (*this);
 
@@ -438,7 +438,7 @@ void ParseTreeBuilder::Swap (ParseTreeBuilder& builder)
   stl::swap (impl, builder.impl);
 }
 
-namespace
+namespace common
 {
 
 void swap (ParseTreeBuilder& builder1, ParseTreeBuilder& builder2)

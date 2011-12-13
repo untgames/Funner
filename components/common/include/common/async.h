@@ -5,6 +5,8 @@
 #include <xtl/functional_fwd>
 #include <xtl/singleton_default.h>
 
+#include <common/action_queue.h>
+
 namespace common
 {
 
@@ -30,6 +32,7 @@ template <>        struct AsyncResultType<void> { typedef void Type; };
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 template <class Ret> AsyncResult async_invoke (const xtl::function<Ret ()>&);
 template <class Ret> AsyncResult async_invoke (const xtl::function<Ret ()>&, const xtl::function<void (AsyncResult&)>& callback);
+template <class Ret> AsyncResult async_invoke (const xtl::function<Ret ()>&, ActionThread callback_thread, const xtl::function<void (AsyncResult&)>& callback);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Результат асинхронной операции (thread safe)
@@ -38,6 +41,7 @@ class AsyncResult
 {
   template <class Ret> friend AsyncResult async_invoke (const xtl::function<Ret ()>&);
   template <class Ret> friend AsyncResult async_invoke (const xtl::function<Ret ()>&, const xtl::function<void (AsyncResult&)>& callback);
+  template <class Ret> friend AsyncResult async_invoke (const xtl::function<Ret ()>&, ActionThread callback_thread, const xtl::function<void (AsyncResult&)>& callback);  
   public:
     typedef xtl::function<void (AsyncResult&)> CallbackHandler;
 
@@ -69,6 +73,7 @@ class AsyncResult
     AsyncResult (Impl*);
     AsyncResult (detail::IAsyncAction*);
     AsyncResult (detail::IAsyncAction*, const CallbackHandler&);
+    AsyncResult (detail::IAsyncAction*, ActionThread thread, const CallbackHandler&);    
     
     detail::IAsyncResult* Result ();
 

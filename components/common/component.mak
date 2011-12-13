@@ -1,8 +1,8 @@
 ###################################################################################################
 #Определения и константы
 ###################################################################################################
-TARGETS := COMMON.SOURCES COMMON.WXF_PARSER COMMON.XML_PARSER COMMON.ZIP_FILE_SYSTEM COMMON.AES \
-  COMMON.AUTO_LICENSE_GENERATOR COMMON.TESTS COMMON.UTILS.FILE_CRYPTER COMMON.UTILS.LICENSE_GENERATOR COMMON.INFO
+TARGETS := COMMON.SOURCES COMMON.WXF_PARSER COMMON.XML_PARSER COMMON.ZIP_FILE_SYSTEM COMMON.AES COMMON.ICONV COMMON.MEMORY_MANAGER_OVERRIDE \
+  COMMON.AUTO_LICENSE_GENERATOR COMMON.TESTS COMMON.UTILS.FILE_CRYPTER COMMON.UTILS.LICENSE_GENERATOR COMMON.INFO  
 
 #Цель - CommonLib sources
 COMMON.SOURCES.TYPE                       := static-lib
@@ -13,14 +13,21 @@ COMMON.SOURCES.SOURCE_DIRS                := sources/file_system/core sources/st
                                              sources/utils sources/log sources/properties sources/licensing/core sources/platform/default
 COMMON.SOURCES.DOCUMENTATION_DIRS         := include
 COMMON.SOURCES.COMPILER_DEFINES           := PCRE_STATIC
-COMMON.SOURCES.IMPORTS                    := compile.math.vecmath
+COMMON.SOURCES.IMPORTS                    := compile.math.vecmath compile.extern.iconv
 COMMON.SOURCES.unistd.SOURCE_DIRS         := sources/platform/unistd
+COMMON.SOURCES.android.SOURCE_DIRS        := sources/platform/android
 COMMON.SOURCES.cocoa.SOURCE_DIRS          := sources/platform/cocoa
 COMMON.SOURCES.cocoa_desktop.SOURCE_DIRS  := sources/platform/cocoa_desktop
 COMMON.SOURCES.iphone.SOURCE_DIRS         := sources/platform/cocoa_iphone
 COMMON.SOURCES.win32.SOURCE_DIRS          := sources/platform/win32
 COMMON.SOURCES.bada.SOURCE_DIRS           := sources/platform/bada
 COMMON.SOURCES.bada.IMPORTS               := compile.extern.bada
+
+#Цель - Memory manager override
+COMMON.MEMORY_MANAGER_OVERRIDE.TYPE         := static-lib
+COMMON.MEMORY_MANAGER_OVERRIDE.INCLUDE_DIRS := include ../xtl/include
+COMMON.MEMORY_MANAGER_OVERRIDE.NAME         := funner.common.memory_manager_override
+COMMON.MEMORY_MANAGER_OVERRIDE.SOURCE_DIRS  := sources/memory/memory_manager_override
 
 #Цель - WxfParser
 COMMON.WXF_PARSER.TYPE             := static-lib
@@ -47,6 +54,13 @@ COMMON.AES.NAME             := funner.common.aes
 COMMON.AES.SOURCE_DIRS      := sources/crypto/aes
 COMMON.AES.IMPORTS          := compile.common
 
+#Цель - CommonLib iconv sources
+COMMON.ICONV.TYPE             := static-lib
+COMMON.ICONV.NAME             := funner.common.iconv
+COMMON.ICONV.INCLUDE_DIRS     := include ../xtl/include
+COMMON.ICONV.SOURCE_DIRS      := sources/strlib/iconv
+COMMON.ICONV.IMPORTS          := compile.extern.iconv
+
 #Цель - CommonLib auto license generator
 COMMON.AUTO_LICENSE_GENERATOR.TYPE        := static-lib
 COMMON.AUTO_LICENSE_GENERATOR.NAME        := funner.common.auto_license_generator
@@ -60,7 +74,7 @@ COMMON.TESTS.SOURCE_DIRS          := tests/file_system tests/streams tests/hash 
                                      tests/memory tests/log tests/parselib tests/crypto tests/properties
 COMMON.TESTS.haswchar.SOURCE_DIRS := tests/strlib/wchar
 COMMON.TESTS.IMPORTS              := compile.math.vecmath compile.common link.common.aes link.common.xml link.common.wxf \
-                                     link.common.zip_file_system link.common.default_console_handler
+                                     link.common.zip_file_system link.common.default_console_handler link.common.iconv
 COMMON.TESTS.bada_simulator.IMPORTS := link.extern.bada_addons
 
 #Цель - CommonLib crypter

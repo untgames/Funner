@@ -1,18 +1,32 @@
 #include <stl/hash_map>
+#include <stl/string>
 
 #include <xtl/function.h>
 #include <xtl/bind.h>
 #include <xtl/common_exceptions.h>
 
+#include <common/component.h>
 #include <common/singleton.h>
-#include <common/utf_converter.h>
+#include <common/strlib.h>
 #include <common/strconv.h>
+#include <common/strlib.h>
+#include <common/utf_converter.h>
 
 using namespace stl;
 using namespace common;
 
 namespace
 {
+
+/*
+    Константы
+*/
+
+const char* DEFAULT_CONVERTERS_MASK = "common.string.converters.*";
+
+/*
+    Внутренние классы реализации
+*/
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Utf-конвертер
@@ -73,31 +87,41 @@ class StringConverterSystemImpl
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Регистрация конвертеров
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    bool RegisterConverter       (const char* source_encoding, const char* destination_encoding, const StringConverterSystem::ConverterFn&);
+    void RegisterConverter       (const char* source_encoding, const char* destination_encoding, const StringConverterSystem::ConverterFn&);
     void UnregisterConverter     (const char* source_encoding, const char* destination_encoding);
     void UnregisterAllConverters ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Проверка зарегистрированности конвертера
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    bool IsConverterRegistered (const char* source_encoding, const char* destination_encoding) const;
+    bool IsConverterRegistered (const char* source_encoding, const char* destination_encoding);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Получение конвертера
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    IStringConverter* CreateConverter (const char* source_encoding, const char* destination_encoding) const;
+    IStringConverter* CreateConverter (const char* source_encoding, const char* destination_encoding);  
+
+  private:
+    struct ConverterDesc
+    {
+      stl::string                        source_encoding;
+      stl::string                        destination_encoding;
+      StringConverterSystem::ConverterFn converter;
+      
+      ConverterDesc (const char* in_source_encoding, const char* in_destination_encoding, const StringConverterSystem::ConverterFn& in_converter)
+        : source_encoding (in_source_encoding)
+        , destination_encoding (in_destination_encoding)
+        , converter (in_converter)
+      {
+      }
+    };
     
-  private:
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Получение хэша имён конвертера
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    static size_t GetConverterHash (const char* source_encoding, const char* destination_encoding);
+    typedef stl::list<ConverterDesc> StringConverterList;
+    
+    StringConverterList::iterator FindConverter (const char* source_encoding, const char* destination_encoding);
 
   private:
-    typedef stl::hash_map<size_t, StringConverterSystem::ConverterFn> StringConverterMap;
-
-  private:
-    StringConverterMap converters;
+    StringConverterList converters;
 };
 
 typedef common::Singleton<StringConverterSystemImpl> StringConverterSystemImplSingleton;
@@ -138,15 +162,28 @@ StringConverterSystemImpl::StringConverterSystemImpl()
 }
 
 /*
-    Получение хэша имён конвертера
+    Поиск конвертера
 */
 
-size_t StringConverterSystemImpl::GetConverterHash (const char* source_encoding, const char* destination_encoding)
+StringConverterSystemImpl::StringConverterList::iterator StringConverterSystemImpl::FindConverter (const char* source_encoding, const char* destination_encoding)
 {
-  return strihash (destination_encoding, strihash (source_encoding));
+  static ComponentLoader loader (DEFAULT_CONVERTERS_MASK);
+
+  if (!source_encoding || !destination_encoding)
+    return converters.end ();
+    
+  for (StringConverterList::iterator iter=converters.begin (), end=converters.end (); iter!=end; ++iter)
+    if (wcimatch (source_encoding, iter->source_encoding.c_str ()) && wcimatch (destination_encoding, iter->destination_encoding.c_str ()))
+      return iter;
+      
+  return converters.end ();
 }
 
-bool StringConverterSystemImpl::RegisterConverter
+/*
+    Регистрация конвертеров
+*/
+
+void StringConverterSystemImpl::RegisterConverter
  (const char*                               source_encoding,
   const char*                               destination_encoding,
   const StringConverterSystem::ConverterFn& converter)
@@ -159,18 +196,9 @@ bool StringConverterSystemImpl::RegisterConverter
       throw xtl::make_null_argument_exception ("", "source_encoding");
 
     if (!destination_encoding)
-      throw xtl::make_null_argument_exception ("", "destination_encoding");
+      throw xtl::make_null_argument_exception ("", "destination_encoding");      
       
-    size_t hash = GetConverterHash (source_encoding, destination_encoding);
-      
-    StringConverterMap::iterator iter = converters.find (hash);
-
-    if (iter != converters.end ())
-      return false;
-
-    converters.insert_pair (hash, converter);
-
-    return true;
+    converters.push_back (ConverterDesc (source_encoding, destination_encoding, converter));
   }
   catch (xtl::exception& exception)
   {
@@ -188,8 +216,13 @@ void StringConverterSystemImpl::UnregisterConverter
 
   if (!destination_encoding)
     return;
-
-  converters.erase (GetConverterHash (source_encoding, destination_encoding));
+    
+  for (StringConverterList::iterator iter=converters.begin (), end=converters.end (); iter!=end; ++iter)
+    if (source_encoding == iter->source_encoding && destination_encoding == iter->destination_encoding)
+    {
+      converters.erase (iter);
+      return;
+    }
 }
 
 void StringConverterSystemImpl::UnregisterAllConverters ()
@@ -197,9 +230,7 @@ void StringConverterSystemImpl::UnregisterAllConverters ()
   converters.clear ();
 }
 
-bool StringConverterSystemImpl::IsConverterRegistered
-  (const char* source_encoding,
-   const char* destination_encoding) const
+bool StringConverterSystemImpl::IsConverterRegistered (const char* source_encoding, const char* destination_encoding)
 {
   if (!source_encoding)
     return false;
@@ -207,14 +238,12 @@ bool StringConverterSystemImpl::IsConverterRegistered
   if (!destination_encoding)
     return false;
 
-  StringConverterMap::const_iterator iter = converters.find (GetConverterHash (source_encoding, destination_encoding));
+  StringConverterList::iterator iter = FindConverter (source_encoding, destination_encoding);
 
   return iter != converters.end ();
 }
 
-IStringConverter* StringConverterSystemImpl::CreateConverter
- (const char* source_encoding,
-  const char* destination_encoding) const
+IStringConverter* StringConverterSystemImpl::CreateConverter (const char* source_encoding, const char* destination_encoding)
 {
   static const char* METHOD_NAME = "common::StringConverterSystemImpl::CreateConverter";
 
@@ -226,12 +255,12 @@ IStringConverter* StringConverterSystemImpl::CreateConverter
     if (!destination_encoding)
       throw xtl::make_null_argument_exception ("", "destination_encoding");
 
-    StringConverterMap::const_iterator iter = converters.find (GetConverterHash (source_encoding, destination_encoding));
+    StringConverterList::iterator iter = FindConverter (source_encoding, destination_encoding);
     
     if (iter == converters.end ())
       throw xtl::format_operation_exception ("", "A converter functor for \'%s-to-%s\' is not registered", source_encoding, destination_encoding);
    
-    return (iter->second)();
+    return iter->converter (source_encoding, destination_encoding);
   }
   catch (xtl::exception& exception)
   {
@@ -246,12 +275,12 @@ IStringConverter* StringConverterSystemImpl::CreateConverter
 ===================================================================================================
 */
 
-bool StringConverterSystem::RegisterConverter
+void StringConverterSystem::RegisterConverter
  (const char*        source_encoding,
   const char*        destination_encoding,
   const ConverterFn& converter)
 {
-  return StringConverterSystemImplSingleton::Instance ()->RegisterConverter (source_encoding, destination_encoding, converter);
+  StringConverterSystemImplSingleton::Instance ()->RegisterConverter (source_encoding, destination_encoding, converter);
 }
 
 void StringConverterSystem::UnregisterConverter (const char* source_encoding, const char* destination_encoding)

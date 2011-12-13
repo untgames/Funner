@@ -1,5 +1,4 @@
 // Тест хеширования длинной строки 
-//                      (c) Gred
 
 #include <common/hash.h>
 #include <string.h>

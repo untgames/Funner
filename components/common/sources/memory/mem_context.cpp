@@ -22,12 +22,6 @@ AllocationContext::AllocationContext (AllocNode* _node)
   node->AddRef ();
 }
 
-AllocationContext::AllocationContext (Heap& heap,const char* name)
-{
-  node = NULL;
-  (*this) = heap.GetContext (name);
-}
-
 AllocationContext::AllocationContext (const AllocationContext& context)
 {
   node = context.node;

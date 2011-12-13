@@ -1,6 +1,9 @@
 #include "shared.h"
 
-namespace
+namespace components
+{
+
+namespace default_console_handler
 {
 
 /*
@@ -32,11 +35,13 @@ class DefaultConsoleHandlerComponent
     xtl::auto_connection on_print_line_connection;
 };
 
-}
-
 extern "C"
 {
 
 common::ComponentRegistrator<DefaultConsoleHandlerComponent> DefaultConsoleHandler ("common.console.DefaultConsoleHandler");
+
+}
+
+}
 
 }

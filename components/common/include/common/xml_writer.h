@@ -50,6 +50,7 @@ class XmlWriter
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Сериализация атрибутов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+                       void WriteAttribute (const char* name, const char* value);
     template <class T> void WriteAttribute (const char* name, const T& value);
     template <class T> void WriteAttribute (const char* name, const T& value, const char* format);
     
@@ -103,6 +104,7 @@ class XmlWriter
     void WriteXmlTextData (const char* value);
     void WriteXmlTextData (const char* value, const char* format);
 
+    const char* EscapeStringSymbols (const char* value);
 
   private:
     XmlWriter (const XmlWriter&); //no impl

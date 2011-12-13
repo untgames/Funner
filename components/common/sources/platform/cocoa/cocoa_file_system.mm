@@ -52,12 +52,6 @@ void check_gestalt_manager_error (OSErr error_code, const char* source, const ch
 
 #endif
 
-bool test_flag (size_t mask,size_t flag)
-{
-  return (mask & flag) == flag;
-}
-
-
 class CocoaFileSystem: public StdioFileSystem
 {
   public:
@@ -87,7 +81,7 @@ class CocoaFileSystem: public StdioFileSystem
         throw;
       }
 
-      if (os_version_major == 10 && os_version_minor > 4 || os_version_major > 10)
+      if ((os_version_major == 10 && os_version_minor > 4) || os_version_major > 10)
         file_manager = [[NSFileManager alloc] init];
       else
         file_manager = [[NSFileManager defaultManager] retain];
@@ -278,6 +272,9 @@ class CocoaFileSystem: public StdioFileSystem
         [pool release];
         return;
       }
+
+      if (dir_name == "./")
+        dir_name = "";
 
 #if defined IPHONE || __MAC_OS_X_VERSION_MIN_REQUIRED >= 1050
       NSError* error = nil;

@@ -258,7 +258,7 @@ void FileSystemImpl::AddPackFile (const char* _path,size_t search_path_hash,cons
         ICustomFileSystemPtr pack_file_system (i->creater (path.c_str ()),false);
 
         pack_files.push_front (PackFile (strihash (path.c_str ()),search_path_hash,pack_file_system));
-
+          
         return;
       }
       catch (std::exception& exception)
@@ -282,25 +282,25 @@ void FileSystemImpl::AddSearchPath (const char* _path,const LogHandler& log_hand
   if (!log_handler)
     throw xtl::make_null_argument_exception ("common::FileSystem::AddSearchPath","log_handler");
 
-  string path = FileSystem::GetNormalizedFileName (_path), mount_path;
+  string path = FileSystem::GetNormalizedFileName (_path), mount_path, prefix;
 
-  ICustomFileSystemPtr owner_file_system = FindFileSystem (path.c_str (),mount_path);
-  FileInfo           file_info;
+  ICustomFileSystemPtr owner_file_system = FindFileSystem (path.c_str (),mount_path,&prefix);
+  FileInfo             file_info;
   
   if (!owner_file_system || !owner_file_system->GetFileInfo (mount_path.c_str (),file_info))
   {
     path = FileSystem::GetNormalizedFileName (_path);
-    
+
     log_handler (format ("Search path '%s' doesn't exist (try to create)",path.c_str ()).c_str ());
-    
+
     AddPackFile (path.c_str (),0,log_handler);
-    
+
     return;
   }
   
   if (path [0] != '/')
-    path = format ("%s/%s",default_path.c_str (),path.c_str ());    
-
+    path = format ("%s%s",prefix.c_str (),path.c_str ());    
+    
   size_t path_hash = strhash (path.c_str ());
 
   if (file_info.is_dir)
@@ -316,7 +316,7 @@ void FileSystemImpl::AddSearchPath (const char* _path,const LogHandler& log_hand
 
     for (PackFileTypeList::iterator i=pack_types.begin ();i!=pack_types.end ();++i)
       owner_file_system->Search (format ("%s/*.%s",mount_path.c_str (),i->extension.c_str ()).c_str (),
-                                ICustomFileSystem::FileSearchHandler (bind (&FileListBuilder::Insert, &list_builder, _1, _2)));
+      ICustomFileSystem::FileSearchHandler (bind (&FileListBuilder::Insert, &list_builder, _1, _2)));
 
     search_paths.push_front (SearchPath (path.c_str (),path_hash));
 
@@ -638,7 +638,7 @@ ICustomFileSystemPtr FileSystemImpl::FindMountFileSystem (const char* file_name,
   return NULL;
 }
 
-ICustomFileSystemPtr FileSystemImpl::FindFileSystem (const char* src_file_name,string& result_file_name)
+ICustomFileSystemPtr FileSystemImpl::FindFileSystem (const char* src_file_name,string& result_file_name,string* prefix_name)
 {
   static const char* METHOD_NAME = "common::FileSystemImpl::FindFileSystem";  
   
@@ -676,7 +676,7 @@ ICustomFileSystemPtr FileSystemImpl::FindFileSystem (const char* src_file_name,s
         iter = symbolic_links.begin ();
     }    
     else ++iter;
-  }
+  }  
   
     //пытаемс€ найти файл не использу€ путей поиска
 
@@ -687,22 +687,15 @@ ICustomFileSystemPtr FileSystemImpl::FindFileSystem (const char* src_file_name,s
     if (!return_value)
       throw xtl::make_argument_exception (METHOD_NAME, "src_file_name", src_file_name, "Can't find mount file system for this file");
 
+    if (prefix_name)
+      *prefix_name = "";
+
     return return_value;
   }
-
-    //пытаемс€ найти файл по дефолтному пути поиска
-
-  string               full_name         = format ("%s/%s",default_path.c_str (),file_name.c_str ()), mount_name;
-  ICustomFileSystemPtr owner_file_system = FindMountFileSystem (full_name.c_str (),mount_name);
+    
+  string full_name, mount_name;
   
-  if (owner_file_system && owner_file_system->IsFileExist (mount_name.c_str ()))
-  {
-    swap (result_file_name,mount_name);
-    return owner_file_system;
-  }
-
-  string             default_mount_name  = mount_name;
-  ICustomFileSystemPtr default_file_system = owner_file_system;
+  ICustomFileSystemPtr owner_file_system;
 
     //пытаемс€ найти файл в списке путей поиска
 
@@ -710,31 +703,75 @@ ICustomFileSystemPtr FileSystemImpl::FindFileSystem (const char* src_file_name,s
   {
     full_name         = format ("%s/%s",i->path.c_str (),file_name.c_str ());
     owner_file_system = FindMountFileSystem (full_name.c_str (),mount_name);
-
+    
     if (owner_file_system && owner_file_system->IsFileExist (mount_name.c_str ()))
     {
       swap (result_file_name,mount_name);
+      
+      if (prefix_name)
+        *prefix_name = i->path + '/';        
+      
       return owner_file_system;
     }
   }
 
     //пытаемс€ найти файл в списке пак-файлов
-
+    
+  for (SearchPathList::iterator iter=search_paths.begin ();iter!=search_paths.end ();++iter)
+  {
+    full_name = format ("%s/%s",iter->path.c_str (),file_name.c_str ());    
+    
+    for (PackFileList::iterator i=pack_files.begin ();i!=pack_files.end ();++i)
+    {
+      if (i->file_system->IsFileExist (full_name.c_str ()))
+      {
+        swap (full_name,result_file_name);
+        
+        if (prefix_name)
+          *prefix_name = iter->path + '/';
+          
+        return i->file_system;
+      }
+    }
+  }
+  
   for (PackFileList::iterator i=pack_files.begin ();i!=pack_files.end ();++i)
     if (i->file_system->IsFileExist (file_name.c_str ()))
     {
       swap (result_file_name,file_name);
+            
+      if (prefix_name)
+        *prefix_name = "";
+      
       return i->file_system;
-    }
+    }  
+  
+    //пытаемс€ найти файл по дефолтному пути поиска
+    
+  full_name         = format ("%s/%s",default_path.c_str (),file_name.c_str ());
+  owner_file_system = FindMountFileSystem (full_name.c_str (),mount_name);
+  
+  if (owner_file_system && owner_file_system->IsFileExist (mount_name.c_str ()))
+  {
+    swap (result_file_name,mount_name);
+    
+    if (prefix_name)
+      *prefix_name = default_path + '/';
+    
+    return owner_file_system;
+  }  
 
     //возвращаем ссылку на файловую систему включающую путь по умолчанию
 
-  if (!default_file_system)
+  if (!owner_file_system)
     throw format_operation_exception (METHOD_NAME, "File '%s' does not belong to any file system",src_file_name);
 
-  swap (result_file_name,default_mount_name);
+  swap (result_file_name,mount_name);
+  
+  if (prefix_name)
+    *prefix_name = default_path + '/';
 
-  return default_file_system;
+  return owner_file_system;
 }
 
 /*
@@ -788,12 +825,15 @@ FileImplPtr FileSystemImpl::OpenFile (const char* src_file_name,filemode_t mode_
       base_file = FileImplPtr (new CryptoFileImpl (base_file, buffer_size, params.ReadMethod (), params.WriteMethod (), params.Key (), params.KeyBits ()), false);
     }
 
-    size_t self_buffer_size = base_file->GetBufferSize ();
+    size_t self_buffer_size = base_file->GetBufferSize (), preferred_buffer_size = GetFileBufferSize (src_file_name);
+    
+    if (preferred_buffer_size > buffer_size)
+      buffer_size = preferred_buffer_size;
 
     if (!buffer_size || self_buffer_size >= buffer_size || (self_buffer_size >= base_file->Size () && !(base_file->Mode () & FileMode_Resize)))
       return base_file;
 
-    if (base_file->Size () < default_file_buffer_size && !(mode_flags & (FileMode_Resize|FileMode_Write)))
+    if (base_file->Size () <= buffer_size && !(mode_flags & (FileMode_Resize|FileMode_Write)))
       return FileImplPtr (new MemFileImpl (base_file), false);
 
     return FileImplPtr (new BufferedFileImpl (base_file,buffer_size), false);
@@ -815,6 +855,33 @@ FileImplPtr FileSystemImpl::OpenFile (const char* src_file_name,filemode_t mode_
 void FileSystemImpl::SetDefaultFileBufferSize (size_t buffer_size)
 {
   default_file_buffer_size = buffer_size;
+}
+
+void FileSystemImpl::SetFileBufferSize (const char* file_name, size_t buffer_size)
+{
+  if (!file_name)
+    throw xtl::make_null_argument_exception ("common::FileSystem::SetFileBufferSize", "file_name");
+    
+  if (!buffer_size)
+  {
+    file_buffer_sizes.erase (file_name);
+    return;
+  }
+  
+  file_buffer_sizes [file_name] = buffer_size;
+}
+
+size_t FileSystemImpl::GetFileBufferSize (const char* file_name) const
+{
+  if (!file_name)
+    throw xtl::make_null_argument_exception ("common::FileSystem::SetFileBufferSize", "file_name");
+    
+  FileBufferSizeMap::const_iterator iter = file_buffer_sizes.find (file_name);
+  
+  if (iter == file_buffer_sizes.end ())
+    return GetDefaultFileBufferSize ();
+    
+  return iter->second;
 }
 
 size_t FileSystemImpl::GetDefaultFileBufferSize () const
@@ -927,7 +994,6 @@ bool FileSystemImpl::IsFileExist (const char* src_file_name)
 
     if (!src_file_name)
       return false;
-
     ICustomFileSystemPtr file_system = FindFileSystem (src_file_name,file_name);
 
     if (!file_system)        
@@ -1104,6 +1170,16 @@ size_t FileSystem::GetDefaultFileBufferSize ()
   return FileSystemSingleton::Instance ()->GetDefaultFileBufferSize ();
 }
 
+void FileSystem::SetFileBufferSize (const char* file_name, size_t buffer_size)
+{
+  FileSystemSingleton::Instance ()->SetFileBufferSize (file_name, buffer_size);
+}
+
+size_t FileSystem::GetFileBufferSize (const char* file_name)
+{
+  return FileSystemSingleton::Instance ()->GetFileBufferSize (file_name);
+}
+
 void FileSystem::SetCurrentDir (const char* path)
 {
   FileSystemSingleton::Instance ()->SetDefaultPath (path);
@@ -1188,7 +1264,7 @@ void FileSystem::GetFileHash (const char* file_name,size_t max_hash_size,FileHas
   {
     InputFile file (file_name);
 
-    InternalGetFileHash (file,~0u,hash);
+    InternalGetFileHash (file, max_hash_size, hash);
   }
   catch (xtl::exception& exception)
   {
@@ -1216,9 +1292,9 @@ string FileSystem::GetNormalizedFileName (const char* file_name)
   for (string::iterator i=res.begin ();i!=res.end ();++i)
     switch (*i)
     {
-      case '\\':
-        *i = '/';
-        break;
+//      case '\\':
+//        *i = '/';
+//        break;
       case '<': //замена шаблона <VarName> на значение переменной VarName
       {
         string::iterator end = strchr (i, '>');

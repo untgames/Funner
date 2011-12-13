@@ -133,6 +133,12 @@ inline AsyncResult async_invoke (const xtl::function<Ret ()>& action, const xtl:
   return AsyncResult (new detail::AsyncAction<Ret> (action), callback);
 }
 
+template <class Ret>
+inline AsyncResult async_invoke (const xtl::function<Ret ()>& action, ActionThread thread, const xtl::function<void (AsyncResult&)>& callback)
+{
+  return AsyncResult (new detail::AsyncAction<Ret> (action), thread, callback);
+}
+
 /*
     Возвращение результата асинхронной операции
 */

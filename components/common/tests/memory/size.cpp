@@ -5,16 +5,15 @@ using namespace common;
 
 struct TestSample
 {
-  size_t      size;
-  size_t      align;
-  size_t      offset;
-  const char* context;
+  size_t size;
+  size_t align;
+  size_t offset;
 };
 
 TestSample test_samples [] = {
   {0},   {15}, {255}, {4095}, {1024*1024}, {256*1024},
   {0,1}, {4,8,3}, {13,256,11}, {1024*1024,8192,15},
-  {0,4,3,"test"}, {255,64,13,"another_test"}, {4096,128,121,"test"}, {1024*1024,4096,153,"another_test"}
+  {0,4,3}, {255,64,13}, {4096,128,121}, {1024*1024,4096,153}
 };
 
 int main ()
@@ -26,8 +25,6 @@ int main ()
   for (size_t i=0;i<sizeof (test_samples)/sizeof (TestSample);i++)
   {
     TestSample& sample = test_samples [i];
-
-    heap.SetCurrentContext (sample.context ? heap.GetContext (sample.context) : heap.GetDefaultContext ());
 
     void* p;
 
@@ -46,8 +43,8 @@ int main ()
       return 0;
     }
 
-    printf ("size=%lu align=%lu offset=%lu context=%s real_size=%lu\n",
-            sample.size,sample.align,sample.offset,sample.context?sample.context:"default",heap.Size (p));
+    printf ("size=%lu align=%lu offset=%lu real_size=%lu\n",
+            sample.size,sample.align,sample.offset,heap.Size (p));
 
     heap.Deallocate (p);
   }

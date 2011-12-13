@@ -86,7 +86,6 @@ Heap::Impl::Impl (Heap* heap,ICustomAllocator* allocator)
   min_reserve_size          = DEFAULT_MIN_RESERVE_SIZE;
   max_reserve_size          = DEFAULT_MAX_RESERVE_SIZE;
   reserve_size              = 0;
-  cur_node                  = &default_node;
   default_node.ref_count    = 1;
   default_node.heap         = heap;
   default_node.node_size    = sizeof (AllocNode) + sizeof (DEFAULT_NODE_NAME);
@@ -97,12 +96,9 @@ Heap::Impl::Impl (Heap* heap,ICustomAllocator* allocator)
   default_node.first_child  = NULL;
 
   memset (small_first_free,0,sizeof (small_first_free));
-  memset (node_hashtable,0,sizeof (node_hashtable));
   strcpy (default_node.name,DEFAULT_NODE_NAME);
   
   default_node.stat.Init ();
-
-  InsertAllocNode (&default_node);
 }
 
 Heap::Impl::~Impl ()
@@ -115,10 +111,10 @@ Heap::Impl::~Impl ()
     Распределение страниц памяти    
 */
 
-MemPage* Heap::Impl::AllocPage (BlockTag tag,size_t min_size,size_t recommended_size,size_t align,size_t offset)
+MemPage* Heap::Impl::AllocPage (BlockTag tag,size_t min_size,size_t recommended_size)
 {  
-  min_size         += sizeof (MemPage) + align + offset;
-  recommended_size += sizeof (MemPage) + align + offset;  
+  min_size         += sizeof (MemPage) + ALIGN_SIZE;
+  recommended_size += sizeof (MemPage) + ALIGN_SIZE;
   
   size_t allocated_size = sys_allocate_size - sys_deallocate_size;
   
@@ -141,13 +137,13 @@ MemPage* Heap::Impl::AllocPage (BlockTag tag,size_t min_size,size_t recommended_
     if      (size - min_size >= min_size)  size /= 2;
     else if (size != min_size)             size  = min_size;
     else                                   return NULL;
-  }
+  }  
   
-  MemPage* page = (MemPage*)AlignPtr (buf,align,sizeof (MemPage)+offset);
+  MemPage* page = (MemPage*)AlignPtr (buf,ALIGN_SIZE,sizeof (MemPage));
 
   page->tag           = tag;
   page->base          = buf;
-  page->size          = size - sizeof (MemPage) - align;
+  page->size          = size - sizeof (MemPage) - ALIGN_SIZE;
   page->reserved_size = size;
   page->prev          = NULL;
   page->next          = first_page;
@@ -159,7 +155,7 @@ MemPage* Heap::Impl::AllocPage (BlockTag tag,size_t min_size,size_t recommended_
     page->next->prev = page;
 
   sys_allocate_count++;
-  sys_allocate_size += size;
+  sys_allocate_size += size;  
 
   return page;
 }
@@ -244,7 +240,7 @@ void Heap::Impl::TrimFreePages (size_t limit)
     Распределение блоков малого размера
 */
 
-void* Heap::Impl::AllocSmallBlock (size_t size,AllocNode* node)
+void* Heap::Impl::AllocSmallBlock (size_t size)
 {
   size_t pool_index = (size + sizeof (unsigned char)) / ALIGN_SIZE;  
     
@@ -271,22 +267,22 @@ void* Heap::Impl::AllocSmallBlock (size_t size,AllocNode* node)
     {
       //try to alloc medium block
       return NULL;
-    }
+    }    
 
-    block          = (unsigned char*)page + sizeof (MemPage);
+    block          = (unsigned char*)AlignPtr ((unsigned char*)page + sizeof (MemPage), ALIGN_SIZE, sizeof (unsigned char) + sizeof (BlockTag));
     small_page_end = block + page->size;
     small_page_pos = block + size;
     *block         = pool_index;
   }
-  
-  HeapInternalStat& stat = node->stat;
 
-  stat.small_allocate_count [pool_index]++;  
-  
+  HeapInternalStat& stat = default_node.stat;
+
+  stat.small_allocate_count [pool_index]++;
+
   return block + sizeof (unsigned char);
 }
 
-void Heap::Impl::FreeSmallBlock (void* p,AllocNode* node)
+void Heap::Impl::FreeSmallBlock (void* p)
 {
   unsigned char* block      = (unsigned char*)p - sizeof (unsigned char);
   size_t         pool_index = *block;
@@ -294,7 +290,7 @@ void Heap::Impl::FreeSmallBlock (void* p,AllocNode* node)
   *(unsigned char**)block       = small_first_free [pool_index];
   small_first_free [pool_index] = block;
     
-  node->stat.small_deallocate_count [pool_index]++;
+  default_node.stat.small_deallocate_count [pool_index]++;
 }
 
 /*
@@ -311,18 +307,18 @@ inline void Heap::Impl::RemoveMediumBlock (MediumBlock* block)
   medium_tree [GetTreeIndex (block->size)].RemoveBlock (block);
 }
 
-void* Heap::Impl::AllocMediumBlock (size_t size,AllocNode* node)
+void* Heap::Impl::AllocMediumBlock (size_t size)
 {
   size = AlignSize (size+sizeof (MediumAllocBlock),ALIGN_SIZE);  
         
   MediumBlockTree& tree  = medium_tree [GetTreeIndex (size)]; 
   MediumBlock*     block = NULL;
-  
+
   //имеет смысл упростить логику условных выражений!!
   
   if (size <= tree.max_block_size)
   {
-    block = tree.FindSmallestBlock (size,node);    
+    block = tree.FindSmallestBlock (size,&default_node);
 
     if (!medium_top || block->size < medium_top->size)
     {      
@@ -354,12 +350,12 @@ void* Heap::Impl::AllocMediumBlock (size_t size,AllocNode* node)
 
   if (!block && medium_top && medium_top->size >= size) //размещаем блок на доступной вершине
   {    
-    node->stat.medium_top_use_count++;
+    default_node.stat.medium_top_use_count++;
     
     block = medium_top;    
     
     if (medium_top->page->size == medium_top->size)
-      RemoveFreePage (medium_top->page);
+      RemoveFreePage (medium_top->page);      
     
     if (block->size - size >= MEDIUM_MIN_BLOCK_SIZE + sizeof (MediumAllocBlock)) //разрезаем блок
     {
@@ -382,7 +378,7 @@ void* Heap::Impl::AllocMediumBlock (size_t size,AllocNode* node)
     MemPage* page = AllocPage (MEDIUM_BLOCK_ID,size,size < medium_granularity ? medium_granularity : size);   
 
     if (!page)
-      return NULL;      
+      return NULL;
       
     block = (MediumBlock*)((char*)page + sizeof (MemPage));
       
@@ -426,7 +422,7 @@ void* Heap::Impl::AllocMediumBlock (size_t size,AllocNode* node)
   
   block->is_free = false;
   
-  HeapInternalStat& stat       = node->stat;
+  HeapInternalStat& stat       = default_node.stat;
   size_t            tree_index = GetTreeIndex (block->size);
   
   size = block->size;
@@ -437,16 +433,16 @@ void* Heap::Impl::AllocMediumBlock (size_t size,AllocNode* node)
   if (size > stat.max_block_size) stat.max_block_size = size;
   if (size < stat.min_block_size) stat.min_block_size = size;  
     
-  return (char*)block + sizeof (MediumAllocBlock);
+  return (char*)block + sizeof (MediumAllocBlock) - sizeof (BlockTag); //block tag will be written to last byte of MediumAllocBlock::filler
 }
 
-void Heap::Impl::FreeMediumBlock (void* p,AllocNode* node)
+void Heap::Impl::FreeMediumBlock (void* p)
 {
-  MediumBlock *block = (MediumBlock*)((char*)p-sizeof (MediumAllocBlock)),
+  MediumBlock *block = (MediumBlock*)((char*)p-sizeof (MediumAllocBlock)+sizeof (BlockTag)),
               *prev  = (MediumBlock*)block->prev,
               *next  = (MediumBlock*)block->next;                            
               
-  HeapInternalStat& stat       = node->stat;
+  HeapInternalStat& stat       = default_node.stat;
   size_t            tree_index = GetTreeIndex (block->size);
                 
   stat.medium_deallocate_count [tree_index]++;  
@@ -494,62 +490,41 @@ void Heap::Impl::FreeMediumBlock (void* p,AllocNode* node)
     Выделение блоков большого размера
 */
 
-void* Heap::Impl::AllocLargeBlock (size_t size,AllocNode* node,size_t align,size_t offset)
+void* Heap::Impl::AllocLargeBlock (size_t size)
 {
-  MemPage* page = AllocPage (LARGE_BLOCK_ID,size,size,align,offset);
+  size += sizeof (LargeAllocBlock);
+
+  MemPage* page = AllocPage (LARGE_BLOCK_ID,size,size);
   
   if (!page)
-    return NULL;
+    return NULL;    
 
-  HeapInternalStat& stat       = node->stat;
+  HeapInternalStat& stat       = default_node.stat;
   size_t            tree_index = GetTreeIndex (page->reserved_size);  
 
-  stat.medium_allocate_count [tree_index]++;  
+  stat.medium_allocate_count [tree_index]++;
   stat.medium_allocate_size [tree_index] += page->reserved_size;  
 
   if (page->size > stat.max_block_size) stat.max_block_size = page->reserved_size;
   if (page->size < stat.min_block_size) stat.min_block_size = page->reserved_size;
+  
+  LargeAllocBlock* block = (LargeAllocBlock*)((char*)page + sizeof (MemPage));
 
-  return (unsigned char*)page+sizeof (MemPage);
+  return (char*)block + sizeof (LargeAllocBlock) - sizeof (BlockTag);
 }
 
-void Heap::Impl::FreeLargeBlock (void* p,AllocNode* node)
+void Heap::Impl::FreeLargeBlock (void* p)
 {
-  MemPage* page = (MemPage*)((unsigned char*)p-sizeof (MemPage));  
+  LargeAllocBlock* block = (LargeAllocBlock*)((char*)p - sizeof (LargeAllocBlock) + sizeof (BlockTag));
+  MemPage*         page  = (MemPage*)((unsigned char*)block - sizeof (MemPage));
 
-  HeapInternalStat& stat       = node->stat;  
+  HeapInternalStat& stat       = default_node.stat;
   size_t            tree_index = GetTreeIndex (page->reserved_size);
 
   stat.medium_deallocate_count [tree_index]++;
   stat.medium_deallocate_size [tree_index] += page->reserved_size;
 
   FreePage (page);
-}
-
-/*
-    Управление узлами распределения
-*/
-
-void Heap::Impl::InsertAllocNode (AllocNode* node)
-{
-  AllocNode*& first = node_hashtable [node->hash&(NODE_HASH_TABLE_SIZE-1)];
-  
-  node->prev_hash = NULL;
-  node->next_hash = first;
-  
-  if (first)
-    first->prev_hash = node;
-  
-  first = node;
-}
-
-void Heap::Impl::RemoveAllocNode (AllocNode* node)
-{
-  AllocNode*& first = node_hashtable [node->hash&(NODE_HASH_TABLE_SIZE-1)];
-  
-  if (node->next_hash) node->next_hash->prev_hash = node->prev_hash;
-  if (node->prev_hash) node->prev_hash->next_hash = node->next_hash;
-  else                 first                      = node->next_hash;
 }
 
 /*
@@ -650,122 +625,72 @@ void* Heap::TryAllocate (size_t size)
 {
   BlockTag       tag;
   unsigned char* p;
-  AllocNode*     node = impl->cur_node;  
 
   size += sizeof (BlockTag);
   
-  if (node != &impl->default_node)
-    size += sizeof (AllocNode*);
-
   if (size < MEDIUM_MIN_BLOCK_SIZE)
   {
-    p   = (unsigned char*)impl->AllocSmallBlock (size,node);
+    p   = (unsigned char*)impl->AllocSmallBlock (size);
     tag = SMALL_BLOCK_ID;
   }
   else if (size <= impl->medium_max_block_size)
   {
-    p   = (unsigned char*)impl->AllocMediumBlock (size,node);
+    p   = (unsigned char*)impl->AllocMediumBlock (size);
     tag = MEDIUM_BLOCK_ID;
   }
   else
   {
-    p   = (unsigned char*)impl->AllocLargeBlock (size,node);
+    p   = (unsigned char*)impl->AllocLargeBlock (size);
     tag = LARGE_BLOCK_ID;
-  }
+  }  
 
   if (!p)
     return NULL;    
     
-  if (node == &impl->default_node)
-  {
-    *(BlockTag*)p = tag;
+  *(BlockTag*)p = tag;
     
-    return p + sizeof (BlockTag);
-  }  
-
-  *(AllocNode**)p  = node;
-  p               += sizeof (AllocNode*);
-  *(BlockTag*)p    = tag|CONTEXT_BLOCK_ID;
-  
-  node->AddRef ();
-  
   return p + sizeof (BlockTag);
 }
 
 void* Heap::TryAllocate (size_t size,size_t align,size_t offset)
 {
   if (align & (align-1)) //проверка случая, когда align не является степенью двойки
-    return NULL;    
-
-  AllocNode* node = impl->cur_node;
-  
-  offset += sizeof (BlockTag);  
-  
-  if (node != &impl->default_node)
-    offset += sizeof (AllocNode*);
+    return NULL;
     
+  if (align < ALIGN_SIZE)
+    align = ALIGN_SIZE;
+  
+  offset += sizeof (BlockTag) + sizeof (size_t); 
+  
   size_t full_size = size + align + offset;
-
-  if (full_size > impl->medium_max_block_size)
-  {
-    unsigned char* p = (unsigned char*)impl->AllocLargeBlock (size,node,align,offset);
-    
-    if (!p)
-      return NULL;
-    
-    if (node == &impl->default_node)
-    {
-      *(BlockTag*)p = LARGE_BLOCK_ID;
-      
-      return p + sizeof (BlockTag);       
-    }
-    
-    *(AllocNode**)p  = node;
-    p               += sizeof (AllocNode*);
-    *(BlockTag*)p    = LARGE_BLOCK_ID|CONTEXT_BLOCK_ID;
-    
-    node->AddRef ();
- 
-    return p + sizeof (BlockTag);
-  }
-  
-  offset += sizeof (void*);
   
   void*    buf;
-  BlockTag tag;  
+  BlockTag tag;
 
   if (full_size < MEDIUM_MIN_BLOCK_SIZE)
   {
-    buf = impl->AllocSmallBlock (full_size,node);
+    buf = impl->AllocSmallBlock (full_size);
     tag = SMALL_BLOCK_ID|ALIGNED_BLOCK_ID;
+  }
+  else if (full_size <= impl->medium_max_block_size)
+  {
+    buf = impl->AllocMediumBlock (full_size);
+    tag = MEDIUM_BLOCK_ID|ALIGNED_BLOCK_ID;
   }
   else
   {
-    buf = impl->AllocMediumBlock (full_size,node);
-    tag = MEDIUM_BLOCK_ID|ALIGNED_BLOCK_ID;
-  }  
+    buf = (unsigned char*)impl->AllocLargeBlock (full_size);
+    tag = LARGE_BLOCK_ID|ALIGNED_BLOCK_ID;
+  }
   
   if (!buf)
     return NULL;
         
   unsigned char* p = (unsigned char*)AlignPtr (buf,align,offset);
   
-  if (node == &impl->default_node)
-  {
-    *(void**)p     = buf;
-    p             += sizeof (void*);
-    *(BlockTag*)p  = tag;
-
-    return p + sizeof (BlockTag);
-  }  
-  
-  *(void**)p       = buf;
-  p               += sizeof (void*);
-  *(AllocNode**)p  = node;
-  p               += sizeof (AllocNode*);
-  *(BlockTag*)p    = tag|CONTEXT_BLOCK_ID;
-  
-  node->AddRef ();
+  *(size_t*)p    = size_t (buf);
+  p             += sizeof (size_t);
+  *(BlockTag*)p  = tag;
 
   return p + sizeof (BlockTag);
 }
@@ -808,45 +733,27 @@ void Heap::Deallocate (void* p)
     return;
 
   unsigned char* block = (unsigned char*)p - sizeof (BlockTag);
-  AllocNode*     node  = (AllocNode*)(block - sizeof (AllocNode*)); //переменная используется не во всех ветвях    
-  
+
   switch (*(BlockTag*)block)
   {
     case SMALL_BLOCK_ID:
-      impl->FreeSmallBlock (block,&impl->default_node);
+      impl->FreeSmallBlock (block);
       break;
     case MEDIUM_BLOCK_ID:
-      impl->FreeMediumBlock (block,&impl->default_node);
+      impl->FreeMediumBlock (block);
       break;
     case LARGE_BLOCK_ID:
-      impl->FreeLargeBlock (block,&impl->default_node);
+      impl->FreeLargeBlock (block);
       break;
     case SMALL_BLOCK_ID|ALIGNED_BLOCK_ID:
-      impl->FreeSmallBlock (*(void**)(block - sizeof (void*)),&impl->default_node);
+      impl->FreeSmallBlock ((void*)*(size_t*)(block - sizeof (size_t)));
       break;
     case MEDIUM_BLOCK_ID|ALIGNED_BLOCK_ID:
-      impl->FreeMediumBlock (*(void**)(block - sizeof (void*)),&impl->default_node);
+      impl->FreeMediumBlock ((void*)*(size_t*)(block - sizeof (size_t)));
       break;
-    case SMALL_BLOCK_ID|CONTEXT_BLOCK_ID:      
-      node->Release ();
-      impl->FreeSmallBlock (block-sizeof (AllocNode*),node);
-      break;
-    case MEDIUM_BLOCK_ID|CONTEXT_BLOCK_ID:
-      node->Release ();    
-      impl->FreeMediumBlock (block-sizeof (AllocNode*),node);
-      break;
-    case LARGE_BLOCK_ID|CONTEXT_BLOCK_ID:
-      node->Release ();    
-      impl->FreeLargeBlock (block-sizeof (AllocNode*),node);
-      break;
-    case SMALL_BLOCK_ID|ALIGNED_BLOCK_ID|CONTEXT_BLOCK_ID:
-      node->Release ();
-      impl->FreeSmallBlock (*(void**)(block - sizeof (void*) - sizeof (AllocNode*)),node);
-      break;
-    case MEDIUM_BLOCK_ID|ALIGNED_BLOCK_ID|CONTEXT_BLOCK_ID:
-      node->Release ();
-      impl->FreeMediumBlock (*(void**)(block - sizeof (void*) - sizeof (AllocNode*)),node);
-      break;
+    case LARGE_BLOCK_ID|ALIGNED_BLOCK_ID:
+      impl->FreeLargeBlock ((void*)*(size_t*)(block - sizeof (size_t)));
+      break;      
     default:
      //call user handler
      break;
@@ -866,17 +773,13 @@ size_t Heap::Size (void* p) const
   switch (info_tag)
   {
     case ALIGNED_BLOCK_ID:
-      block        = *(unsigned char**)(block - sizeof (void*));
-      header_size += sizeof (void*);    
+    {
+      unsigned char* start = (unsigned char*)*(size_t*)(block - sizeof (size_t));
+      
+      header_size += block - start;
+      block        = start;
       break;    
-    case CONTEXT_BLOCK_ID:
-      block       -= sizeof (AllocNode*);
-      header_size += sizeof (AllocNode*);
-      break;
-    case ALIGNED_BLOCK_ID|CONTEXT_BLOCK_ID:
-      block        = *(unsigned char**)(block - sizeof (void*) - sizeof (AllocNode*));
-      header_size += sizeof (void*) + sizeof (AllocNode*);    
-      break;
+    }
     case 0: //no info
       break;
     default:
@@ -889,9 +792,9 @@ size_t Heap::Size (void* p) const
     case SMALL_BLOCK_ID:
       return size_t (block [-1]+1) * ALIGN_SIZE - sizeof (unsigned char) - header_size;
     case MEDIUM_BLOCK_ID:
-      return ((MediumAllocBlock*)(block - sizeof (MediumAllocBlock)))->size - sizeof (MediumAllocBlock) - header_size;
+      return ((MediumAllocBlock*)(block - sizeof (MediumAllocBlock) + sizeof (BlockTag)))->size - sizeof (MediumAllocBlock) - header_size;
     case LARGE_BLOCK_ID:
-      return ((MemPage*)(block - sizeof (MemPage)))->size - header_size;
+      return ((MemPage*)((char*)((LargeAllocBlock*)(block - sizeof (LargeAllocBlock) + sizeof (BlockTag)))-sizeof (MemPage)))->size - header_size - sizeof (LargeAllocBlock);
     default:
      //call user handler
      return 0;
@@ -944,63 +847,6 @@ void Heap::FlushReserve ()
 /*
     Работа с контекстами распределения
 */
-
-AllocationContext Heap::GetContext (const char* name)
-{
-  if (!name)
-    return NULL;
-    
-  size_t     hash = strihash (name);
-  AllocNode* node = impl->node_hashtable [hash&(NODE_HASH_TABLE_SIZE-1)];
-  
-  for (;node;node=node->next_hash)
-    if (node->hash == hash)
-      return node;
-
-    //узел не найден, необходимо его создать
-    
-  size_t size = sizeof (AllocNode) + strlen (name); //+1 байт на завершение строки учтён в структуре AllocNode  
-
-  node = (AllocNode*)Allocate (size);
-  
-  if (!node)
-    throw AllocationContextException ();
-    
-  node->ref_count   = 0;
-  node->node_size   = size;
-  node->heap        = this;
-  node->hash        = hash;
-  node->parent      = &impl->default_node;
-  node->prev        = NULL;
-  node->next        = impl->default_node.first_child;
-  node->first_child = NULL;
-  
-  impl->default_node.first_child = node;
-  
-  if (node->next)
-    node->next->prev = node;
-  
-  strcpy (node->name,name);
-  
-  impl->InsertAllocNode (node);
-  node->stat.Init ();
-
-  return node;
-}
-
-void Heap::SetCurrentContext (const AllocationContext& context)
-{
-  impl->cur_node->Release ();
-    
-  impl->cur_node = context.node;
-
-  impl->cur_node->AddRef ();
-}
-
-AllocationContext Heap::GetCurrentContext () const
-{
-  return impl->cur_node;
-}
 
 AllocationContext Heap::GetDefaultContext () const
 {

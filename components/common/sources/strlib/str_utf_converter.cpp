@@ -9,6 +9,14 @@
 
 #include <common/utf_converter.h>
 
+#ifdef __BIG_ENDIAN__
+const common::Encoding UTF32_ENCODING = common::Encoding_UTF32BE;
+const common::Encoding UTF16_ENCODING = common::Encoding_UTF16BE;
+#else
+const common::Encoding UTF32_ENCODING = common::Encoding_UTF32LE;
+const common::Encoding UTF16_ENCODING = common::Encoding_UTF16LE;
+#endif
+
 namespace
 {
 
@@ -320,12 +328,12 @@ bool decoder<Encoding_UTF32LE> (const void*& src_char, size_t& src_size, void*& 
   const size_t* src_ptr = (const size_t*) src_char;
   size_t* dst_ptr = (size_t*) dst_char;
 
-  if (src_size < sizeof(size_t))
+  if (src_size < sizeof(unsigned int))
     return false;
 
   *dst_ptr = *src_ptr;
   src_ptr++;
-  src_size -= sizeof(size_t);
+  src_size -= sizeof(unsigned int);
 
   src_char = src_ptr;
   return true;
@@ -337,7 +345,7 @@ bool decoder<Encoding_UTF32BE> (const void*& src_char, size_t& src_size, void*& 
   const size_t* src_ptr = (const size_t*) src_char;
   size_t* dst_ptr = (size_t*) dst_char;
 
-  if (src_size < sizeof(size_t))
+  if (src_size < sizeof(unsigned int))
     return false;
 
   *dst_ptr = ((*src_ptr & 0xFF) << 24) +
@@ -346,7 +354,7 @@ bool decoder<Encoding_UTF32BE> (const void*& src_char, size_t& src_size, void*& 
              ((*src_ptr & 0xFF000000) >> 24);
 
   src_ptr++;
-  src_size -= sizeof(size_t);
+  src_size -= sizeof(unsigned int);
 
   src_char = src_ptr;
   return true;
@@ -516,13 +524,13 @@ bool encoder<Encoding_UTF32LE> (const void*& src_char, size_t& src_size, void*& 
   const size_t* src_ptr = (const size_t*) src_char;
   size_t* dst_ptr = (size_t*) dst_char;
 
-  if (dst_size < sizeof(size_t))
+  if (dst_size < sizeof(unsigned int))
     return false;
 
   *dst_ptr = *src_ptr;
 
   dst_ptr++;
-  dst_size -= sizeof(size_t);
+  dst_size -= sizeof(unsigned int);
 
   dst_char = dst_ptr;
   return true;
@@ -534,7 +542,7 @@ bool encoder<Encoding_UTF32BE> (const void*& src_char, size_t& src_size, void*& 
   const size_t* src_ptr = (const size_t*) src_char;
   size_t* dst_ptr = (size_t*) dst_char;
 
-  if (dst_size < sizeof(size_t))
+  if (dst_size < sizeof(unsigned int))
     return false;
 
   *dst_ptr = ((*src_ptr & 0xFF) << 24) +
@@ -543,7 +551,7 @@ bool encoder<Encoding_UTF32BE> (const void*& src_char, size_t& src_size, void*& 
              ((*src_ptr & 0xFF000000) >> 24);
 
   dst_ptr++;
-  dst_size -= sizeof(size_t);
+  dst_size -= sizeof(unsigned int);
 
   dst_char = dst_ptr;
   return true;
@@ -873,6 +881,93 @@ stl::wstring wchar_compress (const char* source)
 stl::wstring wchar_compress (const stl::string& source)
 {
   return wchar_compress (source.c_str (), source.length ());
+}
+
+stl::string  to_utf8_string  (const wchar_t* string, int length)
+{
+  if (!string)
+    throw xtl::make_null_argument_exception ("common::to_utf8_string", "string");
+
+  if (length == -1)
+    length = wcslen (string);
+
+  stl::string result;
+
+  result.fast_resize (length * 4);
+
+  const void* source           = string;
+  size_t      source_size      = length * sizeof (wchar_t);
+  void*       destination      = &result [0];
+  size_t      destination_size = result.size ();
+
+  convert_encoding (sizeof (wchar_t) == 2 ? UTF16_ENCODING : UTF32_ENCODING,
+                    source, source_size, common::Encoding_UTF8, destination, destination_size);
+
+  if (source_size)
+    throw xtl::format_operation_exception ("", "Internal error: buffer not enough (source_size=%u, destination_size=%u)", source_size, destination_size);
+    
+  result.resize ((char*)destination - &result [0]);
+
+  return result;
+}
+
+stl::string  to_utf8_string  (const wchar_t* string)
+{
+  return to_utf8_string(string, -1);
+}
+
+stl::string  to_utf8_string  (const stl::wstring& string)
+{
+  if (string.empty ())
+    return "";
+
+  return to_utf8_string (&string [0], string.size ());
+}
+
+stl::wstring to_wstring_from_utf8 (const char* string, int length)
+{
+  if (!string)
+    throw xtl::make_null_argument_exception ("common::to_wstring_from_utf8", "string");
+
+  if (length == -1)
+    length = strlen (string);
+
+  stl::wstring result;
+
+  result.fast_resize (length);
+
+  const void* source           = string;
+  size_t      source_size      = length;
+  void*       destination      = &result [0];
+  size_t      destination_size = result.size () * sizeof (wchar_t);
+
+  convert_encoding (Encoding_UTF8,
+                    source, source_size, 
+                    sizeof (wchar_t) == 2 ? UTF16_ENCODING : UTF32_ENCODING,
+                    destination, destination_size);
+
+  if (source_size)
+    throw xtl::format_operation_exception ("", "Internal error: buffer not enough (source_size=%u, destination_size=%u)", source_size, destination_size);
+    
+  result.resize ((wchar_t*)destination - &result [0]);
+
+  return result;
+}
+
+stl::wstring to_wstring_from_utf8 (const char* string)
+{
+  if (!string)
+    throw xtl::make_null_argument_exception ("common::to_wstring_from_utf8", "string");  
+
+  return to_wstring_from_utf8 (string, xtl::xstrlen (string));
+}
+
+stl::wstring to_wstring_from_utf8 (const stl::string& string)
+{
+  if (string.empty ())
+    return L"";
+
+  return to_wstring_from_utf8 (&string [0], string.size ());
 }
 
 } //namespace common

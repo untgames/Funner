@@ -34,6 +34,7 @@ root (source='', line=0): {}
   New (source='data/test1.xml', line=57): {}
    Tag (source='data/test1.xml', line=58): {}
     #text (source='data/test1.xml', line=58): {text}
+data/test1.xml(0): warning: non utf-8 encoding windows-1251 used (this decreases parsing perfomance)
 root (source='', line=0): {}
  Uncorrect_tag_property_name (source='data/error_test1.xml', line=4): {}
   Tag (source='data/error_test1.xml', line=6): {}
@@ -44,6 +45,7 @@ root (source='', line=0): {}
  MUST (source='data/error_test1.xml', line=42): {}
  Unclosed (source='data/error_test1.xml', line=44): {}
   No_name_tag (source='data/error_test1.xml', line=46): {}
+data/error_test1.xml(0): warning: non utf-8 encoding windows-1251 used (this decreases parsing perfomance)
 data/error_test1.xml(6): error: syntax error. Unexpected token '1property'
 data/error_test1.xml(11): error: There is no support of DTD in this version of parser
 data/error_test1.xml(11): error: syntax error. Unexpected '['. Tag expected
@@ -90,13 +92,14 @@ root (source='', line=0): {}
     WindowRenderer (source='data/error_test2.xml', line=5): {}
      RendererName (source='data/error_test2.xml', line=5): {MyRenderer}
    #text (source='data/error_test2.xml', line=7): {/>}
+data/error_test2.xml(0): warning: non utf-8 encoding windows-1251 used (this decreases parsing perfomance)
 data/error_test2.xml(8): error: syntax error. Closing tag 'Configuration' without opening. Expected 'WindowManager'.
 data/error_test2.xml(9): error: unexpected EOF (unclosed tag 'WindowManager')
 data/error_test2.xml(9): error: unexpected EOF (unclosed tag 'Configuration')
 root (source='', line=0): {}
  test (source='data/character_reference_test.xml', line=2): {}
   numeric (source='data/character_reference_test.xml', line=3): {}
-   attr (source='data/character_reference_test.xml', line=3): {<aa}
+   attr (source='data/character_reference_test.xml', line=3): {薩<aa}
    attr2 (source='data/character_reference_test.xml', line=3): {<}
    #text (source='data/character_reference_test.xml', line=3): {<aa, <}
   cdata_numeric (source='data/character_reference_test.xml', line=4): {}
@@ -106,3 +109,304 @@ root (source='', line=0): {}
    #text (source='data/character_reference_test.xml', line=5): {<start, frame="111">}
   cdata_symbolic (source='data/character_reference_test.xml', line=6): {}
    #text (source='data/character_reference_test.xml', line=6): {&lt;start frame=&quot;111&quot;&gt;}
+root (source='', line=0): {}
+ Configuration (source='data/error_test3.xml', line=2): {}
+  Attribute (source='data/error_test3.xml', line=2): {correct_attribute_data]]>}
+  #text (source='data/error_test3.xml', line=3): {}
+data/error_test3.xml(0): warning: non utf-8 encoding windows-1251 used (this decreases parsing perfomance)
+data/error_test3.xml(3): error: wrong character on line ']' (at position 22)
+root (source='', line=0): {}
+ NAME (source='data/test-utf8.xml', line=2): {}
+  NAME (source='data/test-utf8.xml', line=2): {First WM}
+  VERSION (source='data/test-utf8.xml', line=2): {0.1}
+  MATERIAL (source='data/test-utf8.xml', line=20): {}
+   NAME (source='data/test-utf8.xml', line=21): {Русский материал}
+   COLOR (source='data/test-utf8.xml', line=22): {00//0099}
+   EPS (source='data/test-utf8.xml', line=23): {//10}
+   MU (source='data/test-utf8.xml', line=24): {1//}
+   SIGMA (source='data/test-utf8.xml', line=25): {100}
+  #text (source='data/test-utf8.xml', line=26): {//ad///sa//}
+  New1 (source='data/test-utf8.xml', line=27): {}
+   #text (source='data/test-utf8.xml', line=28): {薩<沙是在高速公路和吸乾, 1.001, 2.001, 3.001, 4.001, Русский, материал}
+   New2 (source='data/test-utf8.xml', line=31): {}
+    ChineseAttribute (source='data/test-utf8.xml', line=31): {薩沙是在高速公路和吸乾}
+  #text (source='data/test-utf8.xml', line=34): {1.0, 2.0, bla-bla-bla}
+  LAYER (source='data/test-utf8.xml', line=36): {}
+   NAME (source='data/test-utf8.xml', line=37): {Layer1}
+   MATERIAL (source='data/test-utf8.xml', line=38): {Mat2}
+   X (source='data/test-utf8.xml', line=39): {0.2}
+   WIDTH (source='data/test-utf8.xml', line=40): {0.7}
+  #text (source='data/test-utf8.xml', line=42): {CDATA test Русский материал 薩沙是在高速公路和吸乾 CDATA test/}
+  LAYER (source='data/test-utf8.xml', line=44): {}
+   NAME (source='data/test-utf8.xml', line=45): {Layer2}
+   MATERIAL (source='data/test-utf8.xml', line=46): {Mat1}
+   X (source='data/test-utf8.xml', line=47): {0.0}
+   WIDTH (source='data/test-utf8.xml', line=48): {0.1}
+  GAUSSGENERATOR (source='data/test-utf8.xml', line=50): {}
+   NAME (source='data/test-utf8.xml', line=51): {Gen1}
+   X (source='data/test-utf8.xml', line=52): {0.15}
+  SONDE (source='data/test-utf8.xml', line=54): {}
+   NAME (source='data/test-utf8.xml', line=55): {Sonde1}
+   X (source='data/test-utf8.xml', line=56): {0.5}
+  New (source='data/test-utf8.xml', line=58): {}
+   Tag (source='data/test-utf8.xml', line=59): {}
+    #text (source='data/test-utf8.xml', line=59): {text}
+root (source='', line=0): {}
+ NAME (source='data/test-cp1251.xml', line=2): {}
+  NAME (source='data/test-cp1251.xml', line=2): {First WM}
+  VERSION (source='data/test-cp1251.xml', line=2): {0.1}
+  MATERIAL (source='data/test-cp1251.xml', line=20): {}
+   NAME (source='data/test-cp1251.xml', line=20): {Русский материал}
+   COLOR (source='data/test-cp1251.xml', line=20): {00//0099}
+   EPS (source='data/test-cp1251.xml', line=20): {//10}
+   MU (source='data/test-cp1251.xml', line=20): {1//}
+   SIGMA (source='data/test-cp1251.xml', line=20): {100}
+  #text (source='data/test-cp1251.xml', line=21): {//ad///sa//}
+  New1 (source='data/test-cp1251.xml', line=22): {}
+   #text (source='data/test-cp1251.xml', line=23): {薩<沙是在高速公路和吸乾, 1.001, 2.001, 3.001, 4.001, Русский, материал}
+   New2 (source='data/test-cp1251.xml', line=26): {}
+    ChineseAttribute (source='data/test-cp1251.xml', line=26): {薩沙是在高速公路和吸乾}
+  #text (source='data/test-cp1251.xml', line=29): {1.0, 2.0, bla-bla-bla}
+  LAYER (source='data/test-cp1251.xml', line=31): {}
+   NAME (source='data/test-cp1251.xml', line=31): {Layer1}
+   MATERIAL (source='data/test-cp1251.xml', line=31): {Mat2}
+   X (source='data/test-cp1251.xml', line=31): {0.2}
+   WIDTH (source='data/test-cp1251.xml', line=31): {0.7}
+  #text (source='data/test-cp1251.xml', line=33): {CDATA test Русский материал &#34217;&#27801;&#26159;&#22312;&#39640;&#36895;&#20844;&#36335;&#21644;&#21560;&#20094; CDATA test/}
+  LAYER (source='data/test-cp1251.xml', line=35): {}
+   NAME (source='data/test-cp1251.xml', line=35): {Layer2}
+   MATERIAL (source='data/test-cp1251.xml', line=35): {Mat1}
+   X (source='data/test-cp1251.xml', line=35): {0.0}
+   WIDTH (source='data/test-cp1251.xml', line=35): {0.1}
+  GAUSSGENERATOR (source='data/test-cp1251.xml', line=37): {}
+   NAME (source='data/test-cp1251.xml', line=37): {Gen1}
+   X (source='data/test-cp1251.xml', line=37): {0.15}
+  SONDE (source='data/test-cp1251.xml', line=39): {}
+   NAME (source='data/test-cp1251.xml', line=39): {Sonde1}
+   X (source='data/test-cp1251.xml', line=39): {0.5}
+  New (source='data/test-cp1251.xml', line=41): {}
+   Tag (source='data/test-cp1251.xml', line=42): {}
+    #text (source='data/test-cp1251.xml', line=42): {text}
+data/test-cp1251.xml(0): warning: non utf-8 encoding Cp1251 used (this decreases parsing perfomance)
+root (source='', line=0): {}
+ NAME (source='data/test-utf16.xml', line=2): {}
+  NAME (source='data/test-utf16.xml', line=2): {First WM}
+  VERSION (source='data/test-utf16.xml', line=2): {0.1}
+  MATERIAL (source='data/test-utf16.xml', line=20): {}
+   NAME (source='data/test-utf16.xml', line=20): {Русский материал}
+   COLOR (source='data/test-utf16.xml', line=20): {00//0099}
+   EPS (source='data/test-utf16.xml', line=20): {//10}
+   MU (source='data/test-utf16.xml', line=20): {1//}
+   SIGMA (source='data/test-utf16.xml', line=20): {100}
+  #text (source='data/test-utf16.xml', line=21): {//ad///sa//}
+  New1 (source='data/test-utf16.xml', line=22): {}
+   #text (source='data/test-utf16.xml', line=23): {薩<沙是在高速公路和吸乾, 1.001, 2.001, 3.001, 4.001, Русский, материал}
+   New2 (source='data/test-utf16.xml', line=26): {}
+    ChineseAttribute (source='data/test-utf16.xml', line=26): {薩沙是在高速公路和吸乾}
+  #text (source='data/test-utf16.xml', line=29): {1.0, 2.0, bla-bla-bla}
+  LAYER (source='data/test-utf16.xml', line=31): {}
+   NAME (source='data/test-utf16.xml', line=31): {Layer1}
+   MATERIAL (source='data/test-utf16.xml', line=31): {Mat2}
+   X (source='data/test-utf16.xml', line=31): {0.2}
+   WIDTH (source='data/test-utf16.xml', line=31): {0.7}
+  #text (source='data/test-utf16.xml', line=33): {CDATA test Русский материал &#34217;&#27801;&#26159;&#22312;&#39640;&#36895;&#20844;&#36335;&#21644;&#21560;&#20094; CDATA test/}
+  LAYER (source='data/test-utf16.xml', line=35): {}
+   NAME (source='data/test-utf16.xml', line=35): {Layer2}
+   MATERIAL (source='data/test-utf16.xml', line=35): {Mat1}
+   X (source='data/test-utf16.xml', line=35): {0.0}
+   WIDTH (source='data/test-utf16.xml', line=35): {0.1}
+  GAUSSGENERATOR (source='data/test-utf16.xml', line=37): {}
+   NAME (source='data/test-utf16.xml', line=37): {Gen1}
+   X (source='data/test-utf16.xml', line=37): {0.15}
+  SONDE (source='data/test-utf16.xml', line=39): {}
+   NAME (source='data/test-utf16.xml', line=39): {Sonde1}
+   X (source='data/test-utf16.xml', line=39): {0.5}
+  New (source='data/test-utf16.xml', line=41): {}
+   Tag (source='data/test-utf16.xml', line=42): {}
+    #text (source='data/test-utf16.xml', line=42): {text}
+data/test-utf16.xml(0): warning: non utf-8 encoding UTF-16LE used (this decreases parsing perfomance)
+root (source='', line=0): {}
+ NAME (source='data/test-utf16be.xml', line=2): {}
+  NAME (source='data/test-utf16be.xml', line=2): {First WM}
+  VERSION (source='data/test-utf16be.xml', line=2): {0.1}
+  MATERIAL (source='data/test-utf16be.xml', line=20): {}
+   NAME (source='data/test-utf16be.xml', line=20): {Русский материал}
+   COLOR (source='data/test-utf16be.xml', line=20): {00//0099}
+   EPS (source='data/test-utf16be.xml', line=20): {//10}
+   MU (source='data/test-utf16be.xml', line=20): {1//}
+   SIGMA (source='data/test-utf16be.xml', line=20): {100}
+  #text (source='data/test-utf16be.xml', line=21): {//ad///sa//}
+  New1 (source='data/test-utf16be.xml', line=22): {}
+   #text (source='data/test-utf16be.xml', line=23): {薩<沙是在高速公路和吸乾, 1.001, 2.001, 3.001, 4.001, Русский, материал}
+   New2 (source='data/test-utf16be.xml', line=26): {}
+    ChineseAttribute (source='data/test-utf16be.xml', line=26): {薩沙是在高速公路和吸乾}
+  #text (source='data/test-utf16be.xml', line=29): {1.0, 2.0, bla-bla-bla}
+  LAYER (source='data/test-utf16be.xml', line=31): {}
+   NAME (source='data/test-utf16be.xml', line=31): {Layer1}
+   MATERIAL (source='data/test-utf16be.xml', line=31): {Mat2}
+   X (source='data/test-utf16be.xml', line=31): {0.2}
+   WIDTH (source='data/test-utf16be.xml', line=31): {0.7}
+  #text (source='data/test-utf16be.xml', line=33): {CDATA test Русский материал &#34217;&#27801;&#26159;&#22312;&#39640;&#36895;&#20844;&#36335;&#21644;&#21560;&#20094; CDATA test/}
+  LAYER (source='data/test-utf16be.xml', line=35): {}
+   NAME (source='data/test-utf16be.xml', line=35): {Layer2}
+   MATERIAL (source='data/test-utf16be.xml', line=35): {Mat1}
+   X (source='data/test-utf16be.xml', line=35): {0.0}
+   WIDTH (source='data/test-utf16be.xml', line=35): {0.1}
+  GAUSSGENERATOR (source='data/test-utf16be.xml', line=37): {}
+   NAME (source='data/test-utf16be.xml', line=37): {Gen1}
+   X (source='data/test-utf16be.xml', line=37): {0.15}
+  SONDE (source='data/test-utf16be.xml', line=39): {}
+   NAME (source='data/test-utf16be.xml', line=39): {Sonde1}
+   X (source='data/test-utf16be.xml', line=39): {0.5}
+  New (source='data/test-utf16be.xml', line=41): {}
+   Tag (source='data/test-utf16be.xml', line=42): {}
+    #text (source='data/test-utf16be.xml', line=42): {text}
+data/test-utf16be.xml(0): warning: non utf-8 encoding UTF-16BE used (this decreases parsing perfomance)
+root (source='', line=0): {}
+ NAME (source='data/test-utf16le.xml', line=2): {}
+  NAME (source='data/test-utf16le.xml', line=2): {First WM}
+  VERSION (source='data/test-utf16le.xml', line=2): {0.1}
+  MATERIAL (source='data/test-utf16le.xml', line=20): {}
+   NAME (source='data/test-utf16le.xml', line=20): {Русский материал}
+   COLOR (source='data/test-utf16le.xml', line=20): {00//0099}
+   EPS (source='data/test-utf16le.xml', line=20): {//10}
+   MU (source='data/test-utf16le.xml', line=20): {1//}
+   SIGMA (source='data/test-utf16le.xml', line=20): {100}
+  #text (source='data/test-utf16le.xml', line=21): {//ad///sa//}
+  New1 (source='data/test-utf16le.xml', line=22): {}
+   #text (source='data/test-utf16le.xml', line=23): {薩<沙是在高速公路和吸乾, 1.001, 2.001, 3.001, 4.001, Русский, материал}
+   New2 (source='data/test-utf16le.xml', line=26): {}
+    ChineseAttribute (source='data/test-utf16le.xml', line=26): {薩沙是在高速公路和吸乾}
+  #text (source='data/test-utf16le.xml', line=29): {1.0, 2.0, bla-bla-bla}
+  LAYER (source='data/test-utf16le.xml', line=31): {}
+   NAME (source='data/test-utf16le.xml', line=31): {Layer1}
+   MATERIAL (source='data/test-utf16le.xml', line=31): {Mat2}
+   X (source='data/test-utf16le.xml', line=31): {0.2}
+   WIDTH (source='data/test-utf16le.xml', line=31): {0.7}
+  #text (source='data/test-utf16le.xml', line=33): {CDATA test Русский материал &#34217;&#27801;&#26159;&#22312;&#39640;&#36895;&#20844;&#36335;&#21644;&#21560;&#20094; CDATA test/}
+  LAYER (source='data/test-utf16le.xml', line=35): {}
+   NAME (source='data/test-utf16le.xml', line=35): {Layer2}
+   MATERIAL (source='data/test-utf16le.xml', line=35): {Mat1}
+   X (source='data/test-utf16le.xml', line=35): {0.0}
+   WIDTH (source='data/test-utf16le.xml', line=35): {0.1}
+  GAUSSGENERATOR (source='data/test-utf16le.xml', line=37): {}
+   NAME (source='data/test-utf16le.xml', line=37): {Gen1}
+   X (source='data/test-utf16le.xml', line=37): {0.15}
+  SONDE (source='data/test-utf16le.xml', line=39): {}
+   NAME (source='data/test-utf16le.xml', line=39): {Sonde1}
+   X (source='data/test-utf16le.xml', line=39): {0.5}
+  New (source='data/test-utf16le.xml', line=41): {}
+   Tag (source='data/test-utf16le.xml', line=42): {}
+    #text (source='data/test-utf16le.xml', line=42): {text}
+data/test-utf16le.xml(0): warning: non utf-8 encoding UTF-16LE used (this decreases parsing perfomance)
+root (source='', line=0): {}
+ NAME (source='data/test-utf32.xml', line=2): {}
+  NAME (source='data/test-utf32.xml', line=2): {First WM}
+  VERSION (source='data/test-utf32.xml', line=2): {0.1}
+  MATERIAL (source='data/test-utf32.xml', line=20): {}
+   NAME (source='data/test-utf32.xml', line=20): {Русский материал}
+   COLOR (source='data/test-utf32.xml', line=20): {00//0099}
+   EPS (source='data/test-utf32.xml', line=20): {//10}
+   MU (source='data/test-utf32.xml', line=20): {1//}
+   SIGMA (source='data/test-utf32.xml', line=20): {100}
+  #text (source='data/test-utf32.xml', line=21): {//ad///sa//}
+  New1 (source='data/test-utf32.xml', line=22): {}
+   #text (source='data/test-utf32.xml', line=23): {薩<沙是在高速公路和吸乾, 1.001, 2.001, 3.001, 4.001, Русский, материал}
+   New2 (source='data/test-utf32.xml', line=26): {}
+    ChineseAttribute (source='data/test-utf32.xml', line=26): {薩沙是在高速公路和吸乾}
+  #text (source='data/test-utf32.xml', line=29): {1.0, 2.0, bla-bla-bla}
+  LAYER (source='data/test-utf32.xml', line=31): {}
+   NAME (source='data/test-utf32.xml', line=31): {Layer1}
+   MATERIAL (source='data/test-utf32.xml', line=31): {Mat2}
+   X (source='data/test-utf32.xml', line=31): {0.2}
+   WIDTH (source='data/test-utf32.xml', line=31): {0.7}
+  #text (source='data/test-utf32.xml', line=33): {CDATA test Русский материал 薩沙是在高速公路和吸乾 CDATA test/}
+  LAYER (source='data/test-utf32.xml', line=35): {}
+   NAME (source='data/test-utf32.xml', line=35): {Layer2}
+   MATERIAL (source='data/test-utf32.xml', line=35): {Mat1}
+   X (source='data/test-utf32.xml', line=35): {0.0}
+   WIDTH (source='data/test-utf32.xml', line=35): {0.1}
+  GAUSSGENERATOR (source='data/test-utf32.xml', line=37): {}
+   NAME (source='data/test-utf32.xml', line=37): {Gen1}
+   X (source='data/test-utf32.xml', line=37): {0.15}
+  SONDE (source='data/test-utf32.xml', line=39): {}
+   NAME (source='data/test-utf32.xml', line=39): {Sonde1}
+   X (source='data/test-utf32.xml', line=39): {0.5}
+  New (source='data/test-utf32.xml', line=41): {}
+   Tag (source='data/test-utf32.xml', line=42): {}
+    #text (source='data/test-utf32.xml', line=42): {text}
+data/test-utf32.xml(0): warning: non utf-8 encoding UCS-4BE used (this decreases parsing perfomance)
+root (source='', line=0): {}
+ NAME (source='data/test-utf32be.xml', line=2): {}
+  NAME (source='data/test-utf32be.xml', line=2): {First WM}
+  VERSION (source='data/test-utf32be.xml', line=2): {0.1}
+  MATERIAL (source='data/test-utf32be.xml', line=20): {}
+   NAME (source='data/test-utf32be.xml', line=20): {Русский материал}
+   COLOR (source='data/test-utf32be.xml', line=20): {00//0099}
+   EPS (source='data/test-utf32be.xml', line=20): {//10}
+   MU (source='data/test-utf32be.xml', line=20): {1//}
+   SIGMA (source='data/test-utf32be.xml', line=20): {100}
+  #text (source='data/test-utf32be.xml', line=21): {//ad///sa//}
+  New1 (source='data/test-utf32be.xml', line=22): {}
+   #text (source='data/test-utf32be.xml', line=23): {薩<沙是在高速公路和吸乾, 1.001, 2.001, 3.001, 4.001, Русский, материал}
+   New2 (source='data/test-utf32be.xml', line=26): {}
+    ChineseAttribute (source='data/test-utf32be.xml', line=26): {薩沙是在高速公路和吸乾}
+  #text (source='data/test-utf32be.xml', line=29): {1.0, 2.0, bla-bla-bla}
+  LAYER (source='data/test-utf32be.xml', line=31): {}
+   NAME (source='data/test-utf32be.xml', line=31): {Layer1}
+   MATERIAL (source='data/test-utf32be.xml', line=31): {Mat2}
+   X (source='data/test-utf32be.xml', line=31): {0.2}
+   WIDTH (source='data/test-utf32be.xml', line=31): {0.7}
+  #text (source='data/test-utf32be.xml', line=33): {CDATA test Русский материал 薩沙是在高速公路和吸乾 CDATA test/}
+  LAYER (source='data/test-utf32be.xml', line=35): {}
+   NAME (source='data/test-utf32be.xml', line=35): {Layer2}
+   MATERIAL (source='data/test-utf32be.xml', line=35): {Mat1}
+   X (source='data/test-utf32be.xml', line=35): {0.0}
+   WIDTH (source='data/test-utf32be.xml', line=35): {0.1}
+  GAUSSGENERATOR (source='data/test-utf32be.xml', line=37): {}
+   NAME (source='data/test-utf32be.xml', line=37): {Gen1}
+   X (source='data/test-utf32be.xml', line=37): {0.15}
+  SONDE (source='data/test-utf32be.xml', line=39): {}
+   NAME (source='data/test-utf32be.xml', line=39): {Sonde1}
+   X (source='data/test-utf32be.xml', line=39): {0.5}
+  New (source='data/test-utf32be.xml', line=41): {}
+   Tag (source='data/test-utf32be.xml', line=42): {}
+    #text (source='data/test-utf32be.xml', line=42): {text}
+data/test-utf32be.xml(0): warning: non utf-8 encoding UCS-4BE used (this decreases parsing perfomance)
+root (source='', line=0): {}
+ NAME (source='data/test-utf32le.xml', line=2): {}
+  NAME (source='data/test-utf32le.xml', line=2): {First WM}
+  VERSION (source='data/test-utf32le.xml', line=2): {0.1}
+  MATERIAL (source='data/test-utf32le.xml', line=20): {}
+   NAME (source='data/test-utf32le.xml', line=20): {Русский материал}
+   COLOR (source='data/test-utf32le.xml', line=20): {00//0099}
+   EPS (source='data/test-utf32le.xml', line=20): {//10}
+   MU (source='data/test-utf32le.xml', line=20): {1//}
+   SIGMA (source='data/test-utf32le.xml', line=20): {100}
+  #text (source='data/test-utf32le.xml', line=21): {//ad///sa//}
+  New1 (source='data/test-utf32le.xml', line=22): {}
+   #text (source='data/test-utf32le.xml', line=23): {薩<沙是在高速公路和吸乾, 1.001, 2.001, 3.001, 4.001, Русский, материал}
+   New2 (source='data/test-utf32le.xml', line=26): {}
+    ChineseAttribute (source='data/test-utf32le.xml', line=26): {薩沙是在高速公路和吸乾}
+  #text (source='data/test-utf32le.xml', line=29): {1.0, 2.0, bla-bla-bla}
+  LAYER (source='data/test-utf32le.xml', line=31): {}
+   NAME (source='data/test-utf32le.xml', line=31): {Layer1}
+   MATERIAL (source='data/test-utf32le.xml', line=31): {Mat2}
+   X (source='data/test-utf32le.xml', line=31): {0.2}
+   WIDTH (source='data/test-utf32le.xml', line=31): {0.7}
+  #text (source='data/test-utf32le.xml', line=33): {CDATA test Русский материал 薩沙是在高速公路和吸乾 CDATA test/}
+  LAYER (source='data/test-utf32le.xml', line=35): {}
+   NAME (source='data/test-utf32le.xml', line=35): {Layer2}
+   MATERIAL (source='data/test-utf32le.xml', line=35): {Mat1}
+   X (source='data/test-utf32le.xml', line=35): {0.0}
+   WIDTH (source='data/test-utf32le.xml', line=35): {0.1}
+  GAUSSGENERATOR (source='data/test-utf32le.xml', line=37): {}
+   NAME (source='data/test-utf32le.xml', line=37): {Gen1}
+   X (source='data/test-utf32le.xml', line=37): {0.15}
+  SONDE (source='data/test-utf32le.xml', line=39): {}
+   NAME (source='data/test-utf32le.xml', line=39): {Sonde1}
+   X (source='data/test-utf32le.xml', line=39): {0.5}
+  New (source='data/test-utf32le.xml', line=41): {}
+   Tag (source='data/test-utf32le.xml', line=42): {}
+    #text (source='data/test-utf32le.xml', line=42): {text}
+data/test-utf32le.xml(0): warning: non utf-8 encoding UCS-4LE used (this decreases parsing perfomance)

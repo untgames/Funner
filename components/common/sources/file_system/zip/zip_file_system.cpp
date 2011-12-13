@@ -20,7 +20,10 @@
 using namespace common;
 using namespace stl;
 
-namespace
+namespace components
+{
+
+namespace zip_file_system
 {
 
 /*
@@ -251,6 +254,11 @@ class ZipFileSystem: public ICustomFileSystem, public Lockable
 
   private:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+///Регистрация файла
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void RegisterFile (const char* name, FileListItem item);
+  
+///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Проверка ошибки
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void CheckError ();
@@ -327,7 +335,7 @@ ZipFileSystem::ZipFileSystem (const char* path)
 
     ZZIP_DIRENT entry;
     string      file_name;
-
+    
     while (zzip_dir_read (zip_dir,&entry))
     {
       FileListItem item;
@@ -338,18 +346,13 @@ ZipFileSystem::ZipFileSystem (const char* path)
       if (!file_name.empty () && file_name.end ()[-1] == '/')
         file_name.erase (file_name.end ()-1);
 
-      file_names.append    (file_name);
-      file_names.push_back (0);
-
       item.info.is_dir      = entry.st_size == 0;
       item.info.size        = entry.st_size;
       item.info.time_create = 0;
       item.info.time_access = 0;
       item.info.time_modify = 0;
-
-      entry_map [strihash (file_name.c_str ())] = entries.size ();
-
-      entries.push_back (item);
+      
+      RegisterFile (file_name.c_str (), item);
     }
 
     const char* string_base = file_names.c_str ();
@@ -385,6 +388,43 @@ ZipFileSystem::~ZipFileSystem ()
   }
   catch (...)
   {
+  }
+}
+
+/*
+    Регистрация файла
+*/
+
+void ZipFileSystem::RegisterFile (const char* file_name, FileListItem item)
+{   
+  item.name = (const char*)file_names.size ();
+  
+  file_names.append    (file_name);
+  file_names.push_back (0);  
+
+  entry_map [strihash (file_name)] = entries.size (); 
+
+  entries.push_back (item);
+  
+  stl::string dir_name = dir (file_name);
+  
+  if (!dir_name.empty ())
+    dir_name.pop_back ();
+    
+  if (dir_name != ".")
+  {    
+    if (entry_map.find (strihash (dir_name.c_str ())) == entry_map.end ())
+    {
+      FileListItem dir_entry;    
+      
+      dir_entry.info.is_dir      = 1;
+      dir_entry.info.size        = 0;
+      dir_entry.info.time_create = 0;
+      dir_entry.info.time_access = 0;
+      dir_entry.info.time_modify = 0;    
+
+      RegisterFile (dir_name.c_str (), dir_entry);
+    }
   }
 }
 
@@ -630,6 +670,7 @@ class ZipFileSystemComponent
       FileSystem::RegisterPackFile ("jar", &Create);
       FileSystem::RegisterPackFile ("pk3", &Create);
       FileSystem::RegisterPackFile ("pak", &Create);
+      FileSystem::RegisterPackFile ("apk", &Create);      
     }
 
   private:
@@ -639,11 +680,13 @@ class ZipFileSystemComponent
     }
 };
 
-}
-
 extern "C"
 {
 
 ComponentRegistrator<ZipFileSystemComponent> ZipFileSystem ("common.file_systems.ZipFileSystem");
+
+}
+
+}
 
 }

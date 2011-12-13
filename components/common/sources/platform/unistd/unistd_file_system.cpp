@@ -71,6 +71,9 @@ class UnistdFileSystem: public StdioFileSystem
       if (!dir)
         return;
 
+      if (dir_name == "./")
+        dir_name = "";
+
       FileInfo info;
 
       for (struct dirent* entry; (entry = readdir (dir)) != 0;)
