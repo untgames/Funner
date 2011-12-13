@@ -2,7 +2,10 @@
 
 using namespace sound::low_level;
 
-namespace
+namespace components
+{
+
+namespace openal_driver
 {
 
 /*
@@ -123,11 +126,13 @@ class OpenALComponent
     }
 };
 
-}
-
 extern "C"
 {
 
 common::ComponentRegistrator<OpenALComponent> OpenAL (COMPONENT_NAME);
+
+}
+
+}
 
 }
