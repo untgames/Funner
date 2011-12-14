@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<sound_declaration_library>
+  <declaration id="my_sound" type="sfx" looping="1">
+    <params gain="1" min_gain="0" max_gain="1" inner_angle="360" outer_angle="360" outer_gain="1" reference_distance="10" maximum_distance="100" cull_distance="110"/>
+    <samples>
+	  data/sound.wav
+    </samples>
+  </declaration>
+</sound_declaration_library>

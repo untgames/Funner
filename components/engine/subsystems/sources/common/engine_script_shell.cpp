@@ -10,7 +10,10 @@ using namespace engine;
 using namespace script;
 using namespace common;
 
-namespace
+namespace components
+{
+
+namespace shell_subsystem
 {
 
 /*
@@ -151,6 +154,8 @@ extern "C"
 {
 
 ComponentRegistrator<Component> ShellSubsystem (COMPONENT_NAME);
+
+}
 
 }
 

@@ -2,6 +2,7 @@
 #Определения и константы
 ###################################################################################################
 TARGETS        := ENGINE.FUNNER_SHARED_LIBRARY ENGINE.FUNNER_LIBRARY ENGINE.LAUNCHER.SOURCES
+TARGETS        += ENGINE.CLAUNCHER.TESTS
 TARGETS.win32  := ENGINE.CLAUNCHER.SOURCES
 TARGETS.iphone := ENGINE.FUNNER_LIBRARY_LIPO
 
@@ -18,10 +19,14 @@ ENGINE.FUNNER_SHARED_LIBRARY.IMPORTS           := compile.engine.core compile.co
 ENGINE.FUNNER_SHARED_LIBRARY.EXCLUDE_IMPORTS := link.common.auto_license_generator                                             
                                              
 #Цель - сборка движка
-ifneq (,$(filter no_dll,$(PROFILES)))
-ENGINE.FUNNER_LIBRARY.TYPE                := fat-static-lib
-else
+ifeq (,$(filter no_dll,$(PROFILES)))
 ENGINE.FUNNER_LIBRARY.TYPE                := dynamic-lib
+endif
+ifneq (,$(filter iphone,$(PROFILES)))
+ENGINE.FUNNER_LIBRARY.TYPE                := fat-static-lib
+endif
+ifneq (,$(filter android,$(PROFILES)))
+ENGINE.FUNNER_LIBRARY.TYPE                := ignore
 endif
 ENGINE.FUNNER_LIBRARY.NAME                := funner
 #ENGINE.FUNNER_LIBRARY.win32.LINK_FLAGS    := -noentry
@@ -36,10 +41,17 @@ ENGINE.FUNNER_LIBRARY_LIPO.LIBS     := funner
 ENGINE.FUNNER_LIBRARY_LIPO.PROFILES := iphone-device-armv6 iphone-device-armv7 iphone-simulator
 
 #Цель - application
-ENGINE.LAUNCHER.SOURCES.TYPE                    := application
+ifneq (,$(filter android,$(PROFILES)))
+ENGINE.LAUNCHER.SOURCES.NAME                    := funner
+ENGINE.LAUNCHER.SOURCES.TYPE                    := dynamic-lib
+else
 ENGINE.LAUNCHER.SOURCES.NAME                    := launcher
+ENGINE.LAUNCHER.SOURCES.TYPE                    := application
+endif
 ENGINE.LAUNCHER.SOURCES.INCLUDE_DIRS            := include
 ENGINE.LAUNCHER.SOURCES.EXECUTION_DIR           := sources
+ENGINE.LAUNCHER.SOURCES.LINK_INCLUDES           :=
+ENGINE.LAUNCHER.SOURCES.LIBS                    :=
 ENGINE.LAUNCHER.SOURCES.macosx.LINK_FLAGS       := -framework Foundation -framework AppKit
 ENGINE.LAUNCHER.SOURCES.iphone.LINK_FLAGS       := -framework OpenAL -framework UIKit -framework Foundation \
                                                    -framework OpenGLES -framework MediaPlayer -framework AVFoundation \
@@ -51,6 +63,12 @@ ENGINE.LAUNCHER.SOURCES.iphone.SOURCE_DIRS      := sources/platform/iphone
 ENGINE.LAUNCHER.SOURCES.iphone.LIBS             := funner
 ENGINE.LAUNCHER.SOURCES.linux.SOURCE_DIRS       := sources/platform/linux
 ENGINE.LAUNCHER.SOURCES.linux.LIBS              := dl
+ifneq (,$(filter android,$(PROFILES)))
+ENGINE.LAUNCHER.SOURCES.LIBS                    := funner.system #for duplicate JNI_OnLoad in OpenAL32 & system
+endif
+ENGINE.LAUNCHER.SOURCES.android.SOURCE_DIRS     := sources/platform/android
+ENGINE.LAUNCHER.SOURCES.android.IMPORTS         := compile.engine.core link.engine.launcher 
+ENGINE.LAUNCHER.SOURCES.android.EXCLUDE_IMPORTS := link.common.auto_license_generator
 
 #Цель - console application
 ENGINE.CLAUNCHER.SOURCES.TYPE                := application
@@ -61,3 +79,8 @@ ENGINE.CLAUNCHER.SOURCES.IMPORTS             := $(ENGINE.LAUNCHER.SOURCES.IMPORT
 ENGINE.CLAUNCHER.SOURCES.has_windows.IMPORTS := $(ENGINE.LAUNCHER.SOURCES.has_windows.IMPORTS)
 ENGINE.CLAUNCHER.SOURCES.win32.IMPORTS       := $(ENGINE.LAUNCHER.SOURCES.win32.IMPORTS)
 ENGINE.CLAUNCHER.SOURCES.win32.SOURCE_DIRS   := sources/platform/win32
+
+#Цель - launcher tests
+ENGINE.CLAUNCHER.TESTS.TYPE              := test-suite
+ENGINE.CLAUNCHER.TESTS.SOURCE_DIRS       := tests
+ENGINE.CLAUNCHER.TESTS.USED_APPLICATIONS := clauncher

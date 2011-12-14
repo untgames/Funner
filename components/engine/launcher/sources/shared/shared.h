@@ -22,6 +22,7 @@
 #include <common/log.h>
 #include <common/parser.h>
 #include <common/string.h>
+#include <common/xml_writer.h>
 
 #include <syslib/application.h>
 #include <syslib/window.h>

@@ -1,8 +1,13 @@
-<?xml version="1.0" encoding = "windows-1251"?>
+<?xml version="1.0" encoding = "utf-8"?>
 <Configuration>
   <FileSystem Paths="data"/>
   <Log>
     <Console Filters="engine.*"/>
   </Log>
-  <Shell Interpreter="lua" Sources="shell_scripts/*" Libraries="Math SceneGraph LuaOverride" Execute="main ()" SearchPaths="data/shell_scripts/include/?.lua"/>
+  <PhysicsManager
+    DriverName     = "Bullet"
+    AttachmentName = "PhysicsManager"
+    ResourceServer = "Physics"
+    /> 
+  <Shell Interpreter="lua" Sources="shell_scripts/*" Libraries="Math SceneGraph LuaOverride Physics Engine Common" Execute="main ()" SearchPaths="data/shell_scripts/include/?.lua"/>
 </Configuration>

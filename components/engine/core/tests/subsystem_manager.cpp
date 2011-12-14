@@ -67,7 +67,7 @@ int main ()
 
   try
   {
-    common::LogFilter log_filter ("engine.*", &log_handler);
+    common::LogFilter log_filter ("engine*", &log_handler);
 
     xtl::com_ptr<EngineSubsystem> subsystem1 (new EngineSubsystem (SUBSYSTEM1_CONFIGURATION), false),
                                   subsystem2 (new EngineSubsystem (SUBSYSTEM2_CONFIGURATION), false),

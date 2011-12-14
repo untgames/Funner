@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding = "windows-1251"?>
+<Configuration LicenseFile="launcher09.license">
+  <Log>
+    <Console Filters="*"/>  
+  </Log>
+  <ResourceSystem>
+    <Server Name="Graphics" Filters="*xmtl *png *tga *dds" Cache="1"/>
+    <Server Name="Sound" Filters="*snddecl" Cache="1"/>    
+  </ResourceSystem>  
+  <WindowManager ResourceServer="WindowManager">
+    <Window
+      Id         = "MainWindow"
+      Style      = "Overlapped"
+      Title      = "Test window"  
+      Width      = "400"
+      Height     = "300"
+      XPosition  = "100"
+      YPosition  = "100"
+      ViewportAspectRatio = "4:3"      
+      Visible    = "1"
+      CursorVisible = "1"      
+    />  
+  </WindowManager>
+  <WindowRenderer Id="MyRenderer" AdapterMask="*" DriverMask="*" InitString="GL_SGIS_texture_lod=0 GL_ARB_texture_non_power_of_two=0 max_texture_size=1024">
+    <FrameBuffer
+      Window       = "MainWindow"
+      ColorBits    = "32"
+      AlphaBits    = "0"
+      DepthBits    = "24"
+      StencilBits  = "0"
+      FullScreen   = "0"
+      BuffersCount = "2"
+      SwapMethod   = "Discard"
+      SamplesCount = "0"
+      VSync        = "1"
+    />
+  </WindowRenderer>
+  <SceneRender
+    DriverMask     = "*"
+    RendererMask   = "MyRenderer"
+    Log            = "render.scene_render"
+    ResourceServer = "Graphics"
+    >
+    <RenderTarget 
+      Screen     = "Screen1"
+      IdleRender = "1"
+      />
+  </SceneRender>
+  <ScenePlayer 
+    Listener        = "Listener1"
+    DriverMask      = "*"
+    DeviceMask      = "*"
+    InitString      = "max_channels_count=32"
+    ResourceServer  = "Sound"
+    />   
+  <WindowInputDriver>
+    <Device Id="MainWindowDevice" Window="MainWindow"/>
+  </WindowInputDriver>
+  <InputManager TranslationMapRegistry = "data/input.xkeyreg"/>
+  <Shell Interpreter="lua" Libraries="*"/>  
+</Configuration>

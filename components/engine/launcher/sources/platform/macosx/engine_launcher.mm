@@ -21,7 +21,7 @@ const char* ENGINE_LIBRARY_NAME = "funner.dylib";
 }
 
 //точка входа
-int main (int argc, const char* argv [])
+int main (int argc, const char* argv [], const char* env [])
 {
   NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
 
@@ -40,7 +40,7 @@ int main (int argc, const char* argv [])
 
     if (![[NSFileManager defaultManager] changeCurrentDirectoryPath:resources_path])
     {
-      NSLog (@"Can't set current dir '%@'\n", resources_path);
+      NSLog (@"Can't set current dir '%@'", resources_path);
       [pool release];
       return 1;
     }
@@ -56,7 +56,7 @@ int main (int argc, const char* argv [])
 
   if (!library)
   {
-    printf ("Can't load engine library\n");
+    printf ("Can't load engine library, error '%s'\n", dlerror ());
     return 1;
   }
   
@@ -76,7 +76,7 @@ int main (int argc, const char* argv [])
     return 1;
   }
   
-  if (!funner->ParseCommandLine (argc, argv))
+  if (!funner->ParseCommandLine (argc, argv, env))
   {
     return 1;
   }

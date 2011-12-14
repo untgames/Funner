@@ -20,7 +20,10 @@ using namespace engine;
 using namespace common;
 using namespace syslib::iphone;
 
-namespace
+namespace components
+{
+
+namespace iphone_configuration_subsystem
 {
 
 /*
@@ -135,6 +138,8 @@ extern "C"
 {
 
 ComponentRegistrator<IPhoneConfigurationComponent> IPhoneConfigurationSubsystem (COMPONENT_NAME);
+
+}
 
 }
 

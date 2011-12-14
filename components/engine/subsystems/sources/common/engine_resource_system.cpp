@@ -4,7 +4,10 @@ using namespace engine;
 using namespace common;
 using namespace media::rms;
 
-namespace
+namespace components
+{
+
+namespace resource_system
 {
 
 /*
@@ -89,6 +92,8 @@ extern "C"
 {
 
 ComponentRegistrator<ResourceSystemComponent> ResourceSystem (COMPONENT_NAME);
+
+}
 
 }
 

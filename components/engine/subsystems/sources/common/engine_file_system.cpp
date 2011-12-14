@@ -3,28 +3,31 @@
 using namespace engine;
 using namespace common;
 
-namespace
+namespace components
+{
+
+namespace file_system
 {
 
 /*
-    Љ®­бв ­вл
+    Константы
 */
 
-const char* SUBSYSTEM_NAME = "FileSystem";                   //Ё¬п Ї®¤бЁбвҐ¬л
-const char* COMPONENT_NAME = "engine.subsystems.FileSystem"; //Ё¬п Є®¬Ї®­Ґ­в 
+const char* SUBSYSTEM_NAME = "FileSystem";                   //имя подсистемы
+const char* COMPONENT_NAME = "engine.subsystems.FileSystem"; //имя компонента
 const char* LOG_NAME       = COMPONENT_NAME;
 
 /*
-   Џ®¤бЁбвҐ¬  д ©«®ў®© бЁбвҐ¬л
+   Подсистема файловой системы
 */
 
 class FileSystem : public ISubsystem, public xtl::reference_counter
 {
   public:
-/// Љ®­бвагЄв®а/¤ҐбвагЄв®а
+/// Конструктор/деструктор
     FileSystem (common::ParseNode& node)
     {
-        //звҐ­ЁҐ Ї а ¬Ґва®ў иЁда®ў ­Ёп
+        //чтение параметров шифрования
 
       ParseNode crypto_node = node.First ("Crypto");
 
@@ -46,8 +49,21 @@ class FileSystem : public ISubsystem, public xtl::reference_counter
           common::FileSystem::SetCryptoParameters (file_name, crypto_parameters);
         }
       }
+      
+        //чтение параметров кэширования
         
-        //¬®­вЁа®ў ­ЁҐ ЇгвҐ©
+      if (ParseNode cache_node = node.First ("Cache"))
+      {
+        for (Parser::NamesakeIterator iter=cache_node.First ("File"); iter; ++iter)
+        {
+          const char* file_name    = get<const char*> (*iter, "Name");
+          size_t      buffer_size  = get<size_t> (*iter, "BufferSize");
+
+          common::FileSystem::SetFileBufferSize (file_name, buffer_size);
+        }
+      }
+        
+        //монтирование путей
         
       ParseNode mount_node = node.First ("Mount");
       
@@ -66,7 +82,7 @@ class FileSystem : public ISubsystem, public xtl::reference_counter
         }
       }
 
-        //¤®Ў ў«Ґ­ЁҐ ЇгвҐ© Ї®ЁбЄ 
+        //добавление путей поиска
 
       const char* paths_string = get<const char*> (node, "Paths", "");
 
@@ -87,7 +103,7 @@ class FileSystem : public ISubsystem, public xtl::reference_counter
         const char* path = paths [i];
 
         common::FileSystem::AddSearchPath (path, log_handler);
-      }
+      }      
     }
 
     ~FileSystem ()
@@ -96,7 +112,7 @@ class FileSystem : public ISubsystem, public xtl::reference_counter
         common::FileSystem::RemoveSearchPath (paths [i]);
     }
 
-/// Џ®¤бзсв ббл«®Є
+/// Подсчёт ссылок
     void AddRef ()  { addref (this); }
     void Release () { release (this); }
 
@@ -109,13 +125,13 @@ class FileSystem : public ISubsystem, public xtl::reference_counter
 };
 
 /*
-   Љ®¬Ї®­Ґ­в
+   Компонент
 */
 
 class FileSystemComponent
 {
   public:
-    //§ Јаг§Є  Є®¬Ї®­Ґ­в 
+    //загрузка компонента
     FileSystemComponent ()
     {
       StartupManager::RegisterStartupHandler (SUBSYSTEM_NAME, &StartupHandler);
@@ -142,6 +158,8 @@ extern "C"
 {
 
 ComponentRegistrator<FileSystemComponent> FileSystem (COMPONENT_NAME);
+
+}
 
 }
 

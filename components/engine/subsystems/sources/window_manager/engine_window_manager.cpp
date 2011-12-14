@@ -22,6 +22,8 @@
 
 #include <input/cursor.h>
 
+#include <syslib/application.h>
+#include <syslib/screen.h>
 #include <syslib/window.h>
 
 #include <engine/attachments.h>
@@ -30,7 +32,10 @@
 using namespace common;
 using namespace engine;
 
-namespace
+namespace components
+{
+
+namespace window_manager_subsytem
 {
 
 /*
@@ -59,6 +64,8 @@ class WindowManagerSubsystem: public ISubsystem, private media::rms::ICustomServ
 ///Конструктор
     WindowManagerSubsystem (ParseNode& node)
       : log (LOG_NAME)
+      , need_restore_screen_saver (false)
+      , screen_saver_saved_state (true)
     {
       try
       {
@@ -69,6 +76,16 @@ class WindowManagerSubsystem: public ISubsystem, private media::rms::ICustomServ
           WindowPtr window (create_window (*iter, *this), false);
 
           windows.push_back (window);
+        }
+        
+        if (ParseNode screen_saver_node = node.First ("ScreenSaver"))
+        {
+          screen_saver_saved_state  = syslib::Application::GetScreenSaverState ();          
+          need_restore_screen_saver = true;
+          
+          bool screen_saver_state = get<int> (screen_saver_node, "", 1) != 0;                    
+          
+          syslib::Application::SetScreenSaverState (screen_saver_state);
         }
       }
       catch (xtl::exception& e)
@@ -81,7 +98,16 @@ class WindowManagerSubsystem: public ISubsystem, private media::rms::ICustomServ
 ///Деструктор
     ~WindowManagerSubsystem ()
     {
-      resource_server.reset ();
+      try
+      {
+        resource_server.reset ();
+        
+        if (need_restore_screen_saver)
+          syslib::Application::SetScreenSaverState (screen_saver_saved_state);
+      }
+      catch (...)
+      {
+      }
     }
     
 ///Поиск курсора
@@ -252,7 +278,9 @@ class WindowManagerSubsystem: public ISubsystem, private media::rms::ICustomServ
     WindowList                                       windows;    
     stl::auto_ptr<media::rms::ServerGroupAttachment> resource_server;
     HotspotMap                                       hotspots;
-    CursorMap                                        cursors;    
+    CursorMap                                        cursors;
+    bool                                             need_restore_screen_saver;
+    bool                                             screen_saver_saved_state;
 };
 
 /*
@@ -285,6 +313,8 @@ class Window: public IAttachmentRegistryListener<syslib::Window>, public IAttach
         cursor (0),
         aspect_ratio (0)
     {
+      static const char* METHOD_NAME = "engine::Window::Window";
+
         //создание окна
 
       const char* title = get<const char*> (node, "Title", (const char*)0);
@@ -372,7 +402,7 @@ class Window: public IAttachmentRegistryListener<syslib::Window>, public IAttach
       }
       else if (maximized && minimized)
       {
-        throw xtl::format_operation_exception ("engine::Window::Window", "Window can't be maximized and minimized at one time");
+        throw xtl::format_operation_exception (METHOD_NAME, "Window can't be maximized and minimized at one time");
       }
       else if (maximized)
       {
@@ -383,6 +413,85 @@ class Window: public IAttachmentRegistryListener<syslib::Window>, public IAttach
       {
         window.Minimize ();
         window.SetActive (false);
+      }
+
+      if (node.First ("MinDesktopWidth") || node.First ("MinDesktopHeight"))
+      {
+        size_t min_desktop_width  = get<size_t> (node, "MinDesktopWidth", 0),
+               min_desktop_height = get<size_t> (node, "MinDesktopHeight", 0);
+
+        stl::auto_ptr<syslib::Screen> window_screen;        
+
+        try
+        {
+          window_screen.reset (new syslib::Screen (syslib::Screen::ContainingScreen (window.Handle ())));
+        }
+        catch (std::exception& e)
+        {
+          log.Printf ("Can't find containing screen for window, using screen 0, exception: '%s'", e.what ());
+          
+          try
+          {
+            window_screen.reset (new syslib::Screen ((size_t)0));
+          }
+          catch (std::exception& e)
+          {
+            log.Printf ("Can't find screen 0, exception: '%s'", e.what ());
+          }
+          catch (...)
+          {
+            log.Printf ("Can't find screen 0");
+          }
+        }
+
+        if (window_screen && (window_screen->Width () < min_desktop_width || window_screen->Height () < min_desktop_height))
+        {
+          syslib::ScreenModeDesc best_mode;
+          size_t                 best_mode_resolution = 0;
+
+          memset (&best_mode, 0, sizeof (best_mode));
+
+          for (size_t i = 0, count = window_screen->ModesCount (); i < count; i++)
+          {
+            syslib::ScreenModeDesc current_mode;
+
+            window_screen->GetMode (i, current_mode);
+
+            size_t current_mode_resolution = current_mode.width * current_mode.height;
+
+              //поиск режима с максимальным разрешением, частотой развертки и цветностью
+            if (current_mode_resolution < best_mode_resolution)
+              continue;
+
+            if (current_mode.width >= min_desktop_width && current_mode.height >= min_desktop_height)
+            {
+              if (current_mode_resolution > best_mode_resolution)
+              {
+                best_mode            = current_mode;
+                best_mode_resolution = current_mode_resolution;
+              }
+              else
+              {
+                if (current_mode.refresh_rate > best_mode.refresh_rate)
+                  best_mode = current_mode;
+                else if (current_mode.refresh_rate == best_mode.refresh_rate && current_mode.color_bits > best_mode.color_bits)
+                  best_mode = current_mode;
+              }
+            }
+          }
+
+          if (!best_mode.width)
+            log.Printf ("Can't find screen mode with minimum size %ux%u", min_desktop_width, min_desktop_height);
+          else
+          {
+            window_screen->SetCurrentMode (best_mode);
+            
+            saved_window_screen = window_screen;
+
+            if (maximized)
+              window.Maximize ();
+          }
+        }
       }
       
         //видимость курсора
@@ -438,10 +547,20 @@ class Window: public IAttachmentRegistryListener<syslib::Window>, public IAttach
 ///Деструктор
     ~Window ()
     {
-      BindCursor (0);
-      AttachmentRegistry::Unregister (attachment_name.c_str (), window);
-      AttachmentRegistry::Detach (static_cast<IAttachmentRegistryListener<syslib::Window>*> (this));
-      AttachmentRegistry::Detach (static_cast<IAttachmentRegistryListener<input::Cursor>*> (this));
+      try
+      {
+        if (saved_window_screen)
+          saved_window_screen->RestoreDefaultMode ();
+        
+        BindCursor (0);
+        
+        AttachmentRegistry::Unregister (attachment_name.c_str (), window);
+        AttachmentRegistry::Detach (static_cast<IAttachmentRegistryListener<syslib::Window>*> (this));
+        AttachmentRegistry::Detach (static_cast<IAttachmentRegistryListener<input::Cursor>*> (this));
+      }
+      catch (...)
+      {
+      }
     }
     
 ///Имя курсора
@@ -588,15 +707,16 @@ class Window: public IAttachmentRegistryListener<syslib::Window>, public IAttach
     }
 
   private:
-    Log                     log;
-    WindowManagerSubsystem& manager;
-    syslib::Window          window;
-    input::Cursor*          cursor;
-    stl::string             attachment_name;
-    stl::string             parent_window_name;
-    stl::string             cursor_attachment_name;
-    math::vec2f             cached_cursor_position;
-    double                  aspect_ratio;
+    Log                           log;
+    WindowManagerSubsystem&       manager;
+    syslib::Window                window;
+    stl::auto_ptr<syslib::Screen> saved_window_screen;
+    input::Cursor*                cursor;
+    stl::string                   attachment_name;
+    stl::string                   parent_window_name;
+    stl::string                   cursor_attachment_name;
+    math::vec2f                   cached_cursor_position;
+    double                        aspect_ratio;
 };
 
 Window* create_window (ParseNode& node, WindowManagerSubsystem& manager)
@@ -647,6 +767,8 @@ extern "C"
 {
 
 ComponentRegistrator<WindowManagerComponent> WindowManagerSubsystem (COMPONENT_NAME);
+
+}
 
 }
 

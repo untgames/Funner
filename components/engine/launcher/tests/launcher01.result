@@ -1,0 +1,6 @@
+Results of launcher_test01:
+exception: File 'config.xml' not found
+    at common::Win32FileSystem::FileOpen
+    at common::FileSystemImpl::OpenFile()
+    at common::FileSystem::LoadTextFile
+    at common::Parser::Parser(const char*, const char*)

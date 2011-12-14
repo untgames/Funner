@@ -113,13 +113,16 @@ class IEngine
     virtual const char* GetBaseDir () = 0;
 
     ///Разбор командной строки и конфигурирование запуска движка
-    virtual bool ParseCommandLine (unsigned int arguments_count, const char** arguments) = 0;
+    virtual bool ParseCommandLine (unsigned int arguments_count, const char** arguments, const char** env = 0) = 0;
 
     ///Запуск главного цикла
     virtual void Run () = 0;
 
     ///Создание интерфейса поддержки внешних окон
     virtual IWindow* CreateWindow (const char* name) = 0;
+
+    ///Запуск главного цикла
+    virtual void Execute (const char* command) = 0;
 };
 
 }
@@ -130,5 +133,10 @@ class IEngine
 typedef engine::IEngine* (*FunnerInitProc)();
 
 FUNNER_C_API engine::IEngine* FunnerInit ();
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Эмуляция запуска main функции
+///////////////////////////////////////////////////////////////////////////////////////////////////
+FUNNER_C_API int FunnerMain (int argc, const char** argv, const char** env = 0);
 
 #endif

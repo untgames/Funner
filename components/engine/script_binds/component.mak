@@ -9,7 +9,7 @@ ENGINE.SCRIPT_BINDS.SOURCES.NAME         := funner.engine.script_binds
 ENGINE.SCRIPT_BINDS.SOURCES.INCLUDE_DIRS := include
 ENGINE.SCRIPT_BINDS.SOURCES.SOURCE_DIRS  := sources
 ENGINE.SCRIPT_BINDS.SOURCES.IMPORTS      := compile.script.core compile.scene_graph.core compile.common \
-                                            compile.render.scene_render compile.system compile.input.manager \
+                                            compile.render.scene_render2d compile.system compile.input.manager \
                                             compile.engine.core compile.media.rms compile.media.players \
                                             compile.math.curves compile.network compile.physics.scene_physics
 

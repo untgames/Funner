@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding = "windows-1251"?>
+<TranslationTable>
+  <Translation Event="Window closed" Replacement="this.OnWindowClosed ()"/>
+  <Translation Event="CursorX axis *" Replacement="this.OnCursorX ({2})"/>
+  <Translation Event="CursorY axis *" Replacement="this.OnCursorY ({2})"/>
+  <Translation Event="Mouse0 down" Replacement="this.OnMouseDown()"/>
+  <Translation Event="Mouse0 up" Replacement="this.OnMouseUp()"/>  
+  <Translation Event="Cursor enter" Replacement="this.OnCursorEnterWindow ()"/>
+  <Translation Event="Cursor leave" Replacement="this.OnCursorLeaveWindow ()"/>
+</TranslationTable>

@@ -13,7 +13,7 @@ const char* ENGINE_LIBRARY_NAME = "libfunner.so";
 }
 
 //точка входа
-int main (int argc, const char* argv [])
+int main (int argc, const char* argv [], const char* env [])
 {
   void* library = dlopen (ENGINE_LIBRARY_NAME, RTLD_NOW | RTLD_GLOBAL);
   
@@ -39,7 +39,7 @@ int main (int argc, const char* argv [])
     return 1;
   }
   
-  if (!funner->ParseCommandLine (argc, argv))
+  if (!funner->ParseCommandLine (argc, argv, env))
   {
     return 1;
   }

@@ -17,12 +17,18 @@
 #include <common/file.h>
 #include <common/log.h>
 #include <common/parser.h>
+#include <common/property_map.h>
 #include <common/strlib.h>
+#include <common/time.h>
+
+#include <syslib/application.h>
 
 #include <engine/attachments.h>
 #include <engine/subsystem_manager.h>
 
 #include <media/rms/manager.h>
 #include <media/rms/server.h>
+
+#include <physics/manager.h>
 
 #endif

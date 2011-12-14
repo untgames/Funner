@@ -1,0 +1,9 @@
+Results of launcher_test03:
+Usage: app_name [flags] [source] ...
+  flags:
+    --config=config_file_name - launch with specified config file
+    --search-path=dir_name    - add dir_name to search paths
+    --version (-v)            - print version
+    --no-main-loop            - app exits after starting subsystems
+    --main-loop               - app runs main loop after starting subsystems
+    --help                    - print this help

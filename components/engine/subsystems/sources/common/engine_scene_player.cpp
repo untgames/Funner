@@ -13,7 +13,10 @@ using namespace common;
   #pragma warning (disable : 4355) //'this' : used in base member initializer list
 #endif
 
-namespace
+namespace components
+{
+
+namespace scene_player_subsystem
 {
 
 /*
@@ -179,6 +182,8 @@ extern "C"
 {
 
 ComponentRegistrator<ScenePlayerComponent> ScenePlayerSubsystem (COMPONENT_NAME);
+
+}
 
 }
 

@@ -15,7 +15,10 @@
 using namespace engine;
 using namespace common;
 
-namespace
+namespace components
+{
+
+namespace window_renderer_subsystem
 {
 
 /*
@@ -95,6 +98,8 @@ extern "C"
 {
 
 ComponentRegistrator<WindowRendererComponent> WindowRendererSubsystem (COMPONENT_NAME);
+
+}
 
 }
 

@@ -28,7 +28,7 @@ stl::string get_type_name (Environment& env, const xtl::type_info& type, TypeNam
     
     return "System::String^";
   }
-
+  
   const char* result = env.FindLibraryId (type.std_type ());
   
   if (result)
@@ -56,6 +56,42 @@ stl::string get_type_name (Environment& env, const xtl::type_info& type, TypeNam
     type_names [&type] = cpp_result_name;
     
     return cpp_result_name;
+  }
+  
+  if (const xtl::functional_type_info* fn_info = dynamic_cast<const xtl::functional_type_info*> (&type))
+  {
+    stl::string delegate_name = "delegate ";
+    
+    const xtl::type_info& result_type = fn_info->result_type ().remove_reference ().remove_pointer ();
+    
+    const char* direction = "";
+    
+    if (result_type.is_class ())
+      direction = "^";
+      
+    delegate_name += get_type_name (env, result_type, type_names);        
+    delegate_name += "(";
+      
+    bool is_first = true;
+    
+    for (size_t j=0; j<fn_info->arguments_count (); j++)
+    {
+      if (is_first) is_first = false;
+      else          delegate_name += ", ";
+      
+      const xtl::type_info& parameter_type = fn_info->argument_type (j).remove_reference ().remove_pointer ();
+        
+      delegate_name += get_type_name (env, parameter_type, type_names).c_str ();
+      
+      if (parameter_type.is_class ())
+       delegate_name += "^";
+    }
+    
+    delegate_name += ")";
+    
+    type_names [&type] = delegate_name;
+    
+    return delegate_name;
   }
   
   type_names [&type] = type.name ();

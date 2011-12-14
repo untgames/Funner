@@ -13,9 +13,10 @@ namespace
      онстанты
 */
 
-const char* VERSION                         = LAUNCHER_VERSION; //строка версии
+const char* VERSION                         = LAUNCHER_VERSION;   //строка версии
 const char* DEFAULT_CONFIGURATION_FILE_NAME = "config.xml";       //им€ конфигурационного файла по умолчанию
 const bool  DEFAULT_HAS_MAIN_LOOP           = true;               //наличие главного цикла приложени€ по умолчанию
+const char* STARTUP_ENV_VARS_FILE_NAME      = "/anonymous/system/startup_environment_variables.xml"; //им€ файла с переменными среды при запуске
 
 const char* KEY_CONFIGURATION = "--config=";      //им€ ключа конфигурационного файла
 const char* KEY_SEARCH_PATH   = "--search-path="; //путь к каталогу поиска файлов
@@ -45,6 +46,7 @@ class Application: public IEngine
   public:
 /// онструктор
     Application ()
+      : environment_variables_file ((size_t)0, common::FileMode_ReadWrite | common::FileMode_Create)
     {
       has_main_loop      = DEFAULT_HAS_MAIN_LOOP;
       configuration_name = DEFAULT_CONFIGURATION_FILE_NAME;
@@ -81,7 +83,7 @@ class Application: public IEngine
     }
         
 ///–азбор параметров командой строки
-    bool ParseCommandLine (unsigned int args_count, const char** args)
+    bool ParseCommandLine (unsigned int args_count, const char** args, const char** env)
     {
       try
       {
@@ -124,17 +126,44 @@ class Application: public IEngine
             commands.Add (argument);
           }
         }
+
+          //сохранение переменных среды при запуске
         
+        common::FileSystem::Rename (environment_variables_file.Path (), STARTUP_ENV_VARS_FILE_NAME);
+
+        common::XmlWriter writer (STARTUP_ENV_VARS_FILE_NAME);
+
+        common::XmlWriter::Scope xml_root (writer, "Properties");
+        
+        if (env)
+        {
+          for (;*env; ++env)
+          {
+            const char* var   = *env;            
+            const char* value = strchr (var, '=');
+            
+            if (value) value++;
+            else       continue;
+                        
+            common::XmlWriter::Scope xml_property (writer, "Property");
+            
+            writer.WriteAttribute ("Name", stl::string (var, value-1).c_str ());
+            writer.WriteAttribute ("Value", value);
+          }
+        }        
+
         return true;
       }
       catch (std::exception& exception)
       {
         printf ("exception: %s\n", exception.what ());
+        fflush (stdout);
       }
       catch (...)
       {
         printf ("unknown exception at Application::ParseCommandLineEntry\n");
-      }
+        fflush (stdout);        
+      }      
       
       return false;
     }
@@ -158,28 +187,69 @@ class Application: public IEngine
     {
       try
       {
-          //загрузка лицензии
-        common::Parser p (configuration_name.c_str ());
-        if (p.Root ().First ("Configuration.LicenseFile"))
-          common::LicenseManager::Load (common::get<const char*> (p.Root ().First ("Configuration"), "LicenseFile"));
-        else
-          printf ("There is no license information in configuration\n");
-          //регистраци€ обработчика старта приложени€
+        if (!need_print_help && !need_print_version)
+        {
+            //загрузка лицензии
 
-        syslib::Application::RegisterEventHandler (syslib::ApplicationEvent_OnInitialized, xtl::bind (&Application::StartupHandler, this, p.Root ().First ("Configuration")));        
+          common::Parser p (configuration_name.c_str ());
 
-          //запуск основного цикла
-  
-        syslib::Application::Run ();
+          if (p.Root ().First ("Configuration.LicenseFile"))
+          {
+            common::LicenseManager::Load (common::get<const char*> (p.Root ().First ("Configuration"), "LicenseFile"));
+          }
+          else
+          {
+            printf ("There is no license information in configuration\n");
+            fflush (stdout);
+          }
+            
+            //регистраци€ обработчика старта приложени€
+
+          syslib::Application::RegisterEventHandler (syslib::ApplicationEvent_OnInitialized, xtl::bind (&Application::StartupHandler, this, p.Root ().First ("Configuration")));            
+          
+            //запуск основного цикла
+
+          syslib::Application::Run ();          
+        }
+        else if (need_print_version)
+        {
+          common::Console::Printf ("Application version: %s\n", VERSION);
+        }
+        else if (need_print_help)
+        {
+          for (size_t i = 0, help_strings = sizeof (HELP) / sizeof (HELP[0]); i < help_strings; i++)
+            common::Console::Print (HELP [i]);          
+        }        
       }
       catch (std::exception& exception)
       {
         printf ("exception: %s\n", exception.what ());
+        fflush (stdout);
       }
       catch (...)
       {
         printf ("unknown exception at Application::RunEntry\n");
+        fflush (stdout);
       }      
+    }
+
+    ///«апуск главного цикла
+    void Execute (const char* command)
+    {
+      try
+      {
+        manager.Execute (command);
+      }
+      catch (std::exception& exception)
+      {
+        printf ("exception at Application::Execute: %s\n", exception.what ());
+        fflush (stdout);
+      }
+      catch (...)
+      {
+        printf ("unknown exception at Application::Execute\n");
+        fflush (stdout);
+      }
     }
 
   private:
@@ -188,15 +258,6 @@ class Application: public IEngine
     {
       try
       {      
-          //запуск подсистем
-
-        if (need_print_version)
-          common::Console::Printf ("Application version: %s\n", VERSION);
-
-        if (need_print_help)
-          for (size_t i = 0, help_strings = sizeof (HELP) / sizeof (HELP[0]); i < help_strings; i++)
-            common::Console::Print (HELP [i]);
-
           //если основного цикла нет - выход из приложени€
 
         if (!has_main_loop)
@@ -236,10 +297,12 @@ class Application: public IEngine
       catch (std::exception& exception)
       {
         printf ("exception: %s\n", exception.what ());
+        fflush (stdout);
       }
       catch (...)
       {
         printf ("unknown exception at engine::Application::StartupTimerHandler\n");
+        fflush (stdout);        
       }      
     }
 
@@ -252,6 +315,7 @@ class Application: public IEngine
     bool                need_print_help;            //нужно распечатать помощь по запуску приложени€
     common::StringArray commands;                   //команды на выполнение подсистемами
     common::StringArray search_paths;               //пути поиска
+    common::MemFile     environment_variables_file; //файл с переменными среды, указанными при запуске
 };
 
 }
@@ -273,12 +337,39 @@ FUNNER_C_API IEngine* FunnerInit ()
   catch (std::exception& exception)
   {
     printf ("exception: %s\n", exception.what ());
+    fflush (stdout);
   }
   catch (...)
   {
     printf ("unknown exception at FunnerInit\n");
+    fflush (stdout);
   }
 
   return 0;
 }
 
+/*
+    Ёмул€ци€ запуска main функции
+*/
+
+FUNNER_C_API int FunnerMain (int argc, const char** argv, const char** env)
+{
+  IEngine* funner = FunnerInit ();
+
+  if (!funner)
+  {
+    printf ("Funner startup failed!");
+    return 1;
+  }
+  
+  if (!funner->ParseCommandLine (argc, argv, env))
+  {
+    return 1;
+  }
+
+  funner->Run ();
+
+  delete funner;
+  
+  return 0;
+}

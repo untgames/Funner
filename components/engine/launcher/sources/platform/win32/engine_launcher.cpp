@@ -15,7 +15,7 @@ const char* ENGINE_LIBRARY_NAME = "funner.dll";
 }
 
 //точка входа
-int main (int argc, const char* argv [])
+int main (int argc, const char* argv [], const char* env [])
 {
   HMODULE library = LoadLibrary (ENGINE_LIBRARY_NAME);
   
@@ -41,7 +41,7 @@ int main (int argc, const char* argv [])
     return 1;
   }
   
-  if (!funner->ParseCommandLine (argc, argv))
+  if (!funner->ParseCommandLine (argc, argv, env))
   {
     return 1;
   }
