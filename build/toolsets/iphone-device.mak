@@ -1,8 +1,8 @@
 ###################################################################################################
-#—борка под iPhone Device 3.1 g++ armv6 (iPhone, iPhone3G, iPod Touch, iPod Touch 2G)
+#—борка под iPhone Device 3.0 g++ armv6 (iPhone, iPhone3G, iPod Touch, iPod Touch 2G)
 ###################################################################################################
 
-IPHONEOS_DEPLOYMENT_TARGET := 3.1
+IPHONEOS_DEPLOYMENT_TARGET := 3.0
 
 export IPHONEOS_DEPLOYMENT_TARGET
 
@@ -12,7 +12,7 @@ COMMON_CFLAGS     += -miphoneos-version-min=$(IPHONEOS_DEPLOYMENT_TARGET) -DARM 
 COMMON_LINK_FLAGS += -miphoneos-version-min=$(IPHONEOS_DEPLOYMENT_TARGET)
 COMPILER_GCC      := /Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/llvm-gcc-4.2
 LINKER_GCC        := /Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/llvm-g++-4.2
-IPHONE_SDK_PATH   := /Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS5.0.sdk
+IPHONE_SDK_PATH   := /Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS4.3.sdk
 
 include $(TOOLSETS_DIR)/iphone.mak
 
