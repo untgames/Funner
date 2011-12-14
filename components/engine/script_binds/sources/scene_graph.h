@@ -112,7 +112,6 @@ extern const char* SCENE_HEIGHT_MAP_LIBRARY;
 
 void bind_scene_library                           (script::Environment&);
 void bind_node_library                            (script::Environment&);
-void bind_node_properties_library                 (script::Environment&);
 void bind_node_array_library                      (script::Environment&);
 void bind_controller_owner_mode_library           (script::Environment&);
 void bind_controller_library                      (script::Environment&);
@@ -131,6 +130,7 @@ void bind_sprite_library                          (script::Environment&);
 void bind_text_line_library                       (script::Environment&);
 void bind_visual_model_library                    (script::Environment&);
 void bind_height_map_library                      (script::Environment&);
+void bind_controller_water_library                (script::Environment&);
 void bind_controller_water_library                (script::Environment&);
 void bind_controller_move_to_node_point_library   (script::Environment&);
 void bind_controller_look_to_node_point_library   (script::Environment&);

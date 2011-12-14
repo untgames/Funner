@@ -19,7 +19,7 @@ ENGINE.SCRIPT_BINDS.TESTS.SOURCE_DIRS := tests/lua
 ENGINE.SCRIPT_BINDS.TESTS.IMPORTS	  	:= compile.script.core compile.math.vecmath compile.common compile.system compile.engine.core \
                                          compile.physics.manager link.physics.low_level.bullet_driver link.script.lua \
                                          link.engine.script_binds.bv link.engine.script_binds.sg link.engine.script_binds.math \
-                                         link.engine.script_binds.render link.engine.script_binds.common link.engine.script_binds.system \
+                                         link.engine.script_binds.common link.engine.script_binds.system \
                                          link.engine.script_binds.engine link.engine.script_binds.input \
                                          link.engine.script_binds.lua_override link.engine.script_binds.rms \
                                          link.engine.script_binds.media.players link.engine.script_binds.network \

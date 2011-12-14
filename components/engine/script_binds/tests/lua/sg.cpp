@@ -15,6 +15,7 @@ int main ()
     xtl::com_ptr<IInterpreter> script (shell.Interpreter ());                
     
     env.BindLibraries ("BoundVolumes");
+    env.BindLibraries ("Common");
     env.BindLibraries ("Math");
     env.BindLibraries ("SceneGraph");
   
