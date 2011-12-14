@@ -8,7 +8,7 @@ export.link.engine.launcher_shared.iphone.IMPORTS      := link.media.image.pvr l
                                              link.engine.subsystems.iphone_audio_session link.engine.subsystems.iphone_configuration
 export.link.engine.launcher_shared.beagleboard.IMPORTS := link.media.image.pvr
 export.link.engine.launcher_shared.IMPORTS := link.common.default_console_handler link.common.zip_file_system link.common.aes \
-                                link.media.rms link.media.rfx.xmtl link.media.sound.snddecl link.media.sound.default_decoders \
+                                link.media.rms link.media.rfx.xmtl.obsolete link.media.sound.snddecl link.media.sound.default_decoders \
                                 link.media.font.xfont link.media.players.null link.media.physics.xphys \
                                 link.input.manager.xkeymap link.input.manager.xkeyreg link.input.window_driver \
                                 link.render.scene_render.render2d link.script.lua \
