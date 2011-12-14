@@ -2,7 +2,10 @@
 
 using namespace media::adobe::xfl;
 
-namespace
+namespace components
+{
+
+namespace xfl_loader
 {
 
 const char* DOCUMENT_XML_NAME = "DOMDocument.xml";
@@ -28,11 +31,13 @@ class XflLoaderComponent
     }
 };
 
-}
-
 extern "C"
 {
 
 common::ComponentRegistrator<XflLoaderComponent> XflLoader ("media.adobe.xfl.loaders.xfl");
+
+}
+
+}
 
 }
