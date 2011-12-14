@@ -24,7 +24,7 @@ struct Test
     sprite->SetMaterial ("video_material");
     sprite->SetScale (15.0f, 15.0f, 1.0f);    
     
-    sprite->SetProperties (NodeProperties::Create ());
+    sprite->SetProperties (common::PropertyMap ());
     
     sprite->BindToScene (scene);
 

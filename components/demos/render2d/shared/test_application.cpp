@@ -63,7 +63,7 @@ struct TestApplication::Impl
   stl::auto_ptr<syslib::Window>  window;              //главное окно приложения
   xtl::auto_connection           app_idle_connection; //соединение сигнала обработчика холостого хода приложения
   SceneRender                    render;              //рендер сцены
-  render::RenderTarget           render_target;       //цель рендеринга
+  render::obsolete::RenderTarget render_target;       //цель рендеринга
   
   void OnClose ()
   {
