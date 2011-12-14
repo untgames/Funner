@@ -32,14 +32,14 @@ endif
 MSVC_PATH          := $(call convert_path,$(MSVC_PATH))
 MSVC_BIN_PATH      := $(MSVC_PATH)/bin/x86_arm
 MSVS_COMMON_PATH   := $(call convert_path,$(MSVS_COMMON_PATH))
-COMMON_CFLAGS      += -W3 -Ox -wd4996 -nologo -FC -D "_WIN32_WCE=0x502" -D "UNDER_CE" -D "WIN32_PLATFORM_PSPC" -D "WINCE" -D "ARM" -D "_ARM_" -D "POCKETPC2003_UI_MODEL"
-COMMON_LINK_FLAGS  += -NODEFAULTLIB:oldnames.lib coredll.lib corelibc.lib
+COMMON_CFLAGS      += -W3 -Ox -wd4996 -nologo -FC -D "_WIN32_WCE=0x502" -D "UNDER_CE" -D "WIN32_PLATFORM_PSPC" -D "WINCE" -D "ARM" -D "_ARM_" -D "POCKETPC2003_UI_MODEL" -D "UNICODE"
+COMMON_LINK_FLAGS  += -NODEFAULTLIB:oldnames.lib corelibc.lib
 CPU_ARCH           := armv4i
-REMOTE_INSTALL_DIR := \\funner
+REMOTE_INSTALL_DIR := \\Storage Card\\funner
 WINCE_POWERTOYS    := $(call convert_path,$(WINCE_POWERTOYS))
 CECOPY             := $(WINCE_POWERTOYS)/CEcopy/cecopy
 RAPISTART          := $(WINCE_POWERTOYS)/RAPI_Start/rapistart
-WINCE_LAUNCHER     := $(REMOTE_INSTALL_DIR)/dist/winmobile6/bin/wince-launcher.exe
+WINCE_LAUNCHER     := "$(REMOTE_INSTALL_DIR)/dist/winmobile6/bin/wince-launcher.exe"
 
 ###################################################################################################
 #Константы
@@ -50,7 +50,7 @@ EXE_SUFFIX              := .exe
 DLL_SUFFIX              := .dll
 DLL_LIB_SUFFIX          := .lib
 DLL_PREFIX              :=
-PROFILES                += msvc wince win32 has_windows arm
+PROFILES                += msvc wince win32 has_windows arm gles egl
 COMMON_LINK_FLAGS       += -subsystem:windowsce
 
 ###################################################################################################
@@ -84,7 +84,7 @@ endef
 #список подключаемых символов линковки, флаги линковки, def файл)
 ###################################################################################################
 define tools.link
-export PATH="$(MSVS_COMMON_PATH);$$PATH" && "$(MSVC_BIN_PATH)/link" -nologo -out:"$1" $(if $(filter %.dll,$1),-dll,-entry:mainACRTStartup) $(patsubst %,-libpath:"%",$3) $(patsubst %,-include:"_%",$4) $5 $2 $(COMMON_LINK_FLAGS) $(if $(map),-MAP:$(basename $1).map -MAPINFO:EXPORTS) $(if $6,-DEF:"$6")
+export PATH="$(MSVS_COMMON_PATH);$$PATH" && "$(MSVC_BIN_PATH)/link" -nologo -out:"$1" $(if $(filter %.dll,$1),-dll,-entry:mainACRTStartup) $(patsubst %,-libpath:"%",$3) $(patsubst %,-include:"%",$4) $5 $2 $(COMMON_LINK_FLAGS) $(if $(map),-MAP:$(basename $1).map -MAPINFO:EXPORTS) $(if $6,-DEF:"$6")
 endef
 
 ###################################################################################################
@@ -97,7 +97,7 @@ endef
 #Копирование файла на устройство (имя локальных файлов, имя удалённого каталога)
 define tools.install
   export SUBST_STRING=$$(cd $2 && pwd) SUBST_SUBSTRING=$$(cd $(ROOT) && pwd)/ && export SUBST_RESULT=$${SUBST_STRING/#$$SUBST_SUBSTRING/} && \
-  for file in $(subst /,\\,$1); do "$(CECOPY)" //s //is $$file dev:$(REMOTE_INSTALL_DIR)\\$$(echo $$SUBST_RESULT | sed 's/\//\\/g')\\$$(basename $$file); done
+  for file in $(subst /,\\,$1); do "$(CECOPY)" //s //is $$file "dev:$(REMOTE_INSTALL_DIR)\\$$(echo $$SUBST_RESULT | sed 's/\//\\/g')\\$$(basename $$file)"; done
 endef
 
 ###################################################################################################
@@ -105,11 +105,11 @@ endef
 ###################################################################################################
 define tools.run
    export ROOT_SUBSTRING=$$(cd $(ROOT) && pwd)/ && \
-   export SUBST_DIR_STRING=$$(cd $2 && pwd) && export SUBST_DIR_RESULT=$(REMOTE_INSTALL_DIR)/$${SUBST_DIR_STRING/#$$ROOT_SUBSTRING/} && \
+   export SUBST_DIR_STRING=$$(cd $2 && pwd) && export SUBST_DIR_RESULT="$(REMOTE_INSTALL_DIR)/$${SUBST_DIR_STRING/#$$ROOT_SUBSTRING/}" && \
    export PATH_SEARCH="$(foreach path,$3,$$(export SUBST_PATH_STRING=$$(cd $(path) && pwd) && echo $(REMOTE_INSTALL_DIR)/$${SUBST_PATH_STRING/#$$ROOT_SUBSTRING/}))" && \
    export PATH_SEARCH=$${PATH_SEARCH/\ /:} && \
-   export SUBST_CMD_STRING=$$(cd $(dir $(firstword $1)) && pwd)/$(notdir $(firstword $1)) && export SUBST_COMMAND=$(REMOTE_INSTALL_DIR)/$${SUBST_CMD_STRING/#$$ROOT_SUBSTRING/} && \
-   "$(RAPISTART)" $(subst /,\\,$(WINCE_LAUNCHER)) "$$(echo $$SUBST_COMMAND)" "$(REMOTE_INSTALL_DIR)\\$(subst /,\\,$2/$(strip $1).stdout)" "$(REMOTE_INSTALL_DIR)\\$(subst /,\\,$(patsubst ./%,%,$2))" > nul && \
+   export SUBST_CMD_STRING=$$(cd $(dir $(firstword $1)) && pwd)/$(notdir $(firstword $1)) && export SUBST_COMMAND="$(REMOTE_INSTALL_DIR)/$${SUBST_CMD_STRING/#$$ROOT_SUBSTRING/}" && \
+   "$(RAPISTART)" $(subst /,\\,$(WINCE_LAUNCHER)) "$$(echo '"'$$SUBST_COMMAND'"')" "$$(echo '"'$$SUBST_COMMAND'"'.stdout)" '"'"$$(echo $$SUBST_DIR_RESULT)"'"' > nul && \
    plink -P 1663 -telnet $(WINMOBILE_HOST)
 endef
 

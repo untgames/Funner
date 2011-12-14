@@ -10,8 +10,12 @@ DLL_SUFFIX    := .so
 DLL_PREFIX    := lib
 DLL_PATH      := LD_LIBRARY_PATH
 COMMON_CFLAGS += -DLINUX
+LIB_GCC       := ar
 
 PROFILES += linux unistd x11 glx haswchar pthread_static_library has_windows
+
+COMMON_CFLAGS     += -m32
+COMMON_LINK_FLAGS += -m32
 
 include $(TOOLSETS_DIR)/g++.mak
 
