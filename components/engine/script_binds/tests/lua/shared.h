@@ -13,6 +13,7 @@
 #include <common/file.h>
 #include <common/log.h>
 #include <common/strlib.h>
+#include <common/time.h>
 
 #include <math/matrix.h>
 #include <math/quat.h>
@@ -22,6 +23,10 @@
 #include <script/shell.h>
 
 #include <syslib/application.h>
+
+#include <physics/manager.h>
+
+#include <engine/attachments.h>
 
 using namespace script;
 using namespace math;

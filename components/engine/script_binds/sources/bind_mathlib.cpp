@@ -1,17 +1,15 @@
 #include "shared.h"
 
-#include <stl/numeric>
-
-#include <math/vector.h>
-#include <math/matrix.h>
-#include <math/quat.h>
-
 using namespace script;
 using namespace math;
 using namespace stl;
 using namespace common;
+using namespace engine;
 
-namespace
+namespace components
+{
+
+namespace math_script_bind
 {
 
 /*
@@ -541,6 +539,39 @@ void bind_math_common_library (InvokerRegistry& lib)
   lib.Register ("sign", make_invoker (&get_sign));
 }
 
+template <class T>
+quat<T> angles_to_quat (T pitch, T yaw, T roll)
+{
+  return to_quat (degree (pitch), degree (yaw), degree (roll));
+}
+
+template <class T>
+quat<T> angle_axis_to_quat (T angle, const math::vector<T, 3>& axis)
+{
+  return to_quat (degree (angle), axis);
+}
+
+template <class T>
+matrix<T, 4> rotate_angle_axis (T angle, const math::vector<T, 3>& axis)
+{
+  return rotate (degree (angle), axis);
+}
+
+template <class T>
+void bind_math_utility_library (InvokerRegistry& lib)
+{
+  lib.Register ("to_matrix", make_invoker (xtl::implicit_cast<matrix<T, 4> (*) (const quat<T>&)> (to_matrix)));
+  lib.Register ("to_quat",   make_invoker (
+    make_invoker (&angles_to_quat<T>),
+    make_invoker (&angle_axis_to_quat<T>),
+    make_invoker (xtl::implicit_cast<quat<T> (*) (const matrix<T, 4>&)> (to_quat))
+  ));
+  lib.Register ("translate", make_invoker (&translate<T>));
+  lib.Register ("scale",     make_invoker (&scale<T>));
+  lib.Register ("rotate",    make_invoker (&rotate_angle_axis<T>));
+  lib.Register ("lookat",    make_invoker (&lookat<T>));
+}
+
 /*
     Регистрация математической библиотеки
 */
@@ -559,12 +590,13 @@ void bind_math_library (Environment& environment)
   
     //регистрация библиотек
   
-  bind_math_common_library   (math_lib);
-  bind_vec_library<float, 2> (vec2_lib);
-  bind_vec_library<float, 3> (vec3_lib);
-  bind_vec_library<float, 4> (vec4_lib);     
-  bind_matrix_library<float, 4> (mat4_lib);
-  bind_quat_library<float> (quat_lib);
+  bind_math_common_library         (math_lib);
+  bind_math_utility_library<float> (math_lib);
+  bind_vec_library<float, 2>       (vec2_lib);
+  bind_vec_library<float, 3>       (vec3_lib);
+  bind_vec_library<float, 4>       (vec4_lib);
+  bind_matrix_library<float, 4>    (mat4_lib);
+  bind_quat_library<float>         (quat_lib);
   
     //регистрация специфических операций над векторами
 
@@ -610,7 +642,8 @@ class Component
   private:
     static void Bind (Environment& environment)
     {
-      bind_math_library (environment);
+      bind_math_library         (environment);
+      bind_math_splines_library (environment);
     }
 };
 
@@ -618,6 +651,8 @@ extern "C"
 {
 
 common::ComponentRegistrator<Component> MathScriptBind (COMPONENT_NAME);
+
+}
 
 }
 

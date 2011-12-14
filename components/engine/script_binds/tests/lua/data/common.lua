@@ -21,8 +21,24 @@ function test_files()
   else
     print ("File '" .. NOT_EXISTING_FILE .. "' not exist")
   end
+  
+  print ("File hash = " .. Common.File.FileHash ("data/text_file.txt"))
+  print ("File part hash = " .. Common.File.FileHash ("data/text_file.txt", 4))
+  print ("File full part hash = " .. Common.File.FileHash ("data/text_file.txt", 1024))
+end
+
+function test_post()
+  print "Post test"
+
+  local FILE_NAME = "http://www.google.com" 
+
+  local data = Common.File.PostString (FILE_NAME, "post_string")
+
+--  print ("File data: '" .. data .. "'")
+  if data ~= "" then print ("Data has received") end
 end
 
 function test ()
   test_files ()
+  test_post ()
 end

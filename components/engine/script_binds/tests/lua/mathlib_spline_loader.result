@@ -1,0 +1,10 @@
+Results of mathlib_spline_loader_test:
+mathlib spline loader test
+Loaded spline with type 'float'
+Keys count = 11
+Loaded spline with type 'vec2f'
+Keys count = 11
+Loaded spline with type 'vec3f'
+Keys count = 4
+Loaded spline with type 'vec4f'
+Keys count = 4

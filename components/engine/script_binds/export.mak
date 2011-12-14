@@ -13,8 +13,8 @@ export.link.engine.script_binds.common.IMPORTS       := link.engine.script_binds
 
 # Link engine exports
 export.link.engine.script_binds.engine.LINK_INCLUDES := EngineScriptBind
-export.link.engine.script_binds.engine.IMPORTS       := link.engine.script_binds link.engine.core link.scene_graph.core \
-                                                        link.input.manager
+export.link.engine.script_binds.engine.IMPORTS       := link.engine.script_binds link.engine.core link.scene_graph.core link.render.scene_render \
+                                                        link.input.manager link.render.scene_render link.physics.manager
 
 # Link input exports
 export.link.engine.script_binds.input.LINK_INCLUDES := InputScriptBind
@@ -26,7 +26,15 @@ export.link.engine.script_binds.lua_override.IMPORTS       := link.engine.script
 
 # Link math exports
 export.link.engine.script_binds.math.LINK_INCLUDES := MathScriptBind
-export.link.engine.script_binds.math.IMPORTS       := link.engine.script_binds
+export.link.engine.script_binds.math.IMPORTS       := link.engine.script_binds.common
+
+# Link math exports
+export.link.engine.script_binds.math.spline_loader.LINK_INCLUDES := MathSplineLoaderScriptBind
+export.link.engine.script_binds.math.spline_loader.IMPORTS       := link.engine.script_binds
+
+# Link render exports
+export.link.engine.script_binds.render.LINK_INCLUDES := RenderScriptBind
+export.link.engine.script_binds.render.IMPORTS       := link.engine.script_binds link.render.scene_render
 
 # Link media players exports
 export.link.engine.script_binds.media.players.LINK_INCLUDES := MediaPlayersScriptBind
@@ -43,3 +51,11 @@ export.link.engine.script_binds.sg.IMPORTS       := link.engine.script_binds lin
 # Link system exports
 export.link.engine.script_binds.system.LINK_INCLUDES := SystemScriptBind
 export.link.engine.script_binds.system.IMPORTS       := link.engine.script_binds link.system
+
+# Link system exports
+export.link.engine.script_binds.network.LINK_INCLUDES := NetworkScriptBind
+export.link.engine.script_binds.network.IMPORTS       := link.engine.script_binds link.network
+
+# Link system exports
+export.link.engine.script_binds.physics.LINK_INCLUDES := PhysicsScriptBind
+export.link.engine.script_binds.physics.IMPORTS       := link.engine.script_binds link.physics.scene_physics

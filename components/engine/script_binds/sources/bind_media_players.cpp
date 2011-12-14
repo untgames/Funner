@@ -7,7 +7,10 @@ using namespace media::players;
 using namespace script;
 using namespace xtl;
 
-namespace
+namespace components
+{
+
+namespace media_players_script_bind
 {
 
 /*
@@ -187,6 +190,8 @@ extern "C"
 {
 
 common::ComponentRegistrator<Component> MediaPlayersScriptBind (COMPONENT_NAME);
+
+}
 
 }
 

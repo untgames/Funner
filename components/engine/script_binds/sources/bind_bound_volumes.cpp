@@ -7,7 +7,10 @@ using namespace math;
 using namespace xtl;
 using namespace bound_volumes;
 
-namespace
+namespace components
+{
+
+namespace bind_volumes_script_bind
 {
 
 /*
@@ -112,14 +115,19 @@ void bind_axis_aligned_box_library (Environment& environment)
 
   lib.Register ("__add", make_invoker (implicit_cast<box_type (box_type::*) 
                                       (const box_type&) const> (&box_type::operator +)));
-  lib.Register ("__mul", make_invoker (implicit_cast<box_type (box_type::*) 
-                                      (const matrix<T, 4>&) const> (&box_type::operator *)));
+  lib.Register ("__mul", make_invoker (
+    make_invoker (implicit_cast<box_type (box_type::*) (const matrix<T, 4>&) const> (&box_type::operator *)),
+    make_invoker (implicit_cast<box_type (box_type::*) (const quat<T>&) const> (&box_type::operator *))
+  ));
 //  lib.Register ("__eq",  make_invoker (&box_type::operator ==));
 
   lib.Register ("get_Volume", make_invoker (&bound_volumes::volume<T>));
   lib.Register ("Equal", make_invoker (&bound_volumes::equal<T>));
   lib.Register ("Intersects", make_invoker (implicit_cast<bool (*) (const box_type&, const box_type&)> (&bound_volumes::intersects)));
-  lib.Register ("Contains", make_invoker (implicit_cast<bool (*) (const box_type&, const box_type&)> (&bound_volumes::contains)));
+  lib.Register ("Contains", make_invoker (
+    make_invoker (implicit_cast<bool (*) (const box_type&, const box_type&)> (&bound_volumes::contains)),
+    make_invoker (implicit_cast<bool (*) (const box_type&, const math::vector<T, 3>&)> (&bound_volumes::contains))
+  ));
   lib.Register ("Intersection", make_invoker (implicit_cast<box_type (*) (const box_type&, const box_type&)> (&bound_volumes::intersection)));
 
     //регистрация типов данных
@@ -150,6 +158,8 @@ extern "C"
 {
 
 common::ComponentRegistrator<Component> BoundVolumesScriptBind (COMPONENT_NAME);
+
+}
 
 }
 

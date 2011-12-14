@@ -78,8 +78,19 @@ end
 
 function xml_test ()
   local node = Common.StringNode.LoadXml ("data/string_tree.xml")
+  
   print_node (node, 0)
+  
   node:SaveXml ("/io/stdout")
+  node:SafeSaveXml ("results/string_tree.xml")
+  
+  local node1 = Common.StringNode.LoadXml ("results/string_tree.xml")
+  
+  print_node (node1, 0)  
+  
+  local node2 = Common.StringNode.LoadXml ("data/empty_string_tree.xml")
+  
+  print_node (node2, 0)    
 end
 
 function test ()

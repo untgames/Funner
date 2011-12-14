@@ -143,3 +143,24 @@ function test_quat (q)
   
   print ("Test q2:inner(q): "..tostring(q2:inner(q)))
 end
+
+function test_utility ()
+  print ("translate " .. tostring (Math.translate (vec3 (1, 2, 3))))
+  print ("rotate " .. tostring (Math.rotate (90, vec3 (0, 0, 1))))
+  print ("scale " .. tostring (Math.scale (vec3 (1, 2, 3))))
+  print ("lookat " .. tostring (Math.lookat (vec3 (1, 0, 0), vec3 (0), vec3 (0, 1, 0))))
+
+  local q = Math.to_quat (90, vec3 (0, 0, 1));
+  
+  print (string.format ("q = [%.3f %.3f %.3f %.3f] ", q.x, q.y, q.z, q.w))
+  print ("to_matrix (q) " .. tostring (Math.to_matrix (q)))
+  
+  q = Math.to_quat (90, 0, 0)
+  
+  print (string.format ("q = [%.3f %.3f %.3f %.3f] ", q.x, q.y, q.z, q.w))
+  
+  q = Math.to_quat (Math.to_matrix (q))
+  
+  print (string.format ("q = [%.3f %.3f %.3f %.3f] ", q.x, q.y, q.z, q.w))
+
+end

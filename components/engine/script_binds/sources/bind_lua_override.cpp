@@ -2,7 +2,10 @@
 
 using namespace script;
 
-namespace
+namespace components
+{
+
+namespace lua_overridescript_bind
 {
 
 /*
@@ -175,6 +178,8 @@ extern "C"
 {
 
 common::ComponentRegistrator<Component> LuaOverrideScriptBind (COMPONENT_NAME);
+
+}
 
 }
 

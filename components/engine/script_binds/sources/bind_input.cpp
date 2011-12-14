@@ -5,7 +5,10 @@
 using namespace input;
 using namespace script;
 
-namespace
+namespace components
+{
+
+namespace input_script_bind
 {
 
 /*
@@ -76,6 +79,8 @@ extern "C"
 {
 
 common::ComponentRegistrator<Component> InputScriptBind (COMPONENT_NAME);
+
+}
 
 }
 

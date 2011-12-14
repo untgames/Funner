@@ -2,6 +2,8 @@ function test ()
   print ("Axis aligned box test")
 
   local aabox1 = BoundVolumes.AxisAlignedBox.Create ()
+  local aabox2 = BoundVolumes.AxisAlignedBox.Create (vec3 (1, 2, 3), vec3 (4, 5, 6))
+  local aabox3 = BoundVolumes.AxisAlignedBox.Create (1, 2, 3, 4, 5, 6)
 
   print ("minimum = " .. tostring (aabox1.Minimum))
   print ("maximum = " .. tostring (aabox1.Maximum))
@@ -37,9 +39,14 @@ function test ()
   print ("box3 minimum = " .. tostring (aabox3.Minimum))
   print ("box3 maximum = " .. tostring (aabox3.Maximum))
 
+  aabox3 = aabox1 * Math.to_quat (90, 0, 0)
+
+  print ("box3 minimum = " .. tostring (aabox3.Minimum))
+  print ("box3 maximum = " .. tostring (aabox3.Maximum))
+
   aabox1:Reset (vec3 (1, 1, 1))
 
-  print ("box3 volume = " .. tostring (aabox3.Volume))
+  print (string.format ("box3 volume = %.2f", aabox3.Volume))
   print ("box1 volume = " .. tostring (aabox1.Volume))
 
   print ("is box2 intersects box3 ? " .. tostring (BoundVolumes.AxisAlignedBox.Intersects (aabox2, aabox3)))
@@ -48,6 +55,8 @@ function test ()
   aabox3:SetExtents (vec3 (-5, -5, -5), vec3 (4, 4, 4))
   print ("is transformed box2 intersects box3 ? " .. tostring (BoundVolumes.AxisAlignedBox.Intersects (aabox2, aabox3)))
   print ("is transformed box2 contatins box3 ? " .. tostring (BoundVolumes.AxisAlignedBox.Contains (aabox2, aabox3)))
+  print ("is transformed box2 contatins point 1 1 1 ? " .. tostring (aabox2:Contains (vec3 (1))))
+  print ("is transformed box2 contatins point 6 6 6 ? " .. tostring (aabox2:Contains (vec3 (6))))
 
   aabox3:SetExtents (vec3 (-6, -6, -6), vec3 (14, 14, 14))
 

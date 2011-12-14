@@ -640,7 +640,6 @@ function test_text_line ()
   local text_line1 = Scene.TextLine.Create ()
 
   print ("Text = " .. text_line1.Text)
-  print ("TextUnicode = " .. tostring (text_line1.TextUnicode))
   print ("Font = " .. text_line1.Font)
   print ("Color = " .. tostring (text_line1.Color))
   print ("Horizontal aligment = " .. get_name (text_line1.HorizontalAlignment) .. " vertical aligment = " .. get_name (text_line1.VerticalAlignment))
@@ -652,7 +651,6 @@ function test_text_line ()
   text_line1.VerticalAlignment   = Scene.TextLineAlignment.Bottom
 
   print ("Text = " .. text_line1.Text)
-  print ("TextUnicode = " .. tostring (text_line1.TextUnicode))
   print ("Font = " .. text_line1.Font)
   print ("Color = " .. tostring (text_line1.Color))
   print ("Horizontal aligment = " .. get_name (text_line1.HorizontalAlignment) .. " vertical aligment = " .. get_name (text_line1.VerticalAlignment))
@@ -660,7 +658,6 @@ function test_text_line ()
   text_line1.Text = "Non-unicode text"
 
   print ("Text = " .. text_line1.Text)
-  print ("TextUnicode = " .. tostring (text_line1.TextUnicode))
 
   text_line1:SetColor (0.4, 0.3, 0.2, 0.1)
 
@@ -677,6 +674,109 @@ function test_text_line ()
   text_line1:SetAlignment (Scene.TextLineAlignment.BaseLine, Scene.TextLineAlignment.BaseLine)
 
   print ("Horizontal aligment = " .. get_name (text_line1.HorizontalAlignment) .. " vertical aligment = " .. get_name (text_line1.VerticalAlignment))
+end
+
+function test_move_to_node_point_controller ()
+  print ("MoveToNodePoint controller test")
+
+  local scene = Scene.Scene.Create ()
+  local node1 = Scene.Node.Create ()
+  local node2 = Scene.Node.Create ()
+  
+  node1:BindToScene (scene)
+  node2:BindToParent (node1)
+  
+  local mover1 = Scene.Controllers.MoveToNodePoint.Create (node1)
+  local mover2 = Scene.Controllers.MoveToNodePoint.Create (node2)
+
+  local evaluator = Scene.AccelerationEvaluators.Linear.Create ()
+  
+  evaluator.Acceleration = 1
+  evaluator.Deceleration = 1
+  evaluator.MaxSpeed     = 0.5
+  
+  mover1.AccelerationHandler = evaluator
+  mover2.AccelerationHandler = evaluator
+  
+  mover1:Start (scene.Root, vec3 (10, 0, 0))
+  mover2:Start (node1, vec3 (0, 10, 0))
+  
+  scene.Root:Update (1)
+
+  print (string.format ("node1 position is %f %f %f, node2 position is %f %f %f", node1.WorldPosition.x, node1.WorldPosition.y, node1.WorldPosition.z, node2.WorldPosition.x, node2.WorldPosition.y, node2.WorldPosition.z))
+  
+  mover1:Stop ()
+  mover2:Stop ()
+  
+  scene.Root:Update (1)
+
+  print (string.format ("node1 position is %f %f %f, node2 position is %f %f %f", node1.WorldPosition.x, node1.WorldPosition.y, node1.WorldPosition.z, node2.WorldPosition.x, node2.WorldPosition.y, node2.WorldPosition.z))
+end
+
+function test_look_to_node_point_controller ()
+  print ("LookToNodePoint controller test")
+
+  local scene = Scene.Scene.Create ()
+  local node1 = Scene.Node.Create ()
+  
+  node1:BindToScene (scene)
+  
+  local mover1 = Scene.Controllers.LookToNodePoint.Create (node1)
+
+  local evaluator = Scene.AccelerationEvaluators.Linear.Create ()
+  
+  evaluator.Acceleration = 10
+  evaluator.Deceleration = 10
+  evaluator.MaxSpeed     = 5
+  
+  mover1.AccelerationHandler = evaluator
+  
+  mover1:Start (scene.Root, vec3 (10, 0, 0), Scene.NodeOrt.Z, Scene.NodeOrt.Y)
+  
+  scene.Root:Update (0.2)
+
+  print (string.format ("node1 orientation is %f %f %f %f", node1.WorldOrientation.x, node1.WorldOrientation.y, node1.WorldOrientation.z, node1.WorldOrientation.w))
+  
+  mover1:Stop ()
+  
+  scene.Root:Update (0.1)
+
+  print (string.format ("node1 orientation is %f %f %f %f", node1.WorldOrientation.x, node1.WorldOrientation.y, node1.WorldOrientation.z, node1.WorldOrientation.w))
+end
+
+function test_align_with_node_controller ()
+  print ("AlignWithNode controller test")
+
+  local scene = Scene.Scene.Create ()
+  local node1 = Scene.Node.Create ()
+  local node2 = Scene.Node.Create ()
+  
+  node1:BindToScene (scene)
+  node2:BindToScene (scene)
+  
+  local mover1 = Scene.Controllers.AlignWithNode.Create (node2)
+
+  local evaluator = Scene.AccelerationEvaluators.Linear.Create ()
+  
+  evaluator.Acceleration = 10
+  evaluator.Deceleration = 10
+  evaluator.MaxSpeed     = 5
+  
+  mover1.AccelerationHandler = evaluator
+  
+  mover1:Start (node1, Scene.NodeOrt.Z, Scene.NodeOrt.Z, Scene.NodeOrt.X)
+  
+  node1:SetEulerOrientation (90, 0, 0, Scene.NodeTransformSpace.World)
+  
+  scene.Root:Update (0.2)
+
+  print (string.format ("node2 orientation is %f %f %f %f", node2.WorldOrientation.x, node2.WorldOrientation.y, node2.WorldOrientation.z, node2.WorldOrientation.w))
+  
+  mover1:Stop ()
+  
+  scene.Root:Update (0.1)
+
+  print (string.format ("node2 orientation is %f %f %f %f", node2.WorldOrientation.x, node2.WorldOrientation.y, node2.WorldOrientation.z, node2.WorldOrientation.w))
 end
 
 function test ()
@@ -715,4 +815,8 @@ function test ()
   test_scene ()
 
   test_text_line ()
+
+  test_look_to_node_point_controller ()
+  test_move_to_node_point_controller ()
+  test_align_with_node_controller ()
 end

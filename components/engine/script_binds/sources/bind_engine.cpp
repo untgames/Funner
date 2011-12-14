@@ -8,13 +8,18 @@
 
 #include <input/cursor.h>
 
+#include <syslib/window.h>
+
 #include <engine/attachments.h>
 #include <engine/subsystem_manager.h>
 
 using namespace engine;
 using namespace script;
 
-namespace
+namespace common
+{
+
+namespace engine_script_bind
 {
 
 /*
@@ -42,6 +47,20 @@ template <> void register_attachment<scene_graph::Listener> (const char* name, s
   AttachmentRegistry::Register (name, listener_pointer);
 }
 
+template <> void register_attachment<syslib::Window> (const char* name, syslib::Window& window)
+{
+  xtl::trackable_ptr<syslib::Window> window_pointer (&window);
+
+  AttachmentRegistry::Register (name, window_pointer);
+}
+
+template <> void register_attachment<physics::PhysicsManager> (const char* name, physics::PhysicsManager& manager)
+{
+  xtl::trackable_ptr<physics::PhysicsManager> manager_pointer (&manager);
+
+  AttachmentRegistry::Register (name, manager_pointer);
+}
+
 template <class T> void unregister_attachment (const char* name)
 {
   AttachmentRegistry::Unregister<T> (name);
@@ -64,6 +83,20 @@ template <> struct selector_result_type<scene_graph::Listener>
   typedef scene_graph::Listener::Pointer type;
 
   static type get (scene_graph::Listener& value) { return &value; }
+};
+
+template <> struct selector_result_type<syslib::Window>
+{
+  typedef xtl::trackable_ptr<syslib::Window> type;
+
+  static type get (syslib::Window& value) { return &value; }
+};
+
+template <> struct selector_result_type<physics::PhysicsManager>
+{
+  typedef xtl::trackable_ptr<physics::PhysicsManager> type;
+
+  static type get (physics::PhysicsManager& value) { return &value; }
 };
 
 template <class T> typename selector_result_type<T>::type get_attachment (const char* name)
@@ -110,17 +143,31 @@ void bind_attachment_registry_library (Environment& environment)
 
   typedef xtl::function<void (const char*)> InputHandler;
 
-  bind_attachment_methods<InputHandler>  (environment, "InputEventHandlers");
-  bind_attachment_methods<input::Cursor> (environment, "Cursors");
+  bind_attachment_methods<InputHandler>            (environment, "InputEventHandlers");
+  bind_attachment_methods<input::Cursor>           (environment, "Cursors");
+  bind_attachment_methods<syslib::Window>          (environment, "Windows");
+  bind_attachment_methods<physics::PhysicsManager> (environment, "PhysicsManagers");
+}
+
+namespace
+{
+
+const char* get_subsystem_name (SubsystemManager& manager, size_t index)
+{
+  return manager.Subsystem (index).Name ();
+}
+
 }
 
 void bind_subsystem_manager_library (Environment& environment)
 {
   InvokerRegistry lib = environment.Library (SUBSYSTEM_MANAGER_LIBRARY);
 
-  lib.Register ("Start",   make_invoker (xtl::implicit_cast<void (SubsystemManager::*) (const char*, const char*)> (&SubsystemManager::Start)));
-  lib.Register ("Restart", make_invoker (xtl::implicit_cast<void (SubsystemManager::*) (const char*, const char*)> (&SubsystemManager::Restart)));
-  lib.Register ("Remove",  make_invoker (xtl::implicit_cast<void (SubsystemManager::*) (const char*)>              (&SubsystemManager::Remove)));
+  lib.Register ("Start",               make_invoker (xtl::implicit_cast<void (SubsystemManager::*) (const char*, const char*)> (&SubsystemManager::Start)));
+  lib.Register ("Restart",             make_invoker (xtl::implicit_cast<void (SubsystemManager::*) (const char*, const char*)> (&SubsystemManager::Restart)));
+  lib.Register ("Remove",              make_invoker (xtl::implicit_cast<void (SubsystemManager::*) (const char*)>              (&SubsystemManager::Remove)));
+  lib.Register ("get_SubsystemsCount", make_invoker (&SubsystemManager::SubsystemsCount));
+  lib.Register ("SubsystemName",       make_invoker (get_subsystem_name));
 
   environment.RegisterType<SubsystemManager> (SUBSYSTEM_MANAGER_LIBRARY);
 }
@@ -149,6 +196,8 @@ extern "C"
 {
 
 common::ComponentRegistrator<Component> EngineScriptBind (COMPONENT_NAME);
+
+}
 
 }
 

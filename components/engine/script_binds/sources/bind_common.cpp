@@ -7,7 +7,10 @@ using namespace script;
 using namespace common;
 using namespace xtl;
 
-namespace
+namespace components
+{
+
+namespace common_script_bind
 {
 
 /*
@@ -32,11 +35,12 @@ class Component
   private:
     static void Bind (Environment& environment)
     {
-      engine::bind_common_file_library (environment);
-      engine::bind_common_string_tree  (environment);
-      engine::bind_common_signals      (environment);
-      engine::bind_common_action_queue (environment);
-      engine::bind_common_timer        (environment);
+      engine::bind_common_file_library  (environment);
+      engine::bind_common_string_tree   (environment);
+      engine::bind_common_signals       (environment);
+      engine::bind_common_action_queue  (environment);
+      engine::bind_common_timer         (environment);
+      engine::bind_common_async_library (environment);
       engine::bind_common_property_map (environment);
     }
 };
@@ -45,6 +49,8 @@ extern "C"
 {
 
 common::ComponentRegistrator<Component> CommonScriptBind (COMPONENT_NAME);
+
+}
 
 }
 

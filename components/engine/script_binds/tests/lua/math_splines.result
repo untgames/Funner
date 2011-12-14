@@ -1,0 +1,158 @@
+Results of math_splines1_test:
+Test splines library:
+Testing spline Math.LinearSplineFloat:
+Spline default begin wrap is Clamp
+Spline default end wrap is Clamp
+Spline keys count is 0
+Spline empty is true
+Spline capacity is 0
+Spline closed is true
+Spline closed_eps is 0
+Spline min_time is 0
+Spline max_time is 0
+Spline default begin wrap is Repeat
+Spline default end wrap is Mirror
+Spline keys count is 2
+Spline empty is false
+Spline capacity is 10
+Spline closed is true
+Spline closed_eps is 0
+Spline min_time is 1
+Spline max_time is 2
+key 0 time is 1
+key 0 value is '0'
+key 1 time is 2
+key 1 value is '2'
+key 1 time is 3
+key 1 value is '3'
+spline value for time -1 is '3'
+spline value for time 0 is '1.5'
+spline value for time 1 is '0'
+spline value for time 2 is '1.5'
+spline value for time 3 is '3'
+spline value for time 4 is '1.5'
+spline value for time -1 is '0'
+spline value for time 0 is '0'
+spline value for time 1 is '0'
+spline value for time 2 is '1.5'
+spline value for time 3 is '3'
+spline value for time 4 is '3'
+Spline keys count is 1
+Spline keys count is 0
+Testing spline Math.LinearSplineVec2:
+Spline default begin wrap is Clamp
+Spline default end wrap is Clamp
+Spline keys count is 0
+Spline empty is true
+Spline capacity is 0
+Spline closed is true
+Spline closed_eps is 0
+Spline min_time is 0
+Spline max_time is 0
+Spline default begin wrap is Repeat
+Spline default end wrap is Mirror
+Spline keys count is 2
+Spline empty is false
+Spline capacity is 10
+Spline closed is false
+Spline closed_eps is 0
+Spline min_time is 1
+Spline max_time is 2
+key 0 time is 1
+key 0 value is '0 0'
+key 1 time is 2
+key 1 value is '2 2'
+key 1 time is 3
+key 1 value is '3 3'
+spline value for time -1 is '3 3'
+spline value for time 0 is '1.5 1.5'
+spline value for time 1 is '0 0'
+spline value for time 2 is '1.5 1.5'
+spline value for time 3 is '3 3'
+spline value for time 4 is '1.5 1.5'
+spline value for time -1 is '0 0'
+spline value for time 0 is '0 0'
+spline value for time 1 is '0 0'
+spline value for time 2 is '1.5 1.5'
+spline value for time 3 is '3 3'
+spline value for time 4 is '3 3'
+Spline keys count is 1
+Spline keys count is 0
+Testing spline Math.LinearSplineVec3:
+Spline default begin wrap is Clamp
+Spline default end wrap is Clamp
+Spline keys count is 0
+Spline empty is true
+Spline capacity is 0
+Spline closed is true
+Spline closed_eps is 0
+Spline min_time is 0
+Spline max_time is 0
+Spline default begin wrap is Repeat
+Spline default end wrap is Mirror
+Spline keys count is 2
+Spline empty is false
+Spline capacity is 10
+Spline closed is false
+Spline closed_eps is 0
+Spline min_time is 1
+Spline max_time is 2
+key 0 time is 1
+key 0 value is '0 0 0'
+key 1 time is 2
+key 1 value is '2 2 2'
+key 1 time is 3
+key 1 value is '3 3 3'
+spline value for time -1 is '3 3 3'
+spline value for time 0 is '1.5 1.5 1.5'
+spline value for time 1 is '0 0 0'
+spline value for time 2 is '1.5 1.5 1.5'
+spline value for time 3 is '3 3 3'
+spline value for time 4 is '1.5 1.5 1.5'
+spline value for time -1 is '0 0 0'
+spline value for time 0 is '0 0 0'
+spline value for time 1 is '0 0 0'
+spline value for time 2 is '1.5 1.5 1.5'
+spline value for time 3 is '3 3 3'
+spline value for time 4 is '3 3 3'
+Spline keys count is 1
+Spline keys count is 0
+Testing spline Math.LinearSplineVec4:
+Spline default begin wrap is Clamp
+Spline default end wrap is Clamp
+Spline keys count is 0
+Spline empty is true
+Spline capacity is 0
+Spline closed is true
+Spline closed_eps is 0
+Spline min_time is 0
+Spline max_time is 0
+Spline default begin wrap is Repeat
+Spline default end wrap is Mirror
+Spline keys count is 2
+Spline empty is false
+Spline capacity is 10
+Spline closed is false
+Spline closed_eps is 0
+Spline min_time is 1
+Spline max_time is 2
+key 0 time is 1
+key 0 value is '0 0 0 0'
+key 1 time is 2
+key 1 value is '2 2 2 2'
+key 1 time is 3
+key 1 value is '3 3 3 3'
+spline value for time -1 is '3 3 3 3'
+spline value for time 0 is '1.5 1.5 1.5 1.5'
+spline value for time 1 is '0 0 0 0'
+spline value for time 2 is '1.5 1.5 1.5 1.5'
+spline value for time 3 is '3 3 3 3'
+spline value for time 4 is '1.5 1.5 1.5 1.5'
+spline value for time -1 is '0 0 0 0'
+spline value for time 0 is '0 0 0 0'
+spline value for time 1 is '0 0 0 0'
+spline value for time 2 is '1.5 1.5 1.5 1.5'
+spline value for time 3 is '3 3 3 3'
+spline value for time 4 is '3 3 3 3'
+Spline keys count is 1
+Spline keys count is 0

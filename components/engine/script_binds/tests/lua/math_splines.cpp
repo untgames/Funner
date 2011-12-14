@@ -1,10 +1,10 @@
 #include "shared.h"
 
-const char* SCRIPT_FILE_NAME = "data/mathlib.lua";
+const char* SCRIPT_FILE_NAME = "data/math_splines.lua";
 
 int main ()
 {
-  printf ("Results of mathlib1_test:\n");
+  printf ("Results of math_splines1_test:\n");
   
   try
   {
@@ -19,21 +19,9 @@ int main ()
     env.BindLibraries ("Math");
     load_script       (*script, SCRIPT_FILE_NAME);
     
-    printf ("Test vec3f library:\n");
-
-    invoke<void> (*script, "test_vector", vec3f (1, 2, 3));
+    printf ("Test splines library:\n");
     
-    printf ("Test mat4f library:\n");
-    
-    invoke<void> (*script, "test_matrix", mat4f (1));
-    
-    printf ("Test quatf library:\n");
-    
-    invoke<void> (*script, "test_quat", quatf (1));
-
-    printf ("Test utility library:\n");
-
-    invoke<void> (*script, "test_utility");
+    invoke<void> (*script, "test");
   }
   catch (xtl::bad_any_cast& exception)
   {

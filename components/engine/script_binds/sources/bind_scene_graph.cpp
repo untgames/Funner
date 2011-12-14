@@ -41,7 +41,6 @@ const char* SCENE_SPRITE_LIBRARY                      = "Scene.Sprite";
 const char* SCENE_TEXT_LINE_LIBRARY                   = "Scene.TextLine";
 const char* SCENE_VISUAL_MODEL_LIBRARY                = "Scene.VisualModel";
 const char* SCENE_HEIGHT_MAP_LIBRARY                  = "Scene.HeightMap";
-const char* SCENE_CONTROLLER_WATER_LIBRARY            = "Scene.Controllers.Water";
 const char* BINDER_NAME                               = "SceneGraph";
 const char* COMPONENT_NAME                            = "script.binds.SceneGraph";
 
@@ -49,7 +48,10 @@ const char* COMPONENT_NAME                            = "script.binds.SceneGraph
 
 }
 
-namespace
+namespace components
+{
+
+namespace scene_graph_script_bind
 {
 
 /*
@@ -58,27 +60,32 @@ namespace
 
 void bind_scene_graph_library (Environment& environment)
 {
-  bind_scene_library                 (environment);
-  bind_node_library                  (environment);
-  bind_node_array_library            (environment);
-  bind_controller_owner_mode_library (environment);  
-  bind_controller_library            (environment);
-  bind_entity_library                (environment);
-  bind_perspective_camera_library    (environment);
-  bind_ortho_camera_library          (environment);
-  bind_light_library                 (environment);
-  bind_direct_light_library          (environment);
-  bind_spot_light_library            (environment);
-  bind_point_light_library           (environment);
-  bind_box_helper_library            (environment);
-  bind_listener_library              (environment);
-  bind_sound_emitter_library         (environment);
-  bind_sprite_model_library          (environment);
-  bind_sprite_library                (environment);
-  bind_text_line_library             (environment);
-  bind_visual_model_library          (environment);
-  bind_height_map_library            (environment);
-  bind_controller_water_library      (environment);
+  bind_scene_library                           (environment);
+  bind_node_library                            (environment);
+  bind_node_array_library                      (environment);
+  bind_controller_owner_mode_library           (environment);
+  bind_controller_library                      (environment);
+  bind_entity_library                          (environment);
+  bind_perspective_camera_library              (environment);
+  bind_ortho_camera_library                    (environment);
+  bind_light_library                           (environment);
+  bind_direct_light_library                    (environment);
+  bind_spot_light_library                      (environment);
+  bind_point_light_library                     (environment);
+  bind_box_helper_library                      (environment);
+  bind_listener_library                        (environment);
+  bind_sound_emitter_library                   (environment);
+  bind_sprite_model_library                    (environment);
+  bind_sprite_library                          (environment);
+  bind_text_line_library                       (environment);
+  bind_visual_model_library                    (environment);
+  bind_height_map_library                      (environment);
+  bind_controller_water_library                (environment);
+  bind_controller_move_to_node_point_library   (environment);
+  bind_controller_look_to_node_point_library   (environment);
+  bind_controller_align_with_node_library      (environment);
+  bind_linear_acceleration_evaluator_library   (environment);
+  bind_controller_sync_physics_to_node_library (environment);
 }
 
 /*
@@ -104,6 +111,8 @@ extern "C"
 {
 
 common::ComponentRegistrator<Component> SceneGraphScriptBind (COMPONENT_NAME);
+
+}
 
 }
 
