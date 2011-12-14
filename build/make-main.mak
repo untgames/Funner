@@ -23,8 +23,8 @@ DOXYGEN_TEMPLATE_CFG_FILE_SHORT_NAME    := template.cfg  #Имя шаблонного файла с
 DOXYGEN_TAGS_DIR_SHORT_NAME             := ~DOXYGEN_TAGS #Имя каталога с тэгами документации
 EXPORT_VAR_PREFIX                       := export        #Префикс имени переменной экспортирования настроек компонента
 BATCH_COMPILE_FLAG_FILE_SHORT_NAME      := batch-flag    #Базовое имя файла-флага пакетной компиляции
-VALID_TARGET_TYPES                      := static-lib dynamic-lib application test-suite package doxygen-info sdk #Допустимые типы целей
 PACKAGE_COMMANDS                        := build clean test check run install export info #Команды, делегируемые компонентам пакета
+VALID_TARGET_TYPES                      := static-lib dynamic-lib application test-suite package doxygen-info sdk ignore #Допустимые типы целей
 COMPILE_TOOL                            := tools.c++compile     #Имя макроса утилиты компиляции C++ файлов
 LINK_TOOL                               := tools.link           #Имя макроса утилиты редактора связей
 LIB_TOOL                                := tools.lib            #Имя макроса утилиты архивирования объектных файлов
@@ -227,26 +227,26 @@ endef
 ###################################################################################################
 ifneq (,$(filter Win%,$(OS)))
 
-#Выполнение удаленной команды (команда, хост@пользователь, пароль)
+#Выполнение удаленной команды (команда, хост@пользователь, пароль, порт, ключ)
 define ssh_run
-plink $2 -pw $3 $1
+plink $(if $4,-P $4) $2 $(if $3,-pw $3,-pw "") $(if $5,-i $5) $1
 endef
 
-#Копирование файла на удаленную машину (источник, приёмник, пароль)
+#Копирование файла на удаленную машину (источник, приёмник, пароль, порт, ключ)
 define ssh_copy
-pscp -scp -r -batch -pw $3 $1 $2
+pscp -r -scp -batch $(if $4,-P $4) $(if $3,-pw $3,-pw "") $(if $5,-i $5) $1 $2
 endef
 
 else
 
-#Выполнение удаленной команды (команда, хост@пользователь, пароль)
+#Выполнение удаленной команды (команда, хост@пользователь, пароль, порт, ключ)
 define ssh_run
-sshpass -p $3 ssh $2 $1
+sshpass -p $3 ssh $(if $4,-P $4) $(if $5,-i $5) $2 $1
 endef
 
-#Копирование файла на удаленную машину (источник, приёмник, пароль)
+#Копирование файла на удаленную машину (источник, приёмник, пароль, порт, ключ)
 define ssh_copy
-sshpass -p $3 scp -r $1 $2
+sshpass -p $3 scp -r $(if $4,-P $4) $(if $5,-i $5) $1 $2
 endef
 
 endif
@@ -422,9 +422,14 @@ define process_source_dir
   
   ifneq (,$$(wildcard $2/sources.mak))
     SOURCE_FILES :=
+
     GENERATED_SOURCE_FILES :=
+    
+    $$(foreach profile,$(PROFILES),$$(eval SOURCE_FILES.$$(profile) :=))      
   
     include $2/sources.mak    
+    
+    $$(foreach profile,$(PROFILES),$$(eval $$(MODULE_NAME).SOURCE_FILES := $$($$(MODULE_NAME).SOURCE_FILES) $$(SOURCE_FILES.$$(profile))))    
 
     $$(MODULE_NAME).SOURCE_FILES := $$(wildcard $$(SOURCE_FILES:%=$2/%)) $$(GENERATED_SOURCE_FILES)
   else
@@ -524,6 +529,10 @@ define process_target_with_sources
   
   $$($1.INSTALLATION_FLAG): $$($1.INSTALLATION_FILES)
 		@touch $$@
+endef
+
+#Игнорирование цели
+define process_target.ignore
 endef
 
 #Обработка цели static-lib (имя цели)
@@ -818,7 +827,7 @@ define process_target.sdk
   $1.EXPORT.INCLUDES           := $$($1.INCLUDE_DIRS)
   $1.EXPORT.DLLS               := $$($1.DLLS)
   $1.EXPORT.EXECUTABLES        := $$($1.EXECUTABLES)
-  $1.EXPORT.CHMS               := $$($1.CHMS)
+  $1.EXPORT.CHMS               := $$($1.CHMS)  
   $1.EXPORT.LIB_FILTER         := $$(strip $$($1.LIB_FILTER))
   $1.EXPORT.LIB_EXCLUDE_FILTER := $$($1.LIB_EXCLUDE_FILTER)  
   $1.EXPORT.OUT_DIR            := $$(if $$($1.OUT_DIR),$$($1.OUT_DIR),$$($1.NAME))
@@ -842,9 +851,9 @@ ifneq (,$$($1.NAME))
 		@echo '#Exports for $$($1.NAME)'> $$@
 		@echo '$$($1.COMPILE_PREFIX).INCLUDE_DIRS := $$(notdir $$(EXPORT_INCLUDE_DIR))' >> $$@		
 		@echo '$$($1.LINK_PREFIX).LIB_DIRS        := $$(notdir $$(EXPORT_LIB_DIR))' >> $$@
-		@echo '$$($1.LINK_PREFIX).LIBS            := $$(foreach lib,$$($1.LIBS),$$(lib) )' >> $$@		
-		@echo '$$($1.LINK_PREFIX).LINK_INCLUDES   := $$(foreach link,$$($1.LINK_INCLUDES),$$(link) )' >> $$@
-		@echo '$$($1.RUN_PREFIX).DLLS             := $$(foreach dll,$$($1.DLLS),$$(dll) )' >> $$@
+		@echo '$$($1.LINK_PREFIX).LIBS            := $$(strip $$($1.LIBS))' >> $$@		
+		@echo '$$($1.LINK_PREFIX).LINK_INCLUDES   := $$($1.LINK_INCLUDES)' >> $$@
+		@echo '$$($1.RUN_PREFIX).DLLS             := $$($1.DLLS)' >> $$@
 		@echo '$$($1.RUN_PREFIX).DLL_DIRS         := $$(notdir $$(EXPORT_DLL_DIR))' >> $$@
 
 endif
@@ -855,6 +864,7 @@ endef
 define import_variables
 #  $$(warning src='$1' dst='$2' path='$3')  
 
+  $2.TYPE                 := $$(if $$($2.TYPE),$$($2.TYPE),$$($1.TYPE))
   $2.INCLUDE_DIRS         := $$($2.INCLUDE_DIRS) $$($1.INCLUDE_DIRS:%=$3%)
   $2.INCLUDE_FILES        := $$($2.INCLUDE_FILES) $$($1.INCLUDE_FILES)
   $2.SOURCE_DIRS          := $$($2.SOURCE_DIRS) $$($1.SOURCE_DIRS:%=$3%)
@@ -959,14 +969,14 @@ define process_target_common
   $1.EXPORT.INCLUDES    := $$(call specialize_paths,$$($1.EXPORT.INCLUDES))
   $1.EXPORT.DLLS        := $$($1.EXPORT.DLLS:%=$$($1.EXPORT.OUT_DIR)/$$(EXPORT_DLL_DIR)/$(DLL_PREFIX)%$(DLL_SUFFIX))
   $1.EXPORT.EXECUTABLES := $$($1.EXPORT.EXECUTABLES:%=$$(DIST_BIN_DIR)/%$(EXE_SUFFIX))
-  $1.EXPORT.CHMS        := $$($1.EXPORT.CHMS:%=$$(DIST_INFO_DIR)/%.chm)  
+  $1.EXPORT.CHMS        := $$($1.EXPORT.CHMS:%=$$(DIST_INFO_DIR)/%.chm)
 
   export: $$($1.EXPORT.DLLS) $$($1.EXPORT.CHMS)
 
   $$(foreach source,$$($1.EXPORT.LIBS),$$(eval $$(call process_copy_files,$$(source),$$($1.EXPORT.OUT_DIR)/$$(EXPORT_LIB_DIR),$1)))
   $$(foreach source,$$($1.EXPORT.INCLUDES),$$(eval $$(call process_copy_files,$$(source),$$($1.EXPORT.OUT_DIR)/$$(EXPORT_INCLUDE_DIR),$1)))
   $$(foreach source,$$($1.EXPORT.EXECUTABLES),$$(eval $$(call process_copy_files,$$(source),$$($1.EXPORT.OUT_DIR)/$$(EXPORT_BIN_DIR),$1)))
-  $$(foreach source,$$($1.EXPORT.CHMS),$$(eval $$(call process_copy_files,$$(source),$$($1.EXPORT.OUT_DIR)/$$(EXPORT_INFO_DIR),$1)))  
+  $$(foreach source,$$($1.EXPORT.CHMS),$$(eval $$(call process_copy_files,$$(source),$$($1.EXPORT.OUT_DIR)/$$(EXPORT_INFO_DIR),$1)))
 
   $$(foreach file,$$($1.EXPORT.DLLS),$$(eval $$(call create_extern_file_dependency,$$(file),$$($1.DLL_DIRS))))
 endef

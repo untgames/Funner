@@ -1,0 +1,499 @@
+#!/usr/bin/perl
+
+my $hacks = "/cygdrive$ENV{ALCHEMY_SDK}/achacks/hacks.pl";
+require $hacks;
+
+###
+### Tries to act like gcc and pre-process, compile, and link in the AVM2 env
+### It takes many liberties but should work with typical uses
+###
+
+# TODO make abcs to serve as implibs for shared case
+#$hintClass="$home/TT_play/tamarin-tracing/core"; # for tamarin tracing work
+$cpackage = "cmodule";
+$flashlibs="$home/flashlibs";
+$libc="$home/avm2-libc";
+$libclib="$libc/lib/avm2-libc.l.bc";
+$libcpplib="$libc/lib/avm2-libstdc++.l.bc";
+$machimp="$libc/lib/asmachine.abc";
+$libcinc="$libc/include";
+$libcppinc="$libc/include/c++/3.4";
+$avm2envh="$libc/avm2/AVM2Env.h";
+$swfbridge=$ENV{SWFBRIDGE} || "$home/swfbridge/swfbridge";
+@asimps =
+(
+"Date",
+"flash.utils:Dictionary",
+"flash.utils:Timer",
+"flash.net:Socket",
+"flash.events:Event",
+"flash.events:ProgressEvent",
+"flash.events:IOErrorEvent",
+"flash.utils:ByteArray",
+"flash.display:Sprite",
+"flash.display:Stage",
+"flash.text:TextField",
+"flash.display:Bitmap",
+"flash.display:BitmapData",
+);
+$internsyms=<<END
+_start
+malloc
+free
+__adddi3
+__anddi3
+__ashldi3
+__ashrdi3
+__cmpdi2
+__divdi3
+__fixdfdi
+__fixsfdi
+__fixunsdfdi
+__fixunssfdi
+__floatdidf
+__floatdisf
+__floatunsdidf
+__iordi3
+__lshldi3
+__lshrdi3
+__moddi3
+__muldi3
+__negdi2
+__one_cmpldi2
+__qdivrem
+__adddi3
+__anddi3
+__ashldi3
+__ashrdi3
+__cmpdi2
+__divdi3
+__qdivrem
+__fixdfdi
+__fixsfdi
+__fixunsdfdi
+__fixunssfdi
+__floatdidf
+__floatdisf
+__floatunsdidf
+__iordi3
+__lshldi3
+__lshrdi3
+__moddi3
+__muldi3
+__negdi2
+__one_cmpldi2
+__subdi3
+__ucmpdi2
+__udivdi3
+__umoddi3
+__xordi3
+__subdi3
+__ucmpdi2
+__udivdi3
+__umoddi3
+__xordi3
+__error
+END
+;
+$internsyms = join(",", split(/\s+/s, $internsyms));
+
+# libs we know about locally
+$expat = "$home/expat-2.0.1";
+$freetype = "$home/freetype-2.3.5";
+$fontconfig = "$home/fontconfig-2.2.96";
+$cairo = "$home/cairo-1.4.14";
+
+@nostds = ($name eq "g++") ? ("-nostdinc", "-nostdinc++") :
+  ("-nostdinc");
+@incs = ($name eq "g++") ? ("-I$libcinc", "-I$libcppinc") :
+  ("-I$libcinc");
+# additional stuff...
+push(@incs, (
+  # many things needs this...
+  "-I/usr/local/include"
+));
+@compile = ("llvm-$name", "-emit-llvm", @nostds, @incs,
+  "--include", $avm2envh);
+@srcs = ();
+@link = ("llvm-ld");
+$optlvl = $ENV{OPTLVL} || "-O5";
+@objs = ();
+@opt = ("opt");
+@llc = ("llc", "-march=avm2", 
+#"-avm2-eager-dispatch", # WARNING! doesn't work w/ SetjmpAbuse
+#"-avm2-machine-pooling"
+);
+if(!$ENV{NOMEMUSER})
+  { push(@llc, "-avm2-use-memuser") }
+if($ENV{FORCESYNC})
+  { push(@llc, "-avm2-force-sync") }
+@java = ("java");
+@asc = (
+  "-jar", $ascjar,
+  "-AS3", "-strict",
+  "-import", "$flashlibs/global.abc",
+#  "-d", "-import","$hintClass/HintClass.abc", # tamarin tracing work
+  "-import", "$flashlibs/playerglobal.abc");
+if($ENV{ASCOPTS})
+  { push(@asc, split(/\s+/, $ENV{ASCOPTS})) }
+# -L pathes
+@L = (
+  "/usr/local/lib"
+); 
+%l = (); # -l libs
+
+$avmshell = $ENV{AVMSHELL};
+
+# map /usr/..., etc. to local equiv
+# TODO hack install instead?
+%libmap = (
+#  "/usr/local/lib" => [ "$freetype/objs/.libs", "$cairo/objs/.libs",
+#    "$fontconfig/obj/.libs", "$glib/glib/.libs", "$glib/gmodule/.libs",
+#    "$glib/gobject/.libs", "$glib/gthread/.libs" ]
+);
+
+# handle -L...
+sub dash_L
+{
+  my $arg = (shift);
+  my $path;
+
+  if($arg =~ /-L=?(.+)/)
+    { $path = $1 } 
+  else
+    { $path = shift(@ARGV) }
+  my $ppath = $libmap{$path};
+  my @pathes = $ppath ? @$ppath : ($path);
+  push(@L, @pathes);
+  0
+}
+
+# handle -l...
+sub dash_l
+{
+  my $arg = (shift);
+  my $lib;
+
+  if($arg =~ /-l=?(.+)/)
+    { $lib = $1 } 
+  else
+    { $lib = shift(@ARGV) }
+  $l{$lib} = 1;
+  0
+}
+
+# map /usr/..., etc. to local equivalent
+%incmap =
+(
+  # freetype has ft2build.h in /usr/local/include
+#  "/usr/local/include" => [ "$freetype/include" ],
+#  "/usr/local/include/fontconfig" => [ "$fontconfig/fontconfig" ],
+#  "/usr/local/include/freetype2" => [ "$freetype/include/freetype" ],
+#  "/usr/include/freetype2" => [ "$freetype/include" ],
+#  "/usr/local/include/cairo" => [ "$cairo/src" ],
+#  "/usr/local/include/glib-2.0" => [ "$glib/glib" ],
+);
+
+# handle -I...
+sub dash_I
+{
+  my $arg = (shift);
+  my $path;
+
+  if($arg =~ /-I=?(.*)/)
+    { $path = $1 } 
+  else
+    { $path = shift(ARGV) }
+  my $ppath = $incmap{$path};
+  my @pathes = $ppath ? @$ppath : ($path);
+  push(@compile, map { "-I$_" } @pathes);
+  0
+}
+
+sub resolve_libs
+{
+  my %libs = ();
+  my @dirs = map { pfix($_) } @L;
+
+  open(FIND, "-|", "find", @dirs, "-name", "*.l.bc");
+  while(<FIND>)
+  {
+    if(/^.*\/([^\/]+)\.l\.bc$/)
+    {
+      chomp($libs{$1} = $_);
+    }
+  }
+  close(FIND);
+
+  foreach my $lib (keys(%l))
+  {
+    my $path = $libs{$lib};
+
+    if($path)
+    {
+      push(@objs, $path);
+#      print LOG "-l $path\n";
+    }
+  }
+}
+
+sub basename($) {
+  my $file = shift;
+  $file =~ s!^(?:.*/)?(.+?)(?:\.[^.]*)?$!$1!;
+  return $file;
+}
+
+@opthdl = (
+'-print-prog-name=.*' => sub {
+  (shift) =~ /=(.*)/;
+  print "$path/$1\n";
+  exit(0);
+},
+'-g' => sub { $debug = 1; "c" },
+'-v' => sub { $mode="v"; "c" },
+'--version' => sub { $mode="v"; "c" },
+'--help' => sub { $mode="v"; "c" },
+'-c' => sub { $mode="c"; "c" },
+'-E' => sub { $mode="p"; "c" },
+'-D.*' => sub { "c" },
+'-U.*' => sub { "c" },
+'-MF.*' => sub { push(@compile, shift(@ARGV)); "c" },
+'-MT.*' => sub { push(@compile, shift(@ARGV)); "c" },
+'-I.*' => sub { dash_I(shift) },
+'-L.*' => sub { dash_L(shift) },
+'-l.*' => sub { dash_l(shift) },
+'-o' => sub
+{
+  $o = $ARGV[1]; shift(@ARGV); @opto = ("-o", $o);
+  $o = basename($o);
+  if($o =~ /([^\.]*)/)
+  {
+    $cpackage = $1;
+    $cpackage =~ s/\./_/g;
+    $cpackage =~ s/\//./g;
+    $cpackage =~ s/\s+$//g;
+    $cpackage =~ s/[^\w\.]/_/g;
+    $cpackage =~ s/\.+$//g;
+    $cpackage = "cmodule.$cpackage";
+  }
+  0;
+},
+'-swf' => sub { $swf = 1; $shared = 0; 0 },
+'-swc' => sub { $swc = 1; $shared = 0; 0 },
+'-avmshell' => sub { $avmshell = 1; 0 },
+'-shared' => sub { $shared = 1; $static = 0; 0 },
+'-static' => sub { $static = 1; $shared = 0; 0 },
+'-O[0-9]+' => sub { $optlvl = (shift); "c" },
+'-nostdlib' => sub { $nostdlib = 1; 0 },
+'-Xlinker' => sub {
+  my $xlopt = $ARGV[1];
+
+  shift(@ARGV);
+  if($xloptLast eq "--out-implib")
+    { $implib = $xlopt }
+  $xloptLast = $xlopt;
+  0
+},
+'.*\.(?:c|C|cc|cpp|cxx)' => sub { # TODO i, ii, etc.
+  $c = (shift); $mode = $mode || "cl"; push(@srcs, $c);
+  push(@compile, "$c");
+  0
+},
+'.*\.(?:s|S)' => sub { # TODO i, ii, etc.
+  push(@compile, "-x", "c");
+  $c = (shift); $mode = $mode || "cl"; push(@srcs, $c);
+  push(@compile, "$c");
+  0
+},
+'.*\.o' => sub { $mode = $mode || "cl"; push(@objs, (shift)); 0 },
+# CHEESE -- map import lib to real lib
+'.*?(?:\.dll)?\.a' => sub {
+  my $arg = (shift);
+  if($arg =~ /(.*)lib(.*?)(?:\.dll)?\.a$/)
+    { push(@objs, "$1$2.l.bc") }
+  elsif($arg =~ /(.*)(?:\.dll)?\.a$/)
+    { push(@objs, "$1.l.bc") }
+  0
+},
+# CHEESE -- should parse la file
+'.*\.la' => sub {
+  my $arg = (shift);
+  if($arg =~ /lib([^\/]*)\.la$/)
+    { dash_l("-l$1") }
+  0
+},
+);
+while($#ARGV >= 0)
+{
+  my $arg = $ARGV[0];
+  my $dst = "c";
+
+  for(my $i = 0; $i < $#opthdl; $i += 2)
+  {
+    my $pat = $opthdl[$i];
+    my $sub = $opthdl[$i + 1];
+    my $expr = "\$arg =~ /^$pat\$/";
+
+    if(eval($expr))
+      { $dst = $sub->($arg) }
+  }
+  $arg = shift(@ARGV);
+  if($dst eq "l")
+    { push(@link, $arg) }
+  elsif($dst eq "c")
+    { push(@compile, $arg) }
+}
+if($optlvl eq "-O0" && $debug)
+  { push(@asc, "-d") }
+$confShell = $avmshell ? "true" : "false";
+$confNoShell = $avmshell ? "false" : "true";
+$confLogLevel = $ENV{LOGLEVEL} || "0";
+$confVector = $ENV{NOASVECTOR} ? "false" : "true";
+$confNoVector = $ENV{NOASVECTOR} ? "true" : "false";
+$setjmpAbuse = $ENV{SETJMPABUSE} ? "true" : "false";
+$confDebugger = $debug ? "true" : "false";
+$confNoDebugger = $debug ? "false" : "true";
+push(@asc,
+  "-config", "Alchemy::Debugger=$confDebugger",
+  "-config", "Alchemy::NoDebugger=$confNoDebugger",
+  "-config", "Alchemy::Shell=$confShell",
+  "-config", "Alchemy::NoShell=$confNoShell",
+  "-config", "Alchemy::LogLevel=$confLogLevel",
+  "-config", "Alchemy::Vector=$confVector",
+  "-config", "Alchemy::NoVector=$confNoVector",
+  "-config", "Alchemy::SetjmpAbuse=$setjmpAbuse"
+);
+
+$mode = $mode || "cl";
+
+# pre-process or get ver info
+if($mode eq "p" || $mode eq "v")
+  { sys(@compile, @opto) }
+# compile step
+if(index($mode, "c") >= 0 && @srcs)
+{
+  $o = $c;
+  $o =~ s/^.*\/([^\/+])/$1/; # remove path
+  $o =~ s/\.\w+/.o/; # change ext
+  sys(@compile, "-c", "-o", $last = "$$.achacks.o");
+  sys(@opt, "-f", "-o=$last", "-lowerallocs", $last);
+  push(@objs, $last);
+}
+# link step
+if(index($mode, "l") >= 0 && @objs)
+{
+  resolve_libs();
+  my @optlvl = ($optlvl eq "-O0") ? ("-O0", "-disable-opt") : ($optlvl);
+  my @lc = $shared ? ("-disable-opt", "-link-as-library") :
+    (@optlvl, "-internalize-public-api-list=$internsyms");
+  if(!$nostdlib && !$shared)
+  {
+    push(@lc, $libclib);
+    if($name eq "g++")
+      { push(@lc, $libcpplib) }
+  }
+  my @ll = ("-avm2-package-name=$cpackage");
+  my $dim = $ENV{SWFDIM} || "800,600";
+  my @ai = $shared ? ("-import", $machimp,
+    "-swf", "$cpackage.CLibDummySprite,0,0,0") :
+    ("-swf", "$cpackage.ConSprite,$dim,60");
+
+  $o = "a.exe";
+  sys(@link, "-o=".($last = "$$.achacks.exe"), @lc, @objs);
+  $last = $shared ? $last :
+    "$last.bc";
+  @oo = ($last);
+  sys(@llc, "-o=".($last = "$$.achacks.as"), @ll, @oo);
+  @oo = ($last);
+  # getting some errors when heap max is over 1G
+  $jmemmin = 16;
+  $jmemmax = 1024;
+  @jmem = ("-Xms${jmemmin}M", "-Xmx${jmemmax}M");
+  sys(@java, @jmem, @asc, @ai, @oo); $last = "$$.achacks.swf";
+  if($swc)
+  {
+    $cname = "CLibInit";
+    $script = "$cpackage/$cname";
+    $script =~ s/\./\//g;
+    sys("GetABC2.pl", $last, "$last.abc");
+    sys("PutABC2.pl", "$path/swctmpl.swf", "library.swf",
+      "$last.abc", $script);
+    sys("rm", "$last.abc");
+	if(!$ENV{NOMEMUSER})
+	{
+		sys("mv", "library.swf", "temp.swf");
+		sys("V10SWF.pl", "temp.swf", "library.swf");
+		sys("rm", "temp.swf");
+	}
+    open(CAT, ">catalog.xml");
+    $imps = join("", map { <<END
+        <dep id="$_" type="e" /> 
+        <dep id="$_" type="s" /> 
+END
+} @asimps);
+    # TODO at emit correct info (mod time, etc.)
+    # TODO is the template swc ok?
+    print CAT <<END
+<?xml version="1.0" encoding ="utf-8"?>
+<swc xmlns="http://www.adobe.com/flash/swccatalog/9">
+  <versions>
+    <swc version="1.0" />
+    <flex version="2.0" build="143452" />
+  </versions>
+  <features>
+    <feature-script-deps />
+    <feature-files />
+  </features>
+  <libraries>
+    <library path="library.swf">
+      <script name="$script"  mod="1177909560000" >
+        <def id="$cpackage:$cname" /> 
+        $imps
+        <dep id="AS3" type="n" /> 
+        <dep id="Object" type="i" /> 
+      </script>
+    </library>
+  </libraries>
+  <files>
+  </files>
+</swc>
+END
+;
+    close(CAT);
+
+    # check whether line endings need to be fixed on Cygwin
+    $need_fix = qx/mount | grep "cygdrive.*binmode"/;
+    if($need_fix) {
+        print "converting to DOS line endings\n";
+        sys("unix2dos", "catalog.xml");
+    }
+
+    # create swc
+    sys("zip",  "$$.achacks.swc", "catalog.xml", "library.swf");
+    sys("rm", "catalog.xml", "library.swf", $last);
+    $last = "$$.achacks.swc";
+  }
+  elsif(!$shared)
+  {
+    open(SWF, $last);
+    open(SH, ">" . ($last = "$$.achacks.sh"));
+    if(!$swf)
+      { print SH "#!$swfbridge\n" }
+    undef $/;
+    print SH (<SWF>);
+    close(SH);
+    close(SWF);
+  }
+}
+# move to final path
+if($last)
+{
+  $o = $opto[1] || $o;
+  if($implib)
+    { sys("touch", "$implib") } # CHEESE -- generate abc for implib instead?
+  sys("mv", $last, $o);
+  sys("chmod", "+x", $o)
+}
+# remove junk TODO failure leaves stuff around!
+if(!$ENV{ACHACKS_TMPS})
+  { sys("rm", "-f", <$$.achacks.*>) }

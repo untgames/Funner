@@ -17,7 +17,7 @@ PROFILES += iphone cocoa unistd has_windows haswchar gles no_dll has_iconv
 DLL_PATH := DYLD_LIBRARY_PATH
 
 COMMON_CFLAGS     += -Os -isysroot $(IPHONE_SDK_PATH) -DIPHONE
-COMMON_LINK_FLAGS += -isysroot $(IPHONE_SDK_PATH) -mmacosx-version-min=10.5
+COMMON_LINK_FLAGS += -isysroot $(IPHONE_SDK_PATH)
 
 include $(TOOLSETS_DIR)/g++.mak
 
@@ -66,12 +66,13 @@ define process_target.fat-static-lib
   $1.SOURCE_INSTALLATION_LIB_FILES := $$($1.LIB_FILE)
   $1.LIBS                          := $$($1.LIBS:%=$(LIB_PREFIX)%$(LIB_SUFFIX))
   $1.LIBS                          := $$(foreach lib,$$($1.LIBS),$$(call find_library,$$(lib),$$($1.LIB_DIRS)))
-  
+  $1.LIB_DEPS                      := $$(filter $$(addprefix %/,$$(sort $$(notdir $$($1.LIBS)))),$$(wildcard $$($1.LIB_DIRS:%=%/*)))  
+
   build: $$($1.LIB_FILE)
 
-  $$($1.LIB_FILE): $$($1.LIBS)
+  $$($1.LIB_FILE): $$($1.LIB_DEPS)
 		@echo Create fat static library $$(notdir $$($1.LIB_FILE))..
-		@libtool -c -o $$@ $$(sort $$($1.LIBS))
+		@libtool -c -o $$@ $$(sort $$($1.LIB_DEPS))
 endef
 
 #Обработка цели объединения библиотек, собранных для разных архитектур (имя цели)
