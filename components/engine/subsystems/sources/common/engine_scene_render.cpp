@@ -35,7 +35,7 @@ const size_t DEFAULT_IDLE_RENDER_COUNT = 8;                                     
    ѕодсистема рендера сцены
 */
 
-class SceneRenderSubsystem : public ISubsystem, public IAttachmentRegistryListener<render::Screen>,
+class SceneRenderSubsystem : public ISubsystem, public IAttachmentRegistryListener<render::obsolete::Screen>,
   public media::rms::ICustomServer, public xtl::reference_counter
 {
   public:
@@ -84,7 +84,7 @@ class SceneRenderSubsystem : public ISubsystem, public IAttachmentRegistryListen
           }          
         }
 
-        AttachmentRegistry::Attach<render::Screen> (this, AttachmentRegistryAttachMode_ForceNotify);
+        AttachmentRegistry::Attach<render::obsolete::Screen> (this, AttachmentRegistryAttachMode_ForceNotify);
         
         try
         {
@@ -92,7 +92,7 @@ class SceneRenderSubsystem : public ISubsystem, public IAttachmentRegistryListen
         }
         catch (...)
         {
-          AttachmentRegistry::Detach<render::Screen> (this, AttachmentRegistryAttachMode_ForceNotify);
+          AttachmentRegistry::Detach<render::obsolete::Screen> (this, AttachmentRegistryAttachMode_ForceNotify);
           throw;
         }
       }
@@ -108,11 +108,11 @@ class SceneRenderSubsystem : public ISubsystem, public IAttachmentRegistryListen
     {
       resource_server = 0;      
       
-      AttachmentRegistry::Detach<render::Screen> (this, AttachmentRegistryAttachMode_ForceNotify);      
+      AttachmentRegistry::Detach<render::obsolete::Screen> (this, AttachmentRegistryAttachMode_ForceNotify);      
     }
 
 /// —обыти€ установки/удалени€ экрана
-    void OnRegisterAttachment (const char* attachment_name, render::Screen& screen)
+    void OnRegisterAttachment (const char* attachment_name, render::obsolete::Screen& screen)
     {
       ScreenMap::iterator iter = screen_map.find (attachment_name);
 
@@ -122,7 +122,7 @@ class SceneRenderSubsystem : public ISubsystem, public IAttachmentRegistryListen
       render.RenderTarget (iter->second).SetScreen (&screen);
     }
 
-    void OnUnregisterAttachment (const char* attachment_name, render::Screen&)
+    void OnUnregisterAttachment (const char* attachment_name, render::obsolete::Screen&)
     {
       ScreenMap::iterator iter = screen_map.find (attachment_name);
 
@@ -237,13 +237,13 @@ class SceneRenderSubsystem : public ISubsystem, public IAttachmentRegistryListen
   private:
     struct RenderTargetDesc
     {
-      render::RenderTarget target;
+      render::obsolete::RenderTarget target;
       stl::string          on_before_update;
       stl::string          on_after_update;
       size_t               update_delay;
       size_t               last_update_time;
       
-      RenderTargetDesc (const render::RenderTarget& in_target, size_t in_update_frequency, const stl::string& in_on_before_update, const stl::string& in_on_after_update)
+      RenderTargetDesc (const render::obsolete::RenderTarget& in_target, size_t in_update_frequency, const stl::string& in_on_before_update, const stl::string& in_on_after_update)
         : target (in_target)
         , on_before_update (in_on_before_update)
         , on_after_update (in_on_after_update)
@@ -258,7 +258,7 @@ class SceneRenderSubsystem : public ISubsystem, public IAttachmentRegistryListen
 
   private:
     Log                                              log;                 //лог
-    render::SceneRender                              render;              //рендер
+    render::obsolete::SceneRender                    render;              //рендер
     stl::auto_ptr<media::rms::ServerGroupAttachment> resource_server;     //сервер ресурсов рендеринга
     ScreenMap                                        screen_map;          //соответствие экранов и рендер-таргетов
     xtl::auto_connection                             idle_connection;     //соединение обновлени€ рендер-таргетов

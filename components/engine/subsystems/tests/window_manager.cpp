@@ -44,7 +44,7 @@ int main ()
 
     manager.Start (CONFIGURATION_FILE_NAME);
 
-    render::Screen screen1, screen2;
+    render::obsolete::Screen screen1, screen2;
 
     screen1.SetBackgroundColor (0.8f, 0.f, 0.f, 0.f);
     screen2.SetBackgroundColor (0.f, 0.8f, 0.f, 0.f);
