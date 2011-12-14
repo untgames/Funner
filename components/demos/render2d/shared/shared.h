@@ -16,17 +16,27 @@
 
 #include <common/log.h>
 #include <common/parser.h>
+#include <common/property_map.h>
 #include <common/strlib.h>
 #include <common/time.h>
 
 #include <sg/scene.h>
 #include <sg/camera.h>
 #include <sg/sprite.h>
+#include <sg/height_map.h>
+
+#include <sg/controllers/acceleration_evaluators.h>
+#include <sg/controllers/align_with_node.h>
+#include <sg/controllers/look_to_node_point.h>
+#include <sg/controllers/move_to_node_point.h>
+#include <sg/controllers/water.h>
 
 #include <render/scene_render.h>
 
 using namespace scene_graph;
+using namespace scene_graph::controllers;
 using namespace render;
+using namespace render::obsolete;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Общий код для работы тестов двумерного рендера
@@ -48,7 +58,7 @@ class TestApplication
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Получение цели рендеринга
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    render::RenderTarget& RenderTarget ();
+    render::obsolete::RenderTarget& RenderTarget ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Перерисовка
