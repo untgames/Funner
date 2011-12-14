@@ -12,7 +12,7 @@
 #include <xtl/function.h>
 
 using namespace media;
-using namespace media::rfx;
+using namespace media::rfx::obsolete;
 using namespace math;
 
 //тестовый материал

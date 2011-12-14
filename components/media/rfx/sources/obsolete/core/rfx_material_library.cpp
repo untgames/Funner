@@ -1,6 +1,6 @@
 #include "shared.h"
 
-using namespace media::rfx;
+using namespace media::rfx::obsolete;
 using namespace media;
 using namespace stl;
 using namespace common;
@@ -275,9 +275,14 @@ namespace media
 namespace rfx
 {
 
+namespace obsolete
+{
+
 void swap (MaterialLibrary& material1, MaterialLibrary& material2)
 {
   material1.Swap (material2);
+}
+
 }
 
 }

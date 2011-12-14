@@ -1,6 +1,6 @@
 #include "shared.h"
 
-using namespace media::rfx;
+using namespace media::rfx::obsolete;
 
 /*
     Описание реализации SpriteMaterial
@@ -160,6 +160,9 @@ namespace media
 namespace rfx
 {
 
+namespace obsolete
+{
+
 /*
     Получение строкового имени
 */
@@ -176,6 +179,8 @@ const char* get_name (SpriteBlendMode mode)
     default:
       throw xtl::make_argument_exception ("media::rfx::get_name(SpriteBlendMode)", "mode", mode);
   }
+}
+
 }
 
 }

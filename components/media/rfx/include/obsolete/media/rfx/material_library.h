@@ -18,6 +18,9 @@ namespace media
 namespace rfx
 {
 
+namespace obsolete
+{
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Библиотека материалов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -117,6 +120,8 @@ typedef common::ResourceSerializerManager
   void (const char* file_name, MaterialLibrary& library, const MaterialLibrary::LogHandler& log_handler),
   void (const char* file_name, const MaterialLibrary& library, const MaterialLibrary::LogHandler& log_handler)
 > MaterialLibraryManager;
+
+}
 
 }
 

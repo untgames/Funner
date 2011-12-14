@@ -20,6 +20,9 @@ namespace media
 namespace rfx
 {
 
+namespace obsolete
+{
+
 /*
     Утилиты
 */
@@ -31,6 +34,8 @@ inline float clamp (float value, float min_value, float max_value)
   if (value > max_value) return max_value;
   
   return value;
+}
+
 }
 
 }

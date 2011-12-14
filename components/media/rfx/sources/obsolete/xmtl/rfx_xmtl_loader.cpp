@@ -1,6 +1,6 @@
 #include "shared.h"
 
-using namespace media::rfx;
+using namespace media::rfx::obsolete;
 using namespace common;
 
 /*
@@ -11,6 +11,9 @@ namespace components
 {
 
 namespace xmtl_loader
+{
+
+namespace obsolete
 {
 
 class XmlMaterialLibraryLoader
@@ -214,7 +217,9 @@ class XmlMaterialLibraryLoaderComponent
 extern "C"
 {
 
-ComponentRegistrator<XmlMaterialLibraryLoaderComponent> XMtlLoader ("media.rfx.loaders.XMtl");
+ComponentRegistrator<XmlMaterialLibraryLoaderComponent> XMtlLoaderObsolete ("media.rfx.loaders.obsolete.XMtl");
+
+}
 
 }
 

@@ -1,6 +1,6 @@
 #include "shared.h"
 
-using namespace media::rfx;
+using namespace media::rfx::obsolete;
 using namespace media;
 using namespace common;
 

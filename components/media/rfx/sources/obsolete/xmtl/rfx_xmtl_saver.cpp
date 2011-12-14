@@ -1,6 +1,6 @@
 #include "shared.h"
 
-using namespace media::rfx;
+using namespace media::rfx::obsolete;
 using namespace common;
 
 /*
@@ -11,6 +11,9 @@ namespace components
 {
 
 namespace xmtl_saver
+{
+
+namespace obsolete
 {
 
 typedef stl::hash_multimap<const Material*, stl::string> MaterialIdMap;
@@ -214,7 +217,9 @@ class XmlMaterialLibrarySaverComponent
 extern "C"
 {
 
-ComponentRegistrator<XmlMaterialLibrarySaverComponent> XMtlSaver ("media.rfx.savers.XMtl");
+ComponentRegistrator<XmlMaterialLibrarySaverComponent> XMtlSaverObsolete ("media.rfx.savers.obsolete.XMtl");
+
+}
 
 }
 
