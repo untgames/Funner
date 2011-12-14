@@ -2,7 +2,10 @@
 
 using namespace media::collada;
 
-namespace
+namespace components
+{
+
+namespace dae_loader
 {
 
 //загрузчик Dae-файлов
@@ -21,11 +24,13 @@ class DaeLoaderComponent
     }
 };
 
-}
-
 extern "C"
 {
 
 common::ComponentRegistrator<DaeLoaderComponent> DaeLoader ("media.collada.loaders.DAE");
+
+}
+
+}
 
 }

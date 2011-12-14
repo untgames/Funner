@@ -13148,7 +13148,7 @@ Unit of measure: 0.0254
       yfov: 0
       xmag: 0
       ymag: 0
-    Camera 'righthandcontrols-camera'
+    Camera 'lefthandcontrols-camera'
       type: ortho
       znear: 1
       zfar: 1000
@@ -13157,7 +13157,7 @@ Unit of measure: 0.0254
       yfov: 0
       xmag: 158.669
       ymag: 0
-    Camera 'lefthandcontrols-camera'
+    Camera 'righthandcontrols-camera'
       type: ortho
       znear: 1
       zfar: 1000
