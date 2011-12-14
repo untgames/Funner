@@ -1,0 +1,814 @@
+#include "shared.h"
+
+using namespace render;
+using namespace render::low_level;
+
+namespace
+{
+
+/*
+    Константы
+*/
+
+const size_t RESERVED_ENTITIES_COUNT = 512; //резервируемое количество отображаемых объектов
+const size_t RESERVED_FRAMES_COUNT   = 32;  //резервируемое количество отображаемых фреймов
+
+/*
+    Вспомогательные структуры
+*/
+
+typedef stl::hash_map<stl::hash_key<const char*>, RenderTargetDescPtr> RenderTargetDescMap;
+typedef stl::hash_map<stl::hash_key<const char*>, TexturePtr>          TextureMap;
+
+/*
+    Хранилище для эффекта
+*/
+
+struct EffectHolder: public CacheSource
+{
+  DeviceManagerPtr         device_manager;         //менеджер устройства отрисовки
+  EffectManagerPtr         effect_manager;         //ссылка на менеджер эффектов
+  EffectProxy              effect;                 //эффект кадра
+  EffectRendererPtr        effect_renderer;        //рендер эффекта
+  EffectPtr                cached_effect;          //закэшированный эффект
+  ProgramParametersLayout  properties_layout;      //расположение свойств
+  
+///Конструктор
+  EffectHolder (const EffectManagerPtr& in_effect_manager, const DeviceManagerPtr& in_device_manager)
+    : device_manager (in_device_manager)
+    , effect_manager (in_effect_manager)
+    , effect (effect_manager->GetEffectProxy (""))
+    , properties_layout (&device_manager->Device (), &device_manager->Settings ())
+  {
+    effect.AttachCacheHolder (*this);
+  }
+  
+///Работа с кэшем
+  void ResetCacheCore ()
+  {
+    cached_effect   = EffectPtr ();
+    effect_renderer = EffectRendererPtr ();    
+  }
+
+  void UpdateCacheCore ()
+  {
+    try
+    {
+      cached_effect = effect.Resource ();      
+      
+      if (!cached_effect)
+        return;
+        
+      effect_renderer = EffectRendererPtr (new render::EffectRenderer (cached_effect, device_manager, &properties_layout), false);      
+    }
+    catch (xtl::exception& e)
+    {
+      e.touch ("render::EffectHolder::UpdateCacheCore");
+      throw;
+    }
+  }
+    
+  using CacheHolder::UpdateCache;
+  using CacheHolder::ResetCache;
+  using CacheHolder::InvalidateCache;
+};
+
+/*
+    Описание объекта рендеринга
+*/
+
+struct EntityDesc
+{
+  EntityPtr                  entity;          //объект
+  LowLevelBufferPtr          property_buffer; //буфер динамических свойств объекта
+  ProgramParametersLayoutPtr layout;          //расположение динамических свойств объекта
+  
+  EntityDesc (const EntityPtr& in_entity)
+    : entity (in_entity)
+  {
+  }
+};
+
+}
+
+/*
+    Описание реализации кадра
+*/
+
+typedef stl::vector<FramePtr>   FrameArray;
+typedef stl::vector<EntityDesc> EntityArray;
+
+struct FrameImpl::Impl: public CacheHolder
+{
+  stl::auto_ptr<EffectHolder> effect_holder;           //хранилище эффекта
+  EntityArray                 entities;                //список объектов, отображаемых в кадре
+  FrameArray                  frames;                  //список вложенных кадров
+  PropertyBuffer              properties;              //свойства кадра
+  PropertyCachePtr            entities_properties;     //динамические свойства объектов
+  render::ShaderOptionsCache  shader_options_cache;    //кэш опций шейдера
+  RenderTargetDescMap         render_targets;          //целевые буферы отрисовки
+  TextureMap                  textures;                //локальные текстуры фрейма
+  bool                        scissor_state;           //включено ли отсечение  
+  size_t                      clear_flags;             //флаги очистки
+  math::vec4f                 clear_color;             //цвет очистки фона
+  float                       clear_depth_value;       //значение буфера глубины после очистки
+  unsigned char               clear_stencil_index;     //значение буфера трафарета после очистки
+  LowLevelBufferPtr           cached_properties;       //закэшированные свойства
+  EntityDrawFunction          entity_draw_handler;     //обработчик рисования объектов
+  EntityDrawParams            entity_draw_params;      //параметры рисования объектов (кэш)
+
+///Конструктор
+  Impl (const DeviceManagerPtr& device_manager, const EffectManagerPtr& effect_manager, const PropertyCachePtr& in_property_cache)
+    : effect_holder (new EffectHolder (effect_manager, device_manager))
+    , properties (device_manager)
+    , entities_properties (in_property_cache)
+    , shader_options_cache (&device_manager->CacheManager ())
+    , scissor_state (false)
+    , clear_flags (ClearFlag_All)
+    , clear_depth_value (1.0f)
+    , clear_stencil_index (0)
+  {
+    AttachCacheSource (*effect_holder);
+    AttachCacheSource (properties);
+    
+    effect_holder->properties_layout.AttachSlot (ProgramParametersSlot_Frame, properties.Properties ());
+    
+    entities.reserve (RESERVED_ENTITIES_COUNT);
+    frames.reserve (RESERVED_FRAMES_COUNT);
+  }
+  
+///Получение номера уровня детализации по расстоянию
+  size_t GetLod (double distance)
+  {
+    return size_t (log (distance));
+  }
+  
+///Работа с кэшем
+  void ResetCacheCore ()
+  {
+    cached_properties = LowLevelBufferPtr ();
+  }
+
+  void UpdateCacheCore ()
+  {
+    try
+    {
+      effect_holder->UpdateCache ();
+      
+      cached_properties = properties.Buffer ();
+    }
+    catch (xtl::exception& e)
+    {
+      e.touch ("render::FrameImpl::Impl::UpdateCacheCore");
+      throw;
+    }
+  }
+    
+  using CacheHolder::UpdateCache;
+  using CacheHolder::ResetCache;
+};
+
+/*
+   Конструктор / деструктор
+*/
+
+FrameImpl::FrameImpl (const DeviceManagerPtr& device_manager, const EffectManagerPtr& effect_manager, const PropertyCachePtr& property_cache)
+{
+  try
+  {
+    if (!effect_manager)
+      throw xtl::make_null_argument_exception ("", "effect_manager");
+    
+    if (!device_manager)
+      throw xtl::make_null_argument_exception ("", "device_manager");
+      
+    if (!property_cache)
+      throw xtl::make_null_argument_exception ("", "property_cache");
+    
+    impl = new Impl (device_manager, effect_manager, property_cache);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::FrameImpl::FrameImpl");
+    throw;
+  }
+}
+
+FrameImpl::~FrameImpl ()
+{
+}
+
+/*
+    Регистрация целевых буферов отрисовки
+*/
+
+void FrameImpl::SetRenderTarget (const char* name, const RenderTargetPtr& target)
+{
+  SetRenderTarget (name, target, ViewportPtr (), RectAreaPtr ());
+}
+
+void FrameImpl::SetRenderTarget (const char* name, const RenderTargetPtr& target, const ViewportPtr& viewport)
+{
+  SetRenderTarget (name, target, viewport, RectAreaPtr ());
+}
+
+void FrameImpl::SetRenderTarget (const char* name, const RenderTargetPtr& target, const ViewportPtr& viewport, const RectAreaPtr& scissor)
+{
+  try
+  {
+    if (!name)
+      throw xtl::make_null_argument_exception ("", "name");
+      
+    if (!target)
+      throw xtl::make_null_argument_exception ("", "target");
+
+    RenderTargetDescMap::iterator iter = impl->render_targets.find (name);
+
+    if (iter != impl->render_targets.end ())
+      throw xtl::make_argument_exception ("", "name", name, "Render target has already registered");
+
+    impl->render_targets.insert_pair (name, RenderTargetDescPtr (new render::RenderTargetDesc (target, viewport, scissor), false));
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::FrameImpl::SetRenderTarget(const char*,const RenderTargetPtr&,const RectAreaPtr&,const RectAreaPtr&)");
+    throw;
+  }
+}
+
+void FrameImpl::RemoveRenderTarget (const char* name)
+{
+  if (!name)
+    return;
+    
+  impl->render_targets.erase (name);
+}
+
+void FrameImpl::RemoveAllRenderTargets ()
+{
+  impl->render_targets.clear ();
+}
+
+/*
+    Получение целевых буферов отрисовки
+*/
+
+RenderTargetPtr FrameImpl::FindRenderTarget (const char* name)
+{
+  RenderTargetDescPtr desc = FindRenderTargetDesc (name);
+  
+  if (!desc)
+    return RenderTargetPtr ();
+  
+  return desc->render_target;
+}
+
+ViewportPtr FrameImpl::FindViewport (const char* name)
+{
+  RenderTargetDescPtr desc = FindRenderTargetDesc (name);
+  
+  if (!desc)
+    return ViewportPtr ();
+    
+  return desc->viewport;
+}
+
+RectAreaPtr FrameImpl::FindScissor (const char* name)
+{
+  RenderTargetDescPtr desc = FindRenderTargetDesc (name);
+
+  if (!desc)
+    return RectAreaPtr ();
+
+  return desc->scissor;
+}
+
+RenderTargetDescPtr FrameImpl::FindRenderTargetDesc (const char* name)
+{
+  if (!name)
+    return RenderTargetDescPtr ();
+
+  RenderTargetDescMap::iterator iter = impl->render_targets.find (name);
+
+  if (iter == impl->render_targets.end ())
+    return RenderTargetDescPtr ();
+    
+  return iter->second;
+}
+
+RenderTargetPtr FrameImpl::RenderTarget (const char* name)
+{
+  static const char* METHOD_NAME = "render::FrameImpl::RenderTarget";
+  
+  if (!name)
+    throw xtl::make_null_argument_exception (METHOD_NAME, "name");
+    
+  RenderTargetPtr target = FindRenderTarget (name);
+  
+  if (target)
+    return target;
+    
+  throw xtl::make_argument_exception (METHOD_NAME, "name", name, "Render target not found");
+}
+
+ViewportPtr FrameImpl::Viewport (const char* name)
+{
+  static const char* METHOD_NAME = "render::FrameImpl::Viewport";
+  
+  if (!name)
+    throw xtl::make_null_argument_exception (METHOD_NAME, "name");
+    
+  ViewportPtr viewport = FindViewport (name);
+  
+  if (viewport)
+    return viewport;
+    
+  throw xtl::make_argument_exception (METHOD_NAME, "name", name, "Viewport not found");
+}
+
+RectAreaPtr FrameImpl::Scissor (const char* name)
+{
+  static const char* METHOD_NAME = "render::FrameImpl::Scissor";
+  
+  if (!name)
+    throw xtl::make_null_argument_exception (METHOD_NAME, "name");
+    
+  RectAreaPtr area = FindScissor (name);
+  
+  if (area)
+    return area;
+    
+  throw xtl::make_argument_exception (METHOD_NAME, "name", name, "Scissor not found");
+}
+
+RenderTargetDescPtr FrameImpl::RenderTargetDesc (const char* name)
+{
+  static const char* METHOD_NAME = "render::FrameImpl::RenderTargetDesc";
+  
+  if (!name)
+    throw xtl::make_null_argument_exception (METHOD_NAME, "name");
+    
+  RenderTargetDescPtr desc = FindRenderTargetDesc (name);
+  
+  if (desc)
+    return desc;
+    
+  throw xtl::make_argument_exception (METHOD_NAME, "name", name, "Render target not found");
+}
+
+/*
+    Область отсечения
+*/
+
+void FrameImpl::SetScissorState (bool state)
+{
+  impl->scissor_state = state;
+}
+
+bool FrameImpl::ScissorState ()
+{
+  return impl->scissor_state;
+}
+
+/*
+    Флаги очистки кадра
+*/
+
+void FrameImpl::SetClearFlags (size_t clear_flags)
+{
+  impl->clear_flags = clear_flags;
+}
+
+size_t FrameImpl::ClearFlags ()
+{
+  return impl->clear_flags;
+}
+
+/*
+    Параметры очистки буфера цвета
+*/
+
+void FrameImpl::SetClearColor (const math::vec4f& color)
+{
+  impl->clear_color = color;
+}
+
+const math::vec4f& FrameImpl::ClearColor ()
+{
+  return impl->clear_color;
+}
+
+/*
+    Параметры очистки буфера попиксельного отсечения
+*/
+
+void FrameImpl::SetClearDepthValue (float depth_value)
+{
+  impl->clear_depth_value = depth_value;
+}
+
+void FrameImpl::SetClearStencilIndex (unsigned char stencil_index)
+{
+  impl->clear_stencil_index = stencil_index;
+}
+
+float FrameImpl::ClearDepthValue ()
+{
+  return impl->clear_depth_value;
+}
+
+unsigned char FrameImpl::ClearStencilIndex ()
+{
+  return impl->clear_stencil_index;
+}
+
+/*
+    Локальные текстуры
+*/
+
+void FrameImpl::SetLocalTexture (const char* name, const TexturePtr& texture)
+{
+  try
+  {
+    if (!name)
+      throw xtl::make_null_argument_exception ("", "name");
+      
+    if (!texture)
+      throw xtl::make_null_argument_exception ("", "texture");
+      
+    TextureMap::iterator iter = impl->textures.find (name);
+    
+    if (iter != impl->textures.end ())
+      throw xtl::make_argument_exception ("", "name", name, "Frame local texture has already registered");
+      
+    impl->textures.insert_pair (name, texture);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::FrameImpl::SetLocalTexture");
+    throw;
+  }
+}
+
+void FrameImpl::RemoveLocalTexture (const char* name)
+{
+  if (!name)
+    return;
+    
+  impl->textures.erase (name);
+}
+
+void FrameImpl::RemoveAllLocalTextures ()
+{
+  impl->textures.clear ();
+}
+
+/*
+    Получение локальной текстуры
+*/
+
+TexturePtr FrameImpl::FindLocalTexture (const char* name)
+{
+  if (!name)
+    return TexturePtr ();
+    
+  TextureMap::iterator iter = impl->textures.find (name);
+  
+  if (iter == impl->textures.end ())
+    return TexturePtr ();
+    
+  return iter->second;
+}
+
+TexturePtr FrameImpl::LocalTexture (const char* name)
+{
+  static const char* METHOD_NAME = "render::FrameImpl::LocalTexture";
+  
+  if (!name)
+    throw xtl::make_null_argument_exception (METHOD_NAME, "name");
+    
+  TexturePtr texture = FindLocalTexture (name);
+  
+  if (texture)
+    return texture;
+    
+  throw xtl::make_argument_exception (METHOD_NAME, "name", name, "Local texture not found");
+
+}
+
+/*
+    Установка эффекта рендеринга
+*/
+
+void FrameImpl::SetEffect (const char* name)
+{
+  try
+  {
+    if (!name)
+      throw xtl::make_null_argument_exception ("", "name");
+    
+    impl->effect_holder->effect = impl->effect_holder->effect_manager->GetEffectProxy (name);    
+    
+    impl->effect_holder->InvalidateCache ();
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::FrameImpl::SetEffect");
+    throw;
+  }
+}
+
+const char* FrameImpl::Effect ()
+{
+  return impl->effect_holder->effect.Name ();
+}
+
+/*
+    Рендер эффекта
+*/
+
+EffectRendererPtr FrameImpl::EffectRenderer ()
+{
+  try
+  {
+    impl->UpdateCache ();
+    
+    return impl->effect_holder->effect_renderer;
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::FrameImpl::EffectRenderer");
+    throw;
+  }
+}
+
+/*
+    Свойства рендеринга
+*/
+
+void FrameImpl::SetProperties (const common::PropertyMap& properties)
+{
+  try
+  {
+    impl->properties.SetProperties (properties);
+
+    impl->effect_holder->properties_layout.AttachSlot (ProgramParametersSlot_Frame, properties);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::FrameImpl::SetProperties");
+    throw;
+  }
+}
+
+const common::PropertyMap& FrameImpl::Properties ()
+{
+  return impl->properties.Properties ();
+}
+
+/*
+    Получение буфера свойств
+*/
+
+const LowLevelBufferPtr& FrameImpl::DevicePropertyBuffer ()
+{
+  try
+  {
+    impl->UpdateCache ();
+    
+    return impl->cached_properties;
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::FrameImpl::DevicePropertyBuffer");
+    throw;
+  }
+}
+
+/*
+    Макро-определения шейдера
+*/
+
+void FrameImpl::SetShaderOptions (const common::PropertyMap& properties)
+{
+  try
+  {
+    impl->shader_options_cache.SetProperties (properties);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::FrameImpl::SetShaderOptions");
+    throw;
+  }
+}
+
+const common::PropertyMap& FrameImpl::ShaderOptions ()
+{
+  return impl->shader_options_cache.Properties ();
+}
+
+ShaderOptionsCache& FrameImpl::ShaderOptionsCache ()
+{
+  return impl->shader_options_cache;
+}
+
+/*
+    Список отрисовки
+*/
+
+size_t FrameImpl::EntitiesCount ()
+{
+  return impl->entities.size ();
+}
+
+void FrameImpl::AddEntity (const EntityPtr& entity)
+{
+  impl->entities.push_back (EntityDesc (entity));  
+}
+
+void FrameImpl::RemoveAllEntities ()
+{
+  impl->entities.clear ();
+}
+
+/*
+    Добавление вложенных кадров
+*/
+
+size_t FrameImpl::FramesCount ()
+{
+  return impl->frames.size ();
+}
+
+void FrameImpl::AddFrame (const FramePtr& frame)
+{
+  impl->frames.push_back (frame);  
+}
+
+void FrameImpl::RemoveAllFrames ()
+{
+  impl->frames.clear ();  
+}
+
+/*
+    Установка пользовательского обработчика рисования объектов
+*/
+
+void FrameImpl::SetEntityDrawHandler (const EntityDrawFunction& handler)
+{
+  impl->entity_draw_handler = handler;
+}
+
+const Frame::EntityDrawFunction& FrameImpl::EntityDrawHandler ()
+{
+  return impl->entity_draw_handler;
+}
+
+/*
+    Подготовка к отрисовке кадра
+*/
+
+void FrameImpl::Prerender (EntityDrawFunction entity_draw_handler)
+{
+    //построение списка операций
+    
+  render::EffectRenderer& renderer                = *impl->effect_holder->effect_renderer;    
+  Frame                   frame                   = Wrappers::Wrap<Frame> (this);
+  bool                    has_entity_draw_handler = entity_draw_handler;
+  EntityDrawParams&       entity_draw_params      = impl->entity_draw_params;
+  PropertyCache&          entities_properties     = *impl->entities_properties;
+  
+  renderer.RemoveAllOperations ();
+  
+  entity_draw_params.mvp_matrix = math::mat4f (1.0f);
+  
+  for (EntityArray::iterator iter=impl->entities.begin (), end=impl->entities.end (); iter!=end; ++iter)
+  {
+    EntityDesc& desc = *iter;
+    
+      //пропуск рисования пустых объектов
+    
+    if (!desc.entity->LodsCount ())
+      continue;
+      
+      //обновление динамических текстур
+      
+    DynamicTextureEntityStorage& dynamic_textures = desc.entity->DynamicTextureStorage ();
+    
+    dynamic_textures.Update (this);
+      
+      //вызов обработчика      
+
+    size_t eye_distance = 0, lod = 0;
+      
+    if (has_entity_draw_handler)
+    {
+      Entity entity_wrap = Wrappers::Wrap<Entity> (desc.entity);
+
+      entity_draw_handler (frame, entity_wrap, entity_draw_params);
+      
+        //заполнение константного буфера соответствующего паре frame-entity
+      
+      entities_properties.Convert (entity_draw_params.properties, desc.property_buffer, desc.layout);
+      
+        //расчёт расстояния от z-near до объекта        
+        
+      math::vec4f mvp_lod_point = entity_draw_params.mvp_matrix * math::vec4f (desc.entity->LodPoint (), 1.0f); 
+      double      distance      = stl::min (stl::max (mvp_lod_point.z / mvp_lod_point.w, 1.0f), 0.0f) * ~0u;
+      
+      eye_distance = size_t (distance);
+      lod          = impl->GetLod (distance);
+    }    
+
+    renderer.AddOperations (desc.entity->RendererOperations (lod, true), eye_distance, entity_draw_params.mvp_matrix, desc.property_buffer.get (), desc.layout.get ());
+  }
+  
+  for (FrameArray::iterator iter=impl->frames.begin (), end=impl->frames.end (); iter!=end; ++iter)
+  {
+    renderer.AddOperations (**iter);
+  }
+}
+
+/*
+    Рисование кадра
+*/
+
+void FrameImpl::Draw (RenderingContext* previous_context)
+{
+  try
+  {
+      //обновление кэша
+    
+    UpdateCache ();
+    
+      //обновление маркеров отрисовки для корневых кадров
+    
+    if (!previous_context)
+      impl->effect_holder->device_manager->CacheManager ().UpdateMarkers ();
+      
+    try
+    {
+        //формирование контекста отрисовки
+      
+      RenderingContext context (*this, previous_context);
+      
+      if (!impl->effect_holder->effect_renderer)
+        throw xtl::format_operation_exception ("", "No effect assigned");
+        
+        //построение списка операций
+        
+      Prerender (impl->entity_draw_handler);
+        
+        //выполнение операций рендеринга
+
+      impl->effect_holder->effect_renderer->ExecuteOperations (context);
+      
+        //очистка временных данных
+      
+      if (!previous_context)
+        Cleanup ();
+    }
+    catch (...)
+    {
+      if (!previous_context)
+        Cleanup ();      
+
+      throw;
+    }
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::FrameImpl::Draw");
+    throw;
+  }
+}
+
+/*
+    Очистка после рисования кадра
+*/
+
+void FrameImpl::Cleanup ()
+{
+  impl->entities_properties->Reset ();
+  impl->effect_holder->device_manager->CacheManager ().FlushCaches ();    
+}
+
+/*
+    Управление кэшированием
+*/
+
+void FrameImpl::UpdateCache ()
+{
+  impl->UpdateCache ();
+  
+  for (EntityArray::iterator iter=impl->entities.begin (), end=impl->entities.end (); iter!=end; ++iter)
+    iter->entity->UpdateCache ();
+}
+
+void FrameImpl::ResetCache ()
+{
+  impl->ResetCache ();
+  
+  for (EntityArray::iterator iter=impl->entities.begin (), end=impl->entities.end (); iter!=end; ++iter)
+    iter->entity->ResetCache ();  
+}

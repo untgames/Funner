@@ -1,0 +1,42 @@
+Results of effect_loader_test:
+render.manager: Creating render window
+render.manager: Create device manager (driver='*', adapter='*', init_string='')
+render.manager: ...device manager and swap chain have been successfully created
+render.manager: Initialize render targets for swap chain
+render.manager: ...render targets for swap chain created
+window 784x562 added
+render.manager: Effect blend state 'solid' loaded
+render.manager: Effect blend state 'transparent' loaded
+render.manager: Effect blend state 'additive' loaded
+render.manager: Effect depth-stencil state 'solid' loaded
+render.manager: Effect depth-stencil state 'ztest_without_write' loaded
+render.manager: Effect depth-stencil state 'stencil-test' loaded
+render.manager: Effect rasterizer 'default' loaded
+render.manager: Effect rasterizer 'wireframe' loaded
+render.manager: Effect rasterizer 'overlays' loaded
+render.manager: Effect texture sampler 'default' loaded
+render.manager: Effect texture sampler 'repeat' loaded
+render.manager: Effect auxilary texture description 'mirror' loaded
+render.manager: Effect auxilary texture description 'shadow_map' loaded
+render.manager: Effect auxilary texture description 'depth_stencil_render_buffer' loaded
+render.manager: Effect shaders library 'data/shaders/*' loaded (7 shaders loaded)
+render.manager: Program 'phong' common data created (id=2)
+render.manager: Program 'phong' created (id=1)
+render.manager: Effect program 'phong' loaded
+render.manager: Program 'shadow_map' common data created (id=4)
+render.manager: Program 'shadow_map' created (id=3)
+render.manager: Effect program 'shadow_map' loaded
+render.manager: Program 'helper' common data created (id=6)
+render.manager: Program 'helper' created (id=5)
+render.manager: Effect program 'helper' loaded
+render.manager: Effect 'main' loaded
+render.manager: Effect 'shadow' loaded
+render.manager: Effect 'lighting' loaded
+Effects loaded
+window 784x562 removed
+render.manager: Program 'helper' destroyed for options = '' (id=5)
+render.manager: Program 'helper' common data destroyed (id=6)
+render.manager: Program 'shadow_map' destroyed for options = '' (id=3)
+render.manager: Program 'shadow_map' common data destroyed (id=4)
+render.manager: Program 'phong' destroyed for options = '' (id=1)
+render.manager: Program 'phong' common data destroyed (id=2)

@@ -1,0 +1,26 @@
+Results of cache_holder_test:
+Create caches
+Update dependency cache
+...update cache source
+...update cache self
+...update cache dependency
+Update valid dependency cache
+Invalidate cache without dependencies
+...update cache source
+Invalidate cache with dependencies
+...update cache source
+...update cache self
+Update error cache
+...update cache error
+bad allocation
+Update cache after error
+...update cache dependency
+Invalidate error cache and update
+...update cache error
+...update cache dependency
+Remove error cache and update
+...update cache dependency
+Reset cache
+...reset cache self
+...reset cache dependency
+All done

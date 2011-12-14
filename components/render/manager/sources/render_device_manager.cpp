@@ -1,0 +1,110 @@
+#include "shared.h"
+
+using namespace render;
+
+/*
+    Описание реализации менеджера устройства
+*/
+
+struct DeviceManager::Impl
+{
+  LowLevelDevicePtr                device;                     //устройство визуализации
+  LowLevelDriverPtr                driver;                     //драйвер устройства визуализации
+  CacheManagerPtr                  cache_manager;              //менеджер кэширования
+  render::InputLayoutManager       input_layout_manager;       //менеджер лэйаутов геометрии
+  render::ProgramParametersManager program_parameters_manager; //менеджер параметров программ шэйдинга  
+  SettingsPtr                      settings;                   //настройки менеджера рендеринга
+  
+  Impl (const LowLevelDevicePtr& in_device, const LowLevelDriverPtr& in_driver, const SettingsPtr& in_settings, const CacheManagerPtr& in_cache_manager)
+    : device (in_device)
+    , driver (in_driver)
+    , cache_manager (in_cache_manager)
+    , input_layout_manager (in_device, in_settings)
+    , program_parameters_manager (in_device, in_settings, in_cache_manager)
+    , settings (in_settings)
+  {
+  }
+};
+
+/*
+    Конструктор / деструктор
+*/
+
+DeviceManager::DeviceManager (const LowLevelDevicePtr& device, const LowLevelDriverPtr& driver, const SettingsPtr& settings, const CacheManagerPtr& cache_manager)
+{
+  try
+  {
+    if (!device)
+      throw xtl::make_null_argument_exception ("", "device");
+
+    if (!driver)
+      throw xtl::make_null_argument_exception ("", "driver");
+      
+    if (!settings)
+      throw xtl::make_null_argument_exception ("", "settings");
+      
+    if (!cache_manager)
+      throw xtl::make_null_argument_exception ("", "cache_manager");
+
+    impl = new Impl (device, driver, settings, cache_manager);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::DeviceManager::DeviceManager");
+    throw;
+  }
+}
+
+DeviceManager::~DeviceManager ()
+{
+}
+
+/*
+    Получение устройства / драйвера
+*/
+
+render::low_level::IDevice& DeviceManager::Device ()
+{
+  return *impl->device;
+}
+
+render::low_level::IDriver& DeviceManager::Driver ()
+{
+  return *impl->driver;
+}
+
+/*
+    Менеджер кэширования
+*/
+
+render::CacheManager& DeviceManager::CacheManager ()
+{
+  return *impl->cache_manager;
+}
+
+/*
+    Менеджер лэйаутов геометрии
+*/
+
+InputLayoutManager& DeviceManager::InputLayoutManager ()
+{
+  return impl->input_layout_manager;
+}
+
+/*
+    Менеджер параметров программ шэйдинга
+*/
+
+ProgramParametersManager& DeviceManager::ProgramParametersManager ()
+{
+  return impl->program_parameters_manager;
+}
+
+/*
+    Настройки менеджера рендеринга
+*/
+
+Settings& DeviceManager::Settings ()
+{
+  return *impl->settings;
+}
