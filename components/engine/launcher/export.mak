@@ -11,7 +11,7 @@ export.link.engine.launcher_shared.IMPORTS := link.common.default_console_handle
                                 link.media.rms link.media.rfx.xmtl.obsolete link.media.sound.snddecl link.media.sound.default_decoders \
                                 link.media.font.xfont link.media.players.null link.media.physics.xphys \
                                 link.input.manager.xkeymap link.input.manager.xkeyreg link.input.window_driver \
-                                link.render.scene_render.render2d link.script.lua \
+                                link.render.scene_render2d link.script.lua \
                                 link.engine.script_binds.math link.engine.script_binds.sg link.engine.script_binds.bv \
                                 link.engine.script_binds.render link.engine.script_binds.engine \
                                 link.engine.script_binds.input link.engine.script_binds.lua_override \
