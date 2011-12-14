@@ -28,6 +28,27 @@ Results of materials_processor_test1
       <texmap semantic="bump" image="data/textures/canyon_static_world/texture0005.dds"/>
       <texmap semantic="reflection" image="data/textures/sky/sky.jpg.skybox"/>
     </material>
+    <material id="canyon_static_world.balkon" name="balkon" program="phong">
+      <property name="Reflectivity" type="float" value="0"/>
+      <property name="Transparency" type="float" value="1"/>
+      <property name="Shininess" type="float" value="43.2193"/>
+      <property name="Diffuse" type="vector">
+        0 0 0 0
+      </property>
+      <property name="Ambient" type="vector">
+        0 0 0 1
+      </property>
+      <property name="Specular" type="vector">
+        0 0 0 0
+      </property>
+      <property name="Emission" type="vector">
+        0 0 0 1
+      </property>
+      <property name="DiffuseTextureChannel" type="int" value="0"/>
+      <property name="SpecularTextureChannel" type="int" value="0"/>
+      <texmap semantic="diffuse" image="data/textures/canyon_static_world/texture0044.dds"/>
+      <texmap semantic="specular" image="data/textures/canyon_static_world/texture0044.dds"/>
+    </material>
     <material id="canyon_static_world.Material__3" name="Material__3" program="blinn">
       <property name="Reflectivity" type="float" value="0"/>
       <property name="Transparency" type="float" value="1"/>
@@ -51,27 +72,6 @@ Results of materials_processor_test1
       <texmap semantic="diffuse" image="data/textures/canyon_static_world/texture0007.dds"/>
       <texmap semantic="specular" image="data/textures/canyon_static_world/texture0008.dds"/>
       <texmap semantic="bump" image="data/textures/canyon_static_world/texture0009.dds"/>
-    </material>
-    <material id="canyon_static_world.balkon" name="balkon" program="phong">
-      <property name="Reflectivity" type="float" value="0"/>
-      <property name="Transparency" type="float" value="1"/>
-      <property name="Shininess" type="float" value="43.2193"/>
-      <property name="Diffuse" type="vector">
-        0 0 0 0
-      </property>
-      <property name="Ambient" type="vector">
-        0 0 0 1
-      </property>
-      <property name="Specular" type="vector">
-        0 0 0 0
-      </property>
-      <property name="Emission" type="vector">
-        0 0 0 1
-      </property>
-      <property name="DiffuseTextureChannel" type="int" value="0"/>
-      <property name="SpecularTextureChannel" type="int" value="0"/>
-      <texmap semantic="diffuse" image="data/textures/canyon_static_world/texture0044.dds"/>
-      <texmap semantic="specular" image="data/textures/canyon_static_world/texture0044.dds"/>
     </material>
   </materials>
 </material_library>
