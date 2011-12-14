@@ -15,7 +15,7 @@ RENDER.SCENE_RENDER.RENDER2D.SOURCES.TYPE                 := static-lib
 RENDER.SCENE_RENDER.RENDER2D.SOURCES.NAME                 := funner.render.scene_render.render2d
 RENDER.SCENE_RENDER.RENDER2D.SOURCES.SOURCE_DIRS          := sources/render2d
 RENDER.SCENE_RENDER.RENDER2D.SOURCES.IMPORTS              := compile.render.scene_render compile.common compile.scene_graph.core \
-                                                             compile.render.mid_level compile.media.rfx \
+                                                             compile.render.mid_level compile.media.rfx.obsolete \
                                                              compile.media.image compile.media.font \
                                                              compile.media.video
 RENDER.SCENE_RENDER.RENDER2D.SOURCES.msvc.COMPILER_CFLAGS := -wd4355
@@ -31,4 +31,4 @@ RENDER.SCENE_RENDER.RENDER2D.TESTS.TYPE        := test-suite
 RENDER.SCENE_RENDER.RENDER2D.TESTS.SOURCE_DIRS := tests/render2d
 RENDER.SCENE_RENDER.RENDER2D.TESTS.IMPORTS     := compile.render.scene_render link.render.scene_render.render2d \
                                                   link.render.mid_level.debug_renderer_driver compile.scene_graph.core compile.common \
-                                                  link.media.rfx.xmtl link.media.font.xfont
+                                                  link.media.rfx.xmtl.obsolete link.media.font.xfont

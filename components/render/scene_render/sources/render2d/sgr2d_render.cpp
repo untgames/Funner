@@ -253,12 +253,12 @@ void Render::LoadMaterialLibrary (const char* file_name)
 {
   try
   {
-    media::rfx::MaterialLibrary library (file_name, log_handler);
+    media::rfx::obsolete::MaterialLibrary library (file_name, log_handler);
 
-    for (media::rfx::MaterialLibrary::Iterator iter=library.CreateIterator (); iter; ++iter)
+    for (media::rfx::obsolete::MaterialLibrary::Iterator iter=library.CreateIterator (); iter; ++iter)
     {
-      media::rfx::Material::Pointer material        = *iter;
-      media::rfx::SpriteMaterial*   sprite_material = dynamic_cast<media::rfx::SpriteMaterial*> (&*material);
+      media::rfx::obsolete::Material::Pointer material        = *iter;
+      media::rfx::obsolete::SpriteMaterial*   sprite_material = dynamic_cast<media::rfx::obsolete::SpriteMaterial*> (&*material);
 
       if (sprite_material)
       {
@@ -270,7 +270,7 @@ void Render::LoadMaterialLibrary (const char* file_name)
         {
           if (xtl::xstrncmp (sprite_material->Image (), VIDEO_STRING_MARKER, strlen (VIDEO_STRING_MARKER)))
           {
-            GetTexture (sprite_material->Image (), sprite_material->BlendMode () == media::rfx::SpriteBlendMode_AlphaClamp ? true : false); //???? не загружается альфа текстур текста
+            GetTexture (sprite_material->Image (), sprite_material->BlendMode () == media::rfx::obsolete::SpriteBlendMode_AlphaClamp ? true : false); //???? не загружается альфа текстур текста
           }
         }
         catch (std::exception& exception)
@@ -295,12 +295,12 @@ void Render::UnloadMaterialLibrary (const char* file_name)
 {
   try
   {
-    media::rfx::MaterialLibrary library (file_name, log_handler);
+    media::rfx::obsolete::MaterialLibrary library (file_name, log_handler);
 
-    for (media::rfx::MaterialLibrary::Iterator iter=library.CreateIterator (); iter; ++iter)
+    for (media::rfx::obsolete::MaterialLibrary::Iterator iter=library.CreateIterator (); iter; ++iter)
     {
-      media::rfx::Material::Pointer material        = *iter;
-      media::rfx::SpriteMaterial*   sprite_material = dynamic_cast<media::rfx::SpriteMaterial*> (&*material);
+      media::rfx::obsolete::Material::Pointer material        = *iter;
+      media::rfx::obsolete::SpriteMaterial*   sprite_material = dynamic_cast<media::rfx::obsolete::SpriteMaterial*> (&*material);
 
       if (sprite_material)
       {
@@ -317,7 +317,7 @@ void Render::UnloadMaterialLibrary (const char* file_name)
   }
 }
 
-void Render::InsertMaterial (const char* id, const media::rfx::SpriteMaterial::Pointer& material)
+void Render::InsertMaterial (const char* id, const media::rfx::obsolete::SpriteMaterial::Pointer& material)
 {
   materials [id] = material;
 }

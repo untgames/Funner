@@ -18,6 +18,7 @@
 
 #include <common/component.h>
 #include <common/strlib.h>
+#include <common/property_map.h>
 
 #include <media/compressed_image.h>
 #include <media/image.h>
@@ -45,20 +46,20 @@ namespace render2d
 //forward declaration
 class Render;
 
-typedef mid_level::renderer2d::IPrimitive  IPrimitive;
-typedef mid_level::renderer2d::IRenderer   IRenderer;
-typedef mid_level::renderer2d::IFrame      IFrame;
-typedef mid_level::renderer2d::ITexture    ITexture;
-typedef mid_level::IRenderTarget           IRenderTarget;
-typedef mid_level::renderer2d::BlendMode   BlendMode;
-typedef xtl::com_ptr<IPrimitive>           PrimitivePtr;
-typedef xtl::com_ptr<IRenderer>            RendererPtr;
-typedef xtl::com_ptr<IFrame>               FramePtr;
-typedef xtl::com_ptr<ITexture>             TexturePtr;
-typedef xtl::com_ptr<IRenderTarget>        RenderTargetPtr;
-typedef xtl::com_ptr<IRenderQuery>         RenderQueryPtr;
-typedef media::rfx::SpriteMaterial         SpriteMaterial;
-typedef SpriteMaterial::Pointer            SpriteMaterialPtr;
+typedef mid_level::renderer2d::IPrimitive    IPrimitive;
+typedef mid_level::renderer2d::IRenderer     IRenderer;
+typedef mid_level::renderer2d::IFrame        IFrame;
+typedef mid_level::renderer2d::ITexture      ITexture;
+typedef mid_level::IRenderTarget             IRenderTarget;
+typedef mid_level::renderer2d::BlendMode     BlendMode;
+typedef xtl::com_ptr<IPrimitive>             PrimitivePtr;
+typedef xtl::com_ptr<IRenderer>              RendererPtr;
+typedef xtl::com_ptr<IFrame>                 FramePtr;
+typedef xtl::com_ptr<ITexture>               TexturePtr;
+typedef xtl::com_ptr<IRenderTarget>          RenderTargetPtr;
+typedef xtl::com_ptr<IRenderQuery>           RenderQueryPtr;
+typedef media::rfx::obsolete::SpriteMaterial SpriteMaterial;
+typedef SpriteMaterial::Pointer              SpriteMaterialPtr;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Объект, требующий обновления при рендеринге entity

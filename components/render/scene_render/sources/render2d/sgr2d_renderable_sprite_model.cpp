@@ -109,15 +109,15 @@ void RenderableSpriteModel::Update ()
       
     if (model->Properties () && impl->properties_hash != model->Properties ()->Hash ())
     {     
-      const NodeProperties& properties = *model->Properties ();
+      const common::PropertyMap& properties = *model->Properties ();
       
-      if (impl->properties_structure_hash != properties.StructureHash ())
+      if (impl->properties_structure_hash != properties.Layout ().Hash ())
       {
         impl->texture_scroll_property_index = properties.IndexOf ("render.texture_scroll");
         impl->scissor_rect_property_index   = properties.IndexOf ("render.scissor_rect");
         impl->scissor_state_property_index  = properties.IndexOf ("render.scissor_state");
         impl->video_position_property_index = properties.IndexOf ("render.video_position");
-        impl->properties_structure_hash     = properties.StructureHash ();
+        impl->properties_structure_hash     = properties.Layout ().Hash ();
       }
 
       if (impl->texture_scroll_property_index != size_t (-1))
@@ -224,27 +224,27 @@ void RenderableSpriteModel::Update ()
       switch (material->BlendMode ())
       {
         default:
-        case media::rfx::SpriteBlendMode_None:
+        case media::rfx::obsolete::SpriteBlendMode_None:
           blend_mode  = render::mid_level::renderer2d::BlendMode_None;
           shader_mode = render::mid_level::renderer2d::ShaderMode_Normal;
           need_alpha  = false;
           break;
-        case media::rfx::SpriteBlendMode_Translucent:
+        case media::rfx::obsolete::SpriteBlendMode_Translucent:
           blend_mode  = render::mid_level::renderer2d::BlendMode_Translucent;
           shader_mode = render::mid_level::renderer2d::ShaderMode_Normal;
           need_alpha  = false;
           break;
-        case media::rfx::SpriteBlendMode_Mask:
+        case media::rfx::obsolete::SpriteBlendMode_Mask:
           blend_mode  = render::mid_level::renderer2d::BlendMode_Mask;
           shader_mode = render::mid_level::renderer2d::ShaderMode_Normal;
           need_alpha  = false;
           break;
-        case media::rfx::SpriteBlendMode_Additive:
+        case media::rfx::obsolete::SpriteBlendMode_Additive:
           blend_mode  = render::mid_level::renderer2d::BlendMode_Additive;
           shader_mode = render::mid_level::renderer2d::ShaderMode_Normal;
           need_alpha  = false;
           break;
-        case media::rfx::SpriteBlendMode_AlphaClamp:
+        case media::rfx::obsolete::SpriteBlendMode_AlphaClamp:
           blend_mode  = render::mid_level::renderer2d::BlendMode_Translucent;
           shader_mode = render::mid_level::renderer2d::ShaderMode_AlphaClamp;
           need_alpha  = true;

@@ -79,23 +79,23 @@ void RenderableHeightMap::Update ()
       switch (material->BlendMode ())
       {
         default:
-        case media::rfx::SpriteBlendMode_None:
+        case media::rfx::obsolete::SpriteBlendMode_None:
           blend_mode  = render::mid_level::renderer2d::BlendMode_None;
           need_alpha  = false;
           break;
-        case media::rfx::SpriteBlendMode_Translucent:
+        case media::rfx::obsolete::SpriteBlendMode_Translucent:
           blend_mode  = render::mid_level::renderer2d::BlendMode_Translucent;
           need_alpha  = false;
           break;
-        case media::rfx::SpriteBlendMode_Mask:
+        case media::rfx::obsolete::SpriteBlendMode_Mask:
           blend_mode  = render::mid_level::renderer2d::BlendMode_Mask;
           need_alpha  = false;
           break;
-        case media::rfx::SpriteBlendMode_Additive:
+        case media::rfx::obsolete::SpriteBlendMode_Additive:
           blend_mode  = render::mid_level::renderer2d::BlendMode_Additive;
           need_alpha  = false;
           break;
-        case media::rfx::SpriteBlendMode_AlphaClamp:
+        case media::rfx::obsolete::SpriteBlendMode_AlphaClamp:
           blend_mode  = render::mid_level::renderer2d::BlendMode_Translucent;
           need_alpha  = true;
           break;
