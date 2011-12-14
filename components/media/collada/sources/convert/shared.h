@@ -15,6 +15,7 @@
 #include <media/animation/animation_library.h>
 #include <media/geometry/mesh_library.h>
 #include <media/geometry/vertex.h>
+#include <media/physics/physics_library.h>
 #include <media/collada.h>
 
 #endif

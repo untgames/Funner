@@ -13,9 +13,10 @@ struct Light::Impl: public xtl::reference_counter
   LightType   type;                    //тип источника света
   float       params [LightParam_Num]; //параметры источника света
   vec3f       color;                   //цвет источника
+  float       intensity;               //интенсивность источника
   stl::string id;                      //идентификатор источника
   
-  Impl () : type (LightType_Point)
+  Impl () : type (LightType_Point), intensity (1.0f)
   {
     for (size_t i=0; i<LightParam_Num; i++)
       params [i] = 0.0f;
@@ -113,6 +114,20 @@ const vec3f& Light::Color () const
 void Light::SetColor (const vec3f& color)
 {
   impl->color = color;
+}
+
+/*
+    Интенсивность источника
+*/
+
+float Light::Intensity () const
+{
+  return impl->intensity;
+}
+
+void Light::SetIntensity (float value)
+{
+  impl->intensity = value;
 }
 
 /*

@@ -21,11 +21,11 @@ void DaeParser::ParseLibraryLights (Parser::Iterator iter)
     Разбор источника света
 */
 
-void DaeParser::ParseLight (Parser::Iterator iter)
+void DaeParser::ParseLight (Parser::Iterator light_iter)
 {
-  const char* id = get<const char*> (*iter, "id");
-   
-  iter = iter->First ("technique_common");
+  const char* id = get<const char*> (*light_iter, "id");
+  
+  Parser::Iterator iter = light_iter->First ("technique_common");
 
   if (!iter)
     return;
@@ -72,6 +72,20 @@ void DaeParser::ParseLight (Parser::Iterator iter)
   
   if (common::ParseNode param_node = iter->First ("color.#text"))
     light.SetColor (get<vec3f> (param_node, ""));
+    
+    //чтение интенсивности
+
+  for (Parser::NamesakeIterator technique_iter=light_iter->First ("extra.technique"); technique_iter; ++technique_iter)
+  {
+    const char* profile = get<const char*> (*technique_iter, "profile", "");
+    
+    if (!xtl::xstricmp (profile, "OpenCOLLADA3dsMax"))
+    {
+      float intensity = get<float> (*technique_iter, "max_light.multiplier.#text", 1.0f);
+      
+      light.SetIntensity (intensity);
+    }
+  }
   
     //чтение параметров источника света
     

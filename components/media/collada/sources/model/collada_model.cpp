@@ -11,19 +11,24 @@ typedef media::CollectionImpl<Animation, ICollection<Animation> > AnimationListI
 
 struct Model::Impl
 {
-  stl::string            name;         //имя модели
-  stl::string            active_scene; //имя активной сцены
-  AnimationListImpl      animations;   //библиотека анимаций
-  LibraryImpl<Effect>    effects;      //библиотека эффектов
-  LibraryImpl<Image>     images;       //библиотека картинок
-  LibraryImpl<Material>  materials;    //библиотека материалов
-  LibraryImpl<Mesh>      meshes;       //библиотека мешей
-  LibraryImpl<Morph>     morphs;       //библиотека морферов
-  LibraryImpl<Skin>      skins;        //библиотека скинов
-  LibraryImpl<Node>      nodes;        //библиотека узлов
-  LibraryImpl<Node>      scenes;       //библиотека сцен
-  LibraryImpl<Light>     lights;       //библиотека источников света
-  LibraryImpl<Camera>    cameras;      //библиотека камер
+  stl::string            name;            //имя модели
+  stl::string            active_scene;    //имя активной сцены
+  float                  unit_of_measure; //значение единицы величины по отношению к метру
+  AnimationListImpl      animations;      //библиотека анимаций
+  LibraryImpl<Effect>    effects;         //библиотека эффектов
+  LibraryImpl<Image>     images;          //библиотека картинок
+  LibraryImpl<Material>  materials;       //библиотека материалов
+  LibraryImpl<Mesh>      meshes;          //библиотека мешей
+  LibraryImpl<Morph>     morphs;          //библиотека морферов
+  LibraryImpl<Skin>      skins;           //библиотека скинов
+  LibraryImpl<Node>      nodes;           //библиотека узлов
+  LibraryImpl<Node>      scenes;          //библиотека сцен
+  LibraryImpl<Light>     lights;          //библиотека источников света
+  LibraryImpl<Camera>    cameras;         //библиотека камер
+
+  Impl ()
+    : unit_of_measure (1.f)
+    {}
 };
 
 /*
@@ -134,6 +139,20 @@ void Model::SetActiveSceneName (const char* scene_name)
     throw xtl::make_null_argument_exception ("media::collada::Model::SetActiveSceneName", "scene_name");
     
   impl->active_scene = scene_name;
+}
+
+/*
+   Значение единицы величины по отношению к метру
+*/
+
+float Model::UnitOfMeasure () const
+{
+  return impl->unit_of_measure;
+}
+
+void Model::SetUnitOfMeasure (float value)
+{
+  impl->unit_of_measure = value;
 }
 
 /*

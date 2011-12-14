@@ -1,3 +1,4 @@
+#include <cfloat>
 #include <cstdio>
 
 #include <stl/hash_map>
@@ -11,7 +12,13 @@
 #include <common/strlib.h>
 #include <common/xml_writer.h>
 
+#include <bv/axis_aligned_box.h>
+
+#include <math/utility.h>
+
 #include <media/animation/animation_library.h>
+#include <media/physics/physics_library.h>
+#include <media/rfx/material_library.h>
 
 #include <media/collada.h>
 #include <media/image.h>
@@ -26,26 +33,6 @@ using namespace media::collada;
 
 const char* APPLICATION_NAME = "collada_converter";
 
-const char* SHADER_TYPE_ATTRIBUTE              = "Effect";
-const char* REFLECTIVITY_ATTRIBUTE             = "Reflectivity";
-const char* TRANSPARENCY_ATTRIBUTE             = "Transparency";
-const char* SHININESS_ATTRIBUTE                = "Shininess";
-const char* DIFFUSE_ATTRIBUTE                  = "Diffuse";
-const char* DIFFUSE_TEXTURE_ATTRIBUTE          = "DiffuseTexture";
-const char* DIFFUSE_TEXTURE_CHANNEL_ATTRIBUTE  = "DiffuseTextureChannel";
-const char* AMBIENT_ATTRIBUTE                  = "Ambient";
-const char* AMBIENT_TEXTURE_ATTRIBUTE          = "AmbientTexture";
-const char* AMBIENT_TEXTURE_CHANNEL_ATTRIBUTE  = "AmbientTextureChannel";
-const char* SPECULAR_ATTRIBUTE                 = "Specular";
-const char* SPECULAR_TEXTURE_ATTRIBUTE         = "SpecularTexture";
-const char* SPECULAR_TEXTURE_CHANNEL_ATTRIBUTE = "SpecularTextureChannel";
-const char* EMISSION_ATTRIBUTE                 = "Emission";
-const char* EMISSION_TEXTURE_ATTRIBUTE         = "EmissionTexture";
-const char* EMISSION_TEXTURE_CHANNEL_ATTRIBUTE = "EmissionTextureChannel";
-const char* BUMP_AMOUNT_ATTRIBUTE              = "BumpAmount";
-const char* BUMP_TEXTURE_ATTRIBUTE             = "BumpTexture";
-const char* BUMP_TEXTURE_CHANNEL_ATTRIBUTE     = "BumpTextureChannel";
-
 const size_t HELP_STRING_PREFIX_LENGTH  = 30;
 
 const float EPSILON = 0.001f;
@@ -54,7 +41,8 @@ const float EPSILON = 0.001f;
     Типы
 */
 
-typedef stl::hash_map<stl::hash_key<const char*>, stl::string> ImagesMap;
+typedef stl::hash_map<stl::hash_key<const char*>, stl::string>           ImagesMap;
+typedef stl::hash_map<stl::hash_key<const char*>, bound_volumes::aaboxf> BoundVolumesMap;
 
 struct Params;
 
@@ -73,25 +61,30 @@ struct Option
 //параметры запуска
 struct Params
 {
-  const Option* options;                     //массив опций
-  size_t        options_count;               //количество опций
-  stl::string   source_name;                 //имя исходного файла
-  StringArray   source_search_paths;         //пути к каталогам поиск ресурсов
-  stl::string   output_textures_dir_name;    //имя каталога с сохранёнными текстурами
-  stl::string   output_textures_format;      //формат текстур
-  stl::string   output_materials_file_name;  //файл материалов
-  stl::string   output_scene_file_name;      //файл сцены
-  stl::string   output_animations_file_name; //файл анимаций
-  stl::string   output_meshes_file_name;     //имя файла с сохранёнными мешами
-  stl::string   output_remove_file_prefix;   //отбрасываемый префикс имён файлов
-  stl::string   output_resources_namespace;  //пространство имён, применяемое при сохранении ресурсов
-  stl::string   exclude_nodes;               //неэкспортируемые узлы сцены
-  stl::string   merge_animation;             //имя анимации в которую должны быть вклеены все остальные анимации
-  size_t        max_texture_size;            //максимальный размер текстуры
-  bool          pot;                         //нужно ли масштабировать текстуры до ближайшей степени двойки
-  bool          silent;                      //минимальное число сообщений
-  bool          remove_unused_resources;     //нужно ли выбрасывать неиспользуемые ресурсы
-  bool          print_help;                  //нужно ли печатать сообщение помощи
+  const Option* options;                      //массив опций
+  size_t        options_count;                //количество опций
+  stl::string   source_name;                  //имя исходного файла
+  StringArray   source_search_paths;          //пути к каталогам поиск ресурсов
+  stl::string   output_textures_dir_name;     //имя каталога с сохранёнными текстурами
+  stl::string   output_textures_format;       //формат текстур
+  stl::string   material_textures_format;     //формат текстур сохраняемых в материале
+  stl::string   output_materials_file_name;   //файл материалов
+  stl::string   output_scene_file_name;       //файл сцены
+  stl::string   output_animations_file_name;  //файл анимаций
+  stl::string   output_meshes_file_name;      //имя файла с сохранёнными мешами
+  stl::string   output_phys_meshes_file_name; //имя файла с сохранёнными мешами для физики
+  stl::string   convex_phys_meshes;           //список масок имен физических мешей, являющихся конвексами
+  stl::string   output_remove_file_prefix;    //отбрасываемый префикс имён файлов
+  stl::string   output_resources_namespace;   //пространство имён, применяемое при сохранении ресурсов
+  stl::string   exclude_nodes;                //неэкспортируемые узлы сцены
+  stl::string   merge_animation;              //имя анимации в которую должны быть вклеены все остальные анимации
+  size_t        max_texture_size;             //максимальный размер текстуры
+  bool          convert_to_meters;            //нужно ли переводить единицы измерения в метры
+  bool          fix_zero_tangents;            //нужно ли генерировать вместо нулевых касательных произвольные
+  bool          pot;                          //нужно ли масштабировать текстуры до ближайшей степени двойки
+  bool          silent;                       //минимальное число сообщений
+  bool          remove_unused_resources;      //нужно ли выбрасывать неиспользуемые ресурсы
+  bool          print_help;                   //нужно ли печатать сообщение помощи
 };
 
 typedef xtl::shared_ptr<media::Image> TexturePtr;
@@ -177,6 +170,12 @@ void command_line_output_textures_format (const char* format, Params& params)
   params.output_textures_format = format;
 }
 
+//установка формата сохранения текстур в материале
+void command_line_material_textures_format (const char* format, Params& params)
+{
+  params.material_textures_format = format;
+}
+
 //установка максимального размера текстуры
 void command_line_output_max_texture_size (const char* value, Params& params)
 {
@@ -207,6 +206,18 @@ void command_line_output_meshes_file_name (const char* file_name, Params& params
   params.output_meshes_file_name = file_name;
 }
 
+//установка пути физических мешей
+void command_line_output_phys_meshes_file_name (const char* file_name, Params& params)
+{
+  params.output_phys_meshes_file_name = file_name;
+}
+
+//установка списка конвексных физических мешей
+void command_line_convex_phys_meshes (const char* wildcard_list, Params& params)
+{
+  params.convex_phys_meshes = wildcard_list;
+}
+
 //установка неэкспортируемых узлов сцены
 void command_line_exclude_nodes (const char* string, Params& params)
 {
@@ -217,6 +228,18 @@ void command_line_exclude_nodes (const char* string, Params& params)
 void command_line_merge_animation (const char* string, Params& params)
 {
   params.merge_animation = string;
+}
+
+//установка необходимости не корректировать единицы длины
+void command_line_dont_convert_to_meters (const char*, Params& params)
+{
+  params.convert_to_meters = false;
+}
+
+//установка необходимости масштабировать текстуры до ближайшей степени двойки
+void command_line_fix_zero_tangents (const char*, Params& params)
+{
+  params.fix_zero_tangents = true;
 }
 
 //установка необходимости масштабировать текстуры до ближайшей степени двойки
@@ -253,22 +276,27 @@ void command_line_set_resources_namespace (const char* prefix, Params& params)
 void command_line_parse (int argc, const char* argv [], Params& params)
 {
   static Option options [] = {
-    {command_line_source_search_path,          "include",               'I', "dir",       "add path to resources search paths"},
-    {command_line_output_textures_dir_name,    "out-textures-dir",        0, "dir",       "set output textures directory"},
-    {command_line_output_textures_format,      "out-textures-format",     0, "string",    "set output textures format string"},
-    {command_line_output_max_texture_size,     "max-texture-size",        0, "value",     "set maximum output textures size"},
-    {command_line_pot,                         "pot",                     0, 0,           "rescale textures to power of two"},
-    {command_line_output_materials_file_name,  "out-materials",           0, "file",      "set output materials file"},
-    {command_line_output_meshes_file_name,     "out-meshes",              0, "file",      "set output meshes file name"},
-    {command_line_output_scene_file_name,      "out-scene",               0, "file",      "set output scene file"},
-    {command_line_output_animations_file_name, "out-animations",          0, "file",      "set output animations file"},
-    {command_line_set_remove_file_prefix,      "remove-file-prefix",      0, "string",    "remove file prefix from all file links"},
-    {command_line_set_resources_namespace,     "resources-namespace",     0, "string",    "set resources namespace"},
-    {command_line_exclude_nodes,               "exclude-nodes",           0, "wildcards", "exclude selected nodes from export"},
-    {command_line_merge_animation,             "merge-animation",         0, "string",    "merge all animations in one with given name"},
-    {command_line_remove_unused_resources,     "remove-unused",           0, 0,           "remove unused resources from export"},
-    {command_line_silent,                      "silent",                's', 0,           "quiet mode"},
-    {command_line_help,                        "help",                  '?', 0,           "print help message"},
+    {command_line_source_search_path,           "include",                'I', "dir",       "add path to resources search paths"},
+    {command_line_output_textures_dir_name,     "out-textures-dir",         0, "dir",       "set output textures directory"},
+    {command_line_output_textures_format,       "out-textures-format",      0, "string",    "set output textures format string"},
+    {command_line_material_textures_format,     "material-textures-format", 0, "string",    "set material textures format string"},
+    {command_line_output_max_texture_size,      "max-texture-size",         0, "value",     "set maximum output textures size"},
+    {command_line_fix_zero_tangents,            "fix-zero-tangents",        0, 0,           "generate tangents for zero-values"},
+    {command_line_pot,                          "pot",                      0, 0,           "rescale textures to power of two"},
+    {command_line_output_materials_file_name,   "out-materials",            0, "file",      "set output materials file"},
+    {command_line_output_meshes_file_name,      "out-meshes",               0, "file",      "set output meshes file name"},
+    {command_line_output_phys_meshes_file_name, "out-phys-meshes",          0, "file",      "set output physics meshes file name"},
+    {command_line_convex_phys_meshes,           "convex-meshes",            0, "wldcards",  "set selected physics meshes as convex"},
+    {command_line_output_scene_file_name,       "out-scene",                0, "file",      "set output scene file"},
+    {command_line_output_animations_file_name,  "out-animations",           0, "file",      "set output animations file"},
+    {command_line_set_remove_file_prefix,       "remove-file-prefix",       0, "string",    "remove file prefix from all file links"},
+    {command_line_set_resources_namespace,      "resources-namespace",      0, "string",    "set resources namespace"},
+    {command_line_exclude_nodes,                "exclude-nodes",            0, "wildcards", "exclude selected nodes from export"},
+    {command_line_merge_animation,              "merge-animation",          0, "string",    "merge all animations in one with given name"},
+    {command_line_remove_unused_resources,      "remove-unused",            0, 0,           "remove unused resources from export"},
+    {command_line_dont_convert_to_meters,       "dont-convert-to-meters",   0, 0,           "dont scale scene to match units with meters"},
+    {command_line_silent,                       "silent",                 's', 0,           "quiet mode"},
+    {command_line_help,                         "help",                   '?', 0,           "print help message"},
   };
 
   static const size_t options_count = sizeof (options) / sizeof (*options);
@@ -455,7 +483,7 @@ void save_meshes (const Params& params, const Model& model)
 
   media::geometry::MeshLibrary mesh_library;
 
-  convert (model, mesh_library);
+  convert (model, mesh_library, params.fix_zero_tangents);
   
   if (!params.output_resources_namespace.empty ())
   {
@@ -505,6 +533,79 @@ void save_meshes (const Params& params, const Model& model)
     printf ("Ok\n");
 }
 
+//сохранение физических мешей
+void save_physics_meshes (const Params& params, const Model& model)
+{
+  if (!params.silent)
+    printf ("Convert physics meshes...");
+
+  media::physics::PhysicsLibrary library;
+
+  convert_triangle_meshes (model, library);
+
+  if (!params.output_resources_namespace.empty ())
+  {
+    media::physics::PhysicsLibrary new_library;
+
+    new_library.Rename (library.Name ());
+
+    const media::physics::PhysicsLibrary::TriangleMeshCollection& meshes     = library.TriangleMeshes ();
+    media::physics::PhysicsLibrary::TriangleMeshCollection&       new_meshes = new_library.TriangleMeshes ();
+
+    for (media::physics::PhysicsLibrary::TriangleMeshCollection::ConstIterator iter = meshes.CreateIterator (); iter; ++iter)
+    {
+      media::physics::shapes::TriangleMesh mesh  = *iter;
+      const char*                          id     = meshes.ItemId (iter);
+      stl::string                          new_id = common::format ("%s.%s", params.output_resources_namespace.c_str (), id);
+
+      new_meshes.Attach (new_id.c_str (), mesh);
+    }
+
+    new_library.Swap (library);
+  }
+
+  common::StringArray convex_meshes_list = common::split (params.convex_phys_meshes.c_str ());
+
+  for (media::physics::PhysicsLibrary::TriangleMeshCollection::Iterator iter = library.TriangleMeshes ().CreateIterator (); iter; ++iter)
+  {
+    media::physics::shapes::TriangleMesh mesh  = *iter;
+    const char*                          id     = library.TriangleMeshes ().ItemId (iter);
+
+    mesh.SetConvex (false);
+
+    for (size_t i = 0, count = convex_meshes_list.Size (); i < count; i++)
+    {
+      const char* mask = convex_meshes_list [i];
+
+      if (common::wcmatch (id, mask))
+      {
+        mesh.SetConvex (true);
+        break;
+      }
+    }
+  }
+
+  if (!params.silent)
+    printf ("Ok\n");
+
+  if (!params.silent)
+    printf ("Save physics meshes to '%s'...", params.output_phys_meshes_file_name.c_str ());
+
+  stl::string dir_name = common::dir (params.output_phys_meshes_file_name);
+
+  if (!FileSystem::IsFileExist (dir_name.c_str ()))
+    FileSystem::Mkdir (dir_name.c_str ());
+
+  media::physics::PhysicsLibrary::SaveOptions save_options;
+
+  save_options.separate_meshes_file = false;
+
+  library.Save (params.output_phys_meshes_file_name.c_str (), save_options);
+
+  if (!params.silent)
+    printf ("Ok\n");
+}
+
 //сохранение анимаций
 void save_animations (const Params& params, const Model& model)
 {
@@ -518,9 +619,25 @@ void save_animations (const Params& params, const Model& model)
   animation_library.Save (params.output_animations_file_name.c_str ());
 }
 
-//сохранение узла
-void save_node (const Params& params, const Node& node, XmlWriter& writer)
+//имя параметра источника света
+const char* light_param_name (LightParam param)
 {
+  switch (param)
+  {
+    case LightParam_AttenuationConstant:  return "attenuation_constant";
+    case LightParam_AttenuationLinear:    return "attenuation_linear";
+    case LightParam_AttenuationQuadratic: return "attenuation_quadratic";
+    case LightParam_FalloffAngle:         return "falloff_angle";
+    case LightParam_FalloffExponent:      return "falloff_exponent";
+    default:                              throw xtl::make_argument_exception ("::light_param_name", "param", param);
+  }
+}
+
+//сохранение узла
+void save_node (const Params& params, const BoundVolumesMap& meshes_bound_volumes, const Node& node, XmlWriter& writer)
+{
+  static const char* METHOD_NAME = "::save_node";
+
   common::StringArray exclude_nodes_list = common::split (params.exclude_nodes.c_str ());
 
   for (size_t i = 0, count = exclude_nodes_list.Size (); i < count; i++)
@@ -549,6 +666,13 @@ void save_node (const Params& params, const Node& node, XmlWriter& writer)
   if (!math::equal (node.ScalePivot (), math::vec3f (0.0f), EPSILON))
     writer.WriteAttribute ("scale_pivot", node.ScalePivot ());
 
+  if (xtl::xstrlen (node.UserProperties ()))
+  {
+    XmlWriter::Scope scope (writer, "properties");
+
+    writer.WriteData (node.UserProperties ());
+  }
+
     //метод экспорта связан с правилами именования инстанцированных мешей в конвертере
 
   size_t mesh_index = 0;
@@ -560,13 +684,56 @@ void save_node (const Params& params, const Node& node, XmlWriter& writer)
     if (!params.output_resources_namespace.empty ())
       mesh_name = common::format ("%s.%s", params.output_resources_namespace.c_str (), mesh_name.c_str ());
 
+    BoundVolumesMap::const_iterator mesh_bound_volume_iter = meshes_bound_volumes.find (mesh_name.c_str ());
+
+    if (mesh_bound_volume_iter == meshes_bound_volumes.end ())
+      throw xtl::format_operation_exception (METHOD_NAME, "Can't find bound volume for mesh '%s'", mesh_name.c_str ());
+
     XmlWriter::Scope scope (writer, "mesh");
 
     writer.WriteAttribute ("name", mesh_name.c_str ());
+    writer.WriteAttribute ("bound_box_min", mesh_bound_volume_iter->second.minimum ());
+    writer.WriteAttribute ("bound_box_max", mesh_bound_volume_iter->second.maximum ());
+  }
+
+  size_t light_index = 0;
+
+  for (Node::LightList::ConstIterator iter = node.Lights ().CreateIterator (); iter; ++iter)
+  {
+    stl::string light_name = common::format ("%s.light#%u", node.Id (), light_index++);
+
+    const char* light_type;
+
+    switch (iter->Type ())
+    {
+      case LightType_Ambient:
+        light_type = "ambient_light";
+        break;
+      case LightType_Point:
+        light_type = "point_light";
+        break;
+      case LightType_Spot:
+        light_type = "spot_light";
+        break;
+      case LightType_Direct:
+        light_type = "direct_light";
+        break;
+      default:
+        throw xtl::format_operation_exception (METHOD_NAME, "Can't save node '%s', unknown light type %d", node.Id (), iter->Type ());
+    }
+
+    XmlWriter::Scope scope (writer, light_type);
+
+    writer.WriteAttribute ("name", light_name.c_str ());
+    writer.WriteAttribute ("intensity", iter->Intensity ());    
+    writer.WriteAttribute ("color", iter->Color ());
+
+    for (size_t i = 0; i < LightParam_Num; i++)
+      writer.WriteAttribute (light_param_name ((LightParam)i), iter->Param ((LightParam)i));
   }
 
   for (Node::NodeList::ConstIterator iter = node.Nodes ().CreateIterator (); iter; ++iter)
-    save_node (params, *iter, writer);
+    save_node (params, meshes_bound_volumes, *iter, writer);
 }
 
 //сохранение сцены
@@ -584,8 +751,58 @@ void save_scene (const Params& params, const Model& model)
 
   XmlWriter::Scope scope (writer, "scene");
 
+    //построение ограничивающих объемов для мешей
+  BoundVolumesMap meshes_bound_volumes;
+
+  const MeshLibrary& mesh_library = model.Meshes ();
+
+  for (NodeLibrary::ConstIterator node_iter = model.Nodes ().CreateIterator (); node_iter; ++node_iter)
+  {
+    size_t mesh_index = 0;
+
+    for (Node::MeshList::ConstIterator mesh_iter = node_iter->Meshes ().CreateIterator (); mesh_iter; ++mesh_iter, ++mesh_index)
+    {
+      MeshLibrary::ConstIterator instance_mesh_iter = mesh_library.Find (mesh_iter->Mesh ());
+
+      if (!instance_mesh_iter)
+        throw xtl::format_operation_exception ("::save_scene", "Can't find mesh '%s'", mesh_iter->Mesh ());
+
+      bound_volumes::aaboxf bounding_box;
+
+      bool bounding_box_empty = true;
+
+      for (Mesh::SurfaceList::ConstIterator surface_iter = instance_mesh_iter->Surfaces ().CreateIterator (); surface_iter; ++surface_iter)
+      {
+        const Vertex* vertices = surface_iter->Vertices ();
+        const size_t* index    = surface_iter->Indices ();
+
+        for (size_t i = 0, count = surface_iter->IndicesCount (); i < count; i++, index++)
+        {
+          if (bounding_box_empty)
+          {
+            bounding_box.reset (vertices [*index].coord);
+            bounding_box_empty = false;
+          }
+          else
+            bounding_box += vertices [*index].coord;
+        }
+      }
+
+      stl::string mesh_id = common::format ("%s.%s.mesh#%u", params.output_resources_namespace.c_str (), node_iter->Id (), mesh_index);
+
+      meshes_bound_volumes.insert_pair (mesh_id.c_str (), bounding_box);
+    }
+  }
+
   for (NodeLibrary::ConstIterator i = model.Scenes ().CreateIterator (); i; ++i)
-    save_node (params, *i, writer);
+  {
+    Node scene_node (i->Clone ());
+
+    if (params.convert_to_meters)
+      scene_node.SetTransform (math::scale (math::vec3f (model.UnitOfMeasure ())) * scene_node.Transform ());
+
+    save_node (params, meshes_bound_volumes, scene_node, writer);
+  }
 
   if (!params.silent)
     printf ("Ok\n");
@@ -600,8 +817,7 @@ TexturePtr load_texture (const Params& params, const char* path)
   {
     const char* dir = search_paths [i];
     
-    stl::string texture_short_path = common::notdir (path),
-                texture_path       = common::format ("%s/%s", dir, texture_short_path.c_str ());                
+    stl::string texture_path = common::format ("%s/%s", dir, path);
 
     if (!FileSystem::IsFileExist (texture_path.c_str ()))
       continue; //файл не найден
@@ -640,6 +856,32 @@ TexturePtr load_texture (const Params& params, const char* path)
   return TexturePtr ();
 }
 
+stl::string get_texture_name (const char* texture_format, const char* dir_name, const char* image_path, size_t texture_id)
+{
+  if (!xtl::xstrlen (texture_format))
+  {
+    if (xtl::xstrlen (dir_name))
+      return common::format ("%s/%s", dir_name, image_path);
+    else
+      return image_path;
+  }
+  else
+  {
+    stl::string format;
+
+    if (xtl::xstrlen (dir_name))
+    {
+      format = common::format ("%s/%s", dir_name, texture_format);
+    }
+    else
+    {
+      format = texture_format;
+    }
+
+    return common::format (format.c_str (), texture_id);
+  }
+}
+
 //сохранение изображений
 void save_images (const Params& params, const Model& model, ImagesMap& images_map)
 {
@@ -658,8 +900,30 @@ void save_images (const Params& params, const Model& model, ImagesMap& images_ma
     if (!image.Path ())
       continue;
       
-    stl::string image_path = common::notdir (image.Path ());      
+    stl::string image_path;
+
+      //проверка есть ли картинка по указанному пути
+
+    const char** search_paths = params.source_search_paths.Data ();
+
+    for (size_t i=0, count=params.source_search_paths.Size (); i<count; i++)
+    {
+      const char* dir = search_paths [i];
       
+      stl::string texture_path = common::format ("%s/%s", dir, image.Path ());
+
+      if (FileSystem::IsFileExist (texture_path.c_str ()))
+      {
+        image_path = image.Path ();
+        break;
+      }
+    }
+
+      //если по указанному пути картинка не найдена, обрезание пути
+
+    if (image_path.empty ())
+      image_path = common::notdir (image.Path ());
+
     if (!params.silent)
       printf ("  process texture '%s'...", image_path.c_str ());
 
@@ -673,38 +937,17 @@ void save_images (const Params& params, const Model& model, ImagesMap& images_ma
       throw xtl::format_operation_exception ("::save_images", "Image '%s' not found", image_path.c_str ());
     }
       
-    stl::string output_texture_name;
+    stl::string output_texture_name   = get_texture_name (params.output_textures_format.c_str (), params.output_textures_dir_name.c_str (), image_path.c_str (), texture_id),
+                material_texture_name;
 
-    if (params.output_textures_format.empty ())
-    {
-      if (!params.output_textures_dir_name.empty ())
-      {
-        output_texture_name = common::format ("%s/%s", params.output_textures_dir_name.c_str (), image_path.c_str ());
-      }
-      else
-      {
-        output_texture_name = image_path;
-      }
-    }
+    if (params.material_textures_format.empty ())
+      material_texture_name = output_texture_name;
     else
-    {
-      stl::string format;
-      
-      if (!params.output_textures_dir_name.empty ())
-      {
-        format = common::format ("%s/%s", params.output_textures_dir_name.c_str (), params.output_textures_format.c_str ());
-      }
-      else
-      {
-        format = params.output_textures_format;
-      }
-      
-      output_texture_name = common::format (format.c_str (), texture_id);
-    }
+      material_texture_name = get_texture_name (params.material_textures_format.c_str (), params.output_textures_dir_name.c_str (), image_path.c_str (), texture_id);
 
     texture->Save (output_texture_name.c_str ());
 
-    images_map.insert_pair (image.Id (), output_texture_name.c_str ());
+    images_map.insert_pair (image.Id (), material_texture_name.c_str ());
 
     ++texture_id;
 
@@ -735,90 +978,53 @@ stl::string get_texture_path (const Params& params, ImagesMap& images_map, const
 }
 
 //сохранение материалов
-void save_material (const Params& params, const Effect& effect, ImagesMap& images_map, XmlWriter& writer)
+void add_texmap (const Params& params, const Effect& effect, TextureMap map, ImagesMap& images_map, media::rfx::Material& material)
 {
-  XmlWriter::Scope material_scope (writer, "Material");
-  
-  stl::string id = params.output_resources_namespace.empty () ? effect.Id () : common::format ("%s.%s", params.output_resources_namespace.c_str (), effect.Id ());
+  if (!effect.HasTexture (map))
+    return;
 
-  writer.WriteAttribute ("Name", id.c_str ());
+  const Texture&     texture = effect.Texture (map);
+  media::rfx::Texmap texmap;
+  const char         *semantic, *texture_channel_property;
 
-  XmlWriter::Scope shader_parameters_scope (writer, "ShaderParameters");
-
-  switch (effect.ShaderType ())
+  switch (map)
   {
-    case ShaderType_Constant:
-      writer.WriteAttribute (SHADER_TYPE_ATTRIBUTE, "constant");
+    case TextureMap_Diffuse:
+      semantic                 = "diffuse";
+      texture_channel_property = "DiffuseTextureChannel";
       break;
-    case ShaderType_Lambert:
-      writer.WriteAttribute (SHADER_TYPE_ATTRIBUTE, "lambert");
+    case TextureMap_Ambient:
+      semantic                 = "ambient";
+      texture_channel_property = "AmbientTextureChannel";
       break;
-    case ShaderType_Phong:
-      writer.WriteAttribute (SHADER_TYPE_ATTRIBUTE, "phong");
+    case TextureMap_Specular:
+      semantic                 = "specular";
+      texture_channel_property = "SpecularTextureChannel";
       break;
-    case ShaderType_Blinn:
-      writer.WriteAttribute (SHADER_TYPE_ATTRIBUTE, "blinn");
+    case TextureMap_Transparent:  //ignore transparency textures
+      return;
+    case TextureMap_Emission:
+      semantic                 = "emission";
+      texture_channel_property = "EmissionTextureChannel";
+      break;
+    case TextureMap_Reflective:
+      semantic                 = "reflective";
+      texture_channel_property = "ReflectiveTextureChannel";
+      break;
+    case TextureMap_Bump:
+      semantic                 = "bump";
+      texture_channel_property = "BumpTextureChannel";
       break;
     default:
-      throw xtl::format_operation_exception ("save_material", "Effect '%s' has unknown shader type", effect.Id ());
+      throw xtl::format_operation_exception ("add_texmap", "Unknown map %d", map);
   }
 
-  writer.WriteAttribute (REFLECTIVITY_ATTRIBUTE, effect.Param (EffectParam_Reflectivity));
-  writer.WriteAttribute (TRANSPARENCY_ATTRIBUTE, effect.Param (EffectParam_Transparency));
-  writer.WriteAttribute (SHININESS_ATTRIBUTE,    effect.Param (EffectParam_Shininess));
-  writer.WriteAttribute (DIFFUSE_ATTRIBUTE,      effect.MapColor (TextureMap_Diffuse));
-  writer.WriteAttribute (AMBIENT_ATTRIBUTE,      effect.MapColor (TextureMap_Ambient));
-  writer.WriteAttribute (SPECULAR_ATTRIBUTE,     effect.MapColor (TextureMap_Specular));
-  writer.WriteAttribute (EMISSION_ATTRIBUTE,     effect.MapColor (TextureMap_Emission));
+  texmap.SetSemantic (semantic);
+  texmap.SetImage    (get_texture_path (params, images_map, texture).c_str ());
 
-  if (effect.HasTexture (TextureMap_Bump))
-  {
-    const Texture& texture = effect.Texture (TextureMap_Bump);
+  material.AddTexmap (texmap);
 
-    writer.WriteAttribute (BUMP_TEXTURE_ATTRIBUTE, get_texture_path (params, images_map, texture).c_str ());
-    writer.WriteAttribute (BUMP_TEXTURE_CHANNEL_ATTRIBUTE, get_texture_channel_number (texture.TexcoordChannel ()));
-    writer.WriteAttribute (BUMP_AMOUNT_ATTRIBUTE, texture.Amount ());
-  }
-
-  if (effect.HasTexture (TextureMap_Diffuse))
-  {
-    const Texture& texture = effect.Texture (TextureMap_Diffuse);
-
-    writer.WriteAttribute (DIFFUSE_TEXTURE_ATTRIBUTE, get_texture_path (params, images_map, texture).c_str ());
-    writer.WriteAttribute (DIFFUSE_TEXTURE_CHANNEL_ATTRIBUTE, get_texture_channel_number (texture.TexcoordChannel ()));
-  }
-
-  if (effect.HasTexture (TextureMap_Ambient))
-  {
-    const Texture& texture = effect.Texture (TextureMap_Ambient);
-
-    writer.WriteAttribute (AMBIENT_TEXTURE_ATTRIBUTE, get_texture_path (params, images_map, texture).c_str ());
-    writer.WriteAttribute (AMBIENT_TEXTURE_CHANNEL_ATTRIBUTE, get_texture_channel_number (texture.TexcoordChannel ()));
-  }
-
-  if (effect.HasTexture (TextureMap_Specular))
-  {
-    const Texture& texture = effect.Texture (TextureMap_Specular);
-
-    writer.WriteAttribute (SPECULAR_TEXTURE_ATTRIBUTE, get_texture_path (params, images_map, texture).c_str ());
-    writer.WriteAttribute (SPECULAR_TEXTURE_CHANNEL_ATTRIBUTE, get_texture_channel_number (texture.TexcoordChannel ()));
-  }
-
-  if (effect.HasTexture (TextureMap_Emission))
-  {
-    const Texture& texture = effect.Texture (TextureMap_Emission);
-
-    writer.WriteAttribute (EMISSION_TEXTURE_ATTRIBUTE, get_texture_path (params, images_map, texture).c_str ());
-    writer.WriteAttribute (EMISSION_TEXTURE_CHANNEL_ATTRIBUTE, get_texture_channel_number (texture.TexcoordChannel ()));
-  }
-}
-
-void save_property_declaration (const char* name, const char* type, XmlWriter& writer)
-{
-  XmlWriter::Scope scope (writer, "Property");
-
-  writer.WriteAttribute ("Name", name);
-  writer.WriteAttribute ("Type", type);
+  material.Properties ().SetProperty (texture_channel_property, get_texture_channel_number (texture.TexcoordChannel ()));
 }
 
 void save_materials (const Params& params, const Model& model, ImagesMap& images_map)
@@ -831,49 +1037,61 @@ void save_materials (const Params& params, const Model& model, ImagesMap& images
   if (!FileSystem::IsFileExist (dir_name.c_str ()))
     FileSystem::Mkdir (dir_name.c_str ());
 
-  XmlWriter writer (params.output_materials_file_name.c_str ());
-
-  XmlWriter::Scope library_scope (writer, "MaterialLibrary");
-
-  {
-    XmlWriter::Scope templates_scope  (writer, "Templates");
-    XmlWriter::Scope properties_scope (writer, "Properties");
-    writer.WriteAttribute ("Name", "ShaderParameters");
-
-    {
-      XmlWriter::Scope scope (writer, "Property");
-
-      writer.WriteAttribute ("Name", "Effect");
-      writer.WriteAttribute ("Type", "string");
-      writer.WriteAttribute ("Value", "default");
-    }
-
-//    save_property_declaration (SHADER_TYPE_ATTRIBUTE, "string", writer);
-    save_property_declaration (REFLECTIVITY_ATTRIBUTE, "float", writer);
-    save_property_declaration (TRANSPARENCY_ATTRIBUTE, "float", writer);
-    //?????Refraction??????
-    save_property_declaration (SHININESS_ATTRIBUTE,                "float",  writer);
-    save_property_declaration (BUMP_AMOUNT_ATTRIBUTE,              "float",  writer);
-    save_property_declaration (BUMP_TEXTURE_ATTRIBUTE,             "string", writer);
-    save_property_declaration (BUMP_TEXTURE_CHANNEL_ATTRIBUTE,     "int",    writer);
-    save_property_declaration (DIFFUSE_ATTRIBUTE,                  "vector", writer);
-    save_property_declaration (DIFFUSE_TEXTURE_ATTRIBUTE,          "string", writer);
-    save_property_declaration (DIFFUSE_TEXTURE_CHANNEL_ATTRIBUTE,  "int",    writer);
-    save_property_declaration (AMBIENT_ATTRIBUTE,                  "vector", writer);
-    save_property_declaration (AMBIENT_TEXTURE_ATTRIBUTE,          "string", writer);
-    save_property_declaration (AMBIENT_TEXTURE_CHANNEL_ATTRIBUTE,  "int",    writer);
-    save_property_declaration (SPECULAR_ATTRIBUTE,                 "vector", writer);
-    save_property_declaration (SPECULAR_TEXTURE_ATTRIBUTE,         "string", writer);
-    save_property_declaration (SPECULAR_TEXTURE_CHANNEL_ATTRIBUTE, "int",    writer);
-    save_property_declaration (EMISSION_ATTRIBUTE,                 "vector", writer);
-    save_property_declaration (EMISSION_TEXTURE_ATTRIBUTE,         "string", writer);
-    save_property_declaration (EMISSION_TEXTURE_CHANNEL_ATTRIBUTE, "int",    writer);
-  }
-
-  XmlWriter::Scope scope (writer, "Materials");
+  media::rfx::MaterialLibrary material_library;
 
   for (EffectLibrary::ConstIterator i = model.Effects ().CreateIterator (); i; ++i)
-    save_material (params, *i, images_map, writer);
+  {
+    media::rfx::Material material;
+
+    stl::string id = params.output_resources_namespace.empty () ? i->Id () : common::format ("%s.%s", params.output_resources_namespace.c_str (), i->Id ());
+
+    material.SetName (i->Id ());
+
+    switch (i->ShaderType ())
+    {
+      case ShaderType_Constant:
+        material.SetProgram ("constant");
+        break;
+      case ShaderType_Lambert:
+        material.SetProgram ("lambert");
+        break;
+      case ShaderType_Phong:
+        material.SetProgram ("phong");
+        break;
+      case ShaderType_Blinn:
+        material.SetProgram ("blinn");
+        break;
+      default:
+        throw xtl::format_operation_exception ("save_materials", "Effect '%s' has unknown shader type", i->Id ());
+    }
+
+    common::PropertyMap& properties = material.Properties ();
+
+    properties.SetProperty ("Reflectivity", i->Param (EffectParam_Reflectivity));
+    properties.SetProperty ("Transparency", i->Param (EffectParam_Transparency));
+    properties.SetProperty ("Shininess",    i->Param (EffectParam_Shininess));
+    properties.SetProperty ("Diffuse",      i->MapColor (TextureMap_Diffuse));
+    properties.SetProperty ("Ambient",      i->MapColor (TextureMap_Ambient));
+    properties.SetProperty ("Specular",     i->MapColor (TextureMap_Specular));
+    properties.SetProperty ("Emission",     i->MapColor (TextureMap_Emission));
+
+    if (i->HasTexture (TextureMap_Bump))
+    {
+      const Texture& texture = i->Texture (TextureMap_Bump);
+
+      properties.SetProperty ("BumpAmount", texture.Amount ());
+    }
+
+    if (i->HasTexture (TextureMap_Transparent))
+      properties.SetProperty ("BlendMode", "translucent");
+
+    for (size_t j = 0; j < TextureMap_Num; j++)
+      add_texmap (params, *i, (TextureMap)j, images_map, material);
+
+    material_library.Attach (id.c_str (), material);
+  }
+
+  material_library.Save (params.output_materials_file_name.c_str ());
     
   if (!params.silent)
     printf ("Ok\n");
@@ -889,7 +1107,7 @@ void print (const char* message)
 void export_data (Params& params)
 {
   if (!params.silent)
-    printf ("Load model '%s'...", params.source_name.c_str ());
+    printf ("Load model '%s'...\n", params.source_name.c_str ());
 
   Model model (params.source_name.c_str (), &print);
 
@@ -920,6 +1138,9 @@ void export_data (Params& params)
   if (!params.output_meshes_file_name.empty ())
     save_meshes (params, model);
 
+  if (!params.output_phys_meshes_file_name.empty ())
+    save_physics_meshes (params, model);
+
   if (!params.output_scene_file_name.empty ())
     save_scene (params, model);
 
@@ -947,9 +1168,11 @@ int main (int argc, const char *argv[])
 
     params.options                 = 0;
     params.options_count           = 0;
+    params.convert_to_meters       = true;
     params.silent                  = false;
     params.remove_unused_resources = false;
     params.print_help              = false;
+    params.fix_zero_tangents       = false;
     params.pot                     = false;
     params.max_texture_size        = 0;
     

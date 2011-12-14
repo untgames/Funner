@@ -3,7 +3,10 @@
 namespace
 {
 
-const size_t SURFACES_RESERVE_SIZE = 8; //резервируемое количество поверхностей
+const float  EPS                   = 0.001f;
+const size_t SURFACES_RESERVE_SIZE = 8;     //резервируемое количество поверхностей
+
+const char* MAIN_VERTEX_STREAM_NAME = "main";
 
 /*
     Преобразователь данных коллады
@@ -54,17 +57,21 @@ class Converter
     };
 
   private:
-    const media::collada::Model&   model;        //исходная коллада-модель
-    media::geometry::MeshLibrary&  mesh_library; //результирующая библиотека мешей
-    MeshMap                        mesh_map;     //карта преобразованных мешей
-    SkinMap                        skin_map;     //карта преобразованных скинов
+    const media::collada::Model&   model;             //исходная коллада-модель
+    media::geometry::MeshLibrary&  mesh_library;      //результирующая библиотека мешей
+    MeshMap                        mesh_map;          //карта преобразованных мешей
+    SkinMap                        skin_map;          //карта преобразованных скинов
+    bool                           fix_zero_tangents; //необходимо ли исправлять нулевые касательные
 
   public:
     /*
         Конструктор
     */
 
-    Converter (const media::collada::Model& in_model, media::geometry::MeshLibrary& in_library) : model (in_model), mesh_library (in_library)
+    Converter (const media::collada::Model& in_model, media::geometry::MeshLibrary& in_library, bool in_fix_zero_tangents)
+      : model (in_model)
+      , mesh_library (in_library)
+      , fix_zero_tangents (in_fix_zero_tangents)
     {
       ConvertLibrary (model.Meshes (), &Converter::ConvertMesh);
       ConvertLibrary (model.Skins (), &Converter::ConvertSkin);
@@ -89,8 +96,6 @@ class Converter
       //преобразование положений и нормалей
     void ConvertSurfaceVertices (const media::collada::Surface& src_surface, Surface& dst_surface)
     {
-//      typedef media::geometry::Vertex<media::geometry::Position3f, media::geometry::Normalf,
-//        media::geometry::Tangentf, media::geometry::Binormalf> ColladaVertex;
       typedef media::geometry::Vertex<media::geometry::Position3f, media::geometry::Normalf> ColladaVertex;
 
       size_t vertices_count = src_surface.VerticesCount ();
@@ -111,34 +116,72 @@ class Converter
 
         //добавление потока в карту вершинных потоков поверхности
 
-      dst_surface.vertex_streams.insert_pair ("main", vs);
+      dst_surface.vertex_streams.insert_pair (MAIN_VERTEX_STREAM_NAME, vs);
     }
 
       //преобразование текстурных вершин
-    void SetVertexTexCoord (const media::collada::TexVertex& src_vertex, media::geometry::Vertex<media::geometry::TexChannel<0>::Coord3f, media::geometry::Tangentf, media::geometry::Binormalf>& dst_vertex)
+    void SetVertexTexCoord (const media::collada::TexVertex& src_vertex, media::geometry::Vertex<media::geometry::TexChannel<0>::Coord3f, media::geometry::TexChannel<0>::Tangentf, media::geometry::TexChannel<0>::Binormalf>& dst_vertex)
     {
-      dst_vertex.texcoord0 = src_vertex.coord;
+      dst_vertex.texcoord0    = src_vertex.coord;
+      dst_vertex.textangent0  = src_vertex.tangent;
+      dst_vertex.texbinormal0 = src_vertex.binormal; 
     }
 
-    void SetVertexTexCoord (const media::collada::TexVertex& src_vertex, media::geometry::Vertex<media::geometry::TexChannel<1>::Coord3f, media::geometry::Tangentf, media::geometry::Binormalf>& dst_vertex)
+    void SetVertexTexCoord (const media::collada::TexVertex& src_vertex, media::geometry::Vertex<media::geometry::TexChannel<1>::Coord3f, media::geometry::TexChannel<1>::Tangentf, media::geometry::TexChannel<1>::Binormalf>& dst_vertex)
     {
-      dst_vertex.texcoord1 = src_vertex.coord;
+      dst_vertex.texcoord1    = src_vertex.coord;
+      dst_vertex.textangent1  = src_vertex.tangent;
+      dst_vertex.texbinormal1 = src_vertex.binormal;       
     }
 
-    void SetVertexTexCoord (const media::collada::TexVertex& src_vertex, media::geometry::Vertex<media::geometry::TexChannel<2>::Coord3f, media::geometry::Tangentf, media::geometry::Binormalf>& dst_vertex)
+    void SetVertexTexCoord (const media::collada::TexVertex& src_vertex, media::geometry::Vertex<media::geometry::TexChannel<2>::Coord3f, media::geometry::TexChannel<2>::Tangentf, media::geometry::TexChannel<2>::Binormalf>& dst_vertex)
     {
-      dst_vertex.texcoord2 = src_vertex.coord;
+      dst_vertex.texcoord2    = src_vertex.coord;
+      dst_vertex.textangent2  = src_vertex.tangent;
+      dst_vertex.texbinormal2 = src_vertex.binormal;       
     }
 
-    void SetVertexTexCoord (const media::collada::TexVertex& src_vertex, media::geometry::Vertex<media::geometry::TexChannel<3>::Coord3f, media::geometry::Tangentf, media::geometry::Binormalf>& dst_vertex)
+    void SetVertexTexCoord (const media::collada::TexVertex& src_vertex, media::geometry::Vertex<media::geometry::TexChannel<3>::Coord3f, media::geometry::TexChannel<3>::Tangentf, media::geometry::TexChannel<3>::Binormalf>& dst_vertex)
     {
-      dst_vertex.texcoord3 = src_vertex.coord;
+      dst_vertex.texcoord3    = src_vertex.coord;
+      dst_vertex.textangent3  = src_vertex.tangent;
+      dst_vertex.texbinormal3 = src_vertex.binormal;       
     }
 
+    void SetVertexTexCoord (const media::collada::TexVertex& src_vertex, media::geometry::Vertex<media::geometry::TexChannel<4>::Coord3f, media::geometry::TexChannel<4>::Tangentf, media::geometry::TexChannel<4>::Binormalf>& dst_vertex)
+    {
+      dst_vertex.texcoord4    = src_vertex.coord;
+      dst_vertex.textangent4  = src_vertex.tangent;
+      dst_vertex.texbinormal4 = src_vertex.binormal;       
+    }
+
+    void SetVertexTexCoord (const media::collada::TexVertex& src_vertex, media::geometry::Vertex<media::geometry::TexChannel<5>::Coord3f, media::geometry::TexChannel<5>::Tangentf, media::geometry::TexChannel<5>::Binormalf>& dst_vertex)
+    {
+      dst_vertex.texcoord5    = src_vertex.coord;
+      dst_vertex.textangent5  = src_vertex.tangent;
+      dst_vertex.texbinormal5 = src_vertex.binormal;       
+    }
+
+    void SetVertexTexCoord (const media::collada::TexVertex& src_vertex, media::geometry::Vertex<media::geometry::TexChannel<6>::Coord3f, media::geometry::TexChannel<6>::Tangentf, media::geometry::TexChannel<6>::Binormalf>& dst_vertex)
+    {
+      dst_vertex.texcoord6    = src_vertex.coord;
+      dst_vertex.textangent6  = src_vertex.tangent;
+      dst_vertex.texbinormal6 = src_vertex.binormal;       
+    }
+
+    void SetVertexTexCoord (const media::collada::TexVertex& src_vertex, media::geometry::Vertex<media::geometry::TexChannel<7>::Coord3f, media::geometry::TexChannel<7>::Tangentf, media::geometry::TexChannel<7>::Binormalf>& dst_vertex)
+    {
+      dst_vertex.texcoord7    = src_vertex.coord;
+      dst_vertex.textangent7  = src_vertex.tangent;
+      dst_vertex.texbinormal7 = src_vertex.binormal;       
+    }
+    
     template<size_t channel_index>
     media::geometry::VertexStream CreateTexVertices (const media::collada::Surface& src_surface)
     {
-      typedef media::geometry::Vertex<typename media::geometry::TexChannel<channel_index>::Coord3f, media::geometry::Tangentf, media::geometry::Binormalf> ColladaTexVertex;
+      typedef media::geometry::Vertex<typename media::geometry::TexChannel<channel_index>::Coord3f,
+                                      typename media::geometry::TexChannel<channel_index>::Tangentf,
+                                      typename media::geometry::TexChannel<channel_index>::Binormalf> ColladaTexVertex;
 
       size_t vertices_count = src_surface.VerticesCount ();
 
@@ -155,12 +198,7 @@ class Converter
         return vs; //throw!!!
 
       for (size_t j=0; j<vertices_count; j++, src_vertex++, dst_vertex++)
-      {
         SetVertexTexCoord (*src_vertex, *dst_vertex);
-
-        dst_vertex->tangent   = src_vertex->tangent;
-        dst_vertex->binormal  = src_vertex->binormal;
-      }
       
       return vs;
     }
@@ -233,6 +271,18 @@ class Converter
             case 3:
               vs = CreateTexVertices<3> (src_surface);
               break;
+            case 4:
+              vs = CreateTexVertices<4> (src_surface);
+              break;
+            case 5:
+              vs = CreateTexVertices<5> (src_surface);
+              break;
+            case 6:
+              vs = CreateTexVertices<6> (src_surface);
+              break;
+            case 7:
+              vs = CreateTexVertices<7> (src_surface);
+              break;
             default:
               throw xtl::format_operation_exception ("media::collada::Converter::ConvertSurfaceTexVertexChannels", "Unsupported texture channel");
           }
@@ -240,7 +290,7 @@ class Converter
 
           //регистрация вершинного потока в поверхности
 
-        dst_surface.vertex_streams.insert_pair (common::format ("texchannels.%s", tex_channels.Name (i)).c_str (), vs);
+        dst_surface.vertex_streams.insert_pair (common::format ("texchannels.%u", tex_channels.Name (i)).c_str (), vs);
       }
     }
     
@@ -287,29 +337,125 @@ class Converter
              current_index_buffer_size = dst_index_buffer.Size ();
       
       dst_index_buffer.Resize (current_index_buffer_size + indices_count);
+      
+      if (dst_index_buffer.DataType () != media::geometry::IndexType_UInt32)
+        throw xtl::format_operation_exception ("media::collada::Converter::ConvertSurfaceIndices", "Unexpected index buffer type %s", get_index_type_name (dst_index_buffer.DataType ()));
 
-      stl::copy (src_surface.Indices (), src_surface.Indices () + indices_count, dst_index_buffer.Data () + current_index_buffer_size);
+      stl::copy (src_surface.Indices (), src_surface.Indices () + indices_count, dst_index_buffer.Data<unsigned int> () + current_index_buffer_size);
+    }
+
+      //коррекция нулевых касательных
+    void FixZeroTangents (Surface& dst_surface)
+    {
+      VertexStreamMap::iterator main_vs_iter = dst_surface.vertex_streams.find (MAIN_VERTEX_STREAM_NAME);
+
+      if (main_vs_iter == dst_surface.vertex_streams.end ())
+        return;
+
+      const media::geometry::VertexStream& main_vs          = main_vs_iter->second;
+      char*                                main_vs_data     = (char*)main_vs.Data ();
+      size_t                               main_vertex_size = main_vs.VertexSize ();
+      size_t                               normal_offset    = 0;
+
+      math::vec3f ort_y (0.f, 1.f, 0.f), ort_z (0.f, 0.f, 1.f);
+
+      const media::geometry::VertexFormat& main_vs_format = main_vs.Format ();
+
+      for (size_t i = 0, count = main_vs_format.AttributesCount (); i < count; i++)
+      {
+        const media::geometry::VertexAttribute& attribute = main_vs_format.Attribute (i);
+
+        if (attribute.semantic == media::geometry::VertexAttributeSemantic_Normal)
+        {
+          normal_offset = attribute.offset;
+          break;
+        }
+      }
+
+      for (VertexStreamMap::iterator vs_iter = dst_surface.vertex_streams.begin (), end = dst_surface.vertex_streams.end (); vs_iter != end; ++vs_iter)
+      {
+        if (vs_iter == main_vs_iter)
+          continue;
+
+        const media::geometry::VertexStream& vs = vs_iter->second;
+
+        bool   tangent_found = false;
+        size_t tangent_offset;
+
+        const media::geometry::VertexFormat& vertex_format = vs.Format ();
+
+        for (size_t i = 0, count = vertex_format.AttributesCount (); i < count; i++)
+        {
+          const media::geometry::VertexAttribute& attribute = vertex_format.Attribute (i);
+
+          switch (attribute.semantic)
+          {
+            case media::geometry::VertexAttributeSemantic_TexTangent0:
+            case media::geometry::VertexAttributeSemantic_TexTangent1:
+            case media::geometry::VertexAttributeSemantic_TexTangent2:
+            case media::geometry::VertexAttributeSemantic_TexTangent3:
+            case media::geometry::VertexAttributeSemantic_TexTangent4:
+            case media::geometry::VertexAttributeSemantic_TexTangent5:
+            case media::geometry::VertexAttributeSemantic_TexTangent6:
+            case media::geometry::VertexAttributeSemantic_TexTangent7:
+              tangent_found = true;
+              break;
+            default:
+              break;
+          }
+
+          if (tangent_found)
+          {
+            tangent_offset = attribute.offset;
+            break;
+          }
+        }
+
+        if (!tangent_found)
+          continue;
+
+        char*  vs_data     = (char*)vs.Data ();
+        size_t vertex_size = vs.VertexSize ();
+
+        for (size_t i = 0, count = main_vs.Size (); i < count; i++)
+        {
+          math::vec3f& tangent = *(math::vec3f*)(vs_data + vertex_size * i + tangent_offset);
+
+          if (tangent.x != 0.f || tangent.y != 0.f || tangent.z != 0.f)
+            continue;
+
+          const math::vec3f& normal = *(math::vec3f*)(main_vs_data + main_vertex_size * i + normal_offset);
+
+          if (math::equal (normal, ort_y, EPS))
+            tangent = math::cross (normal, ort_z);
+          else
+            tangent = math::cross (normal, ort_y);
+        }
+      }
     }
 
       //преобразование поверхности
     void ConvertSurface (const media::collada::Surface& src_surface, Mesh& dst_mesh)
-    {   
+    {
         //создание поверхности
 
       SurfacePtr dst_surface (new Surface);
-      
+
         //задание диапазона индексов
-        
-      dst_surface->first_index   = dst_mesh.index_buffer.Size ();      
+
+      dst_surface->first_index   = dst_mesh.index_buffer.Size ();
       dst_surface->indices_count = src_surface.IndicesCount ();
-      
+
         //преобразование массивов поверхности
 
       ConvertSurfaceVertices          (src_surface, *dst_surface);
       ConvertSurfaceTexVertexChannels (src_surface, *dst_surface);
       ConvertSurfaceInfluenceChannels (src_surface, *dst_surface);
-      ConvertSurfaceIndices           (src_surface, dst_mesh.index_buffer);      
-      
+      ConvertSurfaceIndices           (src_surface, dst_mesh.index_buffer);
+
+      if (fix_zero_tangents)
+        FixZeroTangents (*dst_surface);
+
         //преобразование типа примитива поверхности
       
       switch (src_surface.PrimitiveType ())
@@ -590,9 +736,9 @@ namespace collada
 {
 
 //преобразование коллада-модели в библиотеку мешей
-void convert (const media::collada::Model& src_model, geometry::MeshLibrary& dst_library)
+void convert (const media::collada::Model& src_model, geometry::MeshLibrary& dst_library, bool fix_zero_tangents)
 {
-  Converter (src_model, dst_library);
+  Converter (src_model, dst_library, fix_zero_tangents);
 }
 
 }

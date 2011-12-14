@@ -2,6 +2,13 @@
 
 using namespace math;
 
+namespace
+{
+
+const char* UNNAMED_NODE_FORMAT = "__unnamed_node_%u__";
+
+}
+
 /*
     Разбор библиотеки визуальных сцен
 */
@@ -31,6 +38,13 @@ void DaeParser::ParseVisualScene (Parser::Iterator iter)
   Node scene;
   
   scene.SetId (id);  
+
+  if (up_axis == Axis_Z)
+  {
+    float z_to_y_transform_matrix [] = { 1.f, 0.f, 0.f, 0.f, 0.f, 0.f, 1.f, 0.f, 0.f, -1.f, 0.f, 0.f, 0.f, 0.f, 0.f, 1.f };
+
+    scene.SetTransform (math::mat4f (z_to_y_transform_matrix));
+  }
   
   if (*name)
     scene.SetName (name);
@@ -48,19 +62,29 @@ void DaeParser::ParseVisualScene (Parser::Iterator iter)
 
 void DaeParser::ParseNode (Parser::Iterator iter, Node& parent)
 {
-  const char *id   = get<const char*> (*iter, "id"),
-             *sid  = get<const char*> (*iter, "sid", ""),
+  const char *sid  = get<const char*> (*iter, "sid", ""),
              *name = get<const char*> (*iter, "name", "");
   
+  stl::string id;
+
+  if (iter->First ("id"))
+    id = get<const char*> (*iter, "id");
+  else
+  {
+    static size_t unnamed_node_index = 0;
+
+    id = common::format (UNNAMED_NODE_FORMAT, unnamed_node_index++);
+  }
+
     //создание узла
   
   Node node;
   
-  node.SetId (id);
+  node.SetId (id.c_str ());
 
     //разбор преобразований узла
 
-  ParseTransform (iter, id, node);
+  ParseTransform (iter, id.c_str (), node);
   
     //биндинг к родительскому узлу
     
@@ -78,7 +102,7 @@ void DaeParser::ParseNode (Parser::Iterator iter, Node& parent)
   
     //добавление узла в библиотеку
     
-  model.Nodes ().Insert (id, node);  
+  model.Nodes ().Insert (id.c_str (), node);
   
     //разбор инстанцированной геометрии
     
@@ -99,6 +123,31 @@ void DaeParser::ParseNode (Parser::Iterator iter, Node& parent)
     //разбор вложенных узлов
 
   for_each_child (*iter, "node", bind (&DaeParser::ParseNode, this, _1, ref (node)));  
+
+    //чтение пользовательских свойств
+
+  for (Parser::NamesakeIterator extra_technique_iter = iter->First ("extra.technique"); extra_technique_iter; ++extra_technique_iter)
+  {
+    if (!xtl::xstrcmp (common::get <const char*> (*extra_technique_iter, "profile"), "OpenCOLLADA"))
+    {
+      Parser::Iterator user_properties_iter = extra_technique_iter->First ("user_properties.#text");
+
+      if (user_properties_iter)
+      {
+        stl::string properties_string;
+
+        for (size_t i = 0, count = user_properties_iter->AttributesCount (); i < count; i++)
+        {
+          properties_string.append (user_properties_iter->Attribute (i));
+
+          if (i != count - 1)
+            properties_string.append (" ");
+        }
+
+        node.SetUserProperties (properties_string.c_str ());
+      }
+    }
+  }
 }
 
 /*
