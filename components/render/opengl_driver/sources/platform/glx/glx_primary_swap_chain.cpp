@@ -287,4 +287,3 @@ void PrimarySwapChain::Present ()
 IPropertyList* PrimarySwapChain::GetProperties ()
 {
   return &impl->properties;
-}
