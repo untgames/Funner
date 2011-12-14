@@ -1,0 +1,246 @@
+/*
+   Class: Render.Screen
+ 
+   Экран. Основа для рендеринга, к нему присоединяются один или несколько вьюпортов, в каждый из 
+   которых может быть отрисовано изображение с камер. Экран должен быть зарегистрирован в файле 
+   конфигурации (подсистема рендеринга сцены).
+ */
+
+/*
+   Group: Функции
+ 
+ */
+
+/*
+   Function: Create
+ 
+   Создание экрана.
+ */
+Create ()
+
+/*
+   Function: SetBackgroundColor 
+ 
+   Установка цвета фона с указанием альфы.
+
+   Параметры:
+     r - red-компонента
+     g - green-компонента
+     b - blue-компонента
+     a - прозрачность
+ */
+SetBackgroundColor (number r, number g, number b, number a)
+
+/*
+   Function: SetBackgroundColor 
+ 
+   Установка цвета фона с альфой равной нулю.
+
+   Параметры:
+     r - red-компонента
+     g - green-компонента
+     b - blue-компонента
+ */
+SetBackgroundColor (number r, number g, number b)
+
+/*
+   Function: EnableBackground
+ 
+   Включение очистки области вывода при каждой перерисовке.
+ */
+EnableBackground ()
+
+/*
+   Function: DisableBackground
+ 
+   Отключение очистки области вывода при каждой перерисовке.
+ */
+DisableBackground ()
+
+/*
+   Function: Attach
+ 
+   Добавление вьюпорта.
+
+   Параметры:
+     viewport - вьюпорт
+ */
+Attach (Render.Viewport viewport)
+
+/*
+   Function: Detach
+ 
+   Удаление вьюпорта.
+
+   Параметры:
+     viewport - вьюпорт
+ */
+Detach (Render.Viewport viewport)
+
+/*
+   Function: DetachAllViewports
+ 
+   Удаление всех вьюпортов.
+ */
+DetachAllViewports ()
+
+/*
+   Function: Viewport
+ 
+   Возвращает вьюпорт по индексу.
+
+   Параметры:
+     index - индекс
+ */
+Viewport (number index)
+
+/*
+   Group: Поля
+ 
+ */
+
+/*
+   Property: Id
+ 
+   Идентификатор экрана (для сравнения двух экранов).
+
+   Тип:
+     number
+ 
+   Доступ:
+     Получение.
+ */
+Id
+
+/*
+   Property: ViewportsCount
+ 
+   Количество вьюпортов.
+
+   Тип:
+     number
+ 
+   Доступ:
+     Получение.
+ */
+ViewportsCount
+
+/*
+   Property: Name
+ 
+   Имя экрана.
+
+   Тип:
+     string
+ 
+   Доступ:
+     Получение/установка.
+ */
+Name
+
+/*
+   Property: BackgroundColor
+ 
+   Цвет фона.
+
+   Тип:
+     <Math.Vector4>
+ 
+   Доступ:
+     Получение/установка.
+ */
+BackgroundColor
+
+/*
+   Property: BackgroundState
+ 
+   Нужно ли очищать экран при каждой перерисовке.
+
+   Тип:
+     bool
+ 
+   Доступ:
+     Получение/установка.
+ */
+BackgroundState
+
+/*
+   Group: Примеры
+ 
+ */
+/*
+  Topic: Пример кода
+ 
+  (start code) 
+  function screen_test ()
+    print ("Screen test")
+
+    local screen1 = Render.Screen.Create ()
+
+    print ("Name = " .. screen1.Name)
+    print ("BackgroundColor = " .. tostring (screen1.BackgroundColor))
+    print ("BackgroundState = " .. tostring (screen1.BackgroundState))
+    print ("Viewports count = " .. screen1.ViewportsCount)
+  --  print ("Id = " .. tostring (screen1.Id))
+
+    screen1.Name = "screen1"
+    screen1.BackgroundColor = vec4 (0.1, 0.2, 0.3, 0.4)
+
+    print ("Name = " .. screen1.Name)
+    print ("BackgroundColor = " .. tostring (screen1.BackgroundColor))
+    print ("BackgroundState = " .. tostring (screen1.BackgroundState))
+
+    screen1:SetBackgroundColor (0.4, 0.3, 0.2, 0.1)
+    print ("BackgroundColor = " .. tostring (screen1.BackgroundColor))
+
+    screen1:SetBackgroundColor (0.4, 0.3, 0.2)
+    print ("BackgroundColor = " .. tostring (screen1.BackgroundColor))
+
+    screen1:DisableBackground ()
+    print ("BackgroundState = " .. tostring (screen1.BackgroundState))
+    screen1:EnableBackground ()
+    print ("BackgroundState = " .. tostring (screen1.BackgroundState))
+
+    local viewport1 = Render.Viewport.Create ()
+
+    viewport1.Name = "viewport1"
+
+    screen1:Attach (viewport1)
+    print ("Viewports count = " .. screen1.ViewportsCount)
+    print ("Viewports 0 name = " .. screen1:Viewport (0).Name)
+
+    screen1:Detach (viewport1)
+    print ("Viewports count = " .. screen1.ViewportsCount)
+
+    screen1:Attach (viewport1)
+    print ("Viewports count = " .. screen1.ViewportsCount)
+
+    screen1:DetachAllViewports ()
+    print ("Viewports count = " .. screen1.ViewportsCount)
+  end
+  (end code)
+*/
+
+/*
+  Topic: Результат
+ 
+  (start code) 
+  Screen test
+  Name = 
+  BackgroundColor = 0 0 0 0
+  BackgroundState = 1
+  Viewports count = 0
+  Name = screen1
+  BackgroundColor = 0.10000000149 0.20000000298 0.300000011921 0.40000000596
+  BackgroundState = 1
+  BackgroundColor = 0.40000000596 0.300000011921 0.20000000298 0.10000000149
+  BackgroundColor = 0.40000000596 0.300000011921 0.20000000298 0
+  BackgroundState = 0
+  BackgroundState = 1
+  Viewports count = 1
+  Viewports 0 name = viewport1
+  Viewports count = 0
+  Viewports count = 1
+  Viewports count = 0
+  (end code)
+*/

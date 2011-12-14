@@ -1,0 +1,173 @@
+/*
+   Class: Scene.Sprite
+ 
+   Спрайт.
+ */
+
+/*
+   Group: Функции
+ 
+ */
+
+/*
+   Function: Create
+ 
+   Создание спрайта.
+ */
+Create ()
+
+/*
+   Function: SetColor
+ 
+   Установка цвета и прозрачности.
+
+   Параметры:
+     r - red-компонента
+     g - green-компонента
+     b - blue-компонента
+     a - прозрачность
+ */
+SetColor (number r, number g, number b, number a)
+
+/*
+   Function: SetColor
+ 
+   Установка цвета и прозрачности.
+
+   Параметры:
+     r - red-компонента
+     g - green-компонента
+     b - blue-компонента
+ */
+SetColor (number r, number g, number b)
+
+/*
+   Group: Поля
+ 
+ */
+
+/*
+   Property: Color
+ 
+   Цвет.
+
+   Тип:
+     <Math.Vector4>
+ 
+   Доступ:
+     Получение/установка.
+ */
+Color
+
+/*
+   Property: Material
+ 
+   Имя материала.
+
+   Тип:
+     string
+ 
+   Доступ:
+     Получение/установка.
+ */
+Material
+
+/*
+   Property: Alpha
+ 
+   Прозрачность.
+
+   Диапазон:
+     0..1
+
+   Тип:
+     number
+ 
+   Доступ:
+     Получение/установка.
+ */
+Alpha
+
+/*
+   Property: AlphaReference
+ 
+   Значение альфы, при котором пиксел становится невидимым.
+
+   Тип:
+     number
+ 
+   Доступ:
+     Получение/установка.
+ */
+AlphaReference
+
+/*
+   Property: Frame
+ 
+   Номер кадра.
+
+   Тип:
+     number
+ 
+   Доступ:
+     Получение/установка.
+ */
+Frame
+
+/*
+   Group: Примеры
+ 
+ */
+/*
+  Topic: Пример кода
+ 
+  (start code) 
+  function test_sprite ()
+    print ("Sprite test")
+
+    local sprite1 = Scene.Sprite.Create ()
+
+    print ("Color = " .. tostring (sprite1.Color))
+    print ("Material name = " .. sprite1.Material)
+
+    sprite1.Material = "SettedMaterial"
+    sprite1.Alpha    = 0.8
+    sprite1.Frame    = 9
+    sprite1.AlphaReference = 0.4
+
+    print ("Alpha value = " .. sprite1.Alpha)
+    print ("Alpha reference = " .. sprite1.AlphaReference)
+    print ("Material name = " .. sprite1.Material)
+    print ("Frame number = " .. sprite1.Frame)
+     
+    sprite1.Color    = vec4 (1, 0, 0, 0.7)
+
+    print ("Color = " .. tostring (sprite1.Color))
+
+    sprite1:SetColor (0, 0, 1, 0.3)
+
+    print ("Color = " .. tostring (sprite1.Color))
+
+    sprite1:SetColor (0, 1, 0)
+
+    print ("Color = " .. tostring (sprite1.Color))  
+  end
+  (end code)
+*/
+
+/*
+  Topic: Результат
+ 
+  (start code) 
+  Sprite test
+  Color = 0 0 0 0
+  Material name = 
+  Alpha value = 0.80000001192093
+  Alpha reference = 0.40000000596046
+  Material name = SettedMaterial
+  Frame number = 9
+  Color = 1 0 0 0.7
+  Color = 0 0 1 0.3
+  Color = 0 1 0 0.3
+  (end code)
+*/

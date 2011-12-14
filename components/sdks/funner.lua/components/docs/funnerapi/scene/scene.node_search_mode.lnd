@@ -1,0 +1,49 @@
+/*
+   Class: Scene.NodeSearchMode
+ 
+   Режим поиска потомков.
+ */
+
+/*
+   Group: Значения
+ 
+ */
+
+/*
+   Property: OnNextSublevel
+ 
+   Поиск потомка только на следующем подуровне.
+
+   Тип:
+     number
+ 
+   Доступ:
+     Получение.
+ */
+OnNextSublevel
+
+/*
+   Property: OnAllSublevels
+ 
+   Поиск потомка на всех подуровнях.
+
+   Тип:
+     number
+ 
+   Доступ:
+     Получение.
+ */
+OnAllSublevels
+
+/*
+   Property: Default
+ 
+   Режим по умолчанию = Scene.NodeSearchMode.OnAllSublevels.
+
+   Тип:
+     number
+ 
+   Доступ:
+     Получение.
+ */
+Default

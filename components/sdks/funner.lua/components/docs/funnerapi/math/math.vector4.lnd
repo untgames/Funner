@@ -1,0 +1,411 @@
+/*
+   Class: Math.Vector4
+ 
+   Четырехкомпонентный вектор.
+ */
+
+/*
+   Group: Функции
+ */
+
+/*
+   Function: vec4 (number)
+ 
+   Создание вектора, все компоненты которого равны.
+  
+   Параметры:
+ 
+     value - значение компонентов вектора
+ 
+   Возвращает:
+     <Vector4>
+ */
+vec4 (number value)
+
+/*
+   Function: vec3 (x,y,z,w)
+ 
+   Создание вектора с указанием всех компонентов.
+  
+   Параметры:
+ 
+     value_x - x-компонент
+     value_y - y-компонент
+     value_z - z-компонент
+     value_w - w-компонент
+ 
+   Возвращает:
+     <Vector4>
+ */
+vec4 (number value_x, number value_y, number value_z, number value_w)
+
+/*
+   Function: normalize
+ 
+   Возвращает нормированный вектор.
+  
+   Возвращает:
+     <Vector4>
+ */
+normalize ()
+
+/*
+   Function: abs
+ 
+   Возвращает вектор, компоненты которого равны модулям соответствующих компонент данного вектора.
+  
+   Возвращает:
+     <Vector2>
+ */
+abs ()
+
+/*
+   Function: min
+ 
+   Возвращает вектор, компоненты которого равны минимумам среди соответствующих компонент данного вектора и another_vector.
+
+   Параметры:
+ 
+     another_vector - вектор
+  
+   Возвращает:
+     <Vector4>
+ */
+min (Vector4 another_vector)
+
+/*
+   Function: max
+ 
+   Возвращает вектор, компоненты которого равны максимумам среди соответствующих компонент данного вектора и another_vector.
+
+   Параметры:
+ 
+     another_vector - вектор
+  
+   Возвращает:
+     <Vector4>
+ */
+max (Vector4 another_vector)
+
+/*
+   Function: cross
+ 
+   Векторное произведение.
+
+   Параметры:
+ 
+     another_vector - вектор
+  
+   Возвращает:
+     <Vector4>
+ */
+cross (Vector4 another_vector)
+
+/*
+   Function: dot
+ 
+   Скалярное произведение.
+
+   Параметры:
+ 
+     another_vector - вектор
+  
+   Возвращает:
+     <Vector4>
+ */
+dot (Vector4 another_vector)
+
+/*
+   Group: Операторы
+ */
+
+/*
+   Operator: operator- (Vector4)
+ 
+   Унарный минус. Возвращает вектор все компоненты которого равны компонентам vector умноженным на -1.
+ 
+   Параметры:
+ 
+     left  - вектор
+     right - вектор
+ 
+   Возвращает:
+     <Vector4>
+ */
+operator- (Vector4 vector) 
+
+/*
+   Operator: operator- (Vector4, Vector4)
+ 
+   Возвращает вектор, являющийся разностью left - right.
+ 
+   Параметры:
+ 
+     vector - вектор
+ 
+   Возвращает:
+     <Vector4>
+ */
+operator- (Vector4 left, Vector4 right)
+
+/*
+   Operator: operator+ (Vector4, Vector4)
+ 
+   Возвращает вектор, являющийся суммой left + right.
+ 
+   Параметры:
+ 
+     left  - вектор
+     right - вектор
+ 
+   Возвращает:
+     <Vector4>
+ */
+operator+ (Vector4 left, Vector4 right)
+
+/*
+   Operator: operator* (Vector4, Vector4)
+ 
+   Возвращает вектор, являющийся произведением left * right (left.x * right.x, left.y * right.y, left.z * right.z, left.w * right.w).
+ 
+   Параметры:
+ 
+     left  - вектор
+     right - вектор
+ 
+   Возвращает:
+     <Vector4>
+ */
+operator* (Vector4 left, Vector4 right)
+
+/*
+   Operator: operator* (Vector4, Matrix4)
+ 
+   Возвращает вектор, являющийся произведением вектора left на матрицу right.
+ 
+   Параметры:
+ 
+     left  - вектор
+     right - матрица
+ 
+   Возвращает:
+     <Vector4>
+ */
+operator* (Vector4 left, Matrix4 right)
+
+/*
+   Operator: operator* (Vector4, number)
+ 
+   Возвращает вектор, являющийся произведением вектора left на скаляр right.
+ 
+   Параметры:
+ 
+     left  - вектор
+     right - скаляр
+ 
+   Возвращает:
+     <Vector4>
+ */
+operator* (Vector4 left, number right)
+
+/*
+   Operator: operator* (number, Vector4)
+ 
+   Возвращает вектор, являющийся произведением скаляра left на вектор right.
+ 
+   Параметры:
+ 
+     left  - скаляр
+     right - вектор
+ 
+   Возвращает:
+     <Vector4>
+ */
+operator* (number left, Vector4 right)
+
+/*
+   Operator: operator/ (Vector4, Vector4)
+ 
+   Возвращает вектор, являющийся частным left / right (left.x / right.x, left.y / right.y, left.z / right.z, left.w / right.w).
+ 
+   Параметры:
+ 
+     left  - вектор
+     right - вектор
+ 
+   Возвращает:
+     <Vector4>
+ */
+operator/ (Vector4 left, Vector4 right)
+
+/*
+   Operator: operator/ (Vector4, number)
+ 
+   Возвращает вектор, являющийся частным от деления вектора left на скаляр right.
+ 
+   Параметры:
+ 
+     left  - вектор
+     right - скаляр
+ 
+   Возвращает:
+     <Vector4>
+ */
+operator/ (Vector4 left, number right)
+
+/*
+   Operator: operator[]
+ 
+   Доступ к компоненту вектора.
+ 
+   Параметры:
+ 
+     index - значение от 0 до 3
+ 
+   Возвращает:
+     number - значение компонента [index]
+ */
+operator[] (number)
+
+/*
+   Group: Поля
+ */
+
+/*
+   Property: x
+ 
+   Нулевой компонент вектора.
+ 
+   Доуступ:
+ 
+     Получение/установка.
+ */
+
+/*
+   Property: y
+ 
+   Первый компонент вектора.
+ 
+   Доуступ:
+ 
+     Получение/установка.
+ */
+
+/*
+   Property: length
+ 
+   Длина вектора.
+ 
+   Доуступ:
+ 
+     Получение.
+ */
+
+/*
+   Property: qlength
+ 
+   Квадрат длины вектора.
+ 
+   Доуступ:
+ 
+     Получение.
+ */
+
+/*
+   Property: любые комбинации x, y, z
+ 
+   Вектор с комбинацей компонентов (vector.y, vector.zw, vector.xzy и т.п.).
+ 
+   Доуступ:
+ 
+     Получение.
+ */
+
+/*
+   Group: Примеры
+ */
+
+/*
+  Topic: Пример кода
+ 
+   (start code) 
+   function test_vector (v)
+     print ("Input:     " .. tostring (v))
+     print ("Get v.x:   " .. tostring (v.x))
+     print ("Get v.y:   " .. v.y)
+     print ("Get v.z:   " .. v.z)
+
+     print ("Get v.xzy: " .. tostring (v.xzy))
+
+     tmp = v.xyz + v.yzx
+
+     print ("tmp = v.xyz + v.yzx: " .. tostring (tmp))
+
+     tmp = tmp - v * v.zxy
+
+     print ("tmp = tmp - v * v.zxy: " .. tostring (tmp))
+     print ("v * 2: " .. tostring (v * 2))
+     print ("3 * v: " .. tostring (3 * v))
+     print ("4 * v / 2: " .. tostring (4 * v / 2))
+
+     print ("vec3(4,5,6): " .. tostring (vec3 (4, 5, 6)))
+
+     v1 = vec3 (7)
+
+     print ("v1 = vec3(7): " .. tostring (v1))
+     print ("v1:normalize(): " .. tostring (v1:normalize()))
+
+     v1 = vec3 (-1, 2, -3):abs ()
+
+     print ("v1 = vec3 (-1, 2, -3):abs (): " .. tostring (v1))
+
+     v2 = v1:min (tmp)
+
+     print ("v2 = v1:min (tmp): " .. tostring (v2))
+
+     v2 = v1:max (tmp)
+
+     print ("v2 = v1:max (tmp): " .. tostring (v2))
+
+     v3 = v1:cross (v2)
+
+     print ("v3 = v1:cross (v2): " .. tostring (v3))
+     print ("v3.qlength: " .. v3.qlength)
+
+     v1 = v.xyz -- явное копирование, а не создание ссылки на объект
+
+     v1 [0] = 4
+     v1 [1] = 5
+     v1.z   = 6
+
+     print ("After set values: " .. tostring (v1))
+   end
+   (end code)
+ */
+
+/*
+  Topic: Результат
+ 
+   (start code) 
+   Test vec3f library:
+   Input:     1 2 3
+   Get v.x:   1
+   Get v.y:   2
+   Get v.z:   3
+   Get v.xzy: 1 3 2
+   tmp = v.xyz + v.yzx: 3 5 4
+   tmp = tmp - v * v.zxy: 0 3 -2
+   v * 2: 2 4 6
+   3 * v: 3 6 9
+   4 * v / 2: 2 4 6
+   vec3(4,5,6): 4 5 6
+   v1 = vec3(7): 7 7 7
+   v1:normalize(): 0.577350258827 0.577350258827 0.577350258827
+   v1 = vec3 (-1, 2, -3):abs (): 1 2 3
+   v2 = v1:min (tmp): 0 2 -2
+   v2 = v1:max (tmp): 1 3 3
+   v3 = v1:cross (v2): -3 0 1
+   v3.qlength: 10
+   After set values: 4 5 6
+   (end code)
+ */

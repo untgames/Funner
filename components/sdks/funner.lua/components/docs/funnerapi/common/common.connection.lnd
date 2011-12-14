@@ -1,0 +1,129 @@
+/*
+   Class: Common.Connection
+ 
+   Используется для работы с соединениями.
+ */
+
+/*
+   Group: Функции
+ 
+ */
+
+/*
+   Function: Disconnect
+ 
+   Разрыв соединения. Обработчик соединения удаляется.
+ */
+Disconnect ()
+
+/*
+   Function: Block
+ 
+   Блокирование соединения. Временная приостановка получения сигналов.
+ */
+Block ()
+
+/*
+   Function: Unblock
+ 
+   Разблокирование соединения. Отключение временной приостановки получения сигналов.  
+ */
+Unblock ()
+
+/*
+   Function: IsEqual
+ 
+   Проверка равенства двух соединений.
+ 
+   Параметры:
+     connection - <Common.Connection>, соединение проверяемое на равенство.
+ */
+IsEqual (connection)
+
+/*
+   Group: Поля
+ */
+
+/*
+   Property: Blocked
+ 
+   Блокировано ли соединение.
+ 
+   Доступ:
+ 
+     Получение.
+ */
+Blocked
+
+/*
+   Property: Connected
+ 
+   Есть ли связь с сигналом.
+ 
+   Доступ:
+ 
+     Получение.
+ */
+Connected
+
+/*
+   Group: Примеры
+ */
+
+/*
+  Topic: Пример кода
+ 
+   (start code) 
+   count = 0
+ 
+   function idle1 ()
+     print ("idle1")
+ 
+     count = count + 1  
+ 
+     if count == 3 then
+       print ("connection blocked")  
+       connection:Block ()
+     end
+     
+     if count == 4 then
+       print ("exit")
+       System.Application.Exit (0)
+     end
+   end
+ 
+   function idle2 ()
+     print ("idle2: blocked=" .. tostring (connection.Blocked))
+ 
+     if connection.Blocked == 1 then
+       print ("connection unblocked")
+       connection:Unblock ()
+     end
+   end
+ 
+   function test ()
+     connection = System.Application.RegisterEventHandler (System.ApplicationEvent.OnIdle, System.Application.CreateEventHandler ("idle1"))
+     System.Application.RegisterEventHandler (System.ApplicationEvent.OnIdle, System.Application.CreateEventHandler ("idle2"))  
+   end
+   (end code)
+ */
+
+/*
+  Topic: Результат
+ 
+   (start code) 
+   Results of syslib_test:
+   Test library:
+   idle1
+   idle2: blocked=false
+   idle1
+   idle2: blocked=false
+   idle1
+   connection blocked
+   idle2: blocked=true
+   connection unblocked
+   idle1
+   exit
+   idle2: blocked=false
+   (end code)
+ */

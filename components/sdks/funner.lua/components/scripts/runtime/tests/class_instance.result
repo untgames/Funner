@@ -1,0 +1,7 @@
+Results of class_instance_test:
+MyClass.Foo
+MyClass.Bar
+MyClass.Baz
+SetProperty('A', '1')
+GetProperty('A')
+Instance name: 'MyClass'

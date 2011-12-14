@@ -1,0 +1,91 @@
+/*
+   Class: Scene.SpotLight
+ 
+   Конический источник света.
+ */
+
+/*
+   Group: Функции
+ 
+ */
+
+/*
+   Function: Create
+ 
+   Создание конического источника света.
+ */
+Create ()
+
+/*
+   Group: Поля
+ 
+ */
+
+/*
+   Property: Angle
+ 
+   Угол светового конуса.
+
+   Тип:
+     number
+ 
+   Доступ:
+     Получение/установка.
+ */
+Angle
+
+/*
+   Property: Exponent
+ 
+   Экспонента затухания.
+
+   Тип:
+     number
+ 
+   Доступ:
+     Получение/установка.
+ */
+Exponent
+
+/*
+   Group: Примеры
+ 
+ */
+/*
+  Topic: Пример кода
+ 
+  (start code) 
+  function test_spot_light ()
+    print ("Spot light test")
+
+    local light1 = Scene.SpotLight.Create ()
+
+    print ("Name = " .. light1.Name)
+    print ("Angle = " .. light1.Angle)
+    print ("Exponent = " .. light1.Exponent)
+
+    light1.Angle = 75
+    light1.Exponent = 0.7
+    light1.Name = "light1"
+
+    print ("Name = " .. light1.Name)
+    print ("Angle = " .. light1.Angle)
+    print ("Exponent = " .. light1.Exponent)
+  end
+  (end code)
+*/
+
+/*
+  Topic: Результат
+ 
+  (start code) 
+  Spot light test
+  Name =
+  Angle = 0
+  Exponent = 0
+  Name = light1
+  Angle = 75
+  Exponent = 0.69999998807907
+  (end code)
+*/
+

@@ -1,0 +1,88 @@
+/*
+   Class: Scene.TextLineAlignment
+ 
+   Режим выравнивания.
+ */
+
+/*
+   Group: Значения
+ 
+ */
+
+/*
+   Property: Center
+ 
+   По центру.
+
+   Тип:
+     number
+ 
+   Доступ:
+     Получение.
+ */
+Center
+
+/*
+   Property: Left
+ 
+   По левому краю.
+
+   Тип:
+     number
+ 
+   Доступ:
+     Получение.
+ */
+Left
+
+/*
+   Property: Top
+ 
+   По верхнему краю.
+
+   Тип:
+     number
+ 
+   Доступ:
+     Получение.
+ */
+Top
+
+/*
+   Property: Right
+ 
+   По правому краю.
+
+   Тип:
+     number
+ 
+   Доступ:
+     Получение.
+ */
+Right
+
+/*
+   Property: Bottom
+ 
+   По нижнему краю.
+
+   Тип:
+     number
+ 
+   Доступ:
+     Получение.
+ */
+Bottom
+
+/*
+   Property: BaseLine
+ 
+   По базовой линии.
+
+   Тип:
+     number
+ 
+   Доступ:
+     Получение.
+ */
+BaseLine

@@ -1,0 +1,2 @@
+Results of read_xml_test:
+SetProperty('A', 'hello')

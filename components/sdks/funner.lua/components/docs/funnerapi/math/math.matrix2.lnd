@@ -1,0 +1,269 @@
+/*
+   Class: Math.Matrix2
+ 
+   Матрица 2х2.
+ */
+
+/*
+   Group: Функции
+ */
+
+/*
+   Function: mat2
+ 
+   Cоздание матрицы. Все компоненты главной диагонали равны value.
+  
+   Параметры:
+ 
+     value - значение компонентов главной диагонали
+ */
+mat2 (number value)
+
+/*
+   Function: transpose
+ 
+   Транспонирование матрицы.
+ */
+transpose ()
+
+/*
+   Function: inverse
+ 
+   Взятие обратной матрицы.
+ */
+inverse ()
+
+/*
+   Function: det
+ 
+   Определитель матрицы.
+ */
+det ()
+
+/*
+   Function: set
+ 
+   Установка значения элемента матрицы.
+  
+   Параметры:
+ 
+     row    - строка
+     column - столбец
+     value  - значение
+ */
+set (number row, number column, number value)
+
+/*
+   Function: get
+ 
+   Получение значения элемента матрицы.
+  
+   Параметры:
+ 
+     row    - строка
+     column - столбец
+ 
+   Returns:
+ 
+     value - значение элемента
+ */
+get (number row, number column)
+
+/*
+   Group: Операторы
+ */
+
+/*
+   Operator: operator- (Matrix2,Matrix2)
+ 
+   Возвращает матрицу, являющуюся разностью left - right.
+ 
+   Параметры:
+ 
+     left  - матрица
+     right - матрица
+ 
+   Возвращает:
+     <Matrix2>
+ */
+operator- (Matrix2 left, Matrix2 right) 
+
+/*
+   Operator: operator+ (Matrix2,Matrix2)
+ 
+   Возвращает матрицу, являющуюся суммой left + right.
+ 
+   Параметры:
+ 
+     left  - матрица
+     right - матрица
+ 
+   Возвращает:
+     <Matrix2>
+ */
+operator+ (Matrix2 left, Matrix2 right) 
+
+/*
+   Operator: operator* (Matrix2,Matrix2)
+ 
+   Возвращает матрицу, являющуюся произведением left * right.
+ 
+   Параметры:
+ 
+     left  - матрица
+     right - матрица
+ 
+   Возвращает:
+     <Matrix2>
+ */
+operator* (Matrix2 left, Matrix2 right) 
+
+/*
+   Operator: operator* (Matrix2,Vector2)
+ 
+   Возвращает вектор, являющийся произведением матрицы left на вектор right.
+ 
+   Параметры:
+ 
+     left  - матрица
+     right - вектор
+ 
+   Возвращает:
+     <Vector2>
+ */
+operator* (Matrix2 left, Vector2 right) 
+
+/*
+   Operator: operator* (Matrix2,number)
+ 
+   Возвращает матрицу, являющийся произведением матрицы left на скаляр right
+ 
+   Параметры:
+ 
+     left  - матрица
+     right - скаляр
+ 
+   Возвращает:
+     <Matrix2>
+ */
+operator* (Matrix2 left, number right) 
+
+/*
+   Operator: operator* (number,Matrix2)
+ 
+   Возвращает матрицу, являющийся произведением скаляра left на матрицу right.
+ 
+   Параметры:
+ 
+     left  - скаляр
+     right - матрица
+ 
+   Возвращает:
+     <Matrix2>
+ */
+operator* (number left, Matrix2 right) 
+
+/*
+   Operator: operator/ (Matrix2,Matrix2)
+ 
+   Возвращает матрицу, являющуюся частным left / right.
+ 
+   Параметры:
+ 
+     left  - матрица
+     right - матрица
+ 
+   Возвращает:
+     <Matrix2>
+ */
+operator* (Matrix2 left, Matrix2 right) 
+
+/*
+   Operator: operator[]
+ 
+   Доступ к строке матрицы.
+ 
+   Параметры:
+ 
+     index - значение от 0 до 3
+ 
+   Возвращает:
+     number - значение компонента [index]
+ */
+operator[] (number index)
+
+/*
+   Group: Примеры
+ */
+
+/*
+  Topic: Пример кода
+ 
+   (start code) 
+   function test_matrix (m)
+     print ("Input:   ");
+
+     print (m [0])
+     print (m [1])
+     print (m [2])
+     print (m [3])
+
+     m [0].zxy = vec3 (1, 2, 3)
+
+     print ("After m[0].zxy=vec3(1,2,3): " .. tostring (m [0]))
+
+     local m1 = mat4 (2)
+     local m2 = mat4 (3)
+     local m3 = m1 * m2
+
+     print ("Result of matrix multiplies: " .. tostring (m3))
+
+     m3:set (1, 1, 123)
+
+     print ("After m3:set(1,1,123): " .. tostring (m3))
+
+     m3 [2][2] = 456
+
+     print ("After m3 [2][2]=456: " .. tostring (m3))
+
+     local m5 = mat4 (2)
+
+     print ("mat4(2):det (): " .. m5:det ())
+
+     print ("m5 * m5: " .. tostring (m5 * m5))
+     print ("m5 * 2: " .. tostring (m5 * 2))
+     print ("3 * m5: " .. tostring (3 * m5))
+     print ("4 * m5 / 2: " .. tostring (4 * m5 / 2))
+     print ("m5 * vec3 (1, 2, 3): " .. tostring (m5 * vec3 (1, 2, 3)))
+     print ("m5 * vec4 (1, 2, 3, 4): " .. tostring (m5 * vec4 (1, 2, 3, 4)))
+     print ("vec3 (1, 2, 3) * m5: " .. tostring (vec3 (1, 2, 3) * m5))
+     print ("vec4 (1, 2, 3, 4) * m5: " .. tostring (vec4 (1, 2, 3, 4) * m5))
+   end
+   (end code)
+ */
+
+/*
+  Topic: Результат
+ 
+   (start code) 
+   Test mat4f library:
+   Input:   
+   1 0 0 0
+   0 1 0 0
+   0 0 1 0
+   0 0 0 1
+   After m[0].zxy=vec3(1,2,3): 2 3 1 0
+   Result of matrix multiplies: 6 0 0 0 0 6 0 0 0 0 6 0 0 0 0 6
+   After m3:set(1,1,123): 6 0 0 0 0 123 0 0 0 0 6 0 0 0 0 6
+   After m3 [2][2]=456: 6 0 0 0 0 123 0 0 0 0 456 0 0 0 0 6
+   mat4(2):det (): 16
+   m5 * m5: 4 0 0 0 0 4 0 0 0 0 4 0 0 0 0 4
+   m5 * 2: 4 0 0 0 0 4 0 0 0 0 4 0 0 0 0 4
+   3 * m5: 6 0 0 0 0 6 0 0 0 0 6 0 0 0 0 6
+   4 * m5 / 2: 4 0 0 0 0 4 0 0 0 0 4 0 0 0 0 4
+   m5 * vec3 (1, 2, 3): 2 4 6
+   m5 * vec4 (1, 2, 3, 4): 2 4 6 8
+   vec3 (1, 2, 3) * m5: 2 4 6
+   vec4 (1, 2, 3, 4) * m5: 2 4 6 8
+   (end code)
+ */

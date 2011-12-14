@@ -1,0 +1,114 @@
+/*
+   Class: BoundVolumes.Corner 
+ 
+   Угол ограничивающего объема.
+ */
+
+/*
+   Group: Значения
+ 
+ */
+
+/*
+   Property: nxnynz
+ 
+   (Negative X, Negative Y, Negative Z). Негативная экстента (минимальная).
+
+   Тип:
+     number
+ 
+   Доступ:
+     Получение.
+ */
+nxnynz
+
+/*
+   Property: pxnynz
+ 
+   (Positive X, Negative Y, Negative Z).
+
+   Тип:
+     number
+ 
+   Доступ:
+     Получение.
+ */
+pxnynz
+
+/*
+   Property: nxpynz
+ 
+   (Negative X, Positive Y, Negative Z).
+
+   Тип:
+     number
+ 
+   Доступ:
+     Получение.
+ */
+nxpynz
+
+/*
+   Property: pxpynz
+ 
+   (Positive X, Positive Y, Negative Z).
+
+   Тип:
+     number
+ 
+   Доступ:
+     Получение.
+ */
+pxpynz
+
+/*
+   Property: nxnypz
+ 
+   (Negative X, Negative Y, Positive Z).
+
+   Тип:
+     number
+ 
+   Доступ:
+     Получение.
+ */
+nxnypz
+
+/*
+   Property: pxnypz
+ 
+   (Positive X, Negative Y, Positive Z).
+
+   Тип:
+     number
+ 
+   Доступ:
+     Получение.
+ */
+pxnypz
+
+/*
+   Property: nxpypz
+ 
+   (Negative X, Positive Y, Positive Z).
+
+   Тип:
+     number
+ 
+   Доступ:
+     Получение.
+ */
+nxpypz
+
+/*
+   Property: pxpypz
+ 
+   (Positive X, Positive Y, Positive Z). Позитивная экстента (максимальная).
+
+   Тип:
+     number
+ 
+   Доступ:
+     Получение.
+ */
+pxpypz

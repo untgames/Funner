@@ -1,0 +1,70 @@
+/*
+   Class: Scene.DirectLight
+ 
+   Направленный источник света.
+ */
+
+/*
+   Group: Функции
+ 
+ */
+
+/*
+   Function: Create
+ 
+   Создание направленного источника света.
+
+   Возвращает:
+     <Scene.DirectLight>
+ */
+Create ()
+
+/*
+   Group: Поля
+ 
+ */
+
+/*
+   Property: Radius
+ 
+   Радиус светового цилиндра.
+
+   Тип:
+     number
+ 
+   Доступ:
+     Получение/установка.
+ */
+Radius
+
+/*
+   Group: Примеры
+ 
+ */
+/*
+  Topic: Пример кода
+ 
+  (start code) 
+  function test_direct_light ()
+    print ("Direct light test")
+
+    local light1 = Scene.DirectLight.Create ()
+
+    print ("Radius = " .. light1.Radius)
+
+    light1.Radius = 763
+
+    print ("Radius = " .. light1.Radius)
+  end
+  (end code)
+*/
+
+/*
+  Topic: Результат
+ 
+  (start code) 
+  Direct light test
+  Radius = 1000000000
+  Radius = 763
+  (end code)
+*/

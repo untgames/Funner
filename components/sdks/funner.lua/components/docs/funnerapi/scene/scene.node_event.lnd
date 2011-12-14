@@ -1,0 +1,114 @@
+/*
+   Class: Scene.NodeEvent
+ 
+   Идентификаторы событий узла.
+ */
+
+/*
+   Group: Значения
+ 
+ */
+
+/*
+   Property: AfterUpdate
+ 
+   Срабатывает после обновления состояния узла.
+
+   Тип:
+     number
+ 
+   Доступ:
+     Получение.
+ */
+AfterUpdate
+
+/*
+   Property: BeforeDestroy
+ 
+   Срабатывает перед удалением узла.
+
+   Тип:
+     number
+ 
+   Доступ:
+     Получение.
+ */
+BeforeDestroy
+
+/*
+   Property: AfterDestroy
+ 
+   Срабатывает после удаления узла.
+
+   Тип:
+     number
+ 
+   Доступ:
+     Получение.
+ */
+AfterDestroy
+
+/*
+   Property: AfterBind
+ 
+   Срабатывает после присоединения узла к родителю.
+
+   Тип:
+     number
+ 
+   Доступ:
+     Получение.
+ */
+AfterBind
+
+/*
+   Property: BeforeUnbind
+ 
+   Срабатывает перед отсоединением узла от родителя.
+
+   Тип:
+     number
+ 
+   Доступ:
+     Получение.
+ */
+BeforeUnbind
+
+/*
+   Property: AfterSceneAttach
+ 
+   Срабатывает после присоединения объекта к сцене.
+
+   Тип:
+     number
+ 
+   Доступ:
+     Получение.
+ */
+AfterSceneAttach
+
+/*
+   Property: BeforeSceneDetach
+ 
+   Срабатывает перед отсоединением объекта от сцены.
+
+   Тип:
+     number
+ 
+   Доступ:
+     Получение.
+ */
+BeforeSceneDetach
+
+/*
+   Property: AfterSceneChange
+ 
+   Срабатывает после изменения сцены.
+
+   Тип:
+     number
+ 
+   Доступ:
+     Получение.
+ */
+AfterSceneChange

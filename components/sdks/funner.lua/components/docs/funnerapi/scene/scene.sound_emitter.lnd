@@ -1,0 +1,110 @@
+/*
+   Class: Scene.SoundEmitter
+ 
+   Источник звука.
+ */
+
+/*
+   Group: Функции
+ 
+ */
+
+/*
+   Function: Create
+ 
+   Создание источника звука по описанию звука.
+
+   Параметры:
+     declaration_name - имя описания звука
+
+   Возвращает:
+     <Scene.SoundEmitter>
+ */
+Create (string declaration_name)
+
+/*
+   Function: Play
+ 
+   Запуск воспроизведения.
+ */
+Play ()
+
+/*
+   Function: Stop
+ 
+   Остановка воспроизведения.
+ */
+Stop ()
+
+/*
+   Group: Поля
+ 
+ */
+
+/*
+   Property: Gain
+ 
+   Громкость воспроизведения.
+
+   Диапазон:
+     0..1
+
+   Тип:
+     number
+ 
+   Доступ:
+     Получение/установка.
+ */
+Gain
+
+/*
+   Property: SoundDeclarationName
+ 
+   Имя описания звука.
+
+   Тип:
+     string
+ 
+   Доступ:
+     Получение.
+ */
+SoundDeclarationName
+
+/*
+   Group: Примеры
+ 
+ */
+/*
+  Topic: Пример кода
+ 
+  (start code) 
+  function test_sound_emitter ()
+    print ("SoundEmitter test")
+
+    local sound_emitter1 = Scene.SoundEmitter.Create ("sound.snddecl")
+
+    print ("Gain = " .. sound_emitter1.Gain)
+
+    sound_emitter1.Gain = 0.7
+    
+    print ("Gain = " .. sound_emitter1.Gain)
+
+    sound_emitter1:Play ()
+    sound_emitter1:Stop ()
+
+    print ("SoundEmitter sound declaration name = " .. sound_emitter1.SoundDeclarationName)
+  end
+  (end code)
+*/
+
+/*
+  Topic: Результат
+ 
+  (start code) 
+  SoundEmitter test
+  Gain = 1
+  Gain = 0.69999998807907
+  SoundEmitter sound declaration name = sound.snddecl
+  (end code)
+*/
+

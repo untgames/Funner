@@ -1,0 +1,59 @@
+/*
+   Class: Scene.PointLight
+ 
+   Точечный источник света.
+ */
+
+/*
+   Group: Функции
+ 
+ */
+
+/*
+   Function: Create
+ 
+   Создание точечного источника света.
+ */
+Create ()
+
+/*
+   Group: Примеры
+ 
+ */
+/*
+  Topic: Пример кода
+ 
+  (start code) 
+  function test_light ()
+    print ("Common light test (point light)")
+
+    local light1 = Scene.PointLight.Create ()
+
+    print ("LightColor = " .. tostring (light1.LightColor))
+    print ("Attenuation = " .. tostring (light1.Attenuation))
+    print ("Range = " .. light1.Range)
+
+    light1.LightColor  = vec3 (1, 0, 0)
+    light1.Attenuation = vec3 (1, 1, 0)
+    light1.Range       = 579
+
+    print ("LightColor = " .. tostring (light1.LightColor))
+    print ("Attenuation = " .. tostring (light1.Attenuation))
+    print ("Range = " .. light1.Range)
+  end
+  (end code)
+*/
+
+/*
+  Topic: Результат
+ 
+  (start code) 
+  Common light test (point light)
+  LightColor = 0 0 0
+  Attenuation = 0 0 0
+  Range = 1000000000
+  LightColor = 1 0 0
+  Attenuation = 1 1 0
+  Range = 579
+  (end code)
+*/

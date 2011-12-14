@@ -1,0 +1,154 @@
+/*
+   Class: Scene.OrthoCamera
+ 
+   Ортографическая камера. Располагается в какой-либо сцене и служит связующим звеном между сценой и областью вывода.
+
+ */
+
+/*
+   Function: Create
+ 
+   Создание ортографической камеры.
+
+   Возвращает:
+     <Scene.OrthoCamera>
+ */
+Create ()
+
+/*
+   Group: Поля
+ 
+ */
+
+/*
+   Property: Left
+ 
+   Левый край камеры.
+
+   Тип:
+     number
+ 
+   Доступ:
+     Получение/установка.
+ */
+Left
+
+/*
+   Property: Right
+ 
+   Правый край камеры.
+
+   Тип:
+     number
+ 
+   Доступ:
+     Получение/установка.
+ */
+Right
+
+/*
+   Property: Top
+ 
+   Верхний край камеры.
+
+   Тип:
+     number
+ 
+   Доступ:
+     Получение/установка.
+ */
+Top
+
+/*
+   Property: Bottom
+ 
+   Нижний край камеры.
+
+   Тип:
+     number
+ 
+   Доступ:
+     Получение/установка.
+ */
+Bottom
+
+/*
+   Property: ZNear
+ 
+   Ближняя плоскость отсечения.
+
+   Тип:
+     number
+ 
+   Доступ:
+     Получение/установка.
+ */
+ZNear
+
+/*
+   Property: ZFar
+ 
+   Дальняя плоскость отсечения.
+
+   Тип:
+     number
+ 
+   Доступ:
+     Получение/установка.
+ */
+ZFar
+
+/*
+   Group: Примеры
+ 
+ */
+/*
+  Topic: Пример кода
+ 
+  (start code) 
+  function test_ortho_camera ()
+    print ("Ortho camera test")
+
+    local camera1 = Scene.OrthoCamera.Create ()
+
+    print ("Left   = " .. camera1.Left)
+    print ("Right  = " .. camera1.Right)
+    print ("Top    = " .. camera1.Top)
+    print ("Bottom = " .. camera1.Bottom)
+    print ("ZNear  = " .. camera1.ZNear)
+    print ("ZFar   = " .. camera1.ZFar)
+    camera1.Left   = -18
+    camera1.Right  = 18
+    camera1.Top    = 10
+    camera1.Bottom = -10
+    camera1.ZNear  = 10
+    camera1.ZFar   = 1000
+    print ("Left   = " .. camera1.Left)
+    print ("Right  = " .. camera1.Right)
+    print ("Top    = " .. camera1.Top)
+    print ("Bottom = " .. camera1.Bottom)
+    print ("ZNear  = " .. camera1.ZNear)
+    print ("ZFar   = " .. camera1.ZFar)
+  end
+  (end code)
+*/
+
+/*
+  Topic: Результат
+ 
+  (start code) 
+  Ortho camera test
+  Left   = 0
+  Right  = 1
+  Top    = 1
+  Bottom = 0
+  ZNear  = 0
+  ZFar   = 1
+  Left   = -18
+  Right  = 18
+  Top    = 10
+  Bottom = -10
+  ZNear  = 10
+  ZFar   = 1000
+  (end code)
+*/

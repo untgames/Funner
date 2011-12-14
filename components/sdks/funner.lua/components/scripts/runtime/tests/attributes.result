@@ -1,0 +1,10 @@
+Results of attributes_test:
+Is serializable: true
+Is serializable: false
+Is serializable: true
+Is atomic:       false
+Is atomic:       true
+Is atomic:       true
+Is composite:    false
+Is composite:    false
+Is composite:    true

@@ -1,0 +1,106 @@
+/*
+   Class: Scene.Scene
+ 
+   Сцена. Вместилище для любых обьектов, описанных в графе сцены как узлы (<Scene.Node>) или производные от них объекты.
+ */
+
+/*
+   Group: Функции
+ 
+ */
+
+/*
+   Function: Create
+ 
+   Создание сцены.
+ */
+Create ()
+
+/*
+   Group: Поля
+ 
+ */
+
+/*
+   Property: Name
+ 
+   Имя сцены.
+
+   Тип:
+     string
+ 
+   Доступ:
+     Получение/установка.
+ */
+Name
+
+/*
+   Property: Root
+ 
+   Корневой узел.
+
+   Тип:
+     <Scene.Node>
+ 
+   Доступ:
+     Получение.
+ */
+Root
+
+/*
+   Property: EntitiesCount
+ 
+   Количество сущностей в сцене.
+
+   Тип:
+     number
+ 
+   Доступ:
+     Получение.
+ */
+EntitiesCount
+
+/*
+   Group: Примеры
+ 
+ */
+/*
+  Topic: Пример кода
+ 
+  (start code) 
+  function test_scene ()
+    print ("Scene test")
+
+    local scene = Scene.Scene.Create ()
+
+    print ("Name = " .. scene.Name)
+    print ("Entities count = " .. scene.EntitiesCount)
+
+    scene.Name = "scene1"
+
+    local sound_emitter1 = Scene.SoundEmitter.Create ("sound.snddecl")
+
+    sound_emitter1:BindToScene (scene)
+
+    print ("Name = " .. scene.Name)
+    print ("Entities count = " .. scene.EntitiesCount)
+
+    sound_emitter1:BindToParent (scene.Root)
+
+    print ("Entities count = " .. scene.EntitiesCount)
+  end
+  (end code)
+*/
+
+/*
+  Topic: Результат
+ 
+  (start code) 
+  Scene test
+  Name =
+  Entities count = 0
+  Name = scene1
+  Entities count = 1
+  Entities count = 1
+  (end code)
+*/
