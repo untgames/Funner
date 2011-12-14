@@ -6,6 +6,7 @@
 #include <render/viewport.h>
 
 using namespace render;
+using namespace render::obsolete;
 using namespace script;
 using namespace xtl;
 
