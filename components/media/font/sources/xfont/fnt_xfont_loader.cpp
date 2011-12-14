@@ -8,7 +8,10 @@ using namespace stl;
     Загрузка шрифта
 */
 
-namespace
+namespace components
+{
+
+namespace xfont_loader
 {
 
 void xfont_load (const char* file_name, Font& font)
@@ -139,6 +142,8 @@ extern "C"
 {
 
 ComponentRegistrator<XFontLoaderComponent> XFontLoader ("media.font.loaders.xfont");
+
+}
 
 }
 

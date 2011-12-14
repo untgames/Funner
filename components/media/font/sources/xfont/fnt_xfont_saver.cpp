@@ -3,7 +3,10 @@
 using namespace media;
 using namespace common;
 
-namespace
+namespace components
+{
+
+namespace xfont_saver
 {
 
 /*
@@ -130,6 +133,8 @@ extern "C"
 {
 
 ComponentRegistrator<XFontSaverComponent> XFontSaver ("media.font.savers.xfont");
+
+}
 
 }
 

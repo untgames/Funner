@@ -7,7 +7,10 @@
 
 using namespace media::players;
 
-namespace
+namespace components
+{
+
+namespace null_player
 {
 
 const char* TARGET_NAME = "null";
@@ -113,11 +116,13 @@ class PlayerComponent
     }
 };
 
-}
-
 extern "C"
 {
 
 common::ComponentRegistrator<PlayerComponent> NullPlayer ("media.players.stream.null");
+
+}
+
+}
 
 }

@@ -11,7 +11,10 @@
 
 using namespace media;
 
-namespace
+namespace components
+{
+
+namespace theora_decoder
 {
 
 const char* LOG_NAME = "media.TheoraDecoder";
@@ -233,7 +236,7 @@ class TheoraDecoderImpl : public IVideoDecoder
 
         try
         {
-          if (decoded_frame_number <= (int)frame || buffer_frame_number < 0 && buffer_frame_number != decoded_frame_number)
+          if (decoded_frame_number <= (int)frame || (buffer_frame_number < 0 && buffer_frame_number != decoded_frame_number))
           {
             if (th_decode_ycbcr_out (th_decoding_context, th_decoded_buffer))
               throw xtl::format_operation_exception (METHOD_NAME, "Can't get decoded video frame");
@@ -558,6 +561,8 @@ extern "C"
 {
 
 common::ComponentRegistrator<TheoraDecoderComponent> TheoraDecoder ("media.video.decoders.theora");
+
+}
 
 }
 

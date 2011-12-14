@@ -8,7 +8,10 @@ using namespace stl;
     «агрузка библиотеки деклараций звуков
 */
 
-namespace
+namespace components
+{
+
+namespace snddecl_loader
 {
 
 void snddecl_load_library (const char* file_name, SoundDeclarationLibrary& library)
@@ -92,6 +95,8 @@ extern "C"
 {
 
 ComponentRegistrator<SnddeclLoaderComponent> SnddeclLoader ("media.sound.loaders.snddecl");
+
+}
 
 }
 
