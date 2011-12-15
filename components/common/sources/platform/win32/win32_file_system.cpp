@@ -12,17 +12,23 @@ using namespace stl;
 Win32FileSystem::Win32FileSystem ()
 {
   memset (path_prefix,0,sizeof(path_prefix));
+  
 #ifdef WINCE
   char filename[MAX_PATH*sizeof(wchar_t)];
+  
   sprintf (filename,"%s.env",__argv[0]);
 
-  DWORD len=0;
+  DWORD  len=0;
   HANDLE currentdir_file = CreateFileW (towstring (filename).c_str (), GENERIC_READ, FILE_SHARE_READ|FILE_SHARE_WRITE, 0, OPEN_ALWAYS, 0, 0);
+  
   memset (filename,0,sizeof(filename));
+  
   ReadFile (currentdir_file,filename,MAX_PATH*sizeof(wchar_t),&len,NULL);
+
   CloseHandle (currentdir_file);
 
-  PropertyMap pmap=parse_init_string(tostring((wchar_t*)filename).c_str());
+  PropertyMap pmap = parse_init_string (tostring ((wchar_t*)filename).c_str());
+
   strcpy (path_prefix,pmap.GetString("CurrentDir"));
 #endif
 }
@@ -99,6 +105,7 @@ size_t Win32FileSystem::FileRead (file_t file, void* buf, size_t size)
 
     if (!ReadFile (file, buf, size, &len, 0))
       raise_error ("::ReadFile");
+
     return len;
   }
   catch (xtl::exception& exception)
@@ -304,7 +311,7 @@ namespace
 
 inline filetime_t make_time (FILETIME ft)
 {
-  return ((filetime_t)ft.dwHighDateTime << 32) + ft.dwLowDateTime;
+  return (((filetime_t)ft.dwHighDateTime) << 32) + ft.dwLowDateTime;
 }
 
 }
@@ -324,6 +331,7 @@ bool Win32FileSystem::GetFileInfo (const char* file_name, FileInfo& info)
 
     if (!GetFileAttributesExW ( GetFullFileName (file_name).c_str (), GetFileExInfoStandard, &file_info))
        return false;
+
     info.time_create = make_time (file_info.ftCreationTime);
     info.time_access = make_time (file_info.ftLastAccessTime);
     info.time_modify = make_time (file_info.ftLastWriteTime);
@@ -370,7 +378,7 @@ void Win32FileSystem::Search (const char* mask, const FileSearchHandler& handler
       info.time_modify = make_time (find_file_data.ftLastWriteTime);
       info.size        = find_file_data.nFileSizeLow;
 
-      if (!dir_name.empty ()) handler (format ("%s%s", dir_name.c_str (), tostring (find_file_data.cFileName)).c_str (), info);
+      if (!dir_name.empty ()) handler (format ("%s%s", dir_name.c_str (), tostring (find_file_data.cFileName).c_str ()).c_str (), info);
       else                    handler (tostring (find_file_data.cFileName).c_str (),info);
     }
   } while (FindNextFileW (handle, &find_file_data));

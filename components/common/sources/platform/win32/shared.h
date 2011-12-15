@@ -68,12 +68,8 @@ class Win32FileSystem: public StdioFileSystem
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 class Win32FileSystem: public ICustomFileSystem
 {
-  protected:
-    char path_prefix[MAX_PATH];
-    stl::wstring Win32FileSystem::GetFullFileName(const char* file_name);
-
   public:
-    Win32FileSystem::Win32FileSystem ();
+    Win32FileSystem ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Работа с файлом
@@ -113,6 +109,12 @@ class Win32FileSystem: public ICustomFileSystem
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void AddRef  () {}
     void Release () {}
+    
+  private:
+    stl::wstring GetFullFileName(const char* file_name);    
+    
+  private:
+    char path_prefix[MAX_PATH];    
 };
 
 #endif
