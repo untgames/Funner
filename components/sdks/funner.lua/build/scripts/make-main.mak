@@ -509,3 +509,6 @@ clean:
 
 fullyclean: clean
 	@$(RM) -r $(DIRS)
+
+install:
+	@echo Installation not supported...
