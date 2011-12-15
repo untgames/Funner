@@ -127,7 +127,7 @@ size_t PThreadManager::GetCurrentThreadId ()
    Установка приоритета нити
 */
 
-void PThreadManager:SetThreadPriority (thread_t thread, ThreadPriority thread_priority)
+void PThreadManager::SetThreadPriority (thread_t thread, ThreadPriority thread_priority)
 {
   try
   {
