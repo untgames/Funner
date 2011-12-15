@@ -2,6 +2,21 @@
 
 using namespace syslib;
 
+namespace syslib
+{
+
+struct thread_handle
+{
+  pthread_t thread;
+  bool      default_scheduling_getted;
+  int       scheduling_policy;
+  int       normal_priority;
+
+  thread_handle () : default_scheduling_getted (false) {}
+};
+
+}
+
 namespace
 {
 
@@ -56,9 +71,9 @@ thread_t PThreadManager::CreateThread (IThreadCallback* in_callback)
 
       //создание нити
 
-    stl::auto_ptr<pthread_t> handle (new pthread_t);
+    stl::auto_ptr<thread_handle> handle (new thread_handle);
 
-    int status = pthread_create (handle.get (), 0, &thread_run, callback.get ());
+    int status = pthread_create (&handle->thread, 0, &thread_run, callback.get ());
 
     if (status)
       pthread_raise_error ("::pthread_create", status);
@@ -74,12 +89,10 @@ thread_t PThreadManager::CreateThread (IThreadCallback* in_callback)
 
 void PThreadManager::DestroyThread (thread_t thread)
 {
-  if (!thread)
+  if (!thread || !thread->thread)
     return;    
 
-  pthread_t* handle = (pthread_t*)thread;    
-
-  delete handle;
+  delete thread;
 }
 
 /*
@@ -90,14 +103,14 @@ void PThreadManager::JoinThread (thread_t thread)
 {
   try
   {
-    if (!thread)
+    if (!thread || !thread->thread)
       throw xtl::make_null_argument_exception ("", "thread");
 
     thread_init ();
 
     void* exit_code = 0;
 
-    int status = pthread_join (*(pthread_t*)thread, &exit_code);
+    int status = pthread_join ((pthread_t)thread->thread, &exit_code);
 
     if (status)
       pthread_raise_error ("::pthread_join", status);
@@ -115,7 +128,7 @@ void PThreadManager::JoinThread (thread_t thread)
 
 size_t PThreadManager::GetThreadId (thread_t thread)
 {
-  return (size_t)*(pthread_t*)thread;
+  return (size_t)thread->thread;
 }
 
 size_t PThreadManager::GetCurrentThreadId ()
