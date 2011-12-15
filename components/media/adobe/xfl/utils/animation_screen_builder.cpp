@@ -314,15 +314,19 @@ void command_line_total_offset (const char* value, Params& params)
 {
   common::StringArray tokens = common::split (value, ";", " \t");
 
-  params.total_offset = xtl::io::get<math::vec2f> (xtl::io::make_token_iterator (tokens.Data (), tokens.Data () + tokens.Size ()));
+  xtl::io::token_iterator<const char*> iter = xtl::io::make_token_iterator (tokens.Data (), tokens.Data () + tokens.Size ());
+  
+  params.total_offset = xtl::io::get<math::vec2f> (iter);
 }
 
 //установка общего масштаба
 void command_line_total_scale (const char* value, Params& params)
 {
   common::StringArray tokens = common::split (value, ";", " \t");
+  
+  xtl::io::token_iterator<const char*> iter = xtl::io::make_token_iterator (tokens.Data (), tokens.Data () + tokens.Size ());  
 
-  params.total_scale = xtl::io::get<math::vec2f> (xtl::io::make_token_iterator (tokens.Data (), tokens.Data () + tokens.Size ()));
+  params.total_scale = xtl::io::get<math::vec2f> (iter);
 }
 
 //разбор командной строки
