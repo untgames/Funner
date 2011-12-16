@@ -6,6 +6,8 @@
 
 #include <sg/listener.h>
 
+#include <render/scene_render.h>
+
 #include <input/cursor.h>
 
 #include <syslib/window.h>
@@ -139,7 +141,8 @@ template <class T> void bind_attachment_methods (Environment& environment, const
 
 void bind_attachment_registry_library (Environment& environment)
 {
-  bind_attachment_methods<scene_graph::Listener> (environment, "Listeners");
+  bind_attachment_methods<render::obsolete::Screen> (environment, "Screens");
+  bind_attachment_methods<scene_graph::Listener>    (environment, "Listeners");
 
   typedef xtl::function<void (const char*)> InputHandler;
 
