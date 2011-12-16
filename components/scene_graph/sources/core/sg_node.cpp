@@ -467,7 +467,7 @@ struct Node::Impl
     
       //увеличиваем счётчик ссылок
       
-    this_node->AddRef ();
+    Pointer node_lock (this_node);
 
       //если у узла уже есть родитель отсоединяем его
       
@@ -585,10 +585,6 @@ struct Node::Impl
       //снятие блокировки на вызов BindToParent
 
     bind_lock = false;
-
-      //уменьшаем счётчик ссылок
-
-    this_node->Release ();
   }
 
   //оповещение о присоединении узла к родителю
