@@ -1,0 +1,22 @@
+1. Список контроллеров, линкуемый в сцену
+2. Сериализатор
+  - обобщение по имени типа узла
+
+Node не зависит от SceneManager
+Добавить Entity::IsVisible/SetVisible
+
+Таймеры:
+  - таймеры хранятся в сцене, есть доступ по имени
+  - для узла по умолчанию проассоциирован таймер "default" (ищется в сцене)
+  - можно установить кастомный таймер
+
+Убрать Node::Update, добавить Scene::Update (без времени)
+
+Возможно сделать один таймер на сцену и Scene::Update (t, dt)
+
+SceneManager::PlayAnimation (const char* name, Node& root_node)
+
+Trigger
+InputTrigger
+  - eventType -> action
+  - geometry
