@@ -255,18 +255,23 @@ struct syslib::window_handle
       throw xtl::format_operation_exception ("", "EngineView::getSurfaceThreadSafe failed");      
 
       //получение дескриптора окна
+      
+    ANativeWindow* new_window = ANativeWindow_fromSurface (&get_env (), surface.get ());
+    
+    if (new_window != window.native_window)
+    {
+      window.native_window = new_window;
+      
+        //оповещение об изменении дескриптора
+      
+      WindowEventContext context;
 
-    window.native_window = ANativeWindow_fromSurface (&get_env (), surface.get ());
-    
-      //оповещение об изменении дескриптора
-    
-    WindowEventContext context;
-
-    memset (&context, 0, sizeof (context));    
-    
-    context.handle = &window;
-    
-    Notify (WindowEvent_OnChangeHandle, context);    
+      memset (&context, 0, sizeof (context));    
+      
+      context.handle = &window;
+      
+      Notify (WindowEvent_OnChangeHandle, context);    
+    }
   }
 
   void OnSurfaceDestroyedCallback ()
