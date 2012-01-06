@@ -18,6 +18,7 @@ namespace social
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Таблица рекордов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+  //non virtual
 class Leaderboard
 {
   public:
@@ -28,7 +29,7 @@ class Leaderboard
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     virtual const char*                Id            () = 0;
     virtual const char*                Title         () = 0;
-    virtual Score*                     UserScore     () = 0;
+    virtual Score::Pointer             UserScore     () = 0;
     virtual size_t                     Size          () = 0;
     virtual const Score&               Score         (size_t index) = 0;
     virtual const common::PropertyMap& Properties    () = 0;

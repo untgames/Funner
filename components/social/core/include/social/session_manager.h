@@ -109,13 +109,30 @@ class RequestStateImpl : private RequestResult, public RequestState
 
 //typedef xtl::function<void (const RequestState& state)> RequestCallback;
 
+class ISessionManager
+{
+  public:
+    virtual ~ISessionManager () {}
+};
+
+class ILeaderboardManager: public virtual ISessionManager
+{
+  public:
+    ////.........
+};
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Сессия
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 class Session
 {
   public:
-    typedef xtl::com_ptr<Session> Pointer;
+    typedef xtl::com_ptr<Session> Pointer;    
+    
+    Session (xtl::function<ISessionManager* (const common::PropertyMap& config)>& creator)
+    {
+      impl->leaderboard_manager = dynamic_cast<ILeaderboardManager*> (manager);
+    }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Описание сессии
@@ -151,15 +168,15 @@ class Session
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     typedef xtl::function<void (const media::Image& picture, OperationStatus status, const char* error)> LoadPictureCallback;
 
-    virtual void LoadUserPicture (const char* id, const LoadPictureCallback& callback) = 0;
+    virtual void LoadUserPicture (const char* user, const LoadPictureCallback& callback) = 0;    
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Друзья
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     typedef xtl::function<void (size_t count, const char** users, OperationStatus status, const char* error)> LoadFriendsIdsCallback;
-    typedef xtl::function<void (size_t count, User** users, OperationStatus status, const char* error)>       LoadFriendsCallback; //?????
-
-    virtual void LoadFriendsIds (const char* id, const LoadFriendsIdsCallback& callback) = 0;
+    typedef xtl::function<void (size_t count, User* users, OperationStatus status, const char* error)>       LoadFriendsCallback; //?????
+    
+    virtual void LoadFriendsIds (const char* id, const LoadFriendsIdsCallback& callback) = 0; //TODO: change param type User&
     virtual void LoadFriends    (const char* id, const LoadFriendsCallback& callback) = 0;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -175,15 +192,30 @@ class Session
     typedef xtl::function<void (size_t count, const char** leaderboards, OperationStatus status, const char* error)> LoadLeaderboardsCallback;
     typedef xtl::function<void (const Leaderboard& leaderboard, OperationStatus status, const char* error)> LoadLeaderboardCallback;
 
-    virtual void LoadLeaderboardsIds (const LoadLeaderboardsCallback& callback) = 0;
+    void LoadLeaderboardsIds (const LoadLeaderboardsCallback& callback)
+    {
+      try
+      {
+        if (!impl->leaderboard_manager)
+          throw ???;
+          
+        impl->leaderboard_manager->LoadLeaderboardIds (callback);
+      }
+      catch (xtl::exception& e)
+      {
+        e.touch ("....");
+        throw;
+      }
+    }
+    
     virtual void LoadLeaderboard     (const char* leaderboard_id, const LoadLeaderboardCallback& callback) = 0;
     virtual void LoadLeaderboard     (const char* leaderboard_id, const char* user_id, const LoadLeaderboardCallback& callback) = 0;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Подсчёт ссылок
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    virtual void AddRef  () = 0;
-    virtual void Release () = 0;
+//    virtual void AddRef  () = 0;
+//    virtual void Release () = 0;
 
   protected:
     virtual ~ISession () {}
@@ -198,7 +230,7 @@ class SessionManager
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Регистрация создателей сессий
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    typedef xtl::function<Session::Pointer ()> CreateSessionHandler;
+    typedef xtl::function<Session::Pointer (const char* name)> CreateSessionHandler;
 
     static void RegisterSession       (const char* name, const CreateSessionHandler& handler);
     static void UnregisterSession     (const char* name);
@@ -207,7 +239,7 @@ class SessionManager
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Проверка наличия сессии
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    static bool HasSession (const char* name);
+    static bool IsSessionRegistered (const char* name);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Создание сессии по имени
