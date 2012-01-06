@@ -3,6 +3,7 @@
 
 #include <xtl/functional_fwd>
 
+#include <social/collection.h>
 #include <social/common.h>
 #include <social/score.h>
 
@@ -49,15 +50,10 @@ class Leaderboard
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Рекорды
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    const Collection<Score>& Scores () const;
-          Collection<Score>& Scores ();
+    typedef Collection<Score> ScoreCollection;
 
-/*    size_t        Capacity      () const;
-    size_t        Size          () const;
-    void          Reserve       (size_t size);
-    void          Resize        (size_t size);
-    const Score&  Score         (size_t index) const;
-          Score&  Score         (size_t index);*/
+    const ScoreCollection& Scores () const;
+          ScoreCollection& Scores ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Получение низкоуровневого дескриптора
@@ -81,7 +77,7 @@ class ILeaderboardManager: public virtual ISessionManager
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Таблицы рекордов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    typedef xtl::function<void (size_t count, const char** leaderboards, OperationStatus status, const char* error)> LoadLeaderboardsCallback;
+    typedef xtl::function<void (size_t count, const char** leaderboards, OperationStatus status, const char* error)> LoadLeaderboardsCallback;  //common::StringArray???
     typedef xtl::function<void (const Leaderboard& leaderboard, OperationStatus status, const char* error)> LoadLeaderboardCallback;
 
     virtual void LoadLeaderboardsIds (const LoadLeaderboardsCallback& callback, const common::PropertyMap& properties) = 0;

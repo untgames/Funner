@@ -3,6 +3,7 @@
 
 #include <xtl/functional_fwd>
 
+#include <social/collection.h>
 #include <social/common.h>
 
 namespace common
@@ -82,7 +83,8 @@ class IUserManager: public virtual ISessionManager
 ///Äðóçüÿ
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     typedef xtl::function<void (size_t count, const char** users, OperationStatus status, const char* error)> LoadFriendsIdsCallback;
-    typedef xtl::function<void (size_t count, User* users, OperationStatus status, const char* error)>        LoadFriendsCallback;
+    typedef Collection<User>                                                                                  UserCollection;
+    typedef xtl::function<void (const UserCollection& users, OperationStatus status, const char* error)>      LoadFriendsCallback;
 
     virtual void LoadFriendsIds (const User& user, const LoadFriendsIdsCallback& callback, const common::PropertyMap& properties) = 0;
     virtual void LoadFriends    (const User& user, const LoadFriendsCallback& callback, const common::PropertyMap& properties) = 0;

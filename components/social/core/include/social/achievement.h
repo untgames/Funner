@@ -1,10 +1,9 @@
 #ifndef SOCIAL_ACHIEVEMENT_HEADER
 #define SOCIAL_ACHIEVEMENT_HEADER
 
-#include <cstddef>
-
 #include <xtl/functional_fwd>
 
+#include <social/collection.h>
 #include <social/common.h>
 
 namespace common
@@ -79,7 +78,8 @@ class IAchievementManager: public virtual ISessionManager
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Достижения
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    typedef xtl::function<void (size_t count, Achievement* achievements, OperationStatus status, const char* text)> LoadAchievementsCallback;
+    typedef Collection<Achievement>                                                                                   AchievementCollection;
+    typedef xtl::function<void (const AchievementCollection& achievements, OperationStatus status, const char* text)> LoadAchievementsCallback;
 
     virtual void LoadAchievements (const LoadAchievementsCallback& callback, const common::PropertyMap& properties) = 0;
 
