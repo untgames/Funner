@@ -1,7 +1,11 @@
 #ifndef SOCIAL_ACHIEVEMENT_HEADER
 #define SOCIAL_ACHIEVEMENT_HEADER
 
-#include <social/session_manager.h>
+#include <cstddef>
+
+#include <xtl/functional_fwd>
+
+#include <social/common.h>
 
 namespace common
 {
@@ -25,51 +29,74 @@ namespace social
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Достижение
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-  //non virtual, with internal reference counter
 class Achievement
 {
   public:
-    typedef xtl::com_ptr<Achievement> Pointer;
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Конструктор / деструктор / копирование
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    Achievement ();
+    Achievement (const void* handle);
+    Achievement (const Achievement&);
+    ~Achievement ();
+
+    Achievement& operator = (const Achievement&);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Свойства
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    virtual const char*                Id            () = 0;
-    virtual const char*                Title         () = 0;
-    virtual bool                       IsHidden      () = 0;
-    virtual double                     Progress      () = 0;
-    virtual void                       SetProgress   (double progress) = 0;
-    virtual const common::PropertyMap& Properties    () = 0;
-    virtual void                       SetProperties (const common::PropertyMap& properties) = 0;
+    const char*                Id            () const;
+    void                       SetId         (const char* id);
+    const char*                Title         () const;
+    void                       SetTitle      (const char* title);
+    bool                       IsHidden      () const;
+    void                       SetHidden     (bool hidden);
+    double                     Progress      () const;
+    void                       SetProgress   (double progress);
+    const common::PropertyMap& Properties    () const;
+          common::PropertyMap& Properties    ();
+    void                       SetProperties (const common::PropertyMap& properties);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Получение низкоуровневого дескриптора
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    const void* Handle () const;
+
+  private:
+    struct Impl;
+    Impl* impl;
+};
+
+//forward declaration
+class ISessionManager;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Менеджер достижений
+///////////////////////////////////////////////////////////////////////////////////////////////////
+class IAchievementManager: public virtual ISessionManager
+{
+  public:
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Достижения
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    typedef xtl::function<void (size_t count, Achievement* achievements, OperationStatus status, const char* text)> LoadAchievementsCallback;
+
+    virtual void LoadAchievements (const LoadAchievementsCallback& callback, const common::PropertyMap& properties) = 0;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Иконка
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    typedef xtl::function<void (const media::Image& picture, OperationStatus status, const char* error)> LoadPictureCallback;
+    typedef xtl::function<void (const media::Image& picture, OperationStatus status, const char* text)> LoadPictureCallback;
 
-    virtual void LoadPicture (const LoadPictureCallback& callback) = 0; //move to AchievementManager
+    virtual void LoadAchievementPicture (const Achievement& achievement, const LoadPictureCallback& callback, const common::PropertyMap& properties) = 0;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Публикация
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    typedef xtl::function<void (OperationStatus status, const char* error)> ReportCallback;
+    typedef xtl::function<void (OperationStatus status, const char* text)> ReportCallback;
 
-    virtual void Report (const ReportCallback& callback) = 0; //move to AchievementManager
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Подсчёт ссылок
-///////////////////////////////////////////////////////////////////////////////////////////////////
-//    virtual void AddRef  () = 0;
-//    virtual void Release () = 0;
-    
-  protected:
-    virtual ~IUser () {}
-    
-  private:
-    AchievementImpl* impl;
+    virtual void ReportAchievement (const Achievement& achievement, const ReportCallback& callback, const common::PropertyMap& properties) = 0;
 };
-
-
 
 }
 

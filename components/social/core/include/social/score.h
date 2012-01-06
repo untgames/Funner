@@ -1,7 +1,7 @@
 #ifndef SOCIAL_SCORE_HEADER
 #define SOCIAL_SCORE_HEADER
 
-#include <social/session_manager.h>
+#include <cstddef>
 
 namespace common
 {
@@ -17,48 +17,46 @@ namespace social
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Очки
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-  //non virtual, with internal reference counter
 class Score
 {
   public:
-    typedef xtl::com_ptr<Score> Pointer;
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Конструктор / деструктор / копирование
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    Score ();
+    Score (const void* handle);
+    Score (const Score&);
+    ~Score ();
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Создание
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    virtual Pointer Create (const char* leaderboard) = 0;
+    Score& operator = (const Score&);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Свойства
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    virtual const char*                PlayerId         () = 0;
-    virtual void                       SetPlayerId      (const char* player) = 0;
-    virtual const char*                LeaderboardId    () = 0;
-    virtual void                       SetLeaderboardId (const char* leaderboard) = 0;
-    virtual const char*                UserData         () = 0;
-    virtual void                       SetUserData      (const char* user_data) = 0;
-    virtual double                     Value            () = 0;
-    virtual void                       SetValue         (double value) = 0;
-    virtual const char*                FormattedValue   () = 0;
-    virtual size_t                     Rank             () = 0;
-    virtual const common::PropertyMap& Properties    () = 0;
-    virtual void                       SetProperties (const common::PropertyMap& properties) = 0;
+    const char*                PlayerId          () const;
+    void                       SetPlayerId       (const char* player);
+    const char*                LeaderboardId     () const;
+    void                       SetLeaderboardId  (const char* leaderboard);
+    const char*                UserData          () const;
+    void                       SetUserData       (const char* user_data);
+    double                     Value             () const;
+    void                       SetValue          (double value);
+    const char*                FormattedValue    () const;
+    void                       SetFormattedValue (const char* formatted_value);
+    size_t                     Rank              () const;
+    void                       SetRank           (size_t rank);
+    const common::PropertyMap& Properties        () const;
+          common::PropertyMap& Properties        ();
+    void                       SetProperties     (const common::PropertyMap& properties);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Публикация
+///Получение низкоуровневого дескриптора
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    typedef xtl::function<void (OperationStatus status, const char* error)> ReportCallback;
+    const void* Handle () const;
 
-    virtual void Report (const ReportCallback& callback) = 0; //move to ScoresManager/LeaderboardManager
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Подсчёт ссылок
-///////////////////////////////////////////////////////////////////////////////////////////////////
-//    virtual void AddRef  () = 0;
-//    virtual void Release () = 0;
-
-  protected:
-    virtual ~Score () {}
+  private:
+    struct Impl;
+    Impl* impl;
 };
 
 }

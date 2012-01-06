@@ -5,6 +5,11 @@
 
 #include <xtl/functional_fwd>
 
+#include <social/achievement.h>
+#include <social/common.h>
+#include <social/leaderboard.h>
+#include <social/user.h>
+
 namespace common
 {
 
@@ -13,112 +18,34 @@ class PropertyMap;
 
 }
 
-namespace media
-{
-
-//forward declaration
-class Image;
-
-}
-
 namespace social
 {
 
-enum OperationStatus
-{
-  OperationStatus_Success,
-  OperationStatus_Failure
-};
-
-//forward declaration
-class Achievement;
-class Leaderboard;
-class User;
-
-/*///////////////////////////////////////////////////////////////////////////////////////////////////
-///Тип результата выполнения операции
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-template <class T> struct RequestResultType       { typedef T&   Type; };
-template <>        struct RequestResultType<void> { typedef void Type; };
-
-/*struct RequestResult
-{
-  const std::type_info* type;
-
-  RequestResult (const std::type_info& in_type)
-    : type (&in_type)
-    {}
-};*/
-
-/*///////////////////////////////////////////////////////////////////////////////////////////////////
-///Результат выполнения операции
+///Менеджер сессии
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-class RequestState
-{
-  public:
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Конструктор / деструктор / присваивание
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    template <class T>
-    RequestState  (const T& result);
-    RequestState  (OperationStatus status, const char* error);
-    RequestState  (const RequestState&);
-    ~RequestState ();
-
-    RequestState& operator = (const RequestState&);
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Получение результата
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    template <class Ret> typename RequestResultType<Ret>::Type Value () const;
-
-    xtl::any AnyValue () const;
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Получение состояния
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    OperationStatus Status () const;
-    const char*     Error  () const;
-
-  private:
-    struct Impl;
-    Impl* impl;
-};*/
-
-/*template <class T>
-class RequestStateImpl : private RequestResult, public RequestState
-{
-  public:
-    RequestStateImpl (const T& in_result)
-      : RequestResult (typeid (T))
-      , RequestState (*this, OperationStatus_Success, "")
-      , result (in_result)
-    {
-    }
-
-    RequestStateImpl (OperationStatus status, const char* error);
-
-    xtl::any AnyValue () const
-    {
-      return xtl::any (result, true);
-    }
-
-  private:
-    T result;
-};*/
-
-//typedef xtl::function<void (const RequestState& state)> RequestCallback;
-
 class ISessionManager
 {
   public:
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Деструктор
+///////////////////////////////////////////////////////////////////////////////////////////////////
     virtual ~ISessionManager () {}
-};
 
-class ILeaderboardManager: public virtual ISessionManager
-{
-  public:
-    ////.........
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Описание сессии
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    virtual const char* GetDescription () = 0;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Показ стандартных окон
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    virtual void ShowWindow (const char* window_name, const common::PropertyMap& properties) = 0;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Получение залогиненного пользователя
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    virtual User& CurrentUser () = 0;
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -127,98 +54,73 @@ class ILeaderboardManager: public virtual ISessionManager
 class Session
 {
   public:
-    typedef xtl::com_ptr<Session> Pointer;    
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Конструктор / деструктор / копирование
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    typedef xtl::function<ISessionManager* (const common::PropertyMap& config)> CreateSessionHandler;
     
-    Session (xtl::function<ISessionManager* (const common::PropertyMap& config)>& creator)
-    {
-      impl->leaderboard_manager = dynamic_cast<ILeaderboardManager*> (manager);
-    }
+    Session (const CreateSessionHandler& creator);
+    Session (const Session& source);
+    ~Session ();
+
+    Session& operator = (const Session& source);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Описание сессии
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    virtual const char* GetDescription () = 0;
+    const char* GetDescription () const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Логин
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    virtual void LogIn      (const common::PropertyMap& config) = 0;
-    virtual void LogOut     () = 0;
-    virtual bool IsLoggedIn () = 0;
+    void LogIn      (const common::PropertyMap& config);
+    void LogOut     ();
+    bool IsLoggedIn ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Показ стандартных окон
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    virtual void ShowWindow (const char* window_name) = 0;
+    void ShowWindow (const char* window_name, const common::PropertyMap& properties = common::PropertyMap ());
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Получение залогиненного пользователя
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    virtual User& CurrentUser () = 0;
+    User& CurrentUser ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Загрузка пользователя по идентификатору
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    typedef xtl::function<void (const User& user, OperationStatus status, const char* error)> LoadUserCallback;
-
-    virtual void LoadUser (const char* id, const LoadUserCallback& callback) = 0;
+    void LoadUser (const char* id, const IUserManager::LoadUserCallback& callback, const common::PropertyMap& properties = common::PropertyMap ());
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Аватар
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    typedef xtl::function<void (const media::Image& picture, OperationStatus status, const char* error)> LoadPictureCallback;
-
-    virtual void LoadUserPicture (const char* user, const LoadPictureCallback& callback) = 0;    
+    void LoadUserPicture (const User& user, const IUserManager::LoadPictureCallback& callback, const common::PropertyMap& properties = common::PropertyMap ());
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Друзья
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    typedef xtl::function<void (size_t count, const char** users, OperationStatus status, const char* error)> LoadFriendsIdsCallback;
-    typedef xtl::function<void (size_t count, User* users, OperationStatus status, const char* error)>       LoadFriendsCallback; //?????
-    
-    virtual void LoadFriendsIds (const char* id, const LoadFriendsIdsCallback& callback) = 0; //TODO: change param type User&
-    virtual void LoadFriends    (const char* id, const LoadFriendsCallback& callback) = 0;
+    void LoadFriendsIds (const User& id, const IUserManager::LoadFriendsIdsCallback& callback, const common::PropertyMap& properties = common::PropertyMap ());
+    void LoadFriends    (const User& id, const IUserManager::LoadFriendsCallback& callback, const common::PropertyMap& properties = common::PropertyMap ());
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Достижения
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    typedef xtl::function<void (size_t count, Achievement** achievements, OperationStatus status, const char* error)> LoadAchievementsCallback; //???????
-
-    virtual void LoadAchievements (const LoadAchievementsCallback& callback) = 0;
+    void LoadAchievements       (const IAchievementManager::LoadAchievementsCallback& callback, const common::PropertyMap& properties = common::PropertyMap ());
+    void LoadAchievementPicture (const Achievement& achievement, const IAchievementManager::LoadPictureCallback& callback, const common::PropertyMap& properties = common::PropertyMap ());
+    void ReportAchievement      (const Achievement& achievement, const IAchievementManager::ReportCallback& callback, const common::PropertyMap& properties = common::PropertyMap ());
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Таблицы рекордов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    typedef xtl::function<void (size_t count, const char** leaderboards, OperationStatus status, const char* error)> LoadLeaderboardsCallback;
-    typedef xtl::function<void (const Leaderboard& leaderboard, OperationStatus status, const char* error)> LoadLeaderboardCallback;
+    void LoadLeaderboardsIds (const ILeaderboardManager::LoadLeaderboardsCallback& callback, const common::PropertyMap& properties = common::PropertyMap ());
+    void LoadLeaderboard     (const char* leaderboard_id, const ILeaderboardManager::LoadLeaderboardCallback& callback, const common::PropertyMap& properties = common::PropertyMap ());
+    void LoadLeaderboard     (const char* leaderboard_id, const char* user_id, const ILeaderboardManager::LoadLeaderboardCallback& callback, const common::PropertyMap& properties = common::PropertyMap ());
+    void ReportScore         (const Score& score, const ILeaderboardManager::ReportScoreCallback& callback, const common::PropertyMap& properties = common::PropertyMap ());
 
-    void LoadLeaderboardsIds (const LoadLeaderboardsCallback& callback)
-    {
-      try
-      {
-        if (!impl->leaderboard_manager)
-          throw ???;
-          
-        impl->leaderboard_manager->LoadLeaderboardIds (callback);
-      }
-      catch (xtl::exception& e)
-      {
-        e.touch ("....");
-        throw;
-      }
-    }
-    
-    virtual void LoadLeaderboard     (const char* leaderboard_id, const LoadLeaderboardCallback& callback) = 0;
-    virtual void LoadLeaderboard     (const char* leaderboard_id, const char* user_id, const LoadLeaderboardCallback& callback) = 0;
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Подсчёт ссылок
-///////////////////////////////////////////////////////////////////////////////////////////////////
-//    virtual void AddRef  () = 0;
-//    virtual void Release () = 0;
-
-  protected:
-    virtual ~ISession () {}
+  private:
+    struct Impl;
+    Impl* impl;
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -230,7 +132,7 @@ class SessionManager
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Регистрация создателей сессий
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    typedef xtl::function<Session::Pointer (const char* name)> CreateSessionHandler;
+    typedef xtl::function<Session (const char* name)> CreateSessionHandler;
 
     static void RegisterSession       (const char* name, const CreateSessionHandler& handler);
     static void UnregisterSession     (const char* name);
@@ -244,7 +146,7 @@ class SessionManager
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Создание сессии по имени
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    static Session::Pointer CreateSession (const char* name);
+    static Session CreateSession (const char* name);
 };
 
 }

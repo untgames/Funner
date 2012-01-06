@@ -1,7 +1,9 @@
 #ifndef SOCIAL_USER_HEADER
 #define SOCIAL_USER_HEADER
 
-#include <social/session_manager.h>
+#include <xtl/functional_fwd>
+
+#include <social/common.h>
 
 namespace common
 {
@@ -17,31 +19,73 @@ namespace social
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Пользователь
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-  //non virtual, impl
 class User
 {
   public:
-    typedef xtl::com_ptr<User> Pointer;
-    
-    User (const char* id);
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Конструктор / деструктор / копирование
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    User ();
+    User (const void* handle);
+    User (const User&);
+    ~User ();
+
+    User& operator = (const User&);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Свойства
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    virtual const char*                Id            () = 0;
-    virtual const char*                Nickname      () = 0;
-    virtual bool                       IsFriend      () = 0;
-    virtual const common::PropertyMap& Properties    () = 0;
-    virtual void                       SetProperties (const common::PropertyMap& properties) = 0;
+    const char*                Id            () const;
+    void                       SetId         (const char* id);
+    const char*                Nickname      () const;
+    void                       SetNickname   (const char* nickname);
+    bool                       IsFriend      () const;
+    void                       SetFriend     (bool is_friend);
+    const common::PropertyMap& Properties    () const;
+          common::PropertyMap& Properties    ();
+    void                       SetProperties (const common::PropertyMap& properties);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Подсчёт ссылок
+///Получение низкоуровневого дескриптора
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    virtual void AddRef  () = 0;
-    virtual void Release () = 0;
+    const void* Handle () const;
 
-  protected:
-    virtual ~IUser () {}
+  private:
+    struct Impl;
+    Impl* impl;
+};
+
+//forward declaration
+class ISessionManager;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Менеджер пользователей
+///////////////////////////////////////////////////////////////////////////////////////////////////
+class IUserManager: public virtual ISessionManager
+{
+  public:
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Загрузка пользователя по идентификатору
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    typedef xtl::function<void (const User& user, OperationStatus status, const char* error)> LoadUserCallback;
+
+    virtual void LoadUser (const char* id, const LoadUserCallback& callback, const common::PropertyMap& properties) = 0;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Аватар
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    typedef xtl::function<void (const media::Image& picture, OperationStatus status, const char* error)> LoadPictureCallback;
+
+    virtual void LoadUserPicture (const User& user, const LoadPictureCallback& callback, const common::PropertyMap& properties) = 0;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Друзья
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    typedef xtl::function<void (size_t count, const char** users, OperationStatus status, const char* error)> LoadFriendsIdsCallback;
+    typedef xtl::function<void (size_t count, User* users, OperationStatus status, const char* error)>        LoadFriendsCallback;
+
+    virtual void LoadFriendsIds (const User& user, const LoadFriendsIdsCallback& callback, const common::PropertyMap& properties) = 0;
+    virtual void LoadFriends    (const User& user, const LoadFriendsCallback& callback, const common::PropertyMap& properties) = 0;
 };
 
 }
