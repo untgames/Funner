@@ -13,6 +13,14 @@ class PropertyMap;
 
 }
 
+namespace media
+{
+
+//forward declaration
+class Image;
+
+}
+
 namespace social
 {
 
@@ -23,7 +31,9 @@ enum OperationStatus
 };
 
 //forward declaration
-class IUser;
+class Achievement;
+class Leaderboard;
+class User;
 
 /*///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Тип результата выполнения операции
@@ -120,6 +130,11 @@ class Session
     virtual bool IsLoggedIn () = 0;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+///Показ стандартных окон
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    virtual void ShowWindow (const char* window_name) = 0;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Получение залогиненного пользователя
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     virtual User& CurrentUser () = 0;
@@ -142,10 +157,27 @@ class Session
 ///Друзья
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     typedef xtl::function<void (size_t count, const char** users, OperationStatus status, const char* error)> LoadFriendsIdsCallback;
-    typedef xtl::function<void (size_t count, IUser** users, OperationStatus status, const char* error)>      LoadFriendsCallback;
+    typedef xtl::function<void (size_t count, User** users, OperationStatus status, const char* error)>       LoadFriendsCallback; //?????
 
     virtual void LoadFriendsIds (const char* id, const LoadFriendsIdsCallback& callback) = 0;
     virtual void LoadFriends    (const char* id, const LoadFriendsCallback& callback) = 0;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Достижения
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    typedef xtl::function<void (size_t count, Achievement** achievements, OperationStatus status, const char* error)> LoadAchievementsCallback; //???????
+
+    virtual void LoadAchievements (const LoadAchievementsCallback& callback) = 0;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Таблицы рекордов
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    typedef xtl::function<void (size_t count, const char** leaderboards, OperationStatus status, const char* error)> LoadLeaderboardsCallback;
+    typedef xtl::function<void (const Leaderboard& leaderboard, OperationStatus status, const char* error)> LoadLeaderboardCallback;
+
+    virtual void LoadLeaderboardsIds (const LoadLeaderboardsCallback& callback) = 0;
+    virtual void LoadLeaderboard     (const char* leaderboard_id, const LoadLeaderboardCallback& callback) = 0;
+    virtual void LoadLeaderboard     (const char* leaderboard_id, const char* user_id, const LoadLeaderboardCallback& callback) = 0;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Подсчёт ссылок
@@ -166,7 +198,7 @@ class SessionManager
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Регистрация создателей сессий
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    typedef xtl::function<Session* ()> CreateSessionHandler;
+    typedef xtl::function<Session::Pointer ()> CreateSessionHandler;
 
     static void RegisterSession       (const char* name, const CreateSessionHandler& handler);
     static void UnregisterSession     (const char* name);
