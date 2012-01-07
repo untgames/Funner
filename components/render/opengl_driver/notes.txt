@@ -1,0 +1,23 @@
+Новая функциональность:
+1. Работа с буферами
+  - Отображение буферов в память - http://www.opengl.org/registry/specs/ARB/map_buffer_range.txt
+  - http://www.opengl.org/registry/specs/ARB/uniform_buffer_object.txt
+  - http://www.opengl.org/registry/specs/NV/shader_buffer_load.txt
+  - http://www.opengl.org/registry/specs/NV/vertex_buffer_unified_memory.txt
+  - GL_ARB_texture_object_array
+2. MRT
+  - GL_ARB_draw_buffers
+  - http://www.opengl.org/registry/specs/ARB/viewport_array.txt
+  - 
+3. Textures
+  - http://www.opengl.org/registry/specs/ARB/sampler_objects.txt
+4. Instancing
+5. Conditional rendering
+  - http://www.opengl.org/registry/specs/NV/conditional_render.txt
+6. Other:
+  - http://www.opengl.org/registry/specs/ARB/debug_output.txt
+  - GL_ATI_meminfo
+  - GL_AMD_performance_monitor
+7. Текстуры
+  - texture arrays
+  - compression formats
