@@ -61,12 +61,26 @@ class Achievement
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     const void* Handle () const;
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Обмен
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void Swap (Achievement&);
+
   private:
     struct Impl;
     Impl* impl;
 };
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Обмен
+///////////////////////////////////////////////////////////////////////////////////////////////////
+void swap (Achievement&, Achievement&);
+
 typedef Collection<Achievement> AchievementList;
+
+typedef xtl::function<void (const AchievementList& achievements, OperationStatus status, const char* text)> LoadAchievementsCallback;
+typedef xtl::function<void (const media::Image& picture, OperationStatus status, const char* text)>         LoadAchievementPictureCallback;
+typedef xtl::function<void (OperationStatus status, const char* text)>                                      SendAchievementCallback;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Менеджер достижений
@@ -77,23 +91,17 @@ class IAchievementManager: public virtual ISessionManager
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Достижения
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    typedef xtl::function<void (const AchievementCollection& achievements, OperationStatus status, const char* text)> LoadAchievementsCallback; //out
-
     virtual void LoadAchievements (const LoadAchievementsCallback& callback, const common::PropertyMap& properties) = 0;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Иконка
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    typedef xtl::function<void (const media::Image& picture, OperationStatus status, const char* text)> LoadPictureCallback;
-
-    virtual void LoadAchievementPicture (const Achievement& achievement, const LoadPictureCallback& callback, const common::PropertyMap& properties) = 0;
+    virtual void LoadAchievementPicture (const Achievement& achievement, const LoadAchievementPictureCallback& callback, const common::PropertyMap& properties) = 0;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Публикация
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    typedef xtl::function<void (OperationStatus status, const char* text)> ReportCallback;
-
-    virtual void ReportAchievement (const Achievement& achievement, const ReportCallback& callback, const common::PropertyMap& properties) = 0;
+    virtual void ReportAchievement (const Achievement& achievement, const SendAchievementCallback& callback, const common::PropertyMap& properties) = 0;
 };
 
 }

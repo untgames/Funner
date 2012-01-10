@@ -62,43 +62,48 @@ class Session
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Загрузка пользователя по идентификатору
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void LoadUser (const char* id, const IUserManager::LoadUserCallback& callback, const common::PropertyMap& properties = common::PropertyMap ()) const;
+    void LoadUser (const char* id, const LoadUserCallback& callback, const common::PropertyMap& properties = common::PropertyMap ()) const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Аватар
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void LoadUserPicture (const User& user, const IUserManager::LoadPictureCallback& callback, const common::PropertyMap& properties = common::PropertyMap ()) const;
+    void LoadUserPicture (const User& user, const LoadUserPictureCallback& callback, const common::PropertyMap& properties = common::PropertyMap ()) const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Друзья
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void LoadFriendsIds (const User& id, const IUserManager::LoadFriendsIdsCallback& callback, const common::PropertyMap& properties = common::PropertyMap ()) const;
-    void LoadFriends    (const User& id, const IUserManager::LoadFriendsCallback& callback, const common::PropertyMap& properties = common::PropertyMap ()) const;
+    void LoadFriendsIds (const User& id, const LoadFriendsIdsCallback& callback, const common::PropertyMap& properties = common::PropertyMap ()) const;
+    void LoadFriends    (const User& id, const LoadFriendsCallback& callback, const common::PropertyMap& properties = common::PropertyMap ()) const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Достижения
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void LoadAchievements       (const IAchievementManager::LoadAchievementsCallback& callback, const common::PropertyMap& properties = common::PropertyMap ()) const;
-    void LoadAchievementPicture (const Achievement& achievement, const IAchievementManager::LoadPictureCallback& callback, const common::PropertyMap& properties = common::PropertyMap ()) const;
-    void ReportAchievement      (const Achievement& achievement, const IAchievementManager::ReportCallback& callback, const common::PropertyMap& properties = common::PropertyMap ()) const;
-      //report -> send
+    void LoadAchievements       (const LoadAchievementsCallback& callback, const common::PropertyMap& properties = common::PropertyMap ()) const;
+    void LoadAchievementPicture (const Achievement& achievement, const LoadAchievementPictureCallback& callback, const common::PropertyMap& properties = common::PropertyMap ()) const;
+    void SendAchievement        (const Achievement& achievement, const SendAchievementCallback& callback, const common::PropertyMap& properties = common::PropertyMap ()) const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Таблицы рекордов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void LoadLeaderboardsIds (const ILeaderboardManager::LoadLeaderboardsCallback& callback, const common::PropertyMap& properties = common::PropertyMap ()) const;
-    void LoadLeaderboard     (const char* leaderboard_id, const ILeaderboardManager::LoadLeaderboardCallback& callback, const common::PropertyMap& properties = common::PropertyMap ()) const;
-    void LoadLeaderboard     (const char* leaderboard_id, const char* user_id, const ILeaderboardManager::LoadLeaderboardCallback& callback, const common::PropertyMap& properties = common::PropertyMap ()) const;
-    void ReportScore         (const Score& score, const ILeaderboardManager::ReportScoreCallback& callback, const common::PropertyMap& properties = common::PropertyMap ()) const;
+    void LoadLeaderboardsIds (const LoadLeaderboardsIdsCallback& callback, const common::PropertyMap& properties = common::PropertyMap ()) const;
+    void LoadLeaderboard     (const char* leaderboard_id, const LoadLeaderboardCallback& callback, const common::PropertyMap& properties = common::PropertyMap ()) const;
+    void LoadLeaderboard     (const char* leaderboard_id, const char* user_id, const LoadLeaderboardCallback& callback, const common::PropertyMap& properties = common::PropertyMap ()) const;
+    void SendScore           (const Score& score, const SendScoreCallback& callback, const common::PropertyMap& properties = common::PropertyMap ()) const;
     
-    //add swap
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Обмен
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void Swap (Session&);
 
   private:
     struct Impl;
     Impl* impl;
 };
 
-//add swap
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Обмен
+///////////////////////////////////////////////////////////////////////////////////////////////////
+void swap (Session&, Session&);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Менеджер сессий

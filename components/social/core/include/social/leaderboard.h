@@ -12,6 +12,7 @@ namespace common
 
 //forward declaration
 class PropertyMap;
+class StringArray;
 
 }
 
@@ -50,18 +51,32 @@ class Leaderboard
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Рекорды
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    const ScoreCollection& Scores () const;
-          ScoreCollection& Scores ();
+    const ScoreList& Scores () const;
+          ScoreList& Scores ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Получение низкоуровневого дескриптора
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     const void* Handle () const;
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Обмен
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void Swap (Leaderboard&);
+
   private:
     struct Impl;
     Impl* impl;
 };
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Обмен
+///////////////////////////////////////////////////////////////////////////////////////////////////
+void swap (Leaderboard&, Leaderboard&);
+
+typedef xtl::function<void (const common::StringArray&, OperationStatus status, const char* error)>     LoadLeaderboardsIdsCallback;
+typedef xtl::function<void (const Leaderboard& leaderboard, OperationStatus status, const char* error)> LoadLeaderboardCallback;
+typedef xtl::function<void (OperationStatus status, const char* error)>                                 SendScoreCallback;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Менеджер таблиц рекордов
@@ -72,9 +87,6 @@ class ILeaderboardManager: public virtual ISessionManager
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Таблицы рекордов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    typedef xtl::function<void (const common::StringArray&, OperationStatus status, const char* error)>     LoadLeaderboardsIdsCallback;
-    typedef xtl::function<void (const Leaderboard& leaderboard, OperationStatus status, const char* error)> LoadLeaderboardCallback;
-
     virtual void LoadLeaderboardsIds (const LoadLeaderboardsIdsCallback& callback, const common::PropertyMap& properties) = 0;
     virtual void LoadLeaderboard     (const char* leaderboard_id, const LoadLeaderboardCallback& callback, const common::PropertyMap& properties) = 0;
     virtual void LoadLeaderboard     (const char* leaderboard_id, const char* user_id, const LoadLeaderboardCallback& callback, const common::PropertyMap& properties) = 0;
@@ -82,9 +94,7 @@ class ILeaderboardManager: public virtual ISessionManager
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Публикация
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    typedef xtl::function<void (OperationStatus status, const char* error)> ReportScoreCallback;
-
-    virtual void ReportScore (const Score& score, const ReportScoreCallback& callback, const common::PropertyMap& properties) = 0;
+    virtual void SendScore (const Score& score, const SendScoreCallback& callback, const common::PropertyMap& properties) = 0;
 };
 
 }
