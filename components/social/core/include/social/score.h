@@ -3,6 +3,8 @@
 
 #include <cstddef>
 
+#include <social/collection.h>
+
 namespace common
 {
 
@@ -58,6 +60,8 @@ class Score
     struct Impl;
     Impl* impl;
 };
+
+typedef Collection<Score> ScoreList;
 
 }
 

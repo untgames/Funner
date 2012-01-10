@@ -34,9 +34,9 @@ class Achievement
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструктор / деструктор / копирование
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    Achievement ();
-    Achievement (const void* handle);
-    Achievement (const Achievement&);
+    Achievement  ();
+    Achievement  (const void* handle);
+    Achievement  (const Achievement&);
     ~Achievement ();
 
     Achievement& operator = (const Achievement&);
@@ -66,8 +66,7 @@ class Achievement
     Impl* impl;
 };
 
-//forward declaration
-class ISessionManager;
+typedef Collection<Achievement> AchievementList;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Менеджер достижений
@@ -78,8 +77,7 @@ class IAchievementManager: public virtual ISessionManager
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Достижения
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    typedef Collection<Achievement>                                                                                   AchievementCollection;
-    typedef xtl::function<void (const AchievementCollection& achievements, OperationStatus status, const char* text)> LoadAchievementsCallback;
+    typedef xtl::function<void (const AchievementCollection& achievements, OperationStatus status, const char* text)> LoadAchievementsCallback; //out
 
     virtual void LoadAchievements (const LoadAchievementsCallback& callback, const common::PropertyMap& properties) = 0;
 

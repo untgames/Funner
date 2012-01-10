@@ -50,8 +50,6 @@ class Leaderboard
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Рекорды
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    typedef Collection<Score> ScoreCollection;
-
     const ScoreCollection& Scores () const;
           ScoreCollection& Scores ();
 
@@ -65,9 +63,6 @@ class Leaderboard
     Impl* impl;
 };
 
-//forward declaration
-class ISessionManager;
-
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Менеджер таблиц рекордов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -77,10 +72,10 @@ class ILeaderboardManager: public virtual ISessionManager
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Таблицы рекордов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    typedef xtl::function<void (size_t count, const char** leaderboards, OperationStatus status, const char* error)> LoadLeaderboardsCallback;  //common::StringArray???
+    typedef xtl::function<void (const common::StringArray&, OperationStatus status, const char* error)>     LoadLeaderboardsIdsCallback;
     typedef xtl::function<void (const Leaderboard& leaderboard, OperationStatus status, const char* error)> LoadLeaderboardCallback;
 
-    virtual void LoadLeaderboardsIds (const LoadLeaderboardsCallback& callback, const common::PropertyMap& properties) = 0;
+    virtual void LoadLeaderboardsIds (const LoadLeaderboardsIdsCallback& callback, const common::PropertyMap& properties) = 0;
     virtual void LoadLeaderboard     (const char* leaderboard_id, const LoadLeaderboardCallback& callback, const common::PropertyMap& properties) = 0;
     virtual void LoadLeaderboard     (const char* leaderboard_id, const char* user_id, const LoadLeaderboardCallback& callback, const common::PropertyMap& properties) = 0;
 
