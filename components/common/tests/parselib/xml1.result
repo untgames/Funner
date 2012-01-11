@@ -410,3 +410,5 @@ root (source='', line=0): {}
    Tag (source='data/test-utf32le.xml', line=42): {}
     #text (source='data/test-utf32le.xml', line=42): {text}
 data/test-utf32le.xml(0): warning: non utf-8 encoding UCS-4LE used (this decreases parsing perfomance)
+root (source='', line=0): {}
+ strings (source='data/test-utf8-bom.xml', line=2): {}

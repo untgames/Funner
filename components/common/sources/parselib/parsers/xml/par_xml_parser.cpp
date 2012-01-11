@@ -162,6 +162,8 @@ class XmlParser
 
         buffer = utf8_buffer.data ();
       }
+      else
+        buffer += text_offset;
 
       lexer.Reset (buffer);
 
