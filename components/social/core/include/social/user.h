@@ -11,7 +11,7 @@ namespace common
 
 //forward declaration
 class PropertyMap;
-class StringArray;
+template<class T> class BasicStringArray;
 
 }
 
@@ -28,29 +28,41 @@ class User
 ///Конструктор / деструктор / копирование
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     User ();
-    User (const void* handle);
     User (const User&);
     ~User ();
 
     User& operator = (const User&);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Свойства
+///Идентификатор
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    const char*                Id            () const;
-    void                       SetId         (const char* id);
-    const char*                Nickname      () const;
-    void                       SetNickname   (const char* nickname);
-    bool                       IsFriend      () const;
-    void                       SetFriend     (bool is_friend);
+    const char* Id    () const;
+    void        SetId (const char* id);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Ник
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    const char* Nickname    () const;
+    void        SetNickname (const char* nickname);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Является ли другом текущего пользователя
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    bool IsFriend  () const;
+    void SetFriend (bool is_friend);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Другие свойства
+///////////////////////////////////////////////////////////////////////////////////////////////////
     const common::PropertyMap& Properties    () const;
           common::PropertyMap& Properties    ();
     void                       SetProperties (const common::PropertyMap& properties);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Получение низкоуровневого дескриптора
+///Низкоуровневый дескриптора
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    const void* Handle () const;
+    const void* Handle    () const;
+    void        SetHandle (const void* handle);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Обмен
@@ -71,7 +83,7 @@ typedef Collection<User> UserList;
 
 typedef xtl::function<void (const User& user, OperationStatus status, const char* error)>            LoadUserCallback;
 typedef xtl::function<void (const media::Image& picture, OperationStatus status, const char* error)> LoadUserPictureCallback;
-typedef xtl::function<void (const common::StringArray&, OperationStatus status, const char* error)>  LoadFriendsIdsCallback;
+typedef xtl::function<void (const common::BasicStringArray<char>&, OperationStatus status, const char* error)>  LoadFriendsIdsCallback;
 typedef xtl::function<void (const UserList& users, OperationStatus status, const char* error)>       LoadFriendsCallback;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

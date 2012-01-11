@@ -44,9 +44,9 @@ class Session
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Логин
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void LogIn      (const common::PropertyMap& config);
-    void LogOut     ();
-    bool IsLoggedIn () const;
+    void LogIn          (const common::PropertyMap& config);
+    void LogOut         ();
+    bool IsUserLoggedIn () const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Показ стандартных окон
@@ -72,8 +72,8 @@ class Session
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Друзья
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void LoadFriendsIds (const User& id, const LoadFriendsIdsCallback& callback, const common::PropertyMap& properties = common::PropertyMap ()) const;
-    void LoadFriends    (const User& id, const LoadFriendsCallback& callback, const common::PropertyMap& properties = common::PropertyMap ()) const;
+    void LoadFriendsIds (const User& user, const LoadFriendsIdsCallback& callback, const common::PropertyMap& properties = common::PropertyMap ()) const;
+    void LoadFriends    (const User& user, const LoadFriendsCallback& callback, const common::PropertyMap& properties = common::PropertyMap ()) const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Достижения
@@ -114,16 +114,16 @@ class SessionManager
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Регистрация создателей сессий
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    typedef xtl::function<ISessionManager* (const char* name, const common::PropertyMap& config)> CreateSessionHandler;
+    typedef xtl::function<ISessionManager* (const char* session_name, const common::PropertyMap& config)> CreateSessionHandler;
 
-    static void RegisterSession       (const char* name, const CreateSessionHandler& handler);
-    static void UnregisterSession     (const char* name);
+    static void RegisterSession       (const char* id, const char* session_name_mask, const CreateSessionHandler& handler);
+    static void UnregisterSession     (const char* id);
     static void UnregisterAllSessions ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Проверка наличия сессии
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    static bool IsSessionRegistered (const char* name);
+    static bool IsSessionRegistered (const char* session_name);
 };
 
 }

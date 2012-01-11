@@ -12,7 +12,7 @@ namespace common
 
 //forward declaration
 class PropertyMap;
-class StringArray;
+template<class T> class BasicStringArray;
 
 }
 
@@ -29,21 +29,32 @@ class Leaderboard
 ///Конструктор / деструктор / копирование
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     Leaderboard ();
-    Leaderboard (const void* handle);
     Leaderboard (const Leaderboard&);
     ~Leaderboard ();
 
     Leaderboard& operator = (const Leaderboard&);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Свойства
+///Идентификатор
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    const char*                Id            () const;
-    void                       SetId         (const char* id);
-    const char*                Title         () const;
-    void                       SetTitle      (const char* title);
-    const Score&               UserScore     () const;
-    void                       SetUserScore  (const Score& score);
+    const char* Id    () const;
+    void        SetId (const char* id);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Название
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    const char* Title    () const;
+    void        SetTitle (const char* title);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Очки залогиненного пользователя
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    const Score& UserScore    () const;
+    void         SetUserScore (const Score& score);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Другие свойства
+///////////////////////////////////////////////////////////////////////////////////////////////////
     const common::PropertyMap& Properties    () const;
           common::PropertyMap& Properties    ();
     void                       SetProperties (const common::PropertyMap& properties);
@@ -51,13 +62,15 @@ class Leaderboard
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Рекорды
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    const ScoreList& Scores () const;
-          ScoreList& Scores ();
+    const ScoreList& Scores    () const;
+          ScoreList& Scores    ();
+    void             SetScores (const ScoreList& scores);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Получение низкоуровневого дескриптора
+///Низкоуровневый дескриптор
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    const void* Handle () const;
+    const void* Handle    () const;
+    void        SetHandle (const void* handle);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Обмен
@@ -74,7 +87,7 @@ class Leaderboard
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 void swap (Leaderboard&, Leaderboard&);
 
-typedef xtl::function<void (const common::StringArray&, OperationStatus status, const char* error)>     LoadLeaderboardsIdsCallback;
+typedef xtl::function<void (const common::BasicStringArray<char>&, OperationStatus status, const char* error)>     LoadLeaderboardsIdsCallback;
 typedef xtl::function<void (const Leaderboard& leaderboard, OperationStatus status, const char* error)> LoadLeaderboardCallback;
 typedef xtl::function<void (OperationStatus status, const char* error)>                                 SendScoreCallback;
 
