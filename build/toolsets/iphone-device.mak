@@ -1,18 +1,18 @@
 ###################################################################################################
-#Сборка под iPhone Device 3.0 g++ armv6 (iPhone, iPhone3G, iPod Touch, iPod Touch 2G)
+#Сборка под iPhone Device 3.2 g++
 ###################################################################################################
 
-IPHONEOS_DEPLOYMENT_TARGET := 3.0
+IPHONEOS_DEPLOYMENT_TARGET := 3.2
 
 export IPHONEOS_DEPLOYMENT_TARGET
 
 REMOTE_DEBUG_DIR  ?= //private/var/work/funner
 PROFILES          += arm
-COMMON_CFLAGS     += -miphoneos-version-min=$(IPHONEOS_DEPLOYMENT_TARGET) -DARM #-gdwarf-2 -fobjc-call-cxx-cdtors  #флаг fobjc-call-cxx-cdtors необходим для использования с++ классов в objective-c классах в gcc версий до 4,2; gdwarf-2 - для профилирования
+COMMON_CFLAGS     += -miphoneos-version-min=$(IPHONEOS_DEPLOYMENT_TARGET) -DARM #-gdwarf-2 #флаг gdwarf-2 - необходим для профилирования
 COMMON_LINK_FLAGS += -miphoneos-version-min=$(IPHONEOS_DEPLOYMENT_TARGET)
 COMPILER_GCC      := /Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/llvm-gcc-4.2
 LINKER_GCC        := /Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/llvm-g++-4.2
-IPHONE_SDK_PATH   := /Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS4.3.sdk
+IPHONE_SDK_PATH   := /Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS5.0.sdk
 
 include $(TOOLSETS_DIR)/iphone.mak
 
