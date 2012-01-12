@@ -97,7 +97,7 @@ struct SessionManagerImpl::Impl
 
     SessionDescMap::iterator iter = FindSessionDesc (session_name);
 
-    if (iter != session_creators.end ())
+    if (iter == session_creators.end ())
       throw xtl::format_operation_exception (METHOD_NAME, "Session '%s' not registered", session_name);
 
     return iter->second.handler (session_name, config);

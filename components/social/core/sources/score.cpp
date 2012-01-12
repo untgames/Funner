@@ -8,7 +8,7 @@ using namespace social;
 
 struct Score::Impl : public xtl::reference_counter
 {
-  stl::string         player_id;       //идентификатор игрока, которому принадлежит достижение
+  stl::string         user_id;         //идентификатор пользователя, которому принадлежит достижение
   stl::string         leaderboard_id;  //идентификатор таблицы рекордов, которой принадлежит достижение
   stl::string         user_data;       //данные, ассоциированные с достижением
   stl::string         formatted_value; //текстовое представление значения
@@ -54,17 +54,17 @@ Score& Score::operator = (const Score& source)
    Идентификатор игрока, которому принадлежит достижение
 */
 
-const char* Score::PlayerId () const
+const char* Score::UserId () const
 {
-  return impl->player_id.c_str ();
+  return impl->user_id.c_str ();
 }
 
-void Score::SetPlayerId (const char* player_id)
+void Score::SetUserId (const char* user_id)
 {
-  if (!player_id)
-    throw xtl::make_null_argument_exception ("social::Score::SetPlayerId", "player_id");
+  if (!user_id)
+    throw xtl::make_null_argument_exception ("social::Score::SetUserId", "user_id");
 
-  impl->player_id = player_id;
+  impl->user_id = user_id;
 }
 
 /*
@@ -95,7 +95,7 @@ const char* Score::UserData () const
 
 void Score::SetUserData (const char* user_data)
 {
-  if (user_data)
+  if (!user_data)
     throw xtl::make_null_argument_exception ("social::Score::SetUserData", "user_data");
 
   impl->user_data = user_data;
@@ -126,7 +126,7 @@ const char* Score::FormattedValue () const
 
 void Score::SetFormattedValue (const char* formatted_value)
 {
-  if (formatted_value)
+  if (!formatted_value)
     throw xtl::make_null_argument_exception ("social::Score::SetFormattedValue", "formatted_value");
 
   impl->formatted_value = formatted_value;

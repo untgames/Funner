@@ -57,7 +57,7 @@ const char* User::Id () const
 
 void User::SetId (const char* id)
 {
-  if (id)
+  if (!id)
     throw xtl::make_null_argument_exception ("social::User::SetId", "id");
 
   impl->id = id;
