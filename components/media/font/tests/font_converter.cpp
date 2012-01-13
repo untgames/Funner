@@ -76,11 +76,12 @@ int main ()
 
     stl::wstring utf16_string = towstring (ascii_string);
 
-    font_desc.file_name = FONT_FILE_NAME;
-    font_desc.char_codes_line = utf16_string.c_str ();
-    font_desc.glyph_size = 64;
+    font_desc.file_name        = FONT_FILE_NAME;
+    font_desc.char_codes_line  = utf16_string.c_str ();
+    font_desc.glyph_size       = 64;
     font_desc.first_glyph_code = FIRST_GLYPH_CODE;
-    font_desc.glyph_interval = 5;
+    font_desc.glyph_interval   = 5;
+    font_desc.fast_convert     = false;
 
     convert (font_desc, font, image);
 
