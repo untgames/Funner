@@ -174,7 +174,11 @@ void convert (const FontDesc& font_desc, Font& result_font, Image& result_image)
   size_t glyphs_count = 0;
 
   xtl::uninitialized_storage<math::vec2ui> glyph_sizes (char_codes_count), glyph_origins (char_codes_count);
-  xtl::uninitialized_storage<size_t> glyph_indices (char_codes_count);
+  xtl::uninitialized_storage<size_t>       glyph_indices (char_codes_count);
+  xtl::uninitialized_storage<FT_UInt>      ft_char_indices (char_codes_count);
+
+  for (size_t i = 0; i < char_codes_count; i++)
+    ft_char_indices.data () [i] = FT_Get_Char_Index (face, font_desc.char_codes_line [i]);
 
   media::GlyphInfo *current_glyph = font.Glyphs ();
 
@@ -189,7 +193,7 @@ void convert (const FontDesc& font_desc, Font& result_font, Image& result_image)
   {
     wchar_t char_code = font_desc.char_codes_line [i];
 
-    if (!FT_Get_Char_Index (face, char_code))
+    if (!ft_char_indices.data () [i])
     {
       set_null_glyph_data (current_glyph);
 
@@ -254,7 +258,11 @@ void convert (const FontDesc& font_desc, Font& result_font, Image& result_image)
   if (font_desc.fast_convert)
     pack_flags |= AtlasPackFlag_Fast;
 
+  get_log ().Printf ("packing %u glyphs...", glyphs_count);
+
   pack_handler (glyphs_count, glyph_sizes.data (), glyph_origins.data (), 0, pack_flags);
+
+  get_log ().Printf ("building image...");
 
   size_t result_image_width = 0, result_image_height = 0;
 
@@ -321,6 +329,8 @@ void convert (const FontDesc& font_desc, Font& result_font, Image& result_image)
     same_glyph->y_pos = first_glyph_occurence->y_pos;
   }
 
+  get_log ().Printf ("getting kernings...");
+
     //Формирование кёрнингов
 
   for (size_t i = 0; i < char_codes_count; i++)
@@ -328,7 +338,7 @@ void convert (const FontDesc& font_desc, Font& result_font, Image& result_image)
     {
       FT_Vector kerning;
 
-      if (FT_Get_Kerning (face, FT_Get_Char_Index (face, font_desc.char_codes_line [i]), FT_Get_Char_Index (face, font_desc.char_codes_line [j]), FT_KERNING_UNFITTED, &kerning))
+      if (FT_Get_Kerning (face, ft_char_indices.data () [i], ft_char_indices.data () [j], FT_KERNING_UNFITTED, &kerning))
       {
         get_log ().Printf ("Can't get kerning for pair %u-%u.", i, j);
         continue;

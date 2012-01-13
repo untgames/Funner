@@ -42,6 +42,9 @@ Results of font_converter_test:
 'media.font.font_converter': 'Freetype returned null for character 125.'
 'media.font.font_converter': 'Freetype returned null for character 126.'
 'media.font.font_converter': 'Font 'data/a_damn_mess.ttf' has no char 127.'
+'media.font.font_converter': 'packing 27 glyphs...'
+'media.font.font_converter': 'building image...'
+'media.font.font_converter': 'getting kernings...'
 <?xml version="1.0" encoding="utf-8"?>
 <Font Name="/io/stdout/a_damn_mess.xfont" FontFile="data/a_damn_mess.tga" FirstCharCode="32">
   <Glyphs>
