@@ -1,10 +1,13 @@
-#include <clocale>
 #include <cstdio>
 
 #include <stl/string>
 
+#include <xtl/bind.h>
+#include <xtl/ref.h>
+
+#include <common/command_line.h>
 #include <common/log.h>
-#include <common/utf_converter.h>
+#include <common/strlib.h>
 
 #include <media/font_converter.h>
 #include <media/image.h>
@@ -12,67 +15,282 @@
 using namespace media;
 using namespace common;
 
-const size_t FIRST_GLYPH_CODE = 32;
-const size_t LAST_GLYPH_CODE  = 16384;
-const size_t FONT_SIZE        = LAST_GLYPH_CODE - FIRST_GLYPH_CODE + 1;
+const char*  PROGRAM_NAME               = "ttf2xfont";
+const size_t DEFAULT_GLYPH_INTERVAL     = 5;
+const size_t DEFAULT_FIRST_GLYPH_CODE   = 32;
+const size_t DEFAULT_LAST_GLYPH_CODE    = 255;
+const size_t HELP_STRING_PREFIX_LENGTH  = 30;
+
+/*
+    Утилиты
+*/
+
+void error (const char* format, ...)
+{
+  va_list args;
+
+  va_start (args, format);
+
+  printf  ("error: ");
+  vprintf (format, args);
+  printf  ("\n");
+  fflush  (stdout);
+
+  exit (1);
+}
+
+/*
+    Обработка командной строки
+*/
+
+struct Params;
+
+//опция
+struct Option
+{
+  CommandLine::SwitchHandler handler;       //обработчик ключа
+  const char*                name;          //имя команды
+  char                       short_name;    //короткое имя
+  const char*                argument_name; //имя аргумента
+  const char*                tip;           //подсказка
+};
+
+//параметры запуска
+struct Params
+{
+  const Option* options;          //массив опций
+  size_t        options_count;    //количество опций
+  stl::string   source_font;      //имя исходного шрифта
+  stl::string   result_image;     //имя результирующего изображения
+  stl::string   result_font;      //имя результирующего шрифта
+  int           glyph_interval;   //интервал между символами в картинке
+  int           glyph_size;       //максимальный размер изображения одного символа
+  int           first_glyph_code; //код первого индекса генерируемого диапазона символов
+  int           last_glyph_code;  //код последнего индекса генерируемого диапазона символов
+  bool          fast_convert;     //быстрая генерация
+  bool          silent;           //минимальное число сообщений
+  bool          print_help;       //нужно ли печатать сообщение помощи
+};
 
 void log_handler (const char* log, const char* message)
 {
   printf ("'%s': '%s'\n", log, message);
 }
 
-int main (int argc, char *argv[])
+//получение подсказки по программе
+void command_line_help (const char*, Params& params)
 {
-  common::LogFilter log_filter ("*", log_handler);
+  printf ("%s [<OPTIONS>] <SOURCE> ...\n", PROGRAM_NAME);
+  printf ("  OPTIONS:\n");
 
-  if (argc != 5)
+  for (size_t i=0; i<params.options_count; i++)
   {
-    printf ("Usage: ttf2xfont ttfname imagename xfontname glyph_size\n");
-    return 1;
+    const Option& option = params.options [i];
+
+    stl::string prefix = common::format (option.argument_name ? "    --%s=<%s>" : "    --%s", option.name, option.argument_name);
+
+    if (option.short_name)
+      prefix += common::format (option.argument_name ? ", -%c <%s>" : ", -%c", option.short_name, option.argument_name);
+
+    printf ("%s ", prefix.c_str ());
+
+    if (prefix.size () < HELP_STRING_PREFIX_LENGTH)
+      for (size_t i=0, count=HELP_STRING_PREFIX_LENGTH-prefix.size (); i<count; i++)
+        printf (" ");
+
+    printf ("%s\n", option.tip);
   }
 
-  int glyph_size = atoi (argv [4]);
+  params.print_help = true;
+}
 
-  if (glyph_size < 1)
+//установка параметра вывода детальной информации
+void command_line_silent (const char*, Params& params)
+{
+  params.silent = true;
+}
+
+//установка параметра быстрого конвертирования
+void command_line_fast_convert (const char*, Params& params)
+{
+  params.fast_convert = true;
+}
+
+//установка имени результирующего файла картинки
+void command_line_result_image_name (const char* file_name, Params& params)
+{
+  params.result_image = file_name;
+}
+
+//установка имени результирующего файла шрифта
+void command_line_result_font (const char* file_name, Params& params)
+{
+  params.result_font = file_name;
+}
+
+//установка максимального размера изображения одного символа
+void command_line_glyph_size (const char* size, Params& params)
+{
+  params.glyph_size = atoi (size);
+}
+
+//установка кода первого индекса генерируемого диапазона символов
+void command_line_first_glyph_code (const char* index, Params& params)
+{
+  params.first_glyph_code = atoi (index);
+}
+
+//установка кода последнего индекса генерируемого диапазона символов
+void command_line_last_glyph_code (const char* index, Params& params)
+{
+  params.last_glyph_code = atoi (index);
+}
+
+//установка интервала между изображениями символов в картинке
+void command_line_glyph_interval (const char* size, Params& params)
+{
+  params.glyph_interval = atoi (size);
+}
+
+//проверка корректности ввода
+void validate (Params& params)
+{
+  if (params.source_font.empty ())
+    error ("no source font name");
+
+  if (params.result_image.empty ())
+    error ("no result image name");
+
+  if (params.result_font.empty ())
+    error ("no result font name");
+
+  if (params.glyph_size < 1)
+    error ("no glyph size");
+
+  if (!params.first_glyph_code && !params.last_glyph_code)
   {
-    printf ("Glyph size must be greater than 0\n");
-    return 1;
+    params.first_glyph_code = DEFAULT_FIRST_GLYPH_CODE;
+    params.last_glyph_code  = DEFAULT_LAST_GLYPH_CODE;
   }
+  else if (params.last_glyph_code < params.first_glyph_code)
+    error ("last glyph code %d is less then first glyph code %d", params.last_glyph_code, params.first_glyph_code);
+  else if (params.first_glyph_code < 1 || params.last_glyph_code < 1)
+    error ("invalid glyph code range %d - %d", params.first_glyph_code, params.last_glyph_code);
 
+  if (params.glyph_interval < 0)
+    params.glyph_interval = DEFAULT_GLYPH_INTERVAL;
+}
+
+void build (Params& params)
+{
   try
   {
+    LogFilter log_filter ("", LogFilter::LogHandler ());
+
+    if (!params.silent)
+      LogFilter ("*", &log_handler).Swap (log_filter);
+
     Font     font;
     Image    image (1, 1, 1, PixelFormat_RGBA8);
     FontDesc font_desc;
 
-    stl::wstring utf16_string (FONT_SIZE, 0);
+    stl::wstring utf16_string (params.last_glyph_code - params.first_glyph_code + 1, 0);
 
-    for (size_t i = FIRST_GLYPH_CODE; i <= LAST_GLYPH_CODE; i++)
-      utf16_string[i - FIRST_GLYPH_CODE] = i;
+    for (int i = params.first_glyph_code; i <= params.last_glyph_code; i++)
+      utf16_string[i - params.first_glyph_code] = i;
 
-    font_desc.file_name = argv [1];
-    font_desc.char_codes_line = utf16_string.c_str ();
-    font_desc.glyph_size = glyph_size;
-    font_desc.first_glyph_code = FIRST_GLYPH_CODE;
-    font_desc.glyph_interval = 5;
+    font_desc.file_name        = params.source_font.c_str ();
+    font_desc.char_codes_line  = utf16_string.c_str ();
+    font_desc.glyph_size       = params.glyph_size;
+    font_desc.first_glyph_code = params.first_glyph_code;
+    font_desc.glyph_interval   = params.glyph_interval;
+    font_desc.fast_convert     = params.fast_convert;
 
     convert (font_desc, font, image);
 
-    image.Rename (argv [2]);
-    
-    font.Rename       (argv [3]);
-    font.SetImageName (argv [2]);
+    image.Rename (params.result_image.c_str ());
 
-    font.Save  (argv [3]);
-    image.Save (argv [2]);
+    font.Rename       (params.result_font.c_str ());
+    font.SetImageName (params.result_image.c_str ());
+
+    font.Save  (params.result_font.c_str ());
+    image.Save (params.result_image.c_str ());
   }
-  catch (std::exception& exception)
-  {                                               
-    printf ("exception: %s\n",exception.what ());
-  }                                               
+  catch (std::exception& e)
+  {
+    error ("%s", e.what ());
+  }
   catch (...)
   {
-    printf ("unknown exception\n");
+    error ("unknown exception");
+  }
+}
+
+int main (int argc, const char** argv)
+{
+  Params params;
+
+  static Option options [] = {
+    {xtl::bind (&command_line_help,                _1, xtl::ref (params)), "help",              '?',        0, "print help message"},
+    {xtl::bind (&command_line_silent,              _1, xtl::ref (params)), "silent",            's',        0, "quiet mode"},
+    {xtl::bind (&command_line_result_image_name,   _1, xtl::ref (params)), "image",             'i',   "file", "set output image file"},
+    {xtl::bind (&command_line_result_font,         _1, xtl::ref (params)), "out-font",          'o',   "file", "set output font name"},
+    {xtl::bind (&command_line_glyph_size,          _1, xtl::ref (params)), "glyph-size",        0,     "size", "set glyph size"},
+    {xtl::bind (&command_line_first_glyph_code,    _1, xtl::ref (params)), "first-glyph-code",  0,    "index", "set first index of generated glyph range"},
+    {xtl::bind (&command_line_last_glyph_code,     _1, xtl::ref (params)), "last-glyph-code",   0,    "index", "set last index of generated glyph range"},
+    {xtl::bind (&command_line_glyph_interval,      _1, xtl::ref (params)), "glyph-interval",    0,     "size", "set glyph interval"},
+    {xtl::bind (&command_line_fast_convert,        _1, xtl::ref (params)), "fast",              0,          0, "fast mode"},
+  };
+
+  static const size_t options_count = sizeof (options) / sizeof (*options);
+
+    //инициализация
+
+  params.options          = options;
+  params.options_count    = options_count;
+  params.glyph_size       = 0;
+  params.first_glyph_code = 0;
+  params.last_glyph_code  = 0;
+  params.glyph_interval   = -1;
+  params.fast_convert     = false;
+  params.print_help       = false;
+  params.silent           = false;
+
+  CommandLine command_line;
+
+  for (size_t i = 0; i < params.options_count; i++)
+    command_line.SetSwitchHandler (options [i].name, options [i].short_name, options [i].argument_name, options [i].handler);
+
+  try
+  {
+      //разбор командной строки
+    command_line.Process (argc, argv);
+
+      // --help только печатает сообщение помощи
+
+    if (params.print_help)
+      return 0;
+
+    if (command_line.ParamsCount () != 1)
+    {
+      printf ("Sources count is %d, only one source file allowed\n", command_line.ParamsCount ());
+      return 1;
+    }
+
+    params.source_font = command_line.Param (0);
+
+      //проверка корректности ввода
+
+    validate (params);
+
+      //построение шрифта
+
+    build (params);
+  }
+  catch (std::exception& e)
+  {
+    printf ("exception '%s'\n", e.what ());
+    return 1;
   }
 
   return 0;
