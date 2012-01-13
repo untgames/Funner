@@ -30,11 +30,12 @@ enum AtlasBuilderInsertMode
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 enum AtlasPackFlag
 {
-  AtlasPackFlag_PowerOfTwoEdges = 1,  //стороны степени двойки
-  AtlasPackFlag_InvertTilesX    = 2,  //инвертировать расположение тайлов по оси X, обрабатывается в AtlasBuilder
-  AtlasPackFlag_InvertTilesY    = 4,  //инвертировать расположение тайлов по оси Y, обрабатывается в AtlasBuilder
-  AtlasPackFlag_SwapAxises      = 8,  //изменить расположение осей при размещении тайлов
-  AtlasPackFlag_SquareAxises    = 16, //равные размеры осей
+  AtlasPackFlag_PowerOfTwoEdges = 1,       //стороны степени двойки
+  AtlasPackFlag_InvertTilesX    = 1 << 1,  //инвертировать расположение тайлов по оси X, обрабатывается в AtlasBuilder
+  AtlasPackFlag_InvertTilesY    = 1 << 2,  //инвертировать расположение тайлов по оси Y, обрабатывается в AtlasBuilder
+  AtlasPackFlag_SwapAxises      = 1 << 3,  //изменить расположение осей при размещении тайлов
+  AtlasPackFlag_SquareAxises    = 1 << 4,  //равные размеры осей
+  AtlasPackFlag_Fast            = 1 << 5,  //быстрое сжатие
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

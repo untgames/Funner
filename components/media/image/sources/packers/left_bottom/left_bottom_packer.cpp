@@ -76,8 +76,18 @@ class TileImageBuilder
     {
       images.resize (images_count);
 
+      average_image_width  = 0;
+      average_image_height = 0;
+
       for (size_t i = 0; i < images_count; i++)
+      {
+        average_image_width  += in_sizes[i].x;
+        average_image_height += in_sizes[i].y;
         images[i] = in_sizes[i];
+      }
+
+      average_image_width  /= (float)images_count;
+      average_image_height /= (float)images_count;
     }
 
     void BuildTileImage (math::vec2ui* out_origins, size_t margin, size_t pack_flags)
@@ -105,6 +115,8 @@ class TileImageBuilder
 
       MyRand my_rand;
 
+      size_t pack_try_count = pack_flags & AtlasPackFlag_Fast ? 0 : PACK_TRY_COUNT;
+
       while (!pack_result)
       {
         if (result_image_horisontal_side > result_image_vertical_side) result_image_vertical_side   *= 2;
@@ -117,13 +129,14 @@ class TileImageBuilder
 
         do
         {
-          pack_result = PackImages (margin, (pack_flags & AtlasPackFlag_SwapAxises) != 0, result_image_horisontal_side, result_image_vertical_side, out_origins, indices);
+          pack_result = PackImages (margin, (pack_flags & AtlasPackFlag_SwapAxises) != 0, (pack_flags & AtlasPackFlag_Fast) != 0,
+                                    result_image_horisontal_side, result_image_vertical_side, out_origins, indices);
 
           if (pack_result) break;
 
           random_shuffle (indices.begin (), indices.end (), my_rand);
         }
-        while (try_count++ < PACK_TRY_COUNT);
+        while (try_count++ < pack_try_count);
       }
     }
 
@@ -167,15 +180,23 @@ class TileImageBuilder
       }
     };
 
-    bool PackImages (size_t margin, bool swap_axises, size_t result_image_horizontal_side, size_t result_image_vertical_side, math::vec2ui* out_origins, const IndexArray& indices)
-    {
-      typedef set<FreeSpace, less<FreeSpace> > FreeSpacesSet;
+    typedef set<FreeSpace, less<FreeSpace> > FreeSpacesSet;
 
+    void AddFreeSpace (const FreeSpace& free_space, FreeSpacesSet& free_spaces, bool fast)
+    {
+      if (fast && (free_space.width < average_image_width || free_space.height < average_image_height))
+        return;
+
+      free_spaces.insert (free_space);
+    }
+
+    bool PackImages (size_t margin, bool swap_axises, bool fast, size_t result_image_horizontal_side, size_t result_image_vertical_side, math::vec2ui* out_origins, const IndexArray& indices)
+    {
       FreeSpacesSet free_spaces;
 
       free_spaces.insert (FreeSpace (0, 0, result_image_horizontal_side, result_image_vertical_side, swap_axises));
 
-      for (size_t i = 0; i < indices.size (); i++)
+      for (size_t i = 0, count = indices.size (); i < count; i++)
       {
         math::vec2ui &image_size = images [indices [i]],
                      &out_origin = out_origins [indices [i]];
@@ -215,25 +236,25 @@ class TileImageBuilder
               {
                 FreeSpace left_free_space (erase_iter->x_pos, erase_iter->y_pos, out_origin.x - erase_iter->x_pos, erase_iter->height, swap_axises);
 
-                free_spaces.insert (left_free_space);
+                AddFreeSpace (left_free_space, free_spaces, fast);
               }
               if ((out_origin.x + image_size.x) < (erase_iter->x_pos + erase_iter->width)) //есть новое свободное место правее картинки
               {
                 FreeSpace right_free_space (out_origin.x + image_size.x, erase_iter->y_pos, erase_iter->x_pos + erase_iter->width - (out_origin.x + image_size.x), erase_iter->height, swap_axises);
 
-                free_spaces.insert (right_free_space);
+                AddFreeSpace (right_free_space, free_spaces, fast);
               }
               if (out_origin.y > erase_iter->y_pos) //есть новое свободное место ниже картинки
               {
                 FreeSpace bottom_free_space (erase_iter->x_pos, erase_iter->y_pos, erase_iter->width, out_origin.y - erase_iter->y_pos, swap_axises);
 
-                free_spaces.insert (bottom_free_space);
+                AddFreeSpace (bottom_free_space, free_spaces, fast);
               }
               if ((out_origin.y + image_size.y) < (erase_iter->y_pos + erase_iter->height)) //есть новое свободное место выше картинки
               {
                 FreeSpace top_free_space (erase_iter->x_pos, out_origin.y + image_size.y, erase_iter->width, erase_iter->y_pos + erase_iter->height - (out_origin.y + image_size.y), swap_axises);
 
-                free_spaces.insert (top_free_space);
+                AddFreeSpace (top_free_space, free_spaces, fast);
               }
 
               FreeSpacesSet::iterator next = erase_iter;
@@ -259,6 +280,8 @@ class TileImageBuilder
 
   private:
     ImagesArray images;
+    size_t      average_image_width;
+    size_t      average_image_height;
 };
 
 void left_bottom_pack (size_t images_count, const math::vec2ui* in_sizes, math::vec2ui* out_origins, size_t margin, size_t pack_flags)
