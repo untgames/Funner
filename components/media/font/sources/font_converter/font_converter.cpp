@@ -136,12 +136,10 @@ void convert (const FontDesc& font_desc, Font& result_font, Image& result_image)
   if (!font_desc.file_name)
     throw xtl::make_null_argument_exception (METHOD_NAME, "font_desc.file_name");
 
-  if (!font_desc.char_codes_line)
-    throw xtl::make_null_argument_exception (METHOD_NAME, "font_desc.char_codes_line");
+  if (!font_desc.char_codes)
+    throw xtl::make_null_argument_exception (METHOD_NAME, "font_desc.char_codes");
   
-  size_t char_codes_count = xtl::xstrlen (font_desc.char_codes_line);
-
-  if (!char_codes_count)
+  if (!font_desc.char_codes_count)
     throw xtl::format_operation_exception (METHOD_NAME, "Empty char codes string");
   
   if (!font_desc.glyph_size)
@@ -166,19 +164,19 @@ void convert (const FontDesc& font_desc, Font& result_font, Image& result_image)
 
   font.Rename (result_font.Name ());
   font.SetImageName (result_image.Name ());
-  font.ResizeGlyphsTable (char_codes_count);
+  font.ResizeGlyphsTable (font_desc.char_codes_count);
   font.SetFirstGlyphCode (font_desc.first_glyph_code);
 
     //Подготовка массива с размерами каждого глифа
 
   size_t glyphs_count = 0;
 
-  xtl::uninitialized_storage<math::vec2ui> glyph_sizes (char_codes_count), glyph_origins (char_codes_count);
-  xtl::uninitialized_storage<size_t>       glyph_indices (char_codes_count);
-  xtl::uninitialized_storage<FT_UInt>      ft_char_indices (char_codes_count);
+  xtl::uninitialized_storage<math::vec2ui> glyph_sizes (font_desc.char_codes_count), glyph_origins (font_desc.char_codes_count);
+  xtl::uninitialized_storage<size_t>       glyph_indices (font_desc.char_codes_count);
+  xtl::uninitialized_storage<FT_UInt>      ft_char_indices (font_desc.char_codes_count);
 
-  for (size_t i = 0; i < char_codes_count; i++)
-    ft_char_indices.data () [i] = FT_Get_Char_Index (face, font_desc.char_codes_line [i]);
+  for (size_t i = 0; i < font_desc.char_codes_count; i++)
+    ft_char_indices.data () [i] = FT_Get_Char_Index (face, font_desc.char_codes [i]);
 
   media::GlyphInfo *current_glyph = font.Glyphs ();
 
@@ -187,11 +185,11 @@ void convert (const FontDesc& font_desc, Font& result_font, Image& result_image)
   BitmapHashMap   bitmap_map;
   DuplicateGlyphs duplicate_glyphs;
 
-  duplicate_glyphs.reserve (char_codes_count);
+  duplicate_glyphs.reserve (font_desc.char_codes_count);
   
-  for (size_t i = 0; i < char_codes_count; i++, current_glyph++)
+  for (size_t i = 0; i < font_desc.char_codes_count; i++, current_glyph++)
   {
-    wchar_t char_code = font_desc.char_codes_line [i];
+    size_t char_code = font_desc.char_codes [i];
 
     if (!ft_char_indices.data () [i])
     {
@@ -294,11 +292,11 @@ void convert (const FontDesc& font_desc, Font& result_font, Image& result_image)
 
   for (size_t i = 0; i < glyphs_count; i++)
   {
-    if (FT_Load_Char (face, font_desc.char_codes_line [glyph_indices.data () [i]], FT_LOAD_RENDER))
-      throw xtl::format_operation_exception (METHOD_NAME, "Can't render glyph %u second time", glyph_indices.data () [i]);
+    if (FT_Load_Char (face, font_desc.char_codes [glyph_indices.data () [i]], FT_LOAD_RENDER))
+      throw xtl::format_operation_exception (METHOD_NAME, "Can't render glyph %u second time", font_desc.char_codes [glyph_indices.data () [i]]);
 
     if (!face->glyph->bitmap.buffer)
-      throw xtl::format_operation_exception (METHOD_NAME, "Can't get glyph %u buffer while rendering second time", glyph_indices.data () [i]);
+      throw xtl::format_operation_exception (METHOD_NAME, "Can't get glyph %u buffer while rendering second time", font_desc.char_codes [glyph_indices.data () [i]]);
 
     current_glyph = font.Glyphs () + glyph_indices.data () [i];
 
@@ -333,8 +331,8 @@ void convert (const FontDesc& font_desc, Font& result_font, Image& result_image)
 
     //Формирование кёрнингов
 
-  for (size_t i = 0; i < char_codes_count; i++)
-    for (size_t j = 0; j < char_codes_count; j++)
+  for (size_t i = 0; i < font_desc.char_codes_count; i++)
+    for (size_t j = 0; j < font_desc.char_codes_count; j++)
     {
       FT_Vector kerning;
 

@@ -69,15 +69,14 @@ int main ()
     Image    image (1, 1, 1, PixelFormat_RGBA8);
     FontDesc font_desc;
 
-    stl::string ascii_string (FONT_SIZE, 0);
+    xtl::uninitialized_storage<size_t> utf32_buffer (FONT_SIZE);
 
     for (size_t i = FIRST_GLYPH_CODE; i <= LAST_GLYPH_CODE; i++)
-      ascii_string[i - FIRST_GLYPH_CODE] = i;
+      utf32_buffer.data () [i - FIRST_GLYPH_CODE] = i;
 
-    stl::wstring utf16_string = towstring (ascii_string);
-
+    font_desc.char_codes       = utf32_buffer.data ();
+    font_desc.char_codes_count = utf32_buffer.size ();
     font_desc.file_name        = FONT_FILE_NAME;
-    font_desc.char_codes_line  = utf16_string.c_str ();
     font_desc.glyph_size       = 64;
     font_desc.first_glyph_code = FIRST_GLYPH_CODE;
     font_desc.glyph_interval   = 5;

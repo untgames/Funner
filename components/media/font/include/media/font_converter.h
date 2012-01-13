@@ -15,7 +15,8 @@ class Image;
 struct FontDesc
 {
   const char*    file_name;        //имя файла со шрифтом
-  const wchar_t* char_codes_line;  //строка с символами для генерации
+  const size_t*  char_codes;       //строка с символами для генерации
+  size_t         char_codes_count; //количество символов для генерации
   size_t         glyph_size;       //максимальный размер стороны символа
   size_t         first_glyph_code; //код первого глифа
   size_t         glyph_interval;   //пропуск между соседними глифами
