@@ -193,7 +193,7 @@ void convert (const FontDesc& font_desc, Font& result_font, Image& result_image)
     {
       set_null_glyph_data (current_glyph);
 
-      get_log ().Printf ("Font '%s' has no char %u (%C).", font_desc.file_name, char_code, char_code);
+      get_log ().Printf ("Font '%s' has no char %u.", font_desc.file_name, char_code);
 
       continue;
     }
@@ -202,14 +202,14 @@ void convert (const FontDesc& font_desc, Font& result_font, Image& result_image)
     {
       set_null_glyph_data (current_glyph);
 
-      get_log ().Printf ("Can't load char %u (%C).", char_code, char_code);
+      get_log ().Printf ("Can't load char %u.", char_code);
     
       continue;
     }
 
     if (!face->glyph->bitmap.buffer)
     {
-      get_log ().Printf ("Freetype returned null for character %u (%C).", char_code, char_code);
+      get_log ().Printf ("Freetype returned null for character %u.", char_code);
       
       set_null_glyph_data (current_glyph);
       current_glyph->advance_x = face->glyph->metrics.horiAdvance >> 6;
@@ -249,7 +249,7 @@ void convert (const FontDesc& font_desc, Font& result_font, Image& result_image)
 
     //Формирование позиций глифов
 
-  pack_handler (glyphs_count, glyph_sizes.data (), glyph_origins.data (), 0, AtlasPackFlag_PowerOfTwoEdges);
+  pack_handler (glyphs_count, glyph_sizes.data (), glyph_origins.data (), 0, AtlasPackFlag_PowerOfTwoEdges | AtlasPackFlag_Fast);
 
   size_t result_image_width = 0, result_image_height = 0;
 
