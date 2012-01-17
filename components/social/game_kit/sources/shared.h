@@ -1,6 +1,13 @@
 #ifndef SOCIAL_GAME_KIT_SHARED_HEADER
 #define SOCIAL_GAME_KIT_SHARED_HEADER
 
+#import <UIKit/UIKit.h>
+
+#import <GameKit/GKAchievementViewController.h>
+#import <GameKit/GKLeaderboardViewController.h>
+#import <GameKit/GKLocalPlayer.h>
+
+
 #include <xtl/bind.h>
 #include <xtl/common_exceptions.h>
 #include <xtl/function.h>
@@ -9,6 +16,8 @@
 #include <common/log.h>
 #include <common/property_map.h>
 
+#include <media/image.h>
+
 #include <social/session.h>
 
 namespace social
@@ -16,6 +25,8 @@ namespace social
 
 namespace game_kit
 {
+
+const char* OK_STATUS = "Ok";
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Game Kit сессия
@@ -33,6 +44,12 @@ class GameKitSessionImpl: public IAchievementManager, public ILeaderboardManager
 ///Проверка наличия поддержки Game Kit API
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     static bool IsApiAvailable ();
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Проверка наличия в PropertyMap неизвестных полей
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    static void CheckUnknownProperties (const char* source, const common::PropertyMap& properties,
+                                        size_t known_properties_count, const char** known_properties_names);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Описание сессии
@@ -104,7 +121,12 @@ class GameKitSessionImpl: public IAchievementManager, public ILeaderboardManager
   private:
     common::Log log;
     User        current_user;
+    NSString*   system_version;
 };
+
+void release_ns_object (const void* handle);
+void fill_user (GKPlayer* player, User& user);
+media::Image convert_image (UIImage* image);
 
 }
 

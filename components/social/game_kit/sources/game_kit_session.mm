@@ -1,9 +1,3 @@
-#import <UIKit/UIKit.h>
-
-#import <GameKit/GKAchievementViewController.h>
-#import <GameKit/GKLeaderboardViewController.h>
-#import <GameKit/GKLocalPlayer.h>
-
 #include "shared.h"
 
 using namespace social;
@@ -57,17 +51,25 @@ GameKitSessionImpl::GameKitSessionImpl ()
 {
   GKLocalPlayer* local_player = [GKLocalPlayer localPlayer];
 
-  [local_player authenticateWithCompletionHandler:^(NSError *error) {
+  [local_player authenticateWithCompletionHandler:^(NSError *error)
+  {
     if (error)
       log.Printf ("Game center authentification error '%s'", [[error description] UTF8String]);
 
     if (!local_player.isAuthenticated)
       return;
+
+    fill_user (local_player, current_user);
+
+    current_user.Properties ().SetProperty ("Underage", local_player.underage ? 1 : 0);
   }];
+
+  system_version = [[[UIDevice currentDevice] systemVersion] retain];
 }
 
 GameKitSessionImpl::~GameKitSessionImpl ()
 {
+  [system_version release];
 }
 
 /*
@@ -94,6 +96,8 @@ void GameKitSessionImpl::ShowWindow (const char* window_name, const common::Prop
 
   if (!xtl::xstrcmp ("Leaderboards", window_name))
   {
+    CheckUnknownProperties (METHOD_NAME, properties, 0, 0);
+
     GKLeaderboardViewController* leaderboard_view_controller = [[GKLeaderboardViewController alloc] init];
 
     leaderboard_view_controller.leaderboardDelegate = [[DismissGameKitViewDelegate alloc] init];
@@ -103,6 +107,10 @@ void GameKitSessionImpl::ShowWindow (const char* window_name, const common::Prop
   }
   else if (!xtl::xstrcmp ("Leaderboard", window_name))
   {
+    static const char* KNOWN_PROPERTIES [] = { "Id", "TimeScope" };
+
+    CheckUnknownProperties (METHOD_NAME, properties, sizeof (KNOWN_PROPERTIES) / sizeof (*KNOWN_PROPERTIES), KNOWN_PROPERTIES);
+
     GKLeaderboardViewController* leaderboard_view_controller = [[GKLeaderboardViewController alloc] init];
     DismissGameKitViewDelegate*  dismiss_delegate            = [[DismissGameKitViewDelegate alloc] init];
 
@@ -146,6 +154,8 @@ void GameKitSessionImpl::ShowWindow (const char* window_name, const common::Prop
   }
   else if (!xtl::xstrcmp ("Achievements", window_name))
   {
+    CheckUnknownProperties (METHOD_NAME, properties, 0, 0);
+
     GKAchievementViewController* achievement_view_controller = [[GKAchievementViewController alloc] init];
 
     achievement_view_controller.achievementDelegate = [[DismissGameKitViewDelegate alloc] init];
@@ -184,4 +194,39 @@ bool GameKitSessionImpl::IsApiAvailable ()
     return false;
 
   return true;
+}
+
+/*
+   Проверка наличия в PropertyMap неизвестных полей
+*/
+
+void GameKitSessionImpl::CheckUnknownProperties (const char* source, const common::PropertyMap& properties,
+                                                 size_t known_properties_count, const char** known_properties_names)
+{
+  static const char* METHOD_NAME = "social::game_kit::GameKitSessionImpl::CheckUnknownProperties";
+
+  if (!source)
+    throw xtl::make_null_argument_exception (METHOD_NAME, "source");
+
+  if (known_properties_count && !known_properties_names)
+    throw xtl::make_null_argument_exception (METHOD_NAME, "known_properties_names");
+
+  for (size_t i = 0, count = properties.Size (); i < count; i++)
+  {
+    const char* property_name = properties.PropertyName (i);
+
+    bool property_known = false;
+
+    for (size_t j = 0; j < known_properties_count; j++)
+    {
+      if (!xtl::xstrcmp (property_name, known_properties_names [j]))
+      {
+        property_known = true;
+        break;
+      }
+    }
+
+    if (!property_known)
+      common::Log (LOG_NAME).Printf ("Unknown property '%s' at '%s'", property_name, source);
+  }
 }
