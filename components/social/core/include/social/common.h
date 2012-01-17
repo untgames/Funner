@@ -1,6 +1,8 @@
 #ifndef SOCIAL_COMMON_HEADER
 #define SOCIAL_COMMON_HEADER
 
+#include <xtl/functional_fwd>
+
 namespace common
 {
 
@@ -23,6 +25,8 @@ enum OperationStatus
   OperationStatus_Success, //Операция завершена успешно
   OperationStatus_Failure  //В ходе выполнения операции произошла ошибка
 };
+
+typedef xtl::function <void (const void*)> ReleaseHandleFunction;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Менеджер сессии

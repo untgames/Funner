@@ -8,16 +8,22 @@ using namespace social;
 
 struct Leaderboard::Impl : public xtl::reference_counter
 {
-  stl::string         id;          //идентификатор
-  stl::string         title;       //название
-  Score               user_score;  //очки залогиненного пользователя
-  common::PropertyMap properties;  //свойства
-  ScoreList           scores;      //очки таблицы
-  const void*         handle;      //низкоуровневый дескриптор
+  stl::string           id;                      //идентификатор
+  stl::string           title;                   //название
+  Score                 user_score;              //очки залогиненного пользователя
+  common::PropertyMap   properties;              //свойства
+  ScoreList             scores;                  //очки таблицы
+  const void*           handle;                  //низкоуровневый дескриптор
+  ReleaseHandleFunction handle_release_function; //функция, вызываемая при освобождении дескриптора
 
   Impl ()
     : handle (0)
     {}
+
+  ~Impl ()
+  {
+    handle_release_function (handle);
+  }
 };
 
 /*
@@ -141,9 +147,12 @@ const void* Leaderboard::Handle () const
   return impl->handle;
 }
 
-void Leaderboard::SetHandle (const void* handle)
+void Leaderboard::SetHandle (const void* handle, const ReleaseHandleFunction& release_function)
 {
+  impl->handle_release_function (impl->handle);
+
   impl->handle = handle;
+  impl->handle_release_function = release_function;
 }
 
 /*

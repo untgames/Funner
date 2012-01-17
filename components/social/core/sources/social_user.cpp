@@ -8,16 +8,22 @@ using namespace social;
 
 struct User::Impl : public xtl::reference_counter
 {
-  stl::string         id;         //идентификатор
-  stl::string         nickname;   //ник
-  bool                is_friend;  //является ли другом текущего пользователя
-  common::PropertyMap properties; //другие свойства
-  const void*         handle;     //низкоуровневый дескриптор
+  stl::string           id;                      //идентификатор
+  stl::string           nickname;                //ник
+  bool                  is_friend;               //является ли другом текущего пользователя
+  common::PropertyMap   properties;              //другие свойства
+  const void*           handle;                  //низкоуровневый дескриптор
+  ReleaseHandleFunction handle_release_function; //функция, вызываемая при освобождении дескриптора
 
   Impl ()
     : is_friend (false)
     , handle (0)
     {}
+
+  ~Impl ()
+  {
+    handle_release_function (handle);
+  }
 };
 
 /*
@@ -122,9 +128,12 @@ const void* User::Handle () const
   return impl->handle;
 }
 
-void User::SetHandle (const void* handle)
+void User::SetHandle (const void* handle, const ReleaseHandleFunction& release_function)
 {
+  impl->handle_release_function (impl->handle);
+
   impl->handle = handle;
+  impl->handle_release_function = release_function;
 }
 
 /*

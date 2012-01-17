@@ -8,18 +8,24 @@ using namespace social;
 
 struct Achievement::Impl : public xtl::reference_counter
 {
-  stl::string         id;         //идентификатор
-  stl::string         title;      //название
-  bool                hidden;     //является ли скрытым
-  double              progress;   //прогресс
-  common::PropertyMap properties; //другие свойства
-  const void*         handle;     //низкоуровневый дескриптор
+  stl::string           id;                      //идентификатор
+  stl::string           title;                   //название
+  bool                  hidden;                  //является ли скрытым
+  double                progress;                //прогресс
+  common::PropertyMap   properties;              //другие свойства
+  const void*           handle;                  //низкоуровневый дескриптор
+  ReleaseHandleFunction handle_release_function; //функция, вызываемая при освобождении дескриптора
 
   Impl ()
     : hidden (false)
     , progress (0)
     , handle (0)
     {}
+
+  ~Impl ()
+  {
+    handle_release_function (handle);
+  }
 };
 
 /*
@@ -138,9 +144,12 @@ const void* Achievement::Handle () const
   return impl->handle;
 }
 
-void Achievement::SetHandle (const void* handle)
+void Achievement::SetHandle (const void* handle, const ReleaseHandleFunction& release_function)
 {
+  impl->handle_release_function (impl->handle);
+
   impl->handle = handle;
+  impl->handle_release_function = release_function;
 }
 
 /*

@@ -8,20 +8,26 @@ using namespace social;
 
 struct Score::Impl : public xtl::reference_counter
 {
-  stl::string         user_id;         //идентификатор пользователя, которому принадлежит достижение
-  stl::string         leaderboard_id;  //идентификатор таблицы рекордов, которой принадлежит достижение
-  stl::string         user_data;       //данные, ассоциированные с достижением
-  stl::string         formatted_value; //текстовое представление значения
-  double              value;           //значение
-  size_t              rank;            //ранг в таблице
-  common::PropertyMap properties;      //другие свойства
-  const void*         handle;          //низкоуровневый дескриптор
+  stl::string           user_id;                 //идентификатор пользователя, которому принадлежит достижение
+  stl::string           leaderboard_id;          //идентификатор таблицы рекордов, которой принадлежит достижение
+  stl::string           user_data;               //данные, ассоциированные с достижением
+  stl::string           formatted_value;         //текстовое представление значения
+  double                value;                   //значение
+  size_t                rank;                    //ранг в таблице
+  common::PropertyMap   properties;              //другие свойства
+  const void*           handle;                  //низкоуровневый дескриптор
+  ReleaseHandleFunction handle_release_function; //функция, вызываемая при освобождении дескриптора
 
   Impl ()
     : value (0)
     , rank (0)
     , handle (0)
     {}
+
+  ~Impl ()
+  {
+    handle_release_function (handle);
+  }
 };
 
 /*
@@ -174,9 +180,12 @@ const void* Score::Handle () const
   return impl->handle;
 }
 
-void Score::SetHandle (const void* handle)
+void Score::SetHandle (const void* handle, const ReleaseHandleFunction& release_function)
 {
+  impl->handle_release_function (impl->handle);
+
   impl->handle = handle;
+  impl->handle_release_function = release_function;
 }
 
 /*

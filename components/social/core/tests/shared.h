@@ -5,6 +5,8 @@
 
 #include <stl/string>
 
+#include <xtl/function.h>
+
 #include <common/property_map.h>
 
 #include <social/session.h>

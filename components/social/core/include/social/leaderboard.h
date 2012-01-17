@@ -70,7 +70,7 @@ class Leaderboard
 ///Низкоуровневый дескриптор
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     const void* Handle    () const;
-    void        SetHandle (const void* handle);
+    void        SetHandle (const void* handle, const ReleaseHandleFunction& release_function = ReleaseHandleFunction ());
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Обмен
@@ -87,9 +87,9 @@ class Leaderboard
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 void swap (Leaderboard&, Leaderboard&);
 
-typedef xtl::function<void (const common::BasicStringArray<char>&, OperationStatus status, const char* error)>     LoadLeaderboardsIdsCallback;
-typedef xtl::function<void (const Leaderboard& leaderboard, OperationStatus status, const char* error)> LoadLeaderboardCallback;
-typedef xtl::function<void (OperationStatus status, const char* error)>                                 SendScoreCallback;
+typedef xtl::function<void (const common::BasicStringArray<char>&, OperationStatus status, const char* error)> LoadLeaderboardsIdsCallback;
+typedef xtl::function<void (const Leaderboard& leaderboard, OperationStatus status, const char* error)>        LoadLeaderboardCallback;
+typedef xtl::function<void (OperationStatus status, const char* error)>                                        SendScoreCallback;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Менеджер таблиц рекордов
