@@ -16,6 +16,7 @@ void fill_user (GKPlayer* player, User& user)
   user.SetId       ([player.playerID UTF8String]);
   user.SetNickname ([player.alias UTF8String]);
   user.SetHandle   (player, &release_ns_object);
+  user.SetFriend   (player.isFriend);
 }
 
 media::Image convert_image (UIImage* image)

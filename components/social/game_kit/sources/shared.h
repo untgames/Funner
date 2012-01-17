@@ -15,6 +15,7 @@
 #include <common/component.h>
 #include <common/log.h>
 #include <common/property_map.h>
+#include <common/strlib.h>
 
 #include <media/image.h>
 

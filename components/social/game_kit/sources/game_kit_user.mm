@@ -6,7 +6,7 @@ using namespace social::game_kit;
 namespace
 {
 
-void on_user_loaded (NSString* user_id, NSArray *players, NSError *error, const common::Log& log, const LoadUserCallback& callback)
+void on_user_loaded (const char* source, NSString* user_id, NSArray *players, NSError *error, const common::Log& log, const LoadUserCallback& callback)
 {
   try
   {
@@ -14,7 +14,7 @@ void on_user_loaded (NSString* user_id, NSArray *players, NSError *error, const 
     {
       const char* error_string = [[error description] UTF8String];
 
-      log.Printf ("LoadUser error '%s'", error_string);
+      log.Printf ("%s error '%s'", source, error_string);
       callback (User (), OperationStatus_Failure, error_string);
       return;
     }
@@ -34,7 +34,7 @@ void on_user_loaded (NSString* user_id, NSArray *players, NSError *error, const 
     {
       static const char* ERROR = "requested player not loaded";
 
-      log.Printf ("LoadUser error '%s'", ERROR);
+      log.Printf ("%s error '%s'", source, ERROR);
       callback (User (), OperationStatus_Failure, ERROR);
       return;
     }
@@ -47,15 +47,15 @@ void on_user_loaded (NSString* user_id, NSArray *players, NSError *error, const 
   }
   catch (xtl::exception& e)
   {
-    log.Printf ("Exception in LoadUser callback: '%s'", e.what ());
+    log.Printf ("Exception in %s callback: '%s'", source, e.what ());
   }
   catch (...)
   {
-    log.Printf ("Unknown exception in LoadUser callback");
+    log.Printf ("Unknown exception in %s callback", source);
   }
 }
 
-void on_user_picture_loaded (UIImage* picture, NSError *error, const common::Log& log, const LoadUserPictureCallback& callback)
+void on_user_picture_loaded (const char* source, UIImage* picture, NSError *error, const common::Log& log, const LoadUserPictureCallback& callback)
 {
   try
   {
@@ -63,7 +63,7 @@ void on_user_picture_loaded (UIImage* picture, NSError *error, const common::Log
     {
       const char* error_string = [[error description] UTF8String];
 
-      log.Printf ("LoadUserPicture error '%s'", error_string);
+      log.Printf ("%s error '%s'", source, error_string);
       callback (media::Image (), OperationStatus_Failure, error_string);
       return;
     }
@@ -72,7 +72,7 @@ void on_user_picture_loaded (UIImage* picture, NSError *error, const common::Log
     {
       static const char* ERROR = "requested picture not loaded";
 
-      log.Printf ("LoadUserPicture error '%s'", ERROR);
+      log.Printf ("%s error '%s'", source, ERROR);
       callback (media::Image (), OperationStatus_Failure, ERROR);
       return;
     }
@@ -81,11 +81,91 @@ void on_user_picture_loaded (UIImage* picture, NSError *error, const common::Log
   }
   catch (xtl::exception& e)
   {
-    log.Printf ("Exception in LoadUserPicture callback: '%s'", e.what ());
+    log.Printf ("Exception in %s callback: '%s'", source, e.what ());
   }
   catch (...)
   {
-    log.Printf ("Unknown exception in LoadUserPicture callback");
+    log.Printf ("Unknown exception in %s callback", source);
+  }
+}
+
+void on_user_friends_ids_loaded (const char* source, NSArray* friends, NSError* error, const common::Log& log, const LoadFriendsIdsCallback& callback)
+{
+  try
+  {
+    if (error)
+    {
+      const char* error_string = [[error description] UTF8String];
+
+      log.Printf ("%s error '%s'", source, error_string);
+      callback (common::StringArray (), OperationStatus_Failure, error_string);
+      return;
+    }
+
+    common::StringArray friends_ids;
+
+    for (NSString* friend_id in friends)
+      friends_ids.Add ([friend_id UTF8String]);
+
+    callback (friends_ids, OperationStatus_Success, OK_STATUS);
+  }
+  catch (xtl::exception& e)
+  {
+    log.Printf ("Exception in %s callback: '%s'", source, e.what ());
+  }
+  catch (...)
+  {
+    log.Printf ("Unknown exception in %s callback", source);
+  }
+}
+
+void load_users (const char* source, NSArray* friends, NSError* error, const common::Log& log, const LoadFriendsCallback& callback)
+{
+  try
+  {
+    if (error)
+    {
+      const char* error_string = [[error description] UTF8String];
+
+      log.Printf ("%s error '%s'", source, error_string);
+      callback (UserList (), OperationStatus_Failure, error_string);
+      return;
+    }
+
+    [GKPlayer loadPlayersForIdentifiers:friends withCompletionHandler:^(NSArray *players, NSError *error)
+    {
+      if (error)
+      {
+        const char* error_string = [[error description] UTF8String];
+
+        log.Printf ("%s error '%s'", source, error_string);
+        callback (UserList (), OperationStatus_Failure, error_string);
+        return;
+      }
+
+      UserList friends_list;
+
+      friends_list.Reserve ([players count]);
+
+      for (GKPlayer* player in players)
+      {
+        User user;
+
+        fill_user (player, user);
+
+        friends_list.Add (user);
+      }
+
+      callback (friends_list, OperationStatus_Success, OK_STATUS);
+    }];
+  }
+  catch (xtl::exception& e)
+  {
+    log.Printf ("Exception in %s callback: '%s'", source, e.what ());
+  }
+  catch (...)
+  {
+    log.Printf ("Unknown exception in %s callback", source);
   }
 }
 
@@ -123,7 +203,7 @@ void GameKitSessionImpl::LoadUser (const char* user_id, const LoadUserCallback& 
 
   [GKPlayer loadPlayersForIdentifiers:[NSArray arrayWithObject:ns_id] withCompletionHandler:^(NSArray *players, NSError *error)
   {
-    on_user_loaded (ns_id, players, error, log, callback);
+    on_user_loaded (METHOD_NAME, ns_id, players, error, log, callback);
   }];
 
   [ns_id release];
@@ -144,7 +224,7 @@ void GameKitSessionImpl::LoadUserPicture (const User& user, const LoadUserPictur
     throw xtl::format_not_supported_exception (METHOD_NAME, "iOS version '%@' does not support user picture loading", [system_version UTF8String]);
 
   if (!user.Handle ())
-    throw xtl::format_operation_exception (METHOD_NAME, "Can't load picture for user without setted handle, you need to pass user loaded with LoadUser");
+    throw xtl::format_operation_exception (METHOD_NAME, "Can't load picture for user without setted handle");
 
   static const char* KNOWN_PROPERTIES [] = { "SIZE" };
 
@@ -154,7 +234,7 @@ void GameKitSessionImpl::LoadUserPicture (const User& user, const LoadUserPictur
 
   [(GKPlayer*)user.Handle () loadPhotoForSize:photo_size withCompletionHandler:^(UIImage *photo, NSError *error)
   {
-    on_user_picture_loaded (photo, error, log, callback);
+    on_user_picture_loaded (METHOD_NAME, photo, error, log, callback);
   }];
 }
 
@@ -164,10 +244,40 @@ void GameKitSessionImpl::LoadUserPicture (const User& user, const LoadUserPictur
 
 void GameKitSessionImpl::LoadFriendsIds (const User& user, const LoadFriendsIdsCallback& callback, const common::PropertyMap& properties)
 {
+  static const char* METHOD_NAME = "social::game_kit::GameKitSessionImpl::LoadFriendsIds";
 
+  if (!IsUserLoggedIn ())
+    throw xtl::format_operation_exception (METHOD_NAME, "User is not logged in yet");
+
+  if (!user.Handle ())
+    throw xtl::format_operation_exception (METHOD_NAME, "Can't load friends ids for user without setted handle");
+
+  if (![(id)user.Handle () isKindOfClass:[GKLocalPlayer class]])
+    throw xtl::format_operation_exception (METHOD_NAME, "Can't load friends for user other than logged user");
+
+  CheckUnknownProperties (METHOD_NAME, properties, 0, 0);
+
+  [(GKLocalPlayer*)user.Handle () loadFriendsWithCompletionHandler:^(NSArray *friends, NSError *error)
+  {
+    on_user_friends_ids_loaded (METHOD_NAME, friends, error, log, callback);
+  }];
 }
 
 void GameKitSessionImpl::LoadFriends (const User& user, const LoadFriendsCallback& callback, const common::PropertyMap& properties)
 {
+  static const char* METHOD_NAME = "social::game_kit::GameKitSessionImpl::LoadFriends";
 
+  if (!IsUserLoggedIn ())
+    throw xtl::format_operation_exception (METHOD_NAME, "User is not logged in yet");
+
+  if (!user.Handle ())
+    throw xtl::format_operation_exception (METHOD_NAME, "Can't load friends ids for user without setted handle");
+
+  if (![(id)user.Handle () isKindOfClass:[GKLocalPlayer class]])
+    throw xtl::format_operation_exception (METHOD_NAME, "Can't load friends for user other than logged user");
+
+  [(GKLocalPlayer*)user.Handle () loadFriendsWithCompletionHandler:^(NSArray *friends, NSError *error)
+  {
+    load_users (METHOD_NAME, friends, error, log, callback);
+  }];
 }
