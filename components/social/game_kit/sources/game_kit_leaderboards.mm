@@ -86,6 +86,31 @@ void on_scores_loaded (const char* source, bool loaded_for_user, GKLeaderboard *
   }
 }
 
+void on_score_posted (const char* source, GKScore *ns_score, NSError *error, const common::Log& log, const SendScoreCallback& callback)
+{
+  try
+  {
+    if (error)
+    {
+      const char* error_string = [[error description] UTF8String];
+
+      log.Printf ("%s error '%s'", source, error_string);
+      callback (OperationStatus_Failure, error_string);
+      return;
+    }
+
+    callback (OperationStatus_Success, OK_STATUS);
+  }
+  catch (xtl::exception& e)
+  {
+    log.Printf ("Exception in %s callback: '%s'", source, e.what ());
+  }
+  catch (...)
+  {
+    log.Printf ("Unknown exception in %s callback", source);
+  }
+}
+
 }
 
 /*
@@ -270,6 +295,40 @@ void GameKitSessionImpl::LoadLeaderboard (const char* leaderboard_id, const char
 
 void GameKitSessionImpl::SendScore (const Score& score, const SendScoreCallback& callback, const common::PropertyMap& properties)
 {
+  static const char* METHOD_NAME = "social::game_kit::GameKitSessionImpl::SendScore";
 
+  if (!IsUserLoggedIn ())
+    throw xtl::format_operation_exception (METHOD_NAME, "User is not logged in yet");
+
+  if (xtl::xstrlen (score.UserId ()) && xtl::xstrcmp (score.UserId (), current_user.Id ()))
+    throw xtl::format_operation_exception (METHOD_NAME, "Can't report score for user '%s' other than current user", score.UserId ());
+
+  CheckUnknownProperties (METHOD_NAME, properties, 0, 0);
+
+  NSString* ns_category = [[NSString alloc] initWithUTF8String:score.LeaderboardId ()];
+
+  GKScore* ns_score = [[GKScore alloc] initWithCategory:ns_category];
+
+  [ns_category release];
+
+  ns_score.value = score.Value ();
+
+  if (system_version_5_0_available)
+  {
+    const char *user_data = score.UserData ();
+    char *user_data_end;
+
+    ns_score.context = strtoll (user_data, &user_data_end, 10);
+
+    if (user_data_end != user_data + xtl::xstrlen (user_data))
+    {
+      [ns_score release];
+      throw xtl::format_operation_exception (METHOD_NAME, "Can't convert user data '%s' to 64-bit integer", user_data);
+    }
+  }
+
+  [ns_score reportScoreWithCompletionHandler:^(NSError *error)
+  {
+    on_score_posted (METHOD_NAME, ns_score, error, log, callback);
+  }];
 }
-
