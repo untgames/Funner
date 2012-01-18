@@ -3,6 +3,8 @@
 
 #import <UIKit/UIKit.h>
 
+#import <GameKit/GKAchievement.h>
+#import <GameKit/GKAchievementDescription.h>
 #import <GameKit/GKAchievementViewController.h>
 #import <GameKit/GKLeaderboardViewController.h>
 #import <GameKit/GKLocalPlayer.h>
@@ -150,6 +152,7 @@ class UtilityImpl
     void         FillUser        (GKPlayer* player, User& user);
     void         FillLeaderboard (GKLeaderboard* ns_leaderboard, Leaderboard& leaderboard, bool loaded_for_user);
     void         FillScore       (GKScore* ns_score, Score& score);
+    void         FillAchievement (GKAchievement* ns_achievement, GKAchievementDescription* ns_description, Achievement& achievement);
     media::Image ConvertImage    (UIImage* image);
 
   private:

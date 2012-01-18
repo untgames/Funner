@@ -137,6 +137,22 @@ void UtilityImpl::FillLeaderboard (GKLeaderboard* ns_leaderboard, Leaderboard& l
     properties.SetProperty ("TimeScope", time_scope);
 }
 
+void UtilityImpl::FillAchievement (GKAchievement* ns_achievement, GKAchievementDescription* ns_description, Achievement& achievement)
+{
+  achievement.SetId       ([ns_achievement.identifier UTF8String]);
+  achievement.SetTitle    ([ns_description.title UTF8String]);
+  achievement.SetHidden   (ns_achievement.hidden);
+  achievement.SetProgress (ns_achievement.percentComplete / 100.f);
+  achievement.SetHandle   ([ns_achievement retain], &release_ns_object);
+
+  common::PropertyMap& properties = achievement.Properties ();
+
+  properties.SetProperty ("LastReportedDate", [[date_formatter stringFromDate:ns_achievement.lastReportedDate] UTF8String]);
+  properties.SetProperty ("AchievedDescription", [ns_description.achievedDescription UTF8String]);
+  properties.SetProperty ("UnachievedDescription", [ns_description.achievedDescription UTF8String]);
+  properties.SetProperty ("MaximumPoints", ns_description.maximumPoints);
+}
+
 media::Image UtilityImpl::ConvertImage (UIImage* image)
 {
   static const char* METHOD_NAME = "social::game_kit::UtilityImpl::ConvertImage";
