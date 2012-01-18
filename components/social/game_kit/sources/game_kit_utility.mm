@@ -59,7 +59,7 @@ void UtilityImpl::FillScore (GKScore* ns_score, Score& score)
   score.Properties ().SetProperty ("Date", [[date_formatter stringFromDate:ns_score.date] UTF8String]);
 }
 
-void UtilityImpl::FillLeaderboard (GKLeaderboard* ns_leaderboard, Leaderboard& leaderboard)
+void UtilityImpl::FillLeaderboard (GKLeaderboard* ns_leaderboard, Leaderboard& leaderboard, bool loaded_for_user)
 {
   static const char* METHOD_NAME = "social::game_kit::UtilityImpl::FillLeaderboard";
 
@@ -124,11 +124,14 @@ void UtilityImpl::FillLeaderboard (GKLeaderboard* ns_leaderboard, Leaderboard& l
 
   common::PropertyMap& properties = leaderboard.Properties ();
 
-  properties.SetProperty ("RangeBegin", (int)ns_leaderboard.range.location);
-  properties.SetProperty ("RangeLength", (int)ns_leaderboard.range.length);
+  if (!loaded_for_user)
+  {
+    properties.SetProperty ("RangeBegin", (int)ns_leaderboard.range.location);
+    properties.SetProperty ("RangeLength", (int)ns_leaderboard.range.length);
 
-  if (xtl::xstrlen (player_scope))
-    properties.SetProperty ("PlayerScope", player_scope);
+    if (xtl::xstrlen (player_scope))
+      properties.SetProperty ("PlayerScope", player_scope);
+  }
 
   if (xtl::xstrlen (time_scope))
     properties.SetProperty ("TimeScope", time_scope);

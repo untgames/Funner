@@ -57,7 +57,7 @@ void on_categories_loaded (const char* source, NSArray *categories, NSArray *tit
   }
 }
 
-void on_scores_loaded (const char* source, GKLeaderboard *ns_leaderboard, NSError *error, const common::Log& log, const LoadLeaderboardCallback& callback)
+void on_scores_loaded (const char* source, bool loaded_for_user, GKLeaderboard *ns_leaderboard, NSError *error, const common::Log& log, const LoadLeaderboardCallback& callback)
 {
   try
   {
@@ -72,7 +72,7 @@ void on_scores_loaded (const char* source, GKLeaderboard *ns_leaderboard, NSErro
 
     Leaderboard leaderboard;
 
-    Utility::Instance ()->FillLeaderboard (ns_leaderboard, leaderboard);
+    Utility::Instance ()->FillLeaderboard (ns_leaderboard, leaderboard, loaded_for_user);
 
     callback (leaderboard, OperationStatus_Success, OK_STATUS);
   }
@@ -109,12 +109,15 @@ void GameKitSessionImpl::LoadLeaderboards (const LoadLeaderboardsCallback& callb
 
 void GameKitSessionImpl::LoadLeaderboard (const char* leaderboard_id, const LoadLeaderboardCallback& callback, const common::PropertyMap& properties)
 {
-  static const char* METHOD_NAME = "social::game_kit::GameKitSessionImpl::LoadLeaderboard";
+  static const char* METHOD_NAME = "social::game_kit::GameKitSessionImpl::LoadLeaderboard (const char*, const LoadLeaderboardCallback&, const common::PropertyMap&)";
 
   try
   {
     if (!IsUserLoggedIn ())
       throw xtl::format_operation_exception ("", "User is not logged in yet");
+
+    if (!leaderboard_id)
+      throw xtl::make_null_argument_exception ("", "leaderboard_id");
 
     static const char* KNOWN_PROPERTIES [] = { "PlayerScope", "RangeBegin", "RangeLength", "TimeScope" };
 
@@ -179,7 +182,7 @@ void GameKitSessionImpl::LoadLeaderboard (const char* leaderboard_id, const Load
 
     [leaderboard loadScoresWithCompletionHandler:^(NSArray *scores, NSError *error)
     {
-      on_scores_loaded (METHOD_NAME, leaderboard, error, log, callback);
+      on_scores_loaded (METHOD_NAME, false, leaderboard, error, log, callback);
     }];
 
     [leaderboard release];
@@ -193,7 +196,72 @@ void GameKitSessionImpl::LoadLeaderboard (const char* leaderboard_id, const Load
 
 void GameKitSessionImpl::LoadLeaderboard (const char* leaderboard_id, const char* user_id, const LoadLeaderboardCallback& callback, const common::PropertyMap& properties)
 {
+  static const char* METHOD_NAME = "social::game_kit::GameKitSessionImpl::LoadLeaderboard (const char*, const char*, const LoadLeaderboardCallback&, const common::PropertyMap&)";
 
+  try
+  {
+    if (!IsUserLoggedIn ())
+      throw xtl::format_operation_exception ("", "User is not logged in yet");
+
+    if (!leaderboard_id)
+      throw xtl::make_null_argument_exception ("", "leaderboard_id");
+
+    if (!user_id)
+      throw xtl::make_null_argument_exception ("", "user_id");
+
+    static const char* KNOWN_PROPERTIES [] = { "TimeScope" };
+
+    CheckUnknownProperties (METHOD_NAME, properties, sizeof (KNOWN_PROPERTIES) / sizeof (*KNOWN_PROPERTIES), KNOWN_PROPERTIES);
+
+    NSString* ns_user_id = [[NSString alloc] initWithUTF8String:user_id];
+    NSArray*  ids_array  = [[NSArray alloc] initWithObject:ns_user_id];
+
+    [ns_user_id release];
+
+    GKLeaderboard* leaderboard = [[GKLeaderboard alloc] initWithPlayerIDs:ids_array];
+
+    [ids_array release];
+
+    NSString* ns_leaderboard_id = [[NSString alloc] initWithUTF8String:leaderboard_id];
+
+    leaderboard.category = ns_leaderboard_id;
+
+    [ns_leaderboard_id release];
+
+    try
+    {
+      if (properties.IsPresent ("TimeScope"))
+      {
+        const char* time_scope = properties.GetString ("TimeScope");
+
+        if (!xtl::xstrcmp (time_scope, "Today"))
+          leaderboard.timeScope = GKLeaderboardTimeScopeToday;
+        if (!xtl::xstrcmp (time_scope, "Week"))
+          leaderboard.timeScope = GKLeaderboardTimeScopeWeek;
+        if (!xtl::xstrcmp (time_scope, "AllTime"))
+          leaderboard.timeScope = GKLeaderboardTimeScopeAllTime;
+        else
+          throw xtl::format_operation_exception ("", "Unknown time scope '%s'", time_scope);
+      }
+    }
+    catch (...)
+    {
+      [leaderboard release];
+      throw;
+    }
+
+    [leaderboard loadScoresWithCompletionHandler:^(NSArray *scores, NSError *error)
+    {
+      on_scores_loaded (METHOD_NAME, true, leaderboard, error, log, callback);
+    }];
+
+    [leaderboard release];
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch (METHOD_NAME);
+    throw;
+  }
 }
 
 /*

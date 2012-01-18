@@ -148,7 +148,7 @@ class UtilityImpl
 ///Утилиты для конвертирования типов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void         FillUser        (GKPlayer* player, User& user);
-    void         FillLeaderboard (GKLeaderboard* ns_leaderboard, Leaderboard& leaderboard);
+    void         FillLeaderboard (GKLeaderboard* ns_leaderboard, Leaderboard& leaderboard, bool loaded_for_user);
     void         FillScore       (GKScore* ns_score, Score& score);
     media::Image ConvertImage    (UIImage* image);
 
