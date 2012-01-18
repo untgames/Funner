@@ -12,7 +12,6 @@ namespace common
 
 //forward declaration
 class PropertyMap;
-template<class T> class BasicStringArray;
 
 }
 
@@ -87,9 +86,11 @@ class Leaderboard
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 void swap (Leaderboard&, Leaderboard&);
 
-typedef xtl::function<void (const common::BasicStringArray<char>&, OperationStatus status, const char* error)> LoadLeaderboardsIdsCallback;
-typedef xtl::function<void (const Leaderboard& leaderboard, OperationStatus status, const char* error)>        LoadLeaderboardCallback;
-typedef xtl::function<void (OperationStatus status, const char* error)>                                        SendScoreCallback;
+typedef Collection<Leaderboard> LeaderboardList;
+
+typedef xtl::function<void (const LeaderboardList&, OperationStatus status, const char* error)>         LoadLeaderboardsCallback;
+typedef xtl::function<void (const Leaderboard& leaderboard, OperationStatus status, const char* error)> LoadLeaderboardCallback;
+typedef xtl::function<void (OperationStatus status, const char* error)>                                 SendScoreCallback;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Менеджер таблиц рекордов
@@ -100,9 +101,9 @@ class ILeaderboardManager: public virtual ISessionManager
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Таблицы рекордов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    virtual void LoadLeaderboardsIds (const LoadLeaderboardsIdsCallback& callback, const common::PropertyMap& properties) = 0;
-    virtual void LoadLeaderboard     (const char* leaderboard_id, const LoadLeaderboardCallback& callback, const common::PropertyMap& properties) = 0;
-    virtual void LoadLeaderboard     (const char* leaderboard_id, const char* user_id, const LoadLeaderboardCallback& callback, const common::PropertyMap& properties) = 0;
+    virtual void LoadLeaderboards (const LoadLeaderboardsCallback& callback, const common::PropertyMap& properties) = 0;
+    virtual void LoadLeaderboard  (const char* leaderboard_id, const LoadLeaderboardCallback& callback, const common::PropertyMap& properties) = 0;
+    virtual void LoadLeaderboard  (const char* leaderboard_id, const char* user_id, const LoadLeaderboardCallback& callback, const common::PropertyMap& properties) = 0;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Публикация

@@ -59,17 +59,18 @@ GameKitSessionImpl::GameKitSessionImpl ()
     if (!local_player.isAuthenticated)
       return;
 
-    fill_user (local_player, current_user);
+    Utility::Instance ()->FillUser (local_player, current_user);
 
     current_user.Properties ().SetProperty ("Underage", local_player.underage ? 1 : 0);
   }];
 
-  system_version = [[[UIDevice currentDevice] systemVersion] retain];
+  NSString* system_version = [[UIDevice currentDevice] systemVersion];
+
+  system_version_5_0_available = [system_version compare:@"5.0" options:NSNumericSearch] != NSOrderedAscending;
 }
 
 GameKitSessionImpl::~GameKitSessionImpl ()
 {
-  [system_version release];
 }
 
 /*
@@ -89,85 +90,93 @@ void GameKitSessionImpl::ShowWindow (const char* window_name, const common::Prop
 {
   static const char* METHOD_NAME = "social::game_kit::GameKitSessionImpl::ShowWindow";
 
-  if (!window_name)
-    throw xtl::make_null_argument_exception (METHOD_NAME, "window_name");
-
-  UIViewController* view_controller = nil;
-
-  if (!xtl::xstrcmp ("Leaderboards", window_name))
+  try
   {
-    CheckUnknownProperties (METHOD_NAME, properties, 0, 0);
+    if (!window_name)
+      throw xtl::make_null_argument_exception ("", "window_name");
 
-    GKLeaderboardViewController* leaderboard_view_controller = [[GKLeaderboardViewController alloc] init];
+    UIViewController* view_controller = nil;
 
-    leaderboard_view_controller.leaderboardDelegate = [[DismissGameKitViewDelegate alloc] init];
-    leaderboard_view_controller.category            = nil;
-
-    view_controller = leaderboard_view_controller;
-  }
-  else if (!xtl::xstrcmp ("Leaderboard", window_name))
-  {
-    static const char* KNOWN_PROPERTIES [] = { "Id", "TimeScope" };
-
-    CheckUnknownProperties (METHOD_NAME, properties, sizeof (KNOWN_PROPERTIES) / sizeof (*KNOWN_PROPERTIES), KNOWN_PROPERTIES);
-
-    GKLeaderboardViewController* leaderboard_view_controller = [[GKLeaderboardViewController alloc] init];
-    DismissGameKitViewDelegate*  dismiss_delegate            = [[DismissGameKitViewDelegate alloc] init];
-
-    leaderboard_view_controller.leaderboardDelegate = dismiss_delegate;
-
-    try
+    if (!xtl::xstrcmp ("Leaderboards", window_name))
     {
-      if (properties.IsPresent ("Id"))
+      CheckUnknownProperties (METHOD_NAME, properties, 0, 0);
+
+      GKLeaderboardViewController* leaderboard_view_controller = [[GKLeaderboardViewController alloc] init];
+
+      leaderboard_view_controller.leaderboardDelegate = [[DismissGameKitViewDelegate alloc] init];
+      leaderboard_view_controller.category            = nil;
+
+      view_controller = leaderboard_view_controller;
+    }
+    else if (!xtl::xstrcmp ("Leaderboard", window_name))
+    {
+      static const char* KNOWN_PROPERTIES [] = { "Id", "TimeScope" };
+
+      CheckUnknownProperties (METHOD_NAME, properties, sizeof (KNOWN_PROPERTIES) / sizeof (*KNOWN_PROPERTIES), KNOWN_PROPERTIES);
+
+      GKLeaderboardViewController* leaderboard_view_controller = [[GKLeaderboardViewController alloc] init];
+      DismissGameKitViewDelegate*  dismiss_delegate            = [[DismissGameKitViewDelegate alloc] init];
+
+      leaderboard_view_controller.leaderboardDelegate = dismiss_delegate;
+
+      try
       {
-        const char* category_id = properties.GetString ("Id");
+        if (properties.IsPresent ("Id"))
+        {
+          const char* category_id = properties.GetString ("Id");
 
-        NSString* ns_category_id = [[NSString alloc] initWithUTF8String:category_id];
+          NSString* ns_category_id = [[NSString alloc] initWithUTF8String:category_id];
 
-        leaderboard_view_controller.category = ns_category_id;
+          leaderboard_view_controller.category = ns_category_id;
 
-        [ns_category_id release];
+          [ns_category_id release];
+        }
+
+        if (properties.IsPresent ("TimeScope"))
+        {
+          const char* time_scope = properties.GetString ("TimeScope");
+
+          if (!xtl::xstrcmp ("Today", time_scope))
+            leaderboard_view_controller.timeScope = GKLeaderboardTimeScopeToday;
+          else if (!xtl::xstrcmp ("Week", time_scope))
+            leaderboard_view_controller.timeScope = GKLeaderboardTimeScopeWeek;
+          else if (!xtl::xstrcmp ("AllTime", time_scope))
+            leaderboard_view_controller.timeScope = GKLeaderboardTimeScopeAllTime;
+          else
+            throw xtl::format_operation_exception ("", "Unknown time scope '%s'", time_scope);
+        }
+      }
+      catch (...)
+      {
+        [dismiss_delegate            release];
+        [leaderboard_view_controller release];
+        throw;
       }
 
-      if (properties.IsPresent ("TimeScope"))
-      {
-        const char* time_scope = properties.GetString ("TimeScope");
-
-        if (!xtl::xstrcmp ("Today", time_scope))
-          leaderboard_view_controller.timeScope = GKLeaderboardTimeScopeToday;
-        else if (!xtl::xstrcmp ("Week", time_scope))
-          leaderboard_view_controller.timeScope = GKLeaderboardTimeScopeWeek;
-        else if (!xtl::xstrcmp ("AllTime", time_scope))
-          leaderboard_view_controller.timeScope = GKLeaderboardTimeScopeAllTime;
-        else
-          throw xtl::format_operation_exception (METHOD_NAME, "Unknown time scope '%s'", time_scope);
-      }
+      view_controller = leaderboard_view_controller;
     }
-    catch (...)
+    else if (!xtl::xstrcmp ("Achievements", window_name))
     {
-      [dismiss_delegate            release];
-      [leaderboard_view_controller release];
-      throw;
+      CheckUnknownProperties (METHOD_NAME, properties, 0, 0);
+
+      GKAchievementViewController* achievement_view_controller = [[GKAchievementViewController alloc] init];
+
+      achievement_view_controller.achievementDelegate = [[DismissGameKitViewDelegate alloc] init];
+
+      view_controller = achievement_view_controller;
     }
+    else
+      throw xtl::make_argument_exception (METHOD_NAME, "window_name", window_name);
 
-    view_controller = leaderboard_view_controller;
+    [[UIApplication sharedApplication].keyWindow.rootViewController presentModalViewController:view_controller animated:YES];
+
+    [view_controller release];
   }
-  else if (!xtl::xstrcmp ("Achievements", window_name))
+  catch (xtl::exception& e)
   {
-    CheckUnknownProperties (METHOD_NAME, properties, 0, 0);
-
-    GKAchievementViewController* achievement_view_controller = [[GKAchievementViewController alloc] init];
-
-    achievement_view_controller.achievementDelegate = [[DismissGameKitViewDelegate alloc] init];
-
-    view_controller = achievement_view_controller;
+    e.touch (METHOD_NAME);
+    throw;
   }
-  else
-    throw xtl::make_argument_exception (METHOD_NAME, "window_name", window_name);
-
-  [[UIApplication sharedApplication].keyWindow.rootViewController presentModalViewController:view_controller animated:YES];
-
-  [view_controller release];
 }
 
 /*

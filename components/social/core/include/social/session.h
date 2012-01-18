@@ -85,10 +85,10 @@ class Session
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Таблицы рекордов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void LoadLeaderboardsIds (const LoadLeaderboardsIdsCallback& callback, const common::PropertyMap& properties = common::PropertyMap ()) const;
-    void LoadLeaderboard     (const char* leaderboard_id, const LoadLeaderboardCallback& callback, const common::PropertyMap& properties = common::PropertyMap ()) const;
-    void LoadLeaderboard     (const char* leaderboard_id, const char* user_id, const LoadLeaderboardCallback& callback, const common::PropertyMap& properties = common::PropertyMap ()) const;
-    void SendScore           (const Score& score, const SendScoreCallback& callback, const common::PropertyMap& properties = common::PropertyMap ()) const;
+    void LoadLeaderboards (const LoadLeaderboardsCallback& callback, const common::PropertyMap& properties = common::PropertyMap ()) const;
+    void LoadLeaderboard  (const char* leaderboard_id, const LoadLeaderboardCallback& callback, const common::PropertyMap& properties = common::PropertyMap ()) const;
+    void LoadLeaderboard  (const char* leaderboard_id, const char* user_id, const LoadLeaderboardCallback& callback, const common::PropertyMap& properties = common::PropertyMap ()) const;
+    void SendScore        (const Score& score, const SendScoreCallback& callback, const common::PropertyMap& properties = common::PropertyMap ()) const;
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Обмен

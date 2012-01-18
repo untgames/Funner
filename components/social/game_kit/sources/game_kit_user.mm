@@ -41,7 +41,7 @@ void on_user_loaded (const char* source, NSString* user_id, NSArray *players, NS
 
     User user;
 
-    fill_user (player, user);
+    Utility::Instance ()->FillUser (player, user);
 
     callback (user, OperationStatus_Success, OK_STATUS);
   }
@@ -77,7 +77,7 @@ void on_user_picture_loaded (const char* source, UIImage* picture, NSError *erro
       return;
     }
 
-    callback (convert_image (picture), OperationStatus_Success, OK_STATUS);
+    callback (Utility::Instance ()->ConvertImage (picture), OperationStatus_Success, OK_STATUS);
   }
   catch (xtl::exception& e)
   {
@@ -151,7 +151,7 @@ void load_users (const char* source, NSArray* friends, NSError* error, const com
       {
         User user;
 
-        fill_user (player, user);
+        Utility::Instance ()->FillUser (player, user);
 
         friends_list.Add (user);
       }
@@ -220,13 +220,13 @@ void GameKitSessionImpl::LoadUserPicture (const User& user, const LoadUserPictur
   if (!IsUserLoggedIn ())
     throw xtl::format_operation_exception (METHOD_NAME, "User is not logged in yet");
 
-  if ([system_version compare:@"5.0" options:NSNumericSearch] == NSOrderedAscending)
-    throw xtl::format_not_supported_exception (METHOD_NAME, "iOS version '%@' does not support user picture loading", [system_version UTF8String]);
+  if (!system_version_5_0_available)
+    throw xtl::format_not_supported_exception (METHOD_NAME, "iOS version less than 5.0 does not support user picture loading");
 
   if (!user.Handle ())
     throw xtl::format_operation_exception (METHOD_NAME, "Can't load picture for user without setted handle");
 
-  static const char* KNOWN_PROPERTIES [] = { "SIZE" };
+  static const char* KNOWN_PROPERTIES [] = { "Size" };
 
   CheckUnknownProperties (METHOD_NAME, properties, sizeof (KNOWN_PROPERTIES) / sizeof (*KNOWN_PROPERTIES), KNOWN_PROPERTIES);
 
@@ -275,6 +275,8 @@ void GameKitSessionImpl::LoadFriends (const User& user, const LoadFriendsCallbac
 
   if (![(id)user.Handle () isKindOfClass:[GKLocalPlayer class]])
     throw xtl::format_operation_exception (METHOD_NAME, "Can't load friends for user other than logged user");
+
+  CheckUnknownProperties (METHOD_NAME, properties, 0, 0);
 
   [(GKLocalPlayer*)user.Handle () loadFriendsWithCompletionHandler:^(NSArray *friends, NSError *error)
   {

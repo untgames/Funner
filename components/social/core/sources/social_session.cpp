@@ -232,15 +232,15 @@ struct Session::Impl : public xtl::reference_counter
     return leaderboard_manager;
   }
 
-  void LoadLeaderboardsIds (const LoadLeaderboardsIdsCallback& callback, const common::PropertyMap& properties)
+  void LoadLeaderboards (const LoadLeaderboardsCallback& callback, const common::PropertyMap& properties)
   {
     try
     {
-      GetLeaderboardManager ()->LoadLeaderboardsIds (callback, properties);
+      GetLeaderboardManager ()->LoadLeaderboards (callback, properties);
     }
     catch (xtl::exception& e)
     {
-      e.touch ("social::Session::LoadLeaderboardIds");
+      e.touch ("social::Session::LoadLeaderboards");
       throw;
     }
   }
@@ -420,9 +420,9 @@ void Session::SendAchievement (const Achievement& achievement, const SendAchieve
    Таблицы рекордов
 */
 
-void Session::LoadLeaderboardsIds (const LoadLeaderboardsIdsCallback& callback, const common::PropertyMap& properties) const
+void Session::LoadLeaderboards (const LoadLeaderboardsCallback& callback, const common::PropertyMap& properties) const
 {
-  impl->LoadLeaderboardsIds (callback, properties);
+  impl->LoadLeaderboards (callback, properties);
 }
 
 void Session::LoadLeaderboard (const char* leaderboard_id, const LoadLeaderboardCallback& callback, const common::PropertyMap& properties) const

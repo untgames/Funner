@@ -6,7 +6,7 @@
 #import <GameKit/GKAchievementViewController.h>
 #import <GameKit/GKLeaderboardViewController.h>
 #import <GameKit/GKLocalPlayer.h>
-
+#import <GameKit/GKScore.h>
 
 #include <xtl/bind.h>
 #include <xtl/common_exceptions.h>
@@ -15,6 +15,7 @@
 #include <common/component.h>
 #include <common/log.h>
 #include <common/property_map.h>
+#include <common/singleton.h>
 #include <common/strlib.h>
 
 #include <media/image.h>
@@ -90,9 +91,9 @@ class GameKitSessionImpl: public IAchievementManager, public ILeaderboardManager
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Таблицы рекордов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void LoadLeaderboardsIds (const LoadLeaderboardsIdsCallback& callback, const common::PropertyMap& properties);
-    void LoadLeaderboard     (const char* leaderboard_id, const LoadLeaderboardCallback& callback, const common::PropertyMap& properties);
-    void LoadLeaderboard     (const char* leaderboard_id, const char* user_id, const LoadLeaderboardCallback& callback, const common::PropertyMap& properties);
+    void LoadLeaderboards (const LoadLeaderboardsCallback& callback, const common::PropertyMap& properties);
+    void LoadLeaderboard  (const char* leaderboard_id, const LoadLeaderboardCallback& callback, const common::PropertyMap& properties);
+    void LoadLeaderboard  (const char* leaderboard_id, const char* user_id, const LoadLeaderboardCallback& callback, const common::PropertyMap& properties);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Публикация
@@ -120,14 +121,49 @@ class GameKitSessionImpl: public IAchievementManager, public ILeaderboardManager
     GameKitSessionImpl& operator = (const GameKitSessionImpl& source);  //no impl
 
   private:
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Утилиты для конвертирования типов
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void         FillUser        (GKPlayer* player, User& user);
+    void         FillLeaderboard (GKLeaderboard* ns_leaderboard, Leaderboard& leaderboard);
+    void         FillScore       (GKScore* ns_score, Score& score);
+    media::Image ConvertImage    (UIImage* image);
+
+  private:
     common::Log log;
     User        current_user;
-    NSString*   system_version;
+    bool        system_version_5_0_available;
 };
 
+class UtilityImpl
+{
+  public:
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Конструктор/деструктор
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    UtilityImpl ();
+    ~UtilityImpl ();
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Утилиты для конвертирования типов
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void         FillUser        (GKPlayer* player, User& user);
+    void         FillLeaderboard (GKLeaderboard* ns_leaderboard, Leaderboard& leaderboard);
+    void         FillScore       (GKScore* ns_score, Score& score);
+    media::Image ConvertImage    (UIImage* image);
+
+  private:
+    UtilityImpl (const UtilityImpl&);             //no impl
+    UtilityImpl& operator = (const UtilityImpl&); //no impl
+
+  private:
+    NSDateFormatter* date_formatter;
+    bool             system_version_5_0_available;
+};
+
+typedef common::Singleton <UtilityImpl> Utility;
+
 void release_ns_object (const void* handle);
-void fill_user (GKPlayer* player, User& user);
-media::Image convert_image (UIImage* image);
 
 }
 
