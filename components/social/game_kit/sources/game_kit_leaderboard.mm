@@ -331,4 +331,6 @@ void GameKitSessionImpl::SendScore (const Score& score, const SendScoreCallback&
   {
     on_score_posted (METHOD_NAME, ns_score, error, log, callback);
   }];
+
+  [ns_score release];
 }

@@ -121,6 +121,31 @@ void on_achievement_image_loaded (const char* source, UIImage* picture, NSError 
   }
 }
 
+void on_achievement_reported (const char* source, NSError *error, const common::Log& log, const SendAchievementCallback& callback)
+{
+  try
+  {
+    if (error)
+    {
+      const char* error_string = [[error description] UTF8String];
+
+      log.Printf ("%s error '%s'", source, error_string);
+      callback (OperationStatus_Failure, error_string);
+      return;
+    }
+
+    callback (OperationStatus_Success, OK_STATUS);
+  }
+  catch (xtl::exception& e)
+  {
+    log.Printf ("Exception in %s callback: '%s'", source, e.what ());
+  }
+  catch (...)
+  {
+    log.Printf ("Unknown exception in %s callback", source);
+  }
+}
+
 }
 
 /*
@@ -178,5 +203,28 @@ void GameKitSessionImpl::LoadAchievementPicture (const Achievement& achievement,
 
 void GameKitSessionImpl::SendAchievement (const Achievement& achievement, const SendAchievementCallback& callback, const common::PropertyMap& properties)
 {
+  static const char* METHOD_NAME = "social::game_kit::GameKitSessionImpl::SendAchievement";
 
+  if (!IsUserLoggedIn ())
+    throw xtl::format_operation_exception (METHOD_NAME, "User is not logged in yet");
+
+  if (achievement.Progress () < 0.f || achievement.Progress () > 1.f)
+    throw xtl::format_operation_exception (METHOD_NAME, "Achievement progress %.f is out of range [0, 1]", achievement.Progress ());
+
+  CheckUnknownProperties (METHOD_NAME, properties, 0, 0);
+
+  NSString* ns_identifier = [[NSString alloc] initWithUTF8String:achievement.Id ()];
+
+  GKAchievement* ns_achievement = [[GKAchievement alloc] initWithIdentifier:ns_identifier];
+
+  [ns_identifier release];
+
+  ns_achievement.percentComplete = achievement.Progress () * 100.f;
+
+  [ns_achievement reportAchievementWithCompletionHandler:^(NSError *error)
+  {
+    on_achievement_reported (METHOD_NAME, error, log, callback);
+  }];
+
+  [ns_achievement release];
 }
