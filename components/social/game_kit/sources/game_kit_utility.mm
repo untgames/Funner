@@ -143,7 +143,13 @@ void UtilityImpl::FillAchievement (GKAchievement* ns_achievement, GKAchievementD
   achievement.SetTitle    ([ns_description.title UTF8String]);
   achievement.SetHidden   (ns_achievement.hidden);
   achievement.SetProgress (ns_achievement.percentComplete / 100.f);
-  achievement.SetHandle   ([ns_achievement retain], &release_ns_object);
+
+  AchievementHandle* handle = [[AchievementHandle alloc] init];
+
+  handle.achievement = ns_achievement;
+  handle.description = ns_description;
+
+  achievement.SetHandle (handle, &release_ns_object);
 
   common::PropertyMap& properties = achievement.Properties ();
 

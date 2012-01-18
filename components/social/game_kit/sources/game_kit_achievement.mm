@@ -3,6 +3,20 @@
 using namespace social;
 using namespace social::game_kit;
 
+@implementation AchievementHandle
+
+@synthesize achievement, description;
+
+-(void)dealloc
+{
+  self.achievement = nil;
+  self.description = nil;
+
+  [super dealloc];
+}
+
+@end
+
 namespace
 {
 
@@ -73,6 +87,40 @@ void on_achievements_loaded (const char* source, NSArray *ns_achievements, NSArr
   }
 }
 
+void on_achievement_image_loaded (const char* source, UIImage* picture, NSError *error, const common::Log& log, const LoadUserPictureCallback& callback)
+{
+  try
+  {
+    if (error)
+    {
+      const char* error_string = [[error description] UTF8String];
+
+      log.Printf ("%s error '%s'", source, error_string);
+      callback (media::Image (), OperationStatus_Failure, error_string);
+      return;
+    }
+
+    if (!picture)
+    {
+      static const char* ERROR = "requested picture not loaded";
+
+      log.Printf ("%s error '%s'", source, ERROR);
+      callback (media::Image (), OperationStatus_Failure, ERROR);
+      return;
+    }
+
+    callback (Utility::Instance ()->ConvertImage (picture), OperationStatus_Success, OK_STATUS);
+  }
+  catch (xtl::exception& e)
+  {
+    log.Printf ("Exception in %s callback: '%s'", source, e.what ());
+  }
+  catch (...)
+  {
+    log.Printf ("Unknown exception in %s callback", source);
+  }
+}
+
 }
 
 /*
@@ -103,7 +151,25 @@ void GameKitSessionImpl::LoadAchievements (const LoadAchievementsCallback& callb
 
 void GameKitSessionImpl::LoadAchievementPicture (const Achievement& achievement, const LoadAchievementPictureCallback& callback, const common::PropertyMap& properties)
 {
+  static const char* METHOD_NAME = "social::game_kit::GameKitSessionImpl::LoadAchievementPicture";
 
+  if (!IsUserLoggedIn ())
+    throw xtl::format_operation_exception (METHOD_NAME, "User is not logged in yet");
+
+  if (!achievement.Handle ())
+    throw xtl::format_operation_exception (METHOD_NAME, "Can't load picture for achievement without setted handle");
+
+  CheckUnknownProperties (METHOD_NAME, properties, 0, 0);
+
+  AchievementHandle* handle = (AchievementHandle*)achievement.Handle ();
+
+  if (handle.description.image)
+    on_achievement_image_loaded (METHOD_NAME, handle.description.image, nil, log, callback);
+  else
+    [handle.description loadImageWithCompletionHandler:^(UIImage *image, NSError *error)
+    {
+      on_achievement_image_loaded (METHOD_NAME, image, error, log, callback);
+    }];
 }
 
 /*

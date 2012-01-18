@@ -172,4 +172,16 @@ void release_ns_object (const void* handle);
 
 }
 
+@interface AchievementHandle : NSObject
+{
+  @private
+    GKAchievement*            achievement;
+    GKAchievementDescription* description;
+}
+
+@property (retain) GKAchievement*            achievement;
+@property (retain) GKAchievementDescription* description;
+
+@end
+
 #endif
