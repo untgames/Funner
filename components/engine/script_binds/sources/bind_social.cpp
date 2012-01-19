@@ -30,10 +30,17 @@ const T& get_collection_item (const Collection<T>& collection, size_t index)
 }
 
 template<class T>
+Collection<T> create_collection ()
+{
+  return Collection<T> ();
+}
+
+template<class T>
 void bind_collection (Environment& environment, const char* library_name)
 {
   InvokerRegistry lib = environment.Library (library_name);
 
+  lib.Register ("Create",       make_invoker (&create_collection<T>));
   lib.Register ("get_Size",     make_invoker (&Collection<T>::Size));
   lib.Register ("get_IsEmpty",  make_invoker (&Collection<T>::IsEmpty));
   lib.Register ("get_Capacity", make_invoker (&Collection<T>::Capacity));
@@ -55,10 +62,16 @@ void bind_operation_status_library (Environment& environment)
   lib.Register ("get_Failure", make_const (OperationStatus_Failure));
 }
 
+Achievement create_achievement ()
+{
+  return Achievement ();
+}
+
 void bind_achievement_library (Environment& environment)
 {
   InvokerRegistry lib = environment.Library (ACHIEVEMENT_LIBRARY);
 
+  lib.Register ("Create",         make_invoker (&create_achievement));
   lib.Register ("get_Id",         make_invoker (&Achievement::Id));
   lib.Register ("get_Title",      make_invoker (&Achievement::Title));
   lib.Register ("get_IsHidden",   make_invoker (&Achievement::IsHidden));
@@ -73,10 +86,16 @@ void bind_achievement_library (Environment& environment)
   environment.RegisterType<Achievement> (ACHIEVEMENT_LIBRARY);
 }
 
+Score create_score ()
+{
+  return Score ();
+}
+
 void bind_score_library (Environment& environment)
 {
   InvokerRegistry lib = environment.Library (SCORE_LIBRARY);
 
+  lib.Register ("Create",             make_invoker (&create_score));
   lib.Register ("get_UserId",         make_invoker (&Score::UserId));
   lib.Register ("get_LeaderboardId",  make_invoker (&Score::LeaderboardId));
   lib.Register ("get_UserData",       make_invoker (&Score::UserData));
@@ -95,10 +114,16 @@ void bind_score_library (Environment& environment)
   environment.RegisterType<Score> (SCORE_LIBRARY);
 }
 
+Leaderboard create_leaderboard ()
+{
+  return Leaderboard ();
+}
+
 void bind_leaderboard_library (Environment& environment)
 {
   InvokerRegistry lib = environment.Library (LEADERBOARD_LIBRARY);
 
+  lib.Register ("Create",         make_invoker (&create_leaderboard));
   lib.Register ("get_Id",         make_invoker (&Leaderboard::Id));
   lib.Register ("get_Title",      make_invoker (&Leaderboard::Title));
   lib.Register ("get_UserScore",  make_invoker (&Leaderboard::UserScore));
@@ -113,10 +138,16 @@ void bind_leaderboard_library (Environment& environment)
   environment.RegisterType<Leaderboard> (LEADERBOARD_LIBRARY);
 }
 
+User create_user ()
+{
+  return User ();
+}
+
 void bind_user_library (Environment& environment)
 {
   InvokerRegistry lib = environment.Library (USER_LIBRARY);
 
+  lib.Register ("Create",         make_invoker (&create_user));
   lib.Register ("get_Id",         make_invoker (&User::Id));
   lib.Register ("get_Nickname",   make_invoker (&User::Nickname));
   lib.Register ("get_IsFriend",   make_invoker (&User::IsFriend));
