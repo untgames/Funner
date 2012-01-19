@@ -207,7 +207,7 @@ bool GameKitSessionImpl::IsUserLoggedIn ()
 bool GameKitSessionImpl::IsApiAvailable ()
 {
   // Check for presence of GKLocalPlayer class.
-  if (!NSClassFromString (@"GKLocalPlayer"));
+  if (!NSClassFromString (@"GKLocalPlayer"))
     return false;
 
   // The device must be running iOS 4.1 or later.

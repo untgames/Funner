@@ -24,7 +24,8 @@ struct Achievement::Impl : public xtl::reference_counter
 
   ~Impl ()
   {
-    handle_release_function (handle);
+    if (handle_release_function)
+      handle_release_function (handle);
   }
 };
 
@@ -146,7 +147,8 @@ const void* Achievement::Handle () const
 
 void Achievement::SetHandle (const void* handle, const ReleaseHandleFunction& release_function)
 {
-  impl->handle_release_function (impl->handle);
+  if (impl->handle_release_function)
+    impl->handle_release_function (impl->handle);
 
   impl->handle = handle;
   impl->handle_release_function = release_function;

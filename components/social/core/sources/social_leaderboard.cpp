@@ -22,7 +22,8 @@ struct Leaderboard::Impl : public xtl::reference_counter
 
   ~Impl ()
   {
-    handle_release_function (handle);
+    if (handle_release_function)
+      handle_release_function (handle);
   }
 };
 
@@ -149,7 +150,8 @@ const void* Leaderboard::Handle () const
 
 void Leaderboard::SetHandle (const void* handle, const ReleaseHandleFunction& release_function)
 {
-  impl->handle_release_function (impl->handle);
+  if (impl->handle_release_function)
+    impl->handle_release_function (impl->handle);
 
   impl->handle = handle;
   impl->handle_release_function = release_function;
