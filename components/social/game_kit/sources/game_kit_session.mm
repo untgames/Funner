@@ -42,6 +42,26 @@ const char* SESSION_DESCRIPTION = "GameKit";
 
 @end
 
+namespace
+{
+
+void on_authentificated (NSError* error, const common::Log& log, User& current_user)
+{
+  GKLocalPlayer *local_player = [GKLocalPlayer localPlayer];
+
+  if (error)
+    log.Printf ("Game center authentification error '%s'", [[error description] UTF8String]);
+
+  if (!local_player.isAuthenticated)
+    return;
+
+  Utility::Instance ()->FillUser (local_player, current_user);
+
+  current_user.Properties ().SetProperty ("Underage", local_player.underage ? 1 : 0);
+}
+
+}
+
 /*
    Конструктор / Деструктор
 */
@@ -49,19 +69,11 @@ const char* SESSION_DESCRIPTION = "GameKit";
 GameKitSessionImpl::GameKitSessionImpl ()
   : log (LOG_NAME)
 {
-  GKLocalPlayer* local_player = [GKLocalPlayer localPlayer];
+  GKLocalPlayer *local_player = [GKLocalPlayer localPlayer];
 
   [local_player authenticateWithCompletionHandler:^(NSError *error)
   {
-    if (error)
-      log.Printf ("Game center authentification error '%s'", [[error description] UTF8String]);
-
-    if (!local_player.isAuthenticated)
-      return;
-
-    Utility::Instance ()->FillUser (local_player, current_user);
-
-    current_user.Properties ().SetProperty ("Underage", local_player.underage ? 1 : 0);
+    on_authentificated (error, log, current_user);
   }];
 
   NSString* system_version = [[UIDevice currentDevice] systemVersion];

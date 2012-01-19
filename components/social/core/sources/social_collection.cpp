@@ -160,11 +160,13 @@ namespace social
 
 //classes
 template class Collection<Achievement>;
+template class Collection<Leaderboard>;
 template class Collection<Score>;
 template class Collection<User>;
 
 //functions
 template void swap (Collection<Achievement>&, Collection<Achievement>&);
+template void swap (Collection<Leaderboard>&, Collection<Leaderboard>&);
 template void swap (Collection<Score>&,       Collection<Score>&);
 template void swap (Collection<User>&,        Collection<User>&);
 
