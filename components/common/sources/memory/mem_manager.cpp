@@ -3,26 +3,6 @@
 
 using namespace common;
 
-void* operator new (size_t size)
-{
-  return common::MemoryManager::Allocate (size);
-}
-
-void* operator new [] (size_t size)
-{
-  return common::MemoryManager::Allocate (size);
-}
-
-void operator delete (void* p)
-{
-  common::MemoryManager::Deallocate (p);
-}
-
-void operator delete [] (void* p)
-{
-  common::MemoryManager::Deallocate (p);
-}
-
 namespace common
 {
 
