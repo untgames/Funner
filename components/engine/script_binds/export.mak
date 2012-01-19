@@ -52,10 +52,14 @@ export.link.engine.script_binds.sg.IMPORTS       := link.engine.script_binds lin
 export.link.engine.script_binds.system.LINK_INCLUDES := SystemScriptBind
 export.link.engine.script_binds.system.IMPORTS       := link.engine.script_binds link.system
 
-# Link system exports
+# Link network exports
 export.link.engine.script_binds.network.LINK_INCLUDES := NetworkScriptBind
 export.link.engine.script_binds.network.IMPORTS       := link.engine.script_binds link.network
 
-# Link system exports
+# Link physics exports
 export.link.engine.script_binds.physics.LINK_INCLUDES := PhysicsScriptBind
 export.link.engine.script_binds.physics.IMPORTS       := link.engine.script_binds link.physics.scene_physics
+
+# Link social exports
+export.link.engine.script_binds.social.LINK_INCLUDES := SocialScriptBind
+export.link.engine.script_binds.social.IMPORTS       := link.engine.script_binds link.social.core

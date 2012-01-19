@@ -5,7 +5,8 @@ export.link.engine.launcher_shared.has_windows.IMPORTS := link.render.low_level.
                                              link.engine.subsystems.window_manager link.engine.subsystems.window_renderer link.media.image.dds
 export.link.engine.launcher_shared.win32.IMPORTS       := link.input.direct_input_driver
 export.link.engine.launcher_shared.iphone.IMPORTS      := link.media.image.pvr link.input.iphone_driver link.media.players.iphone \
-                                             link.engine.subsystems.iphone_audio_session link.engine.subsystems.iphone_configuration
+                                             link.engine.subsystems.iphone_audio_session link.engine.subsystems.iphone_configuration \
+                                             link.social.game_kit
 export.link.engine.launcher_shared.beagleboard.IMPORTS := link.media.image.pvr
 export.link.engine.launcher_shared.IMPORTS := link.common.default_console_handler link.common.zip_file_system link.common.aes \
                                 link.media.rms link.media.rfx.xmtl.obsolete link.media.sound.snddecl link.media.sound.default_decoders \
@@ -24,7 +25,7 @@ export.link.engine.launcher_shared.IMPORTS := link.common.default_console_handle
                                 link.engine.subsystems.log link.engine.subsystems.file_system \
                                 link.engine.subsystems.resource_system link.engine.subsystems.physics_manager \
                                 link.media.video.theora link.network link.common.iconv \
-                                link.physics.low_level.bullet_driver
+                                link.physics.low_level.bullet_driver link.social.core
 
 export.link.engine.launcher.IMPORTS := link.engine.launcher_shared
 export.link.engine.launcher.LINK_INCLUDES := FunnerInit FunnerMain
