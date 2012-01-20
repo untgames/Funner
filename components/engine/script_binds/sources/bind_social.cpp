@@ -51,7 +51,7 @@ void bind_collection (Environment& environment, const char* library_name)
   lib.Register ("Remove",  make_invoker (&Collection<T>::Remove));
   lib.Register ("Clear",   make_invoker (&Collection<T>::Clear));
 
-  environment.RegisterType<Achievement> (library_name);
+  environment.RegisterType<Collection<T> > (library_name);
 }
 
 void bind_operation_status_library (Environment& environment)
@@ -170,7 +170,7 @@ typedef xtl::function<void (const xtl::any&, OperationStatus, const char* error)
 void on_user_loaded (const User& user, OperationStatus status, const char* error, const LoadCallback& callback)
 {
   if (callback)
-    callback (xtl::any (user), status, error);
+    callback (xtl::any (user, true), status, error);
 }
 
 void load_user (Session& session, const char* id, const LoadCallback& callback, const common::PropertyMap& properties = common::PropertyMap ())
@@ -181,7 +181,7 @@ void load_user (Session& session, const char* id, const LoadCallback& callback, 
 void on_friends_loaded (const UserList& friends, OperationStatus status, const char* error, const LoadCallback& callback)
 {
   if (callback)
-    callback (xtl::any (friends), status, error);
+    callback (xtl::any (friends, true), status, error);
 }
 
 void load_friends (Session& session, const User& user, const LoadCallback& callback, const common::PropertyMap& properties = common::PropertyMap ())
@@ -192,7 +192,7 @@ void load_friends (Session& session, const User& user, const LoadCallback& callb
 void on_achievements_loaded (const AchievementList& achievements, OperationStatus status, const char* error, const LoadCallback& callback)
 {
   if (callback)
-    callback (xtl::any (achievements), status, error);
+    callback (xtl::any (achievements, true), status, error);
 }
 
 void load_achievements (Session& session, const LoadCallback& callback, const common::PropertyMap& properties = common::PropertyMap ())
@@ -214,7 +214,7 @@ void send_achievement (Session& session, const Achievement& achievement, const L
 void on_leaderboards_loaded (const LeaderboardList& leaderboards, OperationStatus status, const char* error, const LoadCallback& callback)
 {
   if (callback)
-    callback (xtl::any (leaderboards), status, error);
+    callback (xtl::any (leaderboards, true), status, error);
 }
 
 void load_leaderboards (Session& session, const LoadCallback& callback, const common::PropertyMap& properties = common::PropertyMap ())
@@ -225,7 +225,7 @@ void load_leaderboards (Session& session, const LoadCallback& callback, const co
 void on_leaderboard_loaded (const Leaderboard& leaderboard, OperationStatus status, const char* error, const LoadCallback& callback)
 {
   if (callback)
-    callback (xtl::any (leaderboard), status, error);
+    callback (xtl::any (leaderboard, true), status, error);
 }
 
 void load_user_leaderboard (Session& session, const char* leaderboard_id, const char* user_id, const LoadCallback& callback, const common::PropertyMap& properties = common::PropertyMap ())
