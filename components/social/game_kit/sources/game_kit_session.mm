@@ -45,19 +45,30 @@ const char* SESSION_DESCRIPTION = "GameKit";
 namespace
 {
 
-void on_authentificated (NSError* error, common::Log log, User current_user)
+void on_authentificated (const char* source, NSError* error, common::Log log, User current_user)
 {
-  GKLocalPlayer *local_player = [GKLocalPlayer localPlayer];
+  try
+  {
+    GKLocalPlayer *local_player = [GKLocalPlayer localPlayer];
 
-  if (error)
-    log.Printf ("Game center authentification error '%s'", [[error description] UTF8String]);
+    if (error)
+      log.Printf ("Game center authentification error '%s'", [[error description] UTF8String]);
 
-  if (!local_player.isAuthenticated)
-    return;
+    if (!local_player.isAuthenticated)
+      return;
 
-  Utility::Instance ()->FillUser (local_player, current_user);
+    Utility::Instance ()->FillUser (local_player, current_user);
 
-  current_user.Properties ().SetProperty ("Underage", local_player.underage ? 1 : 0);
+    current_user.Properties ().SetProperty ("Underage", local_player.underage ? 1 : 0);
+  }
+  catch (xtl::exception& e)
+  {
+    log.Printf ("Exception in %s callback: '%s'", source, e.what ());
+  }
+  catch (...)
+  {
+    log.Printf ("Unknown exception in %s callback", source);
+  }
 }
 
 }
@@ -69,11 +80,13 @@ void on_authentificated (NSError* error, common::Log log, User current_user)
 GameKitSessionImpl::GameKitSessionImpl ()
   : log (LOG_NAME)
 {
+  static const char* METHOD_NAME = "social::game_kit::GameKitSessionImpl::GameKitSessionImpl";
+
   GKLocalPlayer *local_player = [GKLocalPlayer localPlayer];
 
   [local_player authenticateWithCompletionHandler:^(NSError *error)
   {
-    on_authentificated (error, log, current_user);
+    on_authentificated (METHOD_NAME, error, log, current_user);
   }];
 
   NSString* system_version = [[UIDevice currentDevice] systemVersion];
