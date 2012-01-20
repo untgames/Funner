@@ -146,7 +146,11 @@ struct PropertyMap::Impl: public xtl::reference_counter, public xtl::trackable
 ///Обновление данных
   void Update ()
   {
-    hash        = crc32 (buffer.data (), buffer.size (), layout.Hash ());    
+    hash = crc32 (buffer.data (), buffer.size (), layout.Hash ());
+
+    if (strings.BufferSize ())
+      hash = crc32 (strings.Buffer (), strings.BufferSize (), hash);
+
     need_update = false;
   }
   

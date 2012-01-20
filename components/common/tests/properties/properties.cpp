@@ -37,6 +37,12 @@ int main ()
     
     dump_properties (properties1);    
     
+    printf ("change properties\n");    
+    
+    properties1.SetProperty ("Y", "3.12");    
+    
+    dump_properties (properties1);        
+    
     printf ("remove properties\n");
     
     properties1.RemoveProperty ("Y");
