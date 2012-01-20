@@ -6,7 +6,7 @@ using namespace social::game_kit;
 namespace
 {
 
-void on_user_loaded (const char* source, NSString* user_id, NSArray *players, NSError *error, const common::Log& log, const LoadUserCallback& callback)
+void on_user_loaded (const char* source, NSString* user_id, NSArray *players, NSError *error, common::Log log, LoadUserCallback callback)
 {
   try
   {
@@ -55,7 +55,7 @@ void on_user_loaded (const char* source, NSString* user_id, NSArray *players, NS
   }
 }
 
-void on_user_picture_loaded (const char* source, UIImage* picture, NSError *error, const common::Log& log, const LoadUserPictureCallback& callback)
+void on_user_picture_loaded (const char* source, UIImage* picture, NSError *error, common::Log log, LoadUserPictureCallback callback)
 {
   try
   {
@@ -89,7 +89,7 @@ void on_user_picture_loaded (const char* source, UIImage* picture, NSError *erro
   }
 }
 
-void on_user_friends_ids_loaded (const char* source, NSArray* friends, NSError* error, const common::Log& log, const LoadFriendsIdsCallback& callback)
+void on_user_friends_ids_loaded (const char* source, NSArray* friends, NSError* error, common::Log log, LoadFriendsIdsCallback callback)
 {
   try
   {
@@ -119,7 +119,7 @@ void on_user_friends_ids_loaded (const char* source, NSArray* friends, NSError* 
   }
 }
 
-void load_users (const char* source, NSArray* friends, NSError* error, const common::Log& log, const LoadFriendsCallback& callback)
+void load_users (const char* source, NSArray* friends, NSError* error, common::Log log, LoadFriendsCallback callback)
 {
   try
   {
@@ -201,9 +201,11 @@ void GameKitSessionImpl::LoadUser (const char* user_id, const LoadUserCallback& 
 
   NSString* ns_id = [[NSString alloc] initWithUTF8String:user_id];
 
+  LoadUserCallback callback_copy (callback);
+
   [GKPlayer loadPlayersForIdentifiers:[NSArray arrayWithObject:ns_id] withCompletionHandler:^(NSArray *players, NSError *error)
   {
-    on_user_loaded (METHOD_NAME, ns_id, players, error, log, callback);
+    on_user_loaded (METHOD_NAME, ns_id, players, error, log, callback_copy);
   }];
 
   [ns_id release];
@@ -232,9 +234,11 @@ void GameKitSessionImpl::LoadUserPicture (const User& user, const LoadUserPictur
 
   GKPhotoSize photo_size = GKPhotoSizeNormal;
 
+  LoadUserPictureCallback callback_copy (callback);
+
   [(GKPlayer*)user.Handle () loadPhotoForSize:photo_size withCompletionHandler:^(UIImage *photo, NSError *error)
   {
-    on_user_picture_loaded (METHOD_NAME, photo, error, log, callback);
+    on_user_picture_loaded (METHOD_NAME, photo, error, log, callback_copy);
   }];
 }
 
@@ -257,9 +261,11 @@ void GameKitSessionImpl::LoadFriendsIds (const User& user, const LoadFriendsIdsC
 
   CheckUnknownProperties (METHOD_NAME, properties, 0, 0);
 
+  LoadFriendsIdsCallback callback_copy (callback);
+
   [(GKLocalPlayer*)user.Handle () loadFriendsWithCompletionHandler:^(NSArray *friends, NSError *error)
   {
-    on_user_friends_ids_loaded (METHOD_NAME, friends, error, log, callback);
+    on_user_friends_ids_loaded (METHOD_NAME, friends, error, log, callback_copy);
   }];
 }
 
@@ -278,8 +284,10 @@ void GameKitSessionImpl::LoadFriends (const User& user, const LoadFriendsCallbac
 
   CheckUnknownProperties (METHOD_NAME, properties, 0, 0);
 
+  LoadFriendsCallback callback_copy (callback);
+
   [(GKLocalPlayer*)user.Handle () loadFriendsWithCompletionHandler:^(NSArray *friends, NSError *error)
   {
-    load_users (METHOD_NAME, friends, error, log, callback);
+    load_users (METHOD_NAME, friends, error, log, callback_copy);
   }];
 }

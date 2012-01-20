@@ -6,7 +6,7 @@ using namespace social::game_kit;
 namespace
 {
 
-void on_categories_loaded (const char* source, NSArray *categories, NSArray *titles, NSError *error, const common::Log& log, const LoadLeaderboardsCallback& callback)
+void on_categories_loaded (const char* source, NSArray *categories, NSArray *titles, NSError *error, common::Log log, LoadLeaderboardsCallback callback)
 {
   try
   {
@@ -57,7 +57,7 @@ void on_categories_loaded (const char* source, NSArray *categories, NSArray *tit
   }
 }
 
-void on_scores_loaded (const char* source, bool loaded_for_user, GKLeaderboard *ns_leaderboard, NSError *error, const common::Log& log, const LoadLeaderboardCallback& callback)
+void on_scores_loaded (const char* source, bool loaded_for_user, GKLeaderboard *ns_leaderboard, NSError *error, common::Log log, LoadLeaderboardCallback callback)
 {
   try
   {
@@ -86,7 +86,7 @@ void on_scores_loaded (const char* source, bool loaded_for_user, GKLeaderboard *
   }
 }
 
-void on_score_posted (const char* source, GKScore *ns_score, NSError *error, const common::Log& log, const SendScoreCallback& callback)
+void on_score_posted (const char* source, GKScore *ns_score, NSError *error, common::Log log, SendScoreCallback callback)
 {
   try
   {
@@ -126,9 +126,11 @@ void GameKitSessionImpl::LoadLeaderboards (const LoadLeaderboardsCallback& callb
 
   CheckUnknownProperties (METHOD_NAME, properties, 0, 0);
 
+  LoadLeaderboardsCallback callback_copy (callback);
+
   [GKLeaderboard loadCategoriesWithCompletionHandler:^(NSArray *categories, NSArray *titles, NSError *error)
   {
-    on_categories_loaded (METHOD_NAME, categories, titles, error, log, callback);
+    on_categories_loaded (METHOD_NAME, categories, titles, error, log, callback_copy);
   }];
 }
 
@@ -205,9 +207,11 @@ void GameKitSessionImpl::LoadLeaderboard (const char* leaderboard_id, const Load
       throw;
     }
 
+    LoadLeaderboardCallback callback_copy (callback);
+
     [leaderboard loadScoresWithCompletionHandler:^(NSArray *scores, NSError *error)
     {
-      on_scores_loaded (METHOD_NAME, false, leaderboard, error, log, callback);
+      on_scores_loaded (METHOD_NAME, false, leaderboard, error, log, callback_copy);
     }];
 
     [leaderboard release];
@@ -275,9 +279,11 @@ void GameKitSessionImpl::LoadLeaderboard (const char* leaderboard_id, const char
       throw;
     }
 
+    LoadLeaderboardCallback callback_copy (callback);
+
     [leaderboard loadScoresWithCompletionHandler:^(NSArray *scores, NSError *error)
     {
-      on_scores_loaded (METHOD_NAME, true, leaderboard, error, log, callback);
+      on_scores_loaded (METHOD_NAME, true, leaderboard, error, log, callback_copy);
     }];
 
     [leaderboard release];
@@ -327,9 +333,11 @@ void GameKitSessionImpl::SendScore (const Score& score, const SendScoreCallback&
     }
   }
 
+  SendScoreCallback callback_copy (callback);
+
   [ns_score reportScoreWithCompletionHandler:^(NSError *error)
   {
-    on_score_posted (METHOD_NAME, ns_score, error, log, callback);
+    on_score_posted (METHOD_NAME, ns_score, error, log, callback_copy);
   }];
 
   [ns_score release];

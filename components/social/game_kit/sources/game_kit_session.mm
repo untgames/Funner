@@ -45,7 +45,7 @@ const char* SESSION_DESCRIPTION = "GameKit";
 namespace
 {
 
-void on_authentificated (NSError* error, const common::Log& log, User& current_user)
+void on_authentificated (NSError* error, common::Log log, User current_user)
 {
   GKLocalPlayer *local_player = [GKLocalPlayer localPlayer];
 

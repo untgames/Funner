@@ -20,7 +20,7 @@ using namespace social::game_kit;
 namespace
 {
 
-void on_achievements_loaded (const char* source, NSArray *ns_achievements, NSArray *ns_descriptions, NSError *achievements_error, NSError *descriptions_error, const common::Log& log, const LoadAchievementsCallback& callback)
+void on_achievements_loaded (const char* source, NSArray *ns_achievements, NSArray *ns_descriptions, NSError *achievements_error, NSError *descriptions_error, common::Log log, LoadAchievementsCallback callback)
 {
   try
   {
@@ -87,7 +87,7 @@ void on_achievements_loaded (const char* source, NSArray *ns_achievements, NSArr
   }
 }
 
-void on_achievement_image_loaded (const char* source, UIImage* picture, NSError *error, const common::Log& log, const LoadUserPictureCallback& callback)
+void on_achievement_image_loaded (const char* source, UIImage* picture, NSError *error, common::Log log, LoadUserPictureCallback callback)
 {
   try
   {
@@ -121,7 +121,7 @@ void on_achievement_image_loaded (const char* source, UIImage* picture, NSError 
   }
 }
 
-void on_achievement_reported (const char* source, NSError *error, const common::Log& log, const SendAchievementCallback& callback)
+void on_achievement_reported (const char* source, NSError *error, common::Log log, SendAchievementCallback callback)
 {
   try
   {
@@ -161,11 +161,13 @@ void GameKitSessionImpl::LoadAchievements (const LoadAchievementsCallback& callb
 
   CheckUnknownProperties (METHOD_NAME, properties, 0, 0);
 
+  LoadAchievementsCallback callback_copy (callback);
+
   [GKAchievement loadAchievementsWithCompletionHandler:^(NSArray *achievements, NSError *achievements_error)
   {
     [GKAchievementDescription loadAchievementDescriptionsWithCompletionHandler:^(NSArray *descriptions, NSError *descriptions_error)
     {
-      on_achievements_loaded (METHOD_NAME, achievements, descriptions, achievements_error, descriptions_error, log, callback);
+      on_achievements_loaded (METHOD_NAME, achievements, descriptions, achievements_error, descriptions_error, log, callback_copy);
     }];
   }];
 }
@@ -191,10 +193,14 @@ void GameKitSessionImpl::LoadAchievementPicture (const Achievement& achievement,
   if (handle.description.image)
     on_achievement_image_loaded (METHOD_NAME, handle.description.image, nil, log, callback);
   else
+  {
+    LoadAchievementPictureCallback callback_copy (callback);
+
     [handle.description loadImageWithCompletionHandler:^(UIImage *image, NSError *error)
     {
-      on_achievement_image_loaded (METHOD_NAME, image, error, log, callback);
+      on_achievement_image_loaded (METHOD_NAME, image, error, log, callback_copy);
     }];
+  }
 }
 
 /*
@@ -221,9 +227,11 @@ void GameKitSessionImpl::SendAchievement (const Achievement& achievement, const 
 
   ns_achievement.percentComplete = achievement.Progress () * 100.f;
 
+  SendAchievementCallback callback_copy (callback);
+
   [ns_achievement reportAchievementWithCompletionHandler:^(NSError *error)
   {
-    on_achievement_reported (METHOD_NAME, error, log, callback);
+    on_achievement_reported (METHOD_NAME, error, log, callback_copy);
   }];
 
   [ns_achievement release];
