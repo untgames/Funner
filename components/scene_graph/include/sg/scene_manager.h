@@ -5,15 +5,6 @@
 
 #include <sg/node.h>
 
-namespace common
-{
-
-//forward declarations
-class ParseNode;
-class XmlWriter;
-
-}
-
 namespace media
 {
 
@@ -178,63 +169,19 @@ class ISceneFactory
 class SceneSerializationManager
 {
   public:
-    typedef xtl::function<ISceneFactory* (const char* file_name)>          SceneLoader;
-    typedef xtl::function<void (const char* file_name, Node& node)>        SceneSaver;
-    typedef xtl::function<ISceneFactory* (const common::ParseNode&)>       XmlSceneLoader;
-    typedef xtl::function<bool (common::XmlWriter& xml_write, Node& node)> XmlSceneSaver;
+    typedef xtl::function<ISceneFactory* (const char* file_name)>   SceneLoader;
+    typedef xtl::function<void (const char* file_name, Node& node)> SceneSaver;
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Регистрация сериализаторов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void RegisterLoader          (const char* file_type, const SceneLoader& loader);
-    void RegisterSaver           (const char* file_type, const SceneSaver& saver);
-    void RegisterXmlLoader       (const char* file_type, const char* node_type, const XmlSceneLoader& loader);
-    void RegisterXmlSaver        (const char* file_type, const char* saver_name, const XmlSceneSaver& saver);
-    void UnregisterLoader        (const char* file_type);
-    void UnregisterSaver         (const char* file_type);
-    void UnregisterXmlLoader     (const char* file_type, const char* node_type);
-    void UnregisterXmlSaver      (const char* file_type, const char* saver_name);
-    void UnregisterAllLoaders    ();
-    void UnregisterAllSavers     ();
-    void UnregisterAllXmlLoaders (const char* file_type);
-    void UnregisterAllXmlLoaders ();
-    void UnregisterAllXmlSavers  (const char* file_type);
-    void UnregisterAllXmlSavers  ();
+    static void RegisterLoader       (const char* file_type, const SceneLoader& loader);
+    static void RegisterSaver        (const char* file_type, const SceneSaver& saver);
+    static void UnregisterLoader     (const char* file_type);
+    static void UnregisterSaver      (const char* file_type);
+    static void UnregisterAllLoaders ();
+    static void UnregisterAllSavers  ();
 };
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Слушатель событий загрузки XML-сцены
-///  используется в качестве именованного присоединенного объекта IXmlSceneLoadListener* к SceneContext)
-///////////////////////////////////////////////////////////////////////////////////////////////////
-class IXmlSceneLoadListener
-{
-  public:
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Обозначение границ сцены
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    virtual void OnBeginScene (const char* file_name, const char* name_prefix) {}
-    virtual void OnEndScene   (const char* file_name, const char* name_prefix) {}
-  
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Обозначение границ узла
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    virtual void OnBeginSceneNode (const common::ParseNode& parse_node, Node& parent, SceneContext& scene_context) {}
-    virtual void OnEndSceneNode   (const common::ParseNode& parse_node, Node& parent, SceneContext& scene_context) {}
-    
-  protected:
-    virtual ~IXmlSceneLoadListener () {}
-};
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Регистрация слушателя событий загрузки XML-сцены в контексте сцены
-///////////////////////////////////////////////////////////////////////////////////////////////////
-void attach (SceneContext& scene_context, const char* xml_file_type, IXmlSceneLoadListener& listener);
-void detach (SceneContext& scene_context, const char* xml_file_type);
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Получение слушателя событий загрузки XML-сцены в контексте сцены
-///////////////////////////////////////////////////////////////////////////////////////////////////
-IXmlSceneLoadListener* get_xml_scene_load_listener (SceneContext& scene_context, const char* xml_file_type);
 
 }
 
