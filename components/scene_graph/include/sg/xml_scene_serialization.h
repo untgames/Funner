@@ -81,13 +81,13 @@ class XmlSceneSerializationManager
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///–егистраци€ сериализаторов базовых классов
+///—ериализаторы базовых классов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 template <class T> struct XmlSceneClassLoader
 {
-  typedef xtl::function<void (const common::ParseNode& parse_node, T& node)> Type;
+  typedef xtl::function<void (T& node, Node& parent, SceneContext& scene_context)> LoadHandler;
   
-  static Type Loader ();
+  static LoadHandler GetHandler (const common::ParseNode&);
 };
 
 template XmlSceneClassLoader<Node>;
