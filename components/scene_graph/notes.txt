@@ -34,4 +34,4 @@ InputTrigger
 5. ?—оздание  узлов  при  помощи  SceneManager,  которые  требуют  передачи  в
 конструктор  кастомного  менеджера   ->   регистраци€   кастомных   загрузчиков
 непосредственно в SceneManager (возможность использовани€ bind+function)
-6. ?«агрузка ресурсов в AnimationManager и ParticleManager>>>>>>> .r6401
+6. ?«агрузка ресурсов в AnimationManager и ParticleManager
