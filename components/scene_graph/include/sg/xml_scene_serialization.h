@@ -35,29 +35,14 @@ class ScenePrototype
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Группа ресурсов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    const scene_graph::ResourceGroup& Resources     () const; //группа ресурсов данного прототипа
-          scene_graph::ResourceGroup& Resources     ();
-          scene_graph::ResourceGroup  FullResources () const; //группа ресурсов данного прототипа и его детей
-    
+    const scene_graph::ResourceGroup& Resources () const; //группа ресурсов данного прототипа
+          scene_graph::ResourceGroup& Resources ();
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Создание сцены
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void CreateScene (Node& parent, SceneContext& scene_context);
-      ///??????????
-    
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Перебор дочерних прототипов
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    size_t                ChildrenCount () const;
-    const ScenePrototype& Child         (size_t index) const;
-          ScenePrototype& Child         (size_t index);
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Добавление и удаление дочерних прототипов
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    size_t AddChild          (const ScenePrototype&);
-    void   RemoveChild       (size_t index);
-    void   RemoveAllChildren ();
+      ///??????????    
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Обмен
@@ -86,16 +71,27 @@ class XmlSceneSerializationManager
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Регистрация сериализаторов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    static void RegisterLoader       (const char*        node_type,                        //имя типа узла
-                                      const SceneLoader& loader,                           //загрузчик
-                                      const char*        ignore_children_node_names = ""); //имена вложенных узлов, которые будут проигнорированы при разборе дочерних узлов
+    static void RegisterLoader       (const char*        node_type,                             //имя типа узла
+                                      const SceneLoader& loader,                                //загрузчик
+                                      const char*        ignore_children_node_name_masks = ""); //имена вложенных узлов, которые будут проигнорированы при разборе дочерних узлов
     static void RegisterSaver        (const char* saver_name, const SceneSaver& saver);
     static void UnregisterLoader     (const char* node_type);
     static void UnregisterSaver      (const char* saver_name);
     static void UnregisterAllLoaders ();
     static void UnregisterAllSavers  ();
     
-    //продолжение загрузки - наследование
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Регистрация сериализаторов
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    template <class T> struct SuperClassLoader
+    {
+      typedef xtl::function<void (const common::ParseNode& parse_node, T& node)> Type;
+    };
+
+    template <class T> static void RegisterLoader   (const typename SuperClassLoader<T>::Type& loader);
+    template <class T> static void UnregisterLoader ();
+    
+    template <class T> typename SuperClassLoader<T>::Type* FindLoader ();
 };
 
 }
