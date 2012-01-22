@@ -21,6 +21,7 @@ namespace scene_graph
 class ScenePrototype
 {
   public:
+      //flag: create or continue parsing
     typedef xtl::function<void (Node& parent, SceneContext& scene_context)> CreateHandler;
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////

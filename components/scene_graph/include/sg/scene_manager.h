@@ -95,6 +95,8 @@ void swap (SceneContext&, SceneContext&);
 class SceneManager
 {
   public:
+    typedef xtl::function<void (const char* message)> LogHandler;  
+  
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструкторы / деструктор / присваивание
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -107,7 +109,7 @@ class SceneManager
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Загрузка ресурсов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void LoadScene   (const char* file_name, const char* name_prefix = "");
+    void LoadScene   (const char* file_name, const char* name_prefix = "", const LogHandler& = LogHandler ());
     void UnloadScene (const char* file_name);
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -171,11 +173,12 @@ class SceneSerializationManager
   public:
     typedef xtl::function<ISceneFactory* (const char* file_name)>   SceneLoader;
     typedef xtl::function<void (const char* file_name, Node& node)> SceneSaver;
+    typedef SceneManager::LogHandler                                LogHandler;
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Регистрация сериализаторов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    static void RegisterLoader       (const char* file_type, const SceneLoader& loader);
+    static void RegisterLoader       (const char* file_type, const SceneLoader& loader, const LogHandler& = LogHandler ());
     static void RegisterSaver        (const char* file_type, const SceneSaver& saver);
     static void UnregisterLoader     (const char* file_type);
     static void UnregisterSaver      (const char* file_type);
