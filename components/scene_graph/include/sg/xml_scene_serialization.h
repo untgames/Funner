@@ -21,7 +21,6 @@ namespace scene_graph
 class ScenePrototype
 {
   public:
-      //flag: create or continue parsing
     typedef xtl::function<void (Node& parent, SceneContext& scene_context)> CreateHandler;
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -78,23 +77,24 @@ class XmlSceneSerializationManager
     static void UnregisterLoader     (const char* node_type);
     static void UnregisterSaver      (const char* saver_name);
     static void UnregisterAllLoaders ();
-    static void UnregisterAllSavers  ();
-    
+    static void UnregisterAllSavers  ();    
+};
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///–егистраци€ сериализаторов базовых классов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    template <class T> struct SuperClassLoader
-    {
-      typedef xtl::function<void (const common::ParseNode& parse_node, T& node)> Type;
-    };
-
-    template <class T> static void RegisterSuperClassLoader       (const typename SuperClassLoader<T>::Type& loader);
-    template <class T> static void UnregisterSuperClassLoader     ();
-                       static void UnregisterAllSuperClassLoaders ();
-    
-    template <class T> static const typename SuperClassLoader<T>::Type* FindSuperClassLoader ();
-    template <class T> static const typename SuperClassLoader<T>::Type& GetSuperClassLoader  ();    
+template <class T> struct XmlSceneClassLoader
+{
+  typedef xtl::function<void (const common::ParseNode& parse_node, T& node)> Type;
+  
+  static Type Loader ();
 };
+
+template XmlSceneClassLoader<Node>;
+template XmlSceneClassLoader<Entity>;
+template XmlSceneClassLoader<Light>;
+template XmlSceneClassLoader<VisualModel>;
+//...
 
 }
 
