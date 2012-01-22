@@ -80,17 +80,19 @@ class XmlSceneSerializationManager
     static void UnregisterAllSavers  ();
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Регистрация сериализаторов
+///Регистрация сериализаторов базовых классов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     template <class T> struct SuperClassLoader
     {
       typedef xtl::function<void (const common::ParseNode& parse_node, T& node)> Type;
     };
 
-    template <class T> static void RegisterLoader   (const typename SuperClassLoader<T>::Type& loader);
-    template <class T> static void UnregisterLoader ();
+    template <class T> static void RegisterSuperClassLoader       (const typename SuperClassLoader<T>::Type& loader);
+    template <class T> static void UnregisterSuperClassLoader     ();
+                       static void UnregisterAllSuperClassLoaders ();
     
-    template <class T> typename SuperClassLoader<T>::Type* FindLoader ();
+    template <class T> static const typename SuperClassLoader<T>::Type* FindSuperClassLoader ();
+    template <class T> static const typename SuperClassLoader<T>::Type& GetSuperClassLoader  ();    
 };
 
 }
