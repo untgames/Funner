@@ -109,6 +109,7 @@ typedef stl::auto_ptr<common::PropertyMap>                                    Pr
 struct Node::Impl
 {
   class NodeIterator;
+  class ControllerIterator;
 
   scene_graph::Scene* scene;                            //сцена, которой принадлежит объект
   stl::string         name;                             //имя узла
@@ -152,7 +153,8 @@ struct Node::Impl
   ControllerEntry*    last_controller;                  //последний контроллер данного узла
   bool                has_updatable_controllers;        //есть ли обновляемые контроллеры
   PropertyMapPtr      properties;                       //свойства узла
-  NodeIterator*       first_iterator;                   //первый активный итератор узла
+  NodeIterator*       first_node_iterator;              //первый активный итератор узла
+  ControllerIterator* first_controller_iterator;        //первый активный итератор контроллеров
   
   ///Итератор узлов
   class NodeIterator: public xtl::noncopyable
@@ -164,15 +166,15 @@ struct Node::Impl
         , last_item (in_last_item)
         , parent (in_parent)
         , next_member (in_next_member)
-        , next_iterator (parent->impl->first_iterator)
+        , next_iterator (parent->impl->first_node_iterator)
       {
-        parent->impl->first_iterator = this;
+        parent->impl->first_node_iterator = this;
       }
       
       ///Деструктор
       ~NodeIterator ()
       {
-        parent->impl->first_iterator = next_iterator;
+        parent->impl->first_node_iterator = next_iterator;
       }
 
       ///Получение текущего элемента и перемемещение к следующему
@@ -235,27 +237,87 @@ struct Node::Impl
         : NodeIterator (parent, parent->impl->first_updatable_child, parent->impl->last_updatable_child, &Impl::next_updatable_child)
       {
       }
-  };  
+  };
+
+  ///Итератор контроллеров
+  class ControllerIterator: public xtl::noncopyable
+  {
+    public:
+      ///Конструктор
+      ControllerIterator (Node* in_node)
+        : node (in_node)
+        , item (in_node->impl->first_controller)
+        , next_iterator (node->impl->first_controller_iterator)
+      {
+        node->impl->first_controller_iterator = this;
+      }
+      
+      ///Деструктор
+      ~ControllerIterator ()
+      {
+        node->impl->first_controller_iterator = next_iterator;
+      }
+
+      ///Получение текущего элемента и перемемещение к следующему
+      ControllerEntry* Next ()
+      {
+        if (!item)
+          return 0;
+          
+        ControllerEntry* result = item;
+          
+        item = item->next;
+        
+        return result;
+      }
+      
+      ///Следуюущий итератор
+      ControllerIterator* NextIterator () { return next_iterator; }
+      
+      ///Оповещение об удалении контроллера
+      void OnRemove (ControllerEntry* entry)
+      {
+        if (entry != item)
+          return;
+
+        Next ();
+      }
+      
+      ///Оповещение о добавлении контроллера
+      void OnAdd (ControllerEntry* entry)
+      {
+        if (item || entry != node->impl->last_controller)
+          return;
+          
+        item = entry;
+      }
+
+    private:  
+      Node::Pointer       node;
+      ControllerEntry*    item;
+      ControllerIterator* next_iterator;
+  };    
   
   Impl (Node* node) : this_node (node)
   {
-    ref_count             = 1;
-    scene                 = 0;
-    parent                = 0;
-    first_child           = 0;
-    last_child            = 0;
-    prev_child            = 0;
-    next_child            = 0;
-    update_lock           = 0;
-    update_notify         = false;
-    name_hash             = strhash (name.c_str ());
-    first_updatable_child = 0;
-    last_updatable_child  = 0;
-    prev_updatable_child  = 0;
-    next_updatable_child  = 0;
-    first_controller      = 0;
-    last_controller       = 0;
-    first_iterator        = 0;
+    ref_count                 = 1;
+    scene                     = 0;
+    parent                    = 0;
+    first_child               = 0;
+    last_child                = 0;
+    prev_child                = 0;
+    next_child                = 0;
+    update_lock               = 0;
+    update_notify             = false;
+    name_hash                 = strhash (name.c_str ());
+    first_updatable_child     = 0;
+    last_updatable_child      = 0;
+    prev_updatable_child      = 0;
+    next_updatable_child      = 0;
+    first_controller          = 0;
+    last_controller           = 0;
+    first_node_iterator       = 0;
+    first_controller_iterator = 0;
 
       //масштаб по умолчанию
 
@@ -291,15 +353,27 @@ struct Node::Impl
   
   void UpdateIteratorsBeforeRemoveChild (Node* child)
   {    
-    for (NodeIterator* i=first_iterator; i; i=i->NextIterator ())    
+    for (NodeIterator* i=first_node_iterator; i; i=i->NextIterator ())    
       i->OnRemove (child);
   }
   
   void UpdateIteratorsAfterAddChild (Node* child)
   {
-    for (NodeIterator* i=first_iterator; i; i=i->NextIterator ())
+    for (NodeIterator* i=first_node_iterator; i; i=i->NextIterator ())
       i->OnAdd (child);
   }  
+  
+  void UpdateIteratorsBeforeRemoveController (ControllerEntry* entry)
+  {    
+    for (ControllerIterator* i=first_controller_iterator; i; i=i->NextIterator ())    
+      i->OnRemove (entry);
+  }
+  
+  void UpdateIteratorsAfterAddController (ControllerEntry* entry)
+  {
+    for (ControllerIterator* i=first_controller_iterator; i; i=i->NextIterator ())
+      i->OnAdd (entry);
+  }    
   
   Pivot& GetPivot ()
   {
@@ -981,14 +1055,12 @@ struct Node::Impl
     {
       this_node->BeginUpdate ();
 
-      for (ControllerEntry* entry=first_controller; entry;)
+      ControllerIterator iter = this_node;
+      
+      while (ControllerEntry* entry = iter.Next ())
       {
-        ControllerEntry* next = entry->next;
-
         if (entry->updatable)
           entry->controller->UpdateState (dt);
-        
-        entry = next;
       }
       
       this_node->EndUpdate ();
@@ -2124,10 +2196,17 @@ void Node::AttachController (ControllerEntry& entry)
 
     impl->BindToParentUpdateList ();
   }
+  
+  impl->UpdateIteratorsAfterAddController (&entry);
 }
 
 void Node::DetachController (ControllerEntry& entry)
 {
+  if (!entry.prev && !entry.next && &entry != impl->first_controller)
+    return;
+
+  impl->UpdateIteratorsBeforeRemoveController (&entry);
+
   if (entry.prev)                            entry.prev->next       = entry.next;
   else if (&entry == impl->first_controller) impl->first_controller = entry.next;
   
@@ -2159,6 +2238,36 @@ void Node::DetachAllControllers ()
 {
   while (impl->first_controller)
     impl->first_controller->controller->Detach ();
+}
+
+/*
+   Перебор контроллеров
+*/
+
+xtl::com_ptr<Controller> Node::FirstController ()
+{
+  if (!impl->first_controller)
+    return xtl::com_ptr<Controller> ();
+
+  return impl->first_controller->controller;
+}
+
+xtl::com_ptr<Controller> Node::LastController ()
+{
+  if (!impl->last_controller)
+    return xtl::com_ptr<Controller> ();
+
+  return impl->last_controller->controller;
+}
+
+xtl::com_ptr<const Controller> Node::FirstController () const
+{
+  return const_cast<Node&> (*this).FirstController ();
+}
+
+xtl::com_ptr<const Controller> Node::LastController () const
+{
+  return const_cast<Node&> (*this).LastController ();
 }
 
 /*

@@ -8,10 +8,10 @@ using namespace scene_graph;
 
 struct Controller::Impl
 {
-  ControllerEntry      entry;              //вхождение контроллера в список узла
-  size_t               ref_count;          //счётчик ссылок
-  ControllerOwnerMode  owner_mode;         //режим владения
-  scene_graph::Node*   node;               //узел, с которым связан контроллер
+  ControllerEntry      entry;      //вхождение контроллера в список узла
+  size_t               ref_count;  //счётчик ссылок
+  ControllerOwnerMode  owner_mode; //режим владения
+  scene_graph::Node*   node;       //узел, с которым связан контроллер
 
 ///Конструктор
   Impl ()
@@ -229,4 +229,34 @@ void Controller::UpdateState (float dt)
 
 void Controller::Update (float)
 {
+}
+
+/*
+   Перебор контроллеров
+*/
+
+Controller::Pointer Controller::NextController ()
+{
+  if (!impl->entry.next)
+    return Controller::Pointer ();
+
+  return impl->entry.next->controller;
+}
+
+Controller::Pointer Controller::PrevController ()
+{
+  if (!impl->entry.prev)
+    return Controller::Pointer ();
+
+  return impl->entry.prev->controller;
+}
+
+Controller::ConstPointer Controller::NextController () const
+{
+  return const_cast<Controller&> (*this).NextController ();
+}
+
+Controller::ConstPointer Controller::PrevController () const
+{
+  return const_cast<Controller&> (*this).PrevController ();
 }

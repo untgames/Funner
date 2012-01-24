@@ -1,0 +1,11 @@
+Results of controller_self_detach_test:
+first update
+MyController<1>::Update
+MyController<2>::Update
+MyController<4>::Update
+MyController<5>::Update
+second update
+MyController<1>::Update
+MyController<4>::Update
+MyController<5>::Update
+MyController<5>::Update
