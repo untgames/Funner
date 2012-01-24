@@ -18,7 +18,7 @@ void binder (Node* parent)
   
   child->AttachController (&my_updater<5>);
   
-  child->BindToParent (*parent);
+  child->BindToParent (*parent, NodeBindMode_AddRef);
 }
 
 int main ()

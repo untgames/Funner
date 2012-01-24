@@ -210,7 +210,7 @@ struct Node::Impl
       }
 
     private:  
-      Node::Pointer  item;
+      Node*          item;
       Node*&         last_item;
       Node::Pointer  parent;
       Node* Impl::*  next_member;
