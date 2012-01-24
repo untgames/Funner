@@ -186,7 +186,7 @@ void Water::OnChangeSizes ()
     ”зел был удалЄн
 */
 
-void Water::OnNodeDestroyed ()
+void Water::OnNodeDetached ()
 {
   if (!impl->height_map)
     return;

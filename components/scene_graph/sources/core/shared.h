@@ -47,5 +47,6 @@
 #include <sg/visual_model.h>
 
 #include "scene_object.h"
+#include "controller_impl.h"
 
 #endif

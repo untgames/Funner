@@ -45,7 +45,7 @@ class Water: public Controller
     
   private:
     void Update (float dt);
-    void OnNodeDestroyed ();
+    void OnNodeDetached ();
     void OnChangeSizes ();
 
   private:

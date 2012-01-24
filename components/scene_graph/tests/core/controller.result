@@ -5,8 +5,8 @@ MyController::~MyController
 node destroyed
 -- node owns controller --
 exit
-node destroyed
 MyController::~MyController
+node destroyed
 -- controller owns node --
 exit
 node destroyed

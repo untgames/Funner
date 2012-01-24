@@ -31,6 +31,18 @@ namespace scene_graph
 //forward declarations
 class Scene;
 class Node;
+class Controller;
+
+//implementation forwards
+struct ControllerEntry;
+
+namespace controllers
+{
+
+//forward declaration
+class DefaultController;
+
+}
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Режим присоединения
@@ -355,17 +367,41 @@ class Node: public xtl::dynamic_cast_root
     bool IsInUpdateTransaction () const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Присоединение / отсоединение контроллера
+///Отсоединение всех контроллеров
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void DetachAllControllers ();
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Присоединение контроллера
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     typedef xtl::function<void (float dt)> UpdateHandler;
 
-    xtl::connection AttachController     (const UpdateHandler&);
-    void            DetachAllControllers ();
+    xtl::com_ptr<controllers::DefaultController> AttachController (const UpdateHandler&);
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Перебор контроллеров
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    xtl::com_ptr<Controller>       FirstController ();
+    xtl::com_ptr<Controller>       LastController  ();
+    xtl::com_ptr<const Controller> FirstController () const;
+    xtl::com_ptr<const Controller> LastController  () const;
+
+    template <class T> typename T::Pointer      FirstController ();
+    template <class T> typename T::Pointer      LastController  ();
+    template <class T> typename T::ConstPointer FirstController () const;
+    template <class T> typename T::ConstPointer LastController  () const;
+    
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Обновление состояния узла и его потомков
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void Update (float dt, NodeTraverseMode mode = NodeTraverseMode_Default);
+    
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Работа с контроллерами (for internal use)
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void AttachController     (ControllerEntry&);
+    void DetachController     (ControllerEntry&);
+    void UpdateControllerList ();
 
   protected:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -395,7 +431,7 @@ class Node: public xtl::dynamic_cast_root
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     virtual void AfterUpdateWorldTransformEvent () {} //после изменения положения объекта
     virtual void AfterSceneAttachEvent () {}          //после присоединения объекта к сцене
-    virtual void BeforeSceneDetachEvent () {}         //перед отсоединением объекта от сцены
+    virtual void BeforeSceneDetachEvent () {}         //перед отсоединением объекта от сцены    
 
   private:
     static void DestroyNode (Node*);

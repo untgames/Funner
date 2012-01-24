@@ -40,7 +40,7 @@ int main ()
     vec3f pos (1.0f, 2.0f, 3.0f);
     
     MyController::Pointer controller (new MyController (*node, pos), false);
-      
+
     node->Update (1.0f);
 
     dump_position (*node);
@@ -83,7 +83,7 @@ int main ()
 
     printf ("exit\n");
   }
-  
+
   {
     printf ("-- change ownership --\n");
     

@@ -98,7 +98,6 @@ void affine_decompose (const math::mat4f& matrix, math::vec3f& position, math::q
 typedef stl::auto_ptr<Pivot>                                                  PivotPtr;
 typedef xtl::signal<void (Node& sender, NodeEvent event)>                     NodeSignal;
 typedef xtl::signal<void (Node& sender, Node& child, NodeSubTreeEvent event)> SubTreeNodeSignal;
-typedef xtl::signal<void (float dt)>                                          UpdateSignal;
 typedef stl::auto_ptr<common::PropertyMap>                                    PropertyMapPtr;
 
 }
@@ -146,7 +145,9 @@ struct Node::Impl
   Node*               first_updatable_child;            //первый обновляемый потомок
   Node*               prev_updatable_child;             //предыдущий обновляемый потомок
   Node*               next_updatable_child;             //следующий обновляемый потомок
-  UpdateSignal        update_signal;                    //сигнал обновления узла
+  ControllerEntry*    first_controller;                 //первый контроллер данного узла
+  ControllerEntry*    last_controller;                  //последний контроллер данного узла
+  bool                has_updatable_controllers;        //есть ли обновляемые контроллеры
   PropertyMapPtr      properties;                       //свойства узла
 
   Impl (Node* node) : this_node (node)
@@ -164,6 +165,8 @@ struct Node::Impl
     first_updatable_child = 0;
     prev_updatable_child  = 0;
     next_updatable_child  = 0;
+    first_controller      = 0;
+    last_controller       = 0;
 
       //масштаб по умолчанию
 
@@ -830,7 +833,7 @@ struct Node::Impl
         
           //рекурсивная отмена регистрации родителя
           
-        if (parent->impl->update_signal.empty ())
+        if (!parent->impl->has_updatable_controllers)
           parent->impl->UnbindFromParentUpdateList ();
       }
     }
@@ -839,7 +842,7 @@ struct Node::Impl
     next_updatable_child = 0;
   }
   
-  bool HasUpdatables () { return !update_signal.empty () || first_updatable_child; }
+  bool HasUpdatables () { return has_updatable_controllers || first_updatable_child; }
 
 /*
     Обновление состояния узла
@@ -849,14 +852,22 @@ struct Node::Impl
   {
     static const char* METHOD_NAME = "scene_graph::Node::Impl::UpdateNode";
 
-    if (update_signal.empty ())
+    if (!has_updatable_controllers)
       return;
     
     try
     {
       this_node->BeginUpdate ();
-      
-      update_signal (dt);
+
+      for (ControllerEntry* entry=first_controller; entry;)
+      {
+        ControllerEntry* next = entry->next;
+
+        if (entry->updatable)
+          entry->controller->UpdateState (dt);
+        
+        entry = next;
+      }
       
       this_node->EndUpdate ();
     }
@@ -895,10 +906,14 @@ Node::~Node ()
   UnbindAllChildren ();
   Unbind ();
   
+    //отсоединение всех контроллеров
+
+  DetachAllControllers ();  
+  
     //оповещение об удалении узла
     
   impl->Notify (NodeEvent_AfterDestroy);
-
+  
     //удаляем реализацию узла
 
   delete impl;
@@ -1958,19 +1973,64 @@ void Node::SetScene (scene_graph::Scene* in_scene)
     Присоединение / отсоединение контроллера
 */
 
-xtl::connection Node::AttachController (const UpdateHandler& fn)
+xtl::com_ptr<controllers::DefaultController> Node::AttachController (const UpdateHandler& updater)
 {
-  impl->BindToParentUpdateList ();
+  return controllers::DefaultController::Create (*this, updater);
+}
 
-  return impl->update_signal.connect (fn);
+void Node::AttachController (ControllerEntry& entry)
+{
+  if (!entry.controller)
+    throw xtl::format_operation_exception ("scene_graph::Node::AttachController", "entry.controller");
+
+  entry.next            = 0;
+  entry.prev            = impl->last_controller;
+  impl->last_controller = &entry;
+ 
+  if (entry.prev) entry.prev->next       = &entry;
+  else            impl->first_controller = &entry;
+  
+  if (entry.updatable)
+  {
+    impl->has_updatable_controllers = true;
+
+    impl->BindToParentUpdateList ();
+  }
+}
+
+void Node::DetachController (ControllerEntry& entry)
+{
+  if (entry.prev)                            entry.prev->next       = entry.next;
+  else if (&entry == impl->first_controller) impl->first_controller = entry.next;
+  
+  if (entry.next)                           entry.next->prev      = entry.prev;
+  else if (&entry == impl->last_controller) impl->last_controller = entry.prev;
+  
+  entry.prev = entry.next = 0;
+
+  if (entry.updatable)
+    UpdateControllerList ();
+}
+
+void Node::UpdateControllerList ()
+{
+  impl->has_updatable_controllers = false;
+  
+  for (ControllerEntry* entry=impl->first_controller; entry; entry=entry->next)
+    if (entry->updatable)
+    {
+      impl->has_updatable_controllers = true;
+      break;
+    }
+
+  if (!impl->HasUpdatables ()) //если нет обновляемых потомков и контроллеров - отсоединение от родительского списка обновлений
+    impl->UnbindFromParentUpdateList ();
 }
 
 void Node::DetachAllControllers ()
 {
-  impl->update_signal.disconnect_all ();
-
-  if (!impl->HasUpdatables ()) //если нет обновляемых потомков - отсоединение от родительского списка обновлений
-    impl->UnbindFromParentUpdateList ();
+  while (impl->first_controller)
+    impl->first_controller->controller->Detach ();
 }
 
 /*

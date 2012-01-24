@@ -34,6 +34,7 @@
 #include <sg/visual_model.h>
 
 using namespace scene_graph;
+using namespace scene_graph::controllers;
 using namespace math;
 using namespace xtl;
 using namespace bound_volumes;

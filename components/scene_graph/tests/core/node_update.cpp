@@ -14,7 +14,7 @@ int main ()
 
   printf ("update parent without controller & child with controller\n");
   
-  xtl::connection child_connection = child->AttachController (&my_updater<2>);    
+  DefaultController::Pointer child_controller = child->AttachController (&my_updater<2>);    
 
   child->BindToParent (*parent);
 
@@ -22,7 +22,7 @@ int main ()
   
   printf ("update parent with controller & child with controller\n");  
   
-  xtl::connection parent_connection = parent->AttachController (&my_updater<1>);
+  DefaultController::Pointer parent_controller = parent->AttachController (&my_updater<1>);
   
   parent->Update (0.5f);
   
@@ -36,7 +36,7 @@ int main ()
   
   printf ("disconnect parent & update parent\n");
   
-  parent_connection.disconnect ();
+  parent_controller->Detach ();
   
   parent->Update (0.5f);
   
@@ -50,7 +50,7 @@ int main ()
   
   printf ("disconnect child & update parent of parent\n");
   
-  child_connection.disconnect ();
+  child_controller->Detach ();
   
   parent_parent->Update (0.5f);
   

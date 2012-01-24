@@ -8,11 +8,10 @@ using namespace scene_graph;
 
 struct Controller::Impl
 {
+  ControllerEntry      entry;              //вхождение контроллера в список узла
   size_t               ref_count;          //счётчик ссылок
   ControllerOwnerMode  owner_mode;         //режим владения
   scene_graph::Node*   node;               //узел, с которым связан контроллер
-  xtl::auto_connection update_connection;  //соединение с сигналом обновления узла
-  xtl::auto_connection destroy_connection; //соединение с сигналом удаления узла
 
 ///Конструктор
   Impl ()
@@ -27,14 +26,17 @@ struct Controller::Impl
     Конструктор / деструктор
 */
 
-Controller::Controller (scene_graph::Node& node)
+Controller::Controller (scene_graph::Node& node, bool updatable)
   : impl (new Impl)
 {
   try
   {
-    impl->update_connection  = node.AttachController (xtl::bind (&Controller::OnUpdate, this, _1));
-    impl->destroy_connection = node.RegisterEventHandler (NodeEvent_AfterDestroy, xtl::bind (&Controller::OnDestroyNode, this));
-    impl->node               = &node;
+    impl->entry.controller = this;
+    impl->entry.updatable  = updatable;
+    
+    node.AttachController (impl->entry);
+    
+    impl->node = &node;
   }
   catch (xtl::exception& e)
   {
@@ -89,26 +91,29 @@ const scene_graph::Node* Controller::AttachedNode () const
 }
 
 /*
+    Состояние обновления контроллера
+*/
+void Controller::SetUpdatable (bool state)
+{
+  if (impl->entry.updatable == state)
+    return;
+
+  impl->entry.updatable = state;
+  
+  if (impl->node)
+    impl->node->UpdateControllerList ();
+}
+
+bool Controller::IsUpdatable () const
+{
+  return impl->entry.updatable;
+}
+
+/*
     Обработчик события отсоединения от узла
 */
 
-void Controller::OnDestroyNode ()
-{
-  if (!impl->node)
-    return;
-    
-  OnNodeDestroyed ();
-
-  impl->node = 0;
-
-  impl->update_connection.disconnect ();
-  impl->destroy_connection.disconnect ();
-  
-  if (impl->owner_mode == ControllerOwnerMode_NodeOwnsController)
-    Release ();
-}
-
-void Controller::OnNodeDestroyed ()
+void Controller::OnNodeDetached ()
 {
 }
 
@@ -184,27 +189,30 @@ ControllerOwnerMode Controller::OwnerMode () const
 void Controller::Detach ()
 {
   if (!impl->node)
-    return;
+    return;    
     
-  AddRef ();
+  AddRef ();    
+    
+  OnNodeDetached ();    
+
+  Node* node = impl->node;
+  
+  impl->node = 0;    
+  
+  node->DetachController (impl->entry);  
   
   switch (impl->owner_mode)
   {
     case ControllerOwnerMode_ControllerOwnsNode:
-      impl->node->Release ();
-      break;
+      node->Release ();
+      break;      
     case ControllerOwnerMode_NodeOwnsController:
       Release ();
       break;
     default:
       break;
   }
-  
-  impl->update_connection.disconnect ();
-  impl->destroy_connection.disconnect ();
-  
-  impl->node = 0;
-  
+
   Release ();
 }
 
@@ -212,7 +220,7 @@ void Controller::Detach ()
     Обновление
 */
 
-void Controller::OnUpdate (float dt)
+void Controller::UpdateState (float dt)
 {
   xtl::com_ptr<Controller> lock_this (this);
   
