@@ -1,0 +1,12 @@
+Results of node_update_with_unbind_test:
+update with unbind child2
+my_updater1
+my_updater2
+unbind
+unbind
+my_updater4
+my_updater5
+second update
+my_updater1
+my_updater4
+my_updater5

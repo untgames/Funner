@@ -108,6 +108,8 @@ typedef stl::auto_ptr<common::PropertyMap>                                    Pr
 
 struct Node::Impl
 {
+  class NodeIterator;
+
   scene_graph::Scene* scene;                            //сцена, которой принадлежит объект
   stl::string         name;                             //имя узла
   size_t              name_hash;                        //хэш имени
@@ -143,13 +145,98 @@ struct Node::Impl
   size_t              update_lock;                      //счётчик открытых транзакций обновления
   bool                update_notify;                    //флаг, сигнализирующий о необходимости оповещения об обновлениях по завершении транзакции обновления
   Node*               first_updatable_child;            //первый обновляемый потомок
+  Node*               last_updatable_child;             //последний обновляемый потомок
   Node*               prev_updatable_child;             //предыдущий обновляемый потомок
   Node*               next_updatable_child;             //следующий обновляемый потомок
   ControllerEntry*    first_controller;                 //первый контроллер данного узла
   ControllerEntry*    last_controller;                  //последний контроллер данного узла
   bool                has_updatable_controllers;        //есть ли обновляемые контроллеры
   PropertyMapPtr      properties;                       //свойства узла
+  NodeIterator*       first_iterator;                   //первый активный итератор узла
+  
+  ///Итератор узлов
+  class NodeIterator: public xtl::noncopyable
+  {
+    public:
+      ///Конструктор
+      NodeIterator (Node* in_parent, Node* first_item, Node*& in_last_item, Node* Impl::* in_next_member)
+        : item (first_item)
+        , last_item (in_last_item)
+        , parent (in_parent)
+        , next_member (in_next_member)
+        , next_iterator (parent->impl->first_iterator)
+      {
+        parent->impl->first_iterator = this;
+      }
+      
+      ///Деструктор
+      ~NodeIterator ()
+      {
+        parent->impl->first_iterator = next_iterator;
+      }
 
+      ///Получение текущего элемента и перемемещение к следующему
+      Node::Pointer Next ()
+      {
+        Node::Pointer result = item;
+        
+        if (!item)
+          return result;
+        
+        item = item->impl->*next_member;
+        
+        return result;
+      }
+      
+      ///Следуюущий итератор
+      NodeIterator* NextIterator () { return next_iterator; }
+      
+      ///Оповещение об удалении узла
+      void OnRemove (Node* node)
+      {
+        if (node != item)
+          return;
+
+        Next ();
+      }
+      
+      ///Оповещение о добавлении узла
+      void OnAdd (Node* node)
+      {
+        if (item || node != last_item)
+          return;
+          
+        item = node;
+      }
+
+    private:  
+      Node::Pointer  item;
+      Node*&         last_item;
+      Node::Pointer  parent;
+      Node* Impl::*  next_member;
+      NodeIterator*  next_iterator;  
+  };
+  
+  ///Итератор дочерних узлов
+  class NodeChildrenIterator: public NodeIterator
+  {
+    public:
+      NodeChildrenIterator (Node* parent)
+        : NodeIterator (parent, parent->impl->first_child, parent->impl->last_child, &Impl::next_child)
+      {
+      }
+  };
+  
+  ///Итератор обновляемых узлов
+  class NodeUpdatablesIterator: public NodeIterator
+  {
+    public:
+      NodeUpdatablesIterator (Node* parent)
+        : NodeIterator (parent, parent->impl->first_updatable_child, parent->impl->last_updatable_child, &Impl::next_updatable_child)
+      {
+      }
+  };  
+  
   Impl (Node* node) : this_node (node)
   {
     ref_count             = 1;
@@ -163,10 +250,12 @@ struct Node::Impl
     update_notify         = false;
     name_hash             = strhash (name.c_str ());
     first_updatable_child = 0;
+    last_updatable_child  = 0;
     prev_updatable_child  = 0;
     next_updatable_child  = 0;
     first_controller      = 0;
     last_controller       = 0;
+    first_iterator        = 0;
 
       //масштаб по умолчанию
 
@@ -199,6 +288,18 @@ struct Node::Impl
     bind_lock = false;
     need_release_at_unbind = false;
   }
+  
+  void UpdateIteratorsBeforeRemoveChild (Node* child)
+  {    
+    for (NodeIterator* i=first_iterator; i; i=i->NextIterator ())    
+      i->OnRemove (child);
+  }
+  
+  void UpdateIteratorsAfterAddChild (Node* child)
+  {
+    for (NodeIterator* i=first_iterator; i; i=i->NextIterator ())
+      i->OnAdd (child);
+  }  
   
   Pivot& GetPivot ()
   {
@@ -788,58 +889,73 @@ struct Node::Impl
 
   void BindToParentUpdateList ()
   {
-    if (!parent || prev_updatable_child)
+    if (!parent)
+      return;
+      
+    if (prev_updatable_child || next_updatable_child || parent->impl->first_updatable_child == this_node)
       return;
 
     if (parent->impl->first_updatable_child) //если список обновляемых узлов не пуст
     {
-      next_updatable_child = parent->impl->first_updatable_child;
-      prev_updatable_child = next_updatable_child->impl->prev_updatable_child;
-
+      next_updatable_child = 0;
+      prev_updatable_child = parent->impl->last_updatable_child;
+      
       prev_updatable_child->impl->next_updatable_child = this_node;
-      next_updatable_child->impl->prev_updatable_child = this_node;
     }
     else
     {
         //если список обновляемых узлов пуст
 
       parent->impl->first_updatable_child = this_node;
-      prev_updatable_child                = this_node;
-      next_updatable_child                = this_node;
+      
+      prev_updatable_child = 0;
+      next_updatable_child = 0;
       
         //рекурсивная регистрация родителя
 
       parent->impl->BindToParentUpdateList ();
     }
+    
+    parent->impl->last_updatable_child = this_node;    
+    
+    parent->impl->UpdateIteratorsAfterAddChild (this_node);
   }
   
   void UnbindFromParentUpdateList ()
   {
-    if (!parent || !prev_updatable_child)
+    if (!parent)
       return;
       
-    prev_updatable_child->impl->next_updatable_child = next_updatable_child;
-    next_updatable_child->impl->prev_updatable_child = prev_updatable_child;  
-
-    if (this_node == parent->impl->first_updatable_child)
+    if (!prev_updatable_child && !next_updatable_child && parent->impl->first_updatable_child != this_node)
+      return;
+      
+    parent->impl->UpdateIteratorsBeforeRemoveChild (this_node);
+      
+    if (prev_updatable_child)
     {
-      if (this_node != next_updatable_child)
-      {
-        parent->impl->first_updatable_child = next_updatable_child;
-      }
-      else
-      {
-        parent->impl->first_updatable_child = 0;
-        
-          //рекурсивная отмена регистрации родителя
-          
-        if (!parent->impl->has_updatable_controllers)
-          parent->impl->UnbindFromParentUpdateList ();
-      }
+      prev_updatable_child->impl->next_updatable_child = next_updatable_child;
     }
-    
+    else if (this_node == parent->impl->first_updatable_child)
+    {
+      parent->impl->first_updatable_child = next_updatable_child;
+    }
+
+    if (next_updatable_child)
+    { 
+      next_updatable_child->impl->prev_updatable_child = prev_updatable_child;  
+    }
+    else if (this_node == parent->impl->last_updatable_child)
+    {
+      parent->impl->last_updatable_child = prev_updatable_child;
+    }    
+
     prev_updatable_child = 0;
     next_updatable_child = 0;
+
+      //рекурсивная отмена регистрации родителя
+          
+    if (!parent->impl->first_updatable_child && !parent->impl->has_updatable_controllers)
+      parent->impl->UnbindFromParentUpdateList ();
   }
   
   bool HasUpdatables () { return has_updatable_controllers || first_updatable_child; }
@@ -2057,21 +2173,10 @@ void Node::Update (float dt, NodeTraverseMode mode)
   
   if (mode != NodeTraverseMode_OnlyThis && impl->first_updatable_child)
   {
-    impl->first_updatable_child->Update (dt, mode);
+    Impl::NodeUpdatablesIterator iter = this;    
     
-    if (impl->first_updatable_child) //проверка нужна на случай удаления контроллера в Update
-    {  
-      Pointer next_lock;
-
-      for (Node* node=impl->first_updatable_child->impl->next_updatable_child; node!=impl->first_updatable_child;) //!!!
-      {
-        next_lock = Pointer (node->impl->next_updatable_child);
-
-        node->Update (dt, mode);
-
-        node = next_lock.get ();
-      }
-    }
+    while (Node::Pointer node = iter.Next ())
+      node->Update (dt, mode);
   }
   
   if (mode == NodeTraverseMode_BottomToTop)
