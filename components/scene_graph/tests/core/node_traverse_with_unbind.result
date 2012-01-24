@@ -1,0 +1,13 @@
+Results of node_traverse_with_unbind_test:
+first traverse
+node 'parent'
+node 'child1'
+node 'child2'
+node 'child4'
+node 'child5'
+second traverse
+node 'parent'
+node 'child1'
+node 'child4'
+node 'child5'
+node 'child5'

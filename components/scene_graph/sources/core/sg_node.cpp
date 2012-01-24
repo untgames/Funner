@@ -390,8 +390,10 @@ struct Node::Impl
     }
 
       //оповещение всех потомков о необходимости пересчёта мировых преобразований
-    
-    for (Node* node=first_child; node; node=node->impl->next_child) //!!!
+
+    NodeChildrenIterator iter = this_node;
+
+    while (Node::Pointer node = iter.Next ())
       node->impl->UpdateWorldTransformNotify ();
   }
 
@@ -580,6 +582,10 @@ struct Node::Impl
         //оповещаем клиентов об отсоединении узла от родителя
 
       UnbindNotify ();
+      
+        //обновляем итераторы, указывающие на данный узел
+        
+      parent->impl->UpdateIteratorsBeforeRemoveChild (this_node);      
 
         //отсоединям узел от родителя
       
@@ -640,6 +646,10 @@ struct Node::Impl
 
       if (HasUpdatables ())
         BindToParentUpdateList ();
+        
+        //обновляем итераторы, указывающие на данный узел
+        
+      parent->impl->UpdateIteratorsAfterAddChild (this_node);        
 
         //оповещение о присоединении узла к родителю
 
@@ -774,14 +784,10 @@ struct Node::Impl
     
       //обновление сцены в потомках
 
-    for (Node* volatile node=first_child; node;) //!!!
-    {
-      Node* next = node->impl->next_child;
-
+    NodeChildrenIterator iter = this_node;      
+    
+    while (Node::Pointer node = iter.Next ())
       node->impl->SetScene (scene);
-      
-      node = next;
-    }
 
       //оповещение о присоединии к новой сцене
       
@@ -824,6 +830,10 @@ struct Node::Impl
 
     signal_process [event] = true;
     
+      //автоматическая блокировка на удаление во время оповещения
+      
+    Pointer self_lock (this_node);
+    
       //вызываем обработчики событий
 
     try
@@ -854,14 +864,10 @@ struct Node::Impl
       
       //оповещаем о возникновении события относительно всех потомков child
 
-    for (Node* node=child.impl->first_child; node;) //!!!
-    {
-      Node* next = node->impl->next_child;
-
+    NodeChildrenIterator iter = &child;
+    
+    while (Node::Pointer node = iter.Next ())
       Notify (*node, event);
-      
-      node = next;
-    }
       
       //устанавливаем флаг обработки события
 
@@ -1326,7 +1332,9 @@ void Node::Traverse (const TraverseFunction& fn, NodeTraverseMode mode) const
 
   if (mode != NodeTraverseMode_OnlyThis)
   {
-    for (Node* node=impl->first_child; node; node=node->impl->next_child) ///!!!
+    Impl::NodeChildrenIterator iter = const_cast<Node*> (this); 
+    
+    while (Node::Pointer node = iter.Next ())
       node->Traverse (fn, mode);
   }
     
@@ -1351,7 +1359,9 @@ void Node::Traverse (INodeTraverser& traverser, NodeTraverseMode mode) const
 
   if (mode != NodeTraverseMode_OnlyThis)
   {
-    for (Node* node=impl->first_child; node; node=node->impl->next_child) ///!!!
+    Impl::NodeChildrenIterator iter = const_cast<Node*> (this);
+    
+    while (Node::Pointer node = iter.Next ())
       node->Traverse (traverser, mode);
   }
 
@@ -1376,7 +1386,9 @@ void Node::VisitEach (Visitor& visitor, NodeTraverseMode mode) const
 
   if (mode != NodeTraverseMode_OnlyThis)
   {
-    for (Node* node=impl->first_child; node; node=node->impl->next_child) //!!!
+    Impl::NodeChildrenIterator iter = const_cast<Node*> (this);
+    
+    while (Node::Pointer node = iter.Next ())
       node->VisitEach (visitor, mode);
   }
 
