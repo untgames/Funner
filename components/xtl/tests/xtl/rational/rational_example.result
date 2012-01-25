@@ -1,0 +1,17 @@
+Resultss of rational_example_test:
+expression 'half.numerator() == 1' is true
+expression 'half.denominator() == 2' is true
+expression 'xtl::rational_cast<double> (half) == 0.5' is true
+expression 'half + half == one' is true
+expression 'one - half == half' is true
+expression 'two * half == one' is true
+expression 'one / half == two' is true
+expression 'half + half == 1' is true
+expression '2 * half == one' is true
+expression '2 * half == 1' is true
+expression 'one / half == 2' is true
+expression '1 / half == 2' is true
+expression '-half == minus_half' is true
+expression 'abs(minus_half) == half' is true
+expression '2 * big == maxint' is true
+Bad rational, as expected: bad rational
