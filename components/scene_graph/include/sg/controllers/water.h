@@ -44,7 +44,7 @@ class Water: public Controller
     ~Water ();
     
   private:
-    void Update (float dt);
+    void Update (const TimeValue& dt);
     void OnNodeDetached ();
     void OnChangeSizes ();
 

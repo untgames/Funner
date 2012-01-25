@@ -4,7 +4,7 @@ struct MyUpdateHandler
 {
   MyUpdateHandler (Node* in_node) : node (in_node) {}
 
-  void operator () (float)
+  void operator () (const TimeValue&)
   {
     node->SetPosition (1.0f, 2.0f, 3.0f);
     node->SetPosition (1.0f, 2.0f, 3.0f);
@@ -28,7 +28,7 @@ int main ()
   node->AttachController (MyUpdateHandler (&*node));
   node->RegisterEventHandler (NodeEvent_AfterUpdate, &on_update_event);
   
-  node->Update (0.5f);
+  node->Update (TimeValue (1, 2));
 
   return 0;
 }

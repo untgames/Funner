@@ -50,7 +50,7 @@ class AlignWithNode: public Controller
     ~AlignWithNode ();
     
   private:
-    void Update (float dt);
+    void Update (const TimeValue& dt);
 
   private:
     struct Impl;

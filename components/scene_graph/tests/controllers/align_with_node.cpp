@@ -25,13 +25,14 @@ int main ()
 
   node1->SetOrientation (math::degree (90.f), math::degree (0.f), math::degree (0.f));
   
-  scene.Root ().Update (0.2f);
+  scene.Root ().Update (0);  
+  scene.Root ().Update (TimeValue (2, 10));
 
   printf ("node2 orientation is %f %f %f %f\n", node2->WorldOrientation ().x, node2->WorldOrientation ().y, node2->WorldOrientation ().z, node2->WorldOrientation ().w);
 
   mover1->Stop ();
 
-  scene.Root ().Update (0.1f);
+  scene.Root ().Update (TimeValue (3, 10));
 
   printf ("node2 orientation is %f %f %f %f\n", node2->WorldOrientation ().x, node2->WorldOrientation ().y, node2->WorldOrientation ().z, node2->WorldOrientation ().w);
 

@@ -1044,7 +1044,7 @@ struct Node::Impl
     Обновление состояния узла
 */
 
-  void UpdateNode (float dt)
+  void UpdateNode (const TimeValue& time)
   {
     static const char* METHOD_NAME = "scene_graph::Node::Impl::UpdateNode";
 
@@ -1060,7 +1060,7 @@ struct Node::Impl
       while (ControllerEntry* entry = iter.Next ())
       {
         if (entry->updatable)
-          entry->controller->UpdateState (dt);
+          entry->controller->UpdateState (time);
       }
       
       this_node->EndUpdate ();
@@ -2274,7 +2274,7 @@ xtl::com_ptr<const Controller> Node::LastController () const
     Обновление состояния узла и его потомков
 */
 
-void Node::Update (float dt, NodeTraverseMode mode)
+void Node::Update (const TimeValue& time, NodeTraverseMode mode)
 {  
     //проверка корректности аргументов
 
@@ -2286,7 +2286,7 @@ void Node::Update (float dt, NodeTraverseMode mode)
       break;
     case NodeTraverseMode_OnlyThis:
     case NodeTraverseMode_TopToBottom:
-      impl->UpdateNode (dt);
+      impl->UpdateNode (time);
       break;
     default:
       throw xtl::make_argument_exception ("scene_graph::Node::Update", "mode", mode);
@@ -2297,12 +2297,12 @@ void Node::Update (float dt, NodeTraverseMode mode)
     Impl::NodeUpdatablesIterator iter = this;    
     
     while (Node::Pointer node = iter.Next ())
-      node->Update (dt, mode);
+      node->Update (time, mode);
   }
   
   if (mode == NodeTraverseMode_BottomToTop)
   {
-    impl->UpdateNode (dt);
+    impl->UpdateNode (time);
   }
 
   if (!impl->HasUpdatables ())

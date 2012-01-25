@@ -10,7 +10,7 @@ class MyController
     MyController  (const MyController&) {}
     ~MyController () {}
 
-    void operator () (float dt) {}
+    void operator () (const TimeValue&) {}
 
   private:
     MyController& operator = (const MyController&); //no impl
@@ -30,7 +30,7 @@ class UnbindController
 
     ~UnbindController () {}
 
-    void operator () (float dt)
+    void operator () (const TimeValue&)
     {
       node_to_unbind->Unbind ();
     }

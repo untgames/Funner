@@ -47,8 +47,8 @@ DefaultController::Pointer DefaultController::Create (Node& node, const UpdateFu
     Обновление
 */
 
-void DefaultController::Update (float dt)
+void DefaultController::Update (const TimeValue& time)
 {
   if (impl->updater)
-    impl->updater (dt);
+    impl->updater (time);
 }

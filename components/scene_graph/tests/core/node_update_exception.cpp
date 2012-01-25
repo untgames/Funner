@@ -1,11 +1,11 @@
 #include "shared.h"
 
-void xtl_exception_updater (float dt)
+void xtl_exception_updater (const TimeValue&)
 {
   throw xtl::format_operation_exception ("my_updater", "test exception");
 }
 
-void exception_updater (float dt)
+void exception_updater (const TimeValue&)
 {
   throw "test exception";
 }
@@ -29,8 +29,8 @@ int main ()
   node->AttachController  (&xtl_exception_updater);
   node2->AttachController (&exception_updater);
 
-  node->Update (1.f);
-  node2->Update (1.f);
+  node->Update (1);
+  node2->Update (1);
 
   return 0;
 }

@@ -15,7 +15,7 @@ template <int I> class MyController: public Controller
       NodeOwnsController ();
     }
     
-    void Update (float)
+    void Update (const TimeValue&)
     {
       printf ("MyController<%d>::Update\n", I);
       
@@ -47,11 +47,11 @@ int main ()
   
   printf ("first update\n");
 
-  node->Update (0.5f);
+  node->Update (TimeValue (1, 2));
   
   printf ("second update\n");  
   
-  node->Update (0.5f);  
+  node->Update (TimeValue (1, 2));  
 
   return 0;
 }

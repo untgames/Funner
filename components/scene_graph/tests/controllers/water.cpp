@@ -9,7 +9,8 @@ int main ()
   
   height_map->SetCellsCount (128, 128);
   
-  height_map->Update (1.0f);
+  height_map->Update (0);
+  height_map->Update (1);
 
   return 0;
 }

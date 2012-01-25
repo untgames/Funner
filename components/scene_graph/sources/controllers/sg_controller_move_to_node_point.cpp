@@ -36,7 +36,7 @@ struct MoveToNodePoint::Impl
 */
 
 MoveToNodePoint::MoveToNodePoint (Node& node)
-  : Controller (node)
+  : Controller (node, ControllerTimeMode_Delta)
   , impl (new Impl (node))
   {}
 
@@ -112,10 +112,12 @@ void MoveToNodePoint::Stop ()
     Обновление
 */
 
-void MoveToNodePoint::Update (float dt)
+void MoveToNodePoint::Update (const TimeValue& time_value)
 {
   static const char* METHOD_NAME = "scene_graph::controllers::MoveToNodePoint::Update";
-
+  
+  float dt = time_value.cast<float> ();
+  
   if (!impl->node->Scene ())
     throw xtl::format_operation_exception (METHOD_NAME, "Can't move node, node is not attached to any scene");
 

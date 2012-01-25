@@ -12,7 +12,7 @@ class MyController: public Controller
       printf ("MyController::~MyController\n");
     }
   
-    void Update (float)
+    void Update (const TimeValue&)
     {
       AttachedNode ()->SetPosition (pos); 
     }
@@ -41,7 +41,7 @@ int main ()
     
     MyController::Pointer controller (new MyController (*node, pos), false);
 
-    node->Update (1.0f);
+    node->Update (1);
 
     dump_position (*node);
     

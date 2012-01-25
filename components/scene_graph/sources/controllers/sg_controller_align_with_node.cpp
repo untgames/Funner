@@ -43,9 +43,10 @@ struct AlignWithNode::Impl
 */
 
 AlignWithNode::AlignWithNode (Node& node)
-  : Controller (node)
+  : Controller (node, ControllerTimeMode_Delta)
   , impl (new Impl (node))
-  {}
+{
+}
 
 AlignWithNode::~AlignWithNode ()
 {
@@ -99,9 +100,11 @@ void AlignWithNode::Stop ()
     Обновление
 */
 
-void AlignWithNode::Update (float dt)
+void AlignWithNode::Update (const TimeValue& time_value)
 {
   static const char* METHOD_NAME = "scene_graph::controllers::AlignWithNode::Update";
+  
+  float dt = time_value.cast<float> ();
 
   if (!impl->target_node)
     return;

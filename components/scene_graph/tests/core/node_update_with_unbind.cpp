@@ -1,6 +1,6 @@
 #include "shared.h"
 
-template <int id> void my_updater (float)
+template <int id> void my_updater (const TimeValue&)
 {
   printf ("my_updater%d\n", id);
 }
@@ -46,11 +46,11 @@ int main ()
 
   printf ("update with unbind child2\n");
   
-  parent->Update (0.5f);
+  parent->Update (TimeValue (1, 2));
   
   printf ("second update\n");  
   
-  parent->Update (0.5f);      
+  parent->Update (TimeValue (1, 2));
 
   return 0;
 }

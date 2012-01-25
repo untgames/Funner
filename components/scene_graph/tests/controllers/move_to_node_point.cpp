@@ -25,14 +25,15 @@ int main ()
   mover1->Start (&scene.Root (), math::vec3f (10, 0, 0));
   mover2->Start (node1, math::vec3f (0, 10, 0));
   
-  scene.Root ().Update (1.0f);
+  scene.Root ().Update (0);  
+  scene.Root ().Update (1);
 
   printf ("node1 position is %f %f %f, node2 position is %f %f %f\n", node1->WorldPosition ().x, node1->WorldPosition ().y, node1->WorldPosition ().z, node2->WorldPosition ().x, node2->WorldPosition ().y, node2->WorldPosition ().z);
 
   mover1->Stop ();
   mover2->Stop ();
 
-  scene.Root ().Update (1.0f);
+  scene.Root ().Update (2);
 
   printf ("node1 position is %f %f %f, node2 position is %f %f %f\n", node1->WorldPosition ().x, node1->WorldPosition ().y, node1->WorldPosition ().z, node2->WorldPosition ().x, node2->WorldPosition ().y, node2->WorldPosition ().z);
 

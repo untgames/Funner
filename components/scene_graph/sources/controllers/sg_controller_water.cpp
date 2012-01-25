@@ -46,7 +46,7 @@ struct Water::Impl
 */
 
 Water::Water (HeightMap& map)
-  : Controller (map)
+  : Controller (map, ControllerTimeMode_Delta)
   , impl (new Impl (map))
 {
   map.RegisterEventHandler (HeightMapEvent_OnSizesUpdate, xtl::bind (&Water::OnChangeSizes, this));
@@ -85,10 +85,12 @@ float Water::Viscosity () const
     Обновление
 */
 
-void Water::Update (float dt)
+void Water::Update (const TimeValue& time_value)
 {
   if (!impl->prev_field || !impl->next_field || !impl->height_map)
     return;
+    
+  float dt = time_value.cast<float> ();  
     
   impl->current_dt += dt;
   

@@ -45,7 +45,7 @@ struct LookToNodePoint::Impl
 */
 
 LookToNodePoint::LookToNodePoint (Node& node)
-  : Controller (node)
+  : Controller (node, ControllerTimeMode_Delta)
   , impl (new Impl (node))
   {}
 
@@ -101,9 +101,11 @@ void LookToNodePoint::Stop ()
     Обновление
 */
 
-void LookToNodePoint::Update (float dt)
+void LookToNodePoint::Update (const TimeValue& time_value)
 {
   static const char* METHOD_NAME = "scene_graph::controllers::LookToNodePoint::Update";
+  
+  float dt = time_value.cast<float> ();    
 
   if (!impl->node->Scene ())
     throw xtl::format_operation_exception (METHOD_NAME, "Can't look to node, node is not attached to any scene");

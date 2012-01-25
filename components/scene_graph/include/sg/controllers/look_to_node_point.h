@@ -49,7 +49,7 @@ class LookToNodePoint: public Controller
     ~LookToNodePoint ();
     
   private:
-    void Update (float dt);
+    void Update (const TimeValue& dt);
 
   private:
     struct Impl;
