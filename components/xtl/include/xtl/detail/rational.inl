@@ -377,8 +377,14 @@ inline rational<I> abs (const rational<I>& r)
     Приведение типов
 */
 
+template <class I> template <class T>
+inline T rational<I>::cast () const
+{
+  return static_cast<T> (n) / d;
+}
+
 template <class T, class I>
 inline T rational_cast (const rational<I>& r)
 {
-  return static_cast<T> (r.numerator ()) / r.denominator ();
+  return r.cast<T> ();
 }
