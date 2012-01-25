@@ -1,0 +1,7 @@
+Results of controller3_test:
+MyController<1>:
+  value=1
+  value=3
+MyController<2>:
+  value=2
+  value=4

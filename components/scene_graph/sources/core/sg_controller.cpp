@@ -44,6 +44,18 @@ Controller::Controller (scene_graph::Node& node, bool updatable)
     node.AttachController (impl->entry);
 
     impl->node = &node;
+    
+    switch (ControllerOwnerMode_Default)
+    {
+      case ControllerOwnerMode_NodeOwnsController:
+        NodeOwnsController ();
+        break;
+      case ControllerOwnerMode_ControllerOwnsNode:
+        ControllerOwnsNode ();
+        break;
+      default:
+        break;      
+    }
   }
   catch (xtl::exception& e)
   {

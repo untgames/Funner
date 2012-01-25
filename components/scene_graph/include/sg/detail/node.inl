@@ -79,3 +79,39 @@ inline bool Node::TryAccept (T& visited, Visitor& visitor)
 
   return !is_not_processed;
 }
+
+/*
+    Перебор контроллеров
+*/
+
+template <class T>
+inline xtl::com_ptr<T> Node::FirstController ()
+{
+  for (xtl::com_ptr<Controller> i=FirstController (); i; i=i->NextController ())
+    if (T* casted_controller = dynamic_cast<T*> (&*i))
+      return casted_controller;
+      
+  return xtl::com_ptr<T> ();
+}
+
+template <class T>
+inline xtl::com_ptr<T> Node::LastController ()
+{
+  for (xtl::com_ptr<Controller> i=LastController (); i; i=i->PrevController ())
+    if (T* casted_controller = dynamic_cast<T*> (&*i))
+      return casted_controller;
+      
+  return xtl::com_ptr<T> ();
+}
+
+template <class T>
+inline xtl::com_ptr<const T> Node::FirstController () const
+{
+  return const_cast<Node&> (*this).FirstController<T> ();
+}
+
+template <class T>
+inline xtl::com_ptr<const T> Node::LastController () const
+{
+  return const_cast<Node&> (*this).LastController<T> ();
+}

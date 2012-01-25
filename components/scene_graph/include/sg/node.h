@@ -383,10 +383,10 @@ class Node: public xtl::dynamic_cast_root
     xtl::com_ptr<const Controller> FirstController () const;
     xtl::com_ptr<const Controller> LastController  () const;
 
-    template <class T> typename T::Pointer      FirstController ();
-    template <class T> typename T::Pointer      LastController  ();
-    template <class T> typename T::ConstPointer FirstController () const;
-    template <class T> typename T::ConstPointer LastController  () const;
+    template <class T> xtl::com_ptr<T>       FirstController ();
+    template <class T> xtl::com_ptr<T>       LastController  ();
+    template <class T> xtl::com_ptr<const T> FirstController () const;
+    template <class T> xtl::com_ptr<const T> LastController  () const;
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Обновление состояния узла и его потомков

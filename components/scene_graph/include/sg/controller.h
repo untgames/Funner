@@ -85,10 +85,10 @@ class Controller: public xtl::dynamic_cast_root
     ConstPointer NextController () const;
     ConstPointer PrevController () const;
 
-    template <class T> typename T::Pointer      NextController ();
-    template <class T> typename T::Pointer      PrevController ();
-    template <class T> typename T::ConstPointer NextController () const;
-    template <class T> typename T::ConstPointer PrevController () const;        
+    template <class T> xtl::com_ptr<T>       NextController ();
+    template <class T> xtl::com_ptr<T>       PrevController ();
+    template <class T> xtl::com_ptr<const T> NextController () const;
+    template <class T> xtl::com_ptr<const T> PrevController () const;
 
   protected:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -179,6 +179,8 @@ class DefaultController: public Controller
 };
 
 }
+
+#include <sg/detail/controller.inl>
 
 }
 
