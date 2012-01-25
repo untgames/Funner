@@ -1,8 +1,6 @@
 Node не зависит от SceneManager
 Добавить Entity::IsVisible/SetVisible
 
-Возможно сделать один таймер на сцену и Scene::Update (t, dt)
-
 SceneManager::PlayAnimation (const char* name, Node& root_node)
 
 Trigger

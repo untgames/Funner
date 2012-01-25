@@ -17,7 +17,7 @@ enum ControllerOwnerMode
   ControllerOwnerMode_ControllerOwnsNode, //контроллер владеет узлом
   ControllerOwnerMode_NodeOwnsController, //узел владеет контроллером
   
-  ControllerOwnerMode_Default = ControllerOwnerMode_None
+  ControllerOwnerMode_Default = ControllerOwnerMode_NodeOwnsController
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

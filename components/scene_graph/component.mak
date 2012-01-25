@@ -11,7 +11,7 @@ SCENE_GRAPH.CORE.SOURCES.SOURCE_DIRS      := sources/core sources/screen sources
 SCENE_GRAPH.CORE.SOURCES.LIB_DIRS         :=  
 SCENE_GRAPH.CORE.SOURCES.LIBS             :=
 SCENE_GRAPH.CORE.SOURCES.COMPILER_DEFINES :=  
-SCENE_GRAPH.CORE.SOURCES.IMPORTS          := compile.scene_graph.core compile.common
+SCENE_GRAPH.CORE.SOURCES.IMPORTS          := compile.scene_graph.core compile.common compile.media.rms
 SCENE_GRAPH.CORE.SOURCES.msvc.COMPILER_CFLAGS  := -wd4355
 
 #Öåëü ¹2 - SG tests
