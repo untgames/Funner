@@ -180,10 +180,17 @@ class CurlStream: public IUrlStream
           check_code (curl_easy_setopt (stream, CURLOPT_DEBUGFUNCTION, &DebugCallback), "::curl_easy_setopt(CURLOPT_DEBUGFUNCTION)");
           check_code (curl_easy_setopt (stream, CURLOPT_DEBUGDATA, this), "::curl_easy_setopt(CURLOPT_DEBUGDATA)");
           check_code (curl_easy_setopt (stream, CURLOPT_VERBOSE, 1L), "::curl_easy_setopt(CURLOPT_VERBOSE)");
+          check_code (curl_easy_setopt (stream, CURLOPT_SSL_VERIFYPEER, false), "::curl_easy_setopt(CURLOPT_SSL_VERIFYPEER)");
+          check_code (curl_easy_setopt (stream, CURLOPT_CONNECTTIMEOUT, 300), "::curl_easy_setopt(CURLOPT_CONNECTTIMEOUT)");                    
           
             //конфигурация соединения, зависящая от параметров
             
-          curl_slist* post_chunk = 0;
+          curl_slist* http_header = 0;
+          
+          http_header = curl_slist_append (http_header, "Expect:");
+          
+          if (!http_header)
+            throw xtl::format_operation_exception ("", "::curl_slist_append failed");                          
             
           if (properties.IsPresent ("method"))
           {
@@ -195,32 +202,27 @@ class CurlStream: public IUrlStream
               
               if (properties.IsPresent ("send_size"))
               {
-                check_code (curl_easy_setopt (stream, CURLOPT_POSTFIELDSIZE, static_cast<size_t> (properties.GetInteger ("send_size"))), "::curl_easy_setopt(CURLOPT_POSTFIELDSIZE)");
-                
-                post_chunk = curl_slist_append (post_chunk, "Expect:");
-                
-                if (!post_chunk)
-                  throw xtl::format_operation_exception ("", "::curl_slist_append failed");                
+                check_code (curl_easy_setopt (stream, CURLOPT_POSTFIELDSIZE, static_cast<size_t> (properties.GetInteger ("send_size"))), "::curl_easy_setopt(CURLOPT_POSTFIELDSIZE)");                
               }
               else
               {
-                post_chunk = curl_slist_append (post_chunk, "Transfer-Encoding: chunked");
+                http_header = curl_slist_append (http_header, "Transfer-Encoding: chunked");
                 
-                if (!post_chunk)
+                if (!http_header)
                   throw xtl::format_operation_exception ("", "::curl_slist_append failed");
-              }
-              
-              if (post_chunk)
-                check_code (curl_easy_setopt (stream, CURLOPT_HTTPHEADER, post_chunk), "curl_easy_setopt(CURLOPT_HTTPHEADER");
+              }              
             }
           }
+          
+          if (http_header)
+            check_code (curl_easy_setopt (stream, CURLOPT_HTTPHEADER, http_header), "curl_easy_setopt(CURLOPT_HTTPHEADER");          
 
             //запуск соединения
 
           check_code (curl_easy_perform (stream), "::curl_perform");
 
-          if (post_chunk)
-            curl_slist_free_all (post_chunk);
+          if (http_header)
+            curl_slist_free_all (http_header);
           
           log.Printf ("URL '%s' received", url.c_str ());
           
@@ -466,6 +468,7 @@ class CurlStreamManagerComponent
     CurlStreamManagerComponent ()    
     {
       UrlStreamManager::RegisterStreamCreator ("http://*", &CurlStreamManagerComponent::CreateStream);
+      UrlStreamManager::RegisterStreamCreator ("https://*", &CurlStreamManagerComponent::CreateStream);      
       UrlStreamManager::RegisterStreamCreator ("ftp://*", &CurlStreamManagerComponent::CreateStream);
     }
     

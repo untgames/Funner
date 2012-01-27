@@ -464,8 +464,10 @@ class UrlFileSystemComponent
     UrlFileSystemComponent ()    
     {
       common::FileSystem::MountLink ("http://", "/inet/http");
+      common::FileSystem::MountLink ("https://", "/inet/https");
       common::FileSystem::MountLink ("ftp://", "/inet/ftp");
       common::FileSystem::Mount     ("/inet/http", xtl::com_ptr<ICustomFileSystem> (new UrlCustomFileSystem ("http://"), false).get ());
+      common::FileSystem::Mount     ("/inet/https", xtl::com_ptr<ICustomFileSystem> (new UrlCustomFileSystem ("https://"), false).get ());
       common::FileSystem::Mount     ("/inet/ftp", xtl::com_ptr<ICustomFileSystem> (new UrlCustomFileSystem ("ftp://"), false).get ());
     }
 };
