@@ -78,6 +78,7 @@
 
 /* Define if you have the <ssl.h> header file.  */
 /* #define HAVE_SSL_H 1 */
+#define HAVE_SSL_H 1
 
 /* Define if you have the <stdlib.h> header file.  */
 #define HAVE_STDLIB_H 1
