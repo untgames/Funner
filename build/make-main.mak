@@ -432,8 +432,6 @@ define process_source_dir
     $$(foreach profile,$(PROFILES),$$(eval $$(MODULE_NAME).SOURCE_FILES := $$($$(MODULE_NAME).SOURCE_FILES) $$(SOURCE_FILES.$$(profile))))        
 
     $$(MODULE_NAME).SOURCE_FILES := $$(wildcard $$(SOURCE_FILES:%=$2/%)) $$(wildcard $$($$(MODULE_NAME).SOURCE_FILES:%=$2/%)) $$(GENERATED_SOURCE_FILES)
-    
-    $$(warning $$($$(MODULE_NAME).SOURCE_FILES))    
   else
     $$(MODULE_NAME).SOURCE_FILES := $$(wildcard $$(SOURCE_FILES_SUFFIXES:%=$2/*.%))
   endif  
