@@ -5,10 +5,7 @@
 #include <math/matrix.h>
 #include <math/quat.h>
 
-#include <xtl/functional_fwd>
-#include <xtl/dynamic_cast_root.h>
-#include <xtl/intrusive_ptr.h>
-#include <xtl/rational.h>
+#include <sg/controller.h>
 
 namespace common
 {
@@ -24,23 +21,6 @@ namespace scene_graph
 //forward declarations
 class Scene;
 class Node;
-class Controller;
-
-//implementation forwards
-struct ControllerEntry;
-
-namespace controllers
-{
-
-//forward declaration
-class DefaultController;
-
-}
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Значение времени, используемое при обновлениях
-///////////////////////////////////////////////////////////////////////////////////////////////////
-typedef xtl::rational<size_t> TimeValue;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Режим присоединения
@@ -371,9 +351,9 @@ class Node: public xtl::dynamic_cast_root
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Присоединение контроллера
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    typedef xtl::function<void (const TimeValue& time)> UpdateHandler;
+    typedef controllers::DefaultController::UpdateFunction UpdateFunction;
 
-    xtl::com_ptr<controllers::DefaultController> AttachController (const UpdateHandler&);
+    xtl::com_ptr<controllers::DefaultController> AttachController (const UpdateFunction&);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Перебор контроллеров

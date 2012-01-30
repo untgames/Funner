@@ -3,10 +3,24 @@
 
 #include <stl/auto_ptr.h>
 
-#include <sg/node.h>
+#include <xtl/dynamic_cast_root.h>
+#include <xtl/functional_fwd>
+#include <xtl/intrusive_ptr.h>
+#include <xtl/rational.h>
 
 namespace scene_graph
 {
+
+//forward declaration
+class Node;
+
+//implementation forwards
+struct ControllerEntry;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Значение времени, используемое при обновлениях
+///////////////////////////////////////////////////////////////////////////////////////////////////
+typedef xtl::rational<size_t> TimeValue;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Режим владения
@@ -147,9 +161,9 @@ namespace controllers
 class DefaultController: public Controller
 {
   public:
-    typedef xtl::com_ptr<DefaultController>       Pointer;
-    typedef xtl::com_ptr<const DefaultController> ConstPointer;
-    typedef Node::UpdateHandler                   UpdateFunction;
+    typedef xtl::com_ptr<DefaultController>             Pointer;
+    typedef xtl::com_ptr<const DefaultController>       ConstPointer;
+    typedef xtl::function<void (const TimeValue& time)> UpdateFunction;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Создание контроллера

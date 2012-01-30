@@ -465,7 +465,7 @@ struct Node::Impl
 
       //оповещение всех потомков о необходимости пересчёта мировых преобразований
 
-    NodeChildrenIterator iter = this_node;
+    NodeChildrenIterator iter (this_node);
 
     while (Node::Pointer node = iter.Next ())
       node->impl->UpdateWorldTransformNotify ();
@@ -858,7 +858,7 @@ struct Node::Impl
     
       //обновление сцены в потомках
 
-    NodeChildrenIterator iter = this_node;      
+    NodeChildrenIterator iter (this_node);
     
     while (Node::Pointer node = iter.Next ())
       node->impl->SetScene (scene);
@@ -938,7 +938,7 @@ struct Node::Impl
       
       //оповещаем о возникновении события относительно всех потомков child
 
-    NodeChildrenIterator iter = &child;
+    NodeChildrenIterator iter (&child);
     
     while (Node::Pointer node = iter.Next ())
       Notify (*node, event);
@@ -1055,7 +1055,7 @@ struct Node::Impl
     {
       this_node->BeginUpdate ();
 
-      ControllerIterator iter = this_node;
+      ControllerIterator iter (this_node);
       
       while (ControllerEntry* entry = iter.Next ())
       {
@@ -1404,7 +1404,7 @@ void Node::Traverse (const TraverseFunction& fn, NodeTraverseMode mode) const
 
   if (mode != NodeTraverseMode_OnlyThis)
   {
-    Impl::NodeChildrenIterator iter = const_cast<Node*> (this); 
+    Impl::NodeChildrenIterator iter (const_cast<Node*> (this));
     
     while (Node::Pointer node = iter.Next ())
       node->Traverse (fn, mode);
@@ -1431,7 +1431,7 @@ void Node::Traverse (INodeTraverser& traverser, NodeTraverseMode mode) const
 
   if (mode != NodeTraverseMode_OnlyThis)
   {
-    Impl::NodeChildrenIterator iter = const_cast<Node*> (this);
+    Impl::NodeChildrenIterator iter (const_cast<Node*> (this));
     
     while (Node::Pointer node = iter.Next ())
       node->Traverse (traverser, mode);
@@ -1458,7 +1458,7 @@ void Node::VisitEach (Visitor& visitor, NodeTraverseMode mode) const
 
   if (mode != NodeTraverseMode_OnlyThis)
   {
-    Impl::NodeChildrenIterator iter = const_cast<Node*> (this);
+    Impl::NodeChildrenIterator iter (const_cast<Node*> (this));
     
     while (Node::Pointer node = iter.Next ())
       node->VisitEach (visitor, mode);
@@ -2173,7 +2173,7 @@ void Node::SetScene (scene_graph::Scene* in_scene)
     Присоединение / отсоединение контроллера
 */
 
-xtl::com_ptr<controllers::DefaultController> Node::AttachController (const UpdateHandler& updater)
+xtl::com_ptr<controllers::DefaultController> Node::AttachController (const UpdateFunction& updater)
 {
   return controllers::DefaultController::Create (*this, updater);
 }
@@ -2294,7 +2294,7 @@ void Node::Update (const TimeValue& time, NodeTraverseMode mode)
   
   if (mode != NodeTraverseMode_OnlyThis && impl->first_updatable_child)
   {
-    Impl::NodeUpdatablesIterator iter = this;    
+    Impl::NodeUpdatablesIterator iter (this);
     
     while (Node::Pointer node = iter.Next ())
       node->Update (time, mode);

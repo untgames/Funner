@@ -1,7 +1,7 @@
 #ifndef SCENE_GRAPH_CONTROLLERS_ALIGN_WITH_NODE_HEADER
 #define SCENE_GRAPH_CONTROLLERS_ALIGN_WITH_NODE_HEADER
 
-#include <sg/controller.h>
+#include <sg/node.h>
 
 namespace scene_graph
 {
