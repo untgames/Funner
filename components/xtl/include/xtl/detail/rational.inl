@@ -75,7 +75,7 @@ inline rational<I>& rational<I>::operator += (const rational& r)
 {
   if (d == r.d)
   {
-    n += r.n  
+    n += r.n;
   }
   else
   {
@@ -91,7 +91,7 @@ inline rational<I>& rational<I>::operator -= (const rational& r)
 {
   if (d == r.d)
   {
-    n -= r.n  
+    n -= r.n;
   }
   else
   {
@@ -386,5 +386,5 @@ inline T rational<I>::cast () const
 template <class T, class I>
 inline T rational_cast (const rational<I>& r)
 {
-  return r.cast<T> ();
+  return r.template cast<T> ();
 }
