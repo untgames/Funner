@@ -2,6 +2,9 @@
 
 stl::wstring towstring (const TextLine& line)
 {
+  if (sizeof (wchar_t) == 4)
+    return stl::wstring ((const wchar_t*)line.TextUtf32 (), line.TextLength ());
+
   stl::wstring result;
   
   result.fast_resize (line.TextLength ());

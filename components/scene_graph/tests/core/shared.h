@@ -124,6 +124,9 @@ inline void dump_scale (Node& node)
 
 stl::basic_string<unsigned int> toutf32 (const wchar_t* string)
 {
+  if (sizeof (wchar_t) == 4)
+    return stl::basic_string<unsigned int> ((const unsigned int*)string);
+
   stl::basic_string<unsigned int> result;
   
   result.fast_resize (xtl::xstrlen (string));
