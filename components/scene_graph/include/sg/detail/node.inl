@@ -53,7 +53,7 @@ inline void swap (NodeUpdateLock& a, NodeUpdateLock& b)
 }
 
 /*
-    Попытка посещения объекта
+    ╧юя√Єър яюёх∙хэш  юс·хъЄр
 */
 
 namespace detail
@@ -81,7 +81,7 @@ inline bool Node::TryAccept (T& visited, Visitor& visitor)
 }
 
 /*
-    Перебор контроллеров
+    ╧хЁхсюЁ ъюэЄЁюыыхЁют
 */
 
 template <class T>
