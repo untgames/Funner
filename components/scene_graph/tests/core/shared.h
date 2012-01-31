@@ -25,6 +25,7 @@
 #include <sg/listener.h>
 #include <sg/node.h>
 #include <sg/node_array.h>
+#include <sg/page_curl.h>
 #include <sg/particle_emitter.h>
 #include <sg/physics.h>
 #include <sg/scene.h>
