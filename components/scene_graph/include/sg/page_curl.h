@@ -99,6 +99,9 @@ class PageCurl : public Entity
     void                SetGridSize                      (const math::vec2ui& size);  //детализация разбиения сетки
     void                SetGridSize                      (size_t x, size_t y);
     const math::vec2ui& GridSize                         () const;
+    void                SetPageColor                     (const math::vec3f& color);  //цвет страницы
+    void                SetPageColor                     (float red, float green, float blue);
+    const math::vec3f&  PageColor                        () const;
     void                SetCornerShadowOffset            (float shadow_offset);       //смещение тени от угла
     float               CornerShadowOffset               () const;
     void                SetShadowWidth                   (float width);               //ширина тени
