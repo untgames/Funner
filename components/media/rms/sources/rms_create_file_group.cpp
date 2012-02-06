@@ -37,12 +37,15 @@ void process_resource_list_file (const char* file_name, Group& result)
           break;
       }
 
-    ParseNode root = parser.Root ().First ("ResourceList.#text");
-    
-    if (!root)
-      throw xtl::format_operation_exception ("", "'ResourceList' root node not found");
+    ParseNode root = parser.Root ().First ("ResourceList");
 
-    process_resource_list (root.AttributesCount (), root.Attributes (), result);
+    if (!root)
+      throw xtl::format_operation_exception ("", "'ResourceList' root node not found");      
+
+    root = root.First ("#text");
+
+    if (root)
+      process_resource_list (root.AttributesCount (), root.Attributes (), result);
   }
   catch (xtl::exception& exception)
   {
