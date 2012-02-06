@@ -49,6 +49,16 @@ inline void copy_matrix_from (const PropertyMap& map, size_t property_index, mat
 
 }
 
+inline void copy_from (const PropertyMap& map, size_t property_index, stl::string& value)
+{
+  map.GetProperty (property_index, value);
+}
+
+inline void copy_from (const PropertyMap& map, size_t property_index, const char*& value)
+{
+  value = map.GetString (property_index);
+}
+
 inline void copy_from (const PropertyMap& map, size_t property_index, signed char& value)
 {
   detail::copy_integer_from (map, property_index, value);
@@ -159,6 +169,16 @@ inline void copy_value_to (const T& value, PropertyMap& map, size_t property_ind
   map.SetProperty (property_index, static_cast<CastT> (value));
 }
 
+}
+
+inline void copy_to (const char* value, PropertyMap& map, size_t property_index)
+{
+  map.SetProperty (property_index, value);
+}
+
+inline void copy_to (const stl::string& value, PropertyMap& map, size_t property_index)
+{
+  map.SetProperty (property_index, value.c_str ());
 }
 
 inline void copy_to (signed char value, PropertyMap& map, size_t property_index)
@@ -295,6 +315,30 @@ template <class T> struct SetterValueType<volatile T> { typedef typename SetterV
 
 template <class Fn>            struct SetterArgType             { typedef typename SetterValueType<typename Fn::arg1_type>::Type Type; };
 template <class Ret, class T>  struct SetterArgType<Ret (*)(T)> { typedef T Type; };
+
+template <class Ret, class C, class FRet, class A1, class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8, class T9>
+struct SetterArgType<xtl::detail::binder<Ret, FRet (C::*)(A1), T1, T2, T3, T4, T5, T6, T7, T8, T9> >
+{
+  typedef typename SetterValueType<A1>::Type Type;
+};
+
+template <class Ret, class C, class FRet, class A1, class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8, class T9>
+struct SetterArgType<xtl::detail::binder<Ret, FRet (C::*)(A1) const, T1, T2, T3, T4, T5, T6, T7, T8, T9> >
+{
+  typedef typename SetterValueType<A1>::Type Type;
+};
+
+template <class Ret, class C, class FRet, class A1, class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8, class T9>
+struct SetterArgType<xtl::detail::binder<Ret, FRet (C::*)(A1) volatile, T1, T2, T3, T4, T5, T6, T7, T8, T9> >
+{
+  typedef typename SetterValueType<A1>::Type Type;
+};
+
+template <class Ret, class C, class FRet, class A1, class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8, class T9>
+struct SetterArgType<xtl::detail::binder<Ret, FRet (C::*)(A1) const volatile, T1, T2, T3, T4, T5, T6, T7, T8, T9> >
+{
+  typedef typename SetterValueType<A1>::Type Type;
+};
 
 template <class Fn>
 class PropertySetter: public IPropertySetter

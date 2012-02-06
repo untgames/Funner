@@ -1,7 +1,23 @@
 #ifndef COMMON_PROPERTY_BINDING_MAP_HEADER
 #define COMMON_PROPERTY_BINDING_MAP_HEADER
 
+#include <stl/string_fwd>
+
 #include <common/property_map.h>
+
+namespace xtl
+{
+
+namespace detail
+{
+
+//forward declaration
+template <class Ret, class Fn, class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8, class T9>
+struct binder;
+
+}
+
+}
 
 namespace common
 {
@@ -138,13 +154,18 @@ class PropertyBindingMap
     size_t AddProperty (const char* name, const common::PropertyBinding&);
     
     template <class GetterFn>
-    size_t AddProperty (const char* name, const GetterFn& getter);
+    size_t AddProperty (const char*     name,    //property name
+                        const GetterFn& getter); //signature like <T ()>
     
     template <class GetterFn, class SetterFn>
-    size_t AddProperty (const char* name, const GetterFn& getter, const SetterFn& setter);    
+    size_t AddProperty (const char*     name,    //property name
+                        const GetterFn& getter,  //signature like <T ()>
+                        const SetterFn& setter); //signature like <void (const T& value)>
     
     template <class Value, class GetterFn, class SetterFn>
-    size_t AddProperty (const char* name, const GetterFn& getter, const SetterFn& setter);
+    size_t AddProperty (const char*     name,    //property name
+                        const GetterFn& getter,  //signature like <T ()>
+                        const SetterFn& setter); //signature like <void (const T& value)>
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///”даление свойств
@@ -238,6 +259,8 @@ void swap (PropertyBindingMapSynchronizer&, PropertyBindingMapSynchronizer&);
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 /// опирование значени€ свойства из PropertyMap в переменную указанного типа
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+void copy_from (const PropertyMap& map, size_t property_index, stl::string& value);
+void copy_from (const PropertyMap& map, size_t property_index, const char*& value);
 void copy_from (const PropertyMap& map, size_t property_index, signed char& value);
 void copy_from (const PropertyMap& map, size_t property_index, unsigned char& value);
 void copy_from (const PropertyMap& map, size_t property_index, short& value);
@@ -274,6 +297,8 @@ void copy_from (const PropertyMap& map, size_t property_index, math::quat<T>& va
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 /// опирование значени€ свойства из переменной указанного типа в PropertyMap
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+void copy_to (const char* value, PropertyMap& map, size_t property_index);
+void copy_to (const stl::string& value, PropertyMap& map, size_t property_index);
 void copy_to (signed char value, PropertyMap& map, size_t property_index);
 void copy_to (unsigned char value, PropertyMap& map, size_t property_index);
 void copy_to (short value, PropertyMap& map, size_t property_index);

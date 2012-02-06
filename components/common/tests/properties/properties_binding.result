@@ -1,0 +1,14 @@
+Results of property_binding_test:
+copy to property map:
+map has 2 properties:
+ #0: name='ConstString', type=string, value='hello world'
+ #1: name='Id', type=integer, value='0'
+A.id=3
+copy vectors:
+map has 3 properties:
+ #0: name='ConstString', type=string, value='hello world'
+ #1: name='Id', type=integer, value='3'
+ #2: name='Vec', type=vector, value='0 0 0 0'
+A.vec=[2.00 2.00 2.00]
+set string
+set_string(test)

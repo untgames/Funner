@@ -1,0 +1,10 @@
+Results of property_binding_synchronizer_test:
+copy to property map:
+map has 3 properties:
+ #0: name='ConstString', type=string, value='hello world'
+ #1: name='Id', type=integer, value='0'
+ #2: name='Vec', type=vector, value='0 0 0 0'
+copy from property map:
+set_string(test)
+A.id=3
+A.vec=[2.00 2.00 2.00]
