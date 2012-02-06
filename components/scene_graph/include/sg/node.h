@@ -12,6 +12,7 @@ namespace common
 
 //forward declaration
 class PropertyMap;
+class PropertyBindingMap;
 
 }
 
@@ -152,6 +153,12 @@ class Node: public xtl::dynamic_cast_root
     const common::PropertyMap* Properties    () const;
     void                       SetProperties (common::PropertyMap* properties);
     void                       SetProperties (const common::PropertyMap& properties);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Связывание свойств узла с методами узла
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    const common::PropertyBindingMap& PropertyBindings () const;
+          common::PropertyBindingMap& PropertyBindings ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Подсчёт ссылок
@@ -377,7 +384,7 @@ class Node: public xtl::dynamic_cast_root
 ///Работа с контроллерами (for internal use)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void AttachController     (ControllerEntry&);
-    void DetachController     (ControllerEntry&);
+    void DetachController     (ControllerEntry&);    
     void UpdateControllerList ();
 
   protected:
@@ -401,6 +408,11 @@ class Node: public xtl::dynamic_cast_root
 ///Метод, вызываемый при посещении данного узла
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     virtual void AcceptCore (Visitor&);
+    
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Связывание свойств узла с методами узла
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    virtual void BindProperties (common::PropertyBindingMap& bindings);
 
   private:
 ///////////////////////////////////////////////////////////////////////////////////////////////////

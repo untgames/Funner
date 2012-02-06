@@ -95,10 +95,35 @@ void affine_decompose (const math::mat4f& matrix, math::vec3f& position, math::q
   rotation = normalize (to_quat (m));
 }
 
+void set_local_tm (Node* node, const math::mat4f& tm)
+{
+  math::vec3f position, scale;
+  math::quatf rotation;
+  
+  affine_decompose (tm, position, rotation, scale);
+  
+  node->SetOrientation (rotation);
+  node->SetScale       (scale);
+  node->SetPosition    (position);
+}
+
+void set_world_tm (Node* node, const math::mat4f& tm)
+{
+  math::vec3f position, scale;
+  math::quatf rotation;
+  
+  affine_decompose (tm, position, rotation, scale);
+  
+  node->SetWorldOrientation (rotation);
+  node->SetWorldScale       (scale);
+  node->SetWorldPosition    (position);
+}
+
 typedef stl::auto_ptr<Pivot>                                                  PivotPtr;
 typedef xtl::signal<void (Node& sender, NodeEvent event)>                     NodeSignal;
 typedef xtl::signal<void (Node& sender, Node& child, NodeSubTreeEvent event)> SubTreeNodeSignal;
 typedef stl::auto_ptr<common::PropertyMap>                                    PropertyMapPtr;
+typedef stl::auto_ptr<common::PropertyBindingMap>                             PropertyBindingMapPtr;
 
 }
 
@@ -111,50 +136,51 @@ struct Node::Impl
   class NodeIterator;
   class ControllerIterator;
 
-  scene_graph::Scene* scene;                            //сцена, которой принадлежит объект
-  stl::string         name;                             //имя узла
-  size_t              name_hash;                        //хэш имени
-  size_t              ref_count;                        //количество ссылок на узел
-  Node*               this_node;                        //текущий узел
-  Node*               parent;                           //родительский узел
-  Node*               first_child;                      //первый потомок
-  Node*               last_child;                       //последний потомок
-  Node*               prev_child;                       //предыдущий потомок
-  Node*               next_child;                       //следующий потомок
-  bool                bind_lock;                        //флаг блокировки на вызов BindToParent
-  bool                need_release_at_unbind;           //нужно ли уменьшать счётчик ссылок узла при отсоединении от родителя
-  NodeSignal          signals [NodeEvent_Num];          //сигналы
-  bool                signal_process [NodeEvent_Num];   //флаги обработки сигналов
-  SubTreeNodeSignal   subtree_signals [NodeSubTreeEvent_Num]; //сигналы событий, возникающих в узлах-потомках
-  bool                subtree_signal_process [NodeSubTreeEvent_Num]; //флаги обработки сигналов, возникающих в узлах потомках
-  PivotPtr            pivot;                            //центр объекта
-  vec3f               local_position;                   //локальное положение
-  quatf               local_orientation;                //локальная ориентация
-  vec3f               local_scale;                      //локальный масштаб
-  mat4f               local_tm;                         //матрица локальных преобразований
-  vec3f               world_position;                   //мировое положение
-  quatf               world_orientation;                //мировая ориентация
-  vec3f               world_scale;                      //мировой масштаб
-  mat4f               world_tm;                         //матрица мировых преобразований
-  bool                orientation_inherit;              //флаг наследования родительской ориентации
-  bool                scale_inherit;                    //флаг наследования родительского масштаба
-  bool                need_world_transform_update;      //флаг, сигнализирующий о необходимости пересчёта мировых преобразований
-  bool                need_world_tm_update;             //флаг, сигнализирующий о необходимости пересчёта матрицы мировых преобразований
-  bool                need_local_tm_update;             //флаг, сигнализирующий о необходимости пересчёта матрицы локальных преобразований
-  bool                need_world_position_update;       //флаг, сигнализирующий о необходимости пересчёта мировой позиции
-  bool                need_world_axises_update;         //флаг, сигнализирующий о необходимости пересчёта мировых осей и масштаба
-  size_t              update_lock;                      //счётчик открытых транзакций обновления
-  bool                update_notify;                    //флаг, сигнализирующий о необходимости оповещения об обновлениях по завершении транзакции обновления
-  Node*               first_updatable_child;            //первый обновляемый потомок
-  Node*               last_updatable_child;             //последний обновляемый потомок
-  Node*               prev_updatable_child;             //предыдущий обновляемый потомок
-  Node*               next_updatable_child;             //следующий обновляемый потомок
-  ControllerEntry*    first_controller;                 //первый контроллер данного узла
-  ControllerEntry*    last_controller;                  //последний контроллер данного узла
-  bool                has_updatable_controllers;        //есть ли обновляемые контроллеры
-  PropertyMapPtr      properties;                       //свойства узла
-  NodeIterator*       first_node_iterator;              //первый активный итератор узла
-  ControllerIterator* first_controller_iterator;        //первый активный итератор контроллеров
+  scene_graph::Scene*   scene;                            //сцена, которой принадлежит объект
+  stl::string           name;                             //имя узла
+  size_t                name_hash;                        //хэш имени
+  size_t                ref_count;                        //количество ссылок на узел
+  Node*                 this_node;                        //текущий узел
+  Node*                 parent;                           //родительский узел
+  Node*                 first_child;                      //первый потомок
+  Node*                 last_child;                       //последний потомок
+  Node*                 prev_child;                       //предыдущий потомок
+  Node*                 next_child;                       //следующий потомок
+  bool                  bind_lock;                        //флаг блокировки на вызов BindToParent
+  bool                  need_release_at_unbind;           //нужно ли уменьшать счётчик ссылок узла при отсоединении от родителя
+  NodeSignal            signals [NodeEvent_Num];          //сигналы
+  bool                  signal_process [NodeEvent_Num];   //флаги обработки сигналов
+  SubTreeNodeSignal     subtree_signals [NodeSubTreeEvent_Num]; //сигналы событий, возникающих в узлах-потомках
+  bool                  subtree_signal_process [NodeSubTreeEvent_Num]; //флаги обработки сигналов, возникающих в узлах потомках
+  PivotPtr              pivot;                            //центр объекта
+  vec3f                 local_position;                   //локальное положение
+  quatf                 local_orientation;                //локальная ориентация
+  vec3f                 local_scale;                      //локальный масштаб
+  mat4f                 local_tm;                         //матрица локальных преобразований
+  vec3f                 world_position;                   //мировое положение
+  quatf                 world_orientation;                //мировая ориентация
+  vec3f                 world_scale;                      //мировой масштаб
+  mat4f                 world_tm;                         //матрица мировых преобразований
+  bool                  orientation_inherit;              //флаг наследования родительской ориентации
+  bool                  scale_inherit;                    //флаг наследования родительского масштаба
+  bool                  need_world_transform_update;      //флаг, сигнализирующий о необходимости пересчёта мировых преобразований
+  bool                  need_world_tm_update;             //флаг, сигнализирующий о необходимости пересчёта матрицы мировых преобразований
+  bool                  need_local_tm_update;             //флаг, сигнализирующий о необходимости пересчёта матрицы локальных преобразований
+  bool                  need_world_position_update;       //флаг, сигнализирующий о необходимости пересчёта мировой позиции
+  bool                  need_world_axises_update;         //флаг, сигнализирующий о необходимости пересчёта мировых осей и масштаба
+  size_t                update_lock;                      //счётчик открытых транзакций обновления
+  bool                  update_notify;                    //флаг, сигнализирующий о необходимости оповещения об обновлениях по завершении транзакции обновления
+  Node*                 first_updatable_child;            //первый обновляемый потомок
+  Node*                 last_updatable_child;             //последний обновляемый потомок
+  Node*                 prev_updatable_child;             //предыдущий обновляемый потомок
+  Node*                 next_updatable_child;             //следующий обновляемый потомок
+  ControllerEntry*      first_controller;                 //первый контроллер данного узла
+  ControllerEntry*      last_controller;                  //последний контроллер данного узла
+  bool                  has_updatable_controllers;        //есть ли обновляемые контроллеры
+  PropertyMapPtr        properties;                       //свойства узла
+  PropertyBindingMapPtr property_bindings;                //связывание свойств узла с методами их получения
+  NodeIterator*         first_node_iterator;              //первый активный итератор узла
+  ControllerIterator*   first_controller_iterator;        //первый активный итератор контроллеров
   
   ///Итератор узлов
   class NodeIterator: public xtl::noncopyable
@@ -1194,6 +1220,67 @@ void Node::SetProperties (common::PropertyMap* properties)
 void Node::SetProperties (const common::PropertyMap& properties)
 {
   SetProperties (&const_cast<common::PropertyMap&> (properties));
+}
+
+/*
+    Связывание свойств узла с методами узла
+*/
+
+common::PropertyBindingMap& Node::PropertyBindings ()
+{
+  if (impl->property_bindings)
+    return *impl->property_bindings;
+
+  try
+  {
+    impl->property_bindings.reset (new common::PropertyBindingMap);
+    
+    try
+    {
+      BindProperties (*impl->property_bindings);
+    }
+    catch (...)
+    {
+      impl->property_bindings.reset ();
+      throw;
+    }
+      
+    return *impl->property_bindings;
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("scene_graph::Node::PropertyBindings");
+    throw;
+  }
+}
+
+const common::PropertyBindingMap& Node::PropertyBindings () const
+{
+  return const_cast<Node&> (*this).PropertyBindings ();
+}
+
+void Node::BindProperties (common::PropertyBindingMap& bindings)
+{
+  bindings.AddProperty ("Name", xtl::bind (&Node::Name, this), xtl::bind (&Node::SetName, this, _1));
+  bindings.AddProperty ("UseCount", xtl::bind (&Node::UseCount, this));
+  bindings.AddProperty ("Position", xtl::bind (&Node::Position, this), xtl::bind (xtl::implicit_cast<void (Node::*)(const math::vec3f&)> (&Node::SetPosition), this, _1));
+  bindings.AddProperty ("Orientation", xtl::bind (&Node::Orientation, this), xtl::bind (xtl::implicit_cast<void (Node::*)(const math::quatf&)> (&Node::SetOrientation), this, _1));
+  bindings.AddProperty ("Scale", xtl::bind (xtl::implicit_cast<const math::vec3f& (Node::*)() const> (&Node::Scale), this), xtl::bind (xtl::implicit_cast<void (Node::*)(const math::vec3f&)> (&Node::SetScale), this, _1));
+  bindings.AddProperty ("WorldPosition", xtl::bind (&Node::WorldPosition, this), xtl::bind (xtl::implicit_cast<void (Node::*)(const math::vec3f&)> (&Node::SetWorldPosition), this, _1));
+  bindings.AddProperty ("WorldOrientation", xtl::bind (&Node::WorldOrientation, this), xtl::bind (xtl::implicit_cast<void (Node::*)(const quatf&)> (&Node::SetWorldOrientation), this, _1));
+  bindings.AddProperty ("WorldScale", xtl::bind (&Node::WorldScale, this), xtl::bind (xtl::implicit_cast<void (Node::*)(const math::vec3f&)> (&Node::SetWorldScale), this, _1));
+  bindings.AddProperty ("LocalTM", xtl::bind (&Node::LocalTM, this), xtl::bind (&set_local_tm, this, _1));
+  bindings.AddProperty ("WorldTM", xtl::bind (&Node::WorldTM, this), xtl::bind (&set_world_tm, this, _1));
+  bindings.AddProperty ("ParentTM", xtl::bind (&Node::ParentTM, this));
+  bindings.AddProperty ("LocalOrtX", xtl::bind (&Node::LocalOrtX, this));
+  bindings.AddProperty ("LocalOrtY", xtl::bind (&Node::LocalOrtY, this));
+  bindings.AddProperty ("LocalOrtZ", xtl::bind (&Node::LocalOrtZ, this));
+  bindings.AddProperty ("WorldOrtX", xtl::bind (&Node::LocalOrtX, this));
+  bindings.AddProperty ("WorldOrtY", xtl::bind (&Node::LocalOrtY, this));
+  bindings.AddProperty ("WorldOrtZ", xtl::bind (&Node::LocalOrtZ, this));
+  bindings.AddProperty ("ParentOrtX", xtl::bind (&Node::ParentOrtX, this));
+  bindings.AddProperty ("ParentOrtY", xtl::bind (&Node::ParentOrtY, this));
+  bindings.AddProperty ("ParentOrtZ", xtl::bind (&Node::ParentOrtZ, this));
 }
 
 /*
