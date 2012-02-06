@@ -17,6 +17,7 @@
 #include <common/log.h>
 #include <common/utf_converter.h>
 #include <common/property_map.h>
+#include <common/property_binding_map.h>
 
 #include <sg/camera.h>
 #include <sg/controller.h>
