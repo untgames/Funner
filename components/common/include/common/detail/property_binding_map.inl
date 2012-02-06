@@ -1,4 +1,41 @@
 /*
+    PropertySelector
+*/
+
+///Конструктор по умолчанию
+inline PropertySelector::PropertySelector ()
+  : index (~0u)
+  , name (0)
+{
+}
+
+///Конструктор по индексу
+inline PropertySelector::PropertySelector (size_t in_index)
+  : index (in_index)
+  , name (0)
+{
+}
+
+///Конструктор по имени
+inline PropertySelector::PropertySelector (const char* in_name)
+  : index (~0u)
+  , name (in_name)
+{
+}
+
+///Наличие имени
+inline bool PropertySelector::HasName () const
+{
+  return name != 0;
+}
+
+///Наличие индекса
+inline bool PropertySelector::HasIndex () const
+{
+  return index != ~0u;
+}
+
+/*
     Copy from property map to value
 */
 
@@ -157,6 +194,17 @@ inline void copy_from (const PropertyMap& map, size_t property_index, math::quat
 }
 
 /*
+    Установка свойств по селектору
+*/
+
+template <class T>
+inline void set_property (PropertyMap& map, const PropertySelector& selector, const T& value)
+{
+  if      (selector.HasIndex ()) map.SetProperty (selector.index, value);
+  else if (selector.HasName ())  map.SetProperty (selector.name, value);
+}
+
+/*
     Copy from value to property map
 */
 
@@ -164,125 +212,125 @@ namespace detail
 {
 
 template <class CastT, class T>
-inline void copy_value_to (const T& value, PropertyMap& map, size_t property_index)
+inline void copy_value_to (const T& value, PropertyMap& map, const PropertySelector& property_selector)
 {
-  map.SetProperty (property_index, static_cast<CastT> (value));
+  set_property (map, property_selector, static_cast<CastT> (value));
 }
 
 }
 
-inline void copy_to (const char* value, PropertyMap& map, size_t property_index)
+inline void copy_to (const char* value, PropertyMap& map, const PropertySelector& property_selector)
 {
-  map.SetProperty (property_index, value);
+  set_property (map, property_selector, value);
 }
 
-inline void copy_to (const stl::string& value, PropertyMap& map, size_t property_index)
+inline void copy_to (const stl::string& value, PropertyMap& map, const PropertySelector& property_selector)
 {
-  map.SetProperty (property_index, value.c_str ());
+  set_property (map, property_selector, value.c_str ());
 }
 
-inline void copy_to (signed char value, PropertyMap& map, size_t property_index)
+inline void copy_to (signed char value, PropertyMap& map, const PropertySelector& property_selector)
 {
-  detail::copy_value_to<int> (value, map, property_index);
+  detail::copy_value_to<int> (value, map, property_selector);
 }
 
-inline void copy_to (unsigned char value, PropertyMap& map, size_t property_index)
+inline void copy_to (unsigned char value, PropertyMap& map, const PropertySelector& property_selector)
 {
-  detail::copy_value_to<int> (value, map, property_index);
+  detail::copy_value_to<int> (value, map, property_selector);
 }
 
-inline void copy_to (short value, PropertyMap& map, size_t property_index)
+inline void copy_to (short value, PropertyMap& map, const PropertySelector& property_selector)
 {
-  detail::copy_value_to<int> (value, map, property_index);
+  detail::copy_value_to<int> (value, map, property_selector);
 }
 
-inline void copy_to (unsigned short value, PropertyMap& map, size_t property_index)
+inline void copy_to (unsigned short value, PropertyMap& map, const PropertySelector& property_selector)
 {
-  detail::copy_value_to<int> (value, map, property_index);
+  detail::copy_value_to<int> (value, map, property_selector);
 }
 
-inline void copy_to (int value, PropertyMap& map, size_t property_index)
+inline void copy_to (int value, PropertyMap& map, const PropertySelector& property_selector)
 {
-  detail::copy_value_to<int> (value, map, property_index);
+  detail::copy_value_to<int> (value, map, property_selector);
 }
 
-inline void copy_to (unsigned int value, PropertyMap& map, size_t property_index)
+inline void copy_to (unsigned int value, PropertyMap& map, const PropertySelector& property_selector)
 {
-  detail::copy_value_to<int> (value, map, property_index);
+  detail::copy_value_to<int> (value, map, property_selector);
 }
 
-inline void copy_to (long value, PropertyMap& map, size_t property_index)
+inline void copy_to (long value, PropertyMap& map, const PropertySelector& property_selector)
 {
-  detail::copy_value_to<int> (value, map, property_index);
+  detail::copy_value_to<int> (value, map, property_selector);
 }
 
-inline void copy_to (unsigned long value, PropertyMap& map, size_t property_index)
+inline void copy_to (unsigned long value, PropertyMap& map, const PropertySelector& property_selector)
 {
-  detail::copy_value_to<int> (value, map, property_index);
+  detail::copy_value_to<int> (value, map, property_selector);
 }
 
-inline void copy_to (float value, PropertyMap& map, size_t property_index)
+inline void copy_to (float value, PropertyMap& map, const PropertySelector& property_selector)
 {
-  detail::copy_value_to<float> (value, map, property_index);
+  detail::copy_value_to<float> (value, map, property_selector);
 }
 
-inline void copy_to (double value, PropertyMap& map, size_t property_index)
+inline void copy_to (double value, PropertyMap& map, const PropertySelector& property_selector)
 {
-  detail::copy_value_to<float> (value, map, property_index);
+  detail::copy_value_to<float> (value, map, property_selector);
 }
 
-inline void copy_to (long double value, PropertyMap& map, size_t property_index)
+inline void copy_to (long double value, PropertyMap& map, const PropertySelector& property_selector)
 {
-  detail::copy_value_to<float> (value, map, property_index);
+  detail::copy_value_to<float> (value, map, property_selector);
 }
 
 template <class T>
-inline void copy_to (const math::vector<T, 2>& value, PropertyMap& map, size_t property_index)
+inline void copy_to (const math::vector<T, 2>& value, PropertyMap& map, const PropertySelector& property_selector)
 {
-  detail::copy_value_to<math::vector<float, 4> > (value, map, property_index);
+  detail::copy_value_to<math::vector<float, 4> > (value, map, property_selector);
 }
 
 template <class T>
-inline void copy_to (const math::vector<T, 3>& value, PropertyMap& map, size_t property_index)
+inline void copy_to (const math::vector<T, 3>& value, PropertyMap& map, const PropertySelector& property_selector)
 {
-  detail::copy_value_to<math::vector<float, 4> > (value, map, property_index);
+  detail::copy_value_to<math::vector<float, 4> > (value, map, property_selector);
 }
 
 template <class T>
-inline void copy_to (const math::vector<T, 4>& value, PropertyMap& map, size_t property_index)
+inline void copy_to (const math::vector<T, 4>& value, PropertyMap& map, const PropertySelector& property_selector)
 {
-  detail::copy_value_to<math::vector<float, 4> > (value, map, property_index);
+  detail::copy_value_to<math::vector<float, 4> > (value, map, property_selector);
 }
 
 template <class T>
-inline void copy_to (const math::matrix<T, 2>& value, PropertyMap& map, size_t property_index)
+inline void copy_to (const math::matrix<T, 2>& value, PropertyMap& map, const PropertySelector& property_selector)
 {
-  detail::copy_value_to<math::matrix<float, 4> > (value, map, property_index);
+  detail::copy_value_to<math::matrix<float, 4> > (value, map, property_selector);
 }
 
 template <class T>
-inline void copy_to (const math::matrix<T, 3>& value, PropertyMap& map, size_t property_index)
+inline void copy_to (const math::matrix<T, 3>& value, PropertyMap& map, const PropertySelector& property_selector)
 {
-  detail::copy_value_to<math::matrix<float, 4> > (value, map, property_index);
+  detail::copy_value_to<math::matrix<float, 4> > (value, map, property_selector);
 }
 
 template <class T>
-inline void copy_to (const math::matrix<T, 4>& value, PropertyMap& map, size_t property_index)
+inline void copy_to (const math::matrix<T, 4>& value, PropertyMap& map, const PropertySelector& property_selector)
 {
-  detail::copy_value_to<math::matrix<float, 4> > (value, map, property_index);
+  detail::copy_value_to<math::matrix<float, 4> > (value, map, property_selector);
 }
 
 template <class T>
-inline void copy_to (const math::quat<T>& value, PropertyMap& map, size_t property_index)
+inline void copy_to (const math::quat<T>& value, PropertyMap& map, const PropertySelector& property_selector)
 {
   math::vector<float, 4> v = reinterpret_cast<const math::vector<T, 4>&> (value);
 
-  map.SetProperty (property_index, v);
+  set_property (map, property_selector, v);
 }
 
-inline void copy_to (const math::quat<float>& value, PropertyMap& map, size_t property_index)
+inline void copy_to (const math::quat<float>& value, PropertyMap& map, const PropertySelector& property_selector)
 {
-  map.SetProperty (property_index, reinterpret_cast<const math::vector<float, 4>&> (value));
+  set_property (map, property_selector, reinterpret_cast<const math::vector<float, 4>&> (value));
 }
 
 namespace detail
@@ -305,7 +353,7 @@ class IPropertyGetter
   public:
     virtual ~IPropertyGetter () {}
     
-    virtual void CopyTo (common::PropertyMap& map, size_t property_index) = 0;
+    virtual void CopyTo (common::PropertyMap& map, const PropertySelector& selector) = 0;
 };
 
 template <class T> struct SetterValueType             { typedef T Type; };
@@ -391,9 +439,9 @@ class PropertyGetter: public IPropertyGetter
     
     const Fn& Function () { return fn; }
   
-    void CopyTo (common::PropertyMap& map, size_t property_index)
+    void CopyTo (common::PropertyMap& map, const PropertySelector& selector)
     {
-      copy_to (fn (), map, property_index);
+      copy_to (fn (), map, selector);
     }
     
   private:

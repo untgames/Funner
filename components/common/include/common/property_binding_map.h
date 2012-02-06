@@ -74,8 +74,10 @@ class PropertyBinding
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Синхронизация с картой свойств
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void CopyFromPropertyMap (const PropertyMap& map, size_t property_index); //установка значения свойства из карты свойств
-    void CopyToPropertyMap   (PropertyMap& map, size_t property_index) const; //установка значения в карте свойств
+    void CopyFromPropertyMap (const PropertyMap& map, size_t property_index);     //установка значения свойства из карты свойств по индексу
+    void CopyFromPropertyMap (const PropertyMap& map, const char* property_name); //установка значения свойства из карты свойств по индексу    
+    void CopyToPropertyMap   (PropertyMap& map, size_t property_index) const;     //установка значения в карте свойств по индексу
+    void CopyToPropertyMap   (PropertyMap& map, const char* property_name) const; //установка значения в карте свойств по имени    
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Обмен
@@ -188,6 +190,11 @@ class PropertyBindingMap
     Synchronizer CreateSynchronizer (PropertyMap&);
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+///Создание карты свойств
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    PropertyMap CreatePropertyMap () const;
+    
+///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Подписка на события карты связывания свойств
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     typedef xtl::function<void (PropertyBindingMapEvent event)> EventHandler;
@@ -295,42 +302,71 @@ template <class T>
 void copy_from (const PropertyMap& map, size_t property_index, math::quat<T>& value);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+///Вспомогательный селектор свойства в карте
+///////////////////////////////////////////////////////////////////////////////////////////////////
+struct PropertySelector
+{
+  size_t      index; //индекс свойства
+  const char* name;  //имя свойства
+  
+///Конструктор по умолчанию
+  PropertySelector ();
+  
+///Конструктор по индексу
+  PropertySelector (size_t index);  
+  
+///Конструктор по имени
+  PropertySelector (const char* name);  
+
+///Наличие имени
+  bool HasName () const;
+
+///Наличие индекса
+  bool HasIndex () const;  
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Установка свойства по селектору
+///////////////////////////////////////////////////////////////////////////////////////////////////
+template <class T> void set_property (PropertyMap&, const PropertySelector& selector, const T& value);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Копирование значения свойства из переменной указанного типа в PropertyMap
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-void copy_to (const char* value, PropertyMap& map, size_t property_index);
-void copy_to (const stl::string& value, PropertyMap& map, size_t property_index);
-void copy_to (signed char value, PropertyMap& map, size_t property_index);
-void copy_to (unsigned char value, PropertyMap& map, size_t property_index);
-void copy_to (short value, PropertyMap& map, size_t property_index);
-void copy_to (unsigned short value, PropertyMap& map, size_t property_index);
-void copy_to (int value, PropertyMap& map, size_t property_index);
-void copy_to (unsigned int value, PropertyMap& map, size_t property_index);
-void copy_to (long value, PropertyMap& map, size_t property_index);
-void copy_to (unsigned long value, PropertyMap& map, size_t property_index);
-void copy_to (float value, PropertyMap& map, size_t property_index);
-void copy_to (double value, PropertyMap& map, size_t property_index);
-void copy_to (long double value, PropertyMap& map, size_t property_index);
+void copy_to (const char* value, PropertyMap& map, const PropertySelector& property_selector);
+void copy_to (const stl::string& value, PropertyMap& map, const PropertySelector& property_selector);
+void copy_to (signed char value, PropertyMap& map, const PropertySelector& property_selector);
+void copy_to (unsigned char value, PropertyMap& map, const PropertySelector& property_selector);
+void copy_to (short value, PropertyMap& map, const PropertySelector& property_selector);
+void copy_to (unsigned short value, PropertyMap& map, const PropertySelector& property_selector);
+void copy_to (int value, PropertyMap& map, const PropertySelector& property_selector);
+void copy_to (unsigned int value, PropertyMap& map, const PropertySelector& property_selector);
+void copy_to (long value, PropertyMap& map, const PropertySelector& property_selector);
+void copy_to (unsigned long value, PropertyMap& map, const PropertySelector& property_selector);
+void copy_to (float value, PropertyMap& map, const PropertySelector& property_selector);
+void copy_to (double value, PropertyMap& map, const PropertySelector& property_selector);
+void copy_to (long double value, PropertyMap& map, const PropertySelector& property_selector);
 
 template <class T>
-void copy_to (const math::vector<T, 2>& value, PropertyMap& map, size_t property_index);
+void copy_to (const math::vector<T, 2>& value, PropertyMap& map, const PropertySelector& property_selector);
 
 template <class T>
-void copy_to (const math::vector<T, 3>& value, PropertyMap& map, size_t property_index);
+void copy_to (const math::vector<T, 3>& value, PropertyMap& map, const PropertySelector& property_selector);
 
 template <class T>
-void copy_to (const math::vector<T, 4>& value, PropertyMap& map, size_t property_index);
+void copy_to (const math::vector<T, 4>& value, PropertyMap& map, const PropertySelector& property_selector);
 
 template <class T>
-void copy_to (const math::matrix<T, 2>& value, PropertyMap& map, size_t property_index);
+void copy_to (const math::matrix<T, 2>& value, PropertyMap& map, const PropertySelector& property_selector);
 
 template <class T>
-void copy_to (const math::matrix<T, 3>& value, PropertyMap& map, size_t property_index);
+void copy_to (const math::matrix<T, 3>& value, PropertyMap& map, const PropertySelector& property_selector);
 
 template <class T>
-void copy_to (const math::matrix<T, 4>& value, PropertyMap& map, size_t property_index);
+void copy_to (const math::matrix<T, 4>& value, PropertyMap& map, const PropertySelector& property_selector);
 
 template <class T>
-void copy_to (const math::quat<T>& value, PropertyMap& map, size_t property_index);
+void copy_to (const math::quat<T>& value, PropertyMap& map, const PropertySelector& property_selector);
 
 #include <common/detail/property_binding_map.inl>
 

@@ -319,6 +319,32 @@ PropertyBindingMapSynchronizer PropertyBindingMap::CreateSynchronizer (PropertyM
 }
 
 /*
+    Создание карты свойств
+*/
+
+PropertyMap PropertyBindingMap::CreatePropertyMap () const
+{
+  try
+  {
+    PropertyMap map;
+    
+    for (Impl::BindingDescArray::const_iterator i=impl->bindings.begin (), end=impl->bindings.end (); i!=end; ++i)
+    {
+      const Impl::BindingDesc& desc = **i;
+      
+      desc.binding.CopyToPropertyMap (map, desc.name.c_str ());
+    }
+
+    return map;
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("common::PropertyBindingMap::CreatePropertyMap");
+    throw;
+  }
+}
+
+/*
     Подписка на события карты связывания свойств
 */
 

@@ -106,7 +106,28 @@ void PropertyBinding::CopyFromPropertyMap (const PropertyMap& map, size_t proper
   }
   catch (xtl::exception& e)
   {
-    e.touch ("common::PropertyBinding::CopyFromPropertyMap");
+    e.touch ("common::PropertyBinding::CopyFromPropertyMap(const PropertyMap&,size_t)");
+    throw;
+  }
+}
+
+void PropertyBinding::CopyFromPropertyMap (const PropertyMap& map, const char* property_name)
+{
+  if (!impl->setter)
+    return;
+    
+  try
+  {    
+    int property_index = map.IndexOf (property_name);
+    
+    if (property_index == -1)
+      return;
+    
+    impl->setter->CopyFrom (map, size_t (property_index));
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("common::PropertyBinding::CopyFromPropertyMap(const PropertyMap,const char*)");
     throw;
   }
 }
@@ -118,11 +139,27 @@ void PropertyBinding::CopyToPropertyMap (PropertyMap& map, size_t property_index
     
   try
   {    
-    impl->getter->CopyTo (map, property_index);
+    impl->getter->CopyTo (map, PropertySelector (property_index));
   }
   catch (xtl::exception& e)
   {
-    e.touch ("common::PropertyBinding::CopyToPropertyMap");
+    e.touch ("common::PropertyBinding::CopyToPropertyMap(PropertyMap&,size_t)");
+    throw;
+  }
+}
+
+void PropertyBinding::CopyToPropertyMap (PropertyMap& map, const char* property_name) const
+{
+  if (!impl->getter)
+    return;
+    
+  try
+  {
+    impl->getter->CopyTo (map, PropertySelector (property_name));
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("common::PropertyBinding::CopyToPropertyMap(PropertyMap&,const char*)");
     throw;
   }
 }
