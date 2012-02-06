@@ -97,6 +97,16 @@ common::PropertyMap get_node_properties (Node& node)
   return common::PropertyMap (*properties);
 }
 
+xtl::com_ptr<Controller> attach_controller (Node& node, const Node::UpdateFunction& fn)
+{
+  return node.AttachController (fn);
+}
+
+void update_node (Node& node, float t)
+{
+  node.Update (TimeValue (size_t (t * 1000), 1000));
+}
+
 void bind_node_library (Environment& environment)
 {
   InvokerRegistry lib = environment.CreateLibrary (SCENE_NODE_LIBRARY);
@@ -221,9 +231,9 @@ void bind_node_library (Environment& environment)
   lib.Register ("BeginUpdate", make_invoker (&Node::BeginUpdate));
   lib.Register ("EndUpdate",   make_invoker (&Node::EndUpdate));
   
-  lib.Register ("AttachController",     make_invoker (&Node::AttachController));
+  lib.Register ("AttachController",     make_invoker (&attach_controller));
   lib.Register ("DetachAllControllers", make_invoker (&Node::DetachAllControllers));
-  lib.Register ("Update",               make_invoker (make_invoker (&Node::Update), make_invoker<void (Node&, float)> (xtl::bind (&Node::Update, _1, _2, NodeTraverseMode_Default))));
+  lib.Register ("Update",               make_invoker (update_node));
 
   lib.Register ("CreateEventHandler",          make_callback_invoker<Node::EventHandler::signature_type> ());
   lib.Register ("CreateSubTreeEventHandler",   make_callback_invoker<Node::SubTreeEventHandler::signature_type> ());
