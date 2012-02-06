@@ -316,6 +316,12 @@ template <class T> struct SetterValueType<volatile T> { typedef typename SetterV
 template <class Fn>            struct SetterArgType             { typedef typename SetterValueType<typename Fn::arg1_type>::Type Type; };
 template <class Ret, class T>  struct SetterArgType<Ret (*)(T)> { typedef T Type; };
 
+template <class Ret, class FRet, class A1, class A2, class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8, class T9>
+struct SetterArgType<xtl::detail::binder<Ret, FRet (*)(A1, A2), T1, T2, T3, T4, T5, T6, T7, T8, T9> >
+{
+  typedef typename SetterValueType<A2>::Type Type;
+};
+
 template <class Ret, class C, class FRet, class A1, class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8, class T9>
 struct SetterArgType<xtl::detail::binder<Ret, FRet (C::*)(A1), T1, T2, T3, T4, T5, T6, T7, T8, T9> >
 {
