@@ -8,6 +8,7 @@
 
 #include <physics/manager.h>
 
+#include <sg/node.h>
 #include <sg/controllers/sync_physics_to_node.h>
 
 using namespace physics;

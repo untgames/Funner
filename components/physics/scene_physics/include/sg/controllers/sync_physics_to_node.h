@@ -38,7 +38,7 @@ class SyncPhysicsToNode: public Controller
     ~SyncPhysicsToNode ();
     
   private:
-    void Update (float dt);
+    void Update (const TimeValue&);
 
   private:
     struct Impl;

@@ -5,6 +5,7 @@
 #include <xtl/connection.h>
 #include <xtl/function.h>
 
+#include <sg/node.h>
 #include <sg/controllers/sync_physics_to_node.h>
 
 #endif

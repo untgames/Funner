@@ -77,7 +77,7 @@ const physics::RigidBody& SyncPhysicsToNode::AttachedBody () const
    Обновление
 */
 
-void SyncPhysicsToNode::Update (float)
+void SyncPhysicsToNode::Update (const TimeValue&)
 {
   impl->Update ();
 }

@@ -29,10 +29,12 @@ int main ()
 
     dump_body_position (body);
     dump_node_position (*node);
+    
+    node->Update (TimeValue (0, 10));    
 
     printf ("Update node\n");
-
-    node->Update (0.1f);
+    
+    node->Update (TimeValue (1, 10));
 
     dump_node_position (*node);
 
@@ -45,13 +47,13 @@ int main ()
 
     printf ("Update node\n");
 
-    node->Update (0.1f);
+    node->Update (TimeValue (2, 10));
 
     dump_node_position (*node);
 
     printf ("Update node\n");
 
-    node->Update (0.1f);
+    node->Update (TimeValue (3, 10));
 
     dump_node_position (*node);
 
