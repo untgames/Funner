@@ -1,0 +1,5 @@
+Results of animation_state_test:
+default: weight is 1.00 time is 0.00
+changed: weight is 0.50 time is 1.00
+exit
+animation state destroyed
