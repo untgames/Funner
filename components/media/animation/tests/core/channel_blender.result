@@ -1,0 +1,7 @@
+Results of channel_blender_test:
+all right, exception detected
+blender(1.0f): 0.00
+remove state
+blender(1.0f): -1.00
+remove channel
+blender(1.0f): 1.00

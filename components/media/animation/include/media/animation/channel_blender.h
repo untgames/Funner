@@ -1,7 +1,17 @@
 #ifndef MEDIA_ANIMATION_CHANNEL_BLENDER_HEADER
 #define MEDIA_ANIMATION_CHANNEL_BLENDER_HEADER
 
+#include <xtl/type.h>
+
 #include <media/animation/channel.h>
+
+namespace math
+{
+
+//forward declaration
+template <class T, size_t Size> class matrix;
+
+}
 
 namespace media
 {
@@ -21,24 +31,24 @@ class ChannelBlenderBase
     ChannelBlenderBase  (const ChannelBlenderBase&);
     ~ChannelBlenderBase ();
     
-    ChannelBlender& operator = (const ChannelBlender&);
-  
+    ChannelBlenderBase& operator = (const ChannelBlenderBase&);
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Количество каналов
+///Тип значений
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    const std::type_info& ValueType () const;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Количество источников
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     size_t ChannelsCount () const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Получение каналов и анимационных состояний
+///Добавление и удаление источников
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-          animation::AnimationState AnimationState (size_t index);
-    const animation::AnimationState AnimationState (size_t index) const;
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Добавление и удаление каналов
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    void AddChannel        (const AnimationState& state, const animation::Channel& channel);
-    void RemoveChannel     (const AnimationState& state);
+    void AddChannel        (const animation::AnimationState& state, const animation::Channel& channel);
+    void RemoveChannels    (const animation::AnimationState& state);
+    void RemoveChannels    (const animation::Channel& channel);    
     void RemoveAllChannels ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -58,7 +68,7 @@ class ChannelBlenderBase
     struct ChannelDesc
     {
       detail::IEvaluatorBase* evaluator; //ссылка на вычислитель состояния анимации
-      AnimationState          state;     //состояние анимации
+      IAnimationState*        state;     //состояние анимации
     };
     
     const ChannelDesc* Channels () const;
@@ -92,6 +102,12 @@ template <class T> class ChannelBlender: public ChannelBlenderBase
     ValueType operator () () const;
     void      operator () (ValueType&) const;
 };
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Начальное значение для смешивания
+///////////////////////////////////////////////////////////////////////////////////////////////////
+template <class T>              T                     blend_init (xtl::type<T>);
+template <class T, size_t Size> math::matrix<T, Size> blend_init (xtl::type<math::matrix<T, Size> >);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Смешивание

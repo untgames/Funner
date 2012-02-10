@@ -9,9 +9,9 @@ inline ChannelBlender<T>::ChannelBlender ()
 }
 
 template <class T>
-inline typename ChannelBlender<T>::ValueType operator () () const
+inline typename ChannelBlender<T>::ValueType ChannelBlender<T>::operator () () const
 {
-  ValueType result;
+  ValueType result = blend_init (xtl::type<ValueType> ());
   
   (*this)(result);
   
@@ -29,7 +29,7 @@ inline void ChannelBlender<T>::operator () (ValueType& value) const
   float total_weight = 0.0f;
   
   for (size_t i=0; i<channels_count; i++)
-    total_weight += fabs (channels [i].state.Weight ());
+    total_weight += channels [i].state->Weight ();
     
   float weight_multiplier = 0;
   
@@ -43,7 +43,13 @@ inline void ChannelBlender<T>::operator () (ValueType& value) const
     //смешивание
   
   for (size_t i=0; i<channels_count; i++)
-    blend (static_cast<detail::IEvaluator<T*> (channels [i].evaluator)->Eval (channels [i].state.Time ()), channels [i].state.Weight () * weight_multiplier, value);
+  {
+    detail::ResultValue<ValueType> channel_value;
+    
+    static_cast<detail::IEvaluator<T>*> (channels [i].evaluator)->Eval (channels [i].state->Time (), channel_value.value);
+  
+    blend (channel_value.value, channels [i].state->Weight () * weight_multiplier, value);
+  }
 }
 
 /*
@@ -54,4 +60,14 @@ template <class T>
 inline void blend (const T& src_value, float weight, T& result_value)
 {
   result_value += src_value * weight;
+}
+
+template <class T> T blend_init (xtl::type<T>)
+{
+  return T ();
+}
+
+template <class T, size_t Size> math::matrix<T, Size> blend_init (xtl::type<math::matrix<T, Size> >)
+{
+  return math::matrix<T, Size> (T ());
 }

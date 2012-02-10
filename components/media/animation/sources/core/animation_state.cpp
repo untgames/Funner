@@ -6,12 +6,19 @@ using namespace media::animation;
     Описание реализации анимационного состояния
 */
 
-struct AnimationState::Impl: public xtl::reference_counter, public xtl::trackable
+struct AnimationState::Impl: public xtl::reference_counter, public xtl::trackable, public IAnimationState
 {
   float time;   //текущее время
   float weight; //вес
 
+///Конструктор
   Impl () : time (0.0f), weight (1.0f) {}
+  
+///Получение времени
+  float Time () { return time; }
+  
+///Получение веса
+  float Weight () { return weight; }
 };
 
 /*
@@ -70,12 +77,24 @@ float AnimationState::Time () const
 
 void AnimationState::SetWeight (float weight)
 {
+  if (weight < 0.0f)
+    weight = 0.0f;
+
   impl->weight = weight;
 }
 
 float AnimationState::Weight () const
 {
   return impl->weight;
+}
+
+/*
+    Получение интерфейса состояния анимации (общий для всех копий AnimationState)
+*/
+
+IAnimationState& AnimationState::AnimationStateCore () const
+{
+  return *impl;
 }
 
 /*

@@ -6,6 +6,7 @@
 #include <stl/string>
 #include <stl/vector>
 
+#include <xtl/bind.h>
 #include <xtl/common_exceptions.h>
 #include <xtl/intrusive_ptr.h>
 #include <xtl/reference_counter.h>
@@ -17,6 +18,7 @@
 #include <media/animation/animation_state.h>
 #include <media/animation/animation.h>
 #include <media/animation/channel.h>
+#include <media/animation/channel_blender.h>
 #include <media/animation/event_track.h>
 
 #include <media/resource_library.h>
