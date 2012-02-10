@@ -20,6 +20,7 @@
 #include <media/animation/channel.h>
 #include <media/animation/channel_blender.h>
 #include <media/animation/event_track.h>
+#include <media/animation/target_blender.h>
 
 #include <media/resource_library.h>
 

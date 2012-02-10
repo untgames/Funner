@@ -31,6 +31,11 @@ class PropertyNameMap
     ~PropertyNameMap ();
     
     PropertyNameMap& operator = (const PropertyNameMap&);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Копирование
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    PropertyNameMap Clone () const;
   
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Установление соответствия
@@ -50,7 +55,11 @@ class PropertyNameMap
     void Swap (PropertyNameMap&);
     
   private:
-    struct Impl;
+    struct Impl;  
+  
+    PropertyNameMap (Impl*);
+    
+  private:
     Impl* impl;
 };
 
@@ -75,12 +84,12 @@ class TargetBlender
     TargetBlender& operator = (const TargetBlender&);
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Добавление и удаление каналов
+///Добавление и удаление источников
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void AddChannel        (AnimationState& state, const Channel& channel);
-    void AddChannel        (AnimationState& state, const Channel& channel, const PropertyNameMap& name_map);
-    void RemoveChannel     (AnimationState& state);
-    void RemoveAllChannels ();
+    void AddSource        (AnimationState& state, const Channel& channel);
+    void AddSource        (AnimationState& state, const Channel& channel, const PropertyNameMap& name_map);
+    void RemoveSource     (AnimationState& state);
+    void RemoveAllSources ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Текущее состояние свойств анимационной цели
