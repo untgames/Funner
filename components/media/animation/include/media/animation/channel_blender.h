@@ -38,20 +38,18 @@ class ChannelBlenderBase
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     const std::type_info& ValueType () const;
     
-    //TODO: изменить channel -> source
-
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Количество источников
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    size_t ChannelsCount () const;
+    size_t SourcesCount () const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Добавление и удаление источников
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void AddChannel        (const animation::AnimationState& state, const animation::Channel& channel);
-    void RemoveChannels    (const animation::AnimationState& state);
-    void RemoveChannels    (const animation::Channel& channel);    
-    void RemoveAllChannels ();
+    void AddSource        (const animation::AnimationState& state, const animation::Channel& channel);
+    void RemoveSources    (const animation::AnimationState& state);
+    void RemoveSources    (const animation::Channel& channel);    
+    void RemoveAllSources ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Обмен
@@ -67,13 +65,13 @@ class ChannelBlenderBase
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Получение массива каналов для смешивания
 ///////////////////////////////////////////////////////////////////////////////////////////////////    
-    struct ChannelDesc
+    struct Source
     {
       detail::IEvaluatorBase* evaluator; //ссылка на вычислитель состояния анимации
       IAnimationState*        state;     //состояние анимации
     };
     
-    const ChannelDesc* Channels () const;
+    const Source* Sources () const;
     
   private:
     struct Impl;

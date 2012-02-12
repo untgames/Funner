@@ -50,8 +50,8 @@ int main ()
 
     ChannelBlender<float> blender;
     
-    blender.AddChannel (state1, channel1);
-    blender.AddChannel (state2, channel2);
+    blender.AddSource (state1, channel1);
+    blender.AddSource (state2, channel2);
     
     try
     {
@@ -59,7 +59,7 @@ int main ()
       
       channel3.SetTrack (Fn3 ());
       
-      blender.AddChannel (state1, channel3);
+      blender.AddSource (state1, channel3);
     }
     catch (std::exception& e)
     {
@@ -79,11 +79,11 @@ int main ()
     
     printf ("blender(1.0f): %.2f\n", blender ());
     
-    blender.AddChannel (state1, channel1);    
+    blender.AddSource (state1, channel1);    
     
     printf ("remove channel\n");    
     
-    blender.RemoveChannels (channel2);
+    blender.RemoveSources (channel2);
     
     printf ("blender(1.0f): %.2f\n", blender ());        
   }

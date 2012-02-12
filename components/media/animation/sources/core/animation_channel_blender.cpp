@@ -19,54 +19,54 @@ const size_t RESERVED_CHANNELS_COUNT = 4; //резервируемое число каналов
 
 struct ChannelBlenderBase::Impl: public xtl::reference_counter
 {
-  typedef stl::vector<ChannelDesc>                   DescArray;
+  typedef stl::vector<Source>                        SourceArray;
   typedef xtl::intrusive_ptr<detail::IEvaluatorBase> EvaluatorPtr;
   
-  struct ChannelImpl: public xtl::reference_counter
+  struct SourceImpl: public xtl::reference_counter
   {
     EvaluatorPtr         evaluator;
     xtl::auto_connection state_tracker;
   };
   
-  typedef xtl::intrusive_ptr<ChannelImpl> ChannelImplPtr;
-  typedef stl::vector<ChannelImplPtr>     ChannelArray;  
+  typedef xtl::intrusive_ptr<SourceImpl> SourceImplPtr;
+  typedef stl::vector<SourceImplPtr>     SourceImplArray;  
 
-  const std::type_info* value_type; //тип значений
-  DescArray             descs;      //массив дескрипторов каналов
-  ChannelArray          channels;   //каналы
+  const std::type_info* value_type;    //тип значений
+  SourceArray           sources;       //массив дескрипторов каналов
+  SourceImplArray       source_impls;  //каналы
   
 /// онструктор
   Impl (const std::type_info& in_value_type)
     : value_type (&in_value_type)
   {
-    descs.reserve (RESERVED_CHANNELS_COUNT);
-    channels.reserve (RESERVED_CHANNELS_COUNT);
+    sources.reserve (RESERVED_CHANNELS_COUNT);
+    source_impls.reserve (RESERVED_CHANNELS_COUNT);
   }
   
 ///”даление каналов
-  void RemoveChannelsByState (IAnimationState* state)
+  void RemoveSourcesByState (IAnimationState* state)
   {
-    for (DescArray::iterator iter=descs.begin (); iter!=descs.end ();)
+    for (SourceArray::iterator iter=sources.begin (); iter!=sources.end ();)
       if (iter->state == state)
       {
-        descs.erase (iter);
-        channels.erase (channels.begin () + (iter - descs.begin ()));
+        sources.erase (iter);
+        source_impls.erase (source_impls.begin () + (iter - sources.begin ()));
       }
       else ++iter;
   }
   
-  void RemoveChannelsByChannel (const Channel& channel)
+  void RemoveSourcesByChannel (const Channel& channel)
   {
     detail::IEvaluatorBase* evaluator = channel.TrackCore ();
     
     if (!evaluator)
       return;
     
-    for (DescArray::iterator iter=descs.begin (); iter!=descs.end ();)
+    for (SourceArray::iterator iter=sources.begin (); iter!=sources.end ();)
       if (iter->evaluator == evaluator)
       {
-        descs.erase (iter);
-        channels.erase (channels.begin () + (iter - descs.begin ()));
+        sources.erase (iter);
+        source_impls.erase (source_impls.begin () + (iter - sources.begin ()));
       }
       else ++iter;
   }  
@@ -112,34 +112,34 @@ const std::type_info& ChannelBlenderBase::ValueType () const
      оличество каналов
 */
 
-size_t ChannelBlenderBase::ChannelsCount () const
+size_t ChannelBlenderBase::SourcesCount () const
 {
-  return impl->descs.size ();
+  return impl->sources.size ();
 }
 
 /*
     ѕолучение каналов и анимационных состо€ний
 */
 
-const ChannelBlenderBase::ChannelDesc* ChannelBlenderBase::Channels () const
+const ChannelBlenderBase::Source* ChannelBlenderBase::Sources () const
 {
-  if (impl->descs.empty ())
+  if (impl->sources.empty ())
     return 0;
 
-  return &impl->descs [0];
+  return &impl->sources [0];
 }
 
 /*
     ƒобавление и удаление каналов
 */
 
-void ChannelBlenderBase::AddChannel (const media::animation::AnimationState& state, const media::animation::Channel& channel)
+void ChannelBlenderBase::AddSource (const media::animation::AnimationState& state, const media::animation::Channel& channel)
 {
-  static const char* METHOD_NAME = "media::animation::ChannelBlenderBase";
+  static const char* METHOD_NAME = "media::animation::ChannelBlenderBase::AddSource";
 
     //проверка корректности аргументов
 
-  ChannelDesc desc;
+  Source desc;
   
   desc.state     = &state.AnimationStateCore ();
   desc.evaluator = channel.TrackCore ();
@@ -153,32 +153,32 @@ void ChannelBlenderBase::AddChannel (const media::animation::AnimationState& sta
       
     //добавление в карту
     
-  Impl::ChannelImplPtr channel_impl (new Impl::ChannelImpl, false);
+  Impl::SourceImplPtr channel_impl (new Impl::SourceImpl, false);
   
   channel_impl->evaluator     = desc.evaluator;
-  channel_impl->state_tracker = state.GetTrackable ().connect_tracker (xtl::bind (&Impl::RemoveChannelsByState, impl, &state.AnimationStateCore ()));
+  channel_impl->state_tracker = state.GetTrackable ().connect_tracker (xtl::bind (&Impl::RemoveSourcesByState, impl, &state.AnimationStateCore ()));
     
-  impl->descs.reserve (impl->descs.size () + 1);
-  impl->channels.reserve (impl->channels.size () + 1);
+  impl->sources.reserve (impl->sources.size () + 1);
+  impl->source_impls.reserve (impl->source_impls.size () + 1);
   
-  impl->descs.push_back (desc);
-  impl->channels.push_back (channel_impl);
+  impl->sources.push_back (desc);
+  impl->source_impls.push_back (channel_impl);
 }
 
-void ChannelBlenderBase::RemoveChannels (const media::animation::AnimationState& state)
+void ChannelBlenderBase::RemoveSources (const media::animation::AnimationState& state)
 {
-  impl->RemoveChannelsByState (&state.AnimationStateCore ());
+  impl->RemoveSourcesByState (&state.AnimationStateCore ());
 }
 
-void ChannelBlenderBase::RemoveChannels (const media::animation::Channel& channel)
+void ChannelBlenderBase::RemoveSources (const media::animation::Channel& channel)
 {
-  impl->RemoveChannelsByChannel (channel);
+  impl->RemoveSourcesByChannel (channel);
 }
 
-void ChannelBlenderBase::RemoveAllChannels ()
+void ChannelBlenderBase::RemoveAllSources ()
 {
-  impl->descs.clear ();
-  impl->channels.clear ();
+  impl->sources.clear ();
+  impl->source_impls.clear ();
 }
 
 /*

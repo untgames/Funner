@@ -21,15 +21,15 @@ inline typename ChannelBlender<T>::ValueType ChannelBlender<T>::operator () () c
 template <class T>
 inline void ChannelBlender<T>::operator () (ValueType& value) const
 {
-  size_t             channels_count = ChannelsCount ();
-  const ChannelDesc* channels       = Channels ();
+  size_t        sources_count = SourcesCount ();
+  const Source* sources       = Sources ();
   
     //расчёт коэффициента нормализации весов
 
   float total_weight = 0.0f;
   
-  for (size_t i=0; i<channels_count; i++)
-    total_weight += channels [i].state->Weight ();
+  for (size_t i=0; i<sources_count; i++)
+    total_weight += sources [i].state->Weight ();
     
   float weight_multiplier = 0;
   
@@ -42,13 +42,13 @@ inline void ChannelBlender<T>::operator () (ValueType& value) const
   
     //смешивание
   
-  for (size_t i=0; i<channels_count; i++)
+  for (size_t i=0; i<sources_count; i++)
   {
-    detail::ResultValue<ValueType> channel_value;
+    detail::ResultValue<ValueType> source_value;
     
-    static_cast<detail::IEvaluator<T>*> (channels [i].evaluator)->Eval (channels [i].state->Time (), channel_value.value);
+    static_cast<detail::IEvaluator<T>*> (sources [i].evaluator)->Eval (sources [i].state->Time (), source_value.value);
   
-    blend (channel_value.value, channels [i].state->Weight () * weight_multiplier, value);
+    blend (source_value.value, sources [i].state->Weight () * weight_multiplier, value);
   }
 }
 
