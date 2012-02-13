@@ -3,6 +3,7 @@
 
 #include <cmath>
 
+#include <stl/auto_ptr.h>
 #include <stl/string>
 #include <stl/vector>
 
@@ -10,9 +11,16 @@
 #include <xtl/common_exceptions.h>
 #include <xtl/intrusive_ptr.h>
 #include <xtl/reference_counter.h>
+#include <xtl/signal.h>
 #include <xtl/trackable.h>
 
+#include <math/vector.h>
+#include <math/matrix.h>
+#include <math/quat.h>
+
 #include <common/component.h>
+#include <common/property_map.h>
+#include <common/strlib.h>
 
 #include <media/animation/animation_library.h>
 #include <media/animation/animation_state.h>

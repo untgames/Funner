@@ -28,12 +28,14 @@ struct ChannelBlenderBase::Impl: public xtl::reference_counter
     xtl::auto_connection state_tracker;
   };
   
-  typedef xtl::intrusive_ptr<SourceImpl> SourceImplPtr;
-  typedef stl::vector<SourceImplPtr>     SourceImplArray;  
+  typedef xtl::intrusive_ptr<SourceImpl>          SourceImplPtr;
+  typedef stl::vector<SourceImplPtr>              SourceImplArray;  
+  typedef xtl::signal<void (ChannelBlenderEvent)> Signal;
 
-  const std::type_info* value_type;    //тип значений
-  SourceArray           sources;       //массив дескрипторов каналов
-  SourceImplArray       source_impls;  //каналы
+  const std::type_info* value_type;                        //тип значений
+  SourceArray           sources;                           //массив дескрипторов каналов
+  SourceImplArray       source_impls;                      //каналы
+  Signal                signals [ChannelBlenderEvent_Num]; //сигналы
   
 /// онструктор
   Impl (const std::type_info& in_value_type)
@@ -43,16 +45,39 @@ struct ChannelBlenderBase::Impl: public xtl::reference_counter
     source_impls.reserve (RESERVED_CHANNELS_COUNT);
   }
   
+///ќповещение о возникновении событи€
+  void Notify (ChannelBlenderEvent event)
+  {
+    if (event < 0 || event >= ChannelBlenderEvent_Num)
+      return;
+      
+    try
+    {
+      signals [event](event);
+    }
+    catch (...)
+    {
+      //подавление всех исключений
+    }
+  }
+  
 ///”даление каналов
   void RemoveSourcesByState (IAnimationState* state)
   {
+    bool removed = false;
+    
     for (SourceArray::iterator iter=sources.begin (); iter!=sources.end ();)
       if (iter->state == state)
       {
         sources.erase (iter);
-        source_impls.erase (source_impls.begin () + (iter - sources.begin ()));
+        source_impls.erase (source_impls.begin () + (iter - sources.begin ()));                        
+        
+        removed = true;
       }
       else ++iter;
+      
+    if (removed)
+      Notify (ChannelBlenderEvent_OnSourcesRemoved);
   }
   
   void RemoveSourcesByChannel (const Channel& channel)
@@ -61,14 +86,21 @@ struct ChannelBlenderBase::Impl: public xtl::reference_counter
     
     if (!evaluator)
       return;
+      
+    bool removed = false;
     
     for (SourceArray::iterator iter=sources.begin (); iter!=sources.end ();)
       if (iter->evaluator == evaluator)
       {
         sources.erase (iter);
         source_impls.erase (source_impls.begin () + (iter - sources.begin ()));
+
+        removed = true;
       }
       else ++iter;
+      
+    if (removed)
+      Notify (ChannelBlenderEvent_OnSourcesRemoved);
   }  
 };
 
@@ -163,6 +195,10 @@ void ChannelBlenderBase::AddSource (const media::animation::AnimationState& stat
   
   impl->sources.push_back (desc);
   impl->source_impls.push_back (channel_impl);
+
+    //оповещени о возникновении событи€
+
+  impl->Notify (ChannelBlenderEvent_OnSourcesAdded);
 }
 
 void ChannelBlenderBase::RemoveSources (const media::animation::AnimationState& state)
@@ -179,6 +215,20 @@ void ChannelBlenderBase::RemoveAllSources ()
 {
   impl->sources.clear ();
   impl->source_impls.clear ();
+  
+  impl->Notify (ChannelBlenderEvent_OnSourcesRemoved);
+}
+
+/*
+    ѕодписка на событи€ блендера каналов
+*/
+
+xtl::connection ChannelBlenderBase::RegisterEventHandler (ChannelBlenderEvent event, const EventHandler& handler)
+{
+  if (event < 0 || event >= ChannelBlenderEvent_Num)
+    throw xtl::make_argument_exception ("media::animation::ChannelBlenderBase::RegisterEventHandler", "event", event);
+    
+  return impl->signals [event].connect (handler);
 }
 
 /*

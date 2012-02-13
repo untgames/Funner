@@ -89,6 +89,8 @@ class TargetBlender
     void AddSource        (AnimationState& state, const Channel& channel);
     void AddSource        (AnimationState& state, const Channel& channel, const PropertyNameMap& name_map);
     void RemoveSource     (AnimationState& state);
+    void RemoveSource     (const Channel& channel);
+    void RemoveSource     (const char* property_name);
     void RemoveAllSources ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

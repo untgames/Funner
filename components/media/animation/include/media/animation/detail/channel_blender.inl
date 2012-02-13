@@ -59,7 +59,7 @@ inline void ChannelBlender<T>::operator () (ValueType& value) const
 template <class T>
 inline void blend (const T& src_value, float weight, T& result_value)
 {
-  result_value += src_value * weight;
+  result_value += static_cast<T> (src_value * weight);
 }
 
 template <class T> T blend_init (xtl::type<T>)
@@ -70,4 +70,9 @@ template <class T> T blend_init (xtl::type<T>)
 template <class T, size_t Size> math::matrix<T, Size> blend_init (xtl::type<math::matrix<T, Size> >)
 {
   return math::matrix<T, Size> (T ());
+}
+
+template <class T> math::quat<T> blend_init (xtl::type<math::quat<T> >)
+{
+  return math::quat<T> (T (), T (), T (), T ());
 }
