@@ -115,20 +115,19 @@ struct PropertyBindingMapSynchronizer::Impl: public xtl::reference_counter
         if (!error_string)
           error_string.reset (new stl::string);
           
-        *error_string += common::format ("  %u) exception at set property '%s': ", errors_count++, property_map.PropertyName (desc.property_index));
-        *error_string += e.what ();
+        *error_string += common::format ("\n  %u) exception at set property '%s': %s", ++errors_count, property_map.PropertyName (desc.property_index), e.what ());
       }
       catch (...)
       {
         if (!error_string)
           error_string.reset (new stl::string);        
 
-        *error_string += common::format ("  %u) unknown exception at set property '%s'\n", errors_count++, property_map.PropertyName (desc.property_index));
+        *error_string += common::format ("\n  %u) unknown exception at set property '%s'\n", ++errors_count, property_map.PropertyName (desc.property_index));
       }
     }    
     
     if (error_string)
-      throw xtl::format_operation_exception ("", "Property bindings synchronization exception. Errors:\n%s", error_string->c_str ());
+      throw xtl::format_operation_exception ("", "Property bindings synchronization exception. Errors:%s", error_string->c_str ());
   }  
 };
 

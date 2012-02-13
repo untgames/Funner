@@ -68,20 +68,19 @@ struct PropertyBindingMap::Impl: public xtl::reference_counter, public xtl::trac
         if (!error_string)
           error_string.reset (new stl::string);
           
-        *error_string += common::format ("  %u) exception at set property '%s': ", errors_count++, desc.name.c_str ());
-        *error_string += e.what ();
+        *error_string += common::format ("\n  %u) exception at set property '%s': %s", ++errors_count, desc.name.c_str (), e.what ());
       }
       catch (...)
       {
         if (!error_string)
           error_string.reset (new stl::string);        
 
-        *error_string += common::format ("  %u) unknown exception at set property '%s'\n", errors_count++, desc.name.c_str ());
+        *error_string += common::format ("\n  %u) unknown exception at set property '%s'\n", ++errors_count, desc.name.c_str ());
       }
     }    
     
     if (error_string)
-      throw xtl::format_operation_exception ("", "Property bindings synchronization exception. Errors:\n%s", error_string->c_str ());
+      throw xtl::format_operation_exception ("", "Property bindings synchronization exception. Errors:%s", error_string->c_str ());
   }
   
 ///Оповещение о возникновении события

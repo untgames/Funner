@@ -19,6 +19,14 @@ struct binder;
 
 }
 
+namespace math
+{
+
+//forward declarations
+template <class T> class quat;
+
+}
+
 namespace common
 {
 
