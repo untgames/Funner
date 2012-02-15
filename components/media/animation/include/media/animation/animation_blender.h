@@ -53,8 +53,10 @@ class AnimationBlender
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Добавление анимации
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    AnimationState AddSource (const Animation&);
-    AnimationState AddSource (const Animation&, const PropertyNameMap&);
+    AnimationState AddSource        (const Animation&);
+    AnimationState AddSource        (const Animation&, const PropertyNameMap&);
+    void           RemoveTarget     (const char* target_name);
+    void           RemoveAllSources ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Количество анимируемых целей

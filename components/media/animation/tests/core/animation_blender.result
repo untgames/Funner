@@ -1,0 +1,11 @@
+Results of animation_blender_test:
+add two targets to blender
+added target 'test_channel_target1'
+added target 'test_channel_target2'
+add one targets to blender
+added target 'test_channel_target3'
+remove first two targets
+removed target 'test_channel_target1'
+removed target 'test_channel_target2'
+exit
+removed target 'test_channel_target3'
