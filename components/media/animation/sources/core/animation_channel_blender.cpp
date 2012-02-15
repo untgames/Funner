@@ -223,7 +223,7 @@ void ChannelBlenderBase::RemoveAllSources ()
     Подписка на события блендера каналов
 */
 
-xtl::connection ChannelBlenderBase::RegisterEventHandler (ChannelBlenderEvent event, const EventHandler& handler)
+xtl::connection ChannelBlenderBase::RegisterEventHandler (ChannelBlenderEvent event, const EventHandler& handler) const
 {
   if (event < 0 || event >= ChannelBlenderEvent_Num)
     throw xtl::make_argument_exception ("media::animation::ChannelBlenderBase::RegisterEventHandler", "event", event);

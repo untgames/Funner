@@ -22,6 +22,7 @@
 #include <common/property_map.h>
 #include <common/strlib.h>
 
+#include <media/animation/animation_blender.h>
 #include <media/animation/animation_library.h>
 #include <media/animation/animation_state.h>
 #include <media/animation/animation.h>

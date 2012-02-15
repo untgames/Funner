@@ -3,6 +3,7 @@
 
 #include <xtl/type.h>
 
+#include <media/animation/animation_state.h>
 #include <media/animation/channel.h>
 
 namespace math
@@ -67,7 +68,7 @@ class ChannelBlenderBase
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     typedef xtl::function<void (ChannelBlenderEvent event)> EventHandler;
 
-    xtl::connection RegisterEventHandler (ChannelBlenderEvent event, const EventHandler& handler);
+    xtl::connection RegisterEventHandler (ChannelBlenderEvent event, const EventHandler& handler) const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Ξαμεν

@@ -251,12 +251,12 @@ void Animation::RemoveAllChannels ()
    Очередь событий
 */
 
-const EventTrack Animation::Events () const
+const EventTrack& Animation::Events () const
 {
   return impl->event_track;
 }
 
-EventTrack Animation::Events ()
+EventTrack& Animation::Events ()
 {
   return impl->event_track;
 }

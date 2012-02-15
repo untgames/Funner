@@ -19,6 +19,9 @@ struct AnimationState::Impl: public xtl::reference_counter, public xtl::trackabl
   
 ///Получение веса
   float Weight () { return weight; }
+  
+///Получение анимационного состояния
+  AnimationState State () { return this; }
 };
 
 /*
@@ -28,6 +31,13 @@ struct AnimationState::Impl: public xtl::reference_counter, public xtl::trackabl
 AnimationState::AnimationState ()
   : impl (new Impl)
 {
+}
+
+//for IAnimationState::State
+AnimationState::AnimationState (Impl* in_impl)
+  : impl (in_impl)
+{
+  addref (impl);
 }
 
 AnimationState::AnimationState (const AnimationState& s)
