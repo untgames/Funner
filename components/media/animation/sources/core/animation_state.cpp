@@ -6,36 +6,36 @@ using namespace media::animation;
     Описание реализации анимационного состояния
 */
 
-struct AnimationState::Impl: public xtl::reference_counter, public xtl::trackable, public IAnimationState
+namespace media
+{
+
+namespace animation
+{
+
+struct AnimationStateImpl: public xtl::reference_counter, public xtl::trackable
 {
   float time;   //текущее время
   float weight; //вес
 
 ///Конструктор
-  Impl () : time (0.0f), weight (1.0f) {}
-  
-///Получение времени
-  float Time () { return time; }
-  
-///Получение веса
-  float Weight () { return weight; }
-  
-///Получение анимационного состояния
-  AnimationState State () { return this; }
+  AnimationStateImpl () : time (0.0f), weight (1.0f) {}  
 };
+
+}
+
+}
 
 /*
     Конструкторы / деструктор / присваивание
 */
 
 AnimationState::AnimationState ()
-  : impl (new Impl)
+  : impl (new AnimationStateImpl)
 {
 }
 
-//for IAnimationState::State
-AnimationState::AnimationState (Impl* in_impl)
-  : impl (in_impl)
+AnimationState::AnimationState (AnimationStateImpl& in_impl)
+  : impl (&in_impl)
 {
   addref (impl);
 }
@@ -99,10 +99,10 @@ float AnimationState::Weight () const
 }
 
 /*
-    Получение интерфейса состояния анимации (общий для всех копий AnimationState)
+    Получение реализации
 */
 
-IAnimationState& AnimationState::AnimationStateCore () const
+AnimationStateImpl& AnimationState::Impl () const
 {
   return *impl;
 }
@@ -149,6 +149,20 @@ namespace animation
 void swap (AnimationState& s1, AnimationState& s2)
 {
   s1.Swap (s2);
+}
+
+/*
+    Получение времени и веса
+*/
+
+float get_time (AnimationStateImpl& impl)
+{
+  return impl.time;
+}
+
+float get_weight (AnimationStateImpl& impl)
+{
+  return impl.weight;
 }
 
 }

@@ -62,7 +62,7 @@ struct ChannelBlenderBase::Impl: public xtl::reference_counter
   }
   
 ///Удаление каналов
-  void RemoveSourcesByState (IAnimationState* state)
+  void RemoveSourcesByState (AnimationStateImpl* state)
   {
     bool removed = false;
     
@@ -173,7 +173,7 @@ void ChannelBlenderBase::AddSource (const media::animation::AnimationState& stat
 
   Source desc;
   
-  desc.state     = &state.AnimationStateCore ();
+  desc.state     = &state.Impl ();
   desc.evaluator = channel.TrackCore ();
   
   if (!desc.evaluator)
@@ -188,7 +188,7 @@ void ChannelBlenderBase::AddSource (const media::animation::AnimationState& stat
   Impl::SourceImplPtr channel_impl (new Impl::SourceImpl, false);
   
   channel_impl->evaluator     = desc.evaluator;
-  channel_impl->state_tracker = state.GetTrackable ().connect_tracker (xtl::bind (&Impl::RemoveSourcesByState, impl, &state.AnimationStateCore ()));
+  channel_impl->state_tracker = state.GetTrackable ().connect_tracker (xtl::bind (&Impl::RemoveSourcesByState, impl, &state.Impl ()));
     
   impl->sources.reserve (impl->sources.size () + 1);
   impl->source_impls.reserve (impl->source_impls.size () + 1);
@@ -203,7 +203,7 @@ void ChannelBlenderBase::AddSource (const media::animation::AnimationState& stat
 
 void ChannelBlenderBase::RemoveSources (const media::animation::AnimationState& state)
 {
-  impl->RemoveSourcesByState (&state.AnimationStateCore ());
+  impl->RemoveSourcesByState (&state.Impl ());
 }
 
 void ChannelBlenderBase::RemoveSources (const media::animation::Channel& channel)

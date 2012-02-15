@@ -87,7 +87,7 @@ class ChannelBlenderBase
     struct Source
     {
       detail::IEvaluatorBase* evaluator; //ссылка на вычислитель состояния анимации
-      IAnimationState*        state;     //состояние анимации
+      AnimationStateImpl*     state;     //состояние анимации
     };
     
     const Source* Sources () const;

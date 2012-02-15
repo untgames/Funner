@@ -29,7 +29,7 @@ inline void ChannelBlender<T>::operator () (ValueType& value) const
   float total_weight = 0.0f;
   
   for (size_t i=0; i<sources_count; i++)
-    total_weight += sources [i].state->Weight ();
+    total_weight += get_weight (*sources [i].state);
     
   float weight_multiplier = 0;
   
@@ -46,9 +46,9 @@ inline void ChannelBlender<T>::operator () (ValueType& value) const
   {
     detail::ResultValue<ValueType> source_value;
     
-    static_cast<detail::IEvaluator<T>*> (sources [i].evaluator)->Eval (sources [i].state->Time (), source_value.value);
+    static_cast<detail::IEvaluator<T>*> (sources [i].evaluator)->Eval (get_time (*sources [i].state), source_value.value);
   
-    blend (source_value.value, sources [i].state->Weight () * weight_multiplier, value);
+    blend (source_value.value, get_weight (*sources [i].state) * weight_multiplier, value);
   }
 }
 
