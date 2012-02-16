@@ -1,11 +1,42 @@
 Results of animation_blender_test:
-add two targets to blender
+-- add two targets to blender
 added target 'test_channel_target1'
 added target 'test_channel_target2'
-add one targets to blender
+targets_count=2 sources_count=1 sources_channels_count=4:
+  target 'test_channel_target1' (sources_count=2):
+    #0: name='param1', type=float
+    #1: name='param2', type=float
+  target 'test_channel_target2' (sources_count=2):
+    #0: name='param1', type=float
+    #1: name='param3', type=float
+-- add one targets to blender
 added target 'test_channel_target3'
-remove first two targets
+events:
+    event: time=0.10 value='animation event1'
+    event: time=0.20 value='animation event1'
+    event: time=0.20 value='animation event2'
+    event: time=0.30 value='animation event1'
+    event: time=0.40 value='animation event1'
+    event: time=0.40 value='animation event2'
+    event: time=0.50 value='animation event1'
+    event: time=0.60 value='animation event2'
+    event: time=0.80 value='animation event2'
+targets_count=3 sources_count=2 sources_channels_count=6:
+  target 'test_channel_target1' (sources_count=2):
+    #0: name='param1', type=float
+    #1: name='param2', type=float
+  target 'test_channel_target2' (sources_count=2):
+    #0: name='param1', type=float
+    #1: name='param3', type=float
+  target 'test_channel_target3' (sources_count=2):
+    #0: name='param1', type=float
+    #1: name='param2', type=float
+-- remove first two targets
 removed target 'test_channel_target1'
 removed target 'test_channel_target2'
-exit
+targets_count=1 sources_count=1 sources_channels_count=2:
+  target 'test_channel_target3' (sources_count=2):
+    #0: name='param1', type=float
+    #1: name='param2', type=float
+-- exit
 removed target 'test_channel_target3'

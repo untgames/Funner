@@ -306,7 +306,7 @@ void EventTrack::GetEvents (float previous_time, float current_time, const Event
         {
             //событие периодическое
 
-          float clamped_t = fmod (t - delay, period);
+          float clamped_t = fmod (t - delay, period);                    
 
           dt = period - clamped_t;
 
@@ -317,7 +317,7 @@ void EventTrack::GetEvents (float previous_time, float current_time, const Event
         }
       }
 
-      if (dt < min_dt)
+      if (dt < min_dt && dt > EPSILON)
         min_dt = dt;
     }
 

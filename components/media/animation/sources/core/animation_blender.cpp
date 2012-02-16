@@ -1,5 +1,9 @@
 #include "shared.h"
 
+#ifdef _MSC_VER
+  #pragma warning (disable : 4355) //'this' : used in base member initializer list
+#endif
+
 using namespace media::animation;
 
 /*
@@ -8,6 +12,97 @@ using namespace media::animation;
 
 namespace
 {
+
+///Буфер событий
+class EventBuffer: public xtl::noncopyable
+{
+  struct Event
+  {
+    float time;
+    char  event [1];
+  };
+  public:
+    static const size_t RESERVED_EVENTS_COUNT = 16;
+    static const size_t AVERAGE_EVENT_SIZE    = 16;
+    static const size_t RESERVED_BUFFER_SIZE  = RESERVED_EVENTS_COUNT * (sizeof (Event) - sizeof (char) + AVERAGE_EVENT_SIZE);
+
+///Конструктор
+    EventBuffer ()
+      : event_handler (xtl::bind (&EventBuffer::AddEvent, this, _1, _2))
+    {
+      buffer.reserve (RESERVED_BUFFER_SIZE);
+      event_offsets.reserve (RESERVED_EVENTS_COUNT);
+    }
+    
+///Добавление события
+    void AddEvent (float time, const char* event_string)
+    {
+      size_t event_size   = strlen (event_string) + 1 + sizeof (Event) - sizeof (char);
+      size_t event_offset = buffer.size ();
+
+      event_offsets.reserve (event_offsets.size () + 1);
+      buffer.resize (buffer.size () + event_size);
+      event_offsets.push_back (event_offset);
+      
+      Event* event = reinterpret_cast<Event*> (buffer.data () + event_offset);
+      
+      event->time = time;
+      
+      strcpy (event->event, event_string);
+    }
+
+    void AddEvents (float previous_time, float current_time, const EventTrack& events)
+    {
+      events.GetEvents (previous_time, current_time, event_handler);
+    }
+    
+///Очистка буферов
+    void Clear ()
+    {
+      buffer.resize (0u, false);
+      event_offsets.clear ();
+    }
+    
+///Получение событий
+    void InvokeEvents (const AnimationBlender::EventTrackHandler& handler)
+    {
+      Sort ();
+      
+      for (stl::vector<size_t>::iterator iter=event_offsets.begin (), end=event_offsets.end (); iter!=end; ++iter)
+      {
+        const Event* event = reinterpret_cast<const Event*> (buffer.data () + *iter);
+
+        handler (event->time, event->event);
+      }
+    }
+    
+  private:
+///Сортировка
+    struct SortPredicate
+    {
+      char* base;
+      
+      SortPredicate (char* in_base) : base (in_base) {}
+      
+      bool operator () (size_t offset1, size_t offset2) const
+      {
+        const Event *event1 = reinterpret_cast<const Event*> (base + offset1),
+                    *event2 = reinterpret_cast<const Event*> (base + offset2);
+
+        return event1->time < event2->time;
+      }
+    };
+
+    void Sort ()
+    {
+      stl::sort (event_offsets.begin (), event_offsets.end (), SortPredicate (buffer.data ()));
+    }
+    
+  private:
+    xtl::uninitialized_storage<char>    buffer;        //буфер событий
+    stl::vector<size_t>                 event_offsets; //смещения событий в буфере
+    AnimationBlender::EventTrackHandler event_handler; //обработчик добавления события
+};
 
 ///Цель анимации
 struct Target: public xtl::reference_counter
@@ -20,11 +115,12 @@ struct Target: public xtl::reference_counter
 ///Анимация
 struct AnimationSource: public xtl::reference_counter
 {
-  EventTrack           events;                     //события анимации
-  AnimationStateImpl*  state;                      //состояние анимации
-  xtl::auto_connection on_state_remove_connection; //соединение с сигналом удаления анимационного состояния
+  EventTrack               events;                     //события анимации
+  AnimationStateImpl*      state;                      //состояние анимации
+  float                    prev_time;                  //предыдущее время анимации
+  xtl::auto_connection     on_state_remove_connection; //соединение с сигналом удаления анимационного состояния
   
-  AnimationSource () : state (0) {}
+  AnimationSource () : state (0), prev_time (0.0f) {}    
 };
 
 typedef xtl::intrusive_ptr<Target>                           TargetPtr;
@@ -41,13 +137,10 @@ struct AnimationBlender::Impl: public xtl::reference_counter
   TargetMap          targets;                             //цели анимации
   AnimationSourceMap sources;                             //исходные анимации
   Signal             signals [AnimationBlenderEvent_Num]; //сигналы  
-  size_t             source_channels_count;               //количество каналов-источников
-  bool               need_update_source_channels_count;   //необходимо обновить количество каналов-источников
+  EventBuffer        event_buffer;                        //буфер событий
   
 ///Конструктор
   Impl ()
-    : source_channels_count (0)
-    , need_update_source_channels_count (false)
   {
   }
   
@@ -65,20 +158,6 @@ struct AnimationBlender::Impl: public xtl::reference_counter
     {
       //подавление всех исключений
     }
-  }
-  
-///Обновление количества источников
-  void UpdateSourceChannelsCount ()
-  {
-    if (!need_update_source_channels_count)
-      return;
-      
-    source_channels_count = 0;
-      
-    for (TargetMap::iterator iter=targets.begin (), end=targets.end (); iter!=end; ++iter)
-      source_channels_count += iter->second->blender.SourcesCount ();
-
-    need_update_source_channels_count = false;
   }
   
 ///Добавление анимации
@@ -183,6 +262,95 @@ struct AnimationBlender::Impl: public xtl::reference_counter
       
     targets.erase (iter);
   }
+  
+///Обновление
+  void Update (const EventTrackHandler* event_handler)
+  {
+    stl::auto_ptr<stl::string> error_string;
+    size_t                     errors_count = 0;
+
+    for (TargetMap::iterator iter=targets.begin (), end=targets.end (); iter!=end; ++iter)
+    {
+      try
+      {        
+        iter->second->blender.Update ();
+      }
+      catch (std::exception& e)
+      {
+        if (!error_string)
+          error_string.reset (new stl::string);
+
+        *error_string += common::format (" %u) exception at update target '%s': %s", ++errors_count, iter->second->name.c_str (), e.what ());
+      }
+      catch (...)
+      {
+        if (!error_string)
+          error_string.reset (new stl::string);
+
+        *error_string += common::format (" %u) unknown exception at update property '%s'\n", ++errors_count, iter->second->name.c_str ());
+      }      
+    }
+    
+    if (error_string)
+      throw xtl::format_operation_exception ("", "Animation blending update exception. Errors:\n%s", error_string->c_str ());
+      
+    if (event_handler)
+    {
+      if (sources.size () == 1)
+      {
+        AnimationSource& source = *sources.begin ()->second;
+        
+        float time = get_time (*source.state);
+        
+        if (time < source.prev_time)
+          source.prev_time = 0.0f;
+        
+        source.events.GetEvents (source.prev_time, time, *event_handler);
+        
+        source.prev_time = time;
+      }
+      else
+      {
+        try
+        {
+            //формирование списка событий
+          
+          for (AnimationSourceMap::iterator iter=sources.begin (), end=sources.end (); iter!=end; ++iter)
+          {
+            AnimationSource& source = *iter->second;
+
+            float time = get_time (*source.state);
+
+            if (time < source.prev_time)
+              source.prev_time = 0.0f;            
+
+            event_buffer.AddEvents (source.prev_time, time, source.events);
+
+            source.prev_time = time;
+          }
+          
+            //сортировка событий по времени и вызов обработчика
+
+          event_buffer.InvokeEvents (*event_handler);
+          event_buffer.Clear ();
+        }
+        catch (...)
+        {
+          event_buffer.Clear ();
+          throw;
+        }                
+      }
+    }
+    else
+    {
+      for (AnimationSourceMap::iterator iter=sources.begin (), end=sources.end (); iter!=end; ++iter)
+      {
+        AnimationSource& source = *iter->second;
+        
+        source.prev_time = get_time (*source.state);
+      }            
+    }
+  }
 };
 
 /*
@@ -222,9 +390,12 @@ size_t AnimationBlender::SourcesCount () const
 
 size_t AnimationBlender::SourceChannelsCount () const
 {
-  impl->UpdateSourceChannelsCount ();
+  size_t source_channels_count = 0;
+    
+  for (TargetMap::iterator iter=impl->targets.begin (), end=impl->targets.end (); iter!=end; ++iter)
+    source_channels_count += iter->second->blender.SourcesCount ();
 
-  return impl->source_channels_count;
+  return source_channels_count;
 }
 
 /*
@@ -263,16 +434,12 @@ void AnimationBlender::RemoveTarget (const char* target_name)
     return;
     
   impl->targets.erase (target_name);
-  
-  impl->need_update_source_channels_count = true;  
 }
 
 void AnimationBlender::RemoveAllSources ()
 {
   impl->targets.clear ();
   impl->sources.clear ();
-  
-  impl->need_update_source_channels_count = true;
 }
 
 /*
@@ -328,24 +495,6 @@ const char* AnimationBlender::TargetId (const ConstTargetIterator& i) const
 }
 
 /*
-    Перечисление событий, прошедших в указанном промежутке времени
-*/
-
-void AnimationBlender::GetEvents (float previous_time, float current_time, const EventTrack::EventHandler& handler) const
-{  
-  try
-  {
-    for (AnimationSourceMap::iterator iter=impl->sources.begin (), end=impl->sources.end (); iter!=end; ++iter)
-      iter->second->events.GetEvents (previous_time, current_time, handler);
-  }
-  catch (xtl::exception& e)
-  {
-    e.touch ("media::anmation::AnimationBlender::GetEvents");
-    throw;
-  }
-}
-
-/*
     Обновление состояния
 */
 
@@ -353,37 +502,24 @@ void AnimationBlender::Update ()
 {
   try
   {
-    stl::auto_ptr<stl::string> error_string;
-    size_t                     errors_count = 0;
-
-    for (TargetMap::iterator iter=impl->targets.begin (), end=impl->targets.end (); iter!=end; ++iter)
-    {
-      try
-      {        
-        iter->second->blender.Update ();
-      }
-      catch (std::exception& e)
-      {
-        if (!error_string)
-          error_string.reset (new stl::string);
-
-        *error_string += common::format (" %u) exception at update target '%s': %s", ++errors_count, iter->second->name.c_str (), e.what ());
-      }
-      catch (...)
-      {
-        if (!error_string)
-          error_string.reset (new stl::string);
-
-        *error_string += common::format (" %u) unknown exception at update property '%s'\n", ++errors_count, iter->second->name.c_str ());
-      }      
-    }
-    
-    if (error_string)
-      throw xtl::format_operation_exception ("", "Animation blending update exception. Errors:\n%s", error_string->c_str ());
+    impl->Update (0);
   }  
   catch (xtl::exception& e)
   {
-    e.touch ("media::animation::AnimationBlender::Update");
+    e.touch ("media::animation::AnimationBlender::Update()");
+    throw;
+  }
+}
+
+void AnimationBlender::Update (const EventTrack::EventHandler& event_handler)
+{
+  try
+  {
+    impl->Update (&event_handler);
+  }  
+  catch (xtl::exception& e)
+  {
+    e.touch ("media::animation::AnimationBlender::Update(const EventTrack::EventHandler&)");
     throw;
   }
 }
