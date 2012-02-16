@@ -224,11 +224,6 @@ inline void copy_to (const char* value, PropertyMap& map, const PropertySelector
   set_property (map, property_selector, value);
 }
 
-inline void copy_to (const stl::string& value, PropertyMap& map, const PropertySelector& property_selector)
-{
-  set_property (map, property_selector, value.c_str ());
-}
-
 inline void copy_to (signed char value, PropertyMap& map, const PropertySelector& property_selector)
 {
   detail::copy_value_to<int> (value, map, property_selector);

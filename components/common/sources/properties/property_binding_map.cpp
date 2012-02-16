@@ -391,4 +391,13 @@ void swap (PropertyBindingMap& map1, PropertyBindingMap& map2)
   map1.Swap (map2);
 }
 
+/*
+    Копирование из строки
+*/
+
+void copy_to (const stl::string& value, PropertyMap& map, const PropertySelector& property_selector)
+{
+  set_property (map, property_selector, value.c_str ());
+}
+
 }
