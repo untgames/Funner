@@ -273,7 +273,7 @@ struct AnimationBlender::Impl: public xtl::reference_counter
     {
       try
       {        
-        iter->second->blender.Update ();
+        iter->second->blender.Update ();        
       }
       catch (std::exception& e)
       {
@@ -287,7 +287,7 @@ struct AnimationBlender::Impl: public xtl::reference_counter
         if (!error_string)
           error_string.reset (new stl::string);
 
-        *error_string += common::format (" %u) unknown exception at update property '%s'\n", ++errors_count, iter->second->name.c_str ());
+        *error_string += common::format (" %u) unknown exception at update target '%s'\n", ++errors_count, iter->second->name.c_str ());
       }      
     }
     

@@ -76,6 +76,7 @@ enum TargetBlenderEvent
 {
   TargetBlenderEvent_OnSourcesChanged, //изменены анимационные источники
   TargetBlenderEvent_OnSourcesEmpty,   //количество анимационные источников стало равным нулю
+  TargetBlenderEvent_OnUpdate,         //вызывается послеобновления блендера
 
   TargetBlenderEvent_Num
 };

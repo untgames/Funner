@@ -279,7 +279,7 @@ struct TargetBlender::Impl: public xtl::reference_counter
     SourceMap::iterator iter = sources.find (key);
 
     if (iter == sources.end ())
-      return; 
+      return;
       
     need_update_sources_count = true;
 
@@ -467,9 +467,28 @@ void TargetBlender::Update ()
           error_string.reset (new stl::string);
 
         *error_string += common::format ("  %u) unknown exception at update property '%s'\n", ++errors_count, impl->properties.PropertyName (iter->second->property_index));
-      }      
+      }
     }
-    
+
+    try
+    {
+      impl->signals [TargetBlenderEvent_OnUpdate](TargetBlenderEvent_OnUpdate);
+    }
+    catch (std::exception& e)
+    {
+      if (!error_string)
+        error_string.reset (new stl::string);
+
+      *error_string += common::format ("  %u) %s", ++errors_count, e.what ());
+    }
+    catch (...)
+    {
+      if (!error_string)
+        error_string.reset (new stl::string);
+
+      *error_string += common::format ("  %u) unknown exception at update animation target\n", ++errors_count);
+    }
+
     if (error_string)
       throw xtl::format_operation_exception ("", "Animation target blending update exception. Errors:\n%s", error_string->c_str ());
   }  
