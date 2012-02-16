@@ -1,7 +1,20 @@
-#ifndef SCENE_GRAPH_CONTROLLERS_ANIMATION_CONTROLLER_HEADER
-#define SCENE_GRAPH_CONTROLLERS_ANIMATION_CONTROLLER_HEADER
+#ifndef SCENE_GRAPH_CONTROLLERS_ANIMATION_HEADER
+#define SCENE_GRAPH_CONTROLLERS_ANIMATION_HEADER
 
 #include <sg/controller.h>
+
+namespace media
+{
+
+namespace animation
+{
+
+//forward declaration
+class Animation;
+
+}
+
+}
 
 namespace scene_graph
 {
@@ -13,13 +26,22 @@ namespace controllers
 class AnimationManager;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+///События анимации
+///////////////////////////////////////////////////////////////////////////////////////////////////
+enum AnimationEvent
+{
+  AnimationEvent_OnStart,  //срабатывает в начале проигрывания анимации
+  AnimationEvent_OnFinish, //срабатывает в конце проигрывания анимации
+  
+  AnimationEvent_Num
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Анимация
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 class Animation
 {
   public:
-    typedef xtl::function<void (Animation& animation)> AnimationHandler;
-    
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструкторы / деструктор / присваивание
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -33,16 +55,21 @@ class Animation
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void Play      ();
     void Stop      ();
+    void Pause     ();
     bool IsPlaying () const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Проигрывание анимаций
+///Получение времени анимации
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void                    SetStartHandler  (const AnimationHandler& handler);
-    void                    SetFinishHandler (const AnimationHandler& handler);
-    const AnimationHandler& StartHandler     () const;
-    const AnimationHandler& FinishHandler    () const;
-    
+    const TimeValue& Time () const;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Подписка на события
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    typedef xtl::function<void (Animation& animation)> EventHandler;
+
+    xtl::connection RegisterEventHandler (AnimationEvent event, const EventHandler& handler) const;
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Цикличность анимации
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -89,7 +116,10 @@ class AnimationManager
 ///Создание анимации
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     Animation CreateAnimation (const char* name, Node& root);
-    Animation PlayAnimation   (const char* name, Node& root);
+    Animation PlayAnimation   (const char*                    name,
+                               Node&                          root,
+                               const Animation::EventHandler& on_start_handler = Animation::EventHandler (),
+                               const Animation::EventHandler& on_finish_handler = Animation::EventHandler ());
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Управление ресурсами
@@ -127,23 +157,27 @@ class AnimationController: public Controller
     static Pointer Create (Node& node, AnimationManager& manager);
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Обработка событий ????????
+///Обработка событий
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+    typedef xtl::function<void (float time, const char* event)> EventHandler;
+
+    xtl::connection RegisterEventHandler (const EventHandler&) const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Перебор анимаций в очереди
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-          size_t                  AnimationsCount () const;
-          scene_graph::Animation& Animation       (size_t index);
-    const scene_graph::Animation& Animation       (size_t index) const;
+          size_t                               AnimationsCount () const;
+          scene_graph::controllers::Animation& Animation       (size_t index);
+    const scene_graph::controllers::Animation& Animation       (size_t index) const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Проигрывание анимаций
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    scene_graph::Animation PlayAnimation   (const char*                        name,
-                                            const Animation::AnimationHandler& on_start_handler = Animation::AnimationHandler (),
-                                            const Animation::AnimationHandler& on_ned_handler = Animation::AnimationHandler ());
-    scene_graph::Animation CreateAnimation (const char* name);
+    scene_graph::controllers::Animation PlayAnimation   (const char*                    name,
+                                                         const Animation::EventHandler& on_start_handler = Animation::EventHandler (),
+                                                         const Animation::EventHandler& on_finish_handler = Animation::EventHandler ());
+    scene_graph::controllers::Animation CreateAnimation (const char* name);
+    scene_graph::controllers::Animation CreateAnimation (const media::animation::Animation&);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Остановка всех анимаций
