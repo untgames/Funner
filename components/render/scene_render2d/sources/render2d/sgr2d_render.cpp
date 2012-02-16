@@ -424,6 +424,24 @@ Renderable* Render::GetRenderable (scene_graph::TextLine* entity)
   return &*renderable;
 }
 
+Renderable* Render::GetRenderable (scene_graph::PageCurl* entity)
+{
+    //попытка найти объект в кэше
+
+  RenderableMap::iterator iter = renderables_cache.find (entity);
+
+  if (iter != renderables_cache.end ())
+    return iter->second.renderable.get ();
+
+    //создание нового спрайта
+
+  RenderablePtr renderable (new RenderablePageCurl (entity, *this), false);
+
+  InsertRenderable (entity, renderable);
+
+  return &*renderable;
+}
+
 void Render::InsertRenderable (scene_graph::Entity* entity, const RenderablePtr& renderable)
 {
   xtl::auto_connection after_destroy_connection = entity->RegisterEventHandler (NodeEvent_AfterDestroy, xtl::bind (&Render::RemoveRenderable, this, entity));

@@ -8,7 +8,7 @@ RENDER.SCENE_RENDER_2D.SOURCES.TYPE        := static-lib
 RENDER.SCENE_RENDER_2D.SOURCES.NAME        := funner.render.scene_render2d
 RENDER.SCENE_RENDER_2D.SOURCES.SOURCE_DIRS := sources/screen sources/core sources/render2d
 RENDER.SCENE_RENDER_2D.SOURCES.IMPORTS     := compile.render.scene_render2d compile.common compile.scene_graph.core \
-                                              compile.render.mid_level compile.media.image \
+                                              compile.render.low_level compile.render.mid_level compile.media.image \
                                               compile.media.rfx.obsolete compile.media.image compile.media.font compile.media.video
 RENDER.SCENE_RENDER_2D.SOURCES.msvc.COMPILER_CFLAGS := -wd4355                                                
                                              

@@ -1,6 +1,8 @@
 #ifndef SCENE_GRAPH_RENDER2D_HEADER
 #define SCENE_GRAPH_RENDER2D_HEADER
 
+#include <cfloat>
+
 #include <stl/hash_map>
 
 #include <xtl/common_exceptions.h>
@@ -17,6 +19,7 @@
 #include <math/utility.h>
 
 #include <common/component.h>
+#include <common/log.h>
 #include <common/strlib.h>
 #include <common/property_map.h>
 
@@ -28,11 +31,16 @@
 #include <media/video.h>
 
 #include <sg/camera.h>
+#include <sg/height_map.h>
+#include <sg/page_curl.h>
 #include <sg/scene.h>
 #include <sg/sprite.h>
-#include <sg/height_map.h>
 #include <sg/text_line.h>
 
+#include <render/low_level/device.h>
+#include <render/low_level/state.h>
+
+#include <render/mid_level/low_level_renderer.h>
 #include <render/mid_level/renderer2d.h>
 
 #include <render/custom_render.h>
@@ -252,6 +260,29 @@ class RenderableTextLine: public Renderable
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+///Перелистывание страницы
+///////////////////////////////////////////////////////////////////////////////////////////////////
+class RenderablePageCurl: public Renderable
+{
+  public:
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Конструктор
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    RenderablePageCurl (scene_graph::PageCurl* page_curl, Render& render);
+    ~RenderablePageCurl ();
+
+  private:
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Рисование
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void DrawCore (IFrame&);
+
+  private:
+    struct Impl;
+    stl::auto_ptr<Impl> impl;
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Область вывода рендера
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 class RenderView: public IRenderView, public xtl::reference_counter
@@ -361,8 +392,9 @@ class Render: public ICustomSceneRender, public xtl::reference_counter
 ///Работа с кэшем
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     Renderable*     GetRenderable (scene_graph::SpriteModel*);  // дублирование!!!
-    Renderable*     GetRenderable (scene_graph::HeightMap*);  // дублирование!!!
+    Renderable*     GetRenderable (scene_graph::HeightMap*);    // дублирование!!!
     Renderable*     GetRenderable (scene_graph::TextLine*);     // дублирование!!!
+    Renderable*     GetRenderable (scene_graph::PageCurl*);     // дублирование!!!
     ITexture*       GetTexture    (const char* file_name, bool need_alpha, Renderable* renderable = 0);
     SpriteMaterial* GetMaterial   (const char* name);
     RenderableFont* GetFont       (const char* name);

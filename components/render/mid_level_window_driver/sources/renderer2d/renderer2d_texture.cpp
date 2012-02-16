@@ -299,3 +299,11 @@ void RenderTargetTexture::Update (media::Image&)
   throw xtl::format_not_supported_exception ("render::mid_level::window_driver::renderer2d::RenderTargetTexture::Update",
     "Render target textures can't be updated from image");
 }
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Получение текстуры
+///////////////////////////////////////////////////////////////////////////////////////////////////
+render::low_level::ITexture* RenderTargetTexture::GetTexture ()
+{
+  return GetView ()->GetTexture ();
+}

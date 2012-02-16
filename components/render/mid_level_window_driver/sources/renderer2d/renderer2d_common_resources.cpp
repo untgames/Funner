@@ -268,8 +268,6 @@ RasterizerStatePtr create_rasterizer_state (IDevice& device, bool scissor_enable
   rasterizer_desc.antialiased_line_enable = false;
   
   return RasterizerStatePtr (device.CreateRasterizerState (rasterizer_desc), false);
-  
-  
 }
 
 }

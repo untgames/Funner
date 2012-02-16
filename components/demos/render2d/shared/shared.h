@@ -20,10 +20,11 @@
 #include <common/strlib.h>
 #include <common/time.h>
 
-#include <sg/scene.h>
 #include <sg/camera.h>
-#include <sg/sprite.h>
 #include <sg/height_map.h>
+#include <sg/page_curl.h>
+#include <sg/scene.h>
+#include <sg/sprite.h>
 
 #include <sg/controllers/acceleration_evaluators.h>
 #include <sg/controllers/align_with_node.h>

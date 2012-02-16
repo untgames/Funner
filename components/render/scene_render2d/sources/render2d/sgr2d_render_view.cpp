@@ -31,7 +31,7 @@ bool has_nan (const math::vec3f& v)
     Посетитель объектов сцены
 */
 
-struct RenderViewVisitor: public xtl::visitor<void, SpriteModel, TextLine, HeightMap>
+struct RenderViewVisitor: public xtl::visitor<void, SpriteModel, TextLine, HeightMap, PageCurl>
 {
   typedef xtl::intrusive_ptr<Render> RenderPtr;
 
@@ -69,6 +69,17 @@ struct RenderViewVisitor: public xtl::visitor<void, SpriteModel, TextLine, Heigh
 
     Renderable* renderable = render->GetRenderable (&text_line);
     
+    if (renderable)
+      renderable->Draw (*frame);
+  }
+
+  void visit (PageCurl& page_curl)
+  {
+    if (has_zero_component_or_nan (page_curl.WorldScale (), MINIMAL_NODE_SCALE) || has_nan (page_curl.WorldPosition ()))
+      return;
+
+    Renderable* renderable = render->GetRenderable (&page_curl);
+
     if (renderable)
       renderable->Draw (*frame);
   }

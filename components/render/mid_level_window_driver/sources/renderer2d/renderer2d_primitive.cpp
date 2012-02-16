@@ -10,9 +10,9 @@ using namespace render::mid_level::window_driver::renderer2d;
 */
 
 Primitive::Primitive ()
-  : need_update_transform (true)
+  : scissor_state (false)
+  , need_update_transform (true)
   , need_update_renderable_sprites (true)
-  , scissor_state (false)
 {
   scissor_rect.x      = 0;
   scissor_rect.y      = 0;
