@@ -7,6 +7,10 @@ class IEvaluatorBase : public xtl::reference_counter
   public:
     virtual const std::type_info& TrackType () = 0; //тип трека
     virtual const std::type_info& ValueType () = 0; //тип значения результата
+    virtual float                 MinUnwrappedTime () = 0; //минимальное неотсеченное время
+    virtual float                 MaxUnwrappedTime () = 0; //максимальное неотсеченное время
+    virtual float                 MinTime () = 0; //минимальное время
+    virtual float                 MaxTime () = 0; //максимальное время
     
     virtual ~IEvaluatorBase () {}
 };
@@ -22,6 +26,61 @@ template <class T> class IEvaluator : public IEvaluatorBase
       return typeid (T);
     }
 };
+
+template <class Key>
+typename math::basic_spline<Key>::time_value get_min_unwrapped_time (const math::basic_spline<Key>& spline)
+{
+  if (spline.is_begin_clamped ())
+    return spline.min_time ();
+
+  return FLT_MIN;
+}
+
+template <class Key>
+typename math::basic_spline<Key>::time_value get_max_unwrapped_time (const math::basic_spline<Key>& spline)
+{
+  if (spline.is_end_clamped ())
+    return spline.max_time ();
+
+  return FLT_MAX;
+}
+
+template <class Key>
+typename math::basic_spline<Key>::time_value get_min_time (const math::basic_spline<Key>& spline)
+{
+  return spline.min_time ();
+}
+
+template <class Key>
+typename math::basic_spline<Key>::time_value get_max_time (const math::basic_spline<Key>& spline)
+{
+  return spline.max_time ();
+}
+
+namespace adl_defaults
+{
+
+inline float get_min_unwrapped_time (xtl::default_cast_type)
+{
+  return FLT_MIN;
+}
+
+inline float get_max_unwrapped_time (xtl::default_cast_type)
+{
+  return FLT_MAX;
+}
+
+inline float get_min_time (xtl::default_cast_type)
+{
+  return FLT_MIN;
+}
+
+inline float get_max_time (xtl::default_cast_type)
+{
+  return FLT_MAX;
+}
+
+}
 
 ///реализация функции анимационного канала
 template <class Fn> class TrackImpl : public IEvaluator<typename TrackResultType<Fn>::Type> 
@@ -48,6 +107,34 @@ template <class Fn> class TrackImpl : public IEvaluator<typename TrackResultType
     {
       return typeid (Fn);
     }
+    
+    float MinUnwrappedTime ()
+    {
+      using adl_defaults::get_min_unwrapped_time;
+      
+      return get_min_unwrapped_time (fn);
+    }
+    
+    float MaxUnwrappedTime ()
+    {
+      using adl_defaults::get_max_unwrapped_time;
+      
+      return get_max_unwrapped_time (fn);
+    }
+    
+    float MinTime ()
+    {
+      using adl_defaults::get_min_time;
+      
+      return get_min_time (fn);
+    }
+    
+    float MaxTime ()
+    {
+      using adl_defaults::get_max_time;
+      
+      return get_max_time (fn);
+    }    
 
   private:
     Fn fn;

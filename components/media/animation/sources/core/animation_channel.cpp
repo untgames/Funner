@@ -73,6 +73,46 @@ size_t Channel::Id () const
 }
 
 /*
+    ћинимальное / максимальное врем€
+*/
+
+float Channel::MinTime () const
+{
+  if (!impl->track)
+    return 0.0f;
+
+  return impl->track->MinTime ();
+}
+
+float Channel::MaxTime () const
+{
+  if (!impl->track)
+    return 0.0f;
+
+  return impl->track->MaxTime ();
+}
+
+/*
+    ћинимальное / максимальное неотсеченное врем€ (-INF/INF в случае открытого диапазона)
+*/
+
+float Channel::MinUnwrappedTime () const
+{
+  if (!impl->track)
+    return 0.0f;
+
+  return impl->track->MinUnwrappedTime ();
+}
+
+float Channel::MaxUnwrappedTime () const
+{
+  if (!impl->track)
+    return 0.0f;
+
+  return impl->track->MaxUnwrappedTime ();
+}
+
+/*
     »м€ анимируемого параметра
 */
 
