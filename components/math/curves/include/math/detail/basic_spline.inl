@@ -872,9 +872,11 @@ void swap (basic_spline<Key>& s1, basic_spline<Key>& s2)
 */
 
 template <class Key>
-const typename basic_spline<Key>::time_type& get_min_time (const basic_spline<Key>& spline)
+const typename basic_spline<Key>::time_type& get_min_active_time (const basic_spline<Key>& spline)
 {
-  return spline.min_time ();
+  return spline.begin_wrap () == spline_wrap_clamp ? spline.min_time () : stl::
+    return ;
+  
 }
 
 template <class Key>
