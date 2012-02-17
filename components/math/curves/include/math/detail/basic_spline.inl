@@ -651,7 +651,7 @@ bool basic_spline<Key>::empty () const
 }
 
 /*
-    Закрытый ли сплайна
+    Закрытый ли сплайн
 */
 
 template <class Key>
@@ -790,13 +790,23 @@ void basic_spline<Key>::sort ()
 */
 
 template <class Key>
-void basic_spline<Key>::eval (const time_type& time, value_type& out_value) const
+void basic_spline<Key>::eval (const time_type& time, value_type& out_value, size_t& out_key_index) const
 {
   time_type wrapped_time = impl->get_wrapped_time (time);
 
   typename implementation::frame_type& frame = impl->get_frame (wrapped_time);
   
   detail::spline_eval (wrapped_time, frame, out_value);
+  
+  out_key_index = &frame - impl->frames.begin ();
+}
+
+template <class Key>
+void basic_spline<Key>::eval (const time_type& time, value_type& out_value) const
+{
+  size_t key_index = 0;
+  
+  eval (time, out_value, key_index);
 }
 
 template <class Key>
@@ -822,7 +832,7 @@ void basic_spline<Key>::operator () (const time_type& time, typename basic_splin
 }
 
 /*
-  Минимальное и максимальное время
+    Минимальное и максимальное время
 */
 
 template <class Key>
@@ -855,4 +865,20 @@ template <class Key>
 void swap (basic_spline<Key>& s1, basic_spline<Key>& s2)
 {
   s1.swap (s2);
+}
+
+/*
+    Получение минимального и максимального времени
+*/
+
+template <class Key>
+const typename basic_spline<Key>::time_type& get_min_time (const basic_spline<Key>& spline)
+{
+  return spline.min_time ();
+}
+
+template <class Key>
+const typename basic_spline<Key>::time_type& get_max_time (const basic_spline<Key>& spline)
+{
+  return spline.max_time ();
 }
