@@ -12,8 +12,11 @@
 #include <xtl/function.h>
 #include <xtl/intrusive_ptr.h>
 #include <xtl/iterator.h>
+#include <xtl/ref.h>
 #include <xtl/reference_counter.h>
+#include <xtl/trackable.h>
 
+#include <common/log.h>
 #include <common/property_map.h>
 #include <common/property_binding_map.h>
 
