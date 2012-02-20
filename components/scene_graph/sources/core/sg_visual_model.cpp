@@ -71,3 +71,14 @@ void VisualModel::AcceptCore (Visitor& visitor)
   if (!TryAccept (*this, visitor))
     Entity::AcceptCore (visitor);
 }
+
+/*
+    Связывание свойств
+*/
+
+void VisualModel::BindProperties (common::PropertyBindingMap& bindings)
+{
+  Entity::BindProperties (bindings);
+
+  bindings.AddProperty ("Mesh", xtl::bind (&VisualModel::MeshName, this), xtl::bind (&VisualModel::SetMeshName, this, _1));
+}

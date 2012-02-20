@@ -136,3 +136,17 @@ void PerspectiveCamera::AcceptCore (Visitor& visitor)
   if (!TryAccept (*this, visitor))
     Camera::AcceptCore (visitor);
 }
+
+/*
+    Связывание свойств
+*/
+
+void PerspectiveCamera::BindProperties (common::PropertyBindingMap& bindings)
+{
+  Camera::BindProperties (bindings);
+
+  bindings.AddProperty ("FovX", xtl::bind (&PerspectiveCamera::FovX, this), xtl::bind (&PerspectiveCamera::SetFovX, this, _1));
+  bindings.AddProperty ("FovY", xtl::bind (&PerspectiveCamera::FovY, this), xtl::bind (&PerspectiveCamera::SetFovY, this, _1));
+  bindings.AddProperty ("ZNear", xtl::bind (&PerspectiveCamera::ZNear, this), xtl::bind (&PerspectiveCamera::SetZNear, this, _1));
+  bindings.AddProperty ("ZFar", xtl::bind (&PerspectiveCamera::ZFar, this), xtl::bind (&PerspectiveCamera::SetZFar, this, _1));
+}

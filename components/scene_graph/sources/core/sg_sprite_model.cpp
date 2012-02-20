@@ -133,3 +133,15 @@ void SpriteModel::UpdateSpriteDescsNotify ()
 
   UpdateNotify ();
 }
+
+/*
+    Связывание свойств
+*/
+
+void SpriteModel::BindProperties (common::PropertyBindingMap& bindings)
+{
+  Entity::BindProperties (bindings);
+
+  bindings.AddProperty ("Material", xtl::bind (&SpriteModel::Material, this), xtl::bind (&SpriteModel::SetMaterial, this, _1));
+  bindings.AddProperty ("AlphaReference", xtl::bind (&SpriteModel::AlphaReference, this), xtl::bind (&SpriteModel::SetAlphaReference, this, _1));
+}

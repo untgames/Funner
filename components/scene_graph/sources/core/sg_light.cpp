@@ -99,3 +99,17 @@ void Light::AcceptCore (Visitor& visitor)
   if (!TryAccept (*this, visitor))
     Entity::AcceptCore (visitor);
 }
+
+/*
+    Связывание свойств
+*/
+
+void Light::BindProperties (common::PropertyBindingMap& bindings)
+{
+  Entity::BindProperties (bindings);
+
+  bindings.AddProperty ("LightColor", xtl::bind (&Light::LightColor, this), xtl::bind (&Light::SetLightColor, this, _1));
+  bindings.AddProperty ("Intensity", xtl::bind (&Light::Intensity, this), xtl::bind (&Light::SetIntensity, this, _1));
+  bindings.AddProperty ("Range", xtl::bind (&Light::Range, this), xtl::bind (&Light::SetRange, this, _1));
+  bindings.AddProperty ("Attenuation", xtl::bind (&Light::Attenuation, this), xtl::bind (&Light::SetAttenuation, this, _1));
+}

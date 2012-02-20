@@ -75,3 +75,14 @@ void DirectLight::AcceptCore (Visitor& visitor)
   if (!TryAccept (*this, visitor))
     Light::AcceptCore (visitor);
 }
+
+/*
+    Связывание свойств
+*/
+
+void DirectLight::BindProperties (common::PropertyBindingMap& bindings)
+{
+  Light::BindProperties (bindings);
+
+  bindings.AddProperty ("Radius", xtl::bind (&DirectLight::Radius, this), xtl::bind (&DirectLight::SetRadius, this, _1));
+}

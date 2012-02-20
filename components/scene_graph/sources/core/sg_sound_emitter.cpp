@@ -149,3 +149,15 @@ void SoundEmitter::AcceptCore (Visitor& visitor)
   if (!TryAccept (*this, visitor))
     Entity::AcceptCore (visitor);
 }
+
+/*
+    Связывание свойств
+*/
+
+void SoundEmitter::BindProperties (common::PropertyBindingMap& bindings)
+{
+  Entity::BindProperties (bindings);
+
+  bindings.AddProperty ("Gain", xtl::bind (&SoundEmitter::Gain, this), xtl::bind (&SoundEmitter::SetGain, this, _1));
+  bindings.AddProperty ("SoundDeclarationName", xtl::bind (&SoundEmitter::SoundDeclarationName, this));
+}

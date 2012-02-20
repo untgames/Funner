@@ -91,3 +91,15 @@ void SpotLight::AcceptCore (Visitor& visitor)
   if (!TryAccept (*this, visitor))
     Light::AcceptCore (visitor);
 }
+
+/*
+    Связывание свойств
+*/
+
+void SpotLight::BindProperties (common::PropertyBindingMap& bindings)
+{
+  Light::BindProperties (bindings);
+
+  bindings.AddProperty ("Angle", xtl::bind (&SpotLight::Angle, this), xtl::bind (&SpotLight::SetAngle, this, _1));
+  bindings.AddProperty ("Exponent", xtl::bind (&SpotLight::Exponent, this), xtl::bind (&SpotLight::SetExponent, this, _1));
+}

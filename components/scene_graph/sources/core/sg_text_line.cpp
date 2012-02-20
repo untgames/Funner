@@ -456,3 +456,16 @@ void TextLine::AcceptCore (Visitor& visitor)
   if (!TryAccept (*this, visitor))
     Entity::AcceptCore (visitor);
 }
+
+/*
+    Связывание свойств
+*/
+
+void TextLine::BindProperties (common::PropertyBindingMap& bindings)
+{
+  Entity::BindProperties (bindings);
+
+  bindings.AddProperty ("Font", xtl::bind (&TextLine::Font, this), xtl::bind (&TextLine::SetFont, this, _1));
+  bindings.AddProperty ("Color", xtl::bind (&TextLine::Color, this), xtl::bind (xtl::implicit_cast<void (TextLine::*)(const math::vec4f&)> (&TextLine::SetColor), this, _1));
+  bindings.AddProperty ("TextUtf8", xtl::bind (&TextLine::TextUtf8, this), xtl::bind (&TextLine::SetTextUtf8, this, _1));
+}

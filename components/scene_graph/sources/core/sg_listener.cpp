@@ -64,3 +64,14 @@ void Listener::AcceptCore (Visitor& visitor)
   if (!TryAccept (*this, visitor))
     Entity::AcceptCore (visitor);
 }
+
+/*
+    Связывание свойств
+*/
+
+void Listener::BindProperties (common::PropertyBindingMap& bindings)
+{
+  Entity::BindProperties (bindings);
+
+  bindings.AddProperty ("Gain", xtl::bind (&Listener::Gain, this), xtl::bind (&Listener::SetGain, this, _1));
+}

@@ -136,3 +136,16 @@ const SpriteModel::SpriteDesc* Sprite::SpriteDescsCore ()
 {
   return &impl->sprite_desc;
 }
+
+/*
+    Связывание свойств
+*/
+
+void Sprite::BindProperties (common::PropertyBindingMap& bindings)
+{
+  SpriteModel::BindProperties (bindings);
+
+  bindings.AddProperty ("Color", xtl::bind (&Sprite::Color, this), xtl::bind (xtl::implicit_cast<void (Sprite::*)(const math::vec4f&)> (&Sprite::SetColor), this, _1));
+  bindings.AddProperty ("Alpha", xtl::bind (&Sprite::Alpha, this), xtl::bind (&Sprite::SetAlpha, this, _1));
+  bindings.AddProperty ("Frame", xtl::bind (&Sprite::Frame, this), xtl::bind (&Sprite::SetFrame, this, _1));
+}

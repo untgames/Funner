@@ -162,3 +162,19 @@ void OrthoCamera::AcceptCore (Visitor& visitor)
   if (!TryAccept (*this, visitor))
     Camera::AcceptCore (visitor);
 }
+
+/*
+    Связывание свойств
+*/
+
+void OrthoCamera::BindProperties (common::PropertyBindingMap& bindings)
+{
+  Camera::BindProperties (bindings);
+
+  bindings.AddProperty ("Left", xtl::bind (&OrthoCamera::Left, this), xtl::bind (&OrthoCamera::SetLeft, this, _1));
+  bindings.AddProperty ("Right", xtl::bind (&OrthoCamera::Right, this), xtl::bind (&OrthoCamera::SetRight, this, _1));
+  bindings.AddProperty ("Top", xtl::bind (&OrthoCamera::Top, this), xtl::bind (&OrthoCamera::SetTop, this, _1));
+  bindings.AddProperty ("Bottom", xtl::bind (&OrthoCamera::Bottom, this), xtl::bind (&OrthoCamera::SetBottom, this, _1));
+  bindings.AddProperty ("ZNear", xtl::bind (&OrthoCamera::ZNear, this), xtl::bind (&OrthoCamera::SetZNear, this, _1));
+  bindings.AddProperty ("ZFar", xtl::bind (&OrthoCamera::ZFar, this), xtl::bind (&OrthoCamera::SetZFar, this, _1));
+}
