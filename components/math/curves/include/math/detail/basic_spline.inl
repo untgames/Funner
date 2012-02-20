@@ -866,21 +866,3 @@ void swap (basic_spline<Key>& s1, basic_spline<Key>& s2)
 {
   s1.swap (s2);
 }
-
-/*
-    ѕолучение минимального и максимального времени
-*/
-
-template <class Key>
-const typename basic_spline<Key>::time_type& get_min_active_time (const basic_spline<Key>& spline)
-{
-  return spline.begin_wrap () == spline_wrap_clamp ? spline.min_time () : stl::
-    return ;
-  
-}
-
-template <class Key>
-const typename basic_spline<Key>::time_type& get_max_time (const basic_spline<Key>& spline)
-{
-  return spline.max_time ();
-}
