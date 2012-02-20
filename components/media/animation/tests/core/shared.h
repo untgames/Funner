@@ -10,6 +10,7 @@
 #include <math/matrix.h>
 #include <math/quat.h>
 #include <math/vector.h>
+#include <math/basic_spline.h>
 
 #include <common/property_map.h>
 

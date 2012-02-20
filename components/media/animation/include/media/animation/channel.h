@@ -133,6 +133,7 @@ class Channel
     template <class Fn> void      SetTrack (const Fn&);
     template <class Fn> const Fn* Track    () const;
     template <class Fn> Fn*       Track    ();
+                        bool      HasTrack () const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Вычисление значений по времени

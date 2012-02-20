@@ -25,7 +25,7 @@ MEDIA.ANIMATION.BINANIM.SOURCES.IMPORTS     := compile.media.animation compile.m
 #Цель - tests
 MEDIA.ANIMATION.TESTS.TYPE        := test-suite
 MEDIA.ANIMATION.TESTS.SOURCE_DIRS := tests/core
-MEDIA.ANIMATION.TESTS.IMPORTS     := compile.media.animation link.media.animation compile.math.vecmath
+MEDIA.ANIMATION.TESTS.IMPORTS     := compile.media.animation link.media.animation compile.math.vecmath compile.math.curves
 
 #Цель - xanim serializer tests
 MEDIA.ANIMATION.XANIM.TESTS.TYPE        := test-suite

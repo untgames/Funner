@@ -42,18 +42,61 @@ typedef stl::vector<EventDescPtr>     EventDescArray;
 
 struct EventTrack::Impl: public xtl::reference_counter
 {
-  EventDescArray events;         //список событий
-  EventDescArray events_to_fire; //список событий, сработавших при вызове GetEvents (буфер дл€ сокращени€ количества операций выделени€ и освобождени€ пам€ти)
+  EventDescArray events;                //список событий
+  EventDescArray events_to_fire;        //список событий, сработавших при вызове GetEvents (буфер дл€ сокращени€ количества операций выделени€ и освобождени€ пам€ти)
+  float          min_time;              //минимальное врем€
+  float          max_time;              //максимальное врем€
+  bool           has_periodic;          //есть ли периодические событи€
+  bool           need_limits_recompute; //нужно ли пересчитывать лимтиы
 
   Impl ()
+    : min_time (0.0f)
+    , max_time (0.0f)
+    , has_periodic (false)
+    , need_limits_recompute (false)
   {
     events_to_fire.reserve (DEFAULT_EVENTS_TO_FIRE_ARRAY_SIZE);
   }
   
   Impl (const Impl& impl)
     : events (impl.events)
+    , min_time (impl.min_time)
+    , max_time (impl.max_time)
+    , has_periodic (impl.has_periodic)
+    , need_limits_recompute (impl.need_limits_recompute)
   {
     events_to_fire.reserve (DEFAULT_EVENTS_TO_FIRE_ARRAY_SIZE);    
+  }
+  
+  void RecomputeLimits ()
+  {
+    if (!need_limits_recompute)
+      return;
+      
+    if (events.empty ())
+    {
+      min_time     = max_time = 0.0f;
+      has_periodic = false;
+    }
+    else
+    {
+      min_time     = FLT_MAX;
+      max_time     = FLT_MIN;
+      has_periodic = false;
+        
+      for (EventDescArray::iterator iter=events.begin (), end=events.end (); iter!=end; ++iter)
+      {
+        EventDesc& desc = **iter;
+        
+        if (min_time > desc.delay) min_time = desc.delay;
+        if (max_time < desc.delay) max_time = desc.delay;
+        
+        if (fabs (desc.period) >= EPSILON)
+          has_periodic = true;
+      }
+    }
+      
+    need_limits_recompute = false;
   }
 };
 
@@ -132,6 +175,40 @@ void EventTrack::Reserve (size_t events_count)
 }
 
 /*
+    ћинимальное / максимальное врем€
+*/
+
+float EventTrack::MinTime () const
+{
+  impl->RecomputeLimits ();
+  
+  return impl->min_time;
+}
+
+float EventTrack::MaxTime () const
+{
+  impl->RecomputeLimits ();
+  
+  return impl->max_time;
+}
+
+/*
+    ћинимальное / максимальное неотсеченное врем€ (-INF/INF в случае открытого диапазона)
+*/
+
+float EventTrack::MinUnwrappedTime () const
+{
+  return MinTime ();
+}
+
+float EventTrack::MaxUnwrappedTime () const
+{
+  impl->RecomputeLimits ();
+  
+  return impl->has_periodic ? FLT_MAX : MaxTime ();
+}
+
+/*
     ƒобавление / изменение событий
 */
 
@@ -149,6 +226,8 @@ size_t EventTrack::AddEvent (float delay, float period, const char* event)
     throw xtl::make_argument_exception (METHOD_NAME, "period", period, "Period must be not negative");
 
   impl->events.push_back (EventDescPtr (new EventDesc (delay, period, event), false));
+  
+  impl->need_limits_recompute = true;
 
   return impl->events.size () - 1;
 }
@@ -164,6 +243,8 @@ void EventTrack::SetDelay (size_t event_index, float delay)
     throw xtl::make_argument_exception (METHOD_NAME, "delay", delay, "Delay must be not negative");
 
   impl->events [event_index]->delay = delay;
+  
+  impl->need_limits_recompute = true;  
 }
 
 void EventTrack::SetPeriod (size_t event_index, float period)
@@ -177,6 +258,8 @@ void EventTrack::SetPeriod (size_t event_index, float period)
     throw xtl::make_argument_exception (METHOD_NAME, "period", period, "Period must be not negative");
 
   impl->events [event_index]->period = period;
+  
+  impl->need_limits_recompute = true;  
 }
 
 void EventTrack::SetEvent (size_t event_index, float delay, float period, const char* event)
@@ -196,6 +279,8 @@ void EventTrack::SetEvent (size_t event_index, float delay, float period, const 
     throw xtl::make_argument_exception (METHOD_NAME, "period", period, "Period must be not negative");
 
   impl->events [event_index] = EventDescPtr (new EventDesc (delay, period, event), false);
+  
+  impl->need_limits_recompute = true;  
 }
 
 void EventTrack::SetEvent (size_t event_index, const char* event)
@@ -335,11 +420,15 @@ void EventTrack::Remove (size_t event_index)
     return;
 
   impl->events.erase (impl->events.begin () + event_index);
+  
+  impl->need_limits_recompute = true;    
 }
 
 void EventTrack::Clear ()
 {
   impl->events.clear ();
+  
+  impl->need_limits_recompute = true;    
 }
 
 /*

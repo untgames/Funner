@@ -28,7 +28,7 @@ template <class T> class IEvaluator : public IEvaluatorBase
 };
 
 template <class Key>
-typename math::basic_spline<Key>::time_value get_min_unwrapped_time (const math::basic_spline<Key>& spline)
+typename math::basic_spline<Key>::time_type get_min_unwrapped_time (const math::basic_spline<Key>& spline)
 {
   if (spline.is_begin_clamped ())
     return spline.min_time ();
@@ -37,7 +37,7 @@ typename math::basic_spline<Key>::time_value get_min_unwrapped_time (const math:
 }
 
 template <class Key>
-typename math::basic_spline<Key>::time_value get_max_unwrapped_time (const math::basic_spline<Key>& spline)
+typename math::basic_spline<Key>::time_type get_max_unwrapped_time (const math::basic_spline<Key>& spline)
 {
   if (spline.is_end_clamped ())
     return spline.max_time ();
@@ -46,13 +46,13 @@ typename math::basic_spline<Key>::time_value get_max_unwrapped_time (const math:
 }
 
 template <class Key>
-typename math::basic_spline<Key>::time_value get_min_time (const math::basic_spline<Key>& spline)
+typename math::basic_spline<Key>::time_type get_min_time (const math::basic_spline<Key>& spline)
 {
   return spline.min_time ();
 }
 
 template <class Key>
-typename math::basic_spline<Key>::time_value get_max_time (const math::basic_spline<Key>& spline)
+typename math::basic_spline<Key>::time_type get_max_time (const math::basic_spline<Key>& spline)
 {
   return spline.max_time ();
 }
@@ -110,28 +110,28 @@ template <class Fn> class TrackImpl : public IEvaluator<typename TrackResultType
     
     float MinUnwrappedTime ()
     {
-      using adl_defaults::get_min_unwrapped_time;
+      using namespace adl_defaults;
       
       return get_min_unwrapped_time (fn);
     }
     
     float MaxUnwrappedTime ()
     {
-      using adl_defaults::get_max_unwrapped_time;
+      using namespace adl_defaults;
       
       return get_max_unwrapped_time (fn);
     }
     
     float MinTime ()
     {
-      using adl_defaults::get_min_time;
+      using namespace adl_defaults;
       
       return get_min_time (fn);
     }
     
     float MaxTime ()
     {
-      using adl_defaults::get_max_time;
+      using namespace adl_defaults;
       
       return get_max_time (fn);
     }    

@@ -79,7 +79,7 @@ size_t Channel::Id () const
 float Channel::MinTime () const
 {
   if (!impl->track)
-    return 0.0f;
+    return 0.0f;    
 
   return impl->track->MinTime ();
 }
@@ -165,6 +165,11 @@ void Channel::SetTrackCore (animation::detail::IEvaluatorBase* in_track)
 animation::detail::IEvaluatorBase* Channel::TrackCore () const
 {
   return impl->track.get ();
+}
+
+bool Channel::HasTrack () const
+{
+  return impl->track;
 }
 
 /*

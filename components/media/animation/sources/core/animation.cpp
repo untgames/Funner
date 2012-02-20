@@ -50,6 +50,54 @@ struct Animation::Impl : public xtl::reference_counter
       channel_groups.push_back (new_group);
     }
   }
+  
+  void GetTimeLimits (float& min_time, float& max_time, float& min_unwrapped_time, float& max_unwrapped_time)
+  {
+    bool has_result = false;
+
+    min_time           = FLT_MAX;
+    max_time           = FLT_MIN;
+    min_unwrapped_time = FLT_MAX;
+    max_unwrapped_time = FLT_MIN;
+    
+    for (ChannelGroupsArray::const_iterator group_iter = channel_groups.begin (), group_end = channel_groups.end (); group_iter != group_end; ++group_iter)
+    {
+      const ChannelGroup& group = **group_iter;
+
+      for (ChannelsArray::const_iterator iter = group.channels.begin (), end = group.channels.end (); iter != end; ++iter)
+      {
+        const animation::Channel& channel = *iter;
+        
+        if (!channel.HasTrack ())
+          continue;
+          
+        if (min_time > channel.MinTime ())                    min_time           = channel.MinTime ();
+        if (min_unwrapped_time > channel.MinUnwrappedTime ()) min_unwrapped_time = channel.MinUnwrappedTime ();          
+        if (max_time < channel.MaxTime ())                    max_time           = channel.MaxTime ();                  
+        if (max_unwrapped_time < channel.MaxUnwrappedTime ()) max_unwrapped_time = channel.MaxUnwrappedTime ();        
+          
+        has_result = true;
+      }
+    }
+    
+    if (event_track.Size ())
+    {
+      if (min_time > event_track.MinTime ())                    min_time           = event_track.MinTime ();
+      if (min_unwrapped_time > event_track.MinUnwrappedTime ()) min_unwrapped_time = event_track.MinUnwrappedTime ();
+      if (max_time < event_track.MaxTime ())                    max_time           = event_track.MaxTime ();
+      if (max_unwrapped_time < event_track.MaxUnwrappedTime ()) max_unwrapped_time = event_track.MaxUnwrappedTime ();
+
+      has_result = true;
+    }
+
+    if (!has_result)
+    {
+      min_time           = 0.0f;
+      max_time           = 0.0f;
+      min_unwrapped_time = 0.0f;
+      max_unwrapped_time = 0.0f;
+    }
+  }
 };
 
 /*
@@ -259,6 +307,62 @@ const EventTrack& Animation::Events () const
 EventTrack& Animation::Events ()
 {
   return impl->event_track;
+}
+
+/*
+    Получение временных лимитов
+*/
+
+void Animation::GetTimeLimits (float& min_time, float& max_time) const
+{
+  float min_unwrapped_time = 0.0f, max_unwrapped_time = 0.0f;
+  
+  impl->GetTimeLimits (min_time, max_time, min_unwrapped_time, max_unwrapped_time);
+}
+
+void Animation::GetTimeLimits (float& min_time, float& max_time, float& min_unwrapped_time, float& max_unwrapped_time) const
+{
+  impl->GetTimeLimits (min_time, max_time, min_unwrapped_time, max_unwrapped_time);  
+}
+
+float Animation::MinTime () const
+{
+  float min_time = 0.0f, max_time = 0.0f, min_unwrapped_time = 0.0f, max_unwrapped_time = 0.0f;
+
+  impl->GetTimeLimits (min_time, max_time, min_unwrapped_time, max_unwrapped_time);  
+  
+  return min_time;
+}
+
+float Animation::MaxTime () const
+{
+  float min_time = 0.0f, max_time = 0.0f, min_unwrapped_time = 0.0f, max_unwrapped_time = 0.0f;
+
+  impl->GetTimeLimits (min_time, max_time, min_unwrapped_time, max_unwrapped_time);  
+  
+  return max_time;
+}
+
+/*
+    Минимальное / максимальное неотсеченное время (-INF/INF в случае открытого диапазона)
+*/
+
+float Animation::MinUnwrappedTime () const
+{
+  float min_time = 0.0f, max_time = 0.0f, min_unwrapped_time = 0.0f, max_unwrapped_time = 0.0f;
+
+  impl->GetTimeLimits (min_time, max_time, min_unwrapped_time, max_unwrapped_time);  
+  
+  return min_unwrapped_time;
+}
+
+float Animation::MaxUnwrappedTime () const
+{
+  float min_time = 0.0f, max_time = 0.0f, min_unwrapped_time = 0.0f, max_unwrapped_time = 0.0f;
+
+  impl->GetTimeLimits (min_time, max_time, min_unwrapped_time, max_unwrapped_time);  
+  
+  return max_unwrapped_time;
 }
 
 /*
