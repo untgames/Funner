@@ -24,6 +24,10 @@ namespace math
 
 //forward declarations
 template <class T> class quat;
+template <class T> class angle;
+
+math::angle<float>  degree (float);
+math::angle<double> degree (double);
 
 }
 
@@ -309,6 +313,9 @@ void copy_from (const PropertyMap& map, size_t property_index, math::matrix<T, 4
 template <class T>
 void copy_from (const PropertyMap& map, size_t property_index, math::quat<T>& value);
 
+template <class T>
+void copy_from (const PropertyMap& map, size_t property_index, math::angle<T>& value);
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///¬спомогательный селектор свойства в карте
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -375,6 +382,9 @@ void copy_to (const math::matrix<T, 4>& value, PropertyMap& map, const PropertyS
 
 template <class T>
 void copy_to (const math::quat<T>& value, PropertyMap& map, const PropertySelector& property_selector);
+
+template <class T>
+void copy_to (const math::angle<T>& value, PropertyMap& map, const PropertySelector& property_selector);
 
 #include <common/detail/property_binding_map.inl>
 

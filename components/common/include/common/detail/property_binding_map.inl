@@ -193,6 +193,23 @@ inline void copy_from (const PropertyMap& map, size_t property_index, math::quat
   detail::copy_vector_from (map, property_index, reinterpret_cast<math::vector<T, 4>&> (value));
 }
 
+template <class T>
+inline void copy_from (const PropertyMap& map, size_t property_index, math::angle<T>& value)
+{
+  struct Value
+  {
+    T value;
+    
+    Value () : value () {}
+  };
+
+  Value tmp;
+  
+  copy_from (map, property_index, tmp.value);
+  
+  value = math::degree (tmp.value);
+}
+
 /*
     Установка свойств по селектору
 */
@@ -326,6 +343,12 @@ inline void copy_to (const math::quat<T>& value, PropertyMap& map, const Propert
 inline void copy_to (const math::quat<float>& value, PropertyMap& map, const PropertySelector& property_selector)
 {
   set_property (map, property_selector, reinterpret_cast<const math::vector<float, 4>&> (value));
+}
+
+template <class T>
+inline void copy_to (const math::angle<T>& value, PropertyMap& map, const PropertySelector& property_selector)
+{
+  copy_to (degree (value), map, property_selector);
 }
 
 namespace detail
