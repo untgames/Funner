@@ -1,0 +1,7 @@
+Results of animation_test:
+f(0):
+target1 position [1.00 1.00 1.00] scale [1.00 1.00 1.00]
+target2 position [-1.00 -1.00 -1.00] scale [1.00 1.00 1.00]
+f(1):
+target1 position [2.00 2.00 2.00] scale [2.00 2.00 2.00]
+target2 position [-2.00 -2.00 -2.00] scale [1.00 1.00 1.00]

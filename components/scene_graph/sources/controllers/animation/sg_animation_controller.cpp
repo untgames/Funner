@@ -10,8 +10,6 @@ using namespace scene_graph::controllers;
 using media::animation::AnimationBlender;
 using media::animation::TargetBlender;
 
-//TODO: detect duration!!!
-
 namespace
 {
 
@@ -21,6 +19,7 @@ namespace
 
 const size_t RESERVED_ANIMATIONS_COUNT = 8;                       //резервируемое количество анимаций, одновременно присоединенных к контроллеру
 const size_t TIME_PRECISION            = 1000;                    //разрешающая способность таймера анимации
+const size_t BAD_TIME_NUMERATOR        = ~0u;                     //неверное время
 const char*  LOG_NAME                  = "scene_graph.animation"; //имя потока протоколирования
 
 }
@@ -42,7 +41,7 @@ struct AnimationImpl: public xtl::reference_counter, public xtl::trackable, publ
   TimeValue                        time;                         //текущее время
   TimeValue                        start_time;                   //время старта анимации
   TimeValue                        offset;                       //смещение времени
-  float                            duration;                     //длительность анимации!!!!!!!!!!
+  float                            duration;                     //длительность анимации
   bool                             playing;                      //проигрывается ли анимация
   bool                             looped;                       //флаг цикличности анимации
   Signal                           signals [AnimationEvent_Num]; //сигналы  
@@ -51,11 +50,17 @@ struct AnimationImpl: public xtl::reference_counter, public xtl::trackable, publ
   AnimationImpl (const AnimationBlender& in_blender, const media::animation::Animation& in_source)
     : blender (in_blender)
     , source (in_source)
-    , time (-1, 1)
-    , start_time (-1, 1)
+    , time (BAD_TIME_NUMERATOR, 1)
+    , start_time (BAD_TIME_NUMERATOR, 1)
+    , duration ()
     , playing (false)
     , looped (false)
   {
+    float min_time = 0.0f, max_time = 0.0f;
+    
+    source.GetTimeLimits (min_time, max_time);
+    
+    duration = max_time - min_time;
   }
   
 ///Получение смещения относительно начала анимации
@@ -96,9 +101,11 @@ struct Target: public xtl::reference_counter
     {
       UnbindNode ();
       return;
-    }
+    }        
 
     synchronizer.reset (new common::PropertyBindingMap::Synchronizer (node->PropertyBindings ().CreateSynchronizer (const_cast<common::PropertyMap&> (blender.Properties ()))));
+    
+    this->node = node;    
   }
   
 ///Отсоединение узла
@@ -197,7 +204,7 @@ struct AnimationController::Impl: public xtl::trackable
 
       Node::Pointer node;
 
-      if (strcmp (root->Name (), target_name))
+      if (!strcmp (root->Name (), target_name))
       {
         node = root;
       }
@@ -306,6 +313,7 @@ AnimationController::AnimationController (Node& node, AnimationManager& manager)
   : Controller (node, ControllerTimeMode_Absolute)
   , impl (new Impl (*this, manager))
 {
+  NodeOwnsController ();
 }
 
 AnimationController::~AnimationController ()
@@ -439,11 +447,11 @@ void AnimationController::Update (const TimeValue& value)
       
       animation.time = value;
 
-      if (animation.start_time.numerator () < 0)
+      if (animation.start_time.numerator () == BAD_TIME_NUMERATOR)
         animation.start_time = value;
-        
+
       TimeValue offset = animation.Tell ();
-      
+
       animation.state.SetTime (offset.cast<float> ());
     }
 

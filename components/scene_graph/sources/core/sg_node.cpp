@@ -1949,7 +1949,7 @@ void Node::LookTo (const math::vec3f& target_point, NodeTransformSpace space)
 
 void Node::SetScale (const vec3f& scale)
 {
-  impl->local_scale = scale;
+  impl->local_scale = scale;  
   
   impl->UpdateLocalTransformNotify ();
 }

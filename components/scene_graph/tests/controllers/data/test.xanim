@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<animation_library>
+  <animation id="animation1" name="animation1">
+    <event_track>
+      <event event="0.11-0.21 event" delay="0.110" period="0.210"/>
+      <event event="0.51-0.31 event" delay="0.510" period="0.310"/>
+    </event_track>
+    <channels>
+      <channel target_name="target1" parameter_name="Position" track_type="basic_spline&lt;spline_tcb_key&lt;vec3f&gt;&gt;">
+        <key time="0.000" value="1.000 1.000 1.000" tension="0.100" continuity="0.200" bias="0.300"/>
+        <key time="1.000" value="2.000 2.000 2.000" tension="0.200" continuity="0.300" bias="0.400"/>
+        <key time="2.000" value="3.000 3.000 3.000" tension="0.500" continuity="0.400" bias="0.300"/>
+      </channel>
+      <channel target_name="target1" parameter_name="Scale" track_type="basic_spline&lt;spline_tcb_key&lt;vec3f&gt;&gt;">
+        <key time="0.000" value="1.000 1.000 1.000" tension="0.100" continuity="0.200" bias="0.300"/>
+        <key time="1.000" value="2.000 2.000 2.000" tension="0.200" continuity="0.300" bias="0.400"/>
+        <key time="2.000" value="3.000 3.000 3.000" tension="0.500" continuity="0.400" bias="0.300"/>
+      </channel>
+      <channel target_name="target2" parameter_name="Position" track_type="basic_spline&lt;spline_tcb_key&lt;vec3f&gt;&gt;">
+        <key time="0.000" value="-1.000 -1.000 -1.000" tension="0.100" continuity="0.200" bias="0.300"/>
+        <key time="1.000" value="-2.000 -2.000 -2.000" tension="0.200" continuity="0.300" bias="0.400"/>
+        <key time="2.000" value="-3.000 -3.000 -3.000" tension="0.500" continuity="0.400" bias="0.300"/>
+      </channel>
+    </channels>
+  </animation>
+</animation_library>
