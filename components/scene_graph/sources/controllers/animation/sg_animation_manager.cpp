@@ -133,13 +133,12 @@ Animation AnimationManager::CreateAnimation (const char* name, Node& root)
   }
 }
 
-Animation AnimationManager::PlayAnimation (const char* name, Node& root, const Animation::EventHandler& on_start, const Animation::EventHandler& on_finish)
+Animation AnimationManager::PlayAnimation (const char* name, Node& root, const Animation::EventHandler& on_finish)
 {
   try
   {
     Animation animation = CreateAnimation (name, root);
 
-    if (on_start)  animation.RegisterEventHandler (AnimationEvent_OnStart, on_start);
     if (on_finish) animation.RegisterEventHandler (AnimationEvent_OnFinish, on_finish);
 
     animation.Play ();

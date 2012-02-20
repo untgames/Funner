@@ -8,7 +8,7 @@ void dump (Node& node)
 
 int main ()
 {
-  printf ("Results of animation_test:\n");
+  printf ("Results of animation1_test:\n");
   
   try
   {  
@@ -22,9 +22,10 @@ int main ()
     target2->SetName ("target2");
 
     target1->BindToParent (*node);
-    target2->BindToParent (*node);
 
     Animation animation = manager.PlayAnimation ("animation1", *node);
+    
+    target2->BindToParent (*node);    
     
     printf ("f(0):\n");
 

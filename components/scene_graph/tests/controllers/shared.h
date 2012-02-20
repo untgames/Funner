@@ -3,6 +3,7 @@
 
 #include <cstdio>
 
+#include <xtl/connection.h>
 #include <xtl/function.h>
 
 #include <sg/scene.h>

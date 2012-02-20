@@ -34,6 +34,8 @@ namespace controllers
 struct AnimationImpl: public xtl::reference_counter, public xtl::trackable, public xtl::noncopyable
 {
   typedef xtl::signal<void (AnimationEvent event, Animation& animation)> Signal;
+  
+  enum Mode { Playing, Stopped, Paused };
 
   AnimationBlender                 blender;                      //блендер анимаций
   media::animation::Animation      source;                       //исходная анимация
@@ -42,7 +44,7 @@ struct AnimationImpl: public xtl::reference_counter, public xtl::trackable, publ
   TimeValue                        start_time;                   //время старта анимации
   TimeValue                        offset;                       //смещение времени
   float                            duration;                     //длительность анимации
-  bool                             playing;                      //проигрывается ли анимация
+  Mode                             mode;                         //текущий режим
   bool                             looped;                       //флаг цикличности анимации
   Signal                           signals [AnimationEvent_Num]; //сигналы  
 
@@ -53,22 +55,51 @@ struct AnimationImpl: public xtl::reference_counter, public xtl::trackable, publ
     , time (BAD_TIME_NUMERATOR, 1)
     , start_time (BAD_TIME_NUMERATOR, 1)
     , duration ()
-    , playing (false)
+    , mode (Stopped)
     , looped (false)
   {
     float min_time = 0.0f, max_time = 0.0f;
-    
+
     source.GetTimeLimits (min_time, max_time);
-    
-    duration = max_time - min_time;
-  }
+
+    duration = max_time; //NOT max_time - min_time
+  }  
   
 ///Получение смещения относительно начала анимации
   TimeValue Tell ()
   {
-    if (playing) return time - start_time + offset;
-    else         return offset;
-  }  
+    if (mode == Playing) return time - start_time + offset;
+    else                 return offset;
+  }
+  
+///Оповещение о возникновении события
+  void Notify (AnimationEvent event, Animation* animation = 0)
+  {
+    if (event < 0 || event >= AnimationEvent_Num || signals [event].empty ())
+      return;
+      
+    try
+    {
+      if (animation)
+      {
+        signals [event] (event, *animation);
+      }
+      else
+      {
+        Animation animation (*this);
+      
+        signals [event] (event, animation);
+      }
+    }
+    catch (std::exception& e)
+    {
+      common::Log (LOG_NAME).Printf ("%s\n    at scene_graph::controllers::AnimationImpl::Notify", e.what ());
+    }
+    catch (...)
+    {
+      common::Log (LOG_NAME).Printf ("unknown exception\n    at scene_graph::controllers::AnimationImpl::Notify");   
+    }
+  }
 };
 
 }
@@ -358,14 +389,14 @@ Animation AnimationController::Animation (size_t index) const
     Проигрывание анимаций
 */
 
-Animation AnimationController::PlayAnimation (const char* name, const Animation::EventHandler& on_start_handler, const Animation::EventHandler& on_finish_handler)
+Animation AnimationController::PlayAnimation (const char* name, const Animation::EventHandler& on_finish_handler)
 {
   try
   {
     if (!AttachedNode ())
       throw xtl::format_operation_exception ("", "Can't create animation. Controller's node was detached");
     
-    return impl->manager.PlayAnimation (name, *AttachedNode (), on_start_handler, on_finish_handler);
+    return impl->manager.PlayAnimation (name, *AttachedNode (), on_finish_handler);
   }
   catch (xtl::exception& e)
   {
@@ -445,14 +476,37 @@ void AnimationController::Update (const TimeValue& value)
     {
       AnimationImpl& animation = **iter;
       
-      animation.time = value;
-
+      if (animation.mode != AnimationImpl::Playing)
+        continue;
+      
+        //обновление времени
+      
+      TimeValue prev_time   = animation.time;
+      TimeValue prev_offset = animation.Tell ();
+      
       if (animation.start_time.numerator () == BAD_TIME_NUMERATOR)
         animation.start_time = value;
+      
+      animation.time = value;
+      
+        //обновление состояния анимации
 
-      TimeValue offset = animation.Tell ();
+      TimeValue offset  = animation.Tell ();
+      float     foffset = offset.cast<float> ();      
 
-      animation.state.SetTime (offset.cast<float> ());
+      animation.state.SetTime (foffset);
+      
+        //оповещение о возникновении событий
+        
+      animation.Notify (AnimationEvent_OnUpdate);
+      
+      if (prev_time.numerator () != BAD_TIME_NUMERATOR)
+      {
+        float prev_foffset = prev_offset.cast<float> ();
+        
+        if (size_t (foffset / animation.duration) > size_t (prev_foffset / animation.duration))
+          animation.Notify (AnimationEvent_OnFinish);
+      }      
     }
 
       //обновление блендера анимаций
@@ -499,13 +553,28 @@ Animation::Animation (const Animation& animation)
 
 Animation::~Animation ()
 {
-  release (impl);
+  if (impl->decrement ())
+  {
+    impl->Notify (AnimationEvent_OnDestroy, this);
+    
+    if (impl->use_count () == 0)
+      delete impl;
+  }
 }
 
 Animation& Animation::operator = (const Animation& animation)
 {
   Animation (animation).Swap (*this);
   return *this;
+}
+
+/*
+    Имя анимации
+*/
+
+const char* Animation::Name () const
+{
+  return impl->source.Name ();
 }
 
 /*
@@ -516,19 +585,26 @@ void Animation::Play ()
 {
   try
   {
-    if (impl->playing)
+    impl->start_time = impl->time;    
+    
+    switch (impl->mode)
     {
-      impl->offset = TimeValue ();
-    }
-    else
-    {
-        //добавление анимации в блендер
+      case AnimationImpl::Playing:
+        impl->offset = TimeValue ();
+        break;
+      default:
+      case AnimationImpl::Stopped:
+          //добавление анимации в блендер
 
-      impl->state = impl->blender.AddSource (impl->source);
-    }
+        impl->state = impl->blender.AddSource (impl->source);
+      case AnimationImpl::Paused:
+          //оповещение о возникновении события
 
-    impl->playing    = true;
-    impl->start_time = impl->time;
+        impl->Notify (AnimationEvent_OnPlay);        
+        break;
+    }  
+    
+    impl->mode = AnimationImpl::Playing;
   }
   catch (xtl::exception& e)
   {
@@ -541,13 +617,23 @@ void Animation::Stop ()
 {
   try
   {
-    if (impl->playing)
+    switch (impl->mode)
     {
-      impl->state = media::animation::AnimationState ();
+      case AnimationImpl::Playing:
+      case AnimationImpl::Paused:
+        impl->state = media::animation::AnimationState ();      
+        break;
+      default:
+      case AnimationImpl::Stopped:
+        return;
     }
 
-    impl->playing = false;
-    impl->offset  = TimeValue ();
+    impl->mode   = AnimationImpl::Stopped;
+    impl->offset = TimeValue ();
+
+      //оповещение о возникновении события
+
+    impl->Notify (AnimationEvent_OnStop);    
   }
   catch (xtl::exception& e)
   {
@@ -558,17 +644,33 @@ void Animation::Stop ()
 
 void Animation::Pause()
 {
-  if (!impl->playing)
-    return;
+  switch (impl->mode)
+  {
+    case AnimationImpl::Stopped:
+    case AnimationImpl::Paused:
+      return;
+    default:
+      break;      
+  }
     
-  impl->playing  = false;
-  impl->offset   = impl->time - impl->start_time;
+  impl->mode   = AnimationImpl::Paused;
+  impl->offset = impl->time - impl->start_time;
+  
+    //оповещение о возникновении события
+  
+  impl->Notify (AnimationEvent_OnPause);
 }
 
 bool Animation::IsPlaying () const
 {
-  if (!impl->playing)
-    return false;
+  switch (impl->mode)
+  {
+    case AnimationImpl::Stopped:
+    case AnimationImpl::Paused:
+      return false;
+    default:
+      break;
+  }
     
   if (impl->looped)
     return true;
@@ -580,36 +682,44 @@ bool Animation::IsPlaying () const
 }
 
 /*
+    Длительность анимации
+*/
+
+float Animation::Duration () const
+{
+  return impl->duration;
+}
+
+/*
     Позиционирование
 */
 
-TimeValue Animation::Tell () const
+float Animation::Tell () const
 {
   float offset   = impl->Tell ().cast<float> (),
         duration = impl->duration;  
 
-  if (impl->looped) return TimeValue (static_cast<size_t> (fmod (offset, duration) * TIME_PRECISION), TIME_PRECISION);
-  else              return offset < duration ? impl->Tell () : TimeValue ();
+  if (impl->looped) return fmod (offset, duration);
+  else              return offset < duration ? impl->Tell ().cast<float> () : duration;
 }
 
-void Animation::Seek (const TimeValue& in_offset, AnimationSeekMode mode)
+void Animation::Seek (float offset, AnimationSeekMode mode)
 {
-  float     duration = impl->duration;
-  TimeValue offset   = in_offset;
+  float duration = impl->duration;
 
-  if (offset < TimeValue ())
-    offset = TimeValue ();    
+  if (offset < 0.0f)
+    offset = 0.0f; 
 
   switch (mode)
   {
     case AnimationSeekMode_Set:
-      impl->offset = offset;
+      impl->offset = TimeValue (static_cast<size_t> (offset * TIME_PRECISION), TIME_PRECISION);
       break;
     case AnimationSeekMode_Current:
-      impl->offset = impl->Tell () + offset;
+      impl->offset = impl->Tell () + TimeValue (static_cast<size_t> (offset * TIME_PRECISION), TIME_PRECISION);
       break;
     case AnimationSeekMode_End:
-      impl->offset = TimeValue (static_cast<size_t> (duration * TIME_PRECISION), TIME_PRECISION) - offset; 
+      impl->offset = TimeValue (static_cast<size_t> ((duration - offset) * TIME_PRECISION), TIME_PRECISION);
       break;
     default:
       throw xtl::make_argument_exception ("scene_graph::controllers::Animation::Seek", "seek_mode", mode);

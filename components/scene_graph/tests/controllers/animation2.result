@@ -1,0 +1,13 @@
+Results of animation2_test:
+animation duration: 2.00
+update animation 'animation1' (offset=0.00)
+update animation 'animation1' (offset=1.00)
+pause animation 'animation1'
+animation offset 1.00
+play animation 'animation1'
+update animation 'animation1' (offset=2.00)
+finish animation 'animation1'
+animation offset 2.00
+stop animation 'animation1'
+animation offset 0.00
+destroy animation 'animation1'

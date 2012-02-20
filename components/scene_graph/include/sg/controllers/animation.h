@@ -31,8 +31,12 @@ struct AnimationImpl;
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 enum AnimationEvent
 {
-  AnimationEvent_OnStart,  //срабатывает в начале проигрывания анимации
-  AnimationEvent_OnFinish, //срабатывает в конце проигрывания анимации
+  AnimationEvent_OnPlay,    //срабатывает при запуске анимации
+  AnimationEvent_OnStop,    //срабатывает при остановке анимации
+  AnimationEvent_OnPause,   //срабатывает при паузе анимации
+  AnimationEvent_OnUpdate,  //срабатывает при обновлении анимации  
+  AnimationEvent_OnFinish,  //срабатывает в конце проигрывания анимации
+  AnimationEvent_OnDestroy, //срабатывает при удалении анимации
   
   AnimationEvent_Num
 };
@@ -63,6 +67,11 @@ class Animation
     ~Animation ();
     
     Animation& operator = (const Animation&);
+    
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Имя анимации
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    const char* Name () const;
   
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Проигрывание анимаций
@@ -73,10 +82,15 @@ class Animation
     bool IsPlaying () const;
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+///Длительность анимации
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    float Duration () const;
+    
+///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Позиционирование
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void      Seek (const TimeValue& offset, AnimationSeekMode seek_mode = AnimationSeekMode_Default);
-    TimeValue Tell () const;
+    void  Seek (float offset, AnimationSeekMode seek_mode = AnimationSeekMode_Default);
+    float Tell () const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Подписка на события
@@ -132,7 +146,6 @@ class AnimationManager
     Animation CreateAnimation (const char* name, Node& root);
     Animation PlayAnimation   (const char*                    name,
                                Node&                          root,
-                               const Animation::EventHandler& on_start_handler = Animation::EventHandler (),
                                const Animation::EventHandler& on_finish_handler = Animation::EventHandler ());
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -187,7 +200,6 @@ class AnimationController: public Controller
 ///Проигрывание анимаций
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     scene_graph::controllers::Animation PlayAnimation   (const char*                    name,
-                                                         const Animation::EventHandler& on_start_handler = Animation::EventHandler (),
                                                          const Animation::EventHandler& on_finish_handler = Animation::EventHandler ());
     scene_graph::controllers::Animation CreateAnimation (const char* name);
     scene_graph::controllers::Animation CreateAnimation (const media::animation::Animation&);
