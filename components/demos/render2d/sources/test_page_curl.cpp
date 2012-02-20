@@ -15,30 +15,33 @@ struct Test
 
     curl = PageCurl::Create ();
 
-    curl->SetPageMaterial (PageCurlPageType_FrontLeft,  "sprite_material");
-    curl->SetPageMaterial (PageCurlPageType_FrontRight, "sprite_material");
-    curl->SetPageMaterial (PageCurlPageType_BackLeft,   "sprite_material");
-    curl->SetPageMaterial (PageCurlPageType_BackRight,  "sprite_material");
+    curl->SetSize         (2, 1);
+    curl->SetMode         (PageCurlMode_DoublePageDoubleMaterial);
+    curl->SetPageMaterial (PageCurlPageType_BackLeft,   "page1");
+    curl->SetPageMaterial (PageCurlPageType_BackRight,  "page2");
+    curl->SetPageMaterial (PageCurlPageType_FrontLeft,  "page3");
+    curl->SetPageMaterial (PageCurlPageType_FrontRight, "page4");
+    curl->SetPosition     (-1, -0.5, 0);
 
     curl->BindToScene (scene);
 
-    sprite = Sprite::Create ();
+/*    sprite = Sprite::Create ();
 
     sprite->SetMaterial ("sprite_material");
     sprite->SetColor    (1, 1, 1, 0.95f);
     sprite->SetPosition (0, 0, 0);
     sprite->SetScale    (0.5, 0.5, 1);
-    sprite->BindToScene (scene, NodeBindMode_AddRef);
+    sprite->BindToScene (scene, NodeBindMode_AddRef);*/
 
     camera = OrthoCamera::Create ();
 
     camera->BindToScene (scene);
     camera->SetName     ("Camera1");
     camera->SetPosition (0, 0, 0);
-    camera->SetLeft     (-1);
-    camera->SetRight    (1);
-    camera->SetTop      (1);
-    camera->SetBottom   (-1);
+    camera->SetLeft     (-1.1);
+    camera->SetRight    (1.1);
+    camera->SetTop      (0.6);
+    camera->SetBottom   (-0.6);
     camera->SetZNear    (-2);
     camera->SetZFar     (2);
 

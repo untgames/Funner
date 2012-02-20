@@ -1,5 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <material_library>
+  <material id="page1">
+    <sprite_profile image="media/page1.jpg" blend_mode="none"/>
+  </material>
+  <material id="page2">
+    <sprite_profile image="media/page2.jpg" blend_mode="none"/>
+  </material>
+  <material id="page3">
+    <sprite_profile image="media/page3.jpg" blend_mode="none"/>
+  </material>
+  <material id="page4">
+    <sprite_profile image="media/page4.jpg" blend_mode="none"/>
+  </material>
   <material id="sprite_material">
     <sprite_profile image="media/bottom.jpg" blend_mode="translucent"/>
   </material>

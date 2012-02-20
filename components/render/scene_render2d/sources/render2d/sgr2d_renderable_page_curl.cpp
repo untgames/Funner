@@ -20,6 +20,8 @@ namespace
 
 const char* LOG_NAME = "render.obsolete.render2d.RenderablePageCurl";
 
+const float STATIC_PAGES_Z_OFFSET = -0.001;
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Параметры вершины необходимые для визуализации
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -37,14 +39,16 @@ struct ProgramParameters
 {
   math::mat4f view_matrix;       //матрица вида
   math::mat4f projection_matrix; //матрица проекции
+  math::mat4f object_matrix;     //матрица объекта
 };
 
 //текст шейдера программы по умолчанию
 const char* DEFAULT_SHADER_SOURCE_CODE =
 "Parameters\n"
 "{\n"
-"  float4x4 currentViewMatrix currentProjMatrix\n"
+"  float4x4 currentViewMatrix currentProjMatrix objMatrix\n"
 "}\n"
+"ObjectMatrix     objMatrix\n"
 "ProjectionMatrix currentProjMatrix\n"
 "ViewMatrix       currentViewMatrix\n"
 "AlphaCompareMode AlwaysPass\n"
@@ -84,9 +88,9 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
   RasterizerStatePtr         rasterizer_state;           //состояние растеризатора
   DepthStencilStatePtr       depth_stencil_state;        //состояние буфера попиксельного отсечения
   BufferPtr                  constant_buffer;            //константный буфер
-  BufferPtr                  vertex_buffer;              //вершинный буфер
-  BufferPtr                  index_buffer;               //индексный буфер
-  RenderableVertex           vertices [4];               //вершины, описывающие спрайт     ??????????????????
+  BufferPtr                  left_page_vertex_buffer;    //вершинный буфер левой страницы
+  BufferPtr                  right_page_vertex_buffer;   //вершинный буфер правой страницы
+  BufferPtr                  static_page_index_buffer;   //индексный буфер статической страницы
   math::vec3f                view_point;                 //позиция камеры
   math::mat4f                projection;                 //матрица камеры
   bool                       initialized;                //инициализированы ли необходимые поля
@@ -106,19 +110,6 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
     low_level_frame = LowLevelFramePtr (low_level_renderer->CreateFrame (), false);
 
     low_level_frame->SetCallback (this);
-
-    //!!!!!!!!!
-    for (size_t i=0; i<4; i++)
-      vertices [i].color = math::vec4ub (255, 255, 255, 255);
-
-    vertices [0].position = math::vec3f (0, 0, 0);
-    vertices [0].texcoord = math::vec2f (0, 0);
-    vertices [1].position = math::vec3f (1, 0, 0);
-    vertices [1].texcoord = math::vec2f (1, 0);
-    vertices [2].position = math::vec3f (0, 1, 0);
-    vertices [2].texcoord = math::vec2f (0, 1);
-    vertices [3].position = math::vec3f (1, 1, 0);
-    vertices [3].texcoord = math::vec2f (1, 1);
   }
 
   //создание состояния смешивания цветов
@@ -223,7 +214,7 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
   //создание состояния расположения параметров шейдинга
   ProgramParametersLayoutPtr CreateProgramParametersLayout (low_level::IDevice& device)
   {
-    low_level::ProgramParameter program_parameters [2];
+    low_level::ProgramParameter program_parameters [3];
 
     memset (program_parameters, 0, sizeof (program_parameters));
 
@@ -238,6 +229,12 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
     program_parameters [1].slot   = 0;
     program_parameters [1].count  = 1;
     program_parameters [1].offset = offsetof (ProgramParameters, projection_matrix);
+
+    program_parameters [2].name   = "objMatrix";
+    program_parameters [2].type   = low_level::ProgramParameterType_Float4x4;
+    program_parameters [2].slot   = 0;
+    program_parameters [2].count  = 1;
+    program_parameters [2].offset = offsetof (ProgramParameters, object_matrix);
 
     low_level::ProgramParametersLayoutDesc program_parameters_layout_desc;
 
@@ -320,7 +317,8 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
       buffer_desc.access_flags = low_level::AccessFlag_Write;
       buffer_desc.size         = sizeof (RenderableVertex) * 4;
 
-      vertex_buffer = BufferPtr (device.CreateBuffer (buffer_desc), false);
+      left_page_vertex_buffer  = BufferPtr (device.CreateBuffer (buffer_desc), false);
+      right_page_vertex_buffer = BufferPtr (device.CreateBuffer (buffer_desc), false);
 
         //создание индексного буфера
 
@@ -331,13 +329,11 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
       buffer_desc.access_flags = low_level::AccessFlag_Write;
       buffer_desc.size         = sizeof (unsigned short) * 6;
 
-      index_buffer = BufferPtr (device.CreateBuffer (buffer_desc), false);
-
-      vertex_buffer->SetData (0, sizeof (vertices), vertices);
+      static_page_index_buffer = BufferPtr (device.CreateBuffer (buffer_desc), false);
 
       unsigned short indices [6] = { 0, 1, 2, 1, 2, 3 };
 
-      index_buffer->SetData (0, sizeof (indices), indices);
+      static_page_index_buffer->SetData (0, sizeof (indices), indices);
 
       initialized = true;
     }
@@ -346,6 +342,7 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
 
     program_parameters.view_matrix       = math::translate (-view_point);
     program_parameters.projection_matrix = projection;
+    program_parameters.object_matrix     = page_curl->WorldTM ();
 
     constant_buffer->SetData (0, sizeof (program_parameters), &program_parameters);
 
@@ -359,12 +356,134 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
     device.SSSetProgram                 (default_program.get ());
     device.OSSetDepthStencilState       (depth_stencil_state.get ());
 
-    BindMaterial (device, page_curl->PageMaterial (PageCurlPageType_BackLeft));
+    switch (page_curl->CurlCorner ())
+    {
+      case PageCurlCorner_LeftTop:
+        DrawLeftTopCornerFlip (device);
+        break;
+      case PageCurlCorner_LeftBottom:
+        DrawLeftBottomCornerFlip (device);
+        break;
+      case PageCurlCorner_RightTop:
+        DrawRightTopCornerFlip (device);
+        break;
+      case PageCurlCorner_RightBottom:
+        DrawRightBottomCornerFlip (device);
+        break;
+    }
+  }
 
-    device.ISSetVertexBuffer (0, vertex_buffer.get ());
-    device.ISSetIndexBuffer  (index_buffer.get ());
+  //Рисование специфичное для каждого угла
+  void DrawLeftTopCornerFlip (low_level::IDevice& device)
+  {
+    DrawStaticPages (device);
+  }
 
-    device.DrawIndexed (low_level::PrimitiveType_TriangleList, 0, 6, 0);
+  void DrawLeftBottomCornerFlip (low_level::IDevice& device)
+  {
+    DrawStaticPages (device);
+  }
+
+  void DrawRightTopCornerFlip (low_level::IDevice& device)
+  {
+    DrawStaticPages (device);
+  }
+
+  void DrawRightBottomCornerFlip (low_level::IDevice& device)
+  {
+    DrawStaticPages (device);
+  }
+
+  //Рисование лежащих страниц
+  void DrawStaticPages (low_level::IDevice& device)
+  {
+    const math::vec2f& size = page_curl->Size ();
+
+    const char *left_page_material     = 0,
+               *right_page_material    = 0;
+    float      left_page_width         = size.x * 0.5f,
+               right_page_width        = left_page_width,
+               left_page_min_texcoord  = 0.f,
+               left_page_max_texcoord  = 1.f,
+               right_page_min_texcoord = 0.f,
+               right_page_max_texcoord = 1.f;
+
+    switch (page_curl->Mode ())
+    {
+      case PageCurlMode_SinglePage:
+        right_page_material     = page_curl->PageMaterial (PageCurlPageType_Front);
+        left_page_width         = 0.f;
+        right_page_width        = size.x;
+        break;
+      case PageCurlMode_DoublePageSingleMaterial:
+        left_page_material  = page_curl->PageMaterial (PageCurlPageType_Back);
+        right_page_material = page_curl->PageMaterial (PageCurlPageType_Front);
+        left_page_min_texcoord  = 0.f;
+        left_page_max_texcoord  = 0.5f;
+        right_page_min_texcoord = 0.5f;
+        right_page_max_texcoord = 1.f;
+        break;
+      case PageCurlMode_DoublePageDoubleMaterial:
+        left_page_material  = page_curl->PageMaterial (PageCurlPageType_BackLeft);
+        right_page_material = page_curl->PageMaterial (PageCurlPageType_FrontRight);
+        break;
+    }
+
+    const math::vec4f& float_page_color = page_curl->PageColor ();
+
+    math::vec4ub page_color (float_page_color.x * 255, float_page_color.y * 255, float_page_color.z * 255, float_page_color.w * 255);
+
+    device.ISSetIndexBuffer (static_page_index_buffer.get ());
+
+    if (left_page_material)
+    {
+      RenderableVertex vertices [4];
+
+      for (size_t i = 0; i < 4; i++)
+        vertices [i].color = page_color;
+
+      vertices [0].position = math::vec3f (0, 0, STATIC_PAGES_Z_OFFSET);
+      vertices [1].position = math::vec3f (left_page_width, 0, STATIC_PAGES_Z_OFFSET);
+      vertices [2].position = math::vec3f (0, size.y, STATIC_PAGES_Z_OFFSET);
+      vertices [3].position = math::vec3f (left_page_width, size.y, STATIC_PAGES_Z_OFFSET);
+      vertices [0].texcoord = math::vec2f (left_page_min_texcoord, 0);
+      vertices [1].texcoord = math::vec2f (left_page_max_texcoord, 0);
+      vertices [2].texcoord = math::vec2f (left_page_min_texcoord, 1.f);
+      vertices [3].texcoord = math::vec2f (left_page_max_texcoord, 1.f);
+
+      left_page_vertex_buffer->SetData (0, sizeof (vertices), vertices);
+
+      device.ISSetVertexBuffer (0, left_page_vertex_buffer.get ());
+
+      BindMaterial (device, left_page_material);
+
+      device.DrawIndexed (low_level::PrimitiveType_TriangleList, 0, 6, 0);
+    }
+
+    if (right_page_material)
+    {
+      RenderableVertex vertices [4];
+
+      for (size_t i = 0; i < 4; i++)
+        vertices [i].color = page_color;
+
+      vertices [0].position = math::vec3f (left_page_width, 0, STATIC_PAGES_Z_OFFSET);
+      vertices [1].position = math::vec3f (left_page_width + right_page_width, 0, STATIC_PAGES_Z_OFFSET);
+      vertices [2].position = math::vec3f (left_page_width, size.y, STATIC_PAGES_Z_OFFSET);
+      vertices [3].position = math::vec3f (left_page_width + right_page_width, size.y, STATIC_PAGES_Z_OFFSET);
+      vertices [0].texcoord = math::vec2f (right_page_min_texcoord, 0);
+      vertices [1].texcoord = math::vec2f (right_page_max_texcoord, 0);
+      vertices [2].texcoord = math::vec2f (right_page_min_texcoord, 1.f);
+      vertices [3].texcoord = math::vec2f (right_page_max_texcoord, 1.f);
+
+      right_page_vertex_buffer->SetData (0, sizeof (vertices), vertices);
+
+      device.ISSetVertexBuffer (0, right_page_vertex_buffer.get ());
+
+      BindMaterial (device, right_page_material);
+
+      device.DrawIndexed (low_level::PrimitiveType_TriangleList, 0, 6, 0);
+    }
   }
 
   void BindMaterial (low_level::IDevice& device, const char* name)

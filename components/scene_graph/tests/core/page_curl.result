@@ -11,7 +11,7 @@ Default curl state:
   curl radius                       0.00
   minimum curl radius               0.00
   grid size                         100x100
-  page color                        1.000; 1.000; 1.000
+  page color                        1.000; 1.000; 1.000; 1.000
   corner shadow offset              15.00
   shadow width                      0.25
   shadow density                    0.40
@@ -31,7 +31,7 @@ Changed curl state:
   curl radius                       4.00
   minimum curl radius               2.00
   grid size                         10x20
-  page color                        0.500; 0.250; 0.125
+  page color                        0.500; 0.250; 0.125; 0.250
   corner shadow offset              16.00
   shadow width                      8.00
   shadow density                    0.50

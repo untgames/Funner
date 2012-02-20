@@ -30,7 +30,7 @@ struct PageCurl::Impl
   float          curl_radius;                        //радиус загиба
   float          minimum_curl_radius;                //минимальный радиус загиба
   math::vec2ui   grid_size;                          //количество разбиений сетки
-  math::vec3f    color;                              //цвет страницы
+  math::vec4f    color;                              //цвет страницы
   float          corner_shadow_offset;               //смещение тени от угла
   float          shadow_width;                       //ширина тени
   float          shadow_density;                     //плотность тени
@@ -250,19 +250,19 @@ const math::vec2ui& PageCurl::GridSize () const
   return impl->grid_size;
 }
 
-void PageCurl::SetPageColor (const math::vec3f& color)
+void PageCurl::SetPageColor (const math::vec4f& color)
 {
   impl->color = color;
 
   UpdateNotify ();
 }
 
-void PageCurl::SetPageColor (float red, float green, float blue)
+void PageCurl::SetPageColor (float red, float green, float blue, float alpha)
 {
-  SetPageColor (math::vec3f (red, green, blue));
+  SetPageColor (math::vec4f (red, green, blue, alpha));
 }
 
-const math::vec3f& PageCurl::PageColor () const
+const math::vec4f& PageCurl::PageColor () const
 {
   return impl->color;
 }
