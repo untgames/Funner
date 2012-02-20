@@ -1,7 +1,4 @@
-Node не зависит от SceneManager
 Добавить Entity::IsVisible/SetVisible
-
-SceneManager::PlayAnimation (const char* name, Node& root_node)
 
 Trigger
 InputTrigger
@@ -9,18 +6,13 @@ InputTrigger
   - geometry
   
 Этапы:
-1. Сделать контроллер, аналог main.lua EvalSpriteState
 2. Сделать загрузку данных для контроллера из XML
   
 ------------------------------------------------------------------
 
-1. ResourceList, хранимый в Node. Построение полного списка по дочерним узлам
-2. Node не зависит от SceneManager
 3. ParticleSystem при создании принимает ParticleManager
-4. AnimationController при создании принимает AnimationManager
 5. ?Создание  узлов  при  помощи  SceneManager,  которые  требуют  передачи  в
 конструктор  кастомного  менеджера   ->   регистрация   кастомных   загрузчиков
 непосредственно в SceneManager (возможность использования bind+function)
-6. ?Загрузка ресурсов в AnimationManager и ParticleManager
 
 
