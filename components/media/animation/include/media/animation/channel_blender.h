@@ -10,7 +10,7 @@ namespace math
 {
 
 //forward declaration
-template <class T, size_t Size> class matrix;
+template <class T, unsigned int Size> class matrix;
 
 }
 
