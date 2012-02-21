@@ -10,12 +10,18 @@
 #include <xtl/signal.h>
 #include <xtl/shared_ptr.h>
 
+#include <common/component.h>
+#include <common/log.h>
 #include <common/property_map.h>
 #include <common/serializer_manager.h>
 #include <common/singleton.h>
 #include <common/strlib.h>
 
+#include <media/rms/binding.h>
+#include <media/rms/manager.h>
+
 #include <sg/scene_manager.h>
+#include <sg/controllers/resource_controller.h>
 
 namespace scene_graph
 {

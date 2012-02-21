@@ -1,7 +1,5 @@
 #include "shared.h"
 
-using namespace scene_graph;
-
 bool check_exception (const char* message)
 {
   printf ("check_exception(%s)\n", message);

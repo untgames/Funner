@@ -1,7 +1,5 @@
 #include "shared.h"
 
-using namespace scene_graph;
-
 int main ()
 {
   printf ("Results of scene_context2_test:\n");

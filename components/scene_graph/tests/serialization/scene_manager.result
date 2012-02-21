@@ -1,0 +1,5 @@
+Results of scene_manager_test:
+CustomLoader::CustomLoader
+register_attachments
+CreateScene(my_scene)
+CustomLoader::~CustomLoader
