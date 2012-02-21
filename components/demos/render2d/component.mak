@@ -20,7 +20,7 @@ DEMOS.RENDER2D.TESTS.SOURCE_DIRS      := sources
 DEMOS.RENDER2D.TESTS.LIB_DIRS         :=  
 DEMOS.RENDER2D.TESTS.LIBS             := funner.demos.render2d.shared
 DEMOS.RENDER2D.TESTS.LINK_INCLUDES    :=
-DEMOS.RENDER2D.TESTS.IMPORTS          := link.system compile.common compile.scene_graph.core compile.render.scene_render2d link.render.scene_render2d \
-                                         link.render.mid_level.window_driver link.render.low_level.opengl_driver \
+DEMOS.RENDER2D.TESTS.IMPORTS          := compile.common compile.system compile.scene_graph.core compile.render.scene_render2d link.render.scene_render2d \
+                                         link.render.mid_level.window_driver link.render.low_level.opengl_driver link.system \
                                          link.media.rfx.xmtl.obsolete link.render.mid_level.debug_renderer_driver link.common.wxf \
                                          link.media.image.pvr run.render.low_level.opengl_driver link.media.video.theora

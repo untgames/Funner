@@ -7,7 +7,6 @@
 
 #include <common/strlib.h>
 
-#include <syslib/window.h>
 #include <syslib/application.h>
 
 #include <render/mid_level/window_driver.h>
@@ -167,6 +166,15 @@ TestApplication::~TestApplication ()
 SceneRender& TestApplication::Render ()
 {
   return impl->render;
+}
+
+/*
+   Получение окна приложения
+*/
+
+syslib::Window& TestApplication::Window ()
+{
+  return *impl->window;
 }
 
 /*

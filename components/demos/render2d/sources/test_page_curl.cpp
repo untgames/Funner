@@ -1,5 +1,15 @@
 #include "shared.h"
 
+namespace
+{
+
+const float CAMERA_LEFT   = -1.1;
+const float CAMERA_RIGHT  = 1.1;
+const float CAMERA_TOP    = 0.6;
+const float CAMERA_BOTTOM = -0.6;
+
+}
+
 struct Test
 {
   TestApplication      application;
@@ -15,13 +25,17 @@ struct Test
 
     curl = PageCurl::Create ();
 
-    curl->SetSize         (2, 1);
-    curl->SetMode         (PageCurlMode_DoublePageDoubleMaterial);
-    curl->SetPageMaterial (PageCurlPageType_BackLeft,   "page1");
-    curl->SetPageMaterial (PageCurlPageType_BackRight,  "page2");
-    curl->SetPageMaterial (PageCurlPageType_FrontLeft,  "page3");
-    curl->SetPageMaterial (PageCurlPageType_FrontRight, "page4");
-    curl->SetPosition     (-1, -0.5, 0);
+    curl->SetSize           (2.f, 1.f);
+    curl->SetGridSize       (100, 100);
+    curl->SetMode           (PageCurlMode_DoublePageDoubleMaterial);
+    curl->SetCurlCorner     (PageCurlCorner_LeftBottom);
+    curl->SetCurlRadius     (0.1f);
+    curl->SetPageMaterial   (PageCurlPageType_BackLeft,   "page1");
+    curl->SetPageMaterial   (PageCurlPageType_BackRight,  "page2");
+    curl->SetPageMaterial   (PageCurlPageType_FrontLeft,  "page3");
+    curl->SetPageMaterial   (PageCurlPageType_FrontRight, "page4");
+    curl->SetPosition       (-1.f, -0.5f, 0.f);
+    curl->SetCornerPosition (0.1f, 0.1f);
 
     curl->BindToScene (scene);
 
@@ -37,11 +51,10 @@ struct Test
 
     camera->BindToScene (scene);
     camera->SetName     ("Camera1");
-    camera->SetPosition (0, 0, 0);
-    camera->SetLeft     (-1.1);
-    camera->SetRight    (1.1);
-    camera->SetTop      (0.6);
-    camera->SetBottom   (-0.6);
+    camera->SetLeft     (CAMERA_LEFT);
+    camera->SetRight    (CAMERA_RIGHT);
+    camera->SetTop      (CAMERA_TOP);
+    camera->SetBottom   (CAMERA_BOTTOM);
     camera->SetZNear    (-2);
     camera->SetZFar     (2);
 
@@ -71,6 +84,8 @@ struct Test
       //установка idle-функции
 
     application.SetIdleHandler (xtl::bind (&Test::Idle, this));
+
+    application.Window ().RegisterEventHandler (syslib::WindowEvent_OnMouseMove, xtl::bind (&Test::OnMouseMove, this, _1, _3));
   }
 
     //обработчик главного цикла приложения
@@ -84,6 +99,19 @@ struct Test
     {
       printf ("exception at idle: %s\n", exception.what ());
     }
+  }
+
+    //обработчик движения мыши
+  void OnMouseMove (const syslib::Window& window, const syslib::WindowEventContext& context)
+  {
+    syslib::Rect client_rect = window.ClientRect ();
+
+    float width  = client_rect.right - client_rect.left,
+          height = client_rect.bottom - client_rect.top;
+
+    curl->SetCornerPosition (CAMERA_LEFT + context.cursor_position.x / width * (CAMERA_RIGHT - CAMERA_LEFT) - curl->Position ().x, CAMERA_BOTTOM + (1 - context.cursor_position.y / height) * (CAMERA_TOP - CAMERA_BOTTOM) - curl->Position ().y);
+
+//    printf ("Corner position = %f %f\n", curl->CornerPosition ().x, curl->CornerPosition ().y);
   }
 };
 

@@ -14,13 +14,14 @@ typedef xtl::com_ptr<low_level::IProgram>                 ProgramPtr;
 typedef xtl::com_ptr<low_level::IProgramParametersLayout> ProgramParametersLayoutPtr;
 typedef xtl::com_ptr<low_level::IRasterizerState>         RasterizerStatePtr;
 typedef xtl::com_ptr<low_level::ISamplerState>            SamplerStatePtr;
+typedef xtl::intrusive_ptr<RenderablePageCurlMesh>        RenderablePageCurlMeshPtr;
 
 namespace
 {
 
 const char* LOG_NAME = "render.obsolete.render2d.RenderablePageCurl";
 
-const float STATIC_PAGES_Z_OFFSET = -0.001;
+const float STATIC_PAGES_Z_OFFSET = 0.001;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Параметры вершины необходимые для визуализации
@@ -93,6 +94,8 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
   BufferPtr                  static_page_index_buffer;   //индексный буфер статической страницы
   math::vec3f                view_point;                 //позиция камеры
   math::mat4f                projection;                 //матрица камеры
+  RenderablePageCurlMeshPtr  curled_page;                //сетка изгибаемой страницы
+  math::vec2ui               current_page_grid_size;     //текущий размер сетки страницы
   bool                       initialized;                //инициализированы ли необходимые поля
 
   ///Конструктор
@@ -293,7 +296,67 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
     return DepthStencilStatePtr (device.CreateDepthStencilState (depth_stencil_desc), false);
   }
 
-  ///Отрисовка
+  //Получение свойств
+  math::vec4ub GetPageColor ()
+  {
+    const math::vec4f& float_page_color = page_curl->PageColor ();
+
+    return math::vec4ub (float_page_color.x * 255, float_page_color.y * 255, float_page_color.z * 255, float_page_color.w * 255);
+  }
+
+  void GetTexCoords (bool left, float& min_s, float& max_s)
+  {
+    switch (page_curl->Mode ())
+    {
+      case PageCurlMode_SinglePage:
+      case PageCurlMode_DoublePageDoubleMaterial:
+        min_s = 0.f;
+        max_s = 1.f;
+        break;
+      case PageCurlMode_DoublePageSingleMaterial:
+        if (left)
+        {
+          min_s = 0.f;
+          max_s = 0.5f;
+        }
+        else
+        {
+          min_s = 0.5f;
+          max_s = 1.f;
+        }
+        break;
+    }
+  }
+
+  const char* GetCurledRightPageMaterial ()
+  {
+    switch (page_curl->Mode ())
+    {
+      case PageCurlMode_SinglePage:
+      case PageCurlMode_DoublePageSingleMaterial:
+        return page_curl->PageMaterial (PageCurlPageType_Back);
+      case PageCurlMode_DoublePageDoubleMaterial:
+        return page_curl->PageMaterial (PageCurlPageType_BackRight);
+    }
+
+    return 0;
+  }
+
+  const char* GetCurledLeftPageMaterial ()
+  {
+    switch (page_curl->Mode ())
+    {
+      case PageCurlMode_SinglePage:
+      case PageCurlMode_DoublePageSingleMaterial:
+        return page_curl->PageMaterial (PageCurlPageType_Front);
+      case PageCurlMode_DoublePageDoubleMaterial:
+        return page_curl->PageMaterial (PageCurlPageType_FrontLeft);
+    }
+
+    return 0;
+  }
+
+  //Отрисовка
   void Draw (low_level::IDevice& device)
   {
     if (!initialized)
@@ -338,6 +401,23 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
       initialized = true;
     }
 
+    const math::vec2ui& grid_size = page_curl->GridSize ();
+
+    if (current_page_grid_size != grid_size)
+    {
+      curled_page = RenderablePageCurlMeshPtr (new RenderablePageCurlMesh (device, grid_size), false);
+
+      current_page_grid_size = grid_size;
+    }
+
+    math::vec2f one_page_size = page_curl->Size ();
+
+    if (page_curl->Mode () != PageCurlMode_SinglePage)
+      one_page_size.x /= 2;
+
+    curled_page->SetSize  (one_page_size);
+    curled_page->SetColor (GetPageColor ());
+
     ProgramParameters program_parameters;
 
     program_parameters.view_matrix       = math::translate (-view_point);
@@ -376,11 +456,75 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
   //Рисование специфичное для каждого угла
   void DrawLeftTopCornerFlip (low_level::IDevice& device)
   {
+    if (page_curl->Mode () == PageCurlMode_SinglePage)
+      throw xtl::format_operation_exception ("render::obsolete::render2d::RenderablePageCurl::DrawLeftTopCornerFlip", "Can't draw flip for left bottom corner in single page mode");
+
     DrawStaticPages (device);
   }
 
   void DrawLeftBottomCornerFlip (low_level::IDevice& device)
   {
+    if (page_curl->Mode () == PageCurlMode_SinglePage)
+      throw xtl::format_operation_exception ("render::obsolete::render2d::RenderablePageCurl::DrawLeftBottomCornerFlip", "Can't draw flip for left bottom corner in single page mode");
+
+    math::vec2f page_size       = page_curl->Size ();
+    math::vec2f corner_position = page_curl->CornerPosition ();
+
+    page_size.x /= 2;
+
+    float x_flip_angle = stl::max (M_PI - 2 * atan2 (corner_position.y, corner_position.x),
+                                   atan2 (corner_position.y, page_size.x - corner_position.x));
+
+    math::vec2f flip_vec (corner_position.y / tan (x_flip_angle), corner_position.y);
+
+    float flip_vec_length = math::length (flip_vec),
+          curl_radius     = page_curl->CurlRadius ();
+
+    if (flip_vec_length > page_size.x)
+    {
+      corner_position.x += (flip_vec_length - page_size.x) * flip_vec.x / flip_vec_length;
+      corner_position.y -= (flip_vec_length - page_size.x) * flip_vec.y / flip_vec_length;
+    }
+
+    if (corner_position.x > 2 * page_size.x - curl_radius * 2)
+      curl_radius *= (2 * page_size.x - corner_position.x) / (curl_radius * 2);
+
+    float flip_width  = corner_position.y / tan (x_flip_angle) + corner_position.x,
+          flip_height = flip_width * tan (x_flip_angle / 2.f),
+          curl_angle  = atan2 (flip_width, flip_height) + M_PI,
+          curl_x      = (page_size.x - flip_width) * cos (curl_angle);
+
+    curled_page->Curl (corner_position, page_curl->CurlCorner (), curl_x, curl_radius, curl_angle,
+                       page_curl->FindBestCurlSteps (), page_curl->BindingMismatchWeight ());
+
+/*      glCullFace (GL_BACK);
+
+      if (nextLeftPage)
+        glEnable (GL_CULL_FACE);
+      else
+        glDisable (GL_CULL_FACE);*/
+
+    BindMaterial (device, GetCurledRightPageMaterial ());
+
+    float min_s, max_s;
+
+    GetTexCoords (false, min_s, max_s);
+
+    curled_page->SetTexCoords (min_s, 0, max_s, 1);
+
+    //      [curledPage calculateShadowForFront:true maxShadow:0];
+
+    curled_page->Draw (device);
+
+/*    if (nextLeftPage)
+    {
+      glCullFace (GL_FRONT);
+      curledPage.texture = previousRightPage;
+      [curledPage inverseTexcoordsS];
+      [curledPage calculateShadowForFront:false maxShadow:(1 - curlRadius / CURL_RADIUS)];
+      [curledPage draw];
+    }*/
+
     DrawStaticPages (device);
   }
 
@@ -399,29 +543,21 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
   {
     const math::vec2f& size = page_curl->Size ();
 
-    const char *left_page_material     = 0,
-               *right_page_material    = 0;
-    float      left_page_width         = size.x * 0.5f,
-               right_page_width        = left_page_width,
-               left_page_min_texcoord  = 0.f,
-               left_page_max_texcoord  = 1.f,
-               right_page_min_texcoord = 0.f,
-               right_page_max_texcoord = 1.f;
+    const char *left_page_material  = 0,
+               *right_page_material = 0;
+    float      left_page_width      = size.x * 0.5f,
+               right_page_width     = left_page_width;
 
     switch (page_curl->Mode ())
     {
       case PageCurlMode_SinglePage:
-        right_page_material     = page_curl->PageMaterial (PageCurlPageType_Front);
-        left_page_width         = 0.f;
-        right_page_width        = size.x;
+        right_page_material = page_curl->PageMaterial (PageCurlPageType_Front);
+        left_page_width     = 0.f;
+        right_page_width    = size.x;
         break;
       case PageCurlMode_DoublePageSingleMaterial:
         left_page_material  = page_curl->PageMaterial (PageCurlPageType_Back);
         right_page_material = page_curl->PageMaterial (PageCurlPageType_Front);
-        left_page_min_texcoord  = 0.f;
-        left_page_max_texcoord  = 0.5f;
-        right_page_min_texcoord = 0.5f;
-        right_page_max_texcoord = 1.f;
         break;
       case PageCurlMode_DoublePageDoubleMaterial:
         left_page_material  = page_curl->PageMaterial (PageCurlPageType_BackLeft);
@@ -429,9 +565,7 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
         break;
     }
 
-    const math::vec4f& float_page_color = page_curl->PageColor ();
-
-    math::vec4ub page_color (float_page_color.x * 255, float_page_color.y * 255, float_page_color.z * 255, float_page_color.w * 255);
+    math::vec4ub page_color (GetPageColor ());
 
     device.ISSetIndexBuffer (static_page_index_buffer.get ());
 
@@ -442,14 +576,18 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
       for (size_t i = 0; i < 4; i++)
         vertices [i].color = page_color;
 
+      float min_s, max_s;
+
+      GetTexCoords (true, min_s, max_s);
+
       vertices [0].position = math::vec3f (0, 0, STATIC_PAGES_Z_OFFSET);
       vertices [1].position = math::vec3f (left_page_width, 0, STATIC_PAGES_Z_OFFSET);
       vertices [2].position = math::vec3f (0, size.y, STATIC_PAGES_Z_OFFSET);
       vertices [3].position = math::vec3f (left_page_width, size.y, STATIC_PAGES_Z_OFFSET);
-      vertices [0].texcoord = math::vec2f (left_page_min_texcoord, 0);
-      vertices [1].texcoord = math::vec2f (left_page_max_texcoord, 0);
-      vertices [2].texcoord = math::vec2f (left_page_min_texcoord, 1.f);
-      vertices [3].texcoord = math::vec2f (left_page_max_texcoord, 1.f);
+      vertices [0].texcoord = math::vec2f (min_s, 0);
+      vertices [1].texcoord = math::vec2f (max_s, 0);
+      vertices [2].texcoord = math::vec2f (min_s, 1.f);
+      vertices [3].texcoord = math::vec2f (max_s, 1.f);
 
       left_page_vertex_buffer->SetData (0, sizeof (vertices), vertices);
 
@@ -467,14 +605,18 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
       for (size_t i = 0; i < 4; i++)
         vertices [i].color = page_color;
 
+      float min_s, max_s;
+
+      GetTexCoords (false, min_s, max_s);
+
       vertices [0].position = math::vec3f (left_page_width, 0, STATIC_PAGES_Z_OFFSET);
       vertices [1].position = math::vec3f (left_page_width + right_page_width, 0, STATIC_PAGES_Z_OFFSET);
       vertices [2].position = math::vec3f (left_page_width, size.y, STATIC_PAGES_Z_OFFSET);
       vertices [3].position = math::vec3f (left_page_width + right_page_width, size.y, STATIC_PAGES_Z_OFFSET);
-      vertices [0].texcoord = math::vec2f (right_page_min_texcoord, 0);
-      vertices [1].texcoord = math::vec2f (right_page_max_texcoord, 0);
-      vertices [2].texcoord = math::vec2f (right_page_min_texcoord, 1.f);
-      vertices [3].texcoord = math::vec2f (right_page_max_texcoord, 1.f);
+      vertices [0].texcoord = math::vec2f (min_s, 0);
+      vertices [1].texcoord = math::vec2f (max_s, 0);
+      vertices [2].texcoord = math::vec2f (min_s, 1.f);
+      vertices [3].texcoord = math::vec2f (max_s, 1.f);
 
       right_page_vertex_buffer->SetData (0, sizeof (vertices), vertices);
 
