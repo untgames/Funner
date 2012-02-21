@@ -252,8 +252,8 @@ struct RenderablePageCurlMesh::Impl
       }
 
       float curl_mismatch = fabs (current_corner_location_x - rotated_corner_location_x) +
-                           fabs (current_top_binding_location_x - rotated_top_binding_location_x) * binding_mismatch_weight +
-                           fabs (current_bottom_binding_location_x - rotated_bottom_binding_location_x) * binding_mismatch_weight;
+                            fabs (current_top_binding_location_x - rotated_top_binding_location_x) * binding_mismatch_weight +
+                            fabs (current_bottom_binding_location_x - rotated_bottom_binding_location_x) * binding_mismatch_weight;
 
       if (curl_mismatch < best_curl_mismatch)
       {
@@ -289,7 +289,7 @@ struct RenderablePageCurlMesh::Impl
             y = v.position.y;
 
       v.position.x = x * cos_curl_angle - y * sin_minus_curl_angle;
-      v.position.y = x * sin_minus_curl_angle + y * cos_curl_angle;
+      v.position.y = height - (x * sin_minus_curl_angle + y * cos_curl_angle);
     }
   }
 
@@ -348,7 +348,7 @@ struct RenderablePageCurlMesh::Impl
         RenderableVertex& vertex = vertices.data () [j * x_size + i];
 
         vertex.texcoord.x = min_s + i / (float)(x_size - 1) * s_range;
-        vertex.texcoord.y = min_t + j / (float)(y_size - 1) * t_range;
+        vertex.texcoord.y = max_t - (min_t + j / (float)(y_size - 1) * t_range);
       }
     }
   }

@@ -486,15 +486,19 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
       corner_position.y -= (flip_vec_length - page_size.x) * flip_vec.y / flip_vec_length;
     }
 
-    if (corner_position.x > 2 * page_size.x - curl_radius * 2)
-      curl_radius *= (2 * page_size.x - corner_position.x) / (curl_radius * 2);
+    math::vec2f curl_corner_position = corner_position;
+
+    curl_corner_position.y = page_size.y - curl_corner_position.y;
+
+    if (curl_corner_position.x > 2 * page_size.x - curl_radius * 2)
+      curl_radius *= (2 * page_size.x - curl_corner_position.x) / (curl_radius * 2);
 
     float flip_width  = corner_position.y / tan (x_flip_angle) + corner_position.x,
           flip_height = flip_width * tan (x_flip_angle / 2.f),
           curl_angle  = atan2 (flip_width, flip_height) + M_PI,
           curl_x      = (page_size.x - flip_width) * cos (curl_angle);
 
-    curled_page->Curl (corner_position, page_curl->CurlCorner (), curl_x, curl_radius, curl_angle,
+    curled_page->Curl (curl_corner_position, page_curl->CurlCorner (), curl_x, curl_radius, curl_angle,
                        page_curl->FindBestCurlSteps (), page_curl->BindingMismatchWeight ());
 
 /*      glCullFace (GL_BACK);
