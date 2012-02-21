@@ -113,7 +113,7 @@ inline T* SceneContext::FindAttachment (const char* name)
 template <class T>
 inline const T* SceneContext::FindAttachment (const char* name) const
 {
-  return const_cast<SceneContext&> (*this).FindAttachment (name);
+  return const_cast<SceneContext&> (*this).FindAttachment<T> (name);
 }
 
 template <class T>
