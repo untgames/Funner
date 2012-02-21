@@ -352,6 +352,27 @@ struct RenderablePageCurlMesh::Impl
       }
     }
   }
+
+  //Рассчет цвета вершин
+  void CalculateShadow (bool front, float max_shadow)
+  {
+    if (last_curl_radius == 0)
+      return;
+
+    RenderableVertex* vertex = vertices.data ();
+
+    for (size_t i = 0; i < vertices_count; i++, vertex++)
+    {
+      float light = stl::max ((float)fabs (vertex->position.z) / (last_curl_radius * 2), max_shadow);
+
+      if (!front)
+        light = 1 - light * 1.5;
+
+      vertex->color.x = color.x * light;
+      vertex->color.y = color.y * light;
+      vertex->color.z = color.z * light;
+    }
+  }
 };
 
 /*
@@ -384,6 +405,15 @@ void RenderablePageCurlMesh::Curl (const math::vec2f& corner_position, scene_gra
                                    float radius, float angle, size_t find_best_curl_steps, float binding_mismatch_weight)
 {
   impl->Curl (corner_position, corner, curl_x, radius, angle, find_best_curl_steps, binding_mismatch_weight);
+}
+
+/*
+   Рассчет цвета вершин
+*/
+
+void RenderablePageCurlMesh::CalculateShadow (bool front, float max_shadow)
+{
+  impl->CalculateShadow (front, max_shadow);
 }
 
 /*

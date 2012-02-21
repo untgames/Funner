@@ -76,27 +76,29 @@ void shader_error_log (const char* message)
 
 struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
 {
-  Render&                    render;                     //ссылка на рендер
-  scene_graph::PageCurl*     page_curl;                  //исходный узел
-  Renderable*                renderable;                 //объект
-  LowLevelFramePtr           low_level_frame;            //фрейм кастомной отрисовки
-  BlendStatePtr              none_blend_state;           //состо€ни€ блендинга
-  BlendStatePtr              translucent_blend_state;    //состо€ни€ блендинга
-  InputLayoutPtr             input_layout;               //состо€ние устройства отрисовки
-  ProgramPtr                 default_program;            //шейдер
-  ProgramParametersLayoutPtr program_parameters_layout;  //расположение параметров шейдера
-  SamplerStatePtr            sampler_state;              //сэмплер
-  RasterizerStatePtr         rasterizer_state;           //состо€ние растеризатора
-  DepthStencilStatePtr       depth_stencil_state;        //состо€ние буфера попиксельного отсечени€
-  BufferPtr                  constant_buffer;            //константный буфер
-  BufferPtr                  left_page_vertex_buffer;    //вершинный буфер левой страницы
-  BufferPtr                  right_page_vertex_buffer;   //вершинный буфер правой страницы
-  BufferPtr                  static_page_index_buffer;   //индексный буфер статической страницы
-  math::vec3f                view_point;                 //позици€ камеры
-  math::mat4f                projection;                 //матрица камеры
-  RenderablePageCurlMeshPtr  curled_page;                //сетка изгибаемой страницы
-  math::vec2ui               current_page_grid_size;     //текущий размер сетки страницы
-  bool                       initialized;                //инициализированы ли необходимые пол€
+  Render&                    render;                      //ссылка на рендер
+  scene_graph::PageCurl*     page_curl;                   //исходный узел
+  Renderable*                renderable;                  //объект
+  LowLevelFramePtr           low_level_frame;             //фрейм кастомной отрисовки
+  BlendStatePtr              none_blend_state;            //состо€ни€ блендинга
+  BlendStatePtr              translucent_blend_state;     //состо€ни€ блендинга
+  InputLayoutPtr             input_layout;                //состо€ние устройства отрисовки
+  ProgramPtr                 default_program;             //шейдер
+  ProgramParametersLayoutPtr program_parameters_layout;   //расположение параметров шейдера
+  SamplerStatePtr            sampler_state;               //сэмплер
+  RasterizerStatePtr         rasterizer_no_cull_state;    //состо€ние растеризатора без отсечени€
+  RasterizerStatePtr         rasterizer_cull_back_state;  //состо€ние растеризатора с отсечением задних сторон треугольников
+  RasterizerStatePtr         rasterizer_cull_front_state; //состо€ние растеризатора с отсечением передних сторон треугольников
+  DepthStencilStatePtr       depth_stencil_state;         //состо€ние буфера попиксельного отсечени€
+  BufferPtr                  constant_buffer;             //константный буфер
+  BufferPtr                  left_page_vertex_buffer;     //вершинный буфер левой страницы
+  BufferPtr                  right_page_vertex_buffer;    //вершинный буфер правой страницы
+  BufferPtr                  static_page_index_buffer;    //индексный буфер статической страницы
+  math::vec3f                view_point;                  //позици€ камеры
+  math::mat4f                projection;                  //матрица камеры
+  RenderablePageCurlMeshPtr  curled_page;                 //сетка изгибаемой страницы
+  math::vec2ui               current_page_grid_size;      //текущий размер сетки страницы
+  bool                       initialized;                 //инициализированы ли необходимые пол€
 
   /// онструктор
   Impl (scene_graph::PageCurl* in_page_curl, Render& in_render, Renderable* in_renderable)
@@ -265,14 +267,14 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
   }
 
   //создание состо€ни€ уровн€ растеризации
-  RasterizerStatePtr CreateRasterizerState (low_level::IDevice& device)
+  RasterizerStatePtr CreateRasterizerState (low_level::IDevice& device, low_level::CullMode cull_mode)
   {
     low_level::RasterizerDesc rasterizer_desc;
 
     memset (&rasterizer_desc, 0, sizeof (rasterizer_desc));
 
     rasterizer_desc.fill_mode               = low_level::FillMode_Solid;
-    rasterizer_desc.cull_mode               = low_level::CullMode_None;
+    rasterizer_desc.cull_mode               = cull_mode;
     rasterizer_desc.front_counter_clockwise = true;
     rasterizer_desc.depth_bias              = 0;
     rasterizer_desc.scissor_enable          = false;
@@ -361,15 +363,17 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
   {
     if (!initialized)
     {
-      none_blend_state          = CreateBlendState              (device, false, low_level::BlendArgument_Zero, low_level::BlendArgument_Zero, low_level::BlendArgument_Zero);
-      translucent_blend_state   = CreateBlendState              (device, true, low_level::BlendArgument_SourceAlpha, low_level::BlendArgument_InverseSourceAlpha, low_level::BlendArgument_InverseSourceAlpha);
-      input_layout              = CreateInputLayout             (device);
-      default_program           = CreateProgram                 (device, "render.obsolete.renderer2d.RenderablePageCurl.default_program", DEFAULT_SHADER_SOURCE_CODE);
-      program_parameters_layout = CreateProgramParametersLayout (device);
-      constant_buffer           = CreateConstantBuffer          (device);
-      rasterizer_state          = CreateRasterizerState         (device);
-      depth_stencil_state       = CreateDepthStencilState       (device);
-      sampler_state             = CreateSampler                 (device);
+      none_blend_state            = CreateBlendState              (device, false, low_level::BlendArgument_Zero, low_level::BlendArgument_Zero, low_level::BlendArgument_Zero);
+      translucent_blend_state     = CreateBlendState              (device, true, low_level::BlendArgument_SourceAlpha, low_level::BlendArgument_InverseSourceAlpha, low_level::BlendArgument_InverseSourceAlpha);
+      input_layout                = CreateInputLayout             (device);
+      default_program             = CreateProgram                 (device, "render.obsolete.renderer2d.RenderablePageCurl.default_program", DEFAULT_SHADER_SOURCE_CODE);
+      program_parameters_layout   = CreateProgramParametersLayout (device);
+      constant_buffer             = CreateConstantBuffer          (device);
+      rasterizer_no_cull_state    = CreateRasterizerState         (device, low_level::CullMode_None);
+      rasterizer_cull_front_state = CreateRasterizerState         (device, low_level::CullMode_Front);
+      rasterizer_cull_back_state  = CreateRasterizerState         (device, low_level::CullMode_Back);
+      depth_stencil_state         = CreateDepthStencilState       (device);
+      sampler_state               = CreateSampler                 (device);
 
       low_level::BufferDesc buffer_desc;
 
@@ -429,7 +433,6 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
       //установка общих ресурсов
 
     device.ISSetInputLayout             (input_layout.get ());
-    device.RSSetState                   (rasterizer_state.get ());
     device.SSSetConstantBuffer          (0, constant_buffer.get ());
     device.SSSetProgramParametersLayout (program_parameters_layout.get ());
     device.SSSetSampler                 (0, sampler_state.get ());
@@ -458,6 +461,8 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
   {
     if (page_curl->Mode () == PageCurlMode_SinglePage)
       throw xtl::format_operation_exception ("render::obsolete::render2d::RenderablePageCurl::DrawLeftTopCornerFlip", "Can't draw flip for left bottom corner in single page mode");
+
+    device.RSSetState (rasterizer_no_cull_state.get ());
 
     DrawStaticPages (device);
   }
@@ -501,12 +506,7 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
     curled_page->Curl (curl_corner_position, page_curl->CurlCorner (), curl_x, curl_radius, curl_angle,
                        page_curl->FindBestCurlSteps (), page_curl->BindingMismatchWeight ());
 
-/*      glCullFace (GL_BACK);
-
-      if (nextLeftPage)
-        glEnable (GL_CULL_FACE);
-      else
-        glDisable (GL_CULL_FACE);*/
+    device.RSSetState (rasterizer_cull_back_state.get ());
 
     BindMaterial (device, GetCurledRightPageMaterial ());
 
@@ -516,29 +516,34 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
 
     curled_page->SetTexCoords (min_s, 0, max_s, 1);
 
-    //      [curledPage calculateShadowForFront:true maxShadow:0];
+    curled_page->CalculateShadow (true, 0);
 
     curled_page->Draw (device);
 
-/*    if (nextLeftPage)
-    {
-      glCullFace (GL_FRONT);
-      curledPage.texture = previousRightPage;
-      [curledPage inverseTexcoordsS];
-      [curledPage calculateShadowForFront:false maxShadow:(1 - curlRadius / CURL_RADIUS)];
-      [curledPage draw];
-    }*/
+    device.RSSetState (rasterizer_cull_front_state.get ());
+
+    BindMaterial (device, GetCurledLeftPageMaterial ());
+
+    curled_page->CalculateShadow (false, 1 - curl_radius / page_curl->CurlRadius ());
+
+    curled_page->Draw (device);
+
+    device.RSSetState (rasterizer_no_cull_state.get ());
 
     DrawStaticPages (device);
   }
 
   void DrawRightTopCornerFlip (low_level::IDevice& device)
   {
+    device.RSSetState (rasterizer_no_cull_state.get ());
+
     DrawStaticPages (device);
   }
 
   void DrawRightBottomCornerFlip (low_level::IDevice& device)
   {
+    device.RSSetState (rasterizer_no_cull_state.get ());
+
     DrawStaticPages (device);
   }
 
