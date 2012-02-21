@@ -1,0 +1,8 @@
+Results of scene_context1_test:
+typed anonymous attachments
+int attachment: 5
+exception thrown
+int attachment not found
+float attachment 'y': -1.00
+exception has not thrown
+float attachment 'y' not found

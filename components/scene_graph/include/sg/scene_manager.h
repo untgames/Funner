@@ -1,6 +1,8 @@
 #ifndef SCENE_GRAPH_SCENE_MANAGER_HEADER
 #define SCENE_GRAPH_SCENE_MANAGER_HEADER
 
+#include <typeinfo>
+
 #include <xtl/functional_fwd>
 
 #include <sg/node.h>
@@ -21,6 +23,14 @@ class Group;
 namespace scene_graph
 {
 
+namespace detail
+{
+
+//forward declaration
+class ISceneAttachment;
+
+}
+
 typedef media::rms::Group ResourceGroup;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -39,11 +49,6 @@ class SceneContext
     SceneContext& operator = (const SceneContext&);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Клонирование
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    SceneContext Clone () const;
-    
-///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Свойства
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     common::PropertyMap Properties    () const;
@@ -52,10 +57,12 @@ class SceneContext
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Присоединенные данные
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    template <class T> void     Attach     (T& value);
-    template <class T> void     Detach     ();
-    template <class T> T&       Attachment ();
-    template <class T> const T& Attachment () const;    
+    template <class T> void     Attach         (T& value);
+    template <class T> void     Detach         ();
+    template <class T> T&       Attachment     ();
+    template <class T> const T& Attachment     () const;
+    template <class T> T*       FindAttachment ();
+    template <class T> const T* FindAttachment () const;        
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Присоединенные именованные данные
@@ -68,17 +75,40 @@ class SceneContext
     template <class T> const T* FindAttachment (const char* name) const;
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+///Отсоединение всех данных
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    template <class T> void DetachAll ();
+                       void DetachAll ();
+                       
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Очистка
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void Clear ();
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Обработчик ошибок создания сцены
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    typedef xtl::function<bool (const char* error_message)> ExceptionHandler; //return true if exceptions has processed
+    typedef xtl::function<bool (const char* error_message)> ExceptionHandler; //returns true if exceptions has processed
 
-    xtl::connection RegisterExceptionHandler (const char* error_wc_mask, const ExceptionHandler& handler);
-    
+    xtl::connection RegisterErrorHandler (const char* error_wc_mask, const ExceptionHandler& handler);
+    bool            FilterError          (const char* error_message) const; //returns true if exception is filtered
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Обмен
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void Swap (SceneContext&);
-    
+
+  private:
+    void                      RaiseAttachmentError (const char*, const std::type_info&);
+    void                      RaiseAttachmentError (const std::type_info&);
+    void                      AttachCore           (detail::ISceneAttachment*);
+    void                      AttachCore           (const char*, detail::ISceneAttachment*);
+    void                      DetachCore           (const std::type_info&);
+    void                      DetachCore           (const char*, const std::type_info&);
+    detail::ISceneAttachment* FindAttachmentCore   (const std::type_info&) const;
+    detail::ISceneAttachment* FindAttachmentCore   (const char*, const std::type_info&) const;
+    void                      DetachAllCore        (const std::type_info&);
+
   private:
     struct Impl;
     Impl* impl;
@@ -171,20 +201,22 @@ class ISceneFactory
 class SceneSerializationManager
 {
   public:
-    typedef xtl::function<ISceneFactory* (const char* file_name)>   SceneLoader;
-    typedef xtl::function<void (const char* file_name, Node& node)> SceneSaver;
-    typedef SceneManager::LogHandler                                LogHandler;
+    typedef SceneManager::LogHandler                                                             LogHandler;  
+    typedef xtl::function<ISceneFactory* (const char* file_name, const LogHandler& log_handler)> SceneLoader;
+    typedef xtl::function<void (const char* file_name, Node& node)>                              SceneSaver;
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Регистрация сериализаторов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    static void RegisterLoader       (const char* file_type, const SceneLoader& loader, const LogHandler& = LogHandler ());
+    static void RegisterLoader       (const char* file_type, const SceneLoader& loader);
     static void RegisterSaver        (const char* file_type, const SceneSaver& saver);
     static void UnregisterLoader     (const char* file_type);
     static void UnregisterSaver      (const char* file_type);
     static void UnregisterAllLoaders ();
     static void UnregisterAllSavers  ();
 };
+
+#include <sg/detail/scene_manager.inl>
 
 }
 

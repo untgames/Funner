@@ -1,0 +1,3 @@
+Results of scene_context3_test:
+check_exception(error: my error)
+check: 1
