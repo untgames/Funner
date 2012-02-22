@@ -21,6 +21,7 @@ namespace
 
 const char* LOG_NAME = "render.obsolete.render2d.RenderablePageCurl";
 
+const float EPS                   = 0.001;
 const float STATIC_PAGES_Z_OFFSET = -0.001;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -500,10 +501,16 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
     if (curl_corner_position.x > 2 * page_size.x - curl_radius * 2)
       curl_radius *= (2 * page_size.x - curl_corner_position.x) / (curl_radius * 2);
 
+    curl_radius = stl::max (EPS, curl_radius);
+
     float flip_width  = corner_position.y / tan (x_flip_angle) + corner_position.x,
           flip_height = flip_width * tan (x_flip_angle / 2.f),
-          curl_angle  = atan2 (flip_width, flip_height) + M_PI,
-          curl_x      = (page_size.x - flip_width) * cos (curl_angle);
+          curl_angle  = atan2 (flip_width, flip_height);
+
+    if (curl_corner_position.y < 1)
+      curl_angle += M_PI;
+
+    float curl_x = (page_size.x - flip_width) * cos (curl_angle);
 
     curled_page->Curl (curl_corner_position, page_curl->CurlCorner (), curl_x, curl_radius, curl_angle,
                        page_curl->FindBestCurlSteps (), page_curl->BindingMismatchWeight ());
