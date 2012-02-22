@@ -127,7 +127,8 @@ void ContextCaps::Init (const ExtensionSet& available_extension_set, const Exten
                    EXT_texture3D                  = "GL_EXT_texture3D",
                    NV_texture_rectangle           = "GL_NV_texture_rectangle",
                    SGIS_generate_mipmap           = "GL_SGIS_generate_mipmap",
-                   SGIS_texture_lod               = "GL_SGIS_texture_lod";                   
+                   SGIS_texture_edge_clamp        = "GL_SGIS_texture_edge_clamp",
+                   SGIS_texture_lod               = "GL_SGIS_texture_lod";
 
   static Extension versions [GlVersion_Num] = {"GL_VERSION_1_2", "GL_VERSION_1_3", "GL_VERSION_1_4", "GL_VERSION_1_5",
                                                "GL_VERSION_2_0", "GL_VERSION_2_1"};
@@ -178,6 +179,7 @@ void ContextCaps::Init (const ExtensionSet& available_extension_set, const Exten
   has_ext_texture3d                  = ext.Get (EXT_texture3D);
   has_img_texture_compression_pvrtc  = false;
   has_sgis_generate_mipmap           = ext.Get (SGIS_generate_mipmap);
+  has_sgis_texture_edge_clamp        = ext.Get (SGIS_texture_edge_clamp);
   has_sgis_texture_lod               = ext.Get (SGIS_texture_lod);
 
   if (has_arb_texture_rectangle) glGetIntegerv (GL_MAX_RECTANGLE_TEXTURE_SIZE_ARB, (GLint*)&max_rectangle_texture_size);

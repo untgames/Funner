@@ -260,7 +260,7 @@ void SamplerState::SetDesc (const SamplerDesc& in_desc)
           
         break;
       case TexcoordWrap_Clamp:
-        gl_wrap [i] = GL_CLAMP;
+        gl_wrap [i] = caps.has_sgis_texture_edge_clamp ? GL_CLAMP_TO_EDGE : GL_CLAMP;
         break;
       case TexcoordWrap_Repeat:
         gl_wrap [i] = GL_REPEAT;

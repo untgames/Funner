@@ -62,6 +62,7 @@ struct ContextCaps
   bool has_ffp;                            //Разрешено ли использование ffp
   bool has_img_texture_compression_pvrtc;  //GL_IMG_texture_compression_pvrtc
   bool has_sgis_generate_mipmap;           //GL_SGIS_generate_mipmap
+  bool has_sgis_texture_edge_clamp;        //GL_SGIS_texture_edge_clamp
   bool has_sgis_texture_lod;               //GL_SGIS_texture_lod
   
 ///////////////////////////////////////////////////////////////////////////////////////////////////
