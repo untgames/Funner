@@ -39,6 +39,7 @@ void dump (const PageCurl& curl)
   printf ("  front right material              '%s'\n",                   curl.PageMaterial (PageCurlPageType_FrontRight));
   printf ("  back left material                '%s'\n",                   curl.PageMaterial (PageCurlPageType_BackLeft));
   printf ("  back right material               '%s'\n",                   curl.PageMaterial (PageCurlPageType_BackRight));
+  printf ("  shadow material                   '%s'\n",                   curl.ShadowMaterial ());
   printf ("  size                              %.2fx%.2f\n",              curl.Size ().x, curl.Size ().y);
   printf ("  corner                            '%s'\n",                   get_corner_name (curl.CurlCorner ()));
   printf ("  corner position                   %.2f; %.2f\n",             curl.CornerPosition ().x, curl.CornerPosition ().y);
@@ -69,6 +70,7 @@ int main ()
   curl->SetPageMaterial                  (PageCurlPageType_Front,     "front_material");
   curl->SetPageMaterial                  (PageCurlPageType_BackLeft,  "back_left_material");
   curl->SetPageMaterial                  (PageCurlPageType_BackRight, "back_right_material");
+  curl->SetShadowMaterial                ("shadow_material");
   curl->SetSize                          (2.f, 4.f);
   curl->SetCurlCorner                    (PageCurlCorner_RightBottom);
   curl->SetCornerPosition                (1.f, 2.f);

@@ -66,8 +66,10 @@ class PageCurl : public Entity
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Установка материалов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void        SetPageMaterial (PageCurlPageType type, const char* name);
-    const char* PageMaterial    (PageCurlPageType type) const;
+    void        SetPageMaterial   (PageCurlPageType type, const char* name);
+    void        SetShadowMaterial (const char* name);
+    const char* PageMaterial      (PageCurlPageType type) const;
+    const char* ShadowMaterial    () const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Установка полного размера страниц

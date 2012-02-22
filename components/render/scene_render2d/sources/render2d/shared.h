@@ -294,6 +294,27 @@ class RenderablePageCurlMesh : public xtl::reference_counter
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void Draw (low_level::IDevice& device);
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Получение информации после трансформации
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    bool               HasRightSideBendPosition    ();
+    bool               HasLeftSideBendPosition     ();
+    bool               HasBottomSideBendPosition   ();
+    bool               HasTopSideBendPosition      ();
+    const math::vec3f& GetRightSideBendPosition    ();
+    const math::vec3f& GetLeftSideBendPosition     ();
+    const math::vec3f& GetTopSideBendPosition      ();
+    const math::vec3f& GetBottomSideBendPosition   ();
+    const math::vec3f& GetRightSideDetachPosition  ();
+    const math::vec3f& GetLeftSideDetachPosition   ();
+    const math::vec3f& GetTopSideDetachPosition    ();
+    const math::vec3f& GetBottomSideDetachPosition ();
+    bool               HasRightSideDetachPosition  ();
+    bool               HasLeftSideDetachPosition   ();
+    bool               HasTopSideDetachPosition    ();
+    bool               HasBottomSideDetachPosition ();
+    const math::vec3f& GetCornerPosition           (scene_graph::PageCurlCorner corner);
+
   private:
     RenderablePageCurlMesh (const RenderablePageCurlMesh&);             //no impl
     RenderablePageCurlMesh& operator = (const RenderablePageCurlMesh&); //no impl

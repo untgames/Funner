@@ -15,6 +15,9 @@
   <material id="sprite_material">
     <sprite_profile image="media/bottom.jpg" blend_mode="translucent"/>
   </material>
+  <material id="page_shadow">
+    <sprite_profile image="media/page_shadow.png" blend_mode="mask"/>
+  </material>
   <material id="dynamic_material">
     <sprite_profile image="dynamic(1024,1024,'test_query')" blend_mode="none"/>
   </material>

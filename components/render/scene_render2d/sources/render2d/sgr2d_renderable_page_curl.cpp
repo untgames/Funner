@@ -21,7 +21,7 @@ namespace
 
 const char* LOG_NAME = "render.obsolete.render2d.RenderablePageCurl";
 
-const float STATIC_PAGES_Z_OFFSET = 0.001;
+const float STATIC_PAGES_Z_OFFSET = -0.001;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Параметры вершины необходимые для визуализации
@@ -82,6 +82,8 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
   LowLevelFramePtr           low_level_frame;             //фрейм кастомной отрисовки
   BlendStatePtr              none_blend_state;            //состояния блендинга
   BlendStatePtr              translucent_blend_state;     //состояния блендинга
+  BlendStatePtr              mask_blend_state;            //состояния блендинга
+  BlendStatePtr              additive_blend_state;        //состояния блендинга
   InputLayoutPtr             input_layout;                //состояние устройства отрисовки
   ProgramPtr                 default_program;             //шейдер
   ProgramParametersLayoutPtr program_parameters_layout;   //расположение параметров шейдера
@@ -91,9 +93,8 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
   RasterizerStatePtr         rasterizer_cull_front_state; //состояние растеризатора с отсечением передних сторон треугольников
   DepthStencilStatePtr       depth_stencil_state;         //состояние буфера попиксельного отсечения
   BufferPtr                  constant_buffer;             //константный буфер
-  BufferPtr                  left_page_vertex_buffer;     //вершинный буфер левой страницы
-  BufferPtr                  right_page_vertex_buffer;    //вершинный буфер правой страницы
-  BufferPtr                  static_page_index_buffer;    //индексный буфер статической страницы
+  BufferPtr                  quad_vertex_buffer;          //вершинный буфер на два треугольника
+  BufferPtr                  quad_index_buffer;           //индексный буфер на два треугольника
   math::vec3f                view_point;                  //позиция камеры
   math::mat4f                projection;                  //матрица камеры
   RenderablePageCurlMeshPtr  curled_page;                 //сетка изгибаемой страницы
@@ -365,6 +366,8 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
     {
       none_blend_state            = CreateBlendState              (device, false, low_level::BlendArgument_Zero, low_level::BlendArgument_Zero, low_level::BlendArgument_Zero);
       translucent_blend_state     = CreateBlendState              (device, true, low_level::BlendArgument_SourceAlpha, low_level::BlendArgument_InverseSourceAlpha, low_level::BlendArgument_InverseSourceAlpha);
+      mask_blend_state            = CreateBlendState              (device, true, low_level::BlendArgument_Zero, low_level::BlendArgument_SourceColor, low_level::BlendArgument_SourceAlpha);
+      additive_blend_state        = CreateBlendState              (device, true, low_level::BlendArgument_SourceAlpha, low_level::BlendArgument_One, low_level::BlendArgument_One);
       input_layout                = CreateInputLayout             (device);
       default_program             = CreateProgram                 (device, "render.obsolete.renderer2d.RenderablePageCurl.default_program", DEFAULT_SHADER_SOURCE_CODE);
       program_parameters_layout   = CreateProgramParametersLayout (device);
@@ -384,8 +387,7 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
       buffer_desc.access_flags = low_level::AccessFlag_Write;
       buffer_desc.size         = sizeof (RenderableVertex) * 4;
 
-      left_page_vertex_buffer  = BufferPtr (device.CreateBuffer (buffer_desc), false);
-      right_page_vertex_buffer = BufferPtr (device.CreateBuffer (buffer_desc), false);
+      quad_vertex_buffer = BufferPtr (device.CreateBuffer (buffer_desc), false);
 
         //создание индексного буфера
 
@@ -396,11 +398,11 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
       buffer_desc.access_flags = low_level::AccessFlag_Write;
       buffer_desc.size         = sizeof (unsigned short) * 6;
 
-      static_page_index_buffer = BufferPtr (device.CreateBuffer (buffer_desc), false);
+      quad_index_buffer = BufferPtr (device.CreateBuffer (buffer_desc), false);
 
       unsigned short indices [6] = { 0, 1, 2, 1, 2, 3 };
 
-      static_page_index_buffer->SetData (0, sizeof (indices), indices);
+      quad_index_buffer->SetData (0, sizeof (indices), indices);
 
       initialized = true;
     }
@@ -426,7 +428,7 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
 
     program_parameters.view_matrix       = math::translate (-view_point);
     program_parameters.projection_matrix = projection;
-    program_parameters.object_matrix     = page_curl->WorldTM ();
+    program_parameters.object_matrix     = page_curl->WorldTM () * math::scale (math::vec3f (1, 1, -1));
 
     constant_buffer->SetData (0, sizeof (program_parameters), &program_parameters);
 
@@ -514,7 +516,7 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
 
     GetTexCoords (false, min_s, max_s);
 
-    curled_page->SetTexCoords (min_s, 0, max_s, 1);
+    curled_page->SetTexCoords (max_s, 0, min_s, 1);
 
     curled_page->CalculateShadow (true, 0);
 
@@ -526,11 +528,116 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
 
     curled_page->CalculateShadow (false, 1 - curl_radius / page_curl->CurlRadius ());
 
+    curled_page->SetTexCoords (min_s, 0, max_s, 1);
+
     curled_page->Draw (device);
 
     device.RSSetState (rasterizer_no_cull_state.get ());
 
     DrawStaticPages (device);
+
+      //Shadow drawing
+    if (curled_page->HasBottomSideBendPosition () && xtl::xstrlen (page_curl->ShadowMaterial ()))
+    {
+      BindMaterial (device, page_curl->ShadowMaterial ());
+
+      bool has_left_side_bend_position = curled_page->HasLeftSideBendPosition ();
+
+      const math::vec3f& bottom_side_bend_position = curled_page->GetBottomSideBendPosition ();
+      const math::vec3f& curled_corner_position    = curled_page->GetCornerPosition (PageCurlCorner_LeftBottom);
+      math::vec3f        left_side_bend_position   = has_left_side_bend_position ? curled_page->GetLeftSideBendPosition () : curled_page->GetCornerPosition (PageCurlCorner_LeftTop);
+      math::vec3f        top_side_bend_position    = curled_page->HasTopSideBendPosition () ? curled_page->GetTopSideBendPosition () : curled_page->GetCornerPosition (PageCurlCorner_LeftTop);
+      math::vec2f        shadow_corner_position;
+
+      math::vec2f bottom_side_vector (curled_corner_position.x - bottom_side_bend_position.x, -curled_corner_position.y + bottom_side_bend_position.y),
+                  left_side_vector (left_side_bend_position.x - curled_corner_position.x, left_side_bend_position.y - curled_corner_position.y),
+                  corner_offset (-bottom_side_vector.x + bottom_side_vector.y, bottom_side_vector.y + bottom_side_vector.x);
+
+      corner_offset = normalize (corner_offset);
+
+      float shadow_grow_power        = page_curl->ShadowGrowPower (),
+            shadow_offset_multiplier = pow (length (left_side_vector), shadow_grow_power) * pow (curled_page->GetCornerPosition (PageCurlCorner_LeftBottom).z / (page_curl->CurlRadius () * 2), shadow_grow_power),
+            shadow_corner_offset     = page_curl->CornerShadowOffset ();
+
+      shadow_corner_position.x = curled_corner_position.x - corner_offset.x * shadow_corner_offset * shadow_offset_multiplier;
+      shadow_corner_position.y = curled_corner_position.y - corner_offset.y * shadow_corner_offset * shadow_offset_multiplier;
+
+      if (!has_left_side_bend_position)
+      {
+        float height_pow_factor             = left_side_bend_position.x > page_size.x ? shadow_grow_power : page_curl->OppositeCornerShadowGrowPower (),
+              left_shadow_offset_multiplier = pow (length (left_side_vector), 0.25) * pow (curled_page->GetCornerPosition (PageCurlCorner_LeftTop).z / (page_curl->CurlRadius () * 2), height_pow_factor);
+
+        left_side_bend_position.x -= corner_offset.x * shadow_corner_offset * left_shadow_offset_multiplier;
+        left_side_bend_position.y += corner_offset.y * shadow_corner_offset * left_shadow_offset_multiplier;
+      }
+      else
+        top_side_bend_position = left_side_bend_position;
+
+      math::vec2f top_side_vector (left_side_bend_position.x - top_side_bend_position.x, left_side_bend_position.y - top_side_bend_position.y);
+
+      float left_side_tex_t = has_left_side_bend_position ? length (left_side_vector) / page_size.y : 1;
+
+      RenderableVertex vertices [4];
+
+      for (size_t i = 0; i < 4; i++)
+        vertices [i].color = 255;
+
+      vertices [0].position = math::vec3f (shadow_corner_position.x, shadow_corner_position.y, curl_radius);
+      vertices [1].position = math::vec3f (bottom_side_bend_position.x, bottom_side_bend_position.y, curl_radius);
+      vertices [2].position = math::vec3f (left_side_bend_position.x, left_side_bend_position.y, curl_radius);
+      vertices [3].position = math::vec3f (top_side_bend_position.x, top_side_bend_position.y, curl_radius);
+      vertices [0].texcoord = math::vec2f (0, 0);
+      vertices [1].texcoord = math::vec2f (length (bottom_side_vector) / page_size.x, 0);
+      vertices [2].texcoord = math::vec2f (0, left_side_tex_t);
+      vertices [3].texcoord = math::vec2f (length (top_side_vector) / page_size.x, 1);
+
+      quad_vertex_buffer->SetData (0, sizeof (vertices), vertices);
+
+      device.ISSetVertexBuffer (0, quad_vertex_buffer.get ());
+
+      device.DrawIndexed (low_level::PrimitiveType_TriangleList, 0, 6, 0);
+    }
+
+/*    glDisable            (GL_TEXTURE_2D);
+    glEnableClientState  (GL_COLOR_ARRAY);
+    glDisableClientState (GL_TEXTURE_COORD_ARRAY);
+
+    device.OSSetBlendState (mask_blend_state.get ());
+
+    float light = 1 - SHADOW_DENSITY * curlRadius / CURL_RADIUS;
+
+    GLfloat colors [] = {
+      light, light, light, 1,
+      light, light, light, 1,
+      1, 1, 1, 1,
+      1, 1, 1, 1
+    };
+
+    CGPoint bottomDetachPosition = [curled_page hasBottomSideDetachPosition] ? [curled_page getBottomSideDetachPosition] : [curled_page getCornerPosition:PageCorner_RightBottom],
+            topDetachPosition    = [curled_page hasLeftSideDetachPosition] ? [curled_page getLeftSideDetachPosition] : [curled_page hasTopSideDetachPosition] ? [curled_page getTopSideDetachPosition] : [curled_page getCornerPosition:PageCorner_RightTop];
+
+    Vector2f detachVec           = { bottomDetachPosition.x - topDetachPosition.x, bottomDetachPosition.y - topDetachPosition.y },
+             normalizedDetachVec = normalize_vector (detachVec);
+
+    topDetachPosition.x -= normalizedDetachVec.x * ADDITIONAL_SHADOW_LENGTH;
+    topDetachPosition.y -= normalizedDetachVec.y * ADDITIONAL_SHADOW_LENGTH;
+
+    Vector2f shadowOffset = { topDetachPosition.y - bottomDetachPosition.y, bottomDetachPosition.x - topDetachPosition.x };
+
+    shadowOffset = normalize_vector (shadowOffset);
+
+    float shadowWidth = leftPageRect.size.width * SHADOW_WIDTH;
+
+    GLfloat vertices [] = { topDetachPosition.x,                                   topDetachPosition.y,                                   0,
+                            bottomDetachPosition.x,                                bottomDetachPosition.y,                                0,
+                            topDetachPosition.x + shadowOffset.x * shadowWidth,    topDetachPosition.y + shadowOffset.y * shadowWidth,    0,
+                            bottomDetachPosition.x + shadowOffset.x * shadowWidth, bottomDetachPosition.y + shadowOffset.y * shadowWidth, 0 };
+    glLoadIdentity ();
+    glTranslatef (leftPageRect.origin.x, leftPageRect.origin.y, -0.005);
+
+    glVertexPointer (3, GL_FLOAT, 0, vertices);
+    glColorPointer  (4, GL_FLOAT, 0, colors);
+    glDrawArrays    (GL_TRIANGLE_STRIP, 0, 4);*/
   }
 
   void DrawRightTopCornerFlip (low_level::IDevice& device)
@@ -557,6 +664,9 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
     float      left_page_width      = size.x * 0.5f,
                right_page_width     = left_page_width;
 
+    device.ISSetIndexBuffer  (quad_index_buffer.get ());
+    device.ISSetVertexBuffer (0, quad_vertex_buffer.get ());
+
     switch (page_curl->Mode ())
     {
       case PageCurlMode_SinglePage:
@@ -575,8 +685,6 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
     }
 
     math::vec4ub page_color (GetPageColor ());
-
-    device.ISSetIndexBuffer (static_page_index_buffer.get ());
 
     if (left_page_material)
     {
@@ -598,9 +706,7 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
       vertices [2].texcoord = math::vec2f (min_s, 1.f);
       vertices [3].texcoord = math::vec2f (max_s, 1.f);
 
-      left_page_vertex_buffer->SetData (0, sizeof (vertices), vertices);
-
-      device.ISSetVertexBuffer (0, left_page_vertex_buffer.get ());
+      quad_vertex_buffer->SetData (0, sizeof (vertices), vertices);
 
       BindMaterial (device, left_page_material);
 
@@ -627,9 +733,7 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
       vertices [2].texcoord = math::vec2f (min_s, 1.f);
       vertices [3].texcoord = math::vec2f (max_s, 1.f);
 
-      right_page_vertex_buffer->SetData (0, sizeof (vertices), vertices);
-
-      device.ISSetVertexBuffer (0, right_page_vertex_buffer.get ());
+      quad_vertex_buffer->SetData (0, sizeof (vertices), vertices);
 
       BindMaterial (device, right_page_material);
 
@@ -655,8 +759,14 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
       case media::rfx::obsolete::SpriteBlendMode_Translucent:
         material_blend_state = translucent_blend_state;
         break;
+      case media::rfx::obsolete::SpriteBlendMode_Mask:
+        material_blend_state = mask_blend_state;
+        break;
+      case media::rfx::obsolete::SpriteBlendMode_Additive:
+        material_blend_state = additive_blend_state;
+        break;
       default:
-        throw xtl::format_operation_exception (METHOD_NAME, "Unsupported material '%s' blend mode, only 'none' and 'translucent' page material blend mode supported", name);
+        throw xtl::format_operation_exception (METHOD_NAME, "Unsupported material '%s' blend mode, only 'none', 'translucent', 'mask' and 'additive' page material blend mode supported", name);
     }
 
     device.OSSetBlendState (material_blend_state.get ());

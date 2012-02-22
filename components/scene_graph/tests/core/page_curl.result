@@ -5,6 +5,7 @@ Default curl state:
   front right material              ''
   back left material                ''
   back right material               ''
+  shadow material                   ''
   size                              1.00x1.00
   corner                            'LeftTop'
   corner position                   0.00; 0.00
@@ -25,6 +26,7 @@ Changed curl state:
   front right material              ''
   back left material                'back_left_material'
   back right material               'back_right_material'
+  shadow material                   'shadow_material'
   size                              2.00x4.00
   corner                            'RightBottom'
   corner position                   1.00; 2.00

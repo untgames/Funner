@@ -24,6 +24,7 @@ struct PageCurl::Impl
 {
   PageCurlMode   mode;                               //режим страниц
   stl::string    materials [PageCurlPageType_Num];   //материалы
+  stl::string    shadow_material;                    //материал тени
   math::vec2f    size;                               //полный размер страниц
   PageCurlCorner corner;                             //угол
   math::vec2f    corner_position;                    //позиция угла
@@ -123,6 +124,21 @@ void PageCurl::SetPageMaterial (PageCurlPageType type, const char* name)
   impl->materials [type] = name;
 
   UpdateNotify ();
+}
+
+void PageCurl::SetShadowMaterial (const char* name)
+{
+  if (!name)
+    throw xtl::make_null_argument_exception ("scene_graph::PageCurl::SetShadowMaterial", "name");
+
+  impl->shadow_material = name;
+
+  UpdateNotify ();
+}
+
+const char* PageCurl::ShadowMaterial () const
+{
+  return impl->shadow_material.c_str ();
 }
 
 const char* PageCurl::PageMaterial (PageCurlPageType type) const

@@ -269,14 +269,14 @@ struct RenderablePageCurlMesh::Impl
       if (v.position.x > curl_x + pi_r)
       {
         v.position.x = curl_x - (v.position.x - pi_r - curl_x);
-        v.position.z = -2 * radius;
+        v.position.z = 2 * radius;
       }
       else if (v.position.x > curl_x)
       {
         float alpha = (v.position.x - curl_x) / radius;
 
         v.position.x = curl_x + radius * sin (alpha);
-        v.position.z = radius * cos (alpha) - radius;
+        v.position.z = radius - radius * cos (alpha);
       }
     }
 
@@ -373,6 +373,279 @@ struct RenderablePageCurlMesh::Impl
       vertex->color.z = color.z * light;
     }
   }
+
+  //Получение информации после трансформации
+  bool HasRightSideBendPosition ()
+  {
+   const RenderableVertex& first_vertex = vertices.data () [x_size - 1];
+   bool                    first_larger = first_vertex.position.z < last_curl_radius;
+
+   for (size_t i = 0; i < y_size; i++)
+   {
+     const RenderableVertex& v = vertices.data () [i * x_size + x_size - 1];
+
+     if ((first_larger && v.position.z > last_curl_radius) || (!first_larger && v.position.z < last_curl_radius))
+       return true;
+   }
+
+   return false;
+  }
+
+  bool HasLeftSideBendPosition ()
+  {
+    const RenderableVertex& first_vertex = vertices.data () [0];
+    bool                    first_larger = first_vertex.position.z < last_curl_radius;
+
+    for (size_t i = 0; i < y_size; i++)
+    {
+      const RenderableVertex& v = vertices.data () [i * x_size];
+
+      if ((first_larger && v.position.z > last_curl_radius) || (!first_larger && v.position.z < last_curl_radius))
+        return true;
+    }
+
+    return false;
+  }
+
+  bool HasBottomSideBendPosition ()
+  {
+    const RenderableVertex& first_vertex = vertices.data () [x_size * (y_size - 1)];
+    bool                    first_larger = first_vertex.position.z < last_curl_radius;
+
+    for (size_t i = 0; i < x_size; i++)
+    {
+      const RenderableVertex& v = vertices.data () [x_size * (y_size - 1) + i];
+
+      if ((first_larger && v.position.z > last_curl_radius) || (!first_larger && v.position.z < last_curl_radius))
+        return true;
+    }
+
+    return false;
+  }
+
+  bool HasTopSideBendPosition ()
+  {
+    const RenderableVertex& first_vertex = vertices.data () [0];
+    bool                    first_larger = first_vertex.position.z < last_curl_radius;
+
+    for (size_t i = 0; i < x_size; i++)
+    {
+      const RenderableVertex& v = vertices.data () [i];
+
+      if ((first_larger && v.position.z > last_curl_radius) || (!first_larger && v.position.z < last_curl_radius))
+        return true;
+    }
+
+    return false;
+  }
+
+  const math::vec3f& GetRightSideBendPosition ()
+  {
+    const RenderableVertex& first_vertex = vertices.data () [x_size - 1];
+    bool                    first_larger = first_vertex.position.z < last_curl_radius;
+
+    for (size_t i = 0; i < y_size; i++)
+    {
+      const RenderableVertex& v = vertices.data () [i * x_size + x_size - 1];
+
+      if ((first_larger && v.position.z > last_curl_radius) || (!first_larger && v.position.z < last_curl_radius))
+        return v.position;
+    }
+
+    return vertices.data () [(y_size - 1) * x_size + x_size - 1].position;
+  }
+
+  const math::vec3f& GetLeftSideBendPosition ()
+  {
+    const RenderableVertex& first_vertex = vertices.data () [0];
+    bool                    first_larger = first_vertex.position.z < last_curl_radius;
+
+    for (size_t i = 0; i < y_size; i++)
+    {
+      const RenderableVertex& v = vertices.data () [i * x_size];
+
+      if ((first_larger && v.position.z > last_curl_radius) || (!first_larger && v.position.z < last_curl_radius))
+        return v.position;
+    }
+
+    return vertices.data () [(y_size - 1) * x_size].position;
+  }
+
+  const math::vec3f& GetTopSideBendPosition ()
+  {
+    const RenderableVertex& first_vertex = vertices.data () [0];
+    bool                    first_larger = first_vertex.position.z < last_curl_radius;
+
+    for (size_t i = 0; i < x_size; i++)
+    {
+      const RenderableVertex& v = vertices.data () [i];
+
+      if ((first_larger && v.position.z > last_curl_radius) || (!first_larger && v.position.z < last_curl_radius))
+        return v.position;
+    }
+
+    return vertices.data () [x_size - 1].position;
+  }
+
+  const math::vec3f& GetBottomSideBendPosition ()
+  {
+    const RenderableVertex& first_vertex = vertices.data () [x_size * (y_size - 1)];
+    bool                    first_larger = first_vertex.position.z < last_curl_radius;
+
+    for (size_t i = 0; i < x_size; i++)
+    {
+      const RenderableVertex& v = vertices.data () [x_size * (y_size - 1) + i];
+
+      if ((first_larger && v.position.z > last_curl_radius) || (!first_larger && v.position.z < last_curl_radius))
+        return v.position;
+    }
+
+    return vertices.data () [x_size * (y_size - 1) + x_size - 1].position;
+  }
+
+  const math::vec3f& GetRightSideDetachPosition ()
+  {
+    const RenderableVertex& first_vertex = vertices.data () [x_size - 1];
+    bool                    first_larger = first_vertex.position.z > 0;
+
+    for (size_t i = 0; i < y_size; i++)
+    {
+      const RenderableVertex& v = vertices.data () [i * x_size + x_size - 1];
+
+      if ((first_larger && v.position.z == 0) || (!first_larger && v.position.z > 0))
+        return v.position;
+    }
+
+    return vertices.data () [(y_size - 1) * x_size + x_size - 1].position;
+  }
+
+  const math::vec3f& GetLeftSideDetachPosition ()
+  {
+    const RenderableVertex& first_vertex = vertices.data () [0];
+    bool                    first_larger = first_vertex.position.z > 0;
+
+    for (size_t i = 0; i < y_size; i++)
+    {
+      const RenderableVertex& v = vertices.data () [i * x_size];
+
+      if ((first_larger && v.position.z == 0) || (!first_larger && v.position.z > 0))
+        return v.position;
+    }
+
+    return vertices.data () [(y_size - 1) * x_size].position;
+  }
+
+  const math::vec3f& GetTopSideDetachPosition ()
+  {
+    const RenderableVertex& first_vertex = vertices.data () [0];
+    bool                    first_larger = first_vertex.position.z > 0;
+
+    for (size_t i = 0; i < x_size; i++)
+    {
+      const RenderableVertex& v = vertices.data () [i];
+
+      if ((first_larger && v.position.z == 0) || (!first_larger && v.position.z > 0))
+        return v.position;
+    }
+
+    return first_vertex.position;
+  }
+
+  const math::vec3f& GetBottomSideDetachPosition ()
+  {
+    const RenderableVertex& first_vertex = vertices.data () [x_size * (y_size - 1)];
+    bool                    first_larger = first_vertex.position.z > 0;
+
+    for (size_t i = 0; i < x_size; i++)
+    {
+      const RenderableVertex& v = vertices.data () [x_size * (y_size - 1) + i];
+
+      if ((first_larger && v.position.z == 0) || (!first_larger && v.position.z > 0))
+        return v.position;
+    }
+
+    return first_vertex.position;
+  }
+
+  bool HasRightSideDetachPosition ()
+  {
+    const RenderableVertex& first_vertex = vertices.data () [x_size - 1];
+    bool                    first_larger = first_vertex.position.z > 0;
+
+    for (size_t i = 0; i < y_size; i++)
+    {
+      const RenderableVertex& v = vertices.data () [i * x_size + x_size - 1];
+
+      if ((first_larger && v.position.z == 0) || (!first_larger && v.position.z > 0))
+        return true;
+    }
+
+    return false;
+  }
+
+  bool HasLeftSideDetachPosition ()
+  {
+    const RenderableVertex& first_vertex = vertices.data () [0];
+    bool                    first_larger = first_vertex.position.z > 0;
+
+    for (size_t i = 0; i < y_size; i++)
+    {
+      const RenderableVertex& v = vertices.data () [i * x_size];
+
+      if ((first_larger && v.position.z == 0) || (!first_larger && v.position.z > 0))
+        return true;
+    }
+
+    return false;
+  }
+
+  bool HasTopSideDetachPosition ()
+  {
+    const RenderableVertex& first_vertex = vertices.data () [0];
+    bool                    first_larger = first_vertex.position.z > 0;
+
+    for (size_t i = 0; i < x_size; i++)
+    {
+      const RenderableVertex& v = vertices.data () [i];
+
+      if ((first_larger && v.position.z == 0) || (!first_larger && v.position.z > 0))
+        return true;
+    }
+
+    return false;
+  }
+
+  bool HasBottomSideDetachPosition ()
+  {
+    const RenderableVertex& first_vertex = vertices.data () [x_size * (y_size - 1)];
+    bool                    first_larger = first_vertex.position.z > 0;
+
+    for (size_t i = 0; i < x_size; i++)
+    {
+      const RenderableVertex& v = vertices.data () [x_size * (y_size - 1) + i];
+
+      if ((first_larger && v.position.z == 0) || (!first_larger && v.position.z > 0))
+        return true;
+    }
+
+    return false;
+  }
+
+  const math::vec3f& GetCornerPosition (scene_graph::PageCurlCorner corner)
+  {
+    switch (corner) {
+      case scene_graph::PageCurlCorner_RightTop:
+        return vertices.data () [x_size - 1].position;
+      case scene_graph::PageCurlCorner_RightBottom:
+        return vertices.data () [(y_size - 1) * x_size + x_size - 1].position;
+      case scene_graph::PageCurlCorner_LeftTop:
+        return vertices.data () [0].position;
+      case scene_graph::PageCurlCorner_LeftBottom:
+        return vertices.data () [(y_size - 1) * x_size].position;
+      default:
+        throw xtl::make_argument_exception ("render::obsolete::render2d::RenderablePageCurlMesh::GetCornerPosition", "corner", corner);
+    }
+  }
 };
 
 /*
@@ -433,4 +706,93 @@ void RenderablePageCurlMesh::SetSize (const math::vec2f& size)
 void RenderablePageCurlMesh::SetTexCoords (float min_s, float min_t, float max_s, float max_t)
 {
   impl->SetTexCoords (min_s, min_t, max_s, max_t);
+}
+
+/*
+   Получение информации после трансформации
+*/
+
+bool RenderablePageCurlMesh::HasRightSideBendPosition ()
+{
+  return impl->HasRightSideBendPosition ();
+}
+
+bool RenderablePageCurlMesh::HasLeftSideBendPosition ()
+{
+  return impl->HasLeftSideBendPosition ();
+}
+
+bool RenderablePageCurlMesh::HasBottomSideBendPosition ()
+{
+  return impl->HasBottomSideBendPosition ();
+}
+
+bool RenderablePageCurlMesh::HasTopSideBendPosition ()
+{
+  return impl->HasTopSideBendPosition ();
+}
+
+const math::vec3f& RenderablePageCurlMesh::GetRightSideBendPosition ()
+{
+  return impl->GetRightSideBendPosition ();
+}
+
+const math::vec3f& RenderablePageCurlMesh::GetLeftSideBendPosition ()
+{
+  return impl->GetLeftSideBendPosition ();
+}
+
+const math::vec3f& RenderablePageCurlMesh::GetTopSideBendPosition ()
+{
+  return impl->GetTopSideBendPosition ();
+}
+
+const math::vec3f& RenderablePageCurlMesh::GetBottomSideBendPosition ()
+{
+  return impl->GetBottomSideBendPosition ();
+}
+
+const math::vec3f& RenderablePageCurlMesh::GetRightSideDetachPosition ()
+{
+  return impl->GetRightSideDetachPosition ();
+}
+
+const math::vec3f& RenderablePageCurlMesh::GetLeftSideDetachPosition ()
+{
+  return impl->GetLeftSideDetachPosition ();
+}
+
+const math::vec3f& RenderablePageCurlMesh::GetTopSideDetachPosition ()
+{
+  return impl->GetTopSideDetachPosition ();
+}
+
+const math::vec3f& RenderablePageCurlMesh::GetBottomSideDetachPosition ()
+{
+  return impl->GetBottomSideDetachPosition ();
+}
+
+bool RenderablePageCurlMesh::HasRightSideDetachPosition ()
+{
+  return impl->HasRightSideDetachPosition ();
+}
+
+bool RenderablePageCurlMesh::HasLeftSideDetachPosition ()
+{
+  return impl->HasLeftSideDetachPosition ();
+}
+
+bool RenderablePageCurlMesh::HasTopSideDetachPosition ()
+{
+  return impl->HasTopSideDetachPosition ();
+}
+
+bool RenderablePageCurlMesh::HasBottomSideDetachPosition ()
+{
+  return impl->HasBottomSideDetachPosition ();
+}
+
+const math::vec3f& RenderablePageCurlMesh::GetCornerPosition (scene_graph::PageCurlCorner corner)
+{
+  return impl->GetCornerPosition (corner);
 }

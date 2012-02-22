@@ -25,17 +25,19 @@ struct Test
 
     curl = PageCurl::Create ();
 
-    curl->SetSize           (2.f, 1.f);
-    curl->SetGridSize       (100, 100);
-    curl->SetMode           (PageCurlMode_DoublePageDoubleMaterial);
-    curl->SetCurlCorner     (PageCurlCorner_LeftBottom);
-    curl->SetCurlRadius     (0.1f);
-    curl->SetPageMaterial   (PageCurlPageType_BackLeft,   "page1");
-    curl->SetPageMaterial   (PageCurlPageType_BackRight,  "page2");
-    curl->SetPageMaterial   (PageCurlPageType_FrontLeft,  "page3");
-    curl->SetPageMaterial   (PageCurlPageType_FrontRight, "page4");
-    curl->SetPosition       (-1.f, -0.5f, 0.f);
-    curl->SetCornerPosition (0.1f, 0.1f);
+    curl->SetSize               (2.f, 1.f);
+    curl->SetGridSize           (100, 100);
+    curl->SetMode               (PageCurlMode_DoublePageDoubleMaterial);
+    curl->SetCurlCorner         (PageCurlCorner_LeftBottom);
+    curl->SetCurlRadius         (0.1f);
+    curl->SetPageMaterial       (PageCurlPageType_BackLeft,   "page1");
+    curl->SetPageMaterial       (PageCurlPageType_BackRight,  "page2");
+    curl->SetPageMaterial       (PageCurlPageType_FrontLeft,  "page3");
+    curl->SetPageMaterial       (PageCurlPageType_FrontRight, "page4");
+    curl->SetShadowMaterial     ("page_shadow");
+    curl->SetCornerShadowOffset (0.1f);
+    curl->SetPosition           (-1.f, -0.5f, 0.f);
+    curl->SetCornerPosition     (0.1f, 0.1f);
 
     curl->BindToScene (scene);
 
