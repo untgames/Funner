@@ -163,6 +163,15 @@ ParseNode& ParseNode::operator = (const ParseNode& node)
 }
 
 /*
+    Идентификатор
+*/
+
+size_t ParseNode::Id () const
+{
+  return reinterpret_cast<size_t> (get_node_impl (tree, offset));
+}
+
+/*
     Проверка на пустоту
 */
 
