@@ -22,6 +22,7 @@ namespace
 const char* LOG_NAME = "render.obsolete.render2d.RenderablePageCurl";
 
 const float EPS                   = 0.001;
+const float BACK_SHADOW_OFFSET    = 0;
 const float STATIC_PAGES_Z_OFFSET = -0.001;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -558,9 +559,7 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
 
       math::vec2f bottom_side_vector (curled_corner_position.x - bottom_side_bend_position.x, -curled_corner_position.y + bottom_side_bend_position.y),
                   left_side_vector (left_side_bend_position.x - curled_corner_position.x, left_side_bend_position.y - curled_corner_position.y),
-                  corner_offset (-bottom_side_vector.x + bottom_side_vector.y, bottom_side_vector.y + bottom_side_vector.x);
-
-      corner_offset = normalize (corner_offset);
+                  corner_offset (normalize (math::vec2f (-bottom_side_vector.x + bottom_side_vector.y, bottom_side_vector.y + bottom_side_vector.x)));
 
       float shadow_grow_power        = page_curl->ShadowGrowPower (),
             shadow_offset_multiplier = pow (length (left_side_vector), shadow_grow_power) * pow (curled_page->GetCornerPosition (PageCurlCorner_LeftBottom).z / (page_curl->CurlRadius () * 2), shadow_grow_power),
@@ -605,46 +604,37 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
       device.DrawIndexed (low_level::PrimitiveType_TriangleList, 0, 6, 0);
     }
 
-/*    glDisable            (GL_TEXTURE_2D);
-    glEnableClientState  (GL_COLOR_ARRAY);
-    glDisableClientState (GL_TEXTURE_COORD_ARRAY);
-
+    device.SSSetTexture    (0, 0);
     device.OSSetBlendState (mask_blend_state.get ());
 
-    float light = 1 - SHADOW_DENSITY * curlRadius / CURL_RADIUS;
+    unsigned char light = (1 - page_curl->ShadowDensity () * curl_radius / page_curl->CurlRadius ()) * 255;
 
-    GLfloat colors [] = {
-      light, light, light, 1,
-      light, light, light, 1,
-      1, 1, 1, 1,
-      1, 1, 1, 1
-    };
+    RenderableVertex vertices [4];
 
-    CGPoint bottomDetachPosition = [curled_page hasBottomSideDetachPosition] ? [curled_page getBottomSideDetachPosition] : [curled_page getCornerPosition:PageCorner_RightBottom],
-            topDetachPosition    = [curled_page hasLeftSideDetachPosition] ? [curled_page getLeftSideDetachPosition] : [curled_page hasTopSideDetachPosition] ? [curled_page getTopSideDetachPosition] : [curled_page getCornerPosition:PageCorner_RightTop];
+    vertices [0].color = math::vec4ub (light, light, light, 255);
+    vertices [1].color = math::vec4ub (light, light, light, 255);
+    vertices [2].color = math::vec4ub (255, 255, 255, 255);
+    vertices [3].color = math::vec4ub (255, 255, 255, 255);
 
-    Vector2f detachVec           = { bottomDetachPosition.x - topDetachPosition.x, bottomDetachPosition.y - topDetachPosition.y },
-             normalizedDetachVec = normalize_vector (detachVec);
+    const math::vec3f& bottom_detach_position = curled_page->HasBottomSideDetachPosition () ? curled_page->GetBottomSideDetachPosition () : curled_page->GetCornerPosition (PageCurlCorner_RightBottom);
+    math::vec3f        top_detach_position    = curled_page->HasLeftSideDetachPosition () ? curled_page->GetLeftSideDetachPosition () : curled_page->HasTopSideDetachPosition () ? curled_page->GetTopSideDetachPosition () : curled_page->GetCornerPosition (PageCurlCorner_RightTop);
 
-    topDetachPosition.x -= normalizedDetachVec.x * ADDITIONAL_SHADOW_LENGTH;
-    topDetachPosition.y -= normalizedDetachVec.y * ADDITIONAL_SHADOW_LENGTH;
+    math::vec2f detach_vec = normalize (math::vec2f (bottom_detach_position.x - top_detach_position.x, bottom_detach_position.y - top_detach_position.y));
 
-    Vector2f shadowOffset = { topDetachPosition.y - bottomDetachPosition.y, bottomDetachPosition.x - topDetachPosition.x };
+    top_detach_position -= detach_vec * page_curl->CornerShadowOffset ();
 
-    shadowOffset = normalize_vector (shadowOffset);
+    math::vec2f shadow_offset = normalize (math::vec2f (-top_detach_position.y + bottom_detach_position.y, -bottom_detach_position.x + top_detach_position.x));
 
-    float shadowWidth = leftPageRect.size.width * SHADOW_WIDTH;
+    float shadow_width = page_size.x * page_curl->ShadowWidth ();
 
-    GLfloat vertices [] = { topDetachPosition.x,                                   topDetachPosition.y,                                   0,
-                            bottomDetachPosition.x,                                bottomDetachPosition.y,                                0,
-                            topDetachPosition.x + shadowOffset.x * shadowWidth,    topDetachPosition.y + shadowOffset.y * shadowWidth,    0,
-                            bottomDetachPosition.x + shadowOffset.x * shadowWidth, bottomDetachPosition.y + shadowOffset.y * shadowWidth, 0 };
-    glLoadIdentity ();
-    glTranslatef (leftPageRect.origin.x, leftPageRect.origin.y, -0.005);
+    vertices [0].position = math::vec3f (top_detach_position.x,                                     top_detach_position.y,                                     BACK_SHADOW_OFFSET);
+    vertices [1].position = math::vec3f (bottom_detach_position.x,                                  bottom_detach_position.y,                                  BACK_SHADOW_OFFSET);
+    vertices [2].position = math::vec3f (top_detach_position.x + shadow_offset.x * shadow_width,    top_detach_position.y + shadow_offset.y * shadow_width,    BACK_SHADOW_OFFSET);
+    vertices [3].position = math::vec3f (bottom_detach_position.x + shadow_offset.x * shadow_width, bottom_detach_position.y + shadow_offset.y * shadow_width, BACK_SHADOW_OFFSET);
 
-    glVertexPointer (3, GL_FLOAT, 0, vertices);
-    glColorPointer  (4, GL_FLOAT, 0, colors);
-    glDrawArrays    (GL_TRIANGLE_STRIP, 0, 4);*/
+    quad_vertex_buffer->SetData (0, sizeof (vertices), vertices);
+
+    device.DrawIndexed (low_level::PrimitiveType_TriangleList, 0, 6, 0);
   }
 
   void DrawRightTopCornerFlip (low_level::IDevice& device)
