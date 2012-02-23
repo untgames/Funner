@@ -461,6 +461,146 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
     }
   }
 
+  //Рисование теней
+  void DrawShadows (low_level::IDevice& device, float curl_radius, bool left_side)
+  {
+    const math::vec2f& total_size      = page_curl->Size ();
+    math::vec2f        page_size       = total_size;
+
+    if (page_curl->Mode () != PageCurlMode_SinglePage)
+      page_size.x /= 2;
+
+    float x_offset = left_side || page_curl->Mode () == PageCurlMode_SinglePage ? 0 : page_size.x;
+
+    const math::vec3f& top_corner_position    = left_side ? curled_page->GetCornerPosition (PageCurlCorner_LeftTop) : curled_page->GetCornerPosition (PageCurlCorner_RightTop);
+    const math::vec3f& bottom_corner_position = left_side ? curled_page->GetCornerPosition (PageCurlCorner_LeftBottom) : curled_page->GetCornerPosition (PageCurlCorner_RightBottom);
+
+    if (xtl::xstrlen (page_curl->ShadowMaterial ()))
+    {
+      if (curled_page->HasBottomSideBendPosition () || curled_page->HasTopSideBendPosition ())
+      {
+        BindMaterial (device, page_curl->ShadowMaterial ());
+
+        math::vec3f bottom_side_bend_position = curled_page->HasBottomSideBendPosition () ? curled_page->GetBottomSideBendPosition () : bottom_corner_position;
+        math::vec3f top_side_bend_position    = curled_page->HasTopSideBendPosition () ? curled_page->GetTopSideBendPosition () : top_corner_position;
+        math::vec3f side_bend_position        = left_side ? curled_page->GetLeftSideBendPosition () : curled_page->GetRightSideBendPosition ();
+
+        math::vec2f top_shadow_corner_position, bottom_shadow_corner_position;
+
+        math::vec2f bottom_side_vector (bottom_corner_position.x - bottom_side_bend_position.x, -bottom_corner_position.y + bottom_side_bend_position.y),
+                    top_side_vector    (top_corner_position.x - top_side_bend_position.x, top_corner_position.y - top_side_bend_position.y),
+                    side_vector        (top_corner_position.x - bottom_corner_position.x, top_corner_position.y - bottom_corner_position.y);
+
+        if (!left_side)
+        {
+          bottom_side_vector.y *= -1;
+          top_side_vector.y    *= -1;
+        }
+
+        if (fabs (top_corner_position.z) < curl_radius)
+          side_vector = bottom_corner_position - side_bend_position;
+
+        if (fabs (bottom_corner_position.z) < curl_radius)
+          side_vector = top_corner_position - side_bend_position;
+
+        math::vec2f top_corner_offset    (normalize (math::vec2f (-top_side_vector.x + top_side_vector.y, top_side_vector.y + top_side_vector.x))),
+                    bottom_corner_offset (normalize (math::vec2f (-bottom_side_vector.x + bottom_side_vector.y, bottom_side_vector.y + bottom_side_vector.x)));
+
+        float shadow_grow_power               = page_curl->ShadowGrowPower (),
+              top_shadow_offset_multiplier    = pow (length (side_vector), shadow_grow_power) * pow (top_corner_position.z / (page_curl->CurlRadius () * 2), shadow_grow_power),
+              bottom_shadow_offset_multiplier = pow (length (side_vector), shadow_grow_power) * pow (bottom_corner_position.z / (page_curl->CurlRadius () * 2), shadow_grow_power),
+              shadow_corner_offset            = page_curl->CornerShadowOffset ();
+
+        if (left_side)
+        {
+          top_corner_offset.x    = -fabs (top_corner_offset.x);
+          bottom_corner_offset.x = -fabs (bottom_corner_offset.x);
+        }
+        else
+        {
+          top_corner_offset.x    = fabs (top_corner_offset.x);
+          bottom_corner_offset.x = fabs (bottom_corner_offset.x);
+          top_corner_offset.y    = -top_corner_offset.y;
+          bottom_corner_offset.y = -bottom_corner_offset.y;
+        }
+
+        top_shadow_corner_position.x    = top_corner_position.x - top_corner_offset.x * shadow_corner_offset * top_shadow_offset_multiplier;
+        top_shadow_corner_position.y    = top_corner_position.y + top_corner_offset.y * shadow_corner_offset * top_shadow_offset_multiplier;
+        bottom_shadow_corner_position.x = bottom_corner_position.x - bottom_corner_offset.x * shadow_corner_offset * bottom_shadow_offset_multiplier;
+        bottom_shadow_corner_position.y = bottom_corner_position.y - bottom_corner_offset.y * shadow_corner_offset * bottom_shadow_offset_multiplier;
+
+        if (fabs (top_corner_position.z) < curl_radius)
+        {
+          top_shadow_corner_position = side_bend_position;
+          top_side_bend_position     = side_bend_position;
+        }
+        if (fabs (bottom_corner_position.z) < curl_radius)
+        {
+          bottom_shadow_corner_position = side_bend_position;
+          bottom_side_bend_position     = side_bend_position;
+        }
+
+        RenderableVertex vertices [4];
+
+        for (size_t i = 0; i < 4; i++)
+          vertices [i].color = 255;
+
+        vertices [0].position = math::vec3f (bottom_shadow_corner_position.x + x_offset, bottom_shadow_corner_position.y, curl_radius);
+        vertices [1].position = math::vec3f (bottom_side_bend_position.x + x_offset, bottom_side_bend_position.y, curl_radius);
+        vertices [2].position = math::vec3f (top_shadow_corner_position.x + x_offset, top_shadow_corner_position.y, curl_radius);
+        vertices [3].position = math::vec3f (top_side_bend_position.x + x_offset, top_side_bend_position.y, curl_radius);
+        vertices [0].texcoord = math::vec2f (0, 0);
+        vertices [1].texcoord = math::vec2f (length (bottom_side_vector) / page_size.x, 0);
+        vertices [2].texcoord = math::vec2f (0, 1);
+        vertices [3].texcoord = math::vec2f (length (top_side_vector) / page_size.x, 1);
+
+        if (fabs (top_corner_position.z) < curl_radius)
+          vertices [2].texcoord = math::vec2f (0, length (side_vector) / page_size.y);
+
+        if (fabs (bottom_corner_position.z) < curl_radius)
+          vertices [1].texcoord = math::vec2f (length (bottom_side_vector) / page_size.x, 1 - length (side_vector) / page_size.y);
+
+        quad_vertex_buffer->SetData (0, sizeof (vertices), vertices);
+
+        device.ISSetVertexBuffer (0, quad_vertex_buffer.get ());
+
+        device.DrawIndexed (low_level::PrimitiveType_TriangleList, 0, 6, 0);
+      }
+    }
+
+/*    device.SSSetTexture    (0, 0);
+    device.OSSetBlendState (mask_blend_state.get ());
+
+    unsigned char light = (1 - page_curl->ShadowDensity () * curl_radius / page_curl->CurlRadius ()) * 255;
+
+    RenderableVertex vertices [4];
+
+    vertices [0].color = math::vec4ub (light, light, light, 255);
+    vertices [1].color = math::vec4ub (light, light, light, 255);
+    vertices [2].color = math::vec4ub (255, 255, 255, 255);
+    vertices [3].color = math::vec4ub (255, 255, 255, 255);
+
+    const math::vec3f& bottom_detach_position = curled_page->HasBottomSideDetachPosition () ? curled_page->GetBottomSideDetachPosition () : curled_page->GetCornerPosition (PageCurlCorner_RightBottom);
+    math::vec3f        top_detach_position    = curled_page->HasLeftSideDetachPosition () ? curled_page->GetLeftSideDetachPosition () : curled_page->HasTopSideDetachPosition () ? curled_page->GetTopSideDetachPosition () : curled_page->GetCornerPosition (PageCurlCorner_RightTop);
+
+    math::vec2f detach_vec = normalize (math::vec2f (bottom_detach_position.x - top_detach_position.x, bottom_detach_position.y - top_detach_position.y));
+
+    top_detach_position -= detach_vec * page_curl->CornerShadowOffset ();
+
+    math::vec2f shadow_offset = normalize (math::vec2f (-top_detach_position.y + bottom_detach_position.y, -bottom_detach_position.x + top_detach_position.x));
+
+    float shadow_width = page_size.x * page_curl->ShadowWidth ();
+
+    vertices [0].position = math::vec3f (top_detach_position.x,                                     top_detach_position.y,                                     BACK_SHADOW_OFFSET);
+    vertices [1].position = math::vec3f (bottom_detach_position.x,                                  bottom_detach_position.y,                                  BACK_SHADOW_OFFSET);
+    vertices [2].position = math::vec3f (top_detach_position.x + shadow_offset.x * shadow_width,    top_detach_position.y + shadow_offset.y * shadow_width,    BACK_SHADOW_OFFSET);
+    vertices [3].position = math::vec3f (bottom_detach_position.x + shadow_offset.x * shadow_width, bottom_detach_position.y + shadow_offset.y * shadow_width, BACK_SHADOW_OFFSET);
+
+    quad_vertex_buffer->SetData (0, sizeof (vertices), vertices);
+
+    device.DrawIndexed (low_level::PrimitiveType_TriangleList, 0, 6, 0);*/
+  }
+
   //Рисование специфичное для каждого угла
   void DrawLeftTopCornerFlip (low_level::IDevice& device)
   {
@@ -499,7 +639,7 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
           flip_height = flip_width * tan (fabs (x_flip_angle / 2.f)),
           curl_angle  = -atan2 (flip_width, flip_height);
 
-    if (curl_corner_position.y > 0)
+    if (curl_corner_position.y >= 0)
       curl_angle += M_PI;
 
     float curl_x = (page_size.x - flip_width) * cos (curl_angle);
@@ -536,6 +676,8 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
     device.RSSetState (rasterizer_no_cull_state.get ());
 
     DrawStaticPages (device);
+
+    DrawShadows (device, curl_radius, true);
   }
 
   void DrawLeftBottomCornerFlip (low_level::IDevice& device)
@@ -575,7 +717,7 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
           flip_height = flip_width * tan (x_flip_angle / 2.f),
           curl_angle  = atan2 (flip_width, flip_height);
 
-    if (curl_corner_position.y < page_size.y)
+    if (curl_corner_position.y <= page_size.y)
       curl_angle += M_PI;
 
     float curl_x = (page_size.x - flip_width) * cos (curl_angle);
@@ -613,97 +755,7 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
 
     DrawStaticPages (device);
 
-      //Shadow drawing
-    if (curled_page->HasBottomSideBendPosition () && xtl::xstrlen (page_curl->ShadowMaterial ()))
-    {
-      BindMaterial (device, page_curl->ShadowMaterial ());
-
-      bool has_left_side_bend_position = curled_page->HasLeftSideBendPosition ();
-
-      const math::vec3f& bottom_side_bend_position = curled_page->GetBottomSideBendPosition ();
-      const math::vec3f& curled_corner_position    = curled_page->GetCornerPosition (PageCurlCorner_LeftBottom);
-      math::vec3f        left_side_bend_position   = has_left_side_bend_position ? curled_page->GetLeftSideBendPosition () : curled_page->GetCornerPosition (PageCurlCorner_LeftTop);
-      math::vec3f        top_side_bend_position    = curled_page->HasTopSideBendPosition () ? curled_page->GetTopSideBendPosition () : curled_page->GetCornerPosition (PageCurlCorner_LeftTop);
-      math::vec2f        shadow_corner_position;
-
-      math::vec2f bottom_side_vector (curled_corner_position.x - bottom_side_bend_position.x, -curled_corner_position.y + bottom_side_bend_position.y),
-                  left_side_vector (left_side_bend_position.x - curled_corner_position.x, left_side_bend_position.y - curled_corner_position.y),
-                  corner_offset (normalize (math::vec2f (-bottom_side_vector.x + bottom_side_vector.y, bottom_side_vector.y + bottom_side_vector.x)));
-
-      float shadow_grow_power        = page_curl->ShadowGrowPower (),
-            shadow_offset_multiplier = pow (length (left_side_vector), shadow_grow_power) * pow (curled_page->GetCornerPosition (PageCurlCorner_LeftBottom).z / (page_curl->CurlRadius () * 2), shadow_grow_power),
-            shadow_corner_offset     = page_curl->CornerShadowOffset ();
-
-      shadow_corner_position.x = curled_corner_position.x - corner_offset.x * shadow_corner_offset * shadow_offset_multiplier;
-      shadow_corner_position.y = curled_corner_position.y - corner_offset.y * shadow_corner_offset * shadow_offset_multiplier;
-
-      if (!has_left_side_bend_position)
-      {
-        float height_pow_factor             = left_side_bend_position.x > page_size.x ? shadow_grow_power : page_curl->OppositeCornerShadowGrowPower (),
-              left_shadow_offset_multiplier = pow (length (left_side_vector), 0.25) * pow (curled_page->GetCornerPosition (PageCurlCorner_LeftTop).z / (page_curl->CurlRadius () * 2), height_pow_factor);
-
-        left_side_bend_position.x -= corner_offset.x * shadow_corner_offset * left_shadow_offset_multiplier;
-        left_side_bend_position.y += corner_offset.y * shadow_corner_offset * left_shadow_offset_multiplier;
-      }
-      else
-        top_side_bend_position = left_side_bend_position;
-
-      math::vec2f top_side_vector (left_side_bend_position.x - top_side_bend_position.x, left_side_bend_position.y - top_side_bend_position.y);
-
-      float left_side_tex_t = has_left_side_bend_position ? length (left_side_vector) / page_size.y : 1;
-
-      RenderableVertex vertices [4];
-
-      for (size_t i = 0; i < 4; i++)
-        vertices [i].color = 255;
-
-      vertices [0].position = math::vec3f (shadow_corner_position.x, shadow_corner_position.y, curl_radius);
-      vertices [1].position = math::vec3f (bottom_side_bend_position.x, bottom_side_bend_position.y, curl_radius);
-      vertices [2].position = math::vec3f (left_side_bend_position.x, left_side_bend_position.y, curl_radius);
-      vertices [3].position = math::vec3f (top_side_bend_position.x, top_side_bend_position.y, curl_radius);
-      vertices [0].texcoord = math::vec2f (0, 0);
-      vertices [1].texcoord = math::vec2f (length (bottom_side_vector) / page_size.x, 0);
-      vertices [2].texcoord = math::vec2f (0, left_side_tex_t);
-      vertices [3].texcoord = math::vec2f (length (top_side_vector) / page_size.x, 1);
-
-      quad_vertex_buffer->SetData (0, sizeof (vertices), vertices);
-
-      device.ISSetVertexBuffer (0, quad_vertex_buffer.get ());
-
-      device.DrawIndexed (low_level::PrimitiveType_TriangleList, 0, 6, 0);
-    }
-
-    device.SSSetTexture    (0, 0);
-    device.OSSetBlendState (mask_blend_state.get ());
-
-    unsigned char light = (1 - page_curl->ShadowDensity () * curl_radius / page_curl->CurlRadius ()) * 255;
-
-    RenderableVertex vertices [4];
-
-    vertices [0].color = math::vec4ub (light, light, light, 255);
-    vertices [1].color = math::vec4ub (light, light, light, 255);
-    vertices [2].color = math::vec4ub (255, 255, 255, 255);
-    vertices [3].color = math::vec4ub (255, 255, 255, 255);
-
-    const math::vec3f& bottom_detach_position = curled_page->HasBottomSideDetachPosition () ? curled_page->GetBottomSideDetachPosition () : curled_page->GetCornerPosition (PageCurlCorner_RightBottom);
-    math::vec3f        top_detach_position    = curled_page->HasLeftSideDetachPosition () ? curled_page->GetLeftSideDetachPosition () : curled_page->HasTopSideDetachPosition () ? curled_page->GetTopSideDetachPosition () : curled_page->GetCornerPosition (PageCurlCorner_RightTop);
-
-    math::vec2f detach_vec = normalize (math::vec2f (bottom_detach_position.x - top_detach_position.x, bottom_detach_position.y - top_detach_position.y));
-
-    top_detach_position -= detach_vec * page_curl->CornerShadowOffset ();
-
-    math::vec2f shadow_offset = normalize (math::vec2f (-top_detach_position.y + bottom_detach_position.y, -bottom_detach_position.x + top_detach_position.x));
-
-    float shadow_width = page_size.x * page_curl->ShadowWidth ();
-
-    vertices [0].position = math::vec3f (top_detach_position.x,                                     top_detach_position.y,                                     BACK_SHADOW_OFFSET);
-    vertices [1].position = math::vec3f (bottom_detach_position.x,                                  bottom_detach_position.y,                                  BACK_SHADOW_OFFSET);
-    vertices [2].position = math::vec3f (top_detach_position.x + shadow_offset.x * shadow_width,    top_detach_position.y + shadow_offset.y * shadow_width,    BACK_SHADOW_OFFSET);
-    vertices [3].position = math::vec3f (bottom_detach_position.x + shadow_offset.x * shadow_width, bottom_detach_position.y + shadow_offset.y * shadow_width, BACK_SHADOW_OFFSET);
-
-    quad_vertex_buffer->SetData (0, sizeof (vertices), vertices);
-
-    device.DrawIndexed (low_level::PrimitiveType_TriangleList, 0, 6, 0);
+    DrawShadows (device, curl_radius, true);
   }
 
   void DrawRightTopCornerFlip (low_level::IDevice& device)
@@ -748,7 +800,7 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
           flip_height            = flip_width * tan (fabs (x_flip_angle / 2.f)),
           curl_angle             = atan2 (flip_width, flip_height);
 
-    if (curl_corner_position.y < 0)
+    if (curl_corner_position.y <= 0)
       curl_angle += M_PI;
 
     float curl_x = (page_size.x - flip_width) * cos (curl_angle);
@@ -810,6 +862,8 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
     }
 
     DrawStaticPages (device);
+
+    DrawShadows (device, curl_radius, false);
   }
 
   void DrawRightBottomCornerFlip (low_level::IDevice& device)
@@ -854,7 +908,7 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
           flip_height            = flip_width * tan (x_flip_angle / 2.f),
           curl_angle             = -atan2 (flip_width, flip_height);
 
-    if (curl_corner_position.y > page_size.y)
+    if (curl_corner_position.y >= page_size.y)
       curl_angle -= M_PI;
 
     float curl_x = (page_size.x - flip_width) * cos (curl_angle);
@@ -916,6 +970,8 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
     }
 
     DrawStaticPages (device);
+
+    DrawShadows (device, curl_radius, false);
   }
 
   //Рисование лежащих страниц
