@@ -1,5 +1,5 @@
-#ifndef SCENE_GRAPH_SERIALIZATION_MENAGER_SHARED_HEADER
-#define SCENE_GRAPH_SERIALIZATION_MENAGER_SHARED_HEADER
+#ifndef SCENE_GRAPH_SERIALIZATION_MANAGER_SHARED_HEADER
+#define SCENE_GRAPH_SERIALIZATION_MANAGER_SHARED_HEADER
 
 #include <stl/hash_map>
 
@@ -12,6 +12,7 @@
 
 #include <common/component.h>
 #include <common/log.h>
+#include <common/parse_tree.h>
 #include <common/property_map.h>
 #include <common/serializer_manager.h>
 #include <common/singleton.h>
@@ -21,6 +22,7 @@
 #include <media/rms/manager.h>
 
 #include <sg/scene_manager.h>
+#include <sg/scene_parser.h>
 #include <sg/controllers/resource_controller.h>
 
 namespace scene_graph

@@ -267,6 +267,8 @@ Node::Pointer SceneManager::CreateScene (const char* scene_name, SceneContext& c
           //присоединение ресурсов
           
         media::rms::Binding binding = media::rms::ResourceManager::CreateBinding (resources);
+        
+        binding.Load ();
 
         controllers::ResourceController::Pointer controller = controllers::ResourceController::Create (*root, binding);
 
