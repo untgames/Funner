@@ -352,6 +352,7 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
     switch (page_curl->Mode ())
     {
       case PageCurlMode_SinglePage:
+        return page_curl->PageMaterial (PageCurlPageType_Back);
       case PageCurlMode_DoublePageSingleMaterial:
         return page_curl->PageMaterial (PageCurlPageType_Front);
       case PageCurlMode_DoublePageDoubleMaterial:
@@ -464,7 +465,73 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
   void DrawLeftTopCornerFlip (low_level::IDevice& device)
   {
     if (page_curl->Mode () == PageCurlMode_SinglePage)
-      throw xtl::format_operation_exception ("render::obsolete::render2d::RenderablePageCurl::DrawLeftTopCornerFlip", "Can't draw flip for left bottom corner in single page mode");
+      throw xtl::format_operation_exception ("render::obsolete::render2d::RenderablePageCurl::DrawLeftBottomCornerFlip", "Can't draw flip for left bottom corner in single page mode");
+
+    math::vec2f page_size       = page_curl->Size ();
+    math::vec2f corner_position = page_curl->CornerPosition ();
+
+    page_size.x /= 2;
+
+    float x_flip_angle = -stl::max (M_PI - 2 * atan2 (page_size.y - corner_position.y, corner_position.x),
+                                    atan2 (page_size.y - corner_position.y, page_size.x - corner_position.x));
+
+    math::vec2f flip_vec ((page_size.y - corner_position.y) / tan (fabs (x_flip_angle)), corner_position.y - page_size.y);
+
+    float flip_vec_length = math::length (flip_vec),
+          curl_radius     = page_curl->CurlRadius ();
+
+    if (flip_vec_length > page_size.x)
+    {
+      corner_position.x += (flip_vec_length - page_size.x) * flip_vec.x / flip_vec_length;
+      corner_position.y -= (flip_vec_length - page_size.x) * flip_vec.y / flip_vec_length;
+    }
+
+    math::vec2f curl_corner_position = corner_position;
+
+    curl_corner_position.y = page_size.y - curl_corner_position.y;
+
+    if (curl_corner_position.x > 2 * page_size.x - curl_radius * 2)
+      curl_radius *= (2 * page_size.x - curl_corner_position.x) / (curl_radius * 2);
+
+    curl_radius = stl::max (EPS, curl_radius);
+
+    float flip_width  = (page_size.y - corner_position.y) / tan (fabs (x_flip_angle)) + corner_position.x,
+          flip_height = flip_width * tan (fabs (x_flip_angle / 2.f)),
+          curl_angle  = -atan2 (flip_width, flip_height);
+
+    if (curl_corner_position.y > 0)
+      curl_angle += M_PI;
+
+    float curl_x = (page_size.x - flip_width) * cos (curl_angle);
+
+    curled_page->Curl (curl_corner_position, page_curl->CurlCorner (), curl_x, curl_radius, curl_angle,
+                       page_curl->FindBestCurlSteps (), page_curl->BindingMismatchWeight ());
+
+    device.RSSetState (rasterizer_cull_back_state.get ());
+
+    BindMaterial (device, GetCurledRightPageMaterial ());
+
+    float min_s, max_s;
+
+    GetTexCoords (false, min_s, max_s);
+
+    curled_page->SetTexCoords (max_s, 0, min_s, 1);
+
+    curled_page->CalculateShadow (true, 0);
+
+    curled_page->Draw (device);
+
+    device.RSSetState (rasterizer_cull_front_state.get ());
+
+    BindMaterial (device, GetCurledLeftPageMaterial ());
+
+    curled_page->CalculateShadow (false, 1 - curl_radius / page_curl->CurlRadius ());
+
+    GetTexCoords (true, min_s, max_s);
+
+    curled_page->SetTexCoords (min_s, 0, max_s, 1);
+
+    curled_page->Draw (device);
 
     device.RSSetState (rasterizer_no_cull_state.get ());
 
@@ -508,7 +575,7 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
           flip_height = flip_width * tan (x_flip_angle / 2.f),
           curl_angle  = atan2 (flip_width, flip_height);
 
-    if (curl_corner_position.y < 1)
+    if (curl_corner_position.y < page_size.y)
       curl_angle += M_PI;
 
     float curl_x = (page_size.x - flip_width) * cos (curl_angle);
@@ -535,6 +602,8 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
     BindMaterial (device, GetCurledLeftPageMaterial ());
 
     curled_page->CalculateShadow (false, 1 - curl_radius / page_curl->CurlRadius ());
+
+    GetTexCoords (true, min_s, max_s);
 
     curled_page->SetTexCoords (min_s, 0, max_s, 1);
 
@@ -639,14 +708,212 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
 
   void DrawRightTopCornerFlip (low_level::IDevice& device)
   {
+    const math::vec2f& total_size      = page_curl->Size ();
+    math::vec2f        page_size       = total_size;
+    math::vec2f        corner_position = page_curl->CornerPosition ();
+
+    if (page_curl->Mode () != PageCurlMode_SinglePage)
+      page_size.x /= 2;
+
+    float left_page_width = page_curl->Mode () == PageCurlMode_SinglePage ? 0 : page_size.x;
+
+    float x_flip_angle = -stl::max (M_PI - 2 * atan2 (page_size.y - corner_position.y, total_size.x - corner_position.x),
+                                    atan2 (page_size.y - corner_position.y, corner_position.x - left_page_width));
+
+    math::vec2f flip_vec ((page_size.y - corner_position.y) / tan (fabs (x_flip_angle)), corner_position.y - page_size.y);
+
+    float flip_vec_length = math::length (flip_vec),
+          curl_radius     = page_curl->CurlRadius ();
+
+    if (flip_vec_length > page_size.x)
+    {
+      corner_position.x -= (flip_vec_length - page_size.x) * flip_vec.x / flip_vec_length;
+      corner_position.y -= (flip_vec_length - page_size.x) * flip_vec.y / flip_vec_length;
+    }
+
+    if (page_curl->Mode () != PageCurlMode_SinglePage)
+      corner_position.x -= page_size.x;
+
+    math::vec2f curl_corner_position = corner_position;
+
+    curl_corner_position.y = page_size.y - curl_corner_position.y;
+
+    if (curl_corner_position.x < -page_size.x + curl_radius * 2)
+      curl_radius *= (-page_size.x - curl_corner_position.x) / -(curl_radius * 2);
+
+    curl_radius = stl::max (EPS, curl_radius);
+
+    float distance_to_right_edge = total_size.x - corner_position.x,
+          flip_width             = (page_size.y - corner_position.y) / tan (fabs (x_flip_angle)) + distance_to_right_edge,
+          flip_height            = flip_width * tan (fabs (x_flip_angle / 2.f)),
+          curl_angle             = atan2 (flip_width, flip_height);
+
+    if (curl_corner_position.y < 0)
+      curl_angle += M_PI;
+
+    float curl_x = (page_size.x - flip_width) * cos (curl_angle);
+
+    curled_page->Curl (curl_corner_position, page_curl->CurlCorner (), curl_x, curl_radius, curl_angle,
+                       page_curl->FindBestCurlSteps (), page_curl->BindingMismatchWeight ());
+
+    if (page_curl->Mode () != PageCurlMode_SinglePage)
+    {
+      ProgramParameters program_parameters;
+
+      program_parameters.view_matrix       = math::translate (-view_point);
+      program_parameters.projection_matrix = projection;
+      program_parameters.object_matrix     = page_curl->WorldTM () * math::scale (math::vec3f (1, 1, -1)) * math::translate (math::vec3f (page_size.x, 0, 0));
+
+      constant_buffer->SetData (0, sizeof (program_parameters), &program_parameters);
+    }
+
+    device.RSSetState (rasterizer_cull_back_state.get ());
+
+    BindMaterial (device, GetCurledLeftPageMaterial ());
+
+    float min_s, max_s;
+
+    GetTexCoords (true, min_s, max_s);
+
+    if (page_curl->Mode () != PageCurlMode_SinglePage)
+      curled_page->SetTexCoords (max_s, 0, min_s, 1);
+    else
+      curled_page->SetTexCoords (min_s, 0, max_s, 1);
+
+    curled_page->CalculateShadow (true, 0);
+
+    curled_page->Draw (device);
+
+    device.RSSetState (rasterizer_cull_front_state.get ());
+
+    BindMaterial (device, GetCurledRightPageMaterial ());
+
+    curled_page->CalculateShadow (false, 1 - curl_radius / page_curl->CurlRadius ());
+
+    GetTexCoords (false, min_s, max_s);
+
+    curled_page->SetTexCoords (min_s, 0, max_s, 1);
+
+    curled_page->Draw (device);
+
     device.RSSetState (rasterizer_no_cull_state.get ());
+
+    if (page_curl->Mode () != PageCurlMode_SinglePage)
+    {
+      ProgramParameters program_parameters;
+
+      program_parameters.view_matrix       = math::translate (-view_point);
+      program_parameters.projection_matrix = projection;
+      program_parameters.object_matrix     = page_curl->WorldTM () * math::scale (math::vec3f (1, 1, -1));
+
+      constant_buffer->SetData (0, sizeof (program_parameters), &program_parameters);
+    }
 
     DrawStaticPages (device);
   }
 
   void DrawRightBottomCornerFlip (low_level::IDevice& device)
   {
+    const math::vec2f& total_size      = page_curl->Size ();
+    math::vec2f        page_size       = total_size;
+    math::vec2f        corner_position = page_curl->CornerPosition ();
+
+    if (page_curl->Mode () != PageCurlMode_SinglePage)
+      page_size.x /= 2;
+
+    float left_page_width = page_curl->Mode () == PageCurlMode_SinglePage ? 0 : page_size.x;
+
+    float x_flip_angle = stl::max (M_PI - 2 * atan2 (corner_position.y, total_size.x - corner_position.x),
+                                    atan2 (corner_position.y, corner_position.x - left_page_width));
+
+    math::vec2f flip_vec (corner_position.y / tan (x_flip_angle), corner_position.y);
+
+    float flip_vec_length = math::length (flip_vec),
+          curl_radius     = page_curl->CurlRadius ();
+
+    if (flip_vec_length > page_size.x)
+    {
+      corner_position.x -= (flip_vec_length - page_size.x) * flip_vec.x / flip_vec_length;
+      corner_position.y -= (flip_vec_length - page_size.x) * flip_vec.y / flip_vec_length;
+    }
+
+    if (page_curl->Mode () != PageCurlMode_SinglePage)
+      corner_position.x -= page_size.x;
+
+    math::vec2f curl_corner_position = corner_position;
+
+    curl_corner_position.y = page_size.y - curl_corner_position.y;
+
+    if (curl_corner_position.x < -page_size.x + curl_radius * 2)
+      curl_radius *= (-page_size.x - curl_corner_position.x) / -(curl_radius * 2);
+
+    curl_radius = stl::max (EPS, curl_radius);
+
+    float distance_to_right_edge = total_size.x - corner_position.x,
+          flip_width             = corner_position.y / tan (x_flip_angle) + distance_to_right_edge,
+          flip_height            = flip_width * tan (x_flip_angle / 2.f),
+          curl_angle             = -atan2 (flip_width, flip_height);
+
+    if (curl_corner_position.y > page_size.y)
+      curl_angle -= M_PI;
+
+    float curl_x = (page_size.x - flip_width) * cos (curl_angle);
+
+    curled_page->Curl (curl_corner_position, page_curl->CurlCorner (), curl_x, curl_radius, curl_angle,
+                       page_curl->FindBestCurlSteps (), page_curl->BindingMismatchWeight ());
+
+    if (page_curl->Mode () != PageCurlMode_SinglePage)
+    {
+      ProgramParameters program_parameters;
+
+      program_parameters.view_matrix       = math::translate (-view_point);
+      program_parameters.projection_matrix = projection;
+      program_parameters.object_matrix     = page_curl->WorldTM () * math::scale (math::vec3f (1, 1, -1)) * math::translate (math::vec3f (page_size.x, 0, 0));
+
+      constant_buffer->SetData (0, sizeof (program_parameters), &program_parameters);
+    }
+
+    device.RSSetState (rasterizer_cull_back_state.get ());
+
+    BindMaterial (device, GetCurledLeftPageMaterial ());
+
+    float min_s, max_s;
+
+    GetTexCoords (true, min_s, max_s);
+
+    if (page_curl->Mode () != PageCurlMode_SinglePage)
+      curled_page->SetTexCoords (max_s, 0, min_s, 1);
+    else
+      curled_page->SetTexCoords (min_s, 0, max_s, 1);
+
+    curled_page->CalculateShadow (true, 0);
+
+    curled_page->Draw (device);
+
+    device.RSSetState (rasterizer_cull_front_state.get ());
+
+    BindMaterial (device, GetCurledRightPageMaterial ());
+
+    curled_page->CalculateShadow (false, 1 - curl_radius / page_curl->CurlRadius ());
+
+    GetTexCoords (false, min_s, max_s);
+
+    curled_page->SetTexCoords (min_s, 0, max_s, 1);
+
+    curled_page->Draw (device);
+
     device.RSSetState (rasterizer_no_cull_state.get ());
+
+    if (page_curl->Mode () != PageCurlMode_SinglePage)
+    {
+      ProgramParameters program_parameters;
+
+      program_parameters.view_matrix       = math::translate (-view_point);
+      program_parameters.projection_matrix = projection;
+      program_parameters.object_matrix     = page_curl->WorldTM () * math::scale (math::vec3f (1, 1, -1));
+
+      constant_buffer->SetData (0, sizeof (program_parameters), &program_parameters);
+    }
 
     DrawStaticPages (device);
   }

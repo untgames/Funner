@@ -5,8 +5,8 @@ namespace
 
 const float CAMERA_LEFT   = -1.1;
 const float CAMERA_RIGHT  = 1.1;
-const float CAMERA_TOP    = 0.6;
-const float CAMERA_BOTTOM = -0.6;
+const float CAMERA_TOP    = 0.9;
+const float CAMERA_BOTTOM = -0.9;
 
 }
 
@@ -25,10 +25,10 @@ struct Test
 
     curl = PageCurl::Create ();
 
-    curl->SetSize               (2.f, 1.f);
+    curl->SetSize               (2.f, 1.5f);
     curl->SetGridSize           (100, 100);
     curl->SetMode               (PageCurlMode_DoublePageDoubleMaterial);
-    curl->SetCurlCorner         (PageCurlCorner_LeftBottom);
+    curl->SetCurlCorner         (PageCurlCorner_RightBottom);
     curl->SetCurlRadius         (0.1f);
     curl->SetPageMaterial       (PageCurlPageType_BackLeft,   "page1");
     curl->SetPageMaterial       (PageCurlPageType_BackRight,  "page2");
@@ -36,7 +36,7 @@ struct Test
     curl->SetPageMaterial       (PageCurlPageType_FrontRight, "page4");
     curl->SetShadowMaterial     ("page_shadow");
     curl->SetCornerShadowOffset (0.1f);
-    curl->SetPosition           (-1.f, -0.5f, 0.f);
+    curl->SetPosition           (-1.f, -0.75f, 0.f);
     curl->SetCornerPosition     (0.1f, 0.1f);
 
     curl->BindToScene (scene);
