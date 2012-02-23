@@ -472,8 +472,12 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
 
     float x_offset = left_side || page_curl->Mode () == PageCurlMode_SinglePage ? 0 : page_size.x;
 
-    const math::vec3f& top_corner_position    = left_side ? curled_page->GetCornerPosition (PageCurlCorner_LeftTop) : curled_page->GetCornerPosition (PageCurlCorner_RightTop);
-    const math::vec3f& bottom_corner_position = left_side ? curled_page->GetCornerPosition (PageCurlCorner_LeftBottom) : curled_page->GetCornerPosition (PageCurlCorner_RightBottom);
+    const math::vec3f& left_bottom_corner_position  = curled_page->GetCornerPosition (PageCurlCorner_LeftBottom);
+    const math::vec3f& left_top_corner_position     = curled_page->GetCornerPosition (PageCurlCorner_LeftTop);
+    const math::vec3f& right_bottom_corner_position = curled_page->GetCornerPosition (PageCurlCorner_RightBottom);
+    const math::vec3f& right_top_corner_position    = curled_page->GetCornerPosition (PageCurlCorner_RightTop);
+    const math::vec3f& top_corner_position          = left_side ? left_top_corner_position : right_top_corner_position;
+    const math::vec3f& bottom_corner_position       = left_side ? left_bottom_corner_position : right_bottom_corner_position;
 
     if (xtl::xstrlen (page_curl->ShadowMaterial ()))
     {
@@ -568,37 +572,100 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
       }
     }
 
-/*    device.SSSetTexture    (0, 0);
-    device.OSSetBlendState (mask_blend_state.get ());
+    if (fabs (left_top_corner_position.z) > EPS || fabs (right_top_corner_position.z) > EPS || fabs (left_bottom_corner_position.z) > EPS || fabs (right_bottom_corner_position.z) > EPS)
+    {
+      device.SSSetTexture    (0, 0);
+      device.OSSetBlendState (mask_blend_state.get ());
 
-    unsigned char light = (1 - page_curl->ShadowDensity () * curl_radius / page_curl->CurlRadius ()) * 255;
+      unsigned char light = (1 - page_curl->ShadowDensity () * curl_radius / page_curl->CurlRadius ()) * 255;
 
-    RenderableVertex vertices [4];
+      RenderableVertex vertices [4];
 
-    vertices [0].color = math::vec4ub (light, light, light, 255);
-    vertices [1].color = math::vec4ub (light, light, light, 255);
-    vertices [2].color = math::vec4ub (255, 255, 255, 255);
-    vertices [3].color = math::vec4ub (255, 255, 255, 255);
+      vertices [0].color = math::vec4ub (light, light, light, 255);
+      vertices [1].color = math::vec4ub (light, light, light, 255);
+      vertices [2].color = math::vec4ub (255, 255, 255, 255);
+      vertices [3].color = math::vec4ub (255, 255, 255, 255);
 
-    const math::vec3f& bottom_detach_position = curled_page->HasBottomSideDetachPosition () ? curled_page->GetBottomSideDetachPosition () : curled_page->GetCornerPosition (PageCurlCorner_RightBottom);
-    math::vec3f        top_detach_position    = curled_page->HasLeftSideDetachPosition () ? curled_page->GetLeftSideDetachPosition () : curled_page->HasTopSideDetachPosition () ? curled_page->GetTopSideDetachPosition () : curled_page->GetCornerPosition (PageCurlCorner_RightTop);
+      bool               has_side_detach_position        = left_side ? curled_page->HasLeftSideDetachPosition () : curled_page->HasRightSideDetachPosition ();
+      bool               has_bottom_side_detach_position = curled_page->HasBottomSideDetachPosition ();
+      bool               has_top_side_detach_position    = curled_page->HasTopSideDetachPosition ();
+      const math::vec3f& side_detach_position            = left_side ? curled_page->GetLeftSideDetachPosition () : curled_page->GetRightSideDetachPosition ();
+      math::vec3f        bottom_detach_position;
+      math::vec3f        top_detach_position;
 
-    math::vec2f detach_vec = normalize (math::vec2f (bottom_detach_position.x - top_detach_position.x, bottom_detach_position.y - top_detach_position.y));
+      if (has_bottom_side_detach_position)
+      {
+        bottom_detach_position = curled_page->GetBottomSideDetachPosition ();
+      }
+      else
+      {
+        if (has_side_detach_position)
+          bottom_detach_position = side_detach_position;
+        else
+        {
+          if (fabs (left_bottom_corner_position.z) > fabs (right_bottom_corner_position.z))
+            bottom_detach_position = right_bottom_corner_position;
+          else
+            bottom_detach_position = left_bottom_corner_position;
+        }
+      }
 
-    top_detach_position -= detach_vec * page_curl->CornerShadowOffset ();
+      if (has_top_side_detach_position)
+      {
+        top_detach_position = curled_page->GetTopSideDetachPosition ();
+      }
+      else
+      {
+        if (has_side_detach_position)
+          top_detach_position = side_detach_position;
+        else
+        {
+          if (fabs (left_top_corner_position.z) > fabs (right_top_corner_position.z))
+            top_detach_position = right_top_corner_position;
+          else
+            top_detach_position = left_top_corner_position;
+        }
+      }
 
-    math::vec2f shadow_offset = normalize (math::vec2f (-top_detach_position.y + bottom_detach_position.y, -bottom_detach_position.x + top_detach_position.x));
+      if (!has_bottom_side_detach_position && !has_top_side_detach_position)
+      {
+        if (fabs (left_top_corner_position.z) > 0 && fabs (right_top_corner_position.z) > 0)
+        {
+          if (fabs (left_top_corner_position.z) > fabs (right_top_corner_position.z))
+            top_detach_position = right_top_corner_position;
+          else
+            top_detach_position = left_top_corner_position;
+        }
+        if (fabs (left_bottom_corner_position.z) > 0 && fabs (right_bottom_corner_position.z) > 0)
+        {
+          if (fabs (left_bottom_corner_position.z) > fabs (right_bottom_corner_position.z))
+            bottom_detach_position = right_bottom_corner_position;
+          else
+            bottom_detach_position = left_bottom_corner_position;
+        }
+      }
 
-    float shadow_width = page_size.x * page_curl->ShadowWidth ();
+      math::vec2f detach_vec = normalize (math::vec2f (bottom_detach_position.x - top_detach_position.x, bottom_detach_position.y - top_detach_position.y));
 
-    vertices [0].position = math::vec3f (top_detach_position.x,                                     top_detach_position.y,                                     BACK_SHADOW_OFFSET);
-    vertices [1].position = math::vec3f (bottom_detach_position.x,                                  bottom_detach_position.y,                                  BACK_SHADOW_OFFSET);
-    vertices [2].position = math::vec3f (top_detach_position.x + shadow_offset.x * shadow_width,    top_detach_position.y + shadow_offset.y * shadow_width,    BACK_SHADOW_OFFSET);
-    vertices [3].position = math::vec3f (bottom_detach_position.x + shadow_offset.x * shadow_width, bottom_detach_position.y + shadow_offset.y * shadow_width, BACK_SHADOW_OFFSET);
+      bottom_detach_position += detach_vec * page_curl->CornerShadowOffset ();
+      top_detach_position    -= detach_vec * page_curl->CornerShadowOffset ();
 
-    quad_vertex_buffer->SetData (0, sizeof (vertices), vertices);
+      math::vec2f shadow_offset = normalize (math::vec2f (-top_detach_position.y + bottom_detach_position.y, -bottom_detach_position.x + top_detach_position.x));
 
-    device.DrawIndexed (low_level::PrimitiveType_TriangleList, 0, 6, 0);*/
+      if (!left_side)
+        shadow_offset *= -1;
+
+      float shadow_width = page_size.x * page_curl->ShadowWidth ();
+
+      vertices [0].position = math::vec3f (top_detach_position.x + x_offset,                                     top_detach_position.y,                                     BACK_SHADOW_OFFSET);
+      vertices [1].position = math::vec3f (bottom_detach_position.x + x_offset,                                  bottom_detach_position.y,                                  BACK_SHADOW_OFFSET);
+      vertices [2].position = math::vec3f (top_detach_position.x + shadow_offset.x * shadow_width + x_offset,    top_detach_position.y + shadow_offset.y * shadow_width,    BACK_SHADOW_OFFSET);
+      vertices [3].position = math::vec3f (bottom_detach_position.x + shadow_offset.x * shadow_width + x_offset, bottom_detach_position.y + shadow_offset.y * shadow_width, BACK_SHADOW_OFFSET);
+
+      quad_vertex_buffer->SetData (0, sizeof (vertices), vertices);
+
+      device.DrawIndexed (low_level::PrimitiveType_TriangleList, 0, 6, 0);
+    }
   }
 
   //Рисование специфичное для каждого угла
