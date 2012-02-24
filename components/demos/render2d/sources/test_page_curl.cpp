@@ -3,10 +3,10 @@
 namespace
 {
 
-const float CAMERA_LEFT   = -1.1;
-const float CAMERA_RIGHT  = 1.1;
-const float CAMERA_TOP    = 0.9;
-const float CAMERA_BOTTOM = -0.9;
+const float CAMERA_LEFT   = -1.1f;
+const float CAMERA_RIGHT  = 1.1f;
+const float CAMERA_TOP    = 0.9f;
+const float CAMERA_BOTTOM = -0.9f;
 
 }
 
@@ -108,8 +108,8 @@ struct Test
   {
     syslib::Rect client_rect = window.ClientRect ();
 
-    float width  = client_rect.right - client_rect.left,
-          height = client_rect.bottom - client_rect.top;
+    float width  = (float)(client_rect.right - client_rect.left),
+          height = (float)(client_rect.bottom - client_rect.top);
 
     curl->SetCornerPosition (CAMERA_LEFT + context.cursor_position.x / width * (CAMERA_RIGHT - CAMERA_LEFT) - curl->Position ().x, CAMERA_BOTTOM + (1 - context.cursor_position.y / height) * (CAMERA_TOP - CAMERA_BOTTOM) - curl->Position ().y);
 

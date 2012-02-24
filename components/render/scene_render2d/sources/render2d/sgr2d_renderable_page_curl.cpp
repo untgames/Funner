@@ -21,9 +21,10 @@ namespace
 
 const char* LOG_NAME = "render.obsolete.render2d.RenderablePageCurl";
 
-const float EPS                   = 0.001;
+const float EPS                   = 0.001f;
 const float BACK_SHADOW_OFFSET    = 0;
-const float STATIC_PAGES_Z_OFFSET = -0.001;
+const float PI                    = 3.1415926f;
+const float STATIC_PAGES_Z_OFFSET = -0.001f;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Параметры вершины необходимые для визуализации
@@ -306,7 +307,7 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
   {
     const math::vec4f& float_page_color = page_curl->PageColor ();
 
-    return math::vec4ub (float_page_color.x * 255, float_page_color.y * 255, float_page_color.z * 255, float_page_color.w * 255);
+    return math::vec4ub ((unsigned char)(float_page_color.x * 255), (unsigned char)(float_page_color.y * 255), (unsigned char)(float_page_color.z * 255), (unsigned char)(float_page_color.w * 255));
   }
 
   void GetTexCoords (bool left, float& min_s, float& max_s)
@@ -577,7 +578,7 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
       device.SSSetTexture    (0, 0);
       device.OSSetBlendState (mask_blend_state.get ());
 
-      unsigned char light = (1 - page_curl->ShadowDensity () * curl_radius / page_curl->CurlRadius ()) * 255;
+      unsigned char light = (unsigned char)((1 - page_curl->ShadowDensity () * curl_radius / page_curl->CurlRadius ()) * 255);
 
       RenderableVertex vertices [4];
 
@@ -679,7 +680,7 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
 
     page_size.x /= 2;
 
-    float x_flip_angle = -stl::max (M_PI - 2 * atan2 (page_size.y - corner_position.y, corner_position.x),
+    float x_flip_angle = -stl::max (PI - 2 * atan2 (page_size.y - corner_position.y, corner_position.x),
                                     atan2 (page_size.y - corner_position.y, page_size.x - corner_position.x));
 
     math::vec2f flip_vec ((page_size.y - corner_position.y) / tan (fabs (x_flip_angle)), corner_position.y - page_size.y);
@@ -707,7 +708,7 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
           curl_angle  = -atan2 (flip_width, flip_height);
 
     if (curl_corner_position.y >= 0)
-      curl_angle += M_PI;
+      curl_angle += PI;
 
     float curl_x = (page_size.x - flip_width) * cos (curl_angle);
 
@@ -757,7 +758,7 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
 
     page_size.x /= 2;
 
-    float x_flip_angle = stl::max (M_PI - 2 * atan2 (corner_position.y, corner_position.x),
+    float x_flip_angle = stl::max (PI - 2 * atan2 (corner_position.y, corner_position.x),
                                    atan2 (corner_position.y, page_size.x - corner_position.x));
 
     math::vec2f flip_vec (corner_position.y / tan (x_flip_angle), corner_position.y);
@@ -785,7 +786,7 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
           curl_angle  = atan2 (flip_width, flip_height);
 
     if (curl_corner_position.y <= page_size.y)
-      curl_angle += M_PI;
+      curl_angle += PI;
 
     float curl_x = (page_size.x - flip_width) * cos (curl_angle);
 
@@ -836,7 +837,7 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
 
     float left_page_width = page_curl->Mode () == PageCurlMode_SinglePage ? 0 : page_size.x;
 
-    float x_flip_angle = -stl::max (M_PI - 2 * atan2 (page_size.y - corner_position.y, total_size.x - corner_position.x),
+    float x_flip_angle = -stl::max (PI - 2 * atan2 (page_size.y - corner_position.y, total_size.x - corner_position.x),
                                     atan2 (page_size.y - corner_position.y, corner_position.x - left_page_width));
 
     math::vec2f flip_vec ((page_size.y - corner_position.y) / tan (fabs (x_flip_angle)), corner_position.y - page_size.y);
@@ -868,7 +869,7 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
           curl_angle             = atan2 (flip_width, flip_height);
 
     if (curl_corner_position.y <= 0)
-      curl_angle += M_PI;
+      curl_angle += PI;
 
     float curl_x = (page_size.x - flip_width) * cos (curl_angle);
 
@@ -944,7 +945,7 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
 
     float left_page_width = page_curl->Mode () == PageCurlMode_SinglePage ? 0 : page_size.x;
 
-    float x_flip_angle = stl::max (M_PI - 2 * atan2 (corner_position.y, total_size.x - corner_position.x),
+    float x_flip_angle = stl::max (PI - 2 * atan2 (corner_position.y, total_size.x - corner_position.x),
                                     atan2 (corner_position.y, corner_position.x - left_page_width));
 
     math::vec2f flip_vec (corner_position.y / tan (x_flip_angle), corner_position.y);
@@ -976,7 +977,7 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
           curl_angle             = -atan2 (flip_width, flip_height);
 
     if (curl_corner_position.y >= page_size.y)
-      curl_angle -= M_PI;
+      curl_angle -= PI;
 
     float curl_x = (page_size.x - flip_width) * cos (curl_angle);
 
@@ -1188,7 +1189,7 @@ RenderablePageCurl::~RenderablePageCurl ()
     Рисование
 */
 
-void RenderablePageCurl::DrawCore (IFrame& frame)
+void RenderablePageCurl::DrawCore (render::obsolete::render2d::IFrame& frame)
 {
   mid_level::Viewport viewport;
 

@@ -8,6 +8,8 @@ typedef xtl::com_ptr<low_level::IBuffer> BufferPtr;
 namespace
 {
 
+const float PI = 3.1415926f;
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Параметры вершины необходимые для визуализации
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -203,7 +205,7 @@ struct RenderablePageCurlMesh::Impl
         break;
     }
 
-    float pi_r                               = M_PI * radius,
+    float pi_r                               = PI * radius,
           rotated_corner_location_x          = corner_position.x * cos_curl_angle - corner_position.y * sin_curl_angle,
           rotated_original_corner_location_x = original_corner_location.x * cos_curl_angle - original_corner_location.y * sin_curl_angle,
           rotated_top_binding_location_x     = top_binding.x * cos_curl_angle - top_binding.y * sin_curl_angle,
@@ -366,11 +368,11 @@ struct RenderablePageCurlMesh::Impl
       float light = stl::max ((float)fabs (vertex->position.z) / (last_curl_radius * 2), max_shadow);
 
       if (!front)
-        light = 1 - light * 1.5;
+        light = 1.f - light * 1.5f;
 
-      vertex->color.x = color.x * light;
-      vertex->color.y = color.y * light;
-      vertex->color.z = color.z * light;
+      vertex->color.x = (unsigned char)(color.x * light);
+      vertex->color.y = (unsigned char)(color.y * light);
+      vertex->color.z = (unsigned char)(color.z * light);
     }
   }
 
