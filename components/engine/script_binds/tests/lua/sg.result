@@ -226,6 +226,70 @@ Color = 0.4 0.3 0.2 0.1
 Color = 0.1 0.2 0.3 0.1
 Horizontal aligment = Right/Bottom vertical aligment = Center
 Horizontal aligment = BaseLine vertical aligment = BaseLine
+PageCurl test
+default curl:
+  mode                              SinglePage
+  front left material               ''
+  front right material              ''
+  back left material                ''
+  back right material               ''
+  shadow material                   ''
+  size                              1.00x1.00
+  corner                            'LeftTop'
+  corner position                   0.00; 0.00
+  curl radius                       0.00
+  minimum curl radius               0.00
+  grid size                         100x100
+  page color                        1.000; 1.000; 1.000; 1.000
+  corner shadow offset              15.00
+  shadow width                      0.25
+  shadow density                    0.40
+  shadow grow power                 0.25
+  opposite corner shadow grow power 15.00
+  find best curl steps              1000
+  binding mismatch weight           10.00
+changed curl:
+  mode                              DoublePageDoubleMaterial
+  front left material               'front_material'
+  front right material              ''
+  back left material                'back_left_material'
+  back right material               'back_right_material'
+  shadow material                   'shadow_material'
+  size                              2.00x4.00
+  corner                            'RightBottom'
+  corner position                   1.00; 2.00
+  curl radius                       4.00
+  minimum curl radius               2.00
+  grid size                         10x20
+  page color                        0.500; 0.250; 0.125; 0.250
+  corner shadow offset              16.00
+  shadow width                      8.00
+  shadow density                    0.50
+  shadow grow power                 0.50
+  opposite corner shadow grow power 2.00
+  find best curl steps              500
+  binding mismatch weight           2.00
+second changed curl:
+  mode                              DoublePageDoubleMaterial
+  front left material               'front_material'
+  front right material              ''
+  back left material                'back_left_material'
+  back right material               'back_right_material'
+  shadow material                   'shadow_material'
+  size                              4.00x2.00
+  corner                            'RightBottom'
+  corner position                   2.00; 1.00
+  curl radius                       4.00
+  minimum curl radius               2.00
+  grid size                         10x20
+  page color                        0.250; 0.125; 0.250; 0.500
+  corner shadow offset              16.00
+  shadow width                      8.00
+  shadow density                    0.50
+  shadow grow power                 0.50
+  opposite corner shadow grow power 2.00
+  find best curl steps              500
+  binding mismatch weight           2.00
 LookToNodePoint controller test
 node1 orientation is 0.000000 0.186730 0.000000 0.982411
 node1 orientation is 0.000000 0.233282 0.000000 0.972409

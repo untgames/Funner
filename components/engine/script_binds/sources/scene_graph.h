@@ -10,6 +10,7 @@
 #include <sg/light.h>
 #include <sg/listener.h>
 #include <sg/node_array.h>
+#include <sg/page_curl.h>
 #include <sg/scene.h>
 #include <sg/sound_emitter.h>
 #include <sg/sprite.h>
@@ -124,6 +125,7 @@ void bind_spot_light_library                      (script::Environment&);
 void bind_point_light_library                     (script::Environment&);
 void bind_box_helper_library                      (script::Environment&);
 void bind_listener_library                        (script::Environment&);
+void bind_page_curl_library                       (script::Environment&);
 void bind_sound_emitter_library                   (script::Environment&);
 void bind_sprite_model_library                    (script::Environment&);
 void bind_sprite_library                          (script::Environment&);

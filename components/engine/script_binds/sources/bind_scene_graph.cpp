@@ -74,6 +74,7 @@ void bind_scene_graph_library (Environment& environment)
   bind_point_light_library                     (environment);
   bind_box_helper_library                      (environment);
   bind_listener_library                        (environment);
+  bind_page_curl_library                       (environment);
   bind_sound_emitter_library                   (environment);
   bind_sprite_model_library                    (environment);
   bind_sprite_library                          (environment);

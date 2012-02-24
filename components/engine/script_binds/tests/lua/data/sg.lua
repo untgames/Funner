@@ -676,6 +676,95 @@ function test_text_line ()
   print ("Horizontal aligment = " .. get_name (text_line1.HorizontalAlignment) .. " vertical aligment = " .. get_name (text_line1.VerticalAlignment))
 end
 
+local function get_mode_name (mode)
+  if mode == Scene.PageCurlMode.SinglePage then 
+    return "SinglePage"
+  elseif mode == Scene.PageCurlMode.DoublePageSingleMaterial then
+    return "DoublePageSingleMaterial"
+  elseif mode == Scene.PageCurlMode.DoublePageDoubleMaterial then
+    return "DoublePageDoubleMaterial"
+  else
+    return "Unknown"
+  end  
+end
+
+local function get_corner_name (corner)
+  if corner == Scene.PageCurlCorner.LeftTop then
+    return "LeftTop"
+  elseif corner == Scene.PageCurlCorner.LeftBottom then
+    return "LeftBottom"
+  elseif corner == Scene.PageCurlCorner.RightTop then
+    return "RightTop"
+  elseif corner == Scene.PageCurlCorner.RightBottom then
+    return "RightBottom"
+  else
+    return "Unknown"
+  end
+end
+
+local function print_curl (curl)
+  print (string.format ("  mode                              %s",                     get_mode_name (curl.Mode)))
+  print (string.format ("  front left material               '%s'",                   curl:PageMaterial (Scene.PageCurlPageType.FrontLeft)))
+  print (string.format ("  front right material              '%s'",                   curl:PageMaterial (Scene.PageCurlPageType.FrontRight)))
+  print (string.format ("  back left material                '%s'",                   curl:PageMaterial (Scene.PageCurlPageType.BackLeft)))
+  print (string.format ("  back right material               '%s'",                   curl:PageMaterial (Scene.PageCurlPageType.BackRight)))
+  print (string.format ("  shadow material                   '%s'",                   curl.ShadowMaterial))
+  print (string.format ("  size                              %.2fx%.2f",              curl.Size.x, curl.Size.y))
+  print (string.format ("  corner                            '%s'",                   get_corner_name (curl.CurlCorner)))
+  print (string.format ("  corner position                   %.2f; %.2f",             curl.CornerPosition.x, curl.CornerPosition.y))
+  print (string.format ("  curl radius                       %.2f",                   curl.CurlRadius))
+  print (string.format ("  minimum curl radius               %.2f",                   curl.MinimumCurlRadius))
+  print (string.format ("  grid size                         %ux%u",                  curl.GridSize.x, curl.GridSize.y))
+  print (string.format ("  page color                        %.3f; %.3f; %.3f; %.3f", curl.PageColor.x, curl.PageColor.y, curl.PageColor.z, curl.PageColor.w))
+  print (string.format ("  corner shadow offset              %.2f",                   curl.CornerShadowOffset))
+  print (string.format ("  shadow width                      %.2f",                   curl.ShadowWidth))
+  print (string.format ("  shadow density                    %.2f",                   curl.ShadowDensity))
+  print (string.format ("  shadow grow power                 %.2f",                   curl.ShadowGrowPower))
+  print (string.format ("  opposite corner shadow grow power %.2f",                   curl.OppositeCornerShadowGrowPower))
+  print (string.format ("  find best curl steps              %u",                     curl.FindBestCurlSteps))
+  print (string.format ("  binding mismatch weight           %.2f",                   curl.BindingMismatchWeight))
+end
+
+local function test_page_curl ()
+  print ("PageCurl test")
+
+  local curl = Scene.PageCurl.Create ()
+
+  print ("default curl:")
+  print_curl (curl)
+
+  curl:SetPageMaterial   (Scene.PageCurlPageType.Front,     "front_material")
+  curl:SetPageMaterial   (Scene.PageCurlPageType.BackLeft,  "back_left_material")
+  curl:SetPageMaterial   (Scene.PageCurlPageType.BackRight, "back_right_material")
+  curl:SetSize           (2, 4)
+  curl:SetCornerPosition (1, 2)
+  curl:SetGridSize       (10, 20)
+  curl:SetPageColor      (0.5, 0.25, 0.125, 0.25)
+
+  curl.Mode                          = Scene.PageCurlMode.DoublePageDoubleMaterial
+  curl.ShadowMaterial                = "shadow_material"
+  curl.CurlCorner                    = Scene.PageCurlCorner.RightBottom
+  curl.CurlRadius                    = 4
+  curl.MinimumCurlRadius             = 2
+  curl.CornerShadowOffset            = 16
+  curl.ShadowWidth                   = 8
+  curl.ShadowDensity                 = 0.5
+  curl.ShadowGrowPower               = 0.5
+  curl.OppositeCornerShadowGrowPower = 2
+  curl.FindBestCurlSteps             = 500
+  curl.BindingMismatchWeight         = 2
+
+  print ("changed curl:")
+  print_curl (curl)
+  
+  curl.Size           = vec2 (4, 2)
+  curl.CornerPosition = vec2 (2, 1)
+  curl.PageColor      = vec4 (0.25, 0.125, 0.25, 0.5)
+
+  print ("second changed curl:")
+  print_curl (curl)
+end
+
 function test_move_to_node_point_controller ()
   print ("MoveToNodePoint controller test")
 
@@ -818,6 +907,8 @@ function test ()
   test_scene ()
 
   test_text_line ()
+
+  test_page_curl ()
 
   test_look_to_node_point_controller ()
   test_move_to_node_point_controller ()
