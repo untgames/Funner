@@ -17,7 +17,6 @@ SYSTEMLIB.SOURCES.SOURCE_DIRS                       += sources/platform/default
 SYSTEMLIB.SOURCES.IMPORTS                           := compile.system
 SYSTEMLIB.SOURCES.win32.SOURCE_DIRS                 := sources/platform/windows sources/platform/windows/application sources/platform/windows/non_unistd
 SYSTEMLIB.SOURCES.x86_win32.SOURCE_DIRS             := sources/platform/windows/thread
-SYSTEMLIB.SOURCES.x86.IMPORTS                       := compile.extern.geekinfo
 SYSTEMLIB.SOURCES.wince.SOURCE_DIRS                 := sources/platform/pthread
 SYSTEMLIB.SOURCES.unistd.SOURCE_DIRS                := sources/platform/pthread sources/platform/unistd sources/platform/message_queue
 SYSTEMLIB.SOURCES.msvc.COMPILER_CFLAGS              := -wd4355
@@ -36,6 +35,10 @@ SYSTEMLIB.SOURCES.bada_device.SOURCE_DIRS           := sources/platform/no_threa
 SYSTEMLIB.SOURCES.beagleboard.IMPORTS               := compile.extern.beagleboard
 SYSTEMLIB.SOURCES.meego.IMPORTS                     := compile.extern.meego
 SYSTEMLIB.SOURCES.tabletos.SOURCE_DIRS              := sources/platform/tabletos
+
+ifeq (,$(filter iphone,$(PROFILES)))
+  SYSTEMLIB.SOURCES.x86.IMPORTS := compile.extern.geekinfo
+endif
 
 #Öåëü ¹2 - System library tests
 SYSTEMLIB.TESTS.TYPE             := test-suite
