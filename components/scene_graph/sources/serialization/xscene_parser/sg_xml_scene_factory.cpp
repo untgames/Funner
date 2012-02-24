@@ -63,7 +63,7 @@ XmlSceneFactory::XmlSceneFactory (const char* file_name, const LogHandler& log_h
     
       //парсинг
       
-    common::ParseNode& xscene_root = parser.Root ().First ();
+    const common::ParseNode& xscene_root = parser.Root ().First ();
     
     if (strcmp (xscene_root.Name (), XSCENE_ROOT))
       throw xtl::format_operation_exception ("", "Bad XML scene file '%s' root node not found", XSCENE_ROOT);      

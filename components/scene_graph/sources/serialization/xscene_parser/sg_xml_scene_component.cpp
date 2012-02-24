@@ -24,7 +24,12 @@ class Component
     }
 };
 
-extern "C" common::ComponentRegistrator<Component> XSceneLoader ("scene.loaders.XScene");
+extern "C"
+{
+
+common::ComponentRegistrator<Component> XSceneLoader ("scene.loaders.XScene");
+
+}
 
 }
 

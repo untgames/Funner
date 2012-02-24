@@ -26,5 +26,5 @@ inline T* SceneParserCache::FindValue (const common::ParseNode& decl)
 template <class T>
 inline const T* SceneParserCache::FindValue (const common::ParseNode& decl) const
 {
-  return const_cast<SceneParserCache&> (*this).FindValue (decl);
+  return const_cast<SceneParserCache&> (*this).FindValue<T> (decl);
 }
