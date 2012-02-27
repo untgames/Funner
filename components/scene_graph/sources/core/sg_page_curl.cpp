@@ -65,6 +65,7 @@ struct PageCurl::Impl
 PageCurl::PageCurl ()
   : impl (new Impl)
 {
+  UpdateBoundsNotify ();
 }
 
 PageCurl::~PageCurl ()
@@ -158,6 +159,7 @@ void PageCurl::SetSize (const math::vec2f& size)
   impl->size = size;
 
   UpdateNotify ();
+  UpdateBoundsNotify ();
 }
 
 void PageCurl::SetSize (float width, float height)
@@ -223,6 +225,7 @@ void PageCurl::SetCurlRadius (float curl_radius)
   impl->curl_radius = curl_radius;
 
   UpdateNotify ();
+  UpdateBoundsNotify ();
 }
 
 float PageCurl::CurlRadius () const
@@ -365,6 +368,15 @@ void PageCurl::SetBindingMismatchWeight (float weight)
 float PageCurl::BindingMismatchWeight () const
 {
   return impl->binding_mismatch_weight;
+}
+
+/*
+   Рассчёт ограничивающего объёма
+*/
+
+void PageCurl::UpdateBoundsCore ()
+{
+  SetBoundBox (bound_volumes::axis_aligned_box <float> (-impl->size.x / 2, -impl->size.y / 2, -impl->curl_radius, impl->size.x / 2, impl->size.y / 2, 0));
 }
 
 /*

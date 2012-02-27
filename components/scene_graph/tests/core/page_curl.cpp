@@ -1,5 +1,24 @@
 #include "shared.h"
 
+void dump (const aaboxf& box)
+{
+  printf ("[");
+  dump (box.minimum ());
+  printf (" - ");
+  dump (box.maximum ());
+  printf ("]");
+}
+
+void dump_bounds (const PageCurl& light)
+{
+  printf ("    local=");
+
+  dump (light.BoundBox ());
+  printf ("\n    world=");
+  dump (light.WorldBoundBox ());
+  printf ("\n");
+}
+
 const char* get_mode_name (PageCurlMode mode)
 {
   switch (mode)
@@ -54,6 +73,8 @@ void dump (const PageCurl& curl)
   printf ("  opposite corner shadow grow power %.2f\n",                   curl.OppositeCornerShadowGrowPower ());
   printf ("  find best curl steps              %u\n",                     curl.FindBestCurlSteps ());
   printf ("  binding mismatch weight           %.2f\n",                   curl.BindingMismatchWeight ());
+  printf ("  bounding box:\n");
+  dump_bounds (curl);
 }
 
 int main ()
