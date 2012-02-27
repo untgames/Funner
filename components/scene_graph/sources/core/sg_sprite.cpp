@@ -26,6 +26,7 @@ struct Sprite::Impl
 Sprite::Sprite ()
   : impl (new Impl)
 {
+  SetBoundBox (bound_volumes::axis_aligned_box <float> (-0.5f, -0.5f, 0, 0.5f, 0.5f, 0));
 }
 
 Sprite::~Sprite ()
