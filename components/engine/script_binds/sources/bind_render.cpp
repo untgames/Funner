@@ -156,7 +156,12 @@ void bind_screen_library (Environment& environment)
   lib.Register ("get_BackgroundState", make_invoker (&Screen::BackgroundState));
   lib.Register ("get_Id",              make_invoker (&Screen::Id));
   lib.Register ("get_ViewportsCount",  make_invoker (&Screen::ViewportsCount));
+  lib.Register ("get_Area",            make_invoker (&Screen::Area));
+  lib.Register ("set_Area",            make_invoker (implicit_cast<void (Screen::*) (const Rect&)> (&Screen::SetArea)));
 
+  lib.Register ("SetArea",             make_invoker (implicit_cast<void (Screen::*) (int, int, size_t, size_t)> (&Screen::SetArea)));
+  lib.Register ("SetOrigin",           make_invoker (&Screen::SetOrigin));
+  lib.Register ("SetSize",             make_invoker (&Screen::SetSize));
   lib.Register ("SetBackgroundColor",  make_invoker (make_invoker (implicit_cast<void (Screen::*) (float, float, float, float)> (&Screen::SetBackgroundColor)),
                  make_invoker<void (Screen&, float, float, float)> (bind (implicit_cast<void (Screen::*) (float, float, float, float)> (&Screen::SetBackgroundColor), _1, _2, _3, _4, 0.f))));
   lib.Register ("EnableBackground",    make_invoker (&Screen::EnableBackground));
