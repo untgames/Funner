@@ -624,7 +624,6 @@ TexturePtr Render::CreateTexture (const char* file_name, bool need_alpha, bool& 
         has_alpha = true;
       }
 
-
         //создание текстуры
 
       return TexturePtr (renderer->CreateTexture (image), false);

@@ -234,7 +234,7 @@ void RenderView::Draw ()
 
   RenderViewVisitor visitor (frame, render);
 
-  scene->VisitEach (visitor);
+  scene->VisitEach (camera->Frustum (), visitor);
 
     //добавление кадра на отрисовку
     
