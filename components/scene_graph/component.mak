@@ -52,7 +52,7 @@ SCENE_GRAPH.SERIALIZATION.TESTS.LIB_DIRS         :=
 SCENE_GRAPH.SERIALIZATION.TESTS.LIBS             :=
 SCENE_GRAPH.SERIALIZATION.TESTS.COMPILER_CFLAGS  :=
 SCENE_GRAPH.SERIALIZATION.TESTS.COMPILER_DEFINES := 
-SCENE_GRAPH.SERIALIZATION.TESTS.IMPORTS          := link.scene_graph.core compile.scene_graph.core compile.common link.media.animation.xanim link.scene_graph.xscene
+SCENE_GRAPH.SERIALIZATION.TESTS.IMPORTS          := link.scene_graph.core compile.scene_graph.core compile.common link.media.animation.xanim link.scene_graph.xscene compile.media.rms
 
 #Цель - сборка документации
 SCENE_GRAPH.CORE.INFO.TYPE        := doxygen-info

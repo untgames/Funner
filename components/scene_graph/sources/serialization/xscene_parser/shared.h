@@ -12,6 +12,7 @@
 #include <xtl/shared_ptr.h>
 
 #include <common/component.h>
+#include <common/file.h>
 #include <common/log.h>
 #include <common/parser.h>
 #include <common/property_map.h>
@@ -95,6 +96,11 @@ class XmlSceneParserManagerImpl
 };
 
 typedef common::Singleton<XmlSceneParserManagerImpl> XmlSceneParserManagerSingleton;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Имя корневого узла XML сцен
+///////////////////////////////////////////////////////////////////////////////////////////////////
+extern const char* XSCENE_ROOT;
 
 }
 

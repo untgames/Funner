@@ -272,7 +272,7 @@ Node::Pointer SceneManager::CreateScene (const char* scene_name, SceneContext& c
 
         controllers::ResourceController::Pointer controller = controllers::ResourceController::Create (*root, binding);
 
-        controller->ControllerOwnsNode ();
+        controller->NodeOwnsController ();
 
         return root;
       }

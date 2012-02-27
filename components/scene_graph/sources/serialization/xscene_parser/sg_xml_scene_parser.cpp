@@ -1,24 +1,103 @@
 #include "shared.h"
 
 using namespace scene_graph;
+using namespace common;
 
 /*
     Описание реализации парсера
 */
 
+typedef stl::hash_map<stl::hash_key<const char*>, ParseNode> IncludeMap;
+
 struct XmlSceneParser::Impl
 {
-  common::ParseNode root;      //корневой узел
+  ParseNode root;      //корневой узел
   SceneParserCache  cache;     //кэш парсера
   ResourceGroup     resources; //ресурсы сцены
+  IncludeMap        includes;  //карта подключаемых файлов
   
 ///Конструктор
-  Impl (const common::ParseNode& in_root) : root (in_root) {}
+  Impl (const ParseNode& in_root) : root (in_root) {}
   
-///Построение списка ресурсов
-  void PrepareResources (const common::ParseNode& node)
+///Предварительный разбор
+  void Prepare (const ParseNode& decl)
   {
-    //////???????????????
+    for (Parser::Iterator iter=decl.First (); iter; ++iter)
+    {
+      try
+      {
+        if (!strcmp (iter->Name (), "resource"))
+        {
+          ParseResourceNode (*iter);
+        }
+        else if (!strcmp (iter->Name (), "include"))
+        {
+          PrepareIncludeNode (*iter);
+        }
+      }
+      catch (std::exception& e)
+      {
+        root.Log ().Error (*iter, "%s", e.what ());
+      }
+      catch (...)
+      {
+        root.Log ().Error (*iter, "unknown exception");
+      }
+    }
+  }
+
+///Разбор узла описания ресурсов
+  void ParseResourceNode (const ParseNode& decl)
+  {
+    const char* name = get<const char*> (decl, "name");
+    
+    if (!name)
+      return;      
+      
+    resources.Add (name);
+  }
+  
+///Разбор подключаемого узла
+  void PrepareIncludeNode (const ParseNode& decl)
+  {
+    const char* source_name = get<const char*> (decl, "source");
+
+    bool ignore_unavailability = strcmp (get<const char*> (decl, "ignore_unavailability", "false"), "true") == 0;
+    
+    if (!source_name)
+      return;
+      
+      //попытка найти в списке уже загруженных
+      
+    IncludeMap::iterator iter = includes.find (source_name);
+    
+    if (iter != includes.end ())
+      return;
+
+      //парсинг
+
+    if (!FileSystem::IsFileExist (source_name) && ignore_unavailability)
+      return;
+
+    Parser parser (root.Log (), source_name, "xml");
+    
+    const ParseNode& xscene_root = parser.Root ().First ();
+    
+    if (strcmp (xscene_root.Name (), XSCENE_ROOT))
+      throw xtl::format_operation_exception ("", "Bad XML scene file '%s'. Root node not found", source_name);
+      
+    bool partial = strcmp (get<const char*> (xscene_root, "partial", ""), "true") == 0;
+
+    if (!partial)
+      throw xtl::format_operation_exception ("", "Bad XML scene file '%s'. Only partial definitions are allowed in this context", source_name);            
+
+      //сохранение ссылки на подключаемый файл
+      
+    includes.insert_pair (source_name, xscene_root);
+    
+      //вложенный разбор
+      
+    Prepare (xscene_root);
   }
 };
 
@@ -26,7 +105,7 @@ struct XmlSceneParser::Impl
     Конструктор / деструктор
 */
 
-XmlSceneParser::XmlSceneParser (const common::ParseNode& root)
+XmlSceneParser::XmlSceneParser (const ParseNode& root)
 {
   try
   { 
@@ -36,7 +115,7 @@ XmlSceneParser::XmlSceneParser (const common::ParseNode& root)
     
       //построение списка ресурсов
       
-    impl->PrepareResources (root);
+    impl->Prepare (root);
   }
   catch (xtl::exception& e)
   {
@@ -53,7 +132,7 @@ XmlSceneParser::~XmlSceneParser ()
     Создание парсера
 */
 
-ISceneParser* XmlSceneParser::Create (const common::ParseNode& root)
+ISceneParser* XmlSceneParser::Create (const ParseNode& root)
 {
   try
   {
@@ -96,7 +175,7 @@ void XmlSceneParser::CreateScene (Node& parent, SceneContext& context, const Log
     Корневой узел
 */
 
-const common::ParseNode& XmlSceneParser::Root () const
+const ParseNode& XmlSceneParser::Root () const
 {
   return impl->root;
 }
@@ -114,7 +193,7 @@ SceneParserCache& XmlSceneParser::Cache ()
     Разбор узла
 */
 
-void XmlSceneParser::ParseDispatch (const common::ParseNode& decl, Node& parent)
+void XmlSceneParser::ParseDispatch (const ParseNode& decl, Node& parent)
 {
 }
 
@@ -122,54 +201,54 @@ void XmlSceneParser::ParseDispatch (const common::ParseNode& decl, Node& parent)
     Парсинг
 */
 
-void XmlSceneParser::Parse (const common::ParseNode& decl, Node& parent, SceneContext& context, const LogHandler& log_handler)
+void XmlSceneParser::Parse (const ParseNode& decl, Node& parent, SceneContext& context, const LogHandler& log_handler)
 {
 }
 
-void XmlSceneParser::Parse (const common::ParseNode& decl, Node& node, Node& parent, SceneContext& context)
+void XmlSceneParser::Parse (const ParseNode& decl, Node& node, Node& parent, SceneContext& context)
 {
 }
 
-void XmlSceneParser::Parse (const common::ParseNode& decl, Entity& node, Node& parent, SceneContext& context)
+void XmlSceneParser::Parse (const ParseNode& decl, Entity& node, Node& parent, SceneContext& context)
 {
 }
 
-void XmlSceneParser::Parse (const common::ParseNode& decl, Camera& node, Node& parent, SceneContext& context)
+void XmlSceneParser::Parse (const ParseNode& decl, Camera& node, Node& parent, SceneContext& context)
 {
 }
 
-void XmlSceneParser::Parse (const common::ParseNode& decl, OrthoCamera& node, Node& parent, SceneContext& context)
+void XmlSceneParser::Parse (const ParseNode& decl, OrthoCamera& node, Node& parent, SceneContext& context)
 {
 }
 
-void XmlSceneParser::Parse (const common::ParseNode& decl, PerspectiveCamera& node, Node& parent, SceneContext& context)
+void XmlSceneParser::Parse (const ParseNode& decl, PerspectiveCamera& node, Node& parent, SceneContext& context)
 {
 }
 
-void XmlSceneParser::Parse (const common::ParseNode& decl, Light& node, Node& parent, SceneContext& context)
+void XmlSceneParser::Parse (const ParseNode& decl, Light& node, Node& parent, SceneContext& context)
 {
 }
 
-void XmlSceneParser::Parse (const common::ParseNode& decl, DirectLight& node, Node& parent, SceneContext& context)
+void XmlSceneParser::Parse (const ParseNode& decl, DirectLight& node, Node& parent, SceneContext& context)
 {
 }
 
-void XmlSceneParser::Parse (const common::ParseNode& decl, SpotLight& node, Node& parent, SceneContext& context)
+void XmlSceneParser::Parse (const ParseNode& decl, SpotLight& node, Node& parent, SceneContext& context)
 {
 }
 
-void XmlSceneParser::Parse (const common::ParseNode& decl, PointLight& node, Node& parent, SceneContext& context)
+void XmlSceneParser::Parse (const ParseNode& decl, PointLight& node, Node& parent, SceneContext& context)
 {
 }
 
-void XmlSceneParser::Parse (const common::ParseNode& decl, VisualModel& node, Node& parent, SceneContext& context)
+void XmlSceneParser::Parse (const ParseNode& decl, VisualModel& node, Node& parent, SceneContext& context)
 {
 }
 
-void XmlSceneParser::Parse (const common::ParseNode& decl, TextLine& node, Node& parent, SceneContext& context)
+void XmlSceneParser::Parse (const ParseNode& decl, TextLine& node, Node& parent, SceneContext& context)
 {
 }
 
-void XmlSceneParser::Parse (const common::ParseNode& decl, Sprite& node, Node& parent, SceneContext& context)
+void XmlSceneParser::Parse (const ParseNode& decl, Sprite& node, Node& parent, SceneContext& context)
 {
 }

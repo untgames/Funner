@@ -2,7 +2,7 @@
 
 using namespace scene_graph;
 
-namespace
+namespace scene_graph
 {
 
 /*
@@ -10,7 +10,17 @@ namespace
 */
 
 const char* XSCENE_ROOT = "xscene"; //имя корневого узла XML сцен
-const char* LOG_NAME    = "scene";  //имя потока протоколирования
+
+}
+
+namespace
+{
+
+/*
+    Константы
+*/
+
+const char* LOG_NAME = "scene";  //имя потока протоколирования
 
 /*
     Дескриптор сцены
@@ -66,7 +76,12 @@ XmlSceneFactory::XmlSceneFactory (const char* file_name, const LogHandler& log_h
     const common::ParseNode& xscene_root = parser.Root ().First ();
     
     if (strcmp (xscene_root.Name (), XSCENE_ROOT))
-      throw xtl::format_operation_exception ("", "Bad XML scene file '%s' root node not found", XSCENE_ROOT);      
+      throw xtl::format_operation_exception ("", "Bad XML scene file '%s'. Root node not found", file_name);
+      
+    bool partial = strcmp (common::get<const char*> (xscene_root, "partial", "false"), "true") == 0;
+    
+    if (partial)
+      throw xtl::format_operation_exception ("", "Bad XML scene file '%s'. Partial definitions not allowed in this context", file_name);
 
     for (common::Parser::NamesakeIterator iter=xscene_root.First ("scene"); iter; ++iter)
     {
@@ -115,9 +130,9 @@ XmlSceneFactory::XmlSceneFactory (const char* file_name, const LogHandler& log_h
     parser.Log ().Print (log_handler);     
     
       //проверка ошибок
-      
+
     if (parser.Log ().HasErrors ())
-      throw xtl::format_operation_exception ("", "Can't parse scene file '%s'", file_name);
+      throw xtl::format_operation_exception ("", "Scene file '%s' has bad format. Can't parse", file_name);
   }
   catch (xtl::exception& e)
   {
@@ -158,7 +173,7 @@ void XmlSceneFactory::CreateScene (const char* name, Node& parent, SceneContext&
 {
   try
   {
-    if (name)
+    if (!name)
       throw xtl::make_null_argument_exception ("", "name");
       
     SceneDescMap::iterator iter = impl->scenes.find (name);

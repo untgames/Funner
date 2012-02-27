@@ -1,0 +1,7 @@
+Results of xscene1_test:
+MyServer::PrefetchResource(1)
+MyServer::PrefetchResource(2)
+MyServer::LoadResource(1)
+MyServer::LoadResource(2)
+MyServer::UnloadResource(2)
+MyServer::UnloadResource(1)
