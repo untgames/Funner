@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xscene>
+  <scene id="scene1" version="1.0">
+    <include source="data/include1.xscene"/>
+  </scene>
+  <scene id="scene2" version="1.0">
+  </scene>
+</xscene>

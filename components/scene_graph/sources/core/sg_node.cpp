@@ -5,40 +5,11 @@ using namespace math;
 using namespace common;
 
 /*
-    Вспомогательные структуры
-*/
-
-namespace
-{
-
-const char* LOG_NAME = "scene_graph.Node";
-
-const bool DEFAULT_SCALE_PIVOT_ENABLED       = true; //значение по умолчанию для использования центра масштабирования
-const bool DEFAULT_ORIENTATION_PIVOT_ENABLED = true; //значение по умолчанию для использования центра поворотов
-
-///центр объекта
-struct Pivot
-{
-  bool  pivot_enabled;                          //включён ли центр
-  bool  need_local_position_after_pivot_update; //необходимо обновлять локальное положение с учётом центра
-  bool  orientation_pivot_enabled;              //включён центр поворотов
-  bool  scale_pivot_enabled;                    //включён центр масштабирования
-  vec3f pivot_position;                         //локальное положение центра
-  vec3f local_position_after_pivot;             //локальное положение с учётом центра
-  vec3f world_position_after_pivot;             //мировое положение с учётом центра
-  
-  Pivot ()
-    : pivot_enabled (false)
-    , need_local_position_after_pivot_update (false)
-    , orientation_pivot_enabled (DEFAULT_ORIENTATION_PIVOT_ENABLED)
-    , scale_pivot_enabled (DEFAULT_SCALE_PIVOT_ENABLED)
-  {
-  }
-};
-
-/*
     Композиция аффинных преобразований
 */
+
+namespace scene_graph
+{
 
 //композиция преобразований
 void affine_compose (const vec3f& position, const quatf& orientation, const vec3f& scale, mat4f& tm)
@@ -94,6 +65,40 @@ void affine_decompose (const math::mat4f& matrix, math::vec3f& position, math::q
   
   rotation = normalize (to_quat (m));
 }
+
+}
+
+/*
+    Вспомогательные структуры
+*/
+
+namespace
+{
+
+const char* LOG_NAME = "scene_graph.Node";
+
+const bool DEFAULT_SCALE_PIVOT_ENABLED       = true; //значение по умолчанию для использования центра масштабирования
+const bool DEFAULT_ORIENTATION_PIVOT_ENABLED = true; //значение по умолчанию для использования центра поворотов
+
+///центр объекта
+struct Pivot
+{
+  bool  pivot_enabled;                          //включён ли центр
+  bool  need_local_position_after_pivot_update; //необходимо обновлять локальное положение с учётом центра
+  bool  orientation_pivot_enabled;              //включён центр поворотов
+  bool  scale_pivot_enabled;                    //включён центр масштабирования
+  vec3f pivot_position;                         //локальное положение центра
+  vec3f local_position_after_pivot;             //локальное положение с учётом центра
+  vec3f world_position_after_pivot;             //мировое положение с учётом центра
+  
+  Pivot ()
+    : pivot_enabled (false)
+    , need_local_position_after_pivot_update (false)
+    , orientation_pivot_enabled (DEFAULT_ORIENTATION_PIVOT_ENABLED)
+    , scale_pivot_enabled (DEFAULT_SCALE_PIVOT_ENABLED)
+  {
+  }
+};
 
 void set_local_tm (Node* node, const math::mat4f& tm)
 {

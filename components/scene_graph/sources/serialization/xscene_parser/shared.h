@@ -10,6 +10,9 @@
 #include <xtl/reference_counter.h>
 #include <xtl/signal.h>
 #include <xtl/shared_ptr.h>
+#include <xtl/token_iterator.h>
+
+#include <math/utility.h>
 
 #include <common/component.h>
 #include <common/file.h>
@@ -21,8 +24,15 @@
 
 #include <media/rms/manager.h>
 
+#include <sg/camera.h>
+#include <sg/light.h>
+#include <sg/listener.h>
 #include <sg/scene_manager.h>
 #include <sg/scene_parser.h>
+#include <sg/sound_emitter.h>
+#include <sg/sprite.h>
+#include <sg/text_line.h>
+#include <sg/visual_model.h>
 
 namespace scene_graph
 {

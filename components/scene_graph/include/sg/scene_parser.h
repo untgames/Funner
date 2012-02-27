@@ -26,6 +26,8 @@ class PointLight;
 class VisualModel;
 class Sprite;
 class TextLine;
+class Listener;
+class SoundEmitter;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Интерфейс парсера сцен
@@ -137,28 +139,52 @@ class XmlSceneParser: public ISceneParser
 ///Кэш
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     SceneParserCache& Cache ();
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Разбор узла
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    virtual void ParseDispatch (const common::ParseNode& decl, Node& parent);
           
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Парсинг
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void Parse (const common::ParseNode& decl, Node& parent, SceneContext& context, const LogHandler& log_handler);
+    void Parse (const common::ParseNode& decl, Node& node, SceneContext& context);
     void Parse (const common::ParseNode& decl, Node& node, Node& parent, SceneContext& context);
     void Parse (const common::ParseNode& decl, Entity& node, Node& parent, SceneContext& context);
     void Parse (const common::ParseNode& decl, Camera& node, Node& parent, SceneContext& context);
     void Parse (const common::ParseNode& decl, OrthoCamera& node, Node& parent, SceneContext& context);
     void Parse (const common::ParseNode& decl, PerspectiveCamera& node, Node& parent, SceneContext& context);
     void Parse (const common::ParseNode& decl, Light& node, Node& parent, SceneContext& context);
+    void Parse (const common::ParseNode& decl, Listener& node, Node& parent, SceneContext& context);
+    void Parse (const common::ParseNode& decl, SoundEmitter& node, Node& parent, SceneContext& context);    
     void Parse (const common::ParseNode& decl, DirectLight& node, Node& parent, SceneContext& context);
     void Parse (const common::ParseNode& decl, SpotLight& node, Node& parent, SceneContext& context);
     void Parse (const common::ParseNode& decl, PointLight& node, Node& parent, SceneContext& context);
     void Parse (const common::ParseNode& decl, VisualModel& node, Node& parent, SceneContext& context);
     void Parse (const common::ParseNode& decl, TextLine& node, Node& parent, SceneContext& context);
     void Parse (const common::ParseNode& decl, Sprite& node, Node& parent, SceneContext& context);
+    
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Разбор атрибутов
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    static void ParseAttribute (const common::ParseNode& decl, const char* name, math::vec2f&);
+    static void ParseAttribute (const common::ParseNode& decl, const char* name, math::vec3f&);
+    static void ParseAttribute (const common::ParseNode& decl, const char* name, math::vec4f&);
+    static void ParseAttribute (const common::ParseNode& decl, const char* name, math::mat2f&);
+    static void ParseAttribute (const common::ParseNode& decl, const char* name, math::mat3f&);
+    static void ParseAttribute (const common::ParseNode& decl, const char* name, math::mat4f&);    
+    static void ParseAttribute (const common::ParseNode& decl, const char* name, math::quatf&);
+    static void ParseAttribute (const common::ParseNode& decl, const char* name, size_t size, float* value);
+    
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Регистрация парсера узла определенного типа
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    typedef xtl::function<void (const common::ParseNode& decl, Node& parent, SceneContext& context)> ParseHandler;
+
+    void RegisterParser       (const char* type, const ParseHandler& handler);
+    void UnregisterParser     (const char* type);
+    void UnregisterAllParsers ();
+
+  private:
+    template <class T> void CreateNode (const common::ParseNode& decl, Node& parent, SceneContext& context);
+    template <>        void CreateNode<SoundEmitter> (const common::ParseNode& decl, Node& parent, SceneContext& context);
+
+    void IncludeSubscene (const common::ParseNode& decl, Node& parent, SceneContext& context);
 
   private:
     struct Impl;
