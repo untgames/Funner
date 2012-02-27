@@ -104,7 +104,7 @@ FboRenderBuffer::FboRenderBuffer (const FrameBufferManagerPtr& manager, const Te
   
   if (desc.format == PixelFormat_D24S8)
   {
-    if (!GetCaps ().has_ext_packed_depth_stencil)
+    if (!caps.has_ext_packed_depth_stencil)
       throw xtl::format_not_supported_exception (METHOD_NAME, "Unsupported render buffer desc.format=%s (GL_EXT_packed_depth_stencil not supported)", get_name (desc.format));
   }
   
@@ -126,7 +126,7 @@ FboRenderBuffer::FboRenderBuffer (const FrameBufferManagerPtr& manager, const Te
   }
   catch (...)
   {
-    if (render_buffer_id) GetCaps ().glDeleteRenderbuffers_fn (1, &render_buffer_id);
+    if (render_buffer_id) caps.glDeleteRenderbuffers_fn (1, &render_buffer_id);
   }
 }
 
