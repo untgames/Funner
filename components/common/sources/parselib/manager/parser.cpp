@@ -10,16 +10,10 @@ struct Parser::Impl
 {
   ParseLog  log;  //протокол разбора
   ParseNode root; //корень дерева разбора
-};
-
-/*
-     онструкторы / деструктор
-*/
-
-Parser::Parser (const char* file_name, const char* format)
-  : impl (new Impl)
-{
-  try
+  
+/// онструкторы
+  Impl (ParseLog in_log, const char* file_name, const char* format)
+    : log (in_log)
   {
       //проверка корректности аргументов
 
@@ -39,28 +33,20 @@ Parser::Parser (const char* file_name, const char* format)
     {
         //разбор    
 
-      impl->root = parse (impl->log, format, file_name, parse_buffer.size () + 1, &parse_buffer [0]);
+      root = parse (log, format, file_name, parse_buffer.size () + 1, &parse_buffer [0]);
     }
     catch (std::exception& exception)
     {
-      impl->log.FatalError ("exception: %s", exception.what ());
+      log.FatalError ("exception: %s", exception.what ());
     }
     catch (...)
     {
-      impl->log.FatalError ("unknown exception");
-    }    
+      log.FatalError ("unknown exception");
+    }
   }
-  catch (xtl::exception& exception)
-  {
-    exception.touch ("common::Parser::Parser(const char*, const char*)");
-    throw;
-  }  
-}
-
-Parser::Parser (const char* name, size_t buffer_size, const char* buffer, const char* format)
-  : impl (new Impl)
-{
-  try
+  
+  Impl (ParseLog in_log, const char* name, size_t buffer_size, const char* buffer, const char* format)
+    : log (in_log)
   {
       //проверка корректности аргументов
 
@@ -72,7 +58,7 @@ Parser::Parser (const char* name, size_t buffer_size, const char* buffer, const 
 
     if (!format)
       throw xtl::make_null_argument_exception ("", "format");
-      
+
         //копирование буфера
 
     stl::string parse_buffer (buffer, buffer_size);    
@@ -81,20 +67,75 @@ Parser::Parser (const char* name, size_t buffer_size, const char* buffer, const 
     {    
         //разбор
 
-      impl->root = parse (impl->log, format, name, parse_buffer.size () + 1, &parse_buffer [0]);
+      root = parse (log, format, name, parse_buffer.size () + 1, &parse_buffer [0]);
     }
     catch (std::exception& exception)
     {
-      impl->log.FatalError ("exception: %s", exception.what ());
+      log.FatalError ("exception: %s", exception.what ());
     }
     catch (...)
     {
-      impl->log.FatalError ("unknown exception");
-    }
+      log.FatalError ("unknown exception");
+    }    
+  }  
+};
+
+/*
+     онструкторы / деструктор
+*/
+
+Parser::Parser (const char* file_name, const char* format)
+{
+  try
+  {
+    ParseLog log;
+    
+    impl = new Impl (log, file_name, format);
+  }
+  catch (xtl::exception& exception)
+  {
+    exception.touch ("common::Parser::Parser(const char*, const char*)");
+    throw;
+  }  
+}
+
+Parser::Parser (const char* name, size_t buffer_size, const char* buffer, const char* format)
+{
+  try
+  {
+    ParseLog log;
+    
+    impl = new Impl (log, name, buffer_size, buffer, format);
   }
   catch (xtl::exception& exception)
   {
     exception.touch ("common::Parser::Parser(const char*, size_t, const char*, const char*)");
+    throw;
+  }
+}
+
+Parser::Parser (ParseLog& log, const char* file_name, const char* format)
+{
+  try
+  {
+    impl = new Impl (log, file_name, format);
+  }
+  catch (xtl::exception& exception)
+  {
+    exception.touch ("common::Parser::Parser(ParseLog&, const char*, const char*)");
+    throw;
+  }  
+}
+
+Parser::Parser (ParseLog& log, const char* name, size_t buffer_size, const char* buffer, const char* format)
+{
+  try
+  {
+    impl = new Impl (log, name, buffer_size, buffer, format);
+  }
+  catch (xtl::exception& exception)
+  {
+    exception.touch ("common::Parser::Parser(ParseLog&, const char*, size_t, const char*, const char*)");
     throw;
   }
 }

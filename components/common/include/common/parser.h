@@ -111,6 +111,8 @@ class Parser
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     Parser  (const char* file_name, const char* format = "auto");
     Parser  (const char* name, size_t buffer_size, const char* buffer, const char* format = "auto");
+    Parser  (ParseLog& log, const char* file_name, const char* format = "auto");
+    Parser  (ParseLog& log, const char* name, size_t buffer_size, const char* buffer, const char* format = "auto");    
     ~Parser ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
