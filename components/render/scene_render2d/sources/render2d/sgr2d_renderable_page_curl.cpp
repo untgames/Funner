@@ -432,7 +432,7 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
 
     program_parameters.view_matrix       = math::translate (-view_point);
     program_parameters.projection_matrix = projection;
-    program_parameters.object_matrix     = page_curl->WorldTM () * math::scale (math::vec3f (1, 1, -1));
+    program_parameters.object_matrix     = page_curl->WorldTM () * math::scale (math::vec3f (1, 1, -1)) * math::translate (math::vec3f (-page_curl->Size ().x / 2, -page_curl->Size ().y / 2, 0));
 
     constant_buffer->SetData (0, sizeof (program_parameters), &program_parameters);
 
@@ -882,7 +882,7 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
 
       program_parameters.view_matrix       = math::translate (-view_point);
       program_parameters.projection_matrix = projection;
-      program_parameters.object_matrix     = page_curl->WorldTM () * math::scale (math::vec3f (1, 1, -1)) * math::translate (math::vec3f (page_size.x, 0, 0));
+      program_parameters.object_matrix     = page_curl->WorldTM () * math::scale (math::vec3f (1, 1, -1)) * math::translate (math::vec3f (page_size.x, 0, 0)) * math::translate (math::vec3f (-page_curl->Size ().x / 2, -page_curl->Size ().y / 2, 0));
 
       constant_buffer->SetData (0, sizeof (program_parameters), &program_parameters);
     }
@@ -924,7 +924,7 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
 
       program_parameters.view_matrix       = math::translate (-view_point);
       program_parameters.projection_matrix = projection;
-      program_parameters.object_matrix     = page_curl->WorldTM () * math::scale (math::vec3f (1, 1, -1));
+      program_parameters.object_matrix     = page_curl->WorldTM () * math::scale (math::vec3f (1, 1, -1)) * math::translate (math::vec3f (-page_curl->Size ().x / 2, -page_curl->Size ().y / 2, 0));
 
       constant_buffer->SetData (0, sizeof (program_parameters), &program_parameters);
     }
@@ -990,7 +990,7 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
 
       program_parameters.view_matrix       = math::translate (-view_point);
       program_parameters.projection_matrix = projection;
-      program_parameters.object_matrix     = page_curl->WorldTM () * math::scale (math::vec3f (1, 1, -1)) * math::translate (math::vec3f (page_size.x, 0, 0));
+      program_parameters.object_matrix     = page_curl->WorldTM () * math::scale (math::vec3f (1, 1, -1)) * math::translate (math::vec3f (page_size.x, 0, 0)) * math::translate (math::vec3f (-page_curl->Size ().x / 2, -page_curl->Size ().y / 2, 0));
 
       constant_buffer->SetData (0, sizeof (program_parameters), &program_parameters);
     }
@@ -1032,7 +1032,7 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
 
       program_parameters.view_matrix       = math::translate (-view_point);
       program_parameters.projection_matrix = projection;
-      program_parameters.object_matrix     = page_curl->WorldTM () * math::scale (math::vec3f (1, 1, -1));
+      program_parameters.object_matrix     = page_curl->WorldTM () * math::scale (math::vec3f (1, 1, -1)) * math::translate (math::vec3f (-page_curl->Size ().x / 2, -page_curl->Size ().y / 2, 0));
 
       constant_buffer->SetData (0, sizeof (program_parameters), &program_parameters);
     }

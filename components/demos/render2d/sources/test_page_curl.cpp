@@ -28,7 +28,7 @@ struct Test
     curl->SetSize               (2.f, 1.5f);
     curl->SetGridSize           (100, 100);
     curl->SetMode               (PageCurlMode_DoublePageDoubleMaterial);
-    curl->SetCurlCorner         (PageCurlCorner_RightBottom);
+    curl->SetCurlCorner         (PageCurlCorner_RightTop);
     curl->SetCurlRadius         (0.1f);
     curl->SetPageMaterial       (PageCurlPageType_BackLeft,   "page1");
     curl->SetPageMaterial       (PageCurlPageType_BackRight,  "page2");
@@ -36,7 +36,6 @@ struct Test
     curl->SetPageMaterial       (PageCurlPageType_FrontRight, "page4");
     curl->SetShadowMaterial     ("page_shadow");
     curl->SetCornerShadowOffset (0.1f);
-    curl->SetPosition           (-1.f, -0.75f, 0.f);
     curl->SetCornerPosition     (0.1f, 0.1f);
 
     curl->BindToScene (scene);
@@ -111,7 +110,12 @@ struct Test
     float width  = (float)(client_rect.right - client_rect.left),
           height = (float)(client_rect.bottom - client_rect.top);
 
-    curl->SetCornerPosition (CAMERA_LEFT + context.cursor_position.x / width * (CAMERA_RIGHT - CAMERA_LEFT) - curl->Position ().x, CAMERA_BOTTOM + (1 - context.cursor_position.y / height) * (CAMERA_TOP - CAMERA_BOTTOM) - curl->Position ().y);
+    math::vec3f corner_position = math::vec3f (CAMERA_LEFT + context.cursor_position.x / width * (CAMERA_RIGHT - CAMERA_LEFT), CAMERA_BOTTOM + (1 - context.cursor_position.y / height) * (CAMERA_TOP - CAMERA_BOTTOM), 0) * math::inverse (curl->WorldTM ());
+
+   corner_position.x += curl->Size ().x / 2;
+   corner_position.y += curl->Size ().y / 2;
+
+    curl->SetCornerPosition (corner_position.x, corner_position.y);
 
 //    printf ("Corner position = %f %f\n", curl->CornerPosition ().x, curl->CornerPosition ().y);
   }
