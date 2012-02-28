@@ -449,10 +449,12 @@ struct RenderTargetManager::Impl: public ContextObject, public RenderTargetManag
         }
         
           //настройка области отсечения
-          
+
+        bool current_scissor_state = GetContextCacheValue (CacheEntry_ScissorEnable);
+
         if (clear_flags & ClearFlag_ViewportOnly)
         {          
-          if (!GetContextCacheValue (CacheEntry_ScissorEnable))
+          if (!current_scissor_state)
           {
             glEnable (GL_SCISSOR_TEST);
 
@@ -472,6 +474,13 @@ struct RenderTargetManager::Impl: public ContextObject, public RenderTargetManag
         }
         else
         {
+          if (current_scissor_state)
+          {
+            glDisable (GL_SCISSOR_TEST);
+
+            need_restore_scissor_test = true;
+          }
+
             //оповещение об обновлении буферов рендеринга          
 
           GetCurrentFrameBuffer ().InvalidateRenderTargets ();
@@ -503,7 +512,8 @@ struct RenderTargetManager::Impl: public ContextObject, public RenderTargetManag
 
         if (need_restore_scissor_test)
         {
-          glDisable (GL_SCISSOR_TEST);
+          if (current_scissor_state) glEnable (GL_SCISSOR_TEST);
+          else                       glDisable (GL_SCISSOR_TEST);
         }
 
         CheckErrors ("glClear");
