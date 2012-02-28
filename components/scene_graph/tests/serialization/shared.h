@@ -6,6 +6,7 @@
 #include <xtl/function.h>
 
 #include <common/property_map.h>
+#include <common/property_binding_map.h>
 
 #include <media/rms/manager.h>
 
@@ -77,17 +78,22 @@ inline void dump_scale (Node& node)
   dump   (node.WorldScale ());
 }
 
+inline void dump_properties (const common::PropertyMap& properties)
+{
+  for (size_t i=0, count=properties.Size (); i<count; i++)
+  {  
+    stl::string value;
+    
+    properties.GetProperty (i, value);
+    
+    printf ("    %s %s='%s'\n", get_name (properties.PropertyType (i)), properties.PropertyName (i), value.c_str ());
+  }
+}
+
 inline void dump_node (Node& node)
 {
   printf ("node '%s':\n", node.Name ());
   printf ("  parent: '%s'\n", node.Parent () ? node.Parent ()->Name () : "");
-  printf ("  position: ");
-  dump_position (node);
-  printf ("\n  rotation: ");
-  dump_orientation (node);
-  printf ("\n  scale: ");
-  dump_scale (node);
-  printf ("\n");
   
   if (node.Properties ())
   {
@@ -95,15 +101,12 @@ inline void dump_node (Node& node)
     
     printf ("  properties:\n");
     
-    for (size_t i=0, count=properties.Size (); i<count; i++)
-    {  
-      stl::string value;
-      
-      properties.GetProperty (i, value);
-      
-      printf ("    name='%s', type=%s, value='%s'\n", properties.PropertyName (i), get_name (properties.PropertyType (i)), value.c_str ());
-    }    
+    dump_properties (properties);
   }
+  
+  printf ("  bindings:\n");
+  
+  dump_properties (node.PropertyBindings ().CreatePropertyMap ());
 }
 
 }

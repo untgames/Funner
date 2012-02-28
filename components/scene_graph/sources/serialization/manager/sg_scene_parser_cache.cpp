@@ -14,14 +14,20 @@ typedef xtl::shared_ptr<ISceneAttachment> AttachmentPtr;
 
 struct CacheValue: public xtl::reference_counter
 {
-  AttachmentPtr     attachment;
-  common::ParseNode decl;
+  AttachmentPtr         attachment;
+  const std::type_info* type;
+  common::ParseNode     decl;
 
-  CacheValue (const AttachmentPtr& in_attachment, const common::ParseNode& in_decl) : attachment (in_attachment), decl (in_decl) {}
+  CacheValue (const AttachmentPtr& in_attachment, const common::ParseNode& in_decl)
+    : attachment (in_attachment)
+    , type (&in_attachment->ValueType ())
+    , decl (in_decl) 
+  {
+  }
 };
 
-typedef xtl::intrusive_ptr<CacheValue>       CacheValuePtr;
-typedef stl::hash_map<size_t, CacheValuePtr> CacheMap;
+typedef xtl::intrusive_ptr<CacheValue>            CacheValuePtr;
+typedef stl::hash_multimap<size_t, CacheValuePtr> CacheMap;
 
 }
 
@@ -68,15 +74,18 @@ void SceneParserCache::SetValueCore (const common::ParseNode& decl, detail::ISce
 
   AttachmentPtr attachment (in_attachment);
   
-  CacheMap::iterator iter = impl->cache.find (decl.Id ());
+  const std::type_info* type = &attachment->ValueType ();
   
-  if (iter != impl->cache.end ())
-  {
-    iter->second->attachment = attachment;
-    
-    return;
-  }
+  stl::pair<CacheMap::iterator, CacheMap::iterator> range = impl->cache.equal_range (decl.Id ());
   
+  for (;range.first != range.second; ++range.first)
+    if (range.first->second->type == type)
+    {
+      range.first->second->attachment = attachment;
+
+      return;      
+    }
+
   CacheValuePtr value (new CacheValue (attachment, decl), false);
   
   impl->cache.insert_pair (decl.Id (), value);
@@ -95,14 +104,15 @@ void SceneParserCache::ResetValue (const common::ParseNode& decl)
     Поиск значения
 */
 
-ISceneAttachment* SceneParserCache::FindValueCore (const common::ParseNode& decl) const
+ISceneAttachment* SceneParserCache::FindValueCore (const common::ParseNode& decl, const std::type_info& type) const
 {
-  CacheMap::iterator iter = impl->cache.find (decl.Id ());
+  stl::pair<CacheMap::iterator, CacheMap::iterator> range = impl->cache.equal_range (decl.Id ());
   
-  if (iter == impl->cache.end ())
-    return 0;
-    
-  return &*iter->second->attachment;
+  for (;range.first != range.second; ++range.first)
+    if (range.first->second->type == &type)
+      return &*range.first->second->attachment;
+
+  return 0;
 }
 
 /*

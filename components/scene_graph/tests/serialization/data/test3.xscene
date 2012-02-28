@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xscene>
+  <scene id="scene3" version="1.0">
+    <ortho_camera id="ortho_camera" left="-10" right="10" top="10" bottom="-10" znear="-10" zfar="10"/>
+    <perspective_camera id="perspective_camera" fov_x="90" znear="-10" zfar="10"/>
+  </scene>
+</xscene>

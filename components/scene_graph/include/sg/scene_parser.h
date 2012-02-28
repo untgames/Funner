@@ -91,7 +91,7 @@ class SceneParserCache
 
   private:
     void                      SetValueCore  (const common::ParseNode&, detail::ISceneAttachment*);
-    detail::ISceneAttachment* FindValueCore (const common::ParseNode&) const;
+    detail::ISceneAttachment* FindValueCore (const common::ParseNode&, const std::type_info&) const;
 
   private:
     struct Impl;

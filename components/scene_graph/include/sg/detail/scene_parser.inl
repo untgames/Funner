@@ -15,9 +15,9 @@ inline void SceneParserCache::SetValue (const common::ParseNode& decl, const T& 
 template <class T>
 inline T* SceneParserCache::FindValue (const common::ParseNode& decl)
 {
-  detail::ISceneAttachment* attachment = FindValueCore (decl);
+  detail::ISceneAttachment* attachment = FindValueCore (decl, typeid (typename detail::SceneAttachmentType<T>::Type));
   
-  if (attachment && &typeid (typename detail::SceneAttachmentType<T>::Type) == &attachment->ValueType ())
+  if (attachment)
     return &static_cast<detail::SceneAttachmentImpl<typename detail::SceneAttachmentType<T>::Type>*> (attachment)->Value ();
 
   return 0;

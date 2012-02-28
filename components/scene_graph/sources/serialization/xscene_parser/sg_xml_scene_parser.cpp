@@ -635,10 +635,57 @@ struct NodeDecl: public xtl::reference_counter
     : is_world_transform (false)
     , scale (1.0f)
   {
+  }  
+};
+
+///Параметр объекта
+template <class T> struct Param
+{
+  T    value;
+  bool state;
+  
+  Param () : value (), state () {}
+  
+  void Parse (const ParseNode& node, const char* name)
+  {
+    ParseNode child = node.First (name);
+    
+    if (!child)
+    {
+      state = false;
+      return;
+    }
+
+    value = get<T> (child, "");
+
+    state = true;
   }
 };
 
-typedef xtl::intrusive_ptr<NodeDecl> NodeDeclPtr;
+///Описание параметров камеры
+struct OrthoCameraDecl: public xtl::reference_counter
+{
+  enum ParamId
+  {
+    Left, Right, Top, Bottom, ZNear, ZFar, Param_Num
+  };  
+  
+  Param<float> params [Param_Num];
+};
+
+struct PerspectiveCameraDecl: public xtl::reference_counter
+{
+  enum ParamId
+  {
+    FovX, FovY, ZNear, ZFar, Param_Num
+  };  
+  
+  Param<float> params [Param_Num];
+};
+
+typedef xtl::intrusive_ptr<NodeDecl>              NodeDeclPtr;
+typedef xtl::intrusive_ptr<OrthoCameraDecl>       OrthoCameraDeclPtr;
+typedef xtl::intrusive_ptr<PerspectiveCameraDecl> PerspectiveCameraDeclPtr;
 
 PropertyType get_property_type (common::ParseNode& node)
 {
@@ -861,8 +908,39 @@ void XmlSceneParser::Parse (const ParseNode& decl, Camera& node, Node& parent, S
 void XmlSceneParser::Parse (const ParseNode& decl, OrthoCamera& node, Node& parent, SceneContext& context)
 {
   try
-  {
-    Parse (decl, static_cast<Camera&> (node), parent, context);    
+  { 
+      //попытка найти параметры в кеше
+      
+    OrthoCameraDeclPtr node_decl;
+
+    if (OrthoCameraDeclPtr* node_decl_ptr = impl->cache.FindValue<OrthoCameraDeclPtr> (decl))
+    {
+      node_decl = *node_decl_ptr;
+    }
+    else
+    {
+      node_decl = xtl::intrusive_ptr<OrthoCameraDecl> (new OrthoCameraDecl, false);
+      
+      node_decl->params [OrthoCameraDecl::Left].Parse (decl, "left");
+      node_decl->params [OrthoCameraDecl::Right].Parse (decl, "right");
+      node_decl->params [OrthoCameraDecl::Top].Parse (decl, "top");
+      node_decl->params [OrthoCameraDecl::Bottom].Parse (decl, "bottom");
+      node_decl->params [OrthoCameraDecl::ZNear].Parse (decl, "znear");
+      node_decl->params [OrthoCameraDecl::ZFar].Parse (decl, "zfar");
+    }
+
+      //настройка камеры
+      
+    if (node_decl->params [OrthoCameraDecl::Left].state)    node.SetLeft (node_decl->params [OrthoCameraDecl::Left].value);
+    if (node_decl->params [OrthoCameraDecl::Right].state)   node.SetRight (node_decl->params [OrthoCameraDecl::Right].value);
+    if (node_decl->params [OrthoCameraDecl::Top].state)     node.SetTop (node_decl->params [OrthoCameraDecl::Top].value);
+    if (node_decl->params [OrthoCameraDecl::Bottom].state)  node.SetBottom (node_decl->params [OrthoCameraDecl::Bottom].value);
+    if (node_decl->params [OrthoCameraDecl::ZNear].state)   node.SetZNear (node_decl->params [OrthoCameraDecl::ZNear].value);
+    if (node_decl->params [OrthoCameraDecl::ZFar].state)    node.SetZFar (node_decl->params [OrthoCameraDecl::ZFar].value);
+
+      //разбор родительских параметров
+    
+    Parse (decl, static_cast<Camera&> (node), parent, context);
   }
   catch (xtl::exception& e)
   {
@@ -875,6 +953,33 @@ void XmlSceneParser::Parse (const ParseNode& decl, PerspectiveCamera& node, Node
 {
   try
   {
+      //попытка найти параметры в кеше
+      
+    PerspectiveCameraDeclPtr node_decl;
+
+    if (PerspectiveCameraDeclPtr* node_decl_ptr = impl->cache.FindValue<PerspectiveCameraDeclPtr> (decl))
+    {
+      node_decl = *node_decl_ptr;
+    }
+    else
+    {
+      node_decl = xtl::intrusive_ptr<PerspectiveCameraDecl> (new PerspectiveCameraDecl, false);
+
+      node_decl->params [PerspectiveCameraDecl::FovX].Parse (decl, "fov_x");
+      node_decl->params [PerspectiveCameraDecl::FovY].Parse (decl, "fov_y");
+      node_decl->params [PerspectiveCameraDecl::ZNear].Parse (decl, "znear");
+      node_decl->params [PerspectiveCameraDecl::ZFar].Parse (decl, "zfar");
+    }
+    
+      //настройка камеры
+      
+    if (node_decl->params [PerspectiveCameraDecl::FovX].state)  node.SetFovX (degree (node_decl->params [PerspectiveCameraDecl::FovX].value));
+    if (node_decl->params [PerspectiveCameraDecl::FovY].state)  node.SetFovY (degree (node_decl->params [PerspectiveCameraDecl::FovY].value)); 
+    if (node_decl->params [PerspectiveCameraDecl::ZNear].state) node.SetZNear (node_decl->params [PerspectiveCameraDecl::ZNear].value);
+    if (node_decl->params [PerspectiveCameraDecl::ZFar].state)  node.SetZFar (node_decl->params [PerspectiveCameraDecl::ZFar].value);
+
+      //разбор родительских параметров
+
     Parse (decl, static_cast<Camera&> (node), parent, context);    
   }
   catch (xtl::exception& e)
