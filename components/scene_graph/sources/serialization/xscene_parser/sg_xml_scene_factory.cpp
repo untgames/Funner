@@ -17,12 +17,6 @@ namespace
 {
 
 /*
-    Константы
-*/
-
-const char* LOG_NAME = "scene";  //имя потока протоколирования
-
-/*
     Дескриптор сцены
 */
 
@@ -42,14 +36,7 @@ typedef stl::hash_map<stl::hash_key<const char*>, SceneDescPtr> SceneDescMap;
 
 struct XmlSceneFactory::Impl
 {
-  SceneDescMap scenes;      //сцены
-  common::Log  log;         //протокол фабрики
-  LogHandler   log_handler;
-  
-///Конструктор
-  Impl ()
-    : log (LOG_NAME)
-    , log_handler (xtl::bind (&common::Log::Print, &log, _1)) {}
+  SceneDescMap scenes; //сцены
 };
 
 /*
@@ -183,7 +170,7 @@ void XmlSceneFactory::CreateScene (const char* name, Node& parent, SceneContext&
       
     SceneDesc& desc = *iter->second;
     
-    desc.parser->CreateScene (parent, scene_context, impl->log_handler);
+    desc.parser->CreateScene (parent, scene_context);
   }
   catch (xtl::exception& e)
   {

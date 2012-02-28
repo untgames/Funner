@@ -30,6 +30,7 @@ struct SceneContext::Impl: public xtl::reference_counter
   common::PropertyMap   properties;       //свойства контекста
   AttachmentRegistryMap attachments;      //присоединенные данные
   ExceptionFilterSignal exception_filter; //фильтр ислючений
+  LogFunction           log_handler;      //обработчик событий протоколирования
 };
 
 /*
@@ -282,6 +283,20 @@ bool SceneContext::FilterError (const char* error_message) const
     return false;
 
   return impl->exception_filter (error_message);
+}
+
+/*
+    Поток протоколирования
+*/
+
+void SceneContext::SetLogHandler (const LogFunction& handler)
+{
+  impl->log_handler = handler;
+}
+
+const SceneContext::LogFunction& SceneContext::LogHandler () const
+{
+  return impl->log_handler;
 }
 
 /*

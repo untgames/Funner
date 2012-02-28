@@ -11,7 +11,7 @@ namespace
     Константы
 */
 
-const math::vec3f DEFAULT_AFTER_NODE_OFFSET (0.0f, 0.0f, 1e-06f);
+const math::vec3f DEFAULT_BEFORE_NODE_OFFSET (0.0f, 0.0f, 1e-06f);
 
 }
 
@@ -24,11 +24,11 @@ struct XmlSceneParser::Impl
   typedef stl::hash_map<stl::hash_key<const char*>, common::ParseNode>            IncludeMap;
   typedef stl::hash_map<stl::hash_key<const char*>, XmlSceneParser::ParseHandler> ParserMap;
 
-  common::ParseNode root;      //корневой узел
-  SceneParserCache  cache;     //кэш парсера
-  ResourceGroup     resources; //ресурсы сцены
-  IncludeMap        includes;  //карта подключаемых файлов
-  ParserMap         parsers;   //парсеры
+  common::ParseNode root;        //корневой узел
+  SceneParserCache  cache;       //кэш парсера
+  ResourceGroup     resources;   //ресурсы сцены
+  IncludeMap        includes;    //карта подключаемых файлов
+  ParserMap         parsers;     //парсеры
   
 ///Конструктор
   Impl (const ParseNode& in_root) : root (in_root) {}
@@ -203,7 +203,7 @@ void print_log (const SceneManager::LogHandler& log_handler, const char* message
 
 }
 
-void XmlSceneParser::CreateScene (Node& parent, SceneContext& context, const LogHandler& log_handler)
+void XmlSceneParser::CreateScene (Node& parent, SceneContext& context)
 {
   try
   {
@@ -294,11 +294,12 @@ class WordParser
             break;
           default:
             loop = false;
+            pos--;
             break;
         }
       }
 
-      const unsigned char *first, *last;
+      const unsigned char *first = 0, *last = 0;
 
       first = pos;
       
@@ -310,7 +311,9 @@ class WordParser
         {
           case ';':
           case ',':
+          case '\0':
             loop = false;
+            pos--;
             break;          
           default:
             break;
@@ -335,6 +338,7 @@ class WordParser
               break;
             default:
               loop = false;
+              last++;
               break;
           }
         }        
@@ -357,9 +361,9 @@ bool try_parse_attribute (const common::ParseNode& decl, const char* name, size_
   
   if (!node || !node.AttributesCount ())
     return false;
-    
-  const char* string_value = node.Attribute (0);
 
+  const char* string_value = node.Attribute (0);
+  
   WordParser parser (string_value);
   
   size_t token_index = 0;
@@ -370,22 +374,22 @@ bool try_parse_attribute (const common::ParseNode& decl, const char* name, size_
   {
     WordParser::Word word = parser.NextWord ();
 
-    if (word.first != word.second || !parser.EndOfString ())
+    if (word.first != word.second)
     {
       size_t length = word.second - word.first;
       
       if (length >= sizeof (parse_buffer))
-        raise_parser_exception (node, "Internal error: string is too big for tokenize '%s' (max tokens size is %u)", string_value, sizeof (parse_buffer) - 1);
+        raise_parser_exception (node, "Internal error: string is too big for tokenize '%s' (max token size is %u)", string_value, sizeof (parse_buffer) - 1);
 
       if (token_index >= size)
         raise_parser_exception (node, "Too many tokens in '%s' (expected %u tokens)", string_value, size);
         
       memcpy (parse_buffer, word.first, length);
       
-      parse_buffer [length] = 0;
-      
+      parse_buffer [length] = 0;      
+
       if (!xtl::io::read_and_cast<float> (parse_buffer, value [token_index]))
-        return false;
+        raise_parser_exception (node, "Can't parse token '%s' while parsing value '%s'", parse_buffer, string_value);
         
       token_index++;
     }
@@ -564,7 +568,7 @@ void XmlSceneParser::Parse (const ParseNode& decl, Node& parent, SceneContext& c
         Impl::ParserMap::iterator iter = impl->parsers.find (type);
 
         if (iter == impl->parsers.end ())
-          return; //игнорирование неизвестных узлов
+          continue; //игнорирование неизвестных узлов
 
         iter->second (decl, parent, context);
       }
@@ -573,7 +577,7 @@ void XmlSceneParser::Parse (const ParseNode& decl, Node& parent, SceneContext& c
         if (!context.FilterError (e.what ()))
           throw;
         
-//        print_log (log_handler, e.what ());        //!!!!!!!!!!
+        print_log (context.LogHandler (), e.what ());
       }
       catch (...)            
       {
@@ -582,7 +586,7 @@ void XmlSceneParser::Parse (const ParseNode& decl, Node& parent, SceneContext& c
         if (!context.FilterError (ERROR_STRING))
           throw;        
 
-//        print_log (log_handler, ERROR_STRING);  ///!!!
+        print_log (context.LogHandler (), ERROR_STRING);
       }
     }    
   }
@@ -610,8 +614,8 @@ struct NodeDecl: public xtl::reference_counter
     bool        has_scale_pivot;       //центр масштабирования не совпадает с геометрическим центром    
     
     Pivot ()
-      : has_orientation_pivot (false)
-      , has_scale_pivot (false)    
+      : has_orientation_pivot (true)
+      , has_scale_pivot (true) 
     {
     }
   };
@@ -622,7 +626,7 @@ struct NodeDecl: public xtl::reference_counter
   math::quatf                orientation;        //ориентация
   stl::auto_ptr<Pivot>       pivot;              //точка поворота/масштабирования
   bool                       is_world_transform; //трансформации заданы в мировых координатах
-  stl::auto_ptr<stl::string> after_node;         //имя узла, после которого будет прибинден данный узел
+  stl::auto_ptr<stl::string> before_node;         //имя узла, перед которым будет прибинден данный узел
   stl::auto_ptr<PropertyMap> properties;         //пользовательские свойства узла
   stl::auto_ptr<stl::string> parent_name;        //имя родительского узла
 
@@ -668,11 +672,11 @@ void XmlSceneParser::Parse (const ParseNode& decl, Node& node, Node& default_par
     else
     {
       node_decl = xtl::intrusive_ptr<NodeDecl> (new NodeDecl, false);            
-      
+
         //парсинг базовых свойств
       
-      node_decl->name = get<const char*> (decl, "name", "");
-      
+      node_decl->name = get<const char*> (decl, "id", "");
+
         //парсинг точки поворота
 
       if (decl.First ("pivot"))      
@@ -681,8 +685,8 @@ void XmlSceneParser::Parse (const ParseNode& decl, Node& node, Node& default_par
 
         ParseAttribute (decl, "pivot", pivot->position);
 
-        pivot->has_orientation_pivot = strcmp (get<const char*> (decl, "orientation_pivot", "false"), "true") == 0;
-        pivot->has_scale_pivot       = strcmp (get<const char*> (decl, "scale_pivot", "false"), "true") == 0;
+        pivot->has_orientation_pivot = strcmp (get<const char*> (decl, "orientation_pivot", "true"), "true") == 0;
+        pivot->has_scale_pivot       = strcmp (get<const char*> (decl, "scale_pivot", "true"), "true") == 0;
 
         node_decl->pivot = pivot;
       }
@@ -702,15 +706,15 @@ void XmlSceneParser::Parse (const ParseNode& decl, Node& node, Node& default_par
       else
       {
         ParseAttribute (decl, "position", node_decl->position);
-        ParseAttribute (decl, "scale", node_decl->scale);
+        ParseAttribute (decl, "scale", node_decl->scale);        
         
         if (ParseNode rotation_node = decl.First ("rotation"))
         {
-          math::anglef rotation [3];
+          float rotation [3] = {0.0f, 0.0f, 0.0f};
           
-          ParseAttribute (rotation_node, "", 3, reinterpret_cast<float*> (&rotation));
+          ParseAttribute (rotation_node, "", 3, &rotation [0]);
           
-          node_decl->orientation = to_quat (rotation [0], rotation [1], rotation [2]);
+          node_decl->orientation = to_quat (degree (rotation [0]), degree (rotation [1]), degree (rotation [2]));
         }
         else
         {
@@ -719,7 +723,7 @@ void XmlSceneParser::Parse (const ParseNode& decl, Node& node, Node& default_par
       }
 
         //парсинг пользовательских свойств              
-        
+
       PropertyMap* properties = 0;
       
       if (decl.First ("property"))
@@ -738,14 +742,14 @@ void XmlSceneParser::Parse (const ParseNode& decl, Node& node, Node& default_par
         
         properties->SetProperty (property_index, value.c_str ());
       }
-      
+
         //парсинг after node
         
-      if (ParseNode after_node_decl = decl.First ("after_node"))
+      if (ParseNode before_node_decl = decl.First ("before_node"))
       {
-        node_decl->after_node.reset (new stl::string);
+        node_decl->before_node.reset (new stl::string);
         
-        *node_decl->after_node = get<const char*> (after_node_decl, "");
+        *node_decl->before_node = get<const char*> (before_node_decl, "");
       }
               
         //парсинг привязки к родителю
@@ -756,7 +760,7 @@ void XmlSceneParser::Parse (const ParseNode& decl, Node& node, Node& default_par
         
         *node_decl->parent_name = get<const char*> (parent_name_decl, "");
       }
-      
+
         //регистрация описателя узла
         
       impl->cache.SetValue (decl, node_decl);
@@ -781,41 +785,42 @@ void XmlSceneParser::Parse (const ParseNode& decl, Node& node, Node& default_par
     if (node_decl->properties)
       node.SetProperties (node_decl->properties->Clone ());
       
-    if (node_decl->after_node && !node_decl->after_node->empty ()) //TODO: сделать в виде контроллера
+    if (node_decl->before_node && !node_decl->before_node->empty ()) //TODO: сделать в виде контроллера!!!
     {
-      math::vec3f offset = DEFAULT_AFTER_NODE_OFFSET;
+      math::vec3f offset = DEFAULT_BEFORE_NODE_OFFSET;
       
-      if (int property_index = context.Properties ().IndexOf ("AfterNodeOffset"))
-        offset = context.Properties ().GetVector (property_index);
-        
-      Node* root = &default_parent;
+      int property_index = context.Properties ().IndexOf ("BeforeNodeOffset");
       
-      while (Node* node = &*root->Parent ())
-        root = node;
+      if (property_index != -1)
+        offset = context.Properties ().GetVector (property_index);        
         
-      if (Node::Pointer after_node = root->FindChild (node_decl->after_node->c_str (), NodeSearchMode_OnAllSublevels))
+      for (Node* search_base = &default_parent; search_base; search_base = &*search_base->Parent ())
       {
-        offset *= -after_node->WorldOrtZ ();
-        
-        node.SetPosition (node.Position () + offset);
-      }
+        if (Node::Pointer before_node = search_base->FindChild (node_decl->before_node->c_str (), NodeSearchMode_OnAllSublevels))
+        {
+          offset *= -before_node->WorldOrtZ ();
+          
+          node.SetPosition (node.Position () + offset);
+        }
+      }                        
     }
-    
+
     Node::Pointer parent = &default_parent;
     
     if (node_decl->parent_name && !node_decl->parent_name->empty ())
     {
-      Node* root = &default_parent;
-      
-      while (Node* node = &*root->Parent ())
-        root = node;
-        
-      if (Node::Pointer node = root->FindChild (node_decl->parent_name->c_str (), NodeSearchMode_OnAllSublevels))
-        parent = node;
-    }
-    
-    node.BindToParent (*parent, NodeBindMode_Default, node_decl->is_world_transform ? NodeTransformSpace_World : NodeTransformSpace_Local);
-    
+      for (Node* search_base = &default_parent; search_base = &*search_base->Parent ();)
+      {
+        if (Node::Pointer node = search_base->FindChild (node_decl->parent_name->c_str (), NodeSearchMode_OnAllSublevels))
+        {
+          parent = node;
+          break;
+        }
+      }
+    }    
+
+    node.BindToParent (*parent, NodeBindMode_AddRef, node_decl->is_world_transform ? NodeTransformSpace_World : NodeTransformSpace_Local);
+
       //разбор вложенных узлов
       
     Parse (decl, node, context);

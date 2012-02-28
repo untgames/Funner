@@ -92,6 +92,14 @@ class SceneContext
 
     xtl::connection RegisterErrorHandler (const char* error_wc_mask, const ExceptionHandler& handler);
     bool            FilterError          (const char* error_message) const; //returns true if exception is filtered
+    
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Поток протоколирования
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    typedef xtl::function<void (const char* message)> LogFunction;
+    
+    void               SetLogHandler (const LogFunction& handler);
+    const LogFunction& LogHandler    () const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Обмен
@@ -125,7 +133,7 @@ void swap (SceneContext&, SceneContext&);
 class SceneManager
 {
   public:
-    typedef xtl::function<void (const char* message)> LogHandler;  
+    typedef SceneContext::LogFunction LogHandler;
   
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструкторы / деструктор / присваивание

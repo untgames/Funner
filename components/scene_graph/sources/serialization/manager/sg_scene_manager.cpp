@@ -43,8 +43,21 @@ typedef xtl::signal<void (SceneContext&)> SceneContextCreatorSignal;
 
 struct SceneManager::Impl: public xtl::reference_counter
 {
-  FactoryDescList           factories;     //список фабрик
-  SceneContextCreatorSignal scene_creator; //сигнал создания нового контекста сцены
+  FactoryDescList           factories;           //список фабрик
+  SceneContextCreatorSignal scene_creator;       //сигнал создания нового контекста сцены
+  common::Log               default_log;         //поток протоколирования по умолчанию
+  LogHandler                default_log_handler; //обработчик протоколирования по умолчанию
+  
+  Impl ()
+    : default_log (DEFAULT_LOADER_LOG_NAME)
+    , default_log_handler (xtl::bind (&Impl::Print, this, _1))
+  {
+  }
+  
+  void Print (const char* message)
+  {
+    default_log.Print (message);
+  }
 };
 
 /*
@@ -196,7 +209,9 @@ SceneContext SceneManager::CreateSceneContext () const
   {
     SceneContext context;
     
-    impl->scene_creator (context);
+    context.SetLogHandler (impl->default_log_handler);
+    
+    impl->scene_creator (context);    
     
     return context;
   }

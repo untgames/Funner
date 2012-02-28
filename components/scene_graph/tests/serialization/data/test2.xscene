@@ -2,6 +2,21 @@
 <xscene>
   <scene id="scene1" version="1.0">
     <include source="data/include1.xscene"/>
+    <node id="node1"/>
+    <node id="node2" scale="1; -2; 3">
+      <node id="node3" position="1;2;3" scale="1; 2; 3" rotation="10;20;30">
+        <property name="A" type="int" value="4"/>
+      </node>
+      <node id="node2" position="1;2;3" parent="node1">
+        <node id="node4" parent="node2"/>
+        <node id="node5" bind_space="world" position="10;20;30"/>
+      </node>
+    </node>
+    <node id="node6" transform="1;0;0;10;0;1;0;20;0;0;1;30;0;0;0;1"/>
+    <node id="node7" rotation="0;0;90" pivot="1;0;0">
+      <node id="node7_test" scale_pivot="false"/>
+    </node>
+    <node id="node8" before_node="node1"/>
   </scene>
   <scene id="scene2" version="1.0">
   </scene>

@@ -1,0 +1,58 @@
+Results of xscene2_test:
+node 'scene1':
+  parent: ''
+  position: local=[+0.00 +0.00 +0.00] world=[+0.00 +0.00 +0.00]
+  rotation: local=[+1.0 +0.0 +0.0 +0.0] world=[+1.0 +0.0 +0.0 +0.0]
+  scale: local=[+1.00 +1.00 +1.00] world=[+1.00 +1.00 +1.00]
+node 'node1':
+  parent: 'scene1'
+  position: local=[+0.00 +0.00 +0.00] world=[+0.00 +0.00 +0.00]
+  rotation: local=[+1.0 +0.0 +0.0 +0.0] world=[+1.0 +0.0 +0.0 +0.0]
+  scale: local=[+1.00 +1.00 +1.00] world=[+1.00 +1.00 +1.00]
+node 'node2':
+  parent: 'node1'
+  position: local=[+1.00 +2.00 +3.00] world=[+1.00 +2.00 +3.00]
+  rotation: local=[+1.0 +0.0 +0.0 +0.0] world=[+1.0 +0.0 +0.0 +0.0]
+  scale: local=[+1.00 +1.00 +1.00] world=[+1.00 +1.00 +1.00]
+node 'node4':
+  parent: 'node2'
+  position: local=[+0.00 +0.00 +0.00] world=[+1.00 +2.00 +3.00]
+  rotation: local=[+1.0 +0.0 +0.0 +0.0] world=[+1.0 +0.0 +0.0 +0.0]
+  scale: local=[+1.00 +1.00 +1.00] world=[+1.00 +1.00 +1.00]
+node 'node5':
+  parent: 'node2'
+  position: local=[+9.00 +18.00 +27.00] world=[+10.00 +20.00 +30.00]
+  rotation: local=[+1.0 +0.0 +0.0 +0.0] world=[+1.0 +0.0 +0.0 +0.0]
+  scale: local=[+1.00 +1.00 +1.00] world=[+1.00 +1.00 +1.00]
+node 'node2':
+  parent: 'scene1'
+  position: local=[+0.00 +0.00 +0.00] world=[+0.00 +0.00 +0.00]
+  rotation: local=[+1.0 +0.0 +0.0 +0.0] world=[+0.0 +0.0 +0.0 +1.0]
+  scale: local=[+1.00 -2.00 +3.00] world=[-1.00 +2.00 +3.00]
+node 'node3':
+  parent: 'node2'
+  position: local=[+1.00 +2.00 +3.00] world=[+1.00 -4.00 +9.00]
+  rotation: local=[+1.0 +0.0 +0.2 +0.2] world=[+0.2 +0.1 +0.0 +1.0]
+  scale: local=[+1.00 +2.00 +3.00] world=[-1.61 +3.77 +8.41]
+  properties:
+    name='A', type=integer, value='4'
+node 'node6':
+  parent: 'scene1'
+  position: local=[+10.00 +20.00 +30.00] world=[+10.00 +20.00 +30.00]
+  rotation: local=[+1.0 +0.0 +0.0 +0.0] world=[+1.0 +0.0 +0.0 +0.0]
+  scale: local=[+1.00 +1.00 +1.00] world=[+1.00 +1.00 +1.00]
+node 'node7':
+  parent: 'scene1'
+  position: local=[+0.00 +0.00 +0.00] world=[+0.00 +0.00 +0.00]
+  rotation: local=[+0.7 +0.0 +0.0 +0.7] world=[+0.7 +0.0 +0.0 +0.7]
+  scale: local=[+1.00 +1.00 +1.00] world=[+1.00 +1.00 +1.00]
+node 'node7_test':
+  parent: 'node7'
+  position: local=[+0.00 +0.00 +0.00] world=[+1.00 -1.00 +0.00]
+  rotation: local=[+1.0 +0.0 +0.0 +0.0] world=[+0.7 +0.0 +0.0 +0.7]
+  scale: local=[+1.00 +1.00 +1.00] world=[+1.00 +1.00 +1.00]
+node 'node8':
+  parent: 'scene1'
+  position: local=[+0.00 +0.00 -1.00] world=[+0.00 +0.00 -1.00]
+  rotation: local=[+1.0 +0.0 +0.0 +0.0] world=[+1.0 +0.0 +0.0 +0.0]
+  scale: local=[+1.00 +1.00 +1.00] world=[+1.00 +1.00 +1.00]
