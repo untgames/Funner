@@ -75,6 +75,29 @@ template <class T> struct Param
   }
 };
 
+template <class T, size_t Size> struct Param<math::vector<T, Size> >
+{
+  math::vector<T, Size> value;
+  bool                  state;
+
+  Param () : value (), state () {}
+
+  void Parse (const ParseNode& node, const char* name)
+  {
+    ParseNode child = node.First (name);
+    
+    if (!child)
+    {
+      state = false;
+      return;
+    }
+
+    parse_attribute (child, "", Size, &value [0]);
+
+    state = true;
+  }
+};
+
 ///Описание параметров камеры
 struct OrthoCameraDecl: public xtl::reference_counter
 {
@@ -96,9 +119,22 @@ struct PerspectiveCameraDecl: public xtl::reference_counter
   Param<float> params [Param_Num];
 };
 
+///Описание параметров источника света
+struct LightDecl: public xtl::reference_counter
+{
+  Param<math::vec3f> light_color;
+  Param<math::vec3f> attenuation;
+  Param<float>       range;
+  Param<float>       intensity;
+  Param<float>       exponent;
+  Param<float>       radius;
+  Param<float>       angle;
+};
+
 typedef xtl::intrusive_ptr<NodeDecl>              NodeDeclPtr;
 typedef xtl::intrusive_ptr<OrthoCameraDecl>       OrthoCameraDeclPtr;
 typedef xtl::intrusive_ptr<PerspectiveCameraDecl> PerspectiveCameraDeclPtr;
+typedef xtl::intrusive_ptr<LightDecl>             LightDeclPtr;
 
 PropertyType get_property_type (common::ParseNode& node)
 {
@@ -171,6 +207,10 @@ struct XmlSceneParser::Impl
 
         iter->second.prepare_handler (decl);
       }
+      catch (common::ParserException&)
+      {
+        //игнорирование, протоколирование уже произведено
+      }
       catch (std::exception& e)
       {
         root.Log ().Error (*iter, "%s", e.what ());
@@ -242,6 +282,7 @@ struct XmlSceneParser::Impl
   NodeDeclPtr PrepareNode (const ParseNode& decl);
   OrthoCameraDeclPtr PrepareOrthoCamera (const ParseNode& decl);
   PerspectiveCameraDeclPtr PreparePerspectiveCamera (const ParseNode& decl);
+  LightDeclPtr PrepareLight (const ParseNode& decl);
 };
 
 /*
@@ -261,9 +302,9 @@ XmlSceneParser::XmlSceneParser (const ParseNode& root)
     RegisterParser ("node", xtl::bind (&XmlSceneParser::CreateNode<Node>, this, _1, _2, _3), xtl::bind (&XmlSceneParser::Impl::PrepareNode, &*impl, _1));
     RegisterParser ("ortho_camera", xtl::bind (&XmlSceneParser::CreateNode<OrthoCamera>, this, _1, _2, _3), xtl::bind (&XmlSceneParser::Impl::PrepareOrthoCamera, &*impl, _1));
     RegisterParser ("perspective_camera", xtl::bind (&XmlSceneParser::CreateNode<PerspectiveCamera>, this, _1, _2, _3), xtl::bind (&XmlSceneParser::Impl::PreparePerspectiveCamera, &*impl, _1));
-    RegisterParser ("spot_light", xtl::bind (&XmlSceneParser::CreateNode<SpotLight>, this, _1, _2, _3));
-    RegisterParser ("direct_light", xtl::bind (&XmlSceneParser::CreateNode<DirectLight>, this, _1, _2, _3));
-    RegisterParser ("point_light", xtl::bind (&XmlSceneParser::CreateNode<PointLight>, this, _1, _2, _3));
+    RegisterParser ("spot_light", xtl::bind (&XmlSceneParser::CreateNode<SpotLight>, this, _1, _2, _3), xtl::bind (&XmlSceneParser::Impl::PrepareLight, &*impl, _1));
+    RegisterParser ("direct_light", xtl::bind (&XmlSceneParser::CreateNode<DirectLight>, this, _1, _2, _3), xtl::bind (&XmlSceneParser::Impl::PrepareLight, &*impl, _1));
+    RegisterParser ("point_light", xtl::bind (&XmlSceneParser::CreateNode<PointLight>, this, _1, _2, _3), xtl::bind (&XmlSceneParser::Impl::PrepareLight, &*impl, _1));
     RegisterParser ("mesh", xtl::bind (&XmlSceneParser::CreateNode<VisualModel>, this, _1, _2, _3));
     RegisterParser ("text_line", xtl::bind (&XmlSceneParser::CreateNode<TextLine>, this, _1, _2, _3));
     RegisterParser ("sprite", xtl::bind (&XmlSceneParser::CreateNode<Sprite>, this, _1, _2, _3));
@@ -897,7 +938,7 @@ PerspectiveCameraDeclPtr XmlSceneParser::Impl::PreparePerspectiveCamera (const P
       
     cache.SetValue (decl, node_decl);    
     
-    return node_decl;    
+    return node_decl;
   }
   catch (xtl::exception& e)
   {
@@ -932,10 +973,55 @@ void XmlSceneParser::Parse (const ParseNode& decl, PerspectiveCamera& node, Node
   }
 }
 
+LightDeclPtr XmlSceneParser::Impl::PrepareLight (const ParseNode& decl)
+{
+  try
+  {
+      //попытка найти параметры в кеше      
+
+    if (LightDeclPtr* node_decl_ptr = cache.FindValue<LightDeclPtr> (decl))
+      return *node_decl_ptr;
+      
+    LightDeclPtr node_decl (new LightDecl, false);
+    
+    node_decl->light_color.Parse (decl, "light_color");
+    node_decl->intensity.Parse (decl, "intensity");
+    node_decl->range.Parse (decl, "range");
+    node_decl->attenuation.Parse (decl, "attenuation");
+    node_decl->radius.Parse (decl, "radius");
+    node_decl->exponent.Parse (decl, "exponent");
+    node_decl->angle.Parse (decl, "angle");
+    
+      //регистрация дескриптора узла
+      
+    cache.SetValue (decl, node_decl);    
+    
+    return node_decl;
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("scene_graph::XmlSceneParser::Impl::PrepareLight");
+    throw;
+  }  
+}
+
 void XmlSceneParser::Parse (const ParseNode& decl, Light& node, Node& parent, SceneContext& context)
 {
   try
   {
+      //предварительный разбор
+      
+    LightDeclPtr node_decl = impl->PrepareLight (decl);
+    
+      //настройка узла
+      
+    if (node_decl->light_color.state) node.SetLightColor (node_decl->light_color.value);
+    if (node_decl->attenuation.state) node.SetAttenuation (node_decl->attenuation.value);
+    if (node_decl->intensity.state)   node.SetIntensity (node_decl->intensity.value);
+    if (node_decl->range.state)       node.SetRange (node_decl->range.value);
+      
+      //разбор родительских параметров
+    
     Parse (decl, static_cast<Entity&> (node), parent, context);    
   }
   catch (xtl::exception& e)
@@ -949,7 +1035,17 @@ void XmlSceneParser::Parse (const ParseNode& decl, DirectLight& node, Node& pare
 {
   try
   {
-    Parse (decl, static_cast<Light&> (node), parent, context);
+      //предварительный разбор
+      
+    LightDeclPtr node_decl = impl->PrepareLight (decl);    
+    
+      //настройка узла
+      
+    if (node_decl->radius.state) node.SetRadius (node_decl->radius.value);
+    
+      //разбор родительских параметров    
+    
+    Parse (decl, static_cast<Light&> (node), parent, context);        
   }
   catch (xtl::exception& e)
   {
@@ -962,6 +1058,17 @@ void XmlSceneParser::Parse (const ParseNode& decl, SpotLight& node, Node& parent
 {
   try
   {
+      //предварительный разбор
+      
+    LightDeclPtr node_decl = impl->PrepareLight (decl);    
+    
+      //настройка узла
+      
+    if (node_decl->exponent.state) node.SetExponent (node_decl->exponent.value);
+    if (node_decl->angle.state)    node.SetAngle (degree (node_decl->angle.value));
+    
+      //разбор родительских параметров    
+    
     Parse (decl, static_cast<Light&> (node), parent, context);    
   }
   catch (xtl::exception& e)
