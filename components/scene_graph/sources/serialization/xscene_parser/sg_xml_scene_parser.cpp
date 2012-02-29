@@ -139,11 +139,22 @@ struct VisualModelDecl: public xtl::reference_counter
   Param<math::vec3f> max_bound;  
 };
 
+///Описание параметров спрайта
+struct SpriteDecl: public xtl::reference_counter
+{
+  stl::string        material;
+  Param<float>       alpha_reference;
+  Param<float>       alpha;
+  Param<size_t>      frame;
+  Param<math::vec3f> color;
+};
+
 typedef xtl::intrusive_ptr<NodeDecl>              NodeDeclPtr;
 typedef xtl::intrusive_ptr<OrthoCameraDecl>       OrthoCameraDeclPtr;
 typedef xtl::intrusive_ptr<PerspectiveCameraDecl> PerspectiveCameraDeclPtr;
 typedef xtl::intrusive_ptr<LightDecl>             LightDeclPtr;
 typedef xtl::intrusive_ptr<VisualModelDecl>       VisualModelDeclPtr;
+typedef xtl::intrusive_ptr<SpriteDecl>            SpriteDeclPtr;
 
 PropertyType get_property_type (const common::ParseNode& node)
 {
@@ -295,6 +306,7 @@ struct XmlSceneParser::Impl
   PerspectiveCameraDeclPtr PreparePerspectiveCamera (const ParseNode& decl);
   LightDeclPtr PrepareLight (const ParseNode& decl);
   VisualModelDeclPtr PrepareVisualModel (const ParseNode& decl);  
+  SpriteDeclPtr PrepareSprite (const ParseNode& decl);  
 };
 
 /*
@@ -319,7 +331,7 @@ XmlSceneParser::XmlSceneParser (const ParseNode& root)
     RegisterParser ("point_light", xtl::bind (&XmlSceneParser::CreateNode<PointLight>, this, _1, _2, _3), xtl::bind (&XmlSceneParser::Impl::PrepareLight, &*impl, _1));
     RegisterParser ("mesh", xtl::bind (&XmlSceneParser::CreateNode<VisualModel>, this, _1, _2, _3), xtl::bind (&XmlSceneParser::Impl::PrepareVisualModel, &*impl, _1));
     RegisterParser ("text_line", xtl::bind (&XmlSceneParser::CreateNode<TextLine>, this, _1, _2, _3));
-    RegisterParser ("sprite", xtl::bind (&XmlSceneParser::CreateNode<Sprite>, this, _1, _2, _3));
+    RegisterParser ("sprite", xtl::bind (&XmlSceneParser::CreateNode<Sprite>, this, _1, _2, _3), xtl::bind (&XmlSceneParser::Impl::PrepareSprite, &*impl, _1));
     RegisterParser ("listener", xtl::bind (&XmlSceneParser::CreateNode<Listener>, this, _1, _2, _3));
     RegisterParser ("sound", xtl::bind (&XmlSceneParser::CreateNode<SoundEmitter>, this, _1, _2, _3));
     RegisterParser ("include", xtl::bind (&XmlSceneParser::IncludeSubscene, this, _1, _2, _3), xtl::bind (&XmlSceneParser::Impl::PrepareIncludeNode, &*impl, _1));
@@ -1162,10 +1174,56 @@ void XmlSceneParser::Parse (const ParseNode& decl, VisualModel& node, Node& pare
   }
 }
 
+SpriteDeclPtr XmlSceneParser::Impl::PrepareSprite (const ParseNode& decl)
+{
+  try
+  {
+      //попытка найти параметры в кеше      
+
+    if (SpriteDeclPtr* node_decl_ptr = cache.FindValue<SpriteDeclPtr> (decl))
+      return *node_decl_ptr;
+      
+    SpriteDeclPtr node_decl (new SpriteDecl, false);
+
+    node_decl->color.Parse (decl, "color");
+    node_decl->alpha.Parse (decl, "alpha");
+    node_decl->alpha_reference.Parse (decl, "alpha_reference");
+    node_decl->frame.Parse (decl, "frame");
+
+    node_decl->material = get<const char*> (decl, "material", "");
+
+      //регистрация дескриптора узла
+
+    cache.SetValue (decl, node_decl);    
+
+    return node_decl;
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("scene_graph::XmlSceneParser::Impl::PrepareSprite");
+    throw;
+  }  
+}
+
 void XmlSceneParser::Parse (const ParseNode& decl, Sprite& node, Node& parent, SceneContext& context)
 {
   try
   {
+      //предварительный разбор
+
+    SpriteDeclPtr node_decl = impl->PrepareSprite (decl);
+
+      //настройка узла
+
+    node.SetMaterial (node_decl->material.c_str ());
+
+    if (node_decl->color.state)           node.SetColor (node_decl->color.value);
+    if (node_decl->alpha.state)           node.SetAlpha (node_decl->alpha.value);
+    if (node_decl->alpha_reference.state) node.SetAlphaReference (node_decl->alpha_reference.value);
+    if (node_decl->frame.state)           node.SetFrame (node_decl->frame.value);
+
+      //разбор родительских параметров
+      
     Parse (decl, static_cast<Entity&> (node), parent, context);    
   }
   catch (xtl::exception& e)
@@ -1174,7 +1232,6 @@ void XmlSceneParser::Parse (const ParseNode& decl, Sprite& node, Node& parent, S
     throw;
   }
 }
-
 
 void XmlSceneParser::Parse (const ParseNode& decl, TextLine& node, Node& parent, SceneContext& context)
 {
