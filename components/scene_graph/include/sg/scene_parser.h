@@ -191,7 +191,6 @@ class XmlSceneParser: public ISceneParser
 
   private:
     template <class T> void CreateNode (const common::ParseNode& decl, Node& parent, SceneContext& context);
-    template <>        void CreateNode<SoundEmitter> (const common::ParseNode& decl, Node& parent, SceneContext& context);
 
     void IncludeSubscene (const common::ParseNode& decl, Node& parent, SceneContext& context);
 
@@ -199,6 +198,8 @@ class XmlSceneParser: public ISceneParser
     struct Impl;
     stl::auto_ptr<Impl> impl;
 };
+
+template <> void XmlSceneParser::CreateNode<SoundEmitter> (const common::ParseNode& decl, Node& parent, SceneContext& context);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Менеджер парсинга XML сцен

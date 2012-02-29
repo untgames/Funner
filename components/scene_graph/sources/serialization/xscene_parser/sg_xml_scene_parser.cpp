@@ -45,8 +45,8 @@ struct NodeDecl: public xtl::reference_counter
 
 ///Конструктор
   NodeDecl ()
-    : is_world_transform (false)
-    , scale (1.0f)
+    : scale (1.0f)
+    , is_world_transform (false)
   {
   }  
 };
@@ -145,7 +145,7 @@ typedef xtl::intrusive_ptr<PerspectiveCameraDecl> PerspectiveCameraDeclPtr;
 typedef xtl::intrusive_ptr<LightDecl>             LightDeclPtr;
 typedef xtl::intrusive_ptr<VisualModelDecl>       VisualModelDeclPtr;
 
-PropertyType get_property_type (common::ParseNode& node)
+PropertyType get_property_type (const common::ParseNode& node)
 {
   const char* value = get<const char*> (node, "");
 
@@ -266,7 +266,9 @@ struct XmlSceneParser::Impl
     if (!FileSystem::IsFileExist (source_name) && ignore_unavailability)
       return;
 
-    Parser parser (root.Log (), source_name, "xml");
+    common::ParseLog root_log = root.Log ();
+
+    Parser parser (root_log, source_name, "xml");
     
     const ParseNode& xscene_root = parser.Root ().First ();
     
@@ -571,7 +573,7 @@ void XmlSceneParser::CreateScene (Node& parent, SceneContext& context)
 template <class T>
 void XmlSceneParser::CreateNode (const common::ParseNode& decl, Node& parent, SceneContext& context)
 {
-  T::Pointer node = T::Create ();
+  typename T::Pointer node = T::Create ();
 
   Parse (decl, *node, parent, context);
 }
@@ -820,7 +822,7 @@ void XmlSceneParser::Parse (const ParseNode& decl, Node& node, Node& default_par
     
     if (node_decl->parent_name && !node_decl->parent_name->empty ())
     {
-      for (Node* search_base = &default_parent; search_base = &*search_base->Parent ();)
+      for (Node* search_base = &default_parent; (search_base = &*search_base->Parent ());)
       {
         if (Node::Pointer node = search_base->FindChild (node_decl->parent_name->c_str (), NodeSearchMode_OnAllSublevels))
         {
