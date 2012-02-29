@@ -9,6 +9,7 @@ typedef xtl::com_ptr<low_level::IBlendState>              BlendStatePtr;
 typedef xtl::com_ptr<low_level::IBuffer>                  BufferPtr;
 typedef xtl::com_ptr<low_level::IDepthStencilState>       DepthStencilStatePtr;
 typedef xtl::com_ptr<ILowLevelFrame>                      LowLevelFramePtr;
+typedef xtl::com_ptr<ILowLevelTexture>                    LowLevelTexturePtr;
 typedef xtl::com_ptr<low_level::IInputLayout>             InputLayoutPtr;
 typedef xtl::com_ptr<low_level::IProgram>                 ProgramPtr;
 typedef xtl::com_ptr<low_level::IProgramParametersLayout> ProgramParametersLayoutPtr;
@@ -80,39 +81,46 @@ void shader_error_log (const char* message)
 
 struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
 {
-  Render&                    render;                           //ссылка на рендер
-  scene_graph::PageCurl*     page_curl;                        //исходный узел
-  Renderable*                renderable;                       //объект
-  LowLevelFramePtr           low_level_frame;                  //фрейм кастомной отрисовки
-  BlendStatePtr              none_blend_state;                 //состояния блендинга
-  BlendStatePtr              translucent_blend_state;          //состояния блендинга
-  BlendStatePtr              mask_blend_state;                 //состояния блендинга
-  BlendStatePtr              additive_blend_state;             //состояния блендинга
-  InputLayoutPtr             input_layout;                     //состояние устройства отрисовки
-  ProgramPtr                 default_program;                  //шейдер
-  ProgramParametersLayoutPtr program_parameters_layout;        //расположение параметров шейдера
-  SamplerStatePtr            sampler_state;                    //сэмплер
-  RasterizerStatePtr         rasterizer_no_cull_state;         //состояние растеризатора без отсечения
-  RasterizerStatePtr         rasterizer_cull_back_state;       //состояние растеризатора с отсечением задних сторон треугольников
-  RasterizerStatePtr         rasterizer_cull_front_state;      //состояние растеризатора с отсечением передних сторон треугольников
-  RasterizerStatePtr         rasterizer_scissor_enabled_state; //состояние растеризатора с областью отсечением
-  DepthStencilStatePtr       depth_stencil_state;              //состояние буфера попиксельного отсечения
-  BufferPtr                  constant_buffer;                  //константный буфер
-  BufferPtr                  quad_vertex_buffer;               //вершинный буфер на два треугольника
-  BufferPtr                  quad_index_buffer;                //индексный буфер на два треугольника
-  StateBlockPtr              render_state;                     //сохранение состояния рендера
-  math::vec3f                view_point;                       //позиция камеры
-  math::mat4f                projection;                       //матрица камеры
-  mid_level::Viewport        viewport;                         //область вывода
-  RenderablePageCurlMeshPtr  curled_page;                      //сетка изгибаемой страницы
-  math::vec2ui               current_page_grid_size;           //текущий размер сетки страницы
-  bool                       initialized;                      //инициализированы ли необходимые поля
+  Render&                    render;                            //ссылка на рендер
+  scene_graph::PageCurl*     page_curl;                         //исходный узел
+  Renderable*                renderable;                        //объект
+  LowLevelTexturePtr         shadow_texture;                    //текстура тени
+  SpriteMaterialPtr          shadow_material;                   //материал тени
+  size_t                     current_shadow_material_name_hash; //хэш текущего имени материала тени
+  LowLevelTexturePtr         page_textures [scene_graph::PageCurlPageType_Num];                     //текстуры страниц
+  SpriteMaterialPtr          page_materials [scene_graph::PageCurlPageType_Num];                    //материалы страниц
+  size_t                     current_page_material_name_hashes [scene_graph::PageCurlPageType_Num]; //хэш текущего имени материалов страниц
+  LowLevelFramePtr           low_level_frame;                   //фрейм кастомной отрисовки
+  BlendStatePtr              none_blend_state;                  //состояния блендинга
+  BlendStatePtr              translucent_blend_state;           //состояния блендинга
+  BlendStatePtr              mask_blend_state;                  //состояния блендинга
+  BlendStatePtr              additive_blend_state;              //состояния блендинга
+  InputLayoutPtr             input_layout;                      //состояние устройства отрисовки
+  ProgramPtr                 default_program;                   //шейдер
+  ProgramParametersLayoutPtr program_parameters_layout;         //расположение параметров шейдера
+  SamplerStatePtr            sampler_state;                     //сэмплер
+  RasterizerStatePtr         rasterizer_no_cull_state;          //состояние растеризатора без отсечения
+  RasterizerStatePtr         rasterizer_cull_back_state;        //состояние растеризатора с отсечением задних сторон треугольников
+  RasterizerStatePtr         rasterizer_cull_front_state;       //состояние растеризатора с отсечением передних сторон треугольников
+  RasterizerStatePtr         rasterizer_scissor_enabled_state;  //состояние растеризатора с областью отсечением
+  DepthStencilStatePtr       depth_stencil_state;               //состояние буфера попиксельного отсечения
+  BufferPtr                  constant_buffer;                   //константный буфер
+  BufferPtr                  quad_vertex_buffer;                //вершинный буфер на два треугольника
+  BufferPtr                  quad_index_buffer;                 //индексный буфер на два треугольника
+  StateBlockPtr              render_state;                      //сохранение состояния рендера
+  math::vec3f                view_point;                        //позиция камеры
+  math::mat4f                projection;                        //матрица камеры
+  mid_level::Viewport        viewport;                          //область вывода
+  RenderablePageCurlMeshPtr  curled_page;                       //сетка изгибаемой страницы
+  math::vec2ui               current_page_grid_size;            //текущий размер сетки страницы
+  bool                       initialized;                       //инициализированы ли необходимые поля
 
   ///Конструктор
   Impl (scene_graph::PageCurl* in_page_curl, Render& in_render, Renderable* in_renderable)
     : render (in_render)
     , page_curl (in_page_curl)
     , renderable (in_renderable)
+    , current_shadow_material_name_hash (0)
     , initialized (false)
   {
     ILowLevelRenderer* low_level_renderer = dynamic_cast<ILowLevelRenderer*> (render.Renderer ().get ());
@@ -120,9 +128,70 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
     if (!low_level_renderer)
       throw xtl::format_operation_exception ("render::obsolete::render2d::RenderablePageCurl::RenderablePageCurl", "Can't cast render to ILowLevelRenderer");
 
+    memset (current_page_material_name_hashes, 0, sizeof (current_page_material_name_hashes));
+
     low_level_frame = LowLevelFramePtr (low_level_renderer->CreateFrame (), false);
 
     low_level_frame->SetCallback (this);
+  }
+
+  ILowLevelTexture* GetLowLevelTexture (const char* image_name)
+  {
+    static const char* METHOD_NAME = "render::obsolete::render2d::RenderablePageCurl::GetLowLevelTexture";
+
+    ILowLevelTexture* texture = dynamic_cast<ILowLevelTexture*> (render.GetTexture (image_name, false, renderable));
+
+    if (!texture)
+      throw xtl::format_operation_exception (METHOD_NAME, "Material '%s' has unsupported texture type, only ILowLevelTexture supported", image_name);
+
+    return texture;
+  }
+
+  //Обновление
+  void Update ()
+  {
+    const char* shadow_material_name = page_curl->ShadowMaterial ();
+
+    size_t shadow_material_name_hash = xtl::xstrlen (shadow_material_name) ? common::strhash (shadow_material_name) : 0;
+
+    if (shadow_material_name_hash != current_shadow_material_name_hash)
+    {
+      if (shadow_material_name_hash)
+      {
+        shadow_material = render.GetMaterial (shadow_material_name);
+        shadow_texture  = GetLowLevelTexture (shadow_material->Image ());
+      }
+      else
+      {
+        shadow_texture  = 0;
+        shadow_material = 0;
+      }
+
+      current_shadow_material_name_hash = shadow_material_name_hash;
+    }
+
+    for (size_t i = 0; i < scene_graph::PageCurlPageType_Num; i++)
+    {
+      const char* material_name = page_curl->PageMaterial ((scene_graph::PageCurlPageType)i);
+
+      size_t material_name_hash = xtl::xstrlen (material_name) ? common::strhash (material_name) : 0;
+
+      if (material_name_hash != current_page_material_name_hashes [i])
+      {
+        if (material_name_hash)
+        {
+          page_materials [i] = render.GetMaterial (material_name);
+          page_textures [i]  = GetLowLevelTexture (page_materials [i]->Image ());
+        }
+        else
+        {
+          page_textures [i]  = 0;
+          page_materials [i] = 0;
+        }
+
+        current_page_material_name_hashes [i] = material_name_hash;
+      }
+    }
   }
 
   //создание состояния смешивания цветов
@@ -338,33 +407,29 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
     }
   }
 
-  const char* GetCurledRightPageMaterial ()
+  scene_graph::PageCurlPageType GetCurledRightPageType ()
   {
     switch (page_curl->Mode ())
     {
       case PageCurlMode_SinglePage:
       case PageCurlMode_DoublePageSingleMaterial:
-        return page_curl->PageMaterial (PageCurlPageType_Back);
-      case PageCurlMode_DoublePageDoubleMaterial:
-        return page_curl->PageMaterial (PageCurlPageType_BackRight);
+        return PageCurlPageType_Back;
+      default:
+        return PageCurlPageType_BackRight;
     }
-
-    return 0;
   }
 
-  const char* GetCurledLeftPageMaterial ()
+  scene_graph::PageCurlPageType GetCurledLeftPageType ()
   {
     switch (page_curl->Mode ())
     {
       case PageCurlMode_SinglePage:
-        return page_curl->PageMaterial (PageCurlPageType_Back);
+        return PageCurlPageType_Back;
       case PageCurlMode_DoublePageSingleMaterial:
-        return page_curl->PageMaterial (PageCurlPageType_Front);
-      case PageCurlMode_DoublePageDoubleMaterial:
-        return page_curl->PageMaterial (PageCurlPageType_FrontLeft);
+        return PageCurlPageType_Front;
+      default:
+        return PageCurlPageType_FrontLeft;
     }
-
-    return 0;
   }
 
   //Отрисовка
@@ -499,7 +564,7 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
     {
       if (curled_page->HasBottomSideBendPosition () || curled_page->HasTopSideBendPosition ())
       {
-        BindMaterial (device, page_curl->ShadowMaterial ());
+        BindMaterial (device, shadow_material.get (), shadow_texture.get ());
 
         math::vec3f bottom_side_bend_position = curled_page->HasBottomSideBendPosition () ? curled_page->GetBottomSideBendPosition () : bottom_corner_position;
         math::vec3f top_side_bend_position    = curled_page->HasTopSideBendPosition () ? curled_page->GetTopSideBendPosition () : top_corner_position;
@@ -745,7 +810,9 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
 
     device.RSSetState (rasterizer_cull_back_state.get ());
 
-    BindMaterial (device, GetCurledRightPageMaterial ());
+    scene_graph::PageCurlPageType curled_right_page_type = GetCurledRightPageType ();
+
+    BindMaterial (device, page_materials [curled_right_page_type].get (), page_textures [curled_right_page_type].get ());
 
     float min_s, max_s;
 
@@ -759,7 +826,9 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
 
     device.RSSetState (rasterizer_cull_front_state.get ());
 
-    BindMaterial (device, GetCurledLeftPageMaterial ());
+    scene_graph::PageCurlPageType curled_left_page_type = GetCurledLeftPageType ();
+
+    BindMaterial (device, page_materials [curled_left_page_type].get (), page_textures [curled_left_page_type].get ());
 
     curled_page->CalculateShadow (false);
 
@@ -823,7 +892,9 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
 
     device.RSSetState (rasterizer_cull_back_state.get ());
 
-    BindMaterial (device, GetCurledRightPageMaterial ());
+    scene_graph::PageCurlPageType curled_right_page_type = GetCurledRightPageType ();
+
+    BindMaterial (device, page_materials [curled_right_page_type].get (), page_textures [curled_right_page_type].get ());
 
     float min_s, max_s;
 
@@ -837,7 +908,9 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
 
     device.RSSetState (rasterizer_cull_front_state.get ());
 
-    BindMaterial (device, GetCurledLeftPageMaterial ());
+    scene_graph::PageCurlPageType curled_left_page_type = GetCurledLeftPageType ();
+
+    BindMaterial (device, page_materials [curled_left_page_type].get (), page_textures [curled_left_page_type].get ());
 
     curled_page->CalculateShadow (false);
 
@@ -917,7 +990,9 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
 
     device.RSSetState (rasterizer_cull_back_state.get ());
 
-    BindMaterial (device, GetCurledLeftPageMaterial ());
+    scene_graph::PageCurlPageType curled_left_page_type = GetCurledLeftPageType ();
+
+    BindMaterial (device, page_materials [curled_left_page_type].get (), page_textures [curled_left_page_type].get ());
 
     float min_s, max_s;
 
@@ -934,7 +1009,9 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
 
     device.RSSetState (rasterizer_cull_front_state.get ());
 
-    BindMaterial (device, GetCurledRightPageMaterial ());
+    scene_graph::PageCurlPageType curled_right_page_type = GetCurledRightPageType ();
+
+    BindMaterial (device, page_materials [curled_right_page_type].get (), page_textures [curled_right_page_type].get ());
 
     curled_page->CalculateShadow (false);
 
@@ -1025,7 +1102,9 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
 
     device.RSSetState (rasterizer_cull_back_state.get ());
 
-    BindMaterial (device, GetCurledLeftPageMaterial ());
+    scene_graph::PageCurlPageType curled_left_page_type = GetCurledLeftPageType ();
+
+    BindMaterial (device, page_materials [curled_left_page_type].get (), page_textures [curled_left_page_type].get ());
 
     float min_s, max_s;
 
@@ -1042,7 +1121,9 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
 
     device.RSSetState (rasterizer_cull_front_state.get ());
 
-    BindMaterial (device, GetCurledRightPageMaterial ());
+    scene_graph::PageCurlPageType curled_right_page_type = GetCurledRightPageType ();
+
+    BindMaterial (device, page_materials [curled_right_page_type].get (), page_textures [curled_right_page_type].get ());
 
     curled_page->CalculateShadow (false);
 
@@ -1075,10 +1156,10 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
   {
     const math::vec2f& size = page_curl->Size ();
 
-    const char *left_page_material  = 0,
-               *right_page_material = 0;
-    float      left_page_width      = size.x * 0.5f,
-               right_page_width     = left_page_width;
+    int   left_page_type   = -1,
+          right_page_type  = -1;
+    float left_page_width  = size.x * 0.5f,
+          right_page_width = left_page_width;
 
     device.ISSetIndexBuffer  (quad_index_buffer.get ());
     device.ISSetVertexBuffer (0, quad_vertex_buffer.get ());
@@ -1086,23 +1167,23 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
     switch (page_curl->Mode ())
     {
       case PageCurlMode_SinglePage:
-        right_page_material = page_curl->PageMaterial (PageCurlPageType_Front);
-        left_page_width     = 0.f;
-        right_page_width    = size.x;
+        right_page_type  = PageCurlPageType_Front;
+        left_page_width  = 0.f;
+        right_page_width = size.x;
         break;
       case PageCurlMode_DoublePageSingleMaterial:
-        left_page_material  = page_curl->PageMaterial (PageCurlPageType_Back);
-        right_page_material = page_curl->PageMaterial (PageCurlPageType_Front);
+        left_page_type  = PageCurlPageType_Back;
+        right_page_type = PageCurlPageType_Front;
         break;
       case PageCurlMode_DoublePageDoubleMaterial:
-        left_page_material  = page_curl->PageMaterial (PageCurlPageType_BackLeft);
-        right_page_material = page_curl->PageMaterial (PageCurlPageType_FrontRight);
+        left_page_type  = PageCurlPageType_BackLeft;
+        right_page_type = PageCurlPageType_FrontRight;
         break;
     }
 
     math::vec4ub page_color (GetPageColor ());
 
-    if (left_page_material)
+    if (left_page_type >= 0)
     {
       RenderableVertex vertices [4];
 
@@ -1124,12 +1205,12 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
 
       quad_vertex_buffer->SetData (0, sizeof (vertices), vertices);
 
-      BindMaterial (device, left_page_material);
+      BindMaterial (device, page_materials [left_page_type].get (), page_textures [left_page_type].get ());
 
       device.DrawIndexed (low_level::PrimitiveType_TriangleList, 0, 6, 0);
     }
 
-    if (right_page_material)
+    if (right_page_type >= 0)
     {
       RenderableVertex vertices [4];
 
@@ -1151,19 +1232,23 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
 
       quad_vertex_buffer->SetData (0, sizeof (vertices), vertices);
 
-      BindMaterial (device, right_page_material);
+      BindMaterial (device, page_materials [right_page_type].get (), page_textures [right_page_type].get ());
 
       device.DrawIndexed (low_level::PrimitiveType_TriangleList, 0, 6, 0);
     }
   }
 
-  void BindMaterial (low_level::IDevice& device, const char* name)
+  void BindMaterial (low_level::IDevice& device, SpriteMaterial* material, ILowLevelTexture* texture)
   {
     static const char* METHOD_NAME = "render::obsolete::render2d::RenderablePageCurl::BindMaterial";
 
-      //получение материала из кэша
+    if (!material)
+      throw xtl::make_null_argument_exception (METHOD_NAME, "material");
 
-    SpriteMaterial* material = render.GetMaterial (name);
+    if (!texture)
+      throw xtl::make_null_argument_exception (METHOD_NAME, "texture");
+
+      //получение материала из кэша
 
     BlendStatePtr material_blend_state;
 
@@ -1182,20 +1267,11 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
         material_blend_state = additive_blend_state;
         break;
       default:
-        throw xtl::format_operation_exception (METHOD_NAME, "Unsupported material '%s' blend mode, only 'none', 'translucent', 'mask' and 'additive' page material blend mode supported", name);
+        throw xtl::format_operation_exception (METHOD_NAME, "Unsupported material '%s' blend mode, only 'none', 'translucent', 'mask' and 'additive' page material blend mode supported", material->Name ());
     }
 
     device.OSSetBlendState (material_blend_state.get ());
-
-    //получение текстуры
-
-    ILowLevelTexture* texture = dynamic_cast<ILowLevelTexture*> (render.GetTexture (material->Image (), false, renderable));
-
-    if (!texture)
-      throw xtl::format_operation_exception (METHOD_NAME, "Material '%s' has unsupported texture type, only ILowLevelTexture supported", name);
-
-      //установка текстуры
-    device.SSSetTexture (0, texture->GetTexture ());
+    device.SSSetTexture    (0, texture->GetTexture ());
   }
 };
 
@@ -1211,6 +1287,15 @@ RenderablePageCurl::RenderablePageCurl (scene_graph::PageCurl* page_curl, Render
 
 RenderablePageCurl::~RenderablePageCurl ()
 {
+}
+
+/*
+   Обновление
+*/
+
+void RenderablePageCurl::Update ()
+{
+  impl->Update ();
 }
 
 /*
