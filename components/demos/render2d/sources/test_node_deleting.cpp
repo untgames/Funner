@@ -59,6 +59,10 @@ struct Test
 
     render_target.SetScreen (&screen);
 
+      //загрузка ресурсов
+
+    application.LoadResources ();
+
       //установка idle-функции
 
     application.SetIdleHandler (xtl::bind (&Test::Idle, this));

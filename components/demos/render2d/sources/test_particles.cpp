@@ -198,6 +198,10 @@ int main (int argc, char* argv [])
 
     render_target.SetScreen (&screen);
 
+      //загрузка ресурсов
+
+    test.LoadResources ();
+
       //установка idle-функции
 
     test.SetIdleHandler (xtl::bind (&idle, _1, xtl::ref (scene)));

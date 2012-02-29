@@ -143,10 +143,6 @@ TestApplication::TestApplication ()
 //    impl->render.SetRenderer ("Debug", "Renderer2d");
 
     impl->render_target = impl->render.RenderTarget (0);
-
-      //загрузка ресурсов
-
-    impl->render.LoadResource (MATERIAL_LIB_FILE_NAME);
   }
   catch (xtl::exception& exception)
   {
@@ -166,6 +162,15 @@ TestApplication::~TestApplication ()
 SceneRender& TestApplication::Render ()
 {
   return impl->render;
+}
+
+/*
+   «агрузка ресурсов
+*/
+
+void TestApplication::LoadResources ()
+{
+  impl->render.LoadResource (MATERIAL_LIB_FILE_NAME);
 }
 
 /*
