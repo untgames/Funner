@@ -132,6 +132,11 @@ void BasicFrame::Draw (render::low_level::IDevice* device, size_t& draw_frames_c
 
   DrawCore (device);
   
+    //генерация мипов
+    
+  if (render_target)
+    render_target->GenerateMips (*device);
+  
     //увеличение числа количества нарисованных кадров
   
   draw_frames_count++;  

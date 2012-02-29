@@ -291,6 +291,15 @@ RenderTargetTexture::ViewPtr RenderTargetTexture::CreateView
 }
 
 /*
+    Генерация мипов
+*/
+
+void RenderTargetTexture::GenerateMips (render::low_level::IDevice& device)
+{
+  device.GenerateMips (GetView ()->GetTexture ());
+}
+
+/*
     Обновление текстуры
 */
 
