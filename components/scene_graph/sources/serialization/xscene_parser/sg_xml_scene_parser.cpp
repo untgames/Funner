@@ -4,6 +4,55 @@ using namespace scene_graph;
 using namespace common;
 using namespace math;
 
+template <> void XmlSceneParser::CreateNode<SoundEmitter> (const common::ParseNode& decl, Node& parent, SceneContext& context);
+
+/*
+    Парсинг внутренних типов сцены
+*/
+
+namespace scene_graph
+{
+
+///Отображение тэга на значение
+template <class T> struct Tag2Value
+{
+  const char* tag;
+  T           value;
+};
+
+template <class BaseIter> inline bool read (xtl::io::token_iterator<const char*, BaseIter>& iter, TextLineAlignment& alignment)
+{
+  if (!iter)
+    return false;
+
+  static const Tag2Value<TextLineAlignment> tags [] = {
+    {"center",   TextLineAlignment_Center},
+    {"left",     TextLineAlignment_Left},
+    {"right",    TextLineAlignment_Right},
+    {"top",      TextLineAlignment_Top},
+    {"bottom",   TextLineAlignment_Bottom},
+    {"baseline", TextLineAlignment_BaseLine},
+  };
+  
+  static const size_t tags_count = sizeof (tags) / sizeof (*tags);
+  
+  const char* string = *iter;
+  
+  for (size_t i=0; i<tags_count; i++)
+    if (!strcmp (tags [i].tag, string))
+    {
+      alignment = tags [i].value;
+
+      ++iter;
+      
+      return true; 
+    }
+    
+  return false;
+}
+
+}
+
 namespace
 {
 
@@ -149,12 +198,24 @@ struct SpriteDecl: public xtl::reference_counter
   Param<math::vec3f> color;
 };
 
+///Описание параметров текстовой строки
+struct TextLineDecl: public xtl::reference_counter
+{
+  stl::string              text;
+  stl::string              font;
+  Param<math::vec3f>       color;
+  Param<float>             alpha;
+  Param<TextLineAlignment> horizontal_alignment;
+  Param<TextLineAlignment> vertical_alignment;
+};
+
 typedef xtl::intrusive_ptr<NodeDecl>              NodeDeclPtr;
 typedef xtl::intrusive_ptr<OrthoCameraDecl>       OrthoCameraDeclPtr;
 typedef xtl::intrusive_ptr<PerspectiveCameraDecl> PerspectiveCameraDeclPtr;
 typedef xtl::intrusive_ptr<LightDecl>             LightDeclPtr;
 typedef xtl::intrusive_ptr<VisualModelDecl>       VisualModelDeclPtr;
 typedef xtl::intrusive_ptr<SpriteDecl>            SpriteDeclPtr;
+typedef xtl::intrusive_ptr<TextLineDecl>          TextLineDeclPtr;
 
 PropertyType get_property_type (const common::ParseNode& node)
 {
@@ -301,12 +362,13 @@ struct XmlSceneParser::Impl
   }
 
 ///Предварительный разбор
-  NodeDeclPtr PrepareNode (const ParseNode& decl);
-  OrthoCameraDeclPtr PrepareOrthoCamera (const ParseNode& decl);
+  NodeDeclPtr              PrepareNode              (const ParseNode& decl);
+  OrthoCameraDeclPtr       PrepareOrthoCamera       (const ParseNode& decl);
   PerspectiveCameraDeclPtr PreparePerspectiveCamera (const ParseNode& decl);
-  LightDeclPtr PrepareLight (const ParseNode& decl);
-  VisualModelDeclPtr PrepareVisualModel (const ParseNode& decl);  
-  SpriteDeclPtr PrepareSprite (const ParseNode& decl);  
+  LightDeclPtr             PrepareLight             (const ParseNode& decl);
+  VisualModelDeclPtr       PrepareVisualModel       (const ParseNode& decl);  
+  SpriteDeclPtr            PrepareSprite            (const ParseNode& decl);  
+  TextLineDeclPtr          PrepareTextLine          (const ParseNode& decl);
 };
 
 /*
@@ -330,7 +392,7 @@ XmlSceneParser::XmlSceneParser (const ParseNode& root)
     RegisterParser ("direct_light", xtl::bind (&XmlSceneParser::CreateNode<DirectLight>, this, _1, _2, _3), xtl::bind (&XmlSceneParser::Impl::PrepareLight, &*impl, _1));
     RegisterParser ("point_light", xtl::bind (&XmlSceneParser::CreateNode<PointLight>, this, _1, _2, _3), xtl::bind (&XmlSceneParser::Impl::PrepareLight, &*impl, _1));
     RegisterParser ("mesh", xtl::bind (&XmlSceneParser::CreateNode<VisualModel>, this, _1, _2, _3), xtl::bind (&XmlSceneParser::Impl::PrepareVisualModel, &*impl, _1));
-    RegisterParser ("text_line", xtl::bind (&XmlSceneParser::CreateNode<TextLine>, this, _1, _2, _3));
+    RegisterParser ("text_line", xtl::bind (&XmlSceneParser::CreateNode<TextLine>, this, _1, _2, _3), xtl::bind (&XmlSceneParser::Impl::PrepareTextLine, &*impl, _1));
     RegisterParser ("sprite", xtl::bind (&XmlSceneParser::CreateNode<Sprite>, this, _1, _2, _3), xtl::bind (&XmlSceneParser::Impl::PrepareSprite, &*impl, _1));
     RegisterParser ("listener", xtl::bind (&XmlSceneParser::CreateNode<Listener>, this, _1, _2, _3));
     RegisterParser ("sound", xtl::bind (&XmlSceneParser::CreateNode<SoundEmitter>, this, _1, _2, _3));
@@ -1233,10 +1295,63 @@ void XmlSceneParser::Parse (const ParseNode& decl, Sprite& node, Node& parent, S
   }
 }
 
+TextLineDeclPtr XmlSceneParser::Impl::PrepareTextLine (const ParseNode& decl)
+{
+  try
+  {
+      //попытка найти параметры в кеше      
+
+    if (TextLineDeclPtr* node_decl_ptr = cache.FindValue<TextLineDeclPtr> (decl))
+      return *node_decl_ptr;
+      
+    TextLineDeclPtr node_decl (new TextLineDecl, false);
+    
+    node_decl->horizontal_alignment.Parse (decl, "horizontal_alignment");
+    node_decl->vertical_alignment.Parse (decl, "vertical_alignment");
+    node_decl->color.Parse (decl, "color");
+    node_decl->alpha.Parse (decl, "alpha");
+
+    node_decl->text = get<const char*> (decl, "text", "");
+    node_decl->font = get<const char*> (decl, "font", "");        
+
+      //регистрация дескриптора узла
+
+    cache.SetValue (decl, node_decl);    
+
+    return node_decl;
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("scene_graph::XmlSceneParser::Impl::PrepareTextLine");
+    throw;
+  }  
+}
+
 void XmlSceneParser::Parse (const ParseNode& decl, TextLine& node, Node& parent, SceneContext& context)
 {
   try
   {
+      //предварительный разбор
+      
+    TextLineDeclPtr node_decl = impl->PrepareTextLine (decl);
+    
+      //настройка узла
+      
+    node.SetTextUtf8 (node_decl->text.c_str ());
+    node.SetFont (node_decl->font.c_str ());
+    
+    if (node_decl->horizontal_alignment.state) node.SetHorizontalAlignment (node_decl->horizontal_alignment.value);
+    if (node_decl->vertical_alignment.state)   node.SetVerticalAlignment (node_decl->vertical_alignment.value);
+    
+    math::vec4f color = node.Color ();
+    
+    if (node_decl->color.state) color = node_decl->color.value;
+    if (node_decl->alpha.state) color.w = node_decl->alpha.value;        
+    
+    node.SetColor (color);
+      
+      //разбор родительских параметров
+    
     Parse (decl, static_cast<Entity&> (node), parent, context);    
   }
   catch (xtl::exception& e)
