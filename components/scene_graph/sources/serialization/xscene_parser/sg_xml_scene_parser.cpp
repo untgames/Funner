@@ -131,10 +131,19 @@ struct LightDecl: public xtl::reference_counter
   Param<float>       angle;
 };
 
+///ќписание параметров визуальной модели
+struct VisualModelDecl: public xtl::reference_counter
+{
+  stl::string        source;
+  Param<math::vec3f> min_bound;
+  Param<math::vec3f> max_bound;  
+};
+
 typedef xtl::intrusive_ptr<NodeDecl>              NodeDeclPtr;
 typedef xtl::intrusive_ptr<OrthoCameraDecl>       OrthoCameraDeclPtr;
 typedef xtl::intrusive_ptr<PerspectiveCameraDecl> PerspectiveCameraDeclPtr;
 typedef xtl::intrusive_ptr<LightDecl>             LightDeclPtr;
+typedef xtl::intrusive_ptr<VisualModelDecl>       VisualModelDeclPtr;
 
 PropertyType get_property_type (common::ParseNode& node)
 {
@@ -283,6 +292,7 @@ struct XmlSceneParser::Impl
   OrthoCameraDeclPtr PrepareOrthoCamera (const ParseNode& decl);
   PerspectiveCameraDeclPtr PreparePerspectiveCamera (const ParseNode& decl);
   LightDeclPtr PrepareLight (const ParseNode& decl);
+  VisualModelDeclPtr PrepareVisualModel (const ParseNode& decl);  
 };
 
 /*
@@ -305,7 +315,7 @@ XmlSceneParser::XmlSceneParser (const ParseNode& root)
     RegisterParser ("spot_light", xtl::bind (&XmlSceneParser::CreateNode<SpotLight>, this, _1, _2, _3), xtl::bind (&XmlSceneParser::Impl::PrepareLight, &*impl, _1));
     RegisterParser ("direct_light", xtl::bind (&XmlSceneParser::CreateNode<DirectLight>, this, _1, _2, _3), xtl::bind (&XmlSceneParser::Impl::PrepareLight, &*impl, _1));
     RegisterParser ("point_light", xtl::bind (&XmlSceneParser::CreateNode<PointLight>, this, _1, _2, _3), xtl::bind (&XmlSceneParser::Impl::PrepareLight, &*impl, _1));
-    RegisterParser ("mesh", xtl::bind (&XmlSceneParser::CreateNode<VisualModel>, this, _1, _2, _3));
+    RegisterParser ("mesh", xtl::bind (&XmlSceneParser::CreateNode<VisualModel>, this, _1, _2, _3), xtl::bind (&XmlSceneParser::Impl::PrepareVisualModel, &*impl, _1));
     RegisterParser ("text_line", xtl::bind (&XmlSceneParser::CreateNode<TextLine>, this, _1, _2, _3));
     RegisterParser ("sprite", xtl::bind (&XmlSceneParser::CreateNode<Sprite>, this, _1, _2, _3));
     RegisterParser ("listener", xtl::bind (&XmlSceneParser::CreateNode<Listener>, this, _1, _2, _3));
@@ -1091,28 +1101,61 @@ void XmlSceneParser::Parse (const ParseNode& decl, PointLight& node, Node& paren
   }
 }
 
+VisualModelDeclPtr XmlSceneParser::Impl::PrepareVisualModel (const ParseNode& decl)
+{
+  try
+  {
+      //попытка найти параметры в кеше      
+
+    if (VisualModelDeclPtr* node_decl_ptr = cache.FindValue<VisualModelDeclPtr> (decl))
+      return *node_decl_ptr;
+      
+    VisualModelDeclPtr node_decl (new VisualModelDecl, false);
+    
+    node_decl->min_bound.Parse (decl, "min_bound");
+    node_decl->max_bound.Parse (decl, "max_bound");
+
+    node_decl->source = get<const char*> (decl, "source", "");
+
+      //регистраци€ дескриптора узла
+      
+    cache.SetValue (decl, node_decl);    
+    
+    return node_decl;
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("scene_graph::XmlSceneParser::Impl::PrepareVisualModel");
+    throw;
+  }  
+}
+
 void XmlSceneParser::Parse (const ParseNode& decl, VisualModel& node, Node& parent, SceneContext& context)
 {
   try
   {
+      //предварительный разбор
+      
+    VisualModelDeclPtr node_decl = impl->PrepareVisualModel (decl);
+
+      //настройка узла
+
+    node.SetMeshName (node_decl->source.c_str ());
+
+    bound_volumes::aaboxf box;
+    
+    if (node_decl->min_bound.state) box.set_minimum (node_decl->min_bound.value);
+    if (node_decl->max_bound.state) box.set_maximum (node_decl->max_bound.value);
+
+    node.SetBoundBox (box);
+
+      //разбор родительских параметров
+    
     Parse (decl, static_cast<Entity&> (node), parent, context);
   }
   catch (xtl::exception& e)
   {
     e.touch ("scene_graph::XmlSceneParser::Parse(const ParseNode&,VisualModel&,Node&,SceneContext&)");
-    throw;
-  }
-}
-
-void XmlSceneParser::Parse (const ParseNode& decl, TextLine& node, Node& parent, SceneContext& context)
-{
-  try
-  {
-    Parse (decl, static_cast<Entity&> (node), parent, context);    
-  }
-  catch (xtl::exception& e)
-  {
-    e.touch ("scene_graph::XmlSceneParser::Parse(const ParseNode&,TextLine&,Node&,SceneContext&)");
     throw;
   }
 }
@@ -1126,6 +1169,20 @@ void XmlSceneParser::Parse (const ParseNode& decl, Sprite& node, Node& parent, S
   catch (xtl::exception& e)
   {
     e.touch ("scene_graph::XmlSceneParser::Parse(const ParseNode&,Sprite&,Node&,SceneContext&)");
+    throw;
+  }
+}
+
+
+void XmlSceneParser::Parse (const ParseNode& decl, TextLine& node, Node& parent, SceneContext& context)
+{
+  try
+  {
+    Parse (decl, static_cast<Entity&> (node), parent, context);    
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("scene_graph::XmlSceneParser::Parse(const ParseNode&,TextLine&,Node&,SceneContext&)");
     throw;
   }
 }
