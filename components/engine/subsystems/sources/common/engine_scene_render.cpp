@@ -30,6 +30,7 @@ const char*  COMPONENT_NAME            = "engine.subsystems.SceneRenderSubsystem
 const char*  LOG_NAME                  = COMPONENT_NAME;                           //имя протокола
 const char*  SUBSYSTEM_NAME            = "SceneRender";                            //подсистема
 const size_t DEFAULT_IDLE_RENDER_COUNT = 8;                                        //количество резервируемых обновляемых индексов рендер-таргетов
+const char*  QUERY_PREFIX              = "screen ";                                //префикс маски запросов рендеринга экранов
 
 /*
    Подсистема рендера сцены
@@ -48,12 +49,16 @@ class SceneRenderSubsystem : public ISubsystem, public IAttachmentRegistryListen
     {
       try
       {
-        render.SetMaxDrawDepth (get<size_t> (node, "MaxDrawDepth", render.MaxDrawDepth ()));
-
         const char* log_name = get<const char*> (node, "Log", "");
 
         if (*log_name)
           Log (log_name).Swap (log);
+
+        render.SetMaxDrawDepth (get<size_t> (node, "MaxDrawDepth", render.MaxDrawDepth ()));
+
+        stl::string query_mask = common::format ("%s*", QUERY_PREFIX);
+
+        render.RegisterQueryHandler (query_mask.c_str (), xtl::bind (&SceneRenderSubsystem::SetupDynamicRenderTarget, this, _1, _2));
 
         render.SetLogHandler (xtl::bind (&Log::Print, &log, _1));
 
@@ -228,6 +233,29 @@ class SceneRenderSubsystem : public ISubsystem, public IAttachmentRegistryListen
 
       if (idle_render_targets.empty ())
         idle_connection.disconnect ();
+    }
+
+      //настройка динамического целевого буфера рендеринга
+    void SetupDynamicRenderTarget (render::obsolete::RenderTarget& render_target, const char* query_name)
+    {
+      static const char* METHOD_NAME = "engine::subsystems::SceneRenderSubsystem::SetupDynamicRenderTarget";
+
+      if (!query_name)
+        throw xtl::make_null_argument_exception (METHOD_NAME, "query_name");
+
+      size_t prefix_length = xtl::xstrlen (QUERY_PREFIX);
+
+      if (xtl::xstrlen (query_name) < prefix_length)
+        throw xtl::make_argument_exception (METHOD_NAME, "query_name", query_name, "Query name is shorter than prefix");
+
+      const char* screen_name = query_name + prefix_length;
+
+      render::obsolete::Screen *screen = AttachmentRegistry::Find<render::obsolete::Screen> (screen_name);
+
+      if (!screen)
+        throw xtl::format_operation_exception (METHOD_NAME, "Can't find screen '%s' needed for query '%s'", screen_name, query_name);
+
+      render_target.SetScreen (screen);
     }
 
   private:
