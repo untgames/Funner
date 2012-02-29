@@ -24,5 +24,7 @@ MEDIA.ADOBE.XFL.TESTS.IMPORTS     := compile.media.adobe.xfl link.media.adobe.xf
 MEDIA.ADOBE.XFL.ANIMATION_SCREEN_BUILDER.TYPE          := application
 MEDIA.ADOBE.XFL.ANIMATION_SCREEN_BUILDER.NAME          := xfl-converter
 MEDIA.ADOBE.XFL.ANIMATION_SCREEN_BUILDER.SOURCE_DIRS   := utils
-MEDIA.ADOBE.XFL.ANIMATION_SCREEN_BUILDER.IMPORTS       := compile.media.adobe.xfl compile.media.shared compile.media.image link.media.image link.media.adobe.xfl.loader link.common.zip_file_system
+MEDIA.ADOBE.XFL.ANIMATION_SCREEN_BUILDER.IMPORTS       := compile.media.adobe.xfl compile.media.shared compile.media.image link.media.image \
+                                                          link.media.adobe.xfl.loader link.common.zip_file_system compile.media.animation link.media.animation link.media.animation.xanim \
+                                                          link.media.animation.binanim compile.math.curves link.math.curves
 MEDIA.ADOBE.XFL.ANIMATION_SCREEN_BUILDER.EXECUTION_DIR := .

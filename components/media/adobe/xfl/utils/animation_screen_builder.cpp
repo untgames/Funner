@@ -12,6 +12,7 @@
 #include <xtl/token_iterator.h>
 
 #include <math/vector.h>
+#include <math/spline.h>
 
 #include <common/file.h>
 #include <common/strlib.h>
@@ -20,6 +21,7 @@
 #include <media/adobe/xfl.h>
 #include <media/collection.h>
 #include <media/image.h>
+#include <media/animation/animation_library.h>
 
 using namespace math;
 using namespace common;
@@ -37,6 +39,10 @@ const float EPSILON = 0.001f;
 struct Params;
 
 typedef void (*ProcessOption)(const char* arg, Params& params);
+
+typedef math::tcb_splinef  trackf;
+typedef math::tcb_spline2f track2f;
+typedef math::tcb_spline3f track3f;
 
 //опция
 struct Option
@@ -56,9 +62,11 @@ struct Params
   stl::string         xfl_name;                          //имя исходного файла или папки
   stl::string         output_textures_dir_name;          //имя каталога с сохранёнными текстурами
   stl::string         output_material_textures_dir_name; //имя каталога с текстурами, используемое при генерации материала
+  stl::string         output_scene_animation_dir_name;   //имя каталога с анимацией, используемое при генерации сцены
   stl::string         output_textures_format;            //формат имён файлов в папке с текстурами
   stl::string         output_materials_file_name;        //имя файла с материалами
-  stl::string         output_scene_file_name;            //имя файла с анимациями
+  stl::string         output_scene_file_name;            //имя файла со сценой
+  stl::string         output_animation_file_name;        //имя файла с анимациями
   stl::string         material_name_pattern;             //строка шаблона поиска имени материала
   stl::string         material_name_replacement;         //строка преобразования имени материала
   stl::string         sprite_name_pattern;               //строка шаблона поиска имени спрайта
@@ -110,10 +118,11 @@ typedef stl::list<Event>                           EventList;
 //параметры конвертации
 struct ConvertData
 {
-  Document                 document;
-  UsedResourcesSet         used_symbols;
-  ImageMap                 images;
-  stl::auto_ptr<XmlWriter> scene_writer;
+  Document                     document;
+  UsedResourcesSet             used_symbols;
+  ImageMap                     images;
+  stl::auto_ptr<XmlWriter>     scene_writer;
+  media::animation::Animation  animation;
 };
 
 enum LayerType
@@ -204,6 +213,12 @@ void command_line_result_material_textures_dir (const char* file_name, Params& p
   params.output_material_textures_dir_name = file_name;
 }
 
+//установка имени пути сохранения анимаций
+void command_line_result_scene_animation_dir (const char* file_name, Params& params)
+{
+  params.output_scene_animation_dir_name = file_name;
+}
+
 //установка формата сохранения текстур
 void command_line_result_textures_format (const char* value, Params& params)
 {
@@ -216,10 +231,16 @@ void command_line_materials_file_name (const char* file_name, Params& params)
   params.output_materials_file_name = file_name;
 }
 
-//установка папки анимаций
+//установка файла сцены
 void command_line_scene_file_name (const char* file_name, Params& params)
 {
   params.output_scene_file_name = file_name;
+}
+
+//установка файла анимации
+void command_line_animation_file_name (const char* file_name, Params& params)
+{
+  params.output_animation_file_name = file_name;
 }
 
 //установка необрезаемых слоёв
@@ -336,8 +357,10 @@ void command_line_parse (int argc, const char* argv [], Params& params)
     {command_line_result_textures_dir,          "out-textures-dir",          'o',        "dir",  "set output textures directory"},
     {command_line_result_textures_format,       "out-textures-format",         0,     "string",  "set output textures format string"},
     {command_line_result_material_textures_dir, "out-material-textures-dir", 'o',        "dir",  "set output textures directory in material file"},    
+    {command_line_result_scene_animation_dir,   "out-scene-animation-dir",   'o',        "dir",  "set output animation directory in scene file"},
     {command_line_materials_file_name,          "out-materials",               0,       "file",  "set output materials file"},
     {command_line_scene_file_name,              "out-scene",                   0,       "file",  "set output scene file"},
+    {command_line_animation_file_name,          "out-animation",               0,       "file",  "set output animation file"},
     {command_line_crop_alpha,                   "crop-alpha",                  0,      "value",  "crop layers by alpha that less than value"},    
     {command_line_crop_exclude,                 "crop-exclude",                0,  "wildcards",  "exclude selected layers from crop"},    
     {command_line_layers_exclude,               "layers-exclude",              0,  "wildcards",  "exclude selected layers from export"},
@@ -347,7 +370,7 @@ void command_line_parse (int argc, const char* argv [], Params& params)
     {command_line_pot,                          "pot",                         0,            0,  "extent textures size to nearest greater power of two"},
     {command_line_inverse_x,                    "inverse-x",                   0,            0,  "inverse X ort"},
     {command_line_inverse_y,                    "inverse-y",                   0,            0,  "inverse Y ort"},
-    {command_line_relative,                     "relative",                    0,            0,  "relative coordinates"},
+//    {command_line_relative,                     "relative",                    0,            0,  "relative coordinates"},
     {command_line_ignore_image_size,            "ignore-image-size",           0,            0,  "do not write image size to output scene"},
     {command_line_total_scale,                  "total-scale",                 0,       "vec2",  "total scale for animation"},
     {command_line_total_offset,                 "total-offset",                0,       "vec2",  "total offset for animation"},
@@ -830,12 +853,30 @@ LayerType get_layer_type (const Layer& layer)
   return LayerType_Undefined;
 }
 
+///создание канала
+template <class Track>
+Track& create_channel (ConvertData& data, const char* target_name, const char* parameter_name)
+{
+  media::animation::Channel channel;
+
+  Track spline;
+  
+  channel.SetTrack (spline);
+  
+  channel.SetParameterName (parameter_name);
+  
+  data.animation.AddChannel (target_name, channel);
+  
+  return *channel.Track<Track> ();
+}
+
 ///компоновка трека
 void write_track
- (ConvertData&             data,
+ (track3f&                 track,
   const PropertyAnimation& x_track,
   const PropertyAnimation& y_track,
   const char*              name_prefix,
+  float                    z,
   const math::vec2f&       offset,
   const math::vec2f&       scale = math::vec2f (1.0f, 1.0f))
 {
@@ -855,8 +896,6 @@ void write_track
       prev_value = math::vec2f (x_frame.value, y_frame.value);
     }
     
-    XmlWriter::Scope scope (*data.scene_writer, "Key");
-
     math::vec2f value;
     float       time;
 
@@ -901,68 +940,54 @@ void write_track
     prev_value = value;
     prev_time  = time;
     value      = (value + offset) * scale;
-
-    data.scene_writer->WriteAttribute ("Time", time);
-    data.scene_writer->WriteAttribute ("Value", common::format ("%.3f; %.3f", value.x, value.y).c_str ());
+    
+    track.add_key (time, math::vec3f (value, z)); 
   }
 }
 
-void write_track (ConvertData& data, const PropertyAnimation& track, float scale = 1.0f)
+void write_track (trackf& dst_track, const PropertyAnimation& src_track, float scale = 1.0f)
 {
-  for (size_t i=0, count=track.Keyframes ().Size (); i<count; i++)
+  for (size_t i=0, count=src_track.Keyframes ().Size (); i<count; i++)
   {
-    const PropertyAnimationKeyframe &frame = track.Keyframes ()[i];
-
-    XmlWriter::Scope scope (*data.scene_writer, "Key");
+    const PropertyAnimationKeyframe &frame = src_track.Keyframes ()[i];
     
-    data.scene_writer->WriteAttribute ("Time", frame.time);
-    data.scene_writer->WriteAttribute ("Value", frame.value * scale);
+    dst_track.add_key (frame.time, frame.value * scale);
+  }
+}
+
+void write_angle_track (track3f& dst_track, const PropertyAnimation& src_track, float scale = 1.0f)
+{
+  for (size_t i=0, count=src_track.Keyframes ().Size (); i<count; i++)
+  {
+    const PropertyAnimationKeyframe &frame = src_track.Keyframes ()[i];
+    
+    dst_track.add_key (frame.time, frame.value * scale);
   }
 }
 
 //обработка событий
 void write_events_track (ConvertData& data, const EventList& events)
 {
-  XmlWriter::Scope track_scope (*data.scene_writer, "Track");
-  
-  data.scene_writer->WriteAttribute ("Name", "events");
+  media::animation::EventTrack track = data.animation.Events ();
 
   for (EventList::const_iterator iter=events.begin (), end=events.end (); iter!=end; ++iter)
   {
     const Event& event = *iter;
     
-    XmlWriter::Scope key_scope (*data.scene_writer, "Key");
-    
-    data.scene_writer->WriteAttribute ("Time", event.time);
-    data.scene_writer->WriteAttribute ("Event", event.action.c_str ());
+    track.AddEvent (event.time, 0.0f, event.action.c_str ());
   }
 }
 
 //запись треков таймлайн-спрайта
-void write_timeline_sprite_tracks (Params& params, ConvertData& data, const EventList& events)
+void write_timeline_node_tracks (Params& params, ConvertData& data, const EventList& events)
 {
-  if (!params.ignore_image_size)
-  {
-    XmlWriter::Scope size_scope (*data.scene_writer, "Track");
-    
-    data.scene_writer->WriteAttribute ("Name", "size");
-    
-    XmlWriter::Scope key_scope (*data.scene_writer, "Key");
-    
-    data.scene_writer->WriteAttribute ("Time", 0.0f);
-    data.scene_writer->WriteAttribute ("Value", "1; 1");
-  }
-  
   write_events_track (data, events);
 }
 
 //запись таймлайн-спрайта
-void write_timeline_sprite_data (ConvertData& data, const char* name)
+void write_timeline_node_data (ConvertData& data, const char* name)
 {
-  data.scene_writer->WriteAttribute ("Name", name);
-  data.scene_writer->WriteAttribute ("Material", "transparent");
-  data.scene_writer->WriteAttribute ("Active", "false");
-  data.scene_writer->WriteAttribute ("Z", 0);  
+  data.scene_writer->WriteAttribute ("id", name);
 }
 
 ///общая часть обработки спрайтов
@@ -986,32 +1011,29 @@ void process_sprite_common
                           
   if (x_track && y_track)
   {
-    XmlWriter::Scope scope (*data.scene_writer, "Track");
+    math::vec2f track_scale  = math::vec2f (params.need_inverse_x ? -1.0f : 1.0f, params.need_inverse_y ? -1.0f : 1.0f) * scale * params.total_scale,
+                track_offset = params.need_relative ? math::vec2f (0.0f) : position + params.total_offset / track_scale;
     
-    data.scene_writer->WriteAttribute ("Name", params.need_relative ? "offset" : "position");
-    
-    if (looped)
-      data.scene_writer->WriteAttribute ("Loop", "true");
+    if (x_track->Keyframes ().Size () == 1 && y_track->Keyframes ().Size () == 1)
+    {
+      math::vec2f key_pos (x_track->Keyframes ()[0].value, y_track->Keyframes ()[0].value);
       
-    math::vec3f track_scale = math::vec2f (params.need_inverse_x ? -1.0f : 1.0f, params.need_inverse_y ? -1.0f : 1.0f) * scale * params.total_scale;
+      key_pos += track_offset;
+      key_pos *= track_scale;
+      
+      data.scene_writer->WriteAttribute (params.need_relative ? "offset" : "position", common::format ("%.3f; %.3f; 0", key_pos.x, key_pos.y));
+    }
+    else
+    {      
+      track3f& track = create_channel<track3f> (data, name, params.need_relative ? "offset" : "position");
 
-    write_track (data, *x_track, *y_track, name, params.need_relative ? math::vec2f (0.0f) : position + params.total_offset / track_scale, track_scale);
+      write_track (track, *x_track, *y_track, name, 0.0f, track_offset, track_scale);
+    }
   }
   else if (!equal (position, math::vec2f (.0f), EPSILON) && !params.need_relative)
   {
-    XmlWriter::Scope track_scope (*data.scene_writer, "Track");
-    
-    data.scene_writer->WriteAttribute ("Name", "position");
-    
-    if (looped)
-      data.scene_writer->WriteAttribute ("Loop", "true");    
-
-    XmlWriter::Scope key_scope (*data.scene_writer, "Key");
-
-    data.scene_writer->WriteAttribute ("Time", 0.0f);
-    data.scene_writer->WriteAttribute ("Value", common::format ("%.3f; %.3f", 
-      params.total_scale.x * (params.need_inverse_x ? -position.x : position.x),
-      params.total_scale.y * (params.need_inverse_y ? -position.y : position.y)).c_str ());
+    data.scene_writer->WriteAttribute ("position", common::format ("%.3f; %.3f; 0", params.total_scale.x * (params.need_inverse_x ? -position.x : position.x),
+      params.total_scale.y * (params.need_inverse_y ? -position.y : position.y), 0.0f).c_str ());
   }
 
     //сохранение масштаба
@@ -1021,14 +1043,16 @@ void process_sprite_common
   
   if (x_scale_track && y_scale_track)
   {
-    XmlWriter::Scope scope (*data.scene_writer, "Track");
+    if (x_scale_track->Keyframes ().Size () == 1 && y_scale_track->Keyframes ().Size () == 1)
+    {
+      data.scene_writer->WriteAttribute ("scale", common::format ("%.3f; %.3f; 1", 0.01f * x_scale_track->Keyframes ()[0].value, 0.01f * y_scale_track->Keyframes ()[0].value));
+    }
+    else
+    {
+      track3f& track = create_channel<track3f> (data, name, "scale");
     
-    data.scene_writer->WriteAttribute ("Name", "scale");
-    
-    if (looped)
-      data.scene_writer->WriteAttribute ("Loop", "true");    
-    
-    write_track (data, *x_scale_track, *y_scale_track, name, math::vec2f (0.0f), math::vec2f (0.01f));
+      write_track (track, *x_scale_track, *y_scale_track, name, 1.0f, math::vec2f (0.0f), math::vec2f (0.01f));
+    }
   }
 
     //сохранение угла
@@ -1059,25 +1083,29 @@ void process_sprite_common
   
   if (angle_in_skew)
   {
-    XmlWriter::Scope scope (*data.scene_writer, "Track");
+    if (skewx_track->Keyframes ().Size () == 1)
+    {
+      data.scene_writer->WriteAttribute ("rotation", common::format ("0; 0; %.3f", -skewx_track->Keyframes ()[0].value).c_str ());
+    }
+    else
+    {
+      track3f& track = create_channel<track3f> (data, name, "rotation");    
 
-    data.scene_writer->WriteAttribute ("Name", "angle");
-    
-    if (looped)
-      data.scene_writer->WriteAttribute ("Loop", "true");    
-
-    write_track (data, *skewx_track, -1.0f);
+      write_angle_track (track, *skewx_track, -1.0f);      
+    }    
   }
   else if (angle_track)
   {
-    XmlWriter::Scope scope (*data.scene_writer, "Track");
+    if (angle_track->Keyframes ().Size () == 1)
+    {
+      data.scene_writer->WriteAttribute ("rotation", common::format ("0; 0; %.3f", -angle_track->Keyframes ()[0].value).c_str ());
+    }
+    else
+    {    
+      track3f& track = create_channel<track3f> (data, name, "rotation");
 
-    data.scene_writer->WriteAttribute ("Name", "angle");
-    
-    if (looped)
-      data.scene_writer->WriteAttribute ("Loop", "true");    
-
-    write_track (data, *angle_track, -1.0f);
+      write_angle_track (track, *angle_track, -1.0f);
+    }
   }
 
     //сохранение альфа
@@ -1086,14 +1114,16 @@ void process_sprite_common
   
   if (alpha_track)
   {
-    XmlWriter::Scope scope (*data.scene_writer, "Track");
+    if (alpha_track->Keyframes ().Size () == 1)
+    {
+      data.scene_writer->WriteAttribute ("alpha", common::format ("%.3f", alpha_track->Keyframes ()[0].value * 0.01f));
+    }
+    else
+    {
+      trackf& track = create_channel<trackf> (data, name, "alpha");
     
-    data.scene_writer->WriteAttribute ("Name", "alpha");
-    
-    if (looped)
-      data.scene_writer->WriteAttribute ("Loop", "true");    
-    
-    write_track (data, *alpha_track, 0.01f);
+      write_track (track, *alpha_track, 0.01f);
+    }
   }
 }
 
@@ -1102,11 +1132,11 @@ void process_sprite (Params& params, ConvertData& data, const Frame& frame, cons
 {
   const FrameElement& element = frame.Elements ()[(size_t)0];
 
-  XmlWriter::Scope scope (*data.scene_writer, "Sprite");
+  XmlWriter::Scope scope (*data.scene_writer, "sprite");
   
     //запись имени спрайта
   
-  data.scene_writer->WriteAttribute ("Name", name);
+  data.scene_writer->WriteAttribute ("id", name);
   
     //запись материала спрайта
   
@@ -1122,26 +1152,21 @@ void process_sprite (Params& params, ConvertData& data, const Frame& frame, cons
   
   const ImageDesc& image_desc = mtl_iter->second;
   
-  data.scene_writer->WriteAttribute ("Material", get_full_material_name (params, resource_name).c_str ());
+  data.scene_writer->WriteAttribute ("material", get_full_material_name (params, resource_name).c_str ());
   
   if (*parent)
   {
-    data.scene_writer->WriteAttribute ("Parent", parent);
-    data.scene_writer->WriteAttribute ("ScaleInherit", "true");
-    data.scene_writer->WriteAttribute ("OrientationInherit", "true");
-    data.scene_writer->WriteAttribute ("PositionSpace", "local");
-    data.scene_writer->WriteAttribute ("ScaleSpace", "local");
-    data.scene_writer->WriteAttribute ("OrientationSpace", "local");
-    data.scene_writer->WriteAttribute ("BindSpace", "parent");
-    data.scene_writer->WriteAttribute ("ScalePivotEnabled", "false");
-    data.scene_writer->WriteAttribute ("OrientationPivotEnabled", "true");
+//    data.scene_writer->WriteAttribute ("parent", parent);
+    data.scene_writer->WriteAttribute ("bind_space", "local");
+    data.scene_writer->WriteAttribute ("scale_pivot", "false");
+    data.scene_writer->WriteAttribute ("orientation_pivot", "true");
   }
   
-  stl::string sprite_name = get_sprite_name (params, resource_name);
+  stl::string sprite_name = get_sprite_name (params, resource_name);  
     
-  data.scene_writer->WriteAttribute ("Layout", sprite_name.c_str ());
-
-  data.scene_writer->WriteAttribute ("Active", "false");
+  data.scene_writer->WriteAttribute ("before_node", sprite_name.c_str ());
+    
+  data.scene_writer->WriteAttribute ("visible", "false");
   
     //сохранение центра вращений
     
@@ -1156,22 +1181,15 @@ void process_sprite (Params& params, ConvertData& data, const Frame& frame, cons
 
   stl::string pivot_value_string;
 
-  pivot_value_string = common::format ("%.3f;%.3f", transformation_point.x, transformation_point.y);
+  pivot_value_string = common::format ("%.3f; %.3f; 0", transformation_point.x, transformation_point.y);
 
-  data.scene_writer->WriteAttribute ("PivotPosition", pivot_value_string.c_str ());
+  data.scene_writer->WriteAttribute ("pivot", pivot_value_string.c_str ());
   
     //сохранение размера
   
   if (!params.need_relative && !params.ignore_image_size)
   {
-    XmlWriter::Scope track_scope (*data.scene_writer, "Track");
-    
-    data.scene_writer->WriteAttribute ("Name",  "size");
-    
-    XmlWriter::Scope key_scope (*data.scene_writer, "Key");    
-    
-    data.scene_writer->WriteAttribute ("Time",  0.0f);
-    data.scene_writer->WriteAttribute ("Value", common::format ("%g; %g", params.total_scale.x * image_desc.width, params.total_scale.y * image_desc.height).c_str ());
+    data.scene_writer->WriteAttribute ("scale", common::format ("%g; %g; 1", params.total_scale.x * image_desc.width, params.total_scale.y * image_desc.height).c_str ());
   }
   
     //сохранение общей части
@@ -1180,30 +1198,6 @@ void process_sprite (Params& params, ConvertData& data, const Frame& frame, cons
     math::vec2f (float (image_desc.x), float (image_desc.y));
   
   process_sprite_common (params, data, frame, name, looped, position);
-}
-
-///обработка группы спрайтов
-void process_sprite_group (Params& params, ConvertData& data, const Layer::FrameList& frames, const char* name_prefix, bool looped)
-{
-  size_t frame_index = 1;
-  
-  for (Layer::FrameList::ConstIterator frame_iter=frames.CreateIterator (); frame_iter; ++frame_iter, ++frame_index)
-  {
-    const Frame& frame = *frame_iter;
-
-    process_sprite (params, data, frame, common::format ("%s.frame%u", name_prefix, frame_index).c_str (), "", looped);
-  }
-  
-    //сохранение группы
-    
-  XmlWriter::Scope group_scope (*data.scene_writer, "SpriteGroup");
-
-  data.scene_writer->WriteAttribute ("Name", name_prefix);
-  data.scene_writer->WriteAttribute ("Sprites", common::format ("%s.frame%%u; 1; %u", name_prefix, frame_index-1).c_str ());
-  data.scene_writer->WriteAttribute ("Fps", data.document.FrameRate ());
-  data.scene_writer->WriteAttribute ("Visible", "false");
-  
-//  process_sprite_common (data, frame, name_prefix);
 }
 
 //является ли спрайт луповым
@@ -1237,14 +1231,12 @@ float process_symbol_instance (Params& params, ConvertData& data, const Frame& f
     //обработка вложений
     
   EventList events;
-
-  float end_time = process_timeline (params, data, data.document.Symbols ()[symbol_name].Timeline (), name_prefix, events);
   
     //обработка спрайта
     
-  XmlWriter::Scope sprite_scope (*data.scene_writer, "Sprite");
+  XmlWriter::Scope node_scope (*data.scene_writer, "node");
   
-  write_timeline_sprite_data (data, name_prefix);  
+  write_timeline_node_data (data, name_prefix);  
 
     //сохранение центра вращений
     
@@ -1262,16 +1254,16 @@ float process_symbol_instance (Params& params, ConvertData& data, const Frame& f
   transformation_point *= params.total_scale;
 //  transformation_point += params.total_offset;
 
-  stl::string pivot_value_string = common::format ("%.3f;%.3f", transformation_point.x, transformation_point.y);
+  stl::string pivot_value_string = common::format ("%.3f; %.3f; 0", transformation_point.x, transformation_point.y);
 
-  data.scene_writer->WriteAttribute ("PivotPosition", pivot_value_string.c_str ());
-  data.scene_writer->WriteAttribute ("ScalePivotEnabled", "true");
-  data.scene_writer->WriteAttribute ("OrientationPivotEnabled", "true");
+  data.scene_writer->WriteAttribute ("pivot", pivot_value_string.c_str ());
+  data.scene_writer->WriteAttribute ("scale_pivot", "true");
+  data.scene_writer->WriteAttribute ("orientation_pivot", "true");
 
   process_sprite_common (params, data, frame, name_prefix, looped, element.Translation ());
-  write_timeline_sprite_tracks (params, data, events);
-
-  return end_time;
+  write_timeline_node_tracks (params, data, events);
+  
+  return process_timeline (params, data, data.document.Symbols ()[symbol_name].Timeline (), name_prefix, events);  
 }
 
 ///обработка таймлайна (возвращает время окончания анимации включая все вложения)
@@ -1296,40 +1288,16 @@ float process_timeline (Params& params, ConvertData& data, const Timeline& timel
     switch (layer_type)
     {
       case LayerType_SpriteGroup:
-      {
-        process_sprite_group (params, data, layer.Frames (), name_prefix.c_str (), is_looped);
-        
-          //регистрация события запуска
-          
-        Event event;          
-        
-        const Frame& frame = layer.Frames ()[0u];
-        
-        event.time   = frame.FirstFrame () / data.document.FrameRate ();
-        event.action = common::format ("ShowSpriteGroup ('%s')", name_prefix.c_str ());
-        
-        events.push_back (event);
-        
-        if (frame.Duration () > 1)
-        {
-          event.time   += frame.Duration () / data.document.FrameRate ();
-          event.action  = common::format ("HideSpriteGroup ('%s')", name_prefix.c_str ());
-          
-          if (event.time > end_time)
-            end_time = event.time;
-
-          events.push_back (event);
-        }
-
+        //ignored
         break;
-      }
       case LayerType_Sprite:
       {
         process_sprite (params, data, layer.Frames ()[0u], name_prefix.c_str (), parent_name, is_looped);
         
+        /*
           //регистрация события запуска
         
-        Event event;          
+        Event event;
         
         const Frame& frame = layer.Frames ()[0u];
         
@@ -1348,7 +1316,8 @@ float process_timeline (Params& params, ConvertData& data, const Timeline& timel
 
           events.push_back (event);
         }
-        
+          */
+
         break;
       }
       case LayerType_Instance:
@@ -1360,6 +1329,7 @@ float process_timeline (Params& params, ConvertData& data, const Timeline& timel
         
           //регистрация события запуска
           
+        /*
         const Frame& frame = layer.Frames ()[0u];          
         
         Event event;          
@@ -1379,7 +1349,7 @@ float process_timeline (Params& params, ConvertData& data, const Timeline& timel
 
           events.push_back (event);
         }        
-        
+        */
         break;
       }
       default:
@@ -1389,7 +1359,7 @@ float process_timeline (Params& params, ConvertData& data, const Timeline& timel
   }
 
     //автоматическая деактивация
-    
+/*    
   if (!float_compare (end_time, 0.0f))
   {    
     Event event;
@@ -1399,7 +1369,7 @@ float process_timeline (Params& params, ConvertData& data, const Timeline& timel
 
     events.push_back (event);
   }
-
+*/
   return end_time;
 }
 
@@ -1408,21 +1378,40 @@ void process_timeline (Params& params, ConvertData& data)
   if (params.output_scene_file_name.empty ())
     return; //в случае отсутствия файла сцены - экспорт не производится
     
+  if (params.output_animation_file_name.empty ())
+    params.output_animation_file_name = common::basename (params.output_scene_file_name) + ".xanim";
+
   if (!params.silent)
     printf ("Processing scene...\n");
 
   data.scene_writer = stl::auto_ptr<XmlWriter> (new XmlWriter (params.output_scene_file_name.c_str ()));
   
-  XmlWriter::Scope scope (*data.scene_writer, "AnimationScreenPart");
+  XmlWriter::Scope xscene_scope (*data.scene_writer, "xscene");
   
-  EventList events;
+  XmlWriter::Scope scene_scope (*data.scene_writer, "scene");
+  
+  data.scene_writer->WriteAttribute ("id", data.document.Timelines ()[(size_t)0].Name ());  
+  
+  {
+    XmlWriter::Scope resource_scope (*data.scene_writer, "resource");
+    
+    data.scene_writer->WriteAttribute ("source", params.output_scene_animation_dir_name.empty () ? params.output_animation_file_name :
+      common::format ("%s/%s", params.output_scene_animation_dir_name.c_str (), common::notdir (params.output_animation_file_name).c_str ()));
+  }  
+  
+  EventList events;  
 
   process_timeline (params, data, data.document.Timelines ()[(size_t)0], data.document.Timelines ()[(size_t)0].Name (), events);
+  write_events_track (data, events);
   
-  XmlWriter::Scope sprite_scope (*data.scene_writer, "Sprite");
-
-  write_timeline_sprite_data (data, data.document.Timelines ()[(size_t)0].Name ());
-  write_timeline_sprite_tracks (params, data, events);
+  if (!params.silent)
+    printf ("Save animations...\n");  
+    
+  media::animation::AnimationLibrary animation_library;
+  
+  animation_library.Attach (data.document.Timelines ()[(size_t)0].Name (), data.animation);
+  
+  animation_library.Save (params.output_animation_file_name.c_str ());
 }
 
 //построение списка используемых символов
