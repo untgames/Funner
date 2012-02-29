@@ -209,6 +209,13 @@ struct TextLineDecl: public xtl::reference_counter
   Param<TextLineAlignment> vertical_alignment;
 };
 
+///Описание параметров источника звука
+struct SoundEmitterDecl: public xtl::reference_counter
+{
+  stl::string  source;
+  Param<float> gain;
+};
+
 typedef xtl::intrusive_ptr<NodeDecl>              NodeDeclPtr;
 typedef xtl::intrusive_ptr<OrthoCameraDecl>       OrthoCameraDeclPtr;
 typedef xtl::intrusive_ptr<PerspectiveCameraDecl> PerspectiveCameraDeclPtr;
@@ -216,6 +223,7 @@ typedef xtl::intrusive_ptr<LightDecl>             LightDeclPtr;
 typedef xtl::intrusive_ptr<VisualModelDecl>       VisualModelDeclPtr;
 typedef xtl::intrusive_ptr<SpriteDecl>            SpriteDeclPtr;
 typedef xtl::intrusive_ptr<TextLineDecl>          TextLineDeclPtr;
+typedef xtl::intrusive_ptr<SoundEmitterDecl>      SoundEmitterDeclPtr;
 
 PropertyType get_property_type (const common::ParseNode& node)
 {
@@ -369,6 +377,7 @@ struct XmlSceneParser::Impl
   VisualModelDeclPtr       PrepareVisualModel       (const ParseNode& decl);  
   SpriteDeclPtr            PrepareSprite            (const ParseNode& decl);  
   TextLineDeclPtr          PrepareTextLine          (const ParseNode& decl);
+  SoundEmitterDeclPtr      PrepareSoundEmitter      (const ParseNode& decl);
 };
 
 /*
@@ -395,7 +404,7 @@ XmlSceneParser::XmlSceneParser (const ParseNode& root)
     RegisterParser ("text_line", xtl::bind (&XmlSceneParser::CreateNode<TextLine>, this, _1, _2, _3), xtl::bind (&XmlSceneParser::Impl::PrepareTextLine, &*impl, _1));
     RegisterParser ("sprite", xtl::bind (&XmlSceneParser::CreateNode<Sprite>, this, _1, _2, _3), xtl::bind (&XmlSceneParser::Impl::PrepareSprite, &*impl, _1));
     RegisterParser ("listener", xtl::bind (&XmlSceneParser::CreateNode<Listener>, this, _1, _2, _3));
-    RegisterParser ("sound", xtl::bind (&XmlSceneParser::CreateNode<SoundEmitter>, this, _1, _2, _3));
+    RegisterParser ("sound", xtl::bind (&XmlSceneParser::CreateNode<SoundEmitter>, this, _1, _2, _3), xtl::bind (&XmlSceneParser::Impl::PrepareSoundEmitter, &*impl, _1));
     RegisterParser ("include", xtl::bind (&XmlSceneParser::IncludeSubscene, this, _1, _2, _3), xtl::bind (&XmlSceneParser::Impl::PrepareIncludeNode, &*impl, _1));
     RegisterParser ("resource", ParseHandler (), xtl::bind (&XmlSceneParser::Impl::PrepareResourceNode, &*impl, _1));  
   }
@@ -648,15 +657,6 @@ template <class T>
 void XmlSceneParser::CreateNode (const common::ParseNode& decl, Node& parent, SceneContext& context)
 {
   typename T::Pointer node = T::Create ();
-
-  Parse (decl, *node, parent, context);
-}
-
-template <> void XmlSceneParser::CreateNode<SoundEmitter> (const common::ParseNode& decl, Node& parent, SceneContext& context)
-{
-  const char* source = get<const char*> (decl, "source");
-
-  SoundEmitter::Pointer node = SoundEmitter::Create (source);
 
   Parse (decl, *node, parent, context);
 }
@@ -1365,6 +1365,12 @@ void XmlSceneParser::Parse (const ParseNode& decl, Listener& node, Node& parent,
 {
   try
   {
+      //настройка узла
+      
+    node.SetGain (get<float> (decl, "gain", node.Gain ()));
+    
+      //разбор родительских параметров
+    
     Parse (decl, static_cast<Entity&> (node), parent, context);    
   }
   catch (xtl::exception& e)
@@ -1374,10 +1380,69 @@ void XmlSceneParser::Parse (const ParseNode& decl, Listener& node, Node& parent,
   }
 }
 
-void XmlSceneParser::Parse (const ParseNode& decl, SoundEmitter& node, Node& parent, SceneContext& context)
+SoundEmitterDeclPtr XmlSceneParser::Impl::PrepareSoundEmitter (const ParseNode& decl)
 {
   try
   {
+      //попытка найти параметры в кеше      
+
+    if (SoundEmitterDeclPtr* node_decl_ptr = cache.FindValue<SoundEmitterDeclPtr> (decl))
+      return *node_decl_ptr;
+      
+    SoundEmitterDeclPtr node_decl (new SoundEmitterDecl, false);
+    
+    node_decl->source = get<const char*> (decl, "source", "");
+    
+    node_decl->gain.Parse (decl, "gain");
+
+      //регистрация дескриптора узла
+
+    cache.SetValue (decl, node_decl);    
+
+    return node_decl;
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("scene_graph::XmlSceneParser::Impl::PrepareSoundEmitter");
+    throw;
+  }  
+}
+
+template <> void XmlSceneParser::CreateNode<SoundEmitter> (const common::ParseNode& decl, Node& parent, SceneContext& context)
+{
+  try
+  {
+      //предварительный разбор
+      
+    SoundEmitterDeclPtr node_decl = impl->PrepareSoundEmitter (decl);
+    
+      //настройка узла
+
+    SoundEmitter::Pointer node = SoundEmitter::Create (node_decl->source.c_str ());
+    
+    if (node_decl->gain.state) node->SetGain (node_decl->gain.value);
+    
+      //разбор родительских параметров
+
+    Parse (decl, static_cast<Entity&> (*node), parent, context);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("scene_graph::XmlSceneParser::CreateNode<SoundEmitter>");
+    throw;
+  }
+}
+
+void XmlSceneParser::Parse (const ParseNode& decl, SoundEmitter& node, Node& parent, SceneContext& context)
+{
+  try
+  {    
+      //настройка узла
+      
+    node.SetGain (get<float> (decl, "gain", node.Gain ()));
+    
+      //разбор родительских параметров
+    
     Parse (decl, static_cast<Entity&> (node), parent, context);    
   }
   catch (xtl::exception& e)

@@ -9,5 +9,6 @@
     <mesh id="mesh" source="1.mesh" min_bound="-10;-20;-30"/>
     <sprite id="sprite" material="sprite_material" color="1;0;1" alpha="0.5" frame="1"/>
     <text_line id="text_line" text="Hello world" font="my_font" color="1;1;1" alpha="0.5" horizontal_alignment="center" vertical_alignment="baseline"/>
+    <sound id="sound" source="my_sound" gain="0.5"/>
   </scene>
 </xscene>
