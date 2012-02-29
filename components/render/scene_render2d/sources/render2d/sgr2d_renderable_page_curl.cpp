@@ -14,6 +14,7 @@ typedef xtl::com_ptr<low_level::IProgram>                 ProgramPtr;
 typedef xtl::com_ptr<low_level::IProgramParametersLayout> ProgramParametersLayoutPtr;
 typedef xtl::com_ptr<low_level::IRasterizerState>         RasterizerStatePtr;
 typedef xtl::com_ptr<low_level::ISamplerState>            SamplerStatePtr;
+typedef xtl::com_ptr<low_level::IStateBlock>              StateBlockPtr;
 typedef xtl::intrusive_ptr<RenderablePageCurlMesh>        RenderablePageCurlMeshPtr;
 
 namespace
@@ -79,30 +80,33 @@ void shader_error_log (const char* message)
 
 struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
 {
-  Render&                    render;                      //ссылка на рендер
-  scene_graph::PageCurl*     page_curl;                   //исходный узел
-  Renderable*                renderable;                  //объект
-  LowLevelFramePtr           low_level_frame;             //фрейм кастомной отрисовки
-  BlendStatePtr              none_blend_state;            //состояния блендинга
-  BlendStatePtr              translucent_blend_state;     //состояния блендинга
-  BlendStatePtr              mask_blend_state;            //состояния блендинга
-  BlendStatePtr              additive_blend_state;        //состояния блендинга
-  InputLayoutPtr             input_layout;                //состояние устройства отрисовки
-  ProgramPtr                 default_program;             //шейдер
-  ProgramParametersLayoutPtr program_parameters_layout;   //расположение параметров шейдера
-  SamplerStatePtr            sampler_state;               //сэмплер
-  RasterizerStatePtr         rasterizer_no_cull_state;    //состояние растеризатора без отсечения
-  RasterizerStatePtr         rasterizer_cull_back_state;  //состояние растеризатора с отсечением задних сторон треугольников
-  RasterizerStatePtr         rasterizer_cull_front_state; //состояние растеризатора с отсечением передних сторон треугольников
-  DepthStencilStatePtr       depth_stencil_state;         //состояние буфера попиксельного отсечения
-  BufferPtr                  constant_buffer;             //константный буфер
-  BufferPtr                  quad_vertex_buffer;          //вершинный буфер на два треугольника
-  BufferPtr                  quad_index_buffer;           //индексный буфер на два треугольника
-  math::vec3f                view_point;                  //позиция камеры
-  math::mat4f                projection;                  //матрица камеры
-  RenderablePageCurlMeshPtr  curled_page;                 //сетка изгибаемой страницы
-  math::vec2ui               current_page_grid_size;      //текущий размер сетки страницы
-  bool                       initialized;                 //инициализированы ли необходимые поля
+  Render&                    render;                           //ссылка на рендер
+  scene_graph::PageCurl*     page_curl;                        //исходный узел
+  Renderable*                renderable;                       //объект
+  LowLevelFramePtr           low_level_frame;                  //фрейм кастомной отрисовки
+  BlendStatePtr              none_blend_state;                 //состояния блендинга
+  BlendStatePtr              translucent_blend_state;          //состояния блендинга
+  BlendStatePtr              mask_blend_state;                 //состояния блендинга
+  BlendStatePtr              additive_blend_state;             //состояния блендинга
+  InputLayoutPtr             input_layout;                     //состояние устройства отрисовки
+  ProgramPtr                 default_program;                  //шейдер
+  ProgramParametersLayoutPtr program_parameters_layout;        //расположение параметров шейдера
+  SamplerStatePtr            sampler_state;                    //сэмплер
+  RasterizerStatePtr         rasterizer_no_cull_state;         //состояние растеризатора без отсечения
+  RasterizerStatePtr         rasterizer_cull_back_state;       //состояние растеризатора с отсечением задних сторон треугольников
+  RasterizerStatePtr         rasterizer_cull_front_state;      //состояние растеризатора с отсечением передних сторон треугольников
+  RasterizerStatePtr         rasterizer_scissor_enabled_state; //состояние растеризатора с областью отсечением
+  DepthStencilStatePtr       depth_stencil_state;              //состояние буфера попиксельного отсечения
+  BufferPtr                  constant_buffer;                  //константный буфер
+  BufferPtr                  quad_vertex_buffer;               //вершинный буфер на два треугольника
+  BufferPtr                  quad_index_buffer;                //индексный буфер на два треугольника
+  StateBlockPtr              render_state;                     //сохранение состояния рендера
+  math::vec3f                view_point;                       //позиция камеры
+  math::mat4f                projection;                       //матрица камеры
+  mid_level::Viewport        viewport;                         //область вывода
+  RenderablePageCurlMeshPtr  curled_page;                      //сетка изгибаемой страницы
+  math::vec2ui               current_page_grid_size;           //текущий размер сетки страницы
+  bool                       initialized;                      //инициализированы ли необходимые поля
 
   ///Конструктор
   Impl (scene_graph::PageCurl* in_page_curl, Render& in_render, Renderable* in_renderable)
@@ -271,7 +275,7 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
   }
 
   //создание состояния уровня растеризации
-  RasterizerStatePtr CreateRasterizerState (low_level::IDevice& device, low_level::CullMode cull_mode)
+  RasterizerStatePtr CreateRasterizerState (low_level::IDevice& device, low_level::CullMode cull_mode, bool scissor_enable = false)
   {
     low_level::RasterizerDesc rasterizer_desc;
 
@@ -281,7 +285,7 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
     rasterizer_desc.cull_mode               = cull_mode;
     rasterizer_desc.front_counter_clockwise = true;
     rasterizer_desc.depth_bias              = 0;
-    rasterizer_desc.scissor_enable          = false;
+    rasterizer_desc.scissor_enable          = scissor_enable;
     rasterizer_desc.multisample_enable      = false;
     rasterizer_desc.antialiased_line_enable = false;
 
@@ -368,19 +372,26 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
   {
     if (!initialized)
     {
-      none_blend_state            = CreateBlendState              (device, false, low_level::BlendArgument_Zero, low_level::BlendArgument_Zero, low_level::BlendArgument_Zero);
-      translucent_blend_state     = CreateBlendState              (device, true, low_level::BlendArgument_SourceAlpha, low_level::BlendArgument_InverseSourceAlpha, low_level::BlendArgument_InverseSourceAlpha);
-      mask_blend_state            = CreateBlendState              (device, true, low_level::BlendArgument_Zero, low_level::BlendArgument_SourceColor, low_level::BlendArgument_SourceAlpha);
-      additive_blend_state        = CreateBlendState              (device, true, low_level::BlendArgument_SourceAlpha, low_level::BlendArgument_One, low_level::BlendArgument_One);
-      input_layout                = CreateInputLayout             (device);
-      default_program             = CreateProgram                 (device, "render.obsolete.renderer2d.RenderablePageCurl.default_program", DEFAULT_SHADER_SOURCE_CODE);
-      program_parameters_layout   = CreateProgramParametersLayout (device);
-      constant_buffer             = CreateConstantBuffer          (device);
-      rasterizer_no_cull_state    = CreateRasterizerState         (device, low_level::CullMode_None);
-      rasterizer_cull_front_state = CreateRasterizerState         (device, low_level::CullMode_Front);
-      rasterizer_cull_back_state  = CreateRasterizerState         (device, low_level::CullMode_Back);
-      depth_stencil_state         = CreateDepthStencilState       (device);
-      sampler_state               = CreateSampler                 (device);
+      none_blend_state                 = CreateBlendState              (device, false, low_level::BlendArgument_Zero, low_level::BlendArgument_Zero, low_level::BlendArgument_Zero);
+      translucent_blend_state          = CreateBlendState              (device, true, low_level::BlendArgument_SourceAlpha, low_level::BlendArgument_InverseSourceAlpha, low_level::BlendArgument_InverseSourceAlpha);
+      mask_blend_state                 = CreateBlendState              (device, true, low_level::BlendArgument_Zero, low_level::BlendArgument_SourceColor, low_level::BlendArgument_SourceAlpha);
+      additive_blend_state             = CreateBlendState              (device, true, low_level::BlendArgument_SourceAlpha, low_level::BlendArgument_One, low_level::BlendArgument_One);
+      input_layout                     = CreateInputLayout             (device);
+      default_program                  = CreateProgram                 (device, "render.obsolete.renderer2d.RenderablePageCurl.default_program", DEFAULT_SHADER_SOURCE_CODE);
+      program_parameters_layout        = CreateProgramParametersLayout (device);
+      constant_buffer                  = CreateConstantBuffer          (device);
+      rasterizer_no_cull_state         = CreateRasterizerState         (device, low_level::CullMode_None);
+      rasterizer_cull_front_state      = CreateRasterizerState         (device, low_level::CullMode_Front);
+      rasterizer_cull_back_state       = CreateRasterizerState         (device, low_level::CullMode_Back);
+      rasterizer_scissor_enabled_state = CreateRasterizerState         (device, low_level::CullMode_None, true);
+      depth_stencil_state              = CreateDepthStencilState       (device);
+      sampler_state                    = CreateSampler                 (device);
+
+      low_level::StateBlockMask state_block_mask;
+
+      state_block_mask.Set ();
+
+      render_state = StateBlockPtr (device.CreateStateBlock (state_block_mask), false);
 
       low_level::BufferDesc buffer_desc;
 
@@ -410,6 +421,8 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
 
       initialized = true;
     }
+
+    render_state->Capture ();
 
     const math::vec2ui& grid_size = page_curl->GridSize ();
 
@@ -460,6 +473,8 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
         DrawRightBottomCornerFlip (device);
         break;
     }
+
+    render_state->Apply ();
   }
 
   //Рисование теней
@@ -664,6 +679,19 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
       vertices [3].position = math::vec3f (bottom_detach_position.x + shadow_offset.x * shadow_width + x_offset, bottom_detach_position.y + shadow_offset.y * shadow_width, BACK_SHADOW_OFFSET);
 
       quad_vertex_buffer->SetData (0, sizeof (vertices), vertices);
+
+      math::vec3f left_bottom_corner_screen = (math::vec3f (-page_curl->Size ().x / 2, -page_curl->Size ().y / 2, 0) * page_curl->WorldTM () - view_point) * projection,
+                  right_top_corner_screen   = (math::vec3f (page_curl->Size ().x / 2, page_curl->Size ().y / 2, 0) * page_curl->WorldTM () - view_point) * projection;
+
+      low_level::Rect scissor_rect;
+
+      scissor_rect.x = viewport.x + (left_bottom_corner_screen.x + 1) / 2 * viewport.width;
+      scissor_rect.y = viewport.y + (left_bottom_corner_screen.y + 1) / 2 * viewport.height;
+      scissor_rect.width  = (right_top_corner_screen.x - left_bottom_corner_screen.x) / 2 * viewport.width;
+      scissor_rect.height = (right_top_corner_screen.y - left_bottom_corner_screen.y) / 2 * viewport.height;
+
+      device.RSSetState (rasterizer_scissor_enabled_state.get ());
+      device.RSSetScissor (scissor_rect);
 
       device.DrawIndexed (low_level::PrimitiveType_TriangleList, 0, 6, 0);
     }
@@ -1191,14 +1219,12 @@ RenderablePageCurl::~RenderablePageCurl ()
 
 void RenderablePageCurl::DrawCore (render::obsolete::render2d::IFrame& frame)
 {
-  mid_level::Viewport viewport;
-
   frame.GetViewPoint  (impl->view_point);
   frame.GetProjection (impl->projection);
-  frame.GetViewport   (viewport);
+  frame.GetViewport   (impl->viewport);
 
   impl->low_level_frame->SetRenderTargets (frame.GetRenderTarget (), frame.GetDepthStencilTarget ());
-  impl->low_level_frame->SetViewport (viewport);
+  impl->low_level_frame->SetViewport (impl->viewport);
 
   impl->render.Renderer ()->AddFrame (impl->low_level_frame.get ());
 }
