@@ -450,7 +450,7 @@ struct RenderTargetManager::Impl: public ContextObject, public RenderTargetManag
         
           //настройка области отсечения
 
-        bool current_scissor_state = GetContextCacheValue (CacheEntry_ScissorEnable);
+        size_t current_scissor_state = GetContextCacheValue (CacheEntry_ScissorEnable);
 
         if (clear_flags & ClearFlag_ViewportOnly)
         {          
