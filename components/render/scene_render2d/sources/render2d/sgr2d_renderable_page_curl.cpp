@@ -753,7 +753,7 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
 
     curled_page->SetTexCoords (max_s, 0, min_s, 1);
 
-    curled_page->CalculateShadow (true, 0);
+    curled_page->CalculateShadow (true);
 
     curled_page->Draw (device);
 
@@ -761,7 +761,7 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
 
     BindMaterial (device, GetCurledLeftPageMaterial ());
 
-    curled_page->CalculateShadow (false, 1 - curl_radius / page_curl->CurlRadius ());
+    curled_page->CalculateShadow (false);
 
     GetTexCoords (true, min_s, max_s);
 
@@ -831,7 +831,7 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
 
     curled_page->SetTexCoords (max_s, 0, min_s, 1);
 
-    curled_page->CalculateShadow (true, 0);
+    curled_page->CalculateShadow (true);
 
     curled_page->Draw (device);
 
@@ -839,7 +839,7 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
 
     BindMaterial (device, GetCurledLeftPageMaterial ());
 
-    curled_page->CalculateShadow (false, 1 - curl_radius / page_curl->CurlRadius ());
+    curled_page->CalculateShadow (false);
 
     GetTexCoords (true, min_s, max_s);
 
@@ -928,7 +928,7 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
     else
       curled_page->SetTexCoords (min_s, 0, max_s, 1);
 
-    curled_page->CalculateShadow (true, 0);
+    curled_page->CalculateShadow (true);
 
     curled_page->Draw (device);
 
@@ -936,7 +936,7 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
 
     BindMaterial (device, GetCurledRightPageMaterial ());
 
-    curled_page->CalculateShadow (false, 1 - curl_radius / page_curl->CurlRadius ());
+    curled_page->CalculateShadow (false);
 
     GetTexCoords (false, min_s, max_s);
 
@@ -1036,7 +1036,7 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
     else
       curled_page->SetTexCoords (min_s, 0, max_s, 1);
 
-    curled_page->CalculateShadow (true, 0);
+    curled_page->CalculateShadow (true);
 
     curled_page->Draw (device);
 
@@ -1044,7 +1044,7 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
 
     BindMaterial (device, GetCurledRightPageMaterial ());
 
-    curled_page->CalculateShadow (false, 1 - curl_radius / page_curl->CurlRadius ());
+    curled_page->CalculateShadow (false);
 
     GetTexCoords (false, min_s, max_s);
 

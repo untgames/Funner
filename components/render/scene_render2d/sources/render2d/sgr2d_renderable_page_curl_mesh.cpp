@@ -356,7 +356,7 @@ struct RenderablePageCurlMesh::Impl
   }
 
   //Рассчет цвета вершин
-  void CalculateShadow (bool front, float max_shadow)
+  void CalculateShadow (bool front)
   {
     if (last_curl_radius == 0)
       return;
@@ -365,7 +365,7 @@ struct RenderablePageCurlMesh::Impl
 
     for (size_t i = 0; i < vertices_count; i++, vertex++)
     {
-      float light = stl::max ((float)fabs (vertex->position.z) / (last_curl_radius * 2), max_shadow);
+      float light = stl::max ((float)fabs (vertex->position.z) / (last_curl_radius * 2), 0.f);
 
       if (!front)
         light = 1.f - light * 1.5f;
@@ -686,9 +686,9 @@ void RenderablePageCurlMesh::Curl (const math::vec2f& corner_position, scene_gra
    Рассчет цвета вершин
 */
 
-void RenderablePageCurlMesh::CalculateShadow (bool front, float max_shadow)
+void RenderablePageCurlMesh::CalculateShadow (bool front)
 {
-  impl->CalculateShadow (front, max_shadow);
+  impl->CalculateShadow (front);
 }
 
 /*
