@@ -91,6 +91,13 @@ XmlSceneFactory::XmlSceneFactory (const char* file_name, const LogHandler& log_h
       try
       {
         SceneParserPtr parser = XmlSceneParserManagerSingleton::Instance ()->CreateParser (*iter);
+        
+        if (!parser)
+          throw xtl::format_operation_exception ("scene_graph::XmlSceneFactory::XmlSceneFactory", "Internal error: parser is null");
+
+          //предварительный разбор
+
+        parser->Prepare ();
 
           //создание описателя сцены
 
