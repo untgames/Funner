@@ -169,15 +169,15 @@ int main (int argc, char* argv [])
 
   try
   {
-      //инициализация приложения
+      //шэшЎшрышчрЎш  яЁшыюцхэш 
 
     TestApplication test;
 
-      //создание сцены
+      //ёючфрэшх ёЎхэ√
 
     TestScene scene;
 
-      //создание областей вывода
+      //ёючфрэшх юсырёЄхщ т√тюфр
 
     Viewport vp;
     Screen screen;
@@ -198,11 +198,11 @@ int main (int argc, char* argv [])
 
     render_target.SetScreen (&screen);
 
-      //установка idle-функции
+      //єёЄрэютър idle-ЇєэъЎшш
 
     test.SetIdleHandler (xtl::bind (&idle, _1, xtl::ref (scene)));
 
-      //запуск приложения
+      //чряєёъ яЁшыюцхэш 
 
     return test.Run ();
   }
