@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding = "utf-8"?>
+<Configuration>
+  <Log>
+    <Console Filters="engine.*"/>
+  </Log>
+  <ResourceSystem>
+    <Server Name="Scene" Filters="*xscene" Cache="1"/>
+    <Server Name="Animation" Filters="*xanim *binanim" Cache="1"/>
+  </ResourceSystem>
+  <SceneManager AttachmentName = "SceneManager1" ResourceServer = "Scene">
+    <AnimationManager AttachmentName = "AnimationManager1" ResourceServer = "Animation"/>
+  </SceneManager>
+  <Shell Interpreter="lua" Sources="data/scene_manager.lua" Libraries="Math SceneGraph LuaOverride Engine Common" Execute="main ()"/>
+</Configuration>

@@ -24,13 +24,14 @@ ENGINE.SUBSYSTEMS.TESTS.IMPORTS             := compile.engine.core compile.commo
                                                link.engine.subsystems.scene_render link.engine.subsystems.scene_player \
                                                link.engine.subsystems.input_manager link.engine.subsystems.shell link.engine.subsystems.log \
                                                link.engine.subsystems.file_system link.engine.subsystems.resource_system \
-                                               link.engine.subsystems.physics_manager \
+                                               link.engine.subsystems.physics_manager link.engine.subsystems.scene_manager \
                                                link.input.manager.xkeymap link.input.manager.xkeyreg link.sound.low_level.openal_driver run.sound.low_level.openal_driver \
                                                link.script.lua link.engine.script_binds.math link.engine.script_binds.sg \
                                                link.engine.script_binds.render link.engine.script_binds.engine \
                                                link.engine.script_binds.input link.engine.script_binds.system \
                                                link.engine.script_binds.lua_override link.common.default_console_handler \
-                                               link.engine.script_binds.physics link.physics.low_level.bullet_driver
+                                               link.engine.script_binds.physics link.physics.low_level.bullet_driver link.media.animation.xanim \
+                                               link.scene_graph.xscene
 ENGINE.SUBSYSTEMS.TESTS.has_windows.IMPORTS := link.render.low_level.opengl_driver link.engine.subsystems.window_input_driver \
                                                link.engine.subsystems.window_manager link.engine.subsystems.window_renderer
 ENGINE.SUBSYSTEMS.TESTS.win32.IMPORTS       := link.input.direct_input_driver

@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<animation_library>
+  <animation id="vase_pieces" name="">
+    <channels>
+      <channel target_name="vase_pieces.piece_09" parameter_name="position" track_type="basic_spline&lt;spline_tcb_key&lt;vec3f&gt;&gt;">
+        <key time="0.000" value="283.000 217.000 0.000" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.040" value="280.267 214.735 0.000" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.080" value="277.826 218.172 0.000" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.120" value="276.000 222.000 0.000" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.160" value="268.445 226.404 0.000" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.200" value="260.392 230.142 0.000" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.240" value="254.300 236.375 0.000" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.280" value="250.104 242.620 0.000" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.320" value="245.270 248.428 0.000" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.360" value="242.319 255.296 0.000" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.400" value="241.305 262.756 0.000" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.440" value="240.488 270.240 0.000" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.480" value="240.850 277.740 0.000" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.520" value="242.794 285.201 0.000" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.560" value="245.340 292.483 0.000" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.600" value="246.500 300.000 0.000" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.640" value="242.558 306.528 0.000" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.680" value="237.937 312.615 0.000" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.720" value="233.725 318.987 0.000" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.760" value="231.136 324.590 0.000" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.800" value="229.177 330.440 0.000" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.840" value="228.000 336.500 0.000" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.880" value="227.237 336.868 0.000" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.920" value="226.313 336.816 0.000" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.960" value="225.409 336.679 0.000" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="1.000" value="224.500 336.500 0.000" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="1.040" value="224.333 336.500 0.000" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="1.080" value="224.166 336.500 0.000" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="1.120" value="224.000 336.500 0.000" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="1.160" value="223.834 336.500 0.000" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="1.200" value="223.667 336.500 0.000" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="1.240" value="223.500 336.500 0.000" tension="0.000" continuity="0.000" bias="0.000"/>
+      </channel>
+      <channel target_name="vase_pieces.piece_09" parameter_name="rotation" track_type="basic_spline&lt;spline_tcb_key&lt;vec3f&gt;&gt;">
+        <key time="0.000" value="0.000 0.000 -0.000" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.040" value="0.000 0.000 4.696" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.080" value="0.000 0.000 9.391" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.120" value="0.000 0.000 14.087" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.160" value="0.000 0.000 23.837" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.200" value="0.000 0.000 33.587" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.240" value="0.000 0.000 43.337" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.280" value="0.000 0.000 53.087" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.320" value="0.000 0.000 62.837" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.360" value="0.000 0.000 72.587" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.400" value="0.000 0.000 82.337" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.440" value="0.000 0.000 92.087" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.480" value="0.000 0.000 101.837" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.520" value="0.000 0.000 111.587" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.560" value="0.000 0.000 121.337" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.600" value="0.000 0.000 131.087" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.640" value="0.000 0.000 134.253" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.680" value="0.000 0.000 137.420" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.720" value="0.000 0.000 140.587" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.760" value="0.000 0.000 143.753" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.800" value="0.000 0.000 146.920" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.840" value="0.000 0.000 150.087" tension="0.000" continuity="0.000" bias="0.000"/>
+      </channel>
+    </channels>
+  </animation>
+</animation_library>

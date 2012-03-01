@@ -1,0 +1,48 @@
+Results of scene_manager_test:
+engine.SubsystemManager1: Add subsystem 'Log'
+engine.SubsystemManager1: Add subsystem 'ResourceSystem'
+engine.SubsystemManager1: Add subsystem 'SceneManager'
+engine.lua: Before animation
+engine.lua: node 'vase_pieces'
+engine.lua: {
+engine.lua:   position: 0.00 0.00 0.00
+engine.lua:   ortx: 1.00 0.00 0.00
+engine.lua:   scale: 1.00 1.00 1.00
+engine.lua:   node 'vase_pieces.piece_09'
+engine.lua:   {
+engine.lua:     position: 0.00 0.00 0.00
+engine.lua:     ortx: 1.00 0.00 0.00
+engine.lua:     scale: 1.00 1.00 1.00
+engine.lua:     node 'vase_pieces.piece_09.Layer 1'
+engine.lua:     {
+engine.lua:       position: 31.50 48.50 0.00
+engine.lua:       ortx: 1.00 0.00 0.00
+engine.lua:       scale: 63.00 97.00 1.00
+engine.lua:     }
+engine.lua:   }
+engine.lua: }
+engine.lua: After animation
+engine.lua: node 'vase_pieces'
+engine.lua: {
+engine.lua:   position: 0.00 0.00 0.00
+engine.lua:   ortx: 1.00 0.00 0.00
+engine.lua:   scale: 1.00 1.00 1.00
+engine.lua:   node 'vase_pieces.piece_09'
+engine.lua:   {
+engine.lua:     position: 224.34 336.50 0.00
+engine.lua:     ortx: -0.87 0.50 0.00
+engine.lua:     scale: 1.00 1.00 1.00
+engine.lua:     node 'vase_pieces.piece_09.Layer 1'
+engine.lua:     {
+engine.lua:       position: 31.50 48.50 0.00
+engine.lua:       ortx: 1.00 0.00 0.00
+engine.lua:       scale: 63.00 97.00 1.00
+engine.lua:     }
+engine.lua:   }
+engine.lua: }
+engine.SubsystemManager1: Add subsystem 'Shell'
+engine.SubsystemManager1: Subsystems successfully started
+engine.SubsystemManager1: Remove subsystem 'Shell'
+engine.SubsystemManager1: Remove subsystem 'SceneManager'
+engine.SubsystemManager1: Remove subsystem 'ResourceSystem'
+engine.SubsystemManager1: Remove subsystem 'Log'

@@ -146,10 +146,12 @@ void bind_attachment_registry_library (Environment& environment)
 
   typedef xtl::function<void (const char*)> InputHandler;
 
-  bind_attachment_methods<InputHandler>            (environment, "InputEventHandlers");
-  bind_attachment_methods<input::Cursor>           (environment, "Cursors");
-  bind_attachment_methods<syslib::Window>          (environment, "Windows");
-  bind_attachment_methods<physics::PhysicsManager> (environment, "PhysicsManagers");
+  bind_attachment_methods<InputHandler>              (environment, "InputEventHandlers");
+  bind_attachment_methods<input::Cursor>             (environment, "Cursors");
+  bind_attachment_methods<syslib::Window>            (environment, "Windows");
+  bind_attachment_methods<physics::PhysicsManager>   (environment, "PhysicsManagers");
+  bind_attachment_methods<scene_graph::SceneManager> (environment, "SceneManagers");  
+  bind_attachment_methods<scene_graph::controllers::AnimationManager> (environment, "AnimationManagers");    
 }
 
 namespace
