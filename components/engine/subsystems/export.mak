@@ -31,6 +31,10 @@ export.link.engine.subsystems.scene_player.IMPORTS       := link.engine.subsyste
 export.link.engine.subsystems.scene_render.LINK_INCLUDES := SceneRenderSubsystem
 export.link.engine.subsystems.scene_render.IMPORTS       := link.engine.subsystems link.render.scene_render2d
 
+# Link scene manager exports
+export.link.engine.subsystems.scene_manager.LINK_INCLUDES := SceneManagerSubsystem
+export.link.engine.subsystems.scene_manager.IMPORTS       := link.engine.subsystems link.scene_graph.core
+
 # Link shell exports
 export.link.engine.subsystems.shell.LINK_INCLUDES := ShellSubsystem
 export.link.engine.subsystems.shell.IMPORTS       := link.engine.subsystems link.script.core
