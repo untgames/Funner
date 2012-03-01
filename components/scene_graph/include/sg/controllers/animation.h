@@ -198,8 +198,8 @@ class AnimationController: public Controller
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Проигрывание анимаций
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    scene_graph::controllers::Animation PlayAnimation   (const char*                    name,
-                                                         const Animation::EventHandler& on_finish_handler = Animation::EventHandler ());
+    scene_graph::controllers::Animation PlayAnimation   (const char*  name);
+    scene_graph::controllers::Animation PlayAnimation   (const char*  name, const Animation::EventHandler& on_finish_handler);
     scene_graph::controllers::Animation CreateAnimation (const char* name);
     scene_graph::controllers::Animation CreateAnimation (const media::animation::Animation&);
 

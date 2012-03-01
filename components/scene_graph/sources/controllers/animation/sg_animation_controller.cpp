@@ -389,6 +389,11 @@ Animation AnimationController::Animation (size_t index) const
     Проигрывание анимаций
 */
 
+Animation AnimationController::PlayAnimation (const char* name)
+{
+  return PlayAnimation (name, Animation::EventHandler ());
+}
+
 Animation AnimationController::PlayAnimation (const char* name, const Animation::EventHandler& on_finish_handler)
 {
   try
