@@ -377,7 +377,7 @@ endef
 define batch-compile
   $2.FLAG_FILE        := $$($2.TMP_DIR)/$$(BATCH_COMPILE_FLAG_FILE_SHORT_NAME)
   $1.FLAG_FILES       := $$($1.FLAG_FILES) $$($2.FLAG_FILE)
-  $2.COMPILER_DEFINES := $$(strip $$($1.COMPILER_DEFINES)) $$(foreach var,$$(AUTO_COMPILER_DEFINES),MAKE_TARGET_$$(var)='$$(subst $$(SPACE),%,$$(strip $$($1.$$(var))))')
+  $2.COMPILER_DEFINES := $$(strip $$($1.COMPILER_DEFINES))# $$(foreach var,$$(AUTO_COMPILER_DEFINES),MAKE_TARGET_$$(var)='$$(subst $$(SPACE),%,$$(strip $$($1.$$(var))))')
   
   ifneq (,$$(strip $$($2.PCH)))
   

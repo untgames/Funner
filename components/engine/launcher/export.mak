@@ -25,8 +25,10 @@ export.link.engine.launcher_shared.IMPORTS := link.common.default_console_handle
                                 link.engine.subsystems.input_manager link.engine.subsystems.shell \
                                 link.engine.subsystems.log link.engine.subsystems.file_system \
                                 link.engine.subsystems.resource_system link.engine.subsystems.physics_manager \
+                                link.engine.subsystems.scene_manager \
                                 link.media.video.theora link.network link.common.iconv \
-                                link.physics.low_level.bullet_driver
+                                link.physics.low_level.bullet_driver link.media.animation.xanim link.media.animation.binanim \
+                                link.scene_graph.xscene
 
 export.link.engine.launcher.IMPORTS := link.engine.launcher_shared
 export.link.engine.launcher.LINK_INCLUDES := FunnerInit FunnerMain
