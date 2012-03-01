@@ -754,7 +754,7 @@ void Animation::SetLooping (bool state)
   impl->looped = state;
 }
 
-bool Animation::IsLopping  () const
+bool Animation::IsLooping  () const
 {
   return impl->looped;
 }
