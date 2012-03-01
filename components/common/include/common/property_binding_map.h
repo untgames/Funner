@@ -291,6 +291,7 @@ void copy_from (const PropertyMap& map, size_t property_index, unsigned long& va
 void copy_from (const PropertyMap& map, size_t property_index, float& value);
 void copy_from (const PropertyMap& map, size_t property_index, double& value);
 void copy_from (const PropertyMap& map, size_t property_index, long double& value);
+void copy_from (const PropertyMap& map, size_t property_index, bool& value);
 
 template <class T>
 void copy_from (const PropertyMap& map, size_t property_index, math::vector<T, 2>& value);
@@ -361,6 +362,7 @@ void copy_to (unsigned long value, PropertyMap& map, const PropertySelector& pro
 void copy_to (float value, PropertyMap& map, const PropertySelector& property_selector);
 void copy_to (double value, PropertyMap& map, const PropertySelector& property_selector);
 void copy_to (long double value, PropertyMap& map, const PropertySelector& property_selector);
+void copy_to (bool value, PropertyMap& map, const PropertySelector& property_selector);
 
 template <class T>
 void copy_to (const math::vector<T, 2>& value, PropertyMap& map, const PropertySelector& property_selector);

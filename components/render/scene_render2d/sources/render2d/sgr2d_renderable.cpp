@@ -8,10 +8,11 @@ using namespace scene_graph;
     Конструктор / деструктор
 */
 
-Renderable::Renderable (scene_graph::Entity* entity)
-  : on_update_connection (entity->RegisterEventHandler (NodeEvent_AfterUpdate, xtl::bind (&Renderable::UpdateNotify, this)))
+Renderable::Renderable (scene_graph::Entity* in_entity)
+  : on_update_connection (in_entity->RegisterEventHandler (NodeEvent_AfterUpdate, xtl::bind (&Renderable::UpdateNotify, this)))
   , need_update (true)
   , video_position (0)
+  , entity (in_entity)
 {
 }
 
@@ -44,6 +45,9 @@ float Renderable::VideoPosition () const
 
 void Renderable::Draw (IFrame& frame)
 {
+  if (!entity->IsVisible ())
+    return;
+
   if (need_update)
   {
     Update ();

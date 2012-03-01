@@ -136,6 +136,11 @@ inline void copy_from (const PropertyMap& map, size_t property_index, unsigned l
   detail::copy_integer_from (map, property_index, value);
 }
 
+inline void copy_from (const PropertyMap& map, size_t property_index, bool& value)
+{
+  value = map.GetInteger (property_index) != 0;
+}
+
 inline void copy_from (const PropertyMap& map, size_t property_index, float& value)
 {
   detail::copy_float_from (map, property_index, value);
@@ -277,6 +282,11 @@ inline void copy_to (long value, PropertyMap& map, const PropertySelector& prope
 }
 
 inline void copy_to (unsigned long value, PropertyMap& map, const PropertySelector& property_selector)
+{
+  detail::copy_value_to<int> (value, map, property_selector);
+}
+
+inline void copy_to (bool value, PropertyMap& map, const PropertySelector& property_selector)
 {
   detail::copy_value_to<int> (value, map, property_selector);
 }

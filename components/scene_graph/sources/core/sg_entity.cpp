@@ -324,4 +324,5 @@ void Entity::BindProperties (common::PropertyBindingMap& bindings)
 
   bindings.AddProperty ("InfiniteBounds", xtl::bind (&Entity::IsInfiniteBounds, this));
   bindings.AddProperty ("WireColor", xtl::bind (&Entity::WireColor, this), xtl::bind (xtl::implicit_cast<void (Entity::*)(const math::vec3f&)> (&Entity::SetWireColor), this, _1));
+  bindings.AddProperty ("Visible", xtl::bind (&Entity::IsVisible, this), xtl::bind (&Entity::SetVisible, this, _1));  
 }
