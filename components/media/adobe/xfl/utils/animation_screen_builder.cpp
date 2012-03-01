@@ -961,7 +961,7 @@ void write_angle_track (track3f& dst_track, const PropertyAnimation& src_track, 
   {
     const PropertyAnimationKeyframe &frame = src_track.Keyframes ()[i];
     
-    dst_track.add_key (frame.time, frame.value * scale);
+    dst_track.add_key (frame.time, math::vec3f (0.0f, 0.0f, frame.value * scale));
   }
 }
 
@@ -1391,6 +1391,7 @@ void process_timeline (Params& params, ConvertData& data)
   XmlWriter::Scope scene_scope (*data.scene_writer, "scene");
   
   data.scene_writer->WriteAttribute ("id", data.document.Timelines ()[(size_t)0].Name ());  
+  data.scene_writer->WriteAttribute ("version", "1.0");    
   
   {
     XmlWriter::Scope resource_scope (*data.scene_writer, "resource");

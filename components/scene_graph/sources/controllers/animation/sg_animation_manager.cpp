@@ -3,10 +3,6 @@
 using namespace scene_graph;
 using namespace scene_graph::controllers;
 
-/*
-    Описание реализации менеджера анимаций
-*/
-
 namespace
 {
 
@@ -18,6 +14,10 @@ struct AnimationLibraryDesc: public xtl::reference_counter
 };
 
 }
+
+/*
+    Описание реализации менеджера анимаций
+*/
 
 typedef xtl::intrusive_ptr<AnimationLibraryDesc>                                 AnimationLibraryPtr;
 typedef stl::list<AnimationLibraryPtr>                                           AnimationLibraryList;

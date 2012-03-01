@@ -7,7 +7,7 @@ Processing scene...
 Save animations...
 <?xml version="1.0" encoding="utf-8"?>
 <xscene>
-  <scene id="ghost_left_group">
+  <scene id="ghost_left_group" version="1.0">
     <resource source="results1/scene.xanim"/>
     <node id="ghost_left_group.ghost_left_movenment" pivot="53.500; 207.500; 0" scale_pivot="true" orientation_pivot="true" scale="1.000; 1.000; 1" rotation="0; 0; -0.000">
       <sprite id="ghost_left_group.ghost_left_movenment.Layer 1" material="ghost_left_movenment-clarices_bedroom.psd/1.png" bind_space="local" scale_pivot="false" orientation_pivot="true" before_node="ghost_left_movenment-clarices_bedroom.psd/1.png" visible="false" pivot="-0.354; -0.015; 0" scale="65; 267; 1" position="55.500; 137.500; 0"/>

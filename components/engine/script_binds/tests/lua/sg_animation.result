@@ -1,0 +1,40 @@
+Results of sg_animation_test:
+Test library:
+Before animation
+node 'vase_pieces'
+{
+  position: 0.00 0.00 0.00
+  ortx: 1.00 0.00 0.00
+  scale: 1.00 1.00 1.00
+  node 'vase_pieces.piece_09'
+  {
+    position: 0.00 0.00 0.00
+    ortx: 1.00 0.00 0.00
+    scale: 1.00 1.00 1.00
+    node 'vase_pieces.piece_09.Layer 1'
+    {
+      position: 31.50 48.50 0.00
+      ortx: 1.00 0.00 0.00
+      scale: 63.00 97.00 1.00
+    }
+  }
+}
+After animation
+node 'vase_pieces'
+{
+  position: 0.00 0.00 0.00
+  ortx: 1.00 0.00 0.00
+  scale: 1.00 1.00 1.00
+  node 'vase_pieces.piece_09'
+  {
+    position: 224.34 336.50 0.00
+    ortx: -0.87 0.50 0.00
+    scale: 1.00 1.00 1.00
+    node 'vase_pieces.piece_09.Layer 1'
+    {
+      position: 31.50 48.50 0.00
+      ortx: 1.00 0.00 0.00
+      scale: 63.00 97.00 1.00
+    }
+  }
+}

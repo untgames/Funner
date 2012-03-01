@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xscene>
+  <scene id="vase_pieces"  version="1.0">
+    <node id="vase_pieces.piece_09" pivot="31.500; 48.500; 0" scale_pivot="true" orientation_pivot="true" scale="1.000; 1.000; 1" alpha="1.000">
+      <sprite id="vase_pieces.piece_09.Layer 1" material="piece_09-hall.psd/1.png" bind_space="local" scale_pivot="false" orientation_pivot="true" before_node="piece_09-hall.psd/1.png" visible="false" pivot="0.000; 0.000; 0" scale="63; 97; 1" position="31.500; 48.500; 0"/>
+    </node>
+  </scene>
+</xscene>

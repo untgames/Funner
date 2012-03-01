@@ -1264,15 +1264,54 @@ const common::PropertyBindingMap& Node::PropertyBindings () const
   return const_cast<Node&> (*this).PropertyBindings ();
 }
 
+namespace
+{
+
+void set_rotation (Node* node, const math::vec3f& rot)
+{
+  node->SetOrientation (math::degree (rot.x), math::degree (rot.y), math::degree (rot.z));
+}
+
+math::vec3f get_rotation (Node* node)
+{
+  math::quatf q = node->Orientation ();
+
+  math::anglef angles [3];
+
+  math::to_euler_angles (q, angles [0], angles [1], angles [2]);
+
+  return math::vec3f (degree (angles [0]), degree (angles [1]), degree (angles [2]));
+}
+
+void set_world_rotation (Node* node, const math::vec3f& rot)
+{
+  node->SetWorldOrientation (math::degree (rot.x), math::degree (rot.y), math::degree (rot.z));
+}
+
+math::vec3f get_world_rotation (Node* node)
+{
+  math::quatf q = node->WorldOrientation ();
+
+  math::anglef angles [3];
+
+  math::to_euler_angles (q, angles [0], angles [1], angles [2]);
+
+  return math::vec3f (degree (angles [0]), degree (angles [1]), degree (angles [2]));
+}
+
+}
+
 void Node::BindProperties (common::PropertyBindingMap& bindings)
 {
   bindings.AddProperty ("Name", xtl::bind (&Node::Name, this), xtl::bind (&Node::SetName, this, _1));
   bindings.AddProperty ("UseCount", xtl::bind (&Node::UseCount, this));
   bindings.AddProperty ("Position", xtl::bind (&Node::Position, this), xtl::bind (xtl::implicit_cast<void (Node::*)(const math::vec3f&)> (&Node::SetPosition), this, _1));
   bindings.AddProperty ("Orientation", xtl::bind (&Node::Orientation, this), xtl::bind (xtl::implicit_cast<void (Node::*)(const math::quatf&)> (&Node::SetOrientation), this, _1));
+  bindings.AddProperty ("Rotation", xtl::bind (&get_rotation, this), xtl::bind (&set_rotation, this, _1));  
   bindings.AddProperty ("Scale", xtl::bind (xtl::implicit_cast<const math::vec3f& (Node::*)() const> (&Node::Scale), this), xtl::bind (xtl::implicit_cast<void (Node::*)(const math::vec3f&)> (&Node::SetScale), this, _1));
   bindings.AddProperty ("WorldPosition", xtl::bind (&Node::WorldPosition, this), xtl::bind (xtl::implicit_cast<void (Node::*)(const math::vec3f&)> (&Node::SetWorldPosition), this, _1));
   bindings.AddProperty ("WorldOrientation", xtl::bind (&Node::WorldOrientation, this), xtl::bind (xtl::implicit_cast<void (Node::*)(const quatf&)> (&Node::SetWorldOrientation), this, _1));
+  bindings.AddProperty ("WorldRotation", xtl::bind (&get_world_rotation, this), xtl::bind (&set_world_rotation, this, _1));    
   bindings.AddProperty ("WorldScale", xtl::bind (&Node::WorldScale, this), xtl::bind (xtl::implicit_cast<void (Node::*)(const math::vec3f&)> (&Node::SetWorldScale), this, _1));
   bindings.AddProperty ("LocalTM", xtl::bind (&Node::LocalTM, this), xtl::bind (&set_local_tm, this, _1));
   bindings.AddProperty ("WorldTM", xtl::bind (&Node::WorldTM, this), xtl::bind (&set_world_tm, this, _1));

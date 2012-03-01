@@ -13,7 +13,7 @@ Processing scene...
 Save animations...
 <?xml version="1.0" encoding="utf-8"?>
 <xscene>
-  <scene id="vase_pieces">
+  <scene id="vase_pieces" version="1.0">
     <resource source="results2/scene.xanim"/>
     <node id="vase_pieces.piece_09" pivot="31.500; 48.500; 0" scale_pivot="true" orientation_pivot="true" scale="1.000; 1.000; 1" alpha="1.000">
       <sprite id="vase_pieces.piece_09.Layer 1" material="piece_09-hall.psd/1.png" bind_space="local" scale_pivot="false" orientation_pivot="true" before_node="piece_09-hall.psd/1.png" visible="false" pivot="0.000; 0.000; 0" scale="63; 97; 1" position="31.500; 48.500; 0"/>
@@ -83,28 +83,28 @@ Save animations...
         <key time="1.240" value="223.500 336.500 0.000" tension="0.000" continuity="0.000" bias="0.000"/>
       </channel>
       <channel target_name="vase_pieces.piece_09" parameter_name="rotation" track_type="basic_spline&lt;spline_tcb_key&lt;vec3f&gt;&gt;">
-        <key time="0.000" value="-0.000 -0.000 -0.000" tension="0.000" continuity="0.000" bias="0.000"/>
-        <key time="0.040" value="4.696 4.696 4.696" tension="0.000" continuity="0.000" bias="0.000"/>
-        <key time="0.080" value="9.391 9.391 9.391" tension="0.000" continuity="0.000" bias="0.000"/>
-        <key time="0.120" value="14.087 14.087 14.087" tension="0.000" continuity="0.000" bias="0.000"/>
-        <key time="0.160" value="23.837 23.837 23.837" tension="0.000" continuity="0.000" bias="0.000"/>
-        <key time="0.200" value="33.587 33.587 33.587" tension="0.000" continuity="0.000" bias="0.000"/>
-        <key time="0.240" value="43.337 43.337 43.337" tension="0.000" continuity="0.000" bias="0.000"/>
-        <key time="0.280" value="53.087 53.087 53.087" tension="0.000" continuity="0.000" bias="0.000"/>
-        <key time="0.320" value="62.837 62.837 62.837" tension="0.000" continuity="0.000" bias="0.000"/>
-        <key time="0.360" value="72.587 72.587 72.587" tension="0.000" continuity="0.000" bias="0.000"/>
-        <key time="0.400" value="82.337 82.337 82.337" tension="0.000" continuity="0.000" bias="0.000"/>
-        <key time="0.440" value="92.087 92.087 92.087" tension="0.000" continuity="0.000" bias="0.000"/>
-        <key time="0.480" value="101.837 101.837 101.837" tension="0.000" continuity="0.000" bias="0.000"/>
-        <key time="0.520" value="111.587 111.587 111.587" tension="0.000" continuity="0.000" bias="0.000"/>
-        <key time="0.560" value="121.337 121.337 121.337" tension="0.000" continuity="0.000" bias="0.000"/>
-        <key time="0.600" value="131.087 131.087 131.087" tension="0.000" continuity="0.000" bias="0.000"/>
-        <key time="0.640" value="134.253 134.253 134.253" tension="0.000" continuity="0.000" bias="0.000"/>
-        <key time="0.680" value="137.420 137.420 137.420" tension="0.000" continuity="0.000" bias="0.000"/>
-        <key time="0.720" value="140.587 140.587 140.587" tension="0.000" continuity="0.000" bias="0.000"/>
-        <key time="0.760" value="143.753 143.753 143.753" tension="0.000" continuity="0.000" bias="0.000"/>
-        <key time="0.800" value="146.920 146.920 146.920" tension="0.000" continuity="0.000" bias="0.000"/>
-        <key time="0.840" value="150.087 150.087 150.087" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.000" value="0.000 0.000 -0.000" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.040" value="0.000 0.000 4.696" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.080" value="0.000 0.000 9.391" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.120" value="0.000 0.000 14.087" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.160" value="0.000 0.000 23.837" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.200" value="0.000 0.000 33.587" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.240" value="0.000 0.000 43.337" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.280" value="0.000 0.000 53.087" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.320" value="0.000 0.000 62.837" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.360" value="0.000 0.000 72.587" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.400" value="0.000 0.000 82.337" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.440" value="0.000 0.000 92.087" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.480" value="0.000 0.000 101.837" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.520" value="0.000 0.000 111.587" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.560" value="0.000 0.000 121.337" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.600" value="0.000 0.000 131.087" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.640" value="0.000 0.000 134.253" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.680" value="0.000 0.000 137.420" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.720" value="0.000 0.000 140.587" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.760" value="0.000 0.000 143.753" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.800" value="0.000 0.000 146.920" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.840" value="0.000 0.000 150.087" tension="0.000" continuity="0.000" bias="0.000"/>
       </channel>
       <channel target_name="vase_pieces.piece_08" parameter_name="position" track_type="basic_spline&lt;spline_tcb_key&lt;vec3f&gt;&gt;">
         <key time="0.000" value="267.000 189.000 0.000" tension="0.000" continuity="0.000" bias="0.000"/>
@@ -131,28 +131,28 @@ Save animations...
         <key time="0.840" value="232.500 365.000 0.000" tension="0.000" continuity="0.000" bias="0.000"/>
       </channel>
       <channel target_name="vase_pieces.piece_08" parameter_name="rotation" track_type="basic_spline&lt;spline_tcb_key&lt;vec3f&gt;&gt;">
-        <key time="0.000" value="-0.000 -0.000 -0.000" tension="0.000" continuity="0.000" bias="0.000"/>
-        <key time="0.040" value="1.333 1.333 1.333" tension="0.000" continuity="0.000" bias="0.000"/>
-        <key time="0.080" value="2.667 2.667 2.667" tension="0.000" continuity="0.000" bias="0.000"/>
-        <key time="0.120" value="4.000 4.000 4.000" tension="0.000" continuity="0.000" bias="0.000"/>
-        <key time="0.160" value="-6.667 -6.667 -6.667" tension="0.000" continuity="0.000" bias="0.000"/>
-        <key time="0.200" value="-17.333 -17.333 -17.333" tension="0.000" continuity="0.000" bias="0.000"/>
-        <key time="0.240" value="-28.000 -28.000 -28.000" tension="0.000" continuity="0.000" bias="0.000"/>
-        <key time="0.280" value="-37.600 -37.600 -37.600" tension="0.000" continuity="0.000" bias="0.000"/>
-        <key time="0.320" value="-47.200 -47.200 -47.200" tension="0.000" continuity="0.000" bias="0.000"/>
-        <key time="0.360" value="-56.800 -56.800 -56.800" tension="0.000" continuity="0.000" bias="0.000"/>
-        <key time="0.400" value="-66.400 -66.400 -66.400" tension="0.000" continuity="0.000" bias="0.000"/>
-        <key time="0.440" value="-76.000 -76.000 -76.000" tension="0.000" continuity="0.000" bias="0.000"/>
-        <key time="0.480" value="-85.600 -85.600 -85.600" tension="0.000" continuity="0.000" bias="0.000"/>
-        <key time="0.520" value="-95.200 -95.200 -95.200" tension="0.000" continuity="0.000" bias="0.000"/>
-        <key time="0.560" value="-104.800 -104.800 -104.800" tension="0.000" continuity="0.000" bias="0.000"/>
-        <key time="0.600" value="-114.400 -114.400 -114.400" tension="0.000" continuity="0.000" bias="0.000"/>
-        <key time="0.640" value="-124.000 -124.000 -124.000" tension="0.000" continuity="0.000" bias="0.000"/>
-        <key time="0.680" value="-133.600 -133.600 -133.600" tension="0.000" continuity="0.000" bias="0.000"/>
-        <key time="0.720" value="-143.200 -143.200 -143.200" tension="0.000" continuity="0.000" bias="0.000"/>
-        <key time="0.760" value="-152.800 -152.800 -152.800" tension="0.000" continuity="0.000" bias="0.000"/>
-        <key time="0.800" value="-162.400 -162.400 -162.400" tension="0.000" continuity="0.000" bias="0.000"/>
-        <key time="0.840" value="-172.000 -172.000 -172.000" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.000" value="0.000 0.000 -0.000" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.040" value="0.000 0.000 1.333" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.080" value="0.000 0.000 2.667" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.120" value="0.000 0.000 4.000" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.160" value="0.000 0.000 -6.667" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.200" value="0.000 0.000 -17.333" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.240" value="0.000 0.000 -28.000" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.280" value="0.000 0.000 -37.600" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.320" value="0.000 0.000 -47.200" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.360" value="0.000 0.000 -56.800" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.400" value="0.000 0.000 -66.400" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.440" value="0.000 0.000 -76.000" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.480" value="0.000 0.000 -85.600" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.520" value="0.000 0.000 -95.200" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.560" value="0.000 0.000 -104.800" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.600" value="0.000 0.000 -114.400" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.640" value="0.000 0.000 -124.000" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.680" value="0.000 0.000 -133.600" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.720" value="0.000 0.000 -143.200" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.760" value="0.000 0.000 -152.800" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.800" value="0.000 0.000 -162.400" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.840" value="0.000 0.000 -172.000" tension="0.000" continuity="0.000" bias="0.000"/>
       </channel>
       <channel target_name="vase_pieces.piece_07" parameter_name="position" track_type="basic_spline&lt;spline_tcb_key&lt;vec3f&gt;&gt;">
         <key time="0.000" value="313.000 227.000 0.000" tension="0.000" continuity="0.000" bias="0.000"/>
@@ -171,20 +171,20 @@ Save animations...
         <key time="0.520" value="315.000 379.000 0.000" tension="0.000" continuity="0.000" bias="0.000"/>
       </channel>
       <channel target_name="vase_pieces.piece_07" parameter_name="rotation" track_type="basic_spline&lt;spline_tcb_key&lt;vec3f&gt;&gt;">
-        <key time="0.000" value="-0.000 -0.000 -0.000" tension="0.000" continuity="0.000" bias="0.000"/>
-        <key time="0.040" value="-1.000 -1.000 -1.000" tension="0.000" continuity="0.000" bias="0.000"/>
-        <key time="0.080" value="-2.000 -2.000 -2.000" tension="0.000" continuity="0.000" bias="0.000"/>
-        <key time="0.120" value="-3.000 -3.000 -3.000" tension="0.000" continuity="0.000" bias="0.000"/>
-        <key time="0.160" value="-6.700 -6.700 -6.700" tension="0.000" continuity="0.000" bias="0.000"/>
-        <key time="0.200" value="-10.400 -10.400 -10.400" tension="0.000" continuity="0.000" bias="0.000"/>
-        <key time="0.240" value="-14.100 -14.100 -14.100" tension="0.000" continuity="0.000" bias="0.000"/>
-        <key time="0.280" value="-17.800 -17.800 -17.800" tension="0.000" continuity="0.000" bias="0.000"/>
-        <key time="0.320" value="-21.500 -21.500 -21.500" tension="0.000" continuity="0.000" bias="0.000"/>
-        <key time="0.360" value="-25.200 -25.200 -25.200" tension="0.000" continuity="0.000" bias="0.000"/>
-        <key time="0.400" value="-28.900 -28.900 -28.900" tension="0.000" continuity="0.000" bias="0.000"/>
-        <key time="0.440" value="-32.600 -32.600 -32.600" tension="0.000" continuity="0.000" bias="0.000"/>
-        <key time="0.480" value="-36.300 -36.300 -36.300" tension="0.000" continuity="0.000" bias="0.000"/>
-        <key time="0.520" value="-40.000 -40.000 -40.000" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.000" value="0.000 0.000 -0.000" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.040" value="0.000 0.000 -1.000" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.080" value="0.000 0.000 -2.000" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.120" value="0.000 0.000 -3.000" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.160" value="0.000 0.000 -6.700" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.200" value="0.000 0.000 -10.400" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.240" value="0.000 0.000 -14.100" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.280" value="0.000 0.000 -17.800" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.320" value="0.000 0.000 -21.500" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.360" value="0.000 0.000 -25.200" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.400" value="0.000 0.000 -28.900" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.440" value="0.000 0.000 -32.600" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.480" value="0.000 0.000 -36.300" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.520" value="0.000 0.000 -40.000" tension="0.000" continuity="0.000" bias="0.000"/>
       </channel>
       <channel target_name="vase_pieces.piece_06" parameter_name="position" track_type="basic_spline&lt;spline_tcb_key&lt;vec3f&gt;&gt;">
         <key time="0.000" value="366.000 226.000 0.000" tension="0.000" continuity="0.000" bias="0.000"/>
@@ -206,23 +206,23 @@ Save animations...
         <key time="0.640" value="376.500 369.500 0.000" tension="0.000" continuity="0.000" bias="0.000"/>
       </channel>
       <channel target_name="vase_pieces.piece_06" parameter_name="rotation" track_type="basic_spline&lt;spline_tcb_key&lt;vec3f&gt;&gt;">
-        <key time="0.000" value="-0.000 -0.000 -0.000" tension="0.000" continuity="0.000" bias="0.000"/>
-        <key time="0.040" value="-3.333 -3.333 -3.333" tension="0.000" continuity="0.000" bias="0.000"/>
-        <key time="0.080" value="-6.667 -6.667 -6.667" tension="0.000" continuity="0.000" bias="0.000"/>
-        <key time="0.120" value="-10.000 -10.000 -10.000" tension="0.000" continuity="0.000" bias="0.000"/>
-        <key time="0.160" value="-17.667 -17.667 -17.667" tension="0.000" continuity="0.000" bias="0.000"/>
-        <key time="0.200" value="-25.333 -25.333 -25.333" tension="0.000" continuity="0.000" bias="0.000"/>
-        <key time="0.240" value="-33.000 -33.000 -33.000" tension="0.000" continuity="0.000" bias="0.000"/>
-        <key time="0.280" value="-40.667 -40.667 -40.667" tension="0.000" continuity="0.000" bias="0.000"/>
-        <key time="0.320" value="-48.333 -48.333 -48.333" tension="0.000" continuity="0.000" bias="0.000"/>
-        <key time="0.360" value="-56.000 -56.000 -56.000" tension="0.000" continuity="0.000" bias="0.000"/>
-        <key time="0.400" value="-63.667 -63.667 -63.667" tension="0.000" continuity="0.000" bias="0.000"/>
-        <key time="0.440" value="-71.333 -71.333 -71.333" tension="0.000" continuity="0.000" bias="0.000"/>
-        <key time="0.480" value="-79.000 -79.000 -79.000" tension="0.000" continuity="0.000" bias="0.000"/>
-        <key time="0.520" value="-99.000 -99.000 -99.000" tension="0.000" continuity="0.000" bias="0.000"/>
-        <key time="0.560" value="-119.000 -119.000 -119.000" tension="0.000" continuity="0.000" bias="0.000"/>
-        <key time="0.600" value="-139.000 -139.000 -139.000" tension="0.000" continuity="0.000" bias="0.000"/>
-        <key time="0.640" value="-159.000 -159.000 -159.000" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.000" value="0.000 0.000 -0.000" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.040" value="0.000 0.000 -3.333" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.080" value="0.000 0.000 -6.667" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.120" value="0.000 0.000 -10.000" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.160" value="0.000 0.000 -17.667" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.200" value="0.000 0.000 -25.333" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.240" value="0.000 0.000 -33.000" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.280" value="0.000 0.000 -40.667" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.320" value="0.000 0.000 -48.333" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.360" value="0.000 0.000 -56.000" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.400" value="0.000 0.000 -63.667" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.440" value="0.000 0.000 -71.333" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.480" value="0.000 0.000 -79.000" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.520" value="0.000 0.000 -99.000" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.560" value="0.000 0.000 -119.000" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.600" value="0.000 0.000 -139.000" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.640" value="0.000 0.000 -159.000" tension="0.000" continuity="0.000" bias="0.000"/>
       </channel>
       <channel target_name="vase_pieces.piece_04" parameter_name="position" track_type="basic_spline&lt;spline_tcb_key&lt;vec3f&gt;&gt;">
         <key time="0.000" value="333.000 178.000 0.000" tension="0.000" continuity="0.000" bias="0.000"/>
@@ -254,33 +254,33 @@ Save animations...
         <key time="1.040" value="367.500 356.000 0.000" tension="0.000" continuity="0.000" bias="0.000"/>
       </channel>
       <channel target_name="vase_pieces.piece_04" parameter_name="rotation" track_type="basic_spline&lt;spline_tcb_key&lt;vec3f&gt;&gt;">
-        <key time="0.000" value="-0.000 -0.000 -0.000" tension="0.000" continuity="0.000" bias="0.000"/>
-        <key time="0.040" value="-2.790 -2.790 -2.790" tension="0.000" continuity="0.000" bias="0.000"/>
-        <key time="0.080" value="-5.579 -5.579 -5.579" tension="0.000" continuity="0.000" bias="0.000"/>
-        <key time="0.120" value="-8.369 -8.369 -8.369" tension="0.000" continuity="0.000" bias="0.000"/>
-        <key time="0.160" value="-9.369 -9.369 -9.369" tension="0.000" continuity="0.000" bias="0.000"/>
-        <key time="0.200" value="-10.369 -10.369 -10.369" tension="0.000" continuity="0.000" bias="0.000"/>
-        <key time="0.240" value="-11.369 -11.369 -11.369" tension="0.000" continuity="0.000" bias="0.000"/>
-        <key time="0.280" value="-12.369 -12.369 -12.369" tension="0.000" continuity="0.000" bias="0.000"/>
-        <key time="0.320" value="-13.369 -13.369 -13.369" tension="0.000" continuity="0.000" bias="0.000"/>
-        <key time="0.360" value="-14.369 -14.369 -14.369" tension="0.000" continuity="0.000" bias="0.000"/>
-        <key time="0.400" value="-15.369 -15.369 -15.369" tension="0.000" continuity="0.000" bias="0.000"/>
-        <key time="0.440" value="-16.369 -16.369 -16.369" tension="0.000" continuity="0.000" bias="0.000"/>
-        <key time="0.480" value="-17.369 -17.369 -17.369" tension="0.000" continuity="0.000" bias="0.000"/>
-        <key time="0.520" value="-18.369 -18.369 -18.369" tension="0.000" continuity="0.000" bias="0.000"/>
-        <key time="0.560" value="-19.369 -19.369 -19.369" tension="0.000" continuity="0.000" bias="0.000"/>
-        <key time="0.600" value="-20.369 -20.369 -20.369" tension="0.000" continuity="0.000" bias="0.000"/>
-        <key time="0.640" value="-21.369 -21.369 -21.369" tension="0.000" continuity="0.000" bias="0.000"/>
-        <key time="0.680" value="-22.369 -22.369 -22.369" tension="0.000" continuity="0.000" bias="0.000"/>
-        <key time="0.720" value="-23.369 -23.369 -23.369" tension="0.000" continuity="0.000" bias="0.000"/>
-        <key time="0.760" value="-24.369 -24.369 -24.369" tension="0.000" continuity="0.000" bias="0.000"/>
-        <key time="0.800" value="-25.369 -25.369 -25.369" tension="0.000" continuity="0.000" bias="0.000"/>
-        <key time="0.840" value="-26.369 -26.369 -26.369" tension="0.000" continuity="0.000" bias="0.000"/>
-        <key time="0.880" value="-26.169 -26.169 -26.169" tension="0.000" continuity="0.000" bias="0.000"/>
-        <key time="0.920" value="-25.969 -25.969 -25.969" tension="0.000" continuity="0.000" bias="0.000"/>
-        <key time="0.960" value="-25.769 -25.769 -25.769" tension="0.000" continuity="0.000" bias="0.000"/>
-        <key time="1.000" value="-25.569 -25.569 -25.569" tension="0.000" continuity="0.000" bias="0.000"/>
-        <key time="1.040" value="-25.369 -25.369 -25.369" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.000" value="0.000 0.000 -0.000" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.040" value="0.000 0.000 -2.790" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.080" value="0.000 0.000 -5.579" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.120" value="0.000 0.000 -8.369" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.160" value="0.000 0.000 -9.369" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.200" value="0.000 0.000 -10.369" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.240" value="0.000 0.000 -11.369" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.280" value="0.000 0.000 -12.369" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.320" value="0.000 0.000 -13.369" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.360" value="0.000 0.000 -14.369" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.400" value="0.000 0.000 -15.369" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.440" value="0.000 0.000 -16.369" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.480" value="0.000 0.000 -17.369" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.520" value="0.000 0.000 -18.369" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.560" value="0.000 0.000 -19.369" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.600" value="0.000 0.000 -20.369" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.640" value="0.000 0.000 -21.369" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.680" value="0.000 0.000 -22.369" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.720" value="0.000 0.000 -23.369" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.760" value="0.000 0.000 -24.369" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.800" value="0.000 0.000 -25.369" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.840" value="0.000 0.000 -26.369" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.880" value="0.000 0.000 -26.169" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.920" value="0.000 0.000 -25.969" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.960" value="0.000 0.000 -25.769" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="1.000" value="0.000 0.000 -25.569" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="1.040" value="0.000 0.000 -25.369" tension="0.000" continuity="0.000" bias="0.000"/>
       </channel>
       <channel target_name="vase_pieces.piece_03" parameter_name="position" track_type="basic_spline&lt;spline_tcb_key&lt;vec3f&gt;&gt;">
         <key time="0.000" value="263.000 132.000 0.000" tension="0.000" continuity="0.000" bias="0.000"/>
@@ -315,33 +315,33 @@ Save animations...
         <key time="1.160" value="167.000 332.000 0.000" tension="0.000" continuity="0.000" bias="0.000"/>
       </channel>
       <channel target_name="vase_pieces.piece_03" parameter_name="rotation" track_type="basic_spline&lt;spline_tcb_key&lt;vec3f&gt;&gt;">
-        <key time="0.000" value="-0.000 -0.000 -0.000" tension="0.000" continuity="0.000" bias="0.000"/>
-        <key time="0.040" value="-0.333 -0.333 -0.333" tension="0.000" continuity="0.000" bias="0.000"/>
-        <key time="0.080" value="-0.667 -0.667 -0.667" tension="0.000" continuity="0.000" bias="0.000"/>
-        <key time="0.120" value="-1.000 -1.000 -1.000" tension="0.000" continuity="0.000" bias="0.000"/>
-        <key time="0.160" value="-1.333 -1.333 -1.333" tension="0.000" continuity="0.000" bias="0.000"/>
-        <key time="0.200" value="-1.667 -1.667 -1.667" tension="0.000" continuity="0.000" bias="0.000"/>
-        <key time="0.240" value="-2.000 -2.000 -2.000" tension="0.000" continuity="0.000" bias="0.000"/>
-        <key time="0.280" value="-2.333 -2.333 -2.333" tension="0.000" continuity="0.000" bias="0.000"/>
-        <key time="0.320" value="-2.667 -2.667 -2.667" tension="0.000" continuity="0.000" bias="0.000"/>
-        <key time="0.360" value="-3.000 -3.000 -3.000" tension="0.000" continuity="0.000" bias="0.000"/>
-        <key time="0.400" value="-3.333 -3.333 -3.333" tension="0.000" continuity="0.000" bias="0.000"/>
-        <key time="0.440" value="-3.667 -3.667 -3.667" tension="0.000" continuity="0.000" bias="0.000"/>
-        <key time="0.480" value="-4.000 -4.000 -4.000" tension="0.000" continuity="0.000" bias="0.000"/>
-        <key time="0.520" value="-10.000 -10.000 -10.000" tension="0.000" continuity="0.000" bias="0.000"/>
-        <key time="0.560" value="-19.000 -19.000 -19.000" tension="0.000" continuity="0.000" bias="0.000"/>
-        <key time="0.600" value="-24.000 -24.000 -24.000" tension="0.000" continuity="0.000" bias="0.000"/>
-        <key time="0.640" value="-27.667 -27.667 -27.667" tension="0.000" continuity="0.000" bias="0.000"/>
-        <key time="0.680" value="-31.333 -31.333 -31.333" tension="0.000" continuity="0.000" bias="0.000"/>
-        <key time="0.720" value="-35.000 -35.000 -35.000" tension="0.000" continuity="0.000" bias="0.000"/>
-        <key time="0.760" value="-38.667 -38.667 -38.667" tension="0.000" continuity="0.000" bias="0.000"/>
-        <key time="0.800" value="-42.333 -42.333 -42.333" tension="0.000" continuity="0.000" bias="0.000"/>
-        <key time="0.840" value="-46.000 -46.000 -46.000" tension="0.000" continuity="0.000" bias="0.000"/>
-        <key time="0.880" value="-42.600 -42.600 -42.600" tension="0.000" continuity="0.000" bias="0.000"/>
-        <key time="0.920" value="-39.200 -39.200 -39.200" tension="0.000" continuity="0.000" bias="0.000"/>
-        <key time="0.960" value="-35.800 -35.800 -35.800" tension="0.000" continuity="0.000" bias="0.000"/>
-        <key time="1.000" value="-32.400 -32.400 -32.400" tension="0.000" continuity="0.000" bias="0.000"/>
-        <key time="1.040" value="-29.000 -29.000 -29.000" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.000" value="0.000 0.000 -0.000" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.040" value="0.000 0.000 -0.333" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.080" value="0.000 0.000 -0.667" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.120" value="0.000 0.000 -1.000" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.160" value="0.000 0.000 -1.333" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.200" value="0.000 0.000 -1.667" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.240" value="0.000 0.000 -2.000" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.280" value="0.000 0.000 -2.333" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.320" value="0.000 0.000 -2.667" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.360" value="0.000 0.000 -3.000" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.400" value="0.000 0.000 -3.333" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.440" value="0.000 0.000 -3.667" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.480" value="0.000 0.000 -4.000" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.520" value="0.000 0.000 -10.000" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.560" value="0.000 0.000 -19.000" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.600" value="0.000 0.000 -24.000" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.640" value="0.000 0.000 -27.667" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.680" value="0.000 0.000 -31.333" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.720" value="0.000 0.000 -35.000" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.760" value="0.000 0.000 -38.667" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.800" value="0.000 0.000 -42.333" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.840" value="0.000 0.000 -46.000" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.880" value="0.000 0.000 -42.600" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.920" value="0.000 0.000 -39.200" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.960" value="0.000 0.000 -35.800" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="1.000" value="0.000 0.000 -32.400" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="1.040" value="0.000 0.000 -29.000" tension="0.000" continuity="0.000" bias="0.000"/>
       </channel>
       <channel target_name="vase_pieces.piece_02" parameter_name="position" track_type="basic_spline&lt;spline_tcb_key&lt;vec3f&gt;&gt;">
         <key time="0.000" value="317.000 100.000 0.000" tension="0.000" continuity="0.000" bias="0.000"/>
@@ -361,21 +361,21 @@ Save animations...
         <key time="0.560" value="286.500 214.000 0.000" tension="0.000" continuity="0.000" bias="0.000"/>
       </channel>
       <channel target_name="vase_pieces.piece_02" parameter_name="rotation" track_type="basic_spline&lt;spline_tcb_key&lt;vec3f&gt;&gt;">
-        <key time="0.000" value="-0.000 -0.000 -0.000" tension="0.000" continuity="0.000" bias="0.000"/>
-        <key time="0.040" value="0.667 0.667 0.667" tension="0.000" continuity="0.000" bias="0.000"/>
-        <key time="0.080" value="1.333 1.333 1.333" tension="0.000" continuity="0.000" bias="0.000"/>
-        <key time="0.120" value="2.000 2.000 2.000" tension="0.000" continuity="0.000" bias="0.000"/>
-        <key time="0.160" value="1.500 1.500 1.500" tension="0.000" continuity="0.000" bias="0.000"/>
-        <key time="0.200" value="1.000 1.000 1.000" tension="0.000" continuity="0.000" bias="0.000"/>
-        <key time="0.240" value="0.500 0.500 0.500" tension="0.000" continuity="0.000" bias="0.000"/>
-        <key time="0.280" value="-0.000 -0.000 -0.000" tension="0.000" continuity="0.000" bias="0.000"/>
-        <key time="0.320" value="-0.500 -0.500 -0.500" tension="0.000" continuity="0.000" bias="0.000"/>
-        <key time="0.360" value="-1.000 -1.000 -1.000" tension="0.000" continuity="0.000" bias="0.000"/>
-        <key time="0.400" value="3.600 3.600 3.600" tension="0.000" continuity="0.000" bias="0.000"/>
-        <key time="0.440" value="8.200 8.200 8.200" tension="0.000" continuity="0.000" bias="0.000"/>
-        <key time="0.480" value="12.800 12.800 12.800" tension="0.000" continuity="0.000" bias="0.000"/>
-        <key time="0.520" value="17.400 17.400 17.400" tension="0.000" continuity="0.000" bias="0.000"/>
-        <key time="0.560" value="22.000 22.000 22.000" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.000" value="0.000 0.000 -0.000" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.040" value="0.000 0.000 0.667" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.080" value="0.000 0.000 1.333" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.120" value="0.000 0.000 2.000" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.160" value="0.000 0.000 1.500" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.200" value="0.000 0.000 1.000" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.240" value="0.000 0.000 0.500" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.280" value="0.000 0.000 -0.000" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.320" value="0.000 0.000 -0.500" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.360" value="0.000 0.000 -1.000" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.400" value="0.000 0.000 3.600" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.440" value="0.000 0.000 8.200" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.480" value="0.000 0.000 12.800" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.520" value="0.000 0.000 17.400" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.560" value="0.000 0.000 22.000" tension="0.000" continuity="0.000" bias="0.000"/>
       </channel>
       <channel target_name="vase_pieces.piece_01" parameter_name="position" track_type="basic_spline&lt;spline_tcb_key&lt;vec3f&gt;&gt;">
         <key time="0.000" value="263.000 81.000 0.000" tension="0.000" continuity="0.000" bias="0.000"/>
@@ -400,10 +400,10 @@ Save animations...
         <key time="0.760" value="261.500 340.500 0.000" tension="0.000" continuity="0.000" bias="0.000"/>
       </channel>
       <channel target_name="vase_pieces.piece_01" parameter_name="rotation" track_type="basic_spline&lt;spline_tcb_key&lt;vec3f&gt;&gt;">
-        <key time="0.000" value="-0.000 -0.000 -0.000" tension="0.000" continuity="0.000" bias="0.000"/>
-        <key time="0.040" value="-1.505 -1.505 -1.505" tension="0.000" continuity="0.000" bias="0.000"/>
-        <key time="0.080" value="-3.010 -3.010 -3.010" tension="0.000" continuity="0.000" bias="0.000"/>
-        <key time="0.120" value="-4.516 -4.516 -4.516" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.000" value="0.000 0.000 -0.000" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.040" value="0.000 0.000 -1.505" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.080" value="0.000 0.000 -3.010" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.120" value="0.000 0.000 -4.516" tension="0.000" continuity="0.000" bias="0.000"/>
       </channel>
     </channels>
   </animation>

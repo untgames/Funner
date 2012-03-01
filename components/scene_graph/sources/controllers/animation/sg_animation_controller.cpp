@@ -22,6 +22,32 @@ const size_t TIME_PRECISION            = 1000;                    //разрешающая 
 const size_t BAD_TIME_NUMERATOR        = ~0u;                     //неверное время
 const char*  LOG_NAME                  = "scene_graph.animation"; //имя потока протоколирования
 
+/*
+    Вспомогательные структуры
+*/
+
+///Карта отображения параметров анимации на параметры узлов
+struct AnimationParameterNameMap
+{
+  media::animation::PropertyNameMap names; //карта имен
+  
+///Конструктор
+  AnimationParameterNameMap ()
+  {
+    names.Set ("position", "Position");
+    names.Set ("orientation", "Orientation");
+    names.Set ("rotation", "Rotation");
+    names.Set ("scale", "Scale");
+    names.Set ("world_position", "WorldPosition");
+    names.Set ("world_orientation", "WorldOrientation");
+    names.Set ("world_rotation", "WorldRotation");
+    names.Set ("world_scale", "WorldScale");    
+    names.Set ("alpha", "Alpha");
+  }
+};
+
+typedef common::Singleton<AnimationParameterNameMap> AnimationParameterNameMapSingleton;
+
 }
 
 namespace scene_graph
@@ -535,6 +561,49 @@ xtl::connection AnimationController::RegisterEventHandler (const EventHandler& h
 }
 
 /*
+    Регистрация отображения имён параметров анимации на имена узлов
+*/
+
+void AnimationController::SetParameterMapping (const char* channel_name, const char* property_name)
+{
+  try
+  {
+    AnimationParameterNameMapSingleton::Instance ()->names.Set (channel_name, property_name);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("scene_graph::controllers::AnimationController::SetParameterMapping");
+    throw;
+  }
+}
+
+void AnimationController::RemoveParameterMapping (const char* channel_name)
+{
+  try
+  {
+    AnimationParameterNameMapSingleton::Instance ()->names.Reset (channel_name);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("scene_graph::controllers::AnimationController::RemoveParameterMapping");
+    throw;
+  }
+}
+
+void AnimationController::RemoveAllParameterMappings ()
+{
+  try
+  {
+    AnimationParameterNameMapSingleton::Instance ()->names.Clear ();
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("scene_graph::controllers::AnimationController::RemoveAllParameterMappings");
+    throw;
+  }
+}
+
+/*
 ===================================================================================================
     Animation
 ===================================================================================================
@@ -601,7 +670,7 @@ void Animation::Play ()
       case AnimationImpl::Stopped:
           //добавление анимации в блендер
 
-        impl->state = impl->blender.AddSource (impl->source);
+        impl->state = impl->blender.AddSource (impl->source, AnimationParameterNameMapSingleton::Instance ()->names);
       case AnimationImpl::Paused:
           //оповещение о возникновении события
 

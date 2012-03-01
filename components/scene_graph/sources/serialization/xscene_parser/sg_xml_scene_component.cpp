@@ -15,6 +15,7 @@ class Component
     {
       SceneSerializationManager::RegisterLoader ("xscene", &Component::CreateFactory);
       XmlSceneParserManager::RegisterParser ("1.0", XmlSceneParser::Create);
+      XmlSceneParserManager::SetDefaultVersion ("1.0");
     }
     
   private:

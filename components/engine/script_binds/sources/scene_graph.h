@@ -12,6 +12,7 @@
 #include <sg/node_array.h>
 #include <sg/page_curl.h>
 #include <sg/scene.h>
+#include <sg/scene_manager.h>
 #include <sg/sound_emitter.h>
 #include <sg/sprite.h>
 #include <sg/text_line.h>
@@ -19,6 +20,7 @@
 
 #include <sg/controllers/acceleration_evaluators.h>
 #include <sg/controllers/align_with_node.h>
+#include <sg/controllers/animation.h>
 #include <sg/controllers/look_to_node_point.h>
 #include <sg/controllers/move_to_node_point.h>
 #include <sg/controllers/water.h>
@@ -139,6 +141,8 @@ void bind_controller_look_to_node_point_library   (script::Environment&);
 void bind_controller_align_with_node_library      (script::Environment&);
 void bind_linear_acceleration_evaluator_library   (script::Environment&);
 void bind_controller_sync_physics_to_node_library (script::Environment&);
+void bind_controller_animation_library            (script::Environment&);
+void bind_scene_manager_library                   (script::Environment& environment);
 
 }
 

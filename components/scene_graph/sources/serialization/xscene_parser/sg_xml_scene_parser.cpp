@@ -82,20 +82,24 @@ struct NodeDecl: public xtl::reference_counter
     }
   };
 
-  stl::string                name;               //имя узла    
-  math::vec3f                position;           //положение
-  math::vec3f                scale;              //масштаб
-  math::quatf                orientation;        //ориентация
-  stl::auto_ptr<Pivot>       pivot;              //точка поворота/масштабирования
-  bool                       is_world_transform; //трансформации заданы в мировых координатах
+  stl::string                name;                //имя узла    
+  math::vec3f                position;            //положение
+  math::vec3f                scale;               //масштаб
+  math::quatf                orientation;         //ориентация
+  bool                       orientation_inherit; //наследуется ли ориентация
+  bool                       scale_inherit;       //наследуется ли масштаб
+  stl::auto_ptr<Pivot>       pivot;               //точка поворота/масштабирования
+  bool                       is_world_transform;  //трансформации заданы в мировых координатах
   stl::auto_ptr<stl::string> before_node;         //имя узла, перед которым будет прибинден данный узел
-  stl::auto_ptr<PropertyMap> properties;         //пользовательские свойства узла
-  stl::auto_ptr<stl::string> parent_name;        //имя родительского узла
+  stl::auto_ptr<PropertyMap> properties;          //пользовательские свойства узла
+  stl::auto_ptr<stl::string> parent_name;         //имя родительского узла
 
 ///Конструктор
   NodeDecl ()
     : scale (1.0f)
     , is_world_transform (false)
+    , orientation_inherit (true)
+    , scale_inherit (true)
   {
   }  
 };
@@ -797,6 +801,9 @@ NodeDeclPtr XmlSceneParser::Impl::PrepareNode (const ParseNode& decl)
         ParseAttribute (decl, "orientation", node_decl->orientation);
       }
     }
+    
+    node_decl->orientation_inherit = strcmp (get<const char*> (decl, "orientation_inherit", "true"), "true") == 0;
+    node_decl->scale_inherit       = strcmp (get<const char*> (decl, "scale_inherit", "true"), "true") == 0;
 
       //парсинг пользовательских свойств              
 
@@ -873,6 +880,9 @@ void XmlSceneParser::Parse (const ParseNode& decl, Node& node, Node& default_par
     node.SetPosition (node_decl->position);
     node.SetOrientation (node_decl->orientation);
     node.SetScale (node_decl->scale);
+    
+    node.SetOrientationInherit (node_decl->orientation_inherit);
+    node.SetScaleInherit (node_decl->scale_inherit);
     
     if (node_decl->properties)
       node.SetProperties (node_decl->properties->Clone ());
