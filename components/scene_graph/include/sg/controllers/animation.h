@@ -144,9 +144,8 @@ class AnimationManager
 ///Создание анимации
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     Animation CreateAnimation (const char* name, Node& root);
-    Animation PlayAnimation   (const char*                    name,
-                               Node&                          root,
-                               const Animation::EventHandler& on_finish_handler = Animation::EventHandler ());
+    Animation PlayAnimation   (const char* name, Node& root);
+    Animation PlayAnimation   (const char* name, Node& root, const Animation::EventHandler& on_finish_handler);  
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Управление ресурсами

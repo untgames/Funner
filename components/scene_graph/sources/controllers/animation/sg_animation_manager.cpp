@@ -133,6 +133,11 @@ Animation AnimationManager::CreateAnimation (const char* name, Node& root)
   }
 }
 
+Animation AnimationManager::PlayAnimation (const char* name, Node& root)
+{
+  return PlayAnimation (name, root, Animation::EventHandler ());
+}
+
 Animation AnimationManager::PlayAnimation (const char* name, Node& root, const Animation::EventHandler& on_finish)
 {
   try
