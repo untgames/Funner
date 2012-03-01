@@ -165,7 +165,7 @@ void AnimationLibrary::Save (const char* file_name)
   }
   catch (xtl::exception& exception)
   {
-    exception.touch ("media::MeshLibrary::Save");
+    exception.touch ("media::animation::AnimationLibrary::Save");
     throw;
   }
 }
