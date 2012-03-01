@@ -1396,7 +1396,7 @@ void process_timeline (Params& params, ConvertData& data)
   {
     XmlWriter::Scope resource_scope (*data.scene_writer, "resource");
     
-    data.scene_writer->WriteAttribute ("source", params.output_scene_animation_dir_name.empty () ? params.output_animation_file_name :
+    data.scene_writer->WriteAttribute ("name", params.output_scene_animation_dir_name.empty () ? params.output_animation_file_name :
       common::format ("%s/%s", params.output_scene_animation_dir_name.c_str (), common::notdir (params.output_animation_file_name).c_str ()));
   }  
   
