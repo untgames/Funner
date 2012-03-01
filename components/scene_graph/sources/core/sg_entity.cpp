@@ -33,6 +33,7 @@ struct Entity::Impl: public SceneObject
   bool   need_local_bounds_update; //локальные ограничивающие объЄмы требуют пересчЄта
   bool   need_world_bounds_update; //мировые ограничивающие объЄмы требуют пересчЄта
   bool   infinite_bounds;          //€вл€ютс€ ли ограничивающие объЄмы узла бесконечными
+  bool   visible;                  //€вл€ютс€ ли объект видимым
   
   Impl (scene_graph::Entity& entity) : SceneObject (entity) {}
 };
@@ -48,6 +49,7 @@ Entity::Entity ()
   impl->need_world_bounds_update = false;
   impl->infinite_bounds          = true;
   impl->local_bound_box          = impl->world_bound_box = aaboxf (vec3f (-INFINITE_BOUND_VALUE), vec3f (INFINITE_BOUND_VALUE));
+  impl->visible                  = true;
 }
   
 Entity::~Entity ()
@@ -74,6 +76,22 @@ void Entity::SetWireColor (float red, float green, float blue)
 const vec3f& Entity::WireColor () const
 {
   return impl->wire_color;
+}
+
+/*
+    ¬идимость объекта
+*/
+
+void Entity::SetVisible (bool state)
+{
+  impl->visible = state;
+  
+  UpdateNotify ();
+}
+
+bool Entity::IsVisible () const
+{
+  return impl->visible;
 }
 
 /*
