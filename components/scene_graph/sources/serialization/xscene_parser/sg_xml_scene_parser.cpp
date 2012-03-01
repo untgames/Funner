@@ -484,6 +484,11 @@ SceneParserCache& XmlSceneParser::Cache ()
     –егистраци€ парсера узла определенного типа
 */
 
+void XmlSceneParser::RegisterParser (const char* type, const ParseHandler& parse_handler)
+{
+  RegisterParser (type, parse_handler, PrepareHandler ());
+}
+
 void XmlSceneParser::RegisterParser (const char* type, const ParseHandler& parse_handler, const PrepareHandler& prepare_handler)
 {
   if (!type)

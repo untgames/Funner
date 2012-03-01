@@ -108,6 +108,11 @@ struct DefaultLogger
 
 }
 
+void SceneManager::LoadScene (const char* file_name, const char* name_prefix)
+{
+  LoadScene (file_name, name_prefix, LogHandler ());
+}
+
 void SceneManager::LoadScene (const char* file_name, const char* name_prefix, const LogHandler& in_log_handler)
 {
   try

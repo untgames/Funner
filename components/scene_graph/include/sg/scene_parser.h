@@ -185,7 +185,8 @@ class XmlSceneParser: public ISceneParser
     typedef xtl::function<void (const common::ParseNode& decl, Node& parent, SceneContext& context)> ParseHandler;
     typedef xtl::function<void (const common::ParseNode& decl)>                                      PrepareHandler;    
 
-    void RegisterParser       (const char* type, const ParseHandler& parse_handler, const PrepareHandler& prepare_handler = PrepareHandler ());
+    void RegisterParser       (const char* type, const ParseHandler& parse_handler);
+    void RegisterParser       (const char* type, const ParseHandler& parse_handler, const PrepareHandler& prepare_handler);
     void UnregisterParser     (const char* type);
     void UnregisterAllParsers ();
 
