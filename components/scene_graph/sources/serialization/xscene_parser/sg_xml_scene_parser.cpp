@@ -4,7 +4,12 @@ using namespace scene_graph;
 using namespace common;
 using namespace math;
 
+namespace scene_graph
+{
+
 template <> void XmlSceneParser::CreateNode<SoundEmitter> (const common::ParseNode& decl, Node& parent, SceneContext& context);
+
+}
 
 /*
     Парсинг внутренних типов сцены
@@ -97,9 +102,9 @@ struct NodeDecl: public xtl::reference_counter
 ///Конструктор
   NodeDecl ()
     : scale (1.0f)
-    , is_world_transform (false)
     , orientation_inherit (true)
     , scale_inherit (true)
+    , is_world_transform (false)
   {
   }  
 };
