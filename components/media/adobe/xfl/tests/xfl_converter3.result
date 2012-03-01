@@ -16,7 +16,7 @@ Processing scene...
 Save animations...
 <?xml version="1.0" encoding="utf-8"?>
 <xscene>
-  <scene id="frog_frame_group_final">
+  <scene id="frog_frame_group_final" version="1.0">
     <resource source="results3/scene.xanim"/>
     <node id="frog_frame_group_final.grid_cutted_overlay" pivot="60.500; 64.500; 0" scale_pivot="true" orientation_pivot="true">
       <sprite id="frog_frame_group_final.grid_cutted_overlay.Layer 1" material="grid_cutted-staircase.psd/1.png" bind_space="local" scale_pivot="false" orientation_pivot="true" before_node="grid_cutted-staircase.psd/1.png" visible="false" pivot="0.000; 0.000; 0" scale="121; 129; 1" position="60.500; 64.500; 0"/>
@@ -93,25 +93,25 @@ Save animations...
         <key time="0.200" value="1.130 1.130 1.000" tension="0.000" continuity="0.000" bias="0.000"/>
       </channel>
       <channel target_name="frog_frame_group_final.grid_cutted_overlay" parameter_name="rotation" track_type="basic_spline&lt;spline_tcb_key&lt;vec3f&gt;&gt;">
-        <key time="0.000" value="-0.000 -0.000 -0.000" tension="0.000" continuity="0.000" bias="0.000"/>
-        <key time="0.200" value="-0.000 -0.000 -0.000" tension="0.000" continuity="0.000" bias="0.000"/>
-        <key time="0.240" value="0.941 0.941 0.941" tension="0.000" continuity="0.000" bias="0.000"/>
-        <key time="0.280" value="1.882 1.882 1.882" tension="0.000" continuity="0.000" bias="0.000"/>
-        <key time="0.320" value="2.824 2.824 2.824" tension="0.000" continuity="0.000" bias="0.000"/>
-        <key time="0.360" value="3.765 3.765 3.765" tension="0.000" continuity="0.000" bias="0.000"/>
-        <key time="0.400" value="4.706 4.706 4.706" tension="0.000" continuity="0.000" bias="0.000"/>
-        <key time="0.440" value="5.647 5.647 5.647" tension="0.000" continuity="0.000" bias="0.000"/>
-        <key time="0.480" value="6.588 6.588 6.588" tension="0.000" continuity="0.000" bias="0.000"/>
-        <key time="0.520" value="7.529 7.529 7.529" tension="0.000" continuity="0.000" bias="0.000"/>
-        <key time="0.560" value="8.471 8.471 8.471" tension="0.000" continuity="0.000" bias="0.000"/>
-        <key time="0.600" value="9.412 9.412 9.412" tension="0.000" continuity="0.000" bias="0.000"/>
-        <key time="0.640" value="10.353 10.353 10.353" tension="0.000" continuity="0.000" bias="0.000"/>
-        <key time="0.680" value="11.294 11.294 11.294" tension="0.000" continuity="0.000" bias="0.000"/>
-        <key time="0.720" value="12.235 12.235 12.235" tension="0.000" continuity="0.000" bias="0.000"/>
-        <key time="0.760" value="13.177 13.177 13.177" tension="0.000" continuity="0.000" bias="0.000"/>
-        <key time="0.800" value="14.118 14.118 14.118" tension="0.000" continuity="0.000" bias="0.000"/>
-        <key time="0.840" value="15.059 15.059 15.059" tension="0.000" continuity="0.000" bias="0.000"/>
-        <key time="0.880" value="16.000 16.000 16.000" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.000" value="0.000 0.000 -0.000" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.200" value="0.000 0.000 -0.000" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.240" value="0.000 0.000 0.941" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.280" value="0.000 0.000 1.882" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.320" value="0.000 0.000 2.824" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.360" value="0.000 0.000 3.765" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.400" value="0.000 0.000 4.706" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.440" value="0.000 0.000 5.647" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.480" value="0.000 0.000 6.588" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.520" value="0.000 0.000 7.529" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.560" value="0.000 0.000 8.471" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.600" value="0.000 0.000 9.412" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.640" value="0.000 0.000 10.353" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.680" value="0.000 0.000 11.294" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.720" value="0.000 0.000 12.235" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.760" value="0.000 0.000 13.177" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.800" value="0.000 0.000 14.118" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.840" value="0.000 0.000 15.059" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.880" value="0.000 0.000 16.000" tension="0.000" continuity="0.000" bias="0.000"/>
       </channel>
       <channel target_name="frog_frame_group_final.grid_cutted_overlay" parameter_name="alpha" track_type="basic_spline&lt;spline_tcb_key&lt;float&gt;&gt;">
         <key time="0.000" value="1.000" tension="0.000" continuity="0.000" bias="0.000"/>
