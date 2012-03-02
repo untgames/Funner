@@ -200,11 +200,12 @@ struct VisualModelDecl: public xtl::reference_counter
 ///Описание параметров спрайта
 struct SpriteDecl: public xtl::reference_counter
 {
-  stl::string        material;
-  Param<float>       alpha_reference;
-  Param<float>       alpha;
-  Param<size_t>      frame;
-  Param<math::vec3f> color;
+  stl::string                 material;
+  stl::auto_ptr<stl::string>  layout;
+  Param<float>                alpha_reference;
+  Param<float>                alpha;
+  Param<size_t>               frame;
+  Param<math::vec3f>          color;
 };
 
 ///Описание параметров текстовой строки
@@ -909,7 +910,7 @@ void XmlSceneParser::Parse (const ParseNode& decl, Node& node, Node& default_par
           
           node.SetPosition (node.Position () + offset);
         }
-      }                        
+      }
     }
 
     Node::Pointer parent = &default_parent;
@@ -1274,6 +1275,9 @@ SpriteDeclPtr XmlSceneParser::Impl::PrepareSprite (const ParseNode& decl)
 
     node_decl->material = get<const char*> (decl, "material", "");
 
+    if (ParseNode layout_node = decl.First ("layout"))
+      node_decl->layout.reset (new stl::string (get<const char*> (layout_node, "")));
+
       //регистрация дескриптора узла
 
     cache.SetValue (decl, node_decl);    
@@ -1307,6 +1311,18 @@ void XmlSceneParser::Parse (const ParseNode& decl, Sprite& node, Node& parent, S
       //разбор родительских параметров
       
     Parse (decl, static_cast<Entity&> (node), parent, context);    
+    
+      //добавление свойств
+      
+    if (node_decl->layout && !node_decl->layout->empty ())
+    {
+      common::PropertyMap* properties = node.Properties ();
+      
+      if (!properties)
+        node.SetProperties (properties = new common::PropertyMap ());
+        
+      properties->SetProperty ("Layout", node_decl->layout->c_str ());
+    }
   }
   catch (xtl::exception& e)
   {

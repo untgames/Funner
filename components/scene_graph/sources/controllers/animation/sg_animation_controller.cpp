@@ -98,6 +98,14 @@ struct AnimationImpl: public xtl::reference_counter, public xtl::trackable, publ
     else                 return offset;
   }
   
+  float ClampedTell ()
+  {
+    float offset = Tell ().cast<float> ();
+
+    if (looped) return fmod (offset, duration);
+    else        return offset < duration ? Tell ().cast<float> () : duration;
+  }  
+  
 ///Оповещение о возникновении события
   void Notify (AnimationEvent event, Animation* animation = 0)
   {
@@ -522,8 +530,7 @@ void AnimationController::Update (const TimeValue& value)
       
         //обновление состояния анимации
 
-      TimeValue offset  = animation.Tell ();
-      float     foffset = offset.cast<float> ();      
+      float foffset = animation.ClampedTell ();
 
       animation.state.SetTime (foffset);
       
@@ -770,11 +777,7 @@ float Animation::Duration () const
 
 float Animation::Tell () const
 {
-  float offset   = impl->Tell ().cast<float> (),
-        duration = impl->duration;  
-
-  if (impl->looped) return fmod (offset, duration);
-  else              return offset < duration ? impl->Tell ().cast<float> () : duration;
+  return impl->ClampedTell ();
 }
 
 void Animation::Seek (float offset, AnimationSeekMode mode)

@@ -1164,7 +1164,7 @@ void process_sprite (Params& params, ConvertData& data, const Frame& frame, cons
   
   stl::string sprite_name = get_sprite_name (params, resource_name);  
     
-  data.scene_writer->WriteAttribute ("before_node", sprite_name.c_str ());
+  data.scene_writer->WriteAttribute ("layout", sprite_name.c_str ());
     
   data.scene_writer->WriteAttribute ("visible", "false");
   

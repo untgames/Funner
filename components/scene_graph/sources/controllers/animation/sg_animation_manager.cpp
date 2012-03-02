@@ -51,6 +51,8 @@ struct AnimationManager::Impl: public xtl::reference_counter
       {
         media::animation::Animation& animation = *iter;
         
+        animation.Rename (library.ItemId (iter));
+        
         animations [library.ItemId (iter)] = &animation;
       }
     }
