@@ -14,33 +14,33 @@ Save animations...
 <?xml version="1.0" encoding="utf-8"?>
 <xscene>
   <scene id="vase_pieces" version="1.0">
-    <resource source="results2/scene.xanim"/>
+    <resource name="results2/scene.xanim"/>
     <node id="vase_pieces.piece_09" pivot="31.500; 48.500; 0" scale_pivot="true" orientation_pivot="true" scale="1.000; 1.000; 1" alpha="1.000">
-      <sprite id="vase_pieces.piece_09.Layer 1" material="piece_09-hall.psd/1.png" bind_space="local" scale_pivot="false" orientation_pivot="true" before_node="piece_09-hall.psd/1.png" visible="false" pivot="0.000; 0.000; 0" scale="63; 97; 1" position="31.500; 48.500; 0"/>
+      <sprite id="vase_pieces.piece_09.Layer 1" material="piece_09-hall.psd/1.png" bind_space="local" scale_pivot="false" orientation_pivot="true" layout="piece_09-hall.psd/1.png" visible="false" pivot="0.000; 0.000; 0" scale="63; 97; 1" position="31.500; 48.500; 0"/>
     </node>
     <node id="vase_pieces.piece_08" pivot="36.000; 27.500; 0" scale_pivot="true" orientation_pivot="true" scale="1.000; 1.000; 1" alpha="1.000">
-      <sprite id="vase_pieces.piece_08.Layer 1" material="piece_08-hall.psd/1.png" bind_space="local" scale_pivot="false" orientation_pivot="true" before_node="piece_08-hall.psd/1.png" visible="false" pivot="-0.014; 0.000; 0" scale="70; 55; 1" position="36.000; 27.500; 0"/>
+      <sprite id="vase_pieces.piece_08.Layer 1" material="piece_08-hall.psd/1.png" bind_space="local" scale_pivot="false" orientation_pivot="true" layout="piece_08-hall.psd/1.png" visible="false" pivot="-0.014; 0.000; 0" scale="70; 55; 1" position="36.000; 27.500; 0"/>
     </node>
     <node id="vase_pieces.piece_07" pivot="29.500; 36.500; 0" scale_pivot="true" orientation_pivot="true" scale="1.000; 1.000; 1" alpha="1.000">
-      <sprite id="vase_pieces.piece_07.Layer 1" material="piece_07-hall.psd/1.png" bind_space="local" scale_pivot="false" orientation_pivot="true" before_node="piece_07-hall.psd/1.png" visible="false" pivot="0.000; -0.014; 0" scale="59; 72; 1" position="29.500; 37.000; 0"/>
+      <sprite id="vase_pieces.piece_07.Layer 1" material="piece_07-hall.psd/1.png" bind_space="local" scale_pivot="false" orientation_pivot="true" layout="piece_07-hall.psd/1.png" visible="false" pivot="0.000; -0.014; 0" scale="59; 72; 1" position="29.500; 37.000; 0"/>
     </node>
     <node id="vase_pieces.piece_06" pivot="7.500; 25.500; 0" scale_pivot="true" orientation_pivot="true" scale="1.000; 1.000; 1" alpha="1.000">
-      <sprite id="vase_pieces.piece_06.Layer 1" material="piece_06-hall.psd/1.png" bind_space="local" scale_pivot="false" orientation_pivot="true" before_node="piece_06-hall.psd/1.png" visible="false" pivot="0.000; 0.000; 0" scale="15; 50; 1" position="7.500; 25.000; 0"/>
+      <sprite id="vase_pieces.piece_06.Layer 1" material="piece_06-hall.psd/1.png" bind_space="local" scale_pivot="false" orientation_pivot="true" layout="piece_06-hall.psd/1.png" visible="false" pivot="0.000; 0.000; 0" scale="15; 50; 1" position="7.500; 25.000; 0"/>
     </node>
     <node id="vase_pieces.piece_05" pivot="43.000; 86.000; 0" scale_pivot="true" orientation_pivot="true" position="291.000; 255.000; 0" scale="1.000; 1.000; 1" rotation="0; 0; -0.000" alpha="1.000">
-      <sprite id="vase_pieces.piece_05.Layer 1" material="piece_05-hall.psd/1.png" bind_space="local" scale_pivot="false" orientation_pivot="true" before_node="piece_05-hall.psd/1.png" visible="false" pivot="0.000; 0.000; 0" scale="86; 172; 1" position="43.000; 86.000; 0"/>
+      <sprite id="vase_pieces.piece_05.Layer 1" material="piece_05-hall.psd/1.png" bind_space="local" scale_pivot="false" orientation_pivot="true" layout="piece_05-hall.psd/1.png" visible="false" pivot="0.000; 0.000; 0" scale="86; 172; 1" position="43.000; 86.000; 0"/>
     </node>
     <node id="vase_pieces.piece_04" pivot="30.500; 33.000; 0" scale_pivot="true" orientation_pivot="true" scale="1.000; 1.000; 1" alpha="1.000">
-      <sprite id="vase_pieces.piece_04.Layer 1" material="piece_04-hall.psd/1.png" bind_space="local" scale_pivot="false" orientation_pivot="true" before_node="piece_04-hall.psd/1.png" visible="false" pivot="0.000; -0.015; 0" scale="60; 65; 1" position="30.000; 33.500; 0"/>
+      <sprite id="vase_pieces.piece_04.Layer 1" material="piece_04-hall.psd/1.png" bind_space="local" scale_pivot="false" orientation_pivot="true" layout="piece_04-hall.psd/1.png" visible="false" pivot="0.000; -0.015; 0" scale="60; 65; 1" position="30.000; 33.500; 0"/>
     </node>
     <node id="vase_pieces.piece_03" pivot="37.500; 46.000; 0" scale_pivot="true" orientation_pivot="true" scale="1.000; 1.000; 1" alpha="1.000">
-      <sprite id="vase_pieces.piece_03.Layer 1" material="piece_03-hall.psd/1.png" bind_space="local" scale_pivot="false" orientation_pivot="true" before_node="piece_03-hall.psd/1.png" visible="false" pivot="0.000; 0.000; 0" scale="75; 92; 1" position="37.500; 46.000; 0"/>
+      <sprite id="vase_pieces.piece_03.Layer 1" material="piece_03-hall.psd/1.png" bind_space="local" scale_pivot="false" orientation_pivot="true" layout="piece_03-hall.psd/1.png" visible="false" pivot="0.000; 0.000; 0" scale="75; 92; 1" position="37.500; 46.000; 0"/>
     </node>
     <node id="vase_pieces.piece_02" pivot="49.500; 54.500; 0" scale_pivot="true" orientation_pivot="true" scale="1.000; 1.000; 1" alpha="1.000">
-      <sprite id="vase_pieces.piece_02.Layer 1" material="piece_02-hall.psd/1.png" bind_space="local" scale_pivot="false" orientation_pivot="true" before_node="piece_02-hall.psd/1.png" visible="false" pivot="0.000; 0.000; 0" scale="81; 95; 1" position="40.500; 47.500; 0"/>
+      <sprite id="vase_pieces.piece_02.Layer 1" material="piece_02-hall.psd/1.png" bind_space="local" scale_pivot="false" orientation_pivot="true" layout="piece_02-hall.psd/1.png" visible="false" pivot="0.000; 0.000; 0" scale="81; 95; 1" position="40.500; 47.500; 0"/>
     </node>
     <node id="vase_pieces.piece_01" pivot="52.500; 31.500; 0" scale_pivot="true" orientation_pivot="true" scale="1.000; 1.000; 1" alpha="1.000">
-      <sprite id="vase_pieces.piece_01.Layer 1" material="piece_01-hall.psd/1.png" bind_space="local" scale_pivot="false" orientation_pivot="true" before_node="piece_01-hall.psd/1.png" visible="false" pivot="0.000; -0.145; 0" scale="103; 55; 1" position="51.500; 35.500; 0"/>
+      <sprite id="vase_pieces.piece_01.Layer 1" material="piece_01-hall.psd/1.png" bind_space="local" scale_pivot="false" orientation_pivot="true" layout="piece_01-hall.psd/1.png" visible="false" pivot="0.000; -0.145; 0" scale="103; 55; 1" position="51.500; 35.500; 0"/>
     </node>
   </scene>
 </xscene>

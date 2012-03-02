@@ -17,45 +17,45 @@ Save animations...
 <?xml version="1.0" encoding="utf-8"?>
 <xscene>
   <scene id="frog_frame_group_final" version="1.0">
-    <resource source="results3/scene.xanim"/>
+    <resource name="results3/scene.xanim"/>
     <node id="frog_frame_group_final.grid_cutted_overlay" pivot="60.500; 64.500; 0" scale_pivot="true" orientation_pivot="true">
-      <sprite id="frog_frame_group_final.grid_cutted_overlay.Layer 1" material="grid_cutted-staircase.psd/1.png" bind_space="local" scale_pivot="false" orientation_pivot="true" before_node="grid_cutted-staircase.psd/1.png" visible="false" pivot="0.000; 0.000; 0" scale="121; 129; 1" position="60.500; 64.500; 0"/>
+      <sprite id="frog_frame_group_final.grid_cutted_overlay.Layer 1" material="grid_cutted-staircase.psd/1.png" bind_space="local" scale_pivot="false" orientation_pivot="true" layout="grid_cutted-staircase.psd/1.png" visible="false" pivot="0.000; 0.000; 0" scale="121; 129; 1" position="60.500; 64.500; 0"/>
     </node>
     <node id="frog_frame_group_final.rasp" pivot="138.000; 117.500; 0" scale_pivot="true" orientation_pivot="true" position="723.000; 428.000; 0" scale="1.000; 1.000; 1" rotation="0; 0; -0.000">
-      <sprite id="frog_frame_group_final.rasp.Layer 1" material="rasp-staircase.psd/1.png" bind_space="local" scale_pivot="false" orientation_pivot="true" before_node="rasp-staircase.psd/1.png" visible="false" pivot="0.000; 0.000; 0" scale="179; 149; 1" position="89.500; 74.500; 0"/>
+      <sprite id="frog_frame_group_final.rasp.Layer 1" material="rasp-staircase.psd/1.png" bind_space="local" scale_pivot="false" orientation_pivot="true" layout="rasp-staircase.psd/1.png" visible="false" pivot="0.000; 0.000; 0" scale="179; 149; 1" position="89.500; 74.500; 0"/>
     </node>
     <node id="frog_frame_group_final.cut_line1" pivot="7.500; 1.000; 0" scale_pivot="true" orientation_pivot="true" position="561.000; 225.000; 0" scale="1.000; 1.000; 1" rotation="0; 0; -0.000" alpha="1.000">
-      <sprite id="frog_frame_group_final.cut_line1.Layer 1" material="cut_line1-staircase.psd/1.png" bind_space="local" scale_pivot="false" orientation_pivot="true" before_node="cut_line1-staircase.psd/1.png" visible="false" pivot="0.000; 0.000; 0" scale="15; 2; 1" position="7.500; 1.000; 0"/>
+      <sprite id="frog_frame_group_final.cut_line1.Layer 1" material="cut_line1-staircase.psd/1.png" bind_space="local" scale_pivot="false" orientation_pivot="true" layout="cut_line1-staircase.psd/1.png" visible="false" pivot="0.000; 0.000; 0" scale="15; 2; 1" position="7.500; 1.000; 0"/>
     </node>
     <node id="frog_frame_group_final.cut_line2" pivot="7.500; 1.000; 0" scale_pivot="true" orientation_pivot="true" position="610.000; 225.000; 0" scale="1.000; 1.000; 1" rotation="0; 0; -0.000" alpha="1.000">
-      <sprite id="frog_frame_group_final.cut_line2.Layer 1" material="cut_line2-staircase.psd/1.png" bind_space="local" scale_pivot="false" orientation_pivot="true" before_node="cut_line2-staircase.psd/1.png" visible="false" pivot="0.000; 0.000; 0" scale="15; 2; 1" position="7.500; 1.000; 0"/>
+      <sprite id="frog_frame_group_final.cut_line2.Layer 1" material="cut_line2-staircase.psd/1.png" bind_space="local" scale_pivot="false" orientation_pivot="true" layout="cut_line2-staircase.psd/1.png" visible="false" pivot="0.000; 0.000; 0" scale="15; 2; 1" position="7.500; 1.000; 0"/>
     </node>
     <node id="frog_frame_group_final.cut_line3" pivot="12.500; 1.000; 0" scale_pivot="true" orientation_pivot="true" position="538.000; 354.000; 0" scale="1.000; 1.000; 1" rotation="0; 0; -0.000" alpha="1.000">
-      <sprite id="frog_frame_group_final.cut_line3.Layer 1" material="cut_line3-staircase.psd/1.png" bind_space="local" scale_pivot="false" orientation_pivot="true" before_node="cut_line3-staircase.psd/1.png" visible="false" pivot="-0.087; 0.000; 0" scale="23; 2; 1" position="13.500; 1.000; 0"/>
+      <sprite id="frog_frame_group_final.cut_line3.Layer 1" material="cut_line3-staircase.psd/1.png" bind_space="local" scale_pivot="false" orientation_pivot="true" layout="cut_line3-staircase.psd/1.png" visible="false" pivot="-0.087; 0.000; 0" scale="23; 2; 1" position="13.500; 1.000; 0"/>
     </node>
     <node id="frog_frame_group_final.cut_line4" pivot="10.500; 1.000; 0" scale_pivot="true" orientation_pivot="true" position="575.000; 354.000; 0" scale="1.000; 1.000; 1" rotation="0; 0; -0.000" alpha="1.000">
-      <sprite id="frog_frame_group_final.cut_line4.Layer 1" material="cut_line4-staircase.psd/1.png" bind_space="local" scale_pivot="false" orientation_pivot="true" before_node="cut_line4-staircase.psd/1.png" visible="false" pivot="0.000; 0.000; 0" scale="21; 2; 1" position="10.500; 1.000; 0"/>
+      <sprite id="frog_frame_group_final.cut_line4.Layer 1" material="cut_line4-staircase.psd/1.png" bind_space="local" scale_pivot="false" orientation_pivot="true" layout="cut_line4-staircase.psd/1.png" visible="false" pivot="0.000; 0.000; 0" scale="21; 2; 1" position="10.500; 1.000; 0"/>
     </node>
     <node id="frog_frame_group_final.cut_line5" pivot="8.500; 1.000; 0" scale_pivot="true" orientation_pivot="true" position="643.000; 354.000; 0" scale="1.000; 1.000; 1" rotation="0; 0; -0.000" alpha="1.000">
-      <sprite id="frog_frame_group_final.cut_line5.Layer 1" material="cut_line5-staircase.psd/1.png" bind_space="local" scale_pivot="false" orientation_pivot="true" before_node="cut_line5-staircase.psd/1.png" visible="false" pivot="0.000; 0.000; 0" scale="17; 2; 1" position="8.500; 1.000; 0"/>
+      <sprite id="frog_frame_group_final.cut_line5.Layer 1" material="cut_line5-staircase.psd/1.png" bind_space="local" scale_pivot="false" orientation_pivot="true" layout="cut_line5-staircase.psd/1.png" visible="false" pivot="0.000; 0.000; 0" scale="17; 2; 1" position="8.500; 1.000; 0"/>
     </node>
     <node id="frog_frame_group_final.cut_line6" pivot="8.000; 1.000; 0" scale_pivot="true" orientation_pivot="true" position="645.000; 225.000; 0" scale="1.000; 1.000; 1" rotation="0; 0; -0.000" alpha="1.000">
-      <sprite id="frog_frame_group_final.cut_line6.Layer 1" material="cut_line6-staircase.psd/1.png" bind_space="local" scale_pivot="false" orientation_pivot="true" before_node="cut_line6-staircase.psd/1.png" visible="false" pivot="0.000; 0.000; 0" scale="16; 2; 1" position="8.000; 1.000; 0"/>
+      <sprite id="frog_frame_group_final.cut_line6.Layer 1" material="cut_line6-staircase.psd/1.png" bind_space="local" scale_pivot="false" orientation_pivot="true" layout="cut_line6-staircase.psd/1.png" visible="false" pivot="0.000; 0.000; 0" scale="16; 2; 1" position="8.000; 1.000; 0"/>
     </node>
     <node id="frog_frame_group_final.leaves" pivot="141.000; 177.000; 0" scale_pivot="true" orientation_pivot="true" position="469.000; 78.000; 0" scale="1.000; 1.000; 1" rotation="0; 0; -0.000" alpha="1.000">
-      <sprite id="frog_frame_group_final.leaves.Layer 1" material="leaves-staircase.psd/1.png" bind_space="local" scale_pivot="false" orientation_pivot="true" before_node="leaves-staircase.psd/1.png" visible="false" pivot="0.000; 0.000; 0" scale="282; 354; 1" position="141.000; 177.000; 0"/>
+      <sprite id="frog_frame_group_final.leaves.Layer 1" material="leaves-staircase.psd/1.png" bind_space="local" scale_pivot="false" orientation_pivot="true" layout="leaves-staircase.psd/1.png" visible="false" pivot="0.000; 0.000; 0" scale="282; 354; 1" position="141.000; 177.000; 0"/>
     </node>
     <node id="frog_frame_group_final.grid_cutted" pivot="60.500; 64.500; 0" scale_pivot="true" orientation_pivot="true" position="543.000; 226.000; 0" scale="1.000; 1.000; 1" rotation="0; 0; -0.000" alpha="0.000">
-      <sprite id="frog_frame_group_final.grid_cutted.Layer 1" material="grid_cutted-staircase.psd/1.png" bind_space="local" scale_pivot="false" orientation_pivot="true" before_node="grid_cutted-staircase.psd/1.png" visible="false" pivot="0.000; 0.000; 0" scale="121; 129; 1" position="60.500; 64.500; 0"/>
+      <sprite id="frog_frame_group_final.grid_cutted.Layer 1" material="grid_cutted-staircase.psd/1.png" bind_space="local" scale_pivot="false" orientation_pivot="true" layout="grid_cutted-staircase.psd/1.png" visible="false" pivot="0.000; 0.000; 0" scale="121; 129; 1" position="60.500; 64.500; 0"/>
     </node>
     <node id="frog_frame_group_final.grid" pivot="75.000; 113.500; 0" scale_pivot="true" orientation_pivot="true" position="514.000; 176.000; 0" scale="1.000; 1.000; 1" rotation="0; 0; -0.000" alpha="1.000">
-      <sprite id="frog_frame_group_final.grid.Layer 1" material="grid-staircase.psd/1.png" bind_space="local" scale_pivot="false" orientation_pivot="true" before_node="grid-staircase.psd/1.png" visible="false" pivot="0.000; 0.000; 0" scale="150; 227; 1" position="75.000; 113.500; 0"/>
+      <sprite id="frog_frame_group_final.grid.Layer 1" material="grid-staircase.psd/1.png" bind_space="local" scale_pivot="false" orientation_pivot="true" layout="grid-staircase.psd/1.png" visible="false" pivot="0.000; 0.000; 0" scale="150; 227; 1" position="75.000; 113.500; 0"/>
     </node>
     <node id="frog_frame_group_final.frog" pivot="75.000; 81.500; 0" scale_pivot="true" orientation_pivot="true" position="530.000; 212.000; 0" scale="1.000; 1.000; 1" rotation="0; 0; -0.000" alpha="1.000">
-      <sprite id="frog_frame_group_final.frog.Layer 1" material="frog-staircase.psd/1.png" bind_space="local" scale_pivot="false" orientation_pivot="true" before_node="frog-staircase.psd/1.png" visible="false" pivot="0.000; 0.000; 0" scale="150; 163; 1" position="75.000; 81.500; 0"/>
+      <sprite id="frog_frame_group_final.frog.Layer 1" material="frog-staircase.psd/1.png" bind_space="local" scale_pivot="false" orientation_pivot="true" layout="frog-staircase.psd/1.png" visible="false" pivot="0.000; 0.000; 0" scale="150; 163; 1" position="75.000; 81.500; 0"/>
     </node>
     <node id="frog_frame_group_final.frog_frame_background" pivot="170.000; 177.000; 0" scale_pivot="true" orientation_pivot="true" position="477.000; 90.000; 0" scale="1.000; 1.000; 1" rotation="0; 0; -0.000" alpha="1.000">
-      <sprite id="frog_frame_group_final.frog_frame_background.Layer 1" material="frog_frame_background-staircase.psd/1.png" bind_space="local" scale_pivot="false" orientation_pivot="true" before_node="frog_frame_background-staircase.psd/1.png" visible="false" pivot="-0.031; -0.277; 0" scale="293; 274; 1" position="155.500; 213.000; 0"/>
+      <sprite id="frog_frame_group_final.frog_frame_background.Layer 1" material="frog_frame_background-staircase.psd/1.png" bind_space="local" scale_pivot="false" orientation_pivot="true" layout="frog_frame_background-staircase.psd/1.png" visible="false" pivot="-0.031; -0.277; 0" scale="293; 274; 1" position="155.500; 213.000; 0"/>
     </node>
   </scene>
 </xscene>
