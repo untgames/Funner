@@ -64,6 +64,8 @@ void bind_entity_library (Environment& environment)
   lib.Register ("get_WireColor",  make_invoker (&Entity::WireColor));
 
   lib.Register ("SetWireColor", make_invoker (implicit_cast<void (Entity::*) (float, float, float)> (&Entity::SetWireColor)));
+  lib.Register ("set_Visible", make_invoker (&Entity::SetVisible));
+  lib.Register ("get_Visible", make_invoker (&Entity::IsVisible));
 
   lib.Register ("get_BoundBox",      make_invoker (&Entity::BoundBox));
   lib.Register ("get_WorldBoundBox", make_invoker (&Entity::WorldBoundBox));
