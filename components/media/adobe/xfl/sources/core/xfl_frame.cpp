@@ -94,6 +94,11 @@ const AnimationCore& Frame::Animation () const
   return impl->animation;
 }
 
+AnimationCore& Frame::Animation ()
+{
+  return impl->animation;
+}
+
 void Frame::SetAnimation (const AnimationCore& animation)
 {
   impl->animation = animation;

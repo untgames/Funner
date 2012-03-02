@@ -20,47 +20,47 @@ Save animations...
 <xscene>
   <scene id="Bench_animation" version="1.0">
     <resource name="results4/scene.xanim"/>
-    <node id="Bench_animation.sheep_bells" pivot="0.000; 0.000; 0" scale_pivot="true" orientation_pivot="true" scale="1.000; 1.000; 1" alpha="1.000">
-      <sprite id="Bench_animation.sheep_bells.Layer 1" material="sheep_bells-Tale.psd/1.png" bind_space="local" scale_pivot="false" orientation_pivot="true" layout="sheep_bells-Tale.psd/1.png" visible="false" pivot="-0.012; -0.036; 0" scale="86; 28; 1" position="44.000; 15.000; 0"/>
+    <node id="Bench_animation.sheep_bells" pivot="0.000; 0.000; 0" scale_pivot="true" orientation_pivot="true" scale="1.000; 1.000; 1">
+      <sprite id="Bench_animation.sheep_bells.Layer 1" material="sheep_bells-Tale.psd/1.png" bind_space="local" scale_pivot="false" orientation_pivot="true" layout="sheep_bells-Tale.psd/1.png" visible="false" pivot="-0.012; -0.036; 0" scale="86; 28; 1" position="44.000; 15.000; 0" alpha="1.000"/>
     </node>
-    <node id="Bench_animation.sheep_body" pivot="0.000; 0.000; 0" scale_pivot="true" orientation_pivot="true" scale="1.000; 1.000; 1" alpha="1.000">
-      <sprite id="Bench_animation.sheep_body.Layer 1" material="sheep_body-Tale.psd/1.png" bind_space="local" scale_pivot="false" orientation_pivot="true" layout="sheep_body-Tale.psd/1.png" visible="false" pivot="0.000; -0.005; 0" scale="345; 408; 1" position="172.500; 206.000; 0"/>
+    <node id="Bench_animation.sheep_body" pivot="0.000; 0.000; 0" scale_pivot="true" orientation_pivot="true" scale="1.000; 1.000; 1">
+      <sprite id="Bench_animation.sheep_body.Layer 1" material="sheep_body-Tale.psd/1.png" bind_space="local" scale_pivot="false" orientation_pivot="true" layout="sheep_body-Tale.psd/1.png" visible="false" pivot="0.000; -0.005; 0" scale="345; 408; 1" position="172.500; 206.000; 0" alpha="1.000"/>
     </node>
-    <node id="Bench_animation.sheep_mouth" pivot="0.000; 0.000; 0" scale_pivot="true" orientation_pivot="true" scale="1.000; 1.000; 1" alpha="1.000">
-      <sprite id="Bench_animation.sheep_mouth.Layer 1" material="sheep_mouth-Tale.psd/1.png" bind_space="local" scale_pivot="false" orientation_pivot="true" layout="sheep_mouth-Tale.psd/1.png" visible="false" pivot="0.000; 0.000; 0" scale="31; 20; 1" position="15.500; 10.000; 0"/>
+    <node id="Bench_animation.sheep_mouth" pivot="0.000; 0.000; 0" scale_pivot="true" orientation_pivot="true" scale="1.000; 1.000; 1">
+      <sprite id="Bench_animation.sheep_mouth.Layer 1" material="sheep_mouth-Tale.psd/1.png" bind_space="local" scale_pivot="false" orientation_pivot="true" layout="sheep_mouth-Tale.psd/1.png" visible="false" pivot="0.000; 0.000; 0" scale="31; 20; 1" position="15.500; 10.000; 0" alpha="1.000"/>
     </node>
-    <node id="Bench_animation.apple_00" pivot="0.000; 0.000; 0" scale_pivot="true" orientation_pivot="true" scale="1.000; 1.000; 1" alpha="1.000">
-      <sprite id="Bench_animation.apple_00.Layer 1" material="apple_00-Tale.psd/1.png" bind_space="local" scale_pivot="false" orientation_pivot="true" layout="apple_00-Tale.psd/1.png" visible="false" pivot="0.000; 0.000; 0" scale="50; 47; 1" position="25.000; 23.500; 0"/>
+    <node id="Bench_animation.apple_00" pivot="0.000; 0.000; 0" scale_pivot="true" orientation_pivot="true" scale="1.000; 1.000; 1">
+      <sprite id="Bench_animation.apple_00.Layer 1" material="apple_00-Tale.psd/1.png" bind_space="local" scale_pivot="false" orientation_pivot="true" layout="apple_00-Tale.psd/1.png" visible="false" pivot="0.000; 0.000; 0" scale="50; 47; 1" position="25.000; 23.500; 0" alpha="1.000"/>
     </node>
-    <node id="Bench_animation.goat_brooch" pivot="0.000; 0.000; 0" scale_pivot="true" orientation_pivot="true" scale="1.000; 1.000; 1" alpha="1.000">
-      <sprite id="Bench_animation.goat_brooch.Layer 1" material="goat_brooch-Tale.psd/1.png" bind_space="local" scale_pivot="false" orientation_pivot="true" layout="goat_brooch-Tale.psd/1.png" visible="false" pivot="-0.016; -0.017; 0" scale="62; 60; 1" position="32.000; 31.000; 0"/>
+    <node id="Bench_animation.goat_brooch" pivot="0.000; 0.000; 0" scale_pivot="true" orientation_pivot="true" scale="1.000; 1.000; 1">
+      <sprite id="Bench_animation.goat_brooch.Layer 1" material="goat_brooch-Tale.psd/1.png" bind_space="local" scale_pivot="false" orientation_pivot="true" layout="goat_brooch-Tale.psd/1.png" visible="false" pivot="-0.016; -0.017; 0" scale="62; 60; 1" position="32.000; 31.000; 0" alpha="1.000"/>
     </node>
-    <node id="Bench_animation.goat_leg" pivot="0.000; 0.000; 0" scale_pivot="true" orientation_pivot="true" scale="1.000; 1.000; 1" alpha="1.000">
-      <sprite id="Bench_animation.goat_leg.Layer 1" material="goat_leg-Tale.psd/1.png" bind_space="local" scale_pivot="false" orientation_pivot="true" layout="goat_leg-Tale.psd/1.png" visible="false" pivot="0.000; 0.000; 0" scale="54; 181; 1" position="27.000; 90.500; 0"/>
+    <node id="Bench_animation.goat_leg" pivot="0.000; 0.000; 0" scale_pivot="true" orientation_pivot="true" scale="1.000; 1.000; 1">
+      <sprite id="Bench_animation.goat_leg.Layer 1" material="goat_leg-Tale.psd/1.png" bind_space="local" scale_pivot="false" orientation_pivot="true" layout="goat_leg-Tale.psd/1.png" visible="false" pivot="0.000; 0.000; 0" scale="54; 181; 1" position="27.000; 90.500; 0" alpha="1.000"/>
     </node>
-    <node id="Bench_animation.goat_hand" pivot="0.000; 0.000; 0" scale_pivot="true" orientation_pivot="true" scale="1.000; 1.000; 1" alpha="1.000">
-      <sprite id="Bench_animation.goat_hand.Layer 1" material="goat_hand-Tale.psd/1.png" bind_space="local" scale_pivot="false" orientation_pivot="true" layout="goat_hand-Tale.psd/1.png" visible="false" pivot="-0.008; 0.000; 0" scale="133; 58; 1" position="67.500; 29.000; 0"/>
+    <node id="Bench_animation.goat_hand" pivot="0.000; 0.000; 0" scale_pivot="true" orientation_pivot="true" scale="1.000; 1.000; 1">
+      <sprite id="Bench_animation.goat_hand.Layer 1" material="goat_hand-Tale.psd/1.png" bind_space="local" scale_pivot="false" orientation_pivot="true" layout="goat_hand-Tale.psd/1.png" visible="false" pivot="-0.008; 0.000; 0" scale="133; 58; 1" position="67.500; 29.000; 0" alpha="1.000"/>
     </node>
-    <node id="Bench_animation.goat_bell" pivot="0.000; 0.000; 0" scale_pivot="true" orientation_pivot="true" scale="1.000; 1.000; 1" alpha="1.000">
-      <sprite id="Bench_animation.goat_bell.Layer 1" material="goat_bell-Tale.psd/1.png" bind_space="local" scale_pivot="false" orientation_pivot="true" layout="goat_bell-Tale.psd/1.png" visible="false" pivot="0.000; 0.000; 0" scale="17; 20; 1" position="8.500; 10.000; 0"/>
+    <node id="Bench_animation.goat_bell" pivot="0.000; 0.000; 0" scale_pivot="true" orientation_pivot="true" scale="1.000; 1.000; 1">
+      <sprite id="Bench_animation.goat_bell.Layer 1" material="goat_bell-Tale.psd/1.png" bind_space="local" scale_pivot="false" orientation_pivot="true" layout="goat_bell-Tale.psd/1.png" visible="false" pivot="0.000; 0.000; 0" scale="17; 20; 1" position="8.500; 10.000; 0" alpha="1.000"/>
     </node>
-    <node id="Bench_animation.goat_mouth" pivot="0.000; 0.000; 0" scale_pivot="true" orientation_pivot="true" scale="1.000; 1.000; 1" alpha="1.000">
-      <sprite id="Bench_animation.goat_mouth.Layer 1" material="goat_mouth-Tale.psd/1.png" bind_space="local" scale_pivot="false" orientation_pivot="true" layout="goat_mouth-Tale.psd/1.png" visible="false" pivot="-0.018; 0.000; 0" scale="57; 41; 1" position="29.500; 20.500; 0"/>
+    <node id="Bench_animation.goat_mouth" pivot="0.000; 0.000; 0" scale_pivot="true" orientation_pivot="true" scale="1.000; 1.000; 1">
+      <sprite id="Bench_animation.goat_mouth.Layer 1" material="goat_mouth-Tale.psd/1.png" bind_space="local" scale_pivot="false" orientation_pivot="true" layout="goat_mouth-Tale.psd/1.png" visible="false" pivot="-0.018; 0.000; 0" scale="57; 41; 1" position="29.500; 20.500; 0" alpha="1.000"/>
     </node>
-    <node id="Bench_animation.goat_head" pivot="0.000; 0.000; 0" scale_pivot="true" orientation_pivot="true" scale="1.000; 1.000; 1" alpha="1.000">
-      <sprite id="Bench_animation.goat_head.Layer 1" material="goat_head-Tale.psd/1.png" bind_space="local" scale_pivot="false" orientation_pivot="true" layout="goat_head-Tale.psd/1.png" visible="false" pivot="0.000; 0.000; 0" scale="212; 132; 1" position="106.000; 66.000; 0"/>
+    <node id="Bench_animation.goat_head" pivot="0.000; 0.000; 0" scale_pivot="true" orientation_pivot="true" scale="1.000; 1.000; 1">
+      <sprite id="Bench_animation.goat_head.Layer 1" material="goat_head-Tale.psd/1.png" bind_space="local" scale_pivot="false" orientation_pivot="true" layout="goat_head-Tale.psd/1.png" visible="false" pivot="0.000; 0.000; 0" scale="212; 132; 1" position="106.000; 66.000; 0" alpha="1.000"/>
     </node>
-    <node id="Bench_animation.goat_body" pivot="0.000; 0.000; 0" scale_pivot="true" orientation_pivot="true" scale="1.000; 1.000; 1" alpha="1.000">
-      <sprite id="Bench_animation.goat_body.Layer 1" material="goat_body-Tale.psd/1.png" bind_space="local" scale_pivot="false" orientation_pivot="true" layout="goat_body-Tale.psd/1.png" visible="false" pivot="-0.002; -0.002; 0" scale="408; 587; 1" position="205.000; 294.500; 0"/>
+    <node id="Bench_animation.goat_body" pivot="0.000; 0.000; 0" scale_pivot="true" orientation_pivot="true" scale="1.000; 1.000; 1">
+      <sprite id="Bench_animation.goat_body.Layer 1" material="goat_body-Tale.psd/1.png" bind_space="local" scale_pivot="false" orientation_pivot="true" layout="goat_body-Tale.psd/1.png" visible="false" pivot="-0.002; -0.002; 0" scale="408; 587; 1" position="205.000; 294.500; 0" alpha="1.000"/>
     </node>
-    <node id="Bench_animation.ropes_right" pivot="16.000; 11.000; 0" scale_pivot="true" orientation_pivot="true" position="990.000; 428.000; 0" scale="1.000; 1.000; 1" alpha="1.000">
-      <sprite id="Bench_animation.ropes_right.Layer 1" material="ropes_right-Tale.psd/1.png" bind_space="local" scale_pivot="false" orientation_pivot="true" layout="ropes_right-Tale.psd/1.png" visible="false" pivot="0.000; -0.002; 0" scale="107; 587; 1" position="53.500; 294.500; 0"/>
+    <node id="Bench_animation.ropes_right" pivot="16.000; 11.000; 0" scale_pivot="true" orientation_pivot="true" position="990.000; 428.000; 0" scale="1.000; 1.000; 1">
+      <sprite id="Bench_animation.ropes_right.Layer 1" material="ropes_right-Tale.psd/1.png" bind_space="local" scale_pivot="false" orientation_pivot="true" layout="ropes_right-Tale.psd/1.png" visible="false" pivot="0.000; -0.002; 0" scale="107; 587; 1" position="53.500; 294.500; 0" alpha="1.000"/>
     </node>
-    <node id="Bench_animation.ropes_left" pivot="57.000; 21.000; 0" scale_pivot="true" orientation_pivot="true" position="266.000; 434.000; 0" scale="1.000; 1.000; 1" alpha="1.000">
-      <sprite id="Bench_animation.ropes_left.Layer 1" material="ropes_left-Tale.psd/1.png" bind_space="local" scale_pivot="false" orientation_pivot="true" layout="ropes_left-Tale.psd/1.png" visible="false" pivot="0.000; 0.000; 0" scale="95; 587; 1" position="47.500; 293.500; 0"/>
+    <node id="Bench_animation.ropes_left" pivot="57.000; 21.000; 0" scale_pivot="true" orientation_pivot="true" position="266.000; 434.000; 0" scale="1.000; 1.000; 1">
+      <sprite id="Bench_animation.ropes_left.Layer 1" material="ropes_left-Tale.psd/1.png" bind_space="local" scale_pivot="false" orientation_pivot="true" layout="ropes_left-Tale.psd/1.png" visible="false" pivot="0.000; 0.000; 0" scale="95; 587; 1" position="47.500; 293.500; 0" alpha="1.000"/>
     </node>
-    <node id="Bench_animation.bench" pivot="446.000; 144.000; 0" scale_pivot="true" orientation_pivot="true" scale="1.000; 1.000; 1" alpha="1.000">
-      <sprite id="Bench_animation.bench.Layer 1" material="bench-Tale.psd/1.png" bind_space="local" scale_pivot="false" orientation_pivot="true" layout="bench-Tale.psd/1.png" visible="false" pivot="0.000; -0.003; 0" scale="892; 288; 1" position="446.000; 145.000; 0"/>
+    <node id="Bench_animation.bench" pivot="446.000; 144.000; 0" scale_pivot="true" orientation_pivot="true" scale="1.000; 1.000; 1">
+      <sprite id="Bench_animation.bench.Layer 1" material="bench-Tale.psd/1.png" bind_space="local" scale_pivot="false" orientation_pivot="true" layout="bench-Tale.psd/1.png" visible="false" pivot="0.000; -0.003; 0" scale="892; 288; 1" position="446.000; 145.000; 0" alpha="1.000"/>
     </node>
   </scene>
 </xscene>

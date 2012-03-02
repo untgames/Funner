@@ -479,7 +479,7 @@ Save animations...
         <key time="20.233" value="225.104 184.424 0.000" tension="0.000" continuity="0.000" bias="0.000"/>
         <key time="20.267" value="225.001 184.375 0.000" tension="0.000" continuity="0.000" bias="0.000"/>
       </channel>
-      <channel target_name="ghost_left_group.ghost_left_movenment" parameter_name="alpha" track_type="basic_spline&lt;spline_tcb_key&lt;float&gt;&gt;">
+      <channel target_name="ghost_left_group.ghost_left_movenment.Layer 1" parameter_name="alpha" track_type="basic_spline&lt;spline_tcb_key&lt;float&gt;&gt;">
         <key time="0.000" value="0.000" tension="0.000" continuity="0.000" bias="0.000"/>
         <key time="6.033" value="0.000" tension="0.000" continuity="0.000" bias="0.000"/>
         <key time="6.067" value="0.011" tension="0.000" continuity="0.000" bias="0.000"/>
@@ -658,7 +658,7 @@ Save animations...
         <key time="19.567" value="0.002" tension="0.000" continuity="0.000" bias="0.000"/>
         <key time="19.600" value="0.000" tension="0.000" continuity="0.000" bias="0.000"/>
       </channel>
-      <channel target_name="ghost_left_group.ghost_left_static" parameter_name="alpha" track_type="basic_spline&lt;spline_tcb_key&lt;float&gt;&gt;">
+      <channel target_name="ghost_left_group.ghost_left_static.Layer 1" parameter_name="alpha" track_type="basic_spline&lt;spline_tcb_key&lt;float&gt;&gt;">
         <key time="0.000" value="0.000" tension="0.000" continuity="0.000" bias="0.000"/>
         <key time="2.700" value="0.000" tension="0.000" continuity="0.000" bias="0.000"/>
         <key time="2.733" value="0.010" tension="0.000" continuity="0.000" bias="0.000"/>
@@ -1648,7 +1648,7 @@ Save animations...
         <key time="26.000" value="186.746 197.062 0.000" tension="0.000" continuity="0.000" bias="0.000"/>
         <key time="26.033" value="186.750 197.375 0.000" tension="0.000" continuity="0.000" bias="0.000"/>
       </channel>
-      <channel target_name="ghost_left_group.ghost_left_background" parameter_name="alpha" track_type="basic_spline&lt;spline_tcb_key&lt;float&gt;&gt;">
+      <channel target_name="ghost_left_group.ghost_left_background.Layer 1" parameter_name="alpha" track_type="basic_spline&lt;spline_tcb_key&lt;float&gt;&gt;">
         <key time="0.000" value="0.000" tension="0.000" continuity="0.000" bias="0.000"/>
         <key time="0.033" value="0.012" tension="0.000" continuity="0.000" bias="0.000"/>
         <key time="0.067" value="0.025" tension="0.000" continuity="0.000" bias="0.000"/>

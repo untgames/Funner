@@ -1217,10 +1217,10 @@ bool is_sprite_looped (const char* name, Params& params)
   return false;
 }
 
-float process_timeline (Params& params, ConvertData& data, const Timeline& timeline, const char* name_prefix, EventList& events);
+float process_timeline (Params& params, ConvertData& data, Timeline& timeline, const char* name_prefix, EventList& events);
 
 ///обработка вложенного символа (возвращает время окончания анимации включая все вложения)
-float process_symbol_instance (Params& params, ConvertData& data, const Frame& frame, const char* name_prefix, bool looped)
+float process_symbol_instance (Params& params, ConvertData& data, Frame& frame, const char* name_prefix, bool looped)
 {
   const FrameElement& element     = frame.Elements ()[(size_t)0];
   const char*         symbol_name = element.Name ();
@@ -1259,6 +1259,48 @@ float process_symbol_instance (Params& params, ConvertData& data, const Frame& f
   data.scene_writer->WriteAttribute ("pivot", pivot_value_string.c_str ());
   data.scene_writer->WriteAttribute ("scale_pivot", "true");
   data.scene_writer->WriteAttribute ("orientation_pivot", "true");
+  
+    //получение объекта анимаций
+    
+  AnimationCore animation = frame.Animation ();
+  
+  PropertyAnimation* alpha_track = animation.Properties ().Find ("headContainer.Colors.Alpha_Color.Alpha_Amount");
+  
+  if (alpha_track)
+  {
+    for (size_t i=0, count=animation.Properties ().Size (); i<count; i++)
+      if (&animation.Properties ()[i] == alpha_track)
+      {        
+        Timeline& timeline = data.document.Symbols ()[symbol_name].Timeline ();
+        
+        for (Timeline::LayerList::Iterator layer_iter=timeline.Layers ().CreateIterator (); layer_iter; ++layer_iter)
+        {
+          Layer& layer = *layer_iter;
+          
+            //определение типа слоя
+           
+          LayerType layer_type = get_layer_type (layer);
+           
+          switch (layer_type)
+          {
+            default:
+              break;
+            case LayerType_Sprite:
+            {
+              AnimationCore&                        animation  = layer.Frames ()[0u].Animation ();
+              AnimationCore::PropertyAnimationList& properties = animation.Properties ();
+              
+              properties.Add (*alpha_track);
+              break;
+            }
+          }
+        }
+
+        animation.Properties ().Remove (i);
+
+        break;
+      }
+  }
 
   process_sprite_common (params, data, frame, name_prefix, looped, element.Translation ());
   write_timeline_node_tracks (params, data, events);
@@ -1267,15 +1309,15 @@ float process_symbol_instance (Params& params, ConvertData& data, const Frame& f
 }
 
 ///обработка таймлайна (возвращает время окончания анимации включая все вложения)
-float process_timeline (Params& params, ConvertData& data, const Timeline& timeline, const char* parent_name, EventList& events)
+float process_timeline (Params& params, ConvertData& data, Timeline& timeline, const char* parent_name, EventList& events)
 {
     //обход слоёв
     
   float end_time = 0.0f;
 
-  for (Timeline::LayerList::ConstIterator layer_iter=timeline.Layers ().CreateIterator (); layer_iter; ++layer_iter)
+  for (Timeline::LayerList::Iterator layer_iter=timeline.Layers ().CreateIterator (); layer_iter; ++layer_iter)
   {
-    const Layer& layer = *layer_iter;
+    Layer& layer = *layer_iter;
     
       //определение типа слоя
     
