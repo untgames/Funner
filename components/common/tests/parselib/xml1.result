@@ -119,296 +119,300 @@ root (source='', line=0): {}
  NAME (source='data/test-utf8.xml', line=2): {}
   NAME (source='data/test-utf8.xml', line=2): {First WM}
   VERSION (source='data/test-utf8.xml', line=2): {0.1}
-  MATERIAL (source='data/test-utf8.xml', line=20): {}
-   NAME (source='data/test-utf8.xml', line=21): {Русский материал}
-   COLOR (source='data/test-utf8.xml', line=22): {00//0099}
-   EPS (source='data/test-utf8.xml', line=23): {//10}
-   MU (source='data/test-utf8.xml', line=24): {1//}
-   SIGMA (source='data/test-utf8.xml', line=25): {100}
-  #text (source='data/test-utf8.xml', line=26): {//ad///sa//}
-  New1 (source='data/test-utf8.xml', line=27): {}
-   #text (source='data/test-utf8.xml', line=28): {薩<沙是在高速公路和吸乾, 1.001, 2.001, 3.001, 4.001, Русский, материал}
-   New2 (source='data/test-utf8.xml', line=31): {}
-    ChineseAttribute (source='data/test-utf8.xml', line=31): {薩沙是在高速公路和吸乾}
-  #text (source='data/test-utf8.xml', line=34): {1.0, 2.0, bla-bla-bla}
-  LAYER (source='data/test-utf8.xml', line=36): {}
-   NAME (source='data/test-utf8.xml', line=37): {Layer1}
-   MATERIAL (source='data/test-utf8.xml', line=38): {Mat2}
-   X (source='data/test-utf8.xml', line=39): {0.2}
-   WIDTH (source='data/test-utf8.xml', line=40): {0.7}
-  #text (source='data/test-utf8.xml', line=42): {CDATA test Русский материал 薩沙是在高速公路和吸乾 CDATA test/}
-  LAYER (source='data/test-utf8.xml', line=44): {}
-   NAME (source='data/test-utf8.xml', line=45): {Layer2}
-   MATERIAL (source='data/test-utf8.xml', line=46): {Mat1}
-   X (source='data/test-utf8.xml', line=47): {0.0}
-   WIDTH (source='data/test-utf8.xml', line=48): {0.1}
-  GAUSSGENERATOR (source='data/test-utf8.xml', line=50): {}
-   NAME (source='data/test-utf8.xml', line=51): {Gen1}
-   X (source='data/test-utf8.xml', line=52): {0.15}
-  SONDE (source='data/test-utf8.xml', line=54): {}
-   NAME (source='data/test-utf8.xml', line=55): {Sonde1}
-   X (source='data/test-utf8.xml', line=56): {0.5}
-  New (source='data/test-utf8.xml', line=58): {}
-   Tag (source='data/test-utf8.xml', line=59): {}
-    #text (source='data/test-utf8.xml', line=59): {text}
+  MATERIAL (source='data/test-utf8.xml', line=21): {}
+   NAME (source='data/test-utf8.xml', line=22): {Русский материал}
+   COLOR (source='data/test-utf8.xml', line=23): {00//0099}
+   EPS (source='data/test-utf8.xml', line=24): {//10}
+   MU (source='data/test-utf8.xml', line=25): {1//}
+   SIGMA (source='data/test-utf8.xml', line=26): {100}
+  #text (source='data/test-utf8.xml', line=27): {//ad///sa//}
+  New1 (source='data/test-utf8.xml', line=28): {}
+   #text (source='data/test-utf8.xml', line=29): {薩<沙是在高速公路和吸乾, 1.001, 2.001, 3.001, 4.001, Русский, материал}
+   New2 (source='data/test-utf8.xml', line=32): {}
+    ChineseAttribute (source='data/test-utf8.xml', line=32): {薩沙是在高速公路和吸乾}
+  #text (source='data/test-utf8.xml', line=35): {1.0, 2.0, bla-bla-bla}
+  LAYER (source='data/test-utf8.xml', line=37): {}
+   NAME (source='data/test-utf8.xml', line=38): {Layer1}
+   MATERIAL (source='data/test-utf8.xml', line=39): {Mat2}
+   X (source='data/test-utf8.xml', line=40): {0.2}
+   WIDTH (source='data/test-utf8.xml', line=41): {0.7}
+  #text (source='data/test-utf8.xml', line=43): {CDATA test Русский материал 薩沙是在高速公路和吸乾 CDATA test/}
+  LAYER (source='data/test-utf8.xml', line=45): {}
+   NAME (source='data/test-utf8.xml', line=46): {Layer2}
+   MATERIAL (source='data/test-utf8.xml', line=47): {Mat1}
+   X (source='data/test-utf8.xml', line=48): {0.0}
+   WIDTH (source='data/test-utf8.xml', line=49): {0.1}
+  GAUSSGENERATOR (source='data/test-utf8.xml', line=51): {}
+   NAME (source='data/test-utf8.xml', line=52): {Gen1}
+   X (source='data/test-utf8.xml', line=53): {0.15}
+  SONDE (source='data/test-utf8.xml', line=55): {}
+   NAME (source='data/test-utf8.xml', line=56): {Sonde1}
+   X (source='data/test-utf8.xml', line=57): {0.5}
+  New (source='data/test-utf8.xml', line=59): {}
+   Tag (source='data/test-utf8.xml', line=60): {}
+    #text (source='data/test-utf8.xml', line=60): {text}
 root (source='', line=0): {}
  NAME (source='data/test-cp1251.xml', line=2): {}
   NAME (source='data/test-cp1251.xml', line=2): {First WM}
   VERSION (source='data/test-cp1251.xml', line=2): {0.1}
-  MATERIAL (source='data/test-cp1251.xml', line=20): {}
-   NAME (source='data/test-cp1251.xml', line=20): {Русский материал}
-   COLOR (source='data/test-cp1251.xml', line=20): {00//0099}
-   EPS (source='data/test-cp1251.xml', line=20): {//10}
-   MU (source='data/test-cp1251.xml', line=20): {1//}
-   SIGMA (source='data/test-cp1251.xml', line=20): {100}
-  #text (source='data/test-cp1251.xml', line=21): {//ad///sa//}
-  New1 (source='data/test-cp1251.xml', line=22): {}
-   #text (source='data/test-cp1251.xml', line=23): {薩<沙是在高速公路和吸乾, 1.001, 2.001, 3.001, 4.001, Русский, материал}
-   New2 (source='data/test-cp1251.xml', line=26): {}
-    ChineseAttribute (source='data/test-cp1251.xml', line=26): {薩沙是在高速公路和吸乾}
-  #text (source='data/test-cp1251.xml', line=29): {1.0, 2.0, bla-bla-bla}
-  LAYER (source='data/test-cp1251.xml', line=31): {}
-   NAME (source='data/test-cp1251.xml', line=31): {Layer1}
-   MATERIAL (source='data/test-cp1251.xml', line=31): {Mat2}
-   X (source='data/test-cp1251.xml', line=31): {0.2}
-   WIDTH (source='data/test-cp1251.xml', line=31): {0.7}
-  #text (source='data/test-cp1251.xml', line=33): {CDATA test Русский материал &#34217;&#27801;&#26159;&#22312;&#39640;&#36895;&#20844;&#36335;&#21644;&#21560;&#20094; CDATA test/}
-  LAYER (source='data/test-cp1251.xml', line=35): {}
-   NAME (source='data/test-cp1251.xml', line=35): {Layer2}
-   MATERIAL (source='data/test-cp1251.xml', line=35): {Mat1}
-   X (source='data/test-cp1251.xml', line=35): {0.0}
-   WIDTH (source='data/test-cp1251.xml', line=35): {0.1}
-  GAUSSGENERATOR (source='data/test-cp1251.xml', line=37): {}
-   NAME (source='data/test-cp1251.xml', line=37): {Gen1}
-   X (source='data/test-cp1251.xml', line=37): {0.15}
-  SONDE (source='data/test-cp1251.xml', line=39): {}
-   NAME (source='data/test-cp1251.xml', line=39): {Sonde1}
-   X (source='data/test-cp1251.xml', line=39): {0.5}
-  New (source='data/test-cp1251.xml', line=41): {}
-   Tag (source='data/test-cp1251.xml', line=42): {}
-    #text (source='data/test-cp1251.xml', line=42): {text}
+  MATERIAL (source='data/test-cp1251.xml', line=21): {}
+   NAME (source='data/test-cp1251.xml', line=21): {Русский материал}
+   COLOR (source='data/test-cp1251.xml', line=21): {00//0099}
+   EPS (source='data/test-cp1251.xml', line=21): {//10}
+   MU (source='data/test-cp1251.xml', line=21): {1//}
+   SIGMA (source='data/test-cp1251.xml', line=21): {100}
+  #text (source='data/test-cp1251.xml', line=22): {//ad///sa//}
+  New1 (source='data/test-cp1251.xml', line=23): {}
+   #text (source='data/test-cp1251.xml', line=24): {薩<沙是在高速公路和吸乾, 1.001, 2.001, 3.001, 4.001, Русский, материал}
+   New2 (source='data/test-cp1251.xml', line=27): {}
+    ChineseAttribute (source='data/test-cp1251.xml', line=27): {薩沙是在高速公路和吸乾}
+  #text (source='data/test-cp1251.xml', line=30): {1.0, 2.0, bla-bla-bla}
+  LAYER (source='data/test-cp1251.xml', line=32): {}
+   NAME (source='data/test-cp1251.xml', line=32): {Layer1}
+   MATERIAL (source='data/test-cp1251.xml', line=32): {Mat2}
+   X (source='data/test-cp1251.xml', line=32): {0.2}
+   WIDTH (source='data/test-cp1251.xml', line=32): {0.7}
+  #text (source='data/test-cp1251.xml', line=34): {CDATA test Русский материал &#34217;&#27801;&#26159;&#22312;&#39640;&#36895;&#20844;&#36335;&#21644;&#21560;&#20094; CDATA test/}
+  LAYER (source='data/test-cp1251.xml', line=36): {}
+   NAME (source='data/test-cp1251.xml', line=36): {Layer2}
+   MATERIAL (source='data/test-cp1251.xml', line=36): {Mat1}
+   X (source='data/test-cp1251.xml', line=36): {0.0}
+   WIDTH (source='data/test-cp1251.xml', line=36): {0.1}
+  GAUSSGENERATOR (source='data/test-cp1251.xml', line=38): {}
+   NAME (source='data/test-cp1251.xml', line=38): {Gen1}
+   X (source='data/test-cp1251.xml', line=38): {0.15}
+  SONDE (source='data/test-cp1251.xml', line=40): {}
+   NAME (source='data/test-cp1251.xml', line=40): {Sonde1}
+   X (source='data/test-cp1251.xml', line=40): {0.5}
+  New (source='data/test-cp1251.xml', line=42): {}
+   Tag (source='data/test-cp1251.xml', line=43): {}
+    #text (source='data/test-cp1251.xml', line=43): {text}
 data/test-cp1251.xml(0): warning: non utf-8 encoding Cp1251 used (this decreases parsing perfomance)
 root (source='', line=0): {}
  NAME (source='data/test-utf16.xml', line=2): {}
   NAME (source='data/test-utf16.xml', line=2): {First WM}
   VERSION (source='data/test-utf16.xml', line=2): {0.1}
-  MATERIAL (source='data/test-utf16.xml', line=20): {}
-   NAME (source='data/test-utf16.xml', line=20): {Русский материал}
-   COLOR (source='data/test-utf16.xml', line=20): {00//0099}
-   EPS (source='data/test-utf16.xml', line=20): {//10}
-   MU (source='data/test-utf16.xml', line=20): {1//}
-   SIGMA (source='data/test-utf16.xml', line=20): {100}
-  #text (source='data/test-utf16.xml', line=21): {//ad///sa//}
-  New1 (source='data/test-utf16.xml', line=22): {}
-   #text (source='data/test-utf16.xml', line=23): {薩<沙是在高速公路和吸乾, 1.001, 2.001, 3.001, 4.001, Русский, материал}
-   New2 (source='data/test-utf16.xml', line=26): {}
-    ChineseAttribute (source='data/test-utf16.xml', line=26): {薩沙是在高速公路和吸乾}
-  #text (source='data/test-utf16.xml', line=29): {1.0, 2.0, bla-bla-bla}
-  LAYER (source='data/test-utf16.xml', line=31): {}
-   NAME (source='data/test-utf16.xml', line=31): {Layer1}
-   MATERIAL (source='data/test-utf16.xml', line=31): {Mat2}
-   X (source='data/test-utf16.xml', line=31): {0.2}
-   WIDTH (source='data/test-utf16.xml', line=31): {0.7}
-  #text (source='data/test-utf16.xml', line=33): {CDATA test Русский материал &#34217;&#27801;&#26159;&#22312;&#39640;&#36895;&#20844;&#36335;&#21644;&#21560;&#20094; CDATA test/}
-  LAYER (source='data/test-utf16.xml', line=35): {}
-   NAME (source='data/test-utf16.xml', line=35): {Layer2}
-   MATERIAL (source='data/test-utf16.xml', line=35): {Mat1}
-   X (source='data/test-utf16.xml', line=35): {0.0}
-   WIDTH (source='data/test-utf16.xml', line=35): {0.1}
-  GAUSSGENERATOR (source='data/test-utf16.xml', line=37): {}
-   NAME (source='data/test-utf16.xml', line=37): {Gen1}
-   X (source='data/test-utf16.xml', line=37): {0.15}
-  SONDE (source='data/test-utf16.xml', line=39): {}
-   NAME (source='data/test-utf16.xml', line=39): {Sonde1}
-   X (source='data/test-utf16.xml', line=39): {0.5}
-  New (source='data/test-utf16.xml', line=41): {}
-   Tag (source='data/test-utf16.xml', line=42): {}
-    #text (source='data/test-utf16.xml', line=42): {text}
+  MATERIAL (source='data/test-utf16.xml', line=21): {}
+   NAME (source='data/test-utf16.xml', line=21): {Русский материал}
+   COLOR (source='data/test-utf16.xml', line=21): {00//0099}
+   EPS (source='data/test-utf16.xml', line=21): {//10}
+   MU (source='data/test-utf16.xml', line=21): {1//}
+   SIGMA (source='data/test-utf16.xml', line=21): {100}
+  #text (source='data/test-utf16.xml', line=22): {//ad///sa//}
+  New1 (source='data/test-utf16.xml', line=23): {}
+   #text (source='data/test-utf16.xml', line=24): {薩<沙是在高速公路和吸乾, 1.001, 2.001, 3.001, 4.001, Русский, материал}
+   New2 (source='data/test-utf16.xml', line=27): {}
+    ChineseAttribute (source='data/test-utf16.xml', line=27): {薩沙是在高速公路和吸乾}
+  #text (source='data/test-utf16.xml', line=30): {1.0, 2.0, bla-bla-bla}
+  LAYER (source='data/test-utf16.xml', line=32): {}
+   NAME (source='data/test-utf16.xml', line=32): {Layer1}
+   MATERIAL (source='data/test-utf16.xml', line=32): {Mat2}
+   X (source='data/test-utf16.xml', line=32): {0.2}
+   WIDTH (source='data/test-utf16.xml', line=32): {0.7}
+  #text (source='data/test-utf16.xml', line=34): {CDATA test Русский материал &#34217;&#27801;&#26159;&#22312;&#39640;&#36895;&#20844;&#36335;&#21644;&#21560;&#20094; CDATA test/}
+  LAYER (source='data/test-utf16.xml', line=36): {}
+   NAME (source='data/test-utf16.xml', line=36): {Layer2}
+   MATERIAL (source='data/test-utf16.xml', line=36): {Mat1}
+   X (source='data/test-utf16.xml', line=36): {0.0}
+   WIDTH (source='data/test-utf16.xml', line=36): {0.1}
+  GAUSSGENERATOR (source='data/test-utf16.xml', line=38): {}
+   NAME (source='data/test-utf16.xml', line=38): {Gen1}
+   X (source='data/test-utf16.xml', line=38): {0.15}
+  SONDE (source='data/test-utf16.xml', line=40): {}
+   NAME (source='data/test-utf16.xml', line=40): {Sonde1}
+   X (source='data/test-utf16.xml', line=40): {0.5}
+  New (source='data/test-utf16.xml', line=42): {}
+   Tag (source='data/test-utf16.xml', line=43): {}
+    #text (source='data/test-utf16.xml', line=43): {text}
 data/test-utf16.xml(0): warning: non utf-8 encoding UTF-16LE used (this decreases parsing perfomance)
 root (source='', line=0): {}
  NAME (source='data/test-utf16be.xml', line=2): {}
   NAME (source='data/test-utf16be.xml', line=2): {First WM}
   VERSION (source='data/test-utf16be.xml', line=2): {0.1}
-  MATERIAL (source='data/test-utf16be.xml', line=20): {}
-   NAME (source='data/test-utf16be.xml', line=20): {Русский материал}
-   COLOR (source='data/test-utf16be.xml', line=20): {00//0099}
-   EPS (source='data/test-utf16be.xml', line=20): {//10}
-   MU (source='data/test-utf16be.xml', line=20): {1//}
-   SIGMA (source='data/test-utf16be.xml', line=20): {100}
-  #text (source='data/test-utf16be.xml', line=21): {//ad///sa//}
-  New1 (source='data/test-utf16be.xml', line=22): {}
-   #text (source='data/test-utf16be.xml', line=23): {薩<沙是在高速公路和吸乾, 1.001, 2.001, 3.001, 4.001, Русский, материал}
-   New2 (source='data/test-utf16be.xml', line=26): {}
-    ChineseAttribute (source='data/test-utf16be.xml', line=26): {薩沙是在高速公路和吸乾}
-  #text (source='data/test-utf16be.xml', line=29): {1.0, 2.0, bla-bla-bla}
-  LAYER (source='data/test-utf16be.xml', line=31): {}
-   NAME (source='data/test-utf16be.xml', line=31): {Layer1}
-   MATERIAL (source='data/test-utf16be.xml', line=31): {Mat2}
-   X (source='data/test-utf16be.xml', line=31): {0.2}
-   WIDTH (source='data/test-utf16be.xml', line=31): {0.7}
-  #text (source='data/test-utf16be.xml', line=33): {CDATA test Русский материал &#34217;&#27801;&#26159;&#22312;&#39640;&#36895;&#20844;&#36335;&#21644;&#21560;&#20094; CDATA test/}
-  LAYER (source='data/test-utf16be.xml', line=35): {}
-   NAME (source='data/test-utf16be.xml', line=35): {Layer2}
-   MATERIAL (source='data/test-utf16be.xml', line=35): {Mat1}
-   X (source='data/test-utf16be.xml', line=35): {0.0}
-   WIDTH (source='data/test-utf16be.xml', line=35): {0.1}
-  GAUSSGENERATOR (source='data/test-utf16be.xml', line=37): {}
-   NAME (source='data/test-utf16be.xml', line=37): {Gen1}
-   X (source='data/test-utf16be.xml', line=37): {0.15}
-  SONDE (source='data/test-utf16be.xml', line=39): {}
-   NAME (source='data/test-utf16be.xml', line=39): {Sonde1}
-   X (source='data/test-utf16be.xml', line=39): {0.5}
-  New (source='data/test-utf16be.xml', line=41): {}
-   Tag (source='data/test-utf16be.xml', line=42): {}
-    #text (source='data/test-utf16be.xml', line=42): {text}
+  MATERIAL (source='data/test-utf16be.xml', line=21): {}
+   NAME (source='data/test-utf16be.xml', line=21): {Русский материал}
+   COLOR (source='data/test-utf16be.xml', line=21): {00//0099}
+   EPS (source='data/test-utf16be.xml', line=21): {//10}
+   MU (source='data/test-utf16be.xml', line=21): {1//}
+   SIGMA (source='data/test-utf16be.xml', line=21): {100}
+  #text (source='data/test-utf16be.xml', line=22): {//ad///sa//}
+  New1 (source='data/test-utf16be.xml', line=23): {}
+   #text (source='data/test-utf16be.xml', line=24): {薩<沙是在高速公路和吸乾, 1.001, 2.001, 3.001, 4.001, Русский, материал}
+   New2 (source='data/test-utf16be.xml', line=27): {}
+    ChineseAttribute (source='data/test-utf16be.xml', line=27): {薩沙是在高速公路和吸乾}
+  #text (source='data/test-utf16be.xml', line=30): {1.0, 2.0, bla-bla-bla}
+  LAYER (source='data/test-utf16be.xml', line=32): {}
+   NAME (source='data/test-utf16be.xml', line=32): {Layer1}
+   MATERIAL (source='data/test-utf16be.xml', line=32): {Mat2}
+   X (source='data/test-utf16be.xml', line=32): {0.2}
+   WIDTH (source='data/test-utf16be.xml', line=32): {0.7}
+  #text (source='data/test-utf16be.xml', line=34): {CDATA test Русский материал &#34217;&#27801;&#26159;&#22312;&#39640;&#36895;&#20844;&#36335;&#21644;&#21560;&#20094; CDATA test/}
+  LAYER (source='data/test-utf16be.xml', line=36): {}
+   NAME (source='data/test-utf16be.xml', line=36): {Layer2}
+   MATERIAL (source='data/test-utf16be.xml', line=36): {Mat1}
+   X (source='data/test-utf16be.xml', line=36): {0.0}
+   WIDTH (source='data/test-utf16be.xml', line=36): {0.1}
+  GAUSSGENERATOR (source='data/test-utf16be.xml', line=38): {}
+   NAME (source='data/test-utf16be.xml', line=38): {Gen1}
+   X (source='data/test-utf16be.xml', line=38): {0.15}
+  SONDE (source='data/test-utf16be.xml', line=40): {}
+   NAME (source='data/test-utf16be.xml', line=40): {Sonde1}
+   X (source='data/test-utf16be.xml', line=40): {0.5}
+  New (source='data/test-utf16be.xml', line=42): {}
+   Tag (source='data/test-utf16be.xml', line=43): {}
+    #text (source='data/test-utf16be.xml', line=43): {text}
 data/test-utf16be.xml(0): warning: non utf-8 encoding UTF-16BE used (this decreases parsing perfomance)
 root (source='', line=0): {}
  NAME (source='data/test-utf16le.xml', line=2): {}
   NAME (source='data/test-utf16le.xml', line=2): {First WM}
   VERSION (source='data/test-utf16le.xml', line=2): {0.1}
-  MATERIAL (source='data/test-utf16le.xml', line=20): {}
-   NAME (source='data/test-utf16le.xml', line=20): {Русский материал}
-   COLOR (source='data/test-utf16le.xml', line=20): {00//0099}
-   EPS (source='data/test-utf16le.xml', line=20): {//10}
-   MU (source='data/test-utf16le.xml', line=20): {1//}
-   SIGMA (source='data/test-utf16le.xml', line=20): {100}
-  #text (source='data/test-utf16le.xml', line=21): {//ad///sa//}
-  New1 (source='data/test-utf16le.xml', line=22): {}
-   #text (source='data/test-utf16le.xml', line=23): {薩<沙是在高速公路和吸乾, 1.001, 2.001, 3.001, 4.001, Русский, материал}
-   New2 (source='data/test-utf16le.xml', line=26): {}
-    ChineseAttribute (source='data/test-utf16le.xml', line=26): {薩沙是在高速公路和吸乾}
-  #text (source='data/test-utf16le.xml', line=29): {1.0, 2.0, bla-bla-bla}
-  LAYER (source='data/test-utf16le.xml', line=31): {}
-   NAME (source='data/test-utf16le.xml', line=31): {Layer1}
-   MATERIAL (source='data/test-utf16le.xml', line=31): {Mat2}
-   X (source='data/test-utf16le.xml', line=31): {0.2}
-   WIDTH (source='data/test-utf16le.xml', line=31): {0.7}
-  #text (source='data/test-utf16le.xml', line=33): {CDATA test Русский материал &#34217;&#27801;&#26159;&#22312;&#39640;&#36895;&#20844;&#36335;&#21644;&#21560;&#20094; CDATA test/}
-  LAYER (source='data/test-utf16le.xml', line=35): {}
-   NAME (source='data/test-utf16le.xml', line=35): {Layer2}
-   MATERIAL (source='data/test-utf16le.xml', line=35): {Mat1}
-   X (source='data/test-utf16le.xml', line=35): {0.0}
-   WIDTH (source='data/test-utf16le.xml', line=35): {0.1}
-  GAUSSGENERATOR (source='data/test-utf16le.xml', line=37): {}
-   NAME (source='data/test-utf16le.xml', line=37): {Gen1}
-   X (source='data/test-utf16le.xml', line=37): {0.15}
-  SONDE (source='data/test-utf16le.xml', line=39): {}
-   NAME (source='data/test-utf16le.xml', line=39): {Sonde1}
-   X (source='data/test-utf16le.xml', line=39): {0.5}
-  New (source='data/test-utf16le.xml', line=41): {}
-   Tag (source='data/test-utf16le.xml', line=42): {}
-    #text (source='data/test-utf16le.xml', line=42): {text}
+  MATERIAL (source='data/test-utf16le.xml', line=21): {}
+   NAME (source='data/test-utf16le.xml', line=21): {Русский материал}
+   COLOR (source='data/test-utf16le.xml', line=21): {00//0099}
+   EPS (source='data/test-utf16le.xml', line=21): {//10}
+   MU (source='data/test-utf16le.xml', line=21): {1//}
+   SIGMA (source='data/test-utf16le.xml', line=21): {100}
+  #text (source='data/test-utf16le.xml', line=22): {//ad///sa//}
+  New1 (source='data/test-utf16le.xml', line=23): {}
+   #text (source='data/test-utf16le.xml', line=24): {薩<沙是在高速公路和吸乾, 1.001, 2.001, 3.001, 4.001, Русский, материал}
+   New2 (source='data/test-utf16le.xml', line=27): {}
+    ChineseAttribute (source='data/test-utf16le.xml', line=27): {薩沙是在高速公路和吸乾}
+  #text (source='data/test-utf16le.xml', line=30): {1.0, 2.0, bla-bla-bla}
+  LAYER (source='data/test-utf16le.xml', line=32): {}
+   NAME (source='data/test-utf16le.xml', line=32): {Layer1}
+   MATERIAL (source='data/test-utf16le.xml', line=32): {Mat2}
+   X (source='data/test-utf16le.xml', line=32): {0.2}
+   WIDTH (source='data/test-utf16le.xml', line=32): {0.7}
+  #text (source='data/test-utf16le.xml', line=34): {CDATA test Русский материал &#34217;&#27801;&#26159;&#22312;&#39640;&#36895;&#20844;&#36335;&#21644;&#21560;&#20094; CDATA test/}
+  LAYER (source='data/test-utf16le.xml', line=36): {}
+   NAME (source='data/test-utf16le.xml', line=36): {Layer2}
+   MATERIAL (source='data/test-utf16le.xml', line=36): {Mat1}
+   X (source='data/test-utf16le.xml', line=36): {0.0}
+   WIDTH (source='data/test-utf16le.xml', line=36): {0.1}
+  GAUSSGENERATOR (source='data/test-utf16le.xml', line=38): {}
+   NAME (source='data/test-utf16le.xml', line=38): {Gen1}
+   X (source='data/test-utf16le.xml', line=38): {0.15}
+  SONDE (source='data/test-utf16le.xml', line=40): {}
+   NAME (source='data/test-utf16le.xml', line=40): {Sonde1}
+   X (source='data/test-utf16le.xml', line=40): {0.5}
+  New (source='data/test-utf16le.xml', line=42): {}
+   Tag (source='data/test-utf16le.xml', line=43): {}
+    #text (source='data/test-utf16le.xml', line=43): {text}
 data/test-utf16le.xml(0): warning: non utf-8 encoding UTF-16LE used (this decreases parsing perfomance)
 root (source='', line=0): {}
  NAME (source='data/test-utf32.xml', line=2): {}
   NAME (source='data/test-utf32.xml', line=2): {First WM}
   VERSION (source='data/test-utf32.xml', line=2): {0.1}
-  MATERIAL (source='data/test-utf32.xml', line=20): {}
-   NAME (source='data/test-utf32.xml', line=20): {Русский материал}
-   COLOR (source='data/test-utf32.xml', line=20): {00//0099}
-   EPS (source='data/test-utf32.xml', line=20): {//10}
-   MU (source='data/test-utf32.xml', line=20): {1//}
-   SIGMA (source='data/test-utf32.xml', line=20): {100}
-  #text (source='data/test-utf32.xml', line=21): {//ad///sa//}
-  New1 (source='data/test-utf32.xml', line=22): {}
-   #text (source='data/test-utf32.xml', line=23): {薩<沙是在高速公路和吸乾, 1.001, 2.001, 3.001, 4.001, Русский, материал}
-   New2 (source='data/test-utf32.xml', line=26): {}
-    ChineseAttribute (source='data/test-utf32.xml', line=26): {薩沙是在高速公路和吸乾}
-  #text (source='data/test-utf32.xml', line=29): {1.0, 2.0, bla-bla-bla}
-  LAYER (source='data/test-utf32.xml', line=31): {}
-   NAME (source='data/test-utf32.xml', line=31): {Layer1}
-   MATERIAL (source='data/test-utf32.xml', line=31): {Mat2}
-   X (source='data/test-utf32.xml', line=31): {0.2}
-   WIDTH (source='data/test-utf32.xml', line=31): {0.7}
-  #text (source='data/test-utf32.xml', line=33): {CDATA test Русский материал 薩沙是在高速公路和吸乾 CDATA test/}
-  LAYER (source='data/test-utf32.xml', line=35): {}
-   NAME (source='data/test-utf32.xml', line=35): {Layer2}
-   MATERIAL (source='data/test-utf32.xml', line=35): {Mat1}
-   X (source='data/test-utf32.xml', line=35): {0.0}
-   WIDTH (source='data/test-utf32.xml', line=35): {0.1}
-  GAUSSGENERATOR (source='data/test-utf32.xml', line=37): {}
-   NAME (source='data/test-utf32.xml', line=37): {Gen1}
-   X (source='data/test-utf32.xml', line=37): {0.15}
-  SONDE (source='data/test-utf32.xml', line=39): {}
-   NAME (source='data/test-utf32.xml', line=39): {Sonde1}
-   X (source='data/test-utf32.xml', line=39): {0.5}
-  New (source='data/test-utf32.xml', line=41): {}
-   Tag (source='data/test-utf32.xml', line=42): {}
-    #text (source='data/test-utf32.xml', line=42): {text}
+  MATERIAL (source='data/test-utf32.xml', line=21): {}
+   NAME (source='data/test-utf32.xml', line=21): {Русский материал}
+   COLOR (source='data/test-utf32.xml', line=21): {00//0099}
+   EPS (source='data/test-utf32.xml', line=21): {//10}
+   MU (source='data/test-utf32.xml', line=21): {1//}
+   SIGMA (source='data/test-utf32.xml', line=21): {100}
+  #text (source='data/test-utf32.xml', line=22): {//ad///sa//}
+  New1 (source='data/test-utf32.xml', line=23): {}
+   #text (source='data/test-utf32.xml', line=24): {薩<沙是在高速公路和吸乾, 1.001, 2.001, 3.001, 4.001, Русский, материал}
+   New2 (source='data/test-utf32.xml', line=27): {}
+    ChineseAttribute (source='data/test-utf32.xml', line=27): {薩沙是在高速公路和吸乾}
+  #text (source='data/test-utf32.xml', line=30): {1.0, 2.0, bla-bla-bla}
+  LAYER (source='data/test-utf32.xml', line=32): {}
+   NAME (source='data/test-utf32.xml', line=32): {Layer1}
+   MATERIAL (source='data/test-utf32.xml', line=32): {Mat2}
+   X (source='data/test-utf32.xml', line=32): {0.2}
+   WIDTH (source='data/test-utf32.xml', line=32): {0.7}
+  #text (source='data/test-utf32.xml', line=34): {CDATA test Русский материал 薩沙是在高速公路和吸乾 CDATA test/}
+  LAYER (source='data/test-utf32.xml', line=36): {}
+   NAME (source='data/test-utf32.xml', line=36): {Layer2}
+   MATERIAL (source='data/test-utf32.xml', line=36): {Mat1}
+   X (source='data/test-utf32.xml', line=36): {0.0}
+   WIDTH (source='data/test-utf32.xml', line=36): {0.1}
+  GAUSSGENERATOR (source='data/test-utf32.xml', line=38): {}
+   NAME (source='data/test-utf32.xml', line=38): {Gen1}
+   X (source='data/test-utf32.xml', line=38): {0.15}
+  SONDE (source='data/test-utf32.xml', line=40): {}
+   NAME (source='data/test-utf32.xml', line=40): {Sonde1}
+   X (source='data/test-utf32.xml', line=40): {0.5}
+  New (source='data/test-utf32.xml', line=42): {}
+   Tag (source='data/test-utf32.xml', line=43): {}
+    #text (source='data/test-utf32.xml', line=43): {text}
 data/test-utf32.xml(0): warning: non utf-8 encoding UCS-4BE used (this decreases parsing perfomance)
 root (source='', line=0): {}
  NAME (source='data/test-utf32be.xml', line=2): {}
   NAME (source='data/test-utf32be.xml', line=2): {First WM}
   VERSION (source='data/test-utf32be.xml', line=2): {0.1}
-  MATERIAL (source='data/test-utf32be.xml', line=20): {}
-   NAME (source='data/test-utf32be.xml', line=20): {Русский материал}
-   COLOR (source='data/test-utf32be.xml', line=20): {00//0099}
-   EPS (source='data/test-utf32be.xml', line=20): {//10}
-   MU (source='data/test-utf32be.xml', line=20): {1//}
-   SIGMA (source='data/test-utf32be.xml', line=20): {100}
-  #text (source='data/test-utf32be.xml', line=21): {//ad///sa//}
-  New1 (source='data/test-utf32be.xml', line=22): {}
-   #text (source='data/test-utf32be.xml', line=23): {薩<沙是在高速公路和吸乾, 1.001, 2.001, 3.001, 4.001, Русский, материал}
-   New2 (source='data/test-utf32be.xml', line=26): {}
-    ChineseAttribute (source='data/test-utf32be.xml', line=26): {薩沙是在高速公路和吸乾}
-  #text (source='data/test-utf32be.xml', line=29): {1.0, 2.0, bla-bla-bla}
-  LAYER (source='data/test-utf32be.xml', line=31): {}
-   NAME (source='data/test-utf32be.xml', line=31): {Layer1}
-   MATERIAL (source='data/test-utf32be.xml', line=31): {Mat2}
-   X (source='data/test-utf32be.xml', line=31): {0.2}
-   WIDTH (source='data/test-utf32be.xml', line=31): {0.7}
-  #text (source='data/test-utf32be.xml', line=33): {CDATA test Русский материал 薩沙是在高速公路和吸乾 CDATA test/}
-  LAYER (source='data/test-utf32be.xml', line=35): {}
-   NAME (source='data/test-utf32be.xml', line=35): {Layer2}
-   MATERIAL (source='data/test-utf32be.xml', line=35): {Mat1}
-   X (source='data/test-utf32be.xml', line=35): {0.0}
-   WIDTH (source='data/test-utf32be.xml', line=35): {0.1}
-  GAUSSGENERATOR (source='data/test-utf32be.xml', line=37): {}
-   NAME (source='data/test-utf32be.xml', line=37): {Gen1}
-   X (source='data/test-utf32be.xml', line=37): {0.15}
-  SONDE (source='data/test-utf32be.xml', line=39): {}
-   NAME (source='data/test-utf32be.xml', line=39): {Sonde1}
-   X (source='data/test-utf32be.xml', line=39): {0.5}
-  New (source='data/test-utf32be.xml', line=41): {}
-   Tag (source='data/test-utf32be.xml', line=42): {}
-    #text (source='data/test-utf32be.xml', line=42): {text}
+  MATERIAL (source='data/test-utf32be.xml', line=21): {}
+   NAME (source='data/test-utf32be.xml', line=21): {Русский материал}
+   COLOR (source='data/test-utf32be.xml', line=21): {00//0099}
+   EPS (source='data/test-utf32be.xml', line=21): {//10}
+   MU (source='data/test-utf32be.xml', line=21): {1//}
+   SIGMA (source='data/test-utf32be.xml', line=21): {100}
+  #text (source='data/test-utf32be.xml', line=22): {//ad///sa//}
+  New1 (source='data/test-utf32be.xml', line=23): {}
+   #text (source='data/test-utf32be.xml', line=24): {薩<沙是在高速公路和吸乾, 1.001, 2.001, 3.001, 4.001, Русский, материал}
+   New2 (source='data/test-utf32be.xml', line=27): {}
+    ChineseAttribute (source='data/test-utf32be.xml', line=27): {薩沙是在高速公路和吸乾}
+  #text (source='data/test-utf32be.xml', line=30): {1.0, 2.0, bla-bla-bla}
+  LAYER (source='data/test-utf32be.xml', line=32): {}
+   NAME (source='data/test-utf32be.xml', line=32): {Layer1}
+   MATERIAL (source='data/test-utf32be.xml', line=32): {Mat2}
+   X (source='data/test-utf32be.xml', line=32): {0.2}
+   WIDTH (source='data/test-utf32be.xml', line=32): {0.7}
+  #text (source='data/test-utf32be.xml', line=34): {CDATA test Русский материал 薩沙是在高速公路和吸乾 CDATA test/}
+  LAYER (source='data/test-utf32be.xml', line=36): {}
+   NAME (source='data/test-utf32be.xml', line=36): {Layer2}
+   MATERIAL (source='data/test-utf32be.xml', line=36): {Mat1}
+   X (source='data/test-utf32be.xml', line=36): {0.0}
+   WIDTH (source='data/test-utf32be.xml', line=36): {0.1}
+  GAUSSGENERATOR (source='data/test-utf32be.xml', line=38): {}
+   NAME (source='data/test-utf32be.xml', line=38): {Gen1}
+   X (source='data/test-utf32be.xml', line=38): {0.15}
+  SONDE (source='data/test-utf32be.xml', line=40): {}
+   NAME (source='data/test-utf32be.xml', line=40): {Sonde1}
+   X (source='data/test-utf32be.xml', line=40): {0.5}
+  New (source='data/test-utf32be.xml', line=42): {}
+   Tag (source='data/test-utf32be.xml', line=43): {}
+    #text (source='data/test-utf32be.xml', line=43): {text}
 data/test-utf32be.xml(0): warning: non utf-8 encoding UCS-4BE used (this decreases parsing perfomance)
 root (source='', line=0): {}
  NAME (source='data/test-utf32le.xml', line=2): {}
   NAME (source='data/test-utf32le.xml', line=2): {First WM}
   VERSION (source='data/test-utf32le.xml', line=2): {0.1}
-  MATERIAL (source='data/test-utf32le.xml', line=20): {}
-   NAME (source='data/test-utf32le.xml', line=20): {Русский материал}
-   COLOR (source='data/test-utf32le.xml', line=20): {00//0099}
-   EPS (source='data/test-utf32le.xml', line=20): {//10}
-   MU (source='data/test-utf32le.xml', line=20): {1//}
-   SIGMA (source='data/test-utf32le.xml', line=20): {100}
-  #text (source='data/test-utf32le.xml', line=21): {//ad///sa//}
-  New1 (source='data/test-utf32le.xml', line=22): {}
-   #text (source='data/test-utf32le.xml', line=23): {薩<沙是在高速公路和吸乾, 1.001, 2.001, 3.001, 4.001, Русский, материал}
-   New2 (source='data/test-utf32le.xml', line=26): {}
-    ChineseAttribute (source='data/test-utf32le.xml', line=26): {薩沙是在高速公路和吸乾}
-  #text (source='data/test-utf32le.xml', line=29): {1.0, 2.0, bla-bla-bla}
-  LAYER (source='data/test-utf32le.xml', line=31): {}
-   NAME (source='data/test-utf32le.xml', line=31): {Layer1}
-   MATERIAL (source='data/test-utf32le.xml', line=31): {Mat2}
-   X (source='data/test-utf32le.xml', line=31): {0.2}
-   WIDTH (source='data/test-utf32le.xml', line=31): {0.7}
-  #text (source='data/test-utf32le.xml', line=33): {CDATA test Русский материал 薩沙是在高速公路和吸乾 CDATA test/}
-  LAYER (source='data/test-utf32le.xml', line=35): {}
-   NAME (source='data/test-utf32le.xml', line=35): {Layer2}
-   MATERIAL (source='data/test-utf32le.xml', line=35): {Mat1}
-   X (source='data/test-utf32le.xml', line=35): {0.0}
-   WIDTH (source='data/test-utf32le.xml', line=35): {0.1}
-  GAUSSGENERATOR (source='data/test-utf32le.xml', line=37): {}
-   NAME (source='data/test-utf32le.xml', line=37): {Gen1}
-   X (source='data/test-utf32le.xml', line=37): {0.15}
-  SONDE (source='data/test-utf32le.xml', line=39): {}
-   NAME (source='data/test-utf32le.xml', line=39): {Sonde1}
-   X (source='data/test-utf32le.xml', line=39): {0.5}
-  New (source='data/test-utf32le.xml', line=41): {}
-   Tag (source='data/test-utf32le.xml', line=42): {}
-    #text (source='data/test-utf32le.xml', line=42): {text}
+  MATERIAL (source='data/test-utf32le.xml', line=21): {}
+   NAME (source='data/test-utf32le.xml', line=21): {Русский материал}
+   COLOR (source='data/test-utf32le.xml', line=21): {00//0099}
+   EPS (source='data/test-utf32le.xml', line=21): {//10}
+   MU (source='data/test-utf32le.xml', line=21): {1//}
+   SIGMA (source='data/test-utf32le.xml', line=21): {100}
+  #text (source='data/test-utf32le.xml', line=22): {//ad///sa//}
+  New1 (source='data/test-utf32le.xml', line=23): {}
+   #text (source='data/test-utf32le.xml', line=24): {薩<沙是在高速公路和吸乾, 1.001, 2.001, 3.001, 4.001, Русский, материал}
+   New2 (source='data/test-utf32le.xml', line=27): {}
+    ChineseAttribute (source='data/test-utf32le.xml', line=27): {薩沙是在高速公路和吸乾}
+  #text (source='data/test-utf32le.xml', line=30): {1.0, 2.0, bla-bla-bla}
+  LAYER (source='data/test-utf32le.xml', line=32): {}
+   NAME (source='data/test-utf32le.xml', line=32): {Layer1}
+   MATERIAL (source='data/test-utf32le.xml', line=32): {Mat2}
+   X (source='data/test-utf32le.xml', line=32): {0.2}
+   WIDTH (source='data/test-utf32le.xml', line=32): {0.7}
+  #text (source='data/test-utf32le.xml', line=34): {CDATA test Русский материал 薩沙是在高速公路和吸乾 CDATA test/}
+  LAYER (source='data/test-utf32le.xml', line=36): {}
+   NAME (source='data/test-utf32le.xml', line=36): {Layer2}
+   MATERIAL (source='data/test-utf32le.xml', line=36): {Mat1}
+   X (source='data/test-utf32le.xml', line=36): {0.0}
+   WIDTH (source='data/test-utf32le.xml', line=36): {0.1}
+  GAUSSGENERATOR (source='data/test-utf32le.xml', line=38): {}
+   NAME (source='data/test-utf32le.xml', line=38): {Gen1}
+   X (source='data/test-utf32le.xml', line=38): {0.15}
+  SONDE (source='data/test-utf32le.xml', line=40): {}
+   NAME (source='data/test-utf32le.xml', line=40): {Sonde1}
+   X (source='data/test-utf32le.xml', line=40): {0.5}
+  New (source='data/test-utf32le.xml', line=42): {}
+   Tag (source='data/test-utf32le.xml', line=43): {}
+    #text (source='data/test-utf32le.xml', line=43): {text}
 data/test-utf32le.xml(0): warning: non utf-8 encoding UCS-4LE used (this decreases parsing perfomance)
 root (source='', line=0): {}
  strings (source='data/test-utf8-bom.xml', line=2): {}
+root (source='', line=0): {}
+ RootTag (source='data/line_start_close.xml', line=2): {}
+  #text (source='data/line_start_close.xml', line=7): { CDATA!
+}

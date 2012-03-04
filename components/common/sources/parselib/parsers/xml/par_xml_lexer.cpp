@@ -88,7 +88,7 @@ void XmlLexer::NextLine ()
 
 void XmlLexer::SkipBlockComment ()
 {
-  for (;; position++)
+  for (;;)
     switch (*position)
     {
       case '\0':
@@ -104,12 +104,16 @@ void XmlLexer::SkipBlockComment ()
       case '\n':
         NextLine ();
         break;
+      default:
+        position++;
+        break;
     }
 }
 
 void XmlLexer::Skip ()
 {
   for (;;)
+  {
     switch (*position)
     {
       case '\n':
@@ -132,6 +136,7 @@ void XmlLexer::Skip ()
       default:
         return;
     }
+  }
 }
 
 void XmlLexer::ReadSymbolReference (char*& write_position)
@@ -294,7 +299,8 @@ void XmlLexer::ReadCData ()
   current_lexem = XmlLexem_CData;
   cursor        = position;
 
-  for (;; position++)
+  for (;;)
+  {
     switch (*position)
     {
       case '\n':
@@ -312,11 +318,16 @@ void XmlLexer::ReadCData ()
           return;
         }
 
+        position++;
         break;
       case '\0':
         SetError (XmlLexerStatus_UnclosedCData, current_token);
         return;
+      default:
+        position++;
+        break;
     }
+  }
 }
 
 void XmlLexer::ReadIdentifier (bool identifier)
