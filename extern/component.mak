@@ -6,7 +6,7 @@ TARGETS := FUNNER_EXTERN_LIBS
 #Цель - external libraries
 FUNNER_EXTERN_LIBS.TYPE       := package
 FUNNER_EXTERN_LIBS.COMPONENTS := zlib zzip pcre jpeg tiff libpng devil ogg vorbis vorbisfile lua \
-                                 freetype libpsd theora shiny libiconv openssl
+                                 freetype libpsd theora shiny openssl
 
 ifeq (,$(filter iphone,$(PROFILES)))
   FUNNER_EXTERN_LIBS.x86.COMPONENTS := geekinfo
