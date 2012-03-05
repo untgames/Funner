@@ -152,8 +152,20 @@ class ApplicationImpl: private IApplicationListener
       }
     }
 
+///Подписка на сообщения / посылка сообщений
+    connection RegisterNotificationHandler (const char* notification_wildcard, const Application::NotificationHandler& handler)
+    {
+      return notification_signal.connect (xtl::bind (&ApplicationImpl::HandleNotification, this, _1, stl::string (notification_wildcard), handler));
+    }
+
+    void PostNotification (const char* notification)
+    {
+      notification_signal (notification);
+    }
+
   private:
-    typedef xtl::signal<void ()> ApplicationSignal;        
+    typedef xtl::signal<void ()>            ApplicationSignal;
+    typedef xtl::signal<void (const char*)> NotificationSignal;
     
 ///Оповещение о возникновении события
     void Notify (ApplicationEvent event)
@@ -190,7 +202,7 @@ class ApplicationImpl: private IApplicationListener
         }
       }  
     }    
-    
+
 ///Включен ли Idle режим?
     bool IsIdleEnabled ()
     {
@@ -268,7 +280,7 @@ class ApplicationImpl: private IApplicationListener
       {
         case ActionThread_Current:
           if (action.CreatorThreadId () != main_thread_id)
-            return;        
+            return;
         case ActionThread_Main:
         {
           try
@@ -285,10 +297,20 @@ class ApplicationImpl: private IApplicationListener
           break;
       }              
     }    
+
+///Обработка сообщений
+    void HandleNotification (const char* notification, stl::string notification_wildcard, const Application::NotificationHandler& handler)
+    {
+      if (!common::wcmatch (notification, notification_wildcard.c_str ()))
+        return;
+
+      ActionQueue::PushAction (xtl::bind (handler, notification), ActionThread_Main);
+    }
     
   private:
     DelegatePtr          current_delegate;               //текущий делегат приложения        
     ApplicationSignal    signals [ApplicationEvent_Num]; //сигналы приложения
+    NotificationSignal   notification_signal;            //сигнал сообщений
     int                  exit_code;                      //код завершения приложения
     bool                 is_exit_detected;               //получен сигнал завершения приложения
     size_t               message_loop_count;             //количество вхождений в обработчик очереди сообщений
@@ -379,6 +401,22 @@ int Application::GetExitCode ()
 connection Application::RegisterEventHandler (ApplicationEvent event, const EventHandler& handler)
 {
   return ApplicationSingleton::Instance ()->RegisterEventHandler (event, handler);
+}
+
+connection Application::RegisterNotificationHandler (const char* notification_wildcard, const NotificationHandler& handler)
+{
+  if (!notification_wildcard)
+    throw xtl::make_null_argument_exception ("syslib::Application::RegisterNotificationHandler", "notification_wildcard");
+
+  return ApplicationSingleton::Instance ()->RegisterNotificationHandler (notification_wildcard, handler);
+}
+
+void Application::PostNotification (const char* notification)
+{
+  if (!notification)
+    throw xtl::make_null_argument_exception ("syslib::Application::PostNotification", "notification");
+
+  ApplicationSingleton::Instance ()->PostNotification (notification);
 }
 
 void Application::Sleep (size_t milliseconds)
