@@ -1,5 +1,8 @@
 Results of syslib_test:
 Test library:
+all_notifications_handler: 'notification 1'
+all_notifications_handler: 'my notification'
+my_notifications_handler: 'my notification'
 idle1
 idle2: blocked=false
 idle1
