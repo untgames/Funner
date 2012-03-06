@@ -136,7 +136,7 @@ RenderTarget* create_render_buffer (IDevice& device, size_t width, size_t height
 
       break;
     case RenderTargetType_DepthStencil:
-      texture_desc.format     = render::low_level::PixelFormat_D24S8;
+      texture_desc.format     = render::low_level::PixelFormat_D16;
       texture_desc.bind_flags = BindFlag_DepthStencil;
 
       break;
