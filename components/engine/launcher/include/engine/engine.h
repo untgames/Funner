@@ -52,6 +52,19 @@ class IWindowListener
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+///Слушатель сообщений приложения
+///////////////////////////////////////////////////////////////////////////////////////////////////
+class INotificationListener
+{
+  public:
+    ///Обработчик события перерисовки окна
+    virtual void OnNotification (const char* notification) = 0;
+
+  protected:
+    virtual ~INotificationListener () {}
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Интерфейс доступа к внешним окнам
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 class IWindow
@@ -123,6 +136,16 @@ class IEngine
 
     ///Запуск главного цикла
     virtual void Execute (const char* command) = 0;
+
+    ///Добавление слушателя сообщений
+    virtual void AttachNotificationListener (const char* notification_wildcard, INotificationListener* listener) = 0;
+
+    ///Удаление слушателя сообщений
+    virtual void DetachNotificationListener (const char* notfication_wildcard, INotificationListener* listener) = 0;
+    virtual void DetachNotificationListener (INotificationListener* listener) = 0;
+
+    ///Удаление всех слушателей сообщений
+    virtual void DetachAllNotificationListeners () = 0;
 };
 
 }

@@ -5,6 +5,7 @@
 
 #include <stl/algorithm>
 #include <stl/auto_ptr.h>
+#include <stl/list>
 #include <stl/string>
 #include <stl/vector>
 
@@ -22,6 +23,7 @@
 #include <common/log.h>
 #include <common/parser.h>
 #include <common/string.h>
+#include <common/strlib.h>
 #include <common/xml_writer.h>
 
 #include <syslib/application.h>

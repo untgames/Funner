@@ -2,6 +2,10 @@
 
 using namespace engine;
 
+#ifdef _MSC_VER
+  #pragma warning (disable : 4355) //'this' : used in base member initializer list
+#endif
+
 namespace
 {
 
@@ -47,6 +51,7 @@ class Application: public IEngine
 /// онструктор
     Application ()
       : environment_variables_file ((size_t)0, common::FileMode_ReadWrite | common::FileMode_Create)
+      , notification_connection (syslib::Application::RegisterNotificationHandler ("*", xtl::bind (&Application::OnNotification, this, _1)))
     {
       has_main_loop      = DEFAULT_HAS_MAIN_LOOP;
       configuration_name = DEFAULT_CONFIGURATION_FILE_NAME;
@@ -252,7 +257,148 @@ class Application: public IEngine
       }
     }
 
+    ///ƒобавление слушател€ сообщений
+    void AttachNotificationListener (const char* notification_wildcard, INotificationListener* listener)
+    {
+      try
+      {
+        if (!notification_wildcard)
+          throw xtl::make_null_argument_exception ("", "notification_wildcard");
+
+        if (!listener)
+          throw xtl::make_null_argument_exception ("", "listener");
+
+        notification_listeners.push_back (NotificationListenerDescPtr (new NotificationListenerDesc (notification_wildcard, listener), false));
+      }
+      catch (std::exception& exception)
+      {
+        printf ("exception at Application::AttachNotificationListener: %s\n", exception.what ());
+        fflush (stdout);
+      }
+      catch (...)
+      {
+        printf ("unknown exception at Application::AttachNotificationListener\n");
+        fflush (stdout);
+      }
+    }
+
+    ///”даление слушател€ сообщений
+    void DetachNotificationListener (const char* notification_wildcard, INotificationListener* listener)
+    {
+      try
+      {
+        if (!notification_wildcard)
+          return;
+
+        if (!listener)
+          return;
+
+        for (NotificationListeners::iterator iter = notification_listeners.begin (), end = notification_listeners.end (); iter != end;)
+        {
+          if ((*iter)->notification_wildcard == notification_wildcard && (*iter)->listener == listener)
+          {
+            NotificationListeners::iterator next = iter;
+
+            ++next;
+
+            notification_listeners.erase (iter);
+
+            iter = next;
+          }
+          else
+            ++iter;
+        }
+      }
+      catch (std::exception& exception)
+      {
+        printf ("exception at Application::DetachNotificationListener: %s\n", exception.what ());
+        fflush (stdout);
+      }
+      catch (...)
+      {
+        printf ("unknown exception at Application::DetachNotificationListener\n");
+        fflush (stdout);
+      }
+    }
+
+    void DetachNotificationListener (INotificationListener* listener)
+    {
+      try
+      {
+        if (!listener)
+          return;
+
+        for (NotificationListeners::iterator iter = notification_listeners.begin (), end = notification_listeners.end (); iter != end;)
+        {
+          if ((*iter)->listener == listener)
+          {
+            NotificationListeners::iterator next = iter;
+
+            ++next;
+
+            notification_listeners.erase (iter);
+
+            iter = next;
+          }
+          else
+            ++iter;
+        }
+      }
+      catch (std::exception& exception)
+      {
+        printf ("exception at Application::DetachNotificationListener: %s\n", exception.what ());
+        fflush (stdout);
+      }
+      catch (...)
+      {
+        printf ("unknown exception at Application::DetachNotificationListener\n");
+        fflush (stdout);
+      }
+    }
+
+    ///”даление всех слушателей сообщений
+    void DetachAllNotificationListeners ()
+    {
+      try
+      {
+        notification_listeners.clear ();
+      }
+      catch (std::exception& exception)
+      {
+        printf ("exception at Application::DetachAllNotificationListeners: %s\n", exception.what ());
+        fflush (stdout);
+      }
+      catch (...)
+      {
+        printf ("unknown exception at Application::DetachAllNotificationListeners\n");
+        fflush (stdout);
+      }
+    }
+
   private:
+///ќбработчик оповещений приложени€
+    void OnNotification (const char* notification)
+    {
+      try
+      {
+        for (NotificationListeners::iterator iter = notification_listeners.begin (), end = notification_listeners.end (); iter != end; ++iter)
+        {
+          if (common::wcmatch (notification, (*iter)->notification_wildcard.c_str ()))
+            (*iter)->listener->OnNotification (notification);
+        }
+      }
+      catch (std::exception& exception)
+      {
+        printf ("exception at Application::OnNotification: %s\n", exception.what ());
+        fflush (stdout);
+      }
+      catch (...)
+      {
+        printf ("unknown exception at Application::OnNotification\n");
+        fflush (stdout);
+      }
+    }
+
 ///ќбработчик старта приложени€
     void StartupHandler (common::ParseNode config_node)
     {
@@ -307,15 +453,32 @@ class Application: public IEngine
     }
 
   private:
-    SubsystemManager    manager;                    //менеджер подсистем
-    bool                has_main_loop;              //есть ли главный цикл приложени€
-    bool                has_explicit_configuration; //конфигураци€ приложени€ указана €вно
-    stl::string         configuration_name;         //им€ конфигурации
-    bool                need_print_version;         //нужно распечатать строку версии
-    bool                need_print_help;            //нужно распечатать помощь по запуску приложени€
-    common::StringArray commands;                   //команды на выполнение подсистемами
-    common::StringArray search_paths;               //пути поиска
-    common::MemFile     environment_variables_file; //файл с переменными среды, указанными при запуске
+    struct NotificationListenerDesc : public xtl::reference_counter
+    {
+      stl::string            notification_wildcard;
+      INotificationListener* listener;
+
+      NotificationListenerDesc (const char *in_notification_wildcard, INotificationListener *in_listener)
+        : notification_wildcard (in_notification_wildcard)
+        , listener (in_listener)
+        {}
+    };
+
+    typedef xtl::intrusive_ptr<NotificationListenerDesc> NotificationListenerDescPtr;
+    typedef stl::list<NotificationListenerDescPtr>       NotificationListeners;
+
+  private:
+    SubsystemManager      manager;                    //менеджер подсистем
+    bool                  has_main_loop;              //есть ли главный цикл приложени€
+    bool                  has_explicit_configuration; //конфигураци€ приложени€ указана €вно
+    stl::string           configuration_name;         //им€ конфигурации
+    bool                  need_print_version;         //нужно распечатать строку версии
+    bool                  need_print_help;            //нужно распечатать помощь по запуску приложени€
+    common::StringArray   commands;                   //команды на выполнение подсистемами
+    common::StringArray   search_paths;               //пути поиска
+    common::MemFile       environment_variables_file; //файл с переменными среды, указанными при запуске
+    NotificationListeners notification_listeners;     //слушатели оповещений приложени€
+    xtl::auto_connection  notification_connection;    //соедениние оповещений приложени€
 };
 
 }
