@@ -137,14 +137,17 @@ class IEngine
     ///Запуск главного цикла
     virtual void Execute (const char* command) = 0;
 
-    ///Добавление слушателя сообщений
+    ///Посылка оповещения
+    virtual void PostNotification (const char* notification) = 0;
+
+    ///Добавление слушателя оповещений
     virtual void AttachNotificationListener (const char* notification_wildcard, INotificationListener* listener) = 0;
 
-    ///Удаление слушателя сообщений
+    ///Удаление слушателя оповещений
     virtual void DetachNotificationListener (const char* notfication_wildcard, INotificationListener* listener) = 0;
     virtual void DetachNotificationListener (INotificationListener* listener) = 0;
 
-    ///Удаление всех слушателей сообщений
+    ///Удаление всех слушателей оповещений
     virtual void DetachAllNotificationListeners () = 0;
 };
 

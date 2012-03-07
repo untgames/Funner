@@ -257,6 +257,28 @@ class Application: public IEngine
       }
     }
 
+    ///Посылка оповещения
+    void PostNotification (const char* notification)
+    {
+      try
+      {
+        if (!notification)
+          throw xtl::make_null_argument_exception ("", "notification");
+
+        syslib::Application::PostNotification (notification);
+      }
+      catch (std::exception& exception)
+      {
+        printf ("exception at Application::PostNotification: %s\n", exception.what ());
+        fflush (stdout);
+      }
+      catch (...)
+      {
+        printf ("unknown exception at Application::PostNotification\n");
+        fflush (stdout);
+      }
+    }
+
     ///Добавление слушателя сообщений
     void AttachNotificationListener (const char* notification_wildcard, INotificationListener* listener)
     {
