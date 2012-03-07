@@ -190,13 +190,15 @@ typedef stl::vector<syslib::iphone::IApplicationListener*> ListenerArray;
 {
 }
 
--(void) applicationDidFinishLaunching:(UIApplication*)application
+-(BOOL) application:(UIApplication*)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
   application_launched = true;
   
   application_delegate->OnInitialized ();
 
   idle_timer.paused = NO;
+
+  return YES;
 }
 
 -(void) applicationWillTerminate:(UIApplication*)application
@@ -205,6 +207,15 @@ typedef stl::vector<syslib::iphone::IApplicationListener*> ListenerArray;
   idle_timer.paused = YES;
 
   application_delegate->OnExit ();
+}
+
+-(BOOL) application:(UIApplication*)application openURL:(NSURL*)url sourceApplication:(NSString*)sourceApplication annotation:(id)annotation
+{
+  stl::string notification = common::format ("ApplicationOpenURL %s", [[url absoluteString] UTF8String]);
+
+  syslib::Application::PostNotification (notification.c_str ());
+
+  return YES;
 }
 
 -(void) applicationDidReceiveMemoryWarning:(UIApplication*)application

@@ -155,7 +155,7 @@ class ApplicationImpl: private IApplicationListener
 ///ѕодписка на сообщени€ / посылка сообщений
     connection RegisterNotificationHandler (const char* notification_wildcard, const Application::NotificationHandler& handler)
     {
-      return notification_signal.connect (xtl::bind (&ApplicationImpl::HandleNotification, this, _1, stl::string (notification_wildcard), handler));
+      return notification_signal.connect (xtl::bind (&ApplicationImpl::HandleNotification, _1, stl::string (notification_wildcard), handler));
     }
 
     void PostNotification (const char* notification)
@@ -299,14 +299,19 @@ class ApplicationImpl: private IApplicationListener
     }    
 
 ///ќбработка сообщений
-    void HandleNotification (const char* notification, stl::string notification_wildcard, const Application::NotificationHandler& handler)
+    static void HandleNotification (const char* notification, const stl::string& notification_wildcard, const Application::NotificationHandler& handler)
     {
       if (!common::wcmatch (notification, notification_wildcard.c_str ()))
         return;
 
-      ActionQueue::PushAction (xtl::bind (handler, notification), ActionThread_Main);
+      ActionQueue::PushAction (xtl::bind (&ApplicationImpl::ReportNotification, stl::string (notification), handler), ActionThread_Main);
     }
     
+    static void ReportNotification (const stl::string& notification, const Application::NotificationHandler& handler)
+    {
+      handler (notification.c_str ());
+    }
+
   private:
     DelegatePtr          current_delegate;               //текущий делегат приложени€        
     ApplicationSignal    signals [ApplicationEvent_Num]; //сигналы приложени€
