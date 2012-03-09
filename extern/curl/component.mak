@@ -9,6 +9,7 @@ EXTERN.CURL.SOURCES.msvc.COMPILER_CFLAGS    := -wd4005 -wd4244
 EXTERN.CURL.SOURCES.iphone.COMPILER_CFLAGS  := -Wno-uninitialized
 EXTERN.CURL.SOURCES.iphone.COMPILER_DEFINES := __IPHONE__
 EXTERN.CURL.SOURCES.IMPORTS                 := compile.extern.zlib compile.extern.openssl
+EXTERN.CURL.SOURCES.clang.COMPILER_CFLAGS   += -w
 
 EXTERN.CURL.TESTS.TYPE                 := test-suite
 EXTERN.CURL.TESTS.SOURCE_DIRS          := tests
