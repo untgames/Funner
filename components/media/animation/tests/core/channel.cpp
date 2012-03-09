@@ -80,7 +80,7 @@ int main ()
 
     printf ("Channel track eval = %.2f\n", channel_track_value);
 
-    Evaluator<float> evaluator = channel.Evaluator<float> ();
+    Evaluator<float> evaluator = channel.Channel::Evaluator<float> ();
 
     printf ("Evaluator eval = %.2f\n", evaluator (0.1f));
   }

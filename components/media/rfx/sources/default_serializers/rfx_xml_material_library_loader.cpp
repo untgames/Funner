@@ -3,7 +3,10 @@
 using namespace media::rfx;
 using namespace common;
 
-namespace
+namespace components
+{
+
+namespace xmtl_loader
 {
 
 /*
@@ -410,11 +413,13 @@ class Component
     }
 };
 
-}
-
 extern "C"
 {
 
 ComponentRegistrator<Component> XmtlLoader (COMPONENT_NAME);
+
+}
+
+}
 
 }

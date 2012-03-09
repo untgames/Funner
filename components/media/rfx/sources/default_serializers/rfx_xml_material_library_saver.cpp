@@ -3,7 +3,10 @@
 using namespace media::rfx;
 using namespace common;
 
-namespace
+namespace components
+{
+
+namespace xmtl_saver
 {
 
 /*
@@ -397,11 +400,13 @@ class Component
     }
 };
 
-}
-
 extern "C"
 {
 
 ComponentRegistrator<Component> XmtlSaver (COMPONENT_NAME);
+
+}
+
+}
 
 }

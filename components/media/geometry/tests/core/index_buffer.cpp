@@ -18,6 +18,8 @@ void dump (const IndexBuffer& ib)
       for (size_t i=0; i<ib.Size (); i++)
         printf ("  %u\n", ib.Data<const unsigned char> ()[i]);
       break;      
+    default:
+      printf ("  Unknown data type\n");
   }  
 }
 

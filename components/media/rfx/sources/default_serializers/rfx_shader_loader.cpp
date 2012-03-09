@@ -3,7 +3,10 @@
 using namespace media::rfx;
 using namespace common;
 
-namespace
+namespace components
+{
+
+namespace default_shader_loader
 {
 
 /*
@@ -59,11 +62,13 @@ class Component
     }
 };
 
-}
-
 extern "C"
 {
 
 ComponentRegistrator<Component> DefaultShaderLoader (COMPONENT_NAME);
+
+}
+
+}
 
 }

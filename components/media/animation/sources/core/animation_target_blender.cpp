@@ -18,7 +18,10 @@ struct Source: public xtl::reference_counter, public xtl::trackable
 
 ///Конструктор
   Source (size_t in_property_index) : property_index (in_property_index) {}
-  
+
+///Деструктор
+  virtual ~Source () {};
+
 ///Получение базового блендера каналов
   virtual ChannelBlenderBase& Blender () = 0;
   

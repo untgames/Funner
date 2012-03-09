@@ -63,7 +63,7 @@ MaterialLibrary::MaterialLibrary (const char* file_name)
   {
     if (!file_name)
       throw xtl::make_null_argument_exception ("", "file_name");
-      
+
     static ComponentLoader loader ("media.rfx.material.loaders.*");
 
     MaterialLibraryManager::GetLoader (file_name, SerializerFindMode_ByName)(file_name, *this);
