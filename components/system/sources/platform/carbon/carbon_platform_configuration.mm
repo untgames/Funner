@@ -1,6 +1,9 @@
 #include "shared.h"
 
-namespace
+namespace components
+{
+
+namespace platform_configuration
 {
 
 const char* CONFIG_PATH = "/anonymous/platform_config.xml";
@@ -65,6 +68,8 @@ extern "C"
 {
 
 common::ComponentRegistrator<PlatformConfigurationComponent> PlatformConfiguration ("common.file_systems.platform_configuration");
+
+}
 
 }
 
