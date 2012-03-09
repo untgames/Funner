@@ -3,20 +3,6 @@
 using namespace syslib;
 
 /*
-    Генерация исключения: работа с многопоточность невозможна для платформы по умолчанию
-*/
-
-namespace
-{
-
-void raise (const char* method_name)
-{
-  throw xtl::format_not_supported_exception (method_name, "No timer support for this platform");
-}
-
-}
-
-/*
     Создание / уничтожение таймера
 */
 

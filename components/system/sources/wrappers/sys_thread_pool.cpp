@@ -118,7 +118,7 @@ class BackgroundThread: public xtl::reference_counter
         
       for (;;)        
       {
-        bool processed_actions = 0;
+        int processed_actions = 0;
         
         for (size_t i=0, count=ActionQueue::ActionsCount (ActionThread_Current); i<count; i++)
         {
