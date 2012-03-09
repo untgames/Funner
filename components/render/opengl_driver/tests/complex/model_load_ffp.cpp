@@ -93,10 +93,10 @@ struct Model
 
       const media::geometry::IndexBuffer& ib = mesh.IndexBuffer ();
 
-      BufferMap::iterator iter = index_buffers.find (ib.Id ());
+      BufferMap::iterator ib_iter = index_buffers.find (ib.Id ());
       BufferPtr ib_buffer;
 
-      if (iter == index_buffers.end ())
+      if (ib_iter == index_buffers.end ())
       {
         if (ib.Size ())
         {
@@ -126,7 +126,7 @@ struct Model
 
         index_buffers [ib.Id ()] = ib_buffer;
       }
-      else ib_buffer = iter->second;
+      else ib_buffer = ib_iter->second;
 
       model_mesh->index_buffer = ib_buffer;
 

@@ -18,7 +18,7 @@ namespace
 
 #ifndef OPENGL_ES_SUPPORT
 
-//определение бага функции glGetTexImage при работе с 3D-текстурой
+/*//определение бага функции glGetTexImage при работе с 3D-текстурой
 bool detect_texture3d_bug ()
 {
   if (!glTexImage3D && !glTexImage3DEXT)
@@ -62,7 +62,7 @@ bool detect_texture3d_bug ()
   glDeleteTextures (1, &texture_id);  
 
   return glGetError () != GL_NO_ERROR || dst_buffer [TEX_SIZE * TEX_SIZE * TEX_SIZE * RGB_TEXEL_SIZE] != DST_BUFFER_MARKER;
-}
+}*/
 
 #endif
 

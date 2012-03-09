@@ -114,11 +114,6 @@ void scale_image_2x_down_impl (size_t width, size_t height, const void* in_src, 
   }
 }
 
-fixed int2fixed (int data)
-{
-  return data << 16;
-}
-
 int fixed2int (fixed data)
 {
   return data >> 16;

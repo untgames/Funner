@@ -295,7 +295,7 @@ struct RenderTargetImpl::Impl: private IScreenListener
     {
       try
       {
-        if (!need_update_background && !clear_frame || !render_manager)
+        if ((!need_update_background && !clear_frame) || !render_manager)
           return;
 
         mid_level::IRenderer& renderer = render_manager->Renderer ();

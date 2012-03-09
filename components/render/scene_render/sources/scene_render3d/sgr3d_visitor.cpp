@@ -14,8 +14,8 @@ using namespace render::scene_render3d;
 */
 
 CollectionVisitor::CollectionVisitor (TraverseResult& in_result, size_t in_filter)
-  : result (in_result)
-  , filter (in_filter)
+  : filter (in_filter)
+  , result (in_result)
 {
 }
 

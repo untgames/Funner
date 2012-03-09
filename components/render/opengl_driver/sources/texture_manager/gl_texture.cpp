@@ -546,15 +546,6 @@ void Texture::SetData
   CheckErrors (METHOD_NAME);
 }
 
-namespace
-{
-
-size_t align_size (size_t size, size_t align)
-{
-  return (size+align-1)&~(align-1);  
-}
-
-}
 
 #ifndef OPENGL_ES_SUPPORT
 
