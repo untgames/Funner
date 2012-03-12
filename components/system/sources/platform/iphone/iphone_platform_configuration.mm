@@ -33,6 +33,7 @@ class PlatformConfigurationComponent
         SaveProperty (writer, "OS", "ios");
         SaveProperty (writer, "Platform", UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad ? "ipad" : "iphone");
         SaveProperty (writer, "Language", [((NSString*)[[NSLocale preferredLanguages] objectAtIndex:0]) UTF8String]);
+        SaveProperty (writer, "OSVersion", [[[UIDevice currentDevice] systemVersion] UTF8String]);
 
         float screen_width = [UIScreen mainScreen].bounds.size.width, screen_height = [UIScreen mainScreen].bounds.size.height;
 
