@@ -24,6 +24,10 @@ struct CustomLoader: public ISceneFactory
   {
     printf ("CreateScene(%s)\n", name);
   }
+  
+  void EnumScenes (const SceneEnumerator&)
+  {
+  }
 
   static ISceneFactory* LoadScene (const char* file_name, const SceneManager::LogHandler&)
   {

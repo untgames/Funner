@@ -205,6 +205,79 @@ bool SceneManager::HasScene (const char* scene_name) const
 }
 
 /*
+    Получение группы ресурсов сцены
+*/
+
+ResourceGroup SceneManager::SceneResources (const char* scene_name) const
+{
+  try
+  {
+    if (!scene_name)
+      throw xtl::make_null_argument_exception ("", "scene_name");
+      
+    ResourceGroup resources;
+    
+    for (FactoryDescList::iterator iter=impl->factories.begin (), end=impl->factories.end (); iter!=end; ++iter)      
+    {
+      FactoryDesc& desc = **iter;
+
+      if (desc.factory->GetSceneInfo (scene_name, &resources))
+        return resources;
+    }
+    
+    throw xtl::format_operation_exception ("", "Scene '%s' not found", scene_name);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("scene_graph::SceneManager::SceneResources");
+    throw;
+  }
+}
+
+namespace
+{
+
+struct ResourceSceneEnumerator
+{
+  ResourceGroup  resources;
+  ISceneFactory* factory;
+  
+  ResourceSceneEnumerator () : factory () {}
+  
+  void operator () (const char* scene_name)
+  {
+    factory->GetSceneInfo (scene_name, &resources);
+  }
+};
+
+}
+
+ResourceGroup SceneManager::Resources () const
+{
+  try
+  {
+    ResourceSceneEnumerator        enumerator;
+    ISceneFactory::SceneEnumerator enum_handler = enumerator;    
+    
+    for (FactoryDescList::iterator iter=impl->factories.begin (), end=impl->factories.end (); iter!=end; ++iter)      
+    {
+      FactoryDesc& desc = **iter;
+      
+      enumerator.factory = &*desc.factory;
+      
+      desc.factory->EnumScenes (enum_handler);
+    }
+    
+    return enumerator.resources;
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("scene_graph::SceneManager::Resources");
+    throw;
+  }
+}
+
+/*
     Создание контекста сцены
 */
 

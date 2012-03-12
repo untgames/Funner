@@ -22,6 +22,7 @@ namespace
 
 struct SceneDesc: public xtl::reference_counter
 {
+  stl::string    name;   //имя сцены
   SceneParserPtr parser; //парсер сцены
 };
 
@@ -103,6 +104,7 @@ XmlSceneFactory::XmlSceneFactory (const char* file_name, const LogHandler& log_h
 
         SceneDescPtr desc (new SceneDesc, false);
 
+        desc->name   = id;
         desc->parser = parser;
 
           //регистрация сцены
@@ -182,6 +184,24 @@ void XmlSceneFactory::CreateScene (const char* name, Node& parent, SceneContext&
   catch (xtl::exception& e)
   {
     e.touch ("scene_graph::XmlSceneFactory::CreateScene");
+    throw;
+  }
+}
+
+/*
+    Перечисление сцен
+*/
+
+void XmlSceneFactory::EnumScenes (const SceneEnumerator& handler)
+{
+  try
+  {
+    for (SceneDescMap::iterator iter=impl->scenes.begin (), end=impl->scenes.end (); iter!=end; ++iter)
+      handler (iter->second->name.c_str ());
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("scene_graph::XmlSceneFactory::EnumScenes");
     throw;
   }
 }
