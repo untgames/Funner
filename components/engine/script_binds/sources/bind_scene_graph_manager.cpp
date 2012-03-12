@@ -1,5 +1,7 @@
 #include "scene_graph.h"
 
+#include <media/rms/group.h>
+
 using namespace scene_graph;
 
 namespace
@@ -46,6 +48,8 @@ void bind_scene_manager_library (Environment& environment)
   lib.Register ("UnloadScene", make_invoker (&SceneManager::UnloadScene));
   lib.Register ("SaveScene", make_invoker (&SceneManager::SaveScene));  
   lib.Register ("HasScene", make_invoker (&SceneManager::HasScene));
+  lib.Register ("SceneResources", make_invoker (&SceneManager::SceneResources));  
+  lib.Register ("get_Resources", make_invoker (&SceneManager::Resources));    
   lib.Register ("CreateScene", make_invoker (xtl::implicit_cast<Node::Pointer (SceneManager::*)(const char*) const> (&SceneManager::CreateScene)));
   lib.Register ("CreateLogHandler", make_callback_invoker<SceneManager::LogHandler::signature_type> ());
     
