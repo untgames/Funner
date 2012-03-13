@@ -67,6 +67,7 @@ struct Params
   size_t        options_count;          //количество опций
   stl::string   source_font;            //имя исходного шрифта
   stl::string   result_image;           //имя результирующего изображения
+  stl::string   result_xml_image_name;  //имя результирующего изображения в xml
   stl::string   result_font;            //имя результирующего шрифта
   stl::string   char_map_file;          //имя файла содержащего символы для генерации шрифта
   stl::string   char_map_file_encoding; //кодировка файла содержащего символы для генерации шрифта
@@ -129,6 +130,12 @@ void command_line_result_image_name (const char* file_name, Params& params)
   params.result_image = file_name;
 }
 
+//установка имени результирующего файла картинки в xml
+void command_line_result_xml_image_name (const char* file_name, Params& params)
+{
+  params.result_xml_image_name = file_name;
+}
+
 //установка имени результирующего файла шрифта
 void command_line_result_font (const char* file_name, Params& params)
 {
@@ -179,6 +186,9 @@ void validate (Params& params)
 
   if (params.result_image.empty ())
     error ("no result image name");
+
+  if (params.result_xml_image_name.empty ())
+    params.result_xml_image_name = params.result_image;
 
   if (params.result_font.empty ())
     error ("no result font name");
@@ -296,7 +306,7 @@ void build (Params& params)
     image.Rename (params.result_image.c_str ());
 
     font.Rename       (params.result_font.c_str ());
-    font.SetImageName (params.result_image.c_str ());
+    font.SetImageName (params.result_xml_image_name.c_str ());
 
     font.Save  (params.result_font.c_str ());
     image.Save (params.result_image.c_str ());
@@ -319,6 +329,7 @@ int main (int argc, const char** argv)
     {xtl::bind (&command_line_help,                   _1, xtl::ref (params)), "help",                  '?',          0, "print help message"},
     {xtl::bind (&command_line_silent,                 _1, xtl::ref (params)), "silent",                's',          0, "quiet mode"},
     {xtl::bind (&command_line_result_image_name,      _1, xtl::ref (params)), "image",                 'i',     "file", "set output image file"},
+    {xtl::bind (&command_line_result_xml_image_name,  _1, xtl::ref (params)), "xml-image-name",         0,      "file", "set output image name in xml file"},
     {xtl::bind (&command_line_result_font,            _1, xtl::ref (params)), "out-font",              'o',     "file", "set output font name"},
     {xtl::bind (&command_line_char_map_file,          _1, xtl::ref (params)), "char-map-file",          0,      "file", "set file with characters to include in font"},
     {xtl::bind (&command_line_char_map_file_encoding, _1, xtl::ref (params)), "char-map-file-encoding", 0,  "encoding", "set encoding of file with characters to include in font"},
