@@ -83,6 +83,7 @@ struct Params
 void log_handler (const char* log, const char* message)
 {
   printf ("'%s': '%s'\n", log, message);
+  fflush (stdout);
 }
 
 //получение подсказки по программе

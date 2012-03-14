@@ -110,8 +110,8 @@ size_t get_glyph_bitmap_size (FT_Bitmap_& bitmap)
   return abs (bitmap.pitch) * bitmap.rows;
 }
 
-typedef stl::hash_map<size_t, size_t>           BitmapHashMap;
-typedef stl::vector<stl::pair<size_t, size_t> > DuplicateGlyphs;
+typedef stl::hash_map<size_t, size_t>             BitmapHashMap;
+typedef stl::vector<stl::pair<size_t, size_t> >   DuplicateGlyphs;
 
 common::Log& get_log ()
 {
@@ -151,6 +151,9 @@ void convert (const FontDesc& font_desc, Font& result_font, Image& result_image)
 
   FT_Face& face = font_face.Face ();
 
+  if (FT_Select_Charmap (face, FT_ENCODING_UNICODE))
+    throw xtl::format_operation_exception (METHOD_NAME, "Can't set unicode char map");
+
   size_t freetype_char_size = font_desc.glyph_size * 64;
 
   if (FT_Set_Char_Size (face, freetype_char_size, freetype_char_size, RESOLUTION, RESOLUTION))
@@ -189,9 +192,10 @@ void convert (const FontDesc& font_desc, Font& result_font, Image& result_image)
   
   for (size_t i = 0; i < font_desc.char_codes_count; i++, current_glyph++)
   {
-    size_t char_code = font_desc.char_codes [i];
+    size_t  char_code  = font_desc.char_codes [i];
+    FT_UInt char_index = ft_char_indices.data () [i];
 
-    if (!ft_char_indices.data () [i])
+    if (!char_index)
     {
       set_null_glyph_data (current_glyph);
 
@@ -292,7 +296,9 @@ void convert (const FontDesc& font_desc, Font& result_font, Image& result_image)
 
   for (size_t i = 0; i < glyphs_count; i++)
   {
-    if (FT_Load_Char (face, font_desc.char_codes [glyph_indices.data () [i]], FT_LOAD_RENDER))
+     FT_ULong char_code = font_desc.char_codes [glyph_indices.data () [i]];
+
+     if (FT_Load_Char (face, char_code, FT_LOAD_RENDER))
       throw xtl::format_operation_exception (METHOD_NAME, "Can't render glyph %u second time", font_desc.char_codes [glyph_indices.data () [i]]);
 
     if (!face->glyph->bitmap.buffer)
@@ -332,8 +338,15 @@ void convert (const FontDesc& font_desc, Font& result_font, Image& result_image)
     //Формирование кёрнингов
 
   for (size_t i = 0; i < font_desc.char_codes_count; i++)
+  {
+    if (font_desc.char_codes [i] != i + font_desc.first_glyph_code)
+      continue;
+
     for (size_t j = 0; j < font_desc.char_codes_count; j++)
     {
+      if (font_desc.char_codes [j] != j + font_desc.first_glyph_code)
+        continue;
+
       FT_Vector kerning;
 
       if (FT_Get_Kerning (face, ft_char_indices.data () [i], ft_char_indices.data () [j], FT_KERNING_UNFITTED, &kerning))
@@ -352,6 +365,7 @@ void convert (const FontDesc& font_desc, Font& result_font, Image& result_image)
         font.InsertKerning (i, j, kerning_info);
       }
     }
+  }
 
   swap (result_image, image);
   swap (result_font,  font);
