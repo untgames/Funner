@@ -71,10 +71,12 @@ struct Params
   stl::string   result_font;            //имя результирующего шрифта
   stl::string   char_map_file;          //имя файла содержащего символы для генерации шрифта
   stl::string   char_map_file_encoding; //кодировка файла содержащего символы для генерации шрифта
+  int           force_advance;          //генерировать отступ равный ширине плюс данное значение
   int           glyph_interval;         //интервал между символами в картинке
   int           glyph_size;             //максимальный размер изображения одного символа
   int           first_glyph_code;       //код первого индекса генерируемого диапазона символов
   int           last_glyph_code;        //код последнего индекса генерируемого диапазона символов
+  bool          use_force_advance;      //генерировать ли значение отступа
   bool          fast_convert;           //быстрая генерация
   bool          silent;                 //минимальное число сообщений
   bool          print_help;             //нужно ли печатать сообщение помощи
@@ -177,6 +179,13 @@ void command_line_last_glyph_code (const char* index, Params& params)
 void command_line_glyph_interval (const char* size, Params& params)
 {
   params.glyph_interval = atoi (size);
+}
+
+//установка генерационного отступа между символами
+void command_line_force_advance (const char* size, Params& params)
+{
+  params.force_advance     = atoi (size);
+  params.use_force_advance = true;
 }
 
 //проверка корректности ввода
@@ -309,6 +318,14 @@ void build (Params& params)
     font.Rename       (params.result_font.c_str ());
     font.SetImageName (params.result_xml_image_name.c_str ());
 
+    if (params.use_force_advance)
+    {
+      GlyphInfo *current_glyph = font.Glyphs ();
+
+      for (size_t i = 0, count = font.GlyphsTableSize (); i < count; i++, current_glyph++)
+        current_glyph->advance_x = current_glyph->width + params.force_advance;
+    }
+
     font.Save  (params.result_font.c_str ());
     image.Save (params.result_image.c_str ());
   }
@@ -338,6 +355,7 @@ int main (int argc, const char** argv)
     {xtl::bind (&command_line_first_glyph_code,       _1, xtl::ref (params)), "first-glyph-code",       0,     "index", "set first index of generated glyph range"},
     {xtl::bind (&command_line_last_glyph_code,        _1, xtl::ref (params)), "last-glyph-code",        0,     "index", "set last index of generated glyph range"},
     {xtl::bind (&command_line_glyph_interval,         _1, xtl::ref (params)), "glyph-interval",         0,      "size", "set glyph interval"},
+    {xtl::bind (&command_line_force_advance,          _1, xtl::ref (params)), "force-advance",          0,      "size", "set force generated advance x"},
     {xtl::bind (&command_line_fast_convert,           _1, xtl::ref (params)), "fast",                   0,           0, "fast mode"},
   };
 
@@ -345,15 +363,17 @@ int main (int argc, const char** argv)
 
     //инициализация
 
-  params.options          = options;
-  params.options_count    = options_count;
-  params.glyph_size       = 0;
-  params.first_glyph_code = 0;
-  params.last_glyph_code  = 0;
-  params.glyph_interval   = -1;
-  params.fast_convert     = false;
-  params.print_help       = false;
-  params.silent           = false;
+  params.options           = options;
+  params.options_count     = options_count;
+  params.glyph_size        = 0;
+  params.first_glyph_code  = 0;
+  params.last_glyph_code   = 0;
+  params.glyph_interval    = -1;
+  params.force_advance     = 0;
+  params.fast_convert      = false;
+  params.print_help        = false;
+  params.use_force_advance = false;
+  params.silent            = false;
 
   CommandLine command_line;
 
