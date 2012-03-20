@@ -8,6 +8,7 @@
 #include <xtl/function.h>
 #include <xtl/intrusive_ptr.h>
 #include <xtl/reference_counter.h>
+#include <xtl/ref.h>
 #include <xtl/signal.h>
 #include <xtl/shared_ptr.h>
 

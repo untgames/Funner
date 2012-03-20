@@ -257,7 +257,7 @@ ResourceGroup SceneManager::Resources () const
   try
   {
     ResourceSceneEnumerator        enumerator;
-    ISceneFactory::SceneEnumerator enum_handler = enumerator;    
+    ISceneFactory::SceneEnumerator enum_handler = xtl::ref (enumerator);
     
     for (FactoryDescList::iterator iter=impl->factories.begin (), end=impl->factories.end (); iter!=end; ++iter)      
     {
