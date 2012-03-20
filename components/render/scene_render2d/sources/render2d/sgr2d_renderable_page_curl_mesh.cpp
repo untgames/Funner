@@ -341,16 +341,21 @@ struct RenderablePageCurlMesh::Impl
     max_t = new_max_t;
 
     float s_range = max_s - min_s,
-          t_range = max_t - min_t;
+          t_range = max_t - min_t,
+          ds      = 1.f / (x_size - 1) * s_range,
+          dt      = 1.f / (y_size - 1) * t_range,
+          t       = t_range;
 
-    for (size_t i = 0; i < x_size; i++)
+    RenderableVertex* vertex = vertices.data ();
+
+    for (size_t j = 0; j < y_size; j++, t -= dt)
     {
-      for (size_t j = 0; j < y_size; j++)
-      {
-        RenderableVertex& vertex = vertices.data () [j * x_size + i];
+      float s = min_s;
 
-        vertex.texcoord.x = min_s + i / (float)(x_size - 1) * s_range;
-        vertex.texcoord.y = max_t - (min_t + j / (float)(y_size - 1) * t_range);
+      for (size_t i = 0; i < x_size; i++, vertex++, s += ds)
+      {
+        vertex->texcoord.x = s;
+        vertex->texcoord.y = t;
       }
     }
   }
