@@ -9,9 +9,9 @@ class MyViewportListener: public IViewportListener
       printf ("OnChangeName(%s)\n", new_name);
     }
 
-    void OnViewportChangeArea (const Rect& new_area)
+    void OnViewportChangeArea (const Rect& new_area, float min_depth, float max_depth)
     {
-      printf ("OnChangeArea(%d, %d, %u, %u)\n", new_area.x, new_area.y, new_area.width, new_area.height);
+      printf ("OnChangeArea(%d, %d, %u, %u, %.2f, %.2f)\n", new_area.x, new_area.y, new_area.width, new_area.height, min_depth, max_depth);
     }
 
     void OnViewportChangeCamera (scene_graph::Camera* new_camera)
@@ -77,6 +77,8 @@ int main ()
     viewport.SetCamera (camera.get ());
     viewport.SetBackgroundColor (1, 1, 0, 1);
     viewport.EnableBackground ();
+    viewport.SetMinDepth (0.5f);
+    viewport.SetMaxDepth (0.75f);
     
       //удаление камеры (проверка weak-reference области вывода)
 

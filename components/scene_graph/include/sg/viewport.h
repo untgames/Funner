@@ -20,7 +20,7 @@ class IViewportListener
 ///События
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     virtual void OnViewportChangeName       (const char* new_name) {}
-    virtual void OnViewportChangeArea       (const Rect& new_area) {}
+    virtual void OnViewportChangeArea       (const Rect& new_area, float min_depth_range, float max_depth_range) {}
     virtual void OnViewportChangeCamera     (Camera* new_camera) {}
     virtual void OnViewportChangeZOrder     (int new_z_order) {}
     virtual void OnViewportChangeActive     (bool new_state) {}
@@ -73,6 +73,15 @@ class Viewport
     void        SetOrigin (int left, int top);
     void        SetSize   (int width, int height);
     const Rect& Area      () const;
+    
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Ограничение по глубине
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void  SetDepthRange (float min_depth, float max_depth);
+    void  SetMinDepth   (float value);
+    void  SetMaxDepth   (float value);
+    float MinDepth      () const;
+    float MaxDepth      () const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Управление порядком отрисовки областей вывода (отрисовка от наименьших номеров по увеличению номера)

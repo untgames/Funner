@@ -25,6 +25,8 @@ struct Viewport::Impl: public xtl::reference_counter
   scene_graph::Camera* camera;            //камера
   stl::string          technique;         //имя техники рендеринга
   Rect                 rect;              //границы области вывода
+  float                min_depth;         //минимальное значение глубины
+  float                max_depth;         //максимальное значение глубины
   bool                 is_active;         //флаг активности области вывода  
   int                  z_order;           //порядок отрисовки области вывода
   math::vec4f          background_color;  //цвет фона
@@ -33,7 +35,7 @@ struct Viewport::Impl: public xtl::reference_counter
   ListenerArray        listeners;         //слушатели событий области вывода
   xtl::auto_connection on_destroy_camera; //слот соединения с сигналом оповещения об удалении камеры
 
-  Impl () : camera (0), is_active (true), z_order (INT_MAX), has_background (false)
+  Impl () : camera (0), is_active (true), z_order (INT_MAX), has_background (false), min_depth (0.0f), max_depth (1.0f)
   {
     listeners.reserve (LISTENER_ARRAY_RESERVE_SIZE);
   }
@@ -84,7 +86,7 @@ struct Viewport::Impl: public xtl::reference_counter
   
   void ChangeAreaNotify ()
   {
-    Notify (xtl::bind (&IViewportListener::OnViewportChangeArea, _1, xtl::cref (rect)));
+    Notify (xtl::bind (&IViewportListener::OnViewportChangeArea, _1, xtl::cref (rect), min_depth, max_depth));
   }
   
   void ChangeCameraNotify ()
@@ -245,6 +247,41 @@ void Viewport::SetSize (int width, int height)
 const Rect& Viewport::Area () const
 {
   return impl->rect;
+}
+
+/*
+    Область depth
+*/
+
+void Viewport::SetDepthRange (float min_depth, float max_depth)
+{
+  if (impl->min_depth == min_depth && impl->max_depth == max_depth)
+    return;
+
+  impl->min_depth = min_depth;
+  impl->max_depth = max_depth;
+
+  impl->ChangeAreaNotify ();  
+}
+
+void Viewport::SetMinDepth (float value)
+{
+  SetDepthRange (value, impl->max_depth);
+}
+
+void Viewport::SetMaxDepth (float value)
+{
+  SetDepthRange (impl->min_depth, value);
+}
+
+float Viewport::MinDepth () const
+{
+  return impl->min_depth;
+}
+
+float Viewport::MaxDepth () const
+{
+  return impl->max_depth;
 }
 
 /*
