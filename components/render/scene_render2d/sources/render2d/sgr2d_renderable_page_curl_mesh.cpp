@@ -150,21 +150,6 @@ struct RenderablePageCurlMesh::Impl
   {
     last_curl_radius = radius;
 
-    float sin_curl_angle       = sin (angle),
-          sin_minus_curl_angle = sin (-angle),
-          cos_curl_angle       = cos (angle);
-
-    //rotate grid
-    for (size_t i = 0; i < vertices_count; i++)
-    {
-      RenderableVertex&  v          = vertices.data () [i];
-      const math::vec3f& original_v = original_vertices.data () [i];
-
-      v.position.x = original_v.x * cos_curl_angle - original_v.y * sin_curl_angle;
-      v.position.y = original_v.x * sin_curl_angle + original_v.y * cos_curl_angle;
-      v.position.z = 0;       //clear z
-    }
-
     math::vec2f original_corner_location, top_binding, bottom_binding;
 
     switch (corner)
@@ -204,6 +189,10 @@ struct RenderablePageCurlMesh::Impl
       default:
         break;
     }
+
+    float sin_curl_angle       = sin (angle),
+          sin_minus_curl_angle = sin (-angle),
+          cos_curl_angle       = cos (angle);
 
     float pi_r                               = PI * radius,
           rotated_corner_location_x          = corner_position.x * cos_curl_angle - corner_position.y * sin_curl_angle,
@@ -264,34 +253,36 @@ struct RenderablePageCurlMesh::Impl
       }
     }
 
-    for (size_t i = 0; i < vertices_count; i++)
+    RenderableVertex*  v          = vertices.data ();
+    const math::vec3f* original_v = original_vertices.data ();
+
+    for (size_t i = 0; i < vertices_count; i++, v++, original_v++)
     {
-      RenderableVertex& v = vertices.data () [i];
+      //rotate grid
+      v->position.x = original_v->x * cos_curl_angle - original_v->y * sin_curl_angle;
+      v->position.y = original_v->x * sin_curl_angle + original_v->y * cos_curl_angle;
+      v->position.z = 0;       //clear z
 
-      if (v.position.x > curl_x + pi_r)
+      //curl vertex
+      if (v->position.x > curl_x + pi_r)
       {
-        v.position.x = curl_x - (v.position.x - pi_r - curl_x);
-        v.position.z = 2 * radius;
+        v->position.x = curl_x - (v->position.x - pi_r - curl_x);
+        v->position.z = 2 * radius;
       }
-      else if (v.position.x > curl_x)
+      else if (v->position.x > curl_x)
       {
-        float alpha = (v.position.x - curl_x) / radius;
+        float alpha = (v->position.x - curl_x) / radius;
 
-        v.position.x = curl_x + radius * sin (alpha);
-        v.position.z = radius - radius * cos (alpha);
+        v->position.x = curl_x + radius * sin (alpha);
+        v->position.z = radius - radius * cos (alpha);
       }
-    }
 
-    //rotate grid back
-    for (size_t i = 0; i < vertices_count; i++)
-    {
-      RenderableVertex& v = vertices.data () [i];
+      //rotate grid back
+      float x = v->position.x,
+            y = v->position.y;
 
-      float x = v.position.x,
-            y = v.position.y;
-
-      v.position.x = x * cos_curl_angle - y * sin_minus_curl_angle;
-      v.position.y = height - (x * sin_minus_curl_angle + y * cos_curl_angle);
+      v->position.x = x * cos_curl_angle - y * sin_minus_curl_angle;
+      v->position.y = height - (x * sin_minus_curl_angle + y * cos_curl_angle);
     }
   }
 
