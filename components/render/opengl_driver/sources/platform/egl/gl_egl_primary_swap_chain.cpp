@@ -276,8 +276,14 @@ void PrimarySwapChain::Present ()
   {
     DisplayLock lock (impl->output->GetDisplay ());        
     
+    size_t start = common::milliseconds ();
+    
     if (!eglSwapBuffers (impl->egl_display, impl->egl_surface))
       raise_error ("::eglSwapBuffers");            
+      
+    size_t time = common::milliseconds () - start;
+    
+    printf ("eglSwapBuffers: %u ms\n", time); fflush (stdout);
   }
   catch (xtl::exception& exception)
   {

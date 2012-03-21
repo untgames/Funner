@@ -228,10 +228,12 @@ class RenderWindow : public IRendererListener, public xtl::trackable
 
         render::mid_level::Viewport viewport;
 
-        viewport.x      = 0;
-        viewport.y      = 0;
-        viewport.width  = src_viewport.right - src_viewport.left;
-        viewport.height = src_viewport.bottom - src_viewport.top;
+        viewport.x         = 0;
+        viewport.y         = 0;
+        viewport.width     = src_viewport.right - src_viewport.left;
+        viewport.height    = src_viewport.bottom - src_viewport.top;
+        viewport.min_depth = 0.0f;
+        viewport.max_depth = 1.0f;        
 
         frame->SetViewport (viewport);
 

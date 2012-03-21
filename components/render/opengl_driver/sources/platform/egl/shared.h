@@ -36,6 +36,8 @@
   #include <common/utf_converter.h>
 #endif
 
+#include <common/time.h>
+
 #ifdef _WIN32
   #include <windows.h>
   

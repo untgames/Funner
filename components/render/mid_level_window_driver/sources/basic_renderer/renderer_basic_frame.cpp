@@ -66,18 +66,22 @@ IRenderTarget* BasicFrame::GetDepthStencilTarget ()
 
 void BasicFrame::SetViewport (const render::mid_level::Viewport& in_viewport)
 {
-  viewport.x      = in_viewport.x;
-  viewport.y      = in_viewport.y;
-  viewport.width  = in_viewport.width;
-  viewport.height = in_viewport.height;
+  viewport.x         = in_viewport.x;
+  viewport.y         = in_viewport.y;
+  viewport.width     = in_viewport.width;
+  viewport.height    = in_viewport.height;
+  viewport.min_depth = in_viewport.min_depth;
+  viewport.max_depth = in_viewport.max_depth;
 }
 
 void BasicFrame::GetViewport (render::mid_level::Viewport& out_viewport)
 {
-  out_viewport.x      = viewport.x;
-  out_viewport.y      = viewport.y;
-  out_viewport.width  = viewport.width;
-  out_viewport.height = viewport.height;
+  out_viewport.x         = viewport.x;
+  out_viewport.y         = viewport.y;
+  out_viewport.width     = viewport.width;
+  out_viewport.height    = viewport.height;
+  out_viewport.min_depth = viewport.min_depth;
+  out_viewport.max_depth = viewport.max_depth;  
 }
 
 /*
