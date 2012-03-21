@@ -116,6 +116,11 @@ void bind_viewport_library (Environment& environment)
   lib.Register ("SetArea",             make_invoker (implicit_cast<void (Viewport::*) (int, int, size_t, size_t)> (&Viewport::SetArea)));
   lib.Register ("SetOrigin",           make_invoker (&Viewport::SetOrigin));
   lib.Register ("SetSize",             make_invoker (&Viewport::SetSize));
+  lib.Register ("get_MinDepth",        make_invoker (&Viewport::MinDepth));
+  lib.Register ("get_MaxDepth",        make_invoker (&Viewport::MaxDepth));
+  lib.Register ("set_MinDepth",        make_invoker (&Viewport::SetMinDepth));
+  lib.Register ("set_MaxDepth",        make_invoker (&Viewport::SetMaxDepth));
+  lib.Register ("SetDepthRange",       make_invoker (&Viewport::SetDepthRange));  
   lib.Register ("Activate",            make_invoker (&Viewport::Activate));
   lib.Register ("Deactivate",          make_invoker (&Viewport::Deactivate));
   lib.Register ("SetBackgroundColor",  make_invoker (make_invoker (implicit_cast<void (Viewport::*) (float, float, float, float)> (&Viewport::SetBackgroundColor)),
