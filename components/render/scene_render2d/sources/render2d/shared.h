@@ -375,8 +375,8 @@ class RenderView: public IRenderView, public xtl::reference_counter
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Установка области вывода
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void SetViewport (const render::obsolete::Rect& rect);
-    void GetViewport (render::obsolete::Rect& out_rect);
+    void SetViewport (const render::obsolete::Rect& rect, float min_depth, float max_depth);
+    void GetViewport (render::obsolete::Rect& out_rect, float& min_depth, float& max_depth);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Установка камеры

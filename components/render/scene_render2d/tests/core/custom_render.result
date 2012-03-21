@@ -15,7 +15,7 @@ Create dynamic render target. Query='test_query'
 MyRenderView #1: Create view
 MyRenderView #1: SetRenderTargets(render-target, depth-stencil-target)
 MyRenderView #1: SetCamera(Camera1)
-MyRenderView #1: SetViewport(0, 0, 800, 600)
+MyRenderView #1: SetViewport(0, 0, 800, 600, 0.00, 1.00)
 MyRenderView #1: Draw view
 render.mid_level.Debug: Begin draw frames (id=2, frame_id=0)
 render.mid_level.Debug: Begin draw frame (id=8)
@@ -32,7 +32,7 @@ CreateRenderView('Scene2')
 MyRenderView #2: Create view
 MyRenderView #2: SetRenderTargets(render-target, depth-stencil-target)
 MyRenderView #2: SetCamera(Camera1)
-MyRenderView #2: SetViewport(0, 0, 800, 600)
+MyRenderView #2: SetViewport(0, 0, 800, 600, 0.00, 1.00)
 MyRenderView #2: Draw view
 Change viewport camera
 MyRenderView #2: SetCamera(Camera2)

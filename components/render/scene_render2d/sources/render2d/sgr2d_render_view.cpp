@@ -144,16 +144,18 @@ mid_level::IRenderTarget* RenderView::GetDepthStencilTarget ()
     Установка области вывода
 */
 
-void RenderView::SetViewport (const render::obsolete::Rect& rect)
+void RenderView::SetViewport (const render::obsolete::Rect& rect, float min_depth, float max_depth)
 {
   try
   {
     render::mid_level::Viewport viewport;
     
-    viewport.x      = rect.left;
-    viewport.y      = rect.top;
-    viewport.width  = rect.width;
-    viewport.height = rect.height;
+    viewport.x         = rect.left;
+    viewport.y         = rect.top;
+    viewport.width     = rect.width;
+    viewport.height    = rect.height;
+    viewport.min_depth = min_depth;
+    viewport.max_depth = max_depth;
     
     frame->SetViewport (viewport);
   }
@@ -164,7 +166,7 @@ void RenderView::SetViewport (const render::obsolete::Rect& rect)
   }
 }
 
-void RenderView::GetViewport (render::obsolete::Rect& out_rect)
+void RenderView::GetViewport (render::obsolete::Rect& out_rect, float& min_depth, float& max_depth)
 {
   try
   {
@@ -176,6 +178,8 @@ void RenderView::GetViewport (render::obsolete::Rect& out_rect)
     out_rect.top    = viewport.y;
     out_rect.width  = viewport.width;
     out_rect.height = viewport.height;
+    min_depth       = viewport.min_depth;
+    max_depth       = viewport.max_depth;
   }
   catch (xtl::exception& exception)
   {

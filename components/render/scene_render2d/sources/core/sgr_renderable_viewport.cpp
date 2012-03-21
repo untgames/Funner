@@ -169,7 +169,7 @@ class RenderableViewport::Impl: private IViewportListener, public xtl::reference
                        size_t (ceil (viewport_area.width * x_scale)),
                        size_t (ceil (viewport_area.height * y_scale)));
                        
-          render_view->SetViewport (result);
+          render_view->SetViewport (result, viewport.MinDepth (), viewport.MaxDepth ());
 
           need_update_area = false;
         }
@@ -210,15 +210,19 @@ class RenderableViewport::Impl: private IViewportListener, public xtl::reference
           //установка начальной области вывода
 
       Rect src_viewport_rect;
+      
+      float min_depth = 0.0f, max_depth = 1.0f;
 
-      render_view->GetViewport (src_viewport_rect);
+      render_view->GetViewport (src_viewport_rect, min_depth, max_depth);
 
       render::mid_level::Viewport dst_viewport_rect;
 
-      dst_viewport_rect.x      = src_viewport_rect.left;
-      dst_viewport_rect.y      = src_viewport_rect.top;
-      dst_viewport_rect.width  = src_viewport_rect.width;
-      dst_viewport_rect.height = src_viewport_rect.height;
+      dst_viewport_rect.x         = src_viewport_rect.left;
+      dst_viewport_rect.y         = src_viewport_rect.top;
+      dst_viewport_rect.width     = src_viewport_rect.width;
+      dst_viewport_rect.height    = src_viewport_rect.height;
+      dst_viewport_rect.min_depth = min_depth;
+      dst_viewport_rect.max_depth = max_depth;
 
       clear_frame->SetViewport (dst_viewport_rect);
 
@@ -241,7 +245,7 @@ class RenderableViewport::Impl: private IViewportListener, public xtl::reference
     }
 
 ///Оповещение о необходимости изменения границ области вывода
-    void OnChangeArea (const Rect&)
+    void OnChangeArea (const Rect&, float, float)
     {
       UpdateArea ();
     }

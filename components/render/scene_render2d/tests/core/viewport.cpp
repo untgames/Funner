@@ -9,9 +9,9 @@ class MyViewportListener: public IViewportListener
       printf ("OnChangeName(%s)\n", new_name);
     }
 
-    void OnChangeArea (const Rect& new_area)
+    void OnChangeArea (const Rect& new_area, float min_depth, float max_depth)
     {
-      printf ("OnChangeArea(%d, %d, %u, %u)\n", new_area.left, new_area.top, new_area.width, new_area.height);
+      printf ("OnChangeArea(%d, %d, %u, %u, %.2f, %.2f)\n", new_area.left, new_area.top, new_area.width, new_area.height, min_depth, max_depth);
     }
 
     void OnChangeCamera (scene_graph::Camera* new_camera)

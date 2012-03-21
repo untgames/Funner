@@ -2,7 +2,7 @@ Results of viewport_test:
 OnChangeName(viewport1)
 OnChangeZOrder(12)
 OnChangeRenderPath(RenderPath1)
-OnChangeArea(0, 0, 100, 200)
+OnChangeArea(0, 0, 100, 200, 0.00, 1.00)
 OnChangeActive(false)
 OnChangeCamera()
 OnChangeBackground(false, 1.00, 1.00, 0.00, 1.00)

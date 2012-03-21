@@ -60,12 +60,12 @@ class MyRenderView: public IRenderView, public xtl::reference_counter
     }
 
 ///Установка области вывода
-    void SetViewport (const Rect& rect)
+    void SetViewport (const Rect& rect, float min_depth, float max_depth)
     {
-      printf ("MyRenderView #%u: SetViewport(%d, %d, %u, %u)\n", id, rect.left, rect.top, rect.width, rect.height);
+      printf ("MyRenderView #%u: SetViewport(%d, %d, %u, %u, %.2f, %.2f)\n", id, rect.left, rect.top, rect.width, rect.height, min_depth, max_depth);
     }
 
-    void GetViewport (Rect&)
+    void GetViewport (Rect&, float&, float&)
     {
       throw xtl::make_not_implemented_exception ("MyRenderView::GetViewport");
     }
