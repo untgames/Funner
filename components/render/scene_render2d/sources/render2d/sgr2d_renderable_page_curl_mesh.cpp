@@ -368,9 +368,11 @@ struct RenderablePageCurlMesh::Impl
 
     RenderableVertex* vertex = vertices.data ();
 
+    float z_to_light = 1 / (last_curl_radius * 2);
+
     for (size_t i = 0; i < vertices_count; i++, vertex++)
     {
-      float light = stl::max ((float)fabs (vertex->position.z) / (last_curl_radius * 2), 0.f);
+      float light = vertex->position.z * z_to_light;
 
       if (!front)
         light = 1.f - light * 1.5f;
