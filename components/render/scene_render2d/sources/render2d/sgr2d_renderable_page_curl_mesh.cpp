@@ -358,20 +358,42 @@ struct RenderablePageCurlMesh::Impl
     if (last_curl_radius == 0)
       return;
 
+    math::vec4ub colors [256];
+
+    math::vec4ub *current_color = colors;
+
+    float intensity      = 0,
+          intensity_step = 1.f / 255.f;
+
+    for (size_t i = 0; i < 256; i++, current_color++, intensity += intensity_step)
+    {
+      current_color->x = (unsigned char)(color.x * intensity);
+      current_color->y = (unsigned char)(color.y * intensity);
+      current_color->z = (unsigned char)(color.z * intensity);
+      current_color->w = color.w;
+    }
+
     RenderableVertex* vertex = vertices.data ();
 
     float z_to_light = 1 / (last_curl_radius * 2);
 
-    for (size_t i = 0; i < vertices_count; i++, vertex++)
+    if (front)
     {
-      float light = vertex->position.z * z_to_light;
+      float k = z_to_light * 255.f;
 
-      if (!front)
-        light = 1.f - light * 1.5f;
+      for (size_t i = 0; i < vertices_count; i++, vertex++)
+      {
+        vertex->color = colors [(unsigned char)(k * vertex->position.z)];
+      }
+    }
+    else
+    {
+      float k = z_to_light * 255.f * 1.5f;
 
-      vertex->color.x = (unsigned char)(color.x * light);
-      vertex->color.y = (unsigned char)(color.y * light);
-      vertex->color.z = (unsigned char)(color.z * light);
+      for (size_t i = 0; i < vertices_count; i++, vertex++)
+      {
+        vertex->color = colors [(unsigned char)(255.f - k * vertex->position.z)];
+      }
     }
   }
 
