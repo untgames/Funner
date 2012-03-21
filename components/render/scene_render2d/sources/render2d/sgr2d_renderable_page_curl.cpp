@@ -281,7 +281,11 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
 
     memset (&sampler_desc, 0, sizeof (sampler_desc));
 
+#ifdef ARM
+    sampler_desc.min_filter           = low_level::TexMinFilter_Linear;
+#else
     sampler_desc.min_filter           = low_level::TexMinFilter_LinearMipLinear;
+#endif    
     sampler_desc.mag_filter           = low_level::TexMagFilter_Linear;
     sampler_desc.max_anisotropy       = 1;
     sampler_desc.wrap_u               = low_level::TexcoordWrap_Clamp;

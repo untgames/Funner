@@ -296,7 +296,9 @@ RenderTargetTexture::ViewPtr RenderTargetTexture::CreateView
 
 void RenderTargetTexture::GenerateMips (render::low_level::IDevice& device)
 {
+#ifndef ARM
   device.GenerateMips (GetView ()->GetTexture ());
+#endif
 }
 
 /*

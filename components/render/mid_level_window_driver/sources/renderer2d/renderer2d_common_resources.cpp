@@ -191,7 +191,11 @@ SamplerStatePtr create_sampler (IDevice& device)
 
   memset (&sampler_desc, 0, sizeof (sampler_desc));
 
+#ifdef ARM
+  sampler_desc.min_filter           = TexMinFilter_Linear;
+#else
   sampler_desc.min_filter           = TexMinFilter_LinearMipLinear;
+#endif  
   sampler_desc.mag_filter           = TexMagFilter_Linear;
   sampler_desc.max_anisotropy       = 1;
 //  sampler_desc.wrap_u               = TexcoordWrap_Clamp;
