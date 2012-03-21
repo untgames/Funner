@@ -198,7 +198,8 @@ struct RenderablePageCurlMesh::Impl
           rotated_corner_location_x          = corner_position.x * cos_curl_angle - corner_position.y * sin_curl_angle,
           rotated_original_corner_location_x = original_corner_location.x * cos_curl_angle - original_corner_location.y * sin_curl_angle,
           rotated_top_binding_location_x     = top_binding.x * cos_curl_angle - top_binding.y * sin_curl_angle,
-          rotated_bottom_binding_location_x  = bottom_binding.x * cos_curl_angle - bottom_binding.y * sin_curl_angle;
+          rotated_bottom_binding_location_x  = bottom_binding.x * cos_curl_angle - bottom_binding.y * sin_curl_angle,
+          one_divide_radius                  = 1.f / radius;
 
     float best_curl_mismatch = FLT_MAX,
           best_curl_step     = width / find_best_curl_steps;
@@ -215,7 +216,7 @@ struct RenderablePageCurlMesh::Impl
       }
       else if (rotated_original_corner_location_x > current_curl_x)
       {
-        float alpha = (rotated_original_corner_location_x - current_curl_x) / radius;
+        float alpha = (rotated_original_corner_location_x - current_curl_x) * one_divide_radius;
 
         current_corner_location_x = current_curl_x + radius * sin (alpha);
       }
@@ -226,7 +227,7 @@ struct RenderablePageCurlMesh::Impl
       }
       else if (rotated_top_binding_location_x > current_curl_x)
       {
-        float alpha = (rotated_top_binding_location_x - current_curl_x) / radius;
+        float alpha = (rotated_top_binding_location_x - current_curl_x) * one_divide_radius;
 
         current_top_binding_location_x = current_curl_x + radius * sin (alpha);
       }
@@ -237,7 +238,7 @@ struct RenderablePageCurlMesh::Impl
       }
       else if (rotated_bottom_binding_location_x > current_curl_x)
       {
-        float alpha = (rotated_bottom_binding_location_x - current_curl_x) / radius;
+        float alpha = (rotated_bottom_binding_location_x - current_curl_x) * one_divide_radius;
 
         current_bottom_binding_location_x = current_curl_x + radius * sin (alpha);
       }
@@ -271,7 +272,7 @@ struct RenderablePageCurlMesh::Impl
       }
       else if (v->position.x > curl_x)
       {
-        float alpha = (v->position.x - curl_x) / radius;
+        float alpha = (v->position.x - curl_x) * one_divide_radius;
 
         v->position.x = curl_x + radius * sin (alpha);
         v->position.z = radius - radius * cos (alpha);
