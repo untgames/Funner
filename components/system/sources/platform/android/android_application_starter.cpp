@@ -62,6 +62,7 @@ class ApplicationThread: private ApplicationStartArgs
       : ApplicationStartArgs (program_name, in_args, in_env_vars)
       , thread (THREAD_NAME, syslib::Thread::Function (xtl::bind (&ApplicationThread::ThreadRoutine, this)))
     {
+      thread.SetPriority (syslib::ThreadPriority_High);
     }
     
 /// Функция нити
@@ -115,13 +116,11 @@ class ApplicationThread: private ApplicationStartArgs
       }
       catch (std::exception& e)
       {        
-        printf ("%s\n  at syslib::android::ApplicationThread::ThreadRoutine", e.what ());
-        fflush (stdout);
+        log_printf ("%s\n  at syslib::android::ApplicationThread::ThreadRoutine", e.what ());
       }
       catch (...)
       {
-        printf ("unhandled exception\n  at syslib::android::ApplicationThread::ThreadRoutine");
-        fflush (stdout);        
+        log_printf ("unhandled exception\n  at syslib::android::ApplicationThread::ThreadRoutine");
       }
       
       Exit (0);

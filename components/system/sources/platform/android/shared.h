@@ -3,10 +3,12 @@
 
 #include <unistd.h>
 #include <errno.h>
+#include <dlfcn.h>
 
 #include <jni.h>
 #include <android/input.h>
 #include <android/keycodes.h>
+#include <android/log.h>
 #include <android/looper.h>
 #include <android/native_window_jni.h>
 
@@ -195,7 +197,19 @@ void register_window_callbacks (JNIEnv* env);
 /// получение контекста запуска приложения
 const ApplicationContext& get_context ();
 
+/*
+    Отладочное протоколирование
+*/
+
+inline int log_printf (const char* format, ...)
+{
+  va_list args;
+
+  va_start (args, format);
+
+  return __android_log_vprint (ANDROID_LOG_INFO, "funner",  format, args);
 }
 
 }
 
+}

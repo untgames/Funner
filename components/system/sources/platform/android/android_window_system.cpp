@@ -81,8 +81,6 @@ struct syslib::window_handle
 
   void OnDisplayHintCallback (int hint)
   {
-    printf ("on_display_hint_callback(%d)\n", hint);
-    fflush (stdout);
   }
 
   void OnDrawCallback ()
