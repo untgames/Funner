@@ -56,10 +56,13 @@ BUILD_PATHS                := $(CYGWIN_BIN):$(GCC_TOOLS_DIR):$(ARM_EABI_DIR)/lib
 COMMON_JAVA_FLAGS          += -g
 COMMON_CPPFLAGS            += -fexceptions -frtti
 COMMON_CFLAGS              += -ffunction-sections -funwind-tables -fstack-protector -fpic -fomit-frame-pointer -fno-strict-aliasing -finline-limit=64
-COMMON_CFLAGS              += -march=armv5te -mtune=xscale -msoft-float -mthumb
+#COMMON_CFLAGS              += -march=armv5te -mtune=xscale -msoft-float -mthumb
+COMMON_CFLAGS              += -march=armv7-a -mtune=xscale -Os -mfpu=vfpv3 #-mfloat-abi=hard
 COMMON_CFLAGS              += -Wno-psabi -Wa,--noexecstack
 COMMON_CFLAGS              += -fvisibility=hidden
-COMMON_CFLAGS              += -D__ARM_ARCH_5__ -D__ARM_ARCH_5T__ -D__ARM_ARCH_5E__ -D__ARM_ARCH_5TE__ -DANDROID -DARM -UDEBUG
+COMMON_CFLAGS              += -D__ARM_ARCH_7__ -D__ARM_ARCH_7A__
+#COMMON_CFLAGS              += -D__ARM_ARCH_5__ -D__ARM_ARCH_5T__ -D__ARM_ARCH_5E__ -D__ARM_ARCH_5TE__
+COMMON_CFLAGS              += -DANDROID -DARM -UDEBUG
 COMMON_CFLAGS              += --sysroot=$(PLATFORM_DIR)/arch-arm
 COMMON_CFLAGS              += -I$(NDK_ROOT)/sources/cxx-stl/gnu-libstdc++/include
 COMMON_CFLAGS              += -I$(NDK_ROOT)/sources/cxx-stl/gnu-libstdc++/libs/armeabi/include
@@ -123,7 +126,8 @@ endef
 #Копирование файла на устройство (имя локальных файлов, имя удалённого каталога)
 define tools.install
  export SUBST_STRING=$$(cd $2 && pwd) SUBST_SUBSTRING=$$(cd $(ROOT) && pwd)/ && export SUBST_RESULT=$${SUBST_STRING/#$$SUBST_SUBSTRING/} && \
- $(ADB) shell "su -c 'mount -o remount,rw -t vfat /dev/block//vold/179:0 $(SDCARD_DIR)' && export PATH=$(REMOTE_DEBUG_DIR)/busybox:\$\$$PATH && su -c '$(REMOTE_DEBUG_DIR)/busybox mkdir -p $(REMOTE_DEBUG_DIR)/$$(echo $$SUBST_RESULT)'" && \
+ $(ADB) shell "su -c 'mount -o remount,rw -t vfat /dev/block//vold/179:0 $(SDCARD_DIR)'" && \
+ $(ADB) shell "export PATH=$(REMOTE_DEBUG_DIR)/busybox:\$\$$PATH && su -c '$(REMOTE_DEBUG_DIR)/busybox mkdir -p $(REMOTE_DEBUG_DIR)/$$(echo $$SUBST_RESULT)'" && \
  $(foreach file,$1, echo -n "Install $(notdir $(file)): " && $(ADB) push $(file) $(REMOTE_DEBUG_DIR)/$$(echo $$SUBST_RESULT) && $(ADB) shell "export PATH=$(REMOTE_DEBUG_DIR)/busybox:\$\$$PATH && su -c '$(REMOTE_DEBUG_DIR)/busybox chmod -R 777 $(REMOTE_DEBUG_DIR)/$$(echo $$SUBST_RESULT)/*'" && ) true
 endef
 
