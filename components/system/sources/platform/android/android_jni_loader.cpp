@@ -16,25 +16,25 @@ jint JNICALL startApplication (JNIEnv* env, jobject thiz, jstring jprogram_name,
 {
   if (!env)
   {  
-    printf ("Bad JNIEnv passed to EngineActivity::startApplication\n");
+    log_error ("Bad JNIEnv passed to EngineActivity::startApplication\n");
     return 0;
   }
 
   if (!jprogram_name || !jprogram_args || !jwork_dir)
   {
-    printf ("Bad arguments passed to EngineActivity::startApplication\n");
+    log_error ("Bad arguments passed to EngineActivity::startApplication\n");
     return 0; 
   }
 
   jni_string program_name (env, jprogram_name), program_args (env, jprogram_args), work_dir (env, jwork_dir), env_vars (env, jenv_vars);
 
-  printf ("Starting program '%s' (args='%s', workdir='%s', env='%s')\n", program_name.get (), program_args.get (), work_dir.get (), env_vars.get ());
+  log_info ("Starting program '%s' (args='%s', workdir='%s', env='%s')\n", program_name.get (), program_args.get (), work_dir.get (), env_vars.get ());
 
   try
   {   
     if (chdir (work_dir.get ()))
     {
-      printf ("Can't set current working dir to '%s'. %s\n", work_dir.get (), strerror (errno));
+      log_error ("Can't set current working dir to '%s'. %s\n", work_dir.get (), strerror (errno));
 
       return 0;
     }
@@ -68,8 +68,7 @@ __attribute__ ((visibility("default"))) extern JNIEXPORT jint JNICALL JNI_OnLoad
 {
   if (!vm)
   {
-    printf ("JavaVM is null\n");
-    fflush (stdout);
+    log_error ("JavaVM is null\n");
 
     return -1; 
   }
@@ -80,8 +79,7 @@ __attribute__ ((visibility("default"))) extern JNIEXPORT jint JNICALL JNI_OnLoad
 
   if (vm->GetEnv ((void**)&env, JNI_VERSION_1_4) != JNI_OK)
   {
-    printf ("Can't get Java environment\n");
-    fflush (stdout);    
+    log_error ("Can't get Java environment\n");
     
     return -1;
   }
@@ -90,8 +88,7 @@ __attribute__ ((visibility("default"))) extern JNIEXPORT jint JNICALL JNI_OnLoad
   
   if (!skeletonActivityClass)
   {
-    printf ("Can't find EngineActivity class\n");
-    fflush (stdout);
+    log_error ("Can't find EngineActivity class\n");
     
     return -1;
   }
@@ -108,8 +105,7 @@ __attribute__ ((visibility("default"))) extern JNIEXPORT jint JNICALL JNI_OnLoad
 
   if (status)
   {
-    printf ("Can't register natives (status=%d)\n", status);
-    fflush (stdout);
+    log_error ("Can't register natives (status=%d)\n", status);
     
     return -1;
   }
@@ -120,37 +116,16 @@ __attribute__ ((visibility("default"))) extern JNIEXPORT jint JNICALL JNI_OnLoad
   }
   catch (std::exception& e)
   {
-    printf ("Can't register window callbacks: %s\n", e.what ());
-    fflush (stdout);
+    log_error ("Can't register window callbacks: %s\n", e.what ());
 
     return -1;    
   }
   catch (...)
   {
-    printf ("Can't register window callbacks: unknown exception\n");
-    fflush (stdout);
-
-    return -1;    
-  }  
-
-  try
-  {
-    register_log_entries (env, skeletonActivityClass);
-  }
-  catch (std::exception& e)
-  {
-    printf ("Can't register log entries: %s\n", e.what ());
-    fflush (stdout);
+    log_error ("Can't register window callbacks: unknown exception\n");
 
     return -1;    
   }
-  catch (...)
-  {
-    printf ("Can't register log entries: unknown exception\n");
-    fflush (stdout);
-
-    return -1;    
-  }    
 
   return JNI_VERSION_1_4;
 }

@@ -116,11 +116,11 @@ class ApplicationThread: private ApplicationStartArgs
       }
       catch (std::exception& e)
       {        
-        log_info ("%s\n  at syslib::android::ApplicationThread::ThreadRoutine", e.what ());
+        log_error ("%s\n  at syslib::android::ApplicationThread::ThreadRoutine", e.what ());
       }
       catch (...)
       {
-        log_info ("unhandled exception\n  at syslib::android::ApplicationThread::ThreadRoutine");
+        log_error ("unhandled exception\n  at syslib::android::ApplicationThread::ThreadRoutine");
       }
       
       Exit (0);

@@ -129,10 +129,4 @@ public class EngineActivity extends Activity
       }
     });
   }
-  
-///Протоколирование
-  public static int printLog (int level, String message)
-  {
-    return Log.println (level, "funner", message);
-  }
 }
