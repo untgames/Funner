@@ -34,11 +34,12 @@ REMOTE_DEBUG_DIR           ?= $(SDCARD_DIR)/funner
 EXE_SUFFIX                 :=
 DLL_SUFFIX                 := .so
 DLL_PREFIX                 := lib
-ANDROID_PLATFORM           := android-9
+ANDROID_NDK_PLATFORM       := android-9
+ANDROID_SDK_PLATFORM       := android-10
 NDK_ROOT                   := /$(subst :,,$(call convert_path,$(ANDROID_NDK)))
 SDK_ROOT                   := /$(subst :,,$(call convert_path,$(ANDROID_SDK)))
 JAVA_SDK                   := /$(subst :,,$(call convert_path,$(JAVA_SDK)))
-PLATFORM_DIR               := $(NDK_ROOT)/platforms/$(ANDROID_PLATFORM)
+PLATFORM_DIR               := $(NDK_ROOT)/platforms/$(ANDROID_NDK_PLATFORM)
 ANDROID_PLATFORM_TOOLS_DIR := $(call convert_path,$(ANDROID_SDK))/platform-tools
 ARM_EABI_DIR               := $(NDK_ROOT)/toolchains/arm-linux-androideabi-4.4.3/prebuilt/$(ANDROID_NDK_HOST)
 GCC_TOOLS_DIR              := $(ARM_EABI_DIR)/bin
@@ -83,7 +84,7 @@ ANDROID_SO_LINK_FLAGS       = -Wl,-soname,$(notdir $1) -shared -Wl,--no-undefine
 VALID_TARGET_TYPES         += android-pak android-jar
 ANDROID_KEY_STORE          := $(BUILD_DIR)platforms/android/my-release-key.keystore
 ANDROID_KEY_PASS           := android
-ANDROID_JAR                := $(ANDROID_SDK)/platforms/$(ANDROID_PLATFORM)/android.jar
+ANDROID_JAR                := $(ANDROID_SDK)/platforms/$(ANDROID_SDK_PLATFORM)/android.jar
 DEFAULT_PACKAGE_PREFIX     := com.untgames.
 GDB_SERVER_FLAG_FILE       := $(ROOT)/$(TMP_DIR_SHORT_NAME)/$(CURRENT_TOOLSET)/gdb-installed
 GDB_SERVER_FILE            := $(ARM_EABI_DIR)/../gdbserver
@@ -161,11 +162,11 @@ define tools.run.android_package
  export DLLS=$${DLLS/\ /:} && \
  export SUBST_CMD_STRING=$$(cd $(dir $(firstword $1)) && pwd)/$(notdir $(firstword $1)) && export SUBST_COMMAND=$(REMOTE_DEBUG_DIR)/$${SUBST_CMD_STRING/#$$ROOT_SUBSTRING/} && \
  export OLD_APP_PID=`$(ADB) shell ps | grep $(DEFAULT_PACKAGE_PREFIX)funner.application | awk '{print $$2}'` && \
- $(ADB) shell "kill $$OLD_APP_PID" && \
+ $(ADB) shell "su -c 'kill $$OLD_APP_PID'" && \
  $(ADB) shell logcat -c && \
  $(ADB) shell "su -c 'mount -o remount,rw -t vfat /dev/block//vold/179:0 $(SDCARD_DIR)' && $(REMOTE_DEBUG_DIR)/busybox mkdir -p $$(echo $$SUBST_DIR_RESULT) && cd $$(echo $$SUBST_DIR_RESULT) && am start -a android.intent.action.VIEW -c android.intent.category.LAUNCHER -n $(DEFAULT_PACKAGE_PREFIX)funner.application/.EngineActivity -e 'program' '$$(echo $$SUBST_COMMAND)' -e 'workdir' '$$SUBST_DIR_RESULT' -e 'libraries' '$$DLLS' -e 'args' '$(subst $(firstword $1),,$1)'" | sed "s/.$$//" && \
  sleep 1 && \
- ( $(ADB) logcat -s -v raw System.out:I -v raw stdout:I & ) && \
+ ( $(ADB) logcat -s -v raw funner:E -v raw funner:I & ) && \
  while $(ADB) shell ps | grep $(DEFAULT_PACKAGE_PREFIX)funner.application; do sleep 1; done > nul
 endef
 
