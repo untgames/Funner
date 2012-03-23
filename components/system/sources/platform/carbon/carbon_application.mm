@@ -104,7 +104,7 @@ class CarbonApplicationDelegate: public IApplicationDelegate, public xtl::refere
         event_loop_started = true;
 
         if (listener)
-          listener->OnInitialized ();
+          listener->OnInitialize ();
 
         while (!is_exited)
         {

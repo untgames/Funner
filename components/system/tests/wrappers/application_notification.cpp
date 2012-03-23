@@ -26,7 +26,7 @@ int main ()
   {
     Application::RegisterNotificationHandler ("*", &on_any_notification);
     Application::RegisterNotificationHandler ("my *", &on_my_notification);
-    Application::RegisterEventHandler (ApplicationEvent_OnInitialized, &on_application_initialized);
+    Application::RegisterEventHandler (ApplicationEvent_OnInitialize, &on_application_initialized);
 
     Application::Run ();        
   }  

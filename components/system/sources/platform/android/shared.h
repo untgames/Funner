@@ -193,6 +193,9 @@ void start_application (JavaVM* vm, jobject activity, const char* program_name, 
 /// регистрация методов обратного вызова окна
 void register_window_callbacks (JNIEnv* env);
 
+/// регистрация методов обратного вызова activity
+void register_activity_callbacks (JNIEnv* env, jclass activity_class);
+
 /// получение контекста запуска приложения
 const ApplicationContext& get_context ();
 

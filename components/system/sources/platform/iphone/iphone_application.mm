@@ -81,10 +81,10 @@ class ApplicationDelegateImpl: public IApplicationDelegate, public xtl::referenc
         listener->OnIdle ();
     }
 
-    void OnInitialized ()
+    void OnInitialize ()
     {
       if (listener)
-        listener->OnInitialized ();
+        listener->OnInitialize ();
     }
 
     void OnExit ()

@@ -214,6 +214,10 @@ struct syslib::window_handle
       case AKEYCODE_PLUS:          syslib_key = Key_Plus;         break;
       case AKEYCODE_PAGE_UP:       syslib_key = Key_PageUp;       break;
       case AKEYCODE_PAGE_DOWN:     syslib_key = Key_PageDown;     break;
+      case AKEYCODE_BACK:          syslib_key = Key_Back;         break;
+      case AKEYCODE_HOME:          syslib_key = Key_HomeScreen;   break;
+      case AKEYCODE_MENU:          syslib_key = Key_Menu;         break;
+      case AKEYCODE_SEARCH:        syslib_key = Key_Search;       break;
     }
 
     context.key = syslib_key;

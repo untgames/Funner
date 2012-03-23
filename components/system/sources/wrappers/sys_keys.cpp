@@ -146,6 +146,11 @@ const char* get_key_name (Key key)
     case Key_NumPadMultiply:  return "Num *";
     case Key_NumPadDivide:    return "Num /";
     case Key_NumPadDot:       return "Num .";
+    
+    case Key_Back:            return "Back";
+    case Key_HomeScreen:      return "HomeScreen";
+    case Key_Menu:            return "Menu";
+    case Key_Search:          return "Search";
 
     default:                  return "Unknown";
   }

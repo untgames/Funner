@@ -29,7 +29,7 @@ class Win32ApplicationDelegate: public IApplicationDelegate, public xtl::referen
         main_thread_id = GetCurrentThreadId ();
         
         if (listener)
-          listener->OnInitialized ();
+          listener->OnInitialize ();
         
         while (!is_exited)
         {

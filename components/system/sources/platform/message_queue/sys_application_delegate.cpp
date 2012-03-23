@@ -41,7 +41,7 @@ class ApplicationDelegate: public IApplicationDelegate, public xtl::reference_co
       try
       {
         if (listener)
-          listener->OnInitialized ();
+          listener->OnInitialize ();
         
         while (!is_exited)
         {

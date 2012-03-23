@@ -112,17 +112,18 @@ __attribute__ ((visibility("default"))) extern JNIEXPORT jint JNICALL JNI_OnLoad
 
   try
   {
+    register_activity_callbacks (env, skeletonActivityClass);
     register_window_callbacks (env);
   }
   catch (std::exception& e)
   {
-    log_error ("Can't register window callbacks: %s\n", e.what ());
+    log_error ("Can't register native callbacks: %s\n", e.what ());
 
     return -1;    
   }
   catch (...)
   {
-    log_error ("Can't register window callbacks: unknown exception\n");
+    log_error ("Can't register native callbacks: unknown exception\n");
 
     return -1;    
   }

@@ -17,13 +17,17 @@ public class EngineActivity extends Activity
   @Override
   public void onCreate(Bundle savedInstanceState)
   {
+    super.onCreate (savedInstanceState);
+    
+    Log.i ("funner", "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!onCreate");
+    
       /// получение параметров запуска
 
     Bundle extras = getIntent ().getExtras ();
     
     if (extras == null)
     {
-      System.out.println ("No command line arguments found");
+      Log.e ("funner", "No command line arguments found");
       System.exit (0);
       
       return;
@@ -33,7 +37,7 @@ public class EngineActivity extends Activity
     
     if (programName == null)
     {
-      System.out.println ("No 'program' command line argument found");
+      Log.e ("funner", "No 'program' command line argument found");
       System.exit (0);
       
       return;
@@ -43,7 +47,7 @@ public class EngineActivity extends Activity
     
     if (workDir == null)
     {
-      System.out.println ("No 'workdir' command line argument found");
+      Log.e ("funner", "No 'workdir' command line argument found");
       System.exit (0);
       
       return;
@@ -56,7 +60,7 @@ public class EngineActivity extends Activity
     
     if (appInfo == null)
     {
-      System.out.println ("No ApplicationInfo attached");
+      Log.e ("funner", "No ApplicationInfo attached");
       System.exit (0);      
 
       return;
@@ -101,17 +105,49 @@ public class EngineActivity extends Activity
     }    
     catch (Throwable e)
     {
-      System.out.println (e.getMessage());
+      Log.e ("funner", e.getMessage());
       e.printStackTrace ();
       
       System.exit (0);
-    }       
-    
-    super.onCreate (savedInstanceState);
+    }           
   }  
   
-/// Точка входа в native код
-  public native int startApplication (String programName, String workDir, String programArgs, String envVars);
+///Приостановка приложения  
+  @Override
+  public void onPause ()
+  {
+    onPauseCallback ();
+    super.onPause ();
+  }  
+  
+///Восстановление приложения
+  @Override
+  public void onResume ()
+  {
+    onResumeCallback ();
+    super.onResume ();
+  }    
+  
+///Завершение приложения
+  @Override
+  public void onDestroy ()
+  {
+    super.onDestroy ();
+  }        
+    
+///Нехватка памяти
+  @Override
+  public void onLowMemory ()  
+  {
+    onLowMemoryCallback ();
+    super.onLowMemory ();
+  }
+  
+///Игнорирование нажатия на кнопку back
+  @Override
+  public void onBackPressed ()
+  {    
+  }
   
 /// Создание окна
   public View createEngineView (String initString, final long windowRef)
@@ -129,4 +165,12 @@ public class EngineActivity extends Activity
       }
     });
   }
+
+/// Точка входа в native код
+  public native int startApplication (String programName, String workDir, String programArgs, String envVars);
+
+/// Оповещение о возникновении событий
+  public native void onPauseCallback ();
+  public native void onResumeCallback ();
+  public native void onLowMemoryCallback ();
 }

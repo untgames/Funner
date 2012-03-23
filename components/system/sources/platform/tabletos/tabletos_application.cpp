@@ -26,7 +26,7 @@ class TabletOsApplicationDelegate: public IApplicationDelegate, public xtl::refe
         raise_error ("::navigator_request_events");
       
       if (listener)
-        listener->OnInitialized ();
+        listener->OnInitialize ();
       
       while (!is_exited)
       {

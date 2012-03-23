@@ -89,7 +89,7 @@ struct ApplicationDelegate: public IApplicationDelegate
   bool OnAppInitializing (Osp::App::Application& app, Osp::App::AppRegistry& app_registry)
   {
     if (listener)
-      listener->OnInitialized ();
+      listener->OnInitialize ();
 
 //    app.GetAppFrame ()->GetFrame ()->AddControl (*form);
 

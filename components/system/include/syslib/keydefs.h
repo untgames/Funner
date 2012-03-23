@@ -116,6 +116,12 @@ enum Key
   Key_NumPadMultiply,  // *
   Key_NumPadDivide,    // /
   Key_NumPadDot,       // .
+  
+  /// mobile keys
+  Key_Back,
+  Key_Menu,
+  Key_HomeScreen,
+  Key_Search,
 
   Key_Num
 };

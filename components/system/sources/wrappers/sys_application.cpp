@@ -133,7 +133,10 @@ class ApplicationImpl: private IApplicationListener
           case ApplicationEvent_OnExit:
           case ApplicationEvent_OnRunLoopEnter:
           case ApplicationEvent_OnRunLoopExit:
-          case ApplicationEvent_OnInitialized:
+          case ApplicationEvent_OnInitialize:
+          case ApplicationEvent_OnPause:
+          case ApplicationEvent_OnResume:
+          case ApplicationEvent_OnMemoryWarning:
             return signals [event].connect (handler);
           case ApplicationEvent_OnIdle:
           {
@@ -225,11 +228,50 @@ class ApplicationImpl: private IApplicationListener
     }
 
 ///Обработка инициализации приложения
-    void OnInitialized ()
+    void OnInitialize ()
     {
       try
       {
-        Notify (ApplicationEvent_OnInitialized);
+        Notify (ApplicationEvent_OnInitialize);
+      }
+      catch (...)
+      {
+        //подавление всех исключений
+      }
+    }
+    
+///Обработка приостановки приложения
+    void OnPause ()
+    {
+      try
+      {
+        Notify (ApplicationEvent_OnPause);
+      }
+      catch (...)
+      {
+        //подавление всех исключений
+      }
+    }
+
+///Обработка восстановления приложения
+    void OnResume ()
+    {
+      try
+      {
+        Notify (ApplicationEvent_OnResume);
+      }
+      catch (...)
+      {
+        //подавление всех исключений
+      }
+    }
+
+///Обработка недостаточности памяти
+    void OnMemoryWarning ()
+    {
+      try
+      {
+        Notify (ApplicationEvent_OnMemoryWarning);
       }
       catch (...)
       {

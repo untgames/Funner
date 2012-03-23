@@ -28,7 +28,10 @@ enum ApplicationEvent
   ApplicationEvent_OnIdle,          //событие обработки пользовательских очередей сообщений
   ApplicationEvent_OnRunLoopEnter,  //событие входа в очередь обработки сообщений
   ApplicationEvent_OnRunLoopExit,   //событие выхода из очереди обработки сообщений
-  ApplicationEvent_OnInitialized,   //событие иницализации приложения
+  ApplicationEvent_OnInitialize,    //событие иницализации приложения
+  ApplicationEvent_OnPause,         //приложение приостановлено
+  ApplicationEvent_OnResume,        //приложение восстановлено
+  ApplicationEvent_OnMemoryWarning, //приложение получило предупреждение об использовании большого объема памяти
 
   ApplicationEvent_Num
 };

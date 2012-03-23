@@ -20,7 +20,7 @@ class DefaultApplicationDelegate: public IApplicationDelegate, public xtl::refer
     void Run ()
     {
       if (listener)
-        listener->OnInitialized ();
+        listener->OnInitialize ();
       
       while (!is_exited)
       {

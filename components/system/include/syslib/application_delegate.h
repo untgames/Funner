@@ -17,7 +17,16 @@ class IApplicationListener
     virtual void OnExit (int code) {}
     
 ///ѕриложение инициализировано
-    virtual void OnInitialized () {}
+    virtual void OnInitialize () {}
+    
+///ѕриложение приостановлено
+    virtual void OnPause () {}
+    
+///ѕриложение восстановлено
+    virtual void OnResume () {}
+    
+///ѕриложение получило предупреждение о недостаточности пам€ти
+    virtual void OnMemoryWarning () {}
 
   protected:
     virtual ~IApplicationListener () {}
