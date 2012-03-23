@@ -13,8 +13,12 @@ ifeq ($(strip $(ANDROID_SDK)),)
   $(error "Please set ANDROID_SDK variable in your environment")
 endif
 
+ifneq (,$(filter Win%,$(OS)))
+
 ifeq ($(strip $(CYGHOME)),)
   $(error "Please set CYGHOME in your environment")
+endif
+
 endif
 
 ifeq ($(strip $(JAVA_SDK)),)
@@ -37,7 +41,6 @@ JAVA_SDK                   := /$(subst :,,$(call convert_path,$(JAVA_SDK)))
 PLATFORM_DIR               := $(NDK_ROOT)/platforms/$(ANDROID_PLATFORM)
 ANDROID_PLATFORM_TOOLS_DIR := $(call convert_path,$(ANDROID_SDK))/platform-tools
 ARM_EABI_DIR               := $(NDK_ROOT)/toolchains/arm-linux-androideabi-4.4.3/prebuilt/$(ANDROID_NDK_HOST)
-CYGWIN_BIN                 := /$(subst :,,$(call convert_path,$(CYGHOME)))/bin
 GCC_TOOLS_DIR              := $(ARM_EABI_DIR)/bin
 COMPILER_GCC               := $(GCC_TOOLS_DIR)/arm-linux-androideabi-gcc
 LINKER_GCC                 := $(GCC_TOOLS_DIR)/arm-linux-androideabi-g++
@@ -51,8 +54,7 @@ JAVA_CC                    := "$(JAVA_SDK)/bin/javac"
 JAVA_AAPT                  := $(ANDROID_PLATFORM_TOOLS_DIR)/aapt
 JAVA_JAR_SIGNER            := "$(JAVA_SDK)/bin/jarsigner"
 ZIP_ALIGNER                := $(ANDROID_SDK)/tools/zipalign
-ADDITIONAL_PATHS           += $(CYGWIN_BIN)
-BUILD_PATHS                := $(CYGWIN_BIN):$(GCC_TOOLS_DIR):$(ARM_EABI_DIR)/libexec/gcc/arm-linux-androideabi/4.4.3
+BUILD_PATHS                := $(GCC_TOOLS_DIR):$(ARM_EABI_DIR)/libexec/gcc/arm-linux-androideabi/4.4.3
 COMMON_JAVA_FLAGS          += -g
 COMMON_CPPFLAGS            += -fexceptions -frtti
 COMMON_CFLAGS              += -ffunction-sections -funwind-tables -fstack-protector -fpic -fomit-frame-pointer -fno-strict-aliasing -finline-limit=64
@@ -69,6 +71,8 @@ COMMON_CFLAGS              += -I$(NDK_ROOT)/sources/cxx-stl/gnu-libstdc++/libs/a
 COMMON_LINK_FLAGS          += --sysroot=$(PLATFORM_DIR)/arch-arm
 COMMON_LINK_FLAGS          += -Wl,-L,$(ARM_EABI_DIR)/lib/gcc/arm-linux-androideabi/4.4.3
 COMMON_LINK_FLAGS          += -Wl,-L,$(ARM_EABI_DIR)/lib/thumb
+#COMMON_LINK_FLAGS          += -Wl,-L,$(NDK_ROOT)/sources/cxx-stl/gnu-libstdc++/libs/armeabi
+COMMON_LINK_FLAGS          += -Wl,-L,$(NDK_ROOT)/sources/cxx-stl/gnu-libstdc++/libs/armeabi-v7a
 COMMON_LINK_FLAGS          += -Wl,-L,$(PLATFORM_DIR)/arch-arm/usr/lib
 COMMON_LINK_FLAGS          += -Wl,-L,$(DIST_BIN_DIR)
 COMMON_LINK_FLAGS          += -Wl,-rpath-link=$(PLATFORM_DIR)/arch-arm/usr/lib
@@ -76,8 +80,6 @@ COMMON_LINK_FLAGS          += -lc -lm -lstdc++ -lgcc -lsupc++
 COMMON_LINK_FLAGS          += -Wl,--no-undefined
 ANDROID_EXE_LINK_FLAGS     += -z $(PLATFORM_DIR)/arch-arm/usr/lib/crtbegin_dynamic.o
 ANDROID_SO_LINK_FLAGS       = -Wl,-soname,$(notdir $1) -shared -Wl,--no-undefined -Wl,-z,noexecstack
-
-CYGWIN                     := nodosfilewarning
 VALID_TARGET_TYPES         += android-pak android-jar
 ANDROID_KEY_STORE          := $(BUILD_DIR)platforms/android/my-release-key.keystore
 ANDROID_KEY_PASS           := android
@@ -89,7 +91,17 @@ GDB_CLIENT                 := $(GCC_TOOLS_DIR)/arm-linux-androideabi-gdb
 BUSYBOX_FILE               := $(BUILD_DIR)platforms/android/busybox
 BUSYBOX_FLAG_FILE          := $(ROOT)/$(TMP_DIR_SHORT_NAME)/$(CURRENT_TOOLSET)/busybox-installed
 
+
+ifneq (,$(filter Win%,$(OS)))
+CYGWIN_BIN                 := /$(subst :,,$(call convert_path,$(CYGHOME)))/bin
+ADDITIONAL_PATHS           += $(CYGWIN_BIN)
+BUILD_PATHS                := $(CYGWIN_BIN):$(BUILD_PATHS)
+CYGWIN                     := nodosfilewarning
+
 export CYGWIN
+
+endif
+
 
 include $(TOOLSETS_DIR)/g++.mak
 
