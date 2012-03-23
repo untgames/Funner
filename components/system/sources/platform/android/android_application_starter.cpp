@@ -116,11 +116,11 @@ class ApplicationThread: private ApplicationStartArgs
       }
       catch (std::exception& e)
       {        
-        log_printf ("%s\n  at syslib::android::ApplicationThread::ThreadRoutine", e.what ());
+        log_info ("%s\n  at syslib::android::ApplicationThread::ThreadRoutine", e.what ());
       }
       catch (...)
       {
-        log_printf ("unhandled exception\n  at syslib::android::ApplicationThread::ThreadRoutine");
+        log_info ("unhandled exception\n  at syslib::android::ApplicationThread::ThreadRoutine");
       }
       
       Exit (0);
@@ -206,7 +206,7 @@ void start_application (JavaVM* vm, jobject activity, const char* program_name, 
   
   if (!application_context.utils_class)
     throw xtl::format_operation_exception ("", "EngineUtils class '%s' not found", ENGINE_UTILS_CLASS_NAME);    
-  
+    
     //запуск нити приложения
     
   ApplicationThread::Start (program_name, args, env_vars);

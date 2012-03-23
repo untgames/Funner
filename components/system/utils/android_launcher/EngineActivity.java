@@ -18,7 +18,7 @@ public class EngineActivity extends Activity
   public void onCreate(Bundle savedInstanceState)
   {
       /// получение параметров запуска
-    
+
     Bundle extras = getIntent ().getExtras ();
     
     if (extras == null)
@@ -28,7 +28,7 @@ public class EngineActivity extends Activity
       
       return;
     }
-    
+
     String programName = extras.getString ("program");
     
     if (programName == null)
@@ -61,14 +61,14 @@ public class EngineActivity extends Activity
 
       return;
     }
-    
+
     String envVars = extras.getString ("envvars"); 
     
     if (envVars == null)
       envVars = "";
       
     ContextWrapper wrapper = new ContextWrapper (this);
-    
+
     String sourceApk = appInfo.sourceDir;
     String dataDir   = appInfo.dataDir;
     String tmpDir    = wrapper.getCacheDir ().getPath ();
@@ -85,20 +85,20 @@ public class EngineActivity extends Activity
       if (librariesString != null)
       {
         String libraries [] = librariesString.split (" ");
-        
+
         for (String library : libraries)
         {
           if (library != "")
             System.loadLibrary (library);
         }
       }              
-      
+
       if (programName != "")
         System.load (programName);
 
       if (startApplication (programName, workDir, programArgs != null ? programArgs : "", envVars) == 0)
         System.exit (0);
-    }
+    }    
     catch (Throwable e)
     {
       System.out.println (e.getMessage());
@@ -128,5 +128,11 @@ public class EngineActivity extends Activity
         return view;
       }
     });
+  }
+  
+///ѕротоколирование
+  public static int printLog (int level, String message)
+  {
+    return Log.println (level, "funner", message);
   }
 }

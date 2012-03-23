@@ -329,7 +329,7 @@ class JniWindowManager
     {
       const ApplicationContext& context = get_context ();     
       
-      local_ref<jobject> view = check_errors (get_env ().CallObjectMethod (context.activity.get (), create_view_method, tojstring (init_string), window_ref));
+      local_ref<jobject> view = check_errors (get_env ().CallObjectMethod (context.activity.get (), create_view_method, tojstring (init_string).get (), window_ref));
 
       if (!view)
         throw xtl::format_operation_exception ("", "EngineActivity::createEngineView failed");
@@ -929,12 +929,12 @@ void register_window_callbacks (JNIEnv* env)
   {
     if (!env)
       throw xtl::make_null_argument_exception ("", "env");
-      
+
     jclass view_class = env->FindClass ("com/untgames/funner/application/EngineView");
-    
+
     if (!view_class)
       throw xtl::format_operation_exception ("", "Can't find EngineView class\n");
-    
+
     static const JNINativeMethod methods [] = {
       {"onLayoutCallback", "(IIII)V", (void*)&on_layout_callback},
       {"onDisplayHintCallback", "(I)V", (void*)&on_display_hint_callback},
@@ -950,11 +950,11 @@ void register_window_callbacks (JNIEnv* env)
     };
 
     static const size_t methods_count = sizeof (methods) / sizeof (*methods);
-
+    
     jint status = env->RegisterNatives (view_class, methods, methods_count);
-
+    
     if (status)
-      throw xtl::format_operation_exception ("", "Can't register natives (status=%d)", status);
+      throw xtl::format_operation_exception ("", "Can't register natives (status=%d)", status);    
   }
   catch (xtl::exception& e)
   {

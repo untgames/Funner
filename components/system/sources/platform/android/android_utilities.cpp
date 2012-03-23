@@ -8,12 +8,12 @@ namespace syslib
 namespace android
 {
 
-jstring tojstring (const char* s)
+local_ref<jstring> tojstring (const char* s)
 {
   if (!s)
     return 0;
 
-  return get_env ().NewStringUTF (s);
+  return local_ref<jstring> (get_env ().NewStringUTF (s), false);
 }
 
 void check_errors ()

@@ -3,13 +3,12 @@
 
 #include <unistd.h>
 #include <errno.h>
-#include <dlfcn.h>
 
 #include <jni.h>
 #include <android/input.h>
 #include <android/keycodes.h>
-#include <android/log.h>
 #include <android/looper.h>
+#include <android/log.h>
 #include <android/native_window_jni.h>
 
 #include <stl/auto_ptr.h>
@@ -164,8 +163,8 @@ class jni_string
     Утилиты
 */
 
-jstring tojstring    (const char* s);
-void    check_errors ();
+local_ref<jstring> tojstring    (const char* s);
+void               check_errors ();
 
 template <class T> T check_errors (T result)
 {
@@ -194,6 +193,9 @@ void start_application (JavaVM* vm, jobject activity, const char* program_name, 
 /// регистрация методов обратного вызова окна
 void register_window_callbacks (JNIEnv* env);
 
+// регистрация методов протоколирования
+void register_log_entries (JNIEnv* env, jclass activityClass);
+
 /// получение контекста запуска приложения
 const ApplicationContext& get_context ();
 
@@ -201,14 +203,13 @@ const ApplicationContext& get_context ();
     Отладочное протоколирование
 */
 
-inline int log_printf (const char* format, ...)
-{
-  va_list args;
+int log_printf  (int level, const char* format, ...);
+int log_vprintf (int level, const char* format, va_list args);
+int log_info    (const char* format, ...);
+int log_error   (const char* format, ...);
 
-  va_start (args, format);
-
-  return __android_log_vprint (ANDROID_LOG_INFO, "funner",  format, args);
-}
+void startStdioRedirection    ();
+void shutdownStdioRedirection ();
 
 }
 
