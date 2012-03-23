@@ -132,8 +132,6 @@ class AndroidApplicationDelegate: public IApplicationDelegate, public xtl::refer
 ///”становка состо€ни€ активности приложени€
     void SetActivityState (bool state)
     {
-      printf ("activity state %d\n", state); fflush (stdout);
-      
       {
         Lock lock (pause_mutex);
         
