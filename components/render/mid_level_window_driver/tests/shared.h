@@ -137,7 +137,7 @@ class RenderWindow : public IRendererListener, public xtl::trackable
     ~RenderWindow ()
     {
       renderer->DetachListener (this);
-    }
+    }    
 
     void OnFrameBufferCreate (IFrameBuffer* new_frame_buffer)
     {
@@ -156,7 +156,8 @@ class RenderWindow : public IRendererListener, public xtl::trackable
 
         //создание базового кадра
 
-      frame = FramePtr (renderer->CreateFrame (), false);
+      if (!frame)        
+        frame = FramePtr (renderer->CreateFrame (), false);
 
       frame->SetRenderTargets (frame_buffer->GetColorBuffer (), frame_buffer->GetDepthStencilBuffer ());
       frame->SetProjection    (GetOrthoProjectionMatrix (-100, 100, -100, 100, -1000, 1000));
@@ -209,6 +210,7 @@ class RenderWindow : public IRendererListener, public xtl::trackable
   private:
     void ChangeWindowStyle ()
     {
+      printf ("Change window style\n");
       window.SetStyle ((syslib::WindowStyle)(style++ % 2));
     }
     

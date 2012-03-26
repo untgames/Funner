@@ -73,7 +73,7 @@ class Test: public BasicTest
 
       sprite_angle    += 0.0005f;
       sprite_rotation += 0.0005f;
-
+      
       if (!screenshot_made)
       {
         media::Image screenshot;
