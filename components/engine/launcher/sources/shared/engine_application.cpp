@@ -210,7 +210,7 @@ class Application: public IEngine
             
             //регистрация обработчика старта приложения
 
-          syslib::Application::RegisterEventHandler (syslib::ApplicationEvent_OnInitialized, xtl::bind (&Application::StartupHandler, this, p.Root ().First ("Configuration")));            
+          syslib::Application::RegisterEventHandler (syslib::ApplicationEvent_OnInitialize, xtl::bind (&Application::StartupHandler, this, p.Root ().First ("Configuration")));            
           
             //запуск основного цикла
 
