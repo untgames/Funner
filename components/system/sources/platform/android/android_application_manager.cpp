@@ -144,15 +144,9 @@ class AndroidApplicationDelegate: public IApplicationDelegate, public xtl::refer
         
         pause_condition.NotifyOne ();
       }
-      
-      if (state)
-      {
-        push_message (xtl::bind (&AndroidApplicationDelegate::OnResume, this));
-      }
-      else
-      {
+
+      if (!state)
         push_message (xtl::bind (&AndroidApplicationDelegate::OnPause, this));        
-      }
     }
     
 ///Оповещение о приостановке приложения
@@ -160,17 +154,18 @@ class AndroidApplicationDelegate: public IApplicationDelegate, public xtl::refer
     {        
       if (listener)
         listener->OnPause ();
-        
-      WaitActivityResume ();        
-    }
-    
-///Оповещение о восстановлении приложения
-    void OnResume ()
-    {
+
+      {
+        Lock lock (pause_mutex);
+
+        while (is_paused)
+          pause_condition.Wait (pause_mutex);        
+      }
+
       if (listener)
-        listener->OnResume ();
+        listener->OnResume ();      
     }
-    
+
 ///Оповещение о недостаточности памяти
     void OnMemoryWarning ()
     {
@@ -212,15 +207,6 @@ class AndroidApplicationDelegate: public IApplicationDelegate, public xtl::refer
         
       return message_queue.IsEmpty ();
     }    
-    
-///Ожидание активности приложения
-    void WaitActivityResume ()
-    {
-      Lock lock (pause_mutex);
-      
-      while (is_paused)
-        pause_condition.Wait (pause_mutex);
-    }
     
 ///Ожидание события
     void WaitMessage ()
@@ -268,7 +254,7 @@ void on_pause_callback (JNIEnv& env, jobject activity)
 {
   if (!application_delegate)
     return;
-    
+
   application_delegate->SetActivityState (false);
 }
 
@@ -276,7 +262,7 @@ void on_resume_callback (JNIEnv& env, jobject activity)
 {
   if (!application_delegate)
     return;
-    
+
   application_delegate->SetActivityState (true);
 }
 

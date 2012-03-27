@@ -106,19 +106,24 @@ void MessageQueue::DispatchFirstMessage ()
 {
   try
   {
-    Lock lock (mutex);
-
-    while (messages.empty ())
-      condition.Wait (mutex);
-
-    MessagePtr message = messages.front ();
+    MessagePtr message;
     
-    messages.pop ();
+    {    
+      Lock lock (mutex);
 
-    if (!handlers.count (message->handler))
-      return; //обработчик сообщения не зарегистрирован
+      while (messages.empty ())
+        condition.Wait (mutex);
 
-    message->Dispatch ();
+      message = messages.front ();
+      
+      messages.pop ();
+
+      if (!handlers.count (message->handler))
+        return; //обработчик сообщения не зарегистрирован
+    }
+    
+    if (message)
+      message->Dispatch ();
   }
   catch (xtl::exception& e)
   {

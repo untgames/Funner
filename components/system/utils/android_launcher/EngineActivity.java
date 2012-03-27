@@ -18,9 +18,7 @@ public class EngineActivity extends Activity
   public void onCreate(Bundle savedInstanceState)
   {
     super.onCreate (savedInstanceState);
-    
-    Log.i ("funner", "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!onCreate");
-    
+        
       /// получение параметров запуска
 
     Bundle extras = getIntent ().getExtras ();
@@ -127,7 +125,7 @@ public class EngineActivity extends Activity
     onResumeCallback ();
     super.onResume ();
   }    
-  
+    
 ///Завершение приложения
   @Override
   public void onDestroy ()

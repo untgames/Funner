@@ -258,9 +258,9 @@ struct syslib::window_handle
 
       //получение дескриптора окна
       
-    ANativeWindow* new_window = ANativeWindow_fromSurface (&get_env (), surface.get ());
-    
-    if (new_window != window.native_window)
+    ANativeWindow* new_window = ANativeWindow_fromSurface (&get_env (), surface.get ());    
+      
+    if (new_window && new_window != window.native_window)
     {
       window.native_window = new_window;
       
@@ -270,7 +270,7 @@ struct syslib::window_handle
 
       memset (&context, 0, sizeof (context));    
       
-      context.handle = &window;
+      context.handle = &window;      
       
       Notify (WindowEvent_OnChangeHandle, context);    
     }
@@ -290,7 +290,7 @@ struct syslib::window_handle
     WindowEventContext context;
 
     memset (&context, 0, sizeof (context));    
-
+    
     Notify (WindowEvent_OnChangeHandle, context);
   }  
 };
@@ -584,6 +584,9 @@ const void* AndroidWindowManager::GetNativeWindowHandle (window_t window)
   {
     if (!window)
       throw xtl::make_null_argument_exception ("", "window");
+      
+    if (!window->window.native_window)
+      return 0;
       
     return &window->window;
   }

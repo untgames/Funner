@@ -95,14 +95,14 @@ class UiDispatch implements Runnable
     try
     {
       UiDispatch container = new UiDispatch (runnable);
-      
+
       activity.runOnUiThread (container);
-      
+
       container.condition.await ();
-      
+
       if (container.exception != null)
         throw new RuntimeException (container.exception.getMessage (), container.exception);
-      
+
       return container.result;
     }
     catch (InterruptedException e)
