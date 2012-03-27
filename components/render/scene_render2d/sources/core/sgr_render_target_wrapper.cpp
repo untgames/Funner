@@ -15,7 +15,7 @@ using namespace render::obsolete;
 
 RenderTarget::RenderTarget ()
 {
-  RenderTargetImpl::Pointer render_target = RenderTargetImpl::Create (0, 0);
+  RenderTargetImpl::Pointer render_target = RenderTargetImpl::Create (0, 0, ~0u);
 
   impl = render_target.get ();
 

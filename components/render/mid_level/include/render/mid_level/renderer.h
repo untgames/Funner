@@ -144,7 +144,7 @@ class IFrameBuffer: virtual public IObject
 class IRendererListener
 {
   public:
-    virtual void OnFrameBufferCreate  (IFrameBuffer* frame_buffer) {}                              //создан буфер кадра
+    virtual void OnFrameBufferCreate  (IFrameBuffer* frame_buffer, size_t tag) {}                  //создан буфер кадра
     virtual void OnFrameBufferDestroy (IFrameBuffer* frame_buffer) {}                              //буфер кадра удалён  
     virtual void OnFrameBufferUpdate  (IFrameBuffer* frame_buffer) {}                              //буфер кадра необходимо обновить
     virtual void OnFrameBufferResize  (IFrameBuffer* frame_buffer, size_t width, size_t height) {} //размеры буфера кадра изменились
@@ -169,6 +169,7 @@ class IRenderer: virtual public IObject
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     virtual size_t        GetFrameBuffersCount () = 0;
     virtual IFrameBuffer* GetFrameBuffer       (size_t index) = 0;
+    virtual size_t        GetFrameBufferTag    (size_t index) = 0;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Создание ресурсов

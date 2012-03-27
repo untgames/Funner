@@ -46,16 +46,16 @@ RendererDispatch::~RendererDispatch ()
    Регистрация/удаление окна
 */
 
-void RendererDispatch::AddFrameBuffer (FrameBuffer* frame_buffer)
+void RendererDispatch::AddFrameBuffer (FrameBuffer* frame_buffer, size_t tag)
 {
   try
   {
     if (!frame_buffer)
       throw xtl::make_null_argument_exception ("", "frame_buffer");
 
-    frame_buffers.push_back (frame_buffer);
+    frame_buffers.push_back (FrameBufferDesc (frame_buffer, tag));
 
-    FrameBufferCreateNotify (frame_buffers.back ());
+    FrameBufferCreateNotify (frame_buffers.back ().frame_buffer, tag);
   }
   catch (xtl::exception& exception)
   {
@@ -68,7 +68,7 @@ void RendererDispatch::RemoveFrameBuffer (FrameBuffer* frame_buffer)
 {
   for (FrameBufferArray::iterator iter=frame_buffers.begin (), end=frame_buffers.end (); iter!=end; ++iter)
   {
-    if (*iter == frame_buffer)
+    if (iter->frame_buffer == frame_buffer)
     {
       frame_buffers.erase (iter);
 
@@ -102,7 +102,15 @@ IFrameBuffer* RendererDispatch::GetFrameBuffer (size_t index)
   if (index >= GetFrameBuffersCount ())
     throw xtl::make_range_exception ("render::mid_level::window_driver::RendererDispatch::GetFrameBuffer", "index", index, frame_buffers.size ());
 
-  return frame_buffers[index];
+  return frame_buffers[index].frame_buffer;
+}
+
+size_t RendererDispatch::GetFrameBufferTag (size_t index)
+{
+  if (index >= GetFrameBuffersCount ())
+    throw xtl::make_range_exception ("render::mid_level::window_driver::RendererDispatch::GetFrameBufferTag", "index", index, frame_buffers.size ());
+
+  return frame_buffers[index].tag;
 }
 
 /*
@@ -230,7 +238,7 @@ void RendererDispatch::DrawFrames ()
     return;
     
     //отрисовка кадров
-    
+
   size_t draw_frames_count = 0;
 
   for (FrameList::iterator iter=frames.begin (), end=frames.end (); iter!=end; ++iter)
@@ -249,7 +257,7 @@ void RendererDispatch::DrawFrames ()
     //вывод сформированной картинки
     
   for (FrameBufferArray::iterator iter=frame_buffers.begin (), end=frame_buffers.end (); iter!=end; ++iter)  
-    (*iter)->Present ();    
+    iter->frame_buffer->Present ();    
 }
 
 void RendererDispatch::CancelFrames ()
@@ -325,10 +333,10 @@ render::mid_level::ILowLevelFrame* RendererDispatch::CreateLowLevelFrame ()
    Оповещения
 */
 
-void RendererDispatch::FrameBufferCreateNotify (IFrameBuffer* frame_buffer)
+void RendererDispatch::FrameBufferCreateNotify (IFrameBuffer* frame_buffer, size_t tag)
 {
   for (ListenerSet::iterator iter = listeners.begin (), end = listeners.end (); iter != end; ++iter)
-    (*iter)->OnFrameBufferCreate (frame_buffer);
+    (*iter)->OnFrameBufferCreate (frame_buffer, tag);
 }
 
 void RendererDispatch::FrameBufferDestroyNotify (IFrameBuffer* frame_buffer)

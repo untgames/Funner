@@ -210,7 +210,7 @@ class RendererDispatch: virtual public IRenderer2dDispatch, virtual public ILowL
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Регистрация/удаление окна
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void AddFrameBuffer    (FrameBuffer*);
+    void AddFrameBuffer    (FrameBuffer*, size_t tag);
     void RemoveFrameBuffer (FrameBuffer*);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -223,6 +223,7 @@ class RendererDispatch: virtual public IRenderer2dDispatch, virtual public ILowL
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     size_t        GetFrameBuffersCount ();
     IFrameBuffer* GetFrameBuffer       (size_t index);
+    size_t        GetFrameBufferTag    (size_t index);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Создание ресурсов
@@ -268,15 +269,27 @@ class RendererDispatch: virtual public IRenderer2dDispatch, virtual public ILowL
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Оповещения
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void FrameBufferCreateNotify  (IFrameBuffer* frame_buffer);
+    void FrameBufferCreateNotify  (IFrameBuffer* frame_buffer, size_t tag);
     void FrameBufferDestroyNotify (IFrameBuffer* frame_buffer);
     void FrameBufferUpdateNotify  (IFrameBuffer* frame_buffer);
     void FrameBufferResizeNotify  (IFrameBuffer* frame_buffer, size_t width, size_t height);
 
   private:
+    struct FrameBufferDesc
+    {
+      FrameBuffer* frame_buffer;
+      size_t       tag;
+      
+      FrameBufferDesc (FrameBuffer* in_frame_buffer, size_t in_tag)
+        : frame_buffer (in_frame_buffer)
+        , tag (in_tag)
+      {
+      }        
+    };
+  
     typedef xtl::intrusive_ptr<BasicFrame>           FramePtr;
     typedef stl::list<FramePtr>                      FrameList;
-    typedef stl::vector<FrameBuffer*>                FrameBufferArray;
+    typedef stl::vector<FrameBufferDesc>             FrameBufferArray;
     typedef xtl::com_ptr<render::low_level::IDevice> DevicePtr;  
     typedef stl::auto_ptr<Renderer2D>                Renderer2DPtr;
     typedef stl::auto_ptr<LowLevelRenderer>          LowLevelRendererPtr;

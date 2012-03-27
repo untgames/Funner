@@ -52,9 +52,10 @@ struct RenderTargetImpl::Impl: private IScreenListener
 {
   public:
 ///Конструктор
-    Impl (RenderTargetImpl&             in_owner,
+    Impl (RenderTargetImpl&         in_owner,
           mid_level::IRenderTarget* in_color_attachment,
-          mid_level::IRenderTarget* in_depth_stencil_attachment)
+          mid_level::IRenderTarget* in_depth_stencil_attachment,
+          size_t                    in_tag)
       : owner (in_owner),
         render_manager (0),
         color_attachment (in_color_attachment),
@@ -63,11 +64,12 @@ struct RenderTargetImpl::Impl: private IScreenListener
         last_update_transaction_id (0),
         need_update_background (true),
         need_update_areas (true),
-        need_reorder (true)
+        need_reorder (true),
+        tag (in_tag)
     {
         //резервирование памяти для хранения областей вывода
 
-      views.reserve (VIEW_ARRAY_RESERVE);
+      views.reserve (VIEW_ARRAY_RESERVE);            
 
         //установка начальной физической области вывода
         
@@ -92,6 +94,9 @@ struct RenderTargetImpl::Impl: private IScreenListener
 ///Целевые буферы
     mid_level::IRenderTarget* ColorAttachment () { return color_attachment.get (); }
     mid_level::IRenderTarget* DepthStencilAttachment () { return depth_stencil_attachment.get (); }
+    
+///Тэг
+    size_t Tag () { return tag; }
 
 ///Установка текущего менеджера рендеринга
     void SetRenderManager (render::obsolete::RenderManager* new_render_manager)
@@ -137,6 +142,45 @@ struct RenderTargetImpl::Impl: private IScreenListener
     
 ///Текущий менеджер рендеринга
     render::obsolete::RenderManager* RenderManager () { return render_manager; }
+    
+///Установка буфера кадра
+    void SetFrameBuffer (mid_level::IFrameBuffer* frame_buffer)
+    {
+        //очистка ресурсов
+
+      views.clear ();            
+      
+        //установка флагов
+
+      need_update_areas          = true;
+      need_reorder               = true;
+      need_update_background     = true;
+      last_update_transaction_id = 0;
+
+        //сброс целевых буферов отрисовки
+
+      color_attachment         = AttachmentPtr ();
+      depth_stencil_attachment = AttachmentPtr ();
+
+        //сброс кадров
+
+      clear_frame = ClearFramePtr ();
+      
+        //установка новых ресурсов
+        
+      if (frame_buffer)
+      {
+        color_attachment         = frame_buffer->GetColorBuffer ();
+        depth_stencil_attachment = frame_buffer->GetDepthStencilBuffer ();
+
+          //установка начальной физической области вывода
+
+        mid_level::IRenderTarget* render_target = color_attachment ? color_attachment.get () : depth_stencil_attachment.get ();
+
+        if (render_target)
+          SetRenderableArea (Rect (0, 0, render_target->GetWidth (), render_target->GetHeight ()));        
+      }
+    }
 
 ///Текущий экран
     render::obsolete::Screen* Screen () { return screen; }
@@ -402,6 +446,7 @@ struct RenderTargetImpl::Impl: private IScreenListener
     bool                   need_update_background;    //необходимо обновить параметры фона
     bool                   need_update_areas;         //необходимо обновить границы областей вывода
     bool                   need_reorder;              //необходимо пересортировать области вывода
+    size_t                 tag;                       //тэг
 };
 
 /*
@@ -410,8 +455,9 @@ struct RenderTargetImpl::Impl: private IScreenListener
 
 RenderTargetImpl::RenderTargetImpl
  (mid_level::IRenderTarget* render_target,
-  mid_level::IRenderTarget* depth_stencil_target)
-    : impl (new Impl (*this, render_target, depth_stencil_target))
+  mid_level::IRenderTarget* depth_stencil_target,
+  size_t                    tag)
+    : impl (new Impl (*this, render_target, depth_stencil_target, tag))
 {
 }
 
@@ -425,21 +471,32 @@ RenderTargetImpl::~RenderTargetImpl ()
 
 RenderTargetImpl::Pointer RenderTargetImpl::Create
  (mid_level::IRenderTarget* color_attachment,
-  mid_level::IRenderTarget* depth_stencil_attachment)
+  mid_level::IRenderTarget* depth_stencil_attachment,
+  size_t                    tag)
 {
-  return Pointer (new RenderTargetImpl (color_attachment, depth_stencil_attachment), false);
+  return Pointer (new RenderTargetImpl (color_attachment, depth_stencil_attachment, tag), false);
 }
 
 RenderTargetImpl::Pointer RenderTargetImpl::Create
  (render::obsolete::RenderManager&    render_manager,
-  mid_level::IRenderTarget* color_attachment,
-  mid_level::IRenderTarget* depth_stencil_attachment)
+  mid_level::IRenderTarget*           color_attachment,
+  mid_level::IRenderTarget*           depth_stencil_attachment,
+  size_t                              tag)
 {
-  Pointer result = Create (color_attachment, depth_stencil_attachment);
+  Pointer result = Create (color_attachment, depth_stencil_attachment, tag);
 
   result->SetRenderManager (&render_manager);
 
   return result;
+}
+
+/*
+    Тэг
+*/
+
+size_t RenderTargetImpl::Tag ()
+{
+  return impl->Tag ();
 }
 
 /*
@@ -493,6 +550,15 @@ render::obsolete::Screen* RenderTargetImpl::Screen ()
 }
 
 /*
+    Сброс буфера кадра
+*/
+
+void RenderTargetImpl::SetFrameBuffer (mid_level::IFrameBuffer* frame_buffer)
+{
+  impl->SetFrameBuffer (frame_buffer);
+}
+
+/*
     Размеры области рендеринга
 */
 
@@ -523,7 +589,7 @@ void RenderTargetImpl::Update ()
 {
   try
   {
-    impl->Update ();
+    impl->Update ();    
   }
   catch (xtl::exception& exception)
   {

@@ -40,7 +40,7 @@ FrameBuffer::FrameBuffer (IDevice& device, ISwapChain& in_swap_chain)
 
     texture      = TexturePtr (device.CreateRenderTargetTexture (swap_chain.get (), swap_chain_desc.buffers_count > 1 ? 1 : 0), false);
     view         = ViewPtr (device.CreateView (texture.get (), view_desc), false);
-    color_buffer = RenderTargetPtr (new RenderTarget (view.get (), RenderTargetType_Color), false);
+    color_buffer = RenderTargetPtr (new RenderTarget (view.get (), RenderTargetType_Color), false);    
     
       //создание буфера попиксельного отсечения
 

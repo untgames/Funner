@@ -4,7 +4,7 @@ using namespace render::mid_level;
 using namespace render::mid_level::window_driver;
 
 /*
-    Конструктор
+    Конструктор / деструктор
 */
 
 RenderTarget::RenderTarget (render::low_level::IView* in_render_target_view, RenderTargetType in_type)
@@ -27,7 +27,11 @@ RenderTarget::RenderTarget (render::low_level::IView* in_render_target_view, Ren
   render_target_view->GetTexture ()->GetDesc (render_texture_desc);
 
   width  = render_texture_desc.width;
-  height = render_texture_desc.height;
+  height = render_texture_desc.height;  
+}
+
+RenderTarget::~RenderTarget ()
+{
 }
 
 /*

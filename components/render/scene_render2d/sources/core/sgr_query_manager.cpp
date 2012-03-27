@@ -155,12 +155,12 @@ IRenderQuery* QueryManager::CreateQuery
 
         //создание запроса
 
-      return (*iter)->CreateQuery (RenderTargetImpl::Create (render_manager, color_attachment, depth_stencil_attachment), query_string);
+      return (*iter)->CreateQuery (RenderTargetImpl::Create (render_manager, color_attachment, depth_stencil_attachment, ~0u), query_string);
     }
 
       //создание пустого запроса
 
-    return new RenderQueryImpl (RenderTargetImpl::Create (render_manager, color_attachment, depth_stencil_attachment));
+    return new RenderQueryImpl (RenderTargetImpl::Create (render_manager, color_attachment, depth_stencil_attachment, ~0u));
   }
   catch (xtl::exception& exception)
   {

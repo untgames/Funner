@@ -534,7 +534,7 @@ struct RenderTargetManager::Impl: public ContextObject, public RenderTargetManag
 ///Добавление отображения
     void AddView (const xtl::com_ptr<View>& view)
     {
-      RegisterDestroyHandler (xtl::bind (&Impl::RemoveView, this, view.get ()), GetTrackable ());
+      view->RegisterDestroyHandler (xtl::bind (&Impl::RemoveView, this, view.get ()), GetTrackable ());
     }
 
 ///Удаление отображения

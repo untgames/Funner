@@ -747,7 +747,7 @@ void Device::Flush ()
     context_manager.MakeContextCurrent ();
     
       //сброс очереди команд
-    
+
     glFlush ();  
 
       //обновление целевых буферов отрисовки

@@ -40,6 +40,10 @@ View::View (const ContextManager& context_manager, ITexture* in_texture, const V
   desc = in_desc;
 }
 
+View::~View ()
+{
+}
+
 /*
     Получение дескриптора
 */

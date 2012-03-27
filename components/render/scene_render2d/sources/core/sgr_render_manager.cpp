@@ -39,9 +39,14 @@ struct FrameBuffer: public xtl::reference_counter
   mid_level::IFrameBuffer*  frame_buffer;  //указаель на буфер кадра системы рендеринга
   RenderTargetImpl::Pointer render_target; //указаель на цель рендеринга
 
-  FrameBuffer (mid_level::IFrameBuffer* in_frame_buffer, RenderManager& manager)
+  FrameBuffer (mid_level::IFrameBuffer* in_frame_buffer, RenderManager& manager, size_t tag)
     : frame_buffer (in_frame_buffer),
-      render_target (RenderTargetImpl::Create (manager, frame_buffer->GetColorBuffer (), frame_buffer->GetDepthStencilBuffer ()))
+      render_target (RenderTargetImpl::Create (manager, frame_buffer->GetColorBuffer (), frame_buffer->GetDepthStencilBuffer (), tag))
+  { }
+  
+  FrameBuffer (mid_level::IFrameBuffer* in_frame_buffer, const RenderTargetImpl::Pointer& in_render_target)
+    : frame_buffer (in_frame_buffer),
+      render_target (in_render_target)
   { }
 
   ~FrameBuffer ()
@@ -242,11 +247,39 @@ class RenderManager::Impl: private mid_level::IRendererListener
     }
 
 ///Регистрация буфера кадра
-    void RegisterFrameBuffer (mid_level::IFrameBuffer* in_frame_buffer)
+    void RegisterFrameBuffer (mid_level::IFrameBuffer* in_frame_buffer, size_t tag)
     {
+        //поиск существующей цели рендеринга с соответствующим тэгом
+        
+      for (FrameBufferArray::iterator iter=frame_buffers.begin (), end=frame_buffers.end (); iter!=end; ++iter)
+      {
+        RenderTargetImpl& target = *(*iter)->render_target;
+        
+        if (target.Tag () != tag)
+          continue;          
+          
+          //указание буфера кадра
+          
+        target.SetFrameBuffer (in_frame_buffer);
+          
+          //указание менеджера рендеринга
+          
+        target.SetRenderManager (&owner);
+          
+          //создание буфера кадра
+
+        FrameBufferPtr frame_buffer (new FrameBuffer (in_frame_buffer, &target), false);
+
+          //добавление буфера кадра
+
+        frame_buffers.push_back (frame_buffer);        
+
+        return;
+      }
+            
         //создание буфера кадра
 
-      FrameBufferPtr frame_buffer (new FrameBuffer (in_frame_buffer, owner), false);
+      FrameBufferPtr frame_buffer (new FrameBuffer (in_frame_buffer, owner, tag), false);
 
         //добавление буфера кадра
 
@@ -353,11 +386,11 @@ class RenderManager::Impl: private mid_level::IRendererListener
     }
 
 ///Создан буфер кадра
-    void OnFrameBufferCreate (mid_level::IFrameBuffer* frame_buffer)
+    void OnFrameBufferCreate (mid_level::IFrameBuffer* frame_buffer, size_t tag)
     {
       try
       {
-        RegisterFrameBuffer (frame_buffer);
+        RegisterFrameBuffer (frame_buffer, tag);
       }
       catch (std::exception& exception)
       {
@@ -372,9 +405,14 @@ class RenderManager::Impl: private mid_level::IRendererListener
 ///Буфер кадра удалён
     void OnFrameBufferDestroy (mid_level::IFrameBuffer* frame_buffer)
     {
-      for (FrameBufferArray::iterator iter=frame_buffers.begin (); iter!=frame_buffers.end ();)
-        if ((*iter)->frame_buffer == frame_buffer) frame_buffers.erase (iter);
-        else                                       ++iter;
+      for (FrameBufferArray::iterator iter=frame_buffers.begin (); iter!=frame_buffers.end (); ++iter)
+        if ((*iter)->frame_buffer == frame_buffer)
+        {
+          (*iter)->frame_buffer = 0;
+          
+          (*iter)->render_target->SetFrameBuffer (0);
+          (*iter)->render_target->SetRenderManager (0);
+        }
     }
 
 ///Буфер кадра необходимо обновить
@@ -448,7 +486,7 @@ RenderManager::RenderManager
     mid_level::IRenderer& renderer = impl->Renderer ();
 
     for (size_t i=0, count=renderer.GetFrameBuffersCount (); i<count; i++)
-      impl->RegisterFrameBuffer (renderer.GetFrameBuffer (i));
+      impl->RegisterFrameBuffer (renderer.GetFrameBuffer (i), renderer.GetFrameBufferTag (i));
   }
   catch (xtl::exception& exception)
   {

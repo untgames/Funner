@@ -116,7 +116,7 @@ void BasicFrame::Draw (render::low_level::IDevice* device, size_t& draw_frames_c
 
   if (!render_target && !depth_stencil_target)
     return;
-    
+
     //установка целей отрисовки
     
   render::low_level::IView *render_target_view        = render_target ? render_target->GetView () : 0,

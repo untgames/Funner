@@ -164,8 +164,13 @@ class RenderTargetImpl: public xtl::reference_counter
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Создание
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    static Pointer Create (mid_level::IRenderTarget* color_attachment, mid_level::IRenderTarget* depth_stencil_attachment);
-    static Pointer Create (render::obsolete::RenderManager& render_manager, mid_level::IRenderTarget* color_attachment, mid_level::IRenderTarget* depth_stencil_attachment);
+    static Pointer Create (mid_level::IRenderTarget* color_attachment, mid_level::IRenderTarget* depth_stencil_attachment, size_t tag);
+    static Pointer Create (render::obsolete::RenderManager& render_manager, mid_level::IRenderTarget* color_attachment, mid_level::IRenderTarget* depth_stencil_attachment, size_t tag);
+    
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Тэг
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    size_t Tag ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Целевые буферы рендеринга
@@ -200,6 +205,11 @@ class RenderTargetImpl: public xtl::reference_counter
 ///Обновление
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void Update ();
+    
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Сброс буфера кадра
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void SetFrameBuffer (mid_level::IFrameBuffer*);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Захват изображения (screen-shot)
@@ -214,7 +224,7 @@ class RenderTargetImpl: public xtl::reference_counter
     void Register   (render::obsolete::RenderManager&);
     void Unregister (render::obsolete::RenderManager&);
 
-    RenderTargetImpl (mid_level::IRenderTarget* render_target, mid_level::IRenderTarget* depth_stencil_target);
+    RenderTargetImpl (mid_level::IRenderTarget* render_target, mid_level::IRenderTarget* depth_stencil_target, size_t tag);
 
     RenderTargetImpl (const RenderTargetImpl&); //no impl
     RenderTargetImpl& operator = (const RenderTargetImpl&); //no impl

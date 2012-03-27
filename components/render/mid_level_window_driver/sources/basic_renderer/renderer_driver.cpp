@@ -136,7 +136,7 @@ class Driver::RendererEntry: public xtl::reference_counter
             //регистрация нового буфера кадров
 
           if (renderer)
-            renderer->AddFrameBuffer (window_entry->frame_buffer.get ());
+            renderer->AddFrameBuffer (window_entry->frame_buffer.get (), reinterpret_cast<size_t> (&*window_entry));
 
             //сохранение параметров
 
@@ -197,7 +197,7 @@ class Driver::RendererEntry: public xtl::reference_counter
           //добавление буферов кадра
           
         for (WindowEntryArray::iterator iter=windows.begin (), end=windows.end (); iter!=end; ++iter)
-          new_renderer->AddFrameBuffer ((*iter)->frame_buffer.get ());
+          new_renderer->AddFrameBuffer ((*iter)->frame_buffer.get (), reinterpret_cast<size_t> (&**iter));
           
           //возвращение результата
 
@@ -273,7 +273,7 @@ class Driver::RendererEntry: public xtl::reference_counter
     {
       if (!window_entry.window.Handle ())
       {
-        if (renderer)
+        if (renderer)          
           renderer->RemoveFrameBuffer (window_entry.frame_buffer.get ());
 
         window_entry.frame_buffer = 0;
@@ -288,7 +288,7 @@ class Driver::RendererEntry: public xtl::reference_counter
         //регистрация буфера кадра
 
       if (renderer)
-        renderer->AddFrameBuffer (window_entry.frame_buffer.get ());
+        renderer->AddFrameBuffer (window_entry.frame_buffer.get (), reinterpret_cast<size_t> (&window_entry));
     }
 
 ///Обработчик события изменения области вывода

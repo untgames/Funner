@@ -50,6 +50,11 @@ void Object::Release ()
   release (this);
 }
 
+unsigned int Object::UseCount ()
+{
+  return use_count ();
+}
+
 /*
     Получение trackable
 */

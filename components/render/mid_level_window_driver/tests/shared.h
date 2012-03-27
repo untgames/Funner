@@ -118,7 +118,7 @@ class RenderWindow : public IRendererListener, public xtl::trackable
 
       renderer->AttachListener (this);
 
-      OnFrameBufferCreate (renderer->GetFrameBuffer (renderer->GetFrameBuffersCount () - 1));
+      OnFrameBufferCreate (renderer->GetFrameBuffer (renderer->GetFrameBuffersCount () - 1), 0);
 
         //регистрация обработчиков событий окна
 
@@ -139,7 +139,7 @@ class RenderWindow : public IRendererListener, public xtl::trackable
       renderer->DetachListener (this);
     }    
 
-    void OnFrameBufferCreate (IFrameBuffer* new_frame_buffer)
+    void OnFrameBufferCreate (IFrameBuffer* new_frame_buffer, size_t)
     {
       if (frame_buffer)
         return;
