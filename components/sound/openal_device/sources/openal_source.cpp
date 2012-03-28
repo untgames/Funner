@@ -33,10 +33,8 @@ OpenALSource::OpenALSource (OpenALDevice& in_device)
     next_active (0),
     log (LOG_NAME)
 {
-  alGetError   ();
-  alGenSources (1, &al_source);
-
-  OpenALContext& context = device.Context ();
+  alGetError ();
+  device.Context ().alGenSources (1, &al_source);
 
   if (alGetError () != AL_NO_ERROR)
     throw xtl::format_exception<OpenALException> ("sound::low_level::OpenALSource::OpenALSource", "No enough sources");
@@ -44,8 +42,6 @@ OpenALSource::OpenALSource (OpenALDevice& in_device)
 
 OpenALSource::~OpenALSource ()
 {
-  OpenALContext& context = device.Context ();
-
   Deactivate ();
 
   try
