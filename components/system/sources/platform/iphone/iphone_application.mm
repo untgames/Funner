@@ -194,7 +194,7 @@ typedef stl::vector<syslib::iphone::IApplicationListener*> ListenerArray;
 {
   application_launched = true;
   
-  application_delegate->OnInitialized ();
+  application_delegate->OnInitialize ();
 
   idle_timer.paused = NO;
 
