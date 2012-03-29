@@ -90,30 +90,31 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
   LowLevelTexturePtr         page_textures [scene_graph::PageCurlPageType_Num];                     //текстуры страниц
   SpriteMaterialPtr          page_materials [scene_graph::PageCurlPageType_Num];                    //материалы страниц
   size_t                     current_page_material_name_hashes [scene_graph::PageCurlPageType_Num]; //хэш текущего имени материалов страниц
-  LowLevelFramePtr           low_level_frame;                   //фрейм кастомной отрисовки
-  BlendStatePtr              none_blend_state;                  //состояния блендинга
-  BlendStatePtr              translucent_blend_state;           //состояния блендинга
-  BlendStatePtr              mask_blend_state;                  //состояния блендинга
-  BlendStatePtr              additive_blend_state;              //состояния блендинга
-  InputLayoutPtr             input_layout;                      //состояние устройства отрисовки
-  ProgramPtr                 default_program;                   //шейдер
-  ProgramParametersLayoutPtr program_parameters_layout;         //расположение параметров шейдера
-  SamplerStatePtr            sampler_state;                     //сэмплер
-  RasterizerStatePtr         rasterizer_no_cull_state;          //состояние растеризатора без отсечения
-  RasterizerStatePtr         rasterizer_cull_back_state;        //состояние растеризатора с отсечением задних сторон треугольников
-  RasterizerStatePtr         rasterizer_cull_front_state;       //состояние растеризатора с отсечением передних сторон треугольников
-  RasterizerStatePtr         rasterizer_scissor_enabled_state;  //состояние растеризатора с областью отсечением
-  DepthStencilStatePtr       depth_stencil_state;               //состояние буфера попиксельного отсечения
-  BufferPtr                  constant_buffer;                   //константный буфер
-  BufferPtr                  quad_vertex_buffer;                //вершинный буфер на два треугольника
-  BufferPtr                  quad_index_buffer;                 //индексный буфер на два треугольника
-  StateBlockPtr              render_state;                      //сохранение состояния рендера
-  math::vec3f                view_point;                        //позиция камеры
-  math::mat4f                projection;                        //матрица камеры
-  mid_level::Viewport        viewport;                          //область вывода
-  RenderablePageCurlMeshPtr  curled_page;                       //сетка изгибаемой страницы
-  math::vec2ui               current_page_grid_size;            //текущий размер сетки страницы
-  bool                       initialized;                       //инициализированы ли необходимые поля
+  LowLevelFramePtr           low_level_frame;                    //фрейм кастомной отрисовки
+  BlendStatePtr              none_blend_state;                   //состояния блендинга
+  BlendStatePtr              translucent_blend_state;            //состояния блендинга
+  BlendStatePtr              mask_blend_state;                   //состояния блендинга
+  BlendStatePtr              additive_blend_state;               //состояния блендинга
+  InputLayoutPtr             input_layout;                       //состояние устройства отрисовки
+  ProgramPtr                 default_program;                    //шейдер
+  ProgramParametersLayoutPtr program_parameters_layout;          //расположение параметров шейдера
+  SamplerStatePtr            sampler_state;                      //сэмплер
+  RasterizerStatePtr         rasterizer_no_cull_state;           //состояние растеризатора без отсечения
+  RasterizerStatePtr         rasterizer_cull_back_state;         //состояние растеризатора с отсечением задних сторон треугольников
+  RasterizerStatePtr         rasterizer_cull_front_state;        //состояние растеризатора с отсечением передних сторон треугольников
+  RasterizerStatePtr         rasterizer_scissor_enabled_state;   //состояние растеризатора с областью отсечением
+  DepthStencilStatePtr       depth_stencil_state_write_enabled;  //состояние буфера попиксельного отсечения
+  DepthStencilStatePtr       depth_stencil_state_write_disabled; //состояние буфера попиксельного отсечения
+  BufferPtr                  constant_buffer;                    //константный буфер
+  BufferPtr                  quad_vertex_buffer;                 //вершинный буфер на два треугольника
+  BufferPtr                  quad_index_buffer;                  //индексный буфер на два треугольника
+  StateBlockPtr              render_state;                       //сохранение состояния рендера
+  math::vec3f                view_point;                         //позиция камеры
+  math::mat4f                projection;                         //матрица камеры
+  mid_level::Viewport        viewport;                           //область вывода
+  RenderablePageCurlMeshPtr  curled_page;                        //сетка изгибаемой страницы
+  math::vec2ui               current_page_grid_size;             //текущий размер сетки страницы
+  bool                       initialized;                        //инициализированы ли необходимые поля
 
   ///Конструктор
   Impl (scene_graph::PageCurl* in_page_curl, Render& in_render, Renderable* in_renderable)
@@ -366,14 +367,14 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
   }
 
   //создание состояния буфера попиксельного отсечения
-  DepthStencilStatePtr CreateDepthStencilState (low_level::IDevice& device)
+  DepthStencilStatePtr CreateDepthStencilState (low_level::IDevice& device, bool write_enabled)
   {
     low_level::DepthStencilDesc depth_stencil_desc;
 
     memset (&depth_stencil_desc, 0, sizeof (depth_stencil_desc));
 
     depth_stencil_desc.depth_test_enable   = true;
-    depth_stencil_desc.depth_write_enable  = true;
+    depth_stencil_desc.depth_write_enable  = write_enabled;
     depth_stencil_desc.depth_compare_mode  = low_level::CompareMode_Less;
 
     return DepthStencilStatePtr (device.CreateDepthStencilState (depth_stencil_desc), false);
@@ -441,20 +442,21 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
   {
     if (!initialized)
     {
-      none_blend_state                 = CreateBlendState              (device, false, low_level::BlendArgument_Zero, low_level::BlendArgument_Zero, low_level::BlendArgument_Zero);
-      translucent_blend_state          = CreateBlendState              (device, true, low_level::BlendArgument_SourceAlpha, low_level::BlendArgument_InverseSourceAlpha, low_level::BlendArgument_InverseSourceAlpha);
-      mask_blend_state                 = CreateBlendState              (device, true, low_level::BlendArgument_Zero, low_level::BlendArgument_SourceColor, low_level::BlendArgument_SourceAlpha);
-      additive_blend_state             = CreateBlendState              (device, true, low_level::BlendArgument_SourceAlpha, low_level::BlendArgument_One, low_level::BlendArgument_One);
-      input_layout                     = CreateInputLayout             (device);
-      default_program                  = CreateProgram                 (device, "render.obsolete.renderer2d.RenderablePageCurl.default_program", DEFAULT_SHADER_SOURCE_CODE);
-      program_parameters_layout        = CreateProgramParametersLayout (device);
-      constant_buffer                  = CreateConstantBuffer          (device);
-      rasterizer_no_cull_state         = CreateRasterizerState         (device, low_level::CullMode_None);
-      rasterizer_cull_front_state      = CreateRasterizerState         (device, low_level::CullMode_Front);
-      rasterizer_cull_back_state       = CreateRasterizerState         (device, low_level::CullMode_Back);
-      rasterizer_scissor_enabled_state = CreateRasterizerState         (device, low_level::CullMode_None, true);
-      depth_stencil_state              = CreateDepthStencilState       (device);
-      sampler_state                    = CreateSampler                 (device);
+      none_blend_state                   = CreateBlendState              (device, false, low_level::BlendArgument_Zero, low_level::BlendArgument_Zero, low_level::BlendArgument_Zero);
+      translucent_blend_state            = CreateBlendState              (device, true, low_level::BlendArgument_SourceAlpha, low_level::BlendArgument_InverseSourceAlpha, low_level::BlendArgument_InverseSourceAlpha);
+      mask_blend_state                   = CreateBlendState              (device, true, low_level::BlendArgument_Zero, low_level::BlendArgument_SourceColor, low_level::BlendArgument_SourceAlpha);
+      additive_blend_state               = CreateBlendState              (device, true, low_level::BlendArgument_SourceAlpha, low_level::BlendArgument_One, low_level::BlendArgument_One);
+      input_layout                       = CreateInputLayout             (device);
+      default_program                    = CreateProgram                 (device, "render.obsolete.renderer2d.RenderablePageCurl.default_program", DEFAULT_SHADER_SOURCE_CODE);
+      program_parameters_layout          = CreateProgramParametersLayout (device);
+      constant_buffer                    = CreateConstantBuffer          (device);
+      rasterizer_no_cull_state           = CreateRasterizerState         (device, low_level::CullMode_None);
+      rasterizer_cull_front_state        = CreateRasterizerState         (device, low_level::CullMode_Front);
+      rasterizer_cull_back_state         = CreateRasterizerState         (device, low_level::CullMode_Back);
+      rasterizer_scissor_enabled_state   = CreateRasterizerState         (device, low_level::CullMode_None, true);
+      depth_stencil_state_write_enabled  = CreateDepthStencilState       (device, true);
+      depth_stencil_state_write_disabled = CreateDepthStencilState       (device, false);
+      sampler_state                      = CreateSampler                 (device);
 
       low_level::StateBlockMask state_block_mask;
 
@@ -525,7 +527,7 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
     device.SSSetProgramParametersLayout (program_parameters_layout.get ());
     device.SSSetSampler                 (0, sampler_state.get ());
     device.SSSetProgram                 (default_program.get ());
-    device.OSSetDepthStencilState       (depth_stencil_state.get ());
+    device.OSSetDepthStencilState       (depth_stencil_state_write_enabled.get ());
 
     switch (page_curl->CurlCorner ())
     {
@@ -549,8 +551,10 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
   //Рисование теней
   void DrawShadows (low_level::IDevice& device, float curl_radius, bool left_side)
   {
-    const math::vec2f& total_size      = page_curl->Size ();
-    math::vec2f        page_size       = total_size;
+    device.OSSetDepthStencilState (depth_stencil_state_write_disabled.get ());
+
+    const math::vec2f& total_size = page_curl->Size ();
+    math::vec2f        page_size  = total_size;
 
     if (page_curl->Mode () != PageCurlMode_SinglePage)
       page_size.x /= 2;
@@ -576,11 +580,11 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
 
         math::vec2f top_shadow_corner_position, bottom_shadow_corner_position;
 
-        math::vec2f bottom_side_vector (bottom_corner_position.x - bottom_side_bend_position.x, -bottom_corner_position.y + bottom_side_bend_position.y),
-                    top_side_vector    (top_corner_position.x - top_side_bend_position.x, top_corner_position.y - top_side_bend_position.y),
+        math::vec2f bottom_side_vector (bottom_corner_position.x - bottom_side_bend_position.x, bottom_corner_position.y - bottom_side_bend_position.y),
+                    top_side_vector    (top_corner_position.x - top_side_bend_position.x, top_side_bend_position.y - top_corner_position.y),
                     side_vector        (top_corner_position.x - bottom_corner_position.x, top_corner_position.y - bottom_corner_position.y);
 
-        if (!left_side)
+        if (left_side)
         {
           bottom_side_vector.y *= -1;
           top_side_vector.y    *= -1;
@@ -594,6 +598,11 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
 
         math::vec2f top_corner_offset    (normalize (math::vec2f (-top_side_vector.x + top_side_vector.y, top_side_vector.y + top_side_vector.x))),
                     bottom_corner_offset (normalize (math::vec2f (-bottom_side_vector.x + bottom_side_vector.y, bottom_side_vector.y + bottom_side_vector.x)));
+
+        if (top_corner_offset.x != top_corner_offset.x)
+          top_corner_offset = 0;
+        if (bottom_corner_offset.x != bottom_corner_offset.x)
+          bottom_corner_offset = 0;
 
         float shadow_grow_power               = page_curl->ShadowGrowPower (),
               top_shadow_offset_multiplier    = pow (length (side_vector), shadow_grow_power) * pow (top_corner_position.z / (page_curl->CurlRadius () * 2), shadow_grow_power),
@@ -618,6 +627,13 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
         bottom_shadow_corner_position.x = bottom_corner_position.x - bottom_corner_offset.x * shadow_corner_offset * bottom_shadow_offset_multiplier;
         bottom_shadow_corner_position.y = bottom_corner_position.y - bottom_corner_offset.y * shadow_corner_offset * bottom_shadow_offset_multiplier;
 
+        math::vec2f bottom_curl_position = curled_page->HasBottomSideBendPosition () ? curled_page->GetBottomSideBendPosition () : side_bend_position;
+        math::vec2f top_curl_position    = curled_page->HasTopSideBendPosition () ? curled_page->GetTopSideBendPosition () : side_bend_position;
+        math::vec2f binding_vector       = math::normalize (top_curl_position - bottom_curl_position);
+
+        top_side_bend_position    += binding_vector * shadow_corner_offset;
+        bottom_side_bend_position -= binding_vector * shadow_corner_offset;
+
         if (fabs (top_corner_position.z) < curl_radius)
         {
           top_shadow_corner_position = side_bend_position;
@@ -633,6 +649,10 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
 
         for (size_t i = 0; i < 4; i++)
           vertices [i].color = 255;
+
+/*        printf ("corner = %f %f bscp = %f %f bsbp = %f %f tscp = %f %f tsbp = %f %f\n", right_bottom_corner_position.x, right_bottom_corner_position.y,
+                bottom_shadow_corner_position.x, bottom_shadow_corner_position.y, bottom_side_bend_position.x, bottom_side_bend_position.y,
+                top_shadow_corner_position.x, top_shadow_corner_position.y, top_side_bend_position.x, top_side_bend_position.y);*/
 
         vertices [0].position = math::vec3f (bottom_shadow_corner_position.x + x_offset, bottom_shadow_corner_position.y, curl_radius);
         vertices [1].position = math::vec3f (bottom_side_bend_position.x + x_offset, bottom_side_bend_position.y, curl_radius);
