@@ -760,7 +760,7 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
       if (!left_side)
         shadow_offset *= -1;
 
-      float shadow_width = page_size.x * page_curl->ShadowWidth ();
+      float shadow_width = page_size.x * page_curl->ShadowWidth () * curl_radius / page_curl->CurlRadius ();
 
       vertices [0].position = math::vec3f (top_detach_position.x + x_offset,                                     top_detach_position.y,                                     BACK_SHADOW_OFFSET);
       vertices [1].position = math::vec3f (bottom_detach_position.x + x_offset,                                  bottom_detach_position.y,                                  BACK_SHADOW_OFFSET);
@@ -776,8 +776,8 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
 
       scissor_rect.x = viewport.x + (left_bottom_corner_screen.x + 1) / 2 * viewport.width;
       scissor_rect.y = viewport.y + (left_bottom_corner_screen.y + 1) / 2 * viewport.height;
-      scissor_rect.width  = (right_top_corner_screen.x - left_bottom_corner_screen.x) / 2 * viewport.width;
-      scissor_rect.height = (right_top_corner_screen.y - left_bottom_corner_screen.y) / 2 * viewport.height;
+      scissor_rect.width  = ceil ((right_top_corner_screen.x - left_bottom_corner_screen.x) / 2 * viewport.width);
+      scissor_rect.height = ceil ((right_top_corner_screen.y - left_bottom_corner_screen.y) / 2 * viewport.height);
 
       device.RSSetState (rasterizer_scissor_enabled_state.get ());
       device.RSSetScissor (scissor_rect);
