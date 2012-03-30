@@ -11,27 +11,28 @@ using namespace syslib::android;
 
 struct syslib::window_handle
 {
-  global_ref<jobject>  view;                           //android окно
-  NativeWindow         window;                         //описание окна
-  WindowMessageHandler message_handler;                //обработчик сообщений
-  void*                user_data;                      //пользовательские данные окна
-  unsigned int         background_color;               //цвет заднего плана
-  unsigned int         background_state;               //наличие заднего фона
-  jmethodID            get_top_method;                 //метод получения верхнего угла окна
-  jmethodID            get_left_method;                //метод получения левого угла окна
-  jmethodID            get_width_method;               //метод получения ширины окна
-  jmethodID            get_height_method;              //метод получения высоты окна
-  jmethodID            layout_method;                  //метод установки размеров и положения окна
-  jmethodID            set_visibility_method;          //метод установки видимости окна
-  jmethodID            get_visibility_method;          //метод получения видимости окна
-  jmethodID            request_focus_method;           //метод запроса фокуса ввода
-  jmethodID            set_background_color_method;    //метод установки цвета заднего плана окна
-  jmethodID            maximize_method;                //метод максимизации окна
-  jmethodID            get_surface_method;             //метод получения поверхности
-  jmethodID            post_invalidate_method;         //метод оповещения о необходимости перерисовки окна
-  jmethodID            bring_to_front_method;          //метод перемещения окна на передний план
-  bool                 is_multitouch_enabled;          //включен ли multitouch
-  volatile bool        is_native_handle_received;      //получен ли android window handle
+  global_ref<jobject>  view;                             //android окно
+  NativeWindow         window;                           //описание окна
+  WindowMessageHandler message_handler;                  //обработчик сообщений
+  void*                user_data;                        //пользовательские данные окна
+  unsigned int         background_color;                 //цвет заднего плана
+  unsigned int         background_state;                 //наличие заднего фона
+  jmethodID            get_top_method;                   //метод получения верхнего угла окна
+  jmethodID            get_left_method;                  //метод получения левого угла окна
+  jmethodID            get_width_method;                 //метод получения ширины окна
+  jmethodID            get_height_method;                //метод получения высоты окна
+  jmethodID            layout_method;                    //метод установки размеров и положения окна
+  jmethodID            set_visibility_method;            //метод установки видимости окна
+  jmethodID            get_visibility_method;            //метод получения видимости окна
+  jmethodID            request_focus_method;             //метод запроса фокуса ввода
+  jmethodID            set_background_color_method;      //метод установки цвета заднего плана окна
+  jmethodID            maximize_method;                  //метод максимизации окна
+  jmethodID            get_surface_method;               //метод получения поверхности
+  jmethodID            post_invalidate_method;           //метод оповещения о необходимости перерисовки окна
+  jmethodID            bring_to_front_method;            //метод перемещения окна на передний план
+  jmethodID            remove_from_parent_window_method; //метод удаления окна
+  bool                 is_multitouch_enabled;            //включен ли multitouch
+  volatile bool        is_native_handle_received;        //получен ли android window handle
   
 ///Конструктор
   window_handle ()
@@ -51,6 +52,18 @@ struct syslib::window_handle
 ///Деструктор
   ~window_handle ()
   {
+    try
+    {
+      JNIEnv& env = get_env ();
+      
+      env.CallVoidMethod (view.get (), remove_from_parent_window_method);
+      
+      check_errors ();      
+    }
+    catch (...)
+    {
+    }
+    
     MessageQueueSingleton::Instance ()->UnregisterHandler (this);
     
     if (window.native_window)
@@ -512,19 +525,20 @@ window_t AndroidWindowManager::CreateWindow (WindowStyle, WindowMessageHandler h
     if (!view_class)
       throw xtl::format_operation_exception ("", "JNIEnv::GetObjectClass failed (for View)");      
       
-    window->get_left_method             = find_method (&env, view_class.get (), "getLeftThreadSafe", "()I");
-    window->get_top_method              = find_method (&env, view_class.get (), "getTopThreadSafe", "()I");
-    window->get_width_method            = find_method (&env, view_class.get (), "getWidthThreadSafe", "()I");
-    window->get_height_method           = find_method (&env, view_class.get (), "getHeightThreadSafe", "()I");
-    window->layout_method               = find_method (&env, view_class.get (), "layoutThreadSafe", "(IIII)V");
-    window->set_visibility_method       = find_method (&env, view_class.get (), "setVisibilityThreadSafe", "(I)V");
-    window->get_visibility_method       = find_method (&env, view_class.get (), "getVisibilityThreadSafe", "()I");
-    window->request_focus_method        = find_method (&env, view_class.get (), "requestFocusThreadSafe", "()Z");
-    window->bring_to_front_method       = find_method (&env, view_class.get (), "bringToFrontThreadSafe", "()V");
-    window->set_background_color_method = find_method (&env, view_class.get (), "setBackgroundColorThreadSafe", "(I)V");
-    window->maximize_method             = find_method (&env, view_class.get (), "maximizeThreadSafe", "()V");
-    window->get_surface_method          = find_method (&env, view_class.get (), "getSurfaceThreadSafe", "()Landroid/view/Surface;");
-    window->post_invalidate_method      = find_method (&env, view_class.get (), "postInvalidate", "()V");
+    window->get_left_method                  = find_method (&env, view_class.get (), "getLeftThreadSafe", "()I");
+    window->get_top_method                   = find_method (&env, view_class.get (), "getTopThreadSafe", "()I");
+    window->get_width_method                 = find_method (&env, view_class.get (), "getWidthThreadSafe", "()I");
+    window->get_height_method                = find_method (&env, view_class.get (), "getHeightThreadSafe", "()I");
+    window->layout_method                    = find_method (&env, view_class.get (), "layoutThreadSafe", "(IIII)V");
+    window->set_visibility_method            = find_method (&env, view_class.get (), "setVisibilityThreadSafe", "(I)V");
+    window->get_visibility_method            = find_method (&env, view_class.get (), "getVisibilityThreadSafe", "()I");
+    window->request_focus_method             = find_method (&env, view_class.get (), "requestFocusThreadSafe", "()Z");
+    window->bring_to_front_method            = find_method (&env, view_class.get (), "bringToFrontThreadSafe", "()V");
+    window->set_background_color_method      = find_method (&env, view_class.get (), "setBackgroundColorThreadSafe", "(I)V");
+    window->maximize_method                  = find_method (&env, view_class.get (), "maximizeThreadSafe", "()V");
+    window->get_surface_method               = find_method (&env, view_class.get (), "getSurfaceThreadSafe", "()Landroid/view/Surface;");
+    window->post_invalidate_method           = find_method (&env, view_class.get (), "postInvalidate", "()V");
+    window->remove_from_parent_window_method = find_method (&env, view_class.get (), "removeFromParentWindowThreadSafe", "()V");
 
       //получение дескриптора поверхности
     
@@ -562,16 +576,46 @@ window_t AndroidWindowManager::CreateWindow (WindowStyle, WindowMessageHandler h
   }
 }
 
-void AndroidWindowManager::CloseWindow (window_t)
+void AndroidWindowManager::CloseWindow (window_t window)
 {
-  throw xtl::make_not_implemented_exception ("syslib::AndroidWindowManager::CloseWindow");
+  try
+  {
+    if (!window)
+      throw xtl::make_null_argument_exception ("", "window");
+      
+    WindowEventContext context;
+
+    memset (&context, 0, sizeof (context));          
+
+    window->Notify (WindowEvent_OnClose, context);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("syslib::AndroidWindowManager::CloseWindow");
+    throw;
+  }
 }
 
-void AndroidWindowManager::DestroyWindow (window_t)
+void AndroidWindowManager::DestroyWindow (window_t window)
 {
-  //TODO: release window handle
+  try
+  {
+    if (!window)
+      throw xtl::make_null_argument_exception ("", "window");
+      
+    WindowEventContext context;
 
-  throw xtl::make_not_implemented_exception ("syslib::AndroidWindowManager::DestroyWindow");
+    memset (&context, 0, sizeof (context));          
+
+    window->Notify (WindowEvent_OnDestroy, context);
+    
+    delete window;
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("syslib::AndroidWindowManager::CloseWindow");
+    throw;
+  }
 }
 
 /*

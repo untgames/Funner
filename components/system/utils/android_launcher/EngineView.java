@@ -57,6 +57,18 @@ public class EngineView extends SurfaceView implements SurfaceHolder.Callback
     return windowRef;
   }
   
+  public void removeFromParentWindowThreadSafe ()
+  {
+    UiDispatch.run (this, new UiRunnable () {
+      public Object run ()
+      {
+        setVisibility (GONE);
+
+        return null;
+      }
+    });
+  }
+  
   public Surface getSurfaceThreadSafe ()
   {
     Surface result = (Surface)UiDispatch.run (this, new UiRunnable () {
