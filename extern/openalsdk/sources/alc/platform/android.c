@@ -77,13 +77,13 @@ static void* thread_function(void* arg)
     (*env)->PushLocalFrame(env, 2);
 
     int sampleRateInHz = device->Frequency;
-    int channelConfig = aluChannelsFromFormat(device->Format) == 1 ? CHANNEL_CONFIGURATION_MONO : CHANNEL_CONFIGURATION_STEREO;
-    int audioFormat = aluBytesFromFormat(device->Format) == 1 ? ENCODING_PCM_8BIT : ENCODING_PCM_16BIT;
+    int channelConfig = ChannelsFromDevFmt(device->FmtChans) == 1 ? CHANNEL_CONFIGURATION_MONO : CHANNEL_CONFIGURATION_STEREO;
+    int audioFormat = BytesFromDevFmt(device->FmtType) == 1 ? ENCODING_PCM_8BIT : ENCODING_PCM_16BIT;
 
     int bufferSizeInBytes = (*env)->CallStaticIntMethod(env, cAudioTrack, 
         mGetMinBufferSize, sampleRateInHz, channelConfig, audioFormat);
 
-    int bufferSizeInSamples = bufferSizeInBytes / aluFrameSizeFromFormat(device->Format);
+    int bufferSizeInSamples = bufferSizeInBytes / FrameSizeFromDevFmt(device->FmtChans, device->FmtType);
 
     jobject track = (*env)->NewObject(env, cAudioTrack, mAudioTrack,
         STREAM_MUSIC, sampleRateInHz, channelConfig, audioFormat, device->NumUpdates * bufferSizeInBytes, MODE_STREAM);
@@ -118,12 +118,10 @@ static void* thread_function(void* arg)
     return NULL;
 }
 
-static ALCboolean android_open_playback(ALCdevice *device, const ALCchar *deviceName)
+static ALCenum android_open_playback(ALCdevice *device, const ALCchar *deviceName)
 {
     JNIEnv* env = GetEnv();
     AndroidData* data;
-    int channels;
-    int bytes;
 
     if (!cAudioTrack)
     {
@@ -135,7 +133,7 @@ static ALCboolean android_open_playback(ALCdevice *device, const ALCchar *device
         if (!cAudioTrack)
         {
             AL_PRINT("android.media.AudioTrack class is not found. Are you running at least 1.5 version?");
-            return ALC_FALSE;
+            return ALC_INVALID_VALUE;
         }
 
         cAudioTrack = (*env)->NewGlobalRef(env, cAudioTrack);
@@ -154,13 +152,13 @@ static ALCboolean android_open_playback(ALCdevice *device, const ALCchar *device
     }
     else if (strcmp(deviceName, android_device) != 0)
     {
-        return ALC_FALSE;
+        return ALC_INVALID_VALUE;
     }
 
     data = (AndroidData*)calloc(1, sizeof(*data));
     device->szDeviceName = strdup(deviceName);
     device->ExtraData = data;
-    return ALC_TRUE;
+    return ALC_NO_ERROR;
 }
 
 static void android_close_playback(ALCdevice *device)
@@ -177,16 +175,23 @@ static ALCboolean android_reset_playback(ALCdevice *device)
 {
     AndroidData* data = (AndroidData*)device->ExtraData;
 
-    if (aluChannelsFromFormat(device->Format) >= 2)
+/*    if (ChannelsFromDevFmt(device->FmtChans) >= 2)
     {
-        device->Format = aluBytesFromFormat(device->Format) >= 2 ? AL_FORMAT_STEREO16 : AL_FORMAT_STEREO8;
+        device->Format = BytesFromDevFmt(device->FmtType) >= 2 ? AL_FORMAT_STEREO16 : AL_FORMAT_STEREO8;
     }
     else
     {
-        device->Format = aluBytesFromFormat(device->Format) >= 2 ? AL_FORMAT_MONO16 : AL_FORMAT_MONO8;
-    }
+        device->Format = BytesFromDevFmt(device->FmtType) >= 2 ? AL_FORMAT_MONO16 : AL_FORMAT_MONO8;
+    }*/
 
     SetDefaultChannelOrder(device);
+
+    return ALC_TRUE;
+}
+
+static ALCboolean android_start_playback(ALCdevice *device)
+{
+    AndroidData* data = (AndroidData*)device->ExtraData;
 
     data->running = 1;
     pthread_create(&data->thread, NULL, thread_function, device);
@@ -205,11 +210,11 @@ static void android_stop_playback(ALCdevice *device)
     }
 }
 
-static ALCboolean android_open_capture(ALCdevice *pDevice, const ALCchar *deviceName)
+static ALCenum android_open_capture(ALCdevice *pDevice, const ALCchar *deviceName)
 {
     (void)pDevice;
     (void)deviceName;
-    return ALC_FALSE;
+    return ALC_NO_ERROR;
 }
 
 static void android_close_capture(ALCdevice *pDevice)
@@ -227,11 +232,12 @@ static void android_stop_capture(ALCdevice *pDevice)
     (void)pDevice;
 }
 
-static void android_capture_samples(ALCdevice *pDevice, ALCvoid *pBuffer, ALCuint lSamples)
+static ALCenum android_capture_samples(ALCdevice *pDevice, ALCvoid *pBuffer, ALCuint lSamples)
 {
     (void)pDevice;
     (void)pBuffer;
     (void)lSamples;
+    return ALC_NO_ERROR;
 }
 
 static ALCuint android_available_samples(ALCdevice *pDevice)
@@ -244,6 +250,7 @@ static const BackendFuncs android_funcs = {
     android_open_playback,
     android_close_playback,
     android_reset_playback,
+    android_start_playback,    
     android_stop_playback,
     android_open_capture,
     android_close_capture,
@@ -268,9 +275,9 @@ void alc_android_deinit(void)
 
 void alc_android_probe(int type)
 {
-    if (type == DEVICE_PROBE)
+    if (type == CAPTURE_DEVICE_PROBE)
     {
-        AppendDeviceList(android_device);
+        AppendCaptureDeviceList(android_device);
     }
     else if (type == ALL_DEVICE_PROBE)
     {

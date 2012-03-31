@@ -63,55 +63,77 @@ static const ALuint channel_masks[] = {
     0x1 | 0x2 | 0x4 | 0x8 | 0x10 | 0x20 | 0x200 | 0x400, /* 7.1 */
 };
 
+
+static void fwrite16le(ALushort val, FILE *f)
+{
+    fputc(val&0xff, f);
+    fputc((val>>8)&0xff, f);
+}
+
+static void fwrite32le(ALuint val, FILE *f)
+{
+    fputc(val&0xff, f);
+    fputc((val>>8)&0xff, f);
+    fputc((val>>16)&0xff, f);
+    fputc((val>>24)&0xff, f);
+}
+
+
 static ALuint WaveProc(ALvoid *ptr)
 {
     ALCdevice *pDevice = (ALCdevice*)ptr;
     wave_data *data = (wave_data*)pDevice->ExtraData;
     ALuint frameSize;
-    ALuint now, last;
+    ALuint now, start;
+    ALuint64 avail, done;
     size_t fs;
-    ALuint avail;
-    union {
-        short s;
-        char b[sizeof(short)];
-    } uSB;
+    const ALuint restTime = (ALuint64)pDevice->UpdateSize * 1000 /
+                            pDevice->Frequency / 2;
 
-    uSB.s = 1;
-    frameSize = aluBytesFromFormat(pDevice->Format) *
-                aluChannelsFromFormat(pDevice->Format);
+    frameSize = FrameSizeFromDevFmt(pDevice->FmtChans, pDevice->FmtType);
 
-    last = timeGetTime()<<8;
+    done = 0;
+    start = timeGetTime();
     while(!data->killNow && pDevice->Connected)
     {
-        now = timeGetTime()<<8;
+        now = timeGetTime();
 
-        avail = (ALuint64)(now-last) * pDevice->Frequency / (1000<<8);
-        if(avail < pDevice->UpdateSize)
+        avail = (ALuint64)(now-start) * pDevice->Frequency / 1000;
+        if(avail < done)
         {
-            Sleep(1);
+            /* Timer wrapped (50 days???). Add the remainder of the cycle to
+             * the available count and reset the number of samples done */
+            avail += ((ALuint64)1<<32)*pDevice->Frequency/1000 - done;
+            done = 0;
+        }
+        if(avail-done < pDevice->UpdateSize)
+        {
+            Sleep(restTime);
             continue;
         }
 
-        while(avail >= pDevice->UpdateSize)
+        while(avail-done >= pDevice->UpdateSize)
         {
             aluMixData(pDevice, data->buffer, pDevice->UpdateSize);
+            done += pDevice->UpdateSize;
 
-            if(uSB.b[0] != 1)
+            if(!IS_LITTLE_ENDIAN)
             {
+                ALuint bytesize = BytesFromDevFmt(pDevice->FmtType);
                 ALubyte *bytes = data->buffer;
                 ALuint i;
 
-                if(aluBytesFromFormat(pDevice->Format) == 1)
+                if(bytesize == 1)
                 {
                     for(i = 0;i < data->size;i++)
                         fputc(bytes[i], data->f);
                 }
-                else if(aluBytesFromFormat(pDevice->Format) == 2)
+                else if(bytesize == 2)
                 {
                     for(i = 0;i < data->size;i++)
                         fputc(bytes[i^1], data->f);
                 }
-                else if(aluBytesFromFormat(pDevice->Format) == 4)
+                else if(bytesize == 4)
                 {
                     for(i = 0;i < data->size;i++)
                         fputc(bytes[i^3], data->f);
@@ -122,32 +144,29 @@ static ALuint WaveProc(ALvoid *ptr)
                             data->f);
             if(ferror(data->f))
             {
-                AL_PRINT("Error writing to file\n");
+                ERR("Error writing to file\n");
                 aluHandleDisconnect(pDevice);
                 break;
             }
-
-            avail -= pDevice->UpdateSize;
-            last += (ALuint64)pDevice->UpdateSize * (1000<<8) / pDevice->Frequency;
         }
     }
 
     return 0;
 }
 
-static ALCboolean wave_open_playback(ALCdevice *device, const ALCchar *deviceName)
+static ALCenum wave_open_playback(ALCdevice *device, const ALCchar *deviceName)
 {
     wave_data *data;
     const char *fname;
 
     fname = GetConfigValue("wave", "file", "");
     if(!fname[0])
-        return ALC_FALSE;
+        return ALC_INVALID_VALUE;
 
     if(!deviceName)
         deviceName = waveDevice;
     else if(strcmp(deviceName, waveDevice) != 0)
-        return ALC_FALSE;
+        return ALC_INVALID_VALUE;
 
     data = (wave_data*)calloc(1, sizeof(wave_data));
 
@@ -155,13 +174,13 @@ static ALCboolean wave_open_playback(ALCdevice *device, const ALCchar *deviceNam
     if(!data->f)
     {
         free(data);
-        AL_PRINT("Could not open file '%s': %s\n", fname, strerror(errno));
-        return ALC_FALSE;
+        ERR("Could not open file '%s': %s\n", fname, strerror(errno));
+        return ALC_INVALID_VALUE;
     }
 
     device->szDeviceName = strdup(deviceName);
     device->ExtraData = data;
-    return ALC_TRUE;
+    return ALC_NO_ERROR;
 }
 
 static void wave_close_playback(ALCdevice *device)
@@ -176,105 +195,87 @@ static void wave_close_playback(ALCdevice *device)
 static ALCboolean wave_reset_playback(ALCdevice *device)
 {
     wave_data *data = (wave_data*)device->ExtraData;
-    ALuint channels, bits, i;
+    ALuint channels=0, bits=0;
     size_t val;
 
     fseek(data->f, 0, SEEK_SET);
     clearerr(data->f);
 
-    bits = aluBytesFromFormat(device->Format) * 8;
-    channels = aluChannelsFromFormat(device->Format);
-
-    /* 7.1 max */
-    if(channels > 8)
+    switch(device->FmtType)
     {
-        if(bits == 8)
-            device->Format = AL_FORMAT_71CHN8;
-        else if(bits == 16)
-            device->Format = AL_FORMAT_71CHN16;
-        else
-        {
-            device->Format = AL_FORMAT_71CHN32;
-            bits = 32;
-        }
-        channels = 8;
+        case DevFmtByte:
+            device->FmtType = DevFmtUByte;
+            break;
+        case DevFmtUShort:
+            device->FmtType = DevFmtShort;
+            break;
+        case DevFmtUInt:
+            device->FmtType = DevFmtInt;
+            break;
+        case DevFmtUByte:
+        case DevFmtShort:
+        case DevFmtInt:
+        case DevFmtFloat:
+            break;
     }
+    bits = BytesFromDevFmt(device->FmtType) * 8;
+    channels = ChannelsFromDevFmt(device->FmtChans);
 
     fprintf(data->f, "RIFF");
-    fputc(0xFF, data->f); // 'RIFF' header len; filled in at close
-    fputc(0xFF, data->f);
-    fputc(0xFF, data->f);
-    fputc(0xFF, data->f);
+    fwrite32le(0xFFFFFFFF, data->f); // 'RIFF' header len; filled in at close
 
     fprintf(data->f, "WAVE");
 
     fprintf(data->f, "fmt ");
-    fputc(40, data->f); // 'fmt ' header len; 40 bytes for EXTENSIBLE
-    fputc(0, data->f);
-    fputc(0, data->f);
-    fputc(0, data->f);
+    fwrite32le(40, data->f); // 'fmt ' header len; 40 bytes for EXTENSIBLE
+
     // 16-bit val, format type id (extensible: 0xFFFE)
-    fputc(0xFE, data->f);
-    fputc(0xFF, data->f);
+    fwrite16le(0xFFFE, data->f);
     // 16-bit val, channel count
-    fputc(channels&0xff, data->f);
-    fputc((channels>>8)&0xff, data->f);
+    fwrite16le(channels, data->f);
     // 32-bit val, frequency
-    fputc(device->Frequency&0xff, data->f);
-    fputc((device->Frequency>>8)&0xff, data->f);
-    fputc((device->Frequency>>16)&0xff, data->f);
-    fputc((device->Frequency>>24)&0xff, data->f);
+    fwrite32le(device->Frequency, data->f);
     // 32-bit val, bytes per second
-    i = device->Frequency * channels * bits / 8;
-    fputc(i&0xff, data->f);
-    fputc((i>>8)&0xff, data->f);
-    fputc((i>>16)&0xff, data->f);
-    fputc((i>>24)&0xff, data->f);
+    fwrite32le(device->Frequency * channels * bits / 8, data->f);
     // 16-bit val, frame size
-    i = channels * bits / 8;
-    fputc(i&0xff, data->f);
-    fputc((i>>8)&0xff, data->f);
+    fwrite16le(channels * bits / 8, data->f);
     // 16-bit val, bits per sample
-    fputc(bits&0xff, data->f);
-    fputc((bits>>8)&0xff, data->f);
+    fwrite16le(bits, data->f);
     // 16-bit val, extra byte count
-    fputc(22, data->f);
-    fputc(0, data->f);
+    fwrite16le(22, data->f);
     // 16-bit val, valid bits per sample
-    fputc(bits&0xff, data->f);
-    fputc((bits>>8)&0xff, data->f);
+    fwrite16le(bits, data->f);
     // 32-bit val, channel mask
-    i = channel_masks[channels];
-    fputc(i&0xff, data->f);
-    fputc((i>>8)&0xff, data->f);
-    fputc((i>>16)&0xff, data->f);
-    fputc((i>>24)&0xff, data->f);
+    fwrite32le(channel_masks[channels], data->f);
     // 16 byte GUID, sub-type format
     val = fwrite(((bits==32) ? SUBTYPE_FLOAT : SUBTYPE_PCM), 1, 16, data->f);
 
     fprintf(data->f, "data");
-    fputc(0xFF, data->f); // 'data' header len; filled in at close
-    fputc(0xFF, data->f);
-    fputc(0xFF, data->f);
-    fputc(0xFF, data->f);
+    fwrite32le(0xFFFFFFFF, data->f); // 'data' header len; filled in at close
 
     if(ferror(data->f))
     {
-        AL_PRINT("Error writing header: %s\n", strerror(errno));
+        ERR("Error writing header: %s\n", strerror(errno));
         return ALC_FALSE;
     }
-
     data->DataStart = ftell(data->f);
 
-    data->size = device->UpdateSize * channels * bits / 8;
+    SetDefaultWFXChannelOrder(device);
+
+    return ALC_TRUE;
+}
+
+static ALCboolean wave_start_playback(ALCdevice *device)
+{
+    wave_data *data = (wave_data*)device->ExtraData;
+
+    data->size = device->UpdateSize * FrameSizeFromDevFmt(device->FmtChans, device->FmtType);
     data->buffer = malloc(data->size);
     if(!data->buffer)
     {
-        AL_PRINT("buffer malloc failed\n");
+        ERR("Buffer malloc failed\n");
         return ALC_FALSE;
     }
-
-    SetDefaultWFXChannelOrder(device);
 
     data->thread = StartThread(WaveProc, device);
     if(data->thread == NULL)
@@ -310,38 +311,20 @@ static void wave_stop_playback(ALCdevice *device)
     {
         dataLen = size - data->DataStart;
         if(fseek(data->f, data->DataStart-4, SEEK_SET) == 0)
-        {
-            fputc(dataLen&0xff, data->f); // 'data' header len
-            fputc((dataLen>>8)&0xff, data->f);
-            fputc((dataLen>>16)&0xff, data->f);
-            fputc((dataLen>>24)&0xff, data->f);
-        }
+            fwrite32le(dataLen, data->f); // 'data' header len
         if(fseek(data->f, 4, SEEK_SET) == 0)
-        {
-            size -= 8;
-            fputc(size&0xff, data->f); // 'WAVE' header len
-            fputc((size>>8)&0xff, data->f);
-            fputc((size>>16)&0xff, data->f);
-            fputc((size>>24)&0xff, data->f);
-        }
+            fwrite32le(size-8, data->f); // 'WAVE' header len
     }
 }
 
 
-static ALCboolean wave_open_capture(ALCdevice *pDevice, const ALCchar *deviceName)
-{
-    (void)pDevice;
-    (void)deviceName;
-    return ALC_FALSE;
-}
-
-
-BackendFuncs wave_funcs = {
+static const BackendFuncs wave_funcs = {
     wave_open_playback,
     wave_close_playback,
     wave_reset_playback,
+    wave_start_playback,
     wave_stop_playback,
-    wave_open_capture,
+    NULL,
     NULL,
     NULL,
     NULL,
@@ -349,22 +332,27 @@ BackendFuncs wave_funcs = {
     NULL
 };
 
-void alc_wave_init(BackendFuncs *func_list)
+ALCboolean alc_wave_init(BackendFuncs *func_list)
 {
     *func_list = wave_funcs;
+    return ALC_TRUE;
 }
 
 void alc_wave_deinit(void)
 {
 }
 
-void alc_wave_probe(int type)
+void alc_wave_probe(enum DevProbe type)
 {
     if(!ConfigValueExists("wave", "file"))
         return;
 
-    if(type == DEVICE_PROBE)
-        AppendDeviceList(waveDevice);
-    else if(type == ALL_DEVICE_PROBE)
-        AppendAllDeviceList(waveDevice);
+    switch(type)
+    {
+        case ALL_DEVICE_PROBE:
+            AppendAllDeviceList(waveDevice);
+            break;
+        case CAPTURE_DEVICE_PROBE:
+            break;
+    }
 }

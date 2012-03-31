@@ -193,6 +193,9 @@
 /* Define if we have the Android backend */
 #define HAVE_ANDROID 1
 
+/* Define if we have the OpenSL backend */
+#define HAVE_OPENSL 1
+
 /* Define if we have the ALSA backend */
 /* #cmakedefine HAVE_ALSA */
 

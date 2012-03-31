@@ -39,6 +39,8 @@
 
 static const ALCchar solaris_device[] = "Solaris Default";
 
+static const char *solaris_driver = "/dev/audio";
+
 typedef struct {
     int fd;
     volatile int killNow;
@@ -53,13 +55,12 @@ static ALuint SolarisProc(ALvoid *ptr)
 {
     ALCdevice *pDevice = (ALCdevice*)ptr;
     solaris_data *data = (solaris_data*)pDevice->ExtraData;
-    int remaining = 0;
     ALint frameSize;
     int wrote;
 
     SetRTPriority();
 
-    frameSize = aluFrameSizeFromFormat(pDevice->Format);
+    frameSize = FrameSizeFromDevFmt(pDevice->FmtChans, pDevice->FmtType);
 
     while(!data->killNow && pDevice->Connected)
     {
@@ -74,7 +75,7 @@ static ALuint SolarisProc(ALvoid *ptr)
             {
                 if(errno != EAGAIN && errno != EWOULDBLOCK && errno != EINTR)
                 {
-                    AL_PRINT("write failed: %s\n", strerror(errno));
+                    ERR("write failed: %s\n", strerror(errno));
                     aluHandleDisconnect(pDevice);
                     break;
                 }
@@ -92,33 +93,29 @@ static ALuint SolarisProc(ALvoid *ptr)
 }
 
 
-static ALCboolean solaris_open_playback(ALCdevice *device, const ALCchar *deviceName)
+static ALCenum solaris_open_playback(ALCdevice *device, const ALCchar *deviceName)
 {
-    char driver[64];
     solaris_data *data;
 
-    strncpy(driver, GetConfigValue("solaris", "device", "/dev/audio"), sizeof(driver)-1);
-    driver[sizeof(driver)-1] = 0;
     if(!deviceName)
         deviceName = solaris_device;
     else if(strcmp(deviceName, solaris_device) != 0)
-        return ALC_FALSE;
+        return ALC_INVALID_VALUE;
 
     data = (solaris_data*)calloc(1, sizeof(solaris_data));
     data->killNow = 0;
 
-    data->fd = open(driver, O_WRONLY);
+    data->fd = open(solaris_driver, O_WRONLY);
     if(data->fd == -1)
     {
         free(data);
-        if(errno != ENOENT)
-            AL_PRINT("Could not open %s: %s\n", driver, strerror(errno));
-        return ALC_FALSE;
+        ERR("Could not open %s: %s\n", solaris_driver, strerror(errno));
+        return ALC_INVALID_VALUE;
     }
 
     device->szDeviceName = strdup(deviceName);
     device->ExtraData = data;
-    return ALC_TRUE;
+    return ALC_NO_ERROR;
 }
 
 static void solaris_close_playback(ALCdevice *device)
@@ -139,65 +136,74 @@ static ALCboolean solaris_reset_playback(ALCdevice *device)
 
     AUDIO_INITINFO(&info);
 
-    switch(aluBytesFromFormat(device->Format))
+    info.play.sample_rate = device->Frequency;
+
+    if(device->FmtChans != DevFmtMono)
+        device->FmtChans = DevFmtStereo;
+    numChannels = ChannelsFromDevFmt(device->FmtChans);
+    info.play.channels = numChannels;
+
+    switch(device->FmtType)
     {
-        case 1:
+        case DevFmtByte:
+            info.play.precision = 8;
+            info.play.encoding = AUDIO_ENCODING_LINEAR;
+            break;
+        case DevFmtUByte:
             info.play.precision = 8;
             info.play.encoding = AUDIO_ENCODING_LINEAR8;
             break;
-        case 4:
-            switch(numChannels)
-            {
-                case 1: device->Format = AL_FORMAT_MONO16; break;
-                case 2: device->Format = AL_FORMAT_STEREO16; break;
-                case 4: device->Format = AL_FORMAT_QUAD16; break;
-                case 6: device->Format = AL_FORMAT_51CHN16; break;
-                case 7: device->Format = AL_FORMAT_61CHN16; break;
-                case 8: device->Format = AL_FORMAT_71CHN16; break;
-            }
+        case DevFmtUShort:
+        case DevFmtInt:
+        case DevFmtUInt:
+        case DevFmtFloat:
+            device->FmtType = DevFmtShort;
             /* fall-through */
-        case 2:
+        case DevFmtShort:
             info.play.precision = 16;
             info.play.encoding = AUDIO_ENCODING_LINEAR;
             break;
-        default:
-            AL_PRINT("Unknown format: 0x%x\n", device->Format);
-            return ALC_FALSE;
     }
 
-    numChannels = aluChannelsFromFormat(device->Format);
-    info.play.sample_rate = device->Frequency;
-    info.play.channels = numChannels;
-
-    frameSize = numChannels * aluBytesFromFormat(device->Format);
+    frameSize = numChannels * BytesFromDevFmt(device->FmtType);
     info.play.buffer_size = device->UpdateSize*device->NumUpdates * frameSize;
 
     if(ioctl(data->fd, AUDIO_SETINFO, &info) < 0)
     {
-        AL_PRINT("ioctl failed: %s\n", strerror(errno));
+        ERR("ioctl failed: %s\n", strerror(errno));
         return ALC_FALSE;
     }
 
-    if(aluChannelsFromFormat(device->Format) != info.play.channels)
+    if(ChannelsFromDevFmt(device->FmtChans) != info.play.channels)
     {
-        AL_PRINT("Could not set %d channels, got %d instead\n", aluChannelsFromFormat(device->Format), info.play.channels);
+        ERR("Could not set %d channels, got %d instead\n", ChannelsFromDevFmt(device->FmtChans), info.play.channels);
         return ALC_FALSE;
     }
 
-    if(!((info.play.precision == 8 && aluBytesFromFormat(device->Format) == 1) ||
-         (info.play.precision == 16 && aluBytesFromFormat(device->Format) == 2)))
+    if(!((info.play.precision == 8 && info.play.encoding == AUDIO_ENCODING_LINEAR8 && device->FmtType == DevFmtUByte) ||
+         (info.play.precision == 8 && info.play.encoding == AUDIO_ENCODING_LINEAR && device->FmtType == DevFmtByte) ||
+         (info.play.precision == 16 && info.play.encoding == AUDIO_ENCODING_LINEAR && device->FmtType == DevFmtShort) ||
+         (info.play.precision == 32 && info.play.encoding == AUDIO_ENCODING_LINEAR && device->FmtType == DevFmtInt)))
     {
-        AL_PRINT("Could not set %d-bit output, got %d\n", aluBytesFromFormat(device->Format)*8, info.play.precision);
+        ERR("Could not set %s samples, got %d (0x%x)\n", DevFmtTypeString(device->FmtType),
+            info.play.precision, info.play.encoding);
         return ALC_FALSE;
     }
 
     device->Frequency = info.play.sample_rate;
     device->UpdateSize = (info.play.buffer_size/device->NumUpdates) + 1;
 
-    data->data_size = device->UpdateSize * frameSize;
-    data->mix_data = calloc(1, data->data_size);
-
     SetDefaultChannelOrder(device);
+
+    return ALC_TRUE;
+}
+
+static ALCboolean solaris_start_playback(ALCdevice *device)
+{
+    solaris_data *data = (solaris_data*)device->ExtraData;
+
+    data->data_size = device->UpdateSize * FrameSizeFromDevFmt(device->FmtChans, device->FmtType);
+    data->mix_data = calloc(1, data->data_size);
 
     data->thread = StartThread(SolarisProc, device);
     if(data->thread == NULL)
@@ -222,83 +228,55 @@ static void solaris_stop_playback(ALCdevice *device)
     data->thread = NULL;
 
     data->killNow = 0;
+    if(ioctl(data->fd, AUDIO_DRAIN) < 0)
+        ERR("Error draining device: %s\n", strerror(errno));
 
     free(data->mix_data);
     data->mix_data = NULL;
 }
 
 
-static ALCboolean solaris_open_capture(ALCdevice *device, const ALCchar *deviceName, ALCuint frequency, ALCenum format, ALCsizei SampleSize)
-{
-    (void)device;
-    (void)deviceName;
-    (void)frequency;
-    (void)format;
-    (void)SampleSize;
-    return ALC_FALSE;
-}
-
-static void solaris_close_capture(ALCdevice *device)
-{
-    (void)device;
-}
-
-static void solaris_start_capture(ALCdevice *pDevice)
-{
-    (void)pDevice;
-}
-
-static void solaris_stop_capture(ALCdevice *pDevice)
-{
-    (void)pDevice;
-}
-
-static void solaris_capture_samples(ALCdevice *pDevice, ALCvoid *pBuffer, ALCuint lSamples)
-{
-    (void)pDevice;
-    (void)pBuffer;
-    (void)lSamples;
-}
-
-static ALCuint solaris_available_samples(ALCdevice *pDevice)
-{
-    (void)pDevice;
-    return 0;
-}
-
-
-BackendFuncs solaris_funcs = {
+static const BackendFuncs solaris_funcs = {
     solaris_open_playback,
     solaris_close_playback,
     solaris_reset_playback,
+    solaris_start_playback,
     solaris_stop_playback,
-    solaris_open_capture,
-    solaris_close_capture,
-    solaris_start_capture,
-    solaris_stop_capture,
-    solaris_capture_samples,
-    solaris_available_samples
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL
 };
 
-void alc_solaris_init(BackendFuncs *func_list)
+ALCboolean alc_solaris_init(BackendFuncs *func_list)
 {
+    ConfigValueStr("solaris", "device", &solaris_driver);
+
     *func_list = solaris_funcs;
+    return ALC_TRUE;
 }
 
 void alc_solaris_deinit(void)
 {
 }
 
-void alc_solaris_probe(int type)
+void alc_solaris_probe(enum DevProbe type)
 {
+    switch(type)
+    {
+        case ALL_DEVICE_PROBE:
+        {
 #ifdef HAVE_STAT
-    struct stat buf;
-    if(stat(GetConfigValue("solaris", "device", "/dev/audio"), &buf) != 0)
-        return;
+            struct stat buf;
+            if(stat(solaris_driver, &buf) == 0)
 #endif
+                AppendAllDeviceList(solaris_device);
+        }
+        break;
 
-    if(type == DEVICE_PROBE)
-        AppendDeviceList(solaris_device);
-    else if(type == ALL_DEVICE_PROBE)
-        AppendAllDeviceList(solaris_device);
+        case CAPTURE_DEVICE_PROBE:
+            break;
+    }
 }
