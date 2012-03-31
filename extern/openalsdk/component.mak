@@ -24,6 +24,7 @@ EXTERN.OPENALLIB.linux.LINK_FLAGS           := -pthread
 EXTERN.OPENALLIB.beagleboard.LINK_FLAGS     := -rdynamic
 EXTERN.OPENALLIB.meego.LINK_FLAGS           := -rdynamic
 EXTERN.OPENALLIB.android.LIBS               := log OpenSLES
+EXTERN.OPENALLIB.android.LINK_FLAGS         := -Wl,-z,lazy
 
 #Цель №2 - OPENAL_TESTS
 EXTERN.OPENAL_TESTS.TYPE         := test-suite
