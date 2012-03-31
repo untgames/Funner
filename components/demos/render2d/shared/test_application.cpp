@@ -100,6 +100,14 @@ struct TestApplication::Impl
       printf ("Exception at window redraw\n");
     }
   }
+  
+  void ChangeWindowStyle ()
+  {
+    printf ("Change window style\n");
+
+    if (window)
+      window->SetStyle ((syslib::WindowStyle)((window->Style () + 1) % 2));    
+  }
 };
 
 /*
@@ -130,6 +138,7 @@ TestApplication::TestApplication ()
 
     impl->window->RegisterEventHandler (syslib::WindowEvent_OnPaint, xtl::bind (&Impl::OnRedraw, &*impl));
     impl->window->RegisterEventHandler (syslib::WindowEvent_OnClose, xtl::bind (&Impl::OnClose, &*impl));
+    impl->window->RegisterEventHandler (syslib::WindowEvent_OnLeftButtonDown, xtl::bind (&Impl::ChangeWindowStyle, &*impl));    
 
       //инициализация системы рендеринга
 
