@@ -25,7 +25,7 @@ ifneq (,$(filter linux,$(PROFILES)))
 endif
 
 ifneq (,$(filter android,$(PROFILES)))
-  FUNNER_EXTERN_LIBS.COMPONENTS += openalsdk
+  FUNNER_EXTERN_LIBS.COMPONENTS += openalsdk android_ndk_profiler
 endif
 
 ifneq (,$(filter psp,$(PROFILES)))
