@@ -34,8 +34,10 @@ void bind_application_events_library (Environment& environment)
 {
   InvokerRegistry lib = environment.Library (APPLICATION_EVENT_LIBRARY);
 
-  lib.Register ("get_OnExit", make_const (ApplicationEvent_OnExit));
-  lib.Register ("get_OnIdle", make_const (ApplicationEvent_OnIdle));
+  lib.Register ("get_OnExit",   make_const (ApplicationEvent_OnExit));
+  lib.Register ("get_OnIdle",   make_const (ApplicationEvent_OnIdle));
+  lib.Register ("get_OnPause",  make_const (ApplicationEvent_OnPause));
+  lib.Register ("get_OnResume", make_const (ApplicationEvent_OnResume));
 }
 
 void bind_window_styles_library (Environment& environment)
