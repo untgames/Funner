@@ -66,10 +66,8 @@ class PageCurl : public Entity
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Установка материалов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void        SetPageMaterial   (PageCurlPageType type, const char* name);
-    void        SetShadowMaterial (const char* name);
-    const char* PageMaterial      (PageCurlPageType type) const;
-    const char* ShadowMaterial    () const;
+    void        SetPageMaterial (PageCurlPageType type, const char* name);
+    const char* PageMaterial    (PageCurlPageType type) const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Установка полного размера страниц
@@ -110,6 +108,8 @@ class PageCurl : public Entity
     float               ShadowWidth                      () const;
     void                SetShadowDensity                 (float density);             //плотность тени
     float               ShadowDensity                    () const;
+    void                SetShadowLogBase                 (float log_base);            //основание логарифма генерации тени
+    float               ShadowLogBase                    () const;
     void                SetShadowGrowPower               (float power);               //степень нарастания тени при увеличении загиба
     float               ShadowGrowPower                  () const;
     void                SetOppositeCornerShadowGrowPower (float power);               //степень нарастания тени при увеличении загиба при поднятом противоположном углу страницы

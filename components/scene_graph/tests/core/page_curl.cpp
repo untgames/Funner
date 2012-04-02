@@ -58,7 +58,6 @@ void dump (const PageCurl& curl)
   printf ("  front right material              '%s'\n",                   curl.PageMaterial (PageCurlPageType_FrontRight));
   printf ("  back left material                '%s'\n",                   curl.PageMaterial (PageCurlPageType_BackLeft));
   printf ("  back right material               '%s'\n",                   curl.PageMaterial (PageCurlPageType_BackRight));
-  printf ("  shadow material                   '%s'\n",                   curl.ShadowMaterial ());
   printf ("  size                              %.2fx%.2f\n",              curl.Size ().x, curl.Size ().y);
   printf ("  corner                            '%s'\n",                   get_corner_name (curl.CurlCorner ()));
   printf ("  corner position                   %.2f; %.2f\n",             curl.CornerPosition ().x, curl.CornerPosition ().y);
@@ -69,6 +68,7 @@ void dump (const PageCurl& curl)
   printf ("  corner shadow offset              %.2f\n",                   curl.CornerShadowOffset ());
   printf ("  shadow width                      %.2f\n",                   curl.ShadowWidth ());
   printf ("  shadow density                    %.2f\n",                   curl.ShadowDensity ());
+  printf ("  shadow log base                   %.2f\n",                   curl.ShadowLogBase ());
   printf ("  shadow grow power                 %.2f\n",                   curl.ShadowGrowPower ());
   printf ("  opposite corner shadow grow power %.2f\n",                   curl.OppositeCornerShadowGrowPower ());
   printf ("  find best curl steps              %u\n",                     curl.FindBestCurlSteps ());
@@ -91,7 +91,6 @@ int main ()
   curl->SetPageMaterial                  (PageCurlPageType_Front,     "front_material");
   curl->SetPageMaterial                  (PageCurlPageType_BackLeft,  "back_left_material");
   curl->SetPageMaterial                  (PageCurlPageType_BackRight, "back_right_material");
-  curl->SetShadowMaterial                ("shadow_material");
   curl->SetSize                          (2.f, 4.f);
   curl->SetCurlCorner                    (PageCurlCorner_RightBottom);
   curl->SetCornerPosition                (1.f, 2.f);
@@ -102,6 +101,7 @@ int main ()
   curl->SetCornerShadowOffset            (16.f);
   curl->SetShadowWidth                   (8.f);
   curl->SetShadowDensity                 (0.5f);
+  curl->SetShadowLogBase                 (32.f);
   curl->SetShadowGrowPower               (0.5f);
   curl->SetOppositeCornerShadowGrowPower (2.f);
   curl->SetFindBestCurlSteps             (500);

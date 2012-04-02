@@ -5,14 +5,15 @@ using namespace scene_graph;
 namespace
 {
 
-const float  DEFAULT_CORNER_SHADOW_OFFSET              = 15.f;
-const float  DEFAULT_GRID_SIZE                         = 100.f;
-const float  DEFAULT_SHADOW_WIDTH                      = 0.25f;
-const float  DEFAULT_SHADOW_DENSITY                    = 0.4f;
-const float  DEFAULT_SHADOW_GROW_POWER                 = 0.25f;
-const float  DEFAULT_OPPOSITE_CORNER_SHADOW_GROW_POWER = 15.f;
-const size_t DEFAULT_FIND_BEST_CURL_STEPS              = 1000;
 const float  DEFAULT_BINDING_MISMATCH_WEIGHT           = 10.f;
+const float  DEFAULT_CORNER_SHADOW_OFFSET              = 15.f;
+const size_t DEFAULT_FIND_BEST_CURL_STEPS              = 1000;
+const float  DEFAULT_GRID_SIZE                         = 100.f;
+const float  DEFAULT_OPPOSITE_CORNER_SHADOW_GROW_POWER = 15.f;
+const float  DEFAULT_SHADOW_DENSITY                    = 1.0f;
+const float  DEFAULT_SHADOW_GROW_POWER                 = 0.25f;
+const float  DEFAULT_SHADOW_LOG_BASE                   = 4.f;
+const float  DEFAULT_SHADOW_WIDTH                      = 0.25f;
 
 }
 
@@ -24,7 +25,6 @@ struct PageCurl::Impl
 {
   PageCurlMode   mode;                               //режим страниц
   stl::string    materials [PageCurlPageType_Num];   //материалы
-  stl::string    shadow_material;                    //материал тени
   math::vec2f    size;                               //полный размер страниц
   PageCurlCorner corner;                             //угол
   math::vec2f    corner_position;                    //позиция угла
@@ -35,6 +35,7 @@ struct PageCurl::Impl
   float          corner_shadow_offset;               //смещение тени от угла
   float          shadow_width;                       //ширина тени
   float          shadow_density;                     //плотность тени
+  float          shadow_log_base;                    //основание логарифма генерации тени
   float          shadow_grow_power;                  //степень нарастания тени при увеличении загиба
   float          opposite_corner_shadow_grow_power;  //степень нарастания тени при увеличении загиба при поднятом противоположном углу страницы
   size_t         find_best_curl_steps;               //количество итераций поиска наилучшей позиции загиба
@@ -51,6 +52,7 @@ struct PageCurl::Impl
     , corner_shadow_offset (DEFAULT_CORNER_SHADOW_OFFSET)
     , shadow_width (DEFAULT_SHADOW_WIDTH)
     , shadow_density (DEFAULT_SHADOW_DENSITY)
+    , shadow_log_base (DEFAULT_SHADOW_LOG_BASE)
     , shadow_grow_power (DEFAULT_SHADOW_GROW_POWER)
     , opposite_corner_shadow_grow_power (DEFAULT_OPPOSITE_CORNER_SHADOW_GROW_POWER)
     , find_best_curl_steps (DEFAULT_FIND_BEST_CURL_STEPS)
@@ -125,21 +127,6 @@ void PageCurl::SetPageMaterial (PageCurlPageType type, const char* name)
   impl->materials [type] = name;
 
   UpdateNotify ();
-}
-
-void PageCurl::SetShadowMaterial (const char* name)
-{
-  if (!name)
-    throw xtl::make_null_argument_exception ("scene_graph::PageCurl::SetShadowMaterial", "name");
-
-  impl->shadow_material = name;
-
-  UpdateNotify ();
-}
-
-const char* PageCurl::ShadowMaterial () const
-{
-  return impl->shadow_material.c_str ();
 }
 
 const char* PageCurl::PageMaterial (PageCurlPageType type) const
@@ -320,6 +307,18 @@ void PageCurl::SetShadowDensity (float density)
 float PageCurl::ShadowDensity () const
 {
   return impl->shadow_density;
+}
+
+void PageCurl::SetShadowLogBase (float log_base)
+{
+  impl->shadow_log_base = log_base;
+
+  UpdateNotify ();
+}
+
+float PageCurl::ShadowLogBase () const
+{
+  return impl->shadow_log_base;
 }
 
 void PageCurl::SetShadowGrowPower (float power)

@@ -5,7 +5,6 @@ Default curl state:
   front right material              ''
   back left material                ''
   back right material               ''
-  shadow material                   ''
   size                              1.00x1.00
   corner                            'LeftTop'
   corner position                   0.00; 0.00
@@ -15,7 +14,8 @@ Default curl state:
   page color                        1.000; 1.000; 1.000; 1.000
   corner shadow offset              15.00
   shadow width                      0.25
-  shadow density                    0.40
+  shadow density                    1.00
+  shadow log base                   4.00
   shadow grow power                 0.25
   opposite corner shadow grow power 15.00
   find best curl steps              1000
@@ -29,7 +29,6 @@ Changed curl state:
   front right material              ''
   back left material                'back_left_material'
   back right material               'back_right_material'
-  shadow material                   'shadow_material'
   size                              2.00x4.00
   corner                            'RightBottom'
   corner position                   1.00; 2.00
@@ -40,6 +39,7 @@ Changed curl state:
   corner shadow offset              16.00
   shadow width                      8.00
   shadow density                    0.50
+  shadow log base                   32.00
   shadow grow power                 0.50
   opposite corner shadow grow power 2.00
   find best curl steps              500

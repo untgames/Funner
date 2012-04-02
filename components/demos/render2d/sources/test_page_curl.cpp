@@ -34,7 +34,6 @@ struct Test
     curl->SetPageMaterial       (PageCurlPageType_BackRight,  "page2");
     curl->SetPageMaterial       (PageCurlPageType_FrontLeft,  "page3");
     curl->SetPageMaterial       (PageCurlPageType_FrontRight, "page4");
-    curl->SetShadowMaterial     ("page_shadow");
     curl->SetCornerShadowOffset (0.1f);
     curl->SetCornerPosition     (0.1f, 0.1f);
 
@@ -69,7 +68,7 @@ struct Test
     vp.SetName            ("Viewport1");
     vp.SetRenderPath      ("Render2d");
     vp.SetCamera          (camera.get ());
-    vp.SetBackgroundColor (0, 0, 0, 0);
+    vp.SetBackgroundColor (1, 1, 1, 1);
     vp.EnableBackground   ();
 
     vp.SetArea (0, 0, 100, 100);
