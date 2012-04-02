@@ -840,7 +840,7 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
           flip_height = flip_width * tan (fabs (x_flip_angle / 2.f)),
           curl_angle  = -atan2 (flip_width, flip_height);
 
-    if (curl_corner_position.y > 0)
+    if (curl_corner_position.y > 0 || curl_angle > -EPS)
       curl_angle += PI;
 
     float curl_x = (page_size.x - flip_width) * cos (curl_angle);
@@ -922,7 +922,7 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
           flip_height = flip_width * tan (x_flip_angle / 2.f),
           curl_angle  = atan2 (flip_width, flip_height);
 
-    if (curl_corner_position.y < page_size.y)
+    if (curl_corner_position.y < page_size.y || curl_angle < EPS)
       curl_angle += PI;
 
     float curl_x = (page_size.x - flip_width) * cos (curl_angle);
@@ -1009,7 +1009,7 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
           flip_height            = flip_width * tan (fabs (x_flip_angle / 2.f)),
           curl_angle             = atan2 (flip_width, flip_height);
 
-    if (curl_corner_position.y <= 0)
+    if (curl_corner_position.y <= 0 && curl_angle > EPS)
       curl_angle += PI;
 
     float curl_x = (page_size.x - flip_width) * cos (curl_angle);
@@ -1121,7 +1121,7 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
           flip_height            = flip_width * tan (x_flip_angle / 2.f),
           curl_angle             = -atan2 (flip_width, flip_height);
 
-    if (curl_corner_position.y >= page_size.y)
+    if (curl_corner_position.y >= page_size.y && curl_angle < -EPS)
       curl_angle -= PI;
 
     float curl_x = (page_size.x - flip_width) * cos (curl_angle);
