@@ -85,6 +85,9 @@ static void* thread_function(void* arg)
         mGetMinBufferSize, sampleRateInHz, channelConfig, audioFormat);
 
     int bufferSizeInSamples = bufferSizeInBytes / FrameSizeFromDevFmt(device->FmtChans, device->FmtType);
+    
+    printf ("sampleRateInHz=%u channelConfig=%u device->FmtChans=%u audioFormat=%u device->FmtType=%u bufferSizeInBytes=%u bufferSizeInSamples=%u\n",
+      sampleRateInHz, channelConfig, device->FmtChans, audioFormat, device->FmtType, bufferSizeInBytes, bufferSizeInSamples); fflush (stdout);
 
     jobject track = (*env)->NewObject(env, cAudioTrack, mAudioTrack,
         STREAM_MUSIC, sampleRateInHz, channelConfig, audioFormat, device->NumUpdates * bufferSizeInBytes, MODE_STREAM);

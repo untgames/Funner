@@ -14,6 +14,7 @@ export.link.extern.openal.macosx.LINK_FLAGS  := -framework OpenAL
 export.link.extern.openal.iphone.LINK_FLAGS  := -framework OpenAL
 export.link.extern.openal.android.LIBS       := funner.extern.openal32
 export.link.extern.openal.tabletos.LIBS      := OpenAL asound
+#export.link.extern.openal.win32.LIBS         := funner.extern.openal32
 
 # Run exports
 export.run.extern.openal.DLLS           :=
