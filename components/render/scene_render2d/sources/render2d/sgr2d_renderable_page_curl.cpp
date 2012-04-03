@@ -26,10 +26,10 @@ const char* LOG_NAME = "render.obsolete.render2d.RenderablePageCurl";
 
 const float  EPS                   = 0.001f;
 const float  BACK_SHADOW_OFFSET    = 0;
-const float  MAX_SHADOW_LOG_VALUE  = 1.0;
+const float  MAX_SHADOW_LOG_VALUE  = 0.4;
 const float  PI                    = 3.1415926f;
 const size_t SHADOW_TEXTURE_SIZE   = 64;
-const size_t SHADOW_VERTICES_COUNT = 16;
+const size_t SHADOW_VERTICES_COUNT = 20;
 const float  STATIC_PAGES_Z_OFFSET = -0.001f;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -430,7 +430,7 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
       translucent_blend_state            = CreateBlendState              (device, true, low_level::BlendArgument_SourceAlpha, low_level::BlendArgument_InverseSourceAlpha, low_level::BlendArgument_InverseSourceAlpha);
       mask_blend_state                   = CreateBlendState              (device, true, low_level::BlendArgument_Zero, low_level::BlendArgument_SourceColor, low_level::BlendArgument_SourceAlpha);
       additive_blend_state               = CreateBlendState              (device, true, low_level::BlendArgument_SourceAlpha, low_level::BlendArgument_One, low_level::BlendArgument_One);
-      shadow_blend_state                 = CreateBlendState              (device, true, low_level::BlendArgument_One, low_level::BlendArgument_InverseSourceAlpha, low_level::BlendArgument_SourceAlpha);
+      shadow_blend_state                 = CreateBlendState              (device, true, low_level::BlendArgument_Zero, low_level::BlendArgument_InverseSourceAlpha, low_level::BlendArgument_SourceAlpha);
       input_layout                       = CreateInputLayout             (device);
       default_program                    = CreateProgram                 (device, "render.obsolete.renderer2d.RenderablePageCurl.default_program", DEFAULT_SHADER_SOURCE_CODE);
       program_parameters_layout          = CreateProgramParametersLayout (device);
@@ -489,13 +489,14 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
       buffer_desc.usage_mode   = low_level::UsageMode_Stream;
       buffer_desc.bind_flags   = low_level::BindFlag_IndexBuffer;
       buffer_desc.access_flags = low_level::AccessFlag_Write;
-      buffer_desc.size         = sizeof (unsigned short) * 36;
+      buffer_desc.size         = sizeof (unsigned short) * 48;
 
       shadow_index_buffer = BufferPtr (device.CreateBuffer (buffer_desc), false);
 
-      unsigned short shadow_indices [36] = { 0,  1,  2,    1,  2,  3,    2,  3,  4,    3,  4,  5,
+      unsigned short shadow_indices [48] = { 0,  1,  2,    1,  2,  3,    2,  3,  4,    3,  4,  5,
                                              6,  7,  8,    7,  8,  9,    8,  9, 10,    9, 10, 11,
-                                            10, 11, 12,   11, 12, 13,   12, 13, 14,   13, 14, 15 };
+                                             9, 11, 12,    9, 12, 13,   12, 13, 14,   13, 14, 15,
+                                            14, 15, 16,   13, 15, 17,   15, 17, 18,   17, 18, 19 };
 
       shadow_index_buffer->SetData (0, sizeof (shadow_indices), shadow_indices);
 
@@ -727,10 +728,9 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
       //отрисовка тени под страницей
     if (curled_page->HasBottomSideBendPosition () || curled_page->HasTopSideBendPosition ())
     {
-/*      math::vec2f base_vertices [4];
-      bool        has_side_bend_position = left_side ? curled_page->HasLeftSideBendPosition () : curled_page->HasRightSideBendPosition ();
-      size_t      base_vertices_count    = has_side_bend_position ? 3 : 4;
-
+      math::vec2f base_vertices [4];
+      math::vec2f mid_points [2];
+      bool        has_side_bend_position    = left_side ? curled_page->HasLeftSideBendPosition () : curled_page->HasRightSideBendPosition ();
       math::vec3f bottom_side_bend_position = curled_page->GetBottomSideBendPosition ();
       math::vec3f top_side_bend_position    = curled_page->GetTopSideBendPosition ();
       math::vec3f side_bend_position        = left_side ? curled_page->GetLeftSideBendPosition () : curled_page->GetRightSideBendPosition ();
@@ -750,7 +750,7 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
           base_vertices [2] = bottom_side_bend_position;
         }
 
-        triangles_count += 6;
+        triangles_count += 8;
       }
       else //загнуты два угла
       {
@@ -759,125 +759,71 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
         base_vertices [2] = bottom_corner_position;
         base_vertices [3] = bottom_side_bend_position;
 
-        triangles_count += 8;
-      }*/
-
-/*      vertices [0].position = math::vec3f (bottom_shadow_corner_position.x + x_offset, bottom_shadow_corner_position.y, curl_radius);
-      vertices [1].position = math::vec3f (bottom_side_bend_position.x + x_offset, bottom_side_bend_position.y, curl_radius);
-      vertices [2].position = math::vec3f (top_shadow_corner_position.x + x_offset, top_shadow_corner_position.y, curl_radius);
-      vertices [3].position = math::vec3f (top_side_bend_position.x + x_offset, top_side_bend_position.y, curl_radius);
-      vertices [0].texcoord = math::vec2f (0, 0);
-      vertices [1].texcoord = math::vec2f (length (bottom_side_vector) / page_size.x, 0);
-      vertices [2].texcoord = math::vec2f (0, 1);
-      vertices [3].texcoord = math::vec2f (length (top_side_vector) / page_size.x, 1);
-
-      if (fabs (top_corner_position.z) < curl_radius)
-        vertices [2].texcoord = math::vec2f (0, length (side_vector) / page_size.y);
-
-      if (fabs (bottom_corner_position.z) < curl_radius)
-        vertices [1].texcoord = math::vec2f (length (bottom_side_vector) / page_size.x, 1 - length (side_vector) / page_size.y);
-
-
-*/
-
-
-
-
-
-
-/*
-      math::vec2f top_shadow_corner_position, bottom_shadow_corner_position;
-
-      math::vec2f bottom_side_vector (bottom_corner_position.x - bottom_side_bend_position.x, bottom_corner_position.y - bottom_side_bend_position.y),
-                  top_side_vector    (top_corner_position.x - top_side_bend_position.x, top_side_bend_position.y - top_corner_position.y),
-                  side_vector        (top_corner_position.x - bottom_corner_position.x, top_corner_position.y - bottom_corner_position.y);
-
-      if (left_side)
-      {
-        bottom_side_vector.y *= -1;
-        top_side_vector.y    *= -1;
+        triangles_count += 12;
       }
 
-      if (fabs (top_corner_position.z) < curl_radius)
-        side_vector = bottom_corner_position - side_bend_position;
+      math::vec2f first_side_vec         = base_vertices [1] - base_vertices [0],
+                  first_side_dir         = math::normalize (first_side_vec),
+                  second_side_vec        = base_vertices [2] - base_vertices [1],
+                  second_side_dir        = math::normalize (second_side_vec);
+      float       first_side_length      = math::length (first_side_vec),
+                  first_mid_point_offset = stl::min (corner_shadow_offset, first_side_length / 2.f);
 
-      if (fabs (bottom_corner_position.z) < curl_radius)
-        side_vector = top_corner_position - side_bend_position;
+      mid_points [0] = base_vertices [0] + first_side_dir * first_mid_point_offset;
 
-      math::vec2f top_corner_offset    (normalize (math::vec2f (-top_side_vector.x + top_side_vector.y, top_side_vector.y + top_side_vector.x))),
-                  bottom_corner_offset (normalize (math::vec2f (-bottom_side_vector.x + bottom_side_vector.y, bottom_side_vector.y + bottom_side_vector.x)));
+      vertices [6].position = math::vec3f (base_vertices [0].x, base_vertices [0].y, curl_radius);
+      vertices [6].texcoord = math::vec2f (0, 0.5);
+      vertices [7].position = math::vec3f (mid_points [0].x, mid_points [0].y, curl_radius);
+      vertices [7].texcoord = math::vec2f (0.5, 0.5);
+      vertices [8].position = math::vec3f (mid_points [0].x - second_side_dir.x * corner_shadow_offset, mid_points [0].y - second_side_dir.y * corner_shadow_offset, curl_radius);
+      vertices [8].texcoord = math::vec2f (0.5, 1);
+      vertices [9].position = math::vec3f (base_vertices [1].x, base_vertices [1].y, curl_radius);
+      vertices [9].texcoord = math::vec2f (0.5, 0.5);
+      vertices [10].position = math::vec3f (base_vertices [1].x - second_side_dir.x * corner_shadow_offset, base_vertices [1].y - second_side_dir.y * corner_shadow_offset, curl_radius);
+      vertices [10].texcoord = math::vec2f (0.5, 1);
+      vertices [11].position = math::vec3f (base_vertices [1].x + (-second_side_dir.x + first_side_dir.x) * corner_shadow_offset, base_vertices [1].y + (-second_side_dir.y + first_side_dir.y) * corner_shadow_offset, curl_radius);
+      vertices [11].texcoord = math::vec2f (1, 1);
+      vertices [12].position = math::vec3f (base_vertices [1].x + first_side_dir.x * corner_shadow_offset, base_vertices [1].y + first_side_dir.y * corner_shadow_offset, curl_radius);
+      vertices [12].texcoord = math::vec2f (1, 0.5);
 
-      if (top_corner_offset.x != top_corner_offset.x)
-        top_corner_offset = 0;
-      if (bottom_corner_offset.x != bottom_corner_offset.x)
-        bottom_corner_offset = 0;
-
-      float shadow_grow_power               = page_curl->ShadowGrowPower (),
-            top_shadow_offset_multiplier    = pow (length (side_vector), shadow_grow_power) * pow (top_corner_position.z / (page_curl->CurlRadius () * 2), shadow_grow_power),
-            bottom_shadow_offset_multiplier = pow (length (side_vector), shadow_grow_power) * pow (bottom_corner_position.z / (page_curl->CurlRadius () * 2), shadow_grow_power),
-            shadow_corner_offset            = page_curl->CornerShadowOffset ();
-
-      if (left_side)
+      if (has_side_bend_position)
       {
-        top_corner_offset.x    = -fabs (top_corner_offset.x);
-        bottom_corner_offset.x = -fabs (bottom_corner_offset.x);
+        float second_side_length      = math::length (second_side_vec),
+              second_mid_point_offset = stl::min (corner_shadow_offset, second_side_length / 2);
+
+        mid_points [1] = base_vertices [2] - second_side_dir * second_mid_point_offset;
+
+        vertices [13].position = math::vec3f (mid_points [1].x, mid_points [1].y, curl_radius);
+        vertices [13].texcoord = math::vec2f (0.5, 0.5);
+        vertices [14].position = math::vec3f (mid_points [1].x + first_side_dir.x * corner_shadow_offset, mid_points [1].y + first_side_dir.y * corner_shadow_offset, curl_radius);
+        vertices [14].texcoord = math::vec2f (1, 0.5);
+        vertices [15].position = math::vec3f (base_vertices [2].x, base_vertices [2].y, curl_radius);
+        vertices [15].texcoord = math::vec2f (0.5, 0);
       }
       else
       {
-        top_corner_offset.x    = fabs (top_corner_offset.x);
-        bottom_corner_offset.x = fabs (bottom_corner_offset.x);
-        top_corner_offset.y    = -top_corner_offset.y;
-        bottom_corner_offset.y = -bottom_corner_offset.y;
+        math::vec2f third_side_vec          = base_vertices [3] - base_vertices [2],
+                    third_side_dir          = math::normalize (third_side_vec);
+        float       third_side_length       = math::length (third_side_vec),
+                    second_mid_point_offset = stl::min (corner_shadow_offset, third_side_length / 2.f);
+
+        mid_points [1] = base_vertices [3] - third_side_dir * second_mid_point_offset;
+
+        vertices [13].position = math::vec3f (base_vertices [2].x, base_vertices [2].y, curl_radius);
+        vertices [13].texcoord = math::vec2f (0.5, 0.5);
+        vertices [14].position = math::vec3f (base_vertices [2].x - third_side_dir.x * corner_shadow_offset, base_vertices [2].y - third_side_dir.y * corner_shadow_offset, curl_radius);
+        vertices [14].texcoord = math::vec2f (1, 0.5);
+        vertices [15].position = math::vec3f (base_vertices [2].x + second_side_dir.x * corner_shadow_offset, base_vertices [2].y + second_side_dir.y * corner_shadow_offset, curl_radius);
+        vertices [15].texcoord = math::vec2f (0.5, 0);
+        vertices [16].position = math::vec3f (base_vertices [2].x + (-third_side_dir.x + second_side_dir.x) * corner_shadow_offset, base_vertices [2].y + (-third_side_dir.y + second_side_dir.y) * corner_shadow_offset, curl_radius);
+        vertices [16].texcoord = math::vec2f (1, 0);
+        vertices [17].position = math::vec3f (mid_points [1].x, mid_points [1].y, curl_radius);
+        vertices [17].texcoord = math::vec2f (0.5, 0.5);
+        vertices [18].position = math::vec3f (mid_points [1].x + second_side_dir.x * corner_shadow_offset, mid_points [1].y + second_side_dir.y * corner_shadow_offset, curl_radius);
+        vertices [18].texcoord = math::vec2f (0.5, 0);
+        vertices [19].position = math::vec3f (base_vertices [3].x, base_vertices [3].y, curl_radius);
+        vertices [19].texcoord = math::vec2f (0, 0.5);
       }
-
-      top_shadow_corner_position.x    = top_corner_position.x - top_corner_offset.x * shadow_corner_offset * top_shadow_offset_multiplier;
-      top_shadow_corner_position.y    = top_corner_position.y + top_corner_offset.y * shadow_corner_offset * top_shadow_offset_multiplier;
-      bottom_shadow_corner_position.x = bottom_corner_position.x - bottom_corner_offset.x * shadow_corner_offset * bottom_shadow_offset_multiplier;
-      bottom_shadow_corner_position.y = bottom_corner_position.y - bottom_corner_offset.y * shadow_corner_offset * bottom_shadow_offset_multiplier;
-
-      math::vec2f bottom_curl_position = curled_page->HasBottomSideBendPosition () ? curled_page->GetBottomSideBendPosition () : side_bend_position;
-      math::vec2f top_curl_position    = curled_page->HasTopSideBendPosition () ? curled_page->GetTopSideBendPosition () : side_bend_position;
-      math::vec2f binding_vector       = math::normalize (top_curl_position - bottom_curl_position);
-
-      top_side_bend_position    += binding_vector * shadow_corner_offset;
-      bottom_side_bend_position -= binding_vector * shadow_corner_offset;
-
-      if (fabs (top_corner_position.z) < curl_radius)
-      {
-        top_shadow_corner_position = side_bend_position;
-        top_side_bend_position     = side_bend_position;
-      }
-      if (fabs (bottom_corner_position.z) < curl_radius)
-      {
-        bottom_shadow_corner_position = side_bend_position;
-        bottom_side_bend_position     = side_bend_position;
-      }
-
-      RenderableVertex vertices [4];
-
-      for (size_t i = 0; i < 4; i++)
-      {
-        vertices [i].color.x = 0;
-        vertices [i].color.y = 0;
-        vertices [i].color.z = 0;
-        vertices [i].color.w = 255;
-      }
-
-      vertices [0].position = math::vec3f (bottom_shadow_corner_position.x + x_offset, bottom_shadow_corner_position.y, curl_radius);
-      vertices [1].position = math::vec3f (bottom_side_bend_position.x + x_offset, bottom_side_bend_position.y, curl_radius);
-      vertices [2].position = math::vec3f (top_shadow_corner_position.x + x_offset, top_shadow_corner_position.y, curl_radius);
-      vertices [3].position = math::vec3f (top_side_bend_position.x + x_offset, top_side_bend_position.y, curl_radius);
-      vertices [0].texcoord = math::vec2f (0, 0);
-      vertices [1].texcoord = math::vec2f (length (bottom_side_vector) / page_size.x, 0);
-      vertices [2].texcoord = math::vec2f (0, 1);
-      vertices [3].texcoord = math::vec2f (length (top_side_vector) / page_size.x, 1);
-
-      if (fabs (top_corner_position.z) < curl_radius)
-        vertices [2].texcoord = math::vec2f (0, length (side_vector) / page_size.y);
-
-      if (fabs (bottom_corner_position.z) < curl_radius)
-        vertices [1].texcoord = math::vec2f (length (bottom_side_vector) / page_size.x, 1 - length (side_vector) / page_size.y);
-      */
     }
 
     if (triangles_count)
