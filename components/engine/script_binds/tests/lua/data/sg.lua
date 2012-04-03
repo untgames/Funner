@@ -708,7 +708,6 @@ local function print_curl (curl)
   print (string.format ("  front right material              '%s'",                   curl:PageMaterial (Scene.PageCurlPageType.FrontRight)))
   print (string.format ("  back left material                '%s'",                   curl:PageMaterial (Scene.PageCurlPageType.BackLeft)))
   print (string.format ("  back right material               '%s'",                   curl:PageMaterial (Scene.PageCurlPageType.BackRight)))
-  print (string.format ("  shadow material                   '%s'",                   curl.ShadowMaterial))
   print (string.format ("  size                              %.2fx%.2f",              curl.Size.x, curl.Size.y))
   print (string.format ("  corner                            '%s'",                   get_corner_name (curl.CurlCorner)))
   print (string.format ("  corner position                   %.2f; %.2f",             curl.CornerPosition.x, curl.CornerPosition.y))
@@ -718,6 +717,7 @@ local function print_curl (curl)
   print (string.format ("  page color                        %.3f; %.3f; %.3f; %.3f", curl.PageColor.x, curl.PageColor.y, curl.PageColor.z, curl.PageColor.w))
   print (string.format ("  corner shadow offset              %.2f",                   curl.CornerShadowOffset))
   print (string.format ("  shadow width                      %.2f",                   curl.ShadowWidth))
+  print (string.format ("  shadow log base                   %.2f",                   curl.ShadowLogBase))
   print (string.format ("  shadow density                    %.2f",                   curl.ShadowDensity))
   print (string.format ("  shadow grow power                 %.2f",                   curl.ShadowGrowPower))
   print (string.format ("  opposite corner shadow grow power %.2f",                   curl.OppositeCornerShadowGrowPower))
@@ -742,7 +742,6 @@ local function test_page_curl ()
   curl:SetPageColor      (0.5, 0.25, 0.125, 0.25)
 
   curl.Mode                          = Scene.PageCurlMode.DoublePageDoubleMaterial
-  curl.ShadowMaterial                = "shadow_material"
   curl.CurlCorner                    = Scene.PageCurlCorner.RightBottom
   curl.CurlRadius                    = 4
   curl.MinimumCurlRadius             = 2
@@ -750,6 +749,7 @@ local function test_page_curl ()
   curl.ShadowWidth                   = 8
   curl.ShadowDensity                 = 0.5
   curl.ShadowGrowPower               = 0.5
+  curl.ShadowLogBase                 = 2
   curl.OppositeCornerShadowGrowPower = 2
   curl.FindBestCurlSteps             = 500
   curl.BindingMismatchWeight         = 2
