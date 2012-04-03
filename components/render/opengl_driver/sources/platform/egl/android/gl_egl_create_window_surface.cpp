@@ -83,42 +83,10 @@ EGLSurface eglCreateWindowSurfaceAndroid (EGLDisplay egl_display, EGLConfig egl_
 {
   try
   {
-    syslib::android::NativeWindow* window = (syslib::android::NativeWindow*)window_handle;
+    jobject view = (jobject)window_handle;
     
-    if (!window)
+    if (!view)
       throw xtl::make_null_argument_exception ("", "window");
-      
-    if (!window->view)
-      throw xtl::make_null_argument_exception ("", "window->view");
-      
-    if (!window->native_window)
-      throw xtl::make_null_argument_exception ("", "window->native_window");
-      
-      //попытка создания поверхности стандартным путем
-
-    ANativeWindow_setBuffersGeometry (window->native_window, 0, 0, format);
-
-    EGLSurface egl_surface = eglCreateWindowSurface (egl_display, egl_config, window->native_window, 0);
-
-    if (egl_surface)
-      return egl_surface;      
-
-    EGLint status = eglGetError ();
-  
-    switch (status)
-    {
-      case EGL_BAD_NATIVE_WINDOW:
-        break;
-      default:
-      {
-        const char* message = get_error_message (status);
-        
-        if (message)
-          throw xtl::format_operation_exception ("", "%s", message);
-          
-        throw xtl::format_operation_exception ("", "EGL error %04x", status);
-      }
-    }
 
       //создание поверхности через JNI
 
@@ -169,7 +137,7 @@ EGLSurface eglCreateWindowSurfaceAndroid (EGLDisplay egl_display, EGLConfig egl_
     if (!egl_display_wrapper)
       throw xtl::format_operation_exception ("", "EGLDisplayImpl constructor failed");      
 
-    local_ref<jobject> egl_surface_wrapper = env.CallObjectMethod (egl.get (), egl_create_window_surface, egl_display_wrapper.get (), egl_config_wrapper.get (), window->view, 0);
+    local_ref<jobject> egl_surface_wrapper = env.CallObjectMethod (egl.get (), egl_create_window_surface, egl_display_wrapper.get (), egl_config_wrapper.get (), view, 0);
 
     if (!egl_surface_wrapper)
       throw xtl::format_operation_exception ("", "EGLImpl::eglCreateWindowSurface failed");

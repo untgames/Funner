@@ -21,9 +21,7 @@
   #include <jni.h>
   #include <dlfcn.h>
   
-  #include <xtl/type_traits>  
-  
-  #include <syslib/platform/android.h>
+  #include <xtl/type_traits>    
 #endif
 
 #include <shared/log.h>

@@ -27,7 +27,6 @@
 
 #include <syslib/keydefs.h>
 #include <syslib/thread.h>
-#include <syslib/platform/android.h>
 
 #include <shared/platform.h>
 #include <shared/message_queue.h>

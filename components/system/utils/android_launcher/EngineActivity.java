@@ -81,9 +81,6 @@ public class EngineActivity extends Activity
 
     try
     {
-      if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.GINGERBREAD)
-        System.loadLibrary ("android");
-        
       if (librariesString != null)
       {
         String libraries [] = librariesString.split (" ");

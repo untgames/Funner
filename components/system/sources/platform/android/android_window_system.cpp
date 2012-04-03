@@ -11,8 +11,7 @@ using namespace syslib::android;
 
 struct syslib::window_handle
 {
-  global_ref<jobject>  view;                             //android окно
-  NativeWindow         window;                           //описание окна
+  global_ref<jobject>  view;                             //android окно  
   WindowMessageHandler message_handler;                  //обработчик сообщений
   void*                user_data;                        //пользовательские данные окна
   unsigned int         background_color;                 //цвет заднего плана
@@ -32,6 +31,7 @@ struct syslib::window_handle
   jmethodID            bring_to_front_method;            //метод перемещения окна на передний план
   jmethodID            remove_from_parent_window_method; //метод удаления окна
   bool                 is_multitouch_enabled;            //включен ли multitouch
+  bool                 is_surface_created;               //состояние поверхности
   volatile bool        is_native_handle_received;        //получен ли android window handle
   
 ///Конструктор
@@ -41,11 +41,9 @@ struct syslib::window_handle
     , background_color (0)
     , background_state (0)
     , is_multitouch_enabled (false)
+    , is_surface_created (false)
     , is_native_handle_received (false)
   {
-    window.native_window = 0;
-    window.view          = 0;
-    
     MessageQueueSingleton::Instance ()->RegisterHandler (this);
   }
 
@@ -65,9 +63,6 @@ struct syslib::window_handle
     }
     
     MessageQueueSingleton::Instance ()->UnregisterHandler (this);
-    
-    if (window.native_window)
-      ANativeWindow_release (window.native_window);
   }
  
   void Notify (WindowEvent event, const WindowEventContext& context)
@@ -262,42 +257,36 @@ struct syslib::window_handle
 
   void OnSurfaceCreatedCallback ()
   {
+    if (is_surface_created)
+      return;
+    
       //получение поверхности
       
     local_ref<jobject> surface = check_errors (get_env ().CallObjectMethod (view.get (), get_surface_method));
     
     if (!surface)
-      throw xtl::format_operation_exception ("", "EngineView::getSurfaceThreadSafe failed");      
+      throw xtl::format_operation_exception ("", "EngineView::getSurfaceThreadSafe failed");                  
+      
+    is_surface_created = true;
 
-      //получение дескриптора окна
-      
-    ANativeWindow* new_window = ANativeWindow_fromSurface (&get_env (), surface.get ());    
-      
-    if (new_window && new_window != window.native_window)
-    {
-      window.native_window = new_window;
-      
-        //оповещение об изменении дескриптора
-      
-      WindowEventContext context;
+      //оповещение об изменении дескриптора
+    
+    WindowEventContext context;
 
-      memset (&context, 0, sizeof (context));    
-      
-      context.handle = &window;      
-      
-      Notify (WindowEvent_OnChangeHandle, context);    
-    }
+    memset (&context, 0, sizeof (context));    
+    
+    context.handle = (void*)view.get ();
+
+    Notify (WindowEvent_OnChangeHandle, context); 
   }
 
   void OnSurfaceDestroyedCallback ()
   {
-    if (!window.native_window)
-      return;
+    if (!is_surface_created)
+      return;    
+      
+    is_surface_created = false;
     
-    ANativeWindow_release (window.native_window);
-    
-    window.native_window = 0;
-
       //оповещение об изменении дескриптора
 
     WindowEventContext context;
@@ -552,21 +541,15 @@ window_t AndroidWindowManager::CreateWindow (WindowStyle, WindowMessageHandler h
     for (;;)
     {
       if (window->is_native_handle_received)
-      {
-        window->window.native_window = ANativeWindow_fromSurface (&env, surface.get ());
-        window->window.view          = window->view.get ();
-
-        if (!window->window.native_window)
-          throw xtl::format_operation_exception ("", "::ANativeWindow_fromSurface failed");
-
         break;
-      }
-      
+
       static const size_t WAIT_TIME_IN_MICROSECONDS = 100*1000; //100 milliseconds
-      
+
       usleep (WAIT_TIME_IN_MICROSECONDS);
     }
-  
+
+    window->is_surface_created = true;
+    
     return window.release ();
   }
   catch (xtl::exception& e)
@@ -629,10 +612,10 @@ const void* AndroidWindowManager::GetNativeWindowHandle (window_t window)
     if (!window)
       throw xtl::make_null_argument_exception ("", "window");
       
-    if (!window->window.native_window)
+    if (!window->is_surface_created)
       return 0;
       
-    return &window->window;
+    return (void*)window->view.get ();
   }
   catch (xtl::exception& e)
   {
