@@ -23,11 +23,10 @@ EXTERN.OPENALLIB.linux.LIBS                 := pthread dl rt
 EXTERN.OPENALLIB.linux.LINK_FLAGS           := -pthread
 EXTERN.OPENALLIB.beagleboard.LINK_FLAGS     := -rdynamic
 EXTERN.OPENALLIB.meego.LINK_FLAGS           := -rdynamic
-EXTERN.OPENALLIB.android.LIBS               := log OpenSLES
-EXTERN.OPENALLIB.android.LINK_FLAGS         := -Wl,-z,lazy
+EXTERN.OPENALLIB.android.LIBS               := log
 
 #Öåëü ¹2 - OPENAL_TESTS
 EXTERN.OPENAL_TESTS.TYPE         := test-suite
 EXTERN.OPENAL_TESTS.SOURCE_DIRS  := tests
 EXTERN.OPENAL_TESTS.INCLUDE_DIRS := include sources sources/openal32
-EXTERN.OPENAL_TESTS.IMPORTS      := link.extern.openal
+EXTERN.OPENAL_TESTS.IMPORTS      := link.extern.openal run.extern.openal

@@ -28,9 +28,15 @@
 
 
 #include <SLES/OpenSLES.h>
+
+#ifdef ANDROID
+#include "android_opensles_dynlib.h"
+#endif
+
 #if 1
 #include <SLES/OpenSLES_Android.h>
 #else
+
 extern SLAPIENTRY const SLInterfaceID SL_IID_ANDROIDSIMPLEBUFFERQUEUE;
 
 struct SLAndroidSimpleBufferQueueItf_;
@@ -428,16 +434,23 @@ static const BackendFuncs opensl_funcs = {
 
 ALCboolean alc_opensl_init(BackendFuncs *func_list)
 {
+#ifdef ANDROID
+    if (!dynlibOpenSlesInitialize ())
+      return ALC_FALSE;
+#endif
     *func_list = opensl_funcs;
     return ALC_TRUE;
 }
 
 void alc_opensl_deinit(void)
 {
+#ifdef ANDROID
+  dynlibOpenSlesShutdown ();
+#endif
 }
 
 void alc_opensl_probe(enum DevProbe type)
-{
+{    
     switch(type)
     {
         case ALL_DEVICE_PROBE:
