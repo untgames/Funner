@@ -205,7 +205,20 @@ static ALCenum opensl_open_playback(ALCdevice *Device, const ALCchar *deviceName
         return ALC_OUT_OF_MEMORY;
 
     // create engine
-    result = slCreateEngine(&data->engineObject, 0, NULL, 0, NULL, NULL);
+    
+    static const struct SLInterfaceID_ MY_SL_IID_ENGINE_ = { 0x8d97c260, 0xddd4, 0x11db, 0x958f, { 0x00, 0x02, 0xa5, 0xd5, 0xc5, 0x1b } };
+    const SLInterfaceID MY_SL_IID_ENGINE = &MY_SL_IID_ENGINE_;    
+    
+    const SLInterfaceID interfaces [] = {
+      MY_SL_IID_ENGINE, SL_IID_ENGINE, SL_IID_BUFFERQUEUE, SL_IID_PLAY, SL_IID_ANDROIDSIMPLEBUFFERQUEUE
+    };
+    SLboolean interfacesRequired [] = {
+      1, 1, 1, 1, 1
+    };
+    
+    printf ("CHECK FOR %u interfaces\n", sizeof (interfaces) / sizeof (*interfaces)); fflush (stdout);
+    
+    result = slCreateEngine(&data->engineObject, 0, NULL, sizeof (interfaces) / sizeof (*interfaces), interfaces, interfacesRequired);
     PRINTERR(result, "slCreateEngine");
     if(SL_RESULT_SUCCESS == result)
     {
