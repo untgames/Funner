@@ -155,6 +155,8 @@ typedef stl::vector <IWindowListener*> ListenerArray;
 
 @interface UIViewControllerWrapper : UIViewController
 {
+  @private
+    UIWindowWrapper* window;
 }
 
 @end
@@ -166,6 +168,18 @@ typedef stl::vector <IWindowListener*> ListenerArray;
   self.view = nil;
 
   [super dealloc];
+}
+
+-(id)initWithWindow:(UIWindowWrapper*)in_window
+{
+  self = [super init];
+
+  if (!self)
+    return nil;
+
+  window = in_window;
+
+  return self;
 }
 
 -(void)loadView
@@ -188,17 +202,17 @@ typedef stl::vector <IWindowListener*> ListenerArray;
 {
   InterfaceOrientation desired_orientation = get_interface_orientation (interface_orientation);
 
-  return ((UIWindowWrapper*)self.view.window).allowed_orientations & desired_orientation;
+  return window.allowed_orientations & desired_orientation;
 }
 
 -(void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)from_orientation
 {
-  [((UIWindowWrapper*)self.view.window) onInterfaceOrientationChangedFrom:get_interface_orientation (from_orientation) to:get_interface_orientation (self.interfaceOrientation)];
+  [window onInterfaceOrientationChangedFrom:get_interface_orientation (from_orientation) to:get_interface_orientation (self.interfaceOrientation)];
 }
 
 -(void)willRotateToInterfaceOrientation:(UIInterfaceOrientation)to_orientation duration:(NSTimeInterval)duration
 {
-  [((UIWindowWrapper*)self.view.window) onInterfaceOrientationWillChangeFrom:get_interface_orientation (self.interfaceOrientation) to:get_interface_orientation (to_orientation) duration:duration];
+  [window onInterfaceOrientationWillChangeFrom:get_interface_orientation (self.interfaceOrientation) to:get_interface_orientation (to_orientation) duration:duration];
 }
 
 @end
@@ -273,7 +287,7 @@ typedef stl::vector <IWindowListener*> ListenerArray;
     return nil;
   }
 
-  self.rootViewController = [[UIViewControllerWrapper alloc] init];
+  self.rootViewController = [[UIViewControllerWrapper alloc] initWithWindow:self];
   [self.rootViewController release];
 
   [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector (onShow) name:UIWindowDidBecomeVisibleNotification object:self];
