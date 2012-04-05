@@ -26,6 +26,7 @@ const char* LOG_NAME = "render.obsolete.render2d.RenderablePageCurl";
 
 const float  EPS                   = 0.001f;
 const float  BACK_SHADOW_OFFSET    = 0;
+const float  CORNER_SHADOW_SHIFT   = 0.2;
 const float  MIN_SHADOW_LOG_VALUE  = 0.4;
 const float  PI                    = 3.1415926f;
 const size_t SHADOW_TEXTURE_SIZE   = 32;
@@ -658,10 +659,39 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
         }
 
         math::vec2f side_vec = base_vertices [2] - base_vertices [0];
-        float       angle    = atan2 (-side_vec.y, side_vec.x);
+        float       angle;
 
-        base_vertices [0] += side_vec * 0.2 * sin (angle);
-        base_vertices [2] -= side_vec * 0.2 * cos (angle);
+        PageCurlCorner top_corner          = (PageCurlCorner)0;
+        float          corners_heights [4] = { left_top_corner_position.z, left_bottom_corner_position.z, right_top_corner_position.z, right_bottom_corner_position.z };
+        float          top_corner_height   = corners_heights [0];
+
+        for (size_t i = 1; i < 4; i++)
+        {
+          if (corners_heights [i] > top_corner_height)
+          {
+            top_corner        = (PageCurlCorner)i;
+            top_corner_height = corners_heights [i];
+          }
+        }
+
+        switch (top_corner)
+        {
+          case PageCurlCorner_LeftTop:
+            angle = atan2 (side_vec.y, side_vec.x);;
+            break;
+          case PageCurlCorner_LeftBottom:
+            angle = atan2 (-side_vec.y, side_vec.x);;
+            break;
+          case PageCurlCorner_RightTop:
+            angle = atan2 (side_vec.y, -side_vec.x);;
+            break;
+          case PageCurlCorner_RightBottom:
+            angle = atan2 (-side_vec.y, -side_vec.x);
+            break;
+        }
+
+        base_vertices [0] += side_vec * CORNER_SHADOW_SHIFT * sin (angle);
+        base_vertices [2] -= side_vec * CORNER_SHADOW_SHIFT * cos (angle);
 
         triangles_count += 13;
       }
