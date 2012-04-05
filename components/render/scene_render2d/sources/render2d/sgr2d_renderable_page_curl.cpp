@@ -474,13 +474,13 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
       buffer_desc.usage_mode   = low_level::UsageMode_Stream;
       buffer_desc.bind_flags   = low_level::BindFlag_IndexBuffer;
       buffer_desc.access_flags = low_level::AccessFlag_Write;
-      buffer_desc.size         = sizeof (unsigned short) * 27;
+      buffer_desc.size         = sizeof (unsigned short) * 33;
 
       corner_shadow_index_buffer = BufferPtr (device.CreateBuffer (buffer_desc), false);
 
-      unsigned short corner_shadow_indices [27] = { 0,  1,  2,    1,  2,  3,    2,  3,  4,    3,  4,  5,
+      unsigned short corner_shadow_indices [33] = { 0,  1,  2,    1,  2,  3,    2,  3,  4,    3,  4,  5,
                                                     3,  5,  6,    3,  6,  7,    6,  7,  8,    7,  8,  9,
-                                                    0,  3,  9 };
+                                                    1,  3,  7,    0,  1,  9,    1,  7,  9 };
 
       corner_shadow_index_buffer->SetData (0, sizeof (corner_shadow_indices), corner_shadow_indices);
 
@@ -489,14 +489,14 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
       buffer_desc.usage_mode   = low_level::UsageMode_Stream;
       buffer_desc.bind_flags   = low_level::BindFlag_IndexBuffer;
       buffer_desc.access_flags = low_level::AccessFlag_Write;
-      buffer_desc.size         = sizeof (unsigned short) * 42;
+      buffer_desc.size         = sizeof (unsigned short) * 48;
 
       page_shadow_index_buffer = BufferPtr (device.CreateBuffer (buffer_desc), false);
 
-      unsigned short page_shadow_indices [42] = { 0,  1,  2,    1,  2,  3,    2,  3,  4,    3,  4,  5,
+      unsigned short page_shadow_indices [48] = { 0,  1,  2,    1,  2,  3,    2,  3,  4,    3,  4,  5,
                                                   3,  5,  6,    3,  6,  7,    6,  7,  8,    7,  8,  9,
                                                   8,  9, 10,    7,  9, 11,    9, 11, 12,   11, 12, 13,
-                                                  0,  3, 13,    3,  7, 13 };
+                                                  1,  3,  7,    1,  7, 11,    0,  1, 11,    0, 11, 13 };
 
       page_shadow_index_buffer->SetData (0, sizeof (page_shadow_indices), page_shadow_indices);
 
@@ -670,8 +670,11 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
         base_vertices [2] = bottom_corner_position;
         base_vertices [3] = bottom_side_bend_position;
 
-        triangles_count += 12;
+        triangles_count += 16;
       }
+
+      for (size_t i = 0; i < 4; i++)
+        base_vertices [i].x += x_offset;
 
       math::vec2f first_side_vec         = base_vertices [1] - base_vertices [0],
                   first_side_dir         = math::normalize (first_side_vec),
@@ -710,13 +713,6 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
         vertices [8].texcoord = math::vec2f (1, 0.5);
         vertices [9].position = math::vec3f (base_vertices [2].x, base_vertices [2].y, curl_radius);
         vertices [9].texcoord = math::vec2f (0.5, 0);
-
-/*        vertices [20].position = math::vec3f (base_vertices [0].x, base_vertices [0].y, curl_radius);
-        vertices [20].texcoord = math::vec2f (0.5, 0.5);
-        vertices [21].position = math::vec3f (base_vertices [1].x, base_vertices [1].y, curl_radius);
-        vertices [21].texcoord = math::vec2f (0.5, 0.5);
-        vertices [22].position = math::vec3f (base_vertices [2].x, base_vertices [2].y, curl_radius);
-        vertices [22].texcoord = math::vec2f (0.5, 0.5);*/
 
         device.ISSetIndexBuffer (corner_shadow_index_buffer.get ());
       }
@@ -1333,7 +1329,7 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
 
       BindMaterial (device, page_materials [right_page_type].get (), page_textures [right_page_type].get ());
 
-      device.DrawIndexed (low_level::PrimitiveType_TriangleStrip, 0, 6, 0);
+      device.Draw (low_level::PrimitiveType_TriangleStrip, 0, 4);
     }
   }
 
