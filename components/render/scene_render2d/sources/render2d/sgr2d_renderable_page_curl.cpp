@@ -27,7 +27,6 @@ const char* LOG_NAME = "render.obsolete.render2d.RenderablePageCurl";
 const float  EPS                   = 0.001f;
 const float  BACK_SHADOW_OFFSET    = 0;
 const float  CORNER_SHADOW_SHIFT   = 0.2;
-const float  MIN_SHADOW_LOG_VALUE  = 0.3;
 const float  PI                    = 3.1415926f;
 const size_t SHADOW_TEXTURE_SIZE   = 32;
 const size_t SHADOW_VERTICES_COUNT = 16;
@@ -526,7 +525,7 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
       unsigned char *current_texel       = texture_data;
       float         half_texture_size    = SHADOW_TEXTURE_SIZE / 2.f,
                     max_texture_distance = half_texture_size - 0.5f,
-                    shadow_arg_min       = pow (page_curl->ShadowLogBase (), MIN_SHADOW_LOG_VALUE),
+                    shadow_arg_min       = pow (page_curl->ShadowLogBase (), page_curl->ShadowMinLogValue ()),
                     shadow_arg_range     = page_curl->ShadowLogBase () - shadow_arg_min,
                     log_delimiter        = log (page_curl->ShadowLogBase ());
 

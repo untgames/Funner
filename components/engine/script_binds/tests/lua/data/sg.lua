@@ -718,6 +718,7 @@ local function print_curl (curl)
   print (string.format ("  corner shadow offset              %.2f",                   curl.CornerShadowOffset))
   print (string.format ("  shadow width                      %.2f",                   curl.ShadowWidth))
   print (string.format ("  shadow log base                   %.2f",                   curl.ShadowLogBase))
+  print (string.format ("  shadow min log value              %.2f",                   curl.ShadowMinLogValue))
   print (string.format ("  shadow density                    %.2f",                   curl.ShadowDensity))
   print (string.format ("  shadow grow power                 %.2f",                   curl.ShadowGrowPower))
   print (string.format ("  opposite corner shadow grow power %.2f",                   curl.OppositeCornerShadowGrowPower))
@@ -750,6 +751,7 @@ local function test_page_curl ()
   curl.ShadowDensity                 = 0.5
   curl.ShadowGrowPower               = 0.5
   curl.ShadowLogBase                 = 2
+  curl.ShadowMinLogValue             = 0
   curl.OppositeCornerShadowGrowPower = 2
   curl.FindBestCurlSteps             = 500
   curl.BindingMismatchWeight         = 2

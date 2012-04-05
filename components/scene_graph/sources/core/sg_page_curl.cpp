@@ -13,6 +13,7 @@ const float  DEFAULT_OPPOSITE_CORNER_SHADOW_GROW_POWER = 15.f;
 const float  DEFAULT_SHADOW_DENSITY                    = 1.0f;
 const float  DEFAULT_SHADOW_GROW_POWER                 = 0.25f;
 const float  DEFAULT_SHADOW_LOG_BASE                   = 4.f;
+const float  DEFAULT_SHADOW_MIN_LOG_VALUE              = 0.3;
 const float  DEFAULT_SHADOW_WIDTH                      = 0.25f;
 
 }
@@ -36,6 +37,7 @@ struct PageCurl::Impl
   float          shadow_width;                       //ширина тени
   float          shadow_density;                     //плотность тени
   float          shadow_log_base;                    //основание логарифма генерации тени
+  float          shadow_min_log_value;               //минимальное значение тени при логарифмировании
   float          shadow_grow_power;                  //степень нарастания тени при увеличении загиба
   float          opposite_corner_shadow_grow_power;  //степень нарастания тени при увеличении загиба при поднятом противоположном углу страницы
   size_t         find_best_curl_steps;               //количество итераций поиска наилучшей позиции загиба
@@ -53,6 +55,7 @@ struct PageCurl::Impl
     , shadow_width (DEFAULT_SHADOW_WIDTH)
     , shadow_density (DEFAULT_SHADOW_DENSITY)
     , shadow_log_base (DEFAULT_SHADOW_LOG_BASE)
+    , shadow_min_log_value (DEFAULT_SHADOW_MIN_LOG_VALUE)
     , shadow_grow_power (DEFAULT_SHADOW_GROW_POWER)
     , opposite_corner_shadow_grow_power (DEFAULT_OPPOSITE_CORNER_SHADOW_GROW_POWER)
     , find_best_curl_steps (DEFAULT_FIND_BEST_CURL_STEPS)
@@ -319,6 +322,16 @@ void PageCurl::SetShadowLogBase (float log_base)
 float PageCurl::ShadowLogBase () const
 {
   return impl->shadow_log_base;
+}
+
+void PageCurl::SetShadowMinLogValue (float value)
+{
+  impl->shadow_min_log_value = value;
+}
+
+float PageCurl::ShadowMinLogValue () const
+{
+  return impl->shadow_min_log_value;
 }
 
 void PageCurl::SetShadowGrowPower (float power)

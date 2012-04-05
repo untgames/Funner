@@ -110,6 +110,8 @@ class PageCurl : public Entity
     float               ShadowDensity                    () const;
     void                SetShadowLogBase                 (float log_base);            //основание логарифма генерации тени
     float               ShadowLogBase                    () const;
+    void                SetShadowMinLogValue             (float value);               //минимальное значение тени при логарифмировании
+    float               ShadowMinLogValue                () const;
     void                SetShadowGrowPower               (float power);               //степень нарастания тени при увеличении загиба
     float               ShadowGrowPower                  () const;
     void                SetOppositeCornerShadowGrowPower (float power);               //степень нарастания тени при увеличении загиба при поднятом противоположном углу страницы

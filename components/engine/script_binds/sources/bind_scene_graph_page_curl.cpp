@@ -92,6 +92,7 @@ void bind_page_curl_library (Environment& environment)
   lib.Register ("set_ShadowDensity",                 make_invoker (&PageCurl::SetShadowDensity));
   lib.Register ("set_ShadowGrowPower",               make_invoker (&PageCurl::SetShadowGrowPower));
   lib.Register ("set_ShadowLogBase",                 make_invoker (&PageCurl::SetShadowLogBase));
+  lib.Register ("set_ShadowMinLogValue",             make_invoker (&PageCurl::SetShadowMinLogValue));
   lib.Register ("set_ShadowWidth",                   make_invoker (&PageCurl::SetShadowWidth));
   lib.Register ("set_Size",                          make_invoker (xtl::implicit_cast<void (PageCurl::*) (const math::vec2f&)> (&PageCurl::SetSize)));
   lib.Register ("get_BindingMismatchWeight",         make_invoker (&PageCurl::BindingMismatchWeight));
@@ -108,6 +109,7 @@ void bind_page_curl_library (Environment& environment)
   lib.Register ("get_ShadowDensity",                 make_invoker (&PageCurl::ShadowDensity));
   lib.Register ("get_ShadowGrowPower",               make_invoker (&PageCurl::ShadowGrowPower));
   lib.Register ("get_ShadowLogBase",                 make_invoker (&PageCurl::ShadowLogBase));
+  lib.Register ("get_ShadowMinLogValue",             make_invoker (&PageCurl::ShadowMinLogValue));
   lib.Register ("get_ShadowWidth",                   make_invoker (&PageCurl::ShadowWidth));
   lib.Register ("get_Size",                          make_invoker (&PageCurl::Size));
 
