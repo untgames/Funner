@@ -27,7 +27,7 @@ const char* LOG_NAME = "render.obsolete.render2d.RenderablePageCurl";
 const float  EPS                   = 0.001f;
 const float  BACK_SHADOW_OFFSET    = 0;
 const float  CORNER_SHADOW_SHIFT   = 0.2;
-const float  MIN_SHADOW_LOG_VALUE  = 0.4;
+const float  MIN_SHADOW_LOG_VALUE  = 0.3;
 const float  PI                    = 3.1415926f;
 const size_t SHADOW_TEXTURE_SIZE   = 32;
 const size_t SHADOW_VERTICES_COUNT = 16;
@@ -708,76 +708,78 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
       for (size_t i = 0; i < 4; i++)
         base_vertices [i].x += x_offset;
 
-      math::vec2f first_side_vec         = base_vertices [1] - base_vertices [0],
-                  first_side_dir         = math::normalize (first_side_vec),
-                  second_side_vec        = base_vertices [2] - base_vertices [1],
-                  second_side_dir        = math::normalize (second_side_vec);
-      float       first_side_length      = math::length (first_side_vec),
-                  first_mid_point_offset = stl::min (corner_shadow_offset, first_side_length / 2.f);
+      math::vec2f short_side_vec          = base_vertices [1] - base_vertices [0],
+                  short_side_dir          = math::normalize (short_side_vec),
+                  long_side_vec           = base_vertices [2] - base_vertices [1],
+                  long_side_dir           = math::normalize (long_side_vec),
+                  third_side_vec          = base_vertices [2] - base_vertices [3],
+                  third_side_dir          = math::normalize (third_side_vec);
+      float       first_side_length       = math::length (short_side_vec),
+                  first_mid_point_offset  = stl::min (corner_shadow_offset, first_side_length / 2.f),
+                  third_side_length       = math::length (third_side_vec),
+                  second_mid_point_offset = stl::min (corner_shadow_offset, third_side_length / 2.f);
 
-      mid_points [0] = base_vertices [0] + first_side_dir * first_mid_point_offset;
+      if (!has_side_bend_position && third_side_length > first_side_length)
+        short_side_dir = third_side_dir;
+
+      mid_points [0] = base_vertices [0] + short_side_dir * first_mid_point_offset;
 
       vertices [0].position = math::vec3f (base_vertices [0].x, base_vertices [0].y, curl_radius);
       vertices [0].texcoord = math::vec2f (0, 0.5);
       vertices [1].position = math::vec3f (mid_points [0].x, mid_points [0].y, curl_radius);
       vertices [1].texcoord = math::vec2f (0.5, 0.5);
-      vertices [2].position = math::vec3f (mid_points [0].x - second_side_dir.x * corner_shadow_offset, mid_points [0].y - second_side_dir.y * corner_shadow_offset, curl_radius);
+      vertices [2].position = math::vec3f (mid_points [0].x - long_side_dir.x * corner_shadow_offset, mid_points [0].y - long_side_dir.y * corner_shadow_offset, curl_radius);
       vertices [2].texcoord = math::vec2f (0.5, 1);
       vertices [3].position = math::vec3f (base_vertices [1].x, base_vertices [1].y, curl_radius);
       vertices [3].texcoord = math::vec2f (0.5, 0.5);
-      vertices [4].position = math::vec3f (base_vertices [1].x - second_side_dir.x * corner_shadow_offset, base_vertices [1].y - second_side_dir.y * corner_shadow_offset, curl_radius);
+      vertices [4].position = math::vec3f (base_vertices [1].x - long_side_dir.x * corner_shadow_offset, base_vertices [1].y - long_side_dir.y * corner_shadow_offset, curl_radius);
       vertices [4].texcoord = math::vec2f (0.5, 1);
-      vertices [5].position = math::vec3f (base_vertices [1].x + (-second_side_dir.x + first_side_dir.x) * corner_shadow_offset, base_vertices [1].y + (-second_side_dir.y + first_side_dir.y) * corner_shadow_offset, curl_radius);
+      vertices [5].position = math::vec3f (base_vertices [1].x + (-long_side_dir.x + short_side_dir.x) * corner_shadow_offset, base_vertices [1].y + (-long_side_dir.y + short_side_dir.y) * corner_shadow_offset, curl_radius);
       vertices [5].texcoord = math::vec2f (1, 1);
-      vertices [6].position = math::vec3f (base_vertices [1].x + first_side_dir.x * corner_shadow_offset, base_vertices [1].y + first_side_dir.y * corner_shadow_offset, curl_radius);
+      vertices [6].position = math::vec3f (base_vertices [1].x + short_side_dir.x * corner_shadow_offset, base_vertices [1].y + short_side_dir.y * corner_shadow_offset, curl_radius);
       vertices [6].texcoord = math::vec2f (1, 0.5);
 
       if (has_side_bend_position)
       {
-        float second_side_length      = math::length (second_side_vec),
-              second_mid_point_offset = stl::min (corner_shadow_offset, second_side_length / 2);
+        float long_side_length        = math::length (long_side_vec),
+              second_mid_point_offset = stl::min (corner_shadow_offset, long_side_length / 2);
 
-        mid_points [1] = base_vertices [2] - second_side_dir * second_mid_point_offset;
+        mid_points [1] = base_vertices [2] - long_side_dir * second_mid_point_offset;
 
         vertices [7].position = math::vec3f (mid_points [1].x, mid_points [1].y, curl_radius);
         vertices [7].texcoord = math::vec2f (0.5, 0.5);
-        vertices [8].position = math::vec3f (mid_points [1].x + first_side_dir.x * corner_shadow_offset, mid_points [1].y + first_side_dir.y * corner_shadow_offset, curl_radius);
+        vertices [8].position = math::vec3f (mid_points [1].x + short_side_dir.x * corner_shadow_offset, mid_points [1].y + short_side_dir.y * corner_shadow_offset, curl_radius);
         vertices [8].texcoord = math::vec2f (1, 0.5);
         vertices [9].position = math::vec3f (base_vertices [2].x, base_vertices [2].y, curl_radius);
         vertices [9].texcoord = math::vec2f (0.5, 0);
-        vertices [10].position = math::vec3f (base_vertices [0].x - second_side_dir.x * corner_shadow_offset, base_vertices [0].y - second_side_dir.y * corner_shadow_offset, curl_radius);
+        vertices [10].position = math::vec3f (base_vertices [0].x - long_side_dir.x * corner_shadow_offset, base_vertices [0].y - long_side_dir.y * corner_shadow_offset, curl_radius);
         vertices [10].texcoord = math::vec2f (0, 1);
-        vertices [11].position = math::vec3f (base_vertices [2].x + first_side_dir.x * corner_shadow_offset, base_vertices [2].y + first_side_dir.y * corner_shadow_offset, curl_radius);
+        vertices [11].position = math::vec3f (base_vertices [2].x + short_side_dir.x * corner_shadow_offset, base_vertices [2].y + short_side_dir.y * corner_shadow_offset, curl_radius);
         vertices [11].texcoord = math::vec2f (1, 0);
 
         device.ISSetIndexBuffer (corner_shadow_index_buffer.get ());
       }
       else
       {
-        math::vec2f third_side_vec          = base_vertices [3] - base_vertices [2],
-                    third_side_dir          = math::normalize (third_side_vec);
-        float       third_side_length       = math::length (third_side_vec),
-                    second_mid_point_offset = stl::min (corner_shadow_offset, third_side_length / 2.f);
-
-        mid_points [1] = base_vertices [3] - third_side_dir * second_mid_point_offset;
+        mid_points [1] = base_vertices [3] + short_side_dir * second_mid_point_offset;
 
         vertices [7].position  = math::vec3f (base_vertices [2].x, base_vertices [2].y, curl_radius);
         vertices [7].texcoord  = math::vec2f (0.5, 0.5);
-        vertices [8].position  = math::vec3f (base_vertices [2].x - third_side_dir.x * corner_shadow_offset, base_vertices [2].y - third_side_dir.y * corner_shadow_offset, curl_radius);
+        vertices [8].position  = math::vec3f (base_vertices [2].x + short_side_dir.x * corner_shadow_offset, base_vertices [2].y + short_side_dir.y * corner_shadow_offset, curl_radius);
         vertices [8].texcoord  = math::vec2f (1, 0.5);
-        vertices [9].position  = math::vec3f (base_vertices [2].x + second_side_dir.x * corner_shadow_offset, base_vertices [2].y + second_side_dir.y * corner_shadow_offset, curl_radius);
+        vertices [9].position  = math::vec3f (base_vertices [2].x + long_side_dir.x * corner_shadow_offset, base_vertices [2].y + long_side_dir.y * corner_shadow_offset, curl_radius);
         vertices [9].texcoord  = math::vec2f (0.5, 0);
-        vertices [10].position = math::vec3f (base_vertices [2].x + (-third_side_dir.x + second_side_dir.x) * corner_shadow_offset, base_vertices [2].y + (-third_side_dir.y + second_side_dir.y) * corner_shadow_offset, curl_radius);
+        vertices [10].position = math::vec3f (base_vertices [2].x + (short_side_dir.x + long_side_dir.x) * corner_shadow_offset, base_vertices [2].y + (short_side_dir.y + long_side_dir.y) * corner_shadow_offset, curl_radius);
         vertices [10].texcoord = math::vec2f (1, 0);
         vertices [11].position = math::vec3f (mid_points [1].x, mid_points [1].y, curl_radius);
         vertices [11].texcoord = math::vec2f (0.5, 0.5);
-        vertices [12].position = math::vec3f (mid_points [1].x + second_side_dir.x * corner_shadow_offset, mid_points [1].y + second_side_dir.y * corner_shadow_offset, curl_radius);
+        vertices [12].position = math::vec3f (mid_points [1].x + long_side_dir.x * corner_shadow_offset, mid_points [1].y + long_side_dir.y * corner_shadow_offset, curl_radius);
         vertices [12].texcoord = math::vec2f (0.5, 0);
         vertices [13].position = math::vec3f (base_vertices [3].x, base_vertices [3].y, curl_radius);
         vertices [13].texcoord = math::vec2f (0, 0.5);
-        vertices [14].position = math::vec3f (base_vertices [0].x - second_side_dir.x * corner_shadow_offset, base_vertices [0].y - second_side_dir.y * corner_shadow_offset, curl_radius);
+        vertices [14].position = math::vec3f (base_vertices [0].x - long_side_dir.x * corner_shadow_offset, base_vertices [0].y - long_side_dir.y * corner_shadow_offset, curl_radius);
         vertices [14].texcoord = math::vec2f (0, 1);
-        vertices [15].position = math::vec3f (base_vertices [3].x + second_side_dir.x * corner_shadow_offset, base_vertices [3].y + second_side_dir.y * corner_shadow_offset, curl_radius);
+        vertices [15].position = math::vec3f (base_vertices [3].x + long_side_dir.x * corner_shadow_offset, base_vertices [3].y + long_side_dir.y * corner_shadow_offset, curl_radius);
         vertices [15].texcoord = math::vec2f (0, 0);
 
         device.ISSetIndexBuffer (page_shadow_index_buffer.get ());
@@ -852,7 +854,8 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
         }
       }
 
-      math::vec2f shadow_offset = normalize (math::vec2f (-top_detach_position.y + bottom_detach_position.y, -bottom_detach_position.x + top_detach_position.x));
+      math::vec2f shadow_offset = normalize (math::vec2f (-top_detach_position.y + bottom_detach_position.y, -bottom_detach_position.x + top_detach_position.x)),
+                  side_vec      = top_detach_position - bottom_detach_position;
 
       if (!left_side)
         shadow_offset *= -1;
@@ -867,6 +870,9 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
         vertices [i].color.y = light;
         vertices [i].color.z = light;
       }
+
+      top_detach_position    += side_vec;
+      bottom_detach_position -= side_vec;
 
       vertices [0].position = math::vec3f (top_detach_position.x + x_offset,                                     top_detach_position.y,                                          BACK_SHADOW_OFFSET);
       vertices [1].position = math::vec3f (top_detach_position.x + shadow_offset.x * shadow_width + x_offset,    top_detach_position.y + shadow_offset.y * shadow_width,         BACK_SHADOW_OFFSET);
