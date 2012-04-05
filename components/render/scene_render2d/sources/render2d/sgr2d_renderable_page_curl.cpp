@@ -29,7 +29,7 @@ const float  BACK_SHADOW_OFFSET    = 0;
 const float  MAX_SHADOW_LOG_VALUE  = 0.4;
 const float  PI                    = 3.1415926f;
 const size_t SHADOW_TEXTURE_SIZE   = 64;
-const size_t SHADOW_VERTICES_COUNT = 20;
+const size_t SHADOW_VERTICES_COUNT = 23;
 const float  STATIC_PAGES_Z_OFFSET = -0.001f;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -97,7 +97,6 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
   BlendStatePtr              translucent_blend_state;            //состояния блендинга
   BlendStatePtr              mask_blend_state;                   //состояния блендинга
   BlendStatePtr              additive_blend_state;               //состояния блендинга
-  BlendStatePtr              shadow_blend_state;                 //состояния блендинга
   InputLayoutPtr             input_layout;                       //состояние устройства отрисовки
   ProgramPtr                 default_program;                    //шейдер
   ProgramParametersLayoutPtr program_parameters_layout;          //расположение параметров шейдера
@@ -430,7 +429,6 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
       translucent_blend_state            = CreateBlendState              (device, true, low_level::BlendArgument_SourceAlpha, low_level::BlendArgument_InverseSourceAlpha, low_level::BlendArgument_InverseSourceAlpha);
       mask_blend_state                   = CreateBlendState              (device, true, low_level::BlendArgument_Zero, low_level::BlendArgument_SourceColor, low_level::BlendArgument_SourceAlpha);
       additive_blend_state               = CreateBlendState              (device, true, low_level::BlendArgument_SourceAlpha, low_level::BlendArgument_One, low_level::BlendArgument_One);
-      shadow_blend_state                 = CreateBlendState              (device, true, low_level::BlendArgument_Zero, low_level::BlendArgument_InverseSourceAlpha, low_level::BlendArgument_SourceAlpha);
       input_layout                       = CreateInputLayout             (device);
       default_program                    = CreateProgram                 (device, "render.obsolete.renderer2d.RenderablePageCurl.default_program", DEFAULT_SHADER_SOURCE_CODE);
       program_parameters_layout          = CreateProgramParametersLayout (device);
@@ -496,7 +494,8 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
       unsigned short shadow_indices [48] = { 0,  1,  2,    1,  2,  3,    2,  3,  4,    3,  4,  5,
                                              6,  7,  8,    7,  8,  9,    8,  9, 10,    9, 10, 11,
                                              9, 11, 12,    9, 12, 13,   12, 13, 14,   13, 14, 15,
-                                            14, 15, 16,   13, 15, 17,   15, 17, 18,   17, 18, 19 };
+                                             7, 9, 13,   6, 7, 15,   7, 13, 15,   17, 18, 19 };
+//                                            14, 15, 16,   13, 15, 17,   15, 17, 18,   17, 18, 19 };
 
       shadow_index_buffer->SetData (0, sizeof (shadow_indices), shadow_indices);
 
@@ -510,7 +509,7 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
       texture_desc.width                = SHADOW_TEXTURE_SIZE;
       texture_desc.height               = SHADOW_TEXTURE_SIZE;
       texture_desc.layers               = 1;
-      texture_desc.format               = low_level::PixelFormat_LA8;
+      texture_desc.format               = low_level::PixelFormat_L8;
       texture_desc.access_flags         = low_level::AccessFlag_ReadWrite;
       texture_desc.bind_flags           = low_level::BindFlag_Texture;
 #ifndef ARM
@@ -519,7 +518,7 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
 
       shadow_texture = DeviceTexturePtr (device.CreateTexture (texture_desc), false);
 
-      unsigned char texture_data [SHADOW_TEXTURE_SIZE * SHADOW_TEXTURE_SIZE * 2];
+      unsigned char texture_data [SHADOW_TEXTURE_SIZE * SHADOW_TEXTURE_SIZE];
       unsigned char *current_texel    = texture_data;
       float         half_texture_size = SHADOW_TEXTURE_SIZE / 2.f,
                     shadow_value      = pow (page_curl->ShadowLogBase (), MAX_SHADOW_LOG_VALUE),
@@ -530,7 +529,6 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
         {
           float distance = math::length (math::vec2f (i + 0.5f - half_texture_size, j + 0.5 - half_texture_size)) / half_texture_size;
 
-          *current_texel++ = 255;                                                                            //color
           *current_texel++ = stl::max (0, (int)(log (shadow_value * (1 - distance)) / log_delimiter * 255)); //alpha
         }
 
@@ -598,7 +596,7 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
   void DrawShadows (low_level::IDevice& device, float curl_radius, bool left_side)
   {
     device.OSSetDepthStencilState (depth_stencil_state_write_disabled.get ());
-    device.OSSetBlendState        (shadow_blend_state.get ());
+    device.OSSetBlendState        (mask_blend_state.get ());
     device.SSSetTexture           (0, shadow_texture.get ());
     device.ISSetVertexBuffer      (0, shadow_vertex_buffer.get ());
     device.ISSetIndexBuffer       (shadow_index_buffer.get ());
@@ -750,7 +748,13 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
           base_vertices [2] = bottom_side_bend_position;
         }
 
-        triangles_count += 8;
+        math::vec2f side_vec = base_vertices [2] - base_vertices [0];
+        float       angle    = atan2 (-side_vec.y, side_vec.x);
+
+        base_vertices [0] += side_vec * 0.2 * sin (angle);
+        base_vertices [2] -= side_vec * 0.2 * cos (angle);
+
+        triangles_count += 11;
       }
       else //загнуты два угла
       {
@@ -799,6 +803,13 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
         vertices [14].texcoord = math::vec2f (1, 0.5);
         vertices [15].position = math::vec3f (base_vertices [2].x, base_vertices [2].y, curl_radius);
         vertices [15].texcoord = math::vec2f (0.5, 0);
+
+        vertices [20].position = math::vec3f (base_vertices [0].x, base_vertices [0].y, curl_radius);
+        vertices [20].texcoord = math::vec2f (0.5, 0.5);
+        vertices [21].position = math::vec3f (base_vertices [1].x, base_vertices [1].y, curl_radius);
+        vertices [21].texcoord = math::vec2f (0.5, 0.5);
+        vertices [22].position = math::vec3f (base_vertices [2].x, base_vertices [2].y, curl_radius);
+        vertices [22].texcoord = math::vec2f (0.5, 0.5);
       }
       else
       {
