@@ -29,7 +29,7 @@ const float  BACK_SHADOW_OFFSET    = 0;
 const float  MIN_SHADOW_LOG_VALUE  = 0.4;
 const float  PI                    = 3.1415926f;
 const size_t SHADOW_TEXTURE_SIZE   = 32;
-const size_t SHADOW_VERTICES_COUNT = 14;
+const size_t SHADOW_VERTICES_COUNT = 16;
 const float  STATIC_PAGES_Z_OFFSET = -0.001f;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -474,13 +474,14 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
       buffer_desc.usage_mode   = low_level::UsageMode_Stream;
       buffer_desc.bind_flags   = low_level::BindFlag_IndexBuffer;
       buffer_desc.access_flags = low_level::AccessFlag_Write;
-      buffer_desc.size         = sizeof (unsigned short) * 33;
+      buffer_desc.size         = sizeof (unsigned short) * 39;
 
       corner_shadow_index_buffer = BufferPtr (device.CreateBuffer (buffer_desc), false);
 
-      unsigned short corner_shadow_indices [33] = { 0,  1,  2,    1,  2,  3,    2,  3,  4,    3,  4,  5,
+      unsigned short corner_shadow_indices [39] = { 0,  1,  2,    1,  2,  3,    2,  3,  4,    3,  4,  5,
                                                     3,  5,  6,    3,  6,  7,    6,  7,  8,    7,  8,  9,
-                                                    1,  3,  7,    0,  1,  9,    1,  7,  9 };
+                                                    1,  3,  7,    0,  1,  9,    1,  7,  9,    0,  2, 10,
+                                                    8,  9, 11 };
 
       corner_shadow_index_buffer->SetData (0, sizeof (corner_shadow_indices), corner_shadow_indices);
 
@@ -489,14 +490,15 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
       buffer_desc.usage_mode   = low_level::UsageMode_Stream;
       buffer_desc.bind_flags   = low_level::BindFlag_IndexBuffer;
       buffer_desc.access_flags = low_level::AccessFlag_Write;
-      buffer_desc.size         = sizeof (unsigned short) * 48;
+      buffer_desc.size         = sizeof (unsigned short) * 54;
 
       page_shadow_index_buffer = BufferPtr (device.CreateBuffer (buffer_desc), false);
 
-      unsigned short page_shadow_indices [48] = { 0,  1,  2,    1,  2,  3,    2,  3,  4,    3,  4,  5,
+      unsigned short page_shadow_indices [54] = { 0,  1,  2,    1,  2,  3,    2,  3,  4,    3,  4,  5,
                                                   3,  5,  6,    3,  6,  7,    6,  7,  8,    7,  8,  9,
                                                   8,  9, 10,    7,  9, 11,    9, 11, 12,   11, 12, 13,
-                                                  1,  3,  7,    1,  7, 11,    0,  1, 11,    0, 11, 13 };
+                                                  1,  3,  7,    1,  7, 11,    0,  1, 11,    0, 11, 13,
+                                                  0,  2, 14,   12, 13, 15 };
 
       page_shadow_index_buffer->SetData (0, sizeof (page_shadow_indices), page_shadow_indices);
 
@@ -661,7 +663,7 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
         base_vertices [0] += side_vec * 0.2 * sin (angle);
         base_vertices [2] -= side_vec * 0.2 * cos (angle);
 
-        triangles_count += 11;
+        triangles_count += 13;
       }
       else //загнуты два угла
       {
@@ -670,7 +672,7 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
         base_vertices [2] = bottom_corner_position;
         base_vertices [3] = bottom_side_bend_position;
 
-        triangles_count += 16;
+        triangles_count += 18;
       }
 
       for (size_t i = 0; i < 4; i++)
@@ -713,6 +715,10 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
         vertices [8].texcoord = math::vec2f (1, 0.5);
         vertices [9].position = math::vec3f (base_vertices [2].x, base_vertices [2].y, curl_radius);
         vertices [9].texcoord = math::vec2f (0.5, 0);
+        vertices [10].position = math::vec3f (base_vertices [0].x - second_side_dir.x * corner_shadow_offset, base_vertices [0].y - second_side_dir.y * corner_shadow_offset, curl_radius);
+        vertices [10].texcoord = math::vec2f (0, 1);
+        vertices [11].position = math::vec3f (base_vertices [2].x + first_side_dir.x * corner_shadow_offset, base_vertices [2].y + first_side_dir.y * corner_shadow_offset, curl_radius);
+        vertices [11].texcoord = math::vec2f (1, 0);
 
         device.ISSetIndexBuffer (corner_shadow_index_buffer.get ());
       }
@@ -739,6 +745,10 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
         vertices [12].texcoord = math::vec2f (0.5, 0);
         vertices [13].position = math::vec3f (base_vertices [3].x, base_vertices [3].y, curl_radius);
         vertices [13].texcoord = math::vec2f (0, 0.5);
+        vertices [14].position = math::vec3f (base_vertices [0].x - second_side_dir.x * corner_shadow_offset, base_vertices [0].y - second_side_dir.y * corner_shadow_offset, curl_radius);
+        vertices [14].texcoord = math::vec2f (0, 1);
+        vertices [15].position = math::vec3f (base_vertices [3].x + second_side_dir.x * corner_shadow_offset, base_vertices [3].y + second_side_dir.y * corner_shadow_offset, curl_radius);
+        vertices [15].texcoord = math::vec2f (0, 0);
 
         device.ISSetIndexBuffer (page_shadow_index_buffer.get ());
       }
