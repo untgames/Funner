@@ -46,6 +46,7 @@ GCC_TOOLS_DIR              := $(ARM_EABI_DIR)/bin
 COMPILER_GCC               := $(GCC_TOOLS_DIR)/arm-linux-androideabi-gcc
 LINKER_GCC                 := $(GCC_TOOLS_DIR)/arm-linux-androideabi-g++
 LIB_GCC                    := $(GCC_TOOLS_DIR)/arm-linux-androideabi-ar
+ADDR2LINE                  := $(GCC_TOOLS_DIR)/arm-linux-androideabi-addr2line
 ANDROID_TOOLS_DIR          := $(SDK_ROOT)/tools
 ADB                        := $(ANDROID_PLATFORM_TOOLS_DIR)/adb
 APK_BUILDER                := $(ANDROID_SDK)/tools/apkbuilder
@@ -58,7 +59,7 @@ ZIP_ALIGNER                := $(ANDROID_SDK)/tools/zipalign
 BUILD_PATHS                := $(GCC_TOOLS_DIR):$(ARM_EABI_DIR)/libexec/gcc/arm-linux-androideabi/4.4.3
 COMMON_JAVA_FLAGS          += -g
 COMMON_CPPFLAGS            += -fexceptions -frtti
-COMMON_CFLAGS              += -ffunction-sections -funwind-tables -fstack-protector -fpic -fomit-frame-pointer -fno-strict-aliasing -finline-limit=64
+COMMON_CFLAGS              += -ffunction-sections -funwind-tables -fstack-protector -fpic -fomit-frame-pointer -fno-strict-aliasing -finline-limit=64 #-gdwarf-2
 #COMMON_CFLAGS              += -march=armv5te -mtune=xscale -msoft-float -mthumb
 COMMON_CFLAGS              += -march=armv7-a -mtune=xscale -Os -mfpu=vfpv3 #-mfloat-abi=hard
 COMMON_CFLAGS              += -Wno-psabi -Wa,--noexecstack
@@ -141,7 +142,7 @@ define tools.install
  export SUBST_STRING=$$(cd $2 && pwd) SUBST_SUBSTRING=$$(cd $(ROOT) && pwd)/ && export SUBST_RESULT=$${SUBST_STRING/#$$SUBST_SUBSTRING/} && \
  $(ADB) shell "su -c 'mount -o remount,rw -t vfat /dev/block//vold/179:0 $(SDCARD_DIR)'" && \
  $(ADB) shell "export PATH=$(REMOTE_DEBUG_DIR)/busybox:\$\$$PATH && su -c '$(REMOTE_DEBUG_DIR)/busybox mkdir -p $(REMOTE_DEBUG_DIR)/$$(echo $$SUBST_RESULT)'" && \
- $(foreach file,$1, echo -n "Install $(notdir $(file)): " && $(ADB) push $(file) $(REMOTE_DEBUG_DIR)/$$(echo $$SUBST_RESULT) && $(ADB) shell "export PATH=$(REMOTE_DEBUG_DIR)/busybox:\$\$$PATH && su -c '$(REMOTE_DEBUG_DIR)/busybox chmod -R 777 $(REMOTE_DEBUG_DIR)/$$(echo $$SUBST_RESULT)/*'" && ) true
+ $(foreach file,$1, echo -n "Install $(notdir $(file)): " && $(ADB) push $(file) $(REMOTE_DEBUG_DIR)/$$(echo $$SUBST_RESULT) && $(ADB) shell "export PATH=$(REMOTE_DEBUG_DIR)/busybox:\$\$$PATH && su -c '$(REMOTE_DEBUG_DIR)/busybox chmod -R 777 $(REMOTE_DEBUG_DIR)/$$(echo $$SUBST_RESULT)'" && ) true
 endef
 
 #Выполнение команды (команда, каталог запуска, дополнительные пути поиска библиотек и приложений, список динамических библиотек)
@@ -348,3 +349,12 @@ $(BUSYBOX_FLAG_FILE): $(BUSYBOX_FILE)
 	@$(ADB) shell "su -c 'mount -o remount,rw -t vfat /dev/block//vold/179:0 $(SDCARD_DIR)'"
 	@$(ADB) shell "su -c 'chmod 777 $(REMOTE_DEBUG_DIR)/busybox'"
 	@touch $@
+
+.PHONY: addr2line
+
+addr2line:
+#ifeq (,$(addr))
+#	@echo Address not specified
+#	@exit 1
+#endif
+	@$(ADDR2LINE) -e $(DIST_BIN_DIR)/$(file) -C -f -i -s

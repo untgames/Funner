@@ -210,18 +210,15 @@ static ALCboolean android_reset_playback(ALCdevice *device)
     device->FmtType  = DevFmtShort;
 
     SetDefaultChannelOrder(device);
+    
+    data->running = 1;
+    pthread_create(&data->thread, NULL, thread_function, device);    
 
     return ALC_TRUE;
 }
 
 static ALCboolean android_start_playback(ALCdevice *device)
 {
-
-    AndroidData* data = (AndroidData*)device->ExtraData;
-
-    data->running = 1;
-    pthread_create(&data->thread, NULL, thread_function, device);
-
     return ALC_TRUE;
 }
 
