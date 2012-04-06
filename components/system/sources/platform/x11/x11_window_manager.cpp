@@ -431,7 +431,7 @@ struct syslib::cursor_handle
     Описание реализации окна
 */
 
-struct syslib::window_handle: public IWindowMessageHandler
+struct syslib::window_handle: public IWindowMessageHandler, public MessageQueue::Handler
 {
   Display*             display;               //дисплей для данного окна
   XWindow              window;                //дескриптор окна
@@ -465,7 +465,7 @@ struct syslib::window_handle: public IWindowMessageHandler
     , is_multitouch_enabled (false)
     , wm_delete (0)
   {
-    message_queue.RegisterHandler (this);
+    message_queue.RegisterHandler (*this);
   }
   
 ///Деструктор
@@ -474,7 +474,7 @@ struct syslib::window_handle: public IWindowMessageHandler
     try
     {
       DisplayManagerSingleton::Instance ()->UnregisterWindow (window);
-      message_queue.UnregisterHandler (this);
+      message_queue.UnregisterHandler (*this);
     }
     catch (...)
     {
@@ -681,7 +681,7 @@ struct syslib::window_handle: public IWindowMessageHandler
     
     message->event = event;
     
-    message_queue.PushMessage (this, message);
+    message_queue.PushMessage (*this, message);
 
     XLockDisplay (display);
   }

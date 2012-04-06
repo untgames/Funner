@@ -37,6 +37,7 @@ public class EngineView extends SurfaceView implements SurfaceHolder.Callback
   }
   
   private volatile long windowRef;  
+  private boolean isSurfaceCreated = false;
   
   public EngineView (Context context, long windowRef)
   {    
@@ -50,6 +51,9 @@ public class EngineView extends SurfaceView implements SurfaceHolder.Callback
     setFocusableInTouchMode (true);
     
     getHolder ().addCallback (this);
+    
+    if (getHolder ().getSurface () != null && getHolder ().getSurface ().isValid ())
+      surfaceCreated (getHolder ());
   }
   
   public long getWindowRef ()
@@ -315,11 +319,21 @@ public class EngineView extends SurfaceView implements SurfaceHolder.Callback
 
   public void surfaceCreated (SurfaceHolder holder)
   {
+    if (isSurfaceCreated)
+      return;
+      
+    isSurfaceCreated = true;
+      
     onSurfaceCreatedCallback ();
   }
   
   public void surfaceDestroyed (SurfaceHolder holder)
   {
+    if (!isSurfaceCreated)
+      return;
+      
+    isSurfaceCreated = false;
+    
     onSurfaceDestroyedCallback ();
   }
   

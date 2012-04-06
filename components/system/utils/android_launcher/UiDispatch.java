@@ -6,6 +6,7 @@ import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.locks.Condition;
 import android.app.Activity;
 import android.view.View;
+import android.util.*;
 
 class UiCondition
 {

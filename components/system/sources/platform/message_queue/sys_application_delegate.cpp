@@ -9,7 +9,7 @@ using namespace syslib;
 namespace
 {
 
-class ApplicationDelegate: public IApplicationDelegate, public xtl::reference_counter
+class ApplicationDelegate: public IApplicationDelegate, public xtl::reference_counter, public MessageQueue::Handler
 {
   public:
 ///Конструктор
@@ -20,7 +20,7 @@ class ApplicationDelegate: public IApplicationDelegate, public xtl::reference_co
       is_exited    = false;
       listener     = 0;
             
-      message_queue.RegisterHandler (this);
+      message_queue.RegisterHandler (*this);
     }
     
 ///Деструктор
@@ -28,7 +28,7 @@ class ApplicationDelegate: public IApplicationDelegate, public xtl::reference_co
     {
       try
       {
-        message_queue.UnregisterHandler (this);
+        message_queue.UnregisterHandler (*this);
       }
       catch (...)
       {
@@ -74,7 +74,7 @@ class ApplicationDelegate: public IApplicationDelegate, public xtl::reference_co
 ///Выход из приложения
     void Exit (int code)
     {
-      message_queue.PushMessage (this, MessageQueue::MessagePtr (new ExitMessage (*this, code), false));
+      message_queue.PushMessage (*this, MessageQueue::MessagePtr (new ExitMessage (*this, code), false));
     }
     
 ///Обработка события выхода из приложения

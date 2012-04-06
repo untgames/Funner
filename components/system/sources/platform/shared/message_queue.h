@@ -23,7 +23,19 @@ namespace syslib
 class MessageQueue
 {
   public:
-    typedef void* handler_t;
+    class Handler
+    {
+      public:
+        Handler ();
+        Handler (const Handler&);
+
+        Handler& operator = (const Handler&) { return *this; }
+        
+        size_t Id () const { return id; }
+
+      private:
+        size_t id;
+    };
       
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Интерфейс сообщения
@@ -32,14 +44,14 @@ class MessageQueue
     {
       friend class MessageQueue;
       public:
-        Message () : handler (0) {}
+        Message () : id () {}
       
         virtual ~Message () {}      
       
-        virtual void Dispatch () = 0;
-        
+        virtual void Dispatch () = 0;        
+
       private:
-        handler_t handler;
+        size_t id;
     };
     
     typedef xtl::intrusive_ptr<Message> MessagePtr;
@@ -53,13 +65,13 @@ class MessageQueue
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Регистрация доступных дескрипторов обработчиков
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void RegisterHandler   (handler_t);
-    void UnregisterHandler (handler_t);
+    void RegisterHandler   (const Handler&);
+    void UnregisterHandler (const Handler&);
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Помещение сообщения в очередь
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void PushMessage      (handler_t, const MessagePtr& message);
+    void PushMessage      (const Handler&, const MessagePtr& message);
     void PushEmptyMessage (); //используется для пробуждения нити обработки сообщений
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -78,8 +90,8 @@ class MessageQueue
     MessageQueue& operator = (const MessageQueue&); //no impl
     
   private:
-    typedef stl::queue<MessagePtr>   MessageQueueImpl;
-    typedef stl::hash_set<handler_t> HandlerSet;
+    typedef stl::queue<MessagePtr> MessageQueueImpl;
+    typedef stl::hash_set<size_t>  HandlerSet;
 
   private:
     Mutex            mutex;

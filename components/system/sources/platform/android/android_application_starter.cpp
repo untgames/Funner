@@ -1,5 +1,6 @@
 #include "shared.h"
 
+using namespace syslib;
 using namespace syslib::android;
 
 extern "C"
@@ -23,6 +24,12 @@ const char* SEARCH_PATHS            = "SEARCH_PATHS";                           
 
 /// Контекст запуска приложения
 ApplicationContext application_context;
+
+/// Защита activity
+Mutex current_activity_mutex;
+
+/// Текущее activity
+global_ref<jobject> current_activity;
 
 /// Параметры запуска приложения
 struct ApplicationStartArgs
@@ -199,8 +206,9 @@ void start_application (JavaVM* vm, jobject activity, const char* program_name, 
     
     //сохранение контекста запуска приложения
 
-  application_context.vm       = vm;
-  application_context.activity = activity;
+  application_context.vm = vm;
+  
+  current_activity = activity;
   
   application_context.utils_class = get_env ().FindClass (ENGINE_UTILS_CLASS_NAME);
   
@@ -216,6 +224,22 @@ void start_application (JavaVM* vm, jobject activity, const char* program_name, 
 const ApplicationContext& get_context ()
 {
   return application_context;
+}
+
+/// изменение activity
+void set_activity (jobject activity)
+{
+  Lock lock (current_activity_mutex);
+
+  current_activity = activity;
+}
+
+/// получение activity
+jobject get_activity ()
+{
+  Lock lock (current_activity_mutex);
+
+  return current_activity.get ();
 }
 
 /// получение виртуальной машины

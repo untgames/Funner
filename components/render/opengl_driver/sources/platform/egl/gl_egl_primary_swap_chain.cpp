@@ -101,7 +101,6 @@ struct PrimarySwapChain::Impl
 #ifdef ANDROID
 
       egl_surface = eglCreateWindowSurfaceAndroid (egl_display, egl_config, output->GetWindowHandle (), format);  
-      
 #else
 
         //создание поверхности отрисовки
@@ -157,7 +156,9 @@ struct PrimarySwapChain::Impl
     try
     {    
       DisplayLock lock (output->GetDisplay ());
-      
+
+      eglWaitGL ();
+
       eglDestroySurface (egl_display, egl_surface);
     }
     catch (...)
@@ -275,6 +276,10 @@ void PrimarySwapChain::Present ()
   try
   {
     DisplayLock lock (impl->output->GetDisplay ());        
+    
+#ifdef ANDROID    
+    eglWaitGL ();    
+#endif
     
     if (!eglSwapBuffers (impl->egl_display, impl->egl_surface))
       raise_error ("::eglSwapBuffers");                  

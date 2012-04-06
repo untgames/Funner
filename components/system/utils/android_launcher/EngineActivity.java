@@ -8,17 +8,23 @@ import android.os.Looper;
 import android.content.ContextWrapper;
 import android.content.pm.ApplicationInfo;
 import android.util.*;
+import android.os.Process;
 import java.io.*;
 
 /// Данный класс используется для запуска внешних shared-library
 public class EngineActivity extends Activity
 {
+  private static boolean isLoaded = false;
+
 ///Загрузчик
   @Override
   public void onCreate(Bundle savedInstanceState)
-  {
+  {        
     super.onCreate (savedInstanceState);
-        
+    
+    if (isLoaded)
+      return;
+
       /// получение параметров запуска
 
     Bundle extras = getIntent ().getExtras ();
@@ -96,7 +102,7 @@ public class EngineActivity extends Activity
         System.load (programName);
 
       if (startApplication (programName, workDir, programArgs != null ? programArgs : "", envVars) == 0)
-        System.exit (0);
+        System.exit (0);              
     }    
     catch (Throwable e)
     {
@@ -105,6 +111,8 @@ public class EngineActivity extends Activity
       
       System.exit (0);
     }           
+    
+    isLoaded = true;
   }  
   
 ///Приостановка приложения  

@@ -3,13 +3,18 @@
 using namespace syslib;
 using namespace syslib::android;
 
-//TODO: обработка исключений в CreateWindow и удаление окна
+namespace
+{
+
+const char* LOG_NAME = "android.syslib.window";
+
+}
 
 /*
     Окно
 */
 
-struct syslib::window_handle
+struct syslib::window_handle: public MessageQueue::Handler
 {
   global_ref<jobject>  view;                             //android окно  
   WindowMessageHandler message_handler;                  //обработчик сообщений
@@ -33,6 +38,7 @@ struct syslib::window_handle
   bool                 is_multitouch_enabled;            //включен ли multitouch
   bool                 is_surface_created;               //состояние поверхности
   volatile bool        is_native_handle_received;        //получен ли android window handle
+  common::Log          log;                              //поток протоколирования
   
 ///Конструктор
   window_handle ()
@@ -43,8 +49,9 @@ struct syslib::window_handle
     , is_multitouch_enabled (false)
     , is_surface_created (false)
     , is_native_handle_received (false)
-  {
-    MessageQueueSingleton::Instance ()->RegisterHandler (this);
+    , log (LOG_NAME)
+  {    
+    MessageQueueSingleton::Instance ()->RegisterHandler (*this);
   }
 
 ///Деструктор
@@ -62,7 +69,7 @@ struct syslib::window_handle
     {
     }
     
-    MessageQueueSingleton::Instance ()->UnregisterHandler (this);
+    MessageQueueSingleton::Instance ()->UnregisterHandler (*this);
   }
  
   void Notify (WindowEvent event, const WindowEventContext& context)
@@ -259,14 +266,16 @@ struct syslib::window_handle
   {
     if (is_surface_created)
       return;
-    
-      //получение поверхности
       
+    log.Printf ("Surface created for window %p", view.get ());
+
+      //получение поверхности
+
     local_ref<jobject> surface = check_errors (get_env ().CallObjectMethod (view.get (), get_surface_method));
-    
+
     if (!surface)
       throw xtl::format_operation_exception ("", "EngineView::getSurfaceThreadSafe failed");                  
-      
+
     is_surface_created = true;
 
       //оповещение об изменении дескриптора
@@ -285,6 +294,8 @@ struct syslib::window_handle
     if (!is_surface_created)
       return;    
       
+    log.Printf ("Surface destroyed for window %p", view.get ());
+
     is_surface_created = false;
     
       //оповещение об изменении дескриптора
@@ -292,7 +303,7 @@ struct syslib::window_handle
     WindowEventContext context;
 
     memset (&context, 0, sizeof (context));    
-    
+
     Notify (WindowEvent_OnChangeHandle, context);
   }  
 };
@@ -316,7 +327,7 @@ class JniWindowManager
       {          
           //получение класса Activity
 
-        activity_class = get_env ().GetObjectClass (get_context ().activity.get ());
+        activity_class = get_env ().GetObjectClass (get_activity ());
         
         if (!activity_class)
           throw xtl::format_operation_exception ("", "JNIEnv::GetObjectClass failed");
@@ -333,9 +344,7 @@ class JniWindowManager
 ///Создание окна
     local_ref<jobject> CreateView (const char* init_string, void* window_ref)
     {
-      const ApplicationContext& context = get_context ();     
-      
-      local_ref<jobject> view = check_errors (get_env ().CallObjectMethod (context.activity.get (), create_view_method, tojstring (init_string).get (), window_ref));
+      local_ref<jobject> view = check_errors (get_env ().CallObjectMethod (get_activity (), create_view_method, tojstring (init_string).get (), window_ref));
 
       if (!view)
         throw xtl::format_operation_exception ("", "EngineActivity::createEngineView failed");
@@ -397,7 +406,7 @@ template <class Fn> class WindowMessage: public MessageQueue::Message
 
   private:
     window_t window;
-    Fn                 fn;
+    Fn       fn;
 };
 
 template <class Fn> void push_message (jobject view, const Fn& fn)
@@ -409,7 +418,7 @@ template <class Fn> void push_message (jobject view, const Fn& fn)
     if (!window)
       return;
 
-    MessageQueueSingleton::Instance ()->PushMessage (window, MessageQueue::MessagePtr (new WindowMessage<Fn> (window, fn), false));
+    MessageQueueSingleton::Instance ()->PushMessage (*window, MessageQueue::MessagePtr (new WindowMessage<Fn> (window, fn), false));
   }
   catch (...)
   {
@@ -529,15 +538,10 @@ window_t AndroidWindowManager::CreateWindow (WindowStyle, WindowMessageHandler h
     window->post_invalidate_method           = find_method (&env, view_class.get (), "postInvalidate", "()V");
     window->remove_from_parent_window_method = find_method (&env, view_class.get (), "removeFromParentWindowThreadSafe", "()V");
 
-      //получение дескриптора поверхности
-    
-    local_ref<jobject> surface = check_errors (env.CallObjectMethod (window->view.get (), window->get_surface_method));
-
-    if (!surface)
-      throw xtl::format_operation_exception ("", "EngineView::getSurfaceThreadSafe failed");      
-
       //ожидание создания поверхности
-            
+
+    size_t start_wait = common::milliseconds ();
+
     for (;;)
     {
       if (window->is_native_handle_received)
@@ -546,7 +550,19 @@ window_t AndroidWindowManager::CreateWindow (WindowStyle, WindowMessageHandler h
       static const size_t WAIT_TIME_IN_MICROSECONDS = 100*1000; //100 milliseconds
 
       usleep (WAIT_TIME_IN_MICROSECONDS);
+      
+      static const size_t MAX_TIMEOUT_IN_MILLISECONDS = 2000;
+      
+      if (common::milliseconds () - start_wait > MAX_TIMEOUT_IN_MILLISECONDS)
+        throw xtl::format_operation_exception ("", "Can't create window because Surface has not been created for %u milliseconds", MAX_TIMEOUT_IN_MILLISECONDS);
     }
+
+      //получение дескриптора поверхности
+    
+    local_ref<jobject> surface = check_errors (env.CallObjectMethod (window->view.get (), window->get_surface_method));
+
+    if (!surface)
+      throw xtl::format_operation_exception ("", "EngineView::getSurfaceThreadSafe failed");          
 
     window->is_surface_created = true;
     

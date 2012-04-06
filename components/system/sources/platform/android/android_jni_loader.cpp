@@ -39,7 +39,7 @@ jint JNICALL startApplication (JNIEnv* env, jobject thiz, jstring jprogram_name,
       return 0;
     }
 
-    startStdioRedirection ();
+    startStdioRedirection (java_vm);
 
     start_application (java_vm, thiz, program_name.get (), program_args.get (), env_vars.get ());
 

@@ -21,9 +21,11 @@
 #include <xtl/reference_counter.h>
 
 #include <common/file.h>
+#include <common/log.h>
 #include <common/property_map.h>
 #include <common/singleton.h>
 #include <common/strlib.h>
+#include <common/time.h>
 
 #include <syslib/keydefs.h>
 #include <syslib/thread.h>
@@ -50,14 +52,14 @@ JNIEnv& get_env ();
 ///Стратегия владения локальной JNI ссылкой
 template <class T> struct jni_local_ref_strategy
 {
-  static T*   clone   (T* ptr) { get_env ().NewLocalRef (ptr); return ptr; }
+  static T*   clone   (T* ptr) { return (T*)get_env ().NewLocalRef (ptr); }
   static void release (T* ptr) { get_env ().DeleteLocalRef (ptr); }  
 };
 
 ///Стратегия владения глобальной JNI ссылкой
 template <class T> struct jni_global_ref_strategy
 {
-  static T*   clone   (T* ptr) { get_env ().NewGlobalRef (ptr); return ptr; }
+  static T*   clone   (T* ptr) { return (T*)get_env ().NewGlobalRef (ptr); }
   static void release (T* ptr) { get_env ().DeleteGlobalRef (ptr); }  
 };
 
@@ -180,7 +182,6 @@ template <class T> T check_errors (T result)
 struct ApplicationContext
 {
   JavaVM*             vm;          //виртуальная машина
-  global_ref<jobject> activity;    //activity, запустившее приложение
   global_ref<jclass>  utils_class; //EngineUtils class
   
   ApplicationContext () : vm (0) {}
@@ -198,6 +199,12 @@ void register_activity_callbacks (JNIEnv* env, jclass activity_class);
 /// получение контекста запуска приложения
 const ApplicationContext& get_context ();
 
+/// изменение activity
+void set_activity (jobject activity);
+
+/// получение текущего activity
+jobject get_activity ();
+
 /*
     Отладочное протоколирование
 */
@@ -207,7 +214,7 @@ int log_vprintf (int level, const char* format, va_list args);
 int log_info    (const char* format, ...);
 int log_error   (const char* format, ...);
 
-void startStdioRedirection    ();
+void startStdioRedirection    (JavaVM*);
 void shutdownStdioRedirection ();
 
 }

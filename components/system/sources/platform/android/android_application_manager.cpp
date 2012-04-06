@@ -1,9 +1,12 @@
 #include "shared.h"
 
 using namespace syslib;
+using namespace syslib::android;
 
 namespace
 {
+
+const char* LOG_NAME = "syslib.android";
 
 class AndroidApplicationDelegate;
 
@@ -24,24 +27,13 @@ template <class Fn> class ActivityMessage: public MessageQueue::Message
     Fn fn;
 };
 
-template <class Fn> void push_message (const Fn& fn)
-{
-  try
-  {
-    MessageQueueSingleton::Instance ()->PushMessage (application_delegate, MessageQueue::MessagePtr (new ActivityMessage<Fn> (fn), false));
-  }
-  catch (...)
-  {
-    //подавление всех исключений
-  }
-}
-
-class AndroidApplicationDelegate: public IApplicationDelegate, public xtl::reference_counter
+class AndroidApplicationDelegate: public IApplicationDelegate, public xtl::reference_counter, public MessageQueue::Handler
 {
   public:
 ///Конструктор
     AndroidApplicationDelegate ()
       : message_queue (*MessageQueueSingleton::Instance ())    
+      , log (LOG_NAME)
     {
       if (application_delegate)
         throw xtl::format_operation_exception ("syslib::android::AndroidApplicationDelegate::AndroidApplicationDelegate", "Delegate has been already created");
@@ -51,7 +43,7 @@ class AndroidApplicationDelegate: public IApplicationDelegate, public xtl::refer
       is_paused    = false;
       listener     = 0;
       
-      MessageQueueSingleton::Instance ()->RegisterHandler (this);
+      MessageQueueSingleton::Instance ()->RegisterHandler (*this);
       
       application_delegate = this;      
     }
@@ -63,7 +55,7 @@ class AndroidApplicationDelegate: public IApplicationDelegate, public xtl::refer
       
       try
       {
-        MessageQueueSingleton::Instance ()->UnregisterHandler (this);
+        MessageQueueSingleton::Instance ()->UnregisterHandler (*this);
       }
       catch (...)
       {
@@ -71,6 +63,19 @@ class AndroidApplicationDelegate: public IApplicationDelegate, public xtl::refer
       }
     }
 
+///Помещение сообщения в очередь
+    template <class Fn> static void PushMessage (const Fn& fn)
+    {
+      try
+      {
+        MessageQueueSingleton::Instance ()->PushMessage (*application_delegate, MessageQueue::MessagePtr (new ActivityMessage<Fn> (fn), false));
+      }
+      catch (...)
+      {
+        //подавление всех исключений
+      }
+    }
+    
 ///Запуск цикла обработки сообщений
     void Run ()
     {
@@ -102,7 +107,7 @@ class AndroidApplicationDelegate: public IApplicationDelegate, public xtl::refer
 ///Выход из приложения
     void Exit (int code)
     {
-      message_queue.PushMessage (this, MessageQueue::MessagePtr (new ExitMessage (*this, code), false));      
+      message_queue.PushMessage (*this, MessageQueue::MessagePtr (new ExitMessage (*this, code), false));      
     }
     
 ///Обработка события выхода из приложения
@@ -146,7 +151,7 @@ class AndroidApplicationDelegate: public IApplicationDelegate, public xtl::refer
       }
 
       if (!state)
-        push_message (xtl::bind (&AndroidApplicationDelegate::OnPause, this));        
+        PushMessage (xtl::bind (&AndroidApplicationDelegate::OnPause, this));        
     }
     
 ///Оповещение о приостановке приложения
@@ -154,6 +159,8 @@ class AndroidApplicationDelegate: public IApplicationDelegate, public xtl::refer
     {        
       if (listener)
         listener->OnPause ();
+        
+      log.Printf ("Application paused");
 
       {
         Lock lock (pause_mutex);
@@ -161,6 +168,8 @@ class AndroidApplicationDelegate: public IApplicationDelegate, public xtl::refer
         while (is_paused)
           pause_condition.Wait (pause_mutex);        
       }
+      
+      log.Printf ("Application resumed");      
 
       if (listener)
         listener->OnResume ();      
@@ -244,6 +253,7 @@ class AndroidApplicationDelegate: public IApplicationDelegate, public xtl::refer
     Condition             pause_condition;
     IApplicationListener* listener;
     MessageQueue&         message_queue;    
+    common::Log           log;
 };
 
 /*
@@ -262,6 +272,8 @@ void on_resume_callback (JNIEnv& env, jobject activity)
 {
   if (!application_delegate)
     return;
+    
+  set_activity (activity);
 
   application_delegate->SetActivityState (true);
 }
@@ -271,7 +283,7 @@ void on_low_memory_callback (JNIEnv& env, jobject activity)
   if (!application_delegate)
     return;
 
-  push_message (xtl::bind (&AndroidApplicationDelegate::OnMemoryWarning, application_delegate));
+  AndroidApplicationDelegate::PushMessage (xtl::bind (&AndroidApplicationDelegate::OnMemoryWarning, application_delegate));
 }
 
 }

@@ -2,6 +2,22 @@
 
 using namespace syslib;
 
+static int message_queue_id = 1;
+
+/*
+    MessageQueue::Handler
+*/
+
+MessageQueue::Handler::Handler ()  
+{
+  id = xtl::atomic_increment (message_queue_id);
+}
+
+MessageQueue::Handler::Handler (const Handler&)
+{
+  id = xtl::atomic_increment (message_queue_id);
+}
+
 /*
     Конструктор / деструктор
 */
@@ -25,13 +41,13 @@ MessageQueue::~MessageQueue ()
     Регистрация доступных дескрипторов обработчиков
 */
 
-void MessageQueue::RegisterHandler (handler_t handler)
+void MessageQueue::RegisterHandler (const Handler& handler)
 {
   try
   {
     Lock lock (mutex);
     
-    handlers.insert (handler);
+    handlers.insert (handler.Id ());
   }
   catch (xtl::exception& e)
   {
@@ -40,13 +56,13 @@ void MessageQueue::RegisterHandler (handler_t handler)
   }
 }
 
-void MessageQueue::UnregisterHandler (handler_t handler)
+void MessageQueue::UnregisterHandler (const Handler& handler)
 {
   try
   {
     Lock lock (mutex);
     
-    handlers.erase (handler);
+    handlers.erase (handler.Id ());
   }
   catch (xtl::exception& e)
   {
@@ -59,13 +75,13 @@ void MessageQueue::UnregisterHandler (handler_t handler)
     Помещение сообщения в очередь
 */
 
-void MessageQueue::PushMessage (handler_t handler, const MessagePtr& message)
+void MessageQueue::PushMessage (const Handler& handler, const MessagePtr& message)
 {
   try
   {
     Lock lock (mutex);
     
-    message->handler = handler;
+    message->id = handler.Id ();
     
     bool is_empty = messages.empty ();
     
@@ -118,7 +134,7 @@ void MessageQueue::DispatchFirstMessage ()
       
       messages.pop ();
 
-      if (!handlers.count (message->handler))
+      if (!handlers.count (message->id))
         return; //обработчик сообщения не зарегистрирован
     }
     

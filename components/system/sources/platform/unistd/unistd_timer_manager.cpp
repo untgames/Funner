@@ -50,7 +50,7 @@ const char* LOG_NAME = "system.unistd"; //имя потока протоколирования
     Менеджер таймеров
 */
 
-class TimerManager
+class TimerManager: public MessageQueue::Handler
 {
   public:
     typedef syslib::timer_t timer_t;
@@ -79,7 +79,7 @@ class TimerManager
       
       try
       {        
-        message_queue.RegisterHandler (this);
+        message_queue.RegisterHandler (*this);
       }
       catch (...)
       {
@@ -95,9 +95,9 @@ class TimerManager
       {
         CloseTimersThread ();
         
-        UnregisterAllTimers ();
+        message_queue.UnregisterHandler (*this);        
         
-        message_queue.UnregisterHandler (this);
+        UnregisterAllTimers ();        
       }
       catch (...)
       {
@@ -181,14 +181,7 @@ class TimerManager
     
 ///Удаление всех таймеров
     void UnregisterAllTimers ()
-    {
-      {
-        Lock lock (mutex);
-      
-        for (TimerList::iterator iter=timers.begin (), end=timers.end (); iter!=end; ++iter)
-          message_queue.UnregisterHandler (*iter);
-      }
-      
+    {      
       condition.NotifyOne ();
     }
     
@@ -287,7 +280,7 @@ class TimerManager
             
           try
           {
-            message_queue.PushMessage (this, xtl::intrusive_ptr<Message> (new Message (*this, &timer), false));
+            message_queue.PushMessage (*this, xtl::intrusive_ptr<Message> (new Message (*this, &timer), false));
           }
           catch (std::exception& e)
           {

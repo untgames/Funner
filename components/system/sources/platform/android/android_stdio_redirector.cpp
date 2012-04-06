@@ -23,12 +23,12 @@ class StdioRedirector
 {
   public:
 ///Начало перенаправления
-    static void Init ()
+    static void Init (JavaVM* vm)
     {
       if (instance)
         return;
         
-      instance = new StdioRedirector;
+      instance = new StdioRedirector (vm);
     }
     
 ///Конец перенаправления
@@ -44,19 +44,23 @@ class StdioRedirector
     
   private:
 ///Конструктор
-    StdioRedirector ()
+    StdioRedirector (JavaVM* in_vm)
       : stop_request (false)
       , thread_ready (false)
+      , vm (in_vm)
     {
       try
-      {
+      {        
         for (size_t i=0; i<2; i++)
           stderr_pipe [i] = stdout_pipe [i] = -1;
         
         try
         {
             //инициализация перенаправления
-          
+            
+          if (!vm)
+            throw xtl::make_null_argument_exception ("", "vm");
+                      
           if (pipe (stdout_pipe) != 0)
             throw xtl::format_operation_exception ("", "::pipe failed. %s", strerror (errno));
 
@@ -129,7 +133,7 @@ class StdioRedirector
     
 ///Основной цикл
     int Run ()
-    {
+    {      
       {
         Lock lock (mutex);
 
@@ -140,7 +144,7 @@ class StdioRedirector
       
       JNIEnv* env = 0;
       
-      jint status = get_context ().vm->AttachCurrentThread (&env, 0);
+      jint status = vm->AttachCurrentThread (&env, 0);
       
       if (status)
         return 0;
@@ -192,6 +196,8 @@ class StdioRedirector
       close (stdout_pipe [0]);
       close (stderr_pipe [0]);
       
+//      vm->DetachCurrentThread (vm);
+      
       return 0;
     }
     
@@ -199,8 +205,8 @@ class StdioRedirector
     {
         //чтение данных
       
-      size_t  available = MAX_LINE_LENGTH - data.count;
-      ssize_t actual    = read (fd, data.buffer + data.count, available);
+      size_t available = MAX_LINE_LENGTH - data.count;
+      int    actual    = read (fd, data.buffer + data.count, available);
 
       if (actual <= 0)
           return false;
@@ -264,6 +270,7 @@ class StdioRedirector
     Condition                     condition;
     int                           stdout_pipe [2];
     int                           stderr_pipe [2];
+    JavaVM*                       vm;
     static StdioRedirector*       instance;
 };
 
@@ -277,9 +284,9 @@ namespace syslib
 namespace android
 {
 
-void startStdioRedirection ()
+void startStdioRedirection (JavaVM* vm)
 {
-  StdioRedirector::Init ();
+  StdioRedirector::Init (vm);
 }
 
 void shutdownStdioRedirection ()
