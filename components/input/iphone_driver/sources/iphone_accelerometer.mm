@@ -1,6 +1,7 @@
 #include "shared.h"
 
 #import <UIKit/UIAccelerometer.h>
+#import <UIKit/UIApplication.h>
 
 using namespace input::low_level::iphone_driver;
 
@@ -121,7 +122,20 @@ class AccelerometerListener
   if (!listener)
     return;
 
-  listener->OnAcceleration (acceleration.x, acceleration.y, acceleration.z);
+  switch ([UIApplication sharedApplication].statusBarOrientation)
+  {
+    case UIInterfaceOrientationPortraitUpsideDown:
+      listener->OnAcceleration (-acceleration.x, -acceleration.y, acceleration.z);
+      break;
+    case UIInterfaceOrientationLandscapeLeft:
+      listener->OnAcceleration (acceleration.y, -acceleration.x, acceleration.z);
+      break;
+    case UIInterfaceOrientationLandscapeRight:
+      listener->OnAcceleration (-acceleration.y, acceleration.x, acceleration.z);
+      break;
+    default:
+      listener->OnAcceleration (acceleration.x, acceleration.y, acceleration.z);
+  }
 }
 
 @end
