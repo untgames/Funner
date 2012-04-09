@@ -13,6 +13,13 @@ using namespace common;
     Реализация таймер с минимальной погрешностью
 */
 
+namespace
+{
+
+size_t start_milliseconds_time = Platform::GetMilliseconds ();
+
+}
+
 namespace common
 {
 
@@ -46,7 +53,7 @@ struct TimerImpl: public xtl::reference_counter
     if (!started)
       return;
       
-    time = static_cast<long> (ComputeTimeInteger ()) / precision;
+    time = ComputeTimeInteger () / precision;
   }
   
 ///Расчёт интервала времени
@@ -230,10 +237,8 @@ void swap (Timer& timer1, Timer& timer2)
 
 //Получение времени в миллисекундах от первого вызова milliseconds
 size_t milliseconds ()
-{
-  static size_t start = Platform::GetMilliseconds ();
-  
-  return Platform::GetMilliseconds () - start;
+{  
+  return Platform::GetMilliseconds () - start_milliseconds_time;
 }
 
 }
