@@ -1,6 +1,5 @@
 #include "shared.h"
 
-#import <Foundation/NSObject.h>
 #import <Foundation/NSAutoreleasePool.h>
 
 #import <UIKit/UIApplication.h>
@@ -113,22 +112,23 @@ class ApplicationDelegateImpl: public IApplicationDelegate, public xtl::referenc
 
 typedef stl::vector<syslib::iphone::IApplicationListener*> ListenerArray;
 
-@interface ApplicationDelegate : NSObject
+@interface ApplicationDelegateInternal : NSObject
 {
   @private
-    ListenerArray *listeners;  //слушатели событий
-    CADisplayLink *idle_timer; //таймер вызова OnIdle
+    ListenerArray *listeners;        //слушатели событий
+    CADisplayLink *idle_timer;       //таймер вызова OnIdle
+    bool          main_view_visible; //виден ли главный view приложения
 }
 
--(id) init;
--(void) dealloc;
-
--(void) attachListener:(syslib::iphone::IApplicationListener*)listener;
--(void) detachListener:(syslib::iphone::IApplicationListener*)listener;
+@property (nonatomic, readonly) ListenerArray* listeners;
+@property (nonatomic, readonly) CADisplayLink* idle_timer;
+@property (nonatomic)           bool           main_view_visible;
 
 @end
 
-@implementation ApplicationDelegate
+@implementation ApplicationDelegateInternal
+
+@synthesize listeners, idle_timer, main_view_visible;
 
 -(void)initIdleTimer
 {
@@ -182,12 +182,37 @@ typedef stl::vector<syslib::iphone::IApplicationListener*> ListenerArray;
 
 -(void) onIdle:(CADisplayLink*)sender
 {
-  if (application_delegate)
+  if (application_delegate && main_view_visible)
     application_delegate->OnIdle ();
 }
 
--(void) applicationWillFinishLaunching:(UIApplication*)application
+@end
+
+@implementation ApplicationDelegate
+
+-(id) init
 {
+  self = [super init];
+
+  if (!self)
+    return nil;
+
+  impl = [[ApplicationDelegateInternal alloc] init];
+
+  if (!impl)
+  {
+    [self release];
+    return nil;
+  }
+
+  return self;
+}
+
+-(void) dealloc
+{
+  [impl release];
+
+  [super dealloc];
 }
 
 -(BOOL) application:(UIApplication*)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
@@ -196,15 +221,15 @@ typedef stl::vector<syslib::iphone::IApplicationListener*> ListenerArray;
   
   application_delegate->OnInitialize ();
 
-  idle_timer.paused = NO;
+  impl.idle_timer.paused = NO;
 
   return YES;
 }
 
 -(void) applicationWillTerminate:(UIApplication*)application
 {
-  [idle_timer invalidate];
-  idle_timer.paused = YES;
+  [impl.idle_timer invalidate];
+  impl.idle_timer.paused = YES;
 
   application_delegate->OnExit ();
 }
@@ -220,25 +245,25 @@ typedef stl::vector<syslib::iphone::IApplicationListener*> ListenerArray;
 
 -(void) applicationDidReceiveMemoryWarning:(UIApplication*)application
 {
-  for (ListenerArray::iterator iter = listeners->begin (), end = listeners->end (); iter != end; ++iter)
+  for (ListenerArray::iterator iter = impl.listeners->begin (), end = impl.listeners->end (); iter != end; ++iter)
     (*iter)->OnMemoryWarning ();
 }
 
 -(void) applicationWillResignActive:(UIApplication*)application
 {
-  for (ListenerArray::iterator iter = listeners->begin (), end = listeners->end (); iter != end; ++iter)
+  for (ListenerArray::iterator iter = impl.listeners->begin (), end = impl.listeners->end (); iter != end; ++iter)
     (*iter)->OnInactive ();
 
-  idle_timer.paused = YES;
-  [idle_timer invalidate];
+  impl.idle_timer.paused = YES;
+  [impl.idle_timer invalidate];
 }
 
 -(void) applicationDidBecomeActive:(UIApplication*)application
 {
-  for (ListenerArray::iterator iter = listeners->begin (), end = listeners->end (); iter != end; ++iter)
+  for (ListenerArray::iterator iter = impl.listeners->begin (), end = impl.listeners->end (); iter != end; ++iter)
     (*iter)->OnActive ();
 
-  [self initIdleTimer];
+  [impl initIdleTimer];
 }
 
 /*
@@ -247,12 +272,22 @@ typedef stl::vector<syslib::iphone::IApplicationListener*> ListenerArray;
 
 -(void) attachListener:(syslib::iphone::IApplicationListener*)listener
 {
-  listeners->push_back (listener);
+  impl.listeners->push_back (listener);
 }
 
 -(void) detachListener:(syslib::iphone::IApplicationListener*)listener
 {
-  listeners->erase (stl::remove (listeners->begin (), listeners->end (), listener), listeners->end ());
+  impl.listeners->erase (stl::remove (impl.listeners->begin (), impl.listeners->end (), listener), impl.listeners->end ());
+}
+
+-(void)setMainViewVisible:(bool)state
+{
+  impl.main_view_visible = state;
+}
+
+-(bool)isMainViewVisible
+{
+  return impl.main_view_visible;
 }
 
 @end

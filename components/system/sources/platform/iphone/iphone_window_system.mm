@@ -198,6 +198,26 @@ typedef stl::vector <IWindowListener*> ListenerArray;
   self.view = nil;
 }
 
+-(void)viewWillDisappear:(BOOL)animated
+{
+  [super viewWillDisappear:animated];
+
+  ApplicationDelegate* delegate = [UIApplication sharedApplication].delegate;
+
+  if ([delegate isKindOfClass:[ApplicationDelegate class]])
+    [delegate setMainViewVisible:false];
+}
+
+-(void)viewWillAppear:(BOOL)animated
+{
+  [super viewWillAppear:animated];
+
+  ApplicationDelegate* delegate = [UIApplication sharedApplication].delegate;
+
+  if ([delegate isKindOfClass:[ApplicationDelegate class]])
+    [delegate setMainViewVisible:true];
+}
+
 -(BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interface_orientation
 {
   InterfaceOrientation desired_orientation = get_interface_orientation (interface_orientation);

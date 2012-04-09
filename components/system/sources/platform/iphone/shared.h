@@ -25,11 +25,26 @@
 
 #include <shared/platform.h>
 
+#import <Foundation/NSObject.h>
+
 namespace syslib
 {
 
 bool is_in_run_loop (); //запущен ли главный цикл
 
 }
+
+@class ApplicationDelegateInternal;
+
+@interface ApplicationDelegate : NSObject
+{
+  @private
+    ApplicationDelegateInternal* impl;
+}
+
+-(void)setMainViewVisible:(bool)state;
+-(bool)isMainViewVisible;
+
+@end
 
 #endif
