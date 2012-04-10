@@ -100,6 +100,8 @@ void XmlLexer::SkipBlockComment ()
           position+=3;
           return;
         }
+
+        position++;
         break;
       case '\n':
         NextLine ();

@@ -416,3 +416,11 @@ root (source='', line=0): {}
  RootTag (source='data/line_start_close.xml', line=2): {}
   #text (source='data/line_start_close.xml', line=7): { CDATA!
 }
+root (source='', line=0): {}
+ TranslationMapRegistry (source='data/comments.xml', line=3): {}
+  Translation (source='data/comments.xml', line=5): {}
+   Profile (source='data/comments.xml', line=5): {game.window.MainWindowDevice}
+   TranslationMap (source='data/comments.xml', line=5): {data/input/game.xkeymap}
+  Translation (source='data/comments.xml', line=7): {}
+   Profile (source='data/comments.xml', line=7): {game.accelerometer}
+   TranslationMap (source='data/comments.xml', line=7): {data/input/game.xkeymap}
