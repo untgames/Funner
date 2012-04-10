@@ -137,7 +137,8 @@ void bind_text_line_library (Environment& environment)
   lib.Register ("SetColor", make_invoker (make_invoker (implicit_cast<void (TextLine::*) (float, float, float, float)> (&TextLine::SetColor)),
                                           make_invoker (implicit_cast<void (TextLine::*) (float, float, float)>        (&TextLine::SetColor))));
   lib.Register ("SetCharsColorFactors", make_invoker (&TextLine::SetCharsColorFactors));
-  lib.Register ("CharColor", make_invoker (&TextLine::CharColor));
+  lib.Register ("CharColor",            make_invoker (&TextLine::CharColor));
+  lib.Register ("CharColorFactor",      make_invoker (&TextLine::CharColorFactor));
 
   lib.Register ("SetAlignment", make_invoker (&TextLine::SetAlignment));
 

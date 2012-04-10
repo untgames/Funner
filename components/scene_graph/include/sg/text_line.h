@@ -48,6 +48,8 @@ class TextLine: public Entity
 ///Цвет определенных символов текста
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void               SetCharsColorFactors (size_t first, size_t count, const math::vec4f& color);
+    const math::vec4f& CharColorFactor      (size_t index) const;
+    void               CharsColorFactors    (size_t first, size_t count, math::vec4f* colors) const;
     const math::vec4f& CharColor            (size_t index) const;
     void               CharsColors          (size_t first, size_t count, math::vec4f* colors) const;
 

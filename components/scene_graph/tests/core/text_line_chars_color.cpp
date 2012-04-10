@@ -28,6 +28,28 @@ void print_chars_colors (TextLine::Pointer text_line)
     dump (chars_colors.data () [i]);
     printf ("\n");
   }
+
+  printf ("chars color factors one by one:\n");
+
+  for (size_t i = 0; i < text_length; i++)
+  {
+    printf ("  char %u: ", i);
+    dump (text_line->CharColorFactor (i));
+    printf ("\n");
+  }
+
+  printf ("chars color factors getted by one piece:\n");
+
+  xtl::uninitialized_storage <math::vec4f> chars_color_factors (text_length);
+
+  text_line->CharsColorFactors (0, text_length, chars_color_factors.data ());
+
+  for (size_t i = 0; i < text_length; i++)
+  {
+    printf ("  char %u: ", i);
+    dump (chars_color_factors.data () [i]);
+    printf ("\n");
+  }
 }
 
 int main ()
@@ -37,7 +59,6 @@ int main ()
   TextLine::Pointer text_line (TextLine::Create ());
 
   printf ("TextLine color = [%.2f %.2f %.2f %.2f]\n", text_line->Color ().x, text_line->Color ().y, text_line->Color ().z, text_line->Color ().w);
-  print_chars_colors (text_line);
 
   text_line->SetColor (0.9f, 0.9f, 0.9f, 0.9f);
   text_line->SetTextUtf8  ("some text");

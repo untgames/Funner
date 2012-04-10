@@ -157,6 +157,40 @@ void TextLine::SetCharsColorFactors (size_t first, size_t count, const math::vec
   UpdateNotify ();
 }
 
+const math::vec4f& TextLine::CharColorFactor (size_t index) const
+{
+  static const char* METHOD_NAME = "scene_graph::TextLine::CharColorFactor";
+
+  size_t text_length = TextLength ();
+
+  if (index >= text_length)
+    throw xtl::make_range_exception (METHOD_NAME, "index", index, 0u, text_length);
+
+  if (impl->chars_colors_factors.empty ())
+    return 1.f;
+
+  return impl->chars_colors_factors [index];
+}
+
+void TextLine::CharsColorFactors (size_t first, size_t count, math::vec4f* colors) const
+{
+  static const char* METHOD_NAME = "scene_graph::TextLine::CharsColorFactors";
+
+  size_t text_length = TextLength (),
+         end         = first + count;
+
+  if (end > text_length)
+    throw xtl::make_range_exception (METHOD_NAME, "first + count", end, 0u, text_length + 1);
+
+  if (impl->chars_colors_factors.empty ())
+  {
+    for (size_t i = 0; i < count; i++, colors++)
+      *colors = 1.f;
+  }
+  else
+    stl::copy (impl->chars_colors_factors.begin () + first, impl->chars_colors_factors.begin () + end, colors);
+}
+
 const math::vec4f& TextLine::CharColor (size_t index) const
 {
   if (index >= TextLength ())

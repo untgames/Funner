@@ -640,6 +640,20 @@ function get_name (alignment)
   return "Invalid"
 end
 
+function print_text_line_colors (text_line)
+  print ("Colors: ")
+  
+  for i = 0, #text_line.Text - 1 do
+    print ("  " .. tostring (text_line:CharColor (i))) 
+  end
+
+  print ("Color factors: ")
+  
+  for i = 0, #text_line.Text - 1 do
+    print ("  " .. tostring (text_line:CharColorFactor (i))) 
+  end
+end
+
 function test_text_line ()
   print ("TextLine test")
 
@@ -680,6 +694,10 @@ function test_text_line ()
   text_line1:SetAlignment (Scene.TextLineAlignment.BaseLine, Scene.TextLineAlignment.BaseLine)
 
   print ("Horizontal aligment = " .. get_name (text_line1.HorizontalAlignment) .. " vertical aligment = " .. get_name (text_line1.VerticalAlignment))
+  
+  text_line1:SetCharsColorFactors (1, 2, vec4 (0, 1, 0.5, 1))
+  
+  print_text_line_colors (text_line1)
 end
 
 local function get_mode_name (mode)
