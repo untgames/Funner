@@ -25,6 +25,8 @@ vec4f clamp (const vec4f& color)
   return vec4f (clamp (color.x), clamp (color.y), clamp (color.z), clamp (color.w));
 }
 
+const math::vec4f DEFAULT_CHAR_COLOR_FACTOR = 1.f;
+
 }
 
 
@@ -148,7 +150,7 @@ void TextLine::SetCharsColorFactors (size_t first, size_t count, const math::vec
     throw xtl::make_range_exception (METHOD_NAME, "first + count", end, 0u, text_length + 1);
 
   if (impl->chars_colors_factors.empty ())
-    impl->chars_colors_factors.resize (TextLength (), 1);
+    impl->chars_colors_factors.resize (TextLength (), DEFAULT_CHAR_COLOR_FACTOR);
 
   stl::fill (impl->chars_colors_factors.begin () + first, impl->chars_colors_factors.begin () + end, color);
 
@@ -167,7 +169,7 @@ const math::vec4f& TextLine::CharColorFactor (size_t index) const
     throw xtl::make_range_exception (METHOD_NAME, "index", index, 0u, text_length);
 
   if (impl->chars_colors_factors.empty ())
-    return 1.f;
+    return DEFAULT_CHAR_COLOR_FACTOR;
 
   return impl->chars_colors_factors [index];
 }
