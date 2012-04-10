@@ -128,12 +128,12 @@ class ScenePlayerEmitter: public xtl::trackable
 
       is_playing        = true;
       play_start_time   = common::milliseconds ();
-      play_start_offset = 0.f;
+      play_start_offset = scene_emitter.PlayStartOffset ();
 
       if (!sound_manager)
         return;
 
-      sound_manager->PlaySound (emitter);
+      sound_manager->PlaySound (emitter, play_start_offset);
 
       scene_emitter.AddRef ();
       
@@ -142,7 +142,7 @@ class ScenePlayerEmitter: public xtl::trackable
       if (!sound_manager->IsLooping (emitter))
       {
         auto_stop_action = common::ActionQueue::PushAction (xtl::bind (&ScenePlayerEmitter::OnStop, this),
-          common::ActionThread_Current, sound_manager->Duration (emitter) + STOP_EMITTER_DELAY);
+          common::ActionThread_Current, sound_manager->Duration (emitter) + STOP_EMITTER_DELAY - play_start_offset);
       }      
     }
 

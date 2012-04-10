@@ -8,11 +8,18 @@ int main ()
 
   printf ("Sound emitter declaration = %s\n", sound_emitter->SoundDeclarationName ());  
 
-  printf ("Gain is %f.\n", sound_emitter->Gain ());
+  printf ("Gain is %.2f\n", sound_emitter->Gain ());
+  printf ("PlayStartOffset is %.2f\n", sound_emitter->PlayStartOffset ());
 
   sound_emitter->SetGain (0.7f);
+  sound_emitter->Play ();
 
-  printf ("Gain is %f.\n", sound_emitter->Gain ());
+  printf ("Gain is %.2f\n", sound_emitter->Gain ());
+  printf ("PlayStartOffset is %.2f\n", sound_emitter->PlayStartOffset ());
+
+  sound_emitter->Play (1.f);
+
+  printf ("PlayStartOffset is %.2f\n", sound_emitter->PlayStartOffset ());
 
   return 0;
 }

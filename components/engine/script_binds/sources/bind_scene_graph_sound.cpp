@@ -70,12 +70,15 @@ void bind_sound_emitter_library (Environment& environment)
 
     //регистрация операций
 
-  lib.Register ("set_Gain", make_invoker (&SoundEmitter::SetGain));
-  lib.Register ("get_Gain", make_invoker (&SoundEmitter::Gain));
+  lib.Register ("set_Gain",            make_invoker (&SoundEmitter::SetGain));
+  lib.Register ("get_Gain",            make_invoker (&SoundEmitter::Gain));
+  lib.Register ("get_PlayStartOffset", make_invoker (&SoundEmitter::PlayStartOffset));
 
   lib.Register ("get_SoundDeclarationName", make_invoker (&SoundEmitter::SoundDeclarationName));
 
-  lib.Register ("Play", make_invoker (&SoundEmitter::Play));
+  lib.Register ("Play", make_invoker (
+      make_invoker (&SoundEmitter::Play),
+      make_invoker<void (SoundEmitter&)> (xtl::bind (&SoundEmitter::Play, _1, 0.f))));
   lib.Register ("Stop", make_invoker (&SoundEmitter::Stop));
 
     //регистрация типов данных

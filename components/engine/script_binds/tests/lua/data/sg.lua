@@ -571,6 +571,7 @@ function test_sound_emitter ()
   local sound_emitter1 = Scene.SoundEmitter.Create ("sound.snddecl")
 
   print ("Gain = " .. tostring (sound_emitter1.Gain))
+  print ("PlayStartOffset = " .. tostring (sound_emitter1.PlayStartOffset))
 
   sound_emitter1.Gain = 0.7
   
@@ -580,6 +581,11 @@ function test_sound_emitter ()
   sound_emitter1:Stop ()
 
   print ("SoundEmitter sound declaration name = " .. sound_emitter1.SoundDeclarationName)
+  print ("PlayStartOffset = " .. tostring (sound_emitter1.PlayStartOffset))
+  
+  sound_emitter1:Play (1)
+
+  print ("PlayStartOffset = " .. tostring (sound_emitter1.PlayStartOffset))
 end
 
 function test_sprite ()

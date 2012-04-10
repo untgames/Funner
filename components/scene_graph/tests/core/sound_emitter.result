@@ -1,4 +1,7 @@
 Results of sound_emitter_test:
 Sound emitter declaration = sound_declaration1
-Gain is 1.000000.
-Gain is 0.700000.
+Gain is 1.00
+PlayStartOffset is 0.00
+Gain is 0.70
+PlayStartOffset is 0.00
+PlayStartOffset is 1.00

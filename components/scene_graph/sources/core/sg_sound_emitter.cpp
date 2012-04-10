@@ -16,8 +16,12 @@ struct SoundEmitter::Impl
   SoundEmitterSignal signals [SoundEmitterEvent_Num];          //сигналы
   bool               signal_process [SoundEmitterEvent_Num];   //флаги обработки сигналов
   float              gain;                                     //громкость
+  float              play_start_offset;                        //смещение при начале проигрывания
 
-  Impl (const char* in_sound_declaration_name) : sound_declaration_name (in_sound_declaration_name), gain (1.f) 
+  Impl (const char* in_sound_declaration_name)
+    : sound_declaration_name (in_sound_declaration_name)
+    , gain (1.f)
+    , play_start_offset (0.f)
   {
     memset (signal_process, 0, sizeof (signal_process));
   }
@@ -99,9 +103,16 @@ const char* SoundEmitter::SoundDeclarationName () const
    Проигрывание
 */
 
-void SoundEmitter::Play ()
+void SoundEmitter::Play (float play_start_offset)
 {
+  impl->play_start_offset = play_start_offset;
+
   impl->Notify (*this, SoundEmitterEvent_OnPlay);
+}
+
+float SoundEmitter::PlayStartOffset () const
+{
+  return impl->play_start_offset;
 }
 
 void SoundEmitter::Stop ()
