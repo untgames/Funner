@@ -53,7 +53,7 @@ struct TimerImpl: public xtl::reference_counter
     if (!started)
       return;
       
-    time = ComputeTimeInteger () / precision;
+    time = static_cast<long> (ComputeTimeInteger ()) / precision;
   }
   
 ///Расчёт интервала времени
