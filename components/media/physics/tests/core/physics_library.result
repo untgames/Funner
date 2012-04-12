@@ -1,0 +1,68 @@
+Results of physics_library_test:
+library 'library1':
+  collision filters count 4
+  rigid bodies count 4
+  materials count 4
+  shapes count 4
+  triangle meshes count 4
+  collision filters:
+    collision filters 'group1_1' with 'group2_1' collides 1
+    collision filters 'group1_2' with 'group2_2' collides 1
+    collision filters 'group1_3' with 'group2_3' collides 0
+    collision filters 'group1_4' with 'group2_4' collides 1
+  bodies:
+    body 'body1'
+    body 'body2'
+    body 'body3'
+    body 'body4'
+  materials:
+    material 'material1'
+    material 'material2'
+    material 'material3'
+    material 'material4'
+  shapes:
+    shape 'shape1'
+    shape 'shape2'
+    shape 'shape3'
+    shape 'shape4'
+  meshes:
+    mesh 'mesh1'
+    mesh 'mesh2'
+    mesh 'mesh3'
+    mesh 'mesh4'
+detach object
+library 'library1':
+  collision filters count 3
+  rigid bodies count 3
+  materials count 3
+  shapes count 3
+  triangle meshes count 3
+  collision filters:
+    collision filters 'group1_1' with 'group2_1' collides 1
+    collision filters 'group1_2' with 'group2_2' collides 1
+    collision filters 'group1_4' with 'group2_4' collides 1
+  bodies:
+    body 'body2'
+    body 'body3'
+    body 'body4'
+  materials:
+    material 'material1'
+    material 'material3'
+    material 'material4'
+  shapes:
+    shape 'shape1'
+    shape 'shape2'
+    shape 'shape4'
+  meshes:
+    mesh 'mesh1'
+    mesh 'mesh2'
+    mesh 'mesh3'
+Has 'shape2' - y
+Has 'shape3' - n
+clear collections
+library 'library1':
+  collision filters count 0
+  rigid bodies count 0
+  materials count 0
+  shapes count 0
+  triangle meshes count 0

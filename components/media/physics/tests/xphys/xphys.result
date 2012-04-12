@@ -35,10 +35,14 @@ Results of xphys_loader_test:
     </shape>
   </shapes>
   <rigid_bodies>
-    <rigid_body name="BigShip" mass="0.000" mass_space_inertia_tensor="0.000 0.000 0.000" shape="BigShipShape" material="Ship" frozen_position_x="1" frozen_position_y="1" frozen_rotation="1"/>
-    <rigid_body name="CompoundBody" mass="0.010" mass_space_inertia_tensor="0.000 0.000 0.000" shape="CompoundShape" material=""/>
+    <rigid_body name="BigShip" mass="0.000" mass_space_inertia_tensor="0.000 0.000 0.000" shape="BigShipShape" material="Ship" frozen_position_x="1" frozen_position_y="1" frozen_rotation="1" collision_group="enemy"/>
+    <rigid_body name="CompoundBody" mass="0.010" mass_space_inertia_tensor="0.000 0.000 0.000" shape="CompoundShape" material="" collision_group="ally"/>
     <rigid_body name="TriangleMeshBody" mass="0.000" mass_space_inertia_tensor="0.100 0.200 0.300" shape="TriangleMeshShape" material="Default"/>
     <rigid_body name="BigShip2" mass="0.000" mass_space_inertia_tensor="0.000 0.000 0.000" shape="BigShipShape" material="" frozen_position="1" frozen_rotation_x="1" frozen_rotation_y="1"/>
     <rigid_body name="KinematicBody" mass="0.000" mass_space_inertia_tensor="0.000 0.000 0.000" shape="ConvexShape" material="" kinematic="1"/>
   </rigid_bodies>
+  <collision_filters>
+    <collision_filter group1_wildcard="enemy" group2_wildcard="ally" collides="1"/>
+    <collision_filter group1_wildcard="*" group2_wildcard="*" collides="0"/>
+  </collision_filters>
 </physics_library>

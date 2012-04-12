@@ -4,6 +4,7 @@
 #include <stl/string>
 #include <stl/vector>
 
+#include <xtl/bind.h>
 #include <xtl/common_exceptions.h>
 #include <xtl/intrusive_ptr.h>
 #include <xtl/iterator.h>
@@ -20,6 +21,7 @@
 #include <media/physics/shape.h>
 #include <media/physics/triangle_mesh.h>
 
+#include <media/collection.h>
 #include <media/resource_library.h>
 
 #endif

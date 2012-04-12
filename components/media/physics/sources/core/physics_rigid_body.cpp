@@ -9,6 +9,7 @@ using namespace media::physics;
 struct RigidBody::Impl : public xtl::reference_counter
 {
   stl::string              name;                       //имя тела
+  stl::string              collision_group;            //группа коллизий
   float                    mass;                       //масса
   math::vec3f              center_of_mass_position;    //положение центра масс
   math::quatf              center_of_mass_orientation; //ориентация центра масс
@@ -24,6 +25,7 @@ struct RigidBody::Impl : public xtl::reference_counter
 
   Impl (const Impl& source)
     : name                       (source.name)
+    , collision_group            (source.collision_group)
     , mass                       (source.mass)
     , center_of_mass_position    (source.center_of_mass_position)
     , center_of_mass_orientation (source.center_of_mass_orientation)
@@ -169,6 +171,23 @@ size_t RigidBody::Flags () const
 void RigidBody::SetFlags (size_t flags)
 {
   impl->flags = flags;
+}
+
+/*
+   Группа коллизий
+*/
+
+const char* RigidBody::CollisionGroup () const
+{
+  return impl->collision_group.c_str ();
+}
+
+void RigidBody::SetCollisionGroup (const char* name)
+{
+  if (!name)
+    throw xtl::make_null_argument_exception ("media::physics::RigidBody::SetCollisionGroup", "name");
+
+  impl->collision_group = name;
 }
 
 /*

@@ -19,13 +19,6 @@ struct TriangleMesh::Impl : public xtl::reference_counter
   Impl ()
     : is_convex (true)
     {}
-
-  Impl (const Impl& source)
-    : name      (source.name)
-    , is_convex (source.is_convex)
-    , vertices  (source.vertices)
-    , triangles (source.triangles)
-    {}
 };
 
 /*

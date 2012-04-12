@@ -54,12 +54,20 @@ class XmlPhysicsLibraryLoader
         destination.Attach (source.ItemId (iter), *iter);
     }
 
+    template <class T>
+    void MergeCollections (const media::physics::PhysicsLibraryOrderedCollection<T>& source, media::physics::PhysicsLibraryOrderedCollection<T>& destination)
+    {
+      for (typename media::physics::PhysicsLibraryOrderedCollection<T>::ConstIterator iter = source.CreateIterator (); iter; ++iter)
+        destination.Add (*iter);
+    }
+
     void MergeLibraries (const PhysicsLibrary& source_library, PhysicsLibrary& target_library)
     {
-      MergeCollections (source_library.RigidBodies (),    target_library.RigidBodies ());
-      MergeCollections (source_library.Materials (),      target_library.Materials ());
-      MergeCollections (source_library.Shapes (),         target_library.Shapes ());
-      MergeCollections (source_library.TriangleMeshes (), target_library.TriangleMeshes ());
+      MergeCollections (source_library.RigidBodies (),      target_library.RigidBodies ());
+      MergeCollections (source_library.Materials (),        target_library.Materials ());
+      MergeCollections (source_library.Shapes (),           target_library.Shapes ());
+      MergeCollections (source_library.TriangleMeshes (),   target_library.TriangleMeshes ());
+      MergeCollections (source_library.CollisionFilters (), target_library.CollisionFilters ());
     }
 
       //разбор подключаемых файлов
@@ -241,6 +249,7 @@ class XmlPhysicsLibraryLoader
       RigidBody body;
 
       body.Rename (get<const char*> (*body_iter, "name"));
+      body.SetCollisionGroup (get<const char*> (*body_iter, "collision_group", ""));
 
       if (body_iter->First ("mass"))
         body.SetMass (get<float> (*body_iter, "mass"));
@@ -301,6 +310,18 @@ class XmlPhysicsLibraryLoader
       library.RigidBodies ().Attach (body.Name (), body);
     }
 
+      //разбор сетки
+    void ParseCollisionFilter (Parser::Iterator filter_iter)
+    {
+      CollisionFilter filter;
+
+      filter.SetGroup1Wildcard (get<const char*> (*filter_iter, "group1_wildcard"));
+      filter.SetGroup2Wildcard (get<const char*> (*filter_iter, "group2_wildcard"));
+      filter.SetCollides (get<int> (*filter_iter, "collides") != 0);
+
+      library.CollisionFilters ().Add (filter);
+    }
+
       //разбор библиотеки
     void ParseLibrary (Parser::Iterator library_iter)
     {
@@ -309,6 +330,7 @@ class XmlPhysicsLibraryLoader
       for_each_child (*library_iter, "triangle_meshes.triangle_mesh", xtl::bind (&XmlPhysicsLibraryLoader::ParseTriangleMesh, this, _1));
       for_each_child (*library_iter, "shapes.shape", xtl::bind (&XmlPhysicsLibraryLoader::ParseShape, this, _1));
       for_each_child (*library_iter, "rigid_bodies.rigid_body", xtl::bind (&XmlPhysicsLibraryLoader::ParseRigidBody, this, _1));
+      for_each_child (*library_iter, "collision_filters.collision_filter", xtl::bind (&XmlPhysicsLibraryLoader::ParseCollisionFilter, this, _1));
     }
 
   public:

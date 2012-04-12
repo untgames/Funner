@@ -142,8 +142,8 @@ namespace media
 namespace physics
 {
 
-template class PhysicsLibraryCollection <RigidBody>;
 template class PhysicsLibraryCollection <Material>;
+template class PhysicsLibraryCollection <RigidBody>;
 template class PhysicsLibraryCollection <Shape>;
 template class PhysicsLibraryCollection <shapes::TriangleMesh>;
 

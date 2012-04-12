@@ -193,6 +193,19 @@ class XmlPhysicsLibrarySaver
 
       if (body_flags & RigidBodyFlag_Kinematic)
         writer.WriteAttribute ("kinematic", "1");
+
+      if (xtl::xstrlen (body.CollisionGroup ()))
+        writer.WriteAttribute ("collision_group", body.CollisionGroup ());
+    }
+
+    //Сохранение фильтра коллизий
+    void Save (const CollisionFilter& filter)
+    {
+      XmlWriter::Scope library_scope (writer, "collision_filter");
+
+      writer.WriteAttribute ("group1_wildcard", filter.Group1Wildcard ());
+      writer.WriteAttribute ("group2_wildcard", filter.Group2Wildcard ());
+      writer.WriteAttribute ("collides", filter.IsCollides () ? "1" : "0");
     }
 
     //Сохранение коллекции
@@ -200,6 +213,13 @@ class XmlPhysicsLibrarySaver
     void SavePhysicsLibraryCollection (const PhysicsLibraryCollection<T>& collection)
     {
       for (typename PhysicsLibraryCollection <T>::ConstIterator iter = collection.CreateIterator (); iter; ++iter)
+        Save (*iter);
+    }
+
+    template <class T>
+    void SavePhysicsLibraryOrderedCollection (const PhysicsLibraryOrderedCollection<T>& collection)
+    {
+      for (typename PhysicsLibraryOrderedCollection <T>::ConstIterator iter = collection.CreateIterator (); iter; ++iter)
         Save (*iter);
     }
 
@@ -257,6 +277,14 @@ class XmlPhysicsLibrarySaver
       SavePhysicsLibraryCollection (bodies);
     }
 
+    //Сохранение фильтров коллизий
+    void SaveCollisionFilters (const PhysicsLibrary::CollisionFilterCollection& filters)
+    {
+      XmlWriter::Scope library_scope (writer, "collision_filters");
+
+      SavePhysicsLibraryOrderedCollection (filters);
+    }
+
   public:
       //конструктор
     XmlPhysicsLibrarySaver (const char* file_name, const PhysicsLibrary::SaveOptions& options, const PhysicsLibrary& library) : writer (file_name)
@@ -287,6 +315,7 @@ class XmlPhysicsLibrarySaver
       SaveTriangleMeshes (triangle_meshes, options);
       SaveShapes (library.Shapes ());
       SaveRigidBodies (library.RigidBodies ());
+      SaveCollisionFilters (library.CollisionFilters ());
     }
 
   private:

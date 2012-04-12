@@ -12,11 +12,12 @@ PhysicsLibrary::SaveOptions::SaveOptions ()
 
 struct PhysicsLibrary::Impl : public xtl::reference_counter
 {
-  stl::string            name;            //имя библиотеки
-  RigidBodyCollection    rigid_bodies;    //коллекция твердых тел
-  MaterialCollection     materials;       //коллекция материалов
-  ShapeCollection        shapes;          //коллекция геометрических тел
-  TriangleMeshCollection triangle_meshes; //коллекция сеток
+  stl::string               name;              //имя библиотеки
+  CollisionFilterCollection collision_filters; //коллекция фильтров коллизий
+  MaterialCollection        materials;         //коллекция материалов
+  RigidBodyCollection       rigid_bodies;      //коллекция твердых тел
+  ShapeCollection           shapes;            //коллекция геометрических тел
+  TriangleMeshCollection    triangle_meshes;   //коллекция сеток
 };
 
 /*
@@ -87,14 +88,14 @@ void PhysicsLibrary::Rename (const char* name)
    Получение коллекций
 */
 
-const PhysicsLibrary::RigidBodyCollection& PhysicsLibrary::RigidBodies () const
+const PhysicsLibrary::CollisionFilterCollection& PhysicsLibrary::CollisionFilters () const
 {
-  return const_cast<PhysicsLibrary&> (*this).RigidBodies ();
+  return const_cast<PhysicsLibrary&> (*this).CollisionFilters ();
 }
 
-PhysicsLibrary::RigidBodyCollection& PhysicsLibrary::RigidBodies ()
+PhysicsLibrary::CollisionFilterCollection& PhysicsLibrary::CollisionFilters ()
 {
-  return impl->rigid_bodies;
+  return impl->collision_filters;
 }
 
 const PhysicsLibrary::MaterialCollection& PhysicsLibrary::Materials () const
@@ -105,6 +106,16 @@ const PhysicsLibrary::MaterialCollection& PhysicsLibrary::Materials () const
 PhysicsLibrary::MaterialCollection& PhysicsLibrary::Materials ()
 {
   return impl->materials;
+}
+
+const PhysicsLibrary::RigidBodyCollection& PhysicsLibrary::RigidBodies () const
+{
+  return const_cast<PhysicsLibrary&> (*this).RigidBodies ();
+}
+
+PhysicsLibrary::RigidBodyCollection& PhysicsLibrary::RigidBodies ()
+{
+  return impl->rigid_bodies;
 }
 
 const PhysicsLibrary::ShapeCollection& PhysicsLibrary::Shapes () const

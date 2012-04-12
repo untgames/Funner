@@ -10,6 +10,7 @@ void dump (const RigidBody& body)
   printf ("  flags                      %08x\n", body.Flags ());
   printf ("  shape                      '%s'\n", body.Shape ().Name ());
   printf ("  material                   '%s'\n", body.Material ().Name ());
+  printf ("  collision group            '%s'\n", body.CollisionGroup ());
 }
 
 int main ()
@@ -38,6 +39,7 @@ int main ()
     body.SetShape (shape);
     body.SetMaterial (material);
     body.SetFlags (RigidBodyFlag_FrozenRotation);
+    body.SetCollisionGroup ("group1");
 
     body.Rename ("modified body");
     dump (body);

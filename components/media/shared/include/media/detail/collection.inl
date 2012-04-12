@@ -158,7 +158,7 @@ void CollectionImpl<Item, BaseClass>::Reserve (size_t count)
 */
 
 template <class Item, class BaseClass>
-size_t CollectionImpl<Item, BaseClass>::Add (Item& item)
+size_t CollectionImpl<Item, BaseClass>::Add (const Item& item)
 {
   items.push_back (item);
 

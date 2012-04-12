@@ -33,15 +33,6 @@ struct Material::Impl : public xtl::reference_counter
     , friction             (DEFAULT_FRICTION)
     , restitution          (DEFAULT_RESTITUTION)
     {}
-
-  Impl (const Impl& source)
-    : name                 (source.name)
-    , anisotropic_friction (source.anisotropic_friction)
-    , linear_damping       (source.linear_damping)
-    , angular_damping      (source.angular_damping)
-    , friction             (source.friction)
-    , restitution          (source.restitution)
-    {}
 };
 
 /*
