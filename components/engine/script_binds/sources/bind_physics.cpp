@@ -29,7 +29,10 @@ void bind_manager_library (Environment& environment)
   InvokerRegistry lib = environment.Library (MANAGER_LIBRARY);
   
   lib.Register ("get_Description",    make_invoker (&PhysicsManager::Description));
-  lib.Register ("CreateScene",        make_invoker (&PhysicsManager::CreateScene));
+  lib.Register ("CreateScene",        make_invoker (
+      make_invoker (xtl::implicit_cast<Scene (PhysicsManager::*)(const char*)> (&PhysicsManager::CreateScene)),
+      make_invoker (xtl::implicit_cast<Scene (PhysicsManager::*)()> (&PhysicsManager::CreateScene))
+  ));
   lib.Register ("CreateMaterial",     make_invoker (
       make_invoker (xtl::implicit_cast<Material (PhysicsManager::*)(const char*)> (&PhysicsManager::CreateMaterial)),
       make_invoker (xtl::implicit_cast<Material (PhysicsManager::*)()> (&PhysicsManager::CreateMaterial))

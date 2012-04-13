@@ -242,6 +242,8 @@ struct Scene::Impl : public xtl::reference_counter, public xtl::trackable
 
       return_value.SetFlags (flags);
 
+      return_value.SetCollisionGroup (media_body->CollisionGroup ());
+
       return return_value;
     }
     catch (xtl::exception& e)
