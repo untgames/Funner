@@ -144,6 +144,7 @@ namespace physics
 
 template class PhysicsLibraryCollection <Material>;
 template class PhysicsLibraryCollection <RigidBody>;
+template class PhysicsLibraryCollection <Scene>;
 template class PhysicsLibraryCollection <Shape>;
 template class PhysicsLibraryCollection <shapes::TriangleMesh>;
 

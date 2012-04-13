@@ -4,6 +4,14 @@ using namespace common;
 using namespace media::physics;
 using namespace media::physics::shapes;
 
+namespace
+{
+
+const char* DEFAULT_GRAVITY         = "0 -9.8 0";
+const float DEFAULT_SIMULATION_STEP = 1.f / 60.f;
+
+}
+
 namespace components
 {
 
@@ -54,20 +62,13 @@ class XmlPhysicsLibraryLoader
         destination.Attach (source.ItemId (iter), *iter);
     }
 
-    template <class T>
-    void MergeCollections (const media::physics::PhysicsLibraryOrderedCollection<T>& source, media::physics::PhysicsLibraryOrderedCollection<T>& destination)
-    {
-      for (typename media::physics::PhysicsLibraryOrderedCollection<T>::ConstIterator iter = source.CreateIterator (); iter; ++iter)
-        destination.Add (*iter);
-    }
-
     void MergeLibraries (const PhysicsLibrary& source_library, PhysicsLibrary& target_library)
     {
       MergeCollections (source_library.RigidBodies (),      target_library.RigidBodies ());
       MergeCollections (source_library.Materials (),        target_library.Materials ());
       MergeCollections (source_library.Shapes (),           target_library.Shapes ());
       MergeCollections (source_library.TriangleMeshes (),   target_library.TriangleMeshes ());
-      MergeCollections (source_library.CollisionFilters (), target_library.CollisionFilters ());
+      MergeCollections (source_library.Scenes (),           target_library.Scenes ());
     }
 
       //разбор подключаемых файлов
@@ -310,8 +311,8 @@ class XmlPhysicsLibraryLoader
       library.RigidBodies ().Attach (body.Name (), body);
     }
 
-      //разбор сетки
-    void ParseCollisionFilter (Parser::Iterator filter_iter)
+      //разбор фильтра коллизий
+    void ParseCollisionFilter (Parser::Iterator filter_iter, Scene& scene)
     {
       CollisionFilter filter;
 
@@ -319,7 +320,27 @@ class XmlPhysicsLibraryLoader
       filter.SetGroup2Wildcard (get<const char*> (*filter_iter, "group2_wildcard"));
       filter.SetCollides (get<int> (*filter_iter, "collides") != 0);
 
-      library.CollisionFilters ().Add (filter);
+      scene.CollisionFilters ().Add (filter);
+    }
+
+      //разбор сцены
+    void ParseScene (Parser::Iterator scene_iter)
+    {
+      Scene scene;
+
+      scene.Rename (get<const char*> (*scene_iter, "name"));
+      scene.SetSimulationStep (get<float> (*scene_iter, "simulation_step", DEFAULT_SIMULATION_STEP));
+
+      math::vec3f value;
+
+      read (scene_iter, get<const char*> (*scene_iter, "gravity", DEFAULT_GRAVITY), value);
+
+      scene.SetGravity (value);
+
+
+      for_each_child (*scene_iter, "collision_filters.collision_filter", xtl::bind (&XmlPhysicsLibraryLoader::ParseCollisionFilter, this, _1, scene));
+
+      library.Scenes ().Attach (scene.Name (), scene);
     }
 
       //разбор библиотеки
@@ -330,7 +351,7 @@ class XmlPhysicsLibraryLoader
       for_each_child (*library_iter, "triangle_meshes.triangle_mesh", xtl::bind (&XmlPhysicsLibraryLoader::ParseTriangleMesh, this, _1));
       for_each_child (*library_iter, "shapes.shape", xtl::bind (&XmlPhysicsLibraryLoader::ParseShape, this, _1));
       for_each_child (*library_iter, "rigid_bodies.rigid_body", xtl::bind (&XmlPhysicsLibraryLoader::ParseRigidBody, this, _1));
-      for_each_child (*library_iter, "collision_filters.collision_filter", xtl::bind (&XmlPhysicsLibraryLoader::ParseCollisionFilter, this, _1));
+      for_each_child (*library_iter, "scenes.scene", xtl::bind (&XmlPhysicsLibraryLoader::ParseScene, this, _1));
     }
 
   public:

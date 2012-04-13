@@ -1,0 +1,23 @@
+Results of scene_test:
+Scene 'default scene':
+  gravity                 [0.00 -9.80 0.00]
+  simulation step       0.017
+  collision filters count 0
+Scene 'modified scene':
+  gravity                 [0.10 0.20 0.30]
+  simulation step       0.100
+  collision filters count 4
+  collision filters:
+    collision filter 'group1_1' with 'group2_1' collides 1
+    collision filter 'group1_2' with 'group2_2' collides 1
+    collision filter 'group1_3' with 'group2_3' collides 0
+    collision filter 'group1_4' with 'group2_4' collides 1
+Scene 'modified scene':
+  gravity                 [0.10 0.20 0.30]
+  simulation step       0.100
+  collision filters count 4
+  collision filters:
+    collision filter 'group1_1' with 'group2_1' collides 1
+    collision filter 'group1_2' with 'group2_2' collides 1
+    collision filter 'group1_3' with 'group2_3' collides 0
+    collision filter 'group1_4' with 'group2_4' collides 1

@@ -41,8 +41,15 @@ Results of xphys_loader_test:
     <rigid_body name="BigShip2" mass="0.000" mass_space_inertia_tensor="0.000 0.000 0.000" shape="BigShipShape" material="" frozen_position="1" frozen_rotation_x="1" frozen_rotation_y="1"/>
     <rigid_body name="KinematicBody" mass="0.000" mass_space_inertia_tensor="0.000 0.000 0.000" shape="ConvexShape" material="" kinematic="1"/>
   </rigid_bodies>
-  <collision_filters>
-    <collision_filter group1_wildcard="enemy" group2_wildcard="ally" collides="1"/>
-    <collision_filter group1_wildcard="*" group2_wildcard="*" collides="0"/>
-  </collision_filters>
+  <scenes>
+    <scene name="Scene1" gravity="0.000 -10.000 0.000" simulation_step="0.100">
+      <collision_filters>
+        <collision_filter group1_wildcard="enemy" group2_wildcard="ally" collides="1"/>
+        <collision_filter group1_wildcard="*" group2_wildcard="*" collides="0"/>
+      </collision_filters>
+    </scene>
+    <scene name="DefaultScene" gravity="0.000 -9.800 0.000" simulation_step="0.017">
+      <collision_filters/>
+    </scene>
+  </scenes>
 </physics_library>

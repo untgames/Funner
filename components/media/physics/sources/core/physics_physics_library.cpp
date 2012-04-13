@@ -12,12 +12,12 @@ PhysicsLibrary::SaveOptions::SaveOptions ()
 
 struct PhysicsLibrary::Impl : public xtl::reference_counter
 {
-  stl::string               name;              //имя библиотеки
-  CollisionFilterCollection collision_filters; //коллекция фильтров коллизий
-  MaterialCollection        materials;         //коллекция материалов
-  RigidBodyCollection       rigid_bodies;      //коллекция твердых тел
-  ShapeCollection           shapes;            //коллекция геометрических тел
-  TriangleMeshCollection    triangle_meshes;   //коллекция сеток
+  stl::string            name;              //имя библиотеки
+  MaterialCollection     materials;         //коллекция материалов
+  RigidBodyCollection    rigid_bodies;      //коллекция твердых тел
+  SceneCollection        scenes;            //коллекция сцен
+  ShapeCollection        shapes;            //коллекция геометрических тел
+  TriangleMeshCollection triangle_meshes;   //коллекция сеток
 };
 
 /*
@@ -88,16 +88,6 @@ void PhysicsLibrary::Rename (const char* name)
    Получение коллекций
 */
 
-const PhysicsLibrary::CollisionFilterCollection& PhysicsLibrary::CollisionFilters () const
-{
-  return const_cast<PhysicsLibrary&> (*this).CollisionFilters ();
-}
-
-PhysicsLibrary::CollisionFilterCollection& PhysicsLibrary::CollisionFilters ()
-{
-  return impl->collision_filters;
-}
-
 const PhysicsLibrary::MaterialCollection& PhysicsLibrary::Materials () const
 {
   return const_cast<PhysicsLibrary&> (*this).Materials ();
@@ -116,6 +106,16 @@ const PhysicsLibrary::RigidBodyCollection& PhysicsLibrary::RigidBodies () const
 PhysicsLibrary::RigidBodyCollection& PhysicsLibrary::RigidBodies ()
 {
   return impl->rigid_bodies;
+}
+
+const PhysicsLibrary::SceneCollection& PhysicsLibrary::Scenes () const
+{
+  return const_cast<PhysicsLibrary&> (*this).Scenes ();
+}
+
+PhysicsLibrary::SceneCollection& PhysicsLibrary::Scenes ()
+{
+  return impl->scenes;
 }
 
 const PhysicsLibrary::ShapeCollection& PhysicsLibrary::Shapes () const

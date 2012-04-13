@@ -198,6 +198,18 @@ class XmlPhysicsLibrarySaver
         writer.WriteAttribute ("collision_group", body.CollisionGroup ());
     }
 
+    //Сохранение сцены
+    void Save (const Scene& scene)
+    {
+      XmlWriter::Scope library_scope (writer, "scene");
+
+      writer.WriteAttribute ("name", scene.Name ());
+      writer.WriteAttribute ("gravity", scene.Gravity (), FLOAT_FORMAT);
+      writer.WriteAttribute ("simulation_step", scene.SimulationStep (), FLOAT_FORMAT);
+
+      SaveCollisionFilters (scene.CollisionFilters ());
+    }
+
     //Сохранение фильтра коллизий
     void Save (const CollisionFilter& filter)
     {
@@ -210,16 +222,9 @@ class XmlPhysicsLibrarySaver
 
     //Сохранение коллекции
     template <class T>
-    void SavePhysicsLibraryCollection (const PhysicsLibraryCollection<T>& collection)
+    void SavePhysicsLibraryCollection (const T& collection)
     {
-      for (typename PhysicsLibraryCollection <T>::ConstIterator iter = collection.CreateIterator (); iter; ++iter)
-        Save (*iter);
-    }
-
-    template <class T>
-    void SavePhysicsLibraryOrderedCollection (const PhysicsLibraryOrderedCollection<T>& collection)
-    {
-      for (typename PhysicsLibraryOrderedCollection <T>::ConstIterator iter = collection.CreateIterator (); iter; ++iter)
+      for (typename T::ConstIterator iter = collection.CreateIterator (); iter; ++iter)
         Save (*iter);
     }
 
@@ -277,12 +282,20 @@ class XmlPhysicsLibrarySaver
       SavePhysicsLibraryCollection (bodies);
     }
 
+    //Сохранение сцен
+    void SaveScenes (const PhysicsLibrary::SceneCollection& scenes)
+    {
+      XmlWriter::Scope library_scope (writer, "scenes");
+
+      SavePhysicsLibraryCollection (scenes);
+    }
+
     //Сохранение фильтров коллизий
-    void SaveCollisionFilters (const PhysicsLibrary::CollisionFilterCollection& filters)
+    void SaveCollisionFilters (const Scene::CollisionFilterCollection& filters)
     {
       XmlWriter::Scope library_scope (writer, "collision_filters");
 
-      SavePhysicsLibraryOrderedCollection (filters);
+      SavePhysicsLibraryCollection (filters);
     }
 
   public:
@@ -315,7 +328,7 @@ class XmlPhysicsLibrarySaver
       SaveTriangleMeshes (triangle_meshes, options);
       SaveShapes (library.Shapes ());
       SaveRigidBodies (library.RigidBodies ());
-      SaveCollisionFilters (library.CollisionFilters ());
+      SaveScenes (library.Scenes ());
     }
 
   private:
