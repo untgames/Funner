@@ -37,6 +37,7 @@ struct PhysicsManager::Impl: public xtl::trackable
 
     MergeCollections (new_library.RigidBodies (),    library.RigidBodies ());
     MergeCollections (new_library.Materials (),      library.Materials ());
+    MergeCollections (new_library.Scenes (),         library.Scenes ());
     MergeCollections (new_library.Shapes (),         library.Shapes ());
     MergeCollections (new_library.TriangleMeshes (), library.TriangleMeshes ());
   }
@@ -47,6 +48,7 @@ struct PhysicsManager::Impl: public xtl::trackable
 
     SubtractCollections (unload_library.RigidBodies (),    library.RigidBodies ());
     SubtractCollections (unload_library.Materials (),      library.Materials ());
+    SubtractCollections (unload_library.Scenes (),         library.Scenes ());
     SubtractCollections (unload_library.Shapes (),         library.Shapes ());
     SubtractCollections (unload_library.TriangleMeshes (), library.TriangleMeshes ());
   }
@@ -96,6 +98,32 @@ const char* PhysicsManager::Description () const
 Scene PhysicsManager::CreateScene ()
 {
   return SceneImplProvider::CreateScene (impl->driver.get (), ScenePtr (impl->driver->CreateScene (), false), impl->library.RigidBodies ());
+}
+
+Scene PhysicsManager::CreateScene (const char* name)
+{
+  try
+  {
+    media::physics::Scene *media_scene = impl->library.Scenes ().Find (name);
+
+    if (!media_scene)
+      throw xtl::format_operation_exception ("", "Scene '%s' was not loaded", name);
+
+    Scene return_value = CreateScene ();
+
+    return_value.SetGravity (media_scene->Gravity ());
+    return_value.SetSimulationStep (media_scene->SimulationStep ());
+
+    for (media::physics::Scene::CollisionFilterCollection::ConstIterator iter = media_scene->CollisionFilters ().CreateIterator (); iter; ++iter)
+      return_value.AddCollisionFilter (iter->Group1Wildcard (), iter->Group2Wildcard (), iter->IsCollides ());
+
+    return return_value;
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("physics::PhysicsManager::CreateMaterial (const char*)");
+    throw;
+  }
 }
 
 Material PhysicsManager::CreateMaterial ()

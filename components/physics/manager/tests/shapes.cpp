@@ -13,6 +13,8 @@ int main ()
 
     Scene scene (manager.CreateScene ());
 
+    scene.SetSimulationStep (1.f / 16.f);
+
     math::vec3f mesh_vertices []        = { math::vec3f (0, -1.5, 0), math::vec3f (0.5, 0, 0), math::vec3f (0, 0, 1), math::vec3f (-1, 0, 0) };
     size_t      triangles_indices []    = { 0, 1, 2, 0, 3, 1, 0, 2, 3, 3, 2, 1};
     size_t      mesh_vertices_count     = sizeof (mesh_vertices) / sizeof (*mesh_vertices);

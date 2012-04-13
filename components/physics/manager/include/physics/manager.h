@@ -46,6 +46,7 @@ class PhysicsManager: public xtl::dynamic_cast_root
 ///Создание объектов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     Scene    CreateScene         ();
+    Scene    CreateScene         (const char* name);
     Material CreateMaterial      ();
     Material CreateMaterial      (const char* name);
     Shape    CreateBoxShape      (const math::vec3f& half_dimensions);

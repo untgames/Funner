@@ -17,7 +17,9 @@ int main ()
     Material default_material = manager.CreateMaterial ("Default");
     Shape    plane_shape      = manager.CreateShape ("PlaneShape");
 
-    Scene scene (manager.CreateScene ());
+    Scene scene (manager.CreateScene ()),
+          scene1 (manager.CreateScene ("Scene1")),
+          scene2 (manager.CreateScene ("DefaultScene"));
 
     RigidBody body1 (scene.CreateRigidBody ("BigShip")),
               body2 (scene.CreateRigidBody ("CompoundBody")),
