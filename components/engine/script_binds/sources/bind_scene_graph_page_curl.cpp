@@ -58,7 +58,7 @@ void bind_static_page_curl_library (Environment& environment)
 
 math::vec2f get_grid_size (PageCurl& page_curl)
 {
-  return math::vec2f (page_curl.GridSize ().x, page_curl.GridSize ().y);
+  return math::vec2f ((float)page_curl.GridSize ().x, (float)page_curl.GridSize ().y);
 }
 
 void bind_page_curl_library (Environment& environment)
