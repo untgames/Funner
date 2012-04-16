@@ -26,7 +26,7 @@ const char* LOG_NAME = "render.obsolete.render2d.RenderablePageCurl";
 
 const float  EPS                   = 0.001f;
 const float  BACK_SHADOW_OFFSET    = 0;
-const float  CORNER_SHADOW_SHIFT   = 0.2;
+const float  CORNER_SHADOW_SHIFT   = 0.2f;
 const float  PI                    = 3.1415926f;
 const size_t SHADOW_TEXTURE_SIZE   = 32;
 const size_t SHADOW_VERTICES_COUNT = 16;
@@ -532,7 +532,7 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
       for (size_t i = 0; i < SHADOW_TEXTURE_SIZE; i++)
         for (size_t j = 0; j < SHADOW_TEXTURE_SIZE; j++)
         {
-          float distance = math::length (math::vec2f (i + 0.5f - half_texture_size, j + 0.5 - half_texture_size)) / max_texture_distance;
+          float distance = math::length (math::vec2f (i + 0.5f - half_texture_size, j + 0.5f - half_texture_size)) / max_texture_distance;
 
           *current_texel++ = stl::min (255, stl::max (0, (int)(log (shadow_arg_min + shadow_arg_range * distance) / log_delimiter * 255)));
         }
@@ -891,10 +891,10 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
 
       low_level::Rect scissor_rect;
 
-      scissor_rect.x = viewport.x + (left_bottom_corner_screen.x + 1) / 2 * viewport.width;
-      scissor_rect.y = viewport.y + (left_bottom_corner_screen.y + 1) / 2 * viewport.height;
-      scissor_rect.width  = ceil ((right_top_corner_screen.x - left_bottom_corner_screen.x) / 2 * viewport.width);
-      scissor_rect.height = ceil ((right_top_corner_screen.y - left_bottom_corner_screen.y) / 2 * viewport.height);
+      scissor_rect.x      = viewport.x + (int)((left_bottom_corner_screen.x + 1.f) / 2.f * viewport.width);
+      scissor_rect.y      = viewport.y + (int)((left_bottom_corner_screen.y + 1.f) / 2.f * viewport.height);
+      scissor_rect.width  = (size_t)ceil ((right_top_corner_screen.x - left_bottom_corner_screen.x) / 2 * viewport.width);
+      scissor_rect.height = (size_t)ceil ((right_top_corner_screen.y - left_bottom_corner_screen.y) / 2 * viewport.height);
 
       device.RSSetState (rasterizer_scissor_enabled_state.get ());
       device.RSSetScissor (scissor_rect);
