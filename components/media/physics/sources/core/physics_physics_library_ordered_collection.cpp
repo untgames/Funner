@@ -100,7 +100,7 @@ typename PhysicsLibraryOrderedCollection<T>::ConstIterator PhysicsLibraryOrdered
 template <class T>
 const T& PhysicsLibraryOrderedCollection<T>::operator [] (size_t index) const
 {
-  return const_cast<Item&> (const_cast<const PhysicsLibraryOrderedCollection&> (*this) [index]);
+  return const_cast<PhysicsLibraryOrderedCollection&> (*this) [index];
 }
 
 template <class T>

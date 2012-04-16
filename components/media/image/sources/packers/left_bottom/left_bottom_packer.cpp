@@ -86,8 +86,8 @@ class TileImageBuilder
         images[i] = in_sizes[i];
       }
 
-      average_image_width  /= (float)images_count;
-      average_image_height /= (float)images_count;
+      average_image_width  /= images_count;
+      average_image_height /= images_count;
     }
 
     void BuildTileImage (math::vec2ui* out_origins, size_t margin, size_t pack_flags)
