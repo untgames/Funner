@@ -8,12 +8,12 @@ namespace
 const float  DEFAULT_BINDING_MISMATCH_WEIGHT           = 10.f;
 const float  DEFAULT_CORNER_SHADOW_OFFSET              = 15.f;
 const size_t DEFAULT_FIND_BEST_CURL_STEPS              = 1000;
-const float  DEFAULT_GRID_SIZE                         = 100.f;
+const size_t DEFAULT_GRID_SIZE                         = 100;
 const float  DEFAULT_OPPOSITE_CORNER_SHADOW_GROW_POWER = 15.f;
 const float  DEFAULT_SHADOW_DENSITY                    = 1.0f;
 const float  DEFAULT_SHADOW_GROW_POWER                 = 0.25f;
 const float  DEFAULT_SHADOW_LOG_BASE                   = 4.f;
-const float  DEFAULT_SHADOW_MIN_LOG_VALUE              = 0.3;
+const float  DEFAULT_SHADOW_MIN_LOG_VALUE              = 0.3f;
 const float  DEFAULT_SHADOW_WIDTH                      = 0.25f;
 
 }
