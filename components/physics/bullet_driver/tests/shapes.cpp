@@ -24,7 +24,7 @@ int main ()
     size_t      triangles_indices_count = sizeof (triangles_indices) / sizeof (*triangles_indices);
 
     ShapePtr box_shape           (bullet_driver->CreateBoxShape          (1.f), false),
-             sphere_shape        (bullet_driver->CreateSphereShape       (1.f), false),
+             sphere_shape        (bullet_driver->CreateSphereShape       (0.5f), false),
              capsule_shape       (bullet_driver->CreateCapsuleShape      (1.f, 0.5f), false),
              plane_shape         (bullet_driver->CreateBoxShape          (math::vec3f (50.f, 0.01f, 50.f)), false),
              convex_shape        (bullet_driver->CreateConvexShape       (mesh_vertices_count, mesh_vertices), false),
