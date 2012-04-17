@@ -1,0 +1,3212 @@
+Content-Type: multipart/related; start=<op.mhtml.1243519524305.e48c1963233a037e@10.1.0.11>; boundary=----------NbTj16xyrFJgraG73IzlC0
+Content-Location: http://sdip.gov.ua/ua/copyright_registration.html
+Subject: =?utf-8?Q?=D0=9E=D1=84=D1=96=D1=86=D1=96=D0=B9=D0=BD=D0=B8=D0=B9=20=D0=B2=D0=B5=D0=B1-=D0=BF=D0=BE=D1=80=D1=82=D0=B0=D0=BB=20=D0=94=D0=B5=D1=80=D0=B6=D0=B0=D0=B2=D0=BD=D0=BE=D0=B3=D0=BE=20=D0=B4=D0=B5=D0=BF=D0=B0=D1=80=D1=82=D0=B0=D0=BC=D0=B5=D0=BD=D1=82=D1=83=20=D1=96=D0=BD=D1=82=D0=B5=D0=BB=D0=B5=D0=BA=D1=82=D1=83=D0=B0=D0=BB=D1=8C=D0=BD=D0=BE=D1=97=20=D0=B2=D0=BB=D0=B0=D1=81=D0=BD=D0=BE=D1=81=D1=82=D1=96=20/=20=D0=90=D0=B2=D1=82=D0=BE=D1=80=D1=81=D1=8C=D0=BA=D0=B5=20=D0=BF=D1=80=D0=B0=D0=B2=D0=BE=20=D1=96=20=D1=81=D1=83=D0=BC=D1=96=D0=B6=D0=BD=D1=96=20=D0=BF=D1=80=D0=B0=D0=B2=D0=B0?=
+MIME-Version: 1.0
+
+------------NbTj16xyrFJgraG73IzlC0
+Content-Disposition: inline; filename=copyright_registration.html
+Content-Type: text/html; charset=windows-1251; name=copyright_registration.html
+Content-Id: <op.mhtml.1243519524305.e48c1963233a037e@10.1.0.11>
+Content-Location: http://sdip.gov.ua/ua/copyright_registration.html
+Content-Transfer-Encoding: Quoted-Printable
+
+<!doctype HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<meta http-equiv=3D"Content-Type" content=3D"text/html; charset=3Dwindow=
+s-1251">
+<title>=CE=F4=B3=F6=B3=E9=ED=E8=E9 =E2=E5=E1-=EF=EE=F0=F2=E0=EB =C4=E5=F0=
+=E6=E0=E2=ED=EE=E3=EE =E4=E5=EF=E0=F0=F2=E0=EC=E5=ED=F2=F3 =B3=ED=F2=E5=EB=
+=E5=EA=F2=F3=E0=EB=FC=ED=EE=BF =E2=EB=E0=F1=ED=EE=F1=F2=B3 / =C0=E2=F2=EE=
+=F0=F1=FC=EA=E5 =EF=F0=E0=E2=EE =B3 =F1=F3=EC=B3=E6=ED=B3 =EF=F0=E0=E2=E0=
+</title>
+	<link rel=3D"alternate" type=3D"application/rss+xml" title=3D"RSS 2.0" =
+href=3D"http://sdip.gov.ua/ua/export.rss" />
+	<script language=3D"javascript" type=3D"text/javascript" src=3D"http://=
+sdip.gov.ua/js/swfobject.js"></script>
+	<link href=3D"http://sdip.gov.ua/inside/css/styles.css" rel=3D"styleshe=
+et" type=3D"text/css" />
+	<LINK REL=3D"StyleSheet" href=3D"http://sdip.gov.ua/inside/css/calendar=
+.css" type=3D"text/css">
+	<!--<script language=3D"javascript" type=3D"text/javascript" src=3D"htt=
+p://sdip.gov.ua/js/calendar/browserSniffer.js"></script>
+	<script language=3D"javascript" type=3D"text/javascript" src=3D"http://=
+sdip.gov.ua/js/calendar/dynCalendar_ua.js"></script>-->
+	<!--
+	=CC=E5=ED=FE
+	-->
+</head>
+<body>
+
+<script language=3D"javascript" type=3D"text/javascript">
+var str, url;
+d =3D document;
+s =3D screen;
+w =3D window;
+str =3D "<img width=3D0 height=3D0 style=3D'visibility:hidden;position:a=
+bsolute;' src=3D'http://sdip.gov.ua/counter.php?";
+url =3D w.location.href.slice(7);
+dp =3D s.colorDepth ? s.colorDepth : s.pixelDepth;
+ref =3D d.referrer.slice(7);
+user_id =3D 11;
+page_id =3D 498;
+var lang =3D 'ua';
+sessid =3D '';
+str +=3D "wd=3D"+s.width+"&ht=3D"+s.height+"&dp=3D"+dp+"&url=3D"+url+"&r=
+ef=3D"+ref+"&user_id=3D"+user_id+"&page_id=3D"+page_id+"&lang=3D"+lang+"=
+&sessid=3D"+sessid;
+str +=3D "'>";
+d.write(str);
+
+</script>
+<script type=3D"text/javascript">
+var inc =3D 4;
+
+  navHover =3D function() {
+  for (var j=3D1; j<inc; j++) {
+	var lis =3D document.getElementById("menu["+j+"]").getElementsByTagName=
+("LI");
+	for (var i=3D0; i<lis.length; i++) {
+			lis[i].onmouseover=3Dfunction() {
+				this.className+=3D" jshover";
+			}
+		lis[i].onmouseout=3Dfunction() {
+			this.className=3Dthis.className.replace(new RegExp(" jshover\\b"), ""=
+);
+		}
+	}
+ }
+ }
+if (window.attachEvent) window.attachEvent("onload", navHover);
+</script>
+
+
+<map name=3D'navy2'>
+   <area shape=3D'rect' coords=3D"9,0,35,28" href=3D'http://sdip.gov.ua/=
+ua' alt=3D'=D1=F2=E0=F0=F2=EE=E2=E0 =F1=F2=EE=F0=B3=ED=EA=E0'>
+   <area shape=3D'rect' coords=3D"45,0,71,28" href=3D'http://sdip.gov.ua=
+/ua/site_map.html' alt=3D'=CC=E0=EF=E0 =F1=E0=E9=F2=F3'>
+   <area shape=3D'rect' coords=3D"82,0,108,28" href=3D'http://sdip.gov.u=
+a/ua/contact/feedback.html' alt=3D'=CD=E0=EF=E8=F1=E0=F2=E8 =ED=E0=EC'>
+</map>
+
+<table width=3D'100%' height=3D'100%' cellspacing=3D'0' cellpadding=3D'0=
+' border=3D'0'>
+<tr><td>
+	<table cellspacing=3D'0' cellpadding=3D'0' border=3D'0' width=3D'100%'>=
+
+		<tr>
+			<td style=3D'background-color:#5c8b84;'>
+			=
+
+
+
+
+			<div  id=3D"top" style=3D"position:relative;display:inline;z-index:3;=
+width:100%;height:187px;"><noscript><table width=3D"100%"  cellpadding=3D=
+"0" cellspacing=3D"0"><tr><td style=3D"background-image: url(/main/img/s=
+hapka.jpg); background-repeat: no-repeat;">&nbsp;</td><td width=3D"346">=
+<a href=3D"/ua/city.html"><img src=3D"/main/img/shapka2.jpg"></a></td></=
+tr></table></noscript></div>
+
+			</td>
+		</tr>
+	</table>
+	</td>
+</tr>
+<tr>
+	<td width=3D"100%" style=3D"text-align:center;">
+	<table border=3D"0" width=3D"100%" cellpadding=3D"0" cellspacing=3D"0" =
+ style=3D"margin-top:1px;border:1px solid #bababa;">
+	<tr style=3D"border:1px solid #bababa;">
+		<td style=3D'padding:0;width:120px;border:0px solid #bababa;text-align=
+:center;'>
+			<img src=3D'http://sdip.gov.ua/inside/img/navy5.jpg' align=3D'center'=
+ usemap=3D"#navy2" border=3D'0' style=3D'margin-top:10px;'>
+		</td>
+		<td style=3D'border:0px solid #bababa; padding:0px 3px 0px 8 px;text-a=
+lign:center;' align=3D'center'><table width=3D"100%" border=3D0 class=3D=
+"menu_border">
+<tr><td>
+
+
+
+<table align=3D"left" border=3D'0' style=3D"width:100%;" cellpadding=3D"=
+0" cellspacing=3D"0">
+<tr><td align=3D"center" style=3D"width:100%;">
+		<ul id=3D"menu[1]" class=3D"menu">
+		<table border=3D"0" align=3D"center" cellpadding=3D"0" cellspacing=3D"=
+0"><tr>
+		=
+
+		=
+
+									<td><li style=3D"z-index:100">
+				 <a href=3D"http://sdip.gov.ua/ua/departament.html"  style=3D"white-=
+space:nowrap;">=CF=F0=EE =C4=E5=F0=E6=E4=E5=EF=E0=F0=F2=E0=EC=E5=ED=F2</=
+a>
+							</li></td>
+									<td><li style=3D"z-index:99">
+				 <a href=3D"http://sdip.gov.ua/ua/plans_reports.html"  style=3D"whit=
+e-space:nowrap;">=CF=EB=E0=ED=E8 =F2=E0 =E7=E2=B3=F2=E8</a>
+							</li></td>
+									<td><li style=3D"z-index:98">
+				 <a href=3D"http://sdip.gov.ua/ua/normative_acts.html"  style=3D"whi=
+te-space:nowrap;">=CD=EE=F0=EC=E0=F2=E8=E2=ED=B3 =B3 =EF=F0=E0=E2=EE=E2=B3=
+ =E0=EA=F2=E8</a>
+							</li></td>
+									<td><li style=3D"z-index:97">
+				 <a href=3D"http://sdip.gov.ua/ua/industrial_ownness.html"  style=3D=
+"white-space:nowrap;">=CE=E1'=BA=EA=F2=E8 =EF=F0=EE=EC=E8=F1=EB=EE=E2=EE=
+=BF =E2=EB=E0=F1=ED=EE=F1=F2=B3</a>
+							</li></td>
+						</tr> </table>
+        </ul>
+
+</td></tr>
+<tr><td align=3D"center" style=3D"width:100%;">
+		<ul id=3D"menu[2]" class=3D"menu">
+		<table border=3D"0" align=3D"center" cellpadding=3D"0" cellspacing=3D"=
+0"><tr>
+		=
+
+		=
+
+									<td><li style=3D"z-index:96">
+				 <a href=3D"http://sdip.gov.ua/ua/authors_rights.html"  style=3D"whi=
+te-space:nowrap;">=C0=E2=F2=EE=F0=F1=FC=EA=E5 =EF=F0=E0=E2=EE =B3 =F1=F3=
+=EC=B3=E6=ED=B3 =EF=F0=E0=E2=E0</a>
+							</li></td>
+									<td><li style=3D"z-index:95">
+				 <a href=3D"http://sdip.gov.ua/ua/info_resurses.html"  style=3D"whit=
+e-space:nowrap;">=B2=ED=F4=EE=F0=EC=E0=F6=B3=E9=ED=B3 =F0=E5=F1=F3=F0=F1=
+=E8</a>
+							</li></td>
+									<td><li style=3D"z-index:94">
+				 <a href=3D"http://sdip.gov.ua/ua/registers.html"  style=3D"white-sp=
+ace:nowrap;">=C4=E5=F0=E6=E0=E2=ED=B3 =F0=E5=BA=F1=F2=F0=E8</a>
+							</li></td>
+									<td><li style=3D"z-index:93">
+				 <a href=3D"http://sdip.gov.ua/ua/rba.html"  style=3D"white-space:no=
+wrap;">=C7=E1=EE=F0=E8 =B3 =E4=E5=F0=E6=EC=E8=F2=EE</a>
+							</li></td>
+						</tr> </table>
+        </ul>
+
+</td></tr>
+<tr><td align=3D"center" style=3D"width:100%;">
+		<ul id=3D"menu[3]" class=3D"menu">
+		<table border=3D"0" align=3D"center" cellpadding=3D"0" cellspacing=3D"=
+0"><tr>
+		=
+
+		=
+
+									<td><li style=3D"z-index:92">
+				 <a href=3D"http://sdip.gov.ua/ua/catalogue.html"  style=3D"white-sp=
+ace:nowrap;">=CA=E0=F2=E0=EB=EE=E3 =EF=EE=F1=EB=F3=E3</a>
+							</li></td>
+									<td><li style=3D"z-index:91">
+				 <a href=3D"http://sdip.gov.ua/ua/events.html"  style=3D"white-space=
+:nowrap;">=C7=E0=F5=EE=E4=E8</a>
+							</li></td>
+									<td><li style=3D"z-index:90">
+				 <a href=3D"http://sdip.gov.ua/ua/multimedia.html"  style=3D"white-s=
+pace:nowrap;">=CC=F3=EB=FC=F2=E8=EC=E5=E4=B3=E0</a>
+							</li></td>
+									<td><li style=3D"z-index:89">
+				 <a href=3D"http://sdip.gov.ua/ua/a_links.html"  style=3D"white-spac=
+e:nowrap;">=CA=EE=F0=E8=F1=ED=B3 =EB=B3=ED=EA=E8</a>
+							</li></td>
+						</tr> </table>
+        </ul>
+
+</td></tr>
+</table>
+</td></tr>
+</table>
+</td>
+		<td style=3D'padding:0;width:120px;border:0px solid #bababa;text-align=
+:center;'>
+		<table  border=3D'0' cellspacing=3D'0' cellpadding=3D'0'>
+		<tr>
+			<td>
+				<a href=3D'http://sdip.gov.ua/ua/copyright_registration.html' class=3D=
+'bg_a1'  style=3D"text-decoration:underline;">=D3=CA=D0</a>
+			</td>
+						<td>
+				<a href=3D'http://sdip.gov.ua/en/copyright_registration.html' class=3D=
+'bg_a1' >ENG</a>
+			</td>
+		</tr>
+		</table>
+		</td>
+	</tr>
+	</table>
+	</td>
+</tr>
+<tr>
+	<td height=3D"100%">
+	<table cellspacing=3D'0' cellpadding=3D'0' border=3D'0' width=3D'100%' =
+style=3D"margin-top:20px;">
+					<tr>
+					<td width=3D'25'>&nbsp;</td>
+					<td  height=3D"100%">
+						<table cellspacing=3D'0' cellpadding=3D'0' border=3D'0' width=3D'1=
+00%'>
+							<tr>
+							<td>
+								<table border=3D"0" width=3D"100%">
+								<tr>
+								<td>
+																<h2>
+																		<a href=3D"http://sdip.gov.ua/ua/authors_rights.html" =
+ class=3D"navigation">=C0=E2=F2=EE=F0=F1=FC=EA=E5 =EF=F0=E0=E2=EE =B3 =F1=
+=F3=EC=B3=E6=ED=B3 =EF=F0=E0=E2=E0 -</a>																		<a href=3D"htt=
+p://sdip.gov.ua/ua/authors_rights2.html"  class=3D"navigation">=B2=ED=F4=
+=EE=F0=EC=E0=F6=B3=FF -</a>																		<font class=3D"navigation_f=
+">=C4=E5=F0=E6=E0=E2=ED=E0 =F0=E5=BA=F1=F2=F0=E0=F6=B3=FF =E0=E2=F2=EE=F0=
+=F1=EA=EE=E3=EE =EF=F0=E0=E2=E0</font>																																		=
+	</h2>
+																</td>
+								</tr>
+								<tr>
+								<td>
+									<hr size=3D"2" width=3D'100%' style=3D'color:#e5e5e5;' align=3D=
+"left">
+								</td></tr>
+								<tr><td id=3D"content_box">
+									<p align=3D"center"><strong><font color=3D"#658c6c">=C4=E5=F0=E6=
+=E0=E2=ED=E0 =F0=E5=BA=F1=F2=F0=E0=F6=B3=FF =E0=E2=F2=EE=F0=F1=FC=EA=EE=E3=
+=EE =EF=F0=E0=E2=E0 =B3 =E4=EE=E3=EE=E2=EE=F0=B3=E2,<br />  =FF=EAi =F1=F2=
+=EE=F1=F3=FE=F2=FC=F1=FF =EF=F0=E0=E2=E0 =E0=E2=F2=EE=F0=E0 =ED=E0 =F2=E2=
+=B3=F0</font></strong></p>  <div align=3D"center">&nbsp;</div>  <div ali=
+gn=3D"justify">=C4=E5=F0=E6=E0=E2=ED=E0 =F0=E5=BA=F1=F2=F0=E0=F6=B3=FF =E0=
+=E2=F2=EE=F0=F1=FC=EA=EE=E3=EE =EF=F0=E0=E2=E0 =E2 =D3=EA=F0=E0=BF=ED=B3=
+ =E7=E4=B3=E9=F1=ED=FE=BA=F2=FC=F1=FF =E2=B3=E4=EF=EE=E2=B3=E4=ED=EE =E4=
+=EE =C7=E0=EA=EE=ED=F3 =D3=EA=F0=E0=BF=ED=E8 <a href=3D"http://zakon.rad=
+a.gov.ua/cgi-bin/laws/main.cgi&#63;nreg=3D3792-12&amp;p=3D11987598178526=
+76" target=3D"_blank">&quot;=CF=F0=EE =E0=E2=F2=EE=F0=F1=FC=EA=E5 =EF=F0=
+=E0=E2=EE i =F1=F3=EC=B3=E6=ED=B3 =EF=F0=E0=E2=E0&quot;</a> =E2=B3=E4 23=
+ =E3=F0=F3=E4=ED=FF 1993 =F0. =B93792-12 (=E4=E0=EB=B3 &ndash; =C7=E0=EA=
+=EE=ED) =F2=E0 =EF=EE=F1=F2=E0=ED=EE=E2=E8 =CA=E0=E1=B3=ED=E5=F2=F3 =CC=B3=
+=ED=B3=F1=F2=F0=B3=E2 =D3=EA=F0=E0=BF=ED=E8 =E2=B3=E4 27.12.2001 =F0. =B9=
+ 1756 <a href=3D"http://zakon.rada.gov.ua/cgi-bin/laws/main.cgi&#63;nreg=
+=3D1756-2001-%EF&amp;p=3D1198759817852676" target=3D"_blank">&quot;=CF=F0=
+=EE =E4=E5=F0=E6=E0=E2=ED=F3 =F0=E5=BA=F1=F2=F0=E0=F6=B3=FE =E0=E2=F2=EE=
+=F0=F1=FC=EA=EE=E3=EE =EF=F0=E0=E2=E0 =B3 =E4=EE=E3=EE=E2=EE=F0=B3=E2, =FF=
+=EA=B3 =F1=F2=EE=F1=F3=FE=F2=FC=F1=FF =EF=F0=E0=E2=E0 =E0=E2=F2=EE=F0=E0=
+ =ED=E0 =F2=E2=B3=F0&quot;</a> (=E4=E0=EB=B3 - =CF=EE=F0=FF=E4=EE=EA).</=
+div>  <div align=3D"justify"><br />  =C7=E0=FF=E2=EA=E8 =ED=E0 =E4=E5=F0=
+=E6=E0=E2=ED=F3 =F0=E5=BA=F1=F2=F0=E0=F6=B3=FE =EF=EE=E4=E0=FE=F2=FC=F1=FF=
+ =E7=E0 =E0=E4=F0=E5=F1=EE=FE: =E2=F3=EB. =D3=F0=E8=F6=FC=EA=EE=E3=EE, 4=
+5, =CA=E8=BF=E2-35, =CC=D1=CF, 03680, =C4=E5=F0=E6=E0=E2=ED=E8=E9 =E4=E5=
+=EF=E0=F0=F2=E0=EC=E5=ED=F2 =B3=ED=F2=E5=EB=E5=EA=F2=F3=E0=EB=FC=ED=EE=BF=
+ =E2=EB=E0=F1=ED=EE=F1=F2=B3. =CF=F0=E8=E9=EE=EC =E7=E0=FF=E2=EE=EA =E7=E4=
+=B3=E9=F1=ED=FE=BA=F2=FC=F1=FF =E2 =F0=EE=E1=EE=F7=B3 =E4=ED=B3 =E7 9.30=
+ =E4=EE 12.30. =D2=E5=EB=E5=F4=EE=ED: (044) 498-37-08, (09, 10).</div>  =
+<div align=3D"center"><br />  <strong><font color=3D"#658c6c">=C2=E8=E4=E8=
+ =F0=E5=BA=F1=F2=F0=E0=F6=B3=E9</font></strong></div>  <p>&nbsp;</p>  <d=
+iv align=3D"left"><font color=3D"#2d4a77"><br />  </font><strong><font c=
+olor=3D"#658c6c">=D0=E5=BA=F1=F2=F0=E0=F6=B3=FF =E0=E2=F2=EE=F0=F1=FC=EA=
+=EE=E3=EE =EF=F0=E0=E2=E0 =ED=E0 =F2=E2=B3=F0</font></strong><strong><br=
+ />  </strong>&bull; =D0=E5=BA=F1=F2=F0=E0=F6=B3=FF =E0=E2=F2=EE=F0=F1=FC=
+=EA=EE=E3=EE =EF=F0=E0=E2=E0 =ED=E0 =F2=E2=B3=F0<br />  &bull; =D0=E5=BA=
+=F1=F2=F0=E0=F6=B3=FF =E0=E2=F2=EE=F0=F1=FC=EA=EE=E3=EE =EF=F0=E0=E2=E0 =
+=ED=E0 =F1=EB=F3=E6=E1=EE=E2=E8=E9 =F2=E2=B3=F0</div>  <div align=3D"lef=
+t"><br />  <strong><font color=3D"#658c6c">=D0=E5=BA=F1=F2=F0=E0=F6=B3=FF=
+ =E4=EE=E3=EE=E2=EE=F0=B3=E2, =FF=EAi =F1=F2=EE=F1=F3=FE=F2=FC=F1=FF =EF=
+=F0=E0=E2=E0 =E0=E2=F2=EE=F0=E0 =ED=E0 =F2=E2=B3=F0</font></strong><br /=
+>  &bull; =D0=E5=BA=F1=F2=F0=E0=F6=B3=FF =E4=EE=E3=EE=E2=EE=F0=F3 =EF=F0=
+=EE =EF=E5=F0=E5=E4=E0=F7=F3 (=E2=B3=E4=F7=F3=E6=E5=ED=ED=FF) =EC=E0=E9=ED=
+=EE=E2=E8=F5 =EF=F0=E0=E2 =ED=E0 =F2=E2=B3=F0<br />  &bull; =D0=E5=BA=F1=
+=F2=F0=E0=F6=B3=FF =E4=EE=E3=EE=E2=EE=F0=F3 =EF=F0=EE =EF=E5=F0=E5=E4=E0=
+=F7=F3 =E2=E8=EA=EB=FE=F7=ED=EE=E3=EE =EF=F0=E0=E2=E0 =ED=E0 =E2=E8=EA=EE=
+=F0=E8=F1=F2=E0=ED=ED=FF =F2=E2=EE=F0=F3<br />  &bull; =D0=E5=BA=F1=F2=F0=
+=E0=F6=B3=FF =E4=EE=E3=EE=E2=EE=F0=F3 =EF=F0=EE =EF=E5=F0=E5=E4=E0=F7=F3=
+ =ED=E5=E2=E8=EA=EB=FE=F7=ED=EE=E3=EE =EF=F0=E0=E2=E0 =ED=E0 =E2=E8=EA=EE=
+=F0=E8=F1=F2=E0=ED=ED=FF =F2=E2=EE=F0=F3</div>  <div align=3D"center"><b=
+r />  <strong><font color=3D"#658c6c">=C4=EE=EA=F3=EC=E5=ED=F2=E8, =F9=EE=
+ =EF=EE=F2=F0=B3=E1=ED=B3 =E4=EB=FF =F0=E5=BA=F1=F2=F0=E0=F6=B3=BF =E0=E2=
+=F2=EE=F0=F1=FC=EA=EE=E3=EE =EF=F0=E0=E2=E0 =F2=E0 =E4=EE=E3=EE=E2=EE=F0=
+=B3=E2,<br />  =FF=EAi =F1=F2=EE=F1=F3=FE=F2=FC=F1=FF =EF=F0=E0=E2=E0 =E0=
+=E2=F2=EE=F0=E0 =ED=E0 =F2=E2=B3=F0 (=EF=EE=E4=E0=FE=F2=FC=F1=FF =EA=EE=EC=
+=EF=EB=E5=EA=F2=ED=EE =E2 =EF=E0=EF=E5=F0=EE=E2=B3=E9 =EF=E0=EF=F6=B3!):=
+</font></strong></div>  <div align=3D"justify"><br />  =C7=E0=FF=E2=EA=E0=
+ =ED=E0 =F0=E5=BA=F1=F2=F0=E0=F6=B3=FE =E0=E2=F2=EE=F0=F1=FC=EA=EE=E3=EE=
+ =EF=F0=E0=E2=E0 =ED=E0 =F2=E2=B3=F0 =EF=EE=E2=E8=ED=ED=E0 =EC=B3=F1=F2=E8=
+=F2=E8: <br />  &bull; =E7=E0=FF=E2=F3 (=E2=E8=EA=EB=E0=E4=E5=ED=F3 =F3=EA=
+=F0=E0=BF=ED=F1=FC=EA=EE=FE =EC=EE=E2=EE=FE, =F9=EE =F1=EA=EB=E0=E4=E0=BA=
+=F2=FC=F1=FF =E7=E0 =E2=F1=F2=E0=ED=EE=E2=EB=E5=ED=EE=FE =F4=EE=F0=EC=EE=
+=FE). =CF=F0=E8=EC=B3=F2=EA=E0: =EE=E1&rsquo;=BA=EA=F2=E8 =E0=E2=F2=EE=F0=
+=F1=FC=EA=EE=E3=EE =EF=F0=E0=E2=E0 =F3 =EF.3 =E7=E0=FF=E2=E8 =E7=E0=E7=ED=
+=E0=F7=E0=FE=F2=FC=F1=FF =E2=B3=E4=EF=EE=E2=B3=E4=ED=EE =E4=EE =F1=F2.8 =
+<a href=3D"http://zakon.rada.gov.ua/cgi-bin/laws/main.cgi&#63;nreg=3D379=
+2-12&amp;p=3D1198759817852676" target=3D"_blank">=C7=E0=EA=EE=ED=F3</a>;=
+ <br />  &bull; =EF=F0=E8=EC=B3=F0=ED=E8=EA =F2=E2=EE=F0=F3 (=F3 =EC=E0=F2=
+=E5=F0=B3=E0=EB=FC=ED=B3=E9 =F4=EE=F0=EC=B3, =E2=E8=E7=ED=E0=F7=E5=ED=B3=
+=E9 =EF=F3=ED=EA=F2=E0=EC=E8 3, 15 <a href=3D"http://zakon.rada.gov.ua/c=
+gi-bin/laws/main.cgi&#63;nreg=3D1756-2001-%EF&amp;p=3D1198759817852676" =
+target=3D"_blank">=CF=EE=F0=FF=E4=EA=F3</a>); <br />  &bull; =E4=EE=EA=F3=
+=EC=E5=ED=F2, =F9=EE =F1=E2=B3=E4=F7=E8=F2=FC =EF=F0=EE =F4=E0=EA=F2 i =E4=
+=E0=F2=F3 =EE=EF=F0=E8=EB=FE=E4=ED=E5=ED=ED=FF =F2=E2=EE=F0=F3 (=E7=E0 =ED=
+=E0=FF=E2=ED=EE=F1=F2=B3); <br />  &bull; =E4=EE=EA=F3=EC=E5=ED=F2 =E0=E1=
+=EE =EA=EE=EF=B3=FE =E4=EE=EA=F3=EC=E5=ED=F2=E0 =EF=F0=EE =F1=EF=EB=E0=F2=
+=F3 =E7=E1=EE=F0=F3 =E7=E0 =EF=B3=E4=E3=EE=F2=EE=E2=EA=F3 =E4=EE =F0=E5=BA=
+=F1=F2=F0=E0=F6=B3=BF =E0=E2=F2=EE=F0=F1=FC=EA=EE=E3=EE =EF=F0=E0=E2=E0,=
+ =E0=E1=EE =EA=EE=EF=B3=FE =E4=EE=EA=F3=EC=E5=ED=F2=E0, =F9=EE =EF=B3=E4=
+=F2=E2=E5=F0=E4=E6=F3=BA =ED=E0=FF=E2=ED=B3=F1=F2=FC =EF=B3=EB=FC=E3; <b=
+r />  &bull; =E4=EE=EA=F3=EC=E5=ED=F2 =EF=F0=EE =F1=EF=EB=E0=F2=F3 =E7=E1=
+=EE=F0=F3 =E7=E0 =EE=F4=EE=F0=EC=EB=E5=ED=ED=FF i =E2=E8=E4=E0=F7=F3 =F1=
+=E2=B3=E4=EE=F6=F2=E2=E0 =E0=E1=EE =EA=EE=EF=B3=FE =E4=EE=EA=F3=EC=E5=ED=
+=F2=E0, =F9=EE =EF=B3=E4=F2=E2=E5=F0=E4=E6=F3=BA =ED=E0=FF=E2=ED=B3=F1=F2=
+=FC =EF=B3=EB=FC=E3; <br />  &bull; =E4=EE=E2=B3=F0=E5=ED=B3=F1=F2=FC, =EE=
+=F4=EE=F0=EC=EB=E5=ED=F3 =E2 =F3=F1=F2=E0=ED=EE=E2=EB=E5=ED=EE=EC=F3 =EF=
+=EE=F0=FF=E4=EA=F3, =FF=EA=F9=EE =E7=E0=FF=E2=EA=E0 =EF=EE=E4=E0=BA=F2=FC=
+=F1=FF =E4=EE=E2=B3=F0=E5=ED=EE=FE =EE=F1=EE=E1=EE=FE.</div>  <div align=
+=3D"justify"><br />  =C7=E0=FF=E2=EA=E0 =ED=E0 =F0=E5=BA=F1=F2=F0=E0=F6=B3=
+=FE =E0=E2=F2=EE=F0=F1=FC=EA=EE=E3=EE =EF=F0=E0=E2=E0 =ED=E0 =F1=EB=F3=E6=
+=E1=EE=E2=E8=E9 =F2=E2=B3=F0, =EA=F0=B3=EC =EF=E5=F0=E5=F0=E0=F5=EE=E2=E0=
+=ED=E8=F5 =E2=E8=F9=E5 =EC=E0=F2=E5=F0=B3=E0=EB=B3=E2, =EF=EE=E2=E8=ED=ED=
+=E0 =EC=B3=F1=F2=E8=F2=E8 =F9=E5 =E9 =E4=EE=EA=F3=EC=E5=ED=F2, =F9=EE =EF=
+=B3=E4=F2=E2=E5=F0=E4=E6=F3=BA, =EA=EE=EC=F3 =ED=E0=EB=E5=E6=E0=F2=FC =EC=
+=E0=E9=ED=EE=E2=B3 =EF=F0=E0=E2=E0 =B3=ED=F2=E5=EB=E5=EA=F2=F3=E0=EB=FC=ED=
+=EE=BF =E2=EB=E0=F1=ED=EE=F1=F2=B3 =ED=E0 =EE=E1'=BA=EA=F2, =F1=F2=E2=EE=
+=F0=E5=ED=E8=E9 =F3 =E7=E2'=FF=E7=EA=F3 =E7 =E2=E8=EA=EE=ED=E0=ED=ED=FF=EC=
+ =F2=F0=F3=E4=EE=E2=EE=E3=EE =E4=EE=E3=EE=E2=EE=F0=F3 (=E2=B3=E4=EF=EE=E2=
+=B3=E4=ED=EE =E4=EE =F1=F2.429 <a href=3D"http://zakon.rada.gov.ua/cgi-b=
+in/laws/main.cgi&#63;page=3D1&amp;nreg=3D435%2D15" target=3D"_blank">=D6=
+=E8=E2=B3=EB=FC=ED=EE=E3=EE =EA=EE=E4=E5=EA=F1=F3 =D3=EA=F0=E0=BF=ED=E8<=
+/a>).</div>  <div align=3D"justify"><br />  =C7=E0=FF=E2=EA=E0 =ED=E0 =F0=
+=E5=BA=F1=F2=F0=E0=F6=B3=FE =E4=EE=E3=EE=E2=EE=F0=F3, =FF=EA=E8=E9 =F1=F2=
+=EE=F1=F3=BA=F2=FC=F1=FF =EF=F0=E0=E2=E0 =E0=E2=F2=EE=F0=E0 =ED=E0 =F2=E2=
+=B3=F0, =EF=EE=E2=E8=ED=ED=E0 =EC=B3=F1=F2=E8=F2=E8:</div>  <div align=3D=
+"justify">&bull; =E7=E0=FF=E2=F3 (=E2=E8=EA=EB=E0=E4=E5=ED=F3 =F3=EA=F0=E0=
+=BF=ED=F1=FC=EA=EE=FE =EC=EE=E2=EE=FE, =F9=EE =F1=EA=EB=E0=E4=E0=BA=F2=FC=
+=F1=FF =E7=E0 =E2=F1=F2=E0=ED=EE=E2=EB=E5=ED=EE=FE =F4=EE=F0=EC=EE=FE). =
+=CF=F0=E8=EC=B3=F2=EA=E0: =EE=E1&rsquo;=BA=EA=F2=E8 =E0=E2=F2=EE=F0=F1=FC=
+=EA=EE=E3=EE =EF=F0=E0=E2=E0 =F3 =EF.3 =E7=E0=FF=E2=E8 =E7=E0=E7=ED=E0=F7=
+=E0=FE=F2=FC=F1=FF =E2=B3=E4=EF=EE=E2=B3=E4=ED=EE =E4=EE =F1=F2.8 <a hre=
+f=3D"http://zakon.rada.gov.ua/cgi-bin/laws/main.cgi&#63;nreg=3D3792-12&a=
+mp;p=3D1198759817852676" target=3D"_blank">=C7=E0=EA=EE=ED=F3</a>;<br />=
+  &bull; =EF=F0=E8=EC=B3=F0=ED=E8=EA =F2=E2=EE=F0=F3 (=F3 =F4=EE=F0=EC=B3=
+, =E2=E8=E7=ED=E0=F7=E5=ED=B3=E9 =EF=F3=ED=EA=F2=E0=EC=E8 3, 15 <a href=3D=
+"http://zakon.rada.gov.ua/cgi-bin/laws/main.cgi&#63;nreg=3D1756-2001-%EF=
+&amp;p=3D1198759817852676" target=3D"_blank">=CF=EE=F0=FF=E4=EA=F3</a>);=
+ <br />  &bull; =EF=F0=E8=EC=B3=F0=ED=E8=EA =E0=E2=F2=EE=F0=F1=FC=EA=EE=E3=
+=EE =E4=EE=E3=EE=E2=EE=F0=F3, =F9=EE =E7=E0=F1=E2=B3=E4=F7=F3=BA =EF=E5=F0=
+=E5=E4=E0=F7=F3 (=E2=B3=E4=F7=F3=E6=E5=ED=ED=FF) =EC=E0=E9=ED=EE=E2=EE=E3=
+=EE =EF=F0=E0=E2=E0 =ED=E0 =F2=E2=B3=F0 (=E2=B3=E4=EF=EE=E2=B3=E4=ED=EE =
+=E4=EE =F1=F2.31 <a href=3D"http://zakon.rada.gov.ua/cgi-bin/laws/main.c=
+gi&#63;nreg=3D3792-12&amp;p=3D1198759817852676" target=3D"_blank">=C7=E0=
+=EA=EE=ED=F3</a>), =E0=E1=EE =EF=F0=E8=EC=B3=F0=ED=E8=EA =E0=E2=F2=EE=F0=
+=F1=FC=EA=EE=E3=EE =E4=EE=E3=EE=E2=EE=F0=F3 =EF=F0=EE =EF=E5=F0=E5=E4=E0=
+=F7=F3 =EF=F0=E0=E2=E0 =ED=E0 =E2=E8=EA=EE=F0=E8=F1=F2=E0=ED=ED=FF =F2=E2=
+=EE=F0=F3 (=E2=B3=E4=EF=EE=E2=B3=E4=ED=EE =E4=EE =F1=F2. 32, 33 <a href=3D=
+"http://zakon.rada.gov.ua/cgi-bin/laws/main.cgi&#63;nreg=3D3792-12&amp;p=
+=3D1198759817852676" target=3D"_blank">=C7=E0=EA=EE=ED=F3</a>); <br />  =
+&bull; =E4=EE=EA=F3=EC=E5=ED=F2, =F9=EE =EF=B3=E4=F2=E2=E5=F0=E4=E6=F3=BA=
+ =ED=E0=FF=E2=ED=B3=F1=F2=FC =EC=E0=E9=ED=EE=E2=E8=F5 =EF=F0=E0=E2, =F9=EE=
+ =EF=E5=F0=E5=E4=E0=FE=F2=FC=F1=FF (=E7=E0 =ED=E5=EE=E1=F5=B3=E4=ED=EE=F1=
+=F2=B3); <br />  &bull; =E4=EE=EA=F3=EC=E5=ED=F2 =E0=E1=EE =EA=EE=EF=B3=FE=
+ =E4=EE=EA=F3=EC=E5=ED=F2=E0 =EF=F0=EE =F1=EF=EB=E0=F2=F3 =E7=E1=EE=F0=F3=
+ =E7=E0 =EF=B3=E4=E3=EE=F2=EE=E2=EA=F3 =E4=EE =F0=E5=BA=F1=F2=F0=E0=F6=B3=
+=BF =E4=EE=E3=EE=E2=EE=F0=F3; <br />  &bull; =E4=EE=E2=B3=F0=E5=ED=B3=F1=
+=F2=FC, =EE=F4=EE=F0=EC=EB=E5=ED=F3 =E2 =F3=F1=F2=E0=ED=EE=E2=EB=E5=ED=EE=
+=EC=F3 =EF=EE=F0=FF=E4=EA=F3, =FF=EA=F9=EE =E7=E0=FF=E2=EA=E0 =EF=EE=E4=E0=
+=BA=F2=FC=F1=FF =E4=EE=E2=B3=F0=E5=ED=EE=FE =EE=F1=EE=E1=EE=FE.</div>  <=
+div align=3D"justify"><br />  =CE=EF=F0=E0=F6=FE=E2=E0=ED=ED=FF =F2=E0 =E7=
+=E1=E5=F0=B3=E3=E0=ED=ED=FF =EE=F0=E8=E3=B3=ED=E0=EB=F3 =F2=E0 =EA=EE=EF=
+=B3=BF =E0=F3=E4=B3=EE=E2=B3=E7=F3=E0=EB=FC=ED=EE=E3=EE =F2=E2=EE=F0=F3,=
+ =F9=EE =E2=E8=EC=E0=E3=E0=BA =F1=EF=E5=F6=B3=E0=EB=FC=ED=E8=F5 =F3=EC=EE=
+=E2 =E7=E1=E5=F0=B3=E3=E0=ED=ED=FF, =E7=E0=E1=E5=E7=EF=E5=F7=F3=BA=F2=FC=
+=F1=FF =CC=B3=ED=B3=F1=F2=E5=F0=F1=F2=E2=EE=EC =EA=F3=EB=FC=F2=F3=F0=E8 =
+=B3 =F2=F3=F0=E8=E7=EC=F3 =D3=EA=F0=E0=BF=ED=E8 =ED=E0 =E1=E0=E7=B3 =E4=E5=
+=F0=E6=E0=E2=ED=EE=E3=EE =EF=B3=E4=EF=F0=E8=BA=EC=F1=F2=E2=E0 &quot;=CD=E0=
+=F6=B3=EE=ED=E0=EB=FC=ED=E8=E9 =F6=E5=ED=F2=F0 =CE=EB=E5=EA=F1=E0=ED=E4=F0=
+=E0 =C4=EE=E2=E6=E5=ED=EA=E0&quot; (=EC. =CA=E8=BF=E2, =EF=F0=EE=F1=EF=E5=
+=EA=F2 =CF=E5=F0=E5=EC=EE=E3=E8, 44, 03057). =CF=EE=F0=FF=E4=EE=EA =EF=EE=
+=E4=E0=ED=ED=FF =E7=E0=E7=ED=E0=F7=E5=ED=EE=E3=EE =F2=E2=EE=F0=F3 =E4=EE=
+ =E4=E5=F0=E6=E0=E2=ED=EE=E3=EE =EF=B3=E4=EF=F0=E8=BA=EC=F1=F2=E2=E0 &qu=
+ot;=CD=E0=F6=B3=EE=ED=E0=EB=FC=ED=E8=E9 =F6=E5=ED=F2=F0 =CE=EB=E5=EA=F1=E0=
+=ED=E4=F0=E0 =C4=EE=E2=E6=E5=ED=EA=E0&quot; =E2=E8=E7=ED=E0=F7=E0=BA=F2=FC=
+=F1=FF =CC=B3=ED=B3=F1=F2=E5=F0=F1=F2=E2=EE=EC =EA=F3=EB=FC=F2=F3=F0=E8 =
+=B3 =F2=F3=F0=E8=E7=EC=F3 =D3=EA=F0=E0=BF=ED=E8.</div>  <div align=3D"ce=
+nter"><br />  <strong><font color=3D"#658c6c">=C1=EB=E0=ED=EA=E8 =E7=E0=FF=
+=E2</font></strong></div>  <div align=3D"justify"><br />  &bull; <a href=
+=3D"http://sdip.gov.ua/t/docman/binary/depart_doc/blanki/ap/ap22.doc" ta=
+rget=3D"_blank">=EF=F0=EE =EF=E5=F0=E5=E4=E0=F7=F3 (=E2=B3=E4=F7=F3=E6=E5=
+=ED=ED=FF) =EC=E0=E9=ED=EE=E2=E8=F5 =EF=F0=E0=E2 =ED=E0 =F2=E2=B3=F0</a>=
+</div>  <div align=3D"justify">&bull; <a href=3D"http://sdip.gov.ua/t/do=
+cman/binary/depart_doc/blanki/ap/ap33.doc" target=3D"_blank">=EF=F0=EE =EF=
+=E5=F0=E5=E4=E0=F7=F3 =E2=E8=EA=EB=FE=F7=ED=EE=E3=EE / =ED=E5=E2=E8=EA=EB=
+=FE=F7=ED=EE=E3=EE =EF=F0=E0=E2=E0 =ED=E0 =E2=E8=EA=EE=F0=E8=F1=F2=E0=ED=
+=ED=FF =F2=E2=EE=F0=F3</a><br />  &bull; <a href=3D"http://sdip.gov.ua/t=
+/docman/binary/depart_doc/blanki/ap/ap44.doc" target=3D"_blank">=EF=F0=EE=
+ =F0=E5=BA=F1=F2=F0=E0=F6=B3=FE =E0=E2=F2=EE=F0=F1=FC=EA=EE=E3=EE =EF=F0=
+=E0=E2=E0 =ED=E0 =F2=E2=B3=F0<br />  </a>&bull; <a href=3D"http://sdip.g=
+ov.ua/t/docman/binary/depart_doc/blanki/ap/ap55.doc" target=3D"_blank">=EF=
+=F0=EE =F0=E5=BA=F1=F2=F0=E0=F6=B3=FE =E0=E2=F2=EE=F0=F1=FC=EA=EE=E3=EE =
+=EF=F0=E0=E2=E0 =ED=E0 =F1=EB=F3=E6=E1=EE=E2=E8=E9 =F2=E2=B3=F0</a></div=
+>  <div align=3D"center"><br />  <strong><font color=3D"#658c6c">=D1=EF=EB=
+=E0=F2=E0 =E7=E1=EE=F0=B3=E2 =E7=E0 =E4=E5=F0=E6=E0=E2=ED=F3 =F0=E5=BA=F1=
+=F2=F0=E0=F6=B3=FE</font></strong></div>  <div align=3D"justify"><br /> =
+ =D1=EF=EB=E0=F2=E0 =E7=E1=EE=F0=B3=E2 =E7=E4=B3=E9=F1=ED=FE=BA=F2=FC=F1=
+=FF =F7=E5=F0=E5=E7 =E1=E0=ED=EA=B3=E2=F1=FC=EA=B3 =F3=F1=F2=E0=ED=EE=E2=
+=E8. =CA=EE=E6=ED=E8=E9 =E2=E8=E4 =E7=E1=EE=F0=F3 =F1=EF=EB=E0=F7=F3=BA=F2=
+=FC=F1=FF =EE=EA=F0=E5=EC=EE =E7 =EE=E1=EE=E2'=FF=E7=EA=EE=E2=E8=EC =E7=E0=
+=E7=ED=E0=F7=E5=ED=ED=FF=EC =EF=F0=E8=E7=ED=E0=F7=E5=ED=ED=FF =EF=EB=E0=F2=
+=E5=E6=F3 =F2=E0 =EF=F0=B3=E7=E2=E8=F9=E0, =B3=EC&rsquo;=FF, =EF=EE =E1=E0=
+=F2=FC=EA=EE=E2=B3 =E0=E1=EE =EF=EE=E2=ED=EE=BF =ED=E0=E7=E2=E8 =EF=EB=E0=
+=F2=ED=E8=EA=E0.</div>  <div align=3D"justify">&nbsp;</div>  <div align=3D=
+"left">  <p><strong><font color=3D"#658c6c">=D0=E5=EA=E2=B3=E7=E8=F2=E8 =
+=EF=EB=E0=F2=E5=E6=F3</font></strong></p>  </div>  <div align=3D"center"=
+>&nbsp;</div>  <div align=3D"center">  <table width=3D"100%" cellspacing=
+=3D"2" cellpadding=3D"2" bordercolor=3D"#658c6c" border=3D"2" bgcolor=3D=
+"#ccffcc" class=3D"text">      <tbody>          <tr>              <td wi=
+dth=3D"20%">              <p>=CE=E4=E5=F0=E6=F3=E2=E0=F7</p>            =
+  </td>              <td width=3D"78%">              <p>=D3=C4=CA =F3 =D8=
+=E5=E2=F7=E5=ED=EA=B3=E2=F1=FC=EA=EE=EC=F3 =F0=E0=E9=EE=ED=B3 =EC. =CA=E8=
+=BA=E2=E0</p>              </td>          </tr>          <tr>           =
+   <td width=3D"20%">              <p>=C7=CA=CF=CE</p>              </td=
+>              <td width=3D"78%">              <p>26077968</p>          =
+    </td>          </tr>          <tr>              <td width=3D"20%">  =
+            <p>=CC=D4=CE</p>              </td>              <td width=3D=
+"78%">              <p>820019</p>              </td>          </tr>     =
+     <tr>              <td width=3D"20%">              <p>=C1=E0=ED=EA</=
+p>              </td>              <td width=3D"78%">              <p>=C3=
+=D3 =C4=CA=D3 =F3 =EC. =CA=E8=BA=E2=B3</p>              </td>          <=
+/tr>          <tr>              <td width=3D"20%">              <p>=D0=E0=
+=F5=F3=ED=EE=EA</p>              </td>              <td width=3D"78%">  =
+            <p>31211217700011</p>              </td>          </tr>     =
+     <tr>              <td width=3D"20%">              <p>=CF=F0=E8=E7=ED=
+=E0=F7=E5=ED=ED=FF =EF=EB=E0=F2=E5=E6=F3</p>              </td>         =
+     <td width=3D"78%">              <div>24060200; =EA=EE=E4 =AA=C4=D0=CF=
+=CE=D3 (=E4=EB=FF =FE=F0=E8=E4=E8=F7=ED=E8=F5 =EE=F1=B3=E1) =E0=E1=EE =B3=
+=E4=E5=ED=F2=E8=F4=B3=EA=E0=F6=B3=E9=ED=E8=E9</div>              <div>=EA=
+=EE=E4 (=E4=EB=FF =F4=B3=E7=E8=F7=ED=E8=F5 =EE=F1=B3=E1); =E7=E1=B3=F0 =E7=
+=E0:</div>              </td>          </tr>      </tbody>  </table>  </=
+div>  <div>&nbsp;</div>  <div>  <p><strong><font color=3D"#658c6c">=D4=EE=
+=F0=EC=F3=EB=FE=E2=E0=ED=ED=FF =EF=F0=E8=E7=ED=E0=F7=E5=ED=ED=FF =EF=EB=E0=
+=F2=E5=E6=F3</font></strong></p>  </div>  <div>&nbsp;</div>  <div><stron=
+g><font color=3D"#0068a5">  <table width=3D"100%" cellspacing=3D"2" cell=
+padding=3D"2" bordercolor=3D"#658c6c" border=3D"2" bgcolor=3D"#ccffcc" c=
+lass=3D"text">      <tbody>          <tr>              <td>             =
+ <p>=E7=E0 =EF=B3=E4=E3=EE=F2=EE=E2=EA=F3 =E4=EE =E4=E5=F0=E6=F0=E5=BA=F1=
+=F2=F0=E0=F6=B3=BF =E0=E2=F2=EE=F0=F1=FC=EA=EE=E3=EE =EF=F0=E0=E2=E0 =E2=
+=B3=E4 =F4=B3=E7=E8=F7=ED=E8=F5 =EE=F1=B3=E1</p>              </td>     =
+         <td>              <p>55,25 =E3=F0=ED.</p>              </td>   =
+       </tr>          <tr>              <td>              <p>=E7=E0 =EE=F4=
+=EE=F0=EC=EB=E5=ED=ED=FF =F2=E0 =E2=E8=E4=E0=F7=F3 =F1=E2=B3=E4=EE=F6=F2=
+=E2=E0 =EF=F0=EE =F0=E5=BA=F1=F2=F0=E0=F6=B3=FE =E0=E2=F2=EE=F0=F1=FC=EA=
+=EE=E3=EE =EF=F0=E0=E2=E0 =ED=E0 =F2=E2=B3=F0 =E2=B3=E4 =F4=B3=E7=E8=F7=ED=
+=E8=F5 =EE=F1=B3=E1</p>              </td>              <td>            =
+  <p>8,5 =E3=F0=ED.</p>              </td>          </tr>          <tr> =
+             <td>              <p>=E7=E0 =EF=B3=E4=E3=EE=F2=EE=E2=EA=F3 =
+=E4=EE =E4=E5=F0=E6=F0=E5=BA=F1=F2=F0=E0=F6=B3=BF =E0=E2=F2=EE=F0=F1=FC=EA=
+=EE=E3=EE =EF=F0=E0=E2=E0 =E2=B3=E4 =FE=F0=E8=E4=E8=F7=ED=E8=F5 =EE=F1=B3=
+=E1</p>              </td>              <td>              <p>161,5 =E3=F0=
+=ED.</p>              </td>          </tr>          <tr>              <t=
+d>              <p>=E7=E0 =EE=F4=EE=F0=EC=EB=E5=ED=ED=FF =F2=E0 =E2=E8=E4=
+=E0=F7=F3 =F1=E2=B3=E4=EE=F6=F2=E2=E0 =EF=F0=EE =F0=E5=BA=F1=F2=F0=E0=F6=
+=B3=FE =E0=E2=F2=EE=F0=F1=FC=EA=EE=E3=EE =EF=F0=E0=E2=E0 =ED=E0 =F2=E2=B3=
+=F0 =E2=B3=E4 =FE=F0=E8=E4=E8=F7=ED=E8=F5 =EE=F1=B3=E1</p>              =
+</td>              <td>              <p>25,5 =E3=F0=ED.</p>             =
+ </td>          </tr>          <tr>              <td>              <p>=E7=
+=E0 =EF=B3=E4=E3=EE=F2=EE=E2=EA=F3 =E4=EE =E4=E5=F0=E6=F0=E5=BA=F1=F2=F0=
+=E0=F6=B3=BF =E4=EE=E3=EE=E2=EE=F0=B3=E2, =FF=EAi =F1=F2=EE=F1=F3=FE=F2=FC=
+=F1=FF =EF=F0=E0=E2=E0 =E0=E2=F2=EE=F0=E0 =ED=E0 =F2=E2=B3=F0, =E2=B3=E4=
+ =F4=B3=E7=E8=F7=ED=E8=F5 =EE=F1=B3=E1</p>              </td>           =
+   <td>              <p>72,25 =E3=F0=ED</p>              </td>          =
+</tr>          <tr>              <td>              <p>=E7=E0 =EF=B3=E4=E3=
+=EE=F2=EE=E2=EA=F3 =E4=EE =E4=E5=F0=E6=F0=E5=BA=F1=F2=F0=E0=F6=B3=BF =E4=
+=EE=E3=EE=E2=EE=F0=B3=E2, =FF=EAi =F1=F2=EE=F1=F3=FE=F2=FC=F1=FF =EF=F0=E0=
+=E2=E0 =E0=E2=F2=EE=F0=E0 =ED=E0 =F2=E2=B3=F0, =E2=B3=E4 =FE=F0=E8=E4=E8=
+=F7=ED=E8=F5 =EE=F1=B3=E1</p>              </td>              <td>      =
+        <p>195,5 =E3=F0=ED.</p>              </td>          </tr>      <=
+/tbody>  </table>  </font></strong></div>  <div>&nbsp;</div>  <div align=
+=3D"center">  <p><strong><font color=3D"#658c6c">=C7=E0=EA=EE=ED=EE=E4=E0=
+=E2=F1=F2=E2=EE</font></strong></p>  </div>  <ul>      <li>      <div al=
+ign=3D"justify"><a href=3D"http://zakon.rada.gov.ua/cgi-bin/laws/main.cg=
+i&#63;nreg=3D3792-12&amp;p=3D1198759817852676" target=3D"_blank">=C7=E0=EA=
+=EE=ED =D3=EA=F0=E0=BF=ED=E8 &quot;=CF=F0=EE =E0=E2=F2=EE=F0=F1=FC=EA=E5=
+ =EF=F0=E0=E2=EE i =F1=F3=EC=B3=E6=ED=B3 =EF=F0=E0=E2=E0&quot; =E2=B3=E4=
+ 23 =E3=F0=F3=E4=ED=FF 1993 =F0. =B9 3792-XII</a></div>      </li>      =
+<li>      <div align=3D"justify"><a href=3D"http://zakon.rada.gov.ua/cgi=
+-bin/laws/main.cgi&#63;page=3D1&amp;nreg=3D435%2D15" target=3D"_blank">=D6=
+=E8=E2=B3=EB=FC=ED=E8=E9 =EA=EE=E4=E5=EA=F1 =D3=EA=F0=E0=BF=ED=E8</a> (=E3=
+=EB=E0=E2=E8 35, 36, 75)</div>      </li>      <li>      <div align=3D"j=
+ustify"><a href=3D"http://zakon.rada.gov.ua/cgi-bin/laws/main.cgi&#63;nr=
+eg=3D1756-2001-%EF&amp;p=3D1198759817852676" target=3D"_blank">=CF=EE=F1=
+=F2=E0=ED=EE=E2=E0 =CA=E0=E1=B3=ED=E5=F2=F3 =CC=B3=ED=B3=F1=F2=F0=B3=E2 =
+=D3=EA=F0=E0=BF=ED=E8 =E2=B3=E4 27.12.2001 =F0. =B9 1756 &quot;=CF=F0=EE=
+ =E4=E5=F0=E6=E0=E2=ED=F3 =F0=E5=BA=F1=F2=F0=E0=F6=B3=FE =E0=E2=F2=EE=F0=
+=F1=FC=EA=EE=E3=EE =EF=F0=E0=E2=E0 =B3 =E4=EE=E3=EE=E2=EE=F0=B3=E2, =FF=EA=
+=B3 =F1=F2=EE=F1=F3=FE=F2=FC=F1=FF =EF=F0=E0=E2=E0 =E0=E2=F2=EE=F0=E0 =ED=
+=E0 =F2=E2=B3=F0&quot;</a></div>      </li>  </ul>  <div align=3D"center=
+"><strong><font color=3D"#658c6c">=D0=EE=E7=E3=EB=FF=E4 =E7=E0=FF=E2=EA=E8=
+, =E2=E8=E4=E0=F7=E0 =F1=E2=B3=E4=EE=F6=F2=E2 =F2=E0 =F0=B3=F8=E5=ED=FC<=
+/font></strong></div>  <div align=3D"justify"><strong><font color=3D"#65=
+8c6c">=D0=E5=BA=F1=F2=F0=E0=F6=B3=FF =E0=E2=F2=EE=F0=F1=FC=EA=EE=E3=EE =EF=
+=F0=E0=E2=E0</font></strong></div>  <p align=3D"justify">=D0=EE=E7=E3=EB=
+=FF=E4 =E7=E0=FF=E2=EA=E8 i =EF=F0=E8=E9=ED=FF=F2=F2=FF =F0=B3=F8=E5=ED=ED=
+=FF =EF=F0=EE =F0=E5=BA=F1=F2=F0=E0=F6=B3=FE =E0=E2=F2=EE=F0=F1=FC=EA=EE=
+=E3=EE =EF=F0=E0=E2=E0 =ED=E0 =F2=E2=B3=F0 =E0=E1=EE =EF=F0=EE =E2=B3=E4=
+=EC=EE=E2=F3 =E2 =F0=E5=BA=F1=F2=F0=E0=F6=B3=BF =E7=E4=B3=E9=F1=ED=FE=BA=
+=F2=FC=F1=FF =EF=F0=EE=F2=FF=E3=EE=EC =EC=B3=F1=FF=F6=FF =E2=B3=E4 =E4=E0=
+=F2=E8 =ED=E0=E4=F5=EE=E4=E6=E5=ED=ED=FF =EF=F0=E0=E2=E8=EB=FC=ED=EE =EE=
+=F4=EE=F0=EC=EB=E5=ED=E8=F5 =E4=EE=EA=F3=EC=E5=ED=F2=B3=E2 =E7=E0=FF=E2=EA=
+=E8.</p>  <p align=3D"justify">=DF=EA=F9=EE =E7=E0=FF=E2=EA=E0 =E2=B3=E4=
+=EF=EE=E2=B3=E4=E0=BA =E2=F1=F2=E0=ED=EE=E2=EB=E5=ED=E8=EC =E2=E8=EC=EE=E3=
+=E0=EC =F0=EE=E7=E4=B3=EB=B3=E2 II =B3 III =CF=EE=F0=FF=E4=EA=F3, =EF=F0=
+=E8=E9=EC=E0=BA=F2=FC=F1=FF =F0=B3=F8=E5=ED=ED=FF =EF=F0=EE =F0=E5=BA=F1=
+=F2=F0=E0=F6=B3=FE =E0=E2=F2=EE=F0=F1=FC=EA=EE=E3=EE =EF=F0=E0=E2=E0 =ED=
+=E0 =F2=E2=B3=F0. =C2 =B3=ED=F8=EE=EC=F3 =E2=E8=EF=E0=E4=EA=F3 =E7=E0=FF=
+=E2=ED=E8=EA=F3 =ED=E0=E4=F1=E8=EB=E0=BA=F2=FC=F1=FF =EE=E1=B4=F0=F3=ED=F2=
+=EE=E2=E0=ED=E5 =F0=B3=F8=E5=ED=ED=FF =EF=F0=EE =E2=B3=E4=EC=EE=E2=F3 =E2=
+ =F0=E5=BA=F1=F2=F0=E0=F6=B3=BF. =CF=F0=E8 =F6=FC=EE=EC=F3 =E4=EE=EA=F3=EC=
+=E5=ED=F2=E8, =EF=EE=E4=E0=ED=B3 =E7=E0=FF=E2=ED=E8=EA=EE=EC =ED=E0 =F0=E5=
+=BA=F1=F2=F0=E0=F6=B3=FE, =E9=EE=EC=F3 =ED=E5 =EF=EE=E2=E5=F0=F2=E0=FE=F2=
+=FC=F1=FF.</p>  <p align=3D"justify">=CD=E0 =EF=B3=E4=F1=F2=E0=E2=B3 =F0=
+=B3=F8=E5=ED=ED=FF =EF=F0=EE =F0=E5=BA=F1=F2=F0=E0=F6=B3=FE =E0=E2=F2=EE=
+=F0=F1=FC=EA=EE=E3=EE =EF=F0=E0=E2=E0 =ED=E0 =F2=E2=B3=F0 =F2=E0 =E7=E0 =
+=ED=E0=FF=E2=ED=EE=F1=F2=B3 =E4=EE=EA=F3=EC=E5=ED=F2=E0 =EF=F0=EE =F1=EF=
+=EB=E0=F2=F3 =E7=E1=EE=F0=F3 =E7=E0 =EE=F4=EE=F0=EC=EB=E5=ED=ED=FF i =E2=
+=E8=E4=E0=F7=F3 =F1=E2=B3=E4=EE=F6=F2=E2=E0 =E2=B3=E4=EE=EC=EE=F1=F2=B3 =
+=EF=F0=EE =F0=E5=BA=F1=F2=F0=E0=F6=B3=FE =E0=E2=F2=EE=F0=F1=FC=EA=EE=E3=EE=
+ =EF=F0=E0=E2=E0 =ED=E0 =F2=E2=B3=F0 =E7=E0=ED=EE=F1=FF=F2=FC=F1=FF =E4=EE=
+ =C4=E5=F0=E6=E0=E2=ED=EE=E3=EE =F0=E5=BA=F1=F2=F0=F3 =F1=E2=B3=E4=EE=F6=
+=F2=E2 =EF=F0=EE =F0=E5=BA=F1=F2=F0=E0=F6=B3=FE =E0=E2=F2=EE=F0=F1=FC=EA=
+=EE=E3=EE =EF=F0=E0=E2=E0 =ED=E0 =F2=E2=B3=F0. =C4=E0=F2=EE=FE =F0=E5=BA=
+=F1=F2=F0=E0=F6=B3=BF =E0=E2=F2=EE=F0=F1=FC=EA=EE=E3=EE =EF=F0=E0=E2=E0 =
+=ED=E0 =F2=E2=B3=F0 =BA =E4=E0=F2=E0 =E7=E0=ED=E5=F1=E5=ED=ED=FF =E2=B3=E4=
+=EE=EC=EE=F1=F2=E5=E9 =EF=F0=EE =F0=E5=BA=F1=F2=F0=E0=F6=B3=FE =E4=EE =C4=
+=E5=F0=E6=E0=E2=ED=EE=E3=EE =F0=E5=BA=F1=F2=F0=F3 =F1=E2=B3=E4=EE=F6=F2=E2=
+ =EF=F0=EE =F0=E5=BA=F1=F2=F0=E0=F6=B3=FE =E0=E2=F2=EE=F0=F1=FC=EA=EE=E3=
+=EE =EF=F0=E0=E2=E0 =ED=E0 =F2=E2=B3=F0.</p>  <p align=3D"justify">=C2=E8=
+=E4=E0=F7=E0 =F1=E2=B3=E4=EE=F6=F2=E2=E0 =E7=E4=B3=E9=F1=ED=FE=BA=F2=FC=F1=
+=FF =C4=E5=F0=E6=E0=E2=ED=E8=EC =E4=E5=EF=E0=F0=F2=E0=EC=E5=ED=F2=EE=EC =
+=B3=ED=F2=E5=EB=E5=EA=F2=F3=E0=EB=FC=ED=EE=BF =E2=EB=E0=F1=ED=EE=F1=F2=B3=
+ =CC=B3=ED=B3=F1=F2=E5=F0=F1=F2=E2=E0 =EE=F1=E2=B3=F2=E8 =B3 =ED=E0=F3=EA=
+=E8 =D3=EA=F0=E0=BF=ED=E8 =E2 =EC=B3=F1=FF=F7=ED=E8=E9 =F1=F2=F0=EE=EA =E2=
+=B3=E4 =E4=E0=F2=E8 =F0=E5=BA=F1=F2=F0=E0=F6=B3=BF. =D1=E2=B3=E4=EE=F6=F2=
+=E2=EE =E2=E8=E4=E0=BA=F2=FC=F1=FF =E1=E5=E7=EF=EE=F1=E5=F0=E5=E4=ED=FC=EE=
+ =E7=E0=FF=E2=ED=E8=EA=F3, =E9=EE=E3=EE =E4=EE=E2=B3=F0=E5=ED=E8=E9 =EE=F1=
+=EE=E1=B3 =E0=E1=EE =ED=E0=E4=F1=E8=EB=E0=BA=F2=FC=F1=FF =ED=E0 =E0=E4=F0=
+=E5=F1=F3, =E7=E0=E7=ED=E0=F7=E5=ED=F3 =E2 =E7=E0=FF=E2=B3.</p>  <div al=
+ign=3D"justify"><strong><font color=3D"#658c6c">=D0=E5=BA=F1=F2=F0=E0=F6=
+=B3=FF =E4=EE=E3=EE=E2=EE=F0=B3=E2, =FF=EAi =F1=F2=EE=F1=F3=FE=F2=FC=F1=FF=
+ =EF=F0=E0=E2=E0 =E0=E2=F2=EE=F0=E0 =ED=E0 =F2=E2=B3=F0</font></strong><=
+/div>  <p align=3D"justify">=D0=EE=E7=E3=EB=FF=E4 =E7=E0=FF=E2=EA=E8 i =EF=
+=F0=E8=E9=ED=FF=F2=F2=FF =F0=B3=F8=E5=ED=ED=FF =EF=F0=EE =F0=E5=BA=F1=F2=
+=F0=E0=F6=B3=FE =E4=EE=E3=EE=E2=EE=F0=F3, =FF=EA=E8=E9 =F1=F2=EE=F1=F3=BA=
+=F2=FC=F1=FF =EF=F0=E0=E2=E0 =E0=E2=F2=EE=F0=E0 =ED=E0 =F2=E2=B3=F0, =E7=
+=E4=B3=E9=F1=ED=FE=BA=F2=FC=F1=FF =EF=F0=EE=F2=FF=E3=EE=EC =EC=B3=F1=FF=F6=
+=FF =E2=B3=E4 =E4=E0=F2=E8 =ED=E0=E4=F5=EE=E4=E6=E5=ED=ED=FF =EF=F0=E0=E2=
+=E8=EB=FC=ED=EE =EE=F4=EE=F0=EC=EB=E5=ED=E8=F5 =E4=EE=EA=F3=EC=E5=ED=F2=B3=
+=E2 =E7=E0=FF=E2=EA=E8.</p>  <p align=3D"justify">=DF=EA=F9=EE =E7=E0=FF=
+=E2=EA=E0 =E2=B3=E4=EF=EE=E2=B3=E4=E0=BA =E2=F1=F2=E0=ED=EE=E2=EB=E5=ED=E8=
+=EC =E2=E8=EC=EE=E3=E0=EC, =EF=F0=E8=E9=EC=E0=BA=F2=FC=F1=FF =F0=B3=F8=E5=
+=ED=ED=FF =EF=F0=EE =F0=E5=BA=F1=F2=F0=E0=F6=B3=FE =E4=EE=E3=EE=E2=EE=F0=
+=F3. =C2 =B3=ED=F8=EE=EC=F3 =E2=E8=EF=E0=E4=EA=F3 =E7=E0=FF=E2=ED=E8=EA=F3=
+ =ED=E0=E4=E0=BA=F2=FC=F1=FF =EE=E1=B4=F0=F3=ED=F2=EE=E2=E0=ED=E5 =F0=B3=
+=F8=E5=ED=ED=FF =EF=F0=EE =E2=B3=E4=EC=EE=E2=F3 =E2 =F0=E5=BA=F1=F2=F0=E0=
+=F6=B3=BF.</p>  <p align=3D"justify">=CD=E0 =EF=B3=E4=F1=F2=E0=E2=B3 =F0=
+=B3=F8=E5=ED=ED=FF =EF=F0=EE =F0=E5=BA=F1=F2=F0=E0=F6=B3=FE =E4=EE=E3=EE=
+=E2=EE=F0=F3 =E2=B3=E4=EE=EC=EE=F1=F2=B3 =EF=F0=EE =E9=EE=E3=EE =F0=E5=BA=
+=F1=F2=F0=E0=F6=B3=FE =E7=E0=ED=EE=F1=FF=F2=FC=F1=FF =E4=EE =C4=E5=F0=E6=
+=E0=E2=ED=EE=E3=EE =F0=E5=BA=F1=F2=F0=F3 =E4=EE=E3=EE=E2=EE=F0=B3=E2, =FF=
+=EAi =F1=F2=EE=F1=F3=FE=F2=FC=F1=FF =EF=F0=E0=E2=E0 =E0=E2=F2=EE=F0=E0 =ED=
+=E0 =F2=E2=B3=F0.</p>  <p align=3D"justify">=C4=E0=F2=EE=FE =F0=E5=BA=F1=
+=F2=F0=E0=F6=B3=BF =E4=EE=E3=EE=E2=EE=F0=F3 =BA =E4=E0=F2=E0 =E7=E0=ED=E5=
+=F1=E5=ED=ED=FF =E2=B3=E4=EE=EC=EE=F1=F2=E5=E9 =EF=F0=EE =F0=E5=BA=F1=F2=
+=F0=E0=F6=B3=FE =E4=EE =C4=E5=F0=E6=E0=E2=ED=EE=E3=EE =F0=E5=BA=F1=F2=F0=
+=F3 =E4=EE=E3=EE=E2=EE=F0=B3=E2.</p>  <p align=3D"justify">=C2=E8=E4=E0=F7=
+=E0 =F0=B3=F8=E5=ED=ED=FF =EF=F0=EE =F0=E5=BA=F1=F2=F0=E0=F6=B3=FE =E4=EE=
+=E3=EE=E2=EE=F0=F3 =E7=E4=B3=E9=F1=ED=FE=BA=F2=FC=F1=FF =C4=E5=F0=E6=E0=E2=
+=ED=E8=EC =E4=E5=EF=E0=F0=F2=E0=EC=E5=ED=F2=EE=EC =B3=ED=F2=E5=EB=E5=EA=F2=
+=F3=E0=EB=FC=ED=EE=BF =E2=EB=E0=F1=ED=EE=F1=F2=B3 =CC=B3=ED=B3=F1=F2=E5=F0=
+=F1=F2=E2=E0 =EE=F1=E2=B3=F2=E8 =B3 =ED=E0=F3=EA=E8 =D3=EA=F0=E0=BF=ED=E8=
+ =E2 =EC=B3=F1=FF=F7=ED=E8=E9 =F1=F2=F0=EE=EA =E2=B3=E4 =E4=E0=F2=E8 =E4=
+=E5=F0=E6=E0=E2=ED=EE=BF =F0=E5=BA=F1=F2=F0=E0=F6=B3=BF. =D0=B3=F8=E5=ED=
+=ED=FF =E2=E8=E4=E0=BA=F2=FC=F1=FF =E1=E5=E7=EF=EE=F1=E5=F0=E5=E4=ED=FC=EE=
+ =E7=E0=FF=E2=ED=E8=EA=F3, =E9=EE=E3=EE =E4=EE=E2=B3=F0=E5=ED=B3=E9 =EE=F1=
+=EE=E1=B3 =E0=E1=EE =ED=E0=E4=F1=E8=EB=E0=BA=F2=FC=F1=FF =ED=E0 =E0=E4=F0=
+=E5=F1=F3, =E2=EA=E0=E7=E0=ED=F3 =E2 =E7=E0=FF=E2=B3.</p>  <p align=3D"c=
+enter"><strong><font color=3D"#658c6c">=CF=F3=E1=EB=B3=EA=E0=F6=B3=FF =E2=
+i=E4=EE=EC=EE=F1=F2=E5=E9 =EF=F0=EE =F0=E5=BA=F1=F2=F0=E0=F6i=FE =E0=E2=F2=
+=EE=F0=F1=FC=EA=EE=E3=EE =EF=F0=E0=E2=E0 i =E4=EE=E3=EE=E2=EE=F0i=E2, =FF=
+=EAi =F1=F2=EE=F1=F3=FE=F2=FC=F1=FF =EF=F0=E0=E2=E0 =E0=E2=F2=EE=F0=E0 =ED=
+=E0 =F2=E2i=F0</font></strong></p>  <div align=3D"justify">=C2i=E4=EE=EC=
+=EE=F1=F2i =EF=F0=EE =F0=E5=BA=F1=F2=F0=E0=F6i=FE =E0=E2=F2=EE=F0=F1=FC=EA=
+=EE=E3=EE =EF=F0=E0=E2=E0 i =E4=EE=E3=EE=E2=EE=F0i=E2, =FF=EAi =F1=F2=EE=
+=F1=F3=FE=F2=FC=F1=FF =EF=F0=E0=E2=E0 =E0=E2=F2=EE=F0=E0 =ED=E0 =F2=E2i=F0=
+, =EF=F3=E1=EBi=EA=F3=FE=F2=FC=F1=FF =E2 =EA=E0=F2=E0=EB=EE=E7i =F3=F1=B3=
+=F5 =E4=E5=F0=E6=E0=E2=ED=E8=F5 =F0=E5=BA=F1=F2=F0=E0=F6i=E9 =E0=E2=F2=EE=
+=F0=F1=FC=EA=EE=E3=EE =EF=F0=E0=E2=E0 =C4=E5=F0=E6=E0=E2=ED=EE=E3=EE =E4=
+=E5=EF=E0=F0=F2=E0=EC=E5=ED=F2=F3 =B3=ED=F2=E5=EB=E5=EA=F2=F3=E0=EB=FC=ED=
+=EE=BF =E2=EB=E0=F1=ED=EE=F1=F2=B3 =CC=B3=ED=B3=F1=F2=E5=F0=F1=F2=E2=E0 =
+=EE=F1=E2=B3=F2=E8 =B3 =ED=E0=F3=EA=E8 =D3=EA=F0=E0=BF=ED=E8 &quot;=CA=E0=
+=F2=E0=EB=EE=E3 =E4=E5=F0=E6=E0=E2=ED=EE=BF =F0=E5=BA=F1=F2=F0=E0=F6=B3=BF=
+&quot; =F2=E0 =E2 =EE=F4i=F6i=E9=ED=EE=EC=F3 =E1=FE=EB=E5=F2=E5=EDi =C4=E5=
+=F0=E6=E0=E2=ED=EE=E3=EE =E4=E5=EF=E0=F0=F2=E0=EC=E5=ED=F2=F3 =B3=ED=F2=E5=
+=EB=E5=EA=F2=F3=E0=EB=FC=ED=EE=BF =E2=EB=E0=F1=ED=EE=F1=F2=B3 =CC=B3=ED=B3=
+=F1=F2=E5=F0=F1=F2=E2=E0 =EE=F1=E2=B3=F2=E8 =B3 =ED=E0=F3=EA=E8 =D3=EA=F0=
+=E0=BF=ED=E8 &quot;=C0=E2=F2=EE=F0=F1=FC=EA=E5 =EF=F0=E0=E2=EE =B3 =F1=F3=
+=EC=B3=E6=ED=B3 =EF=F0=E0=E2=E0&quot;.</div>&nbsp;
+									<div align=3D'left' style=3D"clear:both;"><a href=3D"http://sdi=
+p.gov.ua/ua/copyright_registration.html?s=3Dprint" target=3D'_blank'><im=
+g src=3D"http://sdip.gov.ua/inside//img/pr.png" border=3D'0'> =C2=E5=F0=F1=
+=B3=FF =E4=EB=FF =E4=F0=F3=EA=F3</a></div>								</td></tr>
+								</table>
+							</td>
+							<td style=3D"vertical-align:top;padding-left:30px;width:233px;">
+															<h1>=C0=CA=D2=D3=C0=CB=DC=CD=CE</h1>
+
+
+
+
+
+<table width=3D"100%" id=3D"kat" border=3D"0" cellspacing=3D"0" cellpadd=
+ing=3D"0" style=3D"margin-top:5px;">
+                    <tr>
+                      <td style=3D"padding-right:5px;"><img src=3D"http:=
+//sdip.gov.ua/i/actuals/kat22.jpg" height=3D"50" width=3D"50"></td>
+                      <td style=3D" width:100%;">
+                      	                      	<h2>=D1=E5=EC=B3=ED=E0=F0 =
+=C2=CE=B2=C2</h2>
+                      	                      	=C7 9 =EF=EE 10 =F7=E5=F0=E2=
+=ED=FF 2009 =F0=EE=EA=F3 =F3 =CA=E8=BA=E2=B3 =E2=B3=E4=E1=F3=E4=E5=F2=FC=
+=F1=FF <a href=3D"http://www.sdip.gov.ua/ua/news.html?_m=3Dpublications&=
+_t=3Drec&id=3D792">=CC=B3=E6=ED=E0=F0=EE=E4=ED=E8=E9 =F1=E5=EC=B3=ED=E0=F0=
+ =C2=CE=B2=C2.</a>
+                      </td>
+                    </tr>
+                  </table>
+
+
+
+
+<table width=3D"100%" id=3D"kat" border=3D"0" cellspacing=3D"0" cellpadd=
+ing=3D"0" style=3D"margin-top:5px;">
+                    <tr>
+                      <td style=3D"padding-right:5px;"><img src=3D"http:=
+//sdip.gov.ua/i/actuals/kat5.jpg" height=3D"50" width=3D"50"></td>
+                      <td style=3D" width:100%;">
+                      	                      	<h2>=CA=EE=ED=EA=F3=F0=F1<=
+/h2>
+                      	                      	=C4=E5=F0=E6=E4=E5=EF=E0=F0=
+=F2=E0=EC=E5=ED=F2 =EE=E3=EE=EB=EE=F8=F3=BA <a href=3D"http://www.sdip.g=
+ov.ua/ua/news.html?_m=3Dpublications&_t=3Drec&id=3D778">=EA=EE=ED=EA=F3=F0=
+=F1 =ED=E0 =E2=B3=E4=E1=B3=F0 =EB=E5=EA=F2=EE=F0=B3=E2</a> =E4=EB=FF =E2=
+=E8=EA=EB=E0=E4=E0=ED=ED=FF =F3 =EB=B3=F2=ED=B3=E9 =F8=EA=EE=EB=B3 =E7 =B3=
+=ED=F2=E5=EB=E5=EA=F2=F3=E0=EB=FC=ED=EE=BF =E2=EB=E0=F1=ED=EE=F1=F2=B3 =E2=
+ =D3=EA=F0=E0=BF=ED=B3.
+                      </td>
+                    </tr>
+                  </table>
+
+
+
+
+<table width=3D"100%" id=3D"kat" border=3D"0" cellspacing=3D"0" cellpadd=
+ing=3D"0" style=3D"margin-top:5px;">
+                    <tr>
+                      <td style=3D"padding-right:5px;"><img src=3D"http:=
+//sdip.gov.ua/i/actuals/kat26.jpg" height=3D"50" width=3D"50"></td>
+                      <td style=3D" width:100%;">
+                      	                      	<h2>=C1=E0=E7=E0 =E4=E0=ED=
+=E8=F5</h2>
+                      	                      	=D0=EE=E7=EC=B3=F9=E5=ED=EE=
+ =E1=E0=E7=F3 =E4=E0=ED=E8=F5 (=C1=C4) <a target=3D"_blank" href=3D"http=
+://base.ukrpatent.org/searchEURO2012/">=C0=E2=F2=EE=EC=E0=F2=E8=E7=EE=E2=
+=E0=ED=E0 =C1=C4  =B3=ED=F2=E5=EB=E5=EA=F2=F3=E0=EB=FC=ED=EE=BF =E2=EB=E0=
+=F1=ED=EE=F1=F2=B3 UEFA =F2=E0 =BF=BF =EA=EE=EC=E5=F0=F6=B3=E9=ED=E8=F5 =
+=EF=E0=F0=F2=ED=E5=F0=B3=E2"</a>.
+                      </td>
+                    </tr>
+                  </table>
+
+
+
+
+<table width=3D"100%" id=3D"kat" border=3D"0" cellspacing=3D"0" cellpadd=
+ing=3D"0" style=3D"margin-top:5px;">
+                    <tr>
+                      <td style=3D"padding-right:5px;"><img src=3D"http:=
+//sdip.gov.ua/i/actuals/kat11.jpg" height=3D"50" width=3D"50"></td>
+                      <td style=3D" width:100%;">
+                      	                      	<h2>=CB=B3=F2=ED=FF =F8=EA=
+=EE=EB=E0 =C2=CE=B2=C2</h2>
+                      	                      	=D0=EE=E7=EF=EE=F7=E0=F2=EE=
+ =E2=B3=E4=E1=B3=F0 =F3=F7=E0=F1=ED=E8=EA=B3=E2 =E4=EE <a href=3D"http:/=
+/www.sdip.gov.ua/ua/news.html?_m=3Dpublications&_t=3Drec&id=3D665&fp=3D7=
+">=EB=B3=F2=ED=FC=EE=BF =F8=EA=EE=EB=E8 =E7 =B3=ED=F2=E5=EB=E5=EA=F2=F3=E0=
+=EB=FC=ED=EE=BF =E2=EB=E0=F1=ED=EE=F1=F2=B3 =E2 =D3=EA=F0=E0=BF=ED=B3</a=
+>. =AF=BF =EF=EB=E0=ED=F3=BA=F2=FC=F1=FF =E2=B3=E4=EA=F0=E8=F2=E8 =EF=F0=
+=E8 =CE=E4=E5=F1=FC=EA=B3=E9 =ED=E0=F6=B3=EE=ED=E0=EB=FC=ED=B3=E9 =FE=F0=
+=E8=E4=E8=F7=ED=B3=E9 =E0=EA=E0=E4=E5=EC=B3=BF =ED=E0 =EF=E5=F0=B3=EE=E4=
+ =E7 21 =EF=EE 30 =EB=E8=EF=ED=FF 2009 =F0=EE=EA=F3.
+
+
+                      </td>
+                    </tr>
+                  </table>
+
+
+
+
+<table width=3D"100%" id=3D"kat" border=3D"0" cellspacing=3D"0" cellpadd=
+ing=3D"0" style=3D"margin-top:5px;">
+                    <tr>
+                      <td style=3D"padding-right:5px;"><img src=3D"http:=
+//sdip.gov.ua/i/actuals/kat17.jpg" height=3D"50" width=3D"50"></td>
+                      <td style=3D" width:100%;">
+                      	                      	<h2>=CD=EE=E2=E8=ED=E8 =F3=
+ =F1=F4=E5=F0=B3 =B2=C2</h2>
+                      	                      	=CD=E0 =E2=E5=E1-=F1=E0=E9=
+=F2=B3 =D3=EA=F0=E0=BF=ED=F1=FC=EA=EE=E3=EE =ED=E0=F6=B3=EE=ED=E0=EB=FC=ED=
+=EE=E3=EE =B3=ED=F4=EE=F0=EC=E0=F6=B3=E9=ED=EE=E3=EE =E0=E3=E5=ED=F2=F1=F2=
+=E2=E0 =ED=EE=E2=E8=ED (=D3=CD=B2=C0=CD) =F1=F2=E2=EE=F0=E5=ED=EE =F0=EE=
+=E7=E4=B3=EB <a href=3D"http://human-rights.unian.net/ukr/rubrics/17">"=B2=
+=ED=F2=E5=EB=E5=EA=F2=F3=E0=EB=FC=ED=E0 =E2=EB=E0=F1=ED=B3=F1=F2=FC" </a=
+>=F3 =F0=F3=E1=F0=E8=F6=B3 "=D3=CD=B2=C0=CD =CF=F0=E0=E2=E0 =EB=FE=E4=E8=
+=ED=E8".
+                      </td>
+                    </tr>
+                  </table>
+
+
+
+
+<table width=3D"100%" id=3D"kat" border=3D"0" cellspacing=3D"0" cellpadd=
+ing=3D"0" style=3D"margin-top:5px;">
+                    <tr>
+                      <td style=3D"padding-right:5px;"><img src=3D"http:=
+//sdip.gov.ua/i/actuals/kat23.jpg" height=3D"50" width=3D"50"></td>
+                      <td style=3D" width:100%;">
+                      	                      	<h2>=CF=E5=F0=F1=EF=E5=EA=F2=
+=E8=E2=ED=B3 =E2=E8=ED=E0=F5=EE=E4=E8</h2>
+                      	                      	=D3 =F0=EE=E7=E4=B3=EB=B3 =
+"=B2=ED=F4=EE=F0=EC=E0=F6=B3=E9=ED=B3 =F0=E5=F1=F3=F0=F1=E8" =F0=EE=E7=EC=
+=B3=F9=E5=ED=EE =ED=EE=E2=F3 =E1=E0=E7=F3 =E4=E0=ED=E8=F5 <a target=3D"_=
+blank" href=3D"http://perspectiva.sdip.gov.ua/">"=CF=E5=F0=F1=EF=E5=EA=F2=
+=E8=E2=ED=B3 =E2=E8=ED=E0=F5=EE=E4=E8 =E2 =D3=EA=F0=E0=BF=ED=B3"</a>.
+
+                      </td>
+                    </tr>
+                  </table>
+<script language=3D"javascript">
+
+function sub_auth(mode) {
+	var menu =3D document.getElementById('sub_auth');
+	if (mode =3D=3D 0) {
+		menu.style.display =3D 'block'
+	}
+	else {
+		setTimeout("hide()", 1000);
+		menu.style.display =3D 'none';
+	}
+	=
+
+}
+function hide() {
+	=
+
+}
+
+</script>
+<div style=3D"z-index:4;right:20px; top:0px;position:absolute; border:0p=
+x solid green;">
+
+
+	<!-- LoginMenu -->
+	<script language=3D"javascript" type=3D"text/javascript" src=3D"http://=
+sdip.gov.ua/js/md5.js"></script>
+	<script language=3Djavascript>
+	<!-- //
+	function LogIn(form,form1){
+	 //window.alert(form1.password.value+'t2hZNT')
+	 if ( form.login.value =3D=3D '' ) { form.login.focus(); window.alert('=
+=CD=E5 =E2=EA=E0=E7=E0=ED=E8=E9 =EB=EE=E3=B3=ED'); return false;}
+	 if ( form1.password.value =3D=3D '' ) { form1.password.focus(); window=
+.alert(''); return false;}	 	 	=
+
+	 form.password.value =3D hex_md5(form1.password.value+'t2hZNT');
+	 //window.alert(form.password.value);
+	 //window.alert(hex_md5(form1.password.value+'t2hZNT'))
+	 form.submit();
+	 return false;
+	}
+	 // -->
+	</script>
+
+
+<table cellspacing=3D'0' cellpadding=3D'0' border=3D'0'>
+<tr>
+	<td align=3D'left'>&nbsp;</td>
+	<form action=3D'http://sdip.gov.ua/ua/copyright_registration.html' meth=
+od=3D'post' name=3D'login_form' id=3D"log_form" onsubmit=3D"javascript:w=
+indow.alert('=CD=E5 =E2=EA=E0=E7=E0=ED=E8=E9 =EB=EE=E3=B3=ED'); return f=
+alse;">
+	<input type=3D"hidden" name=3D"password" value=3D"">
+	<td width=3D"135">
+	<input type=3D"text" value=3D'' name=3D"login" class=3D'text1'>
+	</td>
+	</form>
+	<form name=3D"pass_form" onsubmit=3D"LogIn(document.getElementById('log=
+_form'),this);return false;">
+	<td width=3D"135">
+	<input type=3D'password' name=3D"password" value=3D'' class=3D'text1'>
+	</td><td width=3D"75">
+	<input type=3D'submit'  value=3D'=D3=E2=B3=E9=F2=E8' style=3D'width:60p=
+x;height:20px;color:#ffffff;font-weight:bold;background-color:#5b8b84;fo=
+nt-size:11px;font-family:Arial;margin:5px 0px 0px 0px;'>
+	</td>
+	</form>
+	<td style=3D"vertical-align:middle;padding-left:5px;" nowrap><a href=3D=
+'http://sdip.gov.ua/ua/registration.html' style=3D'color:#7d7d7d;font-we=
+ight:bold;font-size:10px;'>=C7=E0=F0=E5=BA=F1=F2=F0=F3=E2=E0=F2=E8=F1=FF=
+</a><br><a href=3D'http://sdip.gov.ua/ua/users/forget_pswd.html' style=3D=
+'color:#7d7d7d;font-weight:bold;font-size:10px;'>=C7=E0=E1=F3=EB=E8 =EF=E0=
+=F0=EE=EB=FC?</a></td>
+	</tr>
+</table>
+<table border=3D"0" align=3D"center" cellspacing=3D"0" cellpadding=3D"0"=
+>
+
+<style>
+.auth_menu td {
+	vertical-align:middle;
+	font-size:11px;
+	=
+
+}
+.auth_menu b{
+	color:#487871;
+}
+.sub_auth_button td{
+	cursor:default;
+	width:162px;
+	height:19;
+	padding:0 0 0 3px;
+	background:url('/main/img/button01.gif') no-repeat;
+}
+.a_menu {
+	font-weight:bold;
+}
+.sub_auth .header{
+	width:160px;
+	height:5px;
+	background:url('/main/img/verh02.gif');
+	=
+
+}
+.sub_auth .footer{
+	width:160px;
+	height:5px;
+	background:url('/main/img/niz02.gif');
+	=
+
+}
+.sub_auth .left{
+	width:1px;
+	background:url('/main/img/pixel.gif') repeat-y 0 0 white;
+}
+.sub_auth .right{
+	width:1px;
+	background:url('/main/img/pixel.gif') repeat-y 100% 0 white;
+	=
+
+}
+</style>
+
+</table>
+
+</div> &nbsp;
+							</td>
+							</tr>
+						</table>
+
+
+					</td>
+					<td width=3D'25'>&nbsp;</td>
+					</tr>
+				</table>
+			</td>
+		</tr>
+		<tr>
+			<td>
+			<table cellspacing=3D'0' cellpadding=3D'0' border=3D'0' width=3D'100%=
+'>
+				<tr>
+					<td class=3D'bg_bottom1'>
+						<p style=3D'margin:0px 0px 0px 80px;padding:0px 0px 0px 0px;'><b>=CD=
+=E0=F8=E0 =E0=E4=F0=E5=F1=E0:</b> =E2=F3=EB. =D3=F0=E8=F6=FC=EA=EE=E3=EE=
+, 45, =EC. =CA=E8=BF=E2-35, =CC=D1=CF, 03680,=D3=EA=F0=E0=BF=ED=E0<br><b=
+>=D2=E5=EB=E5=F4=EE=ED:</b> (+38044) 494-06-06<br><b>=D4=E0=EA=F1:</b> (=
++38044) 494-06-56</p>
+					</td>
+					<td class=3D'bg_bottom3'>&nbsp;</td>
+					<td class=3D'bg_bottom2'>
+						<p style=3D'margin:0px 20px 0px 0px;padding:0px 0px 0px 0px;'>=A9 =
+2008 =CE=F4=B3=F6=B3=E9=ED=E8=E9 =E2=E5=E1-=EF=EE=F0=F2=E0=EB =C4=E5=F0=E6=
+=E4=E5=EF=E0=F0=F2=E0=EC=E5=ED=F2=F3 =B3=ED=F2=E5=EB=E5=EA=F2=F3=E0=EB=FC=
+=ED=EE=BF =E2=EB=E0=F1=ED=EE=F1=F2=B3. <br>=C2=F1=B3 =EF=F0=E0=E2=E0 =E7=
+=E0=F5=E8=F9=E5=ED=EE. <br>=CF=F0=E8 =E2=E8=EA=EE=F0=E8=F1=F2=E0=ED=ED=B3=
+ =EC=E0=F2=E5=F0=B3=E0=EB=B3=E2 =EF=EE=F1=E8=EB=E0=ED=ED=FF =ED=E0 =E2=E5=
+=E1-=EF=EE=F0=F2=E0=EB =EE=E1=EE=E2'=FF=E7=EA=EE=E2=E5.</p>
+					</td>
+				</tr>
+			</table>
+			</td>
+		</tr>
+	</table>
+</td></tr>
+</table>
+	<script type=3D"text/javascript">
+	=
+
+
+	<!--
+	var requiredMajorVersion =3D 7;
+	var requiredMinorVersion =3D 0;
+	var requiredRevision =3D 0;
+	var jsVersion =3D 1.0;
+	// --------------------------------------------------------------------=
+---------
+	// -->
+	</script>
+	<script language=3D"VBScript" type=3D"text/vbscript">
+	<!-- // Visual basic helper required to detect Flash Player ActiveX con=
+trol version information
+	Function VBGetSwfVer(i)
+	  on error resume next
+	  Dim swControl, swVersion
+	  swVersion =3D 0
+
+	  set swControl =3D CreateObject("ShockwaveFlash.ShockwaveFlash." + CSt=
+r(i))
+	  if (IsObject(swControl)) then
+	    swVersion =3D swControl.GetVariable("$version")
+	  end if
+	  VBGetSwfVer =3D swVersion
+	End Function
+	// -->
+	</script>
+	<script language=3D"JavaScript1.1" type=3D"text/javascript">
+	<!-- // Detect Client Browser type
+	var isIE  =3D (navigator.appVersion.indexOf("MSIE") !=3D -1) ? true : f=
+alse;
+	var isWin =3D (navigator.appVersion.toLowerCase().indexOf("win") !=3D -=
+1) ? true : false;
+	var isOpera =3D (navigator.userAgent.indexOf("Opera") !=3D -1) ? true :=
+ false;
+	jsVersion =3D 1.1;
+	// JavaScript helper required to detect Flash Player PlugIn version inf=
+ormation
+	function JSGetSwfVer(i){
+		// NS/Opera version >=3D 3 check for Flash plugin in plugin array
+		if (navigator.plugins !=3D null && navigator.plugins.length > 0) {
+			if (navigator.plugins["Shockwave Flash 2.0"] || navigator.plugins["Sh=
+ockwave Flash"]) {
+				var swVer2 =3D navigator.plugins["Shockwave Flash 2.0"] ? " 2.0" : "=
+";
+	      		var flashDescription =3D navigator.plugins["Shockwave Flash" + =
+swVer2].description;
+				descArray =3D flashDescription.split(" ");
+				tempArrayMajor =3D descArray[2].split(".");
+				versionMajor =3D tempArrayMajor[0];
+				versionMinor =3D tempArrayMajor[1];
+				if ( descArray[3] !=3D "" ) {
+					tempArrayMinor =3D descArray[3].split("r");
+				} else {
+					tempArrayMinor =3D descArray[4].split("r");
+				}
+	      		versionRevision =3D tempArrayMinor[1] > 0 ? tempArrayMinor[1] :=
+ 0;
+	            flashVer =3D versionMajor + "." + versionMinor + "." + vers=
+ionRevision;
+	      	} else {
+				flashVer =3D -1;
+			}
+		}
+		// MSN/WebTV 2.6 supports Flash 4
+		else if (navigator.userAgent.toLowerCase().indexOf("webtv/2.6") !=3D -=
+1) flashVer =3D 4;
+		// WebTV 2.5 supports Flash 3
+		else if (navigator.userAgent.toLowerCase().indexOf("webtv/2.5") !=3D -=
+1) flashVer =3D 3;
+		// older WebTV supports Flash 2
+		else if (navigator.userAgent.toLowerCase().indexOf("webtv") !=3D -1) f=
+lashVer =3D 2;
+		// Can't detect in all other cases
+		else {
+
+			flashVer =3D -1;
+		}
+		return flashVer;
+	}
+	// If called with no parameters this function returns a floating point =
+value
+	// which should be the version of the Flash Player or 0.0
+	// ex: Flash Player 7r14 returns 7.14
+	// If called with reqMajorVer, reqMinorVer, reqRevision returns true if=
+ that version or greater is available
+	function DetectFlashVer(reqMajorVer, reqMinorVer, reqRevision)
+	{
+	 	reqVer =3D parseFloat(reqMajorVer + "." + reqRevision);
+	   	// loop backwards through the versions until we find the newest ver=
+sion
+		for (i=3D25;i>0;i--) {
+			if (isIE && isWin && !isOpera) {
+				versionStr =3D VBGetSwfVer(i);
+			} else {
+				versionStr =3D JSGetSwfVer(i);
+			}
+			if (versionStr =3D=3D -1 ) {
+				return false;
+			} else if (versionStr !=3D 0) {
+				if(isIE && isWin && !isOpera) {
+					tempArray         =3D versionStr.split(" ");
+					tempString        =3D tempArray[1];
+					versionArray      =3D tempString .split(",");
+				} else {
+					versionArray      =3D versionStr.split(".");
+				}
+				versionMajor      =3D versionArray[0];
+				versionMinor      =3D versionArray[1];
+				versionRevision   =3D versionArray[2];
+
+				versionString     =3D versionMajor + "." + versionRevision;   // 7.0=
+r24 =3D=3D 7.24
+				versionNum        =3D parseFloat(versionString);
+	        	// is the major.revision >=3D requested major.revision AND the=
+ minor version >=3D requested minor
+				if ( (versionMajor > reqMajorVer) && (versionNum >=3D reqVer) ) {
+					return true;
+				} else {
+					return ((versionNum >=3D reqVer && versionMinor >=3D reqMinorVer) ?=
+ true : false );
+				}
+			}
+		}
+		return (reqVer ? false : 0.0);
+	}
+	// -->
+	var hasRightVersion =3D DetectFlashVer(requiredMajorVersion, requiredMi=
+norVersion, requiredRevision);
+	if(hasRightVersion) {
+		=
+
+
+		var so =3D new SWFObject("http://sdip.gov.ua/inside/img/topFull6.swf",=
+"testmovie","100%","187","6","#ffffff");
+	 	so.addParam("QUALITY", "low");
+	 	so.addParam("WMODE", "TRANSPARENT");
+	 	so.addVariable("link","http://sdip.gov.ua/ua/city.html");
+	 	so.addVariable("Text",'=B2=ED=F2=E5=EB=E5=EA=F2=F3=E0=EB=FC=ED=E0 =E2=
+=EB=E0=F1=ED=B3=F1=F2=FC =96   =EA=EE=EC=EF=EE=ED=E5=ED=F2=E8 =E2=E7=E0=BA=
+=EC=EE=E4=B3=BF');
+	 	so.addVariable("OnOff","1");
+	 	so.addVariable("lang","ua");
+
+	 	so.write("top");
+
+	 	=
+
+
+	}else{
+		document.getElementById("top").innerHTML =3D '<a href=3D"http://www.ad=
+obe.com/go/getflashplayer"><img src=3D"http://www.adobe.com/images/share=
+d/download_buttons/get_flash_player.gif" alt=3D"Get Adobe Flash player" =
+/></a><table width=3D"100%"  cellpadding=3D"0" cellspacing=3D"0"><tr><td=
+ style=3D"background-image: url(/main/img/shapka.jpg); background-repeat=
+: no-repeat;">&nbsp;</td><td width=3D"346"><a href=3D"/ua/city.html"><im=
+g src=3D"/main/img/shapka2.jpg"></a></td></tr></table>';
+	}
+	=
+
+	</script>
+</body>
+</html>
+------------NbTj16xyrFJgraG73IzlC0
+Content-Disposition: inline; filename=swfobject.js
+Content-Type: application/javascript; charset=windows-1251; name=swfobject.js
+Content-Location: http://sdip.gov.ua/js/swfobject.js
+Content-Transfer-Encoding: Base64
+
+LyoqCiAqIFNXRk9iamVjdCB2MS41OiBGbGFzaCBQbGF5ZXIgZGV0ZWN0aW9uIGFu
+ZCBlbWJlZCAtIGh0dHA6Ly9ibG9nLmRlY29uY2VwdC5jb20vc3dmb2JqZWN0Lwog
+KgogKiBTV0ZPYmplY3QgaXMgKGMpIDIwMDcgR2VvZmYgU3RlYXJucyBhbmQgaXMg
+cmVsZWFzZWQgdW5kZXIgdGhlIE1JVCBMaWNlbnNlOgogKiBodHRwOi8vd3d3Lm9w
+ZW5zb3VyY2Uub3JnL2xpY2Vuc2VzL21pdC1saWNlbnNlLnBocAogKgogKi8KaWYo
+dHlwZW9mIGRlY29uY2VwdD09InVuZGVmaW5lZCIpe3ZhciBkZWNvbmNlcHQ9bmV3
+IE9iamVjdCgpO31pZih0eXBlb2YgZGVjb25jZXB0LnV0aWw9PSJ1bmRlZmluZWQi
+KXtkZWNvbmNlcHQudXRpbD1uZXcgT2JqZWN0KCk7fWlmKHR5cGVvZiBkZWNvbmNl
+cHQuU1dGT2JqZWN0VXRpbD09InVuZGVmaW5lZCIpe2RlY29uY2VwdC5TV0ZPYmpl
+Y3RVdGlsPW5ldyBPYmplY3QoKTt9ZGVjb25jZXB0LlNXRk9iamVjdD1mdW5jdGlv
+bihfMSxpZCx3LGgsXzUsYyxfNyxfOCxfOSxfYSl7aWYoIWRvY3VtZW50LmdldEVs
+ZW1lbnRCeUlkKXtyZXR1cm47fXRoaXMuREVURUNUX0tFWT1fYT9fYToiZGV0ZWN0
+Zmxhc2giO3RoaXMuc2tpcERldGVjdD1kZWNvbmNlcHQudXRpbC5nZXRSZXF1ZXN0
+UGFyYW1ldGVyKHRoaXMuREVURUNUX0tFWSk7dGhpcy5wYXJhbXM9bmV3IE9iamVj
+dCgpO3RoaXMudmFyaWFibGVzPW5ldyBPYmplY3QoKTt0aGlzLmF0dHJpYnV0ZXM9
+bmV3IEFycmF5KCk7aWYoXzEpe3RoaXMuc2V0QXR0cmlidXRlKCJzd2YiLF8xKTt9
+aWYoaWQpe3RoaXMuc2V0QXR0cmlidXRlKCJpZCIsaWQpO31pZih3KXt0aGlzLnNl
+dEF0dHJpYnV0ZSgid2lkdGgiLHcpO31pZihoKXt0aGlzLnNldEF0dHJpYnV0ZSgi
+aGVpZ2h0IixoKTt9aWYoXzUpe3RoaXMuc2V0QXR0cmlidXRlKCJ2ZXJzaW9uIixu
+ZXcgZGVjb25jZXB0LlBsYXllclZlcnNpb24oXzUudG9TdHJpbmcoKS5zcGxpdCgi
+LiIpKSk7fXRoaXMuaW5zdGFsbGVkVmVyPWRlY29uY2VwdC5TV0ZPYmplY3RVdGls
+LmdldFBsYXllclZlcnNpb24oKTtpZighd2luZG93Lm9wZXJhJiZkb2N1bWVudC5h
+bGwmJnRoaXMuaW5zdGFsbGVkVmVyLm1ham9yPjcpe2RlY29uY2VwdC5TV0ZPYmpl
+Y3QuZG9QcmVwVW5sb2FkPXRydWU7fWlmKGMpe3RoaXMuYWRkUGFyYW0oImJnY29s
+b3IiLGMpO312YXIgcT1fNz9fNzoiaGlnaCI7dGhpcy5hZGRQYXJhbSgicXVhbGl0
+eSIscSk7dGhpcy5zZXRBdHRyaWJ1dGUoInVzZUV4cHJlc3NJbnN0YWxsIixmYWxz
+ZSk7dGhpcy5zZXRBdHRyaWJ1dGUoImRvRXhwcmVzc0luc3RhbGwiLGZhbHNlKTt2
+YXIgX2M9KF84KT9fODp3aW5kb3cubG9jYXRpb247dGhpcy5zZXRBdHRyaWJ1dGUo
+InhpUmVkaXJlY3RVcmwiLF9jKTt0aGlzLnNldEF0dHJpYnV0ZSgicmVkaXJlY3RV
+cmwiLCIiKTtpZihfOSl7dGhpcy5zZXRBdHRyaWJ1dGUoInJlZGlyZWN0VXJsIixf
+OSk7fX07ZGVjb25jZXB0LlNXRk9iamVjdC5wcm90b3R5cGU9e3VzZUV4cHJlc3NJ
+bnN0YWxsOmZ1bmN0aW9uKF9kKXt0aGlzLnhpU1dGUGF0aD0hX2Q/ImV4cHJlc3Np
+bnN0YWxsLnN3ZiI6X2Q7dGhpcy5zZXRBdHRyaWJ1dGUoInVzZUV4cHJlc3NJbnN0
+YWxsIix0cnVlKTt9LHNldEF0dHJpYnV0ZTpmdW5jdGlvbihfZSxfZil7dGhpcy5h
+dHRyaWJ1dGVzW19lXT1fZjt9LGdldEF0dHJpYnV0ZTpmdW5jdGlvbihfMTApe3Jl
+dHVybiB0aGlzLmF0dHJpYnV0ZXNbXzEwXTt9LGFkZFBhcmFtOmZ1bmN0aW9uKF8x
+MSxfMTIpe3RoaXMucGFyYW1zW18xMV09XzEyO30sZ2V0UGFyYW1zOmZ1bmN0aW9u
+KCl7cmV0dXJuIHRoaXMucGFyYW1zO30sYWRkVmFyaWFibGU6ZnVuY3Rpb24oXzEz
+LF8xNCl7dGhpcy52YXJpYWJsZXNbXzEzXT1fMTQ7fSxnZXRWYXJpYWJsZTpmdW5j
+dGlvbihfMTUpe3JldHVybiB0aGlzLnZhcmlhYmxlc1tfMTVdO30sZ2V0VmFyaWFi
+bGVzOmZ1bmN0aW9uKCl7cmV0dXJuIHRoaXMudmFyaWFibGVzO30sZ2V0VmFyaWFi
+bGVQYWlyczpmdW5jdGlvbigpe3ZhciBfMTY9bmV3IEFycmF5KCk7dmFyIGtleTt2
+YXIgXzE4PXRoaXMuZ2V0VmFyaWFibGVzKCk7Zm9yKGtleSBpbiBfMTgpe18xNltf
+MTYubGVuZ3RoXT1rZXkrIj0iK18xOFtrZXldO31yZXR1cm4gXzE2O30sZ2V0U1dG
+SFRNTDpmdW5jdGlvbigpe3ZhciBfMTk9IiI7aWYobmF2aWdhdG9yLnBsdWdpbnMm
+Jm5hdmlnYXRvci5taW1lVHlwZXMmJm5hdmlnYXRvci5taW1lVHlwZXMubGVuZ3Ro
+KXtpZih0aGlzLmdldEF0dHJpYnV0ZSgiZG9FeHByZXNzSW5zdGFsbCIpKXt0aGlz
+LmFkZFZhcmlhYmxlKCJNTXBsYXllclR5cGUiLCJQbHVnSW4iKTt0aGlzLnNldEF0
+dHJpYnV0ZSgic3dmIix0aGlzLnhpU1dGUGF0aCk7fV8xOT0iPGVtYmVkIHR5cGU9
+XCJhcHBsaWNhdGlvbi94LXNob2Nrd2F2ZS1mbGFzaFwiIHNyYz1cIiIrdGhpcy5n
+ZXRBdHRyaWJ1dGUoInN3ZiIpKyJcIiB3aWR0aD1cIiIrdGhpcy5nZXRBdHRyaWJ1
+dGUoIndpZHRoIikrIlwiIGhlaWdodD1cIiIrdGhpcy5nZXRBdHRyaWJ1dGUoImhl
+aWdodCIpKyJcIiBzdHlsZT1cIiIrdGhpcy5nZXRBdHRyaWJ1dGUoInN0eWxlIikr
+IlwiIjtfMTkrPSIgaWQ9XCIiK3RoaXMuZ2V0QXR0cmlidXRlKCJpZCIpKyJcIiBu
+YW1lPVwiIit0aGlzLmdldEF0dHJpYnV0ZSgiaWQiKSsiXCIgIjt2YXIgXzFhPXRo
+aXMuZ2V0UGFyYW1zKCk7Zm9yKHZhciBrZXkgaW4gXzFhKXtfMTkrPVtrZXldKyI9
+XCIiK18xYVtrZXldKyJcIiAiO312YXIgXzFjPXRoaXMuZ2V0VmFyaWFibGVQYWly
+cygpLmpvaW4oIiYiKTtpZihfMWMubGVuZ3RoPjApe18xOSs9ImZsYXNodmFycz1c
+IiIrXzFjKyJcIiI7fV8xOSs9Ii8+Ijt9ZWxzZXtpZih0aGlzLmdldEF0dHJpYnV0
+ZSgiZG9FeHByZXNzSW5zdGFsbCIpKXt0aGlzLmFkZFZhcmlhYmxlKCJNTXBsYXll
+clR5cGUiLCJBY3RpdmVYIik7dGhpcy5zZXRBdHRyaWJ1dGUoInN3ZiIsdGhpcy54
+aVNXRlBhdGgpO31fMTk9IjxvYmplY3QgaWQ9XCIiK3RoaXMuZ2V0QXR0cmlidXRl
+KCJpZCIpKyJcIiBjbGFzc2lkPVwiY2xzaWQ6RDI3Q0RCNkUtQUU2RC0xMWNmLTk2
+QjgtNDQ0NTUzNTQwMDAwXCIgd2lkdGg9XCIiK3RoaXMuZ2V0QXR0cmlidXRlKCJ3
+aWR0aCIpKyJcIiBoZWlnaHQ9XCIiK3RoaXMuZ2V0QXR0cmlidXRlKCJoZWlnaHQi
+KSsiXCIgc3R5bGU9XCIiK3RoaXMuZ2V0QXR0cmlidXRlKCJzdHlsZSIpKyJcIj4i
+O18xOSs9IjxwYXJhbSBuYW1lPVwibW92aWVcIiB2YWx1ZT1cIiIrdGhpcy5nZXRB
+dHRyaWJ1dGUoInN3ZiIpKyJcIiAvPiI7dmFyIF8xZD10aGlzLmdldFBhcmFtcygp
+O2Zvcih2YXIga2V5IGluIF8xZCl7XzE5Kz0iPHBhcmFtIG5hbWU9XCIiK2tleSsi
+XCIgdmFsdWU9XCIiK18xZFtrZXldKyJcIiAvPiI7fXZhciBfMWY9dGhpcy5nZXRW
+YXJpYWJsZVBhaXJzKCkuam9pbigiJiIpO2lmKF8xZi5sZW5ndGg+MCl7XzE5Kz0i
+PHBhcmFtIG5hbWU9XCJmbGFzaHZhcnNcIiB2YWx1ZT1cIiIrXzFmKyJcIiAvPiI7
+fV8xOSs9Ijwvb2JqZWN0PiI7fXJldHVybiBfMTk7fSx3cml0ZTpmdW5jdGlvbihf
+MjApe2lmKHRoaXMuZ2V0QXR0cmlidXRlKCJ1c2VFeHByZXNzSW5zdGFsbCIpKXt2
+YXIgXzIxPW5ldyBkZWNvbmNlcHQuUGxheWVyVmVyc2lvbihbNiwwLDY1XSk7aWYo
+dGhpcy5pbnN0YWxsZWRWZXIudmVyc2lvbklzVmFsaWQoXzIxKSYmIXRoaXMuaW5z
+dGFsbGVkVmVyLnZlcnNpb25Jc1ZhbGlkKHRoaXMuZ2V0QXR0cmlidXRlKCJ2ZXJz
+aW9uIikpKXt0aGlzLnNldEF0dHJpYnV0ZSgiZG9FeHByZXNzSW5zdGFsbCIsdHJ1
+ZSk7dGhpcy5hZGRWYXJpYWJsZSgiTU1yZWRpcmVjdFVSTCIsZXNjYXBlKHRoaXMu
+Z2V0QXR0cmlidXRlKCJ4aVJlZGlyZWN0VXJsIikpKTtkb2N1bWVudC50aXRsZT1k
+b2N1bWVudC50aXRsZS5zbGljZSgwLDQ3KSsiIC0gRmxhc2ggUGxheWVyIEluc3Rh
+bGxhdGlvbiI7dGhpcy5hZGRWYXJpYWJsZSgiTU1kb2N0aXRsZSIsZG9jdW1lbnQu
+dGl0bGUpO319aWYodGhpcy5za2lwRGV0ZWN0fHx0aGlzLmdldEF0dHJpYnV0ZSgi
+ZG9FeHByZXNzSW5zdGFsbCIpfHx0aGlzLmluc3RhbGxlZFZlci52ZXJzaW9uSXNW
+YWxpZCh0aGlzLmdldEF0dHJpYnV0ZSgidmVyc2lvbiIpKSl7dmFyIG49KHR5cGVv
+ZiBfMjA9PSJzdHJpbmciKT9kb2N1bWVudC5nZXRFbGVtZW50QnlJZChfMjApOl8y
+MDtuLmlubmVySFRNTD10aGlzLmdldFNXRkhUTUwoKTtyZXR1cm4gdHJ1ZTt9ZWxz
+ZXtpZih0aGlzLmdldEF0dHJpYnV0ZSgicmVkaXJlY3RVcmwiKSE9IiIpe2RvY3Vt
+ZW50LmxvY2F0aW9uLnJlcGxhY2UodGhpcy5nZXRBdHRyaWJ1dGUoInJlZGlyZWN0
+VXJsIikpO319cmV0dXJuIGZhbHNlO319O2RlY29uY2VwdC5TV0ZPYmplY3RVdGls
+LmdldFBsYXllclZlcnNpb249ZnVuY3Rpb24oKXt2YXIgXzIzPW5ldyBkZWNvbmNl
+cHQuUGxheWVyVmVyc2lvbihbMCwwLDBdKTtpZihuYXZpZ2F0b3IucGx1Z2lucyYm
+bmF2aWdhdG9yLm1pbWVUeXBlcy5sZW5ndGgpe3ZhciB4PW5hdmlnYXRvci5wbHVn
+aW5zWyJTaG9ja3dhdmUgRmxhc2giXTtpZih4JiZ4LmRlc2NyaXB0aW9uKXtfMjM9
+bmV3IGRlY29uY2VwdC5QbGF5ZXJWZXJzaW9uKHguZGVzY3JpcHRpb24ucmVwbGFj
+ZSgvKFthLXpBLVpdfFxzKSsvLCIiKS5yZXBsYWNlKC8oXHMrcnxccytiWzAtOV0r
+KS8sIi4iKS5zcGxpdCgiLiIpKTt9fWVsc2V7aWYobmF2aWdhdG9yLnVzZXJBZ2Vu
+dCYmbmF2aWdhdG9yLnVzZXJBZ2VudC5pbmRleE9mKCJXaW5kb3dzIENFIik+PTAp
+e3ZhciBheG89MTt2YXIgXzI2PTM7d2hpbGUoYXhvKXt0cnl7XzI2Kys7YXhvPW5l
+dyBBY3RpdmVYT2JqZWN0KCJTaG9ja3dhdmVGbGFzaC5TaG9ja3dhdmVGbGFzaC4i
+K18yNik7XzIzPW5ldyBkZWNvbmNlcHQuUGxheWVyVmVyc2lvbihbXzI2LDAsMF0p
+O31jYXRjaChlKXtheG89bnVsbDt9fX1lbHNle3RyeXt2YXIgYXhvPW5ldyBBY3Rp
+dmVYT2JqZWN0KCJTaG9ja3dhdmVGbGFzaC5TaG9ja3dhdmVGbGFzaC43Iik7fWNh
+dGNoKGUpe3RyeXt2YXIgYXhvPW5ldyBBY3RpdmVYT2JqZWN0KCJTaG9ja3dhdmVG
+bGFzaC5TaG9ja3dhdmVGbGFzaC42Iik7XzIzPW5ldyBkZWNvbmNlcHQuUGxheWVy
+VmVyc2lvbihbNiwwLDIxXSk7YXhvLkFsbG93U2NyaXB0QWNjZXNzPSJhbHdheXMi
+O31jYXRjaChlKXtpZihfMjMubWFqb3I9PTYpe3JldHVybiBfMjM7fX10cnl7YXhv
+PW5ldyBBY3RpdmVYT2JqZWN0KCJTaG9ja3dhdmVGbGFzaC5TaG9ja3dhdmVGbGFz
+aCIpO31jYXRjaChlKXt9fWlmKGF4byE9bnVsbCl7XzIzPW5ldyBkZWNvbmNlcHQu
+UGxheWVyVmVyc2lvbihheG8uR2V0VmFyaWFibGUoIiR2ZXJzaW9uIikuc3BsaXQo
+IiAiKVsxXS5zcGxpdCgiLCIpKTt9fX1yZXR1cm4gXzIzO307ZGVjb25jZXB0LlBs
+YXllclZlcnNpb249ZnVuY3Rpb24oXzI5KXt0aGlzLm1ham9yPV8yOVswXSE9bnVs
+bD9wYXJzZUludChfMjlbMF0pOjA7dGhpcy5taW5vcj1fMjlbMV0hPW51bGw/cGFy
+c2VJbnQoXzI5WzFdKTowO3RoaXMucmV2PV8yOVsyXSE9bnVsbD9wYXJzZUludChf
+MjlbMl0pOjA7fTtkZWNvbmNlcHQuUGxheWVyVmVyc2lvbi5wcm90b3R5cGUudmVy
+c2lvbklzVmFsaWQ9ZnVuY3Rpb24oZnYpe2lmKHRoaXMubWFqb3I8ZnYubWFqb3Ip
+e3JldHVybiBmYWxzZTt9aWYodGhpcy5tYWpvcj5mdi5tYWpvcil7cmV0dXJuIHRy
+dWU7fWlmKHRoaXMubWlub3I8ZnYubWlub3Ipe3JldHVybiBmYWxzZTt9aWYodGhp
+cy5taW5vcj5mdi5taW5vcil7cmV0dXJuIHRydWU7fWlmKHRoaXMucmV2PGZ2LnJl
+dil7cmV0dXJuIGZhbHNlO31yZXR1cm4gdHJ1ZTt9O2RlY29uY2VwdC51dGlsPXtn
+ZXRSZXF1ZXN0UGFyYW1ldGVyOmZ1bmN0aW9uKF8yYil7dmFyIHE9ZG9jdW1lbnQu
+bG9jYXRpb24uc2VhcmNofHxkb2N1bWVudC5sb2NhdGlvbi5oYXNoO2lmKF8yYj09
+bnVsbCl7cmV0dXJuIHE7fWlmKHEpe3ZhciBfMmQ9cS5zdWJzdHJpbmcoMSkuc3Bs
+aXQoIiYiKTtmb3IodmFyIGk9MDtpPF8yZC5sZW5ndGg7aSsrKXtpZihfMmRbaV0u
+c3Vic3RyaW5nKDAsXzJkW2ldLmluZGV4T2YoIj0iKSk9PV8yYil7cmV0dXJuIF8y
+ZFtpXS5zdWJzdHJpbmcoKF8yZFtpXS5pbmRleE9mKCI9IikrMSkpO319fXJldHVy
+biAiIjt9fTtkZWNvbmNlcHQuU1dGT2JqZWN0VXRpbC5jbGVhbnVwU1dGcz1mdW5j
+dGlvbigpe3ZhciBfMmY9ZG9jdW1lbnQuZ2V0RWxlbWVudHNCeVRhZ05hbWUoIk9C
+SkVDVCIpO2Zvcih2YXIgaT1fMmYubGVuZ3RoLTE7aT49MDtpLS0pe18yZltpXS5z
+dHlsZS5kaXNwbGF5PSJub25lIjtmb3IodmFyIHggaW4gXzJmW2ldKXtpZih0eXBl
+b2YgXzJmW2ldW3hdPT0iZnVuY3Rpb24iKXtfMmZbaV1beF09ZnVuY3Rpb24oKXt9
+O319fX07aWYoZGVjb25jZXB0LlNXRk9iamVjdC5kb1ByZXBVbmxvYWQpe2lmKCFk
+ZWNvbmNlcHQudW5sb2FkU2V0KXtkZWNvbmNlcHQuU1dGT2JqZWN0VXRpbC5wcmVw
+VW5sb2FkPWZ1bmN0aW9uKCl7X19mbGFzaF91bmxvYWRIYW5kbGVyPWZ1bmN0aW9u
+KCl7fTtfX2ZsYXNoX3NhdmVkVW5sb2FkSGFuZGxlcj1mdW5jdGlvbigpe307d2lu
+ZG93LmF0dGFjaEV2ZW50KCJvbnVubG9hZCIsZGVjb25jZXB0LlNXRk9iamVjdFV0
+aWwuY2xlYW51cFNXRnMpO307d2luZG93LmF0dGFjaEV2ZW50KCJvbmJlZm9yZXVu
+bG9hZCIsZGVjb25jZXB0LlNXRk9iamVjdFV0aWwucHJlcFVubG9hZCk7ZGVjb25j
+ZXB0LnVubG9hZFNldD10cnVlO319aWYoIWRvY3VtZW50LmdldEVsZW1lbnRCeUlk
+JiZkb2N1bWVudC5hbGwpe2RvY3VtZW50LmdldEVsZW1lbnRCeUlkPWZ1bmN0aW9u
+KGlkKXtyZXR1cm4gZG9jdW1lbnQuYWxsW2lkXTt9O312YXIgZ2V0UXVlcnlQYXJh
+bVZhbHVlPWRlY29uY2VwdC51dGlsLmdldFJlcXVlc3RQYXJhbWV0ZXI7dmFyIEZs
+YXNoT2JqZWN0PWRlY29uY2VwdC5TV0ZPYmplY3Q7dmFyIFNXRk9iamVjdD1kZWNv
+bmNlcHQuU1dGT2JqZWN0Ow==
+
+------------NbTj16xyrFJgraG73IzlC0
+Content-Disposition: inline; filename=bg_a1.jpg
+Content-Type: image/jpeg; name=bg_a1.jpg
+Content-Location: http://sdip.gov.ua/inside/img/bg_a1.jpg
+Content-Transfer-Encoding: Base64
+
+/9j/4AAQSkZJRgABAgAAZABkAAD/7AARRHVja3kAAQAEAAAAVQAA/+4ADkFkb2Jl
+AGTAAAAAAf/bAIQAAgEBAQEBAgEBAgMCAQIDAwICAgIDAwMDAwMDAwQDBAQEBAME
+BAUGBgYFBAcHCAgHBwoKCgoKDAwMDAwMDAwMDAECAgIEAwQHBAQHCggHCAoMDAwM
+DAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwM/8AA
+EQgAHAAbAwERAAIRAQMRAf/EAI4AAQADAQAAAAAAAAAAAAAAAAcFCAkEAQACAwEA
+AAAAAAAAAAAAAAAEBQIGBwMQAAADBgQEBAMJAQAAAAAAAAECAxETBAUGBwAhEhQx
+FRYXUSIIGEFhkoEyQlJiIzMkNAkRAAAFAgIIBQUAAAAAAAAAAAABEQIDEgQFBiEx
+QVFhcYEUkSKCpBXwweFCB//aAAwDAQACEQMRAD8A2fvlfKfSyf8Aa22CsPD1S73E
+2nkcUTw0qh2ALdACDxYwCGkjcmgI5ceFxcshKp5oCLa1fO5GEoH55R9MVBGBMZ/c
+er4ybjmqvCzZCARMbxTQRhRKUPlhI7MEa6A8bl2RNImpDeCsbJLITCW1HE1jbQp0
+0I6WT4UjzWEIcwEBWHiUiEBUGiwSnBvDPBdrjEUp0qhmA7rBZYiNxEpEHfvbbZy/
+5km55T1RqzZy945e/Xkzi3DcJxQP1m3an1t7tyuREXF9VsArPFlGsEygTFYoEEfk
+QSgz9AeGMnz5iT4buOEj0OYvWo/roNf/AJ/hcc9nJMZaWvTpSX58RBU/U1VTSACK
+KY4gINa0cV6F8jiUWKaONhoD6/F5qno+jJskVdRKJWhV4ZExTCBiqqpiQhi/Mph1
+APwZhVimISwMchmRpo5hvhWHRTyNIyIyUl5bfEL/ALh6jb0/sjbTtF3WZpH/AEM5
+1tW+D3PTjZ/k5vb1+oYj8VD7ij0js/6lenCrS1xIrjyhBSJlcmCLhyJJlEwqQETE
+DGtTZmJ0FDnAxQz0CUwcDMQ55y7JeOZdRFUbCQy2prUuW0WLIWZIrNslpMdJPNSP
+YupD57BEWUqujVaPKpFrEMYU/KZpRzZ44R2FDWI7WHuIE9z1bqBPcS1MR6mrlw9u
+qXKoenFogiM8mcMBhCFhTHYomkYuRolQoCRMgZ6h1D5QHEbbLjsSuCMySMjUzE7n
+MrcMt3ERrIZIRfcaD+2pTaPOQQ/Nun9g91lZttzo5Mxn8e18mrGt9szdsTpuGO95
+Jv8A2q67wxXQ7d9IRHdDb9K5PN4xmpvl0fHW3hpzbwwQBRS6uPYV1REuPv6hfbvk
+Lxrc28z/ALH154Bf2y+aheKA+PuqSprTgqB79K3tWdIdq3fUGkXG8da2fj2zr9hn
+5nX24LjpTyInACSVL51XiHfExzH/2Q==
+
+------------NbTj16xyrFJgraG73IzlC0
+Content-Disposition: inline; filename=bg_bottom1.jpg
+Content-Type: image/jpeg; name=bg_bottom1.jpg
+Content-Location: http://sdip.gov.ua/inside/img/bg_bottom1.jpg
+Content-Transfer-Encoding: Base64
+
+/9j/4AAQSkZJRgABAgAAZABkAAD/7AARRHVja3kAAQAEAAAAUAAA/+4ADkFkb2Jl
+AGTAAAAAAf/bAIQAAgICAgICAgICAgMCAgIDBAMCAgMEBQQEBAQEBQYFBQUFBQUG
+BgcHCAcHBgkJCgoJCQwMDAwMDAwMDAwMDAwMDAEDAwMFBAUJBgYJDQsJCw0PDg4O
+Dg8PDAwMDAwPDwwMDAwMDA8MDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwM/8AA
+EQgAUgGkAwERAAIRAQMRAf/EAKAAAAIDAQEBAQAAAAAAAAAAAAACAQMEBQYIBwEB
+AQEBAQEBAQAAAAAAAAAAAAECAwQFBgcQAAEDAgMGAgcECAYDAQAAAAEAAgMRBCES
+BTFBYXETBlGhgSIyklOVB0IUNESRwdFigjNDhLHxUiM1CHIVhUURAQEAAgEDBAAF
+AQkAAAAAAAABEQIDIZESMUGBBFFhcSIFE6GxwdHhMmIjFP/aAAwDAQACEQMRAD8A
+9i6ean85/vFfWw/mOSfeJ/jSe8f2qJagXE+6Z/vFDJvvE9P5r/eP7VcJmpF3Jvne
+P4itYXNH3+QfmH+8UwvlTHVJIxUTSO4ZimDyqyLXbxp9V2X+IpiLOSx0YtdvHYPm
+djuBKz4aus5dlkmo3ThVk7q8yrNNS7VglvLh7XNMrzm2+sdql1jndq8zcT3kT8vV
+flrg7MVnDGWf79dYjqvNP3imFH3+ce1K/kHGqsgoffXZNGSvaN5LirgVGa5ftuZH
+fxH9qYGmLrEjNM+n/kVpMu3a3L4iPWJrvOKSrK91pUttexdGaP1gKtc00dXmm0ez
+i8dpiuT3N2o29tTd2VxM25gaS+AuJLgPBcU5OHEzH47lvBmaXyChykFxqD4bVcvN
+kpddM9p8g/iKik+8T/Ff7xRMnEsw/rSe8f2ouW6C6mA/nye8VZVegs7qdwb/ALz6
+j94reXN6xl5KZHAzPyuLcvrHDBY2nV11tN1ph/VfzzFYw6Zo+8TfFf7xVM0deb4z
+/eKGaOvN8Z/vFDNHXm+M/wB4oZqetL8Z/vFc0zVfXl+M/wB4o1mqnXMo/rP94oZr
+O65mJ/nP94qrmkM84/rP94o1LUGef4zz/EUalqPvFx8V3vFRqWl68/xn+8VlrNR1
+p/iv94oZT15/jP8AeKGaOvP8Z/vFDNHXn+M/3ihmjrz/ABn+8UM0def4z/eKGaOv
+P8Z/vFDNHXn+M/3ihmjrz/Gf7xQzR15/jP8AeKGaOvP8Z/vFDNHXn+M/3ihmjrz/
+ABn+8UM1S59MS4L2vlZVGZvM+ISRMkMrzsoArhEA1IqTioHFOaAJ5I0GRPme1jWm
+SR5DWRtBLiTsAA2oSZdi70bVNHEL9U0a705s+ML7y3khD/8AxL2tr6Ell9G9uLbT
+/dLP1jVDKyWMhrGAtGymP6Vb1XUhnYAW5aOC5XMaZnuY6pFAr5M2OZdtjcwlzgAN
+6M2OA51SQzYNhRkgZjU7fFbFmQIHY0NKw0uaaLbLSx2xYadqwunQSNc12Ug4Fby3
+ptiv0G1vRPG2VhpIPbPLes2PdNvKPBd2aSyB41S1ZSGd2W7jaMGSO+0OJ8lzrzcv
+HjrHiiM20AqxxwpdbRSVwyu3rTLE+1ez2cQjoVuYHEUosI6NrKWuFMfALbOK9ZDL
+1HZq4ilVnZqejotfmZxCzWzZuCL4jNwRfEZkPEZkPFWXAb0aVul4oMpfXegXMFho
+F2IxQhS70I1El4G9RsgfVAZuCrQzcEBm4IDNwQGbggM3BAZuCAzcEBm4IDNwQGbg
+gM3BAZuCDBnccc1V6nyE1JxwCsEZyoJEhCBhIjR+qhl9I/TrTINF0uy1Swkspdf1
+C0bcvZPb3E0rfvVyba0bE+BpMbQWOe9zTmJoD6q4clzfyfY+nxzTWbTHlZ+fvcT0
+fr2sO06b6YfUefXOnNpEE80Oimc3LpRcQMZCxwN2A7MZWjFmBx4rjM+Uw+hyeN+v
+yXb09vX19Pf83w9Zz5XHivbK/Myrr0ltJWHDem0dHMfeNaMTj4LDFrBLKZzVx9Ub
+GhGcqduOFNwUyhs3BMgzBMrhKphYDvCKsDgEGuKShCD02mXpY5rS7CuIW3o4tvZ6
+SRkd3bzW0tHRXDSzHcTsd6Fy2ei65j8kvLSawuZbaQYx+wfELMrx7zxqiuGGzxVR
+BbXHbwQI62bICfZcgoax0LwDspgg7EdyY5WO3EDO3h4ravQse2gc0+q4YLnW9Tl1
+FzaLn4+a6KM/HzQQZAFzRmfLxXRVDpD6EEZ1zRGdVsufj5osUvmAw2lFKxxcak80
+WLsyjQz8fNAZ+PmgM/HzQGfj5oDPx80Bn4+aAz8fNAZ+PmgM/HzQGfj5oDPx80Bn
+4+aAz8fNBm9Vet8pPFGkhwQgIzhBWW1B8RsRMYe37A+n+ufUTVLrS9FfbwSWVsbm
+ee5c5sYbmawCrWuNSThgsb7zSdXr+r9Tb7G111/B9UdqfTH6r9r6aNHM3b+rabG/
+Paxz3F3DLCQ8SAMlha0lucZsrqgGtKVK8+3Jptc9X2+D6X2OLXx/bZ+t/wAHN70+
+lf1j7usrSwu9Q0WPSdLYG6foFnNNHC3IKAl0rC57qfae5NOTTVj7H0ftcsktmJ6S
+PknuHt3Vu09Vl0nXbWbTNQhoTBIPaadjmOFQ5p3EGi9M2l6x8Tl4d+Lbx2mKyMlu
+Hsyh4e3dnwWkcOZr4ZXNkFK7CMVi9GMBrwRtqhimzBDFGbghiiv73ki+IzBDxWBy
+HicO9KNL2Pog6NvMWkU2rUWdHrLO+GVuYjAKV6uPdl7hso7yNlxEB1msqCuVic2m
+erwBwqDgd4SPJgAjkqLRjuWzENcMzBgoCKbVmrhiLixwB3NUMO9YXIdEYnbWnA8C
+FG9G1z8So6F6iBHTAb1lVDpltlQZaoIzrmiHSIsHUG04U2qtMcl1UlrMOKNFYcxq
+ThvKEaw8DAYBRspkQhepzVaHU5oDqc0B1OaA6nNAdTmgOpzQHU5oDqc0B1OaA6nN
+AdTmgOpzQMXAbTTgvU+QUvzbAQgBX0I00RkhFhngijhs8ELH7l9DIrq91q60TRe7
+NT7Z1jVgSXWdnBcQugt2F+aWSVwc2hJAAG9cOb0zY+n/ABmdtrrrtdbfwk9n7T3B
+d6923q2raPf/AFf16S40XRzrWoSw6ZZmNkGcMaypcPXe4ig4rlMX2fS5bvx7XW8u
+3SZ9Iy3vdXffZLrPuA9233dejQz6bHr+i6vprLR4h1NueJ9rPFVr3N2OAODttU8d
+dumDbm5eHG3ldp0zLMev4U//AGt0+xd212zrDoWjUYNTNpFPQB3Rlhkkc07yM0bT
+/mnBeth/Nazw1298viaGXqAA7RsBXpfnzXLGzRGp9Zmwq2JiPPZnRuIO4rmLBP4q
+5MLBK0pkwMzfFMicw5pkWBw8UyGD1BY162rUyUgrOo7FvNgBVby66uo24+8W7rZ7
+8roznBWdo7ZzMPIahAIZc7fZcalc3m21wwh+OG9ag2RODq4VpvQXsyyEt8dnNDDF
+dQnE0oWBQsJZzEZwPtAeWKEdYT5wCdu9SusI6YeKyqp03FRhUZqoFzoI6vFVsrpg
+0VcaAIMclw6Q4YNQRH65r9kb/FFjV1AMNyKOoo2gyIQnU5KtDqckB1OSA6nJAdTk
+gOpyQHU5IDqckB1OSA6nJAdTkgOpyQHU5INFcxNV6nyAPSeSNJAqcCUFzI3Yesix
+obG4tptR08cvrD/qtoBfqXc/ckrKttIYtPtXn/VK7qSU9DG/pXl+xfSPt/w3F+7b
+f4YdTld3br3c0wcXDv7vSz7etHONB/6zRaTXLh+7UNJSdJPyib3+rtt/z3mvxr6v
+1n6jdv612la3/wBQ+19eutU062kZfa72dqUgutOntg4Em3Y4ER5BQty7KVBwXPTa
+XpXt+1xbcUvLpbZ63W9Zj8nz5/2M73uu6Na0HTYIzBo1npttqVm0mplffxNlL3U2
+ZW0YBz8V04dcPmfyn2LybSe2M93zgyUsfmB2bV2y+Y6LngsDhsK1lXEum1JfTHes
+VMMjX12qGFlQMSURLXtOH6EawszCmCKA7igsDuKBw9BeyTELaOnby4jFG9W6R7qN
+lZ9n2uSOlnvGGd7Z4XV9tm0rFjN6xwC7EjYBvUjm0slyRmmGbBUNHLQtoaU3oOo9
+zZYmyUx2P/apejrjMcen3e4dh6pDiBzH6kiYTHMQaVwQO6VYaVGZRnBerzQwOpzV
+aI+cMFd6DK6UvNXHDcgGf7hwwaNqLI1ZwBQYBFL1OaA6nJRtBkwQJnVaGdAZ0BnQ
+GdAZ0BnQGdAZ0BnQGdAZ0BnQdoii9r5CQN/kggbFhpa0nA1wRvWNDHKZdZH3r9OW
+t7B+hV3r7wI7m5s7vViaUJfKMluPSGsXj3/dvh+k+r/0fVu3vi3/ACfnvZPad7q9
+7pXbdlOyzv8Atrs2e5mvJQXiHUu5Kuc9wGJc2FwpxC1vtjr+f9zy/W4LtZpPWaf2
+7/6P0PvuWw0LsrTvo1oGoC91i70+Ozv7udwIsNMiANzfXZBpG0MBoD44LGvW+Ver
+7NmnFODW5uMfpPe18O9/9xW2vd1Xt5pwc3R7WODTtGDxRxtLKJsETnDcXhmY8Su+
+ssj4H2eScm9s9PSfpHjJaAdVmLd6rzrreYH1CatcMFrLcJMNo8VKl6ONJVhKyqGE
+yGgPMpkbmxMG/NxQW9Nu4qphU+jdhqilDvSmQwegcPQbIpSDtWyV2LaeooTWu5Ho
+1rLdt6Lw7+m7aFhjeYcmcAOqMA72VHJQ9+U5a+wqBsg8VMjpwTjpSg7CQpXXW9Ge
+RwdK0nCjXA+kFJS+rCX0dtVRJl4rDSsy8UB1eIQI64DcBiVcooMlSSTUqNgOzHh4
+oNAeAKDYFMiDJxqqI6iAMijaOpxQKZONEEdTiq0OpxQHU4oDqcUB1OKA6nFAdTig
+OpxQHU4oDqcUB1OKA6nFB7N0Do6l29ezL5l0wzPOOClYhK47VFWs4I66tLKo7vp7
+vf61dra/2Zp3Zmk6TqllYQzWMV+6YQgusrUtLmMySGrnZRStAvNrxWXNfW+x93Tf
+jnHJcdO0eYg+rmhRnu+5e/uHSL/uXWBdNl0d1tC86fBEYbe1dNIXmOgNXZWngr/T
+vT0cP/ZrPK/ult9sentH5R3H37cX9tdaRomnt7f0W8eJNSjbK+4vL94NQ+9u5PXl
+ocQ3Bg/0rc1x6vDy/ZtnjrMS97+teEila4hrxUOVrlr6tD7TKCYjUO2wLFrpdPwc
+yjoZCwim9pWpXOyxsa7qxmvtAYrS6zLkXAIJCzUU2xIqd9VkdFripldVmeqZQrlc
+r4qDUIhc3BBObhirkWCTKmWcujbyuBBrjvVy76V05B94hczfSrSmXazMecMjmu6c
+m2M1x8ApXkZpCcTt8VBTnIxptQbWSFsRqfbd/go6T0T1MxrwP+CNRje87URT1P3l
+lSdRGlZmJ2fpQRnPiUMIzkoLBJQUCCepzQR1P3kB1P3kD51Gyl5QKXoEzlVodTig
+OpxQHU4oDqcUB1OKA6nFAdTigOpxQHU4oDqcUB1OKD9k1S0a0lzRtxwXpy58/Hh5
+iVuJoq8NjPShKIZpR01aoyKYrNd9VxYFHTDFOwH0I57auXK0BwriHI42Et4yJXM3
+b+SGs6pfK8zOmY4tdXDkFmxvOF0mW7ZmAyysGPFZnRuzyn5sEcha4H2XtwLVrLnL
+hF4yrajZtUNp7ufGaD0ojfG6oCzWtWoNBHFMt4FMcRRPVMKZAOZTJYoo48PAJlzw
+pfIGkNb67zu3K5DMblxcayHZwQw0xyZSFcrrcOvbXTKUOBS16dNmLU4I5R14T632
+h4lTLPLpL1cVjnEUe4OAwyo4akc4uPhTBoUyeKx8gbRg2NH+aOhWTUPNSkUOf+hR
+rDO6SiGFZfXaikz8FMgzqhg4Deo1hPU5KspzoDOgszDko2jOggvqgXPx80CF6Bc/
+HzVaGfj5oDPx80Bn4+aAz8fNAZ+PmgM/HzQGfj5oDPx80Bn4+aAz8fNB9BSf79s1
+xFcNvBdsulxtq8rcwhpdhTFay+fvpiua5hrsooxglKIsi1p3Yo66trTmAR6IpmZh
+vwWE2jiTggYDEFHm2iI5APXIxLSESVU2hpXl6FctLGghwc0nBZrSm7jqBcMBLhg9
+v60yzyT3JXNHlOwjaqeznFpbUY4HajlWqE7NqjejrMZQAkbVmvRIskYHNOGO4qSr
+YyAs2H1XN2+CtjlHLlmMkhitsf8AXNuHJWM2niibGMKlx9p52kqp4nIoh4krQo0s
+bKQRtQla2yhwoSjpOrj3DOjLmFcryjltMUrCKukJoG7Md6LqyulGJLsaoKuu0bK4
+bFhZVTpydgRtTnPNAZtiLIjMFGk50BnHigM/FAwf41QNn4oGzFAZuLkC5+KBCTyQ
+KXc0EF3NAuYqtDMUBmKAzFAZigMxQGYoDMUBmKAzFB9JwfyR/I2+hdavF6Ofdb/w
+Xp2rTG/w4s20/gkcL8KDt/JLBPgzdv5JHWfDbHu/Bo7a/B3+x+S9Ky1fT2cS5+1+
+B3o823wxN2D8Aq5z4A2fkEa7Lmf2KzWp8H+w78D7KjV+HOZ/L/Ib+S2z2UP2H/j9
+qOV+F0G0fgPSpW9Ph2G+yPwCld+yRu/BLks+HHvvZd+C9H611no4cnwz2v4Yf8d7
+X2f1pszPhr+2fwGz0rLXYp/sPSh2VO/sEZ7FH9h6UWfC9n9iq6T4Z7z2PyO0bUTf
+4cd2z8jt37FHOfBfH/jfSjXYm7/870IvZHyxVexPlqN9kO/+cua9h8sRrsX5ch2L
+8sQ7G+XIl+B8uReyz5ch2N8vRnsPl6HYfL0OxflyHYrv/nI12HyxDsr+WIdh8sQ7
+D5Yh2HyxDsPliHYfLEOw+WIdh8sQ7D5Yh2HyxDs//9k=
+
+------------NbTj16xyrFJgraG73IzlC0
+Content-Disposition: inline; filename=bg_bottom3.jpg
+Content-Type: image/jpeg; name=bg_bottom3.jpg
+Content-Location: http://sdip.gov.ua/inside/img/bg_bottom3.jpg
+Content-Transfer-Encoding: Base64
+
+/9j/4AAQSkZJRgABAgAAZABkAAD/7AARRHVja3kAAQAEAAAAUAAA/+4ADkFkb2Jl
+AGTAAAAAAf/bAIQAAgICAgICAgICAgMCAgIDBAMCAgMEBQQEBAQEBQYFBQUFBQUG
+BgcHCAcHBgkJCgoJCQwMDAwMDAwMDAwMDAwMDAEDAwMFBAUJBgYJDQsJCw0PDg4O
+Dg8PDAwMDAwPDwwMDAwMDA8MDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwM/8AA
+EQgAUgGkAwERAAIRAQMRAf/EAJMAAAIDAQEBAQAAAAAAAAAAAAADAgQFAQYHCAEB
+AQEBAQEBAAAAAAAAAAAAAAECAwQFBhAAAQMCBAMDCgQFAQkAAAAAAQACAxEEITES
+E0FRYXEiBYGRMpIjUxQ1hZXBQmIG0VIzNEVDobHxcoIkRBUHEQEBAQEAAgMAAgMB
+AQAAAAAAARECIZExEgNBgVFhIgQy/9oADAMBAAIRAxEAPwD1e/P75/rFet+E2jfn
+98/1ihtG/P75/rFDaN+f3z/WKG0b8/vn+sUNo35/fP8AWKG0b8/vn+sUNo35/fP9
+YobRvz++f6xQ2jfn98/1ihtG/P75/rFDaN+f3z/WKGpieb3z/WKqac2ef3z/AFii
+W1ZZPNxmf6xVZtWW3Evvn+sVcc7acLqXLdf6xVcr1TBcy+9f6xWmL1XfiJaEmZ9B
++oqyOd6rOku5XvPtn0H6j/FajlbTGXUx7rpn0OR1FU2pC4laO9M9or/MUxPtUmy3
+EztEcry3iS4gKUm1qxWo0DXNI5xzGoqa7T8/9uOa2KtC7OmLicVYlh8D5XyRNbI5
+gB72JReedvydNevuJyRK8RtFGN1FGu+71U/Dr+W1udiSRxikxqSTQpjX5fpeL5ek
+m3HtDg92IwoSmPZ1tmseUytJ9q6o6lMefrYrfESD/Vf5ys45fapNu5DlK4+UqYs7
+Vp/E59QgtnulmOFanSzrVaxL+lviHWAdbymWWd0tzJ6criSB0Cz18eGvz/5u35bD
+rmtHNkdrHEE4qc/7dr151pMvi5g9q7UB3qkrPXOPRP08Kk13JQtEjqHqVeXPrv8A
+w83d3EuNJH+crrHh76qky9liexxlfSuIqVpid2VvSySPg1NleQ8Y0JwTHo6t+pvh
+99JKw2kkrhJH/SeXHvLPUa/HvZn8pvuJo3OZI9wI6lSNddUjfkc4ASONXgOxPFb+
+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
+
+------------NbTj16xyrFJgraG73IzlC0
+Content-Disposition: inline; filename=bg_bottom2.jpg
+Content-Type: image/jpeg; name=bg_bottom2.jpg
+Content-Location: http://sdip.gov.ua/inside/img/bg_bottom2.jpg
+Content-Transfer-Encoding: Base64
+
+/9j/4AAQSkZJRgABAgAAZABkAAD/7AARRHVja3kAAQAEAAAAUAAA/+4ADkFkb2Jl
+AGTAAAAAAf/bAIQAAgICAgICAgICAgMCAgIDBAMCAgMEBQQEBAQEBQYFBQUFBQUG
+BgcHCAcHBgkJCgoJCQwMDAwMDAwMDAwMDAwMDAEDAwMFBAUJBgYJDQsJCw0PDg4O
+Dg8PDAwMDAwPDwwMDAwMDA8MDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwM/8AA
+EQgAUgAEAwERAAIRAQMRAf/EAFwAAQEBAAAAAAAAAAAAAAAAAAQFBgEBAQEBAQAA
+AAAAAAAAAAAAAAECBAYQAQACAQUBAAAAAAAAAAAAAAASE2EBApIDU5URAQADAAAA
+AAAAAAAAAAAAAAABEZH/2gAMAwEAAhEDEQA/ANXf3+2/lq63hLkaSoPMQKwUGwAL
+AAsyANmQCmA0gV/mst4//9k=
+
+------------NbTj16xyrFJgraG73IzlC0
+Content-Disposition: inline; filename=bg_top1.jpg
+Content-Type: image/jpeg; name=bg_top1.jpg
+Content-Location: http://sdip.gov.ua/inside/img/bg_top1.jpg
+Content-Transfer-Encoding: Base64
+
+/9j/4AAQSkZJRgABAgAAZABkAAD/7AARRHVja3kAAQAEAAAAUAAA/+4ADkFkb2Jl
+AGTAAAAAAf/bAIQAAgICAgICAgICAgMCAgIDBAMCAgMEBQQEBAQEBQYFBQUFBQUG
+BgcHCAcHBgkJCgoJCQwMDAwMDAwMDAwMDAwMDAEDAwMFBAUJBgYJDQsJCw0PDg4O
+Dg8PDAwMDAwPDwwMDAwMDA8MDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwM/8AA
+EQgAIAADAwERAAIRAQMRAf/EAFsAAAMBAAAAAAAAAAAAAAAAAAUGBwkBAQAAAAAA
+AAAAAAAAAAAAAAAQAAEBBgcAAAAAAAAAAAAAAAAB0QJSBAYW0pMUlAVVVhEBAAAA
+AAAAAAAAAAAAAAAAAP/aAAwDAQACEQMRAD8A2UseneikshxgFS0SQoAWAWrzo/1n
+Db+Xxgf/2Q==
+
+------------NbTj16xyrFJgraG73IzlC0
+Content-Disposition: inline; filename=menu_l.jpg
+Content-Type: image/jpeg; name=menu_l.jpg
+Content-Location: http://sdip.gov.ua/main/img/menu_l.jpg
+Content-Transfer-Encoding: Base64
+
+/9j/4AAQSkZJRgABAgAAZABkAAD/7AARRHVja3kAAQAEAAAAUAAA/+4ADkFkb2Jl
+AGTAAAAAAf/bAIQAAgICAgICAgICAgMCAgIDBAMCAgMEBQQEBAQEBQYFBQUFBQUG
+BgcHCAcHBgkJCgoJCQwMDAwMDAwMDAwMDAwMDAEDAwMFBAUJBgYJDQsJCw0PDg4O
+Dg8PDAwMDAwPDwwMDAwMDA8MDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwM/8AA
+EQgAFQFeAwERAAIRAQMRAf/EAHwAAQEBAQEAAAAAAAAAAAAAAAAIBwUJAQEAAwEB
+AAAAAAAAAAAAAAAAAgMEBQYQAAADCAMAAgEFAQAAAAAAAAABBhECktIDUwQFUhUX
+IQcSMUFhIhMUEQEAAAcBAQABAgcAAAAAAAAAASFhoQISIxQRAzFBkbHRIlITBP/a
+AAwDAQACEQMRAD8ArDY75Q5So0qY0+Tj0cnd5WFr8KpknUKm7Vy6jtJw6jzv5GTp
+G8TWOmbP2MaJfPrymWecc4Y4/v8AIfxbG79GfeL71RxxSo59+i8TtZx3JzzNx4yJ
+4ieIsT4NhkfyI74tng/6f8sb/wBEkesKO7RhenFusHI9WZ6wo7tGF6cNYHqzPWFH
+dowvThrA9WZ6wo7tGF6cNYHqzPWFHdowvThrA9WZ6wo7tGF6cNYHqzPWFHdowvTh
+rA9WZ6wo7tGF6cNYHqzPWFHdowvThrA9WZ6wo7tGF6cNYHqzPWFHdowvThrA9WZ6
+wo7tGF6cNYHqzPWFHdowvThrA9WZ6wo7tGF6cNYHqzPWFHdowvThrA9WZ6wo7tGF
+6cNYHqzPWFHdowvThrA9WZ6wo7tGF6cNYHqzPWFHdowvThrA9WZ6wo7tGF6cNYHq
+zPWFHdowvThrA9WZ6wo7tGF6cNYHqzPWFHdowvThrA9WZ6wo7tGF6cNYHqzPWFHd
+owvThrA9WZ6wo7tGF6cNYHqzPWFHdowvThrA9WZ6wo7tGF6cNYHqzPWFHdowvThr
+A9WZ6wo7tGF6cNYHqzPWFHdowvThrA9WZ6wo7tGF6cNYHqzPWFHdowvThrA9WZ6w
+o7tGF6cNYHqzPWFHdowvThrA9WZ6wo7tGF6cNYHqzPWFHdowvThrA9WZ6wo7tGF6
+cNYHqzPWFHdowvThrA9WZ6wo7tGF6cNYHqzPWFHdowvThrA9WZ6wo7tGF6cNYHqz
+d13dYmv+3EBl5+ZRwcDE3+jrZubkVHaVGjRcy6T1SpUqPmTrrrrpGZmZsIhH9mmE
+YQ/NjGP6fYfzXvpVX9V6z7EWS5q/d6WqY6lxsLExtBT3uA7juFi0nXTr1XTr/wBq
+pmRk6ZMY6Z/q34pjCPz58d3D8n4cfy5Z/wCzGfyX2Dxr7Q+Q1PInaHyAO0PkAdof
+IA7Q+QB2h8gDtD5AHaHyAO0PkAdofIA7Q+QB2h8gDtD5AHaHyAO0PkAdofIA7Q+Q
+B2h8gDtD5AHaHyAO0PkAdofIA7Q+QB2h8gDtD5AHaHyAO0PkAdofIA7Q+QB2h8gD
+tD5AHaHyAO0PkAdofIA7Q+QB2h8gDtD5AHaHyAO0PkAdofIA7Q+QB2h8gD7Lf+1T
+2tb/AK8fQOuf50vwOlWqmRu/j8Gw6ZPF/LTEINn5fn3++3xkjV9b0seRKJTUcq2G
+r+3pY8iUJnKthq/t6WPIlCZyrYav7eljyJQmcq2Gr+3pY8iUJnKthq/t6WPIlCZy
+rYav7eljyJQmcq2Gr+3pY8iUJnKthq/t6WPIlCZyrYav7eljyJQmcq2Gr+3pY8iU
+JnKthq/t6WPIlCZyrYav7eljyJQmcq2Gr+3pY8iUJnKthq/t6WPIlCZyrYav7elj
+yJQmcq2Gr+3pY8iUJnKthq/t6WPIlCZyrYav7eljyJQmcq2Gr+3pY8iUJnKthq/t
+6WPIlCZyrYav7eljyJQmcq2Gr+3pY8iUJnKthq/t6WPIlCZyrYav7eljyJQmcq2G
+r+3pY8iUJnKthq/t6WPIlCZyrYav7eljyJQmcq2Gr+3pY8iUJnKthq/t6WPIlCZy
+rYav7eljyJQmcq2Gr+3pY8iUJnKthq/t6WPIlCZyrYav7eljyJQmcq2Gr+3pY8iU
+JnKthq/t6WPIlCZyrYav7eljyJQmcq2Gr+3pY8iUJnKthq/t6WPIlCZyrYav7elj
+yJQmcq2Gr+3pY8iUJnKthq/t6WPIlCZyrYav7eljyJQmcq2f/9k=
+
+------------NbTj16xyrFJgraG73IzlC0
+Content-Disposition: inline; filename=menu_r.jpg
+Content-Type: image/jpeg; name=menu_r.jpg
+Content-Location: http://sdip.gov.ua/main/img/menu_r.jpg
+Content-Transfer-Encoding: Base64
+
+/9j/4AAQSkZJRgABAgAAZABkAAD/7AARRHVja3kAAQAEAAAAUAAA/+4ADkFkb2Jl
+AGTAAAAAAf/bAIQAAgICAgICAgICAgMCAgIDBAMCAgMEBQQEBAQEBQYFBQUFBQUG
+BgcHCAcHBgkJCgoJCQwMDAwMDAwMDAwMDAwMDAEDAwMFBAUJBgYJDQsJCw0PDg4O
+Dg8PDAwMDAwPDwwMDAwMDA8MDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwM/8AA
+EQgAFQAGAwERAAIRAQMRAf/EAG0AAQEAAAAAAAAAAAAAAAAAAAcGAQACAwAAAAAA
+AAAAAAAAAAABAwIEBhAAAAQEAwkAAAAAAAAAAAAAARECAxITBAUAFAYhMUFRIjKk
+FQcRAAIBAwUBAAAAAAAAAAAAAAABAhEhMVFxocEDE//aAAwDAQACEQMRAD8Aurp9
+W1MF60y4mqbSkap5C2gSMKgyr4mPUewQ54tUMUveTvoA1yuZ3PToxbqt0fFfxJiY
+4e3YU1o649jZ5rdpmTnctAt6COS4cZpPtiIuOBcbH50eeD//2Q==
+
+------------NbTj16xyrFJgraG73IzlC0
+Content-Disposition: inline; filename=styles.css
+Content-Type: text/css; name=styles.css
+Content-Location: http://sdip.gov.ua/inside/css/styles.css
+Content-Transfer-Encoding: 8bit
+
+body {
+	margin:0px;
+	padding:0px;
+	background-color:white;
+	overflow: auto;
+	color:#000000;
+	font-size:75%;
+	font-family:Arial;
+    background-attachment: fixed;
+}
+table {
+	border:0;
+	margin:0;
+	padding:0;
+	font-size:1em;
+}
+table td{
+	vertical-align:top;
+}
+td#content_box td {
+	vertical-align:inherit;
+}
+
+blockquote {
+	text-align:left;
+}
+
+a img {
+	border:0;
+}
+a {
+	color:#A54300;
+	text-decoration:none;
+	font-size:12px;
+	font-weight: bold;
+}
+
+a:hover{
+	text-decoration:underline;
+}
+
+h1{
+	color:#54837c;
+	font-size:19px;
+	font-family:Times New Roman;
+	font-weight:bold;
+	padding:0px 0px 0px 0px;
+	margin:0px 0px 0px 0px;
+}
+h2{
+	color:#7d7d7d;
+	font-size:17px;
+	font-family:Times New Roman;
+	font-weight:normal;
+	padding:0px 0px 0px 0px;
+	margin:0px 0px 0px 0px;
+}
+h3{
+	color:#a54300;
+	font-size:20px;
+	font-family:Times New Roman;
+	font-weight:normal;
+	padding:0px 0px 0px 0px;
+	margin:10px 0px 0px 10px;
+}
+table#pages{
+	margin:0px 0px 0px 0px;
+	text-align:center;
+	height:28px;
+}
+table#pages td{
+	padding:6px 0px 0px 0px;
+}
+table#pages a{
+	color:#487871;
+	font-size:14px;
+	padding:0px, 0px, 0px, 0px;
+}
+.now{
+	font-size:15px;
+	padding:0px, 0px, 0px, 0px;
+	color:#a54300;
+}
+td.goto{
+	background:url('/inside/img/go.jpg') no-repeat 0 0;
+	height:33px;
+}
+.bg_a1{
+	font-size:10px;
+	color:#ffffff;
+	display:block;
+	height:27px;
+	weight:28px;
+	background:url('/inside/img/bg_a1.jpg') no-repeat 0 0;
+	padding:7px 8px 5px 4px;
+	margin:10px 0px 0px 0px;
+}
+.bg_bottom1{
+	background-image:url('/inside/img/bg_bottom1.jpg');
+        background-repeat:no-repeat;
+        background-position:center;
+	width:420px;
+	height:82px;
+	color:#ffffff;
+	padding:10px 0px 0px 0px;
+	font-size:8pt;
+}
+.bg_bottom2{
+	background-image:url('/inside/img/bg_bottom3.jpg');
+        background-repeat:no-repeat;
+        background-position:center;
+	width:420px;
+	height:82px;
+	color:#ffffff;
+	padding:10px 0px 0px 0px;
+	font-size:8pt;
+	text-align:right;
+}
+.bg_bottom3{
+	background-image:url('/inside/img/bg_bottom2.jpg');
+        background-repeat:repeat-x;
+        background-position:center;
+}
+table#kat{
+
+	width:233px;
+}
+table#kat td{
+
+	padding-top:10px;
+}
+table#kat2{
+	width:233px;
+	height:86px;
+	margin:0px 0px 20px 0px;
+}
+table#kat2 td{
+	background:url('/main/img/kat8.jpg') repeat-y 0 0;
+	padding:0px 0px 0px 0px;
+}
+table#kat2 td div{
+	background:url('/main/img/kat7.jpg') no-repeat 0 100%;
+	padding:10px 10px 10px 10px;
+	display:block;
+}
+table#kat2 a{
+	display:block;
+	margin:0px 0px 0px 0px;
+	padding:0px;
+	border:0px solid red;
+}
+table#kat2 a img{
+	padding:0px 0px 0px 0px;
+	margin:1px 0px 0px 0px;
+}
+table#news{
+	margin:0px 0px 0px 0px;
+	width:100%;
+}
+table#news td{
+	padding:0px 0px 0px 0px;
+}
+table#news b{
+	vertical-align:middle;
+	color:#487871;
+	font-size:17px;
+	font-weight:bold;
+	font-family: Times New Roman;
+	padding:10px 0px 0px 0px;
+	margin:0px;
+
+}
+table#news span{
+	vertical-align:bottom;
+ 	color:#7B9E98;
+	font-size:12px;
+	font-weight:bold;
+	padding:10px 0px 0px 0px;
+	margin:0px;
+/*	display:block;
+	text-align:right;
+	max-width:65px;*/
+}
+table#news p,table#news div{
+	/*text-align:justify;*/
+	padding:0px 0px 0px 0px;
+	margin:0px;
+/*	font-size:11px;*/
+
+}
+
+table#news img.pic{
+	border: 4px double #9d9d9d;
+	margin:10px;
+}
+.all_news{
+	paddind:0px;
+	margin:0px;
+	margin-right:5px;
+	font-size:18px;
+	font-weight:normal;
+	font-family:Arial;
+}
+.bg_search1{
+	background-image:url('/inside/img/bg_search.jpg');
+	background-repeat:repeat-x;
+	background-position:center;
+	padding:15px 0px 0px 0px;
+}
+.bg_search2{
+	background-image:url('/inside/img/bg_search1.jpg');
+	background-repeat:no-repeat;
+	background-position:center;
+	width:196px;
+	padding:0px 0px 0px 0px;
+}
+.bg_search2 a{
+	margin:20px 0px 0px 80px;
+	display:block;
+	color:#ffffff;
+}
+.search1{
+	width:575px;
+	height:20px;
+	padding:0px 0px 0px 0px;
+	margin:0px 0px 0px 30px;
+	border:1px solid #a6a6a6;
+}
+.white{
+	color:#ffffff;
+}
+.grey{
+	color:#a54300;
+}
+table#search3{
+	margin:0px 0px 20px 0px;
+	border:1px solid #b7b7b7;
+	background-image:url('/inside/img/bg_pad.jpg');
+	background-repeat:no-repeat;
+	background-position:100% 100%;
+}
+table#search3 td{
+	padding:0px 0px 5px 0px;
+}
+table#search3 label{
+	font-size:11px;
+}
+.pad1{
+	color:#ffffff;
+	font-weight:bold;
+	background-image:url('/inside/img/pad3.jpg');
+	background-repeat:repeat-x;
+	background-position:center;
+	padding:5px 0px 0px 10px;
+}
+.pad1 a{
+	color:#ffffff;
+	font-weight:bold;
+}
+table#pad2{
+	margin:0px 0px 20px 0px;
+	border:1px solid #b5b5b5;
+	background-image:url('/inside/img/bg_pad.jpg');
+	background-repeat:no-repeat;
+	background-position:100% 100%;
+}
+table#pad2 img{
+	margin:20px 10px 10px 0px;
+}
+table#pad2 p{
+	margin:20px 20px 0px 0px;
+}
+table#pad4{
+	margin:0px 0px 20px 0px;
+	border:1px solid #b5b5b5;
+	background-image:url('/inside/img/bg_pad2.jpg');
+	background-repeat:no-repeat;
+	background-position:100% 100%;
+}
+table#pad4 img{
+	margin:20px 10px 10px 0px;
+}
+table#pad4 p{
+	margin:20px 20px 0px 0px;
+}
+ul#pad3{
+	list-style:none;
+	margin:10px 0px 0px 20px;
+	padding:0px 0px 0px 0px;
+}
+ul#pad3 li{
+	padding:5px 0px 0px 0px;
+}
+.pad_hn{
+	background-image:url('/inside/img/bg_pad3.jpg');
+	background-repeat:repeat-x;
+	background-position:100% 0;
+}
+}
+ul#ul1{
+	list-style:none;
+	margin:0px 0px 0px 0px;
+	padding:0px 0px 0px 0px;
+	width:100%;
+	display:block;
+	border:1px solid red;
+}
+ul#ul1 li{
+	float:left;
+	position:relative;
+	display:block;
+	width:auto;
+	padding:0px 0px 0px 0px;
+	margin:0px 1px 0px 0px;
+	height:20px;
+	background-image:url('/main/img/bg_ul3.jpg');
+        background-position:0px 0px;
+        background-repeat:no-repeat;
+}
+ul#ul1 li a{
+	color:#ffffff;
+	font-size:11px;
+	font-weight:bold;
+	padding:3px 15px 3px 10px;
+	margin:0px 0px 0px 12px;
+	display:block;
+	background-image:url('/main/img/bg_ul4.jpg');
+        background-position:100% 0;
+        background-repeat:no-repeat;
+}
+#pad5{
+	border:1px solid #487871;
+	background-image:url('/inside/img/bg_pad3.jpg');
+        background-position:0 0;
+        background-repeat:repeat-x;
+        margin:0px 0px 0px 0px;
+        width:680px;
+        height:76px;
+}
+#pad5 img{
+	margin:0px 10px 0px 40px;
+}
+#pad5 b{
+	font-size:24px;
+}
+#top{
+	background-image:url('/inside/img/bg_top1.jpg');
+        background-position:0 0;
+        background-repeat:repeat-x;
+	height:32px;
+}
+.text1{
+	width:124px;
+	height:20px;
+	border:1px solid #a6a6a6;
+	margin:5px 10px 0px 0px;
+}
+.bg_top1{
+	background-image:url('/inside/img/bg_top2.jpg');
+        background-position:0 0;
+        background-repeat:repeat-x;
+}
+.bg_top2{
+	background-image:url('/inside/img/bg_top3.jpg');
+        background-position:0 0;
+        background-repeat:repeat-x;
+}
+table#table1{
+	background-image:url('/inside/img/bg_top4.jpg');
+        background-position:0 0;
+        background-repeat:repeat-x;
+	height:44px;
+}
+ul#menu1{
+	list-style:none;
+	margin:0px 0px 0px 20px;
+	padding:0px;
+}
+ul#menu1 li{
+        float:left;
+        height:22px;
+        padding-left:0px;
+        text-align:center;
+        position:relative;
+}
+ul#menu1 li a{
+        color:#000000;
+        text-decoration:none;
+	font-weight:normal;
+        background-image:url('/inside/img/li.jpg');
+        background-position:7px 2px;
+        background-repeat:no-repeat;
+        padding:0px 0px 0px 15px;
+        line-height:18px;
+}
+ul#menu1 li.clear a{
+	background:none;
+}
+ul#menu1 li a:hover{
+	text-decoration:underline;
+/*	font-weight:bold;*/
+}
+table#menu2{
+	width:100%;
+	height:22px;
+	background-image:url('/inside/img/bg_div.jpg');
+	background-repeat:repeat-x;
+	background-position:center;
+	padding:0px 0px 0px 0px;
+/*	border:1px solid red;*/
+}
+/***********************************************************************************/
+ul.menu{
+	list-style:none;
+	margin:0px 0px 0px 0px;
+	padding:0px 0px 0px 0px;
+	width:auto;/*���� auto; ��� 100% �� �� ���讬 ��࠭� �� �ﭥ���...(((*/
+	display:block;
+
+	/*border:1px solid red;*/
+
+
+}ul.menu li{
+	/*border:1px solid blue;*/
+    float:left;
+	display:block;
+	width:auto;
+    height:21px;
+	padding:0px 0px 0px 0px;
+	margin:0px 2px 2px 0px;
+    background-image:url('/main/img/menu_l.jpg');
+    background-position:0px 0px;
+    background-repeat:no-repeat;
+    position:relative;
+
+}
+ul.menu li a{
+	background-image:url('/main/img/menu_r.jpg');
+    background-position:100% 0;
+    background-repeat:no-repeat;
+	color:#ffffff;
+	font-size:12px;
+	font-family:Arial;
+	font-weight:bold;
+	padding:3px 5px 0px 5px;
+	margin:0px 0px 0px 14px;
+	text-decoration:none;
+	display:block;
+}
+ul.menu li a:hover{
+	text-decoration:underline !important;
+	color:#ffffff;
+}
+
+/*for forum*/
+ul.menu li a:visited{
+	text-decoration:none;
+	color:#ffffff;
+}
+
+ul.menu li ul{
+	display:none;
+	position:absolute;
+	list-style:none;
+	height:auto;
+	width:186px;
+	margin:0px 0px 0px 0px;
+	/*border:1px  solid green;*/
+	border-color:#4c7c76;
+
+}
+ul.menu li li{
+	width:186px;
+	height:auto;
+	padding:0px;
+	margin:0px;
+	text-align:left;
+	display:block;
+	display:inline;
+}
+
+
+ul.menu li li a{
+	font-weight:normal;
+	color:#ffffff;
+	font-size:14px;
+	font-family:Times New Roman;
+	line-height:1em;
+	text-decoration:none;
+	border:none;
+	display:block;
+	margin:0px;
+	padding:5px 5px 6px 20px;
+	background-image:url('/main/img/bg_menu1.jpg');
+	background-position:0 0;
+	background-repeat:no-repeat;
+}
+ul.menu li li a:hover{
+	background-image:url('/main/img/bg_menu2.jpg');
+	color:#477771 !important;
+	text-decoration:none;
+}
+ul.menu li li a:visited{
+	color:#ffffff;
+}
+
+.menu li:hover ul,
+.menu li ul:hover,
+.menu li.jshover ul,
+.menu li ul.jshover{
+	display:block;
+	left:5px;
+	top:20px;
+	padding:0px;
+	margin:0px;
+}
+/*#menu li:hover ul,
+#menu li ul:hover,
+#menu li.jshoverRight ul,
+#menu li ul.jshoverRight{
+	display:block;
+	left:5px;
+	top:20px;
+	padding:0px;
+	margin:0px;
+}*/
+ul.menu ul ul,
+ul.menu ul ul ul {
+  display: none;
+  position: absolute;
+  top: 0;
+
+}
+
+/* Do Not Move - Must Come Before display:block for Gecko */
+ul.menu li:hover ul ul,
+ul.menu li:hover ul ul ul,
+ul.menu li.jshover ul ul,
+ul.menu li.jshover ul ul ul {
+  display: none;
+}
+
+
+
+ul.menu ul li:hover ul,
+ul.menu ul ul li:hover ul,
+ul.menu ul li.jshover ul,
+ul.menu ul ul li.jshover ul {
+  display: block;
+  left:186px;
+  top:5px;
+}
+.vacform {
+border:1px solid #487871;
+width:100%;
+}
+.vaclist{
+ padding:5px;
+}
+.vacform td{
+vertical-align:middle;
+}
+.green{
+	color:#7B9E98;
+}
+.pads{
+	cursor:pointer;
+}
+.ar{
+	cursor:pointer;
+}
+.go_forum{
+	padding:7px 10px 10px 33px;
+	margin:40px 0px 0px 20px;
+	color:#000000;
+	font-size:11px;
+	line-height:12px;
+	display:block;
+	background:url('/inside/img/go_forum.gif') no-repeat 0 0;
+}
+h2 .navigation{
+	font-size:12px;
+	font-family:Arial;
+
+}
+.navigation_f{
+	font-size:12px;
+	font-family:Arial;
+}
+.img_border{
+	border: 4px double #9d9d9d;
+	margin: 5px, 8px, 5px, 5px;
+}
+
+
+table .room {
+	background-color:#487871;
+	margin:0;
+	padding:0;
+	width:90%;
+}
+.room td {
+	background:#e6ecec;
+	padding:1px,5px,1px,5px;
+	vertical-align:middle;
+
+}
+.room textarea {
+	width:100%;
+	margin:5px;
+	font-family:Arial;
+}
+.room .left {
+	background:#c1d1d0;
+}
+.room  .head td{
+	background: #7b9e98;
+	height:30px;
+	vertical-align:middle;
+	text-align:center;
+	font-size:16px;
+	font-weight:bold;
+
+	color:#fff;
+}
+.room  .subhead td{
+	background:#c1d1d0;
+}
+.room a{
+	font-size:1em;
+	cursor:pointer;
+}
+.img_border{
+	border: 4px double #9d9d9d;
+	margin: 5px 8px 5px 5px !important;
+}
+.img_noborder{
+	margin: 5px 8px 5px 5px !important;
+}
+
+.child td{
+	padding:5px 0px 5px 10px;
+}
+.child h1{
+	color:#54837c;
+	font-size:19px;
+	font-family:Times New Roman;
+	font-weight:bold;
+	padding:0px 0px 0px 0px;
+	margin:0px 0px 0px 0px;
+}
+.child h3{
+	color:#a54300;
+	font-size:20px;
+	font-family:Times New Roman;
+	font-weight:normal;
+	padding:0px 0px 0px 0px;
+	margin:0px 0px 0px 0px;
+}
+.content a {
+	font-size:1em;
+	font-family:Arial;
+}
+.links_titles {
+	vertical-align:middle;
+	color:#7B9E98;
+	font-size:17px;
+	font-weight:normal;
+	font-family:Times New Roman;
+	padding:0px 0px 0px 0px;
+	margin:0px;border:0px solid red;
+}
+.links_link {
+	vertical-align:middle;
+	color:#000000;
+	font-size:17px;
+	font-weight:normal;
+	font-family:Times New Roman;
+	padding:0px 0px 0px 0px;
+	margin:0px;border:0px solid red;
+}
+center.content {
+	width: 100%;
+}
+
+/* змист */
+
+/*Стиль шрифта*/
+
+.zmist_font					{font-family: Tahoma;Verdana;Garamond; font-size:11px; color: #000000;line-height:16px;}
+.zmist_title				{font-family: Tahoma;Verdana;Garamond; font-size:12px; color: #4b7e76; }
+.zmist_title b				{font-family: Tahoma;Verdana;Garamond; font-size:12px; color: #4b7e76; }
+.zmist_texts				{font-family: Garamond; font-size:18px; color: #676769;line-height:16px;}
+.zmist_copyright_font		{font-family: Garamond; font-size:16px; color: #676769;line-height:16px;}
+.zmist_title_green			{font-family: Verdana; font-size:24px; color: #32989a;}
+.zmist_font_green			{font-family: Verdana; font-size:18px; color: #32989a;}
+
+/*Стиль ссылок*/
+
+zmist_a                        {FONT: 16px Garamond; color: #676769; TEXT-DECORATION: underline}
+zmist_a:hover                  {FONT: 16px Garamond; COLOR: #676769; TEXT-DECORATION: none}
+zmist_a:active                 {FONT: 16px Garamond; COLOR: #676769; TEXT-DECORATION: none}
+
+.zmist_link               {FONT: 11px tahoma;Garamond; color: #4b7e76; TEXT-DECORATION: underline;}
+.zmist_link:hover         {FONT: 11px tahoma;Garamond; COLOR: #4b7e76; TEXT-DECORATION: none;}
+.zmist_link:active        {FONT: 11px tahoma;Garamond; COLOR: #4b7e76; TEXT-DECORATION: none;}
+
+/*Рассширеный поиск*/
+select.s_box {
+	border : 1px inset #646464;
+	background: #FFFFFF;
+	font-family: Arial, Geneva, Arial, Helvetica, sans-serif;
+	color:#5f5f5f;
+	font-size:10px;
+	width: 250px;
+}
+
+select.s_box_long {
+	border : 1px inset #646464;
+	background: #FFFFFF;
+	font-family: Arial, Geneva, Arial, Helvetica, sans-serif;
+	color:#5f5f5f;
+	font-size:10px;
+	width: 503px;
+}
+
+tr.reestr_table_tr_caption {
+	background: #7ea39e;
+	font-size:1em;
+}
+tr.reestr_table_tr_caption td{
+	text-align: center;
+	color: #333333;
+	font-size:1em;
+}
+tr.reestr_table_tr_light td{
+	background: #f0f0f0;
+	font-family: Arial, Geneva, Arial, Helvetica, sans-serif;
+	font-size:1em;
+	color: black;
+	vertical-align: top !important;
+}
+tr.reestr_table_tr_dark td{
+	background: #e0e0e0;
+	font-family: Arial, Geneva, Arial, Helvetica, sans-serif;
+	font-size:1em;
+	color: black;
+	vertical-align: top !important;
+}
+div.reestr_table_tr_fio{
+	color: #a54300;
+	font-weight:bold;
+	font-family: Arial, Geneva, Arial, Helvetica, sans-serif;
+	font-size:1em;
+	display:inline;
+}
+
+div.reestr_table_tr_fio a{
+	color: #a54300;
+	font-weight:bold;
+	font-family: Arial, Geneva, Arial, Helvetica, sans-serif;
+	font-size:1em;
+	display:inline;
+}
+------------NbTj16xyrFJgraG73IzlC0
+Content-Disposition: inline; filename=calendar.css
+Content-Type: text/css; charset=windows-1251; name=calendar.css
+Content-Location: http://sdip.gov.ua/inside/css/calendar.css
+Content-Transfer-Encoding: 8bit
+
+.dynCalendar_header{
+	font-family: Arial, Verdana, Helvetica, Sans-Serif;
+	font-size: 10pt;
+	font-weight: bold;
+}
+.dynCalendar_dayname {
+	background-color: #eeeeee;
+	border: 1px solid #c0c0c0;
+	font-family: Arial, Verdana, Helvetica, Sans-Serif;
+	font-size: 8pt;
+	text-align: center;
+}
+
+.dynCalendar_day {
+	background-color: #eeeeee;
+	color: #000000;
+	font-family: Arial, Verdana, Helvetica, Sans-Serif;
+	font-size: 8pt;
+}
+
+.dynCalendar_today {
+	background-color: #ffffff;
+	border: 1px solid #c0c0c0;
+	font-family: Arial, Verdana, Helvetica, Sans-Serif;
+	font-size: 8pt;
+}
+
+.dynCalendar {
+	background-color: #c0c0c0;
+	border: 2px outset white;
+	visibility: hidden;
+	position: absolute;
+	top: 1px;
+	left: 1px;
+}
+
+------------NbTj16xyrFJgraG73IzlC0
+Content-Disposition: inline; filename=navy5.jpg
+Content-Type: image/jpeg; name=navy5.jpg
+Content-Location: http://sdip.gov.ua/inside/img/navy5.jpg
+Content-Transfer-Encoding: Base64
+
+/9j/4AAQSkZJRgABAgAAZABkAAD/7AARRHVja3kAAQAEAAAAUAAA/+4ADkFkb2Jl
+AGTAAAAAAf/bAIQAAgICAgICAgICAgMCAgIDBAMCAgMEBQQEBAQEBQYFBQUFBQUG
+BgcHCAcHBgkJCgoJCQwMDAwMDAwMDAwMDAwMDAEDAwMFBAUJBgYJDQsJCw0PDg4O
+Dg8PDAwMDAwPDwwMDAwMDA8MDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwM/8AA
+EQgAHQBzAwERAAIRAQMRAf/EAJMAAAICAwEBAAAAAAAAAAAAAAcIBAYABQkBAwEA
+AgIDAQAAAAAAAAAAAAAABAYABQIDBwEQAAEDAwIFAwIFBAMAAAAAAAIBAwQRBQYA
+EiEiExQHMUEyFghRYXFSFYGxklNCYiMRAAECBQMACQUAAwEAAAAAAAERAgAhEgME
+MUEFUWFxgZEiIxQG8KHBMhOx4RUk/9oADAMBAAIRAxEAPwDu7qRjFRyzLGcaYjss
+RSul8uZK1Z7O2SCTpp6kZLwBsf8AkS6xc4ARk1pcUECu4OZ9cVF2R5OiY88vztdo
+tbUhpr32q/IdEjVPRVon6aDdn22lNYObx1xwXSJMbLMwxVoZFzvMTPbI1Rbg43FG
+Dco4qtFcEBMm3RH3RFRdZ2sy28oqRhdwbjBosGy3XCHdoMW5QHkkQ5jaOx3R9xX+
+yp6Kmi4CibqRIDd0zG/36RLYxWdBx6wxHDjllUxtJTkp0OBdkwhiJAn7yWi+2h7u
+Sy3qYJs4r7mgisxhzqK8r4eX0nGNVCLNs0dI5r7IStPbkr+WtA5G2TBJ424kEbD8
+2evE17Hb/FatuSxW+oCMH1Is1r/bGNePpxUC4p+dNF27jXhWlYCu2XWyhEETWyNU
+aXIL9Bxu2PXOdU9qo3Eht8XZL5V6bDSUWpGqfhREqS0FFVPCUj0BSkBy4zc/u49a
+TnELCDJdwWa2wQnuNivoj0h5wUUk99qImg351tp1WDrfH3HBUjyHe88x1rufqmHn
+8VnnmWyTDC3zFbFOZWHWjMCJE47STjqMzrbjqkS5x9xoVIMePX+35Nao92tpqTD9
+UNs0obbg/Js09iFfXRkAEJG717EjNSJCaedcxm4pe7fdFOhXuRMtMAq8WwigHAfw
+qquf5fppV+TZ7sZtsAycXeIA/wBw3/FePbkm4SJtDT3Elf8AAibhKSyt9tmvQGMv
+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
+fFbEnUiR/9k=
+
+------------NbTj16xyrFJgraG73IzlC0
+Content-Disposition: inline; filename=pr.png
+Content-Type: image/png; name=pr.png
+Content-Location: http://sdip.gov.ua/inside//img/pr.png
+Content-Transfer-Encoding: Base64
+
+iVBORw0KGgoAAAANSUhEUgAAABQAAAATCAMAAACnUt2HAAAABGdBTUEAAK/INwWK
+6QAAABl0RVh0U29mdHdhcmUAQWRvYmUgSW1hZ2VSZWFkeXHJZTwAAAHRUExURf//
+/xBhRV1hYfL2+uHr5+fu9uzy+Pj7/Nra493d5ejo7uTs8qG9tb3Izf7+/t/p511i
+Yurw8Y+0qoyqpVmEecHVzvP3+svY1R1qT83e2NLU3szb1q+/wabBucrL0qjCu8rP
+0brEyeDq54ejmjd5YsfZ02WPgOLr6LXIxmeYiJyyrLPIw5G2q2OShj+AaZy9tY6w
+p+Lr7sDDwpq8scbMzo6inOfq7CRnUO3y92ZsbM3OzsrNzFmRfu3y+Ki9uMjLytXj
+3tzf5BhkSfD189be4I+qoqe8tqO7s8/Q2+/0+bXJwrPHw9HR2+nw7nh4edbY2uXl
+65Wup8DFw8fa0520rnt7fNTi3V1hYs/f2c3S1fn7/bK8wc7Q0yVvVvj6/L3EwXiW
+jNnc4D1xYpqyqt7e5C10XMLHxsXJyG6fjsnLz8bGzpCrouPj6qC6tevx801+cF+N
+fdzn49XV35S4sNXZ3Ojo7c7e2MDVzk9+buLs6JStpt3d5GSXhdXf3X6XjpGqp2yY
+jdfX4cLKy/3+/nCgj+Xm6VOFdd/h59Pc3ujw7dHV2e7u8ePl6KjBwHajlLjFwpu5
+sE2JdNvn4+Xl6fT4+8DSzIGgmbrRyePk6cXR04+0q9dP4GkAAADhSURBVHjaYmDA
+DURZWFiU+PlRBaUZGJrjmMVQBacy8LEzs3miCnqBxFgtUAXdo4Bi3Hl1yGLCyVNs
+WbkNBZXr4UIzcwIS9ItnCekYm3JwyEDEDLi4Jqu1ZNjopcZWFPV6iIAFJ3SXxtRM
+lGAEAvMUTs5pYMG+2tZ+FUYwcPLvES8AC2ryyHu7aVW5ZgeG2GnL8rSBBRt4owWY
+ICDcUpE3Hyyo25gVamVtn54WFG/k5yOVBLFew6XauVN9UpikaoRcRy7cpWa+lYUO
+ZcHl05uQfDSj3TGxpCtSwSSTgTQAEGAAgUkvP9fYTP8AAAAASUVORK5CYII=
+
+------------NbTj16xyrFJgraG73IzlC0
+Content-Disposition: inline; filename=kat22.jpg
+Content-Type: image/jpeg; name=kat22.jpg
+Content-Location: http://sdip.gov.ua/i/actuals/kat22.jpg
+Content-Transfer-Encoding: Base64
+
+/9j/4AAQSkZJRgABAgAAZABkAAD/7AARRHVja3kAAQAEAAAAZAAA/+4ADkFkb2Jl
+AGTAAAAAAf/bAIQAAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEB
+AQEBAQEBAQICAgICAgICAgICAwMDAwMDAwMDAwEBAQEBAQECAQECAgIBAgIDAwMD
+AwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMD/8AA
+EQgANAAzAwERAAIRAQMRAf/EAJ4AAAEEAgMAAAAAAAAAAAAAAAcGCAkKAAUBAwQB
+AAIBBQEBAAAAAAAAAAAAAAAIBwIDBAUGAQkQAAEEAQIEBAUCBgMAAAAAAAIBAwQF
+BhEHABITCCEUFRYxIjIjCWEkUUJSNhcYcnM1EQACAQMDAgQCCAQHAAAAAAABAgMR
+BAUAEgYhQTFREwdhInGRMkIjFBUIseGCM4Gh0aIkFhf/2gAMAwEAAhEDEQA/AL+x
+mLYkZkIAAqRmSoIiIpqpEq6IiIieK8GjTCN1e8S4kZPM2x7bsQHc7NoxHHs8keNU
+wrHHRUmnTkSwdYCwWG8iI6vWYjiSEHVVwVbSh3VF3MQFGq0jeQ7UFW0HbTbnuqzl
+h2XuD3YFhEqV9w8Y27xrzMCuIkVFjNzYlvjExVES8VV15NU8DXwJdRPnLOFiK1p5
+H+WtzBgb2ZQSCtfPWoqNku4HGhckYn3oZe7PT5mouT4xIdr3iRUVAddsstyltsDU
+URdI5aIq8WY+Q2bmhqo+J/lq9Lxy8jWq/MfgNLah7s98Nl7evo+5zDYFzis98YkL
+dHAmTeiDogCLs6CzztSiUUJxwQGNJ5U+SOei6bmG4huF3xMCNaSe2mt22SqVPx1J
+DjmSUWXUtfkWNWsK6pLWM3LgWVe+3JiyWHRQhNt1tSFfBfFPii+C8X9WNbvg0aYV
+3kbtW0KCm1GJzjr5VzEjuZhbRzNuTEq7N5YtfRQ329DZl3biF1TDVxthOVOUnQMc
+LIX1vjbOS9ujSGNan49gB8SaADzOs/G4+4yl7HY2orNI1B8O5J+AFST5DQe2ffxj
+G6aZQ47+xxXGWoL+ZXdQyLtzlF7YvpArKetUdSkTrmfrGhNpqDbIG5pyiqLFDcok
+zdzK7MyYy3pv2dSxY7Uij82dvlX4BmPQU1Lg4qmCtoo1QNlLiuzf0VVVdzyyeSRr
+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
+ea3/AAaNZwaNf//Z
+
+------------NbTj16xyrFJgraG73IzlC0
+Content-Disposition: inline; filename=kat5.jpg
+Content-Type: image/jpeg; name=kat5.jpg
+Content-Location: http://sdip.gov.ua/i/actuals/kat5.jpg
+Content-Transfer-Encoding: Base64
+
+/9j/4AAQSkZJRgABAgAAZABkAAD/7AARRHVja3kAAQAEAAAAUAAA/+4ADkFkb2Jl
+AGTAAAAAAf/bAIQAAgICAgICAgICAgMCAgIDBAMCAgMEBQQEBAQEBQYFBQUFBQUG
+BgcHCAcHBgkJCgoJCQwMDAwMDAwMDAwMDAwMDAEDAwMFBAUJBgYJDQsJCw0PDg4O
+Dg8PDAwMDAwPDwwMDAwMDA8MDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwM/8AA
+EQgANAAzAwERAAIRAQMRAf/EAJcAAAICAgMAAAAAAAAAAAAAAAYHBQgABAIDCQEA
+AgMBAQAAAAAAAAAAAAAAAAUBAgQDBhAAAQMCBAQEAwUHBQAAAAAAAQIDBBEFACES
+BkETFAcxUSIVYXGSoTJCFheRUmIzU4MkozREpQgRAAEDAgQEBAYDAAAAAAAAAAEA
+AgMRBCExEgXwUWFxQYHBE5GhIjIUBrHxQv/aAAwDAQACEQMRAD8A9+yQkFSiAAKk
+nwAwISE3X3imOXN7bHbezjc97aJRKuSj/hRiMiVKBGrSfHMDhWuWIJopAJyQbK25
+3Vvja3tw92DY3Xcza7RG1Nt/whaXGVfafnjO65aFobavctSJsnuDbQpy096LgqQM
+0tTYqi2o+RLj74H04qLtpVnWbgpuB3Z3xsuXHg9zrM1NtT6uWzum1glHDNaBkfM0
+0q8knGlrw7JZnMLc1ZC3XKBd4Ue42yU3NhSkByPJaUFJUk8QRiyqt7AhI7uvuC6y
+3I+xtuFYn3UITcnmjRaW3TpQylWWkroSo8E+Va4q52kVVmN1GikrB2wdsFmYtsC4
+sQVlIVOW2yVqed4lS9STQeAFMY5beWT/AFRbYrmKLJtfNBO52b5tRaFXNkGE84W4
+1wbOppagNWk8UmnBQFaGlaHCW6bJb/dlzTu0dFc/Zny8VD2a63LcE1NvtEdU2WpC
+nChNAEoT4qUpRASMwKk+JA8SMcYZXzO0sFSu88TIG6nmgTX/AE9nTIDsO53KO8zK
+RpkwSyXGzXyUVJzHA6cO4bOVmOvHskU17E/DRUd0tdni99qNzq27dla9uXZ4cpxJ
+Km0FxWlt9uuaamiVpPgc/AVVvjc4ijs0vka2tW5cYKz9R5/HHRc0ptl2/wBw3Ddd
+yyW9Trzr62VHPTrWWmiP7SKYoRVwXQGjT1Taxdc0p+9qo6O3F6ddS0X2nYioJWE6
+g6ZLaSW65hXLKxlnprwrhTvdPxHVzwp8Rl5VTfYq/ltAyxr2oc/Onmlf/wCcHWZE
+rdy3g2ZjbUJMdaqc0NKU8XQkn1aSUo1Uyrprwwr/AFsgmSueHrX0+SbfswIbHTLH
+0p6/NWox6peSQJv+ys3e0I5jWtbDmnWCQUocGlXh5mmKnNWag/8AMF76Xqc6flD/
+ALDqenr864soojHZTqExRFKdL6EKaWn4xHCyr7cRXGikjCqOsSqpFd/LPPum2LbI
+jvDobZODs+KRmouJLbTgVX8BURSmequVM0m+wukiBGQOP8DjqnuwTtjmcDmRgfmR
+xyS47FWCe3u6Tc2HQxDhQVtXBJFS6HyNDYzFPUjXXP7tONQu2S3cJi4ZAY+fFfJM
+t9uWmANOJJw6U4p5q3mPWLyCib04hMItrBIkLSgHgCKrqfpxBUtCVHuCPbOTyfV7
+L71Sg/le5c6n04lC79y3CVsm/qubcdyVBmrXKjx2yAXFlNJMZOopSFKoHEAnNVa5
+DHKWoGoCpHhz6ceK6w0J0uNAfHl148ER7G7p7H7iNOflq9Nu3CMSm4WKSDHnxlpN
+Fpdjror0nLUmqfJRxntNwhuvsdiMwcHDuFovNtntKGRv0nJwxaex4KU/eK4Pq3Xb
+7Y+4yIjUJEiOhBVrPMWtJLtfT4oOmnD54V7q8mUNOVOKpttDAIS4Z1p/SEtvzlwN
+zWFdvdaD78xlhIfKg2easIorRnxyxlgdolbp5ha5264nB2VCrU7k3TtzZ9rfvW6L
+1EsVrjgqcmTHUtpyFSEg5qNOCQTj0008cLdTyAF5aC3kndpjaSePglKx3BY7lM21
+vazE2PBvIULfJlNqjurjKPqmconUhBR6m9aQrMVA1YIpPcAcMkSx+0S0kVHJOL2O
+3f0E/wCw9t8P+P8AuY6risvlkgbgtsi2XBvWw+PSsZLbWM0rQeCknMHAhUM7pdkb
+taLurcUJbsOYyrUzuaGhXLdCR6epS2QptYAprGXzyATX+yxXLvcb9L+Y9U72/fJb
+Vvtu+qPkfDslazL3bAdLl0izLm7QAzWC5N5nxBSFL+oDCN+23cRxGrqMU/j3SzlG
+B09Dgt168bhngNxLPcA7+FbzDkUJI8DrfCAP24lthdSYaSO6h24WkYrqB7Kc252s
+3Bvy7xJW4FPbqehqSWLWpbjkCOUkFJkvuffCTnoApl4Kw4tNmaxwfKdThzyCS3m9
+ue0xwjQ050zKv7szZkfasRanHRNu0sJ66fppkPBtsZ6UDyw8SBG2BCzAhcHOXoVz
+tPLp69dNNPjXLAhJvcP6M89/3P23rNX+R0Wrm6qfi6fj88CFD2r9Ddfo6etcvcef
+p/1vTgQnfbfbOka9o6boqDldLp5dOFNGWBCkMCFmBC//2Q==
+
+------------NbTj16xyrFJgraG73IzlC0
+Content-Disposition: inline; filename=kat26.jpg
+Content-Type: image/jpeg; name=kat26.jpg
+Content-Location: http://sdip.gov.ua/i/actuals/kat26.jpg
+Content-Transfer-Encoding: Base64
+
+/9j/4AAQSkZJRgABAgAAZABkAAD/7AARRHVja3kAAQAEAAAAZAAA/+4ADkFkb2Jl
+AGTAAAAAAf/bAIQAAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEB
+AQEBAQEBAQICAgICAgICAgICAwMDAwMDAwMDAwEBAQEBAQECAQECAgIBAgIDAwMD
+AwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMD/8AA
+EQgANAAzAwERAAIRAQMRAf/EAKwAAAICAwEBAAAAAAAAAAAAAAgJBgcABQoCAwEA
+AQQDAQEAAAAAAAAAAAAABwAEBggCAwUBCRAAAAYBAgQEBAIFDQAAAAAAAQIDBAUG
+BxESACETCDEUFRZBIhcJMiNhgUIzJFFxUnI0JTV11UaWVxgRAAIBAgUBBQMHCwUA
+AAAAAAECAxEEACESBQYxQVFhEwdxIgiRwTJSgtIUgaGx0eFCclOTVLRiI0NjJv/a
+AAwDAQACEQMRAD8A7+OFhYC7OHd2ypE/9NcT1lzlfKy49I0PFKCMNAKm2j/fj9AF
+BBwkmbeZAnMhdBWOiUxTD4WCip6YyVSxovXA+PKt3g5ESO+yH3HReJAcp6lqeO68
+lJC0JyMQHDpGUjHJVx8DbH7gv6fEA5NxvNnA2nUCfA/sx17fZL24XVpIGI3FYFzj
+CLKO4LvVv5X/ADFIJisvnDJQ+ggHUB/fJtAhR3eIoH/m4aJyK0ZqEEe0/sw7fjV2
+q1BB9gxK2fcb3O4CcNvrhXobLWOesk0PkGkpptpdmmYxildSKBCtmZl1BEodNZBm
+TXUCqnMIAPYt7y3uV1QsDji3FncWppMpXDF8fZEqGUKywt1KmW0zDSCYGKqiIlXa
+rByWZP2qgFcMnzY+pVElClOQwCAgHDrDXE24WFgTu67MEjj2pErdWdgztlpaPTep
+htE1dr7YpU5KZJuASA8MZUqLbdqBVDCptMVMxR1TTR28LTzELEilmJ6AAVJPsGN1
+vBLczLbwqWldgqgdSSaAD2nAXYkYvKnBO2mPqtO2ayPBSc3WywsJKzz5Jy+AzlCI
+WetGztVv0w3GU3mA6q+8w6mKI8CHcuV7lvMjx7NBPJAhz8uN3016BtINCRma9uQ6
+YMm28S2zZI0k3ueCKdx7vmSImqnUrqIqoOQp1GfbiYupu/NZGPi3tMuLaWmRdjFR
+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
+8xNuFhYzhYWP/9k=
+
+------------NbTj16xyrFJgraG73IzlC0
+Content-Disposition: inline; filename=kat11.jpg
+Content-Type: image/jpeg; name=kat11.jpg
+Content-Location: http://sdip.gov.ua/i/actuals/kat11.jpg
+Content-Transfer-Encoding: Base64
+
+/9j/4AAQSkZJRgABAgAAZABkAAD/7AARRHVja3kAAQAEAAAAZAAA/+4ADkFkb2Jl
+AGTAAAAAAf/bAIQAAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEB
+AQEBAQEBAQICAgICAgICAgICAwMDAwMDAwMDAwEBAQEBAQECAQECAgIBAgIDAwMD
+AwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMD/8AA
+EQgANAAzAwERAAIRAQMRAf/EAKkAAAEEAwEBAAAAAAAAAAAAAAgFBwkKAAMGBAEB
+AAICAgMBAAAAAAAAAAAAAAAHAwgFBgECBAkQAAEDAwEGBQAJAwUAAAAAAAIBAwQR
+BQYHACESExQIMSIyFRZBUWFCUiMXGAlxJDbRclNzNREAAQIEBAMBCwoHAAAAAAAA
+AQIDABEEBSExQQZREgdh8HGRocHhIpITIwiBsdFCUmKCMxQVomOToyQWF//aAAwD
+AQACEQMRAD8Av7GYtiRmQgACpGZKgiIilVIlWiIiIm9diCAI1V7xLxIyeZpj23Yg
+Op2bRiOPc8keNUwrHHRUmnTkSwdYC4LDeREdXnMRxJCDmq4Ktp0WtKE8yiAkR3Q2
+tw8qBNUM7dNOe6rOWHZeoPdgWESpX5h4xp3jXUwLcRIqLGbmxLvjExVES3qrryVT
+ca7iXEP3yjZUROcuB80Zliw1ryQSCmfGEi0aJdwONC5IxPvQy92enmai5PjEh23v
+EioqA67cstyltsDUURaRyoirtC3uGjWZGaR2nzRM7tysbTNPpHsEdtYe7PXDRe72
++x9zmGwLzis98YkLVHAmTeiDRAEXZ0FnjalEooTjggMaTwp5I50WmZZqGahPO0oE
+RhH6Z6nVyOpKT2xJDjmSWLLrLb8ixq6wr1ZLrGblwLlb325MWSw6KEJtutqQruXe
+nii7l2niCFvYggCu8jVq7QoKaUYnOO3yrzEjuZhdo5m3JiWu5vLFt9ihvt0NmXe3
+ELmmFXG2E4U4SdAx8Vwrqe20blbVGTLaZnt0AHaTIAcTHvttvqLpWt0NKJvOKkOz
+Uk9gEyTwEDDjGcYvppYGcQw7o4zDKCV6u0dAGTfbmg8L8hx8fOsRlatsCi8KNpu3
+LskLxvtyseKG1crQOmXydgynrnrD2s2wEUTAW4gqeI1GPy9pzlplpD/dvmW2nPNR
+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
+ZsQR/9k=
+
+------------NbTj16xyrFJgraG73IzlC0
+Content-Disposition: inline; filename=kat17.jpg
+Content-Type: image/jpeg; name=kat17.jpg
+Content-Location: http://sdip.gov.ua/i/actuals/kat17.jpg
+Content-Transfer-Encoding: Base64
+
+/9j/4AAQSkZJRgABAgAAZABkAAD/7AARRHVja3kAAQAEAAAAZAAA/+4ADkFkb2Jl
+AGTAAAAAAf/bAIQAAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEB
+AQEBAQEBAQICAgICAgICAgICAwMDAwMDAwMDAwEBAQEBAQECAQECAgIBAgIDAwMD
+AwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMD/8AA
+EQgANAAzAwERAAIRAQMRAf/EAKUAAAICAgMBAAAAAAAAAAAAAAgKBgkFBwABAwQB
+AAICAgMBAAAAAAAAAAAAAAcIAAYEBQEDCQIQAAEEAQIEBQIDBwUAAAAAAAIBAwQF
+BhEHABITCCEiFBUWMTJhIwlBQlIkNhcYUXJzJTURAAEDAgQEAgYIBAcAAAAAAAER
+AgMABCESBQYxQRMHUWFxIlIjFQjwkaEyQjMUJLHhghbB0WKiUzQX/9oADAMBAAIR
+AxEAPwB/YzFsSMyEAAVIzJUEREU1UiVdERERPFeJUoCN1e8S4kZPM2x7bsQHc7No
+xHHs8keNUwrHHRUmnTkSwdYCwWG8iI6vWYjiSEHVVwVbT4e9rG5nEBor7ZG+Q5WB
+XVp+w227rc+bN/Pe61zDJ01RL4ptvjCzIcFw9RSIzLhW+MzTNELTxcf830MvBV1M
+ut2kb8jTmd4DivoStxDoV3IzO4ZG8VPBPTWKrtjO4fEyfPGu8vNBtGiVEg5bistY
+Rujyl0pBWuV5OLCFoiL/AC5KiKvhx1N162zZJA5hBxzYf4V2u2/c5M8ThICFGXFf
+t+2plQ92e+Gy9vX0fc5hsC5xWe+MSFujgTJvRB0QBF2dBZ52pRKKE44IDGk8qeSO
+ei6beG4huG54nAitNPbTW7skrS0+dWQ45klFl1LX5FjVrCuqS1jNy4FlXvtyYslh
+0UITbdbUhXwXxT6ovgvHfXRWb4lSgK7yN2raFBTajE5x18q5iR3Mwto5m3JiVdm8
+sWvoob7ehsy7txC6phq42wnKnKToGOFqF9b6bZyXt0Uhjap8+QA8yUAHiaz9N0+4
+1S9jsbULNI5B5cyT5AKSfAVoHbWxgUFd/b/bSPWgkCC/aZNdFNrqoLE4QgNhaWFt
+PkxIrFZEJxGmUJxE5VFARVNEUOXW7L3Xbx1rYloYxpc71mtaGjiS5xa0NGAUn1j6
+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
+
+------------NbTj16xyrFJgraG73IzlC0
+Content-Disposition: inline; filename=kat23.jpg
+Content-Type: image/jpeg; name=kat23.jpg
+Content-Location: http://sdip.gov.ua/i/actuals/kat23.jpg
+Content-Transfer-Encoding: Base64
+
+/9j/4AAQSkZJRgABAgAAZABkAAD/7AARRHVja3kAAQAEAAAAZAAA/+4ADkFkb2Jl
+AGTAAAAAAf/bAIQAAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEB
+AQEBAQEBAQICAgICAgICAgICAwMDAwMDAwMDAwEBAQEBAQECAQECAgIBAgIDAwMD
+AwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMD/8AA
+EQgANAAzAwERAAIRAQMRAf/EAJ8AAAEFAQEBAAAAAAAAAAAAAAgFBgcJCgABAwEA
+AgIDAQEBAAAAAAAAAAAAAAcFCAEDBgQCCRAAAQQBAgQFAwIFBQAAAAAAAgEDBAUG
+EQcAEhMIISIUFRYxMglhI1IkNhcYUUJyczURAAIBAwMBBgIIBAcBAAAAAAECAxEE
+BQASBiExQVFhEweBInGRoTJCIxQIscFSFdHhgqIzFhck/9oADAMBAAIRAxEAPwDf
+sZi2JGZCAAKkZkqCIiKaqRKuiIiInivBo0BG6veJcSMnmbY9t2IDudm0Yjj2eSPG
+qYVjjoqTTpyJYOsBYLDeREdXrMRxJCDqq4Ktp8O6ou5iAo19pG8h2oKtqHbTbnuq
+zlh2XuD3YFhEqV+4eMbd416mBXESKixm5sS3xiYqiJeKq68mqeBr4EsRPnLOFiK1
+p4H/AC1MwYG9mUEgrXx0kVGyXcDjQuSMT70Mvdnp5mouT4xIdr3iRUVAddsstylt
+sDUURdI5aIq8aY+Q2bmhqo8z/lrdLxy8jWq/MfIae1D3Z74bL29fR9zmGwLnFZ74
+xIW6OBMm9EHRAEXZ0FnnalEooTjggMaTyp5I56LpMw3ENwu+JgRqEntprdtkqlT5
+6shxzJKLLqWvyLGrWFdUlrGblwLKvfbkxZLDooQm262pCvgvin1RfBeN+tGlvg0a
+ArvI3atoUFNqMTnHXyrmJHczC2jmbcmJV2byxa+ihvt6GzLu3ELqmGrjbCcqcpOg
+Y+LIX1vjbOS9ujSGNanz7gB5k0AHide/G4+4yl7HY2orNI1B5d5J8gKknwGhhxjO
+MX20oGcQw70cZhlBK6to6AMm9s0HlfkOPj51iMrq2wKLyo2nh4LwkMxzuS8mKRtt
+iB7uz4eQ7K9/b36e2G4AllAHkQtMR3jr8fM9tO7s7tSzhybjZ8wkzFcXs7OARKI2
+ZC3BrTIV0NGrCwdixH1BfuQDJUX68Yxi5zMJ6mPt5Hh/qoFX4MxAPwJ1jKNgcK/p
+ZG4jjm/o6s/xVQSPiBqXq7arcSPBtLnLQCorKevmWL0KqNq+vrEYcdyQsStiQXTj
+K++jfICm7rzKnkLjpYeOZtIpLrJUigiRmKpSSRtoJooU0qaUFT29x1zE/JcE80dr
+jKy3ErqoZ6xxruIG52YVoK1NB2d40PkrdXAsgh3mO2MSwKkn1VhrDurGvtI0h2HH
+clAzJjhT1/QekdBQZcbLnYfUC8yIvHM2fMLW3nZrYzR0Riu51YVUE0YBF+9SnkSK
+1FddVe8MvLiBVulhlq6htqMpAYgVU72+7Wp8QDShodNHtN3aPa7ObbDRsimbfWGR
+x6m0huGRhj1pbsxZNBkUMSIiYh28acwEsE1bQyUlJDYeU2vxXk1ryWxeeGguoZPT
+lUdzbQwIr12ujKy9tKlCSytpSct4td8Xv0gm3G1mj9SJj3ruZWB7tyOrK3ZUAOAF
+ddXGcw/xD9vN9U+3+L/j+vHT65PWeT8he6c3AaHHMzOR6Kw3H3dV8XXDPzVFPkdT
+Bj9HVUUFj4x0nA5dEQ20LT68V0/cZyebAYDH28L7P1N8tfNY3jJ+oPuHmBqy/wC2
+visHIM/kLmdN36Wwenk0qSAfWU2nxDEaYPa3OpNxc6lXWfTX2Ntdv60cpzBGhffk
+XJFOjVmO4hXR4+kmdb5XfzGYzMVr958EcENC0VFRwI2uZyzXOYYjB2aerNSpL/MF
+jhUDqzyyFVCjqw3AddNr3BW5wmHW1wyg569f0oa0AT5S0kzE9FSGNWZnPyqdpPTp
+q7rL88z3bTa48/dwKdZ5FLcr6vENpcYiSJULEocwDWGxfHRxpJzJ8CBHIprjQJEZ
+dQY0bQdZDtpsjlsvhMD/AHdrR3vWKpDaRAlYVP3RJ6YO5lUfOQNimkaUHztU7G4j
+D53kAw63iR2ShnmvJWAaZl+8Y/UI2qzGiAnewrI9T8itbt77j9wty8mk4juRtLd4
+RMOvkWFVfNUmRQqOQcVRJ+tmjcxlKFKNglcaPrkDnIQ6CXLzeDh3NcznL5sdm8dL
+aylCySBJFQ07VbePlNOoO6hoRQGlZDmnB8JgrBclgslFdxBwrxmSJpBXsZdh+YV6
+EbQRUGpFaCZ+RLaFjA66NvlhwJXwrC3YqM3qYydOMNlYC6ddkUZoE5GFmvMkxLFN
+EN42nETmN0lXfvNxlMVCvKsYNkbyBJ0HQbmrtkA7txG1/Fip7Sx0yPZLlD5eZuJZ
+U75UiLwOep2rTdET37QdyHuUMOwKNVO9r+7o5P3rN7YzJTj1buVtPNxt+GLxojmS
+Yo1f5xXShUdFF6LjC2beqaFo+i/7E4WPsdy2f/1ifC7ibW8xdGWvT1YHaVGp4iN5
+B/q8tNb324dbf+QwZvaBd2WWqpoK+lcIsTr9Bkjjb/T560EfP839s9x8/L/jj9NF
+/r/5f8W5/wDs6vjp9eLuV1RPb/GmqVPzO1k2Rsl25ymIxA1Q7gZnQWxoigrEqths
+0jRGqfaT8mocVNfFV4qL+7S0luMLhpVB9JLuYE+BZEp/A6uT+z+7hgzeZhY0lks4
+SB47Xfd9VRpW/DLtjZ7o5rbbhZMEl/F9pWaeSyy6bi113nktqwYxeW+wpIzKlYzX
+LMlCaoRsSHGCTTnXWC/bjx+bNZOTL3u42OPCEA/dechhExHYTGu9q9qsVI7dTn7m
+OQw4PFx4axKi+yJcEj7yQAqZQD2gStsUjsZQwPZrQ1vDe7h41g8672yo6/I8kgSY
+jp1E+PLmepq1MgnlDiwZcKRImsIQmICaqQCWgkWiLbzkV1l7PGNc4SJJr1GB2MCa
+r+KgUqSw6GleyvQnVNuN2uGvcqlrnZXhsXUjepAo/wCHcWDAKeoJp206gV1A20u5
+vczuVYywssQwnCaOAyqyLu9xjL0KRLVUFuBW17uT17kt5deZw+dG2RTxXmIRXlMB
+mubZqZhNb2ttaoOrvFL1P9KqZVqfE1oB5kDXW8iwfBsHCpgubq6u3PRElh6D+pmE
+TUHcBSpPkCdB7+U7cnNsJ2EjYZlWR7d2szO8ggnCoaDG8hqr8oOOO+6yLdJM/LLy
+GzWxrBuKw5ztITiv6Nr5S0Xnvplspj+KDGX01m8l1KtEjjkWTbGdxerSuAobapqK
+nd07DpkeweGxWS5c2UsIb2OO0hbdJJLG8e6QbAlFhRixXcwoaDb17RqhH8bGNWuW
+fka2btlN19zFIO7meX6opqKU57W5XgHWeRF5RYavdwK9sebwQnBRPHTiv37dsXdX
+PuqMmQWSC0nZz4F12L9demrHfuRylrbe0n9sBAee8gVF8RG29vqoCdan/f2vjPo/
+Sfu/2w/ubp0m9faf7t+/dD7fs9J48v26cfoV/hr84qj/AHaFf8lHb05ult1l+EtB
+ySL6Ym4O2c9w0CPFz6pZ6lvjTjhgbUVm9aaJ0dEUz9TIPw6arwtvdbhI51xCfFxA
+f3GP82Anp+YnYvkHFVJ7q6Z3tDzv/oPMoMrOT/bJKxXA7fynoCwHeUNHA76aAzsZ
+uN4IPZrn2EbEWllU704L3Ihl24WH0aA3n7+3p4VQUMVYNY4By7aBEy+ndGZFabcV
+QAkNFAlBxAe3H/YrPgF3ieONJFyS1zHqzxJ0n9D0UQUU9WCyod6AHoOvQ0Nh/c0c
+bu/cWzy/Jkjm4xd4X0reZ+tv6/rSSGrA0UtC42MSOpFOoqLZdsO9G+h18Ck3wwmX
+V5S2w2MmXTnBjTn1REFHrfFZkmNIpJTunMSKYCa6qDQDonDywvuFdxwpbcktmS9A
+6lNoJ82iJBQ/Hr3KBpCZz24tJJnueMXKvYk9A+4geSSgEOB9BI72J0+c172MOoat
++Rj2NXFvP6RLHC0fhVcIXOVeVXjjP2cgwFfFREB5k8OZPrxJZH3EsLWEtaQySS06
+biFHxoWP2ai8b7a5G6nCXc0ccVeu0Mx+FQo+3WejvI3dyLdjJ7nN85tGXZSRVjx2
+gVI1VR08PquMV1c04ZjFgxeczJSJSNwjccIjIiWqvPcrkOSZFr2+Je5aiqqg0Ufh
+RF6mlT5kkkmpJ1bj2+xGP4zjVsbBRHbJVnZj1Y0+Z3boK0Hb0AAAFAANEP8Aiy7f
+LikjZHuhNhS4W4O/USJi+Fsvg/Gm4jsxDeasrHJ3WSUXoErKpxpO84ChsxKkSQDc
+NOH57I8BbiuFfK36bcte0JBpVYx1Vagd/aRUjoCD11Xv329w05bm0xGPk3YewqBS
+tGlPRmoT+HqoNAepBHTWjn4Pjv09C1p8S+E/aP8AT+uvovp9mvjp9OHnpA69zjCa
+LcHG5+MZDH60GaAq282vJLgS2iRyLYQX9FKPMiPChtmniip/pwaNUHd2PYpf0uRz
+M1jMuxpQrqO4FTWHJo76K0H8u1m9XELr09qwDYtlPDVrk0Ukd8jTax5l7XYPlUxy
+UX/y5oj/AJFHR6Dp6i/i7vmFGp46a3CfdjPcSgXFzUu8GD/xOesdT19Jvw952mq1
+7hoWKFdx8IFGLHGrSwbaRECbjEeVksSUninUjhVMP2AgqpqiPR2D0VPLwqZeA8ww
+snppB+pir0aI1qO4kGhFfDrpuxe4XC84nqPP+llI6rKKUPeARUGnj0B05p2WZ9kT
+Xo6zDMuV5xFBCtqKyxuMC8paE7LyOPVxxb1TxVCJfH6cbo+JcwyLej+keIeMnyj+
+f8teeXmHCsYvrfq45j4R/Mf5fZXTl2k7O8k3byqDY5LVN53IhTWJbeKQW3lwGpls
+uNvR5WZ38tloLv0TxC4sEWkZUm0VW5Qppww+Le1WOxVwuTzDC5yC9QKflqfoPafp
+6dvaDTS35Z7uZLL2zYvCqbXHN0Jr+Yw8KjsH29hoCAdaD9mNmq7aqqeckSQusttm
+2Pe71WekKiyKq1W1jRE4USrjGRKIcykREpEqqvDb0nSamups4NY13Bo18JPp+g76
+voem5C63qen0Onp5ur1f2+TT66+HBo0G+4f+Gfrp3yb4R7z1l9w+Mep916/IWvqf
+jHn6mmv3eOv68Gs9dNDFf8Guv+z7Nz83l+ZfI/S82o6f+/8AyenNppzfr+vBo692
+jfxr4x7VG+Jey+zdMPS+w+j9B0+VOTpeh/Z05dNODWNL/Bo13Bo1/9k=
+
+------------NbTj16xyrFJgraG73IzlC0
+Content-Disposition: inline; filename=md5.js
+Content-Type: application/javascript; charset=windows-1251; name=md5.js
+Content-Location: http://sdip.gov.ua/js/md5.js
+Content-Transfer-Encoding: Base64
+
+LyoNCiAqIEEgSmF2YVNjcmlwdCBpbXBsZW1lbnRhdGlvbiBvZiB0aGUgUlNBIERh
+dGEgU2VjdXJpdHksIEluYy4gTUQ1IE1lc3NhZ2UNCiAqIERpZ2VzdCBBbGdvcml0
+aG0sIGFzIGRlZmluZWQgaW4gUkZDIDEzMjEuDQogKiBWZXJzaW9uIDIuMSBDb3B5
+cmlnaHQgKEMpIFBhdWwgSm9obnN0b24gMTk5OSAtIDIwMDIuDQogKiBPdGhlciBj
+b250cmlidXRvcnM6IEdyZWcgSG9sdCwgQW5kcmV3IEtlcGVydCwgWWRuYXIsIExv
+c3RpbmV0DQogKiBEaXN0cmlidXRlZCB1bmRlciB0aGUgQlNEIExpY2Vuc2UNCiAq
+IFNlZSBodHRwOi8vcGFqaG9tZS5vcmcudWsvY3J5cHQvbWQ1IGZvciBtb3JlIGlu
+Zm8uDQogKi8NCg0KLyoNCiAqIENvbmZpZ3VyYWJsZSB2YXJpYWJsZXMuIFlvdSBt
+YXkgbmVlZCB0byB0d2VhayB0aGVzZSB0byBiZSBjb21wYXRpYmxlIHdpdGgNCiAq
+IHRoZSBzZXJ2ZXItc2lkZSwgYnV0IHRoZSBkZWZhdWx0cyB3b3JrIGluIG1vc3Qg
+Y2FzZXMuDQogKi8NCnZhciBoZXhjYXNlID0gMDsgIC8qIGhleCBvdXRwdXQgZm9y
+bWF0LiAwIC0gbG93ZXJjYXNlOyAxIC0gdXBwZXJjYXNlICAgICAgICAqLw0KdmFy
+IGI2NHBhZCAgPSAiIjsgLyogYmFzZS02NCBwYWQgY2hhcmFjdGVyLiAiPSIgZm9y
+IHN0cmljdCBSRkMgY29tcGxpYW5jZSAgICovDQp2YXIgY2hyc3ogICA9IDg7ICAv
+KiBiaXRzIHBlciBpbnB1dCBjaGFyYWN0ZXIuIDggLSBBU0NJSTsgMTYgLSBVbmlj
+b2RlICAgICAgKi8NCg0KLyoNCiAqIFRoZXNlIGFyZSB0aGUgZnVuY3Rpb25zIHlv
+dSdsbCB1c3VhbGx5IHdhbnQgdG8gY2FsbA0KICogVGhleSB0YWtlIHN0cmluZyBh
+cmd1bWVudHMgYW5kIHJldHVybiBlaXRoZXIgaGV4IG9yIGJhc2UtNjQgZW5jb2Rl
+ZCBzdHJpbmdzDQogKi8NCmZ1bmN0aW9uIGhleF9tZDUocyl7IHJldHVybiBiaW5s
+MmhleChjb3JlX21kNShzdHIyYmlubChzKSwgcy5sZW5ndGggKiBjaHJzeikpO30N
+CmZ1bmN0aW9uIGI2NF9tZDUocyl7IHJldHVybiBiaW5sMmI2NChjb3JlX21kNShz
+dHIyYmlubChzKSwgcy5sZW5ndGggKiBjaHJzeikpO30NCmZ1bmN0aW9uIHN0cl9t
+ZDUocyl7IHJldHVybiBiaW5sMnN0cihjb3JlX21kNShzdHIyYmlubChzKSwgcy5s
+ZW5ndGggKiBjaHJzeikpO30NCmZ1bmN0aW9uIGhleF9obWFjX21kNShrZXksIGRh
+dGEpIHsgcmV0dXJuIGJpbmwyaGV4KGNvcmVfaG1hY19tZDUoa2V5LCBkYXRhKSk7
+IH0NCmZ1bmN0aW9uIGI2NF9obWFjX21kNShrZXksIGRhdGEpIHsgcmV0dXJuIGJp
+bmwyYjY0KGNvcmVfaG1hY19tZDUoa2V5LCBkYXRhKSk7IH0NCmZ1bmN0aW9uIHN0
+cl9obWFjX21kNShrZXksIGRhdGEpIHsgcmV0dXJuIGJpbmwyc3RyKGNvcmVfaG1h
+Y19tZDUoa2V5LCBkYXRhKSk7IH0NCg0KLyoNCiAqIFBlcmZvcm0gYSBzaW1wbGUg
+c2VsZi10ZXN0IHRvIHNlZSBpZiB0aGUgVk0gaXMgd29ya2luZw0KICovDQpmdW5j
+dGlvbiBtZDVfdm1fdGVzdCgpDQp7DQogIHJldHVybiBoZXhfbWQ1KCJhYmMiKSA9
+PSAiOTAwMTUwOTgzY2QyNGZiMGQ2OTYzZjdkMjhlMTdmNzIiOw0KfQ0KDQovKg0K
+ICogQ2FsY3VsYXRlIHRoZSBNRDUgb2YgYW4gYXJyYXkgb2YgbGl0dGxlLWVuZGlh
+biB3b3JkcywgYW5kIGEgYml0IGxlbmd0aA0KICovDQpmdW5jdGlvbiBjb3JlX21k
+NSh4LCBsZW4pDQp7DQogIC8qIGFwcGVuZCBwYWRkaW5nICovDQogIHhbbGVuID4+
+IDVdIHw9IDB4ODAgPDwgKChsZW4pICUgMzIpOw0KICB4WygoKGxlbiArIDY0KSA+
+Pj4gOSkgPDwgNCkgKyAxNF0gPSBsZW47DQoNCiAgdmFyIGEgPSAgMTczMjU4NDE5
+MzsNCiAgdmFyIGIgPSAtMjcxNzMzODc5Ow0KICB2YXIgYyA9IC0xNzMyNTg0MTk0
+Ow0KICB2YXIgZCA9ICAyNzE3MzM4Nzg7DQoNCiAgZm9yKHZhciBpID0gMDsgaSA8
+IHgubGVuZ3RoOyBpICs9IDE2KQ0KICB7DQogICAgdmFyIG9sZGEgPSBhOw0KICAg
+IHZhciBvbGRiID0gYjsNCiAgICB2YXIgb2xkYyA9IGM7DQogICAgdmFyIG9sZGQg
+PSBkOw0KDQogICAgYSA9IG1kNV9mZihhLCBiLCBjLCBkLCB4W2krIDBdLCA3ICwg
+LTY4MDg3NjkzNik7DQogICAgZCA9IG1kNV9mZihkLCBhLCBiLCBjLCB4W2krIDFd
+LCAxMiwgLTM4OTU2NDU4Nik7DQogICAgYyA9IG1kNV9mZihjLCBkLCBhLCBiLCB4
+W2krIDJdLCAxNywgIDYwNjEwNTgxOSk7DQogICAgYiA9IG1kNV9mZihiLCBjLCBk
+LCBhLCB4W2krIDNdLCAyMiwgLTEwNDQ1MjUzMzApOw0KICAgIGEgPSBtZDVfZmYo
+YSwgYiwgYywgZCwgeFtpKyA0XSwgNyAsIC0xNzY0MTg4OTcpOw0KICAgIGQgPSBt
+ZDVfZmYoZCwgYSwgYiwgYywgeFtpKyA1XSwgMTIsICAxMjAwMDgwNDI2KTsNCiAg
+ICBjID0gbWQ1X2ZmKGMsIGQsIGEsIGIsIHhbaSsgNl0sIDE3LCAtMTQ3MzIzMTM0
+MSk7DQogICAgYiA9IG1kNV9mZihiLCBjLCBkLCBhLCB4W2krIDddLCAyMiwgLTQ1
+NzA1OTgzKTsNCiAgICBhID0gbWQ1X2ZmKGEsIGIsIGMsIGQsIHhbaSsgOF0sIDcg
+LCAgMTc3MDAzNTQxNik7DQogICAgZCA9IG1kNV9mZihkLCBhLCBiLCBjLCB4W2kr
+IDldLCAxMiwgLTE5NTg0MTQ0MTcpOw0KICAgIGMgPSBtZDVfZmYoYywgZCwgYSwg
+YiwgeFtpKzEwXSwgMTcsIC00MjA2Myk7DQogICAgYiA9IG1kNV9mZihiLCBjLCBk
+LCBhLCB4W2krMTFdLCAyMiwgLTE5OTA0MDQxNjIpOw0KICAgIGEgPSBtZDVfZmYo
+YSwgYiwgYywgZCwgeFtpKzEyXSwgNyAsICAxODA0NjAzNjgyKTsNCiAgICBkID0g
+bWQ1X2ZmKGQsIGEsIGIsIGMsIHhbaSsxM10sIDEyLCAtNDAzNDExMDEpOw0KICAg
+IGMgPSBtZDVfZmYoYywgZCwgYSwgYiwgeFtpKzE0XSwgMTcsIC0xNTAyMDAyMjkw
+KTsNCiAgICBiID0gbWQ1X2ZmKGIsIGMsIGQsIGEsIHhbaSsxNV0sIDIyLCAgMTIz
+NjUzNTMyOSk7DQoNCiAgICBhID0gbWQ1X2dnKGEsIGIsIGMsIGQsIHhbaSsgMV0s
+IDUgLCAtMTY1Nzk2NTEwKTsNCiAgICBkID0gbWQ1X2dnKGQsIGEsIGIsIGMsIHhb
+aSsgNl0sIDkgLCAtMTA2OTUwMTYzMik7DQogICAgYyA9IG1kNV9nZyhjLCBkLCBh
+LCBiLCB4W2krMTFdLCAxNCwgIDY0MzcxNzcxMyk7DQogICAgYiA9IG1kNV9nZyhi
+LCBjLCBkLCBhLCB4W2krIDBdLCAyMCwgLTM3Mzg5NzMwMik7DQogICAgYSA9IG1k
+NV9nZyhhLCBiLCBjLCBkLCB4W2krIDVdLCA1ICwgLTcwMTU1ODY5MSk7DQogICAg
+ZCA9IG1kNV9nZyhkLCBhLCBiLCBjLCB4W2krMTBdLCA5ICwgIDM4MDE2MDgzKTsN
+CiAgICBjID0gbWQ1X2dnKGMsIGQsIGEsIGIsIHhbaSsxNV0sIDE0LCAtNjYwNDc4
+MzM1KTsNCiAgICBiID0gbWQ1X2dnKGIsIGMsIGQsIGEsIHhbaSsgNF0sIDIwLCAt
+NDA1NTM3ODQ4KTsNCiAgICBhID0gbWQ1X2dnKGEsIGIsIGMsIGQsIHhbaSsgOV0s
+IDUgLCAgNTY4NDQ2NDM4KTsNCiAgICBkID0gbWQ1X2dnKGQsIGEsIGIsIGMsIHhb
+aSsxNF0sIDkgLCAtMTAxOTgwMzY5MCk7DQogICAgYyA9IG1kNV9nZyhjLCBkLCBh
+LCBiLCB4W2krIDNdLCAxNCwgLTE4NzM2Mzk2MSk7DQogICAgYiA9IG1kNV9nZyhi
+LCBjLCBkLCBhLCB4W2krIDhdLCAyMCwgIDExNjM1MzE1MDEpOw0KICAgIGEgPSBt
+ZDVfZ2coYSwgYiwgYywgZCwgeFtpKzEzXSwgNSAsIC0xNDQ0NjgxNDY3KTsNCiAg
+ICBkID0gbWQ1X2dnKGQsIGEsIGIsIGMsIHhbaSsgMl0sIDkgLCAtNTE0MDM3ODQp
+Ow0KICAgIGMgPSBtZDVfZ2coYywgZCwgYSwgYiwgeFtpKyA3XSwgMTQsICAxNzM1
+MzI4NDczKTsNCiAgICBiID0gbWQ1X2dnKGIsIGMsIGQsIGEsIHhbaSsxMl0sIDIw
+LCAtMTkyNjYwNzczNCk7DQoNCiAgICBhID0gbWQ1X2hoKGEsIGIsIGMsIGQsIHhb
+aSsgNV0sIDQgLCAtMzc4NTU4KTsNCiAgICBkID0gbWQ1X2hoKGQsIGEsIGIsIGMs
+IHhbaSsgOF0sIDExLCAtMjAyMjU3NDQ2Myk7DQogICAgYyA9IG1kNV9oaChjLCBk
+LCBhLCBiLCB4W2krMTFdLCAxNiwgIDE4MzkwMzA1NjIpOw0KICAgIGIgPSBtZDVf
+aGgoYiwgYywgZCwgYSwgeFtpKzE0XSwgMjMsIC0zNTMwOTU1Nik7DQogICAgYSA9
+IG1kNV9oaChhLCBiLCBjLCBkLCB4W2krIDFdLCA0ICwgLTE1MzA5OTIwNjApOw0K
+ICAgIGQgPSBtZDVfaGgoZCwgYSwgYiwgYywgeFtpKyA0XSwgMTEsICAxMjcyODkz
+MzUzKTsNCiAgICBjID0gbWQ1X2hoKGMsIGQsIGEsIGIsIHhbaSsgN10sIDE2LCAt
+MTU1NDk3NjMyKTsNCiAgICBiID0gbWQ1X2hoKGIsIGMsIGQsIGEsIHhbaSsxMF0s
+IDIzLCAtMTA5NDczMDY0MCk7DQogICAgYSA9IG1kNV9oaChhLCBiLCBjLCBkLCB4
+W2krMTNdLCA0ICwgIDY4MTI3OTE3NCk7DQogICAgZCA9IG1kNV9oaChkLCBhLCBi
+LCBjLCB4W2krIDBdLCAxMSwgLTM1ODUzNzIyMik7DQogICAgYyA9IG1kNV9oaChj
+LCBkLCBhLCBiLCB4W2krIDNdLCAxNiwgLTcyMjUyMTk3OSk7DQogICAgYiA9IG1k
+NV9oaChiLCBjLCBkLCBhLCB4W2krIDZdLCAyMywgIDc2MDI5MTg5KTsNCiAgICBh
+ID0gbWQ1X2hoKGEsIGIsIGMsIGQsIHhbaSsgOV0sIDQgLCAtNjQwMzY0NDg3KTsN
+CiAgICBkID0gbWQ1X2hoKGQsIGEsIGIsIGMsIHhbaSsxMl0sIDExLCAtNDIxODE1
+ODM1KTsNCiAgICBjID0gbWQ1X2hoKGMsIGQsIGEsIGIsIHhbaSsxNV0sIDE2LCAg
+NTMwNzQyNTIwKTsNCiAgICBiID0gbWQ1X2hoKGIsIGMsIGQsIGEsIHhbaSsgMl0s
+IDIzLCAtOTk1MzM4NjUxKTsNCg0KICAgIGEgPSBtZDVfaWkoYSwgYiwgYywgZCwg
+eFtpKyAwXSwgNiAsIC0xOTg2MzA4NDQpOw0KICAgIGQgPSBtZDVfaWkoZCwgYSwg
+YiwgYywgeFtpKyA3XSwgMTAsICAxMTI2ODkxNDE1KTsNCiAgICBjID0gbWQ1X2lp
+KGMsIGQsIGEsIGIsIHhbaSsxNF0sIDE1LCAtMTQxNjM1NDkwNSk7DQogICAgYiA9
+IG1kNV9paShiLCBjLCBkLCBhLCB4W2krIDVdLCAyMSwgLTU3NDM0MDU1KTsNCiAg
+ICBhID0gbWQ1X2lpKGEsIGIsIGMsIGQsIHhbaSsxMl0sIDYgLCAgMTcwMDQ4NTU3
+MSk7DQogICAgZCA9IG1kNV9paShkLCBhLCBiLCBjLCB4W2krIDNdLCAxMCwgLTE4
+OTQ5ODY2MDYpOw0KICAgIGMgPSBtZDVfaWkoYywgZCwgYSwgYiwgeFtpKzEwXSwg
+MTUsIC0xMDUxNTIzKTsNCiAgICBiID0gbWQ1X2lpKGIsIGMsIGQsIGEsIHhbaSsg
+MV0sIDIxLCAtMjA1NDkyMjc5OSk7DQogICAgYSA9IG1kNV9paShhLCBiLCBjLCBk
+LCB4W2krIDhdLCA2ICwgIDE4NzMzMTMzNTkpOw0KICAgIGQgPSBtZDVfaWkoZCwg
+YSwgYiwgYywgeFtpKzE1XSwgMTAsIC0zMDYxMTc0NCk7DQogICAgYyA9IG1kNV9p
+aShjLCBkLCBhLCBiLCB4W2krIDZdLCAxNSwgLTE1NjAxOTgzODApOw0KICAgIGIg
+PSBtZDVfaWkoYiwgYywgZCwgYSwgeFtpKzEzXSwgMjEsICAxMzA5MTUxNjQ5KTsN
+CiAgICBhID0gbWQ1X2lpKGEsIGIsIGMsIGQsIHhbaSsgNF0sIDYgLCAtMTQ1NTIz
+MDcwKTsNCiAgICBkID0gbWQ1X2lpKGQsIGEsIGIsIGMsIHhbaSsxMV0sIDEwLCAt
+MTEyMDIxMDM3OSk7DQogICAgYyA9IG1kNV9paShjLCBkLCBhLCBiLCB4W2krIDJd
+LCAxNSwgIDcxODc4NzI1OSk7DQogICAgYiA9IG1kNV9paShiLCBjLCBkLCBhLCB4
+W2krIDldLCAyMSwgLTM0MzQ4NTU1MSk7DQoNCiAgICBhID0gc2FmZV9hZGQoYSwg
+b2xkYSk7DQogICAgYiA9IHNhZmVfYWRkKGIsIG9sZGIpOw0KICAgIGMgPSBzYWZl
+X2FkZChjLCBvbGRjKTsNCiAgICBkID0gc2FmZV9hZGQoZCwgb2xkZCk7DQogIH0N
+CiAgcmV0dXJuIEFycmF5KGEsIGIsIGMsIGQpOw0KDQp9DQoNCi8qDQogKiBUaGVz
+ZSBmdW5jdGlvbnMgaW1wbGVtZW50IHRoZSBmb3VyIGJhc2ljIG9wZXJhdGlvbnMg
+dGhlIGFsZ29yaXRobSB1c2VzLg0KICovDQpmdW5jdGlvbiBtZDVfY21uKHEsIGEs
+IGIsIHgsIHMsIHQpDQp7DQogIHJldHVybiBzYWZlX2FkZChiaXRfcm9sKHNhZmVf
+YWRkKHNhZmVfYWRkKGEsIHEpLCBzYWZlX2FkZCh4LCB0KSksIHMpLGIpOw0KfQ0K
+ZnVuY3Rpb24gbWQ1X2ZmKGEsIGIsIGMsIGQsIHgsIHMsIHQpDQp7DQogIHJldHVy
+biBtZDVfY21uKChiICYgYykgfCAoKH5iKSAmIGQpLCBhLCBiLCB4LCBzLCB0KTsN
+Cn0NCmZ1bmN0aW9uIG1kNV9nZyhhLCBiLCBjLCBkLCB4LCBzLCB0KQ0Kew0KICBy
+ZXR1cm4gbWQ1X2NtbigoYiAmIGQpIHwgKGMgJiAofmQpKSwgYSwgYiwgeCwgcywg
+dCk7DQp9DQpmdW5jdGlvbiBtZDVfaGgoYSwgYiwgYywgZCwgeCwgcywgdCkNCnsN
+CiAgcmV0dXJuIG1kNV9jbW4oYiBeIGMgXiBkLCBhLCBiLCB4LCBzLCB0KTsNCn0N
+CmZ1bmN0aW9uIG1kNV9paShhLCBiLCBjLCBkLCB4LCBzLCB0KQ0Kew0KICByZXR1
+cm4gbWQ1X2NtbihjIF4gKGIgfCAofmQpKSwgYSwgYiwgeCwgcywgdCk7DQp9DQoN
+Ci8qDQogKiBDYWxjdWxhdGUgdGhlIEhNQUMtTUQ1LCBvZiBhIGtleSBhbmQgc29t
+ZSBkYXRhDQogKi8NCmZ1bmN0aW9uIGNvcmVfaG1hY19tZDUoa2V5LCBkYXRhKQ0K
+ew0KICB2YXIgYmtleSA9IHN0cjJiaW5sKGtleSk7DQogIGlmKGJrZXkubGVuZ3Ro
+ID4gMTYpIGJrZXkgPSBjb3JlX21kNShia2V5LCBrZXkubGVuZ3RoICogY2hyc3op
+Ow0KDQogIHZhciBpcGFkID0gQXJyYXkoMTYpLCBvcGFkID0gQXJyYXkoMTYpOw0K
+ICBmb3IodmFyIGkgPSAwOyBpIDwgMTY7IGkrKykNCiAgew0KICAgIGlwYWRbaV0g
+PSBia2V5W2ldIF4gMHgzNjM2MzYzNjsNCiAgICBvcGFkW2ldID0gYmtleVtpXSBe
+IDB4NUM1QzVDNUM7DQogIH0NCg0KICB2YXIgaGFzaCA9IGNvcmVfbWQ1KGlwYWQu
+Y29uY2F0KHN0cjJiaW5sKGRhdGEpKSwgNTEyICsgZGF0YS5sZW5ndGggKiBjaHJz
+eik7DQogIHJldHVybiBjb3JlX21kNShvcGFkLmNvbmNhdChoYXNoKSwgNTEyICsg
+MTI4KTsNCn0NCg0KLyoNCiAqIEFkZCBpbnRlZ2Vycywgd3JhcHBpbmcgYXQgMl4z
+Mi4gVGhpcyB1c2VzIDE2LWJpdCBvcGVyYXRpb25zIGludGVybmFsbHkNCiAqIHRv
+IHdvcmsgYXJvdW5kIGJ1Z3MgaW4gc29tZSBKUyBpbnRlcnByZXRlcnMuDQogKi8N
+CmZ1bmN0aW9uIHNhZmVfYWRkKHgsIHkpDQp7DQogIHZhciBsc3cgPSAoeCAmIDB4
+RkZGRikgKyAoeSAmIDB4RkZGRik7DQogIHZhciBtc3cgPSAoeCA+PiAxNikgKyAo
+eSA+PiAxNikgKyAobHN3ID4+IDE2KTsNCiAgcmV0dXJuIChtc3cgPDwgMTYpIHwg
+KGxzdyAmIDB4RkZGRik7DQp9DQoNCi8qDQogKiBCaXR3aXNlIHJvdGF0ZSBhIDMy
+LWJpdCBudW1iZXIgdG8gdGhlIGxlZnQuDQogKi8NCmZ1bmN0aW9uIGJpdF9yb2wo
+bnVtLCBjbnQpDQp7DQogIHJldHVybiAobnVtIDw8IGNudCkgfCAobnVtID4+PiAo
+MzIgLSBjbnQpKTsNCn0NCg0KLyoNCiAqIENvbnZlcnQgYSBzdHJpbmcgdG8gYW4g
+YXJyYXkgb2YgbGl0dGxlLWVuZGlhbiB3b3Jkcw0KICogSWYgY2hyc3ogaXMgQVND
+SUksIGNoYXJhY3RlcnMgPjI1NSBoYXZlIHRoZWlyIGhpLWJ5dGUgc2lsZW50bHkg
+aWdub3JlZC4NCiAqLw0KZnVuY3Rpb24gc3RyMmJpbmwoc3RyKQ0Kew0KICB2YXIg
+YmluID0gQXJyYXkoKTsNCiAgdmFyIG1hc2sgPSAoMSA8PCBjaHJzeikgLSAxOw0K
+ICBmb3IodmFyIGkgPSAwOyBpIDwgc3RyLmxlbmd0aCAqIGNocnN6OyBpICs9IGNo
+cnN6KQ0KICAgIGJpbltpPj41XSB8PSAoc3RyLmNoYXJDb2RlQXQoaSAvIGNocnN6
+KSAmIG1hc2spIDw8IChpJTMyKTsNCiAgcmV0dXJuIGJpbjsNCn0NCg0KLyoNCiAq
+IENvbnZlcnQgYW4gYXJyYXkgb2YgbGl0dGxlLWVuZGlhbiB3b3JkcyB0byBhIHN0
+cmluZw0KICovDQpmdW5jdGlvbiBiaW5sMnN0cihiaW4pDQp7DQogIHZhciBzdHIg
+PSAiIjsNCiAgdmFyIG1hc2sgPSAoMSA8PCBjaHJzeikgLSAxOw0KICBmb3IodmFy
+IGkgPSAwOyBpIDwgYmluLmxlbmd0aCAqIDMyOyBpICs9IGNocnN6KQ0KICAgIHN0
+ciArPSBTdHJpbmcuZnJvbUNoYXJDb2RlKChiaW5baT4+NV0gPj4+IChpICUgMzIp
+KSAmIG1hc2spOw0KICByZXR1cm4gc3RyOw0KfQ0KDQovKg0KICogQ29udmVydCBh
+biBhcnJheSBvZiBsaXR0bGUtZW5kaWFuIHdvcmRzIHRvIGEgaGV4IHN0cmluZy4N
+CiAqLw0KZnVuY3Rpb24gYmlubDJoZXgoYmluYXJyYXkpDQp7DQogIHZhciBoZXhf
+dGFiID0gaGV4Y2FzZSA/ICIwMTIzNDU2Nzg5QUJDREVGIiA6ICIwMTIzNDU2Nzg5
+YWJjZGVmIjsNCiAgdmFyIHN0ciA9ICIiOw0KICBmb3IodmFyIGkgPSAwOyBpIDwg
+YmluYXJyYXkubGVuZ3RoICogNDsgaSsrKQ0KICB7DQogICAgc3RyICs9IGhleF90
+YWIuY2hhckF0KChiaW5hcnJheVtpPj4yXSA+PiAoKGklNCkqOCs0KSkgJiAweEYp
+ICsNCiAgICAgICAgICAgaGV4X3RhYi5jaGFyQXQoKGJpbmFycmF5W2k+PjJdID4+
+ICgoaSU0KSo4ICApKSAmIDB4Rik7DQogIH0NCiAgcmV0dXJuIHN0cjsNCn0NCg0K
+LyoNCiAqIENvbnZlcnQgYW4gYXJyYXkgb2YgbGl0dGxlLWVuZGlhbiB3b3JkcyB0
+byBhIGJhc2UtNjQgc3RyaW5nDQogKi8NCmZ1bmN0aW9uIGJpbmwyYjY0KGJpbmFy
+cmF5KQ0Kew0KICB2YXIgdGFiID0gIkFCQ0RFRkdISUpLTE1OT1BRUlNUVVZXWFla
+YWJjZGVmZ2hpamtsbW5vcHFyc3R1dnd4eXowMTIzNDU2Nzg5Ky8iOw0KICB2YXIg
+c3RyID0gIiI7DQogIGZvcih2YXIgaSA9IDA7IGkgPCBiaW5hcnJheS5sZW5ndGgg
+KiA0OyBpICs9IDMpDQogIHsNCiAgICB2YXIgdHJpcGxldCA9ICgoKGJpbmFycmF5
+W2kgICA+PiAyXSA+PiA4ICogKCBpICAgJTQpKSAmIDB4RkYpIDw8IDE2KQ0KICAg
+ICAgICAgICAgICAgIHwgKCgoYmluYXJyYXlbaSsxID4+IDJdID4+IDggKiAoKGkr
+MSklNCkpICYgMHhGRikgPDwgOCApDQogICAgICAgICAgICAgICAgfCAgKChiaW5h
+cnJheVtpKzIgPj4gMl0gPj4gOCAqICgoaSsyKSU0KSkgJiAweEZGKTsNCiAgICBm
+b3IodmFyIGogPSAwOyBqIDwgNDsgaisrKQ0KICAgIHsNCiAgICAgIGlmKGkgKiA4
+ICsgaiAqIDYgPiBiaW5hcnJheS5sZW5ndGggKiAzMikgc3RyICs9IGI2NHBhZDsN
+CiAgICAgIGVsc2Ugc3RyICs9IHRhYi5jaGFyQXQoKHRyaXBsZXQgPj4gNiooMy1q
+KSkgJiAweDNGKTsNCiAgICB9DQogIH0NCiAgcmV0dXJuIHN0cjsNCn0NCg==
+
+------------NbTj16xyrFJgraG73IzlC0--
