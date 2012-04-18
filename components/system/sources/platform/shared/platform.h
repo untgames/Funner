@@ -7,6 +7,7 @@
 #include <shared/default_timer_manager.h>
 #include <shared/default_application_manager.h>
 #include <shared/default_screen_manager.h>
+#include <shared/default_sensor_manager.h>
 
 #include <shared/android.h>
 #include <shared/bada.h>

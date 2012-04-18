@@ -166,6 +166,7 @@ class LinuxPlatform
  , public UnistdLibraryManager
  , public UnistdApplicationManager
  , public DefaultScreenManager 
+ , public DefaultSensorManager 
 {
 };
 

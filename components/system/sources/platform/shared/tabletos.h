@@ -98,6 +98,7 @@ class TabletOsPlatform
  , public PThreadManager 
  , public UnistdLibraryManager
  , public DefaultScreenManager
+ , public DefaultSensorManager 
 {
 };
 

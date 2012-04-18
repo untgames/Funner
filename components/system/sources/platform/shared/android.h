@@ -1,6 +1,7 @@
 #ifndef SYSLIB_ANDROID_PLATFORM_HEADER
 #define SYSLIB_ANDROID_PLATFORM_HEADER
 
+#include <shared/default_sensor_manager.h>
 #include <shared/unistd.h>
 
 namespace syslib
@@ -94,6 +95,7 @@ class AndroidPlatform
  , public AndroidApplicationManager 
  , public UnistdLibraryManager
  , public DefaultScreenManager
+ , public DefaultSensorManager 
 {
 };
 

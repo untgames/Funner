@@ -146,6 +146,7 @@ class BadaPlatform
  , public BadaThreadManager 
  , public UnistdLibraryManager
  , public DefaultScreenManager
+ , public DefaultSensorManager 
 {
 };
 

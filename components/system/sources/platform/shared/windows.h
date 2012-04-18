@@ -301,6 +301,7 @@ class WindowsPlatform
  , public WindowsTimerManager
  , public WindowsApplicationManager
  , public WindowsScreenManager
+ , public DefaultSensorManager
 {
 };
 

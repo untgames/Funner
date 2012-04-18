@@ -219,6 +219,7 @@ class MacOsPlatform
  , public MacOsThreadManager 
  , public UnistdLibraryManager
  , public MacOsScreenManager
+ , public DefaultSensorManager 
 {
 };
 

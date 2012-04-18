@@ -29,6 +29,7 @@
 #include <syslib/keydefs.h>
 #include <syslib/mutex.h>
 #include <syslib/semaphore.h>
+#include <syslib/sensor.h>
 #include <syslib/timer.h>
 #include <syslib/thread.h>
 #include <syslib/tls.h>

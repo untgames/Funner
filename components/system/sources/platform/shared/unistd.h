@@ -64,6 +64,7 @@ class UnistdPlatform
  , public UnistdLibraryManager
  , public UnistdApplicationManager
  , public DefaultScreenManager 
+ , public DefaultSensorManager 
 {
 };
 

@@ -124,6 +124,7 @@ class IPhonePlatform
  , public IPhoneThreadManager 
  , public UnistdLibraryManager
  , public DefaultScreenManager
+ , public DefaultSensorManager 
 {
 };
 
