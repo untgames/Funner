@@ -1,4 +1,9 @@
+#include <stdio.h>
+#include <exception>
+
 #include <syslib/sensor.h>
+
+using namespace syslib;
 
 int main ()
 {
@@ -15,7 +20,7 @@ int main ()
       printf ("  sensor #%u: name='%s, type='%s', vendor='%s', max_range=%.2f, update_rate=%.2f\n", i, s.Name (), s.Type (), s.Vendor (), s.MaxRange (), s.UpdateRate ());
     }
   }  
-  catch (xtl::exception& e)
+  catch (std::exception& e)
   {
     printf ("%s\n", e.what ());
   }

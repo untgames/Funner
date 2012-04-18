@@ -6,6 +6,14 @@
 
 #include <xtl/functional_fwd>
 
+namespace common
+{
+
+//forward declaration
+class PropertyMap;
+
+}
+
 namespace syslib
 {
 
