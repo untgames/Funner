@@ -105,7 +105,7 @@ class JniSensorManager
         get_sensor_resolution_method = find_method (&env, sensor_class.get (), "getResolution", "()F");        
         get_sensor_min_delay_method  = env.GetMethodID (sensor_class.get (), "getMinDelay", "()I");        
         
-        if (jthrowable exc = env.ExceptionOccurred ())
+        if (env.ExceptionOccurred ())
           env.ExceptionClear ();
         
           //заполнение таблиц сенсоров
