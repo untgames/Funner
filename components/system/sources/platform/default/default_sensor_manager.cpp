@@ -44,30 +44,30 @@ void DefaultSensorManager::DestroySensor (sensor_t)
     Имя сенсора
 */
 
-const char* DefaultSensorManager::GetSensorName (sensor_t)
+stl::string DefaultSensorManager::GetSensorName (sensor_t)
 {
   raise ("syslib::DefaultSensorManager::GetSensorName");
-  return 0;
+  return "";
 }
 
 /*
     Производитель сенсора
 */
 
-const char* DefaultSensorManager::GetSensorVendor (sensor_t)
+stl::string DefaultSensorManager::GetSensorVendor (sensor_t)
 {
   raise ("syslib::DefaultSensorManager::GetSensorVendor");
-  return 0;
+  return "";
 }
 
 /*
     Тип устройства
 */
 
-const char* DefaultSensorManager::GetSensorType (sensor_t)
+stl::string DefaultSensorManager::GetSensorType (sensor_t)
 {
   raise ("syslib::DefaultSensorManager::GetSensorType");
-  return 0;
+  return "";
 }
 
 /*

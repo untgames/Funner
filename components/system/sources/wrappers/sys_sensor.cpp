@@ -35,7 +35,11 @@ class SensorImpl: public xtl::reference_counter, public xtl::trackable
         handle = Platform::CreateSensor (index);
         
         if (!handle)
-          throw xtl::format_operation_exception ("", "Null sensor handle returned from Platform::CreateSensor");                   
+          throw xtl::format_operation_exception ("", "Null sensor handle returned from Platform::CreateSensor");
+          
+        name   = Platform::GetSensorName (handle);
+        type   = Platform::GetSensorType (handle);
+        vendor = Platform::GetSensorVendor (handle);
       }
       catch (xtl::exception& e)
       {
@@ -62,6 +66,15 @@ class SensorImpl: public xtl::reference_counter, public xtl::trackable
     
 ///Дескриптор сенсора
     sensor_t Handle () { return handle; }
+    
+///Имя сенсора
+    const char* Name () { return name.c_str (); }
+    
+///Тип сенсора
+    const char* Type () { return type.c_str (); }
+    
+///Производитель сенсора
+    const char* Vendor () { return vendor.c_str (); }
     
 ///Регистрация обработчиков событий
     xtl::connection RegisterEventHandler (const Sensor::EventHandler& handler)
@@ -206,10 +219,13 @@ class SensorImpl: public xtl::reference_counter, public xtl::trackable
     }
   
   private:
-    Mutex    mutex;  //мьютекс доступа к сенсору
-    sensor_t handle; //дескриптор сенсора
-    Signal   signal; //сигнал событий сенсора
-    bool     paused; //флаг паузы принятия событий сенсора
+    Mutex       mutex;  //мьютекс доступа к сенсору
+    sensor_t    handle; //дескриптор сенсора
+    Signal      signal; //сигнал событий сенсора
+    bool        paused; //флаг паузы принятия событий сенсора
+    stl::string name;   //имя сенсора
+    stl::string type;   //тип сенсора
+    stl::string vendor; //производитель сенсора
 };
 
 }
@@ -235,6 +251,9 @@ class SensorManagerImpl: public xtl::trackable
         timer.reset (new Timer (xtl::bind (&SensorManagerImpl::PollSensors, this)));
 
         SetUpdateRate (DEFAULT_SENSOR_MANAGER_UPDATE_RATE);
+        
+        connect_tracker (Application::RegisterEventHandler (ApplicationEvent_OnPause, xtl::bind (&SensorManagerImpl::Pause, this)));
+        connect_tracker (Application::RegisterEventHandler (ApplicationEvent_OnResume, xtl::bind (&SensorManagerImpl::Resume, this)));
       }
       catch (xtl::exception& e)
       {
@@ -406,15 +425,7 @@ Sensor& Sensor::operator = (const Sensor& sensor)
 
 const char* Sensor::Name () const
 {
-  try
-  {
-    return Platform::GetSensorName (impl->Handle ());
-  }
-  catch (xtl::exception& e)
-  {
-    e.touch ("syslib::Sensor::Name");
-    throw;
-  }
+  return impl->Name ();
 }
 
 /*
@@ -423,15 +434,7 @@ const char* Sensor::Name () const
 
 const char* Sensor::Type () const
 {
-  try
-  {
-    return Platform::GetSensorType (impl->Handle ());
-  }
-  catch (xtl::exception& e)
-  {
-    e.touch ("syslib::Sensor::Type");
-    throw;
-  }
+  return impl->Type ();
 }
 
 /*
@@ -440,15 +443,7 @@ const char* Sensor::Type () const
 
 const char* Sensor::Vendor () const
 {
-  try
-  {
-    return Platform::GetSensorVendor (impl->Handle ());
-  }
-  catch (xtl::exception& e)
-  {
-    e.touch ("syslib::Sensor::Vendor");
-    throw;
-  }
+  return impl->Vendor ();
 }
 
 /*
@@ -523,6 +518,8 @@ void Sensor::GetProperties (common::PropertyMap& properties) const
 {
   try
   {
+    properties.Clear ();
+    
     return Platform::GetSensorProperties (impl->Handle (), properties);
   }
   catch (xtl::exception& e)
