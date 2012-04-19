@@ -17,6 +17,7 @@
 #include <syslib/application.h>
 #include <syslib/dll.h>
 #include <syslib/screen.h>
+#include <syslib/sensor.h>
 #include <syslib/timer.h>
 #include <syslib/window.h>
 

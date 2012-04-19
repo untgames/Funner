@@ -3,7 +3,7 @@
     <supports-screens android:resizeable="true" android:smallScreens="true" android:normalScreens="true" android:largeScreens="true" android:xlargeScreens="true"
     android:anyDensity="true"/>
     <application android:label="@string/funner.application" android:debuggable="true">
-        <activity android:name="EngineActivity">
+        <activity android:name="EngineActivity" android:launchMode="singleInstance" android:screenOrientation="landscape" android:theme="@android:style/Theme.Black.NoTitleBar.Fullscreen">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />

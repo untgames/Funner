@@ -31,7 +31,8 @@ typedef float SensorVector [3];
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 struct SensorEvent
 {
-  time_t timestamp;
+  time_t        timestamp;
+  unsigned char values_count;
 
   union
   {

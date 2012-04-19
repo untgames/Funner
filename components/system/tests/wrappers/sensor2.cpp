@@ -1,17 +1,26 @@
-#include <stdio.h>
-#include <exception>
-
-#include <xtl/connection.h>
-#include <xtl/function.h>
-
-#include <syslib/application.h>
-#include <syslib/sensor.h>
+#include "shared.h"
 
 using namespace syslib;
 
 void on_update (const SensorEvent& event)
 {
-  printf ("on_update\n");
+  printf ("on_update: ");
+  
+  for (size_t i=0; i<event.values_count; i++)
+  {
+    if (i)
+      printf (", ");
+    
+    printf ("%.2f", event.data [i]);        
+  }
+  
+  printf ("\n");
+}
+
+void log_print (const char* stream, const char* message)
+{
+  printf ("%s: %s\n", stream, message);
+  fflush (stdout);
 }
 
 int main ()
@@ -20,6 +29,8 @@ int main ()
 
   try
   {   
+    common::LogFilter log_filter ("*", &log_print);    
+    
     Sensor sensor (0);
     
     sensor.RegisterEventHandler (&on_update); 

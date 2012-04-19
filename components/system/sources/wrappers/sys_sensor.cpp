@@ -22,7 +22,7 @@ const float DEFAULT_SENSOR_MANAGER_UPDATE_RATE = 10.0f; //частота обновления сен
 namespace syslib
 {
 
-class SensorImpl: public xtl::reference_counter, public xtl::trackable
+class SensorImpl: public ISensorEventListener, public xtl::reference_counter, public xtl::trackable
 {
   public:
 ///Конструктор
@@ -93,7 +93,7 @@ class SensorImpl: public xtl::reference_counter, public xtl::trackable
         
         if (signal.num_slots () == 1 && !paused)
         {
-          Platform::StartSensorPolling (handle);
+          Platform::StartSensorPolling (handle, *this);
         }
         
         wrapped_handler.target<EventHandlerWrapper> ()->impl = this;
@@ -115,15 +115,20 @@ class SensorImpl: public xtl::reference_counter, public xtl::trackable
         if (paused)
           return;
           
-        for (;;)
-        {
+        Platform::PollSensorEvents (handle);
+
+        while (!events.empty ())
+        {                    
           SensorEvent event;
           
-          memset (&event, 0, sizeof (event));
+          {
+            Lock lock (mutex);
           
-          if (!Platform::PollSensorEvent (handle, event))
-            break;
-            
+            event = events.front ();          
+          
+            events.pop_front ();
+          }
+
           signal (event);
         }
       }
@@ -167,7 +172,7 @@ class SensorImpl: public xtl::reference_counter, public xtl::trackable
           return;                
           
         if (signal.num_slots () > 0)
-          Platform::StartSensorPolling (handle);          
+          Platform::StartSensorPolling (handle, *this);
           
         paused = false;
       }
@@ -178,8 +183,17 @@ class SensorImpl: public xtl::reference_counter, public xtl::trackable
       }      
     }
 
+///Обработка события сенсора
+    void OnSensorChanged (const SensorEvent& event)
+    {
+      Lock lock (mutex);
+      
+      events.push_back (event);
+    }
+
   private:
     typedef xtl::signal<Sensor::EventHandler::signature_type> Signal;
+    typedef stl::deque<SensorEvent>                           EventQueue;
     
     struct EventHandlerWrapper
     {
@@ -226,6 +240,7 @@ class SensorImpl: public xtl::reference_counter, public xtl::trackable
     stl::string name;   //имя сенсора
     stl::string type;   //тип сенсора
     stl::string vendor; //производитель сенсора
+    EventQueue  events; //события сенсора
 };
 
 }

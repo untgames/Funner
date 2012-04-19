@@ -118,7 +118,7 @@ void DefaultSensorManager::GetSensorProperties (sensor_t, common::PropertyMap& p
     Чтение событий сенсора
 */
 
-void DefaultSensorManager::StartSensorPolling (sensor_t)
+void DefaultSensorManager::StartSensorPolling (sensor_t, ISensorEventListener&)
 {
   raise ("syslib::DefaultSensorManager::StartSensorPolling");
 }
@@ -128,7 +128,6 @@ void DefaultSensorManager::StopSensorPolling (sensor_t)
   raise ("syslib::DefaultSensorManager::StopSensorPolling");
 }
 
-bool DefaultSensorManager::PollSensorEvent (sensor_t, SensorEvent&)
+void DefaultSensorManager::PollSensorEvents (sensor_t)
 {
-  return false;
 }

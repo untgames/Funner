@@ -2,6 +2,7 @@
 #include <ctime>
 
 #include <stl/hash_map>
+#include <stl/deque>
 #include <stl/string>
 
 #include <xtl/bind.h>
