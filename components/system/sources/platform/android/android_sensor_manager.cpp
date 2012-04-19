@@ -30,34 +30,43 @@ const char* ANDROID_LIST_CLASS_NAME           = "java/util/List";
 /// Типы сенсоров
 enum SensorType
 {
-    SENSOR_TYPE_ACCELEROMETER       = 1,
-    SENSOR_TYPE_MAGNETIC_FIELD      = 2,
-    SENSOR_TYPE_ORIENTATION         = 3,
-    SENSOR_TYPE_GYROSCOPE           = 4,
-    SENSOR_TYPE_LIGHT               = 5,
-    SENSOR_TYPE_PRESSURE            = 6,
-    SENSOR_TYPE_TEMPERATURE         = 7,
-    SENSOR_TYPE_PROXIMITY           = 8,
-    SENSOR_TYPE_GRAVITY             = 9,
-    SENSOR_TYPE_LINEAR_ACCELERATION = 10,
-    SENSOR_TYPE_ROTATION_VECTOR     = 11,    
-    SENSOR_TYPE_RELATIVE_HUMIDITY   = 12,    
-    
-    SENSOR_TYPE_ALL                 = -1,    
+  SENSOR_TYPE_ACCELEROMETER       = 1,
+  SENSOR_TYPE_MAGNETIC_FIELD      = 2,
+  SENSOR_TYPE_ORIENTATION         = 3,
+  SENSOR_TYPE_GYROSCOPE           = 4,
+  SENSOR_TYPE_LIGHT               = 5,
+  SENSOR_TYPE_PRESSURE            = 6,
+  SENSOR_TYPE_TEMPERATURE         = 7,
+  SENSOR_TYPE_PROXIMITY           = 8,
+  SENSOR_TYPE_GRAVITY             = 9,
+  SENSOR_TYPE_LINEAR_ACCELERATION = 10,
+  SENSOR_TYPE_ROTATION_VECTOR     = 11,    
+  SENSOR_TYPE_RELATIVE_HUMIDITY   = 12,    
+  
+  SENSOR_TYPE_ALL                 = -1,    
+};
+
+/// Типы частоты обновления сенсоров
+enum SensorRateType
+{
+  SENSOR_DELAY_FASTEST = 0,
+  SENSOR_DELAY_GAME    = 1,  
+  SENSOR_DELAY_UI      = 2,
+  SENSOR_DELAY_NORMAL  = 3,  
 };
 
 /*
     JNI шлюз к менеджеру сенсоров
 */
 
-class JniSensorManager
+class JniSensorManager: public MessageQueue::Handler
 {
   public:
 ///Конструктор
     JniSensorManager ()
     {
       try
-      {         
+      {                 
           //сохранение общих методов и классов SensorManager
           
         JNIEnv& env = get_env ();        
@@ -77,7 +86,9 @@ class JniSensorManager
         if (!sensor_manager_class)
           throw xtl::format_operation_exception ("", "Class %s not found in JNI environment", ANDROID_SENSOR_MANAGER_CLASS_NAME);
         
-        get_sensor_list_method = find_method (&env, sensor_manager_class.get (), "getSensorList", "(I)Ljava/util/List;");
+        get_sensor_list_method     = find_method (&env, sensor_manager_class.get (), "getSensorList", "(I)Ljava/util/List;");
+        register_listener_method   = find_method (&env, sensor_manager_class.get (), "registerListener", "(Landroid/hardware/SensorEventListener;Landroid/hardware/Sensor;I)Z");
+        unregister_listener_method = find_method (&env, sensor_manager_class.get (), "unregisterListener", "(Landroid/hardware/SensorEventListener;Landroid/hardware/Sensor;)V");
         
           //сохранение общих методов и классов List
         
@@ -106,17 +117,36 @@ class JniSensorManager
         get_sensor_min_delay_method  = env.GetMethodID (sensor_class.get (), "getMinDelay", "()I");        
         
         if (env.ExceptionOccurred ())
-          env.ExceptionClear ();
+          env.ExceptionClear ();          
+          
+          //создание слушателя
+          
+        jmethodID event_listener_class_constructor = env.GetMethodID (get_context ().sensor_event_listener_class.get (), "<init>", "()V");
+        
+        event_listener = env.NewObject (get_context ().sensor_event_listener_class.get (), event_listener_class_constructor);
+
+        if (!event_listener)
+          throw xtl::format_operation_exception ("", "EngineSensorEventListener constructor failed");                    
         
           //заполнение таблиц сенсоров
         
         AddSensors (SENSOR_TYPE_ALL);
+        
+          //регистрация обработчика событий
+        
+        MessageQueueSingleton::Instance ()->RegisterHandler (*this);
       }
       catch (xtl::exception& e)
       {
         e.touch ("syslib::android::JniSensorManager::JniSensorManager");
         throw;
       }      
+    }
+    
+///Деструктор
+    ~JniSensorManager ()
+    {
+      MessageQueueSingleton::Instance ()->UnregisterHandler (*this);
     }
     
 ///Количество сенсоров
@@ -134,8 +164,62 @@ class JniSensorManager
     int     SensorVersion    (const global_ref<jobject>& sensor) { return get_env ().CallIntMethod (sensor.get (), get_sensor_version_method); };
     float   SensorPower      (const global_ref<jobject>& sensor) { return get_env ().CallFloatMethod (sensor.get (), get_sensor_power_method); };
     float   SensorResolution (const global_ref<jobject>& sensor) { return get_env ().CallFloatMethod (sensor.get (), get_sensor_resolution_method); };
+    
+///Обработчик события изменения точности измерений
+    void OnAccuracyChanged (const global_ref<jobject>& sensor, int accuracy)
+    {
+      printf ("accuracy changed: %d\n", accuracy); fflush (stdout);
+    }
+    
+///Обработчик события изменения сенсора
+    void OnSensorChanged (const global_ref<jobject>& sensor, int accuracy, unsigned long long timestamp, const global_ref<jobjectArray>& values)
+    {
+      printf ("sensor changed\n"); fflush (stdout);
+    }
+    
+///Начало получения событий от сенсора
+    void StartSensorPolling (const global_ref<jobject>& sensor)
+    {      
+      jboolean status = get_env ().CallBooleanMethod (GetSensorManager ().get (), register_listener_method, event_listener.get (), sensor.get (), SENSOR_DELAY_GAME);
+      
+      if (!status)
+        throw xtl::format_operation_exception ("", "SensorManager::registerListener failed");
+    }
+    
+///Конец получения событий от сенсора
+    void StopSensorPolling (const global_ref<jobject>& sensor)
+    {
+      get_env ().CallVoidMethod (GetSensorManager ().get (), unregister_listener_method, event_listener.get (), sensor.get ());            
+    }    
 
   private:
+///Получение менеджер сенсоров
+    local_ref<jobject> GetSensorManager ()
+    {
+      JNIEnv& env = get_env ();
+
+      local_ref<jobject> activity = get_activity ();
+      
+      if (!activity)
+        throw xtl::format_operation_exception ("", "Null activity");
+        
+      local_ref<jclass> activity_class = env.GetObjectClass (activity.get ());
+      
+      if (!activity_class)
+        throw xtl::format_operation_exception ("", "JNIEnv::GetObjectClass failed");        
+
+      jmethodID get_system_service_method = find_method (&env, activity_class.get (), "getSystemService", "(Ljava/lang/String;)Ljava/lang/Object;");        
+      
+      static const char* ANDROID_SENSOR_MANAGER_SERVICE = "sensor";
+
+      local_ref<jobject> sensor_manager = env.CallObjectMethod (activity.get (), get_system_service_method, tojstring (ANDROID_SENSOR_MANAGER_SERVICE).get ());
+      
+      if (!sensor_manager)
+        throw xtl::format_operation_exception ("", "getSystemService('%s') failed", ANDROID_SENSOR_MANAGER_SERVICE);            
+        
+      return sensor_manager;
+    }
+  
 ///Добавление сенсоров
     void AddSensors (int type)
     {
@@ -143,25 +227,8 @@ class JniSensorManager
       {
         JNIEnv& env = get_env ();
 
-        local_ref<jobject> activity = get_activity ();
+        local_ref<jobject> sensor_manager = GetSensorManager ();
         
-        if (!activity)
-          throw xtl::format_operation_exception ("", "Null activity");
-          
-        local_ref<jclass> activity_class = env.GetObjectClass (activity.get ());
-        
-        if (!activity_class)
-          throw xtl::format_operation_exception ("", "JNIEnv::GetObjectClass failed");        
-
-        jmethodID get_system_service_method = find_method (&env, activity_class.get (), "getSystemService", "(Ljava/lang/String;)Ljava/lang/Object;");        
-        
-        static const char* ANDROID_SENSOR_MANAGER_SERVICE = "sensor";
-
-        local_ref<jobject> sensor_manager = env.CallObjectMethod (activity.get (), get_system_service_method, tojstring (ANDROID_SENSOR_MANAGER_SERVICE).get ());
-        
-        if (!sensor_manager)
-          throw xtl::format_operation_exception ("", "getSystemService('%s') failed", ANDROID_SENSOR_MANAGER_SERVICE);
-
         local_ref<jobject> sensors_list = env.CallObjectMethod (sensor_manager.get (), get_sensor_list_method, type);
         
         if (!sensors_list)
@@ -194,24 +261,70 @@ class JniSensorManager
     typedef stl::vector<SensorPtr> SensorArray;
       
   private:
-    SensorArray        sensors;                //список сенсоров
-    global_ref<jclass> sensor_manager_class;   //класс менеджера сенсоров
-    jmethodID          get_sensor_list_method; //метод получения списка сенсоров
-    global_ref<jclass> list_class;             //класс работы со списком
-    jmethodID          get_list_size_method;          //метод получения количества элементов в списке
-    jmethodID          get_list_item_method;          //метод получения элемента списка
-    global_ref<jclass> sensor_class;           //класс работы с сенсором
-    jmethodID          get_sensor_name_method;        //метод получения имени сенсора
-    jmethodID          get_sensor_type_method;        //метод получения типа сенсора
-    jmethodID          get_sensor_vendor_method;      //метод получения производителя сенсора
-    jmethodID          get_sensor_max_range_method;   //метод получения максимального значения сенсора
-    jmethodID          get_sensor_min_delay_method;   //метод получения минимальной задержки между событиями сенсора    
-    jmethodID          get_sensor_version_method;     //метод получения версии сенсора
-    jmethodID          get_sensor_resolution_method;  //метод получения разрешающей способности сенсора
-    jmethodID          get_sensor_power_method;       //метод получения потребления энергии сенсором
+    SensorArray         sensors;                       //список сенсоров
+    global_ref<jclass>  sensor_manager_class;          //класс менеджера сенсоров
+    jmethodID           get_sensor_list_method;        //метод получения списка сенсоров
+    jmethodID           register_listener_method;      //метод подписки на события сенсоров
+    jmethodID           unregister_listener_method;    //метод отмены подписки на события сенсоров    
+    global_ref<jclass>  list_class;                    //класс работы со списком
+    jmethodID           get_list_size_method;          //метод получения количества элементов в списке
+    jmethodID           get_list_item_method;          //метод получения элемента списка
+    global_ref<jclass>  sensor_class;                  //класс работы с сенсором
+    jmethodID           get_sensor_name_method;        //метод получения имени сенсора
+    jmethodID           get_sensor_type_method;        //метод получения типа сенсора
+    jmethodID           get_sensor_vendor_method;      //метод получения производителя сенсора
+    jmethodID           get_sensor_max_range_method;   //метод получения максимального значения сенсора
+    jmethodID           get_sensor_min_delay_method;   //метод получения минимальной задержки между событиями сенсора    
+    jmethodID           get_sensor_version_method;     //метод получения версии сенсора
+    jmethodID           get_sensor_resolution_method;  //метод получения разрешающей способности сенсора
+    jmethodID           get_sensor_power_method;       //метод получения потребления энергии сенсором
+    global_ref<jobject> event_listener;                //слушатель событий сенсоров
 };
 
 typedef common::Singleton<JniSensorManager> JniSensorManagerSingleton;
+
+/*
+    Обработчики оповещения о событиях
+*/
+
+template <class Fn> class SensorManagerMessage: public MessageQueue::Message
+{
+  public:
+    SensorManagerMessage (const Fn& in_fn)
+      : fn (in_fn) {}
+
+    void Dispatch ()
+    {
+      JniSensorManagerSingleton::Instance instance;
+      
+      fn (*instance);
+    }
+
+  private:
+    Fn fn;
+};
+
+template <class Fn> void push_message (const Fn& fn)
+{
+  try
+  {
+    MessageQueueSingleton::Instance ()->PushMessage (*JniSensorManagerSingleton::Instance (), MessageQueue::MessagePtr (new SensorManagerMessage<Fn> (fn), false));
+  }
+  catch (...)
+  {
+    //подавление всех исключений
+  }
+}
+
+void on_accuracy_changed (jobject sensor, int accuracy)
+{
+  push_message (xtl::bind (&JniSensorManager::OnAccuracyChanged, _1, global_ref<jobject> (sensor), accuracy));
+}
+
+void on_sensor_changed (jobject sensor, int accuracy, unsigned long long timestamp, jobjectArray values)
+{
+  push_message (xtl::bind (&JniSensorManager::OnSensorChanged, _1, global_ref<jobject> (sensor), accuracy, timestamp, global_ref<jobjectArray> (values)));
+}
 
 }
 
@@ -429,17 +542,81 @@ void AndroidSensorManager::GetSensorProperties (sensor_t handle, common::Propert
     Чтение событий сенсора
 */
 
-void AndroidSensorManager::StartSensorPolling (sensor_t)
+void AndroidSensorManager::StartSensorPolling (sensor_t handle)
 {
-  throw xtl::make_not_implemented_exception ("syslib::AndroidSensorManager::StartSensorPolling");
+  try
+  {
+    if (!handle)   
+      throw xtl::make_null_argument_exception ("", "handle");    
+    
+    JniSensorManagerSingleton::Instance ()->StartSensorPolling (handle->sensor);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("syslib::AndroidSensorManager::StartSensorPolling");
+    throw;
+  }
 }
 
-void AndroidSensorManager::StopSensorPolling (sensor_t)
+void AndroidSensorManager::StopSensorPolling (sensor_t handle)
 {
-  throw xtl::make_not_implemented_exception ("syslib::AndroidSensorManager::StopSensorPolling");
+  try
+  {
+    if (!handle)   
+      throw xtl::make_null_argument_exception ("", "handle");
+        
+    JniSensorManagerSingleton::Instance ()->StopSensorPolling (handle->sensor);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("syslib::AndroidSensorManager::StopSensorPolling");
+    throw;
+  }
 }
 
 bool AndroidSensorManager::PollSensorEvent (sensor_t, SensorEvent&)
 {
   return false;
+}
+
+namespace syslib
+{
+
+namespace android
+{
+
+/// регистрация методов обратного вызова менеджера сенсоров
+void register_sensor_manager_callbacks (JNIEnv* env)
+{
+  try
+  {
+    if (!env)
+      throw xtl::make_null_argument_exception ("", "env");
+
+    jclass event_listener_class = env->FindClass ("com/untgames/funner/application/EngineSensorEventListener");
+
+    if (!event_listener_class)
+      throw xtl::format_operation_exception ("", "Can't find EngineSensorEventListener class\n");
+
+    static const JNINativeMethod methods [] = {
+      {"onAccuracyChangedCallback", "(Landroid/hardware/Sensor;I)V", (void*)&on_accuracy_changed},
+      {"onSensorChangedCallback", "(Landroid/hardware/Sensor;IJ[F)V", (void*)&on_sensor_changed},
+    };
+
+    static const size_t methods_count = sizeof (methods) / sizeof (*methods);
+
+    jint status = env->RegisterNatives (event_listener_class, methods, methods_count);
+
+    if (status)
+      throw xtl::format_operation_exception ("", "Can't register natives (status=%d)", status);    
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("syslib::android::register_sensor_manager_callbacks");
+    throw;
+  }
+}
+
+}
+
 }

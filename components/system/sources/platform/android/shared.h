@@ -196,8 +196,9 @@ template <class T> T check_errors (T result)
 ///Контекст запуска приложения
 struct ApplicationContext
 {
-  JavaVM*             vm;          //виртуальная машина
-  global_ref<jclass>  utils_class; //EngineUtils class
+  JavaVM*             vm;                         //виртуальная машина
+  global_ref<jclass>  utils_class;                 //EngineUtils class
+  global_ref<jclass>  sensor_event_listener_class; //EngineSensorEventListener class
   
   ApplicationContext () : vm (0) {}
 };
@@ -207,6 +208,9 @@ void start_application (JavaVM* vm, jobject activity, const char* program_name, 
 
 /// регистрация методов обратного вызова окна
 void register_window_callbacks (JNIEnv* env);
+
+/// регистрация методов обратного вызова менеджера сенсоров
+void register_sensor_manager_callbacks (JNIEnv* env);
 
 /// регистрация методов обратного вызова activity
 void register_activity_callbacks (JNIEnv* env, jclass activity_class);

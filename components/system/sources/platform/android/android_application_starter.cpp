@@ -17,10 +17,11 @@ namespace
     Константы
 */
 
-const char* THREAD_NAME             = "system.android.launcher";                     //имя нити приложения
-const char* ENGINE_UTILS_CLASS_NAME = "com/untgames/funner/application/EngineUtils"; //имя класса java утилит
-const char* APK_FULL_PATH           = "APK_FULL_PATH";                               //имя переменной пути к APK-файлу
-const char* SEARCH_PATHS            = "SEARCH_PATHS";                                //имя переменной списка путей поиска файлов
+const char* THREAD_NAME                             = "system.android.launcher";                                    //имя нити приложения
+const char* ENGINE_UTILS_CLASS_NAME                 = "com/untgames/funner/application/EngineUtils";                //имя класса java утилит
+const char* ENGINE_SENSOR_EVENT_LISTENER_CLASS_NAME = "com/untgames/funner/application/EngineSensorEventListener";  //имя класса слушателя событий сенсора
+const char* APK_FULL_PATH                           = "APK_FULL_PATH";                                              //имя переменной пути к APK-файлу
+const char* SEARCH_PATHS                            = "SEARCH_PATHS";                                               //имя переменной списка путей поиска файлов
 
 /// Контекст запуска приложения
 ApplicationContext application_context;
@@ -210,10 +211,14 @@ void start_application (JavaVM* vm, jobject activity, const char* program_name, 
   
   current_activity = activity;
   
-  application_context.utils_class = get_env ().FindClass (ENGINE_UTILS_CLASS_NAME);
+  application_context.utils_class                 = get_env ().FindClass (ENGINE_UTILS_CLASS_NAME);
+  application_context.sensor_event_listener_class = get_env ().FindClass (ENGINE_SENSOR_EVENT_LISTENER_CLASS_NAME);
   
   if (!application_context.utils_class)
     throw xtl::format_operation_exception ("", "EngineUtils class '%s' not found", ENGINE_UTILS_CLASS_NAME);    
+    
+  if (!application_context.sensor_event_listener_class)
+    throw xtl::format_operation_exception ("", "Can't find EngineSensorEventListener class\n");    
     
     //запуск нити приложения
     
