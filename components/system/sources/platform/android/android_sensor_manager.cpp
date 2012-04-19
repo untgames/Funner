@@ -7,7 +7,7 @@ namespace syslib
 {
 
 /// Дескриптор сенсора
-struct sensor_handle: public MessageQueue::Handler
+struct sensor_handle
 {
   global_ref<jobject>   sensor;
   global_ref<jobject>   event_listener;
@@ -27,10 +27,6 @@ struct sensor_handle: public MessageQueue::Handler
 
       if (!event_listener)
         throw xtl::format_operation_exception ("", "EngineSensorEventListener constructor failed");      
-        
-          //регистрация обработчика событий
-        
-      MessageQueueSingleton::Instance ()->RegisterHandler (*this);
     }    
     catch (xtl::exception& e)
     {
@@ -43,8 +39,6 @@ struct sensor_handle: public MessageQueue::Handler
   {
     try
     {
-      MessageQueueSingleton::Instance ()->UnregisterHandler (*this);      
-      
         //получение метода сброса ссылки
 
       jmethodID event_listener_reset_reference = find_method (&get_env (), get_context ().sensor_event_listener_class.get (), "resetSensorRef", "()V");
@@ -72,7 +66,6 @@ const char* ANDROID_SENSOR_MANAGER_CLASS_NAME    = "android/hardware/SensorManag
 const char* ANDROID_SENSOR_CLASS_NAME            = "android/hardware/Sensor";
 const char* ANDROID_LIST_CLASS_NAME              = "java/util/List";
 const char* LOG_NAME                             = "system.android.sensors";
-const bool  SENSOR_EVENT_CALLBACK_IN_SAME_THREAD = true;
 
 /// Типы сенсоров
 enum SensorType
@@ -248,7 +241,7 @@ class JniSensorManager
       if (handle.app_listener)
         throw xtl::format_operation_exception ("", "SensorEventListener has already registered");
       
-      jboolean status = get_env ().CallBooleanMethod (GetSensorManager ().get (), register_listener_method, handle.event_listener.get (), handle.sensor.get (), SENSOR_DELAY_GAME);
+      jboolean status = get_env ().CallBooleanMethod (GetSensorManager ().get (), register_listener_method, handle.event_listener.get (), handle.sensor.get (), SENSOR_DELAY_FASTEST);
       
       if (!status)
         throw xtl::format_operation_exception ("", "SensorManager::registerListener failed");
@@ -359,39 +352,6 @@ class JniSensorManager
 
 typedef common::Singleton<JniSensorManager> JniSensorManagerSingleton;
 
-/*
-    Обработчики оповещения о событиях
-*/
-
-template <class Fn> class SensorManagerMessage: public MessageQueue::Message
-{
-  public:
-    SensorManagerMessage (const Fn& in_fn)
-      : fn (in_fn) {}
-
-    void Dispatch ()
-    {
-      JniSensorManagerSingleton::Instance instance;
-
-      fn (*instance);
-    }
-
-  private:
-    Fn fn;
-};
-
-template <class Fn> void push_message (sensor_t sensor, const Fn& fn)
-{
-  try
-  {
-    MessageQueueSingleton::Instance ()->PushMessage (*sensor, MessageQueue::MessagePtr (new SensorManagerMessage<Fn> (fn), false));
-  }
-  catch (...)
-  {
-    //подавление всех исключений
-  }
-}
-
 void JNICALL on_accuracy_changed (JNIEnv&, jlong sensorRef, jobject sensor, int accuracy)
 {
 ///ignored
@@ -401,14 +361,7 @@ void JNICALL on_sensor_changed (JNIEnv&, jlong sensorRef, jobject sensor, jint a
 {
   sensor_t handle = reinterpret_cast<sensor_t> (sensorRef);  
   
-  if (SENSOR_EVENT_CALLBACK_IN_SAME_THREAD)
-  {
-    JniSensorManagerSingleton::Instance ()->OnSensorChanged (*handle, timestamp, local_ref<jfloatArray> (values));    
-  }
-  else
-  {
-    push_message (handle, xtl::bind (&JniSensorManager::OnSensorChanged, _1, xtl::ref (*handle), timestamp, global_ref<jfloatArray> (values)));    
-  }
+  JniSensorManagerSingleton::Instance ()->OnSensorChanged (*handle, timestamp, local_ref<jfloatArray> (values));    
 }
 
 }
