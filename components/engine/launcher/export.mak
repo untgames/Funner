@@ -11,7 +11,7 @@ export.link.engine.launcher_shared.beagleboard.IMPORTS := link.media.image.pvr
 export.link.engine.launcher_shared.IMPORTS := link.common.default_console_handler link.common.zip_file_system link.common.aes \
                                 link.media.rms link.media.rfx.xmtl.obsolete link.media.sound.snddecl link.media.sound.default_decoders \
                                 link.media.font.xfont link.media.players.null link.media.physics.xphys \
-                                link.input.manager.xkeymap link.input.manager.xkeyreg link.input.window_driver link.input.sensor_manager \
+                                link.input.manager.xkeymap link.input.manager.xkeyreg link.input.window_driver link.input.sensor_input_driver \
                                 link.render.scene_render2d link.script.lua \
                                 link.engine.script_binds.math link.engine.script_binds.sg link.engine.script_binds.bv \
                                 link.engine.script_binds.render link.engine.script_binds.engine \
