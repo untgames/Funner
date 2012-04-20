@@ -101,7 +101,7 @@ class InputManagerSubsystem: public ISubsystem, public IAttachmentRegistryListen
 
             if (device_iter == devices.end ())
             {
-              DevicePtr current_device (current_driver->CreateDevice (current_driver->GetDeviceName (j)), false);
+              DevicePtr current_device (current_driver->CreateDevice (current_driver->GetDeviceFullName (j)), false);
 
               device_entry->device = DeviceHolderPtr (new DeviceHolder (current_device.get (), devices), false);
 

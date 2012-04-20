@@ -98,21 +98,26 @@ class Driver: virtual public IDriver, public xtl::reference_counter
 
       for (size_t i = 0, count = GetDevicesCount (); i < count; i++)
       {
-        const char* device_name = GetDeviceName (i);
+        const char* device_name = GetDeviceFullName (i);
 
-        if (!xtl::xstrcmp (device_name, name))
+        if (!xtl::xstrcmp (device_name, full_name))
         {
-          if (!xtl::xstrcmp (device_name, ASCII_KEYBOARD_DEVICE_DESC.name))
+          if (!xtl::xstrcmp (device_name, ASCII_KEYBOARD_DEVICE_DESC.full_name))
             return new IPhoneKeyboard (ASCII_KEYBOARD_DEVICE_DESC.name, ASCII_KEYBOARD_DEVICE_DESC.full_name, KeyboardType_ASCII, AutocapitalizationType_None);
-          else if (!xtl::xstrcmp (device_name, ASCII_AUTOCAPITALIZED_KEYBOARD_DEVICE_DESC.name))
+            
+          if (!xtl::xstrcmp (device_name, ASCII_AUTOCAPITALIZED_KEYBOARD_DEVICE_DESC.full_name))
             return new IPhoneKeyboard (ASCII_AUTOCAPITALIZED_KEYBOARD_DEVICE_DESC.name, ASCII_AUTOCAPITALIZED_KEYBOARD_DEVICE_DESC.full_name, KeyboardType_ASCII, AutocapitalizationType_Sentences);
-          else if (!xtl::xstrcmp (device_name, NUMBER_KEYBOARD_DEVICE_DESC.name))
+            
+          if (!xtl::xstrcmp (device_name, NUMBER_KEYBOARD_DEVICE_DESC.full_name))
             return new IPhoneKeyboard (NUMBER_KEYBOARD_DEVICE_DESC.name, NUMBER_KEYBOARD_DEVICE_DESC.full_name, KeyboardType_NumberPad, AutocapitalizationType_None);
-          else if (!xtl::xstrcmp (device_name, NUMBER_PUNCTUATION_KEYBOARD_DEVICE_DESC.name))
+            
+          if (!xtl::xstrcmp (device_name, NUMBER_PUNCTUATION_KEYBOARD_DEVICE_DESC.full_name))
             return new IPhoneKeyboard (NUMBER_PUNCTUATION_KEYBOARD_DEVICE_DESC.name, NUMBER_PUNCTUATION_KEYBOARD_DEVICE_DESC.full_name, KeyboardType_NumbersAndPunctuation, AutocapitalizationType_None);
-          else if (!xtl::xstrcmp (device_name, APPLICATION_DEVICE_DESC.name))
+            
+          if (!xtl::xstrcmp (device_name, APPLICATION_DEVICE_DESC.full_name))
             return new IPhoneApplication (APPLICATION_DEVICE_DESC.name, APPLICATION_DEVICE_DESC.full_name);
-          else if (!xtl::xstrcmp (device_name, ACCELEROMETER_DEVICE_DESC.name))
+            
+          if (!xtl::xstrcmp (device_name, ACCELEROMETER_DEVICE_DESC.full_name))
             return new IPhoneAccelerometer (ACCELEROMETER_DEVICE_DESC.name, ACCELEROMETER_DEVICE_DESC.full_name);
         }
       }
