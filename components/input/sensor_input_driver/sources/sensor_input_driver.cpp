@@ -24,6 +24,24 @@ void default_log_handler (const char*)
 Driver::Driver ()
   : debug_log (&default_log_handler)
 {
+  try
+  {
+    size_t sensors_count = SensorManager::SensorsCount ();
+    
+    devices_full_names.Reserve (sensors_count);
+    
+    for (size_t i=0; i<sensors_count; i++)
+    {
+      Sensor s (i);
+      
+      devices_full_names.Add (common::format ("%s.%s", s.Type (), s.Name ()).c_str ());
+    }
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("input::low_level::sensor_input_driver::Driver::Driver");
+    throw;
+  }
 }
 
 Driver::~Driver ()
@@ -50,16 +68,22 @@ size_t Driver::GetDevicesCount ()
 
 const char* Driver::GetDeviceName (size_t index)
 {
-  return Driver::GetDeviceFullName (index);
+  try
+  {
+    return Sensor (index).Name ();
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("input::low_level::sensor_input_driver::Driver::GetDeviceName");
+    throw;
+  }
 }
 
 const char* Driver::GetDeviceFullName (size_t index)
 {
   try
   {
-    Sensor sensor (index);
-    
-    return sensor.Name ();
+    return devices_full_names [index];
   }
   catch (xtl::exception& e)
   {
@@ -72,9 +96,24 @@ const char* Driver::GetDeviceFullName (size_t index)
     Создаение устройства ввода
 */
 
-IDevice* Driver::CreateDevice (const char* full_name, const char* init_string)
+IDevice* Driver::CreateDevice (const char* full_name, const char*)
 {
-  throw xtl::make_not_implemented_exception ("input::low_level::sensor_input_driver::Driver::CreateDevice");
+  try
+  {
+    if (!full_name)
+      throw xtl::make_null_argument_exception ("", "full_name");
+    
+    for (size_t i=0, count=devices_full_names.Size (); i<count; i++)
+      if (!xtl::xstrcmp (devices_full_names [i], full_name))    
+        return new Device (i, full_name);
+        
+    throw xtl::format_operation_exception ("", "Sensor '%s' not found", full_name);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("input::low_level::sensor_input_driver::Driver::CreateDevice");
+    throw;
+  }
 }
 
 /*
@@ -124,7 +163,12 @@ class SensorInputDriverComponent
     }
 };
 
-extern "C" common::ComponentRegistrator<SensorInputDriverComponent> SensorInputDriver (COMPONENT_NAME);
+extern "C"
+{
+
+common::ComponentRegistrator<SensorInputDriverComponent> SensorInputDriver (COMPONENT_NAME);
+
+}
 
 }
 

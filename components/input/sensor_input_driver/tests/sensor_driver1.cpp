@@ -23,12 +23,7 @@ using namespace input::low_level;
 
 void input_event_handler (IDevice* device, const char* event)
 {
-  if (!xtl::xstrcmp ("'Button1' down", event))
-    Application::Exit (0);
-
   printf ("New event: '%s'\n", event);
-
-  printf ("Control name is '%S'\n", device->GetControlName (word (event, 0, " ", " \t", "''").c_str ()));
 }
 
 void debug_log_handler (const char* message)
@@ -54,7 +49,7 @@ int main ()
     IDriver* driver = DriverManager::FindDriver ("SensorInputDriver");
 
     if (!driver)
-      throw xtl::format_operation_exception ("", "Can't find direct input 8 driver");
+      throw xtl::format_operation_exception ("", "Can't find driver");
 
     driver->SetDebugLog (&debug_log_handler);
 
@@ -76,6 +71,8 @@ int main ()
       for (size_t j = 0; !word (devices.back ()->GetProperties (), j, " ", " \t", "''\"\"").empty (); j++)
         printf ("  '%s' = %f\n", word (devices.back ()->GetProperties (), j, " ", " \t", "''\"\"").c_str (), devices.back ()->GetProperty (word (devices.back ()->GetProperties (), j, " ", " \t", "''\"\"").c_str ()));
     }
+    
+    fflush (stdout);
     
     Application::Run ();        
 
