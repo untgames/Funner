@@ -43,7 +43,7 @@ const char* EGL_DISPLAY_CLASS_NAME = "com/google/android/gles_jni/EGLDisplayImpl
 ///—тратеги€ владени€ локальной JNI ссылкой
 template <class T> struct jni_local_ref_strategy
 {
-  static T*   clone   (T* ptr) { syslib::android::get_env ().NewLocalRef (ptr); return ptr; }
+  static T*   clone   (T* ptr) { return (T*)syslib::android::get_env ().NewLocalRef (ptr); }
   static void release (T* ptr) { syslib::android::get_env ().DeleteLocalRef (ptr); }  
 };
 
