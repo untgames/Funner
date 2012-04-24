@@ -129,10 +129,8 @@ class bitset
     bool operator != (const bitset&) const;
    
   private:
-    enum {
-      BITS_PER_WORD = sizeof (word_type) * CHAR_BIT,    //количество битов на слово
-      WORDS         = bits < 1 ? 1 : (bits + BITS_PER_WORD - 1) / BITS_PER_WORD //количество слов
-    };
+    static const size_t BITS_PER_WORD = sizeof (word_type) * CHAR_BIT;    //количество битов на слово
+    static const size_t WORDS         = bits < 1 ? 1 : (bits + BITS_PER_WORD - 1) / BITS_PER_WORD; //количество слов
 
     static size_t    which_word (size_t pos); 
     static size_t    which_byte (size_t pos); 

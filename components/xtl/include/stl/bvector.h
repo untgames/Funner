@@ -38,7 +38,7 @@ class bit_iterator_base
     bit_iterator_base ();
     bit_iterator_base (word_type* pos,word_type offset);
     
-    enum { BITS_PER_WORD = sizeof (word_type) * CHAR_BIT }; //количество битов на слово
+    static const size_t BITS_PER_WORD = sizeof (word_type) * CHAR_BIT; //количество битов на слово
       
   protected:  
     word_type* pos, offset;  
@@ -218,7 +218,7 @@ class bit_vector
     bool operator >= (const bit_vector&) const;
     
   private:
-    enum { BITS_PER_WORD = sizeof (word_type) * CHAR_BIT };
+    static const size_t BITS_PER_WORD = sizeof (word_type) * CHAR_BIT;
     
     iterator  prepare_room (iterator,size_type);
     void      trim         (size_type);

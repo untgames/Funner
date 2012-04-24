@@ -324,7 +324,7 @@ class basic_string: private Allocator::template rebind<T>::other
     pointer allocate         (size_type,size_type&);
     void    deallocate       (pointer,size_type);
 
-    enum { BUF_SIZE = 20/sizeof (value_type)<1?1:20/sizeof (value_type) }; //размер внутреннего буфера
+    static const size_t BUF_SIZE = 20 / sizeof (value_type) < 1 ? 1 : 20 / sizeof (value_type); //размер внутреннего буфера
 
   protected:
     pointer    start, finish, end_of_storage;

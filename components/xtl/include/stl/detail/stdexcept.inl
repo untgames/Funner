@@ -4,7 +4,7 @@
 
 inline named_exception::named_exception (const char* s)
 {
-  strncpy (name,s?s:"unknown exception",BUF_SIZE);
+  strncpy (name, s ? s : "unknown exception", BUF_SIZE);
   name [BUF_SIZE-1] = '\0';  
 }
 

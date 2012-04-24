@@ -30,11 +30,11 @@ using std::exception;
 class named_exception: public exception
 {
   public:
-    enum { BUF_SIZE = 256 };
-
     named_exception (const char*);
 
     const char* what () const throw ();
+
+    static const size_t BUF_SIZE = 256;
 
   private:
     char name [BUF_SIZE];

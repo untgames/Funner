@@ -1,5 +1,10 @@
+namespace detail
+{
+
 const int _ISORT_MAX = 32; //???name???
 const int __stl_chunk_size = 7; //????
+
+}
 
 /*
     Сортировка методом Шелла

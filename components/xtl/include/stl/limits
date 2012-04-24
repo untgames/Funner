@@ -174,7 +174,7 @@ template <> struct numeric_limits<float>
 {
   static float min         () throw () { return FLT_MIN; }
   static float denorm_min  () throw () { return FLT_MIN; }
-  static float max     () throw () { return FLT_MAX; }
+  static float max         () throw () { return FLT_MAX; }
   static float epsilon     () throw () { return FLT_EPSILON; }
   static float round_error () throw () { return 0.5f; }
 };
@@ -188,7 +188,7 @@ template <> struct numeric_limits<double>
 {
   static double min         () throw () { return DBL_MIN; }
   static double denorm_min  () throw () { return DBL_MIN; }
-  static double max     () throw () { return DBL_MAX; }
+  static double max         () throw () { return DBL_MAX; }
   static double epsilon     () throw () { return DBL_EPSILON; }
   static double round_error () throw () { return 0.5; }
 };
@@ -203,8 +203,8 @@ template <> struct numeric_limits<long double>
 {
   static long double min         () throw () { return LDBL_MIN; }
   static long double denorm_min  () throw () { return LDBL_MIN; }
-  static long double max   () throw () { return LDBL_MAX; }
-  static long double epsilon   () throw () { return LDBL_EPSILON; }
+  static long double max         () throw () { return LDBL_MAX; }
+  static long double epsilon     () throw () { return LDBL_EPSILON; }
   static long double round_error () throw () { return 4; }
 };
 

@@ -207,10 +207,8 @@ class deque: private Allocator::template rebind<T>::other
     bool operator >= (const deque&) const;
     
   private:
-    enum {
-      BLOCK_SIZE   = 32, //размер блока
-      MIN_MAP_SIZE = 8   //минимальный размер карты
-    };
+    static const size_t BLOCK_SIZE   = 32; //размер блока
+    static const size_t MIN_MAP_SIZE = 8;  //минимальный размер карты
 
     const_reference get (size_type index) const;
     reference       get (size_type index);

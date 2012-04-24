@@ -252,7 +252,7 @@ bitset<bits>& bitset<bits>::reset ()
 template <size_t bits>
 bitset<bits>& bitset<bits>::flip ()
 {
-  for (int i=0;i<WORDS;i++)
+  for (sie_t i=0;i<WORDS;i++)
     word [i] = ~word [i];
 
   return *this;
@@ -314,7 +314,7 @@ size_t bitset<bits>::count () const
 template <size_t bits>
 bitset<bits>& bitset<bits>::operator &= (const bitset& x)
 {
-  for (int i=0;i<WORDS;i++)
+  for (size_t i=0;i<WORDS;i++)
       word [i] &= x.word [i];
 
   return *this;
@@ -323,7 +323,7 @@ bitset<bits>& bitset<bits>::operator &= (const bitset& x)
 template <size_t bits>
 bitset<bits>& bitset<bits>::operator |= (const bitset& x)
 {
-  for (int i=0;i<WORDS;i++)
+  for (size_t i=0;i<WORDS;i++)
       word [i] |= x.word [i];
 
   return *this;
@@ -332,7 +332,7 @@ bitset<bits>& bitset<bits>::operator |= (const bitset& x)
 template <size_t bits>
 bitset<bits>& bitset<bits>::operator ^= (const bitset& x)
 {
-  for (int i=0;i<WORDS;i++)
+  for (size_t i=0;i<WORDS;i++)
       word [i] ^= x.word [i];
 
   return *this;
@@ -460,7 +460,7 @@ size_t bitset<bits>::find_next (size_t prev) const
 
   if (w)
   {
-    w >>= which_byte (prev) * CHAR_BIT;
+    w >>= word_type (which_byte (prev) * CHAR_BIT);
 
     for (size_t j=which_byte (prev);j<sizeof (word_type);j++,w>>=CHAR_BIT)
     {

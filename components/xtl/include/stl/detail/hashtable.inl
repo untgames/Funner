@@ -4,10 +4,10 @@
 
 template <bool dummy> struct hashtable_prime_list
 {
-  static const unsigned long table [28];
+  static const size_t table [28];
 };
 
-template <bool dummy> const unsigned long hashtable_prime_list<dummy>::table [28] =
+template <bool dummy> const size_t hashtable_prime_list<dummy>::table [28] =
 {
   53ul,         97ul,         193ul,       389ul,       769ul,
   1543ul,       3079ul,       6151ul,      12289ul,     24593ul,
@@ -21,11 +21,11 @@ template <bool dummy> const unsigned long hashtable_prime_list<dummy>::table [28
     Управление ростом хэш-таблицы
 */
 
-inline unsigned long stl_next_prime (unsigned long size)
+inline size_t stl_next_prime (size_t size)
 {
-  const unsigned long *first = hashtable_prime_list<true>::table,
-                      *last  = first + sizeof (hashtable_prime_list<true>::table)/sizeof (*hashtable_prime_list<true>::table),
-                      *pos   = lower_bound (first,last,size);
+  const size_t *first = hashtable_prime_list<true>::table,
+               *last  = first + sizeof (hashtable_prime_list<true>::table)/sizeof (*hashtable_prime_list<true>::table),
+               *pos   = lower_bound (first,last,size);
 
   return pos == last ? last [-1] : *pos;
 }
@@ -395,7 +395,7 @@ void hashtable<Val,Key,HashFn,KeyOf,EqualKey,Allocator>::erase (iterator positio
 
   if (bucket.first == position)
   {
-    if (bucket.count) bucket.first++;
+    if (bucket.count) ++bucket.first;
     else              bucket.first = end ();
   }
 

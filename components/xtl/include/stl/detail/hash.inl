@@ -31,7 +31,7 @@ inline bool hash_key<T>::operator != (const hash_key& key) const
 
 inline size_t hash (int x)
 {
-  return x;
+  return static_cast<size_t> (x);
 }
 
 inline size_t hash (long x)
@@ -41,7 +41,7 @@ inline size_t hash (long x)
 
 inline size_t hash (unsigned int x)
 {
-  return x;
+  return static_cast<size_t> (x);
 }
 
 inline size_t hash (unsigned long x)
@@ -51,7 +51,7 @@ inline size_t hash (unsigned long x)
 
 template <class T> inline size_t hash (const T* p)
 {
-  return (size_t)p;
+  return reinterpret_cast<size_t> (p);
 }
 
 template <class T> inline size_t hash (const hash_key<T>& key)
@@ -61,7 +61,7 @@ template <class T> inline size_t hash (const hash_key<T>& key)
 
 inline size_t hash (const unsigned char* s)
 {
-  return hash ((const char*)s);
+  return hash (reinterpret_cast<const char*> (s));
 }
 
 #ifndef __MYSTL_STANDALONE__

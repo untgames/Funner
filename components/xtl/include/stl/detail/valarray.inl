@@ -220,7 +220,7 @@ inline valarray<T>& valarray<T>::for_each (const valarray& x,BinOperation op)
 template <class T> template <class BinOperation> 
 inline valarray<T>& valarray<T>::for_each (const value_type& x,BinOperation op)
 {   
-  for (int i=0;i<size ();i++) op ((*this)[i],x);
+  for (size_t i=0;i<size ();i++) op ((*this)[i],x);
   
   return *this;
 }
@@ -276,7 +276,7 @@ valarray<T> valarray<T>::shift (int n) const
   else 
   {
     if (static_cast<size_t> (-n) < size ())
-      copy (first,first+size ()+n,tmp.first-n);
+      copy (first,first+n+size (),tmp.first-n);
   }
   
   return tmp;
