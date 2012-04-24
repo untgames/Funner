@@ -50,7 +50,14 @@ ifeq (,$(MSVC_PATH))
   $(error 'Microsoft Visual C++ not detected (empty MSVC_PATH)')
 endif
 
+ifeq (1,$(analyze))
+  ifeq (,$(PVS_STUDIO_DIR))
+    $(error 'PVS Studio not found (empty PVS_STUDIO_DIR)')
+  endif
+endif
+
 MSVC_PATH          := $(call convert_path,$(MSVC_PATH))
+PVS_STUDIO_DIR     := $(call convert_path,$(PVS_STUDIO_DIR))
 MSVC_BIN_PATH      := $(MSVC_PATH)/bin
 MSVS_COMMON_PATH   := $(call convert_path,$(MSVS_COMMON_PATH))
 COMMON_CFLAGS      += -W3 -Ox -wd4996 $(if $(analyze),-analyze) -nologo -FC
@@ -70,6 +77,7 @@ PROFILES                += msvc win32 has_windows x86 vcx86 x86_win32
 COMMON_LINK_FLAGS       += -stack:128000 /MACHINE:X86
 SOURCE_PROCESS_MACROSES += process_idl process_rc
 SOURCE_FILES_SUFFIXES   += asm
+IGNORE_PVS_ERROR        += V126 V122
 
 ###################################################################################################
 #Конфигурация переменных расположения библиотек
@@ -91,9 +99,18 @@ export LIB
 #Компиляция исходников (список исходников, список подключаемых каталогов, список подключаемых файлов, каталог с объектными файлами,
 #список дефайнов, флаги компиляции, pch файл, список каталогов с dll)
 ###################################################################################################
+define tools.msvc-commandline
+-c -Fo"$4\\" $(patsubst %,-I"%",$2) $(patsubst %,-FI"%",$3) $(if $(filter -W%,$6),$(filter-out -W%,$(COMMON_CFLAGS)),$(COMMON_CFLAGS)) $(strip $6) $(if $(filter -clr,$6),$(foreach dir,$8 $(DIST_BIN_DIR),-AI $(dir)) -MD,-EHsc -MT) $(foreach def,$5,-D$(subst %,$(SPACE),$(def))) $(filter %.c,$1) $(filter %.cpp,$1) $(if $7,-FI"$7" -Yc"$7" -Fp"$4\\")
+endef
+
+define tools.pvs-studio
+export PVS_EXCLUDE_PATH=`echo "$(subst /,\,$(MSVC_PATH))" | sed -e 's/\(.*\)\\Common7.*/\1/'` && \
+$(call for_each_file,src,$1,"$(PVS_STUDIO_DIR)/x86/PVS-Studio" --vcinstalldir "$(MSVC_PATH)" --exclude-path "$$PVS_EXCLUDE_PATH"  --platform Win32 --cfg $(BUILD_DIR)pvs/pvs-studio.cfg --source-file $$src --cl-params $(call tools.msvc-commandline,$$src,$2,$3,$4,$5,$6,$7,$8,$9) $(if $(strip $(IGNORE_PVS_ERROR)), > $4/$$src.pvs && sed $(foreach err,$(IGNORE_PVS_ERROR), -e '/.*error $(err):.*/{N;d;}' < $4/$$src.pvs)))
+endef
+
 define tools.c++compile
 export PATH="$(MSVS_COMMON_PATH);$(MSVC_PATH)/bin;$$PATH" \
-$(if $(filter %.c,$1)$(filter %.cpp,$1),&& "$(MSVC_BIN_PATH)/cl" -c -Fo"$4\\" $(patsubst %,-I"%",$2) $(patsubst %,-FI"%",$3) $(if $(filter -W%,$6),$(filter-out -W%,$(COMMON_CFLAGS)),$(COMMON_CFLAGS)) $(strip $6) $(if $(filter -clr,$6),$(foreach dir,$8 $(DIST_BIN_DIR),-AI $(dir)) -MD,-EHsc -MT) $(foreach def,$5,-D$(subst %,$(SPACE),$(def))) $(filter %.c,$1) $(filter %.cpp,$1) $(if $7,-FI"$7" -Yc"$7" -Fp"$4\\")) \
+$(if $(filter %.c,$1)$(filter %.cpp,$1),&& $(if $(analyze),$(call tools.pvs-studio,$1,$2,$3,$4,$5,$6,$7,$8,$9) && ) "$(MSVC_BIN_PATH)/cl" $(call tools.msvc-commandline,$1,$2,$3,$4,$5,$6,$7,$8,$9)) \
 $(if $(filter %.asm,$1),&& "$(MSVC_BIN_PATH)/ml" -nologo -c -Fo"$4\\" $(patsubst %,-I"%",$2) $6 $(foreach def,$5,-D$(subst %,$(SPACE),$(def))) $(filter %.asm,$1))
 endef
 
