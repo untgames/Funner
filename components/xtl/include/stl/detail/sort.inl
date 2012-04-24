@@ -259,7 +259,7 @@ inline Iter stable_partition (Iter first,Iter last,Predicate pred)
 template <class Iter,class Compare>
 void nth_element (Iter first,Iter nth,Iter last,Compare less)
 {
-  while (last-first>_ISORT_MAX)
+  while (last-first>detail::_ISORT_MAX)
   { 
     pair<Iter,Iter> mid = __unguarded_partition (first,last,less);
 
@@ -349,7 +349,7 @@ void __sort (Iter first,Iter last,typename iterator_traits<Iter>::difference_typ
 {
   typename iterator_traits<Iter>::difference_type count;
   
-  for (;(count=last-first) > _ISORT_MAX && ideal;)
+  for (;(count=last-first) > detail::_ISORT_MAX && ideal;)
   { 
     pair<Iter,Iter> mid = __unguarded_partition (first,last,less);
     
@@ -367,7 +367,7 @@ void __sort (Iter first,Iter last,typename iterator_traits<Iter>::difference_typ
     }
   }
 
-  if (count > _ISORT_MAX)
+  if (count > detail::_ISORT_MAX)
   { 
       //сортировка с помощью кучи (если количество разбиений велико)
     make_heap (first,last,less);
@@ -602,7 +602,7 @@ inline void inplace_merge (Iter first,Iter middle,Iter last)
 template <class Iter,class Compare>
 inline void inplace_stable_sort (Iter first,Iter last,Compare less) 
 {
-  if (last-first < _ISORT_MAX) 
+  if (last-first < detail::_ISORT_MAX) 
   {
     shell_sort (first,last,less);
     return;
@@ -648,7 +648,7 @@ void merge_sort_with_buffer (Iter first,Iter last,Pointer buffer,Compare less)
 {
   typedef typename iterator_traits<Iter>::difference_type Distance;
 
-  Distance len         = last-first, step_size = __stl_chunk_size;
+  Distance len         = last-first, step_size = detail::__stl_chunk_size;
   Pointer  buffer_last = buffer+len;
 
   chunk_insertion_sort (first,last,step_size,less);
