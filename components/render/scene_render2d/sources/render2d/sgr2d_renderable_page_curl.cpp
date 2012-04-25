@@ -31,6 +31,7 @@ const float  PI                    = 3.1415926f;
 const size_t SHADOW_TEXTURE_SIZE   = 32;
 const size_t SHADOW_VERTICES_COUNT = 16;
 const float  STATIC_PAGES_Z_OFFSET = -0.001f;
+const float  TEXCOORD_OFFSET       = 0.001f;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Параметры вершины необходимые для визуализации
@@ -91,6 +92,7 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
   DeviceTexturePtr           shadow_texture;                    //текстура тени
   LowLevelTexturePtr         page_textures [scene_graph::PageCurlPageType_Num];                     //текстуры страниц
   SpriteMaterialPtr          page_materials [scene_graph::PageCurlPageType_Num];                    //материалы страниц
+  math::vec2ui               page_textures_sizes [scene_graph::PageCurlPageType_Num];               //размеры текстур страниц
   size_t                     current_page_material_name_hashes [scene_graph::PageCurlPageType_Num]; //хэш текущего имени материалов страниц
   LowLevelFramePtr           low_level_frame;                    //фрейм кастомной отрисовки
   BlendStatePtr              none_blend_state;                   //состояния блендинга
@@ -166,11 +168,19 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
         {
           page_materials [i] = render.GetMaterial (material_name);
           page_textures [i]  = GetLowLevelTexture (page_materials [i]->Image ());
+
+          render::low_level::TextureDesc texture_desc;
+
+          page_textures [i]->GetTexture ()->GetDesc (texture_desc);
+
+          page_textures_sizes [i].x = texture_desc.width;
+          page_textures_sizes [i].y = texture_desc.height;
         }
         else
         {
-          page_textures [i]  = 0;
-          page_materials [i] = 0;
+          page_textures [i]       = 0;
+          page_materials [i]      = 0;
+          page_textures_sizes [i] = 1;
         }
 
         current_page_material_name_hashes [i] = material_name_hash;
@@ -371,27 +381,51 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
     return math::vec4ub ((unsigned char)(float_page_color.x * 255), (unsigned char)(float_page_color.y * 255), (unsigned char)(float_page_color.z * 255), (unsigned char)(float_page_color.w * 255));
   }
 
-  void GetTexCoords (bool left, float& min_s, float& max_s)
+  void GetTexRect (SpriteMaterial* material, const math::vec2ui& texture_size, float& min_s, float& max_s, float& min_t, float& max_t)
   {
-    switch (page_curl->Mode ())
+     if (material->IsTiled ())
+     {
+       size_t tile_width  = material->TileWidth (),
+              tile_height = material->TileHeight ();
+
+       if (!tile_width || !tile_height)
+         throw xtl::format_operation_exception ("render::obsolete::render2d::RenderablePageCurl::GetTexRect",
+                                                "Bad page material (tile_width=%u, tile_height=%u)", tile_width, tile_height);
+
+       min_s = material->TileOffsetX () / (float)texture_size.x;
+       min_t = material->TileOffsetY () / (float)texture_size.y;
+       max_s = min_s + tile_width / (float)texture_size.x;
+       max_t = min_t + tile_height / (float)texture_size.x;
+     }
+     else
+     {
+       min_s = 0;
+       min_t = 0;
+       max_s = 1;
+       max_t = 1;
+     }
+  }
+
+  void GetTexCoords (bool left, SpriteMaterial* material, const math::vec2ui& texture_size, float& min_s, float& max_s, float& min_t, float& max_t)
+  {
+    GetTexRect (material, texture_size, min_s, max_s, min_t, max_t);
+
+    if (page_curl->Mode () == PageCurlMode_DoublePageSingleMaterial)
     {
-      case PageCurlMode_SinglePage:
-      case PageCurlMode_DoublePageDoubleMaterial:
-        min_s = 0.f;
-        max_s = 1.f;
-        break;
-      case PageCurlMode_DoublePageSingleMaterial:
-        if (left)
-        {
-          min_s = 0.f;
-          max_s = 0.5f;
-        }
-        else
-        {
-          min_s = 0.5f;
-          max_s = 1.f;
-        }
-        break;
+      float half_texture_width = (max_s - min_s) * 0.5f;
+
+      if (left)
+        max_s -= half_texture_width;
+      else
+        min_s += half_texture_width;
+    }
+
+    if (material->IsTiled ())
+    {
+      min_s += TEXCOORD_OFFSET;
+      min_t += TEXCOORD_OFFSET;
+      max_s -= TEXCOORD_OFFSET;
+      max_t -= TEXCOORD_OFFSET;
     }
   }
 
@@ -955,11 +989,11 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
 
     BindMaterial (device, page_materials [curled_right_page_type].get (), page_textures [curled_right_page_type].get ());
 
-    float min_s, max_s;
+    float min_s, max_s, min_t, max_t;
 
-    GetTexCoords (false, min_s, max_s);
+    GetTexCoords (false, page_materials [curled_right_page_type].get (), page_textures_sizes [curled_right_page_type], min_s, max_s, min_t, max_t);
 
-    curled_page->SetTexCoords (max_s, 0, min_s, 1);
+    curled_page->SetTexCoords (max_s, min_t, min_s, max_t);
 
     curled_page->CalculateShadow (true);
 
@@ -973,9 +1007,9 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
 
     curled_page->CalculateShadow (false);
 
-    GetTexCoords (true, min_s, max_s);
+    GetTexCoords (true, page_materials [curled_left_page_type].get (), page_textures_sizes [curled_left_page_type], min_s, max_s, min_t, max_t);
 
-    curled_page->SetTexCoords (min_s, 0, max_s, 1);
+    curled_page->SetTexCoords (min_s, min_t, max_s, max_t);
 
     curled_page->Draw (device);
 
@@ -1037,11 +1071,11 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
 
     BindMaterial (device, page_materials [curled_right_page_type].get (), page_textures [curled_right_page_type].get ());
 
-    float min_s, max_s;
+    float min_s, max_s, min_t, max_t;
 
-    GetTexCoords (false, min_s, max_s);
+    GetTexCoords (false, page_materials [curled_right_page_type].get (), page_textures_sizes [curled_right_page_type], min_s, max_s, min_t, max_t);
 
-    curled_page->SetTexCoords (max_s, 0, min_s, 1);
+    curled_page->SetTexCoords (max_s, min_t, min_s, max_t);
 
     curled_page->CalculateShadow (true);
 
@@ -1055,9 +1089,9 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
 
     curled_page->CalculateShadow (false);
 
-    GetTexCoords (true, min_s, max_s);
+    GetTexCoords (true, page_materials [curled_left_page_type].get (), page_textures_sizes [curled_left_page_type], min_s, max_s, min_t, max_t);
 
-    curled_page->SetTexCoords (min_s, 0, max_s, 1);
+    curled_page->SetTexCoords (min_s, min_t, max_s, max_t);
 
     curled_page->Draw (device);
 
@@ -1135,14 +1169,14 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
 
     BindMaterial (device, page_materials [curled_left_page_type].get (), page_textures [curled_left_page_type].get ());
 
-    float min_s, max_s;
+    float min_s, max_s, min_t, max_t;
 
-    GetTexCoords (true, min_s, max_s);
+    GetTexCoords (true, page_materials [curled_left_page_type].get (), page_textures_sizes [curled_left_page_type], min_s, max_s, min_t, max_t);
 
     if (page_curl->Mode () != PageCurlMode_SinglePage)
-      curled_page->SetTexCoords (max_s, 0, min_s, 1);
+      curled_page->SetTexCoords (max_s, min_t, min_s, max_t);
     else
-      curled_page->SetTexCoords (min_s, 0, max_s, 1);
+      curled_page->SetTexCoords (min_s, min_t, max_s, max_t);
 
     curled_page->CalculateShadow (true);
 
@@ -1156,9 +1190,9 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
 
     curled_page->CalculateShadow (false);
 
-    GetTexCoords (false, min_s, max_s);
+    GetTexCoords (false, page_materials [curled_right_page_type].get (), page_textures_sizes [curled_right_page_type], min_s, max_s, min_t, max_t);
 
-    curled_page->SetTexCoords (min_s, 0, max_s, 1);
+    curled_page->SetTexCoords (min_s, min_t, max_s, max_t);
 
     curled_page->Draw (device);
 
@@ -1247,14 +1281,14 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
 
     BindMaterial (device, page_materials [curled_left_page_type].get (), page_textures [curled_left_page_type].get ());
 
-    float min_s, max_s;
+    float min_s, max_s, min_t, max_t;
 
-    GetTexCoords (true, min_s, max_s);
+    GetTexCoords (true, page_materials [curled_left_page_type].get (), page_textures_sizes [curled_left_page_type], min_s, max_s, min_t, max_t);
 
     if (page_curl->Mode () != PageCurlMode_SinglePage)
-      curled_page->SetTexCoords (max_s, 0, min_s, 1);
+      curled_page->SetTexCoords (max_s, min_t, min_s, max_t);
     else
-      curled_page->SetTexCoords (min_s, 0, max_s, 1);
+      curled_page->SetTexCoords (min_s, min_t, max_s, max_t);
 
     curled_page->CalculateShadow (true);
 
@@ -1268,9 +1302,9 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
 
     curled_page->CalculateShadow (false);
 
-    GetTexCoords (false, min_s, max_s);
+    GetTexCoords (false, page_materials [curled_right_page_type].get (), page_textures_sizes [curled_right_page_type], min_s, max_s, min_t, max_t);
 
-    curled_page->SetTexCoords (min_s, 0, max_s, 1);
+    curled_page->SetTexCoords (min_s, min_t, max_s, max_t);
 
     curled_page->Draw (device);
 
@@ -1330,18 +1364,18 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
       for (size_t i = 0; i < 4; i++)
         vertices [i].color = page_color;
 
-      float min_s, max_s;
+      float min_s, max_s, min_t, max_t;
 
-      GetTexCoords (true, min_s, max_s);
+      GetTexCoords (true, page_materials [left_page_type].get (), page_textures_sizes [left_page_type], min_s, max_s, min_t, max_t);
 
       vertices [0].position = math::vec3f (0, 0, STATIC_PAGES_Z_OFFSET);
       vertices [1].position = math::vec3f (left_page_width, 0, STATIC_PAGES_Z_OFFSET);
       vertices [2].position = math::vec3f (0, size.y, STATIC_PAGES_Z_OFFSET);
       vertices [3].position = math::vec3f (left_page_width, size.y, STATIC_PAGES_Z_OFFSET);
-      vertices [0].texcoord = math::vec2f (min_s, 0);
-      vertices [1].texcoord = math::vec2f (max_s, 0);
-      vertices [2].texcoord = math::vec2f (min_s, 1.f);
-      vertices [3].texcoord = math::vec2f (max_s, 1.f);
+      vertices [0].texcoord = math::vec2f (min_s, min_t);
+      vertices [1].texcoord = math::vec2f (max_s, min_t);
+      vertices [2].texcoord = math::vec2f (min_s, max_t);
+      vertices [3].texcoord = math::vec2f (max_s, max_t);
 
       quad_vertex_buffer->SetData (0, sizeof (vertices), vertices);
 
@@ -1357,18 +1391,18 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
       for (size_t i = 0; i < 4; i++)
         vertices [i].color = page_color;
 
-      float min_s, max_s;
+      float min_s, max_s, min_t, max_t;
 
-      GetTexCoords (false, min_s, max_s);
+      GetTexCoords (false, page_materials [right_page_type].get (), page_textures_sizes [right_page_type], min_s, max_s, min_t, max_t);
 
       vertices [0].position = math::vec3f (left_page_width, 0, STATIC_PAGES_Z_OFFSET);
       vertices [1].position = math::vec3f (left_page_width + right_page_width, 0, STATIC_PAGES_Z_OFFSET);
       vertices [2].position = math::vec3f (left_page_width, size.y, STATIC_PAGES_Z_OFFSET);
       vertices [3].position = math::vec3f (left_page_width + right_page_width, size.y, STATIC_PAGES_Z_OFFSET);
-      vertices [0].texcoord = math::vec2f (min_s, 0);
-      vertices [1].texcoord = math::vec2f (max_s, 0);
-      vertices [2].texcoord = math::vec2f (min_s, 1.f);
-      vertices [3].texcoord = math::vec2f (max_s, 1.f);
+      vertices [0].texcoord = math::vec2f (min_s, min_t);
+      vertices [1].texcoord = math::vec2f (max_s, min_t);
+      vertices [2].texcoord = math::vec2f (min_s, max_t);
+      vertices [3].texcoord = math::vec2f (max_s, max_t);
 
       quad_vertex_buffer->SetData (0, sizeof (vertices), vertices);
 

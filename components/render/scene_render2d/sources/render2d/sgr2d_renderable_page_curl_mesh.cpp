@@ -336,7 +336,7 @@ struct RenderablePageCurlMesh::Impl
           t_range = max_t - min_t,
           ds      = 1.f / (x_size - 1) * s_range,
           dt      = 1.f / (y_size - 1) * t_range,
-          t       = t_range;
+          t       = max_t;
 
     RenderableVertex* vertex = vertices.data ();
 
