@@ -393,7 +393,7 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
                                                 "Bad page material (tile_width=%u, tile_height=%u)", tile_width, tile_height);
 
        min_s = material->TileOffsetX () / (float)texture_size.x;
-       min_t = material->TileOffsetY () / (float)texture_size.y;
+       min_t = (material->TileOffsetY () - tile_height) / (float)texture_size.y;
        max_s = min_s + tile_width / (float)texture_size.x;
        max_t = min_t + tile_height / (float)texture_size.x;
      }
@@ -923,10 +923,11 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
       math::vec3f left_bottom_corner_screen = (math::vec3f (-page_curl->Size ().x / 2, -page_curl->Size ().y / 2, 0) * page_curl->WorldTM () - view_point) * projection,
                   right_top_corner_screen   = (math::vec3f (page_curl->Size ().x / 2, page_curl->Size ().y / 2, 0) * page_curl->WorldTM () - view_point) * projection;
 
+      const low_level::Rect& device_viewport = device.RSGetViewport ();
       low_level::Rect scissor_rect;
 
-      scissor_rect.x      = viewport.x + (int)((left_bottom_corner_screen.x + 1.f) / 2.f * viewport.width);
-      scissor_rect.y      = viewport.y + (int)((left_bottom_corner_screen.y + 1.f) / 2.f * viewport.height);
+      scissor_rect.x      = device_viewport.x + viewport.x + (int)((left_bottom_corner_screen.x + 1.f) / 2.f * viewport.width);
+      scissor_rect.y      = device_viewport.y + viewport.y + (int)((left_bottom_corner_screen.y + 1.f) / 2.f * viewport.height);
       scissor_rect.width  = (size_t)ceil ((right_top_corner_screen.x - left_bottom_corner_screen.x) / 2 * viewport.width);
       scissor_rect.height = (size_t)ceil ((right_top_corner_screen.y - left_bottom_corner_screen.y) / 2 * viewport.height);
 

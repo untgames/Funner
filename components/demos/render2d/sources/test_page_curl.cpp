@@ -90,6 +90,40 @@ struct Test
     application.SetIdleHandler (xtl::bind (&Test::Idle, this));
 
     application.Window ().RegisterEventHandler (syslib::WindowEvent_OnMouseMove, xtl::bind (&Test::OnMouseMove, this, _1, _3));
+    application.Window ().SetViewportHandler (xtl::bind (&Test::UpdateViewport, this, _1, _2));
+    application.Window ().InvalidateViewport ();
+  }
+
+  void UpdateViewport (syslib::Window& window, syslib::Rect& viewport)
+  {
+    size_t window_width  = window.ClientWidth (),
+           window_height = window.ClientHeight ();
+
+    double window_aspect_ratio = double (window_width) / double (window_height);
+
+    size_t viewport_width = 0, viewport_height = 0;
+
+    float aspect_ratio = 1.f;
+
+    if (window_aspect_ratio / aspect_ratio < 1.0)
+    {
+        //полосы по вертикали
+
+      viewport_width  = window_width;
+      viewport_height = size_t (viewport_width / aspect_ratio);
+    }
+    else
+    {
+        //полосы по горизонтали
+
+      viewport_height = window_height;
+      viewport_width  = size_t (viewport_height * aspect_ratio);
+    }
+
+    viewport.left   = (window_width - viewport_width) / 2;
+    viewport.top    = (window_height - viewport_height) / 2;
+    viewport.right  = viewport.left + viewport_width;
+    viewport.bottom = viewport.top + viewport_height;
   }
 
     //обработчик главного цикла приложения
