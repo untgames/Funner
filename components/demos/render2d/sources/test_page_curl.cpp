@@ -142,12 +142,12 @@ struct Test
     //обработчик движения мыши
   void OnMouseMove (const syslib::Window& window, const syslib::WindowEventContext& context)
   {
-    syslib::Rect client_rect = window.ClientRect ();
+    syslib::Rect viewport = window.Viewport ();
 
-    float width  = (float)(client_rect.right - client_rect.left),
-          height = (float)(client_rect.bottom - client_rect.top);
+    float width  = (float)(viewport.right - viewport.left),
+          height = (float)(viewport.bottom - viewport.top);
 
-    math::vec3f corner_position = math::vec3f (CAMERA_LEFT + context.cursor_position.x / width * (CAMERA_RIGHT - CAMERA_LEFT), CAMERA_BOTTOM + (1 - context.cursor_position.y / height) * (CAMERA_TOP - CAMERA_BOTTOM), 0) * math::inverse (curl->WorldTM ());
+    math::vec3f corner_position = math::vec3f (CAMERA_LEFT + (context.cursor_position.x - viewport.left) / width * (CAMERA_RIGHT - CAMERA_LEFT), CAMERA_BOTTOM + (1 - (context.cursor_position.y - viewport.top) / height) * (CAMERA_TOP - CAMERA_BOTTOM), 0) * math::inverse (curl->WorldTM ());
 
    corner_position.x += curl->Size ().x / 2;
    corner_position.y += curl->Size ().y / 2;

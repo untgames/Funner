@@ -67,7 +67,6 @@ void dump (const PageCurl& curl)
   printf ("  page color                        %.3f; %.3f; %.3f; %.3f\n", curl.PageColor ().x, curl.PageColor ().y, curl.PageColor ().z, curl.PageColor ().w);
   printf ("  corner shadow offset              %.2f\n",                   curl.CornerShadowOffset ());
   printf ("  shadow width                      %.2f\n",                   curl.ShadowWidth ());
-  printf ("  shadow density                    %.2f\n",                   curl.ShadowDensity ());
   printf ("  shadow log base                   %.2f\n",                   curl.ShadowLogBase ());
   printf ("  shadow min log value              %.2f\n",                   curl.ShadowMinLogValue ());
   printf ("  shadow grow power                 %.2f\n",                   curl.ShadowGrowPower ());
@@ -101,7 +100,6 @@ int main ()
   curl->SetPageColor                     (0.5f, 0.25f, 0.125f, 0.25f);
   curl->SetCornerShadowOffset            (16.f);
   curl->SetShadowWidth                   (8.f);
-  curl->SetShadowDensity                 (0.5f);
   curl->SetShadowLogBase                 (32.f);
   curl->SetShadowMinLogValue             (0.f);
   curl->SetShadowGrowPower               (0.5f);

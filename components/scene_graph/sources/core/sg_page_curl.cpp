@@ -10,7 +10,6 @@ const float  DEFAULT_CORNER_SHADOW_OFFSET              = 15.f;
 const size_t DEFAULT_FIND_BEST_CURL_STEPS              = 1000;
 const size_t DEFAULT_GRID_SIZE                         = 100;
 const float  DEFAULT_OPPOSITE_CORNER_SHADOW_GROW_POWER = 15.f;
-const float  DEFAULT_SHADOW_DENSITY                    = 1.0f;
 const float  DEFAULT_SHADOW_GROW_POWER                 = 0.25f;
 const float  DEFAULT_SHADOW_LOG_BASE                   = 4.f;
 const float  DEFAULT_SHADOW_MIN_LOG_VALUE              = 0.3f;
@@ -35,7 +34,6 @@ struct PageCurl::Impl
   math::vec4f    color;                              //цвет страницы
   float          corner_shadow_offset;               //смещение тени от угла
   float          shadow_width;                       //ширина тени
-  float          shadow_density;                     //плотность тени
   float          shadow_log_base;                    //основание логарифма генерации тени
   float          shadow_min_log_value;               //минимальное значение тени при логарифмировании
   float          shadow_grow_power;                  //степень нарастания тени при увеличении загиба
@@ -53,7 +51,6 @@ struct PageCurl::Impl
     , color (1.f)
     , corner_shadow_offset (DEFAULT_CORNER_SHADOW_OFFSET)
     , shadow_width (DEFAULT_SHADOW_WIDTH)
-    , shadow_density (DEFAULT_SHADOW_DENSITY)
     , shadow_log_base (DEFAULT_SHADOW_LOG_BASE)
     , shadow_min_log_value (DEFAULT_SHADOW_MIN_LOG_VALUE)
     , shadow_grow_power (DEFAULT_SHADOW_GROW_POWER)
@@ -298,18 +295,6 @@ void PageCurl::SetShadowWidth (float width)
 float PageCurl::ShadowWidth () const
 {
   return impl->shadow_width;
-}
-
-void PageCurl::SetShadowDensity (float density)
-{
-  impl->shadow_density = density;
-
-  UpdateNotify ();
-}
-
-float PageCurl::ShadowDensity () const
-{
-  return impl->shadow_density;
 }
 
 void PageCurl::SetShadowLogBase (float log_base)

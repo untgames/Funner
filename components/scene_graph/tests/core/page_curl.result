@@ -14,7 +14,6 @@ Default curl state:
   page color                        1.000; 1.000; 1.000; 1.000
   corner shadow offset              15.00
   shadow width                      0.25
-  shadow density                    1.00
   shadow log base                   4.00
   shadow min log value              0.30
   shadow grow power                 0.25
@@ -39,7 +38,6 @@ Changed curl state:
   page color                        0.500; 0.250; 0.125; 0.250
   corner shadow offset              16.00
   shadow width                      8.00
-  shadow density                    0.50
   shadow log base                   32.00
   shadow min log value              0.00
   shadow grow power                 0.50

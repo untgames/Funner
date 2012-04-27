@@ -645,7 +645,7 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
       page_size.x /= 2;
 
     float x_offset             = left_side || page_curl->Mode () == PageCurlMode_SinglePage ? 0 : page_size.x,
-          corner_shadow_offset = page_curl->CornerShadowOffset ();
+          corner_shadow_offset = page_size.x * page_curl->CornerShadowOffset () * curl_radius / page_curl->CurlRadius ();
 
     const math::vec3f& left_bottom_corner_position  = curled_page->GetCornerPosition (PageCurlCorner_LeftBottom);
     const math::vec3f& left_top_corner_position     = curled_page->GetCornerPosition (PageCurlCorner_LeftTop);
@@ -654,7 +654,7 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
     const math::vec3f& top_corner_position          = left_side ? left_top_corner_position : right_top_corner_position;
     const math::vec3f& bottom_corner_position       = left_side ? left_bottom_corner_position : right_bottom_corner_position;
 
-    unsigned char light = 255;//(unsigned char)((1 - page_curl->ShadowDensity () * curl_radius / page_curl->CurlRadius ()) * 255);
+    float shadow_width = page_size.x * page_curl->ShadowWidth () * curl_radius / page_curl->CurlRadius ();
 
       //отрисовка тени под страницей
     if (curled_page->HasBottomSideBendPosition () || curled_page->HasTopSideBendPosition ())
@@ -663,9 +663,9 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
 
       for (size_t i = 0; i < SHADOW_VERTICES_COUNT; i++)
       {
-        vertices [i].color.x = light;
-        vertices [i].color.y = light;
-        vertices [i].color.z = light;
+        vertices [i].color.x = 255;
+        vertices [i].color.y = 255;
+        vertices [i].color.z = 255;
       }
 
       size_t      triangles_count = 0;
@@ -893,15 +893,13 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
       if (!left_side)
         shadow_offset *= -1;
 
-      float shadow_width = page_size.x * page_curl->ShadowWidth () * curl_radius / page_curl->CurlRadius ();
-
       RenderableVertex vertices [4];
 
       for (size_t i = 0; i < 4; i++)
       {
-        vertices [i].color.x = light;
-        vertices [i].color.y = light;
-        vertices [i].color.z = light;
+        vertices [i].color.x = 255;
+        vertices [i].color.y = 255;
+        vertices [i].color.z = 255;
       }
 
       top_detach_position    += side_vec;

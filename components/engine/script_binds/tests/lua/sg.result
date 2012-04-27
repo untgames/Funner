@@ -281,7 +281,6 @@ default curl:
   shadow width                      0.25
   shadow log base                   4.00
   shadow min log value              0.30
-  shadow density                    1.00
   shadow grow power                 0.25
   opposite corner shadow grow power 15.00
   find best curl steps              1000
@@ -303,7 +302,6 @@ changed curl:
   shadow width                      8.00
   shadow log base                   2.00
   shadow min log value              0.00
-  shadow density                    0.50
   shadow grow power                 0.50
   opposite corner shadow grow power 2.00
   find best curl steps              500
@@ -325,7 +323,6 @@ second changed curl:
   shadow width                      8.00
   shadow log base                   2.00
   shadow min log value              0.00
-  shadow density                    0.50
   shadow grow power                 0.50
   opposite corner shadow grow power 2.00
   find best curl steps              500
