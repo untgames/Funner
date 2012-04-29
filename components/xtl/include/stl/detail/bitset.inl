@@ -252,7 +252,7 @@ bitset<bits>& bitset<bits>::reset ()
 template <size_t bits>
 bitset<bits>& bitset<bits>::flip ()
 {
-  for (sie_t i=0;i<WORDS;i++)
+  for (size_t i=0;i<WORDS;i++)
     word [i] = ~word [i];
 
   return *this;
