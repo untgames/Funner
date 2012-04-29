@@ -100,7 +100,7 @@ class Driver: virtual public IDriver, public xtl::reference_counter
       {
         const char* device_name = GetDeviceFullName (i);
 
-        if (!xtl::xstrcmp (device_name, full_name))
+        if (!xtl::xstrcmp (device_name, name))
         {
           if (!xtl::xstrcmp (device_name, ASCII_KEYBOARD_DEVICE_DESC.full_name))
             return new IPhoneKeyboard (ASCII_KEYBOARD_DEVICE_DESC.name, ASCII_KEYBOARD_DEVICE_DESC.full_name, KeyboardType_ASCII, AutocapitalizationType_None);
