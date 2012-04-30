@@ -199,7 +199,8 @@ struct RenderablePageCurlMesh::Impl
           rotated_original_corner_location_x = original_corner_location.x * cos_curl_angle - original_corner_location.y * sin_curl_angle,
           rotated_top_binding_location_x     = top_binding.x * cos_curl_angle - top_binding.y * sin_curl_angle,
           rotated_bottom_binding_location_x  = bottom_binding.x * cos_curl_angle - bottom_binding.y * sin_curl_angle,
-          one_divide_radius                  = 1.f / radius;
+          one_divide_radius                  = 1.f / radius,
+          best_corner_location_z             = 0;
 
     float best_curl_mismatch = FLT_MAX,
           best_curl_step     = width / find_best_curl_steps;
@@ -251,11 +252,38 @@ struct RenderablePageCurlMesh::Impl
       {
         best_curl_mismatch = curl_mismatch;
         curl_x             = current_curl_x;
+
+        if (rotated_original_corner_location_x > current_curl_x + pi_r)
+        {
+          best_corner_location_z = 2 * radius;
+        }
+        else if (rotated_original_corner_location_x > current_curl_x)
+        {
+          float alpha = (rotated_original_corner_location_x - current_curl_x) * one_divide_radius;
+
+          best_corner_location_z = radius - radius * cos (alpha);
+        }
+        else
+        {
+          best_corner_location_z = 0;
+        }
       }
     }
 
     RenderableVertex*  v          = vertices.data ();
     const math::vec3f* original_v = original_vertices.data ();
+
+    if (best_corner_location_z == 0)  //угол за который тянули не оторвался от плоскости
+    {
+      for (size_t i = 0; i < vertices_count; i++, v++, original_v++)
+      {
+        v->position.x = original_v->x;
+        v->position.y = height - original_v->y;
+        v->position.z = 0;
+      }
+
+      return;
+    }
 
     for (size_t i = 0; i < vertices_count; i++, v++, original_v++)
     {
