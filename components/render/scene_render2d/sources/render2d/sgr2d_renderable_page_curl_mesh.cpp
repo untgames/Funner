@@ -150,41 +150,49 @@ struct RenderablePageCurlMesh::Impl
   {
     last_curl_radius = radius;
 
-    math::vec2f original_corner_location, top_binding, bottom_binding;
+    math::vec2f original_corner_location, opposite_original_corner_location, top_binding, bottom_binding;
 
     switch (corner)
     {
       case scene_graph::PageCurlCorner_RightBottom:
-        original_corner_location.x = width;
-        original_corner_location.y = height;
-        top_binding.x              = 0.f;
-        top_binding.y              = 0.f;
-        bottom_binding.x           = 0.f;
-        bottom_binding.y           = height;
+        original_corner_location.x          = width;
+        original_corner_location.y          = height;
+        opposite_original_corner_location.x = width;
+        opposite_original_corner_location.y = 0.f;
+        top_binding.x                       = 0.f;
+        top_binding.y                       = 0.f;
+        bottom_binding.x                    = 0.f;
+        bottom_binding.y                    = height;
         break;
       case scene_graph::PageCurlCorner_RightTop:
-        original_corner_location.x = width;
-        original_corner_location.y = 0.f;
-        top_binding.x              = 0.f;
-        top_binding.y              = 0.f;
-        bottom_binding.x           = 0.f;
-        bottom_binding.y           = height;
+        original_corner_location.x          = width;
+        original_corner_location.y          = 0.f;
+        opposite_original_corner_location.x = width;
+        opposite_original_corner_location.y = height;
+        top_binding.x                       = 0.f;
+        top_binding.y                       = 0.f;
+        bottom_binding.x                    = 0.f;
+        bottom_binding.y                    = height;
         break;
       case scene_graph::PageCurlCorner_LeftBottom:
-        original_corner_location.x = 0.f;
-        original_corner_location.y = height;
-        top_binding.x              = width;
-        top_binding.y              = 0.f;
-        bottom_binding.x           = width;
-        bottom_binding.y           = height;
+        original_corner_location.x          = 0.f;
+        original_corner_location.y          = height;
+        opposite_original_corner_location.x = 0.f;
+        opposite_original_corner_location.y = 0.f;
+        top_binding.x                       = width;
+        top_binding.y                       = 0.f;
+        bottom_binding.x                    = width;
+        bottom_binding.y                    = height;
         break;
       case scene_graph::PageCurlCorner_LeftTop:
-        original_corner_location.x = 0.f;
-        original_corner_location.y = 0.f;
-        top_binding.x              = width;
-        top_binding.y              = 0.f;
-        bottom_binding.x           = width;
-        bottom_binding.y           = height;
+        original_corner_location.x          = 0.f;
+        original_corner_location.y          = 0.f;
+        opposite_original_corner_location.x = 0.f;
+        opposite_original_corner_location.y = height;
+        top_binding.x                       = width;
+        top_binding.y                       = 0.f;
+        bottom_binding.x                    = width;
+        bottom_binding.y                    = height;
         break;
       default:
         break;
@@ -197,10 +205,12 @@ struct RenderablePageCurlMesh::Impl
     float pi_r                               = PI * radius,
           rotated_corner_location_x          = corner_position.x * cos_curl_angle - corner_position.y * sin_curl_angle,
           rotated_original_corner_location_x = original_corner_location.x * cos_curl_angle - original_corner_location.y * sin_curl_angle,
+          rotated_opposite_corner_location_x = opposite_original_corner_location.x * cos_curl_angle - opposite_original_corner_location.y * sin_curl_angle,
           rotated_top_binding_location_x     = top_binding.x * cos_curl_angle - top_binding.y * sin_curl_angle,
           rotated_bottom_binding_location_x  = bottom_binding.x * cos_curl_angle - bottom_binding.y * sin_curl_angle,
           one_divide_radius                  = 1.f / radius,
-          best_corner_location_z             = 0;
+          best_corner_location_z             = 0,
+          best_opposite_corner_location_z    = 0;
 
     float best_curl_mismatch = FLT_MAX,
           best_curl_step     = width / find_best_curl_steps;
@@ -267,13 +277,28 @@ struct RenderablePageCurlMesh::Impl
         {
           best_corner_location_z = 0;
         }
+
+        if (rotated_opposite_corner_location_x > current_curl_x + pi_r)
+        {
+          best_opposite_corner_location_z = 2 * radius;
+        }
+        else if (rotated_opposite_corner_location_x > current_curl_x)
+        {
+          float alpha = (rotated_opposite_corner_location_x - current_curl_x) * one_divide_radius;
+
+          best_opposite_corner_location_z = radius - radius * cos (alpha);
+        }
+        else
+        {
+          best_opposite_corner_location_z = 0;
+        }
       }
     }
 
     RenderableVertex*  v          = vertices.data ();
     const math::vec3f* original_v = original_vertices.data ();
 
-    if (best_corner_location_z == 0)  //угол за который тянули не оторвался от плоскости
+    if (best_corner_location_z <= best_opposite_corner_location_z * 0.5f)  //угол за который тянули гораздо ниже противоположного угла
     {
       for (size_t i = 0; i < vertices_count; i++, v++, original_v++)
       {
