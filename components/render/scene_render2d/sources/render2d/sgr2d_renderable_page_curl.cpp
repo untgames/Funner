@@ -24,14 +24,15 @@ namespace
 
 const char* LOG_NAME = "render.obsolete.render2d.RenderablePageCurl";
 
-const float  EPS                   = 0.001f;
-const float  BACK_SHADOW_OFFSET    = 0;
-const float  CORNER_SHADOW_SHIFT   = 0.2f;
-const float  PI                    = 3.1415926f;
-const size_t SHADOW_TEXTURE_SIZE   = 32;
-const size_t SHADOW_VERTICES_COUNT = 16;
-const float  STATIC_PAGES_Z_OFFSET = -0.001f;
-const float  TEXCOORD_OFFSET       = 0.001f;
+const float  EPS                     = 0.001f;
+const float  BACK_SHADOW_OFFSET      = 0;
+const float  CORNER_SHADOW_GROW_PART = 0.2f;
+const float  CORNER_SHADOW_SHIFT     = 0.2f;
+const float  PI                      = 3.1415926f;
+const size_t SHADOW_TEXTURE_SIZE     = 32;
+const size_t SHADOW_VERTICES_COUNT   = 16;
+const float  STATIC_PAGES_Z_OFFSET   = -0.001f;
+const float  TEXCOORD_OFFSET         = 0.001f;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Параметры вершины необходимые для визуализации
@@ -654,7 +655,26 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
     const math::vec3f& top_corner_position          = left_side ? left_top_corner_position : right_top_corner_position;
     const math::vec3f& bottom_corner_position       = left_side ? left_bottom_corner_position : right_bottom_corner_position;
 
-    float shadow_width = page_size.x * page_curl->ShadowWidth () * curl_radius / page_curl->CurlRadius ();
+    float shadow_width  = page_size.x * page_curl->ShadowWidth () * curl_radius / page_curl->CurlRadius (),
+          corner_offset = 0.f;
+
+    switch (page_curl->CurlCorner ())
+    {
+      case PageCurlCorner_LeftTop:
+        corner_offset = math::length (math::vec2f (left_top_corner_position.x, page_size.y - left_top_corner_position.y));
+        break;
+      case PageCurlCorner_LeftBottom:
+        corner_offset = math::length (math::vec2f (left_bottom_corner_position.x, left_bottom_corner_position.y));
+        break;
+      case PageCurlCorner_RightTop:
+        corner_offset = math::length (math::vec2f (page_size.x - right_top_corner_position.x,  - right_top_corner_position.y));
+        break;
+      case PageCurlCorner_RightBottom:
+        corner_offset = math::length (math::vec2f (page_size.x - right_bottom_corner_position.x, right_bottom_corner_position.y));
+        break;
+    }
+
+    corner_shadow_offset *= stl::min (corner_offset / page_size.x, CORNER_SHADOW_GROW_PART) / CORNER_SHADOW_GROW_PART;
 
       //отрисовка тени под страницей
     if (curled_page->HasBottomSideBendPosition () || curled_page->HasTopSideBendPosition ())
