@@ -635,6 +635,9 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
   //Рисование теней
   void DrawShadows (low_level::IDevice& device, float curl_radius, bool left_side)
   {
+    if (curl_radius <= EPS)
+      return;
+
     device.OSSetDepthStencilState (depth_stencil_state_write_disabled.get ());
     device.OSSetBlendState        (mask_blend_state.get ());
     device.SSSetTexture           (0, shadow_texture.get ());
@@ -1014,7 +1017,9 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
 
     curled_page->SetTexCoords (max_s, min_t, min_s, max_t);
 
-    curled_page->CalculateShadow (true);
+    float max_shadow = curl_radius / page_curl->CurlRadius ();
+
+    curled_page->CalculateShadow (true, max_shadow);
 
     curled_page->Draw (device);
 
@@ -1024,7 +1029,7 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
 
     BindMaterial (device, page_materials [curled_left_page_type].get (), page_textures [curled_left_page_type].get ());
 
-    curled_page->CalculateShadow (false);
+    curled_page->CalculateShadow (false, max_shadow);
 
     GetTexCoords (true, page_materials [curled_left_page_type].get (), page_textures_sizes [curled_left_page_type], min_s, max_s, min_t, max_t);
 
@@ -1096,7 +1101,9 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
 
     curled_page->SetTexCoords (max_s, min_t, min_s, max_t);
 
-    curled_page->CalculateShadow (true);
+    float max_shadow = curl_radius / page_curl->CurlRadius ();
+
+    curled_page->CalculateShadow (true, max_shadow);
 
     curled_page->Draw (device);
 
@@ -1106,7 +1113,7 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
 
     BindMaterial (device, page_materials [curled_left_page_type].get (), page_textures [curled_left_page_type].get ());
 
-    curled_page->CalculateShadow (false);
+    curled_page->CalculateShadow (false, max_shadow);
 
     GetTexCoords (true, page_materials [curled_left_page_type].get (), page_textures_sizes [curled_left_page_type], min_s, max_s, min_t, max_t);
 
@@ -1197,7 +1204,9 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
     else
       curled_page->SetTexCoords (min_s, min_t, max_s, max_t);
 
-    curled_page->CalculateShadow (true);
+    float max_shadow = curl_radius / page_curl->CurlRadius ();
+
+    curled_page->CalculateShadow (true, max_shadow);
 
     curled_page->Draw (device);
 
@@ -1207,7 +1216,7 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
 
     BindMaterial (device, page_materials [curled_right_page_type].get (), page_textures [curled_right_page_type].get ());
 
-    curled_page->CalculateShadow (false);
+    curled_page->CalculateShadow (false, max_shadow);
 
     GetTexCoords (false, page_materials [curled_right_page_type].get (), page_textures_sizes [curled_right_page_type], min_s, max_s, min_t, max_t);
 
@@ -1309,7 +1318,9 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
     else
       curled_page->SetTexCoords (min_s, min_t, max_s, max_t);
 
-    curled_page->CalculateShadow (true);
+    float max_shadow = curl_radius / page_curl->CurlRadius ();
+
+    curled_page->CalculateShadow (true, max_shadow);
 
     curled_page->Draw (device);
 
@@ -1319,7 +1330,7 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
 
     BindMaterial (device, page_materials [curled_right_page_type].get (), page_textures [curled_right_page_type].get ());
 
-    curled_page->CalculateShadow (false);
+    curled_page->CalculateShadow (false, max_shadow);
 
     GetTexCoords (false, page_materials [curled_right_page_type].get (), page_textures_sizes [curled_right_page_type], min_s, max_s, min_t, max_t);
 
