@@ -298,7 +298,7 @@ struct RenderablePageCurlMesh::Impl
     RenderableVertex*  v          = vertices.data ();
     const math::vec3f* original_v = original_vertices.data ();
 
-    if (best_corner_location_z <= best_opposite_corner_location_z * 0.5f)  //угол за который тянули гораздо ниже противоположного угла
+    if (best_corner_location_z <= best_opposite_corner_location_z * 0.5f && best_opposite_corner_location_z > 0)  //угол за который тянули гораздо ниже противоположного угла
     {
       for (size_t i = 0; i < vertices_count; i++, v++, original_v++)
       {

@@ -991,7 +991,7 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
     if (curl_corner_position.x > 2 * page_size.x - curl_radius * 2)
       curl_radius *= (2 * page_size.x - curl_corner_position.x) / (curl_radius * 2);
 
-    curl_radius = stl::max (EPS, curl_radius);
+    curl_radius = stl::max (0.f, curl_radius);
 
     float flip_width  = (page_size.y - corner_position.y) / tan (fabs (x_flip_angle)) + corner_position.x,
           flip_height = flip_width * tan (fabs (x_flip_angle / 2.f)),
@@ -1075,7 +1075,7 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
     if (curl_corner_position.x > 2 * page_size.x - curl_radius * 2)
       curl_radius *= (2 * page_size.x - curl_corner_position.x) / (curl_radius * 2);
 
-    curl_radius = stl::max (EPS, curl_radius);
+    curl_radius = stl::max (0.f, curl_radius);
 
     float flip_width  = corner_position.y / tan (x_flip_angle) + corner_position.x,
           flip_height = flip_width * tan (x_flip_angle / 2.f),
@@ -1163,7 +1163,7 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
     if (curl_corner_position.x < -page_size.x + curl_radius * 2)
       curl_radius *= (-page_size.x - curl_corner_position.x) / -(curl_radius * 2);
 
-    curl_radius = stl::max (EPS, curl_radius);
+    curl_radius = stl::max (0.f, curl_radius);
 
     float distance_to_right_edge = total_size.x - corner_position.x,
           flip_width             = (page_size.y - corner_position.y) / tan (fabs (x_flip_angle)) + distance_to_right_edge,
@@ -1277,7 +1277,7 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
     if (curl_corner_position.x < -page_size.x + curl_radius * 2)
       curl_radius *= (-page_size.x - curl_corner_position.x) / -(curl_radius * 2);
 
-    curl_radius = stl::max (EPS, curl_radius);
+    curl_radius = stl::max (0.f, curl_radius);
 
     float distance_to_right_edge = total_size.x - corner_position.x,
           flip_width             = corner_position.y / tan (x_flip_angle) + distance_to_right_edge,
