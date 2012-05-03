@@ -208,7 +208,7 @@ struct RenderablePageCurlMesh::Impl
           rotated_opposite_corner_location_x = opposite_original_corner_location.x * cos_curl_angle - opposite_original_corner_location.y * sin_curl_angle,
           rotated_top_binding_location_x     = top_binding.x * cos_curl_angle - top_binding.y * sin_curl_angle,
           rotated_bottom_binding_location_x  = bottom_binding.x * cos_curl_angle - bottom_binding.y * sin_curl_angle,
-          one_divide_radius                  = 1.f / radius,
+          one_divide_radius                  = radius ? 1.f / radius : FLT_MAX,
           best_corner_location_z             = 0,
           best_opposite_corner_location_z    = 0;
 
@@ -408,8 +408,15 @@ struct RenderablePageCurlMesh::Impl
   //Рассчет цвета вершин
   void CalculateShadow (bool front, float max_shadow)
   {
+    RenderableVertex* vertex = vertices.data ();
+
     if (last_curl_radius == 0)
+    {
+      for (size_t i = 0; i < vertices_count; i++, vertex++)
+        vertex->color = color;
+
       return;
+    }
 
     math::vec4ub colors [256];
 
@@ -425,8 +432,6 @@ struct RenderablePageCurlMesh::Impl
       current_color->z = (unsigned char)(color.z * intensity);
       current_color->w = color.w;
     }
-
-    RenderableVertex* vertex = vertices.data ();
 
     float z_to_light = 1 / (last_curl_radius * 2);
 
