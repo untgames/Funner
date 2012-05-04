@@ -1,6 +1,7 @@
 #ifndef SYSLIB_IPHONE_PLATFORM_SHARED_HEADER
 #define SYSLIB_IPHONE_PLATFORM_SHARED_HEADER
 
+#include <cfloat>
 #include <ctime>
 
 #include <CoreFoundation/CFRunLoop.h>
@@ -26,6 +27,9 @@
 #include <shared/platform.h>
 
 #import <Foundation/NSObject.h>
+
+#import <UIKit/UIAccelerometer.h>
+#import <UIKit/UIApplication.h>
 
 namespace syslib
 {

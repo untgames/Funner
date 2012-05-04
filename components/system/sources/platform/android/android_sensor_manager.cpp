@@ -465,18 +465,18 @@ stl::string AndroidSensorManager::GetSensorType (sensor_t handle)
     
     switch (type)
     {
-      case SENSOR_TYPE_ACCELEROMETER:       return "accelerometer";
-      case SENSOR_TYPE_MAGNETIC_FIELD:      return "magnetic_field";
-      case SENSOR_TYPE_ORIENTATION:         return "orientation";
-      case SENSOR_TYPE_GYROSCOPE:           return "gyroscope";
-      case SENSOR_TYPE_LIGHT:               return "light";
-      case SENSOR_TYPE_PRESSURE:            return "pressure";
-      case SENSOR_TYPE_TEMPERATURE:         return "temperature";
-      case SENSOR_TYPE_PROXIMITY:           return "proximity";
-      case SENSOR_TYPE_GRAVITY:             return "gravity";
-      case SENSOR_TYPE_LINEAR_ACCELERATION: return "linear_acceleration";
-      case SENSOR_TYPE_ROTATION_VECTOR:     return "rotation_vector";
-      case SENSOR_TYPE_RELATIVE_HUMIDITY:   return "relative_humidity";
+      case SENSOR_TYPE_ACCELEROMETER:       return "Accelerometer";
+      case SENSOR_TYPE_MAGNETIC_FIELD:      return "MagneticField";
+      case SENSOR_TYPE_ORIENTATION:         return "Orientation";
+      case SENSOR_TYPE_GYROSCOPE:           return "Gyroscope";
+      case SENSOR_TYPE_LIGHT:               return "Light";
+      case SENSOR_TYPE_PRESSURE:            return "Pressure";
+      case SENSOR_TYPE_TEMPERATURE:         return "Temperature";
+      case SENSOR_TYPE_PROXIMITY:           return "Proximity";
+      case SENSOR_TYPE_GRAVITY:             return "Gravity";
+      case SENSOR_TYPE_LINEAR_ACCELERATION: return "LinearAcceleration";
+      case SENSOR_TYPE_ROTATION_VECTOR:     return "RotationVector";
+      case SENSOR_TYPE_RELATIVE_HUMIDITY:   return "RelativeHumidity";
       default:                              return common::format ("android_sensor_type%02d", type);
     }
   }

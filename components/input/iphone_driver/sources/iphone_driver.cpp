@@ -14,14 +14,13 @@ struct DeviceDesc
   const char* full_name;
 };
 
-const DeviceDesc ACCELEROMETER_DEVICE_DESC                  = { "iphone_accelerometer", "accelerometer.iphone_accelerometer" };
 const DeviceDesc APPLICATION_DEVICE_DESC                    = { "iphone_application", "application.iphone_application" };
 const DeviceDesc ASCII_KEYBOARD_DEVICE_DESC                 = { "ascii_keyboard", "keyboard.ascii_keyboard" };
 const DeviceDesc ASCII_AUTOCAPITALIZED_KEYBOARD_DEVICE_DESC = { "ascii_autocapitalized_keyboard", "keyboard.ascii_autocapitalized_keyboard" };
 const DeviceDesc NUMBER_KEYBOARD_DEVICE_DESC                = { "number_keyboard", "keyboard.number_keyboard" };
 const DeviceDesc NUMBER_PUNCTUATION_KEYBOARD_DEVICE_DESC    = { "number_punctuation_keyboard", "keyboard.number_punctuation_keyboard" };
 
-const DeviceDesc SUPPORTED_DEVICES [] = { ACCELEROMETER_DEVICE_DESC, APPLICATION_DEVICE_DESC, ASCII_KEYBOARD_DEVICE_DESC,
+const DeviceDesc SUPPORTED_DEVICES [] = { APPLICATION_DEVICE_DESC, ASCII_KEYBOARD_DEVICE_DESC,
                                           ASCII_AUTOCAPITALIZED_KEYBOARD_DEVICE_DESC, NUMBER_KEYBOARD_DEVICE_DESC,
                                           NUMBER_PUNCTUATION_KEYBOARD_DEVICE_DESC };
 
@@ -116,9 +115,6 @@ class Driver: virtual public IDriver, public xtl::reference_counter
             
           if (!xtl::xstrcmp (device_name, APPLICATION_DEVICE_DESC.full_name))
             return new IPhoneApplication (APPLICATION_DEVICE_DESC.name, APPLICATION_DEVICE_DESC.full_name);
-            
-          if (!xtl::xstrcmp (device_name, ACCELEROMETER_DEVICE_DESC.full_name))
-            return new IPhoneAccelerometer (ACCELEROMETER_DEVICE_DESC.name, ACCELEROMETER_DEVICE_DESC.full_name);
         }
       }
 
