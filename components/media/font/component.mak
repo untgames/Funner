@@ -1,7 +1,8 @@
 ###################################################################################################
 #Определения и константы
 ###################################################################################################
-TARGETS := MEDIA.FONT.SOURCES MEDIA.FONT.XFONT MEDIA.FONT.FONT_CONVERTER MEDIA.FONT.TESTS MEDIA.FONT.IMAGE2XFONT MEDIA.FONT.TTF2XFONT
+TARGETS := MEDIA.FONT.SOURCES MEDIA.FONT.XFONT MEDIA.FONT.FONT_CONVERTER MEDIA.FONT.TESTS \
+           MEDIA.FONT.IMAGE2XFONT MEDIA.FONT.TTF2XFONT MEDIA.FONT.TTF2XFONT.TESTS
 
 #Цель - MediaLib sources
 MEDIA.FONT.SOURCES.TYPE             := static-lib
@@ -24,7 +25,7 @@ MEDIA.FONT.FONT_CONVERTER.IMPORTS          := compile.media.font compile.media.i
 
 #Цель - MediaLib tests
 MEDIA.FONT.TESTS.TYPE             := test-suite
-MEDIA.FONT.TESTS.SOURCE_DIRS      := tests
+MEDIA.FONT.TESTS.SOURCE_DIRS      := tests/font
 MEDIA.FONT.TESTS.IMPORTS          := compile.media.font link.media.font link.media.font.xfont link.media.font.font_converter \
                                      compile.media.image link.media.image link.media.image.left_bottom_packer
 
@@ -41,3 +42,10 @@ MEDIA.FONT.TTF2XFONT.SOURCE_DIRS      := utils/ttf2xfont
 MEDIA.FONT.TTF2XFONT.IMPORTS          := compile.media.font link.media.font link.media.font.xfont compile.media.image \
                                          link.media.image link.media.font.font_converter link.media.image.left_bottom_packer \
                                          link.common.iconv
+
+#Цель - ttf2xfont tests
+MEDIA.FONT.TTF2XFONT.TESTS.TYPE              := test-suite
+MEDIA.FONT.TTF2XFONT.TESTS.SOURCE_DIRS       := tests/ttf2xfont
+MEDIA.FONT.TTF2XFONT.TESTS.USED_APPLICATIONS := ttf2xfont
+
+                                         

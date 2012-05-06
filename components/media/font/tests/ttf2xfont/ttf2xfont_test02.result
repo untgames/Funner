@@ -1,0 +1,16 @@
+Results of ttf2xfont_test02:
+ttf2xfont [<OPTIONS>] <SOURCE> ...
+  OPTIONS:
+    --help, -?                 print help message
+    --silent, -s               quiet mode
+    --image=<file>, -i <file>  set output image file
+    --xml-image-name=<file>    set output image name in xml file
+    --out-font=<file>, -o <file> set output font name
+    --char-map-file=<file>     set file with characters to include in font
+    --char-map-file-encoding=<encoding> set encoding of file with characters to include in font
+    --glyph-size=<size>        set glyph size
+    --first-glyph-code=<index> set first index of generated glyph range
+    --last-glyph-code=<index>  set last index of generated glyph range
+    --glyph-interval=<size>    set glyph interval
+    --force-advance=<size>     set force generated advance x
+    --fast                     fast mode

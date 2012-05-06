@@ -1,0 +1,636 @@
+Results of ttf2xfont_test06:
+<?xml version="1.0" encoding="utf-8"?>
+<Font Name="results/a_damn_mess.xfont" FontFile="results/a_damn_mess.png" FirstCharCode="32">
+  <Glyphs>
+    <Glyph XPos="0" YPos="0" Width="0" Height="0" BearingX="0" BearingY="0" AdvanceX="50" AdvanceY="0"/>
+    <Glyph XPos="0" YPos="0" Width="0" Height="0" BearingX="0" BearingY="0" AdvanceX="50" AdvanceY="0"/>
+    <Glyph XPos="0" YPos="0" Width="0" Height="0" BearingX="0" BearingY="0" AdvanceX="50" AdvanceY="0"/>
+    <Glyph XPos="0" YPos="0" Width="0" Height="0" BearingX="0" BearingY="0" AdvanceX="50" AdvanceY="0"/>
+    <Glyph XPos="0" YPos="0" Width="0" Height="0" BearingX="0" BearingY="0" AdvanceX="50" AdvanceY="0"/>
+    <Glyph XPos="0" YPos="0" Width="0" Height="0" BearingX="0" BearingY="0" AdvanceX="50" AdvanceY="0"/>
+    <Glyph XPos="0" YPos="0" Width="0" Height="0" BearingX="0" BearingY="0" AdvanceX="50" AdvanceY="0"/>
+    <Glyph XPos="0" YPos="0" Width="0" Height="0" BearingX="0" BearingY="0" AdvanceX="50" AdvanceY="0"/>
+    <Glyph XPos="0" YPos="0" Width="0" Height="0" BearingX="0" BearingY="0" AdvanceX="50" AdvanceY="0"/>
+    <Glyph XPos="0" YPos="0" Width="0" Height="0" BearingX="0" BearingY="0" AdvanceX="50" AdvanceY="0"/>
+    <Glyph XPos="0" YPos="0" Width="0" Height="0" BearingX="0" BearingY="0" AdvanceX="50" AdvanceY="0"/>
+    <Glyph XPos="0" YPos="0" Width="0" Height="0" BearingX="0" BearingY="0" AdvanceX="50" AdvanceY="0"/>
+    <Glyph XPos="0" YPos="0" Width="0" Height="0" BearingX="0" BearingY="0" AdvanceX="50" AdvanceY="0"/>
+    <Glyph XPos="0" YPos="0" Width="0" Height="0" BearingX="0" BearingY="0" AdvanceX="50" AdvanceY="0"/>
+    <Glyph XPos="0" YPos="0" Width="0" Height="0" BearingX="0" BearingY="0" AdvanceX="50" AdvanceY="0"/>
+    <Glyph XPos="0" YPos="0" Width="0" Height="0" BearingX="0" BearingY="0" AdvanceX="50" AdvanceY="0"/>
+    <Glyph XPos="0" YPos="0" Width="0" Height="0" BearingX="0" BearingY="0" AdvanceX="50" AdvanceY="0"/>
+    <Glyph XPos="0" YPos="0" Width="0" Height="0" BearingX="0" BearingY="0" AdvanceX="50" AdvanceY="0"/>
+    <Glyph XPos="0" YPos="0" Width="0" Height="0" BearingX="0" BearingY="0" AdvanceX="50" AdvanceY="0"/>
+    <Glyph XPos="0" YPos="0" Width="0" Height="0" BearingX="0" BearingY="0" AdvanceX="50" AdvanceY="0"/>
+    <Glyph XPos="0" YPos="0" Width="0" Height="0" BearingX="0" BearingY="0" AdvanceX="50" AdvanceY="0"/>
+    <Glyph XPos="0" YPos="0" Width="0" Height="0" BearingX="0" BearingY="0" AdvanceX="50" AdvanceY="0"/>
+    <Glyph XPos="0" YPos="0" Width="0" Height="0" BearingX="0" BearingY="0" AdvanceX="50" AdvanceY="0"/>
+    <Glyph XPos="0" YPos="0" Width="0" Height="0" BearingX="0" BearingY="0" AdvanceX="50" AdvanceY="0"/>
+    <Glyph XPos="0" YPos="0" Width="0" Height="0" BearingX="0" BearingY="0" AdvanceX="50" AdvanceY="0"/>
+    <Glyph XPos="0" YPos="0" Width="0" Height="0" BearingX="0" BearingY="0" AdvanceX="50" AdvanceY="0"/>
+    <Glyph XPos="0" YPos="0" Width="0" Height="0" BearingX="0" BearingY="0" AdvanceX="50" AdvanceY="0"/>
+    <Glyph XPos="0" YPos="0" Width="0" Height="0" BearingX="0" BearingY="0" AdvanceX="50" AdvanceY="0"/>
+    <Glyph XPos="0" YPos="0" Width="0" Height="0" BearingX="0" BearingY="0" AdvanceX="50" AdvanceY="0"/>
+    <Glyph XPos="0" YPos="0" Width="0" Height="0" BearingX="0" BearingY="0" AdvanceX="50" AdvanceY="0"/>
+    <Glyph XPos="0" YPos="0" Width="0" Height="0" BearingX="0" BearingY="0" AdvanceX="50" AdvanceY="0"/>
+    <Glyph XPos="0" YPos="0" Width="0" Height="0" BearingX="0" BearingY="0" AdvanceX="50" AdvanceY="0"/>
+    <Glyph XPos="0" YPos="0" Width="0" Height="0" BearingX="0" BearingY="0" AdvanceX="50" AdvanceY="0"/>
+    <Glyph XPos="0" YPos="0" Width="29" Height="33" BearingX="0" BearingY="32" AdvanceX="79" AdvanceY="0"/>
+    <Glyph XPos="0" YPos="53" Width="26" Height="31" BearingX="1" BearingY="31" AdvanceX="76" AdvanceY="0"/>
+    <Glyph XPos="0" YPos="104" Width="28" Height="32" BearingX="0" BearingY="31" AdvanceX="78" AdvanceY="0"/>
+    <Glyph XPos="0" YPos="156" Width="27" Height="33" BearingX="1" BearingY="31" AdvanceX="77" AdvanceY="0"/>
+    <Glyph XPos="47" YPos="156" Width="29" Height="33" BearingX="-1" BearingY="32" AdvanceX="79" AdvanceY="0"/>
+    <Glyph XPos="48" YPos="53" Width="25" Height="32" BearingX="0" BearingY="31" AdvanceX="75" AdvanceY="0"/>
+    <Glyph XPos="49" YPos="0" Width="28" Height="32" BearingX="0" BearingY="31" AdvanceX="78" AdvanceY="0"/>
+    <Glyph XPos="48" YPos="105" Width="25" Height="31" BearingX="0" BearingY="31" AdvanceX="75" AdvanceY="0"/>
+    <Glyph XPos="93" YPos="52" Width="29" Height="30" BearingX="0" BearingY="30" AdvanceX="79" AdvanceY="0"/>
+    <Glyph XPos="93" YPos="102" Width="25" Height="31" BearingX="0" BearingY="31" AdvanceX="75" AdvanceY="0"/>
+    <Glyph XPos="96" YPos="153" Width="27" Height="31" BearingX="1" BearingY="31" AdvanceX="77" AdvanceY="0"/>
+    <Glyph XPos="96" YPos="204" Width="21" Height="31" BearingX="1" BearingY="30" AdvanceX="71" AdvanceY="0"/>
+    <Glyph XPos="97" YPos="0" Width="25" Height="32" BearingX="0" BearingY="32" AdvanceX="75" AdvanceY="0"/>
+    <Glyph XPos="137" YPos="204" Width="26" Height="32" BearingX="1" BearingY="31" AdvanceX="76" AdvanceY="0"/>
+    <Glyph XPos="142" YPos="0" Width="26" Height="32" BearingX="1" BearingY="32" AdvanceX="76" AdvanceY="0"/>
+    <Glyph XPos="138" YPos="102" Width="29" Height="31" BearingX="0" BearingY="31" AdvanceX="79" AdvanceY="0"/>
+    <Glyph XPos="183" YPos="153" Width="25" Height="33" BearingX="0" BearingY="32" AdvanceX="75" AdvanceY="0"/>
+    <Glyph XPos="187" YPos="52" Width="25" Height="32" BearingX="1" BearingY="32" AdvanceX="75" AdvanceY="0"/>
+    <Glyph XPos="188" YPos="0" Width="25" Height="32" BearingX="0" BearingY="32" AdvanceX="75" AdvanceY="0"/>
+    <Glyph XPos="228" YPos="104" Width="28" Height="32" BearingX="-1" BearingY="32" AdvanceX="78" AdvanceY="0"/>
+    <Glyph XPos="228" YPos="156" Width="25" Height="32" BearingX="1" BearingY="31" AdvanceX="75" AdvanceY="0"/>
+    <Glyph XPos="232" YPos="52" Width="30" Height="32" BearingX="0" BearingY="31" AdvanceX="80" AdvanceY="0"/>
+    <Glyph XPos="233" YPos="0" Width="34" Height="31" BearingX="0" BearingY="31" AdvanceX="84" AdvanceY="0"/>
+    <Glyph XPos="273" YPos="156" Width="30" Height="32" BearingX="0" BearingY="32" AdvanceX="80" AdvanceY="0"/>
+    <Glyph XPos="276" YPos="104" Width="27" Height="32" BearingX="0" BearingY="32" AdvanceX="77" AdvanceY="0"/>
+    <Glyph XPos="282" YPos="51" Width="30" Height="31" BearingX="0" BearingY="31" AdvanceX="80" AdvanceY="0"/>
+    <Glyph XPos="0" YPos="0" Width="0" Height="0" BearingX="0" BearingY="0" AdvanceX="50" AdvanceY="0"/>
+    <Glyph XPos="0" YPos="0" Width="0" Height="0" BearingX="0" BearingY="0" AdvanceX="50" AdvanceY="0"/>
+    <Glyph XPos="0" YPos="0" Width="0" Height="0" BearingX="0" BearingY="0" AdvanceX="50" AdvanceY="0"/>
+    <Glyph XPos="0" YPos="0" Width="0" Height="0" BearingX="0" BearingY="0" AdvanceX="50" AdvanceY="0"/>
+    <Glyph XPos="0" YPos="209" Width="10" Height="2" BearingX="0" BearingY="-2" AdvanceX="60" AdvanceY="0"/>
+    <Glyph XPos="0" YPos="0" Width="0" Height="0" BearingX="0" BearingY="0" AdvanceX="50" AdvanceY="0"/>
+    <Glyph XPos="0" YPos="0" Width="29" Height="33" BearingX="0" BearingY="32" AdvanceX="79" AdvanceY="0"/>
+    <Glyph XPos="0" YPos="53" Width="26" Height="31" BearingX="1" BearingY="31" AdvanceX="76" AdvanceY="0"/>
+    <Glyph XPos="0" YPos="104" Width="28" Height="32" BearingX="0" BearingY="31" AdvanceX="78" AdvanceY="0"/>
+    <Glyph XPos="0" YPos="156" Width="27" Height="33" BearingX="1" BearingY="31" AdvanceX="77" AdvanceY="0"/>
+    <Glyph XPos="47" YPos="156" Width="29" Height="33" BearingX="-1" BearingY="32" AdvanceX="79" AdvanceY="0"/>
+    <Glyph XPos="48" YPos="53" Width="25" Height="32" BearingX="0" BearingY="31" AdvanceX="75" AdvanceY="0"/>
+    <Glyph XPos="49" YPos="0" Width="28" Height="32" BearingX="0" BearingY="31" AdvanceX="78" AdvanceY="0"/>
+    <Glyph XPos="48" YPos="105" Width="25" Height="31" BearingX="0" BearingY="31" AdvanceX="75" AdvanceY="0"/>
+    <Glyph XPos="93" YPos="52" Width="29" Height="30" BearingX="0" BearingY="30" AdvanceX="79" AdvanceY="0"/>
+    <Glyph XPos="93" YPos="102" Width="25" Height="31" BearingX="0" BearingY="31" AdvanceX="75" AdvanceY="0"/>
+    <Glyph XPos="96" YPos="153" Width="27" Height="31" BearingX="1" BearingY="31" AdvanceX="77" AdvanceY="0"/>
+    <Glyph XPos="96" YPos="204" Width="21" Height="31" BearingX="1" BearingY="30" AdvanceX="71" AdvanceY="0"/>
+    <Glyph XPos="97" YPos="0" Width="25" Height="32" BearingX="0" BearingY="32" AdvanceX="75" AdvanceY="0"/>
+    <Glyph XPos="137" YPos="204" Width="26" Height="32" BearingX="1" BearingY="31" AdvanceX="76" AdvanceY="0"/>
+    <Glyph XPos="142" YPos="0" Width="26" Height="32" BearingX="1" BearingY="32" AdvanceX="76" AdvanceY="0"/>
+    <Glyph XPos="138" YPos="102" Width="29" Height="31" BearingX="0" BearingY="31" AdvanceX="79" AdvanceY="0"/>
+    <Glyph XPos="183" YPos="153" Width="25" Height="33" BearingX="0" BearingY="32" AdvanceX="75" AdvanceY="0"/>
+    <Glyph XPos="187" YPos="52" Width="25" Height="32" BearingX="1" BearingY="32" AdvanceX="75" AdvanceY="0"/>
+    <Glyph XPos="188" YPos="0" Width="25" Height="32" BearingX="0" BearingY="32" AdvanceX="75" AdvanceY="0"/>
+    <Glyph XPos="228" YPos="104" Width="28" Height="32" BearingX="-1" BearingY="32" AdvanceX="78" AdvanceY="0"/>
+    <Glyph XPos="228" YPos="156" Width="25" Height="32" BearingX="1" BearingY="31" AdvanceX="75" AdvanceY="0"/>
+    <Glyph XPos="232" YPos="52" Width="30" Height="32" BearingX="0" BearingY="31" AdvanceX="80" AdvanceY="0"/>
+    <Glyph XPos="233" YPos="0" Width="34" Height="31" BearingX="0" BearingY="31" AdvanceX="84" AdvanceY="0"/>
+    <Glyph XPos="273" YPos="156" Width="30" Height="32" BearingX="0" BearingY="32" AdvanceX="80" AdvanceY="0"/>
+    <Glyph XPos="276" YPos="104" Width="27" Height="32" BearingX="0" BearingY="32" AdvanceX="77" AdvanceY="0"/>
+    <Glyph XPos="282" YPos="51" Width="30" Height="31" BearingX="0" BearingY="31" AdvanceX="80" AdvanceY="0"/>
+    <Glyph XPos="0" YPos="0" Width="0" Height="0" BearingX="0" BearingY="0" AdvanceX="50" AdvanceY="0"/>
+    <Glyph XPos="0" YPos="0" Width="0" Height="0" BearingX="0" BearingY="0" AdvanceX="50" AdvanceY="0"/>
+    <Glyph XPos="0" YPos="0" Width="0" Height="0" BearingX="0" BearingY="0" AdvanceX="50" AdvanceY="0"/>
+    <Glyph XPos="0" YPos="0" Width="0" Height="0" BearingX="0" BearingY="0" AdvanceX="50" AdvanceY="0"/>
+    <Glyph XPos="0" YPos="0" Width="0" Height="0" BearingX="0" BearingY="0" AdvanceX="50" AdvanceY="0"/>
+    <Glyph XPos="0" YPos="0" Width="0" Height="0" BearingX="0" BearingY="0" AdvanceX="50" AdvanceY="0"/>
+    <Glyph XPos="0" YPos="0" Width="0" Height="0" BearingX="0" BearingY="0" AdvanceX="50" AdvanceY="0"/>
+    <Glyph XPos="0" YPos="0" Width="0" Height="0" BearingX="0" BearingY="0" AdvanceX="50" AdvanceY="0"/>
+    <Glyph XPos="0" YPos="0" Width="0" Height="0" BearingX="0" BearingY="0" AdvanceX="50" AdvanceY="0"/>
+    <Glyph XPos="0" YPos="0" Width="0" Height="0" BearingX="0" BearingY="0" AdvanceX="50" AdvanceY="0"/>
+    <Glyph XPos="0" YPos="0" Width="0" Height="0" BearingX="0" BearingY="0" AdvanceX="50" AdvanceY="0"/>
+    <Glyph XPos="0" YPos="0" Width="0" Height="0" BearingX="0" BearingY="0" AdvanceX="50" AdvanceY="0"/>
+    <Glyph XPos="0" YPos="0" Width="0" Height="0" BearingX="0" BearingY="0" AdvanceX="50" AdvanceY="0"/>
+    <Glyph XPos="0" YPos="0" Width="0" Height="0" BearingX="0" BearingY="0" AdvanceX="50" AdvanceY="0"/>
+    <Glyph XPos="0" YPos="0" Width="0" Height="0" BearingX="0" BearingY="0" AdvanceX="50" AdvanceY="0"/>
+    <Glyph XPos="0" YPos="0" Width="0" Height="0" BearingX="0" BearingY="0" AdvanceX="50" AdvanceY="0"/>
+    <Glyph XPos="0" YPos="0" Width="0" Height="0" BearingX="0" BearingY="0" AdvanceX="50" AdvanceY="0"/>
+    <Glyph XPos="0" YPos="0" Width="0" Height="0" BearingX="0" BearingY="0" AdvanceX="50" AdvanceY="0"/>
+    <Glyph XPos="0" YPos="0" Width="0" Height="0" BearingX="0" BearingY="0" AdvanceX="50" AdvanceY="0"/>
+    <Glyph XPos="0" YPos="0" Width="0" Height="0" BearingX="0" BearingY="0" AdvanceX="50" AdvanceY="0"/>
+    <Glyph XPos="0" YPos="0" Width="0" Height="0" BearingX="0" BearingY="0" AdvanceX="50" AdvanceY="0"/>
+    <Glyph XPos="0" YPos="0" Width="0" Height="0" BearingX="0" BearingY="0" AdvanceX="50" AdvanceY="0"/>
+    <Glyph XPos="0" YPos="0" Width="0" Height="0" BearingX="0" BearingY="0" AdvanceX="50" AdvanceY="0"/>
+    <Glyph XPos="0" YPos="0" Width="0" Height="0" BearingX="0" BearingY="0" AdvanceX="50" AdvanceY="0"/>
+    <Glyph XPos="0" YPos="0" Width="0" Height="0" BearingX="0" BearingY="0" AdvanceX="50" AdvanceY="0"/>
+    <Glyph XPos="0" YPos="0" Width="0" Height="0" BearingX="0" BearingY="0" AdvanceX="50" AdvanceY="0"/>
+    <Glyph XPos="0" YPos="0" Width="0" Height="0" BearingX="0" BearingY="0" AdvanceX="50" AdvanceY="0"/>
+    <Glyph XPos="0" YPos="0" Width="0" Height="0" BearingX="0" BearingY="0" AdvanceX="50" AdvanceY="0"/>
+    <Glyph XPos="0" YPos="0" Width="0" Height="0" BearingX="0" BearingY="0" AdvanceX="50" AdvanceY="0"/>
+    <Glyph XPos="0" YPos="0" Width="0" Height="0" BearingX="0" BearingY="0" AdvanceX="50" AdvanceY="0"/>
+    <Glyph XPos="0" YPos="0" Width="0" Height="0" BearingX="0" BearingY="0" AdvanceX="50" AdvanceY="0"/>
+    <Glyph XPos="0" YPos="0" Width="0" Height="0" BearingX="0" BearingY="0" AdvanceX="50" AdvanceY="0"/>
+    <Glyph XPos="0" YPos="0" Width="0" Height="0" BearingX="0" BearingY="0" AdvanceX="50" AdvanceY="0"/>
+    <Glyph XPos="0" YPos="0" Width="0" Height="0" BearingX="0" BearingY="0" AdvanceX="50" AdvanceY="0"/>
+    <Glyph XPos="0" YPos="0" Width="0" Height="0" BearingX="0" BearingY="0" AdvanceX="50" AdvanceY="0"/>
+    <Glyph XPos="0" YPos="0" Width="0" Height="0" BearingX="0" BearingY="0" AdvanceX="50" AdvanceY="0"/>
+    <Glyph XPos="0" YPos="0" Width="0" Height="0" BearingX="0" BearingY="0" AdvanceX="50" AdvanceY="0"/>
+    <Glyph XPos="0" YPos="0" Width="0" Height="0" BearingX="0" BearingY="0" AdvanceX="50" AdvanceY="0"/>
+    <Glyph XPos="0" YPos="0" Width="0" Height="0" BearingX="0" BearingY="0" AdvanceX="50" AdvanceY="0"/>
+    <Glyph XPos="0" YPos="0" Width="0" Height="0" BearingX="0" BearingY="0" AdvanceX="50" AdvanceY="0"/>
+    <Glyph XPos="0" YPos="0" Width="0" Height="0" BearingX="0" BearingY="0" AdvanceX="50" AdvanceY="0"/>
+    <Glyph XPos="0" YPos="0" Width="0" Height="0" BearingX="0" BearingY="0" AdvanceX="50" AdvanceY="0"/>
+    <Glyph XPos="0" YPos="0" Width="0" Height="0" BearingX="0" BearingY="0" AdvanceX="50" AdvanceY="0"/>
+    <Glyph XPos="0" YPos="0" Width="0" Height="0" BearingX="0" BearingY="0" AdvanceX="50" AdvanceY="0"/>
+    <Glyph XPos="0" YPos="0" Width="0" Height="0" BearingX="0" BearingY="0" AdvanceX="50" AdvanceY="0"/>
+    <Glyph XPos="0" YPos="0" Width="0" Height="0" BearingX="0" BearingY="0" AdvanceX="50" AdvanceY="0"/>
+    <Glyph XPos="0" YPos="0" Width="0" Height="0" BearingX="0" BearingY="0" AdvanceX="50" AdvanceY="0"/>
+    <Glyph XPos="0" YPos="0" Width="0" Height="0" BearingX="0" BearingY="0" AdvanceX="50" AdvanceY="0"/>
+    <Glyph XPos="0" YPos="0" Width="0" Height="0" BearingX="0" BearingY="0" AdvanceX="50" AdvanceY="0"/>
+    <Glyph XPos="0" YPos="0" Width="0" Height="0" BearingX="0" BearingY="0" AdvanceX="50" AdvanceY="0"/>
+    <Glyph XPos="0" YPos="0" Width="0" Height="0" BearingX="0" BearingY="0" AdvanceX="50" AdvanceY="0"/>
+    <Glyph XPos="0" YPos="0" Width="0" Height="0" BearingX="0" BearingY="0" AdvanceX="50" AdvanceY="0"/>
+    <Glyph XPos="0" YPos="0" Width="0" Height="0" BearingX="0" BearingY="0" AdvanceX="50" AdvanceY="0"/>
+    <Glyph XPos="0" YPos="0" Width="0" Height="0" BearingX="0" BearingY="0" AdvanceX="50" AdvanceY="0"/>
+    <Glyph XPos="0" YPos="0" Width="0" Height="0" BearingX="0" BearingY="0" AdvanceX="50" AdvanceY="0"/>
+    <Glyph XPos="0" YPos="0" Width="0" Height="0" BearingX="0" BearingY="0" AdvanceX="50" AdvanceY="0"/>
+    <Glyph XPos="0" YPos="0" Width="0" Height="0" BearingX="0" BearingY="0" AdvanceX="50" AdvanceY="0"/>
+    <Glyph XPos="0" YPos="0" Width="0" Height="0" BearingX="0" BearingY="0" AdvanceX="50" AdvanceY="0"/>
+    <Glyph XPos="0" YPos="0" Width="0" Height="0" BearingX="0" BearingY="0" AdvanceX="50" AdvanceY="0"/>
+    <Glyph XPos="0" YPos="0" Width="0" Height="0" BearingX="0" BearingY="0" AdvanceX="50" AdvanceY="0"/>
+    <Glyph XPos="0" YPos="0" Width="0" Height="0" BearingX="0" BearingY="0" AdvanceX="50" AdvanceY="0"/>
+    <Glyph XPos="0" YPos="0" Width="0" Height="0" BearingX="0" BearingY="0" AdvanceX="50" AdvanceY="0"/>
+    <Glyph XPos="0" YPos="0" Width="0" Height="0" BearingX="0" BearingY="0" AdvanceX="50" AdvanceY="0"/>
+    <Glyph XPos="0" YPos="0" Width="0" Height="0" BearingX="0" BearingY="0" AdvanceX="50" AdvanceY="0"/>
+    <Glyph XPos="0" YPos="0" Width="0" Height="0" BearingX="0" BearingY="0" AdvanceX="50" AdvanceY="0"/>
+    <Glyph XPos="0" YPos="0" Width="0" Height="0" BearingX="0" BearingY="0" AdvanceX="50" AdvanceY="0"/>
+    <Glyph XPos="0" YPos="0" Width="0" Height="0" BearingX="0" BearingY="0" AdvanceX="50" AdvanceY="0"/>
+    <Glyph XPos="0" YPos="0" Width="0" Height="0" BearingX="0" BearingY="0" AdvanceX="50" AdvanceY="0"/>
+    <Glyph XPos="0" YPos="0" Width="0" Height="0" BearingX="0" BearingY="0" AdvanceX="50" AdvanceY="0"/>
+    <Glyph XPos="0" YPos="0" Width="0" Height="0" BearingX="0" BearingY="0" AdvanceX="50" AdvanceY="0"/>
+    <Glyph XPos="0" YPos="0" Width="0" Height="0" BearingX="0" BearingY="0" AdvanceX="50" AdvanceY="0"/>
+    <Glyph XPos="0" YPos="0" Width="0" Height="0" BearingX="0" BearingY="0" AdvanceX="50" AdvanceY="0"/>
+    <Glyph XPos="0" YPos="0" Width="0" Height="0" BearingX="0" BearingY="0" AdvanceX="50" AdvanceY="0"/>
+    <Glyph XPos="0" YPos="0" Width="0" Height="0" BearingX="0" BearingY="0" AdvanceX="50" AdvanceY="0"/>
+    <Glyph XPos="0" YPos="0" Width="0" Height="0" BearingX="0" BearingY="0" AdvanceX="50" AdvanceY="0"/>
+    <Glyph XPos="0" YPos="0" Width="0" Height="0" BearingX="0" BearingY="0" AdvanceX="50" AdvanceY="0"/>
+    <Glyph XPos="0" YPos="0" Width="0" Height="0" BearingX="0" BearingY="0" AdvanceX="50" AdvanceY="0"/>
+    <Glyph XPos="0" YPos="0" Width="0" Height="0" BearingX="0" BearingY="0" AdvanceX="50" AdvanceY="0"/>
+    <Glyph XPos="0" YPos="0" Width="0" Height="0" BearingX="0" BearingY="0" AdvanceX="50" AdvanceY="0"/>
+    <Glyph XPos="0" YPos="0" Width="0" Height="0" BearingX="0" BearingY="0" AdvanceX="50" AdvanceY="0"/>
+    <Glyph XPos="0" YPos="0" Width="0" Height="0" BearingX="0" BearingY="0" AdvanceX="50" AdvanceY="0"/>
+    <Glyph XPos="0" YPos="0" Width="0" Height="0" BearingX="0" BearingY="0" AdvanceX="50" AdvanceY="0"/>
+    <Glyph XPos="0" YPos="0" Width="0" Height="0" BearingX="0" BearingY="0" AdvanceX="50" AdvanceY="0"/>
+    <Glyph XPos="0" YPos="0" Width="0" Height="0" BearingX="0" BearingY="0" AdvanceX="50" AdvanceY="0"/>
+    <Glyph XPos="0" YPos="0" Width="0" Height="0" BearingX="0" BearingY="0" AdvanceX="50" AdvanceY="0"/>
+    <Glyph XPos="0" YPos="0" Width="0" Height="0" BearingX="0" BearingY="0" AdvanceX="50" AdvanceY="0"/>
+    <Glyph XPos="0" YPos="0" Width="0" Height="0" BearingX="0" BearingY="0" AdvanceX="50" AdvanceY="0"/>
+    <Glyph XPos="0" YPos="0" Width="0" Height="0" BearingX="0" BearingY="0" AdvanceX="50" AdvanceY="0"/>
+    <Glyph XPos="0" YPos="0" Width="0" Height="0" BearingX="0" BearingY="0" AdvanceX="50" AdvanceY="0"/>
+    <Glyph XPos="0" YPos="0" Width="0" Height="0" BearingX="0" BearingY="0" AdvanceX="50" AdvanceY="0"/>
+    <Glyph XPos="0" YPos="0" Width="0" Height="0" BearingX="0" BearingY="0" AdvanceX="50" AdvanceY="0"/>
+    <Glyph XPos="0" YPos="0" Width="0" Height="0" BearingX="0" BearingY="0" AdvanceX="50" AdvanceY="0"/>
+    <Glyph XPos="0" YPos="0" Width="0" Height="0" BearingX="0" BearingY="0" AdvanceX="50" AdvanceY="0"/>
+    <Glyph XPos="0" YPos="0" Width="0" Height="0" BearingX="0" BearingY="0" AdvanceX="50" AdvanceY="0"/>
+    <Glyph XPos="0" YPos="0" Width="0" Height="0" BearingX="0" BearingY="0" AdvanceX="50" AdvanceY="0"/>
+    <Glyph XPos="0" YPos="0" Width="0" Height="0" BearingX="0" BearingY="0" AdvanceX="50" AdvanceY="0"/>
+    <Glyph XPos="0" YPos="0" Width="0" Height="0" BearingX="0" BearingY="0" AdvanceX="50" AdvanceY="0"/>
+    <Glyph XPos="0" YPos="0" Width="0" Height="0" BearingX="0" BearingY="0" AdvanceX="50" AdvanceY="0"/>
+    <Glyph XPos="0" YPos="0" Width="0" Height="0" BearingX="0" BearingY="0" AdvanceX="50" AdvanceY="0"/>
+    <Glyph XPos="0" YPos="0" Width="0" Height="0" BearingX="0" BearingY="0" AdvanceX="50" AdvanceY="0"/>
+    <Glyph XPos="0" YPos="0" Width="0" Height="0" BearingX="0" BearingY="0" AdvanceX="50" AdvanceY="0"/>
+    <Glyph XPos="0" YPos="0" Width="0" Height="0" BearingX="0" BearingY="0" AdvanceX="50" AdvanceY="0"/>
+    <Glyph XPos="0" YPos="0" Width="0" Height="0" BearingX="0" BearingY="0" AdvanceX="50" AdvanceY="0"/>
+    <Glyph XPos="0" YPos="0" Width="0" Height="0" BearingX="0" BearingY="0" AdvanceX="50" AdvanceY="0"/>
+    <Glyph XPos="0" YPos="0" Width="0" Height="0" BearingX="0" BearingY="0" AdvanceX="50" AdvanceY="0"/>
+    <Glyph XPos="0" YPos="0" Width="0" Height="0" BearingX="0" BearingY="0" AdvanceX="50" AdvanceY="0"/>
+    <Glyph XPos="0" YPos="0" Width="0" Height="0" BearingX="0" BearingY="0" AdvanceX="50" AdvanceY="0"/>
+    <Glyph XPos="0" YPos="0" Width="0" Height="0" BearingX="0" BearingY="0" AdvanceX="50" AdvanceY="0"/>
+    <Glyph XPos="0" YPos="0" Width="0" Height="0" BearingX="0" BearingY="0" AdvanceX="50" AdvanceY="0"/>
+    <Glyph XPos="0" YPos="0" Width="0" Height="0" BearingX="0" BearingY="0" AdvanceX="50" AdvanceY="0"/>
+    <Glyph XPos="0" YPos="0" Width="0" Height="0" BearingX="0" BearingY="0" AdvanceX="50" AdvanceY="0"/>
+    <Glyph XPos="0" YPos="0" Width="0" Height="0" BearingX="0" BearingY="0" AdvanceX="50" AdvanceY="0"/>
+    <Glyph XPos="0" YPos="0" Width="0" Height="0" BearingX="0" BearingY="0" AdvanceX="50" AdvanceY="0"/>
+    <Glyph XPos="0" YPos="0" Width="0" Height="0" BearingX="0" BearingY="0" AdvanceX="50" AdvanceY="0"/>
+    <Glyph XPos="0" YPos="0" Width="0" Height="0" BearingX="0" BearingY="0" AdvanceX="50" AdvanceY="0"/>
+    <Glyph XPos="0" YPos="0" Width="0" Height="0" BearingX="0" BearingY="0" AdvanceX="50" AdvanceY="0"/>
+    <Glyph XPos="0" YPos="0" Width="0" Height="0" BearingX="0" BearingY="0" AdvanceX="50" AdvanceY="0"/>
+    <Glyph XPos="0" YPos="0" Width="0" Height="0" BearingX="0" BearingY="0" AdvanceX="50" AdvanceY="0"/>
+    <Glyph XPos="0" YPos="0" Width="0" Height="0" BearingX="0" BearingY="0" AdvanceX="50" AdvanceY="0"/>
+    <Glyph XPos="0" YPos="0" Width="0" Height="0" BearingX="0" BearingY="0" AdvanceX="50" AdvanceY="0"/>
+    <Glyph XPos="0" YPos="0" Width="0" Height="0" BearingX="0" BearingY="0" AdvanceX="50" AdvanceY="0"/>
+    <Glyph XPos="0" YPos="0" Width="0" Height="0" BearingX="0" BearingY="0" AdvanceX="50" AdvanceY="0"/>
+    <Glyph XPos="0" YPos="0" Width="0" Height="0" BearingX="0" BearingY="0" AdvanceX="50" AdvanceY="0"/>
+    <Glyph XPos="0" YPos="0" Width="0" Height="0" BearingX="0" BearingY="0" AdvanceX="50" AdvanceY="0"/>
+    <Glyph XPos="0" YPos="0" Width="0" Height="0" BearingX="0" BearingY="0" AdvanceX="50" AdvanceY="0"/>
+    <Glyph XPos="0" YPos="0" Width="0" Height="0" BearingX="0" BearingY="0" AdvanceX="50" AdvanceY="0"/>
+    <Glyph XPos="0" YPos="0" Width="0" Height="0" BearingX="0" BearingY="0" AdvanceX="50" AdvanceY="0"/>
+    <Glyph XPos="0" YPos="0" Width="0" Height="0" BearingX="0" BearingY="0" AdvanceX="50" AdvanceY="0"/>
+    <Glyph XPos="0" YPos="0" Width="0" Height="0" BearingX="0" BearingY="0" AdvanceX="50" AdvanceY="0"/>
+    <Glyph XPos="0" YPos="0" Width="0" Height="0" BearingX="0" BearingY="0" AdvanceX="50" AdvanceY="0"/>
+    <Glyph XPos="0" YPos="0" Width="0" Height="0" BearingX="0" BearingY="0" AdvanceX="50" AdvanceY="0"/>
+    <Glyph XPos="0" YPos="0" Width="0" Height="0" BearingX="0" BearingY="0" AdvanceX="50" AdvanceY="0"/>
+    <Glyph XPos="0" YPos="0" Width="0" Height="0" BearingX="0" BearingY="0" AdvanceX="50" AdvanceY="0"/>
+  </Glyphs>
+  <Kernings>
+    <Kerning LeftGlyph="2" RightGlyph="14" XKerning="-4.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="2" RightGlyph="44" XKerning="0.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="2" RightGlyph="65" XKerning="-3.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="2" RightGlyph="67" XKerning="-3.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="2" RightGlyph="69" XKerning="-3.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="2" RightGlyph="72" XKerning="-12.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="2" RightGlyph="75" XKerning="0.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="2" RightGlyph="77" XKerning="-1.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="2" RightGlyph="78" XKerning="-1.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="2" RightGlyph="79" XKerning="-5.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="2" RightGlyph="80" XKerning="-11.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="2" RightGlyph="81" XKerning="-4.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="2" RightGlyph="82" XKerning="-1.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="2" RightGlyph="83" XKerning="-2.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="2" RightGlyph="84" XKerning="0.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="2" RightGlyph="85" XKerning="-11.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="2" RightGlyph="86" XKerning="1.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="2" RightGlyph="87" XKerning="-11.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="2" RightGlyph="88" XKerning="-11.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="2" RightGlyph="89" XKerning="1.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="2" RightGlyph="90" XKerning="-11.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="14" RightGlyph="38" XKerning="1.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="14" RightGlyph="48" XKerning="2.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="14" RightGlyph="52" XKerning="-5.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="14" RightGlyph="54" XKerning="-5.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="14" RightGlyph="55" XKerning="-6.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="14" RightGlyph="57" XKerning="-4.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="14" RightGlyph="70" XKerning="1.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="14" RightGlyph="82" XKerning="1.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="14" RightGlyph="86" XKerning="-4.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="14" RightGlyph="87" XKerning="-5.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="14" RightGlyph="89" XKerning="-4.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="33" RightGlyph="48" XKerning="2.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="33" RightGlyph="52" XKerning="-9.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="33" RightGlyph="53" XKerning="-2.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="33" RightGlyph="54" XKerning="-9.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="33" RightGlyph="55" XKerning="-10.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="33" RightGlyph="57" XKerning="-8.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="33" RightGlyph="74" XKerning="-5.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="33" RightGlyph="86" XKerning="-5.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="33" RightGlyph="87" XKerning="-6.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="33" RightGlyph="180" XKerning="-1.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="34" RightGlyph="74" XKerning="-5.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="35" RightGlyph="74" XKerning="-7.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="35" RightGlyph="89" XKerning="-7.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="35" RightGlyph="90" XKerning="-2.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="35" RightGlyph="180" XKerning="-1.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="36" RightGlyph="14" XKerning="-4.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="36" RightGlyph="33" XKerning="-3.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="36" RightGlyph="42" XKerning="-4.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="36" RightGlyph="65" XKerning="-2.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="36" RightGlyph="67" XKerning="1.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="36" RightGlyph="68" XKerning="-7.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="36" RightGlyph="74" XKerning="-5.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="36" RightGlyph="77" XKerning="1.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="36" RightGlyph="79" XKerning="-6.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="36" RightGlyph="83" XKerning="-8.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="36" RightGlyph="90" XKerning="-6.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="37" RightGlyph="74" XKerning="-7.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="38" RightGlyph="14" XKerning="-18.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="38" RightGlyph="42" XKerning="-12.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="38" RightGlyph="68" XKerning="-3.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="38" RightGlyph="74" XKerning="-7.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="38" RightGlyph="77" XKerning="-2.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="38" RightGlyph="83" XKerning="-3.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="38" RightGlyph="87" XKerning="-5.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="39" RightGlyph="52" XKerning="-1.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="39" RightGlyph="57" XKerning="-7.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="39" RightGlyph="180" XKerning="0.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="41" RightGlyph="52" XKerning="1.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="43" RightGlyph="89" XKerning="-7.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="43" RightGlyph="90" XKerning="-1.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="44" RightGlyph="35" XKerning="-6.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="44" RightGlyph="52" XKerning="-11.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="44" RightGlyph="54" XKerning="-10.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="44" RightGlyph="55" XKerning="-11.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="44" RightGlyph="70" XKerning="-1.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="44" RightGlyph="71" XKerning="-4.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="44" RightGlyph="82" XKerning="-2.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="44" RightGlyph="86" XKerning="-7.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="44" RightGlyph="89" XKerning="-7.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="44" RightGlyph="90" XKerning="-2.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="47" RightGlyph="44" XKerning="1.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="47" RightGlyph="47" XKerning="1.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="47" RightGlyph="55" XKerning="-4.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="48" RightGlyph="14" XKerning="-18.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="48" RightGlyph="33" XKerning="-7.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="48" RightGlyph="42" XKerning="-10.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="48" RightGlyph="65" XKerning="-3.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="48" RightGlyph="67" XKerning="-3.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="48" RightGlyph="68" XKerning="-4.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="48" RightGlyph="69" XKerning="-3.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="48" RightGlyph="71" XKerning="-3.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="48" RightGlyph="74" XKerning="-6.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="48" RightGlyph="77" XKerning="-13.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="48" RightGlyph="79" XKerning="-4.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="48" RightGlyph="81" XKerning="-3.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="48" RightGlyph="83" XKerning="-3.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="48" RightGlyph="86" XKerning="-6.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="48" RightGlyph="87" XKerning="-2.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="48" RightGlyph="89" XKerning="-9.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="48" RightGlyph="90" XKerning="-1.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="49" RightGlyph="54" XKerning="-3.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="49" RightGlyph="180" XKerning="-2.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="50" RightGlyph="89" XKerning="0.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="50" RightGlyph="90" XKerning="-7.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="51" RightGlyph="52" XKerning="-3.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="51" RightGlyph="54" XKerning="-3.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="51" RightGlyph="57" XKerning="-2.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="52" RightGlyph="14" XKerning="-9.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="52" RightGlyph="33" XKerning="-9.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="52" RightGlyph="39" XKerning="-5.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="52" RightGlyph="42" XKerning="-10.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="52" RightGlyph="44" XKerning="-10.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="52" RightGlyph="45" XKerning="-6.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="52" RightGlyph="65" XKerning="-10.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="52" RightGlyph="67" XKerning="-8.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="52" RightGlyph="68" XKerning="-9.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="52" RightGlyph="69" XKerning="-8.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="52" RightGlyph="71" XKerning="-8.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="52" RightGlyph="74" XKerning="-6.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="52" RightGlyph="77" XKerning="-9.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="52" RightGlyph="78" XKerning="-8.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="52" RightGlyph="79" XKerning="-9.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="52" RightGlyph="80" XKerning="-9.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="52" RightGlyph="81" XKerning="-9.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="52" RightGlyph="82" XKerning="-9.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="52" RightGlyph="83" XKerning="-9.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="52" RightGlyph="85" XKerning="-8.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="52" RightGlyph="86" XKerning="-8.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="52" RightGlyph="87" XKerning="-9.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="52" RightGlyph="88" XKerning="-9.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="52" RightGlyph="89" XKerning="-8.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="52" RightGlyph="90" XKerning="-9.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="52" RightGlyph="180" XKerning="-2.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="54" RightGlyph="14" XKerning="-9.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="54" RightGlyph="33" XKerning="-9.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="54" RightGlyph="42" XKerning="-9.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="54" RightGlyph="44" XKerning="0.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="54" RightGlyph="45" XKerning="-7.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="54" RightGlyph="49" XKerning="-3.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="54" RightGlyph="65" XKerning="-5.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="54" RightGlyph="67" XKerning="-4.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="54" RightGlyph="68" XKerning="-6.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="54" RightGlyph="69" XKerning="-4.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="54" RightGlyph="70" XKerning="-6.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="54" RightGlyph="71" XKerning="-5.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="54" RightGlyph="74" XKerning="-5.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="54" RightGlyph="77" XKerning="-3.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="54" RightGlyph="79" XKerning="-6.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="54" RightGlyph="83" XKerning="-5.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="54" RightGlyph="87" XKerning="-4.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="54" RightGlyph="89" XKerning="-3.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="54" RightGlyph="90" XKerning="-3.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="55" RightGlyph="14" XKerning="-10.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="55" RightGlyph="33" XKerning="-9.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="55" RightGlyph="42" XKerning="-10.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="55" RightGlyph="44" XKerning="0.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="55" RightGlyph="49" XKerning="-4.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="55" RightGlyph="65" XKerning="-6.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="55" RightGlyph="68" XKerning="-6.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="55" RightGlyph="69" XKerning="-5.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="55" RightGlyph="79" XKerning="-6.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="55" RightGlyph="82" XKerning="-4.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="55" RightGlyph="83" XKerning="-6.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="56" RightGlyph="52" XKerning="-3.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="56" RightGlyph="54" XKerning="-2.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="56" RightGlyph="82" XKerning="-6.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="56" RightGlyph="89" XKerning="-6.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="56" RightGlyph="90" XKerning="-6.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="57" RightGlyph="14" XKerning="-9.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="57" RightGlyph="33" XKerning="-9.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="57" RightGlyph="39" XKerning="-4.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="57" RightGlyph="40" XKerning="1.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="57" RightGlyph="42" XKerning="-9.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="57" RightGlyph="44" XKerning="1.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="57" RightGlyph="45" XKerning="1.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="57" RightGlyph="49" XKerning="-5.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="57" RightGlyph="65" XKerning="-8.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="57" RightGlyph="67" XKerning="-8.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="57" RightGlyph="68" XKerning="-9.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="57" RightGlyph="69" XKerning="-8.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="57" RightGlyph="70" XKerning="-6.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="57" RightGlyph="71" XKerning="-8.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="57" RightGlyph="73" XKerning="1.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="57" RightGlyph="74" XKerning="-5.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="57" RightGlyph="77" XKerning="-6.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="57" RightGlyph="78" XKerning="-6.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="57" RightGlyph="79" XKerning="-9.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="57" RightGlyph="80" XKerning="-6.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="57" RightGlyph="81" XKerning="-8.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="57" RightGlyph="82" XKerning="-6.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="57" RightGlyph="83" XKerning="-8.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="57" RightGlyph="85" XKerning="-5.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="57" RightGlyph="86" XKerning="-4.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="57" RightGlyph="87" XKerning="-6.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="57" RightGlyph="88" XKerning="-6.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="57" RightGlyph="89" XKerning="-5.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="57" RightGlyph="90" XKerning="-5.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="58" RightGlyph="35" XKerning="-4.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="58" RightGlyph="36" XKerning="-3.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="58" RightGlyph="37" XKerning="-3.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="58" RightGlyph="38" XKerning="-2.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="58" RightGlyph="39" XKerning="-3.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="58" RightGlyph="40" XKerning="-3.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="58" RightGlyph="41" XKerning="-3.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="58" RightGlyph="43" XKerning="-2.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="58" RightGlyph="44" XKerning="-4.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="58" RightGlyph="45" XKerning="-3.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="58" RightGlyph="47" XKerning="-4.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="58" RightGlyph="49" XKerning="-4.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="58" RightGlyph="52" XKerning="-2.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="58" RightGlyph="54" XKerning="-2.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="58" RightGlyph="55" XKerning="-2.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="58" RightGlyph="56" XKerning="-1.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="58" RightGlyph="57" XKerning="-7.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="58" RightGlyph="58" XKerning="-2.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="58" RightGlyph="74" XKerning="-6.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="58" RightGlyph="82" XKerning="-1.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="58" RightGlyph="89" XKerning="-5.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="58" RightGlyph="90" XKerning="-2.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="65" RightGlyph="2" XKerning="-11.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="65" RightGlyph="48" XKerning="-3.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="65" RightGlyph="52" XKerning="-13.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="65" RightGlyph="54" XKerning="-4.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="65" RightGlyph="55" XKerning="-4.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="65" RightGlyph="57" XKerning="-6.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="65" RightGlyph="180" XKerning="-1.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="66" RightGlyph="2" XKerning="-3.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="66" RightGlyph="38" XKerning="-8.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="66" RightGlyph="52" XKerning="-12.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="66" RightGlyph="54" XKerning="-8.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="66" RightGlyph="55" XKerning="-8.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="66" RightGlyph="57" XKerning="-9.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="66" RightGlyph="74" XKerning="-5.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="67" RightGlyph="2" XKerning="0.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="67" RightGlyph="52" XKerning="-12.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="67" RightGlyph="55" XKerning="-7.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="67" RightGlyph="57" XKerning="-8.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="67" RightGlyph="70" XKerning="-5.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="67" RightGlyph="71" XKerning="-1.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="67" RightGlyph="82" XKerning="-7.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="67" RightGlyph="89" XKerning="-8.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="67" RightGlyph="90" XKerning="-8.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="67" RightGlyph="180" XKerning="-2.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="68" RightGlyph="82" XKerning="1.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="68" RightGlyph="180" XKerning="-1.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="69" RightGlyph="2" XKerning="-12.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="69" RightGlyph="48" XKerning="-2.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="69" RightGlyph="52" XKerning="-13.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="69" RightGlyph="54" XKerning="-4.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="69" RightGlyph="55" XKerning="-4.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="69" RightGlyph="57" XKerning="-6.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="69" RightGlyph="69" XKerning="0.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="69" RightGlyph="82" XKerning="-2.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="70" RightGlyph="14" XKerning="-7.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="70" RightGlyph="70" XKerning="0.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="71" RightGlyph="52" XKerning="-13.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="71" RightGlyph="82" XKerning="1.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="72" RightGlyph="44" XKerning="-10.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="72" RightGlyph="90" XKerning="-2.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="73" RightGlyph="52" XKerning="1.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="73" RightGlyph="54" XKerning="1.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="75" RightGlyph="2" XKerning="-2.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="75" RightGlyph="38" XKerning="-7.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="75" RightGlyph="39" XKerning="-8.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="75" RightGlyph="52" XKerning="-8.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="75" RightGlyph="54" XKerning="-9.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="75" RightGlyph="55" XKerning="-8.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="75" RightGlyph="57" XKerning="-8.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="75" RightGlyph="66" XKerning="-6.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="75" RightGlyph="68" XKerning="-5.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="75" RightGlyph="70" XKerning="-9.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="75" RightGlyph="71" XKerning="-3.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="75" RightGlyph="72" XKerning="-7.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="75" RightGlyph="73" XKerning="-6.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="75" RightGlyph="74" XKerning="-6.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="75" RightGlyph="75" XKerning="-7.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="75" RightGlyph="76" XKerning="-7.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="75" RightGlyph="77" XKerning="0.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="75" RightGlyph="78" XKerning="0.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="75" RightGlyph="82" XKerning="-9.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="75" RightGlyph="83" XKerning="-1.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="75" RightGlyph="84" XKerning="-8.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="75" RightGlyph="85" XKerning="0.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="75" RightGlyph="86" XKerning="0.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="75" RightGlyph="87" XKerning="-7.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="75" RightGlyph="89" XKerning="0.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="75" RightGlyph="90" XKerning="-11.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="75" RightGlyph="179" XKerning="-6.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="75" RightGlyph="180" XKerning="-6.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="77" RightGlyph="2" XKerning="-10.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="77" RightGlyph="38" XKerning="-7.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="77" RightGlyph="52" XKerning="-13.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="77" RightGlyph="82" XKerning="0.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="77" RightGlyph="89" XKerning="-6.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="77" RightGlyph="90" XKerning="0.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="77" RightGlyph="180" XKerning="-1.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="78" RightGlyph="2" XKerning="-12.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="78" RightGlyph="52" XKerning="-13.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="79" RightGlyph="2" XKerning="-2.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="79" RightGlyph="38" XKerning="-3.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="79" RightGlyph="43" XKerning="1.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="79" RightGlyph="48" XKerning="-4.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="79" RightGlyph="52" XKerning="-12.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="79" RightGlyph="54" XKerning="-4.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="79" RightGlyph="55" XKerning="-5.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="79" RightGlyph="57" XKerning="-7.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="79" RightGlyph="75" XKerning="0.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="79" RightGlyph="79" XKerning="3.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="79" RightGlyph="82" XKerning="-3.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="79" RightGlyph="180" XKerning="1.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="80" RightGlyph="2" XKerning="-1.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="80" RightGlyph="14" XKerning="-2.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="80" RightGlyph="52" XKerning="-12.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="80" RightGlyph="65" XKerning="-6.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="80" RightGlyph="66" XKerning="1.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="80" RightGlyph="67" XKerning="1.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="80" RightGlyph="68" XKerning="1.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="80" RightGlyph="70" XKerning="1.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="80" RightGlyph="71" XKerning="-6.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="80" RightGlyph="74" XKerning="-5.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="80" RightGlyph="76" XKerning="1.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="80" RightGlyph="77" XKerning="1.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="80" RightGlyph="79" XKerning="0.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="80" RightGlyph="83" XKerning="-8.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="80" RightGlyph="89" XKerning="-2.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="80" RightGlyph="90" XKerning="-6.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="80" RightGlyph="180" XKerning="-4.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="81" RightGlyph="2" XKerning="-7.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="81" RightGlyph="52" XKerning="-13.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="81" RightGlyph="82" XKerning="1.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="81" RightGlyph="180" XKerning="1.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="82" RightGlyph="2" XKerning="-10.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="82" RightGlyph="14" XKerning="-9.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="82" RightGlyph="52" XKerning="-13.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="82" RightGlyph="54" XKerning="-2.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="82" RightGlyph="55" XKerning="-2.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="82" RightGlyph="68" XKerning="-3.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="82" RightGlyph="77" XKerning="-9.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="82" RightGlyph="87" XKerning="-1.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="83" RightGlyph="2" XKerning="-1.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="83" RightGlyph="48" XKerning="-4.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="83" RightGlyph="52" XKerning="-12.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="83" RightGlyph="57" XKerning="-8.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="83" RightGlyph="180" XKerning="1.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="84" RightGlyph="14" XKerning="1.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="84" RightGlyph="52" XKerning="-13.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="84" RightGlyph="68" XKerning="-2.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="84" RightGlyph="77" XKerning="0.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="84" RightGlyph="87" XKerning="-6.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="85" RightGlyph="2" XKerning="0.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="85" RightGlyph="48" XKerning="0.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="85" RightGlyph="52" XKerning="-13.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="85" RightGlyph="54" XKerning="-2.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="85" RightGlyph="57" XKerning="-4.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="85" RightGlyph="82" XKerning="1.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="86" RightGlyph="2" XKerning="0.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="86" RightGlyph="33" XKerning="2.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="86" RightGlyph="43" XKerning="-3.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="86" RightGlyph="52" XKerning="-13.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="86" RightGlyph="55" XKerning="-2.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="87" RightGlyph="2" XKerning="-10.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="87" RightGlyph="33" XKerning="2.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="87" RightGlyph="52" XKerning="-13.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="88" RightGlyph="2" XKerning="-2.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="88" RightGlyph="52" XKerning="-12.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="89" RightGlyph="2" XKerning="0.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="89" RightGlyph="33" XKerning="1.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="89" RightGlyph="43" XKerning="-4.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="89" RightGlyph="52" XKerning="-14.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="89" RightGlyph="54" XKerning="-3.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="89" RightGlyph="55" XKerning="-3.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="90" RightGlyph="2" XKerning="1.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="90" RightGlyph="41" XKerning="-8.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="90" RightGlyph="52" XKerning="-14.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="90" RightGlyph="71" XKerning="-9.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="90" RightGlyph="82" XKerning="-7.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="90" RightGlyph="89" XKerning="0.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="90" RightGlyph="90" XKerning="-7.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="178" RightGlyph="57" XKerning="-5.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="179" RightGlyph="14" XKerning="-4.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="179" RightGlyph="33" XKerning="-4.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="179" RightGlyph="36" XKerning="-2.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="179" RightGlyph="44" XKerning="-2.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="179" RightGlyph="48" XKerning="-1.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="179" RightGlyph="50" XKerning="-3.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="179" RightGlyph="57" XKerning="-5.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="179" RightGlyph="65" XKerning="-2.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="179" RightGlyph="66" XKerning="-4.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="179" RightGlyph="67" XKerning="-2.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="179" RightGlyph="70" XKerning="-3.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="179" RightGlyph="71" XKerning="-2.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="179" RightGlyph="72" XKerning="-2.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="179" RightGlyph="75" XKerning="-2.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="179" RightGlyph="77" XKerning="-2.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="179" RightGlyph="78" XKerning="-2.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="179" RightGlyph="79" XKerning="-1.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="179" RightGlyph="80" XKerning="-1.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="179" RightGlyph="86" XKerning="-1.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="179" RightGlyph="87" XKerning="-1.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="179" RightGlyph="89" XKerning="-2.000" YKerning="0.000"/>
+    <Kerning LeftGlyph="179" RightGlyph="90" XKerning="-2.000" YKerning="0.000"/>
+  </Kernings>
+</Font>
+54f64d92bd99ee1021e7e0f4f2ffa1a3 *results/a_damn_mess.png
