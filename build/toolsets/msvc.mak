@@ -77,7 +77,7 @@ PROFILES                += msvc win32 has_windows x86 vcx86 x86_win32
 COMMON_LINK_FLAGS       += -stack:128000 /MACHINE:X86
 SOURCE_PROCESS_MACROSES += process_idl process_rc
 SOURCE_FILES_SUFFIXES   += asm
-IGNORE_PVS_ERROR        += V126 V122
+IGNORE_PVS_ERROR        += V126 V122 V201
 
 ###################################################################################################
 #Конфигурация переменных расположения библиотек
