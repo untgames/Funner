@@ -30,6 +30,9 @@
 
 #import <UIKit/UIAccelerometer.h>
 #import <UIKit/UIApplication.h>
+#import <UIKit/UIScreen.h>
+#import <UIKit/UIScreenMode.h>
+#import <UIKit/UIWindow.h>
 
 namespace syslib
 {
