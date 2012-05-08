@@ -6,15 +6,31 @@ using namespace syslib::tabletos;
 namespace
 {
 
-class TabletOsApplicationDelegate: public IApplicationDelegate, public xtl::reference_counter
+class TabletOsApplicationDelegate: public IApplicationDelegate, public xtl::reference_counter, public MessageQueue::Handler
 {
   public:
 ///Конструктор
     TabletOsApplicationDelegate ()
+      : message_queue (*MessageQueueSingleton::Instance ())        
     {
       idle_enabled = false;
       is_exited    = false;
       listener     = 0;
+      
+      MessageQueueSingleton::Instance ()->RegisterHandler (*this);      
+    }
+    
+///Деструктор
+    ~TabletOsApplicationDelegate ()
+    {
+      try
+      {
+        MessageQueueSingleton::Instance ()->UnregisterHandler (*this);
+      }
+      catch (...)
+      {
+        //подавление всех исключений
+      }      
     }
     
 ///Запуск цикла обработки сообщений
@@ -23,14 +39,16 @@ class TabletOsApplicationDelegate: public IApplicationDelegate, public xtl::refe
       platform_initialize ();
       
       if (navigator_request_events (0) != BPS_SUCCESS)
-        raise_error ("::navigator_request_events");
+        raise_error ("::navigator_request_events");             
       
       if (listener)
         listener->OnInitialize ();
       
       while (!is_exited)
       {
-        const int timeout_ms = idle_enabled && listener ? 0 : 100;
+          //обработка системных событий
+        
+/*        const int timeout_ms = idle_enabled && listener ? 0 : 100;
         
         bps_event_t *event = 0;
 
@@ -51,21 +69,42 @@ class TabletOsApplicationDelegate: public IApplicationDelegate, public xtl::refe
               printf ("navigator_domain = %d\n", domain); fflush (stdout);
               HandleNavigatorEvent (event);
           }
-        }
+        }*/
+        
+        while (!IsMessageQueueEmpty ())
+          DoNextEvent ();                    
 
-        if (idle_enabled && listener)
-          listener->OnIdle ();
+         //обработка внутренней очереди сообщений
+
+        if (!idle_enabled)
+        {
+          if (IsMessageQueueEmpty () && !is_exited)
+          {
+            WaitMessage ();
+          }
+        }
+        else
+        {
+          if (listener)
+            listener->OnIdle ();
+        }                
       }
     }
-
+    
 ///Выход из приложения
     void Exit (int code)
     {
+      message_queue.PushMessage (*this, MessageQueue::MessagePtr (new ExitMessage (*this, code), false));      
+    }
+    
+///Обработка события выхода из приложения
+    void OnExit (int code)
+    {
       is_exited = true;
-
+      
       if (listener)
         listener->OnExit (code);
-    }
+    }        
 
 ///Установка необходимости вызова событий idle
     void SetIdleState (bool state)
@@ -91,6 +130,57 @@ class TabletOsApplicationDelegate: public IApplicationDelegate, public xtl::refe
     }    
     
   private:
+///Отложенное события выхода из приложения
+    struct ExitMessage: public MessageQueue::Message
+    {
+      ExitMessage (TabletOsApplicationDelegate& in_delegate, int in_code) : delegate (in_delegate), code (in_code) {}
+      
+      void Dispatch ()
+      {
+        delegate.OnExit (code);
+      }
+      
+      TabletOsApplicationDelegate& delegate;
+      int                          code;
+    };
+
+///Проверка очереди событий на пустоту
+    bool IsMessageQueueEmpty ()
+    {
+      if (is_exited)
+        return true;
+        
+      return message_queue.IsEmpty ();
+    }    
+    
+///Ожидание события
+    void WaitMessage ()
+    {
+      try
+      {
+        message_queue.WaitMessage ();
+      }
+      catch (xtl::exception& exception)
+      {
+        exception.touch ("syslib::tabletos::TabletOsApplicationDelegate::WaitMessage");
+        throw;
+      }
+    }
+    
+///Обработка следующего события
+    void DoNextEvent ()
+    {
+      try
+      {
+        message_queue.DispatchFirstMessage ();
+      }
+      catch (xtl::exception& exception)
+      {
+        exception.touch ("syslib::tabletos::TabletOsApplicationDelegate::DoNextEvent");
+        throw;
+      }
+    }            
+  
 ///Обработка событий экрана
     void HandleScreenEvent (bps_event_t *event)
     {
@@ -171,6 +261,7 @@ class TabletOsApplicationDelegate: public IApplicationDelegate, public xtl::refe
     bool                  idle_enabled;
     bool                  is_exited;
     IApplicationListener* listener;
+    MessageQueue&         message_queue;        
 };
 
 }
