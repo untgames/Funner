@@ -4,7 +4,7 @@
 
 using namespace common;
 
-const size_t CHAR_TEST_ARRAY_SIZE = 0xff;
+const size_t CHAR_TEST_ARRAY_SIZE = 0x7F;
 
 int main ()
 {
