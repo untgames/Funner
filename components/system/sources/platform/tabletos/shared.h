@@ -21,6 +21,7 @@
 #include <common/utf_converter.h>
 
 #include <shared/platform.h>
+#include <shared/message_queue.h>
 
 namespace syslib
 {
