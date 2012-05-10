@@ -89,13 +89,21 @@ typedef common::Singleton<WindowRegistryImpl> WindowRegistrySingleton;
 
 struct WindowImpl: public IWindowImpl
 {
-  screen_context_t screen_context;   // A context encapsulates the connection to the windowing system
-  screen_window_t  screen_window;    // The window is the most basic drawing surface.
-  screen_display_t screen_display;   // A display represents the physical display hardware such as a touch screen display.
-  
+  screen_context_t     screen_context;   // A context encapsulates the connection to the windowing system
+  screen_window_t      screen_window;    // The window is the most basic drawing surface.
+  screen_display_t     screen_display;   // A display represents the physical display hardware such as a touch screen display.
+  WindowMessageHandler message_handler;                  //обработчик сообщений
+  void*                user_data;                        //пользовательские данные окна
+
+  bool                 background_state;
+  bool                 is_multitouch_enabled;  
 ///Constructor
   WindowImpl ()
-    : screen_window (0)
+    : screen_window (0),
+      message_handler (),
+      user_data (), 
+      background_state (false),
+      is_multitouch_enabled (false)
   {
     try
     {
@@ -182,6 +190,19 @@ struct WindowImpl: public IWindowImpl
     
     printf ("event_type = %d\n", event_type); fflush (stdout);
   }
+
+  void Notify (WindowEvent event, const WindowEventContext& context)
+  {
+    try
+    {
+      message_handler ((window_t)this, event, context, user_data);
+    }
+    catch (...)
+    {
+      //подавление всех исключений
+    }
+  }
+
 };
 
 }
@@ -211,6 +232,9 @@ window_t TabletOsWindowManager::CreateWindow (WindowStyle style, WindowMessageHa
 
     stl::auto_ptr<WindowImpl> handle (new WindowImpl);
     
+    handle->message_handler = handler;
+    handle->user_data = user_data;
+
     return (window_t)handle.release ();
   }
   catch (xtl::exception& e)
@@ -220,14 +244,56 @@ window_t TabletOsWindowManager::CreateWindow (WindowStyle style, WindowMessageHa
   }
 }
 
-void TabletOsWindowManager::CloseWindow (window_t)
+void TabletOsWindowManager::CloseWindow (window_t handle)
 {
-  raise ("syslib::TabletOsWindowManager::CloseWindow");
+  try
+  {
+    WindowImpl *window = (WindowImpl*)handle;
+
+    if (!window)
+      throw xtl::make_null_argument_exception ("", "window");
+
+    screen_window_t screen_window = (screen_window_t) GetNativeWindowHandle (handle);
+    if (screen_leave_window_group (screen_window))
+      raise_error ("::screen_leave_window_group");
+
+    WindowEventContext context;
+
+    memset (&context, 0, sizeof (context));          
+
+    window->Notify (WindowEvent_OnClose, context);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("syslib::TabletOsWindowManager::CloseWindow");
+    throw;
+  }
 }
 
-void TabletOsWindowManager::DestroyWindow (window_t)
+void TabletOsWindowManager::DestroyWindow (window_t handle)
 {
-  raise ("syslib::TabletOsWindowManager::DestroyWindow");
+  try
+  {
+    WindowImpl *window = (WindowImpl*)handle;
+
+    if (!window)
+      throw xtl::make_null_argument_exception ("", "window");
+
+    screen_window_t screen_window = (screen_window_t) GetNativeWindowHandle (handle);
+    if(screen_destroy_window (screen_window))
+      raise_error ("::screen_destroy_window");
+
+    WindowEventContext context;
+
+    memset (&context, 0, sizeof (context));          
+
+    window->Notify (WindowEvent_OnDestroy, context);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("syslib::TabletOsWindowManager::DestroyWindow");
+    throw;
+  }
 }
 
 /*
@@ -282,8 +348,8 @@ void TabletOsWindowManager::SetWindowTitle (window_t handle, const wchar_t* buff
     
     stl::string title = common::tostring (buffer);
 
-    if (screen_get_window_property_cv (screen_window, SCREEN_PROPERTY_ID_STRING, title.length (), &title[0]) != BPS_SUCCESS)
-      raise_error ("::screen_get_window_property_cv(SCREEN_PROPERTY_ID_STRING)");
+    if (screen_set_window_property_cv (screen_window, SCREEN_PROPERTY_ID_STRING, title.length (), &title[0]) != BPS_SUCCESS)
+      raise_error ("::screen_set_window_property_cv(SCREEN_PROPERTY_ID_STRING)");
   }
   catch (xtl::exception& exception)
   {
@@ -394,7 +460,7 @@ void TabletOsWindowManager::SetWindowFlag (window_t handle, WindowFlag flag, boo
 {
   screen_window_t screen_window = (screen_window_t) GetNativeWindowHandle (handle);
   WindowImpl*     window        = (WindowImpl*)handle;  
-  
+
   try
   {
     if (!window)
@@ -462,7 +528,13 @@ bool TabletOsWindowManager::GetWindowFlag (window_t handle, WindowFlag flag)
         return state != 0;
       }
       case WindowFlag_Active:
-        break;
+      {
+        int zOrder = 0;
+        
+        if (screen_get_window_property_iv (screen_window, SCREEN_PROPERTY_ZORDER, &zOrder) != BPS_SUCCESS)
+          raise_error ("::screen_get_window_property_iv(SCREEN_PROPERTY_ZORDER)");        
+        return zOrder == 0;
+      }
       case WindowFlag_Focus:
         break;
       case WindowFlag_Maximized:
@@ -504,13 +576,38 @@ const void* TabletOsWindowManager::GetParentWindowHandle (window_t child)
 
 void TabletOsWindowManager::SetMultitouchEnabled (window_t handle, bool enabled)
 {
-//  if (enabled)
-//    raise ("syslib::TabletOsWindowManager::SetMultitouchEnabled");      
+  try
+  {
+    WindowImpl* window = (WindowImpl*)handle;  
+
+    if (!window)
+      throw xtl::make_null_argument_exception ("", "window");
+
+    window->is_multitouch_enabled = enabled;    //??????? filter touch events to keep only one touch if multitouch disabled
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("syslib::TabletOsWindowManager::SetMultitouchEnabled");
+    throw;
+  }
 }
 
 bool TabletOsWindowManager::IsMultitouchEnabled (window_t handle)
 {
-  return false;
+  try
+  {
+    WindowImpl* window = (WindowImpl*)handle;
+  
+    if (!window)
+      throw xtl::make_null_argument_exception ("", "window");
+
+    return window->is_multitouch_enabled;
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("syslib::TabletOsWindowManager::IsMultitouchEnabled");
+    throw;
+  }
 }
 
 /*
@@ -530,8 +627,6 @@ void TabletOsWindowManager::InvalidateWindow (window_t handle)
   if (screen_get_window_property_iv (screen_window, SCREEN_PROPERTY_BUFFER_SIZE, rect+2) != BPS_SUCCESS)
     raise_error ("::screen_get_window_property_iv(SCREEN_PROPERTY_BUFFER_SIZE)");
     
-  printf ("%d %d %d %d\n", rect[0], rect[1], rect[2], rect[3]); fflush (stdout);
-
   if (screen_post_window (screen_window, screen_buffer[0], 1, rect, 0)!= BPS_SUCCESS)
     raise_error ("::screen_post_window");
 }
@@ -551,7 +646,8 @@ void TabletOsWindowManager::SetBackgroundColor (window_t handle, const Color& co
 
 void TabletOsWindowManager::SetBackgroundState (window_t handle, bool state)
 {
-  raise ("syslib::TabletOsWindowManager::SetBackgroundState");
+  WindowImpl* window = (WindowImpl*)handle;
+  window->background_state = state; 
 }
 
 Color TabletOsWindowManager::GetBackgroundColor (window_t handle)
