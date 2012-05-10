@@ -6,25 +6,168 @@ using namespace syslib::tabletos;
 namespace
 {
 
-class TabletOsApplicationDelegate: public IApplicationDelegate, public xtl::reference_counter, public MessageQueue::Handler
+/*
+     онстанты
+*/
+
+const char* LOG_NAME = "system.tabletos"; //им€ потока отладочного протоколировани€
+
+/*
+    ћенеджер обработки событий приложени€
+*/
+
+class TabletOsEventListener: public MessageQueue::Handler
+{
+  public:
+    virtual void OnSystemEvent () = 0;
+  
+  protected:
+    virtual ~TabletOsEventListener () {}
+};
+
+class TabletOsEventManager
+{
+  public:
+/// онструктор
+    TabletOsEventManager (TabletOsEventListener& in_event_listener)
+      : log (LOG_NAME)
+      , event_channel_id ()
+      , message_queue (*MessageQueueSingleton::Instance ())              
+      , event (new Event (in_event_listener), false)
+      , event_listener (in_event_listener)
+      , stopping ()
+    {
+      try
+      {      
+        if (bps_channel_create (&event_channel_id, 0))
+          raise_error ("::bps_channel_create");
+        
+        thread.reset (new Thread (xtl::bind (&TabletOsEventManager::EventProcessingRoutine, this)));
+      }
+      catch (xtl::exception& e)
+      {
+        e.touch ("syslib::tabletos::TabletOsEventManager::TabletOsEventManager");
+        throw;
+      }
+    }
+  
+///ƒеструктор
+    ~TabletOsEventManager ()
+    {
+      try
+      {        
+        stopping = true;
+        
+        thread->Join ();
+        
+        bps_channel_destroy (event_channel_id);        
+      }
+      catch (...)
+      {
+      }
+    }
+    
+///ѕолучение Event channel ID
+    int EventChannelId () { return event_channel_id; }    
+    
+  private:
+///Ќить обработки событий
+    int EventProcessingRoutine ()
+    {
+      log.Printf ("Enter to TabletOS event processing loop");
+      
+        //обработка системных событий
+      
+      while (!stopping)
+      {
+        try
+        {        
+          static const int timeout_ms = 1000;
+          
+          bps_event_t *event = 0;
+
+          if (bps_get_event (&event, timeout_ms) != BPS_SUCCESS)
+            raise_error ("::bps_get_event");                      
+
+          if (!event)
+            continue;
+            
+          if (bps_channel_push_event (event_channel_id, event))
+            raise_error ("::bps_channel_push_event");
+                      
+          message_queue.PushMessage (event_listener, this->event);
+        }
+        catch (std::exception& e)
+        {
+          log.Printf ("%s\n    at syslib::tabletos::TabletOsEventManager::EventProcessingRoutine", e.what ());
+        }
+        catch (...)
+        {
+          log.Printf ("unknown exception\n    at syslib::tabletos::TabletOsEventManager::EventProcessingRoutine");          
+        }        
+      }      
+      
+      log.Printf ("Exit from TabletOS event processing loop");
+      
+      return 0;
+    }
+    
+  private:
+    struct Event: public MessageQueue::Message
+    {
+      public:
+        Event (TabletOsEventListener& in_listener) : listener (in_listener) {}
+      
+        void Dispatch ()
+        {
+          listener.OnSystemEvent ();
+        }
+        
+      private:
+        TabletOsEventListener& listener;
+    };
+    
+  private:
+    common::Log              log;              //поток отладочного протоколировани€
+    stl::auto_ptr<Thread>    thread;           //нить обработки событий
+    int                      event_channel_id; //канал обработки событий
+    MessageQueue&            message_queue;    //очередь сообщений
+    MessageQueue::MessagePtr event;            //событие
+    TabletOsEventListener&   event_listener;   //слушатель событий
+    volatile bool            stopping;         //флаг остановки нити обработки событий
+};
+
+/*
+    ƒелегат дл€ TabletOs приложени€
+*/
+
+class TabletOsApplicationDelegate: public IApplicationDelegate, public xtl::reference_counter, public TabletOsEventListener
 {
   public:
 /// онструктор
     TabletOsApplicationDelegate ()
       : message_queue (*MessageQueueSingleton::Instance ())        
     {
-      idle_enabled = false;
-      is_exited    = false;
-      listener     = 0;
-      
-      MessageQueueSingleton::Instance ()->RegisterHandler (*this);      
+      try
+      {
+        idle_enabled = false;
+        is_exited    = false;
+        listener     = 0;
+        
+        MessageQueueSingleton::Instance ()->RegisterHandler (*this);
+      }
+      catch (xtl::exception& e)
+      {
+        e.touch ("syslib::tabletos::TabletOsApplicationDelegate::TabletOsApplicationDelegate");
+        throw;
+      }
     }
     
 ///ƒеструктор
     ~TabletOsApplicationDelegate ()
     {
       try
-      {
+      {        
         MessageQueueSingleton::Instance ()->UnregisterHandler (*this);
       }
       catch (...)
@@ -35,59 +178,49 @@ class TabletOsApplicationDelegate: public IApplicationDelegate, public xtl::refe
     
 ///«апуск цикла обработки сообщений
     void Run ()
-    {
-      platform_initialize ();
+    {      
+      platform_initialize ();      
       
       if (navigator_request_events (0) != BPS_SUCCESS)
         raise_error ("::navigator_request_events");             
+        
+      TabletOsEventManager event_manager (*this);
       
-      if (listener)
-        listener->OnInitialize ();
+      int prev_channel = bps_channel_set_active (event_manager.EventChannelId ());
       
-      while (!is_exited)
+      if (prev_channel == BPS_FAILURE)
+        raise_error ("::bps_channel_set_active");
+      
+      try
       {
-          //обработка системных событий
+        if (listener)
+          listener->OnInitialize ();
         
-/*        const int timeout_ms = idle_enabled && listener ? 0 : 100;
-        
-        bps_event_t *event = 0;
+        while (!is_exited)
+        {        
+          while (!IsMessageQueueEmpty ())
+            DoNextEvent ();                              
 
-        if (bps_get_event (&event, timeout_ms) != BPS_SUCCESS)
-          raise_error ("::bps_get_event");
+           //обработка внутренней очереди сообщений
 
-        if (event)
-        {
-          int domain = bps_event_get_domain (event);
-
-          if (domain == screen_get_domain())
+          if (!idle_enabled)
           {
-              printf ("screen_domain = %d\n", domain); fflush (stdout);
-              HandleScreenEvent (event);
+            if (IsMessageQueueEmpty () && !is_exited)
+            {
+              WaitMessage ();
+            }
           }
-          else if (domain == navigator_get_domain())
+          else
           {
-              printf ("navigator_domain = %d\n", domain); fflush (stdout);
-              HandleNavigatorEvent (event);
-          }
-        }*/
-        
-        while (!IsMessageQueueEmpty ())
-          DoNextEvent ();                    
-
-         //обработка внутренней очереди сообщений
-
-        if (!idle_enabled)
-        {
-          if (IsMessageQueueEmpty () && !is_exited)
-          {
-            WaitMessage ();
-          }
+            if (listener)
+              listener->OnIdle ();
+          }                
         }
-        else
-        {
-          if (listener)
-            listener->OnIdle ();
-        }                
+      }
+      catch (...)
+      {
+        bps_channel_set_active (prev_channel);
+        throw;
       }
     }
     
@@ -180,6 +313,41 @@ class TabletOsApplicationDelegate: public IApplicationDelegate, public xtl::refe
         throw;
       }
     }            
+    
+///ќбработка системного событи€
+    void OnSystemEvent ()
+    {
+      try
+      {
+        static const int timeout_ms = 0;
+        
+        bps_event_t *event = 0;
+
+        if (bps_get_event (&event, timeout_ms) != BPS_SUCCESS)
+          raise_error ("::bps_get_event");                      
+
+        if (!event)
+          return;        
+        
+        int domain = bps_event_get_domain (event);
+
+        if (domain == screen_get_domain())
+        {
+          printf ("screen_domain = %d\n", domain); fflush (stdout);
+          HandleScreenEvent (event);
+        }
+        else if (domain == navigator_get_domain())
+        {
+          printf ("navigator_domain = %d\n", domain); fflush (stdout);
+          HandleNavigatorEvent (event);
+        }
+      }
+      catch (xtl::exception& e)
+      {
+        e.touch ("TabletOsApplicationDelegate::OnSystemEvent");
+        throw;
+      }
+    }
   
 ///ќбработка событий экрана
     void HandleScreenEvent (bps_event_t *event)
