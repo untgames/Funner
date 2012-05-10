@@ -160,7 +160,7 @@ define process_target.tabletos-bar
 		
   $$($1.BAR_FILE): $$($1.EXE_FILE) $$($1.RES_FILES) $$($1.MANIFEST_FILE)
 		@echo Packaging $$(notdir $$@)...
-		@export PATH=$$$$PATH:/$(subst :,,$(call convert_path,$(TABLETOS_NDK_GCC)/bin)) && $(notdir $(PACKAGER)) -debugToken $(TABLETOS_DEBUG_TOKEN) -package $$@ -devMode $$($1.MANIFEST_FILE) -C $$($1.TMP_DIR) $$($1.EXE_FILE) -C $$($1.RES_DIR) $$($1.RES_FILES) -e $(TABLETOS_NDK)/target/target-override/$(TABLETOS_ARCHITECTURE)/usr/lib/libbps.so lib/libbps.so.1 -e $(TABLETOS_NDK)/target/target-override/$(TABLETOS_ARCHITECTURE)/usr/lib/libOpenAL.so lib/libOpenAL.so.1
+		@export PATH=$$$$PATH:/$(subst :,,$(call convert_path,$(TABLETOS_NDK_GCC)/bin)) && $(notdir $(PACKAGER)) -debugToken $(TABLETOS_DEBUG_TOKEN) -package $$@ -devMode $$($1.MANIFEST_FILE) -C $$($1.TMP_DIR) $$($1.EXE_FILE) -C $$($1.RES_DIR) $$($1.RES_FILES) -e $(TABLETOS_NDK)/target/qnx6/$(TABLETOS_ARCHITECTURE)/usr/lib/libbps.so lib/libbps.so.1 -e $(TABLETOS_NDK)/target/qnx6/$(TABLETOS_ARCHITECTURE)/usr/lib/libOpenAL.so lib/libOpenAL.so.1
 		
 #Install package
   install: INSTALL.$1
