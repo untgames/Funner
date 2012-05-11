@@ -44,17 +44,30 @@ struct RenderableTextLine::Impl
   scene_graph::TextLineAlignment current_vertical_alignment;   //текущее вертикальное выравнивание
   math::vec3f                    current_offset;               //текущее смещение текста, определяемое выраваниванием
   size_t                         current_world_tm_hash;        //хэш текущей матрицы преобразований
+  bool                           current_scissor_state;        //состояние области отсечения
+  math::vec4f                    current_scissor_rect;         //размеры области отсечения
   bool                           need_full_update;             //необходимо полностью обновить все параметры
   bool                           wrong_state;                  //надпись находится в некорректном состоянии
+  size_t                         scissor_rect_property_index;  //текущее значение индекса свойства области отсечения
+  size_t                         scissor_state_property_index; //текущее значение индекса свойства состояния области отсечения
+  size_t                         properties_structure_hash;    //текущий хэш структуры свойств узла
+  size_t                         properties_hash;              //текущий хэш свойств узла
 
 ///Конструктор
   Impl (scene_graph::TextLine* in_text_line, Render& in_render)
-    : render (in_render),
-      text_line (in_text_line),
-      primitive (render.Renderer ()->CreatePrimitive (), false),
-      need_full_update (true),
-      wrong_state (true)
+    : render (in_render)
+    , text_line (in_text_line)
+    , primitive (render.Renderer ()->CreatePrimitive (), false)
+    , current_scissor_state (false)
+    , need_full_update (true)
+    , wrong_state (true)
+    , scissor_rect_property_index (0)
+    , scissor_state_property_index (0)
+    , properties_structure_hash (0)
+    , properties_hash (0)
   {
+    memset (&current_scissor_rect, 0, sizeof (current_scissor_rect));
+
     primitive->SetBlendMode (render::mid_level::renderer2d::BlendMode_Translucent);
   }
 
@@ -106,6 +119,87 @@ struct RenderableTextLine::Impl
       bool need_update_color = need_update_text || memcmp (current_chars_colors.data (), actual_chars_colors.data (), current_chars_colors.size () * sizeof (CharsColors::value_type));
 
       current_chars_colors.swap (actual_chars_colors);
+
+        //обновление области отсечения
+
+      bool need_update_scissor = false;
+      bool scissor_state       = current_scissor_state;
+
+      if (!text_line->Properties () && properties_hash)
+      {
+        properties_hash               = 0;
+        properties_structure_hash     = 0;
+        scissor_rect_property_index   = 0;
+        scissor_state_property_index  = 0;
+        need_update_scissor           = true;
+        scissor_state                 = false;
+      }
+
+      if (text_line->Properties () && properties_hash != text_line->Properties ()->Hash ())
+      {
+        const common::PropertyMap& properties = *text_line->Properties ();
+
+        if (properties_structure_hash != properties.Layout ().Hash ())
+        {
+          scissor_rect_property_index   = properties.IndexOf ("render.scissor_rect");
+          scissor_state_property_index  = properties.IndexOf ("render.scissor_state");
+          properties_structure_hash     = properties.Layout ().Hash ();
+        }
+
+        if (scissor_state_property_index != size_t (-1))
+        {
+          if (scissor_rect_property_index != size_t (-1))
+          {
+            try
+            {
+              scissor_state = properties.GetInteger (scissor_state_property_index) != 0;
+            }
+            catch (...)
+            {
+              scissor_state = false;
+            }
+          }
+          else
+          {
+            scissor_state = false;
+          }
+
+          need_update_scissor = true;
+        }
+        else
+        {
+          if (scissor_state)
+            need_update_scissor = true;
+
+          scissor_state = false;
+        }
+
+        if (scissor_rect_property_index != size_t (-1))
+        {
+          try
+          {
+            properties.GetProperty (scissor_rect_property_index, current_scissor_rect);
+
+            if (scissor_state_property_index == size_t (-1))
+              scissor_state = true;
+          }
+          catch (...)
+          {
+            scissor_state = false;
+          }
+
+          need_update_scissor = true;
+        }
+        else
+        {
+          if (scissor_state)
+            need_update_scissor = true;
+
+          scissor_state = false;
+        }
+
+        properties_hash = properties.Hash ();
+      }
 
         //определение необходимости обновления всех полей
 
@@ -327,6 +421,16 @@ struct RenderableTextLine::Impl
         primitive->AddSprites       (sprites_buffer.size (), sprites_buffer.data ());
       }
 
+      if (need_update_scissor)
+      {
+        if (current_scissor_state != scissor_state)
+        {
+          primitive->SetScissorState (scissor_state);
+        }
+
+        current_scissor_state = scissor_state;
+      }
+
         //обновление корректности состояния надписи
 
       wrong_state = false;
@@ -371,6 +475,25 @@ void RenderableTextLine::Update ()
 
 void RenderableTextLine::DrawCore (IFrame& frame)
 {
+  if (impl->text_line->Properties () && impl->properties_hash != impl->text_line->Properties ()->Hash ())
+    Update ();
+
+  if (impl->current_scissor_state)
+  {
+    render::mid_level::Viewport viewport = {0, 0, 0, 0};
+
+    frame.GetViewport (viewport);
+
+    render::mid_level::Viewport scissor_rect = {0, 0, 0, 0};
+
+    scissor_rect.x      = (int)(viewport.x + viewport.width * impl->current_scissor_rect [0]);
+    scissor_rect.y      = (int)(viewport.y + viewport.height * impl->current_scissor_rect [1]);
+    scissor_rect.width  = (size_t)(viewport.width * impl->current_scissor_rect [2]);
+    scissor_rect.height = (size_t)(viewport.height * impl->current_scissor_rect [3]);
+
+    impl->primitive->SetScissor (scissor_rect);
+  }
+
   if (!impl->wrong_state && impl->primitive->GetSpritesCount ())
     frame.AddPrimitive (impl->primitive.get ());
 }
