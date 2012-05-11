@@ -218,9 +218,8 @@ window_t TabletOsWindowManager::CreateWindow (WindowStyle style, WindowMessageHa
     switch (style)
     {
       case WindowStyle_Overlapped:
-        break;
       case WindowStyle_PopUp:
-        throw xtl::format_not_supported_exception ("", "WindowStyle_Popup not supported");
+        break;
       default:
         throw xtl::make_argument_exception ("", "style", style);
     }

@@ -38,10 +38,18 @@ class TabletOsEventManager
       , stopping ()
     {
       try
-      {      
+      {
+        main_channel_id = bps_channel_get_active ();
+      
+        if (main_channel_id == BPS_FAILURE)
+          raise_error ("::bps_channel_get_active");
+
         if (bps_channel_create (&event_channel_id, 0))
           raise_error ("::bps_channel_create");
-        
+
+        if (bps_channel_set_active (event_channel_id) == BPS_FAILURE)
+          raise_error ("::bps_channel_set_active");
+
         thread.reset (new Thread (xtl::bind (&TabletOsEventManager::EventProcessingRoutine, this)));
       }
       catch (xtl::exception& e)
@@ -75,6 +83,8 @@ class TabletOsEventManager
     int EventProcessingRoutine ()
     {
       log.Printf ("Enter to TabletOS event processing loop");
+      if (bps_channel_set_active (main_channel_id) == BPS_FAILURE)
+        raise_error ("::bps_channel_set_active");       //Нельзя использовать канал из другой нити
       
         //обработка системных событий
       
@@ -91,7 +101,6 @@ class TabletOsEventManager
 
           if (!event)
             continue;
-            
           if (bps_channel_push_event (event_channel_id, event))
             raise_error ("::bps_channel_push_event");
                       
@@ -134,6 +143,7 @@ class TabletOsEventManager
     MessageQueue&            message_queue;    //очередь сообщений
     MessageQueue::MessagePtr event;            //событие
     TabletOsEventListener&   event_listener;   //слушатель событий
+    int                      main_channel_id;  //id главного канала сообщений приложения
     volatile bool            stopping;         //флаг остановки нити обработки событий
 };
 
@@ -189,7 +199,7 @@ class TabletOsApplicationDelegate: public IApplicationDelegate, public xtl::refe
       int prev_channel = bps_channel_set_active (event_manager.EventChannelId ());
       
       if (prev_channel == BPS_FAILURE)
-        raise_error ("::bps_channel_set_active");
+        raise_error ("::bps_channel_set_active");    //Нельзя использовать канал из другой нити
       
       try
       {
