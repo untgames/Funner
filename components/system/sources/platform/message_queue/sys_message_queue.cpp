@@ -1,3 +1,5 @@
+#include <xtl/common_exceptions.h>
+
 #include <shared/message_queue.h>
 
 using namespace syslib;
@@ -31,6 +33,9 @@ MessageQueue::~MessageQueue ()
   try
   {
     mutex.Lock ();
+    
+    if (!messages.empty ()) //проверка верна, в случае empty сигнал был уже вызван
+      signals [MessageQueueEvent_OnEmpty]();
   }
   catch (...)
   {
@@ -88,7 +93,17 @@ void MessageQueue::PushMessage (const Handler& handler, const MessagePtr& messag
     messages.push (message);
     
     if (is_empty)
+    {
+      try
+      {
+        signals [MessageQueueEvent_OnNonEmpty]();
+      }
+      catch (...)
+      {
+      }      
+      
       condition.NotifyAll ();
+    }
   }
   catch (xtl::exception& e)
   {
@@ -105,7 +120,17 @@ void MessageQueue::PushEmptyMessage ()
     Lock lock (mutex);
     
     if (messages.empty ())
+    {
+      try
+      {
+        signals [MessageQueueEvent_OnNonEmpty]();
+      }
+      catch (...)
+      {
+      }
+      
       condition.NotifyAll ();
+    }
   }
   catch (xtl::exception& e)
   {
@@ -133,7 +158,18 @@ void MessageQueue::DispatchFirstMessage ()
       message = messages.front ();
       
       messages.pop ();
-
+      
+      if (messages.empty ())
+      {
+        try
+        {
+          signals [MessageQueueEvent_OnEmpty]();
+        }
+        catch (...)
+        {
+        }        
+      }
+      
       if (!handlers.count (message->id))
         return; //обработчик сообщени€ не зарегистрирован
     }
@@ -181,4 +217,22 @@ void MessageQueue::WaitMessage ()
     e.touch ("syslib::MessageQueue::IsEmpty");
     throw;
   }
+}
+
+/*
+    –егистраци€ обрабочика событи€ очереди сообщений
+*/
+
+xtl::connection MessageQueue::RegisterEventHandler (MessageQueueEvent event, const EventHandler& handler)
+{
+  switch (event)
+  {
+    case MessageQueueEvent_OnEmpty:
+    case MessageQueueEvent_OnNonEmpty:
+      break;
+    default:
+      throw xtl::make_argument_exception ("syslib::MessageQueue::RegisterEventHandler", "event", event);
+  }
+  
+  return signals [event].connect (handler);
 }

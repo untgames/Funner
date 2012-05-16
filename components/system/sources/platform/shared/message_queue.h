@@ -7,6 +7,7 @@
 #include <xtl/exception.h>
 #include <xtl/intrusive_ptr.h>
 #include <xtl/reference_counter.h>
+#include <xtl/signal.h>
 
 #include <common/singleton.h>
 
@@ -16,6 +17,17 @@
 
 namespace syslib
 {
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Событие очереди сообщений
+///////////////////////////////////////////////////////////////////////////////////////////////////
+enum MessageQueueEvent
+{
+  MessageQueueEvent_OnEmpty,    //очередь стала пустой
+  MessageQueueEvent_OnNonEmpty, //очередь перестала быть пустой
+  
+  MessageQueueEvent_Num
+};
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Очередь сообщений приложения
@@ -85,6 +97,13 @@ class MessageQueue
     bool IsEmpty     () const;
     void WaitMessage ();
     
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Регистрация обрабочика события очереди сообщений
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    typedef xtl::function<void ()> EventHandler;
+
+    xtl::connection RegisterEventHandler (MessageQueueEvent event, const EventHandler&);
+    
   private:
     MessageQueue (const MessageQueue&); //no impl
     MessageQueue& operator = (const MessageQueue&); //no impl
@@ -92,12 +111,14 @@ class MessageQueue
   private:
     typedef stl::queue<MessagePtr> MessageQueueImpl;
     typedef stl::hash_set<size_t>  HandlerSet;
+    typedef xtl::signal<void ()>   EventSignal;
 
   private:
     Mutex            mutex;
     Condition        condition;
     MessageQueueImpl messages;
     HandlerSet       handlers;
+    EventSignal      signals [MessageQueueEvent_Num];
 };
 
 typedef common::Singleton<MessageQueue> MessageQueueSingleton;
