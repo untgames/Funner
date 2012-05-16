@@ -37,6 +37,7 @@ RENDER.OPENGL_DRIVER.SOURCES.meego.IMPORTS          := compile.extern.meego
 RENDER.OPENGL_DRIVER.SOURCES.egl.SOURCE_DIRS        := sources/platform/egl
 RENDER.OPENGL_DRIVER.SOURCES.glx.SOURCE_DIRS        := sources/platform/glx
 RENDER.OPENGL_DRIVER.SOURCES.android.SOURCE_DIRS    := sources/platform/egl/android
+RENDER.OPENGL_DRIVER.SOURCES.tabletos.SOURCE_DIRS   := sources/platform/egl/tabletos
 
 ifeq (,$(filter gles,$(PROFILES)))
 
@@ -54,6 +55,7 @@ endif
 #OpenGL render system tests
 RENDER.OPENGL_DRIVER.TESTS.TYPE             := test-suite
 RENDER.OPENGL_DRIVER.TESTS.SOURCE_DIRS      := tests/driver tests/device tests/complex tests/unit
+RENDER.OPENGL_DRIVER.TESTS.LIBS             :=
 RENDER.OPENGL_DRIVER.TESTS.IMPORTS          := link.render.low_level.opengl_driver run.render.low_level.opengl_driver compile.render.low_level \
                                                compile.system link.system link.common compile.media.image compile.media.geometry \
                                                link.media.image link.media.image.dds link.media.geometry.xmesh link.media.image.pvr

@@ -95,9 +95,15 @@ struct PrimarySwapChain::Impl
       log.Printf ("...choose configuration #%u (VisualId: %d, RGB/A: %u/%u, D/S: %u/%u, Samples: %u)",
         egl_config, format, in_desc.frame_buffer.color_bits, in_desc.frame_buffer.alpha_bits, in_desc.frame_buffer.depth_bits,
         in_desc.frame_buffer.stencil_bits, in_desc.samples_count);
+
+#ifdef TABLETOS
+      log.Printf ("...create window buffers");              
+
+      setup_window_buffers (output->GetWindowHandle (), in_desc);
+#endif
         
       log.Printf ("...create window surface");              
-        
+
 #ifdef ANDROID
 
       egl_surface = eglCreateWindowSurfaceAndroid (egl_display, egl_config, output->GetWindowHandle (), format);  
@@ -123,9 +129,9 @@ struct PrimarySwapChain::Impl
       desc.frame_buffer.depth_bits   = GetConfigAttribute (EGL_DEPTH_SIZE);
       desc.frame_buffer.stencil_bits = GetConfigAttribute (EGL_STENCIL_SIZE);
       desc.samples_count             = GetConfigAttribute (EGL_SAMPLES);
-      desc.buffers_count             = 1;
+      desc.buffers_count             = 2;
       desc.fullscreen                = false;
-      
+
         //установка свойств цепочки обмена
         
       try

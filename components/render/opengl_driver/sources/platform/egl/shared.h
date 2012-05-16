@@ -11,6 +11,11 @@
 
 #include <common/singleton.h>
 
+#ifdef TABLETOS
+  #include <syslib/window.h>
+  #include <screen/screen.h>
+#endif
+
 #ifdef BEAGLEBOARD
   #include <X11/Xlib.h>
 
@@ -381,6 +386,11 @@ class DisplayLock
 ///Создание экранной поверхности (для Android)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 EGLSurface eglCreateWindowSurfaceAndroid (EGLDisplay display, EGLConfig config, const void* window, EGLint format);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Настройка оконных буферов (для Tabletos)
+///////////////////////////////////////////////////////////////////////////////////////////////////
+void setup_window_buffers (const void* window_handle, const SwapChainDesc& desc);
 
 }
 
