@@ -221,6 +221,15 @@ DECLARE_HANDLE            (HEVENT);
 
 typedef WORD                ATOM;
 
+
+#if !defined(_MAC) || !defined(GDI_INTERNAL)
+#ifdef STRICT
+typedef void NEAR* HGDIOBJ;
+#else
+DECLARE_HANDLE(HGDIOBJ);
+#endif
+#endif
+
 typedef HANDLE NEAR         *SPHANDLE;
 typedef HANDLE FAR          *LPHANDLE;
 typedef HANDLE              HGLOBAL;

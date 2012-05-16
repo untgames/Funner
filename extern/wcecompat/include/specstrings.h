@@ -59,3 +59,4 @@
 #define __blocksOn(resource)
 
 
+#define __out_opt                                               __out                                       __exceptthat __maybenull

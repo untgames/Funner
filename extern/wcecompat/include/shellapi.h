@@ -21,6 +21,27 @@
 #ifndef _INC_SHELLAPI
 #define _INC_SHELLAPI
 
+/* regular WinExec() codes */
+#define SE_ERR_FNF              2       // file not found
+#define SE_ERR_PNF              3       // path not found
+#define SE_ERR_ACCESSDENIED     5       // access denied
+#define SE_ERR_OOM              8       // out of memory
+#define SE_ERR_DLLNOTFOUND              32
+
+/* error values for ShellExecute() beyond the regular WinExec() codes */
+#define SE_ERR_SHARE                    26
+#define SE_ERR_ASSOCINCOMPLETE          27
+#define SE_ERR_DDETIMEOUT               28
+#define SE_ERR_DDEFAIL                  29
+#define SE_ERR_DDEBUSY                  30
+#define SE_ERR_NOASSOC                  31
+
+// values for the fMask field
+#define SEE_MASK_CLASSNAME        0x00000001
+#define SEE_MASK_HOTKEY           0x00000020
+#define SEE_MASK_NOCLOSEPROCESS   0x00000040
+#define SEE_MASK_FLAG_NO_UI       0x00000400
+
 typedef struct _SHELLEXECUTEINFO
 {
         DWORD cbSize;

@@ -23,6 +23,129 @@ extern "C" {
 
 #include <windef.h>
 
+#define RGB(r,g,b)          ((COLORREF)(((BYTE)(r)|((WORD)((BYTE)(g))<<8))|(((DWORD)(BYTE)(b))<<16)))
+
+/* field selection bits */
+#define DM_ORIENTATION      0x00000001L
+#define DM_PAPERSIZE        0x00000002L
+#define DM_PAPERLENGTH      0x00000004L
+#define DM_PAPERWIDTH       0x00000008L
+#define DM_SCALE            0x00000010L
+#define DM_COPIES           0x00000100L
+#define DM_DEFAULTSOURCE    0x00000200L
+#define DM_PRINTQUALITY     0x00000400L
+#define DM_COLOR            0x00000800L
+#define DM_DUPLEX           0x00001000L
+#define DM_YRESOLUTION      0x00002000L
+#define DM_TTOPTION         0x00004000L
+#define DM_COLLATE          0x00008000L
+#define DM_FORMNAME         0x00010000L
+#define DM_LOGPIXELS        0x00020000L
+#define DM_BITSPERPEL       0x00040000L
+#define DM_PELSWIDTH        0x00080000L
+#define DM_PELSHEIGHT       0x00100000L
+#define DM_DISPLAYFLAGS     0x00200000L
+#define DM_DISPLAYFREQUENCY 0x00400000L
+#define DM_DISPLAYORIENTATION 0x00800000L
+#define DM_DISPLAYQUERYORIENTATION 0x01000000L
+
+
+#define WINGDIAPI
+
+/* size of a device name string */
+#define CCHDEVICENAME 32
+
+/* size of a form name string */
+#define CCHFORMNAME 32
+
+typedef struct _devicemodeA {
+    BYTE   dmDeviceName[CCHDEVICENAME];
+    WORD dmSpecVersion;
+    WORD dmDriverVersion;
+    WORD dmSize;
+    WORD dmDriverExtra;
+    DWORD dmFields;
+    short dmOrientation;
+    short dmPaperSize;
+    short dmPaperLength;
+    short dmPaperWidth;
+    short dmScale;
+    short dmCopies;
+    short dmDefaultSource;
+    short dmPrintQuality;
+    short dmColor;
+    short dmDuplex;
+    short dmYResolution;
+    short dmTTOption;
+    short dmCollate;
+    BYTE   dmFormName[CCHFORMNAME];
+    WORD   dmLogPixels;
+    DWORD  dmBitsPerPel;
+    DWORD  dmPelsWidth;
+    DWORD  dmPelsHeight;
+    DWORD  dmDisplayFlags;
+    DWORD  dmDisplayFrequency;
+    DWORD  dmICMMethod;
+    DWORD  dmICMIntent;
+    DWORD  dmMediaType;
+    DWORD  dmDitherType;
+    DWORD  dmICCManufacturer;
+    DWORD  dmICCModel;
+    DWORD  dmPanningWidth;
+    DWORD  dmPanningHeight;
+    DWORD  dmDisplayOrientation;
+} DEVMODEA, *PDEVMODEA, *NPDEVMODEA, *LPDEVMODEA;
+
+typedef struct _devicemodeW {
+    WCHAR  dmDeviceName[CCHDEVICENAME];
+    WORD dmSpecVersion;
+    WORD dmDriverVersion;
+    WORD dmSize;
+    WORD dmDriverExtra;
+    DWORD dmFields;
+    short dmOrientation;
+    short dmPaperSize;
+    short dmPaperLength;
+    short dmPaperWidth;
+    short dmScale;
+    short dmCopies;
+    short dmDefaultSource;
+    short dmPrintQuality;
+    short dmColor;
+    short dmDuplex;
+    short dmYResolution;
+    short dmTTOption;
+    short dmCollate;
+    WCHAR  dmFormName[CCHFORMNAME];
+    WORD   dmLogPixels;
+    DWORD  dmBitsPerPel;
+    DWORD  dmPelsWidth;
+    DWORD  dmPelsHeight;
+    DWORD  dmDisplayFlags;
+    DWORD  dmDisplayFrequency;
+    DWORD  dmDisplayOrientation;
+// #if (WINVER >= 0x0400)
+//     DWORD  dmICMMethod;
+//     DWORD  dmICMIntent;
+//     DWORD  dmMediaType;
+//     DWORD  dmDitherType;
+//     DWORD  dmReserved1;
+//     DWORD  dmReserved2;
+// #endif /* WINVER */
+} DEVMODEW, *PDEVMODEW, *NPDEVMODEW, *LPDEVMODEW;
+
+#ifdef UNICODE
+typedef DEVMODEW DEVMODE;
+typedef PDEVMODEW PDEVMODE;
+typedef NPDEVMODEW NPDEVMODE;
+typedef LPDEVMODEW LPDEVMODE;
+#else
+typedef DEVMODEA DEVMODE;
+typedef PDEVMODEA PDEVMODE;
+typedef NPDEVMODEA NPDEVMODE;
+typedef LPDEVMODEA LPDEVMODE;
+#endif
+
 
 typedef struct tagPALETTEENTRY {
     BYTE        peRed;
@@ -83,8 +206,48 @@ typedef struct tagLOGFONTW
 
 
 // @CESYSGEN IF GWES_PGDI || GWES_MGBASE
+#define BS_SOLID            0
+#define BS_NULL             1
+#define BS_HOLLOW           BS_NULL
+#define BS_DIBPATTERNPT     6
+
+#define PS_SOLID            0
+#define PS_DASH             1
+#define PS_NULL             5
+
+typedef struct tagLOGBRUSH {
+    UINT        lbStyle;
+    COLORREF    lbColor;
+    LONG        lbHatch;
+} LOGBRUSH, *PLOGBRUSH, NEAR *NPLOGBRUSH, FAR *LPLOGBRUSH;
+
+typedef struct tagLOGPEN {
+    UINT        lopnStyle;
+    POINT       lopnWidth;
+    COLORREF    lopnColor;
+} LOGPEN, *PLOGPEN, NEAR *NPLOGPEN, FAR *LPLOGPEN;
+
+WINGDIAPI HBRUSH   WINAPI CreateDIBPatternBrushPt(CONST VOID *,UINT);
+WINGDIAPI HPEN     WINAPI CreatePenIndirect(CONST LOGPEN *);
+WINGDIAPI HBRUSH   WINAPI CreateSolidBrush(COLORREF);
+WINGDIAPI BOOL     WINAPI DrawEdge(HDC,RECT *,UINT,UINT);
+WINGDIAPI BOOL     WINAPI DrawFocusRect(HDC,CONST RECT *);
+WINGDIAPI BOOL     WINAPI Ellipse(HDC,int,int,int,int);
+WINGDIAPI int      WINAPI FillRect(HDC,CONST RECT *,HBRUSH);
+WINGDIAPI COLORREF WINAPI GetPixel(HDC,int,int);
+WINGDIAPI HBRUSH   WINAPI GetSysColorBrush(int);
+WINGDIAPI BOOL     WINAPI Polygon( __in HDC hdc, __in_ecount(c) CONST POINT * lppt, int c);
+WINGDIAPI BOOL     WINAPI Polyline(__in HDC hdc,__in_ecount(c) CONST POINT * lppt, int c);
+WINGDIAPI BOOL     WINAPI Rectangle(HDC,int,int,int,int);
+WINGDIAPI BOOL     WINAPI RoundRect(HDC,int,int,int,int,int,int);
+WINGDIAPI BOOL     WINAPI SetBrushOrgEx( __in HDC hdc, int x, int y, __out_opt LPPOINT lppt);
+WINGDIAPI COLORREF WINAPI SetPixel(HDC,int,int,COLORREF);
+WINGDIAPI BOOL     WINAPI MoveToEx(HDC,int,int,LPPOINT);
+WINGDIAPI BOOL     WINAPI LineTo(HDC,int,int);
+WINGDIAPI BOOL     WINAPI GetCurrentPositionEx(HDC,LPPOINT);
 // @CESYSGEN ENDIF
 
+WINGDIAPI  BOOL      WINAPI DeleteObject(HGDIOBJ);
 
 // @CESYSGEN IF GWES_MGBASE
 // @CESYSGEN ENDIF
@@ -425,8 +588,20 @@ typedef LPOUTLINETEXTMETRICA LPOUTLINETEXTMETRIC;
 // @CESYSGEN IF GWES_PGDI || GWES_MGDC
 // @CESYSGEN ENDIF
 
+WINGDIAPI  BOOL      WINAPI DeleteDC(HDC);
+
+WINGDIAPI  HGDIOBJ   WINAPI SelectObject(HDC,HGDIOBJ);
 
 // @CESYSGEN IF GWES_MGDC
+WINGDIAPI HDC  WINAPI CreateDCA(LPCSTR, LPCSTR , LPCSTR , CONST DEVMODEA *);
+WINGDIAPI HDC  WINAPI CreateDCW(LPCWSTR, LPCWSTR , LPCWSTR , CONST DEVMODEW *);
+WINGDIAPI int  WINAPI ExtEscape(HDC, int, int, LPCSTR, int, LPSTR);
+
+#ifdef UNICODE
+#define CreateDC  CreateDCW
+#else
+#define CreateDC  CreateDCA
+#endif // !UNICODE
 // @CESYSGEN ENDIF
 
 
