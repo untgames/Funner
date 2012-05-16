@@ -123,31 +123,9 @@ struct WindowImpl: public IWindowImpl
         
       if (screen_create_window (&screen_window, screen_context) != BPS_SUCCESS)
         raise_error ("::screen_create_window");
-       
-        //Set pixel format
-        
-      int format = SCREEN_FORMAT_RGBX8888;
-        
-      if (screen_set_window_property_iv (screen_window, SCREEN_PROPERTY_FORMAT, &format))
-        raise_error ("::screen_set_window_property_iv(SCREEN_PROPERTY_FORMAT)");
-        
-        //Set usage
-        
-//      int usage = SCREEN_USAGE_OPENGL_ES2 | SCREEN_USAGE_OPENGL_ES1 | SCREEN_USAGE_ROTATION;
-      int usage = SCREEN_USAGE_OPENGL_ES1;
 
-      if (screen_set_window_property_iv (screen_window, SCREEN_PROPERTY_USAGE, &usage))
-        raise_error ("screen_set_window_property_iv(SCREEN_PROPERTY_USAGE)");
-
-        //Get display
-
-      if (screen_get_window_property_pv (screen_window, SCREEN_PROPERTY_DISPLAY, (void**)&screen_display) != BPS_SUCCESS)
-        raise_error ("::screen_get_window_property_pv(SCREEN_PROPERTY_DISPLAY)");
-
-        //Create window buffers
-
-      if (screen_create_window_buffers (screen_window, 2))
-        raise_error ("::screen_create_window_buffers");
+      if(screen_get_window_property_pv(screen_window, SCREEN_PROPERTY_DISPLAY, (void **)&screen_display))
+        raise_error ("::screen_get_window_property_pv SCREEN_PROPERTY_DISPLAY");
 
       WindowRegistry::RegisterWindow (screen_window, this);
     }
@@ -171,7 +149,7 @@ struct WindowImpl: public IWindowImpl
       
     screen_destroy_context (screen_context);
   }
-  
+
 ///  
   void GetEventContext (WindowEventContext& context)
   {
@@ -493,7 +471,7 @@ void TabletOsWindowManager::SetWindowFlag (window_t handle, WindowFlag flag, boo
           
         if (screen_set_window_property_iv (window->screen_window, SCREEN_PROPERTY_BUFFER_SIZE, buffer_size))
           raise_error ("::screen_set_window_property_iv");
-        
+
         break;
       }
       case WindowFlag_Minimized:
