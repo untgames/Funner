@@ -34,14 +34,14 @@ class PlatformConfigurationComponent
         SaveProperty (writer, "SharedLibrarySuffix", ".dll");
         SaveProperty (writer, "SharedLibraryPrefix", "");
 
-        char language_name_buffer [16];
+        wchar_t language_name_buffer [16];
 
         memset (language_name_buffer, 0, sizeof (language_name_buffer));
 
-        GetLocaleInfoA (LOCALE_USER_DEFAULT, LOCALE_SNAME, language_name_buffer, sizeof (language_name_buffer));
+        GetLocaleInfoW (LOCALE_USER_DEFAULT, LOCALE_SNAME, language_name_buffer, sizeof (language_name_buffer));
 
         if (xtl::xstrlen (language_name_buffer))
-          SaveProperty (writer, "Language", language_name_buffer);
+          SaveProperty (writer, "Language", common::to_utf8_string (language_name_buffer).c_str ());
       }
       catch (xtl::exception& e)
       {

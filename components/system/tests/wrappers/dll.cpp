@@ -1,6 +1,9 @@
 #include "shared.h"
 
-#if defined (_WIN32)
+#if defined (WINCE)
+  const char* LIBRARY_NAME = "coredll.dll";
+  const char* SYMBOL_NAME  = "LoadLibraryW";
+#elif defined (_WIN32)
   const char* LIBRARY_NAME = "kernel32.dll";
   const char* SYMBOL_NAME  = "LoadLibraryA";
 #elif defined (__APPLE__)
@@ -12,9 +15,12 @@
 #elif defined (BADA)
   const char* LIBRARY_NAME = "libdl.so";
   const char* SYMBOL_NAME  = "dlopen";
-#elif defined (ANDROID) || defined (TABLETOS)
+#elif defined (ANDROID)
   const char* LIBRARY_NAME = "libdl.so";
   const char* SYMBOL_NAME  = "dlopen";  
+#elif defined (TABLETOS)
+  const char* LIBRARY_NAME = "libEGL.so";
+  const char* SYMBOL_NAME  = "eglWaitClient";
 #else
   #error Unknown platform
 #endif

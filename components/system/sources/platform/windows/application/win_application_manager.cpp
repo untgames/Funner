@@ -14,7 +14,7 @@ class Win32ApplicationDelegate: public IApplicationDelegate, public xtl::referen
       idle_enabled    = false;
       is_exited       = false;
       listener        = 0;
-      wake_up_message = RegisterWindowMessage ("Win32ApplicationDelegate.WakeUp");
+      wake_up_message = RegisterWindowMessageW (L"Win32ApplicationDelegate.WakeUp");
       main_thread_id  = 0;
       
       if (!wake_up_message)
@@ -114,6 +114,7 @@ class Win32ApplicationDelegate: public IApplicationDelegate, public xtl::referen
 ///Ожидание события
     void WaitMessage ()
     {
+#ifndef WINCE
       try
       {
         if (!::WaitMessage ())
@@ -124,6 +125,7 @@ class Win32ApplicationDelegate: public IApplicationDelegate, public xtl::referen
         exception.touch ("syslib::Win32ApplicationDelegate::WaitMessage");
         throw;
       }
+#endif
     }
     
 ///Обработка следующего события
@@ -174,7 +176,7 @@ class ApplicationImpl
     }
     
     bool GetScreenSaverState () { return screen_saver_state; }
-  
+
   private:
     bool screen_saver_state; //состояние скрин-сейвера
 };
@@ -200,7 +202,23 @@ void WindowsApplicationManager::OpenUrl (const char* url)
 {
   try
   {
-    int result = (int)ShellExecuteA (0, "open", url, 0, 0, SW_SHOWNORMAL);
+#ifdef WINCE
+    char *verb = "open"; 
+#else
+    wchar_t *verb = L"open"; 
+#endif
+
+    SHELLEXECUTEINFO shell_excinfo;
+    memset (&shell_excinfo, 0, sizeof (SHELLEXECUTEINFO));
+    shell_excinfo.cbSize = sizeof (SHELLEXECUTEINFO);
+    shell_excinfo.hwnd   = 0;
+    shell_excinfo.lpVerb = (LPCTSTR)verb;
+    shell_excinfo.nShow  = SW_SHOWNORMAL;
+
+    ShellExecuteEx (&shell_excinfo);
+
+//    int result = (int)ShellExecuteA (0, "open", url, 0, 0, SW_SHOWNORMAL);
+    int result = (int)shell_excinfo.hInstApp;
 
     if (result > 32)
       return;
@@ -269,6 +287,10 @@ void WindowsApplicationManager::OpenUrl (const char* url)
 
 stl::string WindowsApplicationManager::GetEnvironmentVariable (const char* name)
 {
+#ifdef WINCE
+  raise_error ("GetEnvironmentVariable dose not supported for this platform\n");
+  return "";
+#else
   try
   {
     static const int VALUE_BUFFER_SIZE = 8;
@@ -303,6 +325,7 @@ stl::string WindowsApplicationManager::GetEnvironmentVariable (const char* name)
     e.touch ("syslib::WindowsApplicationManager::GetEnvironmentVariable");
     throw;
   }
+#endif
 }
 
 /*

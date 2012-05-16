@@ -25,14 +25,28 @@ bool get_mode_desc (const char* device_name, int mode_index, ScreenModeDesc& mod
 
   dev_mode_desc.dmSize  = sizeof (dev_mode_desc);
 
+#ifdef WINCE
+  if (!EnumDisplaySettings (common::to_wstring_from_utf8(device_name).c_str(), mode_index, &dev_mode_desc))
+    return false;
+#else
   if (!EnumDisplaySettings (device_name, mode_index, &dev_mode_desc))
     return false;
+#endif
 
   mode_desc.width        = dev_mode_desc.dmPelsWidth;
   mode_desc.height       = dev_mode_desc.dmPelsHeight;
   mode_desc.color_bits   = dev_mode_desc.dmBitsPerPel;
   mode_desc.refresh_rate = dev_mode_desc.dmDisplayFrequency;  
-  
+
+#ifdef WINCE  
+  if (screen_rect)  
+  {
+    screen_rect->left   = 0;
+    screen_rect->top    = 0;
+    screen_rect->right  = dev_mode_desc.dmPelsWidth;
+    screen_rect->bottom = dev_mode_desc.dmPelsHeight;
+  }
+#else
   if (screen_rect)  
   {
     screen_rect->left   = dev_mode_desc.dmPosition.x;
@@ -40,7 +54,8 @@ bool get_mode_desc (const char* device_name, int mode_index, ScreenModeDesc& mod
     screen_rect->right  = dev_mode_desc.dmPosition.x + dev_mode_desc.dmPelsWidth;
     screen_rect->bottom = dev_mode_desc.dmPosition.y + dev_mode_desc.dmPelsHeight;
   }
-  
+#endif  
+
   return true;
 }
 
@@ -94,7 +109,7 @@ struct ScreenDesc: public xtl::reference_counter
     if (device_context)
       return device_context;
 
-    device_context = CreateDC (win_name.c_str (), 0, 0, 0);
+    device_context = CreateDCW (common::to_wstring_from_utf8(win_name).c_str (), 0, 0, 0);
 
     if (!device_context)
       raise_error (common::format ("syslib::windows::ScreenDesc::GetDC(device-name='%s')", name.c_str ()).c_str ());
@@ -153,7 +168,7 @@ struct ScreenArrayBuilder
       
     try
     {
-      ScreenDescPtr screen (new ScreenDesc (device_info.DeviceString, info.szDevice), false);
+      ScreenDescPtr screen (new ScreenDesc ((char*)device_info.DeviceString, (char*)info.szDevice), false);
 
       builder->screens.push_back (screen);
     }
@@ -306,7 +321,11 @@ namespace
 
 void set_mode_desc (const char* device_name, DEVMODE* mode)
 {
+#ifdef WINCE
+  LONG result = ChangeDisplaySettingsEx (common::to_wstring_from_utf8(device_name).c_str(), mode, 0, 0, 0);
+#else
   LONG result = ChangeDisplaySettingsEx (device_name, mode, 0, 0, 0);
+#endif
 
   if (result == DISP_CHANGE_SUCCESSFUL)
     return;
@@ -400,6 +419,9 @@ void WindowsScreenManager::GetScreenDefaultMode (screen_t handle, ScreenModeDesc
 
 void WindowsScreenManager::SetScreenGammaRamp (screen_t handle, const Color3f table [256])
 {
+#ifdef WINCE
+  raise_error("::GetScreenGammaRamp not supported for Windows Mobile");
+#else
   try
   {
     ScreenDescPtr screen = ScreenManagerImpl::GetScreen (handle);
@@ -421,10 +443,14 @@ void WindowsScreenManager::SetScreenGammaRamp (screen_t handle, const Color3f ta
     e.touch ("syslib::WindowsScreenManager::SetScreenGammaRamp");
     throw;
   }
+#endif
 }
 
 void WindowsScreenManager::GetScreenGammaRamp (screen_t handle, Color3f table [256])
 {
+#ifdef WINCE
+  raise_error("::GetScreenGammaRamp not supported for Windows Mobile");
+#else
   try
   {
     ScreenDescPtr screen = ScreenManagerImpl::GetScreen (handle);
@@ -446,6 +472,7 @@ void WindowsScreenManager::GetScreenGammaRamp (screen_t handle, Color3f table [2
     e.touch ("syslib::WindowsScreenManager::GetScreenGammaRamp");
     throw;
   }
+#endif
 }
 
 /*
@@ -491,7 +518,7 @@ struct ScreenSearcher
       {
         ScreenDescPtr screen = *iter;      
         
-        if (!strcmp (screen->win_name.c_str (), info.szDevice))
+        if (!strcmp (screen->win_name.c_str (), (char*)info.szDevice))
         {
           search_data->intersection_region_size = intersection_region_size;
           search_data->containing_screen        = screen;

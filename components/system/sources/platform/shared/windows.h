@@ -6,6 +6,11 @@
 #include <shared/default_timer_manager.h>
 #include <shared/default_application_manager.h>
 #include <shared/default_thread_manager.h>
+#include <shared/pthread_manager.h>
+
+#ifdef LoadLibrary
+#undef LoadLibrary
+#endif
 
 namespace syslib
 {
@@ -84,9 +89,11 @@ class WindowsWindowManager: public DefaultWindowManager
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Изображение курсора
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+#ifndef WINCE
     static cursor_t CreateCursor  (const char* name, int hotspot_x, int hotspot_y); //hotspot_x/hotspot_y = -1 - default value
     static void     DestroyCursor (cursor_t);
     static void     SetCursor     (window_t window, cursor_t cursor);
+#endif
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Установка/получение multitouch режима
@@ -296,7 +303,11 @@ class WindowsScreenManager: public DefaultScreenManager
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 class WindowsPlatform
  : public WindowsWindowManager
+#ifdef WINCE
+ , public PThreadManager
+#else
  , public WindowsThreadManager
+#endif
  , public WindowsLibraryManager
  , public WindowsTimerManager
  , public WindowsApplicationManager

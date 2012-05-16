@@ -7,8 +7,6 @@ using namespace common;
     Загрузка динамических библиотек
 */
 
-#undef LoadLibrary
-
 dll_t WindowsLibraryManager::LoadLibrary (const wchar_t* name)
 {
   try
@@ -64,7 +62,11 @@ void* WindowsLibraryManager::GetSymbol (dll_t handle, const char* symbol_name)
   if (!symbol_name)
     throw xtl::make_null_argument_exception (METHOD_NAME, "symbol_name");
 
+#ifdef WINCE
+  void* address = (void*)GetProcAddressW (library, to_wstring_from_utf8 (symbol_name).c_str ());
+#else
   void* address = (void*)GetProcAddress (library, symbol_name);
+#endif
 
     //сбрасываем все ошибки
 

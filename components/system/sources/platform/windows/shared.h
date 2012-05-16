@@ -1,4 +1,3 @@
-#include <process.h>
 
 #include <stl/hash_map>
 #include <stl/hash_set>
@@ -13,15 +12,29 @@
 #include <common/property_map.h>
 #include <common/singleton.h>
 #include <common/strlib.h>
+#include <common/utf_converter.h>
 #include <common/xml_writer.h>
 
 #include <syslib/application.h>
 
+#ifdef LoadLibrary
+#undef LoadLibrary
+#endif
+
 #include <shared/platform.h>
+
+#include <process.h>
 
 #define _WIN32_WINNT 0x0600 //для использования WM_MOUSEWHEEL
 #include <windows.h>
+
+#ifdef WINCE
+#else
 #include <Wtsapi32.h>
+
+WINGDIAPI  HGDIOBJ   WINAPI SelectObject(HDC,HGDIOBJ);
+
+#endif
 
 namespace syslib
 {

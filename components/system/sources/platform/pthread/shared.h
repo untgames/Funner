@@ -6,6 +6,10 @@
 #include <pthread.h>
 #include <semaphore.h>
 
+#ifdef _WIN32_WCE
+#include <implement.h>
+#endif
+
 #include <stl/auto_ptr.h>
 
 #include <xtl/common_exceptions.h>

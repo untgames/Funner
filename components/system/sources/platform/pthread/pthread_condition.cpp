@@ -93,6 +93,10 @@ bool PThreadManager::WaitCondition (condition_t handle, mutex_t mutex_handle, si
 
     end_time.tv_sec  = current_time.tv_sec;
     end_time.tv_nsec = 0;
+#elif _WIN32_WCE
+    FILETIME fileTime;
+    GetCurrentFT (&fileTime);
+    ptw32_filetime_to_timespec (&fileTime, &end_time);
 #else
     clock_gettime (CLOCK_REALTIME, &end_time);
 #endif
@@ -100,7 +104,7 @@ bool PThreadManager::WaitCondition (condition_t handle, mutex_t mutex_handle, si
     unsigned long long nsec = (wait_in_milliseconds % 1000) * 1000000 + (unsigned long long)end_time.tv_nsec;
     
     end_time.tv_nsec  = nsec % 1000000000;
-    end_time.tv_sec  += wait_in_milliseconds / 1000 + nsec / 1000000000;
+    end_time.tv_sec   = end_time.tv_sec + (time_t)(wait_in_milliseconds / 1000 + nsec / 1000000000);
     
     int status = pthread_cond_timedwait (&handle->condition, &mutex_handle->mutex, &end_time);
     

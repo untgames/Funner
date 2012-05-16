@@ -6,7 +6,7 @@ using namespace common;
 namespace
 {
 
-const char* WINDOW_CLASS_NAME = "Default window class";
+const wchar_t* WINDOW_CLASS_NAME = L"Default window class";
 const char* LOG_NAME          = "system.windows";
 
 /*
@@ -32,36 +32,38 @@ class SysTempFile
         
         //генераци€ имени нового файла
         
-      stl::string dir_name;
+      stl::wstring dir_name;
       
       dir_name.fast_resize (MAX_PATH);
       
-      DWORD dir_len = GetTempPath (dir_name.size (), &dir_name [0]);
+      DWORD dir_len = GetTempPathW (dir_name.size (), &dir_name [0]);
       
       if (!dir_len || dir_len > MAX_PATH)
         raise_error ("::GetTempPath");
         
       file_name.fast_resize (MAX_PATH);
         
-      if (!GetTempFileName (dir_name.c_str (), TEXT("TEMP"), 0, &file_name [0]))
+      if (!GetTempFileNameW (dir_name.c_str (), L"TEMP", 0, &file_name [0]))
         raise_error ("::GetTempFileName");
         
         //копирование содержимого
+      
+      #ifndef WINCE
+        #undef CopyFile
+      #endif
         
-      #undef CopyFile
-        
-      FileSystem::CopyFile (source_file_name, file_name.c_str ());
+      FileSystem::CopyFile (source_file_name, tostring (file_name).c_str ());
     }
     
     ~SysTempFile ()
     {
-      FileSystem::Remove (file_name.c_str ());
+      FileSystem::Remove (tostring(file_name).c_str ());
     }
     
-    const char* Path () const { return file_name.c_str (); }
+    const char* Path () const { return tostring(file_name).c_str (); }
   
   private:
-    stl::string file_name; //им€ файла
+    stl::wstring file_name; //им€ файла
 };
 
 /*
@@ -87,7 +89,11 @@ struct WindowImpl
     , message_handler (handler)
     , is_cursor_visible (true)
     , is_cursor_in_window (false)
-    , default_cursor (LoadCursor (0, IDC_ARROW))
+#ifdef WINCE
+    , default_cursor (LoadCursorW (0, IDC_ARROW))
+#else
+    , default_cursor (LoadCursorA (0, IDC_ARROW))
+#endif
     , preferred_cursor (0)
     , background_brush (CreateSolidBrush (RGB (0, 0, 0)))
     , background_state (false)
@@ -100,6 +106,9 @@ struct WindowImpl
 
   void TrackCursor (HWND wnd)
   {
+#ifdef WINCE
+    return;
+#else
     if (is_cursor_in_window)
       return;
     
@@ -115,6 +124,7 @@ struct WindowImpl
       raise_error ("::TrackMouseEvent");
 
     is_cursor_in_window = true;
+#endif
   }
 
   void Notify (window_t window, WindowEvent event, const WindowEventContext& context)
@@ -226,6 +236,7 @@ ScanCode GetScanCode (size_t lParam)
 
 LRESULT CALLBACK WindowMessageHandler (HWND wnd, UINT message, WPARAM wparam, LPARAM lparam)
 {
+
     //получение указател€ на пользовательские данные
 
   WindowImpl* impl          = reinterpret_cast<WindowImpl*> (GetWindowLong (wnd, GWL_USERDATA));
@@ -362,11 +373,14 @@ LRESULT CALLBACK WindowMessageHandler (HWND wnd, UINT message, WPARAM wparam, LP
 
       impl->TrackCursor (wnd);
       impl->Notify (window_handle, WindowEvent_OnMouseMove, context);
+
       return 0;
+#ifndef WINCE
     case WM_MOUSELEAVE:
       impl->is_cursor_in_window = false;
       impl->Notify (window_handle, WindowEvent_OnMouseLeave, context);
       return 0;
+#endif
     case WM_MOUSEWHEEL: //изменилось положение вертикального колеса мыши
       context.mouse_vertical_wheel_delta = float (GET_WHEEL_DELTA_WPARAM (wparam)) / float (WHEEL_DELTA);
 
@@ -499,9 +513,11 @@ LRESULT CALLBACK WindowMessageHandler (HWND wnd, UINT message, WPARAM wparam, LP
       impl->Notify (window_handle, WindowEvent_OnKeyUp, context);
       return 0;
     case WM_CHAR: //в буфере окна по€вилс€ символ
-      mbtowc (&context.char_code, (char*)&wparam, 1);
+      wcscpy ( &context.char_code, to_wstring_from_utf8((char*)&wparam, 1).c_str () );
+//      mbtowc (&context.char_code, (char*)&wparam, 1);
       impl->Notify (window_handle, WindowEvent_OnChar, context);
       return 0;
+#ifndef WINCE
     case WM_WTSSESSION_CHANGE: //состо€ние сессии изменилось              
       switch (wparam)
       {
@@ -528,11 +544,15 @@ LRESULT CALLBACK WindowMessageHandler (HWND wnd, UINT message, WPARAM wparam, LP
       }
 
       break;      
+#endif
+
+#ifndef WINCE
     case WM_SYSCOMMAND:
       if (wparam == SC_SCREENSAVE && !Application::GetScreenSaverState ())
         return 0;
 
       break;
+#endif
   }
 
     //обработка сообщений по умолчанию    
@@ -546,19 +566,28 @@ LRESULT CALLBACK WindowMessageHandler (HWND wnd, UINT message, WPARAM wparam, LP
 
 void RegisterWindowClass ()
 {
-  WNDCLASS wc;
+  WNDCLASSW wc;
 
   memset (&wc, 0, sizeof (wc));
 
+#ifdef WINCE
+  wc.style         =            CS_DBLCLKS | CS_HREDRAW | CS_VREDRAW;
+#else
   wc.style         = CS_OWNDC | CS_DBLCLKS | CS_HREDRAW | CS_VREDRAW;
+#endif
   wc.lpfnWndProc   = &WindowMessageHandler;
   wc.hInstance     = GetApplicationInstance ();
+
+#ifndef WINCE
   wc.hIcon         = LoadIcon (GetApplicationInstance (), IDI_APPLICATION);
+#endif
+
   wc.hCursor       = LoadCursor (GetApplicationInstance (), IDC_ARROW);
   wc.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
   wc.lpszClassName = WINDOW_CLASS_NAME;
 
-  if (!RegisterClass (&wc))
+
+  if (!RegisterClassW (&wc))
     raise_error ("::RegisterClass");
 }
 
@@ -624,7 +653,7 @@ window_t WindowsWindowManager::CreateWindow (WindowStyle style, WindowMessageHan
 
     try
     {
-      HWND wnd = CreateWindowA (WINDOW_CLASS_NAME, "", win_style, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT,
+      HWND wnd = CreateWindowExW (0, WINDOW_CLASS_NAME, L"", win_style, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT,
                                 (HWND)parent_handle, 0, GetApplicationInstance (), window_impl);
 
       if (!wnd)
@@ -702,13 +731,16 @@ bool WindowsWindowManager::ChangeWindowStyle (window_t handle, WindowStyle style
     HWND wnd       = (HWND)handle;    
     LONG win_style = get_window_style (style, GetParentWindowHandle (handle) != 0);
     
-    if (!SetWindowLongPtr (wnd, GWL_STYLE, win_style))
+    if (!SetWindowLong (wnd, GWL_STYLE, win_style))
       raise_error ("::SetWindowLongPtr");
       
-    HWND prev_window = GetNextWindow (wnd, GW_HWNDPREV);
+    HWND prev_window = 0;
+#ifndef WINCE
+    prev_window = GetNextWindow (wnd, GW_HWNDPREV);
     
     if (!prev_window)
       prev_window = HWND_TOP;
+#endif
       
     RECT window_rect;
 
@@ -755,7 +787,8 @@ void WindowsWindowManager::SetWindowTitle (window_t handle, const wchar_t* title
 
     HWND wnd = (HWND)handle;
 
-    if (!SetWindowTextW (wnd, title))    
+#undef SetWindowTextW
+    if (!SetWindowTextW (wnd, (LPCWSTR)common::tostring (title).c_str ()))    
       raise_error ("::SetWindowTextW");
   }
   catch (xtl::exception& exception)
@@ -767,6 +800,7 @@ void WindowsWindowManager::SetWindowTitle (window_t handle, const wchar_t* title
 
 void WindowsWindowManager::GetWindowTitle (window_t handle, size_t buffer_size, wchar_t* buffer)
 {
+
   try
   {
     HWND wnd = (HWND)handle;
@@ -926,8 +960,13 @@ void WindowsWindowManager::SetWindowFlag (window_t handle, WindowFlag flag, bool
         }
         else
         {
+#ifdef WINCE
+          ShowWindow (wnd, SW_HIDE);
+          ShowWindow (wnd, SW_HIDE);
+#else
           ShowWindow (wnd, SW_HIDE);
           ShowWindow (wnd, SW_SHOWNOACTIVATE);
+#endif
           check_errors ("::ShowWindow");
         }
 
@@ -988,8 +1027,12 @@ bool WindowsWindowManager::GetWindowFlag (window_t handle, WindowFlag flag)
       {
         HWND active_wnd = GetActiveWindow ();
 
+#ifdef WINCE
+       if (active_wnd == 0)
+         return false;
+#else
         check_errors ("::GetActiveWindow");
-
+#endif
         return active_wnd == wnd;
       }
       case WindowFlag_Focus:
@@ -1208,6 +1251,7 @@ bool WindowsWindowManager::GetCursorVisible (window_t handle)
 /*
     »зображение курсора
 */
+#ifndef WINCE
 
 cursor_t WindowsWindowManager::CreateCursor (const char* file_name, int hotspot_x, int hotspot_y)
 {
@@ -1285,6 +1329,8 @@ void WindowsWindowManager::SetCursor (window_t window, cursor_t cursor)
     throw;
   }
 }
+
+#endif
 
 /*
    ”становка/получение multitouch режима

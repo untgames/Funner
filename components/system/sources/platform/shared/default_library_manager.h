@@ -1,6 +1,10 @@
 #ifndef SYSLIB_DEFAULT_LIBRARY_MANAGER_HEADER
 #define SYSLIB_DEFAULT_LIBRARY_MANAGER_HEADER
 
+#ifdef LoadLibrary
+#undef LoadLibrary
+#endif
+
 namespace syslib
 {
 

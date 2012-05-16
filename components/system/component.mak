@@ -18,6 +18,7 @@ SYSTEMLIB.SOURCES.IMPORTS                           := compile.system
 SYSTEMLIB.SOURCES.win32.SOURCE_DIRS                 := sources/platform/windows sources/platform/windows/application sources/platform/windows/non_unistd
 SYSTEMLIB.SOURCES.x86_win32.SOURCE_DIRS             := sources/platform/windows/thread
 SYSTEMLIB.SOURCES.wince.SOURCE_DIRS                 := sources/platform/pthread
+SYSTEMLIB.SOURCES.wince.IMPORTS                     := compile.extern.pthreads_wince
 SYSTEMLIB.SOURCES.unistd.SOURCE_DIRS                := sources/platform/pthread sources/platform/unistd sources/platform/message_queue
 SYSTEMLIB.SOURCES.msvc.COMPILER_CFLAGS              := -wd4355
 SYSTEMLIB.SOURCES.no_windows.SOURCE_DIRS            := sources/platform/no_windows
@@ -44,6 +45,7 @@ endif
 SYSTEMLIB.TESTS.TYPE             := test-suite
 SYSTEMLIB.TESTS.SOURCE_DIRS      := tests/wrappers tests/thread
 SYSTEMLIB.TESTS.IMPORTS          := compile.system link.system link.common.zip_file_system
+SYSTEMLIB.TESTS.LIBS             := 
 SYSTEMLIB.TESTS.x11.IMPORTS      := link.media.image.ani_cursor_loader
 
 #Öåëü ¹3 - Android launcher

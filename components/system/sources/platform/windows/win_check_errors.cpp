@@ -11,8 +11,8 @@ stl::string get_error_message (DWORD error_code)
 {
   void* buffer = 0;
 
-  FormatMessage (FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
-                 0, error_code, MAKELANGID (LANG_NEUTRAL, SUBLANG_DEFAULT), (LPSTR)&buffer, 0, 0);                 
+  FormatMessageW (FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
+                 0, error_code, MAKELANGID (LANG_NEUTRAL, SUBLANG_DEFAULT), (LPWSTR)&buffer, 0, 0);                 
 
   if (!buffer)
   {
@@ -22,9 +22,9 @@ stl::string get_error_message (DWORD error_code)
   {    
       //отсечение завершающих \n и пробелов
 
-    char* iter = (char*)buffer;
+    wchar_t* iter = (wchar_t*)buffer;
     
-    iter += strlen (iter);    
+    iter += xtl::xstrlen (iter);    
     
     if (iter == buffer)
       return "";      
@@ -32,20 +32,20 @@ stl::string get_error_message (DWORD error_code)
     for (bool loop=true; loop;)
       switch (*--iter)
       {
-        case '\n':
-        case '\r':
-        case ' ':
-        case '\t':
+        case L'\n':
+        case L'\r':
+        case L' ':
+        case L'\t':
           break;
         default:
         {
-          iter [1] = '\0';
+          iter [1] = L'\0';
           loop     = false;
           break;
         }
       }
 
-    stl::string message = common::format ("Win32 error %u. %s", error_code, buffer);        
+    stl::string message = common::format ("Win32 error %u. %s", error_code, common::tostring((const wchar_t*)buffer).c_str ());
 
     LocalFree (buffer);
 
@@ -61,7 +61,7 @@ void check_errors (const char* source)
   DWORD error_code = GetLastError ();
   
   if (error_code)
-    throw xtl::format_operation_exception ("syslib::check_errors", get_error_message (error_code).c_str ());
+    throw xtl::format_operation_exception ("common::check_errors", get_error_message (error_code).c_str ());
 }
 
 void raise_error (const char* source)
