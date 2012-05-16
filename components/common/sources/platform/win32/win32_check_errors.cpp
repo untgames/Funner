@@ -32,14 +32,14 @@ stl::string get_error_message (DWORD error_code)
     for (bool loop=true; loop;)
       switch (*--iter)
       {
-        case '\n':
-        case '\r':
-        case ' ':
-        case '\t':
+        case L'\n':
+        case L'\r':
+        case L' ':
+        case L'\t':
           break;
         default:
         {
-          iter [1] = '\0';
+          iter [1] = L'\0';
           loop     = false;
           break;
         }
@@ -58,10 +58,12 @@ stl::string get_error_message (DWORD error_code)
 //проверка ошибок использования WinAPI и генерация исключения в случае их наличия
 void check_errors (const char* source)
 {
+printf("-------------start\n");
   DWORD error_code = GetLastError ();
   
   if (error_code)
     throw xtl::format_operation_exception ("common::check_errors", get_error_message (error_code).c_str ());
+printf("-------------end\n");
 }
 
 void raise_error (const char* source)
