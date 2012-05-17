@@ -388,9 +388,9 @@ class DisplayLock
 EGLSurface eglCreateWindowSurfaceAndroid (EGLDisplay display, EGLConfig config, const void* window, EGLint format);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Настройка оконных буферов (для Tabletos)
+///Настройка окона (для TabletOS)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-void setup_window_buffers (const void* window_handle, const SwapChainDesc& desc);
+void setup_window (const void* window_handle, const SwapChainDesc& desc);
 
 }
 

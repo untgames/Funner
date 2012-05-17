@@ -97,9 +97,9 @@ struct PrimarySwapChain::Impl
         in_desc.frame_buffer.stencil_bits, in_desc.samples_count);
 
 #ifdef TABLETOS
-      log.Printf ("...create window buffers");              
+      log.Printf ("...setup window");              
 
-      setup_window_buffers (output->GetWindowHandle (), in_desc);
+      setup_window (output->GetWindowHandle (), in_desc);
 #endif
         
       log.Printf ("...create window surface");              
