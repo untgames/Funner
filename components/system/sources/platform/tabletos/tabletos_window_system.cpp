@@ -123,9 +123,24 @@ struct WindowImpl: public IWindowImpl
         
       if (screen_create_window (&screen_window, screen_context) != BPS_SUCCESS)
         raise_error ("::screen_create_window");
+        
+        //Get display        
 
-      if(screen_get_window_property_pv(screen_window, SCREEN_PROPERTY_DISPLAY, (void **)&screen_display))
+      if (screen_get_window_property_pv (screen_window, SCREEN_PROPERTY_DISPLAY, (void **)&screen_display))
         raise_error ("::screen_get_window_property_pv SCREEN_PROPERTY_DISPLAY");
+        
+      screen_display_mode_t screen_mode;
+
+      if (screen_get_display_property_pv (screen_display, SCREEN_PROPERTY_MODE, (void**)&screen_mode))
+        raise_error ("::screen_get_display_property_pv SCREEN_PROPERTY_MODE");
+
+      int max_size = screen_mode.width > screen_mode.height ? screen_mode.width : screen_mode.height, buffer_size [2] = {max_size, max_size};
+
+      if (screen_set_window_property_iv (screen_window, SCREEN_PROPERTY_BUFFER_SIZE, buffer_size))
+        raise_error ("::screen_set_window_property_iv SCREEN_PROPERTY_BUFFER_SIZE");
+
+      if (screen_create_window_buffers (screen_window, 2)) //buffers count configuration???
+        raise_error ("::screen_create_window_buffers");        
 
       WindowRegistry::RegisterWindow (screen_window, this);
     }
@@ -231,6 +246,7 @@ void TabletOsWindowManager::CloseWindow (window_t handle)
       throw xtl::make_null_argument_exception ("", "window");
 
     screen_window_t screen_window = (screen_window_t) GetNativeWindowHandle (handle);
+
     if (screen_leave_window_group (screen_window))
       raise_error ("::screen_leave_window_group");
 
@@ -254,17 +270,15 @@ void TabletOsWindowManager::DestroyWindow (window_t handle)
     WindowImpl *window = (WindowImpl*)handle;
 
     if (!window)
-      throw xtl::make_null_argument_exception ("", "window");
-
-    screen_window_t screen_window = (screen_window_t) GetNativeWindowHandle (handle);
-    if(screen_destroy_window (screen_window))
-      raise_error ("::screen_destroy_window");
+      throw xtl::make_null_argument_exception ("", "window");      
 
     WindowEventContext context;
 
     memset (&context, 0, sizeof (context));          
 
     window->Notify (WindowEvent_OnDestroy, context);
+
+    delete window;
   }
   catch (xtl::exception& e)
   {
@@ -341,7 +355,7 @@ void TabletOsWindowManager::GetWindowTitle (window_t handle, size_t buffer_size,
   {
     screen_window_t screen_window = (screen_window_t) GetNativeWindowHandle (handle);
 
-    char title[buffer_size];
+    char title [buffer_size];
 
     if (screen_get_window_property_cv (screen_window, SCREEN_PROPERTY_ID_STRING, buffer_size, title) != BPS_SUCCESS)
       raise_error ("::screen_get_window_property_cv(SCREEN_PROPERTY_ID_STRING)");
@@ -367,11 +381,17 @@ void TabletOsWindowManager::SetWindowRect (window_t handle, const Rect& rect)
   try
   {
     screen_window_t screen_window = (screen_window_t) GetNativeWindowHandle (handle);
-    
-    int buffer_size[2] = {rect.right, rect.bottom};
-    
-    if (screen_set_window_property_iv (screen_window, SCREEN_PROPERTY_BUFFER_SIZE, buffer_size) != BPS_SUCCESS)
-      raise_error ("::screen_set_window_property_iv(SCREEN_PROPERTY_BUFFER_SIZE)");
+
+    int size [2] = {rect.right - rect.left, rect.bottom - rect.top}, position [2] = {rect.left, rect.top};
+
+    if (screen_set_window_property_iv (screen_window, SCREEN_PROPERTY_SIZE, size) != BPS_SUCCESS)
+      raise_error ("::screen_set_window_property_iv(SCREEN_PROPERTY_SIZE)");
+
+    if (screen_set_window_property_iv (screen_window, SCREEN_PROPERTY_POSITION, position) != BPS_SUCCESS)
+      raise_error ("::screen_set_window_property_iv(SCREEN_PROPERTY_POSITION)");
+      
+    if (screen_set_window_property_iv (screen_window, SCREEN_PROPERTY_SOURCE_SIZE, size) != BPS_SUCCESS)
+      raise_error ("::screen_set_window_property_iv(SCREEN_PROPERTY_SOURCE_SIZE)");    
   }
   catch (xtl::exception& exception)
   {
@@ -399,15 +419,18 @@ void TabletOsWindowManager::GetWindowRect (window_t handle, Rect& rect)
   {
     screen_window_t screen_window = (screen_window_t) GetNativeWindowHandle (handle);
     
-    int buffer_size[2] = {0, 0};
+    int size [2] = {0, 0}, position [2] = {0, 0};
     
-    if (screen_get_window_property_iv (screen_window, SCREEN_PROPERTY_BUFFER_SIZE, buffer_size) != BPS_SUCCESS)
-      raise_error ("::screen_get_window_property_iv(SCREEN_PROPERTY_BUFFER_SIZE)");
+    if (screen_get_window_property_iv (screen_window, SCREEN_PROPERTY_SIZE, size) != BPS_SUCCESS)
+      raise_error ("::screen_get_window_property_iv(SCREEN_PROPERTY_SIZE)");
+      
+    if (screen_get_window_property_iv (screen_window, SCREEN_PROPERTY_POSITION, position) != BPS_SUCCESS)
+      raise_error ("::screen_get_window_property_iv(SCREEN_PROPERTY_POSITION)");
 
-    rect.left   = 0;
-    rect.right  = buffer_size[0];
-    rect.top    = 0;
-    rect.bottom = buffer_size[1];
+    rect.left   = position [0];
+    rect.right  = position [0] + size [0];
+    rect.top    = position [1];
+    rect.bottom = position [1] + size [1];
   }
   catch (xtl::exception& exception)
   {
@@ -462,15 +485,14 @@ void TabletOsWindowManager::SetWindowFlag (window_t handle, WindowFlag flag, boo
         break;
       case WindowFlag_Maximized:
       {
-        int screen_resolution [2] = {0, 0};
-        
-        if (screen_get_display_property_iv (window->screen_display, SCREEN_PROPERTY_SIZE, screen_resolution))
-          raise_error ("::screen_get_window_property_iv");
+        screen_display_mode_t screen_mode;
+
+        if (screen_get_display_property_pv (window->screen_display, SCREEN_PROPERTY_MODE, (void**)&screen_mode))
+          raise_error ("::screen_get_display_property_pv SCREEN_PROPERTY_MODE");                
           
-        int buffer_size [2] = {screen_resolution [0], screen_resolution [1]};          
+        Rect rect (0, 0, screen_mode.width, screen_mode.height);
           
-        if (screen_set_window_property_iv (window->screen_window, SCREEN_PROPERTY_BUFFER_SIZE, buffer_size))
-          raise_error ("::screen_set_window_property_iv");
+        SetWindowRect (handle, rect);
 
         break;
       }
@@ -506,11 +528,12 @@ bool TabletOsWindowManager::GetWindowFlag (window_t handle, WindowFlag flag)
       }
       case WindowFlag_Active:
       {
-        int zOrder = 0;
+        int z_order = 0;
         
-        if (screen_get_window_property_iv (screen_window, SCREEN_PROPERTY_ZORDER, &zOrder) != BPS_SUCCESS)
+        if (screen_get_window_property_iv (screen_window, SCREEN_PROPERTY_ZORDER, &z_order) != BPS_SUCCESS)
           raise_error ("::screen_get_window_property_iv(SCREEN_PROPERTY_ZORDER)");        
-        return zOrder == 0;
+          
+        return z_order == 0;
       }
       case WindowFlag_Focus:
         break;
@@ -595,16 +618,16 @@ void TabletOsWindowManager::InvalidateWindow (window_t handle)
 {
   screen_window_t screen_window = (screen_window_t) GetNativeWindowHandle (handle);
 
-  screen_buffer_t screen_buffer[2];
+  screen_buffer_t screen_buffer [2];
 
   screen_get_window_property_pv (screen_window, SCREEN_PROPERTY_RENDER_BUFFERS, (void **)screen_buffer);
 
-  int rect[4] = {0, 0, 1, 1};
+  int rect [4] = {0, 0, 1, 1};
 
   if (screen_get_window_property_iv (screen_window, SCREEN_PROPERTY_BUFFER_SIZE, rect+2) != BPS_SUCCESS)
     raise_error ("::screen_get_window_property_iv(SCREEN_PROPERTY_BUFFER_SIZE)");
     
-  if (screen_post_window (screen_window, screen_buffer[0], 1, rect, 0)!= BPS_SUCCESS)
+  if (screen_post_window (screen_window, screen_buffer [0], 1, rect, 0)!= BPS_SUCCESS)
     raise_error ("::screen_post_window");
 }
 
@@ -614,22 +637,23 @@ void TabletOsWindowManager::InvalidateWindow (window_t handle)
 
 void TabletOsWindowManager::SetBackgroundColor (window_t handle, const Color& color)
 {
-  screen_window_t screen_window = (screen_window_t) GetNativeWindowHandle (handle);
+  screen_window_t screen_window = (screen_window_t)GetNativeWindowHandle (handle);
 
-  int nativeColor = 0xff0000ff;
+  int native_color = 0xff0000ff;
 
-  screen_set_window_property_iv (screen_window, SCREEN_PROPERTY_COLOR, &nativeColor);
+  screen_set_window_property_iv (screen_window, SCREEN_PROPERTY_COLOR, &native_color);
 }
 
 void TabletOsWindowManager::SetBackgroundState (window_t handle, bool state)
 {
   WindowImpl* window = (WindowImpl*)handle;
+  
   window->background_state = state; 
 }
 
 Color TabletOsWindowManager::GetBackgroundColor (window_t handle)
 {
-  screen_window_t screen_window = (screen_window_t) GetNativeWindowHandle (handle);
+  screen_window_t screen_window = (screen_window_t)GetNativeWindowHandle (handle);
 
   int color = 0;
 
