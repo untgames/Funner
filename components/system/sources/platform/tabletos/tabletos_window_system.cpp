@@ -485,6 +485,11 @@ void TabletOsWindowManager::SetWindowFlag (window_t handle, WindowFlag flag, boo
         break;
       case WindowFlag_Maximized:
       {
+        int value = 1;
+      
+        if (screen_set_window_property_iv (screen_window, SCREEN_PROPERTY_VISIBLE, &value) != BPS_SUCCESS)
+          raise_error ("::screen_set_window_property_i(SCREEN_PROPERTY_VISIBLE)");        
+        
         screen_display_mode_t screen_mode;
 
         if (screen_get_display_property_pv (window->screen_display, SCREEN_PROPERTY_MODE, (void**)&screen_mode))
