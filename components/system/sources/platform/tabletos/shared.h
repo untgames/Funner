@@ -9,6 +9,7 @@
 #include <bps/screen.h>
 #include <bps/bps.h>
 #include <bps/event.h>
+#include <sys/keycodes.h>
 
 #include <stl/hash_map>
 

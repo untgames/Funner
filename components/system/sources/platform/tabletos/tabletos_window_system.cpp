@@ -173,15 +173,106 @@ struct WindowImpl: public IWindowImpl
     context.handle = screen_window;
   }
 
-  
+
+  void OnMtouch (int event_type, screen_event_t event)
+  {
+    try
+    {
+      WindowEventContext context;
+    
+      GetEventContext (context);
+
+      int pos[2];
+      if (screen_get_event_property_iv (event, SCREEN_PROPERTY_SOURCE_POSITION, (int*)&pos))
+        raise_error ("::screen_get_event_property_iv SCREEN_PROPERTY_SOURCE_POSITION");
+
+      context.touches_count = 1;
+      context.touches[0].position.x = pos[0];
+      context.touches[0].position.y = pos[1];
+
+      int id;
+      if (screen_get_event_property_iv (event, SCREEN_PROPERTY_TOUCH_ID, &id))
+        raise_error ("::screen_get_event_property_iv SCREEN_PROPERTY_TOUCH_ID");
+
+      context.touches[0].touch_id = id;
+      switch (event_type)
+      {
+        case SCREEN_EVENT_MTOUCH_TOUCH:   // Dispatched when a multi-touch event is detected.
+          Notify (WindowEvent_OnTouchesBegan, context);
+          break;
+        case SCREEN_EVENT_MTOUCH_MOVE:    // Dispatched when a multi-touch move event is detected, for example when the user moves his or her fingers to make an input gesture. 
+          Notify (WindowEvent_OnTouchesMoved ,context);
+          break;
+        case SCREEN_EVENT_MTOUCH_RELEASE: // Dispatched when a multi-touch release event occurs, or when the user completes the multi-touch gesture.
+          Notify (WindowEvent_OnTouchesEnded, context);
+          break;
+      }
+    } 
+    catch (xtl::exception& exception)
+    {
+      exception.touch ("syslib::TabletOsWindowManager::OnMtouch");
+      throw;
+    }
+  }
+
+  void OnKeyboard (int event_type, screen_event_t event)
+  {
+    try
+    {
+      WindowEventContext context;
+    
+      GetEventContext (context);
+
+      int flags;
+      if (screen_get_event_property_iv (event, SCREEN_PROPERTY_KEY_FLAGS, &flags))
+        raise_error ("::screen_get_event_property_iv SCREEN_PROPERTY_KEY_FLAGS");
+
+      int key_sym;
+      if (screen_get_event_property_iv (event, SCREEN_PROPERTY_KEY_SYM, &key_sym))
+        raise_error ("::screen_get_event_property_iv SCREEN_PROPERTY_KEY_SYM");
+
+      int key_mod;
+      if (screen_get_event_property_iv (event, SCREEN_PROPERTY_KEY_MODIFIERS, &key_mod))
+        raise_error ("::screen_get_event_property_iv SCREEN_PROPERTY_KEY_MODIFIERS");
+
+      if (key_mod & KEYMOD_SHIFT) context.keyboard_shift_pressed = true;
+      if (key_mod & KEYMOD_CTRL)  context.keyboard_control_pressed = true;
+      if (key_mod & KEYMOD_ALT)   context.keyboard_alt_pressed = true;
+
+      if (flags & KEY_SYM_VALID)  context.char_code = key_sym;
+ 
+      if (flags & KEY_DOWN)
+        Notify (WindowEvent_OnChar, context);
+    } 
+    catch (xtl::exception& exception)
+    {
+      exception.touch ("syslib::TabletOsWindowManager::OnMtouch");
+      throw;
+    }
+  }
+
 ///Screen window event
   void OnWindowEvent (int event_type, screen_event_t event)
   {
-    WindowEventContext context;
-    
-    GetEventContext (context);
-    
-    printf ("event_type = %d\n", event_type); fflush (stdout);
+    switch (event_type)
+    {
+      case SCREEN_EVENT_MTOUCH_TOUCH:   // Dispatched when a multi-touch event is detected.
+      case SCREEN_EVENT_MTOUCH_MOVE:    // Dispatched when a multi-touch move event is detected, for example when the user moves his or her fingers to make an input gesture. 
+      case SCREEN_EVENT_MTOUCH_RELEASE: // Dispatched when a multi-touch release event occurs, or when the user completes the multi-touch gesture.
+        OnMtouch (event_type, event);
+        break;
+
+      case SCREEN_EVENT_KEYBOARD:
+        OnKeyboard (event_type, event);
+        break;
+
+      case SCREEN_EVENT_CREATE:         // Dispatched when a child window is created.
+      case SCREEN_EVENT_CLOSE:          // Dispatched when a child window is destroyed.
+      case SCREEN_EVENT_POINTER:        // Dispatched when a pointer input event occurs.
+        break;
+      default:
+        break;
+    }
   }
 
   void Notify (WindowEvent event, const WindowEventContext& context)

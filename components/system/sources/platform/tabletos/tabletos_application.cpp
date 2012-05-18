@@ -229,13 +229,12 @@ class TabletOsApplicationDelegate: public IApplicationDelegate, public xtl::refe
         case SCREEN_EVENT_MTOUCH_MOVE:    // Dispatched when a multi-touch move event is detected, for example when the user moves his or her fingers to make an input gesture. 
         case SCREEN_EVENT_MTOUCH_RELEASE: // Dispatched when a multi-touch release event occurs, or when the user completes the multi-touch gesture.
         case SCREEN_EVENT_POINTER:        // Dispatched when a pointer input event occurs.
+        case SCREEN_EVENT_KEYBOARD: // Dispatched when a keyboard input event occurs.
         {
           screen_window_t window_handle;
           screen_get_event_property_pv (screen_event, SCREEN_PROPERTY_WINDOW, (void**)&window_handle);
 
           IWindowImpl* window = WindowRegistry::FindWindow (window_handle);
-          
-          printf ("found window = %p\n", window); fflush (stdout);
 
           if (!window)
             break;
@@ -247,7 +246,6 @@ class TabletOsApplicationDelegate: public IApplicationDelegate, public xtl::refe
         
         case SCREEN_EVENT_INPUT:    // Dispatched when an unknown input event occurs.
         case SCREEN_EVENT_JOG:      // Dispatched when an jog dial input event occurs. 
-        case SCREEN_EVENT_KEYBOARD: // Dispatched when a keyboard input event occurs.
           break;
                 
         case SCREEN_EVENT_NONE:            // A blocking event indicating that there are currently no events in the queue. 
