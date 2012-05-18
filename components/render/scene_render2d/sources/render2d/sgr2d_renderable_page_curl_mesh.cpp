@@ -145,7 +145,7 @@ struct RenderablePageCurlMesh::Impl
   }
 
   //Трансформация страницы
-  void Curl (const math::vec2f& corner_position, scene_graph::PageCurlCorner corner, float curl_x, float radius,
+  void Curl (const math::vec2f& corner_position, scene_graph::PageCurlCorner corner, float radius,
              float angle, size_t find_best_curl_steps, float binding_mismatch_weight)
   {
     last_curl_radius = radius;
@@ -210,7 +210,8 @@ struct RenderablePageCurlMesh::Impl
           rotated_bottom_binding_location_x  = bottom_binding.x * cos_curl_angle - bottom_binding.y * sin_curl_angle,
           one_divide_radius                  = radius ? 1.f / radius : FLT_MAX,
           best_corner_location_z             = 0,
-          best_opposite_corner_location_z    = 0;
+          best_opposite_corner_location_z    = 0,
+          curl_x                             = 0;
 
     float best_curl_mismatch = FLT_MAX,
           best_curl_step     = width / find_best_curl_steps;
@@ -755,10 +756,10 @@ void RenderablePageCurlMesh::Draw (low_level::IDevice& device)
    Трансформация страницы
 */
 
-void RenderablePageCurlMesh::Curl (const math::vec2f& corner_position, scene_graph::PageCurlCorner corner, float curl_x,
+void RenderablePageCurlMesh::Curl (const math::vec2f& corner_position, scene_graph::PageCurlCorner corner,
                                    float radius, float angle, size_t find_best_curl_steps, float binding_mismatch_weight)
 {
-  impl->Curl (corner_position, corner, curl_x, radius, angle, find_best_curl_steps, binding_mismatch_weight);
+  impl->Curl (corner_position, corner, radius, angle, find_best_curl_steps, binding_mismatch_weight);
 }
 
 /*

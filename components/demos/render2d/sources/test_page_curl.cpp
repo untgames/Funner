@@ -28,14 +28,14 @@ struct Test
     curl->SetSize               (2.f, 1.5f);
     curl->SetGridSize           (100, 100);
     curl->SetMode               (PageCurlMode_DoublePageDoubleMaterial);
-    curl->SetCurlCorner         (PageCurlCorner_RightBottom);
+    curl->SetCurlPoint          (PageCurlCorner_RightBottom);
     curl->SetCurlRadius         (0.1f);
     curl->SetPageMaterial       (PageCurlPageType_BackLeft,   "page1");
     curl->SetPageMaterial       (PageCurlPageType_BackRight,  "page2");
     curl->SetPageMaterial       (PageCurlPageType_FrontLeft,  "page3");
     curl->SetPageMaterial       (PageCurlPageType_FrontRight, "page4");
     curl->SetCornerShadowOffset (0.1f);
-    curl->SetCornerPosition     (0.1f, 0.1f);
+    curl->SetCurlPointPosition  (0.1f, 0.1f);
 
     curl->BindToScene (scene);
 
@@ -90,8 +90,8 @@ struct Test
     application.SetIdleHandler (xtl::bind (&Test::Idle, this));
 
     application.Window ().RegisterEventHandler (syslib::WindowEvent_OnMouseMove, xtl::bind (&Test::OnMouseMove, this, _1, _3));
-    application.Window ().SetViewportHandler (xtl::bind (&Test::UpdateViewport, this, _1, _2));
-    application.Window ().InvalidateViewport ();
+//    application.Window ().SetViewportHandler (xtl::bind (&Test::UpdateViewport, this, _1, _2));
+//    application.Window ().InvalidateViewport ();
   }
 
   void UpdateViewport (syslib::Window& window, syslib::Rect& viewport)
@@ -152,7 +152,7 @@ struct Test
    corner_position.x += curl->Size ().x / 2;
    corner_position.y += curl->Size ().y / 2;
 
-    curl->SetCornerPosition (corner_position.x, corner_position.y);
+    curl->SetCurlPointPosition (corner_position.x, corner_position.y);
 
 //    printf ("Corner position = %f %f\n", curl->CornerPosition ().x, curl->CornerPosition ().y);
   }

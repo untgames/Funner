@@ -712,20 +712,6 @@ local function get_mode_name (mode)
   end  
 end
 
-local function get_corner_name (corner)
-  if corner == Scene.PageCurlCorner.LeftTop then
-    return "LeftTop"
-  elseif corner == Scene.PageCurlCorner.LeftBottom then
-    return "LeftBottom"
-  elseif corner == Scene.PageCurlCorner.RightTop then
-    return "RightTop"
-  elseif corner == Scene.PageCurlCorner.RightBottom then
-    return "RightBottom"
-  else
-    return "Unknown"
-  end
-end
-
 local function print_curl (curl)
   print (string.format ("  mode                              %s",                     get_mode_name (curl.Mode)))
   print (string.format ("  front left material               '%s'",                   curl:PageMaterial (Scene.PageCurlPageType.FrontLeft)))
@@ -733,8 +719,8 @@ local function print_curl (curl)
   print (string.format ("  back left material                '%s'",                   curl:PageMaterial (Scene.PageCurlPageType.BackLeft)))
   print (string.format ("  back right material               '%s'",                   curl:PageMaterial (Scene.PageCurlPageType.BackRight)))
   print (string.format ("  size                              %.2fx%.2f",              curl.Size.x, curl.Size.y))
-  print (string.format ("  corner                            '%s'",                   get_corner_name (curl.CurlCorner)))
-  print (string.format ("  corner position                   %.2f; %.2f",             curl.CornerPosition.x, curl.CornerPosition.y))
+  print (string.format ("  curl point                        '%s'",                   curl.CurlPoint.x, curl.CurlPoint.y))
+  print (string.format ("  curl point position               %.2f; %.2f",             curl.CurlPointPosition.x, curl.CurlPointPosition.y))
   print (string.format ("  curl radius                       %.2f",                   curl.CurlRadius))
   print (string.format ("  minimum curl radius               %.2f",                   curl.MinimumCurlRadius))
   print (string.format ("  grid size                         %ux%u",                  curl.GridSize.x, curl.GridSize.y))
@@ -757,16 +743,16 @@ local function test_page_curl ()
   print ("default curl:")
   print_curl (curl)
 
-  curl:SetPageMaterial   (Scene.PageCurlPageType.Front,     "front_material")
-  curl:SetPageMaterial   (Scene.PageCurlPageType.BackLeft,  "back_left_material")
-  curl:SetPageMaterial   (Scene.PageCurlPageType.BackRight, "back_right_material")
-  curl:SetSize           (2, 4)
-  curl:SetCornerPosition (1, 2)
-  curl:SetGridSize       (10, 20)
-  curl:SetPageColor      (0.5, 0.25, 0.125, 0.25)
+  curl:SetPageMaterial      (Scene.PageCurlPageType.Front,     "front_material")
+  curl:SetPageMaterial      (Scene.PageCurlPageType.BackLeft,  "back_left_material")
+  curl:SetPageMaterial      (Scene.PageCurlPageType.BackRight, "back_right_material")
+  curl:SetSize              (2, 4)
+  curl:SetCurlPointPosition (1, 2)
+  curl:SetGridSize          (10, 20)
+  curl:SetPageColor         (0.5, 0.25, 0.125, 0.25)
 
   curl.Mode                          = Scene.PageCurlMode.DoublePageDoubleMaterial
-  curl.CurlCorner                    = Scene.PageCurlCorner.RightBottom
+  curl.CurlPoint                     = Scene.PageCurlCorner.RightBottom
   curl.CurlRadius                    = 4
   curl.MinimumCurlRadius             = 2
   curl.CornerShadowOffset            = 16
@@ -781,9 +767,10 @@ local function test_page_curl ()
   print ("changed curl:")
   print_curl (curl)
   
-  curl.Size           = vec2 (4, 2)
-  curl.CornerPosition = vec2 (2, 1)
-  curl.PageColor      = vec4 (0.25, 0.125, 0.25, 0.5)
+  curl.Size              = vec2 (4, 2)
+  curl.CurlPointPosition = vec2 (2, 1)
+  curl.PageColor         = vec4 (0.25, 0.125, 0.25, 0.5)
+  curl:SetCurlPoint (vec2 (0.25, 0.5))
 
   print ("second changed curl:")
   print_curl (curl)

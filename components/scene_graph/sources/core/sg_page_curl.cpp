@@ -26,8 +26,8 @@ struct PageCurl::Impl
   PageCurlMode   mode;                               //режим страниц
   stl::string    materials [PageCurlPageType_Num];   //материалы
   math::vec2f    size;                               //полный размер страниц
-  PageCurlCorner corner;                             //угол
-  math::vec2f    corner_position;                    //позиция угла
+  math::vec2f    curl_point;                         //точка перетаскивания
+  math::vec2f    curl_point_position;                //позиция точки перетаскивания
   float          curl_radius;                        //радиус загиба
   float          minimum_curl_radius;                //минимальный радиус загиба
   math::vec2ui   grid_size;                          //количество разбиений сетки
@@ -44,7 +44,6 @@ struct PageCurl::Impl
   Impl ()
     : mode (PageCurlMode_SinglePage)
     , size (1.f)
-    , corner (PageCurlCorner_LeftTop)
     , curl_radius (0.f)
     , minimum_curl_radius (0.f)
     , grid_size (DEFAULT_GRID_SIZE)
@@ -160,47 +159,62 @@ const math::vec2f& PageCurl::Size () const
 }
 
 /*
-   Установка угла страницы
+   Установка точки перетаскивания
 */
 
-void PageCurl::SetCurlCorner (PageCurlCorner corner)
+void PageCurl::SetCurlPoint (PageCurlCorner corner)
 {
   switch (corner)
   {
     case PageCurlCorner_LeftTop:
+      SetCurlPoint (math::vec2f (0, impl->size.y));
+      break;
     case PageCurlCorner_LeftBottom:
+      SetCurlPoint (math::vec2f (0, 0));
+      break;
     case PageCurlCorner_RightTop:
+      SetCurlPoint (math::vec2f (impl->size.x, impl->size.y));
+      break;
     case PageCurlCorner_RightBottom:
+      SetCurlPoint (math::vec2f (impl->size.x, 0));
       break;
     default:
-      throw xtl::make_argument_exception ("scene_graph::CurlCurl::SetPageCorner", "corner", corner);
+      throw xtl::make_argument_exception ("scene_graph::CurlCurl::SetCurlPoint", "corner", corner);
   }
+}
 
-  impl->corner = corner;
+void PageCurl::SetCurlPoint (const math::vec2f& point)
+{
+  impl->curl_point = point;
 
   UpdateNotify ();
 }
 
-PageCurlCorner PageCurl::CurlCorner () const
+void PageCurl::SetCurlPoint (float x, float y)
 {
-  return impl->corner;
+  SetCurlPoint (math::vec2f (x, y));
 }
 
-void PageCurl::SetCornerPosition (const math::vec2f& position)
+const math::vec2f& PageCurl::CurlPoint () const
 {
-  impl->corner_position = position;
+  return impl->curl_point;
+}
+
+void PageCurl::SetCurlPointPosition (const math::vec2f& position)
+{
+  impl->curl_point_position = position;
 
   UpdateNotify ();
 }
 
-void PageCurl::SetCornerPosition (float x, float y)
+void PageCurl::SetCurlPointPosition (float x, float y)
 {
-  SetCornerPosition (math::vec2f (x, y));
+  SetCurlPointPosition (math::vec2f (x, y));
 }
 
-const math::vec2f& PageCurl::CornerPosition () const
+const math::vec2f& PageCurl::CurlPointPosition () const
 {
-  return impl->corner_position;
+  return impl->curl_point_position;
 }
 
 /*

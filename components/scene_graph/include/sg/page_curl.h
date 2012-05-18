@@ -77,13 +77,15 @@ class PageCurl : public Entity
     const math::vec2f& Size    () const;
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Установка угла страницы
+///Установка точки перетаскивания
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void               SetCurlCorner     (PageCurlCorner corner);
-    PageCurlCorner     CurlCorner        () const;
-    void               SetCornerPosition (const math::vec2f& position);
-    void               SetCornerPosition (float x, float y);
-    const math::vec2f& CornerPosition    () const;
+    void               SetCurlPoint         (PageCurlCorner corner);
+    void               SetCurlPoint         (const math::vec2f& point);
+    void               SetCurlPoint         (float x, float y);
+    const math::vec2f& CurlPoint            () const;
+    void               SetCurlPointPosition (const math::vec2f& position);
+    void               SetCurlPointPosition (float x, float y);
+    const math::vec2f& CurlPointPosition    () const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Настройка загиба

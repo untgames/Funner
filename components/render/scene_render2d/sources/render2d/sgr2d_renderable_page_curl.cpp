@@ -599,7 +599,8 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
       current_page_grid_size = grid_size;
     }
 
-    math::vec2f one_page_size = page_curl->Size ();
+    const math::vec2f& page_size     = page_curl->Size ();
+          math::vec2f  one_page_size = page_size;
 
     if (page_curl->Mode () != PageCurlMode_SinglePage)
       one_page_size.x /= 2;
@@ -624,27 +625,28 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
     device.SSSetProgram                 (default_program.get ());
     device.OSSetDepthStencilState       (depth_stencil_state_write_enabled.get ());
 
-    switch (page_curl->CurlCorner ())
+    const math::vec2f& curl_point = page_curl->CurlPoint ();
+
+    if (curl_point.x < page_size.x / 2)
     {
-      case PageCurlCorner_LeftTop:
-        DrawLeftTopCornerFlip (device);
-        break;
-      case PageCurlCorner_LeftBottom:
+      if (curl_point.y < page_size.y / 2)
         DrawLeftBottomCornerFlip (device);
-        break;
-      case PageCurlCorner_RightTop:
-        DrawRightTopCornerFlip (device);
-        break;
-      case PageCurlCorner_RightBottom:
+      else
+        DrawLeftTopCornerFlip (device);
+    }
+    else
+    {
+      if (curl_point.y < page_size.y / 2)
         DrawRightBottomCornerFlip (device);
-        break;
+      else
+        DrawRightTopCornerFlip (device);
     }
 
     render_state->Apply ();
   }
 
   //Рисование теней
-  void DrawShadows (low_level::IDevice& device, float curl_radius, bool left_side)
+  void DrawShadows (low_level::IDevice& device, PageCurlCorner corner, float curl_radius, bool left_side)
   {
     if (curl_radius <= EPS)
       return;
@@ -672,7 +674,7 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
     float shadow_width  = page_size.x * page_curl->ShadowWidth () * curl_radius / page_curl->CurlRadius (),
           corner_offset = 0.f;
 
-    switch (page_curl->CurlCorner ())
+    switch (corner)
     {
       case PageCurlCorner_LeftTop:
         corner_offset = math::length (math::vec2f (left_top_corner_position.x, page_size.y - left_top_corner_position.y));
@@ -976,8 +978,11 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
     if (page_curl->Mode () == PageCurlMode_SinglePage)
       throw xtl::format_operation_exception ("render::obsolete::render2d::RenderablePageCurl::DrawLeftBottomCornerFlip", "Can't draw flip for left bottom corner in single page mode");
 
-    math::vec2f page_size       = page_curl->Size ();
-    math::vec2f corner_position = page_curl->CornerPosition ();
+    const math::vec2f& curl_point_position = page_curl->CurlPointPosition ();
+    const math::vec2f& curl_point          = page_curl->CurlPoint ();
+          math::vec2f  page_size           = page_curl->Size ();
+
+    math::vec2f corner_position (curl_point_position.x + curl_point.x, curl_point_position.y - curl_point.y + page_size.y);
 
     page_size.x /= 2;
 
@@ -1011,9 +1016,7 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
     if (curl_corner_position.y > 0 || curl_angle > -EPS)
       curl_angle += PI;
 
-    float curl_x = (page_size.x - flip_width) * cos (curl_angle);
-
-    curled_page->Curl (curl_corner_position, page_curl->CurlCorner (), curl_x, curl_radius, curl_angle,
+    curled_page->Curl (curl_corner_position, PageCurlCorner_LeftTop, curl_radius, curl_angle,
                        page_curl->FindBestCurlSteps (), page_curl->BindingMismatchWeight ());
 
     device.RSSetState (rasterizer_cull_back_state.get ());
@@ -1052,7 +1055,7 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
 
     DrawStaticPages (device);
 
-    DrawShadows (device, curl_radius, true);
+    DrawShadows (device, PageCurlCorner_LeftTop, curl_radius, true);
   }
 
   void DrawLeftBottomCornerFlip (low_level::IDevice& device)
@@ -1060,8 +1063,11 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
     if (page_curl->Mode () == PageCurlMode_SinglePage)
       throw xtl::format_operation_exception ("render::obsolete::render2d::RenderablePageCurl::DrawLeftBottomCornerFlip", "Can't draw flip for left bottom corner in single page mode");
 
-    math::vec2f page_size       = page_curl->Size ();
-    math::vec2f corner_position = page_curl->CornerPosition ();
+    const math::vec2f& curl_point_position = page_curl->CurlPointPosition ();
+    const math::vec2f& curl_point          = page_curl->CurlPoint ();
+          math::vec2f  page_size           = page_curl->Size ();
+
+    math::vec2f corner_position (curl_point_position.x + curl_point.x, curl_point_position.y - curl_point.y);
 
     page_size.x /= 2;
 
@@ -1095,9 +1101,7 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
     if (curl_corner_position.y < page_size.y || curl_angle < EPS)
       curl_angle += PI;
 
-    float curl_x = (page_size.x - flip_width) * cos (curl_angle);
-
-    curled_page->Curl (curl_corner_position, page_curl->CurlCorner (), curl_x, curl_radius, curl_angle,
+    curled_page->Curl (curl_corner_position, PageCurlCorner_LeftBottom, curl_radius, curl_angle,
                        page_curl->FindBestCurlSteps (), page_curl->BindingMismatchWeight ());
 
     device.RSSetState (rasterizer_cull_back_state.get ());
@@ -1136,14 +1140,17 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
 
     DrawStaticPages (device);
 
-    DrawShadows (device, curl_radius, true);
+    DrawShadows (device, PageCurlCorner_LeftBottom, curl_radius, true);
   }
 
   void DrawRightTopCornerFlip (low_level::IDevice& device)
   {
-    const math::vec2f& total_size      = page_curl->Size ();
-    math::vec2f        page_size       = total_size;
-    math::vec2f        corner_position = page_curl->CornerPosition ();
+    const math::vec2f& total_size          = page_curl->Size ();
+    const math::vec2f& curl_point_position = page_curl->CurlPointPosition ();
+    const math::vec2f& curl_point          = page_curl->CurlPoint ();
+          math::vec2f  page_size           = total_size;
+
+    math::vec2f corner_position (curl_point_position.x + curl_point.x - page_size.x, curl_point_position.y - curl_point.y + page_size.y);
 
     if (page_curl->Mode () != PageCurlMode_SinglePage)
       page_size.x /= 2;
@@ -1184,9 +1191,7 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
     if (curl_corner_position.y <= 0 && curl_angle > EPS)
       curl_angle += PI;
 
-    float curl_x = (page_size.x - flip_width) * cos (curl_angle);
-
-    curled_page->Curl (curl_corner_position, page_curl->CurlCorner (), curl_x, curl_radius, curl_angle,
+    curled_page->Curl (curl_corner_position, PageCurlCorner_RightTop, curl_radius, curl_angle,
                        page_curl->FindBestCurlSteps (), page_curl->BindingMismatchWeight ());
 
     if (page_curl->Mode () != PageCurlMode_SinglePage)
@@ -1250,14 +1255,17 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
 
     DrawStaticPages (device);
 
-    DrawShadows (device, curl_radius, false);
+    DrawShadows (device, PageCurlCorner_RightTop, curl_radius, false);
   }
 
   void DrawRightBottomCornerFlip (low_level::IDevice& device)
   {
-    const math::vec2f& total_size      = page_curl->Size ();
-    math::vec2f        page_size       = total_size;
-    math::vec2f        corner_position = page_curl->CornerPosition ();
+    const math::vec2f& total_size          = page_curl->Size ();
+    const math::vec2f& curl_point_position = page_curl->CurlPointPosition ();
+    const math::vec2f& curl_point          = page_curl->CurlPoint ();
+          math::vec2f  page_size           = total_size;
+
+    math::vec2f corner_position (curl_point_position.x + curl_point.x - page_size.x, curl_point_position.y - curl_point.y);
 
     if (page_curl->Mode () != PageCurlMode_SinglePage)
       page_size.x /= 2;
@@ -1298,9 +1306,7 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
     if (curl_corner_position.y >= page_size.y && curl_angle < -EPS)
       curl_angle -= PI;
 
-    float curl_x = (page_size.x - flip_width) * cos (curl_angle);
-
-    curled_page->Curl (curl_corner_position, page_curl->CurlCorner (), curl_x, curl_radius, curl_angle,
+    curled_page->Curl (curl_corner_position, PageCurlCorner_RightBottom, curl_radius, curl_angle,
                        page_curl->FindBestCurlSteps (), page_curl->BindingMismatchWeight ());
 
     if (page_curl->Mode () != PageCurlMode_SinglePage)
@@ -1364,7 +1370,7 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
 
     DrawStaticPages (device);
 
-    DrawShadows (device, curl_radius, false);
+    DrawShadows (device, PageCurlCorner_RightBottom, curl_radius, false);
   }
 
   //Рисование лежащих страниц

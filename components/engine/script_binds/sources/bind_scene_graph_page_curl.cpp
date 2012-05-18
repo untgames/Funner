@@ -80,9 +80,9 @@ void bind_page_curl_library (Environment& environment)
     //регистрация операций
 
   lib.Register ("set_BindingMismatchWeight",         make_invoker (&PageCurl::SetBindingMismatchWeight));
-  lib.Register ("set_CornerPosition",                make_invoker (xtl::implicit_cast<void (PageCurl::*) (const math::vec2f&)> (&PageCurl::SetCornerPosition)));
+  lib.Register ("set_CurlPointPosition",             make_invoker (xtl::implicit_cast<void (PageCurl::*) (const math::vec2f&)> (&PageCurl::SetCurlPointPosition)));
   lib.Register ("set_CornerShadowOffset",            make_invoker (&PageCurl::SetCornerShadowOffset));
-  lib.Register ("set_CurlCorner",                    make_invoker (&PageCurl::SetCurlCorner));
+  lib.Register ("set_CurlPoint",                     make_invoker (xtl::implicit_cast<void (PageCurl::*) (PageCurlCorner)> (&PageCurl::SetCurlPoint)));
   lib.Register ("set_CurlRadius",                    make_invoker (&PageCurl::SetCurlRadius));
   lib.Register ("set_FindBestCurlSteps",             make_invoker (&PageCurl::SetFindBestCurlSteps));
   lib.Register ("set_MinimumCurlRadius",             make_invoker (&PageCurl::SetMinimumCurlRadius));
@@ -95,9 +95,9 @@ void bind_page_curl_library (Environment& environment)
   lib.Register ("set_ShadowWidth",                   make_invoker (&PageCurl::SetShadowWidth));
   lib.Register ("set_Size",                          make_invoker (xtl::implicit_cast<void (PageCurl::*) (const math::vec2f&)> (&PageCurl::SetSize)));
   lib.Register ("get_BindingMismatchWeight",         make_invoker (&PageCurl::BindingMismatchWeight));
-  lib.Register ("get_CornerPosition",                make_invoker (&PageCurl::CornerPosition));
+  lib.Register ("get_CurlPointPosition",             make_invoker (&PageCurl::CurlPointPosition));
   lib.Register ("get_CornerShadowOffset",            make_invoker (&PageCurl::CornerShadowOffset));
-  lib.Register ("get_CurlCorner",                    make_invoker (&PageCurl::CurlCorner));
+  lib.Register ("get_CurlPoint",                     make_invoker (&PageCurl::CurlPoint));
   lib.Register ("get_CurlRadius",                    make_invoker (&PageCurl::CurlRadius));
   lib.Register ("get_FindBestCurlSteps",             make_invoker (&PageCurl::FindBestCurlSteps));
   lib.Register ("get_GridSize",                      make_invoker (&get_grid_size));
@@ -111,12 +111,16 @@ void bind_page_curl_library (Environment& environment)
   lib.Register ("get_ShadowWidth",                   make_invoker (&PageCurl::ShadowWidth));
   lib.Register ("get_Size",                          make_invoker (&PageCurl::Size));
 
-  lib.Register ("SetCornerPosition", make_invoker (xtl::implicit_cast<void (PageCurl::*) (float, float)> (&PageCurl::SetCornerPosition)));
-  lib.Register ("SetPageMaterial",   make_invoker (&PageCurl::SetPageMaterial));
-  lib.Register ("PageMaterial",      make_invoker (&PageCurl::PageMaterial));
-  lib.Register ("SetPageColor",      make_invoker (xtl::implicit_cast<void (PageCurl::*) (float, float, float, float)> (&PageCurl::SetPageColor)));
-  lib.Register ("SetSize",           make_invoker (xtl::implicit_cast<void (PageCurl::*) (float, float)> (&PageCurl::SetSize)));
-  lib.Register ("SetGridSize",       make_invoker (xtl::implicit_cast<void (PageCurl::*) (size_t, size_t)> (&PageCurl::SetGridSize)));
+  lib.Register ("SetCurlPointPosition", make_invoker (xtl::implicit_cast<void (PageCurl::*) (float, float)> (&PageCurl::SetCurlPointPosition)));
+  lib.Register ("SetCurlPoint", make_invoker (
+      make_invoker (xtl::implicit_cast<void (PageCurl::*) (float, float)>       (&PageCurl::SetCurlPoint)),
+      make_invoker (xtl::implicit_cast<void (PageCurl::*) (const math::vec2f&)> (&PageCurl::SetCurlPoint))
+  ));
+  lib.Register ("SetPageMaterial",      make_invoker (&PageCurl::SetPageMaterial));
+  lib.Register ("PageMaterial",         make_invoker (&PageCurl::PageMaterial));
+  lib.Register ("SetPageColor",         make_invoker (xtl::implicit_cast<void (PageCurl::*) (float, float, float, float)> (&PageCurl::SetPageColor)));
+  lib.Register ("SetSize",              make_invoker (xtl::implicit_cast<void (PageCurl::*) (float, float)> (&PageCurl::SetSize)));
+  lib.Register ("SetGridSize",          make_invoker (xtl::implicit_cast<void (PageCurl::*) (size_t, size_t)> (&PageCurl::SetGridSize)));
 
     //регистрация типов данных
 

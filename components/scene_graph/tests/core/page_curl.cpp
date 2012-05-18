@@ -34,23 +34,6 @@ const char* get_mode_name (PageCurlMode mode)
   }
 }
 
-const char* get_corner_name (PageCurlCorner corner)
-{
-  switch (corner)
-  {
-    case PageCurlCorner_LeftTop:
-      return "LeftTop";
-    case PageCurlCorner_LeftBottom:
-      return "LeftBottom";
-    case PageCurlCorner_RightTop:
-      return "RightTop";
-    case PageCurlCorner_RightBottom:
-      return "RightBottom";
-    default:
-      return "Unknown";
-  }
-}
-
 void dump (const PageCurl& curl)
 {
   printf ("  mode                              %s\n",                     get_mode_name (curl.Mode ()));
@@ -59,8 +42,8 @@ void dump (const PageCurl& curl)
   printf ("  back left material                '%s'\n",                   curl.PageMaterial (PageCurlPageType_BackLeft));
   printf ("  back right material               '%s'\n",                   curl.PageMaterial (PageCurlPageType_BackRight));
   printf ("  size                              %.2fx%.2f\n",              curl.Size ().x, curl.Size ().y);
-  printf ("  corner                            '%s'\n",                   get_corner_name (curl.CurlCorner ()));
-  printf ("  corner position                   %.2f; %.2f\n",             curl.CornerPosition ().x, curl.CornerPosition ().y);
+  printf ("  curl point                        %.2f; %.2f\n",             curl.CurlPoint ().x, curl.CurlPoint ().y);
+  printf ("  curl point position               %.2f; %.2f\n",             curl.CurlPointPosition ().x, curl.CurlPointPosition ().y);
   printf ("  curl radius                       %.2f\n",                   curl.CurlRadius ());
   printf ("  minimum curl radius               %.2f\n",                   curl.MinimumCurlRadius ());
   printf ("  grid size                         %ux%u\n",                  curl.GridSize ().x, curl.GridSize ().y);
@@ -92,8 +75,8 @@ int main ()
   curl->SetPageMaterial                  (PageCurlPageType_BackLeft,  "back_left_material");
   curl->SetPageMaterial                  (PageCurlPageType_BackRight, "back_right_material");
   curl->SetSize                          (2.f, 4.f);
-  curl->SetCurlCorner                    (PageCurlCorner_RightBottom);
-  curl->SetCornerPosition                (1.f, 2.f);
+  curl->SetCurlPoint                     (PageCurlCorner_RightBottom);
+  curl->SetCurlPointPosition             (1.f, 2.f);
   curl->SetCurlRadius                    (4.f);
   curl->SetMinimumCurlRadius             (2.f);
   curl->SetGridSize                      (10, 20);
