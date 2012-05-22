@@ -175,12 +175,10 @@ class TabletOsApplicationDelegate: public IApplicationDelegate, public xtl::refe
 
         if (domain == screen_get_domain())
         {
-          printf ("screen_domain = %d\n", domain); fflush (stdout);
           HandleScreenEvent (event);
         }
         else if (domain == navigator_get_domain())
         {
-          printf ("navigator_domain = %d\n", domain); fflush (stdout);
           HandleNavigatorEvent (event);
         }        
         
@@ -230,6 +228,7 @@ class TabletOsApplicationDelegate: public IApplicationDelegate, public xtl::refe
         case SCREEN_EVENT_MTOUCH_RELEASE: // Dispatched when a multi-touch release event occurs, or when the user completes the multi-touch gesture.
         case SCREEN_EVENT_POINTER:        // Dispatched when a pointer input event occurs.
         case SCREEN_EVENT_KEYBOARD: // Dispatched when a keyboard input event occurs.
+        case SCREEN_EVENT_PROPERTY:
         {
           screen_window_t window_handle;
           screen_get_event_property_pv (screen_event, SCREEN_PROPERTY_WINDOW, (void**)&window_handle);
@@ -249,7 +248,6 @@ class TabletOsApplicationDelegate: public IApplicationDelegate, public xtl::refe
           break;
                 
         case SCREEN_EVENT_NONE:            // A blocking event indicating that there are currently no events in the queue. 
-        case SCREEN_EVENT_PROPERTY:        // Dispatched when a property is set.
         case SCREEN_EVENT_USER:            // Dispatched when a user event is detected. 
         case SCREEN_EVENT_POST:            // Dispatched when a child window has posted its first frame.
         case SCREEN_EVENT_EFFECT_COMPLETE: // Dispatched to the window manager indicating that a rotation effect has completed.

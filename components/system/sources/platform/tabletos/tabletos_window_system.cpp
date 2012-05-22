@@ -140,7 +140,7 @@ struct WindowImpl: public IWindowImpl
         raise_error ("::screen_set_window_property_iv SCREEN_PROPERTY_BUFFER_SIZE");
 
       if (screen_create_window_buffers (screen_window, 2)) //buffers count configuration???
-        raise_error ("::screen_create_window_buffers");        
+        raise_error ("::screen_create_window_buffers"); 
 
       WindowRegistry::RegisterWindow (screen_window, this);
     }
@@ -186,15 +186,19 @@ struct WindowImpl: public IWindowImpl
       if (screen_get_event_property_iv (event, SCREEN_PROPERTY_SOURCE_POSITION, (int*)&pos))
         raise_error ("::screen_get_event_property_iv SCREEN_PROPERTY_SOURCE_POSITION");
 
+      mtouch_event_t mtouch_event;
+      if (screen_get_mtouch_event(event, &mtouch_event, 0))
+        raise_error ("::screen_get_mtouch_event");
+
       context.touches_count = 1;
-      context.touches[0].position.x = pos[0];
-      context.touches[0].position.y = pos[1];
+      context.touches[0].position.x = mtouch_event.x;
+      context.touches[0].position.y = mtouch_event.y;
 
       int id;
       if (screen_get_event_property_iv (event, SCREEN_PROPERTY_TOUCH_ID, &id))
         raise_error ("::screen_get_event_property_iv SCREEN_PROPERTY_TOUCH_ID");
 
-      context.touches[0].touch_id = id;
+      context.touches[0].touch_id = mtouch_event.contact_id;
       switch (event_type)
       {
         case SCREEN_EVENT_MTOUCH_TOUCH:   // Dispatched when a multi-touch event is detected.
@@ -246,7 +250,63 @@ struct WindowImpl: public IWindowImpl
     } 
     catch (xtl::exception& exception)
     {
-      exception.touch ("syslib::TabletOsWindowManager::OnMtouch");
+      exception.touch ("syslib::TabletOsWindowManager::OnKeyboard");
+      throw;
+    }
+  }
+ 
+  void OnProperty (int event_type, screen_event_t event)
+  {
+    try
+    {
+      WindowEventContext context;
+    
+      GetEventContext (context);
+
+      int visible;
+      int property;
+      if (screen_get_event_property_iv (event, SCREEN_PROPERTY_NAME, &property))
+        raise_error ("::screen_get_event_property_iv SCREEN_PROPERTY_NAME");
+      
+      switch (property)
+      {
+        case SCREEN_PROPERTY_POSITION:
+          Notify (WindowEvent_OnMove, context);
+          break; 
+
+        case SCREEN_PROPERTY_SIZE:
+          Notify (WindowEvent_OnSize, context);
+          break; 
+
+        case SCREEN_PROPERTY_SOURCE_SIZE:
+        case SCREEN_PROPERTY_SOURCE_POSITION:
+          Notify (WindowEvent_OnChangeViewport, context);
+          break;
+ 
+        case SCREEN_PROPERTY_VISIBLE:
+          if (screen_set_window_property_iv (screen_window, SCREEN_PROPERTY_VISIBLE, &visible))
+            raise_error ("::screen_set_window_property_iv SCREEN_PROPERTY_VISIBLE");
+   
+          if (visible)
+            Notify (WindowEvent_OnShow, context);
+          else
+            Notify (WindowEvent_OnHide, context);
+          break;
+
+        case SCREEN_PROPERTY_ZORDER:
+          if (screen_set_window_property_iv (screen_window, SCREEN_PROPERTY_ZORDER, &visible))
+            raise_error ("::screen_set_window_property_iv SCREEN_PROPERTY_ZORDER");
+   
+          if (visible == 0)
+            Notify (WindowEvent_OnActivate, context);
+          else
+            Notify (WindowEvent_OnDeactivate, context);
+          break;
+      }
+    } 
+    catch (xtl::exception& exception)
+    {
+      exception.touch ("syslib::TabletOsWindowManager::OnProperty");
       throw;
     }
   }
@@ -254,6 +314,10 @@ struct WindowImpl: public IWindowImpl
 ///Screen window event
   void OnWindowEvent (int event_type, screen_event_t event)
   {
+    WindowEventContext context;
+   
+    GetEventContext (context);
+ 
     switch (event_type)
     {
       case SCREEN_EVENT_MTOUCH_TOUCH:   // Dispatched when a multi-touch event is detected.
@@ -265,9 +329,18 @@ struct WindowImpl: public IWindowImpl
       case SCREEN_EVENT_KEYBOARD:
         OnKeyboard (event_type, event);
         break;
+   
+      case SCREEN_EVENT_PROPERTY:
+        OnProperty (event_type, event);
+        break;
 
       case SCREEN_EVENT_CREATE:         // Dispatched when a child window is created.
+        break;
+
       case SCREEN_EVENT_CLOSE:          // Dispatched when a child window is destroyed.
+        Notify (WindowEvent_OnClose, context);
+        break;
+
       case SCREEN_EVENT_POINTER:        // Dispatched when a pointer input event occurs.
         break;
       default:
@@ -733,11 +806,20 @@ void TabletOsWindowManager::InvalidateWindow (window_t handle)
 
 void TabletOsWindowManager::SetBackgroundColor (window_t handle, const Color& color)
 {
-  screen_window_t screen_window = (screen_window_t)GetNativeWindowHandle (handle);
+  try
+  {
+    screen_window_t screen_window = (screen_window_t)GetNativeWindowHandle (handle);
 
-  int native_color = 0xff0000ff;
+    int native_color = 0xff0000ff;
 
-  screen_set_window_property_iv (screen_window, SCREEN_PROPERTY_COLOR, &native_color);
+    if (screen_set_window_property_iv (screen_window, SCREEN_PROPERTY_COLOR, &native_color))
+      raise_error ("::screen_set_window_property_iv (SCREEN_PROPERTY_COLOR)");
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("syslib::TabletOsWindowManager::SetBackgroundColor");
+    throw;
+  }
 }
 
 void TabletOsWindowManager::SetBackgroundState (window_t handle, bool state)

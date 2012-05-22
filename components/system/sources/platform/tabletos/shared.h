@@ -10,6 +10,8 @@
 #include <bps/bps.h>
 #include <bps/event.h>
 #include <sys/keycodes.h>
+#include <input/event_types.h>
+#include <input/screen_helpers.h>
 
 #include <stl/hash_map>
 
