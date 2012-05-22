@@ -24,15 +24,16 @@ namespace
 
 const char* LOG_NAME = "render.obsolete.render2d.RenderablePageCurl";
 
-const float  EPS                     = 0.001f;
-const float  BACK_SHADOW_OFFSET      = 0;
-const float  CORNER_SHADOW_GROW_PART = 0.2f;
-const float  CORNER_SHADOW_SHIFT     = 0.2f;
-const float  PI                      = 3.1415926f;
-const size_t SHADOW_TEXTURE_SIZE     = 32;
-const size_t SHADOW_VERTICES_COUNT   = 16;
-const float  STATIC_PAGES_Z_OFFSET   = -0.001f;
-const float  TEXCOORD_OFFSET         = 0.001f;
+const float  EPS                             = 0.001f;
+const float  BACK_SHADOW_OFFSET              = 0;
+const float  CORNER_SHADOW_GROW_PART         = 0.2f;
+const float  CORNER_SHADOW_SHIFT             = 0.2f;
+const float  MAX_CORNER_HEIGHT_OFFSET_FACTOR = 0.2f;
+const float  PI                              = 3.1415926f;
+const size_t SHADOW_TEXTURE_SIZE             = 32;
+const size_t SHADOW_VERTICES_COUNT           = 16;
+const float  STATIC_PAGES_Z_OFFSET           = -0.001f;
+const float  TEXCOORD_OFFSET                 = 0.001f;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Параметры вершины необходимые для визуализации
@@ -976,13 +977,18 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
   void DrawLeftTopCornerFlip (low_level::IDevice& device)
   {
     if (page_curl->Mode () == PageCurlMode_SinglePage)
-      throw xtl::format_operation_exception ("render::obsolete::render2d::RenderablePageCurl::DrawLeftBottomCornerFlip", "Can't draw flip for left bottom corner in single page mode");
+      throw xtl::format_operation_exception ("render::obsolete::render2d::RenderablePageCurl::DrawLeftTopCornerFlip", "Can't draw flip for left corner in single page mode");
 
     const math::vec2f& curl_point_position = page_curl->CurlPointPosition ();
     const math::vec2f& curl_point          = page_curl->CurlPoint ();
           math::vec2f  page_size           = page_curl->Size ();
 
     math::vec2f corner_position (curl_point_position.x + curl_point.x, curl_point_position.y - curl_point.y + page_size.y);
+
+    float max_corner_height_offset = corner_position.x * MAX_CORNER_HEIGHT_OFFSET_FACTOR;
+
+    if (corner_position.y > page_size.y && corner_position.y - page_size.y > max_corner_height_offset)
+      corner_position.y = page_size.y + max_corner_height_offset;
 
     page_size.x /= 2;
 
@@ -1061,13 +1067,18 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
   void DrawLeftBottomCornerFlip (low_level::IDevice& device)
   {
     if (page_curl->Mode () == PageCurlMode_SinglePage)
-      throw xtl::format_operation_exception ("render::obsolete::render2d::RenderablePageCurl::DrawLeftBottomCornerFlip", "Can't draw flip for left bottom corner in single page mode");
+      throw xtl::format_operation_exception ("render::obsolete::render2d::RenderablePageCurl::DrawLeftBottomCornerFlip", "Can't draw flip for left corner in single page mode");
 
     const math::vec2f& curl_point_position = page_curl->CurlPointPosition ();
     const math::vec2f& curl_point          = page_curl->CurlPoint ();
           math::vec2f  page_size           = page_curl->Size ();
 
     math::vec2f corner_position (curl_point_position.x + curl_point.x, curl_point_position.y - curl_point.y);
+
+    float max_corner_height_offset = corner_position.x * MAX_CORNER_HEIGHT_OFFSET_FACTOR;
+
+    if (corner_position.y < 0 && -corner_position.y > max_corner_height_offset)
+      corner_position.y = -max_corner_height_offset;
 
     page_size.x /= 2;
 
@@ -1151,6 +1162,11 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
           math::vec2f  page_size           = total_size;
 
     math::vec2f corner_position (curl_point_position.x + curl_point.x - page_size.x, curl_point_position.y - curl_point.y + page_size.y);
+
+    float max_corner_height_offset = fabs (page_size.x - corner_position.x) * MAX_CORNER_HEIGHT_OFFSET_FACTOR;
+
+    if (corner_position.y > page_size.y && corner_position.y - page_size.y > max_corner_height_offset)
+      corner_position.y = page_size.y + max_corner_height_offset;
 
     if (page_curl->Mode () != PageCurlMode_SinglePage)
       page_size.x /= 2;
@@ -1266,6 +1282,11 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
           math::vec2f  page_size           = total_size;
 
     math::vec2f corner_position (curl_point_position.x + curl_point.x - page_size.x, curl_point_position.y - curl_point.y);
+
+    float max_corner_height_offset = fabs (page_size.x - corner_position.x) * MAX_CORNER_HEIGHT_OFFSET_FACTOR;
+
+    if (corner_position.y < 0 && -corner_position.y > max_corner_height_offset)
+      corner_position.y = -max_corner_height_offset;
 
     if (page_curl->Mode () != PageCurlMode_SinglePage)
       page_size.x /= 2;
