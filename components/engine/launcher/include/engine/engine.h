@@ -4,7 +4,7 @@
 #ifdef _WIN32
   #define FUNNER_C_API extern "C" __declspec(dllexport)
 #elif __GNUC__
-  #define FUNNER_C_API extern "C"
+  #define FUNNER_C_API extern "C" __attribute__ ((visibility("default")))
 #else
   #error "Unknown platform"
 #endif
