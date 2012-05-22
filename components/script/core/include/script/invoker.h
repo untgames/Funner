@@ -1,8 +1,6 @@
 #ifndef SCRIPTLIB_INVOKER_HEADER
 #define SCRIPTLIB_INVOKER_HEADER
 
-#include <xtl/type_info_decl.h>
-
 #include <stl/string_fwd>
 
 #include <script/stack.h>
@@ -28,8 +26,8 @@ class InvokerSignature
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Тип возвращаемого значения
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    const xtl::type_info& ResultType    () const;
-    void                  SetResultType (const xtl::type_info& type); //type хранится как обычная ссылка
+    const std::type_info& ResultType    () const;
+    void                  SetResultType (const std::type_info& type); //type хранится как обычная ссылка
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Количество параметров
@@ -39,13 +37,13 @@ class InvokerSignature
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Типы параметров
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    const xtl::type_info& ParameterType    (size_t index) const;
-    void                  SetParameterType (size_t index, const xtl::type_info& type);
+    const std::type_info& ParameterType    (size_t index) const;
+    void                  SetParameterType (size_t index, const std::type_info& type);
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Добавление / удаление типов параметров
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    size_t AddParameterType        (const xtl::type_info& type); //type хранится как обычная ссылка
+    size_t AddParameterType        (const std::type_info& type); //type хранится как обычная ссылка
     void   RemoveParameterType     (size_t index);
     void   RemoveAllParameterTypes ();
     

@@ -4,8 +4,9 @@
 #include <xtl/any.h>
 #include <xtl/common_exceptions.h>
 #include <xtl/functional_traits.h>
-#include <xtl/type_info.h>
 #include <xtl/trackable_ptr.h>
+#include <xtl/type.h>
+#include <xtl/type_list.h>
 
 #include <script/invoker.h>
 #include <script/interpreter.h>

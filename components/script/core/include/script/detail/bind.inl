@@ -301,7 +301,7 @@ struct invoker_impl_base<Signature, Fn, void>: public ISignatureInvoker<Signatur
 
 template <class T> void add_argument_type (InvokerSignature& signature, xtl::type<T>)
 {
-  signature.AddParameterType (xtl::get_type<T> ());
+  signature.AddParameterType (typeid (T));
 }
 
 inline void add_argument_type (InvokerSignature& signature, xtl::type<xtl::detail::void_argument>)
@@ -383,7 +383,7 @@ struct invoker_impl: public invoker_impl_base<Signature, Fn>
   {
     InvokerSignature signature;
     
-    signature.SetResultType (xtl::get_type<result_type> ());
+    signature.SetResultType (typeid (result_type));
     
     add_argument_type (signature, xtl::type<arg1_type> ());
     add_argument_type (signature, xtl::type<arg2_type> ());

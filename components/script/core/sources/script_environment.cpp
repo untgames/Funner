@@ -22,25 +22,10 @@ struct TypeImpl: public Environment::Type, public xtl::reference_counter
 {
   LibraryImpl*          library;   //ссылка на библиотеку
   const std::type_info* std_type;  //стандартный тип
-  const xtl::type_info* ext_type;  //динамический тип  
   
-  TypeImpl (LibraryImpl* in_library, const std::type_info* in_std_type, const xtl::type_info* in_ext_type)
-    : library (in_library), std_type (in_std_type), ext_type (in_ext_type) {}
+  TypeImpl (LibraryImpl* in_library, const std::type_info* in_std_type)
+    : library (in_library), std_type (in_std_type) {}
     
-///Информация о типе
-  bool HasExtendedType ()
-  {
-    return ext_type != 0;
-  }
-  
-  const xtl::type_info& ExtendedType ()
-  {
-    if (!ext_type)
-      throw xtl::format_operation_exception ("script::Environment::Type::ExtendedType", "No extended type information for type '%s'",
-        std_type->name ());
-    
-    return *ext_type;
-  }
   
   const std::type_info& StdType ()
   {
@@ -106,7 +91,7 @@ struct Environment::Impl: public xtl::reference_counter
       else ++i;
   }
   
-  void RegisterType (const char* library_id, const std::type_info* std_type, const xtl::type_info* ext_type)
+  void RegisterType (const char* library_id, const std::type_info* std_type)
   {
     if (!library_id)
       throw xtl::make_null_argument_exception ("script::Environment::RegisterType", "library_id");
@@ -116,7 +101,7 @@ struct Environment::Impl: public xtl::reference_counter
     if (iter == libraries.end ())
       throw xtl::make_argument_exception ("script::Environment::RegisterType", "library_id", library_id, "No library with this id");
 
-    types.insert_pair (std_type, TypePtr (new TypeImpl (iter->second, std_type, ext_type), false));
+    types.insert_pair (std_type, TypePtr (new TypeImpl (iter->second, std_type), false));
   }
   
   private:
@@ -228,22 +213,12 @@ void Environment::RemoveAllLibraries ()
 
 void Environment::RegisterType (const std::type_info& type, const char* library_id)
 {
-  impl->RegisterType (library_id, &type, 0);
-}
-
-void Environment::RegisterType (const xtl::type_info& type, const char* library_id)
-{
-  impl->RegisterType (library_id, &type.std_type (), &type);
+  impl->RegisterType (library_id, &type);
 }
 
 void Environment::UnregisterType (const std::type_info& type)
 {   
   impl->types.erase (&type);
-}
-
-void Environment::UnregisterType (const xtl::type_info& type)
-{   
-  UnregisterType (type.std_type ());
 }
 
 void Environment::UnregisterAllTypes ()

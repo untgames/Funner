@@ -4,16 +4,8 @@
 #include <typeinfo>
 
 #include <xtl/functional_fwd>
-#include <xtl/type_info_decl.h>
 
 #include <script/invoker_registry.h>
-
-namespace xtl
-{
-
-template <class T> const xtl::type_info& get_type ();
-
-}
 
 namespace script
 {
@@ -48,9 +40,7 @@ class Environment
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Информация о типе
 ///////////////////////////////////////////////////////////////////////////////////////////////////        
-        virtual bool                  HasExtendedType () = 0;
-        virtual const xtl::type_info& ExtendedType    () = 0;
-        virtual const std::type_info& StdType         () = 0;
+        virtual const std::type_info& StdType () = 0;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Библиотека шлюзов
@@ -105,9 +95,7 @@ class Environment
 ///Регистрация ассоциаций между C++ RTTI и библиотеками
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void RegisterType       (const std::type_info& type, const char* library_id);
-    void RegisterType       (const xtl::type_info& type, const char* library_id);    
     void UnregisterType     (const std::type_info& type);
-    void UnregisterType     (const xtl::type_info& type);    
     void UnregisterAllTypes ();
     
     template <class T> void RegisterType   (const char* library_id);

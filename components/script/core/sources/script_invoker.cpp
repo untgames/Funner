@@ -288,8 +288,8 @@ InvokerSignature SimpleInvoker::GetSignature ()
 {
   InvokerSignature signature;
   
-  signature.SetResultType    (xtl::get_type<size_t> ());
-  signature.AddParameterType (xtl::get_type<IStack> ());
+  signature.SetResultType    (typeid (size_t));
+  signature.AddParameterType (typeid (IStack));
   
   return signature;
 }
