@@ -24,6 +24,8 @@ class TabletOsApplicationDelegate: public IApplicationDelegate, public xtl::refe
         is_exited           = false;
         listener            = 0;
         custom_event_domain = bps_register_domain ();
+
+        is_active           = true;
         
         if (custom_event_domain < 0)
           raise_error ("::bps_register_domain");
@@ -72,12 +74,15 @@ class TabletOsApplicationDelegate: public IApplicationDelegate, public xtl::refe
       {        
           //обработка очереди сообщений делегата
         
-        while (!IsMessageQueueEmpty ())
-          DoNextEvent ();
-          
+        if (is_active)
+        {
+          while (!IsMessageQueueEmpty ())
+            DoNextEvent ();
+        }
+  
           //обработка системной очереди сообщений
           
-        while (ProcessSystemEvent ());        
+        while (ProcessSystemEvent (0));        
 
           //обработка внутренней очереди сообщений
 
@@ -85,12 +90,12 @@ class TabletOsApplicationDelegate: public IApplicationDelegate, public xtl::refe
         {
           if (IsMessageQueueEmpty () && !is_exited)
           {
-            ProcessSystemEvent ();
+            ProcessSystemEvent (-1);
           }
         }
         else
         {
-          if (listener)
+          if (listener && is_active)
             listener->OnIdle ();
         }                
       }
@@ -159,13 +164,13 @@ class TabletOsApplicationDelegate: public IApplicationDelegate, public xtl::refe
     }    
     
 ///Обработка системного сообщения
-    bool ProcessSystemEvent ()
+    bool ProcessSystemEvent (int timeout)
     {
       try
       {
         bps_event_t *event = 0;
 
-        if (bps_get_event (&event, 0) != BPS_SUCCESS)
+        if (bps_get_event (&event, timeout) != BPS_SUCCESS)
           raise_error ("::bps_get_event");
           
         if (!event)
@@ -270,15 +275,25 @@ class TabletOsApplicationDelegate: public IApplicationDelegate, public xtl::refe
       {
         case NAVIGATOR_INVOKE:
         case NAVIGATOR_EXIT:
-        case NAVIGATOR_WINDOW_STATE:
         case NAVIGATOR_SWIPE_DOWN:
         case NAVIGATOR_SWIPE_START:
+
+        case NAVIGATOR_WINDOW_STATE:
+          break;
         case NAVIGATOR_LOW_MEMORY:
+          break;
+
         case NAVIGATOR_ORIENTATION_CHECK:
         case NAVIGATOR_ORIENTATION:
         case NAVIGATOR_BACK:
+          break;
+
         case NAVIGATOR_WINDOW_ACTIVE:
+          is_active = true;
+          break;
         case NAVIGATOR_WINDOW_INACTIVE:
+          is_active = false;
+          break;
 //        case NAVIGATOR_ORIENTATION_RESULT:
         default:
           break;
@@ -295,6 +310,7 @@ class TabletOsApplicationDelegate: public IApplicationDelegate, public xtl::refe
     int                   custom_event_domain;
     bps_event_t*          wakeup_event;
     bps_event_payload_t   custom_event_payload;
+    bool                  is_active;
 };
 
 }

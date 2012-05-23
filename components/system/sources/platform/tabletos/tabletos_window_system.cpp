@@ -587,7 +587,6 @@ void TabletOsWindowManager::GetWindowRect (window_t handle, Rect& rect)
     
     if (screen_get_window_property_iv (screen_window, SCREEN_PROPERTY_SIZE, size) != BPS_SUCCESS)
       raise_error ("::screen_get_window_property_iv(SCREEN_PROPERTY_SIZE)");
-      
     if (screen_get_window_property_iv (screen_window, SCREEN_PROPERTY_POSITION, position) != BPS_SUCCESS)
       raise_error ("::screen_get_window_property_iv(SCREEN_PROPERTY_POSITION)");
 
