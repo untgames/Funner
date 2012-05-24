@@ -1,0 +1,10 @@
+Results of condition_broadcast_test:
+create mutex & condition
+create thread
+sleep
+wait started
+wait started
+wake
+wait finished
+wait finished
+exit

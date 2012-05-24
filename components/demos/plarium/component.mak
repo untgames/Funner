@@ -1,8 +1,7 @@
 ###################################################################################################
 #Определения и константы
 ###################################################################################################
-TARGETS := DEMOS
+TARGETS := PLARIUM
 
-#Цель №1 - demos
-DEMOS.TYPE       := package
-DEMOS.COMPONENTS := water_slides render2d plarium
+PLARIUM.TYPE       := package
+PLARIUM.COMPONENTS := system hsserver

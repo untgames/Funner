@@ -1,8 +1,9 @@
 ###################################################################################################
 #Определения и константы
 ###################################################################################################
-TARGETS := DEMOS
+TARGETS := HSSERVER.SOURCES
 
-#Цель №1 - demos
-DEMOS.TYPE       := package
-DEMOS.COMPONENTS := water_slides render2d plarium
+HSSERVER.SOURCES.TYPE         := static-lib
+HSSERVER.SOURCES.NAME         := plarium.system
+HSSERVER.SOURCES.INCLUDE_DIRS += include
+HSSERVER.SOURCES.SOURCE_DIRS  += sources
