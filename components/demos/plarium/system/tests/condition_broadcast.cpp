@@ -48,7 +48,7 @@ int main ()
     
     mutex->Unlock ();    
 
-    sleep (1);
+    Thread::Sleep (1000);
     
     printf ("wake\n");
     fflush (stdout);

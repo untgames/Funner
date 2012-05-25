@@ -4,7 +4,7 @@ using namespace plarium::system;
 
 struct Thread::Impl
 {
-  pthread_t thread;
+  uintptr_t thread;
 };
 
 namespace
@@ -16,7 +16,7 @@ struct thread_function_data
   void* thread_arg;
 };
 
-void* thread_function (void* data)
+unsigned int __stdcall thread_function (void* data)
 {
   thread_function_data* thread_data = (thread_function_data*)data;
 
@@ -27,7 +27,7 @@ void* thread_function (void* data)
 
     delete thread_data;
 
-    return start (thread_arg);
+    return (unsigned int)start (thread_arg);
   }
   catch (std::exception& e)
   {
@@ -64,10 +64,10 @@ Thread::Thread (ThreadFunction start, void* thread_arg)
     thread_data->start      = start;
     thread_data->thread_arg = thread_arg;
 
-    int status = pthread_create (&impl->thread, 0, thread_function, thread_data);
+    impl->thread = _beginthreadex (0, 0, &thread_function, thread_data, 0, 0);
 
-    if (status)
-      pthread_raise_error ("::pthread_create", status);
+    if (!impl->thread)
+      throw std::runtime_error (utility::format ("::_beginthreadex, error %s", strerror (errno)));
   }
   catch (...)
   {
@@ -78,6 +78,8 @@ Thread::Thread (ThreadFunction start, void* thread_arg)
 
 Thread::~Thread ()
 {
+  CloseHandle ((HANDLE)impl->thread);
+
   delete impl;
 }
 
@@ -87,14 +89,14 @@ Thread::~Thread ()
 
 int Thread::Join ()
 {
-  void* exit_code = 0;
+  if (WaitForSingleObject ((HANDLE)impl->thread, INFINITE) == WAIT_FAILED)
+    raise_error ("::WaitForSingleObject");
 
-  int status = pthread_join (impl->thread, &exit_code);
+  DWORD exit_code;
 
-  if (status)
-    pthread_raise_error ("::pthread_join", status);
+  GetExitCodeThread ((HANDLE)impl->thread, &exit_code);
 
-  return (int)exit_code;
+  return exit_code;
 }
 
 /*
@@ -103,5 +105,5 @@ int Thread::Join ()
 
 void Thread::Sleep (size_t milliseconds)
 {
-  usleep (miliseconds * 1000);
+  ::Sleep (milliseconds);
 }
