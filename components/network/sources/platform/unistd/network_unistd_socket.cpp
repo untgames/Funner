@@ -87,7 +87,7 @@ class UnistdSocket : public SocketImpl, public xtl::reference_counter
 
     ~UnistdSocket ()
     {
-      if (!close (socket))
+      if (close (socket))
       {
         common::Log log (LOG_NAME);
 
