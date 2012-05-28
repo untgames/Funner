@@ -9,6 +9,7 @@
 #include <bps/screen.h>
 #include <bps/bps.h>
 #include <bps/event.h>
+#include <bps/sensor.h>
 #include <sys/keycodes.h>
 #include <input/event_types.h>
 #include <input/screen_helpers.h>
@@ -22,7 +23,9 @@
 #include <xtl/string.h>
 
 #include <common/log.h>
+#include <common/property_map.h>
 #include <common/singleton.h>
+#include <common/strlib.h>
 #include <common/time.h>
 #include <common/utf_converter.h>
 

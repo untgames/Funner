@@ -96,14 +96,17 @@ struct WindowImpl: public IWindowImpl
   void*                user_data;                        //пользовательские данные окна
 
   bool                 background_state;
-  bool                 is_multitouch_enabled;  
+  bool                 is_multitouch_enabled;
+
+  Rect                 window_rect;  
 ///Constructor
   WindowImpl ()
     : screen_window (0),
       message_handler (),
       user_data (), 
       background_state (false),
-      is_multitouch_enabled (false)
+      is_multitouch_enabled (false),
+      window_rect (0, 0, 0, 0)
   {
     try
     {
@@ -193,6 +196,7 @@ struct WindowImpl: public IWindowImpl
       context.touches_count = 1;
       context.touches[0].position.x = mtouch_event.x;
       context.touches[0].position.y = mtouch_event.y;
+printf("----touch %d %d\n",mtouch_event.x,mtouch_event.y);
 
       int id;
       if (screen_get_event_property_iv (event, SCREEN_PROPERTY_TOUCH_ID, &id))
@@ -265,6 +269,7 @@ struct WindowImpl: public IWindowImpl
 
       int visible;
       int property;
+  
       if (screen_get_event_property_iv (event, SCREEN_PROPERTY_NAME, &property))
         raise_error ("::screen_get_event_property_iv SCREEN_PROPERTY_NAME");
       
@@ -279,7 +284,14 @@ struct WindowImpl: public IWindowImpl
           break; 
 
         case SCREEN_PROPERTY_SOURCE_SIZE:
+printf("------------------SCREEN_PROPERTY_SOURCE_SIZE\n");
+          Notify (WindowEvent_OnSize, context);
+          Notify (WindowEvent_OnChangeViewport, context);
+          break;
+
         case SCREEN_PROPERTY_SOURCE_POSITION:
+printf("------------------SCREEN_PROPERTY_SOURCE_POSITION\n");
+          Notify (WindowEvent_OnMove, context);
           Notify (WindowEvent_OnChangeViewport, context);
           break;
  
@@ -548,14 +560,27 @@ void TabletOsWindowManager::SetWindowRect (window_t handle, const Rect& rect)
 
     int size [2] = {rect.right - rect.left, rect.bottom - rect.top}, position [2] = {rect.left, rect.top};
 
-    if (screen_set_window_property_iv (screen_window, SCREEN_PROPERTY_SIZE, size) != BPS_SUCCESS)
+printf("--------------- SetWindowRect %d %d\n",size[0],size[1]);
+/*     (screen_set_window_property_iv (screen_window, SCREEN_PROPERTY_SIZE, size) != BPS_SUCCESS)
       raise_error ("::screen_set_window_property_iv(SCREEN_PROPERTY_SIZE)");
 
     if (screen_set_window_property_iv (screen_window, SCREEN_PROPERTY_POSITION, position) != BPS_SUCCESS)
       raise_error ("::screen_set_window_property_iv(SCREEN_PROPERTY_POSITION)");
-      
+*/
+    if (screen_set_window_property_iv (screen_window, SCREEN_PROPERTY_SOURCE_POSITION, position) != BPS_SUCCESS)
+      raise_error ("::screen_set_window_property_iv(SCREEN_PROPERTY_SOURCE_POSITION)");
+
     if (screen_set_window_property_iv (screen_window, SCREEN_PROPERTY_SOURCE_SIZE, size) != BPS_SUCCESS)
       raise_error ("::screen_set_window_property_iv(SCREEN_PROPERTY_SOURCE_SIZE)");    
+
+    WindowImpl *window = (WindowImpl*)handle;
+    window->window_rect.left   = rect.left;
+    window->window_rect.right  = rect.right; 
+    window->window_rect.top    = rect.top;   
+    window->window_rect.bottom = rect.bottom;
+
+screen_get_window_property_iv (screen_window, SCREEN_PROPERTY_SOURCE_SIZE, size);
+printf("--------------- SetWindowRect get %d %d\n",size[0],size[1]);
   }
   catch (xtl::exception& exception)
   {
@@ -582,18 +607,34 @@ void TabletOsWindowManager::GetWindowRect (window_t handle, Rect& rect)
   try
   {
     screen_window_t screen_window = (screen_window_t) GetNativeWindowHandle (handle);
+    WindowImpl *window = (WindowImpl*)handle;
     
     int size [2] = {0, 0}, position [2] = {0, 0};
     
-    if (screen_get_window_property_iv (screen_window, SCREEN_PROPERTY_SIZE, size) != BPS_SUCCESS)
-      raise_error ("::screen_get_window_property_iv(SCREEN_PROPERTY_SIZE)");
-    if (screen_get_window_property_iv (screen_window, SCREEN_PROPERTY_POSITION, position) != BPS_SUCCESS)
-      raise_error ("::screen_get_window_property_iv(SCREEN_PROPERTY_POSITION)");
+    if (screen_get_window_property_iv (screen_window, SCREEN_PROPERTY_SOURCE_SIZE, size) != BPS_SUCCESS)
+    {
+      size [0] = window->window_rect.right - window->window_rect.left;
+      size [1] = window->window_rect.bottom - window->window_rect.top;
+printf("------get size error %d %d\n",size[0],size[1]);
+    }
+printf("------get size %d %d\n",size[0],size[1]);
+
+    if (screen_get_window_property_iv (screen_window, SCREEN_PROPERTY_SOURCE_POSITION, position) != BPS_SUCCESS)
+    {
+      position [0] = window->window_rect.left;
+      position [1] = window->window_rect.top;
+    }
 
     rect.left   = position [0];
     rect.right  = position [0] + size [0];
     rect.top    = position [1];
     rect.bottom = position [1] + size [1];
+
+printf("-------size window_rect %d %d %d %d \n",rect.left,rect.right,rect.top,rect.bottom);
+    window->window_rect.left   = rect.left;
+    window->window_rect.right  = rect.right; 
+    window->window_rect.top    = rect.top;   
+    window->window_rect.bottom = rect.bottom;
   }
   catch (xtl::exception& exception)
   {
@@ -659,8 +700,14 @@ void TabletOsWindowManager::SetWindowFlag (window_t handle, WindowFlag flag, boo
           raise_error ("::screen_get_display_property_pv SCREEN_PROPERTY_MODE");                
           
         Rect rect (0, 0, screen_mode.width, screen_mode.height);
+
+printf("--------------- WindowFlag_Maximized wh %d %d\n",screen_mode.width,screen_mode.height);
           
         SetWindowRect (handle, rect);
+
+int size[2];
+screen_get_window_property_iv (screen_window, SCREEN_PROPERTY_SOURCE_SIZE, size);
+printf("--------------- WindowFlag_Maximized    %d %d\n",size[0],size[1]);
 
         break;
       }
