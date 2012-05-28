@@ -7,7 +7,7 @@ TARGETS := SYSTEMLIB.SOURCES SYSTEMLIB.TESTS
 SYSTEMLIB.SOURCES.TYPE               := static-lib
 SYSTEMLIB.SOURCES.NAME               := plarium.system
 SYSTEMLIB.SOURCES.IMPORTS            := compile.plarium.system
-SYSTEMLIB.SOURCES.SOURCE_DIRS        := sources/utility
+SYSTEMLIB.SOURCES.SOURCE_DIRS        := sources/utility sources/common
 SYSTEMLIB.SOURCES.win32.SOURCE_DIRS  := sources/windows
 SYSTEMLIB.SOURCES.unistd.SOURCE_DIRS := sources/pthread
 
