@@ -103,5 +103,5 @@ int Thread::Join ()
 
 void Thread::Sleep (size_t milliseconds)
 {
-  usleep (miliseconds * 1000);
+  usleep (milliseconds * 1000);
 }
