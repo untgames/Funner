@@ -1,0 +1,3 @@
+Results of sha256_test:
+HMAC for key '' and data '' correct - y
+HMAC for key 'key' and data 'The quick brown fox jumps over the lazy dog' correct - y
