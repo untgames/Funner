@@ -16,22 +16,29 @@ Test TESTS [] = {
 
 int main ()
 {
-  printf ("Results of sha256_test:\n");
+  printf ("Results of hmac_sha256_test:\n");
 
-  try
+  unsigned char hash [32];
+
+  printf ("One-time hash results:\n");
+
+  for (size_t i = 0, count = sizeof (TESTS) / sizeof (*TESTS); i < count; i++)
   {
-    unsigned char hash [32];
+    hmac_sha256 (TESTS [i].key, strlen (TESTS [i].key), TESTS [i].data, strlen (TESTS [i].data), hash);
 
-    for (size_t i = 0, count = sizeof (TESTS) / sizeof (*TESTS); i < count; i++)
-    {
-      hmac_sha256 (TESTS [i].key, strlen (TESTS [i].key), TESTS [i].data, strlen (TESTS [i].data), hash);
-
-      printf ("HMAC for key '%s' and data '%s' correct - %c\n", TESTS [i].key, TESTS [i].data, memcmp (hash, TESTS [i].result, sizeof (hash)) ? 'n' : 'y');
-    }
+    printf ("HMAC for key '%s' and data '%s' correct - %c\n", TESTS [i].key, TESTS [i].data, memcmp (hash, TESTS [i].result, sizeof (hash)) ? 'n' : 'y');
   }
-  catch (std::exception& exception)
+
+  printf ("Context usage hash results:\n");
+
+  for (size_t i = 0, count = sizeof (TESTS) / sizeof (*TESTS); i < count; i++)
   {
-    printf ("exception: %s\n", exception.what ());
+    HmacSha256Context context (TESTS [i].key, strlen (TESTS [i].key));
+
+    context.Update (TESTS [i].data, strlen (TESTS [i].data));
+    context.Finish (hash);
+
+    printf ("HMAC for key '%s' and data '%s' correct - %c\n", TESTS [i].key, TESTS [i].data, memcmp (hash, TESTS [i].result, sizeof (hash)) ? 'n' : 'y');
   }
 
   return 0;

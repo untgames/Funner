@@ -1,6 +1,51 @@
 #include "shared.h"
 
-#ifndef __APPLE__
+using namespace plarium::utility;
+
+#ifdef __APPLE__
+
+struct Sha256Context::Impl
+{
+  bool          need_init;  //init has to be called before hash calculation
+  CC_SHA256_CTX context;
+
+  Impl ()
+    : need_init (true)
+    {}
+
+  void Init ()
+  {
+    CC_SHA256_Init (&context);
+
+    need_init = false;
+  }
+
+  void Update (const void* data, size_t data_size)
+  {
+    if (!data && data_size)
+      throw std::invalid_argument ("Sha256Context::Update - null data");
+
+    if (need_init)
+      Init ();
+
+    CC_SHA256_Update (&context, data, data_size);
+  }
+
+  void Finish (unsigned char result_hash_value [32])
+  {
+    if (!result_hash_value)
+      throw std::invalid_argument ("Sha256Context::Finish - null result_hash_value");
+
+    if (need_init)
+      Init ();
+
+    CC_SHA256_Final (result_hash_value, &context);
+
+    need_init = true;
+  }
+};
+
+#else
 
 namespace
 {
@@ -270,6 +315,47 @@ void CC_SHA256 (const void* data, size_t size, unsigned char result_hash_value [
 
 }
 
+struct Sha256Context::Impl
+{
+  bool           need_init;  //init has to be called before hash calculation
+  sha256_context context;
+
+  Impl ()
+    : need_init (true)
+    {}
+
+  void Init ()
+  {
+    sha256_starts (&context);
+
+    need_init = false;
+  }
+
+  void Update (const void* data, size_t data_size)
+  {
+    if (!data && data_size)
+      throw std::invalid_argument ("Sha256Context::Update - null data");
+
+    if (need_init)
+      Init ();
+
+    sha256_update (&context, (uint8*)data, data_size);
+  }
+
+  void Finish (unsigned char result_hash_value [32])
+  {
+    if (!result_hash_value)
+      throw std::invalid_argument ("Sha256Context::Finish - null result_hash_value");
+
+    if (need_init)
+      Init ();
+
+    sha256_finish (&context, result_hash_value);
+
+    need_init = true;
+  }
+};
+
 #endif
 
 namespace plarium
@@ -285,4 +371,36 @@ void sha256 (const void* data, size_t size, unsigned char result_hash_value [32]
 
 }
 
+}
+
+/*
+   Constructor / destructor
+*/
+
+Sha256Context::Sha256Context ()
+  : impl (new Impl)
+{
+}
+
+Sha256Context::~Sha256Context ()
+{
+  delete impl;
+}
+
+/*
+   Update
+*/
+
+void Sha256Context::Update (const void* data, size_t data_size)
+{
+  impl->Update (data, data_size);
+}
+
+/*
+   Finish hash calculation and write result data to output buffer
+*/
+
+void Sha256Context::Finish (unsigned char result_hash_value [32])
+{
+  impl->Finish (result_hash_value);
 }

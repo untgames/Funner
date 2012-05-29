@@ -17,20 +17,27 @@ int main ()
 {
   printf ("Results of sha256_test:\n");
 
-  try
+  unsigned char hash [32];
+
+  printf ("One-time hash results:\n");
+
+  for (size_t i = 0, count = sizeof (TESTS) / sizeof (*TESTS); i < count; i++)
   {
-    unsigned char hash [32];
+    sha256 (TESTS [i].source, strlen (TESTS [i].source), hash);
 
-    for (size_t i = 0, count = sizeof (TESTS) / sizeof (*TESTS); i < count; i++)
-    {
-      sha256 (TESTS [i].source, strlen (TESTS [i].source), hash);
-
-      printf ("Hash for '%s' correct - %c\n", TESTS [i].source, memcmp (hash, TESTS [i].result, sizeof (hash)) ? 'n' : 'y');
-    }
+    printf ("Hash for '%s' correct - %c\n", TESTS [i].source, memcmp (hash, TESTS [i].result, sizeof (hash)) ? 'n' : 'y');
   }
-  catch (std::exception& exception)
+
+  printf ("Context usage hash results:\n");
+
+  for (size_t i = 0, count = sizeof (TESTS) / sizeof (*TESTS); i < count; i++)
   {
-    printf ("exception: %s\n", exception.what ());
+    Sha256Context context;
+
+    context.Update (TESTS [i].source, strlen (TESTS [i].source));
+    context.Finish (hash);
+
+    printf ("Hash for '%s' correct - %c\n", TESTS [i].source, memcmp (hash, TESTS [i].result, sizeof (hash)) ? 'n' : 'y');
   }
 
   return 0;

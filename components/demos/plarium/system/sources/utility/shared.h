@@ -1,6 +1,7 @@
 #include <cstdio>
 #include <cstdarg>
 #include <string>
+#include <stdexcept>
 
 #ifdef __APPLE__
 
