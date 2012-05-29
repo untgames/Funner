@@ -35,7 +35,9 @@ int main ()
   {
     HmacSha256Context context (TESTS [i].key, strlen (TESTS [i].key));
 
-    context.Update (TESTS [i].data, strlen (TESTS [i].data));
+    for (size_t j = 0, count = strlen (TESTS [i].data); j < count; j++)
+      context.Update (TESTS [i].data + j, 1);
+
     context.Finish (hash);
 
     printf ("HMAC for key '%s' and data '%s' correct - %c\n", TESTS [i].key, TESTS [i].data, memcmp (hash, TESTS [i].result, sizeof (hash)) ? 'n' : 'y');

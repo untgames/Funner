@@ -1,0 +1,43 @@
+#ifndef UTILITY_CRYPTO_HEADER
+#define UTILITY_CRYPTO_HEADER
+
+namespace plarium
+{
+
+namespace utility
+{
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///AES-OFB crypto context
+///////////////////////////////////////////////////////////////////////////////////////////////////
+class AesOfbContext
+{
+  public:
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Constructor / destructor (if iv == 0, constructor generates random iv)
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    AesOfbContext  (const void* key, size_t key_bits, const unsigned char iv [16] = 0);
+    ~AesOfbContext ();
+
+//////////////////////////////////////////////////////////////////////////////////////////////////
+///Encryption / decryption
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void Update (size_t data_size, const void* src_buffer, void* dst_buffer);
+
+  private:
+    AesOfbContext (const AesOfbContext&);             //no impl
+    AesOfbContext& operator = (const AesOfbContext&); //no impl
+
+  private:
+    struct Impl;
+    Impl* impl;
+};
+
+///if iv == 0, constructor generates random iv
+void aes_ofb (const void* key, size_t key_bits, size_t data_size, const void* src_buffer, void* dst_buffer, const unsigned char iv [16] = 0);
+
+}
+
+}
+
+#endif

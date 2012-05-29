@@ -34,7 +34,9 @@ int main ()
   {
     Sha256Context context;
 
-    context.Update (TESTS [i].source, strlen (TESTS [i].source));
+    for (size_t j = 0, count = strlen (TESTS [i].source); j < count; j++)
+      context.Update (TESTS [i].source + j, 1);
+
     context.Finish (hash);
 
     printf ("Hash for '%s' correct - %c\n", TESTS [i].source, memcmp (hash, TESTS [i].result, sizeof (hash)) ? 'n' : 'y');

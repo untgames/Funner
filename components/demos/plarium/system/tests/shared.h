@@ -6,6 +6,7 @@
 #include <string>
 #include <stdexcept>
 
+#include <utility/crypto.h>
 #include <utility/hash.h>
 #include <utility/utils.h>
 

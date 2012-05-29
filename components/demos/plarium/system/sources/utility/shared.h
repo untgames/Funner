@@ -10,5 +10,6 @@
 
 #endif
 
+#include <utility/crypto.h>
 #include <utility/hash.h>
 #include <utility/utils.h>
