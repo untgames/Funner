@@ -1,0 +1,10 @@
+Results of instance_counter_test:
+instance groups:
+  type=A, count=3
+  type=B, count=0
+instance groups:
+  type=A, count=5
+  type=B, count=2
+instance groups:
+  type=A, count=3
+  type=B, count=0
