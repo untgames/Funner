@@ -173,6 +173,12 @@ namespace utility
 
 void hmac_sha256 (const void* key, size_t key_size, const void* data, size_t data_size, unsigned char result_hash_value [32])
 {
+  if (!key)
+    throw std::invalid_argument ("plarium::utility::hmac_sha256 - null key");
+
+  if (!data && data_size)
+    throw std::invalid_argument ("plarium::utility::hmac_sha256 - null data");
+
 #ifdef __APPLE__
   CCHmac (kCCHmacAlgSHA256, key, key_size, data, data_size, result_hash_value);
 #else

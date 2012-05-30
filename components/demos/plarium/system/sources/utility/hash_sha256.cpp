@@ -366,6 +366,9 @@ namespace utility
 
 void sha256 (const void* data, size_t size, unsigned char result_hash_value [32])
 {
+  if (!data && size)
+    throw std::invalid_argument ("plarium::utility::sha256 - null data");
+
   CC_SHA256 (data, size, result_hash_value);
 }
 

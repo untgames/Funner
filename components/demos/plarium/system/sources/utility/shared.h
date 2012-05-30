@@ -5,6 +5,7 @@
 
 #ifdef __APPLE__
 
+#include <CommonCrypto/CommonCryptor.h>
 #include <CommonCrypto/CommonDigest.h>
 #include <CommonCrypto/CommonHMAC.h>
 
