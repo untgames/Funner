@@ -20,6 +20,8 @@ class TabletOsApplicationDelegate: public IApplicationDelegate, public xtl::refe
     {
       try
       {
+        platform_initialize ();
+
         idle_enabled        = false;
         is_exited           = false;
         listener            = 0;
@@ -81,7 +83,6 @@ class TabletOsApplicationDelegate: public IApplicationDelegate, public xtl::refe
         }
   
           //обработка системной очереди сообщений
-          
         while (ProcessSystemEvent (0));        
 
           //обработка внутренней очереди сообщений
@@ -182,11 +183,18 @@ class TabletOsApplicationDelegate: public IApplicationDelegate, public xtl::refe
         {
           HandleScreenEvent (event);
         }
-        else if (domain == navigator_get_domain())
+        else 
         {
-          HandleNavigatorEvent (event);
+          if (domain == navigator_get_domain())
+          {
+            HandleNavigatorEvent (event);
+          }        
+          else if (domain == sensor_get_domain())
+          {
+            HandleSensorEvent (event);
+          }
         }        
-        
+              
         return true;
       }
       catch (xtl::exception& e)
@@ -298,6 +306,62 @@ class TabletOsApplicationDelegate: public IApplicationDelegate, public xtl::refe
         default:
           break;
       }
+    }
+
+///Обработка событий сенсоров
+    void HandleSensorEvent (bps_event_t *event)
+    {
+      unsigned int event_code = bps_event_get_code(event);
+      sensor_type_t sensor;
+
+      switch (event_code)
+      {
+        case SENSOR_ACCELEROMETER_READING: 
+          sensor = SENSOR_TYPE_ACCELEROMETER;
+          break; 
+        case SENSOR_MAGNETOMETER_READING:   
+          sensor = SENSOR_TYPE_MAGNETOMETER;
+          break; 
+        case SENSOR_GYROSCOPE_READING:   
+          sensor = SENSOR_TYPE_GYROSCOPE;
+          break; 
+        case SENSOR_AZIMUTH_PITCH_ROLL_READING:   
+          sensor = SENSOR_TYPE_AZIMUTH_PITCH_ROLL;
+          break; 
+        case SENSOR_ALTIMETER_READING:   
+          sensor = SENSOR_TYPE_ALTIMETER;
+          break; 
+        case SENSOR_TEMPERATURE_READING:   
+          sensor = SENSOR_TYPE_TEMPERATURE;
+          break; 
+        case SENSOR_PROXIMITY_READING:   
+          sensor = SENSOR_TYPE_PROXIMITY;
+          break; 
+        case SENSOR_LIGHT_READING:   
+          sensor = SENSOR_TYPE_LIGHT;
+          break; 
+        case SENSOR_GRAVITY_READING:   
+          sensor = SENSOR_TYPE_GRAVITY;
+          break; 
+        case SENSOR_LINEAR_ACCEL_READING:   
+          sensor = SENSOR_TYPE_LINEAR_ACCEL;
+          break; 
+        case SENSOR_ROTATION_VECTOR_READING:   
+          sensor = SENSOR_TYPE_ROTATION_VECTOR;
+          break; 
+        case SENSOR_ROTATION_MATRIX_READING:   
+          sensor = SENSOR_TYPE_ROTATION_MATRIX;
+          break;
+        default:
+//---------------- добавить обработку исключения??????
+          break; 
+      }
+      ISensorImpl* sensor_impl = SensorRegistry::FindSensor (sensor);
+
+      if (!sensor_impl)
+        return;
+
+      sensor_impl->OnSensorEvent (sensor, event);
     }
     
     static const int WAKEUP_EVENT_CODE = 0;

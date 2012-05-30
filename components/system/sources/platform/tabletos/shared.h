@@ -50,6 +50,8 @@ class IWindowImpl
 {
   public:
     virtual void OnWindowEvent (int event_type, screen_event_t event) = 0;
+  protected:
+    virtual ~IWindowImpl() {}
 };
 
 class WindowRegistry
@@ -59,6 +61,23 @@ class WindowRegistry
     static void UnregisterWindow (screen_window_t window);    
 
     static IWindowImpl* FindWindow (screen_window_t window);
+};
+
+class ISensorImpl
+{
+  public:
+    virtual void OnSensorEvent (int event_type, bps_event_t *event) = 0;
+  protected:
+    virtual ~ISensorImpl() {}
+};
+
+class SensorRegistry
+{
+  public:
+    static void RegisterSensor   (sensor_type_t sensor, ISensorImpl* impl);
+    static void UnregisterSensor (sensor_type_t sensor);    
+
+    static ISensorImpl* FindSensor (sensor_type_t sensor);
 };
 
 }

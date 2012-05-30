@@ -1,31 +1,35 @@
 #include "shared.h"
 
-namespace syslib
+using namespace syslib;
+using namespace syslib::tabletos;
+
+namespace
 {
 
-class TabletOsSensorHandler
+class TabletOsSensor : public ISensorImpl
 {
   friend class TabletOsSensorManagerImpl;
   friend class TabletOsSensorManager;
 
   public:
-    TabletOsSensorHandler (sensor_type_t t):
+    TabletOsSensor (sensor_type_t t):
       type (t),
-      rate (0)
+      rate (25000),
+      listener ()
     {
       try
       {
-        sensor_info (type, &info);
-//sensor_info возвращает ошибку, но данные потом удут корректные ?????????
+        if (sensor_info (type, &info) == BPS_FAILURE)
+          tabletos::raise_error ("::sensor_info");
       }
       catch (xtl::exception& e)
       {
-        e.touch ("syslib::tabletos::TabletOsSensorHandler::TabletOsSensorHandler");
+        e.touch ("syslib::tabletos::TabletOsSensor::TabletOsSensor");
         throw;
       }
     }
-
-    ~TabletOsSensorHandler ()
+ 
+    ~TabletOsSensor ()
     {
       try
       {
@@ -34,11 +38,11 @@ class TabletOsSensorHandler
       }
       catch (xtl::exception& e)
       {
-        e.touch ("syslib::tabletos::TabletOsSensorHandler::~TabletOsSensorHandler");
+        e.touch ("syslib::tabletos::TabletOsSensor::~TabletOsSensor");
         throw;
       }
     }
-
+ 
     sensor_type_t GetType ()
     {
       return type;
@@ -53,12 +57,13 @@ class TabletOsSensorHandler
     {
       try
       {
+        rate = r;
         if (sensor_set_rate (type, r) == BPS_FAILURE);
           tabletos::raise_error ("::sensor_set_rate");
       }
       catch (xtl::exception& e)
       {
-        e.touch ("syslib::tabletos::TabletOsSensorHandler::SetRate");
+        e.touch ("syslib::tabletos::TabletOsSensor::SetRate");
         throw;
       }
     }
@@ -92,10 +97,114 @@ class TabletOsSensorHandler
       properties.SetProperty ("Power", float_val);
     }
 
+    void StartSensorPolling (ISensorEventListener &l)
+    {
+      try
+      {
+        if (sensor_set_rate (type, rate) == BPS_FAILURE)
+          tabletos::raise_error ("::sensor_set_rate");
+
+        if (sensor_set_skip_duplicates (type, true) == BPS_FAILURE)
+          tabletos::raise_error ("::sensor_set_skip_duplicates");
+
+        if (sensor_request_events (type) == BPS_FAILURE)
+         tabletos::raise_error ("::sensor_request_events");
+     
+        listener = &l;
+      }
+      catch (xtl::exception& e)
+      {
+        e.touch ("syslib::tabletos::TabletOsSensor::StartSensorPolling");
+        throw;
+      }
+    }
+
+    void StopSensorPolling ()
+    {
+      try
+      {
+        listener = 0;
+        if ( sensor_stop_events (type) == BPS_FAILURE);
+          raise_error ("::sensor_stop_events");
+      }
+      catch (xtl::exception& e)
+      {
+        e.touch ("syslib::tabletos::TabletOsSensor::StopSensorPolling");
+        throw;
+      }
+    }
+         
+    void OnSensorEvent (int event_type, bps_event_t *event)
+    {
+      try
+      {
+        if (!listener)
+          return;
+
+        SensorEvent sensor_event;
+        sensor_event.timestamp = common::milliseconds ();
+
+        switch (type)
+        {
+          case SENSOR_TYPE_ACCELEROMETER:
+          case SENSOR_TYPE_MAGNETOMETER:       
+          case SENSOR_TYPE_GYROSCOPE:          
+          case SENSOR_TYPE_LINEAR_ACCEL:
+          case SENSOR_TYPE_GRAVITY:            
+            sensor_event.values_count = 3;
+            if (sensor_event_get_xyz (event, &sensor_event.data[0], &sensor_event.data[1], &sensor_event.data[2]) == BPS_FAILURE)
+              raise_error ("::sensor_event_get_xyz");
+            break;      
+
+          case SENSOR_TYPE_AZIMUTH_PITCH_ROLL: 
+            sensor_event.values_count = 3;
+            if (sensor_event_get_apr (event, &sensor_event.data[0], &sensor_event.data[1], &sensor_event.data[2]))       
+              raise_error ("::sensor_event_get_apr");
+            break;      
+          case SENSOR_TYPE_ALTIMETER:          
+            sensor_event.values_count = 1;
+            sensor_event.data[0] = sensor_event_get_altitude (event);
+            break;      
+          case SENSOR_TYPE_TEMPERATURE:        
+            sensor_event.values_count = 1;
+            sensor_event.data[0] = sensor_event_get_temperature (event);
+            break;      
+          case SENSOR_TYPE_PROXIMITY:          
+            sensor_event.values_count = 1;
+            sensor_event.data[0] = sensor_event_get_proximity (event);
+            break;      
+          case SENSOR_TYPE_LIGHT:              
+            sensor_event.values_count = 1;
+            sensor_event.data[0] = sensor_event_get_illuminance (event);
+            break;      
+          case SENSOR_TYPE_ROTATION_VECTOR:    
+            sensor_event.values_count = 4;
+            if (sensor_event_get_rotation_vector (event, (sensor_rotation_vector_t*)sensor_event.data))       
+              raise_error ("::sensor_event_get_rotation_vector");
+            break;      
+          case SENSOR_TYPE_ROTATION_MATRIX:    
+            sensor_event.values_count = 9;
+            if (sensor_event_get_rotation_matrix (event, (sensor_rotation_matrix_t*)sensor_event.data))       
+              raise_error ("::sensor_event_get_rotation_matrix");
+            break;      
+          default:                             
+            break;      
+        }
+
+        listener->OnSensorChanged (sensor_event);
+      }
+      catch (xtl::exception& e)
+      {
+        e.touch ("syslib::tabletos::TabletOsSensor::OnSensorEvent");
+        throw;
+      }    
+    }
+           
   private:
     sensor_type_t type;
     sensor_info_t *info;
     unsigned int rate;
+    ISensorEventListener *listener;
 };
 
 class TabletOsSensorManagerImpl
@@ -103,38 +212,76 @@ class TabletOsSensorManagerImpl
   public:
     TabletOsSensorManagerImpl ()
     {
-      sensor_type_t sens[] = {SENSOR_TYPE_ACCELEROMETER,SENSOR_TYPE_MAGNETOMETER,SENSOR_TYPE_GYROSCOPE,
+      static sensor_type_t sens[] = {SENSOR_TYPE_ACCELEROMETER,SENSOR_TYPE_MAGNETOMETER,SENSOR_TYPE_GYROSCOPE,
         SENSOR_TYPE_AZIMUTH_PITCH_ROLL,SENSOR_TYPE_ALTIMETER,SENSOR_TYPE_TEMPERATURE,SENSOR_TYPE_PROXIMITY,
         SENSOR_TYPE_LIGHT,SENSOR_TYPE_GRAVITY,SENSOR_TYPE_LINEAR_ACCEL,SENSOR_TYPE_ROTATION_VECTOR,
         SENSOR_TYPE_ROTATION_MATRIX};
 
-      for (unsigned int i=0; i<sizeof (sens) / sizeof (sensor_type_t); i++)
+      platform_initialize ();
+
+      for (unsigned int i=0; i<sizeof (sens) / sizeof (*sens); i++)
         if (sensor_is_supported (sens [i]))
-          sensors.push_back (sens [i]);
+          avalible_sensors.push_back (sens [i]);
     }
 
     size_t GetSensorsCount ()
     {
-      return sensors.size ();
+      return avalible_sensors.size ();
     }
 
-    TabletOsSensorHandler *CreateHandler (size_t index)
+    TabletOsSensor *CreateHandler (size_t index)
     {
-      TabletOsSensorHandler *handler = new TabletOsSensorHandler (sensors [index]);
+      TabletOsSensor *handler = new TabletOsSensor (avalible_sensors [index]);
       return handler;
     } 
 
-    void DestroyHandler (TabletOsSensorHandler *handler)
+    void DestroyHandler (TabletOsSensor *handler)
     {
       delete handler;
-    } 
+    }
+
+    void RegisterSensor (sensor_type_t type, ISensorImpl *impl)
+    {
+      if (!impl)
+        throw xtl::make_null_argument_exception ("", "impl");
+
+      sensors.insert_pair (type, impl);
+    }
+
+    void UnregisterSensor (sensor_type_t type)
+    {
+      sensors.erase (type);
+    }
+
+    ISensorImpl* FindSensor (sensor_type_t sensor)
+    {
+      try
+      {
+        SensorMap::iterator iter = sensors.find (sensor);
+
+        if (iter == sensors.end ())
+          return 0;
+
+        return iter->second;
+      }
+      catch (xtl::exception& e)
+      {
+        e.touch ("syslib::tabletos::TabletOsSensorManagerImpl::FindSensor (sensor)");
+        throw;
+      }
+    }
 
   private:
-    stl::vector<sensor_type_t> sensors;
+    typedef stl::vector<sensor_type_t> SensorVector;
+    typedef stl::hash_map<sensor_type_t, ISensorImpl*> SensorMap;
+
+  private:
+    SensorVector avalible_sensors;
+    SensorMap sensors;
 };
 
 typedef common::Singleton<TabletOsSensorManagerImpl> TabletOsSensorManagerImplSingleton;
-
+}
 
 /*
     Количество сенсоров
@@ -169,7 +316,7 @@ sensor_t TabletOsSensorManager::CreateSensor (size_t sensor_index)
 
 void TabletOsSensorManager::DestroySensor (sensor_t sensor)
 {
-  TabletOsSensorManagerImplSingleton::Instance ()->DestroyHandler ((TabletOsSensorHandler*)sensor);
+  TabletOsSensorManagerImplSingleton::Instance ()->DestroyHandler ((TabletOsSensor*)sensor);
 }
 
 /*
@@ -201,7 +348,7 @@ stl::string TabletOsSensorManager::GetSensorType (sensor_t handle)
     if (!handle)   
       throw xtl::make_null_argument_exception ("", "handle");    
       
-    int type = ((TabletOsSensorHandler*)handle)->GetType ();
+    int type = ((TabletOsSensor*)handle)->GetType ();
     
     switch (type)
     {
@@ -238,7 +385,7 @@ float TabletOsSensorManager::GetSensorMaxRange (sensor_t sensor)
     if (!sensor)   
       throw xtl::make_null_argument_exception ("", "sensor");
 
-    return ((TabletOsSensorHandler*)sensor)->MaxRange ();
+    return ((TabletOsSensor*)sensor)->MaxRange ();
   }
   catch (xtl::exception& e)
   {
@@ -258,7 +405,7 @@ void TabletOsSensorManager::SetSensorUpdateRate (sensor_t sensor, float rate)
     if (!sensor)   
       throw xtl::make_null_argument_exception ("", "sensor");
 
-    ((TabletOsSensorHandler*)sensor)->SetRate (rate);
+    ((TabletOsSensor*)sensor)->SetRate (rate);
   }
   catch (xtl::exception& e)
   {
@@ -274,7 +421,7 @@ float TabletOsSensorManager::GetSensorUpdateRate (sensor_t sensor)
     if (!sensor)   
       throw xtl::make_null_argument_exception ("", "sensor");
 
-    return ((TabletOsSensorHandler*)sensor)->GetRate ();
+    return ((TabletOsSensor*)sensor)->GetRate ();
   }
   catch (xtl::exception& e)
   {
@@ -287,8 +434,20 @@ float TabletOsSensorManager::GetSensorUpdateRate (sensor_t sensor)
     Получение платформо-зависимого дескриптора экрана
 */
 
-const void* TabletOsSensorManager::GetNativeSensorHandle (sensor_t)
+const void* TabletOsSensorManager::GetNativeSensorHandle (sensor_t sensor)
 {
+  try
+  {
+    if (!sensor)   
+      throw xtl::make_null_argument_exception ("", "sensor");
+
+    return (void*)((TabletOsSensor*)sensor)->GetType ();
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("syslib::TabletOsSensorManager::GetNativeSensorHandle");
+    throw;
+  }
   return 0;
 }
 
@@ -303,7 +462,7 @@ void TabletOsSensorManager::GetSensorProperties (sensor_t sensor, common::Proper
     if (!sensor)   
       throw xtl::make_null_argument_exception ("", "sensor");
 
-    ((TabletOsSensorHandler*)sensor)->GetProperties (properties);
+    ((TabletOsSensor*)sensor)->GetProperties (properties);
   }
   catch (xtl::exception& e)
   {
@@ -316,16 +475,71 @@ void TabletOsSensorManager::GetSensorProperties (sensor_t sensor, common::Proper
     Чтение событий сенсора
 */
 
-void TabletOsSensorManager::StartSensorPolling (sensor_t, ISensorEventListener&)
+void TabletOsSensorManager::StartSensorPolling (sensor_t sensor, ISensorEventListener &listener)
 {
+  try
+  {
+    if (!sensor)   
+      throw xtl::make_null_argument_exception ("", "sensor");
+
+    TabletOsSensor *s = (TabletOsSensor*)sensor;
+    s->StartSensorPolling (listener);
+
+    TabletOsSensorManagerImplSingleton::Instance manager;
+    manager->RegisterSensor (s->GetType (), s);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("syslib::TabletOsSensorManager::StopSensorPolling");
+    throw;
+  }
 }
 
-void TabletOsSensorManager::StopSensorPolling (sensor_t)
+void TabletOsSensorManager::StopSensorPolling (sensor_t sensor)
 {
+  try
+  {
+    if (!sensor)   
+      throw xtl::make_null_argument_exception ("", "sensor");
+
+    TabletOsSensor *s = (TabletOsSensor*)sensor;
+    s->StopSensorPolling ();
+
+    TabletOsSensorManagerImplSingleton::Instance manager;
+    manager->UnregisterSensor (s->GetType ());
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("syslib::TabletOsSensorManager::StopSensorPolling");
+    throw;
+  }
 }
 
 void TabletOsSensorManager::PollSensorEvents (sensor_t)
 {
 }
 
+
+
+/*
+    Sensor registry (used for )
+*/
+
+void SensorRegistry::RegisterSensor (sensor_type_t sensor, ISensorImpl* impl)
+{
+  TabletOsSensorManagerImplSingleton::Instance manager;
+  manager->RegisterSensor (sensor,impl);
 }
+
+void SensorRegistry::UnregisterSensor (sensor_type_t sensor)
+{
+  TabletOsSensorManagerImplSingleton::Instance manager;
+  manager->UnregisterSensor (sensor);
+}    
+
+ISensorImpl* SensorRegistry::FindSensor (sensor_type_t sensor)
+{
+  TabletOsSensorManagerImplSingleton::Instance manager;
+  return manager->FindSensor (sensor);
+}
+
