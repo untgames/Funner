@@ -242,10 +242,21 @@ class TabletOsSensorManagerImpl
 
     void RegisterSensor (sensor_type_t type, ISensorImpl *impl)
     {
-      if (!impl)
-        throw xtl::make_null_argument_exception ("", "impl");
+      try
+      {
+        if (!impl)
+          throw xtl::make_null_argument_exception ("", "impl");
 
-      sensors.insert_pair (type, impl);
+        if (FindSensor (type) !=0)
+          raise_error ("Register more than one sensor same type unsupported");
+
+        sensors.insert_pair (type, impl);
+      }
+      catch (xtl::exception& e)
+      {
+        e.touch ("syslib::tabletos::TabletOsSensorManagerImpl::RegisterSensor");
+        throw;
+      }    
     }
 
     void UnregisterSensor (sensor_type_t type)
