@@ -321,7 +321,9 @@ class Window: public IAttachmentRegistryListener<syslib::Window>, public IAttach
 
       if (title)
         window.SetTitle (title);
-        
+
+      window.SetMultitouchEnabled (get<bool> (node, "MultitouchEnabled", window.IsMultitouchEnabled ()));
+
         //сохранение точки привязки родительского окна
 
       parent_window_name = get<const char*> (node, "Parent", "");
@@ -371,7 +373,7 @@ class Window: public IAttachmentRegistryListener<syslib::Window>, public IAttach
           window.SetViewportHandler (xtl::bind (&Window::UpdateViewport, this, _2));
         }
       }      
-      
+
         //размеры и положение окна
         
       bool maximized = get<bool> (node, "Maximize", false),
