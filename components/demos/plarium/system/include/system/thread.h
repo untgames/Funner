@@ -1,6 +1,8 @@
 #ifndef SYSTEM_THREAD_HEADER
 #define SYSTEM_THREAD_HEADER
 
+#include <cstddef>
+
 namespace plarium
 {
 

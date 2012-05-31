@@ -1,6 +1,8 @@
 #ifndef UTILITY_CRYPTO_HEADER
 #define UTILITY_CRYPTO_HEADER
 
+#include <cstddef>
+
 namespace plarium
 {
 

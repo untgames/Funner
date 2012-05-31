@@ -15,12 +15,14 @@ void raise_error (const char* failed_function)
 
 struct TcpClient::Impl
 {
-  int  socket;     //socket descriptor
-  bool connected;  //was connected
+  int                 socket;     //socket descriptor
+  bool                connected;  //was connected
+  ITcpClientListener* listener;   //listener
 
   Impl ()
     : socket (0)
     , connected (false)
+    , listener (0)
     {}
 };
 
@@ -138,9 +140,11 @@ void TcpClient::Send (const void* buffer, size_t size)
     {
       if (errno == ECONNRESET)
       {
-        //send event?
-
         Close ();
+
+        if (impl->listener)
+          impl->listener->OnDisconnect (this);
+
         throw std::runtime_error ("TcpClient::Send - A connection was forcibly closed by a peer.");
       }
       else
@@ -169,9 +173,11 @@ void TcpClient::Receive (void* buffer, size_t size)
 
     if ((received_bytes < 0 && errno == ECONNRESET) || !received_bytes)
     {
-      //send event?
-
       Close ();
+
+      if (impl->listener)
+        impl->listener->OnDisconnect (this);
+
       throw std::runtime_error ("TcpClient::Receive - A connection was forcibly closed by a peer.");
     }
 
@@ -190,4 +196,18 @@ void TcpClient::Receive (void* buffer, size_t size)
 bool TcpClient::IsConnected () const
 {
   return impl->connected;
+}
+
+/*
+   Event listening
+*/
+
+void TcpClient::SetListener (ITcpClientListener* listener)
+{
+  impl->listener = listener;
+}
+
+ITcpClientListener* TcpClient::Listener () const
+{
+  return impl->listener;
 }

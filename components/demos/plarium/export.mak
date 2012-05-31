@@ -1,1 +1,1 @@
-COMPONENT_DIRS := system
+COMPONENT_DIRS := system hsserver

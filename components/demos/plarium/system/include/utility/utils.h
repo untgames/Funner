@@ -1,6 +1,8 @@
 #ifndef UTILITY_UTILS_HEADER
 #define UTILITY_UTILS_HEADER
 
+#include <string>
+
 namespace plarium
 {
 

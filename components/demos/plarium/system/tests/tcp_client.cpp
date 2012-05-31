@@ -16,13 +16,25 @@ void print_data (const unsigned char* data, size_t data_size)
   printf ("\n");
 }
 
+class TcpClientListener : public ITcpClientListener
+{
+  public:
+    void OnDisconnect (TcpClient* sender)
+    {
+      printf ("OnDisconnect!\n");
+    }
+};
+
 int main ()
 {
   printf ("Results of tcp_client_test:\n");
 
   try
   {
-    TcpClient tcp_client;
+    TcpClientListener listener;
+    TcpClient         tcp_client;
+
+    tcp_client.SetListener (&listener);
 
     unsigned char address [4];
 
@@ -90,6 +102,12 @@ int main ()
 
     printf ("Received!\n");
     print_data (buffer, 16);
+
+    unsigned char bad_message [] = "hello world!";
+
+    tcp_client.Send (bad_message, sizeof (bad_message));
+
+    tcp_client.Receive (buffer, 512);
   }
   catch (std::exception& exception)
   {

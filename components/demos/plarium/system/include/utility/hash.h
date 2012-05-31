@@ -1,6 +1,8 @@
 #ifndef UTILITY_HASH_HEADER
 #define UTILITY_HASH_HEADER
 
+#include <cstddef>
+
 namespace plarium
 {
 

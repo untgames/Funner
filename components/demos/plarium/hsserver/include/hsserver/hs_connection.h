@@ -1,11 +1,16 @@
 #ifndef HSSERVER_CONNECTION_HEADER
 #define HSSERVER_CONNECTION_HEADER
 
+#include <cstddef>
+
 namespace plarium
 {
 
 namespace hsserver
 {
+
+//forward declaration
+class HsConnection;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///HS Connection events listener
@@ -16,17 +21,16 @@ class IHsConnectionListener
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///New message
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    virtual void OnMessageReceived (unsigned short plugin_id, const char* event) = 0;
+    virtual void OnMessageReceived (HsConnection* sender, unsigned short plugin_id, const char* event) = 0;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Connection disconnected
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    virtual void OnDisconnect () = 0;
+    virtual void OnDisconnect (HsConnection* sender) = 0;
 
   protected:
     virtual ~IHsConnectionListener () {}
 };
-
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///HS Server Connection
@@ -54,7 +58,8 @@ class HsConnection
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Event listening
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void SetListener (IHsConnectionListener* listener);
+    void                   SetListener (IHsConnectionListener* listener);
+    IHsConnectionListener* Listener    () const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Keep alive options (0 - disabled, default - 10000)
@@ -68,7 +73,7 @@ class HsConnection
     void                 SetCompressionEnabled   (bool state);
     void                 SetCompressionThreshold (size_t threshold);
     void                 SetEncryptionEnabled    (bool state);
-    void                 SetEncryptionKey        (const unsigned char* key, size_t key_size);
+    void                 SetEncryptionKey        (const unsigned char* key, size_t key_bits);
     bool                 IsCompressionEnabled    () const;
     size_t               CompressionThreshold    () const;
     bool                 IsEncrypionEnabled      () const;
