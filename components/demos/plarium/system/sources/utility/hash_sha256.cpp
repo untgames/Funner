@@ -31,7 +31,7 @@ struct Sha256Context::Impl
     CC_SHA256_Update (&context, data, data_size);
   }
 
-  void Finish (unsigned char result_hash_value [32])
+  void Finish (unsigned char (&result_hash_value) [32])
   {
     if (!result_hash_value)
       throw std::invalid_argument ("Sha256Context::Finish - null result_hash_value");
@@ -342,7 +342,7 @@ struct Sha256Context::Impl
     sha256_update (&context, (uint8*)data, data_size);
   }
 
-  void Finish (unsigned char result_hash_value [32])
+  void Finish (unsigned char (&result_hash_value) [32])
   {
     if (!result_hash_value)
       throw std::invalid_argument ("Sha256Context::Finish - null result_hash_value");
@@ -364,7 +364,7 @@ namespace plarium
 namespace utility
 {
 
-void sha256 (const void* data, size_t size, unsigned char result_hash_value [32])
+void sha256 (const void* data, size_t size, unsigned char (&result_hash_value) [32])
 {
   if (!data && size)
     throw std::invalid_argument ("plarium::utility::sha256 - null data");
@@ -403,7 +403,7 @@ void Sha256Context::Update (const void* data, size_t data_size)
    Finish hash calculation and write result data to output buffer
 */
 
-void Sha256Context::Finish (unsigned char result_hash_value [32])
+void Sha256Context::Finish (unsigned char (&result_hash_value) [32])
 {
   impl->Finish (result_hash_value);
 }

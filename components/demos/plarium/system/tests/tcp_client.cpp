@@ -16,14 +16,6 @@ void print_data (const unsigned char* data, size_t data_size)
   printf ("\n");
 }
 
-unsigned int endian_swap (unsigned int x)
-{
-  return (x>>24) |
-         ((x<<8) & 0x00FF0000) |
-         ((x>>8) & 0x0000FF00) |
-         (x<<24);
-}
-
 int main ()
 {
   printf ("Results of tcp_client_test:\n");
@@ -73,38 +65,22 @@ int main ()
 
     unsigned char key [16] = { 0xd0, 0x71, 0x73, 0x41, 0x0d, 0xee, 0xd2, 0x6f, 0x44, 0x3f, 0x7b, 0xa4, 0x42, 0x2f, 0x86, 0x03 };
 
-    aes_ofb (key, sizeof (key) * 8, message_text_length, (const unsigned char*)message_text, message, iv);
+    aes_ofb (key, sizeof (key) * 8, message_text_length, (const unsigned char*)message_text, message, (const unsigned char (&)[16])*iv);
 
     unsigned char hashed_key [32];
 
     sha256 (key, 16, hashed_key);
 
-    unsigned char hmac2 [32];
-
-    hmac_sha256 (hashed_key, sizeof (hashed_key), iv, 16 + message_text_length, hmac2);
-
-    printf ("calc hmac for data size %d, data: ", 16 + message_text_length);
-    print_data (hmac2, 32);
-
-    hmac_sha256 (hashed_key, sizeof (hashed_key), iv, 16 + message_text_length, hmac);
-//    strcpy (message, "{\"event\":\"slot.spin\", \"slotId\":1, \"betId\":1, \"lines\":1}");
-
-    int little_endian_size = message_text_length + 32 + 16,
-        big_endian_size    = little_endian_size;//endian_swap (little_endian_size);
+    hmac_sha256 (hashed_key, sizeof (hashed_key), iv, 16 + message_text_length, (unsigned char (&)[32])*hmac);
 
     int* message_size = (int*)(send_buffer + 4);
 
-    *message_size = big_endian_size;
+    *message_size = message_text_length + 32 + 16;
 
-    printf ("message = '%s' length = %d\n", message_text, little_endian_size);
-
-    tcp_client.Send (send_buffer, 8 + little_endian_size);
-
-    printf ("message size %d: ", little_endian_size);
-    print_data ((const unsigned char*)message_size, sizeof (int));
+    tcp_client.Send (send_buffer, 8 + *message_size);
 
     printf ("Sent data: ");
-    print_data (send_buffer, 8 + little_endian_size);
+    print_data (send_buffer, 8 + *message_size);
 
     unsigned char buffer [1024];
 

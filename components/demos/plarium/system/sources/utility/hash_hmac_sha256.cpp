@@ -29,7 +29,7 @@ struct HmacSha256Context::Impl
     CCHmacUpdate (&context, data, data_size);
   }
 
-  void Finish (unsigned char result_hash_value [32])
+  void Finish (unsigned char (&result_hash_value) [32])
   {
     if (finished)
       throw std::logic_error ("HmacSha256Context::Finish - can't finish after Finish");
@@ -149,7 +149,7 @@ struct HmacSha256Context::Impl
     hmac_sha256_update (&context, (const unsigned char*)data, data_size);
   }
 
-  void Finish (unsigned char result_hash_value [32])
+  void Finish (unsigned char (&result_hash_value) [32])
   {
     if (finished)
       throw std::logic_error ("HmacSha256Context::Finish - can't finish after Finish");
@@ -171,7 +171,7 @@ namespace plarium
 namespace utility
 {
 
-void hmac_sha256 (const void* key, size_t key_size, const void* data, size_t data_size, unsigned char result_hash_value [32])
+void hmac_sha256 (const void* key, size_t key_size, const void* data, size_t data_size, unsigned char (&result_hash_value) [32])
 {
   if (!key)
     throw std::invalid_argument ("plarium::utility::hmac_sha256 - null key");
@@ -221,7 +221,7 @@ void HmacSha256Context::Update (const void* data, size_t data_size)
    Finish hash calculation and write result data to output buffer
 */
 
-void HmacSha256Context::Finish (unsigned char result_hash_value [32])
+void HmacSha256Context::Finish (unsigned char (&result_hash_value) [32])
 {
   impl->Finish (result_hash_value);
 }

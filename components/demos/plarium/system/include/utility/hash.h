@@ -31,7 +31,7 @@ class Sha256Context
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Finish hash calculation and write result data to output buffer
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-     void Finish (unsigned char result_hash_value [32]);
+     void Finish (unsigned char (&result_hash_value) [32]);
 
   private:
     Sha256Context (const Sha256Context&);             //no impl
@@ -42,7 +42,7 @@ class Sha256Context
     Impl* impl;
 };
 
-void sha256 (const void* data, size_t size, unsigned char result_hash_value [32]);
+void sha256 (const void* data, size_t size, unsigned char (&result_hash_value) [32]);
 
 /*
    HMAC-SHA256
@@ -68,7 +68,7 @@ class HmacSha256Context
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Finish hash calculation and write result data to output buffer
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-     void Finish (unsigned char result_hash_value [32]);
+     void Finish (unsigned char (&result_hash_value) [32]);
 
   private:
     HmacSha256Context (const HmacSha256Context&);             //no impl
@@ -79,7 +79,7 @@ class HmacSha256Context
     Impl* impl;
 };
 
-void hmac_sha256 (const void* key, size_t key_size, const void* data, size_t data_size, unsigned char result_hash_value [32]);
+void hmac_sha256 (const void* key, size_t key_size, const void* data, size_t data_size, unsigned char (&result_hash_value) [32]);
 
 }
 

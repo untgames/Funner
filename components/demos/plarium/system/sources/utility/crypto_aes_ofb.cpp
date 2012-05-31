@@ -66,7 +66,7 @@ struct AesOfbContext::Impl
   unsigned char iv [16];
   int           num;
 
-  Impl (const void* key, size_t key_bits, const unsigned char in_iv [16])
+  Impl (const void* key, size_t key_bits, const unsigned char (&in_iv) [16])
     : aes_context (CryptoOperation_Encrypt, key, key_bits), num (0)
   {
     memcpy (iv, in_iv, sizeof (iv));
@@ -90,7 +90,7 @@ namespace plarium
 namespace utility
 {
 
-void aes_ofb (const void* key, size_t key_bits, size_t data_size, const void* src_buffer, void* dst_buffer, const unsigned char iv [16])
+void aes_ofb (const void* key, size_t key_bits, size_t data_size, const void* src_buffer, void* dst_buffer, const unsigned char (&iv) [16])
 {
   AesContext context (CryptoOperation_Encrypt, key, key_bits);
 
@@ -111,7 +111,7 @@ void aes_ofb (const void* key, size_t key_bits, size_t data_size, const void* sr
    Constructor / destructor (if iv == 0, constructor generates random iv)
 */
 
-AesOfbContext::AesOfbContext (const void* key, size_t key_bits, const unsigned char iv [16])
+AesOfbContext::AesOfbContext (const void* key, size_t key_bits, const unsigned char (&iv) [16])
   : impl (new Impl (key, key_bits, iv))
   {}
 

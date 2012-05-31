@@ -55,7 +55,7 @@ class AesOfbContext
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Constructor / destructor
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    AesOfbContext  (const void* key, size_t key_bits, const unsigned char iv [16]);
+    AesOfbContext  (const void* key, size_t key_bits, const unsigned char (&iv) [16]);
     ~AesOfbContext ();
 
 //////////////////////////////////////////////////////////////////////////////////////////////////
@@ -72,7 +72,7 @@ class AesOfbContext
     Impl* impl;
 };
 
-void aes_ofb (const void* key, size_t key_bits, size_t data_size, const void* src_buffer, void* dst_buffer, const unsigned char iv [16]);
+void aes_ofb (const void* key, size_t key_bits, size_t data_size, const void* src_buffer, void* dst_buffer, const unsigned char (&iv) [16]);
 
 }
 
