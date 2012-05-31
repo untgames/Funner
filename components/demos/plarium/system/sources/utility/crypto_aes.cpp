@@ -1107,7 +1107,7 @@ struct AesContext::Impl
         throw std::invalid_argument ("plarium::utility::aes - unsupported operation");
     }
 
-    CheckCCError ("AesContext::AesContext", CCCryptorCreate (cc_operation, kCCAlgorithmAES128, 0, key, key_bits / 8, 0, &cryptor));
+    CheckCCError ("AesContext::AesContext", CCCryptorCreate (cc_operation, kCCAlgorithmAES128, kCCOptionECBMode, key, key_bits / 8, 0, &cryptor));
   }
 
   ~Impl ()
@@ -1270,7 +1270,7 @@ void aes (CryptoOperation operation, const void* key, size_t key_bits, size_t bl
   size_t buffer_size = blocks_count * CRYPTO_BLOCK_SIZE,
          encoded_bytes = 0;
 
-  switch (CCCrypt (cc_operation, kCCAlgorithmAES128, 0, key, key_bits / 8, 0, src_buffer, buffer_size, dst_buffer, buffer_size, &encoded_bytes))
+  switch (CCCrypt (cc_operation, kCCAlgorithmAES128, kCCOptionECBMode, key, key_bits / 8, 0, src_buffer, buffer_size, dst_buffer, buffer_size, &encoded_bytes))
   {
     case kCCBufferTooSmall:
       throw std::runtime_error ("plarium::utility::aes - buffer too small, not all data encoded");
