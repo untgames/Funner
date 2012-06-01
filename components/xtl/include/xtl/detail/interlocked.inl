@@ -61,6 +61,28 @@
         return tmp;
     }  
   }
+  
+  inline int atomic_increment (volatile int& rc, int value)
+  {
+    for (;;)
+    {
+      long tmp = *(const volatile long*)&rc;
+      
+      if (XTL_INTERLOCKED_COMPARE_EXCHANGE ((volatile long*)&rc, tmp + value, tmp) == tmp)
+        return tmp;
+    }
+  }
+  
+  inline int atomic_decrement (volatile int& rc, int value)
+  {
+    for (;;)
+    {
+      long tmp = *(const volatile long*)&rc;
+      
+      if (XTL_INTERLOCKED_COMPARE_EXCHANGE ((volatile long*)&rc, tmp - value, tmp) == tmp)
+        return tmp;
+    }  
+  }  
 
 #elif defined (__GNUC__) && (defined( __i386__) || defined (__x86_64__))
 
@@ -68,36 +90,35 @@
       from boost
   */
   
-  inline int atomic_increment (volatile int& rc)
+  inline int atomic_increment (volatile int& rc, int val)
   {
     int r;
 
-    __asm__ __volatile__
+    asm volatile
     (
-        "lock\n\t"
-        "xadd %1, %0":
-        "=m"( rc ), "=r"( r ): // outputs (%0, %1)
-        "m"( rc ), "1"( 1 ): // inputs (%2, %3 == %1)
-        "memory", "cc" // clobbers
+       "lock\n\t"
+       "xadd %1, %0":
+       "+m"( &rc ), "=r"( r ): // outputs (%0, %1)
+       "1"( val ): // inputs (%2 == %1)
+       "memory", "cc" // clobbers
     );
 
-    return r;  
+    return r  
+  }    
+  
+  inline int atomic_decrement (volatile int& rc, int val)
+  {
+    return atomic_increment (rc, -val);
+  }
+  
+  inline int atomic_increment (volatile int& rc)
+  {
+    atomic_increment (rc, 1);
   }  
 
   inline int atomic_decrement (volatile int& rc)
   {
-    int r;
-
-    __asm__ __volatile__
-    (
-        "lock\n\t"
-        "xadd %1, %0":
-        "=m"( rc ), "=r"( r ): // outputs (%0, %1)
-        "m"( rc ), "1"( -1 ): // inputs (%2, %3 == %1)
-        "memory", "cc" // clobbers
-    );
-
-    return r;
+    atomic_increment (rc, -1);
   }
 
   inline int atomic_conditional_increment (volatile int& rc)
@@ -271,6 +292,16 @@ inline int atomic_increment (volatile int& rc)
 inline int atomic_decrement (volatile int& rc)
 {
   return __sync_fetch_and_sub (&rc, 1);
+}
+
+inline int atomic_increment (volatile int& rc, int val)
+{
+  return __sync_fetch_and_add (&rc, val);
+}
+
+inline int atomic_decrement (volatile int& rc, int val)
+{
+  return __sync_fetch_and_sub (&rc, val);
 }
 
 inline int atomic_conditional_increment (volatile int& rc)

@@ -1,10 +1,13 @@
 Results of instance_counter_test:
-instance groups:
-  type=A, count=3
-  type=B, count=0
-instance groups:
-  type=A, count=5
-  type=B, count=2
-instance groups:
-  type=A, count=3
-  type=B, count=0
+counters:
+  group=group1, name=A, value=3
+  group=group1, name=B, value=0
+  group=group2, name=C, value=0
+counters:
+  group=group1, name=A, value=5
+  group=group1, name=B, value=2
+  group=group2, name=C, value=1
+counters:
+  group=group1, name=A, value=3
+  group=group1, name=B, value=0
+  group=group2, name=C, value=0

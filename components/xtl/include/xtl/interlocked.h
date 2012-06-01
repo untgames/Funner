@@ -22,6 +22,8 @@ int atomic_increment             (volatile int& rc); //int r = rc; ++rc; return 
 int atomic_decrement             (volatile int& rc); //int r = rc; --rc; return r;
 int atomic_conditional_increment (volatile int& rc); //int r = rc; if (r) ++rc; return r;
 int atomic_conditional_decrement (volatile int& rc); //int r = rc; if (r) --rc; return r;
+int atomic_increment             (volatile int& rc, int value); //int r = rc; rc += value; return r;
+int atomic_decrement             (volatile int& rc, int value); //int r = rc; rc -= value; return r;
 
 #include <xtl/detail/interlocked.inl>
 
