@@ -1063,3 +1063,11 @@ endif
 tar-dist: dist
 	@echo Create $(basename $(DIST_DIR)).tar...
 	@tar -cf $(basename $(DIST_DIR)).tar $(DIST_DIR)
+
+#Обновление лицензии разработчика
+.PHONY: update-developer-license
+
+update-developer-license:
+	@echo Create developer license
+	@make -C components/common files=license-generator
+	@$(DIST_BIN_DIR)/license-generator -o license/funner-developer.xml -c "*" -p 0-2
