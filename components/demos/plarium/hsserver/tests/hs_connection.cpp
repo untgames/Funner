@@ -3,17 +3,54 @@
 using namespace plarium::system;
 using namespace plarium::hsserver;
 
-class HsConnectionListener : public IHsConnectionListener
+const char* get_error_code_name (ErrorCode code)
+{
+  switch (code)
+  {
+    case ErrorCode_Generic:             return "Generic";
+    case ErrorCode_SendQueueOverflow:   return "SendQueueOverflow";
+    case ErrorCode_Timeout:             return "Timeout";
+    case ErrorCode_HashMismatch:        return "HashMismatch";
+    default:                            return "Unknown";
+  }
+}
+
+const char* get_connection_state_name (HsConnectionState state)
+{
+  switch (state)
+  {
+    case HsConnectionState_Disconnected: return "Disconnected";
+    case HsConnectionState_Connecting:   return "Connecting";
+    case HsConnectionState_Connected:    return "Connected";
+    default:                             return "Unknown";
+  }
+}
+
+class HsConnectionEventListener : public IHsConnectionEventListener
 {
   public:
-    void OnMessageReceived (HsConnection* sender, unsigned short plugin_id, const char* event)
+    void OnError (HsConnection& sender, ErrorCode code, const char* error)
     {
-      printf ("OnMessageReceived! Plugin %d, message '%s'\n", plugin_id, event);
+      printf ("Error occured: code '%s' error '%s'\n", get_error_code_name (code), error);
     }
 
-    void OnDisconnect (HsConnection* sender)
+    void OnMessageReceived (HsConnection& sender, unsigned short plugin_id, const unsigned char* message, size_t size)
     {
-      printf ("OnDisconnect!\n");
+      printf ("OnMessageReceived! Plugin %d, message '%s', size %d\n", plugin_id, message, size);
+    }
+
+    void OnStateChanged (HsConnection& sender, HsConnectionState new_state)
+    {
+      printf ("OnStateChange - new state '%s'!\n", get_connection_state_name (new_state));
+    }
+};
+
+class HsConnectionLogListener : public IHsConnectionLogListener
+{
+  public:
+    void OnLogMessage (HsConnection& sender, const char* message)
+    {
+      printf ("OnLogMessage - '%s'\n", message);
     }
 };
 
@@ -23,24 +60,29 @@ int main ()
 
   try
   {
-    HsConnectionListener listener;
-    HsConnection connection;
+    HsConnectionSettings connection_settings;
 
-    connection.SetListener (&listener);
+    memset (&connection_settings, 0, sizeof (connection_settings));
 
     unsigned char key [16] = { 0xd0, 0x71, 0x73, 0x41, 0x0d, 0xee, 0xd2, 0x6f, 0x44, 0x3f, 0x7b, 0xa4, 0x42, 0x2f, 0x86, 0x03 };
 
-    connection.SetEncryptionEnabled (true);
-    connection.SetEncryptionKey (key, sizeof (key) * 8);
+    connection_settings.send_queue_size       = 2;
+    connection_settings.keep_alive_interval   = 10000;
+    connection_settings.compression_enabled   = false;
+    connection_settings.compression_threshold = 1024;
+    connection_settings.encryption_enabled    = true;
+    connection_settings.encryption_key_bits   = sizeof (key) * 8;
 
-    unsigned char address [4];
+    memcpy (connection_settings.encryption_key, key, sizeof (key));
 
-    address [0] = 109;
-    address [1] = 234;
-    address [2] = 156;
-    address [3] = 146;
+    HsConnectionEventListener event_listener;
+    HsConnectionLogListener   log_listener;
+    HsConnection              connection (connection_settings);
 
-    connection.Connect (address, 9999);
+    connection.SetEventListener (&event_listener);
+    connection.SetLogListener (&log_listener);
+
+    connection.Connect ("109.234.156.146", 9999);
 
     const char* message_text =  "[{"
       " \"event\":\"user.authenticate\","
@@ -53,7 +95,7 @@ int main ()
       " \"version\":1"
       "}]";
 
-    connection.SendMessage (0, message_text);
+    connection.SendMessage (0, (const unsigned char*)message_text, strlen (message_text));
 
     Thread::Sleep (1000);
   }

@@ -1,3 +1,6 @@
+#include <deque>
+#include <stdexcept>
+
 #include <system/condition.h>
 #include <system/mutex.h>
 #include <system/thread.h>

@@ -40,6 +40,25 @@ class Mutex
     Impl* impl;
 };
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Block lock
+///////////////////////////////////////////////////////////////////////////////////////////////////
+class Lock
+{
+  public:
+    Lock  (Mutex& in_Mutex);
+    ~Lock ();
+
+  private:
+    Lock (const Lock&); //no impl
+    Lock& operator = (const Lock&); //no impl
+
+  private:
+    Mutex& mutex;
+};
+
+#include <system/detail/mutex.inl>
+
 }
 
 }

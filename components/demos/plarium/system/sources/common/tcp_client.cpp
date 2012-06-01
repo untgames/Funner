@@ -153,7 +153,7 @@ void TcpClient::Connect (const char* host, unsigned short port)
 void TcpClient::Disconnect ()
 {
   if (!IsConnected ())
-    throw std::logic_error ("TcpClient::Close - Socket is not connected");
+    return;
 
   impl->connected = false;
 
