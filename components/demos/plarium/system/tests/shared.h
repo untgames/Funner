@@ -8,6 +8,7 @@
 
 #include <utility/crypto.h>
 #include <utility/hash.h>
+#include <utility/shared_queue.h>
 #include <utility/utils.h>
 
 #include <system/condition.h>

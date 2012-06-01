@@ -36,16 +36,6 @@ class IBackgroundThreadListener
     //Error occured
     virtual void OnError (ErrorCode code, const char* error) = 0;
 
-    //Send queue empty
-    virtual bool SendQueueEmpty () = 0;
-
-    //Pop message
-    virtual Message& SendQueueFront () = 0;
-    virtual void     PopSendQueue   () = 0;
-
-    //Check if we should stop send operations
-    virtual bool NeedsStop () = 0;
-
   protected:
     virtual ~IBackgroundThreadListener () {}
 };
@@ -57,6 +47,9 @@ struct SendFunctionArg
   unsigned short             port;
   TcpClient&                 tcp_client;
   IBackgroundThreadListener& listener;
+  Mutex&                     send_queue_mutex;
+  Condition&                 send_queue_condition;
+  volatile bool&             need_stop;
 
   SendFunctionArg (const char* in_host, unsigned short in_port, TcpClient& in_tcp_client, IBackgroundThreadListener& in_listener)
     : host (in_host)
@@ -102,10 +95,12 @@ void* send_function (void* user_data)
 {
   SendFunctionArg* data = (SendFunctionArg*)user_data;
 
-  std::string                host       = data->host;
-  unsigned short             port       = data->port;
-  TcpClient&                 tcp_client = data->tcp_client;
-  IBackgroundThreadListener& listener   = data->listener;
+  std::string                host                 = data->host;
+  unsigned short             port                 = data->port;
+  TcpClient&                 tcp_client           = data->tcp_client;
+  IBackgroundThreadListener& listener             = data->listener;
+  Mutex&                     send_queue_mutex     = data->send_queue_mutex;
+  Condition&                 send_queue_condition = data->send_queue_condition;
 
   delete data;
 
@@ -132,13 +127,30 @@ void* send_function (void* user_data)
 
   for (;;)
   {
-    if (listener.NeedsStop ())
+    try
     {
-      receive_thread.Join ();
+      if (listener.NeedsStop ())
+      {
 
-      break;
+        break;
+      }
+
+      send_queue_mutex.Lock     ();
+
+
+      send_queue_condition.Wait (send_queue_mutex);
+
+      //...
+
+      send_queue_mutex.Unlock ();
+    }
+    catch (...)
+    {
+      ///...................
     }
   }
+
+  receive_thread.Join ();
 
   return 0;
 }
@@ -151,16 +163,17 @@ void* send_function (void* user_data)
 
 struct HsConnection::Impl : public ITcpClientListener, public IBackgroundThreadListener
 {
-  HsConnection*               connection;          //this connection
-  TcpClient                   tcp_client;          //tcp connection
-  HsConnectionSettings        settings;            //connection settings
-  IHsConnectionEventListener* event_listener;      //events listener
-  IHsConnectionLogListener*   log_listener;        //log messages listener
-  volatile HsConnectionState  state;               //connection state
-  Thread*                     send_thread;         //thread for sending data
-  volatile bool               needs_stop_threads;  //signal to stop background threads
-  MessageQueue                send_queue;          //send messages queue
-  Mutex                       send_queue_mutex;    //send messages queue mutex
+  HsConnection*               connection;           //this connection
+  TcpClient                   tcp_client;           //tcp connection
+  HsConnectionSettings        settings;             //connection settings
+  IHsConnectionEventListener* event_listener;       //events listener
+  IHsConnectionLogListener*   log_listener;         //log messages listener
+  volatile HsConnectionState  state;                //connection state
+  Thread*                     send_thread;          //thread for sending data
+  volatile bool               needs_stop_threads;   //signal to stop background threads
+  MessageQueue                send_queue;           //send messages queue
+  Mutex                       send_queue_mutex;     //send messages queue mutex
+  Condition                   send_queue_condition; //send queue new object condition
 
   Impl (HsConnection* in_connection, const HsConnectionSettings& in_settings)
     : connection (in_connection)
@@ -201,6 +214,8 @@ struct HsConnection::Impl : public ITcpClientListener, public IBackgroundThreadL
 
     needs_stop_threads = true;
 
+    send_queue_condition.Notify (false);
+
     send_thread->Join ();
 
     delete send_thread;
@@ -224,6 +239,9 @@ struct HsConnection::Impl : public ITcpClientListener, public IBackgroundThreadL
     if (!message && size)
       throw std::invalid_argument ("HsConnection::SendMessage - null message");
 
+    if (state == HsConnectionState_Disconnected)
+      throw std::logic_error ("HsConnection::SendMessage - connection disconnected");
+
     Lock send_queue_lock (send_queue_mutex);
 
     if (send_queue.size () >= settings.send_queue_size)
@@ -234,6 +252,8 @@ struct HsConnection::Impl : public ITcpClientListener, public IBackgroundThreadL
     }
 
     send_queue.push_back (Message (plugin_id, message, size));
+
+    send_queue_condition.Notify (false);
   }
 
   //Connection disconnected

@@ -219,6 +219,11 @@ void Condition::Wait (Mutex& lock)
   pthread_cond_wait (&impl->condition, (pthread_mutex_t*)lock.Handle ());
 }
 
+void Condition::Wait (Mutex& lock, size_t wait_in_milliseconds)
+{
+  throw std::logic_error ("Condition::Wait - timed wait not implemented");
+}
+
 void Condition::Notify (bool broadcast)
 {
   if (broadcast)

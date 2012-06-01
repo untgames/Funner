@@ -30,6 +30,7 @@ class Condition
 ///Condition wait
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void Wait (Mutex& lock);
+    void Wait (Mutex& lock, size_t wait_in_milliseconds);
 
   private:
     Condition  (const Condition&); //no impl
