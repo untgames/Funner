@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding = "windows-1251"?>
+<Configuration LicenseFile="../../../license/funner-developer.xml">
+  <FileSystem Paths=".">
+    <Crypto>
+      <File Name="data.pak" ReadMethod="aes.decrypt" WriteMethod="aes.encrypt" KeyFile="funner.dll"/>
+    </Crypto>
+    <Mount>
+      <File Name="/profile" Path="/system/appdata/UNT Games/Marbles"/>
+    </Mount>
+  </FileSystem>
+  <Log>
+    <Console Filters="*"/>
+    <File FileName="/profile/log.txt" Filters="*" Flush="1">
+      <OutputFormat 
+        Replacement="{log}: {message}<br>" 
+        SortOrder="999"
+      >
+        <Filter Wildcard="*"/>
+      </OutputFormat>
+      <OutputFormat 
+        Replacement="<font color=#0000f0><strong>{log}: {message}</strong></font><br>" 
+        SortOrder="10"
+      >
+        <Filter Wildcard="*Warning*"/>
+        <Filter Wildcard="*warning*"/>
+      </OutputFormat>
+      <OutputFormat 
+        Replacement="<font color=#ff0000><strong>{log}: {message}</strong></font><br>" 
+        SortOrder="0"
+      >
+        <Filter Wildcard="*Can't*"/>
+        <Filter Wildcard="*fail*"/>
+        <Filter Wildcard="*Exception*"/>
+        <Filter Wildcard="*error*"/>
+      </OutputFormat>
+    </File>
+  </Log>
+  <ResourceSystem>
+    <Server Name="Graphics" Filters="*xmtl" Cache="1"/>
+    <Server Name="Sound" Filters="*snddecl" Cache="1"/>
+    <Server Name="WindowManager" Filters="cursor(*) *.xhotspot" Cache="1"/> 
+  </ResourceSystem>
+  <Include Source="/profile/system_properties.xml" IgnoreUnavailability="1"/>
+  <WindowManager ResourceServer="WindowManager">
+    <Window
+      Id         = "MainWindow"
+      Style      = "Overlapped"
+      XPosition  = "0"
+      YPosition  = "0"      
+      Width      = "960" 
+      Height     = "640"      
+      Title      = "The Apprentice of Warlock"      
+      ViewportAspectRatio = "4:3"
+      Visible    = "1"
+      CursorVisible = "1"      
+      Cursor     = "mouse_cursor"      
+      BackgroundColor = "0 0 0"      
+    />  
+  </WindowManager>
+  <WindowRenderer Id="MyRenderer" AdapterMask="*" DriverMask="*" InitString="GL_SGIS_texture_lod=0 GL_ARB_texture_non_power_of_two=0 max_texture_size=1024">
+    <FrameBuffer
+      Window       = "MainWindow"
+      ColorBits    = "24"
+      AlphaBits    = "0"
+      DepthBits    = "16"
+      StencilBits  = "0"
+      FullScreen   = "0"
+      BuffersCount = "2"
+      SwapMethod   = "Discard"
+      SamplesCount = "0"
+      VSync        = "0"
+    />
+  </WindowRenderer>
+  <SceneRender
+    DriverMask     = "*"
+    RendererMask   = "MyRenderer"
+    Log            = "render.scene_render"
+    ResourceServer = "Graphics"
+    >
+    <RenderTarget 
+      Screen     = "Screen1"
+      IdleRender = "1"
+      />
+  </SceneRender>
+  <ScenePlayer 
+    Listener        = "Listener1"
+    DriverMask      = "*"
+    DeviceMask      = "*Generic Software*"
+    InitString      = "max_channels_count=32"
+    ResourceServer  = "Sound"
+    /> 
+  <WindowInputDriver>
+    <Device Id="MainWindowDevice" Window="MainWindow"/>
+  </WindowInputDriver>
+  <InputManager TranslationMapRegistry = "data/configurations/input/translation_map_registry.xkeyreg">
+  </InputManager>
+  <Shell Interpreter="lua" Sources="data/scripts/main.lua data/scripts/minigames/balls/*" Libraries="*" Execute="Init()"/>
+</Configuration>
