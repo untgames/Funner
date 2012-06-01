@@ -39,7 +39,7 @@ TcpClient::~TcpClient ()
   try
   {
     if (IsConnected ())
-      Close ();
+      Disconnect ();
   }
   catch (std::exception& e)
   {
@@ -150,7 +150,7 @@ void TcpClient::Connect (const char* host, unsigned short port)
   impl->connected = true;
 }
 
-void TcpClient::Close ()
+void TcpClient::Disconnect ()
 {
   if (!IsConnected ())
     throw std::logic_error ("TcpClient::Close - Socket is not connected");
@@ -180,7 +180,13 @@ void TcpClient::Send (const void* buffer, size_t size)
     {
       if (errno == ECONNRESET)
       {
-        Close ();
+        try
+        {
+          Disconnect ();
+        }
+        catch (...)
+        {
+        }
 
         if (impl->listener)
           impl->listener->OnDisconnect (*this);
@@ -213,7 +219,13 @@ void TcpClient::Receive (void* buffer, size_t size)
 
     if ((received_bytes < 0 && errno == ECONNRESET) || !received_bytes)
     {
-      Close ();
+      try
+      {
+        Disconnect ();
+      }
+      catch (...)
+      {
+      }
 
       if (impl->listener)
         impl->listener->OnDisconnect (*this);
