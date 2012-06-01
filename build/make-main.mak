@@ -1068,6 +1068,6 @@ tar-dist: dist
 .PHONY: update-developer-license
 
 update-developer-license:
-	@echo Create developer license
+	@echo Create developer license...
 	@make -C components/common files=license-generator
 	@$(DIST_BIN_DIR)/license-generator -o license/funner-developer.xml -c "*" -p 0-2
