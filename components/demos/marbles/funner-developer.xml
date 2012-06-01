@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<License LicenseHash="b16c48ac10187defd5c74f59780e02ea" SinceDate="2012-06-01" TillDate="2012-08-01">
+  <AllowedComponents>
+    <Component Wildcard="*"/>
+  </AllowedComponents>
+</License>
