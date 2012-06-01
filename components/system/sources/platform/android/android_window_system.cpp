@@ -36,6 +36,7 @@ struct syslib::window_handle: public MessageQueue::Handler
   jmethodID            bring_to_front_method;            //метод перемещения окна на передний план
   jmethodID            remove_from_parent_window_method; //метод удаления окна
   bool                 is_multitouch_enabled;            //включен ли multitouch
+  int                  current_touch_id;                 //текущий идентификатор касания
   bool                 is_surface_created;               //состояние поверхности
   volatile bool        is_native_handle_received;        //получен ли android window handle
   common::Log          log;                              //поток протоколирования
@@ -47,6 +48,7 @@ struct syslib::window_handle: public MessageQueue::Handler
     , background_color (0)
     , background_state (0)
     , is_multitouch_enabled (false)
+    , current_touch_id (-1)
     , is_surface_created (false)
     , is_native_handle_received (false)
     , log (LOG_NAME)
@@ -121,7 +123,7 @@ struct syslib::window_handle: public MessageQueue::Handler
   }
 
   void OnTouchCallback (int pointer_id, int action, float x, float y)
-  {
+  {    
     WindowEventContext context;
 
     FillTouchEventContext (pointer_id, x, y, context);
@@ -129,17 +131,29 @@ struct syslib::window_handle: public MessageQueue::Handler
     switch (action)
     {
       case AMOTION_EVENT_ACTION_DOWN:
-        Notify (WindowEvent_OnTouchesBegan, context);
+        if (is_multitouch_enabled || pointer_id == current_touch_id || current_touch_id == -1)      
+        {
+          Notify (WindowEvent_OnTouchesBegan, context);
+          current_touch_id = pointer_id;
+        }
+
         break;
       case AMOTION_EVENT_ACTION_MOVE:
-        Notify (WindowEvent_OnTouchesMoved, context);
+        if (is_multitouch_enabled || pointer_id == current_touch_id)
+          Notify (WindowEvent_OnTouchesMoved, context);
+
         break;
       case AMOTION_EVENT_ACTION_UP:
       case AMOTION_EVENT_ACTION_CANCEL:
-        Notify (WindowEvent_OnTouchesEnded, context);
+        if (is_multitouch_enabled || pointer_id == current_touch_id)            
+          Notify (WindowEvent_OnTouchesEnded, context);
+          
+        current_touch_id = -1;
+          
         break;
       default:
         printf ("Unhandled touch action %d received\n", action);
+        break;
     }
   }
 
@@ -854,7 +868,7 @@ void AndroidWindowManager::SetMultitouchEnabled (window_t window, bool enabled)
     if (!window)
       throw xtl::make_null_argument_exception ("", "window");
 
-    window->is_multitouch_enabled = enabled;    //??????? filter touch events to keep only one touch if multitouch disabled
+    window->is_multitouch_enabled = enabled;
   }
   catch (xtl::exception& e)
   {
