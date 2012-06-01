@@ -19,7 +19,7 @@ void print_data (const unsigned char* data, size_t data_size)
 class TcpClientListener : public ITcpClientListener
 {
   public:
-    void OnDisconnect (TcpClient* sender)
+    void OnDisconnect (TcpClient& sender)
     {
       printf ("OnDisconnect!\n");
     }
@@ -36,14 +36,7 @@ int main ()
 
     tcp_client.SetListener (&listener);
 
-    unsigned char address [4];
-
-    address [0] = 109;
-    address [1] = 234;
-    address [2] = 156;
-    address [3] = 146;
-
-    tcp_client.Connect (address, 9999);
+    tcp_client.Connect ("109.234.156.146", 9999);
 
     unsigned char send_buffer [1024];
 

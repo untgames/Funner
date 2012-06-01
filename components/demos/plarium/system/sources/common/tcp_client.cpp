@@ -57,12 +57,69 @@ TcpClient::~TcpClient ()
    Connection
 */
 
-void TcpClient::Connect (const unsigned char (&address)[4], unsigned short port)
+void TcpClient::Connect (const char* host, unsigned short port)
 {
   if (IsConnected ())
     throw std::logic_error ("TcpClient::Connect - Socket already connected");
 
-  impl->socket = socket (AF_INET, SOCK_STREAM, IPPROTO_TCP);
+  if (!host)
+    throw std::invalid_argument ("TcpClient::Connect - null host");
+
+  hostent *entry = gethostbyname (host);
+
+  if (!entry)
+    throw std::runtime_error (format ("TcpClient::Connect - can't resolve host name '%s'. Error '%s' while calling ::gethostbyname", host, hstrerror (h_errno)));
+
+  if (!entry->h_addr_list [0])
+    throw std::runtime_error ("TcpClient::Connect - error at ::gethostbyname, null address list returned");
+
+  short            address_family;
+  sockaddr_storage address_storage;
+  size_t           address_storage_size;
+
+  switch (entry->h_length)
+  {
+    case 4:
+    {
+      address_family = AF_INET;
+
+      address_storage_size = sizeof (sockaddr_in);
+
+      sockaddr_in* address_desc = (sockaddr_in*)&address_storage;
+
+      address_desc->sin_port = htons (port);
+
+      address_desc->sin_addr.s_addr = 0;
+
+      address_desc->sin_addr.s_addr |= entry->h_addr_list [0][0];
+      address_desc->sin_addr.s_addr |= (unsigned char)entry->h_addr_list [0][1] << 8;
+      address_desc->sin_addr.s_addr |= (unsigned char)entry->h_addr_list [0][2] << 16;
+      address_desc->sin_addr.s_addr |= (unsigned char)entry->h_addr_list [0][3] << 24;
+
+      break;
+    }
+    case 16:
+    {
+      address_family = AF_INET6;
+
+      address_storage_size = sizeof (sockaddr_in6);
+
+      sockaddr_in6* address_desc = (sockaddr_in6*)&address_storage;
+
+      address_desc->sin6_port = htons (port);
+
+      for (size_t i = 0; i < 16; i++)
+        address_desc->sin6_addr.s6_addr [i] = entry->h_addr_list [0][i];
+
+      break;
+    }
+    default:
+      throw std::runtime_error (format ("TcpClient::Connect - host name '%s' resolved, but host address is unsupported.", host));
+  }
+
+  address_storage.ss_family = address_family;
+
+  impl->socket = socket (address_family, SOCK_STREAM, IPPROTO_TCP);
 
   if (socket < 0)
     raise_error ("TcpClient::Connect - ::socket");
@@ -78,23 +135,6 @@ void TcpClient::Connect (const unsigned char (&address)[4], unsigned short port)
 
     if (fcntl (impl->socket, F_SETFL, flags) == -1)
       raise_error ("TcpClient::Connect - ::fcntl");
-
-    sockaddr_storage address_storage;
-    size_t           address_storage_size;
-
-    address_storage.ss_family = AF_INET;
-    address_storage_size      = sizeof (sockaddr_in);
-
-    sockaddr_in* address_desc = (sockaddr_in*)&address_storage;
-
-    address_desc->sin_port = htons (port);
-
-    address_desc->sin_addr.s_addr = 0;
-
-    address_desc->sin_addr.s_addr |= (int)address [0];
-    address_desc->sin_addr.s_addr |= ((int)address [1]) << 8;
-    address_desc->sin_addr.s_addr |= ((int)address [2]) << 16;
-    address_desc->sin_addr.s_addr |= ((int)address [3]) << 24;
 
     if (connect (impl->socket, (sockaddr*)&address_storage, address_storage_size))
       raise_error ("TcpClient::Connect - ::connect");
@@ -143,7 +183,7 @@ void TcpClient::Send (const void* buffer, size_t size)
         Close ();
 
         if (impl->listener)
-          impl->listener->OnDisconnect (this);
+          impl->listener->OnDisconnect (*this);
 
         throw std::runtime_error ("TcpClient::Send - A connection was forcibly closed by a peer.");
       }
@@ -176,7 +216,7 @@ void TcpClient::Receive (void* buffer, size_t size)
       Close ();
 
       if (impl->listener)
-        impl->listener->OnDisconnect (this);
+        impl->listener->OnDisconnect (*this);
 
       throw std::runtime_error ("TcpClient::Receive - A connection was forcibly closed by a peer.");
     }
