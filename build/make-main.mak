@@ -15,6 +15,7 @@ TMP_DIR_SHORT_NAME                      ?= tmp           #Базовое имя каталога с
 DEFAULT_INSTALLATION_FILES              ?= data/* *.sh   #Список файлов, папок и файловых масок, инсталлируемых по умолчанию
 DIST_DIR_SHORT_NAME                     ?= dist          #Базовое имя каталога с результатами сборки
 PCH_SHORT_NAME                          ?= pch.h         #Базовое имя PCH файла
+DEVELOPER_LICENSE                       ?= $(ROOT)/license/funner-developer.xml #Имя лицензии разработчика
 SOURCE_FILES_SUFFIXES                   := c cpp         #Расширения исходных файлов
 TOOLSETS_DIR_SHORT_NAME                 := toolsets      #Базовое имя каталога с конфигурациями toolset-ов
 DOXYGEN_TEMPLATE_DIR_SHORT_NAME         := doxygen       #Базовое имя каталога с шаблонами doxygen
@@ -511,6 +512,10 @@ define process_target_with_sources
   $1.LIBS                := $$($1.LIBS:%=$(LIB_PREFIX)%$(LIB_SUFFIX))
   $1.LIB_DEPS            := $$(filter $$(addprefix %/,$$($1.LIBS)),$$(wildcard $$($1.LIB_DIRS:%=%/*)))  
   $1.LINK_INCLUDES_COMMA := $$(subst $$(SPACE),$$(COMMA),$$(strip $$($1.LINK_INCLUDES)))  
+  
+ifneq (,$(1.DEVELOPER_LICENSE))
+  $1.DEVELOPER_LICENSE   := $$(call specialize_paths,$$($1.DEVELOPER_LICENSE))
+endif
 
   $$(foreach dir,$$($1.SOURCE_DIRS),$$(eval $$(call process_source_dir,$1,$$(dir),$2)))
 
@@ -604,6 +609,14 @@ define process_target.application
   $1.SOURCE_INSTALLATION_EXE_FILES := $$($1.EXE_FILE)
   $1.INSTALLATION_FILES            := $$($1.INSTALLATION_FILES) $$($1.EXE_FILE) 
 
+ifneq (,$$($1.DEVELOPER_LICENSE))  
+  
+  $$($1.DEVELOPER_LICENSE): $(DEVELOPER_LICENSE)
+		@echo Copy developer license...
+		@cp "$$<" "$$@"
+  
+endif
+
   build: $$($1.EXE_FILE)
 
   $$(eval $$(call process_target_with_sources,$1))
@@ -616,7 +629,7 @@ define process_target.application
 		@echo Linking $$(notdir $$@)...
 		@$$(call $$(if $$($1.LINK_TOOL),$$($1.LINK_TOOL),$(LINK_TOOL)),$$@,$$($1.OBJECT_FILES) $$($1.LIBS),$$($1.LIB_DIRS),$$($1.LINK_INCLUDES),$$($1.LINK_FLAGS))
 
-  RUN.$1: $$($1.EXE_FILE)
+  RUN.$1: $$($1.EXE_FILE) $$($1.DEVELOPER_LICENSE)
 		@echo Running $$(notdir $$<)...
 		@$$(call $$(if $$($1.RUN_TOOL),$$($1.RUN_TOOL),$(RUN_TOOL)),$$(patsubst %,"$(CURDIR)/%",$$<) $(args),$$($1.EXECUTION_DIR),$$(dir $$($1.EXE_FILE)) $$($1.DLL_DIRS),$$($1.TARGET_DLLS)) > $$@
 
@@ -629,7 +642,7 @@ endef
 
 #Вызов теста (имя цели, имя модуля, имя теста)
 define process_tests_source_dir_run_test
-  TEST_MODULE.$2::
+  TEST_MODULE.$2:: $$($1.DEVELOPER_LICENSE)
 		@$$(call $$(if $$($1.RUN_TOOL),$$($1.RUN_TOOL),$(RUN_TOOL)),$3 $(args),$$($2.EXECUTION_DIR),$$($2.TARGET_DIR) $$($1.DLL_DIRS),$$($1.TARGET_DLLS))
 
 endef
@@ -652,7 +665,7 @@ define process_tests_source_dir
   build: $$($2.TEST_EXE_FILES)
   test: TEST_MODULE.$2
   check: CHECK_MODULE.$2
-  .PHONY: TEST_MODULE.$2 CHECK_MODULE.$2
+  .PHONY: TEST_MODULE.$2 CHECK_MODULE.$2  
   
 #Инсталляция
   $1.INSTALLATION_FILES := $$($1.INSTALLATION_FILES) $$($2.TEST_EXE_FILES)
@@ -663,14 +676,14 @@ define process_tests_source_dir
 		@$$(call $$(if $$($1.LINK_TOOL),$$($1.LINK_TOOL),$(LINK_TOOL)),$$@,$$(filter %$(OBJ_SUFFIX),$$<) $$($1.LIBS),$$($1.LIB_DIRS),$$($1.LINK_INCLUDES),$$($1.LINK_FLAGS))
 
 #Правило получения файла-результата тестирования
-  $$($2.TMP_DIR)/%.result: $$($2.TARGET_DIR)/%$(EXE_SUFFIX)
+  $$($2.TMP_DIR)/%.result: $$($2.TARGET_DIR)/%$(EXE_SUFFIX) $$($1.DEVELOPER_LICENSE)
 		@echo Running $$(notdir $$<)...
 		@$$(call $$(if $$($1.RUN_TOOL),$$($1.RUN_TOOL),$(RUN_TOOL)),$$< $(args),$$($2.EXECUTION_DIR),$$($2.TARGET_DIR) $$($1.DLL_DIRS),$$($1.TARGET_DLLS)) > $(CURDIR)/$$@
 		
 #Правило получения файла-результата тестирования по shell-файлу
   $$($2.SOURCE_DIR)/%.sh: $$($2.TEST_EXE_FILES)
   
-  $$($2.TMP_DIR)/%.result: $$($2.SOURCE_DIR)/%.sh $$($2.USED_APPLICATIONS)
+  $$($2.TMP_DIR)/%.result: $$($2.SOURCE_DIR)/%.sh $$($2.USED_APPLICATIONS) $$($1.DEVELOPER_LICENSE)
 		@echo Running $$(notdir $$<)...
 		@$$(call $$(if $$($1.RUN_TOOL),$$($1.RUN_TOOL),$(RUN_TOOL)),$$< $(args),$$($2.EXECUTION_DIR),$$($2.TARGET_DIR) $$($1.DLL_DIRS),$$($1.TARGET_DLLS)) > $(CURDIR)/$$@
 
@@ -686,6 +699,14 @@ endef
 #Обработка цели test-suite (имя цели)
 define process_target.test-suite
   $$(eval $$(call process_target_with_sources,$1,process_tests_source_dir))
+  
+ifneq (,$$($1.DEVELOPER_LICENSE))  
+  
+  $$($1.DEVELOPER_LICENSE): $(DEVELOPER_LICENSE)
+		@echo Copy developer license...
+		@cp "$$<" "$$@"
+  
+endif  
   
   build: $$($1.FLAG_FILES)
 endef
@@ -1065,9 +1086,14 @@ tar-dist: dist
 	@tar -cf $(basename $(DIST_DIR)).tar $(DIST_DIR)
 
 #Обновление лицензии разработчика
-.PHONY: update-developer-license
+.PHONY: update-developer-license remove-developer-license
 
-update-developer-license:
+update-developer-license: remove-developer-license $(DEVELOPER_LICENSE)
+
+remove-developer-license:
+	@$(RM) $(DEVELOPER_LICENSE)
+	
+$(DEVELOPER_LICENSE):
 	@echo Create developer license...
-	@make -C components/common files=license-generator
-	@$(DIST_BIN_DIR)/license-generator -o license/funner-developer.xml -c "*" -p 0-2
+	@make -C $(ROOT)/components/common files=license-generator
+	@$(DIST_BIN_DIR)/license-generator -o $(DEVELOPER_LICENSE) -c "*" -p 0-2
