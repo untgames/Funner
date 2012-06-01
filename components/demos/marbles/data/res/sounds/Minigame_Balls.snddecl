@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<sound_declaration_library>
+  <declaration id="Can't Move" name="Can't Move" type="sfx" looping="0">
+    <params gain="1" min_gain="0" max_gain="1" inner_angle="360" outer_angle="360" outer_gain="1" reference_distance="10" maximum_distance="100" cull_distance="110"/>
+    <samples>
+      'data/sounds/minigames/balls/cant_move.wav'
+    </samples>
+  </declaration>
+  <declaration id="Move" name="Move" type="sfx" looping="0">
+    <params gain="1" min_gain="0" max_gain="1" inner_angle="360" outer_angle="360" outer_gain="1" reference_distance="10" maximum_distance="100" cull_distance="110"/>
+    <samples>
+      'data/sounds/minigames/balls/move_2.wav'
+      'data/sounds/minigames/balls/move_1.wav'
+      'data/sounds/minigames/balls/move_3.wav'
+    </samples>
+  </declaration>
+  <declaration id="Match 3 Balls" name="Match 3 Balls" type="sfx" looping="0">
+    <params gain="1" min_gain="0" max_gain="1" inner_angle="360" outer_angle="360" outer_gain="1" reference_distance="10" maximum_distance="100" cull_distance="110"/>
+    <samples>
+      'data/sounds/minigames/balls/match.wav'
+    </samples>
+  </declaration>
+  <declaration id="Music" name="" type="sfx" looping="1">
+    <params gain="1" min_gain="0" max_gain="1" inner_angle="360" outer_angle="360" outer_gain="1" reference_distance="10" maximum_distance="100" cull_distance="110"/>
+    <samples>
+      'data/sounds/music/music.wav'
+    </samples>
+  </declaration>
+</sound_declaration_library>

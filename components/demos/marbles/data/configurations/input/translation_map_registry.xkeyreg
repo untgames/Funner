@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding = "windows-1251"?>
+<TranslationMapRegistry>
+  <Translation Profile="Balls.window" TranslationMap="data/configurations/input/balls_minigame_window.xkeymap"/>
+</TranslationMapRegistry>

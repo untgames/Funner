@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding = "windows-1251"?>
+<TranslationTable>
+  <Translation Event="Window closed" Replacement="OnWindowClose ()"/>
+  <Translation Event="Right down" Replacement="BallsMinigameState.right_game_field:MoveSelection (1)" Tag=""/>
+  <Translation Event="Left down" Replacement="BallsMinigameState.right_game_field:MoveSelection (-1)" Tag=""/>
+  <Translation Event="Up down" Replacement="BallsMinigameState.right_game_field:UserCycleUpColumn ()" Tag=""/>
+  <Translation Event="Down down" Replacement="BallsMinigameState.right_game_field:UserCycleDownColumn ()" Tag=""/>
+  <Translation Event="Mouse0 down" Replacement="BallsMinigameState.right_game_field:MouseDown ()" Tag=""/>
+  <Translation Event="Mouse0 up" Replacement="BallsMinigameState.right_game_field:MouseUp ()" Tag=""/>
+  <Translation Event="CursorX axis *" Replacement="BallsMinigameState.right_game_field:MouseXMove (({2} + 1) / 2)" Tag=""/>
+  <Translation Event="CursorY axis *" Replacement="BallsMinigameState.right_game_field:MouseYMove (1 - (({2} + 1) / 2))" Tag=""/>
+  <Translation Event="Touch began * * *" Replacement="BallsMinigameState.right_game_field:TouchBegan ({4}, 1 - {3})" Tag=""/>
+  <Translation Event="Touch ended * * *" Replacement="BallsMinigameState.right_game_field:TouchEnded ({4}, 1 - {3})" Tag=""/>
+  <Translation Event="Touch moved * * *" Replacement="BallsMinigameState.right_game_field:TouchMoved ({4}, 1 - {3})" Tag=""/>
+  <Translation Event="Z down" Replacement="BallsMinigameState.right_game_field:Debug ()" Tag=""/>
+</TranslationTable>

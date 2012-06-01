@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<StyleSet>
+  <Style Name="Default">
+    <Rect Material="MetalRect" Color="1 1 1 1"/>
+    <Text Font="data/fonts/stylo.xfont" Scale="25" Color="1 1 1 1"/>
+  </Style>
+  <Style Name="Focused">
+    <Rect Material="MetalRect" Color="1 1 1 1"/>
+    <Text Font="data/fonts/stylo.xfont" Scale="27" Color="1 1 0 1"/>
+  </Style>
+</StyleSet>

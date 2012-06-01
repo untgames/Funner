@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Control    Type="Window"   Size="800 600" XY="0 0" 
+            xreslist="Minigame_Balls"
+            StyleSetName="MetalWindow" SpecialMaterial="Minigame_Balls_Background"
+            Movable="0" AlwaysFocused="1" SelectControlsByKeys="0"  AnimatedOpening="0"
+            OnEvent_Opened="RunBallsMinigame"
+            OnEvent_GotFocus="Balls - update mana bottles"
+            OnEvent_Pressed="Print Cursor XY position for control">
+
+  <Control  Type="Button" Size="100 40" XY="12 -12" Name="FPS" Caption="111" CaptionRelativePosition="1.1 0.5" CaptionAlignment="0 0.5"
+            StyleSetName="Balls_Bottles_Text" SpecialMaterial="transparent"
+            ArrowSelectable="0"/>
+            
+  <Sprite Name="UserFields" Position="84 -278 -100" Pivot="-0.5 0.5" Scale="634 60 1" Material="Minigame_Balls_UserFields"/>
+  <Sprite Name="LFL" Position="111.71875 -282.8125 -95" Pivot="-0.5 0.5" Scale="33.59375 36.71875 1" Material="Minigame_Balls_LeftFieldLeft"/>
+  <Sprite Name="LFR" Position="322.65625 -282.8125 -95" Pivot="-0.5 0.5" Scale="40.625 36.71875 1"   Material="Minigame_Balls_LeftFieldRight" />
+  <Sprite Name="RFL" Position="442.96875 -282.8125 -95" Pivot="-0.5 0.5" Scale="34.375 36.71875 1"   Material="Minigame_Balls_RightFieldLeft" />
+  <Sprite Name="RFR" Position="654.6875 -282.8125 -95" Pivot="-0.5 0.5" Scale="39.84375 36.71875 1"  Material="Minigame_Balls_RightFieldRight" />
+</Control>
