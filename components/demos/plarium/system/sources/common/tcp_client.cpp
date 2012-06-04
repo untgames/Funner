@@ -6,16 +6,121 @@ using namespace plarium::utility;
 namespace
 {
 
-void raise_error (const char* failed_function)
+#ifdef _MSC_VER
+
+//получение строки с сообщением об ошибке
+std::string get_winsock_error_message (DWORD error_code)
 {
-  throw std::runtime_error (format ("%s failed, error '%s'", failed_function, strerror (errno)));
+  void* buffer = 0;
+
+  FormatMessageA (FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
+                 0, error_code, MAKELANGID (LANG_NEUTRAL, SUBLANG_DEFAULT), (LPSTR)&buffer, 0, 0);
+
+  if (!buffer)
+  {
+    return format ("Win32 error %u", error_code);
+  }
+  else
+  {
+      //отсечение завершающих \n и пробелов
+
+    char* iter = (char*)buffer;
+
+    iter += strlen (iter);
+
+    if (iter == buffer)
+      return "";
+
+    for (bool loop=true; loop;)
+      switch (*--iter)
+      {
+        case L'\n':
+        case L'\r':
+        case L' ':
+        case L'\t':
+          break;
+        default:
+        {
+          iter [1] = L'\0';
+          loop     = false;
+          break;
+        }
+      }
+
+    std::string message = format ("Win32 error %u. %s", error_code, buffer);
+
+    LocalFree (buffer);
+
+    return message;
+  }
 }
+
+void raise_host_error (const char* source, const char* function)
+{
+  DWORD error_code = WSAGetLastError ();
+
+  throw std::runtime_error (format ("%s - error at %s - %s", source, function, get_winsock_error_message (error_code).c_str ()));
+}
+
+void raise_error (const char* source, const char* function)
+{
+  raise_host_error (source, function);
+}
+
+
+//Класс инициализирующий и прекращающий работу с WinSock 2 dll
+class WinSockInitializer
+{
+  public:
+    WinSockInitializer ()
+    {
+      WSADATA wsa_data;
+
+      int result = WSAStartup (MAKEWORD(2, 2), &wsa_data);
+
+      if (result)
+        throw std::runtime_error (format ("WinSockInitializer - Error while calling ::WSAStartup: '%s'", get_winsock_error_message (result).c_str ()));
+    }
+
+    ~WinSockInitializer ()
+    {
+      WSACleanup ();
+    }
+};
+
+int close_socket (SOCKET socket)
+{
+  return closesocket (socket) == SOCKET_ERROR;
+}
+
+#else
+
+void raise_error (const char* source, const char* function)
+{
+  throw std::runtime_error (format ("%s - error at %s - %s", source, function, strerror (errno)));
+}
+
+void raise_host_error (const char* source, const char* function)
+{
+  throw std::runtime_error (format ("%s - error at %s - %s", source, function, hstrerror (h_errno)));
+}
+
+int close_socket (int socket)
+{
+  return close (socket);
+}
+
+#endif
 
 }
 
 struct TcpClient::Impl
 {
+#ifdef _MSC_VER
+  SOCKET              socket;     //socket descriptor
+#else
   int                 socket;     //socket descriptor
+#endif
   bool                connected;  //was connected
   ITcpClientListener* listener;   //listener
 
@@ -59,6 +164,10 @@ TcpClient::~TcpClient ()
 
 void TcpClient::Connect (const char* host, unsigned short port)
 {
+#ifdef _MSC_VER
+  static WinSockInitializer network_init;
+#endif
+
   if (IsConnected ())
     throw std::logic_error ("TcpClient::Connect - Socket already connected");
 
@@ -68,7 +177,7 @@ void TcpClient::Connect (const char* host, unsigned short port)
   hostent *entry = gethostbyname (host);
 
   if (!entry)
-    throw std::runtime_error (format ("TcpClient::Connect - can't resolve host name '%s'. Error '%s' while calling ::gethostbyname", host, hstrerror (h_errno)));
+    raise_host_error ("TcpClient::Connect", "::gethostbyname");
 
   if (!entry->h_addr_list [0])
     throw std::runtime_error ("TcpClient::Connect - error at ::gethostbyname, null address list returned");
@@ -121,27 +230,47 @@ void TcpClient::Connect (const char* host, unsigned short port)
 
   impl->socket = socket (address_family, SOCK_STREAM, IPPROTO_TCP);
 
-  if (socket < 0)
-    raise_error ("TcpClient::Connect - ::socket");
+#ifdef _MSC_VER
+  if (impl->socket == INVALID_SOCKET)
+    raise_error ("TcpClient::Connect", "::socket");
+#else
+  if (impl->socket < 0)
+    raise_error ("TcpClient::Connect", "::socket");
+#endif
 
   try
   {
+#ifdef _MSC_VER
+    WSAEVENT dummy_event = WSACreateEvent ();
+
+    if (dummy_event == WSA_INVALID_EVENT)
+      raise_error ("TcpClient::Connect", "::WSACreateEvent");
+
+    if (WSAEventSelect (impl->socket, dummy_event, 0) == SOCKET_ERROR)
+      raise_error ("TcpClient::Connect", "::WSAEventSelect");
+
+    u_long state_value = 0;
+
+    if (ioctlsocket (impl->socket, FIONBIO, &state_value) == SOCKET_ERROR)
+      raise_error ("TcpClient::Connect", "::ioctlsocket");
+#else
     int flags = fcntl (impl->socket, F_GETFL, 0);
 
     if (flags < 0)
-      raise_error ("TcpClient::Connect - ::fcntl");
+      raise_error ("TcpClient::Connect", "::fcntl");
 
     flags &= ~O_NONBLOCK;
 
     if (fcntl (impl->socket, F_SETFL, flags) == -1)
-      raise_error ("TcpClient::Connect - ::fcntl");
+      raise_error ("TcpClient::Connect", "::fcntl");
+#endif
 
     if (connect (impl->socket, (sockaddr*)&address_storage, address_storage_size))
-      raise_error ("TcpClient::Connect - ::connect");
+      raise_error ("TcpClient::Connect", "::connect");
   }
   catch (...)
   {
-    if (close (impl->socket))
+    if (close_socket (impl->socket))
       printf ("Can't close socket, error '%s'\n", strerror (errno));
 
     throw;
@@ -157,7 +286,7 @@ void TcpClient::Disconnect ()
 
   impl->connected = false;
 
-  if (close (impl->socket))
+  if (closesocket (impl->socket))
     throw std::runtime_error (format ("Can't close socket, error '%s'\n", strerror (errno)));
 }
 
@@ -194,7 +323,7 @@ void TcpClient::Send (const void* buffer, size_t size)
         throw std::runtime_error ("TcpClient::Send - A connection was forcibly closed by a peer.");
       }
       else
-        raise_error ("TcpClient::Connect - ::send");
+        raise_error ("TcpClient::Connect", "::send");
     }
 
     size         -= sent_bytes;
@@ -234,7 +363,7 @@ void TcpClient::Receive (void* buffer, size_t size)
     }
 
     if (received_bytes < 0)
-      raise_error ("TcpClient::Connect - ::recv");
+      raise_error ("TcpClient::Connect", "::recv");
 
     size         -= received_bytes;
     data_pointer += received_bytes;

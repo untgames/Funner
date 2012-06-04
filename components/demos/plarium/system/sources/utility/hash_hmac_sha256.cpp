@@ -62,7 +62,7 @@ typedef struct
 
 void hmac_sha256_init   (hmac_sha256_ctx *ctx, const unsigned char *key, unsigned int key_size);
 void hmac_sha256_update (hmac_sha256_ctx *ctx, const unsigned char *message, unsigned int message_len);
-void hmac_sha256_final  (hmac_sha256_ctx *ctx, unsigned char *mac);
+void hmac_sha256_final  (hmac_sha256_ctx *ctx, unsigned char (&mac) [32]);
 
 void hmac_sha256_init (hmac_sha256_ctx *ctx, const unsigned char *key, unsigned int key_size)
 {
@@ -113,7 +113,7 @@ void hmac_sha256_update (hmac_sha256_ctx *ctx, const unsigned char *message, uns
   ctx->ctx_inside.Update (message, message_len);
 }
 
-void hmac_sha256_final (hmac_sha256_ctx *ctx, unsigned char *mac)
+void hmac_sha256_final (hmac_sha256_ctx *ctx, unsigned char (&mac) [32])
 {
   unsigned char digest_inside [SHA256_DIGEST_SIZE];
 
