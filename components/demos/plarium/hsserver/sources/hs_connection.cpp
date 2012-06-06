@@ -7,7 +7,16 @@ using namespace plarium::utility;
 namespace
 {
 
-const size_t DEQUEUE_TIMEOUT = 1000;
+const char*         PING_MESSAGE                = "[{\"event\":\"user.ping\"}]";
+const size_t        DEQUEUE_TIMEOUT             = 100;
+const size_t        DEFAULT_RECEIVE_BUFFER_SIZE = 1024;
+const size_t        DEFAULT_SEND_BUFFER_SIZE    = 1024;
+const size_t        COMPRESSED_LENGTH_SIZE      = 4;
+const size_t        HMAC_SIZE                   = 32;
+const size_t        IV_SIZE                     = 16;
+const unsigned char PACKET_HEADER               = 0x06;
+const unsigned char OPTIONS_COMPRESSED          = 0x01;
+const unsigned char OPTIONS_ENCRYPTED           = 0x02;
 
 struct Message
 {
@@ -35,8 +44,14 @@ class IBackgroundThreadListener
     //Connection failed
     virtual void OnConnectFailed (const char* error) = 0;
 
+    // Message received
+    virtual void OnMessageReceived (unsigned short plugin_id, const unsigned char* message, size_t size) = 0;
+
     //Error occured
     virtual void OnError (ErrorCode code, const char* error) = 0;
+
+    //Logging
+    virtual void Log (const char* message) = 0;
 
   protected:
     virtual ~IBackgroundThreadListener () {}
@@ -47,16 +62,18 @@ struct SendFunctionArg
 {
   std::string                host;
   unsigned short             port;
+  HsConnectionSettings&      connection_settings;
   TcpClient&                 tcp_client;
   MessageQueue&              message_queue;
   volatile bool&             need_stop;
   IBackgroundThreadListener& listener;
 
-  SendFunctionArg (const char* in_host, unsigned short in_port, TcpClient& in_tcp_client,
-                   MessageQueue& in_message_queue, volatile bool& in_need_stop,
+  SendFunctionArg (const char* in_host, unsigned short in_port, HsConnectionSettings& in_connection_settings,
+                   TcpClient& in_tcp_client, MessageQueue& in_message_queue, volatile bool& in_need_stop,
                    IBackgroundThreadListener& in_listener)
     : host (in_host)
     , port (in_port)
+    , connection_settings (in_connection_settings)
     , tcp_client (in_tcp_client)
     , message_queue (in_message_queue)
     , need_stop (in_need_stop)
@@ -67,12 +84,14 @@ struct SendFunctionArg
 //Receive-thread function arguments
 struct ReceiveFunctionArg
 {
+  HsConnectionSettings&      connection_settings;
   TcpClient&                 tcp_client;
   volatile bool&             need_stop;
   IBackgroundThreadListener& listener;
 
-  ReceiveFunctionArg (TcpClient& in_tcp_client, volatile bool& in_need_stop, IBackgroundThreadListener& in_listener)
-    : tcp_client (in_tcp_client)
+  ReceiveFunctionArg (HsConnectionSettings& in_connection_settings, TcpClient& in_tcp_client, volatile bool& in_need_stop, IBackgroundThreadListener& in_listener)
+    : connection_settings (in_connection_settings)
+    , tcp_client (in_tcp_client)
     , need_stop (in_need_stop)
     , listener (in_listener)
     {}
@@ -85,11 +104,114 @@ void* receive_function (void* user_data)
 
   volatile bool& need_stop = data->need_stop;
 
+  size_t         current_buffer_size = DEFAULT_RECEIVE_BUFFER_SIZE;
+  unsigned char* receive_buffer      = new unsigned char [current_buffer_size];
+  unsigned char  packet_header_buffer [8];
+  unsigned char  hashed_key [32];
+
+  if (data->connection_settings.encryption_enabled)
+    sha256 (data->connection_settings.encryption_key, data->connection_settings.encryption_key_bits / 8, hashed_key);
+
   for (;;)
   {
     if (need_stop)
       break;
+
+    try
+    {
+      //TODO receive with timeout
+
+      data->tcp_client.Receive (packet_header_buffer, sizeof (packet_header_buffer));
+
+      if (packet_header_buffer [0] != PACKET_HEADER)
+      {
+        data->listener.OnError (ErrorCode_InvalidHeader, "Invalid package header");
+        break;
+      }
+
+      unsigned char   options      = packet_header_buffer [1];
+      unsigned short* plugin_id    = (unsigned short*)(packet_header_buffer + 2);
+      unsigned int*   message_size = (unsigned int*)(packet_header_buffer + 4);
+
+      if (*message_size > current_buffer_size)
+      {
+        delete [] receive_buffer;
+
+        receive_buffer      = 0;
+        current_buffer_size = 0;
+
+        size_t new_buffer_size = *message_size * 2;
+
+        receive_buffer      = new unsigned char [new_buffer_size];
+        current_buffer_size = new_buffer_size;
+      }
+
+      if (options & OPTIONS_ENCRYPTED)
+      {
+        if (*message_size <= HMAC_SIZE + IV_SIZE)
+        {
+          data->listener.OnError (ErrorCode_InvalidHeader, "Invalid message size");
+          break;
+        }
+      }
+
+      if (options & OPTIONS_COMPRESSED)
+      {
+        if (*message_size <= COMPRESSED_LENGTH_SIZE)
+        {
+          data->listener.OnError (ErrorCode_InvalidHeader, "Invalid message size");
+          break;
+        }
+      }
+
+      data->tcp_client.Receive (receive_buffer, *message_size);
+
+      unsigned char* message_body      = receive_buffer;
+      size_t         message_body_size = *message_size;
+
+      if (options & OPTIONS_ENCRYPTED)
+      {
+        unsigned char hmac [HMAC_SIZE];
+
+        hmac_sha256 (hashed_key, sizeof (hashed_key), receive_buffer + HMAC_SIZE, *message_size - HMAC_SIZE, hmac);
+
+        if (memcmp (hmac, receive_buffer, HMAC_SIZE))
+        {
+          data->listener.OnError (ErrorCode_HashMismatch, "Invalid hash");
+          break;
+        }
+
+        unsigned char* iv = receive_buffer + HMAC_SIZE;
+
+        message_body = iv + IV_SIZE;
+
+        message_body_size -= HMAC_SIZE + IV_SIZE;
+
+        aes_ofb (data->connection_settings.encryption_key, data->connection_settings.encryption_key_bits, message_body_size, message_body, message_body, (const unsigned char (&)[16])*iv);
+      }
+
+      if (options & OPTIONS_COMPRESSED)
+      {
+        //TODO
+        throw std::runtime_error ("Compressed message received");
+      }
+
+      data->listener.OnMessageReceived (*plugin_id, message_body, message_body_size);
+      data->listener.Log (format ("Message received '%s'", message_body).c_str ());
+    }
+    catch (std::exception& e)
+    {
+      data->listener.OnError (ErrorCode_Generic, e.what ());
+      break;
+    }
+    catch (...)
+    {
+      data->listener.OnError (ErrorCode_Generic, "Unknown error while receiving events");
+      break;
+    }
   }
+
+  delete [] receive_buffer;
 
   return 0;
 }
@@ -118,34 +240,128 @@ void* send_function (void* user_data)
 
   data->listener.OnConnected ();
 
-  std::auto_ptr<ReceiveFunctionArg> receive_function_arg (new ReceiveFunctionArg (data->tcp_client, data->need_stop, data->listener));
+  std::auto_ptr<ReceiveFunctionArg> receive_function_arg (new ReceiveFunctionArg (data->connection_settings, data->tcp_client, data->need_stop, data->listener));
 
   Thread receive_thread (receive_function, receive_function_arg.get ());      //thread for receiving data
 
   receive_function_arg.release ();
 
+  size_t last_keep_alive_time = milliseconds ();
+
+  size_t         current_buffer_size = DEFAULT_SEND_BUFFER_SIZE;
+  unsigned char* send_buffer         = new unsigned char [current_buffer_size];
+  unsigned char  hashed_key [32];
+
+  if (data->connection_settings.encryption_enabled)
+    sha256 (data->connection_settings.encryption_key, data->connection_settings.encryption_key_bits / 8, hashed_key);
+
   for (;;)
   {
+    if (need_stop)
+      break;
+
     try
     {
-      if (need_stop)
-      {
-
-        break;
-      }
-
       std::auto_ptr<Message> message = data->message_queue.Dequeue (DEQUEUE_TIMEOUT);
 
       if (!message.get ())
-        continue;
+      {
+        if (milliseconds () - last_keep_alive_time > data->connection_settings.keep_alive_interval)
+        {
+          std::auto_ptr<Message> ping_message (new Message (1, (const unsigned char*)PING_MESSAGE, strlen (PING_MESSAGE)));
 
-      //...
+          data->message_queue.Enqueue (ping_message);
+        }
+
+        continue;
+      }
+
+      last_keep_alive_time = milliseconds ();
+
+      //TODO send with timeout
+
+      size_t message_text_length = message->message.size ();
+      size_t packet_size         = 8; //Header size
+
+      if (data->connection_settings.compression_enabled)
+      {
+        packet_size += 4; //Packed header
+
+        //TODO
+        throw std::invalid_argument ("Compression not supported");
+      }
+      else
+      {
+        packet_size += message_text_length;
+      }
+
+      if (data->connection_settings.encryption_enabled)
+      {
+        packet_size += 48;
+      }
+
+      if (packet_size > current_buffer_size)
+      {
+        delete [] send_buffer;
+
+        send_buffer         = 0;
+        current_buffer_size = 0;
+
+        size_t new_buffer_size = packet_size * 2;
+
+        send_buffer         = new unsigned char [new_buffer_size];
+        current_buffer_size = new_buffer_size;
+      }
+
+      send_buffer [0] = PACKET_HEADER;
+
+      send_buffer [1] = 0; //Options
+
+      if (data->connection_settings.compression_enabled)
+        send_buffer [1] |= OPTIONS_COMPRESSED;
+
+      if (data->connection_settings.encryption_enabled)
+        send_buffer [1] |= OPTIONS_ENCRYPTED;
+
+      unsigned short* plugin_id = (unsigned short*)(send_buffer + 2);
+
+      *plugin_id = message->plugin_id;
+
+      unsigned int* message_size = (unsigned int*)(send_buffer + 4);
+
+      *message_size = packet_size - 8;
+
+      if (data->connection_settings.encryption_enabled)
+      {
+        unsigned char* hmac         = send_buffer + 8;
+        unsigned char* iv           = hmac + HMAC_SIZE;
+        unsigned char* message_data = iv + IV_SIZE;
+
+        for (size_t i = 0; i < IV_SIZE; i++)
+          iv [i] = rand () % 0xff;
+
+        aes_ofb (data->connection_settings.encryption_key, data->connection_settings.encryption_key_bits, message_text_length, message->message.data (), message_data, (const unsigned char (&)[16])*iv);
+
+        hmac_sha256 (hashed_key, sizeof (hashed_key), iv, IV_SIZE + message_text_length, (unsigned char (&)[32])*hmac);
+      }
+
+      data->tcp_client.Send (send_buffer, packet_size);
+
+      data->listener.Log (format ("Message '%s' sent", message->message.c_str ()).c_str ());
+    }
+    catch (std::exception& e)
+    {
+      data->listener.OnError (ErrorCode_Generic, e.what ());
+      break;
     }
     catch (...)
     {
-      ///...................
+      data->listener.OnError (ErrorCode_Generic, "Unknown error while sending events");
+      break;
     }
   }
+
+  delete [] send_buffer;
 
   receive_thread.Join ();
 
@@ -202,7 +418,7 @@ struct HsConnection::Impl : public ITcpClientListener, public IBackgroundThreadL
 
     needs_stop_threads = false;
 
-    std::auto_ptr<SendFunctionArg> send_function_arg (new SendFunctionArg (host, port, tcp_client, send_queue, needs_stop_threads, *this));
+    std::auto_ptr<SendFunctionArg> send_function_arg (new SendFunctionArg (host, port, settings, tcp_client, send_queue, needs_stop_threads, *this));
 
     send_thread.reset (new Thread (send_function, send_function_arg.get ()));
 
@@ -314,6 +530,25 @@ struct HsConnection::Impl : public ITcpClientListener, public IBackgroundThreadL
     state = HsConnectionState_Disconnected;
     OnError (ErrorCode_Generic, error);
     OnConnectionStateChanged ();
+  }
+
+  void OnMessageReceived (unsigned short plugin_id, const unsigned char* message, size_t size)
+  {
+    if (!event_listener)
+      return;
+
+    try
+    {
+      event_listener->OnMessageReceived (*connection, plugin_id, message, size);
+    }
+    catch (std::exception& e)
+    {
+      Log (format ("IHsConnectionEventListener::OnMessageReceived - exception '%s'", e.what ()).c_str ());
+    }
+    catch (...)
+    {
+      Log ("IHsConnectionEventListener::OnMessageReceived - unknown exception");
+    }
   }
 
   void OnError (ErrorCode code, const char* error)

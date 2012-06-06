@@ -1,4 +1,3 @@
-#include <ctime>
 #include <stdexcept>
 
 #include <system/condition.h>

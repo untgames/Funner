@@ -30,6 +30,7 @@ enum ErrorCode
   ErrorCode_Generic,
   ErrorCode_SendQueueOverflow,
   ErrorCode_Timeout,
+  ErrorCode_InvalidHeader,
   ErrorCode_HashMismatch
 };
 

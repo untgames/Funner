@@ -1,6 +1,7 @@
 #include "shared.h"
 
 using namespace plarium::system;
+using namespace plarium::utility;
 
 namespace
 {
@@ -28,11 +29,6 @@ typedef struct
   // Keeps track of whether we were broadcasting or signaling.  This
   // allows us to optimize the code if we're just signaling.
 } pthread_cond_t;
-
-int current_time ()
-{
-  return int (clock () * 1000.0 / CLOCKS_PER_SEC);
-}
 
 void pthread_cond_init (pthread_cond_t *cv, const void *)
 {
@@ -138,7 +134,7 @@ void pthread_cond_timedwait (pthread_cond_t *cv, pthread_mutex_t *external_mutex
    // Returns 0 if successfully signalled, 1 if time expired.
 
    // Calculate delta T to obtain the real time to wait for
-   DWORD wait_time = (DWORD)(end_time - current_time ());
+   DWORD wait_time = (DWORD)(end_time - milliseconds ());
    // Avoid race conditions.
    EnterCriticalSection (&cv->waiters_count_lock_);
    cv->waiters_count_++;
@@ -289,7 +285,7 @@ void Condition::Wait (Mutex& lock)
 
 void Condition::Wait (Mutex& lock, size_t wait_in_milliseconds)
 {
-  pthread_cond_timedwait (&impl->condition, (pthread_mutex_t*)lock.Handle (), current_time () + wait_in_milliseconds);
+  pthread_cond_timedwait (&impl->condition, (pthread_mutex_t*)lock.Handle (), milliseconds () + wait_in_milliseconds);
 }
 
 void Condition::Notify (bool broadcast)

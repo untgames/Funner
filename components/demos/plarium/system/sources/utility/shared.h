@@ -5,9 +5,15 @@
 
 #ifdef __APPLE__
 
+#include <CoreFoundation/CFDate.h>
+
 #include <CommonCrypto/CommonCryptor.h>
 #include <CommonCrypto/CommonDigest.h>
 #include <CommonCrypto/CommonHMAC.h>
+
+#else
+
+#include <ctime>
 
 #endif
 
