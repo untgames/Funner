@@ -88,10 +88,10 @@ int main ()
       " \"event\":\"user.authenticate\","
       " \"lastName\":\"Anonym\","
       " \"firstName\":\"Anonym\","
-      " \"token\":\"d666bbd49c325786d335a3a3e8d3dbd8c5dd3f6d3f6847306f20a6ac2263fc4\","
+      " \"token\":\"16880094c24e9a9754d026d903b06dbe\","
       " \"photo\":\"http://cs912.userapi.com/u93339557/a_57700b24.jpg\","
       " \"network\":\"VK\","
-      " \"loginId\":\"93339557\","
+      " \"loginId\":\"50594503\","
       " \"version\":1"
       "}]";
 

@@ -119,6 +119,7 @@ void* receive_function (void* user_data)
 
     try
     {
+      //TODO timeout error
       //TODO receive with timeout
 
       data->tcp_client.Receive (packet_header_buffer, sizeof (packet_header_buffer));
@@ -192,6 +193,8 @@ void* receive_function (void* user_data)
 
       if (options & OPTIONS_COMPRESSED)
       {
+
+
         //TODO
         throw std::runtime_error ("Compressed message received");
       }

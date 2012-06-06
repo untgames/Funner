@@ -54,6 +54,7 @@ int main ()
     memset (iv, 0, 16);
 
     //http://oauth.vk.com/authorize?client_id=2972852&scope=friends&redirect_uri=http://response.com&display=page&response_type=token
+    //https://oauth.vk.com/token?grant_type=password&client_id=2972852&client_secret=mdKdkpp6bmZ8yrIITjUD&username=anonym90@mail.ru&password=anonym90@mail.ru&scope=friends
 
     const char* message_text =  "[{"
       " \"event\":\"user.authenticate\","
