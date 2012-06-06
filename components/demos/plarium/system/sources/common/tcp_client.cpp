@@ -286,7 +286,7 @@ void TcpClient::Disconnect ()
 
   impl->connected = false;
 
-  if (closesocket (impl->socket))
+  if (close_socket (impl->socket))
     throw std::runtime_error (format ("Can't close socket, error '%s'\n", strerror (errno)));
 }
 
