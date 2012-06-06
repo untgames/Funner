@@ -23,13 +23,17 @@ template <typename T> class SharedQueue
             ~SharedQueue ();
 
     /// Gets the number of elements contained in the Queue.
-    size_t Size () const;
+    bool   Empty () const;
+    size_t Size  () const;
 
     /// Puts the item into the queue.
     bool Enqueue (std::auto_ptr<T>& item);
 
     /// Removes and returns the item at the beginning of the Queue.
     std::auto_ptr<T> Dequeue (size_t milliseconds_timeout);
+
+    /// Clear queue
+    void Clear ();
 
     /// Force wakes up dequeue operation
     void WakeUp ();

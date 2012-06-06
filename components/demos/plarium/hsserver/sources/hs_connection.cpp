@@ -7,6 +7,8 @@ using namespace plarium::utility;
 namespace
 {
 
+const size_t DEQUEUE_TIMEOUT = 1000;
+
 struct Message
 {
   unsigned short plugin_id;
@@ -21,7 +23,7 @@ struct Message
   }
 };
 
-typedef std::deque<Message> MessageQueue;
+typedef SharedQueue<Message> MessageQueue;
 
 //Send-thread function listener
 class IBackgroundThreadListener
@@ -46,15 +48,18 @@ struct SendFunctionArg
   std::string                host;
   unsigned short             port;
   TcpClient&                 tcp_client;
-  IBackgroundThreadListener& listener;
-  Mutex&                     send_queue_mutex;
-  Condition&                 send_queue_condition;
+  MessageQueue&              message_queue;
   volatile bool&             need_stop;
+  IBackgroundThreadListener& listener;
 
-  SendFunctionArg (const char* in_host, unsigned short in_port, TcpClient& in_tcp_client, IBackgroundThreadListener& in_listener)
+  SendFunctionArg (const char* in_host, unsigned short in_port, TcpClient& in_tcp_client,
+                   MessageQueue& in_message_queue, volatile bool& in_need_stop,
+                   IBackgroundThreadListener& in_listener)
     : host (in_host)
     , port (in_port)
     , tcp_client (in_tcp_client)
+    , message_queue (in_message_queue)
+    , need_stop (in_need_stop)
     , listener (in_listener)
     {}
 };
@@ -63,10 +68,12 @@ struct SendFunctionArg
 struct ReceiveFunctionArg
 {
   TcpClient&                 tcp_client;
+  volatile bool&             need_stop;
   IBackgroundThreadListener& listener;
 
-  ReceiveFunctionArg (TcpClient& in_tcp_client, IBackgroundThreadListener& in_listener)
+  ReceiveFunctionArg (TcpClient& in_tcp_client, volatile bool& in_need_stop, IBackgroundThreadListener& in_listener)
     : tcp_client (in_tcp_client)
+    , need_stop (in_need_stop)
     , listener (in_listener)
     {}
 };
@@ -74,16 +81,13 @@ struct ReceiveFunctionArg
 //Receive-thread  function
 void* receive_function (void* user_data)
 {
-  ReceiveFunctionArg* data = (ReceiveFunctionArg*)user_data;
+  std::auto_ptr<ReceiveFunctionArg> data ((ReceiveFunctionArg*)user_data);
 
-  TcpClient&                 tcp_client = data->tcp_client;
-  IBackgroundThreadListener& listener   = data->listener;
-
-  delete data;
+  volatile bool& need_stop = data->need_stop;
 
   for (;;)
   {
-    if (listener.NeedsStop ())
+    if (need_stop)
       break;
   }
 
@@ -93,56 +97,49 @@ void* receive_function (void* user_data)
 //Send-thread function
 void* send_function (void* user_data)
 {
-  SendFunctionArg* data = (SendFunctionArg*)user_data;
+  std::auto_ptr<SendFunctionArg> data ((SendFunctionArg*)user_data);
 
-  std::string                host                 = data->host;
-  unsigned short             port                 = data->port;
-  TcpClient&                 tcp_client           = data->tcp_client;
-  IBackgroundThreadListener& listener             = data->listener;
-  Mutex&                     send_queue_mutex     = data->send_queue_mutex;
-  Condition&                 send_queue_condition = data->send_queue_condition;
-
-  delete data;
+  volatile bool& need_stop = data->need_stop;
 
   try
   {
-    tcp_client.Connect (host.c_str (), port);
+    data->tcp_client.Connect (data->host.c_str (), data->port);
   }
   catch (std::exception& e)
   {
-    listener.OnConnectFailed (e.what ());
+    data->listener.OnConnectFailed (e.what ());
     return 0;
   }
   catch (...)
   {
-    listener.OnConnectFailed ("Uknown exception");
+    data->listener.OnConnectFailed ("Uknown exception");
     return 0;
   }
 
-  listener.OnConnected ();
+  data->listener.OnConnected ();
 
-  ReceiveFunctionArg* receive_function_arg = new ReceiveFunctionArg (tcp_client, listener);
+  std::auto_ptr<ReceiveFunctionArg> receive_function_arg (new ReceiveFunctionArg (data->tcp_client, data->need_stop, data->listener));
 
-  Thread receive_thread (receive_function, receive_function_arg);      //thread for receiving data
+  Thread receive_thread (receive_function, receive_function_arg.get ());      //thread for receiving data
+
+  receive_function_arg.release ();
 
   for (;;)
   {
     try
     {
-      if (listener.NeedsStop ())
+      if (need_stop)
       {
 
         break;
       }
 
-      send_queue_mutex.Lock     ();
+      std::auto_ptr<Message> message = data->message_queue.Dequeue (DEQUEUE_TIMEOUT);
 
-
-      send_queue_condition.Wait (send_queue_mutex);
+      if (!message.get ())
+        continue;
 
       //...
-
-      send_queue_mutex.Unlock ();
     }
     catch (...)
     {
@@ -169,23 +166,26 @@ struct HsConnection::Impl : public ITcpClientListener, public IBackgroundThreadL
   IHsConnectionEventListener* event_listener;       //events listener
   IHsConnectionLogListener*   log_listener;         //log messages listener
   volatile HsConnectionState  state;                //connection state
-  Thread*                     send_thread;          //thread for sending data
+  std::auto_ptr<Thread>       send_thread;          //thread for sending data
   volatile bool               needs_stop_threads;   //signal to stop background threads
   MessageQueue                send_queue;           //send messages queue
-  Mutex                       send_queue_mutex;     //send messages queue mutex
-  Condition                   send_queue_condition; //send queue new object condition
 
   Impl (HsConnection* in_connection, const HsConnectionSettings& in_settings)
     : connection (in_connection)
     , event_listener (0)
     , log_listener (0)
     , state (HsConnectionState_Disconnected)
-    , send_thread (0)
     , needs_stop_threads (false)
+    , send_queue (in_settings.send_queue_size)
   {
     memcpy (&settings, &in_settings, sizeof (settings));
 
     tcp_client.SetListener (this);
+  }
+
+  ~Impl ()
+  {
+    Disconnect ();
   }
 
   //Connection
@@ -202,9 +202,11 @@ struct HsConnection::Impl : public ITcpClientListener, public IBackgroundThreadL
 
     needs_stop_threads = false;
 
-    SendFunctionArg* send_function_arg = new SendFunctionArg (host, port, tcp_client, *this);
+    std::auto_ptr<SendFunctionArg> send_function_arg (new SendFunctionArg (host, port, tcp_client, send_queue, needs_stop_threads, *this));
 
-    send_thread = new Thread (send_function, send_function_arg);
+    send_thread.reset (new Thread (send_function, send_function_arg.get ()));
+
+    send_function_arg.release ();
   }
 
   void Disconnect ()
@@ -214,21 +216,18 @@ struct HsConnection::Impl : public ITcpClientListener, public IBackgroundThreadL
 
     needs_stop_threads = true;
 
-    send_queue_condition.Notify (false);
-
     send_thread->Join ();
 
-    delete send_thread;
-    send_thread = 0;
+    send_thread.reset (0);
 
     tcp_client.Disconnect ();
 
     state = HsConnectionState_Disconnected;
 
-    if (!send_queue.empty ())
-      Log (format ("%u messages dropped because of disconnect", send_queue.size ()).c_str ());
+    if (!send_queue.Empty ())
+      Log (format ("%u messages dropped because of disconnect", send_queue.Size ()).c_str ());
 
-    send_queue.clear ();
+    send_queue.Clear ();
 
     OnConnectionStateChanged ();
   }
@@ -242,18 +241,14 @@ struct HsConnection::Impl : public ITcpClientListener, public IBackgroundThreadL
     if (state == HsConnectionState_Disconnected)
       throw std::logic_error ("HsConnection::SendMessage - connection disconnected");
 
-    Lock send_queue_lock (send_queue_mutex);
+    std::auto_ptr<Message> new_message (new Message (plugin_id, message, size));
 
-    if (send_queue.size () >= settings.send_queue_size)
+    if (!send_queue.Enqueue (new_message))
     {
       Log ("Message queue overlfow");
       OnError (ErrorCode_SendQueueOverflow, "Queue overflowed");
       return;
     }
-
-    send_queue.push_back (Message (plugin_id, message, size));
-
-    send_queue_condition.Notify (false);
   }
 
   //Connection disconnected
@@ -341,35 +336,6 @@ struct HsConnection::Impl : public ITcpClientListener, public IBackgroundThreadL
       Log ("IHsConnectionEventListener::OnError - unknown exception");
     }
   }
-
-  //Check if we should stop send operations
-  bool NeedsStop ()
-  {
-    return needs_stop_threads;
-  }
-
-  //Send queue empty
-  bool SendQueueEmpty ()
-  {
-    Lock send_queue_lock (send_queue_mutex);
-
-    return send_queue.empty ();
-  }
-
-  //Pop message
-  Message& SendQueueFront ()
-  {
-    Lock send_queue_lock (send_queue_mutex);
-
-    return send_queue.front ();
-  }
-
-  void PopSendQueue ()
-  {
-    Lock send_queue_lock (send_queue_mutex);
-
-    send_queue.pop_front ();
-  }
 };
 
 /*
@@ -382,9 +348,6 @@ HsConnection::HsConnection (const HsConnectionSettings& settings)
 
 HsConnection::~HsConnection ()
 {
-  if (impl->state != HsConnectionState_Disconnected)
-    Disconnect ();
-
   delete impl;
 }
 

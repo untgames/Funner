@@ -20,6 +20,14 @@ SharedQueue<T>::~SharedQueue ()
 }
 
 template <typename T>
+bool SharedQueue<T>::Empty () const
+{
+  plarium::system::Lock lock (const_cast<plarium::system::Mutex&> (mutex));
+
+  return items.empty ();
+}
+
+template <typename T>
 size_t SharedQueue<T>::Size () const
 {
   plarium::system::Lock lock (const_cast<plarium::system::Mutex&> (mutex));
@@ -58,6 +66,14 @@ std::auto_ptr<T> SharedQueue<T>::Dequeue (size_t milliseconds_timeout)
   items.pop_front();
 
   return result;
+}
+
+template <typename T>
+void SharedQueue<T>::Clear ()
+{
+  plarium::system::Lock lock (mutex);
+
+  items.clear ();
 }
 
 template <typename T>

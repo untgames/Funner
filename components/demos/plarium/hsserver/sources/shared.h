@@ -1,4 +1,3 @@
-#include <deque>
 #include <stdexcept>
 
 #include <system/condition.h>
@@ -8,6 +7,7 @@
 
 #include <utility/crypto.h>
 #include <utility/hash.h>
+#include <utility/shared_queue.h>
 #include <utility/utils.h>
 
 #include <hsserver/hs_connection.h>
