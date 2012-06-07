@@ -67,7 +67,7 @@ int main ()
     unsigned char key [16] = { 0xd0, 0x71, 0x73, 0x41, 0x0d, 0xee, 0xd2, 0x6f, 0x44, 0x3f, 0x7b, 0xa4, 0x42, 0x2f, 0x86, 0x03 };
 
     connection_settings.send_queue_size       = 2;
-    connection_settings.keep_alive_interval   = 10000;
+    connection_settings.keep_alive_interval   = 30000;
     connection_settings.compression_enabled   = false;
     connection_settings.compression_threshold = 1024;
     connection_settings.encryption_enabled    = true;

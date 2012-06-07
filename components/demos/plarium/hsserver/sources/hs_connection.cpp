@@ -104,8 +104,10 @@ void* receive_function (void* user_data)
 
   volatile bool& need_stop = data->need_stop;
 
-  size_t         current_buffer_size = DEFAULT_RECEIVE_BUFFER_SIZE;
-  unsigned char* receive_buffer      = new unsigned char [current_buffer_size];
+  size_t         current_buffer_size            = DEFAULT_RECEIVE_BUFFER_SIZE;
+  unsigned char* receive_buffer                 = new unsigned char [current_buffer_size];
+  size_t         current_decompress_buffer_size = DEFAULT_RECEIVE_BUFFER_SIZE;
+  unsigned char* decompress_buffer              = new unsigned char [current_decompress_buffer_size];
   unsigned char  packet_header_buffer [8];
   unsigned char  hashed_key [32];
 
@@ -203,7 +205,23 @@ void* receive_function (void* user_data)
 
         message_body += COMPRESSED_LENGTH_SIZE;
 
+        if (*uncompressed_size > current_decompress_buffer_size)
+        {
+          delete [] decompress_buffer;
 
+          decompress_buffer              = 0;
+          current_decompress_buffer_size = 0;
+
+          size_t new_buffer_size = *uncompressed_size * 2;
+
+          decompress_buffer              = new unsigned char [new_buffer_size];
+          current_decompress_buffer_size = new_buffer_size;
+        }
+
+        zlib_decompress (message_body, message_body_size - COMPRESSED_LENGTH_SIZE, decompress_buffer, *uncompressed_size);
+
+        message_body      = decompress_buffer;
+        message_body_size = *uncompressed_size;
       }
 
       data->listener.OnMessageReceived (*plugin_id, message_body, message_body_size);
@@ -222,6 +240,7 @@ void* receive_function (void* user_data)
   }
 
   delete [] receive_buffer;
+  delete [] decompress_buffer;
 
   return 0;
 }
