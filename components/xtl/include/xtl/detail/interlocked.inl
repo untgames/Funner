@@ -98,12 +98,12 @@
     (
        "lock\n\t"
        "xadd %1, %0":
-       "+m"( &rc ), "=r"( r ): // outputs (%0, %1)
+       "+m"( rc ), "=r"( r ): // outputs (%0, %1)
        "1"( val ): // inputs (%2 == %1)
        "memory", "cc" // clobbers
     );
 
-    return r  
+    return r;
   }    
   
   inline int atomic_decrement (volatile int& rc, int val)
@@ -113,12 +113,12 @@
   
   inline int atomic_increment (volatile int& rc)
   {
-    atomic_increment (rc, 1);
+    return atomic_increment (rc, 1);
   }  
 
   inline int atomic_decrement (volatile int& rc)
   {
-    atomic_increment (rc, -1);
+    return atomic_increment (rc, -1);
   }
 
   inline int atomic_conditional_increment (volatile int& rc)

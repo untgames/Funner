@@ -143,7 +143,7 @@ struct AnimationImpl: public xtl::reference_counter, public xtl::trackable, publ
 namespace
 {
 
-struct AnimationTarget;
+struct AnimationTarget {};
 
 ///Анимационная цель
 struct Target: public xtl::reference_counter, public xtl::instance_counter<AnimationTarget>
