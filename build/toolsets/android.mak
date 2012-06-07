@@ -79,7 +79,7 @@ COMMON_LINK_FLAGS          += -Wl,-L,$(PLATFORM_DIR)/arch-arm/usr/lib
 COMMON_LINK_FLAGS          += -Wl,-L,$(DIST_BIN_DIR)
 COMMON_LINK_FLAGS          += -Wl,-rpath-link=$(PLATFORM_DIR)/arch-arm/usr/lib
 COMMON_LINK_FLAGS          += -lc -lm -lstdc++ -lgcc -lsupc++
-COMMON_LINK_FLAGS          += -Wl,--no-undefined
+COMMON_LINK_FLAGS          += -Wl,--no-undefined -s
 ANDROID_EXE_LINK_FLAGS     += -z $(PLATFORM_DIR)/arch-arm/usr/lib/crtbegin_dynamic.o
 ANDROID_SO_LINK_FLAGS       = -Wl,-soname,$(notdir $1) -shared -Wl,--no-undefined -Wl,-z,noexecstack
 VALID_TARGET_TYPES         += android-pak android-jar
