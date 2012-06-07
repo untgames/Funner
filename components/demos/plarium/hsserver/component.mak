@@ -10,4 +10,4 @@ HSSERVER.SOURCES.IMPORTS      := compile.plarium.hsserver compile.plarium.system
 
 HSSERVER.TESTS.TYPE        := test-suite
 HSSERVER.TESTS.SOURCE_DIRS := tests
-HSSERVER.TESTS.IMPORTS     := compile.plarium.hsserver compile.plarium.system link.plarium.hsserver link.plarium.system
+HSSERVER.TESTS.IMPORTS     := compile.plarium.hsserver compile.plarium.system link.plarium.hsserver

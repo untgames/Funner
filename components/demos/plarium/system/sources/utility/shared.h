@@ -17,6 +17,8 @@
 
 #endif
 
+#include <zlib.h>
+
 #include <utility/crypto.h>
 #include <utility/hash.h>
 #include <utility/utils.h>

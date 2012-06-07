@@ -149,7 +149,7 @@ void* receive_function (void* user_data)
 
       if (options & OPTIONS_ENCRYPTED)
       {
-        if (*message_size <= HMAC_SIZE + IV_SIZE)
+        if (*message_size < HMAC_SIZE + IV_SIZE)
         {
           data->listener.OnError (ErrorCode_InvalidHeader, "Invalid message size");
           break;
@@ -158,7 +158,7 @@ void* receive_function (void* user_data)
 
       if (options & OPTIONS_COMPRESSED)
       {
-        if (*message_size <= COMPRESSED_LENGTH_SIZE)
+        if (*message_size < COMPRESSED_LENGTH_SIZE)
         {
           data->listener.OnError (ErrorCode_InvalidHeader, "Invalid message size");
           break;
@@ -193,10 +193,17 @@ void* receive_function (void* user_data)
 
       if (options & OPTIONS_COMPRESSED)
       {
+        if (message_body_size < COMPRESSED_LENGTH_SIZE)
+        {
+          data->listener.OnError (ErrorCode_InvalidHeader, "Invalid message size");
+          break;
+        }
+
+        unsigned int* uncompressed_size = (unsigned int*)message_body;
+
+        message_body += COMPRESSED_LENGTH_SIZE;
 
 
-        //TODO
-        throw std::runtime_error ("Compressed message received");
       }
 
       data->listener.OnMessageReceived (*plugin_id, message_body, message_body_size);

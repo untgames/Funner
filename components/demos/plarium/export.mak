@@ -1,1 +1,1 @@
-COMPONENT_DIRS := system hsserver
+COMPONENT_DIRS := system hsserver zlib
