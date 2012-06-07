@@ -3,7 +3,7 @@
 void test_cast_to_reference()
 {
     int i = 7;
-    any a(i), b(a);
+    any a(i), b = a.clone ();
     const any c(i);
     
     int&                ra1 = any_cast<int&               >(a);

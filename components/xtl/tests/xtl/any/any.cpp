@@ -117,7 +117,7 @@ void test_converting_ctor()
 void test_copy_ctor()
 {
     stl::string text = "test message";
-    any original (text), copy = original;
+    any original (text), copy = original.clone ();
 
     check_false(copy.empty(), "empty");
     check_equal(original.type(), copy.type(), "type");
@@ -137,7 +137,7 @@ void test_copy_assign()
 {
     stl::string text = "test message";
     any original (text), copy;
-    any * assign_result = &(copy = original);
+    any * assign_result = &(copy = original.clone ());
 
     check_false(copy.empty(), "empty");
     check_equal(original.type(), copy.type(), "type");

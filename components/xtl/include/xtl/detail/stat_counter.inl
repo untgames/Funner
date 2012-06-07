@@ -51,7 +51,8 @@ struct stat_counter::group
   }
 };
 
-template <bool dummy> stat_counter::group *stat_counter::group::container_desc<dummy>::first_group = 0, *stat_counter::group::container_desc<dummy>::last_group = 0;
+template <bool dummy> stat_counter::group* stat_counter::group::container_desc<dummy>::first_group = 0; 
+template <bool dummy> stat_counter::group* stat_counter::group::container_desc<dummy>::last_group  = 0;
 
 template <class T>
 struct stat_counter::group_container: public group

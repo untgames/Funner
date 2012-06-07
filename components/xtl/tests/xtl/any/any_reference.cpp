@@ -13,7 +13,7 @@ int main ()
   
   A var_a;
    
-  any a = make_ref_any (make_const_ref (A ())), b = a, c = make_ref_any (make_const_ref (ref (var_a)));
+  any a (make_const_ref (A ())), b = a, c (make_const_ref (ref (var_a)));
 
   return 0;
 }

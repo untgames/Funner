@@ -3,8 +3,9 @@
 
 #include <xtl/any_cast_exception.h>
 #include <xtl/dynamic_cast_root.h>
-#include <xtl/lexical_cast.h>
 #include <xtl/default_cast_type.h>
+#include <xtl/lexical_cast.h>
+#include <xtl/reference_counter.h>
 #include <xtl/type.h>
 #include <xtl/type_traits> //for is_polymorphic, remove_reference
 #include <xtl/ref.h>
@@ -48,7 +49,7 @@ class any
     any  (const any&);
     ~any ();
                        
-    template <class T> explicit any (const T& value, bool ref_counted=false);
+    template <class T> explicit any (const T& value);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Присваивание
@@ -56,6 +57,11 @@ class any
     any& operator = (const any&);
     
     template <class T> any& operator = (const T& value);
+    
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Копирование
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    any clone () const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Проверка на пустоту / проверка на равенство 0 (если castable_type - ссылка или указатель)
@@ -89,9 +95,8 @@ class any
     any& swap (any&);
     
   private:
-    template <class T>
-    static detail::any_holder* create_holder (const T&, bool ref_counted);
-                       
+    any (detail::any_holder*);
+
   private: 
     detail::any_holder* content_ptr;
 };
@@ -100,11 +105,6 @@ class any
 ///Обмен
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 void swap (any&, any&);
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Создание any с подсчётом ссылок
-///////////////////////////////////////////////////////////////////////////////////////////////////
-template <class T> any make_ref_any (T&);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Приведение типов

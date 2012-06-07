@@ -188,20 +188,20 @@ inline bool is_null (const T* value)
     Интерфейс хранилища вариантных данных
 */
 
-struct any_holder
+struct any_holder: public reference_counter
 {
   virtual ~any_holder () {}
 
+  virtual any_holder*           clone                 () = 0;
   virtual size_t                qualifier_mask        () = 0;
   virtual const std::type_info& type                  () = 0;
   virtual const std::type_info& stored_type           () = 0;
   virtual const std::type_info& castable_type         () = 0;
-  virtual any_holder*           clone                 () = 0;
-  virtual void                  release               () = 0;
   virtual void                  dump                  (stl::string&) = 0;
   virtual void                  set_content           (const stl::string&) = 0;
   virtual dynamic_cast_root*    get_dynamic_cast_root () = 0;
   virtual bool                  null                  () = 0;
+  virtual bool                  try_cast              (void*& target_ptr, const std::type_info& target_type) = 0;
 };
 
 /*
@@ -217,17 +217,50 @@ struct any_holder
     Содержимое вариативной переменной
 */
 
+template <class T>
+bool try_direct_cast (T& source, void*& target_ptr, const std::type_info& target_type)
+{
+  static const std::type_info& source_type = typeid (T);
+
+  if (&target_type != &source_type)
+    return false;
+    
+  target_ptr = &source;
+
+  return true;
+}
+
+template <class T>
+bool try_direct_cast (xtl::reference_wrapper<T>& source, void*& target_ptr, const std::type_info& target_type)
+{
+  static const std::type_info& source_type = typeid (T);
+
+  if (&target_type != &source_type)
+    return false;
+    
+  target_ptr = &source.get ();
+
+  return true;
+}
+
 template <class T> struct any_content: public any_holder
 {
   typedef typename any_stored_type<T>::type base_type;
 
   any_content (const T& in_value) : value (get_unqualified_value (in_value)) {}
-
+  
   const std::type_info& type           () { return typeid (T); }
   const std::type_info& stored_type    () { return typeid (base_type); }
   const std::type_info& castable_type  () { return get_typeid (get_castable_value (value)); }
   size_t                qualifier_mask () { return any_qualifier_mask<T>::value; }
   bool                  null           () { return is_null (get_castable_value (value)); }
+  
+  any_holder* clone () { return new any_content<T> (*this); }
+  
+  bool try_cast (void*& target_ptr, const std::type_info& target_type)
+  {
+    return try_direct_cast (value, target_ptr, target_type);
+  }
 
   dynamic_cast_root* get_dynamic_cast_root ()
   {
@@ -253,48 +286,6 @@ template <class T> struct any_content: public any_holder
   base_type value;
 };
 
-#ifdef _MSC_VER
-  #pragma warning (pop)
-#endif
-
-/*
-    Реализации вариативной переменной
-*/
-
-#ifdef _MSC_VER
-  #pragma warning (push)
-  #pragma warning (disable : 4624)  //'xtl::detail::referenced_any_impl<T>' : destructor could not be generated because a base class destructor is inaccessible
-#endif
-
-template <class T> struct copyable_any_impl: public any_content<T>
-{
-  copyable_any_impl (const T& in_value) : any_content<T> (in_value) {}
-
-  any_holder* clone   () { return new copyable_any_impl (*this); }
-  void        release () { delete this; }
-};
-
-template <class T> class referenced_any_impl: public any_content<T>
-{
-  public:
-    referenced_any_impl (const T& in_value) : any_content<T> (in_value), ref_count (1) {}
-
-    any_holder* clone () { return ref_count++, this; }
-
-    void release ()
-    {
-      if (!--ref_count)
-        delete this;
-    }
-
-  private:
-    size_t ref_count;
-};
-
-#ifdef _MSC_VER
-  #pragma warning (pop)
-#endif
-
 }
 
 /*
@@ -312,29 +303,25 @@ inline any::any ()
   {}
 
 template <class T>
-inline any::any (const T& value, bool ref_counted)
-  : content_ptr (create_holder (value, ref_counted))
+inline any::any (const T& value)
+  : content_ptr (new detail::any_content<T> (value))
   {}
+  
+inline any::any (detail::any_holder* in_content_ptr)
+  : content_ptr (in_content_ptr)
+  {}  
 
 inline any::any (const any& in_any)
-  : content_ptr (in_any.content_ptr ? in_any.content_ptr->clone () : 0)
-  {}
+  : content_ptr (in_any.content_ptr)
+{
+  if (content_ptr)
+    addref (content_ptr);
+}
 
 inline any::~any ()
 {
   if (content_ptr)
-    content_ptr->release ();
-}
-
-/*
-    Создание хранилища
-*/
-
-template <class T>
-inline detail::any_holder* any::create_holder (const T& value, bool ref_counted)
-{
-  return ref_counted ? static_cast<detail::any_holder*> (new detail::referenced_any_impl<T> (value)) :
-                       static_cast<detail::any_holder*> (new detail::copyable_any_impl<T> (value));
+    release (content_ptr);
 }
 
 /*
@@ -352,6 +339,15 @@ inline any& any::operator = (const T& value)
 {
   any (value).swap (*this);
   return *this;
+}
+
+/*
+    Копирование
+*/
+
+inline any any::clone () const
+{
+  return content_ptr ? any (content_ptr->clone ()) : any ();
 }
 
 /*
@@ -471,25 +467,6 @@ inline T& try_lexical_cast (const stl::string&, type<reference_wrapper<T> >)
   throw bad_any_cast_internal (bad_any_cast::bad_to_reference_cast);
 }
 
-//попытка прямого приведения
-template <class Dst>
-inline Dst& try_direct_cast (any_holder* content_ptr, false_type)
-{
-  return static_cast<any_content<Dst>*> (content_ptr)->value;
-}
-
-template <class Dst>
-inline Dst& try_direct_cast (any_holder* content_ptr, true_type)
-{
-  throw bad_any_cast (bad_any_cast::bad_direct_cast, content_ptr->type (), typeid (Dst));
-}
-
-template <class Dst>
-inline Dst& try_direct_cast (any_holder* content_ptr)
-{
-  return try_direct_cast<Dst> (content_ptr, bool_constant<type_traits::is_abstract<Dst>::value> ());
-}
-
 }
 
 template <class T>
@@ -508,36 +485,25 @@ inline const T any::cast () const
     static const size_t target_qualifier_mask = detail::any_qualifier_mask<nonref>::value;
 
     bool is_lost_qualifiers = (content_ptr->qualifier_mask () & ~target_qualifier_mask) != 0;
+    
+    if (is_lost_qualifiers)
+    {
+        //преобразование невозможно, из-за понижения уровня cv-квалификаторов
+
+      throw bad_any_cast (bad_any_cast::bad_const_cast, type (), typeid (T));
+    }    
 
        //попытка прямого преобразования
+       
+//    typedef typename type_traits::remove_cv<nonref>::type direct_cast_type;
+    typedef stored_type direct_cast_type;
 
-    const std::type_info* content_type = &content_ptr->stored_type ();
+    static const std::type_info& target_type = typeid (direct_cast_type);
+    
+    void* result = 0;
 
-    if (&typeid (stored_type) == content_type)
-    {
-      if (is_lost_qualifiers)
-      {
-          //преобразование невозможно, из-за понижения уровня cv-квалификаторов
-
-        throw bad_any_cast (bad_any_cast::bad_const_cast, type (), typeid (T));
-      }
-
-      return detail::try_direct_cast<stored_type> (content_ptr);
-    }
-
-      //попытка приведения из reference_wrapper
-
-    if (&typeid (reference_wrapper<stored_type>) == content_type)
-    {
-      if (is_lost_qualifiers)
-      {
-          //преобразование невозможно, из-за понижения уровня cv-квалификаторов
-
-        throw bad_any_cast (bad_any_cast::bad_const_cast, type (), typeid (T));
-      }
-
-      return detail::try_direct_cast<reference_wrapper<stored_type> > (content_ptr);
-    }
+    if (!type_traits::is_abstract<direct_cast_type>::value && content_ptr->try_cast (result, target_type))      
+      return *reinterpret_cast<direct_cast_type*> (result);
 
       //попытка приведения через dynamic_cast_root
 
@@ -646,16 +612,6 @@ inline void swap (any& a1, any& a2)
     Утилиты
 ===================================================================================================
 */
-
-/*
-    Создание any с подсчётом ссылок
-*/
-
-template <class T>
-inline any make_ref_any (T& value)
-{
-  return any (value, true);
-}
 
 /*
     Приведение типов
