@@ -97,7 +97,7 @@ struct argument_invoker
 {
   typedef xtl::any type;
 
-  static type make (const T& value) { return xtl::make_ref_any (value); }  
+  static type make (const T& value) { return xtl::any (value); }  
 };
 
 template <class T, bool is_enum=xtl::type_traits::is_enum<T>::value>
@@ -248,7 +248,7 @@ template <class FunctionalTraits> struct stack_argument_selector
 */
 
 template <class Signature, class Fn, class Ret=typename xtl::functional_traits<Signature>::result_type>
-struct invoker_impl_base: public ISignatureInvoker<Signature>
+struct invoker_impl_base: public IInvoker
 { 
   typedef xtl::functional_traits<Signature> func_traits;
 
@@ -275,7 +275,7 @@ struct invoker_impl_base: public ISignatureInvoker<Signature>
 };
 
 template <class Signature, class Fn>
-struct invoker_impl_base<Signature, Fn, void>: public ISignatureInvoker<Signature>
+struct invoker_impl_base<Signature, Fn, void>: public IInvoker
 {
   typedef xtl::functional_traits<Signature> func_traits;
 
@@ -328,57 +328,7 @@ struct invoker_impl: public invoker_impl_base<Signature, Fn>
   typedef typename traits::template argument<7>::type arg7_type;
   typedef typename traits::template argument<8>::type arg8_type;
   typedef typename traits::template argument<9>::type arg9_type;
-  
-  result_type operator () ()
-  {
-    return xtl::funcall<result_type> (base::fn);
-  }
-  
-  result_type operator () (arg1_type a1)
-  {
-    return xtl::funcall<result_type> (base::fn, a1);
-  }
-  
-  result_type operator () (arg1_type a1, arg2_type a2)
-  {
-    return xtl::funcall<result_type> (base::fn, a1, a2);
-  }
-  
-  result_type operator () (arg1_type a1, arg2_type a2, arg3_type a3)
-  {
-    return xtl::funcall<result_type> (base::fn, a1, a2, a3);
-  }
-  
-  result_type operator () (arg1_type a1, arg2_type a2, arg3_type a3, arg4_type a4)
-  {
-    return xtl::funcall<result_type> (base::fn, a1, a2, a3, a4);
-  }
-  
-  result_type operator () (arg1_type a1, arg2_type a2, arg3_type a3, arg4_type a4, arg5_type a5)
-  {
-    return xtl::funcall<result_type> (base::fn, a1, a2, a3, a4, a5);
-  }
-  
-  result_type operator () (arg1_type a1, arg2_type a2, arg3_type a3, arg4_type a4, arg5_type a5, arg6_type a6)
-  {
-    return xtl::funcall<result_type> (base::fn, a1, a2, a3, a4, a5, a6);
-  }
-  
-  result_type operator () (arg1_type a1, arg2_type a2, arg3_type a3, arg4_type a4, arg5_type a5, arg6_type a6, arg7_type a7)
-  {
-    return xtl::funcall<result_type> (base::fn, a1, a2, a3, a4, a5, a6, a7);
-  }
-  
-  result_type operator () (arg1_type a1, arg2_type a2, arg3_type a3, arg4_type a4, arg5_type a5, arg6_type a6, arg7_type a7, arg8_type a8)
-  {
-    return xtl::funcall<result_type> (base::fn, a1, a2, a3, a4, a5, a6, a7, a8);
-  }
-  
-  result_type operator () (arg1_type a1, arg2_type a2, arg3_type a3, arg4_type a4, arg5_type a5, arg6_type a6, arg7_type a7, arg8_type a8, arg9_type a9)
-  {
-    return xtl::funcall<result_type> (base::fn, a1, a2, a3, a4, a5, a6, a7, a8, a9);
-  }
-  
+
   InvokerSignature GetSignature ()
   {
     InvokerSignature signature;
@@ -1007,7 +957,7 @@ template <class Ret> class callback_dispatcher
 
 template <class Ret> detail::ignore callback_dispatcher<Ret>::dummy;
 
-template <class Signature> struct callback_invoker: public SimpleInvoker
+template <class Signature> struct callback_invoker: public SimpleInvoker, public xtl::instance_counter<callback_invoker<Signature> >
 {
   size_t operator () (IStack& stack)
   {
@@ -1026,7 +976,7 @@ template <class Signature> struct callback_invoker: public SimpleInvoker
 
     xtl::function<Signature> result = callback_dispatcher<result_type> (interpreter, symbol);    
 
-    stack.Push (xtl::make_ref_any (result));    
+    stack.Push (xtl::any (result));    
 
     return 1;
   }

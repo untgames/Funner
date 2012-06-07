@@ -42,7 +42,7 @@ struct ShellCallbackInvoker
   { 
     xtl::function<void (const char*)> result = ShellCallbackHandler (&stack.Interpreter ());
 
-    stack.Push (xtl::make_ref_any (result));
+    stack.Push (xtl::any (result));
 
     return 1;
   }

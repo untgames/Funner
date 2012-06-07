@@ -70,11 +70,11 @@ class MyStack: public IStack
     ISymbol*    GetSymbol  (size_t index) { return new MySymbol (GetString (index)); }
     xtl::any&   GetVariant (size_t index) { return array.at (index); }
 
-    void Push (float value)        { array.push_back (xtl::make_ref_any (value)); }
-    void Push (int value)          { array.push_back (xtl::make_ref_any (value)); }
-    void Push (bool value)         { array.push_back (xtl::make_ref_any (value)); }
-    void Push (void* pointer)      { array.push_back (xtl::make_ref_any (pointer)); }
-    void Push (const char* string) { array.push_back (xtl::make_ref_any (string)); }
+    void Push (float value)        { array.push_back (xtl::any (value)); }
+    void Push (int value)          { array.push_back (xtl::any (value)); }
+    void Push (bool value)         { array.push_back (xtl::any (value)); }
+    void Push (void* pointer)      { array.push_back (xtl::any (pointer)); }
+    void Push (const char* string) { array.push_back (xtl::any (string)); }
     void Push (const xtl::any& a)  { array.push_back (a); }
 
     void PushSymbol (const char* string) { MyStack::Push (string); }

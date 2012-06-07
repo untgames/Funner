@@ -106,94 +106,6 @@ class SimpleInvoker: public IInvoker
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Интерфейс шлюзов с типизированной сигнатурой
-///////////////////////////////////////////////////////////////////////////////////////////////////
-template <class Signature> class ISignatureInvoker;
-
-template <class Ret> class ISignatureInvoker<Ret ()>: public IInvoker
-{
-  public:
-    using IInvoker::operator ();
-    
-    virtual Ret operator () () = 0;
-};
-
-template <class Ret, class T1> class ISignatureInvoker<Ret (T1)>: public IInvoker
-{
-  public:
-    using IInvoker::operator ();
-    
-    virtual Ret operator () (T1) = 0;
-};
-
-template <class Ret, class T1, class T2> class ISignatureInvoker<Ret (T1, T2)>: public IInvoker
-{
-  public:
-    using IInvoker::operator ();
-    
-    virtual Ret operator () (T1, T2) = 0;
-};
-
-template <class Ret, class T1, class T2, class T3> class ISignatureInvoker<Ret (T1, T2, T3)>: public IInvoker
-{
-  public:
-    using IInvoker::operator ();
-    
-    virtual Ret operator () (T1, T2, T3) = 0;
-};
-
-template <class Ret, class T1, class T2, class T3, class T4> class ISignatureInvoker<Ret (T1, T2, T3, T4)>: public IInvoker
-{
-  public:
-    using IInvoker::operator ();
-    
-    virtual Ret operator () (T1, T2, T3, T4) = 0;
-};
-
-template <class Ret, class T1, class T2, class T3, class T4, class T5> class ISignatureInvoker<Ret (T1, T2, T3, T4, T5)>: public IInvoker
-{
-  public:
-    using IInvoker::operator ();
-    
-    virtual Ret operator () (T1, T2, T3, T4, T5) = 0;
-};
-
-template <class Ret, class T1, class T2, class T3, class T4, class T5, class T6> class ISignatureInvoker<Ret (T1, T2, T3, T4, T5, T6)>: public IInvoker
-{
-  public:
-    using IInvoker::operator ();
-    
-    virtual Ret operator () (T1, T2, T3, T4, T5, T6) = 0;
-};
-
-template <class Ret, class T1, class T2, class T3, class T4, class T5, class T6, class T7>
-class ISignatureInvoker<Ret (T1, T2, T3, T4, T5, T6, T7)>: public IInvoker
-{
-  public:
-    using IInvoker::operator ();
-    
-    virtual Ret operator () (T1, T2, T3, T4, T5, T6, T7) = 0;
-};
-
-template <class Ret, class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8>
-class ISignatureInvoker<Ret (T1, T2, T3, T4, T5, T6, T7, T8)>: public IInvoker
-{
-  public:
-    using IInvoker::operator ();
-    
-    virtual Ret operator () (T1, T2, T3, T4, T5, T6, T7, T8) = 0;
-};
-
-template <class Ret, class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8, class T9>
-class ISignatureInvoker<Ret (T1, T2, T3, T4, T5, T6, T7, T8, T9)>: public IInvoker
-{
-  public:
-    using IInvoker::operator ();
-    
-    virtual Ret operator () (T1, T2, T3, T4, T5, T6, T7, T8, T9) = 0;
-};
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Функция-шлюз между скриптовым движком и C++ кодом
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 class Invoker
@@ -230,11 +142,6 @@ class Invoker
     size_t operator () (IStack& stack) const;
     size_t operator () (size_t overload_index, IStack& stack) const;
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Приведение к сигнатуре
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    template <class Signature> ISignatureInvoker<Signature>* SignatureCast () const;
-    
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Обмен
 ///////////////////////////////////////////////////////////////////////////////////////////////////

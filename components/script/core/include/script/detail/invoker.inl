@@ -29,19 +29,3 @@ Invoker::Invoker (const Fn& first_overload)
 {
   Init (new detail::SimpleInvokerWrapper<Fn> (first_overload));
 }
-
-template <class Signature>
-ISignatureInvoker<Signature>* Invoker::SignatureCast () const
-{
-  size_t overloads_count = OverloadsCount ();
-  
-  for (size_t i=0; i<overloads_count; i++)
-  {
-    ISignatureInvoker<Signature>* result = dynamic_cast<ISignatureInvoker<Signature>*> (OverloadInvoker (i));
-    
-    if (result)
-      return result;
-  }
-  
-  return 0;
-}

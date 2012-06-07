@@ -4,6 +4,7 @@
 #include <xtl/any.h>
 #include <xtl/common_exceptions.h>
 #include <xtl/functional_traits.h>
+#include <xtl/stat_counter.h>
 #include <xtl/trackable_ptr.h>
 #include <xtl/type.h>
 #include <xtl/type_list.h>
