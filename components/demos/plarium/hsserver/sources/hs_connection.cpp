@@ -14,6 +14,8 @@ const size_t        DEFAULT_SEND_BUFFER_SIZE    = 1024;
 const size_t        COMPRESSED_LENGTH_SIZE      = 4;
 const size_t        HMAC_SIZE                   = 32;
 const size_t        IV_SIZE                     = 16;
+const size_t        PACKET_HEADER_SIZE          = 8;
+const size_t        SHA_SIZE                    = 32;
 const unsigned char PACKET_HEADER               = 0x06;
 const unsigned char OPTIONS_COMPRESSED          = 0x01;
 const unsigned char OPTIONS_ENCRYPTED           = 0x02;
@@ -108,8 +110,8 @@ void* receive_function (void* user_data)
   unsigned char* receive_buffer                 = new unsigned char [current_buffer_size];
   size_t         current_decompress_buffer_size = DEFAULT_RECEIVE_BUFFER_SIZE;
   unsigned char* decompress_buffer              = new unsigned char [current_decompress_buffer_size];
-  unsigned char  packet_header_buffer [8];
-  unsigned char  hashed_key [32];
+  unsigned char  packet_header_buffer [PACKET_HEADER_SIZE];
+  unsigned char  hashed_key [SHA_SIZE];
 
   if (data->connection_settings.encryption_enabled)
     sha256 (data->connection_settings.encryption_key, data->connection_settings.encryption_key_bits / 8, hashed_key);
@@ -279,7 +281,7 @@ void* send_function (void* user_data)
 
   size_t         current_buffer_size = DEFAULT_SEND_BUFFER_SIZE;
   unsigned char* send_buffer         = new unsigned char [current_buffer_size];
-  unsigned char  hashed_key [32];
+  unsigned char  hashed_key [SHA_SIZE];
 
   if (data->connection_settings.encryption_enabled)
     sha256 (data->connection_settings.encryption_key, data->connection_settings.encryption_key_bits / 8, hashed_key);
@@ -309,15 +311,17 @@ void* send_function (void* user_data)
 
       //TODO send with timeout
 
-      size_t message_text_length = message->message.size ();
-      size_t packet_size         = 8; //Header size
+      const unsigned char* message_text            = (unsigned char*)message->message.data ();
+      size_t               message_text_length     = message->message.size ();
+      size_t               packet_size             = PACKET_HEADER_SIZE;                          //Header size
+      size_t               compression_buffer_size = 0;
+      bool                 compress                = data->connection_settings.compression_enabled && message_text_length > data->connection_settings.compression_threshold;
 
-      if (data->connection_settings.compression_enabled)
+      if (compress)
       {
-        packet_size += 4; //Packed header
+        packet_size += COMPRESSED_LENGTH_SIZE; //Packed header
 
-        //TODO
-        throw std::invalid_argument ("Compression not supported");
+        compression_buffer_size = zlib_compression_upper_size (message_text_length);
       }
       else
       {
@@ -326,27 +330,46 @@ void* send_function (void* user_data)
 
       if (data->connection_settings.encryption_enabled)
       {
-        packet_size += 48;
+        packet_size += HMAC_SIZE + IV_SIZE;
       }
 
-      if (packet_size > current_buffer_size)
+      if (packet_size + compression_buffer_size > current_buffer_size)
       {
         delete [] send_buffer;
 
         send_buffer         = 0;
         current_buffer_size = 0;
 
-        size_t new_buffer_size = packet_size * 2;
+        size_t new_buffer_size = (packet_size + compression_buffer_size) * 2;
 
         send_buffer         = new unsigned char [new_buffer_size];
         current_buffer_size = new_buffer_size;
+      }
+
+      if (compress)
+      {
+        unsigned char* compression_buffer = send_buffer + PACKET_HEADER_SIZE;
+
+        if (data->connection_settings.encryption_enabled)
+          compression_buffer += HMAC_SIZE + IV_SIZE;
+
+        size_t compressed_size = zlib_compress (message_text, message_text_length, compression_buffer + COMPRESSED_LENGTH_SIZE, compression_buffer_size);
+
+        unsigned int* compressed_header = (unsigned int*)compression_buffer;
+
+        *compressed_header = message_text_length;
+
+        message_text        = compression_buffer;
+        message_text_length = compressed_size + COMPRESSED_LENGTH_SIZE;
+
+        packet_size += compressed_size;
       }
 
       send_buffer [0] = PACKET_HEADER;
 
       send_buffer [1] = 0; //Options
 
-      if (data->connection_settings.compression_enabled)
+      if (compress)
         send_buffer [1] |= OPTIONS_COMPRESSED;
 
       if (data->connection_settings.encryption_enabled)
@@ -358,18 +381,18 @@ void* send_function (void* user_data)
 
       unsigned int* message_size = (unsigned int*)(send_buffer + 4);
 
-      *message_size = packet_size - 8;
+      *message_size = packet_size - PACKET_HEADER_SIZE;
 
       if (data->connection_settings.encryption_enabled)
       {
-        unsigned char* hmac         = send_buffer + 8;
+        unsigned char* hmac         = send_buffer + PACKET_HEADER_SIZE;
         unsigned char* iv           = hmac + HMAC_SIZE;
         unsigned char* message_data = iv + IV_SIZE;
 
         for (size_t i = 0; i < IV_SIZE; i++)
           iv [i] = rand () % 0xff;
 
-        aes_ofb (data->connection_settings.encryption_key, data->connection_settings.encryption_key_bits, message_text_length, message->message.data (), message_data, (const unsigned char (&)[16])*iv);
+        aes_ofb (data->connection_settings.encryption_key, data->connection_settings.encryption_key_bits, message_text_length, message_text, message_data, (const unsigned char (&)[16])*iv);
 
         hmac_sha256 (hashed_key, sizeof (hashed_key), iv, IV_SIZE + message_text_length, (unsigned char (&)[32])*hmac);
       }

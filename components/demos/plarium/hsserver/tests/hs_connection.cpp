@@ -68,7 +68,7 @@ int main ()
 
     connection_settings.send_queue_size       = 2;
     connection_settings.keep_alive_interval   = 30000;
-    connection_settings.compression_enabled   = false;
+    connection_settings.compression_enabled   = true;
     connection_settings.compression_threshold = 1024;
     connection_settings.encryption_enabled    = true;
     connection_settings.encryption_key_bits   = sizeof (key) * 8;
