@@ -21,7 +21,7 @@ using namespace script;
 namespace common
 {
 
-namespace engine_script_bind
+namespace debug_script_bind
 {
 
 /*

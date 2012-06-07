@@ -63,3 +63,7 @@ export.link.engine.script_binds.physics.IMPORTS       := link.engine.script_bind
 # Link social exports
 export.link.engine.script_binds.social.LINK_INCLUDES := SocialScriptBind
 export.link.engine.script_binds.social.IMPORTS       := link.engine.script_binds link.social.core
+
+# Link debug exports
+export.link.engine.script_binds.debug.LINK_INCLUDES := DebugScriptBind
+export.link.engine.script_binds.debug.IMPORTS       := link.engine.script_binds
