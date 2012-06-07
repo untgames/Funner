@@ -36,7 +36,7 @@ const math::vec4f DEFAULT_CHAR_COLOR_FACTOR = 1.f;
 
 typedef xtl::uninitialized_storage<unsigned int> Utf32Buffer;
 
-struct TextLine::Impl
+struct TextLine::Impl: public xtl::instance_counter<TextLine>
 {
   typedef stl::vector <math::vec4f> CharsColors;
 

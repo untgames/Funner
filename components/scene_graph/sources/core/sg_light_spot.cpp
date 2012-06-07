@@ -10,7 +10,7 @@ const float LIGHT_INFINITY = 1e9;  //если радиус/расстояние источника света прев
     Описание реализации SpotLight
 */
 
-struct SpotLight::Impl
+struct SpotLight::Impl: public xtl::instance_counter<SpotLight>
 {
   anglef angle;         //угол света
   float  exponent;      //экспонента рассеивания по углу

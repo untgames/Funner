@@ -7,7 +7,7 @@ using namespace scene_graph::controllers;
     Описание реализации контрллера ресурсов
 */
 
-struct ResourceController::Impl
+struct ResourceController::Impl: public xtl::instance_counter<ResourceController>
 {
   media::rms::Binding binding; //связывание с группой ресурсов
   

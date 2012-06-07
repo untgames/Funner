@@ -11,7 +11,7 @@ const float EPS = 1e-6f;
     Описание реализации OrthoCamera
 */
 
-struct OrthoCamera::Impl
+struct OrthoCamera::Impl: public xtl::instance_counter<OrthoCamera>
 {
   float left;   //левая граница камеры
   float right;  //правая граница камеры

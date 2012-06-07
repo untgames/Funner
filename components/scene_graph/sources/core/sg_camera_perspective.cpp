@@ -11,7 +11,7 @@ const float EPS = 1e-6f;
     Описание реализации PerspectiveCamera
 */
 
-struct PerspectiveCamera::Impl
+struct PerspectiveCamera::Impl: public xtl::instance_counter<PerspectiveCamera>
 {
   anglef fov_x;  //угол обзора по горизонтали
   anglef fov_y;  //угол обзора по вертикали

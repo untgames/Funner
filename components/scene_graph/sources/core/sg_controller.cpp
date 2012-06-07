@@ -6,7 +6,7 @@ using namespace scene_graph;
     Описание реализации контроллера
 */
 
-struct Controller::Impl
+struct Controller::Impl: public xtl::instance_counter<Controller>
 {
   ControllerEntry      entry;            //вхождение контроллера в список узла
   size_t               ref_count;        //счётчик ссылок

@@ -12,7 +12,7 @@ namespace
 
 typedef xtl::shared_ptr<ISceneAttachment> AttachmentPtr;
 
-struct CacheValue: public xtl::reference_counter
+struct CacheValue: public xtl::reference_counter, public xtl::instance_counter<CacheValue>
 {
   AttachmentPtr         attachment;
   const std::type_info* type;
@@ -31,7 +31,7 @@ typedef stl::hash_multimap<size_t, CacheValuePtr> CacheMap;
 
 }
 
-struct SceneParserCache::Impl: public xtl::reference_counter
+struct SceneParserCache::Impl: public xtl::reference_counter, public xtl::instance_counter<SceneParserCache>
 {
   CacheMap cache; //кэш значений
 };

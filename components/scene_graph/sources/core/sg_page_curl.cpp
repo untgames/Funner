@@ -21,7 +21,7 @@ const float  DEFAULT_SHADOW_WIDTH                      = 0.25f;
     Описание реализации перелистывания страницы
 */
 
-struct PageCurl::Impl
+struct PageCurl::Impl: public xtl::instance_counter<PageCurl>
 {
   PageCurlMode   mode;                               //режим страниц
   stl::string    materials [PageCurlPageType_Num];   //материалы

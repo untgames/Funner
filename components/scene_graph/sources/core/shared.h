@@ -16,6 +16,7 @@
 #include <xtl/reference_counter.h>
 #include <xtl/shared_ptr.h>
 #include <xtl/signal.h>
+#include <xtl/stat_counter.h>
 #include <xtl/token_parser.h>
 #include <xtl/token_iterator.h>
 #include <xtl/uninitialized_storage.h>

@@ -7,7 +7,7 @@ using namespace scene_graph::physics;
     Описание реализации физического тела
 */
 
-struct Body::Impl
+struct Body::Impl: public xtl::instance_counter<Body>
 {
   stl::string model_name; //имя физической модели
 };

@@ -57,7 +57,7 @@ namespace controllers
 {
 
 ///Описание реализации анимации
-struct AnimationImpl: public xtl::reference_counter, public xtl::trackable, public xtl::noncopyable
+struct AnimationImpl: public xtl::reference_counter, public xtl::trackable, public xtl::noncopyable, public xtl::instance_counter<AnimationImpl>
 {
   typedef xtl::signal<void (AnimationEvent event, Animation& animation)> Signal;
   
@@ -143,8 +143,10 @@ struct AnimationImpl: public xtl::reference_counter, public xtl::trackable, publ
 namespace
 {
 
+struct AnimationTarget;
+
 ///Анимационная цель
-struct Target: public xtl::reference_counter
+struct Target: public xtl::reference_counter, public xtl::instance_counter<AnimationTarget>
 {
   Node*                                                   node;                 //анимируемый узел
   TargetBlender                                           blender;              //блендер анимационной цели
@@ -210,7 +212,7 @@ typedef xtl::signal<void (float time, const char* event)>    EventSignal;
     Описание реализаци анимационного контроллера
 */
 
-struct AnimationController::Impl: public xtl::trackable
+struct AnimationController::Impl: public xtl::trackable, public xtl::instance_counter<AnimationController>
 {
   AnimationController& owner;         //ссылка на владельца
   AnimationManager     manager;       //менеджер анимаций

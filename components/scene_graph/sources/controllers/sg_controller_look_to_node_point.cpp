@@ -14,7 +14,7 @@ const float EPS = 0.0001f;
     Описание реализации контроллера выравнивания ориентации на точку узла
 */
 
-struct LookToNodePoint::Impl
+struct LookToNodePoint::Impl: public xtl::instance_counter<LookToNodePoint>
 {
   Node*                node;                    //передвигаемый узел
   AccelerationFunction acceleration_function;   //функция рассчета ускорения узла

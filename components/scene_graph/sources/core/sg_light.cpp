@@ -7,7 +7,7 @@ using namespace math;
     Описание реализации Light
 */
 
-struct Light::Impl
+struct Light::Impl: public xtl::instance_counter<Light>
 {
   vec3f color;         //цвет света
   vec3f attenuation;   //коэффициенты затухания (x - constant, y - linear, z - quadratic)

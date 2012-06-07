@@ -13,6 +13,7 @@
 #include <xtl/iterator.h>
 #include <xtl/ref.h>
 #include <xtl/reference_counter.h>
+#include <xtl/stat_counter.h>
 
 #include <common/property_map.h>
 

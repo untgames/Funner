@@ -23,7 +23,7 @@ const size_t DEFAULT_SCREEN_HEIGHT       = 100; //высота экрана по умолчанию
 typedef stl::vector<Viewport>         ViewportArray;
 typedef stl::vector<IScreenListener*> ListenerArray;
 
-struct Screen::Impl: public xtl::reference_counter
+struct Screen::Impl: public xtl::reference_counter, public xtl::instance_counter<Screen>
 {
   stl::string   name;             //имя рабочего стола
   Rect          area;             //рабочая область

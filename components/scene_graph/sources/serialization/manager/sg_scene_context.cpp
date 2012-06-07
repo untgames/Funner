@@ -25,7 +25,7 @@ typedef xtl::signal<bool (const char*)>                             ExceptionFil
 
 }
 
-struct SceneContext::Impl: public xtl::reference_counter
+struct SceneContext::Impl: public xtl::reference_counter, public xtl::instance_counter<SceneContext>
 {
   common::PropertyMap   properties;       //свойства контекста
   AttachmentRegistryMap attachments;      //присоединенные данные

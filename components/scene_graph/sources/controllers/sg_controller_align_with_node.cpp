@@ -14,7 +14,7 @@ const float EPS = 0.0001f;
     Описание реализации контроллера выравнивания одного узла с другим узлом
 */
 
-struct AlignWithNode::Impl
+struct AlignWithNode::Impl: public xtl::instance_counter<AlignWithNode>
 {
   Node*                node;                    //выравниваемый узел
   AccelerationFunction acceleration_function;   //функция рассчета ускорения узла

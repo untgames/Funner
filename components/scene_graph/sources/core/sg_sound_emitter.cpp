@@ -10,7 +10,7 @@ using namespace common;
 
 typedef xtl::signal<void (SoundEmitter& sender, SoundEmitterEvent event)> SoundEmitterSignal;
 
-struct SoundEmitter::Impl
+struct SoundEmitter::Impl: public xtl::instance_counter<SoundEmitter>
 {
   stl::string        sound_declaration_name;                   //имя описания звука
   SoundEmitterSignal signals [SoundEmitterEvent_Num];          //сигналы

@@ -18,7 +18,7 @@ const char* DEFAULT_LOADER_LOG_NAME = "scene.loader"; //имя лога
 typedef xtl::shared_ptr<ISceneFactory> FactoryPtr;
 
 ///Дескриптор фабрики сцен
-struct FactoryDesc: public xtl::reference_counter
+struct FactoryDesc: public xtl::reference_counter, public xtl::instance_counter<FactoryDesc>
 {
   stl::string name;        //имя фабрики
   stl::string name_prefix; //префикс имени
@@ -41,7 +41,7 @@ typedef xtl::signal<void (SceneContext&)> SceneContextCreatorSignal;
 
 }
 
-struct SceneManager::Impl: public xtl::reference_counter
+struct SceneManager::Impl: public xtl::reference_counter, public xtl::instance_counter<SceneManager>
 {
   FactoryDescList           factories;           //список фабрик
   SceneContextCreatorSignal scene_creator;       //сигнал создания нового контекста сцены

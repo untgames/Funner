@@ -13,7 +13,7 @@ using namespace xtl;
 //typedef xtl::com_ptr<ISceneManager> SceneManagerPtr;
 typedef com_ptr<Node> NodePtr;
 
-struct Scene::Impl: public SceneSpace
+struct Scene::Impl: public SceneSpace, public xtl::instance_counter<Scene>
 {
 //  SceneManagerPtr scene_manager; //менеджер сцены
   string  name; //имя сцены  

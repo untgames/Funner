@@ -8,7 +8,7 @@ using namespace bound_volumes;
     Описание реализации Camera
 */
 
-struct Camera::Impl
+struct Camera::Impl: public xtl::instance_counter<Camera>
 {
   mat4f       proj_matrix;     //матрица проецирования
   plane_listf frustum;         //пирамида видимости

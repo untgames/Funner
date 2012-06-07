@@ -6,7 +6,7 @@ using namespace scene_graph;
     ќписание реализации ParticleEmitter
 */
 
-struct ParticleEmitter::Impl
+struct ParticleEmitter::Impl: public xtl::instance_counter<ParticleEmitter>
 {
   stl::string          declaration_name;                     //им€ системы частиц
   Node*                particles_parent;                     //узел, в системе координат которого генерируютс€ частицы

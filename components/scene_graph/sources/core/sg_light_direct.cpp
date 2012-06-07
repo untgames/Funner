@@ -10,9 +10,9 @@ const float LIGHT_INFINITY = 1.0e+9f;  //если радиус/расстояние источника света 
     Описание реализации DirectLight
 */
 
-struct DirectLight::Impl
+struct DirectLight::Impl: public xtl::instance_counter<DirectLight>
 {
-  float radius;         //радиус действия света
+  float radius; //радиус действия света
 };
 
 /*

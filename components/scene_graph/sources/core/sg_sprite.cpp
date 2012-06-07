@@ -7,7 +7,7 @@ using namespace math;
     Описание реализации Sprite
 */
 
-struct Sprite::Impl
+struct Sprite::Impl: public xtl::instance_counter<Sprite>
 {
   SpriteDesc sprite_desc; //описание спрайта
   

@@ -9,7 +9,7 @@ using namespace math;
 
 typedef xtl::uninitialized_storage<SpriteModel::SpriteDesc> SpriteDescArray;
 
-struct SpriteList::Impl
+struct SpriteList::Impl: public xtl::instance_counter<SpriteList>
 {
   SpriteDescArray items;    //массив спрайтов  
 };

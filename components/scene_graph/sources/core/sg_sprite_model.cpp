@@ -9,7 +9,7 @@ using namespace math;
 
 typedef xtl::signal<void (SpriteModel& sender, SpriteModelEvent event_id)> SpriteModelSignal;
 
-struct SpriteModel::Impl
+struct SpriteModel::Impl: public xtl::instance_counter<SpriteModel>
 {
   stl::string       material;                       //имя материала
   SpriteModelSignal signals [SpriteModelEvent_Num]; //сигналы модели 

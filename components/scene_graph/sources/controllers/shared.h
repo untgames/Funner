@@ -7,6 +7,7 @@
 #include <xtl/connection.h>
 #include <xtl/common_exceptions.h>
 #include <xtl/function.h>
+#include <xtl/stat_counter.h>
 
 #include <math/utility.h>
 

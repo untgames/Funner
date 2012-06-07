@@ -7,7 +7,7 @@ namespace
 {
 
 ///Дескриптор анимационной библиотеки
-struct AnimationLibraryDesc: public xtl::reference_counter
+struct AnimationLibraryDesc: public xtl::reference_counter, public xtl::instance_counter<AnimationLibraryDesc>
 {
   stl::string                        name;    //имя библиотеки
   media::animation::AnimationLibrary library; //библиотека
@@ -23,7 +23,7 @@ typedef xtl::intrusive_ptr<AnimationLibraryDesc>                                
 typedef stl::list<AnimationLibraryPtr>                                           AnimationLibraryList;
 typedef stl::hash_map<stl::hash_key<const char*>, media::animation::Animation*>  AnimationMap;
 
-struct AnimationManager::Impl: public xtl::reference_counter
+struct AnimationManager::Impl: public xtl::reference_counter, public xtl::instance_counter<AnimationManager>
 {
   AnimationLibraryList animation_libraries;        //библиотеки анимации
   AnimationMap         animations;                 //анимации

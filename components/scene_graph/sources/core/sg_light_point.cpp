@@ -12,10 +12,12 @@ const float LIGHT_INFINITY = 1e9;  //если радиус/расстояние источника света прев
 
 PointLight::PointLight ()
 {
+  xtl::get_instance_counter<PointLight> () += 1;
 }
 
 PointLight::~PointLight ()
 {
+  xtl::get_instance_counter<PointLight> () -= 1;
 }
 
 /*

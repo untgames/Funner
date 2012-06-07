@@ -19,7 +19,7 @@ const size_t LISTENER_ARRAY_RESERVE_SIZE = 16; //резервируемый размер массива сл
 
 typedef stl::vector<IViewportListener*> ListenerArray;
 
-struct Viewport::Impl: public xtl::reference_counter
+struct Viewport::Impl: public xtl::reference_counter, public xtl::instance_counter<Viewport>
 {
   stl::string          name;              //имя области вывода
   scene_graph::Camera* camera;            //камера

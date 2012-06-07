@@ -7,7 +7,7 @@ using namespace scene_graph::controllers;
     Описание реализации контроллера воды
 */
 
-struct DefaultController::Impl
+struct DefaultController::Impl: public xtl::instance_counter<DefaultController>
 {
   UpdateFunction updater; //функция обновления контроллера
   

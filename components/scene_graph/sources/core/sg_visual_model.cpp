@@ -8,7 +8,7 @@ using namespace common;
     Описание реализации VisualModel
 */
 
-struct VisualModel::Impl
+struct VisualModel::Impl: public xtl::instance_counter<VisualModel>
 {
   string mesh_name;       //имя меша  
   size_t mesh_name_hash;  //хэш имени мэша

@@ -9,7 +9,7 @@ using namespace scene_graph;
 namespace scene_graph
 {
 
-class NodeArrayImpl: public xtl::reference_counter
+class NodeArrayImpl: public xtl::reference_counter, public xtl::instance_counter<NodeArray>
 {
   public:
     virtual ~NodeArrayImpl () {}

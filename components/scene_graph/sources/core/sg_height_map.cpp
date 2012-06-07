@@ -9,7 +9,7 @@ using namespace scene_graph;
 typedef stl::vector<HeightMap::VertexDesc>             VertexArray;
 typedef xtl::signal<void (HeightMap&, HeightMapEvent)> HeightMapSignal;
 
-struct HeightMap::Impl
+struct HeightMap::Impl: public xtl::instance_counter<HeightMap>
 {
   VertexArray     vertices;                     //вершины карты высот
   size_t          rows_count;                   //количество строк

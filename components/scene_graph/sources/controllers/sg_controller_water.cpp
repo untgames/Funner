@@ -22,7 +22,7 @@ const float NORMAL_Z_FACTOR   = -4.0f; //коэффициент масштабирования нормали
 
 typedef stl::vector<float> WaterField;
 
-struct Water::Impl
+struct Water::Impl: public xtl::instance_counter<Water>
 {
   HeightMap*  height_map; //карта высот
   float       viscosity;  //вязкость

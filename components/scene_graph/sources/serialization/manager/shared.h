@@ -11,6 +11,7 @@
 #include <xtl/ref.h>
 #include <xtl/signal.h>
 #include <xtl/shared_ptr.h>
+#include <xtl/stat_counter.h>
 
 #include <common/component.h>
 #include <common/log.h>

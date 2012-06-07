@@ -7,9 +7,9 @@ using namespace common;
     Описание реализации Listener
 */
 
-struct Listener::Impl
+struct Listener::Impl: public xtl::instance_counter<Listener>
 {
-  float gain;     //усиление
+  float gain; //усиление
 };
 
 /*

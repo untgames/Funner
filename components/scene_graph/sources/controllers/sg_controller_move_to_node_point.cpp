@@ -7,7 +7,7 @@ using namespace scene_graph::controllers;
     Описание реализации контроллера следования за точкой узла
 */
 
-struct MoveToNodePoint::Impl
+struct MoveToNodePoint::Impl: public xtl::instance_counter<MoveToNodePoint>
 {
   Node*                node;                    //передвигаемый узел
   AccelerationFunction acceleration_function;   //функция рассчета ускорения узла

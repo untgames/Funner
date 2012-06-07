@@ -136,7 +136,7 @@ typedef stl::auto_ptr<common::PropertyBindingMap>                             Pr
     Описание реализации Node
 */
 
-struct Node::Impl
+struct Node::Impl: public xtl::instance_counter<Node>
 {
   class NodeIterator;
   class ControllerIterator;

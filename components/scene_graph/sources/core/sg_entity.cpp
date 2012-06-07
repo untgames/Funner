@@ -25,7 +25,7 @@ const size_t INTERSECTIONS_RESERVE_SIZE = 16;   //резервируемое число пересечени
     Описание реализации Entity
 */
 
-struct Entity::Impl: public SceneObject
+struct Entity::Impl: public SceneObject, public xtl::instance_counter<Entity>
 {
   vec3f  wire_color;               //цвет проволочного представления объекта
   aaboxf local_bound_box;          //ограничивающий параллелипиппед в локальной системе координат

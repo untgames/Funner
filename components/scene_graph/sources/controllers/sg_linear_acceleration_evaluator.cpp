@@ -11,7 +11,7 @@ const float EPS = 0.0001f;
 }
 
 ///Рассчет ускорения с использованием ускорения, замедления, максимальной скорости
-struct LinearAccelerationEvaluator::Impl: public xtl::reference_counter
+struct LinearAccelerationEvaluator::Impl: public xtl::reference_counter, public xtl::instance_counter<LinearAccelerationEvaluator>
 {
   float       acceleration;                  //ускорение разгона
   float       deceleration;                  //ускорение торможения
