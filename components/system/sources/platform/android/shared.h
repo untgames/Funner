@@ -197,7 +197,7 @@ template <class T> T check_errors (T result)
 ///Контекст запуска приложения
 struct ApplicationContext
 {
-  JavaVM*             vm;                         //виртуальная машина
+  JavaVM*             vm;                          //виртуальная машина
   global_ref<jclass>  utils_class;                 //EngineUtils class
   global_ref<jclass>  sensor_event_listener_class; //EngineSensorEventListener class
   

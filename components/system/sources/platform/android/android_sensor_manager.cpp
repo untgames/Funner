@@ -18,12 +18,13 @@ struct sensor_handle
     try
     {
         //получение метода создания слушателя
-          
-      jmethodID event_listener_class_constructor = find_method (&get_env (), get_context ().sensor_event_listener_class.get (), "<init>", "(J)V");
-      
+
+      jmethodID event_listener_class_constructor = find_method (&get_env (), get_context ().sensor_event_listener_class.get (), "<init>", "(JLandroid/content/Context;)V");
+
+
         //создание слушателя
-      
-      event_listener = get_env ().NewObject (get_context ().sensor_event_listener_class.get (), event_listener_class_constructor, (jlong)this);
+
+      event_listener = get_env ().NewObject (get_context ().sensor_event_listener_class.get (), event_listener_class_constructor, (jlong)this, get_activity ());
 
       if (!event_listener)
         throw xtl::format_operation_exception ("", "EngineSensorEventListener constructor failed");      
@@ -93,6 +94,15 @@ enum SensorRateType
   SENSOR_DELAY_GAME    = 1,  
   SENSOR_DELAY_UI      = 2,
   SENSOR_DELAY_NORMAL  = 3,  
+};
+
+/// Ориентации
+enum Orientation
+{
+  ORIENTATION_ROTATION_0,
+  ORIENTATION_ROTATION_90,
+  ORIENTATION_ROTATION_180,
+  ORIENTATION_ROTATION_270
 };
 
 /*
@@ -188,7 +198,7 @@ class JniSensorManager
     float   SensorResolution (const global_ref<jobject>& sensor) { return get_env ().CallFloatMethod (sensor.get (), get_sensor_resolution_method); }    
     
 ///Обработчик события изменения сенсора
-    void OnSensorChanged (sensor_handle& handle, jlong timestamp, const local_ref<jfloatArray>& values)
+    void OnSensorChanged (sensor_handle& handle, jlong timestamp, const local_ref<jfloatArray>& values, Orientation orientation)
     {
       try
       {        
@@ -219,7 +229,28 @@ class JniSensorManager
         if (!src_buf)
           throw xtl::format_operation_exception ("", "JNIEnv::GetPrimitiveArrayCritical failed");
 
-        memcpy (event.data, src_buf, array_length * sizeof (float));
+        memcpy (event.data, src_buf, array_length * sizeof (float));        
+        
+        if (array_length == 3)
+        {
+          switch (orientation)
+          {
+            case ORIENTATION_ROTATION_0:
+              event.data [0] = -event.data [0];
+              event.data [1] = -event.data [1]; 
+              break;
+            case ORIENTATION_ROTATION_90:
+              stl::swap (event.data [0], event.data [1]);
+              event.data [1] = -event.data [1];
+              break;
+            case ORIENTATION_ROTATION_270:
+              stl::swap (event.data [0], event.data [1]);
+              event.data [0] = -event.data [0];
+              break;
+            default:
+              break;
+          }
+        }
 
         env.ReleasePrimitiveArrayCritical (values.get (), src_buf, 0);
 
@@ -352,16 +383,16 @@ class JniSensorManager
 
 typedef common::Singleton<JniSensorManager> JniSensorManagerSingleton;
 
-void JNICALL on_accuracy_changed (JNIEnv&, jlong sensorRef, jobject sensor, int accuracy)
+void JNICALL on_accuracy_changed (JNIEnv&, jlong sensorRef, jobject sensor, jint accuracy)
 {
 ///ignored
 }
 
-void JNICALL on_sensor_changed (JNIEnv&, jlong sensorRef, jobject sensor, jint accuracy, jlong timestamp, jfloatArray values)
+void JNICALL on_sensor_changed (JNIEnv&, jlong sensorRef, jobject sensor, jint accuracy, jlong timestamp, jfloatArray values, jint orientation)
 {
   sensor_t handle = reinterpret_cast<sensor_t> (sensorRef);  
-  
-  JniSensorManagerSingleton::Instance ()->OnSensorChanged (*handle, timestamp, local_ref<jfloatArray> (values));    
+
+  JniSensorManagerSingleton::Instance ()->OnSensorChanged (*handle, timestamp, local_ref<jfloatArray> (values), (Orientation)orientation);
 }
 
 }
@@ -392,10 +423,10 @@ sensor_t AndroidSensorManager::CreateSensor (size_t sensor_index)
   try
   {
     JniSensorManagerSingleton::Instance manager;
-    
+
     if (sensor_index >= manager->SensorsCount ())
       throw xtl::make_range_exception ("", "sensor_index", sensor_index, manager->SensorsCount ());
-      
+
     return new sensor_handle (manager->Sensor (sensor_index));
   }
   catch (xtl::exception& e)
@@ -637,7 +668,7 @@ void register_sensor_manager_callbacks (JNIEnv* env)
 
     static const JNINativeMethod methods [] = {
       {"onAccuracyChangedCallback", "(JLandroid/hardware/Sensor;I)V", (void*)&on_accuracy_changed},
-      {"onSensorChangedCallback", "(JLandroid/hardware/Sensor;IJ[F)V", (void*)&on_sensor_changed},
+      {"onSensorChangedCallback", "(JLandroid/hardware/Sensor;IJ[FI)V", (void*)&on_sensor_changed},
     };
 
     static const size_t methods_count = sizeof (methods) / sizeof (*methods);
