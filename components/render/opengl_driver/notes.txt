@@ -11,6 +11,7 @@
   - 
 3. Textures
   - http://www.opengl.org/registry/specs/ARB/sampler_objects.txt
+  - http://www.khronos.org/registry/gles/extensions/EXT/EXT_texture_storage.txt
 4. Instancing
 5. Conditional rendering
   - http://www.opengl.org/registry/specs/NV/conditional_render.txt
