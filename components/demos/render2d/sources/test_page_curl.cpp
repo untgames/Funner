@@ -28,7 +28,7 @@ struct Test
     curl->SetSize               (2.f, 1.5f);
     curl->SetGridSize           (100, 100);
     curl->SetMode               (PageCurlMode_DoublePageDoubleMaterial);
-    curl->SetCurlPoint          (PageCurlCorner_RightBottom);
+    curl->SetCurlPoint          (PageCurlCorner_LeftBottom);
     curl->SetCurlRadius         (0.1f);
     curl->SetPageMaterial       (PageCurlPageType_BackLeft,   "page1");
     curl->SetPageMaterial       (PageCurlPageType_BackRight,  "page2");
