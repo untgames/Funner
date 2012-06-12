@@ -31,7 +31,6 @@ const float  CORNER_SHADOW_SHIFT             = 0.2f;
 const float  MAX_CORNER_HEIGHT_OFFSET_FACTOR = 0.2f;
 const float  PI                              = 3.1415926f;
 const size_t SHADOW_TEXTURE_SIZE             = 32;
-const size_t SHADOW_VERTICES_COUNT           = 16;
 const float  STATIC_PAGES_Z_OFFSET           = -0.001f;
 const float  TEXCOORD_OFFSET                 = 0.001f;
 
@@ -44,6 +43,8 @@ struct RenderableVertex
   math::vec2f  texcoord; //текстурные координаты
   math::vec4ub color;    //цвет вершины
 };
+
+typedef xtl::uninitialized_storage<RenderableVertex> VerticesBuffer;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///ѕараметры шейдера
@@ -114,8 +115,8 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
   BufferPtr                  constant_buffer;                    //константный буфер
   BufferPtr                  quad_vertex_buffer;                 //вершинный буфер на два треугольника
   BufferPtr                  shadow_vertex_buffer;               //вершинный буфер дл€ отрисовки тени
-  BufferPtr                  corner_shadow_index_buffer;         //индексный буфер дл€ отрисовки тени
-  BufferPtr                  page_shadow_index_buffer;           //индексный буфер дл€ отрисовки тени
+  size_t                     shadow_vertex_buffer_size;          //размер вершинного буфера дл€ отрисовки тени
+  VerticesBuffer             shadow_vertices;                    //буфер дл€ рассчета вершин тени
   StateBlockPtr              render_state;                       //сохранение состо€ни€ рендера
   math::vec3f                view_point;                         //позици€ камеры
   math::mat4f                projection;                         //матрица камеры
@@ -129,6 +130,7 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
     : render (in_render)
     , page_curl (in_page_curl)
     , renderable (in_renderable)
+    , shadow_vertex_buffer_size (0)
     , initialized (false)
   {
     ILowLevelRenderer* low_level_renderer = dynamic_cast<ILowLevelRenderer*> (render.Renderer ().get ());
@@ -505,50 +507,6 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
 
       quad_vertex_buffer = BufferPtr (device.CreateBuffer (buffer_desc), false);
 
-      memset (&buffer_desc, 0, sizeof buffer_desc);
-
-      buffer_desc.usage_mode   = low_level::UsageMode_Stream;
-      buffer_desc.bind_flags   = low_level::BindFlag_VertexBuffer;
-      buffer_desc.access_flags = low_level::AccessFlag_Write;
-      buffer_desc.size         = sizeof (RenderableVertex) * SHADOW_VERTICES_COUNT;
-
-      shadow_vertex_buffer = BufferPtr (device.CreateBuffer (buffer_desc), false);
-
-        //создание индексного буфера
-
-      memset (&buffer_desc, 0, sizeof buffer_desc);
-
-      buffer_desc.usage_mode   = low_level::UsageMode_Stream;
-      buffer_desc.bind_flags   = low_level::BindFlag_IndexBuffer;
-      buffer_desc.access_flags = low_level::AccessFlag_Write;
-      buffer_desc.size         = sizeof (unsigned short) * 39;
-
-      corner_shadow_index_buffer = BufferPtr (device.CreateBuffer (buffer_desc), false);
-
-      unsigned short corner_shadow_indices [39] = { 0,  1,  2,    1,  2,  3,    2,  3,  4,    3,  4,  5,
-                                                    3,  5,  6,    3,  6,  7,    6,  7,  8,    7,  8,  9,
-                                                    1,  3,  7,    0,  1,  9,    1,  7,  9,    0,  2, 10,
-                                                    8,  9, 11 };
-
-      corner_shadow_index_buffer->SetData (0, sizeof (corner_shadow_indices), corner_shadow_indices);
-
-      memset (&buffer_desc, 0, sizeof buffer_desc);
-
-      buffer_desc.usage_mode   = low_level::UsageMode_Stream;
-      buffer_desc.bind_flags   = low_level::BindFlag_IndexBuffer;
-      buffer_desc.access_flags = low_level::AccessFlag_Write;
-      buffer_desc.size         = sizeof (unsigned short) * 54;
-
-      page_shadow_index_buffer = BufferPtr (device.CreateBuffer (buffer_desc), false);
-
-      unsigned short page_shadow_indices [54] = { 0,  1,  2,    1,  2,  3,    2,  3,  4,    3,  4,  5,
-                                                  3,  5,  6,    3,  6,  7,    6,  7,  8,    7,  8,  9,
-                                                  8,  9, 10,    7,  9, 11,    9, 11, 12,   11, 12, 13,
-                                                  1,  3,  7,    1,  7, 11,    0,  1, 11,    0, 11, 13,
-                                                  0,  2, 14,   12, 13, 15 };
-
-      page_shadow_index_buffer->SetData (0, sizeof (page_shadow_indices), page_shadow_indices);
-
         //создание текстуры тени
 
       low_level::TextureDesc texture_desc;
@@ -598,6 +556,27 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
       curled_page = RenderablePageCurlMeshPtr (new RenderablePageCurlMesh (device, grid_size), false);
 
       current_page_grid_size = grid_size;
+
+      size_t shadow_max_vertices = (grid_size.x + grid_size.y) * 2 * 2 * 3 + 6 * 4; //side points count * sides count * triangles per point * vertices per triangle + vertices for corners
+
+      if (shadow_vertex_buffer_size < shadow_max_vertices)
+      {
+        low_level::BufferDesc buffer_desc;
+
+        memset (&buffer_desc, 0, sizeof buffer_desc);
+
+        buffer_desc.usage_mode   = low_level::UsageMode_Stream;
+        buffer_desc.bind_flags   = low_level::BindFlag_VertexBuffer;
+        buffer_desc.access_flags = low_level::AccessFlag_Write;
+        buffer_desc.size         = sizeof (RenderableVertex) * shadow_max_vertices;
+
+        shadow_vertex_buffer = BufferPtr (device.CreateBuffer (buffer_desc), false);
+
+        shadow_vertex_buffer_size = shadow_max_vertices;
+      }
+
+      if (shadow_vertices.size () < shadow_vertex_buffer_size)
+        shadow_vertices.resize (shadow_vertex_buffer_size, false);
     }
 
     const math::vec2f& page_size     = page_curl->Size ();
@@ -647,6 +626,75 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
   }
 
   //–исование теней
+  void BuildSideShadow (const math::vec3f* side_positions, size_t side_positions_count, float corner_shadow_offset, RenderableVertex*& current_vertex, size_t& triangles_count)
+  {
+    math::vec3f prev_offset_point;
+    float       curl_radius = page_curl->CurlRadius ();
+
+    for (size_t i = 0, count = side_positions_count - 1; i < count; i++, side_positions++)
+    {
+      const math::vec3f* next_side_position = side_positions + 1;
+      math::vec2f        side_vec           = *next_side_position - *side_positions;
+      math::vec2f        side_normal        = math::normalize (math::vec2f (side_vec.y, -side_vec.x)) * corner_shadow_offset * stl::max (0.f, side_positions->z / curl_radius - 0.5f);
+
+      current_vertex [0].position = *side_positions;
+      current_vertex [0].texcoord = math::vec2f (0.5, 0.5);
+      current_vertex [0].color    = 255.f;
+      current_vertex [1].position = i ? prev_offset_point : *side_positions + side_normal;
+      current_vertex [1].texcoord = math::vec2f (0.5, 1);
+      current_vertex [1].color    = 255.f;
+      current_vertex [2].position = *next_side_position + side_normal;
+      current_vertex [2].texcoord = math::vec2f (0.5, 1);
+      current_vertex [2].color    = 255.f;
+      current_vertex [3].position = *side_positions;
+      current_vertex [3].texcoord = math::vec2f (0.5, 0.5);
+      current_vertex [3].color    = 255.f;
+      current_vertex [4].position = *next_side_position + side_normal;
+      current_vertex [4].texcoord = math::vec2f (0.5, 1);
+      current_vertex [4].color    = 255.f;
+      current_vertex [5].position = *next_side_position;
+      current_vertex [5].texcoord = math::vec2f (0.5, 0.5);
+      current_vertex [5].color    = 255.f;
+
+      prev_offset_point = current_vertex [2].position;
+
+      triangles_count += 2;
+      current_vertex  += 6;
+    }
+  }
+
+  void BuildCornerShadow (const math::vec3f& corner_position, const math::vec2f& side1_vec, const math::vec2f& side2_vec, float corner_shadow_offset, RenderableVertex*& current_vertex, size_t& triangles_count)
+  {
+    if (!corner_position.z)
+      return;
+
+    float       curl_radius  = page_curl->CurlRadius ();
+    math::vec3f side1_offset = math::normalize (math::vec2f (side1_vec.y, -side1_vec.x)) * corner_shadow_offset * stl::max (0.f, corner_position.z / curl_radius - 0.5f),
+                side2_offset = math::normalize (math::vec2f (side2_vec.y, -side2_vec.x)) * corner_shadow_offset * stl::max (0.f, corner_position.z / curl_radius - 0.5f);
+
+    current_vertex [0].position = corner_position;
+    current_vertex [0].texcoord = math::vec2f (0.5, 0.5);
+    current_vertex [0].color    = 255.f;
+    current_vertex [1].position = corner_position + side2_offset;
+    current_vertex [1].texcoord = math::vec2f (0.5, 1);
+    current_vertex [1].color    = 255.f;
+    current_vertex [2].position = corner_position + side1_offset + side2_offset;
+    current_vertex [2].texcoord = math::vec2f (1, 1);
+    current_vertex [2].color    = 255.f;
+    current_vertex [3].position = corner_position;
+    current_vertex [3].texcoord = math::vec2f (0.5, 0.5);
+    current_vertex [3].color    = 255.f;
+    current_vertex [4].position = corner_position + side1_offset + side2_offset;
+    current_vertex [4].texcoord = math::vec2f (1, 1);
+    current_vertex [4].color    = 255.f;
+    current_vertex [5].position = corner_position + side1_offset;
+    current_vertex [5].texcoord = math::vec2f (1, 0.5);
+    current_vertex [5].color    = 255.f;
+
+    triangles_count += 2;
+    current_vertex  += 6;
+  }
+
   void DrawShadows (low_level::IDevice& device, PageCurlCorner corner, float curl_radius, bool left_side)
   {
     if (curl_radius <= EPS)
@@ -669,8 +717,6 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
     const math::vec3f& left_top_corner_position     = curled_page->GetCornerPosition (PageCurlCorner_LeftTop);
     const math::vec3f& right_bottom_corner_position = curled_page->GetCornerPosition (PageCurlCorner_RightBottom);
     const math::vec3f& right_top_corner_position    = curled_page->GetCornerPosition (PageCurlCorner_RightTop);
-//    const math::vec3f& top_corner_position          = left_side ? left_top_corner_position : right_top_corner_position;
-//    const math::vec3f& bottom_corner_position       = left_side ? left_bottom_corner_position : right_bottom_corner_position;
 
     float shadow_width  = page_size.x * page_curl->ShadowWidth () * curl_radius / page_curl->CurlRadius (),
           corner_offset = 0.f;
@@ -695,276 +741,75 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
 
       //отрисовка тени под страницей
     {
-      RenderableVertex vertices [10000];
-      size_t           triangles_count = 0;
+      size_t triangles_count = 0;
 
-      RenderableVertex*   current_vertex   = vertices;
+      RenderableVertex*   current_vertex   = shadow_vertices.data ();
       const math::vec3f*  positions        = curled_page->GridVertices ();
       size_t              positions_stride = curled_page->GridVerticesStride ();
       const math::vec2ui& grid_size        = curled_page->GridSize ();
 
-      xtl::uninitialized_storage<math::vec3f> side_positions ((grid_size.x + grid_size.y) * 2 - 2);
-      math::vec3f*                            current_side_position = side_positions.data ();
+      xtl::uninitialized_storage<math::vec3f> side_positions (stl::max (grid_size.x, grid_size.y));
 
-      for (size_t i = 0; i < grid_size.x - 1; i++, current_side_position++)
-        *current_side_position = *(const math::vec3f*)((const unsigned char*)positions + i * positions_stride);
+      math::vec3f* current_side_position = side_positions.data ();
 
-      for (size_t i = 0; i < grid_size.y - 1; i++, current_side_position++)
-        *current_side_position = *(const math::vec3f*)((const unsigned char*)positions + (i * grid_size.x + grid_size.x - 1) * positions_stride);
-
-      for (size_t i = grid_size.x - 1; i > 0; i--, current_side_position++)
-        *current_side_position = *(const math::vec3f*)((const unsigned char*)positions + (grid_size.x * (grid_size.y - 1) + i) * positions_stride);
-
-      for (size_t i = grid_size.y - 1; i > 0; i--, current_side_position++)
-        *current_side_position = *(const math::vec3f*)((const unsigned char*)positions + (i * grid_size.x) * positions_stride);
-
-      *current_side_position = *(const math::vec3f*)((const unsigned char*)positions);
-      current_side_position++;
-      *current_side_position = *(const math::vec3f*)((const unsigned char*)positions + positions_stride);
-
-      const math::vec3f* side_position = side_positions.data ();
-      math::vec3f        prev_offset_point;
-
-      for (size_t i = 0, count = side_positions.size () - 2; i < count; i++, side_position++)
+      for (size_t i = 0; i < grid_size.x; i++, current_side_position++)
       {
-        const math::vec3f* next_side_position = side_position + 1;
-        math::vec2f        side_vec           = *next_side_position - *side_position;
-        math::vec2f        side_normal        = math::normalize (math::vec2f (side_vec.y, -side_vec.x)) * corner_shadow_offset * stl::max (0.f, side_position->z - page_curl->CurlRadius () / 2) / page_curl->CurlRadius ();
-
-        current_vertex [0].position = *side_position;
-        current_vertex [0].texcoord = math::vec2f (0.5, 0.5);
-        current_vertex [0].color    = 255.f;
-        current_vertex [1].position = *side_position + side_normal;
-        current_vertex [1].texcoord = math::vec2f (0.5, 1);
-        current_vertex [1].color    = 255.f;
-        current_vertex [2].position = *next_side_position + side_normal;
-        current_vertex [2].texcoord = math::vec2f (0.5, 1);
-        current_vertex [2].color    = 255.f;
-        current_vertex [3].position = *side_position;
-        current_vertex [3].texcoord = math::vec2f (0.5, 0.5);
-        current_vertex [3].color    = 255.f;
-        current_vertex [4].position = *next_side_position + side_normal;
-        current_vertex [4].texcoord = math::vec2f (0.5, 1);
-        current_vertex [4].color    = 255.f;
-        current_vertex [5].position = *next_side_position;
-        current_vertex [5].texcoord = math::vec2f (0.5, 0.5);
-        current_vertex [5].color    = 255.f;
-
-        if (i)
-        {
-          current_vertex [6].position = *side_position;
-          current_vertex [6].texcoord = math::vec2f (0.5, 0.5);
-          current_vertex [6].color    = 255.f;
-          current_vertex [7].position = prev_offset_point;
-          current_vertex [7].texcoord = math::vec2f (0.5, 1);
-          current_vertex [7].color    = 255.f;
-          current_vertex [8].position = *side_position + side_normal;
-          current_vertex [8].texcoord = math::vec2f (0.5, 1);
-          current_vertex [8].color    = 255.f;
-        }
-
-        prev_offset_point = current_vertex [2].position;
-
-        triangles_count += 2;
-        current_vertex  += 6;
-
-        if (i)
-        {
-          triangles_count++;
-          current_vertex += 3;
-        }
+        *current_side_position = *(const math::vec3f*)((const unsigned char*)positions + i * positions_stride);
+        current_side_position->x +=  x_offset;
       }
+
+      BuildSideShadow (side_positions.data (), grid_size.x, corner_shadow_offset, current_vertex, triangles_count);
+
+      current_side_position = side_positions.data ();
+
+      for (size_t i = 0; i < grid_size.y; i++, current_side_position++)
+      {
+        *current_side_position = *(const math::vec3f*)((const unsigned char*)positions + (i * grid_size.x + grid_size.x - 1) * positions_stride);
+        current_side_position->x +=  x_offset;
+      }
+
+      BuildSideShadow (side_positions.data (), grid_size.y, corner_shadow_offset, current_vertex, triangles_count);
+
+      current_side_position = side_positions.data ();
+
+      for (int i = grid_size.x - 1; i >= 0; i--, current_side_position++)
+      {
+        *current_side_position = *(const math::vec3f*)((const unsigned char*)positions + (grid_size.x * (grid_size.y - 1) + i) * positions_stride);
+        current_side_position->x +=  x_offset;
+      }
+
+      BuildSideShadow (side_positions.data (), grid_size.x, corner_shadow_offset, current_vertex, triangles_count);
+
+      current_side_position = side_positions.data ();
+
+      for (int i = grid_size.y - 1; i >= 0; i--, current_side_position++)
+      {
+        *current_side_position = *(const math::vec3f*)((const unsigned char*)positions + (i * grid_size.x) * positions_stride);
+        current_side_position->x +=  x_offset;
+      }
+
+      BuildSideShadow (side_positions.data (), grid_size.y, corner_shadow_offset, current_vertex, triangles_count);
+
+      BuildCornerShadow (left_top_corner_position + math::vec3f (x_offset, 0, 0), left_top_corner_position - *(const math::vec3f*)((const unsigned char*)positions + grid_size.x * positions_stride),
+                         *(const math::vec3f*)((const unsigned char*)positions + positions_stride) - left_top_corner_position, corner_shadow_offset, current_vertex, triangles_count);
+      BuildCornerShadow (left_bottom_corner_position + math::vec3f (x_offset, 0, 0), left_bottom_corner_position - *(const math::vec3f*)((const unsigned char*)positions + (grid_size.x * (grid_size.y - 1) + 1) * positions_stride),
+                         *(const math::vec3f*)((const unsigned char*)positions + (grid_size.x * (grid_size.y - 2)) * positions_stride) - left_bottom_corner_position, corner_shadow_offset, current_vertex, triangles_count);
+      BuildCornerShadow (right_top_corner_position + math::vec3f (x_offset, 0, 0), right_top_corner_position - *(const math::vec3f*)((const unsigned char*)positions + (grid_size.x - 2) * positions_stride),
+                         *(const math::vec3f*)((const unsigned char*)positions + (grid_size.x + grid_size.x - 1) * positions_stride) - right_top_corner_position, corner_shadow_offset, current_vertex, triangles_count);
+      BuildCornerShadow (right_bottom_corner_position + math::vec3f (x_offset, 0, 0), right_bottom_corner_position - *(const math::vec3f*)((const unsigned char*)positions + (grid_size.x * (grid_size.y - 1) - 1) * positions_stride),
+                         *(const math::vec3f*)((const unsigned char*)positions + (grid_size.x * grid_size.y - 2) * positions_stride) - right_bottom_corner_position, corner_shadow_offset, current_vertex, triangles_count);
 
       if (triangles_count)
       {
         size_t vertices_count = triangles_count * 3;
 
-        low_level::BufferDesc buffer_desc;
+        shadow_vertex_buffer->SetData (0, sizeof (RenderableVertex) * vertices_count, shadow_vertices.data ());
 
-        memset (&buffer_desc, 0, sizeof buffer_desc);
-
-        buffer_desc.usage_mode   = low_level::UsageMode_Stream;
-        buffer_desc.bind_flags   = low_level::BindFlag_VertexBuffer;
-        buffer_desc.access_flags = low_level::AccessFlag_Write;
-        buffer_desc.size         = sizeof (RenderableVertex) * vertices_count;
-
-        BufferPtr vb (device.CreateBuffer (buffer_desc), false);
-
-        vb->SetData (0, sizeof (RenderableVertex) * vertices_count, vertices);
-
-        device.ISSetVertexBuffer (0, vb.get ());
+        device.ISSetVertexBuffer (0, shadow_vertex_buffer.get ());
 
         device.Draw (low_level::PrimitiveType_TriangleList, 0, vertices_count);
       }
     }
-
-/*    if (curled_page->HasBottomSideBendPosition () || curled_page->HasTopSideBendPosition ())
-    {
-      RenderableVertex vertices [SHADOW_VERTICES_COUNT];
-
-      for (size_t i = 0; i < SHADOW_VERTICES_COUNT; i++)
-      {
-        vertices [i].color.x = 255;
-        vertices [i].color.y = 255;
-        vertices [i].color.z = 255;
-      }
-
-      size_t      triangles_count = 0;
-      math::vec2f base_vertices [4];
-      math::vec2f mid_points [2];
-      bool        has_side_bend_position    = left_side ? curled_page->HasLeftSideBendPosition () : curled_page->HasRightSideBendPosition ();
-      math::vec3f bottom_side_bend_position = curled_page->GetBottomSideBendPosition ();
-      math::vec3f top_side_bend_position    = curled_page->GetTopSideBendPosition ();
-      math::vec3f side_bend_position        = left_side ? curled_page->GetLeftSideBendPosition () : curled_page->GetRightSideBendPosition ();
-
-      if (has_side_bend_position)  //загнут один угол
-      {
-        base_vertices [0] = side_bend_position;
-
-        if (fabs (top_corner_position.z) > curl_radius)  //загнут верхний угол
-        {
-          base_vertices [1] = top_corner_position;
-          base_vertices [2] = top_side_bend_position;
-        }
-        else //загнут нижний угол
-        {
-          base_vertices [1] = bottom_corner_position;
-          base_vertices [2] = bottom_side_bend_position;
-        }
-
-        math::vec2f side_vec = base_vertices [2] - base_vertices [0];
-        float       angle;
-
-        PageCurlCorner top_corner          = (PageCurlCorner)0;
-        float          corners_heights [4] = { left_top_corner_position.z, left_bottom_corner_position.z, right_top_corner_position.z, right_bottom_corner_position.z };
-        float          top_corner_height   = corners_heights [0];
-
-        for (size_t i = 1; i < 4; i++)
-        {
-          if (corners_heights [i] > top_corner_height)
-          {
-            top_corner        = (PageCurlCorner)i;
-            top_corner_height = corners_heights [i];
-          }
-        }
-
-        switch (top_corner)
-        {
-          case PageCurlCorner_LeftTop:
-            angle = atan2 (side_vec.y, side_vec.x);;
-            break;
-          case PageCurlCorner_LeftBottom:
-            angle = atan2 (-side_vec.y, side_vec.x);;
-            break;
-          case PageCurlCorner_RightTop:
-            angle = atan2 (side_vec.y, -side_vec.x);;
-            break;
-          case PageCurlCorner_RightBottom:
-            angle = atan2 (-side_vec.y, -side_vec.x);
-            break;
-        }
-
-        base_vertices [0] += side_vec * CORNER_SHADOW_SHIFT * sin (angle);
-        base_vertices [2] -= side_vec * CORNER_SHADOW_SHIFT * cos (angle);
-
-        triangles_count += 13;
-      }
-      else //загнуты два угла
-      {
-        base_vertices [0] = top_side_bend_position;
-        base_vertices [1] = top_corner_position;
-        base_vertices [2] = bottom_corner_position;
-        base_vertices [3] = bottom_side_bend_position;
-
-        triangles_count += 18;
-      }
-
-      for (size_t i = 0; i < 4; i++)
-        base_vertices [i].x += x_offset;
-
-      math::vec2f short_side_vec          = base_vertices [1] - base_vertices [0],
-                  short_side_dir          = math::normalize (short_side_vec),
-                  long_side_vec           = base_vertices [2] - base_vertices [1],
-                  long_side_dir           = math::normalize (long_side_vec),
-                  third_side_vec          = base_vertices [2] - base_vertices [3],
-                  third_side_dir          = math::normalize (third_side_vec);
-      float       first_side_length       = math::length (short_side_vec),
-                  first_mid_point_offset  = stl::min (corner_shadow_offset, first_side_length / 2.f),
-                  third_side_length       = math::length (third_side_vec),
-                  second_mid_point_offset = stl::min (corner_shadow_offset, third_side_length / 2.f);
-
-      if (!has_side_bend_position && third_side_length > first_side_length)
-        short_side_dir = third_side_dir;
-
-      mid_points [0] = base_vertices [0] + short_side_dir * first_mid_point_offset;
-
-      vertices [0].position = math::vec3f (base_vertices [0].x, base_vertices [0].y, curl_radius);
-      vertices [0].texcoord = math::vec2f (0, 0.5);
-      vertices [1].position = math::vec3f (mid_points [0].x, mid_points [0].y, curl_radius);
-      vertices [1].texcoord = math::vec2f (0.5, 0.5);
-      vertices [2].position = math::vec3f (mid_points [0].x - long_side_dir.x * corner_shadow_offset, mid_points [0].y - long_side_dir.y * corner_shadow_offset, curl_radius);
-      vertices [2].texcoord = math::vec2f (0.5, 1);
-      vertices [3].position = math::vec3f (base_vertices [1].x, base_vertices [1].y, curl_radius);
-      vertices [3].texcoord = math::vec2f (0.5, 0.5);
-      vertices [4].position = math::vec3f (base_vertices [1].x - long_side_dir.x * corner_shadow_offset, base_vertices [1].y - long_side_dir.y * corner_shadow_offset, curl_radius);
-      vertices [4].texcoord = math::vec2f (0.5, 1);
-      vertices [5].position = math::vec3f (base_vertices [1].x + (-long_side_dir.x + short_side_dir.x) * corner_shadow_offset, base_vertices [1].y + (-long_side_dir.y + short_side_dir.y) * corner_shadow_offset, curl_radius);
-      vertices [5].texcoord = math::vec2f (1, 1);
-      vertices [6].position = math::vec3f (base_vertices [1].x + short_side_dir.x * corner_shadow_offset, base_vertices [1].y + short_side_dir.y * corner_shadow_offset, curl_radius);
-      vertices [6].texcoord = math::vec2f (1, 0.5);
-
-      if (has_side_bend_position)
-      {
-        float long_side_length        = math::length (long_side_vec),
-              second_mid_point_offset = stl::min (corner_shadow_offset, long_side_length / 2);
-
-        mid_points [1] = base_vertices [2] - long_side_dir * second_mid_point_offset;
-
-        vertices [7].position = math::vec3f (mid_points [1].x, mid_points [1].y, curl_radius);
-        vertices [7].texcoord = math::vec2f (0.5, 0.5);
-        vertices [8].position = math::vec3f (mid_points [1].x + short_side_dir.x * corner_shadow_offset, mid_points [1].y + short_side_dir.y * corner_shadow_offset, curl_radius);
-        vertices [8].texcoord = math::vec2f (1, 0.5);
-        vertices [9].position = math::vec3f (base_vertices [2].x, base_vertices [2].y, curl_radius);
-        vertices [9].texcoord = math::vec2f (0.5, 0);
-        vertices [10].position = math::vec3f (base_vertices [0].x - long_side_dir.x * corner_shadow_offset, base_vertices [0].y - long_side_dir.y * corner_shadow_offset, curl_radius);
-        vertices [10].texcoord = math::vec2f (0, 1);
-        vertices [11].position = math::vec3f (base_vertices [2].x + short_side_dir.x * corner_shadow_offset, base_vertices [2].y + short_side_dir.y * corner_shadow_offset, curl_radius);
-        vertices [11].texcoord = math::vec2f (1, 0);
-
-        device.ISSetIndexBuffer (corner_shadow_index_buffer.get ());
-      }
-      else
-      {
-        mid_points [1] = base_vertices [3] + short_side_dir * second_mid_point_offset;
-
-        vertices [7].position  = math::vec3f (base_vertices [2].x, base_vertices [2].y, curl_radius);
-        vertices [7].texcoord  = math::vec2f (0.5, 0.5);
-        vertices [8].position  = math::vec3f (base_vertices [2].x + short_side_dir.x * corner_shadow_offset, base_vertices [2].y + short_side_dir.y * corner_shadow_offset, curl_radius);
-        vertices [8].texcoord  = math::vec2f (1, 0.5);
-        vertices [9].position  = math::vec3f (base_vertices [2].x + long_side_dir.x * corner_shadow_offset, base_vertices [2].y + long_side_dir.y * corner_shadow_offset, curl_radius);
-        vertices [9].texcoord  = math::vec2f (0.5, 0);
-        vertices [10].position = math::vec3f (base_vertices [2].x + (short_side_dir.x + long_side_dir.x) * corner_shadow_offset, base_vertices [2].y + (short_side_dir.y + long_side_dir.y) * corner_shadow_offset, curl_radius);
-        vertices [10].texcoord = math::vec2f (1, 0);
-        vertices [11].position = math::vec3f (mid_points [1].x, mid_points [1].y, curl_radius);
-        vertices [11].texcoord = math::vec2f (0.5, 0.5);
-        vertices [12].position = math::vec3f (mid_points [1].x + long_side_dir.x * corner_shadow_offset, mid_points [1].y + long_side_dir.y * corner_shadow_offset, curl_radius);
-        vertices [12].texcoord = math::vec2f (0.5, 0);
-        vertices [13].position = math::vec3f (base_vertices [3].x, base_vertices [3].y, curl_radius);
-        vertices [13].texcoord = math::vec2f (0, 0.5);
-        vertices [14].position = math::vec3f (base_vertices [0].x - long_side_dir.x * corner_shadow_offset, base_vertices [0].y - long_side_dir.y * corner_shadow_offset, curl_radius);
-        vertices [14].texcoord = math::vec2f (0, 1);
-        vertices [15].position = math::vec3f (base_vertices [3].x + long_side_dir.x * corner_shadow_offset, base_vertices [3].y + long_side_dir.y * corner_shadow_offset, curl_radius);
-        vertices [15].texcoord = math::vec2f (0, 0);
-
-        device.ISSetIndexBuffer (page_shadow_index_buffer.get ());
-      }
-
-      shadow_vertex_buffer->SetData (0, sizeof (vertices), vertices);
-
-      device.ISSetVertexBuffer (0, shadow_vertex_buffer.get ());
-
-      device.DrawIndexed (low_level::PrimitiveType_TriangleList, 0, triangles_count * 3, 0);
-    }*/
 
       //отрисовка тени за страницей
     if (fabs (left_top_corner_position.z) > EPS || fabs (right_top_corner_position.z) > EPS || fabs (left_bottom_corner_position.z) > EPS || fabs (right_bottom_corner_position.z) > EPS)
