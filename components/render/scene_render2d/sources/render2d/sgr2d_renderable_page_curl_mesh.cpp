@@ -35,12 +35,10 @@ struct RenderablePageCurlMesh::Impl
   VertexBuffer   vertices;                  //данные вершин трансформированной страницы
   BufferPtr      vertex_buffer;             //вершинный буфер
   BufferPtr      index_buffer;              //индексный буфер
-  size_t         x_size;                    //размер сетки по горизонтали
-  size_t         y_size;                    //размер сетки по вертикали
+  math::vec2ui   grid_size;                 //размер сетки
   size_t         triangles_count;           //количество треугольников
   size_t         vertices_count;            //количество вершин
-  float          width;                     //ширина
-  float          height;                    //высота
+  math::vec2f    size;                      //размер
   float          min_s;                     //минимальна€ текстурна€ координата по горизонтали
   float          min_t;                     //минимальна€ текстурна€ координата по вертикали
   float          max_s;                     //максимальна€ текстурна€ координата по горизонтали
@@ -49,32 +47,30 @@ struct RenderablePageCurlMesh::Impl
   math::vec4ub   color;                     //цвет
 
   /// онструктор
-  Impl (low_level::IDevice& device, const math::vec2ui& grid_size)
-    : x_size (grid_size.x)
-    , y_size (grid_size.y)
-    , width  (-1)
-    , height (-1)
-    , min_s  (-1)
-    , min_t  (-1)
-    , max_s  (-1)
-    , max_t  (-1)
+  Impl (low_level::IDevice& device, const math::vec2ui& in_grid_size)
+    : grid_size (in_grid_size)
+    , size      (-1)
+    , min_s     (-1)
+    , min_t     (-1)
+    , max_s     (-1)
+    , max_t     (-1)
     , last_curl_radius (0)
-    , color  (0)
+    , color     (0)
   {
     static const char* METHOD_NAME = "render::obsolete::render2d::RenderablePageCurlMesh::RenderablePageCurlMesh";
 
-    if (x_size < 2)
-      throw xtl::make_argument_exception (METHOD_NAME, "x_size", x_size, "x_size must be greater than 1");
+    if (grid_size.x < 2)
+      throw xtl::make_argument_exception (METHOD_NAME, "grid_size.x", (size_t)grid_size.x, "grid_size.x must be greater than 1");
 
-    if (y_size < 2)
-      throw xtl::make_argument_exception (METHOD_NAME, "y_size", y_size, "y_size must be greater than 1");
+    if (grid_size.y < 2)
+      throw xtl::make_argument_exception (METHOD_NAME, "grid_size.y", (size_t)grid_size.y, "grid_size.y must be greater than 1");
 
-    vertices_count = x_size * y_size;
+    vertices_count = grid_size.x * grid_size.y;
 
     if (vertices_count > USHRT_MAX)
-      throw xtl::format_operation_exception (METHOD_NAME, "x_size * y_size is larger than max unsigned short value (x_size = %u, y_size = %u)", x_size, y_size);
+      throw xtl::format_operation_exception (METHOD_NAME, "grid_size.x * grid_size.y is larger than max unsigned short value (grid_size.x = %u, grid_size.y = %u)", grid_size.x, grid_size.y);
 
-    triangles_count = (x_size - 1) * (y_size - 1) * 2;
+    triangles_count = (grid_size.x - 1) * (grid_size.y - 1) * 2;
 
     size_t indices_count = triangles_count * 3;
 
@@ -83,23 +79,23 @@ struct RenderablePageCurlMesh::Impl
 
     xtl::uninitialized_storage<unsigned short> indices (indices_count);
 
-    for (size_t i = 0; i < (x_size - 1) * 2; i++)
+    for (size_t i = 0; i < (grid_size.x - 1) * 2; i++)
     {
-      for (size_t j = 0; j < y_size - 1; j++)
+      for (size_t j = 0; j < grid_size.y - 1; j++)
       {
-        unsigned short* current_indices = &indices.data () [(j * (x_size - 1) * 2 + i) * 3];
+        unsigned short* current_indices = &indices.data () [(j * (grid_size.x - 1) * 2 + i) * 3];
 
         if (i % 2)
         {
-          current_indices [0] = (j + 1) * x_size + i / 2;
-          current_indices [1] = (j + 1) * x_size + i / 2 + 1;
-          current_indices [2] = j * x_size + i / 2 + 1;
+          current_indices [0] = (j + 1) * grid_size.x + i / 2;
+          current_indices [1] = (j + 1) * grid_size.x + i / 2 + 1;
+          current_indices [2] = j * grid_size.x + i / 2 + 1;
         }
         else
         {
-          current_indices [0] = j * x_size + i / 2;
-          current_indices [1] = (j + 1) * x_size + i / 2;
-          current_indices [2] = j * x_size + i / 2 + 1;
+          current_indices [0] = j * grid_size.x + i / 2;
+          current_indices [1] = (j + 1) * grid_size.x + i / 2;
+          current_indices [2] = j * grid_size.x + i / 2 + 1;
         }
       }
     }
@@ -155,44 +151,44 @@ struct RenderablePageCurlMesh::Impl
     switch (corner)
     {
       case scene_graph::PageCurlCorner_RightBottom:
-        original_corner_location.x          = width;
-        original_corner_location.y          = height;
-        opposite_original_corner_location.x = width;
+        original_corner_location.x          = size.x;
+        original_corner_location.y          = size.y;
+        opposite_original_corner_location.x = size.x;
         opposite_original_corner_location.y = 0.f;
         top_binding.x                       = 0.f;
         top_binding.y                       = 0.f;
         bottom_binding.x                    = 0.f;
-        bottom_binding.y                    = height;
+        bottom_binding.y                    = size.y;
         break;
       case scene_graph::PageCurlCorner_RightTop:
-        original_corner_location.x          = width;
+        original_corner_location.x          = size.x;
         original_corner_location.y          = 0.f;
-        opposite_original_corner_location.x = width;
-        opposite_original_corner_location.y = height;
+        opposite_original_corner_location.x = size.x;
+        opposite_original_corner_location.y = size.y;
         top_binding.x                       = 0.f;
         top_binding.y                       = 0.f;
         bottom_binding.x                    = 0.f;
-        bottom_binding.y                    = height;
+        bottom_binding.y                    = size.y;
         break;
       case scene_graph::PageCurlCorner_LeftBottom:
         original_corner_location.x          = 0.f;
-        original_corner_location.y          = height;
+        original_corner_location.y          = size.y;
         opposite_original_corner_location.x = 0.f;
         opposite_original_corner_location.y = 0.f;
-        top_binding.x                       = width;
+        top_binding.x                       = size.x;
         top_binding.y                       = 0.f;
-        bottom_binding.x                    = width;
-        bottom_binding.y                    = height;
+        bottom_binding.x                    = size.x;
+        bottom_binding.y                    = size.y;
         break;
       case scene_graph::PageCurlCorner_LeftTop:
         original_corner_location.x          = 0.f;
         original_corner_location.y          = 0.f;
         opposite_original_corner_location.x = 0.f;
-        opposite_original_corner_location.y = height;
-        top_binding.x                       = width;
+        opposite_original_corner_location.y = size.y;
+        top_binding.x                       = size.x;
         top_binding.y                       = 0.f;
-        bottom_binding.x                    = width;
-        bottom_binding.y                    = height;
+        bottom_binding.x                    = size.x;
+        bottom_binding.y                    = size.y;
         break;
       default:
         break;
@@ -214,9 +210,9 @@ struct RenderablePageCurlMesh::Impl
           curl_x                             = 0;
 
     float best_curl_mismatch = FLT_MAX,
-          best_curl_step     = width / find_best_curl_steps;
+          best_curl_step     = size.x / find_best_curl_steps;
 
-    for (float current_curl_x = -2.f * width; current_curl_x < 2.f * width; current_curl_x += best_curl_step)
+    for (float current_curl_x = -2.f * size.x; current_curl_x < 2.f * size.x; current_curl_x += best_curl_step)
     {
       float current_corner_location_x         = rotated_original_corner_location_x,
             current_top_binding_location_x    = rotated_top_binding_location_x,
@@ -304,7 +300,7 @@ struct RenderablePageCurlMesh::Impl
       for (size_t i = 0; i < vertices_count; i++, v++, original_v++)
       {
         v->position.x = original_v->x;
-        v->position.y = height - original_v->y;
+        v->position.y = size.y - original_v->y;
         v->position.z = 0;
       }
 
@@ -337,7 +333,7 @@ struct RenderablePageCurlMesh::Impl
             y = v->position.y;
 
       v->position.x = x * cos_curl_angle - y * sin_minus_curl_angle;
-      v->position.y = height - (x * sin_minus_curl_angle + y * cos_curl_angle);
+      v->position.y = size.y - (x * sin_minus_curl_angle + y * cos_curl_angle);
     }
   }
 
@@ -355,22 +351,21 @@ struct RenderablePageCurlMesh::Impl
       vertex->color = color;
   }
 
-  void SetSize (const math::vec2f& size)
+  void SetSize (const math::vec2f& in_size)
   {
-    if (width == size.x && height == size.y)
+    if (size == in_size)
       return;
 
-    width  = size.x;
-    height = size.y;
+    size = in_size;
 
-    for (size_t i = 0; i < x_size; i++)
+    for (size_t i = 0; i < grid_size.x; i++)
     {
-      for (size_t j = 0; j < y_size; j++)
+      for (size_t j = 0; j < grid_size.y; j++)
       {
-        math::vec3f& vertex = original_vertices.data () [j * x_size + i];
+        math::vec3f& vertex = original_vertices.data () [j * grid_size.x + i];
 
-        vertex.x = i / (float)(x_size - 1) * width;
-        vertex.y = j / (float)(y_size - 1) * height;
+        vertex.x = i / (float)(grid_size.x - 1) * size.x;
+        vertex.y = j / (float)(grid_size.y - 1) * size.y;
         vertex.z = 0;
       }
     }
@@ -388,17 +383,17 @@ struct RenderablePageCurlMesh::Impl
 
     float s_range = max_s - min_s,
           t_range = max_t - min_t,
-          ds      = 1.f / (x_size - 1) * s_range,
-          dt      = 1.f / (y_size - 1) * t_range,
+          ds      = 1.f / (grid_size.x - 1) * s_range,
+          dt      = 1.f / (grid_size.y - 1) * t_range,
           t       = max_t;
 
     RenderableVertex* vertex = vertices.data ();
 
-    for (size_t j = 0; j < y_size; j++, t -= dt)
+    for (size_t j = 0; j < grid_size.y; j++, t -= dt)
     {
       float s = min_s;
 
-      for (size_t i = 0; i < x_size; i++, vertex++, s += ds)
+      for (size_t i = 0; i < grid_size.x; i++, vertex++, s += ds)
       {
         vertex->texcoord.x = s;
         vertex->texcoord.y = t;
@@ -459,12 +454,12 @@ struct RenderablePageCurlMesh::Impl
   //ѕолучение информации после трансформации
   bool HasRightSideBendPosition ()
   {
-   const RenderableVertex& first_vertex = vertices.data () [x_size - 1];
+   const RenderableVertex& first_vertex = vertices.data () [grid_size.x - 1];
    bool                    first_larger = first_vertex.position.z < last_curl_radius;
 
-   for (size_t i = 0; i < y_size; i++)
+   for (size_t i = 0; i < grid_size.y; i++)
    {
-     const RenderableVertex& v = vertices.data () [i * x_size + x_size - 1];
+     const RenderableVertex& v = vertices.data () [i * grid_size.x + grid_size.x - 1];
 
      if ((first_larger && v.position.z > last_curl_radius) || (!first_larger && v.position.z < last_curl_radius))
        return true;
@@ -478,9 +473,9 @@ struct RenderablePageCurlMesh::Impl
     const RenderableVertex& first_vertex = vertices.data () [0];
     bool                    first_larger = first_vertex.position.z < last_curl_radius;
 
-    for (size_t i = 0; i < y_size; i++)
+    for (size_t i = 0; i < grid_size.y; i++)
     {
-      const RenderableVertex& v = vertices.data () [i * x_size];
+      const RenderableVertex& v = vertices.data () [i * grid_size.x];
 
       if ((first_larger && v.position.z > last_curl_radius) || (!first_larger && v.position.z < last_curl_radius))
         return true;
@@ -491,12 +486,12 @@ struct RenderablePageCurlMesh::Impl
 
   bool HasBottomSideBendPosition ()
   {
-    const RenderableVertex& first_vertex = vertices.data () [x_size * (y_size - 1)];
+    const RenderableVertex& first_vertex = vertices.data () [grid_size.x * (grid_size.y - 1)];
     bool                    first_larger = first_vertex.position.z < last_curl_radius;
 
-    for (size_t i = 0; i < x_size; i++)
+    for (size_t i = 0; i < grid_size.x; i++)
     {
-      const RenderableVertex& v = vertices.data () [x_size * (y_size - 1) + i];
+      const RenderableVertex& v = vertices.data () [grid_size.x * (grid_size.y - 1) + i];
 
       if ((first_larger && v.position.z > last_curl_radius) || (!first_larger && v.position.z < last_curl_radius))
         return true;
@@ -510,7 +505,7 @@ struct RenderablePageCurlMesh::Impl
     const RenderableVertex& first_vertex = vertices.data () [0];
     bool                    first_larger = first_vertex.position.z < last_curl_radius;
 
-    for (size_t i = 0; i < x_size; i++)
+    for (size_t i = 0; i < grid_size.x; i++)
     {
       const RenderableVertex& v = vertices.data () [i];
 
@@ -523,18 +518,18 @@ struct RenderablePageCurlMesh::Impl
 
   const math::vec3f& GetRightSideBendPosition ()
   {
-    const RenderableVertex& first_vertex = vertices.data () [x_size - 1];
+    const RenderableVertex& first_vertex = vertices.data () [grid_size.x - 1];
     bool                    first_larger = first_vertex.position.z < last_curl_radius;
 
-    for (size_t i = 0; i < y_size; i++)
+    for (size_t i = 0; i < grid_size.y; i++)
     {
-      const RenderableVertex& v = vertices.data () [i * x_size + x_size - 1];
+      const RenderableVertex& v = vertices.data () [i * grid_size.x + grid_size.x - 1];
 
       if ((first_larger && v.position.z > last_curl_radius) || (!first_larger && v.position.z < last_curl_radius))
         return v.position;
     }
 
-    return vertices.data () [(y_size - 1) * x_size + x_size - 1].position;
+    return vertices.data () [(grid_size.y - 1) * grid_size.x + grid_size.x - 1].position;
   }
 
   const math::vec3f& GetLeftSideBendPosition ()
@@ -542,15 +537,15 @@ struct RenderablePageCurlMesh::Impl
     const RenderableVertex& first_vertex = vertices.data () [0];
     bool                    first_larger = first_vertex.position.z < last_curl_radius;
 
-    for (size_t i = 0; i < y_size; i++)
+    for (size_t i = 0; i < grid_size.y; i++)
     {
-      const RenderableVertex& v = vertices.data () [i * x_size];
+      const RenderableVertex& v = vertices.data () [i * grid_size.x];
 
       if ((first_larger && v.position.z > last_curl_radius) || (!first_larger && v.position.z < last_curl_radius))
         return v.position;
     }
 
-    return vertices.data () [(y_size - 1) * x_size].position;
+    return vertices.data () [(grid_size.y - 1) * grid_size.x].position;
   }
 
   const math::vec3f& GetTopSideBendPosition ()
@@ -558,7 +553,7 @@ struct RenderablePageCurlMesh::Impl
     const RenderableVertex& first_vertex = vertices.data () [0];
     bool                    first_larger = first_vertex.position.z < last_curl_radius;
 
-    for (size_t i = 0; i < x_size; i++)
+    for (size_t i = 0; i < grid_size.x; i++)
     {
       const RenderableVertex& v = vertices.data () [i];
 
@@ -566,39 +561,39 @@ struct RenderablePageCurlMesh::Impl
         return v.position;
     }
 
-    return vertices.data () [x_size - 1].position;
+    return vertices.data () [grid_size.x - 1].position;
   }
 
   const math::vec3f& GetBottomSideBendPosition ()
   {
-    const RenderableVertex& first_vertex = vertices.data () [x_size * (y_size - 1)];
+    const RenderableVertex& first_vertex = vertices.data () [grid_size.x * (grid_size.y - 1)];
     bool                    first_larger = first_vertex.position.z < last_curl_radius;
 
-    for (size_t i = 0; i < x_size; i++)
+    for (size_t i = 0; i < grid_size.x; i++)
     {
-      const RenderableVertex& v = vertices.data () [x_size * (y_size - 1) + i];
+      const RenderableVertex& v = vertices.data () [grid_size.x * (grid_size.y - 1) + i];
 
       if ((first_larger && v.position.z > last_curl_radius) || (!first_larger && v.position.z < last_curl_radius))
         return v.position;
     }
 
-    return vertices.data () [x_size * (y_size - 1) + x_size - 1].position;
+    return vertices.data () [grid_size.x * (grid_size.y - 1) + grid_size.x - 1].position;
   }
 
   const math::vec3f& GetRightSideDetachPosition ()
   {
-    const RenderableVertex& first_vertex = vertices.data () [x_size - 1];
+    const RenderableVertex& first_vertex = vertices.data () [grid_size.x - 1];
     bool                    first_larger = first_vertex.position.z > 0;
 
-    for (size_t i = 0; i < y_size; i++)
+    for (size_t i = 0; i < grid_size.y; i++)
     {
-      const RenderableVertex& v = vertices.data () [i * x_size + x_size - 1];
+      const RenderableVertex& v = vertices.data () [i * grid_size.x + grid_size.x - 1];
 
       if ((first_larger && v.position.z == 0) || (!first_larger && v.position.z > 0))
         return v.position;
     }
 
-    return vertices.data () [(y_size - 1) * x_size + x_size - 1].position;
+    return vertices.data () [(grid_size.y - 1) * grid_size.x + grid_size.x - 1].position;
   }
 
   const math::vec3f& GetLeftSideDetachPosition ()
@@ -606,15 +601,15 @@ struct RenderablePageCurlMesh::Impl
     const RenderableVertex& first_vertex = vertices.data () [0];
     bool                    first_larger = first_vertex.position.z > 0;
 
-    for (size_t i = 0; i < y_size; i++)
+    for (size_t i = 0; i < grid_size.y; i++)
     {
-      const RenderableVertex& v = vertices.data () [i * x_size];
+      const RenderableVertex& v = vertices.data () [i * grid_size.x];
 
       if ((first_larger && v.position.z == 0) || (!first_larger && v.position.z > 0))
         return v.position;
     }
 
-    return vertices.data () [(y_size - 1) * x_size].position;
+    return vertices.data () [(grid_size.y - 1) * grid_size.x].position;
   }
 
   const math::vec3f& GetTopSideDetachPosition ()
@@ -622,7 +617,7 @@ struct RenderablePageCurlMesh::Impl
     const RenderableVertex& first_vertex = vertices.data () [0];
     bool                    first_larger = first_vertex.position.z > 0;
 
-    for (size_t i = 0; i < x_size; i++)
+    for (size_t i = 0; i < grid_size.x; i++)
     {
       const RenderableVertex& v = vertices.data () [i];
 
@@ -635,12 +630,12 @@ struct RenderablePageCurlMesh::Impl
 
   const math::vec3f& GetBottomSideDetachPosition ()
   {
-    const RenderableVertex& first_vertex = vertices.data () [x_size * (y_size - 1)];
+    const RenderableVertex& first_vertex = vertices.data () [grid_size.x * (grid_size.y - 1)];
     bool                    first_larger = first_vertex.position.z > 0;
 
-    for (size_t i = 0; i < x_size; i++)
+    for (size_t i = 0; i < grid_size.x; i++)
     {
-      const RenderableVertex& v = vertices.data () [x_size * (y_size - 1) + i];
+      const RenderableVertex& v = vertices.data () [grid_size.x * (grid_size.y - 1) + i];
 
       if ((first_larger && v.position.z == 0) || (!first_larger && v.position.z > 0))
         return v.position;
@@ -651,12 +646,12 @@ struct RenderablePageCurlMesh::Impl
 
   bool HasRightSideDetachPosition ()
   {
-    const RenderableVertex& first_vertex = vertices.data () [x_size - 1];
+    const RenderableVertex& first_vertex = vertices.data () [grid_size.x - 1];
     bool                    first_larger = first_vertex.position.z > 0;
 
-    for (size_t i = 0; i < y_size; i++)
+    for (size_t i = 0; i < grid_size.y; i++)
     {
-      const RenderableVertex& v = vertices.data () [i * x_size + x_size - 1];
+      const RenderableVertex& v = vertices.data () [i * grid_size.x + grid_size.x - 1];
 
       if ((first_larger && v.position.z == 0) || (!first_larger && v.position.z > 0))
         return true;
@@ -670,9 +665,9 @@ struct RenderablePageCurlMesh::Impl
     const RenderableVertex& first_vertex = vertices.data () [0];
     bool                    first_larger = first_vertex.position.z > 0;
 
-    for (size_t i = 0; i < y_size; i++)
+    for (size_t i = 0; i < grid_size.y; i++)
     {
-      const RenderableVertex& v = vertices.data () [i * x_size];
+      const RenderableVertex& v = vertices.data () [i * grid_size.x];
 
       if ((first_larger && v.position.z == 0) || (!first_larger && v.position.z > 0))
         return true;
@@ -686,7 +681,7 @@ struct RenderablePageCurlMesh::Impl
     const RenderableVertex& first_vertex = vertices.data () [0];
     bool                    first_larger = first_vertex.position.z > 0;
 
-    for (size_t i = 0; i < x_size; i++)
+    for (size_t i = 0; i < grid_size.x; i++)
     {
       const RenderableVertex& v = vertices.data () [i];
 
@@ -699,12 +694,12 @@ struct RenderablePageCurlMesh::Impl
 
   bool HasBottomSideDetachPosition ()
   {
-    const RenderableVertex& first_vertex = vertices.data () [x_size * (y_size - 1)];
+    const RenderableVertex& first_vertex = vertices.data () [grid_size.x * (grid_size.y - 1)];
     bool                    first_larger = first_vertex.position.z > 0;
 
-    for (size_t i = 0; i < x_size; i++)
+    for (size_t i = 0; i < grid_size.x; i++)
     {
-      const RenderableVertex& v = vertices.data () [x_size * (y_size - 1) + i];
+      const RenderableVertex& v = vertices.data () [grid_size.x * (grid_size.y - 1) + i];
 
       if ((first_larger && v.position.z == 0) || (!first_larger && v.position.z > 0))
         return true;
@@ -717,13 +712,13 @@ struct RenderablePageCurlMesh::Impl
   {
     switch (corner) {
       case scene_graph::PageCurlCorner_RightTop:
-        return vertices.data () [x_size - 1].position;
+        return vertices.data () [grid_size.x - 1].position;
       case scene_graph::PageCurlCorner_RightBottom:
-        return vertices.data () [(y_size - 1) * x_size + x_size - 1].position;
+        return vertices.data () [(grid_size.y - 1) * grid_size.x + grid_size.x - 1].position;
       case scene_graph::PageCurlCorner_LeftTop:
         return vertices.data () [0].position;
       case scene_graph::PageCurlCorner_LeftBottom:
-        return vertices.data () [(y_size - 1) * x_size].position;
+        return vertices.data () [(grid_size.y - 1) * grid_size.x].position;
       default:
         throw xtl::make_argument_exception ("render::obsolete::render2d::RenderablePageCurlMesh::GetCornerPosition", "corner", corner);
     }
@@ -741,6 +736,29 @@ RenderablePageCurlMesh::RenderablePageCurlMesh (low_level::IDevice& device, cons
 
 RenderablePageCurlMesh::~RenderablePageCurlMesh ()
 {
+}
+
+/*
+   ѕолучение размеров сетки
+*/
+
+const math::vec2ui& RenderablePageCurlMesh::GridSize () const
+{
+  return impl->grid_size;
+}
+
+/*
+   ѕолучение сетки
+*/
+
+const math::vec3f* RenderablePageCurlMesh::GridVertices () const
+{
+  return &impl->vertices.data ()->position;
+}
+
+size_t RenderablePageCurlMesh::GridVerticesStride () const
+{
+  return sizeof (RenderableVertex);
 }
 
 /*
@@ -772,7 +790,7 @@ void RenderablePageCurlMesh::CalculateShadow (bool front, float max_shadow)
 }
 
 /*
-   ”становка параметров
+   ”становка / получение параметров
 */
 
 void RenderablePageCurlMesh::SetColor (const math::vec4ub& color)
@@ -788,6 +806,16 @@ void RenderablePageCurlMesh::SetSize (const math::vec2f& size)
 void RenderablePageCurlMesh::SetTexCoords (float min_s, float min_t, float max_s, float max_t)
 {
   impl->SetTexCoords (min_s, min_t, max_s, max_t);
+}
+
+const math::vec4ub& RenderablePageCurlMesh::Color () const
+{
+  return impl->color;
+}
+
+const math::vec2f& RenderablePageCurlMesh::Size () const
+{
+  return impl->size;
 }
 
 /*
