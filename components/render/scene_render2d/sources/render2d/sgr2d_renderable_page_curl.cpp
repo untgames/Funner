@@ -626,16 +626,15 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
   }
 
   //Рисование теней
-  void BuildSideShadow (const math::vec3f* side_positions, size_t side_positions_count, float corner_shadow_offset, RenderableVertex*& current_vertex, size_t& triangles_count)
+  void BuildSideShadow (const math::vec3f* side_positions, size_t side_positions_count, float corner_shadow_offset, float curl_radius, RenderableVertex*& current_vertex, size_t& triangles_count)
   {
     math::vec3f prev_offset_point;
-    float       curl_radius = page_curl->CurlRadius ();
 
     for (size_t i = 0, count = side_positions_count - 1; i < count; i++, side_positions++)
     {
       const math::vec3f* next_side_position = side_positions + 1;
       math::vec2f        side_vec           = *next_side_position - *side_positions;
-      math::vec2f        side_normal        = math::normalize (math::vec2f (side_vec.y, -side_vec.x)) * corner_shadow_offset * stl::max (0.f, side_positions->z / curl_radius - 0.5f);
+      math::vec2f        side_normal        = math::normalize (math::vec2f (side_vec.y, -side_vec.x)) * corner_shadow_offset * stl::max (0.f, side_positions->z / curl_radius - 1.f);
 
       current_vertex [0].position = *side_positions;
       current_vertex [0].texcoord = math::vec2f (0.5, 0.5);
@@ -663,14 +662,13 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
     }
   }
 
-  void BuildCornerShadow (const math::vec3f& corner_position, const math::vec2f& side1_vec, const math::vec2f& side2_vec, float corner_shadow_offset, RenderableVertex*& current_vertex, size_t& triangles_count)
+  void BuildCornerShadow (const math::vec3f& corner_position, const math::vec2f& side1_vec, const math::vec2f& side2_vec, float corner_shadow_offset, float curl_radius, RenderableVertex*& current_vertex, size_t& triangles_count)
   {
     if (!corner_position.z)
       return;
 
-    float       curl_radius  = page_curl->CurlRadius ();
-    math::vec3f side1_offset = math::normalize (math::vec2f (side1_vec.y, -side1_vec.x)) * corner_shadow_offset * stl::max (0.f, corner_position.z / curl_radius - 0.5f),
-                side2_offset = math::normalize (math::vec2f (side2_vec.y, -side2_vec.x)) * corner_shadow_offset * stl::max (0.f, corner_position.z / curl_radius - 0.5f);
+    math::vec3f side1_offset = math::normalize (math::vec2f (side1_vec.y, -side1_vec.x)) * corner_shadow_offset * stl::max (0.f, corner_position.z / curl_radius - 1.f),
+                side2_offset = math::normalize (math::vec2f (side2_vec.y, -side2_vec.x)) * corner_shadow_offset * stl::max (0.f, corner_position.z / curl_radius - 1.f);
 
     current_vertex [0].position = corner_position;
     current_vertex [0].texcoord = math::vec2f (0.5, 0.5);
@@ -758,7 +756,7 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
         current_side_position->x +=  x_offset;
       }
 
-      BuildSideShadow (side_positions.data (), grid_size.x, corner_shadow_offset, current_vertex, triangles_count);
+      BuildSideShadow (side_positions.data (), grid_size.x, corner_shadow_offset, curl_radius, current_vertex, triangles_count);
 
       current_side_position = side_positions.data ();
 
@@ -768,7 +766,7 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
         current_side_position->x +=  x_offset;
       }
 
-      BuildSideShadow (side_positions.data (), grid_size.y, corner_shadow_offset, current_vertex, triangles_count);
+      BuildSideShadow (side_positions.data (), grid_size.y, corner_shadow_offset, curl_radius, current_vertex, triangles_count);
 
       current_side_position = side_positions.data ();
 
@@ -778,7 +776,7 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
         current_side_position->x +=  x_offset;
       }
 
-      BuildSideShadow (side_positions.data (), grid_size.x, corner_shadow_offset, current_vertex, triangles_count);
+      BuildSideShadow (side_positions.data (), grid_size.x, corner_shadow_offset, curl_radius, current_vertex, triangles_count);
 
       current_side_position = side_positions.data ();
 
@@ -788,16 +786,16 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
         current_side_position->x +=  x_offset;
       }
 
-      BuildSideShadow (side_positions.data (), grid_size.y, corner_shadow_offset, current_vertex, triangles_count);
+      BuildSideShadow (side_positions.data (), grid_size.y, corner_shadow_offset, curl_radius, current_vertex, triangles_count);
 
       BuildCornerShadow (left_top_corner_position + math::vec3f (x_offset, 0, 0), left_top_corner_position - *(const math::vec3f*)((const unsigned char*)positions + grid_size.x * positions_stride),
-                         *(const math::vec3f*)((const unsigned char*)positions + positions_stride) - left_top_corner_position, corner_shadow_offset, current_vertex, triangles_count);
+                         *(const math::vec3f*)((const unsigned char*)positions + positions_stride) - left_top_corner_position, corner_shadow_offset, curl_radius, current_vertex, triangles_count);
       BuildCornerShadow (left_bottom_corner_position + math::vec3f (x_offset, 0, 0), left_bottom_corner_position - *(const math::vec3f*)((const unsigned char*)positions + (grid_size.x * (grid_size.y - 1) + 1) * positions_stride),
-                         *(const math::vec3f*)((const unsigned char*)positions + (grid_size.x * (grid_size.y - 2)) * positions_stride) - left_bottom_corner_position, corner_shadow_offset, current_vertex, triangles_count);
+                         *(const math::vec3f*)((const unsigned char*)positions + (grid_size.x * (grid_size.y - 2)) * positions_stride) - left_bottom_corner_position, corner_shadow_offset, curl_radius, current_vertex, triangles_count);
       BuildCornerShadow (right_top_corner_position + math::vec3f (x_offset, 0, 0), right_top_corner_position - *(const math::vec3f*)((const unsigned char*)positions + (grid_size.x - 2) * positions_stride),
-                         *(const math::vec3f*)((const unsigned char*)positions + (grid_size.x + grid_size.x - 1) * positions_stride) - right_top_corner_position, corner_shadow_offset, current_vertex, triangles_count);
+                         *(const math::vec3f*)((const unsigned char*)positions + (grid_size.x + grid_size.x - 1) * positions_stride) - right_top_corner_position, corner_shadow_offset, curl_radius, current_vertex, triangles_count);
       BuildCornerShadow (right_bottom_corner_position + math::vec3f (x_offset, 0, 0), right_bottom_corner_position - *(const math::vec3f*)((const unsigned char*)positions + (grid_size.x * (grid_size.y - 1) - 1) * positions_stride),
-                         *(const math::vec3f*)((const unsigned char*)positions + (grid_size.x * grid_size.y - 2) * positions_stride) - right_bottom_corner_position, corner_shadow_offset, current_vertex, triangles_count);
+                         *(const math::vec3f*)((const unsigned char*)positions + (grid_size.x * grid_size.y - 2) * positions_stride) - right_bottom_corner_position, corner_shadow_offset, curl_radius, current_vertex, triangles_count);
 
       if (triangles_count)
       {

@@ -16,8 +16,6 @@ Default curl state:
   shadow width                      0.25
   shadow log base                   4.00
   shadow min log value              0.30
-  shadow grow power                 0.25
-  opposite corner shadow grow power 15.00
   find best curl steps              1000
   binding mismatch weight           10.00
   bounding box:
@@ -40,8 +38,6 @@ Changed curl state:
   shadow width                      8.00
   shadow log base                   32.00
   shadow min log value              0.00
-  shadow grow power                 0.50
-  opposite corner shadow grow power 2.00
   find best curl steps              500
   binding mismatch weight           2.00
   bounding box:

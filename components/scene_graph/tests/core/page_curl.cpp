@@ -52,8 +52,6 @@ void dump (const PageCurl& curl)
   printf ("  shadow width                      %.2f\n",                   curl.ShadowWidth ());
   printf ("  shadow log base                   %.2f\n",                   curl.ShadowLogBase ());
   printf ("  shadow min log value              %.2f\n",                   curl.ShadowMinLogValue ());
-  printf ("  shadow grow power                 %.2f\n",                   curl.ShadowGrowPower ());
-  printf ("  opposite corner shadow grow power %.2f\n",                   curl.OppositeCornerShadowGrowPower ());
   printf ("  find best curl steps              %u\n",                     curl.FindBestCurlSteps ());
   printf ("  binding mismatch weight           %.2f\n",                   curl.BindingMismatchWeight ());
   printf ("  bounding box:\n");
@@ -85,8 +83,6 @@ int main ()
   curl->SetShadowWidth                   (8.f);
   curl->SetShadowLogBase                 (32.f);
   curl->SetShadowMinLogValue             (0.f);
-  curl->SetShadowGrowPower               (0.5f);
-  curl->SetOppositeCornerShadowGrowPower (2.f);
   curl->SetFindBestCurlSteps             (500);
   curl->SetBindingMismatchWeight         (2.f);
 

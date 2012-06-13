@@ -112,10 +112,6 @@ class PageCurl : public Entity
     float               ShadowLogBase                    () const;
     void                SetShadowMinLogValue             (float value);               //минимальное значение тени при логарифмировании
     float               ShadowMinLogValue                () const;
-    void                SetShadowGrowPower               (float power);               //степень нарастания тени при увеличении загиба
-    float               ShadowGrowPower                  () const;
-    void                SetOppositeCornerShadowGrowPower (float power);               //степень нарастания тени при увеличении загиба при поднятом противоположном углу страницы
-    float               OppositeCornerShadowGrowPower    () const;
     void                SetFindBestCurlSteps             (size_t count);              //количество итераций поиска наилучшей позиции загиба
     size_t              FindBestCurlSteps                () const;
     void                SetBindingMismatchWeight         (float weight);              //вес отклонения позиции сгиба страницы при поиске наилучешй позиции загиба

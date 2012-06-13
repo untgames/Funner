@@ -87,9 +87,7 @@ void bind_page_curl_library (Environment& environment)
   lib.Register ("set_FindBestCurlSteps",             make_invoker (&PageCurl::SetFindBestCurlSteps));
   lib.Register ("set_MinimumCurlRadius",             make_invoker (&PageCurl::SetMinimumCurlRadius));
   lib.Register ("set_Mode",                          make_invoker (&PageCurl::SetMode));
-  lib.Register ("set_OppositeCornerShadowGrowPower", make_invoker (&PageCurl::SetOppositeCornerShadowGrowPower));
   lib.Register ("set_PageColor",                     make_invoker (xtl::implicit_cast<void (PageCurl::*) (const math::vec4f&)> (&PageCurl::SetPageColor)));
-  lib.Register ("set_ShadowGrowPower",               make_invoker (&PageCurl::SetShadowGrowPower));
   lib.Register ("set_ShadowLogBase",                 make_invoker (&PageCurl::SetShadowLogBase));
   lib.Register ("set_ShadowMinLogValue",             make_invoker (&PageCurl::SetShadowMinLogValue));
   lib.Register ("set_ShadowWidth",                   make_invoker (&PageCurl::SetShadowWidth));
@@ -103,9 +101,7 @@ void bind_page_curl_library (Environment& environment)
   lib.Register ("get_GridSize",                      make_invoker (&get_grid_size));
   lib.Register ("get_MinimumCurlRadius",             make_invoker (&PageCurl::MinimumCurlRadius));
   lib.Register ("get_Mode",                          make_invoker (&PageCurl::Mode));
-  lib.Register ("get_OppositeCornerShadowGrowPower", make_invoker (&PageCurl::OppositeCornerShadowGrowPower));
   lib.Register ("get_PageColor",                     make_invoker (&PageCurl::PageColor));
-  lib.Register ("get_ShadowGrowPower",               make_invoker (&PageCurl::ShadowGrowPower));
   lib.Register ("get_ShadowLogBase",                 make_invoker (&PageCurl::ShadowLogBase));
   lib.Register ("get_ShadowMinLogValue",             make_invoker (&PageCurl::ShadowMinLogValue));
   lib.Register ("get_ShadowWidth",                   make_invoker (&PageCurl::ShadowWidth));
