@@ -8,7 +8,7 @@
 
 using namespace common;
 
-const char*  ARGV [] = { "program.exe", "param1",  "-h", "-h", "param2", "--switch", "-b", "b_arg", "-b", "b_arg2 b_arg3", "--batch=\"equal_arg1 equal_arg2\"", "param3" };
+const char*  ARGV [] = { "program.exe", "param1",  "-h", "-h", "param2", "--switch", "@data/command_line_args.txt", "-b", "b_arg", "-b", "b_arg2 b_arg3", "--batch=\"equal_arg1 equal_arg2\"", "param3" };
 const size_t ARGC = sizeof (ARGV) / sizeof (*ARGV);
 
 void print_params (const CommandLine& command_line)
@@ -46,6 +46,7 @@ int main ()
   command_line.SetSwitchHandler ("help",   'h', 0, xtl::bind (&argument_handler, "--help", _1));
   command_line.SetSwitchHandler ("switch", 's', 0, xtl::bind (&argument_handler, "--switch", _1));
   command_line.SetSwitchHandler ("batch",  'b', "batch_arg", xtl::bind (&argument_handler, "--batch", _1));
+  command_line.SetSwitchHandler ("file_link_long_switch", 'f', "file_link_arg", xtl::bind (&argument_handler, "--file_link_long_switch", _1));
 
   try
   {

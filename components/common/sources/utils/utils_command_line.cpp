@@ -6,6 +6,7 @@
 #include <xtl/string.h>
 
 #include <common/command_line.h>
+#include <common/file.h>
 #include <common/string.h>
 #include <common/strlib.h>
 
@@ -14,7 +15,9 @@ using namespace common;
 namespace
 {
 
+const char*  FILE_LINK_PREFIX               = "@";
 const char*  LONG_OPTION_NAME_PREFIX        = "--";
+const size_t FILE_LINK_PREFIX_LENGTH        = xtl::xstrlen (FILE_LINK_PREFIX);
 const size_t LONG_OPTION_NAME_PREFIX_LENGTH = xtl::xstrlen (LONG_OPTION_NAME_PREFIX);
 
 struct SwitchHandlerDesc
@@ -56,127 +59,157 @@ struct CommandLine::Impl
   ///Обработка коммандной строки
   void Process (int argc, const char** argv)
   {
-    static const char* METHOD_NAME = "common::CommandLine::Process";
-
-    params.Clear ();
-
-    for (int i = 1; i < argc; i++)
+    try
     {
-      const char* arg = argv [i];
+      params.Clear ();
 
-      bool long_option  = !xtl::xstrncmp (LONG_OPTION_NAME_PREFIX, arg, LONG_OPTION_NAME_PREFIX_LENGTH);
-      bool short_option = !long_option && *arg == '-' && arg [1];
+        //Чтение ссылок на аргументы во внешних файлах
+      StringArray args;
 
-      if (!long_option && !short_option)
+      args.Reserve (argc - 1);
+
+      for (int i = 1; i < argc; i++)
       {
-        params.Add (arg);
-        continue;
-      }
+        const char* arg = argv [i];
 
-      stl::string option_name;
-      stl::string option_argument;
-
-      SwitchHandlerMap::iterator option = switch_handlers.end ();
-
-        //разбор длинных опций
-
-      if (long_option)
-      {
-        arg += LONG_OPTION_NAME_PREFIX_LENGTH;
-
-        const char* end_option_name = strchr (arg, '=');
-
-        if (end_option_name)
+        if (xtl::xstrncmp (FILE_LINK_PREFIX, arg, FILE_LINK_PREFIX_LENGTH))
         {
-          option_name.assign (arg, end_option_name);
-
-          arg = end_option_name + 1;
+          args.Add (arg);
         }
         else
         {
-          option_name  = arg;
-          arg         += strlen (arg);
+          StringArray file_args = split (FileSystem::LoadTextFile (arg + FILE_LINK_PREFIX_LENGTH), " ", " \t", "\"\"");
+
+          args.Reserve (args.Capacity () + file_args.Size ());
+
+          args += file_args;
         }
-
-        option = switch_handlers.find (option_name.c_str ());
-
-        if (option == switch_handlers.end ())
-          throw xtl::format_operation_exception (METHOD_NAME, "Wrong option '--%s'", option_name.c_str ());
-
-        option_name = LONG_OPTION_NAME_PREFIX + option_name;
       }
 
-        //разбор коротких опций
-
-      if (short_option)
+        //разбор аргументов
+      for (int i = 0, args_count = args.Size (); i < args_count; i++)
       {
-        arg++;
+        const char* arg = args [i];
 
-        if (arg [1])
-          throw xtl::format_operation_exception (METHOD_NAME, "Wrong option '-%s'", arg);
+        bool long_option  = !xtl::xstrncmp (LONG_OPTION_NAME_PREFIX, arg, LONG_OPTION_NAME_PREFIX_LENGTH);
+        bool short_option = !long_option && *arg == '-' && arg [1];
 
-        for (SwitchHandlerMap::iterator iter = switch_handlers.begin (), end = switch_handlers.end (); iter != end; ++iter)
+        if (!long_option && !short_option)
         {
-          if (*arg == iter->second.switch_short_name)
+          params.Add (arg);
+          continue;
+        }
+
+        stl::string option_name;
+        stl::string option_argument;
+
+        SwitchHandlerMap::iterator option = switch_handlers.end ();
+
+          //разбор длинных опций
+
+        if (long_option)
+        {
+          arg += LONG_OPTION_NAME_PREFIX_LENGTH;
+
+          const char* end_option_name = strchr (arg, '=');
+
+          if (end_option_name)
           {
-            option = iter;
-            break;
+            option_name.assign (arg, end_option_name);
+
+            arg = end_option_name + 1;
           }
-        }
-
-        if (option == switch_handlers.end ())
-          throw xtl::format_operation_exception (METHOD_NAME, "Wrong option '-%c'", *arg);
-
-        option_name = common::format ("-%c", *arg);
-
-        if (!option->second.arg_name.empty ())
-        {
-          i++;
-
-          if (i >= argc)
-            throw xtl::format_operation_exception (METHOD_NAME, "option '-%c' require argument", *arg);
-
-          arg = argv [i];
-        }
-        else
-          arg = "";
-      }
-
-        //получение аргумента
-
-      for (;*arg; arg++)
-      {
-        switch (*arg)
-        {
-          case '\'':
-          case '"':
+          else
           {
-            const char* end = strchr (arg + 1, *arg);
+            option_name  = arg;
+            arg         += strlen (arg);
+          }
 
-            if (end)
+          option = switch_handlers.find (option_name.c_str ());
+
+          if (option == switch_handlers.end ())
+            throw xtl::format_operation_exception ("", "Wrong option '--%s'", option_name.c_str ());
+
+          option_name = LONG_OPTION_NAME_PREFIX + option_name;
+        }
+
+          //разбор коротких опций
+
+        if (short_option)
+        {
+          arg++;
+
+          if (arg [1])
+            throw xtl::format_operation_exception ("", "Wrong option '-%s'", arg);
+
+          for (SwitchHandlerMap::iterator iter = switch_handlers.begin (), end = switch_handlers.end (); iter != end; ++iter)
+          {
+            if (*arg == iter->second.switch_short_name)
             {
-              option_argument.append (arg + 1, end);
-
-              arg = end;
+              option = iter;
+              break;
             }
-            else
-              throw xtl::format_operation_exception (METHOD_NAME, "Unquoted string at parse option '%s'", option_name.c_str ());
-
-            break;
           }
-          default:
-            option_argument.push_back (*arg);
-            break;
+
+          if (option == switch_handlers.end ())
+            throw xtl::format_operation_exception ("", "Wrong option '-%c'", *arg);
+
+          option_name = common::format ("-%c", *arg);
+
+          if (!option->second.arg_name.empty ())
+          {
+            i++;
+
+            if (i >= args_count)
+              throw xtl::format_operation_exception ("", "option '-%c' require argument", *arg);
+
+            arg = args [i];
+          }
+          else
+            arg = "";
         }
+
+          //получение аргумента
+
+        for (;*arg; arg++)
+        {
+          switch (*arg)
+          {
+            case '\'':
+            case '"':
+            {
+              const char* end = strchr (arg + 1, *arg);
+
+              if (end)
+              {
+                option_argument.append (arg + 1, end);
+
+                arg = end;
+              }
+              else
+                throw xtl::format_operation_exception ("", "Unquoted string at parse option '%s'", option_name.c_str ());
+
+              break;
+            }
+            default:
+              option_argument.push_back (*arg);
+              break;
+          }
+        }
+
+        if (!option->second.arg_name.empty () && option_argument.empty ())
+          throw xtl::format_operation_exception ("", "Option '%s' require argument", option_name.c_str ());
+
+        if (option->second.arg_name.empty () && !option_argument.empty ())
+          throw xtl::format_operation_exception ("", "Option '%s' has no arguments", option_name.c_str ());
+
+        option->second.handler (option_argument.c_str ());
       }
-
-      if (!option->second.arg_name.empty () && option_argument.empty ())
-        throw xtl::format_operation_exception (METHOD_NAME, "Option '%s' require argument", option_name.c_str ());
-
-      if (option->second.arg_name.empty () && !option_argument.empty ())
-        throw xtl::format_operation_exception (METHOD_NAME, "Option '%s' has no arguments", option_name.c_str ());
-
-      option->second.handler (option_argument.c_str ());
+    }
+    catch (xtl::exception& e)
+    {
+      e.touch ("common::CommandLine::Process");
+      throw;
     }
   }
 
