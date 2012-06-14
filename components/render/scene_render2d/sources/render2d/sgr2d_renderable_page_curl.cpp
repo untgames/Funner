@@ -399,7 +399,7 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
        min_s = material->TileOffsetX () / (float)texture_size.x;
        min_t = (material->TileOffsetY () - tile_height) / (float)texture_size.y;
        max_s = min_s + tile_width / (float)texture_size.x;
-       max_t = min_t + tile_height / (float)texture_size.x;
+       max_t = min_t + tile_height / (float)texture_size.y;
      }
      else
      {
