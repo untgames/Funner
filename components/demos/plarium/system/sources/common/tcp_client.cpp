@@ -129,6 +129,44 @@ struct TcpClient::Impl
     , connected (false)
     , listener (0)
     {}
+
+  template <class T>
+  void SetSocketOption (int option, const T& value, int level = SOL_SOCKET)
+  {
+    if (setsockopt (socket, level, option, &value, sizeof (T)))
+      raise_error ("TcpClient::SetSocketOption", "setsockopt");
+  }
+
+  void SetBlockingMode (bool state)
+  {
+#ifdef _MSC_VER
+    WSAEVENT dummy_event = WSACreateEvent ();
+
+    if (dummy_event == WSA_INVALID_EVENT)
+      raise_error ("TcpClient::Connect", "::WSACreateEvent");
+
+    if (WSAEventSelect (socket, dummy_event, 0) == SOCKET_ERROR)
+      raise_error ("TcpClient::Connect", "::WSAEventSelect");
+
+    u_long state_value = state ? 0 : 1;
+
+    if (ioctlsocket (socket, FIONBIO, &state_value) == SOCKET_ERROR)
+      raise_error ("TcpClient::Connect", "::ioctlsocket");
+#else
+    int flags = fcntl (socket, F_GETFL, 0);
+
+    if (flags < 0)
+      raise_error ("TcpClient::Connect", "::fcntl");
+
+    if (state)
+      flags &= ~O_NONBLOCK;
+    else
+      flags |= O_NONBLOCK;
+
+    if (fcntl (socket, F_SETFL, flags) == -1)
+      raise_error ("TcpClient::Connect", "::fcntl");
+#endif
+  }
 };
 
 /*
@@ -240,33 +278,12 @@ void TcpClient::Connect (const char* host, unsigned short port)
 
   try
   {
-#ifdef _MSC_VER
-    WSAEVENT dummy_event = WSACreateEvent ();
-
-    if (dummy_event == WSA_INVALID_EVENT)
-      raise_error ("TcpClient::Connect", "::WSACreateEvent");
-
-    if (WSAEventSelect (impl->socket, dummy_event, 0) == SOCKET_ERROR)
-      raise_error ("TcpClient::Connect", "::WSAEventSelect");
-
-    u_long state_value = 0;
-
-    if (ioctlsocket (impl->socket, FIONBIO, &state_value) == SOCKET_ERROR)
-      raise_error ("TcpClient::Connect", "::ioctlsocket");
-#else
-    int flags = fcntl (impl->socket, F_GETFL, 0);
-
-    if (flags < 0)
-      raise_error ("TcpClient::Connect", "::fcntl");
-
-    flags &= ~O_NONBLOCK;
-
-    if (fcntl (impl->socket, F_SETFL, flags) == -1)
-      raise_error ("TcpClient::Connect", "::fcntl");
-#endif
+    impl->SetBlockingMode (true);
 
     if (connect (impl->socket, (sockaddr*)&address_storage, address_storage_size))
       raise_error ("TcpClient::Connect", "::connect");
+
+    impl->SetBlockingMode (false);
   }
   catch (...)
   {
@@ -291,62 +308,22 @@ void TcpClient::Disconnect ()
 }
 
 /*
-   Data sending
+   Data sending (returns amoutn of sent data)
 */
 
-void TcpClient::Send (const void* buffer, size_t size)
+size_t TcpClient::Send (const void* buffer, size_t size, size_t timeout_in_milliseconds)
 {
   if (!IsConnected ())
     throw std::logic_error ("TcpClient::Send - Socket is not connected");
 
-  const char* data_pointer = (const char*)buffer;
+  int sent_bytes = send (impl->socket, buffer, size, 0);
 
-  while (size)
+  if (sent_bytes < 0)
   {
-    int sent_bytes = send (impl->socket, data_pointer, size, 0);
+    if (errno == EAGAIN || errno == EWOULDBLOCK)
+      return 0;
 
-    if (sent_bytes < 0)
-    {
-      if (errno == ECONNRESET)
-      {
-        try
-        {
-          Disconnect ();
-        }
-        catch (...)
-        {
-        }
-
-        if (impl->listener)
-          impl->listener->OnDisconnect (*this);
-
-        throw std::runtime_error ("TcpClient::Send - A connection was forcibly closed by a peer.");
-      }
-      else
-        raise_error ("TcpClient::Connect", "::send");
-    }
-
-    size         -= sent_bytes;
-    data_pointer += sent_bytes;
-  }
-}
-
-/*
-   Data receiving
-*/
-
-void TcpClient::Receive (void* buffer, size_t size)
-{
-  if (!IsConnected ())
-    throw std::logic_error ("TcpClient::Receive - Socket is not connected");
-
-  char* data_pointer = (char*)buffer;
-
-  while (size)
-  {
-    int received_bytes = recv (impl->socket, data_pointer, size, 0);
-
-    if ((received_bytes < 0 && errno == ECONNRESET) || !received_bytes)
+    if (errno == ECONNRESET)
     {
       try
       {
@@ -359,15 +336,58 @@ void TcpClient::Receive (void* buffer, size_t size)
       if (impl->listener)
         impl->listener->OnDisconnect (*this);
 
-      throw std::runtime_error ("TcpClient::Receive - A connection was forcibly closed by a peer.");
+      throw std::runtime_error ("TcpClient::Send - A connection was forcibly closed by a peer.");
+    }
+    else
+      raise_error ("TcpClient::Connect", "::send");
+  }
+
+  return sent_bytes;
+}
+
+/*
+   Data receiving (returns amoutn of received data)
+*/
+
+size_t TcpClient::Receive (void* buffer, size_t size, size_t timeout_in_milliseconds)
+{
+  if (!IsConnected ())
+    throw std::logic_error ("TcpClient::Receive - Socket is not connected");
+
+  timeval timeout;
+
+  timeout.tv_sec  = timeout_in_milliseconds / 1000;
+  timeout.tv_usec = (timeout_in_milliseconds % 1000) * 1000;
+
+  impl->SetSocketOption<timeval> (SO_RCVTIMEO, timeout);
+
+  int received_bytes = recv (impl->socket, buffer, size, 0);
+
+  if ((received_bytes < 0 && errno == ECONNRESET) || !received_bytes)
+  {
+    try
+    {
+      Disconnect ();
+    }
+    catch (...)
+    {
     }
 
-    if (received_bytes < 0)
-      raise_error ("TcpClient::Connect", "::recv");
+    if (impl->listener)
+      impl->listener->OnDisconnect (*this);
 
-    size         -= received_bytes;
-    data_pointer += received_bytes;
+    throw std::runtime_error ("TcpClient::Receive - A connection was forcibly closed by a peer.");
   }
+
+  if (received_bytes < 0)
+  {
+    if (errno == EAGAIN || errno == EWOULDBLOCK)
+      return 0;
+    else
+      raise_error ("TcpClient::Connect", "::recv");
+  }
+
+  return received_bytes;
 }
 
 /*

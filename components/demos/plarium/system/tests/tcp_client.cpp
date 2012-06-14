@@ -83,7 +83,7 @@ int main ()
 
     *message_size = message_text_length + 32 + 16;
 
-    tcp_client.Send (send_buffer, 8 + *message_size);
+    tcp_client.Send (send_buffer, 8 + *message_size, 1000);
 
     printf ("Sent data: ");
     print_data (send_buffer, 8 + *message_size);
@@ -92,16 +92,16 @@ int main ()
 
     printf ("sent!\n");
 
-    tcp_client.Receive (buffer, 16);
+    tcp_client.Receive (buffer, 16, 1000);
 
     printf ("Received!\n");
     print_data (buffer, 16);
 
     unsigned char bad_message [] = "hello world!";
 
-    tcp_client.Send (bad_message, sizeof (bad_message));
+    tcp_client.Send (bad_message, sizeof (bad_message), 1000);
 
-    tcp_client.Receive (buffer, 512);
+    tcp_client.Receive (buffer, 512, 1000);
   }
   catch (std::exception& exception)
   {

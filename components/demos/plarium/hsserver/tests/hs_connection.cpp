@@ -10,6 +10,7 @@ const char* get_error_code_name (ErrorCode code)
     case ErrorCode_Generic:             return "Generic";
     case ErrorCode_SendQueueOverflow:   return "SendQueueOverflow";
     case ErrorCode_Timeout:             return "Timeout";
+    case ErrorCode_InvalidHeader:       return "InvalidHeader";
     case ErrorCode_HashMismatch:        return "HashMismatch";
     default:                            return "Unknown";
   }

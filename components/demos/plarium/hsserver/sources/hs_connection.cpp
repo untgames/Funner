@@ -9,6 +9,8 @@ namespace
 
 const char*         PING_MESSAGE                = "[{\"event\":\"user.ping\"}]";
 const size_t        DEQUEUE_TIMEOUT             = 100;
+const size_t        SEND_TIMEOUT                = 100;
+const size_t        RECEIVE_TIMEOUT             = 100;
 const size_t        DEFAULT_RECEIVE_BUFFER_SIZE = 1024;
 const size_t        DEFAULT_SEND_BUFFER_SIZE    = 1024;
 const size_t        COMPRESSED_LENGTH_SIZE      = 4;
@@ -16,6 +18,7 @@ const size_t        HMAC_SIZE                   = 32;
 const size_t        IV_SIZE                     = 16;
 const size_t        PACKET_HEADER_SIZE          = 8;
 const size_t        SHA_SIZE                    = 32;
+const float         TIMEOUT_THRESHOLD           = 1.5f;
 const unsigned char PACKET_HEADER               = 0x06;
 const unsigned char OPTIONS_COMPRESSED          = 0x01;
 const unsigned char OPTIONS_ENCRYPTED           = 0x02;
@@ -100,13 +103,47 @@ struct ReceiveFunctionArg
 };
 
 //Receive-thread  function
+bool receive_data (TcpClient& tcp_client, volatile bool& need_stop, size_t timeout_threshold, IBackgroundThreadListener& listener, unsigned char* buffer, size_t size)
+{
+  size_t last_receive_time = milliseconds ();
+  bool   timeout_occured   = false;
+
+  while (size)
+  {
+    size_t received_bytes = tcp_client.Receive (buffer, size, RECEIVE_TIMEOUT);
+
+    if (need_stop)
+      return false;
+
+    size   -= received_bytes;
+    buffer += received_bytes;
+
+    size_t current_time = milliseconds ();
+
+    if (received_bytes)
+      last_receive_time = current_time;
+    else if (current_time - last_receive_time > timeout_threshold)
+    {
+      timeout_occured = true;
+      listener.OnError (ErrorCode_Timeout, "Timeout while receiving data");
+      break;
+    }
+  }
+
+  if (need_stop || timeout_occured)
+    return false;
+
+  return true;
+}
+
 void* receive_function (void* user_data)
 {
   std::auto_ptr<ReceiveFunctionArg> data ((ReceiveFunctionArg*)user_data);
 
   volatile bool& need_stop = data->need_stop;
 
-  size_t         current_buffer_size            = DEFAULT_RECEIVE_BUFFER_SIZE;
+  size_t         current_buffer_size            = DEFAULT_RECEIVE_BUFFER_SIZE,
+                 timeout_threshold              = data->connection_settings.keep_alive_interval * TIMEOUT_THRESHOLD;
   unsigned char* receive_buffer                 = new unsigned char [current_buffer_size];
   size_t         current_decompress_buffer_size = DEFAULT_RECEIVE_BUFFER_SIZE;
   unsigned char* decompress_buffer              = new unsigned char [current_decompress_buffer_size];
@@ -123,10 +160,8 @@ void* receive_function (void* user_data)
 
     try
     {
-      //TODO timeout error
-      //TODO receive with timeout
-
-      data->tcp_client.Receive (packet_header_buffer, sizeof (packet_header_buffer));
+      if (!receive_data (data->tcp_client, need_stop, timeout_threshold, data->listener, packet_header_buffer, sizeof (packet_header_buffer)))
+        break;
 
       if (packet_header_buffer [0] != PACKET_HEADER)
       {
@@ -169,7 +204,8 @@ void* receive_function (void* user_data)
         }
       }
 
-      data->tcp_client.Receive (receive_buffer, *message_size);
+      if (!receive_data (data->tcp_client, need_stop, timeout_threshold, data->listener, receive_buffer, *message_size))
+        break;
 
       unsigned char* message_body      = receive_buffer;
       size_t         message_body_size = *message_size;
@@ -277,7 +313,8 @@ void* send_function (void* user_data)
 
   receive_function_arg.release ();
 
-  size_t last_keep_alive_time = milliseconds ();
+  size_t last_keep_alive_time = milliseconds (),
+         timeout_threshold    = data->connection_settings.keep_alive_interval * TIMEOUT_THRESHOLD;
 
   size_t         current_buffer_size = DEFAULT_SEND_BUFFER_SIZE;
   unsigned char* send_buffer         = new unsigned char [current_buffer_size];
@@ -308,8 +345,6 @@ void* send_function (void* user_data)
       }
 
       last_keep_alive_time = milliseconds ();
-
-      //TODO send with timeout
 
       const unsigned char* message_text            = (unsigned char*)message->message.data ();
       size_t               message_text_length     = message->message.size ();
@@ -397,7 +432,35 @@ void* send_function (void* user_data)
         hmac_sha256 (hashed_key, sizeof (hashed_key), iv, IV_SIZE + message_text_length, (unsigned char (&)[32])*hmac);
       }
 
-      data->tcp_client.Send (send_buffer, packet_size);
+      unsigned char* left_send_buffer    = send_buffer;
+      size_t         left_send_data_size = packet_size,
+                     last_send_time      = milliseconds ();
+      bool           timeout_occured     = false;
+
+      while (left_send_data_size)
+      {
+        size_t sent_bytes = data->tcp_client.Send (left_send_buffer, left_send_data_size, SEND_TIMEOUT);
+
+        if (need_stop)
+          break;
+
+        left_send_data_size -= sent_bytes;
+        left_send_buffer    += sent_bytes;
+
+        size_t current_time = milliseconds ();
+
+        if (sent_bytes)
+          last_send_time = current_time;
+        else if (current_time - last_send_time > timeout_threshold)
+        {
+          timeout_occured = true;
+          data->listener.OnError (ErrorCode_Timeout, "Timeout while sending data");
+          break;
+        }
+      }
+
+      if (need_stop || timeout_occured)
+        break;
 
       data->listener.Log (format ("Message '%s' sent", message->message.c_str ()).c_str ());
     }
