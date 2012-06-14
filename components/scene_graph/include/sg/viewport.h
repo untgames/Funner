@@ -19,15 +19,16 @@ class IViewportListener
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///События
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    virtual void OnViewportChangeName       (const char* new_name) {}
-    virtual void OnViewportChangeArea       (const Rect& new_area, float min_depth_range, float max_depth_range) {}
-    virtual void OnViewportChangeCamera     (Camera* new_camera) {}
-    virtual void OnViewportChangeZOrder     (int new_z_order) {}
-    virtual void OnViewportChangeActive     (bool new_state) {}
-    virtual void OnViewportChangeBackground (bool new_state, const math::vec4f& new_color) {}
-    virtual void OnViewportChangeTechnique  (const char* new_technique) {}
-    virtual void OnViewportChangeProperties (const common::PropertyMap& properties) {}
-    virtual void OnViewportDestroy          () {}
+    virtual void OnViewportChangeName        (const char* new_name) {}
+    virtual void OnViewportChangeArea        (const Rect& new_area, float min_depth_range, float max_depth_range) {}
+    virtual void OnViewportChangeCamera      (Camera* new_camera) {}
+    virtual void OnViewportChangeZOrder      (int new_z_order) {}
+    virtual void OnViewportChangeActive      (bool new_state) {}
+    virtual void OnViewportChangeBackground  (bool new_state, const math::vec4f& new_color) {}
+    virtual void OnViewportChangeTechnique   (const char* new_technique) {}
+    virtual void OnViewportChangeProperties  (const common::PropertyMap& properties) {}
+    virtual void OnViewportChangeInputState  (bool state) {}
+    virtual void OnViewportDestroy           () {}
 
   protected:
     virtual ~IViewportListener () {}
@@ -118,6 +119,12 @@ class Viewport
     void EnableBackground   () { SetBackgroundState (true); }
     void DisableBackground  () { SetBackgroundState (false); }
     bool BackgroundState    () const;
+    
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Участвует ли область вывода в обработке ввода
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void SetInputState (bool state);
+    bool InputState    () const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Установка переменных области вывода

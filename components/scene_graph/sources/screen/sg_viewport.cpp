@@ -28,6 +28,7 @@ struct Viewport::Impl: public xtl::reference_counter, public xtl::instance_count
   float                min_depth;         //минимальное значение глубины
   float                max_depth;         //максимальное значение глубины
   bool                 is_active;         //флаг активности области вывода  
+  bool                 input_state;       //участвует ли область вывода в обработке ввода
   int                  z_order;           //порядок отрисовки области вывода
   math::vec4f          background_color;  //цвет фона
   bool                 has_background;    //наличие фона
@@ -35,7 +36,7 @@ struct Viewport::Impl: public xtl::reference_counter, public xtl::instance_count
   ListenerArray        listeners;         //слушатели событий области вывода
   xtl::auto_connection on_destroy_camera; //слот соединения с сигналом оповещения об удалении камеры
 
-  Impl () : camera (0), min_depth (0.0f), max_depth (1.0f), is_active (true), z_order (INT_MAX), has_background (false)
+  Impl () : camera (0), min_depth (0.0f), max_depth (1.0f), is_active (true), input_state (true), z_order (INT_MAX), has_background (false)
   {
     listeners.reserve (LISTENER_ARRAY_RESERVE_SIZE);
   }
@@ -103,6 +104,11 @@ struct Viewport::Impl: public xtl::reference_counter, public xtl::instance_count
   {
     Notify (xtl::bind (&IViewportListener::OnViewportChangeActive, _1, is_active));
   }
+  
+  void ChangeInputStateNotify ()
+  {
+    Notify (xtl::bind (&IViewportListener::OnViewportChangeInputState, _1, input_state));
+  }  
   
   void ChangeBackgroundNotify ()
   {
@@ -339,6 +345,25 @@ void Viewport::SetActive (bool state)
 bool Viewport::IsActive () const
 {
   return impl->is_active;
+}
+
+/*
+    Участвует ли область вывода в обработке ввода
+*/
+
+void Viewport::SetInputState (bool state)
+{
+  if (state == impl->input_state)
+    return;
+    
+  impl->input_state = state;
+  
+  impl->ChangeInputStateNotify ();
+}
+
+bool Viewport::InputState () const
+{
+  return impl->input_state;
 }
 
 /*
