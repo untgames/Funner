@@ -1,5 +1,0 @@
-Trigger
-InputTrigger
-  - eventType -> action
-  - geometry
-    
