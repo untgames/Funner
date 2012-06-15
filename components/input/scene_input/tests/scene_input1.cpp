@@ -42,9 +42,9 @@ int main ()
     screen.Attach (viewport);
     
     SceneInputManager manager;
-    
+
     manager.SetScreen (&screen);
-    
+
     manager.ProcessEvent ("CursorX 0");
     manager.ProcessEvent ("CursorY 0");
     manager.ProcessEvent ("Mouse0 down");

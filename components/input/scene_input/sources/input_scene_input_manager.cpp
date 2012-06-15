@@ -150,7 +150,7 @@ struct SceneInputManager::Impl: public xtl::reference_counter, public IScreenLis
     {    
       bool loop = true;
       
-      for (;;s++)
+      for (;loop;s++)
       {
         switch (*s)
         {
@@ -169,7 +169,7 @@ struct SceneInputManager::Impl: public xtl::reference_counter, public IScreenLis
       {
         bool loop = true;
         
-        for (++s;;s++)
+        for (++s;loop;s++)
         {
           switch (*s)
           {
@@ -199,7 +199,7 @@ struct SceneInputManager::Impl: public xtl::reference_counter, public IScreenLis
   bool ParseInputEvent (const char* event_string, TouchEvent& event)
   {
     TokenizeInputEvent (event_string);
-    
+
     if (event_tokens.size () >= 6 && !strcmp (event_tokens [0], "Touch"))
     {
       event.touch    = xtl::io::get<size_t> (event_tokens [3]);
