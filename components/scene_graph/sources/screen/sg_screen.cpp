@@ -11,8 +11,6 @@ namespace
 
 const size_t VIEWPORT_ARRAY_RESERVE_SIZE = 4;   //резервируемый размер массива областей вывода
 const size_t LISTENER_ARRAY_RESERVE_SIZE = 4;   //резервируемый размер массива слушателей
-const size_t DEFAULT_SCREEN_WIDTH        = 100; //ширина экрана по умолчанию
-const size_t DEFAULT_SCREEN_HEIGHT       = 100; //высота экрана по умолчанию
 
 }
 

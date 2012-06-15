@@ -36,7 +36,7 @@ struct Viewport::Impl: public xtl::reference_counter, public xtl::instance_count
   ListenerArray        listeners;         //слушатели событий области вывода
   xtl::auto_connection on_destroy_camera; //слот соединения с сигналом оповещения об удалении камеры
 
-  Impl () : camera (0), min_depth (0.0f), max_depth (1.0f), is_active (true), input_state (true), z_order (INT_MAX), has_background (false)
+  Impl () : camera (0), rect (0, 0, DEFAULT_SCREEN_WIDTH, DEFAULT_SCREEN_HEIGHT), min_depth (0.0f), max_depth (1.0f), is_active (true), input_state (true), z_order (INT_MAX), has_background (false)
   {
     listeners.reserve (LISTENER_ARRAY_RESERVE_SIZE);
   }

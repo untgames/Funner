@@ -19,4 +19,12 @@
 
 #include <sg/screen.h>
 
+namespace scene_graph
+{
+
+const size_t DEFAULT_SCREEN_WIDTH  = 100; //ширина экрана по умолчанию
+const size_t DEFAULT_SCREEN_HEIGHT = 100; //высота экрана по умолчанию
+
+}
+
 #endif
