@@ -1,8 +1,9 @@
 ###################################################################################################
 #Определения и константы
 ###################################################################################################
-TARGETS := COMMON.SOURCES COMMON.WXF_PARSER COMMON.XML_PARSER COMMON.ZIP_FILE_SYSTEM COMMON.AES COMMON.ICONV COMMON.MEMORY_MANAGER_OVERRIDE \
-  COMMON.AUTO_LICENSE_GENERATOR COMMON.TESTS COMMON.UTILS.FILE_CRYPTER COMMON.UTILS.LICENSE_GENERATOR COMMON.INFO  
+TARGETS := COMMON.SOURCES COMMON.WXF_PARSER COMMON.XML_PARSER COMMON.JSON_PARSER COMMON.ZIP_FILE_SYSTEM \
+           COMMON.AES COMMON.ICONV COMMON.MEMORY_MANAGER_OVERRIDE COMMON.AUTO_LICENSE_GENERATOR \
+           COMMON.TESTS COMMON.UTILS.FILE_CRYPTER COMMON.UTILS.LICENSE_GENERATOR COMMON.INFO  
 
 #Цель - CommonLib sources
 COMMON.SOURCES.TYPE                       := static-lib
@@ -41,6 +42,12 @@ COMMON.XML_PARSER.NAME             := funner.common.parsers.xml
 COMMON.XML_PARSER.INCLUDE_DIRS     := include ../xtl/include
 COMMON.XML_PARSER.SOURCE_DIRS      := sources/parselib/parsers/xml
 
+#Цель - JsonParser
+COMMON.JSON_PARSER.TYPE             := static-lib
+COMMON.JSON_PARSER.NAME             := funner.common.parsers.json
+COMMON.JSON_PARSER.INCLUDE_DIRS     := include ../xtl/include
+COMMON.JSON_PARSER.SOURCE_DIRS      := sources/parselib/parsers/json
+
 #Цель - CommonLib zip file system sources
 COMMON.ZIP_FILE_SYSTEM.TYPE         := static-lib
 COMMON.ZIP_FILE_SYSTEM.NAME         := funner.common.zip_file_system
@@ -74,7 +81,8 @@ COMMON.TESTS.SOURCE_DIRS          := tests/file_system tests/streams tests/hash 
                                      tests/memory tests/log tests/parselib tests/crypto tests/properties
 COMMON.TESTS.haswchar.SOURCE_DIRS := tests/strlib/wchar
 COMMON.TESTS.IMPORTS              := compile.math.vecmath compile.common link.common.aes link.common.xml link.common.wxf \
-                                     link.common.zip_file_system link.common.default_console_handler link.common.iconv
+                                     link.common.zip_file_system link.common.default_console_handler link.common.iconv \
+                                     link.common.json
 COMMON.TESTS.bada_simulator.IMPORTS := link.extern.bada_addons
 
 #Цель - CommonLib crypter

@@ -6,6 +6,7 @@ Components:
   component 'common.file_systems.StandardFilePathsMount' not loaded
   component 'common.file_systems.ZipFileSystem' not loaded
   component 'common.licensing.loaders.AutoLicenseGenerator' not loaded
+  component 'common.parsers.json' not loaded
   component 'common.parsers.wxf' not loaded
   component 'common.parsers.xml' not loaded
   component 'common.string.converters.iconv' not loaded
@@ -18,6 +19,7 @@ Components:
   component 'common.file_systems.StandardFilePathsMount' loaded
   component 'common.file_systems.ZipFileSystem' loaded
   component 'common.licensing.loaders.AutoLicenseGenerator' loaded
+  component 'common.parsers.json' loaded
   component 'common.parsers.wxf' loaded
   component 'common.parsers.xml' loaded
   component 'common.string.converters.iconv' loaded
@@ -29,6 +31,7 @@ Components:
   component 'common.file_systems.StandardFilePathsMount' not loaded
   component 'common.file_systems.ZipFileSystem' not loaded
   component 'common.licensing.loaders.AutoLicenseGenerator' not loaded
+  component 'common.parsers.json' not loaded
   component 'common.parsers.wxf' not loaded
   component 'common.parsers.xml' not loaded
   component 'common.string.converters.iconv' not loaded
@@ -40,6 +43,7 @@ Components:
   component 'common.file_systems.StandardFilePathsMount' not loaded
   component 'common.file_systems.ZipFileSystem' not loaded
   component 'common.licensing.loaders.AutoLicenseGenerator' not loaded
+  component 'common.parsers.json' not loaded
   component 'common.parsers.wxf' not loaded
   component 'common.parsers.xml' not loaded
   component 'common.string.converters.iconv' not loaded

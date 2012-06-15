@@ -1,0 +1,486 @@
+Results of json1_test:
+root (source='', line=0): {}
+  (source='data/test1.json', line=1): {}
+   (source='data/test1.json', line=1): {}
+   event (source='data/test1.json', line=1): {user.authenticate}
+   userId (source='data/test1.json', line=1): {46}
+   (source='data/test1.json', line=1): {}
+   event (source='data/test1.json', line=1): {lobby.init}
+   bets (source='data/test1.json', line=1): {}
+     (source='data/test1.json', line=1): {}
+      (source='data/test1.json', line=1): {}
+      id (source='data/test1.json', line=1): {1}
+      money (source='data/test1.json', line=1): {10}
+      (source='data/test1.json', line=1): {}
+      id (source='data/test1.json', line=1): {2}
+      money (source='data/test1.json', line=1): {25}
+      (source='data/test1.json', line=1): {}
+      id (source='data/test1.json', line=1): {3}
+      money (source='data/test1.json', line=1): {50}
+      (source='data/test1.json', line=1): {}
+      id (source='data/test1.json', line=1): {4}
+      money (source='data/test1.json', line=1): {100}
+      (source='data/test1.json', line=1): {}
+      id (source='data/test1.json', line=1): {5}
+      money (source='data/test1.json', line=1): {200}
+      (source='data/test1.json', line=1): {}
+      id (source='data/test1.json', line=1): {6}
+      money (source='data/test1.json', line=1): {500}
+      (source='data/test1.json', line=1): {}
+      id (source='data/test1.json', line=1): {7}
+      money (source='data/test1.json', line=1): {1000}
+      (source='data/test1.json', line=1): {}
+      id (source='data/test1.json', line=1): {8}
+      money (source='data/test1.json', line=1): {1500}
+      (source='data/test1.json', line=1): {}
+      id (source='data/test1.json', line=1): {9}
+      money (source='data/test1.json', line=1): {2000}
+      (source='data/test1.json', line=1): {}
+      id (source='data/test1.json', line=1): {10}
+      money (source='data/test1.json', line=1): {2500}
+      (source='data/test1.json', line=1): {}
+      id (source='data/test1.json', line=1): {11}
+      money (source='data/test1.json', line=1): {5000}
+      (source='data/test1.json', line=1): {}
+      id (source='data/test1.json', line=1): {12}
+      money (source='data/test1.json', line=1): {10000}
+      (source='data/test1.json', line=1): {}
+      id (source='data/test1.json', line=1): {13}
+      money (source='data/test1.json', line=1): {15000}
+      (source='data/test1.json', line=1): {}
+      id (source='data/test1.json', line=1): {14}
+      money (source='data/test1.json', line=1): {20000}
+      (source='data/test1.json', line=1): {}
+      id (source='data/test1.json', line=1): {15}
+      money (source='data/test1.json', line=1): {25000}
+      (source='data/test1.json', line=1): {}
+      id (source='data/test1.json', line=1): {16}
+      money (source='data/test1.json', line=1): {50000}
+      (source='data/test1.json', line=1): {}
+      id (source='data/test1.json', line=1): {17}
+      money (source='data/test1.json', line=1): {100000}
+   levels (source='data/test1.json', line=1): {}
+     (source='data/test1.json', line=1): {}
+      (source='data/test1.json', line=1): {}
+      id (source='data/test1.json', line=1): {1}
+      wagering (source='data/test1.json', line=1): {0}
+      money (source='data/test1.json', line=1): {0}
+      maxBetId (source='data/test1.json', line=1): {4}
+      maxLineId (source='data/test1.json', line=1): {25}
+      (source='data/test1.json', line=1): {}
+      id (source='data/test1.json', line=1): {2}
+      wagering (source='data/test1.json', line=1): {30000}
+      money (source='data/test1.json', line=1): {20000}
+      maxBetId (source='data/test1.json', line=1): {5}
+      maxLineId (source='data/test1.json', line=1): {25}
+      (source='data/test1.json', line=1): {}
+      id (source='data/test1.json', line=1): {3}
+      wagering (source='data/test1.json', line=1): {100000}
+      money (source='data/test1.json', line=1): {30000}
+      maxBetId (source='data/test1.json', line=1): {5}
+      maxLineId (source='data/test1.json', line=1): {25}
+      (source='data/test1.json', line=1): {}
+      id (source='data/test1.json', line=1): {4}
+      wagering (source='data/test1.json', line=1): {200000}
+      money (source='data/test1.json', line=1): {40000}
+      maxBetId (source='data/test1.json', line=1): {6}
+      maxLineId (source='data/test1.json', line=1): {25}
+      (source='data/test1.json', line=1): {}
+      id (source='data/test1.json', line=1): {5}
+      wagering (source='data/test1.json', line=1): {500000}
+      money (source='data/test1.json', line=1): {50000}
+      maxBetId (source='data/test1.json', line=1): {6}
+      maxLineId (source='data/test1.json', line=1): {25}
+      (source='data/test1.json', line=1): {}
+      id (source='data/test1.json', line=1): {6}
+      wagering (source='data/test1.json', line=1): {1000000}
+      money (source='data/test1.json', line=1): {60000}
+      maxBetId (source='data/test1.json', line=1): {7}
+      maxLineId (source='data/test1.json', line=1): {25}
+      (source='data/test1.json', line=1): {}
+      id (source='data/test1.json', line=1): {7}
+      wagering (source='data/test1.json', line=1): {1800000}
+      money (source='data/test1.json', line=1): {70000}
+      maxBetId (source='data/test1.json', line=1): {7}
+      maxLineId (source='data/test1.json', line=1): {25}
+      (source='data/test1.json', line=1): {}
+      id (source='data/test1.json', line=1): {8}
+      wagering (source='data/test1.json', line=1): {3000000}
+      money (source='data/test1.json', line=1): {80000}
+      maxBetId (source='data/test1.json', line=1): {10}
+      maxLineId (source='data/test1.json', line=1): {25}
+      (source='data/test1.json', line=1): {}
+      id (source='data/test1.json', line=1): {9}
+      wagering (source='data/test1.json', line=1): {4500000}
+      money (source='data/test1.json', line=1): {90000}
+      maxBetId (source='data/test1.json', line=1): {10}
+      maxLineId (source='data/test1.json', line=1): {25}
+      (source='data/test1.json', line=1): {}
+      id (source='data/test1.json', line=1): {10}
+      wagering (source='data/test1.json', line=1): {6500000}
+      money (source='data/test1.json', line=1): {100000}
+      maxBetId (source='data/test1.json', line=1): {11}
+      maxLineId (source='data/test1.json', line=1): {25}
+      (source='data/test1.json', line=1): {}
+      id (source='data/test1.json', line=1): {11}
+      wagering (source='data/test1.json', line=1): {8500000}
+      money (source='data/test1.json', line=1): {110000}
+      maxBetId (source='data/test1.json', line=1): {11}
+      maxLineId (source='data/test1.json', line=1): {25}
+      (source='data/test1.json', line=1): {}
+      id (source='data/test1.json', line=1): {12}
+      wagering (source='data/test1.json', line=1): {11500000}
+      money (source='data/test1.json', line=1): {120000}
+      maxBetId (source='data/test1.json', line=1): {11}
+      maxLineId (source='data/test1.json', line=1): {25}
+      (source='data/test1.json', line=1): {}
+      id (source='data/test1.json', line=1): {13}
+      wagering (source='data/test1.json', line=1): {14500000}
+      money (source='data/test1.json', line=1): {130000}
+      maxBetId (source='data/test1.json', line=1): {11}
+      maxLineId (source='data/test1.json', line=1): {25}
+      (source='data/test1.json', line=1): {}
+      id (source='data/test1.json', line=1): {14}
+      wagering (source='data/test1.json', line=1): {18000000}
+      money (source='data/test1.json', line=1): {140000}
+      maxBetId (source='data/test1.json', line=1): {11}
+      maxLineId (source='data/test1.json', line=1): {25}
+      (source='data/test1.json', line=1): {}
+      id (source='data/test1.json', line=1): {15}
+      wagering (source='data/test1.json', line=1): {21500000}
+      money (source='data/test1.json', line=1): {150000}
+      maxBetId (source='data/test1.json', line=1): {11}
+      maxLineId (source='data/test1.json', line=1): {25}
+      (source='data/test1.json', line=1): {}
+      id (source='data/test1.json', line=1): {16}
+      wagering (source='data/test1.json', line=1): {25000000}
+      money (source='data/test1.json', line=1): {160000}
+      maxBetId (source='data/test1.json', line=1): {11}
+      maxLineId (source='data/test1.json', line=1): {25}
+      (source='data/test1.json', line=1): {}
+      id (source='data/test1.json', line=1): {17}
+      wagering (source='data/test1.json', line=1): {29000000}
+      money (source='data/test1.json', line=1): {170000}
+      maxBetId (source='data/test1.json', line=1): {11}
+      maxLineId (source='data/test1.json', line=1): {25}
+      (source='data/test1.json', line=1): {}
+      id (source='data/test1.json', line=1): {18}
+      wagering (source='data/test1.json', line=1): {33000000}
+      money (source='data/test1.json', line=1): {180000}
+      maxBetId (source='data/test1.json', line=1): {11}
+      maxLineId (source='data/test1.json', line=1): {25}
+      (source='data/test1.json', line=1): {}
+      id (source='data/test1.json', line=1): {19}
+      wagering (source='data/test1.json', line=1): {37000000}
+      money (source='data/test1.json', line=1): {190000}
+      maxBetId (source='data/test1.json', line=1): {11}
+      maxLineId (source='data/test1.json', line=1): {25}
+      (source='data/test1.json', line=1): {}
+      id (source='data/test1.json', line=1): {20}
+      wagering (source='data/test1.json', line=1): {41000000}
+      money (source='data/test1.json', line=1): {200000}
+      maxBetId (source='data/test1.json', line=1): {12}
+      maxLineId (source='data/test1.json', line=1): {25}
+      (source='data/test1.json', line=1): {}
+      id (source='data/test1.json', line=1): {21}
+      wagering (source='data/test1.json', line=1): {45500000}
+      money (source='data/test1.json', line=1): {210000}
+      maxBetId (source='data/test1.json', line=1): {12}
+      maxLineId (source='data/test1.json', line=1): {25}
+      (source='data/test1.json', line=1): {}
+      id (source='data/test1.json', line=1): {22}
+      wagering (source='data/test1.json', line=1): {50000000}
+      money (source='data/test1.json', line=1): {220000}
+      maxBetId (source='data/test1.json', line=1): {12}
+      maxLineId (source='data/test1.json', line=1): {25}
+      (source='data/test1.json', line=1): {}
+      id (source='data/test1.json', line=1): {23}
+      wagering (source='data/test1.json', line=1): {55000000}
+      money (source='data/test1.json', line=1): {230000}
+      maxBetId (source='data/test1.json', line=1): {12}
+      maxLineId (source='data/test1.json', line=1): {25}
+      (source='data/test1.json', line=1): {}
+      id (source='data/test1.json', line=1): {24}
+      wagering (source='data/test1.json', line=1): {60000000}
+      money (source='data/test1.json', line=1): {240000}
+      maxBetId (source='data/test1.json', line=1): {12}
+      maxLineId (source='data/test1.json', line=1): {25}
+      (source='data/test1.json', line=1): {}
+      id (source='data/test1.json', line=1): {25}
+      wagering (source='data/test1.json', line=1): {66000000}
+      money (source='data/test1.json', line=1): {250000}
+      maxBetId (source='data/test1.json', line=1): {12}
+      maxLineId (source='data/test1.json', line=1): {25}
+      (source='data/test1.json', line=1): {}
+      id (source='data/test1.json', line=1): {26}
+      wagering (source='data/test1.json', line=1): {72000000}
+      money (source='data/test1.json', line=1): {260000}
+      maxBetId (source='data/test1.json', line=1): {12}
+      maxLineId (source='data/test1.json', line=1): {25}
+      (source='data/test1.json', line=1): {}
+      id (source='data/test1.json', line=1): {27}
+      wagering (source='data/test1.json', line=1): {79000000}
+      money (source='data/test1.json', line=1): {270000}
+      maxBetId (source='data/test1.json', line=1): {12}
+      maxLineId (source='data/test1.json', line=1): {25}
+      (source='data/test1.json', line=1): {}
+      id (source='data/test1.json', line=1): {28}
+      wagering (source='data/test1.json', line=1): {86000000}
+      money (source='data/test1.json', line=1): {280000}
+      maxBetId (source='data/test1.json', line=1): {12}
+      maxLineId (source='data/test1.json', line=1): {25}
+      (source='data/test1.json', line=1): {}
+      id (source='data/test1.json', line=1): {29}
+      wagering (source='data/test1.json', line=1): {94000000}
+      money (source='data/test1.json', line=1): {290000}
+      maxBetId (source='data/test1.json', line=1): {12}
+      maxLineId (source='data/test1.json', line=1): {25}
+      (source='data/test1.json', line=1): {}
+      id (source='data/test1.json', line=1): {30}
+      wagering (source='data/test1.json', line=1): {102000000}
+      money (source='data/test1.json', line=1): {300000}
+      maxBetId (source='data/test1.json', line=1): {14}
+      maxLineId (source='data/test1.json', line=1): {25}
+      (source='data/test1.json', line=1): {}
+      id (source='data/test1.json', line=1): {31}
+      wagering (source='data/test1.json', line=1): {110000000}
+      money (source='data/test1.json', line=1): {310000}
+      maxBetId (source='data/test1.json', line=1): {14}
+      maxLineId (source='data/test1.json', line=1): {25}
+      (source='data/test1.json', line=1): {}
+      id (source='data/test1.json', line=1): {32}
+      wagering (source='data/test1.json', line=1): {120000000}
+      money (source='data/test1.json', line=1): {320000}
+      maxBetId (source='data/test1.json', line=1): {14}
+      maxLineId (source='data/test1.json', line=1): {25}
+      (source='data/test1.json', line=1): {}
+      id (source='data/test1.json', line=1): {33}
+      wagering (source='data/test1.json', line=1): {130000000}
+      money (source='data/test1.json', line=1): {330000}
+      maxBetId (source='data/test1.json', line=1): {14}
+      maxLineId (source='data/test1.json', line=1): {25}
+      (source='data/test1.json', line=1): {}
+      id (source='data/test1.json', line=1): {34}
+      wagering (source='data/test1.json', line=1): {140000000}
+      money (source='data/test1.json', line=1): {340000}
+      maxBetId (source='data/test1.json', line=1): {14}
+      maxLineId (source='data/test1.json', line=1): {25}
+      (source='data/test1.json', line=1): {}
+      id (source='data/test1.json', line=1): {35}
+      wagering (source='data/test1.json', line=1): {155000000}
+      money (source='data/test1.json', line=1): {350000}
+      maxBetId (source='data/test1.json', line=1): {14}
+      maxLineId (source='data/test1.json', line=1): {25}
+      (source='data/test1.json', line=1): {}
+      id (source='data/test1.json', line=1): {36}
+      wagering (source='data/test1.json', line=1): {170000000}
+      money (source='data/test1.json', line=1): {360000}
+      maxBetId (source='data/test1.json', line=1): {14}
+      maxLineId (source='data/test1.json', line=1): {25}
+      (source='data/test1.json', line=1): {}
+      id (source='data/test1.json', line=1): {37}
+      wagering (source='data/test1.json', line=1): {190000000}
+      money (source='data/test1.json', line=1): {370000}
+      maxBetId (source='data/test1.json', line=1): {14}
+      maxLineId (source='data/test1.json', line=1): {25}
+      (source='data/test1.json', line=1): {}
+      id (source='data/test1.json', line=1): {38}
+      wagering (source='data/test1.json', line=1): {210000000}
+      money (source='data/test1.json', line=1): {380000}
+      maxBetId (source='data/test1.json', line=1): {14}
+      maxLineId (source='data/test1.json', line=1): {25}
+      (source='data/test1.json', line=1): {}
+      id (source='data/test1.json', line=1): {39}
+      wagering (source='data/test1.json', line=1): {240000000}
+      money (source='data/test1.json', line=1): {390000}
+      maxBetId (source='data/test1.json', line=1): {14}
+      maxLineId (source='data/test1.json', line=1): {25}
+      (source='data/test1.json', line=1): {}
+      id (source='data/test1.json', line=1): {40}
+      wagering (source='data/test1.json', line=1): {270000000}
+      money (source='data/test1.json', line=1): {400000}
+      maxBetId (source='data/test1.json', line=1): {16}
+      maxLineId (source='data/test1.json', line=1): {25}
+      (source='data/test1.json', line=1): {}
+      id (source='data/test1.json', line=1): {41}
+      wagering (source='data/test1.json', line=1): {300000000}
+      money (source='data/test1.json', line=1): {410000}
+      maxBetId (source='data/test1.json', line=1): {16}
+      maxLineId (source='data/test1.json', line=1): {25}
+      (source='data/test1.json', line=1): {}
+      id (source='data/test1.json', line=1): {42}
+      wagering (source='data/test1.json', line=1): {340000000}
+      money (source='data/test1.json', line=1): {420000}
+      maxBetId (source='data/test1.json', line=1): {16}
+      maxLineId (source='data/test1.json', line=1): {25}
+      (source='data/test1.json', line=1): {}
+      id (source='data/test1.json', line=1): {43}
+      wagering (source='data/test1.json', line=1): {380000000}
+      money (source='data/test1.json', line=1): {430000}
+      maxBetId (source='data/test1.json', line=1): {16}
+      maxLineId (source='data/test1.json', line=1): {25}
+      (source='data/test1.json', line=1): {}
+      id (source='data/test1.json', line=1): {44}
+      wagering (source='data/test1.json', line=1): {420000000}
+      money (source='data/test1.json', line=1): {440000}
+      maxBetId (source='data/test1.json', line=1): {16}
+      maxLineId (source='data/test1.json', line=1): {25}
+      (source='data/test1.json', line=1): {}
+      id (source='data/test1.json', line=1): {45}
+      wagering (source='data/test1.json', line=1): {470000000}
+      money (source='data/test1.json', line=1): {450000}
+      maxBetId (source='data/test1.json', line=1): {16}
+      maxLineId (source='data/test1.json', line=1): {25}
+      (source='data/test1.json', line=1): {}
+      id (source='data/test1.json', line=1): {46}
+      wagering (source='data/test1.json', line=1): {520000000}
+      money (source='data/test1.json', line=1): {460000}
+      maxBetId (source='data/test1.json', line=1): {16}
+      maxLineId (source='data/test1.json', line=1): {25}
+      (source='data/test1.json', line=1): {}
+      id (source='data/test1.json', line=1): {47}
+      wagering (source='data/test1.json', line=1): {570000000}
+      money (source='data/test1.json', line=1): {470000}
+      maxBetId (source='data/test1.json', line=1): {16}
+      maxLineId (source='data/test1.json', line=1): {25}
+      (source='data/test1.json', line=1): {}
+      id (source='data/test1.json', line=1): {48}
+      wagering (source='data/test1.json', line=1): {630000000}
+      money (source='data/test1.json', line=1): {480000}
+      maxBetId (source='data/test1.json', line=1): {16}
+      maxLineId (source='data/test1.json', line=1): {25}
+      (source='data/test1.json', line=1): {}
+      id (source='data/test1.json', line=1): {49}
+      wagering (source='data/test1.json', line=1): {690000000}
+      money (source='data/test1.json', line=1): {490000}
+      maxBetId (source='data/test1.json', line=1): {16}
+      maxLineId (source='data/test1.json', line=1): {25}
+      (source='data/test1.json', line=1): {}
+      id (source='data/test1.json', line=1): {50}
+      wagering (source='data/test1.json', line=1): {760000000}
+      money (source='data/test1.json', line=1): {500000}
+      maxBetId (source='data/test1.json', line=1): {17}
+      maxLineId (source='data/test1.json', line=1): {25}
+   slots (source='data/test1.json', line=1): {}
+     (source='data/test1.json', line=1): {}
+      (source='data/test1.json', line=1): {}
+      id (source='data/test1.json', line=1): {1}
+      level (source='data/test1.json', line=1): {1}
+      path (source='data/test1.json', line=1): {SummerDream}
+      (source='data/test1.json', line=1): {}
+      id (source='data/test1.json', line=1): {2}
+      level (source='data/test1.json', line=1): {1}
+      path (source='data/test1.json', line=1): {Farmandia}
+      (source='data/test1.json', line=1): {}
+      id (source='data/test1.json', line=1): {3}
+      level (source='data/test1.json', line=1): {1}
+      path (source='data/test1.json', line=1): {Pirates}
+      (source='data/test1.json', line=1): {}
+      id (source='data/test1.json', line=1): {101}
+      level (source='data/test1.json', line=1): {1}
+      path (source='data/test1.json', line=1): {SummerDream}
+      (source='data/test1.json', line=1): {}
+      id (source='data/test1.json', line=1): {102}
+      level (source='data/test1.json', line=1): {1}
+      path (source='data/test1.json', line=1): {Farmandia}
+      (source='data/test1.json', line=1): {}
+      id (source='data/test1.json', line=1): {103}
+      level (source='data/test1.json', line=1): {1}
+      path (source='data/test1.json', line=1): {Pirates}
+      (source='data/test1.json', line=1): {}
+      id (source='data/test1.json', line=1): {4}
+      level (source='data/test1.json', line=1): {1}
+      path (source='data/test1.json', line=1): {Bingo}
+      (source='data/test1.json', line=1): {}
+      id (source='data/test1.json', line=1): {5}
+      level (source='data/test1.json', line=1): {1}
+      path (source='data/test1.json', line=1): {Forest}
+   friends (source='data/test1.json', line=1): {}
+     (source='data/test1.json', line=1): {}
+   (source='data/test1.json', line=1): {}
+   event (source='data/test1.json', line=1): {gifts.update}
+   gifts (source='data/test1.json', line=1): {}
+     (source='data/test1.json', line=1): {}
+   (source='data/test1.json', line=1): {}
+   event (source='data/test1.json', line=1): {user.update}
+   level (source='data/test1.json', line=1): {1}
+   wagering (source='data/test1.json', line=1): {2250}
+   money (source='data/test1.json', line=1): {10019300}
+   (source='data/test1.json', line=1): {}
+   event (source='data/test1.json', line=1): {grant.update}
+   level (source='data/test1.json', line=1): {1}
+   time (source='data/test1.json', line=1): {0}
+root (source='', line=0): {}
+  (source='data/test2.json', line=1): {}
+   (source='data/test2.json', line=2): {JSON Test Pattern pass1}
+   (source='data/test2.json', line=3): {}
+   object with 1 member (source='data/test2.json', line=3): {}
+     (source='data/test2.json', line=3): {array with 1 element}
+   (source='data/test2.json', line=4): {}
+   (source='data/test2.json', line=5): {}
+   (source='data/test2.json', line=6): {-42}
+   (source='data/test2.json', line=7): {true}
+   (source='data/test2.json', line=8): {false}
+   (source='data/test2.json', line=9): {}
+   (source='data/test2.json', line=10): {}
+   integer (source='data/test2.json', line=11): {1234567890}
+   real (source='data/test2.json', line=12): {-9876.543210}
+   e (source='data/test2.json', line=13): {0.123456789e-12}
+   E (source='data/test2.json', line=14): {1.234567890E+34}
+    (source='data/test2.json', line=15): {23456789012E66}
+   zero (source='data/test2.json', line=16): {0}
+   one (source='data/test2.json', line=17): {1}
+   space (source='data/test2.json', line=18): { }
+   quote (source='data/test2.json', line=19): {"}
+   backslash (source='data/test2.json', line=20): {\}
+   controls (source='data/test2.json', line=21): {
+	}
+   slash (source='data/test2.json', line=22): {/ & /}
+   alpha (source='data/test2.json', line=23): {abcdefghijklmnopqrstuvwxyz}
+   ALPHA (source='data/test2.json', line=24): {ABCDEFGHIJKLMNOPQRSTUVWXYZ}
+   digit (source='data/test2.json', line=25): {0123456789}
+   0123456789 (source='data/test2.json', line=26): {digit}
+   special (source='data/test2.json', line=27): {`1~!@#$%^&*()_+-={':[,]}|;.</>?}
+   hex (source='data/test2.json', line=28): {ģ䕧覫췯ꯍ}
+   true (source='data/test2.json', line=29): {true}
+   false (source='data/test2.json', line=30): {false}
+   null (source='data/test2.json', line=31): {}
+   array (source='data/test2.json', line=32): {}
+     (source='data/test2.json', line=32): {}
+   object (source='data/test2.json', line=33): {}
+     (source='data/test2.json', line=33): {}
+   address (source='data/test2.json', line=34): {50 St. James Street}
+   url (source='data/test2.json', line=35): {http://www.JSON.org/}
+   comment (source='data/test2.json', line=36): {// /* <!-- --}
+   # -- --> */ (source='data/test2.json', line=37): { }
+    s p a c e d  (source='data/test2.json', line=38): {}
+     (source='data/test2.json', line=38): {1, 2, 3, 4, 5, 6, 7}
+   compact (source='data/test2.json', line=42): {}
+     (source='data/test2.json', line=42): {1, 2, 3, 4, 5, 6, 7}
+   jsontext (source='data/test2.json', line=43): {{"object with 1 member":["array with 1 element"]}}
+   quotes (source='data/test2.json', line=44): {&#34; " %22 0x22 034 &#x22;}
+   /\"쫾몾ꮘﳞ볚
+	`1~!@#$%^&*()_+-=[]{}|;:',./<>? (source='data/test2.json', line=45): {A key can be any string}
+   (source='data/test2.json', line=47): {0.5}
+   (source='data/test2.json', line=47): {98.6}
+   (source='data/test2.json', line=49): {99.44}
+   (source='data/test2.json', line=52): {1066}
+   (source='data/test2.json', line=53): {1e1}
+   (source='data/test2.json', line=54): {0.1e1}
+   (source='data/test2.json', line=55): {1e-1}
+   (source='data/test2.json', line=56): {1e00}
+   (source='data/test2.json', line=57): {2e+00}
+   (source='data/test2.json', line=58): {2e-00}
+   (source='data/test2.json', line=59): {rosebud}
+root (source='', line=0): {}
+  (source='data/error_test1.json', line=2): {val1, val2}
+data/error_test1.json(1): error: syntax error. Unexpected token 'obj'. Object or array expected.
+data/error_test1.json(1): error: syntax error. Unexpected token ''. Object or array expected.
+data/error_test1.json(1): error: syntax error. Unexpected token 'val'. Object or array expected.
+data/error_test1.json(1): error: syntax error. Unexpected token ''. Object or array expected.
+root (source='', line=0): {}
+  (source='data/error_test2.json', line=1): {val2, 5, 16}
+data/error_test2.json(1): error: wrong keyword (at position 3)
+data/error_test2.json(1): error: wrong character on line 'e' (at position 7)
+data/error_test2.json(1): error: syntax error. Unexpected token ''. Object member or end bracket expected.
+data/error_test2.json(3): error: wrong character on line '+' (at position 3)

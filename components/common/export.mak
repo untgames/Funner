@@ -41,6 +41,11 @@ export.link.common.xml.LIBS          := funner.common.parsers.xml
 export.link.common.xml.LINK_INCLUDES := XmlParser
 export.link.common.xml.IMPORTS       := link.common
 
+# JSON link exports
+export.link.common.json.LIBS          := funner.common.parsers.json
+export.link.common.json.LINK_INCLUDES := JsonParser
+export.link.common.json.IMPORTS       := link.common
+
 # ZIP file system link exports
 export.link.common.zip_file_system.LIBS          := funner.common.zip_file_system
 export.link.common.zip_file_system.LINK_INCLUDES := ZipFileSystem
