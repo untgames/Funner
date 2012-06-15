@@ -104,9 +104,17 @@ void InputPort::Update ()
       need_update = false;
       return;
     }
+    
+    const scene_graph::Rect& viewport_rect = viewport.Area ();
+
+    math::vec3f viewport_offset (float (viewport_rect.left ()), float (viewport_rect.top ()), 0.0f),
+                viewport_scale (1.0f / float (viewport_rect.right () - viewport_rect.left ()), 1.0f / float (viewport_rect.bottom () - viewport_rect.top ()), 1.0f);                
+                
+    position_tm = math::inverse (camera->ProjectionMatrix () * math::inverse (camera->WorldTM ())) * math::translate (math::vec3f (-1.0f)) * 
+      math::scale (2.0f * viewport_scale) * math::translate (-viewport_offset);
 
     ////????????????????????
-    
+
     need_update = false;
   }
   catch (xtl::exception& e)
@@ -125,9 +133,13 @@ void InputPort::OnTouch (const TouchEvent& event, bool& touch_catched)
   try
   {
     if (need_update)
-      Update ();
-      
-      //????????????
+      Update ();      
+
+    math::vec4f position = position_tm * math::vec4f (event.position.x, event.position.y, 0.0f, 1.0f);
+    
+    position /= position.w;    
+        
+    printf ("position is %f %f -> %f %f %f %f\n", event.position.x, event.position.y, position.x, position.y, position.z, position.w);
   }
   catch (xtl::exception& e)
   {

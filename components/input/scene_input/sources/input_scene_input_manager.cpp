@@ -18,6 +18,8 @@ struct SceneInputManager::Impl: public xtl::reference_counter, public IScreenLis
   stl::string          event_tokens_buffer; //буфер токенов
   TokenList            event_tokens;        //токены
   math::vec2f          mouse_position;      //положение курсора мыши
+  math::vec2f          screen_size;         //размеры экрана
+  math::vec2f          screen_offset;       //смещение от начала экрана
   
 ///Конструктор
   Impl ()
@@ -64,6 +66,8 @@ struct SceneInputManager::Impl: public xtl::reference_counter, public IScreenLis
       {
         screen = in_screen;
         
+        OnScreenChangeArea (screen->Area ());
+        
         screen->AttachListener (this);        
         
         for (size_t i=0, count=screen->ViewportsCount (); i<count; i++)
@@ -83,6 +87,13 @@ struct SceneInputManager::Impl: public xtl::reference_counter, public IScreenLis
       }
     }
   }
+  
+///Изменение размеров экрана  
+  void OnScreenChangeArea (const Rect& rect)
+  {
+    screen_size   = math::vec2f (float (rect.right () - rect.left ()), float (rect.bottom () - rect.top ()));
+    screen_offset = math::vec2f (float (rect.left ()), float (rect.top ()));
+  }  
   
 ///Присоединена область вывода
   void OnScreenAttachViewport (Viewport& viewport)
@@ -150,12 +161,13 @@ struct SceneInputManager::Impl: public xtl::reference_counter, public IScreenLis
     {    
       bool loop = true;
       
-      for (;loop;s++)
+      for (;loop;)
       {
         switch (*s)
         {
           case ' ':
           case '\t':
+            s++;
             break;
           default:
             loop = false;
@@ -169,7 +181,7 @@ struct SceneInputManager::Impl: public xtl::reference_counter, public IScreenLis
       {
         bool loop = true;
         
-        for (++s;loop;s++)
+        for (++s;loop;)
         {
           switch (*s)
           {
@@ -179,9 +191,10 @@ struct SceneInputManager::Impl: public xtl::reference_counter, public IScreenLis
               loop = false;
               break;
             default:
+              s++;
               break;
           }
-        }    
+        }
         
         last = s;
       }
@@ -189,7 +202,7 @@ struct SceneInputManager::Impl: public xtl::reference_counter, public IScreenLis
       if (first != last)      
         event_tokens.push_back (first);
 
-      if (!*last)
+      if (!*s)
         break;
         
       *s++ = '\0';
@@ -203,7 +216,7 @@ struct SceneInputManager::Impl: public xtl::reference_counter, public IScreenLis
     if (event_tokens.size () >= 6 && !strcmp (event_tokens [0], "Touch"))
     {
       event.touch    = xtl::io::get<size_t> (event_tokens [3]);
-      event.position = math::vec2f (xtl::io::get<float> (event_tokens [4]), xtl::io::get<float> (event_tokens [5]));
+      event.position = math::vec2f (xtl::io::get<float> (event_tokens [4]), xtl::io::get<float> (event_tokens [5])) * screen_size + screen_offset;
       event.button   = 0;
 
       if      (!strcmp (event_tokens [1], "began")) event.state = TouchState_Pressed;
@@ -215,13 +228,13 @@ struct SceneInputManager::Impl: public xtl::reference_counter, public IScreenLis
     }
     else if (event_tokens.size () >= 3 && !strcmp (event_tokens [1], "axis"))
     {
-      if      (!strcmp (event_tokens [0], "CursorX")) mouse_position [0] = xtl::io::get<float> (event_tokens [2]);
-      else if (!strcmp (event_tokens [0], "CursorY")) mouse_position [1] = xtl::io::get<float> (event_tokens [2]);
-      else                                            return false;
+      if      (!strcmp (event_tokens [0], "CursorX")) mouse_position [0] = (xtl::io::get<float> (event_tokens [2]) + 1.0f) * 0.5f;
+      else if (!strcmp (event_tokens [0], "CursorY")) mouse_position [1] = (xtl::io::get<float> (event_tokens [2]) + 1.0f) * 0.5f;
+      else                                            return false;      
 
       event.touch    = MOUSE_TOUCH_ID;
       event.state    = TouchState_Moving;
-      event.position = mouse_position;
+      event.position = mouse_position * screen_size + screen_offset;
       event.button   = 0;
       
       return true;
@@ -230,7 +243,7 @@ struct SceneInputManager::Impl: public xtl::reference_counter, public IScreenLis
     {
       event.touch    = MOUSE_TOUCH_ID;      
       event.button   = xtl::io::get<unsigned int> (event_tokens [0] + 5);
-      event.position = mouse_position;
+      event.position = mouse_position * screen_size + screen_offset;
 
       if      (!strcmp (event_tokens [1], "down")) event.state = TouchState_Pressed;
       else if (!strcmp (event_tokens [1], "up"))   event.state = TouchState_Released;
@@ -247,7 +260,7 @@ struct SceneInputManager::Impl: public xtl::reference_counter, public IScreenLis
   {
     if (!screen)
       return;      
-    
+
     TouchEvent event;
     
     if (!ParseInputEvent (event_string, event))
@@ -257,6 +270,8 @@ struct SceneInputManager::Impl: public xtl::reference_counter, public IScreenLis
       Sort ();      
 
     bool touch_catched = false;
+    
+    math::vec2f position = event.position;
 
     for (InputPortList::iterator iter=input_ports.begin (), end=input_ports.end (); iter!=end; ++iter)
       (*iter)->OnTouch (event, touch_catched);

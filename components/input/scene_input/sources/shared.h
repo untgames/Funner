@@ -9,6 +9,8 @@
 #include <xtl/trackable.h>
 #include <xtl/token_parser.h>
 
+#include <math/utility.h>
+
 #include <common/singleton.h>
 
 #include <sg/camera.h>
@@ -104,6 +106,7 @@ class InputPort: public xtl::reference_counter, public scene_graph::IViewportLis
     bool                   need_update;       //нужно обновление
     xtl::auto_connection   on_camera_updated; //соединение с событием обновления камеры
     xtl::auto_connection   on_scene_changed;  //соединение с событием изменения сцены
+    math::mat4f            position_tm;       //матрица преобразования координат
 };
 
 typedef xtl::intrusive_ptr<InputPort> InputPortPtr;

@@ -16,11 +16,13 @@ int main ()
     OrthoCamera::Pointer camera = OrthoCamera::Create ();
     
     camera->SetLeft (0);
-    camera->SetRight (1000);
+    camera->SetRight (100);
     camera->SetTop (0);
-    camera->SetBottom (-1000);
-    camera->SetZNear (0);
-    camera->SetZFar (1000);
+    camera->SetBottom (-100);
+    camera->SetZNear (-1);
+    camera->SetZFar (1);
+    
+    camera->Translate (0.0f, 0.0f, 1.0f);
     
     camera->BindToScene (scene);
     
@@ -37,6 +39,7 @@ int main ()
     Viewport viewport;
     
     viewport.SetCamera (&*camera);
+    viewport.SetArea (100, 100, 800, 800);
     
     screen.SetArea (0, 0, 1000, 1000);
     screen.Attach (viewport);
@@ -45,8 +48,8 @@ int main ()
 
     manager.SetScreen (&screen);
 
-    manager.ProcessEvent ("CursorX 0");
-    manager.ProcessEvent ("CursorY 0");
+    manager.ProcessEvent ("CursorX axis 0");
+    manager.ProcessEvent ("CursorY axis 0");
     manager.ProcessEvent ("Mouse0 down");
     manager.ProcessEvent ("Mouse0 up");
   }
