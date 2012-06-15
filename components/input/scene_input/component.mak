@@ -7,12 +7,12 @@ TARGETS := INPUT.SCENE_INPUT.SOURCES INPUT.SCENE_INPUT.TESTS INPUT.SCENE_INPUT.I
 INPUT.SCENE_INPUT.SOURCES.TYPE        := static-lib
 INPUT.SCENE_INPUT.SOURCES.NAME        := funner.input.scene_input
 INPUT.SCENE_INPUT.SOURCES.SOURCE_DIRS := sources
-INPUT.SCENE_INPUT.SOURCES.IMPORTS     := 
+INPUT.SCENE_INPUT.SOURCES.IMPORTS     := compile.input.scene_input compile.common
 
 #Цель №2 - INPUT manager tests
 INPUT.SCENE_INPUT.TESTS.TYPE        := test-suite
 INPUT.SCENE_INPUT.TESTS.SOURCE_DIRS := tests
-INPUT.SCENE_INPUT.TESTS.IMPORTS     := 
+INPUT.SCENE_INPUT.TESTS.IMPORTS     := compile.input.scene_input link.input.scene_input
                                    
 #Цель - сборка документации
 INPUT.SCENE_INPUT.INFO.TYPE        := doxygen-info
