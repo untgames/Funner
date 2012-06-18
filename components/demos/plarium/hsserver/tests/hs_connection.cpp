@@ -98,7 +98,7 @@ int main ()
 
     connection.SendMessage (0, (const unsigned char*)message_text, strlen (message_text));
 
-    Thread::Sleep (1000);
+    Thread::Sleep (2000);
   }
   catch (std::exception& exception)
   {

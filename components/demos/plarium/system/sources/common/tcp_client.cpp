@@ -6,6 +6,15 @@ using namespace plarium::utility;
 namespace
 {
 
+//Error codes
+#ifdef _MSC_VER
+const int CONNECTION_RESET_ERROR = WSAECONNRESET;
+const int WOULD_BLOCK_ERROR      = WSAEWOULDBLOCK;
+#else
+const int CONNECTION_RESET_ERROR = ECONNRESET;
+const int WOULD_BLOCK_ERROR      = EWOULDBLOCK;
+#endif
+
 #ifdef _MSC_VER
 
 //получение строки с сообщением об ошибке
@@ -133,7 +142,7 @@ struct TcpClient::Impl
   template <class T>
   void SetSocketOption (int option, const T& value, int level = SOL_SOCKET)
   {
-    if (setsockopt (socket, level, option, &value, sizeof (T)))
+    if (setsockopt (socket, level, option, (const char*)&value, sizeof (T)))
       raise_error ("TcpClient::SetSocketOption", "setsockopt");
   }
 
@@ -143,20 +152,20 @@ struct TcpClient::Impl
     WSAEVENT dummy_event = WSACreateEvent ();
 
     if (dummy_event == WSA_INVALID_EVENT)
-      raise_error ("TcpClient::Connect", "::WSACreateEvent");
+      raise_error ("TcpClient::SetBlockingMode", "::WSACreateEvent");
 
     if (WSAEventSelect (socket, dummy_event, 0) == SOCKET_ERROR)
-      raise_error ("TcpClient::Connect", "::WSAEventSelect");
+      raise_error ("TcpClient::SetBlockingMode", "::WSAEventSelect");
 
     u_long state_value = state ? 0 : 1;
 
     if (ioctlsocket (socket, FIONBIO, &state_value) == SOCKET_ERROR)
-      raise_error ("TcpClient::Connect", "::ioctlsocket");
+      raise_error ("TcpClient::SetBlockingMode", "::ioctlsocket");
 #else
     int flags = fcntl (socket, F_GETFL, 0);
 
     if (flags < 0)
-      raise_error ("TcpClient::Connect", "::fcntl");
+      raise_error ("TcpClient::SetBlockingMode", "::fcntl");
 
     if (state)
       flags &= ~O_NONBLOCK;
@@ -164,7 +173,7 @@ struct TcpClient::Impl
       flags |= O_NONBLOCK;
 
     if (fcntl (socket, F_SETFL, flags) == -1)
-      raise_error ("TcpClient::Connect", "::fcntl");
+      raise_error ("TcpClient::SetBlockingMode", "::fcntl");
 #endif
   }
 };
@@ -316,14 +325,39 @@ size_t TcpClient::Send (const void* buffer, size_t size, size_t timeout_in_milli
   if (!IsConnected ())
     throw std::logic_error ("TcpClient::Send - Socket is not connected");
 
-  int sent_bytes = send (impl->socket, buffer, size, 0);
+  if (!buffer)
+    throw std::invalid_argument ("TcpClient::Send - null buffer");
+
+#ifdef _MSC_VER
+  impl->SetSocketOption<DWORD> (SO_SNDTIMEO, (DWORD)timeout_in_milliseconds);
+#else
+  timeval timeout;
+
+  timeout.tv_sec  = timeout_in_milliseconds / 1000;
+  timeout.tv_usec = (timeout_in_milliseconds % 1000) * 1000;
+
+  impl->SetSocketOption<timeval> (SO_SNDTIMEO, timeout);
+#endif
+
+  int sent_bytes = send (impl->socket, (const char*)buffer, size, 0);
 
   if (sent_bytes < 0)
   {
-    if (errno == EAGAIN || errno == EWOULDBLOCK)
+    int error_code =
+#ifdef _MSC_VER
+        WSAGetLastError ();
+#else
+        errno;
+#endif
+
+#ifdef _MSC_VER
+    if (error_code == WOULD_BLOCK_ERROR)
+#else
+    if (error_code == EAGAIN || errno == WOULD_BLOCK_ERROR)
+#endif
       return 0;
 
-    if (errno == ECONNRESET)
+    if (error_code == CONNECTION_RESET_ERROR)
     {
       try
       {
@@ -339,7 +373,7 @@ size_t TcpClient::Send (const void* buffer, size_t size, size_t timeout_in_milli
       throw std::runtime_error ("TcpClient::Send - A connection was forcibly closed by a peer.");
     }
     else
-      raise_error ("TcpClient::Connect", "::send");
+      raise_error ("TcpClient::Send", "::send");
   }
 
   return sent_bytes;
@@ -354,16 +388,30 @@ size_t TcpClient::Receive (void* buffer, size_t size, size_t timeout_in_millisec
   if (!IsConnected ())
     throw std::logic_error ("TcpClient::Receive - Socket is not connected");
 
+  if (!buffer)
+    throw std::invalid_argument ("TcpClient::Receive - null buffer");
+
+#ifdef _MSC_VER
+  impl->SetSocketOption<DWORD> (SO_RCVTIMEO, (DWORD)timeout_in_milliseconds);
+#else
   timeval timeout;
 
   timeout.tv_sec  = timeout_in_milliseconds / 1000;
   timeout.tv_usec = (timeout_in_milliseconds % 1000) * 1000;
 
   impl->SetSocketOption<timeval> (SO_RCVTIMEO, timeout);
+#endif
 
-  int received_bytes = recv (impl->socket, buffer, size, 0);
+  int received_bytes = recv (impl->socket, (char*)buffer, size, 0);
 
-  if ((received_bytes < 0 && errno == ECONNRESET) || !received_bytes)
+  int error_code =
+#ifdef _MSC_VER
+      WSAGetLastError ();
+#else
+      errno;
+#endif
+
+  if ((received_bytes < 0 && error_code == CONNECTION_RESET_ERROR) || !received_bytes)
   {
     try
     {
@@ -381,10 +429,14 @@ size_t TcpClient::Receive (void* buffer, size_t size, size_t timeout_in_millisec
 
   if (received_bytes < 0)
   {
-    if (errno == EAGAIN || errno == EWOULDBLOCK)
+#ifdef _MSC_VER
+    if (error_code == WOULD_BLOCK_ERROR)
+#else
+    if (error_code == EAGAIN || errno == WOULD_BLOCK_ERROR)
+#endif
       return 0;
     else
-      raise_error ("TcpClient::Connect", "::recv");
+      raise_error ("TcpClient::Receive", "::recv");
   }
 
   return received_bytes;

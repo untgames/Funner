@@ -2,6 +2,8 @@
 
 #undef CreateWindow
 
+#include <cstdio>
+
 #include <launcher/application.h>
 
 using namespace engine;

@@ -1,5 +1,9 @@
 #include "shared.h"
 
+#ifdef _MSC_VER
+  #pragma warning (disable : 4355) //'this' : used in base member initializer list
+#endif
+
 using namespace plarium::hsserver;
 using namespace plarium::system;
 using namespace plarium::utility;
@@ -143,7 +147,7 @@ void* receive_function (void* user_data)
   volatile bool& need_stop = data->need_stop;
 
   size_t         current_buffer_size            = DEFAULT_RECEIVE_BUFFER_SIZE,
-                 timeout_threshold              = data->connection_settings.keep_alive_interval * TIMEOUT_THRESHOLD;
+                 timeout_threshold              = (size_t)(data->connection_settings.keep_alive_interval * TIMEOUT_THRESHOLD);
   unsigned char* receive_buffer                 = new unsigned char [current_buffer_size];
   size_t         current_decompress_buffer_size = DEFAULT_RECEIVE_BUFFER_SIZE;
   unsigned char* decompress_buffer              = new unsigned char [current_decompress_buffer_size];
@@ -316,7 +320,7 @@ void* send_function (void* user_data)
   receive_function_arg.release ();
 
   size_t last_keep_alive_time = milliseconds (),
-         timeout_threshold    = data->connection_settings.keep_alive_interval * TIMEOUT_THRESHOLD;
+         timeout_threshold    = (size_t)(data->connection_settings.keep_alive_interval * TIMEOUT_THRESHOLD);
 
   size_t         current_buffer_size = DEFAULT_SEND_BUFFER_SIZE;
   unsigned char* send_buffer         = new unsigned char [current_buffer_size];
