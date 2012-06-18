@@ -243,7 +243,7 @@ void* receive_function (void* user_data)
 
         message_body += COMPRESSED_LENGTH_SIZE;
 
-        if (*uncompressed_size > current_decompress_buffer_size)
+        if (*uncompressed_size >= current_decompress_buffer_size)
         {
           delete [] decompress_buffer;
 
