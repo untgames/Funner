@@ -93,6 +93,12 @@ function xml_test ()
   print_node (node2, 0)    
 end
 
+function json_test ()
+  local node = Common.StringNode.LoadJsonFromFile ("data/string_tree.json")
+  
+  print_node (node, 0)
+end
+
 function test ()
   local node = Common.StringNode.Create ()
 
@@ -190,4 +196,5 @@ function test ()
   clone_test ()
 
   xml_test ()  
+  json_test ()  
 end

@@ -160,3 +160,358 @@ Attributes:
 End of attributes
 Children
 End of children
+Node ''
+Attributes:
+End of attributes
+Children
+    Node ''
+    Attributes:
+    0 = JSON Test Pattern pass1
+    End of attributes
+    Children
+    End of children
+    Node ''
+    Attributes:
+    End of attributes
+    Children
+        Node 'object with 1 member'
+        Attributes:
+        End of attributes
+        Children
+            Node ''
+            Attributes:
+            0 = array with 1 element
+            End of attributes
+            Children
+            End of children
+        End of children
+    End of children
+    Node ''
+    Attributes:
+    End of attributes
+    Children
+    End of children
+    Node ''
+    Attributes:
+    End of attributes
+    Children
+    End of children
+    Node ''
+    Attributes:
+    0 = -42
+    End of attributes
+    Children
+    End of children
+    Node ''
+    Attributes:
+    0 = true
+    End of attributes
+    Children
+    End of children
+    Node ''
+    Attributes:
+    0 = false
+    End of attributes
+    Children
+    End of children
+    Node ''
+    Attributes:
+    0 = 
+    End of attributes
+    Children
+    End of children
+    Node ''
+    Attributes:
+    End of attributes
+    Children
+        Node 'integer'
+        Attributes:
+        0 = 1234567890
+        End of attributes
+        Children
+        End of children
+        Node 'real'
+        Attributes:
+        0 = -9876.543210
+        End of attributes
+        Children
+        End of children
+        Node 'e'
+        Attributes:
+        0 = 0.123456789e-12
+        End of attributes
+        Children
+        End of children
+        Node 'E'
+        Attributes:
+        0 = 1.234567890E+34
+        End of attributes
+        Children
+        End of children
+        Node ''
+        Attributes:
+        0 = 23456789012E66
+        End of attributes
+        Children
+        End of children
+        Node 'zero'
+        Attributes:
+        0 = 0
+        End of attributes
+        Children
+        End of children
+        Node 'one'
+        Attributes:
+        0 = 1
+        End of attributes
+        Children
+        End of children
+        Node 'space'
+        Attributes:
+        0 =  
+        End of attributes
+        Children
+        End of children
+        Node 'quote'
+        Attributes:
+        0 = "
+        End of attributes
+        Children
+        End of children
+        Node 'backslash'
+        Attributes:
+        0 = \
+        End of attributes
+        Children
+        End of children
+        Node 'controls'
+        Attributes:
+        0 = 
+	
+        End of attributes
+        Children
+        End of children
+        Node 'slash'
+        Attributes:
+        0 = / & /
+        End of attributes
+        Children
+        End of children
+        Node 'alpha'
+        Attributes:
+        0 = abcdefghijklmnopqrstuvwxyz
+        End of attributes
+        Children
+        End of children
+        Node 'ALPHA'
+        Attributes:
+        0 = ABCDEFGHIJKLMNOPQRSTUVWXYZ
+        End of attributes
+        Children
+        End of children
+        Node 'digit'
+        Attributes:
+        0 = 0123456789
+        End of attributes
+        Children
+        End of children
+        Node '0123456789'
+        Attributes:
+        0 = digit
+        End of attributes
+        Children
+        End of children
+        Node 'special'
+        Attributes:
+        0 = `1~!@#$%^&*()_+-={':[,]}|;.</>?
+        End of attributes
+        Children
+        End of children
+        Node 'hex'
+        Attributes:
+        0 = ģ䕧覫췯ꯍ
+        End of attributes
+        Children
+        End of children
+        Node 'true'
+        Attributes:
+        0 = true
+        End of attributes
+        Children
+        End of children
+        Node 'false'
+        Attributes:
+        0 = false
+        End of attributes
+        Children
+        End of children
+        Node 'null'
+        Attributes:
+        End of attributes
+        Children
+        End of children
+        Node 'array'
+        Attributes:
+        End of attributes
+        Children
+            Node ''
+            Attributes:
+            End of attributes
+            Children
+            End of children
+        End of children
+        Node 'object'
+        Attributes:
+        End of attributes
+        Children
+            Node ''
+            Attributes:
+            End of attributes
+            Children
+            End of children
+        End of children
+        Node 'address'
+        Attributes:
+        0 = 50 St. James Street
+        End of attributes
+        Children
+        End of children
+        Node 'url'
+        Attributes:
+        0 = http://www.JSON.org/
+        End of attributes
+        Children
+        End of children
+        Node 'comment'
+        Attributes:
+        0 = // /* <!-- --
+        End of attributes
+        Children
+        End of children
+        Node '# -- --> */'
+        Attributes:
+        0 =  
+        End of attributes
+        Children
+        End of children
+        Node ' s p a c e d '
+        Attributes:
+        End of attributes
+        Children
+            Node ''
+            Attributes:
+            0 = 1
+            1 = 2
+            2 = 3
+            3 = 4
+            4 = 5
+            5 = 6
+            6 = 7
+            End of attributes
+            Children
+            End of children
+        End of children
+        Node 'compact'
+        Attributes:
+        End of attributes
+        Children
+            Node ''
+            Attributes:
+            0 = 1
+            1 = 2
+            2 = 3
+            3 = 4
+            4 = 5
+            5 = 6
+            6 = 7
+            End of attributes
+            Children
+            End of children
+        End of children
+        Node 'jsontext'
+        Attributes:
+        0 = {"object with 1 member":["array with 1 element"]}
+        End of attributes
+        Children
+        End of children
+        Node 'quotes'
+        Attributes:
+        0 = &#34; " %22 0x22 034 &#x22;
+        End of attributes
+        Children
+        End of children
+        Node '/\"쫾몾ꮘﳞ볚
+	`1~!@#$%^&*()_+-=[]{}|;:',./<>?'
+        Attributes:
+        0 = A key can be any string
+        End of attributes
+        Children
+        End of children
+    End of children
+    Node ''
+    Attributes:
+    0 = 0.5
+    End of attributes
+    Children
+    End of children
+    Node ''
+    Attributes:
+    0 = 98.6
+    End of attributes
+    Children
+    End of children
+    Node ''
+    Attributes:
+    0 = 99.44
+    End of attributes
+    Children
+    End of children
+    Node ''
+    Attributes:
+    0 = 1066
+    End of attributes
+    Children
+    End of children
+    Node ''
+    Attributes:
+    0 = 1e1
+    End of attributes
+    Children
+    End of children
+    Node ''
+    Attributes:
+    0 = 0.1e1
+    End of attributes
+    Children
+    End of children
+    Node ''
+    Attributes:
+    0 = 1e-1
+    End of attributes
+    Children
+    End of children
+    Node ''
+    Attributes:
+    0 = 1e00
+    End of attributes
+    Children
+    End of children
+    Node ''
+    Attributes:
+    0 = 2e+00
+    End of attributes
+    Children
+    End of children
+    Node ''
+    Attributes:
+    0 = 2e-00
+    End of attributes
+    Children
+    End of children
+    Node ''
+    Attributes:
+    0 = rosebud
+    End of attributes
+    Children
+    End of children
+End of children

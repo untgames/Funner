@@ -98,11 +98,13 @@ void bind_common_property_map (script::Environment&);
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Загрузка/сохранение
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    static Pointer LoadXml           (const char* file_name);
-    static Pointer LoadXmlFromFile   (const char* file_name);
-    static Pointer LoadXmlFromString (const char* string);
-           void    SaveXml           (const char* file_name);
-           void    SafeSaveXml       (const char* file_name);           
+    static Pointer LoadXml            (const char* file_name);
+    static Pointer LoadXmlFromFile    (const char* file_name);
+    static Pointer LoadXmlFromString  (const char* string);
+    static Pointer LoadJsonFromFile   (const char* file_name);
+    static Pointer LoadJsonFromString (const char* string);
+           void    SaveXml            (const char* file_name);
+           void    SafeSaveXml        (const char* file_name);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Поиск узла

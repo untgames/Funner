@@ -9,7 +9,7 @@ export.link.engine.script_binds.bv.IMPORTS       := link.engine.script_binds
 
 # Link common exports
 export.link.engine.script_binds.common.LINK_INCLUDES := CommonScriptBind
-export.link.engine.script_binds.common.IMPORTS       := link.engine.script_binds link.common.xml
+export.link.engine.script_binds.common.IMPORTS       := link.engine.script_binds link.common.xml link.common.json
 
 # Link engine exports
 export.link.engine.script_binds.engine.LINK_INCLUDES := EngineScriptBind

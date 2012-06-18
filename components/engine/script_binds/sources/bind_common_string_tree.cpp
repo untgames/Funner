@@ -217,16 +217,19 @@ struct StringNode::Impl
     return LoadXmlFromFile (file_name);
   }
 
-  static Pointer LoadXmlFromFile (const char* file_name)
+  static Pointer LoadFromFile (const char* file_name, const char* format)
   {
     static const char* METHOD_NAME = "script::binds::StringNode::LoadXmlFromFile";
 
     if (!file_name)
       throw xtl::make_null_argument_exception (METHOD_NAME, "file_name");
 
+    if (!format)
+      throw xtl::make_null_argument_exception (METHOD_NAME, "format");
+
     Pointer return_value (new StringNode, false);
 
-    Parser parser (file_name);
+    Parser parser (file_name, format);
     ParseLog parse_log = parser.Log ();
 
     for (size_t i = 0; i < parse_log.MessagesCount (); i++)
@@ -247,16 +250,19 @@ struct StringNode::Impl
     return return_value;
   }
 
-  static Pointer LoadXmlFromString (const char* string)
+  static Pointer LoadFromString (const char* string, const char* format)
   {
     static const char* METHOD_NAME = "script::binds::StringNode::LoadXmlFromString";
 
     if (!string)
       throw xtl::make_null_argument_exception (METHOD_NAME, "file_name");
 
+    if (!format)
+      throw xtl::make_null_argument_exception (METHOD_NAME, "format");
+
     Pointer return_value (new StringNode, false);
 
-    Parser parser (string);
+    Parser parser (string, format);
     ParseLog parse_log = parser.Log ();
 
     for (size_t i = 0; i < parse_log.MessagesCount (); i++)
@@ -681,12 +687,22 @@ StringNode::Pointer StringNode::LoadXml (const char* file_name)
 
 StringNode::Pointer StringNode::LoadXmlFromFile (const char* file_name)
 {
-  return Impl::LoadXmlFromFile (file_name);
+  return Impl::LoadFromFile (file_name, "xml");
 }
 
 StringNode::Pointer StringNode::LoadXmlFromString (const char* string)
 {
-  return Impl::LoadXmlFromString (string);
+  return Impl::LoadFromString (string, "xml");
+}
+
+StringNode::Pointer StringNode::LoadJsonFromFile (const char* file_name)
+{
+  return Impl::LoadFromFile (file_name, "json");
+}
+
+StringNode::Pointer StringNode::LoadJsonFromString (const char* string)
+{
+  return Impl::LoadFromString (string, "json");
 }
 
 void StringNode::SaveXml (const char* file_name)
@@ -828,7 +844,9 @@ void bind_common_string_tree (Environment& environment)
   lib.Register ("RemoveAllChildren",   make_invoker (&StringNode::RemoveAllChildren));
   lib.Register ("LoadXml",             make_invoker (&StringNode::LoadXml));
   lib.Register ("LoadXmlFromString",   make_invoker (&StringNode::LoadXmlFromString));
-  lib.Register ("LoadXmlFromString",   make_invoker (&StringNode::LoadXmlFromFile));
+  lib.Register ("LoadXmlFromFile",     make_invoker (&StringNode::LoadXmlFromFile));
+  lib.Register ("LoadJsonFromString",  make_invoker (&StringNode::LoadJsonFromString));
+  lib.Register ("LoadJsonFromFile",    make_invoker (&StringNode::LoadJsonFromFile));
   lib.Register ("SaveXml",             make_invoker (&StringNode::SaveXml));
   lib.Register ("SafeSaveXml",         make_invoker (&StringNode::SafeSaveXml));  
   lib.Register ("Find",                make_invoker (
