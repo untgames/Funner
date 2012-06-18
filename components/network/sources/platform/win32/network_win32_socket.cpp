@@ -481,12 +481,7 @@ class WinSocket : public SocketImpl, public xtl::reference_counter
     {
       try
       {
-        timeval timeout;
-
-        timeout.tv_sec  = timeout_in_milliseconds / 1000;
-        timeout.tv_usec = (timeout_in_milliseconds % 1000) * 1000;
-
-        SetSocketOption<timeval> (SO_RCVTIMEO, timeout);
+        SetSocketOption<DWORD> (SO_RCVTIMEO, (DWORD)timeout_in_milliseconds);
         
         int received_bytes = recv (socket, (char*)buffer, size, 0);
 
@@ -523,12 +518,7 @@ class WinSocket : public SocketImpl, public xtl::reference_counter
     {
       try
       {
-        timeval timeout;
-
-        timeout.tv_sec  = timeout_in_milliseconds / 1000;
-        timeout.tv_usec = (timeout_in_milliseconds % 1000) * 1000;
-
-        SetSocketOption<timeval> (SO_SNDTIMEO, timeout);
+        SetSocketOption<DWORD> (SO_SNDTIMEO, (DWORD)timeout_in_milliseconds);
 
         int sent_bytes = send (socket, (const char*)buffer, size, 0);
 
