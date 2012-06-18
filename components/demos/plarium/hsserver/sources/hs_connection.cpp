@@ -173,7 +173,7 @@ void* receive_function (void* user_data)
       unsigned short* plugin_id    = (unsigned short*)(packet_header_buffer + 2);
       unsigned int*   message_size = (unsigned int*)(packet_header_buffer + 4);
 
-      if (*message_size > current_buffer_size)
+      if (*message_size >= current_buffer_size)
       {
         delete [] receive_buffer;
 
@@ -261,6 +261,8 @@ void* receive_function (void* user_data)
         message_body      = decompress_buffer;
         message_body_size = *uncompressed_size;
       }
+
+      message_body [message_body_size] = 0;
 
       data->listener.OnMessageReceived (*plugin_id, message_body, message_body_size);
       data->listener.Log (format ("Message received '%s'", message_body).c_str ());
