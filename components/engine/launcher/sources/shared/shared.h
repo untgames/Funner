@@ -17,8 +17,9 @@
 #include <xtl/string.h>
 #include <xtl/trackable.h>
 
-#include <common/file.h>
+#include <common/action_queue.h>
 #include <common/console.h>
+#include <common/file.h>
 #include <common/license_manager.h>
 #include <common/log.h>
 #include <common/parser.h>
@@ -27,6 +28,7 @@
 #include <common/xml_writer.h>
 
 #include <syslib/application.h>
+#include <syslib/thread.h>
 #include <syslib/window.h>
 
 #include <engine/attachments.h>

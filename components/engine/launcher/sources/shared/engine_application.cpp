@@ -52,6 +52,7 @@ class Application: public IEngine
     Application ()
       : environment_variables_file ((size_t)0, common::FileMode_ReadWrite | common::FileMode_Create)
       , notification_connection (syslib::Application::RegisterNotificationHandler ("*", xtl::bind (&Application::OnNotification, this, _1)))
+      , main_thread_id (syslib::Thread::GetCurrentThreadId ())
     {
       has_main_loop      = DEFAULT_HAS_MAIN_LOOP;
       configuration_name = DEFAULT_CONFIGURATION_FILE_NAME;
@@ -192,6 +193,9 @@ class Application: public IEngine
     {
       try
       {
+        if (syslib::Thread::GetCurrentThreadId () != main_thread_id)
+          throw xtl::format_operation_exception ("", "Run must be called only from the thread in which object was created");
+
         if (!need_print_help && !need_print_version)
         {
             //загрузка лицензии
@@ -228,7 +232,7 @@ class Application: public IEngine
       }
       catch (std::exception& exception)
       {
-        printf ("exception: %s\n", exception.what ());
+        printf ("exception at Application::RunEntry: %s\n", exception.what ());
         fflush (stdout);
       }
       catch (...)
@@ -238,23 +242,13 @@ class Application: public IEngine
       }      
     }
 
-    ///«апуск главного цикла
+    ///¬ыполнение внешних комманд
     void Execute (const char* command)
     {
-      try
-      {
-        manager.Execute (command);
-      }
-      catch (std::exception& exception)
-      {
-        printf ("exception at Application::Execute: %s\n", exception.what ());
-        fflush (stdout);
-      }
-      catch (...)
-      {
-        printf ("unknown exception at Application::Execute\n");
-        fflush (stdout);
-      }
+      if (syslib::Thread::GetCurrentThreadId () == main_thread_id)
+        ExecuteImpl (command);
+      else
+        common::ActionQueue::PushAction (xtl::bind (&Application::ExecuteOnMainThread, this, stl::string (command)), common::ActionThread_Main);
     }
 
     ///ѕосылка оповещени€
@@ -398,6 +392,30 @@ class Application: public IEngine
     }
 
   private:
+///¬ыполнение внешних комманд
+    void ExecuteImpl (const char* command)
+    {
+      try
+      {
+        manager.Execute (command);
+      }
+      catch (std::exception& exception)
+      {
+        printf ("exception at Application::Execute: %s\n", exception.what ());
+        fflush (stdout);
+      }
+      catch (...)
+      {
+        printf ("unknown exception at Application::Execute\n");
+        fflush (stdout);
+      }
+    }
+
+    void ExecuteOnMainThread (const stl::string& command)
+    {
+      ExecuteImpl (command.c_str ());
+    }
+
 ///ќбработчик оповещений приложени€
     void OnNotification (const char* notification)
     {
@@ -490,17 +508,18 @@ class Application: public IEngine
     typedef stl::list<NotificationListenerDescPtr>       NotificationListeners;
 
   private:
-    SubsystemManager      manager;                    //менеджер подсистем
-    bool                  has_main_loop;              //есть ли главный цикл приложени€
-    bool                  has_explicit_configuration; //конфигураци€ приложени€ указана €вно
-    stl::string           configuration_name;         //им€ конфигурации
-    bool                  need_print_version;         //нужно распечатать строку версии
-    bool                  need_print_help;            //нужно распечатать помощь по запуску приложени€
-    common::StringArray   commands;                   //команды на выполнение подсистемами
-    common::StringArray   search_paths;               //пути поиска
-    common::MemFile       environment_variables_file; //файл с переменными среды, указанными при запуске
-    NotificationListeners notification_listeners;     //слушатели оповещений приложени€
-    xtl::auto_connection  notification_connection;    //соедениние оповещений приложени€
+    SubsystemManager           manager;                    //менеджер подсистем
+    bool                       has_main_loop;              //есть ли главный цикл приложени€
+    bool                       has_explicit_configuration; //конфигураци€ приложени€ указана €вно
+    stl::string                configuration_name;         //им€ конфигурации
+    bool                       need_print_version;         //нужно распечатать строку версии
+    bool                       need_print_help;            //нужно распечатать помощь по запуску приложени€
+    common::StringArray        commands;                   //команды на выполнение подсистемами
+    common::StringArray        search_paths;               //пути поиска
+    common::MemFile            environment_variables_file; //файл с переменными среды, указанными при запуске
+    NotificationListeners      notification_listeners;     //слушатели оповещений приложени€
+    xtl::auto_connection       notification_connection;    //соедениние оповещений приложени€
+    syslib::Thread::threadid_t main_thread_id;             //идентификатор главной нити
 };
 
 }
