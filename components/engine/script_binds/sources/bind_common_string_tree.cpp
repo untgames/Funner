@@ -262,7 +262,7 @@ struct StringNode::Impl
 
     Pointer return_value (new StringNode, false);
 
-    Parser parser (string, format);
+    Parser parser (format, xtl::xstrlen (string), string, format);
     ParseLog parse_log = parser.Log ();
 
     for (size_t i = 0; i < parse_log.MessagesCount (); i++)
