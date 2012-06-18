@@ -13,6 +13,7 @@ InputSceneCollection::InputSceneCollection ()
 
 InputSceneCollection::~InputSceneCollection ()
 {
+  scenes.clear ();
 }
 
 /*
@@ -26,15 +27,22 @@ InputScenePtr InputSceneCollection::GetScene (scene_graph::Scene& scene)
     InputSceneMap::iterator iter = scenes.find (&scene);
     
     if (iter != scenes.end ())
-      return iter->second;
+      return iter->second.scene;
       
-    InputScenePtr input_scene (new InputScene (scene), false);
+    SceneDesc& desc = scenes [&scene];
     
-    connect_tracker (scene.Root ().RegisterEventHandler (NodeEvent_AfterDestroy, xtl::bind (&InputSceneCollection::OnSceneDestroyed, this, &scene)));
-    
-    scenes.insert_pair (&scene, input_scene);
-    
-    return input_scene;
+    try
+    {
+      desc.scene              = InputScenePtr (new InputScene (scene), false);
+      desc.on_scene_destroyed = scene.Root ().RegisterEventHandler (NodeEvent_AfterDestroy, xtl::bind (&InputSceneCollection::OnSceneDestroyed, this, &scene));
+      
+      return desc.scene;
+    }
+    catch (...)
+    {
+      scenes.erase (&scene);
+      throw;
+    }      
   }
   catch (xtl::exception& e)
   {
