@@ -173,9 +173,10 @@ struct Application::Impl : public INotificationListener, public IHsConnectionEve
       }
 
       *replaced_char = 0;
+
+      message = message_buffer;
     }
 
-    //TODO escape ' symbols
     engine->Execute (format ("lua: OnHsConnectionMessage (%d, '%s')", plugin_id, message).c_str ());
   }
 
