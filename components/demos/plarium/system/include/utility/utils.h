@@ -2,6 +2,7 @@
 #define UTILITY_UTILS_HEADER
 
 #include <string>
+#include <vector>
 
 namespace plarium
 {
@@ -11,6 +12,9 @@ namespace utility
 
 //Print to std::string
 std::string format (const char* format,...);
+
+//split string
+std::vector<std::string> split (const char* str, const char* delimiters=" ", const char* brackets="");
 
 //Get current time
 size_t milliseconds ();

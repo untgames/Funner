@@ -39,6 +39,72 @@ std::string format (const char* format,...)
   return vformat (format,list);
 }
 
+std::vector<std::string> split (const char* str, const char* delimiters, const char* brackets)
+{
+  std::vector<std::string> return_value;
+  const char*              start;               //next word start
+  bool                     start_found = false; //was start found
+  const char*              active_bracket = 0;
+
+  for (; *str; str++)
+  {
+    if (start_found && active_bracket)
+    {
+      if (*active_bracket == *str)
+      {
+        return_value.push_back (std::string (start, str - start));
+        start_found    = false;
+        active_bracket = 0;
+      }
+
+      continue;
+    }
+
+    bool is_delimiter = false;
+
+    for (const char* delimiter = delimiters; *delimiter; delimiter++)
+    {
+      if (*delimiter == *str)
+      {
+        is_delimiter = true;
+        break;
+      }
+    }
+
+    if (is_delimiter)
+    {
+      if (start_found)
+      {
+        return_value.push_back (std::string (start, str - start));
+        start_found = false;
+      }
+    }
+    else
+    {
+      if (!start_found)
+      {
+        start = str;
+        start_found = true;
+
+        for (const char* bracket = brackets; *bracket; bracket++)
+        {
+          if (*bracket == *str)
+          {
+            active_bracket = bracket;
+            start++;
+            break;
+          }
+        }
+      }
+    }
+  }
+
+  if (start_found && *start)      //push last word
+    return_value.push_back (std::string (start));
+
+  return return_value;
+}
+
 //Get current time
 size_t milliseconds ()
 {
