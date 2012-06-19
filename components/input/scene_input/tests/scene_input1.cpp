@@ -47,6 +47,7 @@ int main ()
     SceneInputManager manager;
 
     manager.SetScreen (&screen);
+    manager.SetTouchSize (2.0f, InputTransformSpace_Camera);
 
     manager.ProcessEvent ("CursorX axis 0");
     manager.ProcessEvent ("CursorY axis 0");

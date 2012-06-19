@@ -69,3 +69,54 @@ void InputScene::OnInputZoneDestroyed (const scene_graph::InputZoneModel* zone)
 {
   entities.erase (zone);
 }
+
+/*
+    Обработка события нажатия
+*/
+
+namespace
+{
+
+struct TouchTraverser: public INodeTraverser
+{
+  InputScene&        scene;
+  const TouchEvent&  event;
+  const math::vec3f& touch_world_position;
+  bool&              touch_catched;
+  
+  TouchTraverser (InputScene& in_scene, const TouchEvent& in_event, const math::vec3f& in_touch_world_position, bool& in_touch_catched)
+    : scene (in_scene)
+    , event (in_event)
+    , touch_world_position (in_touch_world_position)
+    , touch_catched (in_touch_catched)
+  {
+  }
+
+  void operator () (Node& node)
+  {
+    scene_graph::InputZoneModel* zone = dynamic_cast<scene_graph::InputZoneModel*> (&node);
+
+    if (!zone)
+      return;
+
+//    scene.OnTouch (*zone, event, touch_world_position, touch_catched);
+  }
+};
+
+}
+
+void InputScene::OnTouch (const TouchEvent& event, const math::vec3f& touch_world_position, const frustum& touch_frustum, bool& touch_catched)
+{
+  try
+  {
+    TouchTraverser traverser (*this, event, touch_world_position, touch_catched);
+    
+    scene.Traverse (touch_frustum, traverser);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("input::InputScene::OnTouch(const TouchEvent&,const math::vec3f&,const frustum&,bool&)");
+    throw;
+  }  
+}
+    

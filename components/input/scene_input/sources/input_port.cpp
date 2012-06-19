@@ -12,7 +12,13 @@ InputPort::InputPort (Viewport& in_viewport, bool& in_z_order_changed)
   , z_order_changed (in_z_order_changed)
   , is_active (viewport.IsActive () && viewport.InputState ())
   , need_update (true)
+  , touch_size (1.0f)
+  , touch_size_space (InputTransformSpace_Default)
 {
+  static const size_t PLANES_COUNT = 6;
+
+  touch_frustum.reserve (PLANES_COUNT);
+
   z_order_changed = true;    
 
   OnViewportChangeCamera (viewport.Camera ());
@@ -87,6 +93,17 @@ void InputPort::OnViewportChangeInputState (bool)
 }
 
 /*
+    Размер тача
+*/
+
+void InputPort::SetTouchSize (float size, InputTransformSpace space)
+{
+  touch_size       = size;
+  touch_size_space = space;
+  need_update      = true;
+}
+
+/*
     Обновление параметров области ввода
 */
 
@@ -108,12 +125,26 @@ void InputPort::Update ()
     const scene_graph::Rect& viewport_rect = viewport.Area ();
 
     math::vec3f viewport_offset (float (viewport_rect.left ()), float (viewport_rect.top ()), 0.0f),
-                viewport_scale (1.0f / float (viewport_rect.right () - viewport_rect.left ()), 1.0f / float (viewport_rect.bottom () - viewport_rect.top ()), 1.0f);                
+                viewport_scale (1.0f / float (viewport_rect.right () - viewport_rect.left ()), 1.0f / float (viewport_rect.bottom () - viewport_rect.top ()), 1.0f);
                 
-    position_tm = math::inverse (camera->ProjectionMatrix () * math::inverse (camera->WorldTM ())) * math::translate (math::vec3f (-1.0f)) * 
-      math::scale (2.0f * viewport_scale) * math::translate (-viewport_offset);
+    view_proj_tm           = camera->ProjectionMatrix () * math::inverse (camera->WorldTM ());                
+    normalized_position_tm = math::translate (math::vec3f (-1.0f)) * math::scale (2.0f * viewport_scale) * math::translate (-viewport_offset);
+    position_tm            = math::inverse (view_proj_tm) * normalized_position_tm;
+    
+    switch (touch_size_space)
+    {
+      case InputTransformSpace_Screen:
+        touch_scale = math::vec3f (1.0f) / (math::vec3f (touch_size, touch_size, 1.0f) * viewport_scale);
+        break;
+      case InputTransformSpace_Camera:
+      {
+        math::vec4f normalized_scale = camera->ProjectionMatrix () * math::vec4f (touch_size, touch_size, 0.0f, 0.0f);
+        
+        touch_scale = abs (math::vec3f (2.0f / normalized_scale.x, 2.0f / normalized_scale.y, 1.0f));
 
-    ////????????????????????
+        break;
+      }
+    }    
 
     need_update = false;
   }
@@ -131,15 +162,32 @@ void InputPort::Update ()
 void InputPort::OnTouch (const TouchEvent& event, bool& touch_catched)
 {
   try
-  {
+  {        
     if (need_update)
       Update ();      
+      
+      //перевод координаты в мировую систему координат
 
-    math::vec4f position = position_tm * math::vec4f (event.position.x, event.position.y, 0.0f, 1.0f);
+    math::vec4f source_position (event.position.x, event.position.y, 0.0f, 1.0f),
+                world_position = position_tm * source_position;
+
+    world_position /= world_position.w;    
     
-    position /= position.w;    
-        
-    printf ("position is %f %f -> %f %f %f %f\n", event.position.x, event.position.y, position.x, position.y, position.z, position.w);
+      //получение пирамиды тача
+      
+    math::vec4f normalized_position = normalized_position_tm * source_position;      
+
+    normalized_position /= normalized_position.w;
+    
+    math::mat4f touch_tm = math::scale (touch_scale) * math::translate (math::vec3f (-normalized_position.x, -normalized_position.y)) * view_proj_tm;
+
+    touch_frustum.clear ();
+
+    add_frustum (touch_tm, touch_frustum);
+    
+      //оповещение сцены о возникновении события
+      
+    input_scene->OnTouch (event, math::vec3f (world_position), touch_frustum, touch_catched);    
   }
   catch (xtl::exception& e)
   {

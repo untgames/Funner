@@ -11,6 +11,8 @@
 
 #include <math/utility.h>
 
+#include <bv/plane_list.h>
+
 #include <common/singleton.h>
 
 #include <sg/camera.h>
@@ -27,6 +29,8 @@ namespace input
 class InputScene;
 
 typedef xtl::intrusive_ptr<InputScene> InputScenePtr;
+
+typedef bound_volumes::plane_list<float> frustum;
 
 typedef unsigned int touch_t;
 
@@ -83,6 +87,11 @@ class InputPort: public xtl::reference_counter, public scene_graph::IViewportLis
     void OnViewportChangeZOrder     (int);
     void OnViewportChangeActive     (bool new_state);
     void OnViewportChangeInputState (bool state);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///–азмер тача
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void SetTouchSize (float size, InputTransformSpace);
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///ќбработка событи€ нажати€
@@ -100,14 +109,20 @@ class InputPort: public xtl::reference_counter, public scene_graph::IViewportLis
     void Update ();
 
   private:
-    scene_graph::Viewport& viewport;          //область вывода
-    bool&                  z_order_changed;   //пор€док следовани€ областей ввода изменен
-    InputScenePtr          input_scene;       //сцена ввода
-    bool                   is_active;         //активность области
-    bool                   need_update;       //нужно обновление
-    xtl::auto_connection   on_camera_updated; //соединение с событием обновлени€ камеры
-    xtl::auto_connection   on_scene_changed;  //соединение с событием изменени€ сцены
-    math::mat4f            position_tm;       //матрица преобразовани€ координат
+    scene_graph::Viewport&   viewport;               //область вывода
+    bool&                    z_order_changed;        //пор€док следовани€ областей ввода изменен
+    InputScenePtr            input_scene;            //сцена ввода
+    bool                     is_active;              //активность области
+    bool                     need_update;            //нужно обновление
+    float                    touch_size;             //размер тача
+    InputTransformSpace      touch_size_space;       //система координат размеров тача
+    math::vec3f              touch_scale;            //коэффициент масштабировани€ тача    
+    xtl::auto_connection     on_camera_updated;      //соединение с событием обновлени€ камеры
+    xtl::auto_connection     on_scene_changed;       //соединение с событием изменени€ сцены
+    math::mat4f              normalized_position_tm; //матрица преобразовани€ координат (в систему координат проекции)
+    math::mat4f              position_tm;            //матрица преобразовани€ координат (в мировую систему координат)
+    math::mat4f              view_proj_tm;           //матрица преобразовани€ координат (proj * inv(view))
+    frustum                  touch_frustum;          //пирамида тача
 };
 
 typedef xtl::intrusive_ptr<InputPort> InputPortPtr;
@@ -161,6 +176,11 @@ class InputScene: public xtl::reference_counter, public xtl::noncopyable
 ///—брос состо€ни€ нажатий
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void ResetTouchState ();
+    
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///ќбработка событи€ нажати€
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void OnTouch (const TouchEvent& event, const math::vec3f& touch_world_position, const frustum& touch_frustum, bool& touch_catched);
     
   private:
     void OnInputZoneDestroyed (const scene_graph::InputZoneModel*);

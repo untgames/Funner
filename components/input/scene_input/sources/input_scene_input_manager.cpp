@@ -20,11 +20,15 @@ struct SceneInputManager::Impl: public xtl::reference_counter, public IScreenLis
   math::vec2f          mouse_position;      //положение курсора мыши
   math::vec2f          screen_size;         //размеры экрана
   math::vec2f          screen_offset;       //смещение от начала экрана
+  float                touch_size;          //размер тача
+  InputTransformSpace  touch_size_space;    //система координат размеров тача
   
 ///Конструктор
   Impl ()
     : screen ()
     , need_reorder (false)
+    , touch_size (1.0f)
+    , touch_size_space (InputTransformSpace_Default)
   {
     static const size_t RESERVE_TOKENS_COUNT  = 16;
     static const size_t RESERVE_TOKENS_BUFFER = 256;
@@ -101,6 +105,8 @@ struct SceneInputManager::Impl: public xtl::reference_counter, public IScreenLis
     try
     {
       InputPortPtr input_port (new InputPort (viewport, need_reorder), false);
+      
+      input_port->SetTouchSize (touch_size, touch_size_space);
 
       input_ports.push_back (input_port);
       
@@ -368,6 +374,42 @@ void SceneInputManager::Reset ()
     e.touch ("input::SceneInputManager::Reset");
     throw;
   }
+}
+
+/*
+    Размер тача
+*/
+
+void SceneInputManager::SetTouchSize (float size, InputTransformSpace space)
+{
+  static const char* METHOD_NAME = "input::SceneInputManager::SetTouchSize";
+
+  if (size <= 0.0f)
+    throw xtl::make_argument_exception (METHOD_NAME, "size", size, "Size must be greater than zero");
+
+  switch (space)
+  {
+    case InputTransformSpace_Screen:
+    case InputTransformSpace_Camera:
+      break;
+    default:
+      throw xtl::make_argument_exception (METHOD_NAME, "space", space);
+  }
+
+  impl->touch_size = size;
+  
+  for (InputPortList::iterator iter=impl->input_ports.begin (), end=impl->input_ports.end (); iter!=end; ++iter)
+    (*iter)->SetTouchSize (size, space);
+}
+
+float SceneInputManager::TouchSize () const
+{
+  return impl->touch_size;
+}
+
+InputTransformSpace SceneInputManager::TouchSizeSpace () const
+{
+  return impl->touch_size_space;
 }
 
 /*
