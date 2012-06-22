@@ -14,7 +14,8 @@ struct InputZone::Impl: public xtl::instance_counter<InputZone>
   Impl ()
   {
     zone_desc.position = vec3f (0.0f);  
-    zone_desc.size     = vec2f (1.0f);
+    zone_desc.axis_x   = vec3f (1.0f, 0.0f, 0.0f);
+    zone_desc.axis_y   = vec3f (0.0f, 1.0f, 0.0f);
   }
 };
 
@@ -25,6 +26,8 @@ struct InputZone::Impl: public xtl::instance_counter<InputZone>
 InputZone::InputZone ()
   : impl (new Impl)
 {
+  DisableBoundsAutoUpdate ();
+
   SetBoundBox (bound_volumes::axis_aligned_box <float> (-0.5f, -0.5f, 0, 0.5f, 0.5f, 0));
 }
 

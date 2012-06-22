@@ -37,7 +37,8 @@ class InputZoneModel: public Entity
     struct ZoneDesc
     {
       math::vec3f position;
-      math::vec2f size;
+      math::vec3f axis_x;
+      math::vec3f axis_y;
     };
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -45,6 +46,14 @@ class InputZoneModel: public Entity
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     size_t          ZoneDescsCount () const;
     const ZoneDesc* ZoneDescs      () const;    
+    
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Режим автоматического обновления ограничивающего объема
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void SetBoundsAutoUpdate     (bool state);
+    bool BoundsAutoUpdate        () const;
+    void EnableBoundsAutoUpdate  () { SetBoundsAutoUpdate (true); }
+    void DisableBoundsAutoUpdate () { SetBoundsAutoUpdate (false); }
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Активность зоны
@@ -71,6 +80,17 @@ class InputZoneModel: public Entity
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void Notify                 (const Viewport& viewport, const char* notification_id, const char* notification_params) const;
     bool HasNotificationHandler (const char* notification_id) const;
+    
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Проверка пересечения луча с зонами
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    bool IsIntersected (NodeTransformSpace  transform_space,               //система координат луча
+                        const math::vec3f&  ray_from,                      //начальная координата луча
+                        const math::vec3f&  ray_to,                        //конечная координата луча
+                        size_t&             out_zone_index,                //индекс зоны, с которой пересекся луч
+                        float&              out_ray_intersection_distance, //результирующее расстояние от ray_from до точки пересечения
+                        float&              out_ray_to_zone_distance,      //минимальное расстояние до зоны (0 в случае, если было пересечение)
+                        math::vec2f&        out_zone_intersection_point) const;  //точка пересечения в относительных координатах зоны
 
   protected:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -100,6 +120,13 @@ class InputZoneModel: public Entity
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     virtual size_t          ZoneDescsCountCore () = 0;
     virtual const ZoneDesc* ZoneDescsCore      () = 0;
+    
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Оповещения
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void AfterUpdateWorldTransformEvent ();
+    void UpdateZoneInternals ();
+    void UpdateZoneBounds ();
   
   private:
     struct Impl;
