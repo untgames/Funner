@@ -150,3 +150,21 @@ plane_side side (const plane<T>& p, const vector<T, 3>& point, const T& eps)
 
   return plane_side_none;
 }
+
+/*
+    ¬озвращает точку пересечени€ луча с плоскостью
+*/
+
+template <class T>
+bool intersect (const plane<T>& p, const vector<T, 3>& ray_start, const vector<T, 3>& ray_dir, float& scale, const T& eps)
+{
+  T d1 = dot (p.normal (), ray_start) + p [3],
+    d2 = dot (p.normal (), ray_dir);
+
+  if (d2 >= -eps && d2 <= eps)
+    return false;
+
+  scale = -d1 / d2;
+
+  return true;
+}
