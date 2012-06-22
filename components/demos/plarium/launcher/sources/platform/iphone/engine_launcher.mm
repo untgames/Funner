@@ -2,6 +2,8 @@
 #import <Foundation/NSBundle.h>
 #import <Foundation/NSFileManager.h>
 
+#include <cstdio>
+
 #include <launcher/application.h>
 
 using namespace engine;
