@@ -447,7 +447,7 @@ bool InputZoneModel::IsIntersected
     out_ray_intersection_distance = 0.0f;
     out_ray_to_zone_distance      = 0.0f;
     out_zone_index                = 0;
-    out_zone_intersection_point   = math::vec2f (0.0f);
+    out_zone_intersection_point   = math::vec2f (0.0f);    
       
     for (ZoneImplArray::iterator iter=impl->zones_impl.begin (), end=impl->zones_impl.end (); iter!=end; ++iter)
     {
@@ -459,7 +459,7 @@ bool InputZoneModel::IsIntersected
         continue;
         
       if (intersected && (distance < 0.0f || distance >= out_ray_intersection_distance))
-        continue;
+        continue;        
         
       math::vec3f local_intersection = local_ray_from + local_ray_dir * distance,
                   zone_intersection  = zone_impl.inv_basis * local_intersection;            

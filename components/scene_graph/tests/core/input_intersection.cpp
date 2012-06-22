@@ -18,7 +18,7 @@ void check (const InputZoneModel& zone, NodeTransformSpace space, const math::ve
     case NodeTransformSpace_World:  space_str = "world"; break;        
   }
     
-  printf ("%s: space=%s, ray_start=[%.2f, %.2f, %.2f], ray_dir=[%.2f, %.2f, %.2f], ray_distance=%.2f, edge_distance=%.2f, zone_index=%u, point=[%.2f, %.2f]\n",
+  printf ("%s: space=%s, ray_start=[%.3f, %.3f, %.3f], ray_dir=[%.3f, %.3f, %.3f], ray_distance=%.3f, edge_distance=%.3f, zone_index=%u, point=[%.3f, %.3f]\n",
     intersected ? " in" : "out", space_str, start.x, start.y, start.z, dir.x, dir.y, dir.z, ray_intersection_distance, ray_to_zone_distance,
     zone_index, intersection_point.x, intersection_point.y);
 }
@@ -40,7 +40,7 @@ int main ()
   check (*zone, NodeTransformSpace_Local, math::vec3f (0.5f, 0.51f, -1.0f), math::vec3f (0.0f, 0.0f, 2.0f));  
   check (*zone, NodeTransformSpace_Local, math::vec3f (0.0f, 0.0f, -1.0f), math::vec3f (0.0f, 0.0f, 0.5f));  
   check (*zone, NodeTransformSpace_World, math::vec3f (0.0f, 0.0f, -1.0f), math::vec3f (0.0f, 0.0f, 2.0f));    
-  check (*zone, NodeTransformSpace_World, math::vec3f (0.5f, 0.51f, -1.0f), math::vec3f (0.0f, 0.0f, 2.0f));     //????????
+  check (*zone, NodeTransformSpace_World, math::vec3f (0.5f, 0.51f, -1.0f), math::vec3f (0.0f, 0.0f, 2.0f));    
 
   return 0;
 }
