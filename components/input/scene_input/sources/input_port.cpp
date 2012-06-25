@@ -128,8 +128,9 @@ void InputPort::Update ()
                 viewport_scale (1.0f / float (viewport_rect.right () - viewport_rect.left ()), 1.0f / float (viewport_rect.bottom () - viewport_rect.top ()), 1.0f);
                 
     view_proj_tm           = camera->ProjectionMatrix () * math::inverse (camera->WorldTM ());                
+    inv_view_proj_tm       = math::inverse (view_proj_tm);
     normalized_position_tm = math::translate (math::vec3f (-1.0f)) * math::scale (2.0f * viewport_scale) * math::translate (-viewport_offset);
-    position_tm            = math::inverse (view_proj_tm) * normalized_position_tm;
+    position_tm            = inv_view_proj_tm * normalized_position_tm;
     
     switch (touch_size_space)
     {
@@ -175,19 +176,21 @@ void InputPort::OnTouch (const TouchEvent& event, bool& touch_catched)
     
       //получение пирамиды тача
       
-    math::vec4f normalized_position = normalized_position_tm * source_position;      
+    math::vec4f normalized_position = normalized_position_tm * source_position, normalized_direction (0.0f, 0.0f, 2.0f, 0.0f);
 
     normalized_position /= normalized_position.w;
+    
+    math::vec4f world_direction = inv_view_proj_tm * normalized_direction;
     
     math::mat4f touch_tm = math::scale (touch_scale) * math::translate (math::vec3f (-normalized_position.x, -normalized_position.y)) * view_proj_tm;
 
     touch_frustum.clear ();
 
     add_frustum (touch_tm, touch_frustum);
-    
+
       //оповещение сцены о возникновении события
       
-    input_scene->OnTouch (event, math::vec3f (world_position), touch_frustum, touch_catched);    
+    input_scene->OnTouch (event, math::vec3f (world_position), math::vec3f (world_direction), touch_frustum, touch_catched);
   }
   catch (xtl::exception& e)
   {

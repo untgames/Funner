@@ -28,6 +28,9 @@ int main ()
     
     InputZone::Pointer zone = InputZone::Create ();
     
+    zone->SetName ("zone1");
+    
+    zone->Translate (50.0f, -50.0f, 0.0f);
     zone->SetScale (10.0f, 10.0f, 1.0f);
     
     zone->RegisterNotificationHandler (&input_notify);

@@ -122,6 +122,7 @@ class InputPort: public xtl::reference_counter, public scene_graph::IViewportLis
     math::mat4f              normalized_position_tm; //матрица преобразования координат (в систему координат проекции)
     math::mat4f              position_tm;            //матрица преобразования координат (в мировую систему координат)
     math::mat4f              view_proj_tm;           //матрица преобразования координат (proj * inv(view))
+    math::mat4f              inv_view_proj_tm;       //матрица обратного преобразования координат (inv (proj * inv(view)))
     frustum                  touch_frustum;          //пирамида тача
 };
 
@@ -143,6 +144,11 @@ class InputEntity: public xtl::reference_counter, public xtl::noncopyable
 ///Присоединенная зона ввода
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     const scene_graph::InputZoneModel& Zone () { return zone; }
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Обработка события нажатия
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void OnTouch (const TouchEvent& event, const math::vec3f& touch_world_position, const math::vec2f& touch_local_position); 
   
   private:
     const scene_graph::InputZoneModel& zone;
@@ -180,7 +186,7 @@ class InputScene: public xtl::reference_counter, public xtl::noncopyable
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Обработка события нажатия
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void OnTouch (const TouchEvent& event, const math::vec3f& touch_world_position, const frustum& touch_frustum, bool& touch_catched);
+    void OnTouch (const TouchEvent& event, const math::vec3f& touch_world_position, const math::vec3f& touch_world_direction, const frustum& touch_frustum, bool& touch_catched);
     
   private:
     void OnInputZoneDestroyed (const scene_graph::InputZoneModel*);
