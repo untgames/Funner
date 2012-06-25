@@ -89,7 +89,7 @@ class InputZoneModel: public Entity
                         const math::vec3f&  ray_to,                        //конечная координата луча
                         size_t&             out_zone_index,                //индекс зоны, с которой пересекся луч
                         float&              out_ray_intersection_distance, //результирующее расстояние от ray_from до точки пересечения
-                        float&              out_ray_to_zone_distance,      //минимальное расстояние до зоны (0 в случае, если было пересечение)
+                        math::vec3f&        out_ray_to_zone_offset,        //минимальный вектор смещения до зоны (0 в случае, если было пересечение)
                         math::vec2f&        out_zone_intersection_point) const;  //точка пересечения в относительных координатах зоны
 
   protected:

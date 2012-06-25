@@ -390,7 +390,7 @@ bool InputZoneModel::IsIntersected
   const math::vec3f& ray_to,
   size_t&            out_zone_index,
   float&             out_ray_intersection_distance,
-  float&             out_ray_to_zone_distance,
+  math::vec3f&       out_ray_to_zone_offset,
   math::vec2f&       out_zone_intersection_point) const
 {
   try
@@ -443,9 +443,10 @@ bool InputZoneModel::IsIntersected
       //проверка пересечения
       
     bool intersected = false, quasi_intersected = false;
+    
+    float min_ray_to_zone_distance = 0.0f;    
 
     out_ray_intersection_distance = 0.0f;
-    out_ray_to_zone_distance      = 0.0f;
     out_zone_index                = 0;
     out_zone_intersection_point   = math::vec2f (0.0f);    
       
@@ -486,25 +487,26 @@ bool InputZoneModel::IsIntersected
         if (is_inside_zone)
         {
           intersected              = distance >= 0.0f && distance <= 1.0f;
-          out_ray_to_zone_distance = 0.0f;
+          min_ray_to_zone_distance = 0.0f;
+          out_ray_to_zone_offset   = 0.0f;
         }
         else
         {
           math::vec3f nearest_intersection = zone_impl.basis * normalized_zone_intersection;
           
-          float ray_to_zone_distance = 0.0f;
+          math::vec3f ray_to_zone_offset;
                      
           switch (transform_space)
           {
             default:            
             case NodeTransformSpace_Local:
-              ray_to_zone_distance = length (nearest_intersection - local_intersection);
+              ray_to_zone_offset = nearest_intersection - local_intersection;
               break;
             case NodeTransformSpace_Parent:
             {
               const math::mat4f& local_tm = LocalTM ();
 
-              ray_to_zone_distance = length (local_tm * nearest_intersection - local_tm * local_intersection);
+              ray_to_zone_offset = local_tm * nearest_intersection - local_tm * local_intersection;
 
               break;
             }
@@ -512,16 +514,19 @@ bool InputZoneModel::IsIntersected
             {
               const math::mat4f& world_tm = LocalTM ();
 
-              ray_to_zone_distance = length (world_tm * nearest_intersection - world_tm * local_intersection);
+              ray_to_zone_offset = world_tm * nearest_intersection - world_tm * local_intersection;
 
               break;
             }
           }
           
-          if (quasi_intersected && ray_to_zone_distance > out_ray_to_zone_distance)
+          float ray_to_zone_distance = length (ray_to_zone_offset);
+          
+          if (quasi_intersected && ray_to_zone_distance > min_ray_to_zone_distance)
             continue;
             
-          out_ray_to_zone_distance = ray_to_zone_distance;
+          out_ray_to_zone_offset   = ray_to_zone_offset;
+          min_ray_to_zone_distance = ray_to_zone_distance;
           quasi_intersected        = true;
         }
       }
