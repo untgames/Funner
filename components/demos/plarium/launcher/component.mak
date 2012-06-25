@@ -18,7 +18,6 @@ endif
 ifneq (,$(filter macosx,$(PROFILES)))
 PLARIUM.LAUNCHER.SOURCES.TYPE               := application
 endif
-PLARIUM.LAUNCHER.SOURCES.macosx.TYPE        := application
 PLARIUM.LAUNCHER.SOURCES.INCLUDE_DIRS       := include
 PLARIUM.LAUNCHER.SOURCES.SOURCE_DIRS        := sources/shared
 PLARIUM.LAUNCHER.SOURCES.macosx.LINK_FLAGS  := -framework Foundation -framework AppKit

@@ -358,20 +358,7 @@ size_t TcpClient::Send (const void* buffer, size_t size, size_t timeout_in_milli
       return 0;
 
     if (error_code == CONNECTION_RESET_ERROR)
-    {
-      try
-      {
-        Disconnect ();
-      }
-      catch (...)
-      {
-      }
-
-      if (impl->listener)
-        impl->listener->OnDisconnect (*this);
-
       throw std::runtime_error ("TcpClient::Send - A connection was forcibly closed by a peer.");
-    }
     else
       raise_error ("TcpClient::Send", "::send");
   }
@@ -412,20 +399,7 @@ size_t TcpClient::Receive (void* buffer, size_t size, size_t timeout_in_millisec
 #endif
 
   if ((received_bytes < 0 && error_code == CONNECTION_RESET_ERROR) || !received_bytes)
-  {
-    try
-    {
-      Disconnect ();
-    }
-    catch (...)
-    {
-    }
-
-    if (impl->listener)
-      impl->listener->OnDisconnect (*this);
-
     throw std::runtime_error ("TcpClient::Receive - A connection was forcibly closed by a peer.");
-  }
 
   if (received_bytes < 0)
   {

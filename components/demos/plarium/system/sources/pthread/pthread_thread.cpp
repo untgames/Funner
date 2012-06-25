@@ -105,3 +105,12 @@ void Thread::Sleep (size_t milliseconds)
 {
   usleep (milliseconds * 1000);
 }
+
+/*
+   Current thread id
+*/
+
+size_t Thread::GetCurrentThreadId ()
+{
+  return (size_t)pthread_self ();
+}

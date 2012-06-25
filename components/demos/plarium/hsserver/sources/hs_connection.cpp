@@ -506,6 +506,7 @@ struct HsConnection::Impl : public ITcpClientListener, public IBackgroundThreadL
   std::auto_ptr<Thread>       send_thread;          //thread for sending data
   volatile bool               needs_stop_threads;   //signal to stop background threads
   MessageQueue                send_queue;           //send messages queue
+  size_t                      create_thread_id;     //id of the creator thread
 
   Impl (HsConnection* in_connection, const HsConnectionSettings& in_settings)
     : connection (in_connection)
@@ -514,6 +515,7 @@ struct HsConnection::Impl : public ITcpClientListener, public IBackgroundThreadL
     , state (HsConnectionState_Disconnected)
     , needs_stop_threads (false)
     , send_queue (in_settings.send_queue_size)
+    , create_thread_id (Thread::GetCurrentThreadId ())
   {
     memcpy (&settings, &in_settings, sizeof (settings));
 
@@ -534,6 +536,9 @@ struct HsConnection::Impl : public ITcpClientListener, public IBackgroundThreadL
     if (state != HsConnectionState_Disconnected)
       throw std::logic_error ("HsConnection::Connect - connection already connected");
 
+    if (Thread::GetCurrentThreadId () != create_thread_id)
+      throw std::logic_error ("HsConnection::Connect - can't connect from thread other than main");
+
     state = HsConnectionState_Connecting;
     OnConnectionStateChanged ();
 
@@ -548,6 +553,9 @@ struct HsConnection::Impl : public ITcpClientListener, public IBackgroundThreadL
 
   void Disconnect ()
   {
+    if (Thread::GetCurrentThreadId () != create_thread_id)
+      throw std::logic_error ("HsConnection::Connect - can't connect from thread other than main");
+
     if (state == HsConnectionState_Disconnected)
       return;
 

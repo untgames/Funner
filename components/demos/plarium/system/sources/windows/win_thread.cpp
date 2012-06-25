@@ -107,3 +107,13 @@ void Thread::Sleep (size_t milliseconds)
 {
   ::Sleep (milliseconds);
 }
+
+
+/*
+   Current thread id
+*/
+
+size_t Thread::GetCurrentThreadId ()
+{
+  return (size_t)::GetCurrentThreadId ();
+}
