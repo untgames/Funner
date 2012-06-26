@@ -3,6 +3,42 @@
 using namespace scene_graph;
 
 /*
+    InputZoneNotificationContext
+*/
+
+InputZoneNotificationContext::InputZoneNotificationContext ()
+  : touch_id (0)
+  , button (0)
+{
+}
+
+namespace scene_graph
+{
+
+const char* get_name (InputZoneNotification id)
+{
+  switch (id)
+  {
+    case InputZoneNotification_OnPress:             return "OnPress";
+    case InputZoneNotification_OnClick:             return "OnClick";
+    case InputZoneNotification_OnTouchEnter:        return "OnTouchEnter";
+    case InputZoneNotification_OnTouchLeave:        return "OnTouchLeave";
+    case InputZoneNotification_OnTouchMove:         return "OnTouchMove";
+    case InputZoneNotification_OnTouchDown:         return "OnTouchDown";
+    case InputZoneNotification_OnTouchUpInside:     return "OnTouchUpInside";
+    case InputZoneNotification_OnTouchUpOutside:    return "OnTouchUpOutside";
+    case InputZoneNotification_OnTouchClick:        return "OnTouchClick";
+    case InputZoneNotification_OnScreenTouchDown:   return "OnScreenTouchDown";
+    case InputZoneNotification_OnScreenTouchUp:     return "OnScreenTouchUp";
+    case InputZoneNotification_OnScreenTouchMove:   return "OnScreenTouchMove";
+    default:                                        throw xtl::make_argument_exception ("scene_graph::get_name(InputZoneNotification)", "id", id);
+  }
+}
+
+}
+
+
+/*
     Описание реализации зоны ввода
 */
 
@@ -22,12 +58,6 @@ struct ZoneImpl
 
 typedef stl::vector<ZoneImpl> ZoneImplArray;
 
-}
-
-InputZoneNotificationContext::InputZoneNotificationContext ()
-  : touch_id (0)
-  , button (0)
-{
 }
 
 struct InputZoneModel::Impl
