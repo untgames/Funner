@@ -45,6 +45,7 @@ enum TouchState
 };
 
 const touch_t MOUSE_TOUCH_ID = touch_t (~0u); //идентификатор тача мыши
+const int     MOUSE_HOVER_ID = -1;            //идентификатор hover
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Событие нажатия
@@ -217,22 +218,24 @@ class InputEntity: public xtl::reference_counter, private InputEventListener
     {
       touch_t touch;
       int     button;
+      bool    is_inside;
       
       TouchDesc (touch_t in_touch, int in_button)
         : touch (in_touch)
         , button (in_button)
+        , is_inside (true)
        { }
     };
     
     typedef stl::vector<TouchDesc> TouchDescArray;
     
   private:
-    void OnBroadcastTouch    (InputPort& input_port, const TouchEvent& event, const math::vec3f& touch_world_position);
-    void UpdateNotifications ();
-    void UpdateBroadcasts    ();    
-    void AddTouch            (touch_t touch, int button);
-    bool HasTouch            (touch_t touch, int button);
-    void RemoveTouch         (touch_t touch, int button);
+    void       OnBroadcastTouch    (InputPort& input_port, const TouchEvent& event, const math::vec3f& touch_world_position);
+    void       UpdateNotifications ();
+    void       UpdateBroadcasts    ();
+    void       AddTouch            (touch_t touch, int button);
+    TouchDesc* FindTouch           (touch_t touch, int button);
+    void       RemoveTouch         (touch_t touch, int button);
   
   private:  
     const scene_graph::InputZoneModel& zone;

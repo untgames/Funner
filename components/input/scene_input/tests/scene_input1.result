@@ -1,0 +1,5 @@
+Results of scene_input1_test:
+OnTouchEnter: touch=-1, button=-1, world_position=[50.000, -50.000, 0.000] local_position=[-0.000, 0.000]
+OnTouchDown: touch=-1, button=0, world_position=[50.000, -50.000, 0.000] local_position=[-0.000, 0.000]
+OnTouchUpInside: touch=-1, button=0, world_position=[50.000, -50.000, 0.000] local_position=[-0.000, 0.000]
+OnTouchClick: touch=-1, button=0, world_position=[50.000, -50.000, 0.000] local_position=[-0.000, 0.000]

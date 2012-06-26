@@ -48,13 +48,13 @@ void InputEntity::AddTouch (touch_t touch, int button)
   UpdateBroadcasts ();
 }
 
-bool InputEntity::HasTouch (touch_t touch, int button)
+InputEntity::TouchDesc* InputEntity::FindTouch (touch_t touch, int button)
 {
   for (TouchDescArray::iterator iter=touches.begin (), end=touches.end (); iter!=end; ++iter)
     if (iter->touch == touch && iter->button == button)
-      return true;
+      return &*iter;
       
-  return false;
+  return 0;
 }
 
 void InputEntity::RemoveTouch (touch_t touch, int button)
@@ -91,12 +91,10 @@ void InputEntity::OnTouch (InputPort& input_port, const TouchEvent& event, const
     
       //проверка: зафиксировано ли нажатие на зону
 
-    bool has_touch = HasTouch (event.touch, event.button);    
+    TouchDesc* touch_desc = FindTouch (event.touch, event.button);    
     
-    if (has_touch)
+    if (touch_desc && touch_desc->is_inside)
     {
-        //обработка случая после нажатия на зону
-      
       switch (event.state)
       {
         case TouchState_Moving:
@@ -116,18 +114,36 @@ void InputEntity::OnTouch (InputPort& input_port, const TouchEvent& event, const
           break;        
       }
     }
-    else
+    else if (touch_desc)
     {
-        //обработка случая без нажатия на зону        
-        
-      AddTouch (event.touch, event.button); ////???hover?????
-
+      touch_desc->is_inside = true;
+      
       switch (event.state)
       {
-        case TouchState_Moving:          
+        case TouchState_Moving:
           zone.Notify (input_port.AttachedViewport (), InputZoneNotification_OnTouchEnter, context);
           break;
         case TouchState_Pressed:
+          //ignored
+          break;
+        case TouchState_Released:
+          zone.Notify (input_port.AttachedViewport (), InputZoneNotification_OnTouchUpInside, context);
+          zone.Notify (input_port.AttachedViewport (), InputZoneNotification_OnTouchClick, context);
+          break;
+        default:
+          break;        
+      }        
+    }
+    else
+    {      
+      switch (event.state)
+      {
+        case TouchState_Moving:
+          AddTouch (event.touch, event.button);              
+          zone.Notify (input_port.AttachedViewport (), InputZoneNotification_OnTouchEnter, context);
+          break;
+        case TouchState_Pressed:
+          AddTouch (event.touch, event.button);              
           zone.Notify (input_port.AttachedViewport (), InputZoneNotification_OnTouchDown, context);
           break;
         case TouchState_Released:
@@ -136,7 +152,7 @@ void InputEntity::OnTouch (InputPort& input_port, const TouchEvent& event, const
         default:
           break;        
       }        
-    }
+    }    
   }
   catch (xtl::exception& e)
   {
@@ -179,13 +195,17 @@ void InputEntity::OnBroadcastTouch (InputPort& input_port, const TouchEvent& eve
     
       //зависимые оповещения
       
-    if (HasTouch (event.touch, event.button))
+    if (TouchDesc* touch_desc = FindTouch (event.touch, event.button))
     {
       switch (event.state)
       {
         case TouchState_Moving:
-          zone.Notify (input_port.AttachedViewport (), InputZoneNotification_OnTouchLeave, context);
-          ///????????remove????????????
+          if (touch_desc->is_inside)
+          {
+            zone.Notify (input_port.AttachedViewport (), InputZoneNotification_OnTouchLeave, context);
+            touch_desc->is_inside = false;
+          }
+          
           break;
         case TouchState_Pressed:
           //ignored
@@ -196,7 +216,7 @@ void InputEntity::OnBroadcastTouch (InputPort& input_port, const TouchEvent& eve
           break;
         default:
           break;
-      }
+      }              
     }
   }
   catch (xtl::exception& e)

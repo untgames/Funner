@@ -241,7 +241,7 @@ struct SceneInputManager::Impl: public xtl::reference_counter, public IScreenLis
       event.touch    = MOUSE_TOUCH_ID;
       event.state    = TouchState_Moving;
       event.position = mouse_position * screen_size + screen_offset;
-      event.button   = 0;
+      event.button   = MOUSE_HOVER_ID;
       
       return true;
     }
