@@ -14,7 +14,8 @@ class MyVisitor: public visitor<void, InputZone>
         const InputZoneModel::ZoneDesc& desc = zone.ZoneDescs () [i];
         
         printf ("    position: [%.2f %.2f %.2f]\n", desc.position.x, desc.position.y, desc.position.z);
-        printf ("    size:     [%.2f %.2f]\n", desc.size.x, desc.size.y);
+        printf ("    axis_x:   [%.2f %.2f %.2f]\n", desc.axis_x.x, desc.axis_x.y, desc.axis_x.z);
+        printf ("    axis_y:   [%.2f %.2f %.2f]\n", desc.axis_y.x, desc.axis_y.y, desc.axis_y.z);        
       }
     }
 };
