@@ -58,7 +58,7 @@
 #endif
 
 #ifdef __STL_THREADS
-# include <stl_threads.h>
+# include <sgi_stl/stl_threads.h>
 # define __NODE_ALLOCATOR_THREADS true
 # ifdef __STL_SGI_THREADS
   // We test whether threads are in use before locking.

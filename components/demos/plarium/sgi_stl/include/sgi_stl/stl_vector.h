@@ -239,10 +239,10 @@ public:
   explicit vector(const allocator_type& __a = allocator_type())
     : _Base(__a) {}
 
-  vector(size_type __n, const _Tp& __value,
+  vector(size_type __n, const _Tp& __stlvalue,
          const allocator_type& __a = allocator_type()) 
     : _Base(__n, __a)
-    { _M_finish = uninitialized_fill_n(_M_start, __n, __value); }
+    { _M_finish = uninitialized_fill_n(_M_start, __n, __stlvalue); }
 
   explicit vector(size_type __n)
     : _Base(__n, allocator_type())
@@ -262,10 +262,10 @@ public:
   }
 
   template <class _Integer>
-  void _M_initialize_aux(_Integer __n, _Integer __value, __true_type) {
+  void _M_initialize_aux(_Integer __n, _Integer __stlvalue, __true_type) {
     _M_start = _M_allocate(__n);
     _M_end_of_storage = _M_start + __n; 
-    _M_finish = uninitialized_fill_n(_M_start, __n, __value);
+    _M_finish = uninitialized_fill_n(_M_start, __n, __stlvalue);
   }
 
   template <class _InputIterator>

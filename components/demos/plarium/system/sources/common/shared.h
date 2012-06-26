@@ -1,8 +1,3 @@
-#include <sgi_stl/stdexcept>
-
-#include <errno.h>
-#include <fcntl.h>
-
 #ifdef _MSC_VER
 #include <winsock2.h>
 #include <ws2tcpip.h>
@@ -11,6 +6,11 @@
 
 #include <sys/socket.h>
 #endif
+
+#include <sgi_stl/stdexcept>
+
+#include <errno.h>
+#include <fcntl.h>
 
 #include <system/tcp_client.h>
 #include <utility/utils.h>

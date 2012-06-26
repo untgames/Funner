@@ -255,14 +255,14 @@ _ForwardIter adjacent_find(_ForwardIter __first, _ForwardIter __last,
 // in the HP STL, is retained for backward compatibility.
 
 template <class _InputIter, class _Tp, class _Size>
-void count(_InputIter __first, _InputIter __last, const _Tp& __value,
+void count(_InputIter __first, _InputIter __last, const _Tp& __stlvalue,
            _Size& __n) {
   __STL_REQUIRES(_InputIter, _InputIterator);
   __STL_REQUIRES(typename iterator_traits<_InputIter>::value_type,
                  _EqualityComparable);
   __STL_REQUIRES(_Tp, _EqualityComparable);
   for ( ; __first != __last; ++__first)
-    if (*__first == __value)
+    if (*__first == __stlvalue)
       ++__n;
 }
 
@@ -281,14 +281,14 @@ void count_if(_InputIter __first, _InputIter __last, _Predicate __pred,
 
 template <class _InputIter, class _Tp>
 typename iterator_traits<_InputIter>::difference_type
-count(_InputIter __first, _InputIter __last, const _Tp& __value) {
+count(_InputIter __first, _InputIter __last, const _Tp& __stlvalue) {
   __STL_REQUIRES(_InputIter, _InputIterator);
   __STL_REQUIRES(typename iterator_traits<_InputIter>::value_type,
                  _EqualityComparable);
   __STL_REQUIRES(_Tp, _EqualityComparable);
   typename iterator_traits<_InputIter>::difference_type __n = 0;
   for ( ; __first != __last; ++__first)
-    if (*__first == __value)
+    if (*__first == __stlvalue)
       ++__n;
   return __n;
 }
@@ -606,13 +606,13 @@ _OutputIter generate_n(_OutputIter __first, _Size __n, _Generator __gen) {
 
 template <class _InputIter, class _OutputIter, class _Tp>
 _OutputIter remove_copy(_InputIter __first, _InputIter __last,
-                        _OutputIter __result, const _Tp& __value) {
+                        _OutputIter __result, const _Tp& __stlvalue) {
   __STL_REQUIRES(_InputIter, _InputIterator);
   __STL_REQUIRES(_OutputIter, _OutputIterator);
   __STL_REQUIRES_BINARY_OP(_OP_EQUAL, bool,
        typename iterator_traits<_InputIter>::value_type, _Tp);
   for ( ; __first != __last; ++__first)
-    if (!(*__first == __value)) {
+    if (!(*__first == __stlvalue)) {
       *__result = *__first;
       ++__result;
     }
@@ -636,15 +636,15 @@ _OutputIter remove_copy_if(_InputIter __first, _InputIter __last,
 
 template <class _ForwardIter, class _Tp>
 _ForwardIter remove(_ForwardIter __first, _ForwardIter __last,
-                    const _Tp& __value) {
+                    const _Tp& __stlvalue) {
   __STL_REQUIRES(_ForwardIter, _Mutable_ForwardIterator);
   __STL_REQUIRES_BINARY_OP(_OP_EQUAL, bool,
        typename iterator_traits<_ForwardIter>::value_type, _Tp);
   __STL_CONVERTIBLE(_Tp, typename iterator_traits<_ForwardIter>::value_type);
-  __first = find(__first, __last, __value);
+  __first = find(__first, __last, __stlvalue);
   _ForwardIter __i = __first;
   return __first == __last ? __first 
-                           : remove_copy(++__i, __last, __first, __value);
+                           : remove_copy(++__i, __last, __first, __stlvalue);
 }
 
 template <class _ForwardIter, class _Predicate>
@@ -664,12 +664,12 @@ _ForwardIter remove_if(_ForwardIter __first, _ForwardIter __last,
 template <class _InputIter, class _OutputIter, class _Tp>
 _OutputIter __unique_copy(_InputIter __first, _InputIter __last,
                           _OutputIter __result, _Tp*) {
-  _Tp __value = *__first;
-  *__result = __value;
+  _Tp __stlvalue = *__first;
+  *__result = __stlvalue;
   while (++__first != __last)
-    if (!(__value == *__first)) {
-      __value = *__first;
-      *++__result = __value;
+    if (!(__stlvalue == *__first)) {
+      __stlvalue = *__first;
+      *++__result = __stlvalue;
     }
   return ++__result;
 }
@@ -678,7 +678,7 @@ template <class _InputIter, class _OutputIter>
 inline _OutputIter __unique_copy(_InputIter __first, _InputIter __last,
                                  _OutputIter __result, 
                                  output_iterator_tag) {
-  return __unique_copy(__first, __last, __result, __VALUE_TYPE(__first));
+  return __unique_copy(__first, __last, __result, __stlvalue_TYPE(__first));
 }
 
 template <class _InputIter, class _ForwardIter>
@@ -709,12 +709,12 @@ _OutputIter __unique_copy(_InputIter __first, _InputIter __last,
                           _OutputIter __result,
                           _BinaryPredicate __binary_pred, _Tp*) {
   __STL_BINARY_FUNCTION_CHECK(_BinaryPredicate, bool, _Tp, _Tp);
-  _Tp __value = *__first;
-  *__result = __value;
+  _Tp __stlvalue = *__first;
+  *__result = __stlvalue;
   while (++__first != __last)
-    if (!__binary_pred(__value, *__first)) {
-      __value = *__first;
-      *++__result = __value;
+    if (!__binary_pred(__stlvalue, *__first)) {
+      __stlvalue = *__first;
+      *++__result = __stlvalue;
     }
   return ++__result;
 }
@@ -725,7 +725,7 @@ inline _OutputIter __unique_copy(_InputIter __first, _InputIter __last,
                                  _BinaryPredicate __binary_pred,
                                  output_iterator_tag) {
   return __unique_copy(__first, __last, __result, __binary_pred,
-                       __VALUE_TYPE(__first));
+                       __stlvalue_TYPE(__first));
 }
 
 template <class _InputIter, class _ForwardIter, class _BinaryPredicate>
@@ -1253,7 +1253,7 @@ inline _ForwardIter stable_partition(_ForwardIter __first,
     return __first;
   else
     return __stable_partition_aux(__first, __last, __pred,
-                                  __VALUE_TYPE(__first),
+                                  __stlvalue_TYPE(__first),
                                   __DISTANCE_TYPE(__first));
 }
 
@@ -1350,7 +1350,7 @@ template <class _RandomAccessIter>
 void __insertion_sort(_RandomAccessIter __first, _RandomAccessIter __last) {
   if (__first == __last) return; 
   for (_RandomAccessIter __i = __first + 1; __i != __last; ++__i)
-    __linear_insert(__first, __i, __VALUE_TYPE(__first));
+    __linear_insert(__first, __i, __stlvalue_TYPE(__first));
 }
 
 template <class _RandomAccessIter, class _Compare>
@@ -1358,7 +1358,7 @@ void __insertion_sort(_RandomAccessIter __first,
                       _RandomAccessIter __last, _Compare __comp) {
   if (__first == __last) return;
   for (_RandomAccessIter __i = __first + 1; __i != __last; ++__i)
-    __linear_insert(__first, __i, __VALUE_TYPE(__first), __comp);
+    __linear_insert(__first, __i, __stlvalue_TYPE(__first), __comp);
 }
 
 template <class _RandomAccessIter, class _Tp>
@@ -1371,7 +1371,7 @@ void __unguarded_insertion_sort_aux(_RandomAccessIter __first,
 template <class _RandomAccessIter>
 inline void __unguarded_insertion_sort(_RandomAccessIter __first, 
                                 _RandomAccessIter __last) {
-  __unguarded_insertion_sort_aux(__first, __last, __VALUE_TYPE(__first));
+  __unguarded_insertion_sort_aux(__first, __last, __stlvalue_TYPE(__first));
 }
 
 template <class _RandomAccessIter, class _Tp, class _Compare>
@@ -1386,7 +1386,7 @@ template <class _RandomAccessIter, class _Compare>
 inline void __unguarded_insertion_sort(_RandomAccessIter __first, 
                                        _RandomAccessIter __last,
                                        _Compare __comp) {
-  __unguarded_insertion_sort_aux(__first, __last, __VALUE_TYPE(__first),
+  __unguarded_insertion_sort_aux(__first, __last, __stlvalue_TYPE(__first),
                                  __comp);
 }
 
@@ -1469,7 +1469,7 @@ inline void sort(_RandomAccessIter __first, _RandomAccessIter __last) {
                  _LessThanComparable);
   if (__first != __last) {
     __introsort_loop(__first, __last,
-                     __VALUE_TYPE(__first),
+                     __stlvalue_TYPE(__first),
                      __lg(__last - __first) * 2);
     __final_insertion_sort(__first, __last);
   }
@@ -1484,7 +1484,7 @@ inline void sort(_RandomAccessIter __first, _RandomAccessIter __last,
        typename iterator_traits<_RandomAccessIter>::value_type);
   if (__first != __last) {
     __introsort_loop(__first, __last,
-                     __VALUE_TYPE(__first),
+                     __stlvalue_TYPE(__first),
                      __lg(__last - __first) * 2,
                      __comp);
     __final_insertion_sort(__first, __last, __comp);
@@ -1701,7 +1701,7 @@ inline void stable_sort(_RandomAccessIter __first,
   __STL_REQUIRES(typename iterator_traits<_RandomAccessIter>::value_type,
                  _LessThanComparable);
   __stable_sort_aux(__first, __last,
-                    __VALUE_TYPE(__first),
+                    __stlvalue_TYPE(__first),
                     __DISTANCE_TYPE(__first));
 }
 
@@ -1713,7 +1713,7 @@ inline void stable_sort(_RandomAccessIter __first,
        typename iterator_traits<_RandomAccessIter>::value_type,
        typename iterator_traits<_RandomAccessIter>::value_type);
   __stable_sort_aux(__first, __last,
-                    __VALUE_TYPE(__first),
+                    __stlvalue_TYPE(__first),
                     __DISTANCE_TYPE(__first), 
                     __comp);
 }
@@ -1738,7 +1738,7 @@ inline void partial_sort(_RandomAccessIter __first,
   __STL_REQUIRES(_RandomAccessIter, _Mutable_RandomAccessIterator);
   __STL_REQUIRES(typename iterator_traits<_RandomAccessIter>::value_type,
                  _LessThanComparable);
-  __partial_sort(__first, __middle, __last, __VALUE_TYPE(__first));
+  __partial_sort(__first, __middle, __last, __stlvalue_TYPE(__first));
 }
 
 template <class _RandomAccessIter, class _Tp, class _Compare>
@@ -1760,7 +1760,7 @@ inline void partial_sort(_RandomAccessIter __first,
   __STL_BINARY_FUNCTION_CHECK(_Compare, bool, 
       typename iterator_traits<_RandomAccessIter>::value_type,
       typename iterator_traits<_RandomAccessIter>::value_type);
-  __partial_sort(__first, __middle, __last, __VALUE_TYPE(__first), __comp);
+  __partial_sort(__first, __middle, __last, __stlvalue_TYPE(__first), __comp);
 }
 
 template <class _InputIter, class _RandomAccessIter, class _Distance,
@@ -1804,7 +1804,7 @@ partial_sort_copy(_InputIter __first, _InputIter __last,
                  _LessThanComparable);
   return __partial_sort_copy(__first, __last, __result_first, __result_last, 
                              __DISTANCE_TYPE(__result_first),
-                             __VALUE_TYPE(__first));
+                             __stlvalue_TYPE(__first));
 }
 
 template <class _InputIter, class _RandomAccessIter, class _Compare,
@@ -1849,7 +1849,7 @@ partial_sort_copy(_InputIter __first, _InputIter __last,
   return __partial_sort_copy(__first, __last, __result_first, __result_last,
                              __comp,
                              __DISTANCE_TYPE(__result_first),
-                             __VALUE_TYPE(__first));
+                             __stlvalue_TYPE(__first));
 }
 
 // nth_element() and its auxiliary functions.  
@@ -1877,7 +1877,7 @@ inline void nth_element(_RandomAccessIter __first, _RandomAccessIter __nth,
   __STL_REQUIRES(_RandomAccessIter, _Mutable_RandomAccessIterator);
   __STL_REQUIRES(typename iterator_traits<_RandomAccessIter>::value_type,
                  _LessThanComparable);
-  __nth_element(__first, __nth, __last, __VALUE_TYPE(__first));
+  __nth_element(__first, __nth, __last, __stlvalue_TYPE(__first));
 }
 
 template <class _RandomAccessIter, class _Tp, class _Compare>
@@ -1906,7 +1906,7 @@ inline void nth_element(_RandomAccessIter __first, _RandomAccessIter __nth,
   __STL_BINARY_FUNCTION_CHECK(_Compare, bool,
      typename iterator_traits<_RandomAccessIter>::value_type,
      typename iterator_traits<_RandomAccessIter>::value_type);
-  __nth_element(__first, __nth, __last, __VALUE_TYPE(__first), __comp);
+  __nth_element(__first, __nth, __last, __stlvalue_TYPE(__first), __comp);
 }
 
 
@@ -2505,7 +2505,7 @@ inline void inplace_merge(_BidirectionalIter __first,
   if (__first == __middle || __middle == __last)
     return;
   __inplace_merge_aux(__first, __middle, __last,
-                      __VALUE_TYPE(__first), __DISTANCE_TYPE(__first));
+                      __stlvalue_TYPE(__first), __DISTANCE_TYPE(__first));
 }
 
 template <class _BidirectionalIter, class _Compare>
@@ -2519,7 +2519,7 @@ inline void inplace_merge(_BidirectionalIter __first,
   if (__first == __middle || __middle == __last)
     return;
   __inplace_merge_aux(__first, __middle, __last,
-                      __VALUE_TYPE(__first), __DISTANCE_TYPE(__first),
+                      __stlvalue_TYPE(__first), __DISTANCE_TYPE(__first),
                       __comp);
 }
 

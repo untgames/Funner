@@ -77,7 +77,7 @@ inline _ForwardIter
                      _ForwardIter __result)
 {
   return __uninitialized_copy(__first, __last, __result,
-                              __VALUE_TYPE(__result));
+                              __stlvalue_TYPE(__result));
 }
 
 inline char* uninitialized_copy(const char* __first, const char* __last,
@@ -175,7 +175,7 @@ inline void uninitialized_fill(_ForwardIter __first,
                                _ForwardIter __last, 
                                const _Tp& __x)
 {
-  __uninitialized_fill(__first, __last, __x, __VALUE_TYPE(__first));
+  __uninitialized_fill(__first, __last, __x, __stlvalue_TYPE(__first));
 }
 
 // Valid if copy construction is equivalent to assignment, and if the
@@ -214,7 +214,7 @@ template <class _ForwardIter, class _Size, class _Tp>
 inline _ForwardIter 
 uninitialized_fill_n(_ForwardIter __first, _Size __n, const _Tp& __x)
 {
-  return __uninitialized_fill_n(__first, __n, __x, __VALUE_TYPE(__first));
+  return __uninitialized_fill_n(__first, __n, __x, __stlvalue_TYPE(__first));
 }
 
 // Extensions: __uninitialized_copy_copy, __uninitialized_copy_fill, 

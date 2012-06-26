@@ -127,7 +127,7 @@ _Container_requirement_violation(_Container __c) {
   // Refinement of Assignable
   _Assignable_concept_specification<_Container>::_Assignable_requirement_violation(__c);
   // Associated Types
-  __value_type__typedef_requirement_violation<_Container>();
+  __stlvalue_type__typedef_requirement_violation<_Container>();
   __difference_type__typedef_requirement_violation<_Container>();
   __size_type__typedef_requirement_violation<_Container>();
   __reference__typedef_requirement_violation<_Container>();

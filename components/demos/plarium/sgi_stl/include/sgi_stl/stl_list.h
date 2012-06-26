@@ -424,10 +424,10 @@ public:
     iterator __tmp = end();
     erase(--__tmp);
   }
-  list(size_type __n, const _Tp& __value,
+  list(size_type __n, const _Tp& __stlvalue,
        const allocator_type& __a = allocator_type())
     : _Base(__a)
-    { insert(begin(), __n, __value); }
+    { insert(begin(), __n, __stlvalue); }
   explicit list(size_type __n)
     : _Base(allocator_type())
     { insert(begin(), __n, _Tp()); }
@@ -520,7 +520,7 @@ public:
     if (__first != __last) 
       this->transfer(__position, __first, __last);
   }
-  void remove(const _Tp& __value);
+  void remove(const _Tp& __stlvalue);
   void unique();
   void merge(list& __x);
   void reverse();
@@ -708,14 +708,14 @@ list<_Tp, _Alloc>::_M_assign_dispatch(_InputIter __first2, _InputIter __last2,
 #endif /* __STL_MEMBER_TEMPLATES */
 
 template <class _Tp, class _Alloc>
-void list<_Tp, _Alloc>::remove(const _Tp& __value)
+void list<_Tp, _Alloc>::remove(const _Tp& __stlvalue)
 {
   iterator __first = begin();
   iterator __last = end();
   while (__first != __last) {
     iterator __next = __first;
     ++__next;
-    if (*__first == __value) erase(__first);
+    if (*__first == __stlvalue) erase(__first);
     __first = __next;
   }
 }

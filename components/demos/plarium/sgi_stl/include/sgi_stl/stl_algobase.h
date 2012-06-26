@@ -83,7 +83,7 @@ inline void iter_swap(_ForwardIter1 __a, _ForwardIter2 __b) {
                     typename iterator_traits<_ForwardIter2>::value_type);
   __STL_CONVERTIBLE(typename iterator_traits<_ForwardIter2>::value_type,
                     typename iterator_traits<_ForwardIter1>::value_type);
-  __iter_swap(__a, __b, __VALUE_TYPE(__a));
+  __iter_swap(__a, __b, __stlvalue_TYPE(__a));
 }
 
 template <class _Tp>
@@ -213,7 +213,7 @@ inline _OutputIter copy(_InputIter __first, _InputIter __last,
                         _OutputIter __result) {
   __STL_REQUIRES(_InputIter, _InputIterator);
   __STL_REQUIRES(_OutputIter, _OutputIterator);
-  return __copy_aux(__first, __last, __result, __VALUE_TYPE(__first));
+  return __copy_aux(__first, __last, __result, __stlvalue_TYPE(__first));
 }
 
 // Hack for compilers that don't have partial ordering of function templates
@@ -439,17 +439,17 @@ copy_n(_InputIter __first, _Size __count, _OutputIter __result) {
 
 
 template <class _ForwardIter, class _Tp>
-void fill(_ForwardIter __first, _ForwardIter __last, const _Tp& __value) {
+void fill(_ForwardIter __first, _ForwardIter __last, const _Tp& __stlvalue) {
   __STL_REQUIRES(_ForwardIter, _Mutable_ForwardIterator);
   for ( ; __first != __last; ++__first)
-    *__first = __value;
+    *__first = __stlvalue;
 }
 
 template <class _OutputIter, class _Size, class _Tp>
-_OutputIter fill_n(_OutputIter __first, _Size __n, const _Tp& __value) {
+_OutputIter fill_n(_OutputIter __first, _Size __n, const _Tp& __stlvalue) {
   __STL_REQUIRES(_OutputIter, _OutputIterator);
   for ( ; __n > 0; --__n, ++__first)
-    *__first = __value;
+    *__first = __stlvalue;
   return __first;
 }
 

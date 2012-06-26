@@ -363,7 +363,7 @@
 # if defined(_MSC_VER) && !defined(__ICL) && !defined(__MWERKS__)
 #   define __STL_NO_DRAND48
 #   define __STL_STATIC_CONST_INIT_BUG
-#   define __STL_NEED_TYPENAME
+//#   define __STL_NEED_TYPENAME
 #   define __STL_NO_USING_CLAUSE_IN_CLASS
 #   define __STL_NO_FRIEND_TEMPLATE_CLASS
 #   if _MSC_VER < 1100  /* 1000 is version 4.0, 1100 is 5.0, 1200 is 6.0. */

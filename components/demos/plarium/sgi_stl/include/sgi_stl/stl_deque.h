@@ -530,9 +530,9 @@ public:                         // Constructor, destructor.
     : _Base(__a, 0) {}
   deque(const deque& __x) : _Base(__x.get_allocator(), __x.size()) 
     { uninitialized_copy(__x.begin(), __x.end(), _M_start); }
-  deque(size_type __n, const value_type& __value,
+  deque(size_type __n, const value_type& __stlvalue,
         const allocator_type& __a = allocator_type()) : _Base(__a, __n)
-    { _M_fill_initialize(__value); }
+    { _M_fill_initialize(__stlvalue); }
   explicit deque(size_type __n) : _Base(allocator_type(), __n)
     { _M_fill_initialize(value_type()); }
 
@@ -801,7 +801,7 @@ public:                         // Erase
 
 protected:                        // Internal construction/destruction
 
-  void _M_fill_initialize(const value_type& __value);
+  void _M_fill_initialize(const value_type& __stlvalue);
 
 #ifdef __STL_MEMBER_TEMPLATES  
 
@@ -1052,12 +1052,12 @@ void deque<_Tp,_Alloc>::clear()
 // Precondition: _M_start and _M_finish have already been initialized,
 // but none of the deque's elements have yet been constructed.
 template <class _Tp, class _Alloc>
-void deque<_Tp,_Alloc>::_M_fill_initialize(const value_type& __value) {
+void deque<_Tp,_Alloc>::_M_fill_initialize(const value_type& __stlvalue) {
   _Map_pointer __cur;
   __STL_TRY {
     for (__cur = _M_start._M_node; __cur < _M_finish._M_node; ++__cur)
-      uninitialized_fill(*__cur, *__cur + _S_buffer_size(), __value);
-    uninitialized_fill(_M_finish._M_first, _M_finish._M_cur, __value);
+      uninitialized_fill(*__cur, *__cur + _S_buffer_size(), __stlvalue);
+    uninitialized_fill(_M_finish._M_first, _M_finish._M_cur, __stlvalue);
   }
   __STL_UNWIND(destroy(_M_start, iterator(*__cur, __cur)));
 }

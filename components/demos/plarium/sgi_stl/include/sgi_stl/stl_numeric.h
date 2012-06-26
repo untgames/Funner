@@ -83,10 +83,10 @@ _OutputIterator
 __partial_sum(_InputIterator __first, _InputIterator __last,
               _OutputIterator __result, _Tp*)
 {
-  _Tp __value = *__first;
+  _Tp __stlvalue = *__first;
   while (++__first != __last) {
-    __value = __value + *__first;
-    *++__result = __value;
+    __stlvalue = __stlvalue + *__first;
+    *++__result = __stlvalue;
   }
   return ++__result;
 }
@@ -100,7 +100,7 @@ partial_sum(_InputIterator __first, _InputIterator __last,
   __STL_REQUIRES(_OutputIterator, _OutputIterator);
   if (__first == __last) return __result;
   *__result = *__first;
-  return __partial_sum(__first, __last, __result, __VALUE_TYPE(__first));
+  return __partial_sum(__first, __last, __result, __stlvalue_TYPE(__first));
 }
 
 template <class _InputIterator, class _OutputIterator, class _Tp,
@@ -109,10 +109,10 @@ _OutputIterator
 __partial_sum(_InputIterator __first, _InputIterator __last, 
               _OutputIterator __result, _Tp*, _BinaryOperation __binary_op)
 {
-  _Tp __value = *__first;
+  _Tp __stlvalue = *__first;
   while (++__first != __last) {
-    __value = __binary_op(__value, *__first);
-    *++__result = __value;
+    __stlvalue = __binary_op(__stlvalue, *__first);
+    *++__result = __stlvalue;
   }
   return ++__result;
 }
@@ -126,7 +126,7 @@ partial_sum(_InputIterator __first, _InputIterator __last,
   __STL_REQUIRES(_OutputIterator, _OutputIterator);
   if (__first == __last) return __result;
   *__result = *__first;
-  return __partial_sum(__first, __last, __result, __VALUE_TYPE(__first), 
+  return __partial_sum(__first, __last, __result, __stlvalue_TYPE(__first), 
                        __binary_op);
 }
 
@@ -135,11 +135,11 @@ _OutputIterator
 __adjacent_difference(_InputIterator __first, _InputIterator __last,
                       _OutputIterator __result, _Tp*)
 {
-  _Tp __value = *__first;
+  _Tp __stlvalue = *__first;
   while (++__first != __last) {
     _Tp __tmp = *__first;
-    *++__result = __tmp - __value;
-    __value = __tmp;
+    *++__result = __tmp - __stlvalue;
+    __stlvalue = __tmp;
   }
   return ++__result;
 }
@@ -154,7 +154,7 @@ adjacent_difference(_InputIterator __first,
   if (__first == __last) return __result;
   *__result = *__first;
   return __adjacent_difference(__first, __last, __result,
-                               __VALUE_TYPE(__first));
+                               __stlvalue_TYPE(__first));
 }
 
 template <class _InputIterator, class _OutputIterator, class _Tp, 
@@ -163,11 +163,11 @@ _OutputIterator
 __adjacent_difference(_InputIterator __first, _InputIterator __last, 
                       _OutputIterator __result, _Tp*,
                       _BinaryOperation __binary_op) {
-  _Tp __value = *__first;
+  _Tp __stlvalue = *__first;
   while (++__first != __last) {
     _Tp __tmp = *__first;
-    *++__result = __binary_op(__tmp, __value);
-    __value = __tmp;
+    *++__result = __binary_op(__tmp, __stlvalue);
+    __stlvalue = __tmp;
   }
   return ++__result;
 }
@@ -182,7 +182,7 @@ adjacent_difference(_InputIterator __first, _InputIterator __last,
   if (__first == __last) return __result;
   *__result = *__first;
   return __adjacent_difference(__first, __last, __result,
-                               __VALUE_TYPE(__first),
+                               __stlvalue_TYPE(__first),
                                __binary_op);
 }
 
@@ -238,12 +238,12 @@ inline _Tp power(_Tp __x, _Integer __n)
 
 template <class _ForwardIter, class _Tp>
 void 
-iota(_ForwardIter __first, _ForwardIter __last, _Tp __value)
+iota(_ForwardIter __first, _ForwardIter __last, _Tp __stlvalue)
 {
   __STL_REQUIRES(_ForwardIter, _Mutable_ForwardIterator);
   __STL_CONVERTIBLE(_Tp, typename iterator_traits<_ForwardIter>::value_type);
   while (__first != __last)
-    *__first++ = __value++;
+    *__first++ = __stlvalue++;
 }
 
 __STL_END_NAMESPACE

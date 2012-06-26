@@ -156,7 +156,7 @@ __distance_type(const _Iter&)
 
 template <class _Iter>
 inline typename iterator_traits<_Iter>::value_type*
-__value_type(const _Iter&)
+__stlvalue_type(const _Iter&)
 {
   return static_cast<typename iterator_traits<_Iter>::value_type*>(0);
 }
@@ -172,11 +172,11 @@ distance_type(const _Iter& __i) { return __distance_type(__i); }
 
 template <class _Iter>
 inline typename iterator_traits<_Iter>::value_type*
-value_type(const _Iter& __i) { return __value_type(__i); }
+value_type(const _Iter& __i) { return __stlvalue_type(__i); }
 
 #define __ITERATOR_CATEGORY(__i) __iterator_category(__i)
 #define __DISTANCE_TYPE(__i)     __distance_type(__i)
-#define __VALUE_TYPE(__i)        __value_type(__i)
+#define __stlvalue_TYPE(__i)        __stlvalue_type(__i)
 
 #else /* __STL_CLASS_PARTIAL_SPECIALIZATION */
 
@@ -260,7 +260,7 @@ inline ptrdiff_t* distance_type(const _Tp*) { return (ptrdiff_t*)(0); }
 
 #define __ITERATOR_CATEGORY(__i) iterator_category(__i)
 #define __DISTANCE_TYPE(__i)     distance_type(__i)
-#define __VALUE_TYPE(__i)        value_type(__i)
+#define __stlvalue_TYPE(__i)        value_type(__i)
 
 #endif /* __STL_CLASS_PARTIAL_SPECIALIZATION */
 

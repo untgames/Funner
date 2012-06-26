@@ -495,7 +495,7 @@ template <class _Iterator> struct iterator_traits;
 __STL_END_NAMESPACE
 
 template <class _Iter> 
-struct __value_type_type_definition_requirement_violation {
+struct __stlvalue_type_type_definition_requirement_violation {
   typedef typename __STD::iterator_traits<_Iter>::value_type value_type;
 };
 
@@ -568,7 +568,7 @@ struct _TrivialIterator_concept_specification {
 static void
 _TrivialIterator_requirement_violation(_TrivialIterator __i) {
   typedef typename
-    __value_type_type_definition_requirement_violation<_TrivialIterator>::
+    __stlvalue_type_type_definition_requirement_violation<_TrivialIterator>::
     value_type __T;
   // Refinement of Assignable
   _Assignable_concept_specification<_TrivialIterator>::
@@ -686,7 +686,7 @@ _Mutable_BidirectionalIterator_requirement_violation(
   _Mutable_ForwardIterator_concept_specification<_BidirectionalIterator>::
     _Mutable_ForwardIterator_requirement_violation(__i);
   typedef typename
-    __value_type_type_definition_requirement_violation<
+    __stlvalue_type_type_definition_requirement_violation<
     _BidirectionalIterator>::value_type __T;
   typename _Mutable_trait<__T>::_Type* __tmp_ptr = 0;
   // Valid Expressions
@@ -709,7 +709,7 @@ _RandomAccessIterator_requirement_violation(_RandAccIter __i) {
   _LessThanComparable_concept_specification<_RandAccIter>::
     _LessThanComparable_requirement_violation(__i);
   typedef typename 
-        __value_type_type_definition_requirement_violation<_RandAccIter>
+        __stlvalue_type_type_definition_requirement_violation<_RandAccIter>
         ::value_type
     value_type;
   typedef typename
@@ -748,7 +748,7 @@ _Mutable_RandomAccessIterator_requirement_violation(_RandAccIter __i)
   _Mutable_BidirectionalIterator_concept_specification<_RandAccIter>::
     _Mutable_BidirectionalIterator_requirement_violation(__i);
   typedef typename
-        __value_type_type_definition_requirement_violation<_RandAccIter>
+        __stlvalue_type_type_definition_requirement_violation<_RandAccIter>
         ::value_type
     value_type;
   typedef typename
@@ -789,7 +789,7 @@ _Allocator_requirement_violation(_Alloc __a) {
   _EqualityComparable_concept_specification<_Alloc>::
     _EqualityComparable_requirement_violation(__a);
   // Associated Types
-  __value_type__typedef_requirement_violation<_Alloc>();
+  __stlvalue_type__typedef_requirement_violation<_Alloc>();
   __difference_type__typedef_requirement_violation<_Alloc>();
   __size_type__typedef_requirement_violation<_Alloc>();
   __reference__typedef_requirement_violation<_Alloc>();

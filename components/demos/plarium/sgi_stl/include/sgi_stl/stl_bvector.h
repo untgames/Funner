@@ -396,7 +396,7 @@ public:
           reverse_iterator;
 #endif /* __STL_CLASS_PARTIAL_SPECIALIZATION */
 
-  typedef typename __BVECTOR_BASE::allocator_type allocator_type;
+  typedef __BVECTOR_BASE::allocator_type allocator_type;
   allocator_type get_allocator() const {
     return __BVECTOR_BASE::get_allocator();
   }
@@ -534,12 +534,12 @@ public:
   explicit __VECTOR(const allocator_type& __a = allocator_type())
     : __BVECTOR_BASE(__a) {}
 
-  __VECTOR(size_type __n, bool __value,
+  __VECTOR(size_type __n, bool __stlvalue,
             const allocator_type& __a = allocator_type())
     : __BVECTOR_BASE(__a)
   {
     _M_initialize(__n);
-    fill(_M_start._M_p, _M_end_of_storage, __value ? ~0 : 0);
+    fill(_M_start._M_p, _M_end_of_storage, __stlvalue ? ~0 : 0);
   }
 
   explicit __VECTOR(size_type __n)

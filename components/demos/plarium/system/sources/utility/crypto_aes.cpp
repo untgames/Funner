@@ -9,8 +9,11 @@ const size_t CRYPTO_BLOCK_SIZE = 16;
 
 #ifndef __APPLE__
 
-typedef size_t        aes_uint32_t;
+typedef size_t aes_uint32_t;
+
+#ifndef _MSC_VER
 typedef unsigned char byte;
+#endif
 
 const aes_uint32_t _ae0 [256] =
 {

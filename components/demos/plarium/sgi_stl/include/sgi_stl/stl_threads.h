@@ -33,7 +33,7 @@
 #include <sgi_stl/thread.h>
 #include <sgi_stl/synch.h>
 #elif defined(__STL_WIN32THREADS)
-#include <sgi_stl/windows.h>
+#include <windows.h>
 #endif
 
 __STL_BEGIN_NAMESPACE

@@ -48,8 +48,8 @@ public:
 
   explicit back_insert_iterator(_Container& __x) : container(&__x) {}
   back_insert_iterator<_Container>&
-  operator=(const typename _Container::value_type& __value) { 
-    container->push_back(__value);
+  operator=(const typename _Container::value_type& __stlvalue) { 
+    container->push_back(__stlvalue);
     return *this;
   }
   back_insert_iterator<_Container>& operator*() { return *this; }
@@ -87,8 +87,8 @@ public:
 
   explicit front_insert_iterator(_Container& __x) : container(&__x) {}
   front_insert_iterator<_Container>&
-  operator=(const typename _Container::value_type& __value) { 
-    container->push_front(__value);
+  operator=(const typename _Container::value_type& __stlvalue) { 
+    container->push_front(__stlvalue);
     return *this;
   }
   front_insert_iterator<_Container>& operator*() { return *this; }
@@ -128,8 +128,8 @@ public:
   insert_iterator(_Container& __x, typename _Container::iterator __i) 
     : container(&__x), iter(__i) {}
   insert_iterator<_Container>&
-  operator=(const typename _Container::value_type& __value) { 
-    iter = container->insert(iter, __value);
+  operator=(const typename _Container::value_type& __stlvalue) { 
+    iter = container->insert(iter, __stlvalue);
     ++iter;
     return *this;
   }
@@ -668,8 +668,8 @@ public:
   ostream_iterator(ostream_type& __s) : _M_stream(&__s), _M_string(0) {}
   ostream_iterator(ostream_type& __s, const _CharT* __c) 
     : _M_stream(&__s), _M_string(__c)  {}
-  ostream_iterator<_Tp>& operator=(const _Tp& __value) { 
-    *_M_stream << __value;
+  ostream_iterator<_Tp>& operator=(const _Tp& __stlvalue) { 
+    *_M_stream << __stlvalue;
     if (_M_string) *_M_stream << _M_string;
     return *this;
   }
@@ -933,8 +933,8 @@ public:
   ostream_iterator(std::ostream& __s) : _M_stream(&__s), _M_string(0) {}
   ostream_iterator(std::ostream& __s, const char* __c)
     : _M_stream(&__s), _M_string(__c)  {}
-  ostream_iterator<_Tp>& operator=(const _Tp& __value) { 
-    *_M_stream << __value;
+  ostream_iterator<_Tp>& operator=(const _Tp& __stlvalue) { 
+    *_M_stream << __stlvalue;
     if (_M_string) *_M_stream << _M_string;
     return *this;
   }

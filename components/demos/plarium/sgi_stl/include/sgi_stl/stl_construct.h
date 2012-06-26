@@ -44,8 +44,8 @@ __STL_BEGIN_NAMESPACE
 // Internal names
 
 template <class _T1, class _T2>
-inline void _Construct(_T1* __p, const _T2& __value) {
-  new ((void*) __p) _T1(__value);
+inline void _Construct(_T1* __p, const _T2& __stlvalue) {
+  new ((void*) __p) _T1(__stlvalue);
 }
 
 template <class _T1>
@@ -80,7 +80,7 @@ __destroy(_ForwardIterator __first, _ForwardIterator __last, _Tp*)
 
 template <class _ForwardIterator>
 inline void _Destroy(_ForwardIterator __first, _ForwardIterator __last) {
-  __destroy(__first, __last, __VALUE_TYPE(__first));
+  __destroy(__first, __last, __stlvalue_TYPE(__first));
 }
 
 inline void _Destroy(char*, char*) {}
@@ -96,8 +96,8 @@ inline void _Destroy(wchar_t*, wchar_t*) {}
 // Old names from the HP STL.
 
 template <class _T1, class _T2>
-inline void construct(_T1* __p, const _T2& __value) {
-  _Construct(__p, __value);
+inline void construct(_T1* __p, const _T2& __stlvalue) {
+  _Construct(__p, __stlvalue);
 }
 
 template <class _T1>
