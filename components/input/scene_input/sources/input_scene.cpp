@@ -15,6 +15,8 @@ InputScene::InputScene (scene_graph::Scene& in_scene)
 InputScene::~InputScene ()
 {
   entities.clear ();
+  
+  DetachAll ();
 }
 
 /*
@@ -43,7 +45,7 @@ InputEntityPtr InputScene::GetEntity (const scene_graph::InputZoneModel& zone)
     
     try
     {
-      desc.entity                = InputEntityPtr (new InputEntity (zone), false);
+      desc.entity                = InputEntityPtr (new InputEntity (zone, *this), false);
       desc.on_destroy_connection = zone.RegisterEventHandler (NodeEvent_AfterDestroy, xtl::bind (&InputScene::OnInputZoneDestroyed, this, &zone));
       
       return desc.entity;
@@ -202,3 +204,11 @@ void InputScene::OnTouch (const TouchEvent& event, const math::vec3f& touch_worl
   }  
 }
     
+/*
+    Регистрация слушателей оповещений
+*/
+
+void InputScene::RegisterBroadcastListener (InputEventListener& listener)
+{
+  listener.Attach (*this);
+}
