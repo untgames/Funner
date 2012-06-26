@@ -194,7 +194,7 @@ struct TouchTraverser: public INodeTraverser
 
 }
 
-void InputScene::OnTouch (const TouchEvent& event, const math::vec3f& touch_world_position, const math::vec3f& touch_world_direction, const frustum& touch_frustum, bool& touch_catched)
+void InputScene::OnTouch (InputPort& input_port, const TouchEvent& event, const math::vec3f& touch_world_position, const math::vec3f& touch_world_direction, const frustum& touch_frustum, bool& touch_catched)
 {
   try
   {
@@ -218,7 +218,7 @@ void InputScene::OnTouch (const TouchEvent& event, const math::vec3f& touch_worl
       
       //передача события соответствующему объекту      
       
-    entity->OnTouch (event, touch_world_position, traverser.input_zone_index, traverser.input_zone_intersection_point);
+    entity->OnTouch (input_port, event, touch_world_position, traverser.input_zone_index, traverser.input_zone_intersection_point);
   }
   catch (xtl::exception& e)
   {

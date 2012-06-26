@@ -150,7 +150,7 @@ class InputEventListener: public xtl::noncopyable
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Оповещение
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-        void BroadcastTouch (const TouchEvent& event, const math::vec3f& touch_world_position);
+        void BroadcastTouch (InputPort& input_port, const TouchEvent& event, const math::vec3f& touch_world_position);
         
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Отсоединение всех
@@ -171,7 +171,7 @@ class InputEventListener: public xtl::noncopyable
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Обработка события
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    virtual void OnBroadcastTouch (const TouchEvent& event, const math::vec3f& touch_world_position) {}
+    virtual void OnBroadcastTouch (InputPort& input_port, const TouchEvent& event, const math::vec3f& touch_world_position) {}
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Присоединение слушателя к списку
@@ -205,14 +205,16 @@ class InputEntity: public xtl::reference_counter, private InputEventListener
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Обработка события нажатия
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void OnTouch (const TouchEvent& event, const math::vec3f& touch_world_position, size_t touch_zone_index, const math::vec2f& touch_local_position); 
+    void OnTouch (InputPort& input_port, const TouchEvent& event, const math::vec3f& touch_world_position, size_t touch_zone_index, const math::vec2f& touch_local_position); 
     
   private:
-    void OnBroadcastTouch (const TouchEvent& event, const math::vec3f& touch_world_position);
+    void OnBroadcastTouch    (InputPort& input_port, const TouchEvent& event, const math::vec3f& touch_world_position);
+    void UpdateNotifications ();
   
   private:  
     const scene_graph::InputZoneModel& zone;
     InputScene&                        scene;
+    xtl::auto_connection               on_notifications_changed_connection;
 };
 
 typedef xtl::intrusive_ptr<InputEntity> InputEntityPtr;
@@ -247,7 +249,7 @@ class InputScene: public xtl::reference_counter, private InputEventListener::Lis
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Обработка события
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void OnTouch (const TouchEvent& event, const math::vec3f& touch_world_position, const math::vec3f& touch_world_direction, const frustum& touch_frustum, bool& touch_catched);
+    void OnTouch (InputPort& input_port, const TouchEvent& event, const math::vec3f& touch_world_position, const math::vec3f& touch_world_direction, const frustum& touch_frustum, bool& touch_catched);
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Регистрация слушателей оповещений

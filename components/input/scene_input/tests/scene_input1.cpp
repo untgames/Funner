@@ -1,8 +1,10 @@
 #include "shared.h"
 
-void input_notify (InputZoneModel&, const Viewport&, const char* event, const char* params)
+void input_notify (InputZoneModel&, const Viewport&, const InputZoneNotification notification, const InputZoneNotificationContext& context)
 {
-  printf ("%s: %s\n", event, params);
+  printf ("%s: touch=%d, button=%d, world_position=[%.3f, %.3f, %.3f] local_position=[%.3f, %.3f]\n", get_name (notification), 
+    context.touch_id, context.button, context.touch_world_position.x, context.touch_world_position.y, context.touch_world_position.z,
+    context.touch_local_position.x, context.touch_local_position.y);
 }
 
 int main ()

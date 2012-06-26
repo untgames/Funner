@@ -190,7 +190,7 @@ void InputPort::OnTouch (const TouchEvent& event, bool& touch_catched)
 
       //оповещение сцены о возникновении события
       
-    input_scene->OnTouch (event, math::vec3f (world_position), math::vec3f (world_direction), touch_frustum, touch_catched);
+    input_scene->OnTouch (*this, event, math::vec3f (world_position), math::vec3f (world_direction), touch_frustum, touch_catched);
   }
   catch (xtl::exception& e)
   {

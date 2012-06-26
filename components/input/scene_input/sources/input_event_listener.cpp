@@ -28,13 +28,13 @@ InputEventListener::List::~List ()
     Оповещение
 */
 
-void InputEventListener::List::BroadcastTouch (const TouchEvent& event, const math::vec3f& touch_world_position)
+void InputEventListener::List::BroadcastTouch (InputPort& input_port, const TouchEvent& event, const math::vec3f& touch_world_position)
 {
   for (InputEventListener* i=first; i; i=i->next)
   {
     try
     {
-      i->OnBroadcastTouch (event, touch_world_position);
+      i->OnBroadcastTouch (input_port, event, touch_world_position);
     }
     catch (...)
     {
