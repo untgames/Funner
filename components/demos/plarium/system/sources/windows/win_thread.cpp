@@ -55,7 +55,7 @@ Thread::Thread (ThreadFunction start, void* thread_arg)
       //check arguments
 
     if (!start)
-      throw std::invalid_argument ("thread start function");
+      throw sgi_stl::invalid_argument ("thread start function");
 
       //create thread
 
@@ -67,7 +67,7 @@ Thread::Thread (ThreadFunction start, void* thread_arg)
     impl->thread = _beginthreadex (0, 0, &thread_function, thread_data, 0, 0);
 
     if (!impl->thread)
-      throw std::runtime_error (utility::format ("::_beginthreadex, error %s", strerror (errno)));
+      throw sgi_stl::runtime_error (utility::format ("::_beginthreadex, error %s", strerror (errno)));
   }
   catch (...)
   {

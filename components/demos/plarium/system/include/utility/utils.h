@@ -1,8 +1,8 @@
 #ifndef UTILITY_UTILS_HEADER
 #define UTILITY_UTILS_HEADER
 
-#include <string>
-#include <vector>
+#include <sgi_stl/string>
+#include <sgi_stl/vector>
 
 namespace plarium
 {
@@ -10,11 +10,11 @@ namespace plarium
 namespace utility
 {
 
-//Print to std::string
-std::string format (const char* format,...);
+//Print to sgi_stl::string
+sgi_stl::string format (const char* format,...);
 
 //split string
-std::vector<std::string> split (const char* str, const char* delimiters=" ", const char* brackets="");
+sgi_stl::vector<sgi_stl::string> split (const char* str, const char* delimiters=" ", const char* brackets="");
 
 //Get current time
 size_t milliseconds ();

@@ -1,7 +1,8 @@
 #include <cstdio>
 #include <cstdarg>
-#include <string>
-#include <stdexcept>
+
+#include <sgi_stl/string>
+#include <sgi_stl/stdexcept>
 
 #ifdef __APPLE__
 

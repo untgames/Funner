@@ -27,7 +27,7 @@ void check_errors (int error, const char* source)
   if (error == Z_OK)
     return;
 
-  throw std::runtime_error (format ("Error at '%s' - '%s'", source, get_error_name (error)));
+  throw sgi_stl::runtime_error (format ("Error at '%s' - '%s'", source, get_error_name (error)));
 }
 
 }
@@ -84,7 +84,7 @@ size_t zlib_compress (const unsigned char* src, size_t src_size, unsigned char* 
   int end_result   = deflateEnd (&strm);
 
   if (result == Z_OK)
-    throw std::invalid_argument ("Insufficient dst_size");
+    throw sgi_stl::invalid_argument ("Insufficient dst_size");
 
   if (result != Z_STREAM_END)
     check_errors (result, "::deflate");
@@ -118,7 +118,7 @@ void zlib_decompress (const unsigned char* src, size_t src_size, unsigned char* 
   int end_result    = inflateEnd (&strm);
 
   if (result == Z_OK)
-    throw std::invalid_argument ("Insufficient dst_size");
+    throw sgi_stl::invalid_argument ("Insufficient dst_size");
 
   if (result != Z_STREAM_END)
     check_errors (result, "::inflate");
@@ -126,7 +126,7 @@ void zlib_decompress (const unsigned char* src, size_t src_size, unsigned char* 
   check_errors (end_result, "::inflateEnd");
 
   if (dst_available)
-    throw std::invalid_argument ("dst_size too large");
+    throw sgi_stl::invalid_argument ("dst_size too large");
 }
 
 }

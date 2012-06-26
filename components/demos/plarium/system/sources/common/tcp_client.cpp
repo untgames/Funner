@@ -18,7 +18,7 @@ const int WOULD_BLOCK_ERROR      = EWOULDBLOCK;
 #ifdef _MSC_VER
 
 //получение строки с сообщением об ошибке
-std::string get_winsock_error_message (DWORD error_code)
+sgi_stl::string get_winsock_error_message (DWORD error_code)
 {
   void* buffer = 0;
 
@@ -56,7 +56,7 @@ std::string get_winsock_error_message (DWORD error_code)
         }
       }
 
-    std::string message = format ("Win32 error %u. %s", error_code, buffer);
+    sgi_stl::string message = format ("Win32 error %u. %s", error_code, buffer);
 
     LocalFree (buffer);
 
@@ -68,7 +68,7 @@ void raise_host_error (const char* source, const char* function)
 {
   DWORD error_code = WSAGetLastError ();
 
-  throw std::runtime_error (format ("%s - error at %s - %s", source, function, get_winsock_error_message (error_code).c_str ()));
+  throw sgi_stl::runtime_error (format ("%s - error at %s - %s", source, function, get_winsock_error_message (error_code).c_str ()));
 }
 
 void raise_error (const char* source, const char* function)
@@ -88,7 +88,7 @@ class WinSockInitializer
       int result = WSAStartup (MAKEWORD(2, 2), &wsa_data);
 
       if (result)
-        throw std::runtime_error (format ("WinSockInitializer - Error while calling ::WSAStartup: '%s'", get_winsock_error_message (result).c_str ()));
+        throw sgi_stl::runtime_error (format ("WinSockInitializer - Error while calling ::WSAStartup: '%s'", get_winsock_error_message (result).c_str ()));
     }
 
     ~WinSockInitializer ()
@@ -106,12 +106,12 @@ int close_socket (SOCKET socket)
 
 void raise_error (const char* source, const char* function)
 {
-  throw std::runtime_error (format ("%s - error at %s - %s", source, function, strerror (errno)));
+  throw sgi_stl::runtime_error (format ("%s - error at %s - %s", source, function, strerror (errno)));
 }
 
 void raise_host_error (const char* source, const char* function)
 {
-  throw std::runtime_error (format ("%s - error at %s - %s", source, function, hstrerror (h_errno)));
+  throw sgi_stl::runtime_error (format ("%s - error at %s - %s", source, function, hstrerror (h_errno)));
 }
 
 int close_socket (int socket)
@@ -216,10 +216,10 @@ void TcpClient::Connect (const char* host, unsigned short port)
 #endif
 
   if (IsConnected ())
-    throw std::logic_error ("TcpClient::Connect - Socket already connected");
+    throw sgi_stl::logic_error ("TcpClient::Connect - Socket already connected");
 
   if (!host)
-    throw std::invalid_argument ("TcpClient::Connect - null host");
+    throw sgi_stl::invalid_argument ("TcpClient::Connect - null host");
 
   hostent *entry = gethostbyname (host);
 
@@ -227,7 +227,7 @@ void TcpClient::Connect (const char* host, unsigned short port)
     raise_host_error ("TcpClient::Connect", "::gethostbyname");
 
   if (!entry->h_addr_list [0])
-    throw std::runtime_error ("TcpClient::Connect - error at ::gethostbyname, null address list returned");
+    throw sgi_stl::runtime_error ("TcpClient::Connect - error at ::gethostbyname, null address list returned");
 
   short            address_family;
   sockaddr_storage address_storage;
@@ -270,7 +270,7 @@ void TcpClient::Connect (const char* host, unsigned short port)
       break;
     }
     default:
-      throw std::runtime_error (format ("TcpClient::Connect - host name '%s' resolved, but host address is unsupported.", host));
+      throw sgi_stl::runtime_error (format ("TcpClient::Connect - host name '%s' resolved, but host address is unsupported.", host));
   }
 
   address_storage.ss_family = address_family;
@@ -313,7 +313,7 @@ void TcpClient::Disconnect ()
   impl->connected = false;
 
   if (close_socket (impl->socket))
-    throw std::runtime_error (format ("Can't close socket, error '%s'\n", strerror (errno)));
+    throw sgi_stl::runtime_error (format ("Can't close socket, error '%s'\n", strerror (errno)));
 }
 
 /*
@@ -323,10 +323,10 @@ void TcpClient::Disconnect ()
 size_t TcpClient::Send (const void* buffer, size_t size, size_t timeout_in_milliseconds)
 {
   if (!IsConnected ())
-    throw std::logic_error ("TcpClient::Send - Socket is not connected");
+    throw sgi_stl::logic_error ("TcpClient::Send - Socket is not connected");
 
   if (!buffer)
-    throw std::invalid_argument ("TcpClient::Send - null buffer");
+    throw sgi_stl::invalid_argument ("TcpClient::Send - null buffer");
 
 #ifdef _MSC_VER
   impl->SetSocketOption<DWORD> (SO_SNDTIMEO, (DWORD)timeout_in_milliseconds);
@@ -358,7 +358,7 @@ size_t TcpClient::Send (const void* buffer, size_t size, size_t timeout_in_milli
       return 0;
 
     if (error_code == CONNECTION_RESET_ERROR)
-      throw std::runtime_error ("TcpClient::Send - A connection was forcibly closed by a peer.");
+      throw sgi_stl::runtime_error ("TcpClient::Send - A connection was forcibly closed by a peer.");
     else
       raise_error ("TcpClient::Send", "::send");
   }
@@ -373,10 +373,10 @@ size_t TcpClient::Send (const void* buffer, size_t size, size_t timeout_in_milli
 size_t TcpClient::Receive (void* buffer, size_t size, size_t timeout_in_milliseconds)
 {
   if (!IsConnected ())
-    throw std::logic_error ("TcpClient::Receive - Socket is not connected");
+    throw sgi_stl::logic_error ("TcpClient::Receive - Socket is not connected");
 
   if (!buffer)
-    throw std::invalid_argument ("TcpClient::Receive - null buffer");
+    throw sgi_stl::invalid_argument ("TcpClient::Receive - null buffer");
 
 #ifdef _MSC_VER
   impl->SetSocketOption<DWORD> (SO_RCVTIMEO, (DWORD)timeout_in_milliseconds);
@@ -399,7 +399,7 @@ size_t TcpClient::Receive (void* buffer, size_t size, size_t timeout_in_millisec
 #endif
 
   if ((received_bytes < 0 && error_code == CONNECTION_RESET_ERROR) || !received_bytes)
-    throw std::runtime_error ("TcpClient::Receive - A connection was forcibly closed by a peer.");
+    throw sgi_stl::runtime_error ("TcpClient::Receive - A connection was forcibly closed by a peer.");
 
   if (received_bytes < 0)
   {

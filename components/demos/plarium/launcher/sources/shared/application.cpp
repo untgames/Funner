@@ -24,9 +24,9 @@ const size_t        QUOTE_REPLACEMENT_LENGTH = strlen (QUOTE_REPLACEMENT);
 
 struct Application::Impl : public INotificationListener, public IHsConnectionEventListener, public IHsConnectionLogListener
 {
-  std::auto_ptr<HsConnection> connection;
+  sgi_stl::auto_ptr<HsConnection> connection;
   engine::IEngine*            engine;
-  std::string                 host;
+  sgi_stl::string                 host;
   unsigned short              port;
   unsigned char*              message_buffer;
   size_t                      message_buffer_size;
@@ -64,10 +64,10 @@ struct Application::Impl : public INotificationListener, public IHsConnectionEve
   void Run (engine::IEngine* in_engine)
   {
     if (engine)
-      throw std::logic_error ("plarium::launcher::Application::Run - already run");
+      throw sgi_stl::logic_error ("plarium::launcher::Application::Run - already run");
 
     if (!in_engine)
-      throw std::invalid_argument ("plarium::launcher::Application::Run - null engine");
+      throw sgi_stl::invalid_argument ("plarium::launcher::Application::Run - null engine");
 
     engine = in_engine;
 
@@ -80,13 +80,13 @@ struct Application::Impl : public INotificationListener, public IHsConnectionEve
   {
     static const char* METHOD_NAME = "plarium::launcher::Application::OnNotification";
 
-    std::vector<std::string> words   = split (notification, " ", "'\"");
-    const std::string&       command = words [1];
+    sgi_stl::vector<sgi_stl::string> words   = split (notification, " ", "'\"");
+    const sgi_stl::string&       command = words [1];
 
     if (command == "Connect")
     {
       if (words.size () != 4)
-        throw std::invalid_argument (format ("%s: invalid 'Connect' arguments '%s'", METHOD_NAME, notification));
+        throw sgi_stl::invalid_argument (format ("%s: invalid 'Connect' arguments '%s'", METHOD_NAME, notification));
 
       host = words [2];
       port = atoi (words [3].c_str ());
@@ -105,7 +105,7 @@ struct Application::Impl : public INotificationListener, public IHsConnectionEve
     else if (command == "SendMessage")
     {
       if (words.size () != 4)
-        throw std::invalid_argument (format ("%s: invalid 'SendMessage' arguments '%s'", METHOD_NAME, notification));
+        throw sgi_stl::invalid_argument (format ("%s: invalid 'SendMessage' arguments '%s'", METHOD_NAME, notification));
 
       connection->SendMessage (atoi (words [2].c_str ()), (const unsigned char*)words [3].c_str (), words [3].size ());
     }

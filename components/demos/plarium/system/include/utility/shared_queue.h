@@ -2,8 +2,8 @@
 #define UTILITY_SHARED_QUEUE_HEADER
 
 #include <cstddef>
-#include <deque>
-#include <memory>
+#include <sgi_stl/deque>
+#include <sgi_stl/memory>
 
 #include <system/condition.h>
 #include <system/mutex.h>
@@ -27,10 +27,10 @@ template <typename T> class SharedQueue
     size_t Size  () const;
 
     /// Puts the item into the queue.
-    bool Enqueue (std::auto_ptr<T>& item);
+    bool Enqueue (sgi_stl::auto_ptr<T>& item);
 
     /// Removes and returns the item at the beginning of the Queue.
-    std::auto_ptr<T> Dequeue (size_t milliseconds_timeout);
+    void Dequeue (size_t milliseconds_timeout, sgi_stl::auto_ptr<T>& result);
 
     /// Clear queue
     void Clear ();
@@ -43,7 +43,7 @@ template <typename T> class SharedQueue
     SharedQueue& operator = (const SharedQueue&); //no impl
 
   private:
-    typedef std::deque<T*> ItemCollection;
+    typedef sgi_stl::deque<T*> ItemCollection;
 
     ItemCollection             items;
     plarium::system::Mutex     mutex;

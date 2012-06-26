@@ -3,7 +3,7 @@
 namespace
 {
 
-std::string vformat (const char* format,va_list list)
+sgi_stl::string vformat (const char* format,va_list list)
 {
   if (!format)
     return "";
@@ -13,7 +13,7 @@ std::string vformat (const char* format,va_list list)
   if (size == -1)
     return "";
 
-  std::string str;
+  sgi_stl::string str;
 
   str.resize (size);
 
@@ -30,7 +30,7 @@ namespace plarium
 namespace utility
 {
 
-std::string format (const char* format,...)
+sgi_stl::string format (const char* format,...)
 {
   va_list list;
 
@@ -39,9 +39,9 @@ std::string format (const char* format,...)
   return vformat (format,list);
 }
 
-std::vector<std::string> split (const char* str, const char* delimiters, const char* brackets)
+sgi_stl::vector<sgi_stl::string> split (const char* str, const char* delimiters, const char* brackets)
 {
-  std::vector<std::string> return_value;
+  sgi_stl::vector<sgi_stl::string> return_value;
   const char*              start;               //next word start
   bool                     start_found = false; //was start found
   const char*              active_bracket = 0;
@@ -52,7 +52,7 @@ std::vector<std::string> split (const char* str, const char* delimiters, const c
     {
       if (*active_bracket == *str)
       {
-        return_value.push_back (std::string (start, str - start));
+        return_value.push_back (sgi_stl::string (start, str - start));
         start_found    = false;
         active_bracket = 0;
       }
@@ -75,7 +75,7 @@ std::vector<std::string> split (const char* str, const char* delimiters, const c
     {
       if (start_found)
       {
-        return_value.push_back (std::string (start, str - start));
+        return_value.push_back (sgi_stl::string (start, str - start));
         start_found = false;
       }
     }
@@ -100,7 +100,7 @@ std::vector<std::string> split (const char* str, const char* delimiters, const c
   }
 
   if (start_found && *start)      //push last word
-    return_value.push_back (std::string (start));
+    return_value.push_back (sgi_stl::string (start));
 
   return return_value;
 }

@@ -38,7 +38,7 @@ typedef SharedQueue<TestData> TestQueue;
 int main ()
 {
   {
-    std::auto_ptr <TestData> item (new TestData);
+    sgi_stl::auto_ptr <TestData> item (new TestData);
 
     TestQueue queue(1);
 
@@ -50,7 +50,9 @@ int main ()
 
     printf ("Queue size = %u\n", queue.Size ());
 
-    std::auto_ptr<TestData> result = queue.Dequeue (0);
+    sgi_stl::auto_ptr<TestData> result;
+
+    queue.Dequeue (0, result);
 
     printf ("Result getted = %c\n", result.get () == 0 ? 'n' : 'y');
     printf ("Queue size = %u\n", queue.Size ());

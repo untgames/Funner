@@ -6,7 +6,7 @@ namespace
 {
 
 //получение строки с сообщением об ошибке
-std::string get_error_message (DWORD error_code)
+sgi_stl::string get_error_message (DWORD error_code)
 {
   void* buffer = 0;
 
@@ -44,7 +44,7 @@ std::string get_error_message (DWORD error_code)
         }
       }
 
-    std::string message = utility::format ("Win32 error %u. %s", error_code, buffer);
+    sgi_stl::string message = utility::format ("Win32 error %u. %s", error_code, buffer);
 
     LocalFree (buffer);
 
@@ -66,14 +66,14 @@ void check_errors (const char* source)
   DWORD error_code = GetLastError ();
   
   if (error_code)
-    throw std::runtime_error (utility::format ("common::check_errors", get_error_message (error_code).c_str ()));
+    throw sgi_stl::runtime_error (utility::format ("common::check_errors", get_error_message (error_code).c_str ()));
 }
 
 void raise_error (const char* source)
 {
   check_errors (source);
 
-  throw std::runtime_error (source);
+  throw sgi_stl::runtime_error (source);
 }
 
 }

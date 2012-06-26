@@ -1,4 +1,4 @@
-#include <stdexcept>
+#include <sgi_stl/stdexcept>
 
 #include <hsserver/hs_connection.h>
 

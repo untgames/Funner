@@ -1081,7 +1081,7 @@ struct AesContext::Impl
   Impl (CryptoOperation operation, const void* key, size_t key_bits)
   {
     if (!key)
-      throw std::invalid_argument ("AesContext::AesContext - null key");
+      throw sgi_stl::invalid_argument ("AesContext::AesContext - null key");
 
     switch (key_bits)
     {
@@ -1090,7 +1090,7 @@ struct AesContext::Impl
       case 256:
         break;
       default:
-        throw std::invalid_argument ("AesContext::AesContext - unsupported key bits");
+        throw sgi_stl::invalid_argument ("AesContext::AesContext - unsupported key bits");
     }
 
     CCOperation cc_operation;
@@ -1104,7 +1104,7 @@ struct AesContext::Impl
         cc_operation = kCCDecrypt;
         break;
       default:
-        throw std::invalid_argument ("plarium::utility::aes - unsupported operation");
+        throw sgi_stl::invalid_argument ("plarium::utility::aes - unsupported operation");
     }
 
     CheckCCError ("AesContext::AesContext", CCCryptorCreate (cc_operation, kCCAlgorithmAES128, kCCOptionECBMode, key, key_bits / 8, 0, &cryptor));
@@ -1118,10 +1118,10 @@ struct AesContext::Impl
   void Update (size_t blocks_count, const void* src_buffer, void* dst_buffer)
   {
     if (!src_buffer && blocks_count)
-      throw std::invalid_argument ("AesContext::Update - null src_buffer");
+      throw sgi_stl::invalid_argument ("AesContext::Update - null src_buffer");
 
     if (!dst_buffer && blocks_count)
-      throw std::invalid_argument ("AesContext::Update - null dst_buffer");
+      throw sgi_stl::invalid_argument ("AesContext::Update - null dst_buffer");
 
     size_t buffer_size = blocks_count * CRYPTO_BLOCK_SIZE,
            encoded_bytes = 0;
@@ -1136,19 +1136,19 @@ struct AesContext::Impl
       case kCCSuccess:
         return;
       case kCCParamError:
-        throw std::runtime_error (format ("%s - param error", source));
+        throw sgi_stl::runtime_error (format ("%s - param error", source));
       case kCCBufferTooSmall:
-        throw std::runtime_error (format ("%s - buffer too small", source));
+        throw sgi_stl::runtime_error (format ("%s - buffer too small", source));
       case kCCMemoryFailure:
-        throw std::runtime_error (format ("%s - memory failure", source));
+        throw sgi_stl::runtime_error (format ("%s - memory failure", source));
       case kCCAlignmentError:
-        throw std::runtime_error (format ("%s - alignment error", source));
+        throw sgi_stl::runtime_error (format ("%s - alignment error", source));
       case kCCDecodeError:
-        throw std::runtime_error (format ("%s - decode error", source));
+        throw sgi_stl::runtime_error (format ("%s - decode error", source));
       case kCCUnimplemented:
-        throw std::runtime_error (format ("%s - unimplemented", source));
+        throw sgi_stl::runtime_error (format ("%s - unimplemented", source));
       default:
-        throw std::runtime_error (format ("%s - unknown error %d", source, status));
+        throw sgi_stl::runtime_error (format ("%s - unknown error %d", source, status));
     }
   }
 };
@@ -1164,7 +1164,7 @@ struct AesContext::Impl
     : operation (in_operation)
   {
     if (!key)
-      throw std::invalid_argument ("AesContext::AesContext - null key");
+      throw sgi_stl::invalid_argument ("AesContext::AesContext - null key");
 
     switch (key_bits)
     {
@@ -1173,7 +1173,7 @@ struct AesContext::Impl
       case 256:
         break;
       default:
-        throw std::invalid_argument ("AesContext::AesContext - unsupported key bits");
+        throw sgi_stl::invalid_argument ("AesContext::AesContext - unsupported key bits");
     }
 
     switch (operation)
@@ -1182,7 +1182,7 @@ struct AesContext::Impl
       case CryptoOperation_Decrypt:
         break;
       default:
-        throw std::invalid_argument ("AesContext::AesContext - unsupported operation");
+        throw sgi_stl::invalid_argument ("AesContext::AesContext - unsupported operation");
     }
 
     aes_init (&context, (const byte*)key, key_bits, operation);
@@ -1191,10 +1191,10 @@ struct AesContext::Impl
   void Update (size_t blocks_count, const void* src_buffer, void* dst_buffer)
   {
     if (!src_buffer && blocks_count)
-      throw std::invalid_argument ("AesContext::Update - null src_buffer");
+      throw sgi_stl::invalid_argument ("AesContext::Update - null src_buffer");
 
     if (!dst_buffer && blocks_count)
-      throw std::invalid_argument ("AesContext::Update - null dst_buffer");
+      throw sgi_stl::invalid_argument ("AesContext::Update - null dst_buffer");
 
     const unsigned char *src = (const unsigned char*)src_buffer;
           unsigned char *dst = (unsigned char*)dst_buffer;
@@ -1225,7 +1225,7 @@ namespace utility
 void aes (CryptoOperation operation, const void* key, size_t key_bits, size_t blocks_count, const void* src_buffer, void* dst_buffer)
 {
   if (!key)
-    throw std::invalid_argument ("plarium::utility::aes - null key");
+    throw sgi_stl::invalid_argument ("plarium::utility::aes - null key");
 
   switch (key_bits)
   {
@@ -1234,14 +1234,14 @@ void aes (CryptoOperation operation, const void* key, size_t key_bits, size_t bl
     case 256:
       break;
     default:
-      throw std::invalid_argument ("plarium::utility::aes - unsupported key bits");
+      throw sgi_stl::invalid_argument ("plarium::utility::aes - unsupported key bits");
   }
 
   if (!src_buffer && blocks_count)
-    throw std::invalid_argument ("plarium::utility::aes - null src_buffer");
+    throw sgi_stl::invalid_argument ("plarium::utility::aes - null src_buffer");
 
   if (!dst_buffer && blocks_count)
-    throw std::invalid_argument ("plarium::utility::aes - null dst_buffer");
+    throw sgi_stl::invalid_argument ("plarium::utility::aes - null dst_buffer");
 
   switch (operation)
   {
@@ -1249,7 +1249,7 @@ void aes (CryptoOperation operation, const void* key, size_t key_bits, size_t bl
     case CryptoOperation_Decrypt:
       break;
     default:
-      throw std::invalid_argument ("plarium::utility::aes - unsupported operation");
+      throw sgi_stl::invalid_argument ("plarium::utility::aes - unsupported operation");
   }
 
 #ifdef __APPLE__
@@ -1264,7 +1264,7 @@ void aes (CryptoOperation operation, const void* key, size_t key_bits, size_t bl
       cc_operation = kCCDecrypt;
       break;
     default:
-      throw std::invalid_argument ("plarium::utility::aes - unsupported operation");
+      throw sgi_stl::invalid_argument ("plarium::utility::aes - unsupported operation");
   }
 
   size_t buffer_size = blocks_count * CRYPTO_BLOCK_SIZE,
@@ -1273,14 +1273,14 @@ void aes (CryptoOperation operation, const void* key, size_t key_bits, size_t bl
   switch (CCCrypt (cc_operation, kCCAlgorithmAES128, kCCOptionECBMode, key, key_bits / 8, 0, src_buffer, buffer_size, dst_buffer, buffer_size, &encoded_bytes))
   {
     case kCCBufferTooSmall:
-      throw std::runtime_error ("plarium::utility::aes - buffer too small, not all data encoded");
+      throw sgi_stl::runtime_error ("plarium::utility::aes - buffer too small, not all data encoded");
     case kCCSuccess:
       if (encoded_bytes != buffer_size)
-        throw std::runtime_error ("plarium::utility::aes - unknown error, not all data encoded");
+        throw sgi_stl::runtime_error ("plarium::utility::aes - unknown error, not all data encoded");
 
       return;
     default:
-      throw std::runtime_error ("plarium::utility::aes - unknown error, not all data encoded");
+      throw sgi_stl::runtime_error ("plarium::utility::aes - unknown error, not all data encoded");
   }
 #else
   AesParam context;

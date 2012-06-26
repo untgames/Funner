@@ -36,7 +36,7 @@ size_t SharedQueue<T>::Size () const
 }
 
 template <typename T>
-bool SharedQueue<T>::Enqueue (std::auto_ptr<T>& item)
+bool SharedQueue<T>::Enqueue (sgi_stl::auto_ptr<T>& item)
 {
   plarium::system::Lock lock (mutex);
 
@@ -51,7 +51,7 @@ bool SharedQueue<T>::Enqueue (std::auto_ptr<T>& item)
 }
 
 template <typename T>
-std::auto_ptr<T> SharedQueue<T>::Dequeue (size_t milliseconds_timeout)
+void SharedQueue<T>::Dequeue (size_t milliseconds_timeout, sgi_stl::auto_ptr<T>& result)
 {
   plarium::system::Lock lock (mutex);
 
@@ -59,13 +59,11 @@ std::auto_ptr<T> SharedQueue<T>::Dequeue (size_t milliseconds_timeout)
     dequeue_condition.Wait (mutex, milliseconds_timeout);
 
   if (items.empty ())
-    return std::auto_ptr<T> (0);
+    return result.reset (0);
 
-  std::auto_ptr<T> result (items.front ());
+  result.reset (items.front ());
 
   items.pop_front();
-
-  return result;
 }
 
 template <typename T>

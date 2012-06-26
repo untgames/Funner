@@ -1,4 +1,4 @@
-#include <stdexcept>
+#include <sgi_stl/stdexcept>
 
 #include <errno.h>
 #include <fcntl.h>

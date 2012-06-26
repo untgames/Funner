@@ -11,14 +11,18 @@ void* run (void*)
 {
   printf ("thread started\n");
 
-  std::auto_ptr<int> obj1 = queue->Dequeue (1000);
+  sgi_stl::auto_ptr<int> obj1;
+
+  queue->Dequeue (1000, obj1);
 
   if (obj1.get ())
     printf ("Object %d dequeued\n", *obj1);
   else
     printf ("Dequeue failed\n");
 
-  std::auto_ptr<int> obj2 = queue->Dequeue (500);
+  sgi_stl::auto_ptr<int> obj2;
+
+  queue->Dequeue (500, obj2);
 
   if (obj2.get  ())
     printf ("Object %d dequeued\n", *obj2);
@@ -34,7 +38,7 @@ int main ()
 
   Thread thread (&run);
 
-  std::auto_ptr<int> obj1 (new int (5));
+  sgi_stl::auto_ptr<int> obj1 (new int (5));
 
   queue->Enqueue (obj1);
 

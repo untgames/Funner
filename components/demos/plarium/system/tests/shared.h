@@ -3,8 +3,8 @@
 
 #include <cstdio>
 
-#include <string>
-#include <stdexcept>
+#include <sgi_stl/string>
+#include <sgi_stl/stdexcept>
 
 #include <utility/crypto.h>
 #include <utility/hash.h>

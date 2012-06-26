@@ -25,7 +25,7 @@ PLARIUM.LAUNCHER.SOURCES.msvc.LINK_FLAGS    := -subsystem:windows -entry:mainCRT
 PLARIUM.LAUNCHER.SOURCES.win32.SOURCE_DIRS  := sources/platform/win32
 PLARIUM.LAUNCHER.SOURCES.macosx.SOURCE_DIRS := sources/platform/macosx
 PLARIUM.LAUNCHER.SOURCES.iphone.SOURCE_DIRS := sources/platform/iphone
-PLARIUM.LAUNCHER.SOURCES.IMPORTS            := compile.engine.launcher compile.plarium.hsserver compile.plarium.system link.plarium.hsserver
+PLARIUM.LAUNCHER.SOURCES.IMPORTS            := compile.engine.launcher compile.plarium.hsserver compile.plarium.system link.plarium.hsserver compile.plarium.sgi_stl
 
 #Цель - console application
 PLARIUM.CLAUNCHER.SOURCES.TYPE                := application

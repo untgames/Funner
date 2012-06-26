@@ -4,7 +4,7 @@ using namespace plarium::system;
 
 void* run (void*)
 {
-  throw std::logic_error ("Operation failed");
+  throw sgi_stl::logic_error ("Operation failed");
 }
 
 int main ()

@@ -1,4 +1,4 @@
-#include <stdexcept>
+#include <sgi_stl/stdexcept>
 
 #include <system/condition.h>
 #include <system/mutex.h>

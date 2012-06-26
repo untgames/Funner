@@ -14,7 +14,7 @@ int main ()
 
   for (size_t i = 0, count = sizeof (TESTS) / sizeof (*TESTS); i < count; i++)
   {
-    std::vector<std::string> words = split (TESTS [i], " ", "'");
+    sgi_stl::vector<sgi_stl::string> words = split (TESTS [i], " ", "'");
 
     printf ("Words for string '%s':\n", TESTS [i]);
 

@@ -29,8 +29,8 @@ const unsigned char OPTIONS_ENCRYPTED           = 0x02;
 
 struct Message
 {
-  unsigned short plugin_id;
-  std::string    message;
+  unsigned short  plugin_id;
+  sgi_stl::string message;
 
   Message (unsigned short in_plugin_id, const unsigned char* in_message, size_t size)
     : plugin_id (in_plugin_id)
@@ -69,7 +69,7 @@ class IBackgroundThreadListener
 //Send-thread function arguments
 struct SendFunctionArg
 {
-  std::string                host;
+  sgi_stl::string                host;
   unsigned short             port;
   HsConnectionSettings&      connection_settings;
   TcpClient&                 tcp_client;
@@ -142,7 +142,7 @@ bool receive_data (TcpClient& tcp_client, volatile bool& need_stop, size_t timeo
 
 void* receive_function (void* user_data)
 {
-  std::auto_ptr<ReceiveFunctionArg> data ((ReceiveFunctionArg*)user_data);
+  sgi_stl::auto_ptr<ReceiveFunctionArg> data ((ReceiveFunctionArg*)user_data);
 
   volatile bool& need_stop = data->need_stop;
 
@@ -292,7 +292,7 @@ void* receive_function (void* user_data)
 //Send-thread function
 void* send_function (void* user_data)
 {
-  std::auto_ptr<SendFunctionArg> data ((SendFunctionArg*)user_data);
+  sgi_stl::auto_ptr<SendFunctionArg> data ((SendFunctionArg*)user_data);
 
   volatile bool& need_stop = data->need_stop;
 
@@ -313,7 +313,7 @@ void* send_function (void* user_data)
 
   data->listener.OnConnected ();
 
-  std::auto_ptr<ReceiveFunctionArg> receive_function_arg (new ReceiveFunctionArg (data->connection_settings, data->tcp_client, data->need_stop, data->listener));
+  sgi_stl::auto_ptr<ReceiveFunctionArg> receive_function_arg (new ReceiveFunctionArg (data->connection_settings, data->tcp_client, data->need_stop, data->listener));
 
   Thread receive_thread (receive_function, receive_function_arg.get ());      //thread for receiving data
 
@@ -336,13 +336,15 @@ void* send_function (void* user_data)
 
     try
     {
-      std::auto_ptr<Message> message = data->message_queue.Dequeue (DEQUEUE_TIMEOUT);
+      sgi_stl::auto_ptr<Message> message;
+
+      data->message_queue.Dequeue (DEQUEUE_TIMEOUT, message);
 
       if (!message.get ())
       {
         if (milliseconds () - last_keep_alive_time > data->connection_settings.keep_alive_interval)
         {
-          std::auto_ptr<Message> ping_message (new Message (1, (const unsigned char*)PING_MESSAGE, strlen (PING_MESSAGE)));
+          sgi_stl::auto_ptr<Message> ping_message (new Message (1, (const unsigned char*)PING_MESSAGE, strlen (PING_MESSAGE)));
 
           data->message_queue.Enqueue (ping_message);
         }
@@ -503,7 +505,7 @@ struct HsConnection::Impl : public ITcpClientListener, public IBackgroundThreadL
   IHsConnectionEventListener* event_listener;       //events listener
   IHsConnectionLogListener*   log_listener;         //log messages listener
   volatile HsConnectionState  state;                //connection state
-  std::auto_ptr<Thread>       send_thread;          //thread for sending data
+  sgi_stl::auto_ptr<Thread>       send_thread;          //thread for sending data
   volatile bool               needs_stop_threads;   //signal to stop background threads
   MessageQueue                send_queue;           //send messages queue
   size_t                      create_thread_id;     //id of the creator thread
@@ -531,20 +533,20 @@ struct HsConnection::Impl : public ITcpClientListener, public IBackgroundThreadL
   void Connect (const char* host, unsigned short port)
   {
     if (!host)
-      throw std::invalid_argument ("HsConnection::Connect - null host");
+      throw sgi_stl::invalid_argument ("HsConnection::Connect - null host");
 
     if (state != HsConnectionState_Disconnected)
-      throw std::logic_error ("HsConnection::Connect - connection already connected");
+      throw sgi_stl::logic_error ("HsConnection::Connect - connection already connected");
 
     if (Thread::GetCurrentThreadId () != create_thread_id)
-      throw std::logic_error ("HsConnection::Connect - can't connect from thread other than main");
+      throw sgi_stl::logic_error ("HsConnection::Connect - can't connect from thread other than main");
 
     state = HsConnectionState_Connecting;
     OnConnectionStateChanged ();
 
     needs_stop_threads = false;
 
-    std::auto_ptr<SendFunctionArg> send_function_arg (new SendFunctionArg (host, port, settings, tcp_client, send_queue, needs_stop_threads, *this));
+    sgi_stl::auto_ptr<SendFunctionArg> send_function_arg (new SendFunctionArg (host, port, settings, tcp_client, send_queue, needs_stop_threads, *this));
 
     send_thread.reset (new Thread (send_function, send_function_arg.get ()));
 
@@ -554,7 +556,7 @@ struct HsConnection::Impl : public ITcpClientListener, public IBackgroundThreadL
   void Disconnect ()
   {
     if (Thread::GetCurrentThreadId () != create_thread_id)
-      throw std::logic_error ("HsConnection::Connect - can't connect from thread other than main");
+      throw sgi_stl::logic_error ("HsConnection::Connect - can't connect from thread other than main");
 
     if (state == HsConnectionState_Disconnected)
       return;
@@ -581,12 +583,12 @@ struct HsConnection::Impl : public ITcpClientListener, public IBackgroundThreadL
   void SendMessage (unsigned short plugin_id, const unsigned char* message, size_t size)
   {
     if (!message && size)
-      throw std::invalid_argument ("HsConnection::SendMessage - null message");
+      throw sgi_stl::invalid_argument ("HsConnection::SendMessage - null message");
 
     if (state == HsConnectionState_Disconnected)
-      throw std::logic_error ("HsConnection::SendMessage - connection disconnected");
+      throw sgi_stl::logic_error ("HsConnection::SendMessage - connection disconnected");
 
-    std::auto_ptr<Message> new_message (new Message (plugin_id, message, size));
+    sgi_stl::auto_ptr<Message> new_message (new Message (plugin_id, message, size));
 
     if (!send_queue.Enqueue (new_message))
     {
@@ -745,7 +747,7 @@ void HsConnection::SendMessage (unsigned short plugin_id, const unsigned char* m
 void HsConnection::SetEventListener (IHsConnectionEventListener* listener)
 {
   if (impl->state != HsConnectionState_Disconnected)
-    throw std::logic_error ("HsConnection::SetEventListener - listener can be changed only in disconnected state");
+    throw sgi_stl::logic_error ("HsConnection::SetEventListener - listener can be changed only in disconnected state");
 
   impl->event_listener = listener;
 }
@@ -753,7 +755,7 @@ void HsConnection::SetEventListener (IHsConnectionEventListener* listener)
 void HsConnection::SetLogListener (IHsConnectionLogListener* listener)
 {
   if (impl->state != HsConnectionState_Disconnected)
-    throw std::logic_error ("HsConnection::SetEventListener - listener can be changed only in disconnected state");
+    throw sgi_stl::logic_error ("HsConnection::SetEventListener - listener can be changed only in disconnected state");
 
   impl->log_listener = listener;
 }

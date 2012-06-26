@@ -13,7 +13,7 @@ struct HmacSha256Context::Impl
     : finished (false)
   {
     if (!key && key_size)
-      throw std::invalid_argument ("HmacSha256Context::HmacSha256Context - null key");
+      throw sgi_stl::invalid_argument ("HmacSha256Context::HmacSha256Context - null key");
 
     CCHmacInit (&context, kCCHmacAlgSHA256, key, key_size);
   }
@@ -21,10 +21,10 @@ struct HmacSha256Context::Impl
   void Update (const void* data, size_t data_size)
   {
     if (finished)
-      throw std::logic_error ("HmacSha256Context::Update - can't update after Finish");
+      throw sgi_stl::logic_error ("HmacSha256Context::Update - can't update after Finish");
 
     if (!data && data_size)
-      throw std::invalid_argument ("HmacSha256Context::Update - null data");
+      throw sgi_stl::invalid_argument ("HmacSha256Context::Update - null data");
 
     CCHmacUpdate (&context, data, data_size);
   }
@@ -32,10 +32,10 @@ struct HmacSha256Context::Impl
   void Finish (unsigned char (&result_hash_value) [32])
   {
     if (finished)
-      throw std::logic_error ("HmacSha256Context::Finish - can't finish after Finish");
+      throw sgi_stl::logic_error ("HmacSha256Context::Finish - can't finish after Finish");
 
     if (!result_hash_value)
-      throw std::invalid_argument ("HmacSha256Context::Finish - null result_hash_value");
+      throw sgi_stl::invalid_argument ("HmacSha256Context::Finish - null result_hash_value");
 
     CCHmacFinal (&context, result_hash_value);
 
@@ -133,7 +133,7 @@ struct HmacSha256Context::Impl
     : finished (false)
   {
     if (!key && key_size)
-      throw std::invalid_argument ("HmacSha256Context::HmacSha256Context - null key");
+      throw sgi_stl::invalid_argument ("HmacSha256Context::HmacSha256Context - null key");
 
     hmac_sha256_init (&context, (const unsigned char*)key, key_size);
   }
@@ -141,10 +141,10 @@ struct HmacSha256Context::Impl
   void Update (const void* data, size_t data_size)
   {
     if (finished)
-      throw std::logic_error ("HmacSha256Context::Update - can't update after Finish");
+      throw sgi_stl::logic_error ("HmacSha256Context::Update - can't update after Finish");
 
     if (!data && data_size)
-      throw std::invalid_argument ("HmacSha256Context::Update - null data");
+      throw sgi_stl::invalid_argument ("HmacSha256Context::Update - null data");
 
     hmac_sha256_update (&context, (const unsigned char*)data, data_size);
   }
@@ -152,10 +152,10 @@ struct HmacSha256Context::Impl
   void Finish (unsigned char (&result_hash_value) [32])
   {
     if (finished)
-      throw std::logic_error ("HmacSha256Context::Finish - can't finish after Finish");
+      throw sgi_stl::logic_error ("HmacSha256Context::Finish - can't finish after Finish");
 
     if (!result_hash_value)
-      throw std::invalid_argument ("HmacSha256Context::Finish - null result_hash_value");
+      throw sgi_stl::invalid_argument ("HmacSha256Context::Finish - null result_hash_value");
 
     hmac_sha256_final (&context, result_hash_value);
 
@@ -174,10 +174,10 @@ namespace utility
 void hmac_sha256 (const void* key, size_t key_size, const void* data, size_t data_size, unsigned char (&result_hash_value) [32])
 {
   if (!key)
-    throw std::invalid_argument ("plarium::utility::hmac_sha256 - null key");
+    throw sgi_stl::invalid_argument ("plarium::utility::hmac_sha256 - null key");
 
   if (!data && data_size)
-    throw std::invalid_argument ("plarium::utility::hmac_sha256 - null data");
+    throw sgi_stl::invalid_argument ("plarium::utility::hmac_sha256 - null data");
 
 #ifdef __APPLE__
   CCHmac (kCCHmacAlgSHA256, key, key_size, data, data_size, result_hash_value);

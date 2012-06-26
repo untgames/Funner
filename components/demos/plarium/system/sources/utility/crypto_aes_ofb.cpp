@@ -75,10 +75,10 @@ struct AesOfbContext::Impl
   void Update (size_t data_size, const void* src_buffer, void* dst_buffer)
   {
     if (!src_buffer && data_size)
-      throw std::invalid_argument ("AesOfbContext::Update - null src_buffer");
+      throw sgi_stl::invalid_argument ("AesOfbContext::Update - null src_buffer");
 
     if (!dst_buffer && data_size)
-      throw std::invalid_argument ("AesOfbContext::Update - null dst_buffer");
+      throw sgi_stl::invalid_argument ("AesOfbContext::Update - null dst_buffer");
 
     ofb128_encrypt ((const unsigned char*)src_buffer, (unsigned char*)dst_buffer, data_size, aes_context, iv, &num);
   }

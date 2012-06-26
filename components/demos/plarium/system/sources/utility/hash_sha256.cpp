@@ -23,7 +23,7 @@ struct Sha256Context::Impl
   void Update (const void* data, size_t data_size)
   {
     if (!data && data_size)
-      throw std::invalid_argument ("Sha256Context::Update - null data");
+      throw sgi_stl::invalid_argument ("Sha256Context::Update - null data");
 
     if (need_init)
       Init ();
@@ -34,7 +34,7 @@ struct Sha256Context::Impl
   void Finish (unsigned char (&result_hash_value) [32])
   {
     if (!result_hash_value)
-      throw std::invalid_argument ("Sha256Context::Finish - null result_hash_value");
+      throw sgi_stl::invalid_argument ("Sha256Context::Finish - null result_hash_value");
 
     if (need_init)
       Init ();
@@ -334,7 +334,7 @@ struct Sha256Context::Impl
   void Update (const void* data, size_t data_size)
   {
     if (!data && data_size)
-      throw std::invalid_argument ("Sha256Context::Update - null data");
+      throw sgi_stl::invalid_argument ("Sha256Context::Update - null data");
 
     if (need_init)
       Init ();
@@ -345,7 +345,7 @@ struct Sha256Context::Impl
   void Finish (unsigned char (&result_hash_value) [32])
   {
     if (!result_hash_value)
-      throw std::invalid_argument ("Sha256Context::Finish - null result_hash_value");
+      throw sgi_stl::invalid_argument ("Sha256Context::Finish - null result_hash_value");
 
     if (need_init)
       Init ();
@@ -367,7 +367,7 @@ namespace utility
 void sha256 (const void* data, size_t size, unsigned char (&result_hash_value) [32])
 {
   if (!data && size)
-    throw std::invalid_argument ("plarium::utility::sha256 - null data");
+    throw sgi_stl::invalid_argument ("plarium::utility::sha256 - null data");
 
   CC_SHA256 (data, size, result_hash_value);
 }
