@@ -88,6 +88,7 @@ struct TouchTraverser: public INodeTraverser
   float              min_distance;
   InputZoneModel*    input_zone;
   math::vec2f        input_zone_intersection_point;
+  size_t             input_zone_index;
   
   TouchTraverser (InputScene&        in_scene,
                   const math::vec3f& in_touch_world_position,
@@ -101,6 +102,7 @@ struct TouchTraverser: public INodeTraverser
     , quasi_intersected (false)
     , min_distance (0.0f)
     , input_zone ()
+    , input_zone_index ()
   {
   }
 
@@ -160,6 +162,7 @@ struct TouchTraverser: public INodeTraverser
       min_distance                  = ray_to_zone_distance;
       input_zone                    = zone;
       input_zone_intersection_point = intersection_point;
+      input_zone_index              = zone_index;
     }
   }
 };
@@ -190,7 +193,7 @@ void InputScene::OnTouch (const TouchEvent& event, const math::vec3f& touch_worl
       
       //передача события соответствующему объекту      
       
-    entity->OnTouch (event, touch_world_position, traverser.input_zone_intersection_point);
+    entity->OnTouch (event, touch_world_position, traverser.input_zone_index, traverser.input_zone_intersection_point);
   }
   catch (xtl::exception& e)
   {

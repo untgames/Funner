@@ -148,7 +148,7 @@ class InputEntity: public xtl::reference_counter, public xtl::noncopyable
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Обработка события нажатия
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void OnTouch (const TouchEvent& event, const math::vec3f& touch_world_position, const math::vec2f& touch_local_position); 
+    void OnTouch (const TouchEvent& event, const math::vec3f& touch_world_position, size_t touch_zone_index, const math::vec2f& touch_local_position); 
   
   private:
     const scene_graph::InputZoneModel& zone;
