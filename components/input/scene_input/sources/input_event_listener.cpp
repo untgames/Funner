@@ -64,8 +64,8 @@ void InputEventListener::List::DetachAll ()
 
 InputEventListener::InputEventListener ()
   : list ()
-  , next ()
   , prev ()
+  , next ()  
 {
 }
 

@@ -32,7 +32,7 @@ typedef xtl::intrusive_ptr<InputScene> InputScenePtr;
 
 typedef bound_volumes::plane_list<float> frustum;
 
-typedef unsigned int touch_t;
+typedef size_t touch_t;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///—осто€ние тача
@@ -178,6 +178,11 @@ class InputEventListener: public xtl::noncopyable
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void Attach (List&);
     void Detach ();
+    
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///явл€етс€ ли слушатель присоединенным
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    bool IsAttached () { return list != 0; }
 
   private:
     List*               list;
@@ -208,13 +213,34 @@ class InputEntity: public xtl::reference_counter, private InputEventListener
     void OnTouch (InputPort& input_port, const TouchEvent& event, const math::vec3f& touch_world_position, size_t touch_zone_index, const math::vec2f& touch_local_position); 
     
   private:
+    struct TouchDesc
+    {
+      touch_t touch;
+      int     button;
+      
+      TouchDesc (touch_t in_touch, int in_button)
+        : touch (in_touch)
+        , button (in_button)
+       { }
+    };
+    
+    typedef stl::vector<TouchDesc> TouchDescArray;
+    
+  private:
     void OnBroadcastTouch    (InputPort& input_port, const TouchEvent& event, const math::vec3f& touch_world_position);
     void UpdateNotifications ();
+    void UpdateBroadcasts    ();    
+    void AddTouch            (touch_t touch, int button);
+    bool HasTouch            (touch_t touch, int button);
+    void RemoveTouch         (touch_t touch, int button);
   
   private:  
     const scene_graph::InputZoneModel& zone;
     InputScene&                        scene;
     xtl::auto_connection               on_notifications_changed_connection;
+    bool                               has_screen_handlers;
+    bool                               wait_for_release_event;
+    TouchDescArray                     touches;
 };
 
 typedef xtl::intrusive_ptr<InputEntity> InputEntityPtr;
