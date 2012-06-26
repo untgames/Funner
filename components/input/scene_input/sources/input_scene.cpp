@@ -4,12 +4,13 @@ using namespace scene_graph;
 using namespace input;
 
 /*
-    Љ®­бвагЄв®а / ¤ҐбвагЄв®а
+    Конструктор / деструктор
 */
 
 InputScene::InputScene (scene_graph::Scene& in_scene)
   : scene (in_scene)
 {
+  on_entity_created_connection = scene.Root ().RegisterEventHandler (NodeSubTreeEvent_AfterBind, xtl::bind (&InputScene::OnInputZoneCreated, this, _2));
 }
 
 InputScene::~InputScene ()
@@ -20,7 +21,7 @@ InputScene::~InputScene ()
 }
 
 /*
-    ‘Ўа®б б®бв®п­Ёп ­ ¦ вЁ©
+    Сброс состояния нажатий
 */
 
 void InputScene::ResetTouchState ()
@@ -29,7 +30,7 @@ void InputScene::ResetTouchState ()
 }
 
 /*
-    Џ®«гзҐ­ЁҐ ®ЎкҐЄв  ўў®¤ 
+    Получение объекта ввода
 */
 
 InputEntityPtr InputScene::GetEntity (const scene_graph::InputZoneModel& zone)
@@ -45,8 +46,8 @@ InputEntityPtr InputScene::GetEntity (const scene_graph::InputZoneModel& zone)
     
     try
     {
-      desc.entity                = InputEntityPtr (new InputEntity (zone, *this), false);
-      desc.on_destroy_connection = zone.RegisterEventHandler (NodeEvent_AfterDestroy, xtl::bind (&InputScene::OnInputZoneDestroyed, this, &zone));
+      desc.entity               = InputEntityPtr (new InputEntity (zone, *this), false);
+      desc.on_unbind_connection = zone.RegisterEventHandler (NodeEvent_BeforeSceneDetach, xtl::bind (&InputScene::OnInputZoneDestroyed, this, &zone));
       
       return desc.entity;
     }
@@ -64,7 +65,29 @@ InputEntityPtr InputScene::GetEntity (const scene_graph::InputZoneModel& zone)
 }
 
 /*
-    ЋЇ®ўҐйҐ­ЁҐ ®Ў г¤ «Ґ­ЁЁ §®­л ўў®¤ 
+    Оповещение о создании зоны ввода
+*/
+
+void InputScene::OnInputZoneCreated (Node& node)
+{
+  try
+  {
+    InputZoneModel* zone = dynamic_cast<InputZoneModel*> (&node);
+  
+    if (!zone)
+      return;
+    
+    GetEntity (*zone);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("input::InputScene::OnInputZoneCreated");
+    throw;
+  }
+}
+
+/*
+    Оповещение об удалении зоны ввода
 */
 
 void InputScene::OnInputZoneDestroyed (const scene_graph::InputZoneModel* zone)
@@ -73,7 +96,7 @@ void InputScene::OnInputZoneDestroyed (const scene_graph::InputZoneModel* zone)
 }
 
 /*
-    ЋЎа Ў®вЄ  б®ЎлвЁп ­ ¦ вЁп
+    Обработка события нажатия
 */
 
 namespace
@@ -175,7 +198,7 @@ void InputScene::OnTouch (const TouchEvent& event, const math::vec3f& touch_worl
 {
   try
   {
-      //Ї®ЁбЄ §®­л, ЇҐаҐбҐЄ Ґ¬®© ®Ў« бвмо «гз 
+      //поиск зоны, пересекаемой областью луча
     
     TouchTraverser traverser (*this, touch_world_position, touch_world_direction, touch_frustum);
     
@@ -186,14 +209,14 @@ void InputScene::OnTouch (const TouchEvent& event, const math::vec3f& touch_worl
 
     touch_catched = true;
     
-      //Ї®«гзҐ­ЁҐ ®ЎкҐЄв , б®®вўҐвбвўгойҐЈ® §®­Ґ
+      //получение объекта, соответствующего зоне
       
     InputEntityPtr entity = GetEntity (*traverser.input_zone);
     
     if (!entity)
       throw xtl::format_operation_exception ("", "Null entity returned");            
       
-      //ЇҐаҐ¤ з  б®ЎлвЁп б®®вўҐвбвўгойҐ¬г ®ЎкҐЄвг      
+      //передача события соответствующему объекту      
       
     entity->OnTouch (event, touch_world_position, traverser.input_zone_index, traverser.input_zone_intersection_point);
   }
@@ -205,7 +228,7 @@ void InputScene::OnTouch (const TouchEvent& event, const math::vec3f& touch_worl
 }
     
 /*
-    ђҐЈЁбва жЁп б«ги вҐ«Ґ© ®Ї®ўҐйҐ­Ё©
+    Регистрация слушателей оповещений
 */
 
 void InputScene::RegisterBroadcastListener (InputEventListener& listener)

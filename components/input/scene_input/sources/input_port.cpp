@@ -4,7 +4,7 @@ using namespace scene_graph;
 using namespace input;
 
 /*
-    Конструктор / деструктор
+    ╩юэёЄЁєъЄюЁ / фхёЄЁєъЄюЁ
 */
 
 InputPort::InputPort (Viewport& in_viewport, bool& in_z_order_changed)
@@ -32,7 +32,7 @@ InputPort::~InputPort ()
 }
 
 /*
-    Обработчики событий
+    ╬сЁрсюЄўшъш ёюс√Єшщ
 */
 
 void InputPort::OnViewportChangeArea (const Rect&, float, float)
@@ -93,7 +93,7 @@ void InputPort::OnViewportChangeInputState (bool)
 }
 
 /*
-    Размер тача
+    ╨рчьхЁ Єрўр
 */
 
 void InputPort::SetTouchSize (float size, InputTransformSpace space)
@@ -104,7 +104,7 @@ void InputPort::SetTouchSize (float size, InputTransformSpace space)
 }
 
 /*
-    Обновление параметров области ввода
+    ╬сэютыхэшх ярЁрьхЄЁют юсырёЄш ттюфр
 */
 
 void InputPort::Update ()
@@ -157,7 +157,7 @@ void InputPort::Update ()
 }
 
 /*
-    Обработка события нажатия
+    ╬сЁрсюЄър ёюс√Єш  эрцрЄш 
 */
 
 void InputPort::OnTouch (const TouchEvent& event, bool& touch_catched)
@@ -167,14 +167,14 @@ void InputPort::OnTouch (const TouchEvent& event, bool& touch_catched)
     if (need_update)
       Update ();      
       
-      //перевод координаты в мировую систему координат
+      //яхЁхтюф ъююЁфшэрЄ√ т ьшЁютє■ ёшёЄхьє ъююЁфшэрЄ
 
     math::vec4f source_position (event.position.x, event.position.y, 0.0f, 1.0f),
                 world_position = position_tm * source_position;
 
     world_position /= world_position.w;    
     
-      //получение пирамиды тача
+      //яюыєўхэшх яшЁрьшф√ Єрўр
       
     math::vec4f normalized_position = normalized_position_tm * source_position, normalized_direction (0.0f, 0.0f, 2.0f, 0.0f);
 
@@ -188,7 +188,7 @@ void InputPort::OnTouch (const TouchEvent& event, bool& touch_catched)
 
     add_frustum (touch_tm, touch_frustum);
 
-      //оповещение сцены о возникновении события
+      //юяютх∙хэшх ёЎхэ√ ю тючэшъэютхэшш ёюс√Єш 
       
     input_scene->OnTouch (event, math::vec3f (world_position), math::vec3f (world_direction), touch_frustum, touch_catched);
   }
@@ -200,7 +200,7 @@ void InputPort::OnTouch (const TouchEvent& event, bool& touch_catched)
 }
 
 /*
-    Сброс состояния нажатий
+    ╤сЁюё ёюёЄю эш  эрцрЄшщ
 */
 
 void InputPort::ResetTouchState ()

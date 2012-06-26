@@ -256,19 +256,21 @@ class InputScene: public xtl::reference_counter, private InputEventListener::Lis
     
   private:
     void OnInputZoneDestroyed (const scene_graph::InputZoneModel*);
+    void OnInputZoneCreated   (scene_graph::Node&);
     
     struct EntityDesc
     {
       InputEntityPtr       entity;
-      xtl::auto_connection on_destroy_connection;
+      xtl::auto_connection on_unbind_connection;
     };
     
   private:
     typedef stl::hash_map<const scene_graph::InputZoneModel*, EntityDesc> EntityMap;
 
   private:    
-    scene_graph::Scene& scene;
-    EntityMap           entities;
+    scene_graph::Scene&  scene;
+    EntityMap            entities;
+    xtl::auto_connection on_entity_created_connection;
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
