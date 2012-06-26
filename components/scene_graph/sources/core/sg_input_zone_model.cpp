@@ -447,6 +447,7 @@ bool InputZoneModel::IsIntersected
     float min_ray_to_zone_distance = 0.0f;    
 
     out_ray_intersection_distance = 0.0f;
+    out_ray_to_zone_offset        = 0.0f;    
     out_zone_index                = 0;
     out_zone_intersection_point   = math::vec2f (0.0f);    
       
