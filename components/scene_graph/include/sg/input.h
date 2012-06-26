@@ -34,11 +34,11 @@ enum InputZoneNotification
   InputZoneNotification_OnPress,             //touch, world_position, local_position
   InputZoneNotification_OnClick,             //touch, world_position, local_position
   InputZoneNotification_OnTouchEnter,        //touch, world_position, local_position
-  InputZoneNotification_OnTouchLeave,        //touch, world_position, local_position
+  InputZoneNotification_OnTouchLeave,        //touch, world_position
   InputZoneNotification_OnTouchMove,         //touch, world_position, local_position
   InputZoneNotification_OnTouchDown,         //touch, button, world_position, local_position
   InputZoneNotification_OnTouchUpInside,     //touch, button, world_position, local_position
-  InputZoneNotification_OnTouchUpOutside,    //touch, button, world_position, local_position
+  InputZoneNotification_OnTouchUpOutside,    //touch, button, world_position
   InputZoneNotification_OnTouchClick,        //touch, button, world_position, local_position
   InputZoneNotification_OnScreenTouchDown,   //touch, button, world_position
   InputZoneNotification_OnScreenTouchUp,     //touch, button, world_position
