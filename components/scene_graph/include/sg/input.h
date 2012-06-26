@@ -19,8 +19,9 @@ class Viewport;
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 enum InputZoneEvent
 {
-  InputZoneEvent_AfterZoneDescsUpdate, //срабатывает после изменения данных зон
-  InputZoneEvent_OnActivityChanged,    //срабатывает после изменения состояния активности зон
+  InputZoneEvent_AfterZoneDescsUpdate,      //срабатывает после изменения данных зон
+  InputZoneEvent_AfterActivityChanged,      //срабатывает после изменения состояния активности зон
+  InputZoneEvent_AfterNotificationsChanged, //срабатывает после изменения нотификаций
 
   InputZoneEvent_Num
 };

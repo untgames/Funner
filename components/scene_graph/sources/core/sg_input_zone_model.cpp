@@ -57,10 +57,10 @@ struct InputZoneModel::Impl
     , need_update_inv_world_tm (true)
     , need_update_zones_internals (true)
   {
-  }
+  }  
   
 ///Поиск нотификации
-  Notification* FindNotification (const stl::hash_key<const char*>& name_hash)
+  Notification* FindNotification (const stl::hash_key<const char*>& name_hash, const InputZoneModel& sender)
   {
     if (cached_notification != notifications.end () && cached_notification->name_hash == name_hash)
     {
@@ -68,6 +68,8 @@ struct InputZoneModel::Impl
     }
     else
     {
+      bool notifications_changed = false;
+      
       for (NotificationList::iterator iter=notifications.begin (), end=notifications.end (); iter!=end;)
       {
         if (iter->signal.empty ())
@@ -78,6 +80,8 @@ struct InputZoneModel::Impl
           
           notifications.erase (iter);
           
+          notifications_changed = true;
+          
           iter = next;
           
           continue;
@@ -86,11 +90,18 @@ struct InputZoneModel::Impl
         if (iter->name_hash == name_hash)        
         {
           cached_notification = iter;
+          
+          if (notifications_changed)
+            Notify (const_cast<InputZoneModel&> (sender), InputZoneEvent_AfterNotificationsChanged);
+          
           return &*iter;
         }
         
         ++iter;
       }
+      
+      if (notifications_changed)
+        Notify (const_cast<InputZoneModel&> (sender), InputZoneEvent_AfterNotificationsChanged);      
       
       return 0;
     }        
@@ -124,6 +135,13 @@ InputZoneModel::InputZoneModel ()
 
 InputZoneModel::~InputZoneModel ()
 {
+  impl->notifications.clear ();
+  
+  impl->cached_notification = impl->notifications.end ();
+  
+  impl->default_notification_signal.disconnect_all ();
+
+  impl->Notify (*this, InputZoneEvent_AfterNotificationsChanged);
 }
 
 /*
@@ -195,7 +213,7 @@ void InputZoneModel::SetActive (bool state)
     
   impl->is_active = state;
   
-  impl->Notify (*this, InputZoneEvent_OnActivityChanged);
+  impl->Notify (*this, InputZoneEvent_AfterActivityChanged);
   
   UpdateNotify ();
 }
@@ -209,7 +227,8 @@ xtl::connection InputZoneModel::RegisterEventHandler (InputZoneEvent event_id, c
   switch (event_id)
   {
     case InputZoneEvent_AfterZoneDescsUpdate:
-    case InputZoneEvent_OnActivityChanged:
+    case InputZoneEvent_AfterActivityChanged:
+    case InputZoneEvent_AfterNotificationsChanged:
       break;
     default:
       throw xtl::make_argument_exception ("scene_graph::InputZoneModel::RegisterEventHandler", "event_id", event_id);
@@ -225,9 +244,13 @@ xtl::connection InputZoneModel::RegisterNotificationHandler (const char* notific
     
   stl::hash_key<const char*> name_hash = notification_id;
     
-  if (Notification* notification = impl->FindNotification (name_hash))
+  if (Notification* notification = impl->FindNotification (name_hash, *this))
   {
-    return notification->signal.connect (handler);
+    xtl::connection c = notification->signal.connect (handler);
+    
+    impl->Notify (const_cast<InputZoneModel&> (*this), InputZoneEvent_AfterNotificationsChanged);
+    
+    return c;
   }
   else
   {
@@ -239,7 +262,11 @@ xtl::connection InputZoneModel::RegisterNotificationHandler (const char* notific
       
       notification.name_hash = name_hash;
       
-      return notification.signal.connect (handler);
+      xtl::connection c = notification.signal.connect (handler);
+      
+      impl->Notify (const_cast<InputZoneModel&> (*this), InputZoneEvent_AfterNotificationsChanged);
+      
+      return c;
     }
     catch (...)
     {
@@ -268,7 +295,7 @@ void InputZoneModel::Notify (const Viewport& viewport, const char* notification_
     if (!notification_params)
       throw xtl::make_null_argument_exception ("", "notification_params");            
 
-    if (Notification* notification = impl->FindNotification (notification_id))
+    if (Notification* notification = impl->FindNotification (notification_id, *this))
       notification->signal (const_cast<InputZoneModel&> (*this), viewport, notification_id, notification_params);
 
     impl->default_notification_signal (const_cast<InputZoneModel&> (*this), viewport, notification_id, notification_params);
@@ -282,7 +309,7 @@ void InputZoneModel::Notify (const Viewport& viewport, const char* notification_
 
 bool InputZoneModel::HasNotificationHandler (const char* notification_id) const
 {    
-  return notification_id && (!impl->default_notification_signal.empty () || impl->FindNotification (notification_id));
+  return notification_id && (!impl->default_notification_signal.empty () || impl->FindNotification (notification_id, *this));
 }
 
 /*
