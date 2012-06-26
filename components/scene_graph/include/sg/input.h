@@ -15,15 +15,49 @@ namespace scene_graph
 class Viewport;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///ќповещение об обновлении зон в модели
+///—обыти€ зоны ввода
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 enum InputZoneEvent
 {
-  InputZoneEvent_AfterZoneDescsUpdate,      //срабатывает после изменени€ данных зон
-  InputZoneEvent_AfterActivityChanged,      //срабатывает после изменени€ состо€ни€ активности зон
-  InputZoneEvent_AfterNotificationsChanged, //срабатывает после изменени€ нотификаций
+  InputZoneEvent_AfterZoneDescsUpdate,   //срабатывает после изменени€ данных зон
+  InputZoneEvent_AfterActivityChanged,   //срабатывает после изменени€ состо€ни€ активности зон
+  InputZoneEvent_AfterNotificationAdded, //срабатывает после добавлени€ обработчика оповещений
 
   InputZoneEvent_Num
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///ќповещени€ зоны ввода
+///////////////////////////////////////////////////////////////////////////////////////////////////
+enum InputZoneNotification
+{
+  InputZoneNotification_OnPress,             //touch, world_position, local_position
+  InputZoneNotification_OnClick,             //touch, world_position, local_position
+  InputZoneNotification_OnTouchEnter,        //touch, world_position, local_position
+  InputZoneNotification_OnTouchLeave,        //touch, world_position, local_position
+  InputZoneNotification_OnTouchMove,         //touch, world_position, local_position
+  InputZoneNotification_OnTouchDown,         //touch, button, world_position, local_position
+  InputZoneNotification_OnTouchUpInside,     //touch, button, world_position, local_position
+  InputZoneNotification_OnTouchUpOutside,    //touch, button, world_position, local_position
+  InputZoneNotification_OnTouchClick,        //touch, button, world_position, local_position
+  InputZoneNotification_OnScreenTouchDown,   //touch, button, world_position
+  InputZoneNotification_OnScreenTouchUp,     //touch, button, world_position
+  InputZoneNotification_OnScreenTouchMove,   //touch, world_position
+  
+  InputZoneNotification_Num
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+/// онтекст оповещени€
+///////////////////////////////////////////////////////////////////////////////////////////////////
+struct InputZoneNotificationContext
+{
+  size_t      touch_id;              //идентификатор тача
+  int         button;                //идентификатор кнопки
+  math::vec3f touch_world_position;  //позици€ прикосновени€ в мировых координатах (на znear камеры)
+  math::vec2f touch_local_position;  //позици€ прикосновени€ в локальных координатах соответствующей зоны ([0-1;0-1])
+  
+  InputZoneNotificationContext ();
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -67,21 +101,21 @@ class InputZoneModel: public Entity
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///ѕодписка на событи€ модели
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    typedef xtl::function<void (InputZoneModel& sender, InputZoneEvent event_id)>                                                                EventHandler;
-    typedef xtl::function<void (InputZoneModel& sender, const Viewport& viewport, const char* notification_id, const char* notification_params)> NotificationHandler;
+    typedef xtl::function<void (InputZoneModel& sender, InputZoneEvent event_id)>                                                                           EventHandler;
+    typedef xtl::function<void (InputZoneModel& sender, const Viewport& viewport, InputZoneNotification notification, const InputZoneNotificationContext&)> NotificationHandler;
 
     xtl::connection RegisterEventHandler        (InputZoneEvent event_id, const EventHandler& event_handler) const;
-    xtl::connection RegisterNotificationHandler (const char* notification_id, const NotificationHandler& handler) const;
-    xtl::connection RegisterNotificationHandler (const NotificationHandler& handler) const;
-    
+    xtl::connection RegisterNotificationHandler (InputZoneNotification notification_id, const NotificationHandler& handler) const;
+    xtl::connection RegisterNotificationHandler (const NotificationHandler& handler) const;    
+
     using Entity::RegisterEventHandler;
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///ќповещение о возникновении событи€ ввода
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void Notify                 (const Viewport& viewport, const char* notification_id, const char* notification_params) const;
-    bool HasNotificationHandler (const char* notification_id) const;
-    
+    void Notify                 (const Viewport& viewport, InputZoneNotification notification_id, const InputZoneNotificationContext& context) const;
+    bool HasNotificationHandler (InputZoneNotification notification_id) const;
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///ѕроверка пересечени€ луча с зонами
 ///////////////////////////////////////////////////////////////////////////////////////////////////

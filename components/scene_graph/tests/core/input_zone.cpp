@@ -20,9 +20,9 @@ class MyVisitor: public visitor<void, InputZone>
     }
 };
 
-template <int I> void notify (const char* notification_id, const char* params)
+template <int I> void notify (InputZoneNotification notification_id, const InputZoneNotificationContext&)
 {
-  printf ("notification%u: '%s' '%s'\n", I, notification_id, params);
+  printf ("notification%u: %d\n", I, notification_id);
 }
 
 int main ()
@@ -35,13 +35,15 @@ int main ()
 
   zone->VisitEach (visitor, NodeTraverseMode_TopToBottom);  
   
-  zone->RegisterNotificationHandler (xtl::bind (&notify<0>, _3, _4));    
-  zone->RegisterNotificationHandler ("my_notif", xtl::bind (&notify<1>, _3, _4));
+  zone->RegisterNotificationHandler (xtl::bind (&notify<0>, _3, _4));
+  zone->RegisterNotificationHandler (InputZoneNotification_OnClick, xtl::bind (&notify<1>, _3, _4));
   
   Viewport viewport;
   
-  zone->Notify (viewport, "my_notif", "1 2");
-  zone->Notify (viewport, "my_notif1", "1 2");  
+  InputZoneNotificationContext context;
+  
+  zone->Notify (viewport, InputZoneNotification_OnClick, context);
+  zone->Notify (viewport, InputZoneNotification_OnPress, context);
 
   return 0;
 }

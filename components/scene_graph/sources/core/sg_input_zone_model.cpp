@@ -9,20 +9,8 @@ using namespace scene_graph;
 namespace
 {
 
-typedef xtl::signal<void (InputZoneModel& sender, InputZoneEvent event_id)>                                                   EventSignal;
-typedef xtl::signal<void (InputZoneModel& sender, const Viewport& viewport, const char* notification_id, const char* params)> NotificationSignal;
-
-struct Notification
-{
-  stl::hash_key<const char*> name_hash;
-  NotificationSignal         signal;
-  
-  Notification () : name_hash ("") {}
-  
-  Notification (const Notification&) : name_hash ("") {}
-};
-
-typedef stl::list<Notification> NotificationList;
+typedef xtl::signal<void (InputZoneModel& sender, InputZoneEvent event_id)>                                                                              EventSignal;
+typedef xtl::signal<void (InputZoneModel& sender, const Viewport& viewport, InputZoneNotification notification_id, const InputZoneNotificationContext&)> NotificationSignal;
 
 struct ZoneImpl
 {
@@ -36,76 +24,32 @@ typedef stl::vector<ZoneImpl> ZoneImplArray;
 
 }
 
+InputZoneNotificationContext::InputZoneNotificationContext ()
+  : touch_id (0)
+  , button (0)
+{
+}
+
 struct InputZoneModel::Impl
 {
-  NotificationList           notifications;                      //карта событий ввода
-  NotificationList::iterator cached_notification;                //сохраненная последняя нотификация
-  NotificationSignal         default_notification_signal;        //обработчик нотификаций по умолчанию
-  EventSignal                event_signals [InputZoneEvent_Num]; //сигналы зоны
-  bool                       is_active;                          //активна ли зона
-  bool                       bounds_auto_update;                 //резжим автоматического обновления ограничивающего объема
-  ZoneImplArray              zones_impl;                         //реализации зон
-  math::mat4f                inv_world_tm;                       //инвертированная матрица мирового преобразования
-  bool                       need_update_inv_world_tm;           //инвертированная матрица мирового преобразования требует обновления
-  bool                       need_update_zones_internals;        //необходимо обновить внутреннее представление зон
+  NotificationSignal         notifications [InputZoneNotification_Num]; //оповещения зоны
+  NotificationSignal         default_notification_signal;               //обработчик оповещений по умолчанию
+  EventSignal                event_signals [InputZoneEvent_Num];        //сигналы зоны
+  bool                       is_active;                                 //активна ли зона
+  bool                       bounds_auto_update;                        //резжим автоматического обновления ограничивающего объема
+  ZoneImplArray              zones_impl;                                //реализации зон
+  math::mat4f                inv_world_tm;                              //инвертированная матрица мирового преобразования
+  bool                       need_update_inv_world_tm;                  //инвертированная матрица мирового преобразования требует обновления
+  bool                       need_update_zones_internals;               //необходимо обновить внутреннее представление зон
   
 ///Конструктор
   Impl ()
-    : cached_notification (notifications.end ())
-    , is_active (true)
+    : is_active (true)
     , bounds_auto_update (true)
     , need_update_inv_world_tm (true)
     , need_update_zones_internals (true)
   {
-  }  
-  
-///Поиск нотификации
-  Notification* FindNotification (const stl::hash_key<const char*>& name_hash, const InputZoneModel& sender)
-  {
-    if (cached_notification != notifications.end () && cached_notification->name_hash == name_hash)
-    {
-      return &*cached_notification;
-    }
-    else
-    {
-      bool notifications_changed = false;
-      
-      for (NotificationList::iterator iter=notifications.begin (), end=notifications.end (); iter!=end;)
-      {
-        if (iter->signal.empty ())
-        {          
-          NotificationList::iterator next = iter;
-          
-          ++next;
-          
-          notifications.erase (iter);
-          
-          notifications_changed = true;
-          
-          iter = next;
-          
-          continue;
-        }
-        
-        if (iter->name_hash == name_hash)        
-        {
-          cached_notification = iter;
-          
-          if (notifications_changed)
-            Notify (const_cast<InputZoneModel&> (sender), InputZoneEvent_AfterNotificationsChanged);
-          
-          return &*iter;
-        }
-        
-        ++iter;
-      }
-      
-      if (notifications_changed)
-        Notify (const_cast<InputZoneModel&> (sender), InputZoneEvent_AfterNotificationsChanged);      
-      
-      return 0;
-    }        
-  }
+  }    
 
 ///Оповещение о событии
   void Notify (InputZoneModel& sender, InputZoneEvent event_id)
@@ -121,7 +65,7 @@ struct InputZoneModel::Impl
     {
       //подавление всех исключений
     }
-  }  
+  }
 };
 
 /*
@@ -135,13 +79,6 @@ InputZoneModel::InputZoneModel ()
 
 InputZoneModel::~InputZoneModel ()
 {
-  impl->notifications.clear ();
-  
-  impl->cached_notification = impl->notifications.end ();
-  
-  impl->default_notification_signal.disconnect_all ();
-
-  impl->Notify (*this, InputZoneEvent_AfterNotificationsChanged);
 }
 
 /*
@@ -228,7 +165,7 @@ xtl::connection InputZoneModel::RegisterEventHandler (InputZoneEvent event_id, c
   {
     case InputZoneEvent_AfterZoneDescsUpdate:
     case InputZoneEvent_AfterActivityChanged:
-    case InputZoneEvent_AfterNotificationsChanged:
+    case InputZoneEvent_AfterNotificationAdded:
       break;
     default:
       throw xtl::make_argument_exception ("scene_graph::InputZoneModel::RegisterEventHandler", "event_id", event_id);
@@ -237,47 +174,22 @@ xtl::connection InputZoneModel::RegisterEventHandler (InputZoneEvent event_id, c
   return impl->event_signals [event_id].connect (event_handler);
 }
 
-xtl::connection InputZoneModel::RegisterNotificationHandler (const char* notification_id, const NotificationHandler& handler) const
+xtl::connection InputZoneModel::RegisterNotificationHandler (InputZoneNotification notification_id, const NotificationHandler& handler) const
 {
-  if (!notification_id)
-    throw xtl::make_null_argument_exception ("scene_graph::InputZoneModel::RegisterNotificationHandler", "notification_id");
-    
-  stl::hash_key<const char*> name_hash = notification_id;
-    
-  if (Notification* notification = impl->FindNotification (name_hash, *this))
-  {
-    xtl::connection c = notification->signal.connect (handler);
-    
-    impl->Notify (const_cast<InputZoneModel&> (*this), InputZoneEvent_AfterNotificationsChanged);
-    
-    return c;
-  }
-  else
-  {
-    impl->notifications.push_back ();
-    
-    try
-    {
-      Notification& notification = impl->notifications.back ();
-      
-      notification.name_hash = name_hash;
-      
-      xtl::connection c = notification.signal.connect (handler);
-      
-      impl->Notify (const_cast<InputZoneModel&> (*this), InputZoneEvent_AfterNotificationsChanged);
-      
-      return c;
-    }
-    catch (...)
-    {
-      impl->notifications.pop_back ();
-      throw;
-    }
-  }
+  if (notification_id < 0 || notification_id >= InputZoneNotification_Num)
+    throw xtl::make_argument_exception ("scene_graph::InputZoneModel::RegisterNotificationHandler", "notification_id", notification_id);
+
+  xtl::connection c = impl->notifications [notification_id].connect (handler);
+
+  impl->Notify (const_cast<InputZoneModel&> (*this), InputZoneEvent_AfterNotificationAdded);
+
+  return c;
 }
 
 xtl::connection InputZoneModel::RegisterNotificationHandler (const NotificationHandler& handler) const
 {
+  impl->Notify (const_cast<InputZoneModel&> (*this), InputZoneEvent_AfterNotificationAdded);
+
   return impl->default_notification_signal.connect (handler);
 }
 
@@ -285,20 +197,16 @@ xtl::connection InputZoneModel::RegisterNotificationHandler (const NotificationH
     Оповещение о возникновении события ввода
 */
 
-void InputZoneModel::Notify (const Viewport& viewport, const char* notification_id, const char* notification_params) const
+void InputZoneModel::Notify (const Viewport& viewport, InputZoneNotification notification_id, const InputZoneNotificationContext& context) const
 {
   try
   {
-    if (!notification_id)
-      throw xtl::make_null_argument_exception ("", "notification_id");
+    if (notification_id < 0 || notification_id >= InputZoneNotification_Num)
+      throw xtl::make_argument_exception ("", "notification_id", notification_id);
+      
+    impl->notifications [notification_id] (const_cast<InputZoneModel&> (*this), viewport, notification_id, context);
 
-    if (!notification_params)
-      throw xtl::make_null_argument_exception ("", "notification_params");            
-
-    if (Notification* notification = impl->FindNotification (notification_id, *this))
-      notification->signal (const_cast<InputZoneModel&> (*this), viewport, notification_id, notification_params);
-
-    impl->default_notification_signal (const_cast<InputZoneModel&> (*this), viewport, notification_id, notification_params);
+    impl->default_notification_signal (const_cast<InputZoneModel&> (*this), viewport, notification_id, context);
   }
   catch (xtl::exception& e)
   {
@@ -307,9 +215,12 @@ void InputZoneModel::Notify (const Viewport& viewport, const char* notification_
   }
 }
 
-bool InputZoneModel::HasNotificationHandler (const char* notification_id) const
+bool InputZoneModel::HasNotificationHandler (InputZoneNotification notification_id) const
 {    
-  return notification_id && (!impl->default_notification_signal.empty () || impl->FindNotification (notification_id, *this));
+  if (notification_id < 0 || notification_id >= InputZoneNotification_Num)
+    return false;
+
+  return !impl->default_notification_signal.empty () || !impl->notifications [notification_id].empty ();
 }
 
 /*

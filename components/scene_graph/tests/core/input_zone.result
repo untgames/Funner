@@ -5,6 +5,6 @@ InputZone '':
     position: [0.00 0.00 0.00]
     axis_x:   [1.00 0.00 0.00]
     axis_y:   [0.00 1.00 0.00]
-notification1: 'my_notif' '1 2'
-notification0: 'my_notif' '1 2'
-notification0: 'my_notif1' '1 2'
+notification1: 1
+notification0: 1
+notification0: 0
