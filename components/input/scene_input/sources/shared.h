@@ -217,13 +217,15 @@ class InputEntity: public xtl::reference_counter, private InputEventListener
     struct TouchDesc
     {
       touch_t touch;
-      int     button;
+      int     button;      
       bool    is_inside;
+      bool    touch_check;
       
       TouchDesc (touch_t in_touch, int in_button)
         : touch (in_touch)
         , button (in_button)
         , is_inside (true)
+        , touch_check (true)
        { }
     };
     

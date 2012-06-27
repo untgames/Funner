@@ -197,28 +197,32 @@ struct TouchTraverser: public INodeTraverser
 void InputScene::OnTouch (InputPort& input_port, const TouchEvent& event, const math::vec3f& touch_world_position, const math::vec3f& touch_world_direction, const frustum& touch_frustum, bool& touch_catched)
 {
   try
-  {
+  {        
       //поиск зоны, пересекаемой областью луча
     
     TouchTraverser traverser (*this, touch_world_position, touch_world_direction, touch_frustum);
     
     scene.Traverse (touch_frustum, traverser);
     
-    if (!traverser.input_zone)
-      return;
-
-    touch_catched = true;
+    if (traverser.input_zone)
+    {
+      touch_catched = true;
     
-      //получение объекта, соответствующего зоне
+        //получение объекта, соответствующего зоне
       
-    InputEntityPtr entity = GetEntity (*traverser.input_zone);
+      InputEntityPtr entity = GetEntity (*traverser.input_zone);
     
-    if (!entity)
-      throw xtl::format_operation_exception ("", "Null entity returned");            
+      if (entity)
+      {          
+          //передача события соответствующему объекту      
+          
+        entity->OnTouch (input_port, event, touch_world_position, traverser.input_zone_index, traverser.input_zone_intersection_point);
+      }
+    }
+    
+      //оповещение
       
-      //передача события соответствующему объекту      
-      
-    entity->OnTouch (input_port, event, touch_world_position, traverser.input_zone_index, traverser.input_zone_intersection_point);
+    BroadcastTouch (input_port, event, touch_world_position);        
   }
   catch (xtl::exception& e)
   {

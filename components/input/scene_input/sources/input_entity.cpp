@@ -95,6 +95,8 @@ void InputEntity::OnTouch (InputPort& input_port, const TouchEvent& event, const
     
     if (touch_desc && touch_desc->is_inside)
     {
+      touch_desc->touch_check = true;
+      
       switch (event.state)
       {
         case TouchState_Moving:
@@ -116,7 +118,8 @@ void InputEntity::OnTouch (InputPort& input_port, const TouchEvent& event, const
     }
     else if (touch_desc)
     {
-      touch_desc->is_inside = true;
+      touch_desc->is_inside   = true;
+      touch_desc->touch_check = true;
       
       switch (event.state)
       {
@@ -195,28 +198,35 @@ void InputEntity::OnBroadcastTouch (InputPort& input_port, const TouchEvent& eve
     
       //зависимые оповещения
       
-    if (TouchDesc* touch_desc = FindTouch (event.touch, event.button))
-    {
-      switch (event.state)
+    TouchDesc* touch_desc = FindTouch (event.touch, event.button);
+      
+    if (touch_desc)
+    {      
+      if (!touch_desc->touch_check)
       {
-        case TouchState_Moving:
-          if (touch_desc->is_inside)
-          {
-            zone.Notify (input_port.AttachedViewport (), InputZoneNotification_OnTouchLeave, context);
-            touch_desc->is_inside = false;
-          }
-          
-          break;
-        case TouchState_Pressed:
-          //ignored
-          break;
-        case TouchState_Released:
-          zone.Notify (input_port.AttachedViewport (), InputZoneNotification_OnTouchUpOutside, context);
-          RemoveTouch (event.touch, event.button);
-          break;
-        default:
-          break;
-      }              
+        switch (event.state)
+        {
+          case TouchState_Moving:
+            if (touch_desc->is_inside)
+            {
+              zone.Notify (input_port.AttachedViewport (), InputZoneNotification_OnTouchLeave, context);
+              touch_desc->is_inside = false;
+            }
+            
+            break;
+          case TouchState_Pressed:
+            //ignored
+            break;
+          case TouchState_Released:
+            zone.Notify (input_port.AttachedViewport (), InputZoneNotification_OnTouchUpOutside, context);
+            RemoveTouch (event.touch, event.button);
+            break;
+          default:
+            break;
+        }      
+      }
+      
+      touch_desc->touch_check = false;
     }
   }
   catch (xtl::exception& e)
