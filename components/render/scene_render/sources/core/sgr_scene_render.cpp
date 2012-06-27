@@ -266,7 +266,7 @@ struct SceneRender::Impl: public xtl::reference_counter, public scene_graph::ISc
   {
     bool operator () (const RenderableViewPtr& view1, const RenderableViewPtr& view2) const
     {
-      return view1->Viewport ().ZOrder () < view2->Viewport ().ZOrder ();
+      return view1->Viewport ().ZOrder () > view2->Viewport ().ZOrder ();
     }
   };
   
