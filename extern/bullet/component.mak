@@ -8,5 +8,5 @@ EXTERN.BULLET.SOURCE_DIRS            := sources/LinearMath sources/BulletCollisi
                                         sources/BulletDynamics/ConstraintSolver sources/BulletDynamics/Dynamics sources/BulletDynamics/Vehicle
 EXTERN.BULLET.IMPORTS                := compile.extern.bullet
 EXTERN.BULLET.g++.COMPILER_CFLAGS    := --no-warn
-EXTERN.BULLET.msvc.COMPILER_CFLAGS   := -wd4305
+EXTERN.BULLET.msvc.COMPILER_CFLAGS   := -wd4305 -wd4244
 EXTERN.BULLET.bada.IMPORTS           := compile.extern.bada
