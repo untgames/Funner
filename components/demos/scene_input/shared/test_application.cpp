@@ -9,6 +9,9 @@
 
 #include <syslib/application.h>
 
+#include <input/events_source.h>
+#include <input/low_level/window_driver.h>
+
 #include <render/mid_level/window_driver.h>
 
 #include "shared.h"
@@ -63,6 +66,8 @@ struct TestApplication::Impl
   xtl::auto_connection           app_idle_connection; //соединение сигнала обработчика холостого хода приложения
   SceneRender                    render;              //рендер сцены
   render::obsolete::RenderTarget render_target;       //цель рендеринга
+  input::EventsSource            input_source;        //источник событий ввода
+  SceneInputManager              input;               //менеджер ввода
   
   void OnClose ()
   {
@@ -108,6 +113,11 @@ struct TestApplication::Impl
     if (window)
       window->SetStyle ((syslib::WindowStyle)((window->Style () + 1) % 2));    
   }
+  
+  void ProcessInputEvent (const char* event)
+  {
+    input.ProcessEvent (event);
+  }
 };
 
 /*
@@ -133,12 +143,19 @@ TestApplication::TestApplication ()
     impl->window->SetTitle (get (cfg_root, "WindowTitle", DEFAULT_WINDOW_TITLE));
 
     impl->window->Show ();
+    
+      //настройка ввода      
+      
+    input::low_level::WindowDriver::RegisterDevice ("window1", *impl->window);
+
+    impl->input_source.Connect ("*", "*");
+    
+    impl->input_source.RegisterHandler (xtl::bind (&Impl::ProcessInputEvent, &*impl, _1));
 
       //регистрация обработчиков событий окна
 
     impl->window->RegisterEventHandler (syslib::WindowEvent_OnPaint, xtl::bind (&Impl::OnRedraw, &*impl));
     impl->window->RegisterEventHandler (syslib::WindowEvent_OnClose, xtl::bind (&Impl::OnClose, &*impl));
-    impl->window->RegisterEventHandler (syslib::WindowEvent_OnLeftButtonDown, xtl::bind (&Impl::ChangeWindowStyle, &*impl));    
 
       //инициализация системы рендеринга
 
@@ -171,6 +188,11 @@ TestApplication::~TestApplication ()
 SceneRender& TestApplication::Render ()
 {
   return impl->render;
+}
+
+SceneInputManager& TestApplication::InputManager ()
+{
+  return impl->input;
 }
 
 /*

@@ -3,7 +3,8 @@
 struct Test
 {
   TestApplication      application;
-  Sprite::Pointer      sprite;
+  Sprite::Pointer      sprite [2];
+  InputZone::Pointer   input_zone [2];
   OrthoCamera::Pointer camera;
   Scene                scene;
   Screen               screen;
@@ -12,14 +13,35 @@ struct Test
   {
       //создание сцены
 
-    sprite = Sprite::Create ();
+    sprite [0] = Sprite::Create ();
     
-    sprite->SetMaterial ("sprite_material");
-    sprite->SetScale (15.0f, 15.0f, 1.0f);    
+    sprite [0]->SetMaterial ("sprite_material");
+    sprite [0]->SetScale (10.0f, 10.0f, 1.0f);        
+    sprite [0]->SetPosition (-3.0f, -3.0f, 0.5f);                
     
-    sprite->SetProperties (common::PropertyMap ());
+    sprite [0]->BindToScene (scene);
     
-    sprite->BindToScene (scene);
+    sprite [1] = Sprite::Create ();
+    
+    sprite [1]->SetMaterial ("sprite_material");
+    sprite [1]->SetScale (10.0f, 10.0f, 1.0f);        
+    sprite [1]->SetPosition (3.0f, 3.0f, 0.0f);            
+    
+    sprite [1]->BindToScene (scene);    
+    
+    input_zone [0] = InputZone::Create ();
+
+    input_zone [0]->SetName      ("zone1");
+    input_zone [0]->BindToParent (*sprite [0]);
+    
+    input_zone [0]->RegisterNotificationHandler (&Test::InputNotify);
+    
+    input_zone [1] = InputZone::Create ();
+    
+    input_zone [1]->SetName      ("zone2");    
+    input_zone [1]->BindToParent (*sprite [1]);
+    
+    input_zone [1]->RegisterNotificationHandler (&Test::InputNotify);    
 
     camera = OrthoCamera::Create ();
 
@@ -49,6 +71,10 @@ struct Test
     vp.SetArea (5, 5, 90, 90);
 
     screen.Attach (vp);
+    
+      //настройка ввода
+    
+    application.InputManager ().SetScreen (&screen);
 
       //настройка целевых буферов вывода
 
@@ -61,6 +87,25 @@ struct Test
     application.LoadResources ();
   }
 
+  static void InputNotify (InputZoneModel& zone, const Viewport&, const InputZoneNotification notification, const InputZoneNotificationContext& context)
+  {
+    switch (notification)
+    {
+      case InputZoneNotification_OnTouchMove:
+      case InputZoneNotification_OnScreenTouchMove:
+      case InputZoneNotification_OnScreenTouchUp:
+      case InputZoneNotification_OnScreenTouchDown:
+        return;
+      default:
+        break;
+    }
+    
+    printf ("%s: zone='%s', touch=%d, button=%d, world_position=[%.3f, %.3f, %.3f] local_position=[%.3f, %.3f]\n", get_name (notification), zone.Name (),
+      context.touch_id, context.button, context.touch_world_position.x, context.touch_world_position.y, context.touch_world_position.z,
+      context.touch_local_position.x, context.touch_local_position.y);
+      
+    fflush (stdout);
+  }  
 };
 
 void log_print (const char* log, const char* message)

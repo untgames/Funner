@@ -23,16 +23,11 @@
 #include <syslib/window.h>
 
 #include <sg/camera.h>
-#include <sg/height_map.h>
-#include <sg/page_curl.h>
+#include <sg/input.h>
 #include <sg/scene.h>
 #include <sg/sprite.h>
 
-#include <sg/controllers/acceleration_evaluators.h>
-#include <sg/controllers/align_with_node.h>
-#include <sg/controllers/look_to_node_point.h>
-#include <sg/controllers/move_to_node_point.h>
-#include <sg/controllers/water.h>
+#include <input/scene_input.h>
 
 #include <render/scene_render.h>
 
@@ -40,6 +35,7 @@ using namespace scene_graph;
 using namespace scene_graph::controllers;
 using namespace render;
 using namespace render::obsolete;
+using namespace input;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Общий код для работы тестов двумерного рендера
@@ -56,7 +52,8 @@ class TestApplication
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Получение объектов приложения
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    SceneRender& Render ();
+    SceneRender&       Render       ();
+    SceneInputManager& InputManager ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Загрузка ресурсов
