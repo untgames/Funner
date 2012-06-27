@@ -1,12 +1,5 @@
 #include "shared.h"
 
-const size_t GRID_SIZE = 80;
-
-float frand (float min_value=0.0f, float max_value=1.0f)
-{
-  return min_value + float (rand ()) / RAND_MAX * (max_value - min_value);
-}
-
 struct Test
 {
   TestApplication      application;
@@ -21,7 +14,7 @@ struct Test
 
     sprite = Sprite::Create ();
     
-    sprite->SetMaterial ("video_material");
+    sprite->SetMaterial ("sprite_material");
     sprite->SetScale (15.0f, 15.0f, 1.0f);    
     
     sprite->SetProperties (common::PropertyMap ());
@@ -63,48 +56,11 @@ struct Test
 
     render_target.SetScreen (&screen);
 
-      //настройка запросов рендеринга
-
-    application.Render ().SetMaxDrawDepth (3);
-
-    application.Render ().RegisterQueryHandler ("test_query", xtl::bind (&Test::SetupDynamicRenderTarget, this, _1, _2));
-
       //загрузка ресурсов
 
     application.LoadResources ();
-
-      //установка idle-функции
-
-    application.SetIdleHandler (xtl::bind (&Test::Idle, this));
   }
 
-    //настройка динамического целевого буфера рендеринга
-  void SetupDynamicRenderTarget (RenderTarget& render_target, const char*)
-  {
-    render_target.SetScreen (&screen);
-  }
-
-    //обработчик главного цикла приложени¤
-  void Idle ()
-  {
-    try
-    {
-      static size_t last_update = 0;
-
-      if (common::milliseconds () - last_update >= 10)
-      {
-        sprite->Properties ()->SetProperty ("render.video_position", 25.0f * common::milliseconds () / 1000.0f);
-        
-        last_update = common::milliseconds ();
-      }
-
-      application.PostRedraw ();
-    }
-    catch (std::exception& exception)
-    {
-      printf ("exception at idle: %s\n", exception.what ());
-    }
-  }
 };
 
 void log_print (const char* log, const char* message)
@@ -114,7 +70,7 @@ void log_print (const char* log, const char* message)
 
 int main ()
 {
-  printf ("Results of test_video:\n");
+  printf ("Results of test_input1:\n");
 
   try
   {

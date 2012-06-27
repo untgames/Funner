@@ -66,7 +66,7 @@ struct Test
     screen.SetBackgroundState (false);
 
     vp.SetName            ("Viewport1");
-    vp.SetRenderPath      ("Render2d");
+    vp.SetTechnique       ("Render2d");
     vp.SetCamera          (camera.get ());
     vp.SetBackgroundColor (1, 1, 1, 1);
     vp.EnableBackground   ();

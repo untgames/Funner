@@ -185,7 +185,7 @@ int main (int argc, char* argv [])
     screen.SetBackgroundColor (1, 0, 0, 0);
 
     vp.SetName       ("Viewport1");
-    vp.SetRenderPath ("Render2d");
+    vp.SetTechnique  ("Render2d");
     vp.SetCamera     (scene.camera.get ());
     vp.SetBackgroundColor (0, 0, 0, 0);
     vp.EnableBackground ();
