@@ -1,6 +1,8 @@
 #ifndef FUNNER_ENGINE_HEADER
 #define FUNNER_ENGINE_HEADER
 
+#include <cstddef>
+
 #ifdef _WIN32
   #define FUNNER_C_API extern "C" __declspec(dllexport)
 #elif __GNUC__

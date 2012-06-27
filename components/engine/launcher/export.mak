@@ -20,7 +20,7 @@ export.link.engine.launcher_shared.IMPORTS := link.common.default_console_handle
                                 link.engine.script_binds.system link.engine.script_binds.common link.engine.script_binds.network \
                                 link.engine.script_binds.rms link.engine.script_binds.media.players \
                                 link.engine.script_binds.physics link.engine.script_binds.math.spline_loader \
-                                link.engine.script_binds.social \
+                                link.engine.script_binds.social link.engine.script_binds.debug \
                                 link.sound.low_level.openal_driver run.sound.low_level.openal_driver \
                                 link.engine.subsystems.scene_render link.engine.subsystems.scene_player \
                                 link.engine.subsystems.input_manager link.engine.subsystems.shell \
