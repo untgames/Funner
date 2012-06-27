@@ -7,6 +7,12 @@
 #include <sys/socket.h>
 #endif
 
+#ifdef ANDROID
+#include <linux/in.h>
+#include <linux/in6.h>
+#include <sys/endian.h>
+#endif
+
 #include <sgi_stl/stdexcept>
 
 #include <errno.h>

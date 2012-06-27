@@ -46,14 +46,14 @@ int main ()
   {
     aes (CryptoOperation_Encrypt, TESTS [i].key, TESTS [i].key_size * 8, TESTS [i].blocks_count, TESTS [i].source, buffer);
 
-    printf ("Crypto %d correct - %c\n", i, memcmp (buffer, TESTS [i].result, TESTS [i].blocks_count * BLOCK_SIZE) ? 'n' : 'y');
+//    printf ("Crypto %d correct - %c\n", i, memcmp (buffer, TESTS [i].result, TESTS [i].blocks_count * BLOCK_SIZE) ? 'n' : 'y');
 
-    aes (CryptoOperation_Decrypt, TESTS [i].key, TESTS [i].key_size * 8, TESTS [i].blocks_count, buffer, decrypt_buffer);
+//    aes (CryptoOperation_Decrypt, TESTS [i].key, TESTS [i].key_size * 8, TESTS [i].blocks_count, buffer, decrypt_buffer);
 
-    printf ("Decrypt correct - %c\n", memcmp (TESTS [i].source, decrypt_buffer, TESTS [i].blocks_count * BLOCK_SIZE) ? 'n' : 'y');
+//    printf ("Decrypt correct - %c\n", memcmp (TESTS [i].source, decrypt_buffer, TESTS [i].blocks_count * BLOCK_SIZE) ? 'n' : 'y');
   }
 
-  printf ("Context usage crypto results:\n");
+/*  printf ("Context usage crypto results:\n");
 
   for (size_t i = 0, count = sizeof (TESTS) / sizeof (*TESTS); i < count; i++)
   {
@@ -68,7 +68,7 @@ int main ()
     decrypt_context.Update (TESTS [i].blocks_count, buffer, decrypt_buffer);
 
     printf ("Decrypt correct - %c\n", memcmp (TESTS [i].source, decrypt_buffer, TESTS [i].blocks_count * BLOCK_SIZE) ? 'n' : 'y');
-  }
+  }*/
 
   return 0;
 }

@@ -175,12 +175,12 @@ public:
   allocator_type get_allocator() const { return _Base::get_allocator(); }
 
 #ifdef __STL_CLASS_PARTIAL_SPECIALIZATION
-  typedef reverse_iterator<const_iterator> const_reverse_iterator;
-  typedef reverse_iterator<iterator> reverse_iterator;
+  typedef sgi_stl::reverse_iterator<const_iterator> const_reverse_iterator;
+  typedef sgi_stl::reverse_iterator<iterator> reverse_iterator;
 #else /* __STL_CLASS_PARTIAL_SPECIALIZATION */
-  typedef reverse_iterator<const_iterator, value_type, const_reference, 
+  typedef sgi_stl::reverse_iterator<const_iterator, value_type, const_reference, 
                            difference_type>  const_reverse_iterator;
-  typedef reverse_iterator<iterator, value_type, reference, difference_type>
+  typedef sgi_stl::reverse_iterator<iterator, value_type, reference, difference_type>
           reverse_iterator;
 #endif /* __STL_CLASS_PARTIAL_SPECIALIZATION */
 

@@ -2,6 +2,10 @@
   #include <sys/time.h>
 #endif
 
+#ifdef ANDROID
+  #include <unistd.h>
+#endif
+
 #include <errno.h>
 #include <cstdio>
 #include <cstring>

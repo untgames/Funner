@@ -1,4 +1,6 @@
-#include <launcher/application.>
+#include <stdio.h>
+#include <launcher/application.h>
+#include <sgi_stl/memory>
 
 using namespace engine;
 using namespace plarium::launcher;
@@ -6,9 +8,9 @@ using namespace plarium::launcher;
 //точка входа
 int main (int argc, const char* argv [], const char* env [])
 {
-  stl::auto_ptr<IEngine> funner (FunnerInit ());
+  sgi_stl::auto_ptr<IEngine> funner (FunnerInit ());
 
-  if (!funner)
+  if (!funner.get ())
   {
     printf ("Funner startup failed!");
     return 1;
