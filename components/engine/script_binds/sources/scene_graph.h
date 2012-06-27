@@ -141,6 +141,7 @@ void bind_linear_acceleration_evaluator_library   (script::Environment&);
 void bind_controller_sync_physics_to_node_library (script::Environment&);
 void bind_controller_animation_library            (script::Environment&);
 void bind_scene_manager_library                   (script::Environment& environment);
+void bind_screen_viewport_library                 (script::Environment& environment);
 
 }
 

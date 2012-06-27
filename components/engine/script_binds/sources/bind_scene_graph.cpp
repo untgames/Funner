@@ -89,6 +89,7 @@ void bind_scene_graph_library (Environment& environment)
   bind_controller_sync_physics_to_node_library (environment);
   bind_controller_animation_library            (environment);
   bind_scene_manager_library                   (environment);
+  bind_screen_viewport_library                 (environment);
 }
 
 /*

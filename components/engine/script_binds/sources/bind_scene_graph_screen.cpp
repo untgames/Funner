@@ -1,19 +1,17 @@
 #include "shared.h"
 
 #include <sg/camera.h>
+#include <sg/screen.h>
+#include <sg/viewport.h>
 
-#include <render/screen.h>
-#include <render/viewport.h>
-
-using namespace render;
-using namespace render::obsolete;
+using namespace scene_graph;
 using namespace script;
 using namespace xtl;
 
-namespace components
+namespace engine
 {
 
-namespace render_script_bind
+namespace scene_graph_script_binds
 {
 
 /*
@@ -23,23 +21,21 @@ namespace render_script_bind
 const char* RENDER_RECT_LIBRARY     = "Render.Rect";
 const char* RENDER_VIEWPORT_LIBRARY = "Render.Viewport";
 const char* RENDER_SCREEN_LIBRARY   = "Render.Screen";
-const char* BINDER_NAME             = "Render";
-const char* COMPONENT_NAME          = "script.binds.Render";
 
 /*
     Утилиты
 */
 
 ///Получение параметров области экрана и области вывода
-int    get_rect_left   (const Rect& rect)         { return rect.left; }
-int    get_rect_top    (const Rect& rect)         { return rect.top; }
+int    get_rect_left   (const Rect& rect)         { return rect.x; }
+int    get_rect_top    (const Rect& rect)         { return rect.y; }
 size_t get_rect_width  (const Rect& rect)         { return rect.width; }
 size_t get_rect_height (const Rect& rect)         { return rect.height; }
-int    get_rect_right  (const Rect& rect)         { return rect.left + rect.width; }
-int    get_rect_bottom (const Rect& rect)         { return rect.top + rect.height; }
-void   set_rect_left   (Rect& rect, int param)    { rect.left = param; }
-void   set_rect_top    (Rect& rect, int param)    { rect.top = param; }
-void   set_rect_width  (Rect& rect, size_t param) { rect.width = param; }
+int    get_rect_right  (const Rect& rect)         { return rect.right (); }
+int    get_rect_bottom (const Rect& rect)         { return rect.bottom (); }
+void   set_rect_left   (Rect& rect, int param)    { rect.x      = param; }
+void   set_rect_top    (Rect& rect, int param)    { rect.y      = param; }
+void   set_rect_width  (Rect& rect, size_t param) { rect.width  = param; }
 void   set_rect_height (Rect& rect, size_t param) { rect.height = param; }
 
 ///Создание прямоугольной области
@@ -97,8 +93,8 @@ void bind_viewport_library (Environment& environment)
 
   lib.Register ("set_Name",            make_invoker (&Viewport::SetName));
   lib.Register ("get_Name",            make_invoker (&Viewport::Name));
-  lib.Register ("set_RenderPath",      make_invoker (&Viewport::SetRenderPath));
-  lib.Register ("get_RenderPath",      make_invoker (&Viewport::RenderPath));
+  lib.Register ("set_Technique",       make_invoker (&Viewport::SetTechnique));
+  lib.Register ("get_Technique",       make_invoker (&Viewport::Technique));
   lib.Register ("set_ZOrder",          make_invoker (&Viewport::SetZOrder));
   lib.Register ("get_ZOrder",          make_invoker (&Viewport::ZOrder));
   lib.Register ("set_Camera",          make_invoker (&Viewport::SetCamera));
@@ -113,7 +109,7 @@ void bind_viewport_library (Environment& environment)
   lib.Register ("get_Area",            make_invoker (&Viewport::Area));
   lib.Register ("set_Area",            make_invoker (implicit_cast<void (Viewport::*) (const Rect&)> (&Viewport::SetArea)));
 
-  lib.Register ("SetArea",             make_invoker (implicit_cast<void (Viewport::*) (int, int, size_t, size_t)> (&Viewport::SetArea)));
+  lib.Register ("SetArea",             make_invoker (implicit_cast<void (Viewport::*) (int, int, int, int)> (&Viewport::SetArea)));
   lib.Register ("SetOrigin",           make_invoker (&Viewport::SetOrigin));
   lib.Register ("SetSize",             make_invoker (&Viewport::SetSize));
   lib.Register ("get_MinDepth",        make_invoker (&Viewport::MinDepth));
@@ -127,11 +123,8 @@ void bind_viewport_library (Environment& environment)
                  make_invoker<void (Viewport&, float, float, float)> (bind (implicit_cast<void (Viewport::*) (float, float, float, float)> (&Viewport::SetBackgroundColor), _1, _2, _3, _4, 0.f))));
   lib.Register ("EnableBackground",    make_invoker (&Viewport::EnableBackground));
   lib.Register ("DisableBackground",   make_invoker (&Viewport::DisableBackground));
-  lib.Register ("SetProperty",         make_invoker (&Viewport::SetProperty));
-  lib.Register ("GetProperty",         make_invoker (&Viewport::GetProperty));
-  lib.Register ("HasProperty",         make_invoker (&Viewport::HasProperty));
-  lib.Register ("RemoveProperty",      make_invoker (&Viewport::RemoveProperty));
-  lib.Register ("RemoveAllProperties", make_invoker (&Viewport::RemoveAllProperties));
+  lib.Register ("set_Properties",      make_invoker (&Viewport::SetProperties));
+  lib.Register ("get_Properties",      make_invoker (&Viewport::Properties));
 
   environment.RegisterType<Viewport> (RENDER_VIEWPORT_LIBRARY);
 }
@@ -164,7 +157,7 @@ void bind_screen_library (Environment& environment)
   lib.Register ("get_Area",            make_invoker (&Screen::Area));
   lib.Register ("set_Area",            make_invoker (implicit_cast<void (Screen::*) (const Rect&)> (&Screen::SetArea)));
 
-  lib.Register ("SetArea",             make_invoker (implicit_cast<void (Screen::*) (int, int, size_t, size_t)> (&Screen::SetArea)));
+  lib.Register ("SetArea",             make_invoker (implicit_cast<void (Screen::*) (int, int, int, int)> (&Screen::SetArea)));
   lib.Register ("SetOrigin",           make_invoker (&Screen::SetOrigin));
   lib.Register ("SetSize",             make_invoker (&Screen::SetSize));
   lib.Register ("SetBackgroundColor",  make_invoker (make_invoker (implicit_cast<void (Screen::*) (float, float, float, float)> (&Screen::SetBackgroundColor)),
@@ -183,39 +176,13 @@ void bind_screen_library (Environment& environment)
     Регистрация библиотеки рендера
 */
 
-void bind_render_library (Environment& environment)
+void bind_screen_viewport_library (Environment& environment)
 {
     //регистрация библиотек
   
   bind_rect_library     (environment);
   bind_viewport_library (environment);
   bind_screen_library   (environment);
-}
-
-/*
-    Компонент
-*/
-
-class Component
-{
-  public:
-    Component ()
-    {
-      LibraryManager::RegisterLibrary (BINDER_NAME, &Bind);
-    }
-
-  private:
-    static void Bind (Environment& environment)
-    {
-      bind_render_library (environment);
-    }
-};
-
-extern "C"
-{
-
-common::ComponentRegistrator<Component> RenderScriptBind (COMPONENT_NAME);
-
 }
 
 }
