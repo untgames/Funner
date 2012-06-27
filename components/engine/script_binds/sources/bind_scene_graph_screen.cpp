@@ -18,9 +18,9 @@ namespace scene_graph_script_binds
     Константы (имена библиотек)
 */
 
-const char* RENDER_RECT_LIBRARY     = "Render.Rect";
-const char* RENDER_VIEWPORT_LIBRARY = "Render.Viewport";
-const char* RENDER_SCREEN_LIBRARY   = "Render.Screen";
+const char* RENDER_RECT_LIBRARY     = "Scene.Rect";
+const char* RENDER_VIEWPORT_LIBRARY = "Scene.Viewport";
+const char* RENDER_SCREEN_LIBRARY   = "Scene.Screen";
 
 /*
     Утилиты
