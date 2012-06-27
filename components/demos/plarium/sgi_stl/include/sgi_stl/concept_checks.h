@@ -789,7 +789,7 @@ _Allocator_requirement_violation(_Alloc __a) {
   _EqualityComparable_concept_specification<_Alloc>::
     _EqualityComparable_requirement_violation(__a);
   // Associated Types
-  __stlvalue_type__typedef_requirement_violation<_Alloc>();
+  __value_type__typedef_requirement_violation<_Alloc>();
   __difference_type__typedef_requirement_violation<_Alloc>();
   __size_type__typedef_requirement_violation<_Alloc>();
   __reference__typedef_requirement_violation<_Alloc>();

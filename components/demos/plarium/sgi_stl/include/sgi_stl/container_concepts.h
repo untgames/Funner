@@ -127,7 +127,7 @@ _Container_requirement_violation(_Container __c) {
   // Refinement of Assignable
   _Assignable_concept_specification<_Container>::_Assignable_requirement_violation(__c);
   // Associated Types
-  __stlvalue_type__typedef_requirement_violation<_Container>();
+  __value_type__typedef_requirement_violation<_Container>();
   __difference_type__typedef_requirement_violation<_Container>();
   __size_type__typedef_requirement_violation<_Container>();
   __reference__typedef_requirement_violation<_Container>();
@@ -232,8 +232,8 @@ _RandomAccessContainer_requirement_violation(_RandomAccessContainer __c) {
   typedef Type* _TypePtr;
   typedef typename _Mutable_trait<_Dist>::_Type Dist;
   _STL_ERROR::__element_access_operator_requirement_violation(__c,
-							      _TypePtr(), 
-							      Dist());
+                    _TypePtr(), 
+                    Dist());
   // Requirements on Iterators
   typedef typename _RandomAccessContainer::iterator iter;
   typedef typename _RandomAccessContainer::const_iterator const_iter;

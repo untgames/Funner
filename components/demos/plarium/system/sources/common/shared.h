@@ -7,6 +7,8 @@
 #include <sys/socket.h>
 #endif
 
+#include <stdio.h>
+
 #ifdef ANDROID
 #include <linux/in.h>
 #include <linux/in6.h>

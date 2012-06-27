@@ -388,6 +388,7 @@
 #     define __STL_PARTIAL_SPECIALIZATION_SYNTAX
 #     define __STL_HAS_NAMESPACES
 #     define __STL_CAN_THROW_RANGE_ERRORS
+#     define __STL_CLASS_PARTIAL_SPECIALIZATION
 #     define NOMINMAX
 #     undef min
 #     undef max
@@ -557,7 +558,7 @@
 # include <stdio.h>
 # define __stl_assert(expr) \
     if (!(expr)) { fprintf(stderr, "%s:%d STL assertion failure: %s\n", \
-			  __FILE__, __LINE__, # expr); abort(); }
+        __FILE__, __LINE__, # expr); abort(); }
 #else
 # define __stl_assert(expr)
 #endif

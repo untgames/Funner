@@ -7,6 +7,7 @@
 
 #include <process.h>
 #include <windows.h>
+#include <stdio.h>
 
 namespace plarium
 {

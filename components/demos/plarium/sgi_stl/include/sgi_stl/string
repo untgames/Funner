@@ -1216,7 +1216,7 @@ basic_string<_Tp, _Traits, _Alloc>::append(const _Tp* __first,
   if (__first != __last) {
     const size_type __old_size = size();
     ptrdiff_t __n = __last - __first;
-    if (__n > max_size() || __old_size > max_size() - __n)
+    if ((size_type)__n > max_size() || __old_size > max_size() - __n)
       _M_throw_length_error();
     if (__old_size + __n > capacity()) {
       const size_type __len = __old_size + max(__old_size, (size_t) __n) + 1;

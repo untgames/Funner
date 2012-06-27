@@ -396,7 +396,7 @@ public:
           reverse_iterator;
 #endif /* __STL_CLASS_PARTIAL_SPECIALIZATION */
 
-  typedef __BVECTOR_BASE::allocator_type allocator_type;
+  typedef typename __BVECTOR_BASE::allocator_type allocator_type;
   allocator_type get_allocator() const {
     return __BVECTOR_BASE::get_allocator();
   }

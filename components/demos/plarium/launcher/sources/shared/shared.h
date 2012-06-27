@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include <sgi_stl/stdexcept>
 
 #undef CreateWindow
