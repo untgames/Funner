@@ -9,13 +9,47 @@ using namespace math;
 
 struct InputZone::Impl: public xtl::instance_counter<InputZone>
 {
-  ZoneDesc zone_desc; //описание спрайта
+  ZoneDesc zone_desc [NodeOrt_Num];   //описание спрайта
+  size_t   plane_mask;                //маска включеных плоскостей ввода
+  size_t   zones_count;               //количество зон
   
   Impl ()
   {
-    zone_desc.position = vec3f (0.0f);  
-    zone_desc.axis_x   = vec3f (1.0f, 0.0f, 0.0f);
-    zone_desc.axis_y   = vec3f (0.0f, 1.0f, 0.0f);
+    plane_mask = (1 << NodeOrt_X) | (1 << NodeOrt_Y) | (1 << NodeOrt_Z);    
+
+    UpdatePlanes ();
+  }
+  
+  void UpdatePlanes ()
+  {
+    zones_count = 0;
+    
+    if (plane_mask & (1 << NodeOrt_X))
+    {
+      zone_desc [zones_count].position = vec3f (0.0f);
+      zone_desc [zones_count].axis_x   = vec3f (0.0f, 1.0f, 0.0f);
+      zone_desc [zones_count].axis_y   = vec3f (0.0f, 0.0f, 1.0f);
+
+      zones_count++;
+    }
+
+    if (plane_mask & (1 << NodeOrt_Y))
+    {
+      zone_desc [zones_count].position = vec3f (0.0f);
+      zone_desc [zones_count].axis_x   = vec3f (0.0f, 0.0f, 1.0f);
+      zone_desc [zones_count].axis_y   = vec3f (1.0f, 0.0f, 0.0f);
+
+      zones_count++;
+    }
+
+    if (plane_mask & (1 << NodeOrt_Z))
+    {    
+      zone_desc [zones_count].position = vec3f (0.0f);  
+      zone_desc [zones_count].axis_x   = vec3f (1.0f, 0.0f, 0.0f);
+      zone_desc [zones_count].axis_y   = vec3f (0.0f, 1.0f, 0.0f);        
+
+      zones_count++;
+    }
   }
 };
 
@@ -60,10 +94,61 @@ void InputZone::AcceptCore (Visitor& visitor)
 
 size_t InputZone::ZoneDescsCountCore ()
 {
-  return 1;
+  return impl->zones_count;
 }
 
 const InputZoneModel::ZoneDesc* InputZone::ZoneDescsCore ()
 {
-  return &impl->zone_desc;
+  return &impl->zone_desc [0];
+}
+
+/*
+    ”правление плоскост€ми зон ввода
+*/
+
+void InputZone::SetPlaneState (NodeOrt normal, bool state)
+{
+  switch (normal)
+  {
+    case NodeOrt_X:
+    case NodeOrt_Y:
+    case NodeOrt_Z:
+      break;
+    default:
+      throw xtl::make_argument_exception ("scene_graph::InputZone::SetPlaneState", "normal", normal);
+  }
+    
+  size_t update_mask = 1 << normal;
+  
+  if (state)
+  {
+    if (impl->plane_mask & update_mask)
+      return;
+      
+    impl->plane_mask |= update_mask;
+  }
+  else
+  {
+    if (!(impl->plane_mask & update_mask))
+      return;
+      
+    impl->plane_mask &= ~update_mask;
+  }
+
+  impl->UpdatePlanes ();
+  
+  UpdateZoneDescsNotify ();
+}
+
+bool InputZone::IsPlaneEnabled (NodeOrt normal) const
+{
+  switch (normal)
+  {
+    case NodeOrt_X:
+    case NodeOrt_Y:
+    case NodeOrt_Z:
+      return (impl->plane_mask & (1 << normal)) != 0;
+    default:
+      return false;
+  }
 }
