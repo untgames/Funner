@@ -91,11 +91,11 @@ void EventsSource::Impl::Connect (const char* driver_name_mask, const char* devi
       xtl::com_ptr<IDriver> driver = DriverManager::Driver (i);
 
       for (size_t j = 0; j < driver->GetDevicesCount (); j++)
-        if (wcimatch (driver->GetDeviceName (j), device_name_mask))
+        if (wcimatch (driver->GetDeviceFullName (j), device_name_mask))
         {
           try
           {
-            DevicePtr new_connected_device (driver->CreateDevice (driver->GetDeviceName (j)), false);
+            DevicePtr new_connected_device (driver->CreateDevice (driver->GetDeviceFullName (j)), false);
 
             device_connection = new_connected_device->RegisterEventHandler (xtl::bind (&EventsSource::Impl::DeviceEventHandler, this, _1));
 
