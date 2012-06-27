@@ -4,7 +4,7 @@
 #include <stl/auto_ptr.h>
 #include <xtl/functional_fwd>
 
-#include <render/screen.h>
+#include <sg/screen.h>
 
 //!!добавить тесты RenderTarget на смену SceneRender::SetRenderer
 
@@ -48,8 +48,8 @@ class RenderTarget
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Ёкран (политика владени€ - weak-ref)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void                      SetScreen (render::obsolete::Screen* screen);
-    render::obsolete::Screen* Screen    () const;
+    void                 SetScreen (scene_graph::Screen* screen);
+    scene_graph::Screen* Screen    () const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///ќбновление

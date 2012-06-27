@@ -6,11 +6,11 @@ using namespace render::obsolete;
     ќписание реализации отобржаемой области вывода
 */
 
-class RenderableViewport::Impl: private IViewportListener, public xtl::reference_counter
+class RenderableViewport::Impl: private scene_graph::IViewportListener, public xtl::reference_counter
 {
   public:
 /// онструктор
-    Impl (const render::obsolete::Viewport& in_viewport, RenderTargetImpl& in_render_target, RenderManager& in_render_manager)
+    Impl (const scene_graph::Viewport& in_viewport, RenderTargetImpl& in_render_target, RenderManager& in_render_manager)
       : viewport (in_viewport),
         render_target (in_render_target),
         render_manager (in_render_manager),
@@ -41,7 +41,7 @@ class RenderableViewport::Impl: private IViewportListener, public xtl::reference
     }
     
 ///ѕолучение области вывода
-    render::obsolete::Viewport& Viewport () { return viewport; }
+    scene_graph::Viewport& Viewport () { return viewport; }
     
 ///ќбновление области вывода
     void Update ()
@@ -89,7 +89,7 @@ class RenderableViewport::Impl: private IViewportListener, public xtl::reference
 
         scene_graph::Camera* camera = viewport.Camera ();
         scene_graph::Scene*  scene  = camera ? camera->Scene () : 0;
-        Screen*              screen = render_target.Screen ();
+        scene_graph::Screen* screen = render_target.Screen ();
         
         if (!screen)
           throw xtl::format_operation_exception ("", "Null screen");
@@ -122,18 +122,13 @@ class RenderableViewport::Impl: private IViewportListener, public xtl::reference
 
             //создание области рендеринга
 
-          ICustomSceneRender& render_path = render_manager.GetRenderPath (viewport.RenderPath ());
+          ICustomSceneRender& render_path = render_manager.GetRenderPath (viewport.Technique ());
 
           RenderViewPtr new_render_view (render_path.CreateRenderView (scene), false);
 
             //установка целевых буферов рендеринга
 
           new_render_view->SetRenderTargets (render_target.ColorAttachment (), render_target.DepthStencilAttachment ());
-
-            //установка свойств области вывода в область рендеринга
-
-          for (Viewport::PropertyIterator prop_iter=viewport.CreatePropertyIterator (); prop_iter; ++prop_iter)
-            new_render_view->SetProperty (prop_iter->Name (), prop_iter->Value ());        
 
             //€вное разрешение обновлени€ всех параметров вывода
 
@@ -157,15 +152,15 @@ class RenderableViewport::Impl: private IViewportListener, public xtl::reference
           
         if (need_update_area)
         {
-          const Rect &renderable_area = render_target.RenderableArea (),
-                     &screen_area     = screen->Area (),
-                     &viewport_area   = viewport.Area ();
+          const scene_graph::Rect &renderable_area = render_target.RenderableArea (),
+                                  &screen_area     = screen->Area (),
+                                  &viewport_area   = viewport.Area ();
 
           float x_scale  = screen_area.width ? float (renderable_area.width) / screen_area.width : 0.0f,
                 y_scale  = screen_area.height ? float (renderable_area.height) / screen_area.height : 0.0f;
                 
-          Rect result (int (renderable_area.left + (viewport_area.left - screen_area.left) * x_scale),
-                       int (renderable_area.top + (viewport_area.top - screen_area.top) * y_scale),
+          scene_graph::Rect result (int (renderable_area.left () + (viewport_area.left () - screen_area.left ()) * x_scale),
+                       int (renderable_area.top () + (viewport_area.top () - screen_area.top ()) * y_scale),
                        size_t (ceil (viewport_area.width * x_scale)),
                        size_t (ceil (viewport_area.height * y_scale)));
                        
@@ -209,7 +204,7 @@ class RenderableViewport::Impl: private IViewportListener, public xtl::reference
 
           //установка начальной области вывода
 
-      Rect src_viewport_rect;
+      scene_graph::Rect src_viewport_rect;
       
       float min_depth = 0.0f, max_depth = 1.0f;
 
@@ -217,8 +212,8 @@ class RenderableViewport::Impl: private IViewportListener, public xtl::reference
 
       render::mid_level::Viewport dst_viewport_rect;
 
-      dst_viewport_rect.x         = src_viewport_rect.left;
-      dst_viewport_rect.y         = src_viewport_rect.top;
+      dst_viewport_rect.x         = src_viewport_rect.left ();
+      dst_viewport_rect.y         = src_viewport_rect.top ();
       dst_viewport_rect.width     = src_viewport_rect.width;
       dst_viewport_rect.height    = src_viewport_rect.height;
       dst_viewport_rect.min_depth = min_depth;
@@ -236,7 +231,7 @@ class RenderableViewport::Impl: private IViewportListener, public xtl::reference
     }
 
 ///ќповещение об изменении текущей камеры
-    void OnChangeCamera (scene_graph::Camera*)
+    void OnViewportChangeCamera (scene_graph::Camera*)
     {
       need_update_view   = true;
       need_update_camera = true;
@@ -245,20 +240,20 @@ class RenderableViewport::Impl: private IViewportListener, public xtl::reference
     }
 
 ///ќповещение о необходимости изменени€ границ области вывода
-    void OnChangeArea (const Rect&, float, float)
+    void OnViewportChangeArea (const scene_graph::Rect&, float, float)
     {
       UpdateArea ();
     }
 
 ///ќповещение о необходимости изменени€ пути рендеринга
-    void OnChangeRenderPath (const char*)
+    void OnViewportChangeRenderPath (const char*)
     {
       need_update_view = true;
       need_update_path = true;
     }
 
 ///ќповещение об изменении пор€дка следовани€ областей вывода
-    void OnChangeZOrder (int)
+    void OnViewportChangeZOrder (int)
     {
       render_target.UpdateViewportsOrder ();
     }
@@ -269,17 +264,8 @@ class RenderableViewport::Impl: private IViewportListener, public xtl::reference
       need_update_view = true;
     }
 
-///ќповещение об изменении свойства рендеринга
-    void OnChangeProperty (const char* name, const char* value)
-    {
-      if (!render_view)
-        return;
-
-      render_view->SetProperty (name, value);
-    }
-
 ///ќповещение об изменении фона
-    void OnChangeBackground (bool, const math::vec4f&)
+    void OnViewportChangeBackground (bool, const math::vec4f&)
     {
       need_update_clear_frame = true;
     }
@@ -290,7 +276,7 @@ class RenderableViewport::Impl: private IViewportListener, public xtl::reference
     typedef xtl::com_ptr<render::mid_level::IRenderer>   RendererPtr;
 
   private:
-    render::obsolete::Viewport      viewport;                //область вывода
+    scene_graph::Viewport      viewport;                //область вывода
     RenderTargetImpl&     render_target;           //цель рендеринга
     RenderManager&        render_manager;          //менеджер рендеринга
     mid_level::IRenderer& renderer;                //система рендеринга
@@ -310,7 +296,7 @@ class RenderableViewport::Impl: private IViewportListener, public xtl::reference
      онструкторы / деструктор / присваивание
 */
 
-RenderableViewport::RenderableViewport (const render::obsolete::Viewport& viewport, RenderTargetImpl& render_target, RenderManager& render_manager)
+RenderableViewport::RenderableViewport (const scene_graph::Viewport& viewport, RenderTargetImpl& render_target, RenderManager& render_manager)
 {
   try
   {
@@ -347,7 +333,7 @@ RenderableViewport& RenderableViewport::operator = (const RenderableViewport& vi
     ѕолучение области вывода
 */
 
-render::obsolete::Viewport& RenderableViewport::Viewport ()
+scene_graph::Viewport& RenderableViewport::Viewport ()
 {
   return impl->Viewport ();
 }

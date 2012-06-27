@@ -37,7 +37,7 @@ int main ()
 
     vp1.SetArea       (0, 0, 100, 100);
     vp1.SetCamera     (&*camera);
-    vp1.SetRenderPath ("Render2d");
+    vp1.SetTechnique  ("Render2d");
 
     Screen screen;
 

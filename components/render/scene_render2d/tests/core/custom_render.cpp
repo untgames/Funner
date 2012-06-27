@@ -57,7 +57,7 @@ int main ()
 
     vp1.SetArea       (0, 0, 100, 100);
     vp1.SetCamera     (&*camera1);
-    vp1.SetRenderPath ("MySceneRender");
+    vp1.SetTechnique  ("MySceneRender");
     
     screen.Attach (vp1);
 

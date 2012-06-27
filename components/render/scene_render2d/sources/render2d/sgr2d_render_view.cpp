@@ -144,14 +144,14 @@ mid_level::IRenderTarget* RenderView::GetDepthStencilTarget ()
     Установка области вывода
 */
 
-void RenderView::SetViewport (const render::obsolete::Rect& rect, float min_depth, float max_depth)
+void RenderView::SetViewport (const scene_graph::Rect& rect, float min_depth, float max_depth)
 {
   try
   {
     render::mid_level::Viewport viewport;
     
-    viewport.x         = rect.left;
-    viewport.y         = rect.top;
+    viewport.x         = rect.left ();
+    viewport.y         = rect.top ();
     viewport.width     = rect.width;
     viewport.height    = rect.height;
     viewport.min_depth = min_depth;
@@ -166,7 +166,7 @@ void RenderView::SetViewport (const render::obsolete::Rect& rect, float min_dept
   }
 }
 
-void RenderView::GetViewport (render::obsolete::Rect& out_rect, float& min_depth, float& max_depth)
+void RenderView::GetViewport (scene_graph::Rect& out_rect, float& min_depth, float& max_depth)
 {
   try
   {
@@ -174,8 +174,8 @@ void RenderView::GetViewport (render::obsolete::Rect& out_rect, float& min_depth
     
     frame->GetViewport (viewport);
     
-    out_rect.left   = viewport.x;
-    out_rect.top    = viewport.y;
+    out_rect.x      = viewport.x;
+    out_rect.y      = viewport.y;
     out_rect.width  = viewport.width;
     out_rect.height = viewport.height;
     min_depth       = viewport.min_depth;
@@ -200,20 +200,6 @@ void RenderView::SetCamera (scene_graph::Camera* in_camera)
 scene_graph::Camera* RenderView::GetCamera ()
 {
   return camera;
-}
-
-/*
-    Установка / чтение свойств
-*/
-
-void RenderView::SetProperty (const char*, const char*)
-{
-}
-
-void RenderView::GetProperty (const char*, size_t buffer_size, char* value_buffer)
-{
-  if (buffer_size && value_buffer)
-    *value_buffer = 0;
 }
 
 /*

@@ -441,7 +441,7 @@ class RenderManager::Impl: private mid_level::IRendererListener
       {
         FrameBuffer& frame_buffer = GetFrameBuffer (in_frame_buffer);
 
-        frame_buffer.render_target->SetRenderableArea (Rect (0, 0, width, height));
+        frame_buffer.render_target->SetRenderableArea (scene_graph::Rect (0, 0, width, height));
       }
       catch (std::exception& exception)
       {

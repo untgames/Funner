@@ -48,7 +48,7 @@ struct DrawScope
     Описание реализации цели рендеринга
 */
 
-struct RenderTargetImpl::Impl: private IScreenListener
+struct RenderTargetImpl::Impl: private scene_graph::IScreenListener
 {
   public:
 ///Конструктор
@@ -76,7 +76,7 @@ struct RenderTargetImpl::Impl: private IScreenListener
       mid_level::IRenderTarget* render_target = color_attachment ? color_attachment.get () : depth_stencil_attachment.get ();
 
       if (render_target)
-        SetRenderableArea (Rect (0, 0, render_target->GetWidth (), render_target->GetHeight ()));
+        SetRenderableArea (scene_graph::Rect (0, 0, render_target->GetWidth (), render_target->GetHeight ()));
     }
     
 ///Деструктор
@@ -178,15 +178,15 @@ struct RenderTargetImpl::Impl: private IScreenListener
         mid_level::IRenderTarget* render_target = color_attachment ? color_attachment.get () : depth_stencil_attachment.get ();
 
         if (render_target)
-          SetRenderableArea (Rect (0, 0, render_target->GetWidth (), render_target->GetHeight ()));        
+          SetRenderableArea (scene_graph::Rect (0, 0, render_target->GetWidth (), render_target->GetHeight ()));        
       }
     }
 
 ///Текущий экран
-    render::obsolete::Screen* Screen () { return screen; }
+    scene_graph::Screen* Screen () { return screen; }
 
 ///Смена текущего экрана
-    void SetScreen (render::obsolete::Screen* in_screen)
+    void SetScreen (scene_graph::Screen* in_screen)
     {
         //отмена регистрации слушателя
 
@@ -220,9 +220,9 @@ struct RenderTargetImpl::Impl: private IScreenListener
     }
    
 ///Изменение физическое окна вывода
-    void SetRenderableArea (const Rect& rect)
+    void SetRenderableArea (const scene_graph::Rect& rect)
     {
-      if (renderable_area.left == rect.left && renderable_area.top == rect.top && renderable_area.width == rect.width && renderable_area.height == rect.height)
+      if (renderable_area == rect)
         return;      
 
       renderable_area   = rect;
@@ -230,7 +230,7 @@ struct RenderTargetImpl::Impl: private IScreenListener
     }
 
 ///Текущее физическое окно вывода
-    const Rect& RenderableArea () { return renderable_area; }
+    const scene_graph::Rect& RenderableArea () { return renderable_area; }
     
 ///Оповещение о необходимости пересортировки областей вывода
     void UpdateViewportsOrder ()
@@ -271,7 +271,7 @@ struct RenderTargetImpl::Impl: private IScreenListener
 
         for (ViewArray::iterator volatile iter=views.begin (), end=views.end (); iter!=end; ++iter)
         {
-          Viewport& viewport = iter->Viewport ();        
+          scene_graph::Viewport& viewport = iter->Viewport ();        
           
           try
           {
@@ -279,11 +279,11 @@ struct RenderTargetImpl::Impl: private IScreenListener
           }
           catch (std::exception& exception)
           {
-            render_manager->LogPrintf ("%s\n    at draw viewport='%s', render_path='%s'", exception.what (), viewport.Name (), viewport.RenderPath ());
+            render_manager->LogPrintf ("%s\n    at draw viewport='%s', render_path='%s'", exception.what (), viewport.Name (), viewport.Technique ());
           }
           catch (...)
           {
-            render_manager->LogPrintf ("Unknown exception\n    at draw viewport='%s', render_path='%s'", viewport.Name (), viewport.RenderPath ());
+            render_manager->LogPrintf ("Unknown exception\n    at draw viewport='%s', render_path='%s'", viewport.Name (), viewport.Technique ());
           }
         }
       }
@@ -314,7 +314,7 @@ struct RenderTargetImpl::Impl: private IScreenListener
         return;
 
       for (size_t i=0, count=screen->ViewportsCount (); i<count; i++)
-        OnAttachViewport (screen->Viewport (i));
+        OnScreenAttachViewport (screen->Viewport (i));
     }
 
 ///Сортировка областей вывода
@@ -385,26 +385,26 @@ struct RenderTargetImpl::Impl: private IScreenListener
     }
     
 ///Оповещение об изменении рабочей области экрана
-    void OnChangeArea (const Rect&)
+    void OnScreenChangeArea (const scene_graph::Rect&)
     {
       need_update_areas = true;
     }
     
 ///Оповещение об изменении фона
-    void OnChangeBackground (bool, const math::vec4f&)
+    void OnScreenChangeBackground (bool, const math::vec4f&)
     {
       need_update_background = true;
     }
 
 ///Оповещение о добавлении области вывода
-    void OnAttachViewport (Viewport& viewport)
+    void OnScreenAttachViewport (scene_graph::Viewport& viewport)
     {
       if (render_manager)
         views.push_back (RenderableViewport (viewport, owner, *render_manager));
     }
 
 ///Оповещение об удалении области вывода
-    void OnDetachViewport (Viewport& viewport)
+    void OnScreenDetachViewport (scene_graph::Viewport& viewport)
     {
       size_t id = viewport.Id ();
 
@@ -414,7 +414,7 @@ struct RenderTargetImpl::Impl: private IScreenListener
     }
 
 ///Оповещение об удалении экрана
-    void OnDestroy ()
+    void OnScreenDestroy ()
     {
       SetScreen (0);
     }    
@@ -438,10 +438,10 @@ struct RenderTargetImpl::Impl: private IScreenListener
     render::obsolete::RenderManager* render_manager;            //менеджер рендеринга
     AttachmentPtr          color_attachment;          //ассоциированный буфер цвета
     AttachmentPtr          depth_stencil_attachment;  //ассоциированный буфер попиксельного отсечения
-    render::obsolete::Screen*        screen;                    //экран
+    scene_graph::Screen*        screen;                    //экран
     ViewArray              views;                     //массив областей рендеринга
     ClearFramePtr          clear_frame;               //очищающий кадр
-    Rect                   renderable_area;           //границы отображаемой области
+    scene_graph::Rect      renderable_area;           //границы отображаемой области
     size_t                 last_update_transaction_id;//идентификатор последней транзакции обновления
     bool                   need_update_background;    //необходимо обновить параметры фона
     bool                   need_update_areas;         //необходимо обновить границы областей вывода
@@ -531,7 +531,7 @@ RenderManager* RenderTargetImpl::RenderManager ()
     Экран (политика владения - weak-ref)
 */
 
-void RenderTargetImpl::SetScreen (render::obsolete::Screen* screen)
+void RenderTargetImpl::SetScreen (scene_graph::Screen* screen)
 {
   try
   {
@@ -544,7 +544,7 @@ void RenderTargetImpl::SetScreen (render::obsolete::Screen* screen)
   }
 }
 
-render::obsolete::Screen* RenderTargetImpl::Screen ()
+scene_graph::Screen* RenderTargetImpl::Screen ()
 {
   return impl->Screen ();
 }
@@ -562,12 +562,12 @@ void RenderTargetImpl::SetFrameBuffer (mid_level::IFrameBuffer* frame_buffer)
     Размеры области рендеринга
 */
 
-const Rect& RenderTargetImpl::RenderableArea ()
+const scene_graph::Rect& RenderTargetImpl::RenderableArea ()
 {
   return impl->RenderableArea ();
 }
 
-void RenderTargetImpl::SetRenderableArea (const Rect& rect)
+void RenderTargetImpl::SetRenderableArea (const scene_graph::Rect& rect)
 {
   impl->SetRenderableArea (rect);
 }

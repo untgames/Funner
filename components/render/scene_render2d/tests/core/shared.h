@@ -62,7 +62,7 @@ class MyRenderView: public IRenderView, public xtl::reference_counter
 ///Установка области вывода
     void SetViewport (const Rect& rect, float min_depth, float max_depth)
     {
-      printf ("MyRenderView #%u: SetViewport(%d, %d, %u, %u, %.2f, %.2f)\n", id, rect.left, rect.top, rect.width, rect.height, min_depth, max_depth);
+      printf ("MyRenderView #%u: SetViewport(%d, %d, %u, %u, %.2f, %.2f)\n", id, rect.x, rect.y, rect.width, rect.height, min_depth, max_depth);
     }
 
     void GetViewport (Rect&, float&, float&)
@@ -79,17 +79,6 @@ class MyRenderView: public IRenderView, public xtl::reference_counter
     scene_graph::Camera* GetCamera ()
     {
       throw xtl::make_not_implemented_exception ("MyRenderView::GetCamera");
-    }
-
-///Установка / чтение свойств
-    void SetProperty (const char* name, const char* value)
-    {
-      printf ("MyRenderView #%u: SetProperty(%s, %s)\n", id, name, value);
-    }
-
-    void GetProperty (const char*, size_t, char*)
-    {
-      throw xtl::make_not_implemented_exception ("MyRenderView::GetProperty");
     }
 
 ///Рисование

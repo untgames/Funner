@@ -638,22 +638,22 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
 
       current_vertex [0].position = *side_positions;
       current_vertex [0].texcoord = math::vec2f (0.5, 0.5);
-      current_vertex [0].color    = 255.f;
+      current_vertex [0].color    = 255;
       current_vertex [1].position = i ? prev_offset_point : *side_positions + side_normal;
       current_vertex [1].texcoord = math::vec2f (0.5, 1);
-      current_vertex [1].color    = 255.f;
+      current_vertex [1].color    = 255;
       current_vertex [2].position = *next_side_position + side_normal;
       current_vertex [2].texcoord = math::vec2f (0.5, 1);
-      current_vertex [2].color    = 255.f;
+      current_vertex [2].color    = 255;
       current_vertex [3].position = *side_positions;
       current_vertex [3].texcoord = math::vec2f (0.5, 0.5);
-      current_vertex [3].color    = 255.f;
+      current_vertex [3].color    = 255;
       current_vertex [4].position = *next_side_position + side_normal;
       current_vertex [4].texcoord = math::vec2f (0.5, 1);
-      current_vertex [4].color    = 255.f;
+      current_vertex [4].color    = 255;
       current_vertex [5].position = *next_side_position;
       current_vertex [5].texcoord = math::vec2f (0.5, 0.5);
-      current_vertex [5].color    = 255.f;
+      current_vertex [5].color    = 255;
 
       prev_offset_point = current_vertex [2].position;
 
@@ -672,22 +672,22 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
 
     current_vertex [0].position = corner_position;
     current_vertex [0].texcoord = math::vec2f (0.5, 0.5);
-    current_vertex [0].color    = 255.f;
+    current_vertex [0].color    = 255;
     current_vertex [1].position = corner_position + side2_offset;
     current_vertex [1].texcoord = math::vec2f (0.5, 1);
-    current_vertex [1].color    = 255.f;
+    current_vertex [1].color    = 255;
     current_vertex [2].position = corner_position + side1_offset + side2_offset;
     current_vertex [2].texcoord = math::vec2f (1, 1);
-    current_vertex [2].color    = 255.f;
+    current_vertex [2].color    = 255;
     current_vertex [3].position = corner_position;
     current_vertex [3].texcoord = math::vec2f (0.5, 0.5);
-    current_vertex [3].color    = 255.f;
+    current_vertex [3].color    = 255;
     current_vertex [4].position = corner_position + side1_offset + side2_offset;
     current_vertex [4].texcoord = math::vec2f (1, 1);
-    current_vertex [4].color    = 255.f;
+    current_vertex [4].color    = 255;
     current_vertex [5].position = corner_position + side1_offset;
     current_vertex [5].texcoord = math::vec2f (1, 0.5);
-    current_vertex [5].color    = 255.f;
+    current_vertex [5].color    = 255;
 
     triangles_count += 2;
     current_vertex  += 6;

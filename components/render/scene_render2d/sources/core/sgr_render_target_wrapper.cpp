@@ -59,12 +59,12 @@ bool RenderTarget::IsBindedToRender () const
     Ёкран (политика владени€ - weak-ref)
 */
 
-void RenderTarget::SetScreen (render::obsolete::Screen* screen)
+void RenderTarget::SetScreen (scene_graph::Screen* screen)
 {
   impl->SetScreen (screen);
 }
 
-Screen* RenderTarget::Screen () const
+scene_graph::Screen* RenderTarget::Screen () const
 {
   return impl->Screen ();
 }
