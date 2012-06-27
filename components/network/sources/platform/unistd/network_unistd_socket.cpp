@@ -541,8 +541,6 @@ class UnistdSocket : public SocketImpl, public xtl::reference_counter
         if (receive_buffer_size > receive_available_buffer.size ())
           receive_available_buffer.resize (receive_buffer_size);
 
-        SetBlockingMode (true);
-
         int return_value = recv (socket, receive_available_buffer.data (), receive_available_buffer.size (), MSG_PEEK);
 
         if (return_value < 0)
@@ -555,8 +553,6 @@ class UnistdSocket : public SocketImpl, public xtl::reference_counter
             raise_error ("", "::recv");
           }
         }
-
-        SetBlockingMode (false);
 
         return return_value;
       }
