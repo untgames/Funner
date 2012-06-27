@@ -429,7 +429,7 @@ struct RenderTargetImpl::Impl: private scene_graph::IScreenListener
     {
       bool operator () (const RenderableViewport& view1, const RenderableViewport& view2) const
       {
-        return const_cast<RenderableViewport&> (view1).Viewport ().ZOrder () < const_cast<RenderableViewport&> (view2).Viewport ().ZOrder ();
+        return const_cast<RenderableViewport&> (view1).Viewport ().ZOrder () > const_cast<RenderableViewport&> (view2).Viewport ().ZOrder ();
       }
     };    
 
