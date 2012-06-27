@@ -291,8 +291,6 @@ void TcpClient::Connect (const char* host, unsigned short port)
 
     if (connect (impl->socket, (sockaddr*)&address_storage, address_storage_size))
       raise_error ("TcpClient::Connect", "::connect");
-
-    impl->SetBlockingMode (false);
   }
   catch (...)
   {
