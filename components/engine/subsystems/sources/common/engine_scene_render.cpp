@@ -36,7 +36,7 @@ const char*  QUERY_PREFIX              = "screen ";                             
    Подсистема рендера сцены
 */
 
-class SceneRenderSubsystem : public ISubsystem, public IAttachmentRegistryListener<render::obsolete::Screen>,
+class SceneRenderSubsystem : public ISubsystem, public IAttachmentRegistryListener<scene_graph::Screen>,
   public media::rms::ICustomServer, public xtl::reference_counter
 {
   public:
@@ -89,7 +89,7 @@ class SceneRenderSubsystem : public ISubsystem, public IAttachmentRegistryListen
           }          
         }
 
-        AttachmentRegistry::Attach<render::obsolete::Screen> (this, AttachmentRegistryAttachMode_ForceNotify);
+        AttachmentRegistry::Attach<scene_graph::Screen> (this, AttachmentRegistryAttachMode_ForceNotify);
         
         try
         {
@@ -97,7 +97,7 @@ class SceneRenderSubsystem : public ISubsystem, public IAttachmentRegistryListen
         }
         catch (...)
         {
-          AttachmentRegistry::Detach<render::obsolete::Screen> (this, AttachmentRegistryAttachMode_ForceNotify);
+          AttachmentRegistry::Detach<scene_graph::Screen> (this, AttachmentRegistryAttachMode_ForceNotify);
           throw;
         }
       }
@@ -113,11 +113,11 @@ class SceneRenderSubsystem : public ISubsystem, public IAttachmentRegistryListen
     {
       resource_server = 0;      
       
-      AttachmentRegistry::Detach<render::obsolete::Screen> (this, AttachmentRegistryAttachMode_ForceNotify);      
+      AttachmentRegistry::Detach<scene_graph::Screen> (this, AttachmentRegistryAttachMode_ForceNotify);      
     }
 
 /// События установки/удаления экрана
-    void OnRegisterAttachment (const char* attachment_name, render::obsolete::Screen& screen)
+    void OnRegisterAttachment (const char* attachment_name, scene_graph::Screen& screen)
     {
       ScreenMap::iterator iter = screen_map.find (attachment_name);
 
@@ -127,7 +127,7 @@ class SceneRenderSubsystem : public ISubsystem, public IAttachmentRegistryListen
       render.RenderTarget (iter->second).SetScreen (&screen);
     }
 
-    void OnUnregisterAttachment (const char* attachment_name, render::obsolete::Screen&)
+    void OnUnregisterAttachment (const char* attachment_name, scene_graph::Screen&)
     {
       ScreenMap::iterator iter = screen_map.find (attachment_name);
 
@@ -250,7 +250,7 @@ class SceneRenderSubsystem : public ISubsystem, public IAttachmentRegistryListen
 
       const char* screen_name = query_name + prefix_length;
 
-      render::obsolete::Screen *screen = AttachmentRegistry::Find<render::obsolete::Screen> (screen_name);
+      scene_graph::Screen *screen = AttachmentRegistry::Find<scene_graph::Screen> (screen_name);
 
       if (!screen)
         throw xtl::format_operation_exception (METHOD_NAME, "Can't find screen '%s' needed for query '%s'", screen_name, query_name);
