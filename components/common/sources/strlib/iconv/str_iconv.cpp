@@ -108,7 +108,12 @@ class Component
     }
 };
 
-extern "C" ComponentRegistrator<Component> IconvConverter (ICONV_CONVERTER_NAME);
+extern "C"
+{
+
+ComponentRegistrator<Component> IconvConverter (ICONV_CONVERTER_NAME);
+
+}
 
 }
 
