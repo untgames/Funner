@@ -481,7 +481,7 @@ bool InputZoneModel::IsIntersected
             }
             case NodeTransformSpace_World:
             {
-              const math::mat4f& world_tm = LocalTM ();
+              const math::mat4f& world_tm = WorldTM ();
 
               ray_to_zone_offset = world_tm * nearest_intersection - world_tm * local_intersection;
 
