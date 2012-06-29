@@ -204,7 +204,7 @@ void InputScene::OnTouch (InputPort& input_port, const TouchEvent& event, const 
     
     scene.Traverse (touch_frustum, traverser);
     
-    if (traverser.input_zone)
+    if (traverser.input_zone && !touch_catched)
     {
       touch_catched = true;
     
@@ -238,4 +238,13 @@ void InputScene::OnTouch (InputPort& input_port, const TouchEvent& event, const 
 void InputScene::RegisterBroadcastListener (InputEventListener& listener)
 {
   listener.Attach (*this);
+}
+
+/*
+    Удаление всех нажатий, связанных с указанной областью ввода
+*/
+
+void InputScene::RemoveAllTouches (InputPort& input_port)
+{
+  List::RemoveAllTouches (input_port);
 }

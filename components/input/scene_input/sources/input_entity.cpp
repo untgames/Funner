@@ -29,38 +29,39 @@ InputEntity::InputEntity (const scene_graph::InputZoneModel& in_zone, InputScene
 
 InputEntity::~InputEntity ()
 {
+  printf ("destroy %p\n", this); fflush (stdout);
 }
 
 /*
     ¬едение таблицы нажатий
 */
 
-void InputEntity::AddTouch (touch_t touch, int button)
+void InputEntity::AddTouch (InputPort& port, touch_t touch, int button)
 {
   for (TouchDescArray::iterator iter=touches.begin (), end=touches.end (); iter!=end; ++iter)
-    if (iter->touch == touch && iter->button == button)
+    if (iter->port == &port && iter->touch == touch && iter->button == button)
       return;
       
-  touches.push_back (TouchDesc (touch, button));
+  touches.push_back (TouchDesc (port, touch, button));
   
   wait_for_release_event = true;
   
   UpdateBroadcasts ();
 }
 
-InputEntity::TouchDesc* InputEntity::FindTouch (touch_t touch, int button)
+InputEntity::TouchDesc* InputEntity::FindTouch (InputPort& port, touch_t touch, int button)
 {
   for (TouchDescArray::iterator iter=touches.begin (), end=touches.end (); iter!=end; ++iter)
-    if (iter->touch == touch && iter->button == button)
+    if (iter->port == &port && iter->touch == touch && iter->button == button)
       return &*iter;
       
   return 0;
 }
 
-void InputEntity::RemoveTouch (touch_t touch, int button)
+void InputEntity::RemoveTouch (InputPort& port, touch_t touch, int button)
 {
   for (TouchDescArray::iterator iter=touches.begin (), end=touches.end (); iter!=end; ++iter)
-    if (iter->touch == touch && iter->button == button)
+    if (iter->port == &port && iter->touch == touch && iter->button == button)
     {
       touches.erase (iter);
       
@@ -70,6 +71,17 @@ void InputEntity::RemoveTouch (touch_t touch, int button)
       
       return;
     }
+}
+
+/*
+    ”даление всех нажатий, св€занных с указанной областью ввода
+*/
+
+void InputEntity::RemoveAllTouches (InputPort& port)
+{
+  for (TouchDescArray::iterator iter=touches.begin (); iter!=touches.end ();)
+    if (iter->port == &port) touches.erase (iter);
+    else                     ++iter;
 }
 
 /*
@@ -91,7 +103,7 @@ void InputEntity::OnTouch (InputPort& input_port, const TouchEvent& event, const
     
       //проверка: зафиксировано ли нажатие на зону
 
-    TouchDesc* touch_desc = FindTouch (event.touch, event.button);    
+    TouchDesc* touch_desc = FindTouch (input_port, event.touch, event.button);    
     
     if (touch_desc && touch_desc->is_inside)
     {
@@ -109,7 +121,7 @@ void InputEntity::OnTouch (InputPort& input_port, const TouchEvent& event, const
           zone.Notify (input_port.AttachedViewport (), InputZoneNotification_OnTouchUpInside, context);
           zone.Notify (input_port.AttachedViewport (), InputZoneNotification_OnTouchClick, context);
           
-          RemoveTouch (event.touch, event.button);
+          RemoveTouch (input_port, event.touch, event.button);
 
           break;
         default:
@@ -142,11 +154,11 @@ void InputEntity::OnTouch (InputPort& input_port, const TouchEvent& event, const
       switch (event.state)
       {
         case TouchState_Moving:
-          AddTouch (event.touch, event.button);              
+          AddTouch (input_port, event.touch, event.button);              
           zone.Notify (input_port.AttachedViewport (), InputZoneNotification_OnTouchEnter, context);
           break;
         case TouchState_Pressed:
-          AddTouch (event.touch, event.button);              
+          AddTouch (input_port, event.touch, event.button);              
           zone.Notify (input_port.AttachedViewport (), InputZoneNotification_OnTouchDown, context);
           break;
         case TouchState_Released:
@@ -198,7 +210,7 @@ void InputEntity::OnBroadcastTouch (InputPort& input_port, const TouchEvent& eve
     
       //зависимые оповещени€
       
-    TouchDesc* touch_desc = FindTouch (event.touch, event.button);
+    TouchDesc* touch_desc = FindTouch (input_port, event.touch, event.button);
       
     if (touch_desc)
     {      
@@ -219,7 +231,7 @@ void InputEntity::OnBroadcastTouch (InputPort& input_port, const TouchEvent& eve
             break;
           case TouchState_Released:
             zone.Notify (input_port.AttachedViewport (), InputZoneNotification_OnTouchUpOutside, context);
-            RemoveTouch (event.touch, event.button);
+            RemoveTouch (input_port, event.touch, event.button);
             break;
           default:
             break;

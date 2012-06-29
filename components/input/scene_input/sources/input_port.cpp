@@ -28,6 +28,9 @@ InputPort::InputPort (Viewport& in_viewport, bool& in_z_order_changed)
 
 InputPort::~InputPort ()
 {
+  if (input_scene)
+    input_scene->RemoveAllTouches (*this);
+
   viewport.DetachListener (this);
 }
 
@@ -46,9 +49,12 @@ void InputPort::OnSceneChanged ()
   
   Camera* camera = viewport.Camera ();
   Scene*  scene  = camera ? camera->Scene () : (Scene*)0;
+  
+  if (input_scene && &input_scene->Scene () != scene)
+    input_scene->RemoveAllTouches (*this);
 
   if (!scene)
-  {    
+  {            
     input_scene = InputScenePtr ();    
     return;
   }

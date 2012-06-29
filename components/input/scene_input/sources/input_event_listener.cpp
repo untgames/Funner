@@ -43,6 +43,28 @@ void InputEventListener::List::BroadcastTouch (InputPort& input_port, const Touc
 }
 
 /*
+    Удаление всех нажатий, связанных с указанной областью ввода
+*/
+
+void InputEventListener::List::RemoveAllTouches (InputPort& input_port)
+{
+  for (InputEventListener* i=first; i;)
+  {
+    try
+    {
+      InputEventListener* next = i->next;
+      
+      i->RemoveAllTouches (input_port);
+      
+      i = next;
+    }
+    catch (...)
+    {
+    }
+  }
+}
+
+/*
     Отсоединение всех
 */
 

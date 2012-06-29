@@ -141,7 +141,7 @@ struct SceneInputManager::Impl: public xtl::reference_counter, public IScreenLis
   {
     bool operator () (const InputPortPtr& port1, const InputPortPtr& port2) const
     {
-      return port1->AttachedViewport ().ZOrder () > port2->AttachedViewport ().ZOrder ();
+      return port1->AttachedViewport ().ZOrder () < port2->AttachedViewport ().ZOrder (); //reverse order, different than in render (front-to-back)
     }
   };    
 

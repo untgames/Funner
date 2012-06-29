@@ -154,6 +154,11 @@ class InputEventListener: public xtl::noncopyable
         void BroadcastTouch (InputPort& input_port, const TouchEvent& event, const math::vec3f& touch_world_position);
         
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+///Удаление всех нажатий, связанных с указанной областью ввода
+///////////////////////////////////////////////////////////////////////////////////////////////////
+        void RemoveAllTouches (InputPort&);
+        
+///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Отсоединение всех
 ///////////////////////////////////////////////////////////////////////////////////////////////////
         void DetachAll ();
@@ -173,6 +178,11 @@ class InputEventListener: public xtl::noncopyable
 ///Обработка события
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     virtual void OnBroadcastTouch (InputPort& input_port, const TouchEvent& event, const math::vec3f& touch_world_position) {}
+    
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Удаление всех нажатий, связанных с указанной областью ввода
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    virtual void RemoveAllTouches (InputPort&) {}
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Присоединение слушателя к списку
@@ -213,16 +223,23 @@ class InputEntity: public xtl::reference_counter, private InputEventListener
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void OnTouch (InputPort& input_port, const TouchEvent& event, const math::vec3f& touch_world_position, size_t touch_zone_index, const math::vec2f& touch_local_position); 
     
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Удаление всех нажатий, связанных с указанной областью ввода
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void RemoveAllTouches (InputPort&);
+    
   private:
     struct TouchDesc
     {
-      touch_t touch;
-      int     button;      
-      bool    is_inside;
-      bool    touch_check;
+      InputPort* port;
+      touch_t    touch;
+      int        button;      
+      bool       is_inside;
+      bool       touch_check;
       
-      TouchDesc (touch_t in_touch, int in_button)
-        : touch (in_touch)
+      TouchDesc (InputPort& in_port, touch_t in_touch, int in_button)
+        : port (&in_port)
+        , touch (in_touch)
         , button (in_button)
         , is_inside (true)
         , touch_check (true)
@@ -235,9 +252,9 @@ class InputEntity: public xtl::reference_counter, private InputEventListener
     void       OnBroadcastTouch    (InputPort& input_port, const TouchEvent& event, const math::vec3f& touch_world_position);
     void       UpdateNotifications ();
     void       UpdateBroadcasts    ();
-    void       AddTouch            (touch_t touch, int button);
-    TouchDesc* FindTouch           (touch_t touch, int button);
-    void       RemoveTouch         (touch_t touch, int button);
+    void       AddTouch            (InputPort& port, touch_t touch, int button);
+    TouchDesc* FindTouch           (InputPort& port, touch_t touch, int button);
+    void       RemoveTouch         (InputPort& port, touch_t touch, int button);
   
   private:  
     const scene_graph::InputZoneModel& zone;
@@ -286,7 +303,12 @@ class InputScene: public xtl::reference_counter, private InputEventListener::Lis
 ///Регистрация слушателей оповещений
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void RegisterBroadcastListener (InputEventListener& listener);
-    
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Удаление всех нажатий, связанных с указанной областью ввода
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void RemoveAllTouches (InputPort&);
+
   private:
     void OnInputZoneDestroyed (const scene_graph::InputZoneModel*);
     void OnInputZoneCreated   (scene_graph::Node&);
