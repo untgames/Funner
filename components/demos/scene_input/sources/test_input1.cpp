@@ -96,7 +96,7 @@ struct Test
     vp1.SetCamera          (camera [0].get ());
     vp1.SetDepthRange      (0, 0.5f);
     
-    vp1.SetArea (5, 5, 90, 90);
+//    vp1.SetArea (5, 5, 90, 90);
 
     screen.Attach (vp1);
 
@@ -108,14 +108,14 @@ struct Test
     vp2.SetCamera          (camera [1].get ());
     vp2.SetDepthRange      (0.5f, 1.0f);    
     
-    vp2.SetArea (5, 5, 90, 90);
+//    vp2.SetArea (5, 5, 90, 90);
 
     screen.Attach (vp2);
     
       //настройка ввода
     
     application.InputManager ().SetScreen (&screen);
-//    application.InputManager ().SetTouchSize (1.0f);     //???????
+//    application.InputManager ().SetTouchSize (1.0f);
 
       //настройка целевых буферов вывода
 
