@@ -120,6 +120,9 @@ void InputEntity::OnTouch (InputPort& input_port, const TouchEvent& event, const
           zone.Notify (input_port.AttachedViewport (), InputZoneNotification_OnTouchUpInside, context);
           zone.Notify (input_port.AttachedViewport (), InputZoneNotification_OnTouchClick, context);
           
+          if (context.button == 0)
+            zone.Notify (input_port.AttachedViewport (), InputZoneNotification_OnClick, context);
+          
           RemoveTouch (input_port, event.touch, event.button);
 
           break;
@@ -159,6 +162,10 @@ void InputEntity::OnTouch (InputPort& input_port, const TouchEvent& event, const
         case TouchState_Pressed:
           AddTouch (input_port, event.touch, event.button);              
           zone.Notify (input_port.AttachedViewport (), InputZoneNotification_OnTouchDown, context);
+          
+          if (context.button == 0)
+            zone.Notify (input_port.AttachedViewport (), InputZoneNotification_OnPress, context);
+          
           break;
         case TouchState_Released:
           zone.Notify (input_port.AttachedViewport (), InputZoneNotification_OnTouchUpInside, context);
