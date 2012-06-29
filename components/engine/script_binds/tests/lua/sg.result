@@ -330,3 +330,11 @@ node1 position is 0.500000 0.000000 0.000000, node2 position is 0.500000 0.50000
 AlignWithNode controller test
 node2 orientation is 0.186730 0.000000 0.000000 0.982411
 node2 orientation is 0.186730 0.000000 0.000000 0.982411
+Scene input test
+viewport='viewport1' notification='OnTouchEnter' touch=-1 button=-1 world_position=50 -50 0 local_position=0 0
+viewport='viewport1' notification='OnScreenTouchMove' touch=-1 button=-1 world_position=50 -50 0 local_position=0 0
+viewport='viewport1' notification='OnTouchDown' touch=-1 button=0 world_position=50 -50 0 local_position=0 0
+viewport='viewport1' notification='OnScreenTouchDown' touch=-1 button=0 world_position=50 -50 0 local_position=0 0
+viewport='viewport1' notification='OnTouchUpInside' touch=-1 button=0 world_position=50 -50 0 local_position=0 0
+viewport='viewport1' notification='OnTouchClick' touch=-1 button=0 world_position=50 -50 0 local_position=0 0
+viewport='viewport1' notification='OnScreenTouchUp' touch=-1 button=0 world_position=50 -50 0 local_position=0 0

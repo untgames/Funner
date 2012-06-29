@@ -878,6 +878,60 @@ function test_align_with_node_controller ()
   print (string.format ("node2 orientation is %f %f %f %f", node2.WorldOrientation.x, node2.WorldOrientation.y, node2.WorldOrientation.z, node2.WorldOrientation.w))
 end
 
+local function test_scene_input ()
+  print ("Scene input test")
+
+  local scene  = Scene.Scene.Create ()
+  local camera = Scene.OrthoCamera.Create ()
+
+  camera.Left = 0
+  camera.Right = 100
+  camera.Top = 0
+  camera.Bottom = -100
+  camera.ZNear = -1
+  camera.ZFar = 1
+    
+  camera:Translate (0, 0, 1)
+  
+  camera:BindToScene (scene)
+    
+  local zone = Scene.InputZone.Create ()
+    
+  zone.Name = "zone1"
+    
+  zone:Translate (50, -50, 0)
+  zone.Scale = vec3 (10, 10, 1)
+  
+  local function InputHandler (viewport, notification_id, context)
+    print (string.format ("viewport='%s' notification='%s' touch=%d button=%d world_position=%s local_position=%s",
+      viewport.Name, Scene.InputZone.GetNotificationName (notification_id), context.TouchId, context.Button, tostring (context.TouchWorldPosition), tostring (context.TouchLocalPosition)))
+  end
+    
+  zone:RegisterNotificationHandler (Scene.InputZone.CreateNotificationHandler (InputHandler))
+
+  zone:BindToScene (scene)    
+    
+  local screen = Scene.Screen.Create ()
+  local viewport = Scene.Viewport.Create ()
+
+  viewport.Name = "viewport1"
+  viewport.Camera = camera
+  viewport:SetArea (100, 100, 800, 800)    
+  screen:SetArea (0, 0, 1000, 1000)
+    
+  screen:Attach (viewport)
+  
+  local manager = Scene.InputManager.Create ()
+
+  manager.Screen = screen
+  manager:SetTouchSize (2, Scene.InputTransformSpace.Camera)
+
+  manager:ProcessEvent ("CursorX axis 0")
+  manager:ProcessEvent ("CursorY axis 0")
+  manager:ProcessEvent ("Mouse0 down")
+  manager:ProcessEvent ("Mouse0 up")
+end
+
 function test ()
   test_node ()    
   
@@ -919,5 +973,7 @@ function test ()
 
   test_look_to_node_point_controller ()
   test_move_to_node_point_controller ()
-  test_align_with_node_controller ()
+  test_align_with_node_controller ()  
+  
+  test_scene_input ()
 end

@@ -50,10 +50,10 @@ void bind_input_zone_notification_context_library (script::Environment& env)
   
     //регистрация функций
 
-  lib.Register ("TouchId",            make_invoker (&get_touch_id));
-  lib.Register ("Button",             make_invoker (&get_button));
-  lib.Register ("TouchWorldPosition", make_invoker (&get_touch_world_position));
-  lib.Register ("TouchLocalPosition", make_invoker (&get_touch_local_position));
+  lib.Register ("get_TouchId",            make_invoker (&get_touch_id));
+  lib.Register ("get_Button",             make_invoker (&get_button));
+  lib.Register ("get_TouchWorldPosition", make_invoker (&get_touch_world_position));
+  lib.Register ("get_TouchLocalPosition", make_invoker (&get_touch_local_position));
 
     //регистрация типов данных
 
@@ -82,6 +82,10 @@ xtl::connection register_default_notification_handler (InputZoneModel& zone, con
 void bind_input_zone_model_library (script::Environment& env)
 {
   InvokerRegistry lib = env.CreateLibrary (SCENE_INPUT_ZONE_MODEL_LIBRARY);
+  
+    //наследование
+
+  lib.Register (env, SCENE_ENTITY_LIBRARY);  
 
     //регистрация операций
     
@@ -98,6 +102,8 @@ void bind_input_zone_model_library (script::Environment& env)
   ));
   
   lib.Register ("CreateNotificationHandler", make_callback_invoker<void (const Viewport& viewport, InputZoneNotification notification, const InputZoneNotificationContext&)> ());
+  
+  lib.Register ("GetNotificationName", make_invoker (xtl::implicit_cast<const char* (*)(InputZoneNotification)> (&get_name)));
 
     //регистрация типов данных
 

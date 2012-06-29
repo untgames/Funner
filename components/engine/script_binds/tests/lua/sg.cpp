@@ -18,6 +18,7 @@ int main ()
     env.BindLibraries ("Common");
     env.BindLibraries ("Math");
     env.BindLibraries ("SceneGraph");
+    env.BindLibraries ("SceneInput");
   
     load_script (*script, SCRIPT_FILE_NAME);
     

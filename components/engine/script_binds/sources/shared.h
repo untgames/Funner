@@ -33,6 +33,8 @@
 #include <sg/controllers/sync_physics_to_node.h>
 #include <sg/controllers/animation.h>
 
+#include <input/scene_input.h>
+
 #include <physics/manager.h>
 
 #include <social/session.h>
