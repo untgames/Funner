@@ -235,7 +235,7 @@ template <class T>
 bool contains (const plane_list<T>& p, const math::vector<T, 3>& point, const T& eps)
 {
   for (size_t i = 0, count = p.planes_count (); i < count; i++)
-    if (distance (p [i], point) > eps)
+    if (distance (p [i], point) < -eps)
       return false;
 
   return true;

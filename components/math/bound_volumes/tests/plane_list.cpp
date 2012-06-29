@@ -62,6 +62,7 @@ int main()
   printf ("contains sphere2: %s\n", contains (p1, spheref (vec3f (0.1f, 0.f, 0.f), 0.5f)) ? "true" : "false");
   printf ("contains sphere3: %s\n", contains (p1, spheref (vec3f (2.f, 0.f, 0.f), 1.5f), 2.6f) ? "true" : "false");
   printf ("contains empty sphere: %s\n", contains (p1, spheref ()) ? "true" : "false");
+  printf ("contains point: %s\n", contains (p1, math::vec3f (0.0f)) ? "true" : "false");
 
   p1.clear ();
   p2.clear ();

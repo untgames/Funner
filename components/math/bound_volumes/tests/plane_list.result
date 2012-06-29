@@ -40,6 +40,7 @@ contains sphere1: false
 contains sphere2: true
 contains sphere3: true
 contains empty sphere: false
+contains point: true
 p1 equal p3: true
 p1 equal p3: false
 p1 == p2: false
