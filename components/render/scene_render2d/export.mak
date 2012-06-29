@@ -1,5 +1,6 @@
 # Compile exports
 export.compile.render.scene_render2d.INCLUDE_DIRS := include/obsolete ../../xtl/include
+export.compile.render.scene_render2d.IMPORTS      := compile.scene_graph.core
 
 # Link exports
 export.link.render.scene_render2d.LIBS          := funner.render.scene_render2d
