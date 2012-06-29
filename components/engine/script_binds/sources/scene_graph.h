@@ -7,6 +7,7 @@
 #include <sg/camera.h>
 #include <sg/height_map.h>
 #include <sg/helper.h>
+#include <sg/input.h>
 #include <sg/light.h>
 #include <sg/listener.h>
 #include <sg/node_array.h>
@@ -85,6 +86,7 @@ extern const char* SCENE_STATIC_NODE_SUBTREE_EVENT_LIBRARY;
 extern const char* SCENE_STATIC_NODE_ARRAY_LINK_MODE_LIBRARY;
 extern const char* SCENE_STATIC_TEXT_LINE_ALIGNMENT_LIBRARY;
 extern const char* SCENE_STATIC_NODE_PROPERTY_TYPE_LIBRARY;
+extern const char* SCENE_STATIC_INPUT_ZONE_NOTIFICATION_LIBRARY;
 extern const char* SCENE_CONTROLLER_OWNER_MODE_LIBRARY;
 extern const char* SCENE_SCENE_LIBRARY;
 extern const char* SCENE_NODE_LIBRARY;
@@ -106,6 +108,9 @@ extern const char* SCENE_SPRITE_LIBRARY;
 extern const char* SCENE_TEXT_LINE_LIBRARY;
 extern const char* SCENE_VISUAL_MODEL_LIBRARY;
 extern const char* SCENE_HEIGHT_MAP_LIBRARY;
+extern const char* SCENE_INPUT_ZONE_MODEL_LIBRARY;
+extern const char* SCENE_INPUT_ZONE_LIBRARY;
+extern const char* SCENE_INPUT_ZONE_NOTIFICATION_CONTEXT_LIBRARY;
 
 /*
     Функции биндинга библиотек
@@ -140,8 +145,9 @@ void bind_controller_align_with_node_library      (script::Environment&);
 void bind_linear_acceleration_evaluator_library   (script::Environment&);
 void bind_controller_sync_physics_to_node_library (script::Environment&);
 void bind_controller_animation_library            (script::Environment&);
-void bind_scene_manager_library                   (script::Environment& environment);
-void bind_screen_viewport_library                 (script::Environment& environment);
+void bind_scene_manager_library                   (script::Environment&);
+void bind_screen_viewport_library                 (script::Environment&);
+void bind_input_library                           (script::Environment&);
 
 }
 
