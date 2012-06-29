@@ -29,7 +29,6 @@ InputEntity::InputEntity (const scene_graph::InputZoneModel& in_zone, InputScene
 
 InputEntity::~InputEntity ()
 {
-  printf ("destroy %p\n", this); fflush (stdout);
 }
 
 /*

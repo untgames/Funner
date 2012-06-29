@@ -147,11 +147,11 @@ void InputPort::Update ()
       {
         math::vec4f normalized_scale = camera->ProjectionMatrix () * math::vec4f (touch_size, touch_size, 0.0f, 0.0f);
         
-        touch_scale = abs (math::vec3f (2.0f / normalized_scale.x, 2.0f / normalized_scale.y, 1.0f));
+        touch_scale = abs (math::vec3f (2.0f / normalized_scale.x, 2.0f / normalized_scale.y, 1.0f));        
 
         break;
       }
-    }    
+    }        
 
     need_update = false;
   }

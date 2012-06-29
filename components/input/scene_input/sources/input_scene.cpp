@@ -165,7 +165,7 @@ struct TouchTraverser: public INodeTraverser
     else if (!intersected)
     {
       if (ray_intersection_distance < 0.0f || ray_intersection_distance > 1.0f) //check for z distance
-        return;
+        return;        
       
       float ray_to_zone_distance = length (ray_to_zone_offset);
       

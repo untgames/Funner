@@ -3,6 +3,13 @@
 using namespace scene_graph;
 using namespace input;
 
+namespace
+{
+
+const float DEFAULT_TOUCH_SIZE = 0.001f;
+
+}
+
 /*
     Описание реализации менеджера ввода сцены
 */
@@ -27,8 +34,8 @@ struct SceneInputManager::Impl: public xtl::reference_counter, public IScreenLis
   Impl ()
     : screen ()
     , need_reorder (false)
-    , touch_size (1.0f)
-    , touch_size_space (InputTransformSpace_Default)
+    , touch_size (DEFAULT_TOUCH_SIZE)
+    , touch_size_space (InputTransformSpace_Screen)
   {
     static const size_t RESERVE_TOKENS_COUNT  = 16;
     static const size_t RESERVE_TOKENS_BUFFER = 256;
