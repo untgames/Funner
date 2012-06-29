@@ -1,0 +1,22 @@
+1. Scene render (3 недели)
+  - проектирование
+  - реализация (из капсулы)
+2. Render manager (2 недели)
+  - instancing
+  - sprite/line rendering
+3. OpenGL -> 3.0, ES 2 (1 неделя)
+  - MRT
+  - vertex attributes
+  - instancing
+  - image buffers
+  - geometry shaders?
+  - debug/statistics information
+4. Font rendering (1 неделя)
+  - font renderer
+  - scene graph text renderer
+5. Scene serializer (1 неделя)
+6. Script binds for C# (1 неделя)
+
+7. Editor (3 неделя)
+  - editor framework
+  - basic operations
