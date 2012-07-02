@@ -298,6 +298,8 @@ void InputZoneModel::BindProperties (common::PropertyBindingMap& bindings)
 
 void InputZoneModel::AfterUpdateWorldTransformEvent ()
 {
+  Entity::AfterUpdateWorldTransformEvent ();
+
   impl->need_update_inv_world_tm = true;
 }
 
