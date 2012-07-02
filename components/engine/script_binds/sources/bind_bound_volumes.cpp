@@ -122,7 +122,7 @@ void bind_axis_aligned_box_library (Environment& environment)
 //  lib.Register ("__eq",  make_invoker (&box_type::operator ==));
 
   lib.Register ("get_Volume", make_invoker (&bound_volumes::volume<T>));
-  lib.Register ("Equal", make_invoker (&bound_volumes::equal<T>));
+  lib.Register ("Equal", make_invoker (xtl::implicit_cast<bool (*)(const box_type&, const box_type&, const T& eps)> (&bound_volumes::equal<T>)));
   lib.Register ("Intersects", make_invoker (implicit_cast<bool (*) (const box_type&, const box_type&)> (&bound_volumes::intersects)));
   lib.Register ("Contains", make_invoker (
     make_invoker (implicit_cast<bool (*) (const box_type&, const box_type&)> (&bound_volumes::contains)),
