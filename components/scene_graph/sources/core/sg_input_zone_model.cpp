@@ -218,9 +218,11 @@ xtl::connection InputZoneModel::RegisterNotificationHandler (InputZoneNotificati
 
 xtl::connection InputZoneModel::RegisterNotificationHandler (const NotificationHandler& handler) const
 {
+  xtl::connection c = impl->default_notification_signal.connect (handler);
+
   impl->Notify (const_cast<InputZoneModel&> (*this), InputZoneEvent_AfterNotificationAdded);
 
-  return impl->default_notification_signal.connect (handler);
+  return c;
 }
 
 /*

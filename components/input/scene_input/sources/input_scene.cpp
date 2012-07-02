@@ -7,10 +7,36 @@ using namespace input;
     Конструктор / деструктор
 */
 
+namespace
+{
+
+struct SceneCreationTraverser: public INodeTraverser
+{
+  InputScene& scene;
+  
+  SceneCreationTraverser (InputScene& in_scene) : scene (in_scene) {}
+  
+  void operator () (Node& node)
+  {
+    scene_graph::InputZoneModel* zone = dynamic_cast<scene_graph::InputZoneModel*> (&node);
+
+    if (!zone)
+      return;  
+      
+    scene.GetEntity (*zone);      
+  }
+};
+
+}
+
 InputScene::InputScene (scene_graph::Scene& in_scene)
   : scene (in_scene)
 {
   on_entity_created_connection = scene.Root ().RegisterEventHandler (NodeSubTreeEvent_AfterBind, xtl::bind (&InputScene::OnInputZoneCreated, this, _2));
+  
+  SceneCreationTraverser traverser (*this);
+    
+  scene.Traverse (traverser);  
 }
 
 InputScene::~InputScene ()
