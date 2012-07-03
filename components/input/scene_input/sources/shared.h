@@ -110,7 +110,7 @@ class InputPort: public xtl::reference_counter, public scene_graph::IViewportLis
     void Update ();
 
   private:
-    scene_graph::Viewport&   viewport;               //область вывода
+    scene_graph::Viewport    viewport;               //область вывода
     bool&                    z_order_changed;        //порядок следования областей ввода изменен
     InputScenePtr            input_scene;            //сцена ввода
     bool                     is_active;              //активность области

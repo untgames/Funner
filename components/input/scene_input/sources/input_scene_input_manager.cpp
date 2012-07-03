@@ -110,7 +110,7 @@ struct SceneInputManager::Impl: public xtl::reference_counter, public IScreenLis
   void OnScreenAttachViewport (Viewport& viewport)
   {
     try
-    {
+    {      
       InputPortPtr input_port (new InputPort (viewport, need_reorder), false);
       
       input_port->SetTouchSize (touch_size, touch_size_space);
@@ -128,9 +128,11 @@ struct SceneInputManager::Impl: public xtl::reference_counter, public IScreenLis
 
 ///Отсоединена область вывода
   void OnScreenDetachViewport (Viewport& viewport)
-  {
+  {    
+    size_t viewport_id = viewport.Id ();
+    
     for (InputPortList::iterator iter=input_ports.begin (), end=input_ports.end (); iter!=end; ++iter)
-      if (&(*iter)->AttachedViewport () == &viewport)
+      if ((*iter)->AttachedViewport ().Id () == viewport_id)
       {
         input_ports.erase (iter);
         return;
@@ -155,7 +157,7 @@ struct SceneInputManager::Impl: public xtl::reference_counter, public IScreenLis
   void Sort ()
   {
     if (!need_reorder)
-      return;
+      return;      
       
     stl::sort (input_ports.begin (), input_ports.end (), InputPortComparator ());      
       
@@ -275,7 +277,7 @@ struct SceneInputManager::Impl: public xtl::reference_counter, public IScreenLis
       return;      
 
     TouchEvent event;
-    
+
     if (!ParseInputEvent (event_string, event))
       return;
 

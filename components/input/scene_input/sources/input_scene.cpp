@@ -22,8 +22,8 @@ struct SceneCreationTraverser: public INodeTraverser
 
     if (!zone)
       return;  
-      
-    scene.GetEntity (*zone);      
+
+    scene.GetEntity (*zone);
   }
 };
 
@@ -42,7 +42,7 @@ InputScene::InputScene (scene_graph::Scene& in_scene)
 InputScene::~InputScene ()
 {
   entities.clear ();
-  
+
   DetachAll ();
 }
 
@@ -225,29 +225,29 @@ void InputScene::OnTouch (InputPort& input_port, const TouchEvent& event, const 
   try
   {        
       //поиск зоны, пересекаемой областью луча
-    
+
     TouchTraverser traverser (*this, touch_world_position, touch_world_direction, touch_frustum);
-    
+
     scene.Traverse (touch_frustum, traverser);
-    
+
     if (traverser.input_zone && !touch_catched)
     {
       touch_catched = true;
     
         //получение объекта, соответствующего зоне
-      
+
       InputEntityPtr entity = GetEntity (*traverser.input_zone);
-    
+
       if (entity)
       {          
           //передача события соответствующему объекту      
-          
+
         entity->OnTouch (input_port, event, touch_world_position, traverser.input_zone_index, traverser.input_zone_intersection_point);
       }
     }
     
       //оповещение
-      
+
     BroadcastTouch (input_port, event, touch_world_position);        
   }
   catch (xtl::exception& e)

@@ -23,7 +23,7 @@ InputPort::InputPort (Viewport& in_viewport, bool& in_z_order_changed)
 
   OnViewportChangeCamera (viewport.Camera ());
   
-  viewport.AttachListener (this);
+  viewport.AttachListener (this);  
 }
 
 InputPort::~InputPort ()
@@ -48,7 +48,7 @@ void InputPort::OnSceneChanged ()
   need_update = true;
   
   Camera* camera = viewport.Camera ();
-  Scene*  scene  = camera ? camera->Scene () : (Scene*)0;
+  Scene*  scene  = camera ? camera->Scene () : (Scene*)0;  
   
   if (input_scene && &input_scene->Scene () != scene)
     input_scene->RemoveAllTouches (*this);
@@ -169,10 +169,13 @@ void InputPort::Update ()
 void InputPort::OnTouch (const TouchEvent& event, bool& touch_catched)
 {
   try
-  {        
+  {
+    if (!input_scene)
+      return;
+    
     if (need_update)
       Update ();      
-      
+
       //перевод координаты в мировую систему координат
 
     math::vec4f source_position (event.position.x, event.position.y, 0.0f, 1.0f),
