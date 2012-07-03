@@ -2,6 +2,7 @@
 #define SCENE_GRAPH_SCREEN_SHARED_HEADER
 
 #include <stl/vector>
+#include <stl/list>
 #include <stl/string>
 #include <stl/hash_map>
 

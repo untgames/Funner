@@ -3,21 +3,10 @@
 using namespace scene_graph;
 
 /*
-    Константы
-*/
-
-namespace
-{
-
-const size_t LISTENER_ARRAY_RESERVE_SIZE = 16; //резервируемый размер массива слушателей
-
-}
-
-/*
     Описание реализации Viewport
 */
 
-typedef stl::vector<IViewportListener*> ListenerArray;
+typedef stl::list<IViewportListener*> ListenerList;
 
 struct Viewport::Impl: public xtl::reference_counter, public xtl::instance_counter<Viewport>
 {
@@ -33,12 +22,11 @@ struct Viewport::Impl: public xtl::reference_counter, public xtl::instance_count
   math::vec4f          background_color;  //цвет фона
   bool                 has_background;    //наличие фона
   common::PropertyMap  properties;        //переменные рендеринга
-  ListenerArray        listeners;         //слушатели событий области вывода
+  ListenerList         listeners;         //слушатели событий области вывода
   xtl::auto_connection on_destroy_camera; //слот соединения с сигналом оповещения об удалении камеры
 
   Impl () : camera (0), rect (0, 0, DEFAULT_SCREEN_WIDTH, DEFAULT_SCREEN_HEIGHT), min_depth (0.0f), max_depth (1.0f), is_active (true), input_state (true), z_order (INT_MAX), has_background (false)
   {
-    listeners.reserve (LISTENER_ARRAY_RESERVE_SIZE);
   }
 
   ~Impl ()
@@ -67,8 +55,12 @@ struct Viewport::Impl: public xtl::reference_counter, public xtl::instance_count
   template <class Fn>
   void Notify (Fn fn)
   {
-    for (ListenerArray::iterator volatile iter=listeners.begin (), end=listeners.end (); iter!=end; ++iter)
+    for (ListenerList::iterator iter=listeners.begin (); iter!=listeners.end ();)
     {
+      ListenerList::iterator next = iter;
+      
+      ++next;
+      
       try
       {
         fn (*iter);
@@ -77,6 +69,8 @@ struct Viewport::Impl: public xtl::reference_counter, public xtl::instance_count
       {
         //подавление всех исключений
       }
+      
+      iter = next;
     }    
   }
     

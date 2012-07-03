@@ -9,8 +9,7 @@ namespace
     Константы
 */
 
-const size_t VIEWPORT_ARRAY_RESERVE_SIZE = 4;   //резервируемый размер массива областей вывода
-const size_t LISTENER_ARRAY_RESERVE_SIZE = 4;   //резервируемый размер массива слушателей
+const size_t VIEWPORT_ARRAY_RESERVE_SIZE = 4; //резервируемый размер массива областей вывода
 
 }
 
@@ -18,8 +17,8 @@ const size_t LISTENER_ARRAY_RESERVE_SIZE = 4;   //резервируемый размер массива с
     Описание реализации рабочего стола
 */
 
-typedef stl::vector<Viewport>         ViewportArray;
-typedef stl::vector<IScreenListener*> ListenerArray;
+typedef stl::vector<Viewport>       ViewportArray;
+typedef stl::list<IScreenListener*> ListenerList;
 
 struct Screen::Impl: public xtl::reference_counter, public xtl::instance_counter<Screen>
 {
@@ -28,12 +27,11 @@ struct Screen::Impl: public xtl::reference_counter, public xtl::instance_counter
   math::vec4f   background_color; //цвет фона
   bool          has_background;   //есть ли фон
   ViewportArray viewports;        //области вывода
-  ListenerArray listeners;        //слушатели
+  ListenerList  listeners;        //слушатели
 
   Impl () : area (0, 0, DEFAULT_SCREEN_WIDTH, DEFAULT_SCREEN_HEIGHT), has_background (true)
   {
     viewports.reserve (VIEWPORT_ARRAY_RESERVE_SIZE);
-    listeners.reserve (LISTENER_ARRAY_RESERVE_SIZE);
   }
   
   ~Impl ()
@@ -44,16 +42,22 @@ struct Screen::Impl: public xtl::reference_counter, public xtl::instance_counter
   template <class Fn>
   void Notify (Fn fn)
   {
-    for (ListenerArray::iterator volatile iter=listeners.begin (), end=listeners.end (); iter!=end; ++iter)
+    for (ListenerList::iterator iter=listeners.begin (); iter!=listeners.end ();)
     {
+      ListenerList::iterator next = iter;
+
+      ++next;
+
       try
-      {
-        fn (*iter);
+      {        
+        fn (*iter);        
       }
       catch (...)
       {
         //подавление всех исключений
       }
+
+      iter = next;
     }        
   }  
   
@@ -250,18 +254,12 @@ void Screen::Detach (const scene_graph::Viewport& viewport)
 {
   size_t viewport_id = viewport.Id ();
 
-  for (ViewportArray::iterator iter=impl->viewports.begin (), end=impl->viewports.end (); iter!=end;)
+  for (ViewportArray::iterator iter=impl->viewports.begin (); iter!=impl->viewports.end ();)
     if (iter->Id () == viewport_id)
     {
-      ViewportArray::iterator next = iter;
-
-      ++next;
-
       impl->DetachViewportNotify (*iter);
 
       impl->viewports.erase (iter);
-
-      iter = next;
     }
     else ++iter;
 }
