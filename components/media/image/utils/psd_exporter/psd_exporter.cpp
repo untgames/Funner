@@ -683,7 +683,7 @@ void fix_zero_alpha_color (size_t width, size_t height, rgba_t* bitmap, unsigned
   rgba_t* tmp_bitmap = reinterpret_cast<rgba_t*> (tmp_image.Bitmap (0));
   
   memcpy (tmp_bitmap, bitmap, width * height * sizeof (rgba_t));
-  
+
   for (size_t pass=0; pass<passes_count; pass++)
   {
       //усреднение верхней линии
@@ -720,12 +720,6 @@ void fix_zero_alpha_color (size_t width, size_t height, rgba_t* bitmap, unsigned
         
         get_average_color (avg_pixels, *pixel);
       }
-      else
-      {
-        rgba_t* avg_pixels [2] = {pixel + width, pixel};
-        
-        get_average_color (avg_pixels, *pixel);
-      }
     }    
     else
     {
@@ -757,7 +751,7 @@ void fix_zero_alpha_color (size_t width, size_t height, rgba_t* bitmap, unsigned
     
       //усреднение центра
     
-    for (size_t i=1; i<height-1; i++)    
+    for (size_t i=1; i<height-1; i++)
     {
       rgba_t* pixel = tmp_bitmap + width * i;
       
@@ -787,12 +781,6 @@ void fix_zero_alpha_color (size_t width, size_t height, rgba_t* bitmap, unsigned
       if (width > 1)
       {
         rgba_t* avg_pixels [6] = {pixel - width, pixel - width - 1, pixel, pixel - 1, pixel + width, pixel + width - 1};
-        
-        get_average_color (avg_pixels, *pixel);
-      }
-      else
-      {
-        rgba_t* avg_pixels [3] = {pixel - width, pixel, pixel + width};
         
         get_average_color (avg_pixels, *pixel);
       }
@@ -829,12 +817,6 @@ void fix_zero_alpha_color (size_t width, size_t height, rgba_t* bitmap, unsigned
       if (width > 1)
       {
         rgba_t* avg_pixels [4] = {pixel - width, pixel - width - 1, pixel, pixel - 1};
-        
-        get_average_color (avg_pixels, *pixel);
-      }
-      else
-      {
-        rgba_t* avg_pixels [2] = {pixel - width, pixel};
         
         get_average_color (avg_pixels, *pixel);
       }
@@ -884,7 +866,7 @@ void fix_zero_alpha_color (size_t width, size_t height, rgba_t* bitmap, unsigned
         pixel->blue  = blured_pixel->blue;
       }
     }         
-  }  
+  }
 }
 
 //получение ближайшей сверху степени двойки
