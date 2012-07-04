@@ -25,11 +25,11 @@ const size_t        QUOTE_REPLACEMENT_LENGTH = strlen (QUOTE_REPLACEMENT);
 struct Application::Impl : public INotificationListener, public IHsConnectionEventListener, public IHsConnectionLogListener
 {
   sgi_stl::auto_ptr<HsConnection> connection;
-  engine::IEngine*            engine;
+  engine::IEngine*                engine;
   sgi_stl::string                 host;
-  unsigned short              port;
-  unsigned char*              message_buffer;
-  size_t                      message_buffer_size;
+  unsigned short                  port;
+  unsigned char*                  message_buffer;
+  size_t                          message_buffer_size;
 
   Impl ()
     : engine (0)
