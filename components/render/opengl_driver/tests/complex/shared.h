@@ -145,6 +145,13 @@ struct Test
       vp.height    = rect.bottom - rect.top;
       vp.min_depth = 0;
       vp.max_depth = 1;
+      
+      DeviceCaps caps;
+      
+      device->GetCaps (caps);
+      
+      if (caps.has_right_hand_viewport)
+        vp.y = window.Height () - vp.height - vp.y;
 
       device->RSSetViewport (vp);
     }

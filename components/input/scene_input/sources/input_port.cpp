@@ -135,7 +135,7 @@ void InputPort::Update ()
                 
     view_proj_tm           = camera->ProjectionMatrix () * math::inverse (camera->WorldTM ());                
     inv_view_proj_tm       = math::inverse (view_proj_tm);
-    normalized_position_tm = math::translate (math::vec3f (-1.0f)) * math::scale (2.0f * viewport_scale) * math::translate (-viewport_offset);
+    normalized_position_tm = math::scale (math::vec3f (1.0f, -1.0f, 1.0f)) * math::translate (math::vec3f (-1.0f)) * math::scale (2.0f * viewport_scale) * math::translate (-viewport_offset);
     position_tm            = inv_view_proj_tm * normalized_position_tm;
     
     switch (touch_size_space)

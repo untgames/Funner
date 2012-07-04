@@ -186,13 +186,14 @@ typedef stl::vector<size_t>                                   TagHashArray;
 
 struct EffectRenderer::Impl
 {
-  DeviceManagerPtr            device_manager; //менеджер устройства отрисовки
-  TagHashArray                effect_tags;    //тэги эффекта
-  RenderPassMap               passes;         //проходы рендеринга
-  RenderInstantiatedEffectMap effects;        //инстанцированные эффекты
-  RenderEffectOperationArray  operations;     //операции рендеринга
+  DeviceManagerPtr            device_manager;      //менеджер устройства отрисовки
+  TagHashArray                effect_tags;         //тэги эффекта
+  RenderPassMap               passes;              //проходы рендеринга
+  RenderInstantiatedEffectMap effects;             //инстанцированные эффекты
+  RenderEffectOperationArray  operations;          //операции рендеринга
+  bool                        right_hand_viewport; //является ли область вывода правосторонней
   
-  Impl (const DeviceManagerPtr& in_device_manager) : device_manager (in_device_manager) {}
+  Impl (const DeviceManagerPtr& in_device_manager) : device_manager (in_device_manager), right_hand_viewport (false) { }
 };
 
 /*
@@ -211,6 +212,10 @@ EffectRenderer::EffectRenderer (const EffectPtr& effect, const DeviceManagerPtr&
       
     if (!device_manager)
       throw xtl::make_null_argument_exception ("", "device_manager");                  
+      
+      //получение свойств устройства      
+    
+    impl->right_hand_viewport = device_manager->DeviceCaps ().has_right_hand_viewport;
       
       //копирование тэго эффекта в состояние рендера
       
@@ -454,9 +459,10 @@ struct RenderOperationsExecutor
   FrameImpl&                  frame;                      //фрейм
   ShaderOptionsCache&         frame_shader_options_cache; //кэш опций шейдеров для кадра
   LowLevelBufferPtr           frame_property_buffer;      //буфер параметров кадра
+  bool                        right_hand_viewport;        //является ли область вывода правосторонней
   
 ///Конструктор
-  RenderOperationsExecutor (RenderingContext& in_context, DeviceManager& in_device_manager)
+  RenderOperationsExecutor (RenderingContext& in_context, DeviceManager& in_device_manager, bool in_right_hand_viewport)
     : context (in_context)
     , device_manager (in_device_manager)
     , device (device_manager.Device ())
@@ -464,6 +470,7 @@ struct RenderOperationsExecutor
     , frame (context.Frame ())    
     , frame_shader_options_cache (frame.ShaderOptionsCache ())
     , frame_property_buffer (frame.DevicePropertyBuffer ())
+    , right_hand_viewport (in_right_hand_viewport)
   {
   }
   
@@ -568,6 +575,9 @@ struct RenderOperationsExecutor
       viewport_desc.height    = rect.height;
       viewport_desc.min_depth = viewport->MinDepth ();
       viewport_desc.max_depth = viewport->MaxDepth ();
+
+      if (right_hand_viewport)
+        viewport_desc.y = target_height - viewport_desc.height - viewport_desc.y;
 
       device.RSSetViewport (viewport_desc);
     }
@@ -740,7 +750,7 @@ void EffectRenderer::ExecuteOperations (RenderingContext& context)
 {
   try
   {
-    RenderOperationsExecutor executor (context, *impl->device_manager);
+    RenderOperationsExecutor executor (context, *impl->device_manager, impl->right_hand_viewport);
 
     executor.Draw (impl->operations);
   }

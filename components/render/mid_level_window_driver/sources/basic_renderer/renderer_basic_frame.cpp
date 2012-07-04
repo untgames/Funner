@@ -96,12 +96,19 @@ void BasicFrame::BindViewport (render::low_level::IDevice* device, int& viewport
     throw xtl::format_operation_exception ("render::mid_level::window_driver::BasicFrame::BindViewport", "Different viewport offsets for render target and depth-stencil target");
   }
   
+  low_level::DeviceCaps caps;
+  
+  device->GetCaps (caps);
+  
   render::low_level::Viewport fixed_viewport = viewport;  
 
   viewport_offset_x = render_target->ViewportX ();
   viewport_offset_y = render_target->ViewportY ();
   fixed_viewport.x += viewport_offset_x;
   fixed_viewport.y += viewport_offset_y; 
+
+  if (caps.has_right_hand_viewport)
+    fixed_viewport.y = render_target->GetHeight () - fixed_viewport.height - fixed_viewport.y;
 
   device->RSSetViewport (fixed_viewport);
 }

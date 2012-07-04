@@ -190,7 +190,7 @@ int main (int argc, char* argv [])
     vp.SetBackgroundColor (0, 0, 0, 0);
     vp.EnableBackground ();
 
-    vp.SetArea (10, 10, 80, 80);
+    vp.SetArea (10, 10, 70, 70);
 
     screen.Attach (vp);
 

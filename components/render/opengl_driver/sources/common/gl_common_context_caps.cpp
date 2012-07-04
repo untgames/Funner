@@ -408,4 +408,5 @@ void ContextCaps::GetDeviceCaps (render::low_level::DeviceCaps& caps) const
   caps.has_texture_non_power_of_two   = has_arb_texture_non_power_of_two || has_arb_texture_rectangle;
   caps.has_texture3d                  = has_ext_texture3d;
   caps.has_two_side_stencil           = has_ati_separate_stencil || has_ext_stencil_two_side;
+  caps.has_right_hand_viewport        = true;
 }

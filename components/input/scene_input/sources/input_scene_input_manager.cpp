@@ -244,13 +244,13 @@ struct SceneInputManager::Impl: public xtl::reference_counter, public IScreenLis
     else if (event_tokens.size () >= 3 && !strcmp (event_tokens [1], "axis"))
     {
       if      (!strcmp (event_tokens [0], "CursorX")) mouse_position [0] = (xtl::io::get<float> (event_tokens [2]) + 1.0f) * 0.5f;
-      else if (!strcmp (event_tokens [0], "CursorY")) mouse_position [1] = (xtl::io::get<float> (event_tokens [2]) + 1.0f) * 0.5f;
+      else if (!strcmp (event_tokens [0], "CursorY")) mouse_position [1] = 1.0f - (xtl::io::get<float> (event_tokens [2]) + 1.0f) * 0.5f;
       else                                            return false;      
 
       event.touch    = MOUSE_TOUCH_ID;
       event.state    = TouchState_Moving;
       event.position = mouse_position * screen_size + screen_offset;
-      event.button   = MOUSE_HOVER_ID;
+      event.button   = MOUSE_HOVER_ID;      
       
       return true;
     }

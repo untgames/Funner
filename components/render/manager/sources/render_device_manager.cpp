@@ -14,6 +14,7 @@ struct DeviceManager::Impl
   render::InputLayoutManager       input_layout_manager;       //менеджер лэйаутов геометрии
   render::ProgramParametersManager program_parameters_manager; //менеджер параметров программ шэйдинга  
   SettingsPtr                      settings;                   //настройки менеджера рендеринга
+  low_level::DeviceCaps            device_caps;                //возможности устройства отрисовки
   
   Impl (const LowLevelDevicePtr& in_device, const LowLevelDriverPtr& in_driver, const SettingsPtr& in_settings, const CacheManagerPtr& in_cache_manager)
     : device (in_device)
@@ -23,6 +24,7 @@ struct DeviceManager::Impl
     , program_parameters_manager (in_device, in_settings, in_cache_manager)
     , settings (in_settings)
   {
+    device->GetCaps (device_caps);    
   }
 };
 
@@ -71,6 +73,15 @@ render::low_level::IDevice& DeviceManager::Device ()
 render::low_level::IDriver& DeviceManager::Driver ()
 {
   return *impl->driver;
+}
+
+/*
+    Возможности устройства отрисовки
+*/
+
+const low_level::DeviceCaps& DeviceManager::DeviceCaps ()
+{
+  return impl->device_caps;
 }
 
 /*
