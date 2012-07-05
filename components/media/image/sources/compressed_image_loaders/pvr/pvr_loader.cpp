@@ -11,8 +11,6 @@
 
 #include <media/compressed_image.h>
 
-#pragma pack(1)
-
 using namespace common;
 using namespace media;
 
@@ -38,7 +36,14 @@ enum
   kPVRTextureFlagTypePVRTC_4
 };
 
-typedef struct _PVRTexHeader
+#ifdef _MSC_VER
+  #pragma pack(push,1)
+  #define PACKED_STRUCTURE
+#else
+  #define PACKED_STRUCTURE __attribute__ ((__packed__)
+#endif
+
+struct PACKED_STRUCTURE PVRTexHeader
 {
   uint32_t headerLength;
   uint32_t height;
@@ -53,7 +58,11 @@ typedef struct _PVRTexHeader
   uint32_t bitmaskAlpha;
   uint32_t pvrTag;
   uint32_t numSurfs;
-} PVRTexHeader;
+};
+
+#ifdef _MSC_VER
+  #pragma pack(pop)
+#endif
 
 /*
     Изображение, сжатое в формате PVR
@@ -69,9 +78,9 @@ class PvrCompressedImage: public ICustomCompressedImage
       {
         if (!file_name)
           throw xtl::make_null_argument_exception ("", "file_name");
-                    
+
         InputFile file (file_name);
-        
+
           //разбор заголовка файла
         
         PVRTexHeader header;
@@ -81,12 +90,12 @@ class PvrCompressedImage: public ICustomCompressedImage
           
         if (memcmp (&header.pvrTag, &gPVRTexIdentifier, sizeof (uint32_t)))
           throw xtl::format_operation_exception ("", "Invalid PVR file '%s'. Wrong tag", file_name);
-                 
+
         format = header.flags & PVR_TEXTURE_FLAG_TYPE_MASK;
         
         if (format != kPVRTextureFlagTypePVRTC_4 && format != kPVRTextureFlagTypePVRTC_2)
           throw xtl::format_not_supported_exception ("", "PVR file '%s' with given format %u not supported (only PVRTC4 & PVRTC2 supported)", file_name, format);
-                     
+
         size_t width  = header.width;
         size_t height = header.height;
 
@@ -94,22 +103,22 @@ class PvrCompressedImage: public ICustomCompressedImage
         this->height = height;
 
         has_alpha = header.bitmaskAlpha != 0;
-        
+
           //чтение данных
           
         size_t data_length = header.dataLength;
 
         data.resize (data_length, false);
-        
+
         size_t read_size = file.Read (data.data (), data.size ());
         
         if (read_size != data.size ())
           throw xtl::format_operation_exception ("", "Invalid PVR file '%s'. Error at read %u bytes from file (read_size=%u)", file_name, data.size (), read_size);
-        
+
           // Calculate the data size for each texture level and respect the minimum number of blocks
           
         mip_levels.reserve (GetReservedMipsCount (width, height));
-          
+
         size_t data_offset = 0;
 
         while (data_offset < data_length)
@@ -154,7 +163,7 @@ class PvrCompressedImage: public ICustomCompressedImage
       }
       catch (xtl::exception& e)
       {
-        e.touch ("media::PvrCompressedImage::PvrCompressedImage");
+        e.touch ("media::PvrCompressedImage::PvrCompressedImage");        
         throw;
       }
     }

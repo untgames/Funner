@@ -34,19 +34,22 @@ TextureCubemap::TextureCubemap  (const ContextManager& manager, const TextureDes
          gl_uncompressed_type   = get_uncompressed_gl_type (tex_desc.format),
          gl_internal_format;
          
+  bool is_dxt = false;
+         
   switch (tex_desc.format)
   {
     case PixelFormat_DXT1:
     case PixelFormat_DXT3:
     case PixelFormat_DXT5:
       gl_internal_format = GetCaps ().has_ext_texture_compression_s3tc ? get_gl_internal_format (tex_desc.format) : get_uncompressed_gl_internal_format (tex_desc.format);
+      is_dxt             = true;
       break;
     case PixelFormat_RGB_PVRTC2:
     case PixelFormat_RGB_PVRTC4:
     case PixelFormat_RGBA_PVRTC2:
     case PixelFormat_RGBA_PVRTC4:
       if (!GetCaps ().has_img_texture_compression_pvrtc)
-        throw xtl::format_not_supported_exception (METHOD_NAME, "PVRTC texture compresson not supported");
+        throw xtl::format_not_supported_exception (METHOD_NAME, "PVRTC texture compression not supported");
 
     default:
       gl_internal_format = get_gl_internal_format (tex_desc.format);    
@@ -91,7 +94,7 @@ TextureCubemap::TextureCubemap  (const ContextManager& manager, const TextureDes
   
   xtl::uninitialized_storage<char> unpacked_buffer;      
   
-  if (is_compressed_data && data && !GetCaps ().has_ext_texture_compression_s3tc)
+  if (is_compressed_data && data && !GetCaps ().has_ext_texture_compression_s3tc && is_dxt)
   {
     unpacked_buffer.resize (get_uncompressed_image_size (tex_desc.width, tex_desc.height, tex_desc.format));  
   }
@@ -120,7 +123,7 @@ TextureCubemap::TextureCubemap  (const ContextManager& manager, const TextureDes
         
 #endif
 
-        if (is_compressed_data && level_data.data)
+        if (is_compressed_data && level_data.data && is_dxt)
         {
           unpack_dxt (tex_desc.format, level_desc.width, level_desc.height, level_data.data, unpacked_buffer.data ());
 

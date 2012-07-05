@@ -78,7 +78,7 @@ Texture2D::Texture2D (const ContextManager& manager, const TextureDesc& tex_desc
 
     PFNGLCOMPRESSEDTEXIMAGE2DPROC glCompressedTexImage2D_fn = 0;
 
-    bool supports_compressed = false;
+    bool supports_compressed = false, is_dxt = false;
 
     if (is_compressed_data)
     {
@@ -87,12 +87,17 @@ Texture2D::Texture2D (const ContextManager& manager, const TextureDesc& tex_desc
         case PixelFormat_DXT3:
         case PixelFormat_DXT5:
           supports_compressed = GetCaps ().has_ext_texture_compression_s3tc;
+          is_dxt              = true;
           break;
         case PixelFormat_RGB_PVRTC2:
         case PixelFormat_RGB_PVRTC4:
         case PixelFormat_RGBA_PVRTC2:
         case PixelFormat_RGBA_PVRTC4:
-          supports_compressed = GetCaps ().has_img_texture_compression_pvrtc;
+          if (!GetCaps ().has_img_texture_compression_pvrtc)
+            throw xtl::format_not_supported_exception (METHOD_NAME, "PVRTC texture compression not supported");          
+          
+          supports_compressed = true;
+            
           break;
         default:
           throw xtl::format_operation_exception (METHOD_NAME, "Unknown compressed texture format %d", tex_desc.format);
@@ -104,7 +109,7 @@ Texture2D::Texture2D (const ContextManager& manager, const TextureDesc& tex_desc
     
     xtl::uninitialized_storage<char> unpacked_buffer;      
     
-    if (is_compressed_data && data && !supports_compressed)
+    if (is_compressed_data && data && !supports_compressed && is_dxt)
     {
       unpacked_buffer.resize (get_uncompressed_image_size (tex_desc.width, tex_desc.height, tex_desc.format));  
     }
@@ -131,7 +136,7 @@ Texture2D::Texture2D (const ContextManager& manager, const TextureDesc& tex_desc
         
 #endif
 
-        if (is_compressed_data && level_data.data)
+        if (is_compressed_data && level_data.data && is_dxt)
         {
           unpack_dxt (tex_desc.format, level_desc.width, level_desc.height, level_data.data, unpacked_buffer.data ());
 
