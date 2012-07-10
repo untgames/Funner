@@ -908,8 +908,8 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
       const low_level::Rect& device_viewport = device.RSGetViewport ();
       low_level::Rect scissor_rect;
 
-      scissor_rect.x      = device_viewport.x + viewport.x + (int)((left_bottom_corner_screen.x + 1.f) / 2.f * viewport.width);
-      scissor_rect.y      = device_viewport.y + viewport.y + (int)((left_bottom_corner_screen.y + 1.f) / 2.f * viewport.height);
+      scissor_rect.x      = device_viewport.x + (int)ceil((left_bottom_corner_screen.x + 1.f) / 2.f * viewport.width);
+      scissor_rect.y      = device_viewport.y + (int)ceil((left_bottom_corner_screen.y + 1.f) / 2.f * viewport.height);
       scissor_rect.width  = (size_t)ceil ((right_top_corner_screen.x - left_bottom_corner_screen.x) / 2 * viewport.width);
       scissor_rect.height = (size_t)ceil ((right_top_corner_screen.y - left_bottom_corner_screen.y) / 2 * viewport.height);
 
