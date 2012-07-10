@@ -489,6 +489,7 @@ class WinSocket : public SocketImpl, public xtl::reference_counter
         {
           switch (WSAGetLastError ())
           {
+            case WSAETIMEDOUT:
             case WSAEWOULDBLOCK:
               return 0;
             case WSAECONNABORTED:
@@ -526,6 +527,7 @@ class WinSocket : public SocketImpl, public xtl::reference_counter
         {
           switch (WSAGetLastError ())
           {
+            case WSAETIMEDOUT:
             case WSAEWOULDBLOCK:
               return 0;
             case WSAECONNRESET:

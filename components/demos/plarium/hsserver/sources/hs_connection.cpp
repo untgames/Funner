@@ -13,8 +13,8 @@ namespace
 
 const char*         PING_MESSAGE                = "[{\"event\":\"user.ping\"}]";
 const size_t        DEQUEUE_TIMEOUT             = 100;
-const size_t        SEND_TIMEOUT                = 100;
-const size_t        RECEIVE_TIMEOUT             = 100;
+const size_t        SEND_TIMEOUT                = 500;
+const size_t        RECEIVE_TIMEOUT             = 500;
 const size_t        DEFAULT_RECEIVE_BUFFER_SIZE = 1024;
 const size_t        DEFAULT_SEND_BUFFER_SIZE    = 1024;
 const size_t        COMPRESSED_LENGTH_SIZE      = 4;

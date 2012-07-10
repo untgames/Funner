@@ -10,9 +10,11 @@ namespace
 #ifdef _MSC_VER
 const int CONNECTION_RESET_ERROR = WSAECONNRESET;
 const int WOULD_BLOCK_ERROR      = WSAEWOULDBLOCK;
+const int EAGAIN_ERROR           = WSAETIMEDOUT;
 #else
 const int CONNECTION_RESET_ERROR = ECONNRESET;
 const int WOULD_BLOCK_ERROR      = EWOULDBLOCK;
+const int EAGAIN_ERROR           = EAGAIN;
 #endif
 
 #ifdef _MSC_VER
@@ -348,11 +350,7 @@ size_t TcpClient::Send (const void* buffer, size_t size, size_t timeout_in_milli
         errno;
 #endif
 
-#ifdef _MSC_VER
-    if (error_code == WOULD_BLOCK_ERROR)
-#else
-    if (error_code == EAGAIN || errno == WOULD_BLOCK_ERROR)
-#endif
+    if (error_code == EAGAIN_ERROR || errno == WOULD_BLOCK_ERROR)
       return 0;
 
     if (error_code == CONNECTION_RESET_ERROR)
@@ -401,11 +399,7 @@ size_t TcpClient::Receive (void* buffer, size_t size, size_t timeout_in_millisec
 
   if (received_bytes < 0)
   {
-#ifdef _MSC_VER
-    if (error_code == WOULD_BLOCK_ERROR)
-#else
-    if (error_code == EAGAIN || errno == WOULD_BLOCK_ERROR)
-#endif
+    if (error_code == EAGAIN_ERROR || errno == WOULD_BLOCK_ERROR)
       return 0;
     else
       raise_error ("TcpClient::Receive", "::recv");
