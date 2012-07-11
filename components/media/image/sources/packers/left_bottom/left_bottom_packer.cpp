@@ -215,15 +215,14 @@ class TileImageBuilder
           if ((iter->y_pos + iter->height != result_image_vertical_side) && (iter->height < image_size.y + margin))
             continue;
 
-          image_size.x = stl::min (image_size.x + margin, iter->width);
-          image_size.y = stl::min (image_size.y + margin, iter->height);
+          math::vec2ui margined_image_size (stl::min (image_size.x + margin, iter->width), stl::min (image_size.y + margin, iter->height));
 
           out_origin.x = iter->x_pos;
           out_origin.y = iter->y_pos;
 
           //нашли подходящее место для картинки, для всех свободных мест с которыми пересеклась картинка проводим рассчёт новых свободных мест
           bound_volumes::axis_aligned_box<unsigned int> image_bb (vec3ui (out_origin.x, out_origin.y, 0),
-                                                                  vec3ui (out_origin.x + image_size.x - 1, out_origin.y + image_size.y - 1, 1));
+                                                                  vec3ui (out_origin.x + margined_image_size.x - 1, out_origin.y + margined_image_size.y - 1, 1));
 
           for (FreeSpacesSet::iterator erase_iter = free_spaces.begin (), erase_end = free_spaces.end (); erase_iter != erase_end;)
           {
@@ -238,9 +237,9 @@ class TileImageBuilder
 
                 AddFreeSpace (left_free_space, free_spaces, fast);
               }
-              if ((out_origin.x + image_size.x) < (erase_iter->x_pos + erase_iter->width)) //есть новое свободное место правее картинки
+              if ((out_origin.x + margined_image_size.x) < (erase_iter->x_pos + erase_iter->width)) //есть новое свободное место правее картинки
               {
-                FreeSpace right_free_space (out_origin.x + image_size.x, erase_iter->y_pos, erase_iter->x_pos + erase_iter->width - (out_origin.x + image_size.x), erase_iter->height, swap_axises);
+                FreeSpace right_free_space (out_origin.x + margined_image_size.x, erase_iter->y_pos, erase_iter->x_pos + erase_iter->width - (out_origin.x + margined_image_size.x), erase_iter->height, swap_axises);
 
                 AddFreeSpace (right_free_space, free_spaces, fast);
               }
@@ -250,9 +249,9 @@ class TileImageBuilder
 
                 AddFreeSpace (bottom_free_space, free_spaces, fast);
               }
-              if ((out_origin.y + image_size.y) < (erase_iter->y_pos + erase_iter->height)) //есть новое свободное место выше картинки
+              if ((out_origin.y + margined_image_size.y) < (erase_iter->y_pos + erase_iter->height)) //есть новое свободное место выше картинки
               {
-                FreeSpace top_free_space (erase_iter->x_pos, out_origin.y + image_size.y, erase_iter->width, erase_iter->y_pos + erase_iter->height - (out_origin.y + image_size.y), swap_axises);
+                FreeSpace top_free_space (erase_iter->x_pos, out_origin.y + margined_image_size.y, erase_iter->width, erase_iter->y_pos + erase_iter->height - (out_origin.y + margined_image_size.y), swap_axises);
 
                 AddFreeSpace (top_free_space, free_spaces, fast);
               }
