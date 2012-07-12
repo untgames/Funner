@@ -15,6 +15,9 @@ namespace syslib
 //forward declarations
 class Screen;
 
+struct window_handle;
+typedef window_handle* window_t;
+
 const size_t MAX_TOUCHES_COUNT = 16;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -198,6 +201,7 @@ class Window: public xtl::dynamic_cast_root //убрать!!
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструктор и деструктор
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+    Window  (window_t handle);
     Window  (const char* init_string = ""); //создаётся закрытое окно
     Window  (WindowStyle style, const char* init_string = "");
     Window  (WindowStyle style, size_t width, size_t height, const char* init_string = "");

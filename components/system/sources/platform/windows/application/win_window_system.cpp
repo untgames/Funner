@@ -736,7 +736,7 @@ bool WindowsWindowManager::ChangeWindowStyle (window_t handle, WindowStyle style
       
     HWND prev_window = 0;
 #ifndef WINCE
-    prev_window = GetNextWindow (wnd, GW_HWNDPREV);
+    prev_window = ::GetNextWindow (wnd, GW_HWNDPREV);
     
     if (!prev_window)
       prev_window = HWND_TOP;

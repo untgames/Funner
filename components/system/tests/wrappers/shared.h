@@ -19,6 +19,7 @@
 #include <syslib/screen.h>
 #include <syslib/sensor.h>
 #include <syslib/timer.h>
+#include <syslib/web_view.h>
 #include <syslib/window.h>
 
 using namespace syslib;

@@ -274,3 +274,83 @@ size_t DefaultWindowManager::GetKeyName (ScanCode scan_code, size_t buffer_size,
 
   return strlen (buffer);
 }
+
+/*
+    Создание/уничтожение web-view
+*/
+
+web_view_t DefaultWindowManager::CreateWebView (IWebViewListener*)
+{
+  raise ("syslib::DefaultWindowManager::CreateWebView");
+}
+
+void DefaultWindowManager::DestroyWebView (web_view_t)
+{
+  raise ("syslib::DefaultWindowManager::DestroyWebView");
+}
+
+/*
+    Присоединенное окно
+*/
+
+window_t DefaultWindowManager::GetWindow (web_view_t)
+{
+  raise ("syslib::DefaultWindowManager::GetWindow");
+}
+
+/*
+    Загрузка данных
+*/
+
+void DefaultWindowManager::LoadRequest (web_view_t, const char*)
+{
+  raise ("syslib::DefaultWindowManager::LoadRequest");
+}
+
+void DefaultWindowManager::LoadData (web_view_t, const char*, const char*, const char*, const char*)
+{
+  raise ("syslib::DefaultWindowManager::LoadData");
+}
+
+/*
+    Перезагрузка страницы / остановка загрузки / проверка наличия загрузки
+*/
+
+void DefaultWindowManager::Reload (web_view_t)
+{
+  raise ("syslib::DefaultWindowManager::Reload");
+}
+
+void DefaultWindowManager::StopLoading (web_view_t)
+{
+  raise ("syslib::DefaultWindowManager::StopLoading");
+}
+
+bool DefaultWindowManager::IsLoading (web_view_t)
+{
+  raise ("syslib::DefaultWindowManager::IsLoading");
+}
+
+/*
+    Средства навигации
+*/
+
+bool DefaultWindowManager::CanGoBack (web_view_t)
+{
+  raise ("syslib::DefaultWindowManager::CanGoBack");
+}
+
+bool DefaultWindowManager::CanGoForward (web_view_t)
+{
+  raise ("syslib::DefaultWindowManager::CreateWebView");
+}
+
+void DefaultWindowManager::GoBack (web_view_t)
+{
+  raise ("syslib::DefaultWindowManager::GoBack");
+}
+
+void DefaultWindowManager::GoForward (web_view_t)
+{
+  raise ("syslib::DefaultWindowManager::GoForward");
+}

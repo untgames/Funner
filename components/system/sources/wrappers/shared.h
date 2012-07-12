@@ -34,6 +34,7 @@
 #include <syslib/timer.h>
 #include <syslib/thread.h>
 #include <syslib/tls.h>
+#include <syslib/web_view.h>
 #include <syslib/window.h>
 
 #include <shared/platform.h>

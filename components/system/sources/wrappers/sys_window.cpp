@@ -18,6 +18,7 @@ struct Window::Impl: public xtl::trackable
       : window (in_window)
       , handle (0)
       , parent_handle (0)
+      , embedded (false)
       , style (WindowStyle_Default)
       , need_update_viewport (true)
     {
@@ -28,11 +29,29 @@ struct Window::Impl: public xtl::trackable
       memset (title_unicode, 0, sizeof title_unicode);
     }
     
+    Impl (Window* in_window, window_t in_handle)
+      : window (in_window)
+      , handle (in_handle)
+      , parent_handle (0)
+      , embedded (true)
+      , style (WindowStyle_PopUp)
+      , need_update_viewport (true)
+    {
+      if (!handle)
+        throw xtl::make_null_argument_exception ("syslib::Window::Window::Impl", "handle");
+           
+      memset (title, 0, sizeof title);
+      memset (title_unicode, 0, sizeof title_unicode);
+    }    
+    
 ///Инциализация окна
     void Init (WindowStyle in_style, const void* parent, bool is_visible, const Rect* window_rect = 0)
     {
       try
       {
+        if (embedded)
+          throw xtl::format_operation_exception ("", "Can't recreate embedded window");
+
           //сделать через конструктор и Hide/Show
           
         switch (in_style)
@@ -41,7 +60,7 @@ struct Window::Impl: public xtl::trackable
           case WindowStyle_PopUp:
             break;
           default:
-            throw xtl::make_argument_exception ("syslib::Window::Impl::Init", "style", in_style);
+            throw xtl::make_argument_exception ("", "style", in_style);
         }
 
         if (handle)
@@ -230,8 +249,13 @@ struct Window::Impl: public xtl::trackable
 ///Регистрация обработчиков событий
     xtl::connection RegisterEventHandler (WindowEvent event, const EventHandler& handler)
     {    
+      static const char* METHOD_NAME = "syslib::Window::Impl::RegisterEventHandler";
+      
       if (event < 0 || event >= WindowEvent_Num)
-        throw xtl::make_argument_exception ("syslib::Window::Impl::RegisterEventHandler", "event", event);
+        throw xtl::make_argument_exception (METHOD_NAME, "event", event);
+        
+      if (embedded)
+        throw xtl::format_operation_exception (METHOD_NAME, "Can't register event handlers for embedded window");
 
       return signals [event].connect (handler);
     }    
@@ -324,6 +348,7 @@ struct Window::Impl: public xtl::trackable
     Window*               window;                             //указатель на владельца
     window_t              handle;                             //низкоуровневый дескриптор окна
     const void*           parent_handle;                      //низкоуровневый дескриптор родительского окна
+    bool                  embedded;                           //окно является встроенным
     WindowStyle           style;                              //стиль окна
     stl::string           init_string;                        //строка инициализации окна
     WindowSignal          signals [WindowEvent_Num];          //сигналы окна
@@ -340,6 +365,19 @@ struct Window::Impl: public xtl::trackable
 /*
     Конструктор и деструктор
 */
+
+Window::Window (window_t handle)
+{
+  try
+  {
+    impl = stl::auto_ptr<Impl> (new Impl (this, handle));
+  }
+  catch (xtl::exception& exception)
+  {
+    exception.touch ("syslib::Window::Window(window_t)");
+    throw;
+  }
+}
 
 Window::Window (const char* init_string)
 {
