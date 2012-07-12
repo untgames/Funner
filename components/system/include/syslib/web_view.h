@@ -40,7 +40,7 @@ class WebView: public xtl::dynamic_cast_root //убрать!!!
 ///«агрузка данных
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void LoadRequest (const char* uri);
-    void LoadData    (const char* data, const char* mime_type, const char* encoding, const char* base_url);
+    void LoadData    (const char* data, size_t data_size, const char* mime_type, const char* encoding, const char* base_url);
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///ѕерезагрузка страницы / остановка загрузки / проверка наличи€ загрузки

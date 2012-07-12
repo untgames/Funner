@@ -485,6 +485,9 @@ window_t IPhoneWindowManager::CreateWindow (WindowStyle window_style, WindowMess
 
 void IPhoneWindowManager::CloseWindow (window_t handle)
 {
+  if (!handle)
+    return;
+
   WindowImpl* window = ((UIWindowWrapper*)handle).window_impl;
 
   window->Notify (WindowEvent_OnClose, [(UIWindowWrapper*)handle getEventContext]);
@@ -492,6 +495,9 @@ void IPhoneWindowManager::CloseWindow (window_t handle)
 
 void IPhoneWindowManager::DestroyWindow (window_t handle)
 {
+  if (!handle)
+    return;
+
   WindowImpl* window = ((UIWindowWrapper*)handle).window_impl;
 
   window->Notify (WindowEvent_OnDestroy, [(UIWindowWrapper*)handle getEventContext]);
@@ -505,11 +511,17 @@ void IPhoneWindowManager::DestroyWindow (window_t handle)
 
 const void* IPhoneWindowManager::GetNativeWindowHandle (window_t handle)
 {
+  if (!handle)
+    throw xtl::make_null_argument_exception ("syslib::IPhoneWindowManager::GetNativeWindowHandle", "handle");
+
   return reinterpret_cast<const void*> (handle);
 }
 
-const void* IPhoneWindowManager::GetNativeDisplayHandle (window_t)
+const void* IPhoneWindowManager::GetNativeDisplayHandle (window_t handle)
 {
+  if (!handle)
+    throw xtl::make_null_argument_exception ("syslib::IPhoneWindowManager::GetNativeDisplayHandle", "handle");
+
   return 0;
 }
 
@@ -517,17 +529,29 @@ const void* IPhoneWindowManager::GetNativeDisplayHandle (window_t)
     Заголовок окна
 */
 
-void IPhoneWindowManager::SetWindowTitle (window_t, const wchar_t*)
+void IPhoneWindowManager::SetWindowTitle (window_t handle, const wchar_t* title)
 {
+  static const char* METHOD_NAME = "syslib::IPhoneWindowManager::SetWindowTitle";
+
+  if (!handle)
+    throw xtl::make_null_argument_exception (METHOD_NAME, "handle");
+
+  if (!title)
+    throw xtl::make_null_argument_exception (METHOD_NAME, "title");
 }
 
-void IPhoneWindowManager::GetWindowTitle (window_t, size_t size, wchar_t* buffer)
+void IPhoneWindowManager::GetWindowTitle (window_t handle, size_t size, wchar_t* buffer)
 {
+  static const char* METHOD_NAME = "syslib::IPhoneWindowManager::GetWindowTitle";
+
+  if (!handle)
+    throw xtl::make_null_argument_exception (METHOD_NAME, "handle");
+
   if (!size)
     return;
 
   if (!buffer)
-    throw xtl::make_null_argument_exception ("syslib::IPhoneWindowManager::GetWindowTitle", "buffer");
+    throw xtl::make_null_argument_exception (METHOD_NAME, "buffer");
 
   *buffer = L'\0';
 }
@@ -541,9 +565,9 @@ void IPhoneWindowManager::SetWindowRect (window_t window, const Rect& rect)
   if (!window)
     throw xtl::make_null_argument_exception ("syslib::IPhoneWindowManager::SetWindowRect", "window");
 
-  UIWindowWrapper* wnd = (UIWindowWrapper*)window;
+  UIView* view = (UIView*)window;
 
-  float scale_factor = wnd.contentScaleFactor;
+  float scale_factor = view.contentScaleFactor;
 
   CGRect frame;
 
@@ -552,7 +576,7 @@ void IPhoneWindowManager::SetWindowRect (window_t window, const Rect& rect)
   frame.origin.x    = rect.left / scale_factor;
   frame.origin.y    = rect.top / scale_factor;
 
-  UIInterfaceOrientation ui_orientation = wnd.rootViewController.interfaceOrientation;
+  UIInterfaceOrientation ui_orientation = view.window.rootViewController.interfaceOrientation;
 
   switch (ui_orientation)
   {
@@ -575,14 +599,18 @@ void IPhoneWindowManager::SetWindowRect (window_t window, const Rect& rect)
       break;
   }
 
-  wnd.frame = frame;
+  view.frame = frame;
 
-  WindowImpl* window_impl = wnd.window_impl;
+  if ([view isKindOfClass:[UIWindowWrapper class]])
+  {
+    UIWindowWrapper* wnd         = (UIWindowWrapper*)view;
+    WindowImpl*      window_impl = wnd.window_impl;
 
-  WindowEventContext& dummy_context = [wnd getEventContext];
+    WindowEventContext& dummy_context = [wnd getEventContext];
 
-  window_impl->Notify (WindowEvent_OnMove, dummy_context);
-  window_impl->Notify (WindowEvent_OnSize, dummy_context);
+    window_impl->Notify (WindowEvent_OnMove, dummy_context);
+    window_impl->Notify (WindowEvent_OnSize, dummy_context);
+  }
 }
 
 void IPhoneWindowManager::SetClientRect (window_t handle, const Rect& rect)
@@ -595,12 +623,12 @@ void IPhoneWindowManager::GetWindowRect (window_t window, Rect& rect)
   if (!window)
     throw xtl::make_null_argument_exception ("syslib::IPhoneWindowManager::GetWindowRect", "window");
 
-  UIWindow               *wnd           = (UIWindow*)window;
-  UIInterfaceOrientation ui_orientation = wnd.rootViewController.interfaceOrientation;
+  UIView                 *view          = (UIView*)window;
+  UIInterfaceOrientation ui_orientation = view.window.rootViewController.interfaceOrientation;
 
-  float scale_factor = wnd.contentScaleFactor;
+  float scale_factor = view.contentScaleFactor;
 
-  CGRect frame = wnd.frame;
+  CGRect frame = view.frame;
 
   rect.bottom = (frame.origin.y + frame.size.height) * scale_factor;
   rect.right  = (frame.origin.x + frame.size.width) * scale_factor;
@@ -640,14 +668,23 @@ void IPhoneWindowManager::GetClientRect (window_t handle, Rect& target_rect)
 
 void IPhoneWindowManager::SetWindowFlag (window_t handle, WindowFlag flag, bool state)
 {
+  if (!handle)
+    throw xtl::make_null_argument_exception ("syslib::IPhoneWindowManager::SetWindowFlag", "handle");
+
   if (state == GetWindowFlag (handle, flag))
     return;
 
-  UIWindowWrapper* wnd = (UIWindowWrapper*)handle;
+  UIView             *view          = (UIView*)handle;
+  UIWindowWrapper    *wnd           = nil;
+  WindowImpl         *window        = 0;
+  WindowEventContext *dummy_context = 0;
 
-  WindowImpl* window = wnd.window_impl;
-
-  WindowEventContext& dummy_context = [(UIWindowWrapper*)handle getEventContext];
+  if ([view isKindOfClass:[UIWindowWrapper class]])
+  {
+    wnd           = (UIWindowWrapper*)handle;
+    window        = wnd.window_impl;
+    dummy_context = &[wnd getEventContext];
+  }
 
   try
   {
@@ -657,15 +694,17 @@ void IPhoneWindowManager::SetWindowFlag (window_t handle, WindowFlag flag, bool 
         if (state)
         {
           [wnd makeKeyAndVisible];
-          wnd.hidden = NO;
 
-          window->Notify (WindowEvent_OnShow, dummy_context);
+          view.hidden = NO;
+
+          if (window)
+            window->Notify (WindowEvent_OnShow, *dummy_context);
         }
         else
         {
-          wnd.hidden = YES;
+          view.hidden = YES;
 
-          window->Notify (WindowEvent_OnHide, dummy_context);
+          window->Notify (WindowEvent_OnHide, *dummy_context);
         }
 
         break;
@@ -674,7 +713,8 @@ void IPhoneWindowManager::SetWindowFlag (window_t handle, WindowFlag flag, bool 
         {
           [wnd makeKeyAndVisible];
 
-          window->Notify (WindowEvent_OnActivate, dummy_context);
+          if (window)
+            window->Notify (WindowEvent_OnActivate, *dummy_context);
         }
         else
           throw xtl::format_operation_exception ("", "Can't make window inactive");
@@ -683,20 +723,28 @@ void IPhoneWindowManager::SetWindowFlag (window_t handle, WindowFlag flag, bool 
       case WindowFlag_Focus: //фокус ввода
         if (state)
         {
-          wnd.rootViewController.view.userInteractionEnabled = YES;
+          if (wnd)
+            wnd.rootViewController.view.userInteractionEnabled = YES;
+          else
+            view.userInteractionEnabled = YES;
 
-          window->Notify (WindowEvent_OnSetFocus, dummy_context);
+          if (window)
+            window->Notify (WindowEvent_OnSetFocus, *dummy_context);
         }
         else
         {
-          wnd.rootViewController.view.userInteractionEnabled = NO;
+          if (wnd)
+            wnd.rootViewController.view.userInteractionEnabled = NO;
+          else
+            view.userInteractionEnabled = NO;
 
-          window->Notify (WindowEvent_OnLostFocus, dummy_context);
+          if (window)
+            window->Notify (WindowEvent_OnLostFocus, *dummy_context);
         }
 
         break;
       case WindowFlag_Maximized:
-        wnd.bounds = [UIScreen mainScreen].applicationFrame;
+        view.bounds = [UIScreen mainScreen].applicationFrame;
         break;
       case WindowFlag_Minimized:
         throw xtl::format_operation_exception ("", "Can't minimize window");
@@ -713,18 +761,30 @@ void IPhoneWindowManager::SetWindowFlag (window_t handle, WindowFlag flag, bool 
 
 bool IPhoneWindowManager::GetWindowFlag (window_t handle, WindowFlag flag)
 {
-  UIWindow* wnd = (UIWindow*)handle;
+  if (!handle)
+    throw xtl::make_null_argument_exception ("syslib::IPhoneWindowManager::GetWindowFlag", "handle");
+
+  UIView*          view = (UIView*)handle;
+  UIWindowWrapper* wnd  = 0;
+
+  if ([view isKindOfClass:[UIWindowWrapper class]])
+  {
+    wnd = (UIWindowWrapper*)handle;
+  }
 
   try
   {
     switch (flag)
     {
       case WindowFlag_Visible:
-        return wnd.hidden == NO;
+        return view.hidden == NO;
       case WindowFlag_Active:
-        return wnd == [UIApplication sharedApplication].keyWindow;
+        return view.window == [UIApplication sharedApplication].keyWindow;
       case WindowFlag_Focus:
-        return wnd.rootViewController.view.userInteractionEnabled == YES;
+        if (wnd)
+          return wnd.rootViewController.view.userInteractionEnabled == YES;
+        else
+          return view.userInteractionEnabled == YES;
       case WindowFlag_Maximized:
       {
         CGRect maximized_rect = [UIScreen mainScreen].applicationFrame;
@@ -732,7 +792,7 @@ bool IPhoneWindowManager::GetWindowFlag (window_t handle, WindowFlag flag)
         maximized_rect.origin.x = 0;
         maximized_rect.origin.y = 0;
 
-        return CGRectEqualToRect (wnd.frame, maximized_rect);
+        return CGRectEqualToRect (view.frame, maximized_rect);
       }
       case WindowFlag_Minimized:
         throw xtl::format_operation_exception ("", "Can't get window flag %d value", flag);
@@ -753,7 +813,13 @@ bool IPhoneWindowManager::GetWindowFlag (window_t handle, WindowFlag flag)
 
 void IPhoneWindowManager::InvalidateWindow (window_t handle)
 {
-  [((UIWindowWrapper*)handle).rootViewController.view setNeedsDisplay];
+  if (!handle)
+    throw xtl::make_null_argument_exception ("syslib::IPhoneWindowManager::InvalidateWindow", "handle");
+
+  if ([(id)handle isKindOfClass:[UIWindowWrapper class]])
+    [((UIWindowWrapper*)handle).rootViewController.view setNeedsDisplay];
+  else
+    [(UIView*)handle setNeedsDisplay];
 }
 
 /*
@@ -765,7 +831,10 @@ void IPhoneWindowManager::SetMultitouchEnabled (window_t window, bool enabled)
   if (!window)
     throw xtl::make_null_argument_exception ("syslib::IPhoneWindowManager::SetMultitouchEnabled", "window");
 
-  ((UIWindowWrapper*)window).rootViewController.view.multipleTouchEnabled = enabled;
+  if ([(id)window isKindOfClass:[UIWindowWrapper class]])
+    ((UIWindowWrapper*)window).rootViewController.view.multipleTouchEnabled = enabled;
+  else
+    ((UIView*)window).multipleTouchEnabled = enabled;
 }
 
 bool IPhoneWindowManager::IsMultitouchEnabled (window_t window)
@@ -773,7 +842,10 @@ bool IPhoneWindowManager::IsMultitouchEnabled (window_t window)
   if (!window)
     throw xtl::make_null_argument_exception ("syslib::IPhoneWindowManager::IsMultitouchEnabled", "window");
 
-  return ((UIWindowWrapper*)window).rootViewController.view.multipleTouchEnabled;
+  if ([(id)window isKindOfClass:[UIWindowWrapper class]])
+    return ((UIWindowWrapper*)window).rootViewController.view.multipleTouchEnabled;
+  else
+    return ((UIView*)window).multipleTouchEnabled;
 }
 
 /*
@@ -782,8 +854,13 @@ bool IPhoneWindowManager::IsMultitouchEnabled (window_t window)
 
 void IPhoneWindowManager::SetBackgroundColor (window_t window, const Color& color)
 {
+  static const char* METHOD_NAME = "syslib::IPhoneWindowManager::SetBackgroundColor";
+
   if (!window)
-    throw xtl::make_null_argument_exception ("syslib::IPhoneWindowManager::SetBackgroundColor", "window");
+    throw xtl::make_null_argument_exception (METHOD_NAME, "window");
+
+  if (![(id)window isKindOfClass:[UIWindowWrapper class]])
+    throw xtl::format_operation_exception (METHOD_NAME, "Can't set background color for this window");
 
   UIWindow*      wnd  = (UIWindow*)window;
   UIViewWrapper* view = (UIViewWrapper*)wnd.rootViewController.view;
@@ -802,8 +879,13 @@ void IPhoneWindowManager::SetBackgroundColor (window_t window, const Color& colo
 
 void IPhoneWindowManager::SetBackgroundState (window_t window, bool state)
 {
+  static const char* METHOD_NAME = "syslib::IPhoneWindowManager::SetBackgroundState";
+
   if (!window)
-    throw xtl::make_null_argument_exception ("syslib::IPhoneWindowManager::SetBackgroundState", "window");
+    throw xtl::make_null_argument_exception (METHOD_NAME, "window");
+
+  if (![(id)window isKindOfClass:[UIWindowWrapper class]])
+    throw xtl::format_operation_exception (METHOD_NAME, "Can't set background state for this window");
 
   UIWindow*      wnd  = (UIWindow*)window;
   UIViewWrapper* view = (UIViewWrapper*)wnd.rootViewController.view;
@@ -815,8 +897,13 @@ void IPhoneWindowManager::SetBackgroundState (window_t window, bool state)
 
 Color IPhoneWindowManager::GetBackgroundColor (window_t window)
 {
+  static const char* METHOD_NAME = "syslib::IPhoneWindowManager::GetBackgroundColor";
+
   if (!window)
-    throw xtl::make_null_argument_exception ("syslib::IPhoneWindowManager::GetBackgroundColor", "window");
+    throw xtl::make_null_argument_exception (METHOD_NAME, "window");
+
+  if (![(id)window isKindOfClass:[UIWindowWrapper class]])
+    throw xtl::format_operation_exception (METHOD_NAME, "Can't get background color for this window");
 
   UIWindow*      wnd  = (UIWindow*)window;
   UIViewWrapper *view = (UIViewWrapper*)wnd.rootViewController.view;
@@ -826,8 +913,13 @@ Color IPhoneWindowManager::GetBackgroundColor (window_t window)
 
 bool IPhoneWindowManager::GetBackgroundState (window_t window)
 {
+  static const char* METHOD_NAME = "syslib::IPhoneWindowManager::GetBackgroundState";
+
   if (!window)
-    throw xtl::make_null_argument_exception ("syslib::IPhoneWindowManager::GetBackgroundState", "window");
+    throw xtl::make_null_argument_exception (METHOD_NAME, "window");
+
+  if (![(id)window isKindOfClass:[UIWindowWrapper class]])
+    throw xtl::format_operation_exception (METHOD_NAME, "Can't get background state for this window");
 
   return ((UIViewWrapper*)((UIWindow*)window).rootViewController.view).background_state;
 }

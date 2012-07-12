@@ -199,11 +199,11 @@ void WebView::LoadRequest (const char* uri)
   }
 }
 
-void WebView::LoadData (const char* data, const char* mime_type, const char* encoding, const char* base_url)
+void WebView::LoadData (const char* data, size_t data_size, const char* mime_type, const char* encoding, const char* base_url)
 {
   try
   {
-    if (!data)
+    if (data_size && !data)
       throw xtl::make_null_argument_exception ("", "data");
       
     if (!mime_type)
@@ -215,7 +215,7 @@ void WebView::LoadData (const char* data, const char* mime_type, const char* enc
     if (!base_url)
       throw xtl::make_null_argument_exception ("", "base_url");
     
-    Platform::LoadData (impl->handle, data, mime_type, encoding, base_url);
+    Platform::LoadData (impl->handle, data, data_size, mime_type, encoding, base_url);
   }
   catch (xtl::exception& e)
   {

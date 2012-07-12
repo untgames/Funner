@@ -159,7 +159,7 @@ class DefaultWindowManager
 ///«агрузка данных
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     static void LoadRequest (web_view_t, const char* uri);
-    static void LoadData    (web_view_t, const char* data, const char* mime_type, const char* encoding, const char* base_url);
+    static void LoadData    (web_view_t, const char* data, size_t data_size, const char* mime_type, const char* encoding, const char* base_url);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///ѕерезагрузка страницы / остановка загрузки / проверка наличи€ загрузки

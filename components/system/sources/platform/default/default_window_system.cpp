@@ -282,6 +282,7 @@ size_t DefaultWindowManager::GetKeyName (ScanCode scan_code, size_t buffer_size,
 web_view_t DefaultWindowManager::CreateWebView (IWebViewListener*)
 {
   raise ("syslib::DefaultWindowManager::CreateWebView");
+  return 0;
 }
 
 void DefaultWindowManager::DestroyWebView (web_view_t)
@@ -296,6 +297,7 @@ void DefaultWindowManager::DestroyWebView (web_view_t)
 window_t DefaultWindowManager::GetWindow (web_view_t)
 {
   raise ("syslib::DefaultWindowManager::GetWindow");
+  return 0;
 }
 
 /*
@@ -307,7 +309,7 @@ void DefaultWindowManager::LoadRequest (web_view_t, const char*)
   raise ("syslib::DefaultWindowManager::LoadRequest");
 }
 
-void DefaultWindowManager::LoadData (web_view_t, const char*, const char*, const char*, const char*)
+void DefaultWindowManager::LoadData (web_view_t, const char*, size_t, const char*, const char*, const char*)
 {
   raise ("syslib::DefaultWindowManager::LoadData");
 }
@@ -329,6 +331,7 @@ void DefaultWindowManager::StopLoading (web_view_t)
 bool DefaultWindowManager::IsLoading (web_view_t)
 {
   raise ("syslib::DefaultWindowManager::IsLoading");
+  return false;
 }
 
 /*
@@ -338,11 +341,13 @@ bool DefaultWindowManager::IsLoading (web_view_t)
 bool DefaultWindowManager::CanGoBack (web_view_t)
 {
   raise ("syslib::DefaultWindowManager::CanGoBack");
+  return false;
 }
 
 bool DefaultWindowManager::CanGoForward (web_view_t)
 {
   raise ("syslib::DefaultWindowManager::CreateWebView");
+  return false;
 }
 
 void DefaultWindowManager::GoBack (web_view_t)
