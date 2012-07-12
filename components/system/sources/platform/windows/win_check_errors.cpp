@@ -3,9 +3,6 @@
 namespace syslib
 {
 
-namespace
-{
-
 //получение строки с сообщением об ошибке
 stl::string get_error_message (DWORD error_code)
 {
@@ -53,6 +50,10 @@ stl::string get_error_message (DWORD error_code)
   }
 }
 
+//получение ошибки COM
+stl::string get_com_error_message (HRESULT result)
+{
+  return _com_error (result).ErrorMessage ();
 }
 
 //проверка ошибок использования WinAPI и генерация исключения в случае их наличия
@@ -61,7 +62,7 @@ void check_errors (const char* source)
   DWORD error_code = GetLastError ();
   
   if (error_code)
-    throw xtl::format_operation_exception ("common::check_errors", get_error_message (error_code).c_str ());
+    throw xtl::format_operation_exception ("syslib::check_errors", get_error_message (error_code).c_str ());
 }
 
 void raise_error (const char* source)
@@ -77,6 +78,21 @@ void raise_error (const char* source)
   }
 
   throw xtl::format_operation_exception (source, "Invalid operation");
+}
+
+void raise_com_error (const char* source, const char* message, HRESULT result)
+{
+  try
+  {
+    _com_error error (result);
+
+    throw xtl::format_operation_exception ("syslib::raise_com_error", "%s. %s", message, error.ErrorMessage ());
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch (source);
+    throw;
+  }
 }
 
 }

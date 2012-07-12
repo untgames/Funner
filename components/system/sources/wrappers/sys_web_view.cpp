@@ -44,7 +44,7 @@ struct WebView::Impl: public IWebViewListener
   ~Impl ()
   {
     try
-    {
+    {            
       Platform::DestroyWebView (handle);
     }
     catch (std::exception& e)
@@ -68,7 +68,7 @@ struct WebView::Impl: public IWebViewListener
       this->request = request;
       status        = "Loading";
       
-      events [WebViewEvent_OnLoadStarted] (*owner, WebViewEvent_OnLoadStarted);
+      events [WebViewEvent_OnLoadStart] (*owner, WebViewEvent_OnLoadStart);
     }
     catch (std::exception& e)
     {
@@ -86,7 +86,7 @@ struct WebView::Impl: public IWebViewListener
     {
       status = "Loaded";
       
-      events [WebViewEvent_OnLoadFinished] (*owner, WebViewEvent_OnLoadFinished);
+      events [WebViewEvent_OnLoadFinish] (*owner, WebViewEvent_OnLoadFinish);
     }
     catch (std::exception& e)
     {
@@ -107,7 +107,7 @@ struct WebView::Impl: public IWebViewListener
       
       status = common::format ("Load failed: %s", error_message);
       
-      events [WebViewEvent_OnLoadFailed] (*owner, WebViewEvent_OnLoadFailed);
+      events [WebViewEvent_OnLoadFail] (*owner, WebViewEvent_OnLoadFail);
     }
     catch (std::exception& e)
     {
@@ -117,6 +117,25 @@ struct WebView::Impl: public IWebViewListener
     {
       log.Printf ("Unknown exception\n    at syslib::WebView::Impl::OnLoadFailed");
     }
+  }
+  
+///События взаимодействия с окном
+  void OnClose ()
+  {
+    try
+    {
+      status = "Closed";
+      
+      events [WebViewEvent_OnClose] (*owner, WebViewEvent_OnClose);
+    }
+    catch (std::exception& e)
+    {
+      log.Printf ("%s\n    at syslib::WebView::Impl::OnClose", e.what ());
+    }    
+    catch (...)
+    {
+      log.Printf ("Unknown exception\n    at syslib::WebView::Impl::OnClose");
+    }    
   }
 
 ///Проверка необходимости открытия ссылки
@@ -163,6 +182,18 @@ WebView::WebView ()
 
 WebView::~WebView ()
 {
+  try
+  {            
+    impl->events [WebViewEvent_OnDestroy] (*this, WebViewEvent_OnDestroy);
+  }
+  catch (std::exception& e)
+  {
+    impl->log.Printf ("%s\n    at syslib::WebView::~WebView", e.what ());
+  }    
+  catch (...)
+  {
+    impl->log.Printf ("Unknown exception\n    at syslib::WebView::~WebView");      
+  }
 }
 
 /*
@@ -354,9 +385,11 @@ xtl::connection WebView::RegisterEventHandler (WebViewEvent event, const EventHa
 {
   switch (event)
   {
-    case WebViewEvent_OnLoadStarted:
-    case WebViewEvent_OnLoadFailed:
-    case WebViewEvent_OnLoadFinished:
+    case WebViewEvent_OnLoadStart:
+    case WebViewEvent_OnLoadFail:
+    case WebViewEvent_OnLoadFinish:
+    case WebViewEvent_OnClose:
+    case WebViewEvent_OnDestroy:
       break;
     default:
       throw xtl::make_argument_exception ("syslib::WebView::RegisterEventHandler", "event", event);

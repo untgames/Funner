@@ -11,9 +11,11 @@ namespace syslib
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 enum WebViewEvent
 {
-  WebViewEvent_OnLoadStarted,  //вызывается в начале загрузки данных
-  WebViewEvent_OnLoadFinished, //вызывается в конце загрузки данных
-  WebViewEvent_OnLoadFailed,   //вызывается в случае ошибки при загрузке данных
+  WebViewEvent_OnLoadStart,  //вызывается в начале загрузки данных
+  WebViewEvent_OnLoadFinish, //вызывается в конце загрузки данных
+  WebViewEvent_OnLoadFail,   //вызывается в случае ошибки при загрузке данных
+  WebViewEvent_OnClose,      //вызывается после закрытия окна
+  WebViewEvent_OnDestroy,    //вызывается при уничтожении WebView
   
   WebViewEvent_Num
 };

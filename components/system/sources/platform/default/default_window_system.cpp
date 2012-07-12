@@ -331,7 +331,7 @@ void DefaultWindowManager::StopLoading (web_view_t)
 bool DefaultWindowManager::IsLoading (web_view_t)
 {
   raise ("syslib::DefaultWindowManager::IsLoading");
-  return false;
+  return false;  
 }
 
 /*
@@ -347,7 +347,7 @@ bool DefaultWindowManager::CanGoBack (web_view_t)
 bool DefaultWindowManager::CanGoForward (web_view_t)
 {
   raise ("syslib::DefaultWindowManager::CreateWebView");
-  return false;
+  return false;  
 }
 
 void DefaultWindowManager::GoBack (web_view_t)

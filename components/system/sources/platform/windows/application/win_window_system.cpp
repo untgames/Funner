@@ -6,7 +6,7 @@ using namespace common;
 namespace
 {
 
-const wchar_t* WINDOW_CLASS_NAME = L"Default window class";
+const wchar_t* WINDOW_CLASS_NAME = L"Funner.Default window class";
 const char* LOG_NAME          = "system.windows";
 
 /*
@@ -625,7 +625,7 @@ UINT get_window_style (WindowStyle style, bool has_parent)
 
 #undef CreateWindow
 
-window_t WindowsWindowManager::CreateWindow (WindowStyle style, WindowMessageHandler handler, const void* parent_handle, const char* init_string, void* user_data)
+window_t WindowsWindowManager::CreateWindow (WindowStyle style, WindowMessageHandler handler, const void* parent_handle, const char* init_string, void* user_data, const wchar_t* class_name)
 {  
   try
   {
@@ -653,7 +653,10 @@ window_t WindowsWindowManager::CreateWindow (WindowStyle style, WindowMessageHan
 
     try
     {
-      HWND wnd = CreateWindowExW (0, WINDOW_CLASS_NAME, L"", win_style, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT,
+      if (!class_name)
+        class_name = WINDOW_CLASS_NAME;
+      
+      HWND wnd = CreateWindowExW (0, class_name, L"", win_style, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT,
                                 (HWND)parent_handle, 0, GetApplicationInstance (), window_impl);
 
       if (!wnd)

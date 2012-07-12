@@ -98,7 +98,7 @@ struct Window::Impl: public xtl::trackable
 ///Принудительное закрытие окна
     void ForceClose ()
     {
-      if (!handle)
+      if (!handle || embedded)
         return;
         
 //      Notify (WindowEvent_OnClose);      
