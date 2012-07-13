@@ -9,12 +9,15 @@ namespace
 {
 
 //constants
-const size_t        SEND_QUEUE_SIZE          = 16;
-const size_t        KEEP_ALIVE_INTERVAL      = 30000;
-const size_t        COMPRESSION_THRESHOLD    = 1024;
-const unsigned char ENCRYPTION_KEY []        = { 0xd0, 0x71, 0x73, 0x41, 0x0d, 0xee, 0xd2, 0x6f, 0x44, 0x3f, 0x7b, 0xa4, 0x42, 0x2f, 0x86, 0x03 };
-const char*         QUOTE_REPLACEMENT        = "\\u0027";
-const size_t        QUOTE_REPLACEMENT_LENGTH = strlen (QUOTE_REPLACEMENT);
+const char*         APP_ID                            = "2972852";
+const char*         APP_SECRET                        = "mdKdkpp6bmZ8yrIITjUD";
+const char*         PLARIUM_TOKEN_NOTIFICATION_PREFIX = "GetPlariumToken#";
+const size_t        SEND_QUEUE_SIZE                   = 16;
+const size_t        KEEP_ALIVE_INTERVAL               = 30000;
+const size_t        COMPRESSION_THRESHOLD             = 1024;
+const unsigned char ENCRYPTION_KEY []                 = { 0xd0, 0x71, 0x73, 0x41, 0x0d, 0xee, 0xd2, 0x6f, 0x44, 0x3f, 0x7b, 0xa4, 0x42, 0x2f, 0x86, 0x03 };
+const char*         QUOTE_REPLACEMENT                 = "\\u0027";
+const size_t        QUOTE_REPLACEMENT_LENGTH          = strlen (QUOTE_REPLACEMENT);
 
 }
 
@@ -72,6 +75,7 @@ struct Application::Impl : public INotificationListener, public IHsConnectionEve
     engine = in_engine;
 
     engine->AttachNotificationListener ("HsConnection *", this);
+    engine->AttachNotificationListener (format ("%s*", PLARIUM_TOKEN_NOTIFICATION_PREFIX).c_str (), this);
 
     engine->Run ();
   }
@@ -80,34 +84,54 @@ struct Application::Impl : public INotificationListener, public IHsConnectionEve
   {
     static const char* METHOD_NAME = "plarium::launcher::Application::OnNotification";
 
-    sgi_stl::vector<sgi_stl::string> words   = split (notification, " ", "'\"");
-    const sgi_stl::string&       command = words [1];
-
-    if (command == "Connect")
+    if (strstr (notification, PLARIUM_TOKEN_NOTIFICATION_PREFIX) == notification)
     {
-      if (words.size () != 4)
-        throw sgi_stl::invalid_argument (format ("%s: invalid 'Connect' arguments '%s'", METHOD_NAME, notification));
+      sgi_stl::string token_source = format ("%s_%s_%s", APP_ID, notification + strlen (PLARIUM_TOKEN_NOTIFICATION_PREFIX), APP_SECRET);
 
-      host = words [2];
-      port = atoi (words [3].c_str ());
+      unsigned char token [16];
 
-      connection->Connect (host.c_str (), port);
+      md5 (token_source.c_str (), token_source.size (), token);
+
+      char token_string [33];
+
+      for (size_t i = 0; i < sizeof (token); i++)
+        sprintf (token_string + i * 2, "%02x", token [i]);
+
+      token_string [32] = 0;
+
+      engine->Execute (format ("lua: OnPlariumTokenObtained ('%s')", token_string).c_str ());
     }
-    else if (command == "Disconnect")
+    else
     {
-      connection->Disconnect ();
-    }
-    else if (command == "Reconnect")
-    {
-      connection->Disconnect ();
-      connection->Connect (host.c_str (), port);
-    }
-    else if (command == "SendMessage")
-    {
-      if (words.size () != 4)
-        throw sgi_stl::invalid_argument (format ("%s: invalid 'SendMessage' arguments '%s'", METHOD_NAME, notification));
+      sgi_stl::vector<sgi_stl::string> words   = split (notification, " ", "'\"");
+      const sgi_stl::string&       command = words [1];
 
-      connection->SendMessage (atoi (words [2].c_str ()), (const unsigned char*)words [3].c_str (), words [3].size ());
+      if (command == "Connect")
+      {
+        if (words.size () != 4)
+          throw sgi_stl::invalid_argument (format ("%s: invalid 'Connect' arguments '%s'", METHOD_NAME, notification));
+
+        host = words [2];
+        port = atoi (words [3].c_str ());
+
+        connection->Connect (host.c_str (), port);
+      }
+      else if (command == "Disconnect")
+      {
+        connection->Disconnect ();
+      }
+      else if (command == "Reconnect")
+      {
+        connection->Disconnect ();
+        connection->Connect (host.c_str (), port);
+      }
+      else if (command == "SendMessage")
+      {
+        if (words.size () != 4)
+          throw sgi_stl::invalid_argument (format ("%s: invalid 'SendMessage' arguments '%s'", METHOD_NAME, notification));
+
+        connection->SendMessage (atoi (words [2].c_str ()), (const unsigned char*)words [3].c_str (), words [3].size ());
+      }
     }
   }
 
