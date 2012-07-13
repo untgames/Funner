@@ -2,9 +2,6 @@
 
 #import <syslib/platform/iphone.h>
 
-#import <Foundation/Foundation.h>
-#import <UIKit/UIKit.h>
-
 #import <UIKit/UIApplication.h>
 #import <UIKit/UIScreen.h>
 #import <UIKit/UITouch.h>
@@ -770,7 +767,7 @@ void IPhoneWindowManager::SetWindowFlag (window_t handle, WindowFlag flag, bool 
         if (wnd)
           wnd.bounds = [UIScreen mainScreen].applicationFrame;
         else
-          view.frame = get_transformed_view_rect_size (window.rootViewController.view.bounds, window);
+          view.frame = window.rootViewController.view.bounds;
 
         break;
       case WindowFlag_Minimized:
