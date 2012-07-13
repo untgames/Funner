@@ -1,6 +1,7 @@
 #include "shared.h"
 
 #import <UIKit/UIWebView.h>
+#import <UIKit/UIViewController.h>
 
 using namespace syslib;
 
@@ -30,7 +31,9 @@ using namespace syslib;
 
   self.hidden = YES;
 
-  [[UIApplication sharedApplication].keyWindow addSubview:self];
+  self.autoresizingMask = UIViewAutoresizingFlexibleWidth  | UIViewAutoresizingFlexibleHeight;
+
+  [[UIApplication sharedApplication].keyWindow.rootViewController.view addSubview:self];
 
   return self;
 }

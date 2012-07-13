@@ -190,11 +190,18 @@ xtl::trackable_ptr<Window> get_web_view_window (WebView& web_view)
   return &web_view.Window ();
 }
 
+xtl::shared_ptr<WebView> create_web_view ()
+{
+  return xtl::shared_ptr<WebView> (new WebView);
+}
+
 void bind_web_view_library (Environment& environment)
 {
   InvokerRegistry lib = environment.Library (WEB_VIEW_LIBRARY);
 
     //регистрация операций
+
+  lib.Register ("Create", make_invoker (&create_web_view));
 
   lib.Register ("get_Window",           make_invoker (&get_web_view_window));
   lib.Register ("get_IsLoading",        make_invoker (&WebView::IsLoading));

@@ -2,6 +2,9 @@
 
 #import <syslib/platform/iphone.h>
 
+#import <Foundation/Foundation.h>
+#import <UIKit/UIKit.h>
+
 #import <UIKit/UIApplication.h>
 #import <UIKit/UIScreen.h>
 #import <UIKit/UITouch.h>
@@ -26,6 +29,34 @@ InterfaceOrientation get_interface_orientation (UIInterfaceOrientation interface
     case UIInterfaceOrientationLandscapeRight:     return InterfaceOrientation_LandscapeRight;
     default:                                       return InterfaceOrientation_Unknown;
   }
+}
+
+CGRect get_transformed_view_rect_size (CGRect frame, UIWindow* window)
+{
+  UIInterfaceOrientation ui_orientation = window.rootViewController.interfaceOrientation;
+
+  switch (ui_orientation)
+  {
+    case UIInterfaceOrientationLandscapeLeft:
+    case UIInterfaceOrientationLandscapeRight:
+    {
+      float temp = frame.size.width;
+
+      frame.size.width  = frame.size.height;
+      frame.size.height = temp;
+
+      temp = frame.origin.x;
+
+      frame.origin.x = frame.origin.y;
+      frame.origin.y = temp;
+
+      break;
+    }
+    default:
+      break;
+  }
+
+  return frame;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -586,30 +617,7 @@ void IPhoneWindowManager::SetWindowRect (window_t handle, const Rect& rect)
   frame.origin.x    = rect.left / scale_factor;
   frame.origin.y    = rect.top / scale_factor;
 
-  UIInterfaceOrientation ui_orientation = window.rootViewController.interfaceOrientation;
-
-  switch (ui_orientation)
-  {
-    case UIInterfaceOrientationLandscapeLeft:
-    case UIInterfaceOrientationLandscapeRight:
-    {
-      float temp = frame.size.width;
-
-      frame.size.width  = frame.size.height;
-      frame.size.height = temp;
-
-      temp = frame.origin.x;
-
-      frame.origin.x = frame.origin.y;
-      frame.origin.y = temp;
-
-      break;
-    }
-    default:
-      break;
-  }
-
-  view.frame = frame;
+  view.frame = get_transformed_view_rect_size (frame, window);
 
   if (window_wrapper)
   {
@@ -686,15 +694,19 @@ void IPhoneWindowManager::SetWindowFlag (window_t handle, WindowFlag flag, bool 
 
   UIView             *view          = (UIView*)handle;
   UIWindowWrapper    *wnd           = nil;
-  WindowImpl         *window        = 0;
+  UIWindow           *window        = nil;
+  WindowImpl         *window_impl   = 0;
   WindowEventContext *dummy_context = 0;
 
   if ([view isKindOfClass:[UIWindowWrapper class]])
   {
     wnd           = (UIWindowWrapper*)handle;
-    window        = wnd.window_impl;
+    window        = wnd;
+    window_impl   = wnd.window_impl;
     dummy_context = &[wnd getEventContext];
   }
+  else
+    window = view.window;
 
   try
   {
@@ -707,14 +719,15 @@ void IPhoneWindowManager::SetWindowFlag (window_t handle, WindowFlag flag, bool 
 
           view.hidden = NO;
 
-          if (window)
-            window->Notify (WindowEvent_OnShow, *dummy_context);
+          if (window_impl)
+            window_impl->Notify (WindowEvent_OnShow, *dummy_context);
         }
         else
         {
           view.hidden = YES;
 
-          window->Notify (WindowEvent_OnHide, *dummy_context);
+          if (window_impl)
+            window_impl->Notify (WindowEvent_OnHide, *dummy_context);
         }
 
         break;
@@ -723,8 +736,8 @@ void IPhoneWindowManager::SetWindowFlag (window_t handle, WindowFlag flag, bool 
         {
           [wnd makeKeyAndVisible];
 
-          if (window)
-            window->Notify (WindowEvent_OnActivate, *dummy_context);
+          if (window_impl)
+            window_impl->Notify (WindowEvent_OnActivate, *dummy_context);
         }
         else
           throw xtl::format_operation_exception ("", "Can't make window inactive");
@@ -738,8 +751,8 @@ void IPhoneWindowManager::SetWindowFlag (window_t handle, WindowFlag flag, bool 
           else
             view.userInteractionEnabled = YES;
 
-          if (window)
-            window->Notify (WindowEvent_OnSetFocus, *dummy_context);
+          if (window_impl)
+            window_impl->Notify (WindowEvent_OnSetFocus, *dummy_context);
         }
         else
         {
@@ -748,13 +761,17 @@ void IPhoneWindowManager::SetWindowFlag (window_t handle, WindowFlag flag, bool 
           else
             view.userInteractionEnabled = NO;
 
-          if (window)
-            window->Notify (WindowEvent_OnLostFocus, *dummy_context);
+          if (window_impl)
+            window_impl->Notify (WindowEvent_OnLostFocus, *dummy_context);
         }
 
         break;
       case WindowFlag_Maximized:
-        view.bounds = [UIScreen mainScreen].applicationFrame;
+        if (wnd)
+          wnd.bounds = [UIScreen mainScreen].applicationFrame;
+        else
+          view.frame = get_transformed_view_rect_size (window.rootViewController.view.bounds, window);
+
         break;
       case WindowFlag_Minimized:
         throw xtl::format_operation_exception ("", "Can't minimize window");
@@ -801,7 +818,12 @@ bool IPhoneWindowManager::GetWindowFlag (window_t handle, WindowFlag flag)
           return view.userInteractionEnabled == YES;
       case WindowFlag_Maximized:
       {
-        CGRect maximized_rect = [UIScreen mainScreen].applicationFrame;
+        CGRect maximized_rect;
+
+        if (wnd)
+          maximized_rect = [UIScreen mainScreen].applicationFrame;
+        else
+          maximized_rect = get_transformed_view_rect_size (window.rootViewController.view.bounds, window);
 
         maximized_rect.origin.x = 0;
         maximized_rect.origin.y = 0;
