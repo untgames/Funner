@@ -144,9 +144,9 @@ struct WebView::Impl: public IWebViewListener
     try
     {
       if (!request)
-        throw xtl::make_null_argument_exception ("", "request");
+        throw xtl::make_null_argument_exception ("", "request");              
           
-      return filters (*owner, request);
+      return filters.empty () ? true : filters (*owner, request);
     }
     catch (std::exception& e)
     {
