@@ -2,15 +2,13 @@
 
 #include <syslib/application.h>
 #include <syslib/screen.h>
+#include <syslib/web_view.h>
 #include <syslib/window.h>
 
 using namespace script;
 using namespace syslib;
 
-namespace components
-{
-
-namespace system_script_bind
+namespace
 {
 
 /*
@@ -19,6 +17,8 @@ namespace system_script_bind
 
 const char* APPLICATION_LIBRARY       = "System.Application";
 const char* APPLICATION_EVENT_LIBRARY = "System.ApplicationEvent";
+const char* WEB_VIEW_LIBRARY          = "System.WebView";
+const char* WEB_VIEW_EVENT_LIBRARY    = "System.WebViewEvent";
 const char* WINDOW_STYLE_LIBRARY      = "System.WindowStyle";
 const char* WINDOW_LIBRARY            = "System.Window";
 const char* SCREEN_LIBRARY            = "System.Screen";
@@ -164,6 +164,58 @@ void bind_window_library (Environment& environment)
   environment.RegisterType<Window> (WINDOW_LIBRARY);
 }
 
+void bind_web_view_events_library (Environment& environment)
+{
+  InvokerRegistry lib = environment.Library (WEB_VIEW_EVENT_LIBRARY);
+
+  lib.Register ("get_OnLoadStart",  make_const (WebViewEvent_OnLoadStart));
+  lib.Register ("get_OnLoadFinish", make_const (WebViewEvent_OnLoadFinish));
+  lib.Register ("get_OnLoadFail",   make_const (WebViewEvent_OnLoadFail));
+  lib.Register ("get_OnClose",      make_const (WebViewEvent_OnClose));
+  lib.Register ("get_OnDestroy",    make_const (WebViewEvent_OnDestroy));
+}
+
+xtl::connection register_web_view_event_handler (WebView& web_view, WebViewEvent event, const xtl::function<void (WebViewEvent)>& handler)
+{
+  return web_view.RegisterEventHandler (event, xtl::bind (handler, _2));
+}
+
+xtl::connection register_web_view_filter (WebView& web_view, const xtl::function<bool (const char*)>& filter)
+{
+  return web_view.RegisterFilter (xtl::bind (filter, _2));
+}
+
+xtl::trackable_ptr<Window> get_web_view_window (WebView& web_view)
+{
+  return &web_view.Window ();
+}
+
+void bind_web_view_library (Environment& environment)
+{
+  InvokerRegistry lib = environment.Library (WEB_VIEW_LIBRARY);
+
+    //регистрация операций
+
+  lib.Register ("get_Window",           make_invoker (&get_web_view_window));
+  lib.Register ("get_IsLoading",        make_invoker (&WebView::IsLoading));
+  lib.Register ("get_Request",          make_invoker (&WebView::Request));
+  lib.Register ("get_Status",           make_invoker (&WebView::Status));
+  lib.Register ("get_CanGoBack",        make_invoker (&WebView::CanGoBack));
+  lib.Register ("get_CanGoForward",     make_invoker (&WebView::CanGoForward));
+  lib.Register ("LoadRequest",          make_invoker (&WebView::LoadRequest));
+  lib.Register ("LoadData",             make_invoker (&WebView::LoadData));
+  lib.Register ("Reload",               make_invoker (&WebView::Reload));
+  lib.Register ("StopLoading",          make_invoker (&WebView::StopLoading));
+  lib.Register ("GoBack",               make_invoker (&WebView::GoBack));
+  lib.Register ("GoForward",            make_invoker (&WebView::GoForward));
+  lib.Register ("CreateFilter",         make_callback_invoker<bool (const char*)> ());
+  lib.Register ("RegisterFilter",       make_invoker (&register_web_view_filter));
+  lib.Register ("CreateEventHandler",   make_callback_invoker<void (WebViewEvent)> ());
+  lib.Register ("RegisterEventHandler", make_invoker (&register_web_view_event_handler));
+
+  environment.RegisterType<WebView> (WEB_VIEW_LIBRARY);
+}
+
 size_t get_screen_default_width (const syslib::Screen& screen)
 {
   syslib::ScreenModeDesc desc;
@@ -231,9 +283,19 @@ void bind_syslib_library (Environment& environment)
   bind_application_library        (environment);
   bind_window_styles_library      (environment);  
   bind_window_library             (environment);
+  bind_web_view_events_library    (environment);
+  bind_web_view_library           (environment);
   bind_screen_library             (environment);
   bind_screen_manager_library     (environment);  
 }
+
+}
+
+namespace components
+{
+
+namespace system_script_bind
+{
 
 /*
     Компонент
