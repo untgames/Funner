@@ -560,12 +560,22 @@ void IPhoneWindowManager::GetWindowTitle (window_t handle, size_t size, wchar_t*
     Область окна / клиентская область
 */
 
-void IPhoneWindowManager::SetWindowRect (window_t window, const Rect& rect)
+void IPhoneWindowManager::SetWindowRect (window_t handle, const Rect& rect)
 {
-  if (!window)
-    throw xtl::make_null_argument_exception ("syslib::IPhoneWindowManager::SetWindowRect", "window");
+  if (!handle)
+    throw xtl::make_null_argument_exception ("syslib::IPhoneWindowManager::SetWindowRect", "handle");
 
-  UIView* view = (UIView*)window;
+  UIView*          view           = (UIView*)handle;
+  UIWindowWrapper* window_wrapper = nil;
+  UIWindow*        window         = nil;
+
+  if ([view isKindOfClass:[UIWindowWrapper class]])
+  {
+    window_wrapper = (UIWindowWrapper*)handle;
+    window         = (UIWindow*)handle;
+  }
+  else
+    window = view.window;
 
   float scale_factor = view.contentScaleFactor;
 
@@ -576,7 +586,7 @@ void IPhoneWindowManager::SetWindowRect (window_t window, const Rect& rect)
   frame.origin.x    = rect.left / scale_factor;
   frame.origin.y    = rect.top / scale_factor;
 
-  UIInterfaceOrientation ui_orientation = view.window.rootViewController.interfaceOrientation;
+  UIInterfaceOrientation ui_orientation = window.rootViewController.interfaceOrientation;
 
   switch (ui_orientation)
   {
@@ -601,12 +611,11 @@ void IPhoneWindowManager::SetWindowRect (window_t window, const Rect& rect)
 
   view.frame = frame;
 
-  if ([view isKindOfClass:[UIWindowWrapper class]])
+  if (window_wrapper)
   {
-    UIWindowWrapper* wnd         = (UIWindowWrapper*)view;
-    WindowImpl*      window_impl = wnd.window_impl;
+    WindowImpl* window_impl = window_wrapper.window_impl;
 
-    WindowEventContext& dummy_context = [wnd getEventContext];
+    WindowEventContext& dummy_context = [window_wrapper getEventContext];
 
     window_impl->Notify (WindowEvent_OnMove, dummy_context);
     window_impl->Notify (WindowEvent_OnSize, dummy_context);
@@ -618,13 +627,14 @@ void IPhoneWindowManager::SetClientRect (window_t handle, const Rect& rect)
   SetWindowRect (handle, rect);
 }
 
-void IPhoneWindowManager::GetWindowRect (window_t window, Rect& rect)
+void IPhoneWindowManager::GetWindowRect (window_t handle, Rect& rect)
 {
-  if (!window)
-    throw xtl::make_null_argument_exception ("syslib::IPhoneWindowManager::GetWindowRect", "window");
+  if (!handle)
+    throw xtl::make_null_argument_exception ("syslib::IPhoneWindowManager::GetWindowRect", "handle");
 
-  UIView                 *view          = (UIView*)window;
-  UIInterfaceOrientation ui_orientation = view.window.rootViewController.interfaceOrientation;
+  UIView                 *view          = (UIView*)handle;
+  UIWindow               *window        = [view isKindOfClass:[UIWindowWrapper class]] ? (UIWindow*)handle : view.window;
+  UIInterfaceOrientation ui_orientation = window.rootViewController.interfaceOrientation;
 
   float scale_factor = view.contentScaleFactor;
 
@@ -764,13 +774,17 @@ bool IPhoneWindowManager::GetWindowFlag (window_t handle, WindowFlag flag)
   if (!handle)
     throw xtl::make_null_argument_exception ("syslib::IPhoneWindowManager::GetWindowFlag", "handle");
 
-  UIView*          view = (UIView*)handle;
-  UIWindowWrapper* wnd  = 0;
+  UIView*          view   = (UIView*)handle;
+  UIWindow*        window = 0;
+  UIWindowWrapper* wnd    = 0;
 
   if ([view isKindOfClass:[UIWindowWrapper class]])
   {
-    wnd = (UIWindowWrapper*)handle;
+    wnd    = (UIWindowWrapper*)handle;
+    window = wnd;
   }
+  else
+    window = view.window;
 
   try
   {
@@ -779,7 +793,7 @@ bool IPhoneWindowManager::GetWindowFlag (window_t handle, WindowFlag flag)
       case WindowFlag_Visible:
         return view.hidden == NO;
       case WindowFlag_Active:
-        return view.window == [UIApplication sharedApplication].keyWindow;
+        return window == [UIApplication sharedApplication].keyWindow;
       case WindowFlag_Focus:
         if (wnd)
           return wnd.rootViewController.view.userInteractionEnabled == YES;
