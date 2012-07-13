@@ -59,7 +59,7 @@ int main ()
     
     view.Window ().Show ();
 
-    view.LoadRequest ("http://www.google1.com");
+    view.LoadRequest ("http://google.com");
 
     Application::Run ();
 

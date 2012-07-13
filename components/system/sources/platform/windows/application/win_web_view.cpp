@@ -125,8 +125,6 @@ struct syslib::web_view_handle: public IUnknown
   {
     try
     {
-      printf ("%s(%u)\n", __FUNCTION__, __LINE__); fflush (stdout);
-
       WindowsWindowManager::DestroyWindow (host_window);
     }
     catch (...)
@@ -158,7 +156,9 @@ struct syslib::web_view_handle: public IUnknown
 
     IOleObject* iole = 0;
 
-    ibrowser->QueryInterface (IID_IOleObject, (void**)&iole); 
+    ibrowser->QueryInterface (IID_IOleObject, (void**)&iole);     
+    
+    ibrowser->Quit ();
 
     ibrowser->Release ();
 
@@ -166,7 +166,7 @@ struct syslib::web_view_handle: public IUnknown
     {
       iole->Close  (OLECLOSE_NOSAVE); 
       iole->Release ();
-    }    
+    }
   }
   
 /// IUnknown
@@ -216,10 +216,10 @@ struct syslib::web_view_handle: public IUnknown
   
   ULONG STDMETHODCALLTYPE Release ()
   {
-    int tmp = InterlockedDecrement (&ref_count); 
+    int tmp = InterlockedDecrement (&ref_count);     
     
-    if (!tmp) 
-      delete this; 
+//    if (!tmp)  //it is not needed, because WebView removes manually
+//      delete this;       
       
     return tmp;
   }  
@@ -446,7 +446,6 @@ struct syslib::web_view_handle: public IUnknown
         break;
       }
       case WindowEvent_OnDestroy:
-      printf ("%s(%u)\n", __FUNCTION__, __LINE__); fflush (stdout);      
         if (listener)
           listener->OnClose ();
 
@@ -594,6 +593,8 @@ void WindowsWindowManager::DestroyWebView (web_view_t handle)
     throw xtl::make_null_argument_exception ("syslib::WindowsWindowManager::DestroyWebView", "handle");
 
   view->Close ();
+  
+  delete view;
 }
 
 /*
