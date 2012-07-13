@@ -62,6 +62,8 @@ int main ()
     view.LoadRequest ("http://google.com");
 
     Application::Run ();
+    
+    printf ("can_go_forward: %d, can_go_back: %d\n", view.CanGoForward (), view.CanGoBack ());
 
     return Application::GetExitCode ();
   }

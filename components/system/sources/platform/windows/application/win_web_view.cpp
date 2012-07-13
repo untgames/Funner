@@ -41,6 +41,8 @@ struct syslib::web_view_handle: public IUnknown
   IWebBrowser2*     ibrowser;           //указатель на браузер
   DWORD             cookie;             //cookie
   bool              is_loading;         //загружается ли контент
+  bool              can_go_forward;     //возможно ли перемещение вперед
+  bool              can_go_back;        //возможно ли перемещение назад
   
 ///Конструктор
   web_view_handle (IWebViewListener* in_listener)
@@ -57,6 +59,8 @@ struct syslib::web_view_handle: public IUnknown
     , dispatch (this)
     , ui_handler (this)
     , is_loading (false)
+    , can_go_forward (false)
+    , can_go_back (false)
   {   
     IOleObject* iole = 0;
     
@@ -355,6 +359,20 @@ struct syslib::web_view_handle: public IUnknown
         case DISPID_DOCUMENTCOMPLETE:
           parent->DocumentComplete (params->rgvarg [0].pvarVal->bstrVal); 
           break;
+        case DISPID_COMMANDSTATECHANGE:
+        {
+          DWORD command = params->rgvarg [1].lVal;
+          bool  enabled = params->rgvarg [0].iVal != VARIANT_FALSE;
+
+          switch (command)
+          {
+            case CSC_NAVIGATEFORWARD: parent->can_go_forward = enabled; break;
+            case CSC_NAVIGATEBACK:    parent->can_go_back    = enabled; break;            
+            default:                  break;
+          }
+
+          break;
+        }
         case DISPID_NAVIGATEERROR: 
         {
           //Extract the status code from the DISPPARAMS structure
@@ -378,7 +396,7 @@ struct syslib::web_view_handle: public IUnknown
 
       return S_OK;
     }
-  } dispatch;
+  } dispatch;  
     
 /// IDocHostUIHandler
   struct DocHostUIHandler: public IDocHostUIHandler
@@ -709,14 +727,40 @@ bool WindowsWindowManager::IsLoading (web_view_t handle)
     Средства навигации
 */
 
-bool WindowsWindowManager::CanGoBack (web_view_t)
+bool WindowsWindowManager::CanGoBack (web_view_t handle)
 {  
-  throw xtl::make_not_implemented_exception ("syslib::WindowsWindowManager::CanGoBack");
+  try
+  {
+    WebViewImpl* view = (WebViewImpl*)handle;
+  
+    if (!handle)
+      throw xtl::make_null_argument_exception ("", "handle");        
+      
+    return view->can_go_back;
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("syslib::WindowsWindowManager::CanGoBack");
+    throw;
+  }
 }
 
-bool WindowsWindowManager::CanGoForward (web_view_t)
+bool WindowsWindowManager::CanGoForward (web_view_t handle)
 {
-  throw xtl::make_not_implemented_exception ("syslib::WindowsWindowManager::CreateWebView");
+  try
+  {
+    WebViewImpl* view = (WebViewImpl*)handle;
+  
+    if (!handle)
+      throw xtl::make_null_argument_exception ("", "handle");        
+      
+    return view->can_go_forward;
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("syslib::WindowsWindowManager::CanGoForward");
+    throw;
+  }
 }
 
 void WindowsWindowManager::GoBack (web_view_t handle)
