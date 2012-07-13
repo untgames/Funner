@@ -32,6 +32,7 @@ using namespace syslib;
   self.hidden = YES;
 
   self.autoresizingMask = UIViewAutoresizingFlexibleWidth  | UIViewAutoresizingFlexibleHeight;
+  self.scalesPageToFit  = YES;
 
   [[UIApplication sharedApplication].keyWindow.rootViewController.view addSubview:self];
 
