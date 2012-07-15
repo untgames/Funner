@@ -397,7 +397,7 @@ class DisplayManagerImpl
     stl::string           display_string; //строка инициализации дисплея
     ::Display*            display;        //ссылка на дисплей
     bool                  sync_mode;      //находится ли соединение в режиме синхронизации
-    stl::auto_ptr<Thread> events_thread;  //нить обработки событий окна    
+    stl::auto_ptr<Thread> events_thread;  //нить обработки событий окна
     bool                  event_loop;     //класс находится в состоянии обработки событий
     WindowHandlerMap      handlers;       //отображение системных окон на внутренние структуры обработки сообщений
 };
@@ -440,7 +440,7 @@ struct syslib::window_handle: public IWindowMessageHandler, public MessageQueue:
   Rect                 window_rect;           //область окна
   bool                 window_rect_init;      //инициализирована ли область окна
   Cursor               invisible_cursor;      //невидимый курсор
-  bool                 is_cursor_visible;     //видим ли курсор  
+  bool                 is_cursor_visible;     //видим ли курсор
   cursor_t             active_cursor;         //активный курсор окна
   syslib::Color        background_color;      //цвет заднего фона
   MessageQueue&        message_queue;         //очередь событий
@@ -548,7 +548,7 @@ struct syslib::window_handle: public IWindowMessageHandler, public MessageQueue:
         
         context.cursor_position = Point (event.xkey.x, event.xkey.y);
         context.key_scan_code   = (ScanCode)event.xkey.keycode;
-        context.key             = VirtualKey2SystemKey (XKeycodeToKeysym (display, event.xkey.keycode, 0));
+        context.key             = VirtualKey2SystemKey (XkbKeycodeToKeysym (display, event.xkey.keycode, 0, 0));
         
         Notify (WindowEvent_OnKeyDown, message);
         
@@ -560,7 +560,7 @@ struct syslib::window_handle: public IWindowMessageHandler, public MessageQueue:
         
         context.cursor_position = Point (event.xkey.x, event.xkey.y);
         context.key_scan_code   = (ScanCode)event.xkey.keycode;
-        context.key             = VirtualKey2SystemKey (XKeycodeToKeysym (display, event.xkey.keycode, 0));
+        context.key             = VirtualKey2SystemKey (XkbKeycodeToKeysym (display, event.xkey.keycode, 0, 0));
         
         Notify (WindowEvent_OnKeyUp, message);
         
@@ -674,7 +674,7 @@ struct syslib::window_handle: public IWindowMessageHandler, public MessageQueue:
     }
   }
   
-///Оповещение о возникновении события  
+///Оповещение о возникновении события
   void Notify (WindowEvent event, const xtl::intrusive_ptr<Message>& message)
   {
     XUnlockDisplay (display);
@@ -1673,7 +1673,7 @@ size_t XlibWindowManager::GetKeyName (ScanCode scan_code, size_t buffer_size, ch
   
   DisplayLock lock (display);
     
-  char* name = XKeysymToString (XKeycodeToKeysym (display, scan_code, 0));  
+  char* name = XKeysymToString (XkbKeycodeToKeysym (display, scan_code, 0, 0));
 
   if (!name)
     return 0;
