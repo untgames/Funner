@@ -7,6 +7,10 @@
 #include <stl/string>
 #include <stl/vector>
 
+#include <xtl/bind.h>
+#include <xtl/ref.h>
+
+#include <common/command_line.h>
 #include <common/file.h>
 #include <common/strlib.h>
 #include <common/utf_converter.h>
@@ -64,16 +68,14 @@ struct rgba_t
 
 struct Params;
 
-typedef void (*ProcessOption)(const char* arg, Params& params);
-
 //опция
 struct Option
 {
-  ProcessOption process;       //функция-обработчик опции
-  const char*   name;          //имя команды
-  char          short_name;    //короткое имя
-  const char*   argument_name; //имя аргумента
-  const char*   tip;           //подсказка
+  common::CommandLine::SwitchHandler handler;       //обработчик ключа
+  const char*                        name;          //имя команды
+  char                               short_name;    //короткое имя
+  const char*                        argument_name; //имя аргумента
+  const char*                        tip;           //подсказка
 };
 
 //параметры запуска
@@ -87,6 +89,7 @@ struct Params
   stl::string   layout_layers_dir_name;    //имя каталога с сохранёнными слоями, используемое в файле разметки
   stl::string   layers_format;             //строка форматирования имён слоёв
   stl::string   crop_exclude;              //необрезаемые слои
+  stl::string   dummy_materials_wildcard;  //маска имён слоев, для которых генерируются материалы-заглушки
   size_t        crop_alpha;                //коэффициент обрезания по прозрачности
   size_t        zero_alpha_fix_value;      //коэффициент определения необходимости исправления цвета прозрачного пикселя
   size_t        blur_passes_count;         //количество проходов, используемое при блюре
@@ -270,214 +273,15 @@ void command_line_zalpha (const char* value, Params& params)
   params.need_replace_zcolor = true; 
 }
 
-//разбор командной строки
-void command_line_parse (int argc, const char* argv [], Params& params)
+//установка маски слоев с минимальными материалами
+void command_line_dummy_materials (const char* string, Params& params)
 {
-  static Option options [] = {
-    {command_line_help,                     "help",             '?',          0, "print help message"},
-    {command_line_silent,                   "silent",           's',          0, "quiet mode"},    
-    {command_line_result_layout_layers_dir, "layout-layers-dir", 0,       "dir", "set output layers dir that used in layout file"},    
-    {command_line_result_layout,            "layout",           'o',     "file", "set output layout file"},    
-    {command_line_result_layers_dir,        "layers-dir",       'O',      "dir", "set output layers dir"},    
-    {command_line_result_layers_format,     "layers-format",     0,    "string", "set output layers format string"},
-    {command_line_no_layout,                "no-layout",         0,           0, "don't generate layout file"},
-    {command_line_no_layers,                "no-layers",         0,           0, "don't generate layers"},
-    {command_line_pot,                      "pot",               0,           0, "extent layers image size to nearest greater power of two"},
-    {command_line_crop_alpha,               "crop-alpha",        0,     "value", "crop layers by alpha that less than value"},
-    {command_line_crop_exclude,             "crop-exclude",      0, "wildcards", "exclude selected layers from crop"},
-    {command_line_fix_zero_alpha_color,     "fix-zero-alpha",    0,     "value", "fixup color of pixels with alpha <= value"},
-    {command_line_blur_passes_count,        "blur-passes-count", 0,     "value", "number of blur passes (used in zero alpha fixup)"},
-    {command_line_max_image_size,           "max-image-size",    0,     "value", "max output image size (image with greater size will be rescaled)"},
-    {command_line_trim_name_spaces,         "trim-names",        0,           0, "trim spaces in all layers names"},    
-    {command_line_zcolor_min,               "zcolor-min",        0,     "value", "z-color minimal value for alpha replacement (red green blue)"},
-    {command_line_zcolor_max,               "zcolor-max",        0,     "value", "z-color maximum value for alpha replacement (red green blue)"},    
-    {command_line_zalpha,                   "zalpha",            0,     "value", "z-alpha: replacement value for z-color pixels"},
-  };
-  
-  static const size_t options_count = sizeof (options) / sizeof (*options);
-  
-  params.options       = options;
-  params.options_count = options_count;
-
-    //разбор командной строки
-    
-  for (int i=1; i<argc; i++)
-  {
-    const char* arg = argv [i];    
-    
-    static const char*  LONG_OPTION_NAME_PREFIX        = "--";
-    static const size_t LONG_OPTION_NAME_PREFIX_LENGTH = strlen (LONG_OPTION_NAME_PREFIX);
-
-    bool long_option  = !strncmp (LONG_OPTION_NAME_PREFIX, arg, LONG_OPTION_NAME_PREFIX_LENGTH);
-    bool short_option = !long_option && *arg == '-' && arg [1];    
-    
-    if (!long_option && !short_option)
-    {
-      if (!params.source_file_name.empty ())
-      {
-        error ("source file must be on");
-        return;
-      }
-    
-      params.source_file_name = arg;           
-      
-      continue;
-    }
-
-    stl::string   option_name;
-    stl::string   option_argument;      
-    const Option* option = 0;
-    
-      //разбор длинных опций
-    
-    if (long_option)
-    {
-      arg += LONG_OPTION_NAME_PREFIX_LENGTH;
-      
-      const char* end_option_name = strchr (arg, '=');        
-      
-      if (end_option_name)
-      {
-        option_name.assign (arg, end_option_name);
-
-        arg = end_option_name + 1;
-      }
-      else
-      {
-        option_name  = arg;          
-        arg         += strlen (arg);
-      }
-      
-      for (size_t j=0; j<options_count; j++)
-      {
-        const Option& test_option        = options [j];
-        size_t        test_option_length = strlen (test_option.name);
-
-        if (!strncmp (test_option.name, option_name.c_str (), test_option_length))
-        {
-          option = &test_option;
-          break;
-        }
-      }
-      
-      if (!option)
-      {
-        error ("wrong option '--%s'", option_name.c_str ());
-        
-        return;
-      }
-      
-      option_name = LONG_OPTION_NAME_PREFIX + option_name;
-    }
-
-      //разбор коротких опций
-
-    if (short_option)
-    {
-      arg++;
-      
-      if (arg [1])
-      {
-        error ("wrong option '-%c'", *arg);
-        
-        return;
-      }        
-
-      for (size_t j=0; j<options_count; j++)
-      {
-        if (*arg == options [j].short_name)
-        {
-          option = &options [j];
-          
-          break;
-        }
-      }
-      
-      if (!option)
-      {
-        error ("wrong option '-%c'", *arg);
-        
-        return;
-      }
-
-      option_name = common::format ("-%c", *arg);      
-      
-      if (option->argument_name)
-      {
-        i++;
-
-        if (i >= argc)
-        {
-          error ("option '-%c' require argument", *arg);
-          
-          return;
-        }                
-        
-        arg = argv [i];
-      }            
-    }
-            
-      //получение аргумента
-      
-    for (;*arg; arg++)
-    {
-      switch (*arg)
-      {
-        case '\'':
-        case '"':
-        {
-          const char* end = strchr (arg + 1, *arg);
-          
-          if (end)
-          {
-            option_argument.append (arg + 1, end);
-            
-            arg = end;
-          }
-          else
-          {
-            error ("unquoted string at parse option '%s'", option_name.c_str ());
-            
-            return;
-          }
-
-          break;
-        }
-        default:
-          option_argument.push_back (*arg);
-          break;
-      }
-    }    
-    
-    if (option->argument_name && option_argument.empty ())
-    {
-      error ("option '%s' require argument", option_name.c_str ());
-      
-      return;
-    }
-    
-    if (!option->argument_name && !option_argument.empty ())
-    {
-      error ("option '%s' has not arguments", option_name.c_str ());
-      
-      return;
-    }
-    
-    if (option->process)
-      option->process (option_argument.c_str (), params);
-  }
+  params.dummy_materials_wildcard = string;
 }
 
 //проверка корректности ввода
 void validate (Params& params)
 { 
-  if (params.source_file_name.empty ())
-  {
-    printf ("psd-exporter [<OPTIONS>] <SOURCE>\n  use: psd-exporter --help\n");
-    error ("no input file");
-    return;
-  }
-
   if (params.layout_file_name.empty ())
   {
     params.layout_file_name = common::notdir (common::basename (params.source_file_name)) + ".xlayermap";
@@ -1065,6 +869,12 @@ void export_data (Params& params)
       
     size_t image_index = 1;       
 
+    common::StringArray dummy_materials_wildcard_list = common::split (params.dummy_materials_wildcard.c_str ());
+
+    media::Image dummy_material (1, 1, 1, media::PixelFormat_RGB8);
+
+    memset (dummy_material.Bitmap (), 0, get_bytes_per_pixel (dummy_material.Format ()) * dummy_material.Width () * dummy_material.Height ());
+
     for (int i=0; i<context->layer_count; i++)
     {
       psd_layer_record& layer = context->layer_records [i];
@@ -1086,6 +896,27 @@ void export_data (Params& params)
       if (!params.silent)
         printf ("  save '%s'...\n", dst_image_name.c_str ());
 
+      bool need_dummy_material = false;
+
+      for (size_t j = 0, count = dummy_materials_wildcard_list.Size (); j < count; j++)
+      {
+        const char* mask = dummy_materials_wildcard_list [j];
+
+        if (common::wcmatch (name.c_str (), mask))
+        {
+          need_dummy_material = true;
+          break;
+        }
+      }
+
+      if (need_dummy_material)
+      {
+        dummy_material.Save (dst_image_name.c_str ());
+
+        image_index++;
+        continue;
+      }
+
       const Rect& cropped_rect = cropped_layers [image_index - 1];
 
       size_t image_width  = cropped_rect.width,
@@ -1094,16 +925,16 @@ void export_data (Params& params)
       if (params.need_pot_extent)
       {
         image_width  = get_next_higher_power_of_two (image_width);
-        image_height = get_next_higher_power_of_two (image_height);               
+        image_height = get_next_higher_power_of_two (image_height);
       }
 
       media::Image image (image_width, image_height, 1, media::PixelFormat_RGBA8, 0);
 
       if (params.need_pot_extent)
-        memset (image.Bitmap (), 0, get_bytes_per_pixel (image.Format ()) * image.Width () * image.Height ());                 
+        memset (image.Bitmap (), 0, get_bytes_per_pixel (image.Format ()) * image.Width () * image.Height ());
 
       convert_image_data (layer.width, layer.height, layer.image_data, cropped_rect, image_width, image_height, image.Bitmap ());
-      
+
       if (params.need_fix_zero_alpha_color)
       {
         if (!params.silent)
@@ -1111,7 +942,7 @@ void export_data (Params& params)
         
         fix_zero_alpha_color (image.Width (), image.Height (), reinterpret_cast<rgba_t*> (image.Bitmap ()), params.zero_alpha_fix_value, params.blur_passes_count);
       }
-      
+
       if (params.max_image_size)
       {
         if (image.Width () > params.max_image_size || image.Height () > params.max_image_size)
@@ -1126,13 +957,13 @@ void export_data (Params& params)
           else
           {
             new_image_height = params.max_image_size;
-            new_image_width  = (size_t)(image.Width () * (new_image_height / (float)image.Height ()));            
+            new_image_width  = (size_t)(image.Width () * (new_image_height / (float)image.Height ()));
           }
-          
+
           if (!params.silent)
             printf ("  rescale '%s' from %ux%u to %ux%u...\n", dst_image_name.c_str (), image.Width (), image.Height (),
               new_image_width, new_image_height);
-              
+
           image.Resize (new_image_width, new_image_height, 1);
         }
       }
@@ -1156,9 +987,31 @@ int main (int argc, const char* argv [])
     bgra_t default_zcolor = {0, 0, 0, 0};
 
     Params params;
-      
-    params.options                   = 0;
-    params.options_count             = 0;
+
+    static Option options [] = {
+      {xtl::bind (&command_line_help,                     _1, xtl::ref (params)), "help",             '?',          0, "print help message"},
+      {xtl::bind (&command_line_silent,                   _1, xtl::ref (params)), "silent",           's',          0, "quiet mode"},
+      {xtl::bind (&command_line_result_layout_layers_dir, _1, xtl::ref (params)), "layout-layers-dir", 0,       "dir", "set output layers dir that used in layout file"},
+      {xtl::bind (&command_line_result_layout,            _1, xtl::ref (params)), "layout",           'o',     "file", "set output layout file"},
+      {xtl::bind (&command_line_result_layers_dir,        _1, xtl::ref (params)), "layers-dir",       'O',      "dir", "set output layers dir"},
+      {xtl::bind (&command_line_result_layers_format,     _1, xtl::ref (params)), "layers-format",     0,    "string", "set output layers format string"},
+      {xtl::bind (&command_line_no_layout,                _1, xtl::ref (params)), "no-layout",         0,           0, "don't generate layout file"},
+      {xtl::bind (&command_line_no_layers,                _1, xtl::ref (params)), "no-layers",         0,           0, "don't generate layers"},
+      {xtl::bind (&command_line_pot,                      _1, xtl::ref (params)), "pot",               0,           0, "extent layers image size to nearest greater power of two"},
+      {xtl::bind (&command_line_crop_alpha,               _1, xtl::ref (params)), "crop-alpha",        0,     "value", "crop layers by alpha that less than value"},
+      {xtl::bind (&command_line_crop_exclude,             _1, xtl::ref (params)), "crop-exclude",      0, "wildcards", "exclude selected layers from crop"},
+      {xtl::bind (&command_line_dummy_materials,          _1, xtl::ref (params)), "dummy-materials",   0, "wildcard", "set wildcard for images which will have dummy materials"},
+      {xtl::bind (&command_line_fix_zero_alpha_color,     _1, xtl::ref (params)), "fix-zero-alpha",    0,     "value", "fixup color of pixels with alpha <= value"},
+      {xtl::bind (&command_line_blur_passes_count,        _1, xtl::ref (params)), "blur-passes-count", 0,     "value", "number of blur passes (used in zero alpha fixup)"},
+      {xtl::bind (&command_line_max_image_size,           _1, xtl::ref (params)), "max-image-size",    0,     "value", "max output image size (image with greater size will be rescaled)"},
+      {xtl::bind (&command_line_trim_name_spaces,         _1, xtl::ref (params)), "trim-names",        0,           0, "trim spaces in all layers names"},
+      {xtl::bind (&command_line_zcolor_min,               _1, xtl::ref (params)), "zcolor-min",        0,     "value", "z-color minimal value for alpha replacement (red green blue)"},
+      {xtl::bind (&command_line_zcolor_max,               _1, xtl::ref (params)), "zcolor-max",        0,     "value", "z-color maximum value for alpha replacement (red green blue)"},
+      {xtl::bind (&command_line_zalpha,                   _1, xtl::ref (params)), "zalpha",            0,     "value", "z-alpha: replacement value for z-color pixels"},
+    };
+
+    params.options                   = options;
+    params.options_count             = sizeof (options) / sizeof (*options);
     params.layers_format             = "image%03u.png";
     params.crop_alpha                = 0;
     params.zero_alpha_fix_value      = 0;
@@ -1178,15 +1031,28 @@ int main (int argc, const char* argv [])
     params.has_zcolor_min            = false;
     params.has_zcolor_max            = false;
 
-      //разбор командной строки
+    common::CommandLine command_line;
 
-    command_line_parse (argc, argv, params);
+    for (size_t i = 0; i < params.options_count; i++)
+      command_line.SetSwitchHandler (options [i].name, options [i].short_name, options [i].argument_name, options [i].handler);
+
+      //разбор командной строки
+    command_line.Process (argc, argv);
 
       // --help только печатает сообщение помощи
 
     if (params.print_help)
       return 0;
-        
+
+    if (command_line.ParamsCount () != 1)
+    {
+      printf ("psd-exporter [<OPTIONS>] <SOURCE>\n  use: psd-exporter --help\n");
+      error ("no input file");
+      return 1;
+    }
+
+    params.source_file_name = command_line.Param (0);
+
       //проверка корректности ввода
 
     validate (params);
