@@ -5,6 +5,8 @@ using namespace media;
 namespace
 {
 
+const size_t MIN_BUILD_PACKET_SIZE = 16; //минимальный размер пакета после которого идет упаковка по одной картинке
+
 //получение ближайшей сверху степени двойки
 size_t get_next_higher_power_of_two (size_t k) 
 {
@@ -324,35 +326,62 @@ struct AtlasBuilder::Impl
 
         //упаковка
       xtl::uninitialized_storage<math::vec2ui> sizes (images_to_process.size ()), origins (images_to_process.size ()), success_origins (images_to_process.size ());
-      xtl::uninitialized_storage<size_t> processed_images (images_to_process.size ()), erase_processed_images (images_to_process.size ());
+      xtl::uninitialized_storage<size_t> processed_images (images_to_process.size ());
 
       while (!images_to_process.empty ())
       {
-        size_t packed_count = 0, result_image_width, result_image_height, success_result_image_width, success_result_image_height;
+        size_t packed_count = 0,
+               result_image_width,
+               result_image_height,
+               success_result_image_width,
+               success_result_image_height,
+               try_packet_size = images_to_process.size ();  //количество картинок, которое пробуем добавить в атлас за один раз
 
-        for (size_t i = 0, count = images_to_process.size (); i < count; i++)
+        while (try_packet_size >= 1)
         {
-          size_t image_index = images_to_process [i];
+          size_t try_from = 0;
 
-          ImageHolderPtr image_holder = images [image_index]->image_holder;
-
-          sizes.data () [packed_count].x = image_holder->ImageWidth ();
-          sizes.data () [packed_count].y = image_holder->ImageHeight ();
-
-          processed_images.data () [packed_count] = image_index;
-
-          CalculatePackResults (packed_count + 1, sizes, origins, result_image_width, result_image_height);
-
-          if (result_image_width <= max_image_size && result_image_height <= max_image_size)
+          for (size_t i = 0, packets_count = (size_t)ceil (images_to_process.size () / (float)try_packet_size); i < packets_count; i++)
           {
-            erase_processed_images.data () [packed_count] = i;
-            packed_count++;
+            size_t begin_index = try_from,
+                   end_index   = stl::min (begin_index + try_packet_size, images_to_process.size ()),
+                   packet_size = end_index - begin_index;
 
-            success_result_image_width  = result_image_width;
-            success_result_image_height = result_image_height;
+            for (size_t j = begin_index; j < end_index; j++)
+            {
+              size_t image_index = images_to_process [j],
+                     dst_index   = packed_count + j - begin_index;
 
-            memcpy (success_origins.data (), origins.data (), packed_count * sizeof (*origins.data ()));
+              ImageHolderPtr image_holder = images [image_index]->image_holder;
+
+              sizes.data () [dst_index].x = image_holder->ImageWidth ();
+              sizes.data () [dst_index].y = image_holder->ImageHeight ();
+
+              processed_images.data () [dst_index] = image_index;
+            }
+
+            CalculatePackResults (packed_count + packet_size, sizes, origins, result_image_width, result_image_height);
+
+            if (result_image_width <= max_image_size && result_image_height <= max_image_size) //размещены все картинки пакета
+            {
+              images_to_process.erase (images_to_process.begin () + begin_index, images_to_process.begin () + end_index);
+              packed_count += packet_size;
+
+              success_result_image_width  = result_image_width;
+              success_result_image_height = result_image_height;
+
+              memcpy (success_origins.data (), origins.data (), packed_count * sizeof (*origins.data ()));
+            }
+            else  //не удалось разместить все картинки пакета
+            {
+              try_from += packet_size;
+            }
           }
+
+          try_packet_size /= 2;
+
+          if (try_packet_size && try_packet_size < MIN_BUILD_PACKET_SIZE)
+            try_packet_size = 1;
         }
 
         if (!packed_count)
@@ -413,10 +442,6 @@ struct AtlasBuilder::Impl
         }
 
         pack_results.push_back (pack_result);
-
-          //удаление упакованных картинок из массива упаковки
-        for (int i = packed_count - 1; i >= 0; i--)
-          images_to_process.erase (images_to_process.begin () + erase_processed_images.data () [i]);
       }
     }
     catch (xtl::exception& exception)
