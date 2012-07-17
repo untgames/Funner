@@ -133,6 +133,14 @@ PixelFormat get_pixel_format (GLenum gl_format)
 
 #else //OPENGL_ES_SUPPORT
 
+//this defines not exist in kronos' glext.h but supported by tegra devices
+#ifndef GL_EXT_texture_compression_s3tc
+#define GL_COMPRESSED_RGB_S3TC_DXT1_EXT   0x83F0
+#define GL_COMPRESSED_RGBA_S3TC_DXT1_EXT  0x83F1
+#define GL_COMPRESSED_RGBA_S3TC_DXT3_EXT  0x83F2
+#define GL_COMPRESSED_RGBA_S3TC_DXT5_EXT  0x83F3
+#endif
+
 //преобразование формата хранения пикселей к внутреннему формату OpenGL
 GLint get_gl_internal_format (PixelFormat format)
 {
@@ -145,6 +153,9 @@ GLint get_gl_internal_format (PixelFormat format)
     case PixelFormat_LA8:         return GL_LUMINANCE_ALPHA;
     case PixelFormat_RGB8:        return GL_RGB;
     case PixelFormat_RGBA8:       return GL_RGBA;
+    case PixelFormat_DXT1:        return GL_COMPRESSED_RGB_S3TC_DXT1_EXT;
+    case PixelFormat_DXT3:        return GL_COMPRESSED_RGBA_S3TC_DXT3_EXT;
+    case PixelFormat_DXT5:        return GL_COMPRESSED_RGBA_S3TC_DXT5_EXT;
     case PixelFormat_RGB_PVRTC2:  return GL_COMPRESSED_RGB_PVRTC_2BPPV1_IMG;
     case PixelFormat_RGB_PVRTC4:  return GL_COMPRESSED_RGB_PVRTC_4BPPV1_IMG;    
     case PixelFormat_RGBA_PVRTC2: return GL_COMPRESSED_RGBA_PVRTC_2BPPV1_IMG;
@@ -228,6 +239,9 @@ PixelFormat get_pixel_format (GLenum gl_format)
     case GL_ALPHA:                            return PixelFormat_A8;
     case GL_LUMINANCE:                        return PixelFormat_L8;
     case GL_LUMINANCE_ALPHA:                  return PixelFormat_LA8;
+    case GL_COMPRESSED_RGB_S3TC_DXT1_EXT:     return PixelFormat_DXT1;
+    case GL_COMPRESSED_RGBA_S3TC_DXT3_EXT:    return PixelFormat_DXT3;
+    case GL_COMPRESSED_RGBA_S3TC_DXT5_EXT:    return PixelFormat_DXT5;
     case GL_DEPTH_COMPONENT16_OES:            return PixelFormat_D16;
     case GL_DEPTH_COMPONENT24_OES:            return PixelFormat_D24X8;
     case GL_DEPTH_COMPONENT32_OES:            return PixelFormat_D32;
