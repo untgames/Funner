@@ -3,9 +3,14 @@
 ###################################################################################################
 TARGETS := MEDIA.IMAGE.SOURCES MEDIA.XATLAS.SOURCES MEDIA.LEFT_BOTTOM_PACKER.SOURCES MEDIA.PVR_LOADER.SOURCES  \
            MEDIA.DDS_LOADER.SOURCES MEDIA.IMAGE.ANI_CURSORS MEDIA.IMAGE.TESTS \
-           MEDIA.IMAGE.SPRITE_COMPOSER MEDIA.IMAGE.PSD_EXPORTER.SOURCES \
-           MEDIA.IMAGE.PSD_EXPORTER.TESTS MEDIA.XATLAS_BUILDER.SOURCES MEDIA.XATLAS_BUILDER.TESTS \
-           MEDIA.INTERLACER.SOURCES MEDIA.INTERLACER.TESTS
+           MEDIA.IMAGE.PSD_EXPORTER.SOURCES MEDIA.IMAGE.PSD_EXPORTER.TESTS \
+           MEDIA.XATLAS_BUILDER.SOURCES MEDIA.XATLAS_BUILDER.TESTS \
+           MEDIA.INTERLACER.SOURCES MEDIA.INTERLACER.TESTS \
+           MEDIA.TEXTURE_CONVERTER.SOURCES
+
+ifneq (,$(filter win32,$(PROFILES))$(filter macosx,$(PROFILES)))
+  TARGETS += MEDIA.QUALCOMM_TEXTURE_CONVERTER.TESTS
+endif
 
 #Цель - Image sources
 MEDIA.IMAGE.SOURCES.TYPE        := static-lib
@@ -51,11 +56,6 @@ MEDIA.IMAGE.TESTS.SOURCE_DIRS  := tests/image tests/atlas
 MEDIA.IMAGE.TESTS.IMPORTS      := compile.media.image link.media.image link.media.image.xatlas \
                                   link.media.image.left_bottom_packer run.extern.devil link.media.image.pvr link.media.image.dds \
                                   link.media.image.ani_cursor_loader
-#Цель - Sprite composer sources
-MEDIA.IMAGE.SPRITE_COMPOSER.TYPE        := application
-MEDIA.IMAGE.SPRITE_COMPOSER.NAME        := sprite_composer
-MEDIA.IMAGE.SPRITE_COMPOSER.SOURCE_DIRS := utils/sprite_composer
-MEDIA.IMAGE.SPRITE_COMPOSER.IMPORTS     := compile.media.image link.media.image
 
 #Цель - PSD exporter
 MEDIA.IMAGE.PSD_EXPORTER.SOURCES.TYPE        := application
@@ -90,3 +90,17 @@ MEDIA.INTERLACER.SOURCES.IMPORTS       := compile.common compile.media.image lin
 MEDIA.INTERLACER.TESTS.TYPE              := test-suite
 MEDIA.INTERLACER.TESTS.SOURCE_DIRS       := tests/interlacer
 MEDIA.INTERLACER.TESTS.USED_APPLICATIONS := interlacer
+
+#Цель
+MEDIA.TEXTURE_CONVERTER.SOURCES.TYPE           := application
+MEDIA.TEXTURE_CONVERTER.SOURCES.NAME           := texture-converter
+MEDIA.TEXTURE_CONVERTER.SOURCES.SOURCE_DIRS    := utils/texture_converter
+MEDIA.TEXTURE_CONVERTER.SOURCES.IMPORTS        := compile.common compile.media.image link.media.image
+MEDIA.TEXTURE_CONVERTER.SOURCES.win32.IMPORTS  := compile.extern.qualcomm_texture_converter link.extern.qualcomm_texture_converter
+MEDIA.TEXTURE_CONVERTER.SOURCES.macosx.IMPORTS := compile.extern.qualcomm_texture_converter link.extern.qualcomm_texture_converter
+
+#Цель
+MEDIA.QUALCOMM_TEXTURE_CONVERTER.TESTS.TYPE              := test-suite
+MEDIA.QUALCOMM_TEXTURE_CONVERTER.TESTS.SOURCE_DIRS       := tests/qualcomm_texture_converter
+MEDIA.QUALCOMM_TEXTURE_CONVERTER.TESTS.USED_APPLICATIONS := texture_converter
+
