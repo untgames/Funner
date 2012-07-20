@@ -768,7 +768,7 @@ void HsConnection::Disconnect ()
    Sending events
 */
 
-void HsConnection::SendMessage (unsigned short sender_plugin_id, unsigned short receiver_plugin_id, const unsigned char* message, size_t size)
+void HsConnection::SendMessage (unsigned char sender_plugin_id, unsigned char receiver_plugin_id, const unsigned char* message, size_t size)
 {
   impl->SendMessage (sender_plugin_id, receiver_plugin_id, message, size);
 }
