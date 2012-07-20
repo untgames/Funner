@@ -27,13 +27,41 @@ const unsigned char PACKET_HEADER               = 0x06;
 const unsigned char OPTIONS_COMPRESSED          = 0x01;
 const unsigned char OPTIONS_ENCRYPTED           = 0x02;
 
+inline unsigned int endian_swap (unsigned int value)
+{
+  return (value>>24) |
+         ((value<<8) & 0x00FF0000) |
+         ((value>>8) & 0x0000FF00) |
+         (value<<24);
+}
+
+inline unsigned int to_big_endian (unsigned int value)
+{
+#ifdef __BIG_ENDIAN__
+  return value;
+#else
+  return endian_swap (value);
+#endif
+}
+
+inline unsigned int from_big_endian (unsigned int value)
+{
+#ifdef __BIG_ENDIAN__
+  return value;
+#else
+  return endian_swap (value);
+#endif
+}
+
 struct Message
 {
-  unsigned short  plugin_id;
+  unsigned char   sender_plugin_id;
+  unsigned char   receiver_plugin_id;
   sgi_stl::string message;
 
-  Message (unsigned short in_plugin_id, const unsigned char* in_message, size_t size)
-    : plugin_id (in_plugin_id)
+  Message (unsigned char in_sender_plugin_id, unsigned char in_receiver_plugin_id, const unsigned char* in_message, size_t size)
+    : sender_plugin_id (in_sender_plugin_id)
+    , receiver_plugin_id (in_receiver_plugin_id)
   {
     message.resize (size);
 
@@ -54,7 +82,7 @@ class IBackgroundThreadListener
     virtual void OnConnectFailed (const char* error) = 0;
 
     // Message received
-    virtual void OnMessageReceived (unsigned short plugin_id, const unsigned char* message, size_t size) = 0;
+    virtual void OnMessageReceived (unsigned char sender_plugin_id, unsigned char receiver_plugin_id, const unsigned char* message, size_t size) = 0;
 
     //Error occured
     virtual void OnError (ErrorCode code, const char* error) = 0;
@@ -173,18 +201,19 @@ void* receive_function (void* user_data)
         break;
       }
 
-      unsigned char   options      = packet_header_buffer [1];
-      unsigned short* plugin_id    = (unsigned short*)(packet_header_buffer + 2);
-      unsigned int*   message_size = (unsigned int*)(packet_header_buffer + 4);
+      unsigned char options            = packet_header_buffer [1];
+      unsigned char sender_plugin_id   = packet_header_buffer [2];
+      unsigned char receiver_plugin_id = packet_header_buffer [3];
+      unsigned int  message_size       = from_big_endian (*(unsigned int*)(packet_header_buffer + 4));
 
-      if (*message_size >= current_buffer_size)
+      if (message_size >= current_buffer_size)
       {
         delete [] receive_buffer;
 
         receive_buffer      = 0;
         current_buffer_size = 0;
 
-        size_t new_buffer_size = *message_size * 2;
+        size_t new_buffer_size = message_size * 2;
 
         receive_buffer      = new unsigned char [new_buffer_size];
         current_buffer_size = new_buffer_size;
@@ -192,7 +221,7 @@ void* receive_function (void* user_data)
 
       if (options & OPTIONS_ENCRYPTED)
       {
-        if (*message_size < HMAC_SIZE + IV_SIZE)
+        if (message_size < HMAC_SIZE + IV_SIZE)
         {
           data->listener.OnError (ErrorCode_InvalidHeader, "Invalid message size");
           break;
@@ -201,24 +230,24 @@ void* receive_function (void* user_data)
 
       if (options & OPTIONS_COMPRESSED)
       {
-        if (*message_size < COMPRESSED_LENGTH_SIZE)
+        if (message_size < COMPRESSED_LENGTH_SIZE)
         {
           data->listener.OnError (ErrorCode_InvalidHeader, "Invalid message size");
           break;
         }
       }
 
-      if (!receive_data (data->tcp_client, need_stop, timeout_threshold, data->listener, receive_buffer, *message_size))
+      if (!receive_data (data->tcp_client, need_stop, timeout_threshold, data->listener, receive_buffer, message_size))
         break;
 
       unsigned char* message_body      = receive_buffer;
-      size_t         message_body_size = *message_size;
+      size_t         message_body_size = message_size;
 
       if (options & OPTIONS_ENCRYPTED)
       {
         unsigned char hmac [HMAC_SIZE];
 
-        hmac_sha256 (hashed_key, sizeof (hashed_key), receive_buffer + HMAC_SIZE, *message_size - HMAC_SIZE, hmac);
+        hmac_sha256 (hashed_key, sizeof (hashed_key), receive_buffer + HMAC_SIZE, message_size - HMAC_SIZE, hmac);
 
         if (memcmp (hmac, receive_buffer, HMAC_SIZE))
         {
@@ -243,32 +272,32 @@ void* receive_function (void* user_data)
           break;
         }
 
-        unsigned int* uncompressed_size = (unsigned int*)message_body;
+        unsigned int uncompressed_size = from_big_endian (*(unsigned int*)message_body);
 
         message_body += COMPRESSED_LENGTH_SIZE;
 
-        if (*uncompressed_size >= current_decompress_buffer_size)
+        if (uncompressed_size >= current_decompress_buffer_size)
         {
           delete [] decompress_buffer;
 
           decompress_buffer              = 0;
           current_decompress_buffer_size = 0;
 
-          size_t new_buffer_size = *uncompressed_size * 2;
+          size_t new_buffer_size = uncompressed_size * 2;
 
           decompress_buffer              = new unsigned char [new_buffer_size];
           current_decompress_buffer_size = new_buffer_size;
         }
 
-        zlib_decompress (message_body, message_body_size - COMPRESSED_LENGTH_SIZE, decompress_buffer, *uncompressed_size);
+        zlib_decompress (message_body, message_body_size - COMPRESSED_LENGTH_SIZE, decompress_buffer, uncompressed_size);
 
         message_body      = decompress_buffer;
-        message_body_size = *uncompressed_size;
+        message_body_size = uncompressed_size;
       }
 
       message_body [message_body_size] = 0;
 
-      data->listener.OnMessageReceived (*plugin_id, message_body, message_body_size);
+      data->listener.OnMessageReceived (sender_plugin_id, receiver_plugin_id, message_body, message_body_size);
       data->listener.Log (format ("Message received '%s'", message_body).c_str ());
     }
     catch (std::exception& e)
@@ -344,7 +373,7 @@ void* send_function (void* user_data)
       {
         if (milliseconds () - last_keep_alive_time > data->connection_settings.keep_alive_interval)
         {
-          sgi_stl::auto_ptr<Message> ping_message (new Message (1, (const unsigned char*)PING_MESSAGE, strlen (PING_MESSAGE)));
+          sgi_stl::auto_ptr<Message> ping_message (new Message (1, 1, (const unsigned char*)PING_MESSAGE, strlen (PING_MESSAGE)));
 
           data->message_queue.Enqueue (ping_message);
         }
@@ -400,7 +429,7 @@ void* send_function (void* user_data)
 
         unsigned int* compressed_header = (unsigned int*)compression_buffer;
 
-        *compressed_header = message_text_length;
+        *compressed_header = to_big_endian (message_text_length);
 
         message_text        = compression_buffer;
         message_text_length = compressed_size + COMPRESSED_LENGTH_SIZE;
@@ -418,13 +447,17 @@ void* send_function (void* user_data)
       if (data->connection_settings.encryption_enabled)
         send_buffer [1] |= OPTIONS_ENCRYPTED;
 
-      unsigned short* plugin_id = (unsigned short*)(send_buffer + 2);
+      unsigned char* sender_plugin_id = send_buffer + 2;
 
-      *plugin_id = message->plugin_id;
+      *sender_plugin_id = message->sender_plugin_id;
+
+      unsigned char* receiver_plugin_id = send_buffer + 3;
+
+      *receiver_plugin_id = message->receiver_plugin_id;
 
       unsigned int* message_size = (unsigned int*)(send_buffer + 4);
 
-      *message_size = packet_size - PACKET_HEADER_SIZE;
+      *message_size = to_big_endian (packet_size - PACKET_HEADER_SIZE);
 
       if (data->connection_settings.encryption_enabled)
       {
@@ -505,7 +538,7 @@ struct HsConnection::Impl : public ITcpClientListener, public IBackgroundThreadL
   IHsConnectionEventListener* event_listener;       //events listener
   IHsConnectionLogListener*   log_listener;         //log messages listener
   volatile HsConnectionState  state;                //connection state
-  sgi_stl::auto_ptr<Thread>       send_thread;          //thread for sending data
+  sgi_stl::auto_ptr<Thread>   send_thread;          //thread for sending data
   volatile bool               needs_stop_threads;   //signal to stop background threads
   MessageQueue                send_queue;           //send messages queue
   size_t                      create_thread_id;     //id of the creator thread
@@ -580,7 +613,7 @@ struct HsConnection::Impl : public ITcpClientListener, public IBackgroundThreadL
   }
 
   //Sending events
-  void SendMessage (unsigned short plugin_id, const unsigned char* message, size_t size)
+  void SendMessage (unsigned char sender_plugin_id, unsigned char receiver_plugin_id, const unsigned char* message, size_t size)
   {
     if (!message && size)
       throw sgi_stl::invalid_argument ("HsConnection::SendMessage - null message");
@@ -588,7 +621,7 @@ struct HsConnection::Impl : public ITcpClientListener, public IBackgroundThreadL
     if (state == HsConnectionState_Disconnected)
       throw sgi_stl::logic_error ("HsConnection::SendMessage - connection disconnected");
 
-    sgi_stl::auto_ptr<Message> new_message (new Message (plugin_id, message, size));
+    sgi_stl::auto_ptr<Message> new_message (new Message (sender_plugin_id, receiver_plugin_id, message, size));
 
     if (!send_queue.Enqueue (new_message))
     {
@@ -663,14 +696,14 @@ struct HsConnection::Impl : public ITcpClientListener, public IBackgroundThreadL
     OnConnectionStateChanged ();
   }
 
-  void OnMessageReceived (unsigned short plugin_id, const unsigned char* message, size_t size)
+  void OnMessageReceived (unsigned char sender_plugin_id, unsigned char receiver_plugin_id, const unsigned char* message, size_t size)
   {
     if (!event_listener)
       return;
 
     try
     {
-      event_listener->OnMessageReceived (*connection, plugin_id, message, size);
+      event_listener->OnMessageReceived (*connection, sender_plugin_id, receiver_plugin_id, message, size);
     }
     catch (std::exception& e)
     {
@@ -735,9 +768,9 @@ void HsConnection::Disconnect ()
    Sending events
 */
 
-void HsConnection::SendMessage (unsigned short plugin_id, const unsigned char* message, size_t size)
+void HsConnection::SendMessage (unsigned short sender_plugin_id, unsigned short receiver_plugin_id, const unsigned char* message, size_t size)
 {
-  impl->SendMessage (plugin_id, message, size);
+  impl->SendMessage (sender_plugin_id, receiver_plugin_id, message, size);
 }
 
 /*

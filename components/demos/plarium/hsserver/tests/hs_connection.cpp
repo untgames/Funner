@@ -35,9 +35,9 @@ class HsConnectionEventListener : public IHsConnectionEventListener
       printf ("Error occured: code '%s' error '%s'\n", get_error_code_name (code), error);
     }
 
-    void OnMessageReceived (HsConnection& sender, unsigned short plugin_id, const unsigned char* message, size_t size)
+    void OnMessageReceived (HsConnection& sender, unsigned char sender_plugin_id, unsigned char receiver_plugin_id, const unsigned char* message, size_t size)
     {
-      printf ("OnMessageReceived! Plugin %d, message '%s', size %d\n", plugin_id, message, size);
+      printf ("OnMessageReceived! Sender plugin %d receiver plugin %d, message '%s', size %d\n", sender_plugin_id, receiver_plugin_id, message, size);
     }
 
     void OnStateChanged (HsConnection& sender, HsConnectionState new_state)
@@ -83,7 +83,7 @@ int main ()
     connection.SetEventListener (&event_listener);
     connection.SetLogListener (&log_listener);
 
-    connection.Connect ("109.234.156.146", 9999);
+    connection.Connect ("109.234.156.148", 8888);
 
     const char* message_text =  "[{"
       " \"event\":\"user.authenticate\","
@@ -96,7 +96,7 @@ int main ()
       " \"version\":1"
       "}]";
 
-    connection.SendMessage (0, (const unsigned char*)message_text, strlen (message_text));
+    connection.SendMessage (0, 0, (const unsigned char*)message_text, strlen (message_text));
 
     Thread::Sleep (2000);
   }

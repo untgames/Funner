@@ -127,10 +127,10 @@ struct Application::Impl : public INotificationListener, public IHsConnectionEve
       }
       else if (command == "SendMessage")
       {
-        if (words.size () != 4)
+        if (words.size () != 5)
           throw sgi_stl::invalid_argument (format ("%s: invalid 'SendMessage' arguments '%s'", METHOD_NAME, notification));
 
-        connection->SendMessage (atoi (words [2].c_str ()), (const unsigned char*)words [3].c_str (), words [3].size ());
+        connection->SendMessage (atoi (words [2].c_str ()), atoi (words [3].c_str ()), (const unsigned char*)words [4].c_str (), words [4].size ());
       }
     }
   }
@@ -145,7 +145,7 @@ struct Application::Impl : public INotificationListener, public IHsConnectionEve
     engine->Execute (format ("lua: OnHsConnectionError (%d, \"%s\")", code, error).c_str ());
   }
 
-  void OnMessageReceived (HsConnection& sender, unsigned short plugin_id, const unsigned char* message, size_t size)
+  void OnMessageReceived (HsConnection& sender, unsigned char sender_plugin_id, unsigned char receiver_plugin_id, const unsigned char* message, size_t size)
   {
     bool quote_found = false;
 
@@ -201,7 +201,7 @@ struct Application::Impl : public INotificationListener, public IHsConnectionEve
       message = message_buffer;
     }
 
-    engine->Execute (format ("lua: OnHsConnectionMessage (%d, '%s')", plugin_id, message).c_str ());
+    engine->Execute (format ("lua: OnHsConnectionMessage (%d, %d, '%s')", sender_plugin_id, receiver_plugin_id, message).c_str ());
   }
 
   void OnStateChanged (HsConnection& sender, HsConnectionState new_state)
