@@ -21,6 +21,131 @@ size_t get_next_higher_power_of_two (size_t k)
   return k + 1;
 }
 
+media::PixelFormat max_image_format (media::PixelFormat format_1, media::PixelFormat format_2)
+{
+  static const char* METHOD_NAME = "media::max_image_format";
+
+  switch (format_2)
+  {
+    case PixelFormat_RGB8:
+    case PixelFormat_RGB16:
+    case PixelFormat_BGR8:
+    case PixelFormat_RGBA8:
+    case PixelFormat_RGBA16:
+    case PixelFormat_BGRA8:
+    case PixelFormat_L8:
+    case PixelFormat_A8:
+    case PixelFormat_LA8:
+      break;
+    default:
+      throw xtl::make_argument_exception (METHOD_NAME, "format_1", format_1);
+  }
+
+  switch (format_1)
+  {
+    case PixelFormat_RGB8:
+    case PixelFormat_BGR8:
+    {
+      switch (format_2)
+      {
+        case PixelFormat_RGBA8:
+        case PixelFormat_BGRA8:
+        case PixelFormat_RGBA16:
+        case PixelFormat_RGB16:
+          return format_2;
+        case PixelFormat_A8:
+        case PixelFormat_LA8:
+          return PixelFormat_RGBA8;
+        default:
+          return format_1;
+      }
+    }
+    case PixelFormat_RGB16:
+    {
+      switch (format_2)
+      {
+        case PixelFormat_RGBA8:
+        case PixelFormat_BGRA8:
+        case PixelFormat_RGBA16:
+        case PixelFormat_A8:
+        case PixelFormat_LA8:
+          return PixelFormat_RGBA16;
+        default:
+          return format_1;
+      }
+    }
+    case PixelFormat_RGBA8:
+    case PixelFormat_BGRA8:
+    {
+      switch (format_2)
+      {
+        case PixelFormat_RGBA16:
+        case PixelFormat_RGB16:
+          return PixelFormat_RGBA16;
+        default:
+          return format_1;
+      }
+    }
+    case PixelFormat_RGBA16:
+      return format_1;
+    case PixelFormat_L8:
+    {
+      switch (format_2)
+      {
+        case PixelFormat_RGB8:
+        case PixelFormat_RGB16:
+        case PixelFormat_BGR8:
+        case PixelFormat_RGBA8:
+        case PixelFormat_RGBA16:
+        case PixelFormat_BGRA8:
+        case PixelFormat_LA8:
+          return format_2;
+        case PixelFormat_A8:
+          return PixelFormat_LA8;
+        default:
+          return format_1;
+      }
+    }
+    case PixelFormat_A8:
+    {
+      switch (format_2)
+      {
+        case PixelFormat_RGB8:
+        case PixelFormat_BGR8:
+        case PixelFormat_RGBA8:
+        case PixelFormat_BGRA8:
+          return PixelFormat_RGBA8;
+        case PixelFormat_RGB16:
+        case PixelFormat_RGBA16:
+          return PixelFormat_RGBA16;
+        case PixelFormat_LA8:
+        case PixelFormat_L8:
+          return PixelFormat_LA8;
+        default:
+          return format_1;
+      }
+    }
+    case PixelFormat_LA8:
+    {
+      switch (format_2)
+      {
+        case PixelFormat_RGB8:
+        case PixelFormat_BGR8:
+        case PixelFormat_RGBA8:
+        case PixelFormat_BGRA8:
+          return PixelFormat_RGBA8;
+        case PixelFormat_RGB16:
+        case PixelFormat_RGBA16:
+          return PixelFormat_RGBA16;
+        default:
+          return format_1;
+      }
+    }
+    default:
+      throw xtl::make_argument_exception (METHOD_NAME, "format_1", format_1);
+  }
+}
+
 //класс предоставл€ющий информацию о картинке
 class IImageHolder : public xtl::reference_counter
 {
@@ -491,11 +616,18 @@ struct AtlasBuilder::Impl
   {
     PackResult& pack_result = *pack_results [index];
 
-    Image result_image (pack_result.image_width, pack_result.image_height, 1, (*images.begin ())->image_holder->ImageFormat ());
+    media::PixelFormat atlas_format  = (*images.begin ())->image_holder->ImageFormat ();
+    size_t*            current_index = pack_result.indices.data ();
+
+    for (size_t i = 0, count = pack_result.indices.size (); i < count; i++, current_index++)
+      atlas_format = max_image_format (atlas_format, images [*current_index]->image_holder->ImageFormat ());
+
+    Image result_image (pack_result.image_width, pack_result.image_height, 1, atlas_format);
 
     memset (result_image.Bitmap (), 0, pack_result.image_width * pack_result.image_height * get_bytes_per_pixel (result_image.Format ()));
 
-    size_t*       current_index  = pack_result.indices.data ();
+    current_index = pack_result.indices.data ();
+
     math::vec2ui* current_origin = pack_result.origins.data ();
 
     for (size_t i = 0, count = pack_result.indices.size (); i < count; i++, current_index++, current_origin++)
