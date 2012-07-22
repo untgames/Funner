@@ -955,10 +955,12 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
 
     math::vec2f curl_corner_position = corner_position;
 
+    float distance_to_opposite_side = math::length (math::vec2f (2 * page_size.x - curl_corner_position.x, curl_point.y - curl_corner_position.y));
+
     curl_corner_position.y = page_size.y - curl_corner_position.y;
 
-    if (curl_corner_position.x > 2 * page_size.x - curl_radius * 2)
-      curl_radius *= (2 * page_size.x - curl_corner_position.x) / (curl_radius * 2);
+    if (distance_to_opposite_side < curl_radius * 2)                  //we need to reduce radius when page should lay on it's place
+      curl_radius *= distance_to_opposite_side / (curl_radius * 2);
 
     curl_radius = stl::max (0.f, curl_radius);
 
@@ -1045,10 +1047,12 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
 
     math::vec2f curl_corner_position = corner_position;
 
+    float distance_to_opposite_side = math::length (math::vec2f (2 * page_size.x - curl_corner_position.x, curl_point.y - curl_corner_position.y));
+
     curl_corner_position.y = page_size.y - curl_corner_position.y;
 
-    if (curl_corner_position.x > 2 * page_size.x - curl_radius * 2)
-      curl_radius *= (2 * page_size.x - curl_corner_position.x) / (curl_radius * 2);
+    if (distance_to_opposite_side < curl_radius * 2)                  //we need to reduce radius when page should lay on it's place
+      curl_radius *= distance_to_opposite_side / (curl_radius * 2);
 
     curl_radius = stl::max (0.f, curl_radius);
 
@@ -1139,10 +1143,12 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
 
     math::vec2f curl_corner_position = corner_position;
 
+    float distance_to_opposite_side = math::length (math::vec2f (-page_size.x - curl_corner_position.x, curl_point.y - curl_corner_position.y));
+
     curl_corner_position.y = page_size.y - curl_corner_position.y;
 
-    if (curl_corner_position.x < -page_size.x + curl_radius * 2)
-      curl_radius *= (-page_size.x - curl_corner_position.x) / -(curl_radius * 2);
+    if (distance_to_opposite_side < curl_radius * 2)                  //we need to reduce radius when page should lay on it's place
+      curl_radius *= distance_to_opposite_side / (curl_radius * 2);
 
     curl_radius = stl::max (0.f, curl_radius);
 
@@ -1259,10 +1265,12 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
 
     math::vec2f curl_corner_position = corner_position;
 
+    float distance_to_opposite_side = math::length (math::vec2f (-page_size.x - curl_corner_position.x, curl_point.y - curl_corner_position.y));
+
     curl_corner_position.y = page_size.y - curl_corner_position.y;
 
-    if (curl_corner_position.x < -page_size.x + curl_radius * 2)
-      curl_radius *= (-page_size.x - curl_corner_position.x) / -(curl_radius * 2);
+    if (distance_to_opposite_side < curl_radius * 2)                  //we need to reduce radius when page should lay on it's place
+      curl_radius *= distance_to_opposite_side / (curl_radius * 2);
 
     curl_radius = stl::max (0.f, curl_radius);
 
