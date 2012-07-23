@@ -10,6 +10,7 @@
 #include <common/command_line.h>
 #include <common/strlib.h>
 
+#include <media/compressed_image.h>
 #include <media/image.h>
 
 #if defined (_MSC_VER) || defined (__MACH__)
@@ -20,8 +21,11 @@
     Константы
 */
 
-const char*  APPLICATION_NAME          = "texture-converter";
-const size_t HELP_STRING_PREFIX_LENGTH = 30;
+const char*  APPLICATION_NAME                = "texture-converter";
+const char*  ATC_RGB_AMD                     = "atitc_rgb";
+const char*  ATC_RGBA_EXPLICIT_ALPHA_AMD     = "atitc_rgba_explicit_alpha";
+const char*  ATC_RGBA_INTERPOLATED_ALPHA_AMD = "atitc_rgba_interpolated_alpha";
+const size_t HELP_STRING_PREFIX_LENGTH       = 30;
 
 /*
     Утилиты
@@ -151,7 +155,32 @@ void validate (Params& params)
   }
 }
 
-#if defined (_MSC_VER) || defined (__MACH__)
+//#if defined (_MSC_VER) || defined (__MACH__)
+
+const char* get_qualcomm_error_name (unsigned int error)
+{
+  switch (error)
+  {
+    case Q_ERROR_UNSUPPORTED_DIMENSIONS:      return "Q_ERROR_UNSUPPORTED_DIMENSIONS";
+    case Q_ERROR_UNSUPPORTED_SRC_FORMAT:      return "Q_ERROR_UNSUPPORTED_SRC_FORMAT";
+    case Q_ERROR_UNSUPPORTED_DST_FORMAT:      return "Q_ERROR_UNSUPPORTED_DST_FORMAT";
+    case Q_ERROR_UNSUPPORTED_SRC_FORMAT_FLAG: return "Q_ERROR_UNSUPPORTED_SRC_FORMAT_FLAG";
+    case Q_ERROR_UNSUPPORTED_DST_FORMAT_FLAG: return "Q_ERROR_UNSUPPORTED_DST_FORMAT_FLAG";
+    case Q_ERROR_INCORRECT_SRC_PARAMETER:     return "Q_ERROR_INCORRECT_SRC_PARAMETER";
+    case Q_ERROR_INCORRECT_DST_PARAMETER:     return "Q_ERROR_INCORRECT_DST_PARAMETER";
+    case Q_ERROR_INCORRECT_DATASIZE:          return "Q_ERROR_INCORRECT_DATASIZE";
+    case Q_ERROR_OTHER:                       return "Q_ERROR_OTHER";
+    default:                                  return "Unknown";
+  }
+}
+
+void check_qualcomm_error (const char* source, unsigned int error)
+{
+  if (error == Q_SUCCESS)
+    return;
+
+  throw xtl::format_operation_exception (source, get_qualcomm_error_name (error));
+}
 
 void qualcomm_texture_compress (const Params& params)
 {
@@ -160,10 +189,88 @@ void qualcomm_texture_compress (const Params& params)
 
 void qualcomm_texture_decompress (const Params& params)
 {
+  static const char* METHOD_NAME = "media::qualcomm_texture_decompress";
 
+  media::CompressedImage source_image (params.source.c_str ());
+
+  if ((params.source_format == ATC_RGB_AMD && xtl::xstrcmp (source_image.Format (), "atc")) ||
+      (params.source_format == ATC_RGBA_EXPLICIT_ALPHA_AMD && xtl::xstrcmp (source_image.Format (), "atci")) ||
+      (params.source_format == ATC_RGBA_INTERPOLATED_ALPHA_AMD && xtl::xstrcmp (source_image.Format (), "atca")))
+    throw xtl::format_operation_exception (METHOD_NAME, "Source format '%s' not equal to compressed image format '%s'", params.source_format.c_str (), source_image.Format ());
+  else if (params.source_format != ATC_RGB_AMD &&
+           params.source_format != ATC_RGBA_EXPLICIT_ALPHA_AMD &&
+           params.source_format != ATC_RGBA_INTERPOLATED_ALPHA_AMD &&
+           !params.source_format.empty ())
+    throw xtl::format_operation_exception (METHOD_NAME, "Unsupported source format '%s'", params.source_format.c_str ());
+
+  unsigned int       source_format,
+                     destination_format,
+                     destination_size = source_image.Width () * source_image.Height ();
+  media::PixelFormat result_pixel_format;
+
+  if (!xtl::xstrcmp (source_image.Format (), "atc"))
+  {
+    source_format       = Q_FORMAT_ATITC_RGB;
+    destination_format  = Q_FORMAT_RGB_888;
+    destination_size   *= 3;
+    result_pixel_format = media::PixelFormat_BGR8;
+  }
+  else if (!xtl::xstrcmp (source_image.Format (), "atci"))
+  {
+    source_format       = Q_FORMAT_ATC_RGBA_EXPLICIT_ALPHA;
+    destination_format  = Q_FORMAT_RGBA_8888;
+    destination_size   *= 4;
+    result_pixel_format = media::PixelFormat_BGRA8;
+  }
+  else if (!xtl::xstrcmp (source_image.Format (), "atca"))
+  {
+    source_format       = Q_FORMAT_ATC_RGBA_INTERPOLATED_ALPHA;
+    destination_format  = Q_FORMAT_RGBA_8888;
+    destination_size   *= 4;
+    result_pixel_format = media::PixelFormat_BGRA8;
+  }
+  else
+    throw xtl::format_operation_exception (METHOD_NAME, "Unsupported compressed texture format '%s'", source_image.Format ());
+
+  TQonvertImage source, destination;
+
+  memset (&source, 0, sizeof (source));
+  memset (&destination, 0, sizeof (destination));
+
+  source.nFormat   = source_format;
+  source.nWidth    = source_image.Width ();
+  source.nHeight   = source_image.Height ();
+  source.nDataSize = source_image.BitmapSize (0, 0);
+  source.pData     = (unsigned char*)source_image.Bitmap (0, 0);
+
+  xtl::uninitialized_storage<unsigned char> destination_data (destination_size);
+
+  destination.nFormat   = destination_format;
+  destination.nWidth    = source.nWidth;
+  destination.nHeight   = source.nHeight;
+  destination.nDataSize = destination_size;
+  destination.pData     = destination_data.data ();
+
+  check_qualcomm_error (METHOD_NAME, Qonvert (&source, &destination));
+
+  if (result_pixel_format == media::PixelFormat_BGRA8)
+  {
+    unsigned int *pixel = (unsigned int*)destination_data.data ();
+
+    for (size_t i = 0, count = destination.nWidth * destination.nHeight; i < count; i++, pixel++)
+    {
+      unsigned char* alpha = ((unsigned char*)pixel) + 3;
+
+      *alpha = 255 - *alpha;
+    }
+  }
+
+  media::Image result (destination.nWidth, destination.nHeight, 1, result_pixel_format, destination_data.data ());
+
+  result.Save (params.target.c_str ());
 }
 
-#endif
+//#endif
 
 void common_convert (const Params& params)
 {
@@ -210,12 +317,12 @@ int main (int argc, const char* argv [])
 
     static ConversionDesc converters [] = {
   #if defined (_MSC_VER) || defined (__MACH__)
-      { "", "atitc_rgb",                     xtl::bind (&qualcomm_texture_compress, _1) },
-      { "", "atitc_rgba_explicit_alpha",     xtl::bind (&qualcomm_texture_compress, _1) },
-      { "", "atitc_rgba_interpolated_alpha", xtl::bind (&qualcomm_texture_compress, _1) },
-      { "atitc_rgb", "",                     xtl::bind (&qualcomm_texture_decompress, _1) },
-      { "atitc_rgba_explicit_alpha", "",     xtl::bind (&qualcomm_texture_decompress, _1) },
-      { "atitc_rgba_interpolated_alpha", "", xtl::bind (&qualcomm_texture_decompress, _1) },
+      { "", ATC_RGB_AMD,                     xtl::bind (&qualcomm_texture_compress, _1) },
+      { "", ATC_RGBA_EXPLICIT_ALPHA_AMD,     xtl::bind (&qualcomm_texture_compress, _1) },
+      { "", ATC_RGBA_INTERPOLATED_ALPHA_AMD, xtl::bind (&qualcomm_texture_compress, _1) },
+      { ATC_RGB_AMD, "",                     xtl::bind (&qualcomm_texture_decompress, _1) },
+      { ATC_RGBA_EXPLICIT_ALPHA_AMD, "",     xtl::bind (&qualcomm_texture_decompress, _1) },
+      { ATC_RGBA_INTERPOLATED_ALPHA_AMD, "", xtl::bind (&qualcomm_texture_decompress, _1) },
   #endif
       { "", "",                              xtl::bind (&common_convert, _1) }
     };

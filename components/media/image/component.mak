@@ -95,7 +95,7 @@ MEDIA.INTERLACER.TESTS.USED_APPLICATIONS := interlacer
 MEDIA.TEXTURE_CONVERTER.SOURCES.TYPE           := application
 MEDIA.TEXTURE_CONVERTER.SOURCES.NAME           := texture-converter
 MEDIA.TEXTURE_CONVERTER.SOURCES.SOURCE_DIRS    := utils/texture_converter
-MEDIA.TEXTURE_CONVERTER.SOURCES.IMPORTS        := compile.common compile.media.image link.media.image
+MEDIA.TEXTURE_CONVERTER.SOURCES.IMPORTS        := compile.common compile.media.image link.media.image link.media.image.dds
 MEDIA.TEXTURE_CONVERTER.SOURCES.win32.IMPORTS  := compile.extern.qualcomm_texture_converter link.extern.qualcomm_texture_converter
 MEDIA.TEXTURE_CONVERTER.SOURCES.macosx.IMPORTS := compile.extern.qualcomm_texture_converter link.extern.qualcomm_texture_converter
 

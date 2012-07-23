@@ -98,17 +98,20 @@ const unsigned long FOURCC_A8L8          = 51;
 const unsigned long FOURCC_A4L4          = 52;
 
 ///Блоки форматов DDS
-const uint32 FOURCC_DDS  = MAKEFOURCC ('D', 'D', 'S', ' ');
-const uint32 FOURCC_DXT1 = MAKEFOURCC ('D', 'X', 'T', '1');
-const uint32 FOURCC_DXT2 = MAKEFOURCC ('D', 'X', 'T', '2');
-const uint32 FOURCC_DXT3 = MAKEFOURCC ('D', 'X', 'T', '3');
-const uint32 FOURCC_DXT4 = MAKEFOURCC ('D', 'X', 'T', '4');
-const uint32 FOURCC_DXT5 = MAKEFOURCC ('D', 'X', 'T', '5');
-const uint32 FOURCC_RXGB = MAKEFOURCC ('R', 'X', 'G', 'B');
-const uint32 FOURCC_ATI1 = MAKEFOURCC ('A', 'T', 'I', '1');
-const uint32 FOURCC_ATI2 = MAKEFOURCC ('A', 'T', 'I', '2');
-const uint32 FOURCC_A2XY = MAKEFOURCC ('A', '2', 'X', 'Y');
-const uint32 FOURCC_DX10 = MAKEFOURCC ('D', 'X', '1', '0');
+const uint32 FOURCC_DDS                             = MAKEFOURCC ('D', 'D', 'S', ' ');
+const uint32 FOURCC_DXT1                            = MAKEFOURCC ('D', 'X', 'T', '1');
+const uint32 FOURCC_DXT2                            = MAKEFOURCC ('D', 'X', 'T', '2');
+const uint32 FOURCC_DXT3                            = MAKEFOURCC ('D', 'X', 'T', '3');
+const uint32 FOURCC_DXT4                            = MAKEFOURCC ('D', 'X', 'T', '4');
+const uint32 FOURCC_DXT5                            = MAKEFOURCC ('D', 'X', 'T', '5');
+const uint32 FOURCC_RXGB                            = MAKEFOURCC ('R', 'X', 'G', 'B');
+const uint32 FOURCC_ATI1                            = MAKEFOURCC ('A', 'T', 'I', '1');
+const uint32 FOURCC_ATI2                            = MAKEFOURCC ('A', 'T', 'I', '2');
+const uint32 FOURCC_A2XY                            = MAKEFOURCC ('A', '2', 'X', 'Y');
+const uint32 FOURCC_DX10                            = MAKEFOURCC ('D', 'X', '1', '0');
+const uint32 FOURCC_ATC_RGB_AMD                     = MAKEFOURCC ('A', 'T', 'C', ' ');
+const uint32 FOURCC_ATC_RGBA_EXPLICIT_ALPHA_AMD     = MAKEFOURCC ('A', 'T', 'C', 'I');
+const uint32 FOURCC_ATC_RGBA_INTERPOLATED_ALPHA_AMD = MAKEFOURCC ('A', 'T', 'C', 'A');
 
 const unsigned long FOURCC_D16_LOCKABLE  = 70;
 const unsigned long FOURCC_D32           = 71;
@@ -340,12 +343,13 @@ class DdsCompressedImage: public ICustomCompressedImage
           switch (format)
           {
             case FOURCC_DXT1:
+            case FOURCC_ATC_RGB_AMD:
               bytes_per_block = 8;
               break;
             case FOURCC_DXT3:
-              bytes_per_block = 16;
-              break;
             case FOURCC_DXT5:
+            case FOURCC_ATC_RGBA_EXPLICIT_ALPHA_AMD:
+            case FOURCC_ATC_RGBA_INTERPOLATED_ALPHA_AMD:
               bytes_per_block = 16;
               break;
               //these are unsupported for now
@@ -438,14 +442,17 @@ class DdsCompressedImage: public ICustomCompressedImage
 
               switch (format)
               {
+                case FOURCC_ATC_RGB_AMD:
                 case FOURCC_DXT1:
                   for (size_t j = 0; j < row_size / bytes_per_block; j++)
                     FlipDXT1BlockFull (destination_block + j * bytes_per_block);
                   break;
+                case FOURCC_ATC_RGBA_EXPLICIT_ALPHA_AMD:  //???????
                 case FOURCC_DXT3:
                   for (size_t j = 0; j < row_size / bytes_per_block; j++)
                     FlipDXT3BlockFull (destination_block + j * bytes_per_block);
                   break;
+                case FOURCC_ATC_RGBA_INTERPOLATED_ALPHA_AMD:  //???????
                 case FOURCC_DXT5:
                   for (size_t j = 0; j < row_size / bytes_per_block; j++)
                     FlipDXT5BlockFull (destination_block + j * bytes_per_block);
@@ -503,13 +510,16 @@ class DdsCompressedImage: public ICustomCompressedImage
     {
       switch (format)
       {
-        case FOURCC_DXT1: return "dxt1";
-        case FOURCC_DXT2: return "dxt2";
-        case FOURCC_DXT3: return "dxt3";
-        case FOURCC_DXT4: return "dxt4";
-        case FOURCC_DXT5: return "dxt5";
-        case FOURCC_ATI1: return "ati1";
-        case FOURCC_ATI2: return "ati2";
+        case FOURCC_DXT1:                            return "dxt1";
+        case FOURCC_DXT2:                            return "dxt2";
+        case FOURCC_DXT3:                            return "dxt3";
+        case FOURCC_DXT4:                            return "dxt4";
+        case FOURCC_DXT5:                            return "dxt5";
+        case FOURCC_ATI1:                            return "ati1";
+        case FOURCC_ATI2:                            return "ati2";
+        case FOURCC_ATC_RGB_AMD:                     return "atc";
+        case FOURCC_ATC_RGBA_EXPLICIT_ALPHA_AMD:     return "atci";
+        case FOURCC_ATC_RGBA_INTERPOLATED_ALPHA_AMD: return "atca";
         default:
           return "Unknown";
       }
@@ -677,6 +687,9 @@ class DdsCompressedImage: public ICustomCompressedImage
             case FOURCC_DXT5:
             case FOURCC_ATI1:
             case FOURCC_ATI2:
+            case FOURCC_ATC_RGB_AMD:
+            case FOURCC_ATC_RGBA_EXPLICIT_ALPHA_AMD:
+            case FOURCC_ATC_RGBA_INTERPOLATED_ALPHA_AMD:
               break;
             default:
               throw xtl::format_not_supported_exception ("", "Unsupported DDS file. Unknown fourcc '%s'",
