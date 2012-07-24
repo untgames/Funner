@@ -155,7 +155,7 @@ void validate (Params& params)
   }
 }
 
-//#if defined (_MSC_VER) || defined (__MACH__)
+#if defined (_MSC_VER) || defined (__MACH__)
 
 const char* get_qualcomm_error_name (unsigned int error)
 {
@@ -253,24 +253,12 @@ void qualcomm_texture_decompress (const Params& params)
 
   check_qualcomm_error (METHOD_NAME, Qonvert (&source, &destination));
 
-  if (result_pixel_format == media::PixelFormat_BGRA8)
-  {
-    unsigned int *pixel = (unsigned int*)destination_data.data ();
-
-    for (size_t i = 0, count = destination.nWidth * destination.nHeight; i < count; i++, pixel++)
-    {
-      unsigned char* alpha = ((unsigned char*)pixel) + 3;
-
-      *alpha = 255 - *alpha;
-    }
-  }
-
   media::Image result (destination.nWidth, destination.nHeight, 1, result_pixel_format, destination_data.data ());
 
   result.Save (params.target.c_str ());
 }
 
-//#endif
+#endif
 
 void common_convert (const Params& params)
 {
