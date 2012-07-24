@@ -1,0 +1,11 @@
+Results of texture-converter_test02:
+618798aaf13e212cd58205a75d2fd5d3 *results/bottom_atc_rgb.dds
+06cf0e60cd487a47c2f87f9c28724637 *results/bottom_atc_rgb.png
+43194ea0235df7b5fd264d6d1703bba5 *results/npot.dds
+b376b30ca3ba9e10c5c4fd3f8d09dcd1 *results/npot.png
+c4363979eadca06abbd9038e736f3b7b *results/npot_non_square.dds
+1ba135a6933385893e9fd7b7d3229ea2 *results/npot_non_square.png
+c6dcd402a416ed4ca29c5287ce4a9d8b *results/selection_atc_rgba_explicit_alpha.dds
+84cb69a99d0c9fadc72fde2649f9622d *results/selection_atc_rgba_explicit_alpha.png
+cd45927638f51b41e9b7004686363ed6 *results/selection_atc_rgba_interpolated_alpha.dds
+beb9cedf3822204d5bb04027efa7759c *results/selection_atc_rgba_interpolated_alpha.png

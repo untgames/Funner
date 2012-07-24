@@ -1,0 +1,17 @@
+Results of texture_converter_test01:
+texture-converter [<OPTIONS>] <SOURCE> ...
+  OPTIONS:
+    --help, -?                 print help message
+    --silent, -s               quiet mode
+    --source-format=<format>   set input image format
+    --target=<file>, -o <file> set output image name
+    --target-format=<format>   set output image format
+  Supported converions:
+    '' -> 'atitc_rgb'
+    '' -> 'atitc_rgba_explicit_alpha'
+    '' -> 'atitc_rgba_interpolated_alpha'
+    'atitc_rgb' -> ''
+    'atitc_rgba_explicit_alpha' -> ''
+    'atitc_rgba_interpolated_alpha' -> ''
+    '' -> ''
+successfull!

@@ -1,0 +1,4 @@
+Results of texture_converter_test01:
+texture-converter [<OPTIONS>] <SOURCE> ...
+  use: texture-converter --help
+error: no input file
