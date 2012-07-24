@@ -8,6 +8,7 @@
 #include <xtl/ref.h>
 
 #include <common/command_line.h>
+#include <common/file.h>
 #include <common/strlib.h>
 
 #include <media/compressed_image.h>
@@ -26,6 +27,85 @@ const char*  ATC_RGB_AMD                     = "atitc_rgb";
 const char*  ATC_RGBA_EXPLICIT_ALPHA_AMD     = "atitc_rgba_explicit_alpha";
 const char*  ATC_RGBA_INTERPOLATED_ALPHA_AMD = "atitc_rgba_interpolated_alpha";
 const size_t HELP_STRING_PREFIX_LENGTH       = 30;
+
+const char DDS_MAGIC_ID [4] = {'D', 'D', 'S', ' '};
+
+// surface description flags
+const unsigned long DDSD_CAPS           = 0x00000001l;
+const unsigned long DDSD_HEIGHT         = 0x00000002l;
+const unsigned long DDSD_WIDTH          = 0x00000004l;
+const unsigned long DDSD_PITCH          = 0x00000008l;
+const unsigned long DDSD_PIXELFORMAT    = 0x00001000l;
+const unsigned long DDSD_MIPMAPCOUNT    = 0x00020000l;
+const unsigned long DDSD_LINEARSIZE     = 0x00080000l;
+const unsigned long DDSD_DEPTH          = 0x00800000l;
+
+// pixel format flags
+const unsigned long DDPF_ALPHAPIXELS    = 0x00000001l;
+const unsigned long DDPF_FOURCC         = 0x00000004l;
+const unsigned long DDPF_RGB            = 0x00000040l;
+const unsigned long DDPF_RGBA           = 0x00000041l;
+
+// dwCaps1 flags
+const unsigned long DDSCAPS_COMPLEX         = 0x00000008l;
+const unsigned long DDSCAPS_TEXTURE         = 0x00001000l;
+const unsigned long DDSCAPS_MIPMAP          = 0x00400000l;
+
+// dwCaps2 flags
+const unsigned long DDSCAPS2_CUBEMAP            = 0x00000200l;
+const unsigned long DDSCAPS2_CUBEMAP_POSITIVEX  = 0x00000400l;
+const unsigned long DDSCAPS2_CUBEMAP_NEGATIVEX  = 0x00000800l;
+const unsigned long DDSCAPS2_CUBEMAP_POSITIVEY  = 0x00001000l;
+const unsigned long DDSCAPS2_CUBEMAP_NEGATIVEY  = 0x00002000l;
+const unsigned long DDSCAPS2_CUBEMAP_POSITIVEZ  = 0x00004000l;
+const unsigned long DDSCAPS2_CUBEMAP_NEGATIVEZ  = 0x00008000l;
+const unsigned long DDSCAPS2_CUBEMAP_ALL_FACES  = 0x0000FC00l;
+const unsigned long DDSCAPS2_VOLUME             = 0x00200000l;
+
+typedef unsigned int  uint32;
+typedef unsigned char uint8;
+
+#if !defined(MAKEFOURCC)
+# define MAKEFOURCC(ch0, ch1, ch2, ch3) \
+    (uint32(uint8(ch0)) | (uint32(uint8(ch1)) << 8) | \
+        (uint32(uint8(ch2)) << 16) | (uint32(uint8(ch3)) << 24 ))
+#endif
+
+const uint32 FOURCC_ATC_RGB_AMD                     = MAKEFOURCC ('A', 'T', 'C', ' ');
+const uint32 FOURCC_ATC_RGBA_EXPLICIT_ALPHA_AMD     = MAKEFOURCC ('A', 'T', 'C', 'I');
+const uint32 FOURCC_ATC_RGBA_INTERPOLATED_ALPHA_AMD = MAKEFOURCC ('A', 'T', 'C', 'A');
+
+///Формат пикселей DDS файла
+struct DdsPixelFormat
+{
+  uint32 dwSize;        //Structure size; set to 32 (bytes)
+  uint32 dwFlags;       //Values which indicate what type of data is in the surface
+  uint32 dwFourCC;      //Four-character codes for specifying compressed or custom formats. Possible values include: DXT1, DXT2, DXT3, DXT4, or DXT5. A FourCC of DX10 indicates the prescense of the DDS_HEADER_DXT10 extended header, and the dxgiFormat member of that structure indicates the true format. When using a four-character code, dwFlags must include DDPF_FOURCC
+  uint32 dwRGBBitCount; //Number of bits in an RGB (possibly including alpha) format. Valid when dwFlags includes DDPF_RGB, DDPF_LUMINANCE, or DDPF_YUV
+  uint32 dwRBitMask;    //Red (or lumiannce or Y) mask for reading color data. For instance, given the A8R8G8B8 format, the red mask would be 0x00ff0000
+  uint32 dwGBitMask;    //Green (or U) mask for reading color data. For instance, given the A8R8G8B8 format, the green mask would be 0x0000ff00
+  uint32 dwBBitMask;    //Blue (or V) mask for reading color data. For instance, given the A8R8G8B8 format, the blue mask would be 0x000000ff
+  uint32 dwABitMask;    //Alpha mask for reading alpha data. dwFlags must include DDPF_ALPHAPIXELS or DDPF_ALPHA. For instance, given the A8R8G8B8 format, the alpha mask would be 0xff000000
+};
+
+///Заголовок DDS файла
+struct DdsHeader
+{
+  uint32         dwSize;            //Size of structure. This member must be set to 124
+  uint32         dwFlags;           //Flags to indicate which members contain valid data
+  uint32         dwHeight;          //Surface height (in pixels)
+  uint32         dwWidth;           //Surface width (in pixels)
+  uint32         dwLinearSize;      //The number of bytes per scan line in an uncompressed texture; the total number of bytes in the top level texture for a compressed texture. The pitch must be DWORD aligned
+  uint32         dwDepth;           //Depth of a volume texture (in pixels), otherwise unused
+  uint32         dwMipMapCount;     //Number of mipmap levels, otherwise unused
+  uint32         dwReserved1 [11];  //Unused
+  DdsPixelFormat ddspf;             //The pixel format
+  uint32         dwCaps;            //Specifies the complexity of the surfaces stored
+  uint32         dwCaps2;           //Additional detail about the surfaces stored
+  uint32         dwCaps3;           //Unused
+  uint32         dwCaps4;           //Unused
+  uint32         dwReserved2;       //Unused
+};
 
 /*
     Утилиты
@@ -155,6 +235,33 @@ void validate (Params& params)
   }
 }
 
+//сохранение данных в DDS-файл
+void save_compressed_dds (const char* file_name, size_t width, size_t height, uint32 fourcc, const unsigned char* data, size_t data_size)
+{
+  common::OutputFile file (file_name);
+
+  file.Write (DDS_MAGIC_ID, sizeof (DDS_MAGIC_ID));
+
+  DdsHeader header;
+
+  memset (&header, 0, sizeof (header));
+
+  header.dwSize   = sizeof (header);
+  header.dwFlags  = DDSD_CAPS | DDSD_HEIGHT | DDSD_WIDTH | DDSD_PIXELFORMAT;
+  header.dwHeight = height;
+  header.dwWidth  = width;
+
+  header.ddspf.dwSize   = sizeof (header.ddspf);
+  header.ddspf.dwFlags  = DDPF_FOURCC;
+  header.ddspf.dwFourCC = fourcc;
+
+  header.dwCaps = DDSCAPS_TEXTURE;
+
+  file.Write (&header, sizeof (header));
+
+  file.Write (data, data_size);
+}
+
 #if defined (_MSC_VER) || defined (__MACH__)
 
 const char* get_qualcomm_error_name (unsigned int error)
@@ -184,7 +291,88 @@ void check_qualcomm_error (const char* source, unsigned int error)
 
 void qualcomm_texture_compress (const Params& params)
 {
+  static const char* METHOD_NAME = "media::qualcomm_texture_compress";
 
+  media::Image source_image (params.source.c_str ());
+
+  unsigned int source_format,
+               destination_format;
+
+  switch (source_image.Format ())
+  {
+    case media::PixelFormat_RGB8:
+      source_image.Convert (media::PixelFormat_BGR8);
+      source_format = Q_FORMAT_RGB_888;
+      break;
+    case media::PixelFormat_BGR8:
+      source_format = Q_FORMAT_RGB_888;
+      break;
+    case media::PixelFormat_RGBA8:
+      source_format = Q_FORMAT_BGRA_8888;
+      break;
+    case media::PixelFormat_BGRA8:
+      source_format = Q_FORMAT_RGBA_8888;
+      break;
+    case media::PixelFormat_L8:
+      source_format = Q_FORMAT_LUMINANCE_8;
+      break;
+    case media::PixelFormat_A8:
+      source_format = Q_FORMAT_ALPHA_8;
+      break;
+    case media::PixelFormat_LA8:
+      source_format = Q_FORMAT_LUMINANCE_ALPHA_88;
+      break;
+    default:
+      throw xtl::format_operation_exception (METHOD_NAME, "Unsupported source format '%s'", media::get_format_name (source_image.Format ()));
+  }
+
+  uint32 fourcc;
+
+  if (params.target_format == ATC_RGB_AMD)
+  {
+    destination_format = Q_FORMAT_ATITC_RGB;
+    fourcc             = FOURCC_ATC_RGB_AMD;
+  }
+  else if (params.target_format == ATC_RGBA_EXPLICIT_ALPHA_AMD)
+  {
+    destination_format = Q_FORMAT_ATC_RGBA_EXPLICIT_ALPHA;
+    fourcc             = FOURCC_ATC_RGBA_EXPLICIT_ALPHA_AMD;
+  }
+  else if (params.target_format == ATC_RGBA_INTERPOLATED_ALPHA_AMD)
+  {
+    destination_format = Q_FORMAT_ATC_RGBA_INTERPOLATED_ALPHA;
+    fourcc             = FOURCC_ATC_RGBA_INTERPOLATED_ALPHA_AMD;
+  }
+  else
+    throw xtl::format_operation_exception (METHOD_NAME, "Unsupported target format '%s'", params.target_format.c_str ());
+
+  TQonvertImage source, destination;
+
+  memset (&source, 0, sizeof (source));
+  memset (&destination, 0, sizeof (destination));
+
+  source.nFormat   = source_format;
+  source.nWidth    = source_image.Width ();
+  source.nHeight   = source_image.Height ();
+  source.nDataSize = source.nWidth * source.nHeight * media::get_bytes_per_pixel (source_image.Format ());
+  source.pData     = (unsigned char*)source_image.Bitmap ();
+
+  destination.nFormat   = destination_format;
+  destination.nWidth    = source.nWidth;
+  destination.nHeight   = source.nHeight;
+
+  check_qualcomm_error (METHOD_NAME, Qonvert (&source, &destination));
+
+  xtl::uninitialized_storage<unsigned char> destination_data (destination.nDataSize);
+
+  destination.pData = destination_data.data ();
+
+  check_qualcomm_error (METHOD_NAME, Qonvert (&source, &destination));
+
+  if (common::suffix (params.target) == ".dds")
+    save_compressed_dds (params.target.c_str (), destination.nWidth, destination.nHeight, fourcc, destination.pData, destination.nDataSize);
+  else
+    throw xtl::format_operation_exception (METHOD_NAME, "Unsupported container for target image '%s'", params.target.c_str ());
 }
 
 void qualcomm_texture_decompress (const Params& params)
