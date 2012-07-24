@@ -357,9 +357,16 @@ void qualcomm_texture_compress (const Params& params)
   source.nDataSize = source.nWidth * source.nHeight * media::get_bytes_per_pixel (source_image.Format ());
   source.pData     = (unsigned char*)source_image.Bitmap ();
 
+  TFormatFlags compression_flags;
+
+  memset (&compression_flags, 0, sizeof (compression_flags));
+
+  compression_flags.nFlipY = 1;
+
   destination.nFormat   = destination_format;
   destination.nWidth    = source.nWidth;
   destination.nHeight   = source.nHeight;
+  destination.pFormatFlags = &compression_flags;
 
   check_qualcomm_error (METHOD_NAME, Qonvert (&source, &destination));
 
@@ -425,11 +432,11 @@ void qualcomm_texture_decompress (const Params& params)
   memset (&source, 0, sizeof (source));
   memset (&destination, 0, sizeof (destination));
 
-  source.nFormat   = source_format;
-  source.nWidth    = source_image.Width ();
-  source.nHeight   = source_image.Height ();
-  source.nDataSize = source_image.BitmapSize (0, 0);
-  source.pData     = (unsigned char*)source_image.Bitmap (0, 0);
+  source.nFormat      = source_format;
+  source.nWidth       = source_image.Width ();
+  source.nHeight      = source_image.Height ();
+  source.nDataSize    = source_image.BitmapSize (0, 0);
+  source.pData        = (unsigned char*)source_image.Bitmap (0, 0);
 
   xtl::uninitialized_storage<unsigned char> destination_data (destination_size);
 
