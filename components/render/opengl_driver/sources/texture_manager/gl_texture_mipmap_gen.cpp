@@ -191,6 +191,9 @@ void scale_image_2x_down (PixelFormat format, size_t width, size_t height, const
     case PixelFormat_RGB_PVRTC4:
     case PixelFormat_RGBA_PVRTC2:
     case PixelFormat_RGBA_PVRTC4:    
+    case PixelFormat_ATC_RGB_AMD:
+    case PixelFormat_ATC_RGBA_EXPLICIT_ALPHA_AMD:
+    case PixelFormat_ATC_RGBA_INTERPOLATED_ALPHA_AMD:
     default:
       throw xtl::format_not_supported_exception ("render::low_level::opengl::scale_image_2x_down", "Compressed image scaling not supported (format=%s)", get_name (format));
   }
@@ -217,6 +220,9 @@ void scale_image (PixelFormat format, size_t width, size_t height, size_t new_wi
     case PixelFormat_RGB_PVRTC4:
     case PixelFormat_RGBA_PVRTC2:
     case PixelFormat_RGBA_PVRTC4:    
+    case PixelFormat_ATC_RGB_AMD:
+    case PixelFormat_ATC_RGBA_EXPLICIT_ALPHA_AMD:
+    case PixelFormat_ATC_RGBA_INTERPOLATED_ALPHA_AMD:
     default:
       throw xtl::format_not_supported_exception ("render::low_level::opengl::scale_image", "Compressed image scaling not supported (format=%s)", get_name (format));
   }

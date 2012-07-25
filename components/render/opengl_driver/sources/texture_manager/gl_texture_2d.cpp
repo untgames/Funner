@@ -25,18 +25,30 @@ Texture2D::Texture2D (const ContextManager& manager, const TextureDesc& tex_desc
 
   switch (tex_desc.format)
   {
-    case PixelFormat_DXT1:
-    case PixelFormat_DXT3:
-    case PixelFormat_DXT5:
-      gl_internal_format = GetCaps ().has_ext_texture_compression_s3tc ? get_gl_internal_format (tex_desc.format) : get_uncompressed_gl_internal_format (tex_desc.format);
-      break;
     case PixelFormat_RGB_PVRTC2:
     case PixelFormat_RGB_PVRTC4:
     case PixelFormat_RGBA_PVRTC2:
     case PixelFormat_RGBA_PVRTC4:
       if (!GetCaps ().has_img_texture_compression_pvrtc)
         throw xtl::format_not_supported_exception (METHOD_NAME, "PVRTC texture compresson not supported");
+      break;
+    case PixelFormat_ATC_RGB_AMD:
+    case PixelFormat_ATC_RGBA_EXPLICIT_ALPHA_AMD:
+    case PixelFormat_ATC_RGBA_INTERPOLATED_ALPHA_AMD:
+      if (!GetCaps ().has_amd_compressed_atc_texture)
+        throw xtl::format_not_supported_exception (METHOD_NAME, "AMD ATC texture compression not supported");
+      break;
+    default:
+      break;
+  }
 
+  switch (tex_desc.format)
+  {
+    case PixelFormat_DXT1:
+    case PixelFormat_DXT3:
+    case PixelFormat_DXT5:
+      gl_internal_format = GetCaps ().has_ext_texture_compression_s3tc ? get_gl_internal_format (tex_desc.format) : get_uncompressed_gl_internal_format (tex_desc.format);
+      break;
     default:
       gl_internal_format = get_gl_internal_format (tex_desc.format);    
       break;    
@@ -89,7 +101,7 @@ Texture2D::Texture2D (const ContextManager& manager, const TextureDesc& tex_desc
           supports_compressed = GetCaps ().has_ext_texture_compression_s3tc;
           is_dxt              = true;
           break;
-        case PixelFormat_RGB_PVRTC2:
+        case PixelFormat_RGB_PVRTC2:  //??? Эта проверка есть выше?
         case PixelFormat_RGB_PVRTC4:
         case PixelFormat_RGBA_PVRTC2:
         case PixelFormat_RGBA_PVRTC4:
@@ -98,6 +110,15 @@ Texture2D::Texture2D (const ContextManager& manager, const TextureDesc& tex_desc
           
           supports_compressed = true;
             
+          break;
+        case PixelFormat_ATC_RGB_AMD:
+        case PixelFormat_ATC_RGBA_EXPLICIT_ALPHA_AMD:
+        case PixelFormat_ATC_RGBA_INTERPOLATED_ALPHA_AMD:
+          if (!GetCaps ().has_amd_compressed_atc_texture)
+            throw xtl::format_not_supported_exception (METHOD_NAME, "AMD ATC texture compression not supported");
+
+          supports_compressed = true;
+
           break;
         default:
           throw xtl::format_operation_exception (METHOD_NAME, "Unknown compressed texture format %d", tex_desc.format);

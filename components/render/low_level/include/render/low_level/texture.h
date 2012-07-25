@@ -27,6 +27,9 @@ enum PixelFormat
   PixelFormat_RGB_PVRTC4,  //red, green, blue - compressed
   PixelFormat_RGBA_PVRTC2, //red, green, blue, alpha - compressed
   PixelFormat_RGBA_PVRTC4, //red, green, blue, alpha - compressed
+  PixelFormat_ATC_RGB_AMD, //red, green, blue - compressed
+  PixelFormat_ATC_RGBA_EXPLICIT_ALPHA_AMD,     //red, green, blue, alpha - compressed
+  PixelFormat_ATC_RGBA_INTERPOLATED_ALPHA_AMD, //red, green, blue, alpha - compressed
   PixelFormat_D16,         //depth:16
   PixelFormat_D24X8,       //depth:24, x:8
   PixelFormat_D24S8,       //depth:24, stencil:8

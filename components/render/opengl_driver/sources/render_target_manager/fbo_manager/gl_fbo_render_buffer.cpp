@@ -35,6 +35,9 @@ GLenum get_render_buffer_format (PixelFormat format, const char* source, const c
     case PixelFormat_RGB_PVRTC4:
     case PixelFormat_RGBA_PVRTC2:
     case PixelFormat_RGBA_PVRTC4:
+    case PixelFormat_ATC_RGB_AMD:
+    case PixelFormat_ATC_RGBA_EXPLICIT_ALPHA_AMD:
+    case PixelFormat_ATC_RGBA_INTERPOLATED_ALPHA_AMD:
       throw xtl::format_not_supported_exception (source, "Unsupported %s=%s", param, get_name (format));
     default:
       throw xtl::make_argument_exception (source, param, format);
@@ -65,6 +68,9 @@ GLenum get_render_buffer_format (PixelFormat format, const char* source, const c
     case PixelFormat_RGB_PVRTC4:
     case PixelFormat_RGBA_PVRTC2:
     case PixelFormat_RGBA_PVRTC4:    
+    case PixelFormat_ATC_RGB_AMD:
+    case PixelFormat_ATC_RGBA_EXPLICIT_ALPHA_AMD:
+    case PixelFormat_ATC_RGBA_INTERPOLATED_ALPHA_AMD:
       throw xtl::format_not_supported_exception (source, "Unsupported %s=%s", param, get_name (format));
     default:
       throw xtl::make_argument_exception (source, param, format);

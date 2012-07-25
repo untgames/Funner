@@ -96,6 +96,9 @@ void SwapChainFrameBuffer::SetColorView (View* view)
       case PixelFormat_RGB_PVRTC4:
       case PixelFormat_RGBA_PVRTC2:
       case PixelFormat_RGBA_PVRTC4:      
+      case PixelFormat_ATC_RGB_AMD:
+      case PixelFormat_ATC_RGBA_EXPLICIT_ALPHA_AMD:
+      case PixelFormat_ATC_RGBA_INTERPOLATED_ALPHA_AMD:
         throw xtl::format_not_supported_exception (METHOD_NAME, "Unsupported color render-target texture format=%s", get_name (render_target.texture_desc.format));
       default:
         throw xtl::make_argument_exception (METHOD_NAME, "texture_desc.format", render_target.texture_desc.format);
@@ -162,6 +165,9 @@ void SwapChainFrameBuffer::SetDepthStencilView (View* view)
       case PixelFormat_RGB_PVRTC4:
       case PixelFormat_RGBA_PVRTC2:
       case PixelFormat_RGBA_PVRTC4:
+      case PixelFormat_ATC_RGB_AMD:
+      case PixelFormat_ATC_RGBA_EXPLICIT_ALPHA_AMD:
+      case PixelFormat_ATC_RGBA_INTERPOLATED_ALPHA_AMD:
         throw xtl::format_not_supported_exception (METHOD_NAME, "Unsupported depth-stencil render-target texture format=%s", get_name (render_target.texture_desc.format));
       case PixelFormat_D16:
       case PixelFormat_D24X8:

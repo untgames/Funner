@@ -11,6 +11,9 @@ Results of utils1_test:
 104@PixelFormat_RGB_PVRTC4: size=64 uncompressed_size=192
 104@PixelFormat_RGBA_PVRTC2: size=32 uncompressed_size=256
 104@PixelFormat_RGBA_PVRTC4: size=64 uncompressed_size=256
+104@PixelFormat_ATC_RGB_AMD: size=32 uncompressed_size=192
+104@PixelFormat_ATC_RGBA_EXPLICIT_ALPHA_AMD: size=64 uncompressed_size=256
+104@PixelFormat_ATC_RGBA_INTERPOLATED_ALPHA_AMD: size=64 uncompressed_size=256
 104@PixelFormat_D16: size=128 uncompressed_size=128
 104@PixelFormat_D24X8: size=256 uncompressed_size=256
 104@PixelFormat_D24S8: size=256 uncompressed_size=256

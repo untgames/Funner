@@ -38,6 +38,9 @@ Texture3D::Texture3D  (const ContextManager& manager, const TextureDesc& tex_des
     case PixelFormat_RGB_PVRTC4:
     case PixelFormat_RGBA_PVRTC2:
     case PixelFormat_RGBA_PVRTC4:    
+    case PixelFormat_ATC_RGB_AMD:
+    case PixelFormat_ATC_RGBA_EXPLICIT_ALPHA_AMD:
+    case PixelFormat_ATC_RGBA_INTERPOLATED_ALPHA_AMD:
       throw xtl::format_not_supported_exception (METHOD_NAME, "3D compressed textures not supported (desc.format=%s)", get_name (GetFormat ()));
     case PixelFormat_D16:
     case PixelFormat_D24X8:

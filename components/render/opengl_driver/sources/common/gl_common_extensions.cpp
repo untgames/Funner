@@ -368,7 +368,6 @@ const char* extensions [] = {
   "GL_OES_vertex_type_10_10_10_2",
   "GL_OES_get_program_binary",
   "GL_AMD_program_binary_Z400",
-  "GL_EXT_texture_compression_dxt1",
   "GL_AMD_performance_monitor",
   "GL_EXT_texture_format_BGRA8888",
   "GL_NV_fence",
@@ -380,7 +379,8 @@ const char* extensions [] = {
   "GL_IMG_texture_env_enhanced_fixed_function",
   "GL_APPLE_texture_2D_limited_npot",
   "GL_EXT_texture_lod_bias",
-
+  "GL_AMD_compressed_ATC_texture",
+  "GL_ATI_texture_compression_atitc",
 #endif
 };
 

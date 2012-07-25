@@ -60,6 +60,9 @@ const char* get_name (PixelFormat format)
     case PixelFormat_RGB_PVRTC4:  return "rgb_pvrtc4";
     case PixelFormat_RGBA_PVRTC2: return "rgba_pvrtc2";
     case PixelFormat_RGBA_PVRTC4: return "rgba_pvrtc4";
+    case PixelFormat_ATC_RGB_AMD:                     return "atc";
+    case PixelFormat_ATC_RGBA_EXPLICIT_ALPHA_AMD:     return "atci";
+    case PixelFormat_ATC_RGBA_INTERPOLATED_ALPHA_AMD: return "atca";
     case PixelFormat_D16:         return "d16";
     case PixelFormat_D24X8:       return "d24x8";
     case PixelFormat_D24S8:       return "d24s8";

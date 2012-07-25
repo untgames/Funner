@@ -47,6 +47,9 @@ RenderTargetType get_target_type (IView* view)
       case PixelFormat_RGB_PVRTC4:
       case PixelFormat_RGBA_PVRTC2:
       case PixelFormat_RGBA_PVRTC4:      
+      case PixelFormat_ATC_RGB_AMD:
+      case PixelFormat_ATC_RGBA_EXPLICIT_ALPHA_AMD:
+      case PixelFormat_ATC_RGBA_INTERPOLATED_ALPHA_AMD:
         return RenderTargetType_Color;
       case PixelFormat_D16:
       case PixelFormat_D24X8:

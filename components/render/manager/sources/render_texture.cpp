@@ -32,6 +32,9 @@ render::low_level::PixelFormat get_compressed_pixel_format (const char* name)
   else if (!strcmp (name, "rgb_pvrtc4"))  return render::low_level::PixelFormat_RGB_PVRTC4;
   else if (!strcmp (name, "rgba_pvrtc2")) return render::low_level::PixelFormat_RGBA_PVRTC2;
   else if (!strcmp (name, "rgba_pvrtc4")) return render::low_level::PixelFormat_RGBA_PVRTC4;
+  else if (!strcmp (name, "atc"))         return render::low_level::PixelFormat_ATC_RGB_AMD;
+  else if (!strcmp (name, "atci"))        return render::low_level::PixelFormat_ATC_RGBA_EXPLICIT_ALPHA_AMD;
+  else if (!strcmp (name, "atca"))        return render::low_level::PixelFormat_ATC_RGBA_INTERPOLATED_ALPHA_AMD;
   else if (!strcmp (name, "dxt1"))        return render::low_level::PixelFormat_DXT1;
   else if (!strcmp (name, "dxt3"))        return render::low_level::PixelFormat_DXT3;
   else if (!strcmp (name, "dxt5"))        return render::low_level::PixelFormat_DXT5;
@@ -344,6 +347,9 @@ TextureImpl::TextureImpl (const DeviceManagerPtr& device_manager, render::Textur
       case render::low_level::PixelFormat_DXT1:        format = PixelFormat_DXT1; break;
       case render::low_level::PixelFormat_DXT3:        format = PixelFormat_DXT3; break;
       case render::low_level::PixelFormat_DXT5:        format = PixelFormat_DXT5; break;
+      case render::low_level::PixelFormat_ATC_RGB_AMD:                     format = PixelFormat_ATC_RGB_AMD; break;
+      case render::low_level::PixelFormat_ATC_RGBA_EXPLICIT_ALPHA_AMD:     format = PixelFormat_ATC_RGBA_EXPLICIT_ALPHA_AMD; break;
+      case render::low_level::PixelFormat_ATC_RGBA_INTERPOLATED_ALPHA_AMD: format = PixelFormat_ATC_RGBA_INTERPOLATED_ALPHA_AMD; break;
       case render::low_level::PixelFormat_RGB_PVRTC2:  format = PixelFormat_RGB_PVRTC2; break;
       case render::low_level::PixelFormat_RGB_PVRTC4:  format = PixelFormat_RGB_PVRTC4; break;
       case render::low_level::PixelFormat_RGBA_PVRTC2: format = PixelFormat_RGBA_PVRTC2; break;

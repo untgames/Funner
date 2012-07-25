@@ -61,6 +61,17 @@ Texture::Texture
           get_name (desc.format));
 
       break;
+    case PixelFormat_ATC_RGB_AMD:
+    case PixelFormat_ATC_RGBA_EXPLICIT_ALPHA_AMD:
+    case PixelFormat_ATC_RGBA_INTERPOLATED_ALPHA_AMD:
+      if (!GetCaps ().has_amd_compressed_atc_texture)
+        throw xtl::format_not_supported_exception (METHOD_NAME, "AMD ATC texture compression doesn't supported");
+
+      if (desc.generate_mips_enable)
+        throw xtl::format_operation_exception (METHOD_NAME, "Auto-generate mipmaps incompatible with compressed textures (desc.format=%s)",
+          get_name (desc.format));
+
+      break;
     case PixelFormat_D24S8:
       if (!GetCaps ().has_ext_packed_depth_stencil)
         throw xtl::format_not_supported_exception (METHOD_NAME, "Can't create depth-stencil texture (GL_EXT_packed_depth_stencil not supported)");
@@ -474,6 +485,9 @@ void Texture::SetData
       case PixelFormat_RGB_PVRTC4:
       case PixelFormat_RGBA_PVRTC2:
       case PixelFormat_RGBA_PVRTC4:
+      case PixelFormat_ATC_RGB_AMD:
+      case PixelFormat_ATC_RGBA_EXPLICIT_ALPHA_AMD:
+      case PixelFormat_ATC_RGBA_INTERPOLATED_ALPHA_AMD:
       {
         size_t buffer_size = get_image_size (width, height, source_format);
 
@@ -663,6 +677,9 @@ void Texture::GetData
         case PixelFormat_RGB_PVRTC4:
         case PixelFormat_RGBA_PVRTC2:
         case PixelFormat_RGBA_PVRTC4:
+        case PixelFormat_ATC_RGB_AMD:
+        case PixelFormat_ATC_RGBA_EXPLICIT_ALPHA_AMD:
+        case PixelFormat_ATC_RGBA_INTERPOLATED_ALPHA_AMD:
           throw xtl::format_not_supported_exception (METHOD_NAME, "Get texture sub-image data not supported for format=%s", get_name (target_format));
         case PixelFormat_DXT1:
         case PixelFormat_DXT3:

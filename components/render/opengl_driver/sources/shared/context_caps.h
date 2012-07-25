@@ -27,6 +27,7 @@ struct ContextCaps
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Поддерживаемые расширения
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+  bool has_amd_compressed_atc_texture;     //GL_AMD_compressed_ATC_texture
   bool has_arb_depth_texture;              //GL_ARB_depth_texture
   bool has_arb_fragment_shader;            //GL_ARB_fragment_shader
   bool has_arb_multisample;                //GL_ARB_multisample
