@@ -1,3 +1,4 @@
+#include <cmath>
 #include <cstdio>
 
 #include <stl/string>
@@ -125,6 +126,16 @@ void error (const char* format, ...)
   exit (1);
 }
 
+size_t get_mips_count (size_t size)
+{
+  return (size_t)(log ((double)size) / log (2.0)) + 1;
+}
+
+size_t get_mips_count (size_t width, size_t height)
+{
+  return get_mips_count (stl::max (width, height));
+}
+
 /*
     Обработка командной строки
 */
@@ -236,7 +247,7 @@ void validate (Params& params)
 }
 
 //сохранение данных в DDS-файл
-void save_compressed_dds (const char* file_name, size_t width, size_t height, uint32 fourcc, const unsigned char* data, size_t data_size)
+void save_compressed_dds (const char* file_name, size_t width, size_t height, uint32 fourcc, size_t mips_count, const unsigned char** mips_data, const size_t* mips_data_sizes)
 {
   common::OutputFile file (file_name);
 
@@ -257,9 +268,17 @@ void save_compressed_dds (const char* file_name, size_t width, size_t height, ui
 
   header.dwCaps = DDSCAPS_TEXTURE;
 
+  if (mips_count > 0)
+  {
+    header.dwFlags      |= DDSD_MIPMAPCOUNT;
+    header.dwCaps       |= DDSCAPS_COMPLEX | DDSCAPS_MIPMAP;
+    header.dwMipMapCount = mips_count;
+  }
+
   file.Write (&header, sizeof (header));
 
-  file.Write (data, data_size);
+  for (size_t i = 0; i < mips_count; i++)
+    file.Write (mips_data [i], mips_data_sizes [i]);
 }
 
 #if defined (_MSC_VER) || defined (__MACH__)
@@ -346,10 +365,9 @@ void qualcomm_texture_compress (const Params& params)
   else
     throw xtl::format_operation_exception (METHOD_NAME, "Unsupported target format '%s'", params.target_format.c_str ());
 
-  TQonvertImage source, destination;
+  TQonvertImage source;
 
   memset (&source, 0, sizeof (source));
-  memset (&destination, 0, sizeof (destination));
 
   source.nFormat   = source_format;
   source.nWidth    = source_image.Width ();
@@ -357,27 +375,60 @@ void qualcomm_texture_compress (const Params& params)
   source.nDataSize = source.nWidth * source.nHeight * media::get_bytes_per_pixel (source_image.Format ());
   source.pData     = (unsigned char*)source_image.Bitmap ();
 
+  size_t mips_count = get_mips_count (source.nWidth, source.nHeight);
+
+  xtl::uninitialized_storage<TQonvertImage>  mips_images (mips_count);
+  xtl::uninitialized_storage<unsigned char*> mips_data (mips_count);
+  xtl::uninitialized_storage<size_t>         mips_sizes (mips_count);
+
+  memset (mips_images.data (), 0, sizeof (TQonvertImage) * mips_count);
+
   TFormatFlags compression_flags;
 
   memset (&compression_flags, 0, sizeof (compression_flags));
 
   compression_flags.nFlipY = 1;
 
-  destination.nFormat   = destination_format;
-  destination.nWidth    = source.nWidth;
-  destination.nHeight   = source.nHeight;
-  destination.pFormatFlags = &compression_flags;
+  size_t total_size = 0;
 
-  check_qualcomm_error (METHOD_NAME, Qonvert (&source, &destination));
+  for (size_t i = 0; i < mips_count; i++)
+  {
+    TQonvertImage& destination = mips_images.data () [i];
 
-  xtl::uninitialized_storage<unsigned char> destination_data (destination.nDataSize);
+    destination.nFormat      = destination_format;
+    destination.nWidth       = source.nWidth >> i;
+    destination.nHeight      = source.nHeight >> i;
+    destination.pFormatFlags = &compression_flags;
 
-  destination.pData = destination_data.data ();
+    if (!destination.nWidth)  destination.nWidth  = 1;
+    if (!destination.nHeight) destination.nHeight = 1;
 
-  check_qualcomm_error (METHOD_NAME, Qonvert (&source, &destination));
+    check_qualcomm_error (METHOD_NAME, Qonvert (&source, &destination));
+
+    mips_sizes.data () [i] = destination.nDataSize;
+
+    total_size += destination.nDataSize;
+  }
+
+  xtl::uninitialized_storage<unsigned char> destination_data (total_size);
+
+  size_t current_mip_data_offset = 0;
+
+  for (size_t i = 0; i < mips_count; i++)
+  {
+    TQonvertImage& destination = mips_images.data () [i];
+
+    destination.pData = destination_data.data () + current_mip_data_offset;
+
+    check_qualcomm_error (METHOD_NAME, Qonvert (&source, &destination));
+
+    mips_data.data () [i] = destination.pData;
+
+    current_mip_data_offset += destination.nDataSize;
+  }
 
   if (common::suffix (params.target) == ".dds")
-    save_compressed_dds (params.target.c_str (), destination.nWidth, destination.nHeight, fourcc, destination.pData, destination.nDataSize);
+    save_compressed_dds (params.target.c_str (), source.nWidth, source.nHeight, fourcc, mips_count, (const unsigned char**)mips_data.data (), mips_sizes.data ());
   else
     throw xtl::format_operation_exception (METHOD_NAME, "Unsupported container for target image '%s'", params.target.c_str ());
 }
