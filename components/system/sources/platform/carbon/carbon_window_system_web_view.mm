@@ -6,18 +6,72 @@
 using namespace syslib;
 using namespace syslib::macosx;
 
+@interface WebViewDelegate : NSObject
+{
+  @private
+    IWebViewListener *listener;
+}
+
+@end
+
+@implementation WebViewDelegate
+
+-(id)initWithListener:(IWebViewListener*)in_listener
+{
+  self = [super init];
+
+  if (!self)
+    return nil;
+
+  listener = in_listener;
+
+  return self;
+}
+
+-(void)webView:(WebView *)webView decidePolicyForMIMEType:(NSString *)type request:(NSURLRequest *)request frame:(WebFrame *)frame decisionListener:(id < WebPolicyDecisionListener >)policy_listener
+{
+  if (listener->ShouldStartLoading ([[[request URL] absoluteString] UTF8String]))
+    [policy_listener use];
+  else
+    [policy_listener ignore];
+}
+
+-(void)webView:(WebView *)sender didCommitLoadForFrame:(WebFrame *)frame
+{
+  listener->OnLoadStarted ([[[[[frame dataSource] request] URL] absoluteString] UTF8String]);
+}
+
+-(void)webView:(WebView *)sender didFinishLoadForFrame:(WebFrame *)frame
+{
+  listener->OnLoadFinished ();
+}
+
+-(void)webView:(WebView *)sender didFailLoadWithError:(NSError *)error forFrame:(WebFrame *)frame
+{
+  listener->OnLoadFailed ([[error description] UTF8String]);
+}
+
+-(void)webView:(WebView *)sender didFailProvisionalLoadWithError:(NSError *)error forFrame:(WebFrame *)frame
+{
+  listener->OnLoadFailed ([[error description] UTF8String]);
+}
+
+@end
+
 struct syslib::web_view_handle
 {
   IWebViewListener *listener;
   WindowRef        window;
   HIViewRef        web_view;
   WebView          *ns_web_view;
+  WebViewDelegate  *delegate;
 
   web_view_handle (IWebViewListener *in_listener)
     : listener (in_listener)
     , window (0)
     , web_view (0)
     , ns_web_view (0)
+    , delegate (0)
   {
     try
     {
@@ -28,11 +82,17 @@ struct syslib::web_view_handle
 
       RepositionWindow (window, 0, kWindowCenterOnMainScreen);
 
-      ShowWindow (window);
-
       check_window_manager_error (HIWebViewCreate (&web_view), "::HIWebViewCreate", "Can't create web view");
 
       ns_web_view = HIWebViewGetWebView (web_view);
+
+      if (listener)
+      {
+        delegate = [[WebViewDelegate alloc] initWithListener:listener];
+
+        [ns_web_view setPolicyDelegate:delegate];
+        [ns_web_view setFrameLoadDelegate:delegate];
+      }
 
       HIViewRef root_view = HIViewGetRoot (window),
                 content_view;
@@ -74,6 +134,8 @@ struct syslib::web_view_handle
       if (window)
         DisposeWindow (window);
 
+      [delegate release];
+
       e.touch ("syslib::CarbonWindowManager::CreateWebView");
       throw;
     }
@@ -86,6 +148,8 @@ struct syslib::web_view_handle
 
     if (window)
       DisposeWindow (window);
+
+    [delegate release];
   }
 };
 
