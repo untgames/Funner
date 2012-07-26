@@ -51,6 +51,8 @@ const OSType WINDOW_PROPERTY_CREATOR     = 'untg';  //тег приложения
 const OSType FULLSCREEN_PROPERTY_TAG     = 'fscr';  //тег свойства полноэкранности
 const OSType CURSOR_VISIBLE_PROPERTY_TAG = 'hcrs';  //тег видимости курсора (если истина - курсор виден)
 const OSType WINDOW_IMPL_PROPERTY        = 'impl';  //указатель на реализацию данного окна
+const OSType BACKGROUND_COLOR_PROPERTY   = 'bgcl';  //цвет фона окна
+const OSType BACKGROUND_STATE_PROPERTY   = 'bgst';  //включен ли специальный фон окна
 //const UInt32 UNTGS_EVENT_CLASS           = 'untg';  //класс событий приложения
 //const UInt32 DELETE_WINDOW_EVENT         = 'dwnd';  //событие удаления окна
 
@@ -72,8 +74,6 @@ struct WindowImpl
   UniChar              char_code_buffer[CHAR_CODE_BUFFER_SIZE]; //буффер для получения имени введенного символа
   bool                 is_cursor_in_window;                     //находится ли курсор в окне
   NSCursor             *cursor;                                 //курсор отображаемый над окном
-  bool                 background_state;                        //включен ли задний фон
-  Color                background_color;                        //цвет заднего фона
   WindowGroupRef       window_group;
   bool                 is_maximized;                            //окно находится в полноэкранном режиме
   bool                 is_multitouch_enabled;                   //включен ли multitouch
@@ -89,7 +89,6 @@ struct WindowImpl
     , carbon_window (0)
     , is_cursor_in_window (false)
     , cursor ([[NSCursor arrowCursor] retain])
-    , background_state (false)
     , window_group (0)
     , is_maximized (false)
     , is_multitouch_enabled (false)
@@ -1154,18 +1153,22 @@ void CarbonWindowManager::SetWindowFlag (window_t handle, WindowFlag flag, bool 
 
         ShowWindow (wnd);
 
-        if (window_class == kSheetWindowClass)
+        if (window_class == kSheetWindowClass || window_class == kHelpWindowClass)
         {
-          WindowImpl *impl;
+          WindowImpl *impl = 0;
 
-          check_window_manager_error (GetWindowProperty (wnd, WINDOW_PROPERTY_CREATOR, WINDOW_IMPL_PROPERTY,
-                                      sizeof (impl), 0, &impl), "::GetWindowProperty", "Can't get window property");
+          OSStatus get_impl_status = GetWindowProperty (wnd, WINDOW_PROPERTY_CREATOR, WINDOW_IMPL_PROPERTY,
+              sizeof (impl), 0, &impl);
+
+          if (get_impl_status != noErr && get_impl_status != errWindowPropertyNotFound)
+            check_window_manager_error (get_impl_status, "::GetWindowProperty", "Can't get window property");
 
           if (state)
           {
             check_window_manager_error (SetSystemUIMode (kUIModeAllHidden, 0), "::SetSystemUIMode", "Can't set required system UI mode");
 
-            impl->is_maximized = true;
+            if (impl)
+              impl->is_maximized = true;
 
             CGRect display_bounds = CGDisplayBounds (CGMainDisplayID ());
             Rect   window_bounds;
@@ -1179,11 +1182,10 @@ void CarbonWindowManager::SetWindowFlag (window_t handle, WindowFlag flag, bool 
           }
           else
           {
-            if (impl->is_maximized)
-            {
-              check_window_manager_error (SetSystemUIMode (kUIModeNormal, 0), "::SetSystemUIMode", "Can't set required system UI mode");
+            check_window_manager_error (SetSystemUIMode (kUIModeNormal, 0), "::SetSystemUIMode", "Can't set required system UI mode");
+
+            if (impl)
               impl->is_maximized = false;
-            }
           }
         }
         else
@@ -1248,14 +1250,16 @@ void CarbonWindowManager::SetParentWindowHandle (window_t child, const void* par
     if (!child)
       throw xtl::make_null_argument_exception ("", "child");
 
+    WindowRef child_window = (WindowRef)child;
+
     if (!parent)
     {
       WindowImpl *child_impl;
 
-      check_window_manager_error (GetWindowProperty ((WindowRef)child, WINDOW_PROPERTY_CREATOR, WINDOW_IMPL_PROPERTY,
+      check_window_manager_error (GetWindowProperty (child_window, WINDOW_PROPERTY_CREATOR, WINDOW_IMPL_PROPERTY,
                                   sizeof (child_impl), 0, &child_impl), "::GetWindowProperty", "Can't get window property");
 
-      check_window_manager_error (SetWindowGroup ((WindowRef)child, child_impl->window_group), "::SetWindowGroup", "Can't set window group");
+      check_window_manager_error (SetWindowGroup (child_window, child_impl->window_group), "::SetWindowGroup", "Can't set window group");
     }
     else
     {
@@ -1264,12 +1268,12 @@ void CarbonWindowManager::SetParentWindowHandle (window_t child, const void* par
       check_window_manager_error (GetWindowProperty ((WindowRef)parent, WINDOW_PROPERTY_CREATOR, WINDOW_IMPL_PROPERTY,
           sizeof (parent_impl), 0, &parent_impl), "::GetWindowProperty", "Can't get window property");
 
-      check_window_manager_error (SetWindowGroup ((WindowRef)child, parent_impl->window_group), "::SetWindowGroup", "Can't set window group");
+      check_window_manager_error (SetWindowGroup (child_window, parent_impl->window_group), "::SetWindowGroup", "Can't set window group");
     }
   }
   catch (xtl::exception& exception)
   {
-    exception.touch ("syslib::CarbonWindowManager::SetParentWindow");
+    exception.touch ("syslib::CarbonWindowManager::SetParentWindowHandle");
     throw;
   }
 }
@@ -1559,17 +1563,14 @@ bool CarbonWindowManager::IsMultitouchEnabled (window_t handle)
    Цвет фона
 */
 
-void CarbonWindowManager::SetBackgroundColor (window_t window, const Color& color)
+void CarbonWindowManager::SetBackgroundColor (window_t handle, const Color& color)
 {
   try
   {
-    if (!window)
-      throw xtl::make_null_argument_exception ("", "window");
+    if (!handle)
+      throw xtl::make_null_argument_exception ("", "handle");
 
-    WindowImpl *impl;
-
-    check_window_manager_error (GetWindowProperty ((WindowRef)window, WINDOW_PROPERTY_CREATOR, WINDOW_IMPL_PROPERTY,
-                                sizeof (impl), 0, &impl), "::GetWindowProperty", "Can't get window property");
+    WindowRef window = (WindowRef)handle;
 
     RGBColor rgb_color;
 
@@ -1577,9 +1578,10 @@ void CarbonWindowManager::SetBackgroundColor (window_t window, const Color& colo
     rgb_color.green = color.green / 255.f * 0xffff;
     rgb_color.blue  = color.blue / 255.f * 0xffff;
 
-    check_window_manager_error (SetWindowContentColor ((WindowRef)window, &rgb_color), "::SetWindowContentColor", "Can't set window content color");
+    check_window_manager_error (SetWindowContentColor (window, &rgb_color), "::SetWindowContentColor", "Can't set window content color");
 
-    impl->background_color = color;
+    check_window_manager_error (SetWindowProperty (window, WINDOW_PROPERTY_CREATOR, BACKGROUND_COLOR_PROPERTY,
+                                sizeof (color), &color), "::SetWindowProperty", "Can't set window property");
   }
   catch (xtl::exception& e)
   {
@@ -1595,21 +1597,26 @@ void CarbonWindowManager::SetBackgroundState (window_t window, bool state)
     if (!window)
       throw xtl::make_null_argument_exception ("", "window");
 
-    WindowImpl *impl;
-
-    check_window_manager_error (GetWindowProperty ((WindowRef)window, WINDOW_PROPERTY_CREATOR, WINDOW_IMPL_PROPERTY,
-                                sizeof (impl), 0, &impl), "::GetWindowProperty", "Can't get window property");
-
-    if (impl->background_state == state)
+    if (GetBackgroundState (window) == state)
       return;
 
-    impl->background_state = state;
+    Color color;
 
-    Color default_color;
+    memset (&color, 0, sizeof (color));
 
-    memset (&default_color, 0, sizeof (default_color));
+    if (state)
+    {
+      OSStatus get_color_status = GetWindowProperty ((WindowRef)window, WINDOW_PROPERTY_CREATOR, BACKGROUND_COLOR_PROPERTY,
+          sizeof (color), 0, &color);
 
-    SetBackgroundColor (window, state ? impl->background_color : default_color);
+      if (get_color_status != noErr && get_color_status != errWindowPropertyNotFound)
+        check_window_manager_error (get_color_status, "::GetWindowProperty", "Can't get window property");
+    }
+
+    SetBackgroundColor (window, color);
+
+    check_window_manager_error (SetWindowProperty ((WindowRef)window, WINDOW_PROPERTY_CREATOR, BACKGROUND_STATE_PROPERTY,
+                                sizeof (state), &state), "::SetWindowProperty", "Can't set window property");
   }
   catch (xtl::exception& exception)
   {
@@ -1651,12 +1658,15 @@ bool CarbonWindowManager::GetBackgroundState (window_t window)
     if (!window)
       throw xtl::make_null_argument_exception ("", "window");
 
-    WindowImpl *impl;
+    bool background_state = false;
 
-    check_window_manager_error (GetWindowProperty ((WindowRef)window, WINDOW_PROPERTY_CREATOR, WINDOW_IMPL_PROPERTY,
-                                sizeof (impl), 0, &impl), "::GetWindowProperty", "Can't get window property");
+    OSStatus get_color_status = GetWindowProperty ((WindowRef)window, WINDOW_PROPERTY_CREATOR, BACKGROUND_STATE_PROPERTY,
+        sizeof (background_state), 0, &background_state);
 
-    return impl->background_state;
+    if (get_color_status != noErr && get_color_status != errWindowPropertyNotFound)
+      check_window_manager_error (get_color_status, "::GetWindowProperty", "Can't get window property");
+
+    return background_state;
   }
   catch (xtl::exception& exception)
   {

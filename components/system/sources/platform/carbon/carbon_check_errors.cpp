@@ -52,6 +52,7 @@ const char* get_window_manager_error_name (OSStatus error)
     case windowNoAppModalStateErr:               return "windowNoAppModalStateErr";
     case errWindowDoesntSupportFocus:            return "errWindowDoesntSupportFocus";
     case errWindowRegionCodeInvalid:             return "errWindowRegionCodeInvalid";
+    case errNeedsCompositedWindow:               return "errNeedsCompositedWindow";
     default:                                     return "Unknown error";
   }
 }
