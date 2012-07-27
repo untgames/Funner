@@ -25,7 +25,7 @@ using namespace syslib::macosx;
 
 @implementation WindowDisposer
 
--(id)initWithWindow:(WindowRef)in_window
+-(id)initWithCarbonWindow:(WindowRef)in_window
 {
   self = [super init];
 
@@ -111,7 +111,7 @@ struct WindowImpl
 
     if (carbon_window) //удаление окна по таймеру, так как если удалить окно во время деактивации к нему идет обращение со стороны системы
     {
-      WindowDisposer *disposer = [[WindowDisposer alloc] initWithWindow:carbon_window];
+      WindowDisposer *disposer = [[WindowDisposer alloc] initWithCarbonWindow:carbon_window];
 
       [NSTimer scheduledTimerWithTimeInterval:0.1 target:disposer selector:@selector (dispose) userInfo:nil repeats:NO];
 
@@ -1153,7 +1153,7 @@ void CarbonWindowManager::SetWindowFlag (window_t handle, WindowFlag flag, bool 
 
         ShowWindow (wnd);
 
-        if (window_class == kSheetWindowClass || window_class == kHelpWindowClass)
+        if (window_class == kSheetWindowClass || window_class == kFloatingWindowClass)
         {
           WindowImpl *impl = 0;
 

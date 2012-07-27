@@ -77,7 +77,7 @@ struct syslib::web_view_handle
     {
       ::Rect window_rect = {0, 0, 400, 600};
 
-      check_window_manager_error (CreateNewWindow (kHelpWindowClass, kWindowNoShadowAttribute | kWindowStandardHandlerAttribute | kWindowCompositingAttribute, &window_rect, &window), "::CreateNewWindow",
+      check_window_manager_error (CreateNewWindow (kFloatingWindowClass, kWindowNoShadowAttribute | kWindowStandardHandlerAttribute | kWindowCompositingAttribute, &window_rect, &window), "::CreateNewWindow",
                                   "Can't create window");
 
       RepositionWindow (window, 0, kWindowCenterOnMainScreen);
@@ -143,6 +143,9 @@ struct syslib::web_view_handle
 
   ~web_view_handle ()
   {
+    [ns_web_view setPolicyDelegate:nil];
+    [ns_web_view setFrameLoadDelegate:nil];
+
     if (web_view)
       CFRelease (web_view);
 
