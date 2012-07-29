@@ -358,7 +358,7 @@ void EventTrack::GetEvents (float previous_time, float current_time, const Event
 
   size_t events_to_fire_count = impl->events_to_fire.size ();
 
-  for (float t = 0; t < current_time - previous_time;)
+  for (float t = 0, time_period = current_time - previous_time; t < time_period;)
   {
     float min_dt = current_time - t;
 
@@ -392,6 +392,9 @@ void EventTrack::GetEvents (float previous_time, float current_time, const Event
             //событие периодическое
 
           float clamped_t = fmod (t - delay, period);                    
+
+          if (period - clamped_t < EPSILON) //защита от потери точности float при сложении
+            clamped_t = 0;
 
           dt = period - clamped_t;
 

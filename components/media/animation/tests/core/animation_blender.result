@@ -20,7 +20,11 @@ events:
     event: time=0.40 value='animation event2'
     event: time=0.50 value='animation event1'
     event: time=0.60 value='animation event2'
+    event: time=0.60 value='animation event1'
+    event: time=0.70 value='animation event1'
     event: time=0.80 value='animation event2'
+    event: time=0.80 value='animation event1'
+    event: time=0.90 value='animation event1'
 targets_count=3 sources_count=2 sources_channels_count=6:
   target 'test_channel_target1' (sources_count=2):
     #0: name='param1', type=float
