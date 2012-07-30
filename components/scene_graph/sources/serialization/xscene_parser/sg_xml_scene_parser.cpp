@@ -133,7 +133,7 @@ template <class T> struct Param
   }
 };
 
-template <class T, size_t Size> struct Param<math::vector<T, Size> >
+template <class T, unsigned int Size> struct Param<math::vector<T, Size> >
 {
   math::vector<T, Size> value;
   bool                  state;
