@@ -55,6 +55,7 @@ struct TextLine::Impl: public xtl::instance_counter<TextLine>
   CharsColors       chars_colors_factors;     //множители цвета букв
   CharsColors       chars_colors;
   bool              chars_colors_need_update;
+  float             spacing_multiplier;
 
   Impl ()
    : length (0),
@@ -65,7 +66,8 @@ struct TextLine::Impl: public xtl::instance_counter<TextLine>
      color (1.f, 1.f, 1.f, 1.f), 
      horizontal_alignment (TextLineAlignment_Left),
      vertical_alignment (TextLineAlignment_Top),
-     chars_colors_need_update (false)
+     chars_colors_need_update (false),
+     spacing_multiplier (1.f)
    {}
 
   void OnTextChanged ()
@@ -431,6 +433,20 @@ void TextLine::SetFont (const char* font_name)
 const char* TextLine::Font () const
 {
   return impl->font_name.c_str ();
+}
+
+/*
+   Установка/получение межбуквенного интервала
+*/
+
+void TextLine::SetSpacingMultiplier (float spacing_multiplier)
+{
+  impl->spacing_multiplier = spacing_multiplier;
+}
+
+float TextLine::SpacingMultiplier () const
+{
+  return impl->spacing_multiplier;
 }
 
 /*

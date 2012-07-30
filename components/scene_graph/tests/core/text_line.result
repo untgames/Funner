@@ -5,12 +5,14 @@ TextLine unicode text = ''
 TextLine font name = ''
 TextLine length = 0
 TextLine horizontal alignment = 'TextLineAlignment_Left/TextLineAlignment_Top', vertical_alignment = 'TextLineAlignment_Left/TextLineAlignment_Top'
+textLine spacing multiplier = 1.00
 TextLine color = [0.10 0.20 0.30 0.40]
 TextLine text = 'Non-unicode text'
 TextLine unicode text = 'Non-unicode text'
 TextLine font name = 'font'
 TextLine length = 16
 TextLine horizontal alignment = 'TextLineAlignment_Center', vertical_alignment = 'TextLineAlignment_Right/TextLineAlignment_Bottom'
+textLine spacing multiplier = 2.00
 TextLine text = 'Unicode text'
 TextLine unicode text = 'Unicode text'
 TextLine length = 12

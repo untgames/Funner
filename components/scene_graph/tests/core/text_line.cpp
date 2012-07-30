@@ -43,11 +43,13 @@ int main ()
   printf ("TextLine font name = '%s'\n", text_line->Font ());
   printf ("TextLine length = %u\n", text_line->TextLength ());
   printf ("TextLine horizontal alignment = '%s', vertical_alignment = '%s'\n", get_name (text_line->HorizontalAlignment ()), get_name (text_line->VerticalAlignment ()));
+  printf ("textLine spacing multiplier = %.2f\n", text_line->SpacingMultiplier ());
 
   text_line->SetColor (0.1f, 0.2f, 0.3f, 0.4f);
   text_line->SetTextUtf8 ("Non-unicode text");
   text_line->SetFont  ("font");
   text_line->SetAlignment (TextLineAlignment_Center, TextLineAlignment_Bottom);
+  text_line->SetSpacingMultiplier (2.f);
 
   printf ("TextLine color = [%.2f %.2f %.2f %.2f]\n", text_line->Color ().x, text_line->Color ().y, text_line->Color ().z, text_line->Color ().w);
   printf ("TextLine text = '%s'\n", text_line->TextUtf8 ());
@@ -55,6 +57,7 @@ int main ()
   printf ("TextLine font name = '%s'\n", text_line->Font ());
   printf ("TextLine length = %u\n", text_line->TextLength ());
   printf ("TextLine horizontal alignment = '%s', vertical_alignment = '%s'\n", get_name (text_line->HorizontalAlignment ()), get_name (text_line->VerticalAlignment ()));
+  printf ("textLine spacing multiplier = %.2f\n", text_line->SpacingMultiplier ());
   
   stl::basic_string<unsigned int> result = toutf32 (L"Unicode text");
 
