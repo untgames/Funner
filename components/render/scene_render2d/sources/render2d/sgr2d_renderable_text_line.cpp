@@ -42,7 +42,8 @@ struct RenderableTextLine::Impl
   TextDimensions                 current_text_dimensions;      //текущие границы текста
   scene_graph::TextLineAlignment current_horizontal_alignment; //текущее горизонтальное выравнивание
   scene_graph::TextLineAlignment current_vertical_alignment;   //текущее вертикальное выравнивание
-  math::vec3f                    current_offset;               //текущее смещение текста, определяемое выраваниванием
+  float                          current_spacing_multiplier;   //текущее значение множителя межбуквенного интервала
+  math::vec3f                    current_offset;               //текущее смещение текста, определяемое выравниванием
   size_t                         current_world_tm_hash;        //хэш текущей матрицы преобразований
   bool                           current_scissor_state;        //состояние области отсечения
   math::vec4f                    current_scissor_rect;         //размеры области отсечения
@@ -91,7 +92,8 @@ struct RenderableTextLine::Impl
 
         //определение необходимости обновления текста
 
-      bool need_update_text = renderable_font != current_renderable_font || text_line->TextUtf32Hash () != current_text_hash;
+      bool need_update_text = renderable_font != current_renderable_font || text_line->TextUtf32Hash () != current_text_hash ||
+                              current_spacing_multiplier != text_line->SpacingMultiplier ();
 
         //определение необходимости обновления смещения текста
 
@@ -218,15 +220,17 @@ struct RenderableTextLine::Impl
       {
           //инициализация параметров рендеринга текста
 
-        const unsigned int*     text_unicode      = text_line->TextUtf32 ();
-        const media::Font&      font              = renderable_font->GetFont ();
-        const media::GlyphInfo* glyphs            = font.Glyphs ();
-        size_t                  glyphs_count      = font.GlyphsTableSize (),
-                                first_glyph_code  = font.FirstGlyphCode (),
-                                last_glyph_code   = first_glyph_code + glyphs_count;
-        float                   current_pen_x     = 0.0f,
-                                current_pen_y     = 0.0f,
-                                max_glyph_side    = (float)renderable_font->GetMaxGlyphSide ();
+        const unsigned int*     text_unicode       = text_line->TextUtf32 ();
+        const media::Font&      font               = renderable_font->GetFont ();
+        const media::GlyphInfo* glyphs             = font.Glyphs ();
+        size_t                  glyphs_count       = font.GlyphsTableSize (),
+                                first_glyph_code   = font.FirstGlyphCode (),
+                                last_glyph_code    = first_glyph_code + glyphs_count;
+        float                   current_pen_x      = 0.0f,
+                                current_pen_y      = 0.0f,
+                                max_glyph_side     = (float)renderable_font->GetMaxGlyphSide (),
+                                spacing_multiplier = text_line->SpacingMultiplier (),
+                                advance_multiplier = spacing_multiplier / max_glyph_side;
         TextDimensions          text_dimensions;
 
           //резервирование места для буфера спрайтов
@@ -288,8 +292,8 @@ struct RenderableTextLine::Impl
 
             //перенос пера
 
-          current_pen_x += glyph.advance_x / max_glyph_side;
-          current_pen_y += glyph.advance_y / max_glyph_side;
+          current_pen_x += glyph.advance_x * advance_multiplier;
+          current_pen_y += glyph.advance_y * advance_multiplier;
 
             //корректировка границ текста
 
@@ -321,9 +325,10 @@ struct RenderableTextLine::Impl
 
           //обновление параметров
 
-        current_text_dimensions = text_dimensions;
-        current_renderable_font = renderable_font;
-        current_text_hash       = text_line->TextUtf32Hash ();
+        current_text_dimensions    = text_dimensions;
+        current_renderable_font    = renderable_font;
+        current_text_hash          = text_line->TextUtf32Hash ();
+        current_spacing_multiplier = spacing_multiplier;
 
           //обновление флагов
 

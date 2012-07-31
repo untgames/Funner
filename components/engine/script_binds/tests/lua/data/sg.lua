@@ -663,17 +663,20 @@ function test_text_line ()
   print ("Font = " .. text_line1.Font)
   print ("Color = " .. tostring (text_line1.Color))
   print ("Horizontal aligment = " .. get_name (text_line1.HorizontalAlignment) .. " vertical aligment = " .. get_name (text_line1.VerticalAlignment))
+  print ("Spacing Multiplier = " .. text_line1.SpacingMultiplier)
 
   text_line1.Text                = "text"
   text_line1.Font                = "font"
   text_line1.Color               = vec4 (0.1, 0.2, 0.3, 0.4)
   text_line1.HorizontalAlignment = Scene.TextLineAlignment.Center
   text_line1.VerticalAlignment   = Scene.TextLineAlignment.Bottom
+  text_line1.SpacingMultiplier   = 2
 
   print ("Text = " .. text_line1.Text)
   print ("Font = " .. text_line1.Font)
   print ("Color = " .. tostring (text_line1.Color))
   print ("Horizontal aligment = " .. get_name (text_line1.HorizontalAlignment) .. " vertical aligment = " .. get_name (text_line1.VerticalAlignment))
+  print ("Spacing Multiplier = " .. text_line1.SpacingMultiplier)
 
   text_line1.Text = "Non-unicode text"
 

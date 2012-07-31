@@ -442,6 +442,8 @@ const char* TextLine::Font () const
 void TextLine::SetSpacingMultiplier (float spacing_multiplier)
 {
   impl->spacing_multiplier = spacing_multiplier;
+
+  UpdateNotify ();
 }
 
 float TextLine::SpacingMultiplier () const

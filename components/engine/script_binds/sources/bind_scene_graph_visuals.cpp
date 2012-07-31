@@ -133,6 +133,8 @@ void bind_text_line_library (Environment& environment)
   lib.Register ("get_HorizontalAlignment", make_invoker (&TextLine::HorizontalAlignment));
   lib.Register ("set_VerticalAlignment",   make_invoker (&TextLine::SetVerticalAlignment));
   lib.Register ("get_VerticalAlignment",   make_invoker (&TextLine::VerticalAlignment));
+  lib.Register ("set_SpacingMultiplier",   make_invoker (&TextLine::SetSpacingMultiplier));
+  lib.Register ("get_SpacingMultiplier",   make_invoker (&TextLine::SpacingMultiplier));
 
   lib.Register ("SetColor", make_invoker (make_invoker (implicit_cast<void (TextLine::*) (float, float, float, float)> (&TextLine::SetColor)),
                                           make_invoker (implicit_cast<void (TextLine::*) (float, float, float)>        (&TextLine::SetColor))));
