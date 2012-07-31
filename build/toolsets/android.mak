@@ -38,7 +38,7 @@ ANDROID_NDK_PLATFORM       := android-9
 ANDROID_SDK_PLATFORM       := android-10
 NDK_ROOT                   := /$(subst :,,$(call convert_path,$(ANDROID_NDK)))
 SDK_ROOT                   := /$(subst :,,$(call convert_path,$(ANDROID_SDK)))
-JAVA_SDK                   := /$(subst :,,$(call convert_path,$(JAVA_SDK)))
+JAVA_ROOT                   := /$(subst :,,$(call convert_path,$(JAVA_SDK)))
 PLATFORM_DIR               := $(NDK_ROOT)/platforms/$(ANDROID_NDK_PLATFORM)
 ANDROID_PLATFORM_TOOLS_DIR := $(call convert_path,$(ANDROID_SDK))/platform-tools
 ARM_EABI_DIR               := $(NDK_ROOT)/toolchains/arm-linux-androideabi-4.4.3/prebuilt/$(ANDROID_NDK_HOST)
@@ -51,10 +51,10 @@ ANDROID_TOOLS_DIR          := $(SDK_ROOT)/tools
 ADB                        := $(ANDROID_PLATFORM_TOOLS_DIR)/adb
 APK_BUILDER                := $(ANDROID_SDK)/tools/apkbuilder
 DX_TOOL                    := $(ANDROID_PLATFORM_TOOLS_DIR)/dx
-JAVA_JAR                   := "$(JAVA_SDK)/bin/jar"
-JAVA_CC                    := "$(JAVA_SDK)/bin/javac"
+JAVA_JAR                   := "$(JAVA_ROOT)/bin/jar"
+JAVA_CC                    := "$(JAVA_ROOT)/bin/javac"
 JAVA_AAPT                  := $(ANDROID_PLATFORM_TOOLS_DIR)/aapt
-JAVA_JAR_SIGNER            := "$(JAVA_SDK)/bin/jarsigner"
+JAVA_JAR_SIGNER            := "$(JAVA_ROOT)/bin/jarsigner"
 ZIP_ALIGNER                := $(ANDROID_SDK)/tools/zipalign
 BUILD_PATHS                := $(GCC_TOOLS_DIR):$(ARM_EABI_DIR)/libexec/gcc/arm-linux-androideabi/4.4.3
 COMMON_JAVA_FLAGS          += -g
@@ -238,7 +238,7 @@ endif
   
   $$($1.CLASSES_FLAG): $$($1.SOURCE_FILES) $$($1.JARS) $$($1.PACKAGED_RES_FILE)
 		@echo Compile sources for $$(notdir $$($1.TARGET))...
-		@export R_FILES=$$$$(/usr/bin/find $$($1.R_DIR) -name '*.java') && $(JAVA_CC) $$($1.SOURCE_FILES) $$$$R_FILES $$($1.COMPILER_FLAGS) -d $$($1.CLASSES_DIR) -classpath '$(ANDROID_JAR)$$(if $$($1.JARS),;$$(subst ; ,;,$$($1.JARS:%=%;)))'
+		export R_FILES=$$$$(/usr/bin/find $$($1.R_DIR) -name '*.java') && $(JAVA_CC) $$($1.SOURCE_FILES) $$$$R_FILES $$($1.COMPILER_FLAGS) -d $$($1.CLASSES_DIR) -classpath '$(ANDROID_JAR)$$(if $$($1.JARS),;$$(subst ; ,;,$$($1.JARS:%=%;)))'
 		@touch $$@
   
   $$($1.DEX_FILE): $$($1.CLASSES_FLAG)
