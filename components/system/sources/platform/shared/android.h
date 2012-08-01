@@ -30,12 +30,18 @@ class AndroidApplicationManager: public UnistdApplicationManager
 class AndroidWindowManager: public DefaultWindowManager
 {
   public:
+    enum WindowType
+    {
+      WindowType_Surface,
+      WindowType_WebView,
+    };
+  
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Создание/закрытие/уничтожение окна
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     typedef void (*WindowMessageHandler)(window_t, WindowEvent, const WindowEventContext&, void* user_data);
 
-    static window_t CreateWindow  (WindowStyle, WindowMessageHandler, const void* parent_handle, const char* init_string, void* user_data);
+    static window_t CreateWindow  (WindowStyle, WindowMessageHandler, const void* parent_handle, const char* init_string, void* user_data, WindowType = WindowType_Surface, void** out_view_controller = 0);
     static void     CloseWindow   (window_t);
     static void     DestroyWindow (window_t);
     
@@ -83,6 +89,38 @@ class AndroidWindowManager: public DefaultWindowManager
     static void  SetBackgroundState (window_t window, bool state);
     static Color GetBackgroundColor (window_t window);
     static bool  GetBackgroundState (window_t window);
+    
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Создание/уничтожение web-view
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    static web_view_t CreateWebView  (IWebViewListener*);
+    static void       DestroyWebView (web_view_t);
+    
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Присоединенное окно
+///////////////////////////////////////////////////////////////////////////////////////////////////  
+    static window_t GetWindow (web_view_t);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Загрузка данных
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    static void LoadRequest (web_view_t, const char* uri);
+    static void LoadData    (web_view_t, const char* data, size_t data_size, const char* mime_type, const char* encoding, const char* base_url);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Перезагрузка страницы / остановка загрузки / проверка наличия загрузки
+///////////////////////////////////////////////////////////////////////////////////////////////////    
+    static void Reload      (web_view_t);
+    static void StopLoading (web_view_t);
+    static bool IsLoading   (web_view_t);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Средства навигации
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    static bool CanGoBack    (web_view_t);
+    static bool CanGoForward (web_view_t);
+    static void GoBack       (web_view_t);
+    static void GoForward    (web_view_t);
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

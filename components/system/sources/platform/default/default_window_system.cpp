@@ -346,7 +346,7 @@ bool DefaultWindowManager::CanGoBack (web_view_t)
 
 bool DefaultWindowManager::CanGoForward (web_view_t)
 {
-  raise ("syslib::DefaultWindowManager::CreateWebView");
+  raise ("syslib::DefaultWindowManager::CanGoForward");
   return false;  
 }
 

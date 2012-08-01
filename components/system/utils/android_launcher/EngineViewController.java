@@ -15,7 +15,7 @@ import android.content.Context;
 import android.util.*;
 import java.io.*;
 
-public class EngineViewController implements View.OnTouchListener, View.OnKeyListener, View.OnFocusChangeListener//, View.OnGenericMotionListener
+public class EngineViewController implements View.OnTouchListener, View.OnKeyListener, View.OnFocusChangeListener
 {
   private GestureDetector gesture_detector;
     
@@ -37,78 +37,14 @@ public class EngineViewController implements View.OnTouchListener, View.OnKeyLis
     }
   }
 
-  class EngineSurfaceView extends SurfaceView implements SurfaceHolder.Callback 
-  {
-    private boolean is_surface_created = false;
-    private EngineViewController controller;
-    
-    public EngineSurfaceView (Context context, EngineViewController controller)
-    {    
-      super (context);    
-      
-      this.controller = controller;            
-
-      getHolder ().addCallback (this);
-
-      if (getHolder ().getSurface () != null && getHolder ().getSurface ().isValid ())
-        surfaceCreated (getHolder ());
-    }
-    
-    @Override
-    protected void onLayout (boolean changed, int left, int top, int right, int bottom)
-    {
-      controller.onLayoutCallback (left, top, right, bottom);
-    }    
-
-    @Override  
-    protected void onDisplayHint (int hint)
-    {
-      controller.onDisplayHintCallback (hint);
-    }
-    
-    @Override
-    protected void onDraw (Canvas c)
-    {
-      controller.onDrawCallback ();
-    }
-     
-    @Override    
-    public void surfaceChanged (SurfaceHolder holder, int format, int width, int height)
-    {
-      controller.onSurfaceChangedCallback (format, width, height);
-    }  
-
-    @Override    
-    public void surfaceCreated (SurfaceHolder holder)
-    {
-      if (is_surface_created)
-        return;
-        
-      is_surface_created = true;
-        
-      controller.onSurfaceCreatedCallback ();
-    }
-    
-    @Override    
-    public void surfaceDestroyed (SurfaceHolder holder)
-    {
-      if (!is_surface_created)
-        return;
-        
-      is_surface_created = false;
-      
-      controller.onSurfaceDestroyedCallback ();
-    }    
-  }    
-
   private View          view;
   private volatile long window_ref;
   
-  private void initialize (View view, long window_ref)
-  {    
+  protected void initialize (Context context, View view, long window_ref)
+  {
     this.window_ref = window_ref;
-    this.view = view;
-
+    this.view = view;    
+    
     gesture_detector = new GestureDetector (new DoubletapListener (this)); 
 
     view.setFocusable (true);
@@ -117,25 +53,6 @@ public class EngineViewController implements View.OnTouchListener, View.OnKeyLis
     view.setOnTouchListener (this);
     view.setOnKeyListener (this);
     view.setOnFocusChangeListener (this);
-//    view.setOnGenericMotionListener (this);    
-  }
-  
-  public enum ViewType
-  {
-    SURFACE_VIEW,
-    WEB_VIEW
-  }
-  
-  public EngineViewController (Context context, ViewType type, long window_ref)
-  {
-    switch (type)
-    {
-      case SURFACE_VIEW:
-        initialize (new EngineSurfaceView (context, this), window_ref);
-        break;
-      case WEB_VIEW:
-        break;
-    }
   }
   
   public View getView ()
@@ -312,17 +229,17 @@ public class EngineViewController implements View.OnTouchListener, View.OnKeyLis
     view.postInvalidate ();
   }
   
-  private native void onLayoutCallback           (int left, int top, int right, int bottom);
-  private native void onDisplayHintCallback      (int hint);
-  private native void onDrawCallback             ();
-  private native void onTouchCallback            (int pointerId, int action, float x, float y);
-  private native void onDoubletapCallback        (int pointerId, float x, float y);
-  private native void onTrackballCallback        (int pointerId, int action, float x, float y);
-  private native void onKeyCallback              (int keycode, int action, boolean alt_pressed, boolean shift_pressed, boolean is_sym_pressed);
-  private native void onFocusCallback            (boolean focusGained);
-  private native void onSurfaceCreatedCallback   ();
-  private native void onSurfaceChangedCallback   (int format, int width, int height);  
-  private native void onSurfaceDestroyedCallback ();  
+  public native void onLayoutCallback           (int left, int top, int right, int bottom);
+  public native void onDisplayHintCallback      (int hint);
+  public native void onDrawCallback             ();
+  public native void onTouchCallback            (int pointerId, int action, float x, float y);
+  public native void onDoubletapCallback        (int pointerId, float x, float y);
+  public native void onTrackballCallback        (int pointerId, int action, float x, float y);
+  public native void onKeyCallback              (int keycode, int action, boolean alt_pressed, boolean shift_pressed, boolean is_sym_pressed);
+  public native void onFocusCallback            (boolean focusGained);
+  public native void onSurfaceCreatedCallback   ();
+  public native void onSurfaceChangedCallback   (int format, int width, int height);  
+  public native void onSurfaceDestroyedCallback ();  
   
   @Override
   public boolean onTouch (View v, MotionEvent event)
@@ -342,25 +259,6 @@ public class EngineViewController implements View.OnTouchListener, View.OnKeyLis
     return true;
   }
   
-/*  @Override
-  public boolean onGenericMotion (View v, MotionEvent event)
-  {
-    if (event.getSource () != InputDevice.SOURCE_CLASS_TRACKBALL)
-      return false;
-    
-    int pointers_count = event.getPointerCount (),
-        action         = event.getAction ();
-
-    for (int i=0; i<pointers_count; i++)
-    {    
-      int pointer_id = event.getPointerId (i);  
-
-      onTrackballCallback (pointer_id, action, event.getX (i), event.getY (i)); 
-    }
-    
-    return true;
-  }*/
-  
   @Override
   public boolean onKey (View v, int keyCode, KeyEvent event)
   {
@@ -378,5 +276,5 @@ public class EngineViewController implements View.OnTouchListener, View.OnKeyLis
   public void onFocusChange (View v, boolean has_focus)
   {
     onFocusCallback (has_focus);
-  }    
+  }
 }

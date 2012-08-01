@@ -37,9 +37,9 @@ int main ()
 
   try
   {
-    Window parent_window (WindowStyle_Overlapped);
+//    Window parent_window (WindowStyle_Overlapped);
     
-    parent_window.Maximize ();
+//    parent_window.Maximize ();
     
     WebView view;
     
@@ -50,7 +50,7 @@ int main ()
     view.RegisterEventHandler (WebViewEvent_OnDestroy, &event_handler);
     view.RegisterFilter       (&filter);
     
-    view.Window ().SetParentHandle (parent_window.Handle ());
+//    view.Window ().SetParentHandle (parent_window.Handle ());
     
     view.Window ().Maximize ();
 

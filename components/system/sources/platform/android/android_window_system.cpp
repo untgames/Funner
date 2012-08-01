@@ -348,7 +348,8 @@ class JniWindowManager
         if (!activity_class)
           throw xtl::format_operation_exception ("", "JNIEnv::GetObjectClass failed");
           
-        create_view_controller_method = find_method (&get_env (), activity_class.get (), "createEngineViewController", "(Ljava/lang/String;J)Lcom/untgames/funner/application/EngineViewController;");
+        create_surface_view_controller_method = find_method (&get_env (), activity_class.get (), "createSurfaceViewController", "(Ljava/lang/String;J)Lcom/untgames/funner/application/EngineViewController;");
+        create_web_view_controller_method     = find_method (&get_env (), activity_class.get (), "createWebViewController", "(Ljava/lang/String;J)Lcom/untgames/funner/application/EngineViewController;");
       }
       catch (xtl::exception& e)
       {
@@ -358,15 +359,25 @@ class JniWindowManager
     }
     
 ///Создание окна
-    local_ref<jobject> CreateViewController (const char* init_string, void* window_ref)
+    local_ref<jobject> CreateSurfaceViewController (const char* init_string, void* window_ref)
     {
-      local_ref<jobject> controller = check_errors (get_env ().CallObjectMethod (get_activity (), create_view_controller_method, tojstring (init_string).get (), window_ref));
+      local_ref<jobject> controller = check_errors (get_env ().CallObjectMethod (get_activity (), create_surface_view_controller_method, tojstring (init_string).get (), window_ref));
 
       if (!controller)
-        throw xtl::format_operation_exception ("", "EngineActivity::createEngineViewController failed");
+        throw xtl::format_operation_exception ("", "EngineActivity::createSurfaceViewController failed");
         
       return controller;
     }
+    
+    local_ref<jobject> CreateWebViewController (const char* init_string, void* window_ref)
+    {
+      local_ref<jobject> controller = check_errors (get_env ().CallObjectMethod (get_activity (), create_web_view_controller_method, tojstring (init_string).get (), window_ref));
+
+      if (!controller)
+        throw xtl::format_operation_exception ("", "EngineActivity::createWebViewController failed");
+        
+      return controller;
+    }    
     
 ///Поиск дескриптора окна
     static window_t FindWindow (jobject controller)
@@ -399,7 +410,8 @@ class JniWindowManager
     
   private:
     global_ref<jclass> activity_class;
-    jmethodID          create_view_controller_method;
+    jmethodID          create_surface_view_controller_method;
+    jmethodID          create_web_view_controller_method;    
 };
 
 typedef common::Singleton<JniWindowManager> JniWindowManagerSingleton;
@@ -517,7 +529,7 @@ void on_surface_destroyed_callback (JNIEnv& env, jobject controller)
     Создание/закрытие/уничтожение окна
 */
 
-window_t AndroidWindowManager::CreateWindow (WindowStyle, WindowMessageHandler handler, const void* parent_handle, const char* init_string, void* user_data)
+window_t AndroidWindowManager::CreateWindow (WindowStyle, WindowMessageHandler handler, const void* parent_handle, const char* init_string, void* user_data, WindowType type, void** out_view_controller)
 {
   try
   {
@@ -526,7 +538,18 @@ window_t AndroidWindowManager::CreateWindow (WindowStyle, WindowMessageHandler h
       
     stl::auto_ptr<window_handle> window (new window_handle);
 
-    window->controller      = JniWindowManagerSingleton::Instance ()->CreateViewController (init_string, window.get ());
+    switch (type)
+    {
+      case WindowType_Surface:
+        window->controller = JniWindowManagerSingleton::Instance ()->CreateSurfaceViewController (init_string, window.get ());
+        break;
+      case WindowType_WebView:
+        window->controller = JniWindowManagerSingleton::Instance ()->CreateWebViewController (init_string, window.get ());
+        break;
+      default:
+        throw xtl::make_argument_exception ("", "type", type);
+    }
+
     window->message_handler = handler;
     window->user_data       = user_data;
 
@@ -563,32 +586,38 @@ window_t AndroidWindowManager::CreateWindow (WindowStyle, WindowMessageHandler h
       throw xtl::format_operation_exception ("", "EngineViewController::getView failed");
 
       //ожидание создания поверхности
-
-    size_t start_wait = common::milliseconds ();
-
-    for (;;)
+    
+    if (type == WindowType_Surface)
     {
-      if (window->is_native_handle_received)
-        break;
+      size_t start_wait = common::milliseconds ();
 
-      static const size_t WAIT_TIME_IN_MICROSECONDS = 100*1000; //100 milliseconds
+      for (;;)
+      {
+        if (window->is_native_handle_received)
+          break;
 
-      usleep (WAIT_TIME_IN_MICROSECONDS);
-      
-      static const size_t MAX_TIMEOUT_IN_MILLISECONDS = 2000;
-      
-      if (common::milliseconds () - start_wait > MAX_TIMEOUT_IN_MILLISECONDS)
-        throw xtl::format_operation_exception ("", "Can't create window because Surface has not been created for %u milliseconds", MAX_TIMEOUT_IN_MILLISECONDS);
+        static const size_t WAIT_TIME_IN_MICROSECONDS = 100*1000; //100 milliseconds
+
+        usleep (WAIT_TIME_IN_MICROSECONDS);
+        
+        static const size_t MAX_TIMEOUT_IN_MILLISECONDS = 2000;
+        
+        if (common::milliseconds () - start_wait > MAX_TIMEOUT_IN_MILLISECONDS)
+          throw xtl::format_operation_exception ("", "Can't create window because Surface has not been created for %u milliseconds", MAX_TIMEOUT_IN_MILLISECONDS);
+      }
+
+        //получение дескриптора поверхности
+
+      local_ref<jobject> surface = check_errors (env.CallObjectMethod (window->controller.get (), window->get_surface_method));
+
+      if (!surface)
+        throw xtl::format_operation_exception ("", "EngineViewController::getSurfaceThreadSafe failed");          
+
+      window->is_surface_created = true;
     }
-
-      //получение дескриптора поверхности
-
-    local_ref<jobject> surface = check_errors (env.CallObjectMethod (window->controller.get (), window->get_surface_method));
-
-    if (!surface)
-      throw xtl::format_operation_exception ("", "EngineViewController::getSurfaceThreadSafe failed");          
-
-    window->is_surface_created = true;
+    
+    if (out_view_controller)
+      *out_view_controller = window->controller.get ();
     
     return window.release ();
   }

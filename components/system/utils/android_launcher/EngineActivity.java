@@ -153,14 +153,30 @@ public class EngineActivity extends Activity
   }
   
 /// Создание окна
-  public EngineViewController createEngineViewController (String initString, final long windowRef)
+  public EngineViewController createSurfaceViewController (String initString, final long windowRef)
   {
     final Activity activity = this;    
     
     return (EngineViewController)UiDispatch.run (this, new UiRunnable () {
       public Object run ()
       {
-        EngineViewController controller = new EngineViewController (activity, EngineViewController.ViewType.SURFACE_VIEW, windowRef);
+        EngineViewController controller = new EngineSurfaceViewController (activity, windowRef);
+
+        getWindow ().addContentView (controller.getView (), new ViewGroup.LayoutParams (ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+
+        return controller;
+      }
+    });
+  }
+  
+  public EngineViewController createWebViewController (String initString, final long windowRef)
+  {
+    final Activity activity = this;
+
+    return (EngineViewController)UiDispatch.run (this, new UiRunnable () {
+      public Object run ()
+      {
+        EngineViewController controller = new EngineWebViewController (activity, windowRef);
 
         getWindow ().addContentView (controller.getView (), new ViewGroup.LayoutParams (ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
 
