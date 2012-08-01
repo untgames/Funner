@@ -16,11 +16,13 @@ const char* LOG_NAME = "android.syslib.window";
 
 struct syslib::window_handle: public MessageQueue::Handler
 {
+  global_ref<jobject>  controller;                       //контроллер android окна
   global_ref<jobject>  view;                             //android окно  
   WindowMessageHandler message_handler;                  //обработчик сообщений
   void*                user_data;                        //пользовательские данные окна
   unsigned int         background_color;                 //цвет заднего плана
   unsigned int         background_state;                 //наличие заднего фона
+  jmethodID            get_view_method;                  //метод получени€ окна
   jmethodID            get_top_method;                   //метод получени€ верхнего угла окна
   jmethodID            get_left_method;                  //метод получени€ левого угла окна
   jmethodID            get_width_method;                 //метод получени€ ширины окна
@@ -152,7 +154,7 @@ struct syslib::window_handle: public MessageQueue::Handler
           
         break;
       default:
-        printf ("Unhandled touch action %d received\n", action);
+        log.Printf ("Unhandled touch action %d received\n", action);
         break;
     }
   }
@@ -288,7 +290,7 @@ struct syslib::window_handle: public MessageQueue::Handler
     local_ref<jobject> surface = check_errors (get_env ().CallObjectMethod (view.get (), get_surface_method));
 
     if (!surface)
-      throw xtl::format_operation_exception ("", "EngineView::getSurfaceThreadSafe failed");                  
+      throw xtl::format_operation_exception ("", "EngineViewController::getSurfaceThreadSafe failed");                  
 
     is_surface_created = true;
 
@@ -346,7 +348,7 @@ class JniWindowManager
         if (!activity_class)
           throw xtl::format_operation_exception ("", "JNIEnv::GetObjectClass failed");
           
-        create_view_method = find_method (&get_env (), activity_class.get (), "createEngineView", "(Ljava/lang/String;J)Landroid/view/View;");
+        create_view_controller_method = find_method (&get_env (), activity_class.get (), "createEngineViewController", "(Ljava/lang/String;J)Lcom/untgames/funner/application/EngineViewController;");
       }
       catch (xtl::exception& e)
       {
@@ -356,37 +358,37 @@ class JniWindowManager
     }
     
 ///—оздание окна
-    local_ref<jobject> CreateView (const char* init_string, void* window_ref)
+    local_ref<jobject> CreateViewController (const char* init_string, void* window_ref)
     {
-      local_ref<jobject> view = check_errors (get_env ().CallObjectMethod (get_activity (), create_view_method, tojstring (init_string).get (), window_ref));
+      local_ref<jobject> controller = check_errors (get_env ().CallObjectMethod (get_activity (), create_view_controller_method, tojstring (init_string).get (), window_ref));
 
-      if (!view)
-        throw xtl::format_operation_exception ("", "EngineActivity::createEngineView failed");
+      if (!controller)
+        throw xtl::format_operation_exception ("", "EngineActivity::createEngineViewController failed");
         
-      return view;
+      return controller;
     }
     
 ///ѕоиск дескриптора окна
-    static window_t FindWindow (jobject view)
+    static window_t FindWindow (jobject controller)
     {
       try
       {
-        if (!view)
+        if (!controller)
           return 0;
 
         JNIEnv& env = get_env ();
 
-        local_ref<jclass> view_class = env.GetObjectClass (view);
+        local_ref<jclass> controller_class = env.GetObjectClass (controller);
 
-        if (!view_class)
-          throw xtl::format_operation_exception ("", "JNIEnv::GetObjectClass failed (for View)");
+        if (!controller_class)
+          throw xtl::format_operation_exception ("", "JNIEnv::GetObjectClass failed (for EngineViewController)");
         
-        jmethodID get_window_ref = env.GetMethodID (view_class.get (), "getWindowRef", "()J");
+        jmethodID get_window_ref = env.GetMethodID (controller_class.get (), "getWindowRef", "()J");
 
         if (!get_window_ref)
           return 0;
 
-        return (window_t)check_errors (env.CallLongMethod (view, get_window_ref));
+        return (window_t)check_errors (env.CallLongMethod (controller, get_window_ref));
       }
       catch (xtl::exception& e)
       {
@@ -397,7 +399,7 @@ class JniWindowManager
     
   private:
     global_ref<jclass> activity_class;
-    jmethodID          create_view_method;
+    jmethodID          create_view_controller_method;
 };
 
 typedef common::Singleton<JniWindowManager> JniWindowManagerSingleton;
@@ -423,11 +425,11 @@ template <class Fn> class WindowMessage: public MessageQueue::Message
     Fn       fn;
 };
 
-template <class Fn> void push_message (jobject view, const Fn& fn)
+template <class Fn> void push_message (jobject controller, const Fn& fn)
 {
   try
   {
-    window_t window = JniWindowManager::FindWindow (view);
+    window_t window = JniWindowManager::FindWindow (controller);
 
     if (!window)
       return;
@@ -440,54 +442,54 @@ template <class Fn> void push_message (jobject view, const Fn& fn)
   }
 }
 
-void on_layout_callback (JNIEnv& env, jobject view, int left, int top, int right, int bottom)
+void on_layout_callback (JNIEnv& env, jobject controller, int left, int top, int right, int bottom)
 {
-  push_message (view, xtl::bind (&window_handle::OnLayoutCallback, _1, left, top, right, bottom));
+  push_message (controller, xtl::bind (&window_handle::OnLayoutCallback, _1, left, top, right, bottom));
 }
 
-void on_display_hint_callback (JNIEnv& env, jobject view, int hint)
+void on_display_hint_callback (JNIEnv& env, jobject controller, int hint)
 {
-  push_message (view, xtl::bind (&window_handle::OnDisplayHintCallback, _1, hint));
+  push_message (controller, xtl::bind (&window_handle::OnDisplayHintCallback, _1, hint));
 }
 
-void on_draw_callback (JNIEnv& env, jobject view)
+void on_draw_callback (JNIEnv& env, jobject controller)
 {
-  push_message (view, xtl::bind (&window_handle::OnDrawCallback, _1));
+  push_message (controller, xtl::bind (&window_handle::OnDrawCallback, _1));
 }
 
-void on_touch_callback (JNIEnv& env, jobject view, int pointer_id, int action, float x, float y)
+void on_touch_callback (JNIEnv& env, jobject controller, int pointer_id, int action, float x, float y)
 {
-  push_message (view, xtl::bind (&window_handle::OnTouchCallback, _1, pointer_id, action, x, y));
+  push_message (controller, xtl::bind (&window_handle::OnTouchCallback, _1, pointer_id, action, x, y));
 }
 
-void on_doubletap_callback (JNIEnv& env, jobject view, int pointer_id, float x, float y)
+void on_doubletap_callback (JNIEnv& env, jobject controller, int pointer_id, float x, float y)
 {
-  push_message (view, xtl::bind (&window_handle::OnDoubletapCallback, _1, pointer_id, x, y));
+  push_message (controller, xtl::bind (&window_handle::OnDoubletapCallback, _1, pointer_id, x, y));
 }
 
-void on_trackball_callback (JNIEnv& env, jobject view, int pointer_id, int action, float x, float y)
+void on_trackball_callback (JNIEnv& env, jobject controller, int pointer_id, int action, float x, float y)
 {
-  push_message (view, xtl::bind (&window_handle::OnTrackballCallback, _1, pointer_id, action, x, y));
+  push_message (controller, xtl::bind (&window_handle::OnTrackballCallback, _1, pointer_id, action, x, y));
 }
 
-void on_key_callback (JNIEnv& env, jobject view, int key, int action, jboolean is_alt_pressed, jboolean is_shift_pressed, jboolean is_sym_pressed)
+void on_key_callback (JNIEnv& env, jobject controller, int key, int action, jboolean is_alt_pressed, jboolean is_shift_pressed, jboolean is_sym_pressed)
 {
-  push_message (view, xtl::bind (&window_handle::OnKeyCallback, _1, key, action, is_alt_pressed != 0, is_shift_pressed != 0, is_sym_pressed != 0));
+  push_message (controller, xtl::bind (&window_handle::OnKeyCallback, _1, key, action, is_alt_pressed != 0, is_shift_pressed != 0, is_sym_pressed != 0));
 }
 
-void on_focus_callback (JNIEnv& env, jobject view, jboolean gained)
+void on_focus_callback (JNIEnv& env, jobject controller, jboolean gained)
 {
-  push_message (view, xtl::bind (&window_handle::OnFocusCallback, _1, gained != 0));
+  push_message (controller, xtl::bind (&window_handle::OnFocusCallback, _1, gained != 0));
 }
 
-void on_surface_created_callback (JNIEnv& env, jobject view)
+void on_surface_created_callback (JNIEnv& env, jobject controller)
 {
   try
   {
-    push_message (view, xtl::bind (&window_handle::OnSurfaceCreatedCallback, _1));
-    push_message (view, xtl::bind (&window_handle::OnDrawCallback, _1));
+    push_message (controller, xtl::bind (&window_handle::OnSurfaceCreatedCallback, _1));
+    push_message (controller, xtl::bind (&window_handle::OnDrawCallback, _1));
 
-    window_t window = JniWindowManager::FindWindow (view);
+    window_t window = JniWindowManager::FindWindow (controller);
 
     if (!window)
       return;    
@@ -499,14 +501,14 @@ void on_surface_created_callback (JNIEnv& env, jobject view)
   }
 }
 
-void on_surface_changed_callback (JNIEnv& env, jobject view, jint format, jint width, jint height)
+void on_surface_changed_callback (JNIEnv& env, jobject controller, jint format, jint width, jint height)
 {
-  push_message (view, xtl::bind (&window_handle::OnDrawCallback, _1));    
+  push_message (controller, xtl::bind (&window_handle::OnDrawCallback, _1));    
 }
 
-void on_surface_destroyed_callback (JNIEnv& env, jobject view)
+void on_surface_destroyed_callback (JNIEnv& env, jobject controller)
 {
-  push_message (view, xtl::bind (&window_handle::OnSurfaceDestroyedCallback, _1));
+  push_message (controller, xtl::bind (&window_handle::OnSurfaceDestroyedCallback, _1));
 }
 
 }
@@ -524,7 +526,7 @@ window_t AndroidWindowManager::CreateWindow (WindowStyle, WindowMessageHandler h
       
     stl::auto_ptr<window_handle> window (new window_handle);
 
-    window->view            = JniWindowManagerSingleton::Instance ()->CreateView (init_string, window.get ());
+    window->controller      = JniWindowManagerSingleton::Instance ()->CreateViewController (init_string, window.get ());
     window->message_handler = handler;
     window->user_data       = user_data;
 
@@ -532,25 +534,33 @@ window_t AndroidWindowManager::CreateWindow (WindowStyle, WindowMessageHandler h
     
     JNIEnv& env = get_env ();
 
-    local_ref<jclass> view_class = env.GetObjectClass (window->view.get ());
+    local_ref<jclass> controller_class = env.GetObjectClass (window->controller.get ());
         
-    if (!view_class)
+    if (!controller_class)
       throw xtl::format_operation_exception ("", "JNIEnv::GetObjectClass failed (for View)");      
-      
-    window->get_left_method                  = find_method (&env, view_class.get (), "getLeftThreadSafe", "()I");
-    window->get_top_method                   = find_method (&env, view_class.get (), "getTopThreadSafe", "()I");
-    window->get_width_method                 = find_method (&env, view_class.get (), "getWidthThreadSafe", "()I");
-    window->get_height_method                = find_method (&env, view_class.get (), "getHeightThreadSafe", "()I");
-    window->layout_method                    = find_method (&env, view_class.get (), "layoutThreadSafe", "(IIII)V");
-    window->set_visibility_method            = find_method (&env, view_class.get (), "setVisibilityThreadSafe", "(I)V");
-    window->get_visibility_method            = find_method (&env, view_class.get (), "getVisibilityThreadSafe", "()I");
-    window->request_focus_method             = find_method (&env, view_class.get (), "requestFocusThreadSafe", "()Z");
-    window->bring_to_front_method            = find_method (&env, view_class.get (), "bringToFrontThreadSafe", "()V");
-    window->set_background_color_method      = find_method (&env, view_class.get (), "setBackgroundColorThreadSafe", "(I)V");
-    window->maximize_method                  = find_method (&env, view_class.get (), "maximizeThreadSafe", "()V");
-    window->get_surface_method               = find_method (&env, view_class.get (), "getSurfaceThreadSafe", "()Landroid/view/Surface;");
-    window->post_invalidate_method           = find_method (&env, view_class.get (), "postInvalidate", "()V");
-    window->remove_from_parent_window_method = find_method (&env, view_class.get (), "removeFromParentWindowThreadSafe", "()V");
+
+    window->get_view_method                  = find_method (&env, controller_class.get (), "getView", "()Landroid/view/View;");
+    window->get_left_method                  = find_method (&env, controller_class.get (), "getLeftThreadSafe", "()I");
+    window->get_top_method                   = find_method (&env, controller_class.get (), "getTopThreadSafe", "()I");
+    window->get_width_method                 = find_method (&env, controller_class.get (), "getWidthThreadSafe", "()I");
+    window->get_height_method                = find_method (&env, controller_class.get (), "getHeightThreadSafe", "()I");
+    window->layout_method                    = find_method (&env, controller_class.get (), "layoutThreadSafe", "(IIII)V");
+    window->set_visibility_method            = find_method (&env, controller_class.get (), "setVisibilityThreadSafe", "(I)V");
+    window->get_visibility_method            = find_method (&env, controller_class.get (), "getVisibilityThreadSafe", "()I");
+    window->request_focus_method             = find_method (&env, controller_class.get (), "requestFocusThreadSafe", "()Z");
+    window->bring_to_front_method            = find_method (&env, controller_class.get (), "bringToFrontThreadSafe", "()V");
+    window->set_background_color_method      = find_method (&env, controller_class.get (), "setBackgroundColorThreadSafe", "(I)V");
+    window->maximize_method                  = find_method (&env, controller_class.get (), "maximizeThreadSafe", "()V");
+    window->get_surface_method               = find_method (&env, controller_class.get (), "getSurfaceThreadSafe", "()Landroid/view/Surface;");
+    window->post_invalidate_method           = find_method (&env, controller_class.get (), "postInvalidate", "()V");
+    window->remove_from_parent_window_method = find_method (&env, controller_class.get (), "removeFromParentWindowThreadSafe", "()V");
+
+      //получение объекта окна
+
+    window->view = check_errors (env.CallObjectMethod (window->controller.get (), window->get_view_method));
+
+    if (!window->view)
+      throw xtl::format_operation_exception ("", "EngineViewController::getView failed");
 
       //ожидание создани€ поверхности
 
@@ -572,11 +582,11 @@ window_t AndroidWindowManager::CreateWindow (WindowStyle, WindowMessageHandler h
     }
 
       //получение дескриптора поверхности
-    
-    local_ref<jobject> surface = check_errors (env.CallObjectMethod (window->view.get (), window->get_surface_method));
+
+    local_ref<jobject> surface = check_errors (env.CallObjectMethod (window->controller.get (), window->get_surface_method));
 
     if (!surface)
-      throw xtl::format_operation_exception ("", "EngineView::getSurfaceThreadSafe failed");          
+      throw xtl::format_operation_exception ("", "EngineViewController::getSurfaceThreadSafe failed");          
 
     window->is_surface_created = true;
     
@@ -691,7 +701,7 @@ void AndroidWindowManager::SetWindowRect (window_t window, const Rect& rect)
     
     JNIEnv& env = get_env ();
     
-    env.CallVoidMethod (window->view.get (), window->layout_method, rect.left, rect.top, rect.right, rect.bottom);
+    env.CallVoidMethod (window->controller.get (), window->layout_method, rect.left, rect.top, rect.right, rect.bottom);
     
     check_errors ();
   }
@@ -726,10 +736,10 @@ void AndroidWindowManager::GetWindowRect (window_t window, Rect& out_result)
     
     JNIEnv& env = get_env ();
     
-    result.left   = check_errors (env.CallIntMethod (window->view.get (), window->get_left_method));
-    result.top    = check_errors (env.CallIntMethod (window->view.get (), window->get_top_method));
-    result.right  = result.left + check_errors (env.CallIntMethod (window->view.get (), window->get_width_method));
-    result.bottom = result.top + check_errors (env.CallIntMethod (window->view.get (), window->get_height_method));
+    result.left   = check_errors (env.CallIntMethod (window->controller.get (), window->get_left_method));
+    result.top    = check_errors (env.CallIntMethod (window->controller.get (), window->get_top_method));
+    result.right  = result.left + check_errors (env.CallIntMethod (window->controller.get (), window->get_width_method));
+    result.bottom = result.top + check_errors (env.CallIntMethod (window->controller.get (), window->get_height_method));
     
     out_result = result;
   }
@@ -770,26 +780,26 @@ void AndroidWindowManager::SetWindowFlag (window_t window, WindowFlag flag, bool
     {
       case WindowFlag_Visible:
       {
-        env.CallVoidMethod (window->view.get (), window->set_visibility_method, state ? VIEW_VISIBLE : VIEW_INVISIBLE);
+        env.CallVoidMethod (window->controller.get (), window->set_visibility_method, state ? VIEW_VISIBLE : VIEW_INVISIBLE);
         check_errors ();
         break;
       }
       case WindowFlag_Active:
-        env.CallVoidMethod (window->view.get (), window->bring_to_front_method);
+        env.CallVoidMethod (window->controller.get (), window->bring_to_front_method);
         check_errors ();
         break;
       case WindowFlag_Focus:
-        if (!check_errors (env.CallBooleanMethod (window->view.get (), window->request_focus_method)))
-          throw xtl::format_operation_exception ("", "EngineView::requestFocusThreadSafe failed");
+        if (!check_errors (env.CallBooleanMethod (window->controller.get (), window->request_focus_method)))
+          throw xtl::format_operation_exception ("", "EngineViewController::requestFocusThreadSafe failed");
 
         break;
       case WindowFlag_Maximized:
-        env.CallVoidMethod (window->view.get (), window->maximize_method);        
+        env.CallVoidMethod (window->controller.get (), window->maximize_method);        
         check_errors ();
         break;        
       case WindowFlag_Minimized:
       {
-        env.CallVoidMethod (window->view.get (), window->set_visibility_method, VIEW_GONE);  
+        env.CallVoidMethod (window->controller.get (), window->set_visibility_method, VIEW_GONE);  
         check_errors ();      
         
         break;
@@ -817,7 +827,7 @@ bool AndroidWindowManager::GetWindowFlag (window_t window, WindowFlag flag)
     switch (flag)
     {
       case WindowFlag_Visible:
-        return check_errors (env.CallIntMethod (window->view.get (), window->get_visibility_method)) != 0;
+        return check_errors (env.CallIntMethod (window->controller.get (), window->get_visibility_method)) != 0;
       case WindowFlag_Maximized:
       case WindowFlag_Active:
       case WindowFlag_Focus:
@@ -846,7 +856,7 @@ void AndroidWindowManager::InvalidateWindow (window_t window)
     if (!window)
       throw xtl::make_null_argument_exception ("", "window");
       
-    get_env ().CallVoidMethod (window->view.get (), window->post_invalidate_method);
+    get_env ().CallVoidMethod (window->controller.get (), window->post_invalidate_method);
 
     check_errors ();
   }
@@ -907,7 +917,7 @@ void AndroidWindowManager::SetBackgroundColor (window_t window, const Color& col
     unsigned int int_color = window->background_state + (unsigned int)color.red * 0x10000 + (unsigned int)color.green * 0x100 +
       color.blue;
                              
-    get_env ().CallVoidMethod (window->view.get (), window->set_background_color_method, int_color);
+    get_env ().CallVoidMethod (window->controller.get (), window->set_background_color_method, int_color);
     
     check_errors ();
     
@@ -929,7 +939,7 @@ void AndroidWindowManager::SetBackgroundState (window_t window, bool state)
 
     window->background_state = state ? 0xff000000u : 0u;
 
-    get_env ().CallVoidMethod (window->view.get (), window->set_background_color_method, window->background_color | window->background_state);
+    get_env ().CallVoidMethod (window->controller.get (), window->set_background_color_method, window->background_color | window->background_state);
 
     check_errors ();
   }
@@ -994,10 +1004,10 @@ void register_window_callbacks (JNIEnv* env)
     if (!env)
       throw xtl::make_null_argument_exception ("", "env");
 
-    jclass view_class = env->FindClass ("com/untgames/funner/application/EngineView");
+    jclass controller_class = env->FindClass ("com/untgames/funner/application/EngineViewController");
 
-    if (!view_class)
-      throw xtl::format_operation_exception ("", "Can't find EngineView class\n");
+    if (!controller_class)
+      throw xtl::format_operation_exception ("", "Can't find EngineViewController class\n");
 
     static const JNINativeMethod methods [] = {
       {"onLayoutCallback", "(IIII)V", (void*)&on_layout_callback},
@@ -1015,7 +1025,7 @@ void register_window_callbacks (JNIEnv* env)
 
     static const size_t methods_count = sizeof (methods) / sizeof (*methods);
     
-    jint status = env->RegisterNatives (view_class, methods, methods_count);
+    jint status = env->RegisterNatives (controller_class, methods, methods_count);
     
     if (status)
       throw xtl::format_operation_exception ("", "Can't register natives (status=%d)", status);    

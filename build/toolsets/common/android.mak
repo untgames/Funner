@@ -28,7 +28,7 @@ endif
 ###################################################################################################
 #Константы
 ###################################################################################################
-PROFILES                   += android no_dll unistd egl gles arm has_windows
+PROFILES                   += android no_dll unistd egl gles has_windows
 SDCARD_DIR                 := //mnt/sdcard
 REMOTE_DEBUG_DIR           ?= $(SDCARD_DIR)/funner
 EXE_SUFFIX                 :=
@@ -38,15 +38,15 @@ ANDROID_NDK_PLATFORM       := android-9
 ANDROID_SDK_PLATFORM       := android-10
 NDK_ROOT                   := /$(subst :,,$(call convert_path,$(ANDROID_NDK)))
 SDK_ROOT                   := /$(subst :,,$(call convert_path,$(ANDROID_SDK)))
-JAVA_ROOT                   := /$(subst :,,$(call convert_path,$(JAVA_SDK)))
+JAVA_ROOT                  := /$(subst :,,$(call convert_path,$(JAVA_SDK)))
 PLATFORM_DIR               := $(NDK_ROOT)/platforms/$(ANDROID_NDK_PLATFORM)
 ANDROID_PLATFORM_TOOLS_DIR := $(call convert_path,$(ANDROID_SDK))/platform-tools
-ARM_EABI_DIR               := $(NDK_ROOT)/toolchains/arm-linux-androideabi-4.4.3/prebuilt/$(ANDROID_NDK_HOST)
-GCC_TOOLS_DIR              := $(ARM_EABI_DIR)/bin
-COMPILER_GCC               := $(GCC_TOOLS_DIR)/arm-linux-androideabi-gcc
-LINKER_GCC                 := $(GCC_TOOLS_DIR)/arm-linux-androideabi-g++
-LIB_GCC                    := $(GCC_TOOLS_DIR)/arm-linux-androideabi-ar
-ADDR2LINE                  := $(GCC_TOOLS_DIR)/arm-linux-androideabi-addr2line
+ABI_DIR                    := $(NDK_ROOT)/toolchains/$(ANDROID_TOOLCHAIN)-$(ANDROID_TOOLCHAIN_VERSION)/prebuilt/$(ANDROID_NDK_HOST)
+GCC_TOOLS_DIR              := $(ABI_DIR)/bin
+COMPILER_GCC               := $(GCC_TOOLS_DIR)/$(ANDROID_TOOLCHAIN)-gcc
+LINKER_GCC                 := $(GCC_TOOLS_DIR)/$(ANDROID_TOOLCHAIN)-g++
+LIB_GCC                    := $(GCC_TOOLS_DIR)/$(ANDROID_TOOLCHAIN)-ar
+ADDR2LINE                  := $(GCC_TOOLS_DIR)/$(ANDROID_TOOLCHAIN)-addr2line
 ANDROID_TOOLS_DIR          := $(SDK_ROOT)/tools
 ADB                        := $(ANDROID_PLATFORM_TOOLS_DIR)/adb
 APK_BUILDER                := $(ANDROID_SDK)/tools/apkbuilder
@@ -56,31 +56,27 @@ JAVA_CC                    := "$(JAVA_ROOT)/bin/javac"
 JAVA_AAPT                  := $(ANDROID_PLATFORM_TOOLS_DIR)/aapt
 JAVA_JAR_SIGNER            := "$(JAVA_ROOT)/bin/jarsigner"
 ZIP_ALIGNER                := $(ANDROID_SDK)/tools/zipalign
-BUILD_PATHS                := $(GCC_TOOLS_DIR):$(ARM_EABI_DIR)/libexec/gcc/arm-linux-androideabi/4.4.3
+BUILD_PATHS                := $(GCC_TOOLS_DIR):$(ABI_DIR)/libexec/gcc/$(ANDROID_TOOLCHAIN)/$(ANDROID_TOOLCHAIN_VERSION)
+
 COMMON_JAVA_FLAGS          += -g
 COMMON_CPPFLAGS            += -fexceptions -frtti
-COMMON_CFLAGS              += -ffunction-sections -funwind-tables -fstack-protector -fpic -fomit-frame-pointer -fno-strict-aliasing -finline-limit=64 #-gdwarf-2
-#COMMON_CFLAGS              += -march=armv5te -mtune=xscale -msoft-float -mthumb
-COMMON_CFLAGS              += -march=armv7-a -mtune=xscale -Os -mfpu=vfpv3 #-mfloat-abi=hard
+COMMON_CFLAGS              += -Os -ffunction-sections -funwind-tables -fstack-protector -fpic -fomit-frame-pointer -fno-strict-aliasing -finline-limit=64 #-gdwarf-2
 COMMON_CFLAGS              += -Wno-psabi -Wa,--noexecstack
 COMMON_CFLAGS              += -fvisibility=hidden
-COMMON_CFLAGS              += -D__ARM_ARCH_7__ -D__ARM_ARCH_7A__
-#COMMON_CFLAGS              += -D__ARM_ARCH_5__ -D__ARM_ARCH_5T__ -D__ARM_ARCH_5E__ -D__ARM_ARCH_5TE__
-COMMON_CFLAGS              += -DANDROID -DARM -UDEBUG
-COMMON_CFLAGS              += --sysroot=$(PLATFORM_DIR)/arch-arm
+COMMON_CFLAGS              += -DANDROID -UDEBUG
+COMMON_CFLAGS              += --sysroot=$(PLATFORM_DIR)/arch-$(ANDROID_ARCH)
 COMMON_CFLAGS              += -I$(NDK_ROOT)/sources/cxx-stl/gnu-libstdc++/include
-COMMON_CFLAGS              += -I$(NDK_ROOT)/sources/cxx-stl/gnu-libstdc++/libs/armeabi/include
-COMMON_LINK_FLAGS          += --sysroot=$(PLATFORM_DIR)/arch-arm
-COMMON_LINK_FLAGS          += -Wl,-L,$(ARM_EABI_DIR)/lib/gcc/arm-linux-androideabi/4.4.3
-COMMON_LINK_FLAGS          += -Wl,-L,$(ARM_EABI_DIR)/lib/thumb
-#COMMON_LINK_FLAGS          += -Wl,-L,$(NDK_ROOT)/sources/cxx-stl/gnu-libstdc++/libs/armeabi
-COMMON_LINK_FLAGS          += -Wl,-L,$(NDK_ROOT)/sources/cxx-stl/gnu-libstdc++/libs/armeabi-v7a
-COMMON_LINK_FLAGS          += -Wl,-L,$(PLATFORM_DIR)/arch-arm/usr/lib
+COMMON_CFLAGS              += -I$(NDK_ROOT)/sources/cxx-stl/gnu-libstdc++/libs/$(ANDROID_ABI)/include
+COMMON_LINK_FLAGS          += --sysroot=$(PLATFORM_DIR)/arch-$(ANDROID_ARCH)
+COMMON_LINK_FLAGS          += -Wl,-L,$(ABI_DIR)/lib/gcc/$(ANDROID_TOOLCHAIN)/$(ANDROID_TOOLCHAIN_VERSION)
+COMMON_LINK_FLAGS          += -Wl,-L,$(ABI_DIR)/lib/thumb
+COMMON_LINK_FLAGS          += -Wl,-L,$(NDK_ROOT)/sources/cxx-stl/gnu-libstdc++/libs/$(ANDROID_ABI)
+COMMON_LINK_FLAGS          += -Wl,-L,$(PLATFORM_DIR)/arch-$(ANDROID_ARCH)/usr/lib
 COMMON_LINK_FLAGS          += -Wl,-L,$(DIST_BIN_DIR)
-COMMON_LINK_FLAGS          += -Wl,-rpath-link=$(PLATFORM_DIR)/arch-arm/usr/lib
+COMMON_LINK_FLAGS          += -Wl,-rpath-link=$(PLATFORM_DIR)/arch-$(ANDROID_ARCH)/usr/lib
 COMMON_LINK_FLAGS          += -lc -lm -lstdc++ -lgcc -lsupc++
 COMMON_LINK_FLAGS          += -Wl,--no-undefined -s
-ANDROID_EXE_LINK_FLAGS     += -z $(PLATFORM_DIR)/arch-arm/usr/lib/crtbegin_dynamic.o
+ANDROID_EXE_LINK_FLAGS     += -z $(PLATFORM_DIR)/arch-$(ANDROID_ARCH)/usr/lib/crtbegin_dynamic.o
 ANDROID_SO_LINK_FLAGS       = -Wl,-soname,$(notdir $1) -shared -Wl,--no-undefined -Wl,-z,noexecstack
 VALID_TARGET_TYPES         += android-pak android-jar
 ANDROID_KEY_STORE          := $(BUILD_DIR)platforms/android/my-release-key.keystore
@@ -88,8 +84,8 @@ ANDROID_KEY_PASS           := android
 ANDROID_JAR                := $(ANDROID_SDK)/platforms/$(ANDROID_SDK_PLATFORM)/android.jar
 DEFAULT_PACKAGE_PREFIX     := com.untgames.
 GDB_SERVER_FLAG_FILE       := $(ROOT)/$(TMP_DIR_SHORT_NAME)/$(CURRENT_TOOLSET)/gdb-installed
-GDB_SERVER_FILE            := $(ARM_EABI_DIR)/../gdbserver
-GDB_CLIENT                 := $(GCC_TOOLS_DIR)/arm-linux-androideabi-gdb
+GDB_SERVER_FILE            := $(ABI_DIR)/../gdbserver
+GDB_CLIENT                 := $(GCC_TOOLS_DIR)/$(ANDROID_TOOLCHAIN)-gdb
 BUSYBOX_FILE               := $(BUILD_DIR)platforms/android/busybox
 BUSYBOX_FLAG_FILE          := $(ROOT)/$(TMP_DIR_SHORT_NAME)/$(CURRENT_TOOLSET)/busybox-installed
 
@@ -213,9 +209,10 @@ define process_target.android-pak
   $1.RES_DIR           := $$(call specialize_paths,$$($1.RES_DIR))
   $1.DLL_DIRS          := $$(call specialize_paths,$$($1.DLL_DIRS)) $(DIST_BIN_DIR)
   $1.DLLS              := $$($1.DLLS:%=$(DLL_PREFIX)%$(DLL_SUFFIX))
-  $1.TARGET_DLLS       := $$($1.DLLS:%=$$($1.TMP_DIR)/bin/lib/armeabi/%)
+  $1.ABI_DIR           := $$($1.TMP_DIR)/bin/lib/$(ANDROID_ABI)
+  $1.TARGET_DLLS       := $$($1.DLLS:%=$$($1.ABI_DIR)/%)
   $1.INSTALLATION_FLAG := $$($1.TMP_DIR)/installation-flag
-  TMP_DIRS             := $$(TMP_DIRS) $$($1.TMP_DIR) $$($1.CLASSES_DIR) $$($1.R_DIR) $$($1.TMP_DIR)/bin/lib/armeabi
+  TMP_DIRS             := $$(TMP_DIRS) $$($1.TMP_DIR) $$($1.CLASSES_DIR) $$($1.R_DIR) $$($1.ABI_DIR)
   
   $$(foreach file,$$($1.TARGET_DLLS),$$(eval $$(call create_extern_file_dependency,$$(file),$$($1.DLL_DIRS))))    
   
@@ -238,7 +235,7 @@ endif
   
   $$($1.CLASSES_FLAG): $$($1.SOURCE_FILES) $$($1.JARS) $$($1.PACKAGED_RES_FILE)
 		@echo Compile sources for $$(notdir $$($1.TARGET))...
-		export R_FILES=$$$$(/usr/bin/find $$($1.R_DIR) -name '*.java') && $(JAVA_CC) $$($1.SOURCE_FILES) $$$$R_FILES $$($1.COMPILER_FLAGS) -d $$($1.CLASSES_DIR) -classpath '$(ANDROID_JAR)$$(if $$($1.JARS),;$$(subst ; ,;,$$($1.JARS:%=%;)))'
+		@export R_FILES=$$$$(/usr/bin/find $$($1.R_DIR) -name '*.java') && $(JAVA_CC) $$($1.SOURCE_FILES) $$$$R_FILES $$($1.COMPILER_FLAGS) -d $$($1.CLASSES_DIR) -classpath '$(ANDROID_JAR)$$(if $$($1.JARS),;$$(subst ; ,;,$$($1.JARS:%=%;)))'
 		@touch $$@
   
   $$($1.DEX_FILE): $$($1.CLASSES_FLAG)

@@ -153,18 +153,18 @@ public class EngineActivity extends Activity
   }
   
 /// Создание окна
-  public View createEngineView (String initString, final long windowRef)
+  public EngineViewController createEngineViewController (String initString, final long windowRef)
   {
     final Activity activity = this;    
     
-    return (View)UiDispatch.run (this, new UiRunnable () {
+    return (EngineViewController)UiDispatch.run (this, new UiRunnable () {
       public Object run ()
       {
-        View view = new EngineView (activity, windowRef);
-        
-        getWindow ().addContentView (view, new ViewGroup.LayoutParams (ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));        
-        
-        return view;
+        EngineViewController controller = new EngineViewController (activity, EngineViewController.ViewType.SURFACE_VIEW, windowRef);
+
+        getWindow ().addContentView (controller.getView (), new ViewGroup.LayoutParams (ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+
+        return controller;
       }
     });
   }
