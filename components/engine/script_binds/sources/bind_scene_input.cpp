@@ -49,6 +49,7 @@ void bind_scene_input_manager_library (Environment& environment)
   InvokerRegistry lib = environment.Library (SCENE_INPUT_MANAGER_LIBRARY);
 
   lib.Register ("Create",             make_invoker (&create_manager));
+  lib.Register ("Reset",              make_invoker (&SceneInputManager::Reset));
   lib.Register ("get_Screen",         make_invoker (xtl::implicit_cast<Screen* (SceneInputManager::*)()> (&SceneInputManager::Screen)));
   lib.Register ("set_Screen",         make_invoker (&set_input_screen));
   lib.Register ("get_TouchSize",      make_invoker (&SceneInputManager::TouchSize));
