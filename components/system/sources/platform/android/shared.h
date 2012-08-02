@@ -181,6 +181,7 @@ class jni_string
 */
 
 local_ref<jstring> tojstring    (const char* s);
+stl::string        tostring     (jstring s) { return jni_string (&get_env (), s).get (); }
 void               check_errors ();
 
 template <class T> T check_errors (T result)
@@ -209,6 +210,9 @@ void start_application (JavaVM* vm, jobject activity, const char* program_name, 
 
 /// регистрация методов обратного вызова окна
 void register_window_callbacks (JNIEnv* env);
+
+/// регистрация методов обратного вызова web-view
+void register_web_view_callbacks (JNIEnv* env);
 
 /// регистрация методов обратного вызова менеджера сенсоров
 void register_sensor_manager_callbacks (JNIEnv* env);

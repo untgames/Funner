@@ -24,27 +24,31 @@ public class EngineWebViewController extends EngineViewController
     public boolean isLoading () { return is_loading; }
     
     @Override
-    public boolean shouldOverrideUrlLoading(WebView view, String url)
+    public boolean shouldOverrideUrlLoading (WebView view, String url)
     {
-      Log.e ("funner", url);        
-      return false;
+      return !controller.shouldStartLoading (url);
     }    
     
     @Override
     public void onPageStarted (WebView view, String url, Bitmap favicon)
     {
       is_loading = true;
+      super.onPageStarted (view, url, favicon);
+      controller.onLoadStarted (url);
     }
 
     @Override
     public void onPageFinished (WebView view, String url) 
     {
-
+      super.onPageFinished (view, url);
+      controller.onLoadFinished ();
     }
     
     @Override
     public void onReceivedError (WebView view, int errorCode, String description, String failingUrl)
     {
+      super.onReceivedError (view, errorCode, description, failingUrl);
+      controller.onLoadFailed (description);
     }
   }
 
@@ -90,12 +94,23 @@ public class EngineWebViewController extends EngineViewController
   }
   
   WebView view;
+  volatile long web_view_ref;
 
   public EngineWebViewController (Context context, long window_ref)
   {
     view = new EngineWebView (context, this);
     
     initialize (context, view, window_ref);
+  }  
+  
+  public void setWebViewRef (long value)
+  {
+    web_view_ref = value;
+  }
+  
+  public long getWebViewRef ()
+  {
+    return web_view_ref;
   }  
   
   public void loadUrlThreadSafe (String in_url)
@@ -200,4 +215,9 @@ public class EngineWebViewController extends EngineViewController
     
     return result.booleanValue ();
   }
+  
+  public native void    onLoadStarted      (String request);
+  public native void    onLoadFinished     ();
+  public native void    onLoadFailed       (String error_message);
+  public native boolean shouldStartLoading (String request);
 }

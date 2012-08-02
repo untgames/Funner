@@ -3,7 +3,7 @@
 using namespace syslib;
 using namespace syslib::android;
 
-struct syslib::web_view_handle
+struct syslib::web_view_handle: public MessageQueue::Handler
 {
   IWebViewListener*   listener;               //слушатель событий web-view
   global_ref<jobject> controller;             //контроллер формы
@@ -22,6 +22,13 @@ struct syslib::web_view_handle
     : listener (in_listener)
     , window ()
   {
+    MessageQueueSingleton::Instance ()->RegisterHandler (*this);
+  }
+  
+///Деструктор
+  ~web_view_handle ()
+  {
+    MessageQueueSingleton::Instance ()->UnregisterHandler (*this);
   }
 
 ///Обработчик событий окна
@@ -46,7 +53,129 @@ struct syslib::web_view_handle
         break;
     }
   }  
+  
+///События загрузки
+  void OnLoadStartedCallback (const stl::string& request)
+  {
+    printf ("%s(%u)\n", __FUNCTION__, __LINE__); fflush (stdout);
+    if (listener)
+      listener->OnLoadStarted (request.c_str ());
+  }
+
+  void OnLoadFinishedCallback ()
+  {
+    printf ("%s(%u)\n", __FUNCTION__, __LINE__); fflush (stdout);    
+    if (listener)
+      listener->OnLoadFinished ();
+  }
+
+  void OnLoadFailedCallback (const stl::string& error_message)
+  {
+    printf ("%s(%u)\n", __FUNCTION__, __LINE__); fflush (stdout);    
+    if (listener)
+      listener->OnLoadFailed (error_message.c_str ());    
+  }
+
+///Проверка необходимости открытия ссылки
+  void ShouldStartLoadingCallback (const stl::string& request, bool& result)
+  {
+    printf ("%s(%u)\n", __FUNCTION__, __LINE__); fflush (stdout);    
+    if (listener)
+      result = listener->ShouldStartLoading (request.c_str ());
+  }
 };
+
+namespace
+{
+
+///Получение дескриптора WebView
+web_view_t find_web_view (jobject controller)
+{
+   try
+   {
+     if (!controller)
+       return 0;
+
+     JNIEnv& env = get_env ();
+
+     local_ref<jclass> controller_class = env.GetObjectClass (controller);
+
+     if (!controller_class)
+       throw xtl::format_operation_exception ("", "JNIEnv::GetObjectClass failed (for EngineWebViewController)");
+     
+     jmethodID get_web_view_ref = env.GetMethodID (controller_class.get (), "getWebViewRef", "()J");
+
+     if (!get_web_view_ref)
+       return 0;
+
+     return (web_view_t)check_errors (env.CallLongMethod (controller, get_web_view_ref));
+   }
+   catch (xtl::exception& e)
+   {
+     e.touch ("syslib::android::find_web_view");
+     throw;
+   }
+}
+
+template <class Fn> class WebViewMessage: public MessageQueue::Message
+{
+  public:
+    WebViewMessage (web_view_t in_web_view, const Fn& in_fn)
+      : web_view (in_web_view)
+      , fn (in_fn) {}
+
+    void Dispatch ()
+    {
+      fn (web_view);
+    }
+
+  private:
+    web_view_t web_view;
+    Fn         fn;
+};
+
+template <class Fn> void push_message (jobject controller, const Fn& fn)
+{
+  try
+  {
+    web_view_t view = find_web_view (controller);
+
+    if (!view)
+      return;
+
+    MessageQueueSingleton::Instance ()->PushMessage (*view, MessageQueue::MessagePtr (new WebViewMessage<Fn> (view, fn), false));
+  }
+  catch (...)
+  {
+    //подавление всех исключений
+  }
+}    
+
+void on_load_started (JNIEnv& env, jobject controller, jstring request)
+{
+  push_message (controller, xtl::bind (&web_view_handle::OnLoadStartedCallback, _1, tostring (request)));
+}
+
+void on_load_finished (JNIEnv& env, jobject controller)
+{
+  push_message (controller, xtl::bind (&web_view_handle::OnLoadFinishedCallback, _1));
+}
+
+void on_load_failed (JNIEnv& env, jobject controller, jstring error_message)
+{
+  push_message (controller, xtl::bind (&web_view_handle::OnLoadFailedCallback, _1, tostring (error_message)));
+}
+
+jboolean should_start_loading (JNIEnv& env, jobject controller, jstring request)
+{
+  volatile bool result = true;
+
+//  push_message (controller, xtl::bind (&web_view_handle::OnShouldStartLoadingCallback, _1, tostring (request)));
+
+  return result;
+}
+
+}
 
 /*
     Создание/уничтожение web-view
@@ -83,6 +212,12 @@ web_view_t AndroidWindowManager::CreateWebView (IWebViewListener* listener)
     view->can_go_forward_method = find_method (&env, controller_class.get (), "canGoForwardThreadSafe", "()Z");
     view->go_back_method        = find_method (&env, controller_class.get (), "goBackThreadSafe", "()V");
     view->go_forward_method     = find_method (&env, controller_class.get (), "goForwardThreadSafe", "()V");
+    
+    jmethodID set_web_view_ref = find_method (&env, controller_class.get (), "setWebViewRef", "(J)V");
+    
+    env.CallVoidMethod (view->controller.get (), set_web_view_ref, (jlong)&*view);
+
+    check_errors ();    
 
     return view.release ();
   }
@@ -103,6 +238,8 @@ void AndroidWindowManager::DestroyWebView (web_view_t handle)
     web_view_t view = (web_view_t)handle;
     
     AndroidWindowManager::DestroyWindow (view->window);
+    
+    delete view;
   }
   catch (xtl::exception& e)
   {
@@ -336,4 +473,48 @@ void AndroidWindowManager::GoForward (web_view_t handle)
     e.touch ("syslib::AndroidWindowManager::GoForward");
     throw;
   }
+}
+
+namespace syslib
+{
+
+namespace android
+{
+
+/// регистрация методов обратного вызова web-view
+void register_web_view_callbacks (JNIEnv* env)
+{
+  try
+  {
+    if (!env)
+      throw xtl::make_null_argument_exception ("", "env");
+
+    jclass controller_class = env->FindClass ("com/untgames/funner/application/EngineWebViewController");
+
+    if (!controller_class)
+      throw xtl::format_operation_exception ("", "Can't find EngineWebViewController class\n");
+
+    static const JNINativeMethod methods [] = {
+      {"onLoadStarted", "(Ljava/lang/String;)V", (void*)&on_load_started},
+      {"onLoadFailed", "(Ljava/lang/String;)V", (void*)&on_load_failed},
+      {"onLoadFinished", "()V", (void*)&on_load_finished},
+      {"shouldStartLoading", "(Ljava/lang/String;)Z", (void*)&should_start_loading},
+    };
+
+    static const size_t methods_count = sizeof (methods) / sizeof (*methods);
+    
+    jint status = env->RegisterNatives (controller_class, methods, methods_count);
+    
+    if (status)
+      throw xtl::format_operation_exception ("", "Can't register natives (status=%d)", status);    
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("syslib::android::register_web_view_callbacks");
+    throw;
+  }
+}
+
+}
+
 }
