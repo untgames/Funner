@@ -48,11 +48,7 @@ public class EngineViewController implements View.OnTouchListener, View.OnKeyLis
     gesture_detector = new GestureDetector (new DoubletapListener (this)); 
 
     view.setFocusable (true);
-    view.setFocusableInTouchMode (true);
-    
-    view.setOnTouchListener (this);
-    view.setOnKeyListener (this);
-    view.setOnFocusChangeListener (this);
+    view.setFocusableInTouchMode (true);    
   }
   
   public View getView ()

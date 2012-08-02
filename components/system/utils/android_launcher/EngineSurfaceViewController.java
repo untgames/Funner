@@ -32,6 +32,10 @@ public class EngineSurfaceViewController extends EngineViewController
 
       if (getHolder ().getSurface () != null && getHolder ().getSurface ().isValid ())
         surfaceCreated (getHolder ());
+        
+      setOnTouchListener (controller);
+      setOnKeyListener (controller);
+      setOnFocusChangeListener (controller);
     }
     
     @Override
