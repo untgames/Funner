@@ -5,11 +5,17 @@ using namespace syslib::android;
 
 struct syslib::web_view_handle
 {
-  IWebViewListener*   listener;         //слушатель событий web-view
-  global_ref<jobject> controller;       //контроллер формы
-  window_t            window;           //дескриптор окна
-  jmethodID           load_url_method;  //метод загрузки URL ресурса
-  jmethodID           reload_method;    //метод перезагрузки страницы
+  IWebViewListener*   listener;               //слушатель событий web-view
+  global_ref<jobject> controller;             //контроллер формы
+  window_t            window;                 //дескриптор окна
+  jmethodID           load_url_method;        //метод загрузки URL ресурса
+  jmethodID           load_data_method;       //метод загрузки данных  
+  jmethodID           reload_method;          //метод перезагрузки страницы
+  jmethodID           stop_loading_method;    //метод перезагрузки страницы  
+  jmethodID           can_go_back_method;     //метод проверки возможности возвращения назад
+  jmethodID           can_go_forward_method;  //метод проверки возможности перемещения вперед
+  jmethodID           go_back_method;         //метод возвращения назад
+  jmethodID           go_forward_method;      //метод перемещения вперед
   
 ///Конструктор
   web_view_handle (IWebViewListener* in_listener)
@@ -69,8 +75,14 @@ web_view_t AndroidWindowManager::CreateWebView (IWebViewListener* listener)
     if (!controller_class)
       throw xtl::format_operation_exception ("", "JNIEnv::GetObjectClass failed (for EngingeViewController)");
 
-    view->load_url_method = find_method (&env, controller_class.get (), "loadUrlThreadSafe", "(Ljava/lang/String;)V");
-    view->reload_method   = find_method (&env, controller_class.get (), "reloadThreadSafe", "()V");
+    view->load_url_method       = find_method (&env, controller_class.get (), "loadUrlThreadSafe", "(Ljava/lang/String;)V");
+    view->load_data_method      = find_method (&env, controller_class.get (), "loadDataThreadSafe", "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V");    
+    view->reload_method         = find_method (&env, controller_class.get (), "reloadThreadSafe", "()V");
+    view->stop_loading_method   = find_method (&env, controller_class.get (), "stopLoadingThreadSafe", "()V");
+    view->can_go_back_method    = find_method (&env, controller_class.get (), "canGoBackThreadSafe", "()Z");
+    view->can_go_forward_method = find_method (&env, controller_class.get (), "canGoForwardThreadSafe", "()Z");
+    view->go_back_method        = find_method (&env, controller_class.get (), "goBackThreadSafe", "()V");
+    view->go_forward_method     = find_method (&env, controller_class.get (), "goForwardThreadSafe", "()V");
 
     return view.release ();
   }
@@ -81,11 +93,16 @@ web_view_t AndroidWindowManager::CreateWebView (IWebViewListener* listener)
   }
 }
 
-void AndroidWindowManager::DestroyWebView (web_view_t)
+void AndroidWindowManager::DestroyWebView (web_view_t handle)
 {
   try
   {
-    throw xtl::make_not_implemented_exception (__FUNCTION__);    
+    if (!handle)
+      throw xtl::make_null_argument_exception ("", "handle");
+      
+    web_view_t view = (web_view_t)handle;
+    
+    AndroidWindowManager::DestroyWindow (view->window);
   }
   catch (xtl::exception& e)
   {
@@ -143,17 +160,33 @@ void AndroidWindowManager::LoadRequest (web_view_t handle, const char* request)
   }
 }
 
-void AndroidWindowManager::LoadData (web_view_t handle, const char*, size_t, const char*, const char*, const char*)
+void AndroidWindowManager::LoadData (web_view_t handle, const char* data, size_t data_size, const char* mime_type, const char* encoding, const char* base_url)
 {
   try
   {
     if (!handle)
       throw xtl::make_null_argument_exception ("", "handle");
+      
+    if (!data && data_size)
+      throw xtl::make_null_argument_exception ("", "data");      
+      
+    if (!data)
+      data = "";
+      
+    if (!mime_type)
+      throw xtl::make_null_argument_exception ("", "mime_type");
+      
+    if (!encoding)
+      throw xtl::make_null_argument_exception ("", "encoding");
+
+    if (!base_url)
+      throw xtl::make_null_argument_exception ("", "base_url");
 
     web_view_t view = (web_view_t)handle;
+
+    get_env ().CallVoidMethod (view->controller.get (), view->load_data_method, tojstring (stl::string (data, data + data_size).c_str ()).get (), tojstring (mime_type).get (), tojstring (encoding).get (), tojstring (base_url).get ());
     
-    
-    throw xtl::make_not_implemented_exception (__FUNCTION__);    
+    check_errors ();    
   }
   catch (xtl::exception& e)
   {
@@ -195,8 +228,9 @@ void AndroidWindowManager::StopLoading (web_view_t handle)
 
     web_view_t view = (web_view_t)handle;
     
-    
-    throw xtl::make_not_implemented_exception (__FUNCTION__);    
+    get_env ().CallVoidMethod (view->controller.get (), view->stop_loading_method);
+
+    check_errors ();
   }
   catch (xtl::exception& e)
   {
@@ -236,9 +270,8 @@ bool AndroidWindowManager::CanGoBack (web_view_t handle)
       throw xtl::make_null_argument_exception ("", "handle");
 
     web_view_t view = (web_view_t)handle;
-    
-    
-    throw xtl::make_not_implemented_exception (__FUNCTION__);    
+
+    return check_errors (get_env ().CallBooleanMethod (view->controller.get (), view->can_go_back_method));
   }
   catch (xtl::exception& e)
   {
@@ -256,8 +289,7 @@ bool AndroidWindowManager::CanGoForward (web_view_t handle)
 
     web_view_t view = (web_view_t)handle;
     
-    
-    throw xtl::make_not_implemented_exception (__FUNCTION__);    
+    return check_errors (get_env ().CallBooleanMethod (view->controller.get (), view->can_go_forward_method));
   }
   catch (xtl::exception& e)
   {
@@ -275,8 +307,9 @@ void AndroidWindowManager::GoBack (web_view_t handle)
 
     web_view_t view = (web_view_t)handle;
     
-    
-    throw xtl::make_not_implemented_exception (__FUNCTION__);    
+    get_env ().CallVoidMethod (view->controller.get (), view->go_back_method);
+
+    check_errors ();
   }
   catch (xtl::exception& e)
   {
@@ -293,9 +326,10 @@ void AndroidWindowManager::GoForward (web_view_t handle)
       throw xtl::make_null_argument_exception ("", "handle");
 
     web_view_t view = (web_view_t)handle;
-    
-    
-    throw xtl::make_not_implemented_exception (__FUNCTION__);
+
+    get_env ().CallVoidMethod (view->controller.get (), view->go_forward_method);
+
+    check_errors ();
   }
   catch (xtl::exception& e)
   {
