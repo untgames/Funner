@@ -26,7 +26,13 @@ public class EngineWebViewController extends EngineViewController
     @Override
     public boolean shouldOverrideUrlLoading (WebView view, String url)
     {
-      return !controller.shouldStartLoading (url);
+      UiAsyncBooleanResult result = new UiAsyncBooleanResult ();
+
+      controller.shouldStartLoading (url, result);
+
+      UiDispatch.processMessagesInternally (result);
+      Log.e ("funner", "RESULT IS " + result.getValue ());
+      return !result.getValue ();
     }    
     
     @Override
@@ -216,8 +222,8 @@ public class EngineWebViewController extends EngineViewController
     return result.booleanValue ();
   }
   
-  public native void    onLoadStarted      (String request);
-  public native void    onLoadFinished     ();
-  public native void    onLoadFailed       (String error_message);
-  public native boolean shouldStartLoading (String request);
+  public native void onLoadStarted      (String request);
+  public native void onLoadFinished     ();
+  public native void onLoadFailed       (String error_message);
+  public native void shouldStartLoading (String request, UiAsyncBooleanResult result);
 }

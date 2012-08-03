@@ -57,31 +57,42 @@ struct syslib::web_view_handle: public MessageQueue::Handler
 ///События загрузки
   void OnLoadStartedCallback (const stl::string& request)
   {
-    printf ("%s(%u)\n", __FUNCTION__, __LINE__); fflush (stdout);
     if (listener)
       listener->OnLoadStarted (request.c_str ());
   }
 
   void OnLoadFinishedCallback ()
   {
-    printf ("%s(%u)\n", __FUNCTION__, __LINE__); fflush (stdout);    
     if (listener)
       listener->OnLoadFinished ();
   }
 
   void OnLoadFailedCallback (const stl::string& error_message)
   {
-    printf ("%s(%u)\n", __FUNCTION__, __LINE__); fflush (stdout);    
     if (listener)
       listener->OnLoadFailed (error_message.c_str ());    
   }
 
 ///Проверка необходимости открытия ссылки
-  void ShouldStartLoadingCallback (const stl::string& request, bool& result)
+  void ShouldStartLoadingCallback (const stl::string& request, const global_ref<jobject>& result)
   {
-    printf ("%s(%u)\n", __FUNCTION__, __LINE__); fflush (stdout);    
+    bool bool_result = true;
+    
     if (listener)
-      result = listener->ShouldStartLoading (request.c_str ());
+      bool_result = listener->ShouldStartLoading (request.c_str ());
+
+    JNIEnv& env = get_env ();
+
+    local_ref<jclass> result_class = env.GetObjectClass (result.get ());
+
+    if (!result_class)
+      throw xtl::format_operation_exception ("", "JNIEnv::GetObjectClass failed (for UiAsyncResult)");
+
+    jmethodID set_value_method = find_method (&env, result_class.get (), "setValue", "(Z)V");
+    
+    env.CallVoidMethod (result.get (), set_value_method, (jboolean)bool_result);
+
+    check_errors ();           
   }
 };
 
@@ -166,13 +177,9 @@ void on_load_failed (JNIEnv& env, jobject controller, jstring error_message)
   push_message (controller, xtl::bind (&web_view_handle::OnLoadFailedCallback, _1, tostring (error_message)));
 }
 
-jboolean should_start_loading (JNIEnv& env, jobject controller, jstring request)
+void should_start_loading (JNIEnv& env, jobject controller, jstring request, jobject result)
 {
-  volatile bool result = true;
-
-//  push_message (controller, xtl::bind (&web_view_handle::OnShouldStartLoadingCallback, _1, tostring (request)));
-
-  return result;
+  push_message (controller, xtl::bind (&web_view_handle::ShouldStartLoadingCallback, _1, tostring (request), global_ref<jobject> (result)));
 }
 
 }
@@ -498,7 +505,7 @@ void register_web_view_callbacks (JNIEnv* env)
       {"onLoadStarted", "(Ljava/lang/String;)V", (void*)&on_load_started},
       {"onLoadFailed", "(Ljava/lang/String;)V", (void*)&on_load_failed},
       {"onLoadFinished", "()V", (void*)&on_load_finished},
-      {"shouldStartLoading", "(Ljava/lang/String;)Z", (void*)&should_start_loading},
+      {"shouldStartLoading", "(Ljava/lang/String;Lcom/untgames/funner/application/UiAsyncBooleanResult;)V", (void*)&should_start_loading},
     };
 
     static const size_t methods_count = sizeof (methods) / sizeof (*methods);

@@ -4,6 +4,11 @@ import java.io.*;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.locks.Condition;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import android.app.Activity;
 import android.view.View;
 import android.util.*;
@@ -26,7 +31,7 @@ class UiCondition
     lock.lock ();
     
     try
-    {    
+    {
       while (!state)
         condition.await ();
     }
@@ -56,6 +61,49 @@ class UiCondition
 interface UiRunnable
 {
   public Object run ();
+}
+
+class UiAsyncResult
+{
+  boolean ready;
+  
+  public boolean isReady ()
+  {
+    synchronized (this)
+    {
+      return ready;
+    }
+  }
+  
+  protected void setReady ()
+  {
+    synchronized (this)
+    {
+      ready = true;
+    }
+  }
+}
+
+class UiAsyncBooleanResult extends UiAsyncResult
+{
+  volatile boolean value;
+  
+  public void setValue (boolean inValue)
+  {
+    synchronized (this)
+    {
+      this.value = inValue;
+      setReady ();
+    }
+  }
+  
+  public boolean getValue ()
+  {
+    synchronized (this)
+    {
+      return value;
+    }
+  }
 }
 
 class UiDispatch implements Runnable
@@ -91,13 +139,92 @@ class UiDispatch implements Runnable
     }
   }
   
+  static List    internalMessageQueue;
+  static int     internalMessageProcessingDepth;
+  static Object  internalMessageQueueMutex = new Object ();
+  
+  static List getInternalMessageQueue ()
+  {
+    try
+    {
+      synchronized (internalMessageQueueMutex)
+      {
+        return internalMessageQueue;
+      }    
+    }
+    catch (Exception e)
+    {
+      return null;
+    }
+  }
+  
+  static class InternalMessage
+  {
+    public Activity activity;
+    public Runnable runnable;
+  }
+  
+  static List beginInternalMessageLoop () throws InterruptedException
+  {
+    synchronized (internalMessageQueueMutex)
+    {
+      if (internalMessageQueue == null)
+      {
+        internalMessageQueue           = Collections.synchronizedList (new ArrayList ());
+        internalMessageProcessingDepth = 1;
+      }                    
+      else
+      {
+        internalMessageProcessingDepth++;
+      }
+
+      return internalMessageQueue;
+    }              
+  }
+  
+  static void endInternalMessageLoop () throws InterruptedException
+  {
+    synchronized (internalMessageQueueMutex)
+    {      
+      internalMessageProcessingDepth--;
+        
+      if (internalMessageProcessingDepth == 0)
+      {
+        while (!internalMessageQueue.isEmpty ())
+        {
+          InternalMessage message = (InternalMessage)internalMessageQueue.remove (0);
+          
+          message.activity.runOnUiThread (message.runnable);
+        }
+        
+        internalMessageQueue = null;
+      }
+    }
+  }
+  
   public static Object run (Activity activity, UiRunnable runnable)
   {
     try
     {
       UiDispatch container = new UiDispatch (runnable);
-
-      activity.runOnUiThread (container);
+      
+      boolean needPostToUiThread = true;
+      
+      List queue = getInternalMessageQueue ();
+      
+      if (queue != null)
+      {
+        InternalMessage message = new InternalMessage ();
+        
+        message.activity = activity;
+        message.runnable = container;
+        
+        queue.add (message);
+      }
+      else
+      {
+        activity.runOnUiThread (container);
+      }
 
       container.condition.await ();
 
@@ -115,5 +242,56 @@ class UiDispatch implements Runnable
   public static Object run (View view, UiRunnable runnable)
   {
     return run ((Activity)view.getContext (), runnable);
+  }
+  
+  public static void processMessagesInternally (UiAsyncResult asyncResult)
+  {
+    try
+    {
+      List queue = beginInternalMessageLoop ();
+      
+      if (queue == null)
+        return;
+
+      try
+      {
+        while (!asyncResult.isReady ())
+        {
+          InternalMessage message = null;
+          
+          if (!queue.isEmpty ())
+          {
+            try
+            {                
+              message = (InternalMessage)queue.remove (0);
+            }
+            catch (Exception e)
+            {
+            }
+          }
+
+          if (message == null)
+          {
+            Thread.currentThread ().sleep (1);
+            continue;
+          }
+
+          message.runnable.run ();        
+        }
+      }
+      finally
+      {
+        endInternalMessageLoop ();
+      }
+    }
+    catch (Exception e)
+    {
+      StringWriter sw = new StringWriter();
+      PrintWriter pw = new PrintWriter(sw);
+            
+      e.printStackTrace(pw);                        
+        
+      Log.e ("funner", sw.toString ());
+    }
   }
 }
