@@ -8,6 +8,7 @@ struct syslib::web_view_handle: public MessageQueue::Handler
   IWebViewListener*   listener;               //слушатель событий web-view
   global_ref<jobject> controller;             //контроллер формы
   window_t            window;                 //дескриптор окна
+  jmethodID           is_loading_method;      //метод проверки состояния офрмы
   jmethodID           load_url_method;        //метод загрузки URL ресурса
   jmethodID           load_data_method;       //метод загрузки данных  
   jmethodID           reload_method;          //метод перезагрузки страницы
@@ -211,6 +212,7 @@ web_view_t AndroidWindowManager::CreateWebView (IWebViewListener* listener)
     if (!controller_class)
       throw xtl::format_operation_exception ("", "JNIEnv::GetObjectClass failed (for EngingeViewController)");
 
+    view->is_loading_method     = find_method (&env, controller_class.get (), "isLoadingThreadSafe", "()Z");
     view->load_url_method       = find_method (&env, controller_class.get (), "loadUrlThreadSafe", "(Ljava/lang/String;)V");
     view->load_data_method      = find_method (&env, controller_class.get (), "loadDataThreadSafe", "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V");    
     view->reload_method         = find_method (&env, controller_class.get (), "reloadThreadSafe", "()V");
@@ -391,9 +393,8 @@ bool AndroidWindowManager::IsLoading (web_view_t handle)
       throw xtl::make_null_argument_exception ("", "handle");
 
     web_view_t view = (web_view_t)handle;
-    
-    
-    throw xtl::make_not_implemented_exception (__FUNCTION__);    
+
+    return check_errors (get_env ().CallBooleanMethod (view->controller.get (), view->is_loading_method)) != 0;
   }
   catch (xtl::exception& e)
   {

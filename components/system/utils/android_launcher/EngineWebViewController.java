@@ -14,18 +14,17 @@ public class EngineWebViewController extends EngineViewController
   class EngineWebViewClient extends WebViewClient
   {
     private EngineWebViewController controller;
-    private boolean is_loading;
     
     EngineWebViewClient (EngineWebViewController controller)
     {
       this.controller = controller;
     }
     
-    public boolean isLoading () { return is_loading; }
-    
     @Override
     public boolean shouldOverrideUrlLoading (WebView view, String url)
     {
+      controller.setLoading (false);
+        
       UiAsyncBooleanResult result = new UiAsyncBooleanResult ();
 
       controller.shouldStartLoading (url, result);
@@ -38,23 +37,31 @@ public class EngineWebViewController extends EngineViewController
     @Override
     public void onPageStarted (WebView view, String url, Bitmap favicon)
     {
-      is_loading = true;
+      controller.setLoading (true);
+
       super.onPageStarted (view, url, favicon);
+      
       controller.onLoadStarted (url);
     }
 
     @Override
     public void onPageFinished (WebView view, String url) 
-    {
+    {        
       super.onPageFinished (view, url);
+
       controller.onLoadFinished ();
+
+      controller.setLoading (false);
     }
     
     @Override
     public void onReceivedError (WebView view, int errorCode, String description, String failingUrl)
-    {
+    {      
       super.onReceivedError (view, errorCode, description, failingUrl);
+      
       controller.onLoadFailed (description);
+      
+      controller.setLoading (false);
     }
   }
 
@@ -101,6 +108,7 @@ public class EngineWebViewController extends EngineViewController
   
   WebView view;
   volatile long web_view_ref;
+  volatile boolean is_loading = false;  
 
   public EngineWebViewController (Context context, long window_ref)
   {
@@ -118,6 +126,13 @@ public class EngineWebViewController extends EngineViewController
   {
     return web_view_ref;
   }  
+  
+  void setLoading (boolean state)
+  {
+    is_loading = state;
+  }
+
+  boolean isLoading () { return is_loading; }
   
   public void loadUrlThreadSafe (String in_url)
   {
@@ -222,6 +237,11 @@ public class EngineWebViewController extends EngineViewController
     return result.booleanValue ();
   }
   
+  public boolean isLoadingThreadSafe ()
+  {
+    return isLoading ();
+  }
+
   public native void onLoadStarted      (String request);
   public native void onLoadFinished     ();
   public native void onLoadFailed       (String error_message);
