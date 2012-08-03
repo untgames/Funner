@@ -98,7 +98,7 @@ class TileImageBuilder
 
     void BuildTileImage (math::vec2ui* out_origins, bool* out_was_packed, size_t margin, size_t max_image_size, size_t pack_flags)
     {
-      if (!pack_flags & AtlasPackFlag_PackToMaxImageSize)
+      if (!(pack_flags & AtlasPackFlag_PackToMaxImageSize))
         max_image_size = 0;
 
       IndexArray indices;
