@@ -23,23 +23,27 @@ void event_handler (WebView& view, WebViewEvent event)
     default:
       break;
   }
+  fflush (stdout);  
 }
 
 bool filter (WebView& view, const char* request)
 {
   printf ("navigate to '%s'\n", request);
+  fflush (stdout);  
+  
   return true;
 }
 
 int main ()
 {
   printf ("Results of web_view_test:\n");
-
+  fflush (stdout);
+  
   try
   {
-    Window parent_window (WindowStyle_Overlapped);
+//    Window parent_window (WindowStyle_Overlapped);
     
-    parent_window.Maximize ();
+//    parent_window.Maximize ();
     
     WebView view;
     
@@ -50,7 +54,7 @@ int main ()
     view.RegisterEventHandler (WebViewEvent_OnDestroy, &event_handler);
     view.RegisterFilter       (&filter);
     
-    view.Window ().SetParentHandle (parent_window.Handle ());
+//    view.Window ().SetParentHandle (parent_window.Handle ());
     
     view.Window ().Maximize ();
 
@@ -59,12 +63,15 @@ int main ()
     
     view.Window ().Show ();
 
-    view.LoadRequest ("http://google.com");
+//    view.LoadRequest ("http://google.com");
+    view.LoadRequest ("http://oauth.vk.com/authorize?client_id=2972852&scope=friends&redirect_uri=http://oauth.vk.com/blank.html&display=touch&response_type=token");
+//    view.LoadRequest ("https://oauth.vk.com/logout?client_id=2972852");
 
     Application::Run ();
     
     printf ("can_go_forward: %d, can_go_back: %d\n", view.CanGoForward (), view.CanGoBack ());
-
+    fflush (stdout);
+  
     return Application::GetExitCode ();
   }
   catch (std::exception& exception)
