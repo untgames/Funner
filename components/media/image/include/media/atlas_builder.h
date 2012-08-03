@@ -30,12 +30,13 @@ enum AtlasBuilderInsertMode
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 enum AtlasPackFlag
 {
-  AtlasPackFlag_PowerOfTwoEdges = 1,       //стороны степени двойки
-  AtlasPackFlag_InvertTilesX    = 1 << 1,  //инвертировать расположение тайлов по оси X, обрабатывается в AtlasBuilder
-  AtlasPackFlag_InvertTilesY    = 1 << 2,  //инвертировать расположение тайлов по оси Y, обрабатывается в AtlasBuilder
-  AtlasPackFlag_SwapAxises      = 1 << 3,  //изменить расположение осей при размещении тайлов
-  AtlasPackFlag_SquareAxises    = 1 << 4,  //равные размеры осей
-  AtlasPackFlag_Fast            = 1 << 5,  //быстрое сжатие
+  AtlasPackFlag_PowerOfTwoEdges    = 1,       //стороны степени двойки
+  AtlasPackFlag_InvertTilesX       = 1 << 1,  //инвертировать расположение тайлов по оси X, обрабатывается в AtlasBuilder
+  AtlasPackFlag_InvertTilesY       = 1 << 2,  //инвертировать расположение тайлов по оси Y, обрабатывается в AtlasBuilder
+  AtlasPackFlag_SwapAxises         = 1 << 3,  //изменить расположение осей при размещении тайлов
+  AtlasPackFlag_SquareAxises       = 1 << 4,  //равные размеры осей
+  AtlasPackFlag_PackToMaxImageSize = 1 << 5,  //упаковать максимально возможное количество картинок без превышения заданного размера атласа
+  AtlasPackFlag_Fast               = 1 << 6,  //быстрое сжатие
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -44,7 +45,18 @@ enum AtlasPackFlag
 class AtlasBuilder
 {
   public:
-    typedef xtl::function<void (size_t images_count, const math::vec2ui* in_sizes, math::vec2ui* out_origins, size_t margin, size_t pack_flags)> PackHandler;
+    struct PackHandlerParams
+    {
+      size_t              images_count;    //количество упаковываемых картинок
+      const math::vec2ui* in_sizes;        //размеры картинок
+      math::vec2ui*       out_origins;     //результирующие координаты картинок
+      bool*               out_was_packed;  //для каждой картинки true - если была упакована, false - если не влезла. Может быть равен 0
+      size_t              margin;          //отступ между картинками
+      size_t              max_image_size;  //максимальный размер результирующей картинки (используется только если установлен флаг )
+      size_t              pack_flags;      //параметры упаковки
+    };
+
+    typedef xtl::function<void (const PackHandlerParams&)> PackHandler;
   
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструкторы / деструктор

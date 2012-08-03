@@ -1,11 +1,11 @@
 #include "shared.h"
 
+#include <common/time.h>
+
 using namespace media;
 
 namespace
 {
-
-const size_t MIN_BUILD_PACKET_SIZE = 16; //минимальный размер пакета после которого идет упаковка по одной картинке
 
 //получение ближайшей сверху степени двойки
 size_t get_next_higher_power_of_two (size_t k) 
@@ -282,6 +282,7 @@ struct PackResult : public xtl::reference_counter
   xtl::uninitialized_storage<size_t>       indices;       //индексы картинок
 };
 
+typedef stl::vector<size_t>            IndexArray;
 typedef xtl::intrusive_ptr<PackResult> PackResultPtr;
 typedef stl::vector<PackResultPtr>     PackResultsArray;
 typedef xtl::intrusive_ptr<ImageDesc>  ImageDescPtr;
@@ -394,36 +395,6 @@ struct AtlasBuilder::Impl
     return image_desc;
   }
 
-  ///Построение карты
-  void CalculatePackResults (size_t count, xtl::uninitialized_storage<math::vec2ui>& sizes,
-                             xtl::uninitialized_storage<math::vec2ui>& origins,
-                             size_t& result_image_width, size_t& result_image_height)
-  {
-    result_image_width = result_image_height = 0;
-
-    pack_handler (count, sizes.data (), origins.data (), margin, pack_flags & ~AtlasPackFlag_InvertTilesX & ~AtlasPackFlag_InvertTilesY);
-
-    math::vec2ui *current_origin = origins.data (),
-                 *current_size   = sizes.data ();
-
-    for (size_t i = 0; i < count; i++, current_origin++, current_size++)
-    {
-      if (result_image_width < (current_origin->x + current_size->x))  result_image_width = current_origin->x + current_size->x;
-      if (result_image_height < (current_origin->y + current_size->y)) result_image_height = current_origin->y + current_size->y;
-    }
-
-    if (pack_flags & AtlasPackFlag_PowerOfTwoEdges)
-    {
-      result_image_width  = get_next_higher_power_of_two (result_image_width);
-      result_image_height = get_next_higher_power_of_two (result_image_height);
-    }
-
-    if (pack_flags & AtlasPackFlag_SquareAxises)
-    {
-      result_image_width = result_image_height = stl::max (result_image_width, result_image_height);
-    }
-  }
-
   void Build ()
   {
     if (!needs_rebuild)
@@ -434,12 +405,12 @@ struct AtlasBuilder::Impl
     if (images.empty ())
       return;
 
+    size_t start = common::milliseconds ();
+
     try
     {
         //построение массива индексов уникальных картинок
-      stl::vector<size_t> images_to_process;
-
-      images_to_process.reserve (images.size ());
+      IndexArray images_to_process;
 
       for (size_t i = 0, count = images.size (); i != count; i++)
       {
@@ -451,67 +422,72 @@ struct AtlasBuilder::Impl
 
         //упаковка
       xtl::uninitialized_storage<math::vec2ui> sizes (images_to_process.size ()), origins (images_to_process.size ()), success_origins (images_to_process.size ());
-      xtl::uninitialized_storage<size_t> processed_images (images_to_process.size ());
+      xtl::uninitialized_storage<bool>         was_packed (images_to_process.size ());
+      IndexArray                               packed_indices;
 
       while (!images_to_process.empty ())
       {
-        size_t packed_count = 0,
-               result_image_width,
-               result_image_height,
-               success_result_image_width,
-               success_result_image_height,
-               try_packet_size = images_to_process.size ();  //количество картинок, которое пробуем добавить в атлас за один раз
+        size_t images_count = images_to_process.size ();
 
-        while (try_packet_size >= 1)
+        for (size_t i = 0; i < images_count; i++)
         {
-          size_t try_from = 0;
+          size_t image_index = images_to_process [i];
 
-          for (size_t i = 0, packets_count = (size_t)ceil (images_to_process.size () / (float)try_packet_size); i < packets_count; i++)
-          {
-            size_t begin_index = try_from,
-                   end_index   = stl::min (begin_index + try_packet_size, images_to_process.size ()),
-                   packet_size = end_index - begin_index;
+          ImageHolderPtr image_holder = images [image_index]->image_holder;
 
-            for (size_t j = begin_index; j < end_index; j++)
-            {
-              size_t image_index = images_to_process [j],
-                     dst_index   = packed_count + j - begin_index;
-
-              ImageHolderPtr image_holder = images [image_index]->image_holder;
-
-              sizes.data () [dst_index].x = image_holder->ImageWidth ();
-              sizes.data () [dst_index].y = image_holder->ImageHeight ();
-
-              processed_images.data () [dst_index] = image_index;
-            }
-
-            CalculatePackResults (packed_count + packet_size, sizes, origins, result_image_width, result_image_height);
-
-            if (result_image_width <= max_image_size && result_image_height <= max_image_size) //размещены все картинки пакета
-            {
-              images_to_process.erase (images_to_process.begin () + begin_index, images_to_process.begin () + end_index);
-              packed_count += packet_size;
-
-              success_result_image_width  = result_image_width;
-              success_result_image_height = result_image_height;
-
-              memcpy (success_origins.data (), origins.data (), packed_count * sizeof (*origins.data ()));
-            }
-            else  //не удалось разместить все картинки пакета
-            {
-              try_from += packet_size;
-            }
-          }
-
-          try_packet_size /= 2;
-
-          if (try_packet_size && try_packet_size < MIN_BUILD_PACKET_SIZE)
-            try_packet_size = 1;
+          sizes.data () [i].x = image_holder->ImageWidth ();
+          sizes.data () [i].y = image_holder->ImageHeight ();
         }
 
-        if (!packed_count)
+        PackHandlerParams pack_params;
+
+        memset (&pack_params, 0, sizeof (pack_params));
+
+        pack_params.images_count   = images_count;
+        pack_params.in_sizes       = sizes.data ();
+        pack_params.out_origins    = origins.data ();
+        pack_params.out_was_packed = was_packed.data ();
+        pack_params.margin         = margin;
+        pack_params.max_image_size = max_image_size;
+        pack_params.pack_flags     = (pack_flags & ~AtlasPackFlag_InvertTilesX & ~AtlasPackFlag_InvertTilesY) | AtlasPackFlag_PackToMaxImageSize;
+
+        pack_handler (pack_params);
+
+        math::vec2ui *current_origin     = origins.data (),
+                     *current_size       = sizes.data ();
+        bool         *current_was_packed = was_packed.data ();
+
+        size_t result_image_width  = 0,
+               result_image_height = 0;
+
+        packed_indices.clear   ();
+        packed_indices.reserve (images_count);
+
+        for (size_t i = 0; i < images_count; i++, current_origin++, current_size++, current_was_packed++)
+        {
+          if (!*current_was_packed)
+            continue;
+
+          packed_indices.push_back (i);
+
+          if (result_image_width < (current_origin->x + current_size->x))  result_image_width = current_origin->x + current_size->x;
+          if (result_image_height < (current_origin->y + current_size->y)) result_image_height = current_origin->y + current_size->y;
+        }
+
+        if (packed_indices.empty ())
           throw xtl::format_operation_exception ("", "Can't pack images, image '%s' greater then maximum image size %u",
-                                                 images [images_to_process [0]]->image_holder->ImageName (), max_image_size);
+                                                 images [images_to_process.front ()]->image_holder->ImageName (), max_image_size);
+
+        if (pack_flags & AtlasPackFlag_PowerOfTwoEdges)
+        {
+          result_image_width  = get_next_higher_power_of_two (result_image_width);
+          result_image_height = get_next_higher_power_of_two (result_image_height);
+        }
+
+        if (pack_flags & AtlasPackFlag_SquareAxises)
+        {
+          result_image_width = result_image_height = stl::max (result_image_width, result_image_height);
+        }
 
           //подсчет количества упакованных неуникальных картинок
         size_t packed_images_count = 0;
@@ -520,11 +496,11 @@ struct AtlasBuilder::Impl
         {
           size_t duplicate_of_index = images [i]->duplicate_of_index;
 
-          size_t* current_processed_image = processed_images.data ();
-
-          for (size_t j = 0; j < packed_count; j++, current_processed_image++)
+          for (IndexArray::iterator iter = packed_indices.begin (), end = packed_indices.end (); iter != end; ++iter)
           {
-            if (*current_processed_image == duplicate_of_index)
+            size_t image_index = images_to_process [*iter];
+
+            if (image_index == duplicate_of_index)
             {
               packed_images_count++;
               break;
@@ -535,29 +511,28 @@ struct AtlasBuilder::Impl
           //формирование результата упаковки
         PackResultPtr pack_result (new PackResult, false);
 
-        pack_result->image_width  = success_result_image_width;
-        pack_result->image_height = success_result_image_height;
+        pack_result->image_width  = result_image_width;
+        pack_result->image_height = result_image_height;
         pack_result->origins.resize (packed_images_count);
         pack_result->indices.resize (packed_images_count);
 
-        size_t        pack_result_index = 0;
-        math::vec2ui* current_origin    = pack_result->origins.data ();
-        size_t*       current_index     = pack_result->indices.data ();
+        current_origin = pack_result->origins.data ();
+
+        size_t* current_index = pack_result->indices.data ();
 
         for (size_t i = 0, images_count = images.size (); i < images_count; i++)
         {
           size_t duplicate_of_index = images [i]->duplicate_of_index;
 
-          size_t* current_processed_image = processed_images.data ();
-
-          for (size_t j = 0; j < packed_count; j++, current_processed_image++)
+          for (IndexArray::iterator iter = packed_indices.begin (), end = packed_indices.end (); iter != end; ++iter)
           {
-            if (*current_processed_image == duplicate_of_index)
+            size_t image_index = images_to_process [*iter];
+
+            if (image_index == duplicate_of_index)
             {
-              *current_origin = success_origins.data () [j];
+              *current_origin = origins.data () [*iter];
               *current_index  = i;
 
-              pack_result_index++;
               current_origin++;
               current_index++;
 
@@ -567,6 +542,9 @@ struct AtlasBuilder::Impl
         }
 
         pack_results.push_back (pack_result);
+
+        for (IndexArray::reverse_iterator iter = packed_indices.rbegin (), end = packed_indices.rend (); iter != end; ++iter)
+          images_to_process.erase (images_to_process.begin () + *iter);
       }
     }
     catch (xtl::exception& exception)

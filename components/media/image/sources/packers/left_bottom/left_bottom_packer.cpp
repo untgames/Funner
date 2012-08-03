@@ -25,7 +25,8 @@ namespace components
 namespace left_bottom_packer
 {
 
-const size_t PACK_TRY_COUNT = 10;
+static size_t intersects_count = 0;
+const size_t PACK_TRY_COUNT = 100;
 
 struct MyRand
 {
@@ -40,6 +41,11 @@ struct MyRand
     return (size_t)(next / 65536) % max_rand;
   }
 };
+
+bool largest_area (size_t first, size_t second, math::vec2ui* images)
+{
+  return images [first].x * images [first].y > images [second].x * images [second].y;
+}
 
 //получение ближайшей сверху степени двойки
 size_t get_next_higher_power_of_two (size_t k)
@@ -90,16 +96,19 @@ class TileImageBuilder
       average_image_height /= images_count;
     }
 
-    void BuildTileImage (math::vec2ui* out_origins, size_t margin, size_t pack_flags)
+    void BuildTileImage (math::vec2ui* out_origins, bool* out_was_packed, size_t margin, size_t max_image_size, size_t pack_flags)
     {
-      size_t minimum_area = 0;
-      size_t result_image_horisontal_side, result_image_vertical_side;
+      if (!pack_flags & AtlasPackFlag_PackToMaxImageSize)
+        max_image_size = 0;
 
       IndexArray indices;
 
       //initialization
 
       indices.resize (images.size ());
+
+      size_t minimum_area = 0;
+      size_t result_image_horisontal_side, result_image_vertical_side;
 
       for (ImagesArray::iterator iter = images.begin (), end = images.end (); iter != end; ++iter)
          minimum_area += iter->x * iter->y;
@@ -115,28 +124,68 @@ class TileImageBuilder
 
       MyRand my_rand;
 
-      size_t pack_try_count = pack_flags & AtlasPackFlag_Fast ? 0 : PACK_TRY_COUNT;
+      size_t pack_try_count = pack_flags & AtlasPackFlag_Fast ? 1 : PACK_TRY_COUNT;
+
+        //массивы для сохранения результатов разных попыток упаковки (для выбора наилучшей)
+      xtl::uninitialized_storage<math::vec2ui> origins    (images.size () * pack_try_count);
+      xtl::uninitialized_storage<bool>         was_packed (images.size () * pack_try_count);
 
       while (!pack_result)
       {
         if (result_image_horisontal_side > result_image_vertical_side) result_image_vertical_side   *= 2;
         else                                                           result_image_horisontal_side *= 2;
 
+        if (pack_flags & AtlasPackFlag_PackToMaxImageSize)
+        {
+          if (result_image_horisontal_side > max_image_size)
+            result_image_horisontal_side = max_image_size;
+          if (result_image_vertical_side > max_image_size)
+            result_image_vertical_side = max_image_size;
+        }
+
         for (size_t i = 0; i < indices.size (); i++)
           indices[i] = i;
 
-        size_t try_count = 0;
+        bool pack_to_max_image_size = max_image_size == result_image_horisontal_side && max_image_size == result_image_vertical_side;
+
+        size_t try_count     = 0,
+               max_used_area = 0,
+               best_try      = 0;
 
         do
         {
-          pack_result = PackImages (margin, (pack_flags & AtlasPackFlag_SwapAxises) != 0, (pack_flags & AtlasPackFlag_Fast) != 0,
-                                    result_image_horisontal_side, result_image_vertical_side, out_origins, indices);
+          if (!try_count)
+            stl::sort (indices.begin (), indices.end (), xtl::bind (largest_area, _1, _2, images.begin ()));
 
-          if (pack_result) break;
+          math::vec2ui* current_out_origins    = pack_to_max_image_size ? origins.data () + images.size () * try_count : out_origins;
+          bool*         current_out_was_packed = pack_to_max_image_size ? was_packed.data () + images.size () * try_count : out_was_packed;
+
+          size_t used_area;
+
+          pack_result = PackImages (margin, (pack_flags & AtlasPackFlag_SwapAxises) != 0, (pack_flags & AtlasPackFlag_Fast) != 0,
+                                    result_image_horisontal_side, result_image_vertical_side, indices, pack_to_max_image_size,
+                                    current_out_origins, current_out_was_packed, used_area);
+
+          if (used_area > max_used_area)
+          {
+            max_used_area = used_area;
+            best_try      = try_count;
+          }
+
+          if (pack_result && !pack_to_max_image_size)
+            break;
 
           random_shuffle (indices.begin (), indices.end (), my_rand);
+
+          try_count++;
         }
-        while (try_count++ < pack_try_count);
+        while (try_count < pack_try_count);
+
+        if (pack_to_max_image_size)
+        {
+          memcpy (out_origins, origins.data () + images.size () * best_try, sizeof (*out_origins) * images.size ());
+          memcpy (out_was_packed, was_packed.data () + images.size () * best_try, sizeof (*out_was_packed) * images.size ());
+        }
       }
     }
 
@@ -190,11 +239,15 @@ class TileImageBuilder
       free_spaces.insert (free_space);
     }
 
-    bool PackImages (size_t margin, bool swap_axises, bool fast, size_t result_image_horizontal_side, size_t result_image_vertical_side, math::vec2ui* out_origins, const IndexArray& indices)
+    bool PackImages (size_t margin, bool swap_axises, bool fast, size_t result_image_horizontal_side,
+                     size_t result_image_vertical_side, const IndexArray& indices, bool pack_to_max_image_size,
+                     math::vec2ui* out_origins, bool* out_was_packed, size_t& used_area)
     {
       FreeSpacesSet free_spaces;
 
       free_spaces.insert (FreeSpace (0, 0, result_image_horizontal_side, result_image_vertical_side, swap_axises));
+
+      used_area = 0;
 
       for (size_t i = 0, count = indices.size (); i < count; i++)
       {
@@ -228,6 +281,8 @@ class TileImageBuilder
           {
             bound_volumes::axis_aligned_box<unsigned int> free_space_bb (vec3ui (erase_iter->x_pos, erase_iter->y_pos, 0),
                                                                          vec3ui (erase_iter->x_pos + erase_iter->width - 1, erase_iter->y_pos + erase_iter->height - 1, 1));
+
+            intersects_count++;
 
             if (my_intersects (free_space_bb, image_bb)) //картинка пересеклась с этим свободным местом, удаляем его и добавляем образовавшиеся новые свободные места
             {
@@ -270,7 +325,14 @@ class TileImageBuilder
           break;
         }
 
-        if (iter == end)
+        bool packed = iter != end;
+
+        if (packed)
+          used_area += image_size.x * image_size.y;
+
+        out_was_packed [indices [i]] = packed;
+
+        if (!packed && !pack_to_max_image_size)
           return false;
       }
 
@@ -283,20 +345,30 @@ class TileImageBuilder
     size_t      average_image_height;
 };
 
-void left_bottom_pack (size_t images_count, const math::vec2ui* in_sizes, math::vec2ui* out_origins, size_t margin, size_t pack_flags)
+void left_bottom_pack (const AtlasBuilder::PackHandlerParams& params)
 {
   static const char* METHOD_NAME = "media::LeftBottomPacker";
 
-  if (!in_sizes)
+  if (!params.in_sizes)
     throw xtl::make_null_argument_exception (METHOD_NAME, "in_sizes");
 
-  if (!out_origins)
+  if (!params.out_origins)
     throw xtl::make_null_argument_exception (METHOD_NAME, "out_origins");
 
   TileImageBuilder tile_image_builder;
 
-  tile_image_builder.AddImages (images_count, in_sizes);
-  tile_image_builder.BuildTileImage (out_origins, margin, pack_flags);
+  tile_image_builder.AddImages (params.images_count, params.in_sizes);
+
+  if (params.pack_flags & AtlasPackFlag_PackToMaxImageSize)
+  {
+    if (!params.max_image_size)
+      throw xtl::make_null_argument_exception (METHOD_NAME, "max_image_size");
+
+    if (!params.out_was_packed)
+      throw xtl::make_null_argument_exception (METHOD_NAME, "out_was_packed");
+  }
+
+  tile_image_builder.BuildTileImage (params.out_origins, params.out_was_packed, params.margin, params.max_image_size, params.pack_flags);
 }
 
 /*
@@ -309,7 +381,7 @@ class LeftBottomPackerComponent
     //загрузка компонента
     LeftBottomPackerComponent ()
     {
-      AtlasBuilderManager::PackHandler pack_handler = xtl::bind (&left_bottom_pack, _1, _2, _3, _4, _5);
+      AtlasBuilderManager::PackHandler pack_handler = xtl::bind (&left_bottom_pack, _1);
 
       AtlasBuilderManager::RegisterPacker ("default", pack_handler);
       AtlasBuilderManager::RegisterPacker ("left_bottom", pack_handler);
