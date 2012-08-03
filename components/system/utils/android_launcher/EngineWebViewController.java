@@ -31,7 +31,7 @@ public class EngineWebViewController extends EngineViewController
       controller.shouldStartLoading (url, result);
 
       UiDispatch.processMessagesInternally (result);
-      Log.e ("funner", "RESULT IS " + result.getValue ());
+
       return !result.getValue ();
     }    
     
