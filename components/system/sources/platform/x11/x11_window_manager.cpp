@@ -866,7 +866,10 @@ window_t XlibWindowManager::CreateWindow (WindowStyle style, WindowMessageHandle
       
         //настройка получения событий
 
-      XSelectInput (impl->display, impl->window, StructureNotifyMask | ExposureMask | ButtonPressMask | KeyPressMask | KeyReleaseMask);  
+      XSelectInput (impl->display, impl->window, StructureNotifyMask | ExposureMask | ButtonPressMask |
+                                                 KeyPressMask | KeyReleaseMask | ButtonReleaseMask |
+                                                 PointerMotionMask | FocusChangeMask | VisibilityChangeMask |
+                                                 ExposureMask);
 
       XFlush (impl->display);    
     }
