@@ -68,9 +68,9 @@ Results of ttf2xfont_test09:
     <Glyph XPos="0" YPos="0" Width="0" Height="0" BearingX="0" BearingY="0" AdvanceX="16" AdvanceY="0"/>
     <Glyph XPos="0" YPos="0" Width="0" Height="0" BearingX="0" BearingY="0" AdvanceX="16" AdvanceY="0"/>
     <Glyph XPos="0" YPos="0" Width="29" Height="33" BearingX="0" BearingY="32" AdvanceX="25" AdvanceY="0"/>
-    <Glyph XPos="34" YPos="0" Width="26" Height="31" BearingX="1" BearingY="31" AdvanceX="22" AdvanceY="0"/>
-    <Glyph XPos="65" YPos="0" Width="28" Height="32" BearingX="0" BearingY="31" AdvanceX="22" AdvanceY="0"/>
+    <Glyph XPos="67" YPos="0" Width="26" Height="31" BearingX="1" BearingY="31" AdvanceX="22" AdvanceY="0"/>
+    <Glyph XPos="34" YPos="0" Width="28" Height="32" BearingX="0" BearingY="31" AdvanceX="22" AdvanceY="0"/>
   </Glyphs>
   <Kernings/>
 </Font>
-fca4383f9c4d05af82de20222410ff38 *results/a_damn_mess.png
+3bb1f9e512c40943cf8e8f391c0eab5f *results/a_damn_mess.png

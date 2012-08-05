@@ -330,7 +330,8 @@ class TileImageBuilder
         if (packed)
           used_area += image_size.x * image_size.y;
 
-        out_was_packed [indices [i]] = packed;
+        if (out_was_packed)
+          out_was_packed [indices [i]] = packed;
 
         if (!packed && !pack_to_max_image_size)
           return false;

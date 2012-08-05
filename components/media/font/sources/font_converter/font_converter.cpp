@@ -262,7 +262,16 @@ void convert (const FontDesc& font_desc, Font& result_font, Image& result_image)
 
   get_log ().Printf ("packing %u glyphs...", glyphs_count);
 
-  pack_handler (glyphs_count, glyph_sizes.data (), glyph_origins.data (), 0, pack_flags);
+  media::AtlasBuilder::PackHandlerParams pack_params;
+
+  memset (&pack_params, 0, sizeof (pack_params));
+
+  pack_params.images_count = glyphs_count;
+  pack_params.in_sizes     = glyph_sizes.data ();
+  pack_params.out_origins  = glyph_origins.data ();
+  pack_params.pack_flags   = pack_flags;
+
+  pack_handler (pack_params);
 
   get_log ().Printf ("building image...");
 
