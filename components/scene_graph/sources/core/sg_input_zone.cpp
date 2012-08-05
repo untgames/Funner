@@ -26,7 +26,7 @@ struct InputZone::Impl: public xtl::instance_counter<InputZone>
     
     if (plane_mask & (1 << NodeOrt_X))
     {
-      zone_desc [zones_count].position = vec3f (0.0f);
+      zone_desc [zones_count].position = vec3f (0.0f, -0.5f, -0.5f);
       zone_desc [zones_count].axis_x   = vec3f (0.0f, 1.0f, 0.0f);
       zone_desc [zones_count].axis_y   = vec3f (0.0f, 0.0f, 1.0f);
 
@@ -35,7 +35,7 @@ struct InputZone::Impl: public xtl::instance_counter<InputZone>
 
     if (plane_mask & (1 << NodeOrt_Y))
     {
-      zone_desc [zones_count].position = vec3f (0.0f);
+      zone_desc [zones_count].position = vec3f (-0.5f, 0.0f, -0.5f);
       zone_desc [zones_count].axis_x   = vec3f (0.0f, 0.0f, 1.0f);
       zone_desc [zones_count].axis_y   = vec3f (1.0f, 0.0f, 0.0f);
 
@@ -44,7 +44,7 @@ struct InputZone::Impl: public xtl::instance_counter<InputZone>
 
     if (plane_mask & (1 << NodeOrt_Z))
     {    
-      zone_desc [zones_count].position = vec3f (0.0f);  
+      zone_desc [zones_count].position = vec3f (-0.5f, -0.5f, 0.0f);  
       zone_desc [zones_count].axis_x   = vec3f (1.0f, 0.0f, 0.0f);
       zone_desc [zones_count].axis_y   = vec3f (0.0f, 1.0f, 0.0f);        
 
@@ -62,7 +62,7 @@ InputZone::InputZone ()
 {
   DisableBoundsAutoUpdate ();
 
-  SetBoundBox (bound_volumes::axis_aligned_box <float> (-0.5f, -0.5f, 0, 0.5f, 0.5f, 0));
+  SetBoundBox (bound_volumes::axis_aligned_box <float> (-0.5f, -0.5f, -0.5f, 0.5f, 0.5f, 0.5f));
 }
 
 InputZone::~InputZone ()

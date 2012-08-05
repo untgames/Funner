@@ -39,7 +39,7 @@ int main ()
   
   zone->BindToParent (*parent);
     
-  check (*zone, NodeTransformSpace_Local, math::vec3f (0.0f, 0.0f, -1.0f), math::vec3f (0.0f, 0.0f, 2.0f));  
+  check (*zone, NodeTransformSpace_Local, math::vec3f (0.0f, 0.0f, -1.0f), math::vec3f (0.0f, 0.0f, 2.0f));   //OK
   check (*zone, NodeTransformSpace_Local, math::vec3f (0.5f, 0.51f, -1.0f), math::vec3f (0.0f, 0.0f, 2.0f));  
   check (*zone, NodeTransformSpace_Local, math::vec3f (0.0f, 0.0f, -1.0f), math::vec3f (0.0f, 0.0f, 0.5f));  
   check (*zone, NodeTransformSpace_World, math::vec3f (0.0f, 0.0f, -1.0f), math::vec3f (0.0f, 0.0f, 2.0f));    

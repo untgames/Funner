@@ -154,11 +154,18 @@ void InputZoneModel::UpdateZoneBounds ()
   for (size_t i=0, count=ZoneDescsCountCore (); i<count; i++)
   {
     const ZoneDesc& desc = descs [i];
+    
+    bound_volumes::aaboxf sub_box;    
 
-    box += desc.position + ( desc.axis_x + desc.axis_y) * 0.5f;
-    box += desc.position + ( desc.axis_x - desc.axis_y) * 0.5f;
-    box += desc.position + (-desc.axis_x + desc.axis_y) * 0.5f;
-    box += desc.position + (-desc.axis_x - desc.axis_y) * 0.5f;
+    sub_box.set_minimum (desc.position + ( desc.axis_x + desc.axis_y) * 0.5f);
+    sub_box.set_maximum (sub_box.minimum ());
+    
+    sub_box += desc.position + ( desc.axis_x - desc.axis_y) * 0.5f;
+    sub_box += desc.position + (-desc.axis_x + desc.axis_y) * 0.5f;
+    sub_box += desc.position + (-desc.axis_x - desc.axis_y) * 0.5f;
+    
+    if (i) box += sub_box;
+    else   box  = sub_box;
   }
 
   SetBoundBox (box);
@@ -332,7 +339,7 @@ void InputZoneModel::UpdateZoneInternals ()
       basis [0] = math::vec4f (desc.axis_x, 0.0f);
       basis [1] = math::vec4f (desc.axis_y, 0.0f);
       basis [2] = math::vec4f (normal, 0.0f);
-      basis [3] = math::vec4f (desc.position - (desc.axis_x + desc.axis_y) * 0.5f, 1.0f);
+      basis [3] = math::vec4f (desc.position, 1.0f);
       basis     = transpose (basis);
       
       zone_impl.basis               = basis;
@@ -437,7 +444,7 @@ bool InputZoneModel::IsIntersected
         
       math::vec3f local_intersection = local_ray_from + local_ray_dir * distance,
                   zone_intersection  = zone_impl.inv_basis * local_intersection;            
-                  
+
       if (intersected)
       {
         if (zone_intersection.x < 0.0f || zone_intersection.x > 1.0f)
@@ -505,7 +512,7 @@ bool InputZoneModel::IsIntersected
       }
 
       out_ray_intersection_distance = distance;
-      out_zone_intersection_point   = math::vec2f (zone_intersection) - math::vec2f (0.5f);
+      out_zone_intersection_point   = math::vec2f (zone_intersection);
       out_zone_index                = iter - impl->zones_impl.begin ();
     }
     

@@ -2,13 +2,13 @@ Results of zone_test:
 InputZone '': 
   active: true
   descs (count=3):
-    position: [0.00 0.00 0.00]
+    position: [0.00 -0.50 -0.50]
     axis_x:   [0.00 1.00 0.00]
     axis_y:   [0.00 0.00 1.00]
-    position: [0.00 0.00 0.00]
+    position: [-0.50 0.00 -0.50]
     axis_x:   [0.00 0.00 1.00]
     axis_y:   [1.00 0.00 0.00]
-    position: [0.00 0.00 0.00]
+    position: [-0.50 -0.50 0.00]
     axis_x:   [1.00 0.00 0.00]
     axis_y:   [0.00 1.00 0.00]
 notification1: 1
