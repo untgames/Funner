@@ -159,8 +159,8 @@ struct TouchTraverser: public INodeTraverser
 
   void operator () (Node& node)
   {
-    scene_graph::InputZoneModel* zone = dynamic_cast<scene_graph::InputZoneModel*> (&node);
-
+    scene_graph::InputZoneModel* zone = dynamic_cast<scene_graph::InputZoneModel*> (&node);    
+    
     if (!zone || !zone->IsActive ())
       return;
 
@@ -170,7 +170,7 @@ struct TouchTraverser: public INodeTraverser
     size_t      zone_index = 0;
 
     bool zone_intersection = zone->IsIntersected (NodeTransformSpace_World, touch_world_position, touch_world_position + touch_world_direction, zone_index, 
-      ray_intersection_distance, ray_to_zone_offset, intersection_point);          
+      ray_intersection_distance, ray_to_zone_offset, intersection_point);                      
 
     if (zone_intersection)
     {
@@ -227,7 +227,7 @@ void InputScene::OnTouch (InputPort& input_port, const TouchEvent& event, const 
       //поиск зоны, пересекаемой областью луча
 
     TouchTraverser traverser (*this, touch_world_position, touch_world_direction, touch_frustum);
-
+    
     scene.Traverse (touch_frustum, traverser);
 
     if (traverser.input_zone && !touch_catched)

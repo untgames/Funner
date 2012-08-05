@@ -21,7 +21,7 @@ InputEntity::InputEntity (const scene_graph::InputZoneModel& in_zone, InputScene
   , wait_for_release_event (false)
 {
   touches.reserve (RESERVE_TOUCHES_COUNT);
-
+  
   on_notifications_changed_connection = zone.RegisterEventHandler (InputZoneEvent_AfterNotificationAdded, xtl::bind (&InputEntity::UpdateNotifications, this));
   
   UpdateNotifications ();
@@ -93,12 +93,17 @@ void InputEntity::OnTouch (InputPort& input_port, const TouchEvent& event, const
   {
       //формирование контекста события
       
+    const InputZoneModel::ZoneDesc& desc = zone.ZoneDescs ()[zone_index];
+    
+    if (zone_index >= zone.ZoneDescsCount ())
+      throw xtl::make_range_exception ("", "zone_index", zone_index, zone.ZoneDescsCount ());          
+      
     InputZoneNotificationContext context;
 
     context.touch_id             = event.touch;
     context.button               = event.button;
     context.touch_world_position = touch_world_position;
-    context.touch_local_position = touch_local_position;
+    context.touch_local_position = desc.position + touch_local_position.x * desc.axis_x + touch_local_position.y * desc.axis_y;
     
       //проверка: зафиксировано ли нажатие на зону
 
