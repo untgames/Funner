@@ -932,6 +932,9 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
 
     math::vec2f corner_position (curl_point_position.x + curl_point.x, curl_point_position.y - curl_point.y + page_size.y);
 
+    if (fabs (corner_position.y) < EPS) //workaround for artifacts with zero curl height
+      corner_position.y = EPS;
+
     float max_corner_height_offset = corner_position.x * MAX_CORNER_HEIGHT_OFFSET_FACTOR;
 
     if (corner_position.y > page_size.y && corner_position.y - page_size.y > max_corner_height_offset)
@@ -1024,6 +1027,9 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
 
     math::vec2f corner_position (curl_point_position.x + curl_point.x, curl_point_position.y - curl_point.y);
 
+    if (fabs (corner_position.y) < EPS) //workaround for artifacts with zero curl height
+      corner_position.y = EPS;
+
     float max_corner_height_offset = corner_position.x * MAX_CORNER_HEIGHT_OFFSET_FACTOR;
 
     if (corner_position.y < 0 && -corner_position.y > max_corner_height_offset)
@@ -1113,6 +1119,9 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
           math::vec2f  page_size           = total_size;
 
     math::vec2f corner_position (curl_point_position.x + curl_point.x - page_size.x, curl_point_position.y - curl_point.y + page_size.y);
+
+    if (fabs (corner_position.y) < EPS) //workaround for artifacts with zero curl height
+      corner_position.y = EPS;
 
     float max_corner_height_offset = fabs (page_size.x - corner_position.x) * MAX_CORNER_HEIGHT_OFFSET_FACTOR;
 
@@ -1235,6 +1244,9 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
           math::vec2f  page_size           = total_size;
 
     math::vec2f corner_position (curl_point_position.x + curl_point.x - page_size.x, curl_point_position.y - curl_point.y);
+
+    if (fabs (corner_position.y) < EPS) //workaround for artifacts with zero curl height
+      corner_position.y = EPS;
 
     float max_corner_height_offset = fabs (page_size.x - corner_position.x) * MAX_CORNER_HEIGHT_OFFSET_FACTOR;
 
