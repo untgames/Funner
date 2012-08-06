@@ -955,7 +955,7 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
 
     math::vec2f curl_corner_position = corner_position;
 
-    float distance_to_opposite_side = math::length (math::vec2f (2 * page_size.x - curl_corner_position.x, curl_point.y - curl_corner_position.y));
+    float distance_to_opposite_side = math::length (math::vec2f (2 * page_size.x - stl::min (2 * page_size.x, curl_corner_position.x), curl_point.y - curl_point_position.y));
 
     curl_corner_position.y = page_size.y - curl_corner_position.y;
 
@@ -1047,7 +1047,7 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
 
     math::vec2f curl_corner_position = corner_position;
 
-    float distance_to_opposite_side = math::length (math::vec2f (2 * page_size.x - curl_corner_position.x, curl_point.y - curl_corner_position.y));
+    float distance_to_opposite_side = math::length (math::vec2f (2 * page_size.x - stl::min (2 * page_size.x, curl_corner_position.x), curl_point.y - curl_point_position.y));
 
     curl_corner_position.y = page_size.y - curl_corner_position.y;
 
@@ -1143,7 +1143,7 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
 
     math::vec2f curl_corner_position = corner_position;
 
-    float distance_to_opposite_side = math::length (math::vec2f (-page_size.x - curl_corner_position.x, curl_point.y - curl_corner_position.y));
+    float distance_to_opposite_side = math::length (math::vec2f (stl::max (0.f, -page_size.x - curl_point_position.x), curl_point.y - curl_point_position.y));
 
     curl_corner_position.y = page_size.y - curl_corner_position.y;
 
@@ -1265,7 +1265,7 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
 
     math::vec2f curl_corner_position = corner_position;
 
-    float distance_to_opposite_side = math::length (math::vec2f (-page_size.x - curl_corner_position.x, curl_point.y - curl_corner_position.y));
+    float distance_to_opposite_side = math::length (math::vec2f (stl::max (0.f, -page_size.x - curl_point_position.x), curl_point.y - curl_point_position.y));
 
     curl_corner_position.y = page_size.y - curl_corner_position.y;
 
