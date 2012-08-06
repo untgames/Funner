@@ -22,9 +22,6 @@
 #include <Carbon/Carbon.h>
 #include <CoreServices/CoreServices.h>
 #include <IOKit/graphics/IOGraphicsLib.h>
-#include <WebKit/CarbonUtils.h>
-#include <WebKit/HIWebView.h>
-#include <WebKit/WebPolicyDelegate.h>
 
 namespace syslib
 {
