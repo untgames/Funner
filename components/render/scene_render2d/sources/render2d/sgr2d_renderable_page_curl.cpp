@@ -1143,7 +1143,7 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
 
     math::vec2f curl_corner_position = corner_position;
 
-    float distance_to_opposite_side = math::length (math::vec2f (stl::max (0.f, -page_size.x - curl_point_position.x), curl_point.y - curl_point_position.y));
+    float distance_to_opposite_side = math::length (math::vec2f (stl::min (0.f, -page_size.x - curl_corner_position.x), curl_point.y - curl_point_position.y));
 
     curl_corner_position.y = page_size.y - curl_corner_position.y;
 
@@ -1265,7 +1265,7 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
 
     math::vec2f curl_corner_position = corner_position;
 
-    float distance_to_opposite_side = math::length (math::vec2f (stl::max (0.f, -page_size.x - curl_point_position.x), curl_point.y - curl_point_position.y));
+    float distance_to_opposite_side = math::length (math::vec2f (stl::min (0.f, -page_size.x - curl_corner_position.x), curl_point.y - curl_point_position.y));
 
     curl_corner_position.y = page_size.y - curl_corner_position.y;
 
