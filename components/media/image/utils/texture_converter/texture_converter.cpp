@@ -15,7 +15,7 @@
 #include <media/compressed_image.h>
 #include <media/image.h>
 
-#if defined (_MSC_VER) || defined (__MACH__)
+#if defined (_MSC_VER) || defined (__APPLE__) && !defined (IPHONE)
   #include <TextureConverter.h>
 #endif
 
@@ -281,7 +281,7 @@ void save_compressed_dds (const char* file_name, size_t width, size_t height, ui
     file.Write (mips_data [i], mips_data_sizes [i]);
 }
 
-#if defined (_MSC_VER) || defined (__MACH__)
+#if defined (_MSC_VER) || defined (__APPLE__) && !defined (IPHONE)
 
 const char* get_qualcomm_error_name (unsigned int error)
 {
@@ -550,7 +550,7 @@ int main (int argc, const char* argv [])
     static const size_t options_count = sizeof (options) / sizeof (*options);
 
     static ConversionDesc converters [] = {
-  #if defined (_MSC_VER) || defined (__MACH__)
+  #if defined (_MSC_VER) || defined (__APPLE__) && !defined (IPHONE)
       { "", ATC_RGB_AMD,                     xtl::bind (&qualcomm_texture_compress, _1) },
       { "", ATC_RGBA_EXPLICIT_ALPHA_AMD,     xtl::bind (&qualcomm_texture_compress, _1) },
       { "", ATC_RGBA_INTERPOLATED_ALPHA_AMD, xtl::bind (&qualcomm_texture_compress, _1) },
