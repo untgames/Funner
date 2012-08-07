@@ -2,7 +2,6 @@
 
 using namespace render;
 
-//TODO: check scissor enabled???
 //TODO: program/parameters_layout/local_textures FIFO cache
 
 namespace
@@ -600,19 +599,7 @@ struct RenderOperationsExecutor
       //настройка области отсечения
       
     if (scissor)
-    {
-      render::low_level::Rect dst_rect;
-      const Rect&             src_rect = scissor->Rect ();
-
-      memset (&dst_rect, 0, sizeof (dst_rect));
-
-      dst_rect.x      = src_rect.x;
-      dst_rect.y      = src_rect.y;
-      dst_rect.width  = src_rect.width;
-      dst_rect.height = src_rect.height;
-
-      device.RSSetScissor (dst_rect);
-    }    
+      SetScissorRect (scissor->Rect ());
   }
   
 ///Очистка целевых буферов
@@ -629,6 +616,35 @@ struct RenderOperationsExecutor
       device.ClearViews (dst_clear_flags, (render::low_level::Color4f&)frame.ClearColor (), frame.ClearDepthValue (), frame.ClearStencilIndex ());    
   }
   
+///Установка состояния области отсечения
+  void SetScissorState (RenderPass& pass, bool state)
+  {
+    if (state)
+    {
+      if (pass.scissor_on_state_block)
+        pass.scissor_on_state_block->Apply ();
+    }
+    else
+    {
+      if (pass.scissor_off_state_block)
+        pass.scissor_off_state_block->Apply ();
+    }    
+  }
+  
+  void SetScissorRect (const Rect& src_rect)
+  {
+    render::low_level::Rect dst_rect;
+
+    memset (&dst_rect, 0, sizeof (dst_rect));
+
+    dst_rect.x      = src_rect.x;
+    dst_rect.y      = src_rect.y;
+    dst_rect.width  = src_rect.width;
+    dst_rect.height = src_rect.height;
+
+    device.RSSetScissor (dst_rect);    
+  }
+  
 ///Рендеринг прохода
   void DrawPass (RenderPass& pass)
   {
@@ -638,22 +654,14 @@ struct RenderOperationsExecutor
 
       //установка целевых буферов отрисовки
       
-    RectAreaPtr scissor;
+    RectAreaPtr         scissor;
+    const RectAreaImpl* current_local_scissor = 0;
     
     SetRenderTargets (pass, scissor);
           
       //применение состояния прохода
-
-    if (scissor)
-    {
-      if (pass.scissor_on_state_block)
-        pass.scissor_on_state_block->Apply ();
-    }
-    else
-    {
-      if (pass.scissor_off_state_block)
-        pass.scissor_off_state_block->Apply ();
-    }        
+      
+    SetScissorState (pass, scissor);
     
       //очистка экрана
       
@@ -666,14 +674,15 @@ struct RenderOperationsExecutor
       //выполнение операций                    
 
     for (OperationPtrArray::iterator iter=pass.operation_ptrs.begin (), end=pass.operation_ptrs.end (); iter!=end; ++iter)
-      DrawPassOperation (pass, **iter);
+      DrawPassOperation (pass, **iter, scissor ? &*scissor : (RectAreaImpl*)0, current_local_scissor);
   }
   
 ///Выполнение операции прохода рендеринга
-  void DrawPassOperation (RenderPass& pass, const PassOperation& operation)
+  void DrawPassOperation (RenderPass& pass, const PassOperation& operation, RectAreaImpl* common_scissor, const RectAreaImpl*& current_local_scissor)
   {
     const RendererPrimitive& primitive                   = *operation.primitive;
     ShaderOptionsCache&      entity_shader_options_cache = *operation.shader_options_cache;
+    const RectAreaImpl*      operation_scissor           = operation.scissor;
 
       //поиск программы (TODO: кэширование поиска по адресам кэшей, FIFO)
       
@@ -697,8 +706,58 @@ struct RenderOperationsExecutor
 
       //обработка области отсечения объекта
 
-    ///?????????
+    if (operation_scissor != current_local_scissor)
+    {
+      bool scissor_state = true;
+      
+      if (operation_scissor)
+      {
+        if (common_scissor)
+        {
+            //обе области отсечения присутствуют
+            
+          const Rect &rect1 = common_scissor->Rect (), &rect2 = operation_scissor->Rect ();
+          Rect result;
+          
+          result.x = stl::max (rect1.x, rect2.x);
+          result.y = stl::max (rect1.y, rect2.y);
+          
+          int right  = stl::min (rect1.x + rect1.width, rect2.x + rect2.width),
+              bottom = stl::min (rect1.y + rect1.height, rect2.y + rect2.height);
 
+          result.width  = size_t (right - result.x);
+          result.height = size_t (bottom - result.y);
+            
+          SetScissorRect (result);
+        }
+        else
+        {
+            //присутствует только локальная область отсечения
+            
+          SetScissorRect (operation_scissor->Rect ());
+        }
+      }
+      else
+      {
+        if (common_scissor)
+        {
+            //присутствует только область отсечения фрейма
+
+          SetScissorRect (common_scissor->Rect ());
+        }
+        else
+        {
+            //обе области отсечения отсутствуют                    
+            
+          scissor_state = false;
+        }        
+      }
+      
+      SetScissorState (pass, scissor_state);
+      
+      current_local_scissor = operation_scissor;
+    }
+    
       //установка локальных текстур
     
     if (program->HasFramemaps ())

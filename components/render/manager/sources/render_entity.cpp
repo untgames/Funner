@@ -400,7 +400,7 @@ struct EntityLod: public xtl::reference_counter, public CacheHolder, public Debu
       cached_operations.clear ();
       cached_operations.reserve (operations_count);
       
-      const RectArea* scissor = common_data.ScissorState () ? &common_data.Scissor () : (const RectArea*)0;
+      const RectAreaImpl* scissor = common_data.ScissorState () ? Wrappers::Unwrap<RectAreaImpl> (common_data.Scissor ()).get () : (const RectAreaImpl*)0;
       
         //построение списка операций
         

@@ -10,7 +10,7 @@ struct RendererOperation
   ProgramParametersLayout*        entity_parameters_layout;       //расположение параметров объекта
   const RendererPrimitive*        primitive;                      //примитив
   ShaderOptionsCache*             shader_options_cache;           //кэш опций шейдера
-  const RectArea*                 scissor;                        //область отсечения (может быть null)
+  const RectAreaImpl*             scissor;                        //область отсечения (может быть null)
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
