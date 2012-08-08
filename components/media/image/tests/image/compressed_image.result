@@ -1,15 +1,20 @@
 Results of compressed_image_test:
-width:        64
-height:       64
+width:        2048
+height:       2048
 layers_count: 1
-mips_count:   7
-format:       'rgb_pvrtc4'
+mips_count:   12
+format:       'rgba_pvrtc4'
 layers:
   layer0:
-    mip0: size=2048, crc32=ec65f861
-    mip1: size=512, crc32=d59387de
-    mip2: size=128, crc32=d11f1961
-    mip3: size=32, crc32=1de0df3d
-    mip4: size=32, crc32=e536f15a
-    mip5: size=32, crc32=c285606a
-    mip6: size=32, crc32=d8432862
+    mip0: size=2097152, crc32=adcc39f9
+    mip1: size=524288, crc32=32b33a28
+    mip2: size=131072, crc32=3e71749e
+    mip3: size=32768, crc32=c1a02e3f
+    mip4: size=8192, crc32=4ed4cbf7
+    mip5: size=2048, crc32=309d9a7d
+    mip6: size=512, crc32=82dfccd7
+    mip7: size=128, crc32=6d858c49
+    mip8: size=32, crc32=2e32c1a8
+    mip9: size=32, crc32=666aa065
+    mip10: size=32, crc32=fd198d38
+    mip11: size=32, crc32=bc22ee49

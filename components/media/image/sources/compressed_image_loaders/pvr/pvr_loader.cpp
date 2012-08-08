@@ -5,6 +5,7 @@
 #include <xtl/common_exceptions.h>
 #include <xtl/function.h>
 #include <xtl/uninitialized_storage.h>
+#include <xtl/utility>
 
 #include <common/component.h>
 #include <common/file.h>
@@ -21,19 +22,20 @@ namespace pvr_loader
 {
 
 /*
-    ќписание формата PVR (вз€то из PVRTextureLoader)
+    ќписание формата PVR
 */
 
-const size_t PVR_TEXTURE_FLAG_TYPE_MASK = 0xff;
+static char PVR_VERSION [] = { 0x50, 0x56, 0x52, 0x03 };
 
-static char gPVRTexIdentifier [] = "PVR!";
+typedef size_t             uint32_t;
+typedef unsigned long long uint64_t;
 
-typedef size_t uint32_t;
-
-enum
+enum PixelFormat
 {
-  kPVRTextureFlagTypePVRTC_2 = 24,
-  kPVRTextureFlagTypePVRTC_4
+  PixelFormat_PVRTC2RGB,
+  PixelFormat_PVRTC2RGBA,
+  PixelFormat_PVRTC4RGB,
+  PixelFormat_PVRTC4RGBA,
 };
 
 #ifdef _MSC_VER
@@ -45,19 +47,25 @@ enum
 
 struct PACKED_STRUCTURE PVRTexHeader
 {
-  uint32_t headerLength;
+  uint32_t version;
+  uint32_t flags;
+  uint64_t pixel_format;
+  uint32_t color_space;
+  uint32_t channel_type;
   uint32_t height;
   uint32_t width;
-  uint32_t numMipmaps;
-  uint32_t flags;
-  uint32_t dataLength;
-  uint32_t bpp;
-  uint32_t bitmaskRed;
-  uint32_t bitmaskGreen;
-  uint32_t bitmaskBlue;
-  uint32_t bitmaskAlpha;
-  uint32_t pvrTag;
-  uint32_t numSurfs;
+  uint32_t depth;
+  uint32_t surfaces_count;
+  uint32_t faces_count;
+  uint32_t mips_count;
+  uint32_t meta_data_size;
+};
+
+struct PACKED_STRUCTURE PVRMetaDataHeader
+{
+  uint32_t fourcc;
+  uint32_t key;
+  uint32_t data_size;
 };
 
 #ifdef _MSC_VER
@@ -74,6 +82,8 @@ class PvrCompressedImage: public ICustomCompressedImage
 ///«агрузка изображени€
     PvrCompressedImage (const char* file_name)
     {
+      xtl::compile_time_assert<sizeof (uint64_t) == 8> ();
+
       try
       {
         if (!file_name)
@@ -88,13 +98,26 @@ class PvrCompressedImage: public ICustomCompressedImage
         if (file.Read (&header, sizeof (PVRTexHeader)) != sizeof (PVRTexHeader))
           throw xtl::format_operation_exception ("", "Invalid PVR file '%s'. Error at read header (%u bytes from start of file)", file_name, sizeof (PVRTexHeader));
           
-        if (memcmp (&header.pvrTag, &gPVRTexIdentifier, sizeof (uint32_t)))
+        if (memcmp (&header.version, &PVR_VERSION, sizeof (uint32_t)))
           throw xtl::format_operation_exception ("", "Invalid PVR file '%s'. Wrong tag", file_name);
 
-        format = header.flags & PVR_TEXTURE_FLAG_TYPE_MASK;
+        format = (size_t)(header.pixel_format & 0xffffffff);
         
-        if (format != kPVRTextureFlagTypePVRTC_4 && format != kPVRTextureFlagTypePVRTC_2)
+        if ((format != PixelFormat_PVRTC2RGB && format != PixelFormat_PVRTC2RGBA && format != PixelFormat_PVRTC4RGB && format != PixelFormat_PVRTC4RGBA) || (header.pixel_format >> 32))
           throw xtl::format_not_supported_exception ("", "PVR file '%s' with given format %u not supported (only PVRTC4 & PVRTC2 supported)", file_name, format);
+
+        if (header.color_space)
+          throw xtl::format_not_supported_exception ("", "Only linear color space supported");
+
+        if (header.depth > 1)
+          throw xtl::format_not_supported_exception ("", "3d textures not supported");
+
+        if (header.surfaces_count > 1)
+          throw xtl::format_not_supported_exception ("", "Texture arrays not supported");
+
+        layers_count = header.faces_count;
+
+        file.Seek (header.meta_data_size, FileSeekMode_Current);
 
         size_t width  = header.width;
         size_t height = header.height;
@@ -102,11 +125,9 @@ class PvrCompressedImage: public ICustomCompressedImage
         this->width  = width;
         this->height = height;
 
-        has_alpha = header.bitmaskAlpha != 0;
-
           //чтение данных
           
-        size_t data_length = header.dataLength;
+        size_t data_length = file.Size () - file.Tell ();
 
         data.resize (data_length, false);
 
@@ -117,27 +138,26 @@ class PvrCompressedImage: public ICustomCompressedImage
 
           // Calculate the data size for each texture level and respect the minimum number of blocks
           
-        mip_levels.reserve (GetReservedMipsCount (width, height));
+        mip_levels.reserve (header.mips_count);
 
-        size_t data_offset = 0;
+        size_t data_offset = 0,
+               bpp         = format == PixelFormat_PVRTC4RGB || format == PixelFormat_PVRTC4RGBA  ? 4 : 2;
 
         while (data_offset < data_length)
         {
-          size_t block_size, width_blocks, height_blocks, bpp;
+          size_t block_size, width_blocks, height_blocks;
 
-          if (format == kPVRTextureFlagTypePVRTC_4)
+          if (bpp == 4)
           {
             block_size    = 4 * 4; // Pixel by pixel block size for 4bpp
             width_blocks  = width / 4;
             height_blocks = height / 4;
-            bpp           = 4;
           }
           else
           {
             block_size    = 8 * 4; // Pixel by pixel block size for 2bpp
             width_blocks  = width / 8;
             height_blocks = height / 4;
-            bpp           = 2;
           }
 
             // Clamp to minimum number of blocks
@@ -183,7 +203,7 @@ class PvrCompressedImage: public ICustomCompressedImage
 /// оличество слоЄв
     size_t LayersCount ()
     {
-      return 1; //формат поддерживает только однослойные изображени€
+      return layers_count; //формат поддерживает только однослойные изображени€
     }
 
 /// оличество мип-уровней
@@ -197,9 +217,11 @@ class PvrCompressedImage: public ICustomCompressedImage
     {
       switch (format)
       {
-        case kPVRTextureFlagTypePVRTC_2: return has_alpha ? "rgba_pvrtc2" : "rgb_pvrtc2";
-        case kPVRTextureFlagTypePVRTC_4: return has_alpha ? "rgba_pvrtc4" : "rgb_pvrtc4";
-        default:                         throw xtl::format_operation_exception ("", "Internal error. Wrong format %u", format);
+        case PixelFormat_PVRTC2RGB:  return "rgb_pvrtc2";
+        case PixelFormat_PVRTC2RGBA: return "rgba_pvrtc2";
+        case PixelFormat_PVRTC4RGB:  return "rgb_pvrtc4";
+        case PixelFormat_PVRTC4RGBA: return "rgba_pvrtc4";
+        default:                     throw xtl::format_operation_exception ("", "Internal error. Wrong format %u", format);
       }
     }
 
@@ -216,27 +238,16 @@ class PvrCompressedImage: public ICustomCompressedImage
     }
     
   private:
-///ѕолучение количества мип-уровней (не точное, необходимо дл€ резервировани€ количества элементов в массиве)
-    static size_t GetReservedMipsCount (size_t width, size_t height)
-    {
-      static const float COEF = 1.0f / log (2.0f);
-      
-      size_t size = width > height ? width : height;
-
-      return (size_t)(log ((float)size) * COEF) + 1;
-    }
-    
-  private:
     typedef xtl::uninitialized_storage<char>      Buffer;        
     typedef stl::vector<CompressedImageBlockDesc> MipLevelArray;
 
   private:
-    size_t        format;     //формат изображени€
-    bool          has_alpha;  //присутствует ли в изображении альфа-канал
-    size_t        width;      //ширина изображени€
-    size_t        height;     //высота изображени€
-    Buffer        data;       //данные изображени€
-    MipLevelArray mip_levels; //мип-уровни
+    size_t        format;       //формат изображени€
+    size_t        width;        //ширина изображени€
+    size_t        height;       //высота изображени€
+    size_t        layers_count; //количество слоев
+    Buffer        data;         //данные изображени€
+    MipLevelArray mip_levels;   //мип-уровни
 };
 
 /*
