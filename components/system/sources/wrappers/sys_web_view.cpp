@@ -20,7 +20,7 @@ const char* LOG_NAME = "system.web_view";
 typedef xtl::signal<void (WebView& view, WebViewEvent event)>  EventSignal;
 typedef xtl::signal<bool (WebView& view, const char* request)> FilterSignal;
 
-struct WebView::Impl: public IWebViewListener
+struct WebView::Impl: public IWebViewListener, public xtl::reference_counter
 {
   WebView*       owner;                     //обратная ссылка на владельца
   web_view_t     handle;                    //дескриптор области вывода
@@ -62,6 +62,8 @@ struct WebView::Impl: public IWebViewListener
   {
     try
     {
+      xtl::intrusive_ptr<Impl> this_lock (this);      
+      
       if (!request)
         throw xtl::make_null_argument_exception ("", "request");
           
@@ -84,6 +86,8 @@ struct WebView::Impl: public IWebViewListener
   {
     try
     {
+      xtl::intrusive_ptr<Impl> this_lock (this);      
+      
       status = "Loaded";
       
       events [WebViewEvent_OnLoadFinish] (*owner, WebViewEvent_OnLoadFinish);
@@ -102,6 +106,8 @@ struct WebView::Impl: public IWebViewListener
   {
     try
     {
+      xtl::intrusive_ptr<Impl> this_lock (this);      
+      
       if (!error_message)
         error_message = "unknown error";
       
@@ -124,6 +130,8 @@ struct WebView::Impl: public IWebViewListener
   {
     try
     {
+      xtl::intrusive_ptr<Impl> this_lock (this);      
+      
       status = "Closed";
       
       events [WebViewEvent_OnClose] (*owner, WebViewEvent_OnClose);
@@ -143,6 +151,8 @@ struct WebView::Impl: public IWebViewListener
   {
     try
     {
+      xtl::intrusive_ptr<Impl> this_lock (this);
+      
       if (!request)
         throw xtl::make_null_argument_exception ("", "request");              
           
@@ -185,6 +195,8 @@ WebView::~WebView ()
   try
   {            
     impl->events [WebViewEvent_OnDestroy] (*this, WebViewEvent_OnDestroy);
+    
+    release (impl);
   }
   catch (std::exception& e)
   {

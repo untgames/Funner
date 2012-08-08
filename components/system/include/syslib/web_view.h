@@ -85,7 +85,7 @@ class WebView: public xtl::dynamic_cast_root //убрать!!!
 
   private:
     struct Impl;
-    stl::auto_ptr<Impl> impl;
+    Impl* impl;
 };
 
 }

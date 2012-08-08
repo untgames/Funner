@@ -413,7 +413,7 @@ struct syslib::web_view_handle: public IUnknown
   
     HRESULT STDMETHODCALLTYPE GetHostInfo (DOCHOSTUIINFO* pInfo)
     {
-      pInfo->dwFlags = (parent->has_scroll_bars ? 0 : DOCHOSTUIFLAG_SCROLL_NO) | DOCHOSTUIFLAG_NO3DOUTERBORDER;
+      pInfo->dwFlags = (parent->has_scroll_bars ? 0 : DOCHOSTUIFLAG_SCROLL_NO) | DOCHOSTUIFLAG_NO3DOUTERBORDER | DOCHOSTUIFLAG_ENABLE_REDIRECT_NOTIFICATION | DOCHOSTUIFLAG_HOST_NAVIGATES;
       return S_OK;
     }
 
@@ -485,11 +485,14 @@ struct syslib::web_view_handle: public IUnknown
       
     HRESULT hr;                  
     
-    _variant_t empty;
+    _variant_t empty, flags;
     
     empty.ChangeType (VT_I4);
+    flags.ChangeType (VT_I4);    
+    
+    flags.lVal = navHyperlink;
 
-    if ((hr = ibrowser->Navigate (bs, &empty, &empty, &empty, &empty)) != S_OK)
+    if ((hr = ibrowser->Navigate (bs, &flags, &empty, &empty, &empty)) != S_OK)
       raise_com_error ("", "IWebBrowser2::Navigate failed", hr);
 
     SysFreeString (bs);
@@ -511,7 +514,7 @@ struct syslib::web_view_handle: public IUnknown
       
       if (listener)
         listener->OnLoadStarted (utf8_uri.c_str ());
-    }
+    }    
   }
   
 ///Оповещение о конце загрузки

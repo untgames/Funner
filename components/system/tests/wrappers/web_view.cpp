@@ -64,6 +64,7 @@ int main ()
     view.Window ().Show ();
 
 //    view.LoadRequest ("http://google.com");
+//    view.LoadRequest ("http://google.com");
     view.LoadRequest ("http://oauth.vk.com/authorize?client_id=2972852&scope=friends&redirect_uri=http://oauth.vk.com/blank.html&display=touch&response_type=token");
 //    view.LoadRequest ("https://oauth.vk.com/logout?client_id=2972852");
 
