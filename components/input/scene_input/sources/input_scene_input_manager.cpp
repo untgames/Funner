@@ -293,8 +293,6 @@ struct SceneInputManager::Impl: public xtl::reference_counter, public IScreenLis
     if (need_reorder)
       Sort ();      
 
-    bool touch_catched = false;
-    
     math::vec2f position = event.position;
     
     TouchProcessingContext touch_context (event);
