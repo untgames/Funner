@@ -137,6 +137,7 @@ void InputPort::Update ()
     inv_view_proj_tm       = math::inverse (view_proj_tm);
     normalized_position_tm = math::scale (math::vec3f (1.0f, -1.0f, 1.0f)) * math::translate (math::vec3f (-1.0f)) * math::scale (2.0f * viewport_scale) * math::translate (-viewport_offset);
     position_tm            = inv_view_proj_tm * normalized_position_tm;
+    screen_tm              = math::inverse (normalized_position_tm) * view_proj_tm;
     
     switch (touch_size_space)
     {
@@ -166,7 +167,25 @@ void InputPort::Update ()
     Обработка события нажатия
 */
 
-void InputPort::OnTouch (const TouchEvent& event, bool& touch_catched)
+void InputPort::OnTouch (TouchProcessingContext& touch_context, const math::vec3f& touch_world_position)
+{
+  try
+  {
+    if (!input_scene)
+      return;
+    
+      //оповещение сцены о возникновении события
+      
+    input_scene->OnTouch (*this, touch_world_position, touch_context);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("input::InputPort::OnTouch");
+    throw;
+  }
+}
+
+void InputPort::FindTouch (TouchProcessingContext& touch_context, math::vec3f& out_touch_world_position)
 {
   try
   {
@@ -174,11 +193,11 @@ void InputPort::OnTouch (const TouchEvent& event, bool& touch_catched)
       return;
     
     if (need_update)
-      Update ();      
+      Update ();
 
       //перевод координаты в мировую систему координат
 
-    math::vec4f source_position (event.position.x, event.position.y, 0.0f, 1.0f),
+    math::vec4f source_position (touch_context.event.position.x, touch_context.event.position.y, 0.0f, 1.0f),
                 world_position = position_tm * source_position;
 
     world_position /= world_position.w;    
@@ -197,13 +216,15 @@ void InputPort::OnTouch (const TouchEvent& event, bool& touch_catched)
 
     add_frustum (touch_tm, touch_frustum);
 
-      //оповещение сцены о возникновении события
+      //поиск зоны
       
-    input_scene->OnTouch (*this, event, math::vec3f (world_position), math::vec3f (world_direction), touch_frustum, touch_catched);
+    out_touch_world_position = math::vec3f (world_position);
+
+    input_scene->FindTouch (*this, out_touch_world_position, math::vec3f (world_direction), touch_frustum, screen_tm, touch_context);        
   }
   catch (xtl::exception& e)
   {
-    e.touch ("input::InputPort::OnTouch");
+    e.touch ("input::InputPort::FindTouch");
     throw;
   }
 }

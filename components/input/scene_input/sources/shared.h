@@ -27,6 +27,7 @@ namespace input
 {
 
 class InputScene;
+class InputPort;
 
 typedef xtl::intrusive_ptr<InputScene> InputScenePtr;
 
@@ -56,6 +57,30 @@ struct TouchEvent
   int         button;     //кнопка
   TouchState  state;      //состояние тача
   math::vec2f position;   //положение
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Контекст обработки нажатия
+///////////////////////////////////////////////////////////////////////////////////////////////////
+struct TouchProcessingContext
+{
+  const TouchEvent&            event;
+  InputPort*                   input_port;
+  scene_graph::InputZoneModel* input_zone;
+  size_t                       input_zone_index;      
+  float                        intersection_distance;
+  math::vec2f                  intersection_point;
+  bool                         touch_catched;
+  
+  TouchProcessingContext (const TouchEvent& in_event)
+    : event (in_event)
+    , input_port ()
+    , input_zone ()
+    , input_zone_index (~0u)
+    , intersection_distance ()
+    , intersection_point ()
+    , touch_catched ()
+  { }
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -97,7 +122,8 @@ class InputPort: public xtl::reference_counter, public scene_graph::IViewportLis
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Обработка события нажатия
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void OnTouch (const TouchEvent& event, bool& touch_catched);
+    void FindTouch (TouchProcessingContext& touch_context, math::vec3f& out_touch_world_position);
+    void OnTouch   (TouchProcessingContext& touch_context, const math::vec3f& touch_world_position);
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Сброс состояния нажатий
@@ -121,6 +147,7 @@ class InputPort: public xtl::reference_counter, public scene_graph::IViewportLis
     xtl::auto_connection     on_camera_updated;      //соединение с событием обновления камеры
     xtl::auto_connection     on_scene_changed;       //соединение с событием изменения сцены
     math::mat4f              normalized_position_tm; //матрица преобразования координат (в систему координат проекции)
+    math::mat4f              screen_tm;              //матрица преобразования координат (из мировой системы в систему координат экрана)
     math::mat4f              position_tm;            //матрица преобразования координат (в мировую систему координат)
     math::mat4f              view_proj_tm;           //матрица преобразования координат (proj * inv(view))
     math::mat4f              inv_view_proj_tm;       //матрица обратного преобразования координат (inv (proj * inv(view)))
@@ -297,7 +324,8 @@ class InputScene: public xtl::reference_counter, private InputEventListener::Lis
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Обработка события
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void OnTouch (InputPort& input_port, const TouchEvent& event, const math::vec3f& touch_world_position, const math::vec3f& touch_world_direction, const frustum& touch_frustum, bool& touch_catched);
+    void FindTouch (InputPort& input_port, const math::vec3f& touch_world_position, const math::vec3f& touch_world_direction, const frustum& touch_frustum, const math::mat4f& screen_tm, TouchProcessingContext& context);
+    void OnTouch   (InputPort& input_port, const math::vec3f& touch_world_position, const TouchProcessingContext& context);
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Регистрация слушателей оповещений

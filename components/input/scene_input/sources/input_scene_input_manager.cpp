@@ -3,19 +3,28 @@
 using namespace scene_graph;
 using namespace input;
 
+/*
+    Описание реализации менеджера ввода сцены
+*/
+
 namespace
 {
 
 const float DEFAULT_TOUCH_SIZE = 0.001f;
 
-}
-
-/*
-    Описание реализации менеджера ввода сцены
-*/
-
-typedef stl::vector<InputPortPtr> InputPortList;
 typedef stl::vector<const char*>  TokenList;
+
+struct InputPortDesc
+{
+  InputPortPtr port;
+  math::vec3f  last_touch_world_position;
+  
+  InputPortDesc (const InputPortPtr& in_port) : port (in_port) {}
+};
+
+typedef stl::vector<InputPortDesc> InputPortList;
+
+}
 
 struct SceneInputManager::Impl: public xtl::reference_counter, public IScreenListener
 {
@@ -115,7 +124,7 @@ struct SceneInputManager::Impl: public xtl::reference_counter, public IScreenLis
       
       input_port->SetTouchSize (touch_size, touch_size_space);
 
-      input_ports.push_back (input_port);
+      input_ports.push_back (InputPortDesc (input_port));
       
       need_reorder = true;
     }
@@ -132,7 +141,7 @@ struct SceneInputManager::Impl: public xtl::reference_counter, public IScreenLis
     size_t viewport_id = viewport.Id ();
     
     for (InputPortList::iterator iter=input_ports.begin (), end=input_ports.end (); iter!=end; ++iter)
-      if ((*iter)->AttachedViewport ().Id () == viewport_id)
+      if (iter->port->AttachedViewport ().Id () == viewport_id)
       {
         input_ports.erase (iter);
         return;
@@ -148,9 +157,9 @@ struct SceneInputManager::Impl: public xtl::reference_counter, public IScreenLis
 ///Сортировка областей ввода
   struct InputPortComparator
   {
-    bool operator () (const InputPortPtr& port1, const InputPortPtr& port2) const
+    bool operator () (const InputPortDesc& desc1, const InputPortDesc& desc2) const
     {
-      return port1->AttachedViewport ().ZOrder () < port2->AttachedViewport ().ZOrder (); //reverse order, different than in render (front-to-back)
+      return desc1.port->AttachedViewport ().ZOrder () < desc2.port->AttachedViewport ().ZOrder (); //reverse order, different than in render (front-to-back)
     }
   };    
 
@@ -287,9 +296,18 @@ struct SceneInputManager::Impl: public xtl::reference_counter, public IScreenLis
     bool touch_catched = false;
     
     math::vec2f position = event.position;
+    
+    TouchProcessingContext touch_context (event);
 
-    for (InputPortList::iterator iter=input_ports.begin (), end=input_ports.end (); iter!=end; ++iter)
-      (*iter)->OnTouch (event, touch_catched);
+      //поиск зоны
+
+    for (InputPortList::iterator iter=input_ports.begin (), end=input_ports.end (); iter!=end; ++iter)    
+      iter->port->FindTouch (touch_context, iter->last_touch_world_position);
+
+      //оповещение
+
+    for (InputPortList::iterator iter=input_ports.begin (), end=input_ports.end (); iter!=end; ++iter)    
+      iter->port->OnTouch (touch_context, iter->last_touch_world_position);      
   }
 };
 
@@ -376,7 +394,7 @@ void SceneInputManager::Reset ()
   try
   {
     for (InputPortList::iterator iter=impl->input_ports.begin (), end=impl->input_ports.end (); iter!=end; ++iter)
-      (*iter)->ResetTouchState ();
+      iter->port->ResetTouchState ();
   }
   catch (xtl::exception& e)
   {
@@ -408,7 +426,7 @@ void SceneInputManager::SetTouchSize (float size, InputTransformSpace space)
   impl->touch_size = size;
   
   for (InputPortList::iterator iter=impl->input_ports.begin (), end=impl->input_ports.end (); iter!=end; ++iter)
-    (*iter)->SetTouchSize (size, space);
+    iter->port->SetTouchSize (size, space);
 }
 
 float SceneInputManager::TouchSize () const

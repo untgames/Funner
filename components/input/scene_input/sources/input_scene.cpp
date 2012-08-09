@@ -140,6 +140,7 @@ struct TouchTraverser: public INodeTraverser
   InputZoneModel*    input_zone;
   math::vec2f        input_zone_intersection_point;
   size_t             input_zone_index;
+  math::vec3f        zone_offset;
   
   TouchTraverser (InputScene&        in_scene,
                   const math::vec3f& in_touch_world_position,
@@ -187,6 +188,7 @@ struct TouchTraverser: public INodeTraverser
       min_distance                  = ray_intersection_distance;
       input_zone                    = zone;
       input_zone_intersection_point = intersection_point;
+      zone_offset                   = math::vec3f (0.0f);
     }
     else if (!intersected)
     {
@@ -214,45 +216,79 @@ struct TouchTraverser: public INodeTraverser
       input_zone                    = zone;
       input_zone_intersection_point = intersection_point;
       input_zone_index              = zone_index;
+      zone_offset                   = ray_to_zone_offset;
     }
   }
 };
 
 }
 
-void InputScene::OnTouch (InputPort& input_port, const TouchEvent& event, const math::vec3f& touch_world_position, const math::vec3f& touch_world_direction, const frustum& touch_frustum, bool& touch_catched)
+void InputScene::FindTouch (InputPort& input_port, const math::vec3f& touch_world_position, const math::vec3f& touch_world_direction, const frustum& touch_frustum, const math::mat4f& screen_tm, TouchProcessingContext& touch_context)
 {
   try
   {        
-      //поиск зоны, пересекаемой областью луча
-
-    TouchTraverser traverser (*this, touch_world_position, touch_world_direction, touch_frustum);
+    if (touch_context.touch_catched)
+      return;
+   
+      //поиск зоны, пересекаемой областью луча      
     
+    TouchTraverser traverser (*this, touch_world_position, touch_world_direction, touch_frustum);
+  
     scene.Traverse (touch_frustum, traverser);
 
-    if (traverser.input_zone && !touch_catched)
+    if (!traverser.input_zone)
+      return;
+            
+    if (traverser.intersected)    
     {
-      touch_catched = true;
+      touch_context.touch_catched = true;
+    }
+    else
+    {
+      math::vec3f screen_zone_offset    = screen_tm * math::vec4f (traverser.zone_offset, 0.0f);
+      float       intersection_distance = length (screen_zone_offset);
+      
+      if (!touch_context.input_zone || intersection_distance < touch_context.intersection_distance)
+        touch_context.intersection_distance = intersection_distance;
+    }
     
+    touch_context.input_port         = &input_port;
+    touch_context.input_zone         = traverser.input_zone;
+    touch_context.input_zone_index   = traverser.input_zone_index;
+    touch_context.intersection_point = traverser.input_zone_intersection_point;
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("input::InputScene::FindTouch(InputPort&,const math::vec3f&,math::vec3f&,const frustum&,const math::mat4f&,TouchContext&)");
+    throw;
+  }  
+}
+
+void InputScene::OnTouch (InputPort& input_port, const math::vec3f& touch_world_position, const TouchProcessingContext& touch_context)
+{
+  try
+  {        
+    if (touch_context.input_port == &input_port && touch_context.input_zone)
+    {
         //получение объекта, соответствующего зоне
 
-      InputEntityPtr entity = GetEntity (*traverser.input_zone);
+      InputEntityPtr entity = GetEntity (*touch_context.input_zone);
 
       if (entity)
       {          
           //передача события соответствующему объекту      
 
-        entity->OnTouch (input_port, event, touch_world_position, traverser.input_zone_index, traverser.input_zone_intersection_point);
+        entity->OnTouch (input_port, touch_context.event, touch_world_position, touch_context.input_zone_index, touch_context.intersection_point);
       }
     }
-    
+
       //оповещение
 
-    BroadcastTouch (input_port, event, touch_world_position);        
+    BroadcastTouch (input_port, touch_context.event, touch_world_position);        
   }
   catch (xtl::exception& e)
   {
-    e.touch ("input::InputScene::OnTouch(const TouchEvent&,const math::vec3f&,const frustum&,bool&)");
+    e.touch ("input::InputScene::OnTouch(InputPort&,const math::vec3f&,const frustum&,const TouchProcessingContext&)");
     throw;
   }  
 }
