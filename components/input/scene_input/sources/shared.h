@@ -168,6 +168,7 @@ class InputEventListener: public xtl::noncopyable
     class List: public xtl::noncopyable
     {
       friend class InputEventListener;
+      class Iterator;
       public:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструктор / деструктор
@@ -193,6 +194,7 @@ class InputEventListener: public xtl::noncopyable
       private:
         InputEventListener* first;
         InputEventListener* last;
+        Iterator*           first_iterator;
     };
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////

@@ -1,0 +1,13 @@
+Results of scene_input_self_remove_test:
+zone1: OnScreenTouchMove
+zone2: OnScreenTouchMove
+zone1: OnTouchEnter
+zone1: OnScreenTouchMove
+zone2: OnScreenTouchMove
+zone1: OnTouchDown
+zone1: OnPress
+zone1: OnScreenTouchDown
+zone2: OnScreenTouchDown
+zone2: OnScreenTouchUp
+zone3: OnScreenTouchUp
+exit
