@@ -43,10 +43,10 @@ PLATFORM_DIR               := $(NDK_ROOT)/platforms/$(ANDROID_NDK_PLATFORM)
 ANDROID_PLATFORM_TOOLS_DIR := $(call convert_path,$(ANDROID_SDK))/platform-tools
 ABI_DIR                    := $(NDK_ROOT)/toolchains/$(ANDROID_TOOLCHAIN)-$(ANDROID_TOOLCHAIN_VERSION)/prebuilt/$(ANDROID_NDK_HOST)
 GCC_TOOLS_DIR              := $(ABI_DIR)/bin
-COMPILER_GCC               := $(GCC_TOOLS_DIR)/$(ANDROID_TOOLCHAIN)-gcc
-LINKER_GCC                 := $(GCC_TOOLS_DIR)/$(ANDROID_TOOLCHAIN)-g++
-LIB_GCC                    := $(GCC_TOOLS_DIR)/$(ANDROID_TOOLCHAIN)-ar
-ADDR2LINE                  := $(GCC_TOOLS_DIR)/$(ANDROID_TOOLCHAIN)-addr2line
+COMPILER_GCC               := $(GCC_TOOLS_DIR)/$(ANDROID_TOOLS_PREFIX)-gcc
+LINKER_GCC                 := $(GCC_TOOLS_DIR)/$(ANDROID_TOOLS_PREFIX)-g++
+LIB_GCC                    := $(GCC_TOOLS_DIR)/$(ANDROID_TOOLS_PREFIX)-ar
+ADDR2LINE                  := $(GCC_TOOLS_DIR)/$(ANDROID_TOOLS_PREFIX)-addr2line
 ANDROID_TOOLS_DIR          := $(SDK_ROOT)/tools
 ADB                        := $(ANDROID_PLATFORM_TOOLS_DIR)/adb
 APK_BUILDER                := $(ANDROID_SDK)/tools/apkbuilder
@@ -60,22 +60,32 @@ BUILD_PATHS                := $(GCC_TOOLS_DIR):$(ABI_DIR)/libexec/gcc/$(ANDROID_
 
 COMMON_JAVA_FLAGS          += -g
 COMMON_CPPFLAGS            += -fexceptions -frtti
+COMMON_CFLAGS              += -g
 COMMON_CFLAGS              += -Os -ffunction-sections -funwind-tables -fstack-protector -fpic -fomit-frame-pointer -fno-strict-aliasing -finline-limit=64 #-gdwarf-2
 COMMON_CFLAGS              += -Wno-psabi -Wa,--noexecstack
 COMMON_CFLAGS              += -fvisibility=hidden
 COMMON_CFLAGS              += -DANDROID -UDEBUG
 COMMON_CFLAGS              += --sysroot=$(PLATFORM_DIR)/arch-$(ANDROID_ARCH)
-COMMON_CFLAGS              += -I$(NDK_ROOT)/sources/cxx-stl/gnu-libstdc++/include
-COMMON_CFLAGS              += -I$(NDK_ROOT)/sources/cxx-stl/gnu-libstdc++/libs/$(ANDROID_ABI)/include
 COMMON_LINK_FLAGS          += --sysroot=$(PLATFORM_DIR)/arch-$(ANDROID_ARCH)
 COMMON_LINK_FLAGS          += -Wl,-L,$(ABI_DIR)/lib/gcc/$(ANDROID_TOOLCHAIN)/$(ANDROID_TOOLCHAIN_VERSION)
 COMMON_LINK_FLAGS          += -Wl,-L,$(ABI_DIR)/lib/thumb
-COMMON_LINK_FLAGS          += -Wl,-L,$(NDK_ROOT)/sources/cxx-stl/gnu-libstdc++/libs/$(ANDROID_ABI)
 COMMON_LINK_FLAGS          += -Wl,-L,$(PLATFORM_DIR)/arch-$(ANDROID_ARCH)/usr/lib
 COMMON_LINK_FLAGS          += -Wl,-L,$(DIST_BIN_DIR)
 COMMON_LINK_FLAGS          += -Wl,-rpath-link=$(PLATFORM_DIR)/arch-$(ANDROID_ARCH)/usr/lib
 COMMON_LINK_FLAGS          += -lc -lm -lstdc++ -lgcc -lsupc++
-COMMON_LINK_FLAGS          += -Wl,--no-undefined -s
+COMMON_LINK_FLAGS          += -Wl,--no-undefined
+#COMMON_LINK_FLAGS          += -s
+
+ifneq (,$(wildcard $(NDK_ROOT)/sources/cxx-stl/gnu-libstdc++/libs/$(ANDROID_ABI)/include))
+COMMON_CFLAGS              += -I$(NDK_ROOT)/sources/cxx-stl/gnu-libstdc++/include
+COMMON_CFLAGS              += -I$(NDK_ROOT)/sources/cxx-stl/gnu-libstdc++/libs/$(ANDROID_ABI)/include
+COMMON_LINK_FLAGS          += -Wl,-L,$(NDK_ROOT)/sources/cxx-stl/gnu-libstdc++/libs/$(ANDROID_ABI)
+else
+COMMON_CFLAGS              += -I$(NDK_ROOT)/sources/cxx-stl/gnu-libstdc++/$(ANDROID_TOOLCHAIN_VERSION)/include
+COMMON_CFLAGS              += -I$(NDK_ROOT)/sources/cxx-stl/gnu-libstdc++/$(ANDROID_TOOLCHAIN_VERSION)/libs/$(ANDROID_ABI)/include
+COMMON_LINK_FLAGS          += -Wl,-L,$(NDK_ROOT)/sources/cxx-stl/gnu-libstdc++/$(ANDROID_TOOLCHAIN_VERSION)/libs/$(ANDROID_ABI)
+endif
+
 ANDROID_EXE_LINK_FLAGS     += -z $(PLATFORM_DIR)/arch-$(ANDROID_ARCH)/usr/lib/crtbegin_dynamic.o
 ANDROID_SO_LINK_FLAGS       = -Wl,-soname,$(notdir $1) -shared -Wl,--no-undefined -Wl,-z,noexecstack
 VALID_TARGET_TYPES         += android-pak android-jar
@@ -354,4 +364,5 @@ addr2line:
 #	@echo Address not specified
 #	@exit 1
 #endif
-	@$(ADDR2LINE) -e $(DIST_BIN_DIR)/$(file) -C -f -i -s
+	@$(ADDR2LINE) -e $(DIST_BIN_DIR)/$(file) -C -f -i -s $(addr)
+#	@$(GCC_TOOLS_DIR)/$(ANDROID_TOOLCHAIN)-nm $(DIST_BIN_DIR)/$(file)
