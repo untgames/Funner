@@ -3,7 +3,7 @@ TARGETS += DEBUG.TESTS
 
 DEBUG.SOURCES.TYPE        := static-lib
 DEBUG.SOURCES.NAME        := funner.debug
-DEBUG.SOURCES.SOURCE_DIRS := sources/map_file
+DEBUG.SOURCES.SOURCE_DIRS := sources/map_file/core sources/map_file/parsers/gcc
 DEBUG.SOURCES.IMPORTS     := compile.debug
 
 DEBUG.TESTS.TYPE        := test-suite
