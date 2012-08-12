@@ -804,7 +804,8 @@ window_t XlibWindowManager::CreateWindow (WindowStyle style, WindowMessageHandle
     
       //блокировка соединения с дисплеем
       
-    DisplayLock lock (DisplayManagerSingleton::Instance ()->Display ());
+    ::Display   *display = DisplayManagerSingleton::Instance ()->Display ();
+    DisplayLock lock (display);
     
       //создание дескриптора окна
 
