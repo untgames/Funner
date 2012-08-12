@@ -2,7 +2,7 @@
   #include <sys/time.h>
 #endif
 
-#ifdef ANDROID
+#if defined (__GNUC__) && !defined (__APPLE__)
   #include <unistd.h>
 #endif
 

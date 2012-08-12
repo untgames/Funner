@@ -141,7 +141,7 @@
 // * __stl_assert, either as a test or as a null macro, depending on
 //   whether or not __STL_ASSERTIONS is defined.
 
-#if defined (__APPLE__) || defined (ANDROID)
+#ifdef __GNUC__
   #define __STL_CLASS_PARTIAL_SPECIALIZATION
   #define __STL_EXPLICIT_FUNCTION_TMPL_ARGS
   #define __STL_HAS_NAMESPACES
