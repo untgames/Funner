@@ -509,5 +509,5 @@ const void* AdapterLibrary::GetProcAddress (const char* name, size_t search_flag
     
   if (search_flags & EntrySearch_NoThrow)
     return 0;    
-
   throw xtl::format_operation_exception (METHOD_NAME, "OpenGL entry '%s' not found in GL library '%s'", name, GetName ());
+}
