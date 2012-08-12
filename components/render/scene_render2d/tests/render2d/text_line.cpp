@@ -62,7 +62,7 @@ int main ()
 
     render_target.Update ();
 
-    text_line->SetSpacingMultiplier (2.f);
+    text_line->SetSpacingMultiplier (4.f);
 
     render_target.Update ();
   }
