@@ -154,14 +154,16 @@ Symbol* MapFile::FindSymbol (size_t address)
 {
   SymbolMap::iterator iter = impl->symbols.lower_bound (address);
   
-  if (iter == impl->symbols.end ())
-    return 0;
+  if (iter == impl->symbols.end () || iter == impl->symbols.begin ())
+    return 0;    
+    
+  --iter;
     
   Symbol& symbol = iter->second;
   
   if (address < symbol.StartAddress () || address >= symbol.StartAddress () + symbol.Size ())
     return 0;
-    
+
   return &symbol;
 }
 

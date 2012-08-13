@@ -1,0 +1,98 @@
+I/WindowManager( 1374): WIN DEATH: Window{48abb360 com.untgames.funner.application/com.untgames.funner.application.EngineActivity paused=false}
+D/Zygote  ( 1258): Process 24737 terminated by signal (11)
+I/ActivityManager( 1374): Start proc com.untgames.funner.application for activity com.untgames.funner.application/.EngineActivity: pid=24769 uid=10096 gids={3003, 1015}
+I/Zygote  (24769): Zygote: pid 24769 has INTERNET permission, then set capability for CAP_NET_RAW
+D/dalvikvm(24769): Trying to load lib //mnt/sdcard/funner/tmp/android-armv7/SYSTEMLIB.TESTS/tests/wrappers/crash 0x4857eb78
+D/dalvikvm(24769): Added shared lib //mnt/sdcard/funner/tmp/android-armv7/SYSTEMLIB.TESTS/tests/wrappers/crash 0x4857eb78
+I/funner  (24769): Starting program '//mnt/sdcard/funner/tmp/android-armv7/SYSTEMLIB.TESTS/tests/wrappers/crash' (args=' ', workdir='//mnt/sdcard/funner/components/system/tests/wrappers', env=' APK_FULL_PATH='/data/app/com.untgames.funner.application-1.apk' HOME='/data/data/com.untgames.funner.application' TEMP='/data/data/com.untgames.funner.application/cache'')
+W/dalvikvm(24769): read stdout: (26,512) failed (0): Unknown error: 0
+W/dalvikvm(24769): stdio converter got read error; shutting it down
+I/funner  (24769): In mgmain JNI_OnLoad
+I/funner  (24769): Process 24769 got signal 11
+I/funner  (24769): segment 0000a000-00220000 rwxp 00000000 00:00 0          [heap]
+I/funner  (24769): segment 4320b000-4320c000 r-xs 00000000 b3:02 68556      /data/app/com.untgames.funner.application-1.apk
+I/funner  (24769): segment 448d6000-448dc000 r-xs 00000000 b3:02 68556      /data/app/com.untgames.funner.application-1.apk
+I/funner  (24769): segment 45720000-45726000 r-xs 00000000 b3:02 68556      /data/app/com.untgames.funner.application-1.apk
+I/funner  (24769): segment 45726000-4572e000 r-xp 00000000 b3:02 1592325    /data/dalvik-cache/data@app@com.untgames.funner.application-1.apk@classes.dex
+I/funner  (24769): segment 81e00000-81ea4000 r-xp 00000000 b3:01 942        /mnt/sdcard/funner/tmp/android-armv7/SYSTEMLIB.TESTS/tests/wrappers/crash
+I/funner  (24769): segment 81ea4000-81ea9000 rwxp 000a4000 b3:01 942        /mnt/sdcard/funner/tmp/android-armv7/SYSTEMLIB.TESTS/tests/wrappers/crash
+I/funner  (24769): END crash info
+I/DEBUG   (24695): *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** ***
+I/DEBUG   (24695): Build fingerprint: 'samsung/GT-P1010/GT-P1010/GT-P1010:2.2.1/FROYO/XWKC1:user/release-keys'
+I/DEBUG   (24695): pid: 24769, tid: 24778  >>>  <<<
+I/DEBUG   (24695): signal 11 (SIGSEGV), fault addr 00000000
+I/DEBUG   (24695):  r0 b0003441  r1 4bae2db8  r2 81ea8378  r3 00000000
+I/DEBUG   (24695):  r4 0011ff44  r5 00000000  r6 81ea7e54  r7 0011ff3c
+I/DEBUG   (24695):  r8 001ff9f3  r9 0011ff38  10 0021882b  fp 4bae2e30
+I/DEBUG   (24695):  ip 81ea7f08  sp 4bae2dd8  lr afd13833  pc 81e0c498  cpsr 60000050
+I/DEBUG   (24695):  d0  666e692068736172  d1  636174735b202044
+I/DEBUG   (24695):  d2  454d00464e492d20  d3  412f464e492d4163
+I/DEBUG   (24695):  d4  6531382d30303034  d5  7772203030303961
+I/DEBUG   (24695):  d6  3461303030207078  d7  303a336220303030
+I/DEBUG   (24695):  d8  0000000000000000  d9  0000000000000000
+I/DEBUG   (24695):  d10 0000000000000000  d11 0000000000000000
+I/DEBUG   (24695):  d12 0000000000000000  d13 0000000000000000
+I/DEBUG   (24695):  d14 0000000000000000  d15 0000000000000000
+I/DEBUG   (24695):  d16 346466612d303030  d17 7877722030303034
+I/DEBUG   (24695):  d18 3031343030302070  d19 39303a6138203030
+I/DEBUG   (24695):  d20 38396365622d3030  d21 7078777220303030
+I/DEBUG   (24695):  d22 3030303030303020  d23 2030303a30302030
+I/DEBUG   (24695):  d24 3fc74721cad6b0ed  d25 3fc39a09d078c69f
+I/DEBUG   (24695):  d26 0000000000000000  d27 0000000000000000
+I/DEBUG   (24695):  d28 0000000000000000  d29 0000000000000000
+I/DEBUG   (24695):  d30 0000000000000000  d31 0000000000000000
+I/DEBUG   (24695):  scr 80000012
+I/DEBUG   (24695): 
+I/DEBUG   (24695):          #00  pc 81e0c498  /mnt/sdcard/funner/tmp/android-armv7/SYSTEMLIB.TESTS/tests/wrappers/crash
+I/DEBUG   (24695):          #01  lr afd13833  /system/lib/libc.so
+I/DEBUG   (24695): 
+I/DEBUG   (24695): code around pc:
+I/DEBUG   (24695): 81e0c478 e92d4010 e08f1001 e3a0000b ebfffee2 
+I/DEBUG   (24695): 81e0c488 e59f2018 e3a03000 e08f2002 e5820000 
+I/DEBUG   (24695): 81e0c498 e5833000 e1a00003 e8bd8010 00000154 
+I/DEBUG   (24695): 81e0c4a8 0009bee0 e92d4ff7 e59f00fc e59f10fc 
+I/DEBUG   (24695): 81e0c4b8 e59f50fc e08f0000 e08f1001 ebffff05 
+I/DEBUG   (24695): 
+I/DEBUG   (24695): code around lr:
+I/DEBUG   (24695): afd13810 22004669 f7fa9302 b005ee04 bf00bd30 
+I/DEBUG   (24695): afd13820 9100b51f 46699202 2300466a f7fa9301 
+I/DEBUG   (24695): afd13830 b110edf8 30fff04f 9800e000 bd00b005 
+I/DEBUG   (24695): afd13840 f04fb510 f7ff4200 bd10ffeb f04fb510 
+I/DEBUG   (24695): afd13850 f7ff5280 bd10ffe5 2002b507 466aa901 
+I/DEBUG   (24695): 
+I/DEBUG   (24695): stack:
+I/DEBUG   (24695):     4bae2d98  001ff9f3  [heap]
+I/DEBUG   (24695):     4bae2d9c  0011ff38  [heap]
+I/DEBUG   (24695):     4bae2da0  0021882b  [heap]
+I/DEBUG   (24695):     4bae2da4  afd0be4d  /system/lib/libc.so
+I/DEBUG   (24695):     4bae2da8  4bae2dc8  
+I/DEBUG   (24695):     4bae2dac  81ea87d0  /mnt/sdcard/funner/tmp/android-armv7/SYSTEMLIB.TESTS/tests/wrappers/crash
+I/DEBUG   (24695):     4bae2db0  0011ff44  [heap]
+I/DEBUG   (24695):     4bae2db4  0011ff3c  [heap]
+I/DEBUG   (24695):     4bae2db8  b0003441  /system/bin/linker
+I/DEBUG   (24695):     4bae2dbc  00000000  
+I/DEBUG   (24695):     4bae2dc0  10000000  
+I/DEBUG   (24695):     4bae2dc4  00000000  
+I/DEBUG   (24695):     4bae2dc8  0011ff44  [heap]
+I/DEBUG   (24695):     4bae2dcc  afd13857  /system/lib/libc.so
+I/DEBUG   (24695):     4bae2dd0  e3a07077  
+I/DEBUG   (24695):     4bae2dd4  ef900077  
+I/DEBUG   (24695): #00 4bae2dd8  0011ff44  [heap]
+I/DEBUG   (24695):     4bae2ddc  81e1f704  /mnt/sdcard/funner/tmp/android-armv7/SYSTEMLIB.TESTS/tests/wrappers/crash
+I/DEBUG   (24695):     4bae2de0  00000000  
+I/DEBUG   (24695):     4bae2de4  00000000  
+I/DEBUG   (24695):     4bae2de8  00000000  
+I/DEBUG   (24695):     4bae2dec  00000000  
+I/DEBUG   (24695):     4bae2df0  00000003  
+I/DEBUG   (24695):     4bae2df4  81e844c2  /mnt/sdcard/funner/tmp/android-armv7/SYSTEMLIB.TESTS/tests/wrappers/crash
+I/DEBUG   (24695):     4bae2df8  00000000  
+I/DEBUG   (24695):     4bae2dfc  00000000  
+I/DEBUG   (24695):     4bae2e00  002187a8  [heap]
+I/DEBUG   (24695):     4bae2e04  00219640  [heap]
+I/DEBUG   (24695):     4bae2e08  00219674  [heap]
+I/DEBUG   (24695):     4bae2e0c  00219675  [heap]
+I/DEBUG   (24695):     4bae2e10  00000000  
+I/DEBUG   (24695):     4bae2e14  00000000  
+I/DEBUG   (24695):     4bae2e18  00000000  
+I/DEBUG   (24695):     4bae2e1c  00000000  
+I/DEBUG   (24695): dumpstate /data/log/dumpstate_app_native.txt

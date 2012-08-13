@@ -181,11 +181,24 @@ class GccMapFileParser
         switch (state)
         {
           case State_SearchingSymbol:
-            if (empty_space != 1 || tokens.size () > 1)
-              return;                                  
-
-            state      = State_SymbolHeaderRead;
-            sym_header = tokens [0];
+            if (empty_space != 1)
+              return;
+              
+            switch (tokens.size ())
+            {
+              case 1:
+                state      = State_SymbolHeaderRead;
+                sym_header = tokens [0];
+                break;
+              case 4:
+                sym_header        = tokens [0];
+                sym_start_address = xtl::io::get<size_t> (tokens [1]);
+                sym_size          = xtl::io::get<size_t> (tokens [2]);
+                state             = State_SymbolFirstLineRead;
+                break;
+              default:
+                break;
+            }
 
             break;
           case State_SymbolHeaderRead:

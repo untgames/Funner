@@ -1,0 +1,6 @@
+Results of map_file2_test:
+debug.gcc_map_file_parser: xtl::bad_lexical_cast
+    at GccMapFileParser::ParseLine(line_number=37770)
+debug.gcc_map_file_parser: xtl::bad_lexical_cast
+    at GccMapFileParser::ParseLine(line_number=59137)
+symbol 'main' found
