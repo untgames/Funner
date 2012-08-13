@@ -16,6 +16,7 @@ class ApplicationDelegateImpl;
 
 bool                     application_launched = false;
 ApplicationDelegateImpl* application_delegate = 0;
+NSString*                USER_DEFAULTS_UUID   = @"UUID";
 
 class ApplicationDelegateImpl: public IApplicationDelegate, public xtl::reference_counter
 {
@@ -354,4 +355,52 @@ void IPhoneApplicationManager::OpenUrl (const char* url)
 
   if (!result)
     throw xtl::format_operation_exception ("::UIApplication::openURL", "Can't open URL '%s'", url);
+}
+
+/*
+   Управление энергосбережением
+*/
+
+void IPhoneApplicationManager::SetScreenSaverState (bool state)
+{
+  [UIApplication sharedApplication].idleTimerDisabled = !state;
+}
+
+bool IPhoneApplicationManager::GetScreenSaverState ()
+{
+  return ![UIApplication sharedApplication].idleTimerDisabled;
+}
+
+/*
+   Получение системных свойств
+*/
+
+void IPhoneApplicationManager::GetSystemProperties (common::PropertyMap& properties)
+{
+  NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
+
+  properties.SetProperty ("OS", "ios");
+  properties.SetProperty ("Platform", UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad ? "pad" : "phone");
+  properties.SetProperty ("Language", [((NSString*)[[NSLocale preferredLanguages] objectAtIndex:0]) UTF8String]);
+  properties.SetProperty ("OSVersion", [[[UIDevice currentDevice] systemVersion] UTF8String]);
+
+  NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+
+  NSString* uuid = [defaults objectForKey:USER_DEFAULTS_UUID];
+
+  if (!uuid)
+  {
+    CFUUIDRef cf_uuid = CFUUIDCreate (0);
+
+    uuid = [(NSString*)CFUUIDCreateString (0, cf_uuid) autorelease];
+
+    CFRelease (cf_uuid);
+
+    [defaults setObject:uuid forKey:USER_DEFAULTS_UUID];
+    [defaults synchronize];
+  }
+
+  properties.SetProperty ("UUID", [uuid UTF8String]);
+
+  [pool release];
 }
