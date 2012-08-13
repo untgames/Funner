@@ -600,8 +600,8 @@ UINT get_window_style (WindowStyle style, bool has_parent)
   switch (style)
   {
     case WindowStyle_Overlapped:
-//      win_style = WS_OVERLAPPEDWINDOW;
-      win_style = WS_OVERLAPPED | WS_CAPTION | WS_MINIMIZEBOX | WS_SYSMENU;
+      win_style = WS_OVERLAPPEDWINDOW;
+//      win_style = WS_OVERLAPPED | WS_CAPTION | WS_MINIMIZEBOX | WS_SYSMENU;
 
       if (has_parent)
         win_style |= WS_CHILD | WS_CLIPSIBLINGS;
@@ -806,10 +806,18 @@ void WindowsWindowManager::GetWindowTitle (window_t handle, size_t buffer_size, 
 
   try
   {
-    HWND wnd = (HWND)handle;
+    HWND wnd = (HWND)handle;    
+    
+    stl::string tmp_buffer;
+    
+    tmp_buffer.fast_resize (buffer_size);
 
-    if (!GetWindowTextW (wnd, buffer, buffer_size))
-      raise_error ("::GetWindowText(wchar_t*)");
+    if (!GetWindowTextW (wnd, (LPWSTR)&tmp_buffer [0], tmp_buffer.size ())) //very strange behaviour: GetWindowTextA have to be called
+      raise_error ("::GetWindowTextW");      
+
+    memcpy (buffer, common::towstring (tmp_buffer.c_str ()).c_str (), tmp_buffer.size () * sizeof (wchar_t));
+
+    buffer [buffer_size-1] = 0;
   }
   catch (xtl::exception& exception)
   {
