@@ -1,224 +1,99 @@
-D/dalvikvm(19055): Trying to load lib //mnt/sdcard/funner/tmp/android-armv7/SYSTEMLIB.TESTS/tests/wrappers/crash 0x4857ea48
-D/dalvikvm(19055): Added shared lib //mnt/sdcard/funner/tmp/android-armv7/SYSTEMLIB.TESTS/tests/wrappers/crash 0x4857ea48
-I/funner  (19055): Starting program '//mnt/sdcard/funner/tmp/android-armv7/SYSTEMLIB.TESTS/tests/wrappers/crash' (args=' ', workdir='//mnt/sdcard/funner/components/system/tests/wrappers', env=' APK_FULL_PATH='/data/app/com.untgames.funner.application-1.apk' HOME='/data/data/com.untgames.funner.application' TEMP='/data/data/com.untgames.funner.application/cache'')
-W/dalvikvm(19055): read stdout: (26,512) failed (0): Unknown error: 0
-W/dalvikvm(19055): stdio converter got read error; shutting it down
-I/funner  (19055): In mgmain JNI_OnLoad
-I/funner  (19055): Results of crash_test:
-I/funner  (19055): Crash detected
-I/funner  (19055): segment 0000a000-00221000 rwxp 00000000 00:00 0          [heap]
-I/funner  (19055): segment 4320b000-4320c000 r-xs 00000000 b3:02 68556      /data/app/com.untgames.funner.application-1.apk
-I/funner  (19055): segment 448d6000-448dc000 r-xs 00000000 b3:02 68556      /data/app/com.untgames.funner.application-1.apk
-I/funner  (19055): segment 45720000-45726000 r-xs 00000000 b3:02 68556      /data/app/com.untgames.funner.application-1.apk
-I/funner  (19055): segment 45726000-4572e000 r-xp 00000000 b3:02 1592325    /data/dalvik-cache/data@app@com.untgames.funner.application-1.apk@classes.dex
-I/funner  (19055): segment 81e00000-81ea8000 r-xp 00000000 b3:01 944        /mnt/sdcard/funner/tmp/android-armv7/SYSTEMLIB.TESTS/tests/wrappers/crash
-I/funner  (19055): segment 81ea8000-81ead000 rwxp 000a7000 b3:01 944        /mnt/sdcard/funner/tmp/android-armv7/SYSTEMLIB.TESTS/tests/wrappers/crash
-I/ActivityManager( 1374): Displayed activity com.untgames.funner.application/.EngineActivity: 155 ms (total 20097 ms)
+I/funner  (20156): engine.lua:  FPS: 20.5
+I/funner  (20156): engine.lua: curl start!!!
+I/funner  (20156): Crash detected
+I/funner  (20156): segment 0000a000-00de7000 rwxp 00000000 00:00 0          [heap]
+I/funner  (20156): segment 4320b000-4320c000 r-xs 01857000 b3:02 68465      /data/app/com.untgames.zzbook-1.apk
+I/funner  (20156): segment 448d6000-448de000 r-xp 00000000 b3:02 1592442    /data/dalvik-cache/data@app@com.untgames.zzbook-1.apk@classes.dex
+I/funner  (20156): segment 4b9e3000-4d57d000 r-xs 00000000 b3:02 68465      /data/app/com.untgames.zzbook-1.apk
+I/funner  (20156): segment 4d57d000-4f117000 r-xs 00000000 b3:02 68465      /data/app/com.untgames.zzbook-1.apk
+I/funner  (20156): segment 81e00000-81e43000 r-xp 00000000 b3:02 19166469   /data/data/com.untgames.zzbook/lib/libfunner.extern.openal32.so
+I/funner  (20156): segment 81e43000-81e45000 rwxp 00043000 b3:02 19166469   /data/data/com.untgames.zzbook/lib/libfunner.extern.openal32.so
+I/funner  (20156): segment 82000000-82753000 r-xp 00000000 b3:02 19166474   /data/data/com.untgames.zzbook/lib/libfunner.so
+I/funner  (20156): segment 82753000-82792000 rwxp 00753000 b3:02 19166474   /data/data/com.untgames.zzbook/lib/libfunner.so
 I/DEBUG   (18906): *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** ***
 I/DEBUG   (18906): Build fingerprint: 'samsung/GT-P1010/GT-P1010/GT-P1010:2.2.1/FROYO/XWKC1:user/release-keys'
-I/DEBUG   (18906): pid: 19055, tid: 19064  >>>  <<<
+I/DEBUG   (18906): pid: 20156, tid: 20165  >>>  <<<
 I/DEBUG   (18906): signal 11 (SIGSEGV), fault addr 00000000
-I/DEBUG   (18906):  r0 00000000  r1 00000fd5  r2 00000001  r3 00000000
-I/DEBUG   (18906):  r4 0012bc04  r5 00000000  r6 81eac4c4  r7 0012bbfc
-I/DEBUG   (18906):  r8 001ff983  r9 0012bbf8  10 001ffc0b  fp 4bae2e30
-I/DEBUG   (18906):  ip 000ca008  sp 4bae2dd8  lr 4bae2dbc  pc 81e0c794  cpsr 60000050
-I/DEBUG   (18906):  d0  65643a64696f7262  d1  7078777220303075
-I/DEBUG   (18906):  d2  54454d00464d2e67  d3  454d00464e492d67
-I/DEBUG   (18906):  d4  3761303030207078  d5  303a336220303030
-I/DEBUG   (18906):  d6  2020203434392031  d7  6e6d2f2020202020
+I/DEBUG   (18906):  r0 00000000  r1 00ba8d70  r2 00000001  r3 00000000
+I/DEBUG   (18906):  r4 0073a368  r5 00000000  r6 ffff0fc0  r7 00ba8d70
+I/DEBUG   (18906):  r8 4b4e434c  r9 0000000c  10 4b4e453c  fp 00ba8e8c
+I/DEBUG   (18906):  ip 0073a358  sp 4b4e4230  lr 8235c844  pc 82068d34  cpsr 60000050
+I/DEBUG   (18906):  d0  65643a64696f7262  d1  74735b2020202075
+I/DEBUG   (18906):  d2  0000000600c4f267  d3  6f74636500000067
+I/DEBUG   (18906):  d4  7078777220303030  d5  3030333430303020
+I/DEBUG   (18906):  d6  2032303a33622030  d7  3936343636313931
 I/DEBUG   (18906):  d8  0000000000000000  d9  0000000000000000
 I/DEBUG   (18906):  d10 0000000000000000  d11 0000000000000000
 I/DEBUG   (18906):  d12 0000000000000000  d13 0000000000000000
 I/DEBUG   (18906):  d14 0000000000000000  d15 0000000000000000
-I/DEBUG   (18906):  d16 30622d3030306330  d17 7220303030643030
-I/DEBUG   (18906):  d18 3030303020707877  d19 3a61382030303063
-I/DEBUG   (18906):  d20 3030303030303020  d21 2030303a30302030
-I/DEBUG   (18906):  d22 2020202020202030  d23 636174735b202020
-I/DEBUG   (18906):  d24 3fc74721cad6b0ed  d25 3fc39a09d078c69f
-I/DEBUG   (18906):  d26 0000000000000000  d27 0000000000000000
-I/DEBUG   (18906):  d28 0000000000000000  d29 0000000000000000
-I/DEBUG   (18906):  d30 0000000000000000  d31 0000080000000000
-I/DEBUG   (18906):  scr 80000010
+I/DEBUG   (18906):  d16 66612d3030303134  d17 7220303030343464
+I/DEBUG   (18906):  d18 3430303020707877  d19 3a61382030303031
+I/DEBUG   (18906):  d20 6365622d30303062  d21 7772203030303839
+I/DEBUG   (18906):  d22 3030303030207078  d23 303a303020303030
+I/DEBUG   (18906):  d24 bfb3b0f2af74aad9  d25 3fb10d66a0d04b53
+I/DEBUG   (18906):  d26 bfadde2d52df122b  d27 3fa97b4b24761716
+I/DEBUG   (18906):  d28 bfa2b4442c6a6c2f  d29 3f147e88a0378d4d
+I/DEBUG   (18906):  d30 3efb2a7074bf7ad4  d31 be75f9e830000000
+I/DEBUG   (18906):  scr 20000010
 I/DEBUG   (18906): 
-I/DEBUG   (18906):          #00  pc 81e0c794  /mnt/sdcard/funner/tmp/android-armv7/SYSTEMLIB.TESTS/tests/wrappers/crash
-I/DEBUG   (18906):          #01  lr 4bae2dbc  <unknown>
+I/DEBUG   (18906):          #00  pc 00068d34  /data/data/com.untgames.zzbook/lib/libfunner.so
+I/DEBUG   (18906):          #01  pc 0035c840  /data/data/com.untgames.zzbook/lib/libfunner.so
 I/DEBUG   (18906): 
 I/DEBUG   (18906): code around pc:
-I/DEBUG   (18906): 81e0c774 e28fc600 e28cca9f e5bcff50 e59f0014 
-I/DEBUG   (18906): 81e0c784 e92d4010 e08f0000 ebffffe6 e3a00000 
-I/DEBUG   (18906): 81e0c794 e5800000 e8bd8010 00075ff0 e92d40f7 
-I/DEBUG   (18906): 81e0c7a4 e59f605c e1a05000 e5954000 e3540000 
-I/DEBUG   (18906): 81e0c7b4 01a00004 0a000011 e2847001 e5953000 
+I/DEBUG   (18906): 82068d14 e1a0e00f e593f004 e1a00005 e8bd81f0 
+I/DEBUG   (18906): 82068d24 004a0d58 e92d40f7 e59f605c e1a05000 
+I/DEBUG   (18906): 82068d34 e5954000 e3540000 01a00004 0a000011 
+I/DEBUG   (18906): 82068d44 e2847001 e5953000 e1a01007 e1a02005 
+I/DEBUG   (18906): 82068d54 e58d3004 e59d3004 e1540003 159d0004 
 I/DEBUG   (18906): 
 I/DEBUG   (18906): code around lr:
-I/DEBUG   (18906): 4bae2d9c 81eac4c4 0012bbfc afd15ba1 4bae2dc8 
-I/DEBUG   (18906): 4bae2dac 81e82780 00000016 afd3b77e 00000001 
-I/DEBUG   (18906): 4bae2dbc 4bae2dac 00000002 00000000 001202e8 
-I/DEBUG   (18906): 4bae2dcc 0012bc04 e3a07077 ef900077 0012bc04 
-I/DEBUG   (18906): 4bae2ddc 81e22538 00000000 00000000 00000000 
+I/DEBUG   (18906): 8235c824 e1a00004 e8bd8010 e5913000 e92d4010 
+I/DEBUG   (18906): 8235c834 e1a04000 e5803000 e1a00003 ebf43138 
+I/DEBUG   (18906): 8235c844 e1a00004 e8bd8010 e5903000 e5930004 
+I/DEBUG   (18906): 8235c854 e12fff1e e5900000 e12fff1e e5903000 
+I/DEBUG   (18906): 8235c864 e5930028 e12fff1e e5900000 e2800048 
 I/DEBUG   (18906): 
 I/DEBUG   (18906): stack:
-I/DEBUG   (18906):     4bae2d98  81e82780  /mnt/sdcard/funner/tmp/android-armv7/SYSTEMLIB.TESTS/tests/wrappers/crash
-I/DEBUG   (18906):     4bae2d9c  81eac4c4  /mnt/sdcard/funner/tmp/android-armv7/SYSTEMLIB.TESTS/tests/wrappers/crash
-I/DEBUG   (18906):     4bae2da0  0012bbfc  [heap]
-I/DEBUG   (18906):     4bae2da4  afd15ba1  /system/lib/libc.so
-I/DEBUG   (18906):     4bae2da8  4bae2dc8  
-I/DEBUG   (18906):     4bae2dac  81e82780  /mnt/sdcard/funner/tmp/android-armv7/SYSTEMLIB.TESTS/tests/wrappers/crash
-I/DEBUG   (18906):     4bae2db0  00000016  
-I/DEBUG   (18906):     4bae2db4  afd3b77e  /system/lib/libc.so
-I/DEBUG   (18906):     4bae2db8  00000001  
-I/DEBUG   (18906):     4bae2dbc  4bae2dac  
-I/DEBUG   (18906):     4bae2dc0  00000002  
-I/DEBUG   (18906):     4bae2dc4  00000000  
-I/DEBUG   (18906):     4bae2dc8  001202e8  [heap]
-I/DEBUG   (18906):     4bae2dcc  0012bc04  [heap]
-I/DEBUG   (18906):     4bae2dd0  e3a07077  
-I/DEBUG   (18906):     4bae2dd4  ef900077  
-I/DEBUG   (18906): #00 4bae2dd8  0012bc04  [heap]
-I/DEBUG   (18906):     4bae2ddc  81e22538  /mnt/sdcard/funner/tmp/android-armv7/SYSTEMLIB.TESTS/tests/wrappers/crash
-I/DEBUG   (18906):     4bae2de0  00000000  
-I/DEBUG   (18906):     4bae2de4  00000000  
-I/DEBUG   (18906):     4bae2de8  00000000  
-I/DEBUG   (18906):     4bae2dec  00000000  
-I/DEBUG   (18906):     4bae2df0  00000003  
-I/DEBUG   (18906):     4bae2df4  81e87bae  /mnt/sdcard/funner/tmp/android-armv7/SYSTEMLIB.TESTS/tests/wrappers/crash
-I/DEBUG   (18906):     4bae2df8  00000000  
-I/DEBUG   (18906):     4bae2dfc  00000000  
-I/DEBUG   (18906):     4bae2e00  002197a0  [heap]
-I/DEBUG   (18906):     4bae2e04  0021a300  [heap]
-I/DEBUG   (18906):     4bae2e08  0021a334  [heap]
-I/DEBUG   (18906):     4bae2e0c  0021a335  [heap]
-I/DEBUG   (18906):     4bae2e10  00000000  
-I/DEBUG   (18906):     4bae2e14  00000000  
-I/DEBUG   (18906):     4bae2e18  00000000  
-I/DEBUG   (18906):     4bae2e1c  00000000  
+I/DEBUG   (18906):     4b4e41f0  00000000  
+I/DEBUG   (18906):     4b4e41f4  afd10200  /system/lib/libc.so
+I/DEBUG   (18906):     4b4e41f8  afd43724  /system/lib/libc.so
+I/DEBUG   (18906):     4b4e41fc  afd43758  /system/lib/libc.so
+I/DEBUG   (18906):     4b4e4200  0073a360  [heap]
+I/DEBUG   (18906):     4b4e4204  00ba8d70  [heap]
+I/DEBUG   (18906):     4b4e4208  4b4e434c  
+I/DEBUG   (18906):     4b4e420c  0000000c  
+I/DEBUG   (18906):     4b4e4210  4b4e453c  
+I/DEBUG   (18906):     4b4e4214  afd0c707  /system/lib/libc.so
+I/DEBUG   (18906):     4b4e4218  003b2288  [heap]
+I/DEBUG   (18906):     4b4e421c  003b2240  [heap]
+I/DEBUG   (18906):     4b4e4220  003b21d8  [heap]
+I/DEBUG   (18906):     4b4e4224  4b4e434c  
+I/DEBUG   (18906):     4b4e4228  e3a07077  
+I/DEBUG   (18906):     4b4e422c  ef900077  
+I/DEBUG   (18906): #00 4b4e4230  00000000  
+I/DEBUG   (18906):     4b4e4234  00ba8d70  [heap]
+I/DEBUG   (18906):     4b4e4238  00000001  
+I/DEBUG   (18906):     4b4e423c  0073a368  [heap]
+I/DEBUG   (18906):     4b4e4240  4b4e426c  
+I/DEBUG   (18906):     4b4e4244  00ba8d70  [heap]
+I/DEBUG   (18906):     4b4e4248  00ba8d70  [heap]
+I/DEBUG   (18906):     4b4e424c  8235c844  /data/data/com.untgames.zzbook/lib/libfunner.so
+I/DEBUG   (18906): #01 4b4e4250  0073a360  [heap]
+I/DEBUG   (18906):     4b4e4254  8217d41c  /data/data/com.untgames.zzbook/lib/libfunner.so
+I/DEBUG   (18906):     4b4e4258  4b4e426c  
+I/DEBUG   (18906):     4b4e425c  003b1cc0  [heap]
+I/DEBUG   (18906):     4b4e4260  820c18c4  /data/data/com.untgames.zzbook/lib/libfunner.so
+I/DEBUG   (18906):     4b4e4264  8217d460  /data/data/com.untgames.zzbook/lib/libfunner.so
+I/DEBUG   (18906):     4b4e4268  003b1cc0  [heap]
+I/DEBUG   (18906):     4b4e426c  00ba8d70  [heap]
+I/DEBUG   (18906):     4b4e4270  003b1c90  [heap]
+I/DEBUG   (18906):     4b4e4274  003b1cc0  [heap]
+I/DEBUG   (18906):     4b4e4278  00cde674  [heap]
+I/DEBUG   (18906):     4b4e427c  8217d4d0  /data/data/com.untgames.zzbook/lib/libfunner.so
+I/DEBUG   (18906):     4b4e4280  00cde700  [heap]
+I/DEBUG   (18906):     4b4e4284  4b4e4384  
+I/DEBUG   (18906):     4b4e4288  4b4e434c  
+I/DEBUG   (18906):     4b4e428c  00ba8d70  [heap]
+I/DEBUG   (18906):     4b4e4290  003b1c90  [heap]
+I/DEBUG   (18906):     4b4e4294  82180abc  /data/data/com.untgames.zzbook/lib/libfunner.so
 E/wpa_supplicant( 1464): in wpa_drv_driver_cmd
-D/wpa_supplicant( 1464): wpa_driver_tista_driver_cmd RSSI-APPROX
-D/wpa_supplicant( 1464): rssi-approx command
-E/wpa_supplicant( 1464): in wpa_drv_driver_cmd
-D/wpa_supplicant( 1464): wpa_driver_tista_driver_cmd LINKSPEED
-D/wpa_supplicant( 1464): Link Speed command
-D/wpa_supplicant( 1464): buf LinkSpeed 65
-I/DEBUG   (18906): dumpstate /data/log/dumpstate_app_native.txt
-I/BootReceiver( 1374): Copying /data/tombstones/tombstone_01 to DropBox (SYSTEM_TOMBSTONE)
-I/dumpstate(19069): begin
-D/dalvikvm( 1374): GC_FOR_MALLOC freed 12527 objects / 639944 bytes in 93ms
-I/dalvikvm-heap( 1374): Grow heap (frag case) to 11.834MB for 97920-byte allocation
-I/dalvikvm( 1374): threadid=3: reacting to signal 3
-D/dalvikvm( 1374): GC_FOR_MALLOC freed 777 objects / 37576 bytes in 93ms
-I/dalvikvm( 1374): Wrote stack traces to '/data/anr/traces.txt'
-D/dalvikvm( 1374): GC_FOR_MALLOC freed 828 objects / 175128 bytes in 90ms
-I/dalvikvm( 1467): threadid=3: reacting to signal 3
-I/dalvikvm( 1472): threadid=3: reacting to signal 3
-I/dalvikvm( 1467): Wrote stack traces to '/data/anr/traces.txt'
-E/dalvikvm( 1472): Failed to write stack traces to /data/anr/traces.txt (6589 of 7363): No such file or directory
-D/dalvikvm( 1374): GC_FOR_MALLOC freed 249 objects / 13384 bytes in 91ms
-I/dalvikvm-heap( 1374): Grow heap (frag case) to 11.358MB for 73938-byte allocation
-D/dalvikvm( 1374): GC_FOR_MALLOC freed 0 objects / 0 bytes in 89ms
-I/dalvikvm( 1475): threadid=3: reacting to signal 3
-I/dalvikvm( 1479): threadid=3: reacting to signal 3
-I/dalvikvm( 1475): Wrote stack traces to '/data/anr/traces.txt'
-I/dalvikvm( 1547): threadid=3: reacting to signal 3
-E/dalvikvm( 1547): Failed to write stack traces to /data/anr/traces.txt (1196 of 3003): No such file or directory
-I/dalvikvm( 1479): Wrote stack traces to '/data/anr/traces.txt'
-I/dalvikvm( 1592): threadid=3: reacting to signal 3
-I/dalvikvm( 1639): threadid=3: reacting to signal 3
-I/dalvikvm( 1639): Wrote stack traces to '/data/anr/traces.txt'
-I/dalvikvm( 1592): Wrote stack traces to '/data/anr/traces.txt'
-I/dalvikvm( 1652): threadid=3: reacting to signal 3
-I/dalvikvm( 1652): Wrote stack traces to '/data/anr/traces.txt'
-I/dalvikvm( 1676): threadid=3: reacting to signal 3
-I/dalvikvm( 2304): threadid=3: reacting to signal 3
-I/dalvikvm( 1676): Wrote stack traces to '/data/anr/traces.txt'
-I/dalvikvm( 2304): Wrote stack traces to '/data/anr/traces.txt'
-I/dalvikvm( 2573): threadid=3: reacting to signal 3
-I/dalvikvm( 2626): threadid=3: reacting to signal 3
-I/dalvikvm( 2573): Wrote stack traces to '/data/anr/traces.txt'
-I/dalvikvm( 2626): Wrote stack traces to '/data/anr/traces.txt'
-I/dalvikvm( 4320): threadid=3: reacting to signal 3
-I/dalvikvm( 4320): Wrote stack traces to '/data/anr/traces.txt'
-I/dalvikvm( 7656): threadid=3: reacting to signal 3
-I/dalvikvm( 7656): Wrote stack traces to '/data/anr/traces.txt'
-I/dalvikvm( 7717): threadid=3: reacting to signal 3
-I/dalvikvm(12127): threadid=3: reacting to signal 3
-I/dalvikvm( 7717): Wrote stack traces to '/data/anr/traces.txt'
-I/dalvikvm(12127): Wrote stack traces to '/data/anr/traces.txt'
-I/dalvikvm(12900): threadid=3: reacting to signal 3
-I/dalvikvm(12900): Wrote stack traces to '/data/anr/traces.txt'
-I/dalvikvm(13154): threadid=3: reacting to signal 3
-I/dalvikvm(15967): threadid=3: reacting to signal 3
-I/dalvikvm(15967): Wrote stack traces to '/data/anr/traces.txt'
-I/dalvikvm(13154): Wrote stack traces to '/data/anr/traces.txt'
-I/dalvikvm(16485): threadid=3: reacting to signal 3
-I/dalvikvm(16485): Wrote stack traces to '/data/anr/traces.txt'
-I/dalvikvm(16554): threadid=3: reacting to signal 3
-I/dalvikvm(18893): threadid=3: reacting to signal 3
-I/dalvikvm(16554): Wrote stack traces to '/data/anr/traces.txt'
-E/dalvikvm(18893): Failed to write stack traces to /data/anr/traces.txt (226 of 2336): No such file or directory
-I/dalvikvm(18907): threadid=3: reacting to signal 3
-I/dalvikvm(18907): Wrote stack traces to '/data/anr/traces.txt'
-I/dalvikvm(19055): threadid=3: reacting to signal 3
-I/dalvikvm(19657): threadid=3: reacting to signal 3
-I/dalvikvm(19055): Wrote stack traces to '/data/anr/traces.txt'
-I/dalvikvm(19657): Wrote stack traces to '/data/anr/traces.txt'
-I/dalvikvm(22682): threadid=3: reacting to signal 3
-I/dalvikvm(23685): threadid=3: reacting to signal 3
-I/dalvikvm(23685): Wrote stack traces to '/data/anr/traces.txt'
-E/dalvikvm(22682): Failed to write stack traces to /data/anr/traces.txt (2110 of 4632): No such file or directory
-I/dalvikvm(23718): threadid=3: reacting to signal 3
-I/dalvikvm(23718): Wrote stack traces to '/data/anr/traces.txt'
-I/dalvikvm(23753): threadid=3: reacting to signal 3
-I/dalvikvm(23753): Wrote stack traces to '/data/anr/traces.txt'
-I/dalvikvm(30857): threadid=3: reacting to signal 3
-I/dalvikvm(30867): threadid=3: reacting to signal 3
-I/dalvikvm(30867): Wrote stack traces to '/data/anr/traces.txt'
-E/dalvikvm(30857): Failed to write stack traces to /data/anr/traces.txt (4636 of 6356): No such file or directory
-E/wpa_supplicant( 1464): in wpa_drv_driver_cmd
-D/wpa_supplicant( 1464): wpa_driver_tista_driver_cmd RSSI-APPROX
-D/wpa_supplicant( 1464): rssi-approx command
-E/wpa_supplicant( 1464): in wpa_drv_driver_cmd
-D/wpa_supplicant( 1464): wpa_driver_tista_driver_cmd LINKSPEED
-D/wpa_supplicant( 1464): Link Speed command
-D/wpa_supplicant( 1464): buf LinkSpeed 65
-D/dalvikvm( 1479): GC_EXPLICIT freed 761 objects / 111880 bytes in 117ms
-D/VoldCmdListener( 1251): asec list
-I/dumpstate(19069): done
-I/ActivityManager( 1374): Process com.untgames.funner.application (pid 19055) has died.
-I/WindowManager( 1374): WIN DEATH: Window{48ac63e8 com.untgames.funner.application/com.untgames.funner.application.EngineActivity paused=false}
-D/Zygote  ( 1258): Process 19055 terminated by signal (11)
-I/UsageStats( 1374): Unexpected resume of com.sec.android.app.twlauncher while already resumed in com.untgames.funner.application
-I/Launcher( 1479): onResume(). mIsNewIntent : false
-I/Launcher( 1479): Clearing the Status Bar lock in onResume function
-D/StatusBar( 1374): manageDisableList what=0x0 pkg=com.sec.android.app.twlauncher
-E/Launcher( 1479): setWindowOpaque()
-I/Launcher( 1479): onResume() ended
-E/wpa_supplicant( 1464): in wpa_drv_driver_cmd
-D/wpa_supplicant( 1464): wpa_driver_tista_driver_cmd RSSI-APPROX
-D/wpa_supplicant( 1464): rssi-approx command
-E/wpa_supplicant( 1464): in wpa_drv_driver_cmd
-D/wpa_supplicant( 1464): wpa_driver_tista_driver_cmd LINKSPEED
-D/wpa_supplicant( 1464): Link Speed command
-D/wpa_supplicant( 1464): buf LinkSpeed 65
-E/wpa_supplicant( 1464): in wpa_drv_driver_cmd
-D/wpa_supplicant( 1464): wpa_driver_tista_driver_cmd RSSI-APPROX
-D/wpa_supplicant( 1464): rssi-approx command
-E/wpa_supplicant( 1464): in wpa_drv_driver_cmd
-D/wpa_supplicant( 1464): wpa_driver_tista_driver_cmd LINKSPEED
-D/wpa_supplicant( 1464): Link Speed command
-D/wpa_supplicant( 1464): buf LinkSpeed 65
-D/dalvikvm( 1652): GC_EXPLICIT freed 3155 objects / 261240 bytes in 31ms
-E/wpa_supplicant( 1464): in wpa_drv_driver_cmd
-D/wpa_supplicant( 1464): wpa_driver_tista_driver_cmd RSSI-APPROX
-D/wpa_supplicant( 1464): rssi-approx command
-E/wpa_supplicant( 1464): in wpa_drv_driver_cmd
-D/wpa_supplicant( 1464): wpa_driver_tista_driver_cmd LINKSPEED
-D/wpa_supplicant( 1464): Link Speed command
-D/wpa_supplicant( 1464): buf LinkSpeed 65
-E/wpa_supplicant( 1464): in wpa_drv_driver_cmd
-D/wpa_supplicant( 1464): wpa_driver_tista_driver_cmd RSSI-APPROX
-D/wpa_supplicant( 1464): rssi-approx command
-E/wpa_supplicant( 1464): in wpa_drv_driver_cmd
-D/wpa_supplicant( 1464): wpa_driver_tista_driver_cmd LINKSPEED
-D/wpa_supplicant( 1464): Link Speed command
-D/wpa_supplicant( 1464): buf LinkSpeed 65
-D/dalvikvm( 1676): GC_EXPLICIT freed 1287 objects / 65296 bytes in 96ms

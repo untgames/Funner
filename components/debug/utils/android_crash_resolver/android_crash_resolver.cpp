@@ -248,18 +248,29 @@ void resolve_address (Params& params, size_t address, const char* module_name)
     
     if (desc.map_file->map_file_base_name != module_base_name)
       continue;
-      
-    if (address < desc.start_address || address >= desc.finish_address)
-      continue;                  
-      
-    size_t related_address = address - desc.start_address;        
-    
-    Symbol* symbol = desc.map_file->map_file.FindSymbol (related_address);    
-    
-    if (!symbol)
-      continue;
 
-    printf (" (%s)", symbol->Name ());
+    if (address < desc.start_address || address >= desc.finish_address)
+    {
+      Symbol* symbol = desc.map_file->map_file.FindSymbol (address);    
+      
+      if (!symbol)
+        continue;
+        
+      printf (" [%s]", symbol->Name ());      
+    }
+    else
+    {
+      size_t related_address = address - desc.start_address;        
+      
+      Symbol* symbol = desc.map_file->map_file.FindSymbol (related_address);    
+      
+      if (!symbol)
+        continue;
+        
+      printf (" [%s]", symbol->Name ());                
+    }
+    
+    return;    
   }
 }
 

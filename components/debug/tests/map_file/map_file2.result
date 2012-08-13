@@ -1,2 +1,2 @@
 Results of map_file2_test:
-symbol 'main' found
+symbol 'xtl::atomic_conditional_increment(int volatile&)' found

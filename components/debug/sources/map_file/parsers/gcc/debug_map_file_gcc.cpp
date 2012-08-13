@@ -131,12 +131,36 @@ class GccMapFileParser
       {
         bool loop = true;
         
+        size_t brackets = 0, tmpl_brackets = 0;
+        
         for (++s;loop;)
         {
           switch (*s)
           {
+            case '(':
+              brackets++;
+              s++;
+              break;
+            case ')':
+              brackets--;
+              s++;              
+              break;
+            case '<':
+              tmpl_brackets++;
+              s++;              
+              break;
+            case '>':
+              tmpl_brackets--;
+              s++;              
+              break;
             case ' ':
             case '\t':
+              if (!brackets && !tmpl_brackets)
+                loop = false;
+              else
+                s++;
+
+              break;
             case '\0':
               loop = false;
               break;
@@ -216,9 +240,17 @@ class GccMapFileParser
                 continue;
               }
 
-              sym_start_address = xtl::io::get<size_t> (tokens [0]);
-              sym_size          = xtl::io::get<size_t> (tokens [1]);
-              state             = State_SymbolFirstLineRead;          
+              try
+              {
+                sym_start_address = xtl::io::get<size_t> (tokens [0]);
+                sym_size          = xtl::io::get<size_t> (tokens [1]);
+                state             = State_SymbolFirstLineRead;                          
+              }
+              catch (...)
+              {
+                state = State_SearchingSymbol;                
+                continue;
+              }
             
               break;
             case State_SymbolFirstLineRead:
@@ -229,12 +261,22 @@ class GccMapFileParser
                 continue;
               }
               
-              size_t checker = xtl::io::get<size_t> (tokens [0]);
+              try
+              {
+                size_t checker = xtl::io::get<size_t> (tokens [0]);
+                
+                (void)checker;
               
-              sym_name = tokens [1];
-              state    = State_SearchingSymbol;          
-              
-              map_file.AddSymbol (Symbol (sym_name, sym_start_address, sym_size));
+                sym_name = tokens [1];
+                state    = State_SearchingSymbol;          
+                
+                map_file.AddSymbol (Symbol (sym_name, sym_start_address, sym_size));                
+              }
+              catch (...)
+              {
+                state = State_SearchingSymbol;
+                continue;
+              }              
 
               break;          
             }
