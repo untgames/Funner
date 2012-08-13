@@ -240,7 +240,7 @@ void parse_segment (Params& params, const char* line)
 //разрешение адреса
 void resolve_address (Params& params, size_t address, const char* module_name)
 {
-  stl::string module_base_name = basename (notdir (module_name));
+  stl::string module_base_name = basename (notdir (module_name));  
   
   for (SegmentList::iterator i=params.segments.begin (), end=params.segments.end (); i!= end; ++i)
   {
@@ -250,11 +250,11 @@ void resolve_address (Params& params, size_t address, const char* module_name)
       continue;
       
     if (address < desc.start_address || address >= desc.finish_address)
-      continue;            
+      continue;                  
       
-    size_t related_address = address - desc.start_address;    
+    size_t related_address = address - desc.start_address;        
     
-    Symbol* symbol = desc.map_file->map_file.FindSymbol (related_address);
+    Symbol* symbol = desc.map_file->map_file.FindSymbol (related_address);    
     
     if (!symbol)
       continue;

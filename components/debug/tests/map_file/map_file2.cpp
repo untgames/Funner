@@ -15,7 +15,7 @@ int main ()
   {
     MapFile file ("data/app.map", "gcc");
     
-    Symbol* s = file.FindSymbol (0xc47c);
+    Symbol* s = file.FindSymbol (0xc790);
     
     if (!s) printf ("symbol not found\n");
     else    printf ("symbol '%s' found\n", s->Name ());

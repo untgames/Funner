@@ -176,62 +176,73 @@ class GccMapFileParser
         
       try
       {        
+        if (char* s = strstr (line, "*("))
+        {
+          if (s = strstr (s, "*)"))
+            line = s + 2;
+        }
+
         size_t empty_space = TokenizeLine (line);            
         
-        switch (state)
+        for (;;)
         {
-          case State_SearchingSymbol:
-            if (empty_space != 1)
-              return;
-              
-            switch (tokens.size ())
-            {
-              case 1:
-                state      = State_SymbolHeaderRead;
-                sym_header = tokens [0];
-                break;
-              case 4:
-                sym_header        = tokens [0];
-                sym_start_address = xtl::io::get<size_t> (tokens [1]);
-                sym_size          = xtl::io::get<size_t> (tokens [2]);
-                state             = State_SymbolFirstLineRead;
-                break;
-              default:
-                break;
-            }
-
-            break;
-          case State_SymbolHeaderRead:
-            if (tokens.size () != 3 || empty_space < 16)
-            {
-              state = State_SearchingSymbol;
-              return;
-            }
-
-            sym_start_address = xtl::io::get<size_t> (tokens [0]);
-            sym_size          = xtl::io::get<size_t> (tokens [1]);
-            state             = State_SymbolFirstLineRead;          
-          
-            break;
-          case State_SymbolFirstLineRead:
+          switch (state)
           {
-            if (tokens.size () != 2)
-            {
-              state = State_SearchingSymbol;
-              return;
-            }
-            
-            size_t checker = xtl::io::get<size_t> (tokens [0]);
-            
-            sym_name = tokens [1];
-            state    = State_SearchingSymbol;          
-            
-            map_file.AddSymbol (Symbol (sym_name, sym_start_address, sym_size));
+            case State_SearchingSymbol:
+              if (empty_space != 1)
+                return; 
+                
+              switch (tokens.size ())
+              {
+                case 1:
+                  state      = State_SymbolHeaderRead;
+                  sym_header = tokens [0];
+                  break;
+                case 4:
+                  sym_header        = tokens [0];
+                  sym_start_address = xtl::io::get<size_t> (tokens [1]);
+                  sym_size          = xtl::io::get<size_t> (tokens [2]);
+                  state             = State_SymbolFirstLineRead;
+                  break;
+                default:
+                  break;
+              }
 
-            break;          
+              break;
+            case State_SymbolHeaderRead:
+              if (tokens.size () != 3 || empty_space < 16)
+              {
+                state = State_SearchingSymbol;
+                continue;
+              }
+
+              sym_start_address = xtl::io::get<size_t> (tokens [0]);
+              sym_size          = xtl::io::get<size_t> (tokens [1]);
+              state             = State_SymbolFirstLineRead;          
+            
+              break;
+            case State_SymbolFirstLineRead:
+            {
+              if (tokens.size () != 2)
+              {
+                state = State_SearchingSymbol;
+                continue;
+              }
+              
+              size_t checker = xtl::io::get<size_t> (tokens [0]);
+              
+              sym_name = tokens [1];
+              state    = State_SearchingSymbol;          
+              
+              map_file.AddSymbol (Symbol (sym_name, sym_start_address, sym_size));
+
+              break;          
+            }
+            default:
+              break;                            
           }
-          default:
-            break;
+          
+          break;
         }
       }
       catch (std::exception& e)
