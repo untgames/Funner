@@ -22,22 +22,89 @@ struct InputPortDesc
   InputPortDesc (const InputPortPtr& in_port) : port (in_port) {}
 };
 
-typedef stl::vector<InputPortDesc> InputPortList;
+typedef stl::list<InputPortDesc> InputPortList;
 
 }
 
 struct SceneInputManager::Impl: public xtl::reference_counter, public IScreenListener
 {
-  scene_graph::Screen* screen;              //присоединенный экран
-  InputPortList        input_ports;         //области ввода
-  bool                 need_reorder;        //требуется сортировка областей ввода
-  stl::string          event_tokens_buffer; //буфер токенов
-  TokenList            event_tokens;        //токены
-  math::vec2f          mouse_position;      //положение курсора мыши
-  math::vec2f          screen_size;         //размеры экрана
-  math::vec2f          screen_offset;       //смещение от начала экрана
-  float                touch_size;          //размер тача
-  InputTransformSpace  touch_size_space;    //система координат размеров тача
+  class InputPortIterator;
+
+  scene_graph::Screen* screen;                    //присоединенный экран
+  InputPortList        input_ports;               //области ввода
+  bool                 need_reorder;              //требуется сортировка областей ввода
+  stl::string          event_tokens_buffer;       //буфер токенов
+  TokenList            event_tokens;              //токены
+  math::vec2f          mouse_position;            //положение курсора мыши
+  math::vec2f          screen_size;               //размеры экрана
+  math::vec2f          screen_offset;             //смещение от начала экрана
+  float                touch_size;                //размер тача
+  InputTransformSpace  touch_size_space;          //система координат размеров тача
+  InputPortIterator*   first_input_port_iterator; //первый итератор перебора областей вывода
+  
+  /// Итератор областей ввода
+  class InputPortIterator: public xtl::noncopyable
+  {
+    public:
+      ///Конструктор
+      InputPortIterator (Impl* in_impl)
+        : impl (in_impl)
+        , iter (impl->input_ports.begin ())
+        , next_iterator (impl->first_input_port_iterator)
+      {
+        impl->first_input_port_iterator = this;
+      }
+      
+      ///Деструктор
+      ~InputPortIterator ()
+      {
+        impl->first_input_port_iterator = next_iterator;
+      }
+
+      ///Получение текущего элемента и перемемещение к следующему
+      InputPortDesc* Next ()
+      {
+        if (iter == impl->input_ports.end ())
+          return 0;
+          
+        InputPortDesc* result = &*iter;
+
+        ++iter;
+
+        return result;
+      }
+      
+      ///Следующий итератор
+      InputPortIterator* NextIterator () { return next_iterator; }
+      
+      ///Оповещение об удалении области ввода
+      void OnRemove (InputPortDesc* entry)
+      {
+        if (iter == impl->input_ports.end ())
+          return;
+        
+        if (entry != &*iter)
+          return;
+
+        Next ();
+      }
+      
+      ///Оповещение о добавлении области ввода
+      void OnAdd (InputPortDesc* entry)
+      {
+        if (iter != impl->input_ports.end () || impl->input_ports.empty () || entry != &impl->input_ports.back ())
+          return;
+          
+        iter = impl->input_ports.end ();
+        
+        --iter;
+      }
+
+    private:  
+      Impl*                   impl;
+      InputPortList::iterator iter;
+      InputPortIterator*      next_iterator;
+  };  
   
 ///Конструктор
   Impl ()
@@ -45,6 +112,7 @@ struct SceneInputManager::Impl: public xtl::reference_counter, public IScreenLis
     , need_reorder (false)
     , touch_size (DEFAULT_TOUCH_SIZE)
     , touch_size_space (InputTransformSpace_Screen)
+    , first_input_port_iterator ()
   {
     static const size_t RESERVE_TOKENS_COUNT  = 16;
     static const size_t RESERVE_TOKENS_BUFFER = 256;
@@ -125,7 +193,10 @@ struct SceneInputManager::Impl: public xtl::reference_counter, public IScreenLis
       input_port->SetTouchSize (touch_size, touch_size_space);
 
       input_ports.push_back (InputPortDesc (input_port));
-      
+
+      for (InputPortIterator* i=first_input_port_iterator; i; i=i->NextIterator ())
+        i->OnAdd (&input_ports.back ());
+
       need_reorder = true;
     }
     catch (xtl::exception& e)
@@ -143,7 +214,11 @@ struct SceneInputManager::Impl: public xtl::reference_counter, public IScreenLis
     for (InputPortList::iterator iter=input_ports.begin (), end=input_ports.end (); iter!=end; ++iter)
       if (iter->port->AttachedViewport ().Id () == viewport_id)
       {
+        for (InputPortIterator* i=first_input_port_iterator; i; i=i->NextIterator ())
+          i->OnRemove (&*iter);
+
         input_ports.erase (iter);
+
         return;
       }
   }
@@ -168,8 +243,8 @@ struct SceneInputManager::Impl: public xtl::reference_counter, public IScreenLis
     if (!need_reorder)
       return;      
       
-    stl::sort (input_ports.begin (), input_ports.end (), InputPortComparator ());      
-      
+    input_ports.sort (InputPortComparator ());
+
     need_reorder = false;
   }
   
@@ -303,9 +378,11 @@ struct SceneInputManager::Impl: public xtl::reference_counter, public IScreenLis
       iter->port->FindTouch (touch_context, iter->last_touch_world_position);
 
       //оповещение
+      
+    InputPortIterator iter (this);
 
-    for (InputPortList::iterator iter=input_ports.begin (), end=input_ports.end (); iter!=end; ++iter)    
-      iter->port->OnTouch (touch_context, iter->last_touch_world_position);      
+    while (InputPortDesc* desc = iter.Next ())
+      desc->port->OnTouch (touch_context, desc->last_touch_world_position);
   }
 };
 

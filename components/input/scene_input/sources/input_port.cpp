@@ -175,6 +175,8 @@ void InputPort::OnTouch (TouchProcessingContext& touch_context, const math::vec3
       return;
     
       //оповещение сцены о возникновении события
+
+    InputPortPtr self_lock (this);      
       
     input_scene->OnTouch (*this, touch_world_position, touch_context);
   }

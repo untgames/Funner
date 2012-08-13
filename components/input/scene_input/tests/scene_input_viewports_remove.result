@@ -1,0 +1,9 @@
+Results of scene_input_viewports_remove_test:
+viewport1: OnScreenTouchMove
+viewport1: OnTouchEnter
+viewport1: OnScreenTouchMove
+viewport2: OnScreenTouchMove
+viewport1: OnTouchDown
+viewport1: OnPress
+viewport1: OnScreenTouchDown
+exit
