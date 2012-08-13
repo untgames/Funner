@@ -54,6 +54,8 @@ void bind_application_library (Environment& environment)
 
     //регистрация операций
 
+  lib.Register ("get_ScreenSaverState",        make_invoker (&syslib::Application::GetScreenSaverState));
+  lib.Register ("set_ScreenSaverState",        make_invoker (&syslib::Application::SetScreenSaverState));
   lib.Register ("Exit",                        make_invoker (&syslib::Application::Exit));
   lib.Register ("Sleep",                       make_invoker (&syslib::Application::Sleep));
   lib.Register ("OpenUrl",                     make_invoker (&syslib::Application::OpenUrl));
