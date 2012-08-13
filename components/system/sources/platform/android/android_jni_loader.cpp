@@ -66,6 +66,8 @@ extern "C"
 
 __attribute__ ((visibility("default"))) extern JNIEXPORT jint JNICALL JNI_OnLoad (JavaVM* vm, void* reserved)
 {
+  register_crash_handlers ();
+
   if (!vm)
   {
     log_error ("JavaVM is null\n");
