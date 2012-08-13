@@ -60,7 +60,7 @@ BUILD_PATHS                := $(GCC_TOOLS_DIR):$(ABI_DIR)/libexec/gcc/$(ANDROID_
 
 COMMON_JAVA_FLAGS          += -g
 COMMON_CPPFLAGS            += -fexceptions -frtti
-COMMON_CFLAGS              += -g
+#COMMON_CFLAGS              += -g
 COMMON_CFLAGS              += -Os -ffunction-sections -funwind-tables -fstack-protector -fpic -fomit-frame-pointer -fno-strict-aliasing -finline-limit=64 #-gdwarf-2
 COMMON_CFLAGS              += -Wno-psabi -Wa,--noexecstack
 COMMON_CFLAGS              += -fvisibility=hidden
@@ -74,7 +74,7 @@ COMMON_LINK_FLAGS          += -Wl,-L,$(DIST_BIN_DIR)
 COMMON_LINK_FLAGS          += -Wl,-rpath-link=$(PLATFORM_DIR)/arch-$(ANDROID_ARCH)/usr/lib
 COMMON_LINK_FLAGS          += -lc -lm -lstdc++ -lgcc -lsupc++
 COMMON_LINK_FLAGS          += -Wl,--no-undefined
-#COMMON_LINK_FLAGS          += -s
+COMMON_LINK_FLAGS          += -s
 
 ifneq (,$(wildcard $(NDK_ROOT)/sources/cxx-stl/gnu-libstdc++/libs/$(ANDROID_ABI)/include))
 COMMON_CFLAGS              += -I$(NDK_ROOT)/sources/cxx-stl/gnu-libstdc++/include
