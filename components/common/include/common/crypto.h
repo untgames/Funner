@@ -16,7 +16,7 @@ class CryptoContext
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструкторы / деструктор
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    CryptoContext  (const char* method, const void* key, size_t key_bits);
+    CryptoContext  (const char* method, const void* key, size_t key_bits, const char* init_string = "");
     ~CryptoContext ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -73,7 +73,7 @@ class ICryptoContext
 class CryptoSystem
 {
   public:
-    typedef xtl::function<ICryptoContext* (const char* method, const void* key, size_t key_bits)> CrypterCreator;
+    typedef xtl::function<ICryptoContext* (const char* method, const void* key, size_t key_bits, const char* init_string)> CrypterCreator;
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Регистрация систем шифрования

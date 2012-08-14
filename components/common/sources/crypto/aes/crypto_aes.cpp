@@ -278,17 +278,36 @@ void aes_decrypt (AesParam* ap, aes_uint32_t* dst, const aes_uint32_t* src)
     Контекст шифрования
 */
 
-template <AesOperation operation> class AesContext: public ICryptoContext
+class AesContext: public ICryptoContext
 {
   public:
-    AesContext (const void* key, size_t key_bits)
+    AesContext (AesOperation in_operation, const void* key, size_t key_bits, bool in_ofb, const char* init_string)
+      : operation (in_operation)
+      , ofb (in_ofb)
+      , num ()
     {
+      if (!init_string)
+        init_string = "";
+        
+      if (ofb)
+      {
+        size_t iv_len = strlen (init_string);
+        
+        if (iv_len >= sizeof (iv))
+          iv_len = sizeof (iv);
+          
+        memcpy (iv, init_string, iv_len);
+        
+        if (iv_len < sizeof (iv))
+          memset (iv + iv_len, 0, sizeof (iv) - iv_len);
+      }
+      
       aes_init (&ap, (const byte*)key, key_bits, operation);
     }
 
 ///Размер блока шифрования в байтах
     size_t GetBlockSize () { return CRYPTO_BLOCK_SIZE; }
-
+    
 ///Обновление контекста
     size_t Update (size_t data_size, const void* src_data, void* dst_data)
     {
@@ -298,8 +317,14 @@ template <AesOperation operation> class AesContext: public ICryptoContext
 
       while (data_size >= CRYPTO_BLOCK_SIZE)
       {
-        if (operation == AesOperation_Encrypt) aes_encrypt (&ap, (aes_uint32_t*)dst, (const aes_uint32_t*)src);
-        else                                   aes_decrypt (&ap, (aes_uint32_t*)dst, (const aes_uint32_t*)src);
+        if (ofb)
+        {
+          Ofb128Encrypt ((const unsigned char*)src, (unsigned char*)dst, CRYPTO_BLOCK_SIZE, &num);
+        }
+        else
+        {
+          UpdateCore (src, dst);
+        }
 
         src       += CRYPTO_BLOCK_SIZE;
         dst       += CRYPTO_BLOCK_SIZE;
@@ -311,7 +336,81 @@ template <AesOperation operation> class AesContext: public ICryptoContext
     }
 
   private:
-    AesParam ap;
+    void Ofb128Encrypt (const unsigned char *in, unsigned char *out, size_t len, int *num)
+    {
+      unsigned int n = *num;
+      size_t       l = 0;
+
+      if (16 % sizeof (size_t) == 0)  /* always true actually */
+      {
+        do 
+        {
+          while (n && len) 
+          {
+            *(out++) = *(in++) ^ iv [n];
+            --len;
+            n = (n+1) % 16;
+          }
+          
+          while (len >= 16) 
+          {
+            UpdateCore (iv, iv);
+
+            for (; n<16; n += sizeof (size_t))
+              *(size_t*)(out+n) = *(size_t*)(in+n) ^ *(size_t*)(iv+n);
+              
+            len -= 16;
+            out += 16;
+            in  += 16;
+            n    = 0;
+          }
+          
+          if (len) 
+          {
+            UpdateCore (iv, iv);
+
+            while (len--)
+            {
+              out [n] = in [n] ^ iv [n];
+              ++n;
+            }
+          }
+          
+          *num = n;
+
+          return;
+        } while (0);
+      }
+
+      /* the rest would be commonly eliminated by x86* compiler */
+
+      while (l < len) 
+      {
+        if (n == 0) 
+          UpdateCore (iv, iv);
+
+        out [l] = in [l] ^ iv [n];
+        
+        ++l;
+        
+        n = (n+1) % 16;
+      }
+
+      *num = n;
+    }  
+        
+    void UpdateCore (const void* src, void* dst)    
+    {
+      if (operation == AesOperation_Encrypt) aes_encrypt (&ap, (aes_uint32_t*)dst, (const aes_uint32_t*)src);
+      else                                   aes_decrypt (&ap, (aes_uint32_t*)dst, (const aes_uint32_t*)src);          
+    }  
+    
+  private:
+    AesOperation  operation;
+    bool          ofb;
+    AesParam      ap;
+    unsigned char iv [16];
+    int           num;
 };
 
 /*
@@ -323,16 +422,18 @@ class AesComponent
   public:
     AesComponent ()
     {
-      CryptoSystem::RegisterCrypter ("aes.encrypt", &CreateEncryptContext);
-      CryptoSystem::RegisterCrypter ("aes.decrypt", &CreateDecryptContext);
+      CryptoSystem::RegisterCrypter ("aes.encrypt", &CreateEncryptContext<false>);
+      CryptoSystem::RegisterCrypter ("aes.decrypt", &CreateDecryptContext<false>);
+      CryptoSystem::RegisterCrypter ("aes.ofb.encrypt", &CreateEncryptContext<true>);
+      CryptoSystem::RegisterCrypter ("aes.ofb.decrypt", &CreateDecryptContext<true>);
     }
 
   private:
-    static ICryptoContext* CreateEncryptContext (const char*, const void* key, size_t key_bits)
+    template <bool ofb> static ICryptoContext* CreateEncryptContext (const char*, const void* key, size_t key_bits, const char* init_string)
     {
       try
       {
-        return new AesContext<AesOperation_Encrypt> (key, key_bits);
+        return new AesContext (AesOperation_Encrypt, key, key_bits, ofb, init_string);
       }
       catch (xtl::exception& exception)
       {
@@ -341,11 +442,11 @@ class AesComponent
       }
     }
 
-    static ICryptoContext* CreateDecryptContext (const char*, const void* key, size_t key_bits)
+    template <bool ofb> static ICryptoContext* CreateDecryptContext (const char*, const void* key, size_t key_bits, const char* init_string)
     {
       try
       {
-        return new AesContext<AesOperation_Decrypt> (key, key_bits);
+        return new AesContext (AesOperation_Decrypt, key, key_bits, ofb, init_string);
       }
       catch (xtl::exception& exception)
       {

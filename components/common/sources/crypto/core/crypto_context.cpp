@@ -26,7 +26,7 @@ struct CryptoContext::Impl
     Конструкторы / деструктор
 */
 
-CryptoContext::CryptoContext (const char* method, const void* key, size_t key_bits)
+CryptoContext::CryptoContext (const char* method, const void* key, size_t key_bits, const char* init_string)
   : impl (new Impl)
 {
   try
@@ -36,7 +36,7 @@ CryptoContext::CryptoContext (const char* method, const void* key, size_t key_bi
       
     static ComponentLoader loader (CRYPTO_COMPONENTS_MASK);
 
-    impl->context = CryptoSystemSingleton::Instance ()->GetCrypter (method)(method, key, key_bits);
+    impl->context = CryptoSystemSingleton::Instance ()->GetCrypter (method)(method, key, key_bits, init_string);
     
     if (!impl->context)
       throw xtl::format_operation_exception ("", "Can't create crypto context for method '%s'", method);
