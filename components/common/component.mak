@@ -14,7 +14,7 @@ COMMON.SOURCES.SOURCE_DIRS                := sources/file_system/core sources/st
                                              sources/utils sources/log sources/properties sources/licensing/core sources/platform/default
 COMMON.SOURCES.DOCUMENTATION_DIRS         := include
 COMMON.SOURCES.COMPILER_DEFINES           := PCRE_STATIC
-COMMON.SOURCES.IMPORTS                    := compile.math.vecmath compile.extern.iconv
+COMMON.SOURCES.IMPORTS                    := compile.math.vecmath compile.extern.iconv compile.extern.openssl
 COMMON.SOURCES.unistd.SOURCE_DIRS         := sources/platform/unistd
 COMMON.SOURCES.android.SOURCE_DIRS        := sources/platform/android
 COMMON.SOURCES.cocoa.SOURCE_DIRS          := sources/platform/cocoa
