@@ -69,6 +69,8 @@ int main ()
     Image    image (1, 1, 1, PixelFormat_RGBA8);
     FontDesc font_desc;
 
+    memset (&font_desc, 0, sizeof (font_desc));
+
     xtl::uninitialized_storage<size_t> utf32_buffer (FONT_SIZE);
 
     for (size_t i = FIRST_GLYPH_CODE; i <= LAST_GLYPH_CODE; i++)

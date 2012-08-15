@@ -71,6 +71,7 @@ struct Params
   stl::string   result_font;            //имя результирующего шрифта
   stl::string   char_map_file;          //имя файла содержащего символы для генерации шрифта
   stl::string   char_map_file_encoding; //кодировка файла содержащего символы для генерации шрифта
+  float         stroke_width;           //ширина обводки
   int           force_advance;          //генерировать отступ равный ширине плюс данное значение
   int           glyph_interval;         //интервал между символами в картинке
   int           glyph_size;             //максимальный размер изображения одного символа
@@ -161,6 +162,12 @@ void command_line_char_map_file_encoding (const char* encoding, Params& params)
 void command_line_glyph_size (const char* size, Params& params)
 {
   params.glyph_size = atoi (size);
+}
+
+//установка ширины обводки символов
+void command_line_stroke_width (const char* size, Params& params)
+{
+  params.stroke_width = atof (size);
 }
 
 //установка кода первого индекса генерируемого диапазона символов
@@ -308,6 +315,7 @@ void build (Params& params)
 
     font_desc.file_name      = params.source_font.c_str ();
     font_desc.glyph_size     = params.glyph_size;
+    font_desc.stroke_width   = params.stroke_width;
     font_desc.glyph_interval = params.glyph_interval;
     font_desc.fast_convert   = params.fast_convert;
 
@@ -352,6 +360,7 @@ int main (int argc, const char** argv)
     {xtl::bind (&command_line_char_map_file,          _1, xtl::ref (params)), "char-map-file",          0,      "file", "set file with characters to include in font"},
     {xtl::bind (&command_line_char_map_file_encoding, _1, xtl::ref (params)), "char-map-file-encoding", 0,  "encoding", "set encoding of file with characters to include in font"},
     {xtl::bind (&command_line_glyph_size,             _1, xtl::ref (params)), "glyph-size",             0,      "size", "set glyph size"},
+    {xtl::bind (&command_line_stroke_width,           _1, xtl::ref (params)), "stroke-width",           0,      "size", "set stroke width"},
     {xtl::bind (&command_line_first_glyph_code,       _1, xtl::ref (params)), "first-glyph-code",       0,     "index", "set first index of generated glyph range"},
     {xtl::bind (&command_line_last_glyph_code,        _1, xtl::ref (params)), "last-glyph-code",        0,     "index", "set last index of generated glyph range"},
     {xtl::bind (&command_line_glyph_interval,         _1, xtl::ref (params)), "glyph-interval",         0,      "size", "set glyph interval"},
@@ -366,6 +375,7 @@ int main (int argc, const char** argv)
   params.options           = options;
   params.options_count     = options_count;
   params.glyph_size        = 0;
+  params.stroke_width      = 0;
   params.first_glyph_code  = 0;
   params.last_glyph_code   = 0;
   params.glyph_interval    = -1;

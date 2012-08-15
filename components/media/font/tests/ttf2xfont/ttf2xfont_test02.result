@@ -9,6 +9,7 @@ ttf2xfont [<OPTIONS>] <SOURCE> ...
     --char-map-file=<file>     set file with characters to include in font
     --char-map-file-encoding=<encoding> set encoding of file with characters to include in font
     --glyph-size=<size>        set glyph size
+    --stroke-width=<size>      set stroke width
     --first-glyph-code=<index> set first index of generated glyph range
     --last-glyph-code=<index>  set last index of generated glyph range
     --glyph-interval=<size>    set glyph interval
