@@ -296,7 +296,7 @@ void convert (const FontDesc& font_desc, Font& result_font, Image& result_image)
     {
       check_free_type_error (FT_Stroker_New (freetype_library.Library (), &stroker), "::FT_Stroker_New");
 
-      FT_Stroker_Set (stroker, font_desc.stroke_width * 64, FT_STROKER_LINECAP_ROUND, FT_STROKER_LINEJOIN_ROUND, 0);
+      FT_Stroker_Set (stroker, (FT_Fixed)(font_desc.stroke_width * 64), FT_STROKER_LINECAP_ROUND, FT_STROKER_LINEJOIN_ROUND, 0);
     }
 
     int load_char_mode = font_desc.stroke_width ? FT_LOAD_DEFAULT : FT_LOAD_RENDER;

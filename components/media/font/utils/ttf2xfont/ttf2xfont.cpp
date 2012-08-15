@@ -167,7 +167,7 @@ void command_line_glyph_size (const char* size, Params& params)
 //установка ширины обводки символов
 void command_line_stroke_width (const char* size, Params& params)
 {
-  params.stroke_width = atof (size);
+  params.stroke_width = (float)atof (size);
 }
 
 //установка кода первого индекса генерируемого диапазона символов
