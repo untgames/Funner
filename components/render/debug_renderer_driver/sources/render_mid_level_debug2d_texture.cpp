@@ -62,7 +62,7 @@ void Texture::SetMinFilter (render::mid_level::renderer2d::TexMinFilter filter)
 {
   min_filter = filter;
 
-  log.Printf ("Set min filter %d for texture %u\n", filter, Id ());
+  log.Printf ("Set min filter %d for texture %u", filter, Id ());
 }
 
 render::mid_level::renderer2d::TexMinFilter Texture::GetMinFilter ()
