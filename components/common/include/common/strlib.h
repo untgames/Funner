@@ -100,6 +100,13 @@ const char* strerror (int code);
 void decompress_buffer (size_t src_buffer_size, const void* src_buffer, char* dst_buffer); //dst_buffer_size = buffer_size * 2 + 1
 void compress_buffer   (size_t src_buffer_size, const char* src_buffer, void* dst_buffer); //dst_buffer_size = src_buffer_size / 2
 
+/*
+    Компрессия / декомпрессия в Base64
+*/
+
+void encode_base64 (size_t src_buffer_size, const void* src_buffer, stl::string& result);
+void decode_base64 (size_t src_buffer_size, const char* src_buffer, stl::string& result);
+
 #include <common/detail/strlib.inl>
 
 }
