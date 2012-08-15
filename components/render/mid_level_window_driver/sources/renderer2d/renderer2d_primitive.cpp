@@ -19,11 +19,12 @@ Primitive::Primitive ()
   scissor_rect.width  = 0;
   scissor_rect.height = 0;
 
-  renderable_primitive.blend_mode      = BlendMode_None;
-  renderable_primitive.shader_mode     = ShaderMode_Normal;
-  renderable_primitive.texture         = 0;
-  renderable_primitive.alpha_reference = 0.0f;
-  renderable_primitive.scissor         = 0;
+  renderable_primitive.blend_mode         = BlendMode_None;
+  renderable_primitive.shader_mode        = ShaderMode_Normal;
+  renderable_primitive.texture            = 0;
+  renderable_primitive.texture_min_filter = (render::mid_level::renderer2d::TexMinFilter)0;
+  renderable_primitive.alpha_reference    = 0.0f;
+  renderable_primitive.scissor            = 0;
 }
 
 /*
@@ -50,19 +51,20 @@ void Primitive::SetTexture (render::mid_level::renderer2d::ITexture* in_texture)
 {
   if (!in_texture)
   {
-    renderable_primitive.texture = 0;
+    renderable_primitive.texture            = 0;
+    renderable_primitive.texture_min_filter = (render::mid_level::renderer2d::TexMinFilter)0;
     return;
   }
 
   if (ImageTexture* image_texture = dynamic_cast<ImageTexture*> (in_texture))
   {
-    renderable_primitive.texture = image_texture->GetTexture ();      
-    texture                      = image_texture;
+    renderable_primitive.texture            = image_texture->GetTexture ();
+    renderable_primitive.texture_min_filter = image_texture->GetMinFilter ();
   }
   else if (RenderTargetTexture* render_target_texture = dynamic_cast<RenderTargetTexture*> (in_texture))
   {
-    renderable_primitive.texture = render_target_texture->GetView ()->GetTexture ();
-    texture                      = render_target_texture;
+    renderable_primitive.texture            = render_target_texture->GetView ()->GetTexture ();
+    renderable_primitive.texture_min_filter = render_target_texture->GetMinFilter ();
   }
   else
   {

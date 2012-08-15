@@ -76,6 +76,12 @@ render::low_level::PixelFormat get_pixel_format (const char* name)
 
 ImageTexture::ImageTexture (render::low_level::IDevice& device, const media::Image& image)
 {
+#ifdef ARM
+  min_filter = render::mid_level::renderer2d::TexMinFilter_Linear;
+#else
+  min_filter = render::mid_level::renderer2d::TexMinFilter_LinearMipLinear;
+#endif
+
   try
   {
     memset (&tex_desc, 0, sizeof (tex_desc));
@@ -102,6 +108,12 @@ ImageTexture::ImageTexture (render::low_level::IDevice& device, const media::Ima
 
 ImageTexture::ImageTexture (render::low_level::IDevice& device, const media::CompressedImage& image)
 {
+#ifdef ARM
+  min_filter = render::mid_level::renderer2d::TexMinFilter_Linear;
+#else
+  min_filter = render::mid_level::renderer2d::TexMinFilter_LinearMipLinear;
+#endif
+
   try
   {
     memset (&tex_desc, 0, sizeof (tex_desc));
@@ -157,6 +169,23 @@ size_t ImageTexture::GetHeight ()
   texture->GetDesc (texture_desc);
 
   return texture_desc.height;
+}
+
+/*
+   Фильтрация
+*/
+
+void ImageTexture::SetMinFilter (render::mid_level::renderer2d::TexMinFilter filter)
+{
+  if (filter > 1)
+    throw xtl::make_argument_exception ("ImageTexture::SetMinFilter", "filter", filter);
+
+  min_filter = filter;
+}
+
+render::mid_level::renderer2d::TexMinFilter ImageTexture::GetMinFilter ()
+{
+  return min_filter;
 }
 
 /*
@@ -245,6 +274,11 @@ render::low_level::ITexture* ImageTexture::GetTexture ()
 RenderTargetTexture::RenderTargetTexture (render::low_level::IDevice& device, size_t width, size_t height, render::mid_level::PixelFormat format)
   : RenderTarget (CreateView (device, width, height, format).get (), RenderTargetType_Color)
 {
+#ifdef ARM
+  min_filter = render::mid_level::renderer2d::TexMinFilter_Linear;
+#else
+  min_filter = render::mid_level::renderer2d::TexMinFilter_LinearMipLinear;
+#endif
 }
 
 /*
@@ -290,7 +324,21 @@ RenderTargetTexture::ViewPtr RenderTargetTexture::CreateView
   {
     exception.touch ("render::mid_level::window_driver::renderer2d::RenderTargetTexture::CreateView");
     throw;
-  }  
+  }
+}
+
+/*
+   Фильтрация
+*/
+
+void RenderTargetTexture::SetMinFilter (render::mid_level::renderer2d::TexMinFilter filter)
+{
+  min_filter = filter;
+}
+
+render::mid_level::renderer2d::TexMinFilter RenderTargetTexture::GetMinFilter ()
+{
+  return min_filter;
 }
 
 /*
@@ -299,9 +347,8 @@ RenderTargetTexture::ViewPtr RenderTargetTexture::CreateView
 
 void RenderTargetTexture::GenerateMips (render::low_level::IDevice& device)
 {
-#ifndef ARM
-  device.GenerateMips (GetView ()->GetTexture ());
-#endif
+  if (min_filter == mid_level::renderer2d::TexMinFilter_LinearMipLinear)
+    device.GenerateMips (GetView ()->GetTexture ());
 }
 
 /*

@@ -21,6 +21,8 @@ struct RenderableFont::Impl
 
     texture = render.GetTexture (font.ImageName (), true);
     
+    texture->SetMinFilter (render::mid_level::renderer2d::TexMinFilter_LinearMipLinear);
+
       //определение максимальной стороны глифов
 
     const media::GlyphInfo* current_glyph = font.Glyphs ();

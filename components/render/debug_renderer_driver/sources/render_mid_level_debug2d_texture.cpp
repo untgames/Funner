@@ -13,6 +13,7 @@ Texture::Texture (size_t width, size_t height, PixelFormat in_format)
   : RenderTarget (width, height, RenderTargetType_Color)
   , is_compressed (false)
   , format (in_format)
+  , min_filter ((render::mid_level::renderer2d::TexMinFilter)0)
 {
   switch (format)
   {
@@ -33,6 +34,7 @@ Texture::Texture (size_t width, size_t height, const char* in_format)
   : RenderTarget (width, height, RenderTargetType_Color)
   , is_compressed (true)
   , format (PixelFormat_RGBA8)
+  , min_filter ((render::mid_level::renderer2d::TexMinFilter)0)
 {
   if (!in_format)
     throw xtl::make_null_argument_exception ("render::mid_level::debug::renderer2d::Texture::Texture", "format");
@@ -50,6 +52,22 @@ Texture::~Texture ()
   {
     //подавление всех исключений
   }
+}
+
+/*
+   Фильтрация
+*/
+
+void Texture::SetMinFilter (render::mid_level::renderer2d::TexMinFilter filter)
+{
+  min_filter = filter;
+
+  log.Printf ("Set min filter %d for texture %u\n", filter, Id ());
+}
+
+render::mid_level::renderer2d::TexMinFilter Texture::GetMinFilter ()
+{
+  return min_filter;
 }
 
 /*

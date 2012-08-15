@@ -21,17 +21,18 @@ const size_t PRIMITIVE_ARRAY_RESERVE_SIZE = 2048; //резервируемое количество при
 
 struct RenderContext
 {
-  render::low_level::IDevice*     device;                     //устройство
-  render::low_level::ITexture*    current_texture;            //текущая текстура
-  render::low_level::IBlendState* current_blend_state;        //текущее состояние уровня смешивания цветов
-  render::low_level::Rect*        current_scissor;            //текущая область отсечения
-  ShaderMode                      current_shader_mode;        //текущий режим шейдинга
-  CommonResources*                resources;                  //ресурсы
-  render::low_level::IBuffer*     common_constant_buffer;     //буфер констант
-  render::low_level::IBuffer*     dynamic_constant_buffer;    //буфер констант
-  DynamicProgramParameters        dynamic_program_parameters; //динамические параметры программы рендеринга
-  int                             viewport_offset_x;          //смещение области вывода по горизонтали
-  int                             viewport_offset_y;          //смещение области вывода по вертикали
+  render::low_level::IDevice*       device;                     //устройство
+  render::low_level::ITexture*      current_texture;            //текущая текстура
+  render::low_level::ISamplerState* current_sampler_state;      //текущее состояние сэмплера
+  render::low_level::IBlendState*   current_blend_state;        //текущее состояние уровня смешивания цветов
+  render::low_level::Rect*          current_scissor;            //текущая область отсечения
+  ShaderMode                        current_shader_mode;        //текущий режим шейдинга
+  CommonResources*                  resources;                  //ресурсы
+  render::low_level::IBuffer*       common_constant_buffer;     //буфер констант
+  render::low_level::IBuffer*       dynamic_constant_buffer;    //буфер констант
+  DynamicProgramParameters          dynamic_program_parameters; //динамические параметры программы рендеринга
+  int                               viewport_offset_x;          //смещение области вывода по горизонтали
+  int                               viewport_offset_y;          //смещение области вывода по вертикали
 };
 
 /*
@@ -157,7 +158,12 @@ bool not_blended_sprite_sort_predicate (const RenderableSprite* sprite1, const R
                             &primitive2 = *sprite2->primitive;
 
   if (primitive1.blend_mode == primitive2.blend_mode)
+  {
+    if (primitive1.texture == primitive2.texture)
+      return primitive1.texture_min_filter < primitive2.texture_min_filter;
+
     return primitive1.texture < primitive2.texture;
+  }
 
   return primitive1.blend_mode > primitive2.blend_mode;
 }
@@ -223,10 +229,11 @@ void draw_solid_sprites (RenderContext& context, const RenderableSprite** sprite
 {
   for (const RenderableSprite **sprite=sprites+first_sprite, **last_sprite=sprite+sprites_count; sprite != last_sprite;)
   {
-    render::low_level::ITexture* texture         = (*sprite)->primitive->texture;
-    render::low_level::Rect*     scissor         = (*sprite)->primitive->scissor;
-    float                        alpha_reference = (*sprite)->primitive->alpha_reference;
-    ShaderMode                   shader_mode     = (*sprite)->primitive->shader_mode;
+    render::low_level::ITexture*      texture         = (*sprite)->primitive->texture;
+    render::low_level::ISamplerState* sampler         = context.resources->GetSamplerState ((*sprite)->primitive->texture_min_filter);
+    render::low_level::Rect*          scissor         = (*sprite)->primitive->scissor;
+    float                             alpha_reference = (*sprite)->primitive->alpha_reference;
+    ShaderMode                        shader_mode     = (*sprite)->primitive->shader_mode;
 
     size_t base_sprite_index = sprite++ - sprites;
 
@@ -289,6 +296,13 @@ void draw_solid_sprites (RenderContext& context, const RenderableSprite** sprite
       context.current_texture = texture;
     }
 
+    if (context.current_sampler_state != sampler)
+    {
+      context.device->SSSetSampler (0, sampler);
+
+      context.current_sampler_state = sampler;
+    }
+
     context.device->DrawIndexed (render::low_level::PrimitiveType_TriangleList, base_sprite_index * SPRITE_INDICES_COUNT,
       draw_sprites_count * SPRITE_INDICES_COUNT, 0);
   }
@@ -300,6 +314,7 @@ void draw_blend_sprites (RenderContext& context, const RenderableSprite** sprite
   for (const RenderableSprite **sprite=sprites+first_sprite, **last_sprite=sprite+sprites_count; sprite != last_sprite;)
   {
     render::low_level::ITexture*             texture         = (*sprite)->primitive->texture;
+    render::low_level::ISamplerState*        sampler         = context.resources->GetSamplerState ((*sprite)->primitive->texture_min_filter);
     render::mid_level::renderer2d::BlendMode blend_mode      = (*sprite)->primitive->blend_mode;
     render::low_level::Rect*                 scissor         = (*sprite)->primitive->scissor;
     float                                    alpha_reference = (*sprite)->primitive->alpha_reference;
@@ -366,6 +381,13 @@ void draw_blend_sprites (RenderContext& context, const RenderableSprite** sprite
       context.current_texture = texture;
     }
 
+    if (context.current_sampler_state != sampler)
+    {
+      context.device->SSSetSampler (0, sampler);
+
+      context.current_sampler_state = sampler;
+    }
+
     render::low_level::IBlendState* blend_state = context.resources->GetBlendState (blend_mode);
 
     if (context.current_blend_state != blend_state)
@@ -404,7 +426,6 @@ void Frame::DrawCore (IDevice* device)
   device->SSSetConstantBuffer          (0, common_constant_buffer.get ());
   device->SSSetConstantBuffer          (1, dynamic_constant_buffer.get ());
   device->SSSetProgramParametersLayout (common_resources->GetProgramParametersLayout ());
-  device->SSSetSampler                 (0, common_resources->GetSamplerState ());
   device->RSSetState                   (common_resources->GetRasterizerState (0));
 
     //отрисовка спрайтов без блендинга
@@ -422,6 +443,7 @@ void Frame::DrawCore (IDevice* device)
   
   context.device                                     = device;
   context.current_texture                            = device->SSGetTexture (0);
+  context.current_sampler_state                      = device->SSGetSampler (0);
   context.current_scissor                            = 0;
   context.current_blend_state                        = device->OSGetBlendState ();
   context.current_shader_mode                        = ShaderMode_Normal;

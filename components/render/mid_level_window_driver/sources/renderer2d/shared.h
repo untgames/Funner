@@ -79,11 +79,12 @@ struct RenderableVertex
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 struct RenderablePrimitive
 {
-  float                             alpha_reference; //параметр для альфа-теста
-  render::low_level::ITexture*      texture;         //текстура
-  render::low_level::Rect*          scissor;         //область отсечения
-  mid_level::renderer2d::BlendMode  blend_mode;      //режим смешивания цветов
-  mid_level::renderer2d::ShaderMode shader_mode;     //режим шейдинга
+  float                               alpha_reference;    //параметр для альфа-теста
+  render::low_level::ITexture*        texture;            //текстура
+  mid_level::renderer2d::TexMinFilter texture_min_filter; //фильтр текстуры
+  render::low_level::Rect*            scissor;            //область отсечения
+  mid_level::renderer2d::BlendMode    blend_mode;         //режим смешивания цветов
+  mid_level::renderer2d::ShaderMode   shader_mode;        //режим шейдинга
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -115,7 +116,7 @@ class CommonResources : public Object
     render::low_level::IProgram*                 GetAlphaClampProgram () { return alpha_clamp_program.get (); }
     render::low_level::IProgram*                 GetReflectionProgram () { return reflection_program.get (); }
     render::low_level::IProgramParametersLayout* GetProgramParametersLayout () { return program_parameters_layout.get (); }
-    render::low_level::ISamplerState*            GetSamplerState      () { return sampler.get (); }
+    render::low_level::ISamplerState*            GetSamplerState      (render::mid_level::renderer2d::TexMinFilter filter) { return samplers [filter].get (); }
     render::low_level::IInputLayout*             GetInputLayout       () { return input_layout.get (); }
     render::low_level::IRasterizerState*         GetRasterizerState   (bool scissor_enabled);
 
@@ -126,7 +127,7 @@ class CommonResources : public Object
     ProgramPtr                 alpha_clamp_program;
     ProgramPtr                 reflection_program;
     ProgramParametersLayoutPtr program_parameters_layout;
-    SamplerStatePtr            sampler;
+    SamplerStatePtr            samplers [render::mid_level::renderer2d::TexMinFilter_Num];
     InputLayoutPtr             input_layout;
     RasterizerStatePtr         rasterizer_states [2];
 };
@@ -150,6 +151,12 @@ class ImageTexture: virtual public mid_level::renderer2d::ITexture, public mid_l
     size_t GetHeight ();
   
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+///Фильтрация
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void                                SetMinFilter (mid_level::renderer2d::TexMinFilter filter);
+    mid_level::renderer2d::TexMinFilter GetMinFilter ();
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Копирование образа текстуры в картинку
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void CaptureImage (media::Image&);    
@@ -168,8 +175,9 @@ class ImageTexture: virtual public mid_level::renderer2d::ITexture, public mid_l
     typedef xtl::com_ptr<render::low_level::ITexture> TexturePtr;
     
   private:
-    TexturePtr                     texture;
-    render::low_level::TextureDesc tex_desc;
+    TexturePtr                          texture;
+    render::low_level::TextureDesc      tex_desc;
+    mid_level::renderer2d::TexMinFilter min_filter;
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -183,6 +191,12 @@ class RenderTargetTexture: virtual public mid_level::renderer2d::ITexture, publi
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     RenderTargetTexture (render::low_level::IDevice& device, size_t width, size_t height, PixelFormat format);
     
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Фильтрация
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void                                SetMinFilter (mid_level::renderer2d::TexMinFilter filter);
+    mid_level::renderer2d::TexMinFilter GetMinFilter ();
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Обновление текстуры
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -206,6 +220,9 @@ class RenderTargetTexture: virtual public mid_level::renderer2d::ITexture, publi
 ///Создание отображения
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     static ViewPtr CreateView (render::low_level::IDevice& device, size_t width, size_t height, PixelFormat format);
+
+  private:
+    mid_level::renderer2d::TexMinFilter min_filter;
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

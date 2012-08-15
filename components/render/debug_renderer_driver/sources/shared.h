@@ -362,6 +362,12 @@ class Texture: virtual public mid_level::renderer2d::ITexture, public RenderTarg
     ~Texture ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+///Фильтрация
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void                                SetMinFilter (mid_level::renderer2d::TexMinFilter filter);
+    mid_level::renderer2d::TexMinFilter GetMinFilter ();
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Копирование образа текстуры в картинку
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void CaptureImage (media::Image&);    
@@ -372,8 +378,9 @@ class Texture: virtual public mid_level::renderer2d::ITexture, public RenderTarg
     void Update (media::Image&);
 
   private:
-    bool        is_compressed;
-    PixelFormat format;
+    bool                                is_compressed;
+    PixelFormat                         format;
+    mid_level::renderer2d::TexMinFilter min_filter;
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

@@ -185,17 +185,24 @@ ProgramParametersLayoutPtr create_program_parameters (IDevice& device)
 }
 
 //создание сэмплера
-SamplerStatePtr create_sampler (IDevice& device)
+SamplerStatePtr create_sampler (IDevice& device, render::mid_level::renderer2d::TexMinFilter filter)
 {
   SamplerDesc sampler_desc;
 
   memset (&sampler_desc, 0, sizeof (sampler_desc));
 
-#ifdef ARM
-  sampler_desc.min_filter           = TexMinFilter_Linear;
-#else
-  sampler_desc.min_filter           = TexMinFilter_LinearMipLinear;
-#endif  
+  switch (filter)
+  {
+    case render::mid_level::renderer2d::TexMinFilter_Linear:
+      sampler_desc.min_filter = render::low_level::TexMinFilter_Linear;
+      break;
+    case render::mid_level::renderer2d::TexMinFilter_LinearMipLinear:
+      sampler_desc.min_filter = render::low_level::TexMinFilter_LinearMipLinear;
+      break;
+    default:
+      throw xtl::make_argument_exception ("render::mid_level::window_driver::renderer2d::create_sampler", "filter", filter);
+  }
+
   sampler_desc.mag_filter           = TexMagFilter_Linear;
   sampler_desc.max_anisotropy       = 1;
 //  sampler_desc.wrap_u               = TexcoordWrap_Clamp;
@@ -298,7 +305,8 @@ CommonResources::CommonResources (IDevice* device)
 
   program_parameters_layout = create_program_parameters (*device);
 
-  sampler = create_sampler (*device);
+  for (int i = 0; i < render::mid_level::renderer2d::TexMinFilter_Num; i++)
+    samplers [i] = create_sampler (*device, (render::mid_level::renderer2d::TexMinFilter)i);
 
     //создание состояний выходного уровня
 
