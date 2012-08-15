@@ -12,6 +12,7 @@ Create primitive (id=11)
 Create primitive (id=12)
 Create primitive (id=13)
 Create texture 2048x1024 format=PixelFormat_RGBA8 (id=14)
+Set min filter 1 for texture 14
 Begin draw frames (id=2, frame_id=0)
 Begin draw frame (id=9)
 Set render targets: render-target=4, depth-stencil-target=5
