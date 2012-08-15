@@ -1,0 +1,6 @@
+Results of crypto_test:
+Test library:
+md5('12345678901234567890123456789012345678901234567890123456789012345678901234567890')='57edf4a22be3c955ac49da2e2107b67a'
+sha256('The quick brown fox jumps over the lazy dog')='d7a8fbb307d7809469ca9abcb0082e4f8d5651e46d3cdb762d02d0bf37c9e592'
+sha1('service_id=4method=user.getInfov=1.0secret')='8d92429672531b137f566daad7b62e3e81dc194f'
+base64(encode('Hello world from the AES encrypt', 'aes', 'ABCDEFGHIJKLMNOP', '')='ssf55W0/2vrPMtH5J0zqWqxYxeArYRvwM0xiSRohvg'

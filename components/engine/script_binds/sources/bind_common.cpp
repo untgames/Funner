@@ -41,7 +41,9 @@ class Component
       engine::bind_common_action_queue  (environment);
       engine::bind_common_timer         (environment);
       engine::bind_common_async_library (environment);
-      engine::bind_common_property_map (environment);
+      engine::bind_common_property_map  (environment);
+      engine::bind_common_crypto        (environment);
+      engine::bind_common_base64        (environment);      
     }
 };
 

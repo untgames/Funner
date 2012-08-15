@@ -53,7 +53,6 @@ class StringNode: public xtl::dynamic_cast_root
 {
   public:
     typedef xtl::com_ptr<StringNode> Pointer;
-void bind_common_property_map (script::Environment&);
 
   public:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -148,6 +147,8 @@ void bind_common_action_queue  (script::Environment&);
 void bind_common_timer         (script::Environment&);
 void bind_common_async_library (script::Environment&);
 void bind_common_property_map  (script::Environment&);
+void bind_common_crypto        (script::Environment&);
+void bind_common_base64        (script::Environment&);
 void bind_math_splines_library (script::Environment&);
 
 }
