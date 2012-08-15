@@ -9,6 +9,10 @@ import android.content.ContextWrapper;
 import android.content.pm.ApplicationInfo;
 import android.util.*;
 import android.os.Process;
+import android.os.Build;
+import android.provider.Settings.Secure;
+import java.security.MessageDigest;
+import java.util.Formatter;
 import java.io.*;
 
 /// Данный класс используется для запуска внешних shared-library
@@ -184,9 +188,44 @@ public class EngineActivity extends Activity
       }
     });
   }
+  
+/// Получение UUID
+  public String getUuid ()
+  {      
+    String buildString = null;
+    
+    String androidID = Secure.getString (getContentResolver(), Secure.ANDROID_ID);    
+    
+    if (androidID == null)
+    {
+      buildString = Build.BOARD + Build.BRAND + Build.CPU_ABI + Build.DEVICE + Build.DISPLAY + Build.HOST + Build.ID + Build.MANUFACTURER + Build.MODEL + Build.PRODUCT +
+        Build.TAGS + Build.TYPE + Build.USER;        
+    }
+
+    try
+    {
+      MessageDigest md = MessageDigest.getInstance ("SHA-1");
+      
+      return byteArray2Hex (md.digest (buildString.getBytes ()));
+    }
+    catch (Exception e)
+    {
+      return buildString;
+    }
+  }
+  
+  private static String byteArray2Hex (final byte[] hash) 
+  {
+    Formatter formatter = new Formatter ();
+    
+    for (byte b : hash) 
+      formatter.format ("%02x", b);
+
+    return formatter.toString ();
+}  
 
 /// Точка входа в native код
-  public native int startApplication (String programName, String workDir, String programArgs, String envVars);
+  public native int startApplication (String programName, String workDir, String programArgs, String envVars);  
 
 /// Оповещение о возникновении событий
   public native void onPauseCallback ();
