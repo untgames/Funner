@@ -44,6 +44,7 @@ class XmlFontSaver
       writer.WriteAttribute ("Name", font.Name ());
       writer.WriteAttribute ("FontFile", font.ImageName ());
       writer.WriteAttribute ("FirstCharCode", font.FirstGlyphCode ());
+      writer.WriteAttribute ("FontSize", font.FontSize ());
 
       SaveGlyphs ();
       SaveKernings ();

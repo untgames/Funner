@@ -46,7 +46,7 @@ Results of font_converter_test:
 'media.font.font_converter': 'building image...'
 'media.font.font_converter': 'getting kernings...'
 <?xml version="1.0" encoding="utf-8"?>
-<Font Name="/io/stdout/a_damn_mess.xfont" FontFile="data/a_damn_mess.tga" FirstCharCode="32">
+<Font Name="/io/stdout/a_damn_mess.xfont" FontFile="data/a_damn_mess.tga" FirstCharCode="32" FontSize="64">
   <Glyphs>
     <Glyph XPos="0" YPos="0" Width="0" Height="0" BearingX="0" BearingY="0" AdvanceX="17" AdvanceY="0"/>
     <Glyph XPos="0" YPos="0" Width="0" Height="0" BearingX="0" BearingY="0" AdvanceX="9" AdvanceY="0"/>

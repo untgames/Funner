@@ -1,6 +1,6 @@
 Results of ttf2xfont_test08:
 <?xml version="1.0" encoding="utf-8"?>
-<Font Name="results/a_damn_mess.xfont" FontFile="results/a_damn_mess.png" FirstCharCode="97">
+<Font Name="results/a_damn_mess.xfont" FontFile="results/a_damn_mess.png" FirstCharCode="97" FontSize="32">
   <Glyphs>
     <Glyph XPos="0" YPos="0" Width="29" Height="33" BearingX="0" BearingY="32" AdvanceX="25" AdvanceY="0"/>
     <Glyph XPos="67" YPos="0" Width="26" Height="31" BearingX="1" BearingY="31" AdvanceX="22" AdvanceY="0"/>

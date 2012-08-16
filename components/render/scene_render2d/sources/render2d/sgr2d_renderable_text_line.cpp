@@ -228,9 +228,9 @@ struct RenderableTextLine::Impl
                                 last_glyph_code    = first_glyph_code + glyphs_count;
         float                   current_pen_x      = 0.0f,
                                 current_pen_y      = 0.0f,
-                                max_glyph_side     = (float)renderable_font->GetMaxGlyphSide (),
+                                font_size          = (float)font.FontSize (),
                                 spacing_multiplier = text_line->SpacingMultiplier (),
-                                advance_multiplier = spacing_multiplier / max_glyph_side;
+                                advance_multiplier = spacing_multiplier / font_size;
         TextDimensions          text_dimensions;
 
           //резервирование места для буфера спрайтов
@@ -270,8 +270,8 @@ struct RenderableTextLine::Impl
             {
               media::KerningInfo kerning_info = font.Kerning (prev_glyph_index, glyph_index);
 
-              current_pen_x += kerning_info.x_kerning / max_glyph_side;
-              current_pen_y += kerning_info.y_kerning / max_glyph_side;
+              current_pen_x += kerning_info.x_kerning / font_size;
+              current_pen_y += kerning_info.y_kerning / font_size;
             }
           }
 
@@ -279,7 +279,7 @@ struct RenderableTextLine::Impl
 
               //bearing внести в инициализацию спрайтов в RenderableFont!!!!
 
-          float bearing_x = glyph.bearing_x / max_glyph_side, bearing_y = glyph.bearing_y / max_glyph_side;
+          float bearing_x = glyph.bearing_x / font_size, bearing_y = glyph.bearing_y / font_size;
 
           const mid_level::renderer2d::Sprite& src_sprite = renderable_font->GetSprite (glyph_index);
 

@@ -269,6 +269,7 @@ void convert (const FontDesc& font_desc, Font& result_font, Image& result_image)
     font.SetImageName (result_image.Name ());
     font.ResizeGlyphsTable (font_desc.char_codes_count);
     font.SetFirstGlyphCode (font_desc.first_glyph_code);
+    font.SetFontSize (font_desc.glyph_size);
 
       //Подготовка массива с размерами каждого глифа
 

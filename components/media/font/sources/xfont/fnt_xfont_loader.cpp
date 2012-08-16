@@ -19,7 +19,7 @@ void xfont_load (const char* file_name, Font& font)
   Parser           p (file_name);
   ParseLog         log = p.Log ();
   Parser::Iterator iter = p.Root ().First("Font");
-  size_t           first_char_code = 0, glyph_count = 0;
+  size_t           first_char_code = 0, glyph_count = 0, font_size = 0;
   GlyphInfo*       glyph_info;
   Font             new_font;
 
@@ -64,6 +64,9 @@ void xfont_load (const char* file_name, Font& font)
   if (!iter->First ("FirstCharCode"))
     throw xtl::format_operation_exception (METHOD_NAME, "Incorrect file format, no 'FirstCharCode' property");
 
+  if (!iter->First ("FontSize"))
+    throw xtl::format_operation_exception (METHOD_NAME, "Incorrect file format, no 'FontSize' property");
+
   if (!iter->First ("Glyphs"))
     throw xtl::format_operation_exception (METHOD_NAME, "Incorrect file format, no 'Glyphs' tag");
 
@@ -80,6 +83,10 @@ void xfont_load (const char* file_name, Font& font)
   read (*iter, "FirstCharCode", first_char_code);
 
   new_font.SetFirstGlyphCode (first_char_code);
+
+  read (*iter, "FontSize", font_size);
+
+  new_font.SetFontSize (font_size);
 
   new_font.ResizeGlyphsTable (glyph_count);
 

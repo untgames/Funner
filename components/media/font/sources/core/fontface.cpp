@@ -54,6 +54,7 @@ struct Font::Impl : public xtl::reference_counter
   typedef stl::hash_map<KerningsMapKey, KerningInfo> KerningsMap;
 
   size_t      first_char_index;  //char-код первого глифа
+  size_t      font_size;         //размер шрифта
   GlyphsArray glyphs;            //глифы
   stl::string file_name;         //имя файла с содержимым гарнитуры
   stl::string str_name;          //имя гарнитуры
@@ -186,6 +187,20 @@ void Font::SetFirstGlyphCode (size_t new_first_glyph_code)
 size_t Font::FirstGlyphCode () const
 {
   return impl->first_char_index;
+}
+
+/*
+   Получение/изменение размера шрифта
+*/
+
+void Font::SetFontSize (size_t new_font_size)
+{
+  impl->font_size = new_font_size;
+}
+
+size_t Font::FontSize () const
+{
+  return impl->font_size;
 }
 
 /*
