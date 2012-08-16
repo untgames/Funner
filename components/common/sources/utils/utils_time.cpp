@@ -29,20 +29,22 @@ struct TimerImpl: public xtl::reference_counter
   typedef Timer::time_t     time_t;
   typedef Timer::timeint_t  timeint_t;
 
-  TimeSource source;      //источник получени€ времени
-  bool       auto_update; //обновл€етс€ ли врем€ автоматически
-  time_t     time;        //текущее врем€  
-  time_t     precision;   //точность работы исходного таймера
-  timeint_t  start_time;  //стартовое врем€
-  bool       started;     //включен ли таймер
+  TimeSource source;       //источник получени€ времени
+  bool       auto_update;  //обновл€етс€ ли врем€ автоматически
+  time_t     time;         //текущее врем€  
+  time_t     precision;    //точность работы исходного таймера
+  timeint_t  start_time;   //стартовое врем€
+  timeint_t  current_time; //текущее врем€
+  bool       started;      //включен ли таймер
   
 /// онструктор
   TimerImpl (const TimeSource& in_source, time_t in_precision, bool in_auto_update)
     : source (in_source)
     , auto_update (in_auto_update)
-    , time (0)
+    , time (0)    
     , precision (in_precision)
     , start_time (0)
+    , current_time (0)
     , started (false)
   {
   }
@@ -53,7 +55,17 @@ struct TimerImpl: public xtl::reference_counter
     if (!started)
       return;
       
-    time = static_cast<long> (ComputeTimeInteger ()) / precision;
+    current_time = ComputeTimeInteger ();
+    time         = static_cast<long> (current_time) / precision;    
+  }
+  
+///ѕолучение целочисленного времени
+  timeint_t GetCurrentTimeInteger ()
+  {
+    if (auto_update)
+      Update ();
+      
+    return current_time;
   }
   
 ///–асчЄт интервала времени
@@ -96,7 +108,7 @@ struct ParentTimeSource
 
   Timer::timeint_t operator () () const
   {
-    return impl->ComputeTimeInteger ();
+    return impl->GetCurrentTimeInteger ();
   }
 };
 
@@ -107,7 +119,7 @@ struct ParentTimeSource
 */
 
 Timer::Timer (bool is_auto_update)
-  : impl (new TimerImpl (DefaultTimeSource::Instance (), 1000.0f, is_auto_update))
+  : impl (new TimerImpl (DefaultTimeSource::Instance (), 1000.0, is_auto_update))
 {
 }
 
@@ -205,9 +217,10 @@ void Timer::Stop ()
 
 void Timer::Reset ()
 {
-  impl->started    = false;
-  impl->time       = 0;
-  impl->start_time = 0;
+  impl->started      = false;
+  impl->time         = 0;
+  impl->start_time   = 0;
+  impl->current_time = 0;
 }
 
 bool Timer::IsStarted () const
