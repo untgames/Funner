@@ -11,7 +11,9 @@
 
 #include <common/component.h>
 #include <common/property_map.h>
+#include <common/strlib.h>
 
+#include <syslib/application.h>
 #include <syslib/screen.h>
 
 #include <render/low_level/device.h>

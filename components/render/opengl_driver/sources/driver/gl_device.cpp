@@ -30,10 +30,29 @@ Device::Device (ISwapChain* swap_chain, const char* init_string)
   properties.AddProperty ("gl_renderer",   context_manager.GetRenderer ());
   properties.AddProperty ("gl_version",    context_manager.GetVersion ());
   properties.AddProperty ("gl_extensions", context_manager.GetExtensions ());
+  
+  stl::string prefix = common::format ("GlDevice%02u.", GetId ());
+  
+  syslib::Application::SetSystemProperty ((prefix + "Vendor").c_str (), context_manager.GetVendor ());
+  syslib::Application::SetSystemProperty ((prefix + "Renderer").c_str (), context_manager.GetRenderer ());
+  syslib::Application::SetSystemProperty ((prefix + "Version").c_str (), context_manager.GetVersion ());
+  syslib::Application::SetSystemProperty ((prefix + "Extensions").c_str (), context_manager.GetExtensions ());
 }
 
 Device::~Device ()
 {
+  try
+  {
+    stl::string prefix = common::format ("GlDevice%02u.", GetId ());
+    
+    syslib::Application::RemoveSystemProperty ((prefix + "Vendor").c_str ());
+    syslib::Application::RemoveSystemProperty ((prefix + "Renderer").c_str ());
+    syslib::Application::RemoveSystemProperty ((prefix + "Version").c_str ());
+    syslib::Application::RemoveSystemProperty ((prefix + "Extensions").c_str ());
+  }
+  catch (...)
+  {
+  }
 }
 
 /*
