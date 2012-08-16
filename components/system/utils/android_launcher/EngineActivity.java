@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.os.Looper;
 import android.content.ContextWrapper;
 import android.content.pm.ApplicationInfo;
+import android.content.SharedPreferences;
 import android.util.*;
 import android.os.Process;
 import android.os.Build;
@@ -191,7 +192,14 @@ public class EngineActivity extends Activity
   
 /// Получение UUID
   public String getUuid ()
-  {      
+  {
+    SharedPreferences prefs = getSharedPreferences ("default.settings", 0);
+    
+    String uuid = prefs.getString ("UUID", null);
+    
+    if (uuid != null)
+      return uuid;
+    
     String buildString = null;
     
     String androidID = Secure.getString (getContentResolver(), Secure.ANDROID_ID);    
@@ -206,7 +214,15 @@ public class EngineActivity extends Activity
     {
       MessageDigest md = MessageDigest.getInstance ("SHA-1");
       
-      return byteArray2Hex (md.digest (buildString.getBytes ()));
+      uuid = byteArray2Hex (md.digest (buildString.getBytes ()));
+      
+      SharedPreferences.Editor prefsEditor = prefs.edit ();
+      
+      prefsEditor.putString ("UUID", uuid);
+      
+      prefsEditor.commit ();
+      
+      return uuid;
     }
     catch (Exception e)
     {
