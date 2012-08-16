@@ -65,6 +65,7 @@ void bind_application_library (Environment& environment)
   lib.Register ("PostNotification",            make_invoker (&syslib::Application::PostNotification));
   lib.Register ("CreateNotificationHandler",   make_callback_invoker<syslib::Application::NotificationHandler::signature_type> ());
   lib.Register ("RegisterNotificationHandler", make_invoker (&syslib::Application::RegisterNotificationHandler));
+  lib.Register ("get_SystemProperties",        make_invoker (&syslib::Application::SystemProperties));
 }
 
 void set_window_x (Window& window, int x)
