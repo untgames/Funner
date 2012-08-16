@@ -44,7 +44,7 @@ namespace media
 {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Реализация гарнитуры
+///╨хрышчрЎш  урЁэшЄєЁ√
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 struct Font::Impl : public xtl::reference_counter
 {
@@ -53,11 +53,11 @@ struct Font::Impl : public xtl::reference_counter
   typedef xtl::uninitialized_storage<GlyphInfo>      GlyphsArray;
   typedef stl::hash_map<KerningsMapKey, KerningInfo> KerningsMap;
 
-  size_t      first_char_index;  //char-код первого глифа
-  GlyphsArray glyphs;            //глифы
-  stl::string file_name;         //имя файла с содержимым гарнитуры
-  stl::string str_name;          //имя гарнитуры
-  KerningsMap kernings;          //кернинги
+  size_t      first_char_index;  //char-ъюф яхЁтюую уышЇр
+  GlyphsArray glyphs;            //уышЇ√
+  stl::string file_name;         //шь  Їрщыр ё ёюфхЁцшь√ь урЁэшЄєЁ√
+  stl::string str_name;          //шь  урЁэшЄєЁ√
+  KerningsMap kernings;          //ъхЁэшэуш
 };
 
 }
@@ -110,7 +110,7 @@ Font& Font::operator = (const Font& source)
 }
 
 /*
-   Загрузка
+   ╟руЁєчър
 */
 
 void Font::Load (const char* file_name)
@@ -127,7 +127,7 @@ void Font::Load (const char* file_name)
 }
 
 /*
-   Получение/изменение имени шрифта
+   ╧юыєўхэшх/шчьхэхэшх шьхэш °ЁшЇЄр
 */
 
 const char* Font::Name () const
@@ -144,7 +144,7 @@ void Font::Rename (const char* new_name)
 }
 
 /*
-   Получение/изменение имени файла текстуры шрифта
+   ╧юыєўхэшх/шчьхэхэшх шьхэш Їрщыр ЄхъёЄєЁ√ °ЁшЇЄр
 */
 
 void Font::SetImageName (const char* new_image_name)
@@ -161,7 +161,7 @@ const char* Font::ImageName () const
 }
 
 /*
-   Получение/изменение размера таблицы глифов 
+   ╧юыєўхэшх/шчьхэхэшх ЁрчьхЁр ЄрсышЎ√ уышЇют 
 */
 
 void Font::ResizeGlyphsTable (size_t new_glyphs_count)
@@ -175,7 +175,7 @@ size_t Font::GlyphsTableSize () const
 }
 
 /*
-   Получение/изменение кода первого глифа
+   ╧юыєўхэшх/шчьхэхэшх ъюфр яхЁтюую уышЇр
 */
 
 void Font::SetFirstGlyphCode (size_t new_first_glyph_code)
@@ -189,7 +189,7 @@ size_t Font::FirstGlyphCode () const
 }
 
 /*
-   Доступ к данным о глифах
+   ─юёЄєя ъ фрээ√ь ю уышЇрї
 */
 
 const GlyphInfo* Font::Glyphs () const
@@ -203,7 +203,7 @@ GlyphInfo* Font::Glyphs ()
 }
 
 /*
-   Добавление/получение/удаление информации о кёрнингах
+   ─юсртыхэшх/яюыєўхэшх/єфрыхэшх шэЇюЁьрЎшш ю ъ╕Ёэшэурї
 */
 
 void Font::InsertKerning (size_t left_glyph_index, size_t right_glyph_index, const KerningInfo& kerning_info)
@@ -246,7 +246,7 @@ bool Font::HasKerning (size_t left_glyph_index, size_t right_glyph_index) const
 }
 
 /*
-   Сохранение
+   ╤юїЁрэхэшх
 */
 
 void Font::Save (const char* file_name) const
