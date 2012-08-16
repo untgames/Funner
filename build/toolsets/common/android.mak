@@ -96,9 +96,14 @@ DEFAULT_PACKAGE_PREFIX     := com.untgames.
 GDB_SERVER_FLAG_FILE       := $(ROOT)/$(TMP_DIR_SHORT_NAME)/$(CURRENT_TOOLSET)/gdb-installed
 GDB_SERVER_FILE            := $(ABI_DIR)/../gdbserver
 GDB_CLIENT                 := $(GCC_TOOLS_DIR)/$(ANDROID_TOOLCHAIN)-gdb
-BUSYBOX_FILE               := $(BUILD_DIR)platforms/android/busybox
 BUSYBOX_FLAG_FILE          := $(ROOT)/$(TMP_DIR_SHORT_NAME)/$(CURRENT_TOOLSET)/busybox-installed
+DEFAULT_BUSYBOX_PATH       := $(REMOTE_DEBUG_DIR)/busybox
 
+ifeq (,$(BUSYBOX_PATH))
+BUSYBOX_PATH               := $(DEFAULT_BUSYBOX_PATH)
+else
+ROOTED                     := true
+endif
 
 ifneq (,$(filter Win%,$(OS)))
 CYGWIN_BIN                 := /$(subst :,,$(call convert_path,$(CYGHOME)))/bin
@@ -110,8 +115,25 @@ export CYGWIN
 
 endif
 
-
 include $(TOOLSETS_DIR)/g++.mak
+
+ifeq (,$(ROOTED))
+
+define sudo
+su -c '$1'
+endef
+
+else
+
+define sudo
+$1
+endef
+
+endif
+
+define remount
+ $(call sudo,mount -o remount,rw -t vfat /dev/block//vold/179:0 $(SDCARD_DIR))
+endef
 
 ###################################################################################################
 #ѕереопределени€ вызовов утилит
@@ -146,9 +168,9 @@ endef
 # опирование файла на устройство (им€ локальных файлов, им€ удалЄнного каталога)
 define tools.install
  export SUBST_STRING=$$(cd $2 && pwd) SUBST_SUBSTRING=$$(cd $(ROOT) && pwd)/ && export SUBST_RESULT=$${SUBST_STRING/#$$SUBST_SUBSTRING/} && \
- $(ADB) shell "su -c 'mount -o remount,rw -t vfat /dev/block//vold/179:0 $(SDCARD_DIR)'" && \
- $(ADB) shell "export PATH=$(REMOTE_DEBUG_DIR)/busybox:\$\$$PATH && su -c '$(REMOTE_DEBUG_DIR)/busybox mkdir -p $(REMOTE_DEBUG_DIR)/$$(echo $$SUBST_RESULT)'" && \
- $(foreach file,$1, echo -n "Install $(notdir $(file)): " && $(ADB) push $(file) $(REMOTE_DEBUG_DIR)/$$(echo $$SUBST_RESULT) && $(ADB) shell "export PATH=$(REMOTE_DEBUG_DIR)/busybox:\$\$$PATH && su -c '$(REMOTE_DEBUG_DIR)/busybox chmod -R 777 $(REMOTE_DEBUG_DIR)/$$(echo $$SUBST_RESULT)'" && ) true
+ $(ADB) shell "$(call remount)" && \
+ $(ADB) shell "export PATH=$(BUSYBOX_PATH):\$\$$PATH && $(call sudo,$(BUSYBOX_PATH) mkdir -p $(REMOTE_DEBUG_DIR)/$$(echo $$SUBST_RESULT))" && \
+ $(foreach file,$1, echo -n "Install $(notdir $(file)): " && $(ADB) push $(file) $(REMOTE_DEBUG_DIR)/$$(echo $$SUBST_RESULT) && $(ADB) shell "export PATH=$(BUSYBOX_PATH):\$\$$PATH && $(call sudo,$(BUSYBOX_PATH) chmod -R 777 $(REMOTE_DEBUG_DIR)/$$(echo $$SUBST_RESULT))" && ) true
 endef
 
 #¬ыполнение команды (команда, каталог запуска, дополнительные пути поиска библиотек и приложений, список динамических библиотек)
@@ -158,7 +180,7 @@ define tools.run
  export PATH_SEARCH="$(foreach path,$3,$$(export SUBST_PATH_STRING=$$(cd $(path) && pwd) && echo $(REMOTE_DEBUG_DIR)/$${SUBST_PATH_STRING/#$$ROOT_SUBSTRING/}))" && \
  export PATH_SEARCH=$${PATH_SEARCH/\ /:} && \
  export SUBST_CMD_STRING=$$(cd $(dir $(firstword $1)) && pwd)/$(notdir $(firstword $1)) && export SUBST_COMMAND=$(REMOTE_DEBUG_DIR)/$${SUBST_CMD_STRING/#$$ROOT_SUBSTRING/} && \
- $(ADB) shell "su -c 'mount -o remount,rw -t vfat /dev/block//vold/179:0 $(SDCARD_DIR)' && export OLDPATH=\$\$$PATH:\.:$$PATH_SEARCH && export PATH=$(REMOTE_DEBUG_DIR)/busybox:\$\$$PATH && export LD_LIBRARY_PATH=\$\$$LD_LIBRARY_PATH:\.:$$PATH_SEARCH && $(REMOTE_DEBUG_DIR)/busybox mkdir -p $$(echo $$SUBST_DIR_RESULT) && cd $$(echo $$SUBST_DIR_RESULT) && $$(echo $$SUBST_COMMAND) $(subst $(firstword $1),,$1)" | sed "s/.$$//"
+ $(ADB) shell "$(call remount)" && $(ADB) shell "export OLDPATH=\$\$$PATH:\.:$$PATH_SEARCH && export PATH=$(BUSYBOX_PATH):\$\$$PATH && export LD_LIBRARY_PATH=\$\$$LD_LIBRARY_PATH:\.:$$PATH_SEARCH && $(BUSYBOX_PATH) mkdir -p $$(echo $$SUBST_DIR_RESULT) && cd $$(echo $$SUBST_DIR_RESULT) && $$(echo $$SUBST_COMMAND) $(subst $(firstword $1),,$1)" | sed "s/.$$//"
 endef
 
 #¬ыполнение команды из пакета (команда, каталог запуска, дополнительные пути поиска библиотек и приложений, список динамических библиотек)
@@ -169,9 +191,9 @@ define tools.run.android_package
  export DLLS=$${DLLS/\ /:} && \
  export SUBST_CMD_STRING=$$(cd $(dir $(firstword $1)) && pwd)/$(notdir $(firstword $1)) && export SUBST_COMMAND=$(REMOTE_DEBUG_DIR)/$${SUBST_CMD_STRING/#$$ROOT_SUBSTRING/} && \
  export OLD_APP_PID=`$(ADB) shell ps | grep $(DEFAULT_PACKAGE_PREFIX)funner.application | awk '{print $$2}'` && \
- $(ADB) shell "su -c 'kill $$OLD_APP_PID'" && \
+ $(ADB) shell "$(call sudo,kill $$OLD_APP_PID)" && \
  $(ADB) shell logcat -c && \
- $(ADB) shell "su -c 'mount -o remount,rw -t vfat /dev/block//vold/179:0 $(SDCARD_DIR)' && $(REMOTE_DEBUG_DIR)/busybox mkdir -p $$(echo $$SUBST_DIR_RESULT) && cd $$(echo $$SUBST_DIR_RESULT) && am start -a android.intent.action.VIEW -c android.intent.category.LAUNCHER -n $(DEFAULT_PACKAGE_PREFIX)funner.application/.EngineActivity -e 'program' '$$(echo $$SUBST_COMMAND)' -e 'workdir' '$$SUBST_DIR_RESULT' -e 'libraries' '$$DLLS' -e 'args' '$(subst $(firstword $1),,$1)'" | sed "s/.$$//" && \
+ $(ADB) shell "$(call remount) && $(BUSYBOX_PATH) mkdir -p $$(echo $$SUBST_DIR_RESULT) && cd $$(echo $$SUBST_DIR_RESULT) && am start -a android.intent.action.VIEW -c android.intent.category.LAUNCHER -n $(DEFAULT_PACKAGE_PREFIX)funner.application/.EngineActivity -e 'program' '$$(echo $$SUBST_COMMAND)' -e 'workdir' '$$SUBST_DIR_RESULT' -e 'libraries' '$$DLLS' -e 'args' '$(subst $(firstword $1),,$1)'" | sed "s/.$$//" && \
  sleep 1 && \
  ( $(ADB) logcat -s -v raw funner:E -v raw funner:I & ) && \
  while $(ADB) shell ps | grep $(DEFAULT_PACKAGE_PREFIX)funner.application; do sleep 1; done > nul
@@ -299,7 +321,7 @@ endif
 		@$(ADB) shell logcat -c				
 		@$(ADB) shell am start -a android.intent.action.VIEW -c android.intent.category.LAUNCHER -n $(DEFAULT_PACKAGE_PREFIX)$$($1.NAME)/.EngineActivity -e "program" "value"
 		@sleep 1
-		@$(ADB) shell "$(REMOTE_DEBUG_DIR)/busybox/sh -c 'while ps | $(REMOTE_DEBUG_DIR)/busybox/grep $(DEFAULT_PACKAGE_PREFIX)$$($1.NAME); do sleep 1; done'" > nul
+		@$(ADB) shell "$(BUSYBOX_PATH)/sh -c 'while ps | $(BUSYBOX_PATH)/grep $(DEFAULT_PACKAGE_PREFIX)$$($1.NAME); do sleep 1; done'" > nul
 		@$(ADB) logcat -s -d -v raw System.out:I -v raw stdout:I
 #		@$(ADB) shell setprop log.redirect-stdio true
 
@@ -341,20 +363,23 @@ define process_target.android-jar
 		
 endef
 
-install: $(GDB_SERVER_FLAG_FILE) $(BUSYBOX_FLAG_FILE)
+#install: $(GDB_SERVER_FLAG_FILE) $(BUSYBOX_FLAG_FILE)
+ifeq ($(REMOTE_DEBUG_DIR)/busybox,$(BUSYBOX_PATH))
+install:  $(BUSYBOX_FLAG_FILE)
+endif
 
 $(GDB_SERVER_FLAG_FILE): $(GDB_SERVER_FILE) $(BUSYBOX_FLAG_FILE)
 	@echo Install gdbserver...
 	@$(ADB) push $(GDB_SERVER_FILE) $(REMOTE_DEBUG_DIR)
-	@$(ADB) shell "su -c 'mount -o remount,rw -t vfat /dev/block//vold/179:0 $(SDCARD_DIR)'"	
-	@$(ADB) shell "su -c '$(REMOTE_DEBUG_DIR)/busybox chmod 777 $(REMOTE_DEBUG_DIR)/$(notdir $(GDB_SERVER_FILE))'"
+	@$(ADB) shell "$(call remount)"
+	@$(ADB) shell "$(call sudo,$(BUSYBOX_PATH) chmod 777 $(REMOTE_DEBUG_DIR)/$(notdir $(GDB_SERVER_FILE)))"
 	@touch $@
 
 $(BUSYBOX_FLAG_FILE): $(BUSYBOX_FILE)
 	@echo Install busybox...
 	@$(ADB) push $(BUSYBOX_FILE) $(REMOTE_DEBUG_DIR)
-	@$(ADB) shell "su -c 'mount -o remount,rw -t vfat /dev/block//vold/179:0 $(SDCARD_DIR)'"
-	@$(ADB) shell "su -c 'chmod 777 $(REMOTE_DEBUG_DIR)/busybox'"
+	@$(ADB) shell "$(call remount)"
+	@$(ADB) shell "$(call sudo,chmod 777 $(BUSYBOX_PATH))"
 	@touch $@
 
 .PHONY: addr2line
