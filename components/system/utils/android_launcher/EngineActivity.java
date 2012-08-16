@@ -14,6 +14,7 @@ import android.os.Build;
 import android.provider.Settings.Secure;
 import java.security.MessageDigest;
 import java.util.Formatter;
+import java.util.Locale;
 import java.io.*;
 
 /// ƒанный класс используетс€ дл€ запуска внешних shared-library
@@ -209,6 +210,10 @@ public class EngineActivity extends Activity
       buildString = Build.BOARD + Build.BRAND + Build.CPU_ABI + Build.DEVICE + Build.DISPLAY + Build.HOST + Build.ID + Build.MANUFACTURER + Build.MODEL + Build.PRODUCT +
         Build.TAGS + Build.TYPE + Build.USER;        
     }
+    else
+    {
+      buildString = androidID;
+    }
 
     try
     {
@@ -228,6 +233,31 @@ public class EngineActivity extends Activity
     {
       return buildString;
     }
+  }
+  
+  public String getSystemProperties ()
+  {
+    String result = "";
+    
+    result += " Board=" + Build.BOARD;
+    result += " Brand=" + Build.BRAND;
+    result += " CPU_ABI=" + Build.CPU_ABI;
+    result += " Device=" + Build.DEVICE;
+    result += " Display=" + Build.DISPLAY;
+    result += " Host=" + Build.HOST;    
+    result += " ID=" + Build.ID;
+    result += " Manufacturer=" + Build.MANUFACTURER;
+    result += " Model=" + Build.MODEL;
+    result += " Product=" + Build.PRODUCT;
+    result += " Tags=" + Build.TAGS;
+    result += " Type=" + Build.TYPE;
+    result += " User=" + Build.USER;
+    result += " OSVersion=" + Build.VERSION.RELEASE;
+    result += " SdkInt=" + Build.VERSION.SDK_INT;
+    result += " Language=" + Locale.getDefault ().getLanguage () + "-" + Locale.getDefault ().getCountry ();
+    result += " UUID=" + getUuid ();
+    
+    return result;
   }
   
   private static String byteArray2Hex (final byte[] hash) 

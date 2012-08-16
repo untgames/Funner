@@ -306,6 +306,38 @@ void AndroidApplicationManager::OpenUrl (const char* url)
   throw xtl::make_not_implemented_exception ("syslib::AndroidApplicationManager::OpenUrl");
 }
 
+/*
+    Получение системных свойств
+*/
+
+void AndroidApplicationManager::GetSystemProperties (common::PropertyMap& properties)
+{
+  try
+  {
+    local_ref<jobject> activity (get_activity (), false); 
+    local_ref<jclass>  activity_class (get_env ().GetObjectClass (get_activity ()), false);
+
+    if (!activity_class)
+      throw xtl::format_operation_exception ("", "JNIEnv::GetObjectClass failed");
+
+    jmethodID get_system_properties_method = find_method (&get_env (), activity_class.get (), "getSystemProperties", "()Ljava/lang/String;");
+
+    stl::string properties_line = tostring ((jstring)get_env ().CallObjectMethod (activity.get (), get_system_properties_method));
+
+    common::PropertyMap android_properties = common::parse_init_string (properties_line.c_str ());
+
+    properties.SetProperty ("OS", "android");
+
+    for (size_t i=0, count=android_properties.Size (); i<count; i++)
+      properties.SetProperty (android_properties.PropertyName (i), android_properties.GetString (i));    
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("syslib::AndroidApplicationManager::GetSystemProperties");
+    throw;
+  }
+}
+
 namespace syslib
 {
 
