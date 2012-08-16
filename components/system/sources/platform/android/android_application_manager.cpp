@@ -329,7 +329,7 @@ void AndroidApplicationManager::GetSystemProperties (common::PropertyMap& proper
     properties.SetProperty ("OS", "android");
 
     for (size_t i=0, count=android_properties.Size (); i<count; i++)
-      properties.SetProperty (android_properties.PropertyName (i), android_properties.GetString (i));    
+      properties.SetProperty (android_properties.PropertyName (i), android_properties.GetString (i));
   }
   catch (xtl::exception& e)
   {

@@ -30,7 +30,14 @@ public class EngineActivity extends Activity
     
     if (isLoaded)
       return;
-
+      
+    isLoaded = true;      
+      
+    startApplication ();    
+  }        
+  
+  void startApplication ()
+  {
       /// получение параметров запуска
 
     Bundle extras = getIntent ().getExtras ();
@@ -105,10 +112,10 @@ public class EngineActivity extends Activity
       }              
 
       if (programName != "")
-        System.load (programName);
-
+        System.load (programName);        
+        
       if (startApplication (programName, workDir, programArgs != null ? programArgs : "", envVars) == 0)
-        System.exit (0);              
+        System.exit (0);        
     }    
     catch (Throwable e)
     {
@@ -116,11 +123,9 @@ public class EngineActivity extends Activity
       e.printStackTrace ();
       
       System.exit (0);
-    }           
-    
-    isLoaded = true;
-  }  
-  
+    }                   
+  }
+
 ///Приостановка приложения  
   @Override
   public void onPause ()

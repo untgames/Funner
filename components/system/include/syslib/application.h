@@ -101,7 +101,9 @@ class Application
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Получение платформо-зависимых системных свойств
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    static common::PropertyMap SystemProperties ();
+    static common::PropertyMap SystemProperties     ();
+    static void                SetSystemProperty    (const char* name, const char* value);
+    static void                RemoveSystemProperty (const char* name);
 };
 
 }

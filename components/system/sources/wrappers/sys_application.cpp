@@ -165,10 +165,13 @@ class ApplicationImpl: private IApplicationListener
     {
       notification_signal (notification);
     }
+    
+///Подписка на событие обновления системных свойств   
+    PropertyMap& CustomProperties () { return custom_properties; }
 
   private:
-    typedef xtl::signal<void ()>            ApplicationSignal;
-    typedef xtl::signal<void (const char*)> NotificationSignal;
+    typedef xtl::signal<void ()>             ApplicationSignal;
+    typedef xtl::signal<void (const char*)>  NotificationSignal;
     
 ///Оповещение о возникновении события
     void Notify (ApplicationEvent event)
@@ -355,14 +358,15 @@ class ApplicationImpl: private IApplicationListener
     }
 
   private:
-    DelegatePtr          current_delegate;               //текущий делегат приложения        
-    ApplicationSignal    signals [ApplicationEvent_Num]; //сигналы приложения
-    NotificationSignal   notification_signal;            //сигнал сообщений
-    int                  exit_code;                      //код завершения приложения
-    bool                 is_exit_detected;               //получен сигнал завершения приложения
-    size_t               message_loop_count;             //количество вхождений в обработчик очереди сообщений
-    xtl::auto_connection on_push_action;                 //в очередь добавлено действие
-    size_t               main_thread_id;                 //идентификатор главной нити
+    DelegatePtr             current_delegate;               //текущий делегат приложения        
+    ApplicationSignal       signals [ApplicationEvent_Num]; //сигналы приложения
+    NotificationSignal      notification_signal;            //сигнал сообщений
+    PropertyMap             custom_properties;              //пользовательские свойства
+    int                     exit_code;                      //код завершения приложения
+    bool                    is_exit_detected;               //получен сигнал завершения приложения
+    size_t                  message_loop_count;             //количество вхождений в обработчик очереди сообщений
+    xtl::auto_connection    on_push_action;                 //в очередь добавлено действие
+    size_t                  main_thread_id;                 //идентификатор главной нити    
 };
 
 typedef Singleton<ApplicationImpl> ApplicationSingleton;
@@ -540,12 +544,52 @@ common::PropertyMap Application::SystemProperties ()
     common::PropertyMap properties;
     
     Platform::GetSystemProperties (properties);
-    
+
+    ApplicationSingleton::Instance instance;
+
+    PropertyMap& custom_properties = instance->CustomProperties ();
+
+    for (size_t i=0, count=custom_properties.Size (); i<count; i++)
+      properties.SetProperty (custom_properties.PropertyName (i), custom_properties.GetString (i));
+
     return properties;
   }
   catch (xtl::exception& exception)
   {
     exception.touch ("syslib::Application::SystemProperties");
     throw;
+  }
+}
+
+void Application::SetSystemProperty (const char* name, const char* value)
+{
+  try
+  {
+    ApplicationSingleton::Instance instance;
+    
+    PropertyMap& custom_properties = instance->CustomProperties ();
+    
+    custom_properties.SetProperty (name, value);
+  }
+  catch (xtl::exception& exception)
+  {
+    exception.touch ("syslib::Application::SetSystemProperty");
+    throw;
+  }
+}
+
+void Application::RemoveSystemProperty (const char* name)
+{
+  try
+  {
+    ApplicationSingleton::Instance instance;
+    
+    PropertyMap& custom_properties = instance->CustomProperties ();
+    
+    custom_properties.RemoveProperty (name);
+  }
+  catch (...)
+  {
+    //подавление всех исключений
   }
 }
