@@ -123,17 +123,21 @@ define sudo
 su -c '$1'
 endef
 
+define remount
+ su -c 'mount -o remount,rw -t vfat /dev/block//vold/179:0 $(SDCARD_DIR)'
+endef
+
 else
 
 define sudo
 $1
 endef
 
-endif
-
 define remount
- $(call sudo,mount -o remount,rw -t vfat /dev/block//vold/179:0 $(SDCARD_DIR))
+ mount -o remount,rw -t vfat /dev/block//vold/179:0 $(SDCARD_DIR)
 endef
+
+endif
 
 ###################################################################################################
 #Переопределения вызовов утилит
