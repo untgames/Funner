@@ -433,7 +433,7 @@ int main (int argc, const char* argv [])
     if (params.print_help)
       return 0;
 
-    if (command_line.ParamsCount () != 1)
+    if (command_line.ParamsCount () < 1)
     {
       printf ("%s [<OPTIONS>] <SOURCE>\n  use: %s --help\n", argv [0], argv [0]);
       error ("no input file");
