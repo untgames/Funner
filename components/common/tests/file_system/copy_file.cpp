@@ -11,6 +11,7 @@ int main ()
   try
   {
     FileSystem::CopyFile ("data/test.txt", "/io/stdout");
+    printf ("\n");
   }
   catch (std::exception& exception)
   {

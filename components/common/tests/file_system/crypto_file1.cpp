@@ -56,6 +56,8 @@ int main ()
     in_file.Close ();    
 
     FileSystem::Remove (CRYPTO_FILE_NAME);
+    
+    printf ("\n");
   }
   catch (std::exception& exception)
   {

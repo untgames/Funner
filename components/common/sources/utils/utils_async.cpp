@@ -10,10 +10,22 @@
 #include <common/action_queue.h>
 #include <common/async.h>
 #include <common/lockable.h>
+#include <common/log.h>
 
 #include <platform/platform.h>
 
 using namespace common;
+
+namespace
+{
+
+/*
+     онстанты
+*/
+
+const char* LOG_NAME = "common.async_result"; //поток отладочного протоколировани€
+
+}
 
 /*
 ===================================================================================================
@@ -137,9 +149,14 @@ struct AsyncResult::Impl: public xtl::reference_counter, public Lockable
       tmp_result    = async_action->Perform ();      
       tmp_completed = tmp_result && tmp_result->IsValid ();
     }
+    catch (std::exception& e)
+    {
+      Log (LOG_NAME).Printf ("%s\n    at common::AsyncResult::Impl::Perform", e.what ());
+    }
     catch (...)
     {
-    }        
+      Log (LOG_NAME).Printf ("unknown exception\n    at common::AsyncResult::Impl::Perform");
+    }
     
     action = Action ();
     
@@ -164,9 +181,14 @@ struct AsyncResult::Impl: public xtl::reference_counter, public Lockable
 
         tmp_callback (async_result);
       }
+      catch (std::exception& e)
+      {
+        Log (LOG_NAME).Printf ("%s\n    at common::AsyncResult::Impl::Perform", e.what ());
+      }
       catch (...)
       {
-      }
+        Log (LOG_NAME).Printf ("unknown exception\n    at common::AsyncResult::Impl::Perform"); 
+      }      
     }
   }
 };
