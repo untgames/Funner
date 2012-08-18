@@ -13,10 +13,12 @@ NETWORK.SOURCES.win32.SOURCE_DIRS  := sources/platform/win32 sources/platform/cu
 NETWORK.SOURCES.macosx.SOURCE_DIRS := sources/platform/curl
 NETWORK.SOURCES.iphone.SOURCE_DIRS := sources/platform/curl
 NETWORK.SOURCES.tabletos.SOURCE_DIRS := sources/platform/curl
+NETWORK.SOURCES.android.SOURCE_DIRS := sources/platform/curl
 NETWORK.SOURCES.IMPORTS            := compile.network compile.system compile.common
 NETWORK.SOURCES.win32.IMPORTS      := compile.extern.curl
 NETWORK.SOURCES.macosx.IMPORTS     := compile.extern.curl
 NETWORK.SOURCES.iphone.IMPORTS     := compile.extern.curl
+NETWORK.SOURCES.android.IMPORTS    := compile.extern.curl
 NETWORK.SOURCES.tabletos.IMPORTS   := compile.extern.curl
 
 #Öåëü ¹2 - System library tests
