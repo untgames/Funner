@@ -12,7 +12,7 @@ ifeq (,$(filter iphone,$(PROFILES)))
   FUNNER_EXTERN_LIBS.x86.COMPONENTS := geekinfo
 endif
 
-ifeq (,$(filter beagleboard,$(PROFILES))$(filter android,$(PROFILES))$(filter webos,$(PROFILES)))
+ifeq (,$(filter beagleboard,$(PROFILES))$(filter webos,$(PROFILES)))
   FUNNER_EXTERN_LIBS.COMPONENTS += curl
 endif
 

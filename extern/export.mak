@@ -2,7 +2,7 @@ COMPONENT_DIRS := zlib zzip jpeg tiff libpng devil libpsd gles_win32 gles_wince 
                   vorbisfile theora lua luajit firebreath mongoose beagleboard openalsdk shiny meego \
                   wcecompat libffi libiconv pthreads_wince openssl qualcomm_texture_converter lib64
 
-ifeq (,$(filter android,$(PROFILES))$(filter beagleboard,$(PROFILES))$(filter android,$(PROFILES)))
+ifeq (,$(filter beagleboard,$(PROFILES)))
   COMPONENT_DIRS += curl
 endif
 

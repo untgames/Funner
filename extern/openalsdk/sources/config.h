@@ -256,7 +256,7 @@
 /* Define if we have pthread_setschedparam() */
 //#define HAVE_PTHREAD_SETSCHEDPARAM
 
-#elif defined (ANDROID)
+#elif defined (ANDROID) && (defined (ARM) || defined (X86))
 
 /* Define if we have the Android backend */
 #define HAVE_ANDROID 1
