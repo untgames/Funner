@@ -1,0 +1,11 @@
+Results of background_copy_file_test:
+Status:      'Started' / ''
+File size:    13
+Bytes copied: 0
+Hello world!
+Status:      'InProgress' / ''
+File size:    13
+Bytes copied: 13
+Status:      'Finished' / ''
+File size:    13
+Bytes copied: 13

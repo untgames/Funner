@@ -10,6 +10,7 @@
 #include <xtl/function.h>
 #include <xtl/uninitialized_storage.h>
 
+#include <common/action_queue.h>
 #include <common/file.h>
 #include <common/log.h>
 #include <common/strlib.h>

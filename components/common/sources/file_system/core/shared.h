@@ -17,6 +17,7 @@
 #include <xtl/string.h>
 #include <xtl/uninitialized_storage.h>
 
+#include <common/action_queue.h>
 #include <common/component.h>
 #include <common/crypto.h>
 #include <common/file.h>
