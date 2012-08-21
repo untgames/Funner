@@ -22,6 +22,7 @@
 #include <common/crypto.h>
 #include <common/file.h>
 #include <common/hash.h>
+#include <common/lockable.h>
 #include <common/singleton.h>
 #include <common/strlib.h>
 

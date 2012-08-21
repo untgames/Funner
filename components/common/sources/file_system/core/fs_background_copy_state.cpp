@@ -14,10 +14,10 @@ struct BackgroundCopyState::Impl : public xtl::reference_counter
   stl::string               error;
 
   Impl ()
-    : file_size (0)
-    , bytes_copied (0)
+    : file_size ()
+    , bytes_copied ()
     , status (BackgroundCopyStateStatus_Started)
-    {}
+    {}    
 };
 
 /*
@@ -26,7 +26,13 @@ struct BackgroundCopyState::Impl : public xtl::reference_counter
 
 BackgroundCopyState::BackgroundCopyState ()
   : impl (new Impl)
-{}
+{
+}
+
+BackgroundCopyState::BackgroundCopyState (Impl* in_impl)
+  : impl (in_impl)
+{
+}
 
 BackgroundCopyState::BackgroundCopyState (const BackgroundCopyState& source)
   : impl (source.impl)
@@ -41,12 +47,18 @@ BackgroundCopyState::~BackgroundCopyState ()
 
 BackgroundCopyState& BackgroundCopyState::operator = (const BackgroundCopyState& source)
 {
-  addref (source.impl);
-  release (impl);
-
-  impl = source.impl;
+  BackgroundCopyState (source).Swap (*this);
 
   return *this;
+}
+
+/*
+    Клонирование
+*/
+
+BackgroundCopyState BackgroundCopyState::Clone () const
+{
+  return BackgroundCopyState (new Impl (*impl));
 }
 
 /*
@@ -106,4 +118,23 @@ void BackgroundCopyState::SetStatusText (const char* error)
 const char* BackgroundCopyState::StatusText () const
 {
   return impl->error.c_str ();
+}
+
+/*
+    Обмен
+*/
+
+void BackgroundCopyState::Swap (BackgroundCopyState& state)
+{
+  stl::swap (impl, state.impl);
+}
+
+namespace common
+{
+
+void swap (BackgroundCopyState& state1, BackgroundCopyState& state2)
+{
+  state1.Swap (state2);
+}
+
 }
