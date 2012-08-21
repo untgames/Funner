@@ -9,11 +9,12 @@
 
 #include <stl/string_fwd>
 
+#include <common/action_queue.h>
+
 namespace common
 {
 
 //implementation forwards
-class Action;
 class FileImpl;
 class FileList;
 class FileListImpl;
@@ -500,7 +501,7 @@ enum BackgroundCopyStateStatus
   BackgroundCopyStateStatus_Started,      //Копирование началось
   BackgroundCopyStateStatus_InProgress,   //Копирование в процессе
   BackgroundCopyStateStatus_Finished,     //Копирование успешно завершено
-  BackgroundCopyStateStatus_Cancelled,    //Копирование отменено
+  BackgroundCopyStateStatus_Canceled,     //Копирование отменено
   BackgroundCopyStateStatus_Failed        //Произошла ошибка во время копирования
 };
 
@@ -636,12 +637,12 @@ class FileSystem
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Копирование файла
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    static void        CopyFile           (const char* source_file_name, const char* destination_file_name, size_t buffer_size = 0);
-    static stl::string CopyToTempFile     (const char* source_file_name);
+    static void        CopyFile       (const char* source_file_name, const char* destination_file_name, size_t buffer_size = 0);
+    static stl::string CopyToTempFile (const char* source_file_name);
 
     typedef xtl::function<void (const BackgroundCopyState&)> BackgroundCopyFileCallback;
 
-    static Action BackgroundCopyFile (const char* source_file_name, const char* destination_file_name, const BackgroundCopyFileCallback& callback, size_t buffer_size = 0);
+    static Action BackgroundCopyFile (const char* source_file_name, const char* destination_file_name, const BackgroundCopyFileCallback& callback, ActionThread thread, size_t buffer_size = 0);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Информация о файле

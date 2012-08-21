@@ -14,7 +14,9 @@ namespace
     Константы (имена библиотек)
 */
 
-const char* COMMON_FILE_LIBRARY = "Common.File";
+const char* COMMON_BACKGROUND_COPY_STATE_LIBRARY               = "Common.BackgroundCopyState";
+const char* COMMON_STATIC_BACKGROUND_COPY_STATE_STATUS_LIBRARY = "Common.BackgroundCopyStateStatus";
+const char* COMMON_FILE_LIBRARY                                = "Common.File";
 
 /*
     Регистрация библиотек
@@ -176,6 +178,33 @@ stl::string file_hash (const char* file_name)
 namespace engine
 {
 
+void bind_static_background_copy_state_library (Environment& environment)
+{
+  InvokerRegistry background_copy_state_status_lib = environment.CreateLibrary (COMMON_STATIC_BACKGROUND_COPY_STATE_STATUS_LIBRARY);
+
+  background_copy_state_status_lib.Register ("get_Started",    make_const (BackgroundCopyStateStatus_Started));
+  background_copy_state_status_lib.Register ("get_InProgress", make_const (BackgroundCopyStateStatus_InProgress));
+  background_copy_state_status_lib.Register ("get_Finished",   make_const (BackgroundCopyStateStatus_Finished));
+  background_copy_state_status_lib.Register ("get_Canceled",   make_const (BackgroundCopyStateStatus_Canceled));
+  background_copy_state_status_lib.Register ("get_Failed",     make_const (BackgroundCopyStateStatus_Failed));
+
+  environment.RegisterType<BackgroundCopyStateStatus> (COMMON_STATIC_BACKGROUND_COPY_STATE_STATUS_LIBRARY);
+}
+
+void bind_common_background_copy_state (script::Environment& environment)
+{
+  InvokerRegistry lib = environment.CreateLibrary (COMMON_BACKGROUND_COPY_STATE_LIBRARY);
+
+  bind_static_background_copy_state_library (environment);
+
+  lib.Register ("get_BytesCopied", make_invoker (&BackgroundCopyState::BytesCopied));
+  lib.Register ("get_FileSize",    make_invoker (&BackgroundCopyState::FileSize));
+  lib.Register ("get_Status",      make_invoker (&BackgroundCopyState::Status));
+  lib.Register ("get_StatusText",  make_invoker (&BackgroundCopyState::StatusText));
+
+  environment.RegisterType<BackgroundCopyState> (COMMON_BACKGROUND_COPY_STATE_LIBRARY);
+}
+
 void bind_common_file_library (Environment& environment)
 {
   InvokerRegistry lib = environment.CreateLibrary (COMMON_FILE_LIBRARY);
@@ -186,12 +215,16 @@ void bind_common_file_library (Environment& environment)
   lib.Register ("LoadString",          make_invoker (implicit_cast<stl::string (*)(const char*)> (&FileSystem::LoadTextFile)));
   lib.Register ("LoadStringFilterOut", make_invoker (&load_string_filter_out));
   lib.Register ("PostString",          make_invoker (&post_string));
-  lib.Register ("AsyncLoadString",     make_invoker (&async_load_string));  
+  lib.Register ("AsyncLoadString",     make_invoker (&async_load_string));
   lib.Register ("AsyncPostString",     make_invoker (&async_post_string));
   lib.Register ("IsFileExist",         make_invoker (&FileSystem::IsFileExist));
   lib.Register ("RemoveSearchPath",    make_invoker (&remove_search_path));
-  
-  lib.Register ("CreateAsyncLoadHandler", make_callback_invoker<AsyncLoadCallback::CallbackHandler::signature_type> ());  
+  lib.Register ("BackgroundCopyFile",  make_invoker (
+    make_invoker<Action (const char*, const char*, const FileSystem::BackgroundCopyFileCallback&, size_t)> (xtl::bind (&FileSystem::BackgroundCopyFile, _1, _2, _3, ActionThread_Main, _4)),
+    make_invoker<Action (const char*, const char*, const FileSystem::BackgroundCopyFileCallback&)> (xtl::bind (&FileSystem::BackgroundCopyFile, _1, _2, _3, ActionThread_Main, 0))));
+
+  lib.Register ("CreateAsyncLoadHandler",           make_callback_invoker<AsyncLoadCallback::CallbackHandler::signature_type> ());
+  lib.Register ("CreateBackgroundCopyFileCallback", make_callback_invoker<FileSystem::BackgroundCopyFileCallback::signature_type> ());
 }
 
 }

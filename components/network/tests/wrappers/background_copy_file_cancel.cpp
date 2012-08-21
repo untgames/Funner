@@ -13,7 +13,7 @@ void callback (const BackgroundCopyState& copy_state)
     case BackgroundCopyStateStatus_Started:    status = "Started";    break;
     case BackgroundCopyStateStatus_InProgress: status = "InProgress"; break;
     case BackgroundCopyStateStatus_Finished:   status = "Finished";   break;
-    case BackgroundCopyStateStatus_Cancelled:  status = "Cancelled";  break;
+    case BackgroundCopyStateStatus_Canceled:   status = "Canceled";   break;
     case BackgroundCopyStateStatus_Failed:     status = "Failed";     break;
     default:                                   status = "Unknown";    break;
   }
@@ -25,7 +25,7 @@ void callback (const BackgroundCopyState& copy_state)
   if (copy_state.BytesCopied () > 5)
     action.Cancel ();
 
-  if (copy_state.Status () == BackgroundCopyStateStatus_Finished || copy_state.Status () == BackgroundCopyStateStatus_Cancelled)
+  if (copy_state.Status () == BackgroundCopyStateStatus_Finished || copy_state.Status () == BackgroundCopyStateStatus_Canceled)
     syslib::Application::Exit (0);
   if (copy_state.Status () == BackgroundCopyStateStatus_Failed)
     syslib::Application::Exit (1);
@@ -41,7 +41,7 @@ int main ()
 
     stl::string source_file_path = common::format ("http://localhost:%u/test.txt", SERVER_PORT);
 
-    action = FileSystem::BackgroundCopyFile (source_file_path.c_str (), "data/result.txt", &callback, 1);
+    action = FileSystem::BackgroundCopyFile (source_file_path.c_str (), "data/result.txt", &callback, ActionThread_Background, 1);
 
     syslib::Application::Run ();
   }

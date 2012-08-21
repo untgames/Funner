@@ -11,7 +11,15 @@ const char*  FILE_SYSTEM_ADDONS_MASK              = "common.file_systems.*"; //м
 const char*  ANONYMOUS_FILES_PREFIX               = "/anonymous";            //префикс имён анонимных файлов
 const size_t MAX_SYMBOLIC_LINKS_REPLACEMENT_COUNT = 64;                      //максимальное количество подстановок символьных ссылок
 
-void background_copy_file_impl (Action& action, const char* source_file_name, const char* destination_file_name, const FileSystem::BackgroundCopyFileCallback& callback, size_t buffer_size)
+void background_copy_file_notify (const FileSystem::BackgroundCopyFileCallback& callback, ActionThread thread, const BackgroundCopyState& copy_state)
+{
+  if (thread == ActionThread_Background)
+    callback (copy_state);
+  else
+    ActionQueue::PushAction (xtl::bind (callback, copy_state.Clone ()), ActionThread_Main);
+}
+
+void background_copy_file_impl (Action& action, const char* source_file_name, const char* destination_file_name, const FileSystem::BackgroundCopyFileCallback& callback, ActionThread thread, size_t buffer_size)
 {
   BackgroundCopyState copy_state;
 
@@ -28,7 +36,7 @@ void background_copy_file_impl (Action& action, const char* source_file_name, co
     copy_state.SetStatus (BackgroundCopyStateStatus_Started);
     copy_state.SetFileSize (input_file.Size ());
 
-    callback (copy_state);
+    background_copy_file_notify (callback, thread, copy_state);
 
     copy_state.SetStatus (BackgroundCopyStateStatus_InProgress);
 
@@ -41,8 +49,8 @@ void background_copy_file_impl (Action& action, const char* source_file_name, co
         output_file.Close ();
         FileSystem::Remove (destination_file_name);
 
-        copy_state.SetStatus (BackgroundCopyStateStatus_Cancelled);
-        callback (copy_state);
+        copy_state.SetStatus (BackgroundCopyStateStatus_Canceled);
+        background_copy_file_notify (callback, thread, copy_state);
 
         return;
       }
@@ -57,27 +65,27 @@ void background_copy_file_impl (Action& action, const char* source_file_name, co
       bytes_copied += read_size;
 
       copy_state.SetBytesCopied (bytes_copied);
-      callback (copy_state);
+      background_copy_file_notify (callback, thread, copy_state);
     }
 
     if (!input_file.Eof ())
       throw xtl::format_operation_exception ("", "Internal error: can't read input file");
 
     copy_state.SetStatus (BackgroundCopyStateStatus_Finished);
-    callback (copy_state);
+    background_copy_file_notify (callback, thread, copy_state);
   }
   catch (xtl::exception& e)
   {
     copy_state.SetStatus (BackgroundCopyStateStatus_Failed);
     copy_state.SetStatusText (e.what ());
-    callback (copy_state);
+    background_copy_file_notify (callback, thread, copy_state);
     throw;
   }
   catch (...)
   {
     copy_state.SetStatus (BackgroundCopyStateStatus_Failed);
     copy_state.SetStatusText ("Unknown exception");
-    callback (copy_state);
+    background_copy_file_notify (callback, thread, copy_state);
     throw;
   }
 }
@@ -1546,7 +1554,7 @@ void FileSystem::CopyFile (const char* source_file_name, const char* destination
   }
 }
 
-Action FileSystem::BackgroundCopyFile (const char* source_file_name, const char* destination_file_name, const BackgroundCopyFileCallback& callback, size_t buffer_size)
+Action FileSystem::BackgroundCopyFile (const char* source_file_name, const char* destination_file_name, const BackgroundCopyFileCallback& callback, ActionThread thread, size_t buffer_size)
 {
   if (!source_file_name)
     throw xtl::make_null_argument_exception ("", "source_file_name");
@@ -1560,5 +1568,5 @@ Action FileSystem::BackgroundCopyFile (const char* source_file_name, const char*
   if (!buffer_size)
     buffer_size = 4096;
 
-  return ActionQueue::PushAction (xtl::bind (&background_copy_file_impl, _1, source_file_name, destination_file_name, callback, buffer_size), ActionThread_Background);
+  return ActionQueue::PushAction (xtl::bind (&background_copy_file_impl, _1, source_file_name, destination_file_name, callback, thread, buffer_size), ActionThread_Background);
 }

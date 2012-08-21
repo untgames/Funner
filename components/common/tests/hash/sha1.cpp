@@ -15,7 +15,7 @@ int main ()
 
   printf ("hash = ");
 
-  for (int i=0;i<sizeof(digest);i++)
+  for (size_t i=0;i<sizeof(digest);i++)
     printf ("%02x",digest [i]);
 
   printf ("\n");

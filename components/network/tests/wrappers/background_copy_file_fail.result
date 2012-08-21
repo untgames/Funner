@@ -1,0 +1,6 @@
+Results of background_copy_file_test:
+Status:      'Failed' / 'File 'error_path/error.txt' not found
+    at common::StdioFileSystem::FileOpen
+    at common::FileSystemImpl::OpenFile()'
+File size:    0
+Bytes copied: 0
