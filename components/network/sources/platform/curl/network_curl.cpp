@@ -92,6 +92,7 @@ class CurlStream: public IUrlStream
       , content_encoding ("UTF-8")
       , content_length (0)
       , headers_received (false)
+      , status ("Waiting for headers...")
     {
       try
       {
@@ -115,7 +116,7 @@ class CurlStream: public IUrlStream
       if (stream)
         curl_easy_cleanup (stream);
     }
-    
+            
 ///Параметры потока
     size_t GetContentLength ()
     {
@@ -143,6 +144,15 @@ class CurlStream: public IUrlStream
 
       return content_type.c_str ();
     }
+
+    const char* GetStatus ()
+    {
+      syslib::Lock lock (mutex);
+      
+      WaitHeaders ();
+
+      return status.c_str ();
+    }        
     
   private:
 ///Ожидание заголовков
@@ -169,6 +179,8 @@ class CurlStream: public IUrlStream
         try
         {
             //общая часть конфигурации соединения
+            
+          log.Printf ("URL request '%s'", url.c_str ());
           
           check_code (curl_easy_setopt (stream, CURLOPT_URL, url.c_str ()), "::curl_easy_setopt(CURLOPT_URL)");
           check_code (curl_easy_setopt (stream, CURLOPT_WRITEFUNCTION, &WriteDataCallback), "::curl_easy_setopt(CURLOPT_WRITEFUNCTION)");
@@ -287,6 +299,21 @@ class CurlStream: public IUrlStream
           }
             
           content_length = atoi (tokens [1]);
+        }
+        else if (common::wcimatch (str.c_str (), "HTTP/*"))
+        {
+          common::StringArray tokens = common::parse (str.c_str (), "HTTP/[^ ]* (.*)");
+          
+          if (tokens.Size () != 2)
+          {
+            log.Printf ("Bad HTTP header for URL '%s' (header='%s')", url.c_str (), str.c_str ());
+            return size;
+          }
+          
+          status = tokens [1];
+          
+          if (!strncmp (status.c_str (), "200", 3))
+            status = "Ok";
         }
 
         return size;
@@ -415,10 +442,10 @@ class CurlStream: public IUrlStream
             log.Printf ("%s", GetDebugMessage (data, size).c_str ());
             break;
           case CURLINFO_HEADER_OUT:
-            log.Printf ("Send header '%s' (URL='%s')", GetDebugMessage (data, size).c_str (), url.c_str ());
+//            log.Printf ("Send header '%s' (URL='%s')", GetDebugMessage (data, size).c_str (), url.c_str ());
             break;
           case CURLINFO_DATA_OUT:
-            log.Printf ("Send data (URL='%s')", url.c_str ());
+//            log.Printf ("Send data (URL='%s')", url.c_str ());
             break;
           case CURLINFO_SSL_DATA_OUT:
 //            log.Printf ("Send SSL data (URL='%s')", url.c_str ());
@@ -427,7 +454,7 @@ class CurlStream: public IUrlStream
             log.Printf ("Receive header '%s' (URL='%s')", GetDebugMessage (data, size).c_str (), url.c_str ());
             break;
           case CURLINFO_DATA_IN:
-            log.Printf ("Receive data (URL='%s')", url.c_str ());
+//            log.Printf ("Receive data (URL='%s')", url.c_str ());
             break;
           case CURLINFO_SSL_DATA_IN:
 //            log.Printf ("Receive SSL data (URL='%s')", url.c_str ());
@@ -452,6 +479,7 @@ class CurlStream: public IUrlStream
     stl::auto_ptr<syslib::Thread> thread;            //нить
     stl::string                   content_type;      //тип контента
     stl::string                   content_encoding;  //тип кодировки контента
+    stl::string                   status;            //статус
     size_t                        content_length;    //длина контента
     bool                          headers_received;  //заголовки приняты
     syslib::Condition             headers_condition; //событие ожидания заголовков

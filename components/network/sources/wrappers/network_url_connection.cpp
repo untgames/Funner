@@ -188,6 +188,7 @@ struct UrlConnection::Impl: public xtl::reference_counter, public IUrlStream::IL
   syslib::Mutex             mutex;            //блокировка соединения
   network::Url              url;              //URL ресурса
   stl::auto_ptr<IUrlStream> stream;           //поток URL данных
+  stl::string               status;           //статус
   stl::string               content_type;     //тип контента
   stl::string               content_encoding; //кодировка
   size_t                    content_length;   //длина контента
@@ -235,15 +236,23 @@ struct UrlConnection::Impl: public xtl::reference_counter, public IUrlStream::IL
 ///Получение заголовков
   void ReceiveHeaders ()
   {
-    syslib::Lock lock (mutex);
-    
-    if (recv_headers)
-      return;
-    
-    content_type     = stream->GetContentType ();
-    content_encoding = stream->GetContentEncoding ();
-    content_length   = stream->GetContentLength ();
-    recv_headers     = true;
+    try
+    {
+      syslib::Lock lock (mutex);
+      
+      if (recv_headers)
+        return;
+      
+      content_type     = stream->GetContentType ();
+      content_encoding = stream->GetContentEncoding ();
+      content_length   = stream->GetContentLength ();
+      recv_headers     = true;
+    }
+    catch (xtl::exception& e)
+    {
+      e.touch ("UrlConnection::Impl::ReceiveHeaders");
+      throw;
+    }
   }
   
 ///Обработка события получения данных
@@ -443,24 +452,68 @@ void UrlConnection::CloseSend ()
 */
 
 size_t UrlConnection::ContentLength () const
-{
-  impl->ReceiveHeaders ();
+{  
+  try
+  {
+    impl->ReceiveHeaders ();
 
-  return impl->content_length;
+    return impl->content_length;
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("network::UrlConnection::ContentLength");
+    throw;
+  }    
 }
 
 const char* UrlConnection::ContentEncoding () const
 {
-  impl->ReceiveHeaders ();
+  try
+  {
+    impl->ReceiveHeaders ();
 
-  return impl->content_encoding.c_str ();
+    return impl->content_encoding.c_str ();    
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("network::UrlConnection::ContentEncoding");
+    throw;
+  }
 }
 
 const char* UrlConnection::ContentType () const
 {
-  impl->ReceiveHeaders ();
+  try
+  {
+    impl->ReceiveHeaders ();
 
-  return impl->content_type.c_str ();
+    return impl->content_type.c_str ();    
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("network::UrlConnection::ContentType");
+    throw;
+  }    
+}
+
+const char* UrlConnection::Status () const
+{
+  try
+  {
+    syslib::Lock lock (impl->mutex);
+
+    if (!&*impl->stream)
+      return "Closed";
+      
+    impl->status = impl->stream->GetStatus ();
+
+    return impl->status.c_str ();
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("network::UrlConnection::Status");
+    throw;
+  }    
 }
 
 /*

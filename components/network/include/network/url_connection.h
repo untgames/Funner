@@ -49,6 +49,7 @@ class UrlConnection
     size_t      ContentLength   () const;
     const char* ContentEncoding () const;
     const char* ContentType     () const;
+    const char* Status          () const;
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Чтение / запись данных
@@ -101,6 +102,7 @@ class IUrlStream
     virtual size_t      GetContentLength   () = 0;
     virtual const char* GetContentEncoding () = 0;
     virtual const char* GetContentType     () = 0;
+    virtual const char* GetStatus          () = 0;
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Обработчик обратной связи потока URL соединения

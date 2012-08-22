@@ -392,6 +392,11 @@ class UrlCustomFileSystem: public ICustomFileSystem, public xtl::reference_count
           
         UrlConnection connection (file.url.c_str (), params.c_str ());
         
+        const char* status = connection.Status ();
+        
+        if (strcmp (status, "Ok"))
+          throw xtl::format_operation_exception ("", "URL query '%s' failed. Status is: %s", file.url.c_str (), status);
+        
         xtl::uninitialized_storage<char> buffer (DOWNLOAD_BUFFER_SIZE);
         
         if (file.is_post)

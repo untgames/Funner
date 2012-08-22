@@ -16,6 +16,7 @@ int main ()
     printf ("content-type: '%s'\n", connection.ContentType ());
     printf ("content-encoding: '%s'\n", connection.ContentEncoding ());
     printf ("content-length: %u\n", connection.ContentLength ());
+    printf ("status: '%s'\n", connection.Status ());    
     
     xtl::uninitialized_storage<char> buffer (BUFFER_SIZE);
     
