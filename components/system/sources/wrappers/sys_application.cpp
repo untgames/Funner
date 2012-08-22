@@ -6,6 +6,13 @@ using namespace common;
 
 typedef xtl::com_ptr<IApplicationDelegate> DelegatePtr;
 
+namespace
+{
+
+const char* LOG_NAME = "system.application"; //им€ потока протоколировани€
+
+}
+
 /*
     ќписание реализации приложени€
 */
@@ -15,6 +22,7 @@ class ApplicationImpl: private IApplicationListener
   public:  
 /// онструктор
     ApplicationImpl ()
+      : log (LOG_NAME)
     {
       exit_code          = 0;
       message_loop_count = false;
@@ -180,9 +188,13 @@ class ApplicationImpl: private IApplicationListener
       {
         signals [event] ();
       }
+      catch (xtl::exception& e)
+      {
+        log.Printf ("Exception in Application::Notify: %s", e.what ());
+      }
       catch (...)
       {
-        //подавление всех исключений
+        log.Printf ("Unknown exception in Application::Notify");
       }
     }          
     
@@ -358,6 +370,7 @@ class ApplicationImpl: private IApplicationListener
     }
 
   private:
+    common::Log             log;                            //протоколирование
     DelegatePtr             current_delegate;               //текущий делегат приложени€        
     ApplicationSignal       signals [ApplicationEvent_Num]; //сигналы приложени€
     NotificationSignal      notification_signal;            //сигнал сообщений
