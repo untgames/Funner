@@ -7,5 +7,8 @@ File 'data/not_existing_file.txt' not exist
 File hash = 86fb269d190d2c85f6e0468ceca42a20
 File part hash = 1824e8e0307cbfdd1993511ab040075c
 File full part hash = 86fb269d190d2c85f6e0468ceca42a20
+File 'create' not exist
+File 'create' exist
+File 'create' not exist
 Post test
 Data has received

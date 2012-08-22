@@ -218,6 +218,8 @@ void bind_common_file_library (Environment& environment)
   lib.Register ("AsyncLoadString",     make_invoker (&async_load_string));
   lib.Register ("AsyncPostString",     make_invoker (&async_post_string));
   lib.Register ("IsFileExist",         make_invoker (&FileSystem::IsFileExist));
+  lib.Register ("Mkdir",               make_invoker (&FileSystem::Mkdir));
+  lib.Register ("Remove",              make_invoker (&FileSystem::Remove));
   lib.Register ("RemoveSearchPath",    make_invoker (&remove_search_path));
   lib.Register ("BackgroundCopyFile",  make_invoker (
     make_invoker<Action (const char*, const char*, const FileSystem::BackgroundCopyFileCallback&, size_t)> (xtl::bind (&FileSystem::BackgroundCopyFile, _1, _2, _3, ActionThread_Main, _4)),

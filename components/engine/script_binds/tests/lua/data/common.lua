@@ -1,5 +1,6 @@
 local EXISTING_FILE     = "data/text_file.txt" 
 local NOT_EXISTING_FILE = "data/not_existing_file.txt" 
+local CREATE_DIR        = "create"
 
 function test_files()
   local data = Common.File.LoadString ("data/text_file.txt")
@@ -25,6 +26,28 @@ function test_files()
   print ("File hash = " .. Common.File.FileHash ("data/text_file.txt"))
   print ("File part hash = " .. Common.File.FileHash ("data/text_file.txt", 4))
   print ("File full part hash = " .. Common.File.FileHash ("data/text_file.txt", 1024))
+  
+  if Common.File.IsFileExist (CREATE_DIR) then
+    print ("File '" .. CREATE_DIR .. "' exist")
+  else
+    print ("File '" .. CREATE_DIR .. "' not exist")
+  end
+  
+  Common.File.Mkdir (CREATE_DIR)
+  
+  if Common.File.IsFileExist (CREATE_DIR) then
+    print ("File '" .. CREATE_DIR .. "' exist")
+  else
+    print ("File '" .. CREATE_DIR .. "' not exist")
+  end
+  
+  Common.File.Remove (CREATE_DIR)
+  
+  if Common.File.IsFileExist (CREATE_DIR) then
+    print ("File '" .. CREATE_DIR .. "' exist")
+  else
+    print ("File '" .. CREATE_DIR .. "' not exist")
+  end
 end
 
 function test_post()
