@@ -7,13 +7,6 @@
 #import <Foundation/NSFileManager.h>
 #import <Foundation/NSString.h>
 
-#ifndef IPHONE
-
-#import <AppKit/NSApplication.h>
-#import <CoreServices/CoreServices.h>
-
-#endif
-
 #include <xtl/function.h>
 
 #include <common/singleton.h>
@@ -30,28 +23,6 @@ using namespace common;
 namespace
 {
 
-#ifndef IPHONE
-
-const char* get_gestalt_manager_error_name (OSErr error)
-{
-  switch (error)
-  {
-    case gestaltUndefSelectorErr: return "Undefined selector was passed to the Gestalt Manager";
-    case gestaltDupSelectorErr:   return "Tried to add an entry that already existed";
-    case gestaltLocationErr:      return "Gestalt function ptr was not in the system heap";
-    default:                      return "Unknown error";
-  }
-}
-
-void check_gestalt_manager_error (OSErr error_code, const char* source, const char* message)
-{
-  if (error_code != noErr)
-    throw xtl::format_operation_exception (source, "%s. Gestalt error: %s (code %d)", message,
-                                           get_gestalt_manager_error_name (error_code), error_code);
-}
-
-#endif
-
 class CocoaFileSystem: public StdioFileSystem
 {
   public:
@@ -60,32 +31,7 @@ class CocoaFileSystem: public StdioFileSystem
     {
       NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 
-#ifdef IPHONE
-      file_manager = [[NSFileManager alloc] init];
-#else
-      SInt32 os_version_major, os_version_minor;
-
-      try
-      {
-        if (!NSApplicationLoad ())
-          throw xtl::format_operation_exception ("::NSApplicationLoad", "Can't load application");
-
-        check_gestalt_manager_error (Gestalt (gestaltSystemVersionMajor, &os_version_major), "::Gestalt", "Can't get OS major version");
-        check_gestalt_manager_error (Gestalt (gestaltSystemVersionMinor, &os_version_minor), "::Gestalt", "Can't get OS minor version");
-      }
-      catch (xtl::exception& e)
-      {
-        [pool release];
-
-        e.touch ("common::CocoaFileSystem::CocoaFileSystem");
-        throw;
-      }
-
-      if ((os_version_major == 10 && os_version_minor > 4) || os_version_major > 10)
-        file_manager = [[NSFileManager alloc] init];
-      else
-        file_manager = [[NSFileManager defaultManager] retain];
-#endif
+      file_manager = [[NSFileManager defaultManager] retain];
 
       [pool release];
     }
