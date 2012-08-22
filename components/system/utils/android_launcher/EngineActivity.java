@@ -171,9 +171,9 @@ public class EngineActivity extends Activity
     return (EngineViewController)UiDispatch.run (this, new UiRunnable () {
       public Object run ()
       {
-        EngineViewController controller = new EngineSurfaceViewController (activity, windowRef);
+        EngineViewController controller = new EngineSurfaceViewController (activity, windowRef);                
 
-        getWindow ().addContentView (controller.getView (), new ViewGroup.LayoutParams (ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+        getWindow ().addContentView (controller.getView (), new ViewGroup.LayoutParams (ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));        
 
         return controller;
       }
@@ -187,9 +187,11 @@ public class EngineActivity extends Activity
     return (EngineViewController)UiDispatch.run (this, new UiRunnable () {
       public Object run ()
       {
-        EngineViewController controller = new EngineWebViewController (activity, windowRef);
+        EngineViewController controller = new EngineWebViewController (activity, windowRef);        
 
-        getWindow ().addContentView (controller.getView (), new ViewGroup.LayoutParams (ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+        getWindow ().addContentView (controller.getView (), new ViewGroup.LayoutParams (ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));                
+        
+        controller.getView ().setVisibility (View.INVISIBLE);                
 
         return controller;
       }
