@@ -361,6 +361,27 @@ class UrlCustomFileSystem: public ICustomFileSystem, public xtl::reference_count
       return false;
     }
 
+//Файловые атрибуты
+    void SetFileAttribute (const char* file_name, const char* attribute, const void* data, size_t size)
+    {
+      throw xtl::format_not_supported_exception ("network::UrlCustomFileSystem::SetFileAttribute");
+    }
+
+    void GetFileAttribute (const char* file_name, const char* attribute, void* data, size_t size)
+    {
+      throw xtl::format_not_supported_exception ("network::UrlCustomFileSystem::GetFileAttribute");
+    }
+
+    bool HasFileAttribute (const char* file_name, const char* attribute)
+    {
+      throw xtl::format_not_supported_exception ("network::UrlCustomFileSystem::HasFileAttribute");
+    }
+
+    void RemoveFileAttribute (const char* file_name, const char* attribute)
+    {
+      throw xtl::format_not_supported_exception ("network::UrlCustomFileSystem::RemoveFileAttribute");
+    }
+
 ///Поиск файла
     void Search (const char* wc_mask, const FileSearchHandler& handler)
     {

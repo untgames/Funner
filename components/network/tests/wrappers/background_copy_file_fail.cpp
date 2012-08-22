@@ -34,9 +34,9 @@ int main ()
   {
     TestHttpServer http_server;
 
-    stl::string source_file_path = common::format ("http://localhost:%u/test.txt", SERVER_PORT);
+    stl::string source_file_path = common::format ("http://localhost:%u/error.txt", SERVER_PORT);
 
-    FileSystem::BackgroundCopyFile (source_file_path.c_str (), "error_path/error.txt", &callback, ActionThread_Background);
+    FileSystem::BackgroundCopyFile (source_file_path.c_str (), "/io/stdout", &callback, ActionThread_Background);
 
     syslib::Application::Run ();
   }

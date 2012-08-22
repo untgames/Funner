@@ -1,6 +1,6 @@
 Results of background_copy_file_test:
-Status:      'Failed' / 'File 'error_path/error.txt' not found
-    at common::StdioFileSystem::FileOpen
-    at common::FileSystemImpl::OpenFile()'
+Status:      'Failed' / 'URL query 'http://localhost:9000/error.txt' failed. Status is: 404 Not Found
+    at network::UrlCustomFileSystem::FinishSend
+    at network::UrlCustomFileSystem::FileSize'
 File size:    0
 Bytes copied: 0
