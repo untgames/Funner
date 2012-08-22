@@ -79,19 +79,30 @@ Win32FileSystem::file_t Win32FileSystem::FileOpen (const char* file_name,filemod
 
 void Win32FileSystem::Remove (const char* file_name)
 {
-  stl::wstring file_name_unicode = GetFullFileName (file_name);
-
-  if (_wunlink (file_name_unicode.c_str ()))
+  try
   {
-    switch (errno)
+    stl::wstring full_name = GetFullFileName (file_name);
+
+    DWORD attrib = GetFileAttributesW (full_name.c_str ());
+
+    if (attrib == INVALID_FILE_ATTRIBUTES)
+       return;
+
+    if (attrib & FILE_ATTRIBUTE_DIRECTORY)
     {
-      case EACCES: 
-        throw xtl::format_operation_exception ("common::Win32FileSystem::Remove","Access to file '%S' denied",file_name_unicode.c_str ());
-      case ENOENT: 
-        break;
-      default:
-        throw xtl::format_operation_exception ("common::Win32FileSystem::Remove","Can't remove file '%S'. Reason: %s", file_name_unicode.c_str (), strerror (errno));
+      if (!RemoveDirectoryW (full_name.c_str ()))
+        raise_error ("::RemoveDirectory");
     }
+    else
+    {
+      if (!DeleteFileW (full_name.c_str ()))
+        raise_error ("::DeleteFile ");
+    }
+  }
+  catch (xtl::exception& exception)
+  {
+    exception.touch ("common::Win32FileSystem::Remove");
+    throw;
   }
 }
 

@@ -259,8 +259,23 @@ void Win32FileSystem::Remove (const char* file_name)
 {
   try
   {
-    if (!DeleteFileW (GetFullFileName (file_name).c_str ()))
-      raise_error ("::DeleteFile ");
+    stl::wstring full_name = GetFullFileName (file_name);
+
+    DWORD attrib = GetFileAttributesW (full_name.c_str ());
+
+    if (attrib == INVALID_FILE_ATTRIBUTES)
+       return;
+
+    if (attrib & FILE_ATTRIBUTE_DIRECTORY)
+    {
+      if (!RemoveDirectoryW (full_name.c_str ()))
+        raise_error ("::RemoveDirectory");
+    }
+    else
+    {
+      if (!DeleteFileW (full_name.c_str ()))
+        raise_error ("::DeleteFile ");
+    }
   }
   catch (xtl::exception& exception)
   {
