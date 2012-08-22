@@ -38,6 +38,8 @@ int main ()
 
     FileSystem::BackgroundCopyFile (source_file_path.c_str (), "/io/stdout", &callback, ActionThread_Background);
 
+    source_file_path = "";
+
     syslib::Application::Run ();
   }
   catch (std::exception& exception)

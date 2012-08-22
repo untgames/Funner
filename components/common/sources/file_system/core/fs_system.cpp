@@ -19,14 +19,14 @@ void background_copy_file_notify (const FileSystem::BackgroundCopyFileCallback& 
     ActionQueue::PushAction (xtl::bind (callback, copy_state.Clone ()), ActionThread_Main);
 }
 
-void background_copy_file_impl (Action& action, const char* source_file_name, const char* destination_file_name, const FileSystem::BackgroundCopyFileCallback& callback, ActionThread thread, size_t buffer_size)
+void background_copy_file_impl (Action& action, const stl::string& source_file_name, const stl::string& destination_file_name, const FileSystem::BackgroundCopyFileCallback& callback, ActionThread thread, size_t buffer_size)
 {
   BackgroundCopyState copy_state;
 
   try
   {
-    InputFile input_file (source_file_name);
-    OutputFile output_file (destination_file_name);
+    InputFile input_file (source_file_name.c_str ());
+    OutputFile output_file (destination_file_name.c_str ());
 
     if (output_file.Size ())
       output_file.Resize (0);
@@ -47,7 +47,7 @@ void background_copy_file_impl (Action& action, const char* source_file_name, co
       if (action.IsCanceled ())
       {
         output_file.Close ();
-        FileSystem::Remove (destination_file_name);
+        FileSystem::Remove (destination_file_name.c_str ());
 
         copy_state.SetStatus (BackgroundCopyStateStatus_Canceled);
         background_copy_file_notify (callback, thread, copy_state);
@@ -1568,5 +1568,6 @@ Action FileSystem::BackgroundCopyFile (const char* source_file_name, const char*
   if (!buffer_size)
     buffer_size = 4096;
 
-  return ActionQueue::PushAction (xtl::bind (&background_copy_file_impl, _1, source_file_name, destination_file_name, callback, thread, buffer_size), ActionThread_Background);
+  return ActionQueue::PushAction (xtl::bind (&background_copy_file_impl, _1, stl::string (source_file_name), stl::string (destination_file_name),
+                                              callback, thread, buffer_size), ActionThread_Background);
 }
