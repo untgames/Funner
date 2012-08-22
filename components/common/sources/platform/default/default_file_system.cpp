@@ -210,16 +210,18 @@ void StdioFileSystem::FileFlush (file_t file)
 
 void StdioFileSystem::Remove (const char* file_name)
 {
-  if (unlink (file_name))
+  static const char* METHOD_NAME = "common::StdioFileSystem::Remove";
+
+  if (remove (file_name))
   {
     switch (errno)
     {
       case EACCES: 
-        throw xtl::format_operation_exception ("common::StdioFileSystem::Remove","Access to file '%s' denied",file_name);
+        throw xtl::format_operation_exception (METHOD_NAME,"Access to file '%s' denied",file_name);
       case ENOENT: 
         break;
       default:
-        throw xtl::format_operation_exception ("common::StdioFileSystem::Remove","Can't remove file '%s'. Reason: %s", 
+        throw xtl::format_operation_exception (METHOD_NAME,"Can't remove file '%s'. Reason: %s",
           file_name, strerror (errno));
     }
   }

@@ -983,7 +983,22 @@ void FileSystemImpl::Remove (const char* src_file_name)
   {
     ICustomFileSystemPtr file_system = FindFileSystem (src_file_name,file_name);
 
-    file_system->Remove (file_name.c_str ());
+    FileInfo info;
+    bool     is_dir = false;
+
+    if (file_system->GetFileInfo (file_name.c_str (), info))
+      is_dir = info.is_dir;
+
+    if (is_dir)
+    {
+      stl::string search_mask = common::format ("%s/*", src_file_name);
+
+      file_system->Search (search_mask.c_str (), xtl::bind (&FileSystemImpl::Remove, this, _1));
+
+      file_system->Remove (file_name.c_str ());
+    }
+    else
+      file_system->Remove (file_name.c_str ());
   }
   catch (xtl::exception& exception)
   {
