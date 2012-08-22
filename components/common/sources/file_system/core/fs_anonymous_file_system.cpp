@@ -167,6 +167,26 @@ bool AnonymousFileSystem::GetFileInfo (const char* file_name, FileInfo& info)
   return false;
 }
 
+void AnonymousFileSystem::SetFileAttribute (const char* file_name, const char* attribute, const void* data, size_t size)
+{
+  throw xtl::format_not_supported_exception ("AnonymousFileSystem::SetFileAttribute");
+}
+
+void AnonymousFileSystem::GetFileAttribute (const char* file_name, const char* attribute, void* data, size_t size)
+{
+  throw xtl::format_not_supported_exception ("AnonymousFileSystem::GetFileAttribute");
+}
+
+bool AnonymousFileSystem::HasFileAttribute (const char* file_name, const char* attribute)
+{
+  throw xtl::format_not_supported_exception ("AnonymousFileSystem::HasFileAttribute");
+}
+
+void AnonymousFileSystem::RemoveFileAttribute (const char* file_name, const char* attribute)
+{
+  throw xtl::format_not_supported_exception ("AnonymousFileSystem::RemoveFileAttribute");
+}
+
 void AnonymousFileSystem::Search (const char* mask, const FileSearchHandler& insert_handler)
 {
   try

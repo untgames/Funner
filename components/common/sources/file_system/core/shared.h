@@ -339,25 +339,29 @@ class MountPointFileSystem: public ICustomFileSystem
   public:
     MountPointFileSystem (MountFileSystem& owner);
   
-    file_t     FileOpen    (const char* name,filemode_t mode_flags,size_t);
-    void       FileClose   (file_t);
-    size_t     FileRead    (file_t,void* buf,size_t size);
-    size_t     FileWrite   (file_t,const void* buf,size_t size);
-    void       FileRewind  (file_t);
-    filepos_t  FileSeek    (file_t,filepos_t pos);
-    filepos_t  FileTell    (file_t);
-    filesize_t FileSize    (file_t);
-    void       FileResize  (file_t,filesize_t new_size);
-    bool       FileEof     (file_t);
-    void       FileFlush   (file_t);
-    void       Remove      (const char* file_name);
-    void       Rename      (const char* file_name,const char* new_name);
-    void       Mkdir       (const char* dir_name);
-    bool       IsFileExist (const char* file_name);
-    bool       GetFileInfo (const char* file_name,FileInfo& info);
-    void       Search      (const char* mask,const FileSearchHandler&);
-    void       AddRef      () {}
-    void       Release     () {}
+    file_t     FileOpen            (const char* name,filemode_t mode_flags,size_t);
+    void       FileClose           (file_t);
+    size_t     FileRead            (file_t,void* buf,size_t size);
+    size_t     FileWrite           (file_t,const void* buf,size_t size);
+    void       FileRewind          (file_t);
+    filepos_t  FileSeek            (file_t,filepos_t pos);
+    filepos_t  FileTell            (file_t);
+    filesize_t FileSize            (file_t);
+    void       FileResize          (file_t,filesize_t new_size);
+    bool       FileEof             (file_t);
+    void       FileFlush           (file_t);
+    void       Remove              (const char* file_name);
+    void       Rename              (const char* file_name,const char* new_name);
+    void       Mkdir               (const char* dir_name);
+    bool       IsFileExist         (const char* file_name);
+    bool       GetFileInfo         (const char* file_name,FileInfo& info);
+    void       SetFileAttribute    (const char* file_name, const char* attribute, const void* data, size_t size);
+    void       GetFileAttribute    (const char* file_name, const char* attribute, void* data, size_t size);
+    bool       HasFileAttribute    (const char* file_name, const char* attribute);
+    void       RemoveFileAttribute (const char* file_name, const char* attribute);
+    void       Search              (const char* mask,const FileSearchHandler&);
+    void       AddRef              () {}
+    void       Release             () {}
     
   private:
     MountFileSystem* owner; //владелец
@@ -402,25 +406,29 @@ class AnonymousFileSystem: public ICustomFileSystem, public xtl::reference_count
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Переопределение основных операций
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    file_t     FileOpen    (const char* name,filemode_t mode_flags,size_t);
-    void       FileClose   (file_t);
-    size_t     FileRead    (file_t,void* buf,size_t size);
-    size_t     FileWrite   (file_t,const void* buf,size_t size);
-    void       FileRewind  (file_t);
-    filepos_t  FileSeek    (file_t,filepos_t pos);
-    filepos_t  FileTell    (file_t);
-    filesize_t FileSize    (file_t);
-    void       FileResize  (file_t,filesize_t new_size);
-    bool       FileEof     (file_t);
-    void       FileFlush   (file_t);
-    void       Remove      (const char* file_name);
-    void       Rename      (const char* file_name,const char* new_name);
-    void       Mkdir       (const char* dir_name);
-    bool       IsFileExist (const char* file_name);
-    bool       GetFileInfo (const char* file_name,FileInfo& info);
-    void       Search      (const char* mask,const FileSearchHandler&);
-    void       AddRef      ();
-    void       Release     ();
+    file_t     FileOpen            (const char* name,filemode_t mode_flags,size_t);
+    void       FileClose           (file_t);
+    size_t     FileRead            (file_t,void* buf,size_t size);
+    size_t     FileWrite           (file_t,const void* buf,size_t size);
+    void       FileRewind          (file_t);
+    filepos_t  FileSeek            (file_t,filepos_t pos);
+    filepos_t  FileTell            (file_t);
+    filesize_t FileSize            (file_t);
+    void       FileResize          (file_t,filesize_t new_size);
+    bool       FileEof             (file_t);
+    void       FileFlush           (file_t);
+    void       Remove              (const char* file_name);
+    void       Rename              (const char* file_name,const char* new_name);
+    void       Mkdir               (const char* dir_name);
+    bool       IsFileExist         (const char* file_name);
+    bool       GetFileInfo         (const char* file_name,FileInfo& info);
+    void       SetFileAttribute    (const char* file_name, const char* attribute, const void* data, size_t size);
+    void       GetFileAttribute    (const char* file_name, const char* attribute, void* data, size_t size);
+    bool       HasFileAttribute    (const char* file_name, const char* attribute);
+    void       RemoveFileAttribute (const char* file_name, const char* attribute);
+    void       Search              (const char* mask,const FileSearchHandler&);
+    void       AddRef              ();
+    void       Release             ();
     
   private:
     struct AnonymousFile
@@ -509,7 +517,15 @@ class FileSystemImpl
     FileCryptoParameters GetCryptoParameters       (const char* path) const;
     void                 RemoveCryptoParameters    (const char* path);
     void                 RemoveAllCryptoParameters ();    
-    
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Файловые атрибуты
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void SetFileAttribute    (const char* file_name, const char* attribute, const void* data, size_t size);
+    void GetFileAttribute    (const char* file_name, const char* attribute, void* data, size_t size);
+    bool HasFileAttribute    (const char* file_name, const char* attribute);
+    void RemoveFileAttribute (const char* file_name, const char* attribute);
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Открытие файла
 ///////////////////////////////////////////////////////////////////////////////////////////////////    

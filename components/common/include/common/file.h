@@ -140,6 +140,14 @@ class ICustomFileSystem
     virtual bool GetFileInfo (const char* file_name, FileInfo& info) = 0;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+///Файловые атрибуты
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    virtual void SetFileAttribute    (const char* file_name, const char* attribute, const void* data, size_t size) = 0;
+    virtual void GetFileAttribute    (const char* file_name, const char* attribute, void* data, size_t size) = 0;
+    virtual bool HasFileAttribute    (const char* file_name, const char* attribute) = 0;
+    virtual void RemoveFileAttribute (const char* file_name, const char* attribute) = 0;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Поиск файла
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     typedef xtl::function<void (const char* file, const FileInfo& info)> FileSearchHandler;
@@ -621,11 +629,19 @@ class FileSystem
     static FileCryptoParameters GetCryptoParameters       (const char* path);
     static void                 RemoveCryptoParameters    (const char* path);
     static void                 RemoveAllCryptoParameters ();
-    
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Получение ключа шифрования по файлу
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     static void GetFileCryptoKey (const char* file_name, filecryptokey_t key);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Файловые атрибуты
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    static void SetFileAttribute    (const char* file_name, const char* attribute, const void* data, size_t size);
+    static void GetFileAttribute    (const char* file_name, const char* attribute, void* data, size_t size);
+    static bool HasFileAttribute    (const char* file_name, const char* attribute);
+    static void RemoveFileAttribute (const char* file_name, const char* attribute);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Удаление / переименование файла, создание каталога

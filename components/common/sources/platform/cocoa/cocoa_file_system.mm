@@ -1,3 +1,5 @@
+#include <sys/xattr.h>
+
 #import <Foundation/NSArray.h>
 #import <Foundation/NSAutoreleasePool.h>
 #import <Foundation/NSDate.h>
@@ -132,6 +134,58 @@ class CocoaFileSystem: public StdioFileSystem
       [pool release];
 
       return true;
+    }
+
+///Файловые атрибуты
+    void SetFileAttribute (const char* file_name, const char* attribute, const void* data, size_t size)
+    {
+      if (setxattr (file_name, attribute, data, size, 0, 0))
+        throw xtl::format_operation_exception ("common::CocoaFileSystem::SetFileAttribute", "Can't set attribute '%s' for file '%s' with size %d, error '%s'", attribute, file_name, size, ::strerror (errno));
+    }
+
+    void GetFileAttribute (const char* file_name, const char* attribute, void* data, size_t size)
+    {
+      if (getxattr (file_name, attribute, data, size, 0, 0))
+        throw xtl::format_operation_exception ("common::CocoaFileSystem::GetFileAttribute", "Can't get attribute '%s' for file '%s' with size %d, error '%s' %d", attribute, file_name, size, ::strerror (errno), errno);
+    }
+
+    bool HasFileAttribute (const char* file_name, const char* attribute)
+    {
+      static const char* METHOD_NAME = "common::CocoaFileSystem::HasFileAttribute";
+
+      size_t attributes_length = listxattr (file_name, 0, 0, 0);
+
+      if (attributes_length < 0)
+        throw xtl::format_operation_exception (METHOD_NAME, "Can't get attributes list length for file '%s', error '%s'", file_name, ::strerror (errno));
+
+      if (!attributes_length)
+        return false;
+
+      xtl::uninitialized_storage<char> names (attributes_length);
+
+      attributes_length = listxattr (file_name, names.data (), names.size (), 0);
+
+      if (attributes_length < 0)
+        throw xtl::format_operation_exception (METHOD_NAME, "Can't get attributes list for file '%s', error '%s'", file_name, ::strerror (errno));
+
+      const char *current_attribute = names.data (),
+                 *end               = current_attribute + attributes_length;
+
+      for (; current_attribute < end;)
+      {
+        if (!xtl::xstrcmp (current_attribute, attribute))
+          return true;
+
+        current_attribute += xtl::xstrlen (current_attribute) + 1;
+      }
+
+      return false;
+    }
+
+    void RemoveFileAttribute (const char* file_name, const char* attribute)
+    {
+      if (removexattr (file_name, attribute, 0))
+        throw xtl::format_operation_exception ("common::CocoaFileSystem::RemoveFileAttribute", "Can't remove attribute '%s' for file '%s', error '%s'", attribute, file_name, ::strerror (errno));
     }
 
 ///Поиск файла

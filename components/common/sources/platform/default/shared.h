@@ -93,6 +93,14 @@ class StdioFileSystem: public ICustomFileSystem
     bool GetFileInfo (const char* file_name,FileInfo& info);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+///Файловые атрибуты
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void SetFileAttribute    (const char* file_name, const char* attribute, const void* data, size_t size);
+    void GetFileAttribute    (const char* file_name, const char* attribute, void* data, size_t size);
+    bool HasFileAttribute    (const char* file_name, const char* attribute);
+    void RemoveFileAttribute (const char* file_name, const char* attribute);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Поиск файла
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void Search (const char* wc_mask,const FileSearchHandler& handler);

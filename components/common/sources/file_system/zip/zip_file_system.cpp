@@ -242,6 +242,14 @@ class ZipFileSystem: public ICustomFileSystem, public Lockable
     bool GetFileInfo (const char* file_name,FileInfo& info);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+///Файловые атрибуты
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void SetFileAttribute    (const char* file_name, const char* attribute, const void* data, size_t size);
+    void GetFileAttribute    (const char* file_name, const char* attribute, void* data, size_t size);
+    bool HasFileAttribute    (const char* file_name, const char* attribute);
+    void RemoveFileAttribute (const char* file_name, const char* attribute);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Поиск файла (Search возвращает количество найденных файлов)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void Search (const char* wc_mask,const FileSearchHandler& handler);
@@ -609,6 +617,30 @@ bool ZipFileSystem::GetFileInfo (const char* file_name,FileInfo& info)
   info = entries [i->second].info;
 
   return true;
+}
+
+/*
+    Файловые атрибуты
+*/
+
+void ZipFileSystem::SetFileAttribute (const char* file_name, const char* attribute, const void* data, size_t size)
+{
+  throw xtl::format_not_supported_exception ("ZipFileSystem::SetFileAttribute");
+}
+
+void ZipFileSystem::GetFileAttribute (const char* file_name, const char* attribute, void* data, size_t size)
+{
+  throw xtl::format_not_supported_exception ("ZipFileSystem::GetFileAttribute");
+}
+
+bool ZipFileSystem::HasFileAttribute (const char* file_name, const char* attribute)
+{
+  throw xtl::format_not_supported_exception ("ZipFileSystem::HasFileAttribute");
+}
+
+void ZipFileSystem::RemoveFileAttribute (const char* file_name, const char* attribute)
+{
+  throw xtl::format_not_supported_exception ("ZipFileSystem::RemoveFileAttribute");
 }
 
 /*

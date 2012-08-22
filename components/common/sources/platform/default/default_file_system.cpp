@@ -286,6 +286,30 @@ bool StdioFileSystem::GetFileInfo (const char* file_name,FileInfo& info)
 }
 
 /*
+   Файловые атрибуты
+*/
+
+void StdioFileSystem::SetFileAttribute (const char* file_name, const char* attribute, const void* data, size_t size)
+{
+  throw xtl::format_not_supported_exception ("common::StdioFileSystem::SetFileAttribute");
+}
+
+void StdioFileSystem::GetFileAttribute (const char* file_name, const char* attribute, void* data, size_t size)
+{
+  throw xtl::format_not_supported_exception ("common::StdioFileSystem::GetFileAttribute");
+}
+
+bool StdioFileSystem::HasFileAttribute (const char* file_name, const char* attribute)
+{
+  throw xtl::format_not_supported_exception ("common::StdioFileSystem::HasFileAttribute");
+}
+
+void StdioFileSystem::RemoveFileAttribute (const char* file_name, const char* attribute)
+{
+  throw xtl::format_not_supported_exception ("common::StdioFileSystem::RemoveFileAttribute");
+}
+
+/*
     Поиск файлов
 */
 

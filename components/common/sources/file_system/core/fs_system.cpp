@@ -689,6 +689,116 @@ void FileSystemImpl::RemoveAllCryptoParameters ()
 }
 
 /*
+   Файловые атрибуты
+*/
+
+void FileSystemImpl::SetFileAttribute (const char* src_file_name, const char* attribute, const void* data, size_t size)
+{
+  static const char* METHOD_NAME = "common::FileSystem::SetFileAttribute";
+
+  if (!src_file_name)
+    throw xtl::make_null_argument_exception (METHOD_NAME, "file_name");
+
+  if (!attribute)
+    throw xtl::make_null_argument_exception (METHOD_NAME, "new_name");
+
+  if (size && !data)
+    throw xtl::make_null_argument_exception (METHOD_NAME, "data");
+
+  string file_name;
+
+  try
+  {
+    ICustomFileSystemPtr file_system = FindFileSystem (src_file_name, file_name);
+
+    file_system->SetFileAttribute (file_name.c_str (), attribute, data, size);
+  }
+  catch (xtl::exception& exception)
+  {
+    exception.touch (METHOD_NAME);
+    throw;
+  }
+}
+
+void FileSystemImpl::GetFileAttribute (const char* src_file_name, const char* attribute, void* data, size_t size)
+{
+  static const char* METHOD_NAME = "common::FileSystem::GetFileAttribute";
+
+  if (!src_file_name)
+    throw xtl::make_null_argument_exception (METHOD_NAME, "file_name");
+
+  if (!attribute)
+    throw xtl::make_null_argument_exception (METHOD_NAME, "new_name");
+
+  if (size && !data)
+    throw xtl::make_null_argument_exception (METHOD_NAME, "data");
+
+  string file_name;
+
+  try
+  {
+    ICustomFileSystemPtr file_system = FindFileSystem (src_file_name, file_name);
+
+    file_system->GetFileAttribute (file_name.c_str (), attribute, data, size);
+  }
+  catch (xtl::exception& exception)
+  {
+    exception.touch (METHOD_NAME);
+    throw;
+  }
+}
+
+bool FileSystemImpl::HasFileAttribute (const char* src_file_name, const char* attribute)
+{
+  static const char* METHOD_NAME = "common::FileSystem::HasFileAttribute";
+
+  if (!src_file_name)
+    throw xtl::make_null_argument_exception (METHOD_NAME, "file_name");
+
+  if (!attribute)
+    throw xtl::make_null_argument_exception (METHOD_NAME, "new_name");
+
+  string file_name;
+
+  try
+  {
+    ICustomFileSystemPtr file_system = FindFileSystem (src_file_name, file_name);
+
+    return file_system->HasFileAttribute (file_name.c_str (), attribute);
+  }
+  catch (xtl::exception& exception)
+  {
+    exception.touch (METHOD_NAME);
+    throw;
+  }
+}
+
+void FileSystemImpl::RemoveFileAttribute (const char* src_file_name, const char* attribute)
+{
+  static const char* METHOD_NAME = "common::FileSystem::RemoveFileAttribute";
+
+  if (!src_file_name)
+    throw xtl::make_null_argument_exception (METHOD_NAME, "file_name");
+
+  if (!attribute)
+    throw xtl::make_null_argument_exception (METHOD_NAME, "new_name");
+
+  string file_name;
+
+  try
+  {
+    ICustomFileSystemPtr file_system = FindFileSystem (src_file_name, file_name);
+
+    file_system->RemoveFileAttribute (file_name.c_str (), attribute);
+  }
+  catch (xtl::exception& exception)
+  {
+    exception.touch (METHOD_NAME);
+    throw;
+  }
+}
+
+/*
     Определение принадлежности файла к файловой системе
 */
 
@@ -1519,6 +1629,30 @@ void FileSystem::GetFileCryptoKey (const char* file_name, filecryptokey_t key)
     exception.touch ("common::FileSystem::GetFileCryptoKey");
     throw;
   }
+}
+
+/*
+   Файловые атрибуты
+*/
+
+void FileSystem::SetFileAttribute (const char* file_name, const char* attribute, const void* data, size_t size)
+{
+  FileSystemSingleton::Instance ()->SetFileAttribute (file_name, attribute, data, size);
+}
+
+void FileSystem::GetFileAttribute (const char* file_name, const char* attribute, void* data, size_t size)
+{
+  FileSystemSingleton::Instance ()->GetFileAttribute (file_name, attribute, data, size);
+}
+
+bool FileSystem::HasFileAttribute (const char* file_name, const char* attribute)
+{
+  return FileSystemSingleton::Instance ()->HasFileAttribute (file_name, attribute);
+}
+
+void FileSystem::RemoveFileAttribute (const char* file_name, const char* attribute)
+{
+  FileSystemSingleton::Instance ()->RemoveFileAttribute (file_name, attribute);
 }
 
 /*

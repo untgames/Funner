@@ -79,6 +79,7 @@ COMMON.AUTO_LICENSE_GENERATOR.IMPORTS     := compile.common
 COMMON.TESTS.TYPE                 := test-suite
 COMMON.TESTS.SOURCE_DIRS          := tests/file_system tests/streams tests/hash tests/strlib tests/utils \
                                      tests/memory tests/log tests/parselib tests/crypto tests/properties
+COMMON.TESTS.cocoa.SOURCE_DIRS    := tests/cocoa
 COMMON.TESTS.haswchar.SOURCE_DIRS := tests/strlib/wchar
 COMMON.TESTS.IMPORTS              := compile.math.vecmath compile.common link.common.aes link.common.xml link.common.wxf \
                                      link.common.zip_file_system link.common.default_console_handler link.common.iconv \

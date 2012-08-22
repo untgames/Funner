@@ -100,6 +100,26 @@ bool MountPointFileSystem::GetFileInfo (const char* name,FileInfo& info)
   return true;
 }
 
+void MountPointFileSystem::SetFileAttribute (const char* file_name, const char* attribute, const void* data, size_t size)
+{
+  throw xtl::format_not_supported_exception ("MountPointFileSystem::SetFileAttribute");
+}
+
+void MountPointFileSystem::GetFileAttribute (const char* file_name, const char* attribute, void* data, size_t size)
+{
+  throw xtl::format_not_supported_exception ("MountPointFileSystem::GetFileAttribute");
+}
+
+bool MountPointFileSystem::HasFileAttribute (const char* file_name, const char* attribute)
+{
+  throw xtl::format_not_supported_exception ("MountPointFileSystem::HasFileAttribute");
+}
+
+void MountPointFileSystem::RemoveFileAttribute (const char* file_name, const char* attribute)
+{
+  throw xtl::format_not_supported_exception ("MountPointFileSystem::RemoveFileAttribute");
+}
+
 void MountPointFileSystem::Search (const char* mask,const FileSearchHandler& insert_handler)
 {
   throw xtl::format_not_supported_exception ("MountPointFileSystem::Search");
