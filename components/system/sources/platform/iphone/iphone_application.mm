@@ -379,7 +379,7 @@ void IPhoneApplicationManager::GetSystemProperties (common::PropertyMap& propert
 {
   NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
 
-  properties.SetProperty ("OS", "ios");
+  properties.SetProperty ("Operating System", "iOS");
   properties.SetProperty ("Platform", UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad ? "pad" : "phone");
   properties.SetProperty ("Language", [((NSString*)[[NSLocale preferredLanguages] objectAtIndex:0]) UTF8String]);
   properties.SetProperty ("OSVersion", [[[UIDevice currentDevice] systemVersion] UTF8String]);
