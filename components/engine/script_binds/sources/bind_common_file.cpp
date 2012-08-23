@@ -173,6 +173,21 @@ stl::string file_hash (const char* file_name)
   return file_hash_string (file_hash);
 }
 
+void set_file_string_attribute (const char* file_name, const char* attribute, const char* value)
+{
+  if (!value)
+    throw xtl::make_null_argument_exception ("engine::script_binds::set_file_string_attribute", "value");
+
+  FileSystem::SetFileAttribute (file_name, attribute, value, xtl::xstrlen (value) + 1);
+}
+
+void set_file_int_attribute (const char* file_name, const char* attribute, int value)
+{
+  //TODO 64-bit and endianness compatibility
+
+  FileSystem::SetFileAttribute (file_name, attribute, &value, sizeof (value));
+}
+
 }
 
 namespace engine
@@ -209,19 +224,22 @@ void bind_common_file_library (Environment& environment)
 {
   InvokerRegistry lib = environment.CreateLibrary (COMMON_FILE_LIBRARY);
 
-  lib.Register ("AddSearchPath",       make_invoker (&add_search_path));
-  lib.Register ("FileHash",            make_invoker (make_invoker (xtl::implicit_cast<stl::string (*) (const char*, size_t)> (&file_hash)),
+  lib.Register ("AddSearchPath",          make_invoker (&add_search_path));
+  lib.Register ("FileHash",               make_invoker (make_invoker (xtl::implicit_cast<stl::string (*) (const char*, size_t)> (&file_hash)),
                                                      make_invoker (xtl::implicit_cast<stl::string (*) (const char*)> (&file_hash))));
-  lib.Register ("LoadString",          make_invoker (implicit_cast<stl::string (*)(const char*)> (&FileSystem::LoadTextFile)));
-  lib.Register ("LoadStringFilterOut", make_invoker (&load_string_filter_out));
-  lib.Register ("PostString",          make_invoker (&post_string));
-  lib.Register ("AsyncLoadString",     make_invoker (&async_load_string));
-  lib.Register ("AsyncPostString",     make_invoker (&async_post_string));
-  lib.Register ("IsFileExist",         make_invoker (&FileSystem::IsFileExist));
-  lib.Register ("Mkdir",               make_invoker (&FileSystem::Mkdir));
-  lib.Register ("Remove",              make_invoker (&FileSystem::Remove));
-  lib.Register ("RemoveSearchPath",    make_invoker (&remove_search_path));
-  lib.Register ("BackgroundCopyFile",  make_invoker (
+  lib.Register ("LoadString",             make_invoker (implicit_cast<stl::string (*)(const char*)> (&FileSystem::LoadTextFile)));
+  lib.Register ("LoadStringFilterOut",    make_invoker (&load_string_filter_out));
+  lib.Register ("PostString",             make_invoker (&post_string));
+  lib.Register ("AsyncLoadString",        make_invoker (&async_load_string));
+  lib.Register ("AsyncPostString",        make_invoker (&async_post_string));
+  lib.Register ("IsFileExist",            make_invoker (&FileSystem::IsFileExist));
+  lib.Register ("Mkdir",                  make_invoker (&FileSystem::Mkdir));
+  lib.Register ("Remove",                 make_invoker (&FileSystem::Remove));
+  lib.Register ("SetFileStringAttribute", make_invoker (&set_file_string_attribute));
+  lib.Register ("SetFileIntAttribute",    make_invoker (&set_file_int_attribute));
+  lib.Register ("RemoveFileAttribute",    make_invoker (&FileSystem::RemoveFileAttribute));
+  lib.Register ("RemoveSearchPath",       make_invoker (&remove_search_path));
+  lib.Register ("BackgroundCopyFile",     make_invoker (
     make_invoker<Action (const char*, const char*, const FileSystem::BackgroundCopyFileCallback&, size_t)> (xtl::bind (&FileSystem::BackgroundCopyFile, _1, _2, _3, ActionThread_Main, _4)),
     make_invoker<Action (const char*, const char*, const FileSystem::BackgroundCopyFileCallback&)> (xtl::bind (&FileSystem::BackgroundCopyFile, _1, _2, _3, ActionThread_Main, 0))));
 
