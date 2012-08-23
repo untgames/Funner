@@ -39,11 +39,13 @@ class LogSubsystem : public ISubsystem, public xtl::reference_counter
 
           need_flush = get<bool> (file_node, "Flush", true);
 
+          file_log_exclude_filters = split (get<const char*> (file_node, "ExcludeFilters", ""));
+
           if (*file_log_filters_masks && *file_name)
           {
             StringArray log_filters_masks = split (file_log_filters_masks);
 
-            console_log_filters.reserve (log_filters_masks.Size ());
+            file_log_filters.reserve (log_filters_masks.Size ());
 
             for (size_t i = 0; i < log_filters_masks.Size (); i++)
               file_log_filters.push_back (LogFilter (log_filters_masks[i], xtl::bind (&LogSubsystem::FileLogHandler, this, _1, _2)));
@@ -73,6 +75,8 @@ class LogSubsystem : public ISubsystem, public xtl::reference_counter
         if (console_node)
         {
           const char* console_log_filters_masks = get<const char*> (console_node, "Filters", "*");
+
+          console_log_exclude_filters = split (get<const char*> (file_node, "ExcludeFilters", ""));
 
           if (*console_log_filters_masks)
           {
@@ -117,11 +121,19 @@ class LogSubsystem : public ISubsystem, public xtl::reference_counter
   private:
     void ConsoleLogHandler (const char* log_name, const char* message)
     {
+      for (size_t i = 0, count = console_log_exclude_filters.Size (); i < count; i++)
+        if (common::wcmatch (log_name, console_log_exclude_filters [i]))
+          return;
+
       Console::Printf ("%s: %s\n", log_name, message);
     }
 
     void FileLogHandler (const char* log_name, const char* message)
     {
+      for (size_t i = 0, count = file_log_exclude_filters.Size (); i < count; i++)
+        if (common::wcmatch (log_name, file_log_exclude_filters [i]))
+          return;
+
       output_file.Print (log_name, message);
 
       if (need_flush)
@@ -134,7 +146,9 @@ class LogSubsystem : public ISubsystem, public xtl::reference_counter
 
   private:
     stl::vector<LogFilter> console_log_filters;
+    common::StringArray    console_log_exclude_filters;
     stl::vector<LogFilter> file_log_filters;
+    common::StringArray    file_log_exclude_filters;
     LogFile                output_file;
     bool                   need_flush;
 };
