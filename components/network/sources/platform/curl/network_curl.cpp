@@ -90,9 +90,9 @@ class CurlStream: public IUrlStream
       , params (in_params)
       , content_type ("text/plain")
       , content_encoding ("UTF-8")
+      , status ("Waiting for headers...")
       , content_length (0)
       , headers_received (false)
-      , status ("Waiting for headers...")
     {
       try
       {
