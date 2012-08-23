@@ -31,9 +31,8 @@ typedef stl::list<BlockPtr>       BlockList;
 class Buffer
 {
   public:
-    Buffer (syslib::Mutex& in_mutex)
-      : mutex (in_mutex)
-      , total_size (0)
+    Buffer ()
+      : total_size (0)
       , offset (0)
       , put_finished (false)
     {
@@ -169,7 +168,7 @@ class Buffer
     Buffer& operator = (const Buffer&); //no impl
   
   private:
-    syslib::Mutex&    mutex;        //блокировка
+    syslib::Mutex     mutex;        //блокировка
     syslib::Condition condition;    //событие приёма данных
     size_t            total_size;   //общий объём данных
     size_t            offset;       //смещение для первого блока данных
@@ -204,8 +203,6 @@ struct UrlConnection::Impl: public xtl::reference_counter, public IUrlStream::IL
     , content_type (DEFAULT_CONTENT_TYPE)
     , content_encoding (DEFAULT_CONTENT_ENCODING)
     , content_length (0)
-    , send_buffer (mutex)
-    , recv_buffer (mutex)
     , send_closed (false)
     , recv_closed (false)
     , recv_headers (false)
@@ -215,8 +212,6 @@ struct UrlConnection::Impl: public xtl::reference_counter, public IUrlStream::IL
   Impl (const network::Url& in_url, const char* params)
     : url (in_url)
     , content_length (0)
-    , send_buffer (mutex)
-    , recv_buffer (mutex)
     , send_closed (false)
     , recv_closed (false)
     , recv_headers (false)    
@@ -231,6 +226,8 @@ struct UrlConnection::Impl: public xtl::reference_counter, public IUrlStream::IL
   ~Impl ()
   {
     mutex.Lock (); //без вызова Unlock, поскольку Mutex будет удалён
+
+    stream.reset ();
   }
   
 ///Получение заголовков
