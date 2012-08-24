@@ -10,7 +10,7 @@ ifneq (,$(filter bada,$(PROFILES)))
   COMPONENT_DIRS += bada
 endif
 
-ifneq (,$(filter android,$(PROFILES)))
+ifneq (,$(filter android-arm,$(PROFILES)))
   COMPONENT_DIRS += android_ndk_profiler
 endif
 
