@@ -360,6 +360,13 @@ BIN_DIR=$(DIST_BIN_DIR) \
 endef
 
 ###################################################################################################
+#Получение полного списка файлов каталога
+###################################################################################################
+define get_dir_files
+$(foreach file,$1,$(if $(wildcard $(file)/*),$(call get_dir_files,$(wildcard $(file)/*)),$(file)))
+endef
+
+###################################################################################################
 #Обработка целей компонента
 ###################################################################################################
 
@@ -441,7 +448,7 @@ define process_source_dir
   $$(MODULE_NAME).SOURCE_DIR := $2
   $$(MODULE_NAME).TMP_DIR    := $$($1.TMP_DIR)/$$(MODULE_PATH)
   $1.TMP_DIRS                := $$($$(MODULE_NAME).TMP_DIR) $$($1.TMP_DIRS)  
-  $1.INSTALLATION_FILES      := $$($1.INSTALLATION_FILES) $$(foreach file,$(DEFAULT_INSTALLATION_FILES),$$(wildcard $2/$$(file)))
+  $1.INSTALLATION_FILES      := $$($1.INSTALLATION_FILES) $$(foreach file,$(DEFAULT_INSTALLATION_FILES),$$(wildcard $2/$$(file)))  
   
 #Компиляция  
  
@@ -528,7 +535,9 @@ endif
   
 #Инсталляция 
   $1.INSTALLATION_FILES := $$($1.INSTALLATION_FILES) $$(foreach file,$(DEFAULT_INSTALLATION_FILES),$$(wildcard $$(COMPONENT_DIR)$$(file))) $$($1.TARGET_DLLS)  
-  $1.INSTALLATION_FLAG  := $$($1.TMP_DIR)/$(INSTALLATION_FLAG_SUFFIX)
+  $1.INSTALLATION_FILES := $$(call get_dir_files,$$($1.INSTALLATION_FILES))
+  $1.INSTALLATION_FLAG  := $$($1.TMP_DIR)/$(INSTALLATION_FLAG_SUFFIX)  
+  
   INSTALLATION_FILES    := $$(INSTALLATION_FILES) $$($1.INSTALLATION_FILES)
   INSTALLATION_FLAGS    := $$(INSTALLATION_FLAGS) $$($1.INSTALLATION_FLAG)
   
