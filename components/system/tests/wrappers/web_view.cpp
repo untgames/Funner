@@ -56,6 +56,7 @@ int main ()
     
 //    view.Window ().SetParentHandle (parent_window.Handle ());
     
+    view.Window ().Show ();
     view.Window ().Maximize ();
 
     view.Window ().SetTitle ("Test web view");

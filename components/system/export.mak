@@ -35,6 +35,6 @@ export.link.system.tabletos.LINK_TOOL     := tools.link.shared-lib
 export.link.system.tabletos.RUN_TOOL      := tools.run.tabletos_package
 export.info.system.CHMS                   := funner.system
 
-ifeq (,$(filter iphone,$(PROFILES)))
+ifeq (,$(filter iphone,$(PROFILES))$(filter android,$(PROFILES)))
   export.link.system.x86.IMPORTS            := link.extern.geekinfo
 endif

@@ -37,7 +37,7 @@ SYSTEMLIB.SOURCES.beagleboard.IMPORTS               := compile.extern.beagleboar
 SYSTEMLIB.SOURCES.meego.IMPORTS                     := compile.extern.meego
 SYSTEMLIB.SOURCES.tabletos.SOURCE_DIRS              := sources/platform/tabletos
 
-ifeq (,$(filter iphone,$(PROFILES)))
+ifeq (,$(filter iphone,$(PROFILES))$(filter android,$(PROFILES)))
   SYSTEMLIB.SOURCES.x86.IMPORTS := compile.extern.geekinfo
 endif
 
