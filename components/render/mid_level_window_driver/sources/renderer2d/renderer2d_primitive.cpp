@@ -53,6 +53,8 @@ void Primitive::SetTexture (render::mid_level::renderer2d::ITexture* in_texture)
   {
     renderable_primitive.texture            = 0;
     renderable_primitive.texture_min_filter = (render::mid_level::renderer2d::TexMinFilter)0;
+    texture                                 = in_texture;
+
     return;
   }
 
@@ -71,6 +73,8 @@ void Primitive::SetTexture (render::mid_level::renderer2d::ITexture* in_texture)
     throw xtl::make_argument_exception ("render::mid_level::window_driver::renderer2d::Primitive::SetTexture", "texture", typeid (in_texture).name (),
       "Texture type must be render::mid_level::window_driver::renderer2d::ImageTexture or render::mid_level::window_driver::renderer2d::RenderTargetTexture");    
   }
+
+  texture = in_texture;
 }
 
 ITexture* Primitive::GetTexture ()
