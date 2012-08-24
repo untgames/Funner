@@ -585,8 +585,10 @@
 /* Define to 1 if you have the <signal.h> header file. */
 #define HAVE_SIGNAL_H 1
 
+#ifndef X86
 /* Define to 1 if you have the sigsetjmp function or macro. */
 #define HAVE_SIGSETJMP 1
+#endif
 
 /* Define to 1 if sig_atomic_t is an available typedef. */
 #define HAVE_SIG_ATOMIC_T 1
