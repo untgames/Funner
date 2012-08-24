@@ -14,8 +14,8 @@ int main ()
 
   StringArray tokens = parse (str,pattern);
 
-  printf ("parse '%s' (pattern='%s', locale='%s') on %lu tokens:\n",
-          str,pattern,setlocale (LC_ALL,NULL),tokens.Size ());
+  printf ("parse '%s' (pattern='%s') on %lu tokens:\n",
+          str,pattern,tokens.Size ());
 
   for (size_t i=0;i<tokens.Size ();i++)
     printf ("    '%s'\n",tokens [i]);

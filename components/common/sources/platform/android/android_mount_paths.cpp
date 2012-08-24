@@ -7,14 +7,14 @@ using namespace common;
 
 void AndroidPlatform::MountSystemSpecificPaths ()
 {
-  const char* home_dir = getenv ("HOME");
-  const char* tmp_dir  = getenv ("TEMP");  
+  const char* home_dir = getenv ("ANDROID_DATA");
   
   if (!home_dir)
-    home_dir = "~";
+    home_dir = "/data";
     
-  if (!tmp_dir)
-    tmp_dir = "~";
+  stl::string tmp_dir = home_dir;
+  
+  tmp_dir += "/local/tmp";
 
   FileSystem::MountLink ("/system/appdata", (stl::string ("/std/") + home_dir).c_str ());
   FileSystem::MountLink ("/system/profile", (stl::string ("/std/") + home_dir).c_str ());

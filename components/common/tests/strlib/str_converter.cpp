@@ -30,14 +30,14 @@ void dump (const void* buffer, size_t length, const char* encoding)
     const unsigned short* s = (const unsigned short*)buffer;
 
     for (size_t i=0; i<length/2; i++)
-      printf ("%C", s [i]);
+      printf ("%04x", s [i]);
   }
   else if (!strcmp (encoding, "UTF16BE"))
   {
     const unsigned short* s = (const unsigned short*)buffer;
 
     for (size_t i = 0; i < length / 2; i++)
-      printf ("%C", ((s [i] >> 8) & 0xFF) | ((s [i] << 8) & 0xFF00));
+      printf ("%04x", ((s [i] >> 8) & 0xFF) | ((s [i] << 8) & 0xFF00));
   }
 }
 

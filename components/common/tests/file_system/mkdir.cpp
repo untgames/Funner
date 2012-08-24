@@ -8,8 +8,7 @@ using namespace common;
 
 void remove_all ()
 {
-  if (system ("rm -rf results"))
-    printf ("Can't remove results\n");
+  FileSystem::Remove ("results");
 }
 
 int main ()

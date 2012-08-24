@@ -10,8 +10,10 @@ int main ()
   try
   {
     FileSystem::Mount ("/my", "data");
-    
+            
     FileSystem::CopyFile ("/my/test.txt", "/io/stdout");
+    
+    printf ("\n");
   }
   catch (std::exception& exception)
   {

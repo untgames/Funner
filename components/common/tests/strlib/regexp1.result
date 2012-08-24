@@ -1,5 +1,5 @@
 Results of regexp1_test:
-parse 'hello world' (pattern='(hello) ([[:lower:]]+)', locale='C') on 3 tokens:
+parse 'hello world' (pattern='(hello) ([[:lower:]]+)') on 3 tokens:
     'hello world'
     'hello'
     'world'

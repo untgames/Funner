@@ -264,7 +264,7 @@ void StdioFileSystem::Mkdir (const char* dir_name)
 
 bool StdioFileSystem::IsFileExist (const char* file_name)
 {
-  struct stat s;
+  struct stat s;  
 
   return stat (file_name,&s) == 0; 
 }

@@ -14,7 +14,7 @@ int main()
   {
     stl::string str = "Hello World!!!";
 
-    printf("char->wchar %S",to_wstring_from_utf8 (str).c_str());
+    printf("char->wchar %S\n",to_wstring_from_utf8 (str).c_str());
   }
   catch (std::exception& exception)
   {
