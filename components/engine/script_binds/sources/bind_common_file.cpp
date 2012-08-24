@@ -178,7 +178,7 @@ void set_file_string_attribute (const char* file_name, const char* attribute, co
   if (!value)
     throw xtl::make_null_argument_exception ("engine::script_binds::set_file_string_attribute", "value");
 
-  FileSystem::SetFileAttribute (file_name, attribute, value, xtl::xstrlen (value) + 1);
+  FileSystem::SetFileAttribute (file_name, attribute, value, xtl::xstrlen (value));
 }
 
 void set_file_int_attribute (const char* file_name, const char* attribute, int value)
