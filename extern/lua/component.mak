@@ -16,6 +16,7 @@ EXTERN.LUALIB.msvc.COMPILER_CFLAGS := -TP               #Флаги сборки (зависят о
 EXTERN.LUALIB.g++.COMPILER_CFLAGS  := -x c++
 EXTERN.LUALIB.android.COMPILER_CFLAGS := -include android_lconv_wrapper.h
 EXTERN.LUALIB.wince.COMPILER_CFLAGS   := -FIwince_wrapper.h -DLUA_ANSI
+EXTERN.LUALIB.wp8.COMPILER_CFLAGS     := -FIwp8_wrapper.h
 
 #Цель №2 - LUA_UTILS
 EXTERN.LUA_UTILS.TYPE                   := test-suite     	 #Тип цели
@@ -26,6 +27,7 @@ EXTERN.LUA_UTILS.TARGET_DIR              = $(DIST_BIN_DIR)
 EXTERN.LUA_UTILS.msvc.COMPILER_CFLAGS   := -TP              #Флаги сборки (зависят от конфигурации)
 EXTERN.LUA_UTILS.g++.COMPILER_CFLAGS    := -x c++
 EXTERN.LUA_UTILS.bada_simulator.IMPORTS := link.extern.bada_addons
+EXTERN.LUA_UTILS.wp8.COMPILER_CFLAGS    := -FIwp8_wrapper.h
 
 #Цель №3 - LUA_TESTS
 EXTERN.LUA_TESTS.TYPE              := test-suite
