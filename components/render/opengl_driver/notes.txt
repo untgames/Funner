@@ -22,3 +22,104 @@
 7. Текстуры
   - texture arrays
   - compression formats
+8. Standards
+  - 2.1
+    image buffer objects
+  - 3.0
+    * убраны все встроенные вершинные атрибуты и функции по их установке (теперь только пользовательские атрибуты)
+    * убран FFP: убран весь GL state кроме gl_DepthRange и стек матриц трансформаций, а также функции для настройки FFP
+    * убрана смена толщины линий
+    * теперь режим отображения задних и передних граней обязательно должен совпадать
+    * убрана запись пикселей
+    * убраны форматы ALPHA LUMINANCE, LUMINANCE ALPHA, и INTENSITY (заменены R и RG текстурами)
+    * added GL_EXT_framebuffer_object
+    * added GL_EXT_framebuffer_multisample
+    * added GL_EXT_draw_instanced
+    * added GL_ARB_vertex_array_object
+    * added GL_EXT_framebuffer_sRGB
+    * added GL_EXT_transform_feedback
+    * added EXT_draw_buffers2
+    * added EXT_texture_array    
+  - 3.1
+      Instanced rendering with a per instance counter accessible to vertex shaders    ARB_draw_instanced
+      Data copying between buffer objects     EXT_copy_buffer
+      Primitive restart       NV_primitive_restart
+      Texture buffer objects  ARB_texture_buffer_object
+      Rectangular textures    ARB_texture_rectangle
+      Uniform buffer objects  ARB_uniform_buffer_object  
+  - 3.2
+      BGRA vertex component ordering  ARB_vertext_array_bgra
+      Drawing command allowing modification of the base vertex index  ARB_draw_elements_base_vertex
+      Shader fragment coordinate convention control   ARB_fragment_coord_conventions
+      Provoking vertex control        ARB_provoking_vertex
+      Seamless cube map filtering     ARB_seamless_cube_map
+      Multisampled textures and texture samplers for specific sample locations        ARB_texture_multisample
+      Fragment depth clamping ARB_depth_clamp
+      Geometry shaders        ARB_geometry_shader4
+      Fence sync objects      ARB_sync    
+  - 3.3
+      Shading language 3.30   ARB_shader_bit_encoding
+      New blending functions  ARB_blend_func_extended
+      Attribute locations     ARB_explicit_attrib_location
+      Simple boolean occlusion queries        ARB_occlusion_query2
+      Sampler objects ARB_sampler_objects
+      A new texture format for unsigned 10.10.10.2    ARB_texture_rgb10_a2ui
+      Texture swizzle ARB_texture_swizzle
+      Timer query     ARB_timer_query
+      Instanced arrays        ARB_instanced_arrays
+      Vertex attributes 2.10.10.10    ARB_vertex_type_2_10_10_10_rev  
+  - 4.0
+      Shading language 4.00   ARB_texture_query_lod, ARB_gpu_shader5, ARB_gpu_shader_fp64, ARB_shader_subroutine, ARB_texture_gather
+      Individual blend equations for each color output        ARB_draw_buffers_blend
+      Draw instanced arrays indirect  ARB_draw_indirect
+      Request minimum number of fragment inputs       ARB_sample_shading
+      Tessellation control and evaluation shaders     ARB_tessellation_shader
+      Buffer Texture formats RGB32F, RGB32I, RGB32UI  ARB_texture_buffer_object_rgb32
+      Cube map array textures ARB_texture_cube_map_array
+      Additional transform feedback functionality     ARB_transform_feedback2, ARB_transform_feedback3  
+  - 4.1
+      Query and load a binary blob for program objects        ARB_get_program_binary
+      Ability to bind programs individually to programmable stages    ARB_separate_shader_objects
+      Pulling missing functionality from OpenGL ES 2.0 into OpenGL    ARB_ES2_compatibility
+      Documents precision requirements for several FP operations      ARB_shader_precision
+      Provides 64-bit floating-point component vertex shader inputs   ARB_vertex_attrib_64_bit
+      Multiple viewports for the same rendering surface, or one per surface   ARB_viewport_array  
+  - 4.2
+      Allows atomically incrementing/decrementing and fetching of buffer object memory locations from shaders.        ARB_shader_atomic_counters
+      Allows shaders to read and write images, without filtering and mostly arbitrarily.      ARB_shader_image_load_store
+      Allows texture objects to have the storage for all of their mipmap levels allocated at once. When using this API, the texture object's storage can never be changed again, but the contents of that storage can.        ARB_texture_storage
+      Allows instanced rendering of data written by transform feedback operations.    ARB_transform_feedback_instanced
+      Allows the setting of Uniform Buffer Object and sampler binding points directly from GLSL, among many, many other things.       ARB_shading_language_420pack
+      Allows the use of certain advanced compression techniques.      ARB_texture_compression_BPTC
+      Allows instanced rendering with a starting instance value.      ARB_base_instance
+      Allows the user to detect the maximum number of samples possible for a particular image format and texture type ARB_internalformat_query
+      Allows for sub-rectangle selection when transferring compressed texture data.   ARB_compressed_texture_pixel_storage
+      Allows unpacking 16-bit floats from a 32-bit unsigned integer value.    ARB_shading_language_packing
+      Allows querying of the alignment for pointers returned from buffer object mapping operations.   ARB_map_buffer_alignment
+      Allows explicitly defining how a fragment shader will modify the depth value, so that the system can optimize these cases better.       ARB_conservative_depth  
+  - 4.3
+      Debug messaging KHR_debug
+      GLSL multidimensional arrays    ARB_arrays_of_arrays
+      Clear Buffer Objects to specific values, ala memset?    ARB_clear_buffer_object
+      Arbitrary compute shaders       ARB_compute_shader
+      Arbitrary image copying ARB_copy_image
+      Compatibility with OpenGL ES 3.0        ARB_ES3_compatibility
+      Specifying uniform locations in a shader        ARB_explicit_uniform_location
+      Layer and viewport indices available from the fragment shader   ARB_fragment_layer_viewport
+      Rendering to a Framebuffer Object that has no attachments       ARB_framebuffer_no_attachments
+      Querying support information about Image Formats        ARB_internalformat_query2
+      Texture, buffer object, and framebuffer invalidation.   ARB_invalidate_subdata
+      Issuing multiple indirect rendering commands from a single draw command.        ARB_multi_draw_indirect
+      Improved API for getting info about program object values       ARB_program_interface_query
+      More robustness of API  ARB_robust_buffer_access_behavior,
+      ARB_robustness_isolation,
+      WGL_ARB_robustness_isolation,
+      GLX_ARB_robustness_isolation
+      Get size of images from GLSL    ARB_shader_image_size
+      Buffer object read-write access from shader, via a uniform-block style mechanism        ARB_shader_storage_buffer_object
+      Accessing the stencil values from a depth/stencil texture       ARB_stencil_texturing
+      Buffer Textures can now be bound to a range of a buffer object rather than the whole thing      ARB_texture_buffer_range
+      GLSL can detect the available mipmap pyramid of a sampler or image      ARB_texture_query_levels
+      Texture storage for multisample textures        ARB_texture_storage_multisample
+      The ability to create a new texture, with a new internal format, that references an existing texture's storage  ARB_texture_view
+      Separation of vertex format from buffer object association      ARB_vertex_attrib_binding
