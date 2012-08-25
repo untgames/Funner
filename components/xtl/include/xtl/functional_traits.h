@@ -506,7 +506,7 @@ struct functional_traits<Ret (T::*)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Ar
 template <class T,class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6, class Arg7, class Arg8, class Arg9, class Ret>
 struct functional_traits<Ret (T::*)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8, Arg9, ...) const volatile>: public eclipsis_functional_traits<memfun_arguments_traits<9, const volatile T, Ret, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8, Arg9> > { };
 
-#if !defined(_MSC_VER) || defined(_WIN32_WCE)
+#if !defined(_MSC_VER) || defined(_WIN32_WCE) || defined (WP8)
 
 /*
     Специализации для указателей на функцию
@@ -602,7 +602,7 @@ struct functional_traits<Ret (*)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8,
     Специализации для указателей на функцию с модификатором __fastcall
 */
 
-#ifndef __cplusplus_cli
+#if !defined (__cplusplus_cli) && !defined (WP8)
 
 //специализация для указателя на функцию без аргументов
 template <class Ret>
