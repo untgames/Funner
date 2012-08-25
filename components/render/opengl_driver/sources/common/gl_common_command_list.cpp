@@ -12,34 +12,6 @@ namespace
 
 const size_t COMMAND_ARRAY_RESERVE_SIZE = 16; //резервируемое число команд в буфере
 
-/*
-     ласс, вызывающий дисплейный список
-*/
-
-/*struct DisplayListCaller: public xtl::reference_counter, public ICommandListExecuter
-{
-  int display_list; //номер дисплейного списка
-
-/// онструктор
-  DisplayListCaller (int in_display_list) : display_list (in_display_list) {}
-
-///ƒеструктор
-  ~DisplayListCaller ()
-  {
-    glDeleteLists (display_list, 1);
-  }
-
-///¬ыполнение команд
-  void ExecuteCommands ()
-  {
-    glCallList (display_list);
-  }
-
-///ѕодсчЄт ссылок
-  void AddRef () { addref (this); }
-  void Release () { release (this); }
-};*/
-
 }
 
 /*
@@ -129,39 +101,6 @@ CommandListBuilder::ExecuterPtr CommandListBuilder::Finish ()
 {
   if (!impl)
     impl = new Impl;
-
-    //проверка возможности построени€ дисплейного списка средствами OpenGL
-
-/*  int display_list = glGenLists (1);
-  
-  if (display_list)
-  {
-      //запись команд средствами OpenGL
-      
-    glNewList (display_list, GL_COMPILE);
-
-    impl->Impl::ExecuteCommands ();
-
-    glEndList ();    
-
-      //создание класса, вызывающего дисплейный список
-
-    try
-    {
-      ExecuterPtr executer (new DisplayListCaller (display_list), false);
-
-        //очистка очереди команд
-
-      impl->commands.clear ();
-
-      return executer;
-    }
-    catch (...)
-    {
-      glDeleteLists (display_list, 1);
-      throw;
-    }
-  }*/
 
     //возвращение класса, выполн€щего команды вручную
 
