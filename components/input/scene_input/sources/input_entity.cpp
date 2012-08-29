@@ -91,6 +91,8 @@ void InputEntity::OnTouch (InputPort& input_port, const TouchEvent& event, const
 {
   try
   {
+    xtl::com_ptr<const scene_graph::InputZoneModel> self_lock (&zone);
+    
       //формирование контекста события
       
     const InputZoneModel::ZoneDesc& desc = zone.ZoneDescs ()[zone_index];
@@ -190,9 +192,11 @@ void InputEntity::OnTouch (InputPort& input_port, const TouchEvent& event, const
 void InputEntity::OnBroadcastTouch (InputPort& input_port, const TouchEvent& event, const math::vec3f& touch_world_position)
 {
   try
-  {
+  {    
     if (!has_screen_handlers && !wait_for_release_event)
       return;
+      
+    xtl::com_ptr<const scene_graph::InputZoneModel> self_lock (&zone);      
       
       //подготовка контекста оповещения
 
