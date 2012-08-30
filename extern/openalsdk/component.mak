@@ -4,10 +4,11 @@
 #TARGETS.msvc    := EXTERN.OPENALLIB EXTERN.OPENAL_TESTS
 TARGETS.linux   := EXTERN.OPENALLIB EXTERN.OPENAL_TESTS
 TARGETS.android := EXTERN.OPENALLIB EXTERN.OPENAL_TESTS
+TARGETS.wp8     := EXTERN.OPENALLIB EXTERN.OPENAL_TESTS
 
 #Öåëü ¹1 - OPENALLIB
 ifneq (,$(filter no_dll,$(PROFILES)))
-ifneq (,$(filter android,$(PROFILES)))
+ifneq (,$(filter android,$(PROFILES))$(filter wp8,$(PROFILES)))
 EXTERN.OPENALLIB.TYPE                       := dynamic-lib
 else
 EXTERN.OPENALLIB.TYPE                       := static-lib

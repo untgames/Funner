@@ -14,6 +14,7 @@ export.link.extern.openal.macosx.LINK_FLAGS  := -framework OpenAL
 export.link.extern.openal.iphone.LINK_FLAGS  := -framework OpenAL
 export.link.extern.openal.android.LIBS       := funner.extern.openal32
 export.link.extern.openal.tabletos.LIBS      := OpenAL asound
+export.link.extern.openal.wp8.LIBS           := funner.extern.openal32
 #export.link.extern.openal.win32.LIBS         := funner.extern.openal32
 
 # Run exports
@@ -22,3 +23,4 @@ export.run.extern.openal.win32.DLLS     := OpenAL32 wrap_oal
 export.run.extern.openal.win32.DLL_DIRS := bin
 export.run.extern.openal.linux.DLLS     := funner.extern.openal32
 export.run.extern.openal.android.DLLS   := funner.extern.openal32
+export.run.extern.openal.wp8.DLLS       := funner.extern.openal32
