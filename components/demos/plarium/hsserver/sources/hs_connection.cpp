@@ -589,7 +589,7 @@ struct HsConnection::Impl : public ITcpClientListener, public IBackgroundThreadL
   void Disconnect ()
   {
     if (Thread::GetCurrentThreadId () != create_thread_id)
-      throw sgi_stl::logic_error ("HsConnection::Connect - can't connect from thread other than main");
+      throw sgi_stl::logic_error ("HsConnection::Disconnect - can't disconnect from thread other than main");
 
     if (state == HsConnectionState_Disconnected)
       return;
@@ -598,7 +598,7 @@ struct HsConnection::Impl : public ITcpClientListener, public IBackgroundThreadL
 
     send_thread->Join ();
 
-    send_thread.reset (0);
+    send_thread.reset ();
 
     tcp_client.Disconnect ();
 
@@ -691,7 +691,11 @@ struct HsConnection::Impl : public ITcpClientListener, public IBackgroundThreadL
 
   void OnConnectFailed (const char* error)
   {
+    send_thread.reset ();
+    send_queue.Clear ();
+
     state = HsConnectionState_Disconnected;
+
     OnError (ErrorCode_Generic, error);
     OnConnectionStateChanged ();
   }
