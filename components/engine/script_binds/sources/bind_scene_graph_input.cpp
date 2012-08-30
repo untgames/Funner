@@ -16,7 +16,10 @@ void bind_input_zone_notification_library (script::Environment& env)
 {
   InvokerRegistry lib = env.CreateLibrary (SCENE_STATIC_INPUT_ZONE_NOTIFICATION_LIBRARY);
   
-  lib.Register ("get_OnPress",            make_const (InputZoneNotification_OnPress));  
+  lib.Register ("get_OnPress",            make_const (InputZoneNotification_OnPress));
+  lib.Register ("get_OnPressEnter",       make_const (InputZoneNotification_OnPressEnter));
+  lib.Register ("get_OnPressMove",        make_const (InputZoneNotification_OnPressMove));  
+  lib.Register ("get_OnPressLeave",       make_const (InputZoneNotification_OnPressLeave));
   lib.Register ("get_OnClick",            make_const (InputZoneNotification_OnClick));
   lib.Register ("get_OnTouchEnter",       make_const (InputZoneNotification_OnTouchEnter));
   lib.Register ("get_OnTouchLeave",       make_const (InputZoneNotification_OnTouchLeave));
