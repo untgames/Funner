@@ -24,6 +24,16 @@ struct InputPortDesc
 
 typedef stl::list<InputPortDesc> InputPortList;
 
+struct TouchDesc
+{
+  touch_t touch;
+  int     button;
+  
+  TouchDesc (touch_t in_touch, int in_button) : touch (in_touch), button (in_button) {}
+};
+
+typedef stl::vector<TouchDesc> TouchDescArray;
+
 }
 
 struct SceneInputManager::Impl: public xtl::reference_counter, public IScreenListener
@@ -41,6 +51,7 @@ struct SceneInputManager::Impl: public xtl::reference_counter, public IScreenLis
   float                touch_size;                //размер тача
   InputTransformSpace  touch_size_space;          //система координат размеров тача
   InputPortIterator*   first_input_port_iterator; //первый итератор перебора областей вывода
+  TouchDescArray       touches;                   //текущие нажатия
   
   /// Итератор областей ввода
   class InputPortIterator: public xtl::noncopyable
@@ -119,12 +130,37 @@ struct SceneInputManager::Impl: public xtl::reference_counter, public IScreenLis
     
     event_tokens.reserve (RESERVE_TOKENS_COUNT);
     event_tokens_buffer.reserve (RESERVE_TOKENS_BUFFER);
+    
+    static const size_t RESERVE_TOUCHES_COUNT = 16;
+    
+    touches.reserve (RESERVE_TOUCHES_COUNT);
   }
   
 ///Деструктор
   ~Impl ()
   {
     SetScreen (0);
+  }
+  
+///Добавление тача
+  void AddTouch (touch_t touch, int button)
+  {
+    for (TouchDescArray::iterator iter=touches.begin (), end=touches.end (); iter!=end; ++iter)
+      if (iter->touch == touch && iter->button == button)
+        return;
+        
+    touches.push_back (TouchDesc (touch, button));    
+  }
+
+///Удаление тача
+  void RemoveTouch (touch_t touch, int button)
+  {
+    for (TouchDescArray::iterator iter=touches.begin (), end=touches.end (); iter!=end; ++iter)
+      if (iter->touch == touch && iter->button == button)
+      {
+        touches.erase (iter);
+        return;
+      }    
   }
   
 ///Изменение экрана
@@ -351,22 +387,45 @@ struct SceneInputManager::Impl: public xtl::reference_counter, public IScreenLis
       return true;
     }    
 
-    return false;    
+    return false;
   }
   
 ///Обработка события ввода
   void ProcessInputEvent (const char* event_string)
   {
+    xtl::intrusive_ptr<Impl> self_lock (this);
+    
     if (!screen)
       return;      
+      
+      //парсинг входящего события
 
     TouchEvent event;
 
     if (!ParseInputEvent (event_string, event))
       return;
+      
+      //обновление таблицы нажатий
+            
+    switch (event.state)
+    {
+      case TouchState_Pressed:
+        AddTouch (event.touch, event.button);
+        break;
+      case TouchState_Released:
+        RemoveTouch (event.touch, event.button);
+        break;
+      default:
+      case TouchState_Moving:
+        break;
+    }
+      
+      //подготовка областей ввода
 
     if (need_reorder)
       Sort ();      
+      
+      //диспетчеризация события
 
     math::vec2f position = event.position;
     
@@ -382,7 +441,23 @@ struct SceneInputManager::Impl: public xtl::reference_counter, public IScreenLis
     InputPortIterator iter (this);
 
     while (InputPortDesc* desc = iter.Next ())
-      desc->port->OnTouch (touch_context, desc->last_touch_world_position);
+      desc->port->OnTouch (touch_context, desc->last_touch_world_position);            
+      
+    if (event.button == MOUSE_HOVER_ID && event.state == TouchState_Moving)
+    {
+      for (TouchDescArray::iterator iter=touches.begin (), end=touches.end (); iter!=end; ++iter)
+        if (iter->touch == event.touch && iter->button != MOUSE_HOVER_ID)
+        {
+          InputPortIterator port_iter (this);
+
+          while (InputPortDesc* desc = port_iter.Next ())
+          {
+            event.button = iter->button;
+            
+            desc->port->OnTouch (touch_context, desc->last_touch_world_position);
+          }
+        }            
+    }
   }
 };
 
@@ -470,6 +545,8 @@ void SceneInputManager::Reset ()
   {
     for (InputPortList::iterator iter=impl->input_ports.begin (), end=impl->input_ports.end (); iter!=end; ++iter)
       iter->port->ResetTouchState ();
+      
+    impl->touches.clear ();
   }
   catch (xtl::exception& e)
   {
