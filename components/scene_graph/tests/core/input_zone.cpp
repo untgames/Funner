@@ -22,7 +22,7 @@ class MyVisitor: public visitor<void, InputZone>
 
 template <int I> void notify (InputZoneNotification notification_id, const InputZoneNotificationContext&)
 {
-  printf ("notification%u: %d\n", I, notification_id);
+  printf ("notification%u: %s\n", I, get_name (notification_id));
 }
 
 int main ()

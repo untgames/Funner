@@ -11,6 +11,6 @@ InputZone '':
     position: [-0.50 -0.50 0.00]
     axis_x:   [1.00 0.00 0.00]
     axis_y:   [0.00 1.00 0.00]
-notification1: 1
-notification0: 1
-notification0: 0
+notification1: OnClick
+notification0: OnClick
+notification0: OnPress

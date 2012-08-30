@@ -29,6 +29,9 @@ enum InputZoneEvent
 enum InputZoneNotification
 {
   InputZoneNotification_OnPress,             //touch, world_position, local_position
+  InputZoneNotification_OnPressEnter,        //touch, world_position, local_position  
+  InputZoneNotification_OnPressLeave,        //touch, world_position, local_position
+  InputZoneNotification_OnPressMove,         //touch, world_position, local_position  
   InputZoneNotification_OnClick,             //touch, world_position, local_position
   InputZoneNotification_OnTouchEnter,        //touch, world_position, local_position
   InputZoneNotification_OnTouchLeave,        //touch, world_position

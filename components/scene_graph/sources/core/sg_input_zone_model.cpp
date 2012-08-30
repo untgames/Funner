@@ -20,6 +20,9 @@ const char* get_name (InputZoneNotification id)
   switch (id)
   {
     case InputZoneNotification_OnPress:             return "OnPress";
+    case InputZoneNotification_OnPressEnter:        return "OnPressEnter";
+    case InputZoneNotification_OnPressLeave:        return "OnPressLeave";
+    case InputZoneNotification_OnPressMove:         return "OnPressMove";
     case InputZoneNotification_OnClick:             return "OnClick";
     case InputZoneNotification_OnTouchEnter:        return "OnTouchEnter";
     case InputZoneNotification_OnTouchLeave:        return "OnTouchLeave";
