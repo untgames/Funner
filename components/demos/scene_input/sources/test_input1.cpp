@@ -133,6 +133,7 @@ struct Test
     switch (notification)
     {
       case InputZoneNotification_OnTouchMove:
+      case InputZoneNotification_OnPressMove:
       case InputZoneNotification_OnScreenTouchMove:
       case InputZoneNotification_OnScreenTouchUp:
       case InputZoneNotification_OnScreenTouchDown:
