@@ -326,7 +326,7 @@ void AndroidApplicationManager::GetSystemProperties (common::PropertyMap& proper
 
     common::PropertyMap android_properties = common::parse_init_string (properties_line.c_str ());
 
-    properties.SetProperty ("OS", "android");
+    properties.SetProperty ("Operating System", "Android");
 
     for (size_t i=0, count=android_properties.Size (); i<count; i++)
       properties.SetProperty (android_properties.PropertyName (i), android_properties.GetString (i));
