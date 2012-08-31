@@ -171,7 +171,7 @@ void InputPort::OnTouch (TouchProcessingContext& touch_context, const math::vec3
 {
   try
   {
-    if (!input_scene)
+    if (!input_scene || !is_active)
       return;
     
       //оповещение сцены о возникновении события
@@ -191,7 +191,7 @@ void InputPort::FindTouch (TouchProcessingContext& touch_context, math::vec3f& o
 {
   try
   {
-    if (!input_scene)
+    if (!input_scene || !is_active)
       return;
     
     if (need_update)
