@@ -108,6 +108,12 @@ class IDeviceContext: virtual public IObject
     virtual size_t              OSGetStencilReference  () = 0;
     virtual IView**             OSGetRenderTargetView  () = 0;
     virtual IView*              OSGetDepthStencilView  () = 0;
+    
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Управление уровнем вывода вершин
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    virtual void      SOSetTargets (size_t buffers_count, IBuffer** buffers, const size_t* offsets) = 0;
+    virtual IBuffer** OSGetTargets () = 0;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Очистка буферов отрисовки
@@ -131,6 +137,7 @@ class IDeviceContext: virtual public IObject
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Рисование примитивов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+    virtual void DrawAuto             (PrimitiveType primitive_type);
     virtual void Draw                 (PrimitiveType primitive_type, size_t first_vertex, size_t vertices_count) = 0;
     virtual void DrawIndexed          (PrimitiveType primitive_type, size_t first_index, size_t indices_count, size_t base_vertex) = 0;
     virtual void DrawInstanced        (PrimitiveType primitive_type, size_t vertex_count_per_instance, size_t instance_count, size_t first_vertex, size_t first_instance_location) = 0;

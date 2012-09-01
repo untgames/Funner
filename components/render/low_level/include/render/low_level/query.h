@@ -14,10 +14,14 @@ namespace low_level
 ///////////////////////////////////////////////////////////////////////////////////////////////////  
 enum QueryType
 {
-  QueryType_Event,               //событие
-  QueryType_Occlusion,           //количество нарисованных пикселей
-  QueryType_OcclusionPredicate,  //был ли нарисован хотя бы один пиксель
-  QueryType_PipelineStatistics,  //статистика конвейера
+  QueryType_Event,                   //событие
+  QueryType_Occlusion,               //количество нарисованных пикселей
+  QueryType_OcclusionPredicate,      //был ли нарисован хотя бы один пиксель
+  QueryType_PipelineStatistics,      //статистика конвейера
+  QueryType_StreamOutput0Statistics, //статистика потокового вывода вершин в поток 0
+  QueryType_StreamOutput1Statistics, //статистика потокового вывода вершин в поток 1
+  QueryType_StreamOutput2Statistics, //статистика потокового вывода вершин в поток 2
+  QueryType_StreamOutput3Statistics, //статистика потокового вывода вершин в поток 3
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -34,6 +38,15 @@ struct PipelineStatisticsQueryDesc
 typedef size_t OcclusionQueryDesc;
 typedef bool   OcclusionPredicateQueryDesc;
 typedef bool   EventQueryDesc;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Описание стастистики потокового вывода вершин
+///////////////////////////////////////////////////////////////////////////////////////////////////
+struct StreamOutputStatisticsQueryDesc
+{
+  UInt64 written_primitives_count;           //количество записанных примитивов
+  UInt64 required_storage_primitives_count;  //требуемое для записи количество примитивов
+};
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Запрос к устойству отрисовки
