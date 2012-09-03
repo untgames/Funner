@@ -8,8 +8,12 @@ void input_notify (InputZoneModel& model, const Viewport&, const InputZoneNotifi
   printf ("%s: %s\n", model.Name (), get_name (notification));
   fflush (stdout);  
 
-  if (notification == InputZoneNotification_OnScreenTouchDown && &model != additional_zone)
+  if (notification == InputZoneNotification_OnScreenTouchDown && &model != additional_zone && zone)
+  {
+    zone->Unbind ();
+    
     zone = InputZone::Pointer ();    
+  }
     
   if (notification == InputZoneNotification_OnScreenTouchUp && &model == additional_zone)
   {

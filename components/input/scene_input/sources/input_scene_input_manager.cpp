@@ -81,7 +81,7 @@ struct SceneInputManager::Impl: public xtl::reference_counter, public IScreenLis
         InputPortDesc* result = &*iter;
 
         ++iter;
-
+        
         return result;
       }
       
@@ -89,24 +89,21 @@ struct SceneInputManager::Impl: public xtl::reference_counter, public IScreenLis
       InputPortIterator* NextIterator () { return next_iterator; }
       
       ///Оповещение об удалении области ввода
-      void OnRemove (InputPortDesc* entry)
+      void OnRemove (const InputPortList::iterator& entry)
       {
-        if (iter == impl->input_ports.end ())
-          return;
-        
-        if (entry != &*iter)
+        if (entry != iter)
           return;
 
         Next ();
       }
       
       ///Оповещение о добавлении области ввода
-      void OnAdd (InputPortDesc* entry)
+      void OnAdd ()
       {
-        if (iter != impl->input_ports.end () || impl->input_ports.empty () || entry != &impl->input_ports.back ())
+        if (iter != impl->input_ports.end () || impl->input_ports.empty () || iter != impl->input_ports.end ())
           return;
           
-        iter = impl->input_ports.end ();
+        iter = impl->input_ports.end ();        
         
         --iter;
       }
@@ -231,7 +228,7 @@ struct SceneInputManager::Impl: public xtl::reference_counter, public IScreenLis
       input_ports.push_back (InputPortDesc (input_port));
 
       for (InputPortIterator* i=first_input_port_iterator; i; i=i->NextIterator ())
-        i->OnAdd (&input_ports.back ());
+        i->OnAdd ();
 
       need_reorder = true;
     }
@@ -247,11 +244,11 @@ struct SceneInputManager::Impl: public xtl::reference_counter, public IScreenLis
   {    
     size_t viewport_id = viewport.Id ();
     
-    for (InputPortList::iterator iter=input_ports.begin (), end=input_ports.end (); iter!=end; ++iter)
+    for (InputPortList::iterator iter=input_ports.begin (); iter!=input_ports.end (); ++iter)
       if (iter->port->AttachedViewport ().Id () == viewport_id)
       {
         for (InputPortIterator* i=first_input_port_iterator; i; i=i->NextIterator ())
-          i->OnRemove (&*iter);
+          i->OnRemove (iter);
 
         input_ports.erase (iter);
 
@@ -439,7 +436,7 @@ struct SceneInputManager::Impl: public xtl::reference_counter, public IScreenLis
       //оповещение
       
     InputPortIterator iter (this);
-
+    
     while (InputPortDesc* desc = iter.Next ())
       desc->port->OnTouch (touch_context, desc->last_touch_world_position);            
       

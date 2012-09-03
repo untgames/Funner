@@ -3,6 +3,8 @@ viewport1: OnScreenTouchMove
 viewport1: OnTouchEnter
 viewport1: OnScreenTouchMove
 viewport2: OnScreenTouchMove
+viewport1: OnTouchEnter
+viewport1: OnPressEnter
 viewport1: OnTouchDown
 viewport1: OnPress
 viewport1: OnScreenTouchDown

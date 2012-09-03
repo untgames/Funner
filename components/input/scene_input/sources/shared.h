@@ -284,6 +284,7 @@ class InputEntity: public xtl::reference_counter, private InputEventListener
     void       AddTouch            (InputPort& port, touch_t touch, int button);
     TouchDesc* FindTouch           (InputPort& port, touch_t touch, int button);
     void       RemoveTouch         (InputPort& port, touch_t touch, int button);
+    void       Notify              (InputPort& port, scene_graph::InputZoneNotification notification, const scene_graph::InputZoneNotificationContext& context);
   
   private:  
     const scene_graph::InputZoneModel& zone;
