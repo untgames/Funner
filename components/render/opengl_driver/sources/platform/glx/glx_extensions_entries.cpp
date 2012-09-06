@@ -52,8 +52,6 @@ void GlxExtensionsEntries::Init (ILibrary& library)
   init_extension_entry (library, "glXWaitVideoSyncSGI", WaitVideoSyncSGI);
   init_extension_entry (library, "glXMakeCurrentReadSGI", MakeCurrentReadSGI);
   init_extension_entry (library, "glXGetCurrentReadDrawableSGI", GetCurrentReadDrawableSGI);
-  init_extension_entry (library, "glXCreateGLXVideoSourceSGIX", CreateGLXVideoSourceSGIX);
-  init_extension_entry (library, "glXDestroyGLXVideoSourceSGIX", DestroyGLXVideoSourceSGIX);
   init_extension_entry (library, "glXGetCurrentDisplayEXT", GetCurrentDisplayEXT);
   init_extension_entry (library, "glXQueryContextInfoEXT", QueryContextInfoEXT);
   init_extension_entry (library, "glXGetContextIDEXT", GetContextIDEXT);
@@ -76,7 +74,6 @@ void GlxExtensionsEntries::Init (ILibrary& library)
   init_extension_entry (library, "glXQueryChannelRectSGIX", QueryChannelRectSGIX);
   init_extension_entry (library, "glXQueryChannelDeltasSGIX", QueryChannelDeltasSGIX);
   init_extension_entry (library, "glXChannelRectSyncSGIX", ChannelRectSyncSGIX);
-  init_extension_entry (library, "glXAssociateDMPbufferSGIX", AssociateDMPbufferSGIX);
   init_extension_entry (library, "glXJoinSwapGroupSGIX", JoinSwapGroupSGIX);
   init_extension_entry (library, "glXBindSwapBarrierSGIX", BindSwapBarrierSGIX);
   init_extension_entry (library, "glXQueryMaxSwapBarriersSGIX", QueryMaxSwapBarriersSGIX);
