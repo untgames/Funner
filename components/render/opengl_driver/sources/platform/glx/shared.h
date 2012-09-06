@@ -69,7 +69,7 @@ namespace glx
 class Adapter;
 class DynamicLibrary;
 
-struct GlxExtensionEntries
+struct GlxExtensionsEntries
 {
   PFNGLXSWAPINTERVALSGIPROC SwapIntervalSGI;
   
@@ -93,25 +93,25 @@ enum Caveat
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 struct PixelFormatDesc
 {
-  Adapter*                   adapter;                 //адаптер, поддерживающий указанный формат
-  const GlxExtensionEntries* glx_extension_entries;   //таблица GLX-расширений (должна быть скопирована в методе, получившем PixelFormatDesc, может быть 0)
-  GLXFBConfig                config;                  //конфигурация GLX-буфера кадра
-  int                        pixel_format_index;      //номер конфигурации GLX-буфера кадра
-  int                        visual_id;               //
-  size_t                     color_bits;              //количество бит на цвет
-  size_t                     alpha_bits;              //количество бит на альфу
-  size_t                     depth_bits;              //количество бит на глубину
-  size_t                     stencil_bits;            //количество бит на трафарет
-  size_t                     samples_count;           //количество sample'ов (0=multisample off)
-  size_t                     buffers_count;           //количество буферов в цепочке обмена (0=default 2 buffers)
-  SwapMethod                 swap_method;             //метод обмена заднего и переднего буферов
-  size_t                     aux_buffers;             //количество вспомогательных буферов отрисовки
-  size_t                     max_pbuffer_width;       //максимальная ширина PBuffer
-  size_t                     max_pbuffer_height;      //максимальная высота PBuffer
-  size_t                     max_pbuffer_pixels;      //максимальное количество пикселей для PBuffer
-  bool                       support_stereo;          //поддержка стерео-рендеринга
-  bool                       support_draw_to_window;  //поддержка рисования в Window
-  bool                       support_draw_to_pbuffer; //поддержка рисования в PBuffer
+  Adapter*                    adapter;                 //адаптер, поддерживающий указанный формат
+  const GlxExtensionsEntries* glx_extensions_entries;   //таблица GLX-расширений (должна быть скопирована в методе, получившем PixelFormatDesc, может быть 0)
+  GLXFBConfig                 config;                  //конфигурация GLX-буфера кадра
+  int                         pixel_format_index;      //номер конфигурации GLX-буфера кадра
+  int                         visual_id;               //
+  size_t                      color_bits;              //количество бит на цвет
+  size_t                      alpha_bits;              //количество бит на альфу
+  size_t                      depth_bits;              //количество бит на глубину
+  size_t                      stencil_bits;            //количество бит на трафарет
+  size_t                      samples_count;           //количество sample'ов (0=multisample off)
+  size_t                      buffers_count;           //количество буферов в цепочке обмена (0=default 2 buffers)
+  SwapMethod                  swap_method;             //метод обмена заднего и переднего буферов
+  size_t                      aux_buffers;             //количество вспомогательных буферов отрисовки
+  size_t                      max_pbuffer_width;       //максимальная ширина PBuffer
+  size_t                      max_pbuffer_height;      //максимальная высота PBuffer
+  size_t                      max_pbuffer_pixels;      //максимальное количество пикселей для PBuffer
+  bool                        support_stereo;          //поддержка стерео-рендеринга
+  bool                        support_draw_to_window;  //поддержка рисования в Window
+  bool                        support_draw_to_pbuffer; //поддержка рисования в PBuffer
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -337,10 +337,10 @@ class Adapter: virtual public IAdapter, public Object
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Перечисление доступных форматов пикселей
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    typedef stl::vector<PixelFormatDesc>     PixelFormatArray;
-    typedef stl::vector<GlxExtensionEntries> GlxExtensionEntriesArray;
+    typedef stl::vector<PixelFormatDesc>      PixelFormatArray;
+    typedef stl::vector<GlxExtensionsEntries> GlxExtensionsEntriesArray;
 
-    void EnumPixelFormats (int screen, PixelFormatArray& pixel_formats, GlxExtensionEntriesArray& entries);
+    void EnumPixelFormats (int screen, PixelFormatArray& pixel_formats, GlxExtensionsEntriesArray& entries);
 
   private:
     Adapter (const Adapter&); //no impl
@@ -357,12 +357,12 @@ class Adapter: virtual public IAdapter, public Object
 class ISwapChainImpl: virtual public ISwapChain
 {
   public:
-    virtual Adapter*                   GetAdapterImpl         () = 0; //получение реализации адаптера
-    virtual Display*                   GetDisplay             () = 0; //устройство отображения для текущего контекста
-    virtual Window                     GetWindow              () = 0; //окно отрисовки
-    virtual GLXFBConfig                GetFBConfig            () = 0; //конфигурация буфера кадра
-    virtual const GlxExtensionEntries& GetGlxExtensionEntries () = 0; //получение таблицы GLX-расширений
-    virtual bool                       HasVSync               () = 0; //есть ли вертикальная синхронизация
+    virtual Adapter*                    GetAdapterImpl          () = 0; //получение реализации адаптера
+    virtual Display*                    GetDisplay              () = 0; //устройство отображения для текущего контекста
+    virtual Window                      GetWindow               () = 0; //окно отрисовки
+    virtual GLXFBConfig                 GetFBConfig             () = 0; //конфигурация буфера кадра
+    virtual const GlxExtensionsEntries& GetGlxExtensionsEntries () = 0; //получение таблицы GLX-расширений
+    virtual bool                        HasVSync                () = 0; //есть ли вертикальная синхронизация
 
   protected:
     virtual ~ISwapChainImpl () {}
@@ -399,7 +399,7 @@ class PrimarySwapChain: virtual public ISwapChainImpl, public Object
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Получение таблицы GLX-расширений
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    const GlxExtensionEntries& GetGlxExtensionEntries ();
+    const GlxExtensionsEntries& GetGlxExtensionsEntries ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конфигурация буфера кадра
@@ -500,7 +500,7 @@ class PBuffer: virtual public ISwapChainImpl, public Object
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Получение таблицы GLX-расширений
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    const GlxExtensionEntries& GetGlxExtensionEntries ();
+    const GlxExtensionsEntries& GetGlxExtensionsEntries ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конфигурация буфера кадра

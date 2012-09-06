@@ -114,11 +114,11 @@ class PlatformManagerImpl
         
           //перечисление достуных форматов пикселей
 
-        Adapter::PixelFormatArray         pixel_formats;
-        Adapter::GlxExtensionEntriesArray glx_extension_entries;
+        Adapter::PixelFormatArray          pixel_formats;
+        Adapter::GlxExtensionsEntriesArray glx_extensions_entries;
 
         pixel_formats.reserve (PIXEL_FORMAT_ARRAY_RESERVE_SIZE);
-        glx_extension_entries.reserve (adapters_count);
+        glx_extensions_entries.reserve (adapters_count);
         
         int screen    = get_screen_number ((Window)desc.window_handle);
         int visual_id = XVisualIDFromVisual (DefaultVisual ((Display*)syslib::x11::DisplayManager::DisplayHandle (), screen));        
@@ -140,7 +140,7 @@ class PlatformManagerImpl
           {
             log.Printf ("...enumerate pixel formats on adapter '%s'", adapter->GetName ());
             
-            adapter->EnumPixelFormats (screen, pixel_formats, glx_extension_entries);
+            adapter->EnumPixelFormats (screen, pixel_formats, glx_extensions_entries);
           }
           catch (std::exception& exception)
           {
@@ -152,7 +152,7 @@ class PlatformManagerImpl
           }
         }
 
-          //выбор наиболее подход€щего формата          
+          //выбор наиболее подход€щего формата
 
         const PixelFormatDesc& pixel_format = ChoosePixelFormat (pixel_formats, desc, visual_id);
         
@@ -326,7 +326,7 @@ class PlatformManagerImpl
 ///¬ыбор формата пикселей
     const PixelFormatDesc& ChoosePixelFormat (const Adapter::PixelFormatArray& pixel_formats, const SwapChainDesc& swap_chain_desc, int visual_id)
     {
-        //если не найдено ни одного подход€щего формата - создание цепочки обмена невозможно                  
+        //если не найдено ни одного подход€щего формата - создание цепочки обмена невозможно
 
       if (pixel_formats.empty ())
         throw xtl::format_operation_exception ("render::low_level::opengl::glx::PlatformManagerImpl::ChoosePixelFormat", "No pixel formats found");

@@ -18,11 +18,11 @@ inline void init_extension_entry (ILibrary& library, const char* name, Fn& fn)
     Инициализация точек входа WGL
 */
 
-void GlxExtensionEntries::Init (ILibrary& library)
+void GlxExtensionsEntries::Init (ILibrary& library)
 {
     //обнуление адресов точек входа
 
-  memset (this, 0, sizeof (GlxExtensionEntries));
+  memset (this, 0, sizeof (GlxExtensionsEntries));
 
     //получение адресов точек входа расширений OpenGL
 

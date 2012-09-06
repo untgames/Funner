@@ -13,16 +13,16 @@ typedef Output::Pointer       OutputPtr;
 
 struct PrimarySwapChain::Impl
 {
-  Log                 log;                     //протокол
-  AdapterPtr          adapter;                 //адаптер, которому принадлежит устройство
-  AdapterLibraryPtr   library;                 //библиотека адаптера
-  GlxExtensionEntries glx_extension_entries;   //таблица WGL-расширений
-  int                 pixel_format_index;      //индекс формата пикселей устройства вывода
-  SwapChainDesc       desc;                    //дескриптор цепочки обмена
-  Display*            display;                 //соединение с дисплеем
-  Window              window;                  //окно
-  GLXFBConfig         glx_fb_config;           //конфигурация буфера кадра
-  PropertyList        properties;              //свойства цепочки обмена
+  Log                  log;                     //протокол
+  AdapterPtr           adapter;                 //адаптер, которому принадлежит устройство
+  AdapterLibraryPtr    library;                 //библиотека адаптера
+  GlxExtensionsEntries glx_extensions_entries;   //таблица WGL-расширений
+  int                  pixel_format_index;      //индекс формата пикселей устройства вывода
+  SwapChainDesc        desc;                    //дескриптор цепочки обмена
+  Display*             display;                 //соединение с дисплеем
+  Window               window;                  //окно
+  GLXFBConfig          glx_fb_config;           //конфигурация буфера кадра
+  PropertyList         properties;              //свойства цепочки обмена
 
 ///Конструктор
   Impl (const SwapChainDesc& in_desc, const PixelFormatDesc& pixel_format)
@@ -36,13 +36,13 @@ struct PrimarySwapChain::Impl
     {
         //инициализация таблицы расширений
 
-      if (pixel_format.glx_extension_entries)
+      if (pixel_format.glx_extensions_entries)
       {
-        glx_extension_entries = *pixel_format.glx_extension_entries;
+        glx_extensions_entries = *pixel_format.glx_extensions_entries;
       }
       else
       {
-        memset (&glx_extension_entries, 0, sizeof glx_extension_entries);
+        memset (&glx_extensions_entries, 0, sizeof glx_extensions_entries);
       }
 
         //установка состояния FullScreen
@@ -222,12 +222,21 @@ Window PrimarySwapChain::GetWindow ()
 }
 
 /*
+    Включена ли вертикальная синхронизация
+*/
+
+bool PrimarySwapChain::HasVSync ()
+{
+  return impl->desc.vsync;
+}
+
+/*
     Получение таблицы GLX-расширений
 */
 
-const GlxExtensionEntries& PrimarySwapChain::GetGlxExtensionEntries ()
+const GlxExtensionsEntries& PrimarySwapChain::GetGlxExtensionsEntries ()
 {
-  return impl->glx_extension_entries;
+  return impl->glx_extensions_entries;
 }
 
 /*

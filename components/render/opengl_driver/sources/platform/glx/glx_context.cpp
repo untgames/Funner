@@ -24,7 +24,7 @@ struct Context::Impl
   GlxExtensionsEntries      glx_extensions;        //расширени€ GLX
   bool                      glx_extensions_init;   //инициализированы ли GLX расширени€
   bool                      vsync;                 //вертикальна€ синхронизаци€
-  static Impl*              current_context;       //текущий контекст  
+  static Impl*              current_context;       //текущий контекст
   
 /// онструктор
   Impl ()
@@ -190,7 +190,7 @@ void Context::MakeCurrent (ISwapChain* swap_chain)
       impl->display             = impl->swap_chain->GetDisplay ();
       impl->window              = impl->swap_chain->GetWindow ();
       impl->glx_extensions_init = false;
-      impl->vsync               = casted_swap_chain->HasVsync ();
+      impl->vsync               = casted_swap_chain->HasVSync ();
     }
     
       //оповещение о потере текущего контекста
