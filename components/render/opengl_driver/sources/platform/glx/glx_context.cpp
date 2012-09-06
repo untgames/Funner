@@ -21,12 +21,17 @@ struct Context::Impl
   ListenerArray             listeners;             //слушатели событий контекста
   xtl::trackable::slot_type on_destroy_swap_chain; //обработчик удалени€ цепочки обмена
   ISwapChainImpl*           swap_chain;            //текуща€ цепочка обмена
-  static Impl*              current_context;       //текущий контекст
+  GlxExtensionsEntries      glx_extensions;        //расширени€ GLX
+  bool                      glx_extensions_init;   //инициализированы ли GLX расширени€
+  bool                      vsync;                 //вертикальна€ синхронизаци€
+  static Impl*              current_context;       //текущий контекст  
   
 /// онструктор
   Impl ()
     : on_destroy_swap_chain (xtl::bind (&Impl::OnDestroySwapChain, this))
     , swap_chain (0)
+    , glx_extensions_init (false)
+    , vsync (false)
   {    
   }
   
@@ -51,8 +56,10 @@ struct Context::Impl
     if (current_context == this)
       ResetContext ();
     
-    swap_chain = 0;
-    display    = 0;
+    swap_chain          = 0;
+    display             = 0;
+    vsync               = false;
+    glx_extensions_init = false;
   }
 
 ///ќповещение о потере контекста
@@ -179,9 +186,11 @@ void Context::MakeCurrent (ISwapChain* swap_chain)
 
       casted_swap_chain->RegisterDestroyHandler (impl->on_destroy_swap_chain);
 
-      impl->swap_chain = casted_swap_chain;
-      impl->display    = impl->swap_chain->GetDisplay ();
-      impl->window     = impl->swap_chain->GetWindow ();
+      impl->swap_chain          = casted_swap_chain;
+      impl->display             = impl->swap_chain->GetDisplay ();
+      impl->window              = impl->swap_chain->GetWindow ();
+      impl->glx_extensions_init = false;
+      impl->vsync               = casted_swap_chain->HasVsync ();
     }
     
       //оповещение о потере текущего контекста
@@ -200,11 +209,20 @@ void Context::MakeCurrent (ISwapChain* swap_chain)
     if (!impl->adapter->GetLibrary ().MakeCurrent (impl->display, impl->window, impl->glx_context))
       raise_error ("::glxMakeContextCurrent");
       
-    Impl::current_context = impl.get ();
+    Impl::current_context = impl.get ();        
 
       //оповещение об установке текущего контекста
 
     impl->SetCurrentNotify ();
+    
+      //инициализаци€ расширений
+      
+    if (!impl->glx_extensions_init)
+    {
+      impl->glx_extensions.Init (impl->adapter->GetLibrary ());
+      
+      impl->glx_extensions_init = true;
+    }
   }
   catch (xtl::exception& exception)
   {

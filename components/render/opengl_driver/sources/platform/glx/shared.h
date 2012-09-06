@@ -71,6 +71,8 @@ class DynamicLibrary;
 
 struct GlxExtensionEntries
 {
+  PFNGLXSWAPINTERVALSGIPROC SwapIntervalSGI;
+  
   void Init (ILibrary&);
 };
 
@@ -360,6 +362,7 @@ class ISwapChainImpl: virtual public ISwapChain
     virtual Window                     GetWindow              () = 0; //окно отрисовки
     virtual GLXFBConfig                GetFBConfig            () = 0; //конфигурация буфера кадра
     virtual const GlxExtensionEntries& GetGlxExtensionEntries () = 0; //получение таблицы GLX-расширений
+    virtual bool                       HasVSync               () = 0; //есть ли вертикальная синхронизация
 
   protected:
     virtual ~ISwapChainImpl () {}
@@ -418,6 +421,11 @@ class PrimarySwapChain: virtual public ISwapChainImpl, public Object
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void SetFullscreenState (bool state);
     bool GetFullscreenState ();
+    
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Есть ли вертикальная синхронизация
+///////////////////////////////////////////////////////////////////////////////////////////////////    
+    bool HasVSync ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Обмен текущего заднего буфера и переднего буфера
@@ -468,6 +476,11 @@ class PBuffer: virtual public ISwapChainImpl, public Object
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void SetFullscreenState (bool state);
     bool GetFullscreenState ();
+    
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Есть ли вертикальная синхронизация
+///////////////////////////////////////////////////////////////////////////////////////////////////    
+    bool HasVSync () { return false; }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Обмен текущего заднего буфера и переднего буфера

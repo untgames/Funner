@@ -34,16 +34,18 @@ typedef stl::vector<Output::Pointer> OutputArray;
 
 struct Adapter::Impl
 {
-  Log               log;               //протокол работы OpenGL
-  OutputManager     output_manager;    //менеджер устройств вывода
-  AdapterLibraryPtr library;           //библиотека адаптера
-  stl::string       name;              //имя адаптера
+  Log                 log;               //протокол работы OpenGL
+  OutputManager       output_manager;    //менеджер устройств вывода
+  AdapterLibraryPtr   library;           //библиотека адаптера
+  stl::string         name;              //имя адаптера
+  GlxExtensionEntries glx_entries;
   
 ///Конструктор
   Impl (const char* in_name, const char* in_dll_path, const char* init_string)  
     : library (AdapterLibrary::LoadLibrary (in_dll_path))
     , name (in_name)
   {
+    glx_entries.Init (*library);
   }  
 };
 
@@ -199,7 +201,7 @@ void Adapter::EnumPixelFormats (int screen, PixelFormatArray& pixel_formats, Glx
     PixelFormatDesc desc;
 
     desc.adapter                 = this;
-    desc.glx_extension_entries   = 0;
+    desc.glx_extension_entries   = &impl->glx_entries;
     desc.config                  = config;
     desc.visual_id               = visual_id;
     desc.pixel_format_index      = get_fb_config_attrib (lib, display, config, GLX_FBCONFIG_ID);
