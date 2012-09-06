@@ -22,7 +22,7 @@ void GlxExtensionsEntries::Init (ILibrary& library)
 {
     //обнуление адресов точек входа
 
-  memset (this, 0, sizeof GlxExtensionsEntries);
+  memset (this, 0, sizeof (GlxExtensionsEntries));
 
     //получение адресов точек входа расширений OpenGL
 
