@@ -9,22 +9,21 @@ namespace
 template <class Fn>
 inline void init_extension_entry (ILibrary& library, const char* name, Fn& fn)
 {
-  fn = (Fn)library.GetProcAddress (name, EntrySearch_Context | EntrySearch_NoThrow);
+  fn = reinterpret_cast<Fn> (library.GetProcAddress (name, EntrySearch_Context | EntrySearch_NoThrow));
 }
 
 }
 
 /*
-    Инициализация точек входа WGL
+    Инициализация точек входа GLX
 */
 
 void GlxExtensionsEntries::Init (ILibrary& library)
 {
     //обнуление адресов точек входа
 
-  memset (this, 0, sizeof (GlxExtensionsEntries));
+  memset (this, 0, sizeof GlxExtensionsEntries);
 
     //получение адресов точек входа расширений OpenGL
-
-  init_extension_entry (library, "glXSwapIntervalSGI", SwapIntervalSGI);
+<<<GLXINIT>>>
 }

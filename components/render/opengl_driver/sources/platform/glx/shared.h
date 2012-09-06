@@ -50,8 +50,10 @@
 #include <X11/extensions/xf86vmode.h>
 #endif
 
-#include <GL/gl.h>
-#include <GL/glx.h>
+#include <shared/gl.h>
+#include <shared/profile/gl/glx_types.h>
+
+#include "glx_entries.h"
 
 namespace render
 {
@@ -68,13 +70,6 @@ namespace glx
 //forward declarations
 class Adapter;
 class DynamicLibrary;
-
-struct GlxExtensionsEntries
-{
-  PFNGLXSWAPINTERVALSGIPROC SwapIntervalSGI;
-  
-  void Init (ILibrary&);
-};
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Предостережения конфигурации буфера кадра
