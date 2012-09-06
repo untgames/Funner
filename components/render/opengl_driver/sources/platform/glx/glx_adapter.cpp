@@ -45,6 +45,7 @@ struct Adapter::Impl
     : library (AdapterLibrary::LoadLibrary (in_dll_path))
     , name (in_name)
   {
+	  printf ("H!Y!H!Y!H!Y!HY!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n");
     glx_entries.Init (*library);
   }  
 };
@@ -201,7 +202,7 @@ void Adapter::EnumPixelFormats (int screen, PixelFormatArray& pixel_formats, Glx
     PixelFormatDesc desc;
 
     desc.adapter                 = this;
-    desc.glx_extensions_entries   = &impl->glx_entries;
+    desc.glx_extensions_entries  = &impl->glx_entries;
     desc.config                  = config;
     desc.visual_id               = visual_id;
     desc.pixel_format_index      = get_fb_config_attrib (lib, display, config, GLX_FBCONFIG_ID);

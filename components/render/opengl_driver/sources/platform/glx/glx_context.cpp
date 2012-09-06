@@ -38,10 +38,7 @@ struct Context::Impl
   void SetVSync ()
   {
     if (glx_extensions->SwapIntervalSGI)
-    {
-    	printf ("swap! %p\n", glx_extensions->SwapIntervalSGI); fflush (stdout);
-      //glx_extensions->SwapIntervalSGI (vsync);
-    }
+      glx_extensions->SwapIntervalSGI (vsync);
   }  
   
 ///—брос текущего контекста
