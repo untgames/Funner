@@ -13,27 +13,33 @@ typedef xtl::com_ptr<Adapter>          AdapterPtr;
 
 struct Context::Impl
 {  
-  Log                       log;                   //протокол драйвера отрисовки
-  AdapterPtr                adapter;               //целевой адаптер отрисовки
-  Display*                  display;               //устройство отображения для текущего контекста
-  Window                    window;                //окно отрисовки
-  GLXContext                glx_context;           //контекст GLX-рендеринга
-  ListenerArray             listeners;             //слушатели событий контекста
-  xtl::trackable::slot_type on_destroy_swap_chain; //обработчик удаления цепочки обмена
-  ISwapChainImpl*           swap_chain;            //текущая цепочка обмена
-  GlxExtensionsEntries      glx_extensions;        //расширения GLX
-  bool                      glx_extensions_init;   //инициализированы ли GLX расширения
-  bool                      vsync;                 //вертикальная синхронизация
-  static Impl*              current_context;       //текущий контекст
+  Log                         log;                   //протокол драйвера отрисовки
+  AdapterPtr                  adapter;               //целевой адаптер отрисовки
+  Display*                    display;               //устройство отображения для текущего контекста
+  Window                      window;                //окно отрисовки
+  GLXContext                  glx_context;           //контекст GLX-рендеринга
+  ListenerArray               listeners;             //слушатели событий контекста
+  xtl::trackable::slot_type   on_destroy_swap_chain; //обработчик удаления цепочки обмена
+  ISwapChainImpl*             swap_chain;            //текущая цепочка обмена
+  const GlxExtensionsEntries* glx_extensions;        //расширения GLX
+  bool                        vsync;                 //вертикальная синхронизация
+  static Impl*                current_context;       //текущий контекст
   
 ///Конструктор
   Impl ()
     : on_destroy_swap_chain (xtl::bind (&Impl::OnDestroySwapChain, this))
     , swap_chain (0)
-    , glx_extensions_init (false)
+    , glx_extensions ()
     , vsync (false)
   {    
   }
+  
+///Установка вертикальной синхронизации
+  void SetVSync ()
+  {
+    if (glx_extensions->SwapIntervalEXT)
+      glx_extensions->SwapIntervalEXT (vsync);
+  }  
   
 ///Сброс текущего контекста
   void ResetContext ()
@@ -56,10 +62,10 @@ struct Context::Impl
     if (current_context == this)
       ResetContext ();
     
-    swap_chain          = 0;
-    display             = 0;
-    vsync               = false;
-    glx_extensions_init = false;
+    swap_chain     = 0;
+    display        = 0;
+    vsync          = false;
+    glx_extensions = 0;
   }
 
 ///Оповещение о потере контекста
@@ -112,9 +118,10 @@ Context::Context (ISwapChain* in_swap_chain)
 
     impl = new Impl;    
 
-    impl->adapter = cast_object<Adapter> (swap_chain->GetAdapter (), "", "adapter");
-    impl->display = swap_chain->GetDisplay ();
-    impl->window  = swap_chain->GetWindow ();
+    impl->adapter        = cast_object<Adapter> (swap_chain->GetAdapter (), "", "adapter");
+    impl->display        = swap_chain->GetDisplay ();
+    impl->window         = swap_chain->GetWindow ();
+    impl->glx_extensions = &casted_swap_chain->GetGlxExtensionsEntries ();
     
     DisplayLock lock (impl->display);
 
@@ -210,19 +217,14 @@ void Context::MakeCurrent (ISwapChain* swap_chain)
       raise_error ("::glxMakeContextCurrent");
       
     Impl::current_context = impl.get ();        
+    
+      //установка вертикальной синхронизации
+
+    impl->SetVSync ();    
 
       //оповещение об установке текущего контекста
 
     impl->SetCurrentNotify ();
-    
-      //инициализация расширений
-      
-    if (!impl->glx_extensions_init)
-    {
-      impl->glx_extensions.Init (impl->adapter->GetLibrary ());
-      
-      impl->glx_extensions_init = true;
-    }
   }
   catch (xtl::exception& exception)
   {
