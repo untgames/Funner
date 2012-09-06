@@ -37,8 +37,11 @@ struct Context::Impl
 ///Установка вертикальной синхронизации
   void SetVSync ()
   {
-    if (glx_extensions->SwapIntervalEXT)
-      glx_extensions->SwapIntervalEXT (vsync);
+    if (glx_extensions->SwapIntervalSGI)
+    {
+    	printf ("swap! %p\n", glx_extensions->SwapIntervalSGI); fflush (stdout);
+      //glx_extensions->SwapIntervalSGI (vsync);
+    }
   }  
   
 ///Сброс текущего контекста
@@ -118,10 +121,9 @@ Context::Context (ISwapChain* in_swap_chain)
 
     impl = new Impl;    
 
-    impl->adapter        = cast_object<Adapter> (swap_chain->GetAdapter (), "", "adapter");
-    impl->display        = swap_chain->GetDisplay ();
-    impl->window         = swap_chain->GetWindow ();
-    impl->glx_extensions = &casted_swap_chain->GetGlxExtensionsEntries ();
+    impl->adapter  = cast_object<Adapter> (swap_chain->GetAdapter (), "", "adapter");
+    impl->display  = swap_chain->GetDisplay ();
+    impl->window   = swap_chain->GetWindow ();
     
     DisplayLock lock (impl->display);
 
@@ -193,11 +195,11 @@ void Context::MakeCurrent (ISwapChain* swap_chain)
 
       casted_swap_chain->RegisterDestroyHandler (impl->on_destroy_swap_chain);
 
-      impl->swap_chain          = casted_swap_chain;
-      impl->display             = impl->swap_chain->GetDisplay ();
-      impl->window              = impl->swap_chain->GetWindow ();
-      impl->glx_extensions_init = false;
-      impl->vsync               = casted_swap_chain->HasVSync ();
+      impl->swap_chain     = casted_swap_chain;
+      impl->display        = impl->swap_chain->GetDisplay ();
+      impl->window         = impl->swap_chain->GetWindow ();
+      impl->vsync          = casted_swap_chain->HasVSync ();
+      impl->glx_extensions = &casted_swap_chain->GetGlxExtensionsEntries ();
     }
     
       //оповещение о потере текущего контекста

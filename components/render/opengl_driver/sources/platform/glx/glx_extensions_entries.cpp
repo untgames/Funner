@@ -119,4 +119,6 @@ void GlxExtensionsEntries::Init (ILibrary& library)
   init_extension_entry (library, "glXReleaseVideoCaptureDeviceNV", ReleaseVideoCaptureDeviceNV);
   init_extension_entry (library, "glXSwapIntervalEXT", SwapIntervalEXT);
   init_extension_entry (library, "glXCopyImageSubDataNV", CopyImageSubDataNV);
+
+  printf ("test!!! %p\n", SwapIntervalSGI);
 }
