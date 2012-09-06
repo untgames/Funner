@@ -16,7 +16,7 @@ struct PrimarySwapChain::Impl
   Log                  log;                     //протокол
   AdapterPtr           adapter;                 //адаптер, которому принадлежит устройство
   AdapterLibraryPtr    library;                 //библиотека адаптера
-  GlxExtensionsEntries glx_extensions_entries;   //таблица WGL-расширений
+  GlxExtensionsEntries glx_extensions_entries;  //таблица WGL-расширений
   int                  pixel_format_index;      //индекс формата пикселей устройства вывода
   SwapChainDesc        desc;                    //дескриптор цепочки обмена
   Display*             display;                 //соединение с дисплеем
