@@ -34,6 +34,7 @@
 
 /* Xlib.h is the default header that is included and has the core functionallity */
 #include <X11/Xlib.h>
+#include <X11/Xutil.h>
 
 /* X RandR is used to configure which display ports are enabled (e.g. LCD, VGA and DVI), 
  * and to configure display modes and properties such as orientation, reflection and DPI.
