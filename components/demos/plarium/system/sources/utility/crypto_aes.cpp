@@ -11,7 +11,7 @@ const size_t CRYPTO_BLOCK_SIZE = 16;
 
 typedef size_t aes_uint32_t;
 
-#ifndef _MSC_VER
+#ifdef _MSC_VER
 typedef unsigned char byte;
 #endif
 
