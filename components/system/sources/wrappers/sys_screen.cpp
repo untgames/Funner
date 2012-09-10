@@ -192,6 +192,48 @@ size_t Screen::RefreshRate () const
 }
 
 /*
+   Плотность пикселей на дюйм
+*/
+
+size_t Screen::Xdpi () const
+{
+  try
+  {
+    ScreenModeDesc desc;
+
+    memset (&desc, 0, sizeof (desc));
+
+    GetCurrentMode (desc);
+
+    return desc.xdpi;
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("syslib::Screen::Xdpi");
+    throw;
+  }
+}
+
+size_t Screen::Ydpi () const
+{
+  try
+  {
+    ScreenModeDesc desc;
+
+    memset (&desc, 0, sizeof (desc));
+
+    GetCurrentMode (desc);
+
+    return desc.ydpi;
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("syslib::Screen::Ydpi");
+    throw;
+  }
+}
+
+/*
     Получение списка видео-режимов
 */
 

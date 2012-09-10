@@ -38,8 +38,8 @@ int main ()
   LogFilter filter ("system.application", &log_message);
   
   ActionQueue::PushAction (&action_handler<1>, xtl::bind (&callback_handler<1>, Thread::GetCurrentThreadId ()), ActionThread_Background);
-  ActionQueue::PushAction (&action_handler<2>, make_callback_wrapper (ActionThread_Current, xtl::bind (&callback_handler<2>, Thread::GetCurrentThreadId ())), ActionThread_Background);
-  ActionQueue::PushAction (&action_handler<3>, ActionThread_Main);
+  ActionQueue::PushAction (&action_handler<2>, make_callback_wrapper (ActionThread_Current, xtl::bind (&callback_handler<2>, Thread::GetCurrentThreadId ())), ActionThread_Background, 1);
+  ActionQueue::PushAction (&action_handler<3>, ActionThread_Main, 0.5f);
 
   Application::Run ();
 

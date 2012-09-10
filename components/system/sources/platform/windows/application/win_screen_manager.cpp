@@ -17,7 +17,7 @@ const char*  LOG_NAME                     = "system.windows"; //имя протокола вы
     Получение информации о видео-режиме
 */
 
-bool get_mode_desc (const char* device_name, int mode_index, ScreenModeDesc& mode_desc, Rect* screen_rect=0)
+bool get_mode_desc (const char* device_name, int mode_index, size_t xdpi, size_t ydpi, ScreenModeDesc& mode_desc, Rect* screen_rect=0)
 {
   DEVMODE dev_mode_desc;
   
@@ -37,6 +37,8 @@ bool get_mode_desc (const char* device_name, int mode_index, ScreenModeDesc& mod
   mode_desc.height       = dev_mode_desc.dmPelsHeight;
   mode_desc.color_bits   = dev_mode_desc.dmBitsPerPel;
   mode_desc.refresh_rate = dev_mode_desc.dmDisplayFrequency;  
+  mode_desc.xdpi         = xdpi;
+  mode_desc.ydpi         = ydpi;
 
 #ifdef WINCE  
   if (screen_rect)  
@@ -70,13 +72,17 @@ struct ScreenDesc: public xtl::reference_counter
   HDC             device_context; //контекст устройства
   stl::string     name;           //имя устройства
   stl::string     win_name;       //имя устройства в Windows
+  size_t          xdpi;           //плотность пикселей по горизонтали
+  size_t          ydpi;           //плотность пикселей по вертикали
   ScreenModeArray modes;          //режимы экрана
   
 ///Конструктор
-  ScreenDesc (const char* in_name, const char* in_win_name)
+  ScreenDesc (const char* in_name, const char* in_win_name, size_t in_xdpi, size_t in_ydpi)
     : device_context ()
     , name (in_name)
     , win_name (in_win_name)
+    , xdpi (in_xdpi)
+    , ydpi (in_ydpi)
   {
       //отсечение завершающих пробелов в имени устройства
 
@@ -92,7 +98,7 @@ struct ScreenDesc: public xtl::reference_counter
 
     ScreenModeDesc mode_desc;
 
-    for (int mode_index=0; get_mode_desc (win_name.c_str (), mode_index, mode_desc); mode_index++)
+    for (int mode_index=0; get_mode_desc (win_name.c_str (), mode_index, xdpi, ydpi, mode_desc); mode_index++)
       modes.push_back (mode_desc);
   }
   
@@ -165,10 +171,13 @@ struct ScreenArrayBuilder
 
     if (!EnumDisplayDevices (info.szDevice, 0, &device_info, 0))
       return TRUE;
-      
+
+    int xdpi = GetDeviceCaps (dc, LOGPIXELSX),
+        ydpi = GetDeviceCaps (dc, LOGPIXELSY);
+
     try
     {
-      ScreenDescPtr screen (new ScreenDesc ((char*)device_info.DeviceString, (char*)info.szDevice), false);
+      ScreenDescPtr screen (new ScreenDesc ((char*)device_info.DeviceString, (char*)info.szDevice, xdpi, ydpi), false);
 
       builder->screens.push_back (screen);
     }
@@ -389,7 +398,7 @@ void WindowsScreenManager::GetScreenCurrentMode (screen_t handle, ScreenModeDesc
   {
     ScreenDescPtr screen = ScreenManagerImpl::GetScreen (handle);    
     
-    get_mode_desc (screen->win_name.c_str (), ENUM_CURRENT_SETTINGS, mode_desc);
+    get_mode_desc (screen->win_name.c_str (), ENUM_CURRENT_SETTINGS, screen->xdpi, screen->ydpi, mode_desc);
   }
   catch (xtl::exception& e)
   {
@@ -404,7 +413,7 @@ void WindowsScreenManager::GetScreenDefaultMode (screen_t handle, ScreenModeDesc
   {
     ScreenDescPtr screen = ScreenManagerImpl::GetScreen (handle);
     
-    get_mode_desc (screen->win_name.c_str (), ENUM_REGISTRY_SETTINGS, mode_desc);
+    get_mode_desc (screen->win_name.c_str (), ENUM_REGISTRY_SETTINGS, screen->xdpi, screen->ydpi, mode_desc);
   }
   catch (xtl::exception& e)
   {

@@ -20,6 +20,8 @@ int main ()
       printf ("    height:  %u \n", screen.Height ());
       printf ("    bpp:     %u \n", screen.ColorBits ());
       printf ("    refresh: %u \n", screen.RefreshRate ());      
+      printf ("    xdpi:    %u \n", screen.Xdpi ());
+      printf ("    ydpi:    %u \n", screen.Ydpi ());
       
       screen.GetProperties (properties);
       
