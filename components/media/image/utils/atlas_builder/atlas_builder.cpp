@@ -399,68 +399,81 @@ void build (Params& params)
 
 int main (int argc, const char* argv [])
 {  
-  Params params;
+  try
+  {
+    Params params;
 
-  static Option options [] = {
-    {xtl::bind (&command_line_help,                _1, xtl::ref (params)), "help",              '?',        0, "print help message"},
-    {xtl::bind (&command_line_silent,              _1, xtl::ref (params)), "silent",            's',        0, "quiet mode"},
-    {xtl::bind (&command_line_result_atlas,        _1, xtl::ref (params)), "atlas",             'o',   "file", "set output atlas file format"},
-    {xtl::bind (&command_line_result_layout_atlas, _1, xtl::ref (params)), "layout-atlas",      0,     "file", "set output atlas file format that used in layout"},
-    {xtl::bind (&command_line_result_layout,       _1, xtl::ref (params)), "layout",            'l',   "file", "set output layout file"},
-    {xtl::bind (&command_line_max_image_size,      _1, xtl::ref (params)), "max-image-size",    0,     "size", "set maximum atlas image side size"},
-    {xtl::bind (&command_line_margin,              _1, xtl::ref (params)), "margin",            0,     "size", "set margin beetween images in atlas"},
-    {xtl::bind (&command_line_no_layout,           _1, xtl::ref (params)), "no-layout",         0,          0, "don't generate layout file"},
-    {xtl::bind (&command_line_pot,                 _1, xtl::ref (params)), "pot",               0,          0, "resize atlas texture to nearest greater power of two sizes"},
-    {xtl::bind (&command_line_invert_x,            _1, xtl::ref (params)), "invert-x",          0,          0, "invert X coordinate in layout of tiles"},
-    {xtl::bind (&command_line_invert_y,            _1, xtl::ref (params)), "invert-y",          0,          0, "invert Y coordinate in layout of tiles"},
-    {xtl::bind (&command_line_swap_axises,         _1, xtl::ref (params)), "swap-axises",       0,          0, "swap axises at layout tiles"},
-    {xtl::bind (&command_line_isolated_images,     _1, xtl::ref (params)), "isolated-images",   0, "wildcard", "set wildcard for standalone images which will be isolate from general atlases"},
-    {xtl::bind (&command_line_square_axises,       _1, xtl::ref (params)), "square",            0,          0, "square axises"},
-    {xtl::bind (&command_line_dont_store_images,   _1, xtl::ref (params)), "dont-store-images", 0,          0, "dont store all images in memory"},
-  };
+    static Option options [] = {
+      {xtl::bind (&command_line_help,                _1, xtl::ref (params)), "help",              '?',        0, "print help message"},
+      {xtl::bind (&command_line_silent,              _1, xtl::ref (params)), "silent",            's',        0, "quiet mode"},
+      {xtl::bind (&command_line_result_atlas,        _1, xtl::ref (params)), "atlas",             'o',   "file", "set output atlas file format"},
+      {xtl::bind (&command_line_result_layout_atlas, _1, xtl::ref (params)), "layout-atlas",      0,     "file", "set output atlas file format that used in layout"},
+      {xtl::bind (&command_line_result_layout,       _1, xtl::ref (params)), "layout",            'l',   "file", "set output layout file"},
+      {xtl::bind (&command_line_max_image_size,      _1, xtl::ref (params)), "max-image-size",    0,     "size", "set maximum atlas image side size"},
+      {xtl::bind (&command_line_margin,              _1, xtl::ref (params)), "margin",            0,     "size", "set margin beetween images in atlas"},
+      {xtl::bind (&command_line_no_layout,           _1, xtl::ref (params)), "no-layout",         0,          0, "don't generate layout file"},
+      {xtl::bind (&command_line_pot,                 _1, xtl::ref (params)), "pot",               0,          0, "resize atlas texture to nearest greater power of two sizes"},
+      {xtl::bind (&command_line_invert_x,            _1, xtl::ref (params)), "invert-x",          0,          0, "invert X coordinate in layout of tiles"},
+      {xtl::bind (&command_line_invert_y,            _1, xtl::ref (params)), "invert-y",          0,          0, "invert Y coordinate in layout of tiles"},
+      {xtl::bind (&command_line_swap_axises,         _1, xtl::ref (params)), "swap-axises",       0,          0, "swap axises at layout tiles"},
+      {xtl::bind (&command_line_isolated_images,     _1, xtl::ref (params)), "isolated-images",   0, "wildcard", "set wildcard for standalone images which will be isolate from general atlases"},
+      {xtl::bind (&command_line_square_axises,       _1, xtl::ref (params)), "square",            0,          0, "square axises"},
+      {xtl::bind (&command_line_dont_store_images,   _1, xtl::ref (params)), "dont-store-images", 0,          0, "dont store all images in memory"},    
+    };
 
-  static const size_t options_count = sizeof (options) / sizeof (*options);
+    static const size_t options_count = sizeof (options) / sizeof (*options);
 
-    //инициализация
+      //инициализация
 
-  params.options           = options;
-  params.options_count     = options_count;
-  params.atlas_file_format = DEFAULT_ATLAS_FILE_NAME;
-  params.max_image_size    = -1;
-  params.margin            = 0;
-  params.print_help        = false;
-  params.silent            = false;
-  params.need_layout       = true;
-  params.need_pot_rescale  = false;
-  params.invert_x          = false;
-  params.invert_y          = false;
-  params.swap_axises       = false;
-  params.square_axises     = false;
-  params.dont_store_images = false;
+    params.options           = options;
+    params.options_count     = options_count;
+    params.atlas_file_format = DEFAULT_ATLAS_FILE_NAME;
+    params.max_image_size    = -1;
+    params.margin            = 0;
+    params.print_help        = false;
+    params.silent            = false;
+    params.need_layout       = true;
+    params.need_pot_rescale  = false;
+    params.invert_x          = false;
+    params.invert_y          = false;
+    params.swap_axises       = false;
+    params.square_axises     = false;
+    params.dont_store_images = false;
 
-  CommandLine command_line;
+    CommandLine command_line;
 
-  for (size_t i = 0; i < params.options_count; i++)
-    command_line.SetSwitchHandler (options [i].name, options [i].short_name, options [i].argument_name, options [i].handler);
+    for (size_t i = 0; i < params.options_count; i++)
+      command_line.SetSwitchHandler (options [i].name, options [i].short_name, options [i].argument_name, options [i].handler);
 
-    //разбор командной строки
-  command_line.Process (argc, argv);
-  
-    // --help только печатает сообщение помощи
-  
-  if (params.print_help)
-    return 0;
+      //разбор командной строки
+    command_line.Process (argc, argv);
 
-  for (size_t i = 0, count = command_line.ParamsCount (); i < count; i++)
-    params.sources.Add (command_line.Param (i));
+      // --help только печатает сообщение помощи
+    
+    if (params.print_help)
+      return 0;
 
-    //проверка корректности ввода
+    for (size_t i = 0, count = command_line.ParamsCount (); i < count; i++)
+      params.sources.Add (command_line.Param (i));
 
-  validate (params);
-  
-    //построение атласа
+      //проверка корректности ввода
 
-  build (params);
+    validate (params);
+
+      //построение атласа
+
+    build (params);
+  }
+  catch (std::exception& e)
+  {
+    printf ("error: %s\n", e.what ());
+    return 1;
+  }
+  catch (...)
+  {
+    printf ("error: unhandled exception\n");
+    return 1;
+  }
 
   return 0;
 }
