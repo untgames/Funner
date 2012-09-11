@@ -64,13 +64,13 @@ struct TouchEvent
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 struct TouchProcessingContext
 {
-  const TouchEvent&            event;
-  InputPort*                   input_port;
-  scene_graph::InputZoneModel* input_zone;
-  size_t                       input_zone_index;      
-  float                        intersection_distance;
-  math::vec2f                  intersection_point;
-  bool                         touch_catched;
+  const TouchEvent&                         event;
+  InputPort*                                input_port;
+  xtl::com_ptr<scene_graph::InputZoneModel> input_zone;
+  size_t                                    input_zone_index;
+  float                                     intersection_distance;
+  math::vec2f                               intersection_point;
+  bool                                      touch_catched;
   
   TouchProcessingContext (const TouchEvent& in_event)
     : event (in_event)
