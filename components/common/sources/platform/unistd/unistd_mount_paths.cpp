@@ -1,4 +1,5 @@
 #ifdef HAS_PWD_H
+#include <unistd.h>
 #include <pwd.h>
 #endif
 
@@ -14,9 +15,9 @@ void UnistdPlatform::MountSystemSpecificPaths ()
 #ifdef HAS_PWD_H
   int myuid = getuid ();
 
-  passwd* mypasswd = getpwuid (myuid);
+  passwd* mypasswd = getpwuid (myuid); 
   
-  const char* home_dir = mypasswd->pwd_dir;
+  const char* home_dir = mypasswd ? mypasswd->pw_dir : (const char*)0;
 
 #else
   const char* home_dir = getenv ("HOME");  
