@@ -1,3 +1,7 @@
+#ifdef HAS_PWD_H
+#include <pwd.h>
+#endif
+
 #include <common/file.h>
 #include <common/strlib.h>
 
@@ -7,8 +11,17 @@ using namespace common;
 
 void UnistdPlatform::MountSystemSpecificPaths ()
 {
-  const char* home_dir = getenv ("HOME");
+#ifdef HAS_PWD_H
+  int myuid = getuid ();
+
+  passwd* mypasswd = getpwuid (myuid);
   
+  const char* home_dir = mypasswd->pwd_dir;
+
+#else
+  const char* home_dir = getenv ("HOME");  
+#endif
+
   if (!home_dir)
     home_dir = "~";
 
