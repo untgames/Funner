@@ -129,7 +129,9 @@ void InputEntity::OnTouch (InputPort& input_port, const TouchEvent& event, const
 {
   try
   {
-    xtl::com_ptr<const scene_graph::InputZoneModel> self_lock (&zone);
+    InputEntityPtr self_lock (this);
+
+    xtl::com_ptr<const scene_graph::InputZoneModel> zone_lock (&zone);
     
       //формирование контекста события
       
@@ -218,8 +220,10 @@ void InputEntity::OnBroadcastTouch (InputPort& input_port, const TouchEvent& eve
   {    
     if (!has_screen_handlers && !wait_for_release_event)
       return;
+
+    InputEntityPtr self_lock (this);
       
-    xtl::com_ptr<const scene_graph::InputZoneModel> self_lock (&zone);      
+    xtl::com_ptr<const scene_graph::InputZoneModel> zone_lock (&zone);
       
       //подготовка контекста оповещения
 
