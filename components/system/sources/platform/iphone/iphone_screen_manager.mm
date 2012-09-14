@@ -171,7 +171,7 @@ screen_t IPhoneScreenManager::FindContainingScreen (const void* window)
   if (!window)
     throw xtl::make_null_argument_exception ("syslib::IPhoneScreenManager::FindContainingScreen", "window");
 
-  return (screen_t)((UIWindow*)window).screen;
+  return (screen_t)[((UIWindow*)window).screen retain];
 }
 
 /*
