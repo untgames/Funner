@@ -35,17 +35,19 @@ InputEntity::~InputEntity ()
     Ведение таблицы нажатий
 */
 
-void InputEntity::AddTouch (InputPort& port, touch_t touch, int button)
+InputEntity::TouchDesc* InputEntity::AddTouch (InputPort& port, touch_t touch, int button)
 {
   for (TouchDescArray::iterator iter=touches.begin (), end=touches.end (); iter!=end; ++iter)
     if (iter->port == &port && iter->touch == touch && iter->button == button)
-      return;
+      return &*iter;
       
   touches.push_back (TouchDesc (port, touch, button));
   
   wait_for_release_event = true;
   
   UpdateBroadcasts ();
+  
+  return &touches.back ();
 }
 
 InputEntity::TouchDesc* InputEntity::FindTouch (InputPort& port, touch_t touch, int button)
@@ -147,21 +149,28 @@ void InputEntity::OnTouch (InputPort& input_port, const TouchEvent& event, const
 
     TouchDesc* touch_desc = FindTouch (input_port, event.touch, event.button);    
     
-    if (touch_desc && touch_desc->is_inside)
-    {
-      touch_desc->touch_check = true;
+    if (touch_desc)
+    {     
+      touch_desc->on_touch_method_entered = true;
       
       switch (event.state)
       {
         case TouchState_Moving:
-          Notify (input_port, InputZoneNotification_OnTouchMove, context);
+          if (touch_desc->is_inside) Notify (input_port, InputZoneNotification_OnTouchMove, context);
+          else                       Notify (input_port, InputZoneNotification_OnTouchEnter, context);
+          
+          touch_desc->is_inside = true;
+          
           break;
         case TouchState_Pressed:
           //ignored
           break;
         case TouchState_Released:
           Notify (input_port, InputZoneNotification_OnTouchUpInside, context);
-          Notify (input_port, InputZoneNotification_OnTouchClick, context);          
+          
+          if (touch_desc->touch_check)          
+            Notify (input_port, InputZoneNotification_OnTouchClick, context);          
+
           Notify (input_port, InputZoneNotification_OnTouchLeave, context);
           
           RemoveTouch (input_port, event.touch, event.button);
@@ -170,28 +179,6 @@ void InputEntity::OnTouch (InputPort& input_port, const TouchEvent& event, const
         default:
           break;        
       }
-    }
-    else if (touch_desc)
-    {
-      touch_desc->is_inside   = true;
-      touch_desc->touch_check = true;
-      
-      switch (event.state)
-      {
-        case TouchState_Moving:
-          Notify (input_port, InputZoneNotification_OnTouchEnter, context);          
-          break;
-        case TouchState_Pressed:
-          //ignored
-          break;
-        case TouchState_Released:
-          Notify (input_port, InputZoneNotification_OnTouchUpInside, context);
-          Notify (input_port, InputZoneNotification_OnTouchClick, context);
-          Notify (input_port, InputZoneNotification_OnTouchLeave, context);
-          break;
-        default:
-          break;        
-      }        
     }
     else
     {      
@@ -202,9 +189,13 @@ void InputEntity::OnTouch (InputPort& input_port, const TouchEvent& event, const
           Notify   (input_port, InputZoneNotification_OnTouchEnter, context);                              
           break;
         case TouchState_Pressed:
-          AddTouch (input_port, event.touch, event.button);              
-          Notify   (input_port, InputZoneNotification_OnTouchEnter, context);          
-          Notify   (input_port, InputZoneNotification_OnTouchDown, context);                    
+          touch_desc = AddTouch (input_port, event.touch, event.button);              
+          
+          touch_desc->touch_check = true;
+
+          Notify (input_port, InputZoneNotification_OnTouchEnter, context);          
+          Notify (input_port, InputZoneNotification_OnTouchDown, context);
+                    
           break;
         case TouchState_Released:
           Notify (input_port, InputZoneNotification_OnTouchUpInside, context);
@@ -261,7 +252,7 @@ void InputEntity::OnBroadcastTouch (InputPort& input_port, const TouchEvent& eve
       
     if (touch_desc)
     {      
-      if (!touch_desc->touch_check)
+      if (!touch_desc->on_touch_method_entered)
       {
         switch (event.state)
         {
@@ -278,15 +269,19 @@ void InputEntity::OnBroadcastTouch (InputPort& input_port, const TouchEvent& eve
             //ignored
             break;
           case TouchState_Released:
-            Notify (input_port, InputZoneNotification_OnTouchUpOutside, context);
+            if (touch_desc->touch_check)
+              Notify (input_port, InputZoneNotification_OnTouchUpOutside, context);
+
             RemoveTouch (input_port, event.touch, event.button);
             break;
           default:
             break;
-        }      
+        }
       }
-      
-      touch_desc->touch_check = false;
+      else
+      {
+        touch_desc->on_touch_method_entered = false;
+      }
     }
   }
   catch (xtl::exception& e)

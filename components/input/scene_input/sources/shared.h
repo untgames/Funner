@@ -265,13 +265,15 @@ class InputEntity: public xtl::reference_counter, private InputEventListener
       int        button;      
       bool       is_inside;
       bool       touch_check;
+      bool       on_touch_method_entered;
       
       TouchDesc (InputPort& in_port, touch_t in_touch, int in_button)
         : port (&in_port)
         , touch (in_touch)
         , button (in_button)
         , is_inside (true)
-        , touch_check (true)
+        , touch_check (false)
+        , on_touch_method_entered (true)
        { }
     };
     
@@ -281,7 +283,7 @@ class InputEntity: public xtl::reference_counter, private InputEventListener
     void       OnBroadcastTouch    (InputPort& input_port, const TouchEvent& event, const math::vec3f& touch_world_position);
     void       UpdateNotifications ();
     void       UpdateBroadcasts    ();
-    void       AddTouch            (InputPort& port, touch_t touch, int button);
+    TouchDesc* AddTouch            (InputPort& port, touch_t touch, int button);
     TouchDesc* FindTouch           (InputPort& port, touch_t touch, int button);
     void       RemoveTouch         (InputPort& port, touch_t touch, int button);
     void       Notify              (InputPort& port, scene_graph::InputZoneNotification notification, const scene_graph::InputZoneNotificationContext& context);
