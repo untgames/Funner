@@ -5,12 +5,21 @@ using namespace syslib;
 namespace
 {
 
-void fill_screen_mode_desc (UIScreenMode* mode, ScreenModeDesc& mode_desc)
+const float DEFAULT_DPI = 160.f;
+
+void fill_screen_mode_desc (UIScreen* screen, UIScreenMode* mode, ScreenModeDesc& mode_desc)
 {
+  float scale = 1;
+
+  if ([[[UIDevice currentDevice] systemVersion] compare:@"4.0" options:NSNumericSearch] != NSOrderedAscending)
+    scale = screen.scale;
+
   memset (&mode_desc, 0, sizeof (mode_desc));
 
   mode_desc.width  = mode.size.width;
   mode_desc.height = mode.size.height;
+  mode_desc.xdpi   = DEFAULT_DPI * scale;
+  mode_desc.ydpi   = DEFAULT_DPI * scale;
 }
 
 }
@@ -80,7 +89,7 @@ void IPhoneScreenManager::GetScreenMode (screen_t screen, size_t mode_index, Scr
   if (mode_index >= [available_modes count])
     throw xtl::make_range_exception (METHOD_NAME, "mode_index", mode_index, 0u, [available_modes count]);
 
-  fill_screen_mode_desc ([available_modes objectAtIndex:mode_index], mode_desc);
+  fill_screen_mode_desc (ui_screen, [available_modes objectAtIndex:mode_index], mode_desc);
 }
 
 /*
@@ -114,7 +123,9 @@ void IPhoneScreenManager::GetScreenCurrentMode (screen_t screen, ScreenModeDesc&
   if (!screen)
     throw xtl::make_null_argument_exception ("syslib::IPhoneScreenManager::GetScreenCurrentMode", "screen");
 
-  fill_screen_mode_desc (((UIScreen*)screen).currentMode, mode_desc);
+  UIScreen *ui_screen = (UIScreen*)screen;
+
+  fill_screen_mode_desc (ui_screen, ui_screen.currentMode, mode_desc);
 }
 
 void IPhoneScreenManager::GetScreenDefaultMode (screen_t screen, ScreenModeDesc& mode_desc)
@@ -125,9 +136,9 @@ void IPhoneScreenManager::GetScreenDefaultMode (screen_t screen, ScreenModeDesc&
   UIScreen *ui_screen = (UIScreen*)screen;
 
   if ([[[UIDevice currentDevice] systemVersion] compare:@"4.3" options:NSNumericSearch] != NSOrderedAscending)
-    fill_screen_mode_desc (ui_screen.preferredMode, mode_desc);
+    fill_screen_mode_desc (ui_screen, ui_screen.preferredMode, mode_desc);
   else
-    fill_screen_mode_desc ([[ui_screen availableModes] objectAtIndex:0], mode_desc);
+    fill_screen_mode_desc (ui_screen, [[ui_screen availableModes] objectAtIndex:0], mode_desc);
 }
 
 /*
