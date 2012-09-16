@@ -267,6 +267,11 @@ typedef stl::vector<syslib::iphone::IApplicationListener*> ListenerArray;
   [impl initIdleTimer];
 }
 
+-(NSUInteger)application:(UIApplication*)application supportedInterfaceOrientationsForWindow:(UIWindow*)window
+{
+  return UIInterfaceOrientationMaskAll;
+}
+
 /*
    Добавление/удаление подписчиков
 */
