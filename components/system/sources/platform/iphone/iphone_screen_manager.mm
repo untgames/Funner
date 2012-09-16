@@ -16,8 +16,8 @@ void fill_screen_mode_desc (UIScreen* screen, UIScreenMode* mode, ScreenModeDesc
 
   memset (&mode_desc, 0, sizeof (mode_desc));
 
-  mode_desc.width  = mode.size.width;
-  mode_desc.height = mode.size.height;
+  mode_desc.width  = screen.bounds.size.width * scale;  //!!!!!!TODO multimode screen compatibility - needs testing on device with multimode support
+  mode_desc.height = screen.bounds.size.height * scale;
   mode_desc.xdpi   = DEFAULT_DPI * scale;
   mode_desc.ydpi   = DEFAULT_DPI * scale;
 }
