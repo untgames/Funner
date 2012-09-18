@@ -242,6 +242,17 @@ public class EngineWebViewController extends EngineViewController
     return isLoading ();
   }
 
+  @Override
+  public void setVisibilityThreadSafe (final int visibility)
+  {
+    super.setVisibilityThreadSafe (visibility);
+    
+    if (visibility == View.VISIBLE)
+    {
+      requestFocusThreadSafe ();
+    }
+  }
+  
   public native void onLoadStarted      (String request);
   public native void onLoadFinished     ();
   public native void onLoadFailed       (String error_message);
