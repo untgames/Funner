@@ -163,6 +163,7 @@ class TileImageBuilder
           size_t used_area;
 
           pack_result = PackImages (margin, (pack_flags & AtlasPackFlag_SwapAxises) != 0, (pack_flags & AtlasPackFlag_Fast) != 0,
+                                    (pack_flags & AtlasPackFlag_TopRightEdgeMargin) != 0,
                                     result_image_horisontal_side, result_image_vertical_side, indices, pack_to_max_image_size,
                                     current_out_origins, current_out_was_packed, used_area);
 
@@ -239,7 +240,7 @@ class TileImageBuilder
       free_spaces.insert (free_space);
     }
 
-    bool PackImages (size_t margin, bool swap_axises, bool fast, size_t result_image_horizontal_side,
+    bool PackImages (size_t margin, bool swap_axises, bool fast,  bool top_right_edge_margin, size_t result_image_horizontal_side,
                      size_t result_image_vertical_side, const IndexArray& indices, bool pack_to_max_image_size,
                      math::vec2ui* out_origins, bool* out_was_packed, size_t& used_area)
     {
@@ -262,11 +263,21 @@ class TileImageBuilder
             continue;
 
           //проверяем можно ли вставить картинку с отступом в это место
-          if ((iter->x_pos + iter->width != result_image_horizontal_side) && (iter->width < image_size.x + margin))
-            continue;
+          if (iter->width < image_size.x + margin)
+          {
+            if (iter->x_pos + iter->width != result_image_horizontal_side)
+              continue;
+            if (top_right_edge_margin && iter->x_pos && (iter->x_pos + iter->width == result_image_horizontal_side))
+              continue;
+          }
 
-          if ((iter->y_pos + iter->height != result_image_vertical_side) && (iter->height < image_size.y + margin))
-            continue;
+          if (iter->height < image_size.y + margin)
+          {
+            if (iter->y_pos + iter->height != result_image_vertical_side)
+              continue;
+            if (top_right_edge_margin && iter->y_pos && (iter->y_pos + iter->height == result_image_vertical_side))
+              continue;
+          }
 
           math::vec2ui margined_image_size (stl::min (image_size.x + margin, iter->width), stl::min (image_size.y + margin, iter->height));
 

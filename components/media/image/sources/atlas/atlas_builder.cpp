@@ -463,6 +463,8 @@ struct AtlasBuilder::Impl
         packed_indices.clear   ();
         packed_indices.reserve (images_count);
 
+        size_t top_right_edge_margin = pack_flags & AtlasPackFlag_TopRightEdgeMargin ? margin : 0;
+
         for (size_t i = 0; i < images_count; i++, current_origin++, current_size++, current_was_packed++)
         {
           if (!*current_was_packed)
@@ -470,8 +472,17 @@ struct AtlasBuilder::Impl
 
           packed_indices.push_back (i);
 
-          if (result_image_width < (current_origin->x + current_size->x))  result_image_width = current_origin->x + current_size->x;
-          if (result_image_height < (current_origin->y + current_size->y)) result_image_height = current_origin->y + current_size->y;
+          size_t right = current_origin->x + current_size->x,
+                 top   = current_origin->y + current_size->y;
+
+          if (current_origin->x)
+            right += top_right_edge_margin;
+
+          if (current_origin->y)
+            top += top_right_edge_margin;
+
+          if (result_image_width < right) result_image_width  = right;
+          if (result_image_height < top)  result_image_height = top;
         }
 
         if (packed_indices.empty ())
