@@ -5,6 +5,8 @@ import android.graphics.Point;
 import android.view.Display;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
 import android.os.Bundle;
 import android.os.Looper;
 import android.content.ContextWrapper;
@@ -32,7 +34,7 @@ public class EngineActivity extends Activity
     
     if (isLoaded)
       return;
-      
+
     isLoaded = true;      
     
     startApplication ();    
@@ -130,6 +132,28 @@ public class EngineActivity extends Activity
       System.exit (0);
     }                   
   }
+
+///Установка состояния скрин-сейвера
+  public void setScreenSaverStateThreadSafe (final boolean state)
+  {
+    UiDispatch.run (this, new UiRunnable () {
+      public Object run ()
+      {
+        Window mainWindow = getWindow ();
+        
+        if (state)
+        {
+          mainWindow.clearFlags (WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        }
+        else
+        {
+          mainWindow.addFlags (WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        }
+        
+        return null;
+      }
+    });
+  }  
 
 ///Установка параметров оборудования
   private void setupHardwareConfiguration ()

@@ -12,6 +12,8 @@ class AndroidApplicationDelegate;
 
 AndroidApplicationDelegate* volatile application_delegate = 0;
 
+static bool screen_saver_state = true;
+
 template <class Fn> class ActivityMessage: public MessageQueue::Message
 {
   public:
@@ -304,6 +306,38 @@ IApplicationDelegate* AndroidApplicationManager::CreateDefaultApplicationDelegat
 void AndroidApplicationManager::OpenUrl (const char* url)
 {
   throw xtl::make_not_implemented_exception ("syslib::AndroidApplicationManager::OpenUrl");
+}
+
+/*
+   Управление энергосбережением
+*/
+
+void AndroidApplicationManager::SetScreenSaverState (bool state)
+{
+  try
+  {
+    local_ref<jobject> activity (get_activity (), false);
+    local_ref<jclass>  activity_class (get_env ().GetObjectClass (get_activity ()), false);
+
+    if (!activity_class)
+      throw xtl::format_operation_exception ("", "JNIEnv::GetObjectClass failed");
+
+    jmethodID set_screen_saver_state_method = find_method (&get_env (), activity_class.get (), "setScreenSaverStateThreadSafe", "(Z)V");
+
+    get_env ().CallVoidMethod (activity.get (), set_screen_saver_state_method, state);
+
+    screen_saver_state = state;
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("syslib::AndroidApplicationManager::SetScreenSaverState");
+    throw;
+  }
+}
+
+bool AndroidApplicationManager::GetScreenSaverState ()
+{
+  return screen_saver_state;
 }
 
 /*
