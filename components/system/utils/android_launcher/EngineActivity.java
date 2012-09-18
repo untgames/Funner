@@ -1,6 +1,8 @@
 package com.untgames.funner.application;
 
 import android.app.Activity;
+import android.graphics.Point;
+import android.view.Display;
 import android.view.View;
 import android.view.ViewGroup;
 import android.os.Bundle;
@@ -32,7 +34,7 @@ public class EngineActivity extends Activity
       return;
       
     isLoaded = true;      
-      
+    
     startApplication ();    
   }        
   
@@ -97,7 +99,8 @@ public class EngineActivity extends Activity
     envVars = envVars + " " + "APK_FULL_PATH='" + sourceApk + "'";
     envVars = envVars + " " + "HOME='" + dataDir + "'";
     envVars = envVars + " " + "TEMP='" + tmpDir + "'";
-
+    envVars = envVars + " " + "ANDROID_DATA='" + getFilesDir ().getPath () + "'";
+    
     try
     {
       if (librariesString != null)
@@ -113,9 +116,11 @@ public class EngineActivity extends Activity
 
       if (programName != "")
         System.load (programName);        
-        
+
+      setupHardwareConfiguration ();
+      
       if (startApplication (programName, workDir, programArgs != null ? programArgs : "", envVars) == 0)
-        System.exit (0);        
+        System.exit (0);
     }    
     catch (Throwable e)
     {
@@ -126,6 +131,34 @@ public class EngineActivity extends Activity
     }                   
   }
 
+///Установка параметров оборудования
+  private void setupHardwareConfiguration ()
+  {
+    Display display = getWindowManager().getDefaultDisplay();
+    DisplayMetrics metrics = new DisplayMetrics ();
+    
+    display.getMetrics (metrics);
+
+    int width, height;
+    
+    if (Build.VERSION.SDK_INT >= 13)
+    {
+      Point size = new Point ();
+
+      display.getSize (size);
+
+      width  = size.x;
+      height = size.y;
+    }
+    else
+    {
+      width  = display.getWidth ();
+      height = display.getHeight ();
+    }
+    
+    setScreenMode (width, height, (int)display.getRefreshRate (), (int)metrics.xdpi, (int)metrics.ydpi);
+  }
+  
 ///Приостановка приложения  
   @Override
   public void onPause ()
@@ -279,6 +312,9 @@ public class EngineActivity extends Activity
 
 /// Точка входа в native код
   public native int startApplication (String programName, String workDir, String programArgs, String envVars);  
+
+/// Регистрация параметров дисплея
+  public native void setScreenMode (int width, int height, int refresh_rate, int xdpi, int ydpi);  
 
 /// Оповещение о возникновении событий
   public native void onPauseCallback ();
