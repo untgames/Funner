@@ -1,6 +1,7 @@
 #include "shared.h"
 
 #include <syslib/application.h>
+#include <syslib/cookie.h>
 #include <syslib/screen.h>
 #include <syslib/web_view.h>
 #include <syslib/window.h>
@@ -17,12 +18,13 @@ namespace
 
 const char* APPLICATION_LIBRARY       = "System.Application";
 const char* APPLICATION_EVENT_LIBRARY = "System.ApplicationEvent";
+const char* COOKIE_MANAGER_LIBRARY    = "System.CookieManager";
+const char* SCREEN_LIBRARY            = "System.Screen";
+const char* SCREEN_MANAGER_LIBRARY    = "System.ScreenManager";
 const char* WEB_VIEW_LIBRARY          = "System.WebView";
 const char* WEB_VIEW_EVENT_LIBRARY    = "System.WebViewEvent";
 const char* WINDOW_STYLE_LIBRARY      = "System.WindowStyle";
 const char* WINDOW_LIBRARY            = "System.Window";
-const char* SCREEN_LIBRARY            = "System.Screen";
-const char* SCREEN_MANAGER_LIBRARY    = "System.ScreenManager";
 const char* COMPONENT_NAME            = "script.binds.System";
 const char* BINDER_NAME               = "System";
 
@@ -309,10 +311,21 @@ void bind_screen_manager_library (Environment& environment)
   lib.Register ("Screen",           make_invoker (&syslib::ScreenManager::Screen));
 }
 
+void bind_cookie_manager_library (Environment& environment)
+{
+  InvokerRegistry lib = environment.Library (COOKIE_MANAGER_LIBRARY);
+
+  lib.Register ("get_AcceptCookie", make_invoker (&syslib::CookieManager::AcceptCookie));
+  lib.Register ("set_AcceptCookie", make_invoker (&syslib::CookieManager::SetAcceptCookie));
+  lib.Register ("DeleteCookies",    make_invoker (&syslib::CookieManager::DeleteCookies));
+  lib.Register ("DeleteAllCookies", make_invoker (&syslib::CookieManager::DeleteAllCookies));
+}
+
 void bind_syslib_library (Environment& environment)
 {
   bind_application_events_library (environment);
   bind_application_library        (environment);
+  bind_cookie_manager_library     (environment);
   bind_window_styles_library      (environment);  
   bind_window_library             (environment);
   bind_web_view_events_library    (environment);
