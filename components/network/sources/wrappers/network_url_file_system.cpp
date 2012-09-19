@@ -20,24 +20,402 @@ const char*  LOG_NAME             = "network.url_file_system";
     URL файл
 */
 
-struct UrlFile: public Lockable
+class UrlFile: public Lockable
 {
-  stl::string url;            //URL ресурса
-  File        request_file;   //файла записи данных запроса
-  File        response_file;  //файл чтения данных ответа
-  bool        is_post;        //является ли соедиенние POST запросом
-  bool        end_of_request; //флаг - запрос отправлен
-  size_t      buffer_size;    //размер кеша буфера чтения
-  
-  UrlFile (const char* in_url, bool in_is_post, size_t in_buffer_size)
-    : url (in_url)
-    , is_post (in_is_post)
-    , end_of_request (false)
-    , buffer_size (in_buffer_size)
-  {
-    if (is_post)
-      request_file = TempFile ("/system/inetcache/funner_url_file%06u");
-  }
+  public:  
+///Конструктор
+    UrlFile (const char* in_url, bool in_is_post)
+      : url (in_url)
+      , is_post (in_is_post)
+      , end_of_request (false)
+      , log (LOG_NAME)
+    {
+      if (is_post)
+        request_file = TempFile ("/system/inetcache/funner_url_file%06u");
+    }
+
+///Деструктор
+    virtual ~UrlFile () {}
+    
+///Файловые операции
+    virtual size_t     BufferSize () { return request_file.BufferSize (); }
+    virtual filepos_t  Tell       () { return 0; }    
+    virtual size_t     Read   (void* buf, size_t size) = 0;
+    virtual void       Rewind () = 0;
+    virtual filepos_t  Seek   (filepos_t pos) = 0;
+    virtual filesize_t Size   () = 0;
+    virtual void       Resize (filesize_t new_size) = 0;
+    virtual bool       Eof    () = 0;
+    virtual void       Flush  () = 0;
+
+///Запись в файл запроса
+    size_t Write (const void* buf, size_t size)
+    {
+      common::Lock lock (*this);
+        
+      if (end_of_request)
+        throw xtl::format_operation_exception ("", "Can't send data after finish of send request");
+                  
+      return request_file.Write (buf, size);      
+    }    
+    
+  protected:
+///Завершена ли отсылка данных запроса
+    bool IsEndOfRequest () { return end_of_request; }    
+    
+///URL
+    const char* Url () { return url.c_str (); }
+    
+///URL соединение
+    UrlConnection& Connection () { return connection; }
+    
+///Поток протоколирования
+    common::Log& Log () { return log; }
+    
+///Завершение отсытки данных
+    void FinishSend ()
+    {
+      try
+      {
+        if (end_of_request)
+          return;          
+          
+        stl::string params = is_post ? common::format ("method=post send_size=%u", request_file.Size ()).c_str () : "";
+          
+        log.Printf (params.empty () ? "Starting URL query '%s'" : "Starting URL query '%s' (params='%s')", url.c_str (), params.c_str ());
+          
+        connection = UrlConnection (url.c_str (), params.c_str ());
+        
+        const char* status = connection.Status ();
+        
+        if (strcmp (status, "Ok"))
+          throw xtl::format_operation_exception ("", "URL query '%s' failed. Status is: %s", url.c_str (), status);
+        
+        xtl::uninitialized_storage<char> buffer (DOWNLOAD_BUFFER_SIZE);
+        
+        if (is_post)
+        {        
+          request_file.Rewind ();
+
+          for (;;)
+          {
+            size_t size = request_file.Read (buffer.data (), buffer.size ());
+
+            if (!size)
+              break;
+
+            size_t send_size = connection.Send (buffer.data (), size);
+
+            if (send_size != size)
+              throw xtl::format_operation_exception ("", "Can't send data %u bytes for URL query '%s'", size, url.c_str ());
+          }
+
+          connection.CloseSend ();
+        }
+        
+        if (!request_file.IsClosed ())
+        {
+          stl::string request_file_path = request_file.Path ();
+
+          request_file.Close ();
+
+          common::FileSystem::Remove (request_file_path.c_str ());
+        }        
+
+        end_of_request = true;
+      }
+      catch (xtl::exception& e)
+      {
+        e.touch ("network::UrlFile::FinishSend");
+        throw;
+      }
+    }
+    
+  private:
+    UrlConnection connection;     //соединение
+    stl::string   url;            //URL ресурса
+    File          request_file;   //файла записи данных запроса
+    bool          is_post;        //является ли соедиенние POST запросом
+    bool          end_of_request; //флаг - запрос отправлен  
+    common::Log   log;            //поток протоколирования
+};
+
+class SeekableUrlFile: public UrlFile
+{
+  public:  
+///Конструктор
+    SeekableUrlFile (const char* in_url, bool in_is_post, size_t in_buffer_size)
+      : UrlFile (in_url, in_is_post)
+      , buffer_size (in_buffer_size)
+    {
+    }  
+
+///Закрытие файла
+    ~SeekableUrlFile ()
+    {
+      try
+      {
+        common::Lock lock (*this);
+        
+        FinishSend ();
+        
+        if (!response_file.IsClosed ())
+        {
+          stl::string response_file_path = response_file.Path ();
+
+          response_file.Close ();
+
+          common::FileSystem::Remove (response_file_path.c_str ());
+        }    
+      }
+      catch (...)
+      {
+      }
+    }
+
+///Рамзер буфера
+    size_t BufferSize ()
+    {
+      if (!IsEndOfRequest ())
+        return UrlFile::BufferSize ();
+      
+      return response_file.BufferSize ();
+    }
+
+///Чтение из файла
+    size_t Read (void* buf, size_t size)
+    {
+      common::Lock lock (*this);
+        
+      FinishSend ();
+        
+      return response_file.Read (buf, size);
+    }
+    
+///Сброс файлового указателя
+    void Rewind ()
+    {
+      common::Lock lock (*this);
+
+      FinishSend ();
+        
+      response_file.Rewind ();      
+    }
+    
+///Позиционирование
+    filepos_t Seek (filepos_t pos)
+    {
+      common::Lock lock (*this);
+        
+      FinishSend ();
+        
+      return response_file.Seek (pos);      
+    }
+    
+    filepos_t Tell ()
+    {
+      common::Lock lock (*this); 
+        
+      if (IsEndOfRequest ())
+        return response_file.Tell ();
+        
+      return UrlFile::Tell ();
+    }
+
+///Размер файла
+    filesize_t Size ()
+    {   
+      common::Lock lock (*this);
+
+      FinishSend ();
+
+      return response_file.Size ();
+    }
+    
+    void Resize (filesize_t new_size)
+    {
+      common::Lock lock (*this);
+        
+      FinishSend ();
+        
+      response_file.Resize (new_size);
+    }
+    
+///Проверка конца файла
+    bool Eof ()
+    {
+      common::Lock lock (*this);
+
+      if (!IsEndOfRequest ())
+        return false;
+
+      return response_file.Eof ();
+    }    
+    
+///Сброс файла на диск
+    void Flush ()
+    {
+      common::Lock lock (*this);
+        
+      if (!IsEndOfRequest ())
+        return;
+
+      response_file.Flush ();      
+    }    
+    
+  private:
+    void FinishSend ()
+    {
+      if (IsEndOfRequest ())
+        return;
+
+      UrlFile::FinishSend ();
+      
+      TempFile temp_file ("/system/inetcache/funner_url_file%06u", buffer_size);
+      
+      size_t size;
+      
+      xtl::uninitialized_storage<char> buffer (DOWNLOAD_BUFFER_SIZE);      
+      
+      UrlConnection& connection = Connection ();
+      
+      while ((size = connection.Receive (buffer.data (), buffer.size ())) != 0)
+      {
+        size_t write_size = temp_file.Write (buffer.data (), size);
+        
+        if (write_size != size)
+          throw xtl::format_operation_exception ("", "Can't write to file '%s' %u bytes", temp_file.Path (), size);
+      }
+
+      temp_file.Rewind ();
+      
+      Log ().Printf ("URL query '%s' processed (response_size=%u)", Url (), temp_file.Size ());
+      
+      response_file = temp_file;
+    }
+
+  private:
+    File   response_file;  //файл чтения данных ответа
+    size_t buffer_size;    //размер кеша буфера чтения    
+};
+
+class StreamUrlFile: public UrlFile
+{
+  public:
+///Конструктор
+    StreamUrlFile (const char* in_url, bool in_is_post)
+      : UrlFile (in_url, in_is_post)
+      , file_size ()
+      , file_pos ()
+    {
+    }  
+
+///Закрытие файла
+    ~StreamUrlFile ()
+    {
+      try
+      {
+        common::Lock lock (*this);
+        
+        FinishSend ();
+      }
+      catch (...)
+      {
+      }
+    }
+
+///Рамзер буфера
+    size_t BufferSize ()
+    {
+      if (!IsEndOfRequest ())
+        return UrlFile::BufferSize ();
+      
+      return 0;
+    }
+
+///Чтение из файла
+    size_t Read (void* buf, size_t size)
+    {
+      common::Lock lock (*this);
+        
+      FinishSend ();
+      
+      size_t read_size = Connection ().Receive (buf, size);
+      
+      if (!read_size)
+      {
+        file_pos = file_size;
+      }
+      else
+      {
+        file_pos += read_size;
+      }
+        
+      return read_size;
+    }
+    
+///Сброс файлового указателя
+    void Rewind ()
+    {
+      throw xtl::format_not_supported_exception ("network::StreamUrlFile::Rewind", "Position operations are not supported");
+    }
+    
+///Позиционирование
+    filepos_t Seek (filepos_t)
+    {
+      throw xtl::format_not_supported_exception ("network::StreamUrlFile::Seek", "Position operations are not supported");
+    }
+    
+    filepos_t Tell ()
+    {
+      return file_pos;
+    }
+
+///Размер файла
+    filesize_t Size ()
+    {   
+      common::Lock lock (*this);
+
+      FinishSend ();
+
+      return file_size;
+    }
+    
+    void Resize (filesize_t new_size)
+    {
+      throw xtl::format_not_supported_exception ("network::StreamUrlFile::Seek", "Can't resize URL stream");
+    }
+    
+///Проверка конца файла
+    bool Eof ()
+    {
+      common::Lock lock (*this);
+
+      if (!IsEndOfRequest ())
+        return false;
+
+      return file_pos == file_size;
+    }    
+    
+///Сброс файла на диск
+    void Flush ()
+    {
+    }
+    
+  private:
+    void FinishSend ()
+    {
+      if (IsEndOfRequest ())
+        return;
+        
+      UrlFile::FinishSend ();
+
+      file_size = Connection ().ContentLength ();
+    }
+    
+  private:
+    filesize_t file_size; //размер файла
+    filepos_t  file_pos;  //позиция в потоке
 };
 
 /*
@@ -60,14 +438,23 @@ class UrlCustomFileSystem: public ICustomFileSystem, public xtl::reference_count
       try
       {
         if (!name)
-          throw xtl::make_null_argument_exception ("", "name");
+          throw xtl::make_null_argument_exception ("", "name");          
           
         stl::string url = (prefix + name).c_str ();
           
         log.Printf ("Open url file '%s' (file_mode=%s)", url.c_str (), common::strfilemode (mode_flags).c_str ());
         
-        stl::auto_ptr<UrlFile> file (new UrlFile (url.c_str (), (mode_flags & FileMode_Write) != 0, buffer_size));
+        stl::auto_ptr<UrlFile> file;
         
+        if (mode_flags & (FileMode_Seek | FileMode_Rewind | FileMode_Resize))
+        {
+          file.reset (new SeekableUrlFile (url.c_str (), (mode_flags & FileMode_Write) != 0, buffer_size));
+        }
+        else
+        {
+          file.reset (new StreamUrlFile (url.c_str (), (mode_flags & FileMode_Write) != 0));
+        }
+
         return reinterpret_cast<file_t> (file.release ());
       }
       catch (xtl::exception& e)
@@ -82,22 +469,9 @@ class UrlCustomFileSystem: public ICustomFileSystem, public xtl::reference_count
       try
       {
         UrlFile* file = reinterpret_cast<UrlFile*> (handle);
-        
+
         if (!file)
           throw xtl::make_null_argument_exception ("", "file");
-          
-        Lock lock (*file);
-
-        FinishSend (*file);
-        
-        if (!file->response_file.IsClosed ())
-        {
-          stl::string response_file_path = file->response_file.Path ();
-          
-          file->response_file.Close ();
-          
-          common::FileSystem::Remove (response_file_path.c_str ());
-        }
           
         delete file;
       }
@@ -117,9 +491,7 @@ class UrlCustomFileSystem: public ICustomFileSystem, public xtl::reference_count
         if (!file)
           throw xtl::make_null_argument_exception ("", "file");        
           
-        Lock lock (*file);          
-          
-        return file->buffer_size;
+        return file->BufferSize ();
       }
       catch (xtl::exception& e)
       {
@@ -136,12 +508,8 @@ class UrlCustomFileSystem: public ICustomFileSystem, public xtl::reference_count
         
         if (!file)
           throw xtl::make_null_argument_exception ("", "file");
-
-        Lock lock (*file);          
           
-        FinishSend (*file);
-          
-        return file->response_file.Read (buf, size);
+        return file->Read (buf, size);
       }
       catch (xtl::exception& e)
       {
@@ -159,12 +527,7 @@ class UrlCustomFileSystem: public ICustomFileSystem, public xtl::reference_count
         if (!file)
           throw xtl::make_null_argument_exception ("", "file");
           
-        Lock lock (*file);          
-          
-        if (file->end_of_request)
-          throw xtl::format_operation_exception ("", "Can't send data after finish of send request");
-                    
-        return file->request_file.Write (buf, size);
+        return file->Write (buf, size);
       }
       catch (xtl::exception& e)
       {
@@ -182,11 +545,7 @@ class UrlCustomFileSystem: public ICustomFileSystem, public xtl::reference_count
         if (!file)
           throw xtl::make_null_argument_exception ("", "file");
 
-        Lock lock (*file);          
-          
-        FinishSend (*file);
-          
-        file->response_file.Rewind ();
+        return file->Rewind ();
       }
       catch (xtl::exception& e)
       {
@@ -204,11 +563,7 @@ class UrlCustomFileSystem: public ICustomFileSystem, public xtl::reference_count
         if (!file)
           throw xtl::make_null_argument_exception ("", "file");
 
-        Lock lock (*file);          
-          
-        FinishSend (*file);
-          
-        return file->response_file.Seek (pos);
+        return file->Seek (pos);
       }
       catch (xtl::exception& e)
       {
@@ -226,16 +581,7 @@ class UrlCustomFileSystem: public ICustomFileSystem, public xtl::reference_count
         if (!file)
           throw xtl::make_null_argument_exception ("", "file");
 
-        Lock lock (*file);          
-          
-        if (file->end_of_request)
-        {
-          return file->response_file.Tell ();
-        }
-        else
-        {
-          return 0;
-        }
+        return file->Tell ();
       }
       catch (xtl::exception& e)
       {
@@ -253,11 +599,7 @@ class UrlCustomFileSystem: public ICustomFileSystem, public xtl::reference_count
         if (!file)
           throw xtl::make_null_argument_exception ("", "file");
 
-        Lock lock (*file);          
-          
-        FinishSend (*file);
-          
-        return file->response_file.Size ();        
+        return file->Size ();
       }
       catch (xtl::exception& e)
       {
@@ -275,11 +617,7 @@ class UrlCustomFileSystem: public ICustomFileSystem, public xtl::reference_count
         if (!file)
           throw xtl::make_null_argument_exception ("", "file");        
 
-        Lock lock (*file);          
-          
-        FinishSend (*file);
-          
-        file->response_file.Resize (new_size);
+        return file->Resize (new_size);
       }
       catch (xtl::exception& e)
       {
@@ -297,12 +635,7 @@ class UrlCustomFileSystem: public ICustomFileSystem, public xtl::reference_count
         if (!file)
           throw xtl::make_null_argument_exception ("", "file");        
 
-        Lock lock (*file);          
-          
-        if (!file->end_of_request)
-          return false;
-          
-        return file->response_file.Eof ();        
+        return file->Eof ();
       }
       catch (xtl::exception& e)
       {
@@ -320,12 +653,7 @@ class UrlCustomFileSystem: public ICustomFileSystem, public xtl::reference_count
         if (!file)
           throw xtl::make_null_argument_exception ("", "file");        
 
-        Lock lock (*file);          
-          
-        if (!file->end_of_request)
-          return;
-        
-        file->response_file.Flush ();
+        return file->Flush ();
       }
       catch (xtl::exception& e)
       {
@@ -397,82 +725,6 @@ class UrlCustomFileSystem: public ICustomFileSystem, public xtl::reference_count
     void Release ()
     {
       release (this);
-    }
-
-  private:  
-    void FinishSend (UrlFile& file)
-    {
-      try
-      {
-        if (file.end_of_request)
-          return;
-          
-        stl::string params = file.is_post ? common::format ("method=post send_size=%u", file.request_file.Size ()).c_str () : "";
-          
-        log.Printf (params.empty () ? "Starting URL query '%s'" : "Starting URL query '%s' (params='%s')", file.url.c_str (), params.c_str ());
-          
-        UrlConnection connection (file.url.c_str (), params.c_str ());
-        
-        const char* status = connection.Status ();
-        
-        if (strcmp (status, "Ok"))
-          throw xtl::format_operation_exception ("", "URL query '%s' failed. Status is: %s", file.url.c_str (), status);
-        
-        xtl::uninitialized_storage<char> buffer (DOWNLOAD_BUFFER_SIZE);
-        
-        if (file.is_post)
-        {        
-          file.request_file.Rewind ();
-
-          for (;;)
-          {
-            size_t size = file.request_file.Read (buffer.data (), buffer.size ());
-
-            if (!size)
-              break;
-
-            size_t send_size = connection.Send (buffer.data (), size);
-
-            if (send_size != size)
-              throw xtl::format_operation_exception ("", "Can't send data %u bytes for URL query '%s'", size, file.url.c_str ());
-          }
-
-          connection.CloseSend ();
-        }
-
-        TempFile temp_file ("/system/inetcache/funner_url_file%06u", file.buffer_size);
-        
-        size_t size;
-        
-        while ((size = connection.Receive (buffer.data (), buffer.size ())) != 0)
-        {
-          size_t write_size = temp_file.Write (buffer.data (), size);
-          
-          if (write_size != size)
-            throw xtl::format_operation_exception ("", "Can't write to file '%s' %u bytes", temp_file.Path (), size);
-        }
-
-        temp_file.Rewind ();
-        
-        log.Printf ("URL query '%s' processed (response_size=%u)", file.url.c_str (), temp_file.Size ());
-        
-        file.response_file  = temp_file;
-        file.end_of_request = true;
-
-        if (!file.request_file.IsClosed ())
-        {
-          stl::string request_file_path = file.request_file.Path ();
-
-          file.request_file.Close ();
-
-          common::FileSystem::Remove (request_file_path.c_str ());
-        }
-      }
-      catch (xtl::exception& e)
-      {
-        e.touch ("network::UrlCustomFileSystem::FinishSend");
-        throw;
-      }
     }
     
   private:
