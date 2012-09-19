@@ -1,13 +1,14 @@
 #ifndef SYSLIB_PLATFORM_HEADER
 #define SYSLIB_PLATFORM_HEADER
 
-#include <shared/default_window_manager.h>
-#include <shared/default_thread_manager.h>
-#include <shared/default_library_manager.h>
-#include <shared/default_timer_manager.h>
 #include <shared/default_application_manager.h>
+#include <shared/default_cookie_manager.h>
+#include <shared/default_library_manager.h>
 #include <shared/default_screen_manager.h>
 #include <shared/default_sensor_manager.h>
+#include <shared/default_thread_manager.h>
+#include <shared/default_timer_manager.h>
+#include <shared/default_window_manager.h>
 
 #include <shared/android.h>
 #include <shared/bada.h>

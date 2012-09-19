@@ -160,6 +160,7 @@ class TabletOsPlatform
  , public UnistdLibraryManager
  , public DefaultScreenManager
  , public TabletOsSensorManager 
+ , public DefaultCookieManager
 {
 };
 

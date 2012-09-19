@@ -54,13 +54,15 @@ int main ()
     view.RegisterEventHandler (WebViewEvent_OnDestroy, &event_handler);
     view.RegisterFilter       (&filter);
     
-//    view.Window ().SetParentHandle (parent_window.Handle ());
+  //  view.Window ().SetParentHandle (parent_window.Handle ());
     
     view.Window ().Show ();
     view.Window ().Maximize ();
 
     view.Window ().SetTitle ("Test web view");
     view.Window ().EnableBackground ();    
+
+//    CookieManager::DeleteCookies ("https://www.login.vk.com/");
 
 //    view.LoadRequest ("http://google.com");
     view.LoadRequest ("http://google.com");

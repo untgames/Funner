@@ -1,6 +1,7 @@
 #ifndef SYSLIB_IPHONE_PLATFORM_HEADER
 #define SYSLIB_IPHONE_PLATFORM_HEADER
 
+#include <shared/cocoa.h>
 #include <shared/unistd.h>
 
 namespace syslib
@@ -286,6 +287,7 @@ class IPhonePlatform
  , public UnistdLibraryManager
  , public IPhoneScreenManager
  , public IPhoneSensorManager
+ , public CocoaCookieManager
 {
 };
 

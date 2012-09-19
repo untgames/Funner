@@ -65,6 +65,7 @@ class UnistdPlatform
  , public UnistdApplicationManager
  , public DefaultScreenManager 
  , public DefaultSensorManager 
+ , public DefaultCookieManager
 {
 };
 
