@@ -398,7 +398,7 @@ class StreamUrlFile: public UrlFile
       if (!IsEndOfRequest ())
         return false;
 
-      return file_pos == file_size;
+      return (size_t)file_pos == file_size;
     }    
     
 ///—брос файла на диск
