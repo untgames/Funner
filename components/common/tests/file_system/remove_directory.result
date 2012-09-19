@@ -1,4 +1,9 @@
 Results of remove_directory_test:
+Test path 'test_dir'...
+Is dir exists: n
+Is dir exists: y
+Is dir exists: n
+Test path '/mount/test_dir'...
 Is dir exists: n
 Is dir exists: y
 Is dir exists: n

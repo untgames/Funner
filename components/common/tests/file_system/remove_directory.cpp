@@ -5,8 +5,8 @@
 
 using namespace common;
 
-const char* RESULTS_DIR_NAME = "test_dir";
-const char* NESTED_DIR_NAME  = "test_dir/test_dir";
+const char* RESULTS_DIR_NAMES [] = { "test_dir", "/mount/test_dir" };
+const char* NESTED_DIR_NAMES []  = { "test_dir/test_dir", "/mount/test_dir/test_dir" };
 
 int main ()
 {
@@ -14,16 +14,24 @@ int main ()
   
   try
   {
-    printf ("Is dir exists: %c\n", FileSystem::IsDir (RESULTS_DIR_NAME) ? 'y' : 'n');
+    FileSystem::MountLink ("/mount", "/system/appdata");
+    FileSystem::AddSearchPath ("/system/appdata");
 
-    FileSystem::Mkdir (RESULTS_DIR_NAME);
-    FileSystem::Mkdir (NESTED_DIR_NAME);
+    for (size_t i = 0, count = sizeof (RESULTS_DIR_NAMES) / sizeof (*RESULTS_DIR_NAMES); i < count; i++)
+    {
+      printf ("Test path '%s'...\n", RESULTS_DIR_NAMES [i]);
 
-    printf ("Is dir exists: %c\n", FileSystem::IsDir (RESULTS_DIR_NAME) ? 'y' : 'n');
+      printf ("Is dir exists: %c\n", FileSystem::IsDir (RESULTS_DIR_NAMES [i]) ? 'y' : 'n');
 
-    FileSystem::Remove (RESULTS_DIR_NAME);
+      FileSystem::Mkdir (RESULTS_DIR_NAMES [i]);
+      FileSystem::Mkdir (NESTED_DIR_NAMES [i]);
 
-    printf ("Is dir exists: %c\n", FileSystem::IsDir (RESULTS_DIR_NAME) ? 'y' : 'n');
+      printf ("Is dir exists: %c\n", FileSystem::IsDir (RESULTS_DIR_NAMES [i]) ? 'y' : 'n');
+
+      FileSystem::Remove (RESULTS_DIR_NAMES [i]);
+
+      printf ("Is dir exists: %c\n", FileSystem::IsDir (RESULTS_DIR_NAMES [i]) ? 'y' : 'n');
+    }
   }
   catch (std::exception& exception)
   {
