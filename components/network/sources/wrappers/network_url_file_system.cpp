@@ -357,12 +357,16 @@ class StreamUrlFile: public UrlFile
 ///Сброс файлового указателя
     void Rewind ()
     {
-      throw xtl::format_not_supported_exception ("network::StreamUrlFile::Rewind", "Position operations are not supported");
+      if (file_pos)      
+        throw xtl::format_not_supported_exception ("network::StreamUrlFile::Rewind", "Position operations are not supported");
     }
     
 ///Позиционирование
-    filepos_t Seek (filepos_t)
+    filepos_t Seek (filepos_t pos)
     {
+      if (pos == file_pos)
+        return file_pos;
+      
       throw xtl::format_not_supported_exception ("network::StreamUrlFile::Seek", "Position operations are not supported");
     }
     
