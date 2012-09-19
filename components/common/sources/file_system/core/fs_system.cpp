@@ -25,7 +25,7 @@ void background_copy_file_impl (Action& action, const stl::string& source_file_n
 
   try
   {
-    InputFile input_file (source_file_name.c_str ());
+    StdFile input_file (source_file_name.c_str (), FileMode_Read);
     OutputFile output_file (destination_file_name.c_str ());
 
     if (output_file.Size ())
@@ -1675,7 +1675,7 @@ void FileSystem::CopyFile (const char* source_file_name, const char* destination
     if (!buffer_size)
       buffer_size = 4096;
 
-    InputFile input_file (source_file_name);
+    StdFile input_file (source_file_name, FileMode_Read);
     OutputFile output_file (destination_file_name);
 
     if (output_file.Size ())
