@@ -13,13 +13,20 @@ import android.content.ContextWrapper;
 import android.content.pm.ApplicationInfo;
 import android.content.SharedPreferences;
 import android.util.*;
-import android.os.Process;
 import android.os.Build;
+import android.os.Process;
+import android.os.SystemClock;
 import android.provider.Settings.Secure;
+import android.webkit.CookieManager;
+import android.webkit.CookieSyncManager;
+import java.net.CookieHandler;
 import java.security.MessageDigest;
+import java.util.Arrays;
 import java.util.Formatter;
 import java.util.Locale;
 import java.io.*;
+import org.apache.http.client.CookieStore;
+import org.apache.http.impl.client.DefaultHttpClient;
 
 /// Данный класс используется для запуска внешних shared-library
 public class EngineActivity extends Activity
@@ -332,7 +339,44 @@ public class EngineActivity extends Activity
       formatter.format ("%02x", b);
 
     return formatter.toString ();
-}  
+  }
+  
+/// Работа с cookies
+  private void initCookieManager ()
+  {
+    // Edge case: an illegal state exception is thrown if an instance of
+    // CookieSyncManager has not be created.  CookieSyncManager is normally
+    // created by a WebKit view, but this might happen if you start the
+    // app, restore saved state, and click logout before running a UI
+    // dialog in a WebView -- in which case the app crashes
+    @SuppressWarnings("unused")
+    CookieSyncManager cookieSyncManager = CookieSyncManager.createInstance(this);    
+  }
+  
+  public void setAcceptCookie (boolean accept)
+  {
+    initCookieManager ();
+    
+    CookieManager.getInstance ().setAcceptCookie (accept);
+  }
+
+  public boolean acceptCookie ()
+  {
+    initCookieManager ();
+    
+    return CookieManager.getInstance ().acceptCookie ();
+  }
+
+  public void deleteAllCookies ()
+  {
+    initCookieManager ();
+    
+    CookieManager manager = CookieManager.getInstance ();
+    
+    synchronized (manager) {
+      manager.removeAllCookie ();
+    }
+  }
 
 /// Точка входа в native код
   public native int startApplication (String programName, String workDir, String programArgs, String envVars);  
