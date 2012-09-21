@@ -316,7 +316,7 @@ void AndroidApplicationManager::SetScreenSaverState (bool state)
 {
   try
   {
-    local_ref<jobject> activity (get_activity (), false);
+    local_ref<jobject> activity (get_activity ());
     local_ref<jclass>  activity_class (get_env ().GetObjectClass (get_activity ()), false);
 
     if (!activity_class)
@@ -348,7 +348,7 @@ void AndroidApplicationManager::GetSystemProperties (common::PropertyMap& proper
 {
   try
   {
-    local_ref<jobject> activity (get_activity (), false); 
+    local_ref<jobject> activity (get_activity ()); 
     local_ref<jclass>  activity_class (get_env ().GetObjectClass (get_activity ()), false);
 
     if (!activity_class)

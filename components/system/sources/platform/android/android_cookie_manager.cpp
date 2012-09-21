@@ -9,7 +9,7 @@ using namespace syslib::android;
 
 void AndroidCookieManager::SetAcceptCookie (bool policy)
 {
-  local_ref<jobject> activity (get_activity (), false);
+  local_ref<jobject> activity (get_activity ());
   local_ref<jclass>  activity_class (get_env ().GetObjectClass (get_activity ()), false);
 
   if (!activity_class)
@@ -22,7 +22,7 @@ void AndroidCookieManager::SetAcceptCookie (bool policy)
 
 bool AndroidCookieManager::AcceptCookie ()
 {
-  local_ref<jobject> activity (get_activity (), false);
+  local_ref<jobject> activity (get_activity ());
   local_ref<jclass>  activity_class (get_env ().GetObjectClass (get_activity ()), false);
 
   if (!activity_class)
@@ -44,7 +44,7 @@ void AndroidCookieManager::DeleteCookies (const char* uri)
 
 void AndroidCookieManager::DeleteAllCookies ()
 {
-  local_ref<jobject> activity (get_activity (), false);
+  local_ref<jobject> activity (get_activity ());
   local_ref<jclass>  activity_class (get_env ().GetObjectClass (get_activity ()), false);
 
   if (!activity_class)
