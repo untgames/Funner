@@ -95,11 +95,6 @@ stl::string post_string (const char* file_name, const char* string)
   }  
 }
 
-void async_load_callback (const stl::string& result, const xtl::function<void (const stl::string&)>& callback)
-{
-  ActionQueue::PushAction (xtl::bind (callback, result), ActionThread_Main);
-}
-
 struct AsyncLoadCallback
 {
   typedef xtl::function<void (const char*)> CallbackHandler;
