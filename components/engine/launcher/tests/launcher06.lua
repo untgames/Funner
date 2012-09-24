@@ -2,7 +2,7 @@
 local function InitGraphics ()
   -- Создание экрана
   
-  local screen = Render.Screen.Create ()
+  local screen = Scene.Screen.Create ()
   
   screen.BackgroundColor = vec4 (0, 1, 0, 1)
   
@@ -12,10 +12,10 @@ local function InitGraphics ()
   
   -- Добавление на экран области вывода
 
-  local viewport = Render.Viewport.Create ()
+  local viewport = Scene.Viewport.Create ()
   
-  viewport.RenderPath = "Render2d"
-  viewport.ZOrder     = 0
+  viewport.Technique = "Render2d"
+  viewport.ZOrder    = 0
 
   viewport:SetArea (0, 0, 100, 100)
 
