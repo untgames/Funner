@@ -19,6 +19,9 @@ import android.os.SystemClock;
 import android.provider.Settings.Secure;
 import android.webkit.CookieManager;
 import android.webkit.CookieSyncManager;
+import android.view.ViewGroup;
+import android.widget.RelativeLayout;
+import android.widget.FrameLayout;
 import java.net.CookieHandler;
 import java.security.MessageDigest;
 import java.util.Arrays;
@@ -32,17 +35,18 @@ import org.apache.http.impl.client.DefaultHttpClient;
 public class EngineActivity extends Activity
 {
   private static boolean isLoaded = false;
+  private ViewGroup      views    = null;
 
 ///Загрузчик
   @Override
   public void onCreate(Bundle savedInstanceState)
   {        
-    super.onCreate (savedInstanceState);
+    super.onCreate (savedInstanceState);    
     
     if (isLoaded)
       return;
 
-    isLoaded = true;      
+    isLoaded = true;          
     
     startApplication ();    
   }        
@@ -227,18 +231,36 @@ public class EngineActivity extends Activity
   {    
   }
   
+///Добавление окна
+  void addView (View view)
+  {
+    boolean needSetContentView = views == null;
+    
+    if (needSetContentView)
+    {
+      views = new FrameLayout (this);
+    }
+    
+    views.addView (view, new ViewGroup.LayoutParams (FrameLayout.LayoutParams.WRAP_CONTENT, FrameLayout.LayoutParams.WRAP_CONTENT));
+    
+    view.bringToFront ();
+    
+    if (needSetContentView)    
+      getWindow ().setContentView (views, new ViewGroup.LayoutParams (ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+  }
+  
 /// Создание окна
   public EngineViewController createSurfaceViewController (String initString, final long windowRef)
   {
-    final Activity activity = this;    
+    final EngineActivity activity = this;            
     
     return (EngineViewController)UiDispatch.run (this, new UiRunnable () {
       public Object run ()
       {
-        EngineViewController controller = new EngineSurfaceViewController (activity, windowRef);                
-
-        getWindow ().addContentView (controller.getView (), new ViewGroup.LayoutParams (ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));        
-
+        EngineViewController controller = new EngineSurfaceViewController (activity, windowRef);
+        
+        addView (controller.getView ());
+        
         return controller;
       }
     });
@@ -253,9 +275,9 @@ public class EngineActivity extends Activity
       {
         EngineViewController controller = new EngineWebViewController (activity, windowRef);        
 
-        getWindow ().addContentView (controller.getView (), new ViewGroup.LayoutParams (ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));                
-        
-        controller.getView ().setVisibility (View.INVISIBLE);                
+        addView (controller.getView ());
+
+        controller.getView ().setVisibility (View.INVISIBLE);
 
         return controller;
       }
