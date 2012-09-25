@@ -55,7 +55,8 @@ ENGINE.LAUNCHER.SOURCES.LIBS                    :=
 ENGINE.LAUNCHER.SOURCES.macosx.LINK_FLAGS       := -framework Foundation -framework AppKit
 ENGINE.LAUNCHER.SOURCES.iphone.LINK_FLAGS       := -framework OpenAL -framework UIKit -framework Foundation \
                                                    -framework OpenGLES -framework MediaPlayer -framework AVFoundation \
-                                                   -framework AudioToolbox -framework QuartzCore -framework CoreGraphics
+                                                   -framework AudioToolbox -framework QuartzCore -framework CoreGraphics \
+                                                   -framework SystemConfiguration
 ENGINE.LAUNCHER.SOURCES.msvc.LINK_FLAGS         := -subsystem:windows -entry:mainCRTStartup
 ENGINE.LAUNCHER.SOURCES.win32.SOURCE_DIRS       := sources/platform/win32
 ENGINE.LAUNCHER.SOURCES.macosx.SOURCE_DIRS      := sources/platform/macosx
