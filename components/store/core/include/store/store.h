@@ -1,6 +1,8 @@
 #ifndef STORE_STORE_HEADER
 #define STORE_STORE_HEADER
 
+#include <cstddef>
+
 #include <store/common.h>
 #include <store/product.h>
 #include <store/transaction.h>

@@ -1,6 +1,8 @@
 #ifndef STORE_PRODUCT_HEADER
 #define STORE_PRODUCT_HEADER
 
+#include <cstddef>
+
 #include <store/common.h>
 
 namespace common
