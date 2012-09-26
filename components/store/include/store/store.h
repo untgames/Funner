@@ -4,8 +4,11 @@
 namespace store
 {
 
+//count -> quantity
+
 enum TransactionState
 {
+  TransactionState_New,
   TransactionState_Purchasing,
   TransactionState_Purchased,
   TransactionState_Failed,
@@ -25,11 +28,13 @@ class Transaction
 
     const char* Status () const;
 
-    const char* ProductIdentifier () const;
-    size_t      ProductCount () const;
+    const char* ProductId () const;
+    size_t      Count () const;
 
     size_t ReceiptSize () const;
     const void* ReceiptData () const;
+    
+    void Finish ();
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -40,7 +45,7 @@ class Product
   public:
     const char* Description () const;
 
-    const char* Identifier () const;
+    const char* Id () const;
 
     const common::PropertyMap& Properties () const;
 };
@@ -64,20 +69,21 @@ class Store
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Получение товаров
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    typedef xtl::function<void (const Product* loaded_products, size_t loaded_products_count)> LoadProductsCallback;
+    typedef xtl::function<void (const ProductList& products)> LoadProductsCallback;
 
-    void LoadProducts (const char** identifiers, size_t count, const LoadProductsCallback&) const;
+    void LoadProducts (const char* product_ids, const LoadProductsCallback& callback) const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Покупка / восстановление покупок
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     typedef xtl::function<void (const Transaction&)> PurchaseCallback;
+    
+    //+RegisterEventHandler
 
-    void RestorePurchases (const PurchaseCallback& callback) const;
-    void BuyProduct (const Product& product, size_t count, const PurchaseCallback& callback) const;
-    void BuyProduct (const char* product_identifier, size_t count, const PurchaseCallback& callback) const;
+    void RestorePurchases () const;
 
-    void FinishTransaction (const Transaction& transaction);
+    Transaction BuyProduct (const char* product_id, size_t count, const PurchaseCallback& callback) const;
+    Transaction BuyProduct (const char* product_id, size_t count) const;
 };
 
 }
