@@ -16,9 +16,7 @@ EXTERN.ANGLE.GLES2.win32.SOURCE_DIRS += sources/compiler/win
 EXTERN.ANGLE.GLES2.COMPILER_DEFINES  += LIBGLESV2_EXPORTS
 EXTERN.ANGLE.GLES2.COMPILER_DEFINES  += NOMINMAX
 EXTERN.ANGLE.GLES2.LIBS              += d3d9 D3dx9 d3dcompiler
-EXTERN.ANGLE.GLES2.x86.LIB_DIRS      += dxsdk/lib/x86
-EXTERN.ANGLE.GLES2.x64.LIB_DIRS      += dxsdk/lib/x64
-EXTERN.ANGLE.GLES2.IMPORTS           += compile.extern.angle
+EXTERN.ANGLE.GLES2.IMPORTS           += compile.extern.angle compile.extern.dxsdk link.extern.dxsdk
 
 EXTERN.ANGLE.EGL.TYPE             := dynamic-lib
 EXTERN.ANGLE.EGL.NAME             := libegl
@@ -30,9 +28,7 @@ EXTERN.ANGLE.EGL.SOURCE_DIRS      += sources/common
 EXTERN.ANGLE.EGL.COMPILER_DEFINES += LIBEGL_EXPORTS
 EXTERN.ANGLE.EGL.COMPILER_DEFINES += NOMINMAX
 EXTERN.ANGLE.EGL.LIBS             += d3d9 dxguid user32 gdi32 dwmapi funner.extern.libglesv2
-EXTERN.ANGLE.EGL.x86.LIB_DIRS     += dxsdk/lib/x86
-EXTERN.ANGLE.EGL.x64.LIB_DIRS     += dxsdk/lib/x64
-EXTERN.ANGLE.EGL.IMPORTS          += compile.extern.angle
+EXTERN.ANGLE.EGL.IMPORTS          += compile.extern.angle compile.extern.dxsdk link.extern.dxsdk
 
 EXTERN.ANGLE.TESTS.COMMON.TYPE              := static-lib
 EXTERN.ANGLE.TESTS.COMMON.NAME              := funner.extern.angle.tests-common
