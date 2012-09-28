@@ -2,8 +2,7 @@
 #define STORE_PRODUCT_HEADER
 
 #include <cstddef>
-
-#include <store/common.h>
+#include <xtl/functional_fwd>
 
 namespace common
 {
@@ -53,6 +52,8 @@ class Product
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Низкоуровневый дескриптора
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+    typedef xtl::function <void (const void*)> ReleaseHandleFunction;
+
     const void* Handle    () const;
     void        SetHandle (const void* handle, const ReleaseHandleFunction& release_function = ReleaseHandleFunction ());
 
