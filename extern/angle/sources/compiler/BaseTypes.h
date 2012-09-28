@@ -43,9 +43,11 @@ enum TBasicType
     EbtSampler2D,
     EbtSamplerCube,
     EbtSamplerExternalOES,  // Only valid if OES_EGL_image_external exists.
+    EbtSampler2DRect,       // Only valid if GL_ARB_texture_rectangle exists.
     EbtGuardSamplerEnd,    // non type:  see implementation of IsSampler()
     EbtStruct,
     EbtAddress,            // should be deprecated??
+    EbtInvariant,          // used as a type when qualifying a previously declared variable as being invariant
 };
 
 inline const char* getBasicString(TBasicType t)
@@ -59,6 +61,7 @@ inline const char* getBasicString(TBasicType t)
     case EbtSampler2D:         return "sampler2D";         break;
     case EbtSamplerCube:       return "samplerCube";       break;
     case EbtSamplerExternalOES: return "samplerExternalOES"; break;
+    case EbtSampler2DRect:     return "sampler2DRect";     break;
     case EbtStruct:            return "structure";         break;
     default:                   return "unknown type";
     }

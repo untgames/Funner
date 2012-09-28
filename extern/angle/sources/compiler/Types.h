@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2002-2010 The ANGLE Project Authors. All rights reserved.
+// Copyright (c) 2002-2012 The ANGLE Project Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 //
@@ -11,10 +11,12 @@
 #include "compiler/Common.h"
 #include "compiler/debug.h"
 
+class TType;
+struct TPublicType;
+
 //
 // Need to have association of line numbers to types in a list for building structs.
 //
-class TType;
 struct TTypeLine {
     TType* type;
     int line;
@@ -27,79 +29,26 @@ inline TTypeList* NewPoolTTypeList()
     return new(memory) TTypeList;
 }
 
-//
-// This is a workaround for a problem with the yacc stack,  It can't have
-// types that it thinks have non-trivial constructors.  It should
-// just be used while recognizing the grammar, not anything else.  Pointers
-// could be used, but also trying to avoid lots of memory management overhead.
-//
-// Not as bad as it looks, there is no actual assumption that the fields
-// match up or are name the same or anything like that.
-//
-class TPublicType {
-public:
-    TBasicType type;
-    TQualifier qualifier;
-    TPrecision precision;
-    int size;          // size of vector or matrix, not size of array
-    bool matrix;
-    bool array;
-    int arraySize;
-    TType* userDef;
-    int line;
-
-    void setBasic(TBasicType bt, TQualifier q, int ln = 0)
-    {
-        type = bt;
-        qualifier = q;
-        precision = EbpUndefined;
-        size = 1;
-        matrix = false;
-        array = false;
-        arraySize = 0;
-        userDef = 0;
-        line = ln;
-    }
-
-    void setAggregate(int s, bool m = false)
-    {
-        size = s;
-        matrix = m;
-    }
-
-    void setArray(bool a, int s = 0)
-    {
-        array = a;
-        arraySize = s;
-    }
-};
-
 typedef TMap<TTypeList*, TTypeList*> TStructureMap;
 typedef TMap<TTypeList*, TTypeList*>::iterator TStructureMapIterator;
+
 //
 // Base class for things that have a type.
 //
-class TType {
+class TType
+{
 public:
     POOL_ALLOCATOR_NEW_DELETE(GlobalPoolAllocator)
     TType() {}
     TType(TBasicType t, TPrecision p, TQualifier q = EvqTemporary, int s = 1, bool m = false, bool a = false) :
             type(t), precision(p), qualifier(q), size(s), matrix(m), array(a), arraySize(0),
-            maxArraySize(0), arrayInformationType(0), structure(0), structureSize(0), fieldName(0), mangled(0), typeName(0)
+            maxArraySize(0), arrayInformationType(0), structure(0), structureSize(0), deepestStructNesting(0), fieldName(0), mangled(0), typeName(0)
     {
     }
-    explicit TType(const TPublicType &p) :
-            type(p.type), precision(p.precision), qualifier(p.qualifier), size(p.size), matrix(p.matrix), array(p.array), arraySize(p.arraySize),
-            maxArraySize(0), arrayInformationType(0), structure(0), structureSize(0), fieldName(0), mangled(0), typeName(0)
-    {
-        if (p.userDef) {
-            structure = p.userDef->getStruct();
-            typeName = NewPoolTString(p.userDef->getTypeName().c_str());
-        }
-    }
+    explicit TType(const TPublicType &p);
     TType(TTypeList* userDef, const TString& n, TPrecision p = EbpUndefined) :
             type(EbtStruct), precision(p), qualifier(EvqTemporary), size(1), matrix(false), array(false), arraySize(0),
-            maxArraySize(0), arrayInformationType(0), structure(userDef), structureSize(0), fieldName(0), mangled(0)
+            maxArraySize(0), arrayInformationType(0), structure(userDef), structureSize(0), deepestStructNesting(0), fieldName(0), mangled(0)
     {
         typeName = NewPoolTString(n.c_str());
     }
@@ -144,6 +93,7 @@ public:
 
         structureSize = copyOf.structureSize;
         maxArraySize = copyOf.maxArraySize;
+        deepestStructNesting = copyOf.deepestStructNesting;
         assert(copyOf.arrayInformationType == 0);
         arrayInformationType = 0; // arrayInformationType should not be set for builtIn symbol table level
     }
@@ -202,7 +152,7 @@ public:
     bool isScalar() const { return size == 1 && !matrix && !structure; }
 
     TTypeList* getStruct() const { return structure; }
-    void setStruct(TTypeList* s) { structure = s; }
+    void setStruct(TTypeList* s) { structure = s; computeDeepestStructNesting(); }
 
     const TString& getTypeName() const
     {
@@ -268,9 +218,26 @@ public:
     const char* getQualifierString() const { return ::getQualifierString(qualifier); }
     TString getCompleteString() const;
 
+    // If this type is a struct, returns the deepest struct nesting of
+    // any field in the struct. For example:
+    //   struct nesting1 {
+    //     vec4 position;
+    //   };
+    //   struct nesting2 {
+    //     nesting1 field1;
+    //     vec4 field2;
+    //   };
+    // For type "nesting2", this method would return 2 -- the number
+    // of structures through which indirection must occur to reach the
+    // deepest field (nesting2.field1.position).
+    int getDeepestStructNesting() const { return deepestStructNesting; }
+
+    bool isStructureContainingArrays() const;
+
 protected:
     void buildMangledName(TString&);
     int getStructSize() const;
+    void computeDeepestStructNesting();
 
     TBasicType type      : 6;
     TPrecision precision;
@@ -284,10 +251,68 @@ protected:
 
     TTypeList* structure;      // 0 unless this is a struct
     mutable int structureSize;
+    int deepestStructNesting;
 
     TString *fieldName;         // for structure field names
     TString *mangled;
     TString *typeName;          // for structure field type name
+};
+
+//
+// This is a workaround for a problem with the yacc stack,  It can't have
+// types that it thinks have non-trivial constructors.  It should
+// just be used while recognizing the grammar, not anything else.  Pointers
+// could be used, but also trying to avoid lots of memory management overhead.
+//
+// Not as bad as it looks, there is no actual assumption that the fields
+// match up or are name the same or anything like that.
+//
+struct TPublicType
+{
+    TBasicType type;
+    TQualifier qualifier;
+    TPrecision precision;
+    int size;          // size of vector or matrix, not size of array
+    bool matrix;
+    bool array;
+    int arraySize;
+    TType* userDef;
+    int line;
+
+    void setBasic(TBasicType bt, TQualifier q, int ln = 0)
+    {
+        type = bt;
+        qualifier = q;
+        precision = EbpUndefined;
+        size = 1;
+        matrix = false;
+        array = false;
+        arraySize = 0;
+        userDef = 0;
+        line = ln;
+    }
+
+    void setAggregate(int s, bool m = false)
+    {
+        size = s;
+        matrix = m;
+    }
+
+    void setArray(bool a, int s = 0)
+    {
+        array = a;
+        arraySize = s;
+    }
+
+    bool isStructureContainingArrays() const
+    {
+        if (!userDef)
+        {
+            return false;
+        }
+
+        return userDef->isStructureContainingArrays();
+    }
 };
 
 #endif // _TYPES_INCLUDED_

@@ -15,6 +15,17 @@
 
 namespace gl
 {
+struct Vector4
+{
+    Vector4() {}
+    Vector4(float x, float y, float z, float w) : x(x), y(y), z(z), w(w) {}
+
+    float x;
+    float y;
+    float z;
+    float w;
+};
+
 inline bool isPow2(int x)
 {
     return (x & (x - 1)) == 0 && (x != 0);
@@ -70,26 +81,6 @@ inline unsigned int unorm(float x)
     }
 }
 
-inline RECT transformPixelRect(GLint x, GLint y, GLint w, GLint h, GLint surfaceHeight)
-{
-    RECT rect = {x,
-                 surfaceHeight - y - h,
-                 x + w,
-                 surfaceHeight - y};
-    return rect;
-}
-
-inline int transformPixelYOffset(GLint yoffset, GLint h, GLint surfaceHeight)
-{
-    return surfaceHeight - yoffset - h;
-}
-
-inline GLenum adjustWinding(GLenum winding)
-{
-    ASSERT(winding == GL_CW || winding == GL_CCW);
-    return winding == GL_CW ? GL_CCW : GL_CW;
-}
-
 inline bool supportsSSE2()
 {
     static bool checked = false;
@@ -114,6 +105,9 @@ inline bool supportsSSE2()
 
     return supports;
 }
+
+float float16ToFloat32(unsigned short h);
+
 }
 
 #endif   // LIBGLESV2_MATHUTIL_H_

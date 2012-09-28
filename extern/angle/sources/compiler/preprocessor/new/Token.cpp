@@ -6,50 +6,78 @@
 
 #include "Token.h"
 
-#include "token_type.h"
+#include <cassert>
 
-static const int kLocationLineSize = 16;  // in bits.
-static const int kLocationLineMask = (1 << kLocationLineSize) - 1;
+#include "numeric_lex.h"
 
 namespace pp
 {
 
-Token::Location Token::encodeLocation(int line, int file)
+void Token::reset()
 {
-    return (file << kLocationLineSize) | (line & kLocationLineMask);
+    type = 0;
+    flags = 0;
+    location = SourceLocation();
+    text.clear();
 }
 
-void Token::decodeLocation(Location loc, int* line, int* file)
+bool Token::equals(const Token& other) const
 {
-    if (file) *file = loc >> kLocationLineSize;
-    if (line) *line = loc & kLocationLineMask;
+    return (type == other.type) &&
+           (flags == other.flags) &&
+           (location == other.location) &&
+           (text == other.text);
 }
 
-Token::Token(Location location, int type, std::string* value)
-    : mLocation(location),
-      mType(type),
-      mValue(value)
+void Token::setAtStartOfLine(bool start)
 {
+    if (start)
+        flags |= AT_START_OF_LINE;
+    else
+        flags &= ~AT_START_OF_LINE;
 }
 
-Token::~Token() {
-    delete mValue;
+void Token::setHasLeadingSpace(bool space)
+{
+    if (space)
+        flags |= HAS_LEADING_SPACE;
+    else
+        flags &= ~HAS_LEADING_SPACE;
+}
+
+void Token::setExpansionDisabled(bool disable)
+{
+    if (disable)
+        flags |= EXPANSION_DISABLED;
+    else
+        flags &= ~EXPANSION_DISABLED;
+}
+
+bool Token::iValue(int* value) const
+{
+    assert(type == CONST_INT);
+    return numeric_lex_int(text, value);
+}
+
+bool Token::uValue(unsigned int* value) const
+{
+    assert(type == CONST_INT);
+    return numeric_lex_int(text, value);
+}
+
+bool Token::fValue(float* value) const
+{
+    assert(type == CONST_FLOAT);
+    return numeric_lex_float(text, value);
 }
 
 std::ostream& operator<<(std::ostream& out, const Token& token)
 {
-    switch (token.type())
-    {
-      case INT_CONSTANT:
-      case FLOAT_CONSTANT:
-      case IDENTIFIER:
-        out << *(token.value());
-        break;
-      default:
-        out << static_cast<char>(token.type());
-        break;
-    }
+    if (token.hasLeadingSpace())
+        out << " ";
+
+    out << token.text;
     return out;
 }
-}  // namespace pp
 
+}  // namespace pp
