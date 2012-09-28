@@ -1,5 +1,6 @@
 package com.untgames.funner.application;
 
+import android.view.ViewGroup;
 import android.view.GestureDetector;
 import android.view.SurfaceView;
 import android.view.Surface;
@@ -65,8 +66,12 @@ public class EngineViewController implements View.OnTouchListener, View.OnKeyLis
   {
     UiDispatch.run (view, new UiRunnable () {
       public Object run ()
-      {
+      {        
         view.setVisibility (View.GONE);
+        
+        ViewGroup parent = (ViewGroup)view.getParent ();        
+        
+        parent.removeView (view);
 
         return null;
       }

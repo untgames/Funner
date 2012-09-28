@@ -147,6 +147,7 @@ class BadaPlatform
  , public UnistdLibraryManager
  , public DefaultScreenManager
  , public DefaultSensorManager 
+ , public DefaultCookieManager
 {
 };
 

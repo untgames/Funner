@@ -298,10 +298,21 @@ public:
         return symbol;
     }
 
+    TSymbol *findBuiltIn(const TString &name)
+    {
+        return table[0]->find(name);
+    }
+
     TSymbolTableLevel* getGlobalLevel() {
         assert(table.size() >= 2);
         return table[1];
     }
+
+    TSymbolTableLevel* getOuterLevel() {
+        assert(table.size() >= 2);
+        return table[currentLevel() - 1];
+    }
+
     void relateToOperator(const char* name, TOperator op) {
         table[0]->relateToOperator(name, op);
     }

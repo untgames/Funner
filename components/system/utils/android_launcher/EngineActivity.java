@@ -1,38 +1,53 @@
 package com.untgames.funner.application;
 
 import android.app.Activity;
+import android.graphics.Point;
+import android.view.Display;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
 import android.os.Bundle;
 import android.os.Looper;
 import android.content.ContextWrapper;
 import android.content.pm.ApplicationInfo;
 import android.content.SharedPreferences;
 import android.util.*;
-import android.os.Process;
 import android.os.Build;
+import android.os.Process;
+import android.os.SystemClock;
 import android.provider.Settings.Secure;
+import android.webkit.CookieManager;
+import android.webkit.CookieSyncManager;
+import android.view.ViewGroup;
+import android.widget.RelativeLayout;
+import android.widget.FrameLayout;
+import java.net.CookieHandler;
 import java.security.MessageDigest;
+import java.util.Arrays;
 import java.util.Formatter;
 import java.util.Locale;
 import java.io.*;
+import org.apache.http.client.CookieStore;
+import org.apache.http.impl.client.DefaultHttpClient;
 
 /// Данный класс используется для запуска внешних shared-library
 public class EngineActivity extends Activity
 {
   private static boolean isLoaded = false;
+  private ViewGroup      views    = null;
 
 ///Загрузчик
   @Override
   public void onCreate(Bundle savedInstanceState)
   {        
-    super.onCreate (savedInstanceState);
+    super.onCreate (savedInstanceState);    
     
     if (isLoaded)
       return;
-      
-    isLoaded = true;      
-      
+
+    isLoaded = true;          
+    
     startApplication ();    
   }        
   
@@ -97,7 +112,8 @@ public class EngineActivity extends Activity
     envVars = envVars + " " + "APK_FULL_PATH='" + sourceApk + "'";
     envVars = envVars + " " + "HOME='" + dataDir + "'";
     envVars = envVars + " " + "TEMP='" + tmpDir + "'";
-
+    envVars = envVars + " " + "ANDROID_DATA='" + getFilesDir ().getPath () + "'";
+    
     try
     {
       if (librariesString != null)
@@ -113,9 +129,11 @@ public class EngineActivity extends Activity
 
       if (programName != "")
         System.load (programName);        
-        
+
+      setupHardwareConfiguration ();
+      
       if (startApplication (programName, workDir, programArgs != null ? programArgs : "", envVars) == 0)
-        System.exit (0);        
+        System.exit (0);
     }    
     catch (Throwable e)
     {
@@ -126,6 +144,56 @@ public class EngineActivity extends Activity
     }                   
   }
 
+///Установка состояния скрин-сейвера
+  public void setScreenSaverStateThreadSafe (final boolean state)
+  {
+    UiDispatch.run (this, new UiRunnable () {
+      public Object run ()
+      {
+        Window mainWindow = getWindow ();
+        
+        if (state)
+        {
+          mainWindow.clearFlags (WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        }
+        else
+        {
+          mainWindow.addFlags (WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        }
+        
+        return null;
+      }
+    });
+  }  
+
+///Установка параметров оборудования
+  private void setupHardwareConfiguration ()
+  {
+    Display display = getWindowManager().getDefaultDisplay();
+    DisplayMetrics metrics = new DisplayMetrics ();
+    
+    display.getMetrics (metrics);
+
+    int width, height;
+    
+    if (Build.VERSION.SDK_INT >= 13)
+    {
+      Point size = new Point ();
+
+      display.getSize (size);
+
+      width  = size.x;
+      height = size.y;
+    }
+    else
+    {
+      width  = display.getWidth ();
+      height = display.getHeight ();
+    }
+    
+    setScreenMode (width, height, (int)display.getRefreshRate (), (int)metrics.xdpi, (int)metrics.ydpi);
+  }
+  
 ///Приостановка приложения  
   @Override
   public void onPause ()
@@ -163,18 +231,36 @@ public class EngineActivity extends Activity
   {    
   }
   
+///Добавление окна
+  void addView (View view)
+  {
+    boolean needSetContentView = views == null;
+    
+    if (needSetContentView)
+    {
+      views = new FrameLayout (this);
+    }
+    
+    views.addView (view, new ViewGroup.LayoutParams (FrameLayout.LayoutParams.WRAP_CONTENT, FrameLayout.LayoutParams.WRAP_CONTENT));
+    
+    view.bringToFront ();
+    
+    if (needSetContentView)    
+      getWindow ().setContentView (views, new ViewGroup.LayoutParams (ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+  }
+  
 /// Создание окна
   public EngineViewController createSurfaceViewController (String initString, final long windowRef)
   {
-    final Activity activity = this;    
+    final EngineActivity activity = this;            
     
     return (EngineViewController)UiDispatch.run (this, new UiRunnable () {
       public Object run ()
       {
-        EngineViewController controller = new EngineSurfaceViewController (activity, windowRef);                
-
-        getWindow ().addContentView (controller.getView (), new ViewGroup.LayoutParams (ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));        
-
+        EngineViewController controller = new EngineSurfaceViewController (activity, windowRef);
+        
+        addView (controller.getView ());
+        
         return controller;
       }
     });
@@ -189,9 +275,9 @@ public class EngineActivity extends Activity
       {
         EngineViewController controller = new EngineWebViewController (activity, windowRef);        
 
-        getWindow ().addContentView (controller.getView (), new ViewGroup.LayoutParams (ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));                
-        
-        controller.getView ().setVisibility (View.INVISIBLE);                
+        addView (controller.getView ());
+
+        controller.getView ().setVisibility (View.INVISIBLE);
 
         return controller;
       }
@@ -275,10 +361,50 @@ public class EngineActivity extends Activity
       formatter.format ("%02x", b);
 
     return formatter.toString ();
-}  
+  }
+  
+/// Работа с cookies
+  private void initCookieManager ()
+  {
+    // Edge case: an illegal state exception is thrown if an instance of
+    // CookieSyncManager has not be created.  CookieSyncManager is normally
+    // created by a WebKit view, but this might happen if you start the
+    // app, restore saved state, and click logout before running a UI
+    // dialog in a WebView -- in which case the app crashes
+    @SuppressWarnings("unused")
+    CookieSyncManager cookieSyncManager = CookieSyncManager.createInstance(this);    
+  }
+  
+  public void setAcceptCookie (boolean accept)
+  {
+    initCookieManager ();
+    
+    CookieManager.getInstance ().setAcceptCookie (accept);
+  }
+
+  public boolean acceptCookie ()
+  {
+    initCookieManager ();
+    
+    return CookieManager.getInstance ().acceptCookie ();
+  }
+
+  public void deleteAllCookies ()
+  {
+    initCookieManager ();
+    
+    CookieManager manager = CookieManager.getInstance ();
+    
+    synchronized (manager) {
+      manager.removeAllCookie ();
+    }
+  }
 
 /// Точка входа в native код
   public native int startApplication (String programName, String workDir, String programArgs, String envVars);  
+
+/// Регистрация параметров дисплея
+  public native void setScreenMode (int width, int height, int refresh_rate, int xdpi, int ydpi);  
 
 /// Оповещение о возникновении событий
   public native void onPauseCallback ();

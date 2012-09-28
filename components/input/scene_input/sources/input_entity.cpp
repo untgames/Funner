@@ -35,17 +35,19 @@ InputEntity::~InputEntity ()
     Ведение таблицы нажатий
 */
 
-void InputEntity::AddTouch (InputPort& port, touch_t touch, int button)
+InputEntity::TouchDesc* InputEntity::AddTouch (InputPort& port, touch_t touch, int button)
 {
   for (TouchDescArray::iterator iter=touches.begin (), end=touches.end (); iter!=end; ++iter)
     if (iter->port == &port && iter->touch == touch && iter->button == button)
-      return;
+      return &*iter;
       
   touches.push_back (TouchDesc (port, touch, button));
   
   wait_for_release_event = true;
   
   UpdateBroadcasts ();
+  
+  return &touches.back ();
 }
 
 InputEntity::TouchDesc* InputEntity::FindTouch (InputPort& port, touch_t touch, int button)
@@ -84,6 +86,42 @@ void InputEntity::RemoveAllTouches (InputPort& port)
 }
 
 /*
+    Оповещение
+*/
+
+void InputEntity::Notify (InputPort& input_port, InputZoneNotification notification, const InputZoneNotificationContext& context)
+{
+  if (!zone.Scene ())
+    return;
+    
+  zone.Notify (input_port.AttachedViewport (), notification, context);
+
+  if (context.button == 0)
+  {
+    switch (notification)
+    {
+      case InputZoneNotification_OnTouchMove:
+        zone.Notify (input_port.AttachedViewport (), InputZoneNotification_OnPressMove, context);
+        break;
+      case InputZoneNotification_OnTouchDown:
+        zone.Notify (input_port.AttachedViewport (), InputZoneNotification_OnPress, context);
+        break;        
+      case InputZoneNotification_OnTouchClick:
+        zone.Notify (input_port.AttachedViewport (), InputZoneNotification_OnClick, context);
+        break;        
+      case InputZoneNotification_OnTouchLeave:
+        zone.Notify (input_port.AttachedViewport (), InputZoneNotification_OnPressLeave, context);
+        break;
+      case InputZoneNotification_OnTouchEnter:
+        zone.Notify (input_port.AttachedViewport (), InputZoneNotification_OnPressEnter, context);
+        break;        
+      default:
+        break;
+    }
+  }
+}
+
+/*
     Обработка события
 */
 
@@ -91,7 +129,9 @@ void InputEntity::OnTouch (InputPort& input_port, const TouchEvent& event, const
 {
   try
   {
-    xtl::com_ptr<const scene_graph::InputZoneModel> self_lock (&zone);
+    InputEntityPtr self_lock (this);
+
+    xtl::com_ptr<const scene_graph::InputZoneModel> zone_lock (&zone);
     
       //формирование контекста события
       
@@ -111,33 +151,29 @@ void InputEntity::OnTouch (InputPort& input_port, const TouchEvent& event, const
 
     TouchDesc* touch_desc = FindTouch (input_port, event.touch, event.button);    
     
-    if (touch_desc && touch_desc->is_inside)
-    {
-      touch_desc->touch_check = true;
+    if (touch_desc)
+    {     
+      touch_desc->on_touch_method_entered = true;
       
       switch (event.state)
       {
         case TouchState_Moving:
-          zone.Notify (input_port.AttachedViewport (), InputZoneNotification_OnTouchMove, context);      
+          if (touch_desc->is_inside) Notify (input_port, InputZoneNotification_OnTouchMove, context);
+          else                       Notify (input_port, InputZoneNotification_OnTouchEnter, context);
           
-          if (context.button == 0)
-            zone.Notify (input_port.AttachedViewport (), InputZoneNotification_OnPressMove, context);
+          touch_desc->is_inside = true;
           
           break;
         case TouchState_Pressed:
           //ignored
           break;
         case TouchState_Released:
-          zone.Notify (input_port.AttachedViewport (), InputZoneNotification_OnTouchUpInside, context);
-          zone.Notify (input_port.AttachedViewport (), InputZoneNotification_OnTouchClick, context);
+          Notify (input_port, InputZoneNotification_OnTouchUpInside, context);
           
-          if (context.button == 0)
-            zone.Notify (input_port.AttachedViewport (), InputZoneNotification_OnClick, context);
-            
-          zone.Notify (input_port.AttachedViewport (), InputZoneNotification_OnTouchLeave, context);
-          
-          if (context.button == 0)
-            zone.Notify (input_port.AttachedViewport (), InputZoneNotification_OnPressLeave, context);
+          if (touch_desc->touch_check)          
+            Notify (input_port, InputZoneNotification_OnTouchClick, context);          
+
+          Notify (input_port, InputZoneNotification_OnTouchLeave, context);
           
           RemoveTouch (input_port, event.touch, event.button);
 
@@ -146,65 +182,25 @@ void InputEntity::OnTouch (InputPort& input_port, const TouchEvent& event, const
           break;        
       }
     }
-    else if (touch_desc)
-    {
-      touch_desc->is_inside   = true;
-      touch_desc->touch_check = true;
-      
-      switch (event.state)
-      {
-        case TouchState_Moving:
-          zone.Notify (input_port.AttachedViewport (), InputZoneNotification_OnTouchEnter, context);
-          
-          if (context.button == 0)
-            zone.Notify (input_port.AttachedViewport (), InputZoneNotification_OnPressEnter, context);
-
-          break;
-        case TouchState_Pressed:
-          //ignored
-          break;
-        case TouchState_Released:
-          zone.Notify (input_port.AttachedViewport (), InputZoneNotification_OnTouchUpInside, context);
-          zone.Notify (input_port.AttachedViewport (), InputZoneNotification_OnTouchClick, context);
-          zone.Notify (input_port.AttachedViewport (), InputZoneNotification_OnTouchLeave, context);
-
-          if (context.button == 0)
-            zone.Notify (input_port.AttachedViewport (), InputZoneNotification_OnPressLeave, context);
-
-          break;
-        default:
-          break;        
-      }        
-    }
     else
     {      
       switch (event.state)
       {
         case TouchState_Moving:
           AddTouch (input_port, event.touch, event.button);              
-
-          zone.Notify (input_port.AttachedViewport (), InputZoneNotification_OnTouchEnter, context);
-                              
-          if (context.button == 0)
-            zone.Notify (input_port.AttachedViewport (), InputZoneNotification_OnPressEnter, context);
-
+          Notify   (input_port, InputZoneNotification_OnTouchEnter, context);                              
           break;
         case TouchState_Pressed:
-          AddTouch (input_port, event.touch, event.button);              
+          touch_desc = AddTouch (input_port, event.touch, event.button);              
+          
+          touch_desc->touch_check = true;
 
-          zone.Notify (input_port.AttachedViewport (), InputZoneNotification_OnTouchEnter, context);
-          
-          if (context.button == 0)
-            zone.Notify (input_port.AttachedViewport (), InputZoneNotification_OnPressEnter, context);
-          
-          zone.Notify (input_port.AttachedViewport (), InputZoneNotification_OnTouchDown, context);                    
-          
-          if (context.button == 0)
-            zone.Notify (input_port.AttachedViewport (), InputZoneNotification_OnPress, context);
-          
+          Notify (input_port, InputZoneNotification_OnTouchEnter, context);          
+          Notify (input_port, InputZoneNotification_OnTouchDown, context);
+                    
           break;
         case TouchState_Released:
-          zone.Notify (input_port.AttachedViewport (), InputZoneNotification_OnTouchUpInside, context);
+          Notify (input_port, InputZoneNotification_OnTouchUpInside, context);
           break;
         default:
           break;        
@@ -224,8 +220,10 @@ void InputEntity::OnBroadcastTouch (InputPort& input_port, const TouchEvent& eve
   {    
     if (!has_screen_handlers && !wait_for_release_event)
       return;
+
+    InputEntityPtr self_lock (this);
       
-    xtl::com_ptr<const scene_graph::InputZoneModel> self_lock (&zone);      
+    xtl::com_ptr<const scene_graph::InputZoneModel> zone_lock (&zone);
       
       //подготовка контекста оповещения
 
@@ -240,13 +238,13 @@ void InputEntity::OnBroadcastTouch (InputPort& input_port, const TouchEvent& eve
     switch (event.state)
     {
       case TouchState_Moving:
-        zone.Notify (input_port.AttachedViewport (), InputZoneNotification_OnScreenTouchMove, context);
+        Notify (input_port, InputZoneNotification_OnScreenTouchMove, context);
         break;
       case TouchState_Pressed:
-        zone.Notify (input_port.AttachedViewport (), InputZoneNotification_OnScreenTouchDown, context);
+        Notify (input_port, InputZoneNotification_OnScreenTouchDown, context);
         break;
       case TouchState_Released:
-        zone.Notify (input_port.AttachedViewport (), InputZoneNotification_OnScreenTouchUp, context);
+        Notify (input_port, InputZoneNotification_OnScreenTouchUp, context);
         break;
       default:
         break;
@@ -258,17 +256,14 @@ void InputEntity::OnBroadcastTouch (InputPort& input_port, const TouchEvent& eve
       
     if (touch_desc)
     {      
-      if (!touch_desc->touch_check)
+      if (!touch_desc->on_touch_method_entered)
       {
         switch (event.state)
         {
           case TouchState_Moving:
             if (touch_desc->is_inside)
             {
-              zone.Notify (input_port.AttachedViewport (), InputZoneNotification_OnTouchLeave, context);
-              
-              if (context.button == 0)
-                zone.Notify (input_port.AttachedViewport (), InputZoneNotification_OnPressLeave, context);
+              Notify (input_port, InputZoneNotification_OnTouchLeave, context);
               
               touch_desc->is_inside = false;
             }
@@ -278,15 +273,19 @@ void InputEntity::OnBroadcastTouch (InputPort& input_port, const TouchEvent& eve
             //ignored
             break;
           case TouchState_Released:
-            zone.Notify (input_port.AttachedViewport (), InputZoneNotification_OnTouchUpOutside, context);
+            if (touch_desc->touch_check)
+              Notify (input_port, InputZoneNotification_OnTouchUpOutside, context);
+
             RemoveTouch (input_port, event.touch, event.button);
             break;
           default:
             break;
-        }      
+        }
       }
-      
-      touch_desc->touch_check = false;
+      else
+      {
+        touch_desc->on_touch_method_entered = false;
+      }
     }
   }
   catch (xtl::exception& e)

@@ -246,6 +246,30 @@ typedef stl::vector <IWindowListener*> ListenerArray;
     [delegate setMainViewVisible:true];
 }
 
+-(BOOL)shouldAutorotate
+{
+  return YES;
+}
+
+-(NSUInteger)supportedInterfaceOrientations
+{
+  NSUInteger return_value = 0;
+
+  if (window.allowed_orientations & InterfaceOrientation_Portrait)
+    return_value |= UIInterfaceOrientationMaskPortrait;
+  if (window.allowed_orientations & InterfaceOrientation_PortraitUpsideDown)
+    return_value |= UIInterfaceOrientationMaskPortraitUpsideDown;
+  if (window.allowed_orientations & InterfaceOrientation_LandscapeLeft)
+    return_value |= UIInterfaceOrientationMaskLandscapeLeft;
+  if (window.allowed_orientations & InterfaceOrientation_LandscapeRight)
+    return_value |= UIInterfaceOrientationMaskLandscapeRight;
+
+  if (!return_value)
+    return_value = UIInterfaceOrientationMaskAll;
+
+  return return_value;
+}
+
 -(BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interface_orientation
 {
   InterfaceOrientation desired_orientation = get_interface_orientation (interface_orientation);
@@ -289,22 +313,32 @@ typedef stl::vector <IWindowListener*> ListenerArray;
 
 -(UIViewController*)rootViewController
 {
-  return root_view_controller;
+  if (has_ios_4_0)
+    return super.rootViewController;
+  else
+    return root_view_controller;
 }
 
 -(void)setRootViewController:(UIViewController*)in_root_view_controller
 {
-  if (root_view_controller == in_root_view_controller)
-    return;
+  if (has_ios_4_0)
+  {
+    super.rootViewController = in_root_view_controller;
+  }
+  else
+  {
+    if (root_view_controller == in_root_view_controller)
+      return;
 
-  [root_view_controller.view removeFromSuperview];
+    [root_view_controller.view removeFromSuperview];
 
-  [root_view_controller release];
-  root_view_controller = [in_root_view_controller retain];
+    [root_view_controller release];
+    root_view_controller = [in_root_view_controller retain];
 
-  [self addSubview:root_view_controller.view];
+    [self addSubview:root_view_controller.view];
 
-  [root_view_controller.view becomeFirstResponder];
+    [root_view_controller.view becomeFirstResponder];
+  }
 }
 
 -(id) initWithFrame:(CGRect)rect
@@ -314,7 +348,7 @@ typedef stl::vector <IWindowListener*> ListenerArray;
   if (!self)
     return nil;
 
-  allowed_orientations = InterfaceOrientation_Portrait;
+  allowed_orientations = UIInterfaceOrientationMaskAll;
   has_ios_4_0          = [[[UIDevice currentDevice] systemVersion] compare:@"4.0" options:NSNumericSearch] != NSOrderedAscending;
 
   try

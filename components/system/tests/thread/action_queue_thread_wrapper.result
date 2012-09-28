@@ -1,5 +1,9 @@
 Results of action_queue_thread_wrapper_result:
 [00000000] action 1 executed in thread not creator
 [00000000] callback 1 executed in thread not creator
-[00000000] action 2 executed in thread not creator
-[00000000] callback 2 executed in thread creator
+[00000000] action 3 executed in thread creator
+[00000000] system.application: Exception in Application::ProcessActions: Exception in action handler
+    at action_handler
+    at common::Action::Perform
+[00001000] action 2 executed in thread not creator
+[00001000] callback 2 executed in thread creator

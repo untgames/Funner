@@ -4,6 +4,8 @@ zone2: OnScreenTouchMove
 zone1: OnTouchEnter
 zone1: OnScreenTouchMove
 zone2: OnScreenTouchMove
+zone1: OnTouchEnter
+zone1: OnPressEnter
 zone1: OnTouchDown
 zone1: OnPress
 zone1: OnScreenTouchDown

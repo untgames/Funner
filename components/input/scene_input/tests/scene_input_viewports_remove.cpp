@@ -12,7 +12,7 @@ void input_notify (InputZoneModel& model, const Viewport& vp, const InputZoneNot
   if (notification == InputZoneNotification_OnPress && vp.Id () == first_viewport_id)
     screen->Detach (screen->Viewport (screen->ViewportsCount () - 1));
     
-  if (notification == InputZoneNotification_OnTouchEnter && vp.Id () == first_viewport_id)
+  if (notification == InputZoneNotification_OnTouchEnter && vp.Id () == first_viewport_id && context.button == -1)
   {
     Viewport viewport;
     

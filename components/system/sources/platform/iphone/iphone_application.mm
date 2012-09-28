@@ -1,10 +1,14 @@
 #include "shared.h"
 
+#include <netdb.h>
+
 #import <Foundation/NSAutoreleasePool.h>
 
 #import <UIKit/UIApplication.h>
 
 #import <QuartzCore/CADisplayLink.h>
+
+#import <SystemConfiguration/SCNetworkReachability.h>
 
 using namespace syslib;
 using namespace syslib::iphone;
@@ -267,6 +271,11 @@ typedef stl::vector<syslib::iphone::IApplicationListener*> ListenerArray;
   [impl initIdleTimer];
 }
 
+-(NSUInteger)application:(UIApplication*)application supportedInterfaceOrientationsForWindow:(UIWindow*)window
+{
+  return UIInterfaceOrientationMaskAll;
+}
+
 /*
    Добавление/удаление подписчиков
 */
@@ -401,6 +410,18 @@ void IPhoneApplicationManager::GetSystemProperties (common::PropertyMap& propert
   }
 
   properties.SetProperty ("UUID", [uuid UTF8String]);
+
+  struct sockaddr_in zeroAddress;
+
+  bzero(&zeroAddress, sizeof(zeroAddress));
+  zeroAddress.sin_len = sizeof(zeroAddress);
+  zeroAddress.sin_family = AF_INET;
+
+  SCNetworkReachabilityRef   defaultRouteReachability = SCNetworkReachabilityCreateWithAddress (0, (struct sockaddr *)&zeroAddress);
+  SCNetworkReachabilityFlags flags;
+
+  if (SCNetworkReachabilityGetFlags(defaultRouteReachability, &flags) && (flags & kSCNetworkReachabilityFlagsReachable) && (flags & kSCNetworkReachabilityFlagsTransientConnection))
+    properties.SetProperty ("CellularOnlyInternet", 1);
 
   [pool release];
 }

@@ -12,16 +12,16 @@ typedef xtl::com_ptr<PrimarySwapChain> SwapChainPtr;
 
 struct PBuffer::Impl
 {
-  Log                        log;                   //протокол
-  SwapChainPtr               primary_swap_chain;    //основная цепочка обмена
-  AdapterLibraryPtr          library;               //библиотека OpenGL
-  SwapChainDesc              desc;                  //дескриптор буфера
-  Display*                   display;               //соединение с дисплеем
-  GLXPbuffer                 pbuffer;               //дескриптор PBuffer'а
-  GLXFBConfig                fbconfig;              //конфигурация буфера кадра
-  bool                       create_largest_flag;   //флаг необходимости создания максимально возможного pbuffer'а
-  xtl::auto_connection       cds_connection;        //соединение с сигналом, оповещающим об изменении видео-режима
-  const GlxExtensionEntries* glx_extension_entries; //таблица GLX-расширений  
+  Log                         log;                   //протокол
+  SwapChainPtr                primary_swap_chain;    //основная цепочка обмена
+  AdapterLibraryPtr           library;               //библиотека OpenGL
+  SwapChainDesc               desc;                  //дескриптор буфера
+  Display*                    display;               //соединение с дисплеем
+  GLXPbuffer                  pbuffer;               //дескриптор PBuffer'а
+  GLXFBConfig                 fbconfig;              //конфигурация буфера кадра
+  bool                        create_largest_flag;   //флаг необходимости создания максимально возможного pbuffer'а
+  xtl::auto_connection        cds_connection;        //соединение с сигналом, оповещающим об изменении видео-режима
+  const GlxExtensionsEntries* glx_extensions_entries; //таблица GLX-расширений
 
 ///Конструктор / деструктор
   Impl (PrimarySwapChain* swap_chain)
@@ -42,7 +42,7 @@ struct PBuffer::Impl
     
 //    cds_connection = swap_chain->RegisterDisplayModeChangeHandler (xtl::bind (&PBuffer::Impl::OnDisplayModeChange, this));
 
-    glx_extension_entries = &swap_chain->GetGlxExtensionEntries ();
+    glx_extensions_entries = &swap_chain->GetGlxExtensionsEntries ();
 
 //    if (!has_extension (get_wgl_extensions_string (*wgl_extension_entries, swap_chain->GetDC ()).c_str (), "WGL_ARB_pbuffer"))
 //      throw xtl::format_not_supported_exception (METHOD_NAME, "PBuffer does not supported");        
@@ -245,7 +245,7 @@ bool PBuffer::GetFullscreenState ()
 }
 
 /*
-    Получение 
+    Получение
 */
 
 IAdapter* PBuffer::GetAdapter ()
@@ -282,7 +282,7 @@ GLXFBConfig PBuffer::GetFBConfig ()
 }
 
 //получение точек входа
-const GlxExtensionEntries& PBuffer::GetGlxExtensionEntries ()
+const GlxExtensionsEntries& PBuffer::GetGlxExtensionsEntries ()
 {
-  return *impl->glx_extension_entries;
+  return *impl->glx_extensions_entries;
 }

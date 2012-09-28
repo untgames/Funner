@@ -34,16 +34,19 @@ typedef stl::vector<Output::Pointer> OutputArray;
 
 struct Adapter::Impl
 {
-  Log               log;               //протокол работы OpenGL
-  OutputManager     output_manager;    //менеджер устройств вывода
-  AdapterLibraryPtr library;           //библиотека адаптера
-  stl::string       name;              //имя адаптера
+  Log                  log;               //протокол работы OpenGL
+  OutputManager        output_manager;    //менеджер устройств вывода
+  AdapterLibraryPtr    library;           //библиотека адаптера
+  stl::string          name;              //имя адаптера
+  GlxExtensionsEntries glx_entries;
   
 ///Конструктор
   Impl (const char* in_name, const char* in_dll_path, const char* init_string)  
     : library (AdapterLibrary::LoadLibrary (in_dll_path))
     , name (in_name)
   {
+	  printf ("H!Y!H!Y!H!Y!HY!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n");
+    glx_entries.Init (*library);
   }  
 };
 
@@ -55,7 +58,7 @@ Adapter::Adapter (const char* name, const char* dll_path, const char* init_strin
 {
   try
   {
-      //проверка корректности аргументов    
+      //проверка корректности аргументов
     
     if (!name)
       throw xtl::make_null_argument_exception ("", "name");
@@ -146,7 +149,7 @@ AdapterLibrary& Adapter::GetLibrary ()
     Перечисление доступных форматов пикселей
 */
 
-void Adapter::EnumPixelFormats (int screen, PixelFormatArray& pixel_formats, GlxExtensionEntriesArray& entries)
+void Adapter::EnumPixelFormats (int screen, PixelFormatArray& pixel_formats, GlxExtensionsEntriesArray& entries)
 {
     // блокировка дисплея
     
@@ -199,7 +202,7 @@ void Adapter::EnumPixelFormats (int screen, PixelFormatArray& pixel_formats, Glx
     PixelFormatDesc desc;
 
     desc.adapter                 = this;
-    desc.glx_extension_entries   = 0;
+    desc.glx_extensions_entries  = &impl->glx_entries;
     desc.config                  = config;
     desc.visual_id               = visual_id;
     desc.pixel_format_index      = get_fb_config_attrib (lib, display, config, GLX_FBCONFIG_ID);

@@ -16,6 +16,7 @@
 #include <common/time.h>
 
 #include <syslib/application.h>
+#include <syslib/cookie.h>
 #include <syslib/dll.h>
 #include <syslib/screen.h>
 #include <syslib/sensor.h>

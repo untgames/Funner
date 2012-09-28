@@ -95,11 +95,6 @@ stl::string post_string (const char* file_name, const char* string)
   }  
 }
 
-void async_load_callback (const stl::string& result, const xtl::function<void (const stl::string&)>& callback)
-{
-  ActionQueue::PushAction (xtl::bind (callback, result), ActionThread_Main);
-}
-
 struct AsyncLoadCallback
 {
   typedef xtl::function<void (const char*)> CallbackHandler;
@@ -225,6 +220,12 @@ void bind_common_file_library (Environment& environment)
   InvokerRegistry lib = environment.CreateLibrary (COMMON_FILE_LIBRARY);
 
   lib.Register ("AddSearchPath",          make_invoker (&add_search_path));
+  lib.Register ("Mount",                  make_invoker (
+      make_invoker (xtl::implicit_cast<void (*) (const char*, const char*, const char*)> (&FileSystem::Mount)),
+      make_invoker<void (const char*, const char*)> (xtl::bind (xtl::implicit_cast<void (*) (const char*, const char*, const char*)> (&FileSystem::Mount), _1, _2, (const char*)0))));
+  lib.Register ("Unmount",                make_invoker (xtl::implicit_cast<void (*) (const char*)> (&FileSystem::Unmount)));
+  lib.Register ("UnmountAll",             make_invoker (&FileSystem::UnmountAll));
+  lib.Register ("IsPathMount",            make_invoker (&FileSystem::IsPathMount));
   lib.Register ("FileHash",               make_invoker (make_invoker (xtl::implicit_cast<stl::string (*) (const char*, size_t)> (&file_hash)),
                                                      make_invoker (xtl::implicit_cast<stl::string (*) (const char*)> (&file_hash))));
   lib.Register ("LoadString",             make_invoker (implicit_cast<stl::string (*)(const char*)> (&FileSystem::LoadTextFile)));

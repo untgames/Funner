@@ -11,6 +11,24 @@ const char*  FILE_SYSTEM_ADDONS_MASK              = "common.file_systems.*"; //м
 const char*  ANONYMOUS_FILES_PREFIX               = "/anonymous";            //префикс имён анонимных файлов
 const size_t MAX_SYMBOLIC_LINKS_REPLACEMENT_COUNT = 64;                      //максимальное количество подстановок символьных ссылок
 
+struct RemoveFileWithPrefix
+{
+  FileSystemImpl *file_system;
+  stl::string    prefix_name;
+
+  RemoveFileWithPrefix (FileSystemImpl* in_file_system, const char* in_prefix_name)
+    : file_system (in_file_system)
+    , prefix_name (in_prefix_name)
+  {}
+
+  void operator () (const char* file_name, const FileInfo&)
+  {
+    stl::string full_name = prefix_name + file_name;
+
+    file_system->Remove (full_name.c_str ());
+  }
+};
+
 void background_copy_file_notify (const FileSystem::BackgroundCopyFileCallback& callback, ActionThread thread, const BackgroundCopyState& copy_state)
 {
   if (thread == ActionThread_Background)
@@ -25,7 +43,7 @@ void background_copy_file_impl (Action& action, const stl::string& source_file_n
 
   try
   {
-    InputFile input_file (source_file_name.c_str ());
+    StdFile input_file (source_file_name.c_str (), FileMode_Read);
     OutputFile output_file (destination_file_name.c_str ());
 
     if (output_file.Size ())
@@ -802,7 +820,7 @@ void FileSystemImpl::RemoveFileAttribute (const char* src_file_name, const char*
     Определение принадлежности файла к файловой системе
 */
 
-ICustomFileSystemPtr FileSystemImpl::FindMountFileSystem (const char* file_name,string& result_file_name)
+ICustomFileSystemPtr FileSystemImpl::FindMountFileSystem (const char* file_name, string& result_file_name, string* prefix_name)
 {
   LoadFileSystems ();
 
@@ -814,15 +832,26 @@ ICustomFileSystemPtr FileSystemImpl::FindMountFileSystem (const char* file_name,
       {
         case '\0': //запрос к точке монтирования
           result_file_name = file_name;
+
+          if (prefix_name)
+            *prefix_name = "";
+
           return &i->mount_point_file_system;
         case '/': //запрос к смонтированной файловой системе
           result_file_name = file_name + i->prefix.size ();
+
+          if (prefix_name)
+            *prefix_name = i->prefix;
+
           return i->file_system;
         default:
           break;
       }
     }
   }
+
+  if (prefix_name)
+    *prefix_name = "";
 
   return NULL;
 }
@@ -871,13 +900,10 @@ ICustomFileSystemPtr FileSystemImpl::FindFileSystem (const char* src_file_name,s
 
   if (file_name [0] == '/')
   {
-    ICustomFileSystemPtr return_value = FindMountFileSystem (file_name.c_str (),result_file_name);
+    ICustomFileSystemPtr return_value = FindMountFileSystem (file_name.c_str (), result_file_name, prefix_name);
 
     if (!return_value)
       throw xtl::make_argument_exception (METHOD_NAME, "src_file_name", src_file_name, "Can't find mount file system for this file");
-
-    if (prefix_name)
-      *prefix_name = "";
 
     return return_value;
   }
@@ -1087,11 +1113,11 @@ void FileSystemImpl::Remove (const char* src_file_name)
   if (!src_file_name)
     throw xtl::make_null_argument_exception ("common::FileSystem::Remove","file_name");
 
-  string file_name;
+  string file_name, prefix;
 
   try
   {
-    ICustomFileSystemPtr file_system = FindFileSystem (src_file_name,file_name);
+    ICustomFileSystemPtr file_system = FindFileSystem (src_file_name, file_name, &prefix);
 
     FileInfo info;
     bool     is_dir = false;
@@ -1101,9 +1127,9 @@ void FileSystemImpl::Remove (const char* src_file_name)
 
     if (is_dir)
     {
-      stl::string search_mask = common::format ("%s/*", src_file_name);
+      stl::string search_mask = common::format ("%s/*", file_name.c_str ());
 
-      file_system->Search (search_mask.c_str (), xtl::bind (&FileSystemImpl::Remove, this, _1));
+      file_system->Search (search_mask.c_str (), RemoveFileWithPrefix (this, prefix.c_str ()));
 
       file_system->Remove (file_name.c_str ());
     }
@@ -1675,7 +1701,7 @@ void FileSystem::CopyFile (const char* source_file_name, const char* destination
     if (!buffer_size)
       buffer_size = 4096;
 
-    InputFile input_file (source_file_name);
+    StdFile input_file (source_file_name, FileMode_Read);
     OutputFile output_file (destination_file_name);
 
     if (output_file.Size ())

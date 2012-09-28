@@ -167,6 +167,7 @@ class LinuxPlatform
  , public UnistdApplicationManager
  , public DefaultScreenManager 
  , public DefaultSensorManager 
+ , public DefaultCookieManager
 {
 };
 

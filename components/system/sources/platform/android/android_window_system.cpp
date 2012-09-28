@@ -65,12 +65,17 @@ struct syslib::window_handle: public MessageQueue::Handler
     {
       JNIEnv& env = get_env ();
       
-      env.CallVoidMethod (view.get (), remove_from_parent_window_method);
-      
+      env.CallVoidMethod (controller.get (), remove_from_parent_window_method);
+
       check_errors ();      
+    }
+    catch (std::exception& e)
+    {
+      log.Printf ("%s\n    at syslib::android::window_handle::~window_handle", e.what ());
     }
     catch (...)
     {
+      log.Printf ("unknown exception\n    at syslib::android::window_handle::~window_handle");
     }
     
     MessageQueueSingleton::Instance ()->UnregisterHandler (*this);
@@ -577,7 +582,7 @@ window_t AndroidWindowManager::CreateWindow (WindowStyle, WindowMessageHandler h
     window->get_surface_method               = find_method (&env, controller_class.get (), "getSurfaceThreadSafe", "()Landroid/view/Surface;");
     window->post_invalidate_method           = find_method (&env, controller_class.get (), "postInvalidate", "()V");
     window->remove_from_parent_window_method = find_method (&env, controller_class.get (), "removeFromParentWindowThreadSafe", "()V");
-
+    
       //получение объекта окна
 
     window->view = check_errors (env.CallObjectMethod (window->controller.get (), window->get_view_method));
@@ -611,7 +616,7 @@ window_t AndroidWindowManager::CreateWindow (WindowStyle, WindowMessageHandler h
       local_ref<jobject> surface = check_errors (env.CallObjectMethod (window->controller.get (), window->get_surface_method));
 
       if (!surface)
-        throw xtl::format_operation_exception ("", "EngineViewController::getSurfaceThreadSafe failed");          
+        throw xtl::format_operation_exception ("", "EngineViewController::getSurfaceThreadSafe failed");                  
 
       window->is_surface_created = true;
     }

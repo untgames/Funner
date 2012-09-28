@@ -76,7 +76,7 @@ class LogSubsystem : public ISubsystem, public xtl::reference_counter
         {
           const char* console_log_filters_masks = get<const char*> (console_node, "Filters", "*");
 
-          console_log_exclude_filters = split (get<const char*> (file_node, "ExcludeFilters", ""));
+          console_log_exclude_filters = split (get<const char*> (console_node, "ExcludeFilters", ""));
 
           if (*console_log_filters_masks)
           {

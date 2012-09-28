@@ -23,6 +23,7 @@ SYSTEMLIB.SOURCES.unistd.SOURCE_DIRS                := sources/platform/pthread 
 SYSTEMLIB.SOURCES.msvc.COMPILER_CFLAGS              := -wd4355
 SYSTEMLIB.SOURCES.no_windows.SOURCE_DIRS            := sources/platform/no_windows
 SYSTEMLIB.SOURCES.android.SOURCE_DIRS               := sources/platform/android
+SYSTEMLIB.SOURCES.cocoa.SOURCE_DIRS                 := sources/platform/cocoa
 SYSTEMLIB.SOURCES.carbon.SOURCE_DIRS                := sources/platform/carbon
 SYSTEMLIB.SOURCES.carbon.COMPILER_DEFINES           := NO_PTHREAD_SEMAPHORES
 SYSTEMLIB.SOURCES.iphone.SOURCE_DIRS                := sources/platform/iphone

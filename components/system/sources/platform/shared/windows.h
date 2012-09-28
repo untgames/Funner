@@ -345,6 +345,7 @@ class WindowsPlatform
  , public WindowsApplicationManager
  , public WindowsScreenManager
  , public DefaultSensorManager
+ , public DefaultCookieManager
 {
 };
 

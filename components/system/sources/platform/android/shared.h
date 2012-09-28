@@ -223,6 +223,9 @@ void register_activity_callbacks (JNIEnv* env, jclass activity_class);
 /// регистрация обратчиков аварийного завершения
 void register_crash_handlers ();
 
+/// регистрация методов обратного вызова screen manager
+void register_screen_callbacks (JNIEnv* env, jclass activity_class);
+
 /// получение контекста запуска приложения
 const ApplicationContext& get_context ();
 

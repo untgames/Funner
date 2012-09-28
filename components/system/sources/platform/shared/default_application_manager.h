@@ -3,6 +3,8 @@
 
 #include <stl/string>
 
+#include <syslib/application_delegate.h>
+
 namespace common
 {
 

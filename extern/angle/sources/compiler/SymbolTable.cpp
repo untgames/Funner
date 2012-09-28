@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2002-2010 The ANGLE Project Authors. All rights reserved.
+// Copyright (c) 2002-2012 The ANGLE Project Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 //
@@ -9,13 +9,27 @@
 // are documented in the header file.
 //
 
+#if defined(_MSC_VER)
+#pragma warning(disable: 4718)
+#endif
+
 #include "compiler/SymbolTable.h"
 
 #include <stdio.h>
+#include <algorithm>
 
-//
-// TType helper function needs a place to live.
-//
+#include "common/angleutils.h"
+
+TType::TType(const TPublicType &p) :
+            type(p.type), precision(p.precision), qualifier(p.qualifier), size(p.size), matrix(p.matrix), array(p.array), arraySize(p.arraySize),
+            maxArraySize(0), arrayInformationType(0), structure(0), structureSize(0), deepestStructNesting(0), fieldName(0), mangled(0), typeName(0)
+{
+    if (p.userDef) {
+        structure = p.userDef->getStruct();
+        typeName = NewPoolTString(p.userDef->getTypeName().c_str());
+        computeDeepestStructNesting();
+    }
+}
 
 //
 // Recursively generate mangled names.
@@ -50,7 +64,7 @@ void TType::buildMangledName(TString& mangledName)
     mangledName += static_cast<char>('0' + getNominalSize());
     if (isArray()) {
         char buf[20];
-        sprintf(buf, "%d", arraySize);
+        snprintf(buf, sizeof(buf), "%d", arraySize);
         mangledName += '[';
         mangledName += buf;
         mangledName += ']';
@@ -69,6 +83,39 @@ int TType::getStructSize() const
             structureSize += ((*tl).type)->getObjectSize();
 
     return structureSize;
+}
+
+void TType::computeDeepestStructNesting()
+{
+    if (!getStruct()) {
+        return;
+    }
+
+    int maxNesting = 0;
+    for (TTypeList::const_iterator tl = getStruct()->begin(); tl != getStruct()->end(); ++tl) {
+        maxNesting = std::max(maxNesting, ((*tl).type)->getDeepestStructNesting());
+    }
+
+    deepestStructNesting = 1 + maxNesting;
+}
+
+bool TType::isStructureContainingArrays() const
+{
+    if (!structure)
+    {
+        return false;
+    }
+
+    for (TTypeList::const_iterator member = structure->begin(); member != structure->end(); member++)
+    {
+        if (member->type->isArray() ||
+            member->type->isStructureContainingArrays())
+        {
+            return true;
+        }
+    }
+
+    return false;
 }
 
 //

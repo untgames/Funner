@@ -1,6 +1,7 @@
 Results of background_copy_file_test:
 Status:      'Failed' / 'URL query 'http://localhost:9000/error.txt' failed. Status is: 404 Not Found
-    at network::UrlCustomFileSystem::FinishSend
-    at network::UrlCustomFileSystem::FileSize'
+    at network::UrlFile::FinishSend
+    at network::UrlCustomFileSystem::FileSize
+    at common::FileSystemImpl::OpenFile()'
 File size:    0
 Bytes copied: 0

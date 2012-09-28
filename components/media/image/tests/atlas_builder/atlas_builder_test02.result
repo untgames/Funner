@@ -13,6 +13,7 @@ atlas-builder [<OPTIONS>] <SOURCE> ...
     --invert-x                 invert X coordinate in layout of tiles
     --invert-y                 invert Y coordinate in layout of tiles
     --swap-axises              swap axises at layout tiles
+    --top-right-edge-margin    use margin for top and right edges
     --isolated-images=<wildcard> set wildcard for standalone images which will be isolate from general atlases
     --square                   square axises
     --dont-store-images        dont store all images in memory

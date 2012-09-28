@@ -214,9 +214,13 @@ class ApplicationImpl: private IApplicationListener
             
           action.Perform ();
         }
+        catch (std::exception& e)
+        {
+          log.Printf ("Exception in Application::ProcessActions: %s", e.what ());
+        }
         catch (...)
         {
-          //подавление исключений
+          log.Printf ("Unknown exception in Application::ProcessActions");
         }
       }  
     }    

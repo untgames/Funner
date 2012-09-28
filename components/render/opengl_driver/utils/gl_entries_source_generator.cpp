@@ -13,9 +13,10 @@
     Константы
 */
 
-const char*  WGLEXT_FILE_NAME     = "../sources/shared/gl/wglext.h";  //имя заголовочного файла WGL-расширений
-const char*  GLEXT_FILE_NAME      = "../sources/shared/gl/glext.h";   //имя заголовочного файла расширений OpenGL
-const char*  GLESEXT_FILE_NAME    = "../sources/shared/gles/glext.h"; //имя заголовочного файла расширений OpenGL
+const char*  WGLEXT_FILE_NAME     = "../sources/shared/profile/gl/wglext.h";  //имя заголовочного файла WGL-расширений
+const char*  GLEXT_FILE_NAME      = "../sources/shared/profile/gl/glext.h";   //имя заголовочного файла расширений OpenGL
+const char*  GLXEXT_FILE_NAME     = "../sources/shared/profile/gl/glxext.h";  //имя заголовочного файла расширений OpenGL
+const char*  GLESEXT_FILE_NAME    = "../sources/shared/profile/gles/glext.h"; //имя заголовочного файла расширений OpenGL
 const char*  TEMPLATES_MASK       = "templates/*";                    //маска имён файлов-шаблонов
 const char*  RESULT_DIR           = "results";                        //каталог с результирующими файлами
 const size_t ENTRIES_RESERVE_SIZE = 8192;                             //резервируемое количество точек входа
@@ -135,7 +136,8 @@ void generate_source
   const char*       source_name,
   const EntryArray& gl_entries,
   const EntryArray& gles_entries,
-  const EntryArray& wgl_entries)
+  const EntryArray& wgl_entries,
+  const EntryArray& glx_entries)
 {
     //загрузка шаблона
 
@@ -188,6 +190,9 @@ void generate_source
     else if (tag == "WGLENTRIES")  dump_entries        (wgl_entries, result);
     else if (tag == "WGLDEFINES")  dump_defines        (wgl_entries, result);
     else if (tag == "WGLINIT")     dump_initialization (wgl_entries, result);
+    else if (tag == "GLXENTRIES")  dump_entries        (glx_entries, result);
+    else if (tag == "GLXDEFINES")  dump_defines        (glx_entries, result);
+    else if (tag == "GLXINIT")     dump_initialization (glx_entries, result);    
     else
     {
       printf ("Bad tag '%s' in file '%s'\n", tag.c_str (), template_file_name);
@@ -211,11 +216,12 @@ int main ()
   {
       //загрузка точек входа OpenGL
 
-    EntryArray gl_entries, gles_entries, wgl_entries;
+    EntryArray gl_entries, gles_entries, wgl_entries, glx_entries;
 
     load_entries (GLEXT_FILE_NAME,   "APIENTRY", "gl",    gl_entries);
     load_entries (GLESEXT_FILE_NAME, "GL_APIENTRY", "gl", gles_entries);    
     load_entries (WGLEXT_FILE_NAME,  "WINAPI", "wgl",     wgl_entries);    
+    load_entries (GLXEXT_FILE_NAME,  "", "glX",           glx_entries);
 
       //создание нового каталога с результирующими файлами
 
@@ -228,7 +234,7 @@ int main ()
     {
       stl::string result_file_name = common::format ("%s/%s", RESULT_DIR, common::notdir (iter->name).c_str ());
 
-      generate_source (iter->name, result_file_name.c_str (), gl_entries, gles_entries, wgl_entries);
+      generate_source (iter->name, result_file_name.c_str (), gl_entries, gles_entries, wgl_entries, glx_entries);
     }
   }
   catch (std::exception& exception)

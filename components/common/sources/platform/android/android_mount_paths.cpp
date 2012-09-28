@@ -12,10 +12,11 @@ void AndroidPlatform::MountSystemSpecificPaths ()
   if (!home_dir)
     home_dir = "/data";
     
-  stl::string tmp_dir = home_dir;
-  
-  tmp_dir += "/local/tmp";
+  const char* tmp_dir = getenv ("TEMP");
 
+  if (!tmp_dir)
+    tmp_dir = "/data/local/tmp";
+  
   FileSystem::MountLink ("/system/appdata", (stl::string ("/std/") + home_dir).c_str ());
   FileSystem::MountLink ("/system/profile", (stl::string ("/std/") + home_dir).c_str ());
   FileSystem::MountLink ("/system/personal", (stl::string ("/std/") + home_dir).c_str ());

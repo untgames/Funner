@@ -1,6 +1,7 @@
 #ifndef SYSLIB_MACOSX_PLATFORM_HEADER
 #define SYSLIB_MACOSX_PLATFORM_HEADER
 
+#include <shared/cocoa.h>
 #include <shared/unistd.h>
 
 namespace syslib
@@ -252,6 +253,7 @@ class MacOsPlatform
  , public UnistdLibraryManager
  , public MacOsScreenManager
  , public DefaultSensorManager 
+ , public CocoaCookieManager
 {
 };
 

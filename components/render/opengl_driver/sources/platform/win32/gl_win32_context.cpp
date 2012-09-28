@@ -24,8 +24,16 @@ struct Context::Impl: public IContextLostListener
   xtl::trackable::slot_type   on_destroy_swap_chain; //обработчик удаления цепочки обмена
   ListenerArray               listeners;             //слушатели событий контекста
 
-  Impl () : context (0), pixel_format (0), swap_chain (0), device_context (0), vsync (false), wgl_extension_entries (0),
-    on_destroy_swap_chain (xtl::bind (&Impl::OnDestroySwapChain, this)) {}
+  Impl ()
+    : context (0)
+    , pixel_format (0)
+    , swap_chain (0)
+    , device_context (0)
+    , vsync (false)
+    , wgl_extension_entries (0)
+    , on_destroy_swap_chain (xtl::bind (&Impl::OnDestroySwapChain, this))
+  {
+  }
 
 ///Установка вертикальной синхронизации
   void SetVSync ()
