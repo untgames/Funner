@@ -113,7 +113,7 @@ class IDeviceContext: virtual public IObject
 ///”правление уровнем вывода вершин
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     virtual void      SOSetTargets (size_t buffers_count, IBuffer** buffers, const size_t* offsets) = 0;
-    virtual IBuffer** OSGetTargets () = 0;
+    virtual IBuffer** SOGetTargets () = 0;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///ќчистка буферов отрисовки
