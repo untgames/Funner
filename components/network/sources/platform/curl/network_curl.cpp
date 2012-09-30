@@ -93,6 +93,7 @@ class CurlStream: public IUrlStream
       , status ("Waiting for headers...")
       , content_length (0)
       , headers_received (false)
+      , cancel_operation (false)
     {
       try
       {
@@ -108,6 +109,8 @@ class CurlStream: public IUrlStream
 ///Деструктор
     ~CurlStream ()
     {
+      cancel_operation = true;
+
       if (&*thread)
         thread->Join ();
 
@@ -329,14 +332,25 @@ class CurlStream: public IUrlStream
       
       return 0;     
     }
-  
+
+///Отменена ли операция
+    bool IsCanceled ()
+    {
+      return cancel_operation;
+    }
+
 ///Обработчик получения данных от CURL
     static size_t WriteDataCallback (void *ptr, size_t size, size_t nmemb, void* userdata)
     {
       if (!userdata)
         return 0;
-        
-      return reinterpret_cast<CurlStream*> (userdata)->WriteReceivedData (ptr, size * nmemb);
+
+      CurlStream* stream = reinterpret_cast<CurlStream*> (userdata);
+
+      if (stream->IsCanceled ())
+        return 0;
+
+      return stream->WriteReceivedData (ptr, size * nmemb);
     }
     
     size_t WriteReceivedData (void* buffer, size_t size)
@@ -375,8 +389,13 @@ class CurlStream: public IUrlStream
     {
       if (!userdata)
         return 0;
-        
-      return reinterpret_cast<CurlStream*> (userdata)->ReadSendData (ptr, size * nmemb);
+
+      CurlStream* stream = reinterpret_cast<CurlStream*> (userdata);
+
+      if (stream->IsCanceled ())
+        return CURL_READFUNC_ABORT;
+
+      return stream->ReadSendData (ptr, size * nmemb);
     }
     
     size_t ReadSendData (void* buffer, size_t size)
@@ -405,7 +424,12 @@ class CurlStream: public IUrlStream
       if (!userdata)
         return 0;
 
-      reinterpret_cast<CurlStream*> (userdata)->DebugLog (type, data, size);
+      CurlStream* stream = reinterpret_cast<CurlStream*> (userdata);
+
+      if (stream->IsCanceled ())
+        return 0;
+
+      stream->DebugLog (type, data, size);
       
       return 0;
     }
@@ -483,6 +507,7 @@ class CurlStream: public IUrlStream
     size_t                        content_length;    //длина контента
     bool                          headers_received;  //заголовки приняты
     syslib::Condition             headers_condition; //событие ожидания заголовков
+    volatile bool                 cancel_operation;  //отмена закачки
 };
 
 
