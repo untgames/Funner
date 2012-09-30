@@ -38,7 +38,7 @@ class Transaction
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     typedef xtl::function <void (const Transaction&)> FinishTransactionHandler;
 
-    Transaction  (const FinishTransactionHandler&);
+    Transaction  (const FinishTransactionHandler& finish_handler = FinishTransactionHandler ());
     Transaction  (const Transaction&);
     ~Transaction ();
 

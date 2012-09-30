@@ -79,7 +79,7 @@ class IStore
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Описание магазина
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    virtual const char* GetDescription () = 0;
+    virtual const char* Description () = 0;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Можно ли осуществлять покупки
@@ -90,16 +90,12 @@ class IStore
 ///Получение информации о товарах (products_ids - разделенный пробелами список идентификаторов продуктов,
 ///products ответа может содержать не все запрошенные продукты)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    typedef xtl::function<void (const ProductList& products)> LoadProductsCallback;
-
-    virtual void LoadProducts (const char* product_ids, const LoadProductsCallback& callback) = 0;
+    virtual void LoadProducts (const char* product_ids, const Store::LoadProductsCallback& callback) = 0;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Покупка / восстановление покупок
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    typedef xtl::function<void (const Transaction&)> PurchaseCallback;
-
-    virtual xtl::connection RegisterTransactionUpdateHandler (const PurchaseCallback&) = 0;
+    virtual xtl::connection RegisterTransactionUpdateHandler (const Store::PurchaseCallback&) = 0;
     virtual void            RestorePurchases                 () = 0;
     virtual Transaction     BuyProduct                       (const char* product_id, size_t count) = 0;
 };
@@ -111,7 +107,7 @@ class StoreManager
 {
   public:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Регистрация создателей сессий
+///Регистрация создателей магазинов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     typedef xtl::function<IStore* (const char* store_name)> CreateStoreHandler;
 
@@ -120,7 +116,7 @@ class StoreManager
     static void UnregisterAllStores ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Проверка наличия сессии
+///Проверка наличия магазина
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     static bool IsStoreRegistered (const char* store_name);
 };

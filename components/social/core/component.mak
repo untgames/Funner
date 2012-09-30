@@ -16,6 +16,6 @@ SOCIAL.CORE.TESTS.IMPORTS			:= compile.social.core compile.common link.social.co
 
 #Цель - сборка документации
 SOCIAL.CORE.INFO.TYPE        := doxygen-info
-SOCIAL.CORE.INFO.CHM_NAME    := funner.script.core
+SOCIAL.CORE.INFO.CHM_NAME    := funner.social.core
 SOCIAL.CORE.INFO.SOURCE_DIRS := include
-SOCIAL.CORE.INFO.IMPORTS     := compile.script.core
+SOCIAL.CORE.INFO.IMPORTS     := compile.social.core
