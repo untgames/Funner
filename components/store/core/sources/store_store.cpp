@@ -9,10 +9,14 @@ using namespace store;
 struct Store::Impl : public xtl::reference_counter
 {
   typedef stl::hash_map<size_t, PurchaseCallback> BuyProductCallbacks;
+  typedef stl::hash_map<size_t, Transaction>      TransactionsMap;
+  typedef xtl::signal<void (const Transaction&)>  StoreSignal;
 
   IStore*              store;                         //магазин
-  xtl::auto_connection transaction_update_connection; //соединение оповещения о обновлениях транзакций
   BuyProductCallbacks  buy_product_callbacks;         //колбеки обновления транзакций по продуктам
+  StoreSignal          store_signal;                  //сигнал событий от магазина
+  TransactionsMap      updated_transactions;          //транзакции, обновленные за время работы приложения
+  xtl::auto_connection transaction_update_connection; //соединение оповещения о обновлениях транзакций
 
   Impl (const char* store_name)
     : store (0)
@@ -35,8 +39,31 @@ struct Store::Impl : public xtl::reference_counter
     }
   }
 
+  xtl::connection RegisterTransactionUpdateHandler (const PurchaseCallback& callback)
+  {
+    try
+    {
+      for (TransactionsMap::iterator iter = updated_transactions.begin (), end = updated_transactions.end (); iter != end; ++iter)
+        callback (iter->second);
+
+      return store_signal.connect (callback);
+    }
+    catch (xtl::exception& e)
+    {
+      e.touch ("store::Store::RegisternTransactionUpdateHandler");
+      throw;
+    }
+  }
+
   void OnTransactionUpdated (const Transaction& transaction)
   {
+    TransactionsMap::iterator updated_transaction_iter = updated_transactions.find (transaction.Id ());
+
+    if (updated_transaction_iter != updated_transactions.end ())
+      updated_transactions.insert_pair (transaction.Id (), transaction);
+
+    store_signal (transaction);
+
     BuyProductCallbacks::iterator iter = buy_product_callbacks.find (transaction.Id ());
 
     if (iter == buy_product_callbacks.end ())
@@ -147,7 +174,7 @@ void Store::LoadProducts (const char* product_ids, const LoadProductsCallback& c
 
 xtl::connection Store::RegisterTransactionUpdateHandler (const PurchaseCallback& callback)
 {
-  return impl->store->RegisterTransactionUpdateHandler (callback);
+  return impl->RegisterTransactionUpdateHandler (callback);
 }
 
 Transaction Store::BuyProduct (const char* product_id, size_t count, const PurchaseCallback& callback) const

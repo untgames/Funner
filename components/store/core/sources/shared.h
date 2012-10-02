@@ -10,6 +10,7 @@
 #include <xtl/common_exceptions.h>
 #include <xtl/function.h>
 #include <xtl/reference_counter.h>
+#include <xtl/signal.h>
 
 #include <common/component.h>
 #include <common/property_map.h>
