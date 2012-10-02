@@ -51,6 +51,7 @@ class IProductsRequestListener
     virtual ~IProductsRequestListener () {}
 
     //События
+    virtual void OnProductsLoaded (NSArray* products, const char* product_id, size_t quantity) = 0;
     virtual void OnProductsRequestFinished (ProductsRequestDelegate* delegate) = 0;
     virtual void OnProductsRequestFailed (ProductsRequestDelegate* delegate, NSError* error) = 0;
 };
@@ -112,24 +113,36 @@ class IProductsRequestListener
     SKProductsRequest*          request;
     Store::LoadProductsCallback callback;
     IProductsRequestListener*   listener;
+    bool                        call_products_loaded;
+    size_t                      callback_quantity_arg;
 }
 
 @end
 
 @implementation ProductsRequestDelegate
 
--(id)initWithRequest:(SKProductsRequest*)in_request callback:(const Store::LoadProductsCallback&)in_callback listener:(IProductsRequestListener*) in_listener
+-(id)initWithRequest:(SKProductsRequest*)in_request callback:(const Store::LoadProductsCallback&)in_callback
+     listener:(IProductsRequestListener*) in_listener callProductsLoaded:(bool)in_call_products_loaded
+     withQuantity:(size_t)in_quantity
 {
   self = [super init];
 
   if (!self)
     return nil;
 
-  request  = in_request;
-  callback = in_callback;
-  listener = in_listener;
+  request               = in_request;
+  callback              = in_callback;
+  listener              = in_listener;
+  call_products_loaded  = in_call_products_loaded;
+  callback_quantity_arg = in_quantity;
 
   return self;
+}
+
+-(id)initWithRequest:(SKProductsRequest*)in_request callback:(const Store::LoadProductsCallback&)in_callback
+     listener:(IProductsRequestListener*) in_listener
+{
+  return [self initWithRequest:in_request callback:in_callback listener:in_listener callProductsLoaded:false withQuantity:0];
 }
 
 -(void)dealloc
@@ -151,6 +164,28 @@ class IProductsRequestListener
   try
   {
     ProductList products_list;
+
+    if (call_products_loaded)
+    {
+      const char* product_id = "";
+
+      if ([response.products count])
+      {
+        SKProduct* product = [response.products objectAtIndex:0];
+
+        product_id = [product.productIdentifier UTF8String];
+      }
+      else if ([response.invalidProductIdentifiers count])
+      {
+        NSString* ns_product_id = [response.invalidProductIdentifiers objectAtIndex:0];
+
+        product_id = [ns_product_id UTF8String];
+      }
+
+      listener->OnProductsLoaded (response.products, product_id, callback_quantity_arg);
+
+      return;
+    }
 
     for (SKProduct* sk_product in response.products)
     {
@@ -319,6 +354,35 @@ class IOSStore : public ITransactionObserverListener, public IProductsRequestLis
       return [[SKPaymentQueue defaultQueue] restoreCompletedTransactions];
     }
 
+    void OnProductsLoaded (NSArray* products, const char* product_id, size_t quantity)
+    {
+      if (![products count])
+      {
+        log.Printf ("Product '%s' is invalid", product_id);
+
+        for (TransactionsArray::iterator iter = pending_transactions.begin (), end = pending_transactions.end (); iter != end; ++iter)
+        {
+          if (!iter->transaction.Handle () && !xtl::xstrcmp (iter->transaction.ProductId (), product_id) && iter->transaction.Quantity () == quantity);
+          {
+            iter->transaction.SetState (TransactionState_Failed);
+            iter->transaction.SetStatus ("Invalid product");
+
+            store_signal (iter->transaction);
+
+            break;
+          }
+        }
+
+        return;
+      }
+
+      SKMutablePayment *payment = [SKMutablePayment paymentWithProduct:[products objectAtIndex:0]];
+
+      payment.quantity = quantity;
+
+      [[SKPaymentQueue defaultQueue] addPayment:payment];
+    }
+
     Transaction BuyProduct (const char* product_id, size_t count)
     {
       try
@@ -335,11 +399,21 @@ class IOSStore : public ITransactionObserverListener, public IProductsRequestLis
 
         pending_transactions.push_back (new_transaction);
 
-        SKMutablePayment *payment = [SKMutablePayment paymentWithProduct:[NSString stringWithUTF8String:product_id]];
+        NSMutableSet* ns_products = [[NSMutableSet alloc] initWithObject:[NSString stringWithUTF8String:product_id]];
 
-        payment.quantity = count;
+        SKProductsRequest* request = [[SKProductsRequest alloc] initWithProductIdentifiers:ns_products];
 
-        [[SKPaymentQueue defaultQueue] addPayment:payment];
+        [ns_products release];
+
+        ProductsRequestDelegate* delegate = [[ProductsRequestDelegate alloc] initWithRequest:request callback:Store::LoadProductsCallback () listener:this callProductsLoaded:true withQuantity:count];
+
+        [running_products_requests_delegats addObject:delegate];
+
+        request.delegate = delegate;
+
+        [request start];
+
+        store_signal (new_transaction.transaction);
 
         return new_transaction.transaction;
       }
@@ -377,7 +451,9 @@ class IOSStore : public ITransactionObserverListener, public IProductsRequestLis
     {
       for (SKPaymentTransaction* sk_transaction in transactions)
       {
-        log.Printf ("Transaction '%s' updated", [[sk_transaction description] UTF8String]);
+        log.Printf ("Transaction updated, product %s, quantity %d, state %d, identifier %s, date %s, error %s", [sk_transaction.payment.productIdentifier UTF8String],
+            sk_transaction.payment.quantity, sk_transaction.transactionState, [sk_transaction.transactionIdentifier UTF8String],
+            [[sk_transaction.transactionDate description] UTF8String], [[sk_transaction.error description] UTF8String]);
 
         bool handle_found = false;
 
@@ -388,6 +464,8 @@ class IOSStore : public ITransactionObserverListener, public IProductsRequestLis
             handle_found = true;
 
             iter->Update (sk_transaction);
+
+            store_signal (iter->transaction);
 
             break;
           }
@@ -400,11 +478,24 @@ class IOSStore : public ITransactionObserverListener, public IProductsRequestLis
             if (!iter->transaction.Handle () && !xtl::xstrcmp (iter->transaction.ProductId (), [sk_transaction.payment.productIdentifier UTF8String]) &&
                 iter->transaction.Quantity () == (size_t)sk_transaction.payment.quantity);
             {
+              handle_found = true;
+
               iter->Update (sk_transaction);
+
+              store_signal (iter->transaction);
 
               break;
             }
           }
+        }
+
+        if (!handle_found)
+        {
+          TransactionDesc new_transaction (sk_transaction);
+
+          pending_transactions.push_back (new_transaction);
+
+          store_signal (new_transaction.transaction);
         }
       }
     }
