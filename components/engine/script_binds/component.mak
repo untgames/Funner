@@ -12,7 +12,7 @@ ENGINE.SCRIPT_BINDS.SOURCES.IMPORTS      := compile.script.core compile.scene_gr
                                             compile.render.scene_render2d compile.system compile.input.manager \
                                             compile.engine.core compile.media.rms compile.media.players \
                                             compile.math.curves compile.network compile.physics.scene_physics \
-                                            compile.social.core compile.input.scene_input
+                                            compile.social.core compile.input.scene_input compile.store.core
 
 #Öåëü ¹2 - SCRIPT_BINDS tests
 ENGINE.SCRIPT_BINDS.TESTS.TYPE        := test-suite

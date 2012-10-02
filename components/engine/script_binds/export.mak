@@ -67,3 +67,7 @@ export.link.engine.script_binds.debug.IMPORTS       := link.engine.script_binds
 # Link debug exports
 export.link.engine.script_binds.scene_input.LINK_INCLUDES := SceneInputScriptBind
 export.link.engine.script_binds.scene_input.IMPORTS       := link.engine.script_binds link.input.scene_input
+
+# Link store exports
+export.link.engine.script_binds.store.LINK_INCLUDES := StoreScriptBind
+export.link.engine.script_binds.store.IMPORTS       := link.engine.script_binds link.store.core

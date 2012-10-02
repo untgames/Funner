@@ -39,6 +39,8 @@
 
 #include <social/session.h>
 
+#include <store/store.h>
+
 #include <script/bind.h>
 #include <script/environment.h>
 #include <script/library_manager.h>
