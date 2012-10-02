@@ -552,7 +552,7 @@ void StoreImpl::RestorePurchases ()
   StoreSingleton::Instance ()->RestorePurchases ();
 }
 
-Transaction BuyProduct (const char* product_id, size_t count)
+Transaction StoreImpl::BuyProduct (const char* product_id, size_t count)
 {
   return StoreSingleton::Instance ()->BuyProduct (product_id, count);
 }
