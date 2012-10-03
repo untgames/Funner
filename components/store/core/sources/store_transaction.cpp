@@ -167,6 +167,8 @@ void Transaction::SetReceipt (size_t size, const void* data)
 
   memcpy (impl->receipt.data (), data, size);
 
+  impl->receipt_base64.clear ();
+
   impl->receipt_base64_needs_update = true;
 }
 
