@@ -451,7 +451,7 @@ class IOSStore : public ITransactionObserverListener, public IProductsRequestLis
     {
       for (SKPaymentTransaction* sk_transaction in transactions)
       {
-        log.Printf ("Transaction updated, product %s, quantity %d, state %d, identifier %s, date %s, error %s", [sk_transaction.payment.productIdentifier UTF8String],
+        log.Printf ("Transaction %s updated, product %s, quantity %d, state %d, identifier %s, date %s, error %s", [[sk_transaction description] UTF8String], [sk_transaction.payment.productIdentifier UTF8String],
             sk_transaction.payment.quantity, sk_transaction.transactionState, [sk_transaction.transactionIdentifier UTF8String],
             [[sk_transaction.transactionDate description] UTF8String], [[sk_transaction.error description] UTF8String]);
 
@@ -476,7 +476,7 @@ class IOSStore : public ITransactionObserverListener, public IProductsRequestLis
           for (TransactionsArray::iterator iter = pending_transactions.begin (), end = pending_transactions.end (); iter != end; ++iter)
           {
             if (!iter->transaction.Handle () && !xtl::xstrcmp (iter->transaction.ProductId (), [sk_transaction.payment.productIdentifier UTF8String]) &&
-                iter->transaction.Quantity () == (size_t)sk_transaction.payment.quantity);
+                (iter->transaction.Quantity () == (size_t)sk_transaction.payment.quantity))
             {
               handle_found = true;
 
