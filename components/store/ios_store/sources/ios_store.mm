@@ -354,6 +354,22 @@ class IOSStore : public ITransactionObserverListener, public IProductsRequestLis
       return [[SKPaymentQueue defaultQueue] restoreCompletedTransactions];
     }
 
+    void NotifyTransactionUpdated (const Transaction& transaction)
+    {
+      try
+      {
+        store_signal (transaction);
+      }
+      catch (xtl::exception& e)
+      {
+        log.Printf ("Exception in store::ios_store::IOSStore::NotifyTransactionUpdated: '%s'", e.what ());
+      }
+      catch (...)
+      {
+        log.Printf ("Unknown exception in store::ios_store::IOSStore::NotifyTransactionUpdated");
+      }
+    }
+
     void OnProductsLoaded (NSArray* products, const char* product_id, size_t quantity)
     {
       if (![products count])
@@ -362,12 +378,12 @@ class IOSStore : public ITransactionObserverListener, public IProductsRequestLis
 
         for (TransactionsArray::iterator iter = pending_transactions.begin (), end = pending_transactions.end (); iter != end; ++iter)
         {
-          if (!iter->transaction.Handle () && !xtl::xstrcmp (iter->transaction.ProductId (), product_id) && iter->transaction.Quantity () == quantity);
+          if (!iter->transaction.Handle () && !xtl::xstrcmp (iter->transaction.ProductId (), product_id) && iter->transaction.Quantity () == quantity)
           {
             iter->transaction.SetState (TransactionState_Failed);
             iter->transaction.SetStatus ("Invalid product");
 
-            store_signal (iter->transaction);
+            NotifyTransactionUpdated (iter->transaction);
 
             break;
           }
@@ -413,7 +429,7 @@ class IOSStore : public ITransactionObserverListener, public IProductsRequestLis
 
         [request start];
 
-        store_signal (new_transaction.transaction);
+        NotifyTransactionUpdated (new_transaction.transaction);
 
         return new_transaction.transaction;
       }
@@ -465,7 +481,7 @@ class IOSStore : public ITransactionObserverListener, public IProductsRequestLis
 
             iter->Update (sk_transaction);
 
-            store_signal (iter->transaction);
+            NotifyTransactionUpdated (iter->transaction);
 
             break;
           }
@@ -482,7 +498,7 @@ class IOSStore : public ITransactionObserverListener, public IProductsRequestLis
 
               iter->Update (sk_transaction);
 
-              store_signal (iter->transaction);
+              NotifyTransactionUpdated (iter->transaction);
 
               break;
             }
@@ -495,7 +511,7 @@ class IOSStore : public ITransactionObserverListener, public IProductsRequestLis
 
           pending_transactions.push_back (new_transaction);
 
-          store_signal (new_transaction.transaction);
+          NotifyTransactionUpdated (new_transaction.transaction);
         }
       }
     }
