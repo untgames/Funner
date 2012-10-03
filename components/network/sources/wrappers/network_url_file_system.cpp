@@ -86,11 +86,6 @@ class UrlFile: public Lockable
           
         connection = UrlConnection (url.c_str (), params.c_str ());
         
-        const char* status = connection.Status ();
-        
-        if (strcmp (status, "Ok"))
-          throw xtl::format_operation_exception ("", "URL query '%s' failed. Status is: %s", url.c_str (), status);
-        
         xtl::uninitialized_storage<char> buffer (DOWNLOAD_BUFFER_SIZE);
         
         if (is_post)
@@ -121,6 +116,11 @@ class UrlFile: public Lockable
 
           common::FileSystem::Remove (request_file_path.c_str ());
         }        
+
+        const char* status = connection.Status ();
+
+        if (strcmp (status, "Ok"))
+          throw xtl::format_operation_exception ("", "URL query '%s' failed. Status is: %s", url.c_str (), status);
 
         end_of_request = true;
       }
