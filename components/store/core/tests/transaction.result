@@ -15,7 +15,7 @@ Transaction:
   status      'Success'
   product id  'ProductId'
   quantity     4
-  receipt     'UmVjZWlwd'
+  receipt     'UmVjZWlwdA=='
   handle       1
   properties:
     map has 2 properties (hash=9f20724f, layout_hash=a6232eec):
