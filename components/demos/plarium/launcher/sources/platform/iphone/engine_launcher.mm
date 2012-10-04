@@ -66,16 +66,13 @@ using namespace plarium::launcher;
     parentView = keyWindow;
   }
 
-  CGRect keyWindowFrame = parentView.frame;
+  CGRect keyWindowFrame = parentView.bounds;
 
   [imageView removeFromSuperview];
   [imageView release];
   imageView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:imageName]];
 
   imageView.contentMode = UIViewContentModeScaleAspectFill;
-
-  keyWindowFrame.origin.x = 0;
-  keyWindowFrame.origin.y = 0;
 
   imageView.frame = keyWindowFrame;
 
@@ -148,7 +145,6 @@ int main (int argc, const char* argv [], const char* env [])
     Startup* startup = [[Startup alloc] init];
 
     [[NSNotificationCenter defaultCenter] addObserver:startup selector:@selector (onStartup) name:UIApplicationDidFinishLaunchingNotification object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:startup selector:@selector (onStartup) name:UIApplicationWillChangeStatusBarOrientationNotification object:nil];
 
     Application application;
 
