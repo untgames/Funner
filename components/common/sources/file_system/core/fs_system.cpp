@@ -89,6 +89,8 @@ void background_copy_file_impl (Action& action, const stl::string& source_file_n
     if (!input_file.Eof ())
       throw xtl::format_operation_exception ("", "Internal error: can't read input file");
 
+    output_file.Close ();
+
     copy_state.SetStatus (BackgroundCopyStateStatus_Finished);
     background_copy_file_notify (callback, thread, copy_state);
   }
