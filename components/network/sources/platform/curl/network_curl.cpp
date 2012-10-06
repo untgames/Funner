@@ -257,7 +257,37 @@ class CurlStream: public IUrlStream
       catch (xtl::exception& e)
       {
         e.touch ("network::CurlStream::ThreadRoutine");
+
+        SetStatus (e.what ());
+
         throw;
+      }
+      catch (std::exception& e)
+      {
+        SetStatus (e.what ());
+
+        throw;
+      }
+      catch (...)
+      {
+        SetStatus ("Unknown exception\n    at network::CurlStream::ThreadRoutine");
+
+        throw;
+      }
+    }
+
+///Установка статуса
+    void SetStatus (const char* in_status)
+    {
+      syslib::Lock lock (mutex);
+
+      status = in_status;
+
+      if (!headers_received)
+      {
+        headers_received = true;
+
+        headers_condition.NotifyAll ();
       }
     }
     
