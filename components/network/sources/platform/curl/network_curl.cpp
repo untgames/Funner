@@ -259,18 +259,21 @@ class CurlStream: public IUrlStream
         e.touch ("network::CurlStream::ThreadRoutine");
 
         SetStatus (e.what ());
+        listener.FinishReceiveData ();
 
         throw;
       }
       catch (std::exception& e)
       {
         SetStatus (e.what ());
+        listener.FinishReceiveData ();
 
         throw;
       }
       catch (...)
       {
         SetStatus ("Unknown exception\n    at network::CurlStream::ThreadRoutine");
+        listener.FinishReceiveData ();
 
         throw;
       }
