@@ -57,7 +57,7 @@ using namespace plarium::launcher;
 
   if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)
   {
-    imageName  = @"Default_ipad-Landscape@2x.png";
+    imageName  = [UIScreen mainScreen].scale > 1 ? @"Default_ipad-Landscape@2x.png" : @"Default_ipad-Landscape.png";
     parentView = keyWindowView;
   }
   else
@@ -67,6 +67,14 @@ using namespace plarium::launcher;
   }
 
   CGRect keyWindowFrame = parentView.bounds;
+
+  if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad && keyWindowFrame.size.width < keyWindowFrame.size.height)
+  {
+    float t = keyWindowFrame.size.width;
+
+    keyWindowFrame.size.width  = keyWindowFrame.size.height;
+    keyWindowFrame.size.height = t;
+  }
 
   [imageView removeFromSuperview];
   [imageView release];
