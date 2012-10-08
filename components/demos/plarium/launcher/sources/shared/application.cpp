@@ -11,6 +11,7 @@ namespace
 //constants
 const char*         APP_ID                            = "2972852";
 const char*         APP_SECRET                        = "f2h3o02f43h34qv9h3124vb3721432jpo32ADG";
+const char*         DEBUG_MODE_NOTIFICATION_PREFIX    = "DebugMode#";
 const char*         PLARIUM_TOKEN_NOTIFICATION_PREFIX = "GetPlariumToken#";
 const size_t        SEND_QUEUE_SIZE                   = 16;
 const size_t        KEEP_ALIVE_INTERVAL               = 30000;
@@ -33,12 +34,14 @@ struct Application::Impl : public INotificationListener, public IHsConnectionEve
   unsigned short                  port;
   unsigned char*                  message_buffer;
   size_t                          message_buffer_size;
+  bool                            debug_mode;
 
   Impl ()
     : engine (0)
     , port (0)
     , message_buffer (0)
     , message_buffer_size (0)
+    , debug_mode (false)
   {
     HsConnectionSettings connection_settings;
 
@@ -75,6 +78,7 @@ struct Application::Impl : public INotificationListener, public IHsConnectionEve
     engine = in_engine;
 
     engine->AttachNotificationListener ("HsConnection *", this);
+    engine->AttachNotificationListener (format ("%s*", DEBUG_MODE_NOTIFICATION_PREFIX).c_str (), this);
     engine->AttachNotificationListener (format ("%s*", PLARIUM_TOKEN_NOTIFICATION_PREFIX).c_str (), this);
 
     engine->Run ();
@@ -114,6 +118,10 @@ struct Application::Impl : public INotificationListener, public IHsConnectionEve
 
       engine->Execute (format ("lua: OnPlariumTokenObtained ('%s')", token_string).c_str ());
     }
+    else if (strstr (notification, DEBUG_MODE_NOTIFICATION_PREFIX) == notification)
+    {
+      debug_mode = atoi (notification + strlen (DEBUG_MODE_NOTIFICATION_PREFIX)) != 0;
+    }
     else
     {
       sgi_stl::vector<sgi_stl::string> words   = split (notification, " ", "'\"");
@@ -150,7 +158,8 @@ struct Application::Impl : public INotificationListener, public IHsConnectionEve
 
   void OnLogMessage (HsConnection& sender, const char* message)
   {
-    printf ("HsConnection: '%s'\n", message);
+    if (debug_mode)
+      printf ("HsConnection: '%s'\n", message);
   }
 
   void OnError (HsConnection& sender, ErrorCode code, const char* error)

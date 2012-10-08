@@ -9,6 +9,8 @@
 #import <UIKit/UIScreen.h>
 #import <UIKit/UIWindow.h>
 
+#import "Tracking.h"
+
 #include <cstdio>
 
 #include <launcher/application.h>
@@ -35,16 +37,6 @@ using namespace plarium::launcher;
   [[NSNotificationCenter defaultCenter] removeObserver:self];
 
   [super dealloc];
-}
-
--(id)init
-{
-  self = [super init];
-
-  if (!self)
-    return nil;
-
-  return self;
 }
 
 -(void)onStartup
@@ -112,6 +104,44 @@ using namespace plarium::launcher;
 
 @end
 
+@interface TrackingWrapper : NSObject
+{
+  Tracking* tracker;
+}
+
+@end
+
+@implementation TrackingWrapper
+
+-(void)dealloc
+{
+  [tracker release];
+
+  [[NSNotificationCenter defaultCenter] removeObserver:self];
+
+  [super dealloc];
+}
+
+-(void)reportAppOpen
+{
+  if (!tracker)
+  {
+    tracker = [[Tracking alloc] init];
+    [tracker setURLScheme:@"ADX1144"];
+    [tracker setClientId:@"PLR7hjus768DP"];
+    [tracker setAppleId:@"543831789"];
+  }
+
+  [tracker reportAppOpen];
+}
+
+-(BOOL)application:(UIApplication*)application handleOpenURL:(NSURL*)url
+{
+  return [tracker handleOpenURL:url];
+}
+
+@end
+
 //точка входа
 int main (int argc, const char* argv [], const char* env [])
 {
@@ -152,7 +182,11 @@ int main (int argc, const char* argv [], const char* env [])
 
     Startup* startup = [[Startup alloc] init];
 
+    TrackingWrapper* tracking = [[TrackingWrapper alloc] init];
+
     [[NSNotificationCenter defaultCenter] addObserver:startup selector:@selector (onStartup) name:UIApplicationDidFinishLaunchingNotification object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:tracking selector:@selector (reportAppOpen) name:UIApplicationDidFinishLaunchingNotification object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:tracking selector:@selector (reportAppOpen) name:UIApplicationWillEnterForegroundNotification object:nil];
 
     Application application;
 
