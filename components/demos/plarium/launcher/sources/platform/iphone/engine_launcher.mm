@@ -135,12 +135,37 @@ using namespace plarium::launcher;
   [tracker reportAppOpen];
 }
 
--(BOOL)application:(UIApplication*)application handleOpenURL:(NSURL*)url
+-(void)handleOpenURL:(const char*)url
 {
-  return [tracker handleOpenURL:url];
+  [tracker handleOpenURL:[NSURL URLWithString:[NSString stringWithUTF8String:url]]];
 }
 
 @end
+
+namespace
+{
+
+class OpenUrlHandler : public IOpenUrlHandler
+{
+  public:
+    OpenUrlHandler (TrackingWrapper* in_tracker)
+      : tracker (in_tracker)
+      {}
+
+    void HandleUrlOpen (const char* url)
+    {
+      [tracker handleOpenURL:url];
+    }
+
+  private:
+    OpenUrlHandler (const OpenUrlHandler&);             //no impl
+    OpenUrlHandler& operator = (const OpenUrlHandler&); //no impl
+
+  private:
+    TrackingWrapper* tracker;
+};
+
+}
 
 //точка входа
 int main (int argc, const char* argv [], const char* env [])
@@ -188,7 +213,11 @@ int main (int argc, const char* argv [], const char* env [])
     [[NSNotificationCenter defaultCenter] addObserver:tracking selector:@selector (reportAppOpen) name:UIApplicationDidFinishLaunchingNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:tracking selector:@selector (reportAppOpen) name:UIApplicationWillEnterForegroundNotification object:nil];
 
+    OpenUrlHandler open_url_handler (tracking);
+
     Application application;
+
+    application.SetOpenUrlHandler (&open_url_handler);
 
     application.Run (funner);
 
