@@ -18,6 +18,11 @@
 using namespace engine;
 using namespace plarium::launcher;
 
+static NSString* PHONE_ADX_URL_SCHEME = @"ADX1144";
+static NSString* PAD_ADX_URL_SCHEME   = @"ADX1145";
+static NSString* PHONE_APPLE_ID       = @"543831789";
+static NSString* PAD_APPLE_ID         = @"543831789";
+
 @interface Startup : NSObject
 {
   UIImageView* imageView;
@@ -127,12 +132,12 @@ using namespace plarium::launcher;
   if (!tracker)
   {
     tracker = [[Tracking alloc] init];
-    [tracker setURLScheme:@"ADX1144"];
+    [tracker setURLScheme:UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad ? PAD_ADX_URL_SCHEME : PHONE_ADX_URL_SCHEME];
     [tracker setClientId:@"PLR7hjus768DP"];
-    [tracker setAppleId:@"543831789"];
+    [tracker setAppleId:UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad ? PAD_APPLE_ID : PHONE_APPLE_ID];
   }
 
-  [tracker reportAppOpen];
+  [NSTimer scheduledTimerWithTimeInterval:0.5 target:tracker selector:@selector (reportAppOpen) userInfo:nil repeats:NO];
 }
 
 -(void)handleOpenURL:(const char*)url

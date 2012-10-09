@@ -134,7 +134,11 @@ struct Application::Impl : public INotificationListener, public IHsConnectionEve
     else if (strstr (notification, OPEN_URL_NOTIFICATION_PREFIX) == notification)
     {
       if (open_url_handler)
+      {
         open_url_handler->HandleUrlOpen (notification + strlen (OPEN_URL_NOTIFICATION_PREFIX));
+
+        printf ("Opened url '%s'\n", notification + strlen (OPEN_URL_NOTIFICATION_PREFIX));
+      }
     }
     else
     {
