@@ -111,6 +111,7 @@ void fill_dispatch (const void* source_color, Image& image)
     case PixelFormat_L8:     fill<color_l8> (color, image); break;
     case PixelFormat_A8:     fill<color_a8> (color, image); break;
     case PixelFormat_LA8:    fill<color_la8> (color, image); break;
+    default:                 throw xtl::format_operation_exception ("media::fill_dispatch(const void*, Image&)", "Unknown image format %d", image.Format ());
   }
 }
 
@@ -127,6 +128,7 @@ void fill_dispatch (PixelFormat source_format, const void* source_color, Image& 
     case PixelFormat_L8:     fill_dispatch<color_l8> (source_color, image); break;
     case PixelFormat_A8:     fill_dispatch<color_a8> (source_color, image); break;
     case PixelFormat_LA8:    fill_dispatch<color_la8> (source_color, image); break;    
+    default:                 throw xtl::make_argument_exception ("media::fill_dispatch(PixelFormat, const void*, Image&)", "source_format", source_format);
   }
 }
 
