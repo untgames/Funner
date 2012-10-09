@@ -15,7 +15,7 @@ export.link.engine.launcher_shared.IMPORTS := link.common.default_console_handle
                                 link.input.manager.xkeymap link.input.manager.xkeyreg link.input.window_driver link.input.sensor_input_driver \
                                 link.render.scene_render2d link.script.lua \
                                 link.engine.script_binds.math link.engine.script_binds.sg link.engine.script_binds.bv \
-                                link.engine.script_binds.engine \
+                                link.engine.script_binds.engine link.engine.script_binds.media.image \
                                 link.engine.script_binds.input link.engine.script_binds.lua_override \
                                 link.engine.script_binds.system link.engine.script_binds.common link.engine.script_binds.network \
                                 link.engine.script_binds.rms link.engine.script_binds.media.players \
