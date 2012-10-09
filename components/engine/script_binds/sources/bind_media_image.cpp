@@ -81,8 +81,8 @@ void bind_image_library (Environment& environment)
   lib.Register ("Clone",    make_invoker (&Image::Clone));
   lib.Register ("Load",     make_invoker (&Image::Clone));
   lib.Register ("Save",     make_invoker (make_invoker (&Image::Save),
-      make_invoker<void (Image&, const char*, PixelFormat)>(&Image::Save),
-      make_invoker<void (Image&, const char*)>(&Image::Save)));
+      make_invoker<void (Image&, const char*, PixelFormat)>(xtl::bind (&Image::Save, _1, _2, _3, "")),
+      make_invoker<void (Image&, const char*)>(xtl::bind (&Image::Save, _1, _2, PixelFormat_Default, ""))));
   lib.Register ("Convert",  make_invoker (&Image::Convert));
   lib.Register ("Resize",   make_invoker (&Image::Resize));
   lib.Register ("FillRGBA", make_invoker (&fill_rgba));
