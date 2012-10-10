@@ -105,7 +105,7 @@ void bind_image_library (Environment& environment)
   lib.Register ("FillRGBA", make_invoker (&fill_rgba));
 
 
-  lib.Register ("PutImage", make_invoker (&put_image));
+  lib.Register ("PutImage", &put_image);
 
   environment.RegisterType<Image> (IMAGE_LIBRARY);
 }
