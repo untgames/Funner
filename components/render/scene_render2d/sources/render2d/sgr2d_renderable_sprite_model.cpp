@@ -290,8 +290,9 @@ void RenderableSpriteModel::Update ()
       {
           //маркер отсутствия тайлинга        
         
-        impl->tile_columns = 0; 
-        impl->tile_rows    = 0;
+        impl->tile_columns    = 0;
+        impl->tile_rows       = 0;
+        impl->tile_tex_offset = 0;
       }
       
       impl->need_update_sprites = true;
