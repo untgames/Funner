@@ -20,7 +20,7 @@ import android.provider.Settings.Secure;
 import android.webkit.CookieManager;
 import android.webkit.CookieSyncManager;
 import android.view.ViewGroup;
-import android.widget.RelativeLayout;
+import android.widget.AbsoluteLayout;
 import android.widget.FrameLayout;
 import java.net.CookieHandler;
 import java.security.MessageDigest;
@@ -238,15 +238,15 @@ public class EngineActivity extends Activity
     
     if (needSetContentView)
     {
-      views = new FrameLayout (this);
+      views = new AbsoluteLayout (this);
     }
     
-    views.addView (view, new ViewGroup.LayoutParams (FrameLayout.LayoutParams.WRAP_CONTENT, FrameLayout.LayoutParams.WRAP_CONTENT));
+    views.addView (view, new AbsoluteLayout.LayoutParams (new ViewGroup.LayoutParams (FrameLayout.LayoutParams.WRAP_CONTENT, FrameLayout.LayoutParams.WRAP_CONTENT)));
     
     view.bringToFront ();
     
     if (needSetContentView)    
-      getWindow ().setContentView (views, new ViewGroup.LayoutParams (ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+      getWindow ().setContentView (views, new ViewGroup.LayoutParams (ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
   }
   
 /// Создание окна
