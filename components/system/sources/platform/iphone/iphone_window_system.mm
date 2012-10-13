@@ -28,15 +28,10 @@ InterfaceOrientation get_interface_orientation (UIInterfaceOrientation interface
   }
 }
 
-CGRect get_transformed_view_rect_size (CGRect frame, UIWindow* window)
+CGRect get_transformed_view_rect_size (CGRect frame, UIView* view)
 {
-  UIInterfaceOrientation ui_orientation = window.rootViewController.interfaceOrientation;
-
-  switch (ui_orientation)
+  if (!CGAffineTransformIsIdentity (view.transform))
   {
-    case UIInterfaceOrientationLandscapeLeft:
-    case UIInterfaceOrientationLandscapeRight:
-    {
       float temp = frame.size.width;
 
       frame.size.width  = frame.size.height;
@@ -46,11 +41,6 @@ CGRect get_transformed_view_rect_size (CGRect frame, UIWindow* window)
 
       frame.origin.x = frame.origin.y;
       frame.origin.y = temp;
-
-      break;
-    }
-    default:
-      break;
   }
 
   return frame;
@@ -639,7 +629,7 @@ void IPhoneWindowManager::SetWindowRect (window_t handle, const Rect& rect)
   else
     window = view.window;
 
-  float scale_factor = view.contentScaleFactor;
+  float scale_factor = [UIScreen mainScreen].scale;
 
   CGRect frame;
 
@@ -648,7 +638,9 @@ void IPhoneWindowManager::SetWindowRect (window_t handle, const Rect& rect)
   frame.origin.x    = rect.left / scale_factor;
   frame.origin.y    = rect.top / scale_factor;
 
-  view.frame = get_transformed_view_rect_size (frame, window);
+  view.frame = get_transformed_view_rect_size (frame, view);
+
+  frame = view.frame;
 
   if (window_wrapper)
   {
@@ -671,11 +663,12 @@ void IPhoneWindowManager::GetWindowRect (window_t handle, Rect& rect)
   if (!handle)
     throw xtl::make_null_argument_exception ("syslib::IPhoneWindowManager::GetWindowRect", "handle");
 
-  UIView                 *view          = (UIView*)handle;
-  UIWindow               *window        = [view isKindOfClass:[UIWindowWrapper class]] ? (UIWindow*)handle : view.window;
-  UIInterfaceOrientation ui_orientation = window.rootViewController.interfaceOrientation;
+  UIView *view = (UIView*)handle;
 
-  float scale_factor = view.contentScaleFactor;
+  if ([view isKindOfClass:[UIWindowWrapper class]])
+    view = ((UIWindow*)view).rootViewController.view;
+
+  float scale_factor = [UIScreen mainScreen].scale;
 
   CGRect frame = view.frame;
 
@@ -684,12 +677,9 @@ void IPhoneWindowManager::GetWindowRect (window_t handle, Rect& rect)
   rect.top    = frame.origin.y * scale_factor;
   rect.left   = frame.origin.x * scale_factor;
 
-  switch (ui_orientation)
+  if (!CGAffineTransformIsIdentity (view.transform))
   {
-    case UIInterfaceOrientationLandscapeLeft:
-    case UIInterfaceOrientationLandscapeRight:
-    {
-      float temp = rect.bottom;
+      size_t temp = rect.bottom;
 
       rect.bottom = rect.right;
       rect.right  = temp;
@@ -697,12 +687,7 @@ void IPhoneWindowManager::GetWindowRect (window_t handle, Rect& rect)
       temp = rect.top;
 
       rect.top  = rect.left;
-      rect.left = rect.top;
-
-      break;
-    }
-    default:
-      break;
+      rect.left = temp;
   }
 }
 
@@ -854,7 +839,7 @@ bool IPhoneWindowManager::GetWindowFlag (window_t handle, WindowFlag flag)
         if (wnd)
           maximized_rect = [UIScreen mainScreen].applicationFrame;
         else
-          maximized_rect = get_transformed_view_rect_size (window.rootViewController.view.bounds, window);
+          maximized_rect = get_transformed_view_rect_size (window.rootViewController.view.bounds, view);
 
         maximized_rect.origin.x = 0;
         maximized_rect.origin.y = 0;
