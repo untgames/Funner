@@ -193,9 +193,9 @@ struct UrlConnection::Impl: public xtl::reference_counter, public IUrlStream::IL
   size_t                    content_length;   //длина контента
   Buffer                    send_buffer;      //буфер приёма
   Buffer                    recv_buffer;      //буфер передачи
-  bool                      send_closed;      //канал отправки данных закрыт
-  bool                      recv_closed;      //канал приёма данных закрыт
-  bool                      recv_headers;     //заголовки потока получены
+  volatile bool             send_closed;      //канал отправки данных закрыт
+  volatile bool             recv_closed;      //канал приёма данных закрыт
+  volatile bool             recv_headers;     //заголовки потока получены
 
 ///Конструкторы
   Impl ()
@@ -235,11 +235,11 @@ struct UrlConnection::Impl: public xtl::reference_counter, public IUrlStream::IL
   {
     try
     {
-      syslib::Lock lock (mutex);
-      
       if (recv_headers)
         return;
       
+      syslib::Lock lock (mutex);
+
       content_type     = stream->GetContentType ();
       content_encoding = stream->GetContentEncoding ();
       content_length   = stream->GetContentLength ();
@@ -272,8 +272,6 @@ struct UrlConnection::Impl: public xtl::reference_counter, public IUrlStream::IL
     try
     {
       recv_buffer.FinishPut ();
-
-      syslib::Lock lock (mutex);
 
       recv_closed = true;
     }
@@ -420,29 +418,21 @@ bool UrlConnection::IsClosed () const
 
 bool UrlConnection::IsReceiveClosed () const
 {
-  syslib::Lock lock (impl->mutex);
-
   return impl->recv_closed;
 }
 
 bool UrlConnection::IsSendClosed () const
 {
-  syslib::Lock lock (impl->mutex);
-
   return impl->send_closed;
 }
 
 void UrlConnection::CloseReceive ()
 {
-  syslib::Lock lock (impl->mutex);
-  
   impl->recv_closed = true;
 }
 
 void UrlConnection::CloseSend ()
 {
-  syslib::Lock lock (impl->mutex);
-  
   impl->send_closed = true;
   
   impl->send_buffer.FinishPut ();
