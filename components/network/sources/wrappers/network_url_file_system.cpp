@@ -305,8 +305,8 @@ class StreamUrlFile: public UrlFile
 ///Конструктор
     StreamUrlFile (const char* in_url, bool in_is_post)
       : UrlFile (in_url, in_is_post)
-      , file_size ()
       , file_pos ()
+      , is_eof ()
     {
     }  
 
@@ -342,14 +342,8 @@ class StreamUrlFile: public UrlFile
       
       size_t read_size = Connection ().Receive (buf, size);
       
-      if (!read_size)
-      {
-        file_pos = file_size;
-      }
-      else
-      {
-        file_pos += read_size;
-      }
+      if (read_size) file_pos += read_size;
+      else           is_eof    = true;
         
       return read_size;
     }
@@ -382,7 +376,7 @@ class StreamUrlFile: public UrlFile
 
       FinishSend ();
 
-      return file_size;
+      return Connection ().ContentLength ();
     }
     
     void Resize (filesize_t new_size)
@@ -398,7 +392,7 @@ class StreamUrlFile: public UrlFile
       if (!IsEndOfRequest ())
         return false;
 
-      return (size_t)file_pos == file_size;
+      return is_eof;
     }    
     
 ///Сброс файла на диск
@@ -413,13 +407,11 @@ class StreamUrlFile: public UrlFile
         return;
         
       UrlFile::FinishSend ();
-
-      file_size = Connection ().ContentLength ();
     }
     
   private:
-    filesize_t file_size; //размер файла
     filepos_t  file_pos;  //позиция в потоке
+    bool       is_eof;    //достигнут ли конец файла
 };
 
 /*

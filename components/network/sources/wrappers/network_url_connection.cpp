@@ -79,7 +79,7 @@ class Buffer
         
       while (size)
       {
-        size_t block_offset         = total_size % BLOCK_SIZE, //?????
+        size_t block_offset         = total_size % BLOCK_SIZE,
                available_block_size = BLOCK_SIZE - block_offset,
                write_size           = size < available_block_size ? size : available_block_size;
                
@@ -272,6 +272,10 @@ struct UrlConnection::Impl: public xtl::reference_counter, public IUrlStream::IL
     try
     {
       recv_buffer.FinishPut ();
+
+      syslib::Lock lock (mutex);
+
+      recv_closed = true;
     }
     catch (xtl::exception& e)
     {
