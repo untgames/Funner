@@ -50,11 +50,11 @@ template <class Iter> void iterator_prev (Iter& iter, stl::bidirectional_iterato
     Хранилище для итератора
 */
 
-template <class T, class Iter, class Fn> class iterator_base: public iterator_interface<T>
+template <class T, class Iter, class Fn> class iterator_base: public iterator_interface<T>, private reference_counter
 {
   public:
-    iterator_base (const Iter& in_iter, const Fn& in_selector) : iter (in_iter), ref_count (1), selector (in_selector) {}
-    iterator_base (const iterator_base& i) : iter (i.iter), ref_count (1), selector (i.selector) {}
+    iterator_base (const Iter& in_iter, const Fn& in_selector) : iter (in_iter), selector (in_selector) {}
+    iterator_base (const iterator_base& i) : iter (i.iter), selector (i.selector) {}
     
     bool equal (const iterator_interface<T>& i)
     {
@@ -65,12 +65,13 @@ template <class T, class Iter, class Fn> class iterator_base: public iterator_in
     
     T& get () { return (T&)selector (*iter); }
     
-    size_t use_count () { return ref_count; }
+    size_t use_count () { return reference_counter::use_count (); }
     
-    void addref  () { ++ref_count; }
+    void addref  () { increment (); }
+
     void release ()
     {
-      if (!--ref_count)
+      if (decrement ())
         delete this;
     }
 
@@ -82,7 +83,6 @@ template <class T, class Iter, class Fn> class iterator_base: public iterator_in
 
   protected:
     Iter   iter;
-    size_t ref_count;        
     Fn     selector;
 };
 

@@ -5,6 +5,7 @@
 #include <new>
 
 #include <xtl/singleton_default.h>
+#include <xtl/reference_counter.h>
 
 namespace xtl
 {
