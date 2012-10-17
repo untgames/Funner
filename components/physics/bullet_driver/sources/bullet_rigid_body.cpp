@@ -65,7 +65,7 @@ struct RigidBody::Impl : public btDefaultMotionState
 
     btVector3 bullet_anisotropic_friction (anisotropic_friction.x, anisotropic_friction.y, anisotropic_friction.z);
 
-    body->setDamping             (material->LinearDamping (), material->LinearDamping ());
+    body->setDamping             (material->LinearDamping (), material->AngularDamping ());
     body->setFriction            (material->Friction ());
     body->setAnisotropicFriction (bullet_anisotropic_friction);
     body->setRestitution         (material->Restitution ());
