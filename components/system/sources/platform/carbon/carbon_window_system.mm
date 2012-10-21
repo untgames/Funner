@@ -143,12 +143,15 @@ struct WindowImpl
 
 bool check_fullscreen (WindowRef window)
 {
-  bool is_fullscreen;
+  bool is_fullscreen = false;
 
   try
   {
-    check_window_manager_error (GetWindowProperty (window, WINDOW_PROPERTY_CREATOR, FULLSCREEN_PROPERTY_TAG,
-                                sizeof (is_fullscreen), 0, &is_fullscreen), "::GetWindowProperty", "Can't get window property");
+    OSStatus get_fullscreen_status = GetWindowProperty (window, WINDOW_PROPERTY_CREATOR, FULLSCREEN_PROPERTY_TAG,
+        sizeof (is_fullscreen), 0, &is_fullscreen);
+
+    if (get_fullscreen_status != noErr && get_fullscreen_status != errWindowPropertyNotFound)
+      check_window_manager_error (get_fullscreen_status, "::GetWindowProperty", "Can't get window property");
   }
   catch (xtl::exception& exception)
   {
