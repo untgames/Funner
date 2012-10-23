@@ -22,10 +22,11 @@ export MACOSX_DEPLOYMENT_TARGET
 
 MACOSX_SDK_PATH := /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.7.sdk
 
-COMMON_CFLAGS     += -msse3 -isysroot $(MACOSX_SDK_PATH) -mmacosx-version-min=$(MACOSX_VERSION) -arch i386
-COMMON_LINK_FLAGS += -isysroot $(MACOSX_SDK_PATH) -mmacosx-version-min=$(MACOSX_VERSION) -arch i386
-COMPILER_GCC      := /usr/bin/llvm-gcc-4.2
-LINKER_GCC        := /usr/bin/llvm-g++-4.2
+COMMON_CFLAGS               += -msse3 -isysroot $(MACOSX_SDK_PATH) -mmacosx-version-min=$(MACOSX_VERSION) -arch i386
+COMMON_LINK_FLAGS           += -isysroot $(MACOSX_SDK_PATH) -mmacosx-version-min=$(MACOSX_VERSION) -arch i386
+MAP_FILE_LINK_OPTION_PREFIX := -Wl,-map,
+COMPILER_GCC                := /usr/bin/llvm-gcc-4.2
+LINKER_GCC                  := /usr/bin/llvm-g++-4.2
 
 include $(TOOLSETS_DIR)/g++.mak
 

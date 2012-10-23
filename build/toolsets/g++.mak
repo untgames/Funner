@@ -5,21 +5,22 @@
 ###################################################################################################
 #Константы
 ###################################################################################################
-LIB_SUFFIX            ?= .a
-OBJ_SUFFIX            ?= .o
-EXE_SUFFIX            ?= .exe
-DLL_SUFFIX            ?= .dll
-DLL_PREFIX            ?=
-DLL_LIB_SUFFIX        ?= .a
-LIB_PREFIX            ?= lib
-COMPILER_GCC          ?= gcc
-LINKER_GCC            ?= g++
-LIB_GCC               ?= libtool
-PROFILES              += g++
-DEFAULT_LIBS          +=
-COMMON_CFLAGS         := -Os -Wall -Wno-format $(COMMON_CFLAGS)
-DISABLE_CPP_WARNINGS  += -Wno-invalid-offsetof
-SOURCE_FILES_SUFFIXES += s
+LIB_SUFFIX                  ?= .a
+OBJ_SUFFIX                  ?= .o
+EXE_SUFFIX                  ?= .exe
+DLL_SUFFIX                  ?= .dll
+DLL_PREFIX                  ?=
+DLL_LIB_SUFFIX              ?= .a
+LIB_PREFIX                  ?= lib
+COMPILER_GCC                ?= gcc
+LINKER_GCC                  ?= g++
+LIB_GCC                     ?= libtool
+PROFILES                    += g++
+DEFAULT_LIBS                +=
+COMMON_CFLAGS               := -Os -Wall -Wno-format $(COMMON_CFLAGS)
+MAP_FILE_LINK_OPTION_PREFIX := -Wl,-Map=
+DISABLE_CPP_WARNINGS        += -Wno-invalid-offsetof
+SOURCE_FILES_SUFFIXES       += s
 
 ###################################################################################################
 #Компиляция исходников (исходный файл, список подключаемых каталогов, список подключаемых файлов, каталог с объектными файлами,
@@ -52,7 +53,7 @@ endef
 #список подключаемых символов линковки, флаги линковки, def-файл, файл ошибок)
 ###################################################################################################
 define tools.g++.link
-$(LINKER_GCC) -o "$1" $(if $(filter %$(DLL_SUFFIX),$1),$(call tools.link.dll,$1)) $(filter-out lib%.a,$2) $(foreach dir,$3,-L$(dir)) $(patsubst lib%.a,-l%,$(filter lib%.a,$(filter-out $(EXCLUDE_LIBS:%=lib%.a),$2)) $(DEFAULT_LIBS) $(COMMON_LINK_FLAGS) $5 $(patsubst %,-u _%,$4)) $(if $6,$(call tools.link.deffile,$6)) -Wl,-map,$(basename $1).map $(if $7, 2> $7) && chmod u+x "$1"
+$(LINKER_GCC) -o "$1" $(if $(filter %$(DLL_SUFFIX),$1),$(call tools.link.dll,$1)) $(filter-out lib%.a,$2) $(foreach dir,$3,-L$(dir)) $(patsubst lib%.a,-l%,$(filter lib%.a,$(filter-out $(EXCLUDE_LIBS:%=lib%.a),$2)) $(DEFAULT_LIBS) $(COMMON_LINK_FLAGS) $5 $(patsubst %,-u _%,$4)) $(if $6,$(call tools.link.deffile,$6)) $(MAP_FILE_LINK_OPTION_PREFIX)$(basename $1).map $(if $7, 2> $7) && chmod u+x "$1"
 endef
 
 ###################################################################################################
