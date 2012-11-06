@@ -68,7 +68,8 @@ class SceneRenderSubsystem : public ISubsystem, public IAttachmentRegistryListen
 
         for (Parser::NamesakeIterator iter=node.First ("RenderTarget"); iter; ++iter, ++render_target_index)
         {
-          const char* attachment = get<const char*> (*iter, "Screen");
+          const char* attachment        = get<const char*> (*iter, "Screen");
+          const char* target_attachment = get<const char*> (*iter, "Id", "");
 
           if (render_target_index >= render.RenderTargetsCount ())
           {
@@ -85,7 +86,9 @@ class SceneRenderSubsystem : public ISubsystem, public IAttachmentRegistryListen
             stl::string on_after_update  = get<const char*> (*iter, "OnAfterUpdate", "");
             stl::string on_before_update = get<const char*> (*iter, "OnBeforeUpdate", "");
 
-            idle_render_targets.push_back (RenderTargetDesc (render.RenderTarget (render_target_index), update_frequency, on_before_update, on_after_update));
+            RenderTargetPtr target (new RenderTargetDesc (render.RenderTarget (render_target_index), update_frequency, on_before_update, on_after_update, target_attachment), false);
+
+            idle_render_targets.push_back (target);
           }          
         }
 
@@ -196,7 +199,9 @@ class SceneRenderSubsystem : public ISubsystem, public IAttachmentRegistryListen
       
       for (RenderTargetArray::iterator iter=idle_render_targets.begin (); iter!=idle_render_targets.end ();)
       {
-        if (!iter->target.IsBindedToRender ()) //если цель рендеринга удалена - удаляем её из списка отрисовки
+        RenderTargetDesc& desc = **iter;
+
+        if (!desc.target.IsBindedToRender ()) //если цель рендеринга удалена - удаляем её из списка отрисовки
         {
           idle_render_targets.erase (iter);
 
@@ -205,7 +210,7 @@ class SceneRenderSubsystem : public ISubsystem, public IAttachmentRegistryListen
         
           //проверка синхронизации с частотой обновления кадров
           
-        if (current_time - iter->last_update_time < iter->update_delay)
+        if (current_time - desc.last_update_time < desc.update_delay)
         {
           ++iter;
           continue;
@@ -213,18 +218,18 @@ class SceneRenderSubsystem : public ISubsystem, public IAttachmentRegistryListen
 
           //обновление цели рендеринга
           
-        iter->last_update_time = current_time;          
-        if (!iter->on_before_update.empty ())
-          manager.Execute (iter->on_before_update.c_str ());
+        desc.last_update_time = current_time;          
+        if (!desc.on_before_update.empty ())
+          manager.Execute (desc.on_before_update.c_str ());
 
-        iter->target.Update ();
+        desc.target.Update ();
         
-        if (!iter->on_after_update.empty ())
-          manager.Execute (iter->on_after_update.c_str ());        
+        if (!desc.on_after_update.empty ())
+          manager.Execute (desc.on_after_update.c_str ());
         
         size_t end_time = common::milliseconds ();        
         
-        iter->last_update_time -= (end_time - current_time);
+        desc.last_update_time -= (end_time - current_time);
 
         ++iter;
       }
@@ -263,26 +268,37 @@ class SceneRenderSubsystem : public ISubsystem, public IAttachmentRegistryListen
     SceneRenderSubsystem& operator = (const SceneRenderSubsystem&); //no impl
 
   private:
-    struct RenderTargetDesc
+    struct RenderTargetDesc: public xtl::reference_counter
     {
       render::obsolete::RenderTarget target;
-      stl::string          on_before_update;
-      stl::string          on_after_update;
-      size_t               update_delay;
-      size_t               last_update_time;
+      stl::string                    on_before_update;
+      stl::string                    on_after_update;
+      stl::string                    target_attachment;
+      size_t                         update_delay;
+      size_t                         last_update_time;
       
-      RenderTargetDesc (const render::obsolete::RenderTarget& in_target, size_t in_update_frequency, const stl::string& in_on_before_update, const stl::string& in_on_after_update)
+      RenderTargetDesc (const render::obsolete::RenderTarget& in_target, size_t in_update_frequency, const stl::string& in_on_before_update, const stl::string& in_on_after_update, const char* in_target_attachment)
         : target (in_target)
         , on_before_update (in_on_before_update)
         , on_after_update (in_on_after_update)
+        , target_attachment (in_target_attachment)
         , update_delay (in_update_frequency ? 1000 / in_update_frequency : 0)
         , last_update_time (0)
       {
+        if (!target_attachment.empty ())
+          AttachmentRegistry::Register (target_attachment.c_str (), target);
+      }
+      
+      ~RenderTargetDesc ()
+      {
+        if (!target_attachment.empty ())
+          AttachmentRegistry::Unregister (target_attachment.c_str (), target);
       }
     };
   
     typedef stl::hash_map<stl::hash_key<const char*>, size_t> ScreenMap;
-    typedef stl::vector<RenderTargetDesc>                     RenderTargetArray;
+    typedef xtl::intrusive_ptr<RenderTargetDesc>              RenderTargetPtr;
+    typedef stl::vector<RenderTargetPtr>                      RenderTargetArray;
 
   private:
     Log                                              log;                 //лог
