@@ -19,6 +19,31 @@ const char* RENDER_TARGET_LIBRARY = "Render.RenderTarget";
 const char* COMPONENT_NAME        = "script.binds.Render";
 const char* BINDER_NAME           = "Render";
 
+namespace
+{
+
+size_t get_screen (IStack& stack)
+{
+  xtl::any variant = stack.GetVariant (1);
+
+  RenderTarget& target = variant.cast<RenderTarget&> ();
+
+  scene_graph::Screen* screen = target.Screen ();
+
+  if (screen)
+  {
+    script::detail::push_argument (stack, *screen);
+  }
+  else
+  {
+    stack.Push ((void*)0);
+  }
+
+  return 1;
+}
+
+}
+
 void bind_render_target_library (Environment& environment)
 {
   InvokerRegistry lib = environment.CreateLibrary (RENDER_TARGET_LIBRARY);
@@ -30,8 +55,7 @@ void bind_render_target_library (Environment& environment)
     make_invoker (xtl::implicit_cast<void (RenderTarget::*)(const char*)> (&RenderTarget::CaptureImage))
   ));
 
-  lib.Register ("get_Screen", make_invoker (&RenderTarget::Screen));
-  lib.Register ("set_Screen", make_invoker (&RenderTarget::SetScreen));
+  lib.Register ("get_Screen", &get_screen);
 
     //регистрация типов данных
 
