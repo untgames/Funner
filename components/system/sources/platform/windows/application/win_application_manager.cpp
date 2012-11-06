@@ -217,8 +217,8 @@ void WindowsApplicationManager::OpenUrl (const char* url)
 
     ShellExecuteEx (&shell_excinfo);
 
-//    int result = (int)ShellExecuteA (0, "open", url, 0, 0, SW_SHOWNORMAL);
-    int result = (int)shell_excinfo.hInstApp;
+    int result = (int)ShellExecuteA (0, "open", url, 0, 0, SW_SHOWNORMAL);
+//    int result = (int)shell_excinfo.hInstApp;
 
     if (result > 32)
       return;

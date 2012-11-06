@@ -12,6 +12,7 @@ import android.os.Looper;
 import android.content.ContextWrapper;
 import android.content.pm.ApplicationInfo;
 import android.content.SharedPreferences;
+import android.content.Intent;
 import android.util.*;
 import android.os.Build;
 import android.os.Process;
@@ -22,6 +23,7 @@ import android.webkit.CookieSyncManager;
 import android.view.ViewGroup;
 import android.widget.AbsoluteLayout;
 import android.widget.FrameLayout;
+import android.net.Uri;
 import java.net.CookieHandler;
 import java.security.MessageDigest;
 import java.util.Arrays;
@@ -277,7 +279,7 @@ public class EngineActivity extends Activity
 
         addView (controller.getView ());
 
-        controller.getView ().setVisibility (View.INVISIBLE);
+//        controller.getView ().setVisibility (View.INVISIBLE);
 
         return controller;
       }
@@ -398,6 +400,14 @@ public class EngineActivity extends Activity
     synchronized (manager) {
       manager.removeAllCookie ();
     }
+  }
+
+/// Открытие внешней ссылки
+  public void openUrl (String url)
+  {
+    Intent intent = new Intent (Intent.ACTION_VIEW, Uri.parse (url));
+
+    startActivity (intent);
   }
 
 /// Точка входа в native код

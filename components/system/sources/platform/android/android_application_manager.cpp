@@ -305,7 +305,26 @@ IApplicationDelegate* AndroidApplicationManager::CreateDefaultApplicationDelegat
 
 void AndroidApplicationManager::OpenUrl (const char* url)
 {
-  throw xtl::make_not_implemented_exception ("syslib::AndroidApplicationManager::OpenUrl");
+  try
+  {
+    if (!url)
+      throw xtl::make_null_argument_exception ("", "url");
+
+    local_ref<jobject> activity (get_activity ());
+    local_ref<jclass>  activity_class (get_env ().GetObjectClass (get_activity ()), false);
+
+    if (!activity_class)
+      throw xtl::format_operation_exception ("", "JNIEnv::GetObjectClass failed");
+
+    jmethodID open_url_method = find_method (&get_env (), activity_class.get (), "openUrl", "(Ljava/lang/String;)V");
+
+    get_env ().CallVoidMethod (activity.get (), open_url_method, tojstring (url).get ());
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("syslib::AndroidApplicationManager::OpenUrl");
+    throw;
+  }
 }
 
 /*

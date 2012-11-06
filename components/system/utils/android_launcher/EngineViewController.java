@@ -198,6 +198,7 @@ public class EngineViewController implements View.OnTouchListener, View.OnKeyLis
       public Object run ()
       {
         view.setVisibility (visibility);
+//request layout???
         
         return null;
       }
