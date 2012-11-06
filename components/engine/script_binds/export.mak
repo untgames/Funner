@@ -75,3 +75,7 @@ export.link.engine.script_binds.store.IMPORTS       := link.engine.script_binds 
 # Link media image exports
 export.link.engine.script_binds.media.image.LINK_INCLUDES := MediaImageScriptBind
 export.link.engine.script_binds.media.image.IMPORTS       := link.engine.script_binds link.media.image
+
+# Link render exports
+export.link.engine.script_binds.render.scene_render2d.LINK_INCLUDES := RenderScriptBind
+export.link.engine.script_binds.render.scene_render2d.IMPORTS       := link.engine.script_binds link.render.scene_render2d
