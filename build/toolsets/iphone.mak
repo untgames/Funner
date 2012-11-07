@@ -16,8 +16,9 @@ DLL_LIB_SUFFIX := .dylib
 PROFILES += iphone cocoa unistd has_windows haswchar gles no_dll has_iconv
 DLL_PATH := DYLD_LIBRARY_PATH
 
-COMMON_CFLAGS     += -Os -isysroot $(IPHONE_SDK_PATH) -DIPHONE
-COMMON_LINK_FLAGS += -isysroot $(IPHONE_SDK_PATH)
+COMMON_CFLAGS               += -Os -isysroot $(IPHONE_SDK_PATH) -DIPHONE
+COMMON_LINK_FLAGS           += -isysroot $(IPHONE_SDK_PATH)
+MAP_FILE_LINK_OPTION_PREFIX := -Wl,-map,
 
 include $(TOOLSETS_DIR)/g++.mak
 

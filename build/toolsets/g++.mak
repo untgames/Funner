@@ -18,7 +18,7 @@ LIB_GCC                     ?= libtool
 PROFILES                    += g++
 DEFAULT_LIBS                +=
 COMMON_CFLAGS               := -Os -Wall -Wno-format $(COMMON_CFLAGS)
-MAP_FILE_LINK_OPTION_PREFIX := -Wl,-Map=
+MAP_FILE_LINK_OPTION_PREFIX ?= -Wl,-Map=
 DISABLE_CPP_WARNINGS        += -Wno-invalid-offsetof
 SOURCE_FILES_SUFFIXES       += s
 
