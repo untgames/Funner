@@ -247,13 +247,7 @@ void TcpClient::Connect (const char* host, unsigned short port)
 
       address_desc->sin_port = htons (port);
 
-      address_desc->sin_addr.s_addr = 0;
-
-      address_desc->sin_addr.s_addr |= entry->h_addr_list [0][0];
-      address_desc->sin_addr.s_addr |= (unsigned char)entry->h_addr_list [0][1] << 8;
-      address_desc->sin_addr.s_addr |= (unsigned char)entry->h_addr_list [0][2] << 16;
-      address_desc->sin_addr.s_addr |= (unsigned char)entry->h_addr_list [0][3] << 24;
-
+      memcpy (&address_desc->sin_addr.s_addr, entry->h_addr_list [0], entry->h_length);
       break;
     }
     case 16:
@@ -266,8 +260,7 @@ void TcpClient::Connect (const char* host, unsigned short port)
 
       address_desc->sin6_port = htons (port);
 
-      for (size_t i = 0; i < 16; i++)
-        address_desc->sin6_addr.s6_addr [i] = entry->h_addr_list [0][i];
+      memcpy (&address_desc->sin6_addr.s6_addr, entry->h_addr_list [0], entry->h_length);
 
       break;
     }
