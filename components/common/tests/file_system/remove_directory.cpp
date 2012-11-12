@@ -5,8 +5,8 @@
 
 using namespace common;
 
-const char* RESULTS_DIR_NAMES [] = { "test_dir", "/mount/test_dir" };
-const char* NESTED_DIR_NAMES []  = { "test_dir/test_dir", "/mount/test_dir/test_dir" };
+const char* RESULTS_DIR_NAMES [] = { "test_dir", "test_dir/", "/mount/test_dir" };
+const char* NESTED_DIR_NAMES []  = { "test_dir/test_dir", "test_dir/test_dir", "/mount/test_dir/test_dir" };
 
 int main ()
 {

@@ -1121,6 +1121,9 @@ void FileSystemImpl::Remove (const char* src_file_name)
   {
     ICustomFileSystemPtr file_system = FindFileSystem (src_file_name, file_name, &prefix);
 
+    if (!file_name.empty () && file_name [file_name.size () - 1] == '/')
+      file_name.pop_back ();
+
     FileInfo info;
     bool     is_dir = false;
 
