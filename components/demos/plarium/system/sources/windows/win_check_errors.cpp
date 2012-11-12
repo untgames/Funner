@@ -66,7 +66,7 @@ void check_errors (const char* source)
   DWORD error_code = GetLastError ();
   
   if (error_code)
-    throw sgi_stl::runtime_error (utility::format ("common::check_errors", get_error_message (error_code).c_str ()));
+    throw sgi_stl::runtime_error (utility::format ("common::check_errors '%s'", get_error_message (error_code).c_str ()));
 }
 
 void raise_error (const char* source)
