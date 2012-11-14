@@ -385,6 +385,7 @@ class IOSStore : public ITransactionObserverListener, public IProductsRequestLis
 
             NotifyTransactionUpdated (iter->transaction);
 
+            pending_transactions.erase (iter);  //удаляем транзакцию, поскольку настоящей транзакции для нее не создавалось
             break;
           }
         }
