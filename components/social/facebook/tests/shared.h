@@ -8,5 +8,6 @@
 #include <common/property_map.h>
 
 #include <syslib/application.h>
+#include <syslib/window.h>
 
 #include <social/session.h>

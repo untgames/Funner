@@ -38,9 +38,11 @@ class FacebookComponent
       if (xtl::xstrcmp (session_name, SESSION_NAME_MASK))
         throw xtl::make_argument_exception (METHOD_NAME, "session_name", session_name);
 
-      FacebookSessionImpl::CheckUnknownProperties (METHOD_NAME, config, 0, 0);
+      static const char* LOGIN_PROPERTIES [] = { "AppId" };
 
-      return new FacebookSessionImpl ();
+      FacebookSessionImpl::CheckUnknownProperties (METHOD_NAME, config, sizeof (LOGIN_PROPERTIES) / sizeof (*LOGIN_PROPERTIES), LOGIN_PROPERTIES);
+
+      return new FacebookSessionImpl (config);
     }
 };
 

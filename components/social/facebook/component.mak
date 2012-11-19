@@ -8,7 +8,7 @@ SOCIAL.FACEBOOK.SOURCES.TYPE               := static-lib
 SOCIAL.FACEBOOK.SOURCES.NAME               := funner.social.facebook
 SOCIAL.FACEBOOK.SOURCES.INCLUDE_DIRS       += sources/platform
 SOCIAL.FACEBOOK.SOURCES.SOURCE_DIRS        := sources/shared
-SOCIAL.FACEBOOK.SOURCES.IMPORTS            := compile.social.core compile.common
+SOCIAL.FACEBOOK.SOURCES.IMPORTS            := compile.social.core compile.system
 SOCIAL.FACEBOOK.SOURCES.iphone.SOURCE_DIRS := sources/platform/ios
 
 #Цель - tests

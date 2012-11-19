@@ -3,6 +3,7 @@
 
 #include <xtl/bind.h>
 #include <xtl/common_exceptions.h>
+#include <xtl/connection.h>
 #include <xtl/function.h>
 
 #include <common/component.h>
@@ -10,6 +11,9 @@
 #include <common/property_map.h>
 #include <common/singleton.h>
 #include <common/strlib.h>
+
+#include <syslib/cookie.h>
+#include <syslib/web_view.h>
 
 #include <social/session.h>
 
@@ -28,7 +32,7 @@ class FacebookSessionImpl: public IAchievementManager, public ILeaderboardManage
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструктор/Деструктор
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    FacebookSessionImpl  ();
+    FacebookSessionImpl  (const common::PropertyMap& properties);
     ~FacebookSessionImpl ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -103,13 +107,45 @@ class FacebookSessionImpl: public IAchievementManager, public ILeaderboardManage
     void LoadFriends    (const User& user, const LoadFriendsCallback& callback, const common::PropertyMap& properties);
 
   private:
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Обработка события активации приложения
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void OnActivate ();
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Закрытие диалога
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void CloseDialogWebView ();
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Обработка события логина
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    bool ProcessLoginRequest (const char* request);
+    void ProcessLoginFail ();
+
+  private:
     FacebookSessionImpl (const FacebookSessionImpl& source);              //no impl
     FacebookSessionImpl& operator = (const FacebookSessionImpl& source);  //no impl
 
   private:
-    common::Log log;
-    User        current_user;
+    common::Log          log;
+    stl::string          token;
+    User                 current_user;
+    syslib::WebView      dialog_web_view;
+    bool                 dialog_web_view_active;
+    xtl::auto_connection dialog_web_view_filter_connection;
+    xtl::auto_connection dialog_web_view_load_start_connection;
+    xtl::auto_connection dialog_web_view_load_fail_connection;
+    xtl::auto_connection on_activate_connection;
 };
+
+//utils
+
+//replace percent escapes using utf-8 encoding
+stl::string replace_percent_escapes (const char* str);
+
+//return parameter from url, or empty string if not found
+stl::string get_url_parameter (const char* url, const char* param_name);
 
 }
 
