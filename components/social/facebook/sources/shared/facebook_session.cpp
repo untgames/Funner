@@ -17,6 +17,7 @@ const char* SESSION_DESCRIPTION = "Facebook";
 
 FacebookSessionImpl::FacebookSessionImpl (const common::PropertyMap& properties)
   : log (LOG_NAME)
+  , logged_in (false)
   , dialog_web_view_active (false)
 {
   LogIn (LoginCallback (), properties);
@@ -24,6 +25,7 @@ FacebookSessionImpl::FacebookSessionImpl (const common::PropertyMap& properties)
 
 FacebookSessionImpl::~FacebookSessionImpl ()
 {
+  CloseSession ();
 }
 
 /*
@@ -89,11 +91,11 @@ void FacebookSessionImpl::LogIn (const LoginCallback& callback, const common::Pr
 
   CloseDialogWebView ();
 
+//  LogOut ();  //DEBUG
+
   dialog_web_view_filter_connection     = dialog_web_view.RegisterFilter (xtl::bind (&FacebookSessionImpl::ProcessLoginRequest, this, _2));
   dialog_web_view_load_start_connection = dialog_web_view.RegisterEventHandler (syslib::WebViewEvent_OnLoadStart, xtl::bind (&FacebookSessionImpl::ProcessLoginRequest, this, (const char*)0));
   dialog_web_view_load_fail_connection  = dialog_web_view.RegisterEventHandler (syslib::WebViewEvent_OnLoadFail, xtl::bind (&FacebookSessionImpl::ProcessLoginFail, this));
-
-  LogOut ();  //DEBUG
 
   dialog_web_view.LoadRequest (url.c_str ());
 
@@ -144,6 +146,7 @@ bool FacebookSessionImpl::ProcessLoginRequest (const char* request)
       {
         log.Printf ("Logged in");
 
+        PerformRequest ("", "fields=id,username", xtl::bind (&FacebookSessionImpl::OnUserInfoLoaded, this, _1, _2, _3));
         //TODO setup current user
       }
 
@@ -161,21 +164,79 @@ bool FacebookSessionImpl::ProcessLoginRequest (const char* request)
   return true;
 }
 
+void FacebookSessionImpl::OnUserInfoLoaded (bool succeeded, const stl::string& status, common::ParseNode response)
+{
+  log.Printf ("User info load status '%s'", status.c_str ());
+
+  if (!succeeded)
+  {
+    //TODO login failed
+    return;
+  }
+
+  //TODO fill current user info
+
+  logged_in = true;
+
+  //TODO callback
+}
+
 void FacebookSessionImpl::ProcessLoginFail ()
 {
+  log.Printf ("Login load failed\n");
+
   CloseDialogWebView ();
   //TODO
-  log.Printf ("Login load failed\n");
 }
 
 void FacebookSessionImpl::LogOut ()
 {
+  CloseSession ();
+
   syslib::CookieManager::DeleteAllCookies ();
+
+  logged_in = false;
+
+  token.clear ();
 }
 
 bool FacebookSessionImpl::IsUserLoggedIn ()
 {
-  return !token.empty ();
+  return logged_in;
+}
+
+/*
+   Закрытие сессии
+*/
+
+void FacebookSessionImpl::CloseSession ()
+{
+  CloseDialogWebView ();
+
+  for (ActionsList::iterator iter = pending_actions.begin (), end = pending_actions.end (); iter != end; ++iter)
+    iter->Cancel ();
+
+    //wating for all pending actions to complete
+  for (;;)
+  {
+    bool has_unfinished_actions = false;
+
+    for (ActionsList::iterator iter = pending_actions.begin (), end = pending_actions.end (); iter != end; ++iter)
+    {
+      if (!iter->IsCompleted ())
+      {
+        has_unfinished_actions = true;
+        break;
+      }
+    }
+
+    if (!has_unfinished_actions)
+      break;
+
+    syslib::Application::Sleep (1);
+  }
+
+  pending_actions.clear ();
 }
 
 /*

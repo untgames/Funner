@@ -1,17 +1,23 @@
 #ifndef SOCIAL_FACEBOOK_SHARED_HEADER
 #define SOCIAL_FACEBOOK_SHARED_HEADER
 
+#include <stl/list>
+
 #include <xtl/bind.h>
 #include <xtl/common_exceptions.h>
 #include <xtl/connection.h>
 #include <xtl/function.h>
 
+#include <common/action_queue.h>
 #include <common/component.h>
+#include <common/file.h>
 #include <common/log.h>
+#include <common/parser.h>
 #include <common/property_map.h>
 #include <common/singleton.h>
 #include <common/strlib.h>
 
+#include <syslib/application.h>
 #include <syslib/cookie.h>
 #include <syslib/web_view.h>
 
@@ -108,6 +114,21 @@ class FacebookSessionImpl: public IAchievementManager, public ILeaderboardManage
 
   private:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+///Закрытие сессии
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void CloseSession ();
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Выполнение запроса
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    typedef xtl::function<void (bool succeeded, const stl::string& status, common::ParseNode response)> RequestCallback;
+
+    void PerformRequest (const char* method_name, const char* params, const RequestCallback& callback);
+
+    static void PerformRequestNotify (const RequestCallback& callback, bool succeeded, const char* status, const common::ParseNode& response);
+    static void PerformRequestImpl   (common::Action& action, const stl::string& url, const RequestCallback& callback, common::Log log);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Обработка события активации приложения
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void OnActivate ();
@@ -118,8 +139,9 @@ class FacebookSessionImpl: public IAchievementManager, public ILeaderboardManage
     void CloseDialogWebView ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Обработка события логина
+///Обработка событий логина
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+    void OnUserInfoLoaded (bool succeeded, const stl::string& status, common::ParseNode response);
     bool ProcessLoginRequest (const char* request);
     void ProcessLoginFail ();
 
@@ -128,8 +150,12 @@ class FacebookSessionImpl: public IAchievementManager, public ILeaderboardManage
     FacebookSessionImpl& operator = (const FacebookSessionImpl& source);  //no impl
 
   private:
+    typedef stl::list<common::Action> ActionsList;
+
+  private:
     common::Log          log;
     stl::string          token;
+    bool                 logged_in;
     User                 current_user;
     syslib::WebView      dialog_web_view;
     bool                 dialog_web_view_active;
@@ -137,6 +163,7 @@ class FacebookSessionImpl: public IAchievementManager, public ILeaderboardManage
     xtl::auto_connection dialog_web_view_load_start_connection;
     xtl::auto_connection dialog_web_view_load_fail_connection;
     xtl::auto_connection on_activate_connection;
+    ActionsList          pending_actions;
 };
 
 //utils
