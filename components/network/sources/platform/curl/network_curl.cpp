@@ -151,7 +151,7 @@ class CurlStream: public IUrlStream
     const char* GetStatus ()
     {
       syslib::Lock lock (mutex);
-      
+
       WaitHeaders ();
 
       return status.c_str ();
@@ -163,6 +163,16 @@ class CurlStream: public IUrlStream
     {
       while (!headers_received)
         headers_condition.Wait (mutex);
+    }
+
+    void HeadersReceivedNotify ()
+    {
+      if (headers_received)
+        return;
+
+      headers_received = true;
+
+      headers_condition.NotifyAll ();
     }
 
 ///Обработчик нити
@@ -238,6 +248,12 @@ class CurlStream: public IUrlStream
 
           if (http_header)
             curl_slist_free_all (http_header);
+
+          {
+            syslib::Lock lock (mutex);
+
+            HeadersReceivedNotify ();
+          }
           
           log.Printf ("URL '%s' received", url.c_str ());
           
@@ -286,12 +302,7 @@ class CurlStream: public IUrlStream
 
       status = in_status;
 
-      if (!headers_received)
-      {
-        headers_received = true;
-
-        headers_condition.NotifyAll ();
-      }
+      HeadersReceivedNotify ();
     }
     
 ///Обработчик получения заголовка
@@ -393,12 +404,7 @@ class CurlStream: public IUrlStream
         {
           syslib::Lock lock (mutex);
 
-          if (!headers_received)
-          {
-            headers_received = true;
-
-            headers_condition.NotifyAll ();
-          }
+          HeadersReceivedNotify ();
         }
         
         listener.WriteReceivedData (buffer, size);
