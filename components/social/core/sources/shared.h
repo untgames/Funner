@@ -5,6 +5,7 @@
 #include <stl/string>
 #include <stl/vector>
 
+#include <xtl/bind.h>
 #include <xtl/common_exceptions.h>
 #include <xtl/function.h>
 #include <xtl/reference_counter.h>
@@ -43,7 +44,7 @@ class SessionManagerImpl
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Создание сессии
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    social::ISessionManager* CreateSession (const char* session_name, const common::PropertyMap& config);
+    social::ISessionManager* CreateSession (const char* session_name);
 
   private:
     SessionManagerImpl (const SessionManagerImpl&);               //no impl

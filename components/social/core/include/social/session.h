@@ -44,7 +44,7 @@ class Session
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Логин
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void LogIn          (const common::PropertyMap& config);
+    void LogIn          (const LoginCallback& callback, const common::PropertyMap& config);
     void LogOut         ();
     bool IsUserLoggedIn () const;
 
@@ -114,7 +114,7 @@ class SessionManager
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Регистрация создателей сессий
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    typedef xtl::function<ISessionManager* (const char* session_name, const common::PropertyMap& config)> CreateSessionHandler;
+    typedef xtl::function<ISessionManager* (const char* session_name)> CreateSessionHandler;
 
     static void RegisterSession       (const char* id, const char* session_name_mask, const CreateSessionHandler& handler);
     static void UnregisterSession     (const char* id);

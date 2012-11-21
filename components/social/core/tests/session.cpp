@@ -11,7 +11,7 @@ int main ()
     printf ("Description    '%s'\n", session.Description ());
     printf ("IsUserLoggedIn %c\n",   session.IsUserLoggedIn () ? 'y' : 'n');
 
-    session.LogIn (PropertyMap ());
+    session.LogIn (LoginCallback (), PropertyMap ());
   }
   catch (std::exception& exception)
   {

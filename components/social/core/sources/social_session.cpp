@@ -29,17 +29,20 @@ struct Session::Impl : public xtl::reference_counter
 
   ~Impl ()
   {
-    LogOut ();
+    CloseSession ();
   }
 
   ///Логин
-  void LogIn (const common::PropertyMap& config)
+  void LogIn (const LoginCallback& callback, const common::PropertyMap& config)
   {
-    LogOut ();
-
     try
     {
-      manager = SessionManagerSingleton::Instance ()->CreateSession (name.c_str (), config);
+      if (manager)
+        throw xtl::format_operation_exception ("", "Already logged in");
+
+      manager = SessionManagerSingleton::Instance ()->CreateSession (name.c_str ());
+
+      manager->LogIn (xtl::bind (&Session::Impl::OnLoggedIn, this, _1, _2, callback), config);
     }
     catch (xtl::exception& e)
     {
@@ -48,11 +51,29 @@ struct Session::Impl : public xtl::reference_counter
     }
   }
 
-  void LogOut ()
+  void OnLoggedIn (OperationStatus status, const char* error, const LoginCallback& callback)
+  {
+    if (status == OperationStatus_Canceled || status == OperationStatus_Failure)
+      CloseSession ();
+
+    callback (status, error);
+  }
+
+  void CloseSession ()
   {
     delete manager;
 
     manager = 0;
+  }
+
+  void LogOut ()
+  {
+    if (!manager)
+      return;
+
+    manager->LogOut ();
+
+    CloseSession ();
   }
 
   bool IsUserLoggedIn ()
@@ -327,9 +348,9 @@ const char* Session::Description () const
    Логин
 */
 
-void Session::LogIn (const common::PropertyMap& config)
+void Session::LogIn (const LoginCallback& callback, const common::PropertyMap& config)
 {
-  impl->LogIn (config);
+  impl->LogIn (callback, config);
 }
 
 void Session::LogOut ()

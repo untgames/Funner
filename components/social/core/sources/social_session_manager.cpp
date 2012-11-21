@@ -86,7 +86,7 @@ struct SessionManagerImpl::Impl
   }
 
   ///Создание сессии
-  social::ISessionManager* CreateSession (const char* session_name, const common::PropertyMap& config)
+  social::ISessionManager* CreateSession (const char* session_name)
   {
     static const char* METHOD_NAME = "social::SessionManagerImpl::CreateSession";
 
@@ -100,7 +100,7 @@ struct SessionManagerImpl::Impl
     if (iter == session_creators.end ())
       throw xtl::format_operation_exception (METHOD_NAME, "Session '%s' not registered", session_name);
 
-    return iter->second.handler (session_name, config);
+    return iter->second.handler (session_name);
   }
 
   ///Загрузка сессий по умолчанию
@@ -155,9 +155,9 @@ bool SessionManagerImpl::IsSessionRegistered (const char* session_name)
    Создание сессии
 */
 
-social::ISessionManager* SessionManagerImpl::CreateSession (const char* session_name, const common::PropertyMap& config)
+social::ISessionManager* SessionManagerImpl::CreateSession (const char* session_name)
 {
-  return impl->CreateSession (session_name, config);
+  return impl->CreateSession (session_name);
 }
 
 /*

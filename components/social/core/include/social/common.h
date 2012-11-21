@@ -22,11 +22,15 @@ class User;
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 enum OperationStatus
 {
-  OperationStatus_Success, //Операция завершена успешно
-  OperationStatus_Failure  //В ходе выполнения операции произошла ошибка
+  OperationStatus_Success,  //Операция завершена успешно
+  OperationStatus_Canceled, //Операция была отменена
+  OperationStatus_Failure   //В ходе выполнения операции произошла ошибка
 };
 
 typedef xtl::function <void (const void*)> ReleaseHandleFunction;
+
+//typedef xtl::function<void (OperationStatus status, const char* error)> RequestCallback;                              //ADDED
+typedef xtl::function<void (OperationStatus status, const char* error)> LoginCallback;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Менеджер сессии
@@ -52,7 +56,12 @@ class ISessionManager
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Завершился ли процесс логина
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+    virtual void LogIn          (const LoginCallback& callback, const common::PropertyMap& properties) = 0;
+    virtual void LogOut         () = 0;
     virtual bool IsUserLoggedIn () = 0;
+
+//ADDED
+//    virtual void PerformRequest (const RequestCallback& callback, const common::PropertyMap& properties); //ADDED
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Получение залогиненного пользователя
