@@ -38,7 +38,7 @@ class FacebookSessionImpl: public IAchievementManager, public ILeaderboardManage
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструктор/Деструктор
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    FacebookSessionImpl  (const common::PropertyMap& properties);
+    FacebookSessionImpl  ();
     ~FacebookSessionImpl ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -141,9 +141,9 @@ class FacebookSessionImpl: public IAchievementManager, public ILeaderboardManage
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Обработка событий логина
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void OnUserInfoLoaded (bool succeeded, const stl::string& status, common::ParseNode response);
-    bool ProcessLoginRequest (const char* request);
-    void ProcessLoginFail ();
+    void OnUserInfoLoaded    (bool succeeded, const stl::string& status, common::ParseNode response, const LoginCallback& callback);
+    bool ProcessLoginRequest (const char* request, const LoginCallback& callback);
+    void ProcessLoginFail    (const LoginCallback& callback);
 
   private:
     FacebookSessionImpl (const FacebookSessionImpl& source);              //no impl

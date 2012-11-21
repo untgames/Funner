@@ -15,13 +15,11 @@ const char* SESSION_DESCRIPTION = "Facebook";
    Конструктор / Деструктор
 */
 
-FacebookSessionImpl::FacebookSessionImpl (const common::PropertyMap& properties)
+FacebookSessionImpl::FacebookSessionImpl ()
   : log (LOG_NAME)
   , logged_in (false)
   , dialog_web_view_active (false)
-{
-  LogIn (LoginCallback (), properties);
-}
+  {}
 
 FacebookSessionImpl::~FacebookSessionImpl ()
 {
@@ -93,9 +91,9 @@ void FacebookSessionImpl::LogIn (const LoginCallback& callback, const common::Pr
 
 //  LogOut ();  //DEBUG
 
-  dialog_web_view_filter_connection     = dialog_web_view.RegisterFilter (xtl::bind (&FacebookSessionImpl::ProcessLoginRequest, this, _2));
-  dialog_web_view_load_start_connection = dialog_web_view.RegisterEventHandler (syslib::WebViewEvent_OnLoadStart, xtl::bind (&FacebookSessionImpl::ProcessLoginRequest, this, (const char*)0));
-  dialog_web_view_load_fail_connection  = dialog_web_view.RegisterEventHandler (syslib::WebViewEvent_OnLoadFail, xtl::bind (&FacebookSessionImpl::ProcessLoginFail, this));
+  dialog_web_view_filter_connection     = dialog_web_view.RegisterFilter (xtl::bind (&FacebookSessionImpl::ProcessLoginRequest, this, _2, callback));
+  dialog_web_view_load_start_connection = dialog_web_view.RegisterEventHandler (syslib::WebViewEvent_OnLoadStart, xtl::bind (&FacebookSessionImpl::ProcessLoginRequest, this, (const char*)0, callback));
+  dialog_web_view_load_fail_connection  = dialog_web_view.RegisterEventHandler (syslib::WebViewEvent_OnLoadFail, xtl::bind (&FacebookSessionImpl::ProcessLoginFail, this, callback));
 
   dialog_web_view.LoadRequest (url.c_str ());
 
@@ -108,7 +106,7 @@ void FacebookSessionImpl::LogIn (const LoginCallback& callback, const common::Pr
    Обработка события логина
 */
 
-bool FacebookSessionImpl::ProcessLoginRequest (const char* request)
+bool FacebookSessionImpl::ProcessLoginRequest (const char* request, const LoginCallback& callback)
 {
   if (!request)
     request = dialog_web_view.Request ();
@@ -121,8 +119,6 @@ bool FacebookSessionImpl::ProcessLoginRequest (const char* request)
     {
       token = get_url_parameter (request, "access_token=");
 
-      //TODO extract token, extract cancel event
-
       CloseDialogWebView ();
 
       if (token.empty ())  //login failed
@@ -131,23 +127,22 @@ bool FacebookSessionImpl::ProcessLoginRequest (const char* request)
 
         if (error == "user_denied")
         {
-          //TODO
-
           log.Printf ("Login canceled");
+
+          callback (OperationStatus_Canceled, "");
         }
         else
         {
-          //TODO
-
           log.Printf ("Login failed, error '%s'", error.c_str ());
+
+          callback (OperationStatus_Failure, error.c_str ());
         }
       }
       else
       {
         log.Printf ("Logged in");
 
-        PerformRequest ("", "fields=id,username", xtl::bind (&FacebookSessionImpl::OnUserInfoLoaded, this, _1, _2, _3));
-        //TODO setup current user
+        PerformRequest ("", "fields=id,username", xtl::bind (&FacebookSessionImpl::OnUserInfoLoaded, this, _1, _2, _3, callback));
       }
 
       return false;
@@ -164,13 +159,13 @@ bool FacebookSessionImpl::ProcessLoginRequest (const char* request)
   return true;
 }
 
-void FacebookSessionImpl::OnUserInfoLoaded (bool succeeded, const stl::string& status, common::ParseNode response)
+void FacebookSessionImpl::OnUserInfoLoaded (bool succeeded, const stl::string& status, common::ParseNode response, const LoginCallback& callback)
 {
   log.Printf ("User info load status '%s'", status.c_str ());
 
   if (!succeeded)
   {
-    //TODO login failed
+    callback (OperationStatus_Failure, status.c_str ());
     return;
   }
 
@@ -178,15 +173,16 @@ void FacebookSessionImpl::OnUserInfoLoaded (bool succeeded, const stl::string& s
 
   logged_in = true;
 
-  //TODO callback
+  callback (OperationStatus_Success, status.c_str ());
 }
 
-void FacebookSessionImpl::ProcessLoginFail ()
+void FacebookSessionImpl::ProcessLoginFail (const LoginCallback& callback)
 {
   log.Printf ("Login load failed\n");
 
   CloseDialogWebView ();
-  //TODO
+
+  callback (OperationStatus_Failure, "Can't load login page");
 }
 
 void FacebookSessionImpl::LogOut ()
