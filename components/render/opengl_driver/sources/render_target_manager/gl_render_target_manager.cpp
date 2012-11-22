@@ -320,7 +320,7 @@ struct RenderTargetManager::Impl: public ContextObject, public RenderTargetManag
         {
           const Viewport& viewport = GetViewport ();
 
-          glViewport (viewport.x, viewport.y, viewport.width, viewport.height);
+          glViewport (viewport.x, viewport.y, viewport.width >= 0 ? viewport.width : 0, viewport.height >= 0 ? viewport.height : 0);
 
 #ifndef OPENGL_ES_SUPPORT
           glDepthRange  (viewport.min_depth, viewport.max_depth);
@@ -335,7 +335,7 @@ struct RenderTargetManager::Impl: public ContextObject, public RenderTargetManag
         {        
           const Rect& scissor = GetScissor ();
           
-          glScissor (scissor.x >= 0 ? scissor.x : 0, scissor.y >= 0 ? scissor.y : 0, scissor.width, scissor.height);
+          glScissor (scissor.x >= 0 ? scissor.x : 0, scissor.y >= 0 ? scissor.y : 0, scissor.width >= 0 ? scissor.width : 0, scissor.height >= 0 ? scissor.height : 0);
 
           SetContextCacheValue (CacheEntry_ScissorHash, GetScissorHash ());
         }
@@ -465,7 +465,7 @@ struct RenderTargetManager::Impl: public ContextObject, public RenderTargetManag
           {
             const Viewport& viewport = GetViewport ();
 
-            glScissor (viewport.x >= 0 ? viewport.x : 0, viewport.y >= 0 ? viewport.y : 0, viewport.width, viewport.height);          
+            glScissor (viewport.x >= 0 ? viewport.x : 0, viewport.y >= 0 ? viewport.y : 0, viewport.width >= 0 ? viewport.width : 0, viewport.height >= 0 ? viewport.height : 0);
 
             SetContextCacheValue (CacheEntry_ScissorHash, GetViewportHash ());
 
