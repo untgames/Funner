@@ -74,6 +74,20 @@ stl::string get_url_parameter (const char* url, const char* param_name)
   return replace_percent_escapes (stl::string (param_start, param_end).c_str ());
 }
 
+//get first attribute value for tag with name if it is present
+const char* get_named_attribute (common::ParseNode node, const char* name, const char* default_value)
+{
+  if (!name)
+    throw xtl::make_null_argument_exception ("social::facebook::get_named_attribute", "name");
+
+  common::ParseNode attribute_node = node.First (name);
+
+  if (attribute_node && attribute_node.AttributesCount ())
+    return attribute_node.Attribute (0);
+
+  return default_value;
+}
+
 }
 
 }

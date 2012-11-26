@@ -99,6 +99,8 @@ void FacebookSessionImpl::PerformRequest (const char* method_name, const char* p
   if (token.empty ())
     throw xtl::format_operation_exception (METHOD_NAME, "Can't perform request when is not logged in");
 
+  CleanupRequestsActions (); //TODO this should be called from other place!!!!!!!!
+
   stl::string url = common::format ("https://graph.facebook.com/me/%s?%s&access_token=%s", method_name, params, token.c_str ());
 
   log.Printf ("Performing request '%s'", url.c_str ());

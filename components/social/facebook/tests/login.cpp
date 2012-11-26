@@ -35,6 +35,35 @@ void dump (const User& user)
   dump (user.Properties ());
 }
 
+void load_friends_callback (const UserList& users, OperationStatus status, const char* error)
+{
+  switch (status)
+  {
+    case social::OperationStatus_Success:
+    {
+      printf ("Load friends succeeded\n");
+
+      printf ("Friends count %d:\n", users.Size ());
+
+      for (size_t i = 0, count = users.Size (); i < count; i++)
+      {
+        printf ("  Friend %u:\n", i);
+        dump (users [i]);
+      }
+
+      break;
+    }
+    case social::OperationStatus_Canceled:
+      printf ("Load friends canceled\n");
+      break;
+    case social::OperationStatus_Failure:
+      printf ("Load friends failed, error '%s'\n", error);
+      break;
+    default:
+      printf ("Load friends status unknown\n");
+  }
+}
+
 void login_callback (social::OperationStatus status, const char* error, social::Session* session)
 {
   switch (status)
@@ -48,6 +77,12 @@ void login_callback (social::OperationStatus status, const char* error, social::
       printf ("Logged in user:\n");
 
       dump (user);
+
+      common::PropertyMap properties;
+
+      properties.SetProperty ("fields", "first_name,last_name");
+
+      session->LoadFriends (user, &load_friends_callback, properties);
 
       break;
     }
@@ -84,6 +119,8 @@ int main ()
 
     social::Session session ("Facebook");
     
+    session.LogOut ();
+
     common::PropertyMap login_properties;
 
     login_properties.SetProperty ("AppId", APP_ID);

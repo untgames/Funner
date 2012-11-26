@@ -149,6 +149,11 @@ class FacebookSessionImpl: public IAchievementManager, public ILeaderboardManage
     void ProcessLoginFail        (const LoginCallback& callback);
     void OnPlatformLogInFinished (bool platform_login_result, OperationStatus status, const char* error, const char* in_token, const User& logged_in_user, const common::PropertyMap& properties, const LoginCallback& callback);
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Обработка ответов запросов
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void OnFriendsInfoLoaded (bool succeeded, const stl::string& status, common::ParseNode response, const LoadFriendsCallback& callback);
+
   private:
     FacebookSessionImpl (const FacebookSessionImpl& source);              //no impl
     FacebookSessionImpl& operator = (const FacebookSessionImpl& source);  //no impl
@@ -177,6 +182,9 @@ stl::string replace_percent_escapes (const char* str);
 
 //return parameter from url, or empty string if not found
 stl::string get_url_parameter (const char* url, const char* param_name);
+
+//get first attribute value for tag with name if it is present
+const char* get_named_attribute (common::ParseNode node, const char* name, const char* default_value);
 
 }
 

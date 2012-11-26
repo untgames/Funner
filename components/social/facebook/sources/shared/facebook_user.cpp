@@ -75,8 +75,72 @@ void FacebookSessionImpl::LoadFriends (const User& user, const LoadFriendsCallba
   if (!IsUserLoggedIn ())
     throw xtl::format_operation_exception (METHOD_NAME, "User is not logged in yet");
 
-  if (!user.Handle ())
-    throw xtl::format_operation_exception (METHOD_NAME, "Can't load friends ids for user without setted handle");
+  if (xtl::xstrcmp (user.Id (), current_user.Id ()))
+    throw xtl::format_operation_exception (METHOD_NAME, "Can't load friends for not current user");
 
-  //TODO
+  static const char* SUPPORTED_PROPERTIES [] = { "fields" };
+
+  CheckUnknownProperties (METHOD_NAME, properties, sizeof (SUPPORTED_PROPERTIES) / sizeof (*SUPPORTED_PROPERTIES), SUPPORTED_PROPERTIES);
+
+  stl::string fields = "id,username";
+
+  if (properties.IsPresent ("fields"))
+  {
+    const char* additional_fields = properties.GetString ("fields");
+
+    if (xtl::xstrlen (additional_fields))
+    {
+      fields.append (",");
+      fields.append (additional_fields);
+    }
+  }
+
+  PerformRequest ("friends", common::format ("limit=9999&fields=%s", fields.c_str ()).c_str (), xtl::bind (&FacebookSessionImpl::OnFriendsInfoLoaded, this, _1, _2, _3, callback));
+}
+
+void FacebookSessionImpl::OnFriendsInfoLoaded (bool succeeded, const stl::string& status, common::ParseNode response, const LoadFriendsCallback& callback)
+{
+  try
+  {
+    log.Printf ("Friends load status '%s'", status.c_str ());
+
+    UserList return_value;
+
+    if (!succeeded)
+    {
+      callback (return_value, OperationStatus_Failure, status.c_str ());
+      return;
+    }
+
+    common::ParseNode data = response.First ("data").First ();
+
+    for (common::ParseNode iter = data.First (); iter; iter = iter.Next ())
+    {
+      User user;
+
+      user.SetFriend (true);
+
+      user.SetId       (iter.First ("id").Attribute (0));
+      user.SetNickname (get_named_attribute (iter, "username", ""));
+
+      const char *first_name = get_named_attribute (iter, "first_name", 0),
+                 *last_name  = get_named_attribute (iter, "last_name", 0);
+
+      common::PropertyMap& properties = user.Properties ();
+
+      if (first_name)
+        properties.SetProperty ("first_name", first_name);
+      if (last_name)
+        properties.SetProperty ("last_name", last_name);
+
+      return_value.Add (user);
+    }
+
+    callback (return_value, OperationStatus_Success, status.c_str ());
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("social::facebook::FacebookSessionImpl::OnFriendsLoaded");
+    throw;
+  }
 }

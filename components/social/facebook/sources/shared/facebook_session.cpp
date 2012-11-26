@@ -118,8 +118,6 @@ void FacebookSessionImpl::OnPlatformLogInFinished (bool platform_login_result, O
 
     CloseDialogWebView ();
 
-  //  LogOut ();  //DEBUG
-
     dialog_web_view_filter_connection     = dialog_web_view.RegisterFilter (xtl::bind (&FacebookSessionImpl::ProcessLoginRequest, this, _2, callback));
     dialog_web_view_load_start_connection = dialog_web_view.RegisterEventHandler (syslib::WebViewEvent_OnLoadStart, xtl::bind (&FacebookSessionImpl::ProcessLoginRequest, this, (const char*)0, callback));
     dialog_web_view_load_fail_connection  = dialog_web_view.RegisterEventHandler (syslib::WebViewEvent_OnLoadFail, xtl::bind (&FacebookSessionImpl::ProcessLoginFail, this, callback));
@@ -247,6 +245,7 @@ void FacebookSessionImpl::CloseSession ()
 
   CloseDialogWebView ();
 
+    //TODO remove this!!!!!
   for (ActionsList::iterator iter = pending_actions.begin (), end = pending_actions.end (); iter != end; ++iter)
     iter->Cancel ();
 

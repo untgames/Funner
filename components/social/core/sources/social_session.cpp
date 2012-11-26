@@ -19,17 +19,17 @@ struct Session::Impl : public xtl::reference_counter
   ISessionManager* manager; //менеджер сессии
 
   Impl (const char* in_name)
-    : manager (0)
   {
     if (!in_name)
       throw xtl::make_null_argument_exception ("social::Session::Session", "session_name");
 
-    name = in_name;
+    name    = in_name;
+    manager = SessionManagerSingleton::Instance ()->CreateSession (name.c_str ());
   }
 
   ~Impl ()
   {
-    CloseSession ();
+    delete manager;
   }
 
   ///Логин
@@ -37,10 +37,8 @@ struct Session::Impl : public xtl::reference_counter
   {
     try
     {
-      if (manager)
+      if (manager->IsUserLoggedIn ())
         throw xtl::format_operation_exception ("", "Already logged in");
-
-      manager = SessionManagerSingleton::Instance ()->CreateSession (name.c_str ());
 
       manager->LogIn (xtl::bind (&Session::Impl::OnLoggedIn, this, _1, _2, callback), config);
     }
@@ -53,32 +51,12 @@ struct Session::Impl : public xtl::reference_counter
 
   void OnLoggedIn (OperationStatus status, const char* error, const LoginCallback& callback)
   {
-    if (status == OperationStatus_Canceled || status == OperationStatus_Failure)
-      CloseSession ();
-
     callback (status, error);
-  }
-
-  void CloseSession ()
-  {
-    delete manager;
-
-    manager = 0;
   }
 
   void LogOut ()
   {
-    if (!manager)
-      return;
-
     manager->LogOut ();
-
-    CloseSession ();
-  }
-
-  bool IsUserLoggedIn ()
-  {
-    return manager && manager->IsUserLoggedIn ();
   }
 
   ///Показ стандартных окон
@@ -89,7 +67,7 @@ struct Session::Impl : public xtl::reference_counter
       if (!window_name)
         throw xtl::make_null_argument_exception ("", "window_name");
 
-      if (!manager)
+      if (!manager->IsUserLoggedIn ())
         throw xtl::format_operation_exception ("", "Not logged in");
 
       manager->ShowWindow (window_name, properties);
@@ -106,7 +84,7 @@ struct Session::Impl : public xtl::reference_counter
   {
     try
     {
-      if (!IsUserLoggedIn ())
+      if (!manager->IsUserLoggedIn ())
         throw xtl::format_operation_exception ("", "User not logged in");
 
       return manager->CurrentUser ();
@@ -120,7 +98,7 @@ struct Session::Impl : public xtl::reference_counter
 
   IUserManager* GetUserManager ()
   {
-    if (!manager)
+    if (!manager->IsUserLoggedIn ())
       throw xtl::format_operation_exception ("", "Not logged in");
 
     IUserManager* user_manager = dynamic_cast<IUserManager*> (manager);
@@ -189,7 +167,7 @@ struct Session::Impl : public xtl::reference_counter
   ///Достижения
   IAchievementManager* GetAchievementManager ()
   {
-    if (!manager)
+    if (!manager->IsUserLoggedIn ())
       throw xtl::format_operation_exception ("", "Not logged in");
 
     IAchievementManager* achievement_manager = dynamic_cast<IAchievementManager*> (manager);
@@ -242,7 +220,7 @@ struct Session::Impl : public xtl::reference_counter
   ///Таблицы рекордов
   ILeaderboardManager* GetLeaderboardManager ()
   {
-    if (!manager)
+    if (!manager->IsUserLoggedIn ())
       throw xtl::format_operation_exception ("", "Not logged in");
 
     ILeaderboardManager* leaderboard_manager = dynamic_cast<ILeaderboardManager*> (manager);
@@ -360,7 +338,7 @@ void Session::LogOut ()
 
 bool Session::IsUserLoggedIn () const
 {
-  return impl->IsUserLoggedIn ();
+  return impl->manager->IsUserLoggedIn ();
 }
 
 /*
