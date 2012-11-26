@@ -19,7 +19,9 @@ FacebookSessionImpl::FacebookSessionImpl ()
   : log (LOG_NAME)
   , logged_in (false)
   , dialog_web_view_active (false)
-  {}
+{
+  on_activate_connection = syslib::Application::RegisterEventHandler (syslib::ApplicationEvent_OnResume, xtl::bind (&FacebookSessionImpl::OnActivate, this));
+}
 
 FacebookSessionImpl::~FacebookSessionImpl ()
 {
@@ -61,45 +63,78 @@ void FacebookSessionImpl::ShowWindow (const char* window_name, const common::Pro
 
 void FacebookSessionImpl::LogIn (const LoginCallback& callback, const common::PropertyMap& properties)
 {
-  static const char* METHOD_NAME = "social::facebook::FacebookSessionImpl::LogIn";
+  try
+  {
+    //TODO check that we are already logged in
+    //TODO refresh access token
 
-  static const char* LOGIN_PROPERTIES [] = { "AppId" };
+    const char* app_id = properties.GetString ("AppId");
 
-  FacebookSessionImpl::CheckUnknownProperties (METHOD_NAME, properties, sizeof (LOGIN_PROPERTIES) / sizeof (*LOGIN_PROPERTIES), LOGIN_PROPERTIES);
+    Platform::Login (app_id, xtl::bind (&FacebookSessionImpl::OnPlatformLogInFinished, this, _1, _2, _3, _4, _5, properties, callback), properties);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("social::facebook::FacebookSessionImpl::LogIn");
+    throw;
+  }
+}
 
-  //TODO check that we are already logged in
-  //TODO refresh access token
+void FacebookSessionImpl::OnPlatformLogInFinished (bool platform_login_result, OperationStatus status, const char* error, const char* in_token, const User& logged_in_user, const common::PropertyMap& properties, const LoginCallback& callback)
+{
+  try
+  {
+    //TODO check that we are already logged in
+    //TODO refresh access token
 
-  const char* app_id = properties.GetString ("AppId");
-
-  stl::string url = common::format ("https://m.facebook.com/dialog/oauth?client_id=%s&redirect_uri=https://www.facebook.com/connect/login_success.html&display=touch&response_type=token", app_id);
-
-  /*
-      //TODO permissions
-      if (permissions != nil) {
-          NSString* scope = [permissions componentsJoinedByString:@","];
-          [params setValue:scope forKey:@"scope"];
+    if (platform_login_result)
+    {
+      if (status == OperationStatus_Success)
+      {
+        logged_in    = true;
+        token        = in_token;
+        current_user = logged_in_user;
       }
 
-      //TODO urlSchemeSuffix
-      if (_urlSchemeSuffix) {
-          [params setValue:_urlSchemeSuffix forKey:@"local_client_id"];
-      }
-  */
+      callback (status, error);
+      return;
+    }
 
-  CloseDialogWebView ();
+    const char* app_id = properties.GetString ("AppId");
 
-//  LogOut ();  //DEBUG
+    stl::string url = common::format ("https://m.facebook.com/dialog/oauth?client_id=%s&redirect_uri=https://www.facebook.com/connect/login_success.html&display=touch&response_type=token", app_id);
 
-  dialog_web_view_filter_connection     = dialog_web_view.RegisterFilter (xtl::bind (&FacebookSessionImpl::ProcessLoginRequest, this, _2, callback));
-  dialog_web_view_load_start_connection = dialog_web_view.RegisterEventHandler (syslib::WebViewEvent_OnLoadStart, xtl::bind (&FacebookSessionImpl::ProcessLoginRequest, this, (const char*)0, callback));
-  dialog_web_view_load_fail_connection  = dialog_web_view.RegisterEventHandler (syslib::WebViewEvent_OnLoadFail, xtl::bind (&FacebookSessionImpl::ProcessLoginFail, this, callback));
+    /*
+        //TODO permissions
+        if (permissions != nil) {
+            NSString* scope = [permissions componentsJoinedByString:@","];
+            [params setValue:scope forKey:@"scope"];
+        }
 
-  dialog_web_view.LoadRequest (url.c_str ());
+        //TODO urlSchemeSuffix
+        if (_urlSchemeSuffix) {
+            [params setValue:_urlSchemeSuffix forKey:@"local_client_id"];
+        }
+    */
 
-  dialog_web_view_active = true;
+    CloseDialogWebView ();
 
-  OnActivate ();
+  //  LogOut ();  //DEBUG
+
+    dialog_web_view_filter_connection     = dialog_web_view.RegisterFilter (xtl::bind (&FacebookSessionImpl::ProcessLoginRequest, this, _2, callback));
+    dialog_web_view_load_start_connection = dialog_web_view.RegisterEventHandler (syslib::WebViewEvent_OnLoadStart, xtl::bind (&FacebookSessionImpl::ProcessLoginRequest, this, (const char*)0, callback));
+    dialog_web_view_load_fail_connection  = dialog_web_view.RegisterEventHandler (syslib::WebViewEvent_OnLoadFail, xtl::bind (&FacebookSessionImpl::ProcessLoginFail, this, callback));
+
+    dialog_web_view.LoadRequest (url.c_str ());
+
+    dialog_web_view_active = true;
+
+    OnActivate ();
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("social::facebook::FacebookSessionImpl::OnPlatformLogInFinished");
+    throw;
+  }
 }
 
 /*
@@ -169,7 +204,8 @@ void FacebookSessionImpl::OnUserInfoLoaded (bool succeeded, const stl::string& s
     return;
   }
 
-  //TODO fill current user info
+  current_user.SetId (response.First ("id").Attribute (0));
+  current_user.SetNickname (response.First ("username").Attribute (0));
 
   logged_in = true;
 
@@ -207,6 +243,8 @@ bool FacebookSessionImpl::IsUserLoggedIn ()
 
 void FacebookSessionImpl::CloseSession ()
 {
+  Platform::CancelLogin ();
+
   CloseDialogWebView ();
 
   for (ActionsList::iterator iter = pending_actions.begin (), end = pending_actions.end (); iter != end; ++iter)
@@ -276,8 +314,6 @@ void FacebookSessionImpl::CheckUnknownProperties (const char* source, const comm
 
 void FacebookSessionImpl::OnActivate ()
 {
-  //TODO who will call this method?????
-
   if (!dialog_web_view_active)
     return;
 

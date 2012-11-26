@@ -12,56 +12,29 @@ void FacebookSessionImpl::PerformRequestImpl (common::Action& action, const stl:
 {
   try
   {
-    printf ("OPENING FILE\n");
-    fflush (stdout);
-
     common::StdFile input_file (url.c_str (), common::FileMode_Read);
-
-    printf ("FILE OPENED\n");
-    fflush (stdout);
-
-    printf ("FILE SIZE = %d\n", input_file.Size ());
-    fflush (stdout);
 
     xtl::uninitialized_storage<char> buffer (input_file.Size () + 1);
 
     size_t bytes_copied = 0;
 
-    printf ("START COPIING\n");
-    fflush (stdout);
-
     while (!input_file.Eof ())
     {
-      printf ("1 Bytes copied = %d\n", bytes_copied);
-      fflush (stdout);
       if (action.IsCanceled ())
         return;
 
-      printf ("2 Bytes copied = %d\n", bytes_copied);
-      fflush (stdout);
       size_t read_size = input_file.Read (buffer.data () + bytes_copied, buffer.size () - bytes_copied);
 
-      printf ("3 Bytes copied = %d\n", bytes_copied);
-      fflush (stdout);
       if (!read_size)
         break;
 
       bytes_copied += read_size;
-      printf ("4Bytes copied = %d\n", bytes_copied);
-      fflush (stdout);
     }
 
-    printf ("5Bytes copied = %d\n", bytes_copied);
-    fflush (stdout);
     if (!input_file.Eof ())
       throw xtl::format_operation_exception ("", "Internal error: can't read input file");
 
-    printf ("6 Bytes copied = %d\n", bytes_copied);
-    fflush (stdout);
     buffer.data () [bytes_copied] = 0;
-
-    printf ("Bytes copied = %d\n", bytes_copied);
-    fflush (stdout);
 
     log.Printf ("Response received: '%s'", buffer.data ());
 
@@ -126,11 +99,20 @@ void FacebookSessionImpl::PerformRequest (const char* method_name, const char* p
   if (token.empty ())
     throw xtl::format_operation_exception (METHOD_NAME, "Can't perform request when is not logged in");
 
-  //cleanup pending actions ???? can we do it here ????
+  stl::string url = common::format ("https://graph.facebook.com/me/%s?%s&access_token=%s", method_name, params, token.c_str ());
+
+  log.Printf ("Performing request '%s'", url.c_str ());
+
+  pending_actions.push_back (common::ActionQueue::PushAction (xtl::bind (&FacebookSessionImpl::PerformRequestImpl, _1, url, callback, log), common::ActionThread_Background));
+}
+
+void FacebookSessionImpl::CleanupRequestsActions ()
+{
+  //Where should we call this
 
   for (ActionsList::iterator iter = pending_actions.begin (), end = pending_actions.end (); iter != end;)
   {
-    if (iter->IsCompleted ())
+    if (iter->IsCompleted () || iter->IsCanceled ())
     {
       ActionsList::iterator next = iter;
 
@@ -143,10 +125,4 @@ void FacebookSessionImpl::PerformRequest (const char* method_name, const char* p
     else
       ++iter;
   }
-
-  stl::string url = common::format ("https://graph.facebook.com/me/%s?%s?access_token=%s", method_name, params, token.c_str ());
-
-  log.Printf ("Performing request '%s'", url.c_str ());
-
-  pending_actions.push_back (common::ActionQueue::PushAction (xtl::bind (&FacebookSessionImpl::PerformRequestImpl, _1, url, callback, log), common::ActionThread_Background));
 }

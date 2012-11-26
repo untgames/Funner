@@ -23,6 +23,8 @@
 
 #include <social/session.h>
 
+#include <shared/platform.h>
+
 namespace social
 {
 
@@ -123,7 +125,8 @@ class FacebookSessionImpl: public IAchievementManager, public ILeaderboardManage
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     typedef xtl::function<void (bool succeeded, const stl::string& status, common::ParseNode response)> RequestCallback;
 
-    void PerformRequest (const char* method_name, const char* params, const RequestCallback& callback);
+    void PerformRequest         (const char* method_name, const char* params, const RequestCallback& callback);
+    void CleanupRequestsActions ();
 
     static void PerformRequestNotify (const RequestCallback& callback, bool succeeded, const char* status, const common::ParseNode& response);
     static void PerformRequestImpl   (common::Action& action, const stl::string& url, const RequestCallback& callback, common::Log log);
@@ -141,9 +144,10 @@ class FacebookSessionImpl: public IAchievementManager, public ILeaderboardManage
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Обработка событий логина
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void OnUserInfoLoaded    (bool succeeded, const stl::string& status, common::ParseNode response, const LoginCallback& callback);
-    bool ProcessLoginRequest (const char* request, const LoginCallback& callback);
-    void ProcessLoginFail    (const LoginCallback& callback);
+    void OnUserInfoLoaded        (bool succeeded, const stl::string& status, common::ParseNode response, const LoginCallback& callback);
+    bool ProcessLoginRequest     (const char* request, const LoginCallback& callback);
+    void ProcessLoginFail        (const LoginCallback& callback);
+    void OnPlatformLogInFinished (bool platform_login_result, OperationStatus status, const char* error, const char* in_token, const User& logged_in_user, const common::PropertyMap& properties, const LoginCallback& callback);
 
   private:
     FacebookSessionImpl (const FacebookSessionImpl& source);              //no impl

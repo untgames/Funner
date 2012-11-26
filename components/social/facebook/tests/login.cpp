@@ -1,5 +1,7 @@
 #include "shared.h"
 
+using namespace social;
+
 const char* APP_ID = "271022146306708";
 
 void log_print (const char* stream, const char* message)
@@ -8,24 +10,62 @@ void log_print (const char* stream, const char* message)
   fflush (stdout);
 }
 
-void login_callback (social::OperationStatus status, const char* error)
+void dump (const common::PropertyMap& properties)
+{
+  printf ("    map has %u properties (hash=%08x, layout_hash=%08x):\n",
+    properties.Size (), properties.Hash (), properties.LayoutHash ());
+
+  for (size_t i=0, count=properties.Size (); i<count; i++)
+  {
+    stl::string value;
+
+    properties.GetProperty (i, value);
+
+    printf ("     #%u: name='%s', type=%s, value='%s'\n", i, properties.PropertyName (i), get_name (properties.PropertyType (i)), value.c_str ());
+  }
+}
+
+void dump (const User& user)
+{
+  printf ("  id        '%s'\n", user.Id ());
+  printf ("  nickname  '%s'\n", user.Nickname ());
+  printf ("  is friend %c\n", user.IsFriend () ? 'y' : 'n');
+  printf ("  handle    %d\n",   user.Handle ());
+  printf ("  properties:\n");
+  dump (user.Properties ());
+}
+
+void login_callback (social::OperationStatus status, const char* error, social::Session* session)
 {
   switch (status)
   {
     case social::OperationStatus_Success:
+    {
       printf ("Login succeeded\n");
+
+      const social::User& user = session->CurrentUser ();
+
+      printf ("Logged in user:\n");
+
+      dump (user);
+
       break;
+    }
     case social::OperationStatus_Canceled:
       printf ("Login canceled\n");
+
+      syslib::Application::Exit (0);
       break;
     case social::OperationStatus_Failure:
       printf ("Login failed, error '%s'\n", error);
+
+      syslib::Application::Exit (0);
       break;
     default:
       printf ("Login status unknown\n");
-  }
 
-  syslib::Application::Exit (0);
+      syslib::Application::Exit (0);
+  }
 }
 
 int main ()
@@ -48,7 +88,7 @@ int main ()
 
     login_properties.SetProperty ("AppId", APP_ID);
 
-    session.LogIn (&login_callback, login_properties);
+    session.LogIn (xtl::bind (&login_callback, _1, _2, &session), login_properties);
 
     syslib::Application::Run ();
   }
