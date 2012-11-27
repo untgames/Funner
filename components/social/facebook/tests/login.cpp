@@ -64,10 +64,20 @@ void load_friends_callback (const UserList& users, OperationStatus status, const
   }
 }
 
-void load_user_callback (const User& user, OperationStatus status, const char* error)
+void load_user_callback (const User& user, OperationStatus status, const char* error, social::Session* session)
 {
   printf ("User details loaded:\n");
   dump (user);
+
+  common::PropertyMap apprequest_properties;
+
+  apprequest_properties.SetProperty ("message", "Join me!");
+
+  session->ShowWindow ("apprequests", apprequest_properties);
+
+  //      common::PropertyMap wall_post_properties;
+
+  //      session->ShowWindow ("WallPost", wall_post_properties);
 }
 
 void login_callback (social::OperationStatus status, const char* error, social::Session* session)
@@ -84,15 +94,17 @@ void login_callback (social::OperationStatus status, const char* error, social::
 
       dump (user);
 
-      common::PropertyMap properties;
+      common::PropertyMap friends_properties;
 
-      properties.SetProperty ("Fields", "first_name,last_name");
+      friends_properties.SetProperty ("Fields", "first_name,last_name");
 
-      session->LoadFriends (user, &load_friends_callback, properties);
+      session->LoadFriends (user, &load_friends_callback, friends_properties);
 
-      properties.SetProperty ("Fields", "first_name,last_name,picture,birthday,gender");
+      common::PropertyMap info_properties;
 
-      session->LoadUser (user.Id (), &load_user_callback, properties);
+      info_properties.SetProperty ("Fields", "first_name,last_name,picture,birthday,gender");
+
+      session->LoadUser (user.Id (), xtl::bind (&load_user_callback, _1, _2, _3, session), info_properties);
 
       break;
     }

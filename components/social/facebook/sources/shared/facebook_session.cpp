@@ -47,8 +47,36 @@ void FacebookSessionImpl::ShowWindow (const char* window_name, const common::Pro
 
   try
   {
+    if (!IsUserLoggedIn ())
+      throw xtl::format_operation_exception ("", "Can't show window before log in");
+
+    if (dialog_web_view_active)
+      throw xtl::format_operation_exception ("", "Another window already shown");
+
     if (!window_name)
       throw xtl::make_null_argument_exception ("", "window_name");
+
+    stl::string url = common::format ("https://m.facebook.com/dialog/%s?app_id=%s&display=touch&redirect_uri=fbconnect://success&access_token=%s", window_name, app_id.c_str (), token.c_str ());
+
+    if (properties.Size ())
+    {
+      stl::string params;
+
+      for (size_t i = 0, count = properties.Size (); i < count; i++)
+        params += common::format ("&%s=%s", properties.PropertyName (i), properties.GetString (i));
+
+      url += params;
+    }
+
+    CloseDialogWebView ();
+
+    log.Printf ("Show dialog '%s'", url.c_str ());
+
+    dialog_web_view.LoadRequest (url.c_str ());
+
+    dialog_web_view_active = true;
+
+    OnActivate ();
   }
   catch (xtl::exception& e)
   {
@@ -68,9 +96,9 @@ void FacebookSessionImpl::LogIn (const LoginCallback& callback, const common::Pr
     //TODO check that we are already logged in
     //TODO refresh access token
 
-    const char* app_id = properties.GetString ("AppId");
+    app_id = properties.GetString ("AppId");
 
-    Platform::Login (app_id, xtl::bind (&FacebookSessionImpl::OnPlatformLogInFinished, this, _1, _2, _3, _4, _5, properties, callback), properties);
+    Platform::Login (app_id.c_str (), xtl::bind (&FacebookSessionImpl::OnPlatformLogInFinished, this, _1, _2, _3, _4, _5, properties, callback), properties);
   }
   catch (xtl::exception& e)
   {
@@ -99,9 +127,7 @@ void FacebookSessionImpl::OnPlatformLogInFinished (bool platform_login_result, O
       return;
     }
 
-    const char* app_id = properties.GetString ("AppId");
-
-    stl::string url = common::format ("https://m.facebook.com/dialog/oauth?client_id=%s&redirect_uri=https://www.facebook.com/connect/login_success.html&display=touch&response_type=token", app_id);
+    stl::string url = common::format ("https://m.facebook.com/dialog/oauth?client_id=%s&redirect_uri=https://www.facebook.com/connect/login_success.html&display=touch&response_type=token", app_id.c_str ());
 
     if (properties.IsPresent ("Permissions"))
       url.append (common::format ("&scope=%s", properties.GetString ("Permissions")));
@@ -210,6 +236,8 @@ void FacebookSessionImpl::ProcessLoginFail (const LoginCallback& callback)
 
   CloseDialogWebView ();
 
+  app_id.clear ();
+
   callback (OperationStatus_Failure, "Can't load login page");
 }
 
@@ -218,10 +246,6 @@ void FacebookSessionImpl::LogOut ()
   CloseSession ();
 
   syslib::CookieManager::DeleteAllCookies ();
-
-  logged_in = false;
-
-  token.clear ();
 }
 
 bool FacebookSessionImpl::IsUserLoggedIn ()
@@ -264,6 +288,11 @@ void FacebookSessionImpl::CloseSession ()
   }
 
   pending_actions.clear ();
+
+  logged_in = false;
+
+  app_id.clear ();
+  token.clear ();
 }
 
 /*

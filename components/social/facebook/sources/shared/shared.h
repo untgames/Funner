@@ -164,6 +164,7 @@ class FacebookSessionImpl: public IAchievementManager, public ILeaderboardManage
 
   private:
     common::Log          log;
+    stl::string          app_id;
     stl::string          token;
     bool                 logged_in;
     User                 current_user;
