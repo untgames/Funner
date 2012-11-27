@@ -175,7 +175,7 @@ bool FacebookSessionImpl::ProcessLoginRequest (const char* request, const LoginC
       {
         log.Printf ("Logged in");
 
-        PerformRequest ("", "fields=id,username", xtl::bind (&FacebookSessionImpl::OnUserInfoLoaded, this, _1, _2, _3, callback));
+        PerformRequest ("me/", "fields=id,username", xtl::bind (&FacebookSessionImpl::OnCurrentUserInfoLoaded, this, _1, _2, _3, callback));
       }
 
       return false;
@@ -192,7 +192,7 @@ bool FacebookSessionImpl::ProcessLoginRequest (const char* request, const LoginC
   return true;
 }
 
-void FacebookSessionImpl::OnUserInfoLoaded (bool succeeded, const stl::string& status, common::ParseNode response, const LoginCallback& callback)
+void FacebookSessionImpl::OnCurrentUserInfoLoaded (bool succeeded, const stl::string& status, common::ParseNode response, const LoginCallback& callback)
 {
   log.Printf ("User info load status '%s'", status.c_str ());
 
@@ -202,8 +202,7 @@ void FacebookSessionImpl::OnUserInfoLoaded (bool succeeded, const stl::string& s
     return;
   }
 
-  current_user.SetId (response.First ("id").Attribute (0));
-  current_user.SetNickname (response.First ("username").Attribute (0));
+  current_user = parse_user (response);
 
   logged_in = true;
 

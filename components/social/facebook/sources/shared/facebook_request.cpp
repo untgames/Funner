@@ -101,7 +101,7 @@ void FacebookSessionImpl::PerformRequest (const char* method_name, const char* p
 
   CleanupRequestsActions (); //TODO this should be called from other place!!!!!!!!
 
-  stl::string url = common::format ("https://graph.facebook.com/me/%s?%s&access_token=%s", method_name, params, token.c_str ());
+  stl::string url = common::format ("https://graph.facebook.com/%s?%s&access_token=%s", method_name, params, token.c_str ());
 
   log.Printf ("Performing request '%s'", url.c_str ());
 

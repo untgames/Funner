@@ -107,7 +107,7 @@ void Collection<Item>::Reserve (size_t count)
 */
 
 template <class Item>
-size_t Collection<Item>::Add (Item& item)
+size_t Collection<Item>::Add (const Item& item)
 {
   impl->items.push_back (item);
 

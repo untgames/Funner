@@ -64,6 +64,12 @@ void load_friends_callback (const UserList& users, OperationStatus status, const
   }
 }
 
+void load_user_callback (const User& user, OperationStatus status, const char* error)
+{
+  printf ("User details loaded:\n");
+  dump (user);
+}
+
 void login_callback (social::OperationStatus status, const char* error, social::Session* session)
 {
   switch (status)
@@ -80,9 +86,13 @@ void login_callback (social::OperationStatus status, const char* error, social::
 
       common::PropertyMap properties;
 
-      properties.SetProperty ("fields", "first_name,last_name");
+      properties.SetProperty ("Fields", "first_name,last_name");
 
       session->LoadFriends (user, &load_friends_callback, properties);
+
+      properties.SetProperty ("Fields", "first_name,last_name,picture,birthday,gender");
+
+      session->LoadUser (user.Id (), &load_user_callback, properties);
 
       break;
     }
@@ -119,7 +129,7 @@ int main ()
 
     social::Session session ("Facebook");
     
-    session.LogOut ();
+//    session.LogOut ();
 
     common::PropertyMap login_properties;
 

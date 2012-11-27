@@ -29,9 +29,49 @@ void FacebookSessionImpl::LoadUser (const char* user_id, const LoadUserCallback&
   if (!user_id)
     throw xtl::make_null_argument_exception (METHOD_NAME, "id");
 
-  CheckUnknownProperties (METHOD_NAME, properties, 0, 0);
+  static const char* SUPPORTED_PROPERTIES [] = { "Fields" };
 
-  //TODO
+  CheckUnknownProperties (METHOD_NAME, properties, sizeof (SUPPORTED_PROPERTIES) / sizeof (*SUPPORTED_PROPERTIES), SUPPORTED_PROPERTIES);
+
+  stl::string fields = "id,username";
+
+  if (properties.IsPresent ("Fields"))
+  {
+    const char* additional_fields = properties.GetString ("Fields");
+
+    if (xtl::xstrlen (additional_fields))
+    {
+      fields.append (",");
+      fields.append (additional_fields);
+    }
+  }
+
+  PerformRequest (user_id, common::format ("fields=%s", fields.c_str ()).c_str (), xtl::bind (&FacebookSessionImpl::OnUserInfoLoaded, this, _1, _2, _3, callback));
+}
+
+void FacebookSessionImpl::OnUserInfoLoaded (bool succeeded, const stl::string& status, common::ParseNode response, const LoadUserCallback& callback)
+{
+  try
+  {
+    log.Printf ("User info load status '%s'", status.c_str ());
+
+    User return_value;
+
+    if (!succeeded)
+    {
+      callback (return_value, OperationStatus_Failure, status.c_str ());
+      return;
+    }
+
+    return_value = parse_user (response);
+
+    callback (return_value, OperationStatus_Success, status.c_str ());
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("social::facebook::FacebookSessionImpl::OnFriendsLoaded");
+    throw;
+  }
 }
 
 /*
@@ -78,15 +118,15 @@ void FacebookSessionImpl::LoadFriends (const User& user, const LoadFriendsCallba
   if (xtl::xstrcmp (user.Id (), current_user.Id ()))
     throw xtl::format_operation_exception (METHOD_NAME, "Can't load friends for not current user");
 
-  static const char* SUPPORTED_PROPERTIES [] = { "fields" };
+  static const char* SUPPORTED_PROPERTIES [] = { "Fields" };
 
   CheckUnknownProperties (METHOD_NAME, properties, sizeof (SUPPORTED_PROPERTIES) / sizeof (*SUPPORTED_PROPERTIES), SUPPORTED_PROPERTIES);
 
   stl::string fields = "id,username";
 
-  if (properties.IsPresent ("fields"))
+  if (properties.IsPresent ("Fields"))
   {
-    const char* additional_fields = properties.GetString ("fields");
+    const char* additional_fields = properties.GetString ("Fields");
 
     if (xtl::xstrlen (additional_fields))
     {
@@ -95,7 +135,7 @@ void FacebookSessionImpl::LoadFriends (const User& user, const LoadFriendsCallba
     }
   }
 
-  PerformRequest ("friends", common::format ("limit=9999&fields=%s", fields.c_str ()).c_str (), xtl::bind (&FacebookSessionImpl::OnFriendsInfoLoaded, this, _1, _2, _3, callback));
+  PerformRequest ("me/friends", common::format ("limit=9999&fields=%s", fields.c_str ()).c_str (), xtl::bind (&FacebookSessionImpl::OnFriendsInfoLoaded, this, _1, _2, _3, callback));
 }
 
 void FacebookSessionImpl::OnFriendsInfoLoaded (bool succeeded, const stl::string& status, common::ParseNode response, const LoadFriendsCallback& callback)
@@ -115,26 +155,7 @@ void FacebookSessionImpl::OnFriendsInfoLoaded (bool succeeded, const stl::string
     common::ParseNode data = response.First ("data").First ();
 
     for (common::ParseNode iter = data.First (); iter; iter = iter.Next ())
-    {
-      User user;
-
-      user.SetFriend (true);
-
-      user.SetId       (iter.First ("id").Attribute (0));
-      user.SetNickname (get_named_attribute (iter, "username", ""));
-
-      const char *first_name = get_named_attribute (iter, "first_name", 0),
-                 *last_name  = get_named_attribute (iter, "last_name", 0);
-
-      common::PropertyMap& properties = user.Properties ();
-
-      if (first_name)
-        properties.SetProperty ("first_name", first_name);
-      if (last_name)
-        properties.SetProperty ("last_name", last_name);
-
-      return_value.Add (user);
-    }
+      return_value.Add (parse_user (iter));
 
     callback (return_value, OperationStatus_Success, status.c_str ());
   }

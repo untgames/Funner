@@ -88,6 +88,35 @@ const char* get_named_attribute (common::ParseNode node, const char* name, const
   return default_value;
 }
 
+//parse user
+User parse_user (common::ParseNode node)
+{
+  User return_value;
+
+  return_value.SetId       (node.First ("id").Attribute (0));
+  return_value.SetNickname (get_named_attribute (node, "username", ""));
+
+  const char *first_name = get_named_attribute (node, "first_name", 0),
+             *last_name  = get_named_attribute (node, "last_name", 0),
+             *gender     = get_named_attribute (node, "gender", 0);
+
+  common::PropertyMap& properties = return_value.Properties ();
+
+  if (first_name)
+    properties.SetProperty ("first_name", first_name);
+  if (last_name)
+    properties.SetProperty ("last_name", last_name);
+  if (gender)
+    properties.SetProperty ("gender", gender);
+
+  common::ParseNode picture = node.First ("picture..data..url");
+
+  if (picture && picture.AttributesCount ())
+    properties.SetProperty ("picture", picture.Attribute (0));
+
+  return return_value;
+}
+
 }
 
 }
