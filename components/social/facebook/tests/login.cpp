@@ -134,6 +134,7 @@ int main ()
     common::PropertyMap login_properties;
 
     login_properties.SetProperty ("AppId", APP_ID);
+    login_properties.SetProperty ("Permissions", "user_birthday");
 
     session.LogIn (xtl::bind (&login_callback, _1, _2, &session), login_properties);
 

@@ -103,18 +103,13 @@ void FacebookSessionImpl::OnPlatformLogInFinished (bool platform_login_result, O
 
     stl::string url = common::format ("https://m.facebook.com/dialog/oauth?client_id=%s&redirect_uri=https://www.facebook.com/connect/login_success.html&display=touch&response_type=token", app_id);
 
-    /*
-        //TODO permissions
-        if (permissions != nil) {
-            NSString* scope = [permissions componentsJoinedByString:@","];
-            [params setValue:scope forKey:@"scope"];
-        }
+    if (properties.IsPresent ("Permissions"))
+      url.append (common::format ("&scope=%s", properties.GetString ("Permissions")));
 
-        //TODO urlSchemeSuffix
-        if (_urlSchemeSuffix) {
-            [params setValue:_urlSchemeSuffix forKey:@"local_client_id"];
-        }
-    */
+/*    //TODO urlSchemeSuffix
+    if (_urlSchemeSuffix) {
+        [params setValue:_urlSchemeSuffix forKey:@"local_client_id"];
+    }*/
 
     CloseDialogWebView ();
 

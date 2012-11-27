@@ -98,7 +98,8 @@ User parse_user (common::ParseNode node)
 
   const char *first_name = get_named_attribute (node, "first_name", 0),
              *last_name  = get_named_attribute (node, "last_name", 0),
-             *gender     = get_named_attribute (node, "gender", 0);
+             *gender     = get_named_attribute (node, "gender", 0),
+             *birthday   = get_named_attribute (node, "birthday", 0);
 
   common::PropertyMap& properties = return_value.Properties ();
 
@@ -108,6 +109,8 @@ User parse_user (common::ParseNode node)
     properties.SetProperty ("last_name", last_name);
   if (gender)
     properties.SetProperty ("gender", gender);
+  if (birthday)
+    properties.SetProperty ("birthday", birthday);
 
   common::ParseNode picture = node.First ("picture..data..url");
 
