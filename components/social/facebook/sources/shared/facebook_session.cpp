@@ -68,9 +68,15 @@ void FacebookSessionImpl::ShowWindow (const char* window_name, const common::Pro
       url += params;
     }
 
+    url = percent_escape (url.c_str ());
+
     CloseDialogWebView ();
 
     log.Printf ("Show dialog '%s'", url.c_str ());
+
+    dialog_web_view_filter_connection     = dialog_web_view.RegisterFilter (xtl::bind (&FacebookSessionImpl::ProcessDialogRequest, this, _2));
+    dialog_web_view_load_start_connection = dialog_web_view.RegisterEventHandler (syslib::WebViewEvent_OnLoadStart, xtl::bind (&FacebookSessionImpl::ProcessDialogRequest, this, (const char*)0));
+    dialog_web_view_load_fail_connection  = dialog_web_view.RegisterEventHandler (syslib::WebViewEvent_OnLoadFail, xtl::bind (&FacebookSessionImpl::ProcessDialogFail, this));
 
     dialog_web_view.LoadRequest (url.c_str ());
 
@@ -83,6 +89,38 @@ void FacebookSessionImpl::ShowWindow (const char* window_name, const common::Pro
     e.touch (METHOD_NAME);
     throw;
   }
+}
+
+/*
+   Обработка событий диалогов
+*/
+
+bool FacebookSessionImpl::ProcessDialogRequest (const char* request)
+{
+  if (!request)
+    request = dialog_web_view.Request ();
+
+  if (request)
+  {
+    log.Printf ("Dialog load request '%s'", request);
+
+    if (!strstr (request, "?"))
+    {
+      CloseDialogWebView ();
+      return false;
+    }
+  }
+  else
+    log.Printf ("Dialog load request");
+
+  return true;
+}
+
+void FacebookSessionImpl::ProcessDialogFail ()
+{
+  log.Printf ("Dialog load failed\n");
+
+  CloseDialogWebView ();
 }
 
 /*

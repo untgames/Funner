@@ -155,6 +155,12 @@ class FacebookSessionImpl: public IAchievementManager, public ILeaderboardManage
     void OnFriendsInfoLoaded (bool succeeded, const stl::string& status, common::ParseNode response, const LoadFriendsCallback& callback);
     void OnUserInfoLoaded    (bool succeeded, const stl::string& status, common::ParseNode response, const LoadUserCallback& callback);
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Обработка событий диалогов
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    bool ProcessDialogRequest (const char* request);
+    void ProcessDialogFail    ();
+
   private:
     FacebookSessionImpl (const FacebookSessionImpl& source);              //no impl
     FacebookSessionImpl& operator = (const FacebookSessionImpl& source);  //no impl
@@ -181,6 +187,9 @@ class FacebookSessionImpl: public IAchievementManager, public ILeaderboardManage
 
 //replace percent escapes using utf-8 encoding
 stl::string replace_percent_escapes (const char* str);
+
+//make percent escaped string using utf-8 encoding
+stl::string percent_escape (const char* str);
 
 //return parameter from url, or empty string if not found
 stl::string get_url_parameter (const char* url, const char* param_name);

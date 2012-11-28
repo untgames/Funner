@@ -103,6 +103,8 @@ void FacebookSessionImpl::PerformRequest (const char* method_name, const char* p
 
   stl::string url = common::format ("https://graph.facebook.com/%s?%s&access_token=%s", method_name, params, token.c_str ());
 
+  url = percent_escape (url.c_str ());
+
   log.Printf ("Performing request '%s'", url.c_str ());
 
   pending_actions.push_back (common::ActionQueue::PushAction (xtl::bind (&FacebookSessionImpl::PerformRequestImpl, _1, url, callback, log), common::ActionThread_Background));

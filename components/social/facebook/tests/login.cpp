@@ -2,7 +2,7 @@
 
 using namespace social;
 
-const char* APP_ID = "271022146306708";
+const char* APP_ID = "357943580965557";
 
 void log_print (const char* stream, const char* message)
 {
@@ -69,15 +69,17 @@ void load_user_callback (const User& user, OperationStatus status, const char* e
   printf ("User details loaded:\n");
   dump (user);
 
-  common::PropertyMap apprequest_properties;
+/*  common::PropertyMap apprequest_properties;
 
   apprequest_properties.SetProperty ("message", "Join me!");
 
-  session->ShowWindow ("apprequests", apprequest_properties);
+  session->ShowWindow ("apprequests", apprequest_properties);*/
 
-  //      common::PropertyMap wall_post_properties;
+  common::PropertyMap wall_post_properties;
 
-  //      session->ShowWindow ("WallPost", wall_post_properties);
+//  wall_post_properties.SetProperty ();
+
+  session->ShowWindow ("feed", wall_post_properties);
 }
 
 void login_callback (social::OperationStatus status, const char* error, social::Session* session)

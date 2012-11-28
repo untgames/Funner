@@ -40,6 +40,41 @@ stl::string replace_percent_escapes (const char* str)
   return return_value;
 }
 
+//make percent escaped string using utf-8 encoding
+stl::string percent_escape (const char* str)
+{
+  if (!str)
+    throw xtl::make_null_argument_exception ("social::facebook::percent_escape", "str");
+
+  stl::string return_value;
+
+  size_t result_length = 0;
+
+  for (const unsigned char* current_symbol = (unsigned char*)str; *current_symbol; current_symbol++, result_length++)
+    if (*current_symbol > 127)
+      result_length += 2;
+
+  return_value.resize (result_length);
+
+  size_t current_out_symbols = 0;
+
+  for (const unsigned char* current_symbol = (unsigned char*)str; *current_symbol; current_symbol++)
+  {
+    if (*current_symbol > 127)
+    {
+      xtl::xsnprintf ((char*)return_value.data () + current_out_symbols, 4, "%%%02X", *current_symbol);
+
+      current_out_symbols += 3;
+    }
+    else if (*current_symbol == ' ')
+      return_value [current_out_symbols++] = '+';
+    else
+      return_value [current_out_symbols++] = *current_symbol;
+  }
+
+  return return_value;
+}
+
 //return parameter from url, or empty string if not found
 stl::string get_url_parameter (const char* url, const char* param_name)
 {
