@@ -2,7 +2,7 @@
 
 using namespace social;
 
-const char* APP_ID = "357943580965557";
+const char* APP_ID = "271022146306708";
 
 void log_print (const char* stream, const char* message)
 {
