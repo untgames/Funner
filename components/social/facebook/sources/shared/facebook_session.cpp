@@ -159,6 +159,8 @@ void FacebookSessionImpl::OnPlatformLogInFinished (bool platform_login_result, O
         logged_in    = true;
         token        = in_token;
         current_user = logged_in_user;
+
+        current_user.Properties ().SetProperty ("Token", token.c_str ());
       }
 
       callback (status, error);
@@ -262,6 +264,8 @@ void FacebookSessionImpl::OnCurrentUserInfoLoaded (bool succeeded, const stl::st
   }
 
   current_user = parse_user (response);
+
+  current_user.Properties ().SetProperty ("Token", token.c_str ());
 
   logged_in = true;
 
@@ -383,15 +387,14 @@ void FacebookSessionImpl::OnActivate ()
   window.SetVisible (true);
   window.SetActive  (true);
   window.SetFocus   (true);
-//  window.Maximize   ();
+  window.Maximize   ();
 
   //TODO read window size and position from property map
 
-  //DEBUG
+  /*  //DEBUG
   window.SetSize (800, 600);
   window.SetPosition (100, 100);
-  window.Show ();
-
+  window.Show ();*/
 }
 
 /*
