@@ -24,7 +24,7 @@ bool is_unreserved (unsigned char in)
     case 'P': case 'Q': case 'R': case 'S': case 'T':
     case 'U': case 'V': case 'W': case 'X': case 'Y': case 'Z':
     case '-': case '.': case '_': case '~': case ':': case '/':
-    case '?': case '&': case '=':
+    case '?': case '&': case '=': case '%':
       return true;
     default:
       break;
