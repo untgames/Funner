@@ -727,7 +727,7 @@ define process_package_components
   .PHONY: PACKAGE_$2.$1
 
   PACKAGE_$2.$1:
-		@$$(foreach component,$$($1.COMPONENTS),$(MAKE) -C $$(subst :, ,$(COMPONENT_DIR)/$$(component)) $2 && ) true
+		@$$(foreach component,$$($1.COMPONENTS),$(MAKE) -r -C $$(subst :, ,$(COMPONENT_DIR)/$$(component)) $2 && ) true
 endef
 
 #Обработка цели package (имя цели)
