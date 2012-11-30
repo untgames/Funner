@@ -6,8 +6,15 @@ using namespace social::facebook;
 namespace
 {
 
+const common::ActionQueue::time_t DESTROY_WEB_VIEW_DELAY = 5;
+
 const char* LOG_NAME            = "social.facebook.FacebookSession";
 const char* SESSION_DESCRIPTION = "Facebook";
+
+//Функция, необходимая для удаления web-view после выполнения колбека
+void delete_web_view (xtl::shared_ptr<syslib::WebView> web_view)
+{
+}
 
 }
 
@@ -18,7 +25,6 @@ const char* SESSION_DESCRIPTION = "Facebook";
 FacebookSessionImpl::FacebookSessionImpl ()
   : log (LOG_NAME)
   , logged_in (false)
-  , dialog_web_view_active (false)
 {
   on_activate_connection = syslib::Application::RegisterEventHandler (syslib::ApplicationEvent_OnResume, xtl::bind (&FacebookSessionImpl::OnActivate, this));
 }
@@ -50,7 +56,7 @@ void FacebookSessionImpl::ShowWindow (const char* window_name, const common::Pro
     if (!IsUserLoggedIn ())
       throw xtl::format_operation_exception ("", "Can't show window before log in");
 
-    if (dialog_web_view_active)
+    if (dialog_web_view)
       throw xtl::format_operation_exception ("", "Another window already shown");
 
     if (!window_name)
@@ -70,17 +76,15 @@ void FacebookSessionImpl::ShowWindow (const char* window_name, const common::Pro
 
     url = percent_escape (url.c_str ());
 
-    CloseDialogWebView ();
-
     log.Printf ("Show dialog '%s'", url.c_str ());
 
-    dialog_web_view_filter_connection     = dialog_web_view.RegisterFilter (xtl::bind (&FacebookSessionImpl::ProcessDialogRequest, this, _2));
-    dialog_web_view_load_start_connection = dialog_web_view.RegisterEventHandler (syslib::WebViewEvent_OnLoadStart, xtl::bind (&FacebookSessionImpl::ProcessDialogRequest, this, (const char*)0));
-    dialog_web_view_load_fail_connection  = dialog_web_view.RegisterEventHandler (syslib::WebViewEvent_OnLoadFail, xtl::bind (&FacebookSessionImpl::ProcessDialogFail, this));
+    dialog_web_view.reset (new syslib::WebView);
 
-    dialog_web_view.LoadRequest (url.c_str ());
+    dialog_web_view_filter_connection     = dialog_web_view->RegisterFilter (xtl::bind (&FacebookSessionImpl::ProcessDialogRequest, this, _2));
+    dialog_web_view_load_start_connection = dialog_web_view->RegisterEventHandler (syslib::WebViewEvent_OnLoadStart, xtl::bind (&FacebookSessionImpl::ProcessDialogRequest, this, (const char*)0));
+    dialog_web_view_load_fail_connection  = dialog_web_view->RegisterEventHandler (syslib::WebViewEvent_OnLoadFail, xtl::bind (&FacebookSessionImpl::ProcessDialogFail, this));
 
-    dialog_web_view_active = true;
+    dialog_web_view->LoadRequest (url.c_str ());
 
     OnActivate ();
   }
@@ -98,16 +102,16 @@ void FacebookSessionImpl::ShowWindow (const char* window_name, const common::Pro
 bool FacebookSessionImpl::ProcessDialogRequest (const char* request)
 {
   if (!request)
-    request = dialog_web_view.Request ();
+    request = dialog_web_view->Request ();
 
   if (request)
   {
     log.Printf ("Dialog load request '%s'", request);
 
-    if (!strstr (request, "?"))
+    if (xtl::xstrlen (request) && !strstr (request, "?") && !strstr (request, "about:blank"))
     {
       CloseDialogWebView ();
-      return false;
+      return true;
     }
   }
   else
@@ -179,13 +183,13 @@ void FacebookSessionImpl::OnPlatformLogInFinished (bool platform_login_result, O
 
     CloseDialogWebView ();
 
-    dialog_web_view_filter_connection     = dialog_web_view.RegisterFilter (xtl::bind (&FacebookSessionImpl::ProcessLoginRequest, this, _2, callback));
-    dialog_web_view_load_start_connection = dialog_web_view.RegisterEventHandler (syslib::WebViewEvent_OnLoadStart, xtl::bind (&FacebookSessionImpl::ProcessLoginRequest, this, (const char*)0, callback));
-    dialog_web_view_load_fail_connection  = dialog_web_view.RegisterEventHandler (syslib::WebViewEvent_OnLoadFail, xtl::bind (&FacebookSessionImpl::ProcessLoginFail, this, callback));
+    dialog_web_view.reset (new syslib::WebView);
 
-    dialog_web_view.LoadRequest (url.c_str ());
+    dialog_web_view_filter_connection     = dialog_web_view->RegisterFilter (xtl::bind (&FacebookSessionImpl::ProcessLoginRequest, this, _2, callback));
+    dialog_web_view_load_start_connection = dialog_web_view->RegisterEventHandler (syslib::WebViewEvent_OnLoadStart, xtl::bind (&FacebookSessionImpl::ProcessLoginRequest, this, (const char*)0, callback));
+    dialog_web_view_load_fail_connection  = dialog_web_view->RegisterEventHandler (syslib::WebViewEvent_OnLoadFail, xtl::bind (&FacebookSessionImpl::ProcessLoginFail, this, callback));
 
-    dialog_web_view_active = true;
+    dialog_web_view->LoadRequest (url.c_str ());
 
     OnActivate ();
   }
@@ -203,7 +207,7 @@ void FacebookSessionImpl::OnPlatformLogInFinished (bool platform_login_result, O
 bool FacebookSessionImpl::ProcessLoginRequest (const char* request, const LoginCallback& callback)
 {
   if (!request)
-    request = dialog_web_view.Request ();
+    request = dialog_web_view->Request ();
 
   if (request)
   {
@@ -213,11 +217,13 @@ bool FacebookSessionImpl::ProcessLoginRequest (const char* request, const LoginC
     {
       token = get_url_parameter (request, "access_token=");
 
+      stl::string request_copy (request);
+
       CloseDialogWebView ();
 
       if (token.empty ())  //login failed
       {
-        stl::string error = get_url_parameter (request, "error_reason=");
+        stl::string error = get_url_parameter (request_copy.c_str (), "error_reason=");
 
         if (error == "user_denied")
         {
@@ -378,10 +384,10 @@ void FacebookSessionImpl::CheckUnknownProperties (const char* source, const comm
 
 void FacebookSessionImpl::OnActivate ()
 {
-  if (!dialog_web_view_active)
+  if (!dialog_web_view)
     return;
 
-  syslib::Window& window = dialog_web_view.Window ();
+  syslib::Window& window = dialog_web_view->Window ();
 
   window.SetVisible (false);
   window.SetVisible (true);
@@ -407,7 +413,12 @@ void FacebookSessionImpl::CloseDialogWebView ()
   dialog_web_view_load_start_connection.disconnect ();
   dialog_web_view_load_fail_connection.disconnect ();
 
-  dialog_web_view.Window ().Hide ();
+  if (dialog_web_view)
+  {
+    dialog_web_view->Window ().Hide ();
 
-  dialog_web_view_active = false;
+    common::ActionQueue::PushAction (xtl::bind (&delete_web_view, dialog_web_view), common::ActionThread_Main, DESTROY_WEB_VIEW_DELAY);
+
+    dialog_web_view.reset ();
+  }
 }

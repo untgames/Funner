@@ -7,6 +7,7 @@
 #include <xtl/common_exceptions.h>
 #include <xtl/connection.h>
 #include <xtl/function.h>
+#include <xtl/shared_ptr.h>
 
 #include <common/action_queue.h>
 #include <common/component.h>
@@ -166,7 +167,8 @@ class FacebookSessionImpl: public IAchievementManager, public ILeaderboardManage
     FacebookSessionImpl& operator = (const FacebookSessionImpl& source);  //no impl
 
   private:
-    typedef stl::list<common::Action> ActionsList;
+    typedef stl::list<common::Action>        ActionsList;
+    typedef xtl::shared_ptr<syslib::WebView> WebViewPtr;
 
   private:
     common::Log          log;
@@ -174,8 +176,7 @@ class FacebookSessionImpl: public IAchievementManager, public ILeaderboardManage
     stl::string          token;
     bool                 logged_in;
     User                 current_user;
-    syslib::WebView      dialog_web_view;
-    bool                 dialog_web_view_active;
+    WebViewPtr           dialog_web_view;
     xtl::auto_connection dialog_web_view_filter_connection;
     xtl::auto_connection dialog_web_view_load_start_connection;
     xtl::auto_connection dialog_web_view_load_fail_connection;
