@@ -441,7 +441,7 @@ root (source='', line=0): {}
    digit (source='data/test2.json', line=25): {0123456789}
    0123456789 (source='data/test2.json', line=26): {digit}
    special (source='data/test2.json', line=27): {`1~!@#$%^&*()_+-={':[,]}|;.</>?}
-   hex (source='data/test2.json', line=28): {ģ䕧覫췯ꯍ}
+   hex (source='data/test2.json', line=28): {ģe䕧覫췯ꯍ}
    true (source='data/test2.json', line=29): {true}
    false (source='data/test2.json', line=30): {false}
    null (source='data/test2.json', line=31): {}
