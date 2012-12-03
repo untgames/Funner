@@ -17,14 +17,14 @@ class QueryManagerState: public IStageState
     QueryManagerState (QueryManagerState* in_main_state = 0) : main_state (in_main_state) {}
 
 ///”становка предиката отрисовки
-    void SetPredication (IPredicate* in_predicate, bool in_predicate_value)
+    void SetPredication (IOpenGlPredicate* in_predicate, bool in_predicate_value)
     {
       predicate       = in_predicate;
       predicate_value = in_predicate_value;
     }
 
 ///ѕолучение предиката отрисовки
-    IPredicate* GetPredicate () { return predicate.get (); }
+    IOpenGlPredicate* GetPredicate () { return predicate.get (); }
 
 ///ѕолучение сравниваемого значени€ предиката отрисовки
     bool GetPredicateValue () { return predicate_value; }
@@ -65,7 +65,7 @@ class QueryManagerState: public IStageState
 
   private:
     typedef xtl::trackable_ptr<QueryManagerState> QueryManagerStatePtr;
-    typedef xtl::trackable_ptr<IPredicate>        PredicatePtr;
+    typedef xtl::trackable_ptr<IOpenGlPredicate>  PredicatePtr;
 
   private:
     QueryManagerStatePtr main_state;       //основное состо€ние уровн€
@@ -167,7 +167,9 @@ void QueryManager::SetPredication (IPredicate* predicate, bool predicate_value)
   if (casted_object && !casted_object->IsCompatible (impl->GetContextManager ()))
     throw xtl::format_exception<xtl::bad_argument> (METHOD_NAME, "Argument 'predicate' is incompatible with target IDevice");
 
-  impl->SetPredication (predicate, predicate_value);
+  IOpenGlPredicate* gl_predicate = dynamic_cast<IOpenGlPredicate*> (predicate);
+
+  impl->SetPredication (gl_predicate, predicate_value);
 }
 
 IPredicate* QueryManager::GetPredicate ()
@@ -187,4 +189,38 @@ bool QueryManager::GetPredicateValue ()
 bool QueryManager::GetPredicateAsyncResult ()
 {
   return impl->GetPredicateAsyncResult ();
+}
+
+/*
+    ”казание границ запроса
+*/
+
+void QueryManager::Begin (IQuery* async)
+{
+  static const char* METHOD_NAME = "render::low_level::opengl::QueryManager::Begin";
+
+  if (!async)
+    throw xtl::make_null_argument_exception (METHOD_NAME, "query");
+
+  IQueryScope* casted_object = cast_object<IQueryScope> (async, METHOD_NAME, "query");
+
+  if (!casted_object->IsCompatible (impl->GetContextManager ()))
+    throw xtl::format_not_supported_exception (METHOD_NAME, "Query can't be used with this context");
+
+  casted_object->Begin ();  
+}
+
+void QueryManager::End (IQuery* async)
+{
+  static const char* METHOD_NAME = "render::low_level::opengl::QueryManager::End";
+
+  if (!async)
+    throw xtl::make_null_argument_exception (METHOD_NAME, "query");
+
+  IQueryScope* casted_object = cast_object<IQueryScope> (async, METHOD_NAME, "query");
+
+  if (!casted_object->IsCompatible (impl->GetContextManager ()))
+    throw xtl::format_not_supported_exception (METHOD_NAME, "Query can't be used with this context");
+
+  casted_object->End ();
 }

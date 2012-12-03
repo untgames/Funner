@@ -171,4 +171,13 @@ bool AsyncPredicate::IsResultAvailable ()
   return available != 0;
 }
 
+/*
+    Проверка на совместимость
+*/
+
+bool AsyncPredicate::IsCompatible (const ContextManager& manager)
+{
+  return manager.IsCompatible (GetContextManager ());
+}
+
 #endif
