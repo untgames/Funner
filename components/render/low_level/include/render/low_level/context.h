@@ -93,8 +93,8 @@ class IDeviceContext: virtual public IObject
     virtual void              RSSetViewports (size_t count, const Viewport* viewport) = 0;
     virtual void              RSSetScissors  (size_t count, const Rect* scissor_rect) = 0;
     virtual IRasterizerState* RSGetState     () = 0;
-    virtual const Viewport*   RSGetViewport  () = 0;
-    virtual const Rect*       RSGetScissor   () = 0;
+    virtual const Viewport*   RSGetViewports () = 0;
+    virtual const Rect*       RSGetScissors  () = 0;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///”правление выходным уровнем (output-stage)
@@ -106,7 +106,7 @@ class IDeviceContext: virtual public IObject
     virtual IBlendState*        OSGetBlendState        () = 0;
     virtual IDepthStencilState* OSGetDepthStencilState () = 0;
     virtual size_t              OSGetStencilReference  () = 0;
-    virtual IView**             OSGetRenderTargetView  () = 0;
+    virtual IView**             OSGetRenderTargetViews () = 0;
     virtual IView*              OSGetDepthStencilView  () = 0;
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////

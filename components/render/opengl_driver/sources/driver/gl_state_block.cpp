@@ -7,8 +7,9 @@ using namespace render::low_level::opengl;
     Конструктор
 */
 
-StateBlock::StateBlock (Device& device, const StateBlockMask& in_mask)
-  : mask (in_mask),
+StateBlock::StateBlock (Device& in_device, const StateBlockMask& in_mask)
+  : device (in_device),
+    mask (in_mask),
     render_target_manager_state (device.render_target_manager.CreateStageState ()),
     output_stage_state (device.output_stage.CreateStageState ()),
     input_stage_state (device.input_stage.CreateStageState ()),
@@ -31,10 +32,13 @@ void StateBlock::GetMask (StateBlockMask& out_mask)
     Захват настроек устройства
 */
 
-void StateBlock::Capture ()
+void StateBlock::Capture (IDeviceContext* context)
 {
   try
   {
+    if (context != &device)
+      throw xtl::format_operation_exception ("", "Can't capture context settings from context which differes from device immediate context");
+
     render_target_manager_state->Capture (mask);
     output_stage_state->Capture          (mask);
     input_stage_state->Capture           (mask);
@@ -53,10 +57,13 @@ void StateBlock::Capture ()
     Применение настроек устройства
 */
 
-void StateBlock::Apply ()
+void StateBlock::Apply (IDeviceContext* context)
 {
   try
   {
+    if (context != &device)
+      throw xtl::format_operation_exception ("", "Can't capture context settings from context which differes from device immediate context");
+
     render_target_manager_state->Apply (mask);
     output_stage_state->Apply          (mask);
     input_stage_state->Apply           (mask);

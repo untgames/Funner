@@ -100,7 +100,7 @@ class Driver: virtual public IDriver, public Object
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Устройство отрисовки
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-class Device: virtual public IDevice, public Object
+class Device: virtual public IDevice, virtual public IDeviceContext, public Object
 {
   friend class StateBlock;
   public:  
@@ -119,12 +119,19 @@ class Device: virtual public IDevice, public Object
 ///Имя устройства
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     const char* GetName ();
-    
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Указание границ запроса
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void Begin (IQuery* async);
+    void End   (IQuery* async);
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Получение возможностей устройства
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void        GetCaps      (DeviceCaps&);
-    const char* GetCapString (DeviceCapString);
+    void        GetCaps                        (DeviceCaps&);
+    const char* GetCapString                   (DeviceCapString);
+    const char* GetVertexAttributeSemanticName (VertexAttributeSemantic semantic);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Создание ресурсов
@@ -139,12 +146,14 @@ class Device: virtual public IDevice, public Object
     IProgram*                 CreateProgram                 (size_t shaders_count, const ShaderDesc* shader_descs, const LogFunction& error_log);
     ITexture*                 CreateTexture                 (const TextureDesc&);
     ITexture*                 CreateTexture                 (const TextureDesc&, const TextureData&);
+    ITexture*                 CreateTexture                 (const TextureDesc&, IBuffer* buffer, size_t buffer_offset, const size_t* mip_sizes = 0);
     ITexture*                 CreateRenderTargetTexture     (ISwapChain* swap_chain, size_t buffer_index);
     ITexture*                 CreateDepthStencilTexture     (ISwapChain* swap_chain);
     IView*                    CreateView                    (ITexture* texture, const ViewDesc&);
     IPredicate*               CreatePredicate               ();
-    IStatisticsQuery*         CreateStatisticsQuery         ();
+    IQuery*                   CreateQuery                   (QueryType type);
     IStateBlock*              CreateStateBlock              (const StateBlockMask& mask);
+    IDeviceContext*           CreateDeferredContext         ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Управление входным уровнем (input-stage)
@@ -155,6 +164,12 @@ class Device: virtual public IDevice, public Object
     IInputLayout* ISGetInputLayout  ();
     IBuffer*      ISGetVertexBuffer (size_t vertex_buffer_slot);
     IBuffer*      ISGetIndexBuffer  ();
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Управление уровнем вывода вершин
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    virtual void      SOSetTargets (size_t buffers_count, IBuffer** buffers, const size_t* offsets);
+    virtual IBuffer** SOGetTargets ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Управление шейдерными уровнями (shader-stage)
@@ -173,12 +188,12 @@ class Device: virtual public IDevice, public Object
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Управление растеризатором (rasterizer-stage)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void              RSSetState    (IRasterizerState* state);
-    void              RSSetViewport (const Viewport& viewport);
-    void              RSSetScissor  (const Rect& scissor_rect);
-    IRasterizerState* RSGetState    ();
-    const Viewport&   RSGetViewport ();
-    const Rect&       RSGetScissor  ();
+    void              RSSetState     (IRasterizerState* state);
+    void              RSSetViewports (size_t count, const Viewport* viewports);
+    void              RSSetScissors  (size_t count, const Rect* scissor_rects);
+    IRasterizerState* RSGetState     ();
+    const Viewport*   RSGetViewports ();
+    const Rect*       RSGetScissors  ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Управление выходным уровнем (output-stage)
@@ -186,11 +201,11 @@ class Device: virtual public IDevice, public Object
     void                OSSetBlendState        (IBlendState* state);
     void                OSSetDepthStencilState (IDepthStencilState* state);
     void                OSSetStencilReference  (size_t reference);    
-    void                OSSetRenderTargets     (IView* render_target_view, IView* depth_stencil_view);
+    void                OSSetRenderTargets     (size_t count, IView** render_target_view, IView* depth_stencil_view);
     IBlendState*        OSGetBlendState        ();
     IDepthStencilState* OSGetDepthStencilState ();
     size_t              OSGetStencilReference  ();
-    IView*              OSGetRenderTargetView  ();
+    IView**             OSGetRenderTargetViews ();
     IView*              OSGetDepthStencilView  ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -215,8 +230,10 @@ class Device: virtual public IDevice, public Object
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Рисование примитивов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void Draw        (PrimitiveType primitive_type, size_t first_vertex, size_t vertices_count);
-    void DrawIndexed (PrimitiveType primitive_type, size_t first_index, size_t indices_count, size_t base_vertex);
+    void Draw                 (PrimitiveType primitive_type, size_t first_vertex, size_t vertices_count);
+    void DrawIndexed          (PrimitiveType primitive_type, size_t first_index, size_t indices_count, size_t base_vertex);
+    void DrawInstanced        (PrimitiveType primitive_type, size_t vertex_count_per_instance, size_t instance_count, size_t first_vertex, size_t first_instance_location);
+    void DrawIndexedInstanced (PrimitiveType primitive_type, size_t index_count_per_instance, size_t instance_count, size_t first_index, size_t base_vertex, size_t first_instance_location);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Ожидание завершения выполнения буфера команд
@@ -227,6 +244,17 @@ class Device: virtual public IDevice, public Object
 ///Список свойств устройства отрисовки
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     IPropertyList* GetProperties ();
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Получение непосредственного контекста выполнения операций
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    virtual IDeviceContext* GetImmediateContext () { return this; }
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Выполнение списка команд
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    virtual ICommandList* FinishCommandList  (bool restore_state);
+    virtual void          ExecuteCommandList (ICommandList* list, bool restore_state);
 
   private:
     ITexture* CreateTexture (const TextureDesc&, const TextureData*);
@@ -269,17 +297,18 @@ class StateBlock: virtual public IStateBlock, public Object
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Захват настроек устройства
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void Capture ();
+    void Capture (IDeviceContext* context);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Применение настроек устройства
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void Apply ();
+    void Apply (IDeviceContext* context);
 
   private:
     typedef stl::auto_ptr<IStageState> StageStatePtr;
 
   private:
+    Device&        device;                      //ссылка на устройство отрисовки
     StateBlockMask mask;                        //маска состояний
     StageStatePtr  render_target_manager_state; //состояние менеджера целевых буферов рендеринга
     StageStatePtr  output_stage_state;          //состояние выходного уровня

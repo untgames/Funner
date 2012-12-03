@@ -46,17 +46,17 @@ class RenderTargetManager
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Выбор целевых отображений
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void    SetRenderTargets    (IView* render_target_view, IView* depth_stencil_view);
-    IView*  GetRenderTargetView () const;
-    IView*  GetDepthStencilView () const;
+    void    SetRenderTargets     (size_t count, IView** render_target_view, IView* depth_stencil_view);
+    IView** GetRenderTargetViews () const;
+    IView*  GetDepthStencilView  () const;
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Настройка подуровня растеризации
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void            SetViewport (const Viewport& viewport);
-    void            SetScissor  (const Rect& scissor_rect);
-    const Viewport& GetViewport () const;
-    const Rect&     GetScissor  () const;
+    void            SetViewports (size_t count, const Viewport* viewport);
+    void            SetScissors  (size_t count, const Rect* scissor_rect);
+    const Viewport* GetViewports () const;
+    const Rect*     GetScissors  () const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Очистка буферов отрисовки

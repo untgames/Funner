@@ -100,13 +100,28 @@ const char* Device::GetCapString (DeviceCapString cap_string)
   }
 }
 
+const char* Device::GetVertexAttributeSemanticName (VertexAttributeSemantic semantic)
+{
+  throw xtl::make_not_implemented_exception ("render::low_level::opengl::Device::GetVertexAttributeSemanticName");
+}
+
 /*
-    Создание ресурсов
+    Управление запросами
 */
 
-IStatisticsQuery* Device::CreateStatisticsQuery ()
+IQuery* Device::CreateQuery (QueryType type)
 {
-  throw xtl::make_not_implemented_exception ("render::low_level::opengl::Device::CreateStatisticsQuery");
+  throw xtl::make_not_implemented_exception ("render::low_level::opengl::Device::CreateQuery");
+}
+
+void Device::Begin (IQuery* async)
+{
+  throw xtl::make_not_implemented_exception ("render::low_level::opengl::Device::Begin");
+}
+
+void Device::End (IQuery* async)
+{
+  throw xtl::make_not_implemented_exception ("render::low_level::opengl::Device::End");
 }
 
 /*
@@ -198,6 +213,20 @@ IBuffer* Device::ISGetVertexBuffer (size_t vertex_buffer_slot)
 IBuffer* Device::ISGetIndexBuffer ()
 {
   return input_stage.GetIndexBuffer ();
+}
+
+/*
+    Управление уровнем вывода вершин
+*/
+
+void Device::SOSetTargets (size_t buffers_count, IBuffer** buffers, const size_t* offsets)
+{
+  throw xtl::make_not_implemented_exception ("render::low_level::opengl::Device::SOSetTargets");
+}
+
+IBuffer** Device::SOGetTargets ()
+{
+  throw xtl::make_not_implemented_exception ("render::low_level::opengl::Device::SOGetTargets");
 }
 
 /*
@@ -319,6 +348,11 @@ ITexture* Device::CreateTexture (const TextureDesc& desc, const TextureData* dat
   }
 }
 
+ITexture* Device::CreateTexture (const TextureDesc&, IBuffer* buffer, size_t buffer_offset, const size_t* mip_sizes)
+{
+  throw xtl::make_not_implemented_exception ("render::low_level::opengl::Device::CreateTexture");
+}
+
 void Device::SSSetSampler (size_t sampler_slot, ISamplerState* state)
 {
   texture_manager.SetSampler (sampler_slot, state);
@@ -361,14 +395,14 @@ void Device::RSSetState (IRasterizerState* state)
   output_stage.SetRasterizerState (state);
 }
 
-void Device::RSSetViewport (const Viewport& viewport)
+void Device::RSSetViewports (size_t count, const Viewport* viewports)
 {
-  render_target_manager.SetViewport (viewport);
+  render_target_manager.SetViewports (count, viewports);
 }
 
-void Device::RSSetScissor (const Rect& scissor_rect)
+void Device::RSSetScissors (size_t count, const Rect* scissor_rects)
 {
-  render_target_manager.SetScissor (scissor_rect);
+  render_target_manager.SetScissors (count, scissor_rects);
 }
 
 IRasterizerState* Device::RSGetState ()
@@ -376,14 +410,14 @@ IRasterizerState* Device::RSGetState ()
   return output_stage.GetRasterizerState ();
 }
 
-const Viewport& Device::RSGetViewport ()
+const Viewport* Device::RSGetViewports ()
 {
-  return render_target_manager.GetViewport ();
+  return render_target_manager.GetViewports ();
 }
 
-const Rect& Device::RSGetScissor ()
+const Rect* Device::RSGetScissors ()
 {
-  return render_target_manager.GetScissor ();  
+  return render_target_manager.GetScissors ();
 }
 
 /*
@@ -489,14 +523,14 @@ IView* Device::CreateView (ITexture* texture, const ViewDesc& desc)
   }
 }
 
-void Device::OSSetRenderTargets (IView* render_target_view, IView* depth_stencil_view)
+void Device::OSSetRenderTargets (size_t count, IView** render_target_views, IView* depth_stencil_view)
 {
-  render_target_manager.SetRenderTargets (render_target_view, depth_stencil_view);
+  render_target_manager.SetRenderTargets (count, render_target_views, depth_stencil_view);
 }
 
-IView* Device::OSGetRenderTargetView ()
+IView** Device::OSGetRenderTargetViews ()
 {
-  return render_target_manager.GetRenderTargetView ();
+  return render_target_manager.GetRenderTargetViews ();
 }
 
 IView* Device::OSGetDepthStencilView ()
@@ -566,6 +600,29 @@ IPredicate* Device::GetPredicate ()
 bool Device::GetPredicateValue ()
 {
   return query_manager.GetPredicateValue ();
+}
+
+/*
+    Создание контекста
+*/
+
+IDeviceContext* Device::CreateDeferredContext ()
+{
+  throw xtl::make_not_implemented_exception ("render::low_level::opengl::Device::CreateDeferredContext");
+}
+
+/*
+    
+*/
+
+ICommandList* FinishCommandList (bool restore_state)
+{
+  throw xtl::make_not_implemented_exception ("render::low_level::opengl::Device::FinishCommandList");
+}
+
+void Device::ExecuteCommandList (ICommandList* list, bool restore_state)
+{
+  throw xtl::make_not_implemented_exception ("render::low_level::opengl::Device::ExecuteCommandList");
 }
 
 /*
@@ -639,7 +696,14 @@ void Device::Bind (size_t base_vertex, size_t base_index, IndicesLayout* out_ind
 
     if (context_manager.NeedStageRebind (Stage_Output))
     {
-      output_stage.Bind (render_target_manager.GetRenderTargetView () != 0, render_target_manager.GetDepthStencilView () != 0);
+      IView** views = render_target_manager.GetRenderTargetViews ();
+
+      bool has_render_targets [DEVICE_RENDER_TARGET_VIEWS_COUNT];
+
+      for (size_t i=0; i<DEVICE_RENDER_TARGET_VIEWS_COUNT; i++)
+        has_render_targets [i] = views [i] != 0;
+
+      output_stage.Bind (has_render_targets, render_target_manager.GetDepthStencilView () != 0);
       
       is_program_validate_needed = true;      
     }
@@ -713,7 +777,6 @@ void Device::Draw (PrimitiveType primitive_type, size_t first_vertex, size_t ver
   catch (xtl::exception& exception)
   {
     exception.touch ("render::low_level::opengl::Device::Draw");
-
     throw;
   }
 }
@@ -748,9 +811,18 @@ void Device::DrawIndexed (PrimitiveType primitive_type, size_t first_index, size
   catch (xtl::exception& exception)
   {
     exception.touch ("render::low_level::opengl::Device::DrawIndexed");
-
     throw;
   }
+}
+
+void Device::DrawInstanced (PrimitiveType primitive_type, size_t vertex_count_per_instance, size_t instance_count, size_t first_vertex, size_t first_instance_location)
+{
+  throw xtl::make_not_implemented_exception ("render::low_level::opengl::Device::DrawInstanced");
+}
+
+void Device::DrawIndexedInstanced (PrimitiveType primitive_type, size_t index_count_per_instance, size_t instance_count, size_t first_index, size_t base_vertex, size_t first_instance_location)
+{
+  throw xtl::make_not_implemented_exception ("render::low_level::opengl::Device::DrawIndexedInstanced");
 }
 
 /*

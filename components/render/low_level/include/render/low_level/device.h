@@ -81,12 +81,12 @@ class IDevice: virtual public IObject
     virtual IProgram*                 CreateProgram                 (size_t shaders_count, const ShaderDesc* shader_descs, const LogFunction& error_log) = 0;
     virtual ITexture*                 CreateTexture                 (const TextureDesc&) = 0;
     virtual ITexture*                 CreateTexture                 (const TextureDesc&, const TextureData&) = 0;
-    virtual ITexture*                 CreateTexture                 (const TextureDesc&, IBuffer* buffer, size_t buffer_offset, const size_t* mip_sizes = 0) = 0;
+    virtual ITexture*                 CreateTexture                 (const TextureDesc&, IBuffer* buffer, size_t buffer_offset, const size_t* mip_sizes) = 0;
     virtual ITexture*                 CreateRenderTargetTexture     (ISwapChain* swap_chain, size_t buffer_index) = 0;
     virtual ITexture*                 CreateDepthStencilTexture     (ISwapChain* swap_chain) = 0;
     virtual IView*                    CreateView                    (ITexture* texture, const ViewDesc& desc) = 0;
     virtual IPredicate*               CreatePredicate               () = 0;
-    virtual IStatisticsQuery*         CreateStatisticsQuery         () = 0;
+    virtual IQuery*                   CreateQuery                   (QueryType type) = 0;
     virtual IStateBlock*              CreateStateBlock              (const StateBlockMask& mask) = 0;
     virtual IDeviceContext*           CreateDeferredContext         () = 0;
 
