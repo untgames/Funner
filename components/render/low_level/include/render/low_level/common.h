@@ -18,7 +18,8 @@ typedef unsigned long long UInt64;
 const size_t DEVICE_VERTEX_BUFFER_SLOTS_COUNT   = 8; //количество слотов для размещения вершинных буферов
 const size_t DEVICE_SAMPLER_SLOTS_COUNT         = 8; //количество слотов для размещения сэмплеров
 const size_t DEVICE_CONSTANT_BUFFER_SLOTS_COUNT = 8; //количество слотов для размещения константных буферов
-const size_t DEVICE_RENDER_TARGET_VIEWS_COUNT   = 8; //максимальное количество целей рендеринга
+const size_t DEVICE_RENDER_TARGET_SLOTS_COUNT   = 8; //максимальное количество целей рендеринга
+const size_t DEVICE_STREAM_OUTPUT_SLOTS_COUNT   = 4; //максимальное количество выходных потоков геометрии
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Функция протоколирования

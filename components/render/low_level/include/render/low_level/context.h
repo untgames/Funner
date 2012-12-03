@@ -2,6 +2,8 @@
 #define RENDER_LOW_LEVEL_CONTEXT_HEADER
 
 #include <exception>
+
+#include <render/low_level/array.h>
 #include <render/low_level/buffer.h>
 #include <render/low_level/state.h>
 #include <render/low_level/view.h>
@@ -14,6 +16,18 @@ namespace render
 
 namespace low_level
 {
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Массивы данных
+///////////////////////////////////////////////////////////////////////////////////////////////////
+typedef Array<Rect,     DEVICE_RENDER_TARGET_SLOTS_COUNT> RenderTargetRectArray;
+typedef Array<Viewport, DEVICE_RENDER_TARGET_SLOTS_COUNT> RenderTargetViewportArray;
+typedef Array<IView*,   DEVICE_RENDER_TARGET_SLOTS_COUNT> RenderTargetViewArray;
+typedef Array<IBuffer*, DEVICE_STREAM_OUTPUT_SLOTS_COUNT> StreamOutputArray;
+typedef IArray<Rect>                                      IRectArray;
+typedef IArray<Viewport>                                  IViewportArray;
+typedef IArray<IView*>                                    IViewArray;
+typedef IArray<IBuffer*>                                  IBufferArray;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Флаги очистки буфера кадра
@@ -93,8 +107,8 @@ class IDeviceContext: virtual public IObject
     virtual void              RSSetViewports (size_t count, const Viewport* viewport) = 0;
     virtual void              RSSetScissors  (size_t count, const Rect* scissor_rect) = 0;
     virtual IRasterizerState* RSGetState     () = 0;
-    virtual const Viewport*   RSGetViewports () = 0;
-    virtual const Rect*       RSGetScissors  () = 0;
+    virtual IViewportArray&   RSGetViewports () = 0;
+    virtual IRectArray&       RSGetScissors  () = 0;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Управление выходным уровнем (output-stage)
@@ -106,21 +120,21 @@ class IDeviceContext: virtual public IObject
     virtual IBlendState*        OSGetBlendState        () = 0;
     virtual IDepthStencilState* OSGetDepthStencilState () = 0;
     virtual size_t              OSGetStencilReference  () = 0;
-    virtual IView**             OSGetRenderTargetViews () = 0;
+    virtual IViewArray&         OSGetRenderTargetViews () = 0;
     virtual IView*              OSGetDepthStencilView  () = 0;
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Управление уровнем вывода вершин
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    virtual void      SOSetTargets (size_t buffers_count, IBuffer** buffers, const size_t* offsets) = 0;
-    virtual IBuffer** SOGetTargets () = 0;
+    virtual void          SOSetTargets (size_t buffers_count, IBuffer** buffers, const size_t* offsets) = 0;
+    virtual IBufferArray& SOGetTargets () = 0;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Очистка буферов отрисовки
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    virtual void ClearRenderTargetView (const Color4f& color) = 0;
+    virtual void ClearRenderTargetView (size_t view_index, const Color4f& color) = 0;
     virtual void ClearDepthStencilView (size_t clear_flags, float depth, unsigned char stencil) = 0;
-    virtual void ClearViews            (size_t clear_flags, const Color4f& color, float depth, unsigned char stencil) = 0;
+    virtual void ClearViews            (size_t clear_flags, size_t views_count, const Color4f* colors, float depth, unsigned char stencil) = 0;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Генерация мип-уровней текстуры (необходимо для текстур в которые ведется рендеринг)

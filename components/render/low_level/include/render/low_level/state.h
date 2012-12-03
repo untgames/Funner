@@ -376,7 +376,7 @@ struct BlendDesc
 {
   bool                  sample_alpha_to_coverage;                         //работа с альфа при мультисэмплинге
   bool                  independent_blend_enable;                         //включено ли независимое смешивание цветов для целей рендеринга
-  RenderTargetBlendDesc render_target [DEVICE_RENDER_TARGET_VIEWS_COUNT]; //настройки смешивания цветов целей рендеринга
+  RenderTargetBlendDesc render_target [DEVICE_RENDER_TARGET_SLOTS_COUNT]; //настройки смешивания цветов целей рендеринга
 };
 
 /*
