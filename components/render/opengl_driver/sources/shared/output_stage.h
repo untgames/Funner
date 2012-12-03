@@ -61,7 +61,7 @@ class OutputStage
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Установка состояния уровня в контекст OpenGL
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void Bind (const bool has_render_target [DEVICE_RENDER_TARGET_VIEWS_COUNT], bool has_depth_stencil);
+    void Bind (const bool has_render_target [DEVICE_RENDER_TARGET_SLOTS_COUNT], bool has_depth_stencil);
 
   private:
     OutputStage (const OutputStage&); //no impl

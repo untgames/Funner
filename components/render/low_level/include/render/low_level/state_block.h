@@ -43,11 +43,11 @@ struct StateBlockMask
   bool ss_samplers [DEVICE_SAMPLER_SLOTS_COUNT];
   bool ss_textures [DEVICE_SAMPLER_SLOTS_COUNT];
   bool rs_state;
-  bool rs_viewport;
-  bool rs_scissor;
+  bool rs_viewports;
+  bool rs_scissors;
   bool os_blend_state;
   bool os_depth_stencil_state;
-  bool os_render_target_view;
+  bool os_render_target_views;
   bool os_depth_stencil_view;
   bool predication;
   

@@ -286,8 +286,11 @@ void SwapChainFrameBuffer::Bind ()
     Оповещение об отрисовке в целевые буферы
 */
 
-void SwapChainFrameBuffer::InvalidateRenderTargets (const Rect& update_rect)
+void SwapChainFrameBuffer::InvalidateRenderTargets (size_t render_target_slot, const Rect& update_rect)
 {
+  if (render_target_slot)
+    throw xtl::format_not_supported_exception ("render::low_level::opengl::SwapChainFrameBuffer::InvalidateRenderTargets(size_t,const Rect&)", "Attempt to invalidate render target %u. MRT not supported for this frame buffer", render_target_slot);
+
   if (update_rect.x < dirty_rect.x)
   {
     dirty_rect.width += dirty_rect.x - update_rect.x;
@@ -310,8 +313,11 @@ void SwapChainFrameBuffer::InvalidateRenderTargets (const Rect& update_rect)
     dirty_rect.height = bottom - dirty_rect.y;
 }
 
-void SwapChainFrameBuffer::InvalidateRenderTargets ()
+void SwapChainFrameBuffer::InvalidateRenderTargets (size_t render_target_slot)
 {
+  if (render_target_slot)
+    throw xtl::format_not_supported_exception ("render::low_level::opengl::SwapChainFrameBuffer::InvalidateRenderTargets(size_t)", "Attempt to invalidate render target %u. MRT not supported for this frame buffer", render_target_slot);
+
   size_t color_width  = render_targets [RenderTargetType_Color].mip_level_desc.width,
          color_height = render_targets [RenderTargetType_Color].mip_level_desc.height,
          ds_width     = render_targets [RenderTargetType_DepthStencil].mip_level_desc.width,

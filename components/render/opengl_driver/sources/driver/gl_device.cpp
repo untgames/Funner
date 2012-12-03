@@ -224,9 +224,19 @@ void Device::SOSetTargets (size_t buffers_count, IBuffer** buffers, const size_t
   throw xtl::make_not_implemented_exception ("render::low_level::opengl::Device::SOSetTargets");
 }
 
-IBuffer** Device::SOGetTargets ()
+void Device::SOSetTarget (size_t stream_output_slot, IBuffer* buffer, size_t offset)
 {
-  throw xtl::make_not_implemented_exception ("render::low_level::opengl::Device::SOGetTargets");
+  throw xtl::make_not_implemented_exception ("render::low_level::opengl::Device::SOSetTarget");
+}
+
+IBuffer* Device::SOGetTarget (size_t stream_output_slot)
+{
+  throw xtl::make_not_implemented_exception ("render::low_level::opengl::Device::SOGetTarget");
+}
+
+size_t Device::SOGetTargetOffset (size_t stream_output_slot)
+{
+  throw xtl::make_not_implemented_exception ("render::low_level::opengl::Device::SOGetTargetOffset");
 }
 
 /*
@@ -395,14 +405,14 @@ void Device::RSSetState (IRasterizerState* state)
   output_stage.SetRasterizerState (state);
 }
 
-void Device::RSSetViewports (size_t count, const Viewport* viewports)
+void Device::RSSetViewport (size_t render_target_slot, const Viewport& viewport)
 {
-  render_target_manager.SetViewports (count, viewports);
+  render_target_manager.SetViewport (render_target_slot, viewport);
 }
 
-void Device::RSSetScissors (size_t count, const Rect* scissor_rects)
+void Device::RSSetScissor (size_t render_target_slot, const Rect& scissor_rect)
 {
-  render_target_manager.SetScissors (count, scissor_rects);
+  render_target_manager.SetScissor (render_target_slot, scissor_rect);
 }
 
 IRasterizerState* Device::RSGetState ()
@@ -410,14 +420,14 @@ IRasterizerState* Device::RSGetState ()
   return output_stage.GetRasterizerState ();
 }
 
-const Viewport* Device::RSGetViewports ()
+const Viewport& Device::RSGetViewport (size_t render_target_slot)
 {
-  return render_target_manager.GetViewports ();
+  return render_target_manager.GetViewport (render_target_slot);
 }
 
-const Rect* Device::RSGetScissors ()
+const Rect& Device::RSGetScissor (size_t render_target_slot)
 {
-  return render_target_manager.GetScissors ();
+  return render_target_manager.GetScissor (render_target_slot);
 }
 
 /*
@@ -525,12 +535,39 @@ IView* Device::CreateView (ITexture* texture, const ViewDesc& desc)
 
 void Device::OSSetRenderTargets (size_t count, IView** render_target_views, IView* depth_stencil_view)
 {
-  render_target_manager.SetRenderTargets (count, render_target_views, depth_stencil_view);
+  try
+  {
+    if (!render_target_views && count)
+      throw xtl::make_null_argument_exception ("", "render_target_views");
+
+    for (size_t i=0; i<count; i++)
+      render_target_manager.SetRenderTargetView (i, render_target_views [i]);
+
+    for (size_t i=count; i<DEVICE_RENDER_TARGET_SLOTS_COUNT; i++)
+      render_target_manager.SetRenderTargetView (i, 0);
+
+    render_target_manager.SetDepthStencilView (depth_stencil_view);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::low_level::opengl::Device::OSSetRenderTargets");
+    throw;
+  }
 }
 
-IView** Device::OSGetRenderTargetViews ()
+void Device::OSSetRenderTargetView (size_t render_target_slot, IView* render_target_view)
 {
-  return render_target_manager.GetRenderTargetViews ();
+  render_target_manager.SetRenderTargetView (render_target_slot, render_target_view);
+}
+
+void Device::OSSetDepthStencilView (IView* depth_stencil_view)
+{
+  render_target_manager.SetDepthStencilView (depth_stencil_view);
+}
+
+IView* Device::OSGetRenderTargetView (size_t render_target_slot)
+{
+  return render_target_manager.GetRenderTargetView (render_target_slot);
 }
 
 IView* Device::OSGetDepthStencilView ()
@@ -538,9 +575,9 @@ IView* Device::OSGetDepthStencilView ()
   return render_target_manager.GetDepthStencilView ();
 }
 
-void Device::ClearRenderTargetView (const Color4f& color)
+void Device::ClearRenderTargetView (size_t view_index, const Color4f& color)
 {
-  render_target_manager.ClearRenderTargetView (color);
+  render_target_manager.ClearRenderTargetView (view_index, color);
 }
 
 void Device::ClearDepthStencilView (size_t clear_flags, float depth, unsigned char stencil)
@@ -548,9 +585,9 @@ void Device::ClearDepthStencilView (size_t clear_flags, float depth, unsigned ch
   render_target_manager.ClearDepthStencilView (clear_flags, depth, stencil);
 }
 
-void Device::ClearViews (size_t clear_flags, const Color4f& color, float depth, unsigned char stencil)
+void Device::ClearViews (size_t clear_flags, size_t views_count, const size_t* view_indices, const Color4f* colors, float depth, unsigned char stencil)
 {
-  render_target_manager.ClearViews (clear_flags, color, depth, stencil);
+  render_target_manager.ClearViews (clear_flags, views_count, view_indices, colors, depth, stencil);
 }
 
 /*
@@ -696,12 +733,9 @@ void Device::Bind (size_t base_vertex, size_t base_index, IndicesLayout* out_ind
 
     if (context_manager.NeedStageRebind (Stage_Output))
     {
-      IView** views = render_target_manager.GetRenderTargetViews ();
+      bool has_render_targets [DEVICE_RENDER_TARGET_SLOTS_COUNT];
 
-      bool has_render_targets [DEVICE_RENDER_TARGET_VIEWS_COUNT];
-
-      for (size_t i=0; i<DEVICE_RENDER_TARGET_VIEWS_COUNT; i++)
-        has_render_targets [i] = views [i] != 0;
+      render_target_manager.HasRenderTargetViews (has_render_targets);
 
       output_stage.Bind (has_render_targets, render_target_manager.GetDepthStencilView () != 0);
       

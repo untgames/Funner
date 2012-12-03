@@ -33,11 +33,32 @@ enum RenderTargetManagerCacheEntry
 {
   CacheEntry_FrameBufferId = CacheEntry_RenderTargetManagerPrivateFirst, //идентификатор текущего буфера кадра
   CacheEntry_BufferAttachment,  //тип буфера
-  CacheEntry_ClearColorHash,    //хэш цвета очистки буфера цвета
   CacheEntry_ClearDepthHash,    //хэш значения очистки буфера глубины
   CacheEntry_ClearStencilValue, //значение очистки буфера трафарета
-  CacheEntry_ViewportHash,      //хэш состояния области вывода
-  CacheEntry_ScissorHash,       //хэш состояния области отсечения
+  CacheEntry_ClearColorHash0,   //хэш цвета очистки буфера цвета 0
+  CacheEntry_ClearColorHash1,   //хэш цвета очистки буфера цвета 1
+  CacheEntry_ClearColorHash2,   //хэш цвета очистки буфера цвета 2
+  CacheEntry_ClearColorHash3,   //хэш цвета очистки буфера цвета 3
+  CacheEntry_ClearColorHash4,   //хэш цвета очистки буфера цвета 4
+  CacheEntry_ClearColorHash5,   //хэш цвета очистки буфера цвета 5
+  CacheEntry_ClearColorHash6,   //хэш цвета очистки буфера цвета 6
+  CacheEntry_ClearColorHash7,   //хэш цвета очистки буфера цвета 7
+  CacheEntry_ViewportHash0,     //хэш состояния области вывода 0
+  CacheEntry_ViewportHash1,     //хэш состояния области вывода 1
+  CacheEntry_ViewportHash2,     //хэш состояния области вывода 2
+  CacheEntry_ViewportHash3,     //хэш состояния области вывода 3
+  CacheEntry_ViewportHash4,     //хэш состояния области вывода 4
+  CacheEntry_ViewportHash5,     //хэш состояния области вывода 5
+  CacheEntry_ViewportHash6,     //хэш состояния области вывода 6
+  CacheEntry_ViewportHash7,     //хэш состояния области вывода 7
+  CacheEntry_ScissorHash0,      //хэш состояния области отсечения 0
+  CacheEntry_ScissorHash1,      //хэш состояния области отсечения 1
+  CacheEntry_ScissorHash2,      //хэш состояния области отсечения 2
+  CacheEntry_ScissorHash3,      //хэш состояния области отсечения 3
+  CacheEntry_ScissorHash4,      //хэш состояния области отсечения 4
+  CacheEntry_ScissorHash5,      //хэш состояния области отсечения 5
+  CacheEntry_ScissorHash6,      //хэш состояния области отсечения 6
+  CacheEntry_ScissorHash7,      //хэш состояния области отсечения 7
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -154,8 +175,8 @@ class IFrameBuffer: public xtl::trackable
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Оповещение об отрисовке в целевые буферы
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    virtual void InvalidateRenderTargets (const Rect& update_rect) = 0;
-    virtual void InvalidateRenderTargets () = 0;
+    virtual void InvalidateRenderTargets (size_t render_target_slot, const Rect& update_rect) = 0;
+    virtual void InvalidateRenderTargets (size_t render_target_slot) = 0;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Обновление целевых буферов отрисовки

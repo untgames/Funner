@@ -168,8 +168,10 @@ class Device: virtual public IDevice, virtual public IDeviceContext, public Obje
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///”правление уровнем вывода вершин
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    virtual void      SOSetTargets (size_t buffers_count, IBuffer** buffers, const size_t* offsets);
-    virtual IBuffer** SOGetTargets ();
+    void     SOSetTargets      (size_t buffers_count, IBuffer** buffers, const size_t* offsets);
+    void     SOSetTarget       (size_t stream_output_slot, IBuffer* buffer, size_t offset);
+    IBuffer* SOGetTarget       (size_t stream_output_slot);
+    size_t   SOGetTargetOffset (size_t stream_output_slot);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///”правление шейдерными уровн€ми (shader-stage)
@@ -189,11 +191,11 @@ class Device: virtual public IDevice, virtual public IDeviceContext, public Obje
 ///”правление растеризатором (rasterizer-stage)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void              RSSetState     (IRasterizerState* state);
-    void              RSSetViewports (size_t count, const Viewport* viewports);
-    void              RSSetScissors  (size_t count, const Rect* scissor_rects);
+    void              RSSetViewport  (size_t render_target_slot, const Viewport& viewport);
+    void              RSSetScissor   (size_t render_target_slot, const Rect& scissor_rect);
     IRasterizerState* RSGetState     ();
-    const Viewport*   RSGetViewports ();
-    const Rect*       RSGetScissors  ();
+    const Viewport&   RSGetViewport  (size_t render_target_slot);
+    const Rect&       RSGetScissor   (size_t render_target_slot);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///”правление выходным уровнем (output-stage)
@@ -202,18 +204,20 @@ class Device: virtual public IDevice, virtual public IDeviceContext, public Obje
     void                OSSetDepthStencilState (IDepthStencilState* state);
     void                OSSetStencilReference  (size_t reference);    
     void                OSSetRenderTargets     (size_t count, IView** render_target_view, IView* depth_stencil_view);
+    void                OSSetRenderTargetView  (size_t render_target_slot, IView* view);
+    void                OSSetDepthStencilView  (IView* view);
     IBlendState*        OSGetBlendState        ();
     IDepthStencilState* OSGetDepthStencilState ();
     size_t              OSGetStencilReference  ();
-    IView**             OSGetRenderTargetViews ();
+    IView*              OSGetRenderTargetView  (size_t render_target_slot);
     IView*              OSGetDepthStencilView  ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///ќчистка буферов отрисовки
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void ClearRenderTargetView (const Color4f& color);
+    void ClearRenderTargetView (size_t view_index, const Color4f& color);
     void ClearDepthStencilView (size_t clear_flags, float depth, unsigned char stencil);
-    void ClearViews            (size_t clear_flags, const Color4f& color, float depth, unsigned char stencil);
+    void ClearViews            (size_t clear_flags, size_t views_count, const size_t* view_indices, const Color4f* colors, float depth, unsigned char stencil);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///√енераци€ мип-уровней текстуры (необходимо дл€ текстур в которые ведетс€ рендеринг)
