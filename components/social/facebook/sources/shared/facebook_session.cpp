@@ -108,10 +108,16 @@ bool FacebookSessionImpl::ProcessDialogRequest (const char* request)
   {
     log.Printf ("Dialog load request '%s'", request);
 
-    if (xtl::xstrlen (request) && !strstr (request, "?") && !strstr (request, "about:blank"))
+    if (xtl::xstrlen (request) && !strstr (request, "?"))
     {
       CloseDialogWebView ();
       return true;
+    }
+
+    if (strstr (request, "://m.facebook.com/home.php"))  //Error occured
+    {
+      CloseDialogWebView ();
+      return false;
     }
   }
   else
@@ -245,6 +251,14 @@ bool FacebookSessionImpl::ProcessLoginRequest (const char* request, const LoginC
         PerformRequest ("me/", "fields=id,username", xtl::bind (&FacebookSessionImpl::OnCurrentUserInfoLoaded, this, _1, _2, _3, callback));
       }
 
+      return false;
+    }
+
+    if (strstr (request, "://m.facebook.com/home.php"))  //Leave app button
+    {
+      CloseDialogWebView ();
+
+      callback (OperationStatus_Canceled, "");
       return false;
     }
 
