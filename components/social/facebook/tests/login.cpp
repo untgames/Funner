@@ -66,20 +66,43 @@ void load_friends_callback (const UserList& users, OperationStatus status, const
 
 void load_user_callback (const User& user, OperationStatus status, const char* error, social::Session* session)
 {
-  printf ("User details loaded:\n");
-  dump (user);
+  switch (status)
+  {
+    case social::OperationStatus_Success:
+    {
+      printf ("User details loaded:\n");
+      dump (user);
 
-/*  common::PropertyMap apprequest_properties;
 
-  apprequest_properties.SetProperty ("message", "Join me!");
+      /*  common::PropertyMap apprequest_properties;
 
-  session->ShowWindow ("apprequests", apprequest_properties);*/
+        apprequest_properties.SetProperty ("message", "Join me!");
 
-  common::PropertyMap wall_post_properties;
+        session->ShowWindow ("apprequests", apprequest_properties);*/
 
-//  wall_post_properties.SetProperty ();
+      /*  common::PropertyMap wall_post_properties;
 
-  session->ShowWindow ("feed", wall_post_properties);
+        session->ShowWindow ("feed", wall_post_properties);*/
+      break;
+    }
+    case social::OperationStatus_Canceled:
+      printf ("User details load canceled\n");
+      break;
+    case social::OperationStatus_Failure:
+      printf ("User details load failed, error '%s'\n", error);
+      break;
+    default:
+      printf ("User details load status unknown\n");
+  }
+}
+
+void load_user_info (social::Session* session)
+{
+  common::PropertyMap info_properties;
+
+  info_properties.SetProperty ("Fields", "first_name,last_name,picture,birthday,gender");
+
+  session->LoadUser (session->CurrentUser ().Id (), xtl::bind (&load_user_callback, _1, _2, _3, session), info_properties);
 }
 
 void login_callback (social::OperationStatus status, const char* error, social::Session* session)
@@ -102,11 +125,7 @@ void login_callback (social::OperationStatus status, const char* error, social::
 
       session->LoadFriends (user, &load_friends_callback, friends_properties);
 
-      common::PropertyMap info_properties;
-
-      info_properties.SetProperty ("Fields", "first_name,last_name,picture,birthday,gender");
-
-      session->LoadUser (user.Id (), xtl::bind (&load_user_callback, _1, _2, _3, session), info_properties);
+      common::ActionQueue::PushAction (xtl::bind (&load_user_info, session), common::ActionThread_Main, 10);
 
       break;
     }

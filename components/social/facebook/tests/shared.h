@@ -6,6 +6,7 @@
 #include <xtl/common_exceptions.h>
 #include <xtl/function.h>
 
+#include <common/action_queue.h>
 #include <common/log.h>
 #include <common/property_map.h>
 

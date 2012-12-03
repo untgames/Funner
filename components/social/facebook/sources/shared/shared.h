@@ -129,8 +129,10 @@ class FacebookSessionImpl: public IAchievementManager, public ILeaderboardManage
     void PerformRequest         (const char* method_name, const char* params, const RequestCallback& callback);
     void CleanupRequestsActions ();
 
-    static void PerformRequestNotify (const RequestCallback& callback, bool succeeded, const char* status, const common::ParseNode& response);
-    static void PerformRequestImpl   (common::Action& action, const stl::string& url, const RequestCallback& callback, common::Log log);
+    static void PerformRequestNotify   (const RequestCallback& callback, bool succeeded, const char* status, const common::ParseNode& response);
+    static void PerformRequestImpl     (common::Action& action, const stl::string& method_name, const stl::string& params, const stl::string& token, const RequestCallback& callback, FacebookSessionImpl* session, common::Log log, bool after_relogin);
+           void RequestTryRelogin      (const stl::string& method_name, const stl::string& params, const RequestCallback& callback);
+           void RequestReloginCallback (OperationStatus status, const char* error, const stl::string& method_name, const stl::string& params, const RequestCallback& callback);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Обработка события активации приложения
@@ -148,7 +150,7 @@ class FacebookSessionImpl: public IAchievementManager, public ILeaderboardManage
     void OnCurrentUserInfoLoaded (bool succeeded, const stl::string& status, common::ParseNode response, const LoginCallback& callback);
     bool ProcessLoginRequest     (const char* request, const LoginCallback& callback);
     void ProcessLoginFail        (const LoginCallback& callback);
-    void OnPlatformLogInFinished (bool platform_login_result, OperationStatus status, const char* error, const char* in_token, const User& logged_in_user, const common::PropertyMap& properties, const LoginCallback& callback);
+    void OnPlatformLogInFinished (bool platform_login_result, OperationStatus status, const char* error, const char* in_token, const User& logged_in_user, const LoginCallback& callback);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Обработка ответов запросов
@@ -172,6 +174,7 @@ class FacebookSessionImpl: public IAchievementManager, public ILeaderboardManage
 
   private:
     common::Log          log;
+    common::PropertyMap  login_properties;
     stl::string          app_id;
     stl::string          token;
     bool                 logged_in;

@@ -141,12 +141,10 @@ void FacebookSessionImpl::LogIn (const LoginCallback& callback, const common::Pr
 {
   try
   {
-    //TODO check that we are already logged in
-    //TODO refresh access token
+    login_properties = properties.Clone ();
+    app_id           = properties.GetString ("AppId");
 
-    app_id = properties.GetString ("AppId");
-
-    Platform::Login (app_id.c_str (), xtl::bind (&FacebookSessionImpl::OnPlatformLogInFinished, this, _1, _2, _3, _4, _5, properties, callback), properties);
+    Platform::Login (app_id.c_str (), xtl::bind (&FacebookSessionImpl::OnPlatformLogInFinished, this, _1, _2, _3, _4, _5, callback), properties);
   }
   catch (xtl::exception& e)
   {
@@ -155,12 +153,11 @@ void FacebookSessionImpl::LogIn (const LoginCallback& callback, const common::Pr
   }
 }
 
-void FacebookSessionImpl::OnPlatformLogInFinished (bool platform_login_result, OperationStatus status, const char* error, const char* in_token, const User& logged_in_user, const common::PropertyMap& properties, const LoginCallback& callback)
+void FacebookSessionImpl::OnPlatformLogInFinished (bool platform_login_result, OperationStatus status, const char* error, const char* in_token, const User& logged_in_user, const LoginCallback& callback)
 {
   try
   {
     //TODO check that we are already logged in
-    //TODO refresh access token
 
     if (platform_login_result)
     {
@@ -179,8 +176,8 @@ void FacebookSessionImpl::OnPlatformLogInFinished (bool platform_login_result, O
 
     stl::string url = common::format ("https://m.facebook.com/dialog/oauth?client_id=%s&redirect_uri=https://www.facebook.com/connect/login_success.html&display=touch&response_type=token", app_id.c_str ());
 
-    if (properties.IsPresent ("Permissions"))
-      url.append (common::format ("&scope=%s", properties.GetString ("Permissions")));
+    if (login_properties.IsPresent ("Permissions"))
+      url.append (common::format ("&scope=%s", login_properties.GetString ("Permissions")));
 
 /*    //TODO urlSchemeSuffix
     if (_urlSchemeSuffix) {
@@ -353,6 +350,7 @@ void FacebookSessionImpl::CloseSession ()
 
   logged_in = false;
 
+  login_properties.Clear ();
   app_id.clear ();
   token.clear ();
 }

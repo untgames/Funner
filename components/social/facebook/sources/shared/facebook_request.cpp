@@ -8,12 +8,64 @@ void FacebookSessionImpl::PerformRequestNotify (const RequestCallback& callback,
   common::ActionQueue::PushAction (xtl::bind (callback, succeeded, stl::string (status), response), common::ActionThread_Main);
 }
 
-void FacebookSessionImpl::PerformRequestImpl (common::Action& action, const stl::string& url, const RequestCallback& callback, common::Log log)
+void FacebookSessionImpl::RequestTryRelogin (const stl::string& method_name, const stl::string& params, const RequestCallback& callback)
 {
+  LogIn (xtl::bind (&FacebookSessionImpl::RequestReloginCallback, this, _1, _2, method_name, params, callback), login_properties);
+}
+
+void FacebookSessionImpl::RequestReloginCallback (OperationStatus status, const char* error, const stl::string& method_name, const stl::string& params, const RequestCallback& callback)
+{
+  if (status == OperationStatus_Success)
+  {
+    pending_actions.push_back (common::ActionQueue::PushAction (xtl::bind (&FacebookSessionImpl::PerformRequestImpl, _1, method_name, params, token, callback, this, log, true), common::ActionThread_Background));
+  }
+  else
+  {
+    PerformRequestNotify (callback, false, error, common::ParseNode ());
+  }
+}
+
+void FacebookSessionImpl::PerformRequestImpl (common::Action& action, const stl::string& method_name, const stl::string& params, const stl::string& token, const RequestCallback& callback, FacebookSessionImpl* session, common::Log log, bool after_relogin)
+{
+  common::File input_file;
+
   try
   {
-    common::StdFile input_file (url.c_str (), common::FileMode_Read);
+    stl::string url = common::format ("https://graph.facebook.com/%s?%s&access_token=%s", method_name.c_str (), params.c_str (), token.c_str ());
 
+    url = percent_escape (url.c_str ());
+
+    log.Printf ("Performing request '%s'", url.c_str ());
+
+    input_file = common::StdFile (url.c_str (), common::FileMode_Read);
+  }
+  catch (xtl::exception& e)
+  {
+    if (action.IsCanceled ())
+      return;
+
+    log.Printf ("Request failed, error '%s'", e.what ());
+
+    if (after_relogin)
+      PerformRequestNotify (callback, false, e.what (), common::ParseNode ());
+    else  //try relogin
+      common::ActionQueue::PushAction (xtl::bind (&FacebookSessionImpl::RequestTryRelogin, session, method_name, params, callback), common::ActionThread_Main);
+  }
+  catch (...)
+  {
+    if (action.IsCanceled ())
+      return;
+
+    log.Printf ("Request failed, unknown error");
+
+    if (after_relogin)
+      PerformRequestNotify (callback, false, "Unknown error", common::ParseNode ());
+    else  //try relogin
+      common::ActionQueue::PushAction (xtl::bind (&FacebookSessionImpl::RequestTryRelogin, session, method_name, params, callback), common::ActionThread_Main);
+  }
+
+  try
+  {
     xtl::uninitialized_storage<char> buffer (input_file.Size () + 1);
 
     size_t bytes_copied = 0;
@@ -101,13 +153,7 @@ void FacebookSessionImpl::PerformRequest (const char* method_name, const char* p
 
   CleanupRequestsActions (); //TODO this should be called from other place!!!!!!!!
 
-  stl::string url = common::format ("https://graph.facebook.com/%s?%s&access_token=%s", method_name, params, token.c_str ());
-
-  url = percent_escape (url.c_str ());
-
-  log.Printf ("Performing request '%s'", url.c_str ());
-
-  pending_actions.push_back (common::ActionQueue::PushAction (xtl::bind (&FacebookSessionImpl::PerformRequestImpl, _1, url, callback, log), common::ActionThread_Background));
+  pending_actions.push_back (common::ActionQueue::PushAction (xtl::bind (&FacebookSessionImpl::PerformRequestImpl, _1, method_name, params, token, callback, this, log, false), common::ActionThread_Background));
 }
 
 void FacebookSessionImpl::CleanupRequestsActions ()
