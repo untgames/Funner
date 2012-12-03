@@ -102,7 +102,15 @@ const char* Device::GetCapString (DeviceCapString cap_string)
 
 const char* Device::GetVertexAttributeSemanticName (VertexAttributeSemantic semantic)
 {
-  throw xtl::make_not_implemented_exception ("render::low_level::opengl::Device::GetVertexAttributeSemanticName");
+  try
+  {
+    return InputStage::GetVertexAttributeSemanticName (semantic);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::low_level::opengl::Device::GetVertexAttributeSemanticName");
+    throw;
+  }
 }
 
 /*
