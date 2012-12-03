@@ -234,6 +234,7 @@ class Device: virtual public IDevice, virtual public IDeviceContext, public Obje
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///–исование примитивов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+    void DrawAuto             (PrimitiveType primitive_type);
     void Draw                 (PrimitiveType primitive_type, size_t first_vertex, size_t vertices_count);
     void DrawIndexed          (PrimitiveType primitive_type, size_t first_index, size_t indices_count, size_t base_vertex);
     void DrawInstanced        (PrimitiveType primitive_type, size_t vertex_count_per_instance, size_t instance_count, size_t first_vertex, size_t first_instance_location);
@@ -252,13 +253,13 @@ class Device: virtual public IDevice, virtual public IDeviceContext, public Obje
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///ѕолучение непосредственного контекста выполнени€ операций
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    virtual IDeviceContext* GetImmediateContext () { return this; }
+    IDeviceContext* GetImmediateContext () { return this; }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///¬ыполнение списка команд
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    virtual ICommandList* FinishCommandList  (bool restore_state);
-    virtual void          ExecuteCommandList (ICommandList* list, bool restore_state);
+    ICommandList* FinishCommandList  (bool restore_state);
+    void          ExecuteCommandList (ICommandList* list, bool restore_state);
 
   private:
     ITexture* CreateTexture (const TextureDesc&, const TextureData*);

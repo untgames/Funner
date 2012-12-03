@@ -676,7 +676,7 @@ IDeviceContext* Device::CreateDeferredContext ()
     
 */
 
-ICommandList* FinishCommandList (bool restore_state)
+ICommandList* Device::FinishCommandList (bool restore_state)
 {
   throw xtl::make_not_implemented_exception ("render::low_level::opengl::Device::FinishCommandList");
 }
@@ -881,6 +881,11 @@ void Device::DrawInstanced (PrimitiveType primitive_type, size_t vertex_count_pe
 void Device::DrawIndexedInstanced (PrimitiveType primitive_type, size_t index_count_per_instance, size_t instance_count, size_t first_index, size_t base_vertex, size_t first_instance_location)
 {
   throw xtl::make_not_implemented_exception ("render::low_level::opengl::Device::DrawIndexedInstanced");
+}
+
+void Device::DrawAuto (PrimitiveType primitive_type)
+{
+  throw xtl::make_not_implemented_exception ("render::low_level::opengl::Device::DrawAuto");
 }
 
 /*

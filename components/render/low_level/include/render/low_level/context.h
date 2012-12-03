@@ -94,7 +94,7 @@ class IDeviceContext: virtual public IObject
     virtual void              RSSetViewport (size_t render_target_slot, const Viewport& viewport) = 0;
     virtual void              RSSetScissor  (size_t render_target_slot, const Rect& scissor_rect) = 0;
     virtual IRasterizerState* RSGetState    () = 0;
-    virtual const Viewport&   RSGetViewpor  (size_t render_target_slot) = 0;
+    virtual const Viewport&   RSGetViewport (size_t render_target_slot) = 0;
     virtual const Rect&       RSGetScissor  (size_t render_target_slot) = 0;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -142,7 +142,7 @@ class IDeviceContext: virtual public IObject
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Рисование примитивов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    virtual void DrawAuto             (PrimitiveType primitive_type);
+    virtual void DrawAuto             (PrimitiveType primitive_type) = 0;
     virtual void Draw                 (PrimitiveType primitive_type, size_t first_vertex, size_t vertices_count) = 0;
     virtual void DrawIndexed          (PrimitiveType primitive_type, size_t first_index, size_t indices_count, size_t base_vertex) = 0;
     virtual void DrawInstanced        (PrimitiveType primitive_type, size_t vertex_count_per_instance, size_t instance_count, size_t first_vertex, size_t first_instance_location) = 0;
