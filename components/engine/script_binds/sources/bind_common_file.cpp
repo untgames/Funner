@@ -200,7 +200,6 @@ void bind_static_background_copy_state_library (Environment& environment)
   background_copy_state_status_lib.Register ("get_Started",    make_const (BackgroundCopyStateStatus_Started));
   background_copy_state_status_lib.Register ("get_InProgress", make_const (BackgroundCopyStateStatus_InProgress));
   background_copy_state_status_lib.Register ("get_Finished",   make_const (BackgroundCopyStateStatus_Finished));
-  background_copy_state_status_lib.Register ("get_Canceled",   make_const (BackgroundCopyStateStatus_Canceled));
   background_copy_state_status_lib.Register ("get_Failed",     make_const (BackgroundCopyStateStatus_Failed));
 
   environment.RegisterType<BackgroundCopyStateStatus> (COMMON_STATIC_BACKGROUND_COPY_STATE_STATUS_LIBRARY);

@@ -509,7 +509,6 @@ enum BackgroundCopyStateStatus
   BackgroundCopyStateStatus_Started,      //Копирование началось
   BackgroundCopyStateStatus_InProgress,   //Копирование в процессе
   BackgroundCopyStateStatus_Finished,     //Копирование успешно завершено
-  BackgroundCopyStateStatus_Canceled,     //Копирование отменено
   BackgroundCopyStateStatus_Failed        //Произошла ошибка во время копирования
 };
 

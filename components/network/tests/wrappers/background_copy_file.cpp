@@ -11,7 +11,6 @@ void callback (const BackgroundCopyState& copy_state)
     case BackgroundCopyStateStatus_Started:    status = "Started";    break;
     case BackgroundCopyStateStatus_InProgress: status = "InProgress"; break;
     case BackgroundCopyStateStatus_Finished:   status = "Finished";   break;
-    case BackgroundCopyStateStatus_Canceled:   status = "Canceled";   break;
     case BackgroundCopyStateStatus_Failed:     status = "Failed";     break;
     default:                                   status = "Unknown";    break;
   }
@@ -20,7 +19,7 @@ void callback (const BackgroundCopyState& copy_state)
   printf ("File size:    %u\n", copy_state.FileSize ());
   printf ("Bytes copied: %u\n", copy_state.BytesCopied ());
 
-  if (copy_state.Status () == BackgroundCopyStateStatus_Finished || copy_state.Status () == BackgroundCopyStateStatus_Canceled)
+  if (copy_state.Status () == BackgroundCopyStateStatus_Finished)
     syslib::Application::Exit (0);
   if (copy_state.Status () == BackgroundCopyStateStatus_Failed)
     syslib::Application::Exit (1);
