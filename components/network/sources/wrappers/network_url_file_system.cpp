@@ -27,6 +27,7 @@ class UrlFile: public Lockable
     UrlFile (const char* in_url, bool in_is_post)
       : url (in_url)
       , is_post (in_is_post)
+      , is_finish_sending (false)
       , end_of_request (false)
       , log (LOG_NAME)
     {
@@ -79,6 +80,11 @@ class UrlFile: public Lockable
       {
         if (end_of_request)
           return;          
+
+        if (is_finish_sending)
+          throw xtl::format_operation_exception ("", "URL query '%s' processing failed. Attempt to finish sending after error");
+
+        is_finish_sending = true;
           
         stl::string params = is_post ? common::format ("method=post send_size=%u", request_file.Size ()).c_str () : "";
           
@@ -132,12 +138,13 @@ class UrlFile: public Lockable
     }
     
   private:
-    UrlConnection connection;     //соединение
-    stl::string   url;            //URL ресурса
-    File          request_file;   //файла записи данных запроса
-    bool          is_post;        //является ли соедиенние POST запросом
-    bool          end_of_request; //флаг - запрос отправлен  
-    common::Log   log;            //поток протоколирования
+    UrlConnection connection;        //соединение
+    stl::string   url;               //URL ресурса
+    File          request_file;      //файла записи данных запроса
+    bool          is_post;           //является ли соедиенние POST запросом
+    bool          is_finish_sending; //флаг - завершение передачи
+    bool          end_of_request;    //флаг - запрос отправлен  
+    common::Log   log;               //поток протоколирования
 };
 
 class SeekableUrlFile: public UrlFile
