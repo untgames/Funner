@@ -204,14 +204,14 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
 
     memset (&blend_desc, 0, sizeof (blend_desc));
 
-    blend_desc.blend_enable                     = blend_enable;
-    blend_desc.blend_color_operation            = low_level::BlendOperation_Add;
-    blend_desc.blend_alpha_operation            = low_level::BlendOperation_Add;
-    blend_desc.blend_color_source_argument      = src_arg;
-    blend_desc.blend_color_destination_argument = dst_color_arg;
-    blend_desc.blend_alpha_source_argument      = src_arg;
-    blend_desc.blend_alpha_destination_argument = dst_alpha_arg;
-    blend_desc.color_write_mask                 = low_level::ColorWriteFlag_All;
+    blend_desc.render_target [0].blend_enable                     = blend_enable;
+    blend_desc.render_target [0].blend_color_operation            = low_level::BlendOperation_Add;
+    blend_desc.render_target [0].blend_alpha_operation            = low_level::BlendOperation_Add;
+    blend_desc.render_target [0].blend_color_source_argument      = src_arg;
+    blend_desc.render_target [0].blend_color_destination_argument = dst_color_arg;
+    blend_desc.render_target [0].blend_alpha_source_argument      = src_arg;
+    blend_desc.render_target [0].blend_alpha_destination_argument = dst_alpha_arg;
+    blend_desc.render_target [0].color_write_mask                 = low_level::ColorWriteFlag_All;
 
     return BlendStatePtr (device.CreateBlendState (blend_desc), false);
   }
@@ -223,21 +223,21 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
 
     memset (attributes, 0, sizeof (attributes));
 
-    attributes [0].semantic = low_level::VertexAttributeSemantic_Position;
+    attributes [0].semantic = device.GetVertexAttributeSemanticName (low_level::VertexAttributeSemantic_Position);
     attributes [0].format   = low_level::InputDataFormat_Vector3;
     attributes [0].type     = low_level::InputDataType_Float;
     attributes [0].slot     = 0;
     attributes [0].offset   = offsetof (RenderableVertex, position);
     attributes [0].stride   = sizeof (RenderableVertex);
 
-    attributes [1].semantic = low_level::VertexAttributeSemantic_TexCoord0;
+    attributes [1].semantic = device.GetVertexAttributeSemanticName (low_level::VertexAttributeSemantic_TexCoord0);
     attributes [1].format   = low_level::InputDataFormat_Vector2;
     attributes [1].type     = low_level::InputDataType_Float;
     attributes [1].slot     = 0;
     attributes [1].offset   = offsetof (RenderableVertex, texcoord);
     attributes [1].stride   = sizeof (RenderableVertex);
 
-    attributes [2].semantic = low_level::VertexAttributeSemantic_Color;
+    attributes [2].semantic = device.GetVertexAttributeSemanticName (low_level::VertexAttributeSemantic_Color);
     attributes [2].format   = low_level::InputDataFormat_Vector4;
     attributes [2].type     = low_level::InputDataType_UByte;
     attributes [2].slot     = 0;
@@ -472,6 +472,8 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
   //Отрисовка
   void Draw (low_level::IDevice& device)
   {
+    low_level::IDeviceContext* context = device.GetImmediateContext ();
+
     if (!initialized)
     {
       none_blend_state                   = CreateBlendState              (device, false, low_level::BlendArgument_Zero, low_level::BlendArgument_Zero, low_level::BlendArgument_Zero);
@@ -547,7 +549,7 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
       initialized = true;
     }
 
-    render_state->Capture ();
+    render_state->Capture (context);
 
     const math::vec2ui& grid_size = page_curl->GridSize ();
 
@@ -598,31 +600,31 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
 
       //установка общих ресурсов
 
-    device.ISSetInputLayout             (input_layout.get ());
-    device.SSSetConstantBuffer          (0, constant_buffer.get ());
-    device.SSSetProgramParametersLayout (program_parameters_layout.get ());
-    device.SSSetSampler                 (0, sampler_state.get ());
-    device.SSSetProgram                 (default_program.get ());
-    device.OSSetDepthStencilState       (depth_stencil_state_write_enabled.get ());
+    context->ISSetInputLayout             (input_layout.get ());
+    context->SSSetConstantBuffer          (0, constant_buffer.get ());
+    context->SSSetProgramParametersLayout (program_parameters_layout.get ());
+    context->SSSetSampler                 (0, sampler_state.get ());
+    context->SSSetProgram                 (default_program.get ());
+    context->OSSetDepthStencilState       (depth_stencil_state_write_enabled.get ());
 
     const math::vec2f& curl_point = page_curl->CurlPoint ();
 
     if (curl_point.x < page_size.x / 2)
     {
       if (curl_point.y < page_size.y / 2)
-        DrawLeftBottomCornerFlip (device);
+        DrawLeftBottomCornerFlip (device, *context);
       else
-        DrawLeftTopCornerFlip (device);
+        DrawLeftTopCornerFlip (device, *context);
     }
     else
     {
       if (curl_point.y < page_size.y / 2)
-        DrawRightBottomCornerFlip (device);
+        DrawRightBottomCornerFlip (device, *context);
       else
-        DrawRightTopCornerFlip (device);
+        DrawRightTopCornerFlip (device, *context);
     }
 
-    render_state->Apply ();
+    render_state->Apply (context);
   }
 
   //Рисование теней
@@ -693,14 +695,14 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
     current_vertex  += 6;
   }
 
-  void DrawShadows (low_level::IDevice& device, PageCurlCorner corner, float curl_radius, bool left_side)
+  void DrawShadows (low_level::IDevice& device, low_level::IDeviceContext& context, PageCurlCorner corner, float curl_radius, bool left_side)
   {
     if (curl_radius <= EPS)
       return;
 
-    device.OSSetDepthStencilState (depth_stencil_state_write_disabled.get ());
-    device.OSSetBlendState        (mask_blend_state.get ());
-    device.SSSetTexture           (0, shadow_texture.get ());
+    context.OSSetDepthStencilState (depth_stencil_state_write_disabled.get ());
+    context.OSSetBlendState        (mask_blend_state.get ());
+    context.SSSetTexture           (0, shadow_texture.get ());
 
     const math::vec2f& total_size = page_curl->Size ();
     math::vec2f        page_size  = total_size;
@@ -803,9 +805,9 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
 
         shadow_vertex_buffer->SetData (0, sizeof (RenderableVertex) * vertices_count, shadow_vertices.data ());
 
-        device.ISSetVertexBuffer (0, shadow_vertex_buffer.get ());
+        context.ISSetVertexBuffer (0, shadow_vertex_buffer.get ());
 
-        device.Draw (low_level::PrimitiveType_TriangleList, 0, vertices_count);
+        context.Draw (low_level::PrimitiveType_TriangleList, 0, vertices_count);
       }
     }
 
@@ -900,12 +902,12 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
 
       quad_vertex_buffer->SetData (0, sizeof (vertices), vertices);
 
-      device.ISSetVertexBuffer (0, quad_vertex_buffer.get ());
+      context.ISSetVertexBuffer (0, quad_vertex_buffer.get ());
 
       math::vec3f left_bottom_corner_screen = (math::vec3f (-page_curl->Size ().x / 2, -page_curl->Size ().y / 2, 0) * page_curl->WorldTM () - view_point) * projection,
                   right_top_corner_screen   = (math::vec3f (page_curl->Size ().x / 2, page_curl->Size ().y / 2, 0) * page_curl->WorldTM () - view_point) * projection;
 
-      const low_level::Rect& device_viewport = device.RSGetViewport ();
+      const low_level::Rect& device_viewport = context.RSGetViewport (0);
       low_level::Rect scissor_rect;
 
       scissor_rect.x      = device_viewport.x + (int)ceil((left_bottom_corner_screen.x + 1.f) / 2.f * viewport.width);
@@ -913,15 +915,15 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
       scissor_rect.width  = (size_t)ceil ((right_top_corner_screen.x - left_bottom_corner_screen.x) / 2 * viewport.width);
       scissor_rect.height = (size_t)ceil ((right_top_corner_screen.y - left_bottom_corner_screen.y) / 2 * viewport.height);
 
-      device.RSSetState (rasterizer_scissor_enabled_state.get ());
-      device.RSSetScissor (scissor_rect);
+      context.RSSetState (rasterizer_scissor_enabled_state.get ());
+      context.RSSetScissor (0, scissor_rect);
 
-      device.Draw (low_level::PrimitiveType_TriangleStrip, 0, 4);
+      context.Draw (low_level::PrimitiveType_TriangleStrip, 0, 4);
     }
   }
 
   //Рисование специфичное для каждого угла
-  void DrawLeftTopCornerFlip (low_level::IDevice& device)
+  void DrawLeftTopCornerFlip (low_level::IDevice& device, low_level::IDeviceContext& context)
   {
     if (page_curl->Mode () == PageCurlMode_SinglePage)
       throw xtl::format_operation_exception ("render::obsolete::render2d::RenderablePageCurl::DrawLeftTopCornerFlip", "Can't draw flip for left corner in single page mode");
@@ -977,11 +979,11 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
     curled_page->Curl (curl_corner_position, PageCurlCorner_LeftTop, curl_radius, curl_angle,
                        page_curl->FindBestCurlSteps (), page_curl->BindingMismatchWeight ());
 
-    device.RSSetState (rasterizer_cull_back_state.get ());
+    context.RSSetState (rasterizer_cull_back_state.get ());
 
     scene_graph::PageCurlPageType curled_right_page_type = GetCurledRightPageType ();
 
-    BindMaterial (device, page_materials [curled_right_page_type].get (), page_textures [curled_right_page_type].get ());
+    BindMaterial (device, context, page_materials [curled_right_page_type].get (), page_textures [curled_right_page_type].get ());
 
     float min_s, max_s, min_t, max_t;
 
@@ -993,13 +995,13 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
 
     curled_page->CalculateShadow (true, max_shadow);
 
-    curled_page->Draw (device);
+    curled_page->Draw (device, context);
 
-    device.RSSetState (rasterizer_cull_front_state.get ());
+    context.RSSetState (rasterizer_cull_front_state.get ());
 
     scene_graph::PageCurlPageType curled_left_page_type = GetCurledLeftPageType ();
 
-    BindMaterial (device, page_materials [curled_left_page_type].get (), page_textures [curled_left_page_type].get ());
+    BindMaterial (device, context, page_materials [curled_left_page_type].get (), page_textures [curled_left_page_type].get ());
 
     curled_page->CalculateShadow (false, max_shadow);
 
@@ -1007,16 +1009,16 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
 
     curled_page->SetTexCoords (min_s, min_t, max_s, max_t);
 
-    curled_page->Draw (device);
+    curled_page->Draw (device, context);
 
-    device.RSSetState (rasterizer_no_cull_state.get ());
+    context.RSSetState (rasterizer_no_cull_state.get ());
 
-    DrawStaticPages (device);
+    DrawStaticPages (device, context);
 
-    DrawShadows (device, PageCurlCorner_LeftTop, curl_radius, true);
+    DrawShadows (device, context, PageCurlCorner_LeftTop, curl_radius, true);
   }
 
-  void DrawLeftBottomCornerFlip (low_level::IDevice& device)
+  void DrawLeftBottomCornerFlip (low_level::IDevice& device, low_level::IDeviceContext& context)
   {
     if (page_curl->Mode () == PageCurlMode_SinglePage)
       throw xtl::format_operation_exception ("render::obsolete::render2d::RenderablePageCurl::DrawLeftBottomCornerFlip", "Can't draw flip for left corner in single page mode");
@@ -1072,11 +1074,11 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
     curled_page->Curl (curl_corner_position, PageCurlCorner_LeftBottom, curl_radius, curl_angle,
                        page_curl->FindBestCurlSteps (), page_curl->BindingMismatchWeight ());
 
-    device.RSSetState (rasterizer_cull_back_state.get ());
+    context.RSSetState (rasterizer_cull_back_state.get ());
 
     scene_graph::PageCurlPageType curled_right_page_type = GetCurledRightPageType ();
 
-    BindMaterial (device, page_materials [curled_right_page_type].get (), page_textures [curled_right_page_type].get ());
+    BindMaterial (device, context, page_materials [curled_right_page_type].get (), page_textures [curled_right_page_type].get ());
 
     float min_s, max_s, min_t, max_t;
 
@@ -1088,13 +1090,13 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
 
     curled_page->CalculateShadow (true, max_shadow);
 
-    curled_page->Draw (device);
+    curled_page->Draw (device, context);
 
-    device.RSSetState (rasterizer_cull_front_state.get ());
+    context.RSSetState (rasterizer_cull_front_state.get ());
 
     scene_graph::PageCurlPageType curled_left_page_type = GetCurledLeftPageType ();
 
-    BindMaterial (device, page_materials [curled_left_page_type].get (), page_textures [curled_left_page_type].get ());
+    BindMaterial (device, context, page_materials [curled_left_page_type].get (), page_textures [curled_left_page_type].get ());
 
     curled_page->CalculateShadow (false, max_shadow);
 
@@ -1102,16 +1104,16 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
 
     curled_page->SetTexCoords (min_s, min_t, max_s, max_t);
 
-    curled_page->Draw (device);
+    curled_page->Draw (device, context);
 
-    device.RSSetState (rasterizer_no_cull_state.get ());
+    context.RSSetState (rasterizer_no_cull_state.get ());
 
-    DrawStaticPages (device);
+    DrawStaticPages (device, context);
 
-    DrawShadows (device, PageCurlCorner_LeftBottom, curl_radius, true);
+    DrawShadows (device, context, PageCurlCorner_LeftBottom, curl_radius, true);
   }
 
-  void DrawRightTopCornerFlip (low_level::IDevice& device)
+  void DrawRightTopCornerFlip (low_level::IDevice& device, low_level::IDeviceContext& context)
   {
     const math::vec2f& total_size          = page_curl->Size ();
     const math::vec2f& curl_point_position = page_curl->CurlPointPosition ();
@@ -1183,11 +1185,11 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
       constant_buffer->SetData (0, sizeof (program_parameters), &program_parameters);
     }
 
-    device.RSSetState (rasterizer_cull_back_state.get ());
+    context.RSSetState (rasterizer_cull_back_state.get ());
 
     scene_graph::PageCurlPageType curled_left_page_type = GetCurledLeftPageType ();
 
-    BindMaterial (device, page_materials [curled_left_page_type].get (), page_textures [curled_left_page_type].get ());
+    BindMaterial (device, context, page_materials [curled_left_page_type].get (), page_textures [curled_left_page_type].get ());
 
     float min_s, max_s, min_t, max_t;
 
@@ -1202,13 +1204,13 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
 
     curled_page->CalculateShadow (true, max_shadow);
 
-    curled_page->Draw (device);
+    curled_page->Draw (device, context);
 
-    device.RSSetState (rasterizer_cull_front_state.get ());
+    context.RSSetState (rasterizer_cull_front_state.get ());
 
     scene_graph::PageCurlPageType curled_right_page_type = GetCurledRightPageType ();
 
-    BindMaterial (device, page_materials [curled_right_page_type].get (), page_textures [curled_right_page_type].get ());
+    BindMaterial (device, context, page_materials [curled_right_page_type].get (), page_textures [curled_right_page_type].get ());
 
     curled_page->CalculateShadow (false, max_shadow);
 
@@ -1216,9 +1218,9 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
 
     curled_page->SetTexCoords (min_s, min_t, max_s, max_t);
 
-    curled_page->Draw (device);
+    curled_page->Draw (device, context);
 
-    device.RSSetState (rasterizer_no_cull_state.get ());
+    context.RSSetState (rasterizer_no_cull_state.get ());
 
     if (page_curl->Mode () != PageCurlMode_SinglePage)
     {
@@ -1231,12 +1233,12 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
       constant_buffer->SetData (0, sizeof (program_parameters), &program_parameters);
     }
 
-    DrawStaticPages (device);
+    DrawStaticPages (device, context);
 
-    DrawShadows (device, PageCurlCorner_RightTop, curl_radius, false);
+    DrawShadows (device, context, PageCurlCorner_RightTop, curl_radius, false);
   }
 
-  void DrawRightBottomCornerFlip (low_level::IDevice& device)
+  void DrawRightBottomCornerFlip (low_level::IDevice& device, low_level::IDeviceContext& context)
   {
     const math::vec2f& total_size          = page_curl->Size ();
     const math::vec2f& curl_point_position = page_curl->CurlPointPosition ();
@@ -1308,11 +1310,11 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
       constant_buffer->SetData (0, sizeof (program_parameters), &program_parameters);
     }
 
-    device.RSSetState (rasterizer_cull_back_state.get ());
+    context.RSSetState (rasterizer_cull_back_state.get ());
 
     scene_graph::PageCurlPageType curled_left_page_type = GetCurledLeftPageType ();
 
-    BindMaterial (device, page_materials [curled_left_page_type].get (), page_textures [curled_left_page_type].get ());
+    BindMaterial (device, context, page_materials [curled_left_page_type].get (), page_textures [curled_left_page_type].get ());
 
     float min_s, max_s, min_t, max_t;
 
@@ -1327,13 +1329,13 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
 
     curled_page->CalculateShadow (true, max_shadow);
 
-    curled_page->Draw (device);
+    curled_page->Draw (device, context);
 
-    device.RSSetState (rasterizer_cull_front_state.get ());
+    context.RSSetState (rasterizer_cull_front_state.get ());
 
     scene_graph::PageCurlPageType curled_right_page_type = GetCurledRightPageType ();
 
-    BindMaterial (device, page_materials [curled_right_page_type].get (), page_textures [curled_right_page_type].get ());
+    BindMaterial (device, context, page_materials [curled_right_page_type].get (), page_textures [curled_right_page_type].get ());
 
     curled_page->CalculateShadow (false, max_shadow);
 
@@ -1341,9 +1343,9 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
 
     curled_page->SetTexCoords (min_s, min_t, max_s, max_t);
 
-    curled_page->Draw (device);
+    curled_page->Draw (device, context);
 
-    device.RSSetState (rasterizer_no_cull_state.get ());
+    context.RSSetState (rasterizer_no_cull_state.get ());
 
     if (page_curl->Mode () != PageCurlMode_SinglePage)
     {
@@ -1356,13 +1358,13 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
       constant_buffer->SetData (0, sizeof (program_parameters), &program_parameters);
     }
 
-    DrawStaticPages (device);
+    DrawStaticPages (device, context);
 
-    DrawShadows (device, PageCurlCorner_RightBottom, curl_radius, false);
+    DrawShadows (device, context, PageCurlCorner_RightBottom, curl_radius, false);
   }
 
   //Рисование лежащих страниц
-  void DrawStaticPages (low_level::IDevice& device)
+  void DrawStaticPages (low_level::IDevice& device, low_level::IDeviceContext& context)
   {
     const math::vec2f& size = page_curl->Size ();
 
@@ -1371,7 +1373,7 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
     float left_page_width  = size.x * 0.5f,
           right_page_width = left_page_width;
 
-    device.ISSetVertexBuffer (0, quad_vertex_buffer.get ());
+    context.ISSetVertexBuffer (0, quad_vertex_buffer.get ());
 
     switch (page_curl->Mode ())
     {
@@ -1414,9 +1416,9 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
 
       quad_vertex_buffer->SetData (0, sizeof (vertices), vertices);
 
-      BindMaterial (device, page_materials [left_page_type].get (), page_textures [left_page_type].get ());
+      BindMaterial (device, context, page_materials [left_page_type].get (), page_textures [left_page_type].get ());
 
-      device.Draw (low_level::PrimitiveType_TriangleStrip, 0, 4);
+      context.Draw (low_level::PrimitiveType_TriangleStrip, 0, 4);
     }
 
     if (right_page_type >= 0)
@@ -1441,13 +1443,13 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
 
       quad_vertex_buffer->SetData (0, sizeof (vertices), vertices);
 
-      BindMaterial (device, page_materials [right_page_type].get (), page_textures [right_page_type].get ());
+      BindMaterial (device, context, page_materials [right_page_type].get (), page_textures [right_page_type].get ());
 
-      device.Draw (low_level::PrimitiveType_TriangleStrip, 0, 4);
+      context.Draw (low_level::PrimitiveType_TriangleStrip, 0, 4);
     }
   }
 
-  void BindMaterial (low_level::IDevice& device, SpriteMaterial* material, ILowLevelTexture* texture)
+  void BindMaterial (low_level::IDevice& device, low_level::IDeviceContext& context, SpriteMaterial* material, ILowLevelTexture* texture)
   {
     static const char* METHOD_NAME = "render::obsolete::render2d::RenderablePageCurl::BindMaterial";
 
@@ -1479,8 +1481,8 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
         throw xtl::format_operation_exception (METHOD_NAME, "Unsupported material '%s' blend mode, only 'none', 'translucent', 'mask' and 'additive' page material blend mode supported", material->Name ());
     }
 
-    device.OSSetBlendState (material_blend_state.get ());
-    device.SSSetTexture    (0, texture->GetTexture ());
+    context.OSSetBlendState (material_blend_state.get ());
+    context.SSSetTexture    (0, texture->GetTexture ());
   }
 };
 

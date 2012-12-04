@@ -130,14 +130,14 @@ struct RenderablePageCurlMesh::Impl
   }
 
   //Отрисовка
-  void Draw (low_level::IDevice& device)
+  void Draw (low_level::IDevice& device, low_level::IDeviceContext& context)
   {
     vertex_buffer->SetData (0, sizeof (RenderableVertex) * vertices_count, vertices.data ());
 
-    device.ISSetIndexBuffer  (index_buffer.get ());
-    device.ISSetVertexBuffer (0, vertex_buffer.get ());
+    context.ISSetIndexBuffer  (index_buffer.get ());
+    context.ISSetVertexBuffer (0, vertex_buffer.get ());
 
-    device.DrawIndexed (low_level::PrimitiveType_TriangleList, 0, triangles_count * 3, 0);
+    context.DrawIndexed (low_level::PrimitiveType_TriangleList, 0, triangles_count * 3, 0);
   }
 
   //Трансформация страницы
@@ -765,9 +765,9 @@ size_t RenderablePageCurlMesh::GridVerticesStride () const
     Рисование
 */
 
-void RenderablePageCurlMesh::Draw (low_level::IDevice& device)
+void RenderablePageCurlMesh::Draw (low_level::IDevice& device, low_level::IDeviceContext& context)
 {
-  impl->Draw (device);
+  impl->Draw (device, context);
 }
 
 /*
