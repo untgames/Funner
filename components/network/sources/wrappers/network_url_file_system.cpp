@@ -82,7 +82,7 @@ class UrlFile: public Lockable
           return;          
 
         if (is_finish_sending)
-          throw xtl::format_operation_exception ("", "URL query '%s' processing failed. Attempt to finish sending after error");
+          throw xtl::format_operation_exception ("", "URL query '%s' processing failed. Attempt to finish sending after error", url.c_str ());
 
         is_finish_sending = true;
           
