@@ -69,7 +69,7 @@ class ClearFrame: virtual public IClearFrame, public BasicFrame
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Реализация визуализации
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void DrawCore (render::low_level::IDevice*);
+    void DrawCore (render::low_level::IDevice*, render::low_level::IDeviceContext*);
 
   private:
     size_t                     clear_flags;

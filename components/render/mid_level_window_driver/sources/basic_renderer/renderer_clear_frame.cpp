@@ -61,7 +61,7 @@ void ClearFrame::SetStencilIndex (unsigned char stencil_index)
     Реализация визуализации
 */
 
-void ClearFrame::DrawCore (render::low_level::IDevice* device)
+void ClearFrame::DrawCore (render::low_level::IDevice* device, render::low_level::IDeviceContext* context)
 {
   size_t device_clear_flags = 0;
 
@@ -71,7 +71,7 @@ void ClearFrame::DrawCore (render::low_level::IDevice* device)
   {
     int viewport_offset_x = 0, viewport_offset_y = 0;
        
-    BasicFrame::BindViewport (device, viewport_offset_x, viewport_offset_y);
+    BasicFrame::BindViewport (device, context, viewport_offset_x, viewport_offset_y);
 
     device_clear_flags |= render::low_level::ClearFlag_ViewportOnly;
   }
@@ -87,5 +87,7 @@ void ClearFrame::DrawCore (render::low_level::IDevice* device)
     if (clear_flags & render::mid_level::ClearFlag_Stencil) device_clear_flags |= render::low_level::ClearFlag_Stencil;
   }
 
-  device->ClearViews (device_clear_flags, clear_color, clear_depth_value, clear_stencil_index);  
+  size_t rt_index = 0;
+
+  context->ClearViews (device_clear_flags, 1, &rt_index, &clear_color, clear_depth_value, clear_stencil_index);  
 }

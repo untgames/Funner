@@ -345,10 +345,10 @@ render::mid_level::renderer2d::TexMinFilter RenderTargetTexture::GetMinFilter ()
     Генерация мипов
 */
 
-void RenderTargetTexture::GenerateMips (render::low_level::IDevice& device)
+void RenderTargetTexture::GenerateMips (render::low_level::IDeviceContext& context)
 {
   if (min_filter == mid_level::renderer2d::TexMinFilter_LinearMipLinear)
-    device.GenerateMips (GetView ()->GetTexture ());
+    context.GenerateMips (GetView ()->GetTexture ());
 }
 
 /*
