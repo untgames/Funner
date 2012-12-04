@@ -394,7 +394,7 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
 
        if (!tile_width || !tile_height)
          throw xtl::format_operation_exception ("render::obsolete::render2d::RenderablePageCurl::GetTexRect",
-                                                "Bad page material (tile_width=%u, tile_height=%u)", tile_width, tile_height);
+                                                "Bad page material '%s' (tile_width=%u, tile_height=%u)", material->Name (), tile_width, tile_height);
 
        min_s = material->TileOffsetX () / (float)texture_size.x;
        min_t = (material->TileOffsetY () - tile_height) / (float)texture_size.y;
