@@ -32,12 +32,12 @@ int main ()
     
     DepthStencilStatePtr state (test.device->CreateDepthStencilState (desc), false);
     
-    test.device->OSSetDepthStencilState (state.get ());
-    test.device->OSSetStencilReference (0x17);
+    test.device->GetImmediateContext ()->OSSetDepthStencilState (state.get ());
+    test.device->GetImmediateContext ()->OSSetStencilReference (0x17);
 
-    test.device->Draw (PrimitiveType_PointList, 0, 0);
+    test.device->GetImmediateContext ()->Draw (PrimitiveType_PointList, 0, 0);
     
-    printf ("stencil reference: %02x\n", test.device->OSGetStencilReference ());
+    printf ("stencil reference: %02x\n", test.device->GetImmediateContext ()->OSGetStencilReference ());
   }
   catch (std::exception& exception)
   {

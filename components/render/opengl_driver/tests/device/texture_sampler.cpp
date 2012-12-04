@@ -50,10 +50,10 @@ int main ()
 
     texture->SetData (0, 0, 0, 0, TEX_SIZE, TEX_SIZE, PixelFormat_RGB8, image_data);
 
-    test.device->SSSetSampler (1, sampler.get ());
-    test.device->SSSetTexture  (1, texture.get ());
+    test.device->GetImmediateContext ()->SSSetSampler (1, sampler.get ());
+    test.device->GetImmediateContext ()->SSSetTexture  (1, texture.get ());
 
-    test.device->Draw (PrimitiveType_PointList, 0, 0);
+    test.device->GetImmediateContext ()->Draw (PrimitiveType_PointList, 0, 0);
   }
   catch (std::exception& exception)
   {

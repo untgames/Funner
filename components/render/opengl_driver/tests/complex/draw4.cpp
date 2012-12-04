@@ -38,21 +38,21 @@ struct MyShaderParameters2
 
 void redraw (Test& test)
 {
-  test.device->Draw (PrimitiveType_TriangleList, 0, 3);
+  test.device->GetImmediateContext ()->Draw (PrimitiveType_TriangleList, 0, 3);
 
   PredicatePtr predicate (test.device->CreatePredicate (), false);
   
-  predicate->Begin ();
-  test.device->Draw (PrimitiveType_TriangleList, 3, 3);
-  predicate->End ();
+  test.device->GetImmediateContext ()->Begin (predicate.get ());
+  test.device->GetImmediateContext ()->Draw (PrimitiveType_TriangleList, 3, 3);
+  test.device->GetImmediateContext ()->End (predicate.get ());
 
-  test.device->SetPredication (predicate.get (), true);
+  test.device->GetImmediateContext ()->SetPredication (predicate.get (), true);
 
-  test.device->Flush ();
+  test.device->GetImmediateContext ()->Flush ();
 
   syslib::Application::Sleep (10);
 
-  test.device->Draw (PrimitiveType_TriangleList, 6, 3);
+  test.device->GetImmediateContext ()->Draw (PrimitiveType_TriangleList, 6, 3);
 }
 
 void print (const char* message)
@@ -104,9 +104,9 @@ int main ()
     printf ("Set input-stage\n");
     
     VertexAttribute attributes [] = {
-      {VertexAttributeSemantic_Normal, InputDataFormat_Vector3, InputDataType_Float, 0, TEST_OFFSETOF (MyVertex, normal), sizeof (MyVertex)},
-      {VertexAttributeSemantic_Position, InputDataFormat_Vector3, InputDataType_Float, 0, TEST_OFFSETOF (MyVertex, position), sizeof (MyVertex)},
-      {VertexAttributeSemantic_Color, InputDataFormat_Vector4, InputDataType_Float, 0, TEST_OFFSETOF (MyVertex, color), sizeof (MyVertex)},
+      {test.device->GetVertexAttributeSemanticName (VertexAttributeSemantic_Normal), InputDataFormat_Vector3, InputDataType_Float, 0, TEST_OFFSETOF (MyVertex, normal), sizeof (MyVertex)},
+      {test.device->GetVertexAttributeSemanticName (VertexAttributeSemantic_Position), InputDataFormat_Vector3, InputDataType_Float, 0, TEST_OFFSETOF (MyVertex, position), sizeof (MyVertex)},
+      {test.device->GetVertexAttributeSemanticName (VertexAttributeSemantic_Color), InputDataFormat_Vector4, InputDataType_Float, 0, TEST_OFFSETOF (MyVertex, color), sizeof (MyVertex)},
     };
     
     InputLayoutDesc layout_desc;
@@ -120,8 +120,8 @@ int main ()
     
     InputLayoutPtr layout (test.device->CreateInputLayout (layout_desc), false);
 
-    test.device->ISSetInputLayout (layout.get ());
-    test.device->ISSetVertexBuffer (0, vb.get ());
+    test.device->GetImmediateContext ()->ISSetInputLayout (layout.get ());
+    test.device->GetImmediateContext ()->ISSetVertexBuffer (0, vb.get ());
 
     printf ("Set shader stage\n");
     
@@ -175,10 +175,10 @@ int main ()
     cb->SetData (0, sizeof my_shader_parameters, &my_shader_parameters);
     cb2->SetData (0, sizeof my_shader_parameters2, &my_shader_parameters2);
 
-    test.device->SSSetProgram (shader.get ());
-    test.device->SSSetProgramParametersLayout (program_parameters_layout.get ());
-    test.device->SSSetConstantBuffer (0, cb.get ());
-    test.device->SSSetConstantBuffer (1, cb2.get ());
+    test.device->GetImmediateContext ()->SSSetProgram (shader.get ());
+    test.device->GetImmediateContext ()->SSSetProgramParametersLayout (program_parameters_layout.get ());
+    test.device->GetImmediateContext ()->SSSetConstantBuffer (0, cb.get ());
+    test.device->GetImmediateContext ()->SSSetConstantBuffer (1, cb2.get ());
 
     printf ("Main loop\n");
 

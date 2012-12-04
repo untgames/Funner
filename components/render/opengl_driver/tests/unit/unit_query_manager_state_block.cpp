@@ -7,8 +7,8 @@ struct State
   
   void Init (IDevice& device)
   {
-    predicate       = device.GetPredicate ();
-    predicate_value = device.GetPredicateValue ();
+    predicate       = device.GetImmediateContext ()->GetPredicate ();
+    predicate_value = device.GetImmediateContext ()->GetPredicateValue ();
   }  
 
   void Check (const State& src)
@@ -33,7 +33,7 @@ int main ()
     PredicatePtr predicate (test.device->CreatePredicate ());
     bool         predicate_value = true;
     
-    test.device->SetPredication (predicate.get (), predicate_value);
+    test.device->GetImmediateContext ()->SetPredication (predicate.get (), predicate_value);
 
     State src_state;
 
@@ -45,9 +45,9 @@ int main ()
 
     StateBlockPtr state_block (test.device->CreateStateBlock (mask), false);
     
-    state_block->Capture ();
+    state_block->Capture (test.device->GetImmediateContext ());
 
-    test.device->SetPredication (0, 0);
+    test.device->GetImmediateContext ()->SetPredication (0, 0);
 
     printf ("after reset\n");
     
@@ -56,7 +56,7 @@ int main ()
     dst_state.Init (*test.device);    
     dst_state.Check (src_state);
 
-    state_block->Apply ();
+    state_block->Apply (test.device->GetImmediateContext ());
 
     printf ("after apply\n");    
 

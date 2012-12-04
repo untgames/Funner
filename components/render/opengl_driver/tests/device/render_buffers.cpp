@@ -189,11 +189,13 @@ int main ()
     clear_color.blue  = 3.0f / 255.0f;
     clear_color.alpha = 4.0f / 255.0f;
 
-    test.device->ClearViews (ClearFlag_All, clear_color, 0, 0);
+    size_t rt_index = 0;
+
+    test.device->GetImmediateContext ()->ClearViews (ClearFlag_All, 1, &rt_index, &clear_color, 0, 0);
 
     printf ("Color back-buffer test:\n");
 
-    TexturePtr back_color_buffer = test.device->OSGetRenderTargetView ()->GetTexture ();
+    TexturePtr back_color_buffer = test.device->GetImmediateContext ()->OSGetRenderTargetView (0)->GetTexture ();
 
     test_buffer (*back_color_buffer);
 
@@ -205,7 +207,7 @@ int main ()
 
     printf ("Depth-stencil buffer test:\n");
 
-    TexturePtr depth_stencil_buffer = test.device->OSGetDepthStencilView ()->GetTexture ();
+    TexturePtr depth_stencil_buffer = test.device->GetImmediateContext ()->OSGetDepthStencilView ()->GetTexture ();
 
     test_buffer (*depth_stencil_buffer);    
     

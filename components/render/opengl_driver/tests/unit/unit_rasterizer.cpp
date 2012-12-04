@@ -2,7 +2,7 @@
 
 using namespace common;
 
-//¯¥ç âì ¤¥áªà¨¯â®à  rasterizer-state
+//ïå÷àòü äåñêðèïòîðà rasterizer-state
 inline void dump_desc (IRasterizerState& state)
 {
   if (!&state)
@@ -36,7 +36,7 @@ int main ()
   {
     Test test;
 
-    dump_desc (*test.device->RSGetState ());    
+    dump_desc (*test.device->GetImmediateContext ()->RSGetState ());    
 
     RasterizerDesc desc;
     memset (&desc, 0, sizeof (desc));
@@ -61,13 +61,13 @@ int main ()
     viewport.min_depth = 0.1f;
     viewport.max_depth = 10.9f;
 
-    test.device->RSSetState    (rasterizer.get ());
-    test.device->RSSetViewport (viewport);
-    test.device->RSSetScissor  (scissor);
+    test.device->GetImmediateContext ()->RSSetState    (rasterizer.get ());
+    test.device->GetImmediateContext ()->RSSetViewport (0, viewport);
+    test.device->GetImmediateContext ()->RSSetScissor  (0, scissor);
 
-    dump_desc (*test.device->RSGetState ());    
+    dump_desc (*test.device->GetImmediateContext ()->RSGetState ());    
 
-    test.device->Draw (PrimitiveType_PointList, 0, 0);
+    test.device->GetImmediateContext ()->Draw (PrimitiveType_PointList, 0, 0);
   }
   catch (std::exception& exception)
   {

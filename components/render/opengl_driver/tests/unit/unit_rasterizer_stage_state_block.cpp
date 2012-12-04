@@ -8,9 +8,9 @@ struct State
   
   void Init (IDevice& device)
   {
-    state    = device.RSGetState ();
-    viewport = device.RSGetViewport ();
-    scissor  = device.RSGetScissor ();
+    state    = device.GetImmediateContext ()->RSGetState ();
+    viewport = device.GetImmediateContext ()->RSGetViewport (0);
+    scissor  = device.GetImmediateContext ()->RSGetScissor (0);
   }
   
   static bool Check (const Viewport& v1, const Viewport& v2)
@@ -49,7 +49,7 @@ int main ()
     
     StateBlockPtr state_block (test.device->CreateStateBlock (mask), false);
 
-    state_block->Capture ();
+    state_block->Capture (test.device->GetImmediateContext ());
 
     Rect scissor;
     Viewport viewport;
@@ -57,9 +57,9 @@ int main ()
     memset (&scissor, 0, sizeof scissor);
     memset (&viewport, 0, sizeof viewport);
     
-    test.device->RSSetState (0);
-    test.device->RSSetViewport (viewport);
-    test.device->RSSetScissor  (scissor);    
+    test.device->GetImmediateContext ()->RSSetState (0);
+    test.device->GetImmediateContext ()->RSSetViewport (0, viewport);
+    test.device->GetImmediateContext ()->RSSetScissor  (0, scissor);    
 
     printf ("after reset\n");
     
@@ -68,7 +68,7 @@ int main ()
     dst_state.Init (*test.device);    
     dst_state.Check (src_state);
 
-    state_block->Apply ();
+    state_block->Apply (test.device->GetImmediateContext ());
 
     printf ("after apply\n");    
 

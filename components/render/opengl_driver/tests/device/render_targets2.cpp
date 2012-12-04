@@ -79,8 +79,9 @@ int main ()
         
         try
         {
-          test.device->OSSetRenderTargets (view [i].get (), view [j].get ());
-          test.device->Draw (PrimitiveType_PointList, 0, 0);
+          test.device->GetImmediateContext ()->OSSetRenderTargetView (0, view [i].get ());
+          test.device->GetImmediateContext ()->OSSetDepthStencilView (view [j].get ());
+          test.device->GetImmediateContext ()->Draw (PrimitiveType_PointList, 0, 0);
           
           status [i][j] = true;
           

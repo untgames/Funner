@@ -17,11 +17,11 @@ struct State
   
   void Init (IDevice& device)
   {
-    program_parameters_layout = device.SSGetProgramParametersLayout ();
-    program                   = device.SSGetProgram ();
+    program_parameters_layout = device.GetImmediateContext ()->SSGetProgramParametersLayout ();
+    program                   = device.GetImmediateContext ()->SSGetProgram ();
 
     for (size_t i=0; i<DEVICE_CONSTANT_BUFFER_SLOTS_COUNT; i++)
-      buffers [i] = device.SSGetConstantBuffer (i);
+      buffers [i] = device.GetImmediateContext ()->SSGetConstantBuffer (i);
   }  
 
   void Check (const State& src)
@@ -71,11 +71,11 @@ int main ()
 
     BufferPtr buffer (test.device->CreateBuffer (cb_desc), false);
     
-    test.device->SSSetProgram (shader.get ());
-    test.device->SSSetProgramParametersLayout (program_parameters_layout.get ());
+    test.device->GetImmediateContext ()->SSSetProgram (shader.get ());
+    test.device->GetImmediateContext ()->SSSetProgramParametersLayout (program_parameters_layout.get ());
     
     for (size_t i=0; i<DEVICE_CONSTANT_BUFFER_SLOTS_COUNT; i++)
-      test.device->SSSetConstantBuffer (i, buffer.get ());
+      test.device->GetImmediateContext ()->SSSetConstantBuffer (i, buffer.get ());
 
     State src_state;
 
@@ -93,13 +93,13 @@ int main ()
 
     StateBlockPtr state_block (test.device->CreateStateBlock (mask), false);
     
-    state_block->Capture ();
+    state_block->Capture (test.device->GetImmediateContext ());
 
-    test.device->SSSetProgram (0);
-    test.device->SSSetProgramParametersLayout (0);
+    test.device->GetImmediateContext ()->SSSetProgram (0);
+    test.device->GetImmediateContext ()->SSSetProgramParametersLayout (0);
 
     for (size_t i=0; i<DEVICE_CONSTANT_BUFFER_SLOTS_COUNT; i++)
-      test.device->SSSetConstantBuffer (i, 0);    
+      test.device->GetImmediateContext ()->SSSetConstantBuffer (i, 0);    
 
     printf ("after reset\n");
     
@@ -108,7 +108,7 @@ int main ()
     dst_state.Init (*test.device);    
     dst_state.Check (src_state);
 
-    state_block->Apply ();
+    state_block->Apply (test.device->GetImmediateContext ());
 
     printf ("after apply\n");    
 

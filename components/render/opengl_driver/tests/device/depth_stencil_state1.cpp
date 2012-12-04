@@ -8,7 +8,7 @@ int main ()
   {
     Test test (L"OpenGL device test window (depth_stencil_state1)");
     
-    dump_desc (*test.device->OSGetDepthStencilState ());    
+    dump_desc (*test.device->GetImmediateContext ()->OSGetDepthStencilState ());    
     
     DepthStencilDesc desc;
     
@@ -34,13 +34,13 @@ int main ()
     
     DepthStencilStatePtr state (test.device->CreateDepthStencilState (desc), false);
     
-    test.device->OSSetDepthStencilState (state.get ());
+    test.device->GetImmediateContext ()->OSSetDepthStencilState (state.get ());
     
-    dump_desc (*test.device->OSGetDepthStencilState ());
+    dump_desc (*test.device->GetImmediateContext ()->OSGetDepthStencilState ());
     
     state = 0;
     
-    dump_desc (*test.device->OSGetDepthStencilState ());    
+    dump_desc (*test.device->GetImmediateContext ()->OSGetDepthStencilState ());    
   }
   catch (std::exception& exception)
   {

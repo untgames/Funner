@@ -24,7 +24,7 @@ struct MyShaderParameters2
 
 void redraw (Test& test)
 {
-  test.device->Draw (PrimitiveType_TriangleList, 0, 3);
+  test.device->GetImmediateContext ()->Draw (PrimitiveType_TriangleList, 0, 3);
 }
 
 ViewPtr create_depth_stencil_view (IDevice* device, ISwapChain* swap_chain)
@@ -90,9 +90,9 @@ int main ()
     printf ("Set input-stage\n");
 
     VertexAttribute attributes [] = {
-      {VertexAttributeSemantic_Normal, InputDataFormat_Vector3, InputDataType_Float, 0, TEST_OFFSETOF (MyVertex, normal), sizeof (MyVertex)},
-      {VertexAttributeSemantic_Position, InputDataFormat_Vector3, InputDataType_Float, 0, TEST_OFFSETOF (MyVertex, position), sizeof (MyVertex)},
-      {VertexAttributeSemantic_Color, InputDataFormat_Vector4, InputDataType_UByte, 0, TEST_OFFSETOF (MyVertex, color), sizeof (MyVertex)},
+      {test.device->GetVertexAttributeSemanticName (VertexAttributeSemantic_Normal), InputDataFormat_Vector3, InputDataType_Float, 0, offsetof (MyVertex, normal), sizeof (MyVertex)},
+      {test.device->GetVertexAttributeSemanticName (VertexAttributeSemantic_Position), InputDataFormat_Vector3, InputDataType_Float, 0, offsetof (MyVertex, position), sizeof (MyVertex)},
+      {test.device->GetVertexAttributeSemanticName (VertexAttributeSemantic_Color), InputDataFormat_Vector4, InputDataType_Float, 0, offsetof (MyVertex, color), sizeof (MyVertex)},
     };
     
     InputLayoutDesc layout_desc;
@@ -106,8 +106,8 @@ int main ()
     
     InputLayoutPtr layout (test.device->CreateInputLayout (layout_desc), false);
 
-    test.device->ISSetInputLayout (layout.get ());
-    test.device->ISSetVertexBuffer (0, vb.get ());
+    test.device->GetImmediateContext ()->ISSetInputLayout (layout.get ());
+    test.device->GetImmediateContext ()->ISSetVertexBuffer (0, vb.get ());
 
     printf ("Set output stage\n");
    
@@ -122,7 +122,7 @@ int main ()
 
     DepthStencilStatePtr depth_stencil_state (test.device->CreateDepthStencilState (depth_stencil_desc), false);
 
-    test.device->OSSetDepthStencilState (depth_stencil_state.get ());
+    test.device->GetImmediateContext ()->OSSetDepthStencilState (depth_stencil_state.get ());
 
     printf ("Main loop\n");
 

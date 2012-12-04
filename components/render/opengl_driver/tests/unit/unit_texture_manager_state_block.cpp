@@ -9,8 +9,8 @@ struct State
   {
     for (size_t i=0; i<DEVICE_SAMPLER_SLOTS_COUNT; i++)
     {
-      samplers [i] = device.SSGetSampler (i);
-      textures [i] = device.SSGetTexture (i);
+      samplers [i] = device.GetImmediateContext ()->SSGetSampler (i);
+      textures [i] = device.GetImmediateContext ()->SSGetTexture (i);
     }
   }  
 
@@ -61,8 +61,8 @@ int main ()
     TexturePtr texture (test.device->CreateTexture (texture_desc), false);
     SamplerStatePtr sampler (test.device->CreateSamplerState (sampler_desc), false);        
     
-    test.device->SSSetSampler (0, sampler.get ());
-    test.device->SSSetTexture (0, texture.get ());
+    test.device->GetImmediateContext ()->SSSetSampler (0, sampler.get ());
+    test.device->GetImmediateContext ()->SSSetTexture (0, texture.get ());
 
     State src_state;
 
@@ -80,10 +80,10 @@ int main ()
     
     StateBlockPtr state_block (test.device->CreateStateBlock (mask), false);
 
-    state_block->Capture ();
+    state_block->Capture (test.device->GetImmediateContext ());
         
-    test.device->SSSetSampler (0, 0);
-    test.device->SSSetTexture (0, 0);
+    test.device->GetImmediateContext ()->SSSetSampler (0, 0);
+    test.device->GetImmediateContext ()->SSSetTexture (0, 0);
 
     printf ("after reset\n");
     
@@ -92,7 +92,7 @@ int main ()
     dst_state.Init (*test.device);    
     dst_state.Check (src_state);
 
-    state_block->Apply ();
+    state_block->Apply (test.device->GetImmediateContext ());
 
     printf ("after apply\n");    
 

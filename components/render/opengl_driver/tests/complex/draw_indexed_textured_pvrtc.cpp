@@ -27,7 +27,7 @@ struct MyVertex
 
 void redraw (Test& test)
 {
-  test.device->DrawIndexed (PrimitiveType_TriangleList, 0, 6, 0);  
+  test.device->GetImmediateContext ()->DrawIndexed (PrimitiveType_TriangleList, 0, 6, 0);  
 }
 
 PixelFormat get_format (const char* name)
@@ -94,10 +94,10 @@ int main ()
     printf ("Set input-stage\n");
     
     VertexAttribute attributes [] = {
-      {VertexAttributeSemantic_Normal, InputDataFormat_Vector3, InputDataType_Float, 0, offsetof (MyVertex, normal), sizeof (MyVertex)},
-      {VertexAttributeSemantic_Position, InputDataFormat_Vector3, InputDataType_Float, 0, offsetof (MyVertex, position), sizeof (MyVertex)},
-      {VertexAttributeSemantic_Color, InputDataFormat_Vector4, InputDataType_UByte, 0, offsetof (MyVertex, color), sizeof (MyVertex)},
-      {VertexAttributeSemantic_TexCoord0, InputDataFormat_Vector2, InputDataType_Float, 0, offsetof (MyVertex, tcoord), sizeof (MyVertex)},
+      {test.device->GetVertexAttributeSemanticName (VertexAttributeSemantic_Normal), InputDataFormat_Vector3, InputDataType_Float, 0, offsetof (MyVertex, normal), sizeof (MyVertex)},
+      {test.device->GetVertexAttributeSemanticName (VertexAttributeSemantic_Position), InputDataFormat_Vector3, InputDataType_Float, 0, offsetof (MyVertex, position), sizeof (MyVertex)},
+      {test.device->GetVertexAttributeSemanticName (VertexAttributeSemantic_Color), InputDataFormat_Vector4, InputDataType_UByte, 0, offsetof (MyVertex, color), sizeof (MyVertex)},
+      {test.device->GetVertexAttributeSemanticName (VertexAttributeSemantic_TexCoord0), InputDataFormat_Vector2, InputDataType_Float, 0, offsetof (MyVertex, tcoord), sizeof (MyVertex)},
     };
     
     InputLayoutDesc layout_desc;
@@ -111,9 +111,9 @@ int main ()
     
     InputLayoutPtr layout (test.device->CreateInputLayout (layout_desc), false);
 
-    test.device->ISSetInputLayout (layout.get ());
-    test.device->ISSetVertexBuffer (0, vb.get ());
-    test.device->ISSetIndexBuffer (ib.get ());
+    test.device->GetImmediateContext ()->ISSetInputLayout (layout.get ());
+    test.device->GetImmediateContext ()->ISSetVertexBuffer (0, vb.get ());
+    test.device->GetImmediateContext ()->ISSetIndexBuffer (ib.get ());
     
     printf ("Load textures\n");
     
@@ -155,8 +155,8 @@ int main ()
     TexturePtr      texture (test.device->CreateTexture (texture_desc, texture_data), false);
     SamplerStatePtr sampler (test.device->CreateSamplerState (sampler_desc), false);
 
-    test.device->SSSetTexture (0, texture.get ());
-    test.device->SSSetSampler (0, sampler.get ());
+    test.device->GetImmediateContext ()->SSSetTexture (0, texture.get ());
+    test.device->GetImmediateContext ()->SSSetSampler (0, sampler.get ());
 
     printf ("Main loop\n");
 

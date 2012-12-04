@@ -220,8 +220,9 @@ int main ()
 
         try
         {
-          test.device->OSSetRenderTargets (color_view.get (), depth_stencil_view.get ());
-          test.device->Draw (PrimitiveType_PointList, 0, 0);
+          test.device->GetImmediateContext ()->OSSetRenderTargetView (0, color_view.get ());
+          test.device->GetImmediateContext ()->OSSetDepthStencilView (depth_stencil_view.get ());
+          test.device->GetImmediateContext ()->Draw (PrimitiveType_PointList, 0, 0);
 
           status [i*views.size () + j] = true;
 

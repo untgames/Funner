@@ -26,7 +26,7 @@ void test_state(const RasterizerDesc& desc, IDevice* device)
   total_tests++;
   try
   {
-    device->RSSetState(device->CreateRasterizerState(desc));
+    device->GetImmediateContext ()->RSSetState(device->CreateRasterizerState(desc));
     if (output_mode & OutputMode_Success)
     {
       print_desc(desc);
