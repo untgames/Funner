@@ -6,7 +6,8 @@ using namespace social::facebook;
 namespace
 {
 
-const common::ActionQueue::time_t DESTROY_WEB_VIEW_DELAY = 5;
+const common::ActionQueue::time_t DESTROY_WEB_VIEW_DELAY     = 5;  //Задержка удаления web-view после скрытия
+const common::ActionQueue::time_t ACTIVATE_AFTER_LOGIN_DELAY = 3;  //Задержка показа web-view логина (для логина без показа окна в случае автопродления токена)
 
 const char* LOG_NAME            = "social.facebook.FacebookSession";
 const char* SESSION_DESCRIPTION = "Facebook";
@@ -194,7 +195,7 @@ void FacebookSessionImpl::OnPlatformLogInFinished (bool platform_login_result, O
 
     dialog_web_view->LoadRequest (url.c_str ());
 
-    OnActivate ();
+    activate_after_dialog_show_action = common::ActionQueue::PushAction (xtl::bind (&FacebookSessionImpl::OnActivate, this), common::ActionThread_Main, ACTIVATE_AFTER_LOGIN_DELAY);
   }
   catch (xtl::exception& e)
   {
@@ -263,6 +264,9 @@ bool FacebookSessionImpl::ProcessLoginRequest (const char* request, const LoginC
     if (strstr (request, "://m.facebook.com/help") ||
         strstr (request, "://m.facebook.com/login/identify?ctx=recover"))
       return false;
+
+    if (strstr (request, "://m.facebook.com/dialog/oauth"))
+      OnActivate ();
   }
   else
     log.Printf ("Login load request");
@@ -348,6 +352,8 @@ void FacebookSessionImpl::CloseSession ()
 
   pending_actions.clear ();
 
+  activate_after_dialog_show_action.Cancel ();
+
   logged_in = false;
 
   login_properties.Clear ();
@@ -407,6 +413,7 @@ void FacebookSessionImpl::OnActivate ()
   window.SetFocus   (true);
   window.Maximize   ();
 
+  activate_after_dialog_show_action = common::Action ();
   //TODO read window size and position from property map
 
   /*  //DEBUG

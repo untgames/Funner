@@ -185,6 +185,7 @@ class FacebookSessionImpl: public IAchievementManager, public ILeaderboardManage
     xtl::auto_connection dialog_web_view_load_fail_connection;
     xtl::auto_connection on_activate_connection;
     ActionsList          pending_actions;
+    common::Action       activate_after_dialog_show_action;
 };
 
 //utils
