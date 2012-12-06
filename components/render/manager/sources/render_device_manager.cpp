@@ -8,8 +8,9 @@ using namespace render;
 
 struct DeviceManager::Impl
 {
+  LowLevelDeviceContextPtr         context;                    //непосредственный контекст отрисовки
   LowLevelDevicePtr                device;                     //устройство визуализации
-  LowLevelDriverPtr                driver;                     //драйвер устройства визуализации
+  LowLevelDriverPtr                driver;                     //драйвер устройства визуализации  
   CacheManagerPtr                  cache_manager;              //менеджер кэширования
   render::InputLayoutManager       input_layout_manager;       //менеджер лэйаутов геометрии
   render::ProgramParametersManager program_parameters_manager; //менеджер параметров программ шэйдинга  
@@ -17,7 +18,8 @@ struct DeviceManager::Impl
   low_level::DeviceCaps            device_caps;                //возможности устройства отрисовки
   
   Impl (const LowLevelDevicePtr& in_device, const LowLevelDriverPtr& in_driver, const SettingsPtr& in_settings, const CacheManagerPtr& in_cache_manager)
-    : device (in_device)
+    : context (in_device->GetImmediateContext ())
+    , device (in_device)
     , driver (in_driver)
     , cache_manager (in_cache_manager)
     , input_layout_manager (in_device, in_settings)
@@ -62,12 +64,17 @@ DeviceManager::~DeviceManager ()
 }
 
 /*
-    Получение устройства / драйвера
+    Получение устройства / непосредственного контекста / драйвера
 */
 
 render::low_level::IDevice& DeviceManager::Device ()
 {
   return *impl->device;
+}
+
+render::low_level::IDeviceContext& DeviceManager::ImmediateContext ()
+{
+  return *impl->context;
 }
 
 render::low_level::IDriver& DeviceManager::Driver ()
