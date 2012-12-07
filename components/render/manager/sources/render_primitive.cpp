@@ -104,13 +104,14 @@ struct MeshPrimitive: public xtl::reference_counter, public CacheHolder, public 
       
       LowLevelStateBlockPtr material_state_block = cached_material ? cached_material->StateBlock () : LowLevelStateBlockPtr ();
       
-      render::low_level::IDevice& device = common_data.device_manager->Device ();
+      render::low_level::IDevice& device  = common_data.device_manager->Device ();
+      render::low_level::IDevice& context = common_data.device_manager->ImmediateContext ();
         
       render::low_level::StateBlockMask mask;      
 
       if (material_state_block)
       {
-        material_state_block->Apply ();
+        material_state_block->Apply (&context);
         material_state_block->GetMask (mask);
       }
       
@@ -128,8 +129,8 @@ struct MeshPrimitive: public xtl::reference_counter, public CacheHolder, public 
         mask.is_vertex_buffers [i] = true;
       }
 
-      device.ISSetInputLayout  (layout.get ());
-      device.ISSetIndexBuffer  (common_data.index_buffer.get ());
+      context.ISSetInputLayout  (layout.get ());
+      context.ISSetIndexBuffer  (common_data.index_buffer.get ());
       
         //обновление блока состояний примитива
       
