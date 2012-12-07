@@ -451,20 +451,22 @@ namespace
 ///Обобщение алгоритма рендеринга операций
 struct RenderOperationsExecutor
 {
-  RenderingContext&           context;                    //контекст рендеринга
-  DeviceManager&              device_manager;             //менеджер устройства отрисовки
-  render::low_level::IDevice& device;                     //устройство отрисовки
-  ProgramParametersManager&   program_parameters_manager; //менеджер параметров программы шейдинга
-  FrameImpl&                  frame;                      //фрейм
-  ShaderOptionsCache&         frame_shader_options_cache; //кэш опций шейдеров для кадра
-  LowLevelBufferPtr           frame_property_buffer;      //буфер параметров кадра
-  bool                        right_hand_viewport;        //является ли область вывода правосторонней
+  RenderingContext&                  context;                    //контекст рендеринга
+  DeviceManager&                     device_manager;             //менеджер устройства отрисовки
+  render::low_level::IDevice&        device;                     //устройство отрисовки
+  render::low_level::IDeviceContext& device_context;             //контекст отрисовки
+  ProgramParametersManager&          program_parameters_manager; //менеджер параметров программы шейдинга
+  FrameImpl&                         frame;                      //фрейм
+  ShaderOptionsCache&                frame_shader_options_cache; //кэш опций шейдеров для кадра
+  LowLevelBufferPtr                  frame_property_buffer;      //буфер параметров кадра
+  bool                               right_hand_viewport;        //является ли область вывода правосторонней
   
 ///Конструктор
   RenderOperationsExecutor (RenderingContext& in_context, DeviceManager& in_device_manager, bool in_right_hand_viewport)
     : context (in_context)
     , device_manager (in_device_manager)
     , device (device_manager.Device ())
+    , device_context (device_manager.ImmediateContext ())
     , program_parameters_manager (device_manager.ProgramParametersManager ())
     , frame (context.Frame ())    
     , frame_shader_options_cache (frame.ShaderOptionsCache ())
@@ -557,7 +559,8 @@ struct RenderOperationsExecutor
     
       //установка целевых буферов отрисовки
 
-    device.OSSetRenderTargets (render_target_view, depth_stencil_view);
+    device_context.OSSetRenderTargetView (0, render_target_view);
+    device_context.OSSetDepthStencilView (render_target_view);
 
       //настройка области вывода                
 
@@ -578,7 +581,7 @@ struct RenderOperationsExecutor
       if (right_hand_viewport)
         viewport_desc.y = target_height - viewport_desc.height - viewport_desc.y;
 
-      device.RSSetViewport (viewport_desc);
+      device_context.RSSetViewport (0, viewport_desc);
     }
     else
     {
@@ -593,13 +596,13 @@ struct RenderOperationsExecutor
       viewport_desc.min_depth = 0.0f;
       viewport_desc.max_depth = 1.0f;
       
-      device.RSSetViewport (viewport_desc);
+      device_context.RSSetViewport (0, viewport_desc);
     }
 
       //настройка области отсечения
       
     if (scissor)
-      SetScissorRect (scissor->Rect ());
+      SetScissorRect (0, scissor->Rect ());
   }
   
 ///Очистка целевых буферов
@@ -613,7 +616,11 @@ struct RenderOperationsExecutor
     if (src_clear_flags & ClearFlag_ViewportOnly) dst_clear_flags |= render::low_level::ClearFlag_ViewportOnly;
     
     if (dst_clear_flags)
-      device.ClearViews (dst_clear_flags, (render::low_level::Color4f&)frame.ClearColor (), frame.ClearDepthValue (), frame.ClearStencilIndex ());    
+    {
+      size_t rt_index = 0;
+
+      device_context.ClearViews (dst_clear_flags, 1, &rt_index, &(render::low_level::Color4f&)frame.ClearColor (), frame.ClearDepthValue (), frame.ClearStencilIndex ());    
+    }
   }
   
 ///Установка состояния области отсечения
@@ -622,16 +629,16 @@ struct RenderOperationsExecutor
     if (state)
     {
       if (pass.scissor_on_state_block)
-        pass.scissor_on_state_block->Apply ();
+        pass.scissor_on_state_block->Apply (&device_context);
     }
     else
     {
       if (pass.scissor_off_state_block)
-        pass.scissor_off_state_block->Apply ();
+        pass.scissor_off_state_block->Apply (&device_context);
     }    
   }
   
-  void SetScissorRect (const Rect& src_rect)
+  void SetScissorRect (size_t rt_index, const Rect& src_rect)
   {
     render::low_level::Rect dst_rect;
 
@@ -642,7 +649,7 @@ struct RenderOperationsExecutor
     dst_rect.width  = src_rect.width;
     dst_rect.height = src_rect.height;
 
-    device.RSSetScissor (dst_rect);    
+    device_context.RSSetScissor (rt_index, dst_rect);
   }
   
 ///Рендеринг прохода
@@ -669,7 +676,7 @@ struct RenderOperationsExecutor
       
       //установка константного буфера кадра
 
-    device.SSSetConstantBuffer (ProgramParametersSlot_Frame, frame_property_buffer.get ());
+    device_context.SSSetConstantBuffer (ProgramParametersSlot_Frame, frame_property_buffer.get ());
 
       //выполнение операций                    
 
@@ -693,12 +700,12 @@ struct RenderOperationsExecutor
       
     program = &program->DerivedProgram (frame_shader_options_cache, entity_shader_options_cache);
 
-    device.SSSetProgram (program->LowLevelProgram ().get ());
+    device_context.SSSetProgram (program->LowLevelProgram ().get ());
 
       //применение состояния операции
 
-    primitive.state_block->Apply ();
-    operation.state_block->Apply ();                  
+    primitive.state_block->Apply (&device_context);
+    operation.state_block->Apply (&device_context);
 
     render::low_level::StateBlockMask mask;      
 
@@ -728,13 +735,13 @@ struct RenderOperationsExecutor
           result.width  = size_t (right - result.x);
           result.height = size_t (bottom - result.y);
             
-          SetScissorRect (result);
+          SetScissorRect (0, result);
         }
         else
         {
             //присутствует только локальная область отсечения
             
-          SetScissorRect (operation_scissor->Rect ());
+          SetScissorRect (0, operation_scissor->Rect ());
         }
       }
       else
@@ -743,7 +750,7 @@ struct RenderOperationsExecutor
         {
             //присутствует только область отсечения фрейма
 
-          SetScissorRect (common_scissor->Rect ());
+          SetScissorRect (0, common_scissor->Rect ());
         }
         else
         {
@@ -775,7 +782,7 @@ struct RenderOperationsExecutor
 
         TexturePtr texture = context.FindLocalTexture (texmap.semantic.c_str ());
                        
-        device.SSSetTexture (texmap.channel, texture ? texture->DeviceTexture ().get () : (render::low_level::ITexture*)0);
+        device_context.SSSetTexture (texmap.channel, texture ? texture->DeviceTexture ().get () : (render::low_level::ITexture*)0);
       }
     }
 
@@ -784,13 +791,13 @@ struct RenderOperationsExecutor
 
     ProgramParametersLayoutPtr program_parameters_layout = program_parameters_manager.GetParameters (&pass.parameters_layout, operation.entity_parameters_layout, operation.frame_entity_parameters_layout);
 
-    device.SSSetProgramParametersLayout (&*program_parameters_layout->DeviceLayout ());
-    device.SSSetConstantBuffer (ProgramParametersSlot_FrameEntity, operation.frame_entity_parameters_buffer);
+    device_context.SSSetProgramParametersLayout (&*program_parameters_layout->DeviceLayout ());
+    device_context.SSSetConstantBuffer (ProgramParametersSlot_FrameEntity, operation.frame_entity_parameters_buffer);
 
       //рисование            
 
-    if (primitive.indexed) device.DrawIndexed (primitive.type, primitive.first, primitive.count, 0); //TODO: media::geometry::Primitive::base_vertex
-    else                   device.Draw        (primitive.type, primitive.first, primitive.count);    
+    if (primitive.indexed) device_context.DrawIndexed (primitive.type, primitive.first, primitive.count, 0); //TODO: media::geometry::Primitive::base_vertex
+    else                   device_context.Draw        (primitive.type, primitive.first, primitive.count);    
   }
   
 ///Рендеринг вложенного эффекта
