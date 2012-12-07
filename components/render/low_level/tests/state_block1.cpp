@@ -24,11 +24,11 @@ void dump (const char* name, const StateBlockMask& mask)
     printf ("SSTextures[%u]: %d\n", i, mask.ss_samplers [i]);      
     
   printf ("RSState: %d\n", mask.rs_state);
-  printf ("RSViewport: %d\n", mask.rs_viewport);
-  printf ("RSScissor: %d\n", mask.rs_scissor);
+  printf ("RSViewport: %d\n", mask.rs_viewports);
+  printf ("RSScissor: %d\n", mask.rs_scissors);
   printf ("OSBlendState: %d\n", mask.os_blend_state);
   printf ("OSDepthStencilState: %d\n", mask.os_depth_stencil_state);
-  printf ("OSRenderTargetView: %d\n", mask.os_render_target_view);
+  printf ("OSRenderTargetView: %d\n", mask.os_render_target_views);
   printf ("OSDepthStencilView: %d\n", mask.os_depth_stencil_view);
   printf ("Predication: %d\n", mask.predication);
 }

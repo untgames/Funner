@@ -199,7 +199,7 @@ VertexBufferPtr PrimitiveBuffersImpl::CreateVertexBuffer (const media::geometry:
         return iter->second;
     }      
       
-    VertexBufferPtr buffer (new VertexBuffer (vb, *this, usage), false);
+    VertexBufferPtr buffer (new VertexBuffer (vb, *this, impl->device_manager->Device (), usage), false);
     
     if (impl->cache_state)
       impl->vertex_buffers_cache.insert_pair (vb.Id (), buffer);

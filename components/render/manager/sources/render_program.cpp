@@ -92,10 +92,12 @@ struct ProgramCommonData: public xtl::reference_counter, public DebugIdHolder
       ProgramParametersLayoutPtr new_layout = device_manager->ProgramParametersManager ().GetParameters (ProgramParametersSlot_Program, new_properties.Layout ());
       
       properties.SetProperties (new_properties);
+
+      low_level::IDeviceContext& context = device_manager->ImmediateContext ();
       
-      device_manager->Device ().SSSetConstantBuffer (ProgramParametersSlot_Program, properties.Buffer ().get ());
+      context.SSSetConstantBuffer (ProgramParametersSlot_Program, properties.Buffer ().get ());
       
-      state_block->Capture ();
+      state_block->Capture (&context);
       
       parameters_layout = new_layout;
         

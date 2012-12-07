@@ -51,7 +51,7 @@ LowLevelInputLayoutPtr InputLayoutManager::CreateInputLayout (const render::low_
   try
   {
     //TODO: переделать!!!!!!! хэш считается неверно!!!
-#pragma message ("Wrong hash")
+#pragma message ("!!Wrong hash")
 
     size_t hash = common::crc32 (&desc.vertex_attributes [0], sizeof (render::low_level::VertexAttribute) * desc.vertex_attributes_count);
     
