@@ -9,7 +9,7 @@ using namespace common;
 
 struct VertexFormat::Impl
 {
-  VertexAttribute attributes [VertexAttributeSemantic_Num]; //атрибуты вершины
+  VertexAttribute attributes [VertexAttributeSemantic_Num]; //атрибуты вершины  
   size_t          attributes_count;                         //количество атрибутов
   size_t          attributes_hash;                          //хэш от массива атрибутов
   bool            need_hash_update;                         //необходим пересчёт хэша атрибутов
@@ -79,11 +79,6 @@ const VertexAttribute& VertexFormat::Attribute (size_t index) const
   return impl->attributes [index];
 }
 
-VertexAttribute& VertexFormat::Attribute (size_t index)
-{
-  return const_cast<VertexAttribute&> (const_cast<const VertexFormat&> (*this).Attribute (index));
-}
-
 /*
     Поиск атрибута по семантике
 */
@@ -95,11 +90,6 @@ const VertexAttribute* VertexFormat::FindAttribute (VertexAttributeSemantic sema
       return attribute;
       
   return 0;
-}
-
-VertexAttribute* VertexFormat::FindAttribute (VertexAttributeSemantic semantic)
-{
-  return const_cast<VertexAttribute*> (const_cast<const VertexFormat&> (*this).FindAttribute (semantic));
 }
 
 /*
@@ -390,8 +380,9 @@ const char* get_semantic_name (VertexAttributeSemantic semantic)
     case VertexAttributeSemantic_TexBinormal5: return "texbinormal5";
     case VertexAttributeSemantic_TexBinormal6: return "texbinormal6";
     case VertexAttributeSemantic_TexBinormal7: return "texbinormal7";    
-    case VertexAttributeSemantic_Influence: return "influence";
-    default:                                throw xtl::make_argument_exception ("media::geometry::get_semantic_name(VertexAttributeSemantic)", "semantic", semantic);
+    case VertexAttributeSemantic_Influence:    return "influence";
+    case VertexAttributeSemantic_Custom:       return "custom";
+    default:                                   throw xtl::make_argument_exception ("media::geometry::get_semantic_name(VertexAttributeSemantic)", "semantic", semantic);
   }
 
   return "";
@@ -439,7 +430,8 @@ VertexAttributeSemantic get_vertex_attribute_semantic (const char* name, VertexA
     {"texbinormal5", VertexAttributeSemantic_TexBinormal5},
     {"texbinormal6", VertexAttributeSemantic_TexBinormal6},
     {"texbinormal7", VertexAttributeSemantic_TexBinormal7},    
-    {"influence",    VertexAttributeSemantic_Influence}
+    {"influence",    VertexAttributeSemantic_Influence},
+    {"custom",       VertexAttributeSemantic_Custom},
   };
   
   static const size_t map_size = sizeof (map) / sizeof (*map);
@@ -513,6 +505,19 @@ bool is_compatible (VertexAttributeSemantic semantic, VertexAttributeType type)
 {
   switch (semantic)
   {
+    case VertexAttributeSemantic_Custom:
+      switch (type)
+      {
+        case VertexAttributeType_Influence:
+        case VertexAttributeType_Float2:
+        case VertexAttributeType_Float3:
+        case VertexAttributeType_Float4:
+        case VertexAttributeType_Short2:
+        case VertexAttributeType_Short3:
+        case VertexAttributeType_Short4:
+        case VertexAttributeType_UByte4: return true;
+        default:                         return false;
+      }    
     case VertexAttributeSemantic_Position:
     case VertexAttributeSemantic_TexCoord0:
     case VertexAttributeSemantic_TexCoord1:

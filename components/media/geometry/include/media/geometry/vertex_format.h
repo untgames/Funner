@@ -45,6 +45,7 @@ enum VertexAttributeSemantic
   VertexAttributeSemantic_TexBinormal6,  
   VertexAttributeSemantic_TexBinormal7,    
   VertexAttributeSemantic_Influence, //индексы отрезка индексных весов
+  VertexAttributeSemantic_Custom,    //пользовательский атрибут
   
   VertexAttributeSemantic_Num
 };
@@ -74,6 +75,7 @@ struct VertexAttribute
   VertexAttributeSemantic semantic; //семантика
   VertexAttributeType     type;     //тип элементов
   size_t                  offset;   //смещение от начала вершины
+  const char*             name;     //имя атрибута (только для VertexAttributeSemantic_Custom)
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -107,20 +109,26 @@ class VertexFormat
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Получение атрибута
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    const VertexAttribute& Attribute (size_t index) const;
-          VertexAttribute& Attribute (size_t index);
+    const VertexAttribute& Attribute     (size_t index) const;
+    const char*            AttributeName (size_t index) const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Добавление атрибутов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    size_t AddAttribute  (VertexAttributeSemantic semantic, VertexAttributeType type, size_t offset); //return: индекс вершинного атрибута
+    size_t AddAttribute  (VertexAttributeSemantic semantic, VertexAttributeType type, size_t offset, const char* name = ""); //return: индекс вершинного атрибута
     size_t AddAttributes (const VertexFormat&); //return: инедкс последнего добавленного атрибута
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Изменение атрибутов
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void SetAttribute (size_t index, const VertexAttribute& attribute);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Удаление атрибутов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void RemoveAttribute  (size_t position); //nothrow
     void RemoveAttribute  (VertexAttributeSemantic); //nothrow
+    void RemoveAttribute  (const char* name); //nothrow
     void RemoveAttributes (const VertexFormat&);
     void Clear            (); //удаление всех атрибутов, nothrow
 
@@ -137,7 +145,7 @@ class VertexFormat
 ///Поиск атрибута по семантике
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     const VertexAttribute* FindAttribute (VertexAttributeSemantic) const; //nothrow
-          VertexAttribute* FindAttribute (VertexAttributeSemantic); //nothrow
+    const VertexAttribute* FindAttribute (const char* name) const; //nothrow
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Получение минимального размера вершины
