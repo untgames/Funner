@@ -177,12 +177,13 @@ struct MaterialImpl::Impl: public CacheHolder, public DebugIdHolder
       
       LowLevelBufferPtr device_properties = properties.Buffer ();      
       
-      render::low_level::IDevice& device = device_manager->Device ();
+      render::low_level::IDevice&        device  = device_manager->Device ();
+      render::low_level::IDeviceContext& context = device_manager->ImmediateContext ();
       
         //установка константного буфера и сброс программы рендеринга в устройстве отрисовки
 
-      device.SSSetConstantBuffer (ProgramParametersSlot_Material, device_properties.get ());
-      device.SSSetConstantBuffer (ProgramParametersSlot_Program, 0);
+      context.SSSetConstantBuffer (ProgramParametersSlot_Material, device_properties.get ());
+      context.SSSetConstantBuffer (ProgramParametersSlot_Program, 0);
       
         //применение настроек программы к состоянию устройства отрисовки (для объединения их с настройками материала)
         
@@ -200,7 +201,7 @@ struct MaterialImpl::Impl: public CacheHolder, public DebugIdHolder
 
             //применение настроек программы рендеринга
 
-          program_state_block->Apply ();
+          program_state_block->Apply (&context);
         }
       }
 
@@ -241,13 +242,13 @@ struct MaterialImpl::Impl: public CacheHolder, public DebugIdHolder
         if (!texmap.cached_sampler)        
           log.Printf ("Texmap[%u] for material '%s' will be ignored. Bad sampler '%s'", i, name.c_str (), texmap.sampler.Name ());
         
-        device.SSSetTexture (i, texmap.cached_device_texture.get ());
-        device.SSSetSampler (i, texmap.cached_sampler.get ());
+        context.SSSetTexture (i, texmap.cached_device_texture.get ());
+        context.SSSetSampler (i, texmap.cached_sampler.get ());
       }
 
         //сохранение состояния контекста устройства отрисовки
 
-      cached_state_block->Capture ();
+      cached_state_block->Capture (&context);
 
         //обновление зависимых кэшей
 
