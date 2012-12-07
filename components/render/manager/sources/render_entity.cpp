@@ -203,9 +203,11 @@ class EntityLodCommonData: public CacheHolder, public DebugIdHolder
 
         dynamic_textures.FlushUnusedTextures ();
 
-        device_manager->Device ().SSSetConstantBuffer (ProgramParametersSlot_Entity, properties.Buffer ().get ());
+        low_level::IDeviceContext& context = device_manager->ImmediateContext ();
 
-        default_state_block->Capture ();
+        context.SSSetConstantBuffer (ProgramParametersSlot_Entity, properties.Buffer ().get ());
+
+        default_state_block->Capture (&context);
         
         InvalidateCacheDependencies (); //TODO: проверить необходимость
       }
@@ -272,7 +274,8 @@ class EntityLodCommonData: public CacheHolder, public DebugIdHolder
           
           dynamic_textures.UpdateMask (mask);
           
-          render::low_level::IDevice& device = common_data.DeviceManager ()->Device ();
+          render::low_level::IDevice&        device  = common_data.DeviceManager ()->Device ();
+          render::low_level::IDeviceContext& context = common_data.DeviceManager ()->ImmediateContext ();
           
           size_t mask_hash = mask.Hash ();
           
@@ -282,11 +285,11 @@ class EntityLodCommonData: public CacheHolder, public DebugIdHolder
             state_block_mask_hash = mask_hash;
           }
             
-          dynamic_textures.Apply (device);
+          dynamic_textures.Apply (context);
+
+          context.SSSetConstantBuffer (ProgramParametersSlot_Entity, common_data.Properties ().Buffer ().get ());
           
-          device.SSSetConstantBuffer (ProgramParametersSlot_Entity, common_data.Properties ().Buffer ().get ());
-          
-          state_block->Capture ();
+          state_block->Capture (&context);
           
           parameters_layout->DetachAll ();
           parameters_layout->Attach (*material->ParametersLayout ());
