@@ -21,7 +21,7 @@ using namespace plarium::launcher;
 static NSString* PHONE_ADX_URL_SCHEME = @"ADX1144";
 static NSString* PAD_ADX_URL_SCHEME   = @"ADX1145";
 static NSString* PHONE_APPLE_ID       = @"543831789";
-static NSString* PAD_APPLE_ID         = @"543831789";
+static NSString* PAD_APPLE_ID         = @"586574454";
 
 @interface Startup : NSObject
 {
