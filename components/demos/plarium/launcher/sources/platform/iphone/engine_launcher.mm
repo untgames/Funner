@@ -85,7 +85,7 @@ static NSString* PAD_APPLE_ID         = @"586574454";
 
   [fadeOutTimer invalidate];
   [fadeOutTimer release];
-  fadeOutTimer = [[NSTimer scheduledTimerWithTimeInterval:2 target:self selector:@selector (startFadeout) userInfo:nil repeats:NO] retain];
+  fadeOutTimer = [[NSTimer scheduledTimerWithTimeInterval:3 target:self selector:@selector (startFadeout) userInfo:nil repeats:NO] retain];
 }
 
 -(void)startFadeout
