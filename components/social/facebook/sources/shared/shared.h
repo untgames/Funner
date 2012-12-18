@@ -152,6 +152,7 @@ class FacebookSessionImpl: public IAchievementManager, public ILeaderboardManage
     void ProcessLoginFail        (const LoginCallback& callback);
     void OnPlatformLogInFinished (bool platform_login_result, OperationStatus status, const char* error, const char* login_url, const LoginCallback& callback);
     void HandleLoginResultUrl    (const char* url, const LoginCallback& callback);
+    void OnLoginTokenUpdated     (const LoginCallback& callback);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Обработка ответов запросов

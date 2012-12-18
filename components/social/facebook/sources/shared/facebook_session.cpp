@@ -151,8 +151,28 @@ void FacebookSessionImpl::LogIn (const LoginCallback& callback, const common::Pr
 {
   try
   {
-    login_properties = properties.Clone ();
+    bool has_previous_token = properties.IsPresent ("Token");
+
+    if (has_previous_token && logged_in)
+      throw xtl::format_operation_exception ("", "Login properties must not include 'UserId' or 'Token' for refresh token login");
+
     app_id           = properties.GetString ("AppId");
+    login_properties = properties.Clone ();
+
+    if (has_previous_token)
+    {
+      if (properties.IsPresent ("UserId"))
+        current_user.SetId (properties.GetString ("UserId"));
+
+      token = properties.GetString ("Token");
+
+      login_properties.RemoveProperty ("UserId");
+      login_properties.RemoveProperty ("Token");
+
+      OnLoginTokenUpdated (callback);
+
+      return;
+    }
 
     Platform::Login (app_id.c_str (), xtl::bind (&FacebookSessionImpl::OnPlatformLogInFinished, this, _1, _2, _3, _4, callback), properties);
   }
@@ -212,6 +232,11 @@ void FacebookSessionImpl::OnPlatformLogInFinished (bool platform_login_result, O
    Обработка события логина
 */
 
+void FacebookSessionImpl::OnLoginTokenUpdated (const LoginCallback& callback)
+{
+  PerformRequest ("me/", "fields=id,username", xtl::bind (&FacebookSessionImpl::OnCurrentUserInfoLoaded, this, _1, _2, _3, callback));
+}
+
 void FacebookSessionImpl::HandleLoginResultUrl (const char* url, const LoginCallback& callback)
 {
   if (!url)
@@ -246,9 +271,7 @@ void FacebookSessionImpl::HandleLoginResultUrl (const char* url, const LoginCall
   {
     log.Printf ("Logged in");
 
-    //TODO check that this is our token
-
-    PerformRequest ("me/", "fields=id,username", xtl::bind (&FacebookSessionImpl::OnCurrentUserInfoLoaded, this, _1, _2, _3, callback));
+    OnLoginTokenUpdated (callback);
   }
 }
 
@@ -300,7 +323,15 @@ void FacebookSessionImpl::OnCurrentUserInfoLoaded (bool succeeded, const stl::st
     return;
   }
 
-  current_user = parse_user (response);
+  User logged_in_user = parse_user (response);
+
+  if (xtl::xstrlen (current_user.Id ()) && xtl::xstrcmp (current_user.Id (), logged_in_user.Id ()))
+  {
+    callback (OperationStatus_Failure, "Token refreshed for other user");
+    return;
+  }
+
+  current_user = logged_in_user;
 
   current_user.Properties ().SetProperty ("Token", token.c_str ());
 

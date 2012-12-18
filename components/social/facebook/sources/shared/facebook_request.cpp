@@ -50,6 +50,8 @@ void FacebookSessionImpl::PerformRequestImpl (common::Action& action, const stl:
       PerformRequestNotify (callback, false, e.what (), common::ParseNode ());
     else  //try relogin
       common::ActionQueue::PushAction (xtl::bind (&FacebookSessionImpl::RequestTryRelogin, session, method_name, params, callback), common::ActionThread_Main);
+
+    return;
   }
   catch (...)
   {
@@ -62,6 +64,8 @@ void FacebookSessionImpl::PerformRequestImpl (common::Action& action, const stl:
       PerformRequestNotify (callback, false, "Unknown error", common::ParseNode ());
     else  //try relogin
       common::ActionQueue::PushAction (xtl::bind (&FacebookSessionImpl::RequestTryRelogin, session, method_name, params, callback), common::ActionThread_Main);
+
+    return;
   }
 
   try
