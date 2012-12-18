@@ -134,6 +134,10 @@ stl::string get_url_parameter (const char* url, const char* param_name)
   param_start = param_start + xtl::xstrlen (param_name);
 
   const char* param_end = strstr (param_start, "&");
+  const char* fragment  = strstr (param_start, "#");
+
+  if (fragment)
+    param_end = param_end ? stl::min (param_end, fragment) : fragment;
 
   if (!param_end) //last param
     param_end = param_start + xtl::xstrlen (param_start);

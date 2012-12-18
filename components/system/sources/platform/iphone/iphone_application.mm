@@ -97,6 +97,18 @@ class ApplicationDelegateImpl: public IApplicationDelegate, public xtl::referenc
         listener->OnExit (0);
     }
 
+    void OnResume ()
+    {
+      if (listener)
+        listener->OnResume ();
+    }
+
+    void OnPause ()
+    {
+      if (listener)
+        listener->OnPause ();
+    }
+
 ///Подсчёт ссылок
     void AddRef ()
     {
@@ -256,19 +268,19 @@ typedef stl::vector<syslib::iphone::IApplicationListener*> ListenerArray;
 
 -(void) applicationWillResignActive:(UIApplication*)application
 {
-  for (ListenerArray::iterator iter = impl.listeners->begin (), end = impl.listeners->end (); iter != end; ++iter)
-    (*iter)->OnInactive ();
-
   impl.idle_timer.paused = YES;
   [impl.idle_timer invalidate];
+
+  if (application_delegate)
+    application_delegate->OnPause ();
 }
 
 -(void) applicationDidBecomeActive:(UIApplication*)application
 {
-  for (ListenerArray::iterator iter = impl.listeners->begin (), end = impl.listeners->end (); iter != end; ++iter)
-    (*iter)->OnActive ();
-
   [impl initIdleTimer];
+
+  if (application_delegate)
+    application_delegate->OnResume ();
 }
 
 -(NSUInteger)application:(UIApplication*)application supportedInterfaceOrientationsForWindow:(UIWindow*)window

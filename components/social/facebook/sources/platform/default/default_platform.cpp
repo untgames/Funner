@@ -13,7 +13,7 @@ using namespace social::facebook;
 
 void DefaultPlatform::Login (const char* app_id, const PlatformLoginCallback& callback, const common::PropertyMap& properties)
 {
-  callback (false, OperationStatus_Failure, "", "", User ());
+  callback (false, OperationStatus_Failure, "", "");
 }
 
 void DefaultPlatform::CancelLogin ()

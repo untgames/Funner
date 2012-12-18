@@ -150,7 +150,8 @@ class FacebookSessionImpl: public IAchievementManager, public ILeaderboardManage
     void OnCurrentUserInfoLoaded (bool succeeded, const stl::string& status, common::ParseNode response, const LoginCallback& callback);
     bool ProcessLoginRequest     (const char* request, const LoginCallback& callback);
     void ProcessLoginFail        (const LoginCallback& callback);
-    void OnPlatformLogInFinished (bool platform_login_result, OperationStatus status, const char* error, const char* in_token, const User& logged_in_user, const LoginCallback& callback);
+    void OnPlatformLogInFinished (bool platform_login_result, OperationStatus status, const char* error, const char* login_url, const LoginCallback& callback);
+    void HandleLoginResultUrl    (const char* url, const LoginCallback& callback);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Обработка ответов запросов

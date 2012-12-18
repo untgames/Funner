@@ -12,6 +12,8 @@ const common::ActionQueue::time_t ACTIVATE_AFTER_LOGIN_DELAY = 3;  //Задержка по
 const char* LOG_NAME            = "social.facebook.FacebookSession";
 const char* SESSION_DESCRIPTION = "Facebook";
 
+bool session_created = false;  //Существует ли созданная сессия
+
 //Функция, необходимая для удаления web-view после выполнения колбека
 void delete_web_view (xtl::shared_ptr<syslib::WebView> web_view)
 {
@@ -27,11 +29,18 @@ FacebookSessionImpl::FacebookSessionImpl ()
   : log (LOG_NAME)
   , logged_in (false)
 {
+  if (session_created)
+    throw xtl::format_operation_exception ("social::facebook::FacebookSessionImpl::FacebookSessionImpl", "Another session already created");
+
   on_activate_connection = syslib::Application::RegisterEventHandler (syslib::ApplicationEvent_OnResume, xtl::bind (&FacebookSessionImpl::OnActivate, this));
+
+  session_created = true;
 }
 
 FacebookSessionImpl::~FacebookSessionImpl ()
 {
+  session_created = false;
+
   CloseSession ();
 }
 
@@ -145,7 +154,7 @@ void FacebookSessionImpl::LogIn (const LoginCallback& callback, const common::Pr
     login_properties = properties.Clone ();
     app_id           = properties.GetString ("AppId");
 
-    Platform::Login (app_id.c_str (), xtl::bind (&FacebookSessionImpl::OnPlatformLogInFinished, this, _1, _2, _3, _4, _5, callback), properties);
+    Platform::Login (app_id.c_str (), xtl::bind (&FacebookSessionImpl::OnPlatformLogInFinished, this, _1, _2, _3, _4, callback), properties);
   }
   catch (xtl::exception& e)
   {
@@ -154,7 +163,7 @@ void FacebookSessionImpl::LogIn (const LoginCallback& callback, const common::Pr
   }
 }
 
-void FacebookSessionImpl::OnPlatformLogInFinished (bool platform_login_result, OperationStatus status, const char* error, const char* in_token, const User& logged_in_user, const LoginCallback& callback)
+void FacebookSessionImpl::OnPlatformLogInFinished (bool platform_login_result, OperationStatus status, const char* error, const char* login_url, const LoginCallback& callback)
 {
   try
   {
@@ -163,15 +172,10 @@ void FacebookSessionImpl::OnPlatformLogInFinished (bool platform_login_result, O
     if (platform_login_result)
     {
       if (status == OperationStatus_Success)
-      {
-        logged_in    = true;
-        token        = in_token;
-        current_user = logged_in_user;
+        HandleLoginResultUrl (login_url, callback);
+      else
+        callback (status, error);
 
-        current_user.Properties ().SetProperty ("Token", token.c_str ());
-      }
-
-      callback (status, error);
       return;
     }
 
@@ -208,6 +212,46 @@ void FacebookSessionImpl::OnPlatformLogInFinished (bool platform_login_result, O
    Обработка события логина
 */
 
+void FacebookSessionImpl::HandleLoginResultUrl (const char* url, const LoginCallback& callback)
+{
+  if (!url)
+    throw xtl::make_null_argument_exception ("social::facebook::FacebookSessionImpl::HadleLoginResultUrl", "url");
+
+  log.Printf ("Handle login result url '%s'", url);
+
+  token = get_url_parameter (url, "access_token=");
+
+  stl::string request_copy (url);
+
+  CloseDialogWebView ();
+
+  if (token.empty ())  //login failed
+  {
+    stl::string error = get_url_parameter (request_copy.c_str (), "error_reason=");
+
+    if (error == "user_denied")
+    {
+      log.Printf ("Login canceled");
+
+      callback (OperationStatus_Canceled, "");
+    }
+    else
+    {
+      log.Printf ("Login failed, error '%s'", error.c_str ());
+
+      callback (OperationStatus_Failure, error.c_str ());
+    }
+  }
+  else
+  {
+    log.Printf ("Logged in");
+
+    //TODO check that this is our token
+
+    PerformRequest ("me/", "fields=id,username", xtl::bind (&FacebookSessionImpl::OnCurrentUserInfoLoaded, this, _1, _2, _3, callback));
+  }
+}
+
 bool FacebookSessionImpl::ProcessLoginRequest (const char* request, const LoginCallback& callback)
 {
   if (!request)
@@ -219,35 +263,7 @@ bool FacebookSessionImpl::ProcessLoginRequest (const char* request, const LoginC
 
     if (strstr (request, "https://www.facebook.com/connect/login_success.html") == request)
     {
-      token = get_url_parameter (request, "access_token=");
-
-      stl::string request_copy (request);
-
-      CloseDialogWebView ();
-
-      if (token.empty ())  //login failed
-      {
-        stl::string error = get_url_parameter (request_copy.c_str (), "error_reason=");
-
-        if (error == "user_denied")
-        {
-          log.Printf ("Login canceled");
-
-          callback (OperationStatus_Canceled, "");
-        }
-        else
-        {
-          log.Printf ("Login failed, error '%s'", error.c_str ());
-
-          callback (OperationStatus_Failure, error.c_str ());
-        }
-      }
-      else
-      {
-        log.Printf ("Logged in");
-
-        PerformRequest ("me/", "fields=id,username", xtl::bind (&FacebookSessionImpl::OnCurrentUserInfoLoaded, this, _1, _2, _3, callback));
-      }
+      HandleLoginResultUrl (request, callback);
 
       return false;
     }

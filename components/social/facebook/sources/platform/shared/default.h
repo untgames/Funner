@@ -22,7 +22,7 @@ class DefaultPlatform
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Логин
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    typedef xtl::function<void (bool platform_login_result, OperationStatus status, const char* error, const char* in_token, const User& logged_in_user)> PlatformLoginCallback;
+    typedef xtl::function<void (bool platform_login_result, OperationStatus status, const char* error, const char* login_url)> PlatformLoginCallback;
 
     static void Login       (const char* app_id, const PlatformLoginCallback& callback, const common::PropertyMap& properties);
     static void CancelLogin ();
