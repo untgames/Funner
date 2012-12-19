@@ -95,29 +95,33 @@ typedef common::Singleton<IOsPlatformImpl> IOsPlatformSingleton;
 void IOsPlatform::Login (const char* app_id, const PlatformLoginCallback& callback, const common::PropertyMap& properties)
 {
   //Facebook application auth
-  NSString *scheme            = @"fbauth";
-  NSString *url_scheme_suffix = @"";  //TODO
+  stl::string scheme = "fbauth";
+  stl::string url_scheme_suffix;
 
-  /* //TODO
-     if (_urlSchemeSuffix) {
-          scheme = [scheme stringByAppendingString:@"2"];
-      }*/
+  if (properties.IsPresent ("UrlSchemeSuffix"))
+  {
+    url_scheme_suffix = properties.GetString ("UrlSchemeSuffix");
 
-  NSString *permissions = @"";
+    scheme.append ("2");
+  }
+
+  stl::string params;
 
   if (properties.IsPresent ("Permissions"))
-    permissions = [NSString stringWithFormat:@"&scope=%s", properties.GetString ("Permissions")];
+    params = common::format ("&scope=%s", properties.GetString ("Permissions"));
+  if (!url_scheme_suffix.empty ())
+    params.append (common::format ("&local_client_id=%s", url_scheme_suffix.c_str ()));
 
-  NSString *url = [NSString stringWithFormat:@"%@://authorize?client_id=%s%@", scheme, app_id, permissions];
+  NSString *url = [NSString stringWithFormat:@"%s://authorize?client_id=%s%s", scheme.c_str (), app_id, params.c_str ()];
 
-  stl::string app_base_uri = common::format ("fb%s%s://authorize", app_id, [url_scheme_suffix UTF8String]);
+  stl::string app_base_uri = common::format ("fb%s%s://authorize", app_id, url_scheme_suffix.c_str ());
 
   IOsPlatformSingleton::Instance ()->SetLoginHandler (app_base_uri.c_str (), callback);
 
   if ([[UIApplication sharedApplication] openURL:[NSURL URLWithString:url]])
     return;
 
-  url = [NSString stringWithFormat:@"https://m.facebook.com/dialog/oauth?client_id=%s&redirect_uri=%s&display=touch&response_type=token%@", app_id, app_base_uri.c_str (), permissions];
+  url = [NSString stringWithFormat:@"https://m.facebook.com/dialog/oauth?client_id=%s&redirect_uri=%s&display=touch&response_type=token%s", app_id, app_base_uri.c_str (), params.c_str ()];
 
   if ([[UIApplication sharedApplication] openURL:[NSURL URLWithString:url]])
     return;

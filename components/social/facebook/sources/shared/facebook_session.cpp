@@ -204,11 +204,6 @@ void FacebookSessionImpl::OnPlatformLogInFinished (bool platform_login_result, O
     if (login_properties.IsPresent ("Permissions"))
       url.append (common::format ("&scope=%s", login_properties.GetString ("Permissions")));
 
-/*    //TODO urlSchemeSuffix
-    if (_urlSchemeSuffix) {
-        [params setValue:_urlSchemeSuffix forKey:@"local_client_id"];
-    }*/
-
     CloseDialogWebView ();
 
     dialog_web_view.reset (new syslib::WebView);
