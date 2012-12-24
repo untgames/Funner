@@ -123,6 +123,7 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
   mid_level::Viewport        viewport;                           //область вывода
   RenderablePageCurlMeshPtr  curled_page;                        //сетка изгибаемой страницы
   math::vec2ui               current_page_grid_size;             //текущий размер сетки страницы
+  bool                       current_page_is_rigid;              //является ли страница жесткой
   bool                       initialized;                        //инициализированы ли необходимые поля
 
   ///Конструктор
@@ -550,12 +551,14 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
     render_state->Capture ();
 
     const math::vec2ui& grid_size = page_curl->GridSize ();
+    bool                is_rigid  = page_curl->IsRigidPage ();
 
-    if (current_page_grid_size != grid_size)
+    if (current_page_grid_size != grid_size || current_page_is_rigid != is_rigid)
     {
-      curled_page = RenderablePageCurlMeshPtr (new RenderablePageCurlMesh (device, grid_size), false);
+      curled_page = RenderablePageCurlMeshPtr (new RenderablePageCurlMesh (device, is_rigid, grid_size), false);
 
       current_page_grid_size = grid_size;
+      current_page_is_rigid  = is_rigid;
 
       size_t shadow_max_vertices = (grid_size.x + grid_size.y) * 2 * 2 * 3 + 6 * 4; //side points count * sides count * triangles per point * vertices per triangle + vertices for corners
 
@@ -585,8 +588,9 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
     if (page_curl->Mode () != PageCurlMode_SinglePage)
       one_page_size.x /= 2;
 
-    curled_page->SetSize  (one_page_size);
-    curled_page->SetColor (GetPageColor ());
+    curled_page->SetSize                       (one_page_size);
+    curled_page->SetColor                      (GetPageColor ());
+    curled_page->SetRigidPagePerspectiveFactor (page_curl->RigidPagePerspectiveFactor ());
 
     ProgramParameters program_parameters;
 
@@ -974,6 +978,9 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
     if (curl_corner_position.y > 0 || curl_angle > -EPS)
       curl_angle += PI;
 
+    if (current_page_is_rigid)
+      curl_corner_position.x = stl::max (EPS, stl::min (curl_point_position.x, page_size.x * 2 - EPS));
+
     curled_page->Curl (curl_corner_position, PageCurlCorner_LeftTop, curl_radius, curl_angle,
                        page_curl->FindBestCurlSteps (), page_curl->BindingMismatchWeight ());
 
@@ -1068,6 +1075,9 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
 
     if (curl_corner_position.y < page_size.y || curl_angle < EPS)
       curl_angle += PI;
+
+    if (current_page_is_rigid)
+      curl_corner_position.x = stl::max (EPS, stl::min (curl_point_position.x, page_size.x * 2 - EPS));
 
     curled_page->Curl (curl_corner_position, PageCurlCorner_LeftBottom, curl_radius, curl_angle,
                        page_curl->FindBestCurlSteps (), page_curl->BindingMismatchWeight ());
@@ -1168,6 +1178,9 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
 
     if (curl_corner_position.y <= 0 && curl_angle > EPS)
       curl_angle += PI;
+
+    if (current_page_is_rigid)
+      curl_corner_position.x = stl::max (-page_size.x + EPS, stl::min (curl_point_position.x - page_size.x, page_size.x - EPS));
 
     curled_page->Curl (curl_corner_position, PageCurlCorner_RightTop, curl_radius, curl_angle,
                        page_curl->FindBestCurlSteps (), page_curl->BindingMismatchWeight ());
@@ -1293,6 +1306,9 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
 
     if (curl_corner_position.y >= page_size.y && curl_angle < -EPS)
       curl_angle -= PI;
+
+    if (current_page_is_rigid)
+      curl_corner_position.x = stl::max (-page_size.x + EPS, stl::min (curl_point_position.x - page_size.x, page_size.x - EPS));
 
     curled_page->Curl (curl_corner_position, PageCurlCorner_RightBottom, curl_radius, curl_angle,
                        page_curl->FindBestCurlSteps (), page_curl->BindingMismatchWeight ());
