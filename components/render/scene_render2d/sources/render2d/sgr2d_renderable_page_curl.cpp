@@ -697,6 +697,232 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
     current_vertex  += 6;
   }
 
+  void DrawRigidPageShadows (low_level::IDevice& device, float x_offset, bool left_side)
+  {
+    const math::vec2f page_size = page_curl->Size ();
+
+    //отрисовка тени под страницей
+    RenderableVertex*   current_vertex   = shadow_vertices.data ();
+    const math::vec3f*  positions        = curled_page->GridVertices ();
+    size_t              positions_stride = curled_page->GridVerticesStride ();
+
+    math::vec3f v0 = positions [0];
+    math::vec3f v1 = *(const math::vec3f*)((const unsigned char*)positions + positions_stride);
+    math::vec3f v2 = *(const math::vec3f*)((const unsigned char*)positions + 2 * positions_stride);
+    math::vec3f v3 = *(const math::vec3f*)((const unsigned char*)positions + 3 * positions_stride);
+
+    v0.x += x_offset;
+    v1.x += x_offset;
+    v2.x += x_offset;
+    v3.x += x_offset;
+
+    float corner_shadow_offset = page_curl->CornerShadowOffset ();
+
+    if (left_side)
+    {
+      corner_shadow_offset *= 1 - fabs (v0.x - page_size.x / 2);
+
+      math::vec3f top_side_normal = math::normalize (v1 - v3) * corner_shadow_offset;
+
+      current_vertex [0].position = v1;
+      current_vertex [0].texcoord = math::vec2f (0.5, 1);
+      current_vertex [0].color    = 255;
+      current_vertex [1].position = v0 + top_side_normal;
+      current_vertex [1].texcoord = math::vec2f (0.5, 1);
+      current_vertex [1].color    = 255;
+      current_vertex [2].position = v0;
+      current_vertex [2].texcoord = math::vec2f (0.5, 0.5);
+      current_vertex [2].color    = 255;
+
+      current_vertex += 3;
+
+      math::vec3f side_normal = math::normalize (v0 - v1) * corner_shadow_offset;
+
+      current_vertex [0].position = v0;
+      current_vertex [0].texcoord = math::vec2f (0.5, 0.5);
+      current_vertex [0].color    = 255;
+      current_vertex [1].position = v0 + side_normal;
+      current_vertex [1].texcoord = math::vec2f (0.5, 1);
+      current_vertex [1].color    = 255;
+      current_vertex [2].position = v2 + side_normal;
+      current_vertex [2].texcoord = math::vec2f (0.5, 1);
+      current_vertex [2].color    = 255;
+      current_vertex [3].position = v0;
+      current_vertex [3].texcoord = math::vec2f (0.5, 0.5);
+      current_vertex [3].color    = 255;
+      current_vertex [4].position = v2 + side_normal;
+      current_vertex [4].texcoord = math::vec2f (0.5, 1);
+      current_vertex [4].color    = 255;
+      current_vertex [5].position = v2;
+      current_vertex [5].texcoord = math::vec2f (0.5, 0.5);
+      current_vertex [5].color    = 255;
+
+      current_vertex += 6;
+
+      math::vec3f bottom_side_normal = math::normalize (v3 - v1) * corner_shadow_offset;
+
+      current_vertex [0].position = v3;
+      current_vertex [0].texcoord = math::vec2f (0.5, 1);
+      current_vertex [0].color    = 255;
+      current_vertex [1].position = v2+ bottom_side_normal;
+      current_vertex [1].texcoord = math::vec2f (0.5, 1);
+      current_vertex [1].color    = 255;
+      current_vertex [2].position = v2;
+      current_vertex [2].texcoord = math::vec2f (0.5, 0.5);
+      current_vertex [2].color    = 255;
+
+      current_vertex += 3;
+
+      current_vertex [0].position = v0;
+      current_vertex [0].texcoord = math::vec2f (0.5, 0.5);
+      current_vertex [0].color    = 255;
+      current_vertex [1].position = v0 + top_side_normal;
+      current_vertex [1].texcoord = math::vec2f (0.5, 1);
+      current_vertex [1].color    = 255;
+      current_vertex [2].position = v0 + top_side_normal + side_normal;
+      current_vertex [2].texcoord = math::vec2f (1, 1);
+      current_vertex [2].color    = 255;
+      current_vertex [3].position = v0;
+      current_vertex [3].texcoord = math::vec2f (0.5, 0.5);
+      current_vertex [3].color    = 255;
+      current_vertex [4].position = v0 + top_side_normal + side_normal;
+      current_vertex [4].texcoord = math::vec2f (1, 1);
+      current_vertex [4].color    = 255;
+      current_vertex [5].position = v0 + side_normal;
+      current_vertex [5].texcoord = math::vec2f (0.5, 1);
+      current_vertex [5].color    = 255;
+
+      current_vertex += 6;
+
+      current_vertex [0].position = v2;
+      current_vertex [0].texcoord = math::vec2f (0.5, 0.5);
+      current_vertex [0].color    = 255;
+      current_vertex [1].position = v2 + side_normal;
+      current_vertex [1].texcoord = math::vec2f (0.5, 1);
+      current_vertex [1].color    = 255;
+      current_vertex [2].position = v2 + bottom_side_normal + side_normal;
+      current_vertex [2].texcoord = math::vec2f (1, 1);
+      current_vertex [2].color    = 255;
+      current_vertex [3].position = v2;
+      current_vertex [3].texcoord = math::vec2f (0.5, 0.5);
+      current_vertex [3].color    = 255;
+      current_vertex [4].position = v2 + bottom_side_normal + side_normal;
+      current_vertex [4].texcoord = math::vec2f (1, 1);
+      current_vertex [4].color    = 255;
+      current_vertex [5].position = v2 + bottom_side_normal;
+      current_vertex [5].texcoord = math::vec2f (0.5, 1);
+      current_vertex [5].color    = 255;
+
+      current_vertex += 6;
+    }
+    else
+    {
+      corner_shadow_offset *= 1 - fabs (v1.x - page_size.x / 2);
+
+      math::vec3f top_side_normal = math::normalize (v1 - v3) * corner_shadow_offset;
+
+      current_vertex [0].position = v0;
+      current_vertex [0].texcoord = math::vec2f (0.5, 1);
+      current_vertex [0].color    = 255;
+      current_vertex [1].position = v1 + top_side_normal;
+      current_vertex [1].texcoord = math::vec2f (0.5, 1);
+      current_vertex [1].color    = 255;
+      current_vertex [2].position = v1;
+      current_vertex [2].texcoord = math::vec2f (0.5, 0.5);
+      current_vertex [2].color    = 255;
+
+      current_vertex += 3;
+
+      math::vec3f side_normal = math::normalize (v1 - v0) * corner_shadow_offset;
+
+      current_vertex [0].position = v1;
+      current_vertex [0].texcoord = math::vec2f (0.5, 0.5);
+      current_vertex [0].color    = 255;
+      current_vertex [1].position = v1 + side_normal;
+      current_vertex [1].texcoord = math::vec2f (0.5, 1);
+      current_vertex [1].color    = 255;
+      current_vertex [2].position = v3 + side_normal;
+      current_vertex [2].texcoord = math::vec2f (0.5, 1);
+      current_vertex [2].color    = 255;
+      current_vertex [3].position = v1;
+      current_vertex [3].texcoord = math::vec2f (0.5, 0.5);
+      current_vertex [3].color    = 255;
+      current_vertex [4].position = v3 + side_normal;
+      current_vertex [4].texcoord = math::vec2f (0.5, 1);
+      current_vertex [4].color    = 255;
+      current_vertex [5].position = v3;
+      current_vertex [5].texcoord = math::vec2f (0.5, 0.5);
+      current_vertex [5].color    = 255;
+
+      current_vertex += 6;
+
+      math::vec3f bottom_side_normal = math::normalize (v3 - v1) * corner_shadow_offset;
+
+      current_vertex [0].position = v2;
+      current_vertex [0].texcoord = math::vec2f (0.5, 1);
+      current_vertex [0].color    = 255;
+      current_vertex [1].position = v3 + bottom_side_normal;
+      current_vertex [1].texcoord = math::vec2f (0.5, 1);
+      current_vertex [1].color    = 255;
+      current_vertex [2].position = v3;
+      current_vertex [2].texcoord = math::vec2f (0.5, 0.5);
+      current_vertex [2].color    = 255;
+
+      current_vertex += 3;
+
+      current_vertex [0].position = v1;
+      current_vertex [0].texcoord = math::vec2f (0.5, 0.5);
+      current_vertex [0].color    = 255;
+      current_vertex [1].position = v1 + top_side_normal;
+      current_vertex [1].texcoord = math::vec2f (0.5, 1);
+      current_vertex [1].color    = 255;
+      current_vertex [2].position = v1 + top_side_normal + side_normal;
+      current_vertex [2].texcoord = math::vec2f (1, 1);
+      current_vertex [2].color    = 255;
+      current_vertex [3].position = v1;
+      current_vertex [3].texcoord = math::vec2f (0.5, 0.5);
+      current_vertex [3].color    = 255;
+      current_vertex [4].position = v1 + top_side_normal + side_normal;
+      current_vertex [4].texcoord = math::vec2f (1, 1);
+      current_vertex [4].color    = 255;
+      current_vertex [5].position = v1 + side_normal;
+      current_vertex [5].texcoord = math::vec2f (0.5, 1);
+      current_vertex [5].color    = 255;
+
+      current_vertex += 6;
+
+      current_vertex [0].position = v3;
+      current_vertex [0].texcoord = math::vec2f (0.5, 0.5);
+      current_vertex [0].color    = 255;
+      current_vertex [1].position = v3 + side_normal;
+      current_vertex [1].texcoord = math::vec2f (0.5, 1);
+      current_vertex [1].color    = 255;
+      current_vertex [2].position = v3 + bottom_side_normal + side_normal;
+      current_vertex [2].texcoord = math::vec2f (1, 1);
+      current_vertex [2].color    = 255;
+      current_vertex [3].position = v3;
+      current_vertex [3].texcoord = math::vec2f (0.5, 0.5);
+      current_vertex [3].color    = 255;
+      current_vertex [4].position = v3 + bottom_side_normal + side_normal;
+      current_vertex [4].texcoord = math::vec2f (1, 1);
+      current_vertex [4].color    = 255;
+      current_vertex [5].position = v3 + bottom_side_normal;
+      current_vertex [5].texcoord = math::vec2f (0.5, 1);
+      current_vertex [5].color    = 255;
+
+      current_vertex += 6;
+    }
+
+    size_t triangles_count = 8;
+    size_t vertices_count = triangles_count * 3;
+
+    shadow_vertex_buffer->SetData (0, sizeof (RenderableVertex) * vertices_count, shadow_vertices.data ());
+
+    device.ISSetVertexBuffer (0, shadow_vertex_buffer.get ());
+
+    device.Draw (low_level::PrimitiveType_TriangleList, 0, vertices_count);
+  }
+
   void DrawShadows (low_level::IDevice& device, PageCurlCorner corner, float curl_radius, bool left_side)
   {
     if (curl_radius <= EPS)
@@ -740,6 +966,12 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
     }
 
     corner_shadow_offset *= stl::min (corner_offset / page_size.x, CORNER_SHADOW_GROW_PART) / CORNER_SHADOW_GROW_PART;
+
+    if (current_page_is_rigid)
+    {
+      DrawRigidPageShadows (device, x_offset, left_side);
+      return;
+    }
 
       //отрисовка тени под страницей
     {
