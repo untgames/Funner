@@ -716,202 +716,121 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
     v2.x += x_offset;
     v3.x += x_offset;
 
-    float corner_shadow_offset = page_curl->CornerShadowOffset ();
+    const math::vec3f* top_static_vertex;
+    const math::vec3f* bottom_static_vertex;
+    const math::vec3f* top_dynamic_vertex;
+    const math::vec3f* bottom_dynamic_vertex;
 
     if (left_side)
     {
-      corner_shadow_offset *= 1 - fabs (v0.x - page_size.x / 2);
-
-      math::vec3f top_side_normal = math::normalize (v1 - v3) * corner_shadow_offset;
-
-      current_vertex [0].position = v1;
-      current_vertex [0].texcoord = math::vec2f (0.5, 1);
-      current_vertex [0].color    = 255;
-      current_vertex [1].position = v0 + top_side_normal;
-      current_vertex [1].texcoord = math::vec2f (0.5, 1);
-      current_vertex [1].color    = 255;
-      current_vertex [2].position = v0;
-      current_vertex [2].texcoord = math::vec2f (0.5, 0.5);
-      current_vertex [2].color    = 255;
-
-      current_vertex += 3;
-
-      math::vec3f side_normal = math::normalize (v0 - v1) * corner_shadow_offset;
-
-      current_vertex [0].position = v0;
-      current_vertex [0].texcoord = math::vec2f (0.5, 0.5);
-      current_vertex [0].color    = 255;
-      current_vertex [1].position = v0 + side_normal;
-      current_vertex [1].texcoord = math::vec2f (0.5, 1);
-      current_vertex [1].color    = 255;
-      current_vertex [2].position = v2 + side_normal;
-      current_vertex [2].texcoord = math::vec2f (0.5, 1);
-      current_vertex [2].color    = 255;
-      current_vertex [3].position = v0;
-      current_vertex [3].texcoord = math::vec2f (0.5, 0.5);
-      current_vertex [3].color    = 255;
-      current_vertex [4].position = v2 + side_normal;
-      current_vertex [4].texcoord = math::vec2f (0.5, 1);
-      current_vertex [4].color    = 255;
-      current_vertex [5].position = v2;
-      current_vertex [5].texcoord = math::vec2f (0.5, 0.5);
-      current_vertex [5].color    = 255;
-
-      current_vertex += 6;
-
-      math::vec3f bottom_side_normal = math::normalize (v3 - v1) * corner_shadow_offset;
-
-      current_vertex [0].position = v3;
-      current_vertex [0].texcoord = math::vec2f (0.5, 1);
-      current_vertex [0].color    = 255;
-      current_vertex [1].position = v2+ bottom_side_normal;
-      current_vertex [1].texcoord = math::vec2f (0.5, 1);
-      current_vertex [1].color    = 255;
-      current_vertex [2].position = v2;
-      current_vertex [2].texcoord = math::vec2f (0.5, 0.5);
-      current_vertex [2].color    = 255;
-
-      current_vertex += 3;
-
-      current_vertex [0].position = v0;
-      current_vertex [0].texcoord = math::vec2f (0.5, 0.5);
-      current_vertex [0].color    = 255;
-      current_vertex [1].position = v0 + top_side_normal;
-      current_vertex [1].texcoord = math::vec2f (0.5, 1);
-      current_vertex [1].color    = 255;
-      current_vertex [2].position = v0 + top_side_normal + side_normal;
-      current_vertex [2].texcoord = math::vec2f (1, 1);
-      current_vertex [2].color    = 255;
-      current_vertex [3].position = v0;
-      current_vertex [3].texcoord = math::vec2f (0.5, 0.5);
-      current_vertex [3].color    = 255;
-      current_vertex [4].position = v0 + top_side_normal + side_normal;
-      current_vertex [4].texcoord = math::vec2f (1, 1);
-      current_vertex [4].color    = 255;
-      current_vertex [5].position = v0 + side_normal;
-      current_vertex [5].texcoord = math::vec2f (0.5, 1);
-      current_vertex [5].color    = 255;
-
-      current_vertex += 6;
-
-      current_vertex [0].position = v2;
-      current_vertex [0].texcoord = math::vec2f (0.5, 0.5);
-      current_vertex [0].color    = 255;
-      current_vertex [1].position = v2 + side_normal;
-      current_vertex [1].texcoord = math::vec2f (0.5, 1);
-      current_vertex [1].color    = 255;
-      current_vertex [2].position = v2 + bottom_side_normal + side_normal;
-      current_vertex [2].texcoord = math::vec2f (1, 1);
-      current_vertex [2].color    = 255;
-      current_vertex [3].position = v2;
-      current_vertex [3].texcoord = math::vec2f (0.5, 0.5);
-      current_vertex [3].color    = 255;
-      current_vertex [4].position = v2 + bottom_side_normal + side_normal;
-      current_vertex [4].texcoord = math::vec2f (1, 1);
-      current_vertex [4].color    = 255;
-      current_vertex [5].position = v2 + bottom_side_normal;
-      current_vertex [5].texcoord = math::vec2f (0.5, 1);
-      current_vertex [5].color    = 255;
-
-      current_vertex += 6;
+      top_static_vertex     = &v1;
+      bottom_static_vertex  = &v3;
+      top_dynamic_vertex    = &v0;
+      bottom_dynamic_vertex = &v2;
     }
     else
     {
-      corner_shadow_offset *= 1 - fabs (v1.x - page_size.x / 2);
-
-      math::vec3f top_side_normal = math::normalize (v1 - v3) * corner_shadow_offset;
-
-      current_vertex [0].position = v0;
-      current_vertex [0].texcoord = math::vec2f (0.5, 1);
-      current_vertex [0].color    = 255;
-      current_vertex [1].position = v1 + top_side_normal;
-      current_vertex [1].texcoord = math::vec2f (0.5, 1);
-      current_vertex [1].color    = 255;
-      current_vertex [2].position = v1;
-      current_vertex [2].texcoord = math::vec2f (0.5, 0.5);
-      current_vertex [2].color    = 255;
-
-      current_vertex += 3;
-
-      math::vec3f side_normal = math::normalize (v1 - v0) * corner_shadow_offset;
-
-      current_vertex [0].position = v1;
-      current_vertex [0].texcoord = math::vec2f (0.5, 0.5);
-      current_vertex [0].color    = 255;
-      current_vertex [1].position = v1 + side_normal;
-      current_vertex [1].texcoord = math::vec2f (0.5, 1);
-      current_vertex [1].color    = 255;
-      current_vertex [2].position = v3 + side_normal;
-      current_vertex [2].texcoord = math::vec2f (0.5, 1);
-      current_vertex [2].color    = 255;
-      current_vertex [3].position = v1;
-      current_vertex [3].texcoord = math::vec2f (0.5, 0.5);
-      current_vertex [3].color    = 255;
-      current_vertex [4].position = v3 + side_normal;
-      current_vertex [4].texcoord = math::vec2f (0.5, 1);
-      current_vertex [4].color    = 255;
-      current_vertex [5].position = v3;
-      current_vertex [5].texcoord = math::vec2f (0.5, 0.5);
-      current_vertex [5].color    = 255;
-
-      current_vertex += 6;
-
-      math::vec3f bottom_side_normal = math::normalize (v3 - v1) * corner_shadow_offset;
-
-      current_vertex [0].position = v2;
-      current_vertex [0].texcoord = math::vec2f (0.5, 1);
-      current_vertex [0].color    = 255;
-      current_vertex [1].position = v3 + bottom_side_normal;
-      current_vertex [1].texcoord = math::vec2f (0.5, 1);
-      current_vertex [1].color    = 255;
-      current_vertex [2].position = v3;
-      current_vertex [2].texcoord = math::vec2f (0.5, 0.5);
-      current_vertex [2].color    = 255;
-
-      current_vertex += 3;
-
-      current_vertex [0].position = v1;
-      current_vertex [0].texcoord = math::vec2f (0.5, 0.5);
-      current_vertex [0].color    = 255;
-      current_vertex [1].position = v1 + top_side_normal;
-      current_vertex [1].texcoord = math::vec2f (0.5, 1);
-      current_vertex [1].color    = 255;
-      current_vertex [2].position = v1 + top_side_normal + side_normal;
-      current_vertex [2].texcoord = math::vec2f (1, 1);
-      current_vertex [2].color    = 255;
-      current_vertex [3].position = v1;
-      current_vertex [3].texcoord = math::vec2f (0.5, 0.5);
-      current_vertex [3].color    = 255;
-      current_vertex [4].position = v1 + top_side_normal + side_normal;
-      current_vertex [4].texcoord = math::vec2f (1, 1);
-      current_vertex [4].color    = 255;
-      current_vertex [5].position = v1 + side_normal;
-      current_vertex [5].texcoord = math::vec2f (0.5, 1);
-      current_vertex [5].color    = 255;
-
-      current_vertex += 6;
-
-      current_vertex [0].position = v3;
-      current_vertex [0].texcoord = math::vec2f (0.5, 0.5);
-      current_vertex [0].color    = 255;
-      current_vertex [1].position = v3 + side_normal;
-      current_vertex [1].texcoord = math::vec2f (0.5, 1);
-      current_vertex [1].color    = 255;
-      current_vertex [2].position = v3 + bottom_side_normal + side_normal;
-      current_vertex [2].texcoord = math::vec2f (1, 1);
-      current_vertex [2].color    = 255;
-      current_vertex [3].position = v3;
-      current_vertex [3].texcoord = math::vec2f (0.5, 0.5);
-      current_vertex [3].color    = 255;
-      current_vertex [4].position = v3 + bottom_side_normal + side_normal;
-      current_vertex [4].texcoord = math::vec2f (1, 1);
-      current_vertex [4].color    = 255;
-      current_vertex [5].position = v3 + bottom_side_normal;
-      current_vertex [5].texcoord = math::vec2f (0.5, 1);
-      current_vertex [5].color    = 255;
-
-      current_vertex += 6;
+      top_static_vertex     = &v0;
+      bottom_static_vertex  = &v2;
+      top_dynamic_vertex    = &v1;
+      bottom_dynamic_vertex = &v3;
     }
+
+    float corner_shadow_offset = page_curl->CornerShadowOffset () * (1 - fabs (top_dynamic_vertex->x - page_size.x / 2) / (page_size.x / 2));
+
+    if (corner_shadow_offset < EPS)
+      return;
+
+    math::vec3f top_side_normal = math::normalize (*top_static_vertex - *bottom_static_vertex) * corner_shadow_offset;
+
+    current_vertex [0].position = *top_static_vertex;
+    current_vertex [0].texcoord = math::vec2f (0.5, 1);
+    current_vertex [0].color    = 255;
+    current_vertex [1].position = *top_dynamic_vertex + top_side_normal;
+    current_vertex [1].texcoord = math::vec2f (0.5, 1);
+    current_vertex [1].color    = 255;
+    current_vertex [2].position = *top_dynamic_vertex;
+    current_vertex [2].texcoord = math::vec2f (0.5, 0.5);
+    current_vertex [2].color    = 255;
+
+    current_vertex += 3;
+
+    math::vec3f side_normal = math::normalize (*top_dynamic_vertex - *top_static_vertex) * corner_shadow_offset;
+
+    current_vertex [0].position = *top_dynamic_vertex;
+    current_vertex [0].texcoord = math::vec2f (0.5, 0.5);
+    current_vertex [0].color    = 255;
+    current_vertex [1].position = *top_dynamic_vertex + side_normal;
+    current_vertex [1].texcoord = math::vec2f (0.5, 1);
+    current_vertex [1].color    = 255;
+    current_vertex [2].position = *bottom_dynamic_vertex + side_normal;
+    current_vertex [2].texcoord = math::vec2f (0.5, 1);
+    current_vertex [2].color    = 255;
+    current_vertex [3].position = *top_dynamic_vertex;
+    current_vertex [3].texcoord = math::vec2f (0.5, 0.5);
+    current_vertex [3].color    = 255;
+    current_vertex [4].position = *bottom_dynamic_vertex + side_normal;
+    current_vertex [4].texcoord = math::vec2f (0.5, 1);
+    current_vertex [4].color    = 255;
+    current_vertex [5].position = *bottom_dynamic_vertex;
+    current_vertex [5].texcoord = math::vec2f (0.5, 0.5);
+    current_vertex [5].color    = 255;
+
+    current_vertex += 6;
+
+    math::vec3f bottom_side_normal = math::normalize (*bottom_static_vertex - *top_static_vertex) * corner_shadow_offset;
+
+    current_vertex [0].position = *bottom_static_vertex;
+    current_vertex [0].texcoord = math::vec2f (0.5, 1);
+    current_vertex [0].color    = 255;
+    current_vertex [1].position = *bottom_dynamic_vertex + bottom_side_normal;
+    current_vertex [1].texcoord = math::vec2f (0.5, 1);
+    current_vertex [1].color    = 255;
+    current_vertex [2].position = *bottom_dynamic_vertex;
+    current_vertex [2].texcoord = math::vec2f (0.5, 0.5);
+    current_vertex [2].color    = 255;
+
+    current_vertex += 3;
+
+    current_vertex [0].position = *top_dynamic_vertex;
+    current_vertex [0].texcoord = math::vec2f (0.5, 0.5);
+    current_vertex [0].color    = 255;
+    current_vertex [1].position = *top_dynamic_vertex + top_side_normal;
+    current_vertex [1].texcoord = math::vec2f (0.5, 1);
+    current_vertex [1].color    = 255;
+    current_vertex [2].position = *top_dynamic_vertex + top_side_normal + side_normal;
+    current_vertex [2].texcoord = math::vec2f (1, 1);
+    current_vertex [2].color    = 255;
+    current_vertex [3].position = *top_dynamic_vertex;
+    current_vertex [3].texcoord = math::vec2f (0.5, 0.5);
+    current_vertex [3].color    = 255;
+    current_vertex [4].position = *top_dynamic_vertex + top_side_normal + side_normal;
+    current_vertex [4].texcoord = math::vec2f (1, 1);
+    current_vertex [4].color    = 255;
+    current_vertex [5].position = *top_dynamic_vertex + side_normal;
+    current_vertex [5].texcoord = math::vec2f (0.5, 1);
+    current_vertex [5].color    = 255;
+
+    current_vertex += 6;
+
+    current_vertex [0].position = *bottom_dynamic_vertex;
+    current_vertex [0].texcoord = math::vec2f (0.5, 0.5);
+    current_vertex [0].color    = 255;
+    current_vertex [1].position = *bottom_dynamic_vertex + side_normal;
+    current_vertex [1].texcoord = math::vec2f (0.5, 1);
+    current_vertex [1].color    = 255;
+    current_vertex [2].position = *bottom_dynamic_vertex + bottom_side_normal + side_normal;
+    current_vertex [2].texcoord = math::vec2f (1, 1);
+    current_vertex [2].color    = 255;
+    current_vertex [3].position = *bottom_dynamic_vertex;
+    current_vertex [3].texcoord = math::vec2f (0.5, 0.5);
+    current_vertex [3].color    = 255;
+    current_vertex [4].position = *bottom_dynamic_vertex + bottom_side_normal + side_normal;
+    current_vertex [4].texcoord = math::vec2f (1, 1);
+    current_vertex [4].color    = 255;
+    current_vertex [5].position = *bottom_dynamic_vertex + bottom_side_normal;
+    current_vertex [5].texcoord = math::vec2f (0.5, 1);
+    current_vertex [5].color    = 255;
 
     size_t triangles_count = 8;
     size_t vertices_count = triangles_count * 3;
