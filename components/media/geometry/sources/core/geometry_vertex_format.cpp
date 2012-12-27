@@ -7,18 +7,45 @@ using namespace common;
     Описание реализации формата вершин
 */
 
+typedef stl::vector<VertexAttribute> VertexAttributeArray;
+
 struct VertexFormat::Impl
 {
-  VertexAttribute attributes [VertexAttributeSemantic_Num]; //атрибуты вершины  
-  size_t          attributes_count;                         //количество атрибутов
-  size_t          attributes_hash;                          //хэш от массива атрибутов
-  bool            need_hash_update;                         //необходим пересчёт хэша атрибутов
-  size_t          min_vertex_size;                          //минимальный размер вершины
-  bool            need_vertex_size_update;                  //необходим пересчёт размера вершины
-  
-  size_t Hash ();
-  
-  Impl () : attributes_count (0), need_hash_update (true), need_vertex_size_update (true) {}
+  VertexAttributeArray attributes;              //атрибуты вершины
+  StringArray          names;                   //имена атрибутов
+  size_t               attributes_hash;         //хэш от массива атрибутов
+  bool                 need_hash_update;        //необходим пересчёт хэша атрибутов
+  size_t               min_vertex_size;         //минимальный размер вершины
+  bool                 need_vertex_size_update; //необходим пересчёт размера вершины
+
+  Impl ()
+    : need_hash_update (true) 
+    , min_vertex_size ()
+    , need_vertex_size_update ()
+  {
+  }
+
+  size_t Hash ()
+  {
+    if (need_hash_update)
+    {
+      size_t names_hash = crc32 (names.Buffer (), names.BufferSize ());
+
+      for (VertexAttributeArray::iterator iter=attributes.begin (), end=attributes.end (); iter!=end; ++iter)
+        iter->name = 0;
+
+      attributes_hash = crc32 (&attributes [0], sizeof (VertexAttribute) * attributes.size (), names_hash);
+
+      const char** name = names.Data ();
+
+      for (VertexAttributeArray::iterator iter=attributes.begin (), end=attributes.end (); iter!=end; ++iter, ++name)
+        iter->name = *name;
+
+      need_hash_update = false;
+    }
+
+    return attributes_hash;
+  }  
 };
 
 /*
@@ -55,7 +82,23 @@ VertexFormat& VertexFormat::operator = (const VertexFormat& vf)
 
 size_t VertexFormat::AttributesCount () const
 {
-  return impl->attributes_count;
+  return impl->attributes.size ();
+}
+
+/*
+    Резервирование количества атрибутов 
+*/
+
+void VertexFormat::ReserveAttributes (size_t count, size_t name_buffer_size)
+{
+  impl->attributes.reserve (count);
+  impl->names.Reserve (count);
+  impl->names.ReserveBuffer (name_buffer_size);
+}
+
+size_t VertexFormat::ReservedAttributesCount () const
+{
+  return impl->attributes.capacity ();
 }
 
 /*
@@ -64,7 +107,10 @@ size_t VertexFormat::AttributesCount () const
 
 const VertexAttribute* VertexFormat::Attributes () const
 {
-  return impl->attributes;
+  if (impl->attributes.empty ())
+    return 0;
+
+  return &impl->attributes [0];
 }
 
 /*
@@ -73,22 +119,50 @@ const VertexAttribute* VertexFormat::Attributes () const
 
 const VertexAttribute& VertexFormat::Attribute (size_t index) const
 {
-  if (index >= impl->attributes_count)
-    throw xtl::make_range_exception ("media::geometry::VertexFormat::Attribute", "index", index, impl->attributes_count);
-    
+  if (index >= impl->attributes.size ())
+    throw xtl::make_range_exception ("media::geometry::VertexFormat::Attribute", "index", index, impl->attributes.size ());
+
   return impl->attributes [index];
+}
+
+const char* VertexFormat::AttributeName (size_t index) const
+{
+  if (index >= impl->attributes.size ())
+    throw xtl::make_range_exception ("media::geometry::VertexFormat::AttributeName", "index", index, impl->attributes.size ());
+
+  return impl->names [index];
 }
 
 /*
     Поиск атрибута по семантике
 */
 
-const VertexAttribute* VertexFormat::FindAttribute (VertexAttributeSemantic semantic) const
+const VertexAttribute* VertexFormat::FindAttribute (VertexAttributeSemantic semantic, const VertexAttribute* after) const
 {
-  for (VertexAttribute* attribute=impl->attributes, *end=attribute+impl->attributes_count; attribute != end; attribute++)
-    if (attribute->semantic == semantic)
+  if (!after)
+    after = &impl->attributes [0];
+
+  VertexAttribute* end = &*impl->attributes.end ();
+
+  if (after < &impl->attributes [0] || after >= end)
+    return 0;
+
+  for (const VertexAttribute* attribute=after; attribute != end; attribute++)
+    if (attribute->semantic == semantic)   
       return attribute;
       
+  return 0;
+}
+
+const VertexAttribute* VertexFormat::FindAttribute (const char* name) const
+{
+  if (!name)
+    return 0;
+
+  for (VertexAttribute *attribute=&impl->attributes [0], *end=&*impl->attributes.end (); attribute != end; attribute++)
+    if (attribute->name && !strcmp (name, attribute->name))
+      return attribute;
+
   return 0;
 }
 
@@ -96,57 +170,128 @@ const VertexAttribute* VertexFormat::FindAttribute (VertexAttributeSemantic sema
     Добавление атрибутов
 */
 
-size_t VertexFormat::AddAttribute (VertexAttributeSemantic semantic, VertexAttributeType type, size_t offset)
+size_t VertexFormat::AddAttribute (const char* name, VertexAttributeSemantic semantic, VertexAttributeType type, size_t offset)
 {
+  static const char* METHOD_NAME = "media::geometry::VertexFormat::AddAttribute";
+
+  if (!name)
+    throw xtl::make_null_argument_exception (METHOD_NAME, "name");
+
+  if (!*name)
+    name = "";
+
   if (semantic < 0 || semantic >= VertexAttributeSemantic_Num)
-    throw xtl::make_argument_exception ("media::geometry::VertexFormat::AddAttribute", "semantic", semantic);
+    throw xtl::make_argument_exception (METHOD_NAME, "semantic", semantic);
     
   if (type < 0 || type >= VertexAttributeType_Num)
-    throw xtl::make_argument_exception ("media::geometry::VertexFormat::AddAttribute", "type", type);
+    throw xtl::make_argument_exception (METHOD_NAME, "type", type);
+
+  if (!*name && semantic == VertexAttributeSemantic_Custom)
+    throw xtl::format_not_supported_exception (METHOD_NAME, "Attribute with custom semantic must have name");
     
     //проверка совместимости типа атрибута с его семантикой
     
   if (!is_compatible (semantic, type))
-    throw xtl::format_not_supported_exception ("media::geometry::VertexFormat::AddAttribute", "Semantic '%s' is not compatible with type '%s'",
-                       get_semantic_name (semantic), get_type_name (type));  
-  
+  {
+    if (*name)
+    {
+      throw xtl::format_not_supported_exception (METHOD_NAME, "Semantic '%s' for attribute '%s' is not compatible with type '%s'",
+        get_semantic_name (semantic), name, get_type_name (type));
+    }
+    else
+    {
+      throw xtl::format_not_supported_exception (METHOD_NAME, "Semantic '%s' for attribute is not compatible with type '%s'",
+        get_semantic_name (semantic), get_type_name (type));
+    }
+  }
+
     //проверка наличия атрибута в формате
 
-  if (FindAttribute (semantic))
-    throw xtl::format_not_supported_exception ("media::geometry::VertexFormat::AddAttribute", "Attribute with semantic '%s' has been already inserted",
-                       get_semantic_name (semantic));
+  if (*name)
+  {
+    if (FindAttribute (name))
+      throw xtl::format_not_supported_exception (METHOD_NAME, "Attribute '%s' has been already inserted", name);
+  }
+  else
+  {
+    if (FindAttribute (semantic))
+      throw xtl::format_not_supported_exception (METHOD_NAME, "Anonymous attribute with semantic '%s' has been already inserted", get_semantic_name (semantic));
+  }
     
-    //добавление атрибута
-     
-  VertexAttribute& attribute = impl->attributes [impl->attributes_count];
-  
-  attribute.semantic = semantic;
-  attribute.type     = type;
-  attribute.offset   = offset;
+    //добавление атрибута  
 
-  impl->attributes_count++;
+  size_t old_capacity        = impl->names.Capacity (),
+         old_buffer_capacity = impl->names.BufferCapacity ();  
+
+  impl->names.Add (name);
+
+  if (impl->names.Capacity () != old_capacity || impl->names.BufferCapacity () != old_buffer_capacity)
+  {
+    size_t index = 0;
+
+    for (VertexAttributeArray::iterator iter=impl->attributes.begin (), end=impl->attributes.end (); iter!=end; ++iter, ++index)
+      iter->name = impl->names [index];
+  }
+
+  try
+  {
+    VertexAttribute attribute;
+
+    attribute.name     = impl->names [impl->names.Size () - 1];
+    attribute.semantic = semantic;
+    attribute.type     = type;
+    attribute.offset   = offset;
+
+    impl->attributes.push_back (attribute);
+
+    impl->need_hash_update        = true;
+    impl->need_vertex_size_update = true;
+  }
+  catch (...)
+  {
+    impl->names.Remove (impl->names.Size () - 1);
+    throw;
+  }
   
-  impl->need_hash_update        = true;
-  impl->need_vertex_size_update = true;
-  
-  return impl->attributes_count - 1;
+  return impl->attributes.size () - 1;
+}
+
+size_t VertexFormat::AddAttribute (const char* name, VertexAttributeType type, size_t offset)
+{
+  return AddAttribute (name, VertexAttributeSemantic_Custom, type, offset);
+}
+
+size_t VertexFormat::AddAttribute (VertexAttributeSemantic semantic, VertexAttributeType type, size_t offset)
+{
+  return AddAttribute ("", semantic, type, offset);
 }
 
 size_t VertexFormat::AddAttributes (const VertexFormat& format)
 {
-  for (size_t i=0, count=format.impl->attributes_count; i<count; i++)
-    if (FindAttribute (format.impl->attributes [i].semantic))
-      throw xtl::make_argument_exception ("media::geometry::VertexFormat::AddAttributes", "semantic",
-                            format.impl->attributes [i].semantic, "Attribute has been already inserted");
-                            
-  for (size_t i=0, count=format.impl->attributes_count; i<count; i++)
+  for (VertexAttributeArray::const_iterator iter=format.impl->attributes.begin (), end=format.impl->attributes.end (); iter!=end; ++iter)
   {
-    const VertexAttribute& attribute = format.impl->attributes [i];
+    const char* name = iter->name;
+
+    if (*name)
+    {
+      if (FindAttribute (name))
+        throw xtl::make_argument_exception ("media::geometry::VertexFormat::AddAttributes", "name", name, "Attribute has been already inserted");
+    }
+    else
+    {
+      if (FindAttribute (iter->semantic))
+        throw xtl::make_argument_exception ("media::geometry::VertexFormat::AddAttributes", "semantic", iter->semantic, "Attribute has been already inserted");
+    }
+  }
+                            
+  for (VertexAttributeArray::const_iterator iter=format.impl->attributes.begin (), end=format.impl->attributes.end (); iter!=end; ++iter)
+  {
+    const VertexAttribute& attribute = *iter;
     
-    AddAttribute (attribute.semantic, attribute.type, attribute.offset);
+    AddAttribute (attribute.name, attribute.semantic, attribute.type, attribute.offset);
   }
 
-  return impl->attributes_count - 1;
+  return impl->attributes.size () - 1;
 }
 
 /*
@@ -155,36 +300,102 @@ size_t VertexFormat::AddAttributes (const VertexFormat& format)
 
 void VertexFormat::RemoveAttribute (size_t position)
 {
-  if (position >= impl->attributes_count)
+  if (position >= impl->attributes.size ())
     return;
     
-  memcpy (impl->attributes + position, impl->attributes + position + 1, sizeof (VertexAttribute) * (impl->attributes_count - position - 1));
-  
-  impl->attributes_count--;
+  impl->attributes.erase (impl->attributes.begin () + position);
+  impl->names.Remove (position);
   
   impl->need_hash_update        = true;
   impl->need_vertex_size_update = true;
 }
 
-void VertexFormat::RemoveAttribute (VertexAttributeSemantic semantic)
+void VertexFormat::RemoveAttribute (const char* name)
 {
-  VertexAttribute* attribute = FindAttribute (semantic);
+  const VertexAttribute* attribute = FindAttribute (name);
   
   if (!attribute)
     return;
     
-  RemoveAttribute (attribute - impl->attributes);
+  RemoveAttribute (attribute - &impl->attributes [0]);
+}
+
+void VertexFormat::RemoveAttributes (VertexAttributeSemantic semantic)
+{
+  const VertexAttribute* attribute = 0;
+
+  for (;;)
+  {
+    attribute = FindAttribute (semantic, attribute);
+  
+    if (!attribute)
+      return;
+    
+    RemoveAttribute (attribute - &impl->attributes [0]);
+  }
 }
 
 void VertexFormat::RemoveAttributes (const VertexFormat& format)
 {
-  for (size_t i=0, count=format.impl->attributes_count; i<count; i++)
-    RemoveAttribute (format.impl->attributes [i].semantic);
+  for (VertexAttributeArray::const_iterator iter=format.impl->attributes.begin (), end=format.impl->attributes.end (); iter!=end; ++iter)
+  {
+    const VertexAttribute& attribute = *iter;
+
+    if (*attribute.name)
+    {
+      if (const VertexAttribute* iter = FindAttribute (attribute.name))
+        RemoveAttribute (iter - &impl->attributes [0]);
+    }
+    else
+    {
+      RemoveAttributes (attribute.semantic);
+    }      
+  }
 }
 
 void VertexFormat::Clear ()
 {
-  impl->attributes_count = 0;
+  impl->need_vertex_size_update = true;
+  impl->need_hash_update        = true;
+
+  impl->attributes.clear ();
+  impl->names.Clear ();
+}
+
+/*
+    Расчёт размера вершины
+*/
+
+size_t VertexFormat::GetMinimalVertexSize () const
+{
+  if (!impl->need_vertex_size_update)
+    return impl->min_vertex_size;
+
+  impl->need_vertex_size_update = false;
+
+  if (impl->attributes.empty ())
+    return impl->min_vertex_size = 0;
+
+  size_t max_offset = 0;
+  
+  for (VertexAttributeArray::const_iterator iter=impl->attributes.begin (), end=impl->attributes.end (); iter != end; ++iter)
+  {
+    size_t offset = iter->offset + get_type_size (iter->type);
+
+    if (offset > max_offset)
+      max_offset = offset;
+  }
+
+  return impl->min_vertex_size = max_offset;
+}
+
+/*
+    Расчёт хэша вершин
+*/
+
+size_t VertexFormat::Hash () const
+{
+  return impl->Hash ();
 }
 
 /*
@@ -214,33 +425,17 @@ VertexFormat VertexFormat::operator - (const VertexFormat& format) const
 }
 
 /*
-    Расчёт размера вершины
+    Сравнение
 */
 
-size_t VertexFormat::GetMinimalVertexSize () const
+bool VertexFormat::operator == (const VertexFormat& vf) const
+{ 
+  return impl->attributes.size () == vf.impl->attributes.size () && impl->Hash () == vf.impl->Hash ();
+}
+
+bool VertexFormat::operator != (const VertexFormat& vf) const
 {
-  if (!impl->need_vertex_size_update)
-    return impl->min_vertex_size;
-
-  if (impl->attributes_count)
-  {
-    size_t max_offset = 0;
-    
-    for (VertexAttribute* attribute=impl->attributes, *end=attribute+impl->attributes_count; attribute != end; attribute++)
-    {
-      size_t offset = attribute->offset + get_type_size (attribute->type);
-
-      if (offset > max_offset)
-        max_offset = offset;
-    }
-        
-    impl->min_vertex_size = max_offset;
-  }
-  else impl->min_vertex_size = 0;
-
-  impl->need_vertex_size_update = false;
-
-  return impl->min_vertex_size;
+  return !(*this == vf);
 }
 
 /*
@@ -249,9 +444,7 @@ size_t VertexFormat::GetMinimalVertexSize () const
 
 void VertexFormat::Swap (VertexFormat& vf)
 {
-  Impl* tmp = impl;
-  impl      = vf.impl;
-  vf.impl   = tmp;
+  stl::swap (impl, vf.impl);
 }
 
 namespace media
@@ -263,327 +456,6 @@ namespace geometry
 void swap (VertexFormat& vf1, VertexFormat& vf2)
 {
   vf1.Swap (vf2);
-}
-
-}
-
-}
-
-/*
-    Расчёт хэша вершин
-*/
-
-size_t VertexFormat::Impl::Hash ()
-{
-  if (need_hash_update)
-  {
-    attributes_hash  = crc32 (attributes, sizeof (VertexAttribute) * attributes_count);
-    need_hash_update = false;
-  }
-
-  return attributes_hash;
-}
-
-/*
-    Сравнение
-*/
-
-bool VertexFormat::operator == (const VertexFormat& vf) const
-{
-  return impl->attributes_count == vf.impl->attributes_count && impl->Hash () == vf.impl->Hash ();
-}
-
-bool VertexFormat::operator != (const VertexFormat& vf) const
-{
-  return !(*this == vf);
-}
-
-/*
-    Получение характеристик
-*/
-
-namespace media
-{
-
-namespace geometry
-{
-
-//размер типа атрибута вершин в байтах
-size_t get_type_size (VertexAttributeType type)
-{
-  switch (type)
-  {
-    case VertexAttributeType_Float2:    return sizeof (float) * 2;
-    case VertexAttributeType_Float3:    return sizeof (float) * 3;
-    case VertexAttributeType_Float4:    return sizeof (float) * 4;
-    case VertexAttributeType_Short2:    return sizeof (short) * 2;
-    case VertexAttributeType_Short3:    return sizeof (short) * 3;    
-    case VertexAttributeType_Short4:    return sizeof (short) * 4;
-    case VertexAttributeType_UByte4:    return sizeof (unsigned char) * 4;
-    case VertexAttributeType_Influence: return sizeof (VertexInfluence);
-    default:                            throw xtl::make_argument_exception ("media::get_type_size", "type", type);
-  }
-  
-  return 0;
-}
-
-//количество компонентов
-size_t get_components_count (VertexAttributeType type)
-{
-  switch (type)
-  {
-    case VertexAttributeType_Short2:
-    case VertexAttributeType_Float2:    return 2;
-    case VertexAttributeType_Short3:
-    case VertexAttributeType_Float3:    return 3;
-    case VertexAttributeType_Short4:
-    case VertexAttributeType_UByte4:
-    case VertexAttributeType_Float4:    return 4;
-    case VertexAttributeType_Influence: return 1;
-    default:                            throw xtl::make_argument_exception ("media::get_components_count", "type", type);
-  }
-
-  return 0;
-}
-
-//имя семантики
-const char* get_semantic_name (VertexAttributeSemantic semantic)
-{
-  switch (semantic)
-  {
-    case VertexAttributeSemantic_Position:     return "position";
-    case VertexAttributeSemantic_Normal:       return "normal";
-    case VertexAttributeSemantic_Color:        return "color";
-    case VertexAttributeSemantic_Tangent:      return "tangent";
-    case VertexAttributeSemantic_Binormal:     return "binormal";
-    case VertexAttributeSemantic_TexCoord0:    return "texcoord0";
-    case VertexAttributeSemantic_TexCoord1:    return "texcoord1";
-    case VertexAttributeSemantic_TexCoord2:    return "texcoord2";
-    case VertexAttributeSemantic_TexCoord3:    return "texcoord3";
-    case VertexAttributeSemantic_TexCoord4:    return "texcoord4";
-    case VertexAttributeSemantic_TexCoord5:    return "texcoord5";
-    case VertexAttributeSemantic_TexCoord6:    return "texcoord6";
-    case VertexAttributeSemantic_TexCoord7:    return "texcoord7";
-    case VertexAttributeSemantic_TexTangent0:  return "textangent0";
-    case VertexAttributeSemantic_TexTangent1:  return "textangent1";
-    case VertexAttributeSemantic_TexTangent2:  return "textangent2";
-    case VertexAttributeSemantic_TexTangent3:  return "textangent3";
-    case VertexAttributeSemantic_TexTangent4:  return "textangent4";
-    case VertexAttributeSemantic_TexTangent5:  return "textangent5";
-    case VertexAttributeSemantic_TexTangent6:  return "textangent6";
-    case VertexAttributeSemantic_TexTangent7:  return "textangent7";
-    case VertexAttributeSemantic_TexBinormal0: return "texbinormal0";
-    case VertexAttributeSemantic_TexBinormal1: return "texbinormal1";
-    case VertexAttributeSemantic_TexBinormal2: return "texbinormal2";
-    case VertexAttributeSemantic_TexBinormal3: return "texbinormal3";
-    case VertexAttributeSemantic_TexBinormal4: return "texbinormal4";
-    case VertexAttributeSemantic_TexBinormal5: return "texbinormal5";
-    case VertexAttributeSemantic_TexBinormal6: return "texbinormal6";
-    case VertexAttributeSemantic_TexBinormal7: return "texbinormal7";    
-    case VertexAttributeSemantic_Influence:    return "influence";
-    case VertexAttributeSemantic_Custom:       return "custom";
-    default:                                   throw xtl::make_argument_exception ("media::geometry::get_semantic_name(VertexAttributeSemantic)", "semantic", semantic);
-  }
-
-  return "";
-}
-
-//получение семантики по имени
-VertexAttributeSemantic get_vertex_attribute_semantic (const char* name, VertexAttributeSemantic default_semantic)
-{
-  if (!name)
-    return default_semantic;
-    
-  struct Map
-  {
-    stl::hash_key<const char*> name_hash;
-    VertexAttributeSemantic    semantic;
-  };
-  
-  static Map map [] = {
-    {"position",     VertexAttributeSemantic_Position},
-    {"normal",       VertexAttributeSemantic_Normal},
-    {"color",        VertexAttributeSemantic_Color},
-    {"tangent",      VertexAttributeSemantic_Tangent},
-    {"binormal",     VertexAttributeSemantic_Binormal},
-    {"texcoord0",    VertexAttributeSemantic_TexCoord0},
-    {"texcoord1",    VertexAttributeSemantic_TexCoord1},
-    {"texcoord2",    VertexAttributeSemantic_TexCoord2},
-    {"texcoord3",    VertexAttributeSemantic_TexCoord3},
-    {"texcoord4",    VertexAttributeSemantic_TexCoord4},
-    {"texcoord5",    VertexAttributeSemantic_TexCoord5},
-    {"texcoord6",    VertexAttributeSemantic_TexCoord6},
-    {"texcoord7",    VertexAttributeSemantic_TexCoord7},
-    {"textangent0",  VertexAttributeSemantic_TexTangent0},
-    {"textangent1",  VertexAttributeSemantic_TexTangent1},
-    {"textangent2",  VertexAttributeSemantic_TexTangent2},
-    {"textangent3",  VertexAttributeSemantic_TexTangent3},
-    {"textangent4",  VertexAttributeSemantic_TexTangent4},
-    {"textangent5",  VertexAttributeSemantic_TexTangent5},
-    {"textangent6",  VertexAttributeSemantic_TexTangent6},
-    {"textangent7",  VertexAttributeSemantic_TexTangent7},
-    {"texbinormal0", VertexAttributeSemantic_TexBinormal0},
-    {"texbinormal1", VertexAttributeSemantic_TexBinormal1},
-    {"texbinormal2", VertexAttributeSemantic_TexBinormal2},
-    {"texbinormal3", VertexAttributeSemantic_TexBinormal3},
-    {"texbinormal4", VertexAttributeSemantic_TexBinormal4},
-    {"texbinormal5", VertexAttributeSemantic_TexBinormal5},
-    {"texbinormal6", VertexAttributeSemantic_TexBinormal6},
-    {"texbinormal7", VertexAttributeSemantic_TexBinormal7},    
-    {"influence",    VertexAttributeSemantic_Influence},
-    {"custom",       VertexAttributeSemantic_Custom},
-  };
-  
-  static const size_t map_size = sizeof (map) / sizeof (*map);
-  
-  const Map* map_iter = map;
-  size_t     hash     = strhash (name);
-  
-  for (size_t i=0; i<map_size; i++, map_iter++)
-    if (map_iter->name_hash.get_hash () == hash)
-      return map_iter->semantic;
-  
-  return default_semantic;
-}
-
-//имя типа
-const char* get_type_name (VertexAttributeType type)
-{
-  switch (type)
-  {
-    case VertexAttributeType_Float2:    return "float2";
-    case VertexAttributeType_Float3:    return "float3";
-    case VertexAttributeType_Float4:    return "float4";
-    case VertexAttributeType_Short2:    return "short2";
-    case VertexAttributeType_Short3:    return "short3";
-    case VertexAttributeType_Short4:    return "short4";
-    case VertexAttributeType_UByte4:    return "ubyte4";
-    case VertexAttributeType_Influence: return "influence";
-    default:                            throw xtl::make_argument_exception ("media::geometry::get_type_name(VertexAttributeType)", "type", type);
-  }
-
-  return "";
-}
-
-//получение типа по имени
-VertexAttributeType get_vertex_attribute_type (const char* name, VertexAttributeType default_type)
-{
-  if (!name)
-    return default_type;
-
-  struct Map
-  {
-    stl::hash_key<const char*> name_hash;
-    VertexAttributeType        type;
-  };
-
-  static Map map [] = {
-    {"float2",    VertexAttributeType_Float2},
-    {"float3",    VertexAttributeType_Float3},
-    {"float4",    VertexAttributeType_Float4},
-    {"short2",    VertexAttributeType_Short2},
-    {"short3",    VertexAttributeType_Short3},
-    {"short4",    VertexAttributeType_Short4},
-    {"ubyte4",    VertexAttributeType_UByte4},
-    {"influence", VertexAttributeType_Influence}
-  };
-
-  static const size_t map_size = sizeof (map) / sizeof (*map);
-
-  const Map* map_iter = map;
-  size_t     hash     = strhash (name);
-
-  for (size_t i=0; i<map_size; i++, map_iter++)
-    if (map_iter->name_hash.get_hash () == hash)
-      return map_iter->type;
-
-  return default_type;
-}
-
-//проверка совместимости
-bool is_compatible (VertexAttributeSemantic semantic, VertexAttributeType type)
-{
-  switch (semantic)
-  {
-    case VertexAttributeSemantic_Custom:
-      switch (type)
-      {
-        case VertexAttributeType_Influence:
-        case VertexAttributeType_Float2:
-        case VertexAttributeType_Float3:
-        case VertexAttributeType_Float4:
-        case VertexAttributeType_Short2:
-        case VertexAttributeType_Short3:
-        case VertexAttributeType_Short4:
-        case VertexAttributeType_UByte4: return true;
-        default:                         return false;
-      }    
-    case VertexAttributeSemantic_Position:
-    case VertexAttributeSemantic_TexCoord0:
-    case VertexAttributeSemantic_TexCoord1:
-    case VertexAttributeSemantic_TexCoord2:
-    case VertexAttributeSemantic_TexCoord3:
-    case VertexAttributeSemantic_TexCoord4:
-    case VertexAttributeSemantic_TexCoord5:
-    case VertexAttributeSemantic_TexCoord6:
-    case VertexAttributeSemantic_TexCoord7:
-      switch (type)
-      {
-        case VertexAttributeType_Float2:
-        case VertexAttributeType_Float3:
-        case VertexAttributeType_Float4:
-        case VertexAttributeType_Short2:
-        case VertexAttributeType_Short3:
-        case VertexAttributeType_Short4:
-        case VertexAttributeType_UByte4: return true;
-        default:                         return false;
-      }
-    case VertexAttributeSemantic_TexTangent0:
-    case VertexAttributeSemantic_TexTangent1:
-    case VertexAttributeSemantic_TexTangent2:
-    case VertexAttributeSemantic_TexTangent3:
-    case VertexAttributeSemantic_TexTangent4:
-    case VertexAttributeSemantic_TexTangent5:
-    case VertexAttributeSemantic_TexTangent6:
-    case VertexAttributeSemantic_TexTangent7:
-    case VertexAttributeSemantic_TexBinormal0:
-    case VertexAttributeSemantic_TexBinormal1:
-    case VertexAttributeSemantic_TexBinormal2:
-    case VertexAttributeSemantic_TexBinormal3:
-    case VertexAttributeSemantic_TexBinormal4:
-    case VertexAttributeSemantic_TexBinormal5:
-    case VertexAttributeSemantic_TexBinormal6:
-    case VertexAttributeSemantic_TexBinormal7:
-    case VertexAttributeSemantic_Normal:
-    case VertexAttributeSemantic_Tangent:
-    case VertexAttributeSemantic_Binormal:
-      switch (type)
-      {
-        case VertexAttributeType_Float3:
-        case VertexAttributeType_Short3: return true;
-        default:                         return false;
-      }
-    case VertexAttributeSemantic_Color:
-      switch (type)
-      {
-        case VertexAttributeType_Float3:
-        case VertexAttributeType_Float4:
-        case VertexAttributeType_Short3:
-        case VertexAttributeType_Short4:
-        case VertexAttributeType_UByte4: return true;
-        default:                         return false;
-      }
-    case VertexAttributeSemantic_Influence:
-      switch (type)
-      {
-        case VertexAttributeType_Influence: return true;
-        default:                            return false;
-      }
-    default:
-      break;
-  }
-  
-  return false;
 }
 
 }

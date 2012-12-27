@@ -15,6 +15,7 @@
 
 #include <math/vector.h>
 
+#include <common/string.h>
 #include <common/strlib.h>
 #include <common/hash.h>
 #include <common/component.h>

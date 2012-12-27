@@ -136,8 +136,6 @@ void check_stream (Log& log, CheckContext& context)
       case VertexAttributeSemantic_Position:
       case VertexAttributeSemantic_Normal:
       case VertexAttributeSemantic_Color:
-      case VertexAttributeSemantic_Tangent:
-      case VertexAttributeSemantic_Binormal:
       case VertexAttributeSemantic_TexCoord0:
       case VertexAttributeSemantic_TexCoord1:
       case VertexAttributeSemantic_TexCoord2:
@@ -147,6 +145,7 @@ void check_stream (Log& log, CheckContext& context)
       case VertexAttributeSemantic_TexCoord6:
       case VertexAttributeSemantic_TexCoord7:
       case VertexAttributeSemantic_Influence:
+      case VertexAttributeSemantic_Custom:
         break;
       default:
         log.Error ("vertex_buffer[%u].stream[%u].format.attribute[%u] has unknown semantic=%d",

@@ -72,7 +72,7 @@ int main ()
     
     for (size_t i=0; i<VertexAttributeSemantic_Num; i++)
     {
-      VertexAttribute* attribute = vf3.FindAttribute ((VertexAttributeSemantic)i);
+      const VertexAttribute* attribute = vf3.FindAttribute ((VertexAttributeSemantic)i);
       
       if (attribute)
       {
