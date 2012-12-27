@@ -128,7 +128,7 @@ void background_copy_file_impl (Action& action, BackgroundCopyFileDataPtr data)
       data->started = true;
     }
   }
-  catch (xtl::exception& e)
+  catch (std::exception& e)
   {
     data->copy_state.SetStatus (BackgroundCopyStateStatus_Failed);
     data->copy_state.SetStatusText (e.what ());
