@@ -1,0 +1,17 @@
+Results of product_test:
+default product
+Product:
+  description ''
+  id          ''
+  handle       0
+  properties:
+    map has 0 properties (hash=ffffffff, layout_hash=ffffffff):
+filled product
+Product:
+  description 'Description'
+  id          'Id'
+  handle       1
+  properties:
+    map has 2 properties (hash=9f20724f, layout_hash=a6232eec):
+     #0: name='String', type=string, value='StringValue'
+     #1: name='IntValue', type=integer, value='10'

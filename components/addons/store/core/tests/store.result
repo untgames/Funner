@@ -1,0 +1,4 @@
+Results of store_test:
+exception: Store 'test' not registered
+    at store::StoreManagerImpl::CreateStore
+    at store::Store::Store
