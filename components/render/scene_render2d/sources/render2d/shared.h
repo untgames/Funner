@@ -264,7 +264,7 @@ class RenderablePageCurlMesh : public xtl::reference_counter
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструктор / деструктор
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    RenderablePageCurlMesh  (low_level::IDevice& device, const math::vec2ui& grid_size);
+    RenderablePageCurlMesh  (low_level::IDevice& device, bool is_rigid, const math::vec2ui& grid_size);
     ~RenderablePageCurlMesh ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -292,11 +292,12 @@ class RenderablePageCurlMesh : public xtl::reference_counter
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Установка / получение параметров
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void                SetColor     (const math::vec4ub& color);
-    void                SetSize      (const math::vec2f&  size);
-    void                SetTexCoords (float min_s, float min_t, float max_s, float max_t);
-    const math::vec4ub& Color        () const;
-    const math::vec2f&  Size         () const;
+    void                SetColor                      (const math::vec4ub& color);
+    void                SetSize                       (const math::vec2f&  size);
+    void                SetTexCoords                  (float min_s, float min_t, float max_s, float max_t);
+    void                SetRigidPagePerspectiveFactor (float factor);
+    const math::vec4ub& Color                         () const;
+    const math::vec2f&  Size                          () const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Рисование

@@ -31,24 +31,28 @@ typedef xtl::uninitialized_storage<RenderableVertex> VertexBuffer;
 
 struct RenderablePageCurlMesh::Impl
 {
-  PositionBuffer original_vertices;         //данные вершин плоской страницы
-  VertexBuffer   vertices;                  //данные вершин трансформированной страницы
-  BufferPtr      vertex_buffer;             //вершинный буфер
-  BufferPtr      index_buffer;              //индексный буфер
-  math::vec2ui   grid_size;                 //размер сетки
-  size_t         triangles_count;           //количество треугольников
-  size_t         vertices_count;            //количество вершин
-  math::vec2f    size;                      //размер
-  float          min_s;                     //минимальна€ текстурна€ координата по горизонтали
-  float          min_t;                     //минимальна€ текстурна€ координата по вертикали
-  float          max_s;                     //максимальна€ текстурна€ координата по горизонтали
-  float          max_t;                     //максимальна€ текстурна€ координата по вертикали
-  float          last_curl_radius;          //радиус последней трансформации
-  math::vec4ub   color;                     //цвет
+  PositionBuffer original_vertices;             //данные вершин плоской страницы
+  VertexBuffer   vertices;                      //данные вершин трансформированной страницы
+  BufferPtr      vertex_buffer;                 //вершинный буфер
+  BufferPtr      index_buffer;                  //индексный буфер
+  bool           is_rigid;                      //€вл€етс€ ли страница жесткой
+  float          rigid_page_perspective_factor; //коэффициент увеличени€ жесткой обложки дл€ симул€ции перспективы
+  math::vec2ui   grid_size;                     //размер сетки
+  size_t         triangles_count;               //количество треугольников
+  size_t         vertices_count;                //количество вершин
+  math::vec2f    size;                          //размер
+  float          min_s;                         //минимальна€ текстурна€ координата по горизонтали
+  float          min_t;                         //минимальна€ текстурна€ координата по вертикали
+  float          max_s;                         //максимальна€ текстурна€ координата по горизонтали
+  float          max_t;                         //максимальна€ текстурна€ координата по вертикали
+  float          last_curl_radius;              //радиус последней трансформации
+  math::vec4ub   color;                         //цвет
 
   /// онструктор
-  Impl (low_level::IDevice& device, const math::vec2ui& in_grid_size)
-    : grid_size (in_grid_size)
+  Impl (low_level::IDevice& device, bool in_is_rigid, const math::vec2ui& in_grid_size)
+    : is_rigid  (in_is_rigid)
+    , rigid_page_perspective_factor (1.f)
+    , grid_size (in_grid_size)
     , size      (-1)
     , min_s     (-1)
     , min_t     (-1)
@@ -58,6 +62,12 @@ struct RenderablePageCurlMesh::Impl
     , color     (0)
   {
     static const char* METHOD_NAME = "render::obsolete::render2d::RenderablePageCurlMesh::RenderablePageCurlMesh";
+
+    if (is_rigid)
+    {
+      grid_size.x = 2;
+      grid_size.y = 2;
+    }
 
     if (grid_size.x < 2)
       throw xtl::make_argument_exception (METHOD_NAME, "grid_size.x", (size_t)grid_size.x, "grid_size.x must be greater than 1");
@@ -145,6 +155,54 @@ struct RenderablePageCurlMesh::Impl
              float angle, size_t find_best_curl_steps, float binding_mismatch_weight)
   {
     last_curl_radius = radius;
+
+    if (is_rigid)
+    {
+      RenderableVertex*  v          = vertices.data ();
+      const math::vec3f* original_v = original_vertices.data ();
+
+      size_t top_static_vertex, bottom_static_vertex, top_dynamic_vertex, bottom_dynamic_vertex;
+
+      float x = corner_position.x, dynamic_x_offset = 0;
+
+      switch (corner)
+      {
+        case scene_graph::PageCurlCorner_LeftBottom:
+        case scene_graph::PageCurlCorner_LeftTop:
+          top_static_vertex     = 1;
+          bottom_static_vertex  = 3;
+          top_dynamic_vertex    = 0;
+          bottom_dynamic_vertex = 2;
+          x                     -= size.x;
+          dynamic_x_offset      = size.x;
+          break;
+        default:
+          top_static_vertex     = 0;
+          bottom_static_vertex  = 2;
+          top_dynamic_vertex    = 1;
+          bottom_dynamic_vertex = 3;
+          break;
+      }
+
+      float perspective_factor = stl::max (0.f, (float)(1.f - fabs (x) / size.x) * (rigid_page_perspective_factor - 1.f)),
+            z                  = sqrt (size.x * size.x - x * x);
+
+      v [top_static_vertex].position    = original_v [top_static_vertex];
+      v [bottom_static_vertex].position = original_v [bottom_static_vertex];
+
+      v [top_static_vertex].position.y    = size.y - v [top_static_vertex].position.y;
+      v [bottom_static_vertex].position.y = size.y - v [bottom_static_vertex].position.y;
+
+      v [top_dynamic_vertex].position.x = x + dynamic_x_offset;
+      v [top_dynamic_vertex].position.y = size.y - original_v [top_dynamic_vertex].y + size.y * perspective_factor / 2;
+      v [top_dynamic_vertex].position.z = z;
+
+      v [bottom_dynamic_vertex].position.x = x + dynamic_x_offset;
+      v [bottom_dynamic_vertex].position.y = size.y - original_v [bottom_dynamic_vertex].y - size.y * perspective_factor / 2;
+      v [bottom_dynamic_vertex].position.z = z;
+
+      return;
+    }
 
     math::vec2f original_corner_location, opposite_original_corner_location, top_binding, bottom_binding;
 
@@ -404,6 +462,9 @@ struct RenderablePageCurlMesh::Impl
   //–ассчет цвета вершин
   void CalculateShadow (bool front, float max_shadow)
   {
+    if (is_rigid)
+      return;
+
     RenderableVertex* vertex = vertices.data ();
 
     if (last_curl_radius == 0)
@@ -729,8 +790,8 @@ struct RenderablePageCurlMesh::Impl
      онструктор
 */
 
-RenderablePageCurlMesh::RenderablePageCurlMesh (low_level::IDevice& device, const math::vec2ui& grid_size)
-  : impl (new Impl (device, grid_size))
+RenderablePageCurlMesh::RenderablePageCurlMesh (low_level::IDevice& device, bool is_rigid, const math::vec2ui& grid_size)
+  : impl (new Impl (device, is_rigid, grid_size))
 {
 }
 
@@ -806,6 +867,11 @@ void RenderablePageCurlMesh::SetSize (const math::vec2f& size)
 void RenderablePageCurlMesh::SetTexCoords (float min_s, float min_t, float max_s, float max_t)
 {
   impl->SetTexCoords (min_s, min_t, max_s, max_t);
+}
+
+void RenderablePageCurlMesh::SetRigidPagePerspectiveFactor (float factor)
+{
+  impl->rigid_page_perspective_factor = factor;
 }
 
 const math::vec4ub& RenderablePageCurlMesh::Color () const

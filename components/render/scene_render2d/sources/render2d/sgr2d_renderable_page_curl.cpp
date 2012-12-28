@@ -123,6 +123,7 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
   mid_level::Viewport        viewport;                           //область вывода
   RenderablePageCurlMeshPtr  curled_page;                        //сетка изгибаемой страницы
   math::vec2ui               current_page_grid_size;             //текущий размер сетки страницы
+  bool                       current_page_is_rigid;              //является ли страница жесткой
   bool                       initialized;                        //инициализированы ли необходимые поля
 
   ///Конструктор
@@ -552,12 +553,14 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
     render_state->Capture (context);
 
     const math::vec2ui& grid_size = page_curl->GridSize ();
+    bool                is_rigid  = page_curl->IsRigidPage ();
 
-    if (current_page_grid_size != grid_size)
+    if (current_page_grid_size != grid_size || current_page_is_rigid != is_rigid)
     {
-      curled_page = RenderablePageCurlMeshPtr (new RenderablePageCurlMesh (device, grid_size), false);
+      curled_page = RenderablePageCurlMeshPtr (new RenderablePageCurlMesh (device, is_rigid, grid_size), false);
 
       current_page_grid_size = grid_size;
+      current_page_is_rigid  = is_rigid;
 
       size_t shadow_max_vertices = (grid_size.x + grid_size.y) * 2 * 2 * 3 + 6 * 4; //side points count * sides count * triangles per point * vertices per triangle + vertices for corners
 
@@ -587,8 +590,9 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
     if (page_curl->Mode () != PageCurlMode_SinglePage)
       one_page_size.x /= 2;
 
-    curled_page->SetSize  (one_page_size);
-    curled_page->SetColor (GetPageColor ());
+    curled_page->SetSize                       (one_page_size);
+    curled_page->SetColor                      (GetPageColor ());
+    curled_page->SetRigidPagePerspectiveFactor (page_curl->RigidPagePerspectiveFactor ());
 
     ProgramParameters program_parameters;
 
@@ -695,6 +699,151 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
     current_vertex  += 6;
   }
 
+  void DrawRigidPageShadows (low_level::IDevice& device, low_level::IDeviceContext& context, float x_offset, bool left_side)
+  {
+    const math::vec2f page_size = page_curl->Size ();
+
+    //отрисовка тени под страницей
+    RenderableVertex*   current_vertex   = shadow_vertices.data ();
+    const math::vec3f*  positions        = curled_page->GridVertices ();
+    size_t              positions_stride = curled_page->GridVerticesStride ();
+
+    math::vec3f v0 = positions [0];
+    math::vec3f v1 = *(const math::vec3f*)((const unsigned char*)positions + positions_stride);
+    math::vec3f v2 = *(const math::vec3f*)((const unsigned char*)positions + 2 * positions_stride);
+    math::vec3f v3 = *(const math::vec3f*)((const unsigned char*)positions + 3 * positions_stride);
+
+    v0.x += x_offset;
+    v1.x += x_offset;
+    v2.x += x_offset;
+    v3.x += x_offset;
+
+    const math::vec3f* top_static_vertex;
+    const math::vec3f* bottom_static_vertex;
+    const math::vec3f* top_dynamic_vertex;
+    const math::vec3f* bottom_dynamic_vertex;
+
+    if (left_side)
+    {
+      top_static_vertex     = &v1;
+      bottom_static_vertex  = &v3;
+      top_dynamic_vertex    = &v0;
+      bottom_dynamic_vertex = &v2;
+    }
+    else
+    {
+      top_static_vertex     = &v0;
+      bottom_static_vertex  = &v2;
+      top_dynamic_vertex    = &v1;
+      bottom_dynamic_vertex = &v3;
+    }
+
+    float corner_shadow_offset = page_curl->CornerShadowOffset () * (1 - fabs (top_dynamic_vertex->x - page_size.x / 2) / (page_size.x / 2));
+
+    if (corner_shadow_offset < EPS)
+      return;
+
+    math::vec3f top_side_normal = math::normalize (*top_static_vertex - *bottom_static_vertex) * corner_shadow_offset;
+
+    current_vertex [0].position = *top_static_vertex;
+    current_vertex [0].texcoord = math::vec2f (0.5, 1);
+    current_vertex [0].color    = 255;
+    current_vertex [1].position = *top_dynamic_vertex + top_side_normal;
+    current_vertex [1].texcoord = math::vec2f (0.5, 1);
+    current_vertex [1].color    = 255;
+    current_vertex [2].position = *top_dynamic_vertex;
+    current_vertex [2].texcoord = math::vec2f (0.5, 0.5);
+    current_vertex [2].color    = 255;
+
+    current_vertex += 3;
+
+    math::vec3f side_normal = math::normalize (*top_dynamic_vertex - *top_static_vertex) * corner_shadow_offset;
+
+    current_vertex [0].position = *top_dynamic_vertex;
+    current_vertex [0].texcoord = math::vec2f (0.5, 0.5);
+    current_vertex [0].color    = 255;
+    current_vertex [1].position = *top_dynamic_vertex + side_normal;
+    current_vertex [1].texcoord = math::vec2f (0.5, 1);
+    current_vertex [1].color    = 255;
+    current_vertex [2].position = *bottom_dynamic_vertex + side_normal;
+    current_vertex [2].texcoord = math::vec2f (0.5, 1);
+    current_vertex [2].color    = 255;
+    current_vertex [3].position = *top_dynamic_vertex;
+    current_vertex [3].texcoord = math::vec2f (0.5, 0.5);
+    current_vertex [3].color    = 255;
+    current_vertex [4].position = *bottom_dynamic_vertex + side_normal;
+    current_vertex [4].texcoord = math::vec2f (0.5, 1);
+    current_vertex [4].color    = 255;
+    current_vertex [5].position = *bottom_dynamic_vertex;
+    current_vertex [5].texcoord = math::vec2f (0.5, 0.5);
+    current_vertex [5].color    = 255;
+
+    current_vertex += 6;
+
+    math::vec3f bottom_side_normal = math::normalize (*bottom_static_vertex - *top_static_vertex) * corner_shadow_offset;
+
+    current_vertex [0].position = *bottom_static_vertex;
+    current_vertex [0].texcoord = math::vec2f (0.5, 1);
+    current_vertex [0].color    = 255;
+    current_vertex [1].position = *bottom_dynamic_vertex + bottom_side_normal;
+    current_vertex [1].texcoord = math::vec2f (0.5, 1);
+    current_vertex [1].color    = 255;
+    current_vertex [2].position = *bottom_dynamic_vertex;
+    current_vertex [2].texcoord = math::vec2f (0.5, 0.5);
+    current_vertex [2].color    = 255;
+
+    current_vertex += 3;
+
+    current_vertex [0].position = *top_dynamic_vertex;
+    current_vertex [0].texcoord = math::vec2f (0.5, 0.5);
+    current_vertex [0].color    = 255;
+    current_vertex [1].position = *top_dynamic_vertex + top_side_normal;
+    current_vertex [1].texcoord = math::vec2f (0.5, 1);
+    current_vertex [1].color    = 255;
+    current_vertex [2].position = *top_dynamic_vertex + top_side_normal + side_normal;
+    current_vertex [2].texcoord = math::vec2f (1, 1);
+    current_vertex [2].color    = 255;
+    current_vertex [3].position = *top_dynamic_vertex;
+    current_vertex [3].texcoord = math::vec2f (0.5, 0.5);
+    current_vertex [3].color    = 255;
+    current_vertex [4].position = *top_dynamic_vertex + top_side_normal + side_normal;
+    current_vertex [4].texcoord = math::vec2f (1, 1);
+    current_vertex [4].color    = 255;
+    current_vertex [5].position = *top_dynamic_vertex + side_normal;
+    current_vertex [5].texcoord = math::vec2f (0.5, 1);
+    current_vertex [5].color    = 255;
+
+    current_vertex += 6;
+
+    current_vertex [0].position = *bottom_dynamic_vertex;
+    current_vertex [0].texcoord = math::vec2f (0.5, 0.5);
+    current_vertex [0].color    = 255;
+    current_vertex [1].position = *bottom_dynamic_vertex + side_normal;
+    current_vertex [1].texcoord = math::vec2f (0.5, 1);
+    current_vertex [1].color    = 255;
+    current_vertex [2].position = *bottom_dynamic_vertex + bottom_side_normal + side_normal;
+    current_vertex [2].texcoord = math::vec2f (1, 1);
+    current_vertex [2].color    = 255;
+    current_vertex [3].position = *bottom_dynamic_vertex;
+    current_vertex [3].texcoord = math::vec2f (0.5, 0.5);
+    current_vertex [3].color    = 255;
+    current_vertex [4].position = *bottom_dynamic_vertex + bottom_side_normal + side_normal;
+    current_vertex [4].texcoord = math::vec2f (1, 1);
+    current_vertex [4].color    = 255;
+    current_vertex [5].position = *bottom_dynamic_vertex + bottom_side_normal;
+    current_vertex [5].texcoord = math::vec2f (0.5, 1);
+    current_vertex [5].color    = 255;
+
+    size_t triangles_count = 8;
+    size_t vertices_count = triangles_count * 3;
+
+    shadow_vertex_buffer->SetData (0, sizeof (RenderableVertex) * vertices_count, shadow_vertices.data ());
+
+    context.ISSetVertexBuffer (0, shadow_vertex_buffer.get ());
+
+    context.Draw (low_level::PrimitiveType_TriangleList, 0, vertices_count);
+  }
+
   void DrawShadows (low_level::IDevice& device, low_level::IDeviceContext& context, PageCurlCorner corner, float curl_radius, bool left_side)
   {
     if (curl_radius <= EPS)
@@ -738,6 +887,12 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
     }
 
     corner_shadow_offset *= stl::min (corner_offset / page_size.x, CORNER_SHADOW_GROW_PART) / CORNER_SHADOW_GROW_PART;
+
+    if (current_page_is_rigid)
+    {
+      DrawRigidPageShadows (device, context, x_offset, left_side);
+      return;
+    }
 
       //отрисовка тени под страницей
     {
@@ -976,6 +1131,9 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
     if (curl_corner_position.y > 0 || curl_angle > -EPS)
       curl_angle += PI;
 
+    if (current_page_is_rigid)
+      curl_corner_position.x = stl::max (EPS, stl::min (curl_point_position.x, page_size.x * 2 - EPS));
+
     curled_page->Curl (curl_corner_position, PageCurlCorner_LeftTop, curl_radius, curl_angle,
                        page_curl->FindBestCurlSteps (), page_curl->BindingMismatchWeight ());
 
@@ -1070,6 +1228,9 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
 
     if (curl_corner_position.y < page_size.y || curl_angle < EPS)
       curl_angle += PI;
+
+    if (current_page_is_rigid)
+      curl_corner_position.x = stl::max (EPS, stl::min (curl_point_position.x, page_size.x * 2 - EPS));
 
     curled_page->Curl (curl_corner_position, PageCurlCorner_LeftBottom, curl_radius, curl_angle,
                        page_curl->FindBestCurlSteps (), page_curl->BindingMismatchWeight ());
@@ -1170,6 +1331,9 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
 
     if (curl_corner_position.y <= 0 && curl_angle > EPS)
       curl_angle += PI;
+
+    if (current_page_is_rigid)
+      curl_corner_position.x = stl::max (-page_size.x + EPS, stl::min (curl_point_position.x - page_size.x, page_size.x - EPS));
 
     curled_page->Curl (curl_corner_position, PageCurlCorner_RightTop, curl_radius, curl_angle,
                        page_curl->FindBestCurlSteps (), page_curl->BindingMismatchWeight ());
@@ -1295,6 +1459,9 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
 
     if (curl_corner_position.y >= page_size.y && curl_angle < -EPS)
       curl_angle -= PI;
+
+    if (current_page_is_rigid)
+      curl_corner_position.x = stl::max (-page_size.x + EPS, stl::min (curl_point_position.x - page_size.x, page_size.x - EPS));
 
     curled_page->Curl (curl_corner_position, PageCurlCorner_RightBottom, curl_radius, curl_angle,
                        page_curl->FindBestCurlSteps (), page_curl->BindingMismatchWeight ());
