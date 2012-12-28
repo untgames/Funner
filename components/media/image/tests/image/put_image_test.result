@@ -1,0 +1,9 @@
+Results of put_image_test:
+image data/pic3.bmp format - BGR8
+image4 name - 'data/pic1.jpg'
+image4 new name - 'new_name'
+image new_name format - RGB8
+image new_name format - RGBA16
+image4 width - 171, height - 128, depth - 1
+new image4 width - 1000, height - 1000, depth - 1
+File 'results/put_image1with5 (PutImage test).bmp' hash: {3b,f2,f4,7f,8e,11,f2,c3,a2,d9,f0,bc,b7,84,e5,1e}

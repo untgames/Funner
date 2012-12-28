@@ -227,6 +227,39 @@ void Image::Resize (size_t width, size_t height, size_t depth)
 }
 
 /*
+    Заполнение определенным значением
+*/
+
+void Image::Fill (PixelFormat format, const void* data)
+{
+  static const char* METHOD_NAME = "media::Image::Fill";
+
+  if (!data)
+    throw xtl::make_null_argument_exception (METHOD_NAME, "data");
+
+  switch (format)
+  {
+    case PixelFormat_Default:
+      format = Format ();
+      break;
+    case PixelFormat_RGB8:   
+    case PixelFormat_RGB16:  
+    case PixelFormat_BGR8:   
+    case PixelFormat_RGBA8:  
+    case PixelFormat_RGBA16: 
+    case PixelFormat_BGRA8:  
+    case PixelFormat_L8:     
+    case PixelFormat_A8:     
+    case PixelFormat_LA8:
+      break;
+    default:
+      throw xtl::make_argument_exception (METHOD_NAME, "format", format);
+  }
+
+  fill (format, data, *this);
+}
+
+/*
     Работа с образом
 */
 
@@ -257,6 +290,68 @@ void Image::GetImage (size_t x, size_t y, size_t z, size_t width, size_t height,
     throw xtl::make_null_argument_exception ("media::Image::GetImage", "data");
 
   impl->GetImage (x, y, z, width, height, depth, format, data);
+}
+
+namespace
+{
+
+template <class T, class Img1, class Img2, class Fn>
+void blit (Img1& img1, size_t img1_x, size_t img1_y, size_t img1_z, size_t width, size_t height, size_t depth, Img2& img2, size_t img2_x, size_t img2_y, size_t img2_z, Fn fn)
+{
+  if (img2_x >= img2.Width ())  return;
+  if (img2_y >= img2.Height ()) return;
+  if (img2_z >= img2.Depth ())  return;
+
+  if (img2_x + width > img2.Width ())   width  = img2.Width () - img2_x;
+  if (img2_y + height > img2.Height ()) height = img2.Height () - img2_y;
+  if (img2_z + depth > img2.Depth ())   depth  = img2.Depth () - img2_z;  
+
+  if (!width || !height || !depth)
+    return;
+
+  PixelFormat img2_format     = img2.Format ();
+  size_t      bytes_per_pixel = get_bytes_per_pixel (img2_format),
+              offset          = bytes_per_pixel * (img2_z * img2.Width () * img2.Height () + img2_y * img2.Width () + img2_x);                       
+
+  if (width == img2.Width () && height == img2.Height ())
+  {
+    T* src = reinterpret_cast<T*> (img2.Bitmap ()) + offset;
+    
+    (img1.*fn) (img1_x, img1_y, img1_z, width, height, depth, img2_format, src);
+  }
+  else
+  {
+    size_t step_y       = bytes_per_pixel * img2.Width (),
+           step_z       = step_y * img2.Height ();
+    bool   layered_copy = width == img2.Width ();
+
+    for (size_t i=0; i<depth; i++, offset += step_z)
+    {
+      T* src = reinterpret_cast<T*> (img2.Bitmap ()) + offset;
+      
+      if (layered_copy)
+      {
+        (img1.*fn) (img1_x, img1_y, img1_z + i, width, height, 1, img2_format, src);
+      }
+      else
+      {
+        for (size_t j=0; j<height; j++, src += step_y)
+          (img1.*fn) (img1_x, img1_y + j, img1_z + i, width, 1, 1, img2_format, src);
+      }      
+    }
+  }
+}
+
+}
+
+void Image::PutImage (size_t x, size_t y, size_t z, size_t width, size_t height, size_t depth, const Image& source_image, size_t source_x, size_t source_y, size_t source_z)
+{
+  blit<const char> (*this, x, y, z, width, height, depth, source_image, source_x, source_y, source_z, (void (Image::*)(size_t, size_t, size_t, size_t, size_t, size_t, PixelFormat, const void*))&Image::PutImage);
+}
+
+void Image::GetImage (size_t x, size_t y, size_t z, size_t width, size_t height, size_t depth, Image& target_image, size_t target_x, size_t target_y, size_t target_z) const
+{
+  blit<char> (*this, x, y, z, width, height, depth, target_image, target_x, target_y, target_z, (void (Image::*)(size_t, size_t, size_t, size_t, size_t, size_t, PixelFormat, void*) const)&Image::GetImage);
 }
 
 /*

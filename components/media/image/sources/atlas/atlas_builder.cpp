@@ -405,8 +405,6 @@ struct AtlasBuilder::Impl
     if (images.empty ())
       return;
 
-    size_t start = common::milliseconds ();
-
     try
     {
         //построение массива индексов уникальных картинок
