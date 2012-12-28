@@ -796,8 +796,8 @@ struct RenderOperationsExecutor
 
       //рисование
 
-    if (primitive.indexed) device_context.DrawIndexed (primitive.type, primitive.first, primitive.count, 0); //TODO: media::geometry::Primitive::base_vertex
-    else                   device_context.Draw        (primitive.type, primitive.first, primitive.count);
+    if (primitive.indexed) device_context.DrawIndexed (primitive.type, primitive.first, primitive.count, primitive.base_vertex);
+    else                   device_context.Draw        (primitive.type, primitive.first + primitive.base_vertex, primitive.count);
   }
   
 ///Рендеринг вложенного эффекта
