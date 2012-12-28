@@ -46,10 +46,17 @@ enum CacheEntry
 
   CacheEntry_ActiveTextureSlot, //номер текущего активного слота текстурироания
   CacheEntry_EnabledTextures,   //маска: установлена ли текстура в определенном слоте
-  CacheEntry_ColorWriteMask,    //маска записи в буфер цвета
+  CacheEntry_ScissorEnable,     //включен ли тест отсечения
+  CacheEntry_ColorWriteMask0,   //маска записи в буфер цвета 0
+  CacheEntry_ColorWriteMask1,   //маска записи в буфер цвета 1
+  CacheEntry_ColorWriteMask2,   //маска записи в буфер цвета 2
+  CacheEntry_ColorWriteMask3,   //маска записи в буфер цвета 3
+  CacheEntry_ColorWriteMask4,   //маска записи в буфер цвета 4
+  CacheEntry_ColorWriteMask5,   //маска записи в буфер цвета 5
+  CacheEntry_ColorWriteMask6,   //маска записи в буфер цвета 6
+  CacheEntry_ColorWriteMask7,   //маска записи в буфер цвета 7
   CacheEntry_DepthWriteEnable,  //включена ли запись в буфер глубины
   CacheEntry_StencilWriteMask,  //маска записи в буфер трафарета
-  CacheEntry_ScissorEnable,     //включен ли тест отсечения
 
   CacheEntry_SharedLast = CacheEntry_SharedFirst + CONTEXT_CACHE_STAGE_ENTRIES_NUM,
 

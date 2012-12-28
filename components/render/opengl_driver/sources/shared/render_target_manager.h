@@ -46,24 +46,26 @@ class RenderTargetManager
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Выбор целевых отображений
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void    SetRenderTargets    (IView* render_target_view, IView* depth_stencil_view);
-    IView*  GetRenderTargetView () const;
-    IView*  GetDepthStencilView () const;
+    void   SetRenderTargetView  (size_t render_target_slot, IView* render_target_view);
+    void   SetDepthStencilView  (IView* depth_stencil_view);
+    IView* GetRenderTargetView  (size_t render_target_slot) const;
+    IView* GetDepthStencilView  () const;
+    void   HasRenderTargetViews (bool states [DEVICE_RENDER_TARGET_SLOTS_COUNT]) const;
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Настройка подуровня растеризации
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void            SetViewport (const Viewport& viewport);
-    void            SetScissor  (const Rect& scissor_rect);
-    const Viewport& GetViewport () const;
-    const Rect&     GetScissor  () const;
+    void            SetViewport (size_t render_target_slot, const Viewport& viewport);
+    void            SetScissor  (size_t render_target_slot, const Rect& scissor_rect);
+    const Viewport& GetViewport (size_t render_target_slot) const;
+    const Rect&     GetScissor  (size_t render_target_slot) const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Очистка буферов отрисовки
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void ClearRenderTargetView (const Color4f& color);
+    void ClearRenderTargetView (size_t render_target_slot, const Color4f& color);
     void ClearDepthStencilView (size_t clear_flags, float depth, unsigned char stencil);
-    void ClearViews            (size_t clear_flags, const Color4f& color, float depth, unsigned char stencil);
+    void ClearViews            (size_t clear_flags, size_t views_count, const size_t* view_indices, const Color4f* colors, float depth, unsigned char stencil);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Обновление целевых буферов отрисовки
