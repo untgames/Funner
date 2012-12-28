@@ -170,10 +170,6 @@ class EffectLoader
   
       if (desc.independent_blend_enable)
       {
-        ParseBlendTargetState (iter, desc.render_target [0]);
-      }
-      else
-      {
         for (Parser::NamesakeIterator rt_iter = iter->First ("color_target"); rt_iter; ++rt_iter)
 	{
           Parser::AttributeIterator attr_iter = make_attribute_iterator (*rt_iter);
@@ -185,6 +181,10 @@ class EffectLoader
 
           ParseBlendTargetState (rt_iter, desc.render_target [index]);
         }
+      }
+      else
+      {
+        ParseBlendTargetState (iter, desc.render_target [0]);
       }
 
       try

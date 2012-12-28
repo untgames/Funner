@@ -560,7 +560,7 @@ struct RenderOperationsExecutor
       //установка целевых буферов отрисовки
 
     device_context.OSSetRenderTargetView (0, render_target_view);
-    device_context.OSSetDepthStencilView (render_target_view);
+    device_context.OSSetDepthStencilView (depth_stencil_view);
 
       //настройка области вывода                
 
@@ -794,10 +794,10 @@ struct RenderOperationsExecutor
     device_context.SSSetProgramParametersLayout (&*program_parameters_layout->DeviceLayout ());
     device_context.SSSetConstantBuffer (ProgramParametersSlot_FrameEntity, operation.frame_entity_parameters_buffer);
 
-      //рисование            
+      //рисование
 
     if (primitive.indexed) device_context.DrawIndexed (primitive.type, primitive.first, primitive.count, 0); //TODO: media::geometry::Primitive::base_vertex
-    else                   device_context.Draw        (primitive.type, primitive.first, primitive.count);    
+    else                   device_context.Draw        (primitive.type, primitive.first, primitive.count);
   }
   
 ///Рендеринг вложенного эффекта
