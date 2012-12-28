@@ -116,6 +116,10 @@ class PageCurl : public Entity
     size_t              FindBestCurlSteps                () const;
     void                SetBindingMismatchWeight         (float weight);              //вес отклонени€ позиции сгиба страницы при поиске наилучешй позиции загиба
     float               BindingMismatchWeight            () const;
+    void                SetRigidPage                     (bool state);                //€вл€етс€ ли страница жесткой
+    bool                IsRigidPage                      () const;
+    void                SetRigidPagePerspectiveFactor    (float factor);              //коэффициент увеличени€ кра€ жесткой страницы дл€ симул€ции перспективы
+    float               RigidPagePerspectiveFactor       () const;
 
   private:
 ///////////////////////////////////////////////////////////////////////////////////////////////////

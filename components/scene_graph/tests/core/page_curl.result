@@ -18,6 +18,8 @@ Default curl state:
   shadow min log value              0.30
   find best curl steps              1000
   binding mismatch weight           10.00
+  is rigid page                     n
+  rigid page perspective factor     1.00
   bounding box:
     local=[[-0.50 -0.50 -0.00] - [+0.50 +0.50 +0.00]]
     world=[[-0.50 -0.50 +0.00] - [+0.50 +0.50 +0.00]]
@@ -40,6 +42,8 @@ Changed curl state:
   shadow min log value              0.00
   find best curl steps              500
   binding mismatch weight           2.00
+  is rigid page                     y
+  rigid page perspective factor     2.00
   bounding box:
     local=[[-1.00 -2.00 -4.00] - [+1.00 +2.00 +0.00]]
     world=[[-1.00 -2.00 -4.00] - [+1.00 +2.00 +0.00]]

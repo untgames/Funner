@@ -54,6 +54,8 @@ void dump (const PageCurl& curl)
   printf ("  shadow min log value              %.2f\n",                   curl.ShadowMinLogValue ());
   printf ("  find best curl steps              %u\n",                     curl.FindBestCurlSteps ());
   printf ("  binding mismatch weight           %.2f\n",                   curl.BindingMismatchWeight ());
+  printf ("  is rigid page                     %c\n",                     curl.IsRigidPage () ? 'y' : 'n');
+  printf ("  rigid page perspective factor     %.2f\n",                   curl.RigidPagePerspectiveFactor ());
   printf ("  bounding box:\n");
   dump_bounds (curl);
 }
@@ -85,6 +87,8 @@ int main ()
   curl->SetShadowMinLogValue             (0.f);
   curl->SetFindBestCurlSteps             (500);
   curl->SetBindingMismatchWeight         (2.f);
+  curl->SetRigidPage                     (true);
+  curl->SetRigidPagePerspectiveFactor    (2.f);
 
   printf ("Changed curl state:\n");
 

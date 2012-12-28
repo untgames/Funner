@@ -36,6 +36,8 @@ struct PageCurl::Impl: public xtl::instance_counter<PageCurl>
   float          shadow_min_log_value;               //минимальное значение тени при логарифмировании
   size_t         find_best_curl_steps;               //количество итераций поиска наилучшей позиции загиба
   float          binding_mismatch_weight;            //вес отклонени€ позиции сгиба страницы при поиске наилучешй позиции загиба
+  bool           is_rigid_page;                      //€вл€етс€ ли страница жесткой
+  float          rigid_page_perspective_factor;      //коэффициент увеличени€ кра€ жесткой страницы дл€ симул€ции перспективы
 
   Impl ()
     : mode (PageCurlMode_SinglePage)
@@ -50,6 +52,8 @@ struct PageCurl::Impl: public xtl::instance_counter<PageCurl>
     , shadow_min_log_value (DEFAULT_SHADOW_MIN_LOG_VALUE)
     , find_best_curl_steps (DEFAULT_FIND_BEST_CURL_STEPS)
     , binding_mismatch_weight (DEFAULT_BINDING_MISMATCH_WEIGHT)
+    , is_rigid_page (false)
+    , rigid_page_perspective_factor (1.f)
     {}
 };
 
@@ -349,6 +353,26 @@ void PageCurl::SetBindingMismatchWeight (float weight)
 float PageCurl::BindingMismatchWeight () const
 {
   return impl->binding_mismatch_weight;
+}
+
+void PageCurl::SetRigidPage (bool state)
+{
+  impl->is_rigid_page = state;
+}
+
+bool PageCurl::IsRigidPage () const
+{
+  return impl->is_rigid_page;
+}
+
+void PageCurl::SetRigidPagePerspectiveFactor (float factor)
+{
+  impl->rigid_page_perspective_factor = factor;
+}
+
+float PageCurl::RigidPagePerspectiveFactor () const
+{
+  return impl->rigid_page_perspective_factor;
 }
 
 /*
