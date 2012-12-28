@@ -4,6 +4,17 @@ using namespace media::geometry;
 using namespace common;
 
 /*
+    Константы
+*/
+
+namespace
+{
+
+const size_t DEFAULT_ATTRIBUTES_RESERVE_SIZE = 4;
+
+}
+
+/*
     Описание реализации формата вершин
 */
 
@@ -45,6 +56,14 @@ struct VertexFormat::Impl
     }
 
     return attributes_hash;
+  }
+
+  void UpdateNames ()
+  {
+    const char** name = names.Data ();
+
+    for (VertexAttributeArray::iterator iter=attributes.begin (), end=attributes.end (); iter!=end; ++iter, ++name)
+      iter->name = *name;
   }  
 };
 
@@ -54,7 +73,9 @@ struct VertexFormat::Impl
 
 VertexFormat::VertexFormat ()
   : impl (new Impl)
-  {}
+{
+  ReserveAttributes (DEFAULT_ATTRIBUTES_RESERVE_SIZE);
+}
 
 VertexFormat::VertexFormat (const VertexFormat& vf)
   : impl (new Impl (*vf.impl))
@@ -226,12 +247,7 @@ size_t VertexFormat::AddAttribute (const char* name, VertexAttributeSemantic sem
   impl->names.Add (name);
 
   if (impl->names.Capacity () != old_capacity || impl->names.BufferCapacity () != old_buffer_capacity)
-  {
-    size_t index = 0;
-
-    for (VertexAttributeArray::iterator iter=impl->attributes.begin (), end=impl->attributes.end (); iter!=end; ++iter, ++index)
-      iter->name = impl->names [index];
-  }
+    impl->UpdateNames ();
 
   try
   {
@@ -305,7 +321,10 @@ void VertexFormat::RemoveAttribute (size_t position)
     
   impl->attributes.erase (impl->attributes.begin () + position);
   impl->names.Remove (position);
-  
+
+  if (position != impl->attributes.size ())
+    impl->UpdateNames ();
+
   impl->need_hash_update        = true;
   impl->need_vertex_size_update = true;
 }

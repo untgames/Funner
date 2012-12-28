@@ -3,7 +3,11 @@
 
 #include <stdio.h>
 #include <exception>
+
+#include <common/strlib.h>
+
 #include <media/mesh.h>
+
 #include <xtl/function.h>
 #include <xtl/iterator.h>
 
