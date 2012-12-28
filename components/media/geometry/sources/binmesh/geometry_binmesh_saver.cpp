@@ -250,6 +250,7 @@ class BinMeshLibrarySaver
       file_write (result_file, &primitive.vertex_buffer, sizeof (primitive.vertex_buffer));
       file_write (result_file, &primitive.first, sizeof (primitive.first));
       file_write (result_file, &primitive.count, sizeof (primitive.count));
+      file_write (result_file, &primitive.base_vertex, sizeof (primitive.base_vertex));
     }
 
       //сохранение примитивов

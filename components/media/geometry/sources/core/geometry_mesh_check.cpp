@@ -214,11 +214,21 @@ void check_stream (Log& log, CheckContext& context)
 }
 
 template <class T>
-void check_indices (size_t count, const T* index, size_t verts_count, size_t primitive_index, Log& log)
+void check_indices (size_t count, const T* index, size_t verts_count, size_t base_vertex, size_t primitive_index, Log& log)
 {
   for (size_t j=0; j<count; j++, index++)
-    if (*index >= verts_count)
-      log.Error ("index[%u]=%u >= vertices_count=%u (at primitive #%u)", j, *index, verts_count, primitive_index);
+    if (*index + base_vertex >= verts_count)
+    {
+      if (base_vertex)
+      {
+        log.Error ("index[%u]=%u+%u >= vertices_count=%u (at primitive #%u)", j, *index, base_vertex, verts_count, primitive_index);
+      }
+      else
+      {
+        log.Error ("index[%u]=%u >= vertices_count=%u (at primitive #%u)", j, *index, verts_count, primitive_index);
+      }
+    }
+  
 }
 
 }
@@ -298,13 +308,13 @@ bool check (const Mesh& mesh, size_t joints_count, const xtl::function<void (con
       switch (index_buffer.DataType ())
       {
         case IndexType_UInt32:
-          check_indices (index_buffer.Size (), index_buffer.Data<const unsigned int> (), verts_count, i, log);
+          check_indices (index_buffer.Size (), index_buffer.Data<const unsigned int> (), verts_count, primitive.base_vertex, i, log);
           break;
         case IndexType_UInt16:
-          check_indices (index_buffer.Size (), index_buffer.Data<const unsigned short> (), verts_count, i, log);
+          check_indices (index_buffer.Size (), index_buffer.Data<const unsigned short> (), verts_count, primitive.base_vertex, i, log);
           break;
         case IndexType_UInt8:
-          check_indices (index_buffer.Size (), index_buffer.Data<const unsigned char> (), verts_count, i, log);
+          check_indices (index_buffer.Size (), index_buffer.Data<const unsigned char> (), verts_count, primitive.base_vertex, i, log);
           break;
         default:
           log.Error ("Bad index type %s", get_index_type_name (index_buffer.DataType ()));

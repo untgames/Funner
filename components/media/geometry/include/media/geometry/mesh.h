@@ -44,6 +44,7 @@ struct Primitive
   size_t        vertex_buffer; //индекс вершинного буфера
   size_t        first;         //индекс первой вершины/индекса
   size_t        count;         //количество примитивов
+  size_t        base_vertex;   //индекс базовой вершины
   const char*   material;      //имя материала
 };
 
@@ -115,6 +116,7 @@ class Mesh
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Добавление/удаление примитивов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+    size_t AddPrimitive        (PrimitiveType type, size_t vertex_buffer, size_t first, size_t count, size_t base_vertex, const char* material); //return: индекс примитива
     size_t AddPrimitive        (PrimitiveType type, size_t vertex_buffer, size_t first, size_t count, const char* material); //return: индекс примитива
     void   RemovePrimitive     (size_t primitive_index);
     void   RemoveAllPrimitives ();

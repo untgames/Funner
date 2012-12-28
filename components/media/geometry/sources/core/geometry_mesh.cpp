@@ -230,7 +230,7 @@ const Primitive& Mesh::Primitive (size_t index) const
     ƒобавление/удаление примитивов примитивов
 */
 
-size_t Mesh::AddPrimitive (PrimitiveType type, size_t vertex_buffer, size_t first, size_t count, const char* material)
+size_t Mesh::AddPrimitive (PrimitiveType type, size_t vertex_buffer, size_t first, size_t count, size_t base_vertex, const char* material)
 {
   if (type < 0 || type >= PrimitiveType_Num)
     throw xtl::make_argument_exception ("media::geometry::Mesh::AddPrimitive", "type", type);
@@ -244,6 +244,7 @@ size_t Mesh::AddPrimitive (PrimitiveType type, size_t vertex_buffer, size_t firs
   primitive.vertex_buffer        = vertex_buffer;
   primitive.first                = first;
   primitive.count                = count;
+  primitive.base_vertex          = base_vertex;
   primitive.material             = 0;
   primitive.material_name_offset = impl->material_names.size ();
 
@@ -262,6 +263,11 @@ size_t Mesh::AddPrimitive (PrimitiveType type, size_t vertex_buffer, size_t firs
     impl->material_names.erase (primitive.material_name_offset);
     throw;
   }
+}
+
+size_t Mesh::AddPrimitive (PrimitiveType type, size_t vertex_buffer, size_t first, size_t count, const char* material)
+{
+  return AddPrimitive (type, vertex_buffer, first, count, 0, material);
 }
 
 void Mesh::RemovePrimitive (size_t primitive_index)

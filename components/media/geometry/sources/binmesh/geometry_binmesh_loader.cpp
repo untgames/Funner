@@ -278,11 +278,12 @@ class BinMeshLibraryLoader
 
       material.data ()[material_name_length] = '\0';
 
-      size_t vertex_buffer_index, first, count;
+      size_t vertex_buffer_index = 0, first = 0, count = 0, base_vertex = 0;
 
       file_read (input_file, &vertex_buffer_index, sizeof (vertex_buffer_index));
       file_read (input_file, &first,               sizeof (first));
       file_read (input_file, &count,               sizeof (count));
+      file_read (input_file, &base_vertex,         sizeof (base_vertex));
 
       if (vertex_buffer_index >= mesh.VertexBuffersCount ())
         throw xtl::make_range_exception (METHOD_NAME, "vertex_buffer", vertex_buffer_index, mesh.VertexBuffersCount ());
@@ -295,6 +296,9 @@ class BinMeshLibraryLoader
 
       if (first > max_count)
         throw xtl::make_range_exception (METHOD_NAME, "first", first, max_count);
+
+      if (base_vertex >= vertices_count)
+        throw xtl::make_range_exception (METHOD_NAME, "base_vertex", base_vertex, vertices_count);
 
       max_count -= first;
 
@@ -325,7 +329,7 @@ class BinMeshLibraryLoader
       if (!count)
         return;
 
-      mesh.AddPrimitive (type, vertex_buffer_index, first, count, material.data ());
+      mesh.AddPrimitive (type, vertex_buffer_index, first, count, base_vertex, material.data ());
     }
 
       //чтение меша

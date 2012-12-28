@@ -244,6 +244,9 @@ class XmlMeshLibrarySaver
       writer.WriteAttribute ("vertex_buffer", primitive.vertex_buffer);
       writer.WriteAttribute ("first", primitive.first);
       writer.WriteAttribute ("count", primitive.count);
+
+      if (primitive.base_vertex)
+        writer.WriteAttribute ("base_vertex", primitive.base_vertex);
     }
     
       //сохранение вершинных буферов меша

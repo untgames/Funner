@@ -294,7 +294,8 @@ class XmlMeshLibraryLoader
       const char*   material            = get<const char*> (*primitive_iter, "material", "");
       size_t        vertex_buffer_index = get<size_t> (*primitive_iter, "vertex_buffer"),
                     first               = get<size_t> (*primitive_iter, "first"),
-                    count               = get<size_t> (*primitive_iter, "count");
+                    count               = get<size_t> (*primitive_iter, "count"),
+                    base_vertex         = get<size_t> (*primitive_iter, "base_vertex", 0u);
 
       if (type >= PrimitiveType_Num)
         throw xtl::make_argument_exception (METHOD_NAME, "type", type_string);
@@ -337,13 +338,16 @@ class XmlMeshLibraryLoader
       if (count > max_primitives_count)
         throw xtl::make_range_exception (METHOD_NAME, "count", count, max_primitives_count + 1);
 
+      if (base_vertex >= vertices_count)
+        throw xtl::make_range_exception (METHOD_NAME, "base_vertex", base_vertex, vertices_count);
+
       if (!count)
       {
         primitive_iter->Log ().Warning (*primitive_iter, "Empty primitive");
         return;
       }
 
-      mesh.AddPrimitive (type, vertex_buffer_index, first, count, material);
+      mesh.AddPrimitive (type, vertex_buffer_index, first, count, base_vertex, material);
     }
     
       //разбор меша
