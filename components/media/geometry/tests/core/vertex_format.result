@@ -33,8 +33,6 @@ minimal_vertex_size: 14
 attribute with semantic 'position' found at position 0
 attribute with semantic 'normal' found at position 1
 attribute with semantic 'color' found at position 2
-attribute with semantic 'tangent' not found
-attribute with semantic 'binormal' not found
 attribute with semantic 'texcoord0' not found
 attribute with semantic 'texcoord1' not found
 attribute with semantic 'texcoord2' not found
@@ -43,62 +41,11 @@ attribute with semantic 'texcoord4' not found
 attribute with semantic 'texcoord5' not found
 attribute with semantic 'texcoord6' not found
 attribute with semantic 'texcoord7' not found
-attribute with semantic 'textangent0' not found
-attribute with semantic 'textangent1' not found
-attribute with semantic 'textangent2' not found
-attribute with semantic 'textangent3' not found
-attribute with semantic 'textangent4' not found
-attribute with semantic 'textangent5' not found
-attribute with semantic 'textangent6' not found
-attribute with semantic 'textangent7' not found
-attribute with semantic 'texbinormal0' not found
-attribute with semantic 'texbinormal1' not found
-attribute with semantic 'texbinormal2' not found
-attribute with semantic 'texbinormal3' not found
-attribute with semantic 'texbinormal4' not found
-attribute with semantic 'texbinormal5' not found
-attribute with semantic 'texbinormal6' not found
-attribute with semantic 'texbinormal7' not found
 attribute with semantic 'influence' not found
+attribute with semantic 'custom' not found
 Semantic 'normal' is not compatible with type 'float2'
     at media::geometry::VertexFormat::AddAttribute
 Semantic 'color' is not compatible with type 'float2'
-    at media::geometry::VertexFormat::AddAttribute
-Semantic 'tangent' is not compatible with type 'float2'
-    at media::geometry::VertexFormat::AddAttribute
-Semantic 'binormal' is not compatible with type 'float2'
-    at media::geometry::VertexFormat::AddAttribute
-Semantic 'textangent0' is not compatible with type 'float2'
-    at media::geometry::VertexFormat::AddAttribute
-Semantic 'textangent1' is not compatible with type 'float2'
-    at media::geometry::VertexFormat::AddAttribute
-Semantic 'textangent2' is not compatible with type 'float2'
-    at media::geometry::VertexFormat::AddAttribute
-Semantic 'textangent3' is not compatible with type 'float2'
-    at media::geometry::VertexFormat::AddAttribute
-Semantic 'textangent4' is not compatible with type 'float2'
-    at media::geometry::VertexFormat::AddAttribute
-Semantic 'textangent5' is not compatible with type 'float2'
-    at media::geometry::VertexFormat::AddAttribute
-Semantic 'textangent6' is not compatible with type 'float2'
-    at media::geometry::VertexFormat::AddAttribute
-Semantic 'textangent7' is not compatible with type 'float2'
-    at media::geometry::VertexFormat::AddAttribute
-Semantic 'texbinormal0' is not compatible with type 'float2'
-    at media::geometry::VertexFormat::AddAttribute
-Semantic 'texbinormal1' is not compatible with type 'float2'
-    at media::geometry::VertexFormat::AddAttribute
-Semantic 'texbinormal2' is not compatible with type 'float2'
-    at media::geometry::VertexFormat::AddAttribute
-Semantic 'texbinormal3' is not compatible with type 'float2'
-    at media::geometry::VertexFormat::AddAttribute
-Semantic 'texbinormal4' is not compatible with type 'float2'
-    at media::geometry::VertexFormat::AddAttribute
-Semantic 'texbinormal5' is not compatible with type 'float2'
-    at media::geometry::VertexFormat::AddAttribute
-Semantic 'texbinormal6' is not compatible with type 'float2'
-    at media::geometry::VertexFormat::AddAttribute
-Semantic 'texbinormal7' is not compatible with type 'float2'
     at media::geometry::VertexFormat::AddAttribute
 Semantic 'influence' is not compatible with type 'float2'
     at media::geometry::VertexFormat::AddAttribute
@@ -106,83 +53,11 @@ Semantic 'influence' is not compatible with type 'float3'
     at media::geometry::VertexFormat::AddAttribute
 Semantic 'normal' is not compatible with type 'float4'
     at media::geometry::VertexFormat::AddAttribute
-Semantic 'tangent' is not compatible with type 'float4'
-    at media::geometry::VertexFormat::AddAttribute
-Semantic 'binormal' is not compatible with type 'float4'
-    at media::geometry::VertexFormat::AddAttribute
-Semantic 'textangent0' is not compatible with type 'float4'
-    at media::geometry::VertexFormat::AddAttribute
-Semantic 'textangent1' is not compatible with type 'float4'
-    at media::geometry::VertexFormat::AddAttribute
-Semantic 'textangent2' is not compatible with type 'float4'
-    at media::geometry::VertexFormat::AddAttribute
-Semantic 'textangent3' is not compatible with type 'float4'
-    at media::geometry::VertexFormat::AddAttribute
-Semantic 'textangent4' is not compatible with type 'float4'
-    at media::geometry::VertexFormat::AddAttribute
-Semantic 'textangent5' is not compatible with type 'float4'
-    at media::geometry::VertexFormat::AddAttribute
-Semantic 'textangent6' is not compatible with type 'float4'
-    at media::geometry::VertexFormat::AddAttribute
-Semantic 'textangent7' is not compatible with type 'float4'
-    at media::geometry::VertexFormat::AddAttribute
-Semantic 'texbinormal0' is not compatible with type 'float4'
-    at media::geometry::VertexFormat::AddAttribute
-Semantic 'texbinormal1' is not compatible with type 'float4'
-    at media::geometry::VertexFormat::AddAttribute
-Semantic 'texbinormal2' is not compatible with type 'float4'
-    at media::geometry::VertexFormat::AddAttribute
-Semantic 'texbinormal3' is not compatible with type 'float4'
-    at media::geometry::VertexFormat::AddAttribute
-Semantic 'texbinormal4' is not compatible with type 'float4'
-    at media::geometry::VertexFormat::AddAttribute
-Semantic 'texbinormal5' is not compatible with type 'float4'
-    at media::geometry::VertexFormat::AddAttribute
-Semantic 'texbinormal6' is not compatible with type 'float4'
-    at media::geometry::VertexFormat::AddAttribute
-Semantic 'texbinormal7' is not compatible with type 'float4'
-    at media::geometry::VertexFormat::AddAttribute
 Semantic 'influence' is not compatible with type 'float4'
     at media::geometry::VertexFormat::AddAttribute
 Semantic 'normal' is not compatible with type 'short2'
     at media::geometry::VertexFormat::AddAttribute
 Semantic 'color' is not compatible with type 'short2'
-    at media::geometry::VertexFormat::AddAttribute
-Semantic 'tangent' is not compatible with type 'short2'
-    at media::geometry::VertexFormat::AddAttribute
-Semantic 'binormal' is not compatible with type 'short2'
-    at media::geometry::VertexFormat::AddAttribute
-Semantic 'textangent0' is not compatible with type 'short2'
-    at media::geometry::VertexFormat::AddAttribute
-Semantic 'textangent1' is not compatible with type 'short2'
-    at media::geometry::VertexFormat::AddAttribute
-Semantic 'textangent2' is not compatible with type 'short2'
-    at media::geometry::VertexFormat::AddAttribute
-Semantic 'textangent3' is not compatible with type 'short2'
-    at media::geometry::VertexFormat::AddAttribute
-Semantic 'textangent4' is not compatible with type 'short2'
-    at media::geometry::VertexFormat::AddAttribute
-Semantic 'textangent5' is not compatible with type 'short2'
-    at media::geometry::VertexFormat::AddAttribute
-Semantic 'textangent6' is not compatible with type 'short2'
-    at media::geometry::VertexFormat::AddAttribute
-Semantic 'textangent7' is not compatible with type 'short2'
-    at media::geometry::VertexFormat::AddAttribute
-Semantic 'texbinormal0' is not compatible with type 'short2'
-    at media::geometry::VertexFormat::AddAttribute
-Semantic 'texbinormal1' is not compatible with type 'short2'
-    at media::geometry::VertexFormat::AddAttribute
-Semantic 'texbinormal2' is not compatible with type 'short2'
-    at media::geometry::VertexFormat::AddAttribute
-Semantic 'texbinormal3' is not compatible with type 'short2'
-    at media::geometry::VertexFormat::AddAttribute
-Semantic 'texbinormal4' is not compatible with type 'short2'
-    at media::geometry::VertexFormat::AddAttribute
-Semantic 'texbinormal5' is not compatible with type 'short2'
-    at media::geometry::VertexFormat::AddAttribute
-Semantic 'texbinormal6' is not compatible with type 'short2'
-    at media::geometry::VertexFormat::AddAttribute
-Semantic 'texbinormal7' is not compatible with type 'short2'
     at media::geometry::VertexFormat::AddAttribute
 Semantic 'influence' is not compatible with type 'short2'
     at media::geometry::VertexFormat::AddAttribute
@@ -190,81 +65,9 @@ Semantic 'influence' is not compatible with type 'short3'
     at media::geometry::VertexFormat::AddAttribute
 Semantic 'normal' is not compatible with type 'short4'
     at media::geometry::VertexFormat::AddAttribute
-Semantic 'tangent' is not compatible with type 'short4'
-    at media::geometry::VertexFormat::AddAttribute
-Semantic 'binormal' is not compatible with type 'short4'
-    at media::geometry::VertexFormat::AddAttribute
-Semantic 'textangent0' is not compatible with type 'short4'
-    at media::geometry::VertexFormat::AddAttribute
-Semantic 'textangent1' is not compatible with type 'short4'
-    at media::geometry::VertexFormat::AddAttribute
-Semantic 'textangent2' is not compatible with type 'short4'
-    at media::geometry::VertexFormat::AddAttribute
-Semantic 'textangent3' is not compatible with type 'short4'
-    at media::geometry::VertexFormat::AddAttribute
-Semantic 'textangent4' is not compatible with type 'short4'
-    at media::geometry::VertexFormat::AddAttribute
-Semantic 'textangent5' is not compatible with type 'short4'
-    at media::geometry::VertexFormat::AddAttribute
-Semantic 'textangent6' is not compatible with type 'short4'
-    at media::geometry::VertexFormat::AddAttribute
-Semantic 'textangent7' is not compatible with type 'short4'
-    at media::geometry::VertexFormat::AddAttribute
-Semantic 'texbinormal0' is not compatible with type 'short4'
-    at media::geometry::VertexFormat::AddAttribute
-Semantic 'texbinormal1' is not compatible with type 'short4'
-    at media::geometry::VertexFormat::AddAttribute
-Semantic 'texbinormal2' is not compatible with type 'short4'
-    at media::geometry::VertexFormat::AddAttribute
-Semantic 'texbinormal3' is not compatible with type 'short4'
-    at media::geometry::VertexFormat::AddAttribute
-Semantic 'texbinormal4' is not compatible with type 'short4'
-    at media::geometry::VertexFormat::AddAttribute
-Semantic 'texbinormal5' is not compatible with type 'short4'
-    at media::geometry::VertexFormat::AddAttribute
-Semantic 'texbinormal6' is not compatible with type 'short4'
-    at media::geometry::VertexFormat::AddAttribute
-Semantic 'texbinormal7' is not compatible with type 'short4'
-    at media::geometry::VertexFormat::AddAttribute
 Semantic 'influence' is not compatible with type 'short4'
     at media::geometry::VertexFormat::AddAttribute
 Semantic 'normal' is not compatible with type 'ubyte4'
-    at media::geometry::VertexFormat::AddAttribute
-Semantic 'tangent' is not compatible with type 'ubyte4'
-    at media::geometry::VertexFormat::AddAttribute
-Semantic 'binormal' is not compatible with type 'ubyte4'
-    at media::geometry::VertexFormat::AddAttribute
-Semantic 'textangent0' is not compatible with type 'ubyte4'
-    at media::geometry::VertexFormat::AddAttribute
-Semantic 'textangent1' is not compatible with type 'ubyte4'
-    at media::geometry::VertexFormat::AddAttribute
-Semantic 'textangent2' is not compatible with type 'ubyte4'
-    at media::geometry::VertexFormat::AddAttribute
-Semantic 'textangent3' is not compatible with type 'ubyte4'
-    at media::geometry::VertexFormat::AddAttribute
-Semantic 'textangent4' is not compatible with type 'ubyte4'
-    at media::geometry::VertexFormat::AddAttribute
-Semantic 'textangent5' is not compatible with type 'ubyte4'
-    at media::geometry::VertexFormat::AddAttribute
-Semantic 'textangent6' is not compatible with type 'ubyte4'
-    at media::geometry::VertexFormat::AddAttribute
-Semantic 'textangent7' is not compatible with type 'ubyte4'
-    at media::geometry::VertexFormat::AddAttribute
-Semantic 'texbinormal0' is not compatible with type 'ubyte4'
-    at media::geometry::VertexFormat::AddAttribute
-Semantic 'texbinormal1' is not compatible with type 'ubyte4'
-    at media::geometry::VertexFormat::AddAttribute
-Semantic 'texbinormal2' is not compatible with type 'ubyte4'
-    at media::geometry::VertexFormat::AddAttribute
-Semantic 'texbinormal3' is not compatible with type 'ubyte4'
-    at media::geometry::VertexFormat::AddAttribute
-Semantic 'texbinormal4' is not compatible with type 'ubyte4'
-    at media::geometry::VertexFormat::AddAttribute
-Semantic 'texbinormal5' is not compatible with type 'ubyte4'
-    at media::geometry::VertexFormat::AddAttribute
-Semantic 'texbinormal6' is not compatible with type 'ubyte4'
-    at media::geometry::VertexFormat::AddAttribute
-Semantic 'texbinormal7' is not compatible with type 'ubyte4'
     at media::geometry::VertexFormat::AddAttribute
 Semantic 'influence' is not compatible with type 'ubyte4'
     at media::geometry::VertexFormat::AddAttribute
@@ -273,10 +76,6 @@ Semantic 'position' is not compatible with type 'influence'
 Semantic 'normal' is not compatible with type 'influence'
     at media::geometry::VertexFormat::AddAttribute
 Semantic 'color' is not compatible with type 'influence'
-    at media::geometry::VertexFormat::AddAttribute
-Semantic 'tangent' is not compatible with type 'influence'
-    at media::geometry::VertexFormat::AddAttribute
-Semantic 'binormal' is not compatible with type 'influence'
     at media::geometry::VertexFormat::AddAttribute
 Semantic 'texcoord0' is not compatible with type 'influence'
     at media::geometry::VertexFormat::AddAttribute
@@ -293,36 +92,4 @@ Semantic 'texcoord5' is not compatible with type 'influence'
 Semantic 'texcoord6' is not compatible with type 'influence'
     at media::geometry::VertexFormat::AddAttribute
 Semantic 'texcoord7' is not compatible with type 'influence'
-    at media::geometry::VertexFormat::AddAttribute
-Semantic 'textangent0' is not compatible with type 'influence'
-    at media::geometry::VertexFormat::AddAttribute
-Semantic 'textangent1' is not compatible with type 'influence'
-    at media::geometry::VertexFormat::AddAttribute
-Semantic 'textangent2' is not compatible with type 'influence'
-    at media::geometry::VertexFormat::AddAttribute
-Semantic 'textangent3' is not compatible with type 'influence'
-    at media::geometry::VertexFormat::AddAttribute
-Semantic 'textangent4' is not compatible with type 'influence'
-    at media::geometry::VertexFormat::AddAttribute
-Semantic 'textangent5' is not compatible with type 'influence'
-    at media::geometry::VertexFormat::AddAttribute
-Semantic 'textangent6' is not compatible with type 'influence'
-    at media::geometry::VertexFormat::AddAttribute
-Semantic 'textangent7' is not compatible with type 'influence'
-    at media::geometry::VertexFormat::AddAttribute
-Semantic 'texbinormal0' is not compatible with type 'influence'
-    at media::geometry::VertexFormat::AddAttribute
-Semantic 'texbinormal1' is not compatible with type 'influence'
-    at media::geometry::VertexFormat::AddAttribute
-Semantic 'texbinormal2' is not compatible with type 'influence'
-    at media::geometry::VertexFormat::AddAttribute
-Semantic 'texbinormal3' is not compatible with type 'influence'
-    at media::geometry::VertexFormat::AddAttribute
-Semantic 'texbinormal4' is not compatible with type 'influence'
-    at media::geometry::VertexFormat::AddAttribute
-Semantic 'texbinormal5' is not compatible with type 'influence'
-    at media::geometry::VertexFormat::AddAttribute
-Semantic 'texbinormal6' is not compatible with type 'influence'
-    at media::geometry::VertexFormat::AddAttribute
-Semantic 'texbinormal7' is not compatible with type 'influence'
     at media::geometry::VertexFormat::AddAttribute

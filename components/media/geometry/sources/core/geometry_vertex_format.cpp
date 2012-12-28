@@ -200,7 +200,7 @@ size_t VertexFormat::AddAttribute (const char* name, VertexAttributeSemantic sem
     }
     else
     {
-      throw xtl::format_not_supported_exception (METHOD_NAME, "Semantic '%s' for attribute is not compatible with type '%s'",
+      throw xtl::format_not_supported_exception (METHOD_NAME, "Semantic '%s' is not compatible with type '%s'",
         get_semantic_name (semantic), get_type_name (type));
     }
   }

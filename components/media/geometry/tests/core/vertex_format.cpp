@@ -4,7 +4,9 @@ void try_add_attribute (VertexFormat& vf, VertexAttributeSemantic semantic, Vert
 {
   try
   {
-    vf.AddAttribute (semantic, type, 0);
+    static const char* custom_name = "custom";
+
+    vf.AddAttribute (semantic == VertexAttributeSemantic_Custom ? custom_name : "", semantic, type, 0);
   }
   catch (std::exception& exception)
   {

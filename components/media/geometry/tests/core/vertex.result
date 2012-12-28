@@ -2,8 +2,8 @@ Results of vertex_test:
 vertex format (4 attributes, min_vertex_size=42, vertex_size=42):
   attribute: semantic='position' type='float3' offset=0
   attribute: semantic='normal' type='float3' offset=12
-  attribute: semantic='tangent' type='short3' offset=24
-  attribute: semantic='binormal' type='float3' offset=30
+  attribute: name='tangent' semantic='custom' type='short3' offset=24
+  attribute: name='binormal' semantic='custom' type='float3' offset=30
 vertex format (3 attributes, min_vertex_size=24, vertex_size=24):
   attribute: semantic='position' type='float3' offset=0
   attribute: semantic='texcoord3' type='float2' offset=12
