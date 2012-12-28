@@ -2,18 +2,35 @@
 
 using namespace render;
 
+namespace media
+{
+
+namespace geometry
+{
+
+inline size_t hash (const VertexFormat& vf)
+{
+  return vf.Hash ();
+}
+
+}
+
+}
+
 /*
     Описание реализации менеджера лэйаутов геометрии
 */
 
 typedef stl::hash_map<size_t, LowLevelInputLayoutPtr> InputLayoutMap;
+typedef stl::hash_set<media::geometry::VertexFormat>  VertexFormatSet;
 
 struct InputLayoutManager::Impl
 {
-  LowLevelDevicePtr device;    //устройство отрисовки
-  InputLayoutMap    layouts;   //закэшированные лэйауты
-  Log               log;       //протокол отладочных сообщений
-  SettingsPtr       settings;  //настройки менеджера рендеринга
+  LowLevelDevicePtr device;         //устройство отрисовки
+  InputLayoutMap    layouts;        //закэшированные лэйауты
+  VertexFormatSet   vertex_formats; //вершинные форматы
+  Log               log;            //протокол отладочных сообщений
+  SettingsPtr       settings;       //настройки менеджера рендеринга
   
   Impl (const LowLevelDevicePtr& in_device, const SettingsPtr& in_settings)
     : device (in_device)
@@ -43,40 +60,64 @@ InputLayoutManager::~InputLayoutManager ()
 }
 
 /*
-    Создание лэйаута
+    Получение константной копии
 */
 
-LowLevelInputLayoutPtr InputLayoutManager::CreateInputLayout (const render::low_level::InputLayoutDesc& desc)
+media::geometry::VertexFormat InputLayoutManager::Clone (const media::geometry::VertexFormat& format) const
 {
   try
   {
-    //TODO: переделать!!!!!!! хэш считается неверно!!!
-#pragma message ("!!Wrong hash")
+    VertexFormatSet::iterator iter = impl->vertex_formats.find (format);
 
-    size_t hash = common::crc32 (&desc.vertex_attributes [0], sizeof (render::low_level::VertexAttribute) * desc.vertex_attributes_count);
-    
+    if (iter != impl->vertex_formats.end ())
+      return *iter;
+
+    if (impl->settings->HasDebugLog ())
+      impl->log.Printf ("Create vertex format clone with hash %08x", format.Hash ());
+
+    media::geometry::VertexFormat clone = format.Clone ();
+
+    impl->vertex_formats.insert (clone);
+
+    return clone;
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::InputLayoutManager::Clone");
+    throw;
+  }
+}
+
+/*
+    Создание лэйаута
+*/
+
+LowLevelInputLayoutPtr InputLayoutManager::CreateInputLayout (size_t hash, const render::low_level::InputLayoutDesc& desc)
+{
+  try
+  {
     struct HashDesc
     {
       size_t vertex_attributes_count;
       int    index_type;
       size_t index_buffer_offset;
     };
-    
+
     HashDesc hash_desc;
-    
+
     memset (&hash_desc, 0, sizeof (hash_desc));
-    
+
     hash_desc.vertex_attributes_count = desc.vertex_attributes_count;
     hash_desc.index_type              = desc.index_type;
     hash_desc.index_buffer_offset     = desc.index_buffer_offset;
-    
+
     hash = common::crc32 (&hash_desc, sizeof (hash_desc), hash);
-    
+
     InputLayoutMap::iterator iter = impl->layouts.find (hash);
-    
+
     if (iter != impl->layouts.end ())
       return iter->second;
-      
+
     if (impl->settings->HasDebugLog ())
     {
       impl->log.Printf ("Create input layout:");
@@ -115,15 +156,14 @@ LowLevelInputLayoutPtr InputLayoutManager::CreateInputLayout (const render::low_
           default:
             break;
         }
-        
-        impl->log.Printf ("......semantic=%s, type=%s%u, slot=%u, offset=%u, stride=%u", va.semantic, type, rank,
-          va.slot, va.offset, va.stride);
+
+        impl->log.Printf ("......semantic=%s, type=%s%u, slot=%u, offset=%u, stride=%u", va.semantic, type, rank, va.slot, va.offset, va.stride);
       }
     }
       
     LowLevelInputLayoutPtr layout (impl->device->CreateInputLayout (desc), false);
     
-    if (impl->settings->HasDebugLog ())    
+    if (impl->settings->HasDebugLog ())
       impl->log.Printf ("...layout created (hash=%08x)", hash);
     
     impl->layouts [hash] = layout;

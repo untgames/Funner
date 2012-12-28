@@ -3,6 +3,7 @@
 
 #include <stl/auto_ptr.h>
 #include <stl/hash_map>
+#include <stl/hash_set>
 #include <stl/map>
 #include <stl/string>
 #include <stl/vector>

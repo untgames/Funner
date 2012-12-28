@@ -7,10 +7,17 @@ using namespace render::low_level;
      онструкторы / деструктор
 */
 
-VertexBuffer::VertexBuffer (const media::geometry::VertexBuffer& source, PrimitiveBuffersImpl& buffers, low_level::IDevice& device, MeshBufferUsage usage)
+VertexBuffer::VertexBuffer (const media::geometry::VertexBuffer& source, PrimitiveBuffersImpl& buffers, const DeviceManagerPtr& device_manager, MeshBufferUsage usage)
 {
   try
   {
+    if (!device_manager)
+      throw xtl::make_null_argument_exception ("", "device_manager");
+
+    low_level::IDevice& device = device_manager->Device ();
+
+    InputLayoutManager& layout_manager = device_manager->InputLayoutManager ();
+
       //резервирование вершинных атрибутов
     
     size_t attributes_count = 0;
@@ -19,8 +26,13 @@ VertexBuffer::VertexBuffer (const media::geometry::VertexBuffer& source, Primiti
       attributes_count += source.Stream (i).Format ().AttributesCount ();
       
     attributes.reserve (attributes_count);
+
+    streams.reserve (source.StreamsCount ());
+    vertex_formats.reserve (source.StreamsCount ());
     
       //конвертаци€
+
+    attributes_hash = 0xFFFFFFFF;
     
     for (size_t i=0, streams_count=source.StreamsCount (); i<streams_count; i++)
     {
@@ -28,7 +40,10 @@ VertexBuffer::VertexBuffer (const media::geometry::VertexBuffer& source, Primiti
       
       LowLevelBufferPtr vs_buffer = buffers.CreateVertexStream (vs, usage);
 
-      const media::geometry::VertexFormat& vertex_format = vs.Format ();
+      media::geometry::VertexFormat vertex_format = Clone (layout_manager, vs.Format ());      
+      size_t                        vs_hash       = vertex_format.Hash ();
+
+      attributes_hash = common::crc32 (&vs_hash, sizeof (vs_hash), attributes_hash);
 
       for (size_t j=0, attr_count=vertex_format.AttributesCount (); j<attr_count; j++)
       {
@@ -37,31 +52,36 @@ VertexBuffer::VertexBuffer (const media::geometry::VertexBuffer& source, Primiti
 
         memset (&dst_va, 0, sizeof (dst_va));
 
-        switch (src_va.semantic)
+        if (*src_va.name)
         {
-    //TODO: переделать!!!!!!! нужно сохран€ть строки
-#pragma message ("!!Wrong semantic")
-          case media::geometry::VertexAttributeSemantic_Position:
-            dst_va.semantic = device.GetVertexAttributeSemanticName (VertexAttributeSemantic_Position);
-            break;
-          case media::geometry::VertexAttributeSemantic_Normal:
-            dst_va.semantic = device.GetVertexAttributeSemanticName (VertexAttributeSemantic_Normal);
-            break;
-          case media::geometry::VertexAttributeSemantic_Color:
-            dst_va.semantic = device.GetVertexAttributeSemanticName (VertexAttributeSemantic_Color);
-            break;
-          case media::geometry::VertexAttributeSemantic_TexCoord0:
-          case media::geometry::VertexAttributeSemantic_TexCoord1:
-          case media::geometry::VertexAttributeSemantic_TexCoord2:
-          case media::geometry::VertexAttributeSemantic_TexCoord3:
-          case media::geometry::VertexAttributeSemantic_TexCoord4:
-          case media::geometry::VertexAttributeSemantic_TexCoord5:
-          case media::geometry::VertexAttributeSemantic_TexCoord6:
-          case media::geometry::VertexAttributeSemantic_TexCoord7:          
-            dst_va.semantic = device.GetVertexAttributeSemanticName ((VertexAttributeSemantic)(VertexAttributeSemantic_TexCoord0 + src_va.semantic - media::geometry::VertexAttributeSemantic_TexCoord0));
-            break;
-          default:
-            continue;
+          dst_va.semantic = src_va.name; //can't be changed in futured, stored in internal InputLayoutManager cache and in this object
+        }
+        else
+        {
+          switch (src_va.semantic)
+          {
+            case media::geometry::VertexAttributeSemantic_Position:
+              dst_va.semantic = device.GetVertexAttributeSemanticName (VertexAttributeSemantic_Position);
+              break;
+            case media::geometry::VertexAttributeSemantic_Normal:
+              dst_va.semantic = device.GetVertexAttributeSemanticName (VertexAttributeSemantic_Normal);
+              break;
+            case media::geometry::VertexAttributeSemantic_Color:
+              dst_va.semantic = device.GetVertexAttributeSemanticName (VertexAttributeSemantic_Color);
+              break;
+            case media::geometry::VertexAttributeSemantic_TexCoord0:
+            case media::geometry::VertexAttributeSemantic_TexCoord1:
+            case media::geometry::VertexAttributeSemantic_TexCoord2:
+            case media::geometry::VertexAttributeSemantic_TexCoord3:
+            case media::geometry::VertexAttributeSemantic_TexCoord4:
+            case media::geometry::VertexAttributeSemantic_TexCoord5:
+            case media::geometry::VertexAttributeSemantic_TexCoord6:
+            case media::geometry::VertexAttributeSemantic_TexCoord7:          
+              dst_va.semantic = device.GetVertexAttributeSemanticName ((VertexAttributeSemantic)(VertexAttributeSemantic_TexCoord0 + src_va.semantic - media::geometry::VertexAttributeSemantic_TexCoord0));
+              break;
+            default:
+              continue;
+          }
         }
 
         switch (src_va.type)
@@ -116,6 +136,27 @@ VertexBuffer::VertexBuffer (const media::geometry::VertexBuffer& source, Primiti
 }
 
 /*
+     лонирование вершинного формата
+*/
+
+media::geometry::VertexFormat VertexBuffer::Clone (InputLayoutManager& manager, const media::geometry::VertexFormat& format)
+{
+  try
+  {
+    media::geometry::VertexFormat clone = manager.Clone (format);
+
+    vertex_formats.push_back (clone);
+
+    return clone;
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::VertexBuffer::Clone");
+    throw;
+  }
+}
+
+/*
     ¬ершинные потоки
 */
 
@@ -161,7 +202,7 @@ LowLevelInputLayoutPtr VertexBuffer::CreateInputLayout (InputLayoutManager& layo
     layout_desc.index_type              = type;
     layout_desc.index_buffer_offset     = 0;
 
-    layout = layout_manager.CreateInputLayout (layout_desc);
+    layout = layout_manager.CreateInputLayout (attributes_hash, layout_desc);
       
     return layout;
   }
