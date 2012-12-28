@@ -92,7 +92,12 @@ class XmlMeshLibrarySaver
 
         XmlWriter::Scope scope (writer, "channel");
 
-        writer.WriteAttribute ("semantic", get_semantic_name (attribute.semantic));
+        if (*attribute.name)
+          writer.WriteAttribute ("name", attribute.name);
+
+        if (attribute.semantic != VertexAttributeSemantic_Custom)
+          writer.WriteAttribute ("semantic", get_semantic_name (attribute.semantic));
+
         writer.WriteAttribute ("type", get_type_name (attribute.type));
         writer.WriteAttribute ("offset", attribute.offset);
 
