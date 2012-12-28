@@ -152,17 +152,17 @@ LowLevelStateBlockPtr EffectPass::StateBlock (bool scissor_enable)
   {
     if (impl->state_block_need_update)
     {      
-      render::low_level::IDevice& device = impl->device_manager->Device ();
+      render::low_level::IDeviceContext& context = impl->device_manager->ImmediateContext ();
       
-      device.OSSetBlendState        (impl->blend_state.get ());
-      device.OSSetDepthStencilState (impl->depth_stencil_state.get ());
-      device.RSSetState             (impl->rasterizer_state.get ());
+      context.OSSetBlendState        (impl->blend_state.get ());
+      context.OSSetDepthStencilState (impl->depth_stencil_state.get ());
+      context.RSSetState             (impl->rasterizer_state.get ());
       
-      impl->scissor_off_state_block->Capture ();
+      impl->scissor_off_state_block->Capture (&context);
       
-      device.RSSetState (impl->rasterizer_scissor_state.get ());
+      context.RSSetState (impl->rasterizer_scissor_state.get ());
 
-      impl->scissor_on_state_block->Capture ();
+      impl->scissor_on_state_block->Capture (&context);
     }    
     
     return scissor_enable ? impl->scissor_on_state_block : impl->scissor_off_state_block;

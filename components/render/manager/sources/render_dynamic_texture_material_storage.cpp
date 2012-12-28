@@ -88,7 +88,7 @@ void DynamicTextureMaterialStorage::UpdateMask (render::low_level::StateBlockMas
     Применение текстур материала
 */
 
-void DynamicTextureMaterialStorage::Apply (render::low_level::IDevice& device)
+void DynamicTextureMaterialStorage::Apply (render::low_level::IDeviceContext& context)
 {
   try
   {
@@ -102,7 +102,7 @@ void DynamicTextureMaterialStorage::Apply (render::low_level::IDevice& device)
       if (!texture)
         throw xtl::format_operation_exception ("", "Null dynamic texture at channel %u", channel.channel_index);
       
-      device.SSSetTexture (channel.channel_index, texture ? texture->DeviceTexture ().get () : (render::low_level::ITexture*)0);
+      context.SSSetTexture (channel.channel_index, texture ? texture->DeviceTexture ().get () : (render::low_level::ITexture*)0);
     }
   }
   catch (xtl::exception& e)

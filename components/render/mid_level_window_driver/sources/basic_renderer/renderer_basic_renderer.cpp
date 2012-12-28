@@ -252,7 +252,7 @@ void RendererDispatch::DrawFrames ()
   
     //сброс команд
     
-  device->Flush ();
+  device->GetImmediateContext ()->Flush ();
 
     //вывод сформированной картинки
     

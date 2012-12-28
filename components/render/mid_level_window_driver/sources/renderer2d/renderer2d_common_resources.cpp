@@ -89,14 +89,14 @@ BlendStatePtr create_blend_state
 
   memset (&blend_desc, 0, sizeof (blend_desc));
 
-  blend_desc.blend_enable                     = blend_enable;
-  blend_desc.blend_color_operation            = BlendOperation_Add;
-  blend_desc.blend_alpha_operation            = BlendOperation_Add;
-  blend_desc.blend_color_source_argument      = src_arg;
-  blend_desc.blend_color_destination_argument = dst_color_arg;
-  blend_desc.blend_alpha_source_argument      = src_arg;
-  blend_desc.blend_alpha_destination_argument = dst_alpha_arg;
-  blend_desc.color_write_mask                 = ColorWriteFlag_All;
+  blend_desc.render_target [0].blend_enable                     = blend_enable;
+  blend_desc.render_target [0].blend_color_operation            = BlendOperation_Add;
+  blend_desc.render_target [0].blend_alpha_operation            = BlendOperation_Add;
+  blend_desc.render_target [0].blend_color_source_argument      = src_arg;
+  blend_desc.render_target [0].blend_color_destination_argument = dst_color_arg;
+  blend_desc.render_target [0].blend_alpha_source_argument      = src_arg;
+  blend_desc.render_target [0].blend_alpha_destination_argument = dst_alpha_arg;
+  blend_desc.render_target [0].color_write_mask                 = ColorWriteFlag_All;
 
   return BlendStatePtr (device.CreateBlendState (blend_desc), false);
 }
@@ -223,28 +223,28 @@ InputLayoutPtr create_input_layout (IDevice& device)
 
   memset (attributes, 0, sizeof (attributes));
 
-  attributes [0].semantic = VertexAttributeSemantic_Position;
+  attributes [0].semantic = device.GetVertexAttributeSemanticName (VertexAttributeSemantic_Position);
   attributes [0].format   = InputDataFormat_Vector3;
   attributes [0].type     = InputDataType_Float;
   attributes [0].slot     = 0;
   attributes [0].offset   = offsetof (RenderableVertex, position);
   attributes [0].stride   = sizeof (RenderableVertex);
 
-  attributes [1].semantic = VertexAttributeSemantic_TexCoord0;
+  attributes [1].semantic = device.GetVertexAttributeSemanticName (VertexAttributeSemantic_TexCoord0);
   attributes [1].format   = InputDataFormat_Vector2;
   attributes [1].type     = InputDataType_Float;
   attributes [1].slot     = 0;
   attributes [1].offset   = offsetof (RenderableVertex, texcoord);
   attributes [1].stride   = sizeof (RenderableVertex);
 
-  attributes [2].semantic = VertexAttributeSemantic_Color;
+  attributes [2].semantic = device.GetVertexAttributeSemanticName (VertexAttributeSemantic_Color);
   attributes [2].format   = InputDataFormat_Vector4;
   attributes [2].type     = InputDataType_UByte;
   attributes [2].slot     = 0;
   attributes [2].offset   = offsetof (RenderableVertex, color);
   attributes [2].stride   = sizeof (RenderableVertex);
   
-  attributes [3].semantic = VertexAttributeSemantic_Normal;
+  attributes [3].semantic = device.GetVertexAttributeSemanticName (VertexAttributeSemantic_Normal);
   attributes [3].format   = InputDataFormat_Vector3;
   attributes [3].type     = InputDataType_Float;
   attributes [3].slot     = 0;

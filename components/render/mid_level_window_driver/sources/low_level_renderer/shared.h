@@ -35,7 +35,7 @@ class LowLevelFrame: virtual public ILowLevelFrame, public BasicFrame
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Реализация визуализации
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void DrawCore (render::low_level::IDevice* device);
+    void DrawCore (render::low_level::IDevice* device, render::low_level::IDeviceContext* device_context);
 
   private:
     LowLevelFrame (const LowLevelFrame&); //no impl

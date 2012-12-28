@@ -30,7 +30,7 @@ void LowLevelFrame::SetCallback (IDrawCallback* new_draw_callback)
     Реализация визуализации
 */
 
-void LowLevelFrame::DrawCore (render::low_level::IDevice* device)
+void LowLevelFrame::DrawCore (render::low_level::IDevice* device, render::low_level::IDeviceContext* device_context)
 {
   if (!draw_callback)
     return; //виузализация не требуется
@@ -39,7 +39,7 @@ void LowLevelFrame::DrawCore (render::low_level::IDevice* device)
     
   int viewport_offset_x = 0, viewport_offset_y = 0;
 
-  BasicFrame::BindViewport (device, viewport_offset_x, viewport_offset_y);
+  BasicFrame::BindViewport (device, device_context, viewport_offset_x, viewport_offset_y);
 
     //визуализация
 

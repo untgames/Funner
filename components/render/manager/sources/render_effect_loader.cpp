@@ -124,16 +124,9 @@ class EffectLoader
     }
     
 ///Разбор состояния уровня смешивания цветов
-    void ParseBlendState (Parser::Iterator iter)
+    void ParseBlendTargetState (Parser::Iterator iter, RenderTargetBlendDesc& desc)
     {
-      const char* id = get<const char*> (*iter, "");
-      
-      BlendDesc desc;
-      
-      memset (&desc, 0, sizeof (desc));
-      
-      desc.blend_enable                     = xtl::xstrcmp (get<const char*> (*iter, "blend_enable",              "true"), "true") == 0;
-      desc.sample_alpha_to_coverage         = xtl::xstrcmp (get<const char*> (*iter, "sample_alpha_to_coverage",  "false"), "true") == 0;
+      desc.blend_enable                     = xtl::xstrcmp (get<const char*> (*iter, "blend_enable", "true"), "true") == 0;
       desc.blend_color_operation            = BlendOperation_Add;
       desc.blend_color_source_argument      = BlendArgument_One;
       desc.blend_color_destination_argument = BlendArgument_Zero;
@@ -141,7 +134,7 @@ class EffectLoader
       desc.blend_alpha_source_argument      = BlendArgument_One;
       desc.blend_alpha_destination_argument = BlendArgument_Zero;
       desc.color_write_mask                 = 0;
-      
+
       const char* color_mask = get<const char*> (*iter, "color_write_mask", "rgba");
       
       if (strchr (color_mask, 'r')) desc.color_write_mask |= ColorWriteFlag_Red;
@@ -161,7 +154,38 @@ class EffectLoader
         Parser::AttributeIterator attr_iter = make_attribute_iterator (alpha_node);
         
         ParseBlendOperation (*iter, attr_iter, desc.blend_alpha_operation, desc.blend_alpha_source_argument, desc.blend_alpha_destination_argument);
-      }      
+      }
+    }
+
+    void ParseBlendState (Parser::Iterator iter)
+    {
+      const char* id = get<const char*> (*iter, "");
+      
+      BlendDesc desc;
+      
+      memset (&desc, 0, sizeof (desc));
+      
+      desc.sample_alpha_to_coverage = xtl::xstrcmp (get<const char*> (*iter, "sample_alpha_to_coverage",  "false"), "true") == 0;
+      desc.independent_blend_enable = xtl::xstrcmp (get<const char*> (*iter, "independent_blend_enable",  "false"), "true") == 0;
+  
+      if (desc.independent_blend_enable)
+      {
+        for (Parser::NamesakeIterator rt_iter = iter->First ("color_target"); rt_iter; ++rt_iter)
+	{
+          Parser::AttributeIterator attr_iter = make_attribute_iterator (*rt_iter);
+
+          size_t index = xtl::io::get<size_t> (attr_iter);
+
+          if (index >= DEVICE_RENDER_TARGET_SLOTS_COUNT)
+            raise_parser_exception (*rt_iter, "Unexpected blend render target index %u", index);
+
+          ParseBlendTargetState (rt_iter, desc.render_target [index]);
+        }
+      }
+      else
+      {
+        ParseBlendTargetState (iter, desc.render_target [0]);
+      }
 
       try
       {

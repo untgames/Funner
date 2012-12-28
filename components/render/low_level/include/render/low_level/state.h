@@ -71,12 +71,12 @@ enum InputDataFormat
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 struct VertexAttribute
 {
-  VertexAttributeSemantic semantic; //семантика вершинного атрибута
-  InputDataFormat         format;   //формат данных
-  InputDataType           type;     //тип элементов
-  size_t                  slot;     //номер слота с вершинным буфером
-  size_t                  offset;   //смещение от начала вершинного буфера
-  size_t                  stride;   //шаг в вершинном буфере
+  const char*      semantic; //семантика вершинного атрибута
+  InputDataFormat  format;   //формат данных
+  InputDataType    type;     //тип элементов
+  size_t           slot;     //номер слота с вершинным буфером
+  size_t           offset;   //смещение от начала вершинного буфера
+  size_t           stride;   //шаг в вершинном буфере
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -88,6 +88,8 @@ struct InputLayoutDesc
   const VertexAttribute* vertex_attributes;       //вершинные атрибуты
   InputDataType          index_type;              //тип индексов в вершинном буфере
   size_t                 index_buffer_offset;     //смещение в индексном буфере
+  size_t                 instance_data_step_rate; //количество отрисованных инстансов после которого произойдет смещение на 1
+  bool                   is_per_instance;         //является ли атрибут инстанцируемым
 };
 
 /*
@@ -353,12 +355,11 @@ enum ColorWriteFlag
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Дескриптор уровня смешивания цветов
+///Дескриптор уровня смешивания цветов цели рендеринга
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-struct BlendDesc
+struct RenderTargetBlendDesc
 {
   bool           blend_enable;                      //включено ли смешивание цветов
-  bool           sample_alpha_to_coverage;          //работа с альфа при мультисэмплинге
   BlendOperation blend_color_operation;             //вид операции смешивания цветов
   BlendArgument  blend_color_source_argument;       //аргумент функции смешивания цветов, выбранный из источника цвета
   BlendArgument  blend_color_destination_argument;  //аргумент функции смешивания цветов, выбранный из приёмника цвета
@@ -366,6 +367,16 @@ struct BlendDesc
   BlendArgument  blend_alpha_source_argument;       //аргумент функции смешивания альфа компонент, выбранный из источника цвета
   BlendArgument  blend_alpha_destination_argument;  //аргумент функции смешивания альфа компонент, выбранный из приёмника цвета
   unsigned char  color_write_mask;                  //маска записи цветов
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Дескриптор уровня смешивания цветов
+///////////////////////////////////////////////////////////////////////////////////////////////////
+struct BlendDesc
+{
+  bool                  sample_alpha_to_coverage;                         //работа с альфа при мультисэмплинге
+  bool                  independent_blend_enable;                         //включено ли независимое смешивание цветов для целей рендеринга
+  RenderTargetBlendDesc render_target [DEVICE_RENDER_TARGET_SLOTS_COUNT]; //настройки смешивания цветов целей рендеринга
 };
 
 /*

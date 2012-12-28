@@ -3,6 +3,7 @@
 
 #include <stl/auto_ptr.h>
 #include <stl/hash_map>
+#include <stl/hash_set>
 #include <stl/map>
 #include <stl/string>
 #include <stl/vector>
@@ -102,6 +103,7 @@ typedef xtl::com_ptr<low_level::IDriver>                  LowLevelDriverPtr;
 typedef xtl::com_ptr<low_level::IAdapter>                 LowLevelAdapterPtr;
 typedef xtl::com_ptr<low_level::ISwapChain>               LowLevelSwapChainPtr;
 typedef xtl::com_ptr<low_level::IDevice>                  LowLevelDevicePtr;
+typedef xtl::com_ptr<low_level::IDeviceContext>           LowLevelDeviceContextPtr;
 typedef xtl::com_ptr<low_level::ITexture>                 LowLevelTexturePtr;
 typedef xtl::com_ptr<low_level::ISamplerState>            LowLevelSamplerStatePtr;
 typedef xtl::com_ptr<low_level::IView>                    LowLevelViewPtr;

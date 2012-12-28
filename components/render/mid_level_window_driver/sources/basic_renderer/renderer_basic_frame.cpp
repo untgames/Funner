@@ -88,7 +88,7 @@ void BasicFrame::GetViewport (render::mid_level::Viewport& out_viewport)
     Установка области вывода
 */
 
-void BasicFrame::BindViewport (render::low_level::IDevice* device, int& viewport_offset_x, int& viewport_offset_y)
+void BasicFrame::BindViewport (render::low_level::IDevice* device, render::low_level::IDeviceContext* context, int& viewport_offset_x, int& viewport_offset_y)
 {
   if (render_target && depth_stencil_target && (render_target->ViewportX () != depth_stencil_target->ViewportX () ||
     render_target->ViewportY () != depth_stencil_target->ViewportY ()))
@@ -110,7 +110,7 @@ void BasicFrame::BindViewport (render::low_level::IDevice* device, int& viewport
   if (caps.has_right_hand_viewport)
     fixed_viewport.y = render_target->GetHeight () - fixed_viewport.height - fixed_viewport.y;
 
-  device->RSSetViewport (fixed_viewport);
+  context->RSSetViewport (0, fixed_viewport);
 }
 
 /*
@@ -124,29 +124,34 @@ void BasicFrame::Draw (render::low_level::IDevice* device, size_t& draw_frames_c
   if (!render_target && !depth_stencil_target)
     return;
 
+  render::low_level::IDeviceContext* context = device->GetImmediateContext ();
+
+  if (!context)
+    return;
+
     //установка целей отрисовки
     
   render::low_level::IView *render_target_view        = render_target ? render_target->GetView () : 0,
                            *depth_stencil_view        = depth_stencil_target ? depth_stencil_target->GetView () : 0,
-                           *device_render_target_view = device->OSGetRenderTargetView (),
-                           *device_depth_stencil_view = device->OSGetDepthStencilView ();
+                           *device_render_target_view = context->OSGetRenderTargetView (0),
+                           *device_depth_stencil_view = context->OSGetDepthStencilView ();
 
   if (render_target_view != device_render_target_view || depth_stencil_view != device_depth_stencil_view)
   {                           
     if (draw_frames_count && (device_render_target_view || device_depth_stencil_view))
-      device->Flush ();
+      context->Flush ();
 
-    device->OSSetRenderTargets (render_target_view, depth_stencil_view);
+    context->OSSetRenderTargets (1, &render_target_view, depth_stencil_view);
   }  
 
     //собственно отрисовка
 
-  DrawCore (device);
+  DrawCore (device, context);
   
     //генерация мипов
     
   if (render_target)
-    render_target->GenerateMips (*device);
+    render_target->GenerateMips (*context);
   
     //увеличение числа количества нарисованных кадров
   

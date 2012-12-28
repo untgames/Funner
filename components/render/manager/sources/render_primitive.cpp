@@ -35,6 +35,7 @@ struct MeshPrimitive: public xtl::reference_counter, public CacheHolder, public 
   LowLevelInputLayoutPtr           layout;                       //лэйаут примитива
   size_t                           first;                        //индекс первой вершины/индекса
   size_t                           count;                        //количество примитивов
+  size_t                           base_vertex;                  //индекс базовой вершины
   MaterialProxy                    material;                     //материал
   Log                              log;                          //поток протоколирования
   MaterialPtr                      cached_material;              //закэшированный материал
@@ -49,6 +50,7 @@ struct MeshPrimitive: public xtl::reference_counter, public CacheHolder, public 
     , type (PrimitiveType_PointList)
     , first (0)
     , count (0)    
+    , base_vertex (0)
     , material (in_material)
     , cached_state_block_mask_hash (0)
   {
@@ -104,13 +106,14 @@ struct MeshPrimitive: public xtl::reference_counter, public CacheHolder, public 
       
       LowLevelStateBlockPtr material_state_block = cached_material ? cached_material->StateBlock () : LowLevelStateBlockPtr ();
       
-      render::low_level::IDevice& device = common_data.device_manager->Device ();
+      render::low_level::IDevice&        device  = common_data.device_manager->Device ();
+      render::low_level::IDeviceContext& context = common_data.device_manager->ImmediateContext ();
         
       render::low_level::StateBlockMask mask;      
 
       if (material_state_block)
       {
-        material_state_block->Apply ();
+        material_state_block->Apply (&context);
         material_state_block->GetMask (mask);
       }
       
@@ -123,13 +126,13 @@ struct MeshPrimitive: public xtl::reference_counter, public CacheHolder, public 
 
       for (size_t i=0, streams_count=vertex_buffer->StreamsCount (); i<streams_count; i++)
       {        
-        device.ISSetVertexBuffer (i, streams [i].get ());
+        context.ISSetVertexBuffer (i, streams [i].get ());
         
         mask.is_vertex_buffers [i] = true;
       }
 
-      device.ISSetInputLayout  (layout.get ());
-      device.ISSetIndexBuffer  (common_data.index_buffer.get ());
+      context.ISSetInputLayout  (layout.get ());
+      context.ISSetIndexBuffer  (common_data.index_buffer.get ());
       
         //обновление блока состояний примитива
       
@@ -144,7 +147,7 @@ struct MeshPrimitive: public xtl::reference_counter, public CacheHolder, public 
         cached_state_block_mask_hash = mask_hash;
       }
       
-      cached_state_block->Capture ();
+      cached_state_block->Capture (&context);
       
         //кэширование параметров примитива для отрисовки
       
@@ -154,6 +157,7 @@ struct MeshPrimitive: public xtl::reference_counter, public CacheHolder, public 
       cached_primitive.type        = type;
       cached_primitive.first       = first;
       cached_primitive.count       = count;
+      cached_primitive.base_vertex = base_vertex;
       cached_primitive.tags_count  = cached_material ? cached_material->TagsCount () : 0;
       cached_primitive.tags        = cached_material ? cached_material->Tags () : (const size_t*)0;
       
@@ -458,6 +462,8 @@ size_t PrimitiveImpl::AddMesh (const media::geometry::Mesh& source, MeshBufferUs
         default:
           throw xtl::format_operation_exception ("", "Bad primitive #%u type %s", i, get_type_name (src_primitive.type));
       }
+
+      dst_primitive->base_vertex = src_primitive.base_vertex;
 
       if (src_primitive.vertex_buffer >= vertex_buffers.size ())
         throw xtl::format_operation_exception ("", "Bad primitive #%u vertex buffer index %u (vertex buffers count is %u)", i, src_primitive.vertex_buffer,

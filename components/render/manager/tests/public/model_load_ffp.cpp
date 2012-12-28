@@ -21,66 +21,77 @@ math::mat4f get_ortho_proj (float left, float right, float bottom, float top, fl
 
 void idle (Test& test, Entity& entity, Frame& frame)
 {
-  static size_t last = 0;
-  static float angle;
-
-  static size_t last_fps = 0;
-  static size_t frames_count = 0;
-
-  float dt = float (common::milliseconds () - last) / 1000.f;
-
-  if (common::milliseconds () - last > 25)
+  try
   {
-    last = common::milliseconds ();
-    return;
+    static size_t last = 0;
+    static float angle;
+
+    static size_t last_fps = 0;
+    static size_t frames_count = 0;
+
+    float dt = float (common::milliseconds () - last) / 1000.f;
+
+    if (common::milliseconds () - last > 25)
+    {
+      last = common::milliseconds ();
+      return;
+    }
+
+    if (common::milliseconds () - last_fps > 1000)
+    {
+      printf ("FPS: %.2f\n", float (frames_count)/float (common::milliseconds () - last_fps)*1000.f);
+      fflush (stdout);
+
+      last_fps = common::milliseconds ();
+      frames_count = 0;        
+      
+      return;
+    }
+    
+    static size_t last_settings_change = 0;
+    
+    if (common::milliseconds () - last_settings_change > 5000)
+    {
+      static bool state = false;
+      
+      common::PropertyMap settings;
+      
+      settings.SetProperty ("FrontCounterClockwise", state ? "true" : "false");
+      
+      test.RenderManager ().ChangeSettings (settings);    
+      
+      state = !state;
+      
+      last_settings_change = common::milliseconds ();
+    }    
+    
+    frames_count++;
+    
+    common::PropertyMap frame_properties = frame.Properties ();
+    common::PropertyMap entity_properties = entity.Properties ();  
+
+    angle += 0.05f*dt;
+    
+    entity_properties.SetProperty ("myObjectMatrix", math::rotate (math::radian (angle), math::vec3f (0, 0, 1)) *
+      math::rotate (math::radian (angle*0.2f), math::vec3f (1, 0, 0)));
+      
+    math::vec3f light_pos = math::vec3f (40 * cos (angle), 40 * sin (angle), 0.0f);
+      
+    frame_properties.SetProperty ("lightPos", light_pos);
+    frame_properties.SetProperty ("lightDir", -math::normalize (light_pos));
+
+    frame.Draw ();
+      
+    test.Window ().SwapBuffers ();
   }
-
-  if (common::milliseconds () - last_fps > 1000)
+  catch (std::exception& e)
   {
-    printf ("FPS: %.2f\n", float (frames_count)/float (common::milliseconds () - last_fps)*1000.f);
-    fflush (stdout);
-
-    last_fps = common::milliseconds ();
-    frames_count = 0;        
-    
-    return;
+    printf ("exception: %s\n    at idle", e.what ());
   }
-  
-  static size_t last_settings_change = 0;
-  
-  if (common::milliseconds () - last_settings_change > 5000)
+  catch (...)
   {
-    static bool state = false;
-    
-    common::PropertyMap settings;
-    
-    settings.SetProperty ("FrontCounterClockwise", state ? "true" : "false");
-    
-    test.RenderManager ().ChangeSettings (settings);    
-    
-    state = !state;
-    
-    last_settings_change = common::milliseconds ();
-  }    
-  
-  frames_count++;
-  
-  common::PropertyMap frame_properties = frame.Properties ();
-  common::PropertyMap entity_properties = entity.Properties ();  
-
-  angle += 0.05f*dt;
-  
-  entity_properties.SetProperty ("myObjectMatrix", math::rotate (math::radian (angle), math::vec3f (0, 0, 1)) *
-    math::rotate (math::radian (angle*0.2f), math::vec3f (1, 0, 0)));
-    
-  math::vec3f light_pos = math::vec3f (40 * cos (angle), 40 * sin (angle), 0.0f);
-    
-  frame_properties.SetProperty ("lightPos", light_pos);
-  frame_properties.SetProperty ("lightDir", -math::normalize (light_pos));
-
-  frame.Draw ();
-    
-  test.Window ().SwapBuffers ();
+    printf ("unknown exception\n    at idle");
+  }
 }
 
 int main ()
