@@ -1,0 +1,66 @@
+Results of vertex_format_custom_test:
+hash1: 6816d837
+hash2: 6816d837
+00: Name pointer is same
+01: Name pointer is same
+02: Name pointer is same
+03: Name pointer is same
+04: Name pointer is same
+05: Name pointer is same
+06: Name pointer is same
+07: Name pointer is same
+08: Name pointer is same
+09: Name pointer is same
+10: Name pointer is same
+11: Name pointer is same
+12: Name pointer is same
+13: Name pointer is same
+14: Name pointer is same
+15: Name pointer is same
+16: Name pointer is same
+17: Name pointer is same
+18: Name pointer is same
+19: Name pointer is same
+20: Name pointer is same
+21: Name pointer is same
+22: Name pointer is not same
+23: Name pointer is not same
+24: Name pointer is not same
+before remove
+vertex format (29 attributes, min_vertex_size=46):
+  attribute: semantic='position' type='float3' offset=0
+  attribute: semantic='normal' type='float3' offset=12
+  attribute: semantic='texcoord0' type='float2' offset=24
+  attribute: name='tangent' semantic='custom' type='short3' offset=32
+  attribute: name='binormal00' semantic='position' type='float3' offset=34
+  attribute: name='binormal01' semantic='position' type='float3' offset=34
+  attribute: name='binormal02' semantic='position' type='float3' offset=34
+  attribute: name='binormal03' semantic='position' type='float3' offset=34
+  attribute: name='binormal04' semantic='position' type='float3' offset=34
+  attribute: name='binormal05' semantic='position' type='float3' offset=34
+  attribute: name='binormal06' semantic='position' type='float3' offset=34
+  attribute: name='binormal07' semantic='position' type='float3' offset=34
+  attribute: name='binormal08' semantic='position' type='float3' offset=34
+  attribute: name='binormal09' semantic='position' type='float3' offset=34
+  attribute: name='binormal10' semantic='position' type='float3' offset=34
+  attribute: name='binormal11' semantic='position' type='float3' offset=34
+  attribute: name='binormal12' semantic='position' type='float3' offset=34
+  attribute: name='binormal13' semantic='position' type='float3' offset=34
+  attribute: name='binormal14' semantic='position' type='float3' offset=34
+  attribute: name='binormal15' semantic='position' type='float3' offset=34
+  attribute: name='binormal16' semantic='position' type='float3' offset=34
+  attribute: name='binormal17' semantic='position' type='float3' offset=34
+  attribute: name='binormal18' semantic='position' type='float3' offset=34
+  attribute: name='binormal19' semantic='position' type='float3' offset=34
+  attribute: name='binormal20' semantic='position' type='float3' offset=34
+  attribute: name='binormal21' semantic='position' type='float3' offset=34
+  attribute: name='binormal22' semantic='position' type='float3' offset=34
+  attribute: name='binormal23' semantic='position' type='float3' offset=34
+  attribute: name='binormal24' semantic='position' type='float3' offset=34
+after remove
+vertex format (3 attributes, min_vertex_size=38):
+  attribute: semantic='normal' type='float3' offset=12
+  attribute: semantic='texcoord0' type='float2' offset=24
+  attribute: name='tangent' semantic='custom' type='short3' offset=32
+hash1: 62f6f6f1
+hash2: 6816d837

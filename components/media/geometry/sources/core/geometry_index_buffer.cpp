@@ -249,28 +249,6 @@ void swap (IndexBuffer& ib1, IndexBuffer& ib2)
   ib1.Swap (ib2);
 }
 
-const char* get_index_type_name (IndexType type)
-{
-  switch (type)
-  {
-    case IndexType_UInt32: return "uint32";
-    case IndexType_UInt16: return "uint16";
-    case IndexType_UInt8:  return "uint8";
-    default:               throw xtl::make_argument_exception ("media::geometry::get_index_type_name", "type", type);
-  }
-}
-
-size_t get_index_type_size (IndexType type)
-{
-  switch (type)
-  {
-    case IndexType_UInt32: return sizeof (unsigned int);
-    case IndexType_UInt16: return sizeof (unsigned short);
-    case IndexType_UInt8:  return sizeof (unsigned char);
-    default:               throw xtl::make_argument_exception ("media::geometry::get_index_type_size", "type", type);
-  }
-}
-
 }
 
 }

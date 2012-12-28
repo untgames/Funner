@@ -20,6 +20,7 @@ int main ()
         verts1 [i].normal    = vec3f  ((float)(i & 1), (float)((i + 1) & 1), 0);
         verts1 [i].texcoord0 = vec2f  (0, -(float)i, 0);
         verts1 [i].color     = vec4ub (0, i, 0, i);
+        verts1 [i].tangent   = vec3f  (1.0f, 0.0f, 0.0f);
       }
     }
     

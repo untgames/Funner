@@ -9,6 +9,145 @@ const size_t SURFACES_RESERVE_SIZE = 8;     //резервируемое количество поверхнос
 const char* MAIN_VERTEX_STREAM_NAME = "main";
 
 /*
+    Текстурные касательные и бинормали
+*/
+
+struct Tangent: public media::geometry::CustomAttribute<math::vec3f>
+{
+  static const char* name () { return "tangent"; }
+
+  math::vec3f tangent;
+};
+
+struct Binormal: public media::geometry::CustomAttribute<math::vec3f>
+{
+  static const char* name () { return "binormal"; }
+
+  math::vec3f binormal;
+};
+
+template <size_t Channel> struct TexTangent;
+template <size_t Channel> struct TexBinormal;
+
+template <> struct TexTangent<0>: public media::geometry::CustomAttribute<math::vec3f, media::geometry::VertexAttributeSemantic_TexCoord0>
+{
+  static const char* name () { return "textangent0"; }
+
+  math::vec3f textangent0;
+};
+
+template <> struct TexTangent<1>: public media::geometry::CustomAttribute<math::vec3f, media::geometry::VertexAttributeSemantic_TexCoord1>
+{
+  static const char* name () { return "textangent1"; }
+
+  math::vec3f textangent1;
+};
+
+template <> struct TexTangent<2>: public media::geometry::CustomAttribute<math::vec3f, media::geometry::VertexAttributeSemantic_TexCoord2>
+{
+  static const char* name () { return "textangent2"; }
+
+  math::vec3f textangent2;
+};
+
+template <> struct TexTangent<3>: public media::geometry::CustomAttribute<math::vec3f, media::geometry::VertexAttributeSemantic_TexCoord3>
+{
+  static const char* name () { return "textangent3"; }
+
+  math::vec3f textangent3;
+};
+
+template <> struct TexTangent<4>: public media::geometry::CustomAttribute<math::vec3f, media::geometry::VertexAttributeSemantic_TexCoord4>
+{
+  static const char* name () { return "textangent4"; }
+
+  math::vec3f textangent4;
+};
+
+template <> struct TexTangent<5>: public media::geometry::CustomAttribute<math::vec3f, media::geometry::VertexAttributeSemantic_TexCoord5>
+{
+  static const char* name () { return "textangent5"; }
+
+  math::vec3f textangent5;
+};
+
+template <> struct TexTangent<6>: public media::geometry::CustomAttribute<math::vec3f, media::geometry::VertexAttributeSemantic_TexCoord6>
+{
+  static const char* name () { return "textangent6"; }
+
+  math::vec3f textangent6;
+};
+
+template <> struct TexTangent<7>: public media::geometry::CustomAttribute<math::vec3f, media::geometry::VertexAttributeSemantic_TexCoord7>
+{
+  static const char* name () { return "textangent7"; }
+
+  math::vec3f textangent7;
+};
+
+template <> struct TexBinormal<0>: public media::geometry::CustomAttribute<math::vec3f, media::geometry::VertexAttributeSemantic_TexCoord0>
+{
+  static const char* name () { return "texbinormal0"; }
+
+  math::vec3f texbinormal0;
+};
+
+template <> struct TexBinormal<1>: public media::geometry::CustomAttribute<math::vec3f, media::geometry::VertexAttributeSemantic_TexCoord1>
+{
+  static const char* name () { return "texbinormal1"; }
+
+  math::vec3f texbinormal1;
+};
+
+template <> struct TexBinormal<2>: public media::geometry::CustomAttribute<math::vec3f, media::geometry::VertexAttributeSemantic_TexCoord2>
+{
+  static const char* name () { return "texbinormal2"; }
+
+  math::vec3f texbinormal2;
+};
+
+template <> struct TexBinormal<3>: public media::geometry::CustomAttribute<math::vec3f, media::geometry::VertexAttributeSemantic_TexCoord3>
+{
+  static const char* name () { return "texbinormal3"; }
+
+  math::vec3f texbinormal3;
+};
+
+template <> struct TexBinormal<4>: public media::geometry::CustomAttribute<math::vec3f, media::geometry::VertexAttributeSemantic_TexCoord4>
+{
+  static const char* name () { return "texbinormal4"; }
+
+  math::vec3f texbinormal4;
+};
+
+template <> struct TexBinormal<5>: public media::geometry::CustomAttribute<math::vec3f, media::geometry::VertexAttributeSemantic_TexCoord5>
+{
+  static const char* name () { return "texbinormal5"; }
+
+  math::vec3f texbinormal5;
+};
+
+template <> struct TexBinormal<6>: public media::geometry::CustomAttribute<math::vec3f, media::geometry::VertexAttributeSemantic_TexCoord6>
+{
+  static const char* name () { return "texbinormal6"; }
+
+  math::vec3f texbinormal6;
+};
+
+template <> struct TexBinormal<7>: public media::geometry::CustomAttribute<math::vec3f, media::geometry::VertexAttributeSemantic_TexCoord7>
+{
+  static const char* name () { return "texbinormal7"; }
+
+  math::vec3f texbinormal7;
+};
+
+template <size_t Channel> struct TexChannel: public media::geometry::TexChannel<Channel>
+{
+  typedef TexTangent<Channel>  Tangentf;
+  typedef TexBinormal<Channel> Binormalf;
+};
+
+/*
     Преобразователь данных коллады
 */
 
@@ -120,56 +259,56 @@ class Converter
     }
 
       //преобразование текстурных вершин
-    void SetVertexTexCoord (const media::collada::TexVertex& src_vertex, media::geometry::Vertex<media::geometry::TexChannel<0>::Coord3f, media::geometry::TexChannel<0>::Tangentf, media::geometry::TexChannel<0>::Binormalf>& dst_vertex)
+    void SetVertexTexCoord (const media::collada::TexVertex& src_vertex, media::geometry::Vertex<TexChannel<0>::Coord3f, TexChannel<0>::Tangentf, TexChannel<0>::Binormalf>& dst_vertex)
     {
       dst_vertex.texcoord0    = src_vertex.coord;
       dst_vertex.textangent0  = src_vertex.tangent;
       dst_vertex.texbinormal0 = src_vertex.binormal; 
     }
 
-    void SetVertexTexCoord (const media::collada::TexVertex& src_vertex, media::geometry::Vertex<media::geometry::TexChannel<1>::Coord3f, media::geometry::TexChannel<1>::Tangentf, media::geometry::TexChannel<1>::Binormalf>& dst_vertex)
+    void SetVertexTexCoord (const media::collada::TexVertex& src_vertex, media::geometry::Vertex<TexChannel<1>::Coord3f, TexChannel<1>::Tangentf, TexChannel<1>::Binormalf>& dst_vertex)
     {
       dst_vertex.texcoord1    = src_vertex.coord;
       dst_vertex.textangent1  = src_vertex.tangent;
       dst_vertex.texbinormal1 = src_vertex.binormal;       
     }
 
-    void SetVertexTexCoord (const media::collada::TexVertex& src_vertex, media::geometry::Vertex<media::geometry::TexChannel<2>::Coord3f, media::geometry::TexChannel<2>::Tangentf, media::geometry::TexChannel<2>::Binormalf>& dst_vertex)
+    void SetVertexTexCoord (const media::collada::TexVertex& src_vertex, media::geometry::Vertex<TexChannel<2>::Coord3f, TexChannel<2>::Tangentf, TexChannel<2>::Binormalf>& dst_vertex)
     {
       dst_vertex.texcoord2    = src_vertex.coord;
       dst_vertex.textangent2  = src_vertex.tangent;
       dst_vertex.texbinormal2 = src_vertex.binormal;       
     }
 
-    void SetVertexTexCoord (const media::collada::TexVertex& src_vertex, media::geometry::Vertex<media::geometry::TexChannel<3>::Coord3f, media::geometry::TexChannel<3>::Tangentf, media::geometry::TexChannel<3>::Binormalf>& dst_vertex)
+    void SetVertexTexCoord (const media::collada::TexVertex& src_vertex, media::geometry::Vertex<TexChannel<3>::Coord3f, TexChannel<3>::Tangentf, TexChannel<3>::Binormalf>& dst_vertex)
     {
       dst_vertex.texcoord3    = src_vertex.coord;
       dst_vertex.textangent3  = src_vertex.tangent;
       dst_vertex.texbinormal3 = src_vertex.binormal;       
     }
 
-    void SetVertexTexCoord (const media::collada::TexVertex& src_vertex, media::geometry::Vertex<media::geometry::TexChannel<4>::Coord3f, media::geometry::TexChannel<4>::Tangentf, media::geometry::TexChannel<4>::Binormalf>& dst_vertex)
+    void SetVertexTexCoord (const media::collada::TexVertex& src_vertex, media::geometry::Vertex<TexChannel<4>::Coord3f, TexChannel<4>::Tangentf, TexChannel<4>::Binormalf>& dst_vertex)
     {
       dst_vertex.texcoord4    = src_vertex.coord;
       dst_vertex.textangent4  = src_vertex.tangent;
       dst_vertex.texbinormal4 = src_vertex.binormal;       
     }
 
-    void SetVertexTexCoord (const media::collada::TexVertex& src_vertex, media::geometry::Vertex<media::geometry::TexChannel<5>::Coord3f, media::geometry::TexChannel<5>::Tangentf, media::geometry::TexChannel<5>::Binormalf>& dst_vertex)
+    void SetVertexTexCoord (const media::collada::TexVertex& src_vertex, media::geometry::Vertex<TexChannel<5>::Coord3f, TexChannel<5>::Tangentf, TexChannel<5>::Binormalf>& dst_vertex)
     {
       dst_vertex.texcoord5    = src_vertex.coord;
       dst_vertex.textangent5  = src_vertex.tangent;
       dst_vertex.texbinormal5 = src_vertex.binormal;       
     }
 
-    void SetVertexTexCoord (const media::collada::TexVertex& src_vertex, media::geometry::Vertex<media::geometry::TexChannel<6>::Coord3f, media::geometry::TexChannel<6>::Tangentf, media::geometry::TexChannel<6>::Binormalf>& dst_vertex)
+    void SetVertexTexCoord (const media::collada::TexVertex& src_vertex, media::geometry::Vertex<TexChannel<6>::Coord3f, TexChannel<6>::Tangentf, TexChannel<6>::Binormalf>& dst_vertex)
     {
       dst_vertex.texcoord6    = src_vertex.coord;
       dst_vertex.textangent6  = src_vertex.tangent;
       dst_vertex.texbinormal6 = src_vertex.binormal;       
     }
 
-    void SetVertexTexCoord (const media::collada::TexVertex& src_vertex, media::geometry::Vertex<media::geometry::TexChannel<7>::Coord3f, media::geometry::TexChannel<7>::Tangentf, media::geometry::TexChannel<7>::Binormalf>& dst_vertex)
+    void SetVertexTexCoord (const media::collada::TexVertex& src_vertex, media::geometry::Vertex<TexChannel<7>::Coord3f, TexChannel<7>::Tangentf, TexChannel<7>::Binormalf>& dst_vertex)
     {
       dst_vertex.texcoord7    = src_vertex.coord;
       dst_vertex.textangent7  = src_vertex.tangent;
@@ -179,9 +318,9 @@ class Converter
     template<size_t channel_index>
     media::geometry::VertexStream CreateTexVertices (const media::collada::Surface& src_surface)
     {
-      typedef media::geometry::Vertex<typename media::geometry::TexChannel<channel_index>::Coord3f,
-                                      typename media::geometry::TexChannel<channel_index>::Tangentf,
-                                      typename media::geometry::TexChannel<channel_index>::Binormalf> ColladaTexVertex;
+      typedef media::geometry::Vertex<typename TexChannel<channel_index>::Coord3f,
+                                      typename TexChannel<channel_index>::Tangentf,
+                                      typename TexChannel<channel_index>::Binormalf> ColladaTexVertex;
 
       size_t vertices_count = src_surface.VerticesCount ();
 
@@ -206,8 +345,7 @@ class Converter
       //преобразование текстурных вершин с цветами
     media::geometry::VertexStream CreateTexColoredVertices (const media::collada::Surface& src_surface, size_t tex_channel_index, size_t color_channel_index)
     {
-      typedef media::geometry::Vertex<media::geometry::Color3f, media::geometry::TexChannel<0>::Coord3f,
-                                      media::geometry::Tangentf, media::geometry::Binormalf> ColladaTexVertex;
+      typedef media::geometry::Vertex<media::geometry::Color3f, TexChannel<0>::Coord3f, Tangent, Binormal> ColladaTexVertex;
 
       size_t vertices_count = src_surface.VerticesCount ();
 
@@ -379,8 +517,8 @@ class Converter
 
         const media::geometry::VertexStream& vs = vs_iter->second;
 
-        bool   tangent_found = false;
-        size_t tangent_offset;
+        bool   tangent_found  = false;
+        size_t tangent_offset = 0;
 
         const media::geometry::VertexFormat& vertex_format = vs.Format ();
 
@@ -388,21 +526,11 @@ class Converter
         {
           const media::geometry::VertexAttribute& attribute = vertex_format.Attribute (i);
 
-          switch (attribute.semantic)
-          {
-            case media::geometry::VertexAttributeSemantic_TexTangent0:
-            case media::geometry::VertexAttributeSemantic_TexTangent1:
-            case media::geometry::VertexAttributeSemantic_TexTangent2:
-            case media::geometry::VertexAttributeSemantic_TexTangent3:
-            case media::geometry::VertexAttributeSemantic_TexTangent4:
-            case media::geometry::VertexAttributeSemantic_TexTangent5:
-            case media::geometry::VertexAttributeSemantic_TexTangent6:
-            case media::geometry::VertexAttributeSemantic_TexTangent7:
-              tangent_found = true;
-              break;
-            default:
-              break;
-          }
+          static const char* TANGENT_PREFIX        = "textangent";
+          static size_t      TANGENT_PREFIX_LENGTH = strlen (TANGENT_PREFIX);
+
+          if (!strncmp (attribute.name, TANGENT_PREFIX, TANGENT_PREFIX_LENGTH))
+            tangent_found = true;
 
           if (tangent_found)
           {

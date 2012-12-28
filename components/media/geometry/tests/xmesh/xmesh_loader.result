@@ -1,9 +1,9 @@
 Results of xmesh_loader_test:
-data/test.xmesh(65): warning: node 'primitive': Empty primitive
+data/test.xmesh(68): warning: node 'primitive': Empty primitive
 <?xml version="1.0" encoding="utf-8"?>
 <mesh_library>
   <vertex_streams>
-    <vertex_stream id="vs#1" vertices_count="4" vertex_size="36">
+    <vertex_stream id="vs#1" vertices_count="4" vertex_size="48">
       <channel semantic="position" type="float3" offset="0">
         0 0 0 1 2 3 2 4 6 3 6 9
       </channel>
@@ -15,6 +15,9 @@ data/test.xmesh(65): warning: node 'primitive': Empty primitive
       </channel>
       <channel semantic="texcoord0" type="float2" offset="28">
         0 -0 0 -1 0 -2 0 -3
+      </channel>
+      <channel name="tangent" type="float3" offset="36">
+        1 0 0 1 0 0 1 0 0 1 0 0
       </channel>
     </vertex_stream>
     <vertex_stream id="vs#2" vertices_count="4" vertex_size="20">

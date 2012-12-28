@@ -81,8 +81,10 @@ class XmlMeshLibraryLoader
     {
       static const char* METHOD_NAME = "media::geometry::XmlMeshLibraryLoader::ParseVertexFormatChannel";
 
-      const char              *semantic_string = get<const char*> (*channel_iter, "semantic"),
-                              *type_string     = get<const char*> (*channel_iter, "type");
+      const char *name            = get<const char*> (*channel_iter, "name", ""),
+                 *semantic_string = *name ? get<const char*> (*channel_iter, "semantic", "custom") : get<const char*> (*channel_iter, "semantic"),
+                 *type_string     = get<const char*> (*channel_iter, "type");
+
       VertexAttributeSemantic semantic         = get_vertex_attribute_semantic (semantic_string);
       VertexAttributeType     type             = get_vertex_attribute_type (type_string);
       size_t                  offset           = get<size_t> (*channel_iter, "offset");
@@ -93,7 +95,7 @@ class XmlMeshLibraryLoader
       if (type == VertexAttributeType_Num)
         throw xtl::make_argument_exception (METHOD_NAME, "type", type_string);
 
-      vertex_format.AddAttribute (semantic, type, offset);
+      vertex_format.AddAttribute (name, semantic, type, offset);
     }
     
       //получение итератора на данные вершинного потока
@@ -292,7 +294,8 @@ class XmlMeshLibraryLoader
       const char*   material            = get<const char*> (*primitive_iter, "material", "");
       size_t        vertex_buffer_index = get<size_t> (*primitive_iter, "vertex_buffer"),
                     first               = get<size_t> (*primitive_iter, "first"),
-                    count               = get<size_t> (*primitive_iter, "count");
+                    count               = get<size_t> (*primitive_iter, "count"),
+                    base_vertex         = get<size_t> (*primitive_iter, "base_vertex", 0u);
 
       if (type >= PrimitiveType_Num)
         throw xtl::make_argument_exception (METHOD_NAME, "type", type_string);
@@ -335,13 +338,16 @@ class XmlMeshLibraryLoader
       if (count > max_primitives_count)
         throw xtl::make_range_exception (METHOD_NAME, "count", count, max_primitives_count + 1);
 
+      if (base_vertex >= vertices_count)
+        throw xtl::make_range_exception (METHOD_NAME, "base_vertex", base_vertex, vertices_count);
+
       if (!count)
       {
         primitive_iter->Log ().Warning (*primitive_iter, "Empty primitive");
         return;
       }
 
-      mesh.AddPrimitive (type, vertex_buffer_index, first, count, material);
+      mesh.AddPrimitive (type, vertex_buffer_index, first, count, base_vertex, material);
     }
     
       //разбор меша

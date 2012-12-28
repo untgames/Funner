@@ -34,12 +34,23 @@ namespace bin_mesh_saver
 */
 
 const char HEADER [4] = {'B', 'M', 'S', 'H'};
-const int VERSION = 1;
+const int VERSION = 2;
 
 void file_write (OutputFile& file, const void* data, size_t size)
 {
   if (file.Write (data, size) != size)
     throw xtl::format_operation_exception ("media::geometry::BinMeshLibrarySaver", "Can't write data to file");
+}
+
+void file_write (OutputFile& file, const char* string)
+{
+  if (!string)
+    throw xtl::make_null_argument_exception ("media::geometry::BinMeshSaver", "string");
+
+  unsigned int length = strlen (string);
+
+  file_write (file, &length, sizeof (length));
+  file_write (file, string, length);
 }
 
 /*
@@ -82,6 +93,7 @@ class BinMeshLibrarySaver
         file_write (result_file, &attribute.semantic, sizeof (attribute.semantic));
         file_write (result_file, &attribute.type,     sizeof (attribute.type));
         file_write (result_file, &attribute.offset,   sizeof (attribute.offset));
+        file_write (result_file, attribute.name);
       }
 
       file_write (result_file, vs.Data (), vertices_count * vertex_size);
@@ -238,6 +250,7 @@ class BinMeshLibrarySaver
       file_write (result_file, &primitive.vertex_buffer, sizeof (primitive.vertex_buffer));
       file_write (result_file, &primitive.first, sizeof (primitive.first));
       file_write (result_file, &primitive.count, sizeof (primitive.count));
+      file_write (result_file, &primitive.base_vertex, sizeof (primitive.base_vertex));
     }
 
       //сохранение примитивов

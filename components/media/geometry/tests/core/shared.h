@@ -3,7 +3,11 @@
 
 #include <stdio.h>
 #include <exception>
+
+#include <common/strlib.h>
+
 #include <media/mesh.h>
+
 #include <xtl/function.h>
 #include <xtl/iterator.h>
 
@@ -11,13 +15,38 @@ using namespace media::geometry;
 using namespace media;
 using namespace math;
 
+template <class T> struct Tangent: public CustomAttribute<math::vector<T, 3> >
+{
+  static const char* name () { return "tangent"; }
+
+  math::vector<T, 3> tangent;
+};
+
+template <class T> struct Binormal: public CustomAttribute<math::vector<T, 3> >
+{
+  static const char* name () { return "binormal"; }
+
+  math::vector<T, 3> binormal;
+};
+
+typedef Tangent<signed short> Tangents;
+typedef Binormal<float>       Binormalf;
+
 typedef Vertex<Position3f, Normalf, Color4ub, TexChannel<0>::Coord2f> CustomVertex;
 
 //вывод вершинного атрибута
 void dump (const VertexAttribute& attribute)
 {
-  printf ("  attribute: semantic='%s' type='%s' offset=%u\n", get_semantic_name (attribute.semantic),
-          get_type_name (attribute.type), attribute.offset);
+  if (*attribute.name)
+  {
+    printf ("  attribute: name='%s' semantic='%s' type='%s' offset=%u\n", attribute.name, get_semantic_name (attribute.semantic),
+            get_type_name (attribute.type), attribute.offset);
+  }
+  else
+  {
+    printf ("  attribute: semantic='%s' type='%s' offset=%u\n", get_semantic_name (attribute.semantic),
+            get_type_name (attribute.type), attribute.offset);
+  }
 }
 
 //вывод формата меша
