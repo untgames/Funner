@@ -38,16 +38,6 @@ struct IPhoneApplication::Impl : public IApplicationListener
   {
     signals ("MemoryWarning");
   }
-
-  void OnActive ()
-  {
-    signals ("Application active");
-  }
-
-  void OnInactive ()
-  {
-    signals ("Application inactive");
-  }
 };
 
 /*

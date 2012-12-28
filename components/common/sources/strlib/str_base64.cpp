@@ -40,7 +40,15 @@ void encode_base64 (size_t src_buffer_size, const void* src_buffer, stl::string&
   if (dst_length < 0)
     throw xtl::format_operation_exception ("common::encode_base64", "::base64_encode_block failed");
     
-  result.fast_resize (saved_result_size + (size_t)dst_length);
+  int end_length = base64_encode_blockend (&result [saved_result_size + (size_t)dst_length], &state);
+  
+  if (end_length < 0)
+    throw xtl::format_operation_exception ("common::encode_base64", "::base64_encode_blockend failed");  
+
+  result.fast_resize (saved_result_size + (size_t)dst_length + (size_t)end_length);
+  
+  if (result [result.size () - 1] == '\n')
+    result.pop_back ();
 }
 
 void decode_base64 (size_t src_buffer_size, const char* src_buffer, stl::string& result)

@@ -118,7 +118,7 @@ void pthread_cond_wait (pthread_cond_t *cv, pthread_mutex_t *external_mutex)
   {
     // Always regain the external mutex since that's the guarantee we
     // give to our callers. 
-    DWORD result = WaitForSingleObject (*external_mutex, 0);
+    DWORD result = WaitForSingleObject (*external_mutex, INFINITE);
     
     if (result != WAIT_OBJECT_0)
       raise_error ("::WaitForSingleObject");

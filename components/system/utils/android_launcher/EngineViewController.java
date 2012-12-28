@@ -10,7 +10,7 @@ import android.view.MotionEvent;
 import android.view.KeyEvent;
 import android.graphics.Canvas;
 import android.graphics.Rect;
-import android.widget.FrameLayout;
+import android.widget.AbsoluteLayout;
 import android.view.InputDevice;
 import android.content.Context;
 import android.util.*;
@@ -93,13 +93,28 @@ public class EngineViewController implements View.OnTouchListener, View.OnKeyLis
     return result;
   }
   
+  void setLayout (int left, int top, int right, int bottom)
+  {
+    AbsoluteLayout.LayoutParams params = (AbsoluteLayout.LayoutParams)view.getLayoutParams ();
+    
+    params.x      = left;
+    params.y      = top;
+    params.width  = right - left;
+    params.height = bottom - top;
+    
+    view.requestLayout ();
+  }
+  
   public void maximizeThreadSafe ()
   {
     UiDispatch.run (view, new UiRunnable () {
       public Object run ()
       {
-        view.setLayoutParams (new FrameLayout.LayoutParams (FrameLayout.LayoutParams.FILL_PARENT, FrameLayout.LayoutParams.FILL_PARENT));
-        
+        ViewGroup parent = (ViewGroup)view.getParent ();
+
+        setLayout (parent.getLeft () + parent.getPaddingLeft (), parent.getTop () + parent.getPaddingTop (), 
+          parent.getRight () - parent.getPaddingRight (), parent.getBottom () - parent.getPaddingBottom ());          
+
         return null;
       }
     });
@@ -158,7 +173,7 @@ public class EngineViewController implements View.OnTouchListener, View.OnKeyLis
     UiDispatch.run (view, new UiRunnable () {
       public Object run ()
       {
-        view.layout (left, top, right, bottom);
+        setLayout (left, top, right, bottom);
         
         return null;
       }
@@ -183,6 +198,7 @@ public class EngineViewController implements View.OnTouchListener, View.OnKeyLis
       public Object run ()
       {
         view.setVisibility (visibility);
+//request layout???
         
         return null;
       }

@@ -58,8 +58,9 @@ void bind_operation_status_library (Environment& environment)
 {
   InvokerRegistry lib = environment.Library (OPERATION_STATUS_LIBRARY);
 
-  lib.Register ("get_Success", make_const (OperationStatus_Success));
-  lib.Register ("get_Failure", make_const (OperationStatus_Failure));
+  lib.Register ("get_Success",  make_const (OperationStatus_Success));
+  lib.Register ("get_Canceled", make_const (OperationStatus_Canceled));
+  lib.Register ("get_Failure",  make_const (OperationStatus_Failure));
 }
 
 Achievement create_achievement ()
@@ -249,6 +250,17 @@ void send_score (Session& session, const Score& score, const LoadCallback& callb
   session.SendScore (score, xtl::bind (&on_score_sent, _1, _2, callback), properties);
 }
 
+void on_logged_in (OperationStatus status, const char* error, const LoadCallback& callback)
+{
+  if (callback)
+    callback (xtl::any (), status, error);
+}
+
+void login (Session& session, const LoadCallback& callback, const common::PropertyMap& properties)
+{
+  session.LogIn (xtl::bind (&on_logged_in, _1, _2, callback), properties);
+}
+
 void bind_session_library (Environment& environment)
 {
   InvokerRegistry lib = environment.Library (SESSION_LIBRARY);
@@ -257,7 +269,7 @@ void bind_session_library (Environment& environment)
   lib.Register ("get_Description",    make_invoker (&Session::Description));
   lib.Register ("get_CurrentUser",    make_invoker (xtl::implicit_cast<const User& (Session::*) () const> (&Session::CurrentUser)));
   lib.Register ("get_IsUserLoggedIn", make_invoker (&Session::IsUserLoggedIn));
-  lib.Register ("LogIn",              make_invoker (&Session::LogIn));
+  lib.Register ("LogIn",              make_invoker (&login));
   lib.Register ("LogOut",             make_invoker (&Session::LogOut));
   lib.Register ("ShowWindow",         make_invoker (
       make_invoker (&Session::ShowWindow),

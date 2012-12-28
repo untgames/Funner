@@ -94,14 +94,30 @@ void JsonLexer::ReadSymbolReference (char*& write_position)
     char* symbol_code_start = position + 2;
     int   base              = 16;
 
-    char*         symbol_code_end = 0;
-    unsigned long symbol_code     = strtoul (symbol_code_start, &symbol_code_end, base);
+    char code_buffer [5];
+    int  buffer_size = 0;
 
-    if (!symbol_code || !symbol_code_end || symbol_code_end - symbol_code_start != 4)
+    for (; buffer_size < 4 && *symbol_code_start; buffer_size++, symbol_code_start++)
+      code_buffer [buffer_size] = *symbol_code_start;
+
+    if (buffer_size != 4)
+    {
       SetError (JsonLexerStatus_InvalidCharacterReference, current_token);
+      return;
+    }
+
+    code_buffer [buffer_size] = 0;
+
+    char*         symbol_code_end = 0;
+    unsigned long symbol_code     = strtoul (code_buffer, &symbol_code_end, base);
+
+    if (!symbol_code || !symbol_code_end || symbol_code_end - code_buffer != 4)
+    {
+      SetError (JsonLexerStatus_InvalidCharacterReference, current_token);
+    }
     else
     {
-      position = symbol_code_end - 1;
+      position += 5;
 
       unsigned char utf8_buffer [MAX_UTF8_CHAR_SIZE];
 

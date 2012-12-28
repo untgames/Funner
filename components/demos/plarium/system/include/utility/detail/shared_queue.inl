@@ -7,7 +7,7 @@ SharedQueue<T>::SharedQueue (size_t size)
 template <typename T>
 SharedQueue<T>::~SharedQueue ()
 {
-  plarium::system::Lock lock (mutex);
+  mutex.Lock ();
 
   while (!items.empty ())
   {

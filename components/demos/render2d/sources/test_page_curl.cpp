@@ -36,6 +36,8 @@ struct Test
     curl->SetPageMaterial       (PageCurlPageType_FrontRight, "page4");
     curl->SetCornerShadowOffset (0.1f);
     curl->SetCurlPointPosition  (0.1f, 0.1f);
+    curl->SetRigidPage          (true);
+    curl->SetRigidPagePerspectiveFactor (1.2f);
 
     curl->BindToScene (scene);
 

@@ -97,6 +97,18 @@ class ApplicationDelegateImpl: public IApplicationDelegate, public xtl::referenc
         listener->OnExit (0);
     }
 
+    void OnResume ()
+    {
+      if (listener)
+        listener->OnResume ();
+    }
+
+    void OnPause ()
+    {
+      if (listener)
+        listener->OnPause ();
+    }
+
 ///Подсчёт ссылок
     void AddRef ()
     {
@@ -256,19 +268,19 @@ typedef stl::vector<syslib::iphone::IApplicationListener*> ListenerArray;
 
 -(void) applicationWillResignActive:(UIApplication*)application
 {
-  for (ListenerArray::iterator iter = impl.listeners->begin (), end = impl.listeners->end (); iter != end; ++iter)
-    (*iter)->OnInactive ();
-
   impl.idle_timer.paused = YES;
   [impl.idle_timer invalidate];
+
+  if (application_delegate)
+    application_delegate->OnPause ();
 }
 
 -(void) applicationDidBecomeActive:(UIApplication*)application
 {
-  for (ListenerArray::iterator iter = impl.listeners->begin (), end = impl.listeners->end (); iter != end; ++iter)
-    (*iter)->OnActive ();
-
   [impl initIdleTimer];
+
+  if (application_delegate)
+    application_delegate->OnResume ();
 }
 
 -(NSUInteger)application:(UIApplication*)application supportedInterfaceOrientationsForWindow:(UIWindow*)window
@@ -388,10 +400,12 @@ void IPhoneApplicationManager::GetSystemProperties (common::PropertyMap& propert
 {
   NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
 
+  NSString* system_version = [[UIDevice currentDevice] systemVersion];
+
   properties.SetProperty ("Operating System", "iOS");
   properties.SetProperty ("Platform", UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad ? "pad" : "phone");
   properties.SetProperty ("Language", [((NSString*)[[NSLocale preferredLanguages] objectAtIndex:0]) UTF8String]);
-  properties.SetProperty ("OSVersion", [[[UIDevice currentDevice] systemVersion] UTF8String]);
+  properties.SetProperty ("OSVersion", [system_version UTF8String]);
 
   NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
 
@@ -399,14 +413,21 @@ void IPhoneApplicationManager::GetSystemProperties (common::PropertyMap& propert
 
   if (!uuid)
   {
-    CFUUIDRef cf_uuid = CFUUIDCreate (0);
+    if ([system_version compare:@"6.0" options:NSNumericSearch] != NSOrderedAscending)
+    {
+      uuid = [[[UIDevice currentDevice] identifierForVendor] UUIDString];
+    }
+    else
+    {
+      CFUUIDRef cf_uuid = CFUUIDCreate (0);
 
-    uuid = [(NSString*)CFUUIDCreateString (0, cf_uuid) autorelease];
+      uuid = [(NSString*)CFUUIDCreateString (0, cf_uuid) autorelease];
 
-    CFRelease (cf_uuid);
+      CFRelease (cf_uuid);
 
-    [defaults setObject:uuid forKey:USER_DEFAULTS_UUID];
-    [defaults synchronize];
+      [defaults setObject:uuid forKey:USER_DEFAULTS_UUID];
+      [defaults synchronize];
+    }
   }
 
   properties.SetProperty ("UUID", [uuid UTF8String]);

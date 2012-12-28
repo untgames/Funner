@@ -2,12 +2,175 @@
 #import <Foundation/NSBundle.h>
 #import <Foundation/NSFileManager.h>
 
+#import <UIKit/UIApplication.h>
+#import <UIKit/UIImage.h>
+#import <UIKit/UIImageView.h>
+#import <UIKit/UIViewController.h>
+#import <UIKit/UIScreen.h>
+#import <UIKit/UIWindow.h>
+
+#import "Tracking.h"
+
 #include <cstdio>
 
 #include <launcher/application.h>
 
 using namespace engine;
 using namespace plarium::launcher;
+
+static NSString* PHONE_ADX_URL_SCHEME = @"ADX1144";
+static NSString* PAD_ADX_URL_SCHEME   = @"ADX1145";
+static NSString* PHONE_APPLE_ID       = @"543831789";
+static NSString* PAD_APPLE_ID         = @"586574454";
+
+@interface Startup : NSObject
+{
+  UIImageView* imageView;
+  NSTimer*     fadeOutTimer;
+}
+
+-(void)onStartup;
+
+@end
+
+@implementation Startup
+
+-(void)dealloc
+{
+  [imageView release];
+
+  [[NSNotificationCenter defaultCenter] removeObserver:self];
+
+  [super dealloc];
+}
+
+-(void)onStartup
+{
+  UIWindow* keyWindow     = [UIApplication sharedApplication].keyWindow;
+  UIView*   keyWindowView = keyWindow.rootViewController.view;
+  UIView*   parentView;
+
+  NSString* imageName;
+
+  if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)
+  {
+    imageName  = [UIScreen mainScreen].scale > 1 ? @"Default_ipad-Landscape@2x.png" : @"Default_ipad-Landscape.png";
+    parentView = keyWindowView;
+  }
+  else
+  {
+    imageName  = [UIScreen mainScreen].scale > 1 ? @"Default-568h@2x.png" : @"Default.png";
+    parentView = keyWindow;
+  }
+
+  CGRect keyWindowFrame = parentView.bounds;
+
+  if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad && keyWindowFrame.size.width < keyWindowFrame.size.height)
+  {
+    float t = keyWindowFrame.size.width;
+
+    keyWindowFrame.size.width  = keyWindowFrame.size.height;
+    keyWindowFrame.size.height = t;
+  }
+
+  [imageView removeFromSuperview];
+  [imageView release];
+  imageView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:imageName]];
+
+  imageView.contentMode = UIViewContentModeScaleAspectFill;
+
+  imageView.frame = keyWindowFrame;
+
+  [parentView addSubview:imageView];
+
+  [fadeOutTimer invalidate];
+  [fadeOutTimer release];
+  fadeOutTimer = [[NSTimer scheduledTimerWithTimeInterval:3 target:self selector:@selector (startFadeout) userInfo:nil repeats:NO] retain];
+}
+
+-(void)startFadeout
+{
+  [UIView beginAnimations:nil context:nil];
+  [UIView setAnimationDuration:0.5];
+
+  [UIView setAnimationDelegate:self];
+  [UIView setAnimationDidStopSelector:@selector(onFadedOut)];
+
+  imageView.alpha = 0;
+
+  [UIView commitAnimations];
+}
+
+-(void)onFadedOut
+{
+  [imageView removeFromSuperview];
+  [self release];
+}
+
+@end
+
+@interface TrackingWrapper : NSObject
+{
+  Tracking* tracker;
+}
+
+@end
+
+@implementation TrackingWrapper
+
+-(void)dealloc
+{
+  [tracker release];
+
+  [[NSNotificationCenter defaultCenter] removeObserver:self];
+
+  [super dealloc];
+}
+
+-(void)reportAppOpen
+{
+  if (!tracker)
+  {
+    tracker = [[Tracking alloc] init];
+    [tracker setURLScheme:UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad ? PAD_ADX_URL_SCHEME : PHONE_ADX_URL_SCHEME];
+    [tracker setClientId:@"PLR7hjus768DP"];
+    [tracker setAppleId:UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad ? PAD_APPLE_ID : PHONE_APPLE_ID];
+  }
+
+  [NSTimer scheduledTimerWithTimeInterval:0.5 target:tracker selector:@selector (reportAppOpen) userInfo:nil repeats:NO];
+}
+
+-(void)handleOpenURL:(const char*)url
+{
+  [tracker handleOpenURL:[NSURL URLWithString:[NSString stringWithUTF8String:url]]];
+}
+
+@end
+
+namespace
+{
+
+class OpenUrlHandler : public IOpenUrlHandler
+{
+  public:
+    OpenUrlHandler (TrackingWrapper* in_tracker)
+      : tracker (in_tracker)
+      {}
+
+    void HandleUrlOpen (const char* url)
+    {
+      [tracker handleOpenURL:url];
+    }
+
+  private:
+    OpenUrlHandler (const OpenUrlHandler&);             //no impl
+    OpenUrlHandler& operator = (const OpenUrlHandler&); //no impl
+
+  private:
+    TrackingWrapper* tracker;
+};
+
+}
 
 //точка входа
 int main (int argc, const char* argv [], const char* env [])
@@ -45,9 +208,25 @@ int main (int argc, const char* argv [], const char* env [])
       return 1;
 
   {
+    pool = [[NSAutoreleasePool alloc] init];
+
+    Startup* startup = [[Startup alloc] init];
+
+    TrackingWrapper* tracking = [[TrackingWrapper alloc] init];
+
+    [[NSNotificationCenter defaultCenter] addObserver:startup selector:@selector (onStartup) name:UIApplicationDidFinishLaunchingNotification object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:tracking selector:@selector (reportAppOpen) name:UIApplicationDidFinishLaunchingNotification object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:tracking selector:@selector (reportAppOpen) name:UIApplicationWillEnterForegroundNotification object:nil];
+
+    OpenUrlHandler open_url_handler (tracking);
+
     Application application;
 
+    application.SetOpenUrlHandler (&open_url_handler);
+
     application.Run (funner);
+
+    [pool release];
   }
 
   delete funner;

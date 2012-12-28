@@ -73,8 +73,6 @@ class IApplicationListener
 ///События
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     virtual void OnMemoryWarning () {}   //нехватка памяти
-    virtual void OnActive        () {}   //приложение стало активным
-    virtual void OnInactive      () {}   //приложение стало неактивным
 
   protected:
     virtual ~IApplicationListener () {}

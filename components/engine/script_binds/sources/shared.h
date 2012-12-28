@@ -29,6 +29,8 @@
 #include <math/utility.h>
 #include <math/vector.h>
 
+#include <media/image.h>
+
 #include <sg/scene_manager.h>
 #include <sg/controllers/sync_physics_to_node.h>
 #include <sg/controllers/animation.h>
@@ -38,6 +40,8 @@
 #include <physics/manager.h>
 
 #include <social/session.h>
+
+#include <store/store.h>
 
 #include <script/bind.h>
 #include <script/environment.h>

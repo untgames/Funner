@@ -10,7 +10,9 @@ namespace
 
 //constants
 const char*         APP_ID                            = "2972852";
-const char*         APP_SECRET                        = "mdKdkpp6bmZ8yrIITjUD";
+const char*         APP_SECRET                        = "f2h3o02f43h34qv9h3124vb3721432jpo32ADG";
+const char*         DEBUG_MODE_NOTIFICATION_PREFIX    = "DebugMode#";
+const char*         OPEN_URL_NOTIFICATION_PREFIX      = "ApplicationOpenURL ";
 const char*         PLARIUM_TOKEN_NOTIFICATION_PREFIX = "GetPlariumToken#";
 const size_t        SEND_QUEUE_SIZE                   = 16;
 const size_t        KEEP_ALIVE_INTERVAL               = 30000;
@@ -33,12 +35,15 @@ struct Application::Impl : public INotificationListener, public IHsConnectionEve
   unsigned short                  port;
   unsigned char*                  message_buffer;
   size_t                          message_buffer_size;
+  bool                            debug_mode;
+  IOpenUrlHandler*                open_url_handler;
 
   Impl ()
     : engine (0)
     , port (0)
     , message_buffer (0)
     , message_buffer_size (0)
+    , debug_mode (false)
   {
     HsConnectionSettings connection_settings;
 
@@ -64,6 +69,12 @@ struct Application::Impl : public INotificationListener, public IHsConnectionEve
     delete [] message_buffer;
   }
 
+  //Set open URL handler
+  void SetOpenUrlHandler (IOpenUrlHandler* handler)
+  {
+   open_url_handler = handler;
+  }
+
   void Run (engine::IEngine* in_engine)
   {
     if (engine)
@@ -75,7 +86,9 @@ struct Application::Impl : public INotificationListener, public IHsConnectionEve
     engine = in_engine;
 
     engine->AttachNotificationListener ("HsConnection *", this);
+    engine->AttachNotificationListener (format ("%s*", DEBUG_MODE_NOTIFICATION_PREFIX).c_str (), this);
     engine->AttachNotificationListener (format ("%s*", PLARIUM_TOKEN_NOTIFICATION_PREFIX).c_str (), this);
+    engine->AttachNotificationListener (format ("%s*", OPEN_URL_NOTIFICATION_PREFIX).c_str (), this);
 
     engine->Run ();
   }
@@ -86,7 +99,20 @@ struct Application::Impl : public INotificationListener, public IHsConnectionEve
 
     if (strstr (notification, PLARIUM_TOKEN_NOTIFICATION_PREFIX) == notification)
     {
-      sgi_stl::string token_source = format ("%s_%s_%s", APP_ID, notification + strlen (PLARIUM_TOKEN_NOTIFICATION_PREFIX), APP_SECRET);
+      sgi_stl::string token_component_source = format ("%s%s", APP_ID, APP_SECRET);
+
+      unsigned char token_component [16];
+
+      md5 (token_component_source.c_str (), token_component_source.size (), token_component);
+
+      char token_component_string [33];
+
+      for (size_t i = 0; i < sizeof (token_component); i++)
+        sprintf (token_component_string + i * 2, "%02x", token_component [i]);
+
+      token_component_string [32] = 0;
+
+      sgi_stl::string token_source = format ("%s_%s_%s", token_component_string, notification + strlen (PLARIUM_TOKEN_NOTIFICATION_PREFIX), APP_SECRET);
 
       unsigned char token [16];
 
@@ -100,6 +126,19 @@ struct Application::Impl : public INotificationListener, public IHsConnectionEve
       token_string [32] = 0;
 
       engine->Execute (format ("lua: OnPlariumTokenObtained ('%s')", token_string).c_str ());
+    }
+    else if (strstr (notification, DEBUG_MODE_NOTIFICATION_PREFIX) == notification)
+    {
+      debug_mode = atoi (notification + strlen (DEBUG_MODE_NOTIFICATION_PREFIX)) != 0;
+    }
+    else if (strstr (notification, OPEN_URL_NOTIFICATION_PREFIX) == notification)
+    {
+      if (open_url_handler)
+      {
+        open_url_handler->HandleUrlOpen (notification + strlen (OPEN_URL_NOTIFICATION_PREFIX));
+
+        printf ("Opened url '%s'\n", notification + strlen (OPEN_URL_NOTIFICATION_PREFIX));
+      }
     }
     else
     {
@@ -137,7 +176,8 @@ struct Application::Impl : public INotificationListener, public IHsConnectionEve
 
   void OnLogMessage (HsConnection& sender, const char* message)
   {
-    printf ("HsConnection: '%s'\n", message);
+    if (debug_mode)
+      printf ("HsConnection: '%s'\n", message);
   }
 
   void OnError (HsConnection& sender, ErrorCode code, const char* error)
@@ -230,4 +270,13 @@ Application::~Application ()
 void Application::Run (engine::IEngine* engine)
 {
   impl->Run (engine);
+}
+
+/*
+   Set open URL handler
+*/
+
+void Application::SetOpenUrlHandler (IOpenUrlHandler* handler)
+{
+  impl->SetOpenUrlHandler (handler);
 }

@@ -67,3 +67,15 @@ export.link.engine.script_binds.debug.IMPORTS       := link.engine.script_binds
 # Link debug exports
 export.link.engine.script_binds.scene_input.LINK_INCLUDES := SceneInputScriptBind
 export.link.engine.script_binds.scene_input.IMPORTS       := link.engine.script_binds link.input.scene_input
+
+# Link store exports
+export.link.engine.script_binds.store.LINK_INCLUDES := StoreScriptBind
+export.link.engine.script_binds.store.IMPORTS       := link.engine.script_binds link.store.core
+
+# Link media image exports
+export.link.engine.script_binds.media.image.LINK_INCLUDES := MediaImageScriptBind
+export.link.engine.script_binds.media.image.IMPORTS       := link.engine.script_binds link.media.image
+
+# Link render exports
+export.link.engine.script_binds.render.scene_render2d.LINK_INCLUDES := RenderScriptBind
+export.link.engine.script_binds.render.scene_render2d.IMPORTS       := link.engine.script_binds link.render.scene_render2d

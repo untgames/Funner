@@ -1,14 +1,16 @@
 #include "shared.h"
 
-#import <UIKit/UIWebView.h>
+#import <UIKit/UIActivityIndicatorView.h>
 #import <UIKit/UIViewController.h>
+#import <UIKit/UIWebView.h>
 
 using namespace syslib;
 
 @interface UIWebViewWrapper : UIWebView <UIWebViewDelegate>
 {
   @private
-    IWebViewListener* listener;
+    IWebViewListener*        listener;
+    UIActivityIndicatorView* activity_indicator;
 }
 
 -(id)initWithListener:(IWebViewListener*)in_listener;
@@ -16,6 +18,13 @@ using namespace syslib;
 @end
 
 @implementation UIWebViewWrapper
+
+-(void)dealloc
+{
+  [activity_indicator release];
+
+  [super dealloc];
+}
 
 -(id)initWithListener:(IWebViewListener*)in_listener
 {
@@ -31,17 +40,35 @@ using namespace syslib;
 
   self.hidden = YES;
 
-  self.autoresizingMask = UIViewAutoresizingFlexibleWidth  | UIViewAutoresizingFlexibleHeight;
+  self.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
   self.scalesPageToFit  = YES;
+
+  activity_indicator = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
+
+  [activity_indicator startAnimating];
 
   [[UIApplication sharedApplication].keyWindow.rootViewController.view addSubview:self];
 
   return self;
 }
 
+-(void)layoutSubviews
+{
+  [super layoutSubviews];
+
+  CGRect activity_indicator_frame = activity_indicator.frame;
+
+  activity_indicator_frame.origin.x = floor (self.bounds.size.width / 2 - activity_indicator_frame.size.width / 2);
+  activity_indicator_frame.origin.y = floor (self.bounds.size.height / 2 - activity_indicator_frame.size.height / 2);
+
+  activity_indicator.frame = activity_indicator_frame;
+}
+
 -(void)webView:(UIWebView *)webView didFailLoadWithError:(NSError *)error
 {
   listener->OnLoadFailed ([[error description] UTF8String]);
+
+  [activity_indicator removeFromSuperview];
 }
 
 -(BOOL)webView:(UIWebView *)webView shouldStartLoadWithRequest:(NSURLRequest *)request navigationType:(UIWebViewNavigationType)navigationType
@@ -52,11 +79,17 @@ using namespace syslib;
 -(void)webViewDidFinishLoad:(UIWebView *)webView
 {
   listener->OnLoadFinished ();
+
+  [activity_indicator removeFromSuperview];
 }
 
 -(void)webViewDidStartLoad:(UIWebView *)webView
 {
   listener->OnLoadStarted ([[webView.request.URL absoluteString] UTF8String]);
+
+  [self layoutSubviews];
+
+  [self addSubview:activity_indicator];
 }
 
 @end

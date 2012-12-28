@@ -37,74 +37,110 @@ void background_copy_file_notify (const FileSystem::BackgroundCopyFileCallback& 
     ActionQueue::PushAction (xtl::bind (callback, copy_state.Clone ()), ActionThread_Main);
 }
 
-void background_copy_file_impl (Action& action, const stl::string& source_file_name, const stl::string& destination_file_name, const FileSystem::BackgroundCopyFileCallback& callback, ActionThread thread, size_t buffer_size)
+//Рабочие данные процесса фонового копирования файла
+struct BackgroundCopyFileData : public xtl::reference_counter
 {
-  BackgroundCopyState copy_state;
+  BackgroundCopyState                    copy_state;            //Состояние копирования
+  File                                   input_file;            //Файл для чтения
+  File                                   output_file;           //Файл для записи
+  stl::string                            source_file_name;      //Имя исходного файла
+  stl::string                            destination_file_name; //Имя целевого файла
+  FileSystem::BackgroundCopyFileCallback callback;              //Колбек
+  ActionThread                           thread;                //Нить вызова колбека
+  size_t                                 buffer_size;           //Размер буфера копирования
+  size_t                                 bytes_copied;          //Объем скопированных данных
+  xtl::uninitialized_storage<char>       buffer;                //Буфер копирования
+  bool                                   started;               //Началось ли копирование
+  bool                                   finished;              //Завершилось ли копирование
 
+  BackgroundCopyFileData (const char* in_source_file_name, const char* in_destination_file_name,
+                          const FileSystem::BackgroundCopyFileCallback& in_callback,
+                          ActionThread in_thread, size_t in_buffer_size)
+    : source_file_name (in_source_file_name)
+    , destination_file_name (in_destination_file_name)
+    , callback (in_callback)
+    , thread (in_thread)
+    , buffer_size (in_buffer_size)
+    , bytes_copied (0)
+    , buffer (in_buffer_size)
+    , started (false)
+    , finished (false)
+    {}
+
+  ~BackgroundCopyFileData ()
+  {
+    if (!finished)
+    {
+      output_file.Close ();
+      FileSystem::Remove (destination_file_name.c_str ());
+    }
+  }
+};
+
+typedef xtl::intrusive_ptr<BackgroundCopyFileData> BackgroundCopyFileDataPtr;
+
+void background_copy_file_impl (Action& action, BackgroundCopyFileDataPtr data)
+{
   try
   {
-    StdFile input_file (source_file_name.c_str (), FileMode_Read);
-    OutputFile output_file (destination_file_name.c_str ());
-
-    if (output_file.Size ())
-      output_file.Resize (0);
-
-    xtl::uninitialized_storage<char> buffer (buffer_size);
-
-    copy_state.SetStatus (BackgroundCopyStateStatus_Started);
-    copy_state.SetFileSize (input_file.Size ());
-
-    background_copy_file_notify (callback, thread, copy_state);
-
-    copy_state.SetStatus (BackgroundCopyStateStatus_InProgress);
-
-    size_t bytes_copied = 0;
-
-    while (!input_file.Eof ())
+    if (data->started)
     {
-      if (action.IsCanceled ())
+      if (data->input_file.Eof ())
       {
-        output_file.Close ();
-        FileSystem::Remove (destination_file_name.c_str ());
+        data->output_file.Close ();
 
-        copy_state.SetStatus (BackgroundCopyStateStatus_Canceled);
-        background_copy_file_notify (callback, thread, copy_state);
+        data->copy_state.SetStatus (BackgroundCopyStateStatus_Finished);
+        background_copy_file_notify (data->callback, data->thread, data->copy_state);
+        action.Cancel ();
 
-        return;
+        data->finished = true;
       }
+      else
+      {
+        size_t read_size = data->input_file.Read (data->buffer.data (), data->buffer.size ());
 
-      size_t read_size = input_file.Read (buffer.data (), buffer.size ());
+        if (!read_size && !data->input_file.Eof ())
+          throw xtl::format_operation_exception ("", "Internal error: can't read input file");
 
-      if (!read_size)
-        break;
+        data->output_file.Write (data->buffer.data (), read_size);
 
-      output_file.Write (buffer.data (), read_size);
+        data->bytes_copied += read_size;
 
-      bytes_copied += read_size;
-
-      copy_state.SetBytesCopied (bytes_copied);
-      background_copy_file_notify (callback, thread, copy_state);
+        data->copy_state.SetBytesCopied (data->bytes_copied);
+        background_copy_file_notify (data->callback, data->thread, data->copy_state);
+      }
     }
+    else
+    {
+      data->input_file  = StdFile    (data->source_file_name.c_str (), FileMode_Read);
+      data->output_file = OutputFile (data->destination_file_name.c_str ());
 
-    if (!input_file.Eof ())
-      throw xtl::format_operation_exception ("", "Internal error: can't read input file");
+      if (data->output_file.Size ())
+        data->output_file.Resize (0);
 
-    copy_state.SetStatus (BackgroundCopyStateStatus_Finished);
-    background_copy_file_notify (callback, thread, copy_state);
+      data->copy_state.SetStatus (BackgroundCopyStateStatus_Started);
+      data->copy_state.SetFileSize (data->input_file.Size ());
+
+      background_copy_file_notify (data->callback, data->thread, data->copy_state);
+
+      data->copy_state.SetStatus (BackgroundCopyStateStatus_InProgress);
+
+      data->started = true;
+    }
   }
-  catch (xtl::exception& e)
+  catch (std::exception& e)
   {
-    copy_state.SetStatus (BackgroundCopyStateStatus_Failed);
-    copy_state.SetStatusText (e.what ());
-    background_copy_file_notify (callback, thread, copy_state);
-    throw;
+    data->copy_state.SetStatus (BackgroundCopyStateStatus_Failed);
+    data->copy_state.SetStatusText (e.what ());
+    background_copy_file_notify (data->callback, data->thread, data->copy_state);
+    action.Cancel ();
   }
   catch (...)
   {
-    copy_state.SetStatus (BackgroundCopyStateStatus_Failed);
-    copy_state.SetStatusText ("Unknown exception");
-    background_copy_file_notify (callback, thread, copy_state);
-    throw;
+    data->copy_state.SetStatus (BackgroundCopyStateStatus_Failed);
+    data->copy_state.SetStatusText ("Unknown exception");
+    background_copy_file_notify (data->callback, data->thread, data->copy_state);
+    action.Cancel ();
   }
 }
 
@@ -1119,6 +1155,9 @@ void FileSystemImpl::Remove (const char* src_file_name)
   {
     ICustomFileSystemPtr file_system = FindFileSystem (src_file_name, file_name, &prefix);
 
+    if (!file_name.empty () && file_name [file_name.size () - 1] == '/')
+      file_name.pop_back ();
+
     FileInfo info;
     bool     is_dir = false;
 
@@ -1743,6 +1782,7 @@ Action FileSystem::BackgroundCopyFile (const char* source_file_name, const char*
   if (!buffer_size)
     buffer_size = 4096;
 
-  return ActionQueue::PushAction (xtl::bind (&background_copy_file_impl, _1, stl::string (source_file_name), stl::string (destination_file_name),
-                                              callback, thread, buffer_size), ActionThread_Background);
+  BackgroundCopyFileDataPtr data (new BackgroundCopyFileData (source_file_name, destination_file_name, callback, thread, buffer_size), false);
+
+  return ActionQueue::PushAction (xtl::bind (&background_copy_file_impl, _1, data), ActionThread_Background, 0, 0);
 }

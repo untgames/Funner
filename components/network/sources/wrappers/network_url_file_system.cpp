@@ -27,6 +27,7 @@ class UrlFile: public Lockable
     UrlFile (const char* in_url, bool in_is_post)
       : url (in_url)
       , is_post (in_is_post)
+      , is_finish_sending (false)
       , end_of_request (false)
       , log (LOG_NAME)
     {
@@ -79,17 +80,17 @@ class UrlFile: public Lockable
       {
         if (end_of_request)
           return;          
+
+        if (is_finish_sending)
+          throw xtl::format_operation_exception ("", "URL query '%s' processing failed. Attempt to finish sending after error", url.c_str ());
+
+        is_finish_sending = true;
           
         stl::string params = is_post ? common::format ("method=post send_size=%u", request_file.Size ()).c_str () : "";
           
         log.Printf (params.empty () ? "Starting URL query '%s'" : "Starting URL query '%s' (params='%s')", url.c_str (), params.c_str ());
           
         connection = UrlConnection (url.c_str (), params.c_str ());
-        
-        const char* status = connection.Status ();
-        
-        if (strcmp (status, "Ok"))
-          throw xtl::format_operation_exception ("", "URL query '%s' failed. Status is: %s", url.c_str (), status);
         
         xtl::uninitialized_storage<char> buffer (DOWNLOAD_BUFFER_SIZE);
         
@@ -122,6 +123,11 @@ class UrlFile: public Lockable
           common::FileSystem::Remove (request_file_path.c_str ());
         }        
 
+        const char* status = connection.Status ();
+
+        if (strcmp (status, "Ok"))
+          throw xtl::format_operation_exception ("", "URL query '%s' failed. Status is: %s", url.c_str (), status);
+
         end_of_request = true;
       }
       catch (xtl::exception& e)
@@ -132,12 +138,13 @@ class UrlFile: public Lockable
     }
     
   private:
-    UrlConnection connection;     //соединение
-    stl::string   url;            //URL ресурса
-    File          request_file;   //файла записи данных запроса
-    bool          is_post;        //является ли соедиенние POST запросом
-    bool          end_of_request; //флаг - запрос отправлен  
-    common::Log   log;            //поток протоколирования
+    UrlConnection connection;        //соединение
+    stl::string   url;               //URL ресурса
+    File          request_file;      //файла записи данных запроса
+    bool          is_post;           //является ли соедиенние POST запросом
+    bool          is_finish_sending; //флаг - завершение передачи
+    bool          end_of_request;    //флаг - запрос отправлен  
+    common::Log   log;               //поток протоколирования
 };
 
 class SeekableUrlFile: public UrlFile
@@ -305,8 +312,8 @@ class StreamUrlFile: public UrlFile
 ///Конструктор
     StreamUrlFile (const char* in_url, bool in_is_post)
       : UrlFile (in_url, in_is_post)
-      , file_size ()
       , file_pos ()
+      , is_eof ()
     {
     }  
 
@@ -342,14 +349,8 @@ class StreamUrlFile: public UrlFile
       
       size_t read_size = Connection ().Receive (buf, size);
       
-      if (!read_size)
-      {
-        file_pos = file_size;
-      }
-      else
-      {
-        file_pos += read_size;
-      }
+      if (read_size) file_pos += read_size;
+      else           is_eof    = true;
         
       return read_size;
     }
@@ -382,7 +383,7 @@ class StreamUrlFile: public UrlFile
 
       FinishSend ();
 
-      return file_size;
+      return Connection ().ContentLength ();
     }
     
     void Resize (filesize_t new_size)
@@ -398,7 +399,7 @@ class StreamUrlFile: public UrlFile
       if (!IsEndOfRequest ())
         return false;
 
-      return (size_t)file_pos == file_size;
+      return is_eof;
     }    
     
 ///Сброс файла на диск
@@ -413,13 +414,11 @@ class StreamUrlFile: public UrlFile
         return;
         
       UrlFile::FinishSend ();
-
-      file_size = Connection ().ContentLength ();
     }
     
   private:
-    filesize_t file_size; //размер файла
     filepos_t  file_pos;  //позиция в потоке
+    bool       is_eof;    //достигнут ли конец файла
 };
 
 /*

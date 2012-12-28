@@ -33,6 +33,11 @@ void remove_search_path (const char* path)
   FileSystem::RemoveSearchPath (path);
 }
 
+void remove_all_search_paths ()
+{
+  FileSystem::RemoveAllSearchPaths ();
+}
+
 //загрузка строки с фильтрацией определённых символов
 stl::string load_string_filter_out (const char* file_name, const char* out_filter_string)
 {
@@ -195,7 +200,6 @@ void bind_static_background_copy_state_library (Environment& environment)
   background_copy_state_status_lib.Register ("get_Started",    make_const (BackgroundCopyStateStatus_Started));
   background_copy_state_status_lib.Register ("get_InProgress", make_const (BackgroundCopyStateStatus_InProgress));
   background_copy_state_status_lib.Register ("get_Finished",   make_const (BackgroundCopyStateStatus_Finished));
-  background_copy_state_status_lib.Register ("get_Canceled",   make_const (BackgroundCopyStateStatus_Canceled));
   background_copy_state_status_lib.Register ("get_Failed",     make_const (BackgroundCopyStateStatus_Failed));
 
   environment.RegisterType<BackgroundCopyStateStatus> (COMMON_STATIC_BACKGROUND_COPY_STATE_STATUS_LIBRARY);
@@ -239,6 +243,7 @@ void bind_common_file_library (Environment& environment)
   lib.Register ("SetFileStringAttribute", make_invoker (&set_file_string_attribute));
   lib.Register ("SetFileIntAttribute",    make_invoker (&set_file_int_attribute));
   lib.Register ("RemoveFileAttribute",    make_invoker (&FileSystem::RemoveFileAttribute));
+  lib.Register ("RemoveAllSearchPaths",   make_invoker (&remove_all_search_paths));
   lib.Register ("RemoveSearchPath",       make_invoker (&remove_search_path));
   lib.Register ("BackgroundCopyFile",     make_invoker (
     make_invoker<Action (const char*, const char*, const FileSystem::BackgroundCopyFileCallback&, size_t)> (xtl::bind (&FileSystem::BackgroundCopyFile, _1, _2, _3, ActionThread_Main, _4)),

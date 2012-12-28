@@ -3,6 +3,8 @@ package com.untgames.funner.application;
 import android.view.View;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.webkit.SslErrorHandler;
+import android.net.http.SslError;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Bitmap;
@@ -30,8 +32,10 @@ public class EngineWebViewController extends EngineViewController
       controller.shouldStartLoading (url, result);
 
       UiDispatch.processMessagesInternally (result);
-
-      return !result.getValue ();
+      
+      boolean r = !result.getValue ();
+      
+      return r;
     }    
     
     @Override
@@ -62,6 +66,12 @@ public class EngineWebViewController extends EngineViewController
       controller.onLoadFailed (description);
       
       controller.setLoading (false);
+    }
+    
+    @Override
+    public void onReceivedSslError (WebView view, SslErrorHandler handler, SslError error)
+    {
+      handler.proceed (); // Ignore SSL certificate errors
     }
   }
 

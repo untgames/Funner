@@ -25,7 +25,7 @@
         "digit": "0123456789",
         "0123456789": "digit",
         "special": "`1~!@#$%^&*()_+-={':[,]}|;.</>?",
-        "hex": "\u0123\u4567\u89AB\uCDEF\uabcd\uef4A",
+        "hex": "\u0123e\u4567\u89AB\uCDEF\uabcd\uef4A",
         "true": true,
         "false": false,
         "null": null,
