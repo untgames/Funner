@@ -3,6 +3,7 @@
 
 #include <stl/hash_map>
 #include <stl/set>
+#include <stl/string>
 
 #include <xtl/common_exceptions.h>
 #include <xtl/iterator.h>

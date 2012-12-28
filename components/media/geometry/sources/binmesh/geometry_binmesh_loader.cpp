@@ -34,13 +34,28 @@ namespace bin_mesh_loader
 */
 
 const char HEADER [4] = {'B', 'M', 'S', 'H'};
-const int VERSION = 1;
+const int VERSION = 2;
 
 void file_read (InputFile& file, void* data, size_t size)
 {
   if (file.Read (data, size) != size)
     throw xtl::format_operation_exception ("media::geometry::BinMeshLibraryLoader", "Can't read data from file at %u, file size is %u",
       file.Tell (), file.Size ());
+}
+
+stl::string file_read_string (InputFile& file)
+{
+  unsigned int length = 0;
+
+  file_read (file, &length, sizeof (length));
+
+  stl::string result;
+
+  result.fast_resize (length);  
+
+  file_read (file, &result [0], length);
+
+  return result;
 }
 
 /*
@@ -61,7 +76,9 @@ class BinMeshLibraryLoader
       file_read (input_file, &type,     sizeof (type));
       file_read (input_file, &offset,   sizeof (offset));
 
-      vertex_format.AddAttribute (semantic, type, offset);
+      stl::string name = file_read_string (input_file);
+
+      vertex_format.AddAttribute (name.c_str (), semantic, type, offset);
     }
 
       //чтение вершинного потока
