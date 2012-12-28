@@ -96,6 +96,27 @@ VertexFormat& VertexFormat::operator = (const VertexFormat& vf)
   
   return *this;
 }
+
+/*
+    Клонирование  
+*/
+
+VertexFormat VertexFormat::Clone () const
+{
+  try
+  {
+    VertexFormat format;
+
+    format.AddAttributes (*this);
+
+    return format;
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("media::geometry::VertexFormat::Clone");
+    throw;
+  }
+}
   
 /*
     Количество атрибутов

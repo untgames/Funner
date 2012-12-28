@@ -18,9 +18,7 @@ int main ()
 
     printf ("hash1: %08x\n", vf1.Hash ());
 
-    VertexFormat vf2;
-
-    get_vertex_format ((CustomVertex*)0, vf2);
+    VertexFormat vf2 = vf1.Clone ();
 
     printf ("hash2: %08x\n", vf2.Hash ());
 
@@ -59,6 +57,9 @@ int main ()
     vf1.RemoveAttributes (VertexAttributeSemantic_Position);
 
     dump (vf1);
+
+    printf ("hash1: %08x\n", vf1.Hash ());
+    printf ("hash2: %08x\n", vf2.Hash ());
   }
   catch (std::exception& exception)
   {
