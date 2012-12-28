@@ -479,3 +479,12 @@ void InputStage::Bind (size_t base_vertex, size_t base_index, IndicesLayout* out
     throw;
   }  
 }
+
+/*
+    Получение имени семантики
+*/
+
+const char* InputStage::GetVertexAttributeSemanticName (VertexAttributeSemantic semantic)
+{
+  return get_semantic_name (semantic);
+}

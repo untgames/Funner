@@ -257,6 +257,12 @@ class InputLayout: virtual public IInputLayout, public ContextObject
     size_t                      attributes_hash;         //хеш атрибутов
 };
 
+//получение семантики по имени
+VertexAttributeSemantic get_semantic_by_name (const char* name);
+
+//получение имени семантики
+const char* get_semantic_name (VertexAttributeSemantic semantic);
+
 }
 
 }

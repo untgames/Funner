@@ -164,12 +164,13 @@ struct OutputStage::Impl: public ContextObject, public OutputStageState
       
       memset (&blend_desc, 0, sizeof (blend_desc));
 
-      blend_desc.blend_enable     = false;
-      blend_desc.color_write_mask = ColorWriteFlag_All;
+      blend_desc.render_target [0].blend_enable     = false;
+      blend_desc.render_target [0].color_write_mask = ColorWriteFlag_All;
+      blend_desc.independent_blend_enable           = false;
 
       default_blend_state = BlendStatePtr (new BlendState (GetContextManager (), blend_desc), false);      
       
-      blend_desc.color_write_mask = 0;
+      blend_desc.render_target [0].color_write_mask = 0;
       
       null_blend_state = BlendStatePtr (new BlendState (GetContextManager (), blend_desc), false);      
       
@@ -215,15 +216,17 @@ struct OutputStage::Impl: public ContextObject, public OutputStageState
     }
     
 ///Установка состояния уровня в контекст OpenGL
-    void Bind (bool has_render_target, bool has_depth_stencil)
+    void Bind (const bool has_render_target [DEVICE_RENDER_TARGET_SLOTS_COUNT], bool has_depth_stencil)
     {
       try
       {      
+          //TODO: MRT
+
           //установка состояния подуровня смешивания цветов        
 
         BlendState* blend_state = GetBlendState ();        
 
-        if (!blend_state || !has_render_target)
+        if (!blend_state || !has_render_target [0])
           blend_state = null_blend_state.get ();
 
         blend_state->Bind ();
@@ -399,7 +402,7 @@ IRasterizerState* OutputStage::GetRasterizerState () const
     Установка состояния уровня в контекст OpenGL
 */
 
-void OutputStage::Bind (bool has_render_target, bool has_depth_stencil_target)
+void OutputStage::Bind (const bool has_render_target [DEVICE_RENDER_TARGET_SLOTS_COUNT], bool has_depth_stencil_target)
 {
   impl->Bind (has_render_target, has_depth_stencil_target);
 }
