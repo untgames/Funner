@@ -8,10 +8,10 @@ int main ()
   {
     Test test;
     
-    IBlendState*        src_blend_state         = test.device->OSGetBlendState ();
-    IDepthStencilState* src_depth_stencil_state = test.device->OSGetDepthStencilState ();
-    IView*              src_render_target_view  = test.device->OSGetRenderTargetView ();
-    IView*              src_depth_stencil_view  = test.device->OSGetDepthStencilView ();
+    IBlendState*        src_blend_state         = test.device->GetImmediateContext ()->OSGetBlendState ();
+    IDepthStencilState* src_depth_stencil_state = test.device->GetImmediateContext ()->OSGetDepthStencilState ();
+    IView*              src_render_target_view  = test.device->GetImmediateContext ()->OSGetRenderTargetView (0);
+    IView*              src_depth_stencil_view  = test.device->GetImmediateContext ()->OSGetDepthStencilView ();
 
     StateBlockMask mask;        
 
@@ -21,32 +21,32 @@ int main ()
     
     StateBlockPtr state_block (test.device->CreateStateBlock (mask), false);
     
-    state_block->Capture ();
+    state_block->Capture (test.device->GetImmediateContext ());
     
-    test.device->OSSetBlendState (0);
-    test.device->OSSetDepthStencilState (0);
-    test.device->OSSetRenderTargets (0, 0);    
+    test.device->GetImmediateContext ()->OSSetBlendState (0);
+    test.device->GetImmediateContext ()->OSSetDepthStencilState (0);
+    test.device->GetImmediateContext ()->OSSetRenderTargets (0, 0, 0);    
     
     printf ("after reset\n");
     
-    IBlendState*        dst_blend_state         = test.device->OSGetBlendState ();
-    IDepthStencilState* dst_depth_stencil_state = test.device->OSGetDepthStencilState ();    
-    IView*              dst_render_target_view  = test.device->OSGetRenderTargetView ();
-    IView*              dst_depth_stencil_view  = test.device->OSGetDepthStencilView ();    
+    IBlendState*        dst_blend_state         = test.device->GetImmediateContext ()->OSGetBlendState ();
+    IDepthStencilState* dst_depth_stencil_state = test.device->GetImmediateContext ()->OSGetDepthStencilState ();    
+    IView*              dst_render_target_view  = test.device->GetImmediateContext ()->OSGetRenderTargetView (0);
+    IView*              dst_depth_stencil_view  = test.device->GetImmediateContext ()->OSGetDepthStencilView ();    
     
     printf ("OSGetBlendState:        %d\n", src_blend_state == dst_blend_state);
     printf ("OSGetDepthStencilState: %d\n", src_depth_stencil_state == dst_depth_stencil_state);
     printf ("OSGetRenderTargetView:  %d\n", src_render_target_view == dst_render_target_view);
     printf ("OSGetDepthStencilView:  %d\n", src_depth_stencil_view == dst_depth_stencil_view);    
     
-    state_block->Apply ();
+    state_block->Apply (test.device->GetImmediateContext ());
     
     printf ("after apply\n");    
     
-    dst_blend_state         = test.device->OSGetBlendState ();
-    dst_depth_stencil_state = test.device->OSGetDepthStencilState ();    
-    dst_render_target_view  = test.device->OSGetRenderTargetView ();
-    dst_depth_stencil_view  = test.device->OSGetDepthStencilView ();
+    dst_blend_state         = test.device->GetImmediateContext ()->OSGetBlendState ();
+    dst_depth_stencil_state = test.device->GetImmediateContext ()->OSGetDepthStencilState ();    
+    dst_render_target_view  = test.device->GetImmediateContext ()->OSGetRenderTargetView (0);
+    dst_depth_stencil_view  = test.device->GetImmediateContext ()->OSGetDepthStencilView ();
     
     printf ("OSGetBlendState:        %d\n", src_blend_state == dst_blend_state);
     printf ("OSGetDepthStencilState: %d\n", src_depth_stencil_state == dst_depth_stencil_state);

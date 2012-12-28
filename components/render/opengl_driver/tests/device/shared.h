@@ -116,6 +116,8 @@ struct Test
 //печать дескриптора blend-state
 inline void dump_desc (IBlendState& state)
 {
+  //TODO: MRT
+
   if (!&state)
   {
     printf ("Null blend state\n");
@@ -130,15 +132,15 @@ inline void dump_desc (IBlendState& state)
   state.GetDesc (desc);
   
   printf ("Blend state:\n");
-  printf ("  blend_enable:                     %s\n", desc.blend_enable ? "true" : "false");
+  printf ("  blend_enable:                     %s\n", desc.render_target [0].blend_enable ? "true" : "false");
   printf ("  sample_alpha_to_coverage:         %s\n", desc.sample_alpha_to_coverage ? "true" : "false");
-  printf ("  blend_color_operation:            %s\n", get_name (desc.blend_color_operation));
-  printf ("  blend_color_source_argument:      %s\n", get_name (desc.blend_color_source_argument));
-  printf ("  blend_color_destination_argument: %s\n", get_name (desc.blend_color_destination_argument));
-  printf ("  blend_alpha_operation:            %s\n", get_name (desc.blend_alpha_operation));  
-  printf ("  blend_alpha_source_argument:      %s\n", get_name (desc.blend_alpha_source_argument));
-  printf ("  blend_alpha_destination_argument: %s\n", get_name (desc.blend_alpha_destination_argument));  
-  printf ("  color_write_mask:                 %s\n", get_name ((ColorWriteFlag)desc.color_write_mask));
+  printf ("  blend_color_operation:            %s\n", get_name (desc.render_target [0].blend_color_operation));
+  printf ("  blend_color_source_argument:      %s\n", get_name (desc.render_target [0].blend_color_source_argument));
+  printf ("  blend_color_destination_argument: %s\n", get_name (desc.render_target [0].blend_color_destination_argument));
+  printf ("  blend_alpha_operation:            %s\n", get_name (desc.render_target [0].blend_alpha_operation));  
+  printf ("  blend_alpha_source_argument:      %s\n", get_name (desc.render_target [0].blend_alpha_source_argument));
+  printf ("  blend_alpha_destination_argument: %s\n", get_name (desc.render_target [0].blend_alpha_destination_argument));  
+  printf ("  color_write_mask:                 %s\n", get_name ((ColorWriteFlag)desc.render_target [0].color_write_mask));
 }
 
 //печать дескриптора stencil

@@ -243,13 +243,13 @@ struct Model
             switch (src_va.semantic)
             {
               case media::geometry::VertexAttributeSemantic_Position:
-                dst_va.semantic = VertexAttributeSemantic_Position;
+                dst_va.semantic = device->GetVertexAttributeSemanticName (VertexAttributeSemantic_Position);
                 break;
               case media::geometry::VertexAttributeSemantic_Normal:
-                dst_va.semantic = VertexAttributeSemantic_Normal;
+                dst_va.semantic = device->GetVertexAttributeSemanticName (VertexAttributeSemantic_Normal);
                 break;
               case media::geometry::VertexAttributeSemantic_Color:
-                dst_va.semantic = VertexAttributeSemantic_Color;
+                dst_va.semantic = device->GetVertexAttributeSemanticName (VertexAttributeSemantic_Color);
                 break;
               case media::geometry::VertexAttributeSemantic_TexCoord0:
               case media::geometry::VertexAttributeSemantic_TexCoord1:
@@ -259,7 +259,7 @@ struct Model
               case media::geometry::VertexAttributeSemantic_TexCoord5:
               case media::geometry::VertexAttributeSemantic_TexCoord6:
               case media::geometry::VertexAttributeSemantic_TexCoord7:
-                dst_va.semantic = (VertexAttributeSemantic)(VertexAttributeSemantic_TexCoord0 + src_va.semantic - media::geometry::VertexAttributeSemantic_TexCoord0);
+                dst_va.semantic = device->GetVertexAttributeSemanticName ((VertexAttributeSemantic)(VertexAttributeSemantic_TexCoord0 + src_va.semantic - media::geometry::VertexAttributeSemantic_TexCoord0));
                 break;
               default:
                 continue;
@@ -331,33 +331,35 @@ struct Model
 
   void Draw ()
   {
+    IDeviceContext& context = *device->GetImmediateContext ();
+
     for (ModelMeshArray::iterator iter=meshes.begin (); iter!=meshes.end (); ++iter)
     {
       const ModelMesh& mesh = **iter;
 
-      device->ISSetIndexBuffer (mesh.index_buffer.get ());
+      context.ISSetIndexBuffer (mesh.index_buffer.get ());
 
       for (PrimitiveArray::const_iterator iter=mesh.primitives.begin (); iter!=mesh.primitives.end (); ++iter)
       {
         const ModelPrimitive& primitive = *iter;
         ModelVertexBuffer&    vb        = *primitive.vertex_buffer;
 
-        device->ISSetInputLayout (vb.input_layout.get ());
+        context.ISSetInputLayout (vb.input_layout.get ());
 
         for (size_t i=0; i<vb.vertex_streams.size (); i++)
         {
           BufferPtr vs = vb.vertex_streams [i];
 
-          device->ISSetVertexBuffer (i, vs.get ());
+          context.ISSetVertexBuffer (i, vs.get ());
         }
 
         if (mesh.index_buffer)
         {
-          device->DrawIndexed (primitive.type, primitive.first, primitive.count, 0);
+          context.DrawIndexed (primitive.type, primitive.first, primitive.count, 0);
         }
         else
         {
-          device->Draw (primitive.type, primitive.first, primitive.count);
+          context.Draw (primitive.type, primitive.first, primitive.count);
         }
       }
     }
@@ -418,7 +420,7 @@ void idle (Test& test)
     
     MyShaderParameters my_shader_parameters;
 
-    IBuffer* cb = test.device->SSGetConstantBuffer (0);
+    IBuffer* cb = test.device->GetImmediateContext ()->SSGetConstantBuffer (0);
 
     if (!cb)
     {
@@ -529,9 +531,9 @@ int main ()
 
     cb->SetData (0, sizeof my_shader_parameters, &my_shader_parameters);
 
-    test.device->SSSetProgram (shader.get ());
-    test.device->SSSetProgramParametersLayout (program_parameters_layout.get ());
-    test.device->SSSetConstantBuffer (0, cb.get ());
+    test.device->GetImmediateContext ()->SSSetProgram (shader.get ());
+    test.device->GetImmediateContext ()->SSSetProgramParametersLayout (program_parameters_layout.get ());
+    test.device->GetImmediateContext ()->SSSetConstantBuffer (0, cb.get ());
 
     printf ("Register callbacks\n");
 

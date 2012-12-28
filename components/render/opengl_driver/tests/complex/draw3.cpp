@@ -39,7 +39,7 @@ struct MyShaderParameters2
 
 void redraw (Test& test)
 {
-  test.device->Draw (PrimitiveType_TriangleStrip, 0, 4);
+  test.device->GetImmediateContext ()->Draw (PrimitiveType_TriangleStrip, 0, 4);
 }
 
 void idle (Test& test)
@@ -58,7 +58,7 @@ void idle (Test& test)
 
   MyShaderParameters2 my_shader_parameters2;
 
-  IBuffer* cb = test.device->SSGetConstantBuffer (1);
+  IBuffer* cb = test.device->GetImmediateContext ()->SSGetConstantBuffer (1);
 
   if (!cb)
   {
@@ -118,10 +118,9 @@ int main ()
     printf ("Set input-stage\n");
 
     VertexAttribute attributes [] = {
-      {VertexAttributeSemantic_Normal, InputDataFormat_Vector3, InputDataType_Float, 0, TEST_OFFSETOF (MyVertex, normal), sizeof (MyVertex)},
-      {VertexAttributeSemantic_Position, InputDataFormat_Vector3, InputDataType_Float, 0, TEST_OFFSETOF (MyVertex, position), sizeof (MyVertex)},
-      {VertexAttributeSemantic_Color, InputDataFormat_Vector3, InputDataType_Float, 0, TEST_OFFSETOF (MyVertex, color), sizeof (MyVertex)},
-//      {VertexAttributeSemantic_TexCoord0, InputDataFormat_Vector2, InputDataType_Float, 0, TEST_OFFSETOF (MyVertex, tc), sizeof (MyVertex)},
+      {test.device->GetVertexAttributeSemanticName (VertexAttributeSemantic_Normal), InputDataFormat_Vector3, InputDataType_Float, 0, TEST_OFFSETOF (MyVertex, normal), sizeof (MyVertex)},
+      {test.device->GetVertexAttributeSemanticName (VertexAttributeSemantic_Position), InputDataFormat_Vector3, InputDataType_Float, 0, TEST_OFFSETOF (MyVertex, position), sizeof (MyVertex)},
+      {test.device->GetVertexAttributeSemanticName (VertexAttributeSemantic_Color), InputDataFormat_Vector3, InputDataType_Float, 0, TEST_OFFSETOF (MyVertex, color), sizeof (MyVertex)},
     };
 
     InputLayoutDesc layout_desc;
@@ -135,8 +134,8 @@ int main ()
 
     InputLayoutPtr layout (test.device->CreateInputLayout (layout_desc), false);
 
-    test.device->ISSetInputLayout (layout.get ());
-    test.device->ISSetVertexBuffer (0, vb.get ());
+    test.device->GetImmediateContext ()->ISSetInputLayout (layout.get ());
+    test.device->GetImmediateContext ()->ISSetVertexBuffer (0, vb.get ());
 
     printf ("Set shader stage\n");
 
@@ -186,10 +185,10 @@ int main ()
     cb->SetData (0, sizeof my_shader_parameters, &my_shader_parameters);
     cb2->SetData (0, sizeof my_shader_parameters2, &my_shader_parameters2);
 
-    test.device->SSSetProgram (shader.get ());
-    test.device->SSSetProgramParametersLayout (program_parameters_layout.get ());
-    test.device->SSSetConstantBuffer (0, cb.get ());
-    test.device->SSSetConstantBuffer (1, cb2.get ());    
+    test.device->GetImmediateContext ()->SSSetProgram (shader.get ());
+    test.device->GetImmediateContext ()->SSSetProgramParametersLayout (program_parameters_layout.get ());
+    test.device->GetImmediateContext ()->SSSetConstantBuffer (0, cb.get ());
+    test.device->GetImmediateContext ()->SSSetConstantBuffer (1, cb2.get ());    
 
     printf ("Load textures\n");
 
@@ -233,10 +232,10 @@ int main ()
     bump_texture->SetData (0, 0, 0, 0, bump_image.Width (), bump_image.Height (), PixelFormat_RGB8, bump_image.Bitmap ());
     diffuse_texture->SetData (0, 0, 0, 0, diffuse_image.Width (), diffuse_image.Height (), PixelFormat_RGB8, diffuse_image.Bitmap ());
 
-    test.device->SSSetTexture (0, bump_texture.get ());
-    test.device->SSSetSampler (0, sampler.get ());
-    test.device->SSSetTexture (1, diffuse_texture.get ());
-    test.device->SSSetSampler (1, sampler.get ());
+    test.device->GetImmediateContext ()->SSSetTexture (0, bump_texture.get ());
+    test.device->GetImmediateContext ()->SSSetSampler (0, sampler.get ());
+    test.device->GetImmediateContext ()->SSSetTexture (1, diffuse_texture.get ());
+    test.device->GetImmediateContext ()->SSSetSampler (1, sampler.get ());
 
     printf ("Register callbacks\n");
 

@@ -1,5 +1,7 @@
 #include "shared.h"
 
+//TODO: MRT
+
 size_t output_mode   = OutputMode_Default;
 size_t success_tests = 0;
 size_t wrong_tests   = 0;
@@ -42,17 +44,17 @@ void print_blend_equation (BlendOperation op, BlendArgument arg1, BlendArgument 
 
 void print_blend_desc (const BlendDesc& desc)
 {
-  printf ("color_write_mask=%s", get_name ((ColorWriteFlag)desc.color_write_mask));
+  printf ("color_write_mask=%s", get_name ((ColorWriteFlag)desc.render_target [0].color_write_mask));
   
   if (desc.sample_alpha_to_coverage)
     printf (", sample_alpha_to_coverage");
     
-  if (desc.blend_enable)
+  if (desc.render_target [0].blend_enable)
   {
     printf (", color_equation='");
-    print_blend_equation (desc.blend_color_operation, desc.blend_color_source_argument, desc.blend_color_destination_argument);
+    print_blend_equation (desc.render_target [0].blend_color_operation, desc.render_target [0].blend_color_source_argument, desc.render_target [0].blend_color_destination_argument);
     printf ("', alpha_equation='");
-    print_blend_equation (desc.blend_alpha_operation, desc.blend_alpha_source_argument, desc.blend_alpha_destination_argument);
+    print_blend_equation (desc.render_target [0].blend_alpha_operation, desc.render_target [0].blend_alpha_source_argument, desc.render_target [0].blend_alpha_destination_argument);
     printf ("'");
   }
   else
@@ -65,7 +67,7 @@ void test_blend_state (const BlendDesc& desc, IDevice* device)
 {
   try
   {
-    device->OSSetBlendState (device->CreateBlendState (desc));
+    device->GetImmediateContext ()->OSSetBlendState (device->CreateBlendState (desc));
 
     if (output_mode & OutputMode_Success)
     {      
@@ -108,21 +110,23 @@ int main ()
     output_mode = test.log_mode;
     
     BlendDesc desc;
+ 
+    memset (&desc, 0, sizeof (desc));
     
-    desc.blend_enable             = false;
-    desc.sample_alpha_to_coverage = false;
-    desc.color_write_mask         = ColorWriteFlag_All;
+    desc.render_target [0].blend_enable      = false;
+    desc.sample_alpha_to_coverage            = false;
+    desc.render_target [0].color_write_mask  = ColorWriteFlag_All;
 
-    desc.blend_color_operation            = BlendOperation_Add;
-    desc.blend_color_source_argument      = BlendArgument_Zero;
-    desc.blend_color_destination_argument = BlendArgument_Zero;    
-    desc.blend_alpha_operation            = BlendOperation_Add;
-    desc.blend_alpha_source_argument      = BlendArgument_Zero;
-    desc.blend_alpha_destination_argument = BlendArgument_Zero;
+    desc.render_target [0].blend_color_operation            = BlendOperation_Add;
+    desc.render_target [0].blend_color_source_argument      = BlendArgument_Zero;
+    desc.render_target [0].blend_color_destination_argument = BlendArgument_Zero;    
+    desc.render_target [0].blend_alpha_operation            = BlendOperation_Add;
+    desc.render_target [0].blend_alpha_source_argument      = BlendArgument_Zero;
+    desc.render_target [0].blend_alpha_destination_argument = BlendArgument_Zero;
     
     test_blend_state (desc, test.device.get ());
     
-    desc.blend_enable = true;
+    desc.render_target [0].blend_enable = true;
       
     for (int sample = 0; sample < 2; sample++)
     {
@@ -130,27 +134,27 @@ int main ()
     
       for (int cop = 0; cop < BlendOperation_Num; cop++)
       {
-        desc.blend_color_operation = (BlendOperation) cop;
+        desc.render_target [0].blend_color_operation = (BlendOperation) cop;
         
         for (int csrc = 0; csrc < BlendArgument_Num; csrc++)
         {
-          desc.blend_color_source_argument = (BlendArgument) csrc;
+          desc.render_target [0].blend_color_source_argument = (BlendArgument) csrc;
           
           for (int cdst = 0; cdst < BlendArgument_Num; cdst++)
           {
-            desc.blend_color_destination_argument = (BlendArgument) cdst;
+            desc.render_target [0].blend_color_destination_argument = (BlendArgument) cdst;
            
             for (int cop = 0; cop < BlendOperation_Num; cop++)
             {
-              desc.blend_color_operation = (BlendOperation) cop;
+              desc.render_target [0].blend_color_operation = (BlendOperation) cop;
               
               for (int csrc = 0; csrc < BlendArgument_Num; csrc++)
               {
-                desc.blend_color_source_argument = (BlendArgument) csrc;
+                desc.render_target [0].blend_color_source_argument = (BlendArgument) csrc;
                 
                 for (int cdst = 0; cdst < BlendArgument_Num; cdst++)
                 {
-                  desc.blend_color_destination_argument = (BlendArgument) cdst;
+                  desc.render_target [0].blend_color_destination_argument = (BlendArgument) cdst;
                   
                   test_blend_state (desc, test.device.get ());
                 }

@@ -40,7 +40,7 @@ void test_state(const DepthStencilDesc& desc, IDevice* device)
  	total_tests++;
   try
   {
-    device->OSSetDepthStencilState(device->CreateDepthStencilState(desc));
+    device->GetImmediateContext ()->OSSetDepthStencilState(device->CreateDepthStencilState(desc));
     if (output_mode & OutputMode_Success)
     {
       print_desc(desc);

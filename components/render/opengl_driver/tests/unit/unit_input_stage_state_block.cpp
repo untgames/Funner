@@ -8,11 +8,11 @@ struct State
   
   void Init (IDevice& device)
   {
-    layout       = device.ISGetInputLayout ();
-    index_buffer = device.ISGetIndexBuffer ();
+    layout       = device.GetImmediateContext ()->ISGetInputLayout ();
+    index_buffer = device.GetImmediateContext ()->ISGetIndexBuffer ();
 
     for (size_t i=0; i<DEVICE_VERTEX_BUFFER_SLOTS_COUNT; i++)
-      vertex_buffer [i] = device.ISGetVertexBuffer (i);
+      vertex_buffer [i] = device.GetImmediateContext ()->ISGetVertexBuffer (i);
   }
   
   void Check (const State& src)
@@ -45,13 +45,13 @@ int main ()
     BufferPtr vertex_buffer (test.device->CreateBuffer (buffer_desc), false);
     
     for (size_t i=0; i<DEVICE_VERTEX_BUFFER_SLOTS_COUNT; i++)
-      test.device->ISSetVertexBuffer (i, vertex_buffer.get ());
+      test.device->GetImmediateContext ()->ISSetVertexBuffer (i, vertex_buffer.get ());
       
     buffer_desc.bind_flags = BindFlag_IndexBuffer;
     
     BufferPtr index_buffer (test.device->CreateBuffer (buffer_desc), false);
     
-    test.device->ISSetIndexBuffer (index_buffer.get ());
+    test.device->GetImmediateContext ()->ISSetIndexBuffer (index_buffer.get ());
 
     State src_state;
 
@@ -65,13 +65,13 @@ int main ()
     
     StateBlockPtr state_block (test.device->CreateStateBlock (mask), false);
 
-    state_block->Capture ();
+    state_block->Capture (test.device->GetImmediateContext ());
     
-    test.device->ISSetInputLayout (0);
-    test.device->ISSetIndexBuffer (0);
+    test.device->GetImmediateContext ()->ISSetInputLayout (0);
+    test.device->GetImmediateContext ()->ISSetIndexBuffer (0);
     
     for (size_t i=0; i<DEVICE_VERTEX_BUFFER_SLOTS_COUNT; i++)
-      test.device->ISSetVertexBuffer (i, 0);
+      test.device->GetImmediateContext ()->ISSetVertexBuffer (i, 0);
 
     printf ("after reset\n");
     
@@ -80,7 +80,7 @@ int main ()
     dst_state.Init (*test.device);    
     dst_state.Check (src_state);
     
-    state_block->Apply ();
+    state_block->Apply (test.device->GetImmediateContext ());
 
     printf ("after apply\n");    
 

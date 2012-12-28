@@ -26,7 +26,7 @@ void print_input_layout_desc(const InputLayoutDesc& desc)
       buffer_names[i + 1],
       get_name(desc.vertex_attributes[i].type),
       get_name(desc.vertex_attributes[i].format),
-      get_name(desc.vertex_attributes[i].semantic),
+      desc.vertex_attributes[i].semantic,
       desc.vertex_attributes[i].slot,
       desc.vertex_attributes[i].offset,
       desc.vertex_attributes[i].stride
@@ -41,8 +41,8 @@ void test_input_layout_desc(const InputLayoutDesc& desc, IDevice* device)
   total_tests++;
   try
   {
-    device->ISSetInputLayout(device->CreateInputLayout(desc));
-    device->Draw(PrimitiveType_PointList, 0, 0);
+    device->GetImmediateContext ()->ISSetInputLayout(device->CreateInputLayout(desc));
+    device->GetImmediateContext ()->Draw(PrimitiveType_PointList, 0, 0);
     
     if (output_mode & OutputMode_Success)
     {
@@ -103,8 +103,8 @@ int main ()
     
     desc.index_buffer_offset = 0;
     
-    test.device.get()->ISSetVertexBuffer(0, test.device.get()->CreateBuffer(vertex));
-    test.device.get()->ISSetIndexBuffer(test.device.get()->CreateBuffer(index));
+    test.device->GetImmediateContext ()->ISSetVertexBuffer(0, test.device.get()->CreateBuffer(vertex));
+    test.device->GetImmediateContext ()->ISSetIndexBuffer(test.device.get()->CreateBuffer(index));
     
     for (int itype = 0; itype < InputDataType_Num; itype++)
     {
@@ -120,7 +120,7 @@ int main ()
           
           for (int semantic1 = 0; semantic1 < VertexAttributeSemantic_Num; semantic1++)
           {
-            attribs[0].semantic = (VertexAttributeSemantic) semantic1;
+            attribs[0].semantic = test.device->GetVertexAttributeSemanticName ((VertexAttributeSemantic) semantic1);
             
             for (int type2 = 0; type2 < InputDataType_Num; type2++)
             {
@@ -132,7 +132,7 @@ int main ()
                 
                 for (int semantic2 = 0; semantic2 < VertexAttributeSemantic_Num; semantic2++)
                 {
-                  attribs[1].semantic = (VertexAttributeSemantic) semantic2;
+                  attribs[1].semantic = test.device->GetVertexAttributeSemanticName ((VertexAttributeSemantic) semantic2);
                   
                   test_input_layout_desc(desc, test.device.get());
                 }

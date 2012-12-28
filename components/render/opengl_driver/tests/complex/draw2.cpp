@@ -38,7 +38,7 @@ struct MyShaderParameters2
 
 void redraw (Test& test)
 {
-  test.device->Draw (PrimitiveType_TriangleList, 0, 3);
+  test.device->GetImmediateContext ()->Draw (PrimitiveType_TriangleList, 0, 3);
 }
 
 void idle (Test& test)
@@ -56,7 +56,7 @@ void idle (Test& test)
 
   MyShaderParameters2 my_shader_parameters2;
 
-  IBuffer* cb = test.device->SSGetConstantBuffer (1);
+  IBuffer* cb = test.device->GetImmediateContext ()->SSGetConstantBuffer (1);
 
   if (!cb)
   {
@@ -115,9 +115,9 @@ int main ()
     printf ("Set input-stage\n");
 
     VertexAttribute attributes [] = {
-      {VertexAttributeSemantic_Normal, InputDataFormat_Vector3, InputDataType_Float, 0, offsetof (MyVertex, normal), sizeof (MyVertex)},
-      {VertexAttributeSemantic_Position, InputDataFormat_Vector3, InputDataType_Float, 0, offsetof (MyVertex, position), sizeof (MyVertex)},
-      {VertexAttributeSemantic_Color, InputDataFormat_Vector4, InputDataType_Float, 0, offsetof (MyVertex, color), sizeof (MyVertex)},
+      {test.device->GetVertexAttributeSemanticName (VertexAttributeSemantic_Normal), InputDataFormat_Vector3, InputDataType_Float, 0, offsetof (MyVertex, normal), sizeof (MyVertex)},
+      {test.device->GetVertexAttributeSemanticName (VertexAttributeSemantic_Position), InputDataFormat_Vector3, InputDataType_Float, 0, offsetof (MyVertex, position), sizeof (MyVertex)},
+      {test.device->GetVertexAttributeSemanticName (VertexAttributeSemantic_Color), InputDataFormat_Vector4, InputDataType_Float, 0, offsetof (MyVertex, color), sizeof (MyVertex)},
     };
 
     InputLayoutDesc layout_desc;
@@ -131,8 +131,8 @@ int main ()
 
     InputLayoutPtr layout (test.device->CreateInputLayout (layout_desc), false);
 
-    test.device->ISSetInputLayout (layout.get ());
-    test.device->ISSetVertexBuffer (0, vb.get ());
+    test.device->GetImmediateContext ()->ISSetInputLayout (layout.get ());
+    test.device->GetImmediateContext ()->ISSetVertexBuffer (0, vb.get ());
 
     printf ("Set shader stage\n");
 
@@ -186,10 +186,10 @@ int main ()
     cb->SetData (0, sizeof my_shader_parameters, &my_shader_parameters);
     cb2->SetData (0, sizeof my_shader_parameters2, &my_shader_parameters2);
 
-    test.device->SSSetProgram (shader.get ());
-    test.device->SSSetProgramParametersLayout (program_parameters_layout.get ());
-    test.device->SSSetConstantBuffer (0, cb.get ());
-    test.device->SSSetConstantBuffer (1, cb2.get ());
+    test.device->GetImmediateContext ()->SSSetProgram (shader.get ());
+    test.device->GetImmediateContext ()->SSSetProgramParametersLayout (program_parameters_layout.get ());
+    test.device->GetImmediateContext ()->SSSetConstantBuffer (0, cb.get ());
+    test.device->GetImmediateContext ()->SSSetConstantBuffer (1, cb2.get ());
 
     printf ("Register callbacks\n");
 

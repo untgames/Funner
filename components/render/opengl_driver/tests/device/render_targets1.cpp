@@ -56,7 +56,8 @@ int main ()
       for (int i=0; i<4; i++)
         view [i] = ViewPtr (test.device->CreateView (texture [i].get (), view_desc), false);
 
-      test.device->OSSetRenderTargets (view [Window1_RenderTarget].get (), view [Window2_DepthStencil].get ());
+      test.device->GetImmediateContext ()->OSSetRenderTargetView (0, view [Window1_RenderTarget].get ());
+      test.device->GetImmediateContext ()->OSSetDepthStencilView (view [Window2_DepthStencil].get ());
       
       Color4f clear_color;
       
@@ -65,8 +66,10 @@ int main ()
       clear_color.blue  = 0.7f;
       clear_color.alpha = 0;
 
-      test.device->ClearViews (ClearFlag_All, clear_color, 0.5f, 12);
-      test.device->Draw (PrimitiveType_PointList, 0, 0);
+      size_t rt_index = 0;
+
+      test.device->GetImmediateContext ()->ClearViews (ClearFlag_All, 1, &rt_index, &clear_color, 0.5f, 12);
+      test.device->GetImmediateContext ()->Draw (PrimitiveType_PointList, 0, 0);
 
       test.swap_chain->Present ();      
       swap_chain->Present ();

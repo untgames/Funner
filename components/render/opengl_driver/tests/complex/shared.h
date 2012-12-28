@@ -153,7 +153,7 @@ struct Test
       if (caps.has_right_hand_viewport)
         vp.y = window.Height () - vp.height - vp.y;
 
-      device->RSSetViewport (vp);
+      device->GetImmediateContext ()->RSSetViewport (0, vp);
     }
     catch (std::exception& e)
     {
@@ -172,12 +172,14 @@ struct Test
       clear_color.blue  = 0.7f;
       clear_color.alpha = 1.0f;
 
-      device->ClearViews (ClearFlag_All, clear_color, 1.0f, 0);
+      size_t rt_index = 0;
+
+      device->GetImmediateContext ()->ClearViews (ClearFlag_All, 1, &rt_index, &clear_color, 1.0f, 0);
 
       if (redraw)
         redraw (*this);
 
-      device->Flush ();
+      device->GetImmediateContext ()->Flush ();
 
       swap_chain->Present ();      
     }
