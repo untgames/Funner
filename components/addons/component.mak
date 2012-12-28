@@ -1,9 +1,8 @@
 ###################################################################################################
 #Определения и константы
 ###################################################################################################
-TARGETS := FUNNER_COMPONENTS
+TARGETS := ADDONS_COMPONENTS
 
 #Цель - пакет
-FUNNER_COMPONENTS.TYPE       := package
-FUNNER_COMPONENTS.COMPONENTS := xtl common debug math media system scene_graph sound render input network script physics addons engine demos sdks
-
+ADDONS_COMPONENTS.TYPE       := package
+ADDONS_COMPONENTS.COMPONENTS := social store
