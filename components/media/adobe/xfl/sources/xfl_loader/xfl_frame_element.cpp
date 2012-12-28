@@ -1,10 +1,16 @@
+#ifdef _MSC_VER
+  typedef unsigned __int64 uint64;
+#else
+  typedef unsigned long long uint64;
+#endif
+
 namespace xtl
 {
 
 namespace io
 {
 
-bool read (const char* string, unsigned long long& value);
+bool read (const char* string, uint64& value);
 
 }
 
@@ -21,12 +27,16 @@ namespace xtl
 namespace io
 {
 
-inline bool read (const char* string, unsigned long long& value)
+inline bool read (const char* string, uint64& value)
 {
   if (!string || !*string)
     return false;
 
-  unsigned long long tmp = strtoull (string, (char**)&string, 0);
+#ifdef _MSC_VER
+  uint64 tmp = _strtoui64 (string, (char**)&string, 0);
+#else
+  uint64 tmp = strtoull (string, (char**)&string, 0);
+#endif
 
   if (!*string)
   {
@@ -47,7 +57,7 @@ inline bool read (const char* string, unsigned long long& value)
 }
 
 template <class BaseIter>
-inline bool read (token_iterator<const char*, BaseIter>& iter, unsigned long long& value)
+inline bool read (token_iterator<const char*, BaseIter>& iter, uint64& value)
 {
   return detail::read_value (iter, value);
 }
@@ -69,11 +79,11 @@ float read_xfl_float (const ParseNode& node, const char* name)
   if (float_value < MAX_CORRECT_VALUE)
     return float_value;
 
-  unsigned long long unsigned_value = get<unsigned long long> (node, name);
+  uint64 unsigned_value = get<uint64> (node, name);
 
-  unsigned_value = -unsigned_value;
+  unsigned_value = 0 - unsigned_value;
 
-  return (float)-unsigned_value;
+  return -(float)unsigned_value;
 }
 
 }
