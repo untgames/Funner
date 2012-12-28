@@ -132,41 +132,43 @@ class TestView: public IGameView
         return;                
 
       UpdateShaderParameters ();        
+
+      render::low_level::IDeviceContext& context = *current_device->GetImmediateContext ();
       
-      DepthStencilStatePtr default_depth_stencil_state = current_device->OSGetDepthStencilState ();      
-      BlendStatePtr        default_blend_state         = current_device->OSGetBlendState ();      
+      DepthStencilStatePtr default_depth_stencil_state = context.OSGetDepthStencilState ();      
+      BlendStatePtr        default_blend_state         = context.OSGetBlendState ();      
 
-      current_device->RSSetState                   (rasterizer.get ());            
-      current_device->SSSetProgramParametersLayout (shader_parameters_layout.get ());      
-      current_device->SSSetConstantBuffer          (0, constant_buffer.get ());
-      current_device->SSSetSampler                 (0, texture_sampler.get ());
-      current_device->ISSetInputLayout             (input_layout.get ());
-      current_device->OSSetDepthStencilState       (0);
+      context.RSSetState                   (rasterizer.get ());            
+      context.SSSetProgramParametersLayout (shader_parameters_layout.get ());      
+      context.SSSetConstantBuffer          (0, constant_buffer.get ());
+      context.SSSetSampler                 (0, texture_sampler.get ());
+      context.ISSetInputLayout             (input_layout.get ());
+      context.OSSetDepthStencilState       (0);
 
-      current_device->SSSetProgram      (ground_shader.get ());
-      current_device->SSSetTexture      (0, ground_texture.get ());
-      current_device->ISSetVertexBuffer (0, rect_vertex_buffer.get ());
-      current_device->ISSetIndexBuffer  (rect_index_buffer.get ());
-      current_device->DrawIndexed       (PrimitiveType_TriangleList, 0, 6, 0);
+      context.SSSetProgram      (ground_shader.get ());
+      context.SSSetTexture      (0, ground_texture.get ());
+      context.ISSetVertexBuffer (0, rect_vertex_buffer.get ());
+      context.ISSetIndexBuffer  (rect_index_buffer.get ());
+      context.DrawIndexed       (PrimitiveType_TriangleList, 0, 6, 0);
 
-      current_device->SSSetProgram      (water_shader.get ());
-      current_device->OSSetBlendState   (blend_state.get ());
-      current_device->SSSetTexture      (0, water_texture.get ());
-      current_device->ISSetVertexBuffer (0, vertex_buffer.get ());
-      current_device->ISSetIndexBuffer  (index_buffer.get ());
+      context.SSSetProgram      (water_shader.get ());
+      context.OSSetBlendState   (blend_state.get ());
+      context.SSSetTexture      (0, water_texture.get ());
+      context.ISSetVertexBuffer (0, vertex_buffer.get ());
+      context.ISSetIndexBuffer  (index_buffer.get ());
 
       for (size_t i=0; i<GRID_SIZE-2; i++)
-        current_device->DrawIndexed (PrimitiveType_TriangleStrip, i * indices_block_size, indices_block_size, 0);
+        context.DrawIndexed (PrimitiveType_TriangleStrip, i * indices_block_size, indices_block_size, 0);
 
-      current_device->ISSetVertexBuffer   (0, rect_vertex_buffer.get ());
-      current_device->ISSetIndexBuffer    (rect_index_buffer.get ());
-      current_device->SSSetProgram        (ground_shader.get ());
-      current_device->SSSetConstantBuffer (0, boat_constant_buffer.get ());
-      current_device->SSSetTexture        (0, boat_texture.get ());
-//      current_device->DrawIndexed         (PrimitiveType_TriangleList, 0, 6, 0);
+      context.ISSetVertexBuffer   (0, rect_vertex_buffer.get ());
+      context.ISSetIndexBuffer    (rect_index_buffer.get ());
+      context.SSSetProgram        (ground_shader.get ());
+      context.SSSetConstantBuffer (0, boat_constant_buffer.get ());
+      context.SSSetTexture        (0, boat_texture.get ());
+//      context.DrawIndexed         (PrimitiveType_TriangleList, 0, 6, 0);
 
-      current_device->OSSetBlendState (default_blend_state.get ());
-      current_device->OSSetDepthStencilState (default_depth_stencil_state.get ());      
+      context.OSSetBlendState (default_blend_state.get ());
+      context.OSSetDepthStencilState (default_depth_stencil_state.get ());      
     }
 
     void LoadResources (sound::ScenePlayer* player, IDevice& device)
@@ -209,10 +211,10 @@ class TestView: public IGameView
       rect_index_buffer->SetData (0, sizeof rect_indices, rect_indices);
 
       static VertexAttribute attributes [] = {
-        {VertexAttributeSemantic_Normal, InputDataFormat_Vector3, InputDataType_Float, 0, offsetof (Vertex, normal), sizeof (Vertex)},
-        {VertexAttributeSemantic_Position, InputDataFormat_Vector3, InputDataType_Float, 0, offsetof (Vertex, position), sizeof (Vertex)},
-        {VertexAttributeSemantic_TexCoord0, InputDataFormat_Vector2, InputDataType_Float, 0, offsetof (Vertex, texcoord), sizeof (Vertex)},
-        {VertexAttributeSemantic_Color, InputDataFormat_Vector4, InputDataType_UByte, 0, offsetof (Vertex, color), sizeof (Vertex)},
+        {current_device->GetVertexAttributeSemanticName (VertexAttributeSemantic_Normal), InputDataFormat_Vector3, InputDataType_Float, 0, offsetof (Vertex, normal), sizeof (Vertex)},
+        {current_device->GetVertexAttributeSemanticName (VertexAttributeSemantic_Position), InputDataFormat_Vector3, InputDataType_Float, 0, offsetof (Vertex, position), sizeof (Vertex)},
+        {current_device->GetVertexAttributeSemanticName (VertexAttributeSemantic_TexCoord0), InputDataFormat_Vector2, InputDataType_Float, 0, offsetof (Vertex, texcoord), sizeof (Vertex)},
+        {current_device->GetVertexAttributeSemanticName (VertexAttributeSemantic_Color), InputDataFormat_Vector4, InputDataType_UByte, 0, offsetof (Vertex, color), sizeof (Vertex)},
       };
       
       InputLayoutDesc layout_desc;
@@ -296,14 +298,14 @@ class TestView: public IGameView
       
       memset (&blend_desc, 0, sizeof (blend_desc));
 
-      blend_desc.blend_enable                     = true;
-      blend_desc.blend_color_operation            = BlendOperation_Add;
-      blend_desc.blend_color_source_argument      = BlendArgument_SourceAlpha;
-      blend_desc.blend_color_destination_argument = BlendArgument_InverseSourceAlpha;
-      blend_desc.blend_alpha_operation            = BlendOperation_Add;
-      blend_desc.blend_alpha_source_argument      = BlendArgument_SourceAlpha;
-      blend_desc.blend_alpha_destination_argument = BlendArgument_InverseSourceAlpha;
-      blend_desc.color_write_mask                 = ColorWriteFlag_All;
+      blend_desc.render_target [0].blend_enable                     = true;
+      blend_desc.render_target [0].blend_color_operation            = BlendOperation_Add;
+      blend_desc.render_target [0].blend_color_source_argument      = BlendArgument_SourceAlpha;
+      blend_desc.render_target [0].blend_color_destination_argument = BlendArgument_InverseSourceAlpha;
+      blend_desc.render_target [0].blend_alpha_operation            = BlendOperation_Add;
+      blend_desc.render_target [0].blend_alpha_source_argument      = BlendArgument_SourceAlpha;
+      blend_desc.render_target [0].blend_alpha_destination_argument = BlendArgument_InverseSourceAlpha;
+      blend_desc.render_target [0].color_write_mask                 = ColorWriteFlag_All;
 
       blend_state = BlendStatePtr (current_device->CreateBlendState (blend_desc), false);                  
 

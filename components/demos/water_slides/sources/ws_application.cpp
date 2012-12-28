@@ -286,7 +286,7 @@ struct MyApplication::Impl
         vp.min_depth = 0;
         vp.max_depth = 1;
 
-        device->RSSetViewport (vp);
+        device->GetImmediateContext ()->RSSetViewport (0, vp);
 
         window.Invalidate ();
       }
@@ -312,7 +312,9 @@ struct MyApplication::Impl
         clear_color.blue  = 0.7f;
         clear_color.alpha = 0;
 
-        device->ClearViews (ClearFlag_All, clear_color, 1.0f, 0);                
+        size_t rt_index = 0;
+
+        device->GetImmediateContext ()->ClearViews (ClearFlag_All, 1, &rt_index, &clear_color, 1.0f, 0);                
 
         if (current_view)
           current_view->OnDraw ();        
