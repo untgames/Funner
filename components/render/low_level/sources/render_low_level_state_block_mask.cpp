@@ -51,14 +51,14 @@ void StateBlockMask::Set (StateBlockGroup group, bool value)
       break;
     }
     case StateBlockGroup_RasterizerStage:
-      rs_state    = value;
-      rs_viewport = value;
-      rs_scissor  = value;
+      rs_state     = value;
+      rs_viewports = value;
+      rs_scissors  = value;
       break;
     case StateBlockGroup_OutputStage:
       os_blend_state         = value;
       os_depth_stencil_state = value;
-      os_render_target_view  = value;
+      os_render_target_views = value;
       os_depth_stencil_view  = value;
       break;
     default:
