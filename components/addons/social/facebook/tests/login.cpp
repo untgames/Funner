@@ -64,6 +64,24 @@ void load_friends_callback (const UserList& users, OperationStatus status, const
   }
 }
 
+void window_callback (OperationStatus status, const char* error)
+{
+  switch (status)
+  {
+    case social::OperationStatus_Success:
+      printf ("Window finished with success\n");
+      break;
+    case social::OperationStatus_Canceled:
+      printf ("Window canceled\n");
+      break;
+    case social::OperationStatus_Failure:
+      printf ("Window failed, error '%s'\n", error);
+      break;
+    default:
+      printf ("Window status unknown\n");
+  }
+}
+
 void load_user_callback (const User& user, OperationStatus status, const char* error, social::Session* session)
 {
   switch (status)
@@ -80,9 +98,9 @@ void load_user_callback (const User& user, OperationStatus status, const char* e
 
         session->ShowWindow ("apprequests", apprequest_properties);*/
 
-      /*  common::PropertyMap wall_post_properties;
+       common::PropertyMap wall_post_properties;
 
-        session->ShowWindow ("feed", wall_post_properties);*/
+        session->ShowWindow ("feed", &window_callback, wall_post_properties);
       break;
     }
     case social::OperationStatus_Canceled:

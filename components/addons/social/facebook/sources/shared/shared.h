@@ -58,7 +58,7 @@ class FacebookSessionImpl: public IAchievementManager, public ILeaderboardManage
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Показ стандартных окон
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void ShowWindow (const char* window_name, const common::PropertyMap& properties);
+    void ShowWindow (const char* window_name, const WindowCallback& callback, const common::PropertyMap& properties);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Логин
@@ -163,8 +163,8 @@ class FacebookSessionImpl: public IAchievementManager, public ILeaderboardManage
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Обработка событий диалогов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    bool ProcessDialogRequest (const char* request);
-    void ProcessDialogFail    ();
+    bool ProcessDialogRequest (const char* request, const WindowCallback& callback);
+    void ProcessDialogFail    (const WindowCallback& callback);
 
   private:
     FacebookSessionImpl (const FacebookSessionImpl& source);              //no impl

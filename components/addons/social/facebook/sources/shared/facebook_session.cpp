@@ -57,7 +57,7 @@ const char* FacebookSessionImpl::GetDescription ()
    Показ стандартных окон
 */
 
-void FacebookSessionImpl::ShowWindow (const char* window_name, const common::PropertyMap& properties)
+void FacebookSessionImpl::ShowWindow (const char* window_name, const WindowCallback& callback, const common::PropertyMap& properties)
 {
   static const char* METHOD_NAME = "social::facebook::FacebookSessionImpl::ShowWindow";
 
@@ -90,9 +90,9 @@ void FacebookSessionImpl::ShowWindow (const char* window_name, const common::Pro
 
     dialog_web_view.reset (new syslib::WebView);
 
-    dialog_web_view_filter_connection     = dialog_web_view->RegisterFilter (xtl::bind (&FacebookSessionImpl::ProcessDialogRequest, this, _2));
-    dialog_web_view_load_start_connection = dialog_web_view->RegisterEventHandler (syslib::WebViewEvent_OnLoadStart, xtl::bind (&FacebookSessionImpl::ProcessDialogRequest, this, (const char*)0));
-    dialog_web_view_load_fail_connection  = dialog_web_view->RegisterEventHandler (syslib::WebViewEvent_OnLoadFail, xtl::bind (&FacebookSessionImpl::ProcessDialogFail, this));
+    dialog_web_view_filter_connection     = dialog_web_view->RegisterFilter (xtl::bind (&FacebookSessionImpl::ProcessDialogRequest, this, _2, callback));
+    dialog_web_view_load_start_connection = dialog_web_view->RegisterEventHandler (syslib::WebViewEvent_OnLoadStart, xtl::bind (&FacebookSessionImpl::ProcessDialogRequest, this, (const char*)0, callback));
+    dialog_web_view_load_fail_connection  = dialog_web_view->RegisterEventHandler (syslib::WebViewEvent_OnLoadFail, xtl::bind (&FacebookSessionImpl::ProcessDialogFail, this, callback));
 
     dialog_web_view->LoadRequest (url.c_str ());
 
@@ -109,7 +109,7 @@ void FacebookSessionImpl::ShowWindow (const char* window_name, const common::Pro
    Обработка событий диалогов
 */
 
-bool FacebookSessionImpl::ProcessDialogRequest (const char* request)
+bool FacebookSessionImpl::ProcessDialogRequest (const char* request, const WindowCallback& callback)
 {
   if (!request)
     request = dialog_web_view->Request ();
@@ -118,15 +118,31 @@ bool FacebookSessionImpl::ProcessDialogRequest (const char* request)
   {
     log.Printf ("Dialog load request '%s'", request);
 
-    if (xtl::xstrlen (request) && !strstr (request, "?"))
+    if (strstr (request, "fbconnect://success") == request) //dialog finished
     {
+      stl::string request_copy = request;
+
       CloseDialogWebView ();
+
+      if (strstr (request, "?"))
+      {
+        stl::string error = get_url_parameter (request_copy.c_str (), "error_code=");
+
+        if (error.empty ())
+          callback (OperationStatus_Success, "");
+        else
+          callback (OperationStatus_Failure, error.c_str ());
+      }
+      else
+        callback (OperationStatus_Canceled, "");
+
       return true;
     }
 
     if (strstr (request, "://m.facebook.com/home.php"))  //Error occured
     {
       CloseDialogWebView ();
+      callback (OperationStatus_Failure, "Load failed");
       return false;
     }
   }
@@ -136,11 +152,13 @@ bool FacebookSessionImpl::ProcessDialogRequest (const char* request)
   return true;
 }
 
-void FacebookSessionImpl::ProcessDialogFail ()
+void FacebookSessionImpl::ProcessDialogFail (const WindowCallback& callback)
 {
   log.Printf ("Dialog load failed\n");
 
   CloseDialogWebView ();
+
+  callback (OperationStatus_Failure, "Load failed");
 }
 
 /*

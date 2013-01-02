@@ -60,7 +60,7 @@ struct Session::Impl : public xtl::reference_counter
   }
 
   ///Показ стандартных окон
-  void ShowWindow (const char* window_name, const common::PropertyMap& properties)
+  void ShowWindow (const char* window_name, const WindowCallback& callback, const common::PropertyMap& properties)
   {
     try
     {
@@ -70,7 +70,7 @@ struct Session::Impl : public xtl::reference_counter
       if (!manager->IsUserLoggedIn ())
         throw xtl::format_operation_exception ("", "Not logged in");
 
-      manager->ShowWindow (window_name, properties);
+      manager->ShowWindow (window_name, callback, properties);
     }
     catch (xtl::exception& e)
     {
@@ -345,9 +345,9 @@ bool Session::IsUserLoggedIn () const
    Показ стандартных окон
 */
 
-void Session::ShowWindow (const char* window_name, const common::PropertyMap& properties) const
+void Session::ShowWindow (const char* window_name, const WindowCallback& callback, const common::PropertyMap& properties) const
 {
-  impl->ShowWindow (window_name, properties);
+  impl->ShowWindow (window_name, callback, properties);
 }
 
 /*

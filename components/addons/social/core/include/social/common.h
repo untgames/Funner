@@ -31,6 +31,7 @@ typedef xtl::function <void (const void*)> ReleaseHandleFunction;
 
 //typedef xtl::function<void (OperationStatus status, const char* error)> RequestCallback;                              //ADDED
 typedef xtl::function<void (OperationStatus status, const char* error)> LoginCallback;
+typedef xtl::function<void (OperationStatus status, const char* error)> WindowCallback;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Менеджер сессии
@@ -51,7 +52,7 @@ class ISessionManager
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Показ стандартных окон
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    virtual void ShowWindow (const char* window_name, const common::PropertyMap& properties) = 0;
+    virtual void ShowWindow (const char* window_name, const WindowCallback& callback, const common::PropertyMap& properties) = 0;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Завершился ли процесс логина

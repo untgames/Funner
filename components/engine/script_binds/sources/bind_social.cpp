@@ -174,7 +174,7 @@ void on_user_loaded (const User& user, OperationStatus status, const char* error
     callback (xtl::any (user), status, error);
 }
 
-void load_user (Session& session, const char* id, const LoadCallback& callback, const common::PropertyMap& properties = common::PropertyMap ())
+void load_user (Session& session, const char* id, const LoadCallback& callback, const common::PropertyMap& properties)
 {
   session.LoadUser (id, xtl::bind (&on_user_loaded, _1, _2, _3, callback), properties);
 }
@@ -185,7 +185,7 @@ void on_friends_loaded (const UserList& friends, OperationStatus status, const c
     callback (xtl::any (friends), status, error);
 }
 
-void load_friends (Session& session, const User& user, const LoadCallback& callback, const common::PropertyMap& properties = common::PropertyMap ())
+void load_friends (Session& session, const User& user, const LoadCallback& callback, const common::PropertyMap& properties)
 {
   session.LoadFriends (user, xtl::bind (&on_friends_loaded, _1, _2, _3, callback), properties);
 }
@@ -196,7 +196,7 @@ void on_achievements_loaded (const AchievementList& achievements, OperationStatu
     callback (xtl::any (achievements), status, error);
 }
 
-void load_achievements (Session& session, const LoadCallback& callback, const common::PropertyMap& properties = common::PropertyMap ())
+void load_achievements (Session& session, const LoadCallback& callback, const common::PropertyMap& properties)
 {
   session.LoadAchievements (xtl::bind (&on_achievements_loaded, _1, _2, _3, callback), properties);
 }
@@ -207,7 +207,7 @@ void on_achievement_sent (OperationStatus status, const char* error, const LoadC
     callback (xtl::any (), status, error);
 }
 
-void send_achievement (Session& session, const Achievement& achievement, const LoadCallback& callback, const common::PropertyMap& properties = common::PropertyMap ())
+void send_achievement (Session& session, const Achievement& achievement, const LoadCallback& callback, const common::PropertyMap& properties)
 {
   session.SendAchievement (achievement, xtl::bind (&on_achievement_sent, _1, _2, callback), properties);
 }
@@ -218,7 +218,7 @@ void on_leaderboards_loaded (const LeaderboardList& leaderboards, OperationStatu
     callback (xtl::any (leaderboards), status, error);
 }
 
-void load_leaderboards (Session& session, const LoadCallback& callback, const common::PropertyMap& properties = common::PropertyMap ())
+void load_leaderboards (Session& session, const LoadCallback& callback, const common::PropertyMap& properties)
 {
   session.LoadLeaderboards (xtl::bind (&on_leaderboards_loaded, _1, _2, _3, callback), properties);
 }
@@ -229,12 +229,12 @@ void on_leaderboard_loaded (const Leaderboard& leaderboard, OperationStatus stat
     callback (xtl::any (leaderboard), status, error);
 }
 
-void load_user_leaderboard (Session& session, const char* leaderboard_id, const char* user_id, const LoadCallback& callback, const common::PropertyMap& properties = common::PropertyMap ())
+void load_user_leaderboard (Session& session, const char* leaderboard_id, const char* user_id, const LoadCallback& callback, const common::PropertyMap& properties)
 {
   session.LoadLeaderboard (leaderboard_id, user_id, xtl::bind (&on_leaderboard_loaded, _1, _2, _3, callback), properties);
 }
 
-void load_leaderboard (Session& session, const char* leaderboard_id, const LoadCallback& callback, const common::PropertyMap& properties = common::PropertyMap ())
+void load_leaderboard (Session& session, const char* leaderboard_id, const LoadCallback& callback, const common::PropertyMap& properties)
 {
   session.LoadLeaderboard (leaderboard_id, xtl::bind (&on_leaderboard_loaded, _1, _2, _3, callback), properties);
 }
@@ -245,7 +245,7 @@ void on_score_sent (OperationStatus status, const char* error, const LoadCallbac
     callback (xtl::any (), status, error);
 }
 
-void send_score (Session& session, const Score& score, const LoadCallback& callback, const common::PropertyMap& properties = common::PropertyMap ())
+void send_score (Session& session, const Score& score, const LoadCallback& callback, const common::PropertyMap& properties)
 {
   session.SendScore (score, xtl::bind (&on_score_sent, _1, _2, callback), properties);
 }
@@ -261,6 +261,17 @@ void login (Session& session, const LoadCallback& callback, const common::Proper
   session.LogIn (xtl::bind (&on_logged_in, _1, _2, callback), properties);
 }
 
+void window_finished (OperationStatus status, const char* error, const LoadCallback& callback)
+{
+  if (callback)
+    callback (xtl::any (), status, error);
+}
+
+void show_window (Session& session, const char* window_name, const LoadCallback& callback, const common::PropertyMap& properties)
+{
+  session.ShowWindow (window_name, xtl::bind (&window_finished, _1, _2, callback), properties);
+}
+
 void bind_session_library (Environment& environment)
 {
   InvokerRegistry lib = environment.Library (SESSION_LIBRARY);
@@ -272,8 +283,9 @@ void bind_session_library (Environment& environment)
   lib.Register ("LogIn",              make_invoker (&login));
   lib.Register ("LogOut",             make_invoker (&Session::LogOut));
   lib.Register ("ShowWindow",         make_invoker (
-      make_invoker (&Session::ShowWindow),
-      make_invoker<void (Session&, const char*)> (xtl::bind (&Session::ShowWindow, _1, _2, common::PropertyMap ()))
+      make_invoker (&show_window),
+      make_invoker<void (Session&, const char*, const LoadCallback&)> (xtl::bind (&show_window, _1, _2, _3, common::PropertyMap ())),
+      make_invoker<void (Session&, const char*)> (xtl::bind (&show_window, _1, _2, LoadCallback (), common::PropertyMap ()))
   ));
   lib.Register ("CreateLoadCallback", make_callback_invoker<LoadCallback::signature_type> ());
   lib.Register ("LoadUser",           make_invoker (
