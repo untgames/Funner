@@ -123,7 +123,7 @@ class RenderTargetManagerState: public IStageState
       if (render_target.need_recalc_viewport_hash)
       {
         render_target.viewport_hash             = crc32 (&render_target.viewport, sizeof render_target.viewport);
-        render_target.viewport_rect_hash        = crc32 (&render_target.viewport, sizeof Rect);
+        render_target.viewport_rect_hash        = crc32 (&render_target.viewport, sizeof (Rect));
         render_target.need_recalc_viewport_hash = false;
       }
 
@@ -173,8 +173,6 @@ class RenderTargetManagerState: public IStageState
       {
         for (size_t i=0; i<DEVICE_RENDER_TARGET_SLOTS_COUNT; i++)
         {
-          RenderTargetDesc& render_target = render_targets [i];
-
           if (mask.os_render_target_views) SetRenderTargetView (i, source.GetRenderTargetView (i));
           if (mask.rs_viewports)           SetViewport (i, source.GetViewport (i));
           if (mask.rs_scissors)            SetScissor (i, source.GetScissor (i));        
