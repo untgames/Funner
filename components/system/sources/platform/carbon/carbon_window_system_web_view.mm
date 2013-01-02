@@ -44,6 +44,11 @@ using namespace syslib::macosx;
   listener->OnLoadStarted ([[[[[frame dataSource] request] URL] absoluteString] UTF8String]);
 }
 
+-(void)webView:(WebView *)sender willPerformClientRedirectToURL:(NSURL *)URL delay:(NSTimeInterval)seconds fireDate:(NSDate *)date forFrame:(WebFrame *)frame
+{
+  listener->OnLoadStarted ([[URL absoluteString] UTF8String]);
+}
+
 -(void)webView:(WebView *)sender didFinishLoadForFrame:(WebFrame *)frame
 {
   listener->OnLoadFinished ();
