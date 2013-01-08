@@ -31,7 +31,7 @@ void GlEntries::Init (ILibrary& library)
     //обнуление адресов точек входа
 
   memset (this, 0, sizeof (GlEntries));
-
+  
     //получение адресов точек входа OpenGL ES 1.1
 
   init_entry (library, "glAlphaFunc", AlphaFunc);
@@ -178,8 +178,8 @@ void GlEntries::Init (ILibrary& library)
   init_entry (library, "glTranslatex", Translatex);
   init_entry (library, "glVertexPointer", VertexPointer);
   init_entry (library, "glViewport", Viewport);
-//  init_entry (library, "glPointSizePointerOES", PointSizePointerOES);
-
+  init_entry (library, "glPointSizePointerOES", PointSizePointerOES);
+  
     //получение адресов точек входа расширений OpenGL
 
   init_extension_entry (library, "glBlendEquationSeparateOES", BlendEquationSeparateOES);

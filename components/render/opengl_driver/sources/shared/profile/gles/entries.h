@@ -551,6 +551,10 @@ const GlEntries* get_gl_entries ();
 #define glEnableDriverControlQCOM get_gl_entries ()->EnableDriverControlQCOM
 #define glDisableDriverControlQCOM get_gl_entries ()->DisableDriverControlQCOM
 
+#ifdef GL_APIENTRY
+  #undef GL_APIENTRY
+#endif
+
 }
 
 }

@@ -8,7 +8,8 @@ using namespace common;
     Константы
 */
 
-const size_t SHADER_LAYOUTS_TABLE_SIZE = 32; //резервируемое количество лэйаутов
+const size_t SHADER_LAYOUTS_TABLE_SIZE   = 32; //резервируемое количество лэйаутов
+const size_t MAX_SHADER_ATTRIBUTES_COUNT = 32; //максимально допустимое количество шейдерных атрибутов (ограничено размерами int)
 
 /*
     Внутренние структуры данных
@@ -41,9 +42,12 @@ struct InputLayout::ShaderAttributeLayout: public xtl::reference_counter
 
   LocationArray        locations;             //индексы шейдерных вершинных атрибутов
   xtl::auto_connection on_dictionary_destroy; //соединение с обработчиком удаления словаря
+  size_t               hash;                  //хэш расположения
+  size_t               used_semantics_mask;   //маска использованных семантик
 
 ///Конструктор
   ShaderAttributeLayout (VertexAttributeDictionary& dictionary, size_t slots_count, const GlVertexAttributeGroup* groups, const common::StringArray& names)
+    : used_semantics_mask ()
   {
     try
     {
@@ -70,8 +74,24 @@ struct InputLayout::ShaderAttributeLayout: public xtl::reference_counter
         const GlVertexAttribute* attribute = group->attributes + group->std_attributes_count;
 
         for (size_t j=0; j<group->shader_attributes_count; j++, attribute++)
-          locations.push_back (dictionary.FindAttribute (names [attribute->name_index])); //может быть -1
+        {
+          int location = dictionary.FindAttribute (names [attribute->name_index]); //может быть -1
+
+          if (location >= 0)
+          {
+            if (location >= MAX_SHADER_ATTRIBUTES_COUNT)
+              throw xtl::format_not_supported_exception ("", "Vertex attribute '%s' location %d is greater than available attributes count %d", names [attribute->name_index], location, MAX_SHADER_ATTRIBUTES_COUNT);
+
+            used_semantics_mask |= 1 << location;
+          }
+
+          locations.push_back (location);
+        }
       }
+
+        //расчёт хэша
+
+      hash = locations.empty () ? 0 : common::crc32 (&locations [0], sizeof (int) * locations.size ());
     }
     catch (xtl::exception& e)
     {
@@ -355,11 +375,33 @@ void InputLayout::SetDesc (const InputLayoutDesc& desc)
 
       if (semantic < 0)
       {
-        //TODO: shaders support!
+#ifndef OPENGL_ES_SUPPORT
+        switch (va.type)
+        {
+          case InputDataType_Byte:
+          case InputDataType_UByte:
+          case InputDataType_Short:
+          case InputDataType_UShort:
+          case InputDataType_Int:
+          case InputDataType_UInt:
+            if (!caps.glVertexAttribIPointer_fn)
+              throw xtl::format_exception<xtl::not_supported_exception> (METHOD_NAME, "Integer vertex attribute '%s' is not supported (no GL_NV_vertex_program4 extension)", va.semantic);
+
+          case InputDataType_Float:
+            if (!caps.glVertexAttribPointer_fn)
+              throw xtl::format_exception<xtl::not_supported_exception> (METHOD_NAME, "Vertex attribute '%s' is not supported (no GL_ARB_vertex_shader extension)", va.semantic);
+
+            break;
+          default:
+            break; //exception will be thrown below
+        }
 
         shader_attributes_count++;
         
         shader_attribute_names_length += strlen (va.semantic) + 1;
+#else
+        throw xtl::format_exception<xtl::not_supported_exception> (METHOD_NAME, "Vertex attribute '%s' is not supported", va.semantic);
+#endif
       }
       else
       {
@@ -620,7 +662,7 @@ void set_client_capability (GLenum capability, size_t current_mask, size_t requi
 
 }
 
-void InputLayout::BindVertexAttributes (size_t base_vertex, BufferPtr* vertex_buffers)
+void InputLayout::BindVertexAttributes (size_t base_vertex, BufferPtr* vertex_buffers, ShaderAttributeLayout* shader_layout)
 {
   static const char* METHOD_NAME = "render::low_level::opengl::InputLayout::BindVertexAttributes";
 
@@ -671,7 +713,36 @@ void InputLayout::BindVertexAttributes (size_t base_vertex, BufferPtr* vertex_bu
     SetContextCacheValue (CacheEntry_EnabledSemantics, used_semantics_mask);
   }
 
+#ifndef OPENGL_ES_SUPPORT
+  const size_t current_enabled_shader_semantics_mask = GetContextCacheValue (CacheEntry_EnabledShaderSemantics),
+               used_shader_semantics_mask            = shader_layout ? shader_layout->used_semantics_mask : 0;
+
+  if (current_enabled_shader_semantics_mask != used_shader_semantics_mask)
+  {
+    size_t mask = 1;
+
+    for (size_t i=0; i<MAX_SHADER_ATTRIBUTES_COUNT; i++, mask <<= 1)
+    {
+      if (current_enabled_shader_semantics_mask & ~used_shader_semantics_mask & mask)
+      {
+	caps.glDisableVertexAttribArray_fn (i);
+        continue;
+      }
+
+      if (used_shader_semantics_mask & ~current_enabled_shader_semantics_mask & mask)
+      {
+        caps.glEnableVertexAttribArray_fn (i);
+        continue;
+      }
+    }
+
+    SetContextCacheValue (CacheEntry_EnabledShaderSemantics, used_shader_semantics_mask);
+  }
+#endif
+
     //настройка вершинных буферов
+
+  int* attribute_location = shader_layout ? &shader_layout->locations [0] : (int*)0;
    
   for (GlVertexAttributeGroupArray::iterator group_iter=vertex_attribute_groups.begin (), group_end=vertex_attribute_groups.end (); group_iter!=group_end; ++group_iter)
   {
@@ -723,7 +794,37 @@ void InputLayout::BindVertexAttributes (size_t base_vertex, BufferPtr* vertex_bu
           break;
         }
         default:
-          continue;
+        {
+          if (va.semantic >= 0 || !attribute_location)
+            continue;
+
+          int location = *attribute_location++;
+
+          if (location < 0)
+            continue;
+
+#ifndef OPENGL_ES_SUPPORT
+          switch (va.type)
+          {
+            case GL_BYTE:
+            case GL_UNSIGNED_BYTE:
+            case GL_SHORT:
+            case GL_UNSIGNED_SHORT:
+            case GL_INT:
+            case GL_UNSIGNED_INT:
+              caps.glVertexAttribIPointer_fn ((GLuint)location, va.components, va.type, va.stride, offset);
+              break;
+            case GL_DOUBLE:
+              caps.glVertexAttribLPointer_fn ((GLuint)location, va.components, va.type, va.stride, offset);
+              break;
+            default:
+              caps.glVertexAttribPointer_fn ((GLuint)location, va.components, va.type, GL_FALSE, va.stride, offset);
+              break;
+          }
+#endif
+
+          break;
+        }
       }
     }
   }
@@ -737,54 +838,67 @@ void InputLayout::Bind
   Buffer*                    index_buffer,
   IndicesLayout*             out_indices_layout)
 {
-  static const char* METHOD_NAME = "render::low_level::opengl::InputLayout::Bind";
-  
-    //установка текущего контекста
-
-  MakeContextCurrent ();  
-  
-    //проверка необходимости переустановки layout
+  try
+  {
     
-  const size_t current_base_vertex  = GetContextCacheValue (CacheEntry_CurrentBaseVertex),  
-               current_layout_hash  = GetContextCacheValue (CacheEntry_CurrentLayoutHash),
-               current_buffers_hash = GetContextCacheValue (CacheEntry_CurrentBuffersHash);
+      //установка текущего контекста
 
-  size_t vertex_buffers_id [DEVICE_VERTEX_BUFFER_SLOTS_COUNT];
+    MakeContextCurrent ();  
+    
+      //проверка необходимости переустановки layout
+      
+    const size_t current_base_vertex        = GetContextCacheValue (CacheEntry_CurrentBaseVertex),  
+                 current_layout_hash        = GetContextCacheValue (CacheEntry_CurrentLayoutHash),
+                 current_buffers_hash       = GetContextCacheValue (CacheEntry_CurrentBuffersHash),
+                 current_shader_layout_hash = GetContextCacheValue (CacheEntry_CurrentShaderLayoutHash);
 
-  for (size_t i=0; i<DEVICE_VERTEX_BUFFER_SLOTS_COUNT; i++)
-    vertex_buffers_id [i] = vertex_buffers [i] ? vertex_buffers [i]->GetId () : 0;
+    size_t vertex_buffers_id [DEVICE_VERTEX_BUFFER_SLOTS_COUNT];
 
-  size_t buffers_hash = crc32 (vertex_buffers_id, sizeof vertex_buffers_id);
+    for (size_t i=0; i<DEVICE_VERTEX_BUFFER_SLOTS_COUNT; i++)
+      vertex_buffers_id [i] = vertex_buffers [i] ? vertex_buffers [i]->GetId () : 0;
 
-    //установка вершинных атрибутов  
+    size_t buffers_hash = crc32 (vertex_buffers_id, sizeof vertex_buffers_id);
 
-  if (current_base_vertex != base_vertex || current_layout_hash != attributes_hash || buffers_hash != current_buffers_hash)
-  {
-    BindVertexAttributes (base_vertex, vertex_buffers);
+    ShaderAttributeLayout* shader_layout = dictionary ? &GetShaderLayout (*dictionary) : (ShaderAttributeLayout*)0;
 
-    SetContextCacheValue (CacheEntry_CurrentBaseVertex,  base_vertex);
-    SetContextCacheValue (CacheEntry_CurrentLayoutHash,  attributes_hash);
-    SetContextCacheValue (CacheEntry_CurrentBuffersHash, buffers_hash);
+    size_t shader_layout_hash = shader_layout ? shader_layout->hash : 0;
+
+      //установка вершинных атрибутов  
+
+    if (current_base_vertex != base_vertex || current_layout_hash != attributes_hash || buffers_hash != current_buffers_hash || current_shader_layout_hash != shader_layout_hash)
+    {
+      BindVertexAttributes (base_vertex, vertex_buffers, shader_layout);
+
+      SetContextCacheValue (CacheEntry_CurrentBaseVertex,       base_vertex);
+      SetContextCacheValue (CacheEntry_CurrentLayoutHash,       attributes_hash);
+      SetContextCacheValue (CacheEntry_CurrentBuffersHash,      buffers_hash);
+      SetContextCacheValue (CacheEntry_CurrentShaderLayoutHash, shader_layout_hash);
+    }
+
+      //установка индексного буфера
+    
+    if (out_indices_layout)
+    {
+        //установка индексного буфера в контекст OpenGL
+
+      if (!index_buffer)
+        throw xtl::format_operation_exception ("", "Null index buffer");
+
+      index_buffer->Bind ();
+
+        //расчёт смещения первого индекса относительно начала индексного буфера
+
+      out_indices_layout->type = index_data_type;
+      out_indices_layout->data = (char*)index_buffer->GetDataPointer () + index_buffer_offset + base_index * index_size;
+    }
+
+      //проверка ошибок
+
+    CheckErrors ("");
   }
-
-    //установка индексного буфера
-  
-  if (out_indices_layout)
+  catch (xtl::exception& e)
   {
-      //установка индексного буфера в контекст OpenGL
-
-    if (!index_buffer)
-      throw xtl::format_operation_exception (METHOD_NAME, "Null index buffer");
-
-    index_buffer->Bind ();
-
-      //расчёт смещения первого индекса относительно начала индексного буфера
-
-    out_indices_layout->type = index_data_type;
-    out_indices_layout->data = (char*)index_buffer->GetDataPointer () + index_buffer_offset + base_index * index_size;
+    e.touch ("render::low_level::opengl::InputLayout::Bind");
+    throw;
   }
-
-    //проверка ошибок
-
-  CheckErrors (METHOD_NAME);
 }

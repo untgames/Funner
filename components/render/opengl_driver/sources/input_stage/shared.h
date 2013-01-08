@@ -39,10 +39,12 @@ namespace opengl
 enum InputStageCacheEntry
 {
   CacheEntry_BindedVboBuffer = CacheEntry_InputStagePrivateFirst, //ID текущего забинденного буфера
-  CacheEntry_EnabledSemantics,   //маска используемых семантик вершинных атрибутов
-  CacheEntry_CurrentBaseVertex,  //текущая базовая вершина
-  CacheEntry_CurrentLayoutHash,  //хэш атрибутов layout'а
-  CacheEntry_CurrentBuffersHash, //хэш установленных вершинных буферов
+  CacheEntry_EnabledSemantics,        //маска используемых семантик вершинных атрибутов
+  CacheEntry_CurrentBaseVertex,       //текущая базовая вершина
+  CacheEntry_CurrentLayoutHash,       //хэш атрибутов layout'а
+  CacheEntry_CurrentBuffersHash,      //хэш установленных вершинных буферов
+  CacheEntry_CurrentShaderLayoutHash, //хэш расположения вершинных атрибутов
+  CacheEntry_EnabledShaderSemantics,  //маска используемых семантик шейдерных вершинных атрибутов
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -243,7 +245,7 @@ class InputLayout: virtual public IInputLayout, public ContextObject
   private:
     struct ShaderAttributeLayout;
 
-    void                   BindVertexAttributes (size_t base_vertex, BufferPtr* vertex_buffers);    
+    void                   BindVertexAttributes (size_t base_vertex, BufferPtr* vertex_buffers, ShaderAttributeLayout* shader_layout);
     ShaderAttributeLayout& GetShaderLayout      (VertexAttributeDictionary& dictionary);
     void                   RemoveShaderLayout   (size_t id);
 

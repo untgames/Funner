@@ -19,6 +19,14 @@ enum GlVersion
   GlVersion_1_5,
   GlVersion_2_0,
   GlVersion_2_1,
+/*  GlVersion_3_0,
+  GlVersion_3_1,
+  GlVersion_3_2,
+  GlVersion_3_3,
+  GlVersion_4_0,
+  GlVersion_4_1,
+  GlVersion_4_2,
+  GlVersion_4_3,*/
 
   GlVersion_Num
 };
@@ -364,6 +372,20 @@ void ContextCaps::Init (const ExtensionSet& available_extension_set, const Exten
     else
       texture_units_count = 1;
   }
+
+  if (has_arb_vertex_shader)
+  { 
+    glVertexAttribPointer_fn       = glVertexAttribPointer ? glVertexAttribPointer : glVertexAttribPointerARB;
+    glDisableVertexAttribArray_fn  = glDisableVertexAttribArray ? glDisableVertexAttribArray : glDisableVertexAttribArrayARB;
+    glEnableVertexAttribArray_fn   = glEnableVertexAttribArray ? glEnableVertexAttribArray : glEnableVertexAttribArrayARB;
+
+    if (ext.Get ("GL_NV_vertex_program4"))
+      glVertexAttribIPointer_fn = glVertexAttribIPointer ? glVertexAttribIPointer : glVertexAttribIPointerEXT;
+
+    if (ext.Get ("GL_ARB_vertex_attrib_64bit") || ext.Get ("GL_EXT_vertex_attrib_64bit"))
+      glVertexAttribLPointer_fn  = glVertexAttribLPointer ? glVertexAttribLPointer : glVertexAttribLPointerEXT;
+  }
+
 #endif
   
   size_t settings_max_texture_size    = settings.GetInteger (ContextSettingsInteger_MaxTextureSize),

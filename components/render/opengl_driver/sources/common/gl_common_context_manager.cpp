@@ -44,7 +44,7 @@ class ContextImpl: public xtl::reference_counter, private IContextListener
           //выбор активного контекста          
         
         context->MakeCurrent (swap_chain);
-        
+
           //инициализация таблицы точек входа OpenGL 1.1
 
         gl_entries.Init (context->GetLibrary ());

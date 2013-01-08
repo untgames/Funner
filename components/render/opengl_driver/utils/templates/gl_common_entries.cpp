@@ -1,3 +1,5 @@
+#ifndef OPENGL_ES_SUPPORT
+
 #include "shared.h"
 
 using namespace render::low_level;
@@ -372,3 +374,5 @@ void GlEntries::Init (ILibrary& library)
     //получение адресов точек входа расширений OpenGL
 <<<GLINIT>>>
 }
+
+#endif
