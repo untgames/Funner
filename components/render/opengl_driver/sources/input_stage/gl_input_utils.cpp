@@ -53,7 +53,7 @@ VertexAttributeSemantic get_semantic_by_name (const char* name)
     if (!strcmp (iter->name, name))
       return iter->semantic;
 
-  throw xtl::make_argument_exception (METHOD_NAME, "name", name, "Unknown semantic");
+  return (VertexAttributeSemantic)-1;
 }
 
 //получение имени семантики

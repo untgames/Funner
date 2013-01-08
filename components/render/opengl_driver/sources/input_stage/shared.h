@@ -3,16 +3,19 @@
 
 #include <string.h>
 
-#include <stl/vector>
 #include <stl/algorithm>
+#include <stl/hash_map>
+#include <stl/vector>
 
-#include <xtl/uninitialized_storage.h>
-#include <xtl/trackable_ptr.h>
-#include <xtl/intrusive_ptr.h>
 #include <xtl/array>
+#include <xtl/bind.h>
 #include <xtl/common_exceptions.h>
+#include <xtl/intrusive_ptr.h>
+#include <xtl/trackable_ptr.h>
+#include <xtl/uninitialized_storage.h>
 
 #include <common/singleton.h>
+#include <common/string.h>
 #include <common/hash.h>
 
 #include <render/low_level/utils.h>
@@ -230,25 +233,34 @@ class InputLayout: virtual public IInputLayout, public ContextObject
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 //Установка состояния в контекст OpenGL
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-   void Bind (size_t         base_vertex,
-              size_t         base_index,
-              BufferPtr*     vertex_buffers,
-              Buffer*        index_buffer,
-              IndicesLayout* out_indices_layout);
+   void Bind (size_t                     base_vertex,
+              size_t                     base_index,
+              BufferPtr*                 vertex_buffers,
+              VertexAttributeDictionary* dictionary,
+              Buffer*                    index_buffer,
+              IndicesLayout*             out_indices_layout);
 
   private:
-    void BindVertexAttributes (size_t base_vertex, BufferPtr* vertex_buffers);
+    struct ShaderAttributeLayout;
+
+    void                   BindVertexAttributes (size_t base_vertex, BufferPtr* vertex_buffers);    
+    ShaderAttributeLayout& GetShaderLayout      (VertexAttributeDictionary& dictionary);
+    void                   RemoveShaderLayout   (size_t id);
 
   private:
     struct GlVertexAttribute;
     struct GlVertexAttributeGroup;
 
-    typedef stl::vector<GlVertexAttribute>      GlVertexAttributeArray;
-    typedef stl::vector<GlVertexAttributeGroup> GlVertexAttributeGroupArray;
+    typedef stl::vector<GlVertexAttribute>                  GlVertexAttributeArray;
+    typedef stl::vector<GlVertexAttributeGroup>             GlVertexAttributeGroupArray;
+    typedef xtl::intrusive_ptr<ShaderAttributeLayout>       ShaderAttributeLayoutPtr;
+    typedef stl::hash_map<size_t, ShaderAttributeLayoutPtr> ShaderAttributeLayoutMap;
 
   private:
     GlVertexAttributeArray      vertex_attributes;       //вершинные атрибуты
     GlVertexAttributeGroupArray vertex_attribute_groups; //группы вершинных атрибутов
+    ShaderAttributeLayoutMap    shader_layouts;          //расположение атрибутов шейдера
+    common::StringArray         shader_attribute_names;  //имена шейдерных атрибутов
     GLenum                      index_data_type;         //тип индексов
     size_t                      index_size;              //размер индекса
     size_t                      index_buffer_offset;     //смещение в индексном буфере до первого индекса
@@ -257,7 +269,7 @@ class InputLayout: virtual public IInputLayout, public ContextObject
     size_t                      attributes_hash;         //хеш атрибутов
 };
 
-//получение семантики по имени
+//получение семантики по имени (returns (VertexAttributeSemantic)-1 if fails)
 VertexAttributeSemantic get_semantic_by_name (const char* name);
 
 //получение имени семантики

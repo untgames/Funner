@@ -284,7 +284,7 @@ struct InputStage::Impl: public ContextObject
         Установка состояния уровня в контекст OpenGL
     */
       
-    void Bind (size_t base_vertex, size_t base_index, IndicesLayout* out_indices_layout)  
+    void Bind (size_t base_vertex, size_t base_index, VertexAttributeDictionary* dictionary, IndicesLayout* out_indices_layout)  
     {
       try
       {
@@ -293,7 +293,7 @@ struct InputStage::Impl: public ContextObject
         if (!layout)
           layout = default_layout.get ();
 
-        layout->Bind (base_vertex, base_index, state.GetVertexBuffers (), state.GetIndexBuffer (), out_indices_layout);
+        layout->Bind (base_vertex, base_index, state.GetVertexBuffers (), dictionary, state.GetIndexBuffer (), out_indices_layout);
       }
       catch (xtl::exception& exception)
       {
@@ -467,11 +467,11 @@ IBuffer* InputStage::GetIndexBuffer () const
     Установка состояния уровня в контекст OpenGL
 */
 
-void InputStage::Bind (size_t base_vertex, size_t base_index, IndicesLayout* out_indices_layout)
+void InputStage::Bind (size_t base_vertex, size_t base_index, VertexAttributeDictionary* dictionary, IndicesLayout* out_indices_layout)
 {
   try
   {
-    impl->Bind (base_vertex, base_index, out_indices_layout);
+    impl->Bind (base_vertex, base_index, dictionary, out_indices_layout);
   }
   catch (xtl::exception& exception)
   {
