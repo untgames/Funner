@@ -43,10 +43,10 @@
 
 #ifdef _WIN32_WCE
 #  include "config-win32ce.h"
-#else
-#  ifdef WIN32
-#    include "config-win32.h"
-#  endif
+#elif defined(WP8)
+#  include "config-wp8.h"
+#elif defined(WIN32)
+#  include "config-win32.h"
 #endif
 
 #ifdef TABLETOS
