@@ -23,7 +23,7 @@ endif
 
 MSVC_BIN_PATH      := $(MSVC_PATH)/bin/x86_arm
 COMMON_CFLAGS      += -W3 -Ox -wd4996 -nologo -FC -D "WP8" -D "ARM" -D "WINAPI_FAMILY=WINAPI_FAMILY_PHONE_APP" -MD -arch:ARMV7VE
-COMMON_LINK_FLAGS  += -machine:arm WindowsPhoneCore.lib
+COMMON_LINK_FLAGS  += -machine:arm WindowsPhoneCore.lib funner.extern.wp8compat.lib
 
 ###################################################################################################
 #Константы
