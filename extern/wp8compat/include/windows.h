@@ -3,6 +3,10 @@
 
 #include <../../8.0/Include/windows.h>
 
-inline ULONGLONG GetTickCount () { return GetTickCount64 (); }
+__inline ULONGLONG GetTickCount () { return GetTickCount64 (); }
+
+__inline HANDLE GetModuleHandle () { return (HANDLE)0; }
+
+__inline HWND GetDesktopWindow () { return (HWND)0; }
 
 #endif
