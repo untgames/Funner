@@ -764,7 +764,7 @@ BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason,
 	}
 #endif
 
-#if defined(_WIN32) && !defined(__CYGWIN__)
+#if defined(_WIN32) && !defined(__CYGWIN__) && !defined(WP8)
 #include <tchar.h>
 #include <signal.h>
 #ifdef __WATCOMC__
