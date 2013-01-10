@@ -12,7 +12,7 @@ extern "C"
 #endif
 
 
-__inline ULONGLONG GetTickCount () { return GetTickCount64 (); }
+__inline DWORD GetTickCount () { return (DWORD)GetTickCount64 (); }
 
 __inline HANDLE GetModuleHandle () { return (HANDLE)0; }
 
@@ -27,6 +27,8 @@ __inline int _getpid () { return (int)GetCurrentProcessId (); }
 __inline char* getenv (const char* name) { return 0; }
 
 void Sleep (DWORD milliseconds);
+
+__inline DWORD SleepEx (DWORD dwMilliseconds, BOOL bAlertable) { Sleep (dwMilliseconds); return 0; }
 
 HANDLE WINAPI FindFirstFileA (LPCTSTR lpFileName, LPWIN32_FIND_DATA lpFindFileData);
 
