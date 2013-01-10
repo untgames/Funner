@@ -2,6 +2,8 @@
 #define WP8_COMPATIBILITY_WINDOWS_H_HEADER
 
 #include <../../8.0/Include/windows.h>
+#include <minwin/fileapi.h>
+
 #include <signal.h>
 
 #ifdef __cplusplus
@@ -25,6 +27,14 @@ __inline int _getpid () { return (int)GetCurrentProcessId (); }
 __inline char* getenv (const char* name) { return 0; }
 
 void Sleep (DWORD milliseconds);
+
+HANDLE WINAPI FindFirstFileA (LPCTSTR lpFileName, LPWIN32_FIND_DATA lpFindFileData);
+
+#ifdef UNICODE
+#define FindFirstFile  FindFirstFileW
+#else
+#define FindFirstFile  FindFirstFileA
+#endif // !UNICODE
 
 #ifdef __cplusplus
 }
