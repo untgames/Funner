@@ -104,6 +104,7 @@ EXTERN.OPENSSL.wp8.COMPILER_CFLAGS       += -FI winsock2.h
 
 ifneq (,$(filter wp8,$(PROFILES)))
 EXTERN.OPENSSL.SOURCE_DIRS := $(filter-out sources/crypto/rand,$(EXTERN.OPENSSL.SOURCE_DIRS))
+EXTERN.OPENSSL.SOURCE_DIRS := $(filter-out sources/crypto/ui,$(EXTERN.OPENSSL.SOURCE_DIRS))
 endif
 
 #EXTERN.OPENSSL.win32.COMPILER_DEFINES += OPENSSL_BN_ASM_MONT
