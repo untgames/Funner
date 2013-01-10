@@ -43,8 +43,8 @@ CPU_ARCH                := arm
 INCLUDE := $(MSVC_PATH)/include
 LIB     := $(MSVC_PATH)/lib/$(CPU_ARCH)
 
-INCLUDE         := $(WP8_SDK)/include;$(WP8_SDK)/include/mincore;$(WP8_SDK)/include/minwin;$(INCLUDE)
-LIB             := $(WP8_SDK)/lib/$(CPU_ARCH);$(LIB)
+INCLUDE := $(ROOT)/extern/wp8compat/include;$(WP8_SDK)/include;$(WP8_SDK)/include/mincore;$(WP8_SDK)/include/minwin;$(INCLUDE)
+LIB     := $(WP8_SDK)/lib/$(CPU_ARCH);$(LIB)
 
 export INCLUDE
 export LIB
