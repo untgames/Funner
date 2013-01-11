@@ -14,7 +14,6 @@ extern "C"
 {
 #endif
 
-
 __inline DWORD GetTickCount () { return (DWORD)GetTickCount64 (); }
 
 __inline HANDLE GetModuleHandle () { return INVALID_HANDLE_VALUE; }
@@ -22,6 +21,15 @@ __inline HANDLE GetModuleHandle () { return INVALID_HANDLE_VALUE; }
 __inline HWND GetDesktopWindow () { return (HWND)0; }
 
 __inline int _getpid () { return (int)GetCurrentProcessId (); }
+
+DWORD WINAPI GetModuleFileNameA (HMODULE hModule, LPSTR lpFilename, DWORD nSize);
+DWORD WINAPI GetModuleFileNameW (HMODULE hModule, LPWSTR lpFilename,DWORD nSize);
+
+#ifdef UNICODE
+#define GetModuleFileName  GetModuleFileNameW
+#else
+#define GetModuleFileName  GetModuleFileNameA
+#endif // !UNICODE
 
 #ifdef getenv
 #undef getenv
@@ -113,6 +121,8 @@ __inline HMODULE WINAPI LoadLibraryW (LPCWSTR lpFileName) { return (HMODULE)0; }
 #else
 #define LoadLibrary LoadLibraryA
 #endif // !UNICODE
+
+__inline UINT WINAPI GetACP (void) { return 65001; } //utf-8
 
 #ifdef __cplusplus
 }
