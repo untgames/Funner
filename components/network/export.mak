@@ -12,6 +12,7 @@ export.link.network.iphone.LINK_INCLUDES := CurlStreamManager UrlFileSystem
 export.link.network.tabletos.LINK_INCLUDES  := CurlStreamManager UrlFileSystem
 export.link.network.android.LINK_INCLUDES  := CurlStreamManager UrlFileSystem
 export.link.network.win32.IMPORTS        := link.extern.curl
+export.link.network.wp8.IMPORTS          := link.extern.curl
 export.link.network.macosx.IMPORTS       := link.extern.curl
 export.link.network.iphone.IMPORTS       := link.extern.curl
 export.link.network.android.IMPORTS      := link.extern.curl

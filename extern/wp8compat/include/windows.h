@@ -32,12 +32,6 @@ DWORD WINAPI GetModuleFileNameW (HMODULE hModule, LPWSTR lpFilename,DWORD nSize)
 #define GetModuleFileName  GetModuleFileNameA
 #endif // !UNICODE
 
-#ifdef getenv
-#undef getenv
-#endif
-
-__inline char* getenv (const char* name) { return 0; }
-
 HANDLE WINAPI FindFirstFileA (LPCTSTR lpFileName, LPWIN32_FIND_DATAA lpFindFileData);
 
 HANDLE WINAPI FindFirstFileW (LPCWSTR lpFileName, LPWIN32_FIND_DATAW lpFindFileData);
