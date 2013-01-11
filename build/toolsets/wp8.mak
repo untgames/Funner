@@ -35,7 +35,7 @@ EXE_SUFFIX              := .exe
 DLL_SUFFIX              := .dll
 DLL_LIB_SUFFIX          := .lib
 DLL_PREFIX              :=
-PROFILES                += msvc wp8 has_windows arm
+PROFILES                += msvc wp8 has_windows arm no_dll
 CPU_ARCH                := arm
 
 ###################################################################################################

@@ -8,6 +8,7 @@
 #include <minwin/sysinfoapi.h>
 
 #include <signal.h>
+#include <stdlib.h>
 
 #ifdef __cplusplus
 extern "C"
@@ -113,6 +114,8 @@ void WINAPI TlsShutdown();
 
 __inline BOOL WINAPI TerminateProcess (HANDLE hProcess, UINT uExitCode) { return FALSE; }
 
+__inline VOID WINAPI ExitProcess (UINT uExitCode) { exit (uExitCode); }
+
 __inline HMODULE WINAPI LoadLibraryA (LPCTSTR lpFileName) { return (HMODULE)0; }
 __inline HMODULE WINAPI LoadLibraryW (LPCWSTR lpFileName) { return (HMODULE)0; }
 
@@ -123,6 +126,10 @@ __inline HMODULE WINAPI LoadLibraryW (LPCWSTR lpFileName) { return (HMODULE)0; }
 #endif // !UNICODE
 
 __inline UINT WINAPI GetACP (void) { return 65001; } //utf-8
+
+__inline void _tzset (void) {}
+
+DWORD WINAPI ExpandEnvironmentStrings (LPCTSTR lpSrc, LPTSTR lpDst, DWORD nSize);
 
 #ifdef __cplusplus
 }
