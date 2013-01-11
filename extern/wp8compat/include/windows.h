@@ -14,7 +14,7 @@ extern "C"
 
 __inline DWORD GetTickCount () { return (DWORD)GetTickCount64 (); }
 
-__inline HANDLE GetModuleHandle () { return (HANDLE)0; }
+__inline HANDLE GetModuleHandle () { return INVALID_HANDLE_VALUE; }
 
 __inline HWND GetDesktopWindow () { return (HWND)0; }
 
@@ -37,6 +37,12 @@ HANDLE WINAPI FindFirstFileA (LPCTSTR lpFileName, LPWIN32_FIND_DATA lpFindFileDa
 #else
 #define FindFirstFile  FindFirstFileA
 #endif // !UNICODE
+
+__inline int _getch (void) { return 0; }
+
+__inline HANDLE WINAPI GetStdHandle (DWORD nStdHandle) { return INVALID_HANDLE_VALUE; }
+
+__inline BOOL WINAPI FlushConsoleInputBuffer (HANDLE hConsoleInput) { return TRUE; }
 
 #ifdef __cplusplus
 }
