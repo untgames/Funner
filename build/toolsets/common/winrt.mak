@@ -1,51 +1,54 @@
 ###################################################################################################
-#Сборка под WindowsPhone8
+#Сборка под WindowsRT
 ###################################################################################################
 
 ###################################################################################################
 #Выбор конфигурации MSVC
 ###################################################################################################
-ifneq (,$(WP8_VC))
-  MSVC_PATH ?= $(call convert_path,$(WP8_VC))
+ifneq (,$(VS110COMNTOOLS))
+  MSVC_PATH         ?= $(VS110COMNTOOLS)../../vc
+  MSVS_COMMON_PATH  ?= $(VS110COMNTOOLS)../../Common7/Ide
+  PROFILES          += haswchar
 endif
 
-ifneq (,$(WP8_SDK))
-  SDK_DIR ?= $(call convert_path,$(WP8_SDK))
+ifeq (,$(MSVS_COMMON_PATH))
+  $(error 'Microsoft Visual Studio not detected (empty MSVC_PATH)')
 endif
 
 ifeq (,$(MSVC_PATH))
   $(error 'Microsoft Visual C++ not detected (empty MSVC_PATH)')
 endif
 
-ifeq (,$(SDK_DIR))
-  $(error 'Microsoft Windows Phone SDK not detected (empty WP8_SDK)')
+ifeq (,$(WINRT_SDK))
+  $(error 'Microsoft WindowsRT SDK not detected (empty WINRT_SDK)')
 endif
 
-MSVC_BIN_PATH      := $(MSVC_PATH)/bin/x86_arm
-COMMON_CFLAGS      += -W3 -Ox -wd4996 -nologo -FC -D "WP8" -D "ARM" -D "WINAPI_FAMILY=WINAPI_FAMILY_PHONE_APP" -MD -arch:ARMV7VE -AI "$(WP8_SDK)\Windows MetaData"
-COMMON_CFLAGS      += -AI "$(WP8_VC)\lib\arm"
-COMMON_LINK_FLAGS  += -machine:arm WindowsPhoneCore.lib funner.extern.wp8compat.lib
+ifneq (,$(WINRT_SDK))
+  SDK_DIR ?= $(call convert_path,$(WINRT_SDK))
+endif
+
+MSVC_BIN_PATH      := $(MSVC_PATH)/bin$(if $(filter x86,$(CPU_ARCH)),)
+$(warning $(MSVC_BIN_PATH))
+COMMON_CFLAGS      += -W3 -Ox -wd4996 -nologo -FC -D "WINRT" -D "WINAPI_FAMILY=WINAPI_FAMILY_APP" -MD -AI "$(WINRT_SDK)\References\CommonConfiguration\Neutral"
+COMMON_CFLAGS      += -AI "$(MSVC_PATH)\vcpackages"
+COMMON_LINK_FLAGS  +=
 
 ###################################################################################################
 #Константы
 ###################################################################################################
-LIB_SUFFIX              := .lib
-OBJ_SUFFIX              := .obj
-EXE_SUFFIX              := .exe
-DLL_SUFFIX              := .dll
-DLL_LIB_SUFFIX          := .lib
-DLL_PREFIX              :=
-PROFILES                += msvc wp8 has_windows arm no_dll win8
-CPU_ARCH                := arm
+LIB_SUFFIX     := .lib
+OBJ_SUFFIX     := .obj
+EXE_SUFFIX     := .exe
+DLL_SUFFIX     := .dll
+DLL_LIB_SUFFIX := .lib
+DLL_PREFIX     :=
+PROFILES       += msvc has_windows win8 winrt
 
 ###################################################################################################
 #Конфигурация переменных расположения библиотек
 ###################################################################################################
-INCLUDE := $(MSVC_PATH)/include
-LIB     := $(MSVC_PATH)/lib/$(CPU_ARCH)
-
-INCLUDE := $(ROOT)/extern/wp8compat/include;$(WP8_SDK)/include;$(WP8_SDK)/include/mincore;$(WP8_SDK)/include/minwin;$(WP8_SDK)/include/abi;$(INCLUDE)
-LIB     := $(WP8_SDK)/lib/$(CPU_ARCH);$(LIB)
+INCLUDE := $(WINRT_SDK)/include;$(WINRT_SDK)/include/shared;$(WINRT_SDK)/include/um;$(WINRT_SDK)/include/winrt;$(MSVC_PATH)/include;$(INCLUDE)
+LIB     := $(WINRT_SDK)/lib/win8/um/$(CPU_ARCH);$(MSVC_PATH)/lib$(if $(filter x86,$(CPU_ARCH)),);$(LIB)
 
 export INCLUDE
 export LIB
