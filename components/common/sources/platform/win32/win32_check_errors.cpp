@@ -6,51 +6,50 @@ namespace common
 namespace
 {
 
+const size_t MAX_BUFFER_SIZE = 2048;
+
 //получение строки с сообщением об ошибке
 stl::string get_error_message (DWORD error_code)
 {
-  void* buffer = 0;
-
-  FormatMessageW (FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
-                 0, error_code, MAKELANGID (LANG_NEUTRAL, SUBLANG_DEFAULT), (LPWSTR)&buffer, 0, 0);                 
+  void* buffer = malloc (MAX_BUFFER_SIZE);
 
   if (!buffer)
-  {
     return common::format ("Win32 error %u", error_code);
-  }
-  else
-  {    
-      //отсечение завершающих \n и пробелов
 
-    wchar_t* iter = (wchar_t*)buffer;
+  DWORD flags = FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS;
+
+  FormatMessageW (flags, 0, error_code, MAKELANGID (LANG_NEUTRAL, SUBLANG_DEFAULT), (LPWSTR)&buffer, 0, 0);
+
+    //отсечение завершающих \n и пробелов
+
+  wchar_t* iter = (wchar_t*)buffer;
+  
+  iter += xtl::xstrlen (iter);    
+  
+  if (iter == buffer)
+    return "";      
     
-    iter += xtl::xstrlen (iter);    
-    
-    if (iter == buffer)
-      return "";      
-      
-    for (bool loop=true; loop;)
-      switch (*--iter)
+  for (bool loop=true; loop;)
+    switch (*--iter)
+    {
+      case L'\n':
+      case L'\r':
+      case L' ':
+      case L'\t':
+        break;
+      default:
       {
-        case L'\n':
-        case L'\r':
-        case L' ':
-        case L'\t':
-          break;
-        default:
-        {
-          iter [1] = L'\0';
-          loop     = false;
-          break;
-        }
+        iter [1] = L'\0';
+        loop     = false;
+        break;
       }
+    }
 
-    stl::string message = common::format ("Win32 error %u. %s", error_code, common::tostring((const wchar_t*)buffer).c_str ());
+  stl::string message = common::format ("Win32 error %u. %s", error_code, common::tostring((const wchar_t*)buffer).c_str ());
 
-    LocalFree (buffer);
+  free (buffer);
 
-    return message;
-  }
+  return message;
 }
 
 }

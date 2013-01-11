@@ -8,7 +8,10 @@
 
 #include <windows.h>
 #include <stdlib.h>
+
+#ifndef WP8
 #include <shlobj.h>
+#endif
 
 #include <xtl/common_exceptions.h>
 #include <xtl/function.h>

@@ -5,6 +5,7 @@ using namespace common;
 namespace
 {
 
+#ifndef WP8
 stl::string GetFolderPath (int csidl)
 {
   stl::wstring result;
@@ -46,11 +47,13 @@ stl::string GetTempDirPath ()
 
   return to_utf8_string (result);
 }
+#endif
 
 }
 
 void Win32Platform::MountSystemSpecificPaths ()
 {
+#ifndef WP8
   FileSystem::Mount ("/system/appdata",   GetFolderPath (CSIDL_APPDATA).c_str ());
   FileSystem::Mount ("/system/personal",  GetFolderPath (CSIDL_PERSONAL).c_str ());  
 #if defined(WINCE)
@@ -61,4 +64,11 @@ void Win32Platform::MountSystemSpecificPaths ()
   FileSystem::Mount ("/system/inetcache", GetFolderPath (CSIDL_INTERNET_CACHE).c_str ());
 #endif
   FileSystem::Mount ("/system/temp",      GetTempDirPath ().c_str ());
+#else
+  FileSystem::Mount ("/system/appdata",   "/FUNNER_UNKNOWN");
+  FileSystem::Mount ("/system/personal",  "/FUNNER_UNKNOWN");
+  FileSystem::Mount ("/system/profile",   "/FUNNER_UNKNOWN"); 
+  FileSystem::Mount ("/system/inetcache", "/FUNNER_UNKNOWN");
+  FileSystem::Mount ("/system/temp",      "/FUNNER_UNKNOWN");
+#endif
 }

@@ -2,6 +2,7 @@
 #define COMMONLIB_FILE_SYSTEM_SHARED_HEADER
 
 #include <cstring>
+#include <stdlib.h>
 
 #include <stl/algorithm>
 #include <stl/auto_ptr.h>

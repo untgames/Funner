@@ -4,6 +4,7 @@
 #include <climits>
 #include <cstdio>
 #include <cstring>
+#include <stdlib.h>
 
 #include <stl/string>
 
@@ -16,7 +17,7 @@
 using namespace common;
 
 /*
-    Вывод основной информации о файле
+    ┬√тюф юёэютэющ шэЇюЁьрЎшш ю Їрщых
 */
 
 inline void PrintFileInfo (const char* file_name)

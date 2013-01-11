@@ -21,6 +21,7 @@ COMMON.SOURCES.cocoa.SOURCE_DIRS          := sources/platform/cocoa
 COMMON.SOURCES.cocoa_desktop.SOURCE_DIRS  := sources/platform/cocoa_desktop
 COMMON.SOURCES.iphone.SOURCE_DIRS         := sources/platform/cocoa_iphone
 COMMON.SOURCES.win32.SOURCE_DIRS          := sources/platform/win32
+COMMON.SOURCES.wp8.SOURCE_DIRS            := sources/platform/win32
 COMMON.SOURCES.bada.SOURCE_DIRS           := sources/platform/bada
 COMMON.SOURCES.bada.IMPORTS               := compile.extern.bada
 COMMON.SOURCES.linux.COMPILER_DEFINES     := HAS_PWD_H
