@@ -1111,7 +1111,9 @@ FileImplPtr FileSystemImpl::OpenFile (const char* src_file_name,filemode_t mode_
 
 FileImplPtr FileSystemImpl::OpenFile (const char* src_file_name,filemode_t mode_flags)
 {
-  return OpenFile (src_file_name,mode_flags,FileSystemSingleton::Instance ()->GetDefaultFileBufferSize ());
+  size_t buffer_size = FileSystemSingleton::Instance ()->GetDefaultFileBufferSize ();
+
+  return OpenFile (src_file_name,mode_flags, buffer_size);
 }
 
 void FileSystemImpl::SetDefaultFileBufferSize (size_t buffer_size)
