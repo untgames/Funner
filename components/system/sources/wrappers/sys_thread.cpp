@@ -79,6 +79,8 @@ struct Thread::Impl: public IThreadCallback
     , exit_code ()
     , cancel_requested (false)    
   {
+    xtl::com_ptr<Impl> self_lock (this);
+
     try
     {
       AddRef ();
