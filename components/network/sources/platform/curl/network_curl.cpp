@@ -34,6 +34,9 @@ namespace curl_stream_manager
 
 const char* LOG_NAME = "network.curl"; //название потока протоколировани€
 
+const long MIN_DOWNLOAD_SPEED          = 100;  //ћинимальна€ скорость закачки в байтах в секунду, при падении до которой закачка будет оборвана
+const long MIN_DOWNLOAD_SPEED_DURATION = 30;   //ƒлительность закачки с минимальной скоростью, после которой будет выдана ошибка
+
 /*
     Ѕиблиотека CURL
 */
@@ -206,7 +209,8 @@ class CurlStream: public IUrlStream
           check_code (curl_easy_setopt (stream, CURLOPT_DEBUGDATA, this), "::curl_easy_setopt(CURLOPT_DEBUGDATA)");
           check_code (curl_easy_setopt (stream, CURLOPT_VERBOSE, 1L), "::curl_easy_setopt(CURLOPT_VERBOSE)");
           check_code (curl_easy_setopt (stream, CURLOPT_SSL_VERIFYPEER, false), "::curl_easy_setopt(CURLOPT_SSL_VERIFYPEER)");
-          check_code (curl_easy_setopt (stream, CURLOPT_CONNECTTIMEOUT, 300), "::curl_easy_setopt(CURLOPT_CONNECTTIMEOUT)");                    
+          check_code (curl_easy_setopt (stream, CURLOPT_LOW_SPEED_LIMIT, MIN_DOWNLOAD_SPEED), "::curl_easy_setopt(CURLOPT_LOW_SPEED_LIMIT)");
+          check_code (curl_easy_setopt (stream, CURLOPT_LOW_SPEED_TIME, MIN_DOWNLOAD_SPEED_DURATION), "::curl_easy_setopt(CURLOPT_LOW_SPEED_TIME)");
           
             //конфигураци€ соединени€, завис€ща€ от параметров
             
