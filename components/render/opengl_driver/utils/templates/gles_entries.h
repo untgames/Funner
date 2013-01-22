@@ -345,10 +345,6 @@ const GlEntries* get_gl_entries ();
 */
 <<<GLESDEFINES>>>
 
-#ifdef GL_APIENTRY
-  #undef GL_APIENTRY
-#endif
-
 }
 
 }
