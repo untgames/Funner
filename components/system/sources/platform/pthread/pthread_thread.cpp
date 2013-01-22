@@ -135,7 +135,7 @@ size_t PThreadManager::GetCurrentThreadId ()
 #ifdef WINCE
   return (size_t)pthread_getw32threadid_np (pthread_self ());
 #else
-  return gettid ();
+  return (size_t)pthread_self ();
 #endif
 }
 
