@@ -8,7 +8,7 @@ int main ()
   {
     LogFilter filter ("system.threads.*", &print_log);
 
-    Thread& thread = Thread::GetCurrent ();
+    Thread thread = Thread::GetCurrent ();
 
     thread.GetCurrent ();
 //    printf ("current thread name is '%s'\n", thread.Name ());
