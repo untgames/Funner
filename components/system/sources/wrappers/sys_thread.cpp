@@ -75,6 +75,7 @@ struct Thread::Impl: public IThreadCallback
 ///Конструктор
   Impl (const char* in_name, const Function& in_thread_function)
     : thread_function (in_thread_function)
+    , id ()
     , name (in_name)
     , exit_code ()
     , cancel_requested (false)    
@@ -86,9 +87,6 @@ struct Thread::Impl: public IThreadCallback
       AddRef ();
       
       handle = Platform::CreateThread (this);
-      id     = Platform::GetThreadId (handle);
-
-      ThreadManagerSingleton::Instance ()->AddThread (id, this);
     }
     catch (...)
     {
@@ -119,6 +117,10 @@ struct Thread::Impl: public IThreadCallback
 
       Release (); //компенсация увеличения ссылок в конструкторе
 
+      id = Platform::GetCurrentThreadId ();
+
+      ThreadManagerSingleton::Instance ()->AddThread (id, this);
+
       try
       {
         exit_code = thread_function ();
@@ -136,26 +138,19 @@ struct Thread::Impl: public IThreadCallback
     {
       //подавление всех исключений
     }
+
+    ThreadManagerSingleton::Instance ()->RemoveThread (id);
   }
 
 ///Подсчёт ссылок
   void AddRef () { ref_count.increment (); }
 
   void Release ()
-  {
+  {    
     if (!ref_count.decrement ())
       return;
 
-    ThreadManagerSingleton::Instance instance;
-
-    ref_count.increment ();
-
-    if (!ref_count.decrement ())
-      return;
-
-    instance->RemoveThread (id);
-
-    delete this;    
+    delete this;
   }
 };
 
@@ -268,7 +263,7 @@ Thread Thread::GetCurrent ()
 {
   try
   {
-    return Thread (&*ThreadManagerSingleton::Instance ()->GetThread ((Platform::GetCurrentThreadId ())));
+    return Thread (&*ThreadManagerSingleton::Instance ()->GetThread (Platform::GetCurrentThreadId ()));
   }
   catch (xtl::exception& exception)
   {
