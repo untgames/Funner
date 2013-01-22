@@ -125,22 +125,6 @@ void PThreadManager::JoinThread (thread_t thread)
    Получение идентификатора нити
 */
 
-#ifdef WINCE
-
-inline size_t get_thread_id (pthread_t thread)
-{
-  return (size_t)pthread_getw32threadid_np (thread);
-}
-
-#else
-
-inline size_t get_thread_id (pthread_t thread)
-{
-  return (size_t)thread;
-}
-
-#endif
-
 size_t PThreadManager::GetThreadId (thread_t thread)
 {
   return (size_t)thread->thread;
@@ -148,7 +132,11 @@ size_t PThreadManager::GetThreadId (thread_t thread)
 
 size_t PThreadManager::GetCurrentThreadId ()
 {
-  return get_thread_id (pthread_self ());
+#ifdef WINCE
+  return (size_t)pthread_getw32threadid_np (pthread_self ());
+#else
+  return gettid ();
+#endif
 }
 
 /*
