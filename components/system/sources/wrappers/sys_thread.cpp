@@ -12,12 +12,17 @@ namespace
 
 const char* LOG_NAME_PREFIX = "system.threads"; //имя потока протоколирования
 
+}
+
+namespace syslib
+{
+
 ///Менеджер созданных нитей
 class ThreadManager
 {
   public:
     ///Добавление / удаление / поиск нити по идентификатору
-    void AddThread (size_t thread_id, Thread* thread)
+    void AddThread (size_t thread_id, Thread::Impl* thread)
     {
       ThreadsMap::iterator iter = threads_map.find (thread_id);
 
@@ -32,7 +37,7 @@ class ThreadManager
       threads_map.erase (thread_id);
     }
 
-    Thread* GetThread (size_t thread_id)
+    xtl::com_ptr<Thread::Impl> GetThread (size_t thread_id)
     {
       ThreadsMap::iterator iter = threads_map.find (thread_id);
 
@@ -43,13 +48,13 @@ class ThreadManager
     }
 
   private:
-    typedef stl::hash_map<size_t, Thread*> ThreadsMap;
+    typedef stl::hash_map<size_t, Thread::Impl*> ThreadsMap;
 
   private:
     ThreadsMap threads_map;
 };
 
-typedef common::Singleton <ThreadManager> ThreadManagerSingleton;
+typedef common::Singleton<ThreadManager> ThreadManagerSingleton;
 
 }
 
@@ -57,36 +62,37 @@ typedef common::Singleton <ThreadManager> ThreadManagerSingleton;
     Описание реализации нити
 */
 
-struct Thread::Impl: public IThreadCallback, public xtl::reference_counter, public Lockable
+struct Thread::Impl: public IThreadCallback
 {
-  typedef xtl::lock_ptr<Impl, xtl::intrusive_ptr<Impl> > LockPtr;
-
-  Function     thread_function;  //функция нити
-  thread_t     handle;           //идентификатор нити
-  size_t       id;               //численный идентификатор нити
-  stl::string  name;             //имя нити
-  int          exit_code;        //код выхода нити
-  bool         cancel_requested; //был ли получен запрос на отмену нити
+  Function               thread_function;  //функция нити
+  thread_t               handle;           //идентификатор нити
+  size_t                 id;               //численный идентификатор нити
+  stl::string            name;             //имя нити
+  int                    exit_code;        //код выхода нити
+  bool                   cancel_requested; //был ли получен запрос на отмену нити
+  xtl::reference_counter ref_count;        //счетчик ссылок
 
 ///Конструктор
   Impl (const char* in_name, const Function& in_thread_function)
     : thread_function (in_thread_function)
     , name (in_name)
+    , exit_code ()
     , cancel_requested (false)    
   {
     try
     {
-      addref (this);
+      AddRef ();
       
       handle = Platform::CreateThread (this);
+      id     = Platform::GetThreadId (handle);
+
+      ThreadManagerSingleton::Instance ()->AddThread (id, this);
     }
     catch (...)
     {
-      release (this);
+      Release ();
       throw;
     }
-
-    id = Platform::GetThreadId (handle);
   }
 
 ///Деструктор
@@ -107,11 +113,12 @@ struct Thread::Impl: public IThreadCallback, public xtl::reference_counter, publ
   {
     try
     {
-      release (this); //компенсация увеличения ссылок в конструкторе
-      
+      xtl::com_ptr<Impl> self_lock (this);
+
+      Release (); //компенсация увеличения ссылок в конструкторе
+
       try
       {
-        id        = Platform::GetCurrentThreadId ();
         exit_code = thread_function ();
       }
       catch (std::exception& exception)
@@ -130,9 +137,24 @@ struct Thread::Impl: public IThreadCallback, public xtl::reference_counter, publ
   }
 
 ///Подсчёт ссылок
-  void AddRef () { addref (this); }
+  void AddRef () { ref_count.increment (); }
 
-  void Release () { release (this); }
+  void Release ()
+  {
+    if (!ref_count.decrement ())
+      return;
+
+    ThreadManagerSingleton::Instance instance;
+
+    ref_count.increment ();
+
+    if (!ref_count.decrement ())
+      return;
+
+    instance->RemoveThread (id);
+
+    delete this;    
+  }
 };
 
 /*
@@ -143,19 +165,15 @@ Thread::Thread (const Function& thread_function)
 {
   try
   {
-    static size_t thread_auto_counter = 0;
+    static volatile int thread_auto_counter = 0;
 
-    ++thread_auto_counter;
+    xtl::atomic_increment (thread_auto_counter);
 
     impl = new Impl (format ("Thread%u", thread_auto_counter).c_str (), thread_function);
-
-    ThreadManagerSingleton::Instance manager = ThreadManagerSingleton::Instance ();
-
-    manager->AddThread (Platform::GetThreadId (impl->handle), this);
   }
   catch (xtl::exception& exception)
   {
-    exception.touch ("syslib::Thread::Thread(const Function&, ThreadState)");
+    exception.touch ("syslib::Thread::Thread(const Function&)");
     throw;
   }
 }
@@ -168,27 +186,29 @@ Thread::Thread (const char* name, const Function& thread_function)
       throw xtl::make_null_argument_exception ("", "name");
     
     impl = new Impl (name, thread_function);
-
-    ThreadManagerSingleton::Instance manager = ThreadManagerSingleton::Instance ();
-
-    manager->AddThread (Platform::GetThreadId (impl->handle), this);
   }
   catch (xtl::exception& exception)
   {
-    exception.touch ("syslib::Thread::Thread(const char*, const Function&, ThreadState)");
+    exception.touch ("syslib::Thread::Thread(const char*, const Function&)");
     throw;
   }
 }
 
+Thread::Thread (Impl* in_impl)
+  : impl (in_impl)
+{
+  impl->AddRef ();
+}
+
+Thread::Thread (const Thread& thread)
+  : impl (thread.impl)
+{
+  impl->AddRef ();
+}
+
 Thread::~Thread ()
 {
-  common::Lock lock (*impl);
-
-  ThreadManagerSingleton::Instance manager = ThreadManagerSingleton::Instance ();
-
-  manager->RemoveThread (Platform::GetThreadId (impl->handle));
-
-  release (impl);
+  impl->Release ();
 }
 
 /*
@@ -197,17 +217,17 @@ Thread::~Thread ()
 
 Thread::threadid_t Thread::Id () const
 {
-  return Impl::LockPtr (impl)->id;
+  return impl->id;
 }
 
 /*
     Имя нити
 */
 
-/*const char* Thread::Name () const
+const char* Thread::Name () const
 {
-  return impl->handle ? impl->name.c_str () : Platform::GetCurrentThreadName ();
-}*/
+  return impl->handle ? impl->name.c_str () : "<nil>";
+}
 
 /*
    Установка приоритета нити
@@ -215,9 +235,7 @@ Thread::threadid_t Thread::Id () const
 
 void Thread::SetPriority (ThreadPriority thread_priority)
 {
-  Impl::LockPtr thread_impl (impl);
-
-  Platform::SetThreadPriority (thread_impl->handle, thread_priority);
+  Platform::SetThreadPriority (impl->handle, thread_priority);
 }
 
 /*
@@ -226,7 +244,7 @@ void Thread::SetPriority (ThreadPriority thread_priority)
 
 void Thread::Cancel ()
 {
-  Impl::LockPtr (impl)->cancel_requested = true;
+  impl->cancel_requested = true;
 }
 
 /*
@@ -235,24 +253,20 @@ void Thread::Cancel ()
 
 int Thread::Join ()
 {
-  Impl::LockPtr thread_impl (impl);
+  Platform::JoinThread (impl->handle);
 
-  Platform::JoinThread (thread_impl->handle);
-
-  return thread_impl->exit_code;
+  return impl->exit_code;
 }
 
 /*
     Получение текущей нити
 */
 
-Thread& Thread::GetCurrent ()
+Thread Thread::GetCurrent ()
 {
   try
   {
-    ThreadManagerSingleton::Instance manager = ThreadManagerSingleton::Instance ();
-
-    return *(manager->GetThread (Platform::GetCurrentThreadId ()));
+    return Thread (&*ThreadManagerSingleton::Instance ()->GetThread ((Platform::GetCurrentThreadId ())));
   }
   catch (xtl::exception& exception)
   {
@@ -280,22 +294,20 @@ Thread::threadid_t Thread::GetCurrentThreadId ()
 
 void Thread::TestCancel ()
 {
-  Impl::LockPtr current_thread_impl;
-
   try
   {
-    current_thread_impl = GetCurrent ().impl;
+    Thread thread = GetCurrent ();
+
+    if (!thread.impl->cancel_requested)
+      return;
+
+    thread.impl->exit_code = THREAD_CANCELED_EXIT_CODE;
+
+    throw xtl::format_exception <cancel_thread_exception> ("", "Thread has been cancelled");
   }
   catch (xtl::exception& exception)
   {
     exception.touch ("syslib::Thread::TestCancel");
     throw;
   }
-
-  if (!current_thread_impl->cancel_requested)
-    return;
-
-  current_thread_impl->exit_code = THREAD_CANCELED_EXIT_CODE;
-
-  throw xtl::format_exception <cancel_thread_exception> ("syslib::Thread::TestCancel", "Thread cancelled");
 }
