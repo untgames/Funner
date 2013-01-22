@@ -530,8 +530,8 @@ class FileSystemImpl
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Открытие файла
 ///////////////////////////////////////////////////////////////////////////////////////////////////    
-    FileImplPtr OpenFile (const char* src_file_name,filemode_t mode_flags);
-    FileImplPtr OpenFile (const char* src_file_name,filemode_t mode_flags,size_t buffer_size);
+    static FileImplPtr OpenFile (const char* src_file_name,filemode_t mode_flags);
+    static FileImplPtr OpenFile (const char* src_file_name,filemode_t mode_flags,size_t buffer_size);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Установка размера буфера файла по умолчанию

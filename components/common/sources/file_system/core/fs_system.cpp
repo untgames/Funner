@@ -1034,9 +1034,23 @@ FileImplPtr FileSystemImpl::OpenFile (const char* src_file_name,filemode_t mode_
   if (!src_file_name)
     throw xtl::make_null_argument_exception ("FileSystemImpl::OpenFile","file_name");
 
-  string file_name;
+  string                 file_name;
+  bool                   has_crypto_params = false;
+  ICustomFileSystemPtr   file_system;
+  AnonymousFileSystemPtr anonymous_file_system;
 
-  ICustomFileSystemPtr file_system = FindFileSystem (src_file_name,file_name);
+  {
+    FileSystemSingleton::Instance instance;
+
+    has_crypto_params     = instance->HasCryptoParameters (src_file_name);
+    file_system           = instance->FindFileSystem (src_file_name,file_name);
+    anonymous_file_system = instance->anonymous_file_system;
+
+    size_t preferred_buffer_size = instance->GetFileBufferSize (src_file_name);
+
+    if (preferred_buffer_size > buffer_size)
+      buffer_size = preferred_buffer_size;
+  }
 
   try
   {
@@ -1069,18 +1083,15 @@ FileImplPtr FileSystemImpl::OpenFile (const char* src_file_name,filemode_t mode_
       }
     }         
 
-    if (HasCryptoParameters (src_file_name))
+    if (has_crypto_params)
     {
-      FileCryptoParameters params = GetCryptoParameters (src_file_name);
+      FileCryptoParameters params = FileSystemSingleton::Instance ()->GetCryptoParameters (src_file_name);
 
       base_file = FileImplPtr (new CryptoFileImpl (base_file, buffer_size, params.ReadMethod (), params.WriteMethod (), params.Key (), params.KeyBits ()), false);
     }
 
-    size_t self_buffer_size = base_file->GetBufferSize (), preferred_buffer_size = GetFileBufferSize (src_file_name);
+    size_t self_buffer_size = base_file->GetBufferSize ();
     
-    if (preferred_buffer_size > buffer_size)
-      buffer_size = preferred_buffer_size;
-
     if (!buffer_size || self_buffer_size >= buffer_size || (self_buffer_size >= base_file->Size () && !(base_file->Mode () & FileMode_Resize)))
       return base_file;
 
@@ -1095,12 +1106,12 @@ FileImplPtr FileSystemImpl::OpenFile (const char* src_file_name,filemode_t mode_
     throw;
   }
 
-  return NULL;
+  return 0;
 }
 
 FileImplPtr FileSystemImpl::OpenFile (const char* src_file_name,filemode_t mode_flags)
 {
-  return OpenFile (src_file_name,mode_flags,default_file_buffer_size);
+  return OpenFile (src_file_name,mode_flags,FileSystemSingleton::Instance ()->GetDefaultFileBufferSize ());
 }
 
 void FileSystemImpl::SetDefaultFileBufferSize (size_t buffer_size)

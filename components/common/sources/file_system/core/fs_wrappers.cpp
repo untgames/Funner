@@ -3,11 +3,11 @@
 using namespace common;
 
 StdFile::StdFile (const char* file_name,filemode_t mode_flags)
-  : File (FileSystemSingleton::Instance ()->OpenFile (file_name,mode_flags))
+  : File (FileSystemImpl::OpenFile (file_name,mode_flags))
   { }
 
 StdFile::StdFile (const char* file_name,filemode_t mode_flags,size_t buffer_size)
-  : File (FileSystemSingleton::Instance ()->OpenFile (file_name,mode_flags,buffer_size))
+  : File (FileSystemImpl::OpenFile (file_name,mode_flags,buffer_size))
   { }
 
 InputFile::InputFile (const char* file_name)
