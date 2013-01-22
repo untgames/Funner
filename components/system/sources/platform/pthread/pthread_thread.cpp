@@ -32,7 +32,6 @@ void* thread_run (void* data)
 
   pthread_cleanup_push  (&thread_done, 0);
   
-
   try
   {
     callback->Run ();
