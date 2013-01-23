@@ -178,7 +178,7 @@ void GlEntries::Init (ILibrary& library)
   init_entry (library, "glTranslatex", Translatex);
   init_entry (library, "glVertexPointer", VertexPointer);
   init_entry (library, "glViewport", Viewport);
-  init_entry (library, "glPointSizePointerOES", PointSizePointerOES);
+//  init_entry (library, "glPointSizePointerOES", PointSizePointerOES);
   
     //получение адресов точек входа расширений OpenGL
 <<<GLESINIT>>>
