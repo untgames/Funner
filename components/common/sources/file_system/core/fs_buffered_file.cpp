@@ -47,8 +47,6 @@ struct BufferedFileImpl::Impl
       char*  data = buffer.data () + (data_dirty_start_pos - data_start_pos);
       size_t size = data_dirty_end_pos - data_dirty_start_pos;
 
-printf ("write %u bytes\n", size);
-
       size_t write_size = base_file->Write (data, size);
 
       if (write_size != size)
