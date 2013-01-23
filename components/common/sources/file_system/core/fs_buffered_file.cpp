@@ -16,6 +16,7 @@ struct BufferedFileImpl::Impl
   filesize_t  file_size;            //размер файла
   filepos_t   file_pos;             //файловая позиция
   filepos_t   data_start_pos;       //позиция начала данных
+  filepos_t   data_end_pos;         //позиция конца данных для чтения
   filepos_t   data_dirty_start_pos; //файловая позиция начала блока данных, требующего выгрузки на диск
   filepos_t   data_dirty_end_pos;   //файловая позиция конца блока данных, требующего выгрузки на диск
   
@@ -25,10 +26,11 @@ struct BufferedFileImpl::Impl
     , file_size (base_file->Size ())
     , file_pos (0)
     , data_start_pos (0)
+    , data_end_pos (0)
     , data_dirty_start_pos (0)
     , data_dirty_end_pos (0)
   {
-    buffer.reserve (buffer_size);    
+    buffer.resize (buffer_size);    
   }
   
 ///Сброс буфера
@@ -45,6 +47,8 @@ struct BufferedFileImpl::Impl
       char*  data = buffer.data () + (data_dirty_start_pos - data_start_pos);
       size_t size = data_dirty_end_pos - data_dirty_start_pos;
 
+printf ("write %u bytes\n", size);
+
       size_t write_size = base_file->Write (data, size);
 
       if (write_size != size)
@@ -52,8 +56,6 @@ struct BufferedFileImpl::Impl
 
       data_dirty_start_pos = 0;
       data_dirty_end_pos   = 0;
-
-      buffer.resize (0);
     }
     catch (xtl::exception& exception)
     {
@@ -63,10 +65,10 @@ struct BufferedFileImpl::Impl
   }  
 
 ///Подготовка данных
-  void PrepareData (filepos_t pos)
+  void PrepareData (filepos_t pos, bool ignore_fail = false)
   {
-    if (pos >= data_start_pos && size_t (pos - data_start_pos) < buffer.size ())
-      return;    
+    if (pos >= data_start_pos && pos < data_end_pos)
+      return;
 
     try
     {
@@ -84,29 +86,32 @@ struct BufferedFileImpl::Impl
 
           size_t available_size = base_file->Size () - data_start_pos;
 
-          buffer.resize (available_size < buffer.capacity () ? available_size : buffer.capacity (), false);
-
             //чтение данных
+        
+          if (available_size)
+          {
+            if (base_file->Seek (data_start_pos) != data_start_pos)
+              throw xtl::format_operation_exception ("", "Can't seek file");
 
-          if (base_file->Seek (data_start_pos) != data_start_pos)
-            throw xtl::format_operation_exception ("", "Can't seek file");
+            size_t result = base_file->Read (buffer.data (), available_size);        
 
-          size_t result = base_file->Read (buffer.data (), buffer.size ());
+            data_end_pos = data_start_pos + result;
 
-          if (result != buffer.size ())
-            throw xtl::format_operation_exception ("", "Can't read data from file");
+            if (!result && ignore_fail)
+              data_end_pos = data_start_pos + buffer.size ();
+          }
+          else data_end_pos = data_start_pos + buffer.size ();
         }
         else
         {
-          buffer.resize (0);
+          data_end_pos = data_start_pos;
         }
       }
       catch (...)
       {
         data_start_pos = 0;
+        data_end_pos   = 0;
 
-        buffer.resize (0);
-        
         throw;
       }
     }
@@ -196,10 +201,6 @@ void BufferedFileImpl::Resize (filesize_t new_size)
 {
   try
   {
-    impl->FlushBuffer ();
-    
-    impl->base_file->Resize (new_size);
-    
     impl->file_size = new_size;
   }
   catch (xtl::exception& exception)
@@ -260,7 +261,7 @@ size_t BufferedFileImpl::Read (void* buf, size_t size)
         //копирование данных
 
       size_t      offset         = pos - impl->data_start_pos;
-      size_t      available_size = impl->buffer.size () - offset;
+      size_t      available_size = impl->data_end_pos - pos;
       size_t      read_size      = size < available_size ? size : available_size;
       const char* src            = impl->buffer.data () + offset;
 
@@ -334,19 +335,15 @@ size_t BufferedFileImpl::Write (const void* buf,size_t size)
     {
         //подготовка буфера данных
 
-      impl->PrepareData (pos);
+      impl->PrepareData (pos, true);
 
         //копирование данных
 
       size_t offset         = pos - impl->data_start_pos;
-      size_t available_size = impl->buffer.size () - offset;
+      size_t available_size = impl->data_end_pos - pos;
 
       if (!available_size)  //файл только на запись, данные не могут быть прочитаны
-      {
         available_size = impl->buffer.capacity () < size ? impl->buffer.capacity () : size;
-
-        impl->buffer.resize (available_size, false);
-      }
 
       size_t write_size = size < available_size ? size : available_size;
       char*  dst        = impl->buffer.data () + offset;
