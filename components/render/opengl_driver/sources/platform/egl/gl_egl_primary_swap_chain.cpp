@@ -47,47 +47,13 @@ struct PrimarySwapChain::Impl
       
         //выбор конфигурации
 
-      EGLint config_attributes [CONFIG_MAX_ATTRIBUTES], *attr = config_attributes;
-      
-      *attr++ = EGL_BUFFER_SIZE;
-      *attr++ = in_desc.frame_buffer.color_bits;
-      *attr++ = EGL_ALPHA_SIZE;
-      *attr++ = in_desc.frame_buffer.alpha_bits;      
-      *attr++ = EGL_DEPTH_SIZE;
-      *attr++ = in_desc.frame_buffer.depth_bits;
-//      *attr++ = EGL_STENCIL_SIZE; //for tests only!!!!!!!
-//      *attr++ = in_desc.frame_buffer.stencil_bits;
-      *attr++ = EGL_SAMPLES;
-      *attr++ = in_desc.samples_count;
-      *attr++ = EGL_SURFACE_TYPE;
-      *attr++ = EGL_WINDOW_BIT;
-      *attr++ = EGL_RENDERABLE_TYPE;
-      *attr++ = EGL_OPENGL_ES_BIT;
-      
-      switch (in_desc.swap_method)
-      {
-        case SwapMethod_Discard:
-        case SwapMethod_Flip:
-        case SwapMethod_Copy:
-          break;
-        default:
-          throw xtl::make_argument_exception ("", "desc.swap_method", desc.swap_method);
-      }            
-      
-      *attr++ = EGL_SURFACE_TYPE;
-      *attr++ = EGL_WINDOW_BIT;
-      *attr++ = EGL_NONE;      
-      
-      EGLint configs_count = 0;
-
-      if (!eglChooseConfig (egl_display, config_attributes, &egl_config, 1, &configs_count))
-        raise_error ("::eglChooseConfig");
+      egl_config = ChooseConfig (in_desc);
         
-      if (!configs_count)
+      if (!egl_config)
         throw xtl::format_operation_exception ("", "Bad EGL configuration (RGB/A: %u/%u, D/S: %u/%u, Samples: %u)",
           in_desc.frame_buffer.color_bits, in_desc.frame_buffer.alpha_bits, in_desc.frame_buffer.depth_bits,
           in_desc.frame_buffer.stencil_bits, in_desc.samples_count);
-          
+
       EGLint format = 0;
           
       eglGetConfigAttrib (egl_display, egl_config, EGL_NATIVE_VISUAL_ID, &format);                
@@ -169,6 +135,98 @@ struct PrimarySwapChain::Impl
     }
     catch (...)
     {
+    }
+  }
+
+///Сравнение двух количественных показателей (0 - первый формат более подходит, 1 - второй формат более подходит)
+  static int CompareFormatCounts (size_t source1, size_t source2, size_t require)
+  {
+    if (source1 == require)
+      return 0;
+
+    if (source2 == require)
+      return 1;
+
+    if (source1 < require)
+    {
+       if (source2 < require) return source1 < source2;
+       else                   return 1;
+    }
+    else //source1 > require
+    {
+      if (source2 > require) return source1 > source2;
+      else                   return 0;
+    }
+  }
+
+///Сравнение двух форматов (0 - первый формат более подходит, 1 - второй формат более подходит)
+  static int CompareFormats (const PixelFormatDesc& fmt0, const PixelFormatDesc& fmt1, const SwapChainDesc& swap_chain_desc)
+  {
+      //упорядочивание по типу ускорения
+
+    if (fmt0.acceleration != fmt1.acceleration)
+      return fmt0.acceleration < fmt1.acceleration;
+
+      //упорядочивание по количеству битов цвета
+      
+    if (fmt0.color_bits != fmt1.color_bits)
+      return CompareFormatCounts (fmt0.color_bits, fmt1.color_bits, swap_chain_desc.frame_buffer.color_bits);
+      
+      //упорядочивание по количеству битов глубины
+
+    if (fmt0.depth_bits != fmt1.depth_bits)
+      return CompareFormatCounts (fmt0.depth_bits, fmt1.depth_bits, swap_chain_desc.frame_buffer.depth_bits);
+
+      //упорядочивание по количеству битов трафарета
+
+    if (fmt0.stencil_bits != fmt1.stencil_bits)
+      return CompareFormatCounts (fmt0.stencil_bits, fmt1.stencil_bits, swap_chain_desc.frame_buffer.stencil_bits);
+
+      //упорядочивание по количеству сэмплов
+
+    if (fmt0.samples_count != fmt1.samples_count)
+      return CompareFormatCounts (fmt0.samples_count, fmt1.samples_count, swap_chain_desc.samples_count);
+
+      //упорядочивание по количеству битов альфы
+
+    if (fmt0.alpha_bits != fmt1.alpha_bits)
+      return CompareFormatCounts (fmt0.alpha_bits, fmt1.alpha_bits, swap_chain_desc.frame_buffer.alpha_bits);
+
+      //при прочих равных первый формат более подходит
+
+    return 1;
+  }
+
+///Выбор конфигурации
+  EGLConfig ChooseConfig (const SwapChainDesc& swap_chain_desc)
+  {
+    try
+    {
+        //перечисление доступных форматов
+
+      Adapter::PixelFormatArray formats;
+
+      adapter->EnumPixelFormats (egl_display, formats);
+
+        //выбор формата
+
+      if (formats.empty ())
+        return (EGLConfig)0;
+
+          //поиск формата
+
+      const PixelFormatDesc* best = &formats [0];
+        
+      for (Adapter::PixelFormatArray::const_iterator iter=formats.begin ()+1, end=formats.end (); iter!=end; ++iter)
+        if (CompareFormats (*best, *iter, swap_chain_desc))
+          best = &*iter;
+
+      return best->egl_config;
+    }
+    catch (xtl::exception& e)
+    {
+      e.touch ("render::low_level::opengl::egl::PrimarySwapChain::Impl::ChooseConfig");
+      throw;
     }
   }
   
