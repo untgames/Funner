@@ -30,9 +30,11 @@ public class EngineSurfaceViewController extends EngineViewController
 
       getHolder ().addCallback (this);
 
+      getHolder ().setFormat (android.graphics.PixelFormat.RGBA_8888);
+        
       if (getHolder ().getSurface () != null && getHolder ().getSurface ().isValid ())
         surfaceCreated (getHolder ());
-        
+
       setOnTouchListener (controller);
       setOnKeyListener (controller);
       setOnFocusChangeListener (controller);
