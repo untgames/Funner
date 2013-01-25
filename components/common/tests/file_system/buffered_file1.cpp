@@ -1,6 +1,9 @@
-#include <common/file.h>
 #include <stdio.h>
 #include <string.h>
+#include <stl/string>
+#include <xtl/reference_counter.h>
+#include <xtl/common_exceptions.h>
+#include <common/file.h>
 
 using namespace common;
 
