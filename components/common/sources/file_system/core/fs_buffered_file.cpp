@@ -19,16 +19,18 @@ struct BufferedFileImpl::Impl
   filepos_t   data_end_pos;         //позиция конца данных для чтения
   filepos_t   data_dirty_start_pos; //файловая позиция начала блока данных, требующего выгрузки на диск
   filepos_t   data_dirty_end_pos;   //файловая позиция конца блока данных, требующего выгрузки на диск
+  filepos_t   data_tail_start_pos;  //файловая позиция начала блока незаписанных данных
   
 ///Конструктор
   Impl (FileImplPtr in_base_file, size_t buffer_size)
     : base_file (in_base_file)  
     , file_size (base_file->Size ())
-    , file_pos (0)
-    , data_start_pos (0)
-    , data_end_pos (0)
-    , data_dirty_start_pos (0)
-    , data_dirty_end_pos (0)
+    , file_pos ()
+    , data_start_pos ()
+    , data_end_pos ()
+    , data_dirty_start_pos ()
+    , data_dirty_end_pos ()
+    , data_tail_start_pos (base_file->Size ())
   {
     buffer.resize (buffer_size);    
   }
@@ -40,30 +42,35 @@ struct BufferedFileImpl::Impl
     {
       if (data_dirty_start_pos == data_dirty_end_pos)
         return;
+
+      if ((filesize_t)data_dirty_end_pos > base_file->Size ())
+        base_file->Resize ((filesize_t)data_dirty_end_pos);
         
       if (base_file->Seek (data_dirty_start_pos) != data_dirty_start_pos)
         throw xtl::format_operation_exception ("", "Can't seek file");      
         
-      char*  data = buffer.data () + (data_dirty_start_pos - data_start_pos);
-      size_t size = data_dirty_end_pos - data_dirty_start_pos;
-
+      char*  data       = buffer.data () + (data_dirty_start_pos - data_start_pos);
+      size_t size       = data_dirty_end_pos - data_dirty_start_pos;
       size_t write_size = base_file->Write (data, size);
 
       if (write_size != size)
         throw xtl::format_operation_exception ("", "Can't write file");
+
+      if (data_dirty_end_pos > data_tail_start_pos)
+        data_tail_start_pos = data_dirty_end_pos;
 
       data_dirty_start_pos = 0;
       data_dirty_end_pos   = 0;
     }
     catch (xtl::exception& exception)
     {
-      exception.touch ("common::BufferedFileImpl::Impl");
+      exception.touch ("common::BufferedFileImpl::Impl::FlushBuffer");
       throw;
     }
   }  
 
 ///Подготовка данных
-  void PrepareData (filepos_t pos, bool ignore_fail = false)
+  void PrepareData (filepos_t pos)
   {
     if (pos >= data_start_pos && pos < data_end_pos)
       return;
@@ -80,9 +87,19 @@ struct BufferedFileImpl::Impl
         
         if (base_file->Mode () & FileMode_Read)
         {
+
             //изменение размеров буферов
 
           size_t available_size = base_file->Size () - data_start_pos;
+
+          if (available_size > buffer.size ())
+            available_size = buffer.size ();
+
+          if (data_start_pos > data_tail_start_pos)
+            available_size = 0;
+
+          if ((filepos_t)(data_start_pos + available_size) > data_tail_start_pos)
+            available_size = data_tail_start_pos - data_start_pos;
 
             //чтение данных
         
@@ -94,15 +111,15 @@ struct BufferedFileImpl::Impl
             size_t result = base_file->Read (buffer.data (), available_size);        
 
             data_end_pos = data_start_pos + result;
-
-            if (!result && ignore_fail)
-              data_end_pos = data_start_pos + buffer.size ();
           }
-          else data_end_pos = data_start_pos + buffer.size ();
+          else data_end_pos = data_start_pos;
+
+          if (size_t (data_end_pos - data_start_pos) < buffer.size () && available_size < buffer.size ())
+            data_end_pos = data_start_pos + buffer.size ();
         }
         else
         {
-          data_end_pos = data_start_pos;
+          data_end_pos = data_start_pos + buffer.size ();
         }
       }
       catch (...)
@@ -230,7 +247,7 @@ size_t BufferedFileImpl::Read (void* buf, size_t size)
     {      
         //чтение в обход кэша
         
-      impl->FlushBuffer ();        
+      impl->FlushBuffer ();
 
       if (impl->base_file->Seek (impl->file_pos) != impl->file_pos)
         throw xtl::format_operation_exception ("", "Can't seek file");
@@ -265,7 +282,7 @@ size_t BufferedFileImpl::Read (void* buf, size_t size)
 
         //проверка возможности чтения
 
-      if (!available_size)
+      if (!read_size)
         break; //end of file
 
       memcpy (dst, src, read_size);
@@ -311,6 +328,9 @@ size_t BufferedFileImpl::Write (const void* buf,size_t size)
 
       impl->FlushBuffer ();
 
+      if ((filesize_t)(impl->file_pos + size) > impl->base_file->Size ())
+        impl->base_file->Resize ((filesize_t)(impl->file_pos + size));
+
       if (impl->base_file->Seek (impl->file_pos) != impl->file_pos)
         throw xtl::format_operation_exception ("", "Can't seek file");
 
@@ -333,18 +353,17 @@ size_t BufferedFileImpl::Write (const void* buf,size_t size)
     {
         //подготовка буфера данных
 
-      impl->PrepareData (pos, true);
+      impl->PrepareData (pos);
 
         //копирование данных
 
       size_t offset         = pos - impl->data_start_pos;
       size_t available_size = impl->data_end_pos - pos;
+      size_t write_size     = size < available_size ? size : available_size;
+      char*  dst            = impl->buffer.data () + offset;
 
-      if (!available_size)  //файл только на запись, данные не могут быть прочитаны
-        available_size = impl->buffer.capacity () < size ? impl->buffer.capacity () : size;
-
-      size_t write_size = size < available_size ? size : available_size;
-      char*  dst        = impl->buffer.data () + offset;
+      if (!write_size)
+        break;
       
       memcpy (dst, src, write_size);
       

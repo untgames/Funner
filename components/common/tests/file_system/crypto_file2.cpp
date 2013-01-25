@@ -18,6 +18,7 @@ int main ()
     printf ("file size: %u / %u\n", crypto_file.Size (), file.Size ());
     
     crypto_file.Resize (113);
+    crypto_file.Flush ();
     
     printf ("file size: %u / %u\n", crypto_file.Size (), file.Size ());    
 

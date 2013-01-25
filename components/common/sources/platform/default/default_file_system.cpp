@@ -61,17 +61,26 @@ void StdioFileSystem::FileClose (file_t file)
 
 size_t StdioFileSystem::FileRead (file_t file,void* buf,size_t size)
 {
-  clearerr ((FILE*)file);
-
   size_t read_size = fread (buf,1,size,(FILE*)file);
   
-  if (ferror ((FILE*)file))
+  if (read_size != size)
   {
     switch (errno)
     {
-      case EBADF:  throw xtl::make_argument_exception      ("common::StdioFileSystem::FileRead","file"); break;
-      case EINVAL: throw xtl::make_null_argument_exception ("common::StdioFileSystem::FileRead","buffer"); break;
-      default:     throw xtl::format_operation_exception   ("common::StdioFileSystem::FileRead","Unknown error"); break;
+      case EBADF:  throw xtl::make_argument_exception      ("common::StdioFileSystem::FileRead","file");
+      case EINVAL:
+#ifdef _WIN32
+        if (!read_size) 
+        {
+          //correct result
+
+          read_size = size;
+
+          break;
+        }
+#endif
+        throw xtl::format_operation_exception   ("common::StdioFileSystem::FileRead", strerror (errno));
+      default:     throw xtl::format_operation_exception   ("common::StdioFileSystem::FileRead","Unknown error");
     }
   }
   
@@ -82,12 +91,23 @@ size_t StdioFileSystem::FileWrite (file_t file,const void* buf,size_t size)
 {
   size_t write_size = fwrite (buf,1,size,(FILE*)file);
   
-  if (ferror ((FILE*)file))
-  {
+  if (write_size != size)
+  {    
     switch (errno)
     {
       case EBADF:  throw xtl::make_argument_exception ("common::StdioFileSystem::FileWrite","file"); break;
-      case EINVAL: throw xtl::make_null_argument_exception ("common::StdioFileSystem::FileWrite","buffer"); break;
+      case EINVAL: 
+#ifdef _WIN32
+        if (!write_size) 
+        {
+          //correct result
+
+          write_size = size;
+
+          break;
+        }
+#endif
+        throw xtl::format_operation_exception   ("common::StdioFileSystem::FileWrite", strerror (errno));
       case ENOSPC: throw xtl::format_operation_exception ("common::StdioFileSystem::FileWrite","No enough space for write %u bytes to file",size); break;
       default:     throw xtl::format_operation_exception ("common::StdioFileSystem::FileWrite","Unknown error"); break;
     }
@@ -102,6 +122,8 @@ void StdioFileSystem::FileRewind (file_t file)
 
   if (ferror ((FILE*)file))
   {
+    clearerr ((FILE*)file);
+
     switch (errno)
     {
       case EBADF:  throw xtl::make_argument_exception ("common::StdioFileSystem::FileRewind","file"); break;
