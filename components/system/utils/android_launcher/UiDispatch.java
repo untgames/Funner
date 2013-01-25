@@ -1,5 +1,7 @@
 package com.untgames.funner.application;
 
+///помещать сообщения всегда во внутренню очередь; во внешшнюю пппомещать сообщение о необходимости внутренней очереди
+
 import java.io.*;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
