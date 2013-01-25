@@ -200,6 +200,12 @@ void Adapter::EnumPixelFormats (EGLDisplay display, PixelFormatArray& pixel_form
       if (!(get_config_attribute (display, config, EGL_RENDERABLE_TYPE) & EGL_OPENGL_ES_BIT))
         continue;
 
+      if (get_config_attribute (display, config, EGL_LEVEL) != 0)
+        continue;
+
+      if (!(get_config_attribute (display, config, EGL_CONFORMANT) & EGL_OPENGL_ES_BIT))
+        continue;
+
       PixelFormatDesc desc;
 
       memset (&desc, 0, sizeof (desc));

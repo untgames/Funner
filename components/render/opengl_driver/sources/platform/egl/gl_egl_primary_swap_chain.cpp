@@ -213,6 +213,8 @@ struct PrimarySwapChain::Impl
       if (formats.empty ())
         return (EGLConfig)0;
 
+      log.Printf ("...found %u pixel formats", formats.size ());
+
           //поиск формата
 
       const PixelFormatDesc* best = &formats [0];
