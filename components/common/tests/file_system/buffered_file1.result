@@ -1,5 +1,11 @@
 Results of buffered_file1_test:
+open file 'buffered_file_results.txt'
+get file size for 'buffered_file_results.txt'
+get file size for 'buffered_file_results.txt'
+get file size for 'buffered_file_results.txt'
+get file size for 'buffered_file_results.txt'
 Is file buffered: true
+get file size for 'buffered_file_results.txt'
 File content (forward read):
 0123456789
 0123456789
@@ -54,3 +60,10 @@ File content (direct read test):
 9876543210
 9876543210
 End file content
+get file size for 'buffered_file_results.txt'
+resize file 'buffered_file_results.txt' to 220
+seek file 'buffered_file_results.txt' to position 0
+write 220 bytes to file 'buffered_file_results.txt' position 0
+flush file 'buffered_file_results.txt'
+flush file 'buffered_file_results.txt'
+close file 'buffered_file_results.txt'

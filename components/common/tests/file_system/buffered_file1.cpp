@@ -8,9 +8,303 @@ const size_t READ_BLOCK_SIZE   = 4;
 const char*  MESSAGE1          = "0123456789\n";
 const char*  MESSAGE2          = "9876543210\n";
 const char*  MESSAGE3          = "---ABCDEFGHIJKLMNOPQRSTUVWXYZ---\n";
-const char*  RESULTS_FILE_NAME = "data/buffered_file_results.txt";
+const char*  RESULTS_FILE_NAME = "/log/data/buffered_file_results.txt";
+const char*  LOG_PREFIX        = "/log/";
 
 static char buffer [1024*16];
+
+class LogFileSystem: public ICustomFileSystem, public xtl::reference_counter
+{
+  public:
+///Работа с файлом
+    file_t FileOpen (const char* name, filemode_t mode_flags, size_t buffer_size)
+    {
+      try
+      {
+        if (!name)
+          throw xtl::make_null_argument_exception ("", "name");          
+          
+        stl::string path = name + strlen (LOG_PREFIX);
+          
+        printf ("open file '%s'\n", path.c_str ());
+
+        return reinterpret_cast<file_t> (new StdFile (path.c_str (), mode_flags, buffer_size));
+      }
+      catch (xtl::exception& e)
+      {
+        e.touch ("LogFileSystem::FileOpen");
+        throw;
+      }
+    }
+    
+    void FileClose (file_t handle)
+    {
+      try
+      {
+        StdFile* file = reinterpret_cast<StdFile*> (handle);
+
+        if (!file)
+          throw xtl::make_null_argument_exception ("", "file");
+
+        printf ("close file '%s'\n", file->Path ());
+          
+        delete file;
+      }
+      catch (xtl::exception& e)
+      {
+        e.touch ("LogFileSystem::FileClose");
+        throw;
+      }      
+    }
+    
+    size_t FileBufferSize (file_t handle)
+    {
+      return 0;
+    }
+    
+    size_t FileRead (file_t handle, void* buf, size_t size)
+    {
+      try
+      {
+        StdFile* file = reinterpret_cast<StdFile*> (handle);
+        
+        if (!file)
+          throw xtl::make_null_argument_exception ("", "file");
+
+        printf ("read %u bytes from file '%s' position %u\n", size, file->Path (), file->Tell ());
+
+        return file->Read (buf, size);
+      }
+      catch (xtl::exception& e)
+      {
+        e.touch ("LogFileSystem::FileRead");
+        throw;
+      }      
+    }
+    
+    size_t FileWrite (file_t handle, const void* buf, size_t size)
+    {
+      try
+      {
+        StdFile* file = reinterpret_cast<StdFile*> (handle);
+        
+        if (!file)
+          throw xtl::make_null_argument_exception ("", "file");
+
+        printf ("write %u bytes to file '%s' position %u\n", size, file->Path (), file->Tell ());
+          
+        return file->Write (buf, size);
+      }
+      catch (xtl::exception& e)
+      {
+        e.touch ("LogFileSystem::FileWrite");
+        throw;
+      }
+    }
+    
+    void FileRewind (file_t handle)
+    {
+      try      
+      {
+        StdFile* file = reinterpret_cast<StdFile*> (handle);
+        
+        if (!file)
+          throw xtl::make_null_argument_exception ("", "file");
+
+        printf ("rewind file '%s'\n", file->Path ());
+
+        return file->Rewind ();
+      }
+      catch (xtl::exception& e)
+      {
+        e.touch ("LogFileSystem::FileRewind");
+        throw;
+      }      
+    }
+    
+    filepos_t FileSeek (file_t handle, filepos_t pos)
+    {
+      try
+      {
+        StdFile* file = reinterpret_cast<StdFile*> (handle);
+        
+        if (!file)
+          throw xtl::make_null_argument_exception ("", "file");
+
+        printf ("seek file '%s' to position %u\n", file->Path (), pos);
+
+        return file->Seek (pos);
+      }
+      catch (xtl::exception& e)
+      {
+        e.touch ("LogFileSystem::FileSeek");
+        throw;
+      }      
+    }
+    
+    filepos_t FileTell (file_t handle)
+    {
+      try
+      {
+        StdFile* file = reinterpret_cast<StdFile*> (handle);
+        
+        if (!file)
+          throw xtl::make_null_argument_exception ("", "file");
+
+        printf ("get file position for '%s'\n", file->Path ());
+
+        return file->Tell ();
+      }
+      catch (xtl::exception& e)
+      {
+        e.touch ("LogFileSystem::FileTell");
+        throw;
+      }      
+    }
+    
+    filesize_t FileSize (file_t handle)
+    {
+      try
+      {
+        StdFile* file = reinterpret_cast<StdFile*> (handle);
+        
+        if (!file)
+          throw xtl::make_null_argument_exception ("", "file");
+
+        printf ("get file size for '%s'\n", file->Path ());
+
+        return file->Size ();
+      }
+      catch (xtl::exception& e)
+      {
+        e.touch ("LogFileSystem::FileSize");
+        throw;
+      }      
+    }
+    
+    void FileResize (file_t handle, filesize_t new_size)
+    {
+      try
+      {
+        StdFile* file = reinterpret_cast<StdFile*> (handle);
+        
+        if (!file)
+          throw xtl::make_null_argument_exception ("", "file");        
+
+        printf ("resize file '%s' to %u\n", file->Path (), new_size);
+
+        return file->Resize (new_size);
+      }
+      catch (xtl::exception& e)
+      {
+        e.touch ("LogFileSystem::FileResize");
+        throw;
+      }      
+    }
+    
+    bool FileEof (file_t handle)
+    {
+      try
+      {
+        StdFile* file = reinterpret_cast<StdFile*> (handle);
+        
+        if (!file)
+          throw xtl::make_null_argument_exception ("", "file");        
+
+        return file->Eof ();
+      }
+      catch (xtl::exception& e)
+      {
+        e.touch ("LogFileSystem::FileEof");
+        throw;
+      }      
+    }
+    
+    void FileFlush (file_t handle)
+    {
+      try
+      {
+        StdFile* file = reinterpret_cast<StdFile*> (handle);
+        
+        if (!file)
+          throw xtl::make_null_argument_exception ("", "file");        
+
+        printf ("flush file '%s'\n", file->Path ());
+
+        return file->Flush ();
+      }
+      catch (xtl::exception& e)
+      {
+        e.touch ("LogFileSystem::FileFlush");
+        throw;
+      }      
+    }
+
+///Управление расположением файлов
+    void Remove (const char* file_name)
+    {
+      FileSystem::Remove (file_name + strlen (LOG_PREFIX));
+    }
+    
+    void Rename (const char* file_name, const char* new_name)
+    {
+      throw xtl::format_not_supported_exception ("LogFileSystem::Remove", "Rename operation not supported on url links");      
+    }
+
+    void Mkdir (const char* dir_name)
+    {
+      throw xtl::format_not_supported_exception ("LogFileSystem::Remove", "Mkdir operation not supported on url links");      
+    }
+
+///Получение информации о файле
+    bool IsFileExist (const char* file_name)
+    {
+      return false;
+    }
+    
+    bool GetFileInfo (const char* file_name, FileInfo& info)
+    {
+      return false;
+    }
+
+//Файловые атрибуты
+    void SetFileAttribute (const char* file_name, const char* attribute, const void* data, size_t size)
+    {
+      throw xtl::format_not_supported_exception ("LogFileSystem::SetFileAttribute");
+    }
+
+    void GetFileAttribute (const char* file_name, const char* attribute, void* data, size_t size)
+    {
+      throw xtl::format_not_supported_exception ("LogFileSystem::GetFileAttribute");
+    }
+
+    bool HasFileAttribute (const char* file_name, const char* attribute)
+    {
+      throw xtl::format_not_supported_exception ("LogFileSystem::HasFileAttribute");
+    }
+
+    void RemoveFileAttribute (const char* file_name, const char* attribute)
+    {
+      throw xtl::format_not_supported_exception ("LogFileSystem::RemoveFileAttribute");
+    }
+
+///Поиск файла
+    void Search (const char* wc_mask, const FileSearchHandler& handler)
+    {
+      //поиска по URL ссылке нет
+    }
+
+///Подсчёт ссылок
+    void AddRef ()
+    {
+      addref (this);
+    }
+    
+    void Release ()
+    {
+      release (this);
+    }
+};
 
 int main ()
 {
@@ -18,6 +312,8 @@ int main ()
   
   try
   {
+    FileSystem::Mount ("/log", xtl::com_ptr<LogFileSystem> (new LogFileSystem, false).get ());
+
     StdFile file (RESULTS_FILE_NAME,FileMode_ReadWrite|FileMode_Create,strlen (MESSAGE1) * 2 + 1);
 
     printf ("Is file buffered: %s\n",file.IsBuffered () ? "true" : "false");
