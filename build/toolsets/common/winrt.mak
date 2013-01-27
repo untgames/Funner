@@ -28,8 +28,7 @@ ifneq (,$(WINRT_SDK))
 endif
 
 MSVC_BIN_PATH      := $(MSVC_PATH)/bin$(if $(filter x86,$(CPU_ARCH)),)
-$(warning $(MSVC_BIN_PATH))
-COMMON_CFLAGS      += -W3 -Ox -wd4996 -nologo -FC -D "WINRT" -D "WINAPI_FAMILY=WINAPI_FAMILY_APP" -MD -AI "$(WINRT_SDK)\References\CommonConfiguration\Neutral"
+COMMON_CFLAGS      += -W3 -Ox -wd4996 -nologo -FC -D "WINRT" -D "WINAPI_FAMILY=WINAPI_FAMILY_DESKTOP_APP" -MD -AI "$(WINRT_SDK)\References\CommonConfiguration\Neutral"
 COMMON_CFLAGS      += -AI "$(MSVC_PATH)\vcpackages"
 COMMON_LINK_FLAGS  +=
 
