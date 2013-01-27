@@ -472,7 +472,7 @@ struct RenderTargetManager::Impl: public ContextObject, public RenderTargetManag
         if (views_count && !colors)
           throw xtl::make_null_argument_exception ("", "colors");
 
-        if (views_count > 1 || views_count && render_target_indices [0] != 0)
+        if (views_count > 1 || (views_count && render_target_indices [0] != 0))
           throw xtl::format_not_supported_exception ("", "MRT not supported");
 
           //маскировка буферов, которые можно очищать
