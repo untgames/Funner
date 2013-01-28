@@ -34,6 +34,8 @@ export.link.system.tabletos.LINK_INCLUDES := tabletos_startup main
 export.link.system.tabletos.LINK_TOOL     := tools.link.shared-lib
 export.link.system.tabletos.RUN_TOOL      := tools.run.tabletos_package
 export.info.system.CHMS                   := funner.system
+#export.link.system.win8.LINK_FLAGS        := -subsystem:windows -entry:mainCRTStartup
+export.link.system.win8.IMPORTS           := link.common.iconv
 
 ifeq (,$(filter iphone,$(PROFILES))$(filter android,$(PROFILES)))
   export.link.system.x86.IMPORTS            := link.extern.geekinfo

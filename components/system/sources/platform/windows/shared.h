@@ -1,4 +1,3 @@
-
 #include <stl/hash_map>
 #include <stl/hash_set>
 
@@ -21,7 +20,7 @@
 #undef LoadLibrary
 #endif
 
-#include <shared/platform.h>
+#include <shared/windows.h>
 
 #include <process.h>
 

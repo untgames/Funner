@@ -1,6 +1,9 @@
 #ifndef SYSLIB_WINDOWS_PLATFORM_HEADER
 #define SYSLIB_WINDOWS_PLATFORM_HEADER
 
+#include <shared/default_cookie_manager.h>
+#include <shared/default_screen_manager.h>
+#include <shared/default_sensor_manager.h>
 #include <shared/default_window_manager.h>
 #include <shared/default_library_manager.h>
 #include <shared/default_timer_manager.h>
