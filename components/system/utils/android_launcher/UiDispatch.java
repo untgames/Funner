@@ -141,68 +141,36 @@ class UiDispatch implements Runnable
     }
   }
   
-  static List    internalMessageQueue;
-  static int     internalMessageProcessingDepth;
-  static Object  internalMessageQueueMutex = new Object ();
-  
-  static List getInternalMessageQueue ()
-  {
-    try
-    {
-      synchronized (internalMessageQueueMutex)
-      {
-        return internalMessageQueue;
-      }    
-    }
-    catch (Exception e)
-    {
-      return null;
-    }
-  }
-  
+  static List internalMessageQueue = Collections.synchronizedList (new ArrayList ());
+    
   static class InternalMessage
   {
     public Activity activity;
     public Runnable runnable;
   }
-  
-  static List beginInternalMessageLoop () throws InterruptedException
-  {
-    synchronized (internalMessageQueueMutex)
-    {
-      if (internalMessageQueue == null)
-      {
-        internalMessageQueue           = Collections.synchronizedList (new ArrayList ());
-        internalMessageProcessingDepth = 1;
-      }                    
-      else
-      {
-        internalMessageProcessingDepth++;
-      }
 
-      return internalMessageQueue;
-    }              
+  static boolean dispatchMessage ()
+  {        
+    if (internalMessageQueue.isEmpty ())
+      return false;
+
+    InternalMessage message = (InternalMessage)internalMessageQueue.remove (0);
+
+    if (message == null)
+      return false;
+
+    message.runnable.run ();
+
+    return true;
   }
-  
-  static void endInternalMessageLoop () throws InterruptedException
+
+  static class MessageDispatcher implements Runnable
   {
-    synchronized (internalMessageQueueMutex)
-    {      
-      internalMessageProcessingDepth--;
-        
-      if (internalMessageProcessingDepth == 0)
-      {
-        while (!internalMessageQueue.isEmpty ())
-        {
-          InternalMessage message = (InternalMessage)internalMessageQueue.remove (0);
-          
-          message.activity.runOnUiThread (message.runnable);
-        }
-        
-        internalMessageQueue = null;
-      }
+    public void run ()
+    {
+      dispatchMessage ();
     }
-  }
+  }    
   
   public static Object run (Activity activity, UiRunnable runnable)
   {
@@ -210,23 +178,14 @@ class UiDispatch implements Runnable
     {
       UiDispatch container = new UiDispatch (runnable);
       
-      boolean needPostToUiThread = true;
-      
-      List queue = getInternalMessageQueue ();
-      
-      if (queue != null)
-      {
-        InternalMessage message = new InternalMessage ();
+      InternalMessage message = new InternalMessage ();
         
-        message.activity = activity;
-        message.runnable = container;
+      message.activity = activity;
+      message.runnable = container;
         
-        queue.add (message);
-      }
-      else
-      {
-        activity.runOnUiThread (container);
-      }
+      internalMessageQueue.add (message);
+
+      activity.runOnUiThread (new MessageDispatcher ());
 
       container.condition.await ();
 
@@ -248,52 +207,22 @@ class UiDispatch implements Runnable
   
   public static void processMessagesInternally (UiAsyncResult asyncResult)
   {
-    try
+    while (!asyncResult.isReady ())
     {
-      List queue = beginInternalMessageLoop ();
-      
-      if (queue == null)
-        return;
-
       try
       {
-        while (!asyncResult.isReady ())
-        {
-          InternalMessage message = null;
-          
-          if (!queue.isEmpty ())
-          {
-            try
-            {                
-              message = (InternalMessage)queue.remove (0);
-            }
-            catch (Exception e)
-            {
-            }
-          }
-
-          if (message == null)
-          {
-            Thread.currentThread ().sleep (1);
-            continue;
-          }
-
-          message.runnable.run ();        
-        }
+        if (!dispatchMessage ())
+          Thread.currentThread ().sleep (1);
       }
-      finally
+      catch (Exception e)
       {
-        endInternalMessageLoop ();
+        StringWriter sw = new StringWriter();
+        PrintWriter pw = new PrintWriter(sw);
+              
+        e.printStackTrace(pw);                        
+          
+        Log.e ("funner", sw.toString ());
       }
-    }
-    catch (Exception e)
-    {
-      StringWriter sw = new StringWriter();
-      PrintWriter pw = new PrintWriter(sw);
-            
-      e.printStackTrace(pw);                        
-        
-      Log.e ("funner", sw.toString ());
     }
   }
 }
