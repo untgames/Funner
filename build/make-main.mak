@@ -890,6 +890,59 @@ endif
 
 endef
 
+#Сборка зависимых компонентов (зависящая цель, зависимость)
+define build_deps
+
+  $$(warning check $1 $2)
+
+  $1: BUILD_DEPS.$2
+
+  .PHONY: BUILD_DEPS.$2
+
+  $$(warning "  '$1' depends from 'BUILD_DEPS.$2'")
+
+ifeq (,$$(BUILD_DEPS.$2.COMPONENT_DIR))
+
+  BUILD_DEPS.$2.COMPONENT_DIR  := $$(paths.$2)
+  BUILD_DEPS.$2.IMPORTS        := $$(export.$2.IMPORTS)
+  BUILD_DEPS.$2.COMPONENT_NAME := $$(subst /,-,$$(subst ./,this-level-,$$(subst ../,upper-level-,$$(BUILD_DEPS.$2.COMPONENT_DIR))))
+
+  $$(foreach profile,$$(PROFILES),$$(eval BUILD_DEPS.$2.IMPORTS := $$(BUILD_DEPS.$2.IMPORTS) $$(export.$2.$$(profile).IMPORTS)))
+
+  $$(warning "  processing imports for BUILD_DEPS.$$(BUILD_DEPS.$2.COMPONENT_NAME) component ($2)")
+
+  $$(foreach import,$$(BUILD_DEPS.$2.IMPORTS),$$(eval $$(call build_deps,BUILD_DEPS.$$(BUILD_DEPS.$2.COMPONENT_NAME),$$(import))))
+
+#ifneq ($$($1.COMPONENT_DIR),$$(paths.$2))
+
+  BUILD_DEPS.$2: BUILD_DEPS.$$(BUILD_DEPS.$2.COMPONENT_NAME)
+
+  .PHONY: BUILD_DEPS.$$(BUILD_DEPS.$2.COMPONENT_NAME)
+
+  $$(warning "  'BUILD_DEPS.$2' depends from BUILD_DEPS.$$(BUILD_DEPS.$2.COMPONENT_NAME)")
+
+#endif
+
+ifeq (,$$(BUILD_DEPS.$$(BUILD_DEPS.$2.COMPONENT_NAME).COMPONENT_DIR))
+
+  BUILD_DEPS.$$(BUILD_DEPS.$2.COMPONENT_NAME).COMPONENT_DIR := $$(BUILD_DEPS.$2.COMPONENT_DIR)
+
+  $$(warning "  BUILD_DEPS.$$(BUILD_DEPS.$2.COMPONENT_NAME) build dir is '$$(BUILD_DEPS.$2.COMPONENT_DIR)'")
+
+ifneq (,$$(BUILD_DEPS.$2.COMPONENT_DIR))
+  BUILD_DEPS.$$(BUILD_DEPS.$2.COMPONENT_NAME):
+#	@echo $$(BUILD_DEPS.$2.COMPONENT_DIR)
+	@+$(MAKE) -r -C $$(BUILD_DEPS.$2.COMPONENT_DIR)
+endif
+
+endif
+
+endif
+
+  $$(warning end check $1 $2)
+
+endef
+
 #Импортирование переменных (префикс источника, префикс приёмника, относительный путь к используемому компоненту)
 define import_variables
 #  $$(warning src='$1' dst='$2' path='$3')  
@@ -1009,6 +1062,20 @@ define process_target_common
   $$(foreach source,$$($1.EXPORT.CHMS),$$(eval $$(call process_copy_files,$$(source),$$($1.EXPORT.OUT_DIR)/$$(EXPORT_INFO_DIR),$1)))
 
   $$(foreach file,$$($1.EXPORT.DLLS),$$(eval $$(call create_extern_file_dependency,$$(file),$$($1.DLL_DIRS))))
+
+  #Построение дерева зависимостей
+
+ifneq (,$$(filter build-deps,$$(MAKECMDGOALS)))
+  build-deps: BUILD_DEPS.$1
+
+  .PHONY: BUILD_DEPS.$1
+
+  BUILD_DEPS.$1.COMPONENT_DIR := $(COMPONENT_DIR)
+
+  $$(foreach import,$$($1.IMPORTS),$$(eval $$(call build_deps,BUILD_DEPS.$1,$$(import))))
+
+endif
+
 endef
 
 #Проверка корректности типа цели (тип цели)
@@ -1032,7 +1099,7 @@ check: install
 export: build
 force:
 
-.PHONY: build rebuild clean fullyclean run test check help create-dirs force dump info install uninstall reinstall export tar-dist
+.PHONY: build rebuild clean fullyclean run test check help create-dirs force dump info install uninstall reinstall export tar-dist build-deps
 
 #Специализация списка целей (в зависимости от профиля)
 $(foreach profile,$(PROFILES),$(eval TARGETS := $$(TARGETS) $$(TARGETS.$$(profile))))  
