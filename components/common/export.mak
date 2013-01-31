@@ -10,8 +10,8 @@ export.compile.common.INCLUDE_DIRS     := include ../xtl/include
 export.compile.common.COMPILER_DEFINES :=
 
 # Link exports
-export.link.common.LIBS                        := funner.common funner.extern.pcre
-export.link.common.IMPORTS                     := link.common.auto_license_generator link.extern.openssl link.extern.lib64 # link.common.memory_manager_override
+export.link.common.LIBS                        := funner.common
+export.link.common.IMPORTS                     := link.common.auto_license_generator link.extern.openssl link.extern.lib64 # link.common.memory_manager_override link.extern.pcre
 export.link.common.LINK_INCLUDES               := StandardFilePathsMount
 export.link.common.mingw.LIBS                  := shell32
 export.link.common.vcx86.LIBS                  := shell32
