@@ -28,6 +28,9 @@ endif
 ifneq (,$(filter android,$(PROFILES)))
 ENGINE.FUNNER_LIBRARY.TYPE                := ignore
 endif
+ifneq (,$(filter tabletos,$(PROFILES)))
+ENGINE.FUNNER_LIBRARY.TYPE                := ignore
+endif
 ENGINE.FUNNER_LIBRARY.NAME                := funner
 #ENGINE.FUNNER_LIBRARY.win32.LINK_FLAGS    := -noentry
 ENGINE.FUNNER_LIBRARY.IMPORTS             := compile.engine.core compile.common compile.system link.engine.launcher
@@ -70,6 +73,9 @@ endif
 ENGINE.LAUNCHER.SOURCES.android.SOURCE_DIRS     := sources/platform/android
 ENGINE.LAUNCHER.SOURCES.android.IMPORTS         := compile.engine.core link.engine.launcher compile.extern.android_ndk_profiler link.extern.android_ndk_profiler
 ENGINE.LAUNCHER.SOURCES.android.EXCLUDE_IMPORTS := link.common.auto_license_generator
+ENGINE.LAUNCHER.SOURCES.tabletos.SOURCE_DIRS     := sources/platform/tabletos
+ENGINE.LAUNCHER.SOURCES.tabletos.IMPORTS         := compile.engine.core link.engine.launcher
+ENGINE.LAUNCHER.SOURCES.tabletos.EXCLUDE_IMPORTS := link.common.auto_license_generator
 
 #Цель - console application
 ENGINE.CLAUNCHER.SOURCES.TYPE                := application
