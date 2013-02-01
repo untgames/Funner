@@ -1,6 +1,6 @@
 COMPONENT_DIRS := zlib zzip pcre jpeg tiff libpng devil libpsd gles_win32 gles_wince bullet ogg vorbis \
                   vorbisfile theora lua luajit firebreath mongoose beagleboard openalsdk shiny meego \
-                  wcecompat libffi libiconv pthreads_wince openssl qualcomm_texture_converter lib64 dxsdk angle
+                  wcecompat libffi libiconv pthreads_wince openssl qualcomm_texture_converter lib64 dxsdk angle freetype
 
 ifeq (,$(filter beagleboard,$(PROFILES)))
   COMPONENT_DIRS += curl
