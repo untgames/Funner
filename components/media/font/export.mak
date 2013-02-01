@@ -13,4 +13,5 @@ export.link.media.font.xfont.LINK_INCLUDES := XFontLoader XFontSaver
 export.link.media.font.xfont.IMPORTS       := link.media.font link.common.xml
 
 # Font converter link exports
-export.link.media.font.font_converter.LIBS := funner.media.font.font_converter funner.extern.freetype
+export.link.media.font.font_converter.LIBS := funner.media.font.font_converter 
+export.link.media.font.font_converter.IMPORTS := link.extern.freetype
