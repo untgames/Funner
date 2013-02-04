@@ -48,9 +48,9 @@ JRE_BIN                  := $(TABLETOS_NDK)/jre/bin
 JAVA                     := $(JRE_BIN)/java
 COMMON_CPPFLAGS          += -fexceptions -frtti
 COMMON_CFLAGS            += -fPIC -DTABLETOS -Os -Wno-psabi -Wno-strict-aliasing -I$(TABLETOS_NDK)/target/target-override/usr/include -I$(TABLETOS_NDK)/target/qnx6/usr/include/freetype2
-COMMON_CFLAGS            += -include$(BUILD_DIR)platforms/tabletos/common.h
 COMMON_CFLAGS            += -fvisibility=hidden
 COMMON_LINK_FLAGS        += -Wl,--no-undefined -L$(TABLETOS_NDK)/target/target-override/$(TABLETOS_ARCHITECTURE)/lib -L$(TABLETOS_NDK)/target/target-override/$(TABLETOS_ARCHITECTURE)/usr/lib -Wl,-L,$(DIST_BIN_DIR)
+COMMON_LINK_FLAGS        += -s
 TABLETOS_HOST            := $(strip $(TABLETOS_HOST))
 TABLETOS_USER            := $(strip $(TABLETOS_USER))
 TABLETOS_PORT            := $(strip $(TABLETOS_PORT))
@@ -75,19 +75,19 @@ include $(TOOLSETS_DIR)/g++.mak
 #Переопределения вызовов утилит
 ###################################################################################################
 define tools.c++compile
-export PATH=$(BUILD_PATHS):$$PATH && $(call tools.g++.c++compile,$1,$2,$3,$4,$5,$6,$7,$8,$9)
+$(call tools.g++.c++compile,$1,$2,$3,$4,$5,$6,$7,$8,$9)
 endef
 
 define tools.link
-export PATH=$(BUILD_PATHS):$$PATH && $(call tools.g++.link,$1,$2,$3,,$5 $(foreach link,$4,-Wl,-u,$(link)))
+$(call tools.g++.link,$1,$2,$3,,$5 $(foreach link,$4,-Wl,-u,$(link)))
 endef
 
 define tools.link.shared-lib
-export PATH=$(BUILD_PATHS):$$PATH && $(call tools.g++.link,$1,$2,,,$5 $(foreach dir,$3,-Wl,-L,$(dir)) -shared $(foreach link,$4,-Wl,-u,$(link)))
+$(call tools.g++.link,$1,$2,,,$5 $(foreach dir,$3,-Wl,-L,$(dir)) -shared $(foreach link,$4,-Wl,-u,$(link)))
 endef
 
 define tools.lib
-export PATH=$(BUILD_PATHS):$$PATH && export FILE_COUNTER=0 FILE_LIST="" && for file in $2; do export FILE_COUNTER=$$(($$FILE_COUNTER + 1)) && FILE_LIST="$$FILE_LIST $$file"; if [ $$FILE_COUNTER -eq 256 ]; then $(call tools.g++.lib,$1,$$FILE_LIST,$3,$4,$5,$6,$7,$8,$9); export FILE_COUNTER=0 FILE_LIST=""; fi; done && $(call tools.g++.lib,$1,$$FILE_LIST,$3,$4,$5,$6,$7,$8,$9)
+export FILE_COUNTER=0 FILE_LIST="" && for file in $2; do export FILE_COUNTER=$$(($$FILE_COUNTER + 1)) && FILE_LIST="$$FILE_LIST $$file"; if [ $$FILE_COUNTER -eq 256 ]; then $(call tools.g++.lib,$1,$$FILE_LIST,$3,$4,$5,$6,$7,$8,$9); export FILE_COUNTER=0 FILE_LIST=""; fi; done && $(call tools.g++.lib,$1,$$FILE_LIST,$3,$4,$5,$6,$7,$8,$9)
 endef
 
 define tools.link.dll
