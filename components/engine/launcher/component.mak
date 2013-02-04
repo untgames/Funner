@@ -76,6 +76,10 @@ ENGINE.LAUNCHER.SOURCES.android.EXCLUDE_IMPORTS := link.common.auto_license_gene
 ENGINE.LAUNCHER.SOURCES.tabletos.SOURCE_DIRS     := sources/platform/tabletos
 ENGINE.LAUNCHER.SOURCES.tabletos.IMPORTS         := compile.engine.core link.engine.launcher
 ENGINE.LAUNCHER.SOURCES.tabletos.EXCLUDE_IMPORTS := link.common.auto_license_generator
+ENGINE.LAUNCHER.SOURCES.tabletos.LINK_TOOL       := $(LINK_TOOL)
+ifneq (,$(filter tabletos,$(PROFILES)))
+ENGINE.LAUNCHER.SOURCES.LINK_TOOL                := $(SPACE)
+endif
 
 #Цель - console application
 ENGINE.CLAUNCHER.SOURCES.TYPE                := application

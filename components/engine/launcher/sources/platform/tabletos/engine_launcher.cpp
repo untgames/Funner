@@ -7,7 +7,7 @@
 using namespace engine;
 
 //точка входа
-int main (int argc, const char* argv [], const char* env [])
+extern "C" __attribute__ ((visibility("default"))) int main (int argc, const char* argv [], const char* env [])
 {
   stl::auto_ptr<IEngine> funner (FunnerInit ());
 
@@ -16,6 +16,8 @@ int main (int argc, const char* argv [], const char* env [])
     printf ("Funner startup failed!");
     return 1;
   }
+
+  funner->SetBaseDir ("app/native/assets");
 
   if (!funner->ParseCommandLine (argc, argv, env))
     return 1;
