@@ -26,6 +26,7 @@ COMMON.SOURCES.wp8.SOURCE_DIRS            := sources/platform/win32
 COMMON.SOURCES.bada.SOURCE_DIRS           := sources/platform/bada
 COMMON.SOURCES.bada.IMPORTS               := compile.extern.bada
 COMMON.SOURCES.linux.COMPILER_DEFINES     := HAS_PWD_H
+COMMON.SOURCES.tabletos.COMPILER_DEFINES  := HAS_PWD_H
 
 #Цель - Memory manager override
 COMMON.MEMORY_MANAGER_OVERRIDE.TYPE         := static-lib
