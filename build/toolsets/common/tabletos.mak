@@ -47,7 +47,9 @@ DEBUG_TOKEN_REQUESTER    := $(TABLETOS_NDK_GCC)/bin/blackberry-debugtokenrequest
 JRE_BIN                  := $(TABLETOS_NDK)/jre/bin
 JAVA                     := $(JRE_BIN)/java
 COMMON_CPPFLAGS          += -fexceptions -frtti
-COMMON_CFLAGS            += -fPIC -DTABLETOS -O2 -Wno-psabi -Wno-strict-aliasing -I$(TABLETOS_NDK)/target/target-override/usr/include -I$(TABLETOS_NDK)/target/qnx6/usr/include/freetype2
+COMMON_CFLAGS            += -fPIC -DTABLETOS -Os -Wno-psabi -Wno-strict-aliasing -I$(TABLETOS_NDK)/target/target-override/usr/include -I$(TABLETOS_NDK)/target/qnx6/usr/include/freetype2
+COMMON_CFLAGS            += -include$(BUILD_DIR)platforms/tabletos/common.h
+COMMON_CFLAGS            += -fvisibility=hidden
 COMMON_LINK_FLAGS        += -Wl,--no-undefined -L$(TABLETOS_NDK)/target/target-override/$(TABLETOS_ARCHITECTURE)/lib -L$(TABLETOS_NDK)/target/target-override/$(TABLETOS_ARCHITECTURE)/usr/lib -Wl,-L,$(DIST_BIN_DIR)
 TABLETOS_HOST            := $(strip $(TABLETOS_HOST))
 TABLETOS_USER            := $(strip $(TABLETOS_USER))
@@ -55,7 +57,7 @@ TABLETOS_PORT            := $(strip $(TABLETOS_PORT))
 VALID_TARGET_TYPES       += tabletos-bar
 TESTS_LAUNCHER           := $(DIST_LIB_DIR)/funner.application.bar
 TABLETOS_DEBUG_TOKEN     := $(BUILD_DIR)platforms/tabletos/debugtoken.bar
-TABLETOS_CSJ_FILE        := $(BUILD_DIR)platforms/tabletos/client.csj
+TABLETOS_CSJ_FILE        := $(BUILD_DIR)platforms/tabletos/client-PBDT-1965718.csj
 TABLETOS_KEYSTORE        := $(BUILD_DIR)platforms/tabletos/keystore.p12
 
 ifneq (,$(filter Win%,$(OS)))

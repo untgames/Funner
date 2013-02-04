@@ -1,5 +1,5 @@
-Version=0
-SignerID=RDK
-ClientID=452756164
-URL=http\://www.rim.net/Websigner/servlet/RDK-Waterloo
+ClientID=1965718
 Company=UNT Games
+SignerID=RDK
+URL=http\://www.rim.net/Websigner/servlet/RDK-Waterloo
+Version=0

@@ -899,7 +899,7 @@ define build_deps
 
   .PHONY: BUILD_DEPS.$2
 
-  $$(warning "  '$1' depends from 'BUILD_DEPS.$2'")
+#  $$(warning "  '$1' depends from 'BUILD_DEPS.$2'")
 
 ifeq (,$$(BUILD_DEPS.$2.COMPONENT_DIR))
 
@@ -909,7 +909,7 @@ ifeq (,$$(BUILD_DEPS.$2.COMPONENT_DIR))
 
   $$(foreach profile,$$(PROFILES),$$(eval BUILD_DEPS.$2.IMPORTS := $$(BUILD_DEPS.$2.IMPORTS) $$(export.$2.$$(profile).IMPORTS)))
 
-  $$(warning "  processing imports for BUILD_DEPS.$$(BUILD_DEPS.$2.COMPONENT_NAME) component ($2)")
+#  $$(warning "  processing imports for BUILD_DEPS.$$(BUILD_DEPS.$2.COMPONENT_NAME) component ($2)")
 
   $$(foreach import,$$(BUILD_DEPS.$2.IMPORTS),$$(eval $$(call build_deps,BUILD_DEPS.$$(BUILD_DEPS.$2.COMPONENT_NAME),$$(import))))
 
@@ -919,7 +919,7 @@ ifeq (,$$(BUILD_DEPS.$2.COMPONENT_DIR))
 
   .PHONY: BUILD_DEPS.$$(BUILD_DEPS.$2.COMPONENT_NAME)
 
-  $$(warning "  'BUILD_DEPS.$2' depends from BUILD_DEPS.$$(BUILD_DEPS.$2.COMPONENT_NAME)")
+#  $$(warning "  'BUILD_DEPS.$2' depends from BUILD_DEPS.$$(BUILD_DEPS.$2.COMPONENT_NAME)")
 
 #endif
 
@@ -927,7 +927,7 @@ ifeq (,$$(BUILD_DEPS.$$(BUILD_DEPS.$2.COMPONENT_NAME).COMPONENT_DIR))
 
   BUILD_DEPS.$$(BUILD_DEPS.$2.COMPONENT_NAME).COMPONENT_DIR := $$(BUILD_DEPS.$2.COMPONENT_DIR)
 
-  $$(warning "  BUILD_DEPS.$$(BUILD_DEPS.$2.COMPONENT_NAME) build dir is '$$(BUILD_DEPS.$2.COMPONENT_DIR)'")
+#  $$(warning "  BUILD_DEPS.$$(BUILD_DEPS.$2.COMPONENT_NAME) build dir is '$$(BUILD_DEPS.$2.COMPONENT_DIR)'")
 
 ifneq (,$$(BUILD_DEPS.$2.COMPONENT_DIR))
   BUILD_DEPS.$$(BUILD_DEPS.$2.COMPONENT_NAME):
