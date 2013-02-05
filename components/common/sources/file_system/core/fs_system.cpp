@@ -939,7 +939,7 @@ ICustomFileSystemPtr FileSystemImpl::FindFileSystem (const char* src_file_name,s
     ICustomFileSystemPtr return_value = FindMountFileSystem (file_name.c_str (), result_file_name, prefix_name);
 
     if (!return_value)
-      throw xtl::make_argument_exception (METHOD_NAME, "src_file_name", src_file_name, "Can't find mount file system for this file");
+      throw xtl::make_argument_exception (METHOD_NAME, "src_file_name", src_file_name, common::format ("Can't find mount file system for this file (resolved name is '%s')", file_name.c_str ()).c_str ());
 
     return return_value;
   }
