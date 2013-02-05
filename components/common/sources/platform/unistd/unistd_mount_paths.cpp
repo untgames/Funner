@@ -26,9 +26,11 @@ void UnistdPlatform::MountSystemSpecificPaths ()
   if (!home_dir)
     home_dir = "~";
 
-  FileSystem::MountLink ("/system/appdata", "/std//var");
-  FileSystem::MountLink ("/system/profile", (stl::string ("/std/") + home_dir).c_str ());
-  FileSystem::MountLink ("/system/personal", (stl::string ("/std/") + home_dir).c_str ());
+  stl::string data_dir = stl::string ("/std/") + home_dir;
+
+  FileSystem::MountLink ("/system/appdata", data_dir.c_str ());
+  FileSystem::MountLink ("/system/profile", data_dir.c_str ());
+  FileSystem::MountLink ("/system/personal", data_dir.c_str ());
   FileSystem::MountLink ("/system/inetcache", "/std//tmp");
   FileSystem::MountLink ("/system/temp", "/std//tmp");
 }
