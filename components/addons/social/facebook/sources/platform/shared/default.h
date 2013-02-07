@@ -26,6 +26,11 @@ class DefaultPlatform
 
     static void Login       (const char* app_id, const PlatformLoginCallback& callback, const common::PropertyMap& properties);
     static void CancelLogin ();
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Публикация события установки приложения
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    static void PublishAppInstallEvent (const char* app_id);
 };
 
 }

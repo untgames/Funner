@@ -19,3 +19,11 @@ void DefaultPlatform::Login (const char* app_id, const PlatformLoginCallback& ca
 void DefaultPlatform::CancelLogin ()
 {
 }
+
+/*
+   Публикация события установки приложения
+*/
+
+void DefaultPlatform::PublishAppInstallEvent (const char* app_id)
+{
+}

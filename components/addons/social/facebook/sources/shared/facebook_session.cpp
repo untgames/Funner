@@ -177,6 +177,14 @@ void FacebookSessionImpl::LogIn (const LoginCallback& callback, const common::Pr
     app_id           = properties.GetString ("AppId");
     login_properties = properties.Clone ();
 
+    try
+    {
+      Platform::PublishAppInstallEvent (app_id.c_str ());
+    }
+    catch (...)
+    {
+    }
+
     if (has_previous_token)
     {
       if (properties.IsPresent ("UserId"))

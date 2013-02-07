@@ -9,7 +9,9 @@
 #include <syslib/application.h>
 
 #include <common/action_queue.h>
+#include <common/file.h>
 #include <common/log.h>
+#include <common/parser.h>
 #include <common/singleton.h>
 #include <common/strlib.h>
 

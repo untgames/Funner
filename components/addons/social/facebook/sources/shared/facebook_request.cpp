@@ -158,6 +158,14 @@ void FacebookSessionImpl::PerformRequest (const char* method_name, const char* p
   CleanupRequestsActions (); //TODO this should be called from other place!!!!!!!!
 
   pending_actions.push_back (common::ActionQueue::PushAction (xtl::bind (&FacebookSessionImpl::PerformRequestImpl, _1, stl::string (method_name), stl::string (params), token, callback, this, log, false), common::ActionThread_Background));
+
+  try
+  {
+    Platform::PublishAppInstallEvent (app_id.c_str ());
+  }
+  catch (...)
+  {
+  }
 }
 
 void FacebookSessionImpl::CleanupRequestsActions ()
