@@ -32,7 +32,6 @@ const float  MAX_CORNER_HEIGHT_OFFSET_FACTOR = 0.2f;
 const float  PI                              = 3.1415926f;
 const size_t SHADOW_TEXTURE_SIZE             = 32;
 const float  STATIC_PAGES_Z_OFFSET           = -0.001f;
-const float  TEXCOORD_OFFSET                 = 0.001f;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Параметры вершины необходимые для визуализации
@@ -431,17 +430,6 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
         min_s     += half_texture_width;
         crop_min_s = false;
       }
-    }
-
-    if (material->IsTiled ())
-    {
-      if (crop_min_s)
-        min_s += TEXCOORD_OFFSET;
-      if (crop_max_s)
-        max_s -= TEXCOORD_OFFSET;
-
-      min_t += TEXCOORD_OFFSET;
-      max_t -= TEXCOORD_OFFSET;
     }
   }
 
