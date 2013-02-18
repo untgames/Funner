@@ -155,6 +155,8 @@ class SceneRenderSubsystem : public ISubsystem, public IAttachmentRegistryListen
 
       try
       {
+        log.Printf ("Loading renderer resource '%s'...", resource_name);
+
         render.LoadResource (resource_name);
       }
       catch (xtl::exception& exception)
@@ -176,6 +178,8 @@ class SceneRenderSubsystem : public ISubsystem, public IAttachmentRegistryListen
 
       try
       {
+        log.Printf ("Unloading renderer resource '%s'...", resource_name);
+
         render.UnloadResource (resource_name);
       }
       catch (xtl::exception& exception)
