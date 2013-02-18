@@ -396,3 +396,33 @@ void TabletOsApplicationManager::OpenUrl (const char* url)
 {
   throw xtl::make_not_implemented_exception ("syslib::TabletOsApplicationManager::OpenUrl");
 }
+
+/*
+    Получение системных свойств
+*/
+
+void TabletOsApplicationManager::GetSystemProperties (common::PropertyMap& properties)
+{
+  try
+  {
+    properties.SetProperty ("Operating System", "TabletOS");
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("syslib::TabletOsApplicationManager::GetSystemProperties");
+    throw;
+  }
+}
+
+/*
+   Управление энергосбережением
+*/
+
+void TabletOsApplicationManager::SetScreenSaverState (bool state)
+{
+}
+
+bool TabletOsApplicationManager::GetScreenSaverState ()
+{
+  return true;
+}
