@@ -129,6 +129,11 @@ struct WindowImpl: public IWindowImpl
         
         //Get display        
 
+      int format = SCREEN_FORMAT_RGBA8888;
+
+      if (screen_set_window_property_iv (screen_window, SCREEN_PROPERTY_FORMAT, &format))
+        raise_error ("::screen_set_window_property_iv(SCREEN_PROPERTY_FORMAT)");
+
       if (screen_get_window_property_pv (screen_window, SCREEN_PROPERTY_DISPLAY, (void **)&screen_display))
         raise_error ("::screen_get_window_property_pv SCREEN_PROPERTY_DISPLAY");
         
@@ -139,8 +144,10 @@ struct WindowImpl: public IWindowImpl
 
       int max_size = screen_mode.width > screen_mode.height ? screen_mode.width : screen_mode.height, buffer_size [2] = {max_size, max_size};
 
-      if (screen_set_window_property_iv (screen_window, SCREEN_PROPERTY_BUFFER_SIZE, buffer_size))
-        raise_error ("::screen_set_window_property_iv SCREEN_PROPERTY_BUFFER_SIZE");
+printf ("buffer_size=%d\n", max_size);
+
+//      if (screen_set_window_property_iv (screen_window, SCREEN_PROPERTY_BUFFER_SIZE, buffer_size))
+//        raise_error ("::screen_set_window_property_iv SCREEN_PROPERTY_BUFFER_SIZE");
 
       if (screen_create_window_buffers (screen_window, 2)) //buffers count configuration???
         raise_error ("::screen_create_window_buffers"); 
