@@ -10,6 +10,7 @@
 #include <xtl/intrusive_ptr.h>
 
 #include <common/singleton.h>
+#include <common/strlib.h>
 
 #ifdef TABLETOS
   #include <syslib/window.h>
@@ -423,7 +424,7 @@ EGLSurface eglCreateWindowSurfaceAndroid (EGLDisplay display, EGLConfig config, 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Настройка окона (для TabletOS)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-void setup_window (const void* window_handle, const SwapChainDesc& desc);
+void setup_window (const void* window_handle, const SwapChainDesc& desc, Log& log);
 
 }
 

@@ -47,7 +47,24 @@ struct PrimarySwapChain::Impl
       
         //выбор конфигурации
 
-      egl_config = ChooseConfig (in_desc);
+      desc = in_desc;
+
+#ifdef TABLETOS
+      desc.frame_buffer.alpha_bits = 8;
+      desc.frame_buffer.color_bits = 24;
+      desc.frame_buffer.depth_bits = 24;
+      desc.frame_buffer.stencil_bits = 8;
+#endif
+
+      egl_config = ChooseConfig (desc);
+
+      desc.frame_buffer.alpha_bits   = GetConfigAttribute (EGL_ALPHA_SIZE);
+      desc.frame_buffer.color_bits   = GetConfigAttribute (EGL_BUFFER_SIZE) - desc.frame_buffer.alpha_bits;
+      desc.frame_buffer.depth_bits   = GetConfigAttribute (EGL_DEPTH_SIZE);
+      desc.frame_buffer.stencil_bits = GetConfigAttribute (EGL_STENCIL_SIZE);
+      desc.samples_count             = GetConfigAttribute (EGL_SAMPLES);
+      desc.buffers_count             = 2;
+      desc.fullscreen                = false;
         
       if (!egl_config)
         throw xtl::format_operation_exception ("", "Bad EGL configuration (RGB/A: %u/%u, D/S: %u/%u, Samples: %u)",
@@ -59,13 +76,13 @@ struct PrimarySwapChain::Impl
       eglGetConfigAttrib (egl_display, egl_config, EGL_NATIVE_VISUAL_ID, &format);                
         
       log.Printf ("...choose configuration #%u (VisualId: %d, RGB/A: %u/%u, D/S: %u/%u, Samples: %u)",
-        egl_config, format, in_desc.frame_buffer.color_bits, in_desc.frame_buffer.alpha_bits, in_desc.frame_buffer.depth_bits,
-        in_desc.frame_buffer.stencil_bits, in_desc.samples_count);
+        egl_config, format, desc.frame_buffer.color_bits, desc.frame_buffer.alpha_bits, desc.frame_buffer.depth_bits,
+        desc.frame_buffer.stencil_bits, desc.samples_count);
 
 #ifdef TABLETOS
       log.Printf ("...setup window");              
 
-      setup_window (output->GetWindowHandle (), in_desc);
+      setup_window (output->GetWindowHandle (), desc, log);
 #endif
         
       log.Printf ("...create window surface");              
@@ -86,17 +103,8 @@ struct PrimarySwapChain::Impl
 
         //сохранение дескриптора устройства        
 
-      desc = in_desc;
-
-      desc.frame_buffer.width        = GetSurfaceAttribute (EGL_WIDTH);
-      desc.frame_buffer.height       = GetSurfaceAttribute (EGL_HEIGHT);
-      desc.frame_buffer.color_bits   = GetConfigAttribute (EGL_BUFFER_SIZE);
-      desc.frame_buffer.alpha_bits   = GetConfigAttribute (EGL_ALPHA_SIZE);
-      desc.frame_buffer.depth_bits   = GetConfigAttribute (EGL_DEPTH_SIZE);
-      desc.frame_buffer.stencil_bits = GetConfigAttribute (EGL_STENCIL_SIZE);
-      desc.samples_count             = GetConfigAttribute (EGL_SAMPLES);
-      desc.buffers_count             = 2;
-      desc.fullscreen                = false;
+      desc.frame_buffer.width  = GetSurfaceAttribute (EGL_WIDTH);
+      desc.frame_buffer.height = GetSurfaceAttribute (EGL_HEIGHT);
 
         //установка свойств цепочки обмена
         
