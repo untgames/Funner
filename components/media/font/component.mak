@@ -19,9 +19,9 @@ MEDIA.FONT.XFONT.IMPORTS          := compile.media.font
 #Цель - xfont
 MEDIA.FONT.FONT_CONVERTER.TYPE             := static-lib
 MEDIA.FONT.FONT_CONVERTER.NAME             := funner.media.font.font_converter
-MEDIA.FONT.FONT_CONVERTER.INCLUDE_DIRS     := ../../../extern/freetype/include
+MEDIA.FONT.FONT_CONVERTER.INCLUDE_DIRS     := 
 MEDIA.FONT.FONT_CONVERTER.SOURCE_DIRS      := sources/font_converter
-MEDIA.FONT.FONT_CONVERTER.IMPORTS          := compile.media.font compile.media.image link.media.image
+MEDIA.FONT.FONT_CONVERTER.IMPORTS          := compile.media.font compile.media.image link.media.image compile.extern.freetype
 
 #Цель - MediaLib tests
 MEDIA.FONT.TESTS.TYPE             := test-suite
