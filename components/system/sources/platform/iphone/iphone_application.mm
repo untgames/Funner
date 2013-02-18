@@ -2,6 +2,8 @@
 
 #include <netdb.h>
 
+#include <sys/sysctl.h>
+
 #import <Foundation/NSAutoreleasePool.h>
 
 #import <UIKit/UIApplication.h>
@@ -406,6 +408,23 @@ void IPhoneApplicationManager::GetSystemProperties (common::PropertyMap& propert
   properties.SetProperty ("Platform", UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad ? "pad" : "phone");
   properties.SetProperty ("Language", [((NSString*)[[NSLocale preferredLanguages] objectAtIndex:0]) UTF8String]);
   properties.SetProperty ("OSVersion", [system_version UTF8String]);
+
+  NSString* application_version = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleVersion"];
+
+  if ([application_version isKindOfClass:[NSString class]])
+    properties.SetProperty ("ApplicationVersion", [application_version UTF8String]);
+
+  size_t model_name_size = 0;
+
+  sysctlbyname ("hw.machine", 0, &model_name_size, 0, 0);
+
+  xtl::uninitialized_storage<char> model_name (model_name_size + 1);
+
+  if (!sysctlbyname ("hw.machine", model_name.data (), &model_name_size, 0, 0))
+  {
+    model_name.data () [model_name_size] = 0;
+    properties.SetProperty ("DeviceModel", model_name.data ());
+  }
 
   NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
 
