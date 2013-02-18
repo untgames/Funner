@@ -1,9 +1,15 @@
-COMPONENT_DIRS := zlib zzip pcre jpeg tiff libpng devil libpsd gles_win32 gles_wince bullet ogg vorbis \
+COMPONENT_DIRS := zzip pcre tiff devil libpsd gles_win32 gles_wince bullet ogg vorbis \
                   vorbisfile theora lua luajit firebreath mongoose beagleboard openalsdk shiny meego \
-                  wcecompat libffi libiconv pthreads_wince openssl qualcomm_texture_converter lib64 dxsdk angle freetype
+                  wcecompat libffi pthreads_wince qualcomm_texture_converter lib64 dxsdk angle libiconv
 
 ifeq (,$(filter beagleboard,$(PROFILES)))
   COMPONENT_DIRS += curl
+endif
+
+ifeq (,$(filter tabletos,$(PROFILES)))
+  COMPONENT_DIRS += zlib jpeg libpng freetype openssl
+else
+  COMPONENT_DIRS += tabletos
 endif
 
 ifneq (,$(filter bada,$(PROFILES)))

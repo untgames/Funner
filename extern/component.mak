@@ -5,8 +5,23 @@ TARGETS := FUNNER_EXTERN_LIBS
 
 #Цель - external libraries
 FUNNER_EXTERN_LIBS.TYPE       := package
-FUNNER_EXTERN_LIBS.COMPONENTS := zlib zzip lib64 pcre jpeg tiff libpng devil ogg vorbis vorbisfile lua \
-                                 freetype libpsd theora shiny openssl
+FUNNER_EXTERN_LIBS.COMPONENTS := 
+
+ifeq (,$(filter tabletos,$(PROFILES)))
+FUNNER_EXTERN_LIBS.COMPONENTS += zlib
+endif
+
+FUNNER_EXTERN_LIBS.COMPONENTS += zzip lib64 pcre tiff
+
+ifeq (,$(filter tabletos,$(PROFILES)))
+FUNNER_EXTERN_LIBS.COMPONENTS += jpeg libpng freetype
+endif
+
+FUNNER_EXTERN_LIBS.COMPONENTS += devil ogg vorbis vorbisfile lua libpsd theora shiny
+
+ifeq (,$(filter tabletos,$(PROFILES)))
+FUNNER_EXTERN_LIBS.COMPONENTS += openssl
+endif
 
 ifeq (,$(filter iphone,$(PROFILES))$(filter android,$(PROFILES)))
   FUNNER_EXTERN_LIBS.x86.COMPONENTS := geekinfo
