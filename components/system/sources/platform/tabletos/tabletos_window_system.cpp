@@ -94,7 +94,6 @@ struct WindowImpl: public IWindowImpl
   screen_display_t     screen_display;   // A display represents the physical display hardware such as a touch screen display.
   WindowMessageHandler message_handler;                  //обработчик сообщений
   void*                user_data;                        //пользовательские данные окна
-
   bool                 background_state;
   bool                 is_multitouch_enabled;
 
@@ -143,8 +142,6 @@ struct WindowImpl: public IWindowImpl
         raise_error ("::screen_get_display_property_pv SCREEN_PROPERTY_MODE");
 
       int max_size = screen_mode.width > screen_mode.height ? screen_mode.width : screen_mode.height, buffer_size [2] = {max_size, max_size};
-
-printf ("buffer_size=%d\n", max_size);
 
 //      if (screen_set_window_property_iv (screen_window, SCREEN_PROPERTY_BUFFER_SIZE, buffer_size))
 //        raise_error ("::screen_set_window_property_iv SCREEN_PROPERTY_BUFFER_SIZE");
