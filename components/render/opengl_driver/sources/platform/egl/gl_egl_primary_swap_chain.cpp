@@ -50,10 +50,10 @@ struct PrimarySwapChain::Impl
       desc = in_desc;
 
 #ifdef TABLETOS
-      desc.frame_buffer.alpha_bits = 8;
-      desc.frame_buffer.color_bits = 24;
-      desc.frame_buffer.depth_bits = 24;
-      desc.frame_buffer.stencil_bits = 8;
+      desc.frame_buffer.color_bits   = 24;
+      desc.frame_buffer.depth_bits   = 24;
+//      desc.frame_buffer.alpha_bits   = 8;
+//      desc.frame_buffer.stencil_bits = 8;
 #endif
 
       egl_config = ChooseConfig (desc);
@@ -179,7 +179,12 @@ struct PrimarySwapChain::Impl
       
     if (fmt0.color_bits != fmt1.color_bits)
       return CompareFormatCounts (fmt0.color_bits, fmt1.color_bits, swap_chain_desc.frame_buffer.color_bits);
-      
+
+      //упорядочивание по количеству битов альфы
+
+    if (fmt0.alpha_bits != fmt1.alpha_bits)
+      return CompareFormatCounts (fmt0.alpha_bits, fmt1.alpha_bits, swap_chain_desc.frame_buffer.alpha_bits);
+
       //упорядочивание по количеству битов глубины
 
     if (fmt0.depth_bits != fmt1.depth_bits)
@@ -194,11 +199,6 @@ struct PrimarySwapChain::Impl
 
     if (fmt0.samples_count != fmt1.samples_count)
       return CompareFormatCounts (fmt0.samples_count, fmt1.samples_count, swap_chain_desc.samples_count);
-
-      //упорядочивание по количеству битов альфы
-
-    if (fmt0.alpha_bits != fmt1.alpha_bits)
-      return CompareFormatCounts (fmt0.alpha_bits, fmt1.alpha_bits, swap_chain_desc.frame_buffer.alpha_bits);
 
       //при прочих равных первый формат более подходит
 

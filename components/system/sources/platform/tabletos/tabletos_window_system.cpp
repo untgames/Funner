@@ -128,7 +128,7 @@ struct WindowImpl: public IWindowImpl
         
         //Get display        
 
-      int format = SCREEN_FORMAT_RGBA8888;
+      int format = SCREEN_FORMAT_RGBX8888;
 
       if (screen_set_window_property_iv (screen_window, SCREEN_PROPERTY_FORMAT, &format))
         raise_error ("::screen_set_window_property_iv(SCREEN_PROPERTY_FORMAT)");
