@@ -1,8 +1,7 @@
 ###################################################################################################
 #Константы
 ###################################################################################################
-COMMON_CFLAGS     += -march=armv7-a -mfloat-abi=softfp -mfpu=vfpv3-d16
-COMMON_CFLAGS     += -D__ARM_ARCH_7__ -D__ARM_ARCH_7A__
-COMMON_LINK_FLAGS += -Wl,--fix-cortex-a8
+COMMON_CFLAGS += -mtune=xscale -mtune=arm6 -march=armv5te -mfloat-abi=softfp -mfpu=vfp
+COMMON_CFLAGS += -D__ARM_ARCH_5__ -D__ARM_ARCH_5T__ -D__ARM_ARCH_5E__ -D__ARM_ARCH_5TE__
 
 include $(TOOLSETS_DIR)/common/android-arm.mak
