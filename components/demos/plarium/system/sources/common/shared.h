@@ -16,6 +16,11 @@
 #include <sys/endian.h>
 #endif
 
+#ifdef TABLETOS
+#include <sys/time.h>
+#include <netinet/in.h>
+#endif
+
 #include <sgi_stl/stdexcept>
 
 #include <errno.h>

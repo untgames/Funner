@@ -7,3 +7,4 @@ export.link.plarium.system.win32.LIBS       := wsock32 ws2_32
 export.link.plarium.system.linux.LIBS       := pthread rt
 export.link.plarium.system.cocoa.LINK_FLAGS := -framework CoreFoundation -framework Foundation
 export.link.plarium.system.IMPORTS          := link.extern.zlib
+export.link.plarium.system.tabletos.LIBS    := socket

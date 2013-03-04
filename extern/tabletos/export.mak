@@ -10,4 +10,4 @@ export.link.extern.libpng.LINK_FLAGS   := -lpng
 export.link.extern.jpeg.LINK_FLAGS     := -ljpeg
 export.link.extern.freetype.LINK_FLAGS := -lfreetype
 export.link.extern.zlib.LINK_FLAGS     := -lz
-export.link.extern.openssl.LINK_FLAGS  := -lssl
+export.link.extern.openssl.LINK_FLAGS  := -lssl -lcrypto
