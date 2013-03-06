@@ -43,6 +43,18 @@ class ScriptTcpClient: public TcpClient, public xtl::dynamic_cast_root
         
       return result;
     }
+
+    void SwitchToAsyncSending () { TcpClient::SwitchToAsyncSending (); }
+
+    void SwitchToAsyncReceiving () { TcpClient::SwitchToAsyncReceiving (); }
+
+///Регистрация обработчика асинхронного получения данных
+    typedef xtl::function<void (const stl::string&)> AsyncReceivingEventHandler;
+
+    xtl::connection RegisterAsyncReceivingEventHandler (const AsyncReceivingEventHandler& handler)
+    {
+      return TcpClient::RegisterAsyncReceivingEventHandler (AsyncReceivingAdaptor (handler));
+    }
    
 ///Порождающие функции
     static Pointer Create (const char* host, unsigned short port)
@@ -54,6 +66,19 @@ class ScriptTcpClient: public TcpClient, public xtl::dynamic_cast_root
     {
       return Pointer (new ScriptTcpClient (host, port, timeout));
     }
+
+  private:
+    struct AsyncReceivingAdaptor
+    {
+      AsyncReceivingAdaptor (const ScriptTcpClient::AsyncReceivingEventHandler& in_handler) : handler (in_handler) {}
+
+      void operator () (const void* buffer, size_t size) const
+      {
+        common::ActionQueue::PushAction (xtl::bind (handler, stl::string ((const char*)buffer, size)), common::ActionThread_Main);
+      }
+
+      AsyncReceivingEventHandler handler;
+    };
 };
 
 void bind_tcp_client_library (Environment& environment)
@@ -66,10 +91,14 @@ void bind_tcp_client_library (Environment& environment)
 
     //регистрация операций
     
-  lib.Register ("Close",   make_invoker (&ScriptTcpClient::Close));
-  lib.Register ("Send",    make_invoker (xtl::implicit_cast<void (ScriptTcpClient::*)(const char*)> (&ScriptTcpClient::Send)));
-  lib.Register ("Receive", make_invoker (&ScriptTcpClient::Receive));
-  
+  lib.Register ("Close",                               make_invoker (&ScriptTcpClient::Close));
+  lib.Register ("Send",                                make_invoker (xtl::implicit_cast<void (ScriptTcpClient::*)(const char*)> (&ScriptTcpClient::Send)));
+  lib.Register ("Receive",                             make_invoker (&ScriptTcpClient::Receive));
+  lib.Register ("SwitchToAsyncSending",                make_invoker (&ScriptTcpClient::SwitchToAsyncSending));
+  lib.Register ("SwitchToAsyncReceiving",              make_invoker (&ScriptTcpClient::SwitchToAsyncReceiving));
+  lib.Register ("CreateAsyncReceivingCallbackHandler", make_callback_invoker<ScriptTcpClient::AsyncReceivingEventHandler::signature_type> ());    
+  lib.Register ("RegisterAsyncReceivingEventHandler",  make_invoker (&ScriptTcpClient::RegisterAsyncReceivingEventHandler));
+
   lib.Register ("get_ReceiveBufferSize", make_invoker (&ScriptTcpClient::ReceiveBufferSize));
   lib.Register ("set_ReceiveBufferSize", make_invoker (&ScriptTcpClient::SetReceiveBufferSize));  
   lib.Register ("get_SendBufferSize",    make_invoker (&ScriptTcpClient::SendBufferSize));
@@ -79,11 +108,12 @@ void bind_tcp_client_library (Environment& environment)
   lib.Register ("get_Closed",            make_invoker (&ScriptTcpClient::IsClosed));
   lib.Register ("get_Connected",         make_invoker (&ScriptTcpClient::IsConnected));  
   lib.Register ("get_ReceiveAvailable",  make_invoker (&ScriptTcpClient::ReceiveAvailable));  
+  lib.Register ("get_AsyncSending",      make_invoker (&ScriptTcpClient::IsAsyncSendingEnabled));
+  lib.Register ("get_AsyncReceiving",    make_invoker (&ScriptTcpClient::IsAsyncReceivingEnabled));
 
     //регистрация типов данных
 
-  environment.RegisterType<ScriptTcpClient> (TCP_CLIENT_LIBRARY);
-  
+  environment.RegisterType<ScriptTcpClient> (TCP_CLIENT_LIBRARY);  
 }
 
 void bind_network_library (Environment& environment)

@@ -2,20 +2,35 @@
 
 const char* SCRIPT_FILE_NAME = "data/network.lua";
 
+void log_handler (const char* log_name, const char* event)
+{
+  printf ("%s: %s\n", log_name, event);
+}
+
+void apprun ()
+{
+  syslib::Application::Run ();
+}
+
 int main ()
 {
   printf ("Results of network_test:\n");
   
   try
   {
+    common::LogFilter filter ("network.*", &log_handler);
+
     Environment env;
 
     Shell shell ("lua", env);
 
     xtl::com_ptr<IInterpreter> script (shell.Interpreter ());
 
+    env.Library ("global").Register ("apprun", make_invoker (&apprun));
+
     env.BindLibraries ("Common");
     env.BindLibraries ("Network");
+    env.BindLibraries ("System");
   
     load_script (*script, SCRIPT_FILE_NAME);
 
