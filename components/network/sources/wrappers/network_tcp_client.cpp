@@ -2,18 +2,365 @@
 
 using namespace network;
 
+//TODO: настроить работу таймаутов
+//TODO: сделать select-based обработку
+//TODO: использовать threadpool
+
+#ifdef _MSC_VER
+  #pragma warning (disable : 4355) //'this' is used in base member initializer list
+#endif
+
+namespace
+{
+
 /*
-    Описание реализации клиента
+    Константы
+*/
+
+const size_t DEFAULT_ASYNC_RECEIVE_BUFFER_RECEIVE_SIZE = 16384;
+const size_t ASYNC_SENDING_QUEUE_MAX_SIZE              = 16;
+const size_t ASYNC_TIMEOUT_IN_MILLISECONDS             = 1000;
+
+/*
+    Типы
 */
 
 typedef xtl::uninitialized_storage<char> Buffer;
 
+/*
+    Реализация асинхронного доступа
+*/
+
+///Блок с данными
+struct Block
+{
+  typedef xtl::com_ptr<Block> Pointer;
+
+  xtl::reference_counter ref_count; //количество ссылок на буфер
+  size_t                 size;      //размер буфера
+  char                   data [1];  //данные
+
+///Конструктор
+  Block (size_t in_size, const void* in_data)
+    : size (in_size)
+  {
+    memcpy (data, in_data, size);
+  }
+
+///Создание буфера
+  static Pointer Create (size_t size, const void* data)
+  {
+    Block* block = new (stl::allocate<char> (sizeof (Block) - sizeof (char) + size)) Block (size, data);
+
+    return Pointer (block, false);
+  }
+
+///Подсчет ссылок
+  void AddRef () { ref_count.increment (); }
+
+  void Release ()
+  {
+    if (ref_count.decrement ())
+    {
+      const size_t buf_size = size;
+
+      stl::destroy (this);
+      stl::deallocate ((void*)this, buf_size);
+    }
+  }
+};
+
+typedef Block::Pointer BlockPtr;
+
+///Очередь с возможностью доступа из нескольких нитей
+class SharedQueue
+{
+  public:
+///Конструктор
+    SharedQueue (size_t in_max_size)
+      : max_size (in_max_size)
+    {      
+    }
+      
+///Деструктор
+    ~SharedQueue ()
+    {
+      mutex.Lock ();
+    }
+
+///Помещение буфера в очередь
+    bool Push (const BlockPtr& block, size_t timeout_in_milliseconds)
+    {
+      syslib::Lock lock (mutex);
+
+      size_t start_time = common::milliseconds ();
+
+      while (blocks.size () >= max_size)
+      {
+        size_t delay = start_time + timeout_in_milliseconds - common::milliseconds ();
+
+        if (delay > timeout_in_milliseconds || !delay)
+          return false;
+
+        full_condition.TryWait (mutex, delay);        
+      }
+
+      blocks.push_back (block);
+
+      empty_condition.NotifyOne ();
+
+      return true;
+    }
+
+///Извлечение буфера из очереди
+    BlockPtr Pop (size_t timeout_in_milliseconds)
+    {
+      syslib::Lock lock (mutex);
+
+      size_t start_time = common::milliseconds ();
+
+      while (blocks.empty ())      
+      {
+        size_t delay = start_time + timeout_in_milliseconds - common::milliseconds ();
+
+        if (delay > timeout_in_milliseconds || !delay)
+          return BlockPtr ();
+
+        empty_condition.TryWait (mutex, delay);
+      }
+
+      BlockPtr result = blocks.front ();
+
+      blocks.pop_front ();
+
+      full_condition.NotifyOne ();
+
+      return result;
+    }
+
+  private:
+    typedef stl::deque<BlockPtr> BlockQueue;
+
+  private:
+    syslib::Mutex     mutex;           //блокировка доступа к данным очереди
+    syslib::Condition full_condition;  //событие изменения состояния очереди
+    syslib::Condition empty_condition; //событие изменения состояния очереди
+    BlockQueue        blocks;          //блоки
+    size_t            max_size;        //максимальный размер очереди
+};
+
+///Асинхронная обработка данных
+class AsyncProcessor
+{
+  public:
+///Конструктор
+    AsyncProcessor (const char* name)
+      : thread (name, xtl::bind (&AsyncProcessor::Run, this))
+      , log (name)
+      , stop_requested (false)
+    {
+    }
+
+///Деструктор
+    ~AsyncProcessor ()
+    {
+      try
+      {
+        Stop ();
+      }
+      catch (...)
+      {
+      }
+    }
+
+///Остановка обработки
+    void Stop ()
+    {
+      stop_requested = true;
+
+      thread.Join ();      
+    }
+
+    void StopRequest () { stop_requested = true; }
+
+///Запрошена ли остановка
+    bool IsStopRequested () const { return stop_requested; }
+
+  private:
+///Обработка очереди
+    int Run ()
+    {
+      while (!stop_requested)
+      {
+        try
+        {
+          DoStep ();
+        }
+        catch (std::exception& e)
+        {
+          log.Printf ("%s\n    at network::AsyncProcessor::Run", e.what ());
+        }
+        catch (...)
+        {
+          log.Printf ("unknown exception\n    at network::AsyncProcessor::Run");
+        }
+      }
+
+      return 0;
+    }
+
+///Итерация обработки очереди
+    virtual void DoStep () = 0;
+
+  private:    
+    syslib::Thread thread;         //нить отсылки данных
+    common::Log    log;            //поток отладочного протоколирования
+    volatile bool  stop_requested; //запрошена остановка
+};
+
+///Асинхронная отсылка данных
+class AsyncSender: public AsyncProcessor
+{
+  public:
+///Конструктор
+    AsyncSender (Socket& in_socket)
+      : AsyncProcessor ("network.AsyncSender")
+      , socket (in_socket)
+      , queue (ASYNC_SENDING_QUEUE_MAX_SIZE)
+    {
+    }
+
+///Деструктор
+    ~AsyncSender ()
+    {
+      try
+      {
+        Stop ();
+      }
+      catch (...)
+      {
+      }
+    }
+
+///Запрос на отсылку данных
+    void SendRequest (const void* buffer, size_t size)
+    {
+      try
+      { 
+        while (!queue.Push (Block::Create (size, buffer), ASYNC_TIMEOUT_IN_MILLISECONDS) && !IsStopRequested ());
+      }
+      catch (xtl::exception& e)
+      {
+        e.touch ("network::AsyncSender");
+        throw;
+      }
+    }
+
+  private:
+///Итерация обработки очереди
+    void DoStep ()
+    {
+      BlockPtr block = queue.Pop (ASYNC_TIMEOUT_IN_MILLISECONDS);  
+
+      if (!block)
+        return;
+
+      size_t size = block->size;
+      char*  data = block->data;
+
+      while (size)
+      {
+        if (IsStopRequested ())
+          break;
+
+        size_t send_size = socket.Send (data, size, ASYNC_TIMEOUT_IN_MILLISECONDS);        
+
+        if (!send_size)
+        {
+          if (socket.IsSendClosed ())
+            StopRequest ();
+
+          return;
+        }
+
+        size -= send_size;
+      }
+    }
+
+  private:    
+    Socket&     socket; //сокет
+    SharedQueue queue;  //очередь отсылки
+};
+
+///Асинхронный прием данных
+class AsyncReceiver: public AsyncProcessor, public common::Lockable
+{
+  public:
+///Конструктор
+    AsyncReceiver (Socket& in_socket, const TcpClient::AsyncReceivingHandler& in_handler)
+      : AsyncProcessor ("network.AsyncReceiver")
+      , socket (in_socket)
+      , handler (in_handler)
+    {
+      buffer.resize (DEFAULT_ASYNC_RECEIVE_BUFFER_RECEIVE_SIZE);
+    }
+
+///Деструктор
+    ~AsyncReceiver ()
+    {
+      try
+      {
+        Stop ();
+
+        Lock ();
+      }
+      catch (...)
+      {
+      }
+    }
+
+  private:
+///Итерация обработки очереди
+    void DoStep ()
+    {
+      size_t recv_size = socket.Receive (buffer.data (), buffer.size (), ASYNC_TIMEOUT_IN_MILLISECONDS);
+
+      if (!recv_size)
+      {
+        if (socket.IsReceiveClosed ())
+          StopRequest ();
+
+        return;
+      }
+
+      common::Lock lock (*this);
+
+      handler (buffer.data (), recv_size);
+    }
+
+  private:    
+    Socket&                          socket;  //сокет
+    Buffer                           buffer;  //буфер приемки
+    TcpClient::AsyncReceivingHandler handler; //обработчик получения данных
+};
+
+}
+
+/*
+    Описание реализации клиента
+*/
+
+typedef xtl::signal<void (const void*, size_t)> AsyncDataReceivingSignal;
+
 struct TcpClient::Impl: public xtl::reference_counter, public common::Lockable
 {
-  Socket socket;      //сокет
-  Buffer recv_buffer; //буфер с принятыми данными
-  char*  recv_start;  //начало принятых данных
-  char*  recv_finish; //конец принятых данных
+  Socket                       socket;                    //сокет
+  Buffer                       recv_buffer;               //буфер с принятыми данными
+  char*                        recv_start;                //начало принятых данных
+  char*                        recv_finish;               //конец принятых данных
+  stl::auto_ptr<AsyncReceiver> async_receiver;            //асинхронный приём данных
+  stl::auto_ptr<AsyncSender>   async_sender;              //асинхронная отсылка данных
+  AsyncDataReceivingSignal     async_receive_data_signal; //сигнал оповещения о получении данных
   
 ///Конструктор
   Impl ()
@@ -36,6 +383,11 @@ struct TcpClient::Impl: public xtl::reference_counter, public common::Lockable
 ///Закрытие канала
   void Close ()
   {
+    common::Lock lock (*this);
+
+    async_sender.reset ();
+    async_receiver.reset ();
+
     socket.Close ();
     recv_buffer.resize (0);
     
@@ -140,6 +492,14 @@ struct TcpClient::Impl: public xtl::reference_counter, public common::Lockable
 
       return false;
     }
+  }
+
+///Асинхронный обработчик получения данных
+  void OnAsyncDataReceived (const void* data, size_t size)
+  {
+    common::Lock lock (*this);
+  
+    async_receive_data_signal (data, size);
   }
 };
 
@@ -268,12 +628,25 @@ void TcpClient::Send (const void* buffer, size_t size)
   {
     if (!buffer && size)
       throw xtl::make_null_argument_exception ("", "buffer");
+
+    {
+      common::Lock lock (*impl);
+
+      if (impl->async_sender)
+      {
+        impl->async_sender->SendRequest (buffer, size);
+        return;
+      }
+    }
+
+    const char* data = (const char*)buffer;
       
     while (size)
     {
-      size_t send_size = impl->socket.Send (buffer, size);
+      size_t send_size = impl->socket.Send (data, size);
 
       size -= send_size;
+      data += send_size;
     }
   }
   catch (xtl::exception& e)
@@ -307,6 +680,13 @@ size_t TcpClient::Receive (void* buffer, size_t size, size_t timeout_in_millisec
 {
   try
   {
+    {
+      common::Lock lock (*impl);
+    
+      if (impl->async_receiver.get ())
+        return 0;
+    }
+
     return impl->Receive (buffer, size, timeout_in_milliseconds);
   }
   catch (xtl::exception& e)
@@ -320,6 +700,13 @@ bool TcpClient::ReceiveExactly (void* buffer, size_t size, size_t timeout_in_mil
 {
   try
   {
+    {
+      common::Lock lock (*impl);
+    
+      if (impl->async_receiver.get ())
+        return false;
+    }
+
     return impl->ReceiveExactly (buffer, size, timeout_in_milliseconds);
   }
   catch (xtl::exception& e)
@@ -458,6 +845,60 @@ void TcpClient::SetTcpNoDelay (bool state)
     e.touch ("network::TcpClient::SetTcpNoDelay");
     throw;
   }
+}
+
+/*
+    Асинхронный режим
+*/
+
+bool TcpClient::IsAsyncSendingEnabled () const
+{
+  common::Lock lock (*impl);
+
+  return impl->async_sender;
+}
+
+bool TcpClient::IsAsyncReceivingEnabled () const
+{
+  common::Lock lock (*impl);
+
+  return impl->async_receiver;
+}
+
+void TcpClient::SwitchToAsyncReceiving () const
+{
+  common::Lock lock (*impl);
+
+  if (impl->async_receiver)
+    return;
+
+  size_t available = impl->recv_finish - impl->recv_start;
+
+  if (available)
+  {
+    impl->async_receive_data_signal (impl->recv_start, available);
+
+    impl->recv_start = impl->recv_finish = impl->recv_buffer.data ();
+  }
+
+  impl->async_receiver.reset (new AsyncReceiver (impl->socket, xtl::bind (&Impl::OnAsyncDataReceived, &*impl, _1, _2)));
+}
+
+void TcpClient::SwitchToAsyncSending () const
+{
+  common::Lock lock (*impl);
+
+  if (impl->async_sender)
+    return;
+
+  impl->async_sender.reset (new AsyncSender (impl->socket));
+}
+
+xtl::connection TcpClient::RegisterAsyncReceivingEventHandler (const AsyncReceivingHandler& handler)
+{
+  common::Lock lock (*impl);
+
+  return impl->async_receive_data_signal.connect (handler);
 }
 
 /*

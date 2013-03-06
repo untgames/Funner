@@ -61,7 +61,19 @@ class TcpClient
     bool IsClosed      () const;      //закрыт ли сокет
     bool IsConnected   () const;      //установлена ли связь
     bool IsTcpNoDelay  () const;      //установлен ли флаг TCP_NODELAY
-    void SetTcpNoDelay (bool state);        
+    void SetTcpNoDelay (bool state);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Асинхронный режим
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    bool IsAsyncSendingEnabled   () const;
+    bool IsAsyncReceivingEnabled () const;
+    void SwitchToAsyncReceiving  () const;
+    void SwitchToAsyncSending    () const;
+
+    typedef xtl::function<void (const void* buffer, size_t size)> AsyncReceivingHandler;
+
+    xtl::connection RegisterAsyncReceivingEventHandler (const AsyncReceivingHandler& handler);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Обмен

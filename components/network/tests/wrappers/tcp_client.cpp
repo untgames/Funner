@@ -1,7 +1,5 @@
 #include "shared.h"
 
-#include "shared.h"
-
 using namespace network;
 
 const unsigned short CONNECTION_PORT = 12973;

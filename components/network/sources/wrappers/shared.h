@@ -2,13 +2,16 @@
 #define NETWORK_WRAPPERS_SHARED_HEADER
 
 #include <stl/auto_ptr.h>
+#include <stl/deque>
 #include <stl/list>
 #include <stl/string>
 
+#include <xtl/bind.h>
 #include <xtl/common_exceptions.h>
 #include <xtl/function.h>
 #include <xtl/intrusive_ptr.h>
 #include <xtl/reference_counter.h>
+#include <xtl/signal.h>
 
 #include <common/component.h>
 #include <common/file.h>

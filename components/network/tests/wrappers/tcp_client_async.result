@@ -1,0 +1,3 @@
+Results of tcp_client_async_test:
+Server: received 'First hello from socket!'
+Client: received 'First hello from socket!Last hello from socket!'

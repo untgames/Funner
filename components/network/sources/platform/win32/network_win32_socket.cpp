@@ -480,7 +480,7 @@ class WinSocket : public SocketImpl, public xtl::reference_counter
     size_t Receive (void* buffer, size_t size, size_t timeout_in_milliseconds)
     {
       try
-      {
+      {        
         SetSocketOption<DWORD> (SO_RCVTIMEO, (DWORD)timeout_in_milliseconds);
         
         int received_bytes = recv (socket, (char*)buffer, size, 0);
