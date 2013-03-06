@@ -29,6 +29,8 @@ class ApplicationImpl: private IApplicationListener
       is_exit_detected   = false;
       on_push_action     = ActionQueue::RegisterEventHandler (ActionQueueEvent_OnPushAction, xtl::bind (&ApplicationImpl::OnPushAction, this, _1, _2));
       main_thread_id     = Platform::GetCurrentThreadId ();
+
+      UpdateIdleState ();
     }      
     
 ///Работа с делегатами
@@ -177,6 +179,12 @@ class ApplicationImpl: private IApplicationListener
 ///Подписка на событие обновления системных свойств   
     PropertyMap& CustomProperties () { return custom_properties; }
 
+///Включен ли Idle режим?
+    bool IsIdleEnabled ()
+    {
+      return !signals [ApplicationEvent_OnIdle].empty () || ActionQueue::ActionsCount (ActionThread_Main) != 0 || ActionQueue::ActionsCount (main_thread_id) != 0;
+    }
+
   private:
     typedef xtl::signal<void ()>             ApplicationSignal;
     typedef xtl::signal<void (const char*)>  NotificationSignal;
@@ -224,12 +232,6 @@ class ApplicationImpl: private IApplicationListener
         }
       }  
     }    
-
-///Включен ли Idle режим?
-    bool IsIdleEnabled ()
-    {
-      return !signals [ApplicationEvent_OnIdle].empty () || ActionQueue::ActionsCount (ActionThread_Main) != 0 || ActionQueue::ActionsCount (main_thread_id) != 0;
-    }
 
 ///Обновление idle-режима
     void UpdateIdleState ()
@@ -419,6 +421,8 @@ void Application::Run (IApplicationDelegate* in_delegate)
         app->BeginDelegate (delegate.get ());
       
         app->EnterMessageLoop ();
+
+        delegate->SetIdleState (app->IsIdleEnabled ());
       }
 
       try
