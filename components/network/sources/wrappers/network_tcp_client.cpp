@@ -178,7 +178,7 @@ class AsyncProcessor
     {
       stop_requested = true;
 
-      thread.Join ();      
+      thread.Join ();
     }
 
     void StopRequest () { stop_requested = true; }
@@ -383,15 +383,28 @@ struct TcpClient::Impl: public xtl::reference_counter, public common::Lockable
 ///Закрытие канала
   void Close ()
   {
-    common::Lock lock (*this);
+    stl::auto_ptr<AsyncReceiver> tmp_async_receiver;
+    stl::auto_ptr<AsyncSender>   tmp_async_sender;
+  
+    {
+      common::Lock lock (*this);
 
-    async_sender.reset ();
-    async_receiver.reset ();
+      tmp_async_sender   = async_sender;
+      tmp_async_receiver = async_receiver;
+    }
 
-    socket.Close ();
-    recv_buffer.resize (0);
-    
-    recv_start = recv_finish = recv_buffer.data ();
+    tmp_async_sender.reset ();
+    tmp_async_receiver.reset ();
+
+    {
+      common::Lock lock (*this);
+
+      socket.Close ();
+
+      recv_buffer.resize (0);
+
+      recv_start = recv_finish = recv_buffer.data ();
+    }
   }
   
 ///Принятие данных
@@ -498,7 +511,7 @@ struct TcpClient::Impl: public xtl::reference_counter, public common::Lockable
   void OnAsyncDataReceived (const void* data, size_t size)
   {
     common::Lock lock (*this);
-  
+
     async_receive_data_signal (data, size);
   }
 };
