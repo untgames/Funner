@@ -63,12 +63,6 @@ struct RenderablePageCurlMesh::Impl
   {
     static const char* METHOD_NAME = "render::obsolete::render2d::RenderablePageCurlMesh::RenderablePageCurlMesh";
 
-    if (is_rigid)
-    {
-      grid_size.x = 2;
-      grid_size.y = 2;
-    }
-
     if (grid_size.x < 2)
       throw xtl::make_argument_exception (METHOD_NAME, "grid_size.x", (size_t)grid_size.x, "grid_size.x must be greater than 1");
 
@@ -158,48 +152,63 @@ struct RenderablePageCurlMesh::Impl
 
     if (is_rigid)
     {
-      RenderableVertex*  v          = vertices.data ();
-      const math::vec3f* original_v = original_vertices.data ();
+      float x                     = corner_position.x,
+            x_offset_from_binding = x,
+            min_x                 = 0,
+            max_x                 = x;
 
-      size_t top_static_vertex, bottom_static_vertex, top_dynamic_vertex, bottom_dynamic_vertex;
-
-      float x = corner_position.x, dynamic_x_offset = 0;
+      bool is_left_side = false;
 
       switch (corner)
       {
         case scene_graph::PageCurlCorner_LeftBottom:
         case scene_graph::PageCurlCorner_LeftTop:
-          top_static_vertex     = 1;
-          bottom_static_vertex  = 3;
-          top_dynamic_vertex    = 0;
-          bottom_dynamic_vertex = 2;
-          x                     -= size.x;
-          dynamic_x_offset      = size.x;
+          min_x                 = x;
+          max_x                 = size.x;
+          x_offset_from_binding = x - size.x;
+          is_left_side          = true;
           break;
         default:
-          top_static_vertex     = 0;
-          bottom_static_vertex  = 2;
-          top_dynamic_vertex    = 1;
-          bottom_dynamic_vertex = 3;
           break;
       }
 
-      float perspective_factor = stl::max (0.f, (float)(1.f - fabs (x) / size.x) * (rigid_page_perspective_factor - 1.f)),
-            z                  = sqrt (size.x * size.x - x * x);
+      float perspective_factor = stl::max (0.f, (float)(1.f - fabs (x_offset_from_binding) / size.x) * (rigid_page_perspective_factor - 1.f)),
+            min_z = 0,
+            max_z = sqrt (size.x * size.x - x_offset_from_binding * x_offset_from_binding),
+            dx    = (max_x - min_x) / (grid_size.x - 1),
+            dz    = (max_z - min_z) / (grid_size.x - 1);
 
-      v [top_static_vertex].position    = original_v [top_static_vertex];
-      v [bottom_static_vertex].position = original_v [bottom_static_vertex];
+      if (is_left_side)
+      {
+        min_z = max_z;
+        dz    = -dz;
+      }
 
-      v [top_static_vertex].position.y    = size.y - v [top_static_vertex].position.y;
-      v [bottom_static_vertex].position.y = size.y - v [bottom_static_vertex].position.y;
+      RenderableVertex*  vertex     = vertices.data ();
+      const math::vec3f* original_v = original_vertices.data ();
 
-      v [top_dynamic_vertex].position.x = x + dynamic_x_offset;
-      v [top_dynamic_vertex].position.y = size.y - original_v [top_dynamic_vertex].y + size.y * perspective_factor / 2;
-      v [top_dynamic_vertex].position.z = z;
+      for (size_t j = 0; j < grid_size.y; j++)
+      {
+        float x                  = min_x,
+              z                  = min_z,
+              min_y              = size.y - original_v [j * grid_size.x].y,
+              perspective_y_grow = (min_y - size.y / 2) * perspective_factor / 2,
+              dy                 = perspective_y_grow / (grid_size.x - 1),
+              y                  = min_y;
 
-      v [bottom_dynamic_vertex].position.x = x + dynamic_x_offset;
-      v [bottom_dynamic_vertex].position.y = size.y - original_v [bottom_dynamic_vertex].y - size.y * perspective_factor / 2;
-      v [bottom_dynamic_vertex].position.z = z;
+        if (is_left_side)
+        {
+          y += perspective_y_grow;
+          dy = -dy;
+        }
+
+        for (size_t i = 0; i < grid_size.x; i++, vertex++, x += dx, y += dy, z += dz)
+        {
+          vertex->position.x = x;
+          vertex->position.y = y;
+          vertex->position.z = z;
+        }
+      }
 
       return;
     }

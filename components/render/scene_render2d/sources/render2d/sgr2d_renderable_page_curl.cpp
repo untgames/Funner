@@ -692,14 +692,10 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
     const math::vec2f page_size = page_curl->Size ();
 
     //отрисовка тени под страницей
-    RenderableVertex*   current_vertex   = shadow_vertices.data ();
-    const math::vec3f*  positions        = curled_page->GridVertices ();
-    size_t              positions_stride = curled_page->GridVerticesStride ();
-
-    math::vec3f v0 = positions [0];
-    math::vec3f v1 = *(const math::vec3f*)((const unsigned char*)positions + positions_stride);
-    math::vec3f v2 = *(const math::vec3f*)((const unsigned char*)positions + 2 * positions_stride);
-    math::vec3f v3 = *(const math::vec3f*)((const unsigned char*)positions + 3 * positions_stride);
+    math::vec3f v0 = curled_page->GetCornerPosition (PageCurlCorner_LeftTop);
+    math::vec3f v1 = curled_page->GetCornerPosition (PageCurlCorner_RightTop);
+    math::vec3f v2 = curled_page->GetCornerPosition (PageCurlCorner_LeftBottom);
+    math::vec3f v3 = curled_page->GetCornerPosition (PageCurlCorner_RightBottom);
 
     v0.x += x_offset;
     v1.x += x_offset;
@@ -732,6 +728,8 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
       return;
 
     math::vec3f top_side_normal = math::normalize (*top_static_vertex - *bottom_static_vertex) * corner_shadow_offset;
+
+    RenderableVertex* current_vertex = shadow_vertices.data ();
 
     current_vertex [0].position = *top_static_vertex;
     current_vertex [0].texcoord = math::vec2f (0.5, 1);
