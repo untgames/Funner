@@ -63,7 +63,7 @@ class TlsManager
         try
         {
           if (tls->cleanup)
-            tls->cleanup->Cleanup (Platform::GetTls (tls));
+            tls->cleanup->Cleanup (WindowsThreadManager::GetTls (tls));
         }
         catch (...)
         {
