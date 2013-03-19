@@ -9,6 +9,8 @@
 #include <stl/algorithm>
 #include <stl/vector>
 
+#include <xtl/bind.h>
+#include <xtl/connection.h>
 #include <xtl/common_exceptions.h>
 #include <xtl/function.h>
 

@@ -111,6 +111,17 @@ class ApplicationDelegateImpl: public IApplicationDelegate, public xtl::referenc
         listener->OnPause ();
     }
 
+///Подписка на обновления системных свойств
+    void RegisterForSystemPropertiesUpdates (common::PropertyMap& system_properties)
+    {
+      system_properties_update_connection = system_properties.RegisterEventHandler (common::PropertyMapEvent_OnUpdate, xtl::bind (&ApplicationDelegateImpl::OnSystemPropertiesUpdated, this, system_properties));
+    }
+
+    void UnregisterFromSystemPropertiesUpdates ()
+    {
+      system_properties_update_connection.disconnect ();
+    }
+
 ///Подсчёт ссылок
     void AddRef ()
     {
@@ -123,8 +134,21 @@ class ApplicationDelegateImpl: public IApplicationDelegate, public xtl::referenc
     }
 
   private:
-    bool                          idle_enabled;
-    syslib::IApplicationListener* listener;
+///Обработка обновления системных свойств
+    void OnSystemPropertiesUpdated (const common::PropertyMap& property_map)
+    {
+      NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
+
+      if (property_map.IsPresent ("ApplicationIconBadgeNumber"))
+        [UIApplication sharedApplication].applicationIconBadgeNumber = property_map.GetInteger ("ApplicationIconBadgeNumber");
+
+      [pool release];
+    }
+
+  private:
+    bool                          idle_enabled;                          //необходимо ли вызывать события idle
+    syslib::IApplicationListener* listener;                              //слушатель событий
+    xtl::auto_connection          system_properties_update_connection;   //соединение обновления системных свойств
 };
 
 }
@@ -400,6 +424,9 @@ bool IPhoneApplicationManager::GetScreenSaverState ()
 
 void IPhoneApplicationManager::GetSystemProperties (common::PropertyMap& properties)
 {
+  if (application_delegate)
+    application_delegate->UnregisterFromSystemPropertiesUpdates ();
+
   NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
 
   NSString* system_version = [[UIDevice currentDevice] systemVersion];
@@ -463,5 +490,10 @@ void IPhoneApplicationManager::GetSystemProperties (common::PropertyMap& propert
   if (SCNetworkReachabilityGetFlags(defaultRouteReachability, &flags) && (flags & kSCNetworkReachabilityFlagsReachable) && (flags & kSCNetworkReachabilityFlagsTransientConnection))
     properties.SetProperty ("CellularOnlyInternet", 1);
 
+  properties.SetProperty ("ApplicationIconBadgeNumber", [UIApplication sharedApplication].applicationIconBadgeNumber);
+
   [pool release];
+
+  if (application_delegate)
+    application_delegate->RegisterForSystemPropertiesUpdates (properties);
 }
