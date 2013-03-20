@@ -22,14 +22,19 @@ class ApplicationDelegateImpl;
 
 bool                     application_launched = false;
 ApplicationDelegateImpl* application_delegate = 0;
-NSString*                USER_DEFAULTS_UUID   = @"UUID";
+
+NSString*   USER_DEFAULTS_UUID                     = @"UUID";
+const char* LOG_NAME                               = "syslib.IPhoneApplication";
+const char* REGISTER_FOR_PUSH_NOTIFICATIONS_PREFIX = "RegisterForPushNotification Register ";
 
 class ApplicationDelegateImpl: public IApplicationDelegate, public xtl::reference_counter
 {
   public:
 /// онструктор
     ApplicationDelegateImpl ()
-      : idle_enabled (false), listener (0)
+      : log (LOG_NAME)
+      , idle_enabled (false)
+      , listener (0)
       {}
 
     ~ApplicationDelegateImpl ()
@@ -45,6 +50,9 @@ class ApplicationDelegateImpl: public IApplicationDelegate, public xtl::referenc
 
       if (application_delegate)
         throw xtl::format_operation_exception (METHOD_NAME, "Loop already runned");
+
+      register_for_push_notifications_connection = Application::RegisterNotificationHandler (common::format ("%s*", REGISTER_FOR_PUSH_NOTIFICATIONS_PREFIX).c_str (),
+                                                                                             xtl::bind (&ApplicationDelegateImpl::RegisterForPushNotifications, this, _1));
 
       @try
       {
@@ -145,10 +153,47 @@ class ApplicationDelegateImpl: public IApplicationDelegate, public xtl::referenc
       [pool release];
     }
 
+///–егистраци€ обработки push-сообщений
+    void RegisterForPushNotifications (const char* notification)
+    {
+      common::PropertyMap params = common::parse_init_string (notification + strlen (REGISTER_FOR_PUSH_NOTIFICATIONS_PREFIX));
+
+      UIRemoteNotificationType types = UIRemoteNotificationTypeBadge | UIRemoteNotificationTypeSound | UIRemoteNotificationTypeAlert;
+
+      if (params.IsPresent ("Types"))
+      {
+        common::StringArray params_types = common::split (params.GetString ("Types"));
+
+        types = 0;
+
+        for (size_t i = 0, count = params_types.Size (); i < count; i++)
+        {
+          const char* type = params_types [i];
+
+          if (!xtl::xstrcmp (type, "Badge"))
+            types |= UIRemoteNotificationTypeBadge;
+          else if (!xtl::xstrcmp (type, "Sound"))
+            types |= UIRemoteNotificationTypeSound;
+          else if (!xtl::xstrcmp (type, "Alert"))
+            types |= UIRemoteNotificationTypeAlert;
+          else
+            log.Printf ("Ignored unknown push notification type '%s'", type);
+        }
+      }
+
+      NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
+
+      [[UIApplication sharedApplication] registerForRemoteNotificationTypes:types];
+
+      [pool release];
+    }
+
   private:
-    bool                          idle_enabled;                          //необходимо ли вызывать событи€ idle
-    syslib::IApplicationListener* listener;                              //слушатель событий
-    xtl::auto_connection          system_properties_update_connection;   //соединение обновлени€ системных свойств
+    common::Log                   log;                                        //протокол
+    bool                          idle_enabled;                               //необходимо ли вызывать событи€ idle
+    syslib::IApplicationListener* listener;                                   //слушатель событий
+    xtl::auto_connection          system_properties_update_connection;        //соединение обновлени€ системных свойств
+    xtl::auto_connection          register_for_push_notifications_connection; //соединение событи€ инициации подписки на push-сообщени€
 };
 
 }
@@ -312,6 +357,34 @@ typedef stl::vector<syslib::iphone::IApplicationListener*> ListenerArray;
 -(NSUInteger)application:(UIApplication*)application supportedInterfaceOrientationsForWindow:(UIWindow*)window
 {
   return UIInterfaceOrientationMaskAll;
+}
+
+//push notifications
+-(void)application:(UIApplication*)application didRegisterForRemoteNotificationsWithDeviceToken:(NSData*)deviceToken
+{
+  const unsigned char              *token_bytes = (unsigned char*)[deviceToken bytes];
+  size_t                           token_size   = [deviceToken length];
+  xtl::uninitialized_storage<char> token (token_size * 2 + 1);
+
+  for (size_t i = 0; i < token_size; i++)
+    xtl::xsnprintf (token.data () + i * 2, 3, "%02x", token_bytes [i]);
+
+  token.data () [token.size () - 1] = 0;
+
+  common::Log (LOG_NAME).Printf ("Registration for push notifications succeeded, token '%s'", token.data ());
+
+  stl::string notification = common::format ("RegisterForPushNotification Succeeded %s", token.data ());
+
+  syslib::Application::PostNotification (notification.c_str ());
+}
+
+-(void)application:(UIApplication*)application didFailToRegisterForRemoteNotificationsWithError:(NSError*)error
+{
+  common::Log (LOG_NAME).Printf ("Registration for push notifications failed, error '%s'", [[error description] UTF8String]);
+
+  stl::string notification = common::format ("RegisterForPushNotification Failed %s", [[error description] UTF8String]);
+
+  syslib::Application::PostNotification (notification.c_str ());
 }
 
 /*
