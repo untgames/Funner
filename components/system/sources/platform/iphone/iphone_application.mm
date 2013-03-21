@@ -27,6 +27,63 @@ NSString*   USER_DEFAULTS_UUID                     = @"UUID";
 const char* LOG_NAME                               = "syslib.IPhoneApplication";
 const char* REGISTER_FOR_PUSH_NOTIFICATIONS_PREFIX = "RegisterForPushNotification Register ";
 
+//Functions for printing objective-c objects to json
+void ns_object_to_json (id obj, stl::string& output);
+
+void ns_array_to_json (NSArray* arr, stl::string& output)
+{
+  output += "[";
+
+  for (size_t i = 0, count = [arr count]; i < count; i++)
+  {
+    if (i)
+      output += ",";
+
+    ns_object_to_json ([arr objectAtIndex:i], output);
+  }
+
+  output += "]";
+}
+
+void ns_dictionary_to_json (NSDictionary* dic, stl::string& output)
+{
+  output += "{";
+
+  __block bool first_item_processed = false;
+
+  [dic enumerateKeysAndObjectsUsingBlock:^(id key, id obj, BOOL *stop)
+    {
+      if (![key isKindOfClass:[NSString class]])
+        return;
+
+      if (first_item_processed)
+        output += ",";
+
+      output += common::format ("\"%s\":", [(NSString*)key UTF8String]);
+
+      ns_object_to_json (obj, output);
+
+      first_item_processed = true;
+    }
+  ];
+
+  output += "}";
+}
+
+void ns_object_to_json (id obj, stl::string& output)
+{
+  if ([obj isKindOfClass:[NSString class]])
+    output += common::format ("\"%s\"", [(NSString*)obj UTF8String]);
+  else if ([obj isKindOfClass:[NSNumber class]])
+    output += common::format ("%s", [[(NSNumber*)obj stringValue] UTF8String]);
+  else if ([obj isKindOfClass:[NSDictionary class]])
+    ns_dictionary_to_json (obj, output);
+  else if ([obj isKindOfClass:[NSArray class]])
+    ns_array_to_json (obj, output);
+  else
+    output += "\"\"";
+}
+
 class ApplicationDelegateImpl: public IApplicationDelegate, public xtl::reference_counter
 {
   public:
@@ -303,6 +360,23 @@ typedef stl::vector<syslib::iphone::IApplicationListener*> ListenerArray;
   [super dealloc];
 }
 
+-(void) onRemoteNotificationReceived:(NSDictionary*)notification_data whileActive:(bool)while_active
+{
+  NSMutableDictionary* data = [NSMutableDictionary dictionaryWithDictionary:notification_data];
+
+  [data setObject:[NSNumber numberWithInt: while_active ? 1 : 0] forKey:@"received_while_active"];
+
+  stl::string json_string;
+
+  json_string.reserve (512);
+
+  ns_dictionary_to_json (data, json_string);
+
+  stl::string notification = common::format ("PushNotificationReceived %s", json_string.c_str ());
+
+  syslib::Application::PostNotification (notification.c_str ());
+}
+
 -(BOOL) application:(UIApplication*)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
   application_launched = true;
@@ -310,6 +384,11 @@ typedef stl::vector<syslib::iphone::IApplicationListener*> ListenerArray;
   application_delegate->OnInitialize ();
 
   impl.idle_timer.paused = NO;
+
+  NSDictionary *remote_notification = [launchOptions objectForKey:UIApplicationLaunchOptionsRemoteNotificationKey];
+
+  if (remote_notification)
+    [self onRemoteNotificationReceived:remote_notification whileActive:false];
 
   return YES;
 }
@@ -385,6 +464,11 @@ typedef stl::vector<syslib::iphone::IApplicationListener*> ListenerArray;
   stl::string notification = common::format ("RegisterForPushNotification Failed %s", [[error description] UTF8String]);
 
   syslib::Application::PostNotification (notification.c_str ());
+}
+
+- (void)application:(UIApplication *)application didReceiveRemoteNotification:(NSDictionary *)userInfo
+{
+  [self onRemoteNotificationReceived:userInfo whileActive:[UIApplication sharedApplication].applicationState == UIApplicationStateActive];
 }
 
 /*
