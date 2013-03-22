@@ -13,6 +13,8 @@
 
 #include <cstdio>
 
+#include <utility/utils.h>
+
 #include <launcher/application.h>
 
 using namespace engine;
@@ -147,6 +149,39 @@ static NSString* PAD_APPLE_ID         = @"586574454";
 
 @end
 
+@interface SystemAlertDelegate : NSObject
+{
+  @private
+    sgi_stl::string  tag;
+    engine::IEngine* engine;
+}
+
+@end
+
+@implementation SystemAlertDelegate
+
+-(id)initWithTag:(sgi_stl::string&)inTag engine:(engine::IEngine*)inEngine
+{
+  self = [super init];
+
+  if (!self)
+    return nil;
+
+  tag    = inTag;
+  engine = inEngine;
+
+  return self;
+}
+
+-(void)alertView:(UIAlertView*)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
+{
+  engine->PostNotification (plarium::utility::format ("SystemAlertButtonClicked %s %d", tag.c_str (), buttonIndex).c_str ());
+
+  [self release];
+}
+
+@end
+
 namespace
 {
 
@@ -169,6 +204,63 @@ class OpenUrlHandler : public IOpenUrlHandler
   private:
     TrackingWrapper* tracker;
 };
+
+class SystemAlertHandler : public INotificationListener
+{
+  private:
+    static const char* SYSTEM_ALERT_NOTIFICATION_PREFIX;
+
+  public:
+    ///Constructor/destructor
+    SystemAlertHandler (engine::IEngine* in_engine)
+      : engine (in_engine)
+    {
+      engine->AttachNotificationListener (plarium::utility::format ("%s*", SYSTEM_ALERT_NOTIFICATION_PREFIX).c_str (), this);
+    }
+
+    ~SystemAlertHandler ()
+    {
+      engine->DetachNotificationListener (this);
+    }
+
+    ///Notification handler
+    void OnNotification (const char* notification)
+    {
+      notification += strlen (SYSTEM_ALERT_NOTIFICATION_PREFIX);
+
+      sgi_stl::vector<sgi_stl::string> components = plarium::utility::split (notification, "|");
+
+      if (components.size () < 4)
+        throw sgi_stl::invalid_argument (plarium::utility::format ("SystemAlertHandler::OnNotification: invalid 'SystemAlert' arguments '%s'", notification));
+
+      for (size_t i = 0, count = components.size (); i < count; i++)
+        if (components [i] == " ")
+          components [i] = "";
+
+      SystemAlertDelegate* alert_delegate = [[SystemAlertDelegate alloc] initWithTag:components [0] engine:engine];
+
+      UIAlertView* alertView = [[UIAlertView alloc] initWithTitle:[NSString stringWithUTF8String:components [1].c_str ()]
+                                                          message:[NSString stringWithUTF8String:components [2].c_str ()]
+                                                         delegate:alert_delegate
+                                                cancelButtonTitle:[NSString stringWithUTF8String:components [3].c_str ()]
+                                                otherButtonTitles:nil];
+
+      for (size_t i = 4, count = components.size (); i < count; i++)
+        [alertView addButtonWithTitle:[NSString stringWithUTF8String:components [i].c_str ()]];
+
+      [alertView show];
+      [alertView release];
+    }
+
+  private:
+    SystemAlertHandler (const SystemAlertHandler&);             //no impl
+    SystemAlertHandler& operator = (const SystemAlertHandler&); //no impl
+
+  private:
+    engine::IEngine *engine;
+};
+
+const char* SystemAlertHandler::SYSTEM_ALERT_NOTIFICATION_PREFIX = "ShowSystemAlert ";
 
 }
 
@@ -217,6 +309,8 @@ int main (int argc, const char* argv [], const char* env [])
     [[NSNotificationCenter defaultCenter] addObserver:startup selector:@selector (onStartup) name:UIApplicationDidFinishLaunchingNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:tracking selector:@selector (reportAppOpen) name:UIApplicationDidFinishLaunchingNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:tracking selector:@selector (reportAppOpen) name:UIApplicationWillEnterForegroundNotification object:nil];
+
+    SystemAlertHandler system_alert_handler (funner);
 
     OpenUrlHandler open_url_handler (tracking);
 
