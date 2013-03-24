@@ -48,7 +48,7 @@ DLL_PREFIX     :=
 PROFILES       += msvc has_windows win8 winrt
 FRAMEWORK_DIR  := ${SYSTEMROOT}/Microsoft.NET/Framework/v4.0.30319
 SOURCE_FILES_SUFFIXES += asm
-VALID_TARGET_TYPES += win8-msbuild-appx
+VALID_TARGET_TYPES += win8-appx
 
 ###################################################################################################
 #Конфигурация переменных расположения библиотек
@@ -89,21 +89,38 @@ export PATH=$(BUILD_PATHS):$$PATH && export FILE_COUNTER=0 FILE_LIST="" && for f
 endef
 
 #Обработка цели win8-msbuild-appx (имя цели)
-define process_target.win8-msbuild-appx
-  $1.SOLUTION     := $(COMPONENT_DIR)$$($1.SOLUTION)
-  $1.PACKAGE_NAME := $(DIST_LIB_DIR)/$$($1.NAME).appx
-  $1.SOURCE_DIR   := $$(dir $$($1.SOLUTION))
-  $1.DEPS         := $$(foreach ext,$$(SOURCE_FILES_SUFFIXES),$$(wildcard $$($1.SOURCE_DIR)/*.$$(ext)) )
-  $1.TMP_DIR      := $(ROOT)/$(TMP_DIR_SHORT_NAME)/$(CURRENT_TOOLSET)/$1
+define process_target.win8-appx
+  $1.TMP_DIR        := $(ROOT)/$(TMP_DIR_SHORT_NAME)/$(CURRENT_TOOLSET)/$1
+  $1.OUT_DIR        := $$(if $$($1.OUT_DIR),$$(COMPONENT_DIR)/$$($1.OUT_DIR),$$(DIST_LIB_DIR))
+  $1.EXE_FILE       := $$($1.TMP_DIR)/$$($1.NAME)$$(if $$(suffix $$($1.NAME)),,$(EXE_SUFFIX))
+  $1.PACKAGE_FILE   := $$($1.OUT_DIR)/$$($1.NAME).appx
+  $1.MANIFEST_FILE  := $(COMPONENT_DIR)$$($1.MANIFEST_FILE)
+  $1.PFX_FILE       := $(COMPONENT_DIR)$$($1.PFX_FILE)
+  TARGET_FILES      := $$(TARGET_FILES) $$($1.PACKAGE_FILE)
+  $1.TARGET_DLLS    := $$($1.DLLS:%=$$($1.OUT_DIR)/$(DLL_PREFIX)%$(DLL_SUFFIX))
+
+  $$(eval $$(call process_target_with_sources,$1))
 
   build: BUILD.$1
 
   .PHONY: BUILD.$1
 
-  BUILD.$1: $$($1.PACKAGE_NAME)
+  BUILD.$1: $$($1.PACKAGE_FILE)
 
-  $$($1.PACKAGE_NAME): $$($1.SOLUTION) $$($1.DEPS)
-	@echo Building $$(notdir $$($1.SOLUTION))...
-	@test -d "$$($1.TMP_DIR)" || mkdir -p "$$($1.TMP_DIR)"
-	@chcp.com 850 > $$($1.TMP_DIR)/chcp.stdout && $(call convert_path,$(FRAMEWORK_DIR))/msbuild.exe $$($1.SOLUTION) -p:VisualStudioVersion=11.0 -property:Configuration="Release" -property:Platform="$(TARGET_PLATFORM)" > $$($1.TMP_DIR).msbuild-out
+  $$($1.EXE_FILE): $$($1.FLAG_FILES) $$($1.LIB_DEPS) $$($1.OBJECT_FILES)
+	@echo Linking $$(notdir $$@)...
+	@$$(call $$(if $$($1.LINK_TOOL),$$($1.LINK_TOOL),$(LINK_TOOL)),$$@,$$($1.OBJECT_FILES) $$($1.LIBS),$$($1.LIB_DIRS),$$($1.LINK_INCLUDES),$$($1.LINK_FLAGS))
+
+  $$($1.PFX_FILE):
+	@echo Create $$(notdir $$@)...
+#	@$(WINRT_SDK)/
+#rem MakeCert -n "CN=leny" -r -h 0 -eku "1.3.6.1.5.5.7.3.3,1.3.6.1.4.1.311.10.3.13" -e 03/24/2014 -sv MyKey.pvk MyKey.cer
+#rem rem Pvk2Pfx -pvk MyKey.pvk -pi 123456 -spc MyKey.cer -pfx MyKey.pfx
+#rem Pvk2Pfx -pvk MyKey.pvk -spc MyKey.cer -pfx MyKey.pfx
+
+
+  $$($1.PACKAGE_FILE): $$($1.EXE_FILE) $$($1.MANIFEST_FILE) $$($1.PFX_FILE)
+#	@echo Building $$(notdir $$($1.SOLUTION))...
+#	@test -d "$$($1.TMP_DIR)" || mkdir -p "$$($1.TMP_DIR)"
+#	@chcp.com 850 > $$($1.TMP_DIR)/chcp.stdout && $(call convert_path,$(FRAMEWORK_DIR))/msbuild.exe $$($1.SOLUTION) -p:VisualStudioVersion=11.0 -property:Configuration="Release" -property:Platform="$(TARGET_PLATFORM)" > $$($1.TMP_DIR).msbuild-out
 endef

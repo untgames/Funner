@@ -1,8 +1,7 @@
-﻿#include <wrl/client.h>
-#include <memory>
+﻿#include "pch.h"
 
 [Platform::MTAThread]
 int main(Platform::Array<Platform::String^>^)	
 {
-  return 0;
+	return 0;
 }
