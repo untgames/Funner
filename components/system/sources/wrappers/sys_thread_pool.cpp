@@ -110,7 +110,7 @@ class BackgroundThread: public xtl::reference_counter
 ///Функция нити
     int Run ()
     {
-      thread_id = Platform::GetCurrentThreadId ();      
+      thread_id = syslib::Platform::GetCurrentThreadId ();      
 
       log.Printf ("Start background worker thread %u", thread_id);      
       
@@ -178,7 +178,7 @@ class BackgroundThread: public xtl::reference_counter
 
             //ожидание задачи
 
-          Platform::Sleep (BACKGROUND_MIN_PAUSE_TIME + stl::random_number (BACKGROUND_MAX_PAUSE_TIME-BACKGROUND_MIN_PAUSE_TIME));
+          syslib::Platform::Sleep (BACKGROUND_MIN_PAUSE_TIME + stl::random_number (BACKGROUND_MAX_PAUSE_TIME-BACKGROUND_MIN_PAUSE_TIME));
         }
       }      
 

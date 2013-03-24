@@ -5,6 +5,7 @@ COMMON_CFLAGS      += -arch:IA32
 COMMON_LINK_FLAGS  += -machine:x86
 PROFILES           += x86 x86_winrt
 CPU_ARCH           := x86
+TARGET_PLATFORM    := Win32
 
 include $(TOOLSETS_DIR)/common/winrt.mak
 

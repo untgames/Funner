@@ -1,6 +1,7 @@
 #include "shared.h"
 
-using namespace syslib;
+namespace syslib
+{
 
 /*
     Генерация исключения: работа с динамическими библиотеками невозможна для платформы по умолчанию
@@ -37,4 +38,6 @@ void* DefaultLibraryManager::GetSymbol (dll_t, const char*)
   raise ("syslib::DefaultLibraryManager::GetSymbol");
 
   return 0;
+}
+
 }

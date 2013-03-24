@@ -261,7 +261,7 @@ class SensorManagerImpl: public xtl::trackable
     {
       try
       {
-        sensors.resize (Platform::GetSensorsCount ());
+        sensors.resize (syslib::Platform::GetSensorsCount ());
 
         timer.reset (new Timer (xtl::bind (&SensorManagerImpl::PollSensors, this)));
 

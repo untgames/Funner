@@ -1,9 +1,10 @@
 #include "shared.h"
 
-using namespace syslib;
+namespace syslib
+{
 
 /*
-    Генерация исключения: работа с многопоточность невозможна для платформы по умолчанию
+    ├хэхЁрЎш  шёъы■ўхэш : ЁрсюЄр ё ьэюуюяюЄюўэюёЄ№ эхтючьюцэр фы  яырЄЇюЁь√ яю єьюыўрэш■
 */
 
 namespace
@@ -36,4 +37,6 @@ void* DefaultThreadManager::GetTls (tls_t tls)
 {
   raise ("syslib::DefaultThreadManager::GetTls");
   return 0;
+}
+
 }

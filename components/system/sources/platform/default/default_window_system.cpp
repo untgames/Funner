@@ -1,6 +1,7 @@
 #include "shared.h"
 
-using namespace syslib;
+namespace syslib
+{
 
 /*
     Генерация исключения: работа с окнами невозможна для платформы по умолчанию
@@ -358,4 +359,6 @@ void DefaultWindowManager::GoBack (web_view_t)
 void DefaultWindowManager::GoForward (web_view_t)
 {
   raise ("syslib::DefaultWindowManager::GoForward");
+}
+
 }

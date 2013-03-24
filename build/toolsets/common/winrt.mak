@@ -23,6 +23,10 @@ ifeq (,$(WINRT_SDK))
   $(error 'Microsoft WindowsRT SDK not detected (empty WINRT_SDK)')
 endif
 
+ifeq (,$(TARGET_PLATFORM))
+  $(error 'TARGET_PLATFORM has not been defined')
+endif
+
 ifneq (,$(WINRT_SDK))
   SDK_DIR ?= $(call convert_path,$(WINRT_SDK))
 endif
@@ -42,7 +46,9 @@ DLL_SUFFIX     := .dll
 DLL_LIB_SUFFIX := .lib
 DLL_PREFIX     :=
 PROFILES       += msvc has_windows win8 winrt
+FRAMEWORK_DIR  := ${SYSTEMROOT}/Microsoft.NET/Framework/v4.0.30319
 SOURCE_FILES_SUFFIXES += asm
+VALID_TARGET_TYPES += win8-msbuild-appx
 
 ###################################################################################################
 #Конфигурация переменных расположения библиотек
@@ -80,4 +86,24 @@ endef
 
 define tools.lib
 export PATH=$(BUILD_PATHS):$$PATH && export FILE_COUNTER=0 FILE_LIST="" && for file in $2; do export FILE_COUNTER=$$(($$FILE_COUNTER + 1)) && FILE_LIST="$$FILE_LIST $$file"; if [ $$FILE_COUNTER -eq 256 ]; then $(call tools.lib.generic,$1,$$FILE_LIST,$3,$4,$5,$6,$7,$8,$9); export FILE_COUNTER=0 FILE_LIST="$1"; fi; done && $(call tools.lib.generic,$1,$$FILE_LIST,$3,$4,$5,$6,$7,$8,$9)
+endef
+
+#Обработка цели win8-msbuild-appx (имя цели)
+define process_target.win8-msbuild-appx
+  $1.SOLUTION     := $(COMPONENT_DIR)$$($1.SOLUTION)
+  $1.PACKAGE_NAME := $(DIST_LIB_DIR)/$$($1.NAME).appx
+  $1.SOURCE_DIR   := $$(dir $$($1.SOLUTION))
+  $1.DEPS         := $$(foreach ext,$$(SOURCE_FILES_SUFFIXES),$$(wildcard $$($1.SOURCE_DIR)/*.$$(ext)) )
+  $1.TMP_DIR      := $(ROOT)/$(TMP_DIR_SHORT_NAME)/$(CURRENT_TOOLSET)/$1
+
+  build: BUILD.$1
+
+  .PHONY: BUILD.$1
+
+  BUILD.$1: $$($1.PACKAGE_NAME)
+
+  $$($1.PACKAGE_NAME): $$($1.SOLUTION) $$($1.DEPS)
+	@echo Building $$(notdir $$($1.SOLUTION))...
+	@test -d "$$($1.TMP_DIR)" || mkdir -p "$$($1.TMP_DIR)"
+	@chcp.com 850 > $$($1.TMP_DIR)/chcp.stdout && $(call convert_path,$(FRAMEWORK_DIR))/msbuild.exe $$($1.SOLUTION) -p:VisualStudioVersion=11.0 -property:Configuration="Release" -property:Platform="$(TARGET_PLATFORM)" > $$($1.TMP_DIR).msbuild-out
 endef

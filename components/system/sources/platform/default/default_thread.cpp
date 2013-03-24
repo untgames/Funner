@@ -1,6 +1,7 @@
 #include "shared.h"
 
-using namespace syslib;
+namespace syslib
+{
 
 /*
     Генерация исключения: работа с многопоточность невозможна для платформы по умолчанию
@@ -62,4 +63,6 @@ size_t DefaultThreadManager::GetCurrentThreadId ()
 void DefaultThreadManager::SetThreadPriority (thread_t thread, ThreadPriority thread_priority)
 {
   raise ("syslib::DefaultThreadManager::SetThreadPriority");
+}
+
 }

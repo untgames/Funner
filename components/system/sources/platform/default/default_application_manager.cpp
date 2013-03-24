@@ -1,6 +1,7 @@
 #include "shared.h"
 
-using namespace syslib;
+namespace syslib
+{
 
 namespace
 {
@@ -144,4 +145,6 @@ void DefaultApplicationManager::GetSystemProperties (common::PropertyMap& proper
     throw;
   }
 #endif
+}
+
 }

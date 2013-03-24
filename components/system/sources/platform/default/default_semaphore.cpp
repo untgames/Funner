@@ -1,6 +1,7 @@
 #include "shared.h"
 
-using namespace syslib;
+namespace syslib
+{
 
 /*
     Генерация исключения: работа с многопоточность невозможна для платформы по умолчанию
@@ -53,4 +54,6 @@ bool DefaultThreadManager::TryWaitSemaphore (semaphore_t handle)
 void DefaultThreadManager::PostSemaphore (semaphore_t handle)
 {
   raise ("syslib::DefaultThreadManager::PostSemaphore");
+}
+
 }

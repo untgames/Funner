@@ -1,6 +1,7 @@
 #include "shared.h"
 
-using namespace syslib;
+namespace syslib
+{
 
 /*
     Генерация исключения: работа с экранами невозможна на системе по умолчанию
@@ -130,4 +131,6 @@ const void* DefaultScreenManager::GetNativeScreenHandle (screen_t)
 void DefaultScreenManager::GetScreenProperties (screen_t, common::PropertyMap& properties)
 {
   raise ("syslib::DefaultScreenManager::GetScreenProperties");
+}
+
 }

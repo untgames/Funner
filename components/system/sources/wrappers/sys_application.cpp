@@ -28,7 +28,7 @@ class ApplicationImpl: private IApplicationListener
       message_loop_count = false;
       is_exit_detected   = false;
       on_push_action     = ActionQueue::RegisterEventHandler (ActionQueueEvent_OnPushAction, xtl::bind (&ApplicationImpl::OnPushAction, this, _1, _2));
-      main_thread_id     = Platform::GetCurrentThreadId ();
+      main_thread_id     = syslib::Platform::GetCurrentThreadId ();
 
       UpdateIdleState ();
     }      

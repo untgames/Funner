@@ -1,6 +1,7 @@
 #include "shared.h"
 
-using namespace syslib;
+namespace syslib
+{
 
 /*
     Генерация исключения: работа с окнами невозможна для платформы по умолчанию
@@ -43,4 +44,6 @@ void DefaultCookieManager::DeleteCookies (const char* uri)
 void DefaultCookieManager::DeleteAllCookies ()
 {
   raise ("syslib::DefaultCookieManager::DeleteAllCookies");
+}
+
 }

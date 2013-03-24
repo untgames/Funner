@@ -1,6 +1,7 @@
 #include "shared.h"
 
-using namespace syslib;
+namespace syslib
+{
 
 /*
     Генерация исключения: работа с многопоточность невозможна для платформы по умолчанию
@@ -43,4 +44,6 @@ bool DefaultThreadManager::WaitCondition (condition_t handle, mutex_t mutex_hand
 void DefaultThreadManager::NotifyCondition (condition_t handle, bool broadcast)
 {
   raise ("syslib::DefaultThreadManager::NotifyCondition");
+}
+
 }

@@ -1,6 +1,7 @@
 #include "shared.h"
 
-using namespace syslib;
+namespace syslib
+{
 
 /*
     Генерация исключения: работа с многопоточность невозможна для платформы по умолчанию
@@ -53,4 +54,6 @@ bool DefaultThreadManager::TryLockMutex (mutex_t handle)
 void DefaultThreadManager::UnlockMutex (mutex_t handle)
 {
   raise ("syslib::DefaultThreadManager::UnlockMutex");
+}
+
 }

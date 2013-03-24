@@ -1,6 +1,7 @@
 #include "shared.h"
 
-using namespace syslib;
+namespace syslib
+{
 
 /*
     Генерация исключения: работа с сенсорами невозможна
@@ -130,4 +131,6 @@ void DefaultSensorManager::StopSensorPolling (sensor_t)
 
 void DefaultSensorManager::PollSensorEvents (sensor_t)
 {
+}
+
 }
