@@ -60,8 +60,8 @@ VALID_TARGET_TYPES += win8-appx
 ###################################################################################################
 #Конфигурация переменных расположения библиотек
 ###################################################################################################
-INCLUDE := $(WINRT_SDK)/include;$(WINRT_SDK)/include/shared;$(WINRT_SDK)/include/um;$(WINRT_SDK)/include/winrt;$(MSVC_PATH)/include;$(INCLUDE)
-LIB     := $(WINRT_SDK)/lib/win8/um/$(CPU_ARCH);$(MSVC_PATH)/lib$(if $(filter x86,$(CPU_ARCH)),);$(LIB)
+INCLUDE := $(WINRT_SDK)/include;$(WINRT_SDK)/include/shared;$(WINRT_SDK)/include/um;$(WINRT_SDK)/include/winrt;$(MSVC_PATH)/include;$(MSVC_PATH)/atlmfc/include;$(INCLUDE)
+LIB     := $(WINRT_SDK)/lib/win8/um/$(CPU_ARCH);$(MSVC_PATH)/lib$(if $(filter x86,$(CPU_ARCH)),,/$(CPU_ARCH));$(MSVC_PATH)/atlmfc/lib$(if $(filter x86,$(CPU_ARCH)),,/$(CPU_ARCH));$(LIB)
 
 export INCLUDE
 export LIB
@@ -148,7 +148,7 @@ endif
 	@test -d "$$(dir $$@)" || mkdir -p "$$(dir $$@)"
 	@$$(call $$(if $$($1.LINK_TOOL),$$($1.LINK_TOOL),$(LINK_TOOL)),$$@,$$($1.OBJECT_FILES) $$($1.LIBS),$$($1.LIB_DIRS),$$($1.LINK_INCLUDES),$$($1.LINK_FLAGS))
 
-  $$($1.CER_FILE): $(COMPONENT_DIR)component.mak
+  $$($1.CER_FILE): #$(COMPONENT_DIR)component.mak
 	@echo Creating certificate file $$(notdir $$@)...
 	@test -d "$$(dir $$@)" || mkdir -p "$$(dir $$@)"
 	@$(RM) $$@ $$($1.PVK_FILE)

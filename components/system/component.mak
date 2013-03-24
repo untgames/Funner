@@ -3,10 +3,11 @@
 ###################################################################################################
 #TARGETS := SYSTEMLIB.SOURCES SYSTEMLIB.TESTS SYSTEMLIB.INFO
 
-TARGETS.android  += SYSTEMLIB.UTILS.ANDROID_LAUNCHER
-TARGETS.android  += SYSTEMLIB.UTILS.ANDROID_LAUNCHER_COMMON
-TARGETS.tabletos += SYSTEMLIB.UTILS.TABLETOS_LAUNCHER
-TARGETS.win8     += SYSTEMLIB.UTILS.WIN8_LAUNCHER
+TARGETS.android   += SYSTEMLIB.UTILS.ANDROID_LAUNCHER
+TARGETS.android   += SYSTEMLIB.UTILS.ANDROID_LAUNCHER_COMMON
+TARGETS.tabletos  += SYSTEMLIB.UTILS.TABLETOS_LAUNCHER
+TARGETS.x86_winrt += SYSTEMLIB.UTILS.WIN8_APPX_ACTIVATOR
+TARGETS.win8      += SYSTEMLIB.UTILS.WIN8_LAUNCHER
 
 #Цель - System library sources
 SYSTEMLIB.SOURCES.TYPE                              := static-lib
@@ -74,10 +75,15 @@ SYSTEMLIB.UTILS.TABLETOS_LAUNCHER.LIBS          := socket EGL GLESv1_CM png free
 SYSTEMLIB.UTILS.TABLETOS_LAUNCHER.RES_DIR       := utils/tabletos_launcher/res
 SYSTEMLIB.UTILS.TABLETOS_LAUNCHER.MANIFEST_FILE := utils/tabletos_launcher/res/bar-descriptor.xml
 
+#Цель - Win8 activator
+SYSTEMLIB.UTILS.WIN8_APPX_ACTIVATOR.TYPE        := application
+SYSTEMLIB.UTILS.WIN8_APPX_ACTIVATOR.NAME        := win8-app-launcher
+SYSTEMLIB.UTILS.WIN8_APPX_ACTIVATOR.SOURCE_DIRS := utils/win8_appx_activator
+#SYSTEMLIB.UTILS.WIN8_APPX_ACTIVATOR.LINK_FLAGS  := -entry:mainC
+
 #Цель - Win8 launcher
 SYSTEMLIB.UTILS.WIN8_LAUNCHER.TYPE              := win8-appx
 SYSTEMLIB.UTILS.WIN8_LAUNCHER.NAME              := funner.application
-#SYSTEMLIB.UTILS.WIN8_LAUNCHER.UUID              := 551efd59-0678-4f51-9f33-ebbbcfe14e4f
 SYSTEMLIB.UTILS.WIN8_LAUNCHER.SOURCE_DIRS       := utils/win8_launcher
 SYSTEMLIB.UTILS.WIN8_LAUNCHER.MANIFEST_FILE     := utils/win8_launcher/AppxManifest.xml
 SYSTEMLIB.UTILS.WIN8_LAUNCHER.PFX_FILE          := utils/win8_launcher/key.pfx
