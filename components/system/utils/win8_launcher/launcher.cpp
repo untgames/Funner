@@ -4,5 +4,7 @@
 [Platform::MTAThread]
 int main(Platform::Array<Platform::String^>^)	
 {
+  for (;;);
+
   return 0;
 }
