@@ -32,6 +32,7 @@ ifneq (,$(WINRT_SDK))
 endif
 
 MSVC_BIN_PATH      := $(MSVC_PATH)/bin$(if $(filter x86,$(CPU_ARCH)),)
+HOST_PLATFORM      := x86
 COMMON_CFLAGS      += -W3 -Ox -wd4996 -nologo -FC -D "WINRT" -D "WINAPI_FAMILY=WINAPI_FAMILY_DESKTOP_APP" -MD -AI "$(WINRT_SDK)\References\CommonConfiguration\Neutral"
 COMMON_CFLAGS      += -AI "$(MSVC_PATH)\vcpackages"
 COMMON_LINK_FLAGS  += -DYNAMICBASE
@@ -98,6 +99,9 @@ define process_target.win8-appx
   $1.PFX_FILE       := $(COMPONENT_DIR)$$($1.PFX_FILE)
   TARGET_FILES      := $$(TARGET_FILES) $$($1.PACKAGE_FILE)
   $1.TARGET_DLLS    := $$($1.DLLS:%=$$($1.OUT_DIR)/$(DLL_PREFIX)%$(DLL_SUFFIX))
+  $1.CER_FILE       := $$($1.TMP_DIR)/$$(basename $$(notdir $$($1.PFX_FILE))).cer
+  $1.PVK_FILE       := $$($1.TMP_DIR)/$$(basename $$(notdir $$($1.PFX_FILE))).pvk
+  $1.LINK_FLAGS     := $$($1.LINK_FLAGS) -subsystem:windows -winmd -winmdfile:$$(basename $$($1.EXE_FILE)).winmd
 
   $$(eval $$(call process_target_with_sources,$1))
 
@@ -109,17 +113,17 @@ define process_target.win8-appx
 
   $$($1.EXE_FILE): $$($1.FLAG_FILES) $$($1.LIB_DEPS) $$($1.OBJECT_FILES)
 	@echo Linking $$(notdir $$@)...
+	@test -d "$$(dir $$@)" || mkdir -p "$$(dir $$@)"
 	@$$(call $$(if $$($1.LINK_TOOL),$$($1.LINK_TOOL),$(LINK_TOOL)),$$@,$$($1.OBJECT_FILES) $$($1.LIBS),$$($1.LIB_DIRS),$$($1.LINK_INCLUDES),$$($1.LINK_FLAGS))
 
   $$($1.PFX_FILE):
 	@echo Create $$(notdir $$@)...
-#	@$(WINRT_SDK)/
-#rem MakeCert -n "CN=leny" -r -h 0 -eku "1.3.6.1.5.5.7.3.3,1.3.6.1.4.1.311.10.3.13" -e 03/24/2014 -sv MyKey.pvk MyKey.cer
-#rem rem Pvk2Pfx -pvk MyKey.pvk -pi 123456 -spc MyKey.cer -pfx MyKey.pfx
-#rem Pvk2Pfx -pvk MyKey.pvk -spc MyKey.cer -pfx MyKey.pfx
-
+	@test -d "$$(dir $$@)" || mkdir -p "$$(dir $$@)"
+	@"$(WINRT_SDK)/bin/$(HOST_PLATFORM)/MakeCert" $$($1.CER_FILE) -r -n "$$($1.PUBLISHER)" -$$$$ individual -sv $$($1.PVK_FILE) -pe -cy end
+	@"$(WINRT_SDK)/bin/$(HOST_PLATFORM)/Pvk2Pfx" -pvk $$($1.PVK_FILE) -spc $$($1.CER_FILE) -pfx $$@
 
   $$($1.PACKAGE_FILE): $$($1.EXE_FILE) $$($1.MANIFEST_FILE) $$($1.PFX_FILE)
+	@echo Here!
 #	@echo Building $$(notdir $$($1.SOLUTION))...
 #	@test -d "$$($1.TMP_DIR)" || mkdir -p "$$($1.TMP_DIR)"
 #	@chcp.com 850 > $$($1.TMP_DIR)/chcp.stdout && $(call convert_path,$(FRAMEWORK_DIR))/msbuild.exe $$($1.SOLUTION) -p:VisualStudioVersion=11.0 -property:Configuration="Release" -property:Platform="$(TARGET_PLATFORM)" > $$($1.TMP_DIR).msbuild-out

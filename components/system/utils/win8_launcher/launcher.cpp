@@ -1,5 +1,5 @@
-﻿#include <wrl/client.h>
-#include <memory>
+﻿#include <memory>
+#include <wrl/client.h>
 
 [Platform::MTAThread]
 int main(Platform::Array<Platform::String^>^)	
