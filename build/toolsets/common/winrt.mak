@@ -181,20 +181,20 @@ endif
 
   $$($1.APPX_INSTALLATION_FLAG): $$($1.PACKAGE_FILE) $$($1.CER_INSTALLATION_FLAG)
 	@echo Installing $$(notdir $$($1.PACKAGE_FILE))...
-	@export APPX_UUID=`cat $$($1.MANIFEST_FILE) | sed -n -e 's/.*Name="\([0-9a-fA-F]*-[0-9a-fA-F]*-[0-9a-fA-F]*-[0-9a-fA-F]*-[0-9a-fA-F]*\)".*/\1/p'` && \
+	@chcp.com 850 > $$($1.TMP_DIR).chcp && export APPX_UUID=`cat $$($1.MANIFEST_FILE) | sed -n -e 's/.*Name="\([0-9a-fA-F]*-[0-9a-fA-F]*-[0-9a-fA-F]*-[0-9a-fA-F]*-[0-9a-fA-F]*\)".*/\1/p'` && \
          export APPX_FULL_NAME=`PowerShell "get-appxpackage $$$$APPX_UUID" | sed -n -e 's/.*PackageFullName *: *\(.*\)/\1/p'` && \
          if [ -n "$$$$APPX_FULL_NAME" ]; then PowerShell "remove-appxpackage $$$$APPX_FULL_NAME"; fi
-	@PowerShell "add-appxpackage $$($1.PACKAGE_FILE)"
+	@chcp.com 850 > $$($1.TMP_DIR).chcp && PowerShell "add-appxpackage $$($1.PACKAGE_FILE)"
 	@touch $$@
 
   $$($1.CER_INSTALLATION_FLAG): $$($1.CER_FILE)
 	@echo Adding certificate $$(notdir $$($1.CER_FILE))...
-	@"${SYSTEMROOT}/system32/Certutil" -addStore TrustedPeople $$($1.CER_FILE)
+	@chcp.com 850 > $$($1.TMP_DIR).chcp && "${SYSTEMROOT}/system32/Certutil" -addStore TrustedPeople $$($1.CER_FILE)
 	@touch $$@
 
   UNINSTALL_APPX.$1:
 	@rm -f $$($1.APPX_INSTALLATION_FLAG) $$($1.CER_INSTALLATION_FLAG)
-	@export APPX_UUID=`cat $$($1.MANIFEST_FILE) | sed -n -e 's/.*Name="\([0-9a-fA-F]*-[0-9a-fA-F]*-[0-9a-fA-F]*-[0-9a-fA-F]*-[0-9a-fA-F]*\)".*/\1/p'` && \
+	@chcp.com 850 > $$($1.TMP_DIR).chcp && export APPX_UUID=`cat $$($1.MANIFEST_FILE) | sed -n -e 's/.*Name="\([0-9a-fA-F]*-[0-9a-fA-F]*-[0-9a-fA-F]*-[0-9a-fA-F]*-[0-9a-fA-F]*\)".*/\1/p'` && \
          export APPX_FULL_NAME=`PowerShell "get-appxpackage $$$$APPX_UUID" | sed -n -e 's/.*PackageFullName *: *\(.*\)/\1/p'` && \
          if [ -n "$$$$APPX_FULL_NAME" ]; then PowerShell "remove-appxpackage $$$$APPX_FULL_NAME"; fi
 endef
