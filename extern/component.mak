@@ -35,6 +35,10 @@ endif
 #  FUNNER_EXTERN_LIBS.COMPONENTS += luajit
 #endif
 
+ifneq (,$(filter win32,$(PROFILES)))
+  FUNNER_EXTERN_LIBS.COMPONENTS += win32_load_dll
+endif
+
 ifneq (,$(filter linux,$(PROFILES)))
   FUNNER_EXTERN_LIBS.COMPONENTS += openalsdk
 endif
