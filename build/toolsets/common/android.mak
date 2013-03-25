@@ -340,7 +340,10 @@ define process_target.android-jar
   $1.PACKAGE_NAME      := $$(if $$($1.PACKAGE_NAME),$$($1.PACKAGE_NAME),$(DEFAULT_PACKAGE_PREFIX)$$($1.NAME))
   $1.TARGET            := $(DIST_LIB_DIR)/$$($1.NAME).jar
   $1.TMP_DIR           := $(ROOT)/$(TMP_DIR_SHORT_NAME)/$(CURRENT_TOOLSET)/$1
-  $1.JARS              := $$(call specialize_paths,$$($1.JARS))
+  $1.JARS              := $$($1.JARS:%=%.jar)
+  $1.JAR_DIRS          := $$(call specialize_paths,$$($1.JAR_DIRS)) $(DIST_LIB_DIR)
+  $1.JARS              := $$(foreach jar,$$($1.JARS),$$(if $$(wildcard $$($1.JAR_DIRS:%=%/$$(jar))),$$(wildcard $$($1.JAR_DIRS:%=%/$$(jar))),$$(jar)))
+  $1.JARS              := $$($1.JARS)
   $1.CLASSES_DIR       := $$($1.TMP_DIR)/classes
   $1.CLASSES_FLAG      := $$($1.TMP_DIR)/compilation-flag
   $1.COMPILER_FLAGS    := $(COMMON_JAVA_FLAGS) $$($1.COMPILER_FLAGS)
@@ -357,7 +360,7 @@ define process_target.android-jar
 		@echo Compile sources for $$(notdir $$($1.TARGET))...
 		@$(RM) -r $$($1.CLASSES_DIR)
 		@mkdir -p $$($1.CLASSES_DIR)
-		@$(JAVA_CC) $$($1.SOURCE_FILES) $$($1.COMPILER_FLAGS) -d $$($1.CLASSES_DIR) -classpath /$(subst :,,$(call convert_path,$(ANDROID_JAR)))
+		@$(JAVA_CC) $$($1.SOURCE_FILES) $$($1.COMPILER_FLAGS) -d $$($1.CLASSES_DIR) -classpath '$(ANDROID_JAR)$$(if $$($1.JARS),:$$(subst ; ,;,$$($1.JARS:%=%:)))'
 		@touch $$@
 
   $$($1.TARGET): $$($1.CLASSES_FLAG)
