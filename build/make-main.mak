@@ -966,6 +966,8 @@ define import_variables
   $2.LIB_TOOL             := $$(if $$($2.LIB_TOOL),$$($2.LIB_TOOL),$$($1.LIB_TOOL))
   $2.COMPILE_TOOL         := $$(if $$($2.COMPILE_TOOL),$$($2.COMPILE_TOOL),$$($1.COMPILE_TOOL))
   $2.RUN_TOOL             := $$(if $$($2.RUN_TOOL),$$($2.RUN_TOOL),$$($1.RUN_TOOL))
+  $2.JAR_DIRS             := $$($2.JAR_DIRS) $$($1.JAR_DIRS:%=$3%)
+  $2.JARS                 := $$($2.JARS) $$($1.JARS)
 endef
 
 #Предварительный импорт настроек - построение списка импорта (имя зависимости, имя цели, имя переменной со списком)
