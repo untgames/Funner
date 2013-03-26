@@ -2,5 +2,6 @@
 
 __declspec (dllexport) void sampleFn ()
 {
-  printf ("Sample function\n");
+  printf ("Sample function\n"); 
+//  fflush (stdout);
 }
