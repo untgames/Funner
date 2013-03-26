@@ -9,16 +9,20 @@ namespace
 const char* REGISTER_FOR_PUSH_NOTIFICATIONS_PREFIX = "RegisterForPushNotification Register"; //Префикс сообщения инициализации подписки на пуш-сообщения
 
 //Менеджер google cloud messaging
-class GcmManagerImpl : public MessageQueue::Handler
+class GcmManagerImpl : public MessageQueue::Handler, xtl::noncopyable
 {
   public:
     //Конструктор/деструктор
     GcmManagerImpl ()
       : gcm_manager_class (0)
-      {}
+    {
+      MessageQueueSingleton::Instance ()->RegisterHandler (*this);
+    }
 
     ~GcmManagerImpl ()
     {
+      MessageQueueSingleton::Instance ()->UnregisterHandler (*this);
+
       if (gcm_manager_class)
         get_env ().DeleteGlobalRef (gcm_manager_class);
     }
@@ -122,17 +126,17 @@ template <class Fn> void push_message (const Fn& fn)
 
 void on_registered (JNIEnv& env, jobject, jstring reg_id)
 {
-  push_message (xtl::bind (&GcmManagerImpl::OnRegistered, xtl::ref (*GcmManagerSingleton::Instance ()), tostring (reg_id)));
+  push_message (xtl::bind (&GcmManagerImpl::OnRegistered, &*GcmManagerSingleton::Instance (), tostring (reg_id)));
 }
 
 void on_message (JNIEnv& env, jobject, jstring message)
 {
-  push_message (xtl::bind (&GcmManagerImpl::OnMessage, xtl::ref (*GcmManagerSingleton::Instance ()), tostring (message)));
+  push_message (xtl::bind (&GcmManagerImpl::OnMessage, &*GcmManagerSingleton::Instance (), tostring (message)));
 }
 
 void on_error (JNIEnv& env, jobject, jstring error)
 {
-  push_message (xtl::bind (&GcmManagerImpl::OnError, xtl::ref (*GcmManagerSingleton::Instance ()), tostring (error)));
+  push_message (xtl::bind (&GcmManagerImpl::OnError, &*GcmManagerSingleton::Instance (), tostring (error)));
 }
 
 }
