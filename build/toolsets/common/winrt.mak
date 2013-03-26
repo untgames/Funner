@@ -52,8 +52,7 @@ EXE_SUFFIX     := .exe
 DLL_SUFFIX     := .dll
 DLL_LIB_SUFFIX := .lib
 DLL_PREFIX     :=
-PROFILES       += msvc has_windows win8 winrt
-FRAMEWORK_DIR  := ${SYSTEMROOT}/Microsoft.NET/Framework/v4.0.30319
+PROFILES       += msvc has_windows win8 winrt no_dll
 SOURCE_FILES_SUFFIXES += asm
 VALID_TARGET_TYPES += win8-appx
 
@@ -82,6 +81,10 @@ endef
 ###################################################################################################
 define tools.link
 export PATH="$(MSVS_COMMON_PATH);$$PATH" && "$(MSVC_BIN_PATH)/link" -nologo -out:"$1" $(if $(filter %.dll,$1),-dll) $(patsubst %,-libpath:"%",$3) $(patsubst %,-include:"_%",$4) $5 $2 $(COMMON_LINK_FLAGS) $(if $(map),-MAP:$(basename $1).map -MAPINFO:EXPORTS) $(if $6,-DEF:"$6")
+endef
+
+define tools.link.shared-lib
+$(call tools.link,$1,$2,$3,$4,$5) -dll
 endef
 
 ###################################################################################################
@@ -181,20 +184,21 @@ endif
 
   $$($1.APPX_INSTALLATION_FLAG): $$($1.PACKAGE_FILE) $$($1.CER_INSTALLATION_FLAG)
 	@echo Installing $$(notdir $$($1.PACKAGE_FILE))...
+	@$(if $(INSTALLATION_FLAGS)$(INSTALLATION_FLAG),$(RM) $(INSTALLATION_FLAGS) $(INSTALLATION_FLAG))
 	@chcp.com 850 > $$($1.TMP_DIR).chcp && export APPX_UUID=`cat $$($1.MANIFEST_FILE) | sed -n -e 's/.*Name="\([0-9a-fA-F]*-[0-9a-fA-F]*-[0-9a-fA-F]*-[0-9a-fA-F]*-[0-9a-fA-F]*\)".*/\1/p'` && \
          export APPX_FULL_NAME=`PowerShell "get-appxpackage $$$$APPX_UUID" | sed -n -e 's/.*PackageFullName *: *\(.*\)/\1/p'` && \
          if [ -n "$$$$APPX_FULL_NAME" ]; then PowerShell "remove-appxpackage $$$$APPX_FULL_NAME"; fi
-	@chcp.com 850 > $$($1.TMP_DIR).chcp && PowerShell "add-appxpackage $$($1.PACKAGE_FILE)"
+	@chcp.com 850 > $$($1.TMP_DIR)/chcp.log && PowerShell "add-appxpackage $$($1.PACKAGE_FILE)"
 	@touch $$@
 
   $$($1.CER_INSTALLATION_FLAG): $$($1.CER_FILE)
 	@echo Adding certificate $$(notdir $$($1.CER_FILE))...
-	@chcp.com 850 > $$($1.TMP_DIR).chcp && "${SYSTEMROOT}/system32/Certutil" -addStore TrustedPeople $$($1.CER_FILE)
+	@chcp.com 850 > $$($1.TMP_DIR)/chcp.log && "${SYSTEMROOT}/system32/Certutil" -addStore TrustedPeople $$($1.CER_FILE)
 	@touch $$@
 
   UNINSTALL_APPX.$1:
-	@rm -f $$($1.APPX_INSTALLATION_FLAG) $$($1.CER_INSTALLATION_FLAG)
-	@chcp.com 850 > $$($1.TMP_DIR).chcp && export APPX_UUID=`cat $$($1.MANIFEST_FILE) | sed -n -e 's/.*Name="\([0-9a-fA-F]*-[0-9a-fA-F]*-[0-9a-fA-F]*-[0-9a-fA-F]*-[0-9a-fA-F]*\)".*/\1/p'` && \
+	@rm -f $$($1.APPX_INSTALLATION_FLAG) $$($1.CER_INSTALLATION_FLAG) $(INSTALLATION_FLAGS) $(INSTALLATION_FLAG)
+	@chcp.com 850 > $$($1.TMP_DIR)/chcp.log && export APPX_UUID=`cat $$($1.MANIFEST_FILE) | sed -n -e 's/.*Name="\([0-9a-fA-F]*-[0-9a-fA-F]*-[0-9a-fA-F]*-[0-9a-fA-F]*-[0-9a-fA-F]*\)".*/\1/p'` && \
          export APPX_FULL_NAME=`PowerShell "get-appxpackage $$$$APPX_UUID" | sed -n -e 's/.*PackageFullName *: *\(.*\)/\1/p'` && \
          if [ -n "$$$$APPX_FULL_NAME" ]; then PowerShell "remove-appxpackage $$$$APPX_FULL_NAME"; fi
 endef
