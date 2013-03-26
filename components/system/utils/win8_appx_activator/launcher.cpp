@@ -257,12 +257,35 @@ int wmain(int argc, wchar_t* argv[])
 
   printf ("Connection accepted\n");
 
-  sock_printf (sockfd, "%s %s", tostring (dll_name).c_str (), tostring (cur_dir).c_str ());
+  sock_printf (newsockfd, "%s %s", tostring (dll_name).c_str (), tostring (cur_dir).c_str ());
 
-     //copy args!!!
+     //TODO: copy args!!!
+
+  int timeout = 1;
+
+  if (setsockopt (newsockfd, SOL_SOCKET, SO_RCVTIMEO, (char*)&timeout, sizeof timeout))
+  {
+    printf ("ERROR setsockopt");
+    return 1;
+  }
+
+  for (;;)
+  {
+    char buffer [512];
+
+    int read_count = recv (newsockfd, buffer, sizeof (buffer), 0);
+
+    if (!read_count)
+      break;
+
+    if (read_count < 0)
+     continue;
+
+    printf ("%s", std::string (buffer, read_count).c_str ());
+  }
 
   closesocket (newsockfd);  
   closesocket (sockfd);  
 
-  return hrResult;
+  return 0;
 }

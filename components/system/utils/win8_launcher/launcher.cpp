@@ -11,6 +11,7 @@
 #include <ppltasks.h>
 
 using namespace Platform;
+using namespace Windows::Storage::Streams;
 using namespace Windows::Networking;
 using namespace Windows::Networking::Sockets;
 using namespace concurrency;
@@ -70,29 +71,21 @@ struct LaunchInfo
   int           result;
 };
 
-/*struct ArgReader
+struct ArgReader
 {
-  int   socket;
-  char  buffer [512];
-  char* read_pos;
-  char* write_pos;
+  Log&        log;
+  DataReader^ reader;
+  char        buffer [512];
+  char*       read_pos;
+  char*       write_pos;
   
-  ArgReader (int in_socket)
-    : socket (in_socket)
+  ArgReader (Log& in_log, StreamSocket^ socket)
+    : log (in_log)
+    , reader (ref new DataReader (socket->InputStream))
     , read_pos (buffer)
     , write_pos (buffer)
   {
-    timeval tv;
-    
-    memset (&tv, 0, sizeof (tv));
-    
-    tv.tv_sec = 1;
-    
-    if (setsockopt (socket, SOL_SOCKET, SO_RCVTIMEO, (char*)&tv, sizeof tv))
-    {
-      perror ("ERROR setsockopt");
-      exit (1);
-    }
+    reader->InputStreamOptions = InputStreamOptions::Partial;
   }
 
   std::string Read ()
@@ -106,10 +99,7 @@ struct LaunchInfo
         size_t shift_offset = read_pos - buffer;
         
         if (!shift_offset)
-        {
-          perror ("Command not found\n");
-          exit (1);
-        }
+          throw std::runtime_error ("Command not found\n");
         
         memmove (buffer, read_pos, write_pos - read_pos);
         
@@ -119,10 +109,34 @@ struct LaunchInfo
       
       if (read_pos == write_pos)
       {
-        int read_count = recv (socket, write_pos, buffer + sizeof (buffer) - write_pos, 0);
+          log.Printf ("try load\n");
+        int max_size = buffer + sizeof (buffer) - write_pos;
+ 
+        task<unsigned int> load_task (reader->LoadAsync (max_size));
+
+        load_task.wait ();
+
+         int read_count = reader->UnconsumedBufferLength;
+
+          log.Printf ("read_count=%d\n", read_count);
+
+        if (read_count > max_size)
+          read_count = max_size;
+
+          log.Printf ("read_count=%d corrected\n", read_count);
 
         if (read_count > 0)
+        {
+          Platform::Array<unsigned char>^ bytes = ref new Platform::Array<unsigned char> (read_count);
+
+          reader->ReadBytes (bytes);
+
+          memcpy (write_pos, &bytes [0], read_count);
+
+          log.Printf ("test='%s'\n", std::string (write_pos, read_count).c_str ());
+
           write_pos += read_count;
+        }
       }
 
       for (char* p=read_pos; p!=write_pos; p++)
@@ -135,11 +149,13 @@ struct LaunchInfo
           if (read_pos > buffer + sizeof (buffer))
             read_pos = buffer + sizeof (buffer);
 
+          log.Printf ("teststr='%s'\n", result.c_str ());
+        
           return result;
         }
     }
   }
-};*/
+};
 
 /*
     Функции
@@ -179,23 +195,22 @@ int main(Platform::Array<Platform::String^>^)
 
     log.Printf ("Sucessfully connected\n");
    
-/*      //чтение параметров запуска
+      //чтение параметров запуска
       
-    ArgReader arg_reader (sockfd);
+    ArgReader arg_reader (log, socket);
       
-    std::string app_name     = arg_reader.Read (),
-                cur_dir      = arg_reader.Read (),
-                args         = arg_reader.Read ();              
+    std::string app_name = arg_reader.Read (),
+                cur_dir  = arg_reader.Read ();
                 
     if (app_name.size () >= 2 && app_name [0] == '/' && app_name [1] == '/')
       app_name = app_name.substr (1);
 
     if (cur_dir.size () >= 2 && cur_dir [0] == '/' && cur_dir [1] == '/')
-      cur_dir = cur_dir.substr (1);*/
+      cur_dir = cur_dir.substr (1);
 
   //  chdir (cur_dir.c_str ()); 
 
-//    log.Printf ("app_name='%s' cur_dir='%s' args='%s'\n", app_name.c_str (), cur_dir.c_str (), args.c_str ());
+    log.Printf ("app_name='%s' cur_dir='%s'\n", app_name.c_str (), cur_dir.c_str ());
     log.Printf ("%S\n", std::wstring (Windows::Storage::ApplicationData::Current->LocalFolder->Path->Data ()).c_str ());
     log.Printf ("%S\n", std::wstring (Windows::Storage::ApplicationData::Current->RoamingFolder->Path->Data ()).c_str ());
     log.Printf ("%S\n", std::wstring (Windows::Storage::ApplicationData::Current->TemporaryFolder->Path->Data ()).c_str ());
@@ -204,7 +219,7 @@ int main(Platform::Array<Platform::String^>^)
   {
     log.Printf ("%s\n    at %s\n", e.what (), __FUNCTION__);
   }
-  catch (Exception^ e)
+  catch (Platform::Exception^ e)
   {
     log.Printf ("%S\n    at %s\n", e->Message->Data (), __FUNCTION__);
   }
