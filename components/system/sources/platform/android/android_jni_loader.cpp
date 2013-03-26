@@ -119,6 +119,7 @@ __attribute__ ((visibility("default"))) extern JNIEXPORT jint JNICALL JNI_OnLoad
     register_web_view_callbacks (env);    
     register_sensor_manager_callbacks (env);
     register_screen_callbacks (env, skeletonActivityClass);
+    register_gcm_callbacks (env);
   }
   catch (std::exception& e)
   {

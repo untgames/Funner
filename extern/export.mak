@@ -20,6 +20,10 @@ ifneq (,$(filter android-arm,$(PROFILES)))
   COMPONENT_DIRS += android_ndk_profiler
 endif
 
+ifneq (,$(filter android,$(PROFILES)))
+  COMPONENT_DIRS += gcm
+endif
+
 ifeq (,$(filter android,$(PROFILES)))
 ifneq (,$(filter x86,$(PROFILES)))
   COMPONENT_DIRS += geekinfo
