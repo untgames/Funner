@@ -23,8 +23,6 @@ using namespace concurrency;
 
 const wchar_t* SHELL_HOST = L"127.0.0.1";   //хост, на который соединяется launcher 
 const wchar_t* SHELL_PORT = L"1663";        //порт, на который соединяется launcher
-//const wchar_t* SHELL_HOST = L"google.com";   //хост, на который соединяется launcher 
-//const wchar_t* SHELL_PORT = L"80";        //порт, на который соединяется launcher
 
 /*
     Типы

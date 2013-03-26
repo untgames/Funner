@@ -108,11 +108,11 @@ define process_target.win8-appx
   $1.UNSIGNED_APPX_FILE      := $$($1.TMP_DIR)/$$($1.NAME).unsigned.appx
   $1.SIGNED_APPX_FILE        := $$($1.TMP_DIR)/$$($1.NAME).appx
   $1.MANIFEST_FILE           := $(COMPONENT_DIR)$$($1.MANIFEST_FILE)
-  $1.PFX_FILE                := $(COMPONENT_DIR)$$($1.PFX_FILE)
   TARGET_FILES               := $$(TARGET_FILES) $$($1.PACKAGE_FILE)
   $1.TARGET_DLLS             := $$($1.DLLS:%=$$($1.OUT_DIR)/$(DLL_PREFIX)%$(DLL_SUFFIX))
-  $1.CER_FILE                := $$($1.TMP_DIR)/$$(basename $$(notdir $$($1.PFX_FILE))).cer
-  $1.PVK_FILE                := $$($1.TMP_DIR)/$$(basename $$(notdir $$($1.PFX_FILE))).pvk
+  $1.PFX_FILE                := $$($1.TMP_DIR)/key.pfx
+  $1.CER_FILE                := $(COMPONENT_DIR)$$($1.CER_FILE)
+  $1.PVK_FILE                := $$(basename $$($1.CER_FILE)).pvk
   $1.LINK_FLAGS              := $$($1.LINK_FLAGS) -subsystem:windows -winmd -winmdfile:$$($1.WINMD_FILE)
   $1.APPX_LIST               := $$($1.EXE_FILE) $$($1.WINMD_FILE)
   $1.SOURCE_DATA_ROOT        := $(COMPONENT_DIR)$$($1.SOURCE_DATA_ROOT)

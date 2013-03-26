@@ -88,7 +88,7 @@ SYSTEMLIB.UTILS.WIN8_LAUNCHER.TYPE              := win8-appx
 SYSTEMLIB.UTILS.WIN8_LAUNCHER.NAME              := funner.application
 SYSTEMLIB.UTILS.WIN8_LAUNCHER.SOURCE_DIRS       := utils/win8_launcher
 SYSTEMLIB.UTILS.WIN8_LAUNCHER.MANIFEST_FILE     := utils/win8_launcher/AppxManifest.xml
-SYSTEMLIB.UTILS.WIN8_LAUNCHER.PFX_FILE          := utils/win8_launcher/key.pfx
+SYSTEMLIB.UTILS.WIN8_LAUNCHER.CER_FILE          := utils/win8_launcher/cert/cert.cer
 SYSTEMLIB.UTILS.WIN8_LAUNCHER.SOURCE_DATA_ROOT  := utils/win8_launcher
 SYSTEMLIB.UTILS.WIN8_LAUNCHER.SOURCE_DATA_FILES := utils/win8_launcher/assets
 SYSTEMLIB.UTILS.WIN8_LAUNCHER.PUBLISHER         := CN=leny
