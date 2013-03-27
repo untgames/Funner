@@ -43,7 +43,14 @@ public class GCMIntentService extends GCMBaseIntentService {
     
     @Override
     protected void onRegistered(final Context context, final String registrationId) {
-      onRegisteredCallback (registrationId);
+    	try
+    	{
+        onRegisteredCallback (registrationId);
+    	}
+    	catch (Throwable e)
+    	{
+    		Log.e (TAG, "Exception while processing registration: " + e);
+    	}
     }
 
     @Override
@@ -53,46 +60,69 @@ public class GCMIntentService extends GCMBaseIntentService {
 
     @Override
     protected void onMessage(Context context, final Intent intent) {
-    	Bundle extras = intent.getExtras ();
-    	
-    	if (extras == null)
-        onMessageCallback ("");
-    	else
+    	try
     	{
-    		try
+    		//Send broadcast with this message
+    		Intent broadcastIntent = new Intent ("com.untgames.funner.application.PROCESS_GCM_MESSAGE");
+    		
+    		broadcastIntent.putExtras (intent);
+    		broadcastIntent.addCategory (getApplicationContext().getPackageName());
+    		
+    		context.sendBroadcast (broadcastIntent);
+    		
+    		//Send message to native code
+    		Bundle extras = intent.getExtras ();
+
+    		if (extras == null)
+    			onMessageCallback ("");
+    		else
     		{
-    			JSONStringer json = new JSONStringer ();
-
-    			json.object ();
-
-    			Set<String> extrasKeys = extras.keySet ();
-
-    			for (String key : extrasKeys)
+    			try
     			{
-    				json.key (key);
-    				json.value (extras.getString (key));
-    			};
+    				JSONStringer json = new JSONStringer ();
 
-    			json.endObject ();
+    				json.object ();
 
-    			onMessageCallback (json.toString ());
+    				Set<String> extrasKeys = extras.keySet ();
+
+    				for (String key : extrasKeys)
+    				{
+    					json.key (key);
+    					json.value (extras.getString (key));
+    				};
+
+    				json.endObject ();
+
+    				onMessageCallback (json.toString ());
+    			}
+    			catch (org.json.JSONException exception)
+    			{
+    				Log.e (TAG, "Exception while encoding message: " + exception);
+    			}
     		}
-    		catch (org.json.JSONException exception)
-    		{
-    			Log.e (TAG, "Exception while encoding message: " + exception);
-    		}
+    	}
+    	catch (Throwable e)
+    	{
+    		Log.e (TAG, "Exception while processing message: " + e);
     	}
     }
 
     @Override
     public void onError(Context context, final String errorId) {
-      onErrorCallback (errorId);
+    	try
+    	{
+        onErrorCallback (errorId);
+    	}
+    	catch (Throwable e)
+    	{
+    		Log.e (TAG, "Exception while processing error: " + e);
+    	}
     }
 
     @Override
     protected boolean onRecoverableError(Context context, String errorId) {
     	onError(context, errorId);
-        return super.onRecoverableError(context, errorId);
+      return super.onRecoverableError(context, errorId);
     }
 
     public native void onRegisteredCallback(String request);
