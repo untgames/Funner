@@ -33,6 +33,10 @@ const wchar_t* SHELL_PORT = L"1663";        //порт, на который со
     Типы
 */
 
+typedef STRING ANSI_STRING, *PANSI_STRING;
+
+typedef void (*StdoutFn)(const char* buffer, size_t size, void* user_data);
+
 class Log
 {
   public:
@@ -67,15 +71,7 @@ class Log
 
 struct LaunchInfo
 {
-  Log&          log;
-  DataWriter^   stdout_writer;
-  HANDLE        stdout_handle;
-  std::string   app_name;
-  std::string   cur_dir;
-  volatile bool launching;
-  int           result;
-
-  LaunchInfo (Log& in_log) : log (in_log), stdout_writer (), stdout_handle (), launching (true), result () {}
+  DataWriter^ stdout_writer;
 };
 
 struct ArgReader
@@ -161,6 +157,72 @@ struct ArgReader
     Функции
 */
 
+extern "C"
+{
+
+NTSYSAPI NTSTATUS NTAPI LdrLoadDll (IN PWCHAR PathToFile OPTIONAL, IN ULONG Flags OPTIONAL, IN PUNICODE_STRING ModuleFileName, OUT PHANDLE ModuleHandle);
+NTSYSAPI NTSTATUS NTAPI LdrGetProcedureAddress (IN HMODULE ModuleHandle, IN PANSI_STRING FunctionName OPTIONAL, IN WORD Oridinal OPTIONAL, OUT PVOID *FunctionAddress);
+
+}
+
+std::string tostring (const wchar_t* string, int length)
+{
+  if (length == -1)
+    length = wcslen (string);
+
+  std::string result;
+
+  result.resize (length * 4);
+
+  int result_size = wcsrtombs (&result [0], &string, length, 0);
+
+  if (result_size < 0)
+    return "(common::tostring error)";
+
+  result.resize (result_size);
+
+  return result;
+}
+
+std::wstring towstring (const char* string, int length)
+{
+  if (!string)
+    return L"";
+
+  if (length == -1)
+    length = strlen (string);
+
+  std::wstring result;
+
+  result.resize (length);
+
+  int result_size = mbsrtowcs (&result [0], &string, length, 0);
+
+  if (result_size < 0)
+    return L"(common::towstring error)";
+
+  result.resize (result_size);
+
+  return result;
+}
+
+std::wstring towstring (const std::string& s)
+{
+  return towstring (s.c_str (), s.size ());
+}
+
+FORCEINLINE VOID pRtlInitUnicodeString(PUNICODE_STRING destString, PWSTR sourceString)
+{
+  destString->Buffer                             = sourceString;
+  destString->MaximumLength = destString->Length = wcslen(sourceString) * sizeof(WCHAR);
+};
+
+FORCEINLINE VOID pRtlInitString(PANSI_STRING destString, PSTR sourceString)
+{
+  destString->Buffer        = sourceString;
+  destString->MaximumLength = destString->Length = strlen(sourceString) * sizeof(CHAR);
+};
+
 /*void sock_printf (DataWriter^ stream, const char* format, ...)
 {
   va_list list;
@@ -178,45 +240,14 @@ struct ArgReader
   stream->WriteBytes (ref new array<unsigned char> (length, buffer));
 } */
 
-void dump_thread (LaunchInfo* info)
+void stdout_redirect (const char* data, size_t size, void* user_data)
 {
-  Log& log = info->log;
+  LaunchInfo* info = (LaunchInfo*)user_data;
 
-  log.Printf ("Dump thread has been started\n");
+  if (!info || !data)
+    return;
 
-  char buffer [4096];
-
-  for (;;)
-  {
-    if (!info->launching)
-      return;
-
-    DWORD read_count = 0;
-
-  printf ("!!! %u\n", clock ());
-  fflush (stdout);
-
-    log.Printf ("%s(%u)\n", __FUNCTION__, __LINE__);    
-
-//    if (!ReadFile (info->stdout_handle, buffer, sizeof (buffer), &read_count, 0))
-    if (!ReadFile (info->stdout_handle, buffer, 3, &read_count, 0))
-      continue;
-
-    log.Printf ("%s(%u)\n", __FUNCTION__, __LINE__);    
-
-    log.Printf ("read %u bytes\n", read_count);    
-
-    if (!read_count)
-      continue;
-
-    Platform::Array<unsigned char>^ bytes = ref new Platform::Array<unsigned char> (read_count);
-
-    memcpy (&bytes [0], buffer, read_count);
-    
-    info->stdout_writer->WriteBytes (bytes);
-
-    delete bytes;
-  }  
+  info->stdout_writer->WriteBytes (ref new Platform::Array<unsigned char> ((unsigned char*)data, size));
 }
 
 [Platform::MTAThread]
@@ -235,27 +266,7 @@ int main(Platform::Array<Platform::String^>^)
     connectionTask.wait ();
 
     log.Printf ("Sucessfully connected\n");
-
-      //stdout redirect
-
-    HANDLE hRead, hWrite;
-
-//    SECURITY_ATTRIBUTES pipe_attr; 
-    
-//    pipe_attr.nLength              = sizeof (SECURITY_ATTRIBUTES); 
-//    pipe_attr.bInheritHandle       = TRUE; 
-//    pipe_attr.lpSecurityDescriptor = NULL; 
-
-    if (!CreatePipe (&hRead, &hWrite, 0, 0))
-      throw std::runtime_error ("::CreatePipe has been failed");
-
-    if (!SetStdHandle (STD_OUTPUT_HANDLE, hWrite))
-      throw std::runtime_error ("::SetStdHandle failed");
-  
-    printf("\n->Start of parent execution.\n"); fflush (stdout);
-
-    log.Printf ("StdOut has been redirected\n");
-   
+ 
       //чтение параметров запуска
       
     ArgReader arg_reader (log, socket);
@@ -271,19 +282,41 @@ int main(Platform::Array<Platform::String^>^)
 
     log.Printf ("Launching application '%s' with current dir '%s'\n", app_name.c_str (), cur_dir.c_str ());
 
-    LaunchInfo info (log), *info_ptr = &info;
+    UNICODE_STRING app_name_unicode;
 
-    info.app_name      = app_name;
-    info.cur_dir       = cur_dir;
-    info.stdout_handle = hRead;
+    pRtlInitUnicodeString (&app_name_unicode, &towstring (app_name)[0]);
+
+    HANDLE handle = 0;
+
+    NTSTATUS ntstatus = LdrLoadDll (0, 0, &app_name_unicode, &handle);
+
+    if (!handle)
+      throw std::runtime_error ("::LdrLoadDll failed");
+
+    log.Printf ("Dll has been loaded");
+     
+    HMODULE module = (HMODULE)handle;
+
+    ANSI_STRING entry_point_name;
+     
+    pRtlInitString (&entry_point_name, "win8_entry_point");
+
+    typedef int (*EntryFn)(const char* cur_dir, StdoutFn stdout_handler, void* user_data);
+
+    EntryFn entry_fn = 0;
+     
+    ntstatus = LdrGetProcedureAddress (module, &entry_point_name, 0, (PVOID*)&entry_fn);
+     
+    if (!entry_fn)
+      throw std::runtime_error ("::LdrGetProcedureAddress failed");
+
+    log.Printf ("Entry point has been found");
+
+    LaunchInfo info;
+
     info.stdout_writer = ref new DataWriter (socket->OutputStream);
 
-    task<void> dump_task (Windows::System::Threading::ThreadPool::RunAsync (ref new WorkItemHandler ([&info_ptr](IAsyncAction^) { dump_thread (info_ptr); })));
-
-    dump_task.wait ();
-
-//    _chdir (cur_dir.c_str ()); 
-
+    return entry_fn (cur_dir.c_str (), stdout_redirect, &info);
   }
   catch (std::exception& e)
   {
