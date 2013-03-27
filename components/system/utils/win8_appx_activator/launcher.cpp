@@ -48,7 +48,7 @@ HRESULT LaunchApp(const std::wstring& strAppUserModelId, PDWORD pdwProcessId)
         if (SUCCEEDED(hrResult))
         {
             // This call ensures that the app is launched as the foreground window
-//            hrResult = CoAllowSetForegroundWindow(spAppActivationManager, NULL);
+            hrResult = CoAllowSetForegroundWindow(spAppActivationManager, NULL);
             
             // Launch the app
             if (SUCCEEDED(hrResult))
@@ -166,6 +166,24 @@ std::string tostring (const std::wstring& s)
   return tostring (s.c_str (), s.size ());
 }
 
+int launch (const wchar_t* app_name)
+{
+    //активация приложения
+
+  HRESULT hrResult = S_OK;
+
+  if (SUCCEEDED (CoInitializeEx(NULL, COINIT_APARTMENTTHREADED)))
+  {
+    DWORD dwProcessId = 0;
+
+    hrResult = LaunchApp (app_name, &dwProcessId);
+
+    CoUninitialize ();
+  }
+
+  return hrResult;
+}
+
 int wmain(int argc, wchar_t* argv[])
 {
   if (argc < 1 || (argc > 1 && argc < 3))
@@ -178,19 +196,8 @@ int wmain(int argc, wchar_t* argv[])
 
     //активация приложения
 
-  HRESULT hrResult = S_OK;
-
-  if (SUCCEEDED (CoInitializeEx(NULL, COINIT_APARTMENTTHREADED)))
-  {
-    DWORD dwProcessId = 0;
-
-    hrResult = LaunchApp (app_name.c_str (), &dwProcessId);
-
-    CoUninitialize ();
-  }
-
   if (argc < 2)
-    return hrResult;
+    return launch (app_name.c_str ());
 
     //передача параметров
 
@@ -242,6 +249,11 @@ int wmain(int argc, wchar_t* argv[])
   printf ("Listen successfull\n");
   fflush (stdout);
 
+  result = launch (app_name.c_str ());
+
+  printf ("Launch successfull\n");
+  fflush (stdout);
+
   socklen_t clilen = sizeof (cli_addr);
 
   memset ((char*)&cli_addr, 0, sizeof (cli_addr));  
@@ -256,21 +268,24 @@ int wmain(int argc, wchar_t* argv[])
   }  
 
   printf ("Connection accepted\n");
+  fflush (stdout);
 
-  sock_printf (newsockfd, "%s %s", tostring (dll_name).c_str (), tostring (cur_dir).c_str ());
+  sock_printf (newsockfd, "%s %s\n", tostring (dll_name).c_str (), tostring (cur_dir).c_str ());
 
 //  for (int i=4; i<=argc; i++)    
 //    sock_printf (newsockfd, i == 4 ? "%s" : " %s", argv [i]);
 
-  sock_printf (newsockfd, "\n");
+//  sock_printf (newsockfd, "\n");
 
-  int timeout = 1;
+  int timeout = 1000;
 
   if (setsockopt (newsockfd, SOL_SOCKET, SO_RCVTIMEO, (char*)&timeout, sizeof timeout))
   {
     printf ("ERROR setsockopt");
     return 1;
   }
+
+  fflush (stdout);
 
   for (;;)
   {
@@ -282,9 +297,10 @@ int wmain(int argc, wchar_t* argv[])
       break;
 
     if (read_count < 0)
-     continue;
+      continue;
 
     printf ("%s", std::string (buffer, read_count).c_str ());
+    fflush (stdout);
   }
 
   closesocket (newsockfd);  

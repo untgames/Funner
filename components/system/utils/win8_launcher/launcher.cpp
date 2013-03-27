@@ -141,9 +141,11 @@ struct ArgReader
       {
         int max_size = buffer + sizeof (buffer) - write_pos;
  
+log.Printf ("%s(%u)\n", __FUNCTION__, __LINE__);
         task<unsigned int> load_task (reader->LoadAsync (max_size));
-
+log.Printf ("%s(%u)\n", __FUNCTION__, __LINE__);
         load_task.wait ();
+log.Printf ("%s(%u)\n", __FUNCTION__, __LINE__);
 
         int read_count = reader->UnconsumedBufferLength;
 
@@ -153,13 +155,15 @@ struct ArgReader
         if (read_count > 0)
         {
           Platform::Array<unsigned char>^ bytes = ref new Platform::Array<unsigned char> (read_count);
-
+log.Printf ("%s(%u)\n", __FUNCTION__, __LINE__);
           reader->ReadBytes (bytes);
-
+log.Printf ("%s(%u)\n", __FUNCTION__, __LINE__);
           memcpy (write_pos, &bytes [0], read_count);
 
           delete bytes;
 
+
+log.Printf ("test='%s'\n", std::string (write_pos, read_count).c_str ());
           write_pos += read_count;
         }
       }
@@ -173,6 +177,7 @@ struct ArgReader
 
           if (read_pos > buffer + sizeof (buffer))
             read_pos = buffer + sizeof (buffer);
+log.Printf ("result='%s'\n", result.c_str ());
         
           return result;
         }
@@ -239,9 +244,15 @@ void stdout_redirect (const char* data, size_t size, void* user_data)
 
   info->log->Printf (std::string (data, size).c_str ());
 
-  info->stdout_writer->WriteBytes (ref new Platform::Array<unsigned char> ((unsigned char*)data, size));
+  Platform::Array<unsigned char>^ bytes = ref new Platform::Array<unsigned char> (size);
 
-  info->stdout_writer->FlushAsync ();
+  memcpy (&bytes [0], data, size);
+
+  info->stdout_writer->WriteBytes (bytes);
+
+  task<unsigned int> store_task (info->stdout_writer->StoreAsync ());
+
+  store_task.wait ();
 }
 
 [Platform::MTAThread]
@@ -254,6 +265,8 @@ int main(Platform::Array<Platform::String^>^)
     log.Printf ("Creating socket...\n");
 
     StreamSocket^ socket = ref new StreamSocket ();
+
+    socket->Control->NoDelay = true;
 
     task<void> connectionTask (socket->ConnectAsync (ref new HostName (ref new String (SHELL_HOST)), ref new String (SHELL_PORT), SocketProtectionLevel::PlainSocket));
 
