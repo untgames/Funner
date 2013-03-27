@@ -5,7 +5,12 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Bundle;
 import android.util.Log;
+
+import java.util.Set;
+
+import org.json.JSONStringer;
 
 import com.google.android.gcm.GCMBaseIntentService;
 import com.google.android.gcm.GCMRegistrar;
@@ -39,29 +44,44 @@ public class GCMIntentService extends GCMBaseIntentService {
     @Override
     protected void onRegistered(final Context context, final String registrationId) {
       onRegisteredCallback (registrationId);
-
-              //TODO call this later!!!!!!!!!
-      GCMRegistrar.setRegisteredOnServer(context, true);
     }
 
     @Override
     protected void onUnregistered(Context context, String registrationId) {
-     /*   if (GCMRegistrar.isRegisteredOnServer(context)) {
-        } else {
-            // This callback results from the call to unregister made on
-            // ServerUtilities when the registration to the server failed.
-        }*/
+    	//Do nothing
     }
 
     @Override
     protected void onMessage(Context context, final Intent intent) {
-     	String message = new String ();
-            	
-    	Log.i (TAG, "Message received!!!!!!!! " + intent.toString ());
-      	
-    	//TODO fill message
-      	
-      onMessageCallback (message);
+    	Bundle extras = intent.getExtras ();
+    	
+    	if (extras == null)
+        onMessageCallback ("");
+    	else
+    	{
+    		try
+    		{
+    			JSONStringer json = new JSONStringer ();
+
+    			json.object ();
+
+    			Set<String> extrasKeys = extras.keySet ();
+
+    			for (String key : extrasKeys)
+    			{
+    				json.key (key);
+    				json.value (extras.getString (key));
+    			};
+
+    			json.endObject ();
+
+    			onMessageCallback (json.toString ());
+    		}
+    		catch (org.json.JSONException exception)
+    		{
+    			Log.e (TAG, "Exception while encoding message: " + exception);
+    		}
+    	}
     }
 
     @Override
