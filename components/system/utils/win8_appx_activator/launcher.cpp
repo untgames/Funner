@@ -199,6 +199,8 @@ int wmain(int argc, wchar_t* argv[])
   if (argc < 2)
     return launch (app_name.c_str ());
 
+  launch (app_name.c_str ());
+
     //передача параметров
 
   std::wstring dll_name = argv [2], cur_dir = argv [3];
@@ -249,7 +251,7 @@ int wmain(int argc, wchar_t* argv[])
   printf ("Listen successfull\n");
   fflush (stdout);
 
-  result = launch (app_name.c_str ());
+//  result = launch (app_name.c_str ());
 
   printf ("Launch successfull\n");
   fflush (stdout);

@@ -22,8 +22,6 @@ using namespace Windows::System::Threading;
 using namespace Windows::Foundation;
 using namespace concurrency;
 
-#pragma comment (linker, "/defaultlib:ntdll.lib")
-
 /*
     Константы
 */
@@ -115,7 +113,7 @@ struct ArgReader
     , read_pos (buffer)
     , write_pos (buffer)
   {
-    reader->InputStreamOptions = InputStreamOptions::Partial;
+    reader->InputStreamOptions |= InputStreamOptions::Partial;
   }
 
   std::string Read ()
@@ -141,11 +139,9 @@ struct ArgReader
       {
         int max_size = buffer + sizeof (buffer) - write_pos;
  
-log.Printf ("%s(%u)\n", __FUNCTION__, __LINE__);
         task<unsigned int> load_task (reader->LoadAsync (max_size));
-log.Printf ("%s(%u)\n", __FUNCTION__, __LINE__);
+
         load_task.wait ();
-log.Printf ("%s(%u)\n", __FUNCTION__, __LINE__);
 
         int read_count = reader->UnconsumedBufferLength;
 
@@ -155,15 +151,13 @@ log.Printf ("%s(%u)\n", __FUNCTION__, __LINE__);
         if (read_count > 0)
         {
           Platform::Array<unsigned char>^ bytes = ref new Platform::Array<unsigned char> (read_count);
-log.Printf ("%s(%u)\n", __FUNCTION__, __LINE__);
+
           reader->ReadBytes (bytes);
-log.Printf ("%s(%u)\n", __FUNCTION__, __LINE__);
+
           memcpy (write_pos, &bytes [0], read_count);
 
           delete bytes;
 
-
-log.Printf ("test='%s'\n", std::string (write_pos, read_count).c_str ());
           write_pos += read_count;
         }
       }
@@ -177,7 +171,6 @@ log.Printf ("test='%s'\n", std::string (write_pos, read_count).c_str ());
 
           if (read_pos > buffer + sizeof (buffer))
             read_pos = buffer + sizeof (buffer);
-log.Printf ("result='%s'\n", result.c_str ());
         
           return result;
         }

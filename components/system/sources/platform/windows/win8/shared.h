@@ -1,5 +1,11 @@
 #include "../shared.h"
 
+#include <wrl/client.h>
+#include <ppltasks.h>
+
+#include <io.h>
+#include <fcntl.h>
+#include <stdio.h>
 #include <locale.h>
 #include <wrl/client.h>
 

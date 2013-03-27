@@ -24,7 +24,10 @@
 
 #include <process.h>
 
+#ifndef WINRT
 #define _WIN32_WINNT 0x0600 //для использования WM_MOUSEWHEEL
+#endif
+
 #include <windows.h>
 
 #include <mshtml.h>
