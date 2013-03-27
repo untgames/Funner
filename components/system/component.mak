@@ -94,6 +94,7 @@ SYSTEMLIB.UTILS.WIN8_LAUNCHER.SOURCE_DATA_FILES := utils/win8_launcher/assets
 SYSTEMLIB.UTILS.WIN8_LAUNCHER.PUBLISHER         := CN=leny
 SYSTEMLIB.UTILS.WIN8_LAUNCHER.COMPILER_CFLAGS   := -ZW
 SYSTEMLIB.UTILS.WIN8_LAUNCHER.LIBS              := wsock32
+SYSTEMLIB.UTILS.WIN8_LAUNCHER.IMPORTS           := compile.extern.win32_load_dll link.extern.win32_load_dll
 
 #Цель - сборка документации
 SYSTEMLIB.INFO.TYPE        := doxygen-info

@@ -38,6 +38,7 @@ export.info.system.CHMS                   := funner.system
 export.link.system.win8.IMPORTS           := link.common.iconv
 export.link.system.win8.LINK_TOOL         := tools.link.shared-lib
 export.link.system.win8.RUN_TOOL          := tools.run.winrt_x86_package
+export.link.system.win8.LINK_INCLUDES     := win8_startup main
 
 ifeq (,$(filter iphone,$(PROFILES))$(filter android,$(PROFILES)))
   export.link.system.x86.IMPORTS            := link.extern.geekinfo

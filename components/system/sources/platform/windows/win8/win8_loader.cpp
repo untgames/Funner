@@ -12,7 +12,7 @@ extern "C"
 
 extern int main (...);
 
-__declspec(dllexport) int win8_entry_point (const char* cur_dir, StdoutFn stdout_handler, void* user_data)
+__declspec(dllexport) int win8_startup (const char* cur_dir, StdoutFn stdout_handler, void* user_data)
 {
   try
   {    
@@ -24,12 +24,12 @@ __declspec(dllexport) int win8_entry_point (const char* cur_dir, StdoutFn stdout
   }
   catch (std::exception& e)
   {
-    printf ("%s\n    at win8_entry_point\n", e.what ());
+    printf ("%s\n    at win8_startup\n", e.what ());
     return -1;    
   }  
   catch (...)
   {
-    printf ("Unknown exception\n    at win8_entry_point\n");
+    printf ("Unknown exception\n    at win8_startup\n");
     return -1;
   }
 }
