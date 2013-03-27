@@ -1,6 +1,8 @@
 ﻿#include <stdio.h>
 #include <stdarg.h>
 #include <wchar.h>
+#include <time.h>
+
 #include <memory>
 #include <string>
 
@@ -14,6 +16,8 @@ using namespace Platform;
 using namespace Windows::Storage::Streams;
 using namespace Windows::Networking;
 using namespace Windows::Networking::Sockets;
+using namespace Windows::System::Threading;
+using namespace Windows::Foundation;
 using namespace concurrency;
 
 #pragma comment (linker, "/defaultlib:ntdll.lib")
@@ -63,19 +67,22 @@ class Log
 
 struct LaunchInfo
 {
+  Log&          log;
+  DataWriter^   stdout_writer;
+  HANDLE        stdout_handle;
   std::string   app_name;
+  std::string   cur_dir;
   volatile bool launching;
-  int           argc;
-  char**        argv;
-  char**        env;
   int           result;
+
+  LaunchInfo (Log& in_log) : log (in_log), stdout_writer (), stdout_handle (), launching (true), result () {}
 };
 
 struct ArgReader
 {
   Log&        log;
   DataReader^ reader;
-  char        buffer [512];
+  char        buffer [4096];
   char*       read_pos;
   char*       write_pos;
   
@@ -109,21 +116,16 @@ struct ArgReader
       
       if (read_pos == write_pos)
       {
-          log.Printf ("try load\n");
         int max_size = buffer + sizeof (buffer) - write_pos;
  
         task<unsigned int> load_task (reader->LoadAsync (max_size));
 
         load_task.wait ();
 
-         int read_count = reader->UnconsumedBufferLength;
-
-          log.Printf ("read_count=%d\n", read_count);
+        int read_count = reader->UnconsumedBufferLength;
 
         if (read_count > max_size)
           read_count = max_size;
-
-          log.Printf ("read_count=%d corrected\n", read_count);
 
         if (read_count > 0)
         {
@@ -133,7 +135,7 @@ struct ArgReader
 
           memcpy (write_pos, &bytes [0], read_count);
 
-          log.Printf ("test='%s'\n", std::string (write_pos, read_count).c_str ());
+          delete bytes;
 
           write_pos += read_count;
         }
@@ -148,8 +150,6 @@ struct ArgReader
 
           if (read_pos > buffer + sizeof (buffer))
             read_pos = buffer + sizeof (buffer);
-
-          log.Printf ("teststr='%s'\n", result.c_str ());
         
           return result;
         }
@@ -178,6 +178,47 @@ struct ArgReader
   stream->WriteBytes (ref new array<unsigned char> (length, buffer));
 } */
 
+void dump_thread (LaunchInfo* info)
+{
+  Log& log = info->log;
+
+  log.Printf ("Dump thread has been started\n");
+
+  char buffer [4096];
+
+  for (;;)
+  {
+    if (!info->launching)
+      return;
+
+    DWORD read_count = 0;
+
+  printf ("!!! %u\n", clock ());
+  fflush (stdout);
+
+    log.Printf ("%s(%u)\n", __FUNCTION__, __LINE__);    
+
+//    if (!ReadFile (info->stdout_handle, buffer, sizeof (buffer), &read_count, 0))
+    if (!ReadFile (info->stdout_handle, buffer, 3, &read_count, 0))
+      continue;
+
+    log.Printf ("%s(%u)\n", __FUNCTION__, __LINE__);    
+
+    log.Printf ("read %u bytes\n", read_count);    
+
+    if (!read_count)
+      continue;
+
+    Platform::Array<unsigned char>^ bytes = ref new Platform::Array<unsigned char> (read_count);
+
+    memcpy (&bytes [0], buffer, read_count);
+    
+    info->stdout_writer->WriteBytes (bytes);
+
+    delete bytes;
+  }  
+}
+
 [Platform::MTAThread]
 int main(Platform::Array<Platform::String^>^)	
 {
@@ -194,6 +235,26 @@ int main(Platform::Array<Platform::String^>^)
     connectionTask.wait ();
 
     log.Printf ("Sucessfully connected\n");
+
+      //stdout redirect
+
+    HANDLE hRead, hWrite;
+
+//    SECURITY_ATTRIBUTES pipe_attr; 
+    
+//    pipe_attr.nLength              = sizeof (SECURITY_ATTRIBUTES); 
+//    pipe_attr.bInheritHandle       = TRUE; 
+//    pipe_attr.lpSecurityDescriptor = NULL; 
+
+    if (!CreatePipe (&hRead, &hWrite, 0, 0))
+      throw std::runtime_error ("::CreatePipe has been failed");
+
+    if (!SetStdHandle (STD_OUTPUT_HANDLE, hWrite))
+      throw std::runtime_error ("::SetStdHandle failed");
+  
+    printf("\n->Start of parent execution.\n"); fflush (stdout);
+
+    log.Printf ("StdOut has been redirected\n");
    
       //чтение параметров запуска
       
@@ -208,12 +269,21 @@ int main(Platform::Array<Platform::String^>^)
     if (cur_dir.size () >= 2 && cur_dir [0] == '/' && cur_dir [1] == '/')
       cur_dir = cur_dir.substr (1);
 
-  //  chdir (cur_dir.c_str ()); 
+    log.Printf ("Launching application '%s' with current dir '%s'\n", app_name.c_str (), cur_dir.c_str ());
 
-    log.Printf ("app_name='%s' cur_dir='%s'\n", app_name.c_str (), cur_dir.c_str ());
-    log.Printf ("%S\n", std::wstring (Windows::Storage::ApplicationData::Current->LocalFolder->Path->Data ()).c_str ());
-    log.Printf ("%S\n", std::wstring (Windows::Storage::ApplicationData::Current->RoamingFolder->Path->Data ()).c_str ());
-    log.Printf ("%S\n", std::wstring (Windows::Storage::ApplicationData::Current->TemporaryFolder->Path->Data ()).c_str ());
+    LaunchInfo info (log), *info_ptr = &info;
+
+    info.app_name      = app_name;
+    info.cur_dir       = cur_dir;
+    info.stdout_handle = hRead;
+    info.stdout_writer = ref new DataWriter (socket->OutputStream);
+
+    task<void> dump_task (Windows::System::Threading::ThreadPool::RunAsync (ref new WorkItemHandler ([&info_ptr](IAsyncAction^) { dump_thread (info_ptr); })));
+
+    dump_task.wait ();
+
+//    _chdir (cur_dir.c_str ()); 
+
   }
   catch (std::exception& e)
   {

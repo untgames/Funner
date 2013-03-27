@@ -131,11 +131,11 @@ void sock_printf (int socket, const char* format, ...)
   
   va_start (list, format);
   
-  char buffer [256];
+  char buffer [4096];
   
   vsnprintf (buffer, sizeof (buffer), format, list);
   
-  buffer [255] = '\0';
+  buffer [sizeof (buffer) - 1] = '\0';
   
   size_t length = strlen (buffer);
   
@@ -259,7 +259,10 @@ int wmain(int argc, wchar_t* argv[])
 
   sock_printf (newsockfd, "%s %s", tostring (dll_name).c_str (), tostring (cur_dir).c_str ());
 
-     //TODO: copy args!!!
+//  for (int i=4; i<=argc; i++)    
+//    sock_printf (newsockfd, i == 4 ? "%s" : " %s", argv [i]);
+
+  sock_printf (newsockfd, "\n");
 
   int timeout = 1;
 
