@@ -31,6 +31,7 @@ import java.security.MessageDigest;
 import java.util.Arrays;
 import java.util.Formatter;
 import java.util.Locale;
+import java.util.UUID;
 import org.apache.http.client.CookieStore;
 import org.apache.http.impl.client.DefaultHttpClient;
 
@@ -303,10 +304,9 @@ public class EngineActivity extends Activity
     
     String androidID = Secure.getString (getContentResolver(), Secure.ANDROID_ID);    
     
-    if (androidID == null)
+    if (androidID == null || androidID.equals ("9774d56d682e549c")) //magick android id - http://code.google.com/p/android/issues/detail?id=10603
     {
-      buildString = Build.BOARD + Build.BRAND + Build.CPU_ABI + Build.DEVICE + Build.DISPLAY + Build.HOST + Build.ID + Build.MANUFACTURER + Build.MODEL + Build.PRODUCT +
-        Build.TAGS + Build.TYPE + Build.USER;        
+      buildString = UUID.randomUUID ().toString ();
     }
     else
     {
