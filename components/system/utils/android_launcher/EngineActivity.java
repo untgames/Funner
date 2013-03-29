@@ -1,41 +1,44 @@
 package com.untgames.funner.application;
 
 import android.app.Activity;
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
+import android.content.ContextWrapper;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Point;
+import android.net.Uri;
+import android.os.Build;
+import android.os.Bundle;
+import android.os.Looper;
+import android.os.Process;
+import android.os.SystemClock;
+import android.provider.Settings.Secure;
+import android.util.*;
 import android.view.Display;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
-import android.os.Bundle;
-import android.os.Looper;
-import android.content.ContextWrapper;
-import android.content.pm.ApplicationInfo;
-import android.content.SharedPreferences;
-import android.content.Intent;
-import android.util.*;
-import android.os.Build;
-import android.os.Process;
-import android.os.SystemClock;
-import android.provider.Settings.Secure;
 import android.webkit.CookieManager;
 import android.webkit.CookieSyncManager;
-import android.view.ViewGroup;
 import android.widget.AbsoluteLayout;
 import android.widget.FrameLayout;
-import android.net.Uri;
+import java.io.*;
 import java.net.CookieHandler;
 import java.security.MessageDigest;
 import java.util.Arrays;
 import java.util.Formatter;
 import java.util.Locale;
-import java.io.*;
 import org.apache.http.client.CookieStore;
 import org.apache.http.impl.client.DefaultHttpClient;
 
 /// ƒанный класс используетс€ дл€ запуска внешних shared-library
 public class EngineActivity extends Activity
 {
+	private static final String TAG = "funner";
+			
   private static boolean isLoaded = false;
   private ViewGroup      views    = null;
 
@@ -61,7 +64,7 @@ public class EngineActivity extends Activity
     
     if (extras == null)
     {
-      Log.e ("funner", "No command line arguments found");
+      Log.e (TAG, "No command line arguments found");
       System.exit (0);
       
       return;
@@ -71,7 +74,7 @@ public class EngineActivity extends Activity
     
     if (programName == null)
     {
-      Log.e ("funner", "No 'program' command line argument found");
+      Log.e (TAG, "No 'program' command line argument found");
       System.exit (0);
       
       return;
@@ -81,7 +84,7 @@ public class EngineActivity extends Activity
     
     if (workDir == null)
     {
-      Log.e ("funner", "No 'workdir' command line argument found");
+      Log.e (TAG, "No 'workdir' command line argument found");
       System.exit (0);
       
       return;
@@ -94,7 +97,7 @@ public class EngineActivity extends Activity
     
     if (appInfo == null)
     {
-      Log.e ("funner", "No ApplicationInfo attached");
+      Log.e (TAG, "No ApplicationInfo attached");
       System.exit (0);      
 
       return;
@@ -139,7 +142,7 @@ public class EngineActivity extends Activity
     }    
     catch (Throwable e)
     {
-      Log.e ("funner", e.getMessage());
+      Log.e (TAG, e.getMessage());
       e.printStackTrace ();
       
       System.exit (0);
@@ -351,6 +354,17 @@ public class EngineActivity extends Activity
     result += " SdkInt=" + Build.VERSION.SDK_INT;
     result += " Language=" + Locale.getDefault ().getLanguage () + "-" + Locale.getDefault ().getCountry ();
     result += " UUID=" + getUuid ();
+
+    try
+    {
+    	PackageInfo packageInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
+
+    	result += " ApplicationVersion=" + packageInfo.versionName;
+    }
+    catch (Exception e)
+    {
+    	Log.e (TAG, "Exception while getting application version: " + e.getMessage ());
+    }
     
     return result;
   }
