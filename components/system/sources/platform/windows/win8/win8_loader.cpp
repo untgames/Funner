@@ -72,12 +72,16 @@ __declspec(dllexport) int win8_startup (const char* cur_dir, StdoutFn stdout_han
     stdout_context.stdout_handler = stdout_handler;
     stdout_context.user_data      = user_data;
 
+printf ("before '%s'\n", cur_dir);
+
+    common::FileSystem::SetCurrentDir (common::format ("/std/%s", cur_dir).c_str ());
+printf ("main\n");
     return main (0, &program_name, &env);
   }
   catch (std::exception& e)
   {
     printf ("%s\n    at win8_startup\n", e.what ());
-    return -1;    
+    return -1;
   }  
   catch (...)
   {
