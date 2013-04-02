@@ -1,11 +1,11 @@
-TARGETS.wp8 := EXTERN.WP8COMPAT 
-TARGETS     := EXTERN.WP8COMPAT.STDIO
+TARGETS.wp8 := EXTERN.WIN8_COMPAT 
+TARGETS     := EXTERN.WIN8_COMPAT.STDIO
 
-EXTERN.WP8COMPAT.TYPE            := static-lib
-EXTERN.WP8COMPAT.NAME            := funner.extern.wp8compat
-EXTERN.WP8COMPAT.SOURCE_DIRS     := sources/common
-EXTERN.WP8COMPAT.COMPILER_CFLAGS := -ZW
+EXTERN.WIN8_COMPAT.TYPE            := static-lib
+EXTERN.WIN8_COMPAT.NAME            := funner.extern.win8_compat
+EXTERN.WIN8_COMPAT.SOURCE_DIRS     := sources/common
+EXTERN.WIN8_COMPAT.COMPILER_CFLAGS := -ZW
 
-EXTERN.WP8COMPAT.STDIO.TYPE         := static-lib
-EXTERN.WP8COMPAT.STDIO.NAME         := funner.extern.wp8compat.stdio
-EXTERN.WP8COMPAT.STDIO.SOURCE_DIRS  := sources/stdio
+EXTERN.WIN8_COMPAT.STDIO.TYPE         := static-lib
+EXTERN.WIN8_COMPAT.STDIO.NAME         := funner.extern.win8_compat.stdio
+EXTERN.WIN8_COMPAT.STDIO.SOURCE_DIRS  := sources/stdio

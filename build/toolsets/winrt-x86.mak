@@ -31,9 +31,9 @@ endef
 define tools.run.winrt_x86_package
 CheckNetIsolation.exe LoopbackExempt \-a \-n=$(APPX_LAUNCHER_PACKAGE_NAME) > nul && \
 export ROOT_SUBSTRING=$$(cd $(ROOT) && pwd)/ && \
-export SUBST_DIR_STRING=$$(cd $2 && pwd) && export SUBST_DIR_RESULT=$(REMOTE_DEBUG_DIR)/$${SUBST_DIR_STRING/#$$ROOT_SUBSTRING/} && \
-export PATH_SEARCH="$(foreach path,$3,$$(export SUBST_PATH_STRING=$$(cd $(path) && pwd) && echo $(REMOTE_DEBUG_DIR)/$${SUBST_PATH_STRING/#$$ROOT_SUBSTRING/}))" && \
+export SUBST_DIR_STRING=$$(cd $2 && pwd) && export SUBST_DIR_RESULT=$(APPX_REMOTE_DIR)/$${SUBST_DIR_STRING/#$$ROOT_SUBSTRING/} && \
+export PATH_SEARCH="$(foreach path,$3,$$(export SUBST_PATH_STRING=$$(cd $(path) && pwd) && echo $(APPX_REMOTE_DIR)/$${SUBST_PATH_STRING/#$$ROOT_SUBSTRING/}))" && \
 export PATH_SEARCH=$${PATH_SEARCH/\ /:} && \
-export SUBST_CMD_STRING=$$(cd $(dir $(firstword $1)) && pwd)/$(notdir $(firstword $1)) && export SUBST_COMMAND=$(REMOTE_DEBUG_DIR)/$${SUBST_CMD_STRING/#$$ROOT_SUBSTRING/} && \
+export SUBST_CMD_STRING=$$(cd $(dir $(firstword $1)) && pwd)/$(notdir $(firstword $1)) && export SUBST_COMMAND=$(APPX_REMOTE_DIR)/$${SUBST_CMD_STRING/#$$ROOT_SUBSTRING/} && \
 $(DIST_BIN_DIR)/win8-app-launcher $(APPX_APP_NAME) $$(echo $$SUBST_COMMAND) $$(echo $$SUBST_DIR_RESULT) $(args)
 endef

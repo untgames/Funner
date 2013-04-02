@@ -1012,6 +1012,8 @@ endef
 define process_target_common
   PROCESSED_IMPORTS :=
 
+  $1.IMPORTS := $$($1.IMPORTS) $(COMMON_IMPORTS)
+
     #ƒобавление toolset-настроек к общему списку настроек
   $$(foreach profile,$$(PROFILES),$$(eval $1.IMPORTS := $$($1.IMPORTS) $$($1.$$(profile).IMPORTS)))  
 

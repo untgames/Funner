@@ -42,6 +42,7 @@ HOST_PLATFORM      := x86
 COMMON_CFLAGS      += -W3 -Ox -wd4996 -nologo -FC -D "WINRT" -D "WINAPI_FAMILY=WINAPI_FAMILY_DESKTOP_APP" -MD -AI "$(WINRT_SDK)\References\CommonConfiguration\Neutral"
 COMMON_CFLAGS      += -AI "$(MSVC_PATH)\vcpackages"
 COMMON_LINK_FLAGS  += -DYNAMICBASE
+COMMON_IMPORTS     += link.extern.win8_compat
 
 ###################################################################################################
 #Константы
@@ -59,7 +60,7 @@ VALID_TARGET_TYPES += win8-appx
 ###################################################################################################
 #Конфигурация переменных расположения библиотек
 ###################################################################################################
-INCLUDE := $(WINRT_SDK)/include;$(WINRT_SDK)/include/shared;$(WINRT_SDK)/include/um;$(WINRT_SDK)/include/winrt;$(MSVC_PATH)/include;$(MSVC_PATH)/atlmfc/include;$(INCLUDE)
+INCLUDE := $(ROOT)/extern/win8_compat/include/stdio;$(WINRT_SDK)/include;$(WINRT_SDK)/include/shared;$(WINRT_SDK)/include/um;$(WINRT_SDK)/include/winrt;$(MSVC_PATH)/include;$(MSVC_PATH)/atlmfc/include;$(INCLUDE)
 LIB     := $(WINRT_SDK)/lib/win8/um/$(CPU_ARCH);$(MSVC_PATH)/lib$(if $(filter x86,$(CPU_ARCH)),,/$(CPU_ARCH));$(MSVC_PATH)/atlmfc/lib$(if $(filter x86,$(CPU_ARCH)),,/$(CPU_ARCH));$(LIB)
 
 export INCLUDE
@@ -188,12 +189,13 @@ endif
 	@chcp.com 850 > $$($1.TMP_DIR).chcp && export APPX_UUID=`cat $$($1.MANIFEST_FILE) | sed -n -e 's/.*Name="\([0-9a-fA-F]*-[0-9a-fA-F]*-[0-9a-fA-F]*-[0-9a-fA-F]*-[0-9a-fA-F]*\)".*/\1/p'` && \
          export APPX_FULL_NAME=`PowerShell "get-appxpackage $$$$APPX_UUID" | sed -n -e 's/.*PackageFullName *: *\(.*\)/\1/p'` && \
          if [ -n "$$$$APPX_FULL_NAME" ]; then PowerShell "remove-appxpackage $$$$APPX_FULL_NAME"; fi
-	@chcp.com 850 > $$($1.TMP_DIR)/chcp.log && PowerShell "add-appxpackage $$($1.PACKAGE_FILE)"
+	@PowerShell "add-appxpackage $$($1.PACKAGE_FILE)"
 	@touch $$@
 
   $$($1.CER_INSTALLATION_FLAG): $$($1.CER_FILE)
 	@echo Adding certificate $$(notdir $$($1.CER_FILE))...
-	@chcp.com 850 > $$($1.TMP_DIR)/chcp.log && "${SYSTEMROOT}/system32/Certutil" -addStore TrustedPeople $$($1.CER_FILE)
+#	@chcp.com 850 > $$($1.TMP_DIR)/chcp.log && "${SYSTEMROOT}/system32/Certutil" -addStore TrustedPeople $$($1.CER_FILE)
+	@"${SYSTEMROOT}/system32/Certutil" -addStore TrustedPeople $$($1.CER_FILE)
 	@touch $$@
 
   UNINSTALL_APPX.$1:

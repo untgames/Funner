@@ -14,6 +14,8 @@
 #include <common/strconv.h>
 #include <common/utf_converter.h>
 
+#include <syslib/mutex.h>
+
 namespace syslib
 {
 

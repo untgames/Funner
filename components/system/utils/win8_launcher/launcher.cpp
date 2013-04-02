@@ -201,33 +201,6 @@ std::string tostring (const wchar_t* string, int length)
   return result;
 }
 
-std::wstring towstring (const char* string, int length)
-{
-  if (!string)
-    return L"";
-
-  if (length == -1)
-    length = strlen (string);
-
-  std::wstring result;
-
-  result.resize (length);
-
-  int result_size = mbsrtowcs (&result [0], &string, length, 0);
-
-  if (result_size < 0)
-    return L"(common::towstring error)";
-
-  result.resize (result_size);
-
-  return result;
-}
-
-std::wstring towstring (const std::string& s)
-{
-  return towstring (s.c_str (), s.size ());
-}
-
 void stdout_redirect (const char* data, size_t size, void* user_data)
 {
   LaunchInfo* info = (LaunchInfo*)user_data;
@@ -304,7 +277,11 @@ int main(Platform::Array<Platform::String^>^)
     launch_info.stdout_writer = ref new DataWriter (socket->OutputStream);
     launch_info.log           = &log;
 
-    return entry_fn (cur_dir.c_str (), stdout_redirect, &launch_info);
+    int result = entry_fn (cur_dir.c_str (), stdout_redirect, &launch_info);
+
+    log.Printf ("Program was exited (exit code is %d)\n", result);
+
+    return result;
   }
   catch (std::exception& e)
   {
@@ -319,7 +296,7 @@ int main(Platform::Array<Platform::String^>^)
     log.Printf ("unknown exception\n    at %s\n", __FUNCTION__);
   }
 
-  log.Printf ("exit");
+  log.Printf ("Exit");
 
   return 0;
 }

@@ -24,7 +24,8 @@ endif
 MSVC_BIN_PATH      := $(MSVC_PATH)/bin/x86_arm
 COMMON_CFLAGS      += -W3 -Ox -wd4996 -nologo -FC -D "WP8" -D "ARM" -D "WINAPI_FAMILY=WINAPI_FAMILY_PHONE_APP" -MD -arch:ARMV7VE -AI "$(WP8_SDK)\Windows MetaData"
 COMMON_CFLAGS      += -AI "$(WP8_VC)\lib\arm"
-COMMON_LINK_FLAGS  += -machine:arm WindowsPhoneCore.lib funner.extern.wp8compat.lib
+COMMON_LINK_FLAGS  += -machine:arm WindowsPhoneCore.lib funner.extern.win8_compat.lib
+COMMON_IMPORTs     += link.extern.win8_compat
 
 ###################################################################################################
 #Константы
@@ -44,7 +45,7 @@ CPU_ARCH                := arm
 INCLUDE := $(MSVC_PATH)/include
 LIB     := $(MSVC_PATH)/lib/$(CPU_ARCH)
 
-INCLUDE := $(ROOT)/extern/wp8compat/include;$(WP8_SDK)/include;$(WP8_SDK)/include/mincore;$(WP8_SDK)/include/minwin;$(WP8_SDK)/include/abi;$(INCLUDE)
+INCLUDE := $(ROOT)/extern/win8_compat/include;$(WP8_SDK)/include;$(WP8_SDK)/include/mincore;$(WP8_SDK)/include/minwin;$(WP8_SDK)/include/abi;$(INCLUDE)
 LIB     := $(WP8_SDK)/lib/$(CPU_ARCH);$(LIB)
 
 export INCLUDE

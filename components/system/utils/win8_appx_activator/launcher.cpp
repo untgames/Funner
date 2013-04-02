@@ -9,6 +9,8 @@
 #include <atlbase.h>
 #include <windows.h>
 
+//#define DEBUG_LOG
+
 /*
     Константы
 */
@@ -226,7 +228,10 @@ int wmain(int argc, wchar_t* argv[])
     return 1;
   }   
 
+#ifdef DEBUG_LOG
   printf ("Socket has been opened\n");
+  fflush (stdout);
+#endif
 
   sockaddr_in serv_addr, cli_addr;
 
@@ -243,18 +248,24 @@ int wmain(int argc, wchar_t* argv[])
     return 1;
   }
 
+#ifdef DEBUG_LOG
   printf ("Bind successfull\n");
   fflush (stdout);
+#endif
 
   listen (sockfd, 5);
 
+#ifdef DEBUG_LOG
   printf ("Listen successfull\n");
   fflush (stdout);
+#endif
 
 //  result = launch (app_name.c_str ());
 
+#ifdef DEBUG_LOG
   printf ("Launch successfull\n");
   fflush (stdout);
+#endif
 
   socklen_t clilen = sizeof (cli_addr);
 
@@ -269,8 +280,10 @@ int wmain(int argc, wchar_t* argv[])
     return 1;
   }  
 
+#ifdef DEBUG_LOG
   printf ("Connection accepted\n");
   fflush (stdout);
+#endif
 
   sock_printf (newsockfd, "%s %s\n", tostring (dll_name).c_str (), tostring (cur_dir).c_str ());
 
