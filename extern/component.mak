@@ -69,6 +69,6 @@ ifeq (,$(filter has_iconv,$(PROFILES)))
   FUNNER_EXTERN_LIBS.COMPONENTS += libiconv
 endif
 
-ifneq (,$(filter wp8,$(PROFILES)))
-  FUNNER_EXTERN_LIBS.COMPONENTS := wp8compat $(FUNNER_EXTERN_LIBS.COMPONENTS)
+ifneq (,$(filter win8,$(PROFILES)))
+  FUNNER_EXTERN_LIBS.COMPONENTS := win8_compat $(FUNNER_EXTERN_LIBS.COMPONENTS)
 endif
