@@ -12,8 +12,6 @@
 #include <wrl/client.h>
 #include <ppltasks.h>
 
-#include <load_dll.h>
-
 using namespace Platform;
 using namespace Windows::Storage::Streams;
 using namespace Windows::Networking;
@@ -21,6 +19,8 @@ using namespace Windows::Networking::Sockets;
 using namespace Windows::System::Threading;
 using namespace Windows::Foundation;
 using namespace concurrency;
+
+#pragma comment (linker, "/defaultlib:ntdll.lib")
 
 /*
     Константы
@@ -33,6 +33,8 @@ const char*    ENTRY_NAME = "win8_startup"; //точка входа в тест
 /*
     Типы
 */
+
+typedef STRING ANSI_STRING, *PANSI_STRING;
 
 typedef void (*StdoutFn)(const char* buffer, size_t size, void* user_data);
 
@@ -72,31 +74,6 @@ struct LaunchInfo
 {
   DataWriter^ stdout_writer;
   Log*        log;
-};
-
-struct Dll
-{
-  LOAD_DLL_INFO info;
-
-  Dll (const char* name)
-  {
-    memset (&info, 0, sizeof (info));
-
-    DWORD result = LoadDLLFromFile ((char*)name, 0, DLL_SIZE_UNK, 0, &info);
-
-    if (result)
-      throw std::runtime_error ("::LoadDLLFromFile failed");
-  }
-  
-  ~Dll ()
-  {
-    UnloadDLL (&info, 0);
-  }
-
-  void *GetEntry (const char* name)
-  {
-    return MyGetProcAddress (&info, name);
-  }
 };
 
 struct ArgReader
@@ -201,6 +178,45 @@ std::string tostring (const wchar_t* string, int length)
   return result;
 }
 
+std::wstring towstring (const char* string, int length)
+{
+  if (!string)
+    return L"";
+
+  if (length == -1)
+    length = strlen (string);
+
+  std::wstring result;
+
+  result.resize (length);
+
+  int result_size = mbsrtowcs (&result [0], &string, length, 0);
+
+  if (result_size < 0)
+    return L"(common::towstring error)";
+
+  result.resize (result_size);
+
+  return result;
+}
+
+std::wstring towstring (const std::string& s)
+{
+  return towstring (s.c_str (), s.size ());
+}
+
+FORCEINLINE VOID pRtlInitUnicodeString(PUNICODE_STRING destString, PWSTR sourceString)
+{
+  destString->Buffer                             = sourceString;
+  destString->MaximumLength = destString->Length = wcslen(sourceString) * sizeof(WCHAR);
+};
+
+FORCEINLINE VOID pRtlInitString(PANSI_STRING destString, PSTR sourceString)
+{
+  destString->Buffer        = sourceString;
+  destString->MaximumLength = destString->Length = strlen(sourceString) * sizeof(CHAR);
+}
+
 void stdout_redirect (const char* data, size_t size, void* user_data)
 {
   LaunchInfo* info = (LaunchInfo*)user_data;
@@ -219,6 +235,14 @@ void stdout_redirect (const char* data, size_t size, void* user_data)
   task<unsigned int> store_task (info->stdout_writer->StoreAsync ());
 
   store_task.wait ();
+}
+
+extern "C"
+{
+
+NTSYSAPI NTSTATUS NTAPI LdrLoadDll (IN PWCHAR PathToFile OPTIONAL, IN ULONG Flags OPTIONAL, IN PUNICODE_STRING ModuleFileName, OUT PHANDLE ModuleHandle);
+NTSYSAPI NTSTATUS NTAPI LdrGetProcedureAddress (IN HMODULE ModuleHandle, IN PANSI_STRING FunctionName OPTIONAL, IN WORD Oridinal OPTIONAL, OUT PVOID *FunctionAddress);
+
 }
 
 [Platform::MTAThread]
@@ -259,18 +283,35 @@ int main(Platform::Array<Platform::String^>^)
 
     log.Printf ("Launching application '%s' with current dir '%s'\n", app_name.c_str (), cur_dir.c_str ());
 
-    Dll dll (app_name.c_str ());
-
-    log.Printf ("Dll has been loaded\n");
-
     typedef int (*EntryFn)(const char* cur_dir, StdoutFn stdout_handler, void* user_data);
 
-    EntryFn entry_fn = (EntryFn)dll.GetEntry (ENTRY_NAME);
-     
-    log.Printf ("Entry point '%s' has been found %p\n", ENTRY_NAME, entry_fn);
+    std::wstring app_name_wstr = towstring (app_name);
 
+    UNICODE_STRING app_name_unicode;
+
+    pRtlInitUnicodeString (&app_name_unicode, &app_name_wstr [0]);
+
+    HANDLE handle = 0;
+
+    NTSTATUS ntstatus = LdrLoadDll (0, 0, &app_name_unicode, &handle);
+
+    if (!handle)
+      throw std::runtime_error ("::LdrLoadDll failed");
+
+    log.Printf ("Dll has been loaded\n");
+     
+    HMODULE module = (HMODULE)handle;
+
+    ANSI_STRING entry_point_name;
+     
+    pRtlInitString (&entry_point_name, (PSTR)ENTRY_NAME);
+
+    EntryFn entry_fn = 0;
+     
+    ntstatus = LdrGetProcedureAddress (module, &entry_point_name, 0, (PVOID*)&entry_fn);
+     
     if (!entry_fn)
-      throw std::runtime_error ("::MyGetProcAddress failed");
+      throw std::runtime_error ("::LdrGetProcedureAddress failed");
 
     LaunchInfo launch_info;
 
