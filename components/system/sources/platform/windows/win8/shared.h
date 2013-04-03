@@ -19,17 +19,6 @@
 namespace syslib
 {
 
-/// Инициализатор WinRT
-class WinRtInitializer: public xtl::noncopyable
-{
-  public:
-    /// Конструктор
-    WinRtInitializer ();
-
-    /// Деструктор
-    ~WinRtInitializer ();
-};
-
 /// Преобазования строк
 stl::string tostring (Platform::String^ input);
 

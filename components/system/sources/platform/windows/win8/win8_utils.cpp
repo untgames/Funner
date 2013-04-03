@@ -2,56 +2,8 @@
 
 using namespace Platform;
 
-namespace
-{
-
-__declspec (thread) int winrt_initializer_counter = 0;
-
-}
-
 namespace syslib
 {
-
-/*
-    Инициализатор WinRT
-*/
-
-/// Конструктор
-WinRtInitializer::WinRtInitializer ()
-{
-  try
-  {
-    if (!winrt_initializer_counter)
-    {
-      static const int WINRT_INIT_MULTITHREADED = 0x1;
-
-      HRESULT result = Windows::Foundation::Initialize ((RO_INIT_TYPE)WINRT_INIT_MULTITHREADED);
-
-      if (result != S_OK)
-        raise_com_error ("Windows::Foundation::Initialize", result);
-
-      printf ("%p\n", setlocale (LC_ALL, "Russian"));
-
-//      Windows::Globalization::ApplicationLanguages::PrimaryLanguageOverride = "en";
-    }
-
-    winrt_initializer_counter++;
-  }
-  catch (xtl::exception& e)
-  {
-    e.touch ("syslib::windows::WinRtInitializer::WinRtInitializer");
-    throw;
-  }
-}
-
-/// Деструктор
-WinRtInitializer::~WinRtInitializer ()
-{
-  --winrt_initializer_counter;
-
-  if (!winrt_initializer_counter)
-    Windows::Foundation::Uninitialize ();
-}
 
 /*
     Утилиты

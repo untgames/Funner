@@ -18,7 +18,7 @@ for (;;);
 };
 
 /// Делегат приложения
-class Win8ApplicationDelegate: public IApplicationDelegate, public xtl::reference_counter, private WinRtInitializer
+class Win8ApplicationDelegate: public IApplicationDelegate, public xtl::reference_counter
 {
   public:
 ///Конструктор
@@ -36,16 +36,14 @@ class Win8ApplicationDelegate: public IApplicationDelegate, public xtl::referenc
       {
         if (listener)
           listener->OnInitialize ();
-printf ("%s(%u)\n", __FUNCTION__, __LINE__); fflush (stdout);
+
 	auto source = ref new ApplicationSource;
-printf ("%s(%u)\n", __FUNCTION__, __LINE__); fflush (stdout);
+
 	Windows::ApplicationModel::Core::CoreApplication::Run (source);
-printf ("%s(%u)\n", __FUNCTION__, __LINE__); fflush (stdout);
       }
       catch (Platform::Exception^ e)
       {
-printf ("%s(%u)\n", __FUNCTION__, __LINE__); fflush (stdout);
-printf ("%s /// %04x /// %s\n", tostring (e->Message).c_str (), e->HResult, _com_error (e->HResult).ErrorMessage ());
+        throw xtl::format_operation_exception ("syslib::Win8ApplicationDelegate::Run", "Platform exception %s. %s", tostring (e->Message).c_str (), _com_error (e->HResult).ErrorMessage ());
       }
       catch (xtl::exception& e)
       {
