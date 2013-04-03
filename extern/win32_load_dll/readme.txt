@@ -1,0 +1,1 @@
+C++ exceptions are not working with this library due to OS internal implementation of throw/catch
