@@ -1,5 +1,7 @@
 #include <stdio.h>
 
+#include <exception>
+
 #define CUSTOM_LOADING
 
 #ifdef CUSTOM_LOADING
@@ -41,7 +43,18 @@ int main ()
 
   fflush (stdout);
 
-  fn ();
+  try
+  {
+    fn ();
+  }
+  catch (std::exception& e)
+  {
+    printf ("exception was thrown: %s\n", e.what ());
+  }
+  catch (...)
+  {
+    printf ("unknown exception was thrown\n");
+  }
 
   UnloadDLL (&info, 0);
 #else
@@ -64,7 +77,18 @@ int main ()
     return 1;
   }
 
-  fn ();
+  try
+  {
+    fn ();
+  }
+  catch (std::exception& e)
+  {
+    printf ("exception was thrown: %s\n", e.what ());
+  }
+  catch (...)
+  {
+    printf ("unknown exception was thrown\n");
+  }
 
 #endif
 
