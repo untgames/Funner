@@ -8,9 +8,11 @@ TARGETS.win32 := PLARIUM.CLAUNCHER.SOURCES
 PLARIUM.LAUNCHER.SOURCES.NAME               := plarium-launcher
 ifneq (,$(filter iphone,$(PROFILES)))
 PLARIUM.LAUNCHER.SOURCES.TYPE               := static-lib
+PLARIUM.LAUNCHER.SOURCES.EXCLUDE_IMPORTS    := link.common.auto_license_generator                                             
 endif
 ifneq (,$(filter android,$(PROFILES)))
 PLARIUM.LAUNCHER.SOURCES.TYPE               := dynamic-lib
+PLARIUM.LAUNCHER.SOURCES.EXCLUDE_IMPORTS    := link.common.auto_license_generator                                             
 endif
 ifneq (,$(filter win32,$(PROFILES)))
 PLARIUM.LAUNCHER.SOURCES.TYPE               := application

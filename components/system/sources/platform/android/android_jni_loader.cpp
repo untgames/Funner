@@ -6,6 +6,7 @@ namespace
 {
 
 /// Константы
+const char* COMPONENTS_MASK                               = "common.syslib.android.load_handlers.*";                  //маска имён компонентов обработчиков загрузки
 const char* ENGINE_ACTIVITY_CLASS_NAME                    = "com/untgames/funner/application/EngineActivity";
 const char* ENGINE_ACTIVITY_START_APPLICATION_METHOD_NAME = "startApplication";
 
@@ -59,6 +60,96 @@ jint JNICALL startApplication (JNIEnv* env, jobject thiz, jstring jprogram_name,
   }
 }
 
+///Менеджер приложения
+class ApplicationManagerImpl
+{
+  public:
+    ///Регистрация обработчиков загрузки приложения
+    void RegisterLoadHandler (const char* id, const ApplicationManager::LoadHandler& handler)
+    {
+      static const char* METHOD_NAME = "syslib::android::ApplicationManager::RegisterLoadHandler";
+
+      if (!id)
+        throw xtl::make_null_argument_exception (METHOD_NAME, "id");
+
+      LoadHandlersMap::iterator iter = load_handlers.find (id);
+
+      if (iter != load_handlers.end ())
+        throw xtl::format_operation_exception (METHOD_NAME, "Load handler with id '%s' already registered", id);
+
+      load_handlers.insert_pair (id, handler);
+    }
+
+    void UnregisterLoadHandler (const char* id)
+    {
+      if (!id)
+        throw xtl::make_null_argument_exception ("syslib::android::ApplicationManager::UnregisterLoadHandler", "id");
+
+      load_handlers.erase (id);
+    }
+
+    void UnregisterAllLoadHandlers ()
+    {
+      load_handlers.clear ();
+    }
+
+    ///Проверка зарегистрирован ли обработчки загрузки
+    bool IsLoadHandlerRegistered (const char* id)
+    {
+      if (!id)
+        throw xtl::make_null_argument_exception ("syslib::android::ApplicationManager::IsLoadHandlerRegistered", "id");
+
+      return load_handlers.find (id) != load_handlers.end ();
+    }
+
+    ///Оповещение о загрузке приложения
+    void OnLoad (JNIEnv* env)
+    {
+      for (LoadHandlersMap::iterator iter = load_handlers.begin (), end = load_handlers.end (); iter != end; ++iter)
+        iter->second (env);
+    }
+
+  private:
+    typedef stl::hash_map<stl::hash_key<const char*>, ApplicationManager::LoadHandler> LoadHandlersMap;
+
+  private:
+    LoadHandlersMap load_handlers;
+};
+
+typedef common::Singleton<ApplicationManagerImpl> ApplicationManagerSingleton;
+
+}
+
+/*
+   Менеджер приложения
+*/
+
+/*
+   Регистрация обработчиков загрузки приложения
+*/
+
+void ApplicationManager::RegisterLoadHandler (const char* id, const LoadHandler& handler)
+{
+  ApplicationManagerSingleton::Instance ()->RegisterLoadHandler (id, handler);
+}
+
+void ApplicationManager::UnregisterLoadHandler (const char* id)
+{
+  ApplicationManagerSingleton::Instance ()->UnregisterLoadHandler (id);
+}
+
+void ApplicationManager::UnregisterAllLoadHandlers ()
+{
+  ApplicationManagerSingleton::Instance ()->UnregisterAllLoadHandlers ();
+}
+
+/*
+   Проверка зарегистрирован ли обработчки загрузки
+*/
+
+bool ApplicationManager::IsLoadHandlerRegistered (const char* id)
+{
+  return ApplicationManagerSingleton::Instance ()->IsLoadHandlerRegistered (id);
 }
 
 extern "C"
@@ -116,10 +207,14 @@ __attribute__ ((visibility("default"))) extern JNIEXPORT jint JNICALL JNI_OnLoad
   {
     register_activity_callbacks (env, skeletonActivityClass);
     register_window_callbacks (env);
-    register_web_view_callbacks (env);    
+    register_web_view_callbacks (env);
     register_sensor_manager_callbacks (env);
     register_screen_callbacks (env, skeletonActivityClass);
     register_gcm_callbacks (env);
+
+    static common::ComponentLoader loader (COMPONENTS_MASK);
+
+    ApplicationManagerSingleton::Instance ()->OnLoad (env);
   }
   catch (std::exception& e)
   {

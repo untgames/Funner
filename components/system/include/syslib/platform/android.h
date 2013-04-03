@@ -1,0 +1,182 @@
+#ifndef SYSLIB_PLATFORM_ANDROID_HEADER
+#define SYSLIB_PLATFORM_ANDROID_HEADER
+
+#include <cstdarg>
+
+#include <jni.h>
+
+#include <stl/string>
+
+#include <xtl/intrusive_ptr.h>
+#include <xtl/type_traits>
+
+namespace syslib
+{
+
+namespace android
+{
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Получение виртуальной машины
+///////////////////////////////////////////////////////////////////////////////////////////////////
+JavaVM* get_vm ();
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Получение окружения текущей нити
+///////////////////////////////////////////////////////////////////////////////////////////////////
+JNIEnv& get_env ();
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Получение текущего activity
+///////////////////////////////////////////////////////////////////////////////////////////////////
+jobject get_activity ();
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///JNI ссылки
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Стратегия владения локальной JNI ссылкой
+///////////////////////////////////////////////////////////////////////////////////////////////////
+template <class T> struct jni_local_ref_strategy
+{
+  static T*   clone   (T* ptr) { return (T*)get_env ().NewLocalRef (ptr); }
+  static void release (T* ptr) { get_env ().DeleteLocalRef (ptr); }
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Стратегия владения глобальной JNI ссылкой
+///////////////////////////////////////////////////////////////////////////////////////////////////
+template <class T> struct jni_global_ref_strategy
+{
+  static T*   clone   (T* ptr) { return (T*)get_env ().NewGlobalRef (ptr); }
+  static void release (T* ptr) { get_env ().DeleteGlobalRef (ptr); }
+};
+
+template <class T> class global_ref;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Локальная JNI ссылка
+///////////////////////////////////////////////////////////////////////////////////////////////////
+template <class T> class local_ref: public xtl::intrusive_ptr<typename xtl::type_traits::remove_pointer<T>::type, jni_local_ref_strategy>
+{
+  typedef xtl::intrusive_ptr<typename xtl::type_traits::remove_pointer<T>::type, jni_local_ref_strategy> base;
+  public:
+    typedef typename base::element_type element_type;
+
+    local_ref () {}
+    local_ref (element_type* ptr, bool addref = true) : base (ptr, addref) {}
+    local_ref (const local_ref& ref) : base (ref) {}
+
+    template <class T1> local_ref (const local_ref<T1>& ref) : base (ref) {}
+    template <class T1> local_ref (const global_ref<T1>& ref) : base (&*ref) {}
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Глобальная JNI ссылка
+///////////////////////////////////////////////////////////////////////////////////////////////////
+template <class T> class global_ref: public xtl::intrusive_ptr<typename xtl::type_traits::remove_pointer<T>::type, jni_global_ref_strategy>
+{
+  typedef xtl::intrusive_ptr<typename xtl::type_traits::remove_pointer<T>::type, jni_global_ref_strategy> base;
+  public:
+    typedef typename base::element_type element_type;
+
+    global_ref () {}
+    global_ref (element_type* ptr, bool addref = true) : base (ptr, addref) {}
+    global_ref (const global_ref& ref) : base (ref) {}
+
+    template <class T1> global_ref (const global_ref<T1>& ref) : base (ref) {}
+    template <class T1> global_ref (const local_ref<T1>& ref) : base (&*ref) {}
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Поиск методов и полей
+///////////////////////////////////////////////////////////////////////////////////////////////////
+jmethodID find_static_method (JNIEnv* env, jclass class_, const char* name, const char* signature);
+jmethodID find_method (JNIEnv* env, jclass class_, const char* name, const char* signature);
+jfieldID find_field (JNIEnv* env, jclass class_, const char* name, const char* type);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Обёртка для работы со строками
+///////////////////////////////////////////////////////////////////////////////////////////////////
+class jni_string
+{
+  public:
+    jni_string (JNIEnv* inEnv, jstring inJavaString)
+      : env (inEnv)
+      , javaString (inJavaString)
+      , string (0)
+    {
+      string = env->GetStringUTFChars (javaString, 0);
+    }
+
+    ~jni_string ()
+    {
+      if (!string || !env || !javaString)
+        return;
+
+      env->ReleaseStringUTFChars (javaString, string);
+    }
+
+    const char* get () const { return string; }
+
+  private:
+    jni_string (const jni_string&);             //no impl
+    jni_string& operator = (const jni_string&); //no impl
+
+  private:
+    JNIEnv*     env;
+    jstring     javaString;
+    const char* string;
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Утилиты
+///////////////////////////////////////////////////////////////////////////////////////////////////
+local_ref<jstring> tojstring    (const char* s);
+inline stl::string tostring     (jstring s) { return jni_string (&get_env (), s).get (); }
+void               check_errors ();
+
+template <class T> T check_errors (T result)
+{
+  check_errors ();
+
+  return result;
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Отладочное протоколирование
+///////////////////////////////////////////////////////////////////////////////////////////////////
+int log_printf  (int level, const char* format, ...);
+int log_vprintf (int level, const char* format, va_list args);
+int log_info    (const char* format, ...);
+int log_error   (const char* format, ...);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Менеджер приложения
+///////////////////////////////////////////////////////////////////////////////////////////////////
+class ApplicationManager
+{
+  public:
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Регистрация обработчиков загрузки приложения
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    typedef xtl::function<void (JNIEnv* env)> LoadHandler;
+
+    static void RegisterLoadHandler       (const char* id, const LoadHandler& handler);
+    static void UnregisterLoadHandler     (const char* id);
+    static void UnregisterAllLoadHandlers ();
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Проверка зарегистрирован ли обработчки загрузки
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    static bool IsLoadHandlerRegistered (const char* id);
+};
+
+#include <syslib/platform/detail/android.inl>
+
+}
+
+}
+
+#endif
