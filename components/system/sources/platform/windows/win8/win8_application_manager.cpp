@@ -1,9 +1,63 @@
 #include "shared.h"
 
+using namespace Windows::UI::Core;
+using namespace Windows::ApplicationModel::Core;
+using namespace Windows::ApplicationModel::Activation;
+using namespace Windows::Foundation;
+
 using namespace syslib;
 
 namespace
 {
+
+ref class ApplicationView;
+
+ApplicationView^ app_view;
+
+/// Основное окно приложения
+ref class ApplicationView sealed: Windows::ApplicationModel::Core::IFrameworkView, public IApplicationContext
+{
+  public:
+    // This method is called on application launch.
+    virtual void Initialize (CoreApplicationView^ view)
+    {
+      view->Activated += ref new TypedEventHandler<CoreApplicationView^, IActivatedEventArgs^> (this, &ApplicationView::OnActivated);
+    }
+
+    // This method is called after Initialize.
+    virtual void SetWindow (CoreWindow^ window)
+    {
+      main_window = window;
+    }
+
+    virtual void Load (Platform::String^ entryPoint)
+    {
+    }
+
+    virtual void Run()
+    {
+    }
+
+    // This method is called before the application exits.
+    virtual void Uninitialize ()
+    {
+    }
+
+    /// Main window
+    virtual Windows::UI::Core::CoreWindow^ MainWindow ()
+    {
+      return main_window.Get ();
+    }
+
+  private:
+    void OnActivated (CoreApplicationView^ applicationView, IActivatedEventArgs^ args)
+    {
+      CoreWindow::GetForCurrentThread ()->Activate ();
+    }
+
+  private:
+    Platform::Agile<CoreWindow> main_window;
+};
 
 /// Фабрика создания основного окна приложения
 ref class ApplicationSource sealed: Windows::ApplicationModel::Core::IFrameworkViewSource
@@ -11,9 +65,7 @@ ref class ApplicationSource sealed: Windows::ApplicationModel::Core::IFrameworkV
   public:
     virtual Windows::ApplicationModel::Core::IFrameworkView^ CreateView ()
     {
-printf ("%s(%u)\n", __FUNCTION__, __LINE__); fflush (stdout);
-for (;;);
-      return nullptr;
+      return ref new ApplicationView;
     }
 };
 
@@ -93,6 +145,22 @@ class Win8ApplicationDelegate: public IApplicationDelegate, public xtl::referenc
     bool                  is_exited;
     IApplicationListener* listener;
 };
+
+}
+
+namespace syslib
+{
+
+namespace android
+{
+
+/// Получение контекста приложения
+IApplicationContext^ get_context ()
+{
+  return app_view;
+}
+
+}
 
 }
 

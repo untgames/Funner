@@ -92,7 +92,7 @@ endef
 #—борка библиотеки (им€ выходного файла, список файлов)
 ###################################################################################################
 define tools.lib.generic
-export PATH="$(MSVS_COMMON_PATH);$$PATH" && "$(MSVC_BIN_PATH)/lib" -nologo -out:$1 $2
+export PATH="$(MSVS_COMMON_PATH);$$PATH" && "$(MSVC_BIN_PATH)/lib" -ignore:4264 -nologo -out:$1 $2
 endef
 
 define tools.lib

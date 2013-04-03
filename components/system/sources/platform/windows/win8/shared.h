@@ -2,6 +2,7 @@
 
 #include <wrl/client.h>
 #include <ppltasks.h>
+#include <agile.h>
 
 #include <io.h>
 #include <fcntl.h>
@@ -19,7 +20,17 @@
 namespace syslib
 {
 
-/// Преобазования строк
+/// Контекст приложения
+interface class IApplicationContext
+{
+  /// Получение главного окна
+  Windows::UI::Core::CoreWindow^ MainWindow ();
+};
+
+/// Получение контекста приложения
+IApplicationContext^ get_context ();
+
+/// Преобразования строк
 stl::string tostring (Platform::String^ input);
 
 /// Выброс исключения с сообщением HRESULT
