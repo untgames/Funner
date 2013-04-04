@@ -18,7 +18,7 @@ struct Store::Impl : public xtl::reference_counter
   TransactionsMap      updated_transactions;          //транзакции, обновленные за время работы приложения
   xtl::auto_connection transaction_update_connection; //соединение оповещения о обновлениях транзакций
 
-  Impl (const char* store_name)
+  Impl (const char* store_name, const OnInitializedCallback& callback)
     : store (0)
   {
     try
@@ -29,6 +29,8 @@ struct Store::Impl : public xtl::reference_counter
       store = StoreManagerSingleton::Instance ()->CreateStore (store_name);
 
       transaction_update_connection = store->RegisterTransactionUpdateHandler (xtl::bind (&Store::Impl::OnTransactionUpdated, this, _1));
+
+      store->Initialize (callback);
     }
     catch (xtl::exception& e)
     {
@@ -83,7 +85,7 @@ struct Store::Impl : public xtl::reference_counter
     }
   }
 
-  Transaction BuyProduct (const char* product_id, size_t count) const
+  Transaction BuyProduct (const char* product_id, size_t count, const common::PropertyMap& properties) const
   {
     static const char* METHOD_NAME = "store::Store::BuyProduct";
 
@@ -93,12 +95,12 @@ struct Store::Impl : public xtl::reference_counter
     if (!count)
       throw xtl::make_null_argument_exception (METHOD_NAME, "count");
 
-    return store->BuyProduct (product_id, count);
+    return store->BuyProduct (product_id, count, properties);
   }
 
-  Transaction BuyProduct (const char* product_id, size_t count, const PurchaseCallback& callback)
+  Transaction BuyProduct (const char* product_id, size_t count, const PurchaseCallback& callback, const common::PropertyMap& properties)
   {
-    Transaction return_value = BuyProduct (product_id, count);
+    Transaction return_value = BuyProduct (product_id, count, properties);
 
     buy_product_callbacks.insert_pair (return_value.Id (), callback);
 
@@ -115,8 +117,8 @@ struct Store::Impl : public xtl::reference_counter
    Конструктор / деструктор / копирование
 */
 
-Store::Store (const char* store_name)
-  : impl (new Impl (store_name))
+Store::Store (const char* store_name, const OnInitializedCallback& callback)
+  : impl (new Impl (store_name, callback))
   {}
 
 Store::Store (const Store& source)
@@ -177,14 +179,14 @@ xtl::connection Store::RegisterTransactionUpdateHandler (const PurchaseCallback&
   return impl->RegisterTransactionUpdateHandler (callback);
 }
 
-Transaction Store::BuyProduct (const char* product_id, size_t count, const PurchaseCallback& callback) const
+Transaction Store::BuyProduct (const char* product_id, size_t count, const PurchaseCallback& callback, const common::PropertyMap& properties) const
 {
-  return impl->BuyProduct (product_id, count, callback);
+  return impl->BuyProduct (product_id, count, callback, properties);
 }
 
-Transaction Store::BuyProduct (const char* product_id, size_t count) const
+Transaction Store::BuyProduct (const char* product_id, size_t count, const common::PropertyMap& properties) const
 {
-  return impl->BuyProduct (product_id, count);
+  return impl->BuyProduct (product_id, count, properties);
 }
 
 void Store::RestorePurchases () const

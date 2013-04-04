@@ -26,6 +26,11 @@ class AndroidStore
     {
     }
 
+///Инициализация
+    void Initialize (const Store::OnInitializedCallback& callback)
+    {
+    }
+
 ///Можно ли осуществлять покупки
     bool CanBuyProducts ()
     {
@@ -77,7 +82,7 @@ class AndroidStore
       }
     }
 
-    Transaction BuyProduct (const char* product_id, size_t count)
+    Transaction BuyProduct (const char* product_id, size_t count, const common::PropertyMap& properties)
     {
       try
       {
@@ -123,6 +128,15 @@ StoreImpl::~StoreImpl ()
 }
 
 /*
+   Инициализация
+*/
+
+void StoreImpl::Initialize (const Store::OnInitializedCallback& callback)
+{
+  StoreSingleton::Instance ()->Initialize (callback);
+}
+
+/*
    Описание магазина
 */
 
@@ -164,7 +178,7 @@ void StoreImpl::RestorePurchases ()
   StoreSingleton::Instance ()->RestorePurchases ();
 }
 
-Transaction StoreImpl::BuyProduct (const char* product_id, size_t count)
+Transaction StoreImpl::BuyProduct (const char* product_id, size_t count, const common::PropertyMap& properties)
 {
-  return StoreSingleton::Instance ()->BuyProduct (product_id, count);
+  return StoreSingleton::Instance ()->BuyProduct (product_id, count, properties);
 }

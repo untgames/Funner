@@ -74,27 +74,30 @@ void bind_transaction_library (Environment& environment)
   environment.RegisterType<Transaction> (TRANSACTION_LIBRARY);
 }
 
-Store create_store (const char* name)
+Store create_store (const char* name, const Store::OnInitializedCallback& callback)
 {
-  return Store (name);
+  return Store (name, callback);
 }
 
 void bind_store_library (Environment& environment)
 {
   InvokerRegistry lib = environment.Library (STORE_LIBRARY);
 
-  lib.Register ("Create", make_invoker (&create_store));
+  lib.Register ("CreateOnInitializedCallback", make_callback_invoker<Store::OnInitializedCallback::signature_type> ());
+  lib.Register ("Create",                      make_invoker (&create_store));
 
   lib.Register ("get_Description",    make_invoker (&Store::Description));
   lib.Register ("get_CanBuyProducts", make_invoker (&Store::CanBuyProducts));
 
-  lib.Register ("CreateLoadProductsCallback",       make_callback_invoker<store::Store::LoadProductsCallback::signature_type> ());
+  lib.Register ("CreateLoadProductsCallback",       make_callback_invoker<Store::LoadProductsCallback::signature_type> ());
   lib.Register ("LoadProducts",                     make_invoker (&Store::LoadProducts));
-  lib.Register ("CreatePurchaseCallback",           make_callback_invoker<store::Store::PurchaseCallback::signature_type> ());
+  lib.Register ("CreatePurchaseCallback",           make_callback_invoker<Store::PurchaseCallback::signature_type> ());
   lib.Register ("RegisterTransactionUpdateHandler", make_invoker (&Store::RegisterTransactionUpdateHandler));
   lib.Register ("BuyProduct",         make_invoker (
-      make_invoker (xtl::implicit_cast<Transaction (Store::*)(const char*, size_t, const Store::PurchaseCallback&) const> (&Store::BuyProduct)),
-      make_invoker (xtl::implicit_cast<Transaction (Store::*)(const char*, size_t) const> (&Store::BuyProduct))
+      make_invoker (xtl::implicit_cast<Transaction (Store::*)(const char*, size_t, const Store::PurchaseCallback&, const common::PropertyMap&) const> (&Store::BuyProduct)),
+      make_invoker<Transaction (Store&, const char*, size_t, const Store::PurchaseCallback&)> (xtl::bind (xtl::implicit_cast<Transaction (Store::*)(const char*, size_t, const Store::PurchaseCallback&, const common::PropertyMap&) const> (&Store::BuyProduct), _1, _2, _3, _4, common::PropertyMap ())),
+      make_invoker (xtl::implicit_cast<Transaction (Store::*)(const char*, size_t, const common::PropertyMap&) const> (&Store::BuyProduct)),
+      make_invoker<Transaction (Store&, const char*, size_t)> (xtl::bind (xtl::implicit_cast<Transaction (Store::*)(const char*, size_t, const common::PropertyMap&) const> (&Store::BuyProduct), _1, _2, _3, common::PropertyMap ()))
   ));
   lib.Register ("RestorePurchases",                 make_invoker (&Store::RestorePurchases));
 

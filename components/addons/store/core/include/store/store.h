@@ -4,6 +4,14 @@
 #include <store/product.h>
 #include <store/transaction.h>
 
+namespace common
+{
+
+//forward declaration
+class PropertyMap;
+
+}
+
 namespace store
 {
 
@@ -16,7 +24,9 @@ class Store
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструктор / деструктор / копирование
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    Store  (const char* store_name);
+    typedef xtl::function<void ()> OnInitializedCallback;
+
+    Store  (const char* store_name, const OnInitializedCallback& callback = OnInitializedCallback ());
     Store  (const Store& source);
     ~Store ();
 
@@ -46,8 +56,8 @@ class Store
     typedef xtl::function<void (const Transaction&)> PurchaseCallback;
     
     xtl::connection RegisterTransactionUpdateHandler (const PurchaseCallback&);
-    Transaction     BuyProduct                       (const char* product_id, size_t count, const PurchaseCallback& callback) const;
-    Transaction     BuyProduct                       (const char* product_id, size_t count) const;
+    Transaction     BuyProduct                       (const char* product_id, size_t count, const PurchaseCallback& callback, const common::PropertyMap& properties = common::PropertyMap ()) const;
+    Transaction     BuyProduct                       (const char* product_id, size_t count, const common::PropertyMap& properties = common::PropertyMap ()) const;
     void            RestorePurchases                 () const;    
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -77,6 +87,11 @@ class IStore
     virtual ~IStore () {}
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+///Инициализация
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    virtual void Initialize (const Store::OnInitializedCallback& callback) = 0;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Описание магазина
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     virtual const char* Description () = 0;
@@ -97,7 +112,7 @@ class IStore
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     virtual xtl::connection RegisterTransactionUpdateHandler (const Store::PurchaseCallback&) = 0;
     virtual void            RestorePurchases                 () = 0;
-    virtual Transaction     BuyProduct                       (const char* product_id, size_t count) = 0;
+    virtual Transaction     BuyProduct                       (const char* product_id, size_t count, const common::PropertyMap& properties) = 0;
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

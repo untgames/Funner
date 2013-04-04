@@ -9,6 +9,7 @@
 
 #include <common/component.h>
 #include <common/log.h>
+#include <common/property_map.h>
 #include <common/singleton.h>
 #include <common/strlib.h>
 
@@ -35,6 +36,11 @@ class StoreImpl : public IStore
     ~StoreImpl ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+///Инициализация
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void Initialize (const Store::OnInitializedCallback& callback);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Описание магазина
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     const char* Description ();
@@ -55,7 +61,7 @@ class StoreImpl : public IStore
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     xtl::connection RegisterTransactionUpdateHandler (const Store::PurchaseCallback&);
     void            RestorePurchases                 ();
-    Transaction     BuyProduct                       (const char* product_id, size_t count);
+    Transaction     BuyProduct                       (const char* product_id, size_t count, const common::PropertyMap& properties);
 };
 
 }

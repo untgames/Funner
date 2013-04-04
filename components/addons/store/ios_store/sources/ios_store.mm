@@ -619,6 +619,15 @@ StoreImpl::~StoreImpl ()
 }
 
 /*
+   Инициализация
+*/
+
+void StoreImpl::Initialize (const Store::OnInitializedCallback& callback)
+{
+  callback ();
+}
+
+/*
    Описание магазина
 */
 
@@ -660,7 +669,7 @@ void StoreImpl::RestorePurchases ()
   StoreSingleton::Instance ()->RestorePurchases ();
 }
 
-Transaction StoreImpl::BuyProduct (const char* product_id, size_t count)
+Transaction StoreImpl::BuyProduct (const char* product_id, size_t count, const common::PropertyMap& properties)
 {
   return StoreSingleton::Instance ()->BuyProduct (product_id, count);
 }
