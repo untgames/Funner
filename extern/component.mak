@@ -44,7 +44,7 @@ ifneq (,$(filter linux,$(PROFILES)))
 endif
 
 ifneq (,$(filter android,$(PROFILES)))
-  FUNNER_EXTERN_LIBS.COMPONENTS += openalsdk
+  FUNNER_EXTERN_LIBS.COMPONENTS += openalsdk google_play_billing
 endif
 
 ifneq (,$(filter android-arm,$(PROFILES)))

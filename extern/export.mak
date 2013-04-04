@@ -21,7 +21,7 @@ ifneq (,$(filter android-arm,$(PROFILES)))
 endif
 
 ifneq (,$(filter android,$(PROFILES)))
-  COMPONENT_DIRS += gcm
+  COMPONENT_DIRS += gcm google_play_billing
 endif
 
 ifeq (,$(filter android,$(PROFILES)))
