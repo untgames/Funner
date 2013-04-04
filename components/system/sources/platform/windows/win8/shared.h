@@ -20,6 +20,9 @@
 namespace syslib
 {
 
+namespace win8
+{
+
 /// Контекст приложения
 interface class IApplicationContext
 {
@@ -35,5 +38,7 @@ stl::string tostring (Platform::String^ input);
 
 /// Выброс исключения с сообщением HRESULT
 void raise_com_error (const char* method, HRESULT error);
+
+}
 
 }

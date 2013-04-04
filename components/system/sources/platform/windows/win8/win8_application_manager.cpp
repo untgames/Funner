@@ -6,6 +6,7 @@ using namespace Windows::ApplicationModel::Activation;
 using namespace Windows::Foundation;
 
 using namespace syslib;
+using namespace syslib::win8;
 
 namespace
 {
@@ -240,7 +241,7 @@ class Win8ApplicationDelegate: public IApplicationDelegate, public xtl::referenc
 namespace syslib
 {
 
-namespace android
+namespace win8
 {
 
 /// Получение контекста приложения

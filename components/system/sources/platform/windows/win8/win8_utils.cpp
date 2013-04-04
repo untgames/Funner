@@ -5,6 +5,9 @@ using namespace Platform;
 namespace syslib
 {
 
+namespace win8
+{
+
 /*
     Утилиты
 */
@@ -30,6 +33,8 @@ stl::string tostring (String^ input)
 void raise_com_error (const char* method, HRESULT error)
 {
   throw xtl::format_operation_exception (method, _com_error (error).ErrorMessage ());
+}
+
 }
 
 }
