@@ -49,6 +49,7 @@ LIB_GCC                    := $(GCC_TOOLS_DIR)/$(ANDROID_TOOLS_PREFIX)-ar
 ADDR2LINE                  := $(GCC_TOOLS_DIR)/$(ANDROID_TOOLS_PREFIX)-addr2line
 ANDROID_TOOLS_DIR          := $(SDK_ROOT)/tools
 ADB                        := $(ANDROID_PLATFORM_TOOLS_DIR)/adb
+AIDL                       := $(ANDROID_PLATFORM_TOOLS_DIR)/aidl
 APK_BUILDER                := $(ANDROID_SDK)/tools/apkbuilder
 DX_TOOL                    := $(ANDROID_PLATFORM_TOOLS_DIR)/dx
 JAVA_JAR                   := "$(JAVA_ROOT)/bin/jar"
@@ -89,6 +90,7 @@ endif
 ANDROID_EXE_LINK_FLAGS     += -z $(PLATFORM_DIR)/arch-$(ANDROID_ARCH)/usr/lib/crtbegin_dynamic.o
 ANDROID_SO_LINK_FLAGS       = -Wl,-soname,$(notdir $1) -shared -Wl,--no-undefined -Wl,-z,noexecstack
 VALID_TARGET_TYPES         += android-pak android-jar
+ANDROID_AIDL               := $(ANDROID_SDK)/platforms/$(ANDROID_SDK_PLATFORM)/framework.aidl
 ANDROID_KEY_STORE          := $(BUILD_DIR)platforms/android/my-release-key.keystore
 ANDROID_KEY_PASS           := android
 ANDROID_JAR                := $(ANDROID_SDK)/platforms/$(ANDROID_SDK_PLATFORM)/android.jar
@@ -216,8 +218,16 @@ define process_android_java_source_dir
 
     $1.SOURCE_FILES := $$($1.SOURCE_FILES) $$(wildcard $$(SOURCE_FILES:%=$2/%))
   else
-    $1.SOURCE_FILES := $$($1.SOURCE_FILES) $$(wildcard $2/*.java)
+    $1.SOURCE_FILES := $$($1.SOURCE_FILES) $$(wildcard $2/*.java) $$(wildcard $2/*.aidl)
   endif
+endef
+
+#Генерация java файлов из aidl (source_file, out_file)
+define aidl_gen
+  $2: $1
+		@echo Generating $$(notdir $1)...
+		@test -d "$$(dir $$@)" || mkdir -p "$$(dir $$@)"
+		@$(AIDL) -p$(ANDROID_AIDL) $$< $$@
 endef
 
 #Обработка цели android-apk (имя цели)
@@ -229,6 +239,9 @@ define process_target.android-pak
   $1.PACKAGE_NAME      := $$(if $$($1.PACKAGE_NAME),$$($1.PACKAGE_NAME),$(DEFAULT_PACKAGE_PREFIX)$$($1.NAME))
   $1.TARGET            := $(DIST_LIB_DIR)/$$($1.NAME).apk
   $1.TMP_DIR           := $(ROOT)/$(TMP_DIR_SHORT_NAME)/$(CURRENT_TOOLSET)/$1
+  $1.AIDL_GEN_DIR      := $(COMPONENT_DIR)$$($1.AIDL_GEN_DIR)
+  $1.AIDL_FILES        := $$(filter %.aidl,$$($1.SOURCE_FILES))
+  $1.AIDL_JAVA_FILES   := $$(foreach aidl,$$($1.AIDL_FILES),$$($1.AIDL_GEN_DIR)/$$(basename $$(notdir $$(aidl))).java)
   $1.UNSIGNED_TARGET   := $$($1.TMP_DIR)/$$($1.NAME).unsigned.apk
   $1.SIGNED_TARGET     := $$($1.TMP_DIR)/$$($1.NAME).signed.apk
   $1.PACKAGED_RES_FILE := $$($1.TMP_DIR)/resource.pak
@@ -248,8 +261,11 @@ define process_target.android-pak
   $1.ABI_DIR           := $$($1.TMP_DIR)/bin/lib/$(ANDROID_ABI)
   $1.TARGET_DLLS       := $$($1.DLLS:%=$$($1.ABI_DIR)/%)
   $1.INSTALLATION_FLAG := $$($1.TMP_DIR)/installation-flag
+  $1.SOURCE_FILES      := $$(filter-out %.aidl,$$($1.SOURCE_FILES)) $$($1.AIDL_JAVA_FILES)
   TMP_DIRS             := $$(TMP_DIRS) $$($1.TMP_DIR) $$($1.CLASSES_DIR) $$($1.R_DIR) $$($1.ABI_DIR)
   
+  $$(foreach aidl,$$($1.AIDL_FILES),$$(eval $$(call aidl_gen,$$(aidl),$$($1.AIDL_GEN_DIR)/$$(basename $$(notdir $$(aidl))).java)))
+
   $$(foreach file,$$($1.TARGET_DLLS),$$(eval $$(call create_extern_file_dependency,$$(file),$$($1.DLL_DIRS))))    
   
 ifeq (,$$(wildcard $$($1.MANIFEST_FILE)))
@@ -340,6 +356,9 @@ define process_target.android-jar
   $1.PACKAGE_NAME      := $$(if $$($1.PACKAGE_NAME),$$($1.PACKAGE_NAME),$(DEFAULT_PACKAGE_PREFIX)$$($1.NAME))
   $1.TARGET            := $(DIST_LIB_DIR)/$$($1.NAME).jar
   $1.TMP_DIR           := $(ROOT)/$(TMP_DIR_SHORT_NAME)/$(CURRENT_TOOLSET)/$1
+  $1.AIDL_GEN_DIR      := $(COMPONENT_DIR)$$($1.AIDL_GEN_DIR)
+  $1.AIDL_FILES        := $$(filter %.aidl,$$($1.SOURCE_FILES))
+  $1.AIDL_JAVA_FILES   := $$(foreach aidl,$$($1.AIDL_FILES),$$($1.AIDL_GEN_DIR)/$$(basename $$(notdir $$(aidl))).java)
   $1.JARS              := $$($1.JARS:%=%.jar)
   $1.JAR_DIRS          := $$(call specialize_paths,$$($1.JAR_DIRS)) $(DIST_LIB_DIR)
   $1.JARS              := $$(foreach jar,$$($1.JARS),$$(if $$(wildcard $$($1.JAR_DIRS:%=%/$$(jar))),$$(wildcard $$($1.JAR_DIRS:%=%/$$(jar))),$$(jar)))
@@ -347,7 +366,10 @@ define process_target.android-jar
   $1.CLASSES_DIR       := $$($1.TMP_DIR)/classes
   $1.CLASSES_FLAG      := $$($1.TMP_DIR)/compilation-flag
   $1.COMPILER_FLAGS    := $(COMMON_JAVA_FLAGS) $$($1.COMPILER_FLAGS)
+  $1.SOURCE_FILES      := $$(filter-out %.aidl,$$($1.SOURCE_FILES)) $$($1.AIDL_JAVA_FILES)
   TMP_DIRS             := $$(TMP_DIRS) $$($1.TMP_DIR) $$($1.CLASSES_DIR)
+  
+  $$(foreach aidl,$$($1.AIDL_FILES),$$(eval $$(call aidl_gen,$$(aidl),$$($1.AIDL_GEN_DIR)/$$(basename $$(notdir $$(aidl))).java)))
   
 #Build package
   build: BUILD.$1
