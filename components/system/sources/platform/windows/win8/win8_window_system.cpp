@@ -254,8 +254,6 @@ const void* WindowsWindowManager::GetParentWindowHandle (window_t child)
 
 void WindowsWindowManager::SetMultitouchEnabled (window_t window, bool enabled)
 {
-  if (enabled)
-    throw xtl::make_not_implemented_exception ("syslib::WindowsWindowManager::SetMultitouchEnabled");      
 }
 
 bool WindowsWindowManager::IsMultitouchEnabled (window_t window)
