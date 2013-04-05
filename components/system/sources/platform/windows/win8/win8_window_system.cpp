@@ -17,6 +17,16 @@ namespace syslib
 namespace
 {
 
+/// Получение контекста по умолчанию
+inline WindowEventContext get_event_context ()
+{
+  WindowEventContext context;
+
+  memset (&context, 0, sizeof (context));
+
+  return context;
+}
+
 /// Реализация окна
 struct WindowImpl
 {
@@ -29,11 +39,52 @@ struct WindowImpl
     : message_handler (in_message_handler)
     , user_data (in_user_data)
   {
+      CoreWindow^ window = this->window.Get ();
+
+      window->Closed  += ref new TypedEventHandler<CoreWindow^, CoreWindowEventArgs^> (xtl::bind (&WindowImpl::OnClosed, this), Platform::CallbackContext::Same);
+      window->KeyDown += ref new TypedEventHandler<CoreWindow^, KeyEventArgs^> (xtl::bind (&WindowImpl::OnKeyDown, this, _2), Platform::CallbackContext::Same);
+      window->KeyUp   += ref new TypedEventHandler<CoreWindow^, KeyEventArgs^> (xtl::bind (&WindowImpl::OnKeyDown, this, _2), Platform::CallbackContext::Same);
   }
 
 /// Деструктор
   ~WindowImpl ()
   {
+  }
+
+/// События
+  void Notify (WindowEvent event, const WindowEventContext& context = get_event_context ())
+  {
+    try
+    {
+      message_handler ((window_t)this, event, context, user_data);
+    }
+    catch (...)
+    {
+      //подавление всех исключений
+    }
+  }
+
+  void OnClosed ()
+  {
+    Notify (WindowEvent_OnClose);
+  }
+
+  void OnKeyDown (KeyEventArgs^ args)
+  {
+    WindowEventContext context = get_event_context ();
+
+    context.key = get_key_code (args->VirtualKey);
+
+    Notify (WindowEvent_OnKeyDown, context);
+  }
+
+  void OnKeyUp (KeyEventArgs^ args)
+  {
+    WindowEventContext context = get_event_context ();
+
+    context.key = get_key_code (args->VirtualKey);
+
+    Notify (WindowEvent_OnKeyUp, context);
   }
 };
 

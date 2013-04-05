@@ -10,6 +10,7 @@
 #include <locale.h>
 #include <wrl/client.h>
 
+#include <xtl/bind.h>
 #include <xtl/utility>
 
 #include <common/strconv.h>
@@ -38,6 +39,9 @@ stl::string tostring (Platform::String^ input);
 
 /// Выброс исключения с сообщением HRESULT
 void raise_com_error (const char* method, HRESULT error);
+
+/// Преобразование кодов клавиш
+Key get_key_code (Windows::System::VirtualKey key);
 
 }
 
