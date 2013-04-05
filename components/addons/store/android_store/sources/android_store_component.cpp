@@ -55,7 +55,7 @@ class AndroidStoreLoadHandlerComponent
   private:
     void OnApplicationLoad (JNIEnv* env)
     {
-      syslib::android::log_error ("%s %d\n", __FUNCTION__, __LINE__);
+      StoreImpl::InitJavaBindings (env);
     }
 };
 

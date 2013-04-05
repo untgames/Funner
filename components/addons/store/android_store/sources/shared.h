@@ -7,6 +7,7 @@
 #include <xtl/function.h>
 #include <xtl/signal.h>
 
+#include <common/action_queue.h>
 #include <common/component.h>
 #include <common/log.h>
 #include <common/property_map.h>
@@ -62,6 +63,14 @@ class StoreImpl : public IStore
     xtl::connection RegisterTransactionUpdateHandler (const Store::PurchaseCallback&);
     void            RestorePurchases                 ();
     Transaction     BuyProduct                       (const char* product_id, size_t count, const common::PropertyMap& properties);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Инициализация java-биндинга
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    static void InitJavaBindings (JNIEnv* env);
+
+  private:
+    xtl::auto_connection on_initialized_connection;
 };
 
 }

@@ -87,9 +87,6 @@ public class IabHelper {
     // The item type of the current purchase flow
     String mPurchasingItemType;
 
-    // Public key for verifying signature, in base64 encoding
-    String mSignatureBase64 = null;
-
     // Billing response codes
     public static final int BILLING_RESPONSE_RESULT_OK = 0;
     public static final int BILLING_RESPONSE_RESULT_USER_CANCELED = 1;
@@ -143,9 +140,8 @@ public class IabHelper {
      *     public key in your application's page on Google Play Developer Console. Note that this
      *     is NOT your "developer public key".
      */
-    public IabHelper(Context ctx, String base64PublicKey) {
+    public IabHelper(Context ctx) {
         mContext = ctx.getApplicationContext();
-        mSignatureBase64 = base64PublicKey;
         logDebug("IAB helper created.");
     }
     
@@ -439,16 +435,6 @@ public class IabHelper {
             Purchase purchase = null;
             try {
                 purchase = new Purchase(mPurchasingItemType, purchaseData, dataSignature);
-                String sku = purchase.getSku();
-
-                // Verify signature
-                if (!Security.verifyPurchase(mSignatureBase64, purchaseData, dataSignature)) {
-                    logError("Purchase signature verification FAILED for sku " + sku);
-                    result = new IabResult(IABHELPER_VERIFICATION_FAILED, "Signature verification failed for sku " + sku);
-                    if (mPurchaseListener != null) mPurchaseListener.onIabPurchaseFinished(result, purchase);
-                    return true;
-                }
-                logDebug("Purchase signature successfully verified.");
             }
             catch (JSONException e) {
                 logError("Failed to parse purchase data.");
@@ -825,24 +811,17 @@ public class IabHelper {
                 String purchaseData = purchaseDataList.get(i);
                 String signature = signatureList.get(i);
                 String sku = ownedSkus.get(i);
-                if (Security.verifyPurchase(mSignatureBase64, purchaseData, signature)) {
-                    logDebug("Sku is owned: " + sku);
-                    Purchase purchase = new Purchase(itemType, purchaseData, signature);
 
-                    if (TextUtils.isEmpty(purchase.getToken())) {
-                        logWarn("BUG: empty/null token!");
-                        logDebug("Purchase data: " + purchaseData);
-                    }
+                logDebug("Sku is owned: " + sku);
+                Purchase purchase = new Purchase(itemType, purchaseData, signature);
 
-                    // Record ownership and token
-                    inv.addPurchase(purchase);
+                if (TextUtils.isEmpty(purchase.getToken())) {
+                    logWarn("BUG: empty/null token!");
+                    logDebug("Purchase data: " + purchaseData);
                 }
-                else {
-                    logWarn("Purchase signature verification **FAILED**. Not adding item.");
-                    logDebug("   Purchase data: " + purchaseData);
-                    logDebug("   Signature: " + signature);
-                    verificationFailed = true;
-                }
+
+                // Record ownership and token
+                inv.addPurchase(purchase);
             }
 
             continueToken = ownedItems.getString(INAPP_CONTINUATION_TOKEN);
