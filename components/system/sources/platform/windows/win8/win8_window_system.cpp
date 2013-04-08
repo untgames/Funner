@@ -40,10 +40,15 @@ struct WindowImpl: public xtl::reference_counter
     , message_handler (in_message_handler)
     , user_data (in_user_data)
   {
-      window->Closed      += ref new TypedEventHandler<CoreWindow^, CoreWindowEventArgs^> (xtl::bind (&WindowImpl::OnClosed, this), Platform::CallbackContext::Same);
-      window->KeyDown     += ref new TypedEventHandler<CoreWindow^, KeyEventArgs^> (xtl::bind (&WindowImpl::OnKeyDown, this, _2), Platform::CallbackContext::Same);
-      window->KeyUp       += ref new TypedEventHandler<CoreWindow^, KeyEventArgs^> (xtl::bind (&WindowImpl::OnKeyUp, this, _2), Platform::CallbackContext::Same);
-      window->SizeChanged += ref new TypedEventHandler<CoreWindow^, WindowSizeChangedEventArgs^> (xtl::bind (&WindowImpl::OnSizeChanged, this, _2), Platform::CallbackContext::Same);
+    window->Closed          += ref new TypedEventHandler<CoreWindow^, CoreWindowEventArgs^> (xtl::bind (&WindowImpl::OnClosed, this), Platform::CallbackContext::Same);
+    window->KeyDown         += ref new TypedEventHandler<CoreWindow^, KeyEventArgs^> (xtl::bind (&WindowImpl::OnKeyDown, this, _2), Platform::CallbackContext::Same);
+    window->KeyUp           += ref new TypedEventHandler<CoreWindow^, KeyEventArgs^> (xtl::bind (&WindowImpl::OnKeyUp, this, _2), Platform::CallbackContext::Same);
+    window->SizeChanged     += ref new TypedEventHandler<CoreWindow^, WindowSizeChangedEventArgs^> (xtl::bind (&WindowImpl::OnSizeChanged, this, _2), Platform::CallbackContext::Same);
+    window->PointerPressed  += ref new TypedEventHandler<CoreWindow^, PointerEventArgs^> (xtl::bind (&WindowImpl::OnPointerPressed, this, _2), Platform::CallbackContext::Same);
+    window->PointerReleased += ref new TypedEventHandler<CoreWindow^, PointerEventArgs^> (xtl::bind (&WindowImpl::OnPointerReleased, this, _2), Platform::CallbackContext::Same);
+    window->PointerMoved    += ref new TypedEventHandler<CoreWindow^, PointerEventArgs^> (xtl::bind (&WindowImpl::OnPointerMoved, this, _2), Platform::CallbackContext::Same);
+    window->PointerEntered  += ref new TypedEventHandler<CoreWindow^, PointerEventArgs^> (xtl::bind (&WindowImpl::OnPointerEntered, this, _2), Platform::CallbackContext::Same);
+    window->PointerExited   += ref new TypedEventHandler<CoreWindow^, PointerEventArgs^> (xtl::bind (&WindowImpl::OnPointerExited, this, _2), Platform::CallbackContext::Same);
   }
 
 /// Деструктор
@@ -87,6 +92,51 @@ struct WindowImpl: public xtl::reference_counter
     context.key_scan_code = (ScanCode)args->VirtualKey;
 
     Notify (WindowEvent_OnKeyUp, context);
+  }
+
+  WindowEventContext GetPointerContext (PointerEventArgs^ args)
+  {
+    WindowEventContext context = get_event_context ();
+
+#ifndef WP8
+    Windows::System::VirtualKeyModifiers mods = args->KeyModifiers;
+
+    context.keyboard_alt_pressed     = (mods & Windows::System::VirtualKeyModifiers::Menu) != Windows::System::VirtualKeyModifiers::None;
+    context.keyboard_control_pressed = (mods & Windows::System::VirtualKeyModifiers::Control) != Windows::System::VirtualKeyModifiers::None;
+    context.keyboard_shift_pressed   = (mods & Windows::System::VirtualKeyModifiers::Shift) != Windows::System::VirtualKeyModifiers::None;
+#endif
+
+    Windows::Foundation::Point p = args->CurrentPoint->Position;
+
+    context.touches_count        = 1;
+    context.touches [0].touch_id = args->CurrentPoint->PointerId;
+    context.touches [0].position = Point ((size_t)p.X, (size_t)p.Y);
+    
+    return context;
+  }
+
+  void OnPointerEntered (PointerEventArgs^ args)
+  {
+  }
+
+  void OnPointerExited (PointerEventArgs^ args)
+  {
+    Notify (WindowEvent_OnMouseLeave, GetPointerContext (args));
+  }
+
+  void OnPointerMoved (PointerEventArgs^ args)
+  {
+    Notify (WindowEvent_OnTouchesMoved, GetPointerContext (args));
+  }
+
+  void OnPointerPressed (PointerEventArgs^ args)
+  {    
+    Notify (WindowEvent_OnTouchesBegan, GetPointerContext (args));
+  }
+
+  void OnPointerReleased (PointerEventArgs^ args)
+  {    
+    Notify (WindowEvent_OnTouchesEnded, GetPointerContext (args));
   }
 
   void OnSizeChanged (WindowSizeChangedEventArgs^ args)
