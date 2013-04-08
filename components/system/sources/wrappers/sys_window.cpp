@@ -68,7 +68,7 @@ struct Window::Impl: public xtl::trackable
 
         style         = in_style;
         parent_handle = parent;
-        
+
         window_t new_handle = Platform::CreateWindow (style, &MessageHandler, parent, init_string.c_str (), this);
 
         SetHandle (new_handle);

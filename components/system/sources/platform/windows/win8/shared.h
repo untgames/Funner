@@ -11,6 +11,7 @@
 #include <wrl/client.h>
 
 #include <xtl/bind.h>
+#include <xtl/function.h>
 #include <xtl/utility>
 
 #include <common/strconv.h>
@@ -30,6 +31,9 @@ interface class IApplicationContext
   /// Получение главного окна
   Windows::UI::Core::CoreWindow^ MainWindow ();
 };
+
+/// Старт приложения
+void start_application ();
 
 /// Получение контекста приложения
 IApplicationContext^ get_context ();

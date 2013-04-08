@@ -6,6 +6,7 @@ using namespace Windows::Foundation;
 using namespace concurrency;
 
 using namespace syslib;
+using namespace syslib::win8;
 
 #pragma warning (disable : 4273) //incosistent dll linkage
 
@@ -61,20 +62,18 @@ int win8_vprintf (const char *format, va_list list)
   return 0;
 }
 
-extern int main (...);
-
 __declspec(dllexport) int win8_startup (const char* cur_dir, StdoutFn stdout_handler, void* user_data)
 {
   try
   {    
-    char* program_name = "launcher", *env = 0;
-
     stdout_context.stdout_handler = stdout_handler;
     stdout_context.user_data      = user_data;
 
     common::FileSystem::SetCurrentDir (common::format ("/std/%s", cur_dir).c_str ());
 
-    return main (0, &program_name, &env);
+    start_application ();
+
+    return 0;
   }
   catch (std::exception& e)
   {

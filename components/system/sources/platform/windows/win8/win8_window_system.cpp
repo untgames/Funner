@@ -28,22 +28,22 @@ inline WindowEventContext get_event_context ()
 }
 
 /// Реализация окна
-struct WindowImpl
+struct WindowImpl: public xtl::reference_counter
 {
   Platform::Agile<CoreWindow> window;          //окно
   WindowMessageHandler        message_handler; //обработчик событий окна
   void*                       user_data;       //пользовательские данные обработчика
 
 /// Конструктор
-  WindowImpl (WindowMessageHandler in_message_handler, void* in_user_data)
-    : message_handler (in_message_handler)
+  WindowImpl (CoreWindow^ in_window, WindowMessageHandler in_message_handler, void* in_user_data)
+    : window (in_window)
+    , message_handler (in_message_handler)
     , user_data (in_user_data)
   {
-      CoreWindow^ window = this->window.Get ();
-
-      window->Closed  += ref new TypedEventHandler<CoreWindow^, CoreWindowEventArgs^> (xtl::bind (&WindowImpl::OnClosed, this), Platform::CallbackContext::Same);
-      window->KeyDown += ref new TypedEventHandler<CoreWindow^, KeyEventArgs^> (xtl::bind (&WindowImpl::OnKeyDown, this, _2), Platform::CallbackContext::Same);
-      window->KeyUp   += ref new TypedEventHandler<CoreWindow^, KeyEventArgs^> (xtl::bind (&WindowImpl::OnKeyDown, this, _2), Platform::CallbackContext::Same);
+      window->Closed      += ref new TypedEventHandler<CoreWindow^, CoreWindowEventArgs^> (xtl::bind (&WindowImpl::OnClosed, this), Platform::CallbackContext::Same);
+      window->KeyDown     += ref new TypedEventHandler<CoreWindow^, KeyEventArgs^> (xtl::bind (&WindowImpl::OnKeyDown, this, _2), Platform::CallbackContext::Same);
+      window->KeyUp       += ref new TypedEventHandler<CoreWindow^, KeyEventArgs^> (xtl::bind (&WindowImpl::OnKeyUp, this, _2), Platform::CallbackContext::Same);
+      window->SizeChanged += ref new TypedEventHandler<CoreWindow^, WindowSizeChangedEventArgs^> (xtl::bind (&WindowImpl::OnSizeChanged, this, _2), Platform::CallbackContext::Same);
   }
 
 /// Деструктор
@@ -73,7 +73,8 @@ struct WindowImpl
   {
     WindowEventContext context = get_event_context ();
 
-    context.key = get_key_code (args->VirtualKey);
+    context.key           = get_key_code (args->VirtualKey);
+    context.key_scan_code = (ScanCode)args->VirtualKey;
 
     Notify (WindowEvent_OnKeyDown, context);
   }
@@ -82,9 +83,20 @@ struct WindowImpl
   {
     WindowEventContext context = get_event_context ();
 
-    context.key = get_key_code (args->VirtualKey);
+    context.key           = get_key_code (args->VirtualKey);
+    context.key_scan_code = (ScanCode)args->VirtualKey;
 
     Notify (WindowEvent_OnKeyUp, context);
+  }
+
+  void OnSizeChanged (WindowSizeChangedEventArgs^ args)
+  {
+    Notify (WindowEvent_OnSize);
+  }
+
+  void OnRedraw ()
+  {
+    Notify (WindowEvent_OnPaint);
   }
 };
 
@@ -101,11 +113,11 @@ window_t WindowsWindowManager::CreateWindow (WindowStyle, WindowMessageHandler h
     if (parent_handle)
       throw xtl::format_not_supported_exception ("", "Parent windows is not supported in Windows8");
 
-    std::auto_ptr<WindowImpl> impl (new WindowImpl (handler, user_data));
+    xtl::intrusive_ptr<WindowImpl> impl (new WindowImpl (get_context ()->MainWindow (), handler, user_data), false);
 
-    impl->window = get_context ()->MainWindow ();
+    addref (&*impl);
 
-    return (window_t)impl.release ();
+    return (window_t)&*impl;
   }
   catch (xtl::exception& e)
   {
@@ -139,7 +151,7 @@ void WindowsWindowManager::DestroyWindow (window_t handle)
   if (!impl)
     return;
 
-  delete impl;
+  release (impl);
 }
 
 /*
@@ -184,36 +196,98 @@ const void* WindowsWindowManager::GetNativeDisplayHandle (window_t)
 
 void WindowsWindowManager::SetWindowTitle (window_t, const wchar_t*)
 {
-  throw xtl::make_not_implemented_exception ("syslib::WindowsWindowManager::SetWindowTitle");
 }
 
-void WindowsWindowManager::GetWindowTitle (window_t, size_t, wchar_t*)
+void WindowsWindowManager::GetWindowTitle (window_t handle, size_t buffer_size, wchar_t* buffer)
 {
-  throw xtl::make_not_implemented_exception ("syslib::WindowsWindowManager::GetWindowTitle");
+  try
+  {
+    if (!buffer_size)
+      return;
+
+    static const wchar_t TITLE [] = L"Funner Application";
+
+    if (buffer_size > sizeof (TITLE))
+      buffer_size = sizeof (TITLE);
+
+    memcpy (buffer, TITLE, buffer_size);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("syslib::WindowsWindowManager::GetWindowTitle");
+    throw;
+  }
 }
 
 /*
     Область окна / клиентская область
 */
 
-void WindowsWindowManager::SetWindowRect (window_t, const Rect&)
+void WindowsWindowManager::SetWindowRect (window_t handle, const Rect&)
 {
-  throw xtl::make_not_implemented_exception ("syslib::WindowsWindowManager::SetWindowRect");
+  try
+  {
+    WindowImpl* impl = (WindowImpl*)handle;
+
+    if (!impl)
+      throw xtl::make_null_argument_exception ("", "window");      
+
+    impl->Notify (WindowEvent_OnSize);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("syslib::WindowsWindowManager::SetWindowRect");
+    throw;
+  }
 }
 
-void WindowsWindowManager::SetClientRect (window_t, const Rect&)
+void WindowsWindowManager::SetClientRect (window_t handle, const Rect& rect)
 {
-  throw xtl::make_not_implemented_exception ("syslib::WindowsWindowManager::SetClientRect");
+  try
+  {
+    SetWindowRect (handle, rect);    
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("syslib::WindowsWindowManager::SetClientRect");
+    throw;
+  }
 }
 
-void WindowsWindowManager::GetWindowRect (window_t, Rect&)
+void WindowsWindowManager::GetWindowRect (window_t handle, Rect& out_rect)
 {
-  throw xtl::make_not_implemented_exception ("syslib::WindowsWindowManager::GetWindowRect");
+  try
+  {
+    WindowImpl* impl = (WindowImpl*)handle;
+
+    if (!impl)
+      throw xtl::make_null_argument_exception ("", "window");      
+
+    Windows::Foundation::Rect rect = impl->window->Bounds;
+
+    out_rect.left   = (size_t)rect.X;
+    out_rect.top    = (size_t)rect.Y;
+    out_rect.right  = (size_t)(rect.X + rect.Width);
+    out_rect.bottom = (size_t)(rect.Y + rect.Height);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("syslib::WindowsWindowManager::GetWindowRect");
+    throw;
+  }
 }
 
-void WindowsWindowManager::GetClientRect (window_t, Rect&)
+void WindowsWindowManager::GetClientRect (window_t handle, Rect& rect)
 {
-  throw xtl::make_not_implemented_exception ("syslib::WindowsWindowManager::GetClientRect");
+  try
+  {
+    GetWindowRect (handle, rect);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("syslib::WindowsWindowManager::GetClientRect");
+    throw;
+  }
 }
 
 /*
@@ -222,14 +296,37 @@ void WindowsWindowManager::GetClientRect (window_t, Rect&)
 
 void WindowsWindowManager::SetWindowFlag (window_t, WindowFlag, bool)
 {
-  throw xtl::make_not_implemented_exception ("syslib::WindowsWindowManager::SetWindowFlag");
 }
 
-bool WindowsWindowManager::GetWindowFlag (window_t, WindowFlag)
+bool WindowsWindowManager::GetWindowFlag (window_t handle, WindowFlag flag)
 {
-  throw xtl::make_not_implemented_exception ("syslib::WindowsWindowManager::GetWindowFlag");
+  try
+  {
+    WindowImpl* impl = (WindowImpl*)handle;
 
-  return false;
+    if (!impl)
+      throw xtl::make_null_argument_exception ("", "window");      
+
+    switch (flag)
+    {
+      case WindowFlag_Visible: //видимость окна
+        return impl->window->Visible;
+      case WindowFlag_Active: //активность окна
+        return true;
+      case WindowFlag_Focus: //фокус ввода
+        return true;
+      case WindowFlag_Maximized:
+      case WindowFlag_Minimized:
+        throw xtl::format_operation_exception ("", "Can't get window flag %d value", flag);
+      default:
+        throw xtl::make_argument_exception ("", "flag", flag);  
+    }
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("syslib::WindowsWindowManager::GetWindowFlag");
+    throw;
+  }
 }
 
 /*
@@ -238,13 +335,11 @@ bool WindowsWindowManager::GetWindowFlag (window_t, WindowFlag)
 
 void WindowsWindowManager::SetParentWindowHandle (window_t child, const void* parent_handle)
 {
-  throw xtl::make_not_implemented_exception ("syslib::WindowsWindowManager::SetParentWindow");
+  throw xtl::format_not_supported_exception ("syslib::WindowsWindowManager::SetParentWindow", "Child windows are not supported");
 }
 
 const void* WindowsWindowManager::GetParentWindowHandle (window_t child)
 {
-  throw xtl::make_not_implemented_exception ("syslib::WindowsWindowManager::GetParentWindow");
-
   return 0;
 }
 
@@ -265,9 +360,22 @@ bool WindowsWindowManager::IsMultitouchEnabled (window_t window)
     Обновление окна
 */
 
-void WindowsWindowManager::InvalidateWindow (window_t)
+void WindowsWindowManager::InvalidateWindow (window_t handle)
 {
-  throw xtl::make_not_implemented_exception ("syslib::WindowsWindowManager::InvalidateWindow");
+  try
+  {
+    WindowImpl* impl = (WindowImpl*)handle;
+
+    if (!impl)
+      throw xtl::make_null_argument_exception ("", "window");
+
+    common::ActionQueue::PushAction (xtl::bind (&WindowImpl::OnRedraw, xtl::intrusive_ptr<WindowImpl> (impl)), common::ActionThread_Main);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("syslib::WindowsWindowManager::InvalidateWindow");
+    throw;
+  }
 }
 
 /*
@@ -342,26 +450,20 @@ void WindowsWindowManager::SetCursor (window_t, cursor_t)
 
 void WindowsWindowManager::SetBackgroundColor (window_t window, const Color& color)
 {
-  throw xtl::make_not_implemented_exception ("syslib::WindowsWindowManager::SetBackgroundColor");
 }
 
 void WindowsWindowManager::SetBackgroundState (window_t window, bool state)
 {
-  throw xtl::make_not_implemented_exception ("syslib::WindowsWindowManager::SetBackgroundState");
 }
 
 Color WindowsWindowManager::GetBackgroundColor (window_t window)
 {
-  throw xtl::make_not_implemented_exception ("syslib::WindowsWindowManager::GetBackgroundColor");
-
   return Color (0, 0, 0);
 }
 
 bool WindowsWindowManager::GetBackgroundState (window_t window)
 {
-  throw xtl::make_not_implemented_exception ("syslib::WindowsWindowManager::GetBackgroundState");
-  
-  return false;
+  return true;
 }
 
 /*
@@ -464,8 +566,10 @@ size_t WindowsWindowManager::GetKeyName (ScanCode scan_code, size_t buffer_size,
 
   if (!buffer_size)
     return 0;
+
+  char scan_str [2] = {*(char*)&scan_code, 0};
     
-  strncpy (buffer, "Unknown", buffer_size);
+  strncpy (buffer, scan_str, buffer_size);
 
   return strlen (buffer);
 }

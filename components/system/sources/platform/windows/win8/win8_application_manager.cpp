@@ -8,18 +8,21 @@ using namespace Windows::Foundation;
 using namespace syslib;
 using namespace syslib::win8;
 
+extern "C" int main (...);
+
 namespace
 {
 
 ref class ApplicationView;
+ref class ApplicationSource;
 
 ApplicationView^ app_view;
+ApplicationSource^ app_source;
 
 /// Слушатель событий приложения
-class IApplicationViewListener
+class IApplicationSourceListener
 {
   public:
-    virtual void RunCore () = 0;
     virtual void OnExit () = 0;
 };
 
@@ -28,9 +31,21 @@ ref class ApplicationView sealed: Windows::ApplicationModel::Core::IFrameworkVie
 {
   internal:
     // Constructor
-    ApplicationView (IApplicationViewListener* in_listener) : listener (in_listener) {}
+    ApplicationView (ApplicationSource^ in_source) : source (in_source)
+    {
+      if (app_view)
+        throw xtl::format_operation_exception ("syslib::win8::ApplicationView::ApplicationView", "ApplicationView has been already created");
+
+      app_view = this;      
+    }
 
   public:
+    // Destructor
+    virtual ~ApplicationView ()
+    {
+      app_view = nullptr;
+    }
+
     // This method is called on application launch.
     virtual void Initialize (CoreApplicationView^ view)
     {
@@ -49,7 +64,9 @@ ref class ApplicationView sealed: Windows::ApplicationModel::Core::IFrameworkVie
 
     virtual void Run ()
     {
-      listener->RunCore ();
+      char* program_name = "launcher", *env = 0;
+
+      main (0, &program_name, &env);
     }
 
     // This method is called before the application exits.
@@ -70,37 +87,53 @@ ref class ApplicationView sealed: Windows::ApplicationModel::Core::IFrameworkVie
     }
 
   private:
-    IApplicationViewListener*   listener;
-    Platform::Agile<CoreWindow> main_window;
+    Platform::Agile<ApplicationSource> source;
+    Platform::Agile<CoreWindow>        main_window;
 };
 
 /// Фабрика создания основного окна приложения
 ref class ApplicationSource sealed: Windows::ApplicationModel::Core::IFrameworkViewSource
 {
   internal:
-    ApplicationSource (IApplicationViewListener* in_listener) 
-      : listener (in_listener)
+    ApplicationSource () 
+      : listener ()
     {
+      if (app_source)
+        throw xtl::format_operation_exception ("syslib::win8::ApplicationSource::ApplicationSource", "ApplicationSource has been already created");
+
+      app_source = this;
+
       Windows::ApplicationModel::Core::CoreApplication::Exiting += ref new EventHandler<Platform::Object^> (this, &ApplicationSource::OnExit);
     }
 
+    void SetListener (IApplicationSourceListener* in_listener)
+    {
+      listener = in_listener;
+    }
+
   public:
+    virtual ~ApplicationSource ()
+    {
+      app_source = nullptr;
+    }
+
     virtual Windows::ApplicationModel::Core::IFrameworkView^ CreateView ()
     {
-      return ref new ApplicationView (listener);
+      return ref new ApplicationView (this);
     }
 
     void OnExit (Platform::Object^, Platform::Object^)
     {   
-      listener->OnExit ();
+      if (listener)
+        listener->OnExit ();
     }
 
   private:
-    IApplicationViewListener* listener;
+    IApplicationSourceListener* listener;
 };
 
 /// Делегат приложения
-class Win8ApplicationDelegate: public IApplicationDelegate, public xtl::reference_counter, private IApplicationViewListener
+class Win8ApplicationDelegate: public IApplicationDelegate, public xtl::reference_counter, private IApplicationSourceListener
 {
   public:
 ///Конструктор
@@ -114,20 +147,45 @@ class Win8ApplicationDelegate: public IApplicationDelegate, public xtl::referenc
       
       if (!wake_up_message)
         raise_error ("::RegisterWindowMessage");
+
+      if (app_source)
+        app_source->SetListener (this);
     }
 
-///Запуск цикла обработки сообщений
+/// Деструктор
+    ~Win8ApplicationDelegate ()
+    {
+      if (app_source)
+        app_source->SetListener (0);
+    }
+
+/// Главный цикл
     void Run ()
     {
       try
       {
-	auto source = ref new ApplicationSource (this);
+        main_thread_id = GetCurrentThreadId ();
 
-	Windows::ApplicationModel::Core::CoreApplication::Run (source);
-      }
-      catch (Platform::Exception^ e)
-      {
-        throw xtl::format_operation_exception ("syslib::Win8ApplicationDelegate::Run", "Platform exception %s. %s", tostring (e->Message).c_str (), _com_error (e->HResult).ErrorMessage ());
+        if (listener)
+          listener->OnInitialize ();
+
+        while (!is_exited)
+        {
+          DoNextEvents ();
+
+           //если нет обработчиков OnIdle - приостанавливаем приложение
+
+          if (!idle_enabled)
+          {
+            if (!is_exited)
+              DoNextEvents ();
+          }
+          else
+          {
+            if (listener)
+              listener->OnIdle ();
+          }
+        }
       }
       catch (xtl::exception& e)
       {
@@ -178,41 +236,6 @@ class Win8ApplicationDelegate: public IApplicationDelegate, public xtl::referenc
       is_exited = true;
     }
 
-/// Главный цикл
-    void RunCore ()
-    {
-      try
-      {
-        main_thread_id = GetCurrentThreadId ();
-        
-        if (listener)
-          listener->OnInitialize ();
-        
-        while (!is_exited)
-        {
-          DoNextEvents ();
-
-           //если нет обработчиков OnIdle - приостанавливаем приложение
-
-          if (!idle_enabled)
-          {
-            if (!is_exited)
-              DoNextEvents ();
-          }
-          else
-          {
-            if (listener)
-              listener->OnIdle ();
-          }
-        }
-      }
-      catch (xtl::exception& e)
-      {
-        e.touch ("syslib::Win8ApplicationDelegate::Run");
-        throw;
-      }
-    }
-
 ///Обработка следующего события
     void DoNextEvents ()
     {
@@ -248,6 +271,24 @@ namespace win8
 IApplicationContext^ get_context ()
 {
   return app_view;
+}
+
+/// Старт приложения
+void start_application ()
+{
+  try
+  {
+    Windows::ApplicationModel::Core::CoreApplication::Run (ref new ApplicationSource);
+  }
+  catch (Platform::Exception^ e)
+  {
+    throw xtl::format_operation_exception ("syslib::win8::start_application", "Platform exception %s. %s", tostring (e->Message).c_str (), _com_error (e->HResult).ErrorMessage ());
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("syslib::win8::start_application");
+    throw;
+  }  
 }
 
 }
