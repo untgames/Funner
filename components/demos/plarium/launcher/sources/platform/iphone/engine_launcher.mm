@@ -214,17 +214,21 @@ static NSString* MAT_AD_KEY = @"3fa11cf8822ff1d86461c44ac1ee09b2";
   NSFileManager* file_manager = [NSFileManager defaultManager];
   NSString*      path         = [paths count] ? [paths objectAtIndex:0] : nil;
 
-  if ([file_manager fileExistsAtPath:[path stringByAppendingPathComponent:@"Plarium/Slots/Downloads_1"]] && ![file_manager fileExistsAtPath:[path stringByAppendingPathComponent:@"Plarium/mat_report_sent.flag"]])
+  bool mat_flag_exists = [file_manager fileExistsAtPath:[path stringByAppendingPathComponent:@"Plarium/mat_report_sent.flag"]];
+
+  if ([file_manager fileExistsAtPath:[path stringByAppendingPathComponent:@"Plarium/Slots/Downloads_1"]] && !mat_flag_exists)
   {
     NSLog (@"MAT track update");
     [[MobileAppTracker sharedManager] trackUpdate];
-    [file_manager createFileAtPath:[path stringByAppendingPathComponent:@"Plarium/mat_report_sent.flag"] contents:nil attributes:nil];
   }
   else
   {
     NSLog (@"MAT track install");
     [[MobileAppTracker sharedManager] trackInstall];
   }
+
+  if (!mat_flag_exists)
+    [file_manager createFileAtPath:[path stringByAppendingPathComponent:@"Plarium/mat_report_sent.flag"] contents:nil attributes:nil];
 }
 
 /*!
