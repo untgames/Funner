@@ -382,7 +382,7 @@ define process_target.android-jar
 		@echo Compile sources for $$(notdir $$($1.TARGET))...
 		@$(RM) -r $$($1.CLASSES_DIR)
 		@mkdir -p $$($1.CLASSES_DIR)
-		@$(JAVA_CC) $$($1.SOURCE_FILES) $$($1.COMPILER_FLAGS) -d $$($1.CLASSES_DIR) -classpath '$(ANDROID_JAR)$$(if $$($1.JARS),:$$(subst ; ,;,$$($1.JARS:%=%:)))'
+		@$(JAVA_CC) $$($1.SOURCE_FILES) $$($1.COMPILER_FLAGS) -d $$($1.CLASSES_DIR) -classpath '$(ANDROID_JAR)$$(if $$($1.JARS),:$$(subst : ,:,$$(subst ; ,;,$$($1.JARS:%=%:))))'
 		@touch $$@
 
   $$($1.TARGET): $$($1.CLASSES_FLAG)
