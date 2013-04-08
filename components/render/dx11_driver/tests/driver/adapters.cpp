@@ -6,11 +6,11 @@ int main ()
   
   try
   {
-    xtl::com_ptr<IDriver> driver = DriverManager::FindDriver ("OpenGL");
+    xtl::com_ptr<IDriver> driver = DriverManager::FindDriver ("DX11");
     
     if (!driver)
     {
-      printf ("OpenGL driver not found");
+      printf ("Driver not found");
       return 0;
     }    
     
