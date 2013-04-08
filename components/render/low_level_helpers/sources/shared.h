@@ -1,7 +1,6 @@
 #ifndef RENDER_LOW_LEVEL_HELPERS_COMMON_SHARED_HEADER
 #define RENDER_LOW_LEVEL_HELPERS_COMMON_SHARED_HEADER
 
-#include <render/low_level/helpers/log.h>
 #include <render/low_level/helpers/object.h>
 #include <render/low_level/helpers/property_list.h>
 
@@ -11,7 +10,6 @@
 #include <xtl/intrusive_ptr.h>
 #include <xtl/reference_counter.h>
 
-#include <common/log.h>
 #include <common/singleton.h>
 #include <common/strlib.h>
 
