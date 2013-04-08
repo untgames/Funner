@@ -1,6 +1,6 @@
 #include "shared.h"
 
-using namespace render::low_level::opengl;
+using namespace render::low_level::helpers;
 using namespace render::low_level;
 using namespace common;
 

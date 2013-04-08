@@ -7,8 +7,8 @@ TARGETS := RENDER.DX11_DRIVER.SOURCES RENDER.DX11_DRIVER.TESTS
 RENDER.DX11_DRIVER.SOURCES.TYPE         := static-lib
 RENDER.DX11_DRIVER.SOURCES.NAME         := funner.render.low_level.dx11_driver
 RENDER.DX11_DRIVER.SOURCES.INCLUDE_DIRS := sources
-RENDER.DX11_DRIVER.SOURCES.SOURCE_DIRS  +=
-RENDER.DX11_DRIVER.SOURCES.IMPORTS      := compile.render.low_level compile.common compile.system
+RENDER.DX11_DRIVER.SOURCES.SOURCE_DIRS  += sources/driver
+RENDER.DX11_DRIVER.SOURCES.IMPORTS      := compile.render.low_level compile.common compile.system compile.extern.dxsdk
 
 #DX11 render system tests
 RENDER.DX11_DRIVER.TESTS.TYPE          := test-suite
