@@ -1,7 +1,7 @@
 # Link exports
 export.link.render.low_level.opengl_driver.LIBS                := funner.render.low_level.opengl_driver
 export.link.render.low_level.opengl_driver.LINK_INCLUDES       := OpenGLDriver
-export.link.render.low_level.opengl_driver.IMPORTS             := link.render.low_level link.common.wxf link.system
+export.link.render.low_level.opengl_driver.IMPORTS             := link.render.low_level link.render.low_level.helpers link.common.wxf link.system
 export.link.render.low_level.opengl_driver.x86_win32.LIBS      := gdi32
 export.link.render.low_level.opengl_driver.win32.IMPORTS       := link.system
 export.link.render.low_level.opengl_driver.macosx.LINK_FLAGS   := -framework AGL
