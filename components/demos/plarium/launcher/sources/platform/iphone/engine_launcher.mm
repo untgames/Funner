@@ -11,6 +11,8 @@
 
 #import "Tracking.h"
 
+#import <MobileAppTracker/MobileAppTracker.h>
+
 #include <cstdio>
 
 #include <utility/utils.h>
@@ -20,10 +22,15 @@
 using namespace engine;
 using namespace plarium::launcher;
 
+//AD-X constants
 static NSString* PHONE_ADX_URL_SCHEME = @"ADX1144";
 static NSString* PAD_ADX_URL_SCHEME   = @"ADX1145";
 static NSString* PHONE_APPLE_ID       = @"543831789";
 static NSString* PAD_APPLE_ID         = @"586574454";
+
+//MobileAppTracking constants
+static NSString* MAT_AD_ID  = @"5740";
+static NSString* MAT_AD_KEY = @"3fa11cf8822ff1d86461c44ac1ee09b2";
 
 @interface Startup : NSObject
 {
@@ -145,6 +152,99 @@ static NSString* PAD_APPLE_ID         = @"586574454";
 -(void)handleOpenURL:(const char*)url
 {
   [tracker handleOpenURL:[NSURL URLWithString:[NSString stringWithUTF8String:url]]];
+}
+
+@end
+
+@interface MobileAppTrackerWrapper : NSObject<MobileAppTrackerDelegate>
+{
+}
+
+@end
+
+@implementation MobileAppTrackerWrapper
+
+-(void)dealloc
+{
+  [[NSNotificationCenter defaultCenter] removeObserver:self];
+
+  [super dealloc];
+}
+
+-(void)reportAppInstall
+{
+  NSError *error = nil;
+
+  [[MobileAppTracker sharedManager] startTrackerWithAdvertiserId:MAT_AD_ID advertiserKey:MAT_AD_KEY withError:&error];
+
+  if (error)
+  {
+    NSLog (@"Error while starting MobileAppTracker - '%@'", error);
+    return;
+  }
+
+  [[MobileAppTracker sharedManager] setDelegate:self];
+
+  NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+
+  NSString* uuid = [defaults objectForKey:@"UUID"];
+
+  if (!uuid)
+  {
+    if ([[[UIDevice currentDevice] systemVersion] compare:@"6.0" options:NSNumericSearch] != NSOrderedAscending)
+    {
+      uuid = [[[UIDevice currentDevice] identifierForVendor] UUIDString];
+    }
+    else
+    {
+      CFUUIDRef cf_uuid = CFUUIDCreate (0);
+
+      uuid = [(NSString*)CFUUIDCreateString (0, cf_uuid) autorelease];
+
+      CFRelease (cf_uuid);
+
+      [defaults setObject:uuid forKey:@"UUID"];
+      [defaults synchronize];
+    }
+  }
+
+  [[MobileAppTracker sharedManager] setDeviceId:uuid];
+
+  NSArray*       paths        = NSSearchPathForDirectoriesInDomains (NSLibraryDirectory, NSUserDomainMask, YES);
+  NSFileManager* file_manager = [NSFileManager defaultManager];
+  NSString*      path         = [paths count] ? [paths objectAtIndex:0] : nil;
+
+  if ([file_manager fileExistsAtPath:[path stringByAppendingPathComponent:@"Plarium/Slots/Downloads_1"]] && ![file_manager fileExistsAtPath:[path stringByAppendingPathComponent:@"Plarium/mat_report_sent.flag"]])
+  {
+    NSLog (@"MAT track update");
+    [[MobileAppTracker sharedManager] trackUpdate];
+    [file_manager createFileAtPath:[path stringByAppendingPathComponent:@"Plarium/mat_report_sent.flag"] contents:nil attributes:nil];
+  }
+  else
+  {
+    NSLog (@"MAT track install");
+    [[MobileAppTracker sharedManager] trackInstall];
+  }
+}
+
+/*!
+ Delegate method called when a track action succeeds.
+ @param tracker The MobileAppTracker instance.
+ @param data The success data returned by the MobileAppTracker.
+ */
+- (void)mobileAppTracker:(MobileAppTracker *)tracker didSucceedWithData:(NSData *)data
+{
+  NSLog (@"MAT tracking succeeded '%@'", [[[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding] autorelease]);
+}
+
+/*!
+ Delegate method called when a track action fails.
+ @param tracker The MobileAppTracker instance.
+ @param error Error object returned by the MobileAppTracker.
+ */
+- (void)mobileAppTracker:(MobileAppTracker *)tracker didFailWithError:(NSError *)error
+{
+  NSLog (@"MAT tracking failed with error '%@'", error);
 }
 
 @end
@@ -306,9 +406,12 @@ int main (int argc, const char* argv [], const char* env [])
 
     TrackingWrapper* tracking = [[TrackingWrapper alloc] init];
 
+    MobileAppTrackerWrapper* mat_tracking = [[MobileAppTrackerWrapper alloc] init];
+
     [[NSNotificationCenter defaultCenter] addObserver:startup selector:@selector (onStartup) name:UIApplicationDidFinishLaunchingNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:tracking selector:@selector (reportAppOpen) name:UIApplicationDidFinishLaunchingNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:tracking selector:@selector (reportAppOpen) name:UIApplicationWillEnterForegroundNotification object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:mat_tracking selector:@selector (reportAppInstall) name:UIApplicationDidFinishLaunchingNotification object:nil];
 
     SystemAlertHandler system_alert_handler (funner);
 

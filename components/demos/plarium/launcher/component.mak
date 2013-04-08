@@ -26,21 +26,22 @@ endif
 ifneq (,$(filter tabletos,$(PROFILES)))
 PLARIUM.LAUNCHER.SOURCES.TYPE               := application
 endif
-PLARIUM.LAUNCHER.SOURCES.INCLUDE_DIRS       := include
-PLARIUM.LAUNCHER.SOURCES.SOURCE_DIRS        := sources/shared
-PLARIUM.LAUNCHER.SOURCES.macosx.LINK_FLAGS  := -framework Foundation -framework AppKit
-PLARIUM.LAUNCHER.SOURCES.msvc.LINK_FLAGS    := -subsystem:windows -entry:mainCRTStartup
-PLARIUM.LAUNCHER.SOURCES.win32.SOURCE_DIRS  := sources/platform/win32
-PLARIUM.LAUNCHER.SOURCES.macosx.SOURCE_DIRS := sources/platform/macosx
-PLARIUM.LAUNCHER.SOURCES.linux.LIBS         := dl
-PLARIUM.LAUNCHER.SOURCES.linux.SOURCE_DIRS  := sources/platform/linux
-PLARIUM.LAUNCHER.SOURCES.iphone.SOURCE_DIRS := sources/platform/iphone
-PLARIUM.LAUNCHER.SOURCES.android.SOURCE_DIRS := sources/platform/android
-PLARIUM.LAUNCHER.SOURCES.tabletos.SOURCE_DIRS := sources/platform/tabletos
-PLARIUM.LAUNCHER.SOURCES.IMPORTS            := compile.engine.launcher compile.plarium.hsserver compile.plarium.system link.plarium.hsserver compile.plarium.sgi_stl
-PLARIUM.LAUNCHER.SOURCES.android.IMPORTS    := link.engine.launcher
+PLARIUM.LAUNCHER.SOURCES.INCLUDE_DIRS          := include
+PLARIUM.LAUNCHER.SOURCES.SOURCE_DIRS           := sources/shared
+PLARIUM.LAUNCHER.SOURCES.macosx.LINK_FLAGS     := -framework Foundation -framework AppKit
+PLARIUM.LAUNCHER.SOURCES.msvc.LINK_FLAGS       := -subsystem:windows -entry:mainCRTStartup
+PLARIUM.LAUNCHER.SOURCES.win32.SOURCE_DIRS     := sources/platform/win32
+PLARIUM.LAUNCHER.SOURCES.macosx.SOURCE_DIRS    := sources/platform/macosx
+PLARIUM.LAUNCHER.SOURCES.linux.LIBS            := dl
+PLARIUM.LAUNCHER.SOURCES.linux.SOURCE_DIRS     := sources/platform/linux
+PLARIUM.LAUNCHER.SOURCES.iphone.SOURCE_DIRS    := sources/platform/iphone
+PLARIUM.LAUNCHER.SOURCES.android.SOURCE_DIRS   := sources/platform/android
+PLARIUM.LAUNCHER.SOURCES.tabletos.SOURCE_DIRS  := sources/platform/tabletos
+PLARIUM.LAUNCHER.SOURCES.iphone.COMPILER_CFLAGS := -F$(COMPONENT_DIR)sources/platform/iphone/Frameworks
+PLARIUM.LAUNCHER.SOURCES.IMPORTS               := compile.engine.launcher compile.plarium.hsserver compile.plarium.system link.plarium.hsserver compile.plarium.sgi_stl
+PLARIUM.LAUNCHER.SOURCES.android.IMPORTS       := link.engine.launcher
 ifneq (,$(filter android,$(PROFILES)))
-PLARIUM.LAUNCHER.SOURCES.LIBS               := funner.system #for duplicate JNI_OnLoad in OpenAL32 & system
+PLARIUM.LAUNCHER.SOURCES.LIBS                  := funner.system #for duplicate JNI_OnLoad in OpenAL32 & system
 endif
 PLARIUM.LAUNCHER.SOURCES.tabletos.IMPORTS         := link.engine.launcher
 PLARIUM.LAUNCHER.SOURCES.tabletos.IMPORTS         := compile.engine.core link.engine.launcher
