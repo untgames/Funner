@@ -1,7 +1,6 @@
 #include "shared.h"
 
 using namespace render::low_level::helpers;
-using namespace common;
 
 /*
     Количество свойств

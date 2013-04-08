@@ -19,7 +19,7 @@ namespace render
 namespace low_level
 {
 
-namespace opengl
+namespace helpers
 {
 
 /*

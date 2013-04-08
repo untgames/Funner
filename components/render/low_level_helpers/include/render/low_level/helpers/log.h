@@ -1,6 +1,8 @@
 #ifndef RENDER_LOW_LEVEL_HELPERS_LOG_HEADER
 #define RENDER_LOW_LEVEL_HELPERS_LOG_HEADER
 
+#include <cstdarg>
+
 namespace render
 {
 
