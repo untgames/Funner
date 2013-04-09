@@ -1,5 +1,8 @@
 #include "shared.h"
 
+using namespace render::low_level;
+using namespace render::low_level::dx11;
+
 namespace
 {
 
@@ -27,8 +30,7 @@ class Component
   public:
     Component ()
     {
-      throw xtl::make_not_implemented_exception ("components::dx11_driver::Component::Component");
-//      DriverManager::RegisterDriver (DRIVER_NAME, xtl::com_ptr<Driver> (new Driver, false).get ());
+      DriverManager::RegisterDriver (DRIVER_NAME, xtl::com_ptr<Driver> (new Driver, false).get ());
     }
 };
 
