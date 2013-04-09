@@ -14,6 +14,7 @@ const size_t RESERVE_OUTPUTS_SIZE = 16;
 */
 
 Adapter::Adapter (const DxFactoryPtr& factory, const char* name, const char* dll_path, const char*)
+  : module ()
 {
   try
   {
@@ -26,7 +27,7 @@ Adapter::Adapter (const DxFactoryPtr& factory, const char* name, const char* dll
     if (!dll_path)
       throw xtl::make_null_argument_exception ("", "dll_path");
 
-    HMODULE module = LoadLibrary (dll_path);
+    module = LoadLibrary (dll_path);
 
     if (!module)
       throw xtl::format_operation_exception ("", "Can't load module '%s'", dll_path);
@@ -52,8 +53,6 @@ Adapter::Adapter (const DxFactoryPtr& factory, const char* name, const char* dll
       FreeLibrary (module);
       throw;
     }
-
-    FreeLibrary (module);
   }
   catch (xtl::exception& e)
   {
@@ -63,6 +62,7 @@ Adapter::Adapter (const DxFactoryPtr& factory, const char* name, const char* dll
 }
 
 Adapter::Adapter (const DxAdapterPtr& in_adapter)
+  : module ()
 {
   try
   {
@@ -117,6 +117,8 @@ void Adapter::Init ()
 
 Adapter::~Adapter ()
 {
+  if (module)
+    FreeLibrary (module);
 }
 
 /*
@@ -136,6 +138,20 @@ const char* Adapter::GetPath ()
 const char* Adapter::GetDescription ()
 {
   return "render::low_level::dx11::Adapter";
+}
+
+HMODULE Adapter::GetModule ()
+{
+  return module;
+}
+
+/*
+    —сылка на адаптер DX11
+*/
+
+IDXGIAdapter& Adapter::DxAdapter ()
+{
+  return *adapter;
 }
 
 /*

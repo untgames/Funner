@@ -16,7 +16,9 @@
 #include <common/strlib.h>
 #include <common/utf_converter.h>
 
+#include <render/low_level/device.h>
 #include <render/low_level/driver.h>
+#include <render/low_level/utils.h>
 
 #include <render/low_level/helpers/object.h>
 #include <render/low_level/helpers/property_list.h>
@@ -32,12 +34,18 @@ namespace low_level
 namespace dx11
 {
 
+class Adapter;
+
 using helpers::Object;
 using helpers::PropertyList;
 
-typedef xtl::com_ptr<IDXGIAdapter> DxAdapterPtr;
-typedef xtl::com_ptr<IDXGIFactory> DxFactoryPtr;
-typedef xtl::com_ptr<IDXGIOutput>  DxOutputPtr;
+typedef xtl::com_ptr<IDXGIAdapter>        DxAdapterPtr;
+typedef xtl::com_ptr<IDXGIFactory>        DxFactoryPtr;
+typedef xtl::com_ptr<IDXGIOutput>         DxOutputPtr;
+typedef xtl::com_ptr<ID3D11DeviceContext> DxContextPtr;
+typedef xtl::com_ptr<ID3D11Device>        DxDevicePtr;
+
+typedef xtl::com_ptr<Adapter> AdapterPtr;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Устройство вывода
@@ -104,11 +112,17 @@ class Adapter: virtual public IAdapter, public Object
     ~Adapter ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Имя адаптера / путь к модулю / описание
+///Имя адаптера / путь к модулю / описание / дескриптор модуля
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     const char* GetName        ();
     const char* GetPath        ();
     const char* GetDescription ();
+    HMODULE     GetModule      ();
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Ссылка на адаптер DX11
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    IDXGIAdapter& DxAdapter ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Перечисление доступных устройств вывода
@@ -135,6 +149,7 @@ class Adapter: virtual public IAdapter, public Object
     stl::string  path;         //путь к адаптеру
     PropertyList properties;   //свойства адаптера
     OutputArray  outputs;      //устройства вывода
+    HMODULE      module;       //дескриптор модуля
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -182,6 +197,68 @@ class SwapChain: virtual public ISwapChain, public Object
     
   private:
     PropertyList properties; //свойства цепочки обмена
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Устройство отрисовки
+///////////////////////////////////////////////////////////////////////////////////////////////////
+class Device: virtual public IDevice, public Object
+{
+  public:  
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Конструктор / деструктор
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    Device  (const AdapterPtr& adapter, const char* init_string);
+    ~Device ();
+    
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Имя устройства
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    const char* GetName ();
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Получение возможностей устройства
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void        GetCaps                        (DeviceCaps&);
+    const char* GetCapString                   (DeviceCapString);
+    const char* GetVertexAttributeSemanticName (VertexAttributeSemantic semantic);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Создание ресурсов
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    IInputLayout*             CreateInputLayout             (const InputLayoutDesc&);
+    IProgramParametersLayout* CreateProgramParametersLayout (const ProgramParametersLayoutDesc&);
+    IRasterizerState*         CreateRasterizerState         (const RasterizerDesc&);
+    IBlendState*              CreateBlendState              (const BlendDesc&);
+    IDepthStencilState*       CreateDepthStencilState       (const DepthStencilDesc&);
+    ISamplerState*            CreateSamplerState            (const SamplerDesc&);
+    IBuffer*                  CreateBuffer                  (const BufferDesc&);
+    IProgram*                 CreateProgram                 (size_t shaders_count, const ShaderDesc* shader_descs, const LogFunction& error_log);
+    ITexture*                 CreateTexture                 (const TextureDesc&);
+    ITexture*                 CreateTexture                 (const TextureDesc&, const TextureData&);
+    ITexture*                 CreateTexture                 (const TextureDesc&, IBuffer* buffer, size_t buffer_offset, const size_t* mip_sizes = 0);
+    ITexture*                 CreateRenderTargetTexture     (ISwapChain* swap_chain, size_t buffer_index);
+    ITexture*                 CreateDepthStencilTexture     (ISwapChain* swap_chain);
+    IView*                    CreateView                    (ITexture* texture, const ViewDesc&);
+    IPredicate*               CreatePredicate               ();
+    IQuery*                   CreateQuery                   (QueryType type);
+    IStateBlock*              CreateStateBlock              (const StateBlockMask& mask);
+    IDeviceContext*           CreateDeferredContext         ();
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Список свойств устройства отрисовки
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    IPropertyList* GetProperties ();
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Получение непосредственного контекста выполнения операций
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    IDeviceContext* GetImmediateContext ();
+
+  private:
+    AdapterPtr   adapter;    //адаптер устройства
+    PropertyList properties; //свойства устройства
+    DxDevicePtr  device;     //устройство отрисовки
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
