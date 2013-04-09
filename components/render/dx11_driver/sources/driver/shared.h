@@ -1,6 +1,8 @@
 #ifndef RENDER_DX11_DRIVER_SOURCES_HEADER
 #define RENDER_DX11_DRIVER_SOURCES_HEADER
 
+#include <cmath>
+
 #include <D3D11.h>
 
 #include <stl/string>

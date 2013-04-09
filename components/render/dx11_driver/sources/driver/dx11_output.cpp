@@ -60,7 +60,7 @@ Output::Output (const DxOutputPtr& in_output)
     };
 
     static const Format2ColorBits formats [] = {
-      {DXGI_FORMAT_R8G8B8A8_TYPELESS, 32},
+      {DXGI_FORMAT_R8G8B8A8_UNORM, 32},
     };
 
     static const size_t formats_count = sizeof (formats) / sizeof (*formats);
@@ -94,7 +94,7 @@ Output::Output (const DxOutputPtr& in_output)
           dst_desc.width        = src_desc.Width;
           dst_desc.height       = src_desc.Height;
           dst_desc.color_bits   = color_bits;
-          dst_desc.refresh_rate = src_desc.RefreshRate.Numerator / src_desc.RefreshRate.Denominator;
+          dst_desc.refresh_rate = (size_t)ceil ((double)src_desc.RefreshRate.Numerator / src_desc.RefreshRate.Denominator);
 
           modes.push_back (dst_desc);
         }
