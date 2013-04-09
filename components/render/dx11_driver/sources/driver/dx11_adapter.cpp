@@ -4,6 +4,12 @@ using namespace render::low_level;
 using namespace render::low_level::dx11;
 
 /*
+    Константы
+*/
+
+const size_t RESERVE_OUTPUTS_SIZE = 16;
+
+/*
     Конструктор / деструктор
 */
 
@@ -76,6 +82,8 @@ Adapter::Adapter (const DxAdapterPtr& in_adapter)
 
 void Adapter::Init ()
 {
+    //получение параметров адаптера
+
   DXGI_ADAPTER_DESC desc;
 
   check_errors ("IDXGIAdapter::GetDesc", adapter->GetDesc (&desc));
@@ -91,7 +99,20 @@ void Adapter::Init ()
   properties.AddProperty ("DedicatedVideoMemory", common::format ("%u", desc.DedicatedVideoMemory).c_str ());
   properties.AddProperty ("DedicatedSystemMemory", common::format ("%u", desc.DedicatedSystemMemory).c_str ());
   properties.AddProperty ("SharedSystemMemory", common::format ("%u", desc.SharedSystemMemory).c_str ());
-  properties.AddProperty ("AdapterLuid", common::format ("%08x", desc.AdapterLuid).c_str ());
+  properties.AddProperty ("AdapterLuid", common::format ("%08x", desc.AdapterLuid).c_str ()); 
+
+    //перечисление устройств вывода
+
+  outputs.reserve (RESERVE_OUTPUTS_SIZE);
+
+  IDXGIOutput* dx_output = 0;
+
+  for (UINT i=0; adapter->EnumOutputs (i, &dx_output) != DXGI_ERROR_NOT_FOUND; i++)
+  {
+    OutputPtr output (new Output (dx_output), false);
+
+    outputs.push_back (output);
+  }  
 }
 
 Adapter::~Adapter ()
@@ -123,12 +144,15 @@ const char* Adapter::GetDescription ()
 
 size_t Adapter::GetOutputsCount ()
 {
-  throw xtl::make_not_implemented_exception (__FUNCTION__);
+  return outputs.size ();
 }
 
 IOutput* Adapter::GetOutput (size_t index)
 {
-  throw xtl::make_not_implemented_exception (__FUNCTION__);
+  if (index >= outputs.size ())
+    throw xtl::make_range_exception ("render::low_level::dx11::Adapter::GetOutput", "index", index, outputs.size ());
+
+  return &*outputs [index];
 }
 
 /*
