@@ -181,21 +181,43 @@ class DriverManagerImpl
 
       if (!init_string)
         init_string = "";
-        
+
         //поиск драйвера
         
-      AdapterArray adapters;        
+      AdapterArray adapters;
 
       DriverPtr driver = GetDriver (driver_mask, adapter_mask, adapters);
 
-        //создание SwapChain и устройства отрисовки
+        //получение возможностей драйвера
 
-      xtl::com_ptr<ISwapChain> swap_chain (driver->CreateSwapChain (adapters.size (), &adapters [0], swap_chain_desc), false);
-      xtl::com_ptr<IDevice>    device (driver->CreateDevice (get_pointer (swap_chain), init_string), false);
+      DriverCaps caps;
 
-      out_swap_chain = swap_chain;
-      out_device     = device;
-      out_driver     = driver;
+      memset (&caps, 0, sizeof (caps));
+
+      driver->GetCaps (caps);
+
+      if (caps.can_create_swap_chain_without_device)
+      {
+          //создание SwapChain и устройства отрисовки
+
+        xtl::com_ptr<ISwapChain> swap_chain (driver->CreateSwapChain (adapters.size (), &adapters [0], swap_chain_desc), false);
+        xtl::com_ptr<IDevice>    device (driver->CreateDevice (get_pointer (swap_chain), init_string), false);
+
+        out_swap_chain = swap_chain;
+        out_device     = device;
+      }
+      else
+      {
+          //создание SwapChain и устройства отрисовки
+
+        xtl::com_ptr<IDevice>    device (driver->CreateDevice (0, init_string), false);
+        xtl::com_ptr<ISwapChain> swap_chain (driver->CreateSwapChain (device.get (), swap_chain_desc), false);
+
+        out_swap_chain = swap_chain;
+        out_device     = device;
+      }
+
+      out_driver = driver;
     }
 
   private:

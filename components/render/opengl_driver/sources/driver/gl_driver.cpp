@@ -54,6 +54,17 @@ const char* Driver::GetDescription ()
 }
 
 /*
+    Получение возможностей драйвера
+*/
+
+void Driver::GetCaps (DriverCaps& caps)
+{
+  memset (&caps, 0, sizeof caps);
+
+  caps.can_create_swap_chain_without_device = true;
+}
+
+/*
     Перечисление доступных адаптеров
 */
 
@@ -145,7 +156,27 @@ ISwapChain* Driver::CreateSwapChain (size_t prefered_adapters_count, IAdapter** 
   }
   catch (xtl::exception& exception)
   {
-    exception.touch ("render::low_level::opengl::Driver::CreateSwapChain");
+    exception.touch ("render::low_level::opengl::Driver::CreateSwapChain(size_t,IAdapter**,const SwapChainDesc&)");
+    throw;
+  }
+}
+
+ISwapChain* Driver::CreateSwapChain (IDevice* in_device, const SwapChainDesc& desc)
+{
+  try
+  {
+    if (!in_device)
+      throw xtl::make_null_argument_exception ("", "device");
+
+    Device* device = cast_object<Device> (in_device, "", "device");
+
+    IAdapter* adapter = device->GetAdapter ();
+
+    return CreateSwapChain (1, &adapter, desc);
+  }
+  catch (xtl::exception& exception)
+  {
+    exception.touch ("render::low_level::opengl::Driver::CreateSwapChain(IDevice*,const SwapChainDesc&)");
     throw;
   }
 }

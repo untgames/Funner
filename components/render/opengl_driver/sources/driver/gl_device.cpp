@@ -65,6 +65,15 @@ const char* Device::GetName ()
 }
 
 /*
+    Получение адаптера
+*/
+
+IAdapter* Device::GetAdapter ()
+{
+  return context_manager.GetAdapter ();
+}
+
+/*
     Получение возможностей устройства
 */
 

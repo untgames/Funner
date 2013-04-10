@@ -263,7 +263,17 @@ struct ContextManager::Impl: public xtl::reference_counter
 
       for (size_t stage=0; stage<Stage_Num; stage++)
         need_stage_rebind [stage] = true;
-    }    
+
+        //получение адаптера
+
+      if (!swap_chain)
+        throw xtl::make_null_argument_exception ("render::low_level::opengl::ContextManager::Impl::Impl", "swap_chain");
+
+      adapter = swap_chain->GetAdapter ();
+    }
+
+///Получение адаптера
+    IAdapter* GetAdapter () { return adapter.get (); }
 
 ///Установка текущей цепочки обмена
     void SetSwapChain (ISwapChain* swap_chain)
@@ -435,7 +445,7 @@ struct ContextManager::Impl: public xtl::reference_counter
 
       return need_stage_rebind [stage];
     }  
-    
+
   private:
 ///Обработчик удаления цепочки обмена
     void OnDestroySwapChain ()
@@ -445,9 +455,13 @@ struct ContextManager::Impl: public xtl::reference_counter
     }
 
   private:
+    typedef xtl::com_ptr<IAdapter> AdapterPtr;
+
+  private:
     Log                       log;                           //протокол
     ContextImpl               context;                       //контекст
     LogHandler                log_handler;                   //обработчик протоколирования
+    AdapterPtr                adapter;                       //адаптер менеджера контекстов    
     ISwapChain*               current_swap_chain;            //текущая цепочка обмена
     bool                      check_gl_errors;               //нужно ли проверять ошибки OpenGL
     bool                      need_change_context;           //необходимо сменить контекст
@@ -588,6 +602,15 @@ const char* ContextManager::GetVendor () const
 const char* ContextManager::GetRenderer () const
 {
   return impl->GetContext ().GetRendererString ();
+}
+
+/*
+    Адаптер
+*/
+
+IAdapter* ContextManager::GetAdapter () const
+{
+  return impl->GetAdapter ();
 }
 
 /*
