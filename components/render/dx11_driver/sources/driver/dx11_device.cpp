@@ -91,7 +91,7 @@ void Device::GetCaps (DeviceCaps& caps)
 {
   try
   {
-    throw xtl::make_not_implemented_exception (__FUNCTION__);
+    memset (&caps, 0, sizeof (caps));
   }
   catch (xtl::exception& exception)
   {
@@ -107,7 +107,7 @@ const char* Device::GetCapString (DeviceCapString cap_string)
     switch (cap_string)
     {
       case DeviceCapString_ShaderProfiles:
-        throw xtl::make_not_implemented_exception (__FUNCTION__);
+        return "hlsl.vs hlsl.ps";
       default:
         throw xtl::make_argument_exception ("", "cap_string", cap_string);
     }
