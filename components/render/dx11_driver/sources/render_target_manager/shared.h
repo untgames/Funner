@@ -1,0 +1,6 @@
+#ifndef RENDER_DX11_DRIVER_RENDER_TARGET_MANAGER_SHARED_HEADER
+#define RENDER_DX11_DRIVER_RENDER_TARGET_MANAGER_SHARED_HEADER
+
+#include <shared/render_target_manager.h>
+
+#endif

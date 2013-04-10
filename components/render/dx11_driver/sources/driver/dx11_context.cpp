@@ -10,6 +10,7 @@ using namespace render::low_level::dx11;
 Context::Context (const DxContextPtr& in_context, const DeviceManager& device_manager)
   : DeviceObject (device_manager)
   , context (in_context)
+  , render_target_context (context, device_manager)
 {
   if (!context)
     throw xtl::make_null_argument_exception ("render::low_level::dx11::Context::Context", "context");

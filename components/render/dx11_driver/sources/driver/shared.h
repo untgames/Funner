@@ -43,13 +43,6 @@ using helpers::Object;
 using helpers::PropertyList;
 using helpers::cast_object;
 
-typedef xtl::com_ptr<IDXGIAdapter>        DxAdapterPtr;
-typedef xtl::com_ptr<IDXGIFactory>        DxFactoryPtr;
-typedef xtl::com_ptr<IDXGIOutput>         DxOutputPtr;
-typedef xtl::com_ptr<ID3D11DeviceContext> DxContextPtr;
-typedef xtl::com_ptr<ID3D11Device>        DxDevicePtr;
-typedef xtl::com_ptr<IDXGISwapChain>      DxSwapChainPtr;
-
 typedef xtl::com_ptr<Adapter> AdapterPtr;
 typedef xtl::com_ptr<Context> ContextPtr;
 
@@ -334,7 +327,8 @@ class Context: virtual public IDeviceContext, public DeviceObject
     void          ExecuteCommandList (ICommandList* list, bool restore_state);
 
   private:
-    DxContextPtr context; //контекст отрисовки
+    DxContextPtr        context;               //контекст отрисовки
+    RenderTargetContext render_target_context; //контекст целей отрисовки
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
