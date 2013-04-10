@@ -7,9 +7,41 @@ using namespace render::low_level::dx11;
     Описание реализации контекста целей рендеринга
 */
 
+typedef xtl::trackable_ptr<View> ViewPtr;
+
+namespace
+{
+
+struct RenderTargetDesc
+{
+  ViewPtr  view;                      //текущее отображение буферов цвета
+  Viewport viewport;                  //область вывода
+  Rect     scissor;                   //область отсечения
+  size_t   viewport_hash;             //хеш области вывода
+  size_t   viewport_rect_hash;        //хэш области вывода для области отсечения
+  size_t   scissor_hash;              //хэш области отсечения
+  bool     need_recalc_viewport_hash; //флаг необходимости пересчёта хэша области вывода
+  bool     need_recalc_scissor_hash;  //флаг необходимости пересчёта хэша области отсечения
+
+  RenderTargetDesc () 
+    : viewport_hash ()
+    , viewport_rect_hash ()
+    , scissor_hash ()
+    , need_recalc_viewport_hash (true)
+    , need_recalc_scissor_hash (true)
+  {
+    memset (&viewport, 0, sizeof viewport);
+    memset (&scissor, 0, sizeof scissor);
+  }
+};
+
+}
+
 struct RenderTargetContextState::Impl
 {
-  bool is_dirty; //флаг "грязности"
+  RenderTargetDesc render_targets [DEVICE_RENDER_TARGET_SLOTS_COUNT]; //дескрипторы целей рендеринга
+  ViewPtr          depth_stencil_view;                                //текущее отображение буфера попиксельного отсечения
+  bool             is_dirty;                                          //флаг "грязности"
 
 /// Конструктор
   Impl ()
