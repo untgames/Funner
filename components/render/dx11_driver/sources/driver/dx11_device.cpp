@@ -29,8 +29,20 @@ Device::Device (const AdapterPtr& in_adapter, const char* init_string)
     ID3D11DeviceContext* dx_context = 0;
     D3D_FEATURE_LEVEL    feature_level;
 
-    check_errors ("::D3D11CreateDevice", D3D11CreateDevice (&adapter->DxAdapter (), adapter->GetModule () ? D3D_DRIVER_TYPE_SOFTWARE : D3D_DRIVER_TYPE_HARDWARE,
-      adapter->GetModule (), 0, 0, 0, D3D11_SDK_VERSION, &dx_device, &feature_level, &dx_context));
+    static const D3D_FEATURE_LEVEL feature_levels_requested [] = {
+      D3D_FEATURE_LEVEL_11_0,
+      D3D_FEATURE_LEVEL_10_1,
+      D3D_FEATURE_LEVEL_10_0,
+      D3D_FEATURE_LEVEL_9_3,
+      D3D_FEATURE_LEVEL_9_2,
+      D3D_FEATURE_LEVEL_9_1,
+    };
+
+    static const size_t feature_levels_requested_count = sizeof (feature_levels_requested) / sizeof (*feature_levels_requested);
+
+    check_errors ("::D3D11CreateDevice", D3D11CreateDevice (adapter->GetModule () ? (IDXGIAdapter*)0 : &adapter->DxAdapter (), 
+      adapter->GetModule () ? D3D_DRIVER_TYPE_SOFTWARE : D3D_DRIVER_TYPE_UNKNOWN,
+      adapter->GetModule (), 0, feature_levels_requested, feature_levels_requested_count, D3D11_SDK_VERSION, &dx_device, &feature_level, &dx_context));
 
     if (!dx_device || !dx_context)
       throw xtl::format_operation_exception ("", "::D3D11CreateDevice failed");
