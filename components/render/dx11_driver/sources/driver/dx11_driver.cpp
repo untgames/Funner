@@ -72,6 +72,15 @@ const char* Driver::GetDescription ()
 }
 
 /*
+    Получение возможностей драйвера
+*/
+
+void Driver::GetCaps (DriverCaps& caps)
+{
+  memset (&caps, 0, sizeof (caps));
+}
+
+/*
     Перечисление доступных адаптеров
 */
 
@@ -156,6 +165,11 @@ IAdapter* Driver::CreateAdapter (const char* name, const char* path, const char*
 */
 
 ISwapChain* Driver::CreateSwapChain (size_t prefered_adapters_count, IAdapter** prefered_adapters, const SwapChainDesc& desc)
+{
+  throw xtl::make_not_implemented_exception (__FUNCTION__);
+}
+
+ISwapChain* Driver::CreateSwapChain (IDevice* device, const SwapChainDesc& desc)
 {
   throw xtl::make_not_implemented_exception (__FUNCTION__);
 }
