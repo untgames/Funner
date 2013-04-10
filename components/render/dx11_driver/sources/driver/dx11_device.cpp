@@ -19,7 +19,7 @@ Device::Device (const AdapterPtr& in_adapter, const char* init_string)
     if (!in_adapter)
       throw xtl::make_null_argument_exception ("", "adapter");
 
-      //сохранение адаптера
+      //сохранение аргументов
 
     adapter = in_adapter;
 
@@ -47,7 +47,7 @@ Device::Device (const AdapterPtr& in_adapter, const char* init_string)
     if (!dx_device || !dx_context)
       throw xtl::format_operation_exception ("", "::D3D11CreateDevice failed");
 
-    device = dx_device;
+    device = DxDevicePtr (dx_device, false);
   }
   catch (xtl::exception& e)
   {
@@ -58,6 +58,15 @@ Device::Device (const AdapterPtr& in_adapter, const char* init_string)
 
 Device::~Device ()
 {
+}
+
+/*
+    Получение дескриптора устройства
+*/
+
+DxDevicePtr Device::GetDevice ()
+{
+  return device;
 }
 
 /*

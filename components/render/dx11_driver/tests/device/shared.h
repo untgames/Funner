@@ -92,8 +92,8 @@ struct Test
     desc.frame_buffer.depth_bits   = 16;
     desc.frame_buffer.stencil_bits = 0;
     desc.buffers_count             = 2;
-    desc.samples_count             = 0;
-    desc.swap_method               = SwapMethod_Discard;
+    desc.samples_count             = 1;
+    desc.swap_method               = SwapMethod_Flip;
     desc.vsync                     = true;
     desc.fullscreen                = false;
     desc.window_handle             = window.Handle ();

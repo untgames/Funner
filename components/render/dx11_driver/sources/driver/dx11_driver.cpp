@@ -166,12 +166,25 @@ IAdapter* Driver::CreateAdapter (const char* name, const char* path, const char*
 
 ISwapChain* Driver::CreateSwapChain (size_t prefered_adapters_count, IAdapter** prefered_adapters, const SwapChainDesc& desc)
 {
-  throw xtl::make_not_implemented_exception (__FUNCTION__);
+  throw xtl::format_operation_exception ("render::low_level::dx11::Driver::CreateSwapChain(size_t,IAdapter*,const SwapChainDesc&)", "Can't create swap chain without device");
 }
 
-ISwapChain* Driver::CreateSwapChain (IDevice* device, const SwapChainDesc& desc)
+ISwapChain* Driver::CreateSwapChain (IDevice* in_device, const SwapChainDesc& desc)
 {
-  throw xtl::make_not_implemented_exception (__FUNCTION__);
+  try
+  {
+    if (!in_device)
+      throw xtl::make_null_argument_exception ("", "device");
+
+    Device* device = cast_object<Device> (in_device, "", "device");
+
+    return new SwapChain (factory, device->GetDevice (), desc);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::low_level::dx11::Driver::CreateSwapChain(IDevice*,const SwapChainDesc&)");
+    throw;
+  }
 }
 
 /*

@@ -46,6 +46,7 @@ typedef xtl::com_ptr<IDXGIFactory>        DxFactoryPtr;
 typedef xtl::com_ptr<IDXGIOutput>         DxOutputPtr;
 typedef xtl::com_ptr<ID3D11DeviceContext> DxContextPtr;
 typedef xtl::com_ptr<ID3D11Device>        DxDevicePtr;
+typedef xtl::com_ptr<IDXGISwapChain>      DxSwapChainPtr;
 
 typedef xtl::com_ptr<Adapter> AdapterPtr;
 
@@ -163,7 +164,7 @@ class SwapChain: virtual public ISwapChain, public Object
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструктор / деструктор
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    SwapChain  (const SwapChainDesc& desc);
+    SwapChain  (const DxFactoryPtr& factory, const DxDevicePtr& device, const SwapChainDesc& desc);
     ~SwapChain ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -198,7 +199,8 @@ class SwapChain: virtual public ISwapChain, public Object
     IPropertyList* GetProperties ();
     
   private:
-    PropertyList properties; //свойства цепочки обмена
+    DxSwapChainPtr swap_chain; //цепочка обмена
+    PropertyList   properties; //свойства цепочки обмена
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -212,6 +214,11 @@ class Device: virtual public IDevice, public Object
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     Device  (const AdapterPtr& adapter, const char* init_string);
     ~Device ();
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Получение дескриптора устройства / фабрики
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    DxDevicePtr GetDevice ();
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Имя устройства
