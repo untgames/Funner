@@ -61,12 +61,17 @@ Device::~Device ()
 }
 
 /*
-    Получение дескриптора устройства
+    Получение дескриптора устройства / адаптера
 */
 
 DxDevicePtr Device::GetDevice ()
 {
   return device;
+}
+
+AdapterPtr Device::GetAdapter ()
+{
+  return adapter;
 }
 
 /*

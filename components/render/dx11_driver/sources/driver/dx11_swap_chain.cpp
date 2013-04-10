@@ -7,15 +7,20 @@ using namespace render::low_level::dx11;
     Конструктор / деструктор
 */
 
-SwapChain::SwapChain (const DxFactoryPtr& factory, const DxDevicePtr& device, const SwapChainDesc& src_desc)
+SwapChain::SwapChain (const DxFactoryPtr& factory, const AdapterPtr& in_adapter, const DxDevicePtr& device, const SwapChainDesc& src_desc)
 {
   try
   {
     if (!device)
       throw xtl::make_null_argument_exception ("", "device");
 
+    if (!in_adapter)
+      throw xtl::make_null_argument_exception ("", "adapter");
+
     if (!factory)
       throw xtl::make_null_argument_exception ("", "factory");
+
+    adapter = in_adapter;
 
     DXGI_SWAP_CHAIN_DESC dx_desc;
 
@@ -57,6 +62,33 @@ SwapChain::SwapChain (const DxFactoryPtr& factory, const DxDevicePtr& device, co
       throw xtl::format_operation_exception ("", "IDXGIFactory::CreateSwapChain failed");
 
     swap_chain = DxSwapChainPtr (dx_swap_chain, false);
+
+    check_errors ("IDXGISwapChain::GetDesc", swap_chain->GetDesc (&dx_desc));
+
+    memset (&desc, 0, sizeof (desc));
+
+    desc = src_desc;
+
+    desc.frame_buffer.width        = dx_desc.BufferDesc.Width;
+    desc.frame_buffer.height       = dx_desc.BufferDesc.Height;
+    desc.frame_buffer.color_bits   = 32;
+    desc.frame_buffer.alpha_bits   = 8;
+    desc.frame_buffer.depth_bits   = 24;
+    desc.frame_buffer.stencil_bits = 8;
+    desc.samples_count             = dx_desc.SampleDesc.Count;
+    desc.buffers_count             = dx_desc.BufferCount;
+    desc.fullscreen                = !dx_desc.Windowed; 
+
+    switch (dx_desc.SwapEffect)
+    {
+      case DXGI_SWAP_EFFECT_DISCARD:
+        desc.swap_method = SwapMethod_Discard;
+        break;
+      default:
+      case DXGI_SWAP_EFFECT_SEQUENTIAL:
+        desc.swap_method = SwapMethod_Copy;
+        break;
+    }
   }
   catch (xtl::exception& e)
   {
@@ -75,16 +107,16 @@ SwapChain::~SwapChain ()
 
 IAdapter* SwapChain::GetAdapter ()
 {
-  throw xtl::make_not_implemented_exception (__FUNCTION__);
+  return &*adapter;
 }
 
 /*
     Получение дескриптора
 */
 
-void SwapChain::GetDesc (SwapChainDesc&)
+void SwapChain::GetDesc (SwapChainDesc& out_desc)
 {
-  throw xtl::make_not_implemented_exception (__FUNCTION__);
+  out_desc = desc;
 }
 
 /*
@@ -93,7 +125,22 @@ void SwapChain::GetDesc (SwapChainDesc&)
 
 IOutput* SwapChain::GetContainingOutput ()
 {
-  throw xtl::make_not_implemented_exception (__FUNCTION__);
+  try
+  {
+    IDXGIOutput* output = 0;
+
+    check_errors ("IDXGISwapChain::GetContainingOutput", swap_chain->GetContainingOutput (&output));
+
+    if (!output)
+      throw xtl::format_operation_exception ("", "IDXGISwapChain::GetContainingOutput failed");
+
+    return adapter->FindOutput (output);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::low_level::dx11::SwapChain::GetContainingOutput");
+    throw;
+  }
 }
 
 /*
@@ -102,12 +149,39 @@ IOutput* SwapChain::GetContainingOutput ()
 
 void SwapChain::SetFullscreenState (bool state)
 {
-  throw xtl::make_not_implemented_exception (__FUNCTION__);
+  try
+  {
+    IDXGIOutput* output = 0;
+
+    check_errors ("IDXGISwapChain::GetContainingOutput", swap_chain->GetContainingOutput (&output));
+
+    if (!output)
+      throw xtl::format_operation_exception ("", "IDXGISwapChain::GetContainingOutput failed");
+
+    check_errors ("IDXGISwapChain::SetFullscreenState", swap_chain->SetFullscreenState (state, output));
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::low_level::dx11::SwapChain::SetFullscreenState");
+    throw;
+  }
 }
 
 bool SwapChain::GetFullscreenState ()
 {
-  throw xtl::make_not_implemented_exception (__FUNCTION__);
+  try
+  {
+    BOOL state = FALSE;
+
+    check_errors ("IDXGISwapChain::GetFullscreenState", swap_chain->GetFullscreenState (&state, 0));
+
+    return state != FALSE;
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::low_level::dx11::SwapChain::GetFullscreenState");
+    throw;
+  }
 }
 
 /*
@@ -116,7 +190,15 @@ bool SwapChain::GetFullscreenState ()
 
 void SwapChain::Present ()
 {
-  throw xtl::make_not_implemented_exception (__FUNCTION__);
+  try
+  {
+    check_errors ("IDXGISwapChain::Present", swap_chain->Present (desc.vsync, 0));
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::low_level::dx11::SwapChain::Present");
+    throw;
+  }
 }
 
 /*

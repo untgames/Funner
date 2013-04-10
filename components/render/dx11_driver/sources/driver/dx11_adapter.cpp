@@ -171,6 +171,15 @@ IOutput* Adapter::GetOutput (size_t index)
   return &*outputs [index];
 }
 
+Output* Adapter::FindOutput (IDXGIOutput* output)
+{
+  for (OutputArray::iterator iter=outputs.begin (), end=outputs.end (); iter!=end; ++iter)
+    if ((*iter)->GetOutput () == output)
+      return &**iter;
+
+  return 0;
+}
+
 /*
     Список свойств адаптера
 */

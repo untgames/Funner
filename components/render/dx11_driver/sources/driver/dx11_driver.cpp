@@ -178,7 +178,7 @@ ISwapChain* Driver::CreateSwapChain (IDevice* in_device, const SwapChainDesc& de
 
     Device* device = cast_object<Device> (in_device, "", "device");
 
-    return new SwapChain (factory, device->GetDevice (), desc);
+    return new SwapChain (factory, device->GetAdapter (), device->GetDevice (), desc);
   }
   catch (xtl::exception& e)
   {

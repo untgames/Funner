@@ -130,6 +130,15 @@ const char* Output::GetName ()
 }
 
 /*
+    Дескриптор устройства вывода
+*/
+
+DxOutputPtr Output::GetOutput ()
+{
+  return output;
+}
+
+/*
     Получение списка видео-режимов
 */
 
