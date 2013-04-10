@@ -41,7 +41,7 @@ DeviceManager& DeviceManager::operator = (const DeviceManager& manager)
   return *this;
 }
 
-IDXGIDevice& DeviceManager::GetDevice () const
+ID3D11Device& DeviceManager::GetDevice () const
 {
   return *impl->device;
 }
@@ -60,7 +60,7 @@ DeviceObject::DeviceObject (const DeviceManager& in_manager)
 {
 }
 
-IDXGIDevice& DeviceObject::GetDevice () const
+ID3D11Device& DeviceObject::GetDevice () const
 {
   return manager.GetDevice ();
 }

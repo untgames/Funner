@@ -133,9 +133,9 @@ const char* Output::GetName ()
     Дескриптор устройства вывода
 */
 
-DxOutputPtr Output::GetOutput ()
+IDXGIOutput& Output::GetHandle ()
 {
-  return output;
+  return *output;
 }
 
 /*

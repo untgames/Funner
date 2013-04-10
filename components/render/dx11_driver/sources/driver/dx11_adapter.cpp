@@ -149,7 +149,7 @@ HMODULE Adapter::GetModule ()
     Ññûëêà íà àäàïòåğ DX11
 */
 
-IDXGIAdapter& Adapter::DxAdapter ()
+IDXGIAdapter& Adapter::GetHandle ()
 {
   return *adapter;
 }
@@ -174,7 +174,7 @@ IOutput* Adapter::GetOutput (size_t index)
 Output* Adapter::FindOutput (IDXGIOutput* output)
 {
   for (OutputArray::iterator iter=outputs.begin (), end=outputs.end (); iter!=end; ++iter)
-    if ((*iter)->GetOutput () == output)
+    if (&(*iter)->GetHandle () == output)
       return &**iter;
 
   return 0;

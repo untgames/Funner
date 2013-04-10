@@ -40,7 +40,7 @@ Device::Device (const AdapterPtr& in_adapter, const char* init_string)
 
     static const size_t feature_levels_requested_count = sizeof (feature_levels_requested) / sizeof (*feature_levels_requested);
 
-    check_errors ("::D3D11CreateDevice", D3D11CreateDevice (adapter->GetModule () ? (IDXGIAdapter*)0 : &adapter->DxAdapter (), 
+    check_errors ("::D3D11CreateDevice", D3D11CreateDevice (adapter->GetModule () ? (IDXGIAdapter*)0 : &adapter->GetHandle (), 
       adapter->GetModule () ? D3D_DRIVER_TYPE_SOFTWARE : D3D_DRIVER_TYPE_UNKNOWN,
       adapter->GetModule (), 0, feature_levels_requested, feature_levels_requested_count, D3D11_SDK_VERSION, &dx_device, &feature_level, &dx_context));
 
@@ -48,6 +48,10 @@ Device::Device (const AdapterPtr& in_adapter, const char* init_string)
       throw xtl::format_operation_exception ("", "::D3D11CreateDevice failed");
 
     device = DxDevicePtr (dx_device, false);
+
+    device_manager.reset (new DeviceManager (device));
+
+    immediate_context = ContextPtr (new Context (DxContextPtr (dx_context, false), *device_manager), false);
   }
   catch (xtl::exception& e)
   {
@@ -64,9 +68,9 @@ Device::~Device ()
     Получение дескриптора устройства / адаптера
 */
 
-DxDevicePtr Device::GetDevice ()
+ID3D11Device& Device::GetHandle ()
 {
-  return device;
+  return *device;
 }
 
 AdapterPtr Device::GetAdapter ()
@@ -418,7 +422,7 @@ IDeviceContext* Device::CreateDeferredContext ()
 
 IDeviceContext* Device::GetImmediateContext ()
 {
-  throw xtl::make_not_implemented_exception (__FUNCTION__);
+  return &*immediate_context;
 }
 
 /*

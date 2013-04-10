@@ -25,6 +25,7 @@
 
 #include <shared/log.h>
 #include <shared/error.h>
+#include <shared/render_target_manager.h>
 
 namespace render
 {
@@ -36,6 +37,7 @@ namespace dx11
 {
 
 class Adapter;
+class Context;
 
 using helpers::Object;
 using helpers::PropertyList;
@@ -49,6 +51,7 @@ typedef xtl::com_ptr<ID3D11Device>        DxDevicePtr;
 typedef xtl::com_ptr<IDXGISwapChain>      DxSwapChainPtr;
 
 typedef xtl::com_ptr<Adapter> AdapterPtr;
+typedef xtl::com_ptr<Context> ContextPtr;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Устройство вывода
@@ -65,7 +68,7 @@ class Output: virtual public IOutput, public Object
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Дескриптор устройства вывода
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    DxOutputPtr GetOutput ();
+    IDXGIOutput& GetHandle ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Получение имени
@@ -130,7 +133,7 @@ class Adapter: virtual public IAdapter, public Object
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Ссылка на адаптер DX11
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    IDXGIAdapter& DxAdapter ();
+    IDXGIAdapter& GetHandle ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Перечисление доступных устройств вывода
@@ -211,6 +214,130 @@ class SwapChain: virtual public ISwapChain, public Object
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+///Контекст отрисовки
+///////////////////////////////////////////////////////////////////////////////////////////////////
+class Context: virtual public IDeviceContext, public DeviceObject
+{
+  public:
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Конструктор
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    Context  (const DxContextPtr& context, const DeviceManager& device_manager);
+    ~Context ();
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Низкоуровневый дескриптор
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    ID3D11DeviceContext& GetHandle ();
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Указание границ запроса
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void Begin (IQuery* async);
+    void End   (IQuery* async);
+  
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Управление входным уровнем (input-stage)
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void          ISSetInputLayout  (IInputLayout* state);
+    void          ISSetVertexBuffer (size_t vertex_buffer_slot,  IBuffer* buffer);
+    void          ISSetIndexBuffer  (IBuffer* buffer);
+    IInputLayout* ISGetInputLayout  ();
+    IBuffer*      ISGetVertexBuffer (size_t vertex_buffer_slot);
+    IBuffer*      ISGetIndexBuffer  ();
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Управление шейдерными уровнями (shader-stage)
+/// в случае несовпадения расположения переменных в программе и лэйауте - генерируется исключение
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void                      SSSetProgram                 (IProgram* program);
+    void                      SSSetProgramParametersLayout (IProgramParametersLayout* parameters_layout);
+    void                      SSSetSampler                 (size_t sampler_slot, ISamplerState* state);
+    void                      SSSetTexture                 (size_t sampler_slot, ITexture* texture);
+    void                      SSSetConstantBuffer          (size_t buffer_slot, IBuffer* buffer);
+    IProgramParametersLayout* SSGetProgramParametersLayout ();
+    IProgram*                 SSGetProgram                 ();
+    ISamplerState*            SSGetSampler                 (size_t sampler_slot);
+    ITexture*                 SSGetTexture                 (size_t sampler_slot);
+    IBuffer*                  SSGetConstantBuffer          (size_t buffer_slot);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Управление растеризатором (rasterizer-stage)
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void              RSSetState    (IRasterizerState* state);
+    void              RSSetViewport (size_t render_target_slot, const Viewport& viewport);
+    void              RSSetScissor  (size_t render_target_slot, const Rect& scissor_rect);
+    IRasterizerState* RSGetState    ();
+    const Viewport&   RSGetViewport (size_t render_target_slot);
+    const Rect&       RSGetScissor  (size_t render_target_slot);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Управление выходным уровнем (output-stage)
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void                OSSetBlendState        (IBlendState* state);
+    void                OSSetDepthStencilState (IDepthStencilState* state);
+    void                OSSetStencilReference  (size_t reference);
+    void                OSSetRenderTargets     (size_t views_count, IView** render_target_view, IView* depth_stencil_view);
+    void                OSSetRenderTargetView  (size_t render_target_slot, IView* view);
+    void                OSSetDepthStencilView  (IView* view);
+    IBlendState*        OSGetBlendState        ();
+    IDepthStencilState* OSGetDepthStencilState ();
+    size_t              OSGetStencilReference  ();
+    IView*              OSGetRenderTargetView  (size_t render_target_slot);
+    IView*              OSGetDepthStencilView  ();
+    
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Управление уровнем вывода вершин
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void     SOSetTargets      (size_t buffers_count, IBuffer** buffers, const size_t* offsets);
+    void     SOSetTarget       (size_t stream_output_slot, IBuffer* buffer, size_t offset);
+    IBuffer* SOGetTarget       (size_t stream_output_slot);
+    size_t   SOGetTargetOffset (size_t stream_output_slot);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Очистка буферов отрисовки
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void ClearRenderTargetView (size_t render_target_slot, const Color4f& color);
+    void ClearDepthStencilView (size_t clear_flags, float depth, unsigned char stencil);
+    void ClearViews            (size_t clear_flags, size_t render_targets_count, const size_t* render_target_indices, const Color4f* colors, float depth, unsigned char stencil);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Генерация мип-уровней текстуры (необходимо для текстур в которые ведется рендеринг)
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void GenerateMips (ITexture* texture);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Управление предикатами отрисовки
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void        SetPredication    (IPredicate* predicate, bool predicate_value);
+    IPredicate* GetPredicate      ();
+    bool        GetPredicateValue ();
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Рисование примитивов
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void DrawAuto             (PrimitiveType primitive_type);
+    void Draw                 (PrimitiveType primitive_type, size_t first_vertex, size_t vertices_count);
+    void DrawIndexed          (PrimitiveType primitive_type, size_t first_index, size_t indices_count, size_t base_vertex);
+    void DrawInstanced        (PrimitiveType primitive_type, size_t vertex_count_per_instance, size_t instance_count, size_t first_vertex, size_t first_instance_location);
+    void DrawIndexedInstanced (PrimitiveType primitive_type, size_t index_count_per_instance, size_t instance_count, size_t first_index, size_t base_vertex, size_t first_instance_location);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Ожидание завершения выполнения буфера команд
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void Flush ();
+    
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Выполнение списка команд
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    ICommandList* FinishCommandList  (bool restore_state);
+    void          ExecuteCommandList (ICommandList* list, bool restore_state);
+
+  private:
+    DxContextPtr context; //контекст отрисовки
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Устройство отрисовки
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 class Device: virtual public IDevice, public Object
@@ -225,8 +352,8 @@ class Device: virtual public IDevice, public Object
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Получение дескриптора устройства / адаптера
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    DxDevicePtr GetDevice  ();
-    AdapterPtr  GetAdapter ();
+    ID3D11Device& GetHandle  ();
+    AdapterPtr    GetAdapter ();
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Имя устройства
@@ -253,7 +380,7 @@ class Device: virtual public IDevice, public Object
     IProgram*                 CreateProgram                 (size_t shaders_count, const ShaderDesc* shader_descs, const LogFunction& error_log);
     ITexture*                 CreateTexture                 (const TextureDesc&);
     ITexture*                 CreateTexture                 (const TextureDesc&, const TextureData&);
-    ITexture*                 CreateTexture                 (const TextureDesc&, IBuffer* buffer, size_t buffer_offset, const size_t* mip_sizes = 0);
+    ITexture*                 CreateTexture                 (const TextureDesc&, IBuffer* buffer, size_t buffer_offset, const size_t* mip_sizes);
     ITexture*                 CreateRenderTargetTexture     (ISwapChain* swap_chain, size_t buffer_index);
     ITexture*                 CreateDepthStencilTexture     (ISwapChain* swap_chain);
     IView*                    CreateView                    (ITexture* texture, const ViewDesc&);
@@ -273,9 +400,11 @@ class Device: virtual public IDevice, public Object
     IDeviceContext* GetImmediateContext ();
 
   private:
-    AdapterPtr   adapter;    //адаптер устройства
-    PropertyList properties; //свойства устройства
-    DxDevicePtr  device;     //устройство отрисовки
+    AdapterPtr                   adapter;           //адаптер устройства
+    PropertyList                 properties;        //свойства устройства
+    DxDevicePtr                  device;            //устройство отрисовки
+    stl::auto_ptr<DeviceManager> device_manager;    //менеджер устройства
+    ContextPtr                   immediate_context; //непосредственный конеткст отрисовки
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
