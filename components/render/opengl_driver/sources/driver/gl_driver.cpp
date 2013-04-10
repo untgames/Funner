@@ -204,6 +204,11 @@ IDevice* Driver::CreateDevice (ISwapChain* swap_chain, const char* init_string)
   }
 }
 
+IDevice* Driver::CreateDevice (size_t prefered_adapters_count, IAdapter** prefered_adapters, const char* init_string)
+{
+  throw xtl::format_operation_exception ("render::low_level::opengl::Driver::CreateDevice", "Can't create device without swap chain");
+}
+
 /*
     Установка функции отладочного протоколирования драйвера
 */

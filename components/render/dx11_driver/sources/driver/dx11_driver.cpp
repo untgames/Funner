@@ -178,9 +178,84 @@ ISwapChain* Driver::CreateSwapChain (IDevice* device, const SwapChainDesc& desc)
     Создание устройства отрисовки
 */
 
-IDevice* Driver::CreateDevice (ISwapChain* swap_chain, const char* init_string)
+IDevice* Driver::CreateDevice (ISwapChain* in_swap_chain, const char* init_string)
 {
-  throw xtl::make_not_implemented_exception (__FUNCTION__);
+  try
+  {
+    if (!in_swap_chain)
+      throw xtl::make_null_argument_exception ("", "swap_chain");
+
+    SwapChain* swap_chain = cast_object<SwapChain> (in_swap_chain, "", "swap_chain");
+
+    IAdapter* adapter = swap_chain->GetAdapter ();
+
+    return CreateDevice (1, &adapter, init_string);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::low_level::dx11::Driver::CreateDevice(ISwapChain*,const char*)");
+    throw;
+  }
+}
+
+IDevice* Driver::CreateDevice (size_t prefered_adapters_count, IAdapter** prefered_adapters, const char* init_string)
+{
+  static const char* METHOD_NAME = "render::low_level::dx11::Driver::CreateDevice(ISwapChain*,const char*)";
+
+  try
+  {
+    if (!prefered_adapters_count)
+      throw xtl::make_null_argument_exception ("", "prefered_adapters_count");
+
+    if (!prefered_adapters)
+      throw xtl::make_null_argument_exception ("", "prefered_adapters");    
+
+    for (size_t i=0; i<prefered_adapters_count; i++)
+    {
+      IAdapter* src_adapter = prefered_adapters [i];
+
+      if (!src_adapter)
+        throw xtl::format_exception<xtl::null_argument_exception> ("", "Null argument prefered_adapters[%u]", i);
+
+      try
+      {
+        AdapterPtr adapter = cast_object<Adapter> (src_adapter, "", "adapter");
+
+        return new Device (adapter, init_string);
+      }
+      catch (std::exception& e)
+      {
+        log.Printf ("Attempt to create device for adapter '%s' failed. %s\n    at %s", src_adapter->GetName (), e.what (), METHOD_NAME);
+
+        if (i == prefered_adapters_count-1)
+        {
+          if (i == 0)
+            throw;
+
+          throw xtl::format_operation_exception ("", "Can't create DX11 device");
+        }
+      }
+      catch (...)
+      {
+        log.Printf ("Attempt to create device for adapter '%s' failed. Unknown exception\n    at %s", src_adapter->GetName (), METHOD_NAME);
+
+        if (i == prefered_adapters_count-1)
+        {
+          if (i == 0)
+            throw;
+
+          throw xtl::format_operation_exception ("", "Can't create DX11 device");
+        }
+      }
+    }
+
+    throw xtl::format_operation_exception ("", "Can't create DX11 device. No adapters");
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch (METHOD_NAME);
+    throw;
+  }
 }
 
 /*
@@ -189,10 +264,10 @@ IDevice* Driver::CreateDevice (ISwapChain* swap_chain, const char* init_string)
 
 void Driver::SetDebugLog (const LogFunction& fn)
 {
-  log_fn = fn;
+  dummy_log_fn = fn;
 }
 
 const LogFunction& Driver::GetDebugLog ()
 {
-  return log_fn;
+  return dummy_log_fn;
 }

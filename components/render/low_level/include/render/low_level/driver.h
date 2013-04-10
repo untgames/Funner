@@ -198,6 +198,7 @@ class IDriver: virtual public IObject
 ///Создание устройства отрисовки
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     virtual IDevice* CreateDevice (ISwapChain* swap_chain, const char* init_string = "") = 0;
+    virtual IDevice* CreateDevice (size_t prefered_adapters_count, IAdapter** prefered_adapters, const char* init_string = "") = 0;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Установка функции отладочного протоколирования драйвера

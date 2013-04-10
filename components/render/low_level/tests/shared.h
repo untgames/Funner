@@ -172,6 +172,11 @@ class TestDriver: public IDriver, public ObjectImpl
       throw xtl::make_not_implemented_exception ("TestDriver::CreateDevice");
     }
 
+    IDevice* CreateDevice (size_t adapters_count, IAdapter**, const char*)
+    {
+      throw xtl::make_not_implemented_exception ("TestDriver::CreateDevice");
+    }
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Установка функции отладочного протоколирования драйвера
 ///////////////////////////////////////////////////////////////////////////////////////////////////   

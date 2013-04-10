@@ -210,7 +210,7 @@ class DriverManagerImpl
       {
           //создание SwapChain и устройства отрисовки
 
-        xtl::com_ptr<IDevice>    device (driver->CreateDevice (0, init_string), false);
+        xtl::com_ptr<IDevice>    device (driver->CreateDevice (adapters.size (), &adapters [0], init_string), false);
         xtl::com_ptr<ISwapChain> swap_chain (driver->CreateSwapChain (device.get (), swap_chain_desc), false);
 
         out_swap_chain = swap_chain;

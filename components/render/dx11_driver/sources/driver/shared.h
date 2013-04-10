@@ -23,6 +23,7 @@
 #include <render/low_level/helpers/object.h>
 #include <render/low_level/helpers/property_list.h>
 
+#include <shared/log.h>
 #include <shared/error.h>
 
 namespace render
@@ -38,6 +39,7 @@ class Adapter;
 
 using helpers::Object;
 using helpers::PropertyList;
+using helpers::cast_object;
 
 typedef xtl::com_ptr<IDXGIAdapter>        DxAdapterPtr;
 typedef xtl::com_ptr<IDXGIFactory>        DxFactoryPtr;
@@ -304,6 +306,7 @@ class Driver: virtual public IDriver, public Object
 ///Создание устройства отрисовки
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     IDevice* CreateDevice (ISwapChain* swap_chain, const char* init_string);
+    IDevice* CreateDevice (size_t prefered_adapters_count, IAdapter** prefered_adapters, const char* init_string);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Установка функции отладочного протоколирования драйвера
@@ -324,7 +327,8 @@ class Driver: virtual public IDriver, public Object
     DxFactoryPtr     factory;             //фабрика DXGI
     AdapterArray     adapters;            //адаптеры отрисовки
     AdapterWeakArray registered_adapters; //зарегистрированные адаптеры отрисовки
-    LogFunction      log_fn;              //функция отладочного протоколирования
+    Log              log;                 //поток отладочного протоколирования
+    LogFunction      dummy_log_fn;        //функция отладочного протоколирования
 };
 
 }

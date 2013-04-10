@@ -116,6 +116,23 @@ IQuery* Device::CreateQuery (QueryType type)
 }
 
 /*
+    ”правление предикатами отрисовки
+*/
+
+IPredicate* Device::CreatePredicate ()
+{
+  try
+  {
+    throw xtl::make_not_implemented_exception (__FUNCTION__);
+  }
+  catch (xtl::exception& exception)
+  {
+    exception.touch ("render::low_level::dx11::Device::CreatePredicate");
+    throw;
+  }
+}
+
+/*
     –абота с блоками состо€ний
 */
 
@@ -365,6 +382,15 @@ IView* Device::CreateView (ITexture* texture, const ViewDesc& desc)
 */
 
 IDeviceContext* Device::CreateDeferredContext ()
+{
+  throw xtl::make_not_implemented_exception (__FUNCTION__);
+}
+
+/*
+    ѕолучение непосредственного контекста выполнени€ операций
+*/
+
+IDeviceContext* Device::GetImmediateContext ()
 {
   throw xtl::make_not_implemented_exception (__FUNCTION__);
 }
