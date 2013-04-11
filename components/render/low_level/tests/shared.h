@@ -45,6 +45,12 @@ class ObjectImpl: virtual public IObject, public xtl::reference_counter, public 
     {
       return xtl::trackable::connect_tracker (handler, linked_trackable);
     }
+
+    void GetFamily (ObjectFamily& family, void*& root)
+    {
+      memset (&family, 0, sizeof (family));
+      root = 0;
+    }
 };
 
 //тестовое устройство вывода

@@ -17,5 +17,6 @@
 #include <shared/device_manager.h>
 #include <shared/error.h>
 #include <shared/log.h>
+#include <shared/object.h>
 
 #endif

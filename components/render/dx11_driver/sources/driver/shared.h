@@ -25,6 +25,7 @@
 
 #include <shared/log.h>
 #include <shared/error.h>
+#include <shared/object.h>
 #include <shared/render_target_manager.h>
 
 namespace render
@@ -39,9 +40,7 @@ namespace dx11
 class Adapter;
 class Context;
 
-using helpers::Object;
 using helpers::PropertyList;
-using helpers::cast_object;
 
 typedef xtl::com_ptr<Adapter> AdapterPtr;
 typedef xtl::com_ptr<Context> ContextPtr;

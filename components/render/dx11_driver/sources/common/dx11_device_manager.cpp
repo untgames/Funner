@@ -60,6 +60,13 @@ DeviceObject::DeviceObject (const DeviceManager& in_manager)
 {
 }
 
+void DeviceObject::GetFamily (ObjectFamily& family, void*& root)
+{
+  family.id     = FAMILY_ID;
+  family.sub_id = manager.GetFamilySubId ();
+  root          = static_cast<Object*> (this);
+}
+
 ID3D11Device& DeviceObject::GetDevice () const
 {
   return manager.GetDevice ();

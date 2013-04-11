@@ -1,5 +1,7 @@
-#ifndef RENDER_GL_DRIVER_OBJECT_HEADER
-#define RENDER_GL_DRIVER_OBJECT_HEADER
+#ifndef RENDER_DX11_DRIVER_OBJECT_HEADER
+#define RENDER_DX11_DRIVER_OBJECT_HEADER
+
+#include <typeinfo>
 
 #include <render/low_level/helpers/object.h>
 
@@ -9,10 +11,8 @@ namespace render
 namespace low_level
 {
 
-namespace opengl
+namespace dx11
 {
-
-using render::low_level::helpers::cast_object;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Реализация объекта
@@ -20,11 +20,21 @@ using render::low_level::helpers::cast_object;
 class Object: public helpers::Object
 {
   public:
+    static const size_t FAMILY_ID = 'DX11';
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Получение семейства объекта
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void GetFamily (ObjectFamily& family, void*& root);
 };
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Приведение типов объектов
+///////////////////////////////////////////////////////////////////////////////////////////////////
+template <class DstT, class SrcT>
+DstT* cast_object (SrcT* ptr, const char* source, const char* argument_name);
+
+#include <shared/detail/object.inl>
 
 }
 
