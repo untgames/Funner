@@ -111,6 +111,15 @@ IAdapter* SwapChain::GetAdapter ()
 }
 
 /*
+    Низкоуровневый дескриптор
+*/
+
+IDXGISwapChain& SwapChain::GetHandle ()
+{
+  return *swap_chain;
+}
+
+/*
     Получение дескриптора
 */
 

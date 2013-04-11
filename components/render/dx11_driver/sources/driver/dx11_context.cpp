@@ -254,7 +254,13 @@ void Context::OSSetRenderTargets (size_t count, IView** render_target_views, IVi
     if (!render_target_views && count)
       throw xtl::make_null_argument_exception ("", "render_target_views");
 
-    throw xtl::make_not_implemented_exception (__FUNCTION__);
+    for (size_t i=0; i<count; i++)
+      render_target_context.SetRenderTargetView (i, render_target_views [i]);
+
+    for (size_t i=count; i<DEVICE_RENDER_TARGET_SLOTS_COUNT; i++)
+      render_target_context.SetRenderTargetView (i, 0);
+
+    render_target_context.SetDepthStencilView (depth_stencil_view);
   }
   catch (xtl::exception& e)
   {
@@ -265,37 +271,93 @@ void Context::OSSetRenderTargets (size_t count, IView** render_target_views, IVi
 
 void Context::OSSetRenderTargetView (size_t render_target_slot, IView* render_target_view)
 {
-  throw xtl::make_not_implemented_exception (__FUNCTION__);
+  try
+  {    
+    render_target_context.SetRenderTargetView (render_target_slot, render_target_view);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::low_level::dx11::Context::OSSetRenderTargetView");
+    throw;
+  }
 }
 
 void Context::OSSetDepthStencilView (IView* depth_stencil_view)
 {
-  throw xtl::make_not_implemented_exception (__FUNCTION__);
+  try
+  {    
+    render_target_context.SetDepthStencilView (depth_stencil_view);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::low_level::dx11::Context::OSSetDepthStencilView");
+    throw;
+  }
 }
 
 IView* Context::OSGetRenderTargetView (size_t render_target_slot)
 {
-  throw xtl::make_not_implemented_exception (__FUNCTION__);
+  try
+  {    
+    return render_target_context.GetRenderTargetView (render_target_slot);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::low_level::dx11::Context::OSGetRenderTargetView");
+    throw;
+  }
 }
 
 IView* Context::OSGetDepthStencilView ()
 {
-  throw xtl::make_not_implemented_exception (__FUNCTION__);
+  try
+  {    
+    return render_target_context.GetDepthStencilView ();
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::low_level::dx11::Context::OSGetDepthStencilView");
+    throw;
+  }
 }
 
 void Context::ClearRenderTargetView (size_t view_index, const Color4f& color)
 {
-  throw xtl::make_not_implemented_exception (__FUNCTION__);
+  try
+  {    
+    render_target_context.ClearRenderTargetView (view_index, color);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::low_level::dx11::Context::ClearRenderTargetView");
+    throw;
+  }
 }
 
 void Context::ClearDepthStencilView (size_t clear_flags, float depth, unsigned char stencil)
 {
-  throw xtl::make_not_implemented_exception (__FUNCTION__);
+  try
+  {    
+    render_target_context.ClearDepthStencilView (clear_flags, depth, stencil);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::low_level::dx11::Context::ClearDepthStencilView");
+    throw;
+  }
 }
 
 void Context::ClearViews (size_t clear_flags, size_t views_count, const size_t* view_indices, const Color4f* colors, float depth, unsigned char stencil)
 {
-  throw xtl::make_not_implemented_exception (__FUNCTION__);
+  try
+  {    
+    render_target_context.ClearViews (clear_flags, views_count, view_indices, colors, depth, stencil);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::low_level::dx11::Context::ClearViews");
+    throw;
+  }
 }
 
 /*

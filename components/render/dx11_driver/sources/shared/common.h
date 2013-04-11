@@ -23,6 +23,7 @@ typedef xtl::com_ptr<IDXGISwapChain>      DxSwapChainPtr;
 typedef xtl::com_ptr<ID3D11DeviceContext> DxContextPtr;
 typedef xtl::com_ptr<ID3D11Device>        DxDevicePtr;
 typedef xtl::com_ptr<ID3D11View>          DxViewPtr;
+typedef xtl::com_ptr<ID3D11Resource>      DxResourcePtr;
 
 }
 

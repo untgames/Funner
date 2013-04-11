@@ -52,6 +52,10 @@ Device::Device (const AdapterPtr& in_adapter, const char* init_string)
     device_manager.reset (new DeviceManager (device));
 
     immediate_context = ContextPtr (new Context (DxContextPtr (dx_context, false), *device_manager), false);
+
+      //инициализация подуровней
+
+    render_target_manager.reset (new RenderTargetManager (*device_manager));
   }
   catch (xtl::exception& e)
   {
@@ -272,15 +276,15 @@ ISamplerState* Device::CreateSamplerState (const SamplerDesc& desc)
 
 ITexture* Device::CreateTexture (const TextureDesc& desc)
 {
-  throw xtl::make_not_implemented_exception (__FUNCTION__);
+  return CreateTexture (desc, 0);
 }
 
 ITexture* Device::CreateTexture (const TextureDesc& desc, const TextureData& data)
 {
-  throw xtl::make_not_implemented_exception (__FUNCTION__);
+  return CreateTexture (desc, &data);
 }
 
-/*ITexture* Device::CreateTexture (const TextureDesc& desc, const TextureData* data)
+ITexture* Device::CreateTexture (const TextureDesc& desc, const TextureData* data)
 {
   static const char* METHOD_NAME = "render::low_level::dx11::Device::CreateTexture";
 
@@ -300,17 +304,16 @@ ITexture* Device::CreateTexture (const TextureDesc& desc, const TextureData& dat
     }
     else if (desc.bind_flags & (BindFlag_RenderTarget | BindFlag_DepthStencil))
     {
-      throw xtl::make_not_implemented_exception (__FUNCTION__);
+      throw render_target_manager->CreateTexture (desc);
     }
     else return 0;
   }
-  catch (xtl::exception& exception)
+  catch (xtl::exception& e)
   {
-    exception.touch (METHOD_NAME);
-
+    e.touch (METHOD_NAME);
     throw;
   }
-}*/
+}
 
 ITexture* Device::CreateTexture (const TextureDesc&, IBuffer* buffer, size_t buffer_offset, const size_t* mip_sizes)
 {
@@ -372,7 +375,7 @@ ITexture* Device::CreateRenderTargetTexture (ISwapChain* swap_chain, size_t buff
 {
   try
   {
-    throw xtl::make_not_implemented_exception (__FUNCTION__);
+    return render_target_manager->CreateRenderTargetTexture (swap_chain, buffer_index);
   }
   catch (xtl::exception& exception)
   {
@@ -385,7 +388,7 @@ ITexture* Device::CreateDepthStencilTexture (ISwapChain* swap_chain)
 {
   try
   {
-    throw xtl::make_not_implemented_exception (__FUNCTION__);
+    return render_target_manager->CreateDepthStencilTexture (swap_chain);
   }
   catch (xtl::exception& exception)
   {
@@ -398,7 +401,7 @@ IView* Device::CreateView (ITexture* texture, const ViewDesc& desc)
 {
   try
   {
-    throw xtl::make_not_implemented_exception (__FUNCTION__);
+    return render_target_manager->CreateView (texture, desc);
   }
   catch (xtl::exception& exception)
   {
@@ -413,7 +416,22 @@ IView* Device::CreateView (ITexture* texture, const ViewDesc& desc)
 
 IDeviceContext* Device::CreateDeferredContext ()
 {
-  throw xtl::make_not_implemented_exception (__FUNCTION__);
+  try
+  {
+    ID3D11DeviceContext* context = 0;
+
+    check_errors ("ID3D11Device::CreateDeferredContext", device->CreateDeferredContext (0, &context));    
+
+    if (!context)
+      throw xtl::format_operation_exception ("", "ID3D11Device::CreateDeferredContext failed");
+
+    return new Context (DxContextPtr (context, false), *device_manager);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::low_level::dx11::Device::CreateDeferredContext");
+    throw;
+  }
 }
 
 /*

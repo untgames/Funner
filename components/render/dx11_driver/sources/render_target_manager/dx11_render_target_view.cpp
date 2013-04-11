@@ -4,6 +4,17 @@ using namespace render::low_level;
 using namespace render::low_level::dx11;
 
 /*
+ID3D10RenderTargetView * pView;
+D3D10_RENDER_TARGET_VIEW_DESC rtd;
+rtd.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+rtd.ViewDimension = D3D10_RTV_DIMENSION_TEXTURE2D;
+rtd.Texture2D.MipSlice = 0;
+ThrowFailure( pD3D10Device->CreateRenderTargetView(pBB, &rtd, &pView), 
+  "Couldn't create view" );    
+
+*/
+
+/*
     Конструктор / деструктор
 */
 
@@ -23,14 +34,14 @@ View::~View ()
 
 ITexture* View::GetTexture ()
 {
-  throw xtl::make_not_implemented_exception (__FUNCTION__);
+  return texture.get ();
 }
 
 /*
     Получение дескриптора
 */
 
-void View::GetDesc (ViewDesc&)
+void View::GetDesc (ViewDesc& out_desc)
 {
-  throw xtl::make_not_implemented_exception (__FUNCTION__);
+  out_desc = desc;
 }

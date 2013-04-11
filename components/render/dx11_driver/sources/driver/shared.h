@@ -27,6 +27,7 @@
 #include <shared/error.h>
 #include <shared/object.h>
 #include <shared/render_target_manager.h>
+#include <shared/swap_chain.h>
 
 namespace render
 {
@@ -158,7 +159,7 @@ class Adapter: virtual public IAdapter, public Object
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Первичная цепочка обмена
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-class SwapChain: virtual public ISwapChain, public Object
+class SwapChain: public ISwapChainImpl
 {
   public:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -171,6 +172,11 @@ class SwapChain: virtual public ISwapChain, public Object
 ///Получение адаптера
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     IAdapter* GetAdapter ();
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Низкоуровневый дескриптор
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    IDXGISwapChain& GetHandle ();
   
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Получение дескриптора
@@ -393,11 +399,15 @@ class Device: virtual public IDevice, public Object
     IDeviceContext* GetImmediateContext ();
 
   private:
-    AdapterPtr                   adapter;           //адаптер устройства
-    PropertyList                 properties;        //свойства устройства
-    DxDevicePtr                  device;            //устройство отрисовки
-    stl::auto_ptr<DeviceManager> device_manager;    //менеджер устройства
-    ContextPtr                   immediate_context; //непосредственный конеткст отрисовки
+    ITexture* CreateTexture (const TextureDesc&, const TextureData*);
+
+  private:
+    AdapterPtr                         adapter;               //адаптер устройства
+    PropertyList                       properties;            //свойства устройства
+    DxDevicePtr                        device;                //устройство отрисовки
+    stl::auto_ptr<DeviceManager>       device_manager;        //менеджер устройства
+    ContextPtr                         immediate_context;     //непосредственный конеткст отрисовки
+    stl::auto_ptr<RenderTargetManager> render_target_manager; //менеджер целей рендеринга
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
