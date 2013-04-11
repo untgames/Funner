@@ -33,16 +33,58 @@ RenderTargetManager::~RenderTargetManager ()
     Создание текстур
 */
 
+namespace
+{
+
+DXGI_FORMAT get_dx11_format (PixelFormat fmt)
+{
+  switch (fmt)
+  {
+    case PixelFormat_RGBA8: return DXGI_FORMAT_R8G8B8A8_UNORM;
+    case PixelFormat_L8:    return DXGI_FORMAT_R8_UINT;
+    case PixelFormat_A8:    return DXGI_FORMAT_A8_UNORM;
+    case PixelFormat_LA8:   return DXGI_FORMAT_R8G8_UINT;
+    case PixelFormat_D16:   return DXGI_FORMAT_D16_UNORM;
+    case PixelFormat_D24S8: return DXGI_FORMAT_D24_UNORM_S8_UINT;
+      break;
+    case PixelFormat_D32:
+    case PixelFormat_D24X8:
+    case PixelFormat_DXT1:
+    case PixelFormat_DXT3:
+    case PixelFormat_DXT5:
+    case PixelFormat_S8:
+    case PixelFormat_RGB8:
+    case PixelFormat_RGB_PVRTC2:  
+    case PixelFormat_RGB_PVRTC4:
+    case PixelFormat_RGBA_PVRTC2:
+    case PixelFormat_RGBA_PVRTC4:
+    case PixelFormat_ATC_RGB_AMD:
+    case PixelFormat_ATC_RGBA_EXPLICIT_ALPHA_AMD:
+    case PixelFormat_ATC_RGBA_INTERPOLATED_ALPHA_AMD:
+      throw xtl::format_operation_exception ("render::low_level::dx11::get_dx11_format", "Format %s can't be found in DX11", get_name (fmt));
+    default:
+      throw xtl::make_argument_exception ("render::low_level::dx11::get_dx11_format", "format", fmt);
+  }
+}
+
+}
+
 ITexture* RenderTargetManager::CreateTexture (const TextureDesc& src_desc)
 {
   try
   {
-    D3D11_BUFFER_DESC dst_desc;
+    D3D11_TEXTURE2D_DESC dst_desc;
 
     memset (&dst_desc, 0, sizeof (dst_desc));
 
-    dst_desc.ByteWidth = get_uncompressed_image_size (src_desc.width, src_desc.height, src_desc.format);
-    dst_desc.Usage     = D3D11_USAGE_DEFAULT;
+    dst_desc.Width              = src_desc.width;
+    dst_desc.Height             = src_desc.height;
+    dst_desc.MipLevels          = 1;
+    dst_desc.ArraySize          = 1;
+    dst_desc.Format             = get_dx11_format (src_desc.format);
+    dst_desc.SampleDesc.Count   = 1;    
+    dst_desc.SampleDesc.Quality = 0;
+    dst_desc.Usage              = D3D11_USAGE_DEFAULT;
 
     struct FlagMap
     {
@@ -72,17 +114,14 @@ ITexture* RenderTargetManager::CreateTexture (const TextureDesc& src_desc)
     if (src_desc.access_flags & AccessFlag_Read)  dst_desc.CPUAccessFlags |= D3D11_CPU_ACCESS_READ;
     if (src_desc.access_flags & AccessFlag_Write) dst_desc.CPUAccessFlags |= D3D11_CPU_ACCESS_WRITE;
 
-    dst_desc.MiscFlags           = 0;
-    dst_desc.StructureByteStride = 0;
+    ID3D11Texture2D* texture = 0;
 
-    ID3D11Buffer* buffer = 0;
+    check_errors ("D3D11Device::Texture2D", impl->GetDeviceManager ().GetDevice ().CreateTexture2D (&dst_desc, 0, &texture));
 
-    check_errors ("D3D11Device::CreateBuffer", impl->GetDeviceManager ().GetDevice ().CreateBuffer (&dst_desc, 0, &buffer));
+    if (!texture)
+      throw xtl::format_operation_exception ("", "D3D11Device::CreateTexture2D failed");
 
-    if (!buffer)
-      throw xtl::format_operation_exception ("", "D3D11Device::CreateBuffer failed");
-
-    return new RenderBuffer (impl->GetDeviceManager (), src_desc, DxResourcePtr (buffer, false));
+    return new RenderBuffer (impl->GetDeviceManager (), src_desc, DxResourcePtr (texture, false));
   }
   catch (xtl::exception& e)
   {
@@ -162,7 +201,7 @@ ITexture* RenderTargetManager::CreateDepthStencilTexture (ISwapChain* in_swap_ch
     dst_desc.layers               = 1;
     dst_desc.format               = PixelFormat_D24S8;
     dst_desc.generate_mips_enable = false;
-    dst_desc.access_flags         = AccessFlag_Read | AccessFlag_Write;
+    dst_desc.access_flags         = AccessFlag_ReadWrite;
     dst_desc.bind_flags           = BindFlag_DepthStencil;
     dst_desc.usage_mode           = UsageMode_Static;
 
@@ -183,3 +222,4 @@ IView* RenderTargetManager::CreateView (ITexture* texture, const ViewDesc&)
 {
   throw xtl::make_not_implemented_exception (__FUNCTION__);
 }
+
