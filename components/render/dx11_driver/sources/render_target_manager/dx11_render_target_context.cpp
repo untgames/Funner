@@ -9,7 +9,7 @@ using namespace render::low_level::dx11;
 ===================================================================================================
 */
 
-typedef xtl::trackable_ptr<View> ViewPtr;
+typedef xtl::com_ptr<View> ViewPtr;
 
 namespace
 {
@@ -240,14 +240,37 @@ void RenderTargetContextState::CopyTo (const StateBlockMask&, RenderTargetContex
 ===================================================================================================
 */
 
+namespace
+{
+
+/// Кэш цели рендеринга
+struct RenderTargetCache
+{
+  ID3D11RenderTargetView* view;             //отображение
+  size_t                  viewport_hash;    //хэш области вывода
+  size_t                  scissor_hash;     //хэш области отсечения
+
+  RenderTargetCache ()
+    : view ()
+    , viewport_hash ()
+    , scissor_hash ()
+  {
+  }
+};
+
+}
+
 struct RenderTargetContext::Impl: public RenderTargetContextState::Impl
 {
-  DxContextPtr context; //контекст
+  DxContextPtr            context;                                                 //контекст
+  RenderTargetCache       render_target_caches [DEVICE_RENDER_TARGET_SLOTS_COUNT]; //кэши целей рендеринга
+  ID3D11DepthStencilView* depth_stencil_view_cache;                                //кэш отображения depth/stencil
 
 /// Конструктор
   Impl (const DeviceManager& device_manager, const DxContextPtr& in_context)
     : RenderTargetContextState::Impl (device_manager)
     , context (in_context)
+    , depth_stencil_view_cache ()
   {
     if (!context)
       throw xtl::make_null_argument_exception ("render::low_level::dx11::RenderTargetContext::Impl::Impl", "context");
@@ -396,7 +419,96 @@ void RenderTargetContext::Bind ()
 {
   try
   {
-    throw xtl::make_not_implemented_exception (__FUNCTION__);
+    Impl& impl = GetImpl ();
+
+    if (!impl.is_dirty)
+      return;
+
+      //очистка целей рендеринга
+
+    ID3D11DeviceContext& context = *impl.context;
+
+      //преобразование целей
+
+    bool need_update_render_targets = false, need_update_viewports = false, need_update_scissors = false;
+
+    ID3D11RenderTargetView* views [DEVICE_RENDER_TARGET_SLOTS_COUNT];
+    D3D11_VIEWPORT          viewports [DEVICE_RENDER_TARGET_SLOTS_COUNT];
+    D3D11_RECT              scissors [DEVICE_RENDER_TARGET_SLOTS_COUNT];
+    size_t                  viewport_hashes [DEVICE_RENDER_TARGET_SLOTS_COUNT];
+    size_t                  scissor_hashes [DEVICE_RENDER_TARGET_SLOTS_COUNT];
+
+    memset (views, 0, sizeof (views));
+
+    for (size_t i=0; i<DEVICE_RENDER_TARGET_SLOTS_COUNT; i++)
+    {
+      const RenderTargetDesc&  render_target       = impl.render_targets [i];
+      const RenderTargetCache& render_target_cache = impl.render_target_caches [i];
+
+      if (&render_target.view->GetHandle () != render_target_cache.view)
+        need_update_render_targets = true;
+
+      viewport_hashes [i] = impl.GetViewportHash (i);
+      scissor_hashes [i]  = impl.GetScissorHash (i);
+
+      if (viewport_hashes [i] != render_target_cache.viewport_hash)
+        need_update_viewports = true;
+
+      if (scissor_hashes [i] != render_target_cache.scissor_hash)
+        need_update_scissors = true;
+
+      views [i] = static_cast<ID3D11RenderTargetView*> (&render_target.view->GetHandle ());
+
+      const Viewport& src_vp = render_target.viewport;
+      D3D11_VIEWPORT& dst_vp = viewports [i];
+
+      dst_vp.TopLeftX = (float)src_vp.x;
+      dst_vp.TopLeftY = (float)src_vp.y;
+      dst_vp.Width    = (float)src_vp.width;
+      dst_vp.Height   = (float)src_vp.height;
+      dst_vp.MinDepth = src_vp.min_depth;
+      dst_vp.MaxDepth = src_vp.max_depth;
+
+      const Rect& src_scissor = render_target.scissor;
+      D3D11_RECT& dst_scissor = scissors [i];      
+
+      dst_scissor.left   = src_scissor.x;
+      dst_scissor.top    = src_scissor.y;
+      dst_scissor.right  = src_scissor.x + src_scissor.width;
+      dst_scissor.bottom = src_scissor.y + src_scissor.height;
+    }
+
+      //установка в контекст
+
+    if (need_update_render_targets || &impl.depth_stencil_view->GetHandle () != impl.depth_stencil_view_cache)
+    {
+      ID3D11DepthStencilView* depth_stencil_view = static_cast<ID3D11DepthStencilView*> (&impl.depth_stencil_view->GetHandle ());
+
+      context.OMSetRenderTargets (DEVICE_RENDER_TARGET_SLOTS_COUNT, views, depth_stencil_view);
+    }
+
+    if (need_update_viewports)
+      context.RSSetViewports (DEVICE_RENDER_TARGET_SLOTS_COUNT, viewports);
+
+    if (need_update_scissors)
+      context.RSSetScissorRects (DEVICE_RENDER_TARGET_SLOTS_COUNT, scissors);
+
+      //обновление кэша
+
+    for (size_t i=0; i<DEVICE_RENDER_TARGET_SLOTS_COUNT; i++)
+    {
+      RenderTargetCache& render_target_cache = impl.render_target_caches [i];
+
+      render_target_cache.view          = views [i];
+      render_target_cache.viewport_hash = viewport_hashes [i];
+      render_target_cache.scissor_hash  = scissor_hashes [i];
+    }
+
+    impl.depth_stencil_view_cache = static_cast<ID3D11DepthStencilView*> (&impl.depth_stencil_view->GetHandle ());
+
+      //очистка флага грязности состояния
+
+    impl.is_dirty = false;
   }
   catch (xtl::exception& e)
   {
