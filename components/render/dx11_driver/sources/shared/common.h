@@ -24,6 +24,7 @@ typedef xtl::com_ptr<ID3D11DeviceContext> DxContextPtr;
 typedef xtl::com_ptr<ID3D11Device>        DxDevicePtr;
 typedef xtl::com_ptr<ID3D11View>          DxViewPtr;
 typedef xtl::com_ptr<ID3D11Resource>      DxResourcePtr;
+typedef xtl::com_ptr<ID3D11Texture2D>     DxTexture2DPtr;
 
 }
 

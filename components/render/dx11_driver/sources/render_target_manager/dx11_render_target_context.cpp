@@ -444,8 +444,9 @@ void RenderTargetContext::Bind ()
     {
       const RenderTargetDesc&  render_target       = impl.render_targets [i];
       const RenderTargetCache& render_target_cache = impl.render_target_caches [i];
+      ID3D11View*              view                = render_target.view ? &render_target.view->GetHandle () : (ID3D11View*)0;
 
-      if (&render_target.view->GetHandle () != render_target_cache.view)
+      if (view != render_target_cache.view)
         need_update_render_targets = true;
 
       viewport_hashes [i] = impl.GetViewportHash (i);
@@ -457,7 +458,7 @@ void RenderTargetContext::Bind ()
       if (scissor_hashes [i] != render_target_cache.scissor_hash)
         need_update_scissors = true;
 
-      views [i] = static_cast<ID3D11RenderTargetView*> (&render_target.view->GetHandle ());
+      views [i] = static_cast<ID3D11RenderTargetView*> (view);
 
       const Viewport& src_vp = render_target.viewport;
       D3D11_VIEWPORT& dst_vp = viewports [i];
@@ -470,7 +471,7 @@ void RenderTargetContext::Bind ()
       dst_vp.MaxDepth = src_vp.max_depth;
 
       const Rect& src_scissor = render_target.scissor;
-      D3D11_RECT& dst_scissor = scissors [i];      
+      D3D11_RECT& dst_scissor = scissors [i];
 
       dst_scissor.left   = src_scissor.x;
       dst_scissor.top    = src_scissor.y;
@@ -480,12 +481,10 @@ void RenderTargetContext::Bind ()
 
       //установка в контекст
 
-    if (need_update_render_targets || &impl.depth_stencil_view->GetHandle () != impl.depth_stencil_view_cache)
-    {
-      ID3D11DepthStencilView* depth_stencil_view = static_cast<ID3D11DepthStencilView*> (&impl.depth_stencil_view->GetHandle ());
+    ID3D11DepthStencilView* depth_stencil_view = impl.depth_stencil_view ? static_cast<ID3D11DepthStencilView*> (&impl.depth_stencil_view->GetHandle ()) : (ID3D11DepthStencilView*)0;
 
+    if (need_update_render_targets || depth_stencil_view != impl.depth_stencil_view_cache)
       context.OMSetRenderTargets (DEVICE_RENDER_TARGET_SLOTS_COUNT, views, depth_stencil_view);
-    }
 
     if (need_update_viewports)
       context.RSSetViewports (DEVICE_RENDER_TARGET_SLOTS_COUNT, viewports);
@@ -504,7 +503,7 @@ void RenderTargetContext::Bind ()
       render_target_cache.scissor_hash  = scissor_hashes [i];
     }
 
-    impl.depth_stencil_view_cache = static_cast<ID3D11DepthStencilView*> (&impl.depth_stencil_view->GetHandle ());
+    impl.depth_stencil_view_cache = static_cast<ID3D11DepthStencilView*> (depth_stencil_view);
 
       //очистка флага грязности состояния
 

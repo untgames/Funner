@@ -7,16 +7,17 @@ using namespace render::low_level::dx11;
     Конструктор
 */
 
-RenderBuffer::RenderBuffer (const DeviceManager& manager, const TextureDesc& desc, const DxResourcePtr& in_resource)
-  : DeviceObject (manager)
+RenderBuffer::RenderBuffer (const DeviceManager& manager, const TextureDesc& in_desc, const DxTexture2DPtr& in_texture)
+  : ITextureImpl (manager)
   , view_type ()
-  , resource (in_resource)
+  , texture (in_texture)
+  , desc (in_desc)
 {
   static const char* METHOD_NAME = "render::low_level::dx11::RenderBuffer::RenderBuffer";  
 
     //проверка корректности дескриптора
 
-  if (!resource)
+  if (!texture)
     throw xtl::make_null_argument_exception (METHOD_NAME, "resource");
 
   switch (desc.format)
@@ -101,6 +102,15 @@ RenderBuffer::RenderBuffer (const DeviceManager& manager, const TextureDesc& des
 void RenderBuffer::GetDesc (TextureDesc& out_desc)
 {
   out_desc = desc;
+}
+
+/*
+    Получение низкоуровневого дескриптора
+*/
+
+ID3D11Resource& RenderBuffer::GetHandle ()
+{
+  return *texture;
 }
 
 /*

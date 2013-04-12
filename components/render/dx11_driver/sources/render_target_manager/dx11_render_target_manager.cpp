@@ -121,7 +121,7 @@ ITexture* RenderTargetManager::CreateTexture (const TextureDesc& src_desc)
     if (!texture)
       throw xtl::format_operation_exception ("", "D3D11Device::CreateTexture2D failed");
 
-    return new RenderBuffer (impl->GetDeviceManager (), src_desc, DxResourcePtr (texture, false));
+    return new RenderBuffer (impl->GetDeviceManager (), src_desc, DxTexture2DPtr (texture, false));
   }
   catch (xtl::exception& e)
   {
@@ -137,13 +137,13 @@ ITexture* RenderTargetManager::CreateRenderTargetTexture (ISwapChain* in_swap_ch
     if (!in_swap_chain)
       throw xtl::make_null_argument_exception ("", "swap_chain");
 
-    ISwapChainImpl* swap_chain_impl = cast_object<ISwapChainImpl> (in_swap_chain, "", "swap_chain");
-    IDXGISwapChain& swap_chain      = swap_chain_impl->GetHandle ();   
-    ID3D11Resource* resource        = 0;
+    ISwapChainImpl*  swap_chain_impl = cast_object<ISwapChainImpl> (in_swap_chain, "", "swap_chain");
+    IDXGISwapChain&  swap_chain      = swap_chain_impl->GetHandle ();   
+    ID3D11Texture2D* texture         = 0;
 
-    check_errors ("IDXGISwapChain::GetBuffer", swap_chain.GetBuffer (buffer_index, __uuidof (resource), reinterpret_cast<void**> (&resource)));
+    check_errors ("IDXGISwapChain::GetBuffer", swap_chain.GetBuffer (buffer_index, __uuidof (texture), reinterpret_cast<void**> (&texture)));
 
-    if (!resource)
+    if (!texture)
       throw xtl::format_operation_exception ("", "IDXGISwapChain::GetBuffer failed");
 
     DXGI_SWAP_CHAIN_DESC src_desc;
@@ -166,7 +166,8 @@ ITexture* RenderTargetManager::CreateRenderTargetTexture (ISwapChain* in_swap_ch
     dst_desc.bind_flags           = BindFlag_RenderTarget;
     dst_desc.usage_mode           = UsageMode_Static;
 
-    return new RenderBuffer (impl->GetDeviceManager (), dst_desc, DxResourcePtr (resource, false)); //??? ref count
+//    return new RenderBuffer (impl->GetDeviceManager (), dst_desc, DxTexture2DPtr (texture, false)); //??? ref count
+    return new RenderBuffer (impl->GetDeviceManager (), dst_desc, DxTexture2DPtr (texture));
   }
   catch (xtl::exception& e)
   {
@@ -218,8 +219,15 @@ ITexture* RenderTargetManager::CreateDepthStencilTexture (ISwapChain* in_swap_ch
     Создание отображений
 */
 
-IView* RenderTargetManager::CreateView (ITexture* texture, const ViewDesc&)
+IView* RenderTargetManager::CreateView (ITexture* texture, const ViewDesc& desc)
 {
-  throw xtl::make_not_implemented_exception (__FUNCTION__);
+  try
+  {
+    return new View (impl->GetDeviceManager (), texture, desc);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::low_level::dx11::RenderTargetManager::CreateView");
+    throw;
+  }
 }
-

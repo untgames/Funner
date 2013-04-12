@@ -40,9 +40,9 @@ int main ()
       SwapChainPtr swap_chain (driver->CreateSwapChain (test.device.get (), swap_chain_desc), false);
       
       TexturePtr texture [4] = {
-        TexturePtr (test.device->CreateRenderTargetTexture (test.swap_chain.get (), 1), false),
+        TexturePtr (test.device->CreateRenderTargetTexture (test.swap_chain.get (), 0), false),
         TexturePtr (test.device->CreateDepthStencilTexture (test.swap_chain.get ()), false),
-        TexturePtr (test.device->CreateRenderTargetTexture (swap_chain.get (), 1), false),
+        TexturePtr (test.device->CreateRenderTargetTexture (swap_chain.get (), 0), false),
         TexturePtr (test.device->CreateDepthStencilTexture (swap_chain.get ()), false)
       };    
       
@@ -58,7 +58,7 @@ int main ()
 
       test.device->GetImmediateContext ()->OSSetRenderTargetView (0, view [Window1_RenderTarget].get ());
       test.device->GetImmediateContext ()->OSSetDepthStencilView (view [Window2_DepthStencil].get ());
-      
+
       Color4f clear_color;
       
       clear_color.red   = 0;
