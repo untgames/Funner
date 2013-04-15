@@ -37,7 +37,7 @@ ITexture* RenderTargetManager::CreateTexture (const TextureDesc& desc)
 {
   try
   {
-    return new Texture (impl->GetDeviceManager (), desc);
+    return new Texture (impl->GetDeviceManager (), desc, 0);
   }
   catch (xtl::exception& e)
   {

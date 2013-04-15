@@ -27,7 +27,7 @@ class Texture: virtual public ITexture, public DeviceObject
 ///Конструктор
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     Texture  (const DeviceManager& manager, const TextureDesc& desc, const DxResourcePtr& resource);
-    Texture  (const DeviceManager& manager, const TextureDesc& desc);
+    Texture  (const DeviceManager& manager, const TextureDesc& desc, const TextureData* data);
     ~Texture ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

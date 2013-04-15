@@ -29,7 +29,7 @@ class SamplerState: virtual public ISamplerState, public DeviceObject
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструктор
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    SamplerState  (const DeviceManager&, const DxSamplerStatePtr&);
+    SamplerState  (const DeviceManager&, const SamplerDesc& desc);
     ~SamplerState ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -45,6 +45,7 @@ class SamplerState: virtual public ISamplerState, public DeviceObject
 
   private:
     DxSamplerStatePtr sampler;
+    SamplerDesc       desc;
 };
 
 }

@@ -168,12 +168,15 @@ void fill_desc (const TextureDesc& src_desc, DstDesc& dst_desc)
 
 }
 
-Texture::Texture (const DeviceManager& device_manager, const TextureDesc& desc)
+Texture::Texture (const DeviceManager& device_manager, const TextureDesc& desc, const TextureData* data)
   : DeviceObject (device_manager)
   , impl (new Impl (desc))
 {
   try
   {
+    if (data)
+      throw xtl::make_null_argument_exception ("", "data");
+
     switch (desc.dimension)
     {
       case TextureDimension_1D:
