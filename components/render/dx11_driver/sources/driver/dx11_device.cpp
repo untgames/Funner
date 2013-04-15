@@ -57,6 +57,7 @@ Device::Device (const AdapterPtr& in_adapter, const char* init_string)
 
     render_target_manager.reset (new RenderTargetManager (*device_manager));
     texture_manager.reset       (new TextureManager (*device_manager));
+    input_manager.reset         (new InputManager (*device_manager));
   }
   catch (xtl::exception& e)
   {
@@ -116,7 +117,7 @@ const char* Device::GetCapString (DeviceCapString cap_string)
     switch (cap_string)
     {
       case DeviceCapString_ShaderProfiles:
-        return "hlsl.vs hlsl.ps";
+        return "hlsl.vs hlsl.ps hlsl";
       default:
         throw xtl::make_argument_exception ("", "cap_string", cap_string);
     }
@@ -132,7 +133,7 @@ const char* Device::GetVertexAttributeSemanticName (VertexAttributeSemantic sema
 {
   try
   {
-    throw xtl::make_not_implemented_exception (__FUNCTION__);
+    return InputManager::GetVertexAttributeSemanticName (semantic);
   }
   catch (xtl::exception& e)
   {
@@ -192,7 +193,7 @@ IInputLayout* Device::CreateInputLayout (const InputLayoutDesc& desc)
 {
   try
   {
-    throw xtl::make_not_implemented_exception (__FUNCTION__);
+    return input_manager->CreateInputLayout (desc);
   }
   catch (xtl::exception& exception)
   {
@@ -207,19 +208,7 @@ IBuffer* Device::CreateBuffer (const BufferDesc& desc)
 
   try
   {
-    static const size_t BAD_FLAGS = BindFlag_Texture | BindFlag_RenderTarget | BindFlag_DepthStencil;
-
-    if (desc.bind_flags & BAD_FLAGS)
-      throw xtl::make_argument_exception ("", "desc.bind_flags", get_name ((BindFlag)desc.bind_flags));
-
-    switch (desc.bind_flags)
-    {
-      case BindFlag_VertexBuffer:   throw xtl::make_not_implemented_exception (__FUNCTION__);
-      case BindFlag_IndexBuffer:    throw xtl::make_not_implemented_exception (__FUNCTION__);
-      case BindFlag_ConstantBuffer: throw xtl::make_not_implemented_exception (__FUNCTION__);
-      default:
-        throw xtl::format_not_supported_exception ("", "Incompatible desc.bind_flags=%s", get_name ((BindFlag)desc.bind_flags));
-    }
+    return input_manager->CreateBuffer (desc);
   }
   catch (xtl::exception& e)
   {

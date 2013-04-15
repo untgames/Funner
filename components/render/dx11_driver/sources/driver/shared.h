@@ -25,6 +25,7 @@
 
 #include <shared/log.h>
 #include <shared/error.h>
+#include <shared/input_manager.h>
 #include <shared/object.h>
 #include <shared/render_target_manager.h>
 #include <shared/texture_manager.h>
@@ -336,6 +337,7 @@ class Context: virtual public IDeviceContext, public DeviceObject
     DxContextPtr          context;                 //контекст отрисовки
     RenderTargetContext   render_target_context;   //контекст целей отрисовки
     TextureManagerContext texture_manager_context; //контекст менеджера текстур
+    InputManagerContext   input_manager_context;   //контекст менеджера входного уровня
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -411,6 +413,7 @@ class Device: virtual public IDevice, public Object
     ContextPtr                         immediate_context;     //непосредственный конеткст отрисовки
     stl::auto_ptr<RenderTargetManager> render_target_manager; //менеджер целей рендеринга
     stl::auto_ptr<TextureManager>      texture_manager;       //менеджер текстур
+    stl::auto_ptr<InputManager>        input_manager;         //менеджер входного уровня
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

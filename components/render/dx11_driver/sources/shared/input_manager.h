@@ -5,6 +5,7 @@
 
 #include <render/low_level/device.h>
 
+#include <shared/common.h>
 #include <shared/device_manager.h>
 
 namespace render
@@ -51,12 +52,14 @@ class InputManagerContextState
 
     Impl& GetImpl () const;
 
+    InputManagerContextState (Impl*);
+
   private:
     InputManagerContextState (const InputManagerContextState&); //no impl
     InputManagerContextState& operator = (const InputManagerContextState&); //no impl
 
   private:
-    std::auto_ptr<Impl> impl;
+    stl::auto_ptr<Impl> impl;
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -97,10 +100,8 @@ class InputManager
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Создание ресурсов уровня
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    IInputLayout*  CreateInputLayout    (const InputLayoutDesc& desc);
-    IBuffer*       CreateVertexBuffer   (const BufferDesc& desc);
-    IBuffer*       CreateIndexBuffer    (const BufferDesc& desc);
-    IBuffer*       CreateConstantBuffer (const BufferDesc& desc);
+    IInputLayout*  CreateInputLayout (const InputLayoutDesc& desc);
+    IBuffer*       CreateBuffer      (const BufferDesc& desc);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Получение имени семантики

@@ -12,6 +12,7 @@ Context::Context (const DxContextPtr& in_context, const DeviceManager& device_ma
   , context (in_context)
   , render_target_context (device_manager, in_context)
   , texture_manager_context (device_manager, in_context)
+  , input_manager_context (device_manager, in_context)
 {
   if (!context)
     throw xtl::make_null_argument_exception ("render::low_level::dx11::Context::Context", "context");
@@ -66,32 +67,80 @@ void Context::End (IQuery* async)
 
 void Context::ISSetInputLayout (IInputLayout* state)
 {
-  throw xtl::make_not_implemented_exception (__FUNCTION__);
+  try
+  {
+    input_manager_context.SetInputLayout (state);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::low_level::dx11::Context::ISSetInputLayout");
+    throw;
+  }
 }
 
 void Context::ISSetVertexBuffer (size_t vertex_buffer_slot, IBuffer* buffer)
 {
-  throw xtl::make_not_implemented_exception (__FUNCTION__);
+  try
+  {
+    input_manager_context.SetVertexBuffer (vertex_buffer_slot, buffer);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::low_level::dx11::Context::ISSetVertexBuffer");
+    throw;
+  }
 }
 
 void Context::ISSetIndexBuffer (IBuffer* buffer)
 {
-  throw xtl::make_not_implemented_exception (__FUNCTION__);
+  try
+  {
+    input_manager_context.SetIndexBuffer (buffer);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::low_level::dx11::Context::ISSetIndexBuffer");
+    throw;
+  }
 }
 
 IInputLayout* Context::ISGetInputLayout ()
 {
-  throw xtl::make_not_implemented_exception (__FUNCTION__);
+  try
+  {
+    return input_manager_context.GetInputLayout ();
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::low_level::dx11::Context::ISGetInputLayout");
+    throw;
+  }
 }
 
 IBuffer* Context::ISGetVertexBuffer (size_t vertex_buffer_slot)
 {
-  throw xtl::make_not_implemented_exception (__FUNCTION__);
+  try
+  {
+    return input_manager_context.GetVertexBuffer (vertex_buffer_slot);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::low_level::dx11::Context::ISGetVertexBuffer");
+    throw;
+  }
 }
 
 IBuffer* Context::ISGetIndexBuffer ()
 {
-  throw xtl::make_not_implemented_exception (__FUNCTION__);
+  try
+  {
+    return input_manager_context.GetIndexBuffer ();
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::low_level::dx11::Context::ISGetIndexBuffer");
+    throw;
+  }
 }
 
 /*
@@ -214,32 +263,81 @@ ITexture* Context::SSGetTexture (size_t sampler_slot)
 
 void Context::RSSetState (IRasterizerState* state)
 {
-  throw xtl::make_not_implemented_exception (__FUNCTION__);
+  try
+  {
+    throw xtl::make_not_implemented_exception (__FUNCTION__);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::low_level::dx11::Context::RSSetState");
+    throw;
+  }
 }
 
 void Context::RSSetViewport (size_t render_target_slot, const Viewport& viewport)
 {
-  throw xtl::make_not_implemented_exception (__FUNCTION__);
+  try
+  {
+    return render_target_context.SetViewport (render_target_slot, viewport);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::low_level::dx11::Context::RSSetViewport");
+    throw;
+  }
 }
 
 void Context::RSSetScissor (size_t render_target_slot, const Rect& scissor_rect)
 {
-  throw xtl::make_not_implemented_exception (__FUNCTION__);
+  try
+  {
+    return render_target_context.SetScissor (render_target_slot, scissor_rect);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::low_level::dx11::Context::RSSetScissor");
+    throw;
+  }
 }
 
 IRasterizerState* Context::RSGetState ()
 {
-  throw xtl::make_not_implemented_exception (__FUNCTION__);
+  try
+  {
+    throw xtl::make_not_implemented_exception (__FUNCTION__);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::low_level::dx11::Context::RSGetState");
+    throw;
+  }
 }
 
 const Viewport& Context::RSGetViewport (size_t render_target_slot)
 {
-  throw xtl::make_not_implemented_exception (__FUNCTION__);
+  try
+  {
+    return render_target_context.GetViewport (render_target_slot);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::low_level::dx11::Context::RSGetViewport");
+    throw;
+  }
 }
 
 const Rect& Context::RSGetScissor (size_t render_target_slot)
 {
-  throw xtl::make_not_implemented_exception (__FUNCTION__);
+  try
+  {
+    return render_target_context.GetScissor (render_target_slot);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::low_level::dx11::Context::RSGetScissor");
+    throw;
+  }
+
 }
 
 /*
