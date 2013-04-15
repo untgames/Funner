@@ -1,4 +1,6 @@
 Новая функциональность:
+!. Убрать SetDesc
+
 1. Работа с буферами
   - Отображение буферов в память - http://www.opengl.org/registry/specs/ARB/map_buffer_range.txt
   - http://www.opengl.org/registry/specs/ARB/uniform_buffer_object.txt

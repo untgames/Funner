@@ -152,13 +152,9 @@ void fill_desc (const TextureDesc& src_desc, DstDesc& dst_desc)
 
   static size_t flags_count = sizeof (flags) / sizeof (*flags);
 
-  dst_desc.BindFlags = 0;
-
   for (size_t i=0; i<flags_count; i++)
     if (src_desc.bind_flags & flags [i].src_flag)
       dst_desc.BindFlags |= flags [i].dst_flag;    
-
-  dst_desc.CPUAccessFlags = 0;
 
   if (src_desc.access_flags & AccessFlag_Read)  dst_desc.CPUAccessFlags |= D3D11_CPU_ACCESS_READ;
   if (src_desc.access_flags & AccessFlag_Write) dst_desc.CPUAccessFlags |= D3D11_CPU_ACCESS_WRITE;

@@ -56,6 +56,7 @@ Device::Device (const AdapterPtr& in_adapter, const char* init_string)
       //инициализация подуровней
 
     render_target_manager.reset (new RenderTargetManager (*device_manager));
+    texture_manager.reset       (new TextureManager (*device_manager));
   }
   catch (xtl::exception& e)
   {
@@ -265,7 +266,7 @@ ISamplerState* Device::CreateSamplerState (const SamplerDesc& desc)
 {
   try
   {
-    throw xtl::make_not_implemented_exception (__FUNCTION__);
+    return texture_manager->CreateSamplerState (desc);
   }
   catch (xtl::exception& exception)
   {
@@ -286,31 +287,16 @@ ITexture* Device::CreateTexture (const TextureDesc& desc, const TextureData& dat
 
 ITexture* Device::CreateTexture (const TextureDesc& desc, const TextureData* data)
 {
-  static const char* METHOD_NAME = "render::low_level::dx11::Device::CreateTexture";
-
-  if (!(desc.bind_flags & (BindFlag_Texture | BindFlag_RenderTarget | BindFlag_DepthStencil)))
-  {
-    throw xtl::format_not_supported_exception (METHOD_NAME, "Unsupported bindable flags desc.bind_flags=%s",
-      get_name ((BindFlag)desc.bind_flags));
-
-    return 0;
-  }
-
   try
   {
-    if (desc.bind_flags & BindFlag_Texture)
-    {    
-      throw xtl::make_not_implemented_exception (__FUNCTION__);
-    }
-    else if (desc.bind_flags & (BindFlag_RenderTarget | BindFlag_DepthStencil))
-    {
-      throw render_target_manager->CreateTexture (desc);
-    }
-    else return 0;
+    if (!(desc.bind_flags & (BindFlag_Texture | BindFlag_RenderTarget | BindFlag_DepthStencil)))
+      throw xtl::format_not_supported_exception ("", "Unsupported bindable flags desc.bind_flags=%s", get_name ((BindFlag)desc.bind_flags));
+
+    return texture_manager->CreateTexture (desc, data);
   }
   catch (xtl::exception& e)
   {
-    e.touch (METHOD_NAME);
+    e.touch ("render::low_level::dx11::Device::CreateTexture");
     throw;
   }
 }

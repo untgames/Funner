@@ -33,19 +33,6 @@ RenderTargetManager::~RenderTargetManager ()
     Создание текстур
 */
 
-ITexture* RenderTargetManager::CreateTexture (const TextureDesc& desc)
-{
-  try
-  {
-    return new Texture (impl->GetDeviceManager (), desc, 0);
-  }
-  catch (xtl::exception& e)
-  {
-    e.touch ("render::low_level::dx11::RenderTargetManager::CreateTexture");
-    throw;
-  }
-}
-
 ITexture* RenderTargetManager::CreateRenderTargetTexture (ISwapChain* in_swap_chain, size_t buffer_index)
 {
   try
@@ -122,7 +109,7 @@ ITexture* RenderTargetManager::CreateDepthStencilTexture (ISwapChain* in_swap_ch
     dst_desc.bind_flags           = BindFlag_DepthStencil;
     dst_desc.usage_mode           = UsageMode_Default;
 
-    return CreateTexture (dst_desc);
+    return new Texture (impl->GetDeviceManager (), dst_desc, 0);
   }
   catch (xtl::exception& e)
   {

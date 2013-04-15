@@ -410,6 +410,7 @@ class Device: virtual public IDevice, public Object
     stl::auto_ptr<DeviceManager>       device_manager;        //менеджер устройства
     ContextPtr                         immediate_context;     //непосредственный конеткст отрисовки
     stl::auto_ptr<RenderTargetManager> render_target_manager; //менеджер целей рендеринга
+    stl::auto_ptr<TextureManager>      texture_manager;       //менеджер текстур
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
