@@ -15,7 +15,7 @@
 
 #include <shared/error.h>
 #include <shared/log.h>
-#include <shared/shader.h>
+#include <shared/shader_manager.h>
 
 namespace render
 {

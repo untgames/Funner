@@ -148,6 +148,7 @@ ShaderCode::ShaderCode
   const char*          source_code,
   size_t               source_code_length,
   const char*          options,
+  const LogFunction&   log_fn,
   size_t               flags1,
   size_t               flags2)
    : DeviceObject (device_manager)
@@ -191,6 +192,11 @@ ShaderCode::ShaderCode
 
     if (!dx_shader_blob)
       throw xtl::format_operation_exception ("", "D3DX11CompileFromMemory failed");
+
+    impl->data = DxBlobPtr (dx_shader_blob, false);
+    impl->hash = common::crc32 (impl->data->GetBufferPointer (), impl->data->GetBufferSize ());
+
+    DxBlobPtr err_blob (dx_error_msg_blob, false);
     
     if (dx_error_msg_blob)
     {
@@ -198,13 +204,13 @@ ShaderCode::ShaderCode
       size_t      err_size = dx_error_msg_blob->GetBufferSize ();
 
       if (err_data && err_size)
-        Log ().Printf ("Shader '%s' compilation errors:\n%s", name, stl::string (err_data, err_size).c_str ());
+      {
+        stl::string message = common::format ("Shader '%s' compilation errors:\n%s", name, stl::string (err_data, err_size).c_str ());
 
-      dx_error_msg_blob->Release ();
+        if (log_fn) log_fn (message.c_str ());
+        else        Log ().Print (message.c_str ());
+      }
     }
-
-    impl->data = DxBlobPtr (dx_shader_blob, false);
-    impl->hash = common::crc32 (impl->data->GetBufferPointer (), impl->data->GetBufferSize ());
   }
   catch (xtl::exception& e)
   {

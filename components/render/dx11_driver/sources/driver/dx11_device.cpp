@@ -58,6 +58,7 @@ Device::Device (const AdapterPtr& in_adapter, const char* init_string)
     render_target_manager.reset (new RenderTargetManager (*device_manager));
     texture_manager.reset       (new TextureManager (*device_manager));
     input_manager.reset         (new InputManager (*device_manager));
+    shader_manager.reset        (new ShaderManager (*device_manager));
   }
   catch (xtl::exception& e)
   {
@@ -225,7 +226,7 @@ IProgramParametersLayout* Device::CreateProgramParametersLayout (const ProgramPa
 {
   try
   {
-    throw xtl::make_not_implemented_exception (__FUNCTION__);
+    return shader_manager->CreateProgramParametersLayout (desc);
   }
   catch (xtl::exception& exception)
   {
@@ -238,7 +239,7 @@ IProgram* Device::CreateProgram (size_t shaders_count, const ShaderDesc* shader_
 {
   try
   {
-    throw xtl::make_not_implemented_exception (__FUNCTION__);
+    return shader_manager->CreateProgram (shaders_count, shader_descs, error_log);
   }
   catch (xtl::exception& exception)
   {

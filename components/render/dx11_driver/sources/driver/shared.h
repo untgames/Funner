@@ -28,6 +28,7 @@
 #include <shared/input_manager.h>
 #include <shared/object.h>
 #include <shared/render_target_manager.h>
+#include <shared/shader_manager.h>
 #include <shared/texture_manager.h>
 #include <shared/swap_chain.h>
 
@@ -338,6 +339,7 @@ class Context: virtual public IDeviceContext, public DeviceObject
     RenderTargetContext   render_target_context;   //контекст целей отрисовки
     TextureManagerContext texture_manager_context; //контекст менеджера текстур
     InputManagerContext   input_manager_context;   //контекст менеджера входного уровня
+    ShaderManagerContext  shader_manager_context;  //контекст менеджера шейдеров
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -414,6 +416,7 @@ class Device: virtual public IDevice, public Object
     stl::auto_ptr<RenderTargetManager> render_target_manager; //менеджер целей рендеринга
     stl::auto_ptr<TextureManager>      texture_manager;       //менеджер текстур
     stl::auto_ptr<InputManager>        input_manager;         //менеджер входного уровня
+    stl::auto_ptr<ShaderManager>       shader_manager;        //менеджер шейдеров
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

@@ -13,6 +13,7 @@ Context::Context (const DxContextPtr& in_context, const DeviceManager& device_ma
   , render_target_context (device_manager, in_context)
   , texture_manager_context (device_manager, in_context)
   , input_manager_context (device_manager, in_context)
+  , shader_manager_context (device_manager, in_context)
 {
   if (!context)
     throw xtl::make_null_argument_exception ("render::low_level::dx11::Context::Context", "context");
@@ -173,32 +174,80 @@ size_t Context::SOGetTargetOffset (size_t stream_output_slot)
 
 void Context::SSSetProgram (IProgram* program)
 {
-  throw xtl::make_not_implemented_exception (__FUNCTION__);
+  try
+  {
+    shader_manager_context.SetProgram (program);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::low_level::dx11::Context::SSSetProgram");
+    throw;
+  }
 }
 
 void Context::SSSetProgramParametersLayout (IProgramParametersLayout* layout)
 {
-  throw xtl::make_not_implemented_exception (__FUNCTION__);
+  try
+  {
+    shader_manager_context.SetProgramParametersLayout (layout);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::low_level::dx11::Context::SSSetProgramParametersLayout");
+    throw;
+  }
 }
 
 void Context::SSSetConstantBuffer (size_t buffer_slot, IBuffer* buffer)
 {
-  throw xtl::make_not_implemented_exception (__FUNCTION__);
+  try
+  {
+    shader_manager_context.SetConstantBuffer (buffer_slot, buffer);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::low_level::dx11::Context::SSSetConstantBuffer");
+    throw;
+  }
 }
 
 IProgramParametersLayout* Context::SSGetProgramParametersLayout ()
 {
-  throw xtl::make_not_implemented_exception (__FUNCTION__);
+  try
+  {
+    return shader_manager_context.GetProgramParametersLayout ();
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::low_level::dx11::Context::SSGetProgramParametersLayout");
+    throw;
+  }
 }
 
 IProgram* Context::SSGetProgram ()
 {
-  throw xtl::make_not_implemented_exception (__FUNCTION__);
+  try
+  {
+    return shader_manager_context.GetProgram ();
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::low_level::dx11::Context::SSGetProgram");
+    throw;
+  }
 }
 
 IBuffer* Context::SSGetConstantBuffer (size_t buffer_slot)
 {
-  throw xtl::make_not_implemented_exception (__FUNCTION__);
+  try
+  {
+    return shader_manager_context.GetConstantBuffer (buffer_slot);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::low_level::dx11::Context::SSGetConstantBuffer");
+    throw;
+  }
 }
 
 /*
