@@ -10,7 +10,7 @@ using namespace render::low_level::dx11;
 namespace
 {
 
-typedef xtl::com_ptr<ITextureImpl> TexturePtr;
+typedef xtl::com_ptr<Texture>      TexturePtr;
 typedef xtl::com_ptr<SamplerState> SamplerStatePtr;
 
 /// Слот текстура - сэмплер
@@ -80,7 +80,7 @@ void TextureManagerContextState::SetTexture (size_t sampler_slot, ITexture* in_t
 {
   try
   {
-    ITextureImpl* texture = cast_object<ITextureImpl> (*impl, in_texture, "", "texture");
+    Texture* texture = cast_object<Texture> (*impl, in_texture, "", "texture");
 
     if (sampler_slot >= DEVICE_SAMPLER_SLOTS_COUNT)
       throw xtl::make_range_exception ("", "sampler_slot", sampler_slot, DEVICE_SAMPLER_SLOTS_COUNT);
@@ -251,7 +251,7 @@ void TextureManagerContext::GenerateMips (ITexture* in_texture)
   {
     Impl& impl = GetImpl ();
 
-    ITextureImpl* texture = cast_object<ITextureImpl> (impl, in_texture, "", "texture");
+    Texture* texture = cast_object<Texture> (impl, in_texture, "", "texture");
 
     if (!texture)
       throw xtl::make_null_argument_exception ("", "texture");

@@ -20,7 +20,7 @@ View::View (const DeviceManager& device_manager, ITexture* in_texture, const Vie
     if (!texture)
       throw xtl::make_null_argument_exception ("", "texture");
 
-    ITextureImpl* texture_impl = cast_object<ITextureImpl> (*this, in_texture, "", "texture");
+    Texture* texture_impl = cast_object<Texture> (*this, in_texture, "", "texture");
 
        //проверка корректности дескриптора
 
