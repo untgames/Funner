@@ -11,6 +11,7 @@ Context::Context (const DxContextPtr& in_context, const DeviceManager& device_ma
   : DeviceObject (device_manager)
   , context (in_context)
   , render_target_context (device_manager, in_context)
+  , texture_manager_context (device_manager, in_context)
 {
   if (!context)
     throw xtl::make_null_argument_exception ("render::low_level::dx11::Context::Context", "context");
@@ -157,22 +158,54 @@ IBuffer* Context::SSGetConstantBuffer (size_t buffer_slot)
 
 void Context::SSSetSampler (size_t sampler_slot, ISamplerState* state)
 {
-  throw xtl::make_not_implemented_exception (__FUNCTION__);
+  try
+  {
+    texture_manager_context.SetSampler (sampler_slot, state);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::low_level::dx11::Context::SSSetSampler");
+    throw;
+  }
 }
 
 void Context::SSSetTexture (size_t sampler_slot, ITexture* texture)
 {
-  throw xtl::make_not_implemented_exception (__FUNCTION__);
+  try
+  {
+    texture_manager_context.SetTexture (sampler_slot, texture);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::low_level::dx11::Context::SSSetTexture");
+    throw;
+  }
 }
 
 ISamplerState* Context::SSGetSampler (size_t sampler_slot)
 {
-  throw xtl::make_not_implemented_exception (__FUNCTION__);
+  try
+  {
+    return texture_manager_context.GetSampler (sampler_slot);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::low_level::dx11::Context::SSGetSampler");
+    throw;
+  }
 }
 
 ITexture* Context::SSGetTexture (size_t sampler_slot)
 {
-  throw xtl::make_not_implemented_exception (__FUNCTION__);
+  try
+  {
+    return texture_manager_context.GetTexture (sampler_slot);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::low_level::dx11::Context::SSGetTexture");
+    throw;
+  }
 }
 
 /*
@@ -368,11 +401,11 @@ void Context::GenerateMips (ITexture* texture)
 {
   try
   {
-    throw xtl::make_not_implemented_exception (__FUNCTION__);
+    texture_manager_context.GenerateMips (texture);
   }
-  catch (xtl::exception& exception)
+  catch (xtl::exception& e)
   {
-    exception.touch ("render::low_level::dx11::Context::GenerateMips");
+    e.touch ("render::low_level::dx11::Context::GenerateMips");
     throw;
   }
 }
@@ -397,7 +430,7 @@ bool Context::GetPredicateValue ()
 }
 
 /*
-    
+    Работа со списками команд
 */
 
 ICommandList* Context::FinishCommandList (bool restore_state)

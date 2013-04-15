@@ -10,6 +10,7 @@ RENDER.DX11_DRIVER.SOURCES.INCLUDE_DIRS += sources
 RENDER.DX11_DRIVER.SOURCES.SOURCE_DIRS  += sources/common
 RENDER.DX11_DRIVER.SOURCES.SOURCE_DIRS  += sources/driver
 RENDER.DX11_DRIVER.SOURCES.SOURCE_DIRS  += sources/render_target_manager
+RENDER.DX11_DRIVER.SOURCES.SOURCE_DIRS  += sources/texture_manager
 RENDER.DX11_DRIVER.SOURCES.IMPORTS      := compile.render.low_level compile.render.low_level.helpers compile.common compile.system compile.extern.dxsdk
 
 #DX11 render system tests

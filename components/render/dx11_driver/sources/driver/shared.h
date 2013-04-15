@@ -27,6 +27,7 @@
 #include <shared/error.h>
 #include <shared/object.h>
 #include <shared/render_target_manager.h>
+#include <shared/texture_manager.h>
 #include <shared/swap_chain.h>
 
 namespace render
@@ -332,8 +333,9 @@ class Context: virtual public IDeviceContext, public DeviceObject
     void          ExecuteCommandList (ICommandList* list, bool restore_state);
 
   private:
-    DxContextPtr        context;               //контекст отрисовки
-    RenderTargetContext render_target_context; //контекст целей отрисовки
+    DxContextPtr          context;                 //контекст отрисовки
+    RenderTargetContext   render_target_context;   //контекст целей отрисовки
+    TextureManagerContext texture_manager_context; //контекст менеджера текстур
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

@@ -20,7 +20,6 @@ struct RenderTargetDesc
   Viewport viewport;                  //область вывода
   Rect     scissor;                   //область отсечения
   size_t   viewport_hash;             //хеш области вывода
-  size_t   viewport_rect_hash;        //хэш области вывода для области отсечения
   size_t   scissor_hash;              //хэш области отсечения
   bool     need_recalc_viewport_hash; //флаг необходимости пересчёта хэша области вывода
   bool     need_recalc_scissor_hash;  //флаг необходимости пересчёта хэша области отсечения
@@ -28,7 +27,6 @@ struct RenderTargetDesc
 /// Конструктор
   RenderTargetDesc () 
     : viewport_hash ()
-    , viewport_rect_hash ()
     , scissor_hash ()
     , need_recalc_viewport_hash (true)
     , need_recalc_scissor_hash (true)
@@ -79,18 +77,10 @@ struct RenderTargetContextState::Impl: public DeviceObject
     if (render_target.need_recalc_viewport_hash)
     {
       render_target.viewport_hash             = common::crc32 (&render_target.viewport, sizeof render_target.viewport);
-      render_target.viewport_rect_hash        = common::crc32 (&render_target.viewport, sizeof (Rect));
       render_target.need_recalc_viewport_hash = false;
     }
 
     return render_target.viewport_hash;
-  }
-
-  size_t GetViewportRectHash (size_t view_index)
-  {
-    GetViewportHash (view_index); //for update
-
-    return render_targets [view_index].viewport_rect_hash;
   }
 
 ///Получение хэша области отсечения
@@ -229,9 +219,55 @@ const Rect& RenderTargetContextState::GetScissor (size_t view_index) const
     Захват / восстановление состояния
 */
 
-void RenderTargetContextState::CopyTo (const StateBlockMask&, RenderTargetContextState& dst_state) const
+void RenderTargetContextState::CopyTo (const StateBlockMask& mask, RenderTargetContextState& dst_state) const
 {
-  throw xtl::make_not_implemented_exception (__FUNCTION__);
+  try
+  {
+    if (!mask.os_render_target_views && !mask.rs_viewports && !mask.rs_scissors)
+      return;
+
+    bool update_notify = false;
+ 
+    for (size_t i=0; i<DEVICE_RENDER_TARGET_SLOTS_COUNT; i++)
+    {
+      const RenderTargetDesc& src_desc = impl->render_targets [i];
+      RenderTargetDesc&       dst_desc = dst_state.impl->render_targets [i];
+
+      if (mask.os_render_target_views && src_desc.view != dst_desc.view)
+      {
+        dst_desc.view = src_desc.view;
+        update_notify = true;
+      }
+
+      if (mask.rs_viewports && src_desc.viewport_hash != dst_desc.viewport_hash)
+      {
+        dst_desc.viewport                  = src_desc.viewport;
+        dst_desc.need_recalc_viewport_hash = true;
+        update_notify                      = true;
+      }
+
+      if (mask.rs_scissors && src_desc.scissor_hash != dst_desc.scissor_hash)
+      {
+        dst_desc.scissor                  = src_desc.scissor;
+        dst_desc.need_recalc_scissor_hash = true;
+        update_notify                     = true;
+      }
+    }
+
+    if (mask.os_depth_stencil_view && impl->depth_stencil_view != dst_state.impl->depth_stencil_view)
+    {
+      dst_state.impl->depth_stencil_view = impl->depth_stencil_view;
+      update_notify                      = true;
+    }
+
+    if (update_notify)
+      dst_state.impl->UpdateNotify ();
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::low_level::dx11::RenderTargetContextState::CopyTo");
+    throw;
+  }
 }
 
 /*

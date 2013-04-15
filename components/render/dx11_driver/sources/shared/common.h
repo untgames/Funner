@@ -16,15 +16,17 @@ namespace low_level
 namespace dx11
 {
 
-typedef xtl::com_ptr<IDXGIAdapter>        DxAdapterPtr;
-typedef xtl::com_ptr<IDXGIFactory>        DxFactoryPtr;
-typedef xtl::com_ptr<IDXGIOutput>         DxOutputPtr;
-typedef xtl::com_ptr<IDXGISwapChain>      DxSwapChainPtr;
-typedef xtl::com_ptr<ID3D11DeviceContext> DxContextPtr;
-typedef xtl::com_ptr<ID3D11Device>        DxDevicePtr;
-typedef xtl::com_ptr<ID3D11View>          DxViewPtr;
-typedef xtl::com_ptr<ID3D11Resource>      DxResourcePtr;
-typedef xtl::com_ptr<ID3D11Texture2D>     DxTexture2DPtr;
+typedef xtl::com_ptr<IDXGIAdapter>             DxAdapterPtr;
+typedef xtl::com_ptr<IDXGIFactory>             DxFactoryPtr;
+typedef xtl::com_ptr<IDXGIOutput>              DxOutputPtr;
+typedef xtl::com_ptr<IDXGISwapChain>           DxSwapChainPtr;
+typedef xtl::com_ptr<ID3D11DeviceContext>      DxContextPtr;
+typedef xtl::com_ptr<ID3D11Device>             DxDevicePtr;
+typedef xtl::com_ptr<ID3D11View>               DxViewPtr;
+typedef xtl::com_ptr<ID3D11Resource>           DxResourcePtr;
+typedef xtl::com_ptr<ID3D11Texture2D>          DxTexture2DPtr;
+typedef xtl::com_ptr<ID3D11SamplerState>       DxSamplerStatePtr;
+typedef xtl::com_ptr<ID3D11ShaderResourceView> DxShaderResourceViewPtr;
 
 }
 

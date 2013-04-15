@@ -113,6 +113,11 @@ ID3D11Resource& RenderBuffer::GetHandle ()
   return *texture;
 }
 
+ID3D11ShaderResourceView& RenderBuffer::GetShaderResourceView ()
+{
+  throw xtl::make_not_implemented_exception (__FUNCTION__);
+}
+
 /*
     Работа с данными
 */
