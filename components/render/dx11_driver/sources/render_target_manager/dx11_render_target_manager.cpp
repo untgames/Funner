@@ -120,7 +120,7 @@ ITexture* RenderTargetManager::CreateDepthStencilTexture (ISwapChain* in_swap_ch
     dst_desc.generate_mips_enable = false;
     dst_desc.access_flags         = 0;
     dst_desc.bind_flags           = BindFlag_DepthStencil;
-    dst_desc.usage_mode           = UsageMode_Static;
+    dst_desc.usage_mode           = UsageMode_Default;
 
     return CreateTexture (dst_desc);
   }

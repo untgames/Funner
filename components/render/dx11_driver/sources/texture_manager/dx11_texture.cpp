@@ -265,7 +265,7 @@ Texture::Texture (const DeviceManager& device_manager, const TextureDesc& desc)
 
       //принудительное создание отображения
 
-    GetShaderResourceView ();    
+//    GetShaderResourceView ();    
   }
   catch (xtl::exception& e)
   {
