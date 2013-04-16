@@ -3,21 +3,47 @@
 using namespace render::low_level;
 using namespace render::low_level::dx11;
 
+namespace
+{
+
+///Дескриптор mip-уровня текстуры
+struct MipLevelDesc
+{
+  size_t width, height; //ширина / высота изображения на уровне
+};
+
+}
+
 /*
     Описание реализации
 */
 
 struct Texture::Impl
 {
-  TextureDesc             desc;    //дескриптор текстуры
-  DxResourcePtr           texture; //ресурс
-  DxShaderResourceViewPtr view;    //отображение
+  TextureDesc             desc;       //дескриптор текстуры
+  DxResourcePtr           texture;    //ресурс
+  DxShaderResourceViewPtr view;       //отображение
+  size_t                  mips_count; //количество мип-уровней
 
 /// Конструктор
   Impl (const TextureDesc& in_desc, const DxResourcePtr& in_texture = DxResourcePtr ())
     : desc (in_desc)
     , texture (in_texture)
+    , mips_count ()
   {
+  }
+
+/// Получение дескриптора уровня текстуры
+  void GetMipLevelDesc (size_t mip_level, MipLevelDesc& out_desc) const
+  {
+    size_t level_width  = desc.width >> mip_level,
+           level_height = desc.height >> mip_level;
+    
+    if (!level_width)  level_width  = 1;
+    if (!level_height) level_height = 1;
+
+    out_desc.width  = level_width;
+    out_desc.height = level_height;
   }
 };
 
@@ -188,7 +214,8 @@ Texture::Texture (const DeviceManager& device_manager, const TextureDesc& desc, 
         if (!texture)
           throw xtl::format_operation_exception ("", "D3D11Device::CreateTexture1D failed");
 
-        impl->texture = DxResourcePtr (texture, false);
+        impl->texture    = DxResourcePtr (texture, false);
+        impl->mips_count = get_mips_count (desc.width);
 
         break;
       }
@@ -210,7 +237,8 @@ Texture::Texture (const DeviceManager& device_manager, const TextureDesc& desc, 
         if (!texture)
           throw xtl::format_operation_exception ("", "D3D11Device::CreateTexture2D failed");
 
-        impl->texture = DxResourcePtr (texture, false);
+        impl->texture    = DxResourcePtr (texture, false);
+        impl->mips_count = get_mips_count (desc.width, desc.height);
 
         break;
       }
@@ -230,7 +258,8 @@ Texture::Texture (const DeviceManager& device_manager, const TextureDesc& desc, 
         if (!texture)
           throw xtl::format_operation_exception ("", "D3D11Device::CreateTexture3D failed");
 
-        impl->texture = DxResourcePtr (texture, false);
+        impl->texture    = DxResourcePtr (texture, false);
+        impl->mips_count = get_mips_count (desc.width, desc.height, desc.layers);
 
         break;
       }
@@ -254,7 +283,8 @@ Texture::Texture (const DeviceManager& device_manager, const TextureDesc& desc, 
         if (!texture)
           throw xtl::format_operation_exception ("", "D3D11Device::CreateTexture2D failed");
 
-        impl->texture = DxResourcePtr (texture, false);
+        impl->texture    = DxResourcePtr (texture, false);
+        impl->mips_count = get_mips_count (desc.width, desc.height);
 
         break;
       }
@@ -385,7 +415,66 @@ ID3D11ShaderResourceView& Texture::GetShaderResourceView ()
 
 void Texture::SetData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height, PixelFormat source_format, const void* buffer)
 {
-  throw xtl::make_not_implemented_exception (__FUNCTION__);
+  try
+  {
+      //проверка возможности записи
+    
+    if (!(impl->desc.access_flags & AccessFlag_Write))
+      throw xtl::format_operation_exception ("", "Can't set texture data (no AccessFlag_Write in desc.access_flags)");
+
+      //проверка корректности номеров слоя и mip-уровня
+
+    if (layer >= impl->desc.layers)
+      throw xtl::make_range_exception ("", "layer", layer, impl->desc.layers);
+
+    if (mip_level >= impl->mips_count)
+      throw xtl::make_range_exception ("", "mip_level", mip_level, impl->mips_count);
+
+      //сохранение неотсеченных размеров
+
+    size_t unclamped_width  = width,
+           unclamped_height = height;
+
+      //получение дескриптора mip-уровня и информации о слое текстуры
+
+    MipLevelDesc level_desc;
+
+    impl->GetMipLevelDesc (mip_level, level_desc);
+
+      //отсечение
+
+    if (x >= level_desc.width || y >= level_desc.height)
+      return;
+
+    if (x + width > level_desc.width)
+      width = level_desc.width - x;
+
+    if (y + height > level_desc.height)
+      height = level_desc.height - y;    
+
+    if (!width || !height)
+      return;
+
+    if (!buffer)
+      throw xtl::make_null_argument_exception ("", "buffer");    
+
+      //проверка совместимости форматов
+
+    bool is_depth_stencil_source_format = is_depth_stencil (source_format),
+         is_depth_stencil_tex_format    = is_depth_stencil (impl->desc.format),
+         is_compatible                  = (is_depth_stencil_tex_format  && is_depth_stencil_source_format) ||
+                                          (!is_depth_stencil_tex_format && !is_depth_stencil_source_format);
+
+    if (!is_compatible)
+      throw xtl::format_not_supported_exception ("", "Texture format %s incompatible with source_format %s", get_name (impl->desc.format), get_name (source_format));
+
+    throw xtl::make_not_implemented_exception (__FUNCTION__);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::low_level::dx11::Texture::SetData");
+    throw;
+  }
 }
 
 void Texture::GetData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height, PixelFormat target_format, void* buffer)

@@ -9,12 +9,24 @@ using namespace render::low_level::dx11;
 
 struct DeviceManager::Impl: public xtl::reference_counter
 {
-  DxDevicePtr device;
+  DxDevicePtr  device;
+  DxContextPtr context;
 
   Impl (const DxDevicePtr& in_device) : device (in_device) 
   {
+    static const char* METHOD_NAME = "render::low_level::dx11::DeviceManager::Impl::Impl";
+
     if (!device)
-      throw xtl::make_null_argument_exception ("render::low_level::dx11::DeviceManager::Impl::Impl", "device");
+      throw xtl::make_null_argument_exception (METHOD_NAME, "device");
+
+    ID3D11DeviceContext* dx_context = 0;
+
+    device->GetImmediateContext (&dx_context);
+
+    if (!dx_context)
+      throw xtl::format_operation_exception (METHOD_NAME, "ID3D11Device::GetImmediateContext failed");
+
+    context = dx_context;
   }
 };
 
@@ -44,6 +56,11 @@ DeviceManager& DeviceManager::operator = (const DeviceManager& manager)
 ID3D11Device& DeviceManager::GetDevice () const
 {
   return *impl->device;
+}
+
+ID3D11DeviceContext& DeviceManager::GetImmediateContext () const
+{
+  return *impl->context;
 }
 
 void DeviceManager::Swap (DeviceManager& manager)

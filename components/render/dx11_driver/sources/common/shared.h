@@ -14,6 +14,7 @@
 #include <common/singleton.h>
 #include <common/strlib.h>
 
+#include <shared/common.h>
 #include <shared/device_manager.h>
 #include <shared/error.h>
 #include <shared/log.h>
