@@ -93,3 +93,44 @@ void Program::Bind (ID3D11DeviceContext& context)
   context.PSSetShader (Get<ID3D11PixelShader, ShaderType_Pixel> (), 0, 0);
   context.VSSetShader (Get<ID3D11VertexShader, ShaderType_Vertex> (), 0, 0);
 }
+
+/*
+    Создание входного лэйаута
+*/
+
+DxInputLayoutPtr Program::CreateInputLayout (const D3D11_INPUT_ELEMENT_DESC* descs, size_t descs_count)
+{
+  try
+  {
+      //проверка корректности аргументов
+
+    if (!descs)
+      throw xtl::make_null_argument_exception ("", "descs");
+
+    if (!descs_count)
+      throw xtl::make_null_argument_exception ("", "descs_count");
+
+    ShaderSlot& vs_slot = shaders [ShaderType_Vertex];
+
+    if (!vs_slot.shader)
+      throw xtl::format_operation_exception ("", "Can't create layout: no vertex shader was attached");   
+
+    ShaderCode& code = vs_slot.holder->GetShaderCode ();
+
+      //создание лэйаута
+
+    ID3D11InputLayout* dx_layout = 0;
+
+    check_errors ("ID3D11Device::CreateInputLayout", GetDevice ().CreateInputLayout (descs, descs_count, code.GetCompiledData (), code.GetCompiledDataSize (), &dx_layout));
+
+    if (!dx_layout)
+      throw xtl::format_operation_exception ("", "ID3D11Device::CreateInputLayout failed");
+
+    return DxInputLayoutPtr (dx_layout, false);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::low_level::dx11::Program::CreateInputLayout");
+    throw;
+  }
+}
