@@ -128,16 +128,18 @@ class Program: virtual public IProgram, public DeviceObject
     void Bind (ID3D11DeviceContext& context);
 
   private:
-    typedef stl::vector<ShaderPtr> ShaderList;    
+    struct ShaderSlot
+    {
+      ShaderPtr          holder;
+      ID3D11DeviceChild* shader;
+
+      ShaderSlot () : shader () {}
+    };
+
+    template <class T, ShaderType Type> T* Get ();
 
   private:
-    ShaderList            shaders;         //список использованных шейдеров
-    ID3D11ComputeShader*  compute_shader;  //вычислительный шейдер
-    ID3D11DomainShader*   domain_shader;   //шейдер входного слоя
-    ID3D11GeometryShader* geometry_shader; //геометрический шейдер
-    ID3D11HullShader*     hull_shader;     //шейдер оболочки
-    ID3D11PixelShader*    pixel_shader;    //пиксельный шейдер
-    ID3D11VertexShader*   vertex_shader;   //вершинный шейдер
+    ShaderSlot shaders [ShaderType_Num]; //использованные шейдеры
 };
 
 }
