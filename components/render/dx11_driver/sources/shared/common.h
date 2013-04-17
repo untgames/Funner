@@ -28,6 +28,12 @@ typedef xtl::com_ptr<ID3D11Texture2D>          DxTexture2DPtr;
 typedef xtl::com_ptr<ID3D11SamplerState>       DxSamplerStatePtr;
 typedef xtl::com_ptr<ID3D11ShaderResourceView> DxShaderResourceViewPtr;
 typedef xtl::com_ptr<ID3D11DeviceChild>        DxDeviceChildPtr;
+typedef xtl::com_ptr<ID3D11ComputeShader>      DxComputeShaderPtr;
+typedef xtl::com_ptr<ID3D11DomainShader>       DxDomainShaderPtr;
+typedef xtl::com_ptr<ID3D11GeometryShader>     DxGeometryShaderPtr;
+typedef xtl::com_ptr<ID3D11HullShader>         DxHullShaderPtr;
+typedef xtl::com_ptr<ID3D11PixelShader>        DxPixelShaderPtr;
+typedef xtl::com_ptr<ID3D11VertexShader>       DxVertexShaderPtr;
 
 }
 

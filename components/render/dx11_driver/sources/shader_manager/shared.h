@@ -42,6 +42,8 @@ enum ShaderType
   ShaderType_Hull,
   ShaderType_Pixel,
   ShaderType_Vertex,
+
+  ShaderType_Num
 };
 
 typedef xtl::shared_ptr<ShaderCode> ShaderCodePtr;
@@ -61,7 +63,7 @@ class Shader: public DeviceObject
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Тип шейдера
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    ShaderType GetShaderType () const { return type; }
+    ShaderType GetType () const { return type; }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Объект шейдера
@@ -117,11 +119,25 @@ class Program: virtual public IProgram, public DeviceObject
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструктор / деструктор
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    Program  (const DeviceManager& device_manager);
+    Program  (ShaderLibrary& library, size_t shaders_count, const ShaderDesc* shader_descs, const LogFunction& error_log);
     ~Program ();
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Установка программы в контекст
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void Bind (ID3D11DeviceContext& context);
+
   private:
-    
+    typedef stl::vector<ShaderPtr> ShaderList;    
+
+  private:
+    ShaderList            shaders;         //список использованных шейдеров    
+    ID3D11ComputeShader*  compute_shader;  //вычислительный шейдер
+    ID3D11DomainShader*   domain_shader;   //шейдер входного слоя
+    ID3D11GeometryShader* geometry_shader; //геометрический шейдер
+    ID3D11HullShader*     hull_shader;     //шейдер оболочки
+    ID3D11PixelShader*    pixel_shader;    //пиксельный шейдер
+    ID3D11VertexShader*   vertex_shader;   //вершинный шейдер
 };
 
 }
