@@ -131,7 +131,7 @@ class Program: virtual public IProgram, public DeviceObject
     typedef stl::vector<ShaderPtr> ShaderList;    
 
   private:
-    ShaderList            shaders;         //список использованных шейдеров    
+    ShaderList            shaders;         //список использованных шейдеров
     ID3D11ComputeShader*  compute_shader;  //вычислительный шейдер
     ID3D11DomainShader*   domain_shader;   //шейдер входного слоя
     ID3D11GeometryShader* geometry_shader; //геометрический шейдер
