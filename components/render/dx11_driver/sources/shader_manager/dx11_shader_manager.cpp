@@ -49,5 +49,5 @@ IProgram* ShaderManager::CreateProgram (size_t shaders_count, const ShaderDesc* 
 
 const char* ShaderManager::GetShaderProfilesString () const
 {
-  throw xtl::make_not_implemented_exception (__FUNCTION__);
+  return "hlsl.vs hlsl.ps hlsl";
 }

@@ -118,7 +118,7 @@ const char* Device::GetCapString (DeviceCapString cap_string)
     switch (cap_string)
     {
       case DeviceCapString_ShaderProfiles:
-        return "hlsl.vs hlsl.ps hlsl";
+        return shader_manager->GetShaderProfilesString ();
       default:
         throw xtl::make_argument_exception ("", "cap_string", cap_string);
     }
