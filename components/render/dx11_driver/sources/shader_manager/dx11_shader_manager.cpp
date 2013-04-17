@@ -9,9 +9,12 @@ using namespace render::low_level::dx11;
 
 struct ShaderManager::Impl: public DeviceObject
 {
+  ShaderLibrary shader_library; //библиотека шейдеров
+
 /// Конструктор
   Impl (const DeviceManager& device_manager)
     : DeviceObject (device_manager)
+    , shader_library (device_manager)
   {
   }
 };
@@ -40,7 +43,15 @@ IProgramParametersLayout* ShaderManager::CreateProgramParametersLayout (const Pr
 
 IProgram* ShaderManager::CreateProgram (size_t shaders_count, const ShaderDesc* shader_descs, const LogFunction& error_log)
 {
-  throw xtl::make_not_implemented_exception (__FUNCTION__);
+  try
+  {
+    return new Program (impl->shader_library, shaders_count, shader_descs, error_log);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::low_level::dx11::ShaderManager::CreateProgram");
+    throw;
+  }
 }
     
 /*
