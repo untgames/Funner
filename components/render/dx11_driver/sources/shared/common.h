@@ -27,6 +27,7 @@ typedef xtl::com_ptr<ID3D11Resource>           DxResourcePtr;
 typedef xtl::com_ptr<ID3D11Texture2D>          DxTexture2DPtr;
 typedef xtl::com_ptr<ID3D11SamplerState>       DxSamplerStatePtr;
 typedef xtl::com_ptr<ID3D11ShaderResourceView> DxShaderResourceViewPtr;
+typedef xtl::com_ptr<ID3D11DeviceChild>        DxDeviceChildPtr;
 
 }
 
