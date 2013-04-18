@@ -37,7 +37,7 @@ IInputLayout* InputManager::CreateInputLayout (const InputLayoutDesc& desc)
 {
   try
   {
-    throw xtl::make_not_implemented_exception (__FUNCTION__);
+    return new InputLayout (desc);
   }
   catch (xtl::exception& e)
   {

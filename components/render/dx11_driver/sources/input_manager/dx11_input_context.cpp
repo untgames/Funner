@@ -53,20 +53,6 @@ InputManagerContextState::Impl& InputManagerContextState::GetImpl () const
 }
 
 /*
-    ”правление конфигурацией входных данных
-*/
-
-void InputManagerContextState::SetInputLayout (IInputLayout* state)
-{
-  throw xtl::make_not_implemented_exception (__FUNCTION__);
-}
-
-IInputLayout* InputManagerContextState::GetInputLayout () const
-{
-  throw xtl::make_not_implemented_exception (__FUNCTION__);
-}
-
-/*
     ”правление вершинными буферами
 */
 

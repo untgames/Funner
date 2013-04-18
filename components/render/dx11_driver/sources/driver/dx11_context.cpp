@@ -70,7 +70,7 @@ void Context::ISSetInputLayout (IInputLayout* state)
 {
   try
   {
-    input_manager_context.SetInputLayout (state);
+    shader_manager_context.SetInputLayout (state);
   }
   catch (xtl::exception& e)
   {
@@ -109,7 +109,7 @@ IInputLayout* Context::ISGetInputLayout ()
 {
   try
   {
-    return input_manager_context.GetInputLayout ();
+    return shader_manager_context.GetInputLayout ();
   }
   catch (xtl::exception& e)
   {

@@ -53,6 +53,20 @@ ShaderManagerContextState::Impl& ShaderManagerContextState::GetImpl () const
 }
 
 /*
+    Управление конфигурацией входных данных
+*/
+
+void ShaderManagerContextState::SetInputLayout (IInputLayout* state)
+{
+  throw xtl::make_not_implemented_exception (__FUNCTION__);
+}
+
+IInputLayout* ShaderManagerContextState::GetInputLayout () const
+{
+  throw xtl::make_not_implemented_exception (__FUNCTION__);
+}
+
+/*
     Установка состояния, вьюпорта и отсечения
 */
 
