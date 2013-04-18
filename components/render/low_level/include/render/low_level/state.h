@@ -71,12 +71,14 @@ enum InputDataFormat
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 struct VertexAttribute
 {
-  const char*      semantic; //семантика вершинного атрибута
-  InputDataFormat  format;   //формат данных
-  InputDataType    type;     //тип элементов
-  size_t           slot;     //номер слота с вершинным буфером
-  size_t           offset;   //смещение от начала вершинного буфера
-  size_t           stride;   //шаг в вершинном буфере
+  const char*      semantic;                //семантика вершинного атрибута
+  InputDataFormat  format;                  //формат данных
+  InputDataType    type;                    //тип элементов
+  size_t           slot;                    //номер слота с вершинным буфером
+  size_t           offset;                  //смещение от начала вершинного буфера
+  size_t           stride;                  //шаг в вершинном буфере
+  size_t           instance_data_step_rate; //количество отрисованных инстансов после которого произойдет смещение на 1
+  bool             is_per_instance;         //является ли атрибут инстанцируемым
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -88,8 +90,6 @@ struct InputLayoutDesc
   const VertexAttribute* vertex_attributes;       //вершинные атрибуты
   InputDataType          index_type;              //тип индексов в вершинном буфере
   size_t                 index_buffer_offset;     //смещение в индексном буфере
-  size_t                 instance_data_step_rate; //количество отрисованных инстансов после которого произойдет смещение на 1
-  bool                   is_per_instance;         //является ли атрибут инстанцируемым
 };
 
 /*

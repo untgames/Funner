@@ -290,16 +290,6 @@ void InputLayout::SetDesc (const InputLayoutDesc& desc)
 { 
   static const char* METHOD_NAME = "render::low_level::opengl::InputLayout::SetDesc";
 
-    //проверка корректности аргументов
-
-    //TODO: instancing
-
-  if (desc.instance_data_step_rate)
-    throw xtl::format_not_supported_exception (METHOD_NAME, "Instancing not supported. Please check InputLayoutDesc::instance_data_step_rate field");
-
-  if (desc.is_per_instance)
-    throw xtl::format_not_supported_exception (METHOD_NAME, "Instancing not supported. Please check InputLayoutDesc::is_per_instance field");
-  
     //преобразование конфигурации индексного буфера
     
   GLenum new_index_data_type;
@@ -368,6 +358,14 @@ void InputLayout::SetDesc (const InputLayoutDesc& desc)
     for (size_t i=0; i<desc.vertex_attributes_count; i++)
     {
       const VertexAttribute& va = desc.vertex_attributes [i];
+
+        //TODO: instancing
+
+      if (va.instance_data_step_rate)
+        throw xtl::format_not_supported_exception (METHOD_NAME, "Instancing not supported. Please check VertexAttribute::instance_data_step_rate field");
+
+      if (va.is_per_instance)
+        throw xtl::format_not_supported_exception (METHOD_NAME, "Instancing not supported. Please check VertexAttribute::is_per_instance field");
 
         //проверка корректности вершинной семантики
 

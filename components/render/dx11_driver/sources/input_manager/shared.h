@@ -1,6 +1,11 @@
 #ifndef RENDER_DX11_DRIVER_INPUT_STAGE_SHARED_HEADER
 #define RENDER_DX11_DRIVER_INPUT_STAGE_SHARED_HEADER
 
+#include <stl/vector>
+
+#include <render/low_level/utils.h>
+
+#include <shared/input_layout.h>
 #include <shared/input_manager.h>
 
 namespace render
