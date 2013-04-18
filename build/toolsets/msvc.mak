@@ -132,7 +132,7 @@ endef
 #—борка библиотеки (им€ выходного файла, список файлов)
 ###################################################################################################
 define tools.lib
-export PATH="$(MSVS_COMMON_PATH);$$PATH" && echo -nologo -out:$1 $2 > $1.commandline && "$(MSVC_BIN_PATH)/lib" @$1.commandline && rm -f $1.commandline
+export PATH="$(MSVS_COMMON_PATH);$$PATH" && echo -nologo -out:$1 $2 > $1.commandline && "$(MSVC_BIN_PATH)/lib" @$1.commandline && $(dir $(SHELL))/$(RM) $1.commandline
 endef
 
 ###################################################################################################
