@@ -13,16 +13,30 @@ using namespace render::low_level::dx11;
     Описание реализации состояния контекста менеджера шейдеров
 */
 
+typedef xtl::com_ptr<InputLayout> InputLayoutPtr;
+typedef xtl::com_ptr<Program>     ProgramPtr;
+
 struct ShaderManagerContextState::Impl: public DeviceObject
 {
+  InputLayoutPtr input_layout; //входной лэйаут
+  ProgramPtr     program;      //программа
+  bool           is_dirty;     //флаг "грязности"
+
 /// Конструктор
   Impl (const DeviceManager& device_manager)
     : DeviceObject (device_manager)
+    , is_dirty (true)
   {
   }
 
 /// Деструктор
   virtual ~Impl () {}
+
+/// Оповещение об изменении
+  void UpdateNotify ()
+  {
+    is_dirty = true;
+  }
 };
 
 /*
@@ -56,23 +70,47 @@ ShaderManagerContextState::Impl& ShaderManagerContextState::GetImpl () const
     Управление конфигурацией входных данных
 */
 
-void ShaderManagerContextState::SetInputLayout (IInputLayout* state)
+void ShaderManagerContextState::SetInputLayout (IInputLayout* in_state)
 {
-  throw xtl::make_not_implemented_exception (__FUNCTION__);
+  try
+  {
+    InputLayout* state = cast_object<InputLayout> (*impl, in_state, "", "state");
+
+    impl->input_layout = state;
+
+    impl->UpdateNotify ();
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::low_level::dx11::ShaderManagerContextState::SetInputLayout");
+    throw;
+  }
 }
 
 IInputLayout* ShaderManagerContextState::GetInputLayout () const
 {
-  throw xtl::make_not_implemented_exception (__FUNCTION__);
+  return impl->input_layout.get ();
 }
 
 /*
     Установка состояния, вьюпорта и отсечения
 */
 
-void ShaderManagerContextState::SetProgram (IProgram* program)
+void ShaderManagerContextState::SetProgram (IProgram* in_program)
 {
-  throw xtl::make_not_implemented_exception (__FUNCTION__);
+  try
+  {
+    Program* program = cast_object<Program> (*impl, in_program, "", "program");
+
+    impl->program = program;
+
+    impl->UpdateNotify ();
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::low_level::dx11::ShaderManagerContextState::SetProgram");
+    throw;
+  }
 }
 
 void ShaderManagerContextState::SetProgramParametersLayout (IProgramParametersLayout* parameters_layout)
@@ -96,7 +134,7 @@ IProgramParametersLayout* ShaderManagerContextState::GetProgramParametersLayout 
 
 IProgram* ShaderManagerContextState::GetProgram () const
 {
-  throw xtl::make_not_implemented_exception (__FUNCTION__);
+  return impl->program.get ();
 }
 
 IBuffer* ShaderManagerContextState::GetConstantBuffer (size_t buffer_slot) const

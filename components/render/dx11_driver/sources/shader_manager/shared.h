@@ -20,6 +20,7 @@
 
 #include <shared/error.h>
 #include <shared/log.h>
+#include <shared/input_layout.h>
 #include <shared/shader_manager.h>
 
 namespace render
