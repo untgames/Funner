@@ -23,6 +23,7 @@
 #include <common/crypto.h>
 #include <common/file.h>
 #include <common/hash.h>
+#include <common/log.h>
 #include <common/lockable.h>
 #include <common/singleton.h>
 #include <common/strlib.h>
@@ -613,6 +614,7 @@ class FileSystemImpl
     stl::string            compress_path;            //буфер для формирования сокращённого пути
     size_t                 default_file_buffer_size; //размер буфера файла по умолчанию
     FileBufferSizeMap      file_buffer_sizes;        //уточнения размеров буфера файла для различных файлов
+    common::Log            log;                      //протокол
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

@@ -10,6 +10,7 @@ namespace
 const char*  FILE_SYSTEM_ADDONS_MASK              = "common.file_systems.*"; //маска имён компонентов, пользовательских файловых систем
 const char*  ANONYMOUS_FILES_PREFIX               = "/anonymous";            //префикс имён анонимных файлов
 const size_t MAX_SYMBOLIC_LINKS_REPLACEMENT_COUNT = 64;                      //максимальное количество подстановок символьных ссылок
+const char*  LOG_NAME                             = "common.file_systems";   //имя лога
 
 struct RemoveFileWithPrefix
 {
@@ -192,6 +193,7 @@ inline SymbolicLink::SymbolicLink (const char* in_prefix, const char* in_link)
 */
 
 FileSystemImpl::FileSystemImpl ()
+  : log (LOG_NAME)
 {
   default_file_buffer_size = DEFAULT_FILE_BUF_SIZE;
   anonymous_file_system    = AnonymousFileSystemPtr (new AnonymousFileSystem, false);
@@ -417,6 +419,8 @@ void FileSystemImpl::AddSearchPath (const char* _path,const LogHandler& log_hand
 
   string path = FileSystem::GetNormalizedFileName (_path), mount_path, prefix;
 
+  log.Printf ("Attempt to add search path '%s'", path.c_str ());
+
   ICustomFileSystemPtr owner_file_system = FindFileSystem (path.c_str (),mount_path,&prefix);
   FileInfo             file_info;
   
@@ -424,6 +428,7 @@ void FileSystemImpl::AddSearchPath (const char* _path,const LogHandler& log_hand
   {
     path = FileSystem::GetNormalizedFileName (_path);
 
+    log.Printf ("Search path '%s' doesn't exist (try to create)",path.c_str ());
     log_handler (format ("Search path '%s' doesn't exist (try to create)",path.c_str ()).c_str ());
 
     AddPackFile (path.c_str (),0,log_handler);
@@ -441,6 +446,7 @@ void FileSystemImpl::AddSearchPath (const char* _path,const LogHandler& log_hand
     for (SearchPathList::iterator i=search_paths.begin ();i!=search_paths.end ();++i)
       if (i->hash == path_hash)
       {
+        log.Printf ("Search path '%s' has been already added (path='%s')",path.c_str (),i->path.c_str ());
         log_handler (format ("Search path '%s' has been already added",path.c_str ()).c_str ());
         return;
       }
@@ -450,6 +456,8 @@ void FileSystemImpl::AddSearchPath (const char* _path,const LogHandler& log_hand
     for (PackFileTypeList::iterator i=pack_types.begin ();i!=pack_types.end ();++i)
       owner_file_system->Search (format ("%s/*.%s",mount_path.c_str (),i->extension.c_str ()).c_str (),
       ICustomFileSystem::FileSearchHandler (bind (&FileListBuilder::Insert, &list_builder, _1, _2)));
+
+    log.Printf ("Add search path '%s'", path.c_str ());
 
     search_paths.push_front (SearchPath (path.c_str (),path_hash));
 
@@ -471,6 +479,8 @@ void FileSystemImpl::RemoveSearchPath (const char* _path)
     path = format ("%s/%s",default_path.c_str (),path.c_str ());
 
   size_t hash = strhash (path.c_str ());
+
+  log.Printf ("Remove search path '%s'", path.c_str ());
 
   for (SearchPathList::iterator i=search_paths.begin ();i!=search_paths.end ();++i)
     if (i->hash == hash)
