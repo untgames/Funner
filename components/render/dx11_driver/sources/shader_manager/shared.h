@@ -38,6 +38,9 @@ namespace dx11
 
 using helpers::ProgramParameterGroup;
 
+//forwards
+class ShaderLibrary;
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Тип шейдера
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -63,7 +66,7 @@ struct ShaderParameter: public ProgramParameter {};
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Лэйаут константного буфера
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-class ConstantBufferLayout: public xtl::reference_counter
+class ConstantBufferLayout: public xtl::reference_counter, public xtl::trackable
 {
   public:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -84,6 +87,11 @@ class ConstantBufferLayout: public xtl::reference_counter
     D3D11_CBUFFER_TYPE GetType () const { return type; }
     size_t             GetSize () const { return buffer_size; }
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Получение хэша
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    size_t GetHash () const { return hash; }
+
   private:
     ConstantBufferLayout (const ConstantBufferLayout&); //no implementation
     ConstantBufferLayout& operator = (const ConstantBufferLayout&); //no implementation
@@ -96,6 +104,7 @@ class ConstantBufferLayout: public xtl::reference_counter
     common::StringArray  strings;     //строки с именами параметров
     D3D11_CBUFFER_TYPE   type;        //тип буфера
     size_t               buffer_size; //размер буфера
+    size_t               hash;        //хэш лэйаута для идентификации
 };
 
 typedef xtl::intrusive_ptr<ConstantBufferLayout> ConstantBufferLayoutPtr;
@@ -109,7 +118,7 @@ class Shader: public DeviceObject
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструктор / деструктор
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    Shader  (ShaderType shader_type, const ShaderCodePtr& shader_code);
+    Shader  (ShaderType shader_type, const ShaderCodePtr& shader_code, ShaderLibrary& library);
     ~Shader ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -162,14 +171,27 @@ class ShaderLibrary: public DeviceObject
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     ShaderPtr CreateShader (const ShaderDesc& shader_desc, const LogFunction& error_log);
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Поиск лэйаута константного буфера по хэшу
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    ConstantBufferLayoutPtr FindConstantBufferLayout (size_t hash) const; 
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Добавление / удаление лэйаута константного буфера по хэшу
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    ConstantBufferLayoutPtr AddConstantBufferLayout    (const ConstantBufferLayoutPtr& layout);
+    void                    RemoveConstantBufferLayout (size_t hash);
+
   private:
     void RemoveShaderByHash (size_t hash);
 
   private:
-    typedef stl::hash_map<size_t, Shader*> ShaderMap;
+    typedef stl::hash_map<size_t, Shader*>               ShaderMap;
+    typedef stl::hash_map<size_t, ConstantBufferLayout*> BufferLayoutMap;
 
   private:
-    ShaderMap shaders; //шейдеры
+    ShaderMap       shaders;         //шейдеры
+    BufferLayoutMap buffer_layouts;  //лэйауты константных буферов
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

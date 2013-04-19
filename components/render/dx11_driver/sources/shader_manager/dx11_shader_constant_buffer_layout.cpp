@@ -140,12 +140,22 @@ ConstantBufferLayout::ConstantBufferLayout (ID3D11ShaderReflectionConstantBuffer
       params.push_back (param);
     }
 
+      //расчёт хэша
+
+    hash = common::crc32 (&params [0], sizeof (ShaderParameter) * params.size ());
+
       //обновление имен
 
     const char** name = strings.Data ();
 
     for (ShaderParameterArray::iterator iter=params.begin (), end=params.end (); iter!=end; ++iter, ++name)
       iter->name = *name;
+
+      //обновление хэша
+
+    hash = common::crc32 (strings.Buffer (), strings.BufferSize (), hash);
+    hash = common::crc32 (&type, sizeof (type), hash);
+    hash = common::crc32 (&buffer_size, sizeof (buffer_size), hash);
   }
   catch (xtl::exception& e)
   {

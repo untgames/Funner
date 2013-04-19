@@ -7,7 +7,7 @@ using namespace render::low_level::dx11;
     Конструктор / деструктор
 */
 
-Shader::Shader (ShaderType in_shader_type, const ShaderCodePtr& in_code)
+Shader::Shader (ShaderType in_shader_type, const ShaderCodePtr& in_code, ShaderLibrary& library)
   : DeviceObject (code->GetDeviceManager ())
   , type (in_shader_type)
   , code (in_code)
@@ -130,6 +130,8 @@ Shader::Shader (ShaderType in_shader_type, const ShaderCodePtr& in_code)
         throw xtl::format_operation_exception ("", "ID3D11ShaderReflection::GetConstantBufferByIndex failed");
 
       ConstantBufferLayoutPtr layout (new ConstantBufferLayout (*buffer), false);
+
+      layout = library.AddConstantBufferLayout (layout);
 
       buffer_layouts.push_back (layout);
     }

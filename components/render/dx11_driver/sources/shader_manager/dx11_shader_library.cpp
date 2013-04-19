@@ -88,7 +88,7 @@ ShaderPtr ShaderLibrary::CreateShader (const ShaderDesc& desc, const LogFunction
       //создание нового шейдера
 
     ShaderCodePtr code (new ShaderCode (GetDeviceManager (), desc.name, dx_profile, desc.source_code, source_code_size, options, error_log));
-    ShaderPtr     shader (new Shader (type, code), false);
+    ShaderPtr     shader (new Shader (type, code, *this), false);
 
      //регистрация шейдера в библиотеке
 
@@ -108,4 +108,62 @@ ShaderPtr ShaderLibrary::CreateShader (const ShaderDesc& desc, const LogFunction
 void ShaderLibrary::RemoveShaderByHash (size_t hash)
 {
   shaders.erase (hash);
+}
+
+/*
+    Поиск лэйаута константного буфера по хэшу
+*/
+
+ConstantBufferLayoutPtr ShaderLibrary::FindConstantBufferLayout (size_t hash) const
+{
+  BufferLayoutMap::const_iterator iter = buffer_layouts.find (hash);
+
+  if (iter != buffer_layouts.end ())
+    return iter->second;
+
+  return ConstantBufferLayoutPtr ();
+}
+
+/*
+    Добавление / удаление лэйаута константного буфера по хэшу
+*/
+
+ConstantBufferLayoutPtr ShaderLibrary::AddConstantBufferLayout (const ConstantBufferLayoutPtr& layout)
+{
+  try
+  {
+    if (!layout)
+      throw xtl::make_null_argument_exception ("", "layout");
+
+    size_t hash = layout->GetHash ();
+
+    BufferLayoutMap::const_iterator iter = buffer_layouts.find (hash);
+
+    if (iter != buffer_layouts.end ())
+      return iter->second;
+
+    buffer_layouts.insert_pair (hash, layout.get ());
+
+    try
+    {
+      layout->connect_tracker (xtl::bind (&ShaderLibrary::RemoveConstantBufferLayout, this, hash), GetTrackable ());
+    }
+    catch (...)
+    {
+      buffer_layouts.erase (hash);
+      throw;
+    }
+
+    return layout;
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::low_level::dx11::ShaderLibrary::AddConstantBufferLayout");
+    throw;
+  }
+}
+
+void ShaderLibrary::RemoveConstantBufferLayout (size_t hash)
+{
+  buffer_layouts.erase (hash);
 }
