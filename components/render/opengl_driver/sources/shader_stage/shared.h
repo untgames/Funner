@@ -14,6 +14,8 @@
 
 #include <render/low_level/utils.h>
 
+#include <render/low_level/helpers/program_parameters_layout.h>
+
 #include <shared/shader_stage.h>
 #include <shared/input_stage.h>
 
@@ -25,6 +27,8 @@ namespace low_level
 
 namespace opengl
 {
+
+using helpers::ProgramParameterGroup;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Элементы таблицы локальных данных контекста
@@ -42,52 +46,19 @@ enum ShadingStageCacheEntry
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Описание расположения параметров в группе (группировка произодится по индексам константных буферов)
-///////////////////////////////////////////////////////////////////////////////////////////////////
-struct ProgramParameterGroup
-{
-  size_t            slot;       //индекс константного буфера
-  size_t            count;      //количество параметров в группе
-  ProgramParameter* parameters; //указатель на начало области с параметрами группы
-};
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Описание расположения параметров программы шейдинга
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-class ProgramParametersLayout: virtual public IProgramParametersLayout, public ContextObject
+class ProgramParametersLayout: public helpers::ProgramParametersLayout, public ContextObject
 {
   public:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструктор
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    ProgramParametersLayout (const ContextManager&, const ProgramParametersLayoutDesc&);
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Изменение дескриптора
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    void SetDesc (const ProgramParametersLayoutDesc& in_desc);
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Получение параметров
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    size_t            GetParametersCount () const { return parameters.size (); }    
-    ProgramParameter* GetParameters      ()       { return &parameters [0]; }
-    
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Получение групп
-///////////////////////////////////////////////////////////////////////////////////////////////////    
-    size_t                 GetGroupsCount () const { return groups.size (); }
-    ProgramParameterGroup* GetGroups      ()       { return &groups [0]; }
-    ProgramParameterGroup& GetGroup       (size_t index);
-
-  private:
-    typedef stl::vector<ProgramParameter>      ParameterArray;
-    typedef stl::vector<ProgramParameterGroup> GroupArray;
-
-  private:  
-    ParameterArray parameters; //параметры программы шейдинга
-    GroupArray     groups;     //группы параметров программы шейдинга
-    stl::string    names;      //имена параметров
+    ProgramParametersLayout (const ContextManager& manager, const ProgramParametersLayoutDesc& desc)
+      : helpers::ProgramParametersLayout (desc)
+      , ContextObject (manager)
+    {
+    }
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

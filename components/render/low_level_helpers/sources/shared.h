@@ -3,6 +3,7 @@
 
 #include <render/low_level/helpers/object.h>
 #include <render/low_level/helpers/property_list.h>
+#include <render/low_level/helpers/program_parameters_layout.h>
 
 #include <stl/vector>
 
