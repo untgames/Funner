@@ -152,10 +152,10 @@ Shader::~Shader ()
 */
 
 
-ConstantBufferLayoutPtr Shader::GetConstantBuffersLayout (size_t index) const
+ConstantBufferLayoutPtr Shader::GetConstantBufferLayout (size_t index) const
 {
   if (index >= buffer_layouts.size ())
-    throw xtl::make_range_exception ("render::low_level::dx11:Shader::GetConstantBuffersLayout", "index", index, buffer_layouts.size ());
+    throw xtl::make_range_exception ("render::low_level::dx11:Shader::GetConstantBufferLayout", "index", index, buffer_layouts.size ());
 
   return buffer_layouts [index];
 }

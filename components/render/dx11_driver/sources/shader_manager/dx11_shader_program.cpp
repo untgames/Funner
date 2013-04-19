@@ -41,6 +41,8 @@ Program::Program (ShaderLibrary& library, size_t shaders_count, const ShaderDesc
 
       //создание шейдеров
 
+    size_t buffers_count = 0;
+
     for (size_t i=0; i<shaders_count; i++)
     {
       const ShaderDesc& desc = shader_descs [i];
@@ -61,6 +63,29 @@ Program::Program (ShaderLibrary& library, size_t shaders_count, const ShaderDesc
 
       slot.holder = shader;
       slot.shader = &shader->GetHandle ();
+
+      buffers_count += shader->GetConstantBufferLayoutsCount ();
+    }
+
+      //копирование лэйаутов
+
+    buffer_layouts.reserve (buffers_count);
+
+    for (size_t i=0; i<ShaderType_Num; i++)
+    {
+      ShaderSlot& slot = shaders [i];
+
+      if (!slot.shader)
+        continue;
+
+      for (size_t j=0, count=slot.holder->GetConstantBufferLayoutsCount (); j<count; j++)
+      {
+        ConstantBufferLayoutPtr layout = slot.holder->GetConstantBufferLayout (j);
+
+        ProgramBufferLayoutPtr program_layout (new ProgramBufferLayout (layout, (ShaderType)i, j), false);
+
+        buffer_layouts.push_back (program_layout);
+      }
     }
   }
   catch (xtl::exception& e)
@@ -133,4 +158,16 @@ DxInputLayoutPtr Program::CreateInputLayout (const D3D11_INPUT_ELEMENT_DESC* des
     e.touch ("render::low_level::dx11::Program::CreateInputLayout");
     throw;
   }
+}
+
+/*
+    Перечисление константных буферов
+*/
+
+const ProgramBufferLayout& Program::GetConstantBufferLayout (size_t index) const
+{
+  if (index >= buffer_layouts.size ())
+    throw xtl::make_range_exception ("render::low_level::dx11::Program::GetConstantBufferLayout", "index", index, buffer_layouts.size ());
+
+  return *buffer_layouts [index];
 }

@@ -140,7 +140,7 @@ class Shader: public DeviceObject
 ///Перечисление константных буферов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     size_t                  GetConstantBufferLayoutsCount () const { return buffer_layouts.size (); }
-    ConstantBufferLayoutPtr GetConstantBuffersLayout      (size_t index) const;
+    ConstantBufferLayoutPtr GetConstantBufferLayout       (size_t index) const;
 
   private:
     typedef stl::vector<ConstantBufferLayoutPtr> BufferLayoutArray;
@@ -195,6 +195,41 @@ class ShaderLibrary: public DeviceObject
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+///Описание буфера программы
+///////////////////////////////////////////////////////////////////////////////////////////////////
+class ProgramBufferLayout: public xtl::reference_counter
+{
+  public:
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Конструктор
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    ProgramBufferLayout (const ConstantBufferLayoutPtr& in_layout, ShaderType in_type, size_t in_slot)
+      : layout (in_layout)
+      , shader_type (in_type)
+      , slot (in_slot)
+    {
+    }
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Доступ
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    const ConstantBufferLayoutPtr& GetLayout () const { return layout; }
+    ShaderType                     GetType   () const { return shader_type; }
+    size_t                         GetSlot   () const { return slot; }
+
+  private:
+    ProgramBufferLayout (const ProgramBufferLayout&); //no implementation
+    ProgramBufferLayout& operator = (const ProgramBufferLayout&); //no implementation
+
+  private:
+    ConstantBufferLayoutPtr layout;      //исходный лэйаут
+    ShaderType              shader_type; //тип шейдера
+    size_t                  slot;        //индекс слота
+};
+
+typedef xtl::intrusive_ptr<ProgramBufferLayout> ProgramBufferLayoutPtr;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Программа
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 class Program: virtual public IProgram, public DeviceObject
@@ -216,6 +251,12 @@ class Program: virtual public IProgram, public DeviceObject
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     DxInputLayoutPtr CreateInputLayout (const D3D11_INPUT_ELEMENT_DESC* descs, size_t descs_count);
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Перечисление константных буферов
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    size_t                     GetConstantBufferLayoutsCount () const { return buffer_layouts.size (); }
+    const ProgramBufferLayout& GetConstantBufferLayout       (size_t index) const;
+
   private:
     struct ShaderSlot
     {
@@ -227,8 +268,11 @@ class Program: virtual public IProgram, public DeviceObject
 
     template <class T, ShaderType Type> T* Get ();
 
+    typedef stl::vector<ProgramBufferLayoutPtr> BufferLayoutArray;
+
   private:
-    ShaderSlot shaders [ShaderType_Num]; //использованные шейдеры
+    ShaderSlot        shaders [ShaderType_Num]; //использованные шейдеры
+    BufferLayoutArray buffer_layouts;           //лэйауты буферов
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -252,6 +296,15 @@ class ProgramParametersLayout: public helpers::ProgramParametersLayout, public O
 
   private:
     ParameterMap params;
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Синхронизатор буфера
+///////////////////////////////////////////////////////////////////////////////////////////////////
+class BufferSynchronizer: public xtl::reference_counter, public xtl::trackable
+{
+  public:
+  private:
 };
 
 }
