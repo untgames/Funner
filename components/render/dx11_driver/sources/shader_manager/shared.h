@@ -4,6 +4,7 @@
 #include <D3Dcommon.h>
 #include <D3DX11async.h>
 #include <D3D11Shader.h>
+#include <D3Dcompiler.h>
 
 #include <stl/hash_map>
 #include <stl/vector>
@@ -125,13 +126,17 @@ class Shader: public DeviceObject
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Перечисление константных буферов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    size_t GetConstantBuffersCount () const;
-      
+    size_t                  GetConstantBufferLayoutsCount () const { return buffer_layouts.size (); }
+    ConstantBufferLayoutPtr GetConstantBuffersLayout      (size_t index) const;
 
   private:
-    ShaderType       type;   //тип шейдера
-    DxDeviceChildPtr shader; //объект шейдера
-    ShaderCodePtr    code;   //код шейдера
+    typedef stl::vector<ConstantBufferLayoutPtr> BufferLayoutArray;
+
+  private:
+    ShaderType        type;           //тип шейдера
+    DxDeviceChildPtr  shader;         //объект шейдера
+    ShaderCodePtr     code;           //код шейдера
+    BufferLayoutArray buffer_layouts; //лэйауты буферов
 };
 
 typedef xtl::com_ptr<Shader> ShaderPtr;

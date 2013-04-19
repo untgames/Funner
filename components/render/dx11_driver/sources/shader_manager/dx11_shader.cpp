@@ -19,6 +19,8 @@ Shader::Shader (ShaderType in_shader_type, const ShaderCodePtr& in_code)
 
     ID3D11Device& device = GetDevice ();
 
+      //компил€ци€ шейдера
+
     switch (type)
     {
       case ShaderType_Compute:
@@ -102,6 +104,35 @@ Shader::Shader (ShaderType in_shader_type, const ShaderCodePtr& in_code)
       default:
         throw xtl::make_argument_exception ("", "shader_type");
     }
+
+      //получение информации о шейдере
+
+    ID3D11ShaderReflection* reflector = 0;
+    
+    check_errors ("D3DReflect", D3DReflect (code->GetCompiledData (), code->GetCompiledDataSize (), IID_ID3D11ShaderReflection, (void**)&reflector));
+
+    if (!reflector)
+      throw xtl::format_operation_exception ("", "D3DReflect failed");
+
+    D3D11_SHADER_DESC desc;
+
+    check_errors ("ID3D11ShaderReflection::GetDesc", reflector->GetDesc (&desc));
+
+      //получение информации о константных буферах
+
+    buffer_layouts.reserve (desc.ConstantBuffers);
+
+    for (size_t i=0; i<desc.ConstantBuffers; i++)
+    {
+      ID3D11ShaderReflectionConstantBuffer* buffer = reflector->GetConstantBufferByIndex (i);
+
+      if (!buffer)
+        throw xtl::format_operation_exception ("", "ID3D11ShaderReflection::GetConstantBufferByIndex failed");
+
+      ConstantBufferLayoutPtr layout (new ConstantBufferLayout (*buffer), false);
+
+      buffer_layouts.push_back (layout);
+    }
   }
   catch (xtl::exception& e)
   {
@@ -112,4 +143,17 @@ Shader::Shader (ShaderType in_shader_type, const ShaderCodePtr& in_code)
 
 Shader::~Shader ()
 {
+}
+
+/*
+    ѕеречисление константных буферов
+*/
+
+
+ConstantBufferLayoutPtr Shader::GetConstantBuffersLayout (size_t index) const
+{
+  if (index >= buffer_layouts.size ())
+    throw xtl::make_range_exception ("render::low_level::dx11:Shader::GetConstantBuffersLayout", "index", index, buffer_layouts.size ());
+
+  return buffer_layouts [index];
 }
