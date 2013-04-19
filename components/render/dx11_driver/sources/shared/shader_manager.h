@@ -6,6 +6,7 @@
 #include <render/low_level/device.h>
 
 #include <shared/common.h>
+#include <shared/input_layout.h>
 #include <shared/shader_code.h>
 
 namespace render
@@ -32,8 +33,8 @@ class ShaderManagerContextState
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Управление конфигурацией входных данных
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void          SetInputLayout (IInputLayout* state);
-    IInputLayout* GetInputLayout () const;
+    void         SetInputLayout (InputLayout* state);
+    InputLayout* GetInputLayout () const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Установка состояния, вьюпорта и отсечения

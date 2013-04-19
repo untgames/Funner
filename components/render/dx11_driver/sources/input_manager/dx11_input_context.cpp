@@ -13,25 +13,37 @@ using namespace render::low_level::dx11;
     Описание реализации состояния контекста менеджера входного уровня
 */
 
+typedef xtl::com_ptr<InputLayout> InputLayoutPtr;
+
 struct InputManagerContextState::Impl: public DeviceObject
 {
+  InputLayoutPtr input_layout; //входной лэйаут  
+  bool           is_dirty;     //флаг "грязности"
+
 /// Конструктор
   Impl (const DeviceManager& device_manager)
     : DeviceObject (device_manager)
+    , is_dirty (true)
   {
   }
 
 /// Деструктор
   virtual ~Impl () {}
+
+/// Оповещение об изменении
+  void UpdateNotify ()
+  {
+    is_dirty = true;
+  }
 };
 
 /*
     Конструктор / деструктор
 */
 
-InputManagerContextState::InputManagerContextState (const DeviceManager&)
+InputManagerContextState::InputManagerContextState (const DeviceManager& device_manager)
+  : impl (new Impl (device_manager))
 {
-  throw xtl::make_not_implemented_exception (__FUNCTION__);
 }
 
 InputManagerContextState::InputManagerContextState (Impl* in_impl)
@@ -50,6 +62,22 @@ InputManagerContextState::~InputManagerContextState ()
 InputManagerContextState::Impl& InputManagerContextState::GetImpl () const
 {
   return *impl;
+}
+
+/*
+    Управление конфигурацией входных данных
+*/
+
+void InputManagerContextState::SetInputLayout (InputLayout* state)
+{  
+  impl->input_layout = state;
+
+  impl->UpdateNotify ();
+}
+
+InputLayout* InputManagerContextState::GetInputLayout () const
+{
+  return impl->input_layout.get ();
 }
 
 /*

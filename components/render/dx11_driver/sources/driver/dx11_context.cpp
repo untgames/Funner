@@ -66,10 +66,13 @@ void Context::End (IQuery* async)
     ”правление входным уровнем (input-stage)
 */
 
-void Context::ISSetInputLayout (IInputLayout* state)
+void Context::ISSetInputLayout (IInputLayout* in_state)
 {
   try
   {
+    InputLayout* state = cast_object<InputLayout> (*this, in_state, "", "state");
+
+    input_manager_context.SetInputLayout (state);
     shader_manager_context.SetInputLayout (state);
   }
   catch (xtl::exception& e)
@@ -109,7 +112,7 @@ IInputLayout* Context::ISGetInputLayout ()
 {
   try
   {
-    return shader_manager_context.GetInputLayout ();
+    return input_manager_context.GetInputLayout ();
   }
   catch (xtl::exception& e)
   {

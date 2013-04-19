@@ -70,12 +70,10 @@ ShaderManagerContextState::Impl& ShaderManagerContextState::GetImpl () const
     ”правление конфигурацией входных данных
 */
 
-void ShaderManagerContextState::SetInputLayout (IInputLayout* in_state)
+void ShaderManagerContextState::SetInputLayout (InputLayout* state)
 {
   try
   {
-    InputLayout* state = cast_object<InputLayout> (*impl, in_state, "", "state");
-
     impl->input_layout = state;
 
     impl->UpdateNotify ();
@@ -87,7 +85,7 @@ void ShaderManagerContextState::SetInputLayout (IInputLayout* in_state)
   }
 }
 
-IInputLayout* ShaderManagerContextState::GetInputLayout () const
+InputLayout* ShaderManagerContextState::GetInputLayout () const
 {
   return impl->input_layout.get ();
 }
