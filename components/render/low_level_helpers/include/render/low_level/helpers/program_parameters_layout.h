@@ -5,8 +5,6 @@
 
 #include <render/low_level/state.h>
 
-#include <render/low_level/helpers/object.h>
-
 namespace render
 {
 
