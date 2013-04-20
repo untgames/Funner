@@ -339,26 +339,58 @@ class SourceConstantBuffer: virtual public IBuffer, public Object
     mutable bool                     need_update_hash; //хэш требует обновления
 };
 
-/*
+typedef xtl::com_ptr<SourceConstantBuffer> SourceConstantBufferPtr;
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Синхронизатор буфера
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-class BufferSynchronizer: public xtl::reference_counter, public xtl::trackable
+class ShaderBuffersSynchronizer: public xtl::reference_counter, public xtl::trackable
 {
   public:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструктор
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    BufferSynchronizer (ProgramParametersLayout& src_layout, ConstantBufferLayout& dst_layout);
+    ShaderBuffersSynchronizer (const ProgramParametersLayout& src_layout, const ConstantBufferLayout& dst_layout);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Копирование
+/// (без проверок корректности аргументов)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///????????
+    void CopyTo (size_t slot_index, const char* src_buffer, char* dst_buffer) const
+    {
+      const Slot&  slot  = slots [slot_index];
+      const Chunk* chunk = &chunks [0] + slot.first_chunk;
+
+      for (size_t i=0, count=slot.chunks_count; i<count; i++, chunk++)
+      {
+        memcpy (dst_buffer + chunk->dst_offset, src_buffer + chunk->src_offset, chunk->size);
+      }
+    }
 
   private:
+    struct Chunk
+    {
+      size_t src_offset; //смещение в исходном буфере
+      size_t dst_offset; //смещение в результирующем буфере
+      size_t size;       //размер блока
+
+      Chunk () : src_offset (), dst_offset (), size () {}
+    };
+
+    struct Slot
+    {
+      size_t first_chunk;   //индекс первого блока
+      size_t chunks_count;  //количество блоков
+
+      Slot () : first_chunk (), chunks_count () {}
+    };
+
+    typedef stl::vector<Chunk> ChunkArray;
+
+  private:
+    ChunkArray chunks;                                     //блоки синхронизации
+    Slot       slots [DEVICE_CONSTANT_BUFFER_SLOTS_COUNT]; //соответствие слоту консткнтного буфера
 };
-*/
 
 }
 
