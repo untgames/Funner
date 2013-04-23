@@ -31,6 +31,10 @@
 #include <shared/input_layout.h>
 #include <shared/shader_manager.h>
 
+#ifdef _MSC_VER
+  #pragma warning (disable : 4503) //decorated name length exceeded, name was truncated
+#endif
+
 namespace render
 {
 
@@ -157,46 +161,6 @@ class Shader: public DeviceObject
 };
 
 typedef xtl::com_ptr<Shader> ShaderPtr;
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Библиотека шейдеров
-///////////////////////////////////////////////////////////////////////////////////////////////////
-class ShaderLibrary: public DeviceObject
-{
-  public:
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Конструктор / деструктор
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    ShaderLibrary  (const DeviceManager& device_manager);
-    ~ShaderLibrary ();
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Создание шейдера
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    ShaderPtr CreateShader (const ShaderDesc& shader_desc, const LogFunction& error_log);
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Поиск лэйаута константного буфера по хэшу
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    ConstantBufferLayoutPtr FindConstantBufferLayout (size_t hash) const; 
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Добавление / удаление лэйаута константного буфера по хэшу
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    ConstantBufferLayoutPtr AddConstantBufferLayout    (const ConstantBufferLayoutPtr& layout);
-    void                    RemoveConstantBufferLayout (size_t hash);
-
-  private:
-    void RemoveShaderByHash (size_t hash);
-
-  private:
-    typedef stl::hash_map<size_t, Shader*>               ShaderMap;
-    typedef stl::hash_map<size_t, ConstantBufferLayout*> BufferLayoutMap;
-
-  private:
-    ShaderMap       shaders;         //шейдеры
-    BufferLayoutMap buffer_layouts;  //лэйауты константных буферов
-};
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Описание буфера программы
@@ -408,8 +372,70 @@ class ShaderBuffersSynchronizer: public xtl::reference_counter, public xtl::trac
     size_t     min_dst_buffer_size;                        //минимальный размер результирующего буфера
 };
 
+typedef xtl::intrusive_ptr<ShaderBuffersSynchronizer> ShaderBuffersSynchronizerPtr;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Библиотека шейдеров
+///////////////////////////////////////////////////////////////////////////////////////////////////
+class ShaderLibrary: public DeviceObject
+{
+  public:
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Конструктор / деструктор
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    ShaderLibrary  (const DeviceManager& device_manager);
+    ~ShaderLibrary ();
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Создание шейдера
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    ShaderPtr CreateShader (const ShaderDesc& shader_desc, const LogFunction& error_log);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Поиск лэйаута константного буфера по хэшу
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    ConstantBufferLayoutPtr FindConstantBufferLayout (size_t hash) const; 
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Добавление / удаление лэйаута константного буфера по хэшу
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    ConstantBufferLayoutPtr AddConstantBufferLayout    (const ConstantBufferLayoutPtr& layout);
+    void                    RemoveConstantBufferLayout (size_t hash);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Получение синхронизатора
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    ShaderBuffersSynchronizer& GetSynchronizer (const ProgramParametersLayout& src_layout, const ConstantBufferLayout& dst_layout);
+
+  private:
+    typedef stl::pair<const ProgramParametersLayout*, const ConstantBufferLayout*> SyncLayoutPair;
+
+    void RemoveShaderByHash (size_t hash);
+    void RemoveSynchronizer (const SyncLayoutPair&);
+
+  private:
+    typedef stl::hash_map<size_t, Shader*>                              ShaderMap;
+    typedef stl::hash_map<size_t, ConstantBufferLayout*>                BufferLayoutMap;
+    typedef stl::hash_map<SyncLayoutPair, ShaderBuffersSynchronizerPtr> SyncLayoutMap;
+
+  private:
+    ShaderMap       shaders;         //шейдеры
+    BufferLayoutMap buffer_layouts;  //лэйауты константных буферов
+    SyncLayoutMap   layout_syncs;    //синхронизаторы лэйаутов
+};
+
 }
 
+}
+
+}
+
+namespace stl
+{
+
+inline size_t hash (const stl::pair<const render::low_level::dx11::ProgramParametersLayout*, const render::low_level::dx11::ConstantBufferLayout*>& p)
+{
+  return common::crc32 (&p.first, sizeof (p.first), common::crc32 (&p.second, sizeof (p.second)));
 }
 
 }

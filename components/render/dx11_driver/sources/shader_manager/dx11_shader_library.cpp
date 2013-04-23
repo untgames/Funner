@@ -167,3 +167,49 @@ void ShaderLibrary::RemoveConstantBufferLayout (size_t hash)
 {
   buffer_layouts.erase (hash);
 }
+
+/*
+    Получение синхронизатора
+*/
+
+ShaderBuffersSynchronizer& ShaderLibrary::GetSynchronizer (const ProgramParametersLayout& src_layout, const ConstantBufferLayout& dst_layout)
+{
+  try
+  {
+    SyncLayoutPair key (&src_layout, &dst_layout);
+
+    SyncLayoutMap::iterator iter = layout_syncs.find (key);
+
+    if (iter != layout_syncs.end ())
+      return *iter->second;
+
+    ShaderBuffersSynchronizerPtr synchronizer (new ShaderBuffersSynchronizer (src_layout, dst_layout), false);
+
+    layout_syncs.insert_pair (key, synchronizer);
+
+    try
+    {
+      xtl::trackable::function_type track_handler (xtl::bind (&ShaderLibrary::RemoveSynchronizer, this, key));
+
+      const_cast<ProgramParametersLayout&> (src_layout).RegisterDestroyHandler (track_handler, GetTrackable ());
+      const_cast<ConstantBufferLayout&> (dst_layout).connect_tracker (track_handler, GetTrackable ());
+    }
+    catch (...)
+    {
+      layout_syncs.erase (key);
+      throw;
+    }
+
+    return *synchronizer;
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::low_level::dx11::ShaderLibrary::GetSynchronizer");
+    throw;
+  }
+}
+
+void ShaderLibrary::RemoveSynchronizer (const SyncLayoutPair& p)
+{
+  layout_syncs.erase (p);
+}

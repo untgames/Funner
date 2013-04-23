@@ -59,7 +59,7 @@ Program::Program (ShaderLibrary& library, size_t shaders_count, const ShaderDesc
       ShaderSlot& slot = shaders [type];
 
       if (slot.shader)
-        throw xtl::format_operation_exception ("", "%s has been already set", get_name (type));
+        throw xtl::format_operation_exception ("", "%s has been already set", ::get_name (type));
 
       slot.holder = shader;
       slot.shader = &shader->GetHandle ();
