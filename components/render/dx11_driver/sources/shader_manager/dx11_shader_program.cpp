@@ -94,7 +94,7 @@ Program::Program (ShaderLibrary& library, size_t shaders_count, const ShaderDesc
         {
            ProgramBufferLayout& program_layout = **iter;
 
-          if (program_layout.GetLayout () == layout)
+          if (&program_layout.GetLayout () == layout)
           {
             program_layout.AddSlot (ProgramBufferLayout::Slot ((ShaderType)i, j));
 
