@@ -424,7 +424,7 @@ class TargetConstantBufferPrototype: public xtl::reference_counter, public xtl::
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструктор / деструктор
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    TargetConstantBufferPrototype  (ShaderLibrary& library, const ProgramParametersLayout& src_layout, ProgramBufferLayout& dst_layout);
+    TargetConstantBufferPrototype  (ShaderLibrary& library, const ProgramParametersLayout& src_layout, const ProgramBufferLayout& dst_layout);
     ~TargetConstantBufferPrototype ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -465,7 +465,7 @@ class TargetConstantBufferPrototype: public xtl::reference_counter, public xtl::
 
   private:
     ShaderBuffersSynchronizer& synchronizer; //синхронизатор
-    ProgramBufferLayout&       dst_layout;   //целевой лэйаут
+    const ProgramBufferLayout& dst_layout;   //целевой лэйаут
     IndexArray                 indices;      //индексы
     size_t                     slots_count;  //количество слотов
     const Slot*                slots;        //слоты

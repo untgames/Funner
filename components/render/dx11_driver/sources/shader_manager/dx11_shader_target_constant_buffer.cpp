@@ -11,7 +11,7 @@ using namespace render::low_level::dx11;
     Конструктор / деструктор
 */
 
-TargetConstantBufferPrototype::TargetConstantBufferPrototype (ShaderLibrary& library, const ProgramParametersLayout& src_layout, ProgramBufferLayout& in_dst_layout)
+TargetConstantBufferPrototype::TargetConstantBufferPrototype (ShaderLibrary& library, const ProgramParametersLayout& src_layout, const ProgramBufferLayout& in_dst_layout)
   : synchronizer (library.GetSynchronizer (src_layout, in_dst_layout.GetLayout ()))
   , dst_layout (in_dst_layout)
 {

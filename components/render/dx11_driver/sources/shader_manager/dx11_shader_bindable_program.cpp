@@ -21,10 +21,12 @@ BindableProgram::BindableProgram (ShaderLibrary& library, Program& in_program, P
     {
       const ProgramBufferLayout& buffer_layout = program.GetConstantBufferLayout (i);
 
-//      TargetConstantBufferPrototypePtr  (ShaderLibrary& library, const ProgramParametersLayout& src_layout, ProgramBufferLayout& dst_layout);      
-    }
+        //создание прототипа (без карты прототипов)
 
-    throw xtl::make_not_implemented_exception (__FUNCTION__);
+      TargetConstantBufferPrototypePtr prototype (new TargetConstantBufferPrototype (library, parameters_layout, buffer_layout), false);
+
+      buffer_prototypes.push_back (prototype);
+    }
   }
   catch (xtl::exception& e)
   {
