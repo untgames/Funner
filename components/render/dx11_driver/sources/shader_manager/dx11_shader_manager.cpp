@@ -36,9 +36,17 @@ ShaderManager::~ShaderManager ()
     Создание шейдеров
 */
 
-IProgramParametersLayout* ShaderManager::CreateProgramParametersLayout (const ProgramParametersLayoutDesc&)
+IProgramParametersLayout* ShaderManager::CreateProgramParametersLayout (const ProgramParametersLayoutDesc& desc)
 {
-  throw xtl::make_not_implemented_exception (__FUNCTION__);
+  try
+  {
+    return new ProgramParametersLayout (desc);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::low_level::dx11::ShaderManager::CreateProgramParametersLayout");
+    throw;
+  }
 }
 
 IProgram* ShaderManager::CreateProgram (size_t shaders_count, const ShaderDesc* shader_descs, const LogFunction& error_log)
