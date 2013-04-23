@@ -13,7 +13,7 @@ class BindableProgram: public xtl::reference_counter, public xtl::trackable
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Биндинг в контекст
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void Bind (ID3D11DeviceContext& context);
+    void Bind (ID3D11DeviceContext& context, const SourceConstantBufferPtr buffers [DEVICE_CONSTANT_BUFFER_SLOTS_COUNT]);
 
   private:
     typedef stl::vector<TargetConstantBufferPrototypePtr> BufferPrototypeArray;

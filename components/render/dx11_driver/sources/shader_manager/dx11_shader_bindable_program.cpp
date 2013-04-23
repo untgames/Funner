@@ -43,7 +43,7 @@ BindableProgram::~BindableProgram ()
     Биндинг в контекст
 */
 
-void BindableProgram::Bind (ID3D11DeviceContext& context)
+void BindableProgram::Bind (ID3D11DeviceContext& context, const SourceConstantBufferPtr buffers [DEVICE_CONSTANT_BUFFER_SLOTS_COUNT])
 {
   try
   {
