@@ -4,6 +4,12 @@ using namespace render::low_level;
 using namespace render::low_level::dx11;
 
 /*
+    Константы
+*/
+
+const size_t RESERVED_SLOTS_COUNT = 4; //резервируемое количество слотов
+
+/*
     Конструктор / деструктор
 */
 
@@ -82,7 +88,28 @@ Program::Program (ShaderLibrary& library, size_t shaders_count, const ShaderDesc
       {
         ConstantBufferLayoutPtr layout = slot.holder->GetConstantBufferLayout (j);
 
-        ProgramBufferLayoutPtr program_layout (new ProgramBufferLayout (layout, (ShaderType)i, j), false);
+        bool found = false;
+
+        for (BufferLayoutArray::iterator iter=buffer_layouts.begin (), end=buffer_layouts.end (); iter!=end; ++iter)
+        {
+           ProgramBufferLayout& program_layout = **iter;
+
+          if (program_layout.GetLayout () == layout)
+          {
+            program_layout.AddSlot (ProgramBufferLayout::Slot ((ShaderType)i, j));
+
+            found = true;
+
+            break;
+          }
+        }
+
+        if (found)
+          continue;
+
+        ProgramBufferLayoutPtr program_layout (new ProgramBufferLayout (layout, RESERVED_SLOTS_COUNT), false);
+
+        program_layout->AddSlot (ProgramBufferLayout::Slot ((ShaderType)i, j));
 
         buffer_layouts.push_back (program_layout);
       }

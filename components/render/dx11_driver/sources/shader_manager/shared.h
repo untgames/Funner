@@ -171,28 +171,56 @@ class ProgramBufferLayout: public xtl::reference_counter
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструктор
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    ProgramBufferLayout (const ConstantBufferLayoutPtr& in_layout, ShaderType in_type, size_t in_slot)
+    ProgramBufferLayout (const ConstantBufferLayoutPtr& in_layout, size_t reserved_count = 0)
       : layout (in_layout)
-      , shader_type (in_type)
-      , slot (in_slot)
     {
+      slots.reserve (reserved_count);
     }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Доступ
+///Получение лэйаута
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     const ConstantBufferLayoutPtr& GetLayout () const { return layout; }
-    ShaderType                     GetType   () const { return shader_type; }
-    size_t                         GetSlot   () const { return slot; }
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Описание слота
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    struct Slot
+    {      
+      ShaderType type;
+      size_t     slot;
+
+      Slot (ShaderType in_type, size_t in_slot)
+        : type (in_type)
+        , slot (in_slot)
+      {
+      }
+    };
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Перечисление слотов
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    size_t      GetSlotsCount () const { return slots.size (); }
+    const Slot* GetSlots      () const { return slots.empty () ? (Slot*)0 : &slots [0]; }
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Добавление слотов
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void AddSlot (const Slot& slot)
+    {
+      slots.push_back (slot);
+    }
 
   private:
     ProgramBufferLayout (const ProgramBufferLayout&); //no implementation
     ProgramBufferLayout& operator = (const ProgramBufferLayout&); //no implementation
 
   private:
-    ConstantBufferLayoutPtr layout;      //исходный лэйаут
-    ShaderType              shader_type; //тип шейдера
-    size_t                  slot;        //индекс слота
+    typedef stl::vector<Slot> SlotArray;
+
+  private:
+    ConstantBufferLayoutPtr layout; //исходный лэйаут
+    SlotArray               slots;  //слоты
 };
 
 typedef xtl::intrusive_ptr<ProgramBufferLayout> ProgramBufferLayoutPtr;
@@ -368,11 +396,22 @@ class ShaderBuffersSynchronizer: public xtl::reference_counter, public xtl::trac
 
   private:
     ChunkArray chunks;                                     //блоки синхронизации
-    Slot       slots [DEVICE_CONSTANT_BUFFER_SLOTS_COUNT]; //соответствие слоту консткнтного буфера
+    Slot       slots [DEVICE_CONSTANT_BUFFER_SLOTS_COUNT]; //соответствие слоту константного буфера
     size_t     min_dst_buffer_size;                        //минимальный размер результирующего буфера
 };
 
 typedef xtl::intrusive_ptr<ShaderBuffersSynchronizer> ShaderBuffersSynchronizerPtr;
+
+/*///////////////////////////////////////////////////////////////////////////////////////////////////
+///Программа, устанавливаемая в контекст
+///////////////////////////////////////////////////////////////////////////////////////////////////
+class BindableProgram: public xtl::reference_counter, public xtl::trackable
+{
+  public:
+  private:
+    Program&                 program;           //исходная программа
+    ProgramParametersLayout& parameters_layout; //расположение параметров
+};*/
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Библиотека шейдеров
