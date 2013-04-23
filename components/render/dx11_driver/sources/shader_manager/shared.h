@@ -6,6 +6,7 @@
 #include <D3D11Shader.h>
 #include <D3Dcompiler.h>
 
+#include <stl/deque>
 #include <stl/hash_map>
 #include <stl/vector>
 
@@ -350,6 +351,31 @@ class ShaderBuffersSynchronizer: public xtl::reference_counter, public xtl::trac
 {
   public:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+///Вспомагательные структуры
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    struct Chunk
+    {
+      size_t slot;       //индекс слота
+      size_t src_offset; //смещение в исходном буфере
+      size_t dst_offset; //смещение в результирующем буфере
+      size_t size;       //размер блока
+
+      Chunk () : slot (), src_offset (), dst_offset (), size () {}
+
+      bool operator < (const Chunk&) const;
+    };
+
+    struct Slot
+    {
+      size_t first_chunk;          //индекс первого блока
+      size_t min_src_buffer_size;  //минимальный размер буфера
+
+      Slot () : first_chunk (), min_src_buffer_size () {}
+    };
+
+    typedef stl::vector<Chunk> ChunkArray;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструктор
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     ShaderBuffersSynchronizer (const ProgramParametersLayout& src_layout, const ConstantBufferLayout& dst_layout);
@@ -375,29 +401,6 @@ class ShaderBuffersSynchronizer: public xtl::reference_counter, public xtl::trac
         memcpy (dst_buffer + chunk->dst_offset, src_buffer + chunk->src_offset, chunk->size);
       }
     }
-
-  private:
-    struct Chunk
-    {
-      size_t slot;       //индекс слота
-      size_t src_offset; //смещение в исходном буфере
-      size_t dst_offset; //смещение в результирующем буфере
-      size_t size;       //размер блока
-
-      Chunk () : slot (), src_offset (), dst_offset (), size () {}
-
-      bool operator < (const Chunk&) const;
-    };
-
-    struct Slot
-    {
-      size_t first_chunk;          //индекс первого блока
-      size_t min_src_buffer_size;  //минимальный размер буфера
-
-      Slot () : first_chunk (), min_src_buffer_size () {}
-    };
-
-    typedef stl::vector<Chunk> ChunkArray;
 
   private:
     ChunkArray chunks;                                     //блоки синхронизации

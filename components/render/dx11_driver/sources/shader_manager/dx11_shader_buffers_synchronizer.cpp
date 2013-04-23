@@ -9,7 +9,117 @@ using namespace render::low_level::dx11;
 
 inline bool ShaderBuffersSynchronizer::Chunk::operator < (const Chunk& another) const
 {
-  return dst_offset < another.dst_offset;
+  if (slot != another.slot)
+    return slot < another.slot;
+
+  return src_offset < another.src_offset;
+}
+
+namespace
+{
+
+typedef stl::pair<size_t, size_t> Span;
+typedef stl::deque<Span>          SpanQueue;
+
+Span merge (const Span& s1, const Span& s2)
+{
+  if (s1.first > s2.first)
+    return merge (s2, s1);
+
+  if (s1.second < s2.first)
+    return Span (0, 0);
+
+  //pre-cond: s1.first <= s2.first, s1.second >= s2.first
+
+  size_t finish = s1.second > s2.second ? s1.second : s2.second;
+
+  return Span (s1.first, finish);
+}
+
+void merge (const ShaderBuffersSynchronizer::Chunk* first_chunk, size_t count, SpanQueue& out_spans)
+{
+    //build spans
+
+  SpanQueue spans;
+
+  for (size_t i=0; i<count; i++)
+  {
+    const ShaderBuffersSynchronizer::Chunk& chunk = first_chunk [i];
+
+    Span span (chunk.dst_offset, chunk.dst_offset + chunk.size);
+    bool merged = false;
+
+    for (SpanQueue::iterator iter=spans.begin (), end=spans.end (); iter!=end; ++iter)
+    {
+      if (iter->second < span.first)
+        continue;
+
+      Span merged_span = merge (span, *iter);
+
+      if (merged_span.first == merged_span.second) spans.insert (iter, span);
+      else                                         *iter = merged_span;
+
+      merged = true;
+
+      break;
+    }
+
+    if (!merged)
+      spans.push_back (span);
+  }
+
+    //merge spans
+
+  Span span (0, 0);
+
+  out_spans.clear ();
+
+  for (SpanQueue::iterator iter=spans.begin (), end=spans.end (); iter!=end; ++iter)
+  {
+    if (span.first == span.second)
+    {
+      span = *iter;
+      continue;
+    }
+
+    Span merged_span = merge (span, *iter);
+
+    if (merged_span.first == merged_span.second)
+    {
+      out_spans.push_back (span);
+
+      span = *iter;
+
+      continue;
+    }
+  }
+
+  if (span.first != span.second)
+    out_spans.push_back (span);
+}
+
+void merge (const ShaderBuffersSynchronizer::Chunk* first_chunk, size_t count, stl::vector<ShaderBuffersSynchronizer::Chunk>& chunks, SpanQueue& tmp_spans)
+{
+  merge (first_chunk, count, tmp_spans);
+
+  chunks.reserve (chunks.size () + tmp_spans.size ());
+
+  size_t offset = 0;
+
+  for (SpanQueue::iterator iter=tmp_spans.begin (), end=tmp_spans.end (); iter!=end; ++iter)
+  {
+    ShaderBuffersSynchronizer::Chunk chunk;
+
+    chunk.slot        = first_chunk->slot;
+    chunk.src_offset  = first_chunk->src_offset + offset;
+    chunk.dst_offset  = iter->first;
+    chunk.size        = iter->second - iter->first;
+    offset           += chunk.size;
+
+    chunks.push_back (chunk);
+  }
+}
+
 }
 
 /*
@@ -23,7 +133,9 @@ ShaderBuffersSynchronizer::ShaderBuffersSynchronizer (const ProgramParametersLay
   {
       //резервирование количества блоков
 
-    chunks.reserve (dst_layout.GetParamsCount ());
+    ChunkArray tmp_chunks;
+
+    tmp_chunks.reserve (dst_layout.GetParamsCount ());
 
       //обход параметров
 
@@ -80,7 +192,7 @@ ShaderBuffersSynchronizer::ShaderBuffersSynchronizer (const ProgramParametersLay
       chunk.dst_offset = dst_param->offset;
       chunk.size       = param_size;
 
-      chunks.push_back (chunk);
+      tmp_chunks.push_back (chunk);
 
         //обновление параметров слота
 
@@ -93,31 +205,29 @@ ShaderBuffersSynchronizer::ShaderBuffersSynchronizer (const ProgramParametersLay
         min_dst_buffer_size = dst_param->offset + param_size;
     }
 
-      //упорядочивание блоков
+      //упорядочивание блоков по источнику
 
-    stl::sort (chunks.begin (), chunks.end ());
+    stl::sort (tmp_chunks.begin (), tmp_chunks.end ());
 
       //оптимизация блоков
 
- /*   Chunk* first_chunk = 0;
+    SpanQueue tmp_spans;
+    
+    Chunk* first_chunk = 0;
 
-    for (ChunkArray::iterator iter=chunks.begin (), end=chunks.end (); iter!=end; ++iter)
+    for (ChunkArray::iterator iter=tmp_chunks.begin (), end=tmp_chunks.end (); iter!=end; ++iter)
     {
-      if (!first_chunk || first_chunk->slot != iter->slot || first_chunk->src_offset + first_chunk->size != iter->src_offset) //????
+      if (!first_chunk || iter [-1].slot != iter->slot || iter [-1].src_offset + iter [-1].size != iter->src_offset)
       {
+        if (first_chunk)
+          merge (first_chunk, iter - first_chunk, chunks, tmp_spans);
+
         first_chunk = &*iter;
-        continue;
-      }
+      }      
+    }
 
-      if (first_chunk->slot != iter->slot)
-      {
-        first_chunk 
-      }
-    }*/
-
-    //выделить Span
-    //убрать slot из Chunk
-
+    if (first_chunk)
+      merge (first_chunk, tmp_chunks.end () - first_chunk, chunks, tmp_spans);
 
       //обновление слотов
 
@@ -128,13 +238,7 @@ ShaderBuffersSynchronizer::ShaderBuffersSynchronizer (const ProgramParametersLay
       {
         slots [iter->slot].first_chunk = iter - chunks.begin ();
         current_slot                   = iter->slot;
-      }    
-
-      //усечение "на месте"
-
-    ChunkArray (chunks).swap (chunks);
-
-    throw xtl::make_not_implemented_exception (__FUNCTION__);
+      }
   }
   catch (xtl::exception& e)
   {
