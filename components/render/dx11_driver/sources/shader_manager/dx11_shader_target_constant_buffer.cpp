@@ -59,14 +59,80 @@ TargetConstantBufferPtr TargetConstantBufferPrototype::CreateBuffer (const Devic
 {
   try
   {
-    throw xtl::make_not_implemented_exception (__FUNCTION__);
-//    return TargetConstantBufferPtr (new TargetConstantBuffer (device_manager, *this, buffers), false);
+    return TargetConstantBufferPtr (new TargetConstantBuffer (device_manager, *this, buffers), false);
   }
   catch (xtl::exception& e)
   {
     e.touch ("render::low_level::dx11::TargetConstantBufferPrototype::CreateBuffer");
     throw;
   }
+}
+
+/*
+    Получение буфера
+*/
+
+TargetConstantBuffer& TargetConstantBufferPrototype::GetBuffer (const SourceConstantBufferPtr buffers [DEVICE_CONSTANT_BUFFER_SLOTS_COUNT], ShaderLibrary& library) const
+{
+  try
+  {
+      //формирование хэша
+
+    SourceConstantBuffer* buffers_hash_array [DEVICE_CONSTANT_BUFFER_SLOTS_COUNT];
+
+    memset (buffers_hash_array, 0, sizeof (buffers_hash_array));
+
+    for (IndexArray::const_iterator iter=indices.begin (), end=indices.end (); iter!=end; ++iter)
+    {
+      if (!buffers [*iter])
+        throw xtl::format_operation_exception ("", "Null constant buffer #%u", *iter);
+
+      buffers_hash_array [*iter] = buffers [*iter].get ();
+    }
+
+    const TargetConstantBufferPrototype* prototype = this;
+
+    size_t hash = common::crc32 (buffers_hash_array, sizeof (buffers_hash_array), common::crc32 (&prototype, 0, sizeof (prototype)));
+
+      //поиск константного буфера
+
+    TargetConstantBufferPtr buffer = library.FindConstantBuffer (hash);
+
+    if (buffer)
+      return *buffer;
+
+      //создание константного буфера и его регистрация
+
+    buffer = CreateBuffer (library.GetDeviceManager (), buffers);
+
+    library.AddConstantBuffer (hash, buffer);
+
+    try
+    {
+      xtl::trackable::function_type tracker = xtl::bind (&ShaderLibrary::RemoveConstantBuffer, &library, hash);
+
+      for (IndexArray::const_iterator iter=indices.begin (), end=indices.end (); iter!=end; ++iter)
+      {
+        SourceConstantBufferPtr src_buffer = buffers [*iter];
+
+        src_buffer->RegisterDestroyHandler (tracker, library.GetTrackable ());
+      }
+
+      const_cast<TargetConstantBufferPrototype&> (*this).connect_tracker (tracker, library.GetTrackable ());
+    }
+    catch (...)
+    {
+      library.RemoveConstantBuffer (hash);
+      throw;
+    }
+
+    return *buffer;
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::low_level::dx11::TargetConstantBufferPrototype::GetBuffer");
+    throw;
+  }  
 }
 
 /*
@@ -77,7 +143,7 @@ TargetConstantBufferPtr TargetConstantBufferPrototype::CreateBuffer (const Devic
     Конструктор / деструктор
 */
 
-TargetConstantBuffer::TargetConstantBuffer (const DeviceManager& device_manager, TargetConstantBufferPrototype& in_prototype, const SourceConstantBufferPtr buffers [DEVICE_CONSTANT_BUFFER_SLOTS_COUNT])
+TargetConstantBuffer::TargetConstantBuffer (const DeviceManager& device_manager, const TargetConstantBufferPrototype& in_prototype, const SourceConstantBufferPtr buffers [DEVICE_CONSTANT_BUFFER_SLOTS_COUNT])
   : DeviceObject (device_manager)
   , prototype (in_prototype)
 {

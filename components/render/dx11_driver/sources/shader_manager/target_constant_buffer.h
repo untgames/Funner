@@ -15,9 +15,9 @@ class TargetConstantBufferPrototype: public xtl::reference_counter, public xtl::
     ~TargetConstantBufferPrototype ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Создание буфера
+///Получение буфера
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    TargetConstantBufferPtr CreateBuffer (const DeviceManager& device_manager, const SourceConstantBufferPtr buffers [DEVICE_CONSTANT_BUFFER_SLOTS_COUNT]) const;
+    TargetConstantBuffer& GetBuffer (const SourceConstantBufferPtr buffers [DEVICE_CONSTANT_BUFFER_SLOTS_COUNT], ShaderLibrary& library) const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Получение списка индексов константных буферов
@@ -47,6 +47,12 @@ class TargetConstantBufferPrototype: public xtl::reference_counter, public xtl::
     void Bind (ID3D11Buffer& buffer, ID3D11Buffer* context_buffers [ShaderType_Num][DEVICE_CONSTANT_BUFFER_SLOTS_COUNT]) const;
 
   private:
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Создание буфера
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    TargetConstantBufferPtr CreateBuffer (const DeviceManager& device_manager, const SourceConstantBufferPtr buffers [DEVICE_CONSTANT_BUFFER_SLOTS_COUNT]) const;
+
+  private:
     typedef stl::vector<unsigned char> IndexArray;
     typedef ProgramBufferLayout::Slot  Slot;
 
@@ -69,7 +75,7 @@ class TargetConstantBuffer: public DeviceObject
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструктор / деструктор
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    TargetConstantBuffer  (const DeviceManager&, TargetConstantBufferPrototype& prototype, const SourceConstantBufferPtr buffers [DEVICE_CONSTANT_BUFFER_SLOTS_COUNT]);
+    TargetConstantBuffer  (const DeviceManager&, const TargetConstantBufferPrototype& prototype, const SourceConstantBufferPtr buffers [DEVICE_CONSTANT_BUFFER_SLOTS_COUNT]);
     ~TargetConstantBuffer ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -93,7 +99,7 @@ class TargetConstantBuffer: public DeviceObject
     typedef stl::vector<SourceBufferDesc> BufferDescArray;
 
   private:
-    TargetConstantBufferPrototype& prototype;   //прототип
-    DxBufferPtr                    dst_buffer;  //целевой буфер  
-    BufferDescArray                src_buffers; //исходные буферы
+    const TargetConstantBufferPrototype& prototype;   //прототип
+    DxBufferPtr                          dst_buffer;  //целевой буфер  
+    BufferDescArray                      src_buffers; //исходные буферы
 };

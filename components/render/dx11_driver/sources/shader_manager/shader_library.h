@@ -31,6 +31,17 @@ class ShaderLibrary: public DeviceObject
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     ShaderBuffersSynchronizer& GetSynchronizer (const ProgramParametersLayout& src_layout, const ConstantBufferLayout& dst_layout);
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Получение целевого константного буфера
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    TargetConstantBufferPtr FindConstantBuffer (size_t hash) const;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Регистрация и удаление константного буфера
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void AddConstantBuffer    (size_t hash, const TargetConstantBufferPtr& buffer);
+    void RemoveConstantBuffer (size_t hash);
+
   private:
     typedef stl::pair<const ProgramParametersLayout*, const ConstantBufferLayout*> SyncLayoutPair;
 
@@ -41,9 +52,11 @@ class ShaderLibrary: public DeviceObject
     typedef stl::hash_map<size_t, Shader*>                              ShaderMap;
     typedef stl::hash_map<size_t, ConstantBufferLayout*>                BufferLayoutMap;
     typedef stl::hash_map<SyncLayoutPair, ShaderBuffersSynchronizerPtr> SyncLayoutMap;
+    typedef stl::hash_map<size_t, TargetConstantBufferPtr>              BufferMap;
 
   private:
     ShaderMap       shaders;         //шейдеры
     BufferLayoutMap buffer_layouts;  //лэйауты константных буферов
     SyncLayoutMap   layout_syncs;    //синхронизаторы лэйаутов
+    BufferMap       buffers;         //целевые константные буферы
 };

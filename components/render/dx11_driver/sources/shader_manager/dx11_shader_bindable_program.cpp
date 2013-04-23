@@ -43,7 +43,7 @@ BindableProgram::~BindableProgram ()
     Биндинг в контекст
 */
 
-void BindableProgram::Bind (ID3D11DeviceContext& context, const SourceConstantBufferPtr buffers [DEVICE_CONSTANT_BUFFER_SLOTS_COUNT])
+void BindableProgram::Bind (ID3D11DeviceContext& context, ShaderLibrary& library, const SourceConstantBufferPtr src_buffers [DEVICE_CONSTANT_BUFFER_SLOTS_COUNT])
 {
   try
   {
@@ -51,17 +51,19 @@ void BindableProgram::Bind (ID3D11DeviceContext& context, const SourceConstantBu
 
     program.Bind (context);
 
-      //поиск буферов
-
-    //???????
-
-      //биндинг буферов
+      //поиск и биндинг буферов
 
     ID3D11Buffer* buffers [ShaderType_Num][DEVICE_CONSTANT_BUFFER_SLOTS_COUNT];
 
     memset (buffers, 0, sizeof (buffers));
 
-    //??????????
+    for (BufferPrototypeArray::iterator iter=buffer_prototypes.begin (), end=buffer_prototypes.end (); iter!=end; ++iter)
+    {
+      TargetConstantBufferPrototype& prototype = **iter;
+      TargetConstantBuffer&          buffer    = prototype.GetBuffer (src_buffers, library);
+
+      buffer.Bind (context, buffers);
+    }
 
       //установка контекста
 
@@ -71,8 +73,6 @@ void BindableProgram::Bind (ID3D11DeviceContext& context, const SourceConstantBu
     context.HSSetConstantBuffers (0, DEVICE_CONSTANT_BUFFER_SLOTS_COUNT, buffers [ShaderType_Hull]);
     context.PSSetConstantBuffers (0, DEVICE_CONSTANT_BUFFER_SLOTS_COUNT, buffers [ShaderType_Pixel]);
     context.VSSetConstantBuffers (0, DEVICE_CONSTANT_BUFFER_SLOTS_COUNT, buffers [ShaderType_Vertex]);
-
-    throw xtl::make_not_implemented_exception (__FUNCTION__);
   }
   catch (xtl::exception& e)
   {

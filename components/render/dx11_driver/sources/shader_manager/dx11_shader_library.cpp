@@ -213,3 +213,31 @@ void ShaderLibrary::RemoveSynchronizer (const SyncLayoutPair& p)
 {
   layout_syncs.erase (p);
 }
+
+/*
+    Получение целевого константного буфера
+*/
+
+TargetConstantBufferPtr ShaderLibrary::FindConstantBuffer (size_t hash) const
+{
+  BufferMap::const_iterator iter = buffers.find (hash);
+
+  if (iter != buffers.end ())
+    return iter->second;
+
+  return TargetConstantBufferPtr ();
+}
+
+/*
+    Регистрация и удаление константного буфера
+*/
+
+void ShaderLibrary::AddConstantBuffer (size_t hash, const TargetConstantBufferPtr& buffer)
+{
+  buffers.insert_pair (hash, buffer);
+}
+
+void ShaderLibrary::RemoveConstantBuffer (size_t hash)
+{
+  buffers.erase (hash);
+}
