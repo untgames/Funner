@@ -1519,7 +1519,11 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
   //Рисование лежащих страниц
   void DrawStaticPages (low_level::IDevice& device, low_level::IDeviceContext& context)
   {
-    const math::vec2f& size = page_curl->Size ();
+	const math::vec2f& curl_point          = page_curl->CurlPoint ();
+	const math::vec2f& curl_point_position = page_curl->CurlPointPosition ();
+	bool               page_in_place       = (fabs (curl_point.x - curl_point_position.x) < EPS) && (fabs (curl_point.y - curl_point_position.y) < EPS);
+    const math::vec2f& size                = page_curl->Size ();
+    bool               left_corner_curled  = curl_point.x < size.x / 2;
 
     int   left_page_type   = -1,
           right_page_type  = -1;
@@ -1547,7 +1551,7 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
 
     math::vec4ub page_color (GetPageColor ());
 
-    if (left_page_type >= 0)
+    if (left_page_type >= 0 && !(left_corner_curled && page_in_place))
     {
       RenderableVertex vertices [4];
 
@@ -1574,7 +1578,7 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
       context.Draw (low_level::PrimitiveType_TriangleStrip, 0, 4);
     }
 
-    if (right_page_type >= 0)
+    if (right_page_type >= 0 && !(!left_corner_curled && page_in_place))
     {
       RenderableVertex vertices [4];
 
