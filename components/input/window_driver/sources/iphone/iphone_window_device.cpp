@@ -39,7 +39,8 @@ struct IPhoneDevice::Impl : public IWindowListener
 
   ~Impl ()
   {
-    WindowManager::DetachWindowListener (*window, this);
+    if (window)
+      WindowManager::DetachWindowListener (*window, this);
   }
 
   ///События разворота
@@ -71,6 +72,7 @@ struct IPhoneDevice::Impl : public IWindowListener
   void OnWindowDestroy ()
   {
     WindowManager::DetachWindowListener (*window, this);
+    window = 0;
   }
 
   const char* OrientationName (InterfaceOrientation orientation)
