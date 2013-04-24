@@ -9,6 +9,7 @@ ifneq (,$(VS110COMNTOOLS))
   MSVC_PATH         ?= $(VS110COMNTOOLS)../../vc
   MSVS_COMMON_PATH  ?= $(VS110COMNTOOLS)../../Common7/Ide
   PROFILES          += vc11 haswchar
+  COMMON_CFLAGS     += -wd4005
 endif
 
 ifneq (,$(VS100COMNTOOLS))
