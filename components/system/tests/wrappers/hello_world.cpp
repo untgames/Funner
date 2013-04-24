@@ -1,3 +1,5 @@
+#include <stdio.h>
+
 #include <common/file.h>
 
 int main ()
