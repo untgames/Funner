@@ -7,7 +7,7 @@ class BindableProgram: public xtl::reference_counter, public xtl::trackable
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструктор / деструктор
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    BindableProgram  (ShaderLibrary& library, Program& program, ProgramParametersLayout& layout);
+    BindableProgram  (ShaderLibrary& library, const Program& program, const ProgramParametersLayout& layout);
     ~BindableProgram ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -19,7 +19,9 @@ class BindableProgram: public xtl::reference_counter, public xtl::trackable
     typedef stl::vector<TargetConstantBufferPrototypePtr> BufferPrototypeArray;
     
   private:
-    Program&                 program;           //исходная программа
-    ProgramParametersLayout& parameters_layout; //расположение параметров
-    BufferPrototypeArray     buffer_prototypes; //прототипы буферов
+    const Program&                 program;           //исходная программа
+    const ProgramParametersLayout& parameters_layout; //расположение параметров
+    BufferPrototypeArray           buffer_prototypes; //прототипы буферов
 };
+
+typedef xtl::intrusive_ptr<BindableProgram> BindableProgramPtr;

@@ -241,3 +241,49 @@ void ShaderLibrary::RemoveConstantBuffer (size_t hash)
 {
   buffers.erase (hash);
 }
+
+/*
+    Получение программы, устанавливаемой в контекст
+*/
+
+BindableProgram& ShaderLibrary::GetBindableProgram (const Program& program, const ProgramParametersLayout& layout)
+{
+  try
+  {
+    BindableProgramKey key (&program, &layout);
+
+    BindableProgramMap::iterator iter = bindable_programs.find (key);
+
+    if (iter != bindable_programs.end ())
+      return *iter->second;
+
+    BindableProgramPtr bindable_program (new BindableProgram (*this, program, layout), false);
+
+    xtl::trackable::function_type tracker (xtl::bind (&ShaderLibrary::RemoveBindableProgram, this, key));
+
+    bindable_programs.insert_pair (key, bindable_program);    
+
+    try
+    {    
+      const_cast<Program&> (program).RegisterDestroyHandler (tracker, GetTrackable ());
+      const_cast<ProgramParametersLayout&> (layout).RegisterDestroyHandler (tracker, GetTrackable ());
+    }
+    catch (...)
+    {
+      bindable_programs.erase (key);
+      throw;
+    }
+
+    return *bindable_program;
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::low_level::dx11::ShaderLibrary::GetBindableProgram");
+    throw;
+  }
+}
+
+void ShaderLibrary::RemoveBindableProgram (const BindableProgramKey& key)
+{
+  bindable_programs.erase (key);
+}

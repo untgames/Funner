@@ -13,7 +13,7 @@ class Program: virtual public IProgram, public DeviceObject
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Установка программы в контекст
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void Bind (ID3D11DeviceContext& context);
+    void Bind (ID3D11DeviceContext& context) const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Создание входного лэйаута
@@ -35,7 +35,7 @@ class Program: virtual public IProgram, public DeviceObject
       ShaderSlot () : shader () {}
     };
 
-    template <class T, ShaderType Type> T* Get ();
+    template <class T, ShaderType Type> T* Get () const;
 
     typedef stl::vector<ProgramBufferLayoutPtr> BufferLayoutArray;
 

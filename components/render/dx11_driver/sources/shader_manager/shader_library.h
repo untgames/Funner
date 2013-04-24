@@ -42,21 +42,30 @@ class ShaderLibrary: public DeviceObject
     void AddConstantBuffer    (size_t hash, const TargetConstantBufferPtr& buffer);
     void RemoveConstantBuffer (size_t hash);
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Получение программы, устанавливаемой в контекст
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    BindableProgram& GetBindableProgram (const Program& program, const ProgramParametersLayout& layout);
+
   private:
     typedef stl::pair<const ProgramParametersLayout*, const ConstantBufferLayout*> SyncLayoutPair;
+    typedef stl::pair<const Program*, const ProgramParametersLayout*>              BindableProgramKey;
 
     void RemoveShaderByHash (size_t hash);
     void RemoveSynchronizer (const SyncLayoutPair&);
+    void RemoveBindableProgram (const BindableProgramKey&);
 
   private:
     typedef stl::hash_map<size_t, Shader*>                              ShaderMap;
     typedef stl::hash_map<size_t, ConstantBufferLayout*>                BufferLayoutMap;
     typedef stl::hash_map<SyncLayoutPair, ShaderBuffersSynchronizerPtr> SyncLayoutMap;
     typedef stl::hash_map<size_t, TargetConstantBufferPtr>              BufferMap;
+    typedef stl::hash_map<BindableProgramKey, BindableProgramPtr>       BindableProgramMap;
 
   private:
-    ShaderMap       shaders;         //шейдеры
-    BufferLayoutMap buffer_layouts;  //лэйауты константных буферов
-    SyncLayoutMap   layout_syncs;    //синхронизаторы лэйаутов
-    BufferMap       buffers;         //целевые константные буферы
+    ShaderMap          shaders;            //шейдеры
+    BufferLayoutMap    buffer_layouts;     //лэйауты константных буферов
+    SyncLayoutMap      layout_syncs;       //синхронизаторы лэйаутов
+    BufferMap          buffers;            //целевые константные буферы
+    BindableProgramMap bindable_programs;  //программы, устанавливаемые в контекст
 };

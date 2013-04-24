@@ -86,14 +86,4 @@ struct ShaderParameter: public ProgramParameter {};
 
 }
 
-namespace stl
-{
-
-inline size_t hash (const stl::pair<const render::low_level::dx11::ProgramParametersLayout*, const render::low_level::dx11::ConstantBufferLayout*>& p)
-{
-  return common::crc32 (&p.first, sizeof (p.first), common::crc32 (&p.second, sizeof (p.second)));
-}
-
-}
-
 #endif

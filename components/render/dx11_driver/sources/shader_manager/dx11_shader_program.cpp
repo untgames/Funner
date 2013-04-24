@@ -131,12 +131,12 @@ Program::~Program ()
 */
 
 template <class T, ShaderType Type>
-inline T* Program::Get ()
+inline T* Program::Get () const
 {
   return static_cast<T*> (shaders [Type].shader);
 }
 
-void Program::Bind (ID3D11DeviceContext& context)
+void Program::Bind (ID3D11DeviceContext& context) const
 {
   context.CSSetShader (Get<ID3D11ComputeShader, ShaderType_Compute> (), 0, 0);
   context.DSSetShader (Get<ID3D11DomainShader, ShaderType_Domain> (), 0, 0);

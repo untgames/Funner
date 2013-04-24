@@ -7,7 +7,7 @@ using namespace render::low_level::dx11;
     Конструктор / деструктор
 */
 
-BindableProgram::BindableProgram (ShaderLibrary& library, Program& in_program, ProgramParametersLayout& in_layout)
+BindableProgram::BindableProgram (ShaderLibrary& library, const Program& in_program, const ProgramParametersLayout& in_layout)
   : program (in_program)
   , parameters_layout (in_layout)
 {
