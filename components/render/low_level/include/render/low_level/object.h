@@ -1,6 +1,8 @@
 #ifndef RENDER_LOW_LEVEL_OBJECT_HEADER
 #define RENDER_LOW_LEVEL_OBJECT_HEADER
 
+#include <cstddef>
+
 #include <xtl/functional_fwd>
 
 namespace render
