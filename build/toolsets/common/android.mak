@@ -112,8 +112,13 @@ CYGWIN_BIN                 := /$(subst :,,$(call convert_path,$(CYGHOME)))/bin
 ADDITIONAL_PATHS           += $(CYGWIN_BIN)
 BUILD_PATHS                := $(CYGWIN_BIN):$(BUILD_PATHS)
 CYGWIN                     := nodosfilewarning
+PATH_SEPARATOR             := ;
 
 export CYGWIN
+
+else
+
+PATH_SEPARATOR             := :
 
 endif
 
@@ -263,7 +268,7 @@ define process_target.android-pak
   $1.INSTALLATION_FLAG := $$($1.TMP_DIR)/installation-flag
   $1.SOURCE_FILES      := $$(filter-out %.aidl,$$($1.SOURCE_FILES)) $$($1.AIDL_JAVA_FILES)
   TMP_DIRS             := $$(TMP_DIRS) $$($1.TMP_DIR) $$($1.CLASSES_DIR) $$($1.R_DIR) $$($1.ABI_DIR)
-  
+ 
   $$(foreach aidl,$$($1.AIDL_FILES),$$(eval $$(call aidl_gen,$$(aidl),$$($1.AIDL_GEN_DIR)/$$(basename $$(notdir $$(aidl))).java)))
 
   $$(foreach file,$$($1.TARGET_DLLS),$$(eval $$(call create_extern_file_dependency,$$(file),$$($1.DLL_DIRS))))    
@@ -287,7 +292,7 @@ endif
   
   $$($1.CLASSES_FLAG): $$($1.SOURCE_FILES) $$($1.JARS) $$($1.PACKAGED_RES_FILE)
 		@echo Compile sources for $$(notdir $$($1.TARGET))...
-		@export R_FILES=$$$$(/usr/bin/find $$($1.R_DIR) -name '*.java') && $(JAVA_CC) $$($1.SOURCE_FILES) $$$$R_FILES $$($1.COMPILER_FLAGS) -d $$($1.CLASSES_DIR) -classpath '$(ANDROID_JAR)$$(if $$($1.JARS),:$$(subst ; ,;,$$($1.JARS:%=%:)))'
+		@export R_FILES=$$$$(/usr/bin/find $$($1.R_DIR) -name '*.java') && $(JAVA_CC) $$($1.SOURCE_FILES) $$$$R_FILES $$($1.COMPILER_FLAGS) -d $$($1.CLASSES_DIR) -classpath '$(ANDROID_JAR)$$(if $$($1.JARS),$(PATH_SEPARATOR)$$(subst ; ,$(PATH_SEPARATOR),$$($1.JARS:%=%$(PATH_SEPARATOR))))'
 		@touch $$@
   
   $$($1.DEX_FILE): $$($1.CLASSES_FLAG)
@@ -301,7 +306,7 @@ endif
   $$($1.UNSIGNED_TARGET): $$($1.DEX_FILE) $$($1.PACKAGED_RES_FILE) $$($1.TARGET_DLLS)
 		@echo Create unsigned APK $$(notdir $$@)...
 ifeq ($(ANDROID_NDK_HOST),windows)		
-		@export LIB_DIR_PREFIX=$$$$($$(call get_system_dir,$$(DIST_LIB_DIR))) TMP_DIR_PREFIX=$$$$($$(call get_system_dir,$$($1.TMP_DIR))) && if ! cmd //C "$(APK_BUILDER) %TMP_DIR_PREFIX%\$$(notdir $$@) -u -z %TMP_DIR_PREFIX%\$$(notdir $$($1.PACKAGED_RES_FILE)) -f %TMP_DIR_PREFIX%\$$(notdir $$($1.DEX_FILE)) -rf %TMP_DIR_PREFIX%\\bin $$(foreach jar,$$($1.JARS),-rj %LIB_DIR_PREFIX%\\$$(notdir $$(jar)))"; then $(RM) $$@; exit 1; fi
+		@export LIB_DIR_PREFIX=$$$$(cmd "\\/C" "cd . && cd") TMP_DIR_PREFIX=$$$$($$(call get_system_dir,$$($1.TMP_DIR))) && if ! cmd //C "$(APK_BUILDER) %TMP_DIR_PREFIX%\$$(notdir $$@) -u -z %TMP_DIR_PREFIX%\$$(notdir $$($1.PACKAGED_RES_FILE)) -f %TMP_DIR_PREFIX%\$$(notdir $$($1.DEX_FILE)) -rf %TMP_DIR_PREFIX%\\bin $$(foreach jar,$$($1.JARS),-rj %LIB_DIR_PREFIX%\\$$(subst /,\,$$(jar)))"; then $(RM) $$@; exit 1; fi
 else
 		@if ! $$$$($(APK_BUILDER) $$@ -u -z $$($1.PACKAGED_RES_FILE) -f $$($1.DEX_FILE) -rf $$($1.TMP_DIR)/bin $$(foreach jar,$$($1.JARS),-rj $$(jar))); then $(RM) $$@; exit 1; fi
 endif
@@ -382,7 +387,7 @@ define process_target.android-jar
 		@echo Compile sources for $$(notdir $$($1.TARGET))...
 		@$(RM) -r $$($1.CLASSES_DIR)
 		@mkdir -p $$($1.CLASSES_DIR)
-		@$(JAVA_CC) $$($1.SOURCE_FILES) $$($1.COMPILER_FLAGS) -d $$($1.CLASSES_DIR) -classpath '$(ANDROID_JAR)$$(if $$($1.JARS),:$$(subst : ,:,$$(subst ; ,;,$$($1.JARS:%=%:))))'
+		@$(JAVA_CC) $$($1.SOURCE_FILES) $$($1.COMPILER_FLAGS) -d $$($1.CLASSES_DIR) -classpath '$(ANDROID_JAR)$$(if $$($1.JARS),$(PATH_SEPARATOR)$$(subst ; ,$(PATH_SEPARATOR),$$(subst ; ,$(PATH_SEPARATOR),$$($1.JARS:%=%$(PATH_SEPARATOR)))))'
 		@touch $$@
 
   $$($1.TARGET): $$($1.CLASSES_FLAG)
