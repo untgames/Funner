@@ -30,8 +30,8 @@ class ShaderCode: public DeviceObject
     size_t GetCompiledDataHash () const;
 
   private:
-    struct Impl;
-    stl::auto_ptr<Impl> impl;
+    DxBlobPtr data; //буфера данных шейдера
+    size_t    hash; //хэш
 };
 
-typedef xtl::shared_ptr<ShaderCode> ShaderCodePtr;
+typedef xtl::com_ptr<ShaderCode> ShaderCodePtr;

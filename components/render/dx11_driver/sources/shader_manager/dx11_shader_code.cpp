@@ -3,23 +3,11 @@
 using namespace render::low_level;
 using namespace render::low_level::dx11;
 
-typedef xtl::com_ptr<ID3D10Blob> DxBlobPtr;
-
 /*
     Константы
 */
 
 const size_t RESERVED_MACRO_SIZE = 16;
-
-/*
-    Описание реализации кода шейдера
-*/
-
-struct ShaderCode::Impl
-{
-  DxBlobPtr data; //буфера данных шейдера
-  size_t    hash; //хэш
-};
 
 /*
     Конструктор / деструктор
@@ -152,7 +140,6 @@ ShaderCode::ShaderCode
   size_t               flags1,
   size_t               flags2)
    : DeviceObject (device_manager)
-   , impl (new Impl)
 {
   try
   {
@@ -193,8 +180,8 @@ ShaderCode::ShaderCode
     if (!dx_shader_blob)
       throw xtl::format_operation_exception ("", "D3DX11CompileFromMemory failed");
 
-    impl->data = DxBlobPtr (dx_shader_blob, false);
-    impl->hash = common::crc32 (impl->data->GetBufferPointer (), impl->data->GetBufferSize ());
+    data = DxBlobPtr (dx_shader_blob, false);
+    hash = common::crc32 (data->GetBufferPointer (), data->GetBufferSize ());
 
     DxBlobPtr err_blob (dx_error_msg_blob, false);
     
@@ -229,12 +216,12 @@ ShaderCode::~ShaderCode ()
 
 const void* ShaderCode::GetCompiledData () const
 {
-  return impl->data->GetBufferPointer ();
+  return data->GetBufferPointer ();
 }
 
 size_t ShaderCode::GetCompiledDataSize () const
 {
-  return impl->data->GetBufferSize ();
+  return data->GetBufferSize ();
 }
 
 /*
@@ -243,5 +230,5 @@ size_t ShaderCode::GetCompiledDataSize () const
 
 size_t ShaderCode::GetCompiledDataHash () const
 {
-  return impl->hash;
+  return hash;
 }
