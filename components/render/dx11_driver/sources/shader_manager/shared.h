@@ -62,13 +62,12 @@ enum ShaderType
   ShaderType_Num
 };
 
-typedef xtl::shared_ptr<ShaderCode> ShaderCodePtr;
-
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Описание параметра шейдера
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 struct ShaderParameter: public ProgramParameter {};
 
+#include "shader_code.h"
 #include "constant_buffer_layout.h"
 #include "shader.h"
 #include "program_buffer_layout.h"

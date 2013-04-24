@@ -6,8 +6,8 @@
 #include <render/low_level/device.h>
 
 #include <shared/common.h>
+#include <shared/device_manager.h>
 #include <shared/input_layout.h>
-#include <shared/shader_code.h>
 
 namespace render
 {

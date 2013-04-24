@@ -1,21 +1,3 @@
-#ifndef RENDER_DX11_DRIVER_SHADER_CODE_HEADER
-#define RENDER_DX11_DRIVER_SHADER_CODE_HEADER
-
-#include <stl/auto_ptr.h>
-
-#include <render/low_level/device.h>
-
-#include <shared/device_manager.h>
-
-namespace render
-{
-
-namespace low_level
-{
-
-namespace dx11
-{
-
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Шейдер
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -52,10 +34,4 @@ class ShaderCode: public DeviceObject
     stl::auto_ptr<Impl> impl;
 };
 
-}
-
-}
-
-}
-
-#endif
+typedef xtl::shared_ptr<ShaderCode> ShaderCodePtr;
