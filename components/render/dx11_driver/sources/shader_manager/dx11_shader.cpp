@@ -29,7 +29,7 @@ Shader::Shader (ShaderType in_shader_type, const ShaderCodePtr& in_code, ShaderL
 
         check_errors ("ID3D11Device::CreateComputeShader", device.CreateComputeShader (code->GetCompiledData (), code->GetCompiledDataSize (), 0, &dx_shader));
 
-        if (dx_shader)
+        if (!dx_shader)
           throw xtl::format_operation_exception ("", "ID3D11Device::CreateComputeShader failed");
         
         shader = DxDeviceChildPtr (dx_shader, false);
@@ -42,7 +42,7 @@ Shader::Shader (ShaderType in_shader_type, const ShaderCodePtr& in_code, ShaderL
 
         check_errors ("ID3D11Device::CreateDomainShader", device.CreateDomainShader (code->GetCompiledData (), code->GetCompiledDataSize (), 0, &dx_shader));
 
-        if (dx_shader)
+        if (!dx_shader)
           throw xtl::format_operation_exception ("", "ID3D11Device::CreateDomainShader failed");
         
         shader = DxDeviceChildPtr (dx_shader, false);
@@ -55,7 +55,7 @@ Shader::Shader (ShaderType in_shader_type, const ShaderCodePtr& in_code, ShaderL
 
         check_errors ("ID3D11Device::CreateGeometryShader", device.CreateGeometryShader (code->GetCompiledData (), code->GetCompiledDataSize (), 0, &dx_shader));
 
-        if (dx_shader)
+        if (!dx_shader)
           throw xtl::format_operation_exception ("", "ID3D11Device::CreateGeometryShader failed");
         
         shader = DxDeviceChildPtr (dx_shader, false);
@@ -68,7 +68,7 @@ Shader::Shader (ShaderType in_shader_type, const ShaderCodePtr& in_code, ShaderL
 
         check_errors ("ID3D11Device::CreateHullShader", device.CreateHullShader (code->GetCompiledData (), code->GetCompiledDataSize (), 0, &dx_shader));
 
-        if (dx_shader)
+        if (!dx_shader)
           throw xtl::format_operation_exception ("", "ID3D11Device::CreateHullShader failed");
         
         shader = DxDeviceChildPtr (dx_shader, false);
@@ -81,7 +81,7 @@ Shader::Shader (ShaderType in_shader_type, const ShaderCodePtr& in_code, ShaderL
 
         check_errors ("ID3D11Device::CreatePixelShader", device.CreatePixelShader (code->GetCompiledData (), code->GetCompiledDataSize (), 0, &dx_shader));
 
-        if (dx_shader)
+        if (!dx_shader)
           throw xtl::format_operation_exception ("", "ID3D11Device::CreatePixelShader failed");
         
         shader = DxDeviceChildPtr (dx_shader, false);
@@ -91,10 +91,10 @@ Shader::Shader (ShaderType in_shader_type, const ShaderCodePtr& in_code, ShaderL
       case ShaderType_Vertex:
       {
         ID3D11VertexShader* dx_shader = 0;
-printf ("%s(%u)\n", __FUNCTION__, __LINE__); fflush (stdout);
+
         check_errors ("ID3D11Device::CreateVertexShader", device.CreateVertexShader (code->GetCompiledData (), code->GetCompiledDataSize (), 0, &dx_shader));
-printf ("%s(%u)\n", __FUNCTION__, __LINE__); fflush (stdout);
-        if (dx_shader)
+
+        if (!dx_shader)
           throw xtl::format_operation_exception ("", "ID3D11Device::CreateVertexShader failed");
 
         shader = DxDeviceChildPtr (dx_shader, false);
