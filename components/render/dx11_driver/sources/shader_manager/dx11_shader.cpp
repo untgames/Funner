@@ -8,7 +8,7 @@ using namespace render::low_level::dx11;
 */
 
 Shader::Shader (ShaderType in_shader_type, const ShaderCodePtr& in_code, ShaderLibrary& library)
-  : DeviceObject (code->GetDeviceManager ())
+  : DeviceObject (in_code->GetDeviceManager ())
   , type (in_shader_type)
   , code (in_code)
 {
@@ -91,12 +91,12 @@ Shader::Shader (ShaderType in_shader_type, const ShaderCodePtr& in_code, ShaderL
       case ShaderType_Vertex:
       {
         ID3D11VertexShader* dx_shader = 0;
-
+printf ("%s(%u)\n", __FUNCTION__, __LINE__); fflush (stdout);
         check_errors ("ID3D11Device::CreateVertexShader", device.CreateVertexShader (code->GetCompiledData (), code->GetCompiledDataSize (), 0, &dx_shader));
-
+printf ("%s(%u)\n", __FUNCTION__, __LINE__); fflush (stdout);
         if (dx_shader)
           throw xtl::format_operation_exception ("", "ID3D11Device::CreateVertexShader failed");
-        
+
         shader = DxDeviceChildPtr (dx_shader, false);
 
         break;

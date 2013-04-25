@@ -50,12 +50,12 @@ ShaderPtr ShaderLibrary::CreateShader (const ShaderDesc& desc, const LogFunction
     };
 
     static const Profile2ShaderType type_map [] = {
-      {"hlsl.vs", ShaderType_Vertex,   "vs_4_0_level_9_3"},
-      {"hlsl.ps", ShaderType_Pixel,    "ps_4_0_level_9_3"},
-      {"hlsl.gs", ShaderType_Geometry, "gs_4_0_level_9_3"},
-      {"hlsl.hs", ShaderType_Hull,     "hs_4_0_level_9_3"},
-      {"hlsl.ds", ShaderType_Domain,   "ds_4_0_level_9_3"},
-      {"hlsl.cs", ShaderType_Compute,  "cs_4_0_level_9_3"},
+      {"hlsl.vs", ShaderType_Vertex,   "vs_1_1"},
+      {"hlsl.ps", ShaderType_Pixel,    "ps_1_1"},
+      {"hlsl.gs", ShaderType_Geometry, "gs_1_1"},
+      {"hlsl.hs", ShaderType_Hull,     "hs_1_1"},
+      {"hlsl.ds", ShaderType_Domain,   "ds_1_1"},
+      {"hlsl.cs", ShaderType_Compute,  "cs_1_1"},
     };
 
     static const size_t type_map_size = sizeof (type_map) / sizeof (*type_map);
@@ -87,7 +87,7 @@ ShaderPtr ShaderLibrary::CreateShader (const ShaderDesc& desc, const LogFunction
 
       //создание нового шейдера
 
-    ShaderCodePtr code (new ShaderCode (GetDeviceManager (), desc.name, dx_profile, desc.source_code, source_code_size, options, error_log));
+    ShaderCodePtr code (new ShaderCode (GetDeviceManager (), desc.name, dx_profile, desc.source_code, source_code_size, options, error_log), false);
     ShaderPtr     shader (new Shader (type, code, *this), false);
 
      //регистрация шейдера в библиотеке

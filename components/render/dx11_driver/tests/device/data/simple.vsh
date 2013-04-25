@@ -20,7 +20,7 @@ float4x4 WorldViewProj;
 // Type: Vertex shader
 // Desc: Vertex transformation and texture coord pass-through
 //
-VS_OUTPUT vs_main( in VS_INPUT In )
+VS_OUTPUT main( in VS_INPUT In )
 {
   VS_OUTPUT Out;                      //create an output vertex
 
