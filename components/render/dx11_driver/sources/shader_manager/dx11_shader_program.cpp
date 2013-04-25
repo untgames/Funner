@@ -73,6 +73,10 @@ Program::Program (ShaderLibrary& library, size_t shaders_count, const ShaderDesc
       buffers_count += shader->GetConstantBufferLayoutsCount ();
     }
 
+      //расчёт хэша вершинного шейдера
+
+    vertex_shader_code_hash = shaders [ShaderType_Vertex].holder ? shaders [ShaderType_Vertex].holder->GetShaderCode ().GetCompiledDataHash () : 0;
+
       //копирование лэйаутов
 
     buffer_layouts.reserve (buffers_count);
@@ -92,7 +96,7 @@ Program::Program (ShaderLibrary& library, size_t shaders_count, const ShaderDesc
 
         for (BufferLayoutArray::iterator iter=buffer_layouts.begin (), end=buffer_layouts.end (); iter!=end; ++iter)
         {
-           ProgramBufferLayout& program_layout = **iter;
+          ProgramBufferLayout& program_layout = **iter;
 
           if (&program_layout.GetLayout () == layout)
           {
@@ -138,19 +142,29 @@ inline T* Program::Get () const
 
 void Program::Bind (ID3D11DeviceContext& context) const
 {
-  context.CSSetShader (Get<ID3D11ComputeShader, ShaderType_Compute> (), 0, 0);
-  context.DSSetShader (Get<ID3D11DomainShader, ShaderType_Domain> (), 0, 0);
-  context.GSSetShader (Get<ID3D11GeometryShader, ShaderType_Geometry> (), 0, 0);
-  context.HSSetShader (Get<ID3D11HullShader, ShaderType_Hull> (), 0, 0);
-  context.PSSetShader (Get<ID3D11PixelShader, ShaderType_Pixel> (), 0, 0);
-  context.VSSetShader (Get<ID3D11VertexShader, ShaderType_Vertex> (), 0, 0);
+  try
+  {
+      //установка шейдеров
+
+    context.CSSetShader (Get<ID3D11ComputeShader, ShaderType_Compute> (), 0, 0);
+    context.DSSetShader (Get<ID3D11DomainShader, ShaderType_Domain> (), 0, 0);
+    context.GSSetShader (Get<ID3D11GeometryShader, ShaderType_Geometry> (), 0, 0);
+    context.HSSetShader (Get<ID3D11HullShader, ShaderType_Hull> (), 0, 0);
+    context.PSSetShader (Get<ID3D11PixelShader, ShaderType_Pixel> (), 0, 0);
+    context.VSSetShader (Get<ID3D11VertexShader, ShaderType_Vertex> (), 0, 0);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::low_level::dx11::Program::Bind");
+    throw;
+  }
 }
 
 /*
     Создание входного лэйаута
 */
 
-DxInputLayoutPtr Program::CreateInputLayout (const D3D11_INPUT_ELEMENT_DESC* descs, size_t descs_count)
+DxInputLayoutPtr Program::CreateInputLayout (const D3D11_INPUT_ELEMENT_DESC* descs, size_t descs_count) const
 {
   try
   {
@@ -162,12 +176,12 @@ DxInputLayoutPtr Program::CreateInputLayout (const D3D11_INPUT_ELEMENT_DESC* des
     if (!descs_count)
       throw xtl::make_null_argument_exception ("", "descs_count");
 
-    ShaderSlot& vs_slot = shaders [ShaderType_Vertex];
+    const ShaderSlot& vs_slot = shaders [ShaderType_Vertex];
 
     if (!vs_slot.shader)
       throw xtl::format_operation_exception ("", "Can't create layout: no vertex shader was attached");   
 
-    ShaderCode& code = vs_slot.holder->GetShaderCode ();
+    const ShaderCode& code = vs_slot.holder->GetShaderCode ();
 
       //создание лэйаута
 
@@ -183,6 +197,50 @@ DxInputLayoutPtr Program::CreateInputLayout (const D3D11_INPUT_ELEMENT_DESC* des
   catch (xtl::exception& e)
   {
     e.touch ("render::low_level::dx11::Program::CreateInputLayout");
+    throw;
+  }
+}
+
+DxInputLayoutPtr Program::GetInputLayout (ShaderLibrary& library, const InputLayout& input_layout) const
+{
+  try
+  {
+    if (!vertex_shader_code_hash)
+      return DxInputLayoutPtr ();
+
+    DxInputLayoutPtr dx_input_layout = library.FindInputLayout (input_layout.GetVertexElementsHash (), vertex_shader_code_hash);
+
+    if (dx_input_layout)
+      return dx_input_layout;
+
+    dx_input_layout = CreateInputLayout (input_layout.GetVertexElements (), input_layout.GetVertexElementsCount ());
+
+    library.AddInputLayout (input_layout.GetVertexElementsHash (), vertex_shader_code_hash, dx_input_layout);
+
+    try
+    {
+      xtl::trackable::function_type tracker (xtl::bind (&ShaderLibrary::RemoveInputLayout, &library, input_layout.GetVertexElementsHash (), vertex_shader_code_hash));
+
+      const_cast<InputLayout&> (input_layout).RegisterDestroyHandler (tracker, library.GetTrackable ());
+
+      if (!shaders [ShaderType_Vertex].holder)
+        throw xtl::format_operation_exception ("", "Null vertex shader");
+
+      ShaderCode& code = const_cast<Shader*> (&*shaders [ShaderType_Vertex].holder)->GetShaderCode ();
+
+      code.RegisterDestroyHandler (tracker, library.GetTrackable ());
+
+      return dx_input_layout;
+    }
+    catch (...)
+    {
+      library.RemoveInputLayout (input_layout.GetVertexElementsHash (), vertex_shader_code_hash);
+      throw;
+    }
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::low_level::dx11::Program::GetInputLayout");
     throw;
   }
 }

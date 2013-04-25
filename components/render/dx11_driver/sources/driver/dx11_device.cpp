@@ -48,10 +48,10 @@ Device::Device (const AdapterPtr& in_adapter, const char* init_string)
       throw xtl::format_operation_exception ("", "::D3D11CreateDevice failed");
 
     device = DxDevicePtr (dx_device, false);
+    
+    DxContextPtr dx_immediate_context (dx_context, false);
 
     device_manager.reset (new DeviceManager (device));
-
-    immediate_context = ContextPtr (new Context (DxContextPtr (dx_context, false), *device_manager), false);
 
       //инициализация подуровней
 
@@ -59,6 +59,10 @@ Device::Device (const AdapterPtr& in_adapter, const char* init_string)
     texture_manager.reset       (new TextureManager (*device_manager));
     input_manager.reset         (new InputManager (*device_manager));
     shader_manager.reset        (new ShaderManager (*device_manager));
+
+      //создание контекста
+
+    immediate_context = ContextPtr (new Context (dx_immediate_context, *device_manager, shader_manager->GetShaderLibrary ()), false);
   }
   catch (xtl::exception& e)
   {
@@ -394,14 +398,7 @@ IDeviceContext* Device::CreateDeferredContext ()
 {
   try
   {
-    ID3D11DeviceContext* context = 0;
-
-    check_errors ("ID3D11Device::CreateDeferredContext", device->CreateDeferredContext (0, &context));    
-
-    if (!context)
-      throw xtl::format_operation_exception ("", "ID3D11Device::CreateDeferredContext failed");
-
-    return new Context (DxContextPtr (context, false), *device_manager);
+    throw xtl::make_not_implemented_exception (__FUNCTION__); //can't be implmented only via DX deferred contexts (need MT guard)
   }
   catch (xtl::exception& e)
   {

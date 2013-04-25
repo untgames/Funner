@@ -8,7 +8,8 @@ using namespace render::low_level::dx11;
 */
 
 BindableProgram::BindableProgram (ShaderLibrary& library, const Program& in_program, const ProgramParametersLayout& in_layout)
-  : program (in_program)
+  : DeviceObject (library.GetDeviceManager ())
+  , program (in_program)
   , parameters_layout (in_layout)
 {
   try
@@ -43,36 +44,76 @@ BindableProgram::~BindableProgram ()
     Биндинг в контекст
 */
 
-void BindableProgram::Bind (ID3D11DeviceContext& context, ShaderLibrary& library, const SourceConstantBufferPtr src_buffers [DEVICE_CONSTANT_BUFFER_SLOTS_COUNT])
+void BindableProgram::Bind 
+ (ID3D11DeviceContext&          context,
+  ShaderLibrary&                library,
+  const SourceConstantBufferPtr src_buffers [DEVICE_CONSTANT_BUFFER_SLOTS_COUNT],
+  const InputLayout&            input_layout,
+  BindableProgramContext&       program_context)
 {
   try
   {
-      //биндинг программы
+      //поиск входного лэйаута
 
-    program.Bind (context);
-
-      //поиск и биндинг буферов
-
-    ID3D11Buffer* buffers [ShaderType_Num][DEVICE_CONSTANT_BUFFER_SLOTS_COUNT];
-
-    memset (buffers, 0, sizeof (buffers));
-
-    for (BufferPrototypeArray::iterator iter=buffer_prototypes.begin (), end=buffer_prototypes.end (); iter!=end; ++iter)
+    if (!program_context.input_layout)
     {
-      TargetConstantBufferPrototype& prototype = **iter;
-      TargetConstantBuffer&          buffer    = prototype.GetBuffer (src_buffers, library);
-
-      buffer.Bind (context, buffers);
+      program_context.input_layout = program.GetInputLayout (library, input_layout);
+   
+      context.IASetInputLayout (program_context.input_layout.get ());
     }
 
-      //установка контекста
+      //биндинг программы
 
-    context.CSSetConstantBuffers (0, DEVICE_CONSTANT_BUFFER_SLOTS_COUNT, buffers [ShaderType_Compute]);
-    context.DSSetConstantBuffers (0, DEVICE_CONSTANT_BUFFER_SLOTS_COUNT, buffers [ShaderType_Domain]);
-    context.GSSetConstantBuffers (0, DEVICE_CONSTANT_BUFFER_SLOTS_COUNT, buffers [ShaderType_Geometry]);
-    context.HSSetConstantBuffers (0, DEVICE_CONSTANT_BUFFER_SLOTS_COUNT, buffers [ShaderType_Hull]);
-    context.PSSetConstantBuffers (0, DEVICE_CONSTANT_BUFFER_SLOTS_COUNT, buffers [ShaderType_Pixel]);
-    context.VSSetConstantBuffers (0, DEVICE_CONSTANT_BUFFER_SLOTS_COUNT, buffers [ShaderType_Vertex]);
+    if (!program_context.program_binded)
+    {      
+      program.Bind (context);
+
+      program_context.program_binded = true;
+    }
+
+      //поиск и биндинг буферов
+    
+    if (program_context.has_dirty_buffers)
+    {
+      ID3D11Buffer* buffers [ShaderType_Num][DEVICE_CONSTANT_BUFFER_SLOTS_COUNT];
+
+      memset (buffers, 0, sizeof (buffers));
+
+      for (BufferPrototypeArray::iterator iter=buffer_prototypes.begin (), end=buffer_prototypes.end (); iter!=end; ++iter)
+      {
+        TargetConstantBufferPrototype& prototype = **iter;
+
+        const unsigned char* index = prototype.GetSourceBuffersIndices ();
+        bool                 dirty = false;  
+
+        for (size_t i=0, count=prototype.GetSourceBuffersCount (); i<count; i++, index++)
+          if (program_context.dirty_buffers [*index])
+          {
+            dirty = true;
+            break;
+          }
+
+        if (!dirty)
+          continue;
+
+        TargetConstantBuffer& buffer = prototype.GetBuffer (src_buffers, library);
+
+        buffer.Bind (context, buffers);
+      }
+
+        //установка контекста
+
+      context.CSSetConstantBuffers (0, DEVICE_CONSTANT_BUFFER_SLOTS_COUNT, buffers [ShaderType_Compute]);
+      context.DSSetConstantBuffers (0, DEVICE_CONSTANT_BUFFER_SLOTS_COUNT, buffers [ShaderType_Domain]);
+      context.GSSetConstantBuffers (0, DEVICE_CONSTANT_BUFFER_SLOTS_COUNT, buffers [ShaderType_Geometry]);
+      context.HSSetConstantBuffers (0, DEVICE_CONSTANT_BUFFER_SLOTS_COUNT, buffers [ShaderType_Hull]);
+      context.PSSetConstantBuffers (0, DEVICE_CONSTANT_BUFFER_SLOTS_COUNT, buffers [ShaderType_Pixel]);
+      context.VSSetConstantBuffers (0, DEVICE_CONSTANT_BUFFER_SLOTS_COUNT, buffers [ShaderType_Vertex]);
+
+      program_context.has_dirty_buffers = false;
+
+      memset (program_context.dirty_buffers, 0, sizeof (program_context.dirty_buffers));
+    }
   }
   catch (xtl::exception& e)
   {

@@ -22,3 +22,5 @@ class ProgramParametersLayout: public helpers::ProgramParametersLayout, public O
   private:
     ParameterMap params;
 };
+
+typedef xtl::com_ptr<ProgramParametersLayout> ProgramParametersLayoutPtr;

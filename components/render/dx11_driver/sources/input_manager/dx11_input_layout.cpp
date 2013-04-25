@@ -11,9 +11,11 @@ typedef stl::vector<D3D11_INPUT_ELEMENT_DESC> InputElementArray;
 
 struct InputLayout::Impl
 {
-  InputElementArray vertex_elements;     //вершинные элементы
-  DXGI_FORMAT       index_format;        //формат индексов
-  size_t            index_buffer_offset; //смещение в индексном буфере    
+  InputElementArray vertex_elements;      //вершинные элементы
+  DXGI_FORMAT       index_format;         //формат индексов
+  size_t            index_buffer_offset;  //смещение в индексном буфере    
+  size_t            vertex_elements_hash; //хэш вершинных элементов
+  size_t            hash;                 //хэш
 };
 
 /*
@@ -188,6 +190,12 @@ InputLayout::InputLayout (const InputLayoutDesc& desc)
       case InputDataType_Float:   impl->index_format = DXGI_FORMAT_R32_FLOAT; break;
       default:                    throw xtl::make_argument_exception ("", "desc.index_type", desc.index_type);
     }
+
+      //расчёт хэша
+
+    impl->vertex_elements_hash = common::crc32 (&impl->vertex_elements [0], sizeof (D3D11_INPUT_ELEMENT_DESC) * impl->vertex_elements.size ());
+
+    impl->hash = common::crc32 (&impl->index_format, sizeof (impl->index_format), common::crc32 (&impl->index_buffer_offset, sizeof (impl->index_buffer_offset), impl->vertex_elements_hash));
   }
   catch (xtl::exception& e)
   {
@@ -226,4 +234,18 @@ DXGI_FORMAT InputLayout::GetIndexFormat () const
 size_t InputLayout::GetIndexBufferOffset () const
 {
   return impl->index_buffer_offset;
+}
+
+/*
+    Получение хэша
+*/
+
+size_t InputLayout::GetHash () const
+{
+  return impl->hash;
+}
+
+size_t InputLayout::GetVertexElementsHash () const
+{
+  return impl->vertex_elements_hash;
 }

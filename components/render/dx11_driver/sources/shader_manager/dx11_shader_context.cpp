@@ -18,9 +18,12 @@ typedef xtl::com_ptr<Program>     ProgramPtr;
 
 struct ShaderManagerContextState::Impl: public DeviceObject
 {
-  InputLayoutPtr input_layout; //входной лэйаут
-  ProgramPtr     program;      //программа
-  bool           is_dirty;     //флаг "грязности"
+  InputLayoutPtr             input_layout;                                 //входной лэйаут
+  ProgramPtr                 program;                                      //программа
+  ProgramParametersLayoutPtr parameters_layout;                            //лэйаут параметров программы
+  SourceConstantBufferPtr    buffers [DEVICE_CONSTANT_BUFFER_SLOTS_COUNT]; //константные буферы
+  BindableProgramContext     bindable_program_context;                     //контекст программы
+  bool                       is_dirty;                                     //флаг "грязности"
 
 /// Конструктор
   Impl (const DeviceManager& device_manager)
@@ -74,7 +77,12 @@ void ShaderManagerContextState::SetInputLayout (InputLayout* state)
 {
   try
   {
+    if (state == impl->input_layout)
+      return;
+
     impl->input_layout = state;
+
+    impl->bindable_program_context.input_layout = DxInputLayoutPtr ();
 
     impl->UpdateNotify ();
   }
@@ -91,7 +99,7 @@ InputLayout* ShaderManagerContextState::GetInputLayout () const
 }
 
 /*
-    Установка состояния, вьюпорта и отсечения
+    Установка состояния
 */
 
 void ShaderManagerContextState::SetProgram (IProgram* in_program)
@@ -100,7 +108,12 @@ void ShaderManagerContextState::SetProgram (IProgram* in_program)
   {
     Program* program = cast_object<Program> (*impl, in_program, "", "program");
 
+    if (program == impl->program)
+      return;
+
     impl->program = program;
+
+    impl->bindable_program_context.Reset ();
 
     impl->UpdateNotify ();
   }
@@ -113,12 +126,46 @@ void ShaderManagerContextState::SetProgram (IProgram* in_program)
 
 void ShaderManagerContextState::SetProgramParametersLayout (IProgramParametersLayout* parameters_layout)
 {
-  throw xtl::make_not_implemented_exception (__FUNCTION__);
+  try
+  {
+    ProgramParametersLayout* layout = cast_object<ProgramParametersLayout> (*impl, parameters_layout, "", "parameters_layout");
+
+    if (layout != impl->parameters_layout)
+      return;
+
+    impl->parameters_layout = layout;
+
+    impl->bindable_program_context.Reset ();
+
+    impl->UpdateNotify ();
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::low_level::dx11::ShaderManagerContextState::SetProgramParametersLayout");
+    throw;
+  }
 }
 
-void ShaderManagerContextState::SetConstantBuffer (size_t buffer_slot, IBuffer* buffer)
+void ShaderManagerContextState::SetConstantBuffer (size_t buffer_slot, IBuffer* in_buffer)
 {
-  throw xtl::make_not_implemented_exception (__FUNCTION__);
+  try
+  {
+    if (buffer_slot >= DEVICE_CONSTANT_BUFFER_SLOTS_COUNT)
+      throw xtl::make_range_exception ("", "buffer_slot", buffer_slot, DEVICE_CONSTANT_BUFFER_SLOTS_COUNT);
+
+    SourceConstantBuffer* buffer = cast_object<SourceConstantBuffer> (*impl, in_buffer, "", "buffer");
+
+    impl->buffers [buffer_slot]                                = buffer;
+    impl->bindable_program_context.dirty_buffers [buffer_slot] = true;
+    impl->bindable_program_context.has_dirty_buffers           = true;
+
+    impl->UpdateNotify ();
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::low_level::dx11::ShaderManagerContextState::SetConstantBuffer");
+    throw;
+  }
 }
 
 /*
@@ -127,7 +174,7 @@ void ShaderManagerContextState::SetConstantBuffer (size_t buffer_slot, IBuffer* 
 
 IProgramParametersLayout* ShaderManagerContextState::GetProgramParametersLayout () const
 {
-  throw xtl::make_not_implemented_exception (__FUNCTION__);
+  return impl->parameters_layout.get ();
 }
 
 IProgram* ShaderManagerContextState::GetProgram () const
@@ -137,7 +184,18 @@ IProgram* ShaderManagerContextState::GetProgram () const
 
 IBuffer* ShaderManagerContextState::GetConstantBuffer (size_t buffer_slot) const
 {
-  throw xtl::make_not_implemented_exception (__FUNCTION__);
+  try
+  {
+    if (buffer_slot >= DEVICE_CONSTANT_BUFFER_SLOTS_COUNT)
+      throw xtl::make_range_exception ("", "buffer_slot", buffer_slot, DEVICE_CONSTANT_BUFFER_SLOTS_COUNT);
+
+    return impl->buffers [buffer_slot].get ();
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::low_level::dx11::ShaderManagerContextState::GetConstantBuffer");
+    throw;
+  }
 }
 
 /*
@@ -150,13 +208,19 @@ IBuffer* ShaderManagerContextState::GetConstantBuffer (size_t buffer_slot) const
     Описание реализации контекста
 */
 
+typedef xtl::trackable_ptr<BindableProgram> BindableProgramWeakPtr;
+typedef xtl::com_ptr<ShaderLibrary>         ShaderLibraryPtr;
+
 struct ShaderManagerContext::Impl: public ShaderManagerContextState::Impl
 {
-  DxContextPtr context; //контекст
+  ShaderLibraryPtr       shader_library;   //библиотека шейдеров
+  DxContextPtr           context;          //контекст
+  BindableProgramWeakPtr bindable_program; //программа, устанавливаемая в контекст
 
 /// Конструктор
-  Impl (const DeviceManager& device_manager, const DxContextPtr& in_context)
-    : ShaderManagerContextState::Impl (device_manager)
+  Impl (ShaderLibrary& library, const DxContextPtr& in_context)
+    : ShaderManagerContextState::Impl (library.GetDeviceManager ())
+    , shader_library (&library)
     , context (in_context)
   {
     if (!context)
@@ -168,8 +232,8 @@ struct ShaderManagerContext::Impl: public ShaderManagerContextState::Impl
     Конструктор / деструктор
 */
 
-ShaderManagerContext::ShaderManagerContext (const DeviceManager& device_manager, const DxContextPtr& context)
-  : ShaderManagerContextState (new Impl (device_manager, context))
+ShaderManagerContext::ShaderManagerContext (ShaderLibrary& library, const DxContextPtr& context)
+  : ShaderManagerContextState (new Impl (library, context))
 {
 }
 
@@ -192,5 +256,37 @@ ShaderManagerContext::Impl& ShaderManagerContext::GetImpl () const
 
 void ShaderManagerContext::Bind ()
 {
-  throw xtl::make_not_implemented_exception (__FUNCTION__);
+  try
+  {
+      //получение программы, устанавливаемой в контекст
+
+    Impl& impl = GetImpl ();
+
+    if (!impl.bindable_program || &impl.bindable_program->GetProgram () != impl.program.get () || &impl.bindable_program->GetProgramParametersLayout () != impl.parameters_layout.get ())
+    { 
+      if (!impl.program)
+        throw xtl::format_operation_exception ("", "Null program");
+
+      if (!impl.parameters_layout)
+        throw xtl::format_operation_exception ("", "Null program parameters layout");        
+
+      BindableProgram& bindable_program = impl.shader_library->GetBindableProgram (*impl.program, *impl.parameters_layout);
+
+      impl.bindable_program = &bindable_program;     
+    }
+
+      //проверка входного лэйаута
+
+    if (!impl.input_layout)
+      throw xtl::make_null_argument_exception ("", "Null input layout");
+
+      //установка в контекст
+
+    impl.bindable_program->Bind (*impl.context, *impl.shader_library, impl.buffers, *impl.input_layout, impl.bindable_program_context);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::low_level::dx11::ShaderManagerContext::Bind");
+    throw;
+  }
 }

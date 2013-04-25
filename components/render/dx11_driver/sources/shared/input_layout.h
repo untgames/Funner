@@ -42,6 +42,12 @@ class InputLayout: virtual public IInputLayout, public Object
     DXGI_FORMAT GetIndexFormat       () const;
     size_t      GetIndexBufferOffset () const;
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Получение хэша
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    size_t GetHash               () const;
+    size_t GetVertexElementsHash () const;
+
   private:
     struct Impl;
     stl::auto_ptr<Impl> impl;

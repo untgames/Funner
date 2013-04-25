@@ -47,6 +47,17 @@ class ShaderLibrary: public DeviceObject
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     BindableProgram& GetBindableProgram (const Program& program, const ProgramParametersLayout& layout);
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Поиск входного лэйаута
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    DxInputLayoutPtr FindInputLayout (size_t input_hash, size_t shader_hash) const;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Регистрация и удаление входного лэйаута
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void AddInputLayout    (size_t input_hash, size_t shader_hash, const DxInputLayoutPtr& layout);
+    void RemoveInputLayout (size_t input_hash, size_t shader_hash);
+
   private:
     typedef stl::pair<const ProgramParametersLayout*, const ConstantBufferLayout*> SyncLayoutPair;
     typedef stl::pair<const Program*, const ProgramParametersLayout*>              BindableProgramKey;
@@ -61,6 +72,8 @@ class ShaderLibrary: public DeviceObject
     typedef stl::hash_map<SyncLayoutPair, ShaderBuffersSynchronizerPtr> SyncLayoutMap;
     typedef stl::hash_map<size_t, TargetConstantBufferPtr>              BufferMap;
     typedef stl::hash_map<BindableProgramKey, BindableProgramPtr>       BindableProgramMap;
+    typedef stl::pair<size_t, size_t>                                   InputLayoutKey;
+    typedef stl::hash_map<InputLayoutKey, DxInputLayoutPtr>             InputLayoutMap;
 
   private:
     ShaderMap          shaders;            //шейдеры
@@ -68,4 +81,7 @@ class ShaderLibrary: public DeviceObject
     SyncLayoutMap      layout_syncs;       //синхронизаторы лэйаутов
     BufferMap          buffers;            //целевые константные буферы
     BindableProgramMap bindable_programs;  //программы, устанавливаемые в контекст
+    InputLayoutMap     input_layouts;      //входные лэйауты
 };
+
+typedef xtl::com_ptr<ShaderLibrary> ShaderLibraryPtr;

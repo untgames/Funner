@@ -3,6 +3,8 @@
 
 #include <stl/vector>
 
+#include <common/hash.h>
+
 #include <render/low_level/utils.h>
 
 #include <shared/input_layout.h>

@@ -287,3 +287,40 @@ void ShaderLibrary::RemoveBindableProgram (const BindableProgramKey& key)
 {
   bindable_programs.erase (key);
 }
+
+/*
+    Поиск входного лэйаута
+*/
+
+DxInputLayoutPtr ShaderLibrary::FindInputLayout (size_t input_hash, size_t shader_hash) const
+{
+  InputLayoutKey key (input_hash, shader_hash);
+
+  InputLayoutMap::const_iterator iter = input_layouts.find (key);
+
+  if (iter != input_layouts.end ())
+    return iter->second;
+
+  return DxInputLayoutPtr ();
+}
+
+/*
+    Регистрация и удаление входного лэйаута
+*/
+
+void ShaderLibrary::AddInputLayout (size_t input_hash, size_t shader_hash, const DxInputLayoutPtr& layout)
+{
+  InputLayoutKey key (input_hash, shader_hash);
+
+  InputLayoutMap::iterator iter = input_layouts.find (key);
+
+  if (iter != input_layouts.end ())
+    throw xtl::format_operation_exception ("render::low_level::dx11:ShaderLibrary::AddInputLayout", "InputLayout for this shader has been already added");
+
+  input_layouts.insert_pair (key, layout);
+}
+
+void ShaderLibrary::RemoveInputLayout (size_t input_hash, size_t shader_hash)
+{
+  input_layouts.erase (InputLayoutKey (input_hash, shader_hash));
+}

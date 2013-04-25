@@ -9,12 +9,12 @@ using namespace render::low_level::dx11;
 
 struct ShaderManager::Impl: public DeviceObject
 {
-  ShaderLibrary shader_library; //библиотека шейдеров
+  ShaderLibraryPtr shader_library; //библиотека шейдеров
 
 /// Конструктор
   Impl (const DeviceManager& device_manager)
     : DeviceObject (device_manager)
-    , shader_library (device_manager)
+    , shader_library (new ShaderLibrary (device_manager), false)
   {
   }
 };
@@ -53,7 +53,7 @@ IProgram* ShaderManager::CreateProgram (size_t shaders_count, const ShaderDesc* 
 {
   try
   {
-    return new Program (impl->shader_library, shaders_count, shader_descs, error_log);
+    return new Program (*impl->shader_library, shaders_count, shader_descs, error_log);
   }
   catch (xtl::exception& e)
   {
@@ -69,4 +69,13 @@ IProgram* ShaderManager::CreateProgram (size_t shaders_count, const ShaderDesc* 
 const char* ShaderManager::GetShaderProfilesString () const
 {
   return "hlsl.vs hlsl.ps hlsl";
+}
+
+/*
+    Получение библиотеки шейдеров
+*/
+
+ShaderLibrary& ShaderManager::GetShaderLibrary () const
+{
+  return *impl->shader_library;
 }

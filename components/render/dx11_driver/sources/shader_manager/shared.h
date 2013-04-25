@@ -15,6 +15,7 @@
 #include <xtl/intrusive_ptr.h>
 #include <xtl/ref.h>
 #include <xtl/shared_ptr.h>
+#include <xtl/trackable_ptr.h>
 #include <xtl/uninitialized_storage.h>
 
 #include <common/file.h>
