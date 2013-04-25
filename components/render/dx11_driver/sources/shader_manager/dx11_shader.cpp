@@ -151,7 +151,6 @@ Shader::~Shader ()
     Перечисление константных буферов
 */
 
-
 ConstantBufferLayoutPtr Shader::GetConstantBufferLayout (size_t index) const
 {
   if (index >= buffer_layouts.size ())
