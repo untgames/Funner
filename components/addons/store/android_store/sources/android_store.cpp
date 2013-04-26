@@ -12,6 +12,8 @@ namespace
 const char* LOG_NAME            = "store.android_store.AndroidStore";
 const char* SESSION_DESCRIPTION = "AndroidStore";
 
+const int MAX_PAYLOAD_VALUE = 1000000;  //максимальное значение, присваемое payload покупки
+
 void on_initialized (JNIEnv& env, jobject, jboolean can_buy_products);
 
 /*
@@ -40,8 +42,6 @@ class AndroidStore
 ///Инициализация
     xtl::connection Initialize (const Store::OnInitializedCallback& callback)
     {
-      printf ("INITIALIZE CALLED FROM THREAD %p\n", syslib::Thread::GetCurrentThreadId ());
-
       if (initialized)
       {
         callback ();
@@ -57,7 +57,7 @@ class AndroidStore
 
       JNIEnv* env = &get_env ();
 
-      jmethodID initialize_method = find_static_method (env, store_class, "initialize", "(Landroid/content/Context;)V");
+      jmethodID initialize_method = find_static_method (env, store_class, "initialize", "(Lcom/untgames/funner/application/EngineActivity;)V");
 
       env->CallStaticVoidMethod (store_class, initialize_method, get_activity ());
 
@@ -66,8 +66,6 @@ class AndroidStore
 
     void OnInitialized (bool in_can_buy_products)
     {
-      printf ("ON INITIALIZED CALLBACK CALLED FROM THREAD %p\n", syslib::Thread::GetCurrentThreadId ());
-
       can_buy_products = in_can_buy_products;
 
       on_initialized_signal ();
@@ -90,6 +88,8 @@ class AndroidStore
           throw xtl::make_null_argument_exception ("", "product_ids");
 
         common::StringArray products = common::split (product_ids);
+
+        //TODO
       }
       catch (xtl::exception& e)
       {
@@ -101,12 +101,19 @@ class AndroidStore
 ///Покупка / восстановление покупок
     xtl::connection RegisterTransactionUpdateHandler (const Store::PurchaseCallback& callback)
     {
+      TransactionsArray transactions = pending_transactions;
+
+      for (TransactionsArray::iterator iter = transactions.begin (), end = transactions.end (); iter != end; ++iter)
+        callback (iter->transaction);
+
       return store_signal.connect (callback);
     }
 
     void RestorePurchases ()
     {
       log.Printf ("Restoring transactions");
+
+      //TODO
     }
 
     void NotifyTransactionUpdated (const Transaction& transaction)
@@ -127,17 +134,35 @@ class AndroidStore
 
     Transaction BuyProduct (const char* product_id, size_t count, const common::PropertyMap& properties)
     {
+      //TODO implement subscriptions selling
+
       try
       {
         if (!product_id)
           throw xtl::make_null_argument_exception ("", "product_id");
 
-        if (!count)
-          throw xtl::make_null_argument_exception ("", "count");
+        if (count > 1)
+          throw xtl::make_range_exception ("", "count", count, 0u, 1u);
 
-        log.Printf ("Buy product '%s' with count %u requested", product_id, count);
+        log.Printf ("Buy product '%s' requested", product_id);
 
-        return Transaction ();
+        bool consumable = properties.IsPresent ("Consumable") && properties.GetInteger ("Consumable");
+
+        int payload_value = rand () % MAX_PAYLOAD_VALUE;
+
+        TransactionDesc new_transaction (product_id, payload_value, consumable);
+
+        NotifyTransactionUpdated (new_transaction.transaction);
+
+        JNIEnv* env = &get_env ();
+
+        jmethodID buy_method = find_static_method (env, store_class, "buyProduct", "(Landroid/app/Activity;Ljava/lang/String;I)V");
+
+        env->CallStaticVoidMethod (store_class, buy_method, get_activity (), tojstring (product_id).get (), payload_value);
+
+        pending_transactions.push_back (new_transaction);
+
+        return new_transaction.transaction;
       }
       catch (xtl::exception& e)
       {
@@ -189,8 +214,26 @@ class AndroidStore
    }
 
   private:
+    struct TransactionDesc
+    {
+      Transaction transaction;
+      bool        consumable;
+      int         payload_value;
+
+      TransactionDesc (const char* product_id, bool in_consumable, int in_payload_value)
+        : transaction ()
+        , consumable (in_consumable)
+        , payload_value (in_payload_value)
+      {
+        transaction.SetState (TransactionState_New);
+        transaction.SetProductId (product_id);
+        transaction.SetQuantity (1);
+      }
+    };
+
     typedef xtl::signal<void (const Transaction&)> StoreSignal;
     typedef xtl::signal<void ()>                   OnInitializedSignal;
+    typedef stl::vector<TransactionDesc>           TransactionsArray;
 
   public:
     common::Log         log;                      //протокол
@@ -200,6 +243,7 @@ class AndroidStore
     StoreSignal         store_signal;             //соединение оповещения обновления транзакций
     OnInitializedSignal on_initialized_signal;    //соединение оповещения завершения инициализации магазина
     jclass              store_class;              //класс Store
+    TransactionsArray   pending_transactions;     //текущие незавершенные транзакции
 };
 
 typedef common::Singleton<AndroidStore> StoreSingleton;

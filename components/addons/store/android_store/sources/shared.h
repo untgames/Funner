@@ -1,6 +1,8 @@
 #ifndef STORE_ANDROID_STORE_SHARED_HEADER
 #define STORE_ANDROID_STORE_SHARED_HEADER
 
+#include <stl/vector>
+
 #include <xtl/bind.h>
 #include <xtl/common_exceptions.h>
 #include <xtl/connection.h>

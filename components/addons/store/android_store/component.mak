@@ -13,4 +13,5 @@ STORE.ANDROID_STORE.SOURCES.IMPORTS			:= compile.store.core compile.system
 STORE.ANDROID_STORE.JAVA.TYPE        := android-jar
 STORE.ANDROID_STORE.JAVA.NAME        := funner.store
 STORE.ANDROID_STORE.JAVA.SOURCE_DIRS := java_sources
+STORE.ANDROID_STORE.JAVA.JARS        := funner.application
 STORE.ANDROID_STORE.JAVA.IMPORTS     := compile.extern.google_play_billing
