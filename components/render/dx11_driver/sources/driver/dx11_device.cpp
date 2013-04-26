@@ -213,7 +213,19 @@ IBuffer* Device::CreateBuffer (const BufferDesc& desc)
 
   try
   {
-    return input_manager->CreateBuffer (desc);
+    static const size_t BAD_FLAGS = BindFlag_Texture | BindFlag_RenderTarget | BindFlag_DepthStencil;
+
+    if (desc.bind_flags & BAD_FLAGS)
+      throw xtl::make_argument_exception ("", "desc.bind_flags", get_name ((BindFlag)desc.bind_flags));
+
+    switch (desc.bind_flags)
+    {
+      case BindFlag_VertexBuffer:
+      case BindFlag_IndexBuffer:    return input_manager->CreateBuffer (desc);
+      case BindFlag_ConstantBuffer: return shader_manager->CreateConstantBuffer (desc);
+      default:
+        throw xtl::format_not_supported_exception ("", "Incompatible desc.bind_flags=%s", get_name ((BindFlag)desc.bind_flags));
+    }
   }
   catch (xtl::exception& e)
   {

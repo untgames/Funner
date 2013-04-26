@@ -61,6 +61,23 @@ IProgram* ShaderManager::CreateProgram (size_t shaders_count, const ShaderDesc* 
     throw;
   }
 }
+
+/*
+    Создание константного буфера
+*/
+
+IBuffer* ShaderManager::CreateConstantBuffer (const BufferDesc& desc)
+{
+  try
+  {
+    return new SourceConstantBuffer (desc);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::low_level::dx11::ShaderManager::CreateConstantBuffer");
+    throw;
+  }
+}
     
 /*
     Получение строки поддерживаемых контекстом профилей шейдеров

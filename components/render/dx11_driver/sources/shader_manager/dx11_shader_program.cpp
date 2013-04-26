@@ -53,9 +53,7 @@ Program::Program (ShaderLibrary& library, size_t shaders_count, const ShaderDesc
     {
       const ShaderDesc& desc = shader_descs [i];
 
-printf ("%s(%u)\n", __FUNCTION__, __LINE__); fflush (stdout);
       ShaderPtr shader = library.CreateShader (desc, error_log);
-printf ("%s(%u)\n", __FUNCTION__, __LINE__); fflush (stdout);
 
         //диспетчеризация типа шейдера
 

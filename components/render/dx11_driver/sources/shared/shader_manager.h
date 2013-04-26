@@ -104,6 +104,7 @@ class ShaderManager
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     IProgramParametersLayout* CreateProgramParametersLayout (const ProgramParametersLayoutDesc&);
     IProgram*                 CreateProgram                 (size_t shaders_count, const ShaderDesc* shader_descs, const LogFunction& error_log);
+    IBuffer*                  CreateConstantBuffer          (const BufferDesc&);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Получение библиотеки шейдеров
