@@ -97,11 +97,11 @@ void Device::InitDefaults ()
 
     memset (&va, 0, sizeof (va));
 
-    va.semantic = "Position";
-    va.format   = InputDataFormat_Vector4;
+    va.semantic = "POSITION";
+    va.format   = InputDataFormat_Vector3;
     va.type     = InputDataType_Float;
     va.offset   = 0;
-    va.stride   = sizeof (float) * 4;
+    va.stride   = sizeof (float) * 3;
 
     default_layout_desc.vertex_attributes       = &va;
     default_layout_desc.vertex_attributes_count = 1;
