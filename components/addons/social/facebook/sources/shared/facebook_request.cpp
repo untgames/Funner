@@ -3,6 +3,13 @@
 using namespace social;
 using namespace social::facebook;
 
+namespace
+{
+
+size_t DEFAULT_RESPONSE_BUFFER_SIZE = 1024 * 16; //buffer size used for chunked response with unknown response size
+
+}
+
 void FacebookSessionImpl::PerformRequestNotify (const RequestCallback& callback, bool succeeded, const char* status, const common::ParseNode& response)
 {
   common::ActionQueue::PushAction (xtl::bind (callback, succeeded, stl::string (status), response), common::ActionThread_Main);
@@ -70,7 +77,14 @@ void FacebookSessionImpl::PerformRequestImpl (common::Action& action, const stl:
 
   try
   {
-    xtl::uninitialized_storage<char> buffer (input_file.Size () + 1);
+    size_t initial_buffer_size = input_file.Size ();
+
+    if (!initial_buffer_size)
+      initial_buffer_size = DEFAULT_RESPONSE_BUFFER_SIZE;
+    else
+      initial_buffer_size++;  //additional symbol for '\0'
+
+    xtl::uninitialized_storage<char> buffer (initial_buffer_size);
 
     size_t bytes_copied = 0;
 
@@ -85,6 +99,9 @@ void FacebookSessionImpl::PerformRequestImpl (common::Action& action, const stl:
         break;
 
       bytes_copied += read_size;
+
+      if (buffer.size () == bytes_copied)  //buffer full, allocate additional space
+        buffer.resize (stl::max (buffer.size () * 2, DEFAULT_RESPONSE_BUFFER_SIZE));
     }
 
     if (!input_file.Eof ())
