@@ -13,8 +13,7 @@ using namespace render::low_level::dx11;
     Описание реализации состояния контекста менеджера шейдеров
 */
 
-typedef xtl::com_ptr<InputLayout> InputLayoutPtr;
-typedef xtl::com_ptr<Program>     ProgramPtr;
+typedef xtl::com_ptr<Program> ProgramPtr;
 
 struct ShaderManagerContextState::Impl: public DeviceObject
 {
@@ -213,22 +212,36 @@ IBuffer* ShaderManagerContextState::GetConstantBuffer (size_t buffer_slot) const
 
 typedef xtl::trackable_ptr<BindableProgram> BindableProgramWeakPtr;
 typedef xtl::com_ptr<ShaderLibrary>         ShaderLibraryPtr;
+typedef xtl::com_ptr<Program>               ProgramPtr;
 
 struct ShaderManagerContext::Impl: public ShaderManagerContextState::Impl
 {
-  ShaderLibraryPtr       shader_library;   //библиотека шейдеров
-  DxContextPtr           context;          //контекст
-  BindableProgramWeakPtr bindable_program; //программа, устанавливаемая в контекст
+  ShaderLibraryPtr       shader_library;           //библиотека шейдеров
+  InputLayoutPtr         default_input_layout;     //входной лэйаут по умолчанию
+  ProgramPtr             default_program;          //программа по умолчанию
+  DxContextPtr           context;                  //контекст
+  BindableProgramWeakPtr bindable_program;         //программа, устанавливаемая в контекст
   size_t                 buffer_hashes [DEVICE_CONSTANT_BUFFER_SLOTS_COUNT]; //хэши буферов
 
 /// Конструктор
-  Impl (ShaderLibrary& library, const DxContextPtr& in_context)
+  Impl (ShaderLibrary& library, const DxContextPtr& in_context, const InputLayoutPtr& in_default_input_layout, const IProgramPtr& in_default_program)
     : ShaderManagerContextState::Impl (library.GetDeviceManager ())
     , shader_library (&library)
+    , default_input_layout (in_default_input_layout)
     , context (in_context)
   {
+    static const char* METHOD_NAME = "render::low_level::dx11::ShaderManagerContext::Impl::Impl";
+
     if (!context)
-      throw xtl::make_null_argument_exception ("render::low_level::dx11::ShaderManagerContext::Impl::Impl", "context");
+      throw xtl::make_null_argument_exception (METHOD_NAME, "context");
+
+    if (!default_input_layout)
+      throw xtl::make_null_argument_exception (METHOD_NAME, "default_input_layout");
+
+    if (!in_default_program)
+      throw xtl::make_null_argument_exception (METHOD_NAME, "default_program");
+
+    default_program = cast_object<Program> (library.GetDeviceManager (), in_default_program.get (), METHOD_NAME, "default_program");
 
     memset (buffer_hashes, 0, sizeof (buffer_hashes));
   }
@@ -238,8 +251,8 @@ struct ShaderManagerContext::Impl: public ShaderManagerContextState::Impl
     Конструктор / деструктор
 */
 
-ShaderManagerContext::ShaderManagerContext (ShaderLibrary& library, const DxContextPtr& context)
-  : ShaderManagerContextState (new Impl (library, context))
+ShaderManagerContext::ShaderManagerContext (ShaderLibrary& library, const DxContextPtr& context, const InputLayoutPtr& input_layout, const IProgramPtr& program)
+  : ShaderManagerContextState (new Impl (library, context, input_layout, program))
 {
 }
 
@@ -293,22 +306,26 @@ void ShaderManagerContext::Bind ()
 
     if (!impl.bindable_program || &impl.bindable_program->GetProgram () != impl.program.get () || impl.bindable_program->GetProgramParametersLayout () != impl.parameters_layout.get ())
     { 
-      if (!impl.program)
-        throw xtl::format_operation_exception ("", "Null program");
+      Program* program = impl.program.get ();
 
-      BindableProgram& bindable_program = impl.shader_library->GetBindableProgram (*impl.program, &*impl.parameters_layout);
+      if (!program)
+        program = impl.default_program.get ();
+
+      BindableProgram& bindable_program = impl.shader_library->GetBindableProgram (*program, &*impl.parameters_layout);
 
       impl.bindable_program = &bindable_program;     
     }
 
       //проверка входного лэйаута
 
-    if (!impl.input_layout)
-      throw xtl::make_null_argument_exception ("", "Null input layout");
+    InputLayout* input_layout = impl.input_layout.get ();
+
+    if (!input_layout)
+      input_layout = impl.default_input_layout.get ();
 
       //установка в контекст
 
-    impl.bindable_program->Bind (*impl.context, *impl.shader_library, impl.buffers, *impl.input_layout, impl.bindable_program_context);
+    impl.bindable_program->Bind (*impl.context, *impl.shader_library, impl.buffers, *input_layout, impl.bindable_program_context);
 
       //обновление флагов
 

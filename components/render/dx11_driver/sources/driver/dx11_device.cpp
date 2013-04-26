@@ -66,7 +66,7 @@ Device::Device (const AdapterPtr& in_adapter, const char* init_string)
 
       //создание контекста
 
-    immediate_context = ContextPtr (new Context (dx_immediate_context, *device_manager, shader_manager->GetShaderLibrary ()), false);      
+    immediate_context = ContextPtr (new Context (dx_immediate_context, *device_manager, shader_manager->GetShaderLibrary (), default_input_layout, default_program), false);      
   }
   catch (xtl::exception& e)
   {
@@ -93,7 +93,19 @@ void Device::InitDefaults ()
     
     memset (&default_layout_desc, 0 , sizeof default_layout_desc);
 
-    default_layout_desc.index_type = InputDataType_UShort;
+    VertexAttribute va;
+
+    memset (&va, 0, sizeof (va));
+
+    va.semantic = "Position";
+    va.format   = InputDataFormat_Vector4;
+    va.type     = InputDataType_Float;
+    va.offset   = 0;
+    va.stride   = sizeof (float) * 4;
+
+    default_layout_desc.vertex_attributes       = &va;
+    default_layout_desc.vertex_attributes_count = 1;
+    default_layout_desc.index_type              = InputDataType_UShort;
 
     default_input_layout = InputLayoutPtr (input_manager->CreateInputLayout (default_layout_desc), false);
 
@@ -128,7 +140,7 @@ void Device::InitDefaults ()
     shader_descs [1].source_code      = DEFAULT_PIXEL_SHADER;
     shader_descs [1].profile          = "hlsl.ps";
 
-    default_program = ProgramPtr (CreateProgram (sizeof (shader_descs) / sizeof (*shader_descs), &shader_descs [0], LogFunction ()), false);    
+    default_program = IProgramPtr (CreateProgram (sizeof (shader_descs) / sizeof (*shader_descs), &shader_descs [0], LogFunction ()), false);    
   }
   catch (xtl::exception& e)
   {

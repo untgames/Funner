@@ -46,10 +46,8 @@ class Context;
 
 using helpers::PropertyList;
 
-typedef xtl::com_ptr<Adapter>      AdapterPtr;
-typedef xtl::com_ptr<Context>      ContextPtr;
-typedef xtl::com_ptr<IInputLayout> InputLayoutPtr;
-typedef xtl::com_ptr<IProgram>     ProgramPtr;
+typedef xtl::com_ptr<Adapter> AdapterPtr;
+typedef xtl::com_ptr<Context> ContextPtr;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Устройство вывода
@@ -225,7 +223,7 @@ class Context: virtual public IDeviceContext, public DeviceObject
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструктор
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    Context  (const DxContextPtr& context, const DeviceManager& device_manager, ShaderLibrary& shader_library);
+    Context  (const DxContextPtr& context, const DeviceManager& device_manager, ShaderLibrary& shader_library, const InputLayoutPtr& default_input_layout, const IProgramPtr& default_program);
     ~Context ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -427,7 +425,7 @@ class Device: virtual public IDevice, public Object
     stl::auto_ptr<InputManager>        input_manager;         //менеджер входного уровня
     stl::auto_ptr<ShaderManager>       shader_manager;        //менеджер шейдеров
     InputLayoutPtr                     default_input_layout;  //входной лэйаут по умолчанию
-    ProgramPtr                         default_program;       //программа по умолчанию
+    IProgramPtr                        default_program;       //программа по умолчанию
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

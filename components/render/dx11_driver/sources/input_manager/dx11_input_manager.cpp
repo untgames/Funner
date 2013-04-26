@@ -33,7 +33,7 @@ InputManager::~InputManager ()
     Создание ресурсов уровня
 */
 
-IInputLayout* InputManager::CreateInputLayout (const InputLayoutDesc& desc)
+InputLayout* InputManager::CreateInputLayout (const InputLayoutDesc& desc)
 {
   try
   {

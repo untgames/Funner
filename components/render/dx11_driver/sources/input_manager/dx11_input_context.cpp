@@ -13,8 +13,6 @@ using namespace render::low_level::dx11;
     Описание реализации состояния контекста менеджера входного уровня
 */
 
-typedef xtl::com_ptr<InputLayout> InputLayoutPtr;
-
 struct InputManagerContextState::Impl: public DeviceObject
 {
   InputLayoutPtr input_layout; //входной лэйаут  
@@ -116,15 +114,22 @@ IBuffer* InputManagerContextState::GetIndexBuffer () const
 
 struct InputManagerContext::Impl: public InputManagerContextState::Impl
 {
-  DxContextPtr context; //контекст
+  DxContextPtr   context;        //контекст
+  InputLayoutPtr default_layout; //лэйаут по умолчанию
 
 /// Конструктор
-  Impl (const DeviceManager& device_manager, const DxContextPtr& in_context)
+  Impl (const DeviceManager& device_manager, const DxContextPtr& in_context, const InputLayoutPtr& in_default_layout)
     : InputManagerContextState::Impl (device_manager)
     , context (in_context)
+    , default_layout (in_default_layout)
   {
+    static const char* METHOD_NAME = "render::low_level::dx11::InputManagerContext::Impl::Impl";
+
     if (!context)
-      throw xtl::make_null_argument_exception ("render::low_level::dx11::InputManagerContext::Impl::Impl", "context");
+      throw xtl::make_null_argument_exception (METHOD_NAME, "context");
+
+    if (!default_layout)
+      throw xtl::make_null_argument_exception (METHOD_NAME, "default_layout");
   }
 };
 
@@ -132,8 +137,8 @@ struct InputManagerContext::Impl: public InputManagerContextState::Impl
     Конструктор / деструктор
 */
 
-InputManagerContext::InputManagerContext (const DeviceManager& device_manager, const DxContextPtr& context)
-  : InputManagerContextState (new Impl (device_manager, context))
+InputManagerContext::InputManagerContext (const DeviceManager& device_manager, const DxContextPtr& context, const InputLayoutPtr& input_layout)
+  : InputManagerContextState (new Impl (device_manager, context, input_layout))
 {
 }
 

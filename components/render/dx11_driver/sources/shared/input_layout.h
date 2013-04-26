@@ -53,6 +53,8 @@ class InputLayout: virtual public IInputLayout, public Object
     stl::auto_ptr<Impl> impl;
 };
 
+typedef xtl::com_ptr<InputLayout> InputLayoutPtr;
+
 }
 
 }

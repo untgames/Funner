@@ -16,6 +16,8 @@ namespace low_level
 namespace dx11
 {
 
+typedef xtl::com_ptr<IProgram> IProgramPtr;
+
 typedef xtl::com_ptr<IDXGIAdapter>             DxAdapterPtr;
 typedef xtl::com_ptr<IDXGIFactory>             DxFactoryPtr;
 typedef xtl::com_ptr<IDXGIOutput>              DxOutputPtr;

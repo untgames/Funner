@@ -7,13 +7,13 @@ using namespace render::low_level::dx11;
     Конструктор
 */
 
-Context::Context (const DxContextPtr& in_context, const DeviceManager& device_manager, ShaderLibrary& shader_library)
+Context::Context (const DxContextPtr& in_context, const DeviceManager& device_manager, ShaderLibrary& shader_library, const InputLayoutPtr& default_input_layout, const IProgramPtr& default_program)
   : DeviceObject (device_manager)
   , context (in_context)
   , render_target_context (device_manager, in_context)
   , texture_manager_context (device_manager, in_context)
-  , input_manager_context (device_manager, in_context)
-  , shader_manager_context (shader_library, in_context)
+  , input_manager_context (device_manager, in_context, default_input_layout)
+  , shader_manager_context (shader_library, in_context, default_input_layout, default_program)
 {
   if (!context)
     throw xtl::make_null_argument_exception ("render::low_level::dx11::Context::Context", "context");
