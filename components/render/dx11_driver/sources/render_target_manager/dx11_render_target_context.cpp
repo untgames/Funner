@@ -336,15 +336,6 @@ RenderTargetContext::Impl& RenderTargetContext::GetImpl () const
 }
 
 /*
-    Флаг измененности состояния
-*/
-
-bool RenderTargetContext::IsDirty () const
-{
-  return GetImpl ().is_dirty;
-}
-
-/*
     Очистка буферов отрисовки
 */
 

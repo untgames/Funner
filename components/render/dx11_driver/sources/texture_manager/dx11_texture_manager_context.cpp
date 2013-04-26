@@ -233,15 +233,6 @@ TextureManagerContext::Impl& TextureManagerContext::GetImpl () const
 }
 
 /*
-    Флаг измененности состояния
-*/
-
-bool TextureManagerContext::IsDirty () const
-{
-  return GetImpl ().is_dirty;
-}
-
-/*
     Генерация мип-уровней текстуры (необходимо для текстур в которые ведется рендеринг)
 */
 

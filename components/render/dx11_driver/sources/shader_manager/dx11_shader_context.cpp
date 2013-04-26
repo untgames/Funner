@@ -219,6 +219,7 @@ struct ShaderManagerContext::Impl: public ShaderManagerContextState::Impl
   ShaderLibraryPtr       shader_library;   //библиотека шейдеров
   DxContextPtr           context;          //контекст
   BindableProgramWeakPtr bindable_program; //программа, устанавливаемая в контекст
+  size_t                 buffer_hashes [DEVICE_CONSTANT_BUFFER_SLOTS_COUNT]; //хэши буферов
 
 /// Конструктор
   Impl (ShaderLibrary& library, const DxContextPtr& in_context)
@@ -228,6 +229,8 @@ struct ShaderManagerContext::Impl: public ShaderManagerContextState::Impl
   {
     if (!context)
       throw xtl::make_null_argument_exception ("render::low_level::dx11::ShaderManagerContext::Impl::Impl", "context");
+
+    memset (buffer_hashes, 0, sizeof (buffer_hashes));
   }
 };
 
@@ -261,12 +264,32 @@ void ShaderManagerContext::Bind ()
 {
   try
   {
-      //получение программы, устанавливаемой в контекст
-
     Impl& impl = GetImpl ();
 
+      //проверка необходимости биндинга
+
     if (!impl.is_dirty)
-      return; //TODO: constant buffers check
+    {
+      SourceConstantBufferPtr* buffer = impl.buffers;
+      size_t*                  hash   = impl.buffer_hashes;
+
+      for (size_t i=0; i<DEVICE_CONSTANT_BUFFER_SLOTS_COUNT; i++, buffer++, hash++)
+      {
+        size_t new_hash = *buffer ? (*buffer)->GetHash () : 0;
+
+        if (*hash == new_hash)
+          continue;
+
+        *hash                                           = new_hash;
+        impl.bindable_program_context.has_dirty_buffers = true;
+        impl.bindable_program_context.dirty_buffers [i] = true;
+      }
+
+      if (!impl.bindable_program_context.has_dirty_buffers)
+        return;
+    }
+
+      //получение программы, устанавливаемой в контекст
 
     if (!impl.bindable_program || &impl.bindable_program->GetProgram () != impl.program.get () || &impl.bindable_program->GetProgramParametersLayout () != impl.parameters_layout.get ())
     { 
