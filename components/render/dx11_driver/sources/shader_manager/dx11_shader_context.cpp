@@ -291,15 +291,12 @@ void ShaderManagerContext::Bind ()
 
       //получение программы, устанавливаемой в контекст
 
-    if (!impl.bindable_program || &impl.bindable_program->GetProgram () != impl.program.get () || &impl.bindable_program->GetProgramParametersLayout () != impl.parameters_layout.get ())
+    if (!impl.bindable_program || &impl.bindable_program->GetProgram () != impl.program.get () || impl.bindable_program->GetProgramParametersLayout () != impl.parameters_layout.get ())
     { 
       if (!impl.program)
         throw xtl::format_operation_exception ("", "Null program");
 
-      if (!impl.parameters_layout)
-        throw xtl::format_operation_exception ("", "Null program parameters layout");        
-
-      BindableProgram& bindable_program = impl.shader_library->GetBindableProgram (*impl.program, *impl.parameters_layout);
+      BindableProgram& bindable_program = impl.shader_library->GetBindableProgram (*impl.program, &*impl.parameters_layout);
 
       impl.bindable_program = &bindable_program;     
     }

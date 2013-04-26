@@ -9,14 +9,14 @@ class BindableProgram: public DeviceObject
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструктор / деструктор
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    BindableProgram  (ShaderLibrary& library, const Program& program, const ProgramParametersLayout& layout);
+    BindableProgram  (ShaderLibrary& library, const Program& program, const ProgramParametersLayout* layout);
     ~BindableProgram ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Получение программы и лэйаута
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     const Program&                 GetProgram                 () const { return program; }
-    const ProgramParametersLayout& GetProgramParametersLayout () const { return parameters_layout; }
+    const ProgramParametersLayout* GetProgramParametersLayout () const { return parameters_layout; }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Биндинг в контекст
@@ -32,7 +32,7 @@ class BindableProgram: public DeviceObject
     
   private:
     const Program&                 program;           //исходная программа
-    const ProgramParametersLayout& parameters_layout; //расположение параметров
+    const ProgramParametersLayout* parameters_layout; //лэйаут параметров программы (может быть нулевым)
     BufferPrototypeArray           buffer_prototypes; //прототипы буферов
 };
 

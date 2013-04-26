@@ -7,13 +7,16 @@ using namespace render::low_level::dx11;
     Конструктор / деструктор
 */
 
-BindableProgram::BindableProgram (ShaderLibrary& library, const Program& in_program, const ProgramParametersLayout& in_layout)
+BindableProgram::BindableProgram (ShaderLibrary& library, const Program& in_program, const ProgramParametersLayout* in_layout)
   : DeviceObject (library.GetDeviceManager ())
   , program (in_program)
   , parameters_layout (in_layout)
 {
   try
   {
+    if (!parameters_layout && program.GetConstantBufferLayoutsCount ())
+      throw xtl::format_operation_exception ("", "Null program parameters layout but program requires it (%u constant buffer layouts found)", program.GetConstantBufferLayoutsCount ());
+     
       //создание прототипов буферов
 
     buffer_prototypes.reserve (program.GetConstantBufferLayoutsCount ());
@@ -24,7 +27,7 @@ BindableProgram::BindableProgram (ShaderLibrary& library, const Program& in_prog
 
         //создание прототипа (без карты прототипов)
 
-      TargetConstantBufferPrototypePtr prototype (new TargetConstantBufferPrototype (library, parameters_layout, buffer_layout), false);
+      TargetConstantBufferPrototypePtr prototype (new TargetConstantBufferPrototype (library, *parameters_layout, buffer_layout), false);
 
       buffer_prototypes.push_back (prototype);
     }

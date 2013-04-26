@@ -62,7 +62,7 @@ Device::Device (const AdapterPtr& in_adapter, const char* init_string)
 
       //инициализация ресурсов по умолчанию
 
-    InitDefaults ();
+//    InitDefaults ();
 
       //создание контекста
 

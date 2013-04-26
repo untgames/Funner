@@ -246,11 +246,11 @@ void ShaderLibrary::RemoveConstantBuffer (size_t hash)
     Получение программы, устанавливаемой в контекст
 */
 
-BindableProgram& ShaderLibrary::GetBindableProgram (const Program& program, const ProgramParametersLayout& layout)
+BindableProgram& ShaderLibrary::GetBindableProgram (const Program& program, const ProgramParametersLayout* layout)
 {
   try
   {
-    BindableProgramKey key (&program, &layout);
+    BindableProgramKey key (&program, layout);
 
     BindableProgramMap::iterator iter = bindable_programs.find (key);
 
@@ -266,7 +266,9 @@ BindableProgram& ShaderLibrary::GetBindableProgram (const Program& program, cons
     try
     {    
       const_cast<Program&> (program).RegisterDestroyHandler (tracker, GetTrackable ());
-      const_cast<ProgramParametersLayout&> (layout).RegisterDestroyHandler (tracker, GetTrackable ());
+
+      if (layout)
+        const_cast<ProgramParametersLayout*> (layout)->RegisterDestroyHandler (tracker, GetTrackable ());
     }
     catch (...)
     {
