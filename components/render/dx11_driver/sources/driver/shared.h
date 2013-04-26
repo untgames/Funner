@@ -335,6 +335,12 @@ class Context: virtual public IDeviceContext, public DeviceObject
     void          ExecuteCommandList (ICommandList* list, bool restore_state);
 
   private:
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Установка состояния подуровней в контекст
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void Bind ();
+
+  private:
     DxContextPtr          context;                 //контекст отрисовки
     RenderTargetContext   render_target_context;   //контекст целей отрисовки
     TextureManagerContext texture_manager_context; //контекст менеджера текстур

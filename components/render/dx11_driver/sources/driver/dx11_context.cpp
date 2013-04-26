@@ -594,6 +594,26 @@ void Context::ExecuteCommandList (ICommandList* list, bool restore_state)
 }
 
 /*
+    Установка состояния подуровней в контекст
+*/
+
+void Context::Bind ()
+{
+  try
+  {
+    render_target_context.Bind ();
+    texture_manager_context.Bind ();
+//    input_manager_context.Bind ();
+    shader_manager_context.Bind ();
+  }
+  catch (xtl::exception& exception)
+  {
+    exception.touch ("render::low_level::dx11::Context::Bind");
+    throw;
+  }
+}
+
+/*
     Рисование примитивов
 */
 
@@ -601,6 +621,8 @@ void Context::Draw (PrimitiveType primitive_type, size_t first_vertex, size_t ve
 {
   try
   {
+    Bind ();
+
     throw xtl::make_not_implemented_exception (__FUNCTION__);
   }
   catch (xtl::exception& exception)
@@ -614,6 +636,8 @@ void Context::DrawIndexed (PrimitiveType primitive_type, size_t first_index, siz
 {
   try
   {
+    Bind ();
+
     throw xtl::make_not_implemented_exception (__FUNCTION__);
   }
   catch (xtl::exception& exception)
@@ -625,17 +649,47 @@ void Context::DrawIndexed (PrimitiveType primitive_type, size_t first_index, siz
 
 void Context::DrawInstanced (PrimitiveType primitive_type, size_t vertex_count_per_instance, size_t instance_count, size_t first_vertex, size_t first_instance_location)
 {
-  throw xtl::make_not_implemented_exception (__FUNCTION__);
+  try
+  {
+    Bind ();
+
+    throw xtl::make_not_implemented_exception (__FUNCTION__);
+  }
+  catch (xtl::exception& exception)
+  {
+    exception.touch ("render::low_level::dx11::Context::DrawInstanced");
+    throw;
+  }
 }
 
 void Context::DrawIndexedInstanced (PrimitiveType primitive_type, size_t index_count_per_instance, size_t instance_count, size_t first_index, size_t base_vertex, size_t first_instance_location)
 {
-  throw xtl::make_not_implemented_exception (__FUNCTION__);
+  try
+  {
+    Bind ();
+
+    throw xtl::make_not_implemented_exception (__FUNCTION__);
+  }
+  catch (xtl::exception& exception)
+  {
+    exception.touch ("render::low_level::dx11::Context::DrawIndexedInstanced");
+    throw;
+  }
 }
 
 void Context::DrawAuto (PrimitiveType primitive_type)
 {
-  throw xtl::make_not_implemented_exception (__FUNCTION__);
+  try
+  {
+    Bind ();
+
+    throw xtl::make_not_implemented_exception (__FUNCTION__);
+  }
+  catch (xtl::exception& exception)
+  {
+    exception.touch ("render::low_level::dx11::Context::DrawAuto");
+    throw;
+  }
 }
 
 /*
