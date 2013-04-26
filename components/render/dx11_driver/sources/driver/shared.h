@@ -46,8 +46,10 @@ class Context;
 
 using helpers::PropertyList;
 
-typedef xtl::com_ptr<Adapter> AdapterPtr;
-typedef xtl::com_ptr<Context> ContextPtr;
+typedef xtl::com_ptr<Adapter>      AdapterPtr;
+typedef xtl::com_ptr<Context>      ContextPtr;
+typedef xtl::com_ptr<IInputLayout> InputLayoutPtr;
+typedef xtl::com_ptr<IProgram>     ProgramPtr;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Устройство вывода
@@ -412,6 +414,7 @@ class Device: virtual public IDevice, public Object
 
   private:
     ITexture* CreateTexture (const TextureDesc&, const TextureData*);
+    void      InitDefaults  ();
 
   private:
     AdapterPtr                         adapter;               //адаптер устройства
@@ -423,6 +426,8 @@ class Device: virtual public IDevice, public Object
     stl::auto_ptr<TextureManager>      texture_manager;       //менеджер текстур
     stl::auto_ptr<InputManager>        input_manager;         //менеджер входного уровня
     stl::auto_ptr<ShaderManager>       shader_manager;        //менеджер шейдеров
+    InputLayoutPtr                     default_input_layout;  //входной лэйаут по умолчанию
+    ProgramPtr                         default_program;       //программа по умолчанию
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

@@ -174,14 +174,8 @@ ShaderCode::ShaderCode
 
     ID3D10Blob *dx_shader_blob = 0, *dx_error_msg_blob = 0;
 
-    check_errors ("D3DX11CompileFromMemory", D3DX11CompileFromMemory (source_code, source_code_length, name, macro_mapper.Build (), &include_manager, "main",
-      profile, flags1, flags2, 0, &dx_shader_blob, &dx_error_msg_blob, 0));
-
-    if (!dx_shader_blob)
-      throw xtl::format_operation_exception ("", "D3DX11CompileFromMemory failed");
-
-    data = DxBlobPtr (dx_shader_blob, false);
-    hash = common::crc32 (data->GetBufferPointer (), data->GetBufferSize ());
+    HRESULT result = D3DX11CompileFromMemory (source_code, source_code_length, name, macro_mapper.Build (), &include_manager, "main",
+      profile, flags1, flags2, 0, &dx_shader_blob, &dx_error_msg_blob, 0);
 
     DxBlobPtr err_blob (dx_error_msg_blob, false);
     
@@ -194,14 +188,27 @@ ShaderCode::ShaderCode
       {
         stl::string message = common::format ("Shader '%s' compilation errors:\n%s", name, stl::string (err_data, err_size).c_str ());
 
+        if (!message.empty () && message [message.size ()-1] == '\n')
+          message.pop_back ();
+
         if (log_fn) log_fn (message.c_str ());
         else        Log ().Print (message.c_str ());
       }
     }
+
+    check_errors ("D3DX11CompileFromMemory", result);
+
+    if (!dx_shader_blob)
+      throw xtl::format_operation_exception ("", "D3DX11CompileFromMemory failed");
+
+    data = DxBlobPtr (dx_shader_blob, false);
+    hash = common::crc32 (data->GetBufferPointer (), data->GetBufferSize ());
   }
   catch (xtl::exception& e)
   {
-    e.touch ("render::low_level::dx11::ShaderCode::ShaderCode");
+    if (name)  e.touch ("render::low_level::dx11::ShaderCode::ShaderCode(shader='%s', profile='%s')", name, profile ? profile : "null");
+    else       e.touch ("render::low_level::dx11::ShaderCode::ShaderCode");
+
     throw;
   }
 }

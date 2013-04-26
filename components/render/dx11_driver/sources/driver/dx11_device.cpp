@@ -60,9 +60,13 @@ Device::Device (const AdapterPtr& in_adapter, const char* init_string)
     input_manager.reset         (new InputManager (*device_manager));
     shader_manager.reset        (new ShaderManager (*device_manager));
 
+      //инициализация ресурсов по умолчанию
+
+    InitDefaults ();
+
       //создание контекста
 
-    immediate_context = ContextPtr (new Context (dx_immediate_context, *device_manager, shader_manager->GetShaderLibrary ()), false);
+    immediate_context = ContextPtr (new Context (dx_immediate_context, *device_manager, shader_manager->GetShaderLibrary ()), false);      
   }
   catch (xtl::exception& e)
   {
@@ -73,6 +77,64 @@ Device::Device (const AdapterPtr& in_adapter, const char* init_string)
 
 Device::~Device ()
 {
+}
+
+/*
+    Инициализация ресурсов по умолчанию
+*/
+
+void Device::InitDefaults ()
+{
+  try
+  {
+      //создание входного лэйаута по умолчанию
+
+    InputLayoutDesc default_layout_desc;
+    
+    memset (&default_layout_desc, 0 , sizeof default_layout_desc);
+
+    default_layout_desc.index_type = InputDataType_UShort;
+
+    default_input_layout = InputLayoutPtr (input_manager->CreateInputLayout (default_layout_desc), false);
+
+      //создание программы по умолчанию
+
+    ShaderDesc shader_descs [2];
+
+    static const char* DEFAULT_VERTEX_SHADER = 
+      "struct VS_INPUT   { float4 Position : POSITION; };\n"
+      "struct VS_OUTPUT  { float4 Position : POSITION; };\n"
+
+      "VS_OUTPUT main (in VS_INPUT In) {\n"
+      "  VS_OUTPUT Out;\n"
+      "  Out.Position = In.Position;\n"
+      "  return Out;\n"
+      "}\n";
+
+    static const char* DEFAULT_PIXEL_SHADER = 
+      "struct PS_INPUT {};\n"
+      "float4 main (PS_INPUT Input) : SV_TARGET {\n"
+      "    return float4 (1.0, 1, 1.0, 1.0);\n"
+      "}\n";
+
+    memset (&shader_descs, 0, sizeof (shader_descs));
+
+    shader_descs [0].name             = "Default vertex shader";
+    shader_descs [0].source_code_size = ~0;
+    shader_descs [0].source_code      = DEFAULT_VERTEX_SHADER;
+    shader_descs [0].profile          = "hlsl.vs";
+    shader_descs [1].name             = "Default pixel shader";
+    shader_descs [1].source_code_size = ~0;
+    shader_descs [1].source_code      = DEFAULT_PIXEL_SHADER;
+    shader_descs [1].profile          = "hlsl.ps";
+
+    default_program = ProgramPtr (CreateProgram (sizeof (shader_descs) / sizeof (*shader_descs), &shader_descs [0], LogFunction ()), false);    
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::low_level::dx11:Device::InitDefaults");
+    throw;
+  }
 }
 
 /*
