@@ -49,7 +49,7 @@ int main ()
     cb->SetData (0, sizeof my_shader_parameters, &my_shader_parameters);
 
     test.device->GetImmediateContext ()->SSSetProgram (program.get ());
-//    test.device->GetImmediateContext ()->SSSetProgramParametersLayout (program_parameters_layout.get ());
+    test.device->GetImmediateContext ()->SSSetProgramParametersLayout (program_parameters_layout.get ());
     test.device->GetImmediateContext ()->SSSetConstantBuffer (0, cb.get ());
 
     test.device->GetImmediateContext ()->Draw (PrimitiveType_TriangleList, 0, 0);
