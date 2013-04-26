@@ -83,10 +83,16 @@ BOOL PixelFormatManager::SetPixelFormat (HDC dc, int pixel_format, DescribePixel
       return FALSE;
 
       //поиск дескриптора
-      
-    if (GetPixelFormat (dc))
-      return FALSE;         
-        
+
+    for (DcPixelFormat* iter=first; iter; iter=iter->next)
+      if (iter->dc == dc)
+      {
+        if (iter->pixel_format == pixel_format && describe == iter->describe)
+          return TRUE;
+
+        return FALSE;
+      }
+   
       //добавление нового дескриптора
 
     DcPixelFormat* desc = new DcPixelFormat;
