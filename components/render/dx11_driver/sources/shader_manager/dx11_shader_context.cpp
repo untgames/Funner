@@ -130,7 +130,7 @@ void ShaderManagerContextState::SetProgramParametersLayout (IProgramParametersLa
   {
     ProgramParametersLayout* layout = cast_object<ProgramParametersLayout> (parameters_layout, "", "parameters_layout");
 
-    if (layout != impl->parameters_layout)
+    if (layout == impl->parameters_layout)
       return;
 
     impl->parameters_layout = layout;
@@ -154,6 +154,9 @@ void ShaderManagerContextState::SetConstantBuffer (size_t buffer_slot, IBuffer* 
       throw xtl::make_range_exception ("", "buffer_slot", buffer_slot, DEVICE_CONSTANT_BUFFER_SLOTS_COUNT);
 
     SourceConstantBuffer* buffer = cast_object<SourceConstantBuffer> (in_buffer, "", "buffer");
+
+    if (impl->buffers [buffer_slot] == buffer)
+      return;
 
     impl->buffers [buffer_slot]                                = buffer;
     impl->bindable_program_context.dirty_buffers [buffer_slot] = true;
@@ -262,6 +265,9 @@ void ShaderManagerContext::Bind ()
 
     Impl& impl = GetImpl ();
 
+    if (!impl.is_dirty)
+      return; //TODO: constant buffers check
+
     if (!impl.bindable_program || &impl.bindable_program->GetProgram () != impl.program.get () || &impl.bindable_program->GetProgramParametersLayout () != impl.parameters_layout.get ())
     { 
       if (!impl.program)
@@ -283,6 +289,10 @@ void ShaderManagerContext::Bind ()
       //установка в контекст
 
     impl.bindable_program->Bind (*impl.context, *impl.shader_library, impl.buffers, *impl.input_layout, impl.bindable_program_context);
+
+      //обновление флагов
+
+    impl.is_dirty = false;
   }
   catch (xtl::exception& e)
   {
