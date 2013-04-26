@@ -128,7 +128,7 @@ void ShaderManagerContextState::SetProgramParametersLayout (IProgramParametersLa
 {
   try
   {
-    ProgramParametersLayout* layout = cast_object<ProgramParametersLayout> (*impl, parameters_layout, "", "parameters_layout");
+    ProgramParametersLayout* layout = cast_object<ProgramParametersLayout> (parameters_layout, "", "parameters_layout");
 
     if (layout != impl->parameters_layout)
       return;
@@ -153,7 +153,7 @@ void ShaderManagerContextState::SetConstantBuffer (size_t buffer_slot, IBuffer* 
     if (buffer_slot >= DEVICE_CONSTANT_BUFFER_SLOTS_COUNT)
       throw xtl::make_range_exception ("", "buffer_slot", buffer_slot, DEVICE_CONSTANT_BUFFER_SLOTS_COUNT);
 
-    SourceConstantBuffer* buffer = cast_object<SourceConstantBuffer> (*impl, in_buffer, "", "buffer");
+    SourceConstantBuffer* buffer = cast_object<SourceConstantBuffer> (in_buffer, "", "buffer");
 
     impl->buffers [buffer_slot]                                = buffer;
     impl->bindable_program_context.dirty_buffers [buffer_slot] = true;

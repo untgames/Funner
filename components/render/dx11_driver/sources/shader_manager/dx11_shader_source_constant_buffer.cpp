@@ -45,6 +45,8 @@ SourceConstantBuffer::SourceConstantBuffer (const BufferDesc& in_desc)
 
     if (!desc.size)
       throw xtl::make_null_argument_exception ("", "desc.size");
+
+    buffer.resize (desc.size);
   }
   catch (xtl::exception& e)
   {
