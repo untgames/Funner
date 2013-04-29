@@ -5,7 +5,7 @@
 
 #include <xtl/intrusive_ptr.h>
 
-#include <render/low_level/state_block.h>
+#include <render/low_level/shader.h>
 
 namespace render
 {
