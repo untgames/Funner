@@ -19,6 +19,12 @@ Device::Device (const AdapterPtr& in_adapter, const char* init_string)
     if (!in_adapter)
       throw xtl::make_null_argument_exception ("", "adapter");
 
+      //разбор строки инициализации
+
+    common::PropertyMap init_properties = common::parse_init_string (init_string);
+
+    bool is_debug = init_properties.GetInteger ("debug") != 0;
+
       //сохранение аргументов
 
     adapter = in_adapter;
@@ -40,9 +46,13 @@ Device::Device (const AdapterPtr& in_adapter, const char* init_string)
 
     static const size_t feature_levels_requested_count = sizeof (feature_levels_requested) / sizeof (*feature_levels_requested);
 
+    UINT flags = 0;
+
+    if (is_debug) flags |= D3D11_CREATE_DEVICE_DEBUG;
+
     check_errors ("::D3D11CreateDevice", D3D11CreateDevice (adapter->GetModule () ? (IDXGIAdapter*)0 : &adapter->GetHandle (), 
       adapter->GetModule () ? D3D_DRIVER_TYPE_SOFTWARE : D3D_DRIVER_TYPE_UNKNOWN,
-      adapter->GetModule (), 0, feature_levels_requested, feature_levels_requested_count, D3D11_SDK_VERSION, &dx_device, &feature_level, &dx_context));
+      adapter->GetModule (), flags, feature_levels_requested, feature_levels_requested_count, D3D11_SDK_VERSION, &dx_device, &feature_level, &dx_context));
 
     if (!dx_device || !dx_context)
       throw xtl::format_operation_exception ("", "::D3D11CreateDevice failed");
@@ -67,6 +77,15 @@ Device::Device (const AdapterPtr& in_adapter, const char* init_string)
       //создание контекста
 
     immediate_context = ContextPtr (new Context (dx_immediate_context, *device_manager, shader_manager->GetShaderLibrary (), default_input_layout, default_program), false);      
+
+      //создание отладочного уровня
+
+    if (is_debug)
+      StartDebugLayer ();
+
+      //заполнение свойств
+
+    properties.AddProperty ("init_string", init_string);
   }
   catch (xtl::exception& e)
   {
@@ -77,6 +96,7 @@ Device::Device (const AdapterPtr& in_adapter, const char* init_string)
 
 Device::~Device ()
 {
+  StopDebugLayer ();
 }
 
 /*
@@ -146,6 +166,32 @@ void Device::InitDefaults ()
   {
     e.touch ("render::low_level::dx11:Device::InitDefaults");
     throw;
+  }
+}
+
+void Device::StartDebugLayer ()
+{
+  try
+  {
+    StopDebugLayer ();
+
+    debug_layer.reset (new DeviceDebugLayer (device));
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::low_level::dx11::Device::StartDebugLayer");
+    throw;
+  }
+}
+
+void Device::StopDebugLayer  ()
+{
+  try
+  {
+    debug_layer.reset ();
+  }
+  catch (...)
+  {
   }
 }
 

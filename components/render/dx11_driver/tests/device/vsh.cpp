@@ -12,13 +12,20 @@ void print (const char* message)
   printf ("Shader message: '%s'\n", message);
 }
 
+void log_print (const char* stream, const char* message)
+{
+  printf ("%s: %s\n", stream, message);
+}
+
 int main ()
 {
   printf ("Results of vsh_test:\n");
   
   try
   {
-    Test test (L"DX11 device test window (vsh)");
+    common::LogFilter filter ("*", &log_print);
+
+    Test test (L"DX11 device test window (vsh)", "debug=1");
 
     stl::string shader_source = read_shader (SHADER_FILE_NAME);
 

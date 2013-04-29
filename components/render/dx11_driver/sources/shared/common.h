@@ -39,6 +39,7 @@ typedef xtl::com_ptr<ID3D11VertexShader>       DxVertexShaderPtr;
 typedef xtl::com_ptr<ID3D11InputLayout>        DxInputLayoutPtr;
 typedef xtl::com_ptr<ID3D11Buffer>             DxBufferPtr;
 typedef xtl::com_ptr<ID3D10Blob>               DxBlobPtr;
+typedef xtl::com_ptr<ID3D11InfoQueue>          DxInfoQueuePtr;
 
 }
 

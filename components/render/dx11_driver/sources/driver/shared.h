@@ -12,7 +12,10 @@
 #include <xtl/common_exceptions.h>
 #include <xtl/intrusive_ptr.h>
 
+#include <common/action_queue.h>
 #include <common/component.h>
+#include <common/lockable.h>
+#include <common/property_map.h>
 #include <common/strlib.h>
 #include <common/utf_converter.h>
 
@@ -349,6 +352,38 @@ class Context: virtual public IDeviceContext, public DeviceObject
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+///Отладочный слой устройства
+///////////////////////////////////////////////////////////////////////////////////////////////////
+class DeviceDebugLayer: public xtl::noncopyable, private common::Lockable
+{
+  public:
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Конструктор / деструктор
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    DeviceDebugLayer  (const DxDevicePtr& device);
+    ~DeviceDebugLayer ();
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Остановка
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void StopAndJoin ();
+
+  private:
+    void UpdateMessages ();
+    void UpdateMessagesCore ();
+
+    typedef xtl::uninitialized_storage<char> Buffer;
+
+  private:
+    Log            log;                      //поток отладочного протоколирования
+    DxDevicePtr    device;                   //устройство отрисовки
+    DxInfoQueuePtr info_queue;               //очередь информационных сообщений
+    common::Action update_action;            //действие обновления сообщений
+    UINT64         processed_messages_count; //количество обработанных сообщений
+    Buffer         message_buffer;           //буфер сообщения
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Устройство отрисовки
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 class Device: virtual public IDevice, public Object
@@ -411,8 +446,10 @@ class Device: virtual public IDevice, public Object
     IDeviceContext* GetImmediateContext ();
 
   private:
-    ITexture* CreateTexture (const TextureDesc&, const TextureData*);
-    void      InitDefaults  ();
+    ITexture* CreateTexture   (const TextureDesc&, const TextureData*);
+    void      InitDefaults    ();
+    void      StartDebugLayer ();
+    void      StopDebugLayer  ();
 
   private:
     AdapterPtr                         adapter;               //адаптер устройства
@@ -426,6 +463,7 @@ class Device: virtual public IDevice, public Object
     stl::auto_ptr<ShaderManager>       shader_manager;        //менеджер шейдеров
     InputLayoutPtr                     default_input_layout;  //входной лэйаут по умолчанию
     IProgramPtr                        default_program;       //программа по умолчанию
+    stl::auto_ptr<DeviceDebugLayer>    debug_layer;           //отладочный слой
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
