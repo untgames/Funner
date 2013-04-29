@@ -414,7 +414,7 @@ void IOsPlatform::Login (const char* app_id, const PlatformLoginCallback& callba
   if ([[UIApplication sharedApplication] openURL:[NSURL URLWithString:url]])
     return;
 
-  url = [NSString stringWithFormat:@"https://m.facebook.com/dialog/oauth?client_id=%s&redirect_uri=%s&display=touch&response_type=token%s", app_id, app_base_uri.c_str (), params.c_str ()];
+  url = [NSString stringWithFormat:@"https://m.facebook.com/dialog/oauth?type=user_agent&sdk=ios&client_id=%s&redirect_uri=%s&display=touch&response_type=token%s", app_id, app_base_uri.c_str (), params.c_str ()];
 
   if ([[UIApplication sharedApplication] openURL:[NSURL URLWithString:url]])
     return;
