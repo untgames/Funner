@@ -2,11 +2,12 @@ package com.untgames.funner.store;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.util.Log;
 
 import com.untgames.funner.application.EngineActivity;
 
-public class Store implements EngineActivity.EngineActivityEventListener
+public class Store implements EngineActivity.EngineActivityEventListener, EngineActivity.EngineActivityResultListener
 {
   private static final String TAG                   = "funner.Store";
   private static final int    PURCHASE_REQUEST_CODE = 343467;
@@ -18,11 +19,15 @@ public class Store implements EngineActivity.EngineActivityEventListener
   public void initialize (EngineActivity inActivity) 
   {
   	if (activity != null)
+  	{
   		activity.removeEventListener (this);
+  		activity.removeResultListener (this);
+  	}
   	
   	activity = inActivity;
   	
   	activity.addEventListener (this);
+  	activity.addResultListener (this);
   	
     if (helper != null)
     	throw new IllegalStateException ("Already initialized");
@@ -51,6 +56,11 @@ public class Store implements EngineActivity.EngineActivityEventListener
       helper.dispose ();
       helper = null;
     }
+	}
+	
+	public boolean handleEngineActivityResult (int requestCode, int resultCode, Intent data)
+	{
+    return helper.handleActivityResult (requestCode, resultCode, data);
 	}
 
   public void buyProduct (final Activity activity, final String sku, final int payloadValue)

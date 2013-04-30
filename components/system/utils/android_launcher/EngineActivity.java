@@ -55,11 +55,18 @@ public class EngineActivity extends Activity
 		void handleEngineActivityEvent (EventType eventType);
 	}
 
+	///Интерфейс слушателя результатов запуска других activity
+	public interface EngineActivityResultListener
+	{
+		boolean handleEngineActivityResult (int requestCode, int resultCode, Intent data);
+	}
+
 	private static final String TAG = "funner";
 			
-  private static boolean isLoaded  = false;
-  private ViewGroup      views     = null;
-  private List           listeners = new ArrayList ();
+  private static boolean isLoaded        = false;
+  private ViewGroup      views           = null;
+  private List           eventListeners  = new ArrayList ();
+  private List           resultListeners = new ArrayList ();
 
 ///Загрузчик
   @Override
@@ -451,22 +458,46 @@ public class EngineActivity extends Activity
 /// Работа с событиями
   public void addEventListener (EngineActivityEventListener listener)  
   {
-    listeners.add (listener);
+    eventListeners.add (listener);
   }
   
   public void removeEventListener (EngineActivityEventListener listener)   
   {
-    listeners.remove (listener);
+    eventListeners.remove (listener);
   }
  
   private void notify (EventType eventType) 
   {
-    Iterator i = listeners.iterator ();
+    Iterator i = eventListeners.iterator ();
     
     while (i.hasNext())  
     {
       ((EngineActivityEventListener) i.next()).handleEngineActivityEvent(eventType);
     }
+  }
+  
+/// Работа с результатами запуска других активити
+  public void addResultListener (EngineActivityResultListener listener)  
+  {
+    resultListeners.add (listener);
+  }
+  
+  public void removeResultListener (EngineActivityResultListener listener)   
+  {
+    resultListeners.remove (listener);
+  }
+ 
+  protected void onActivityResult (int requestCode, int resultCode, Intent data)
+  {
+    Iterator i = resultListeners.iterator ();
+    
+    while (i.hasNext())  
+    {
+      if (((EngineActivityResultListener) i.next()).handleEngineActivityResult(requestCode, resultCode, data))  //result handled
+      	return;
+    }
+    
+    super.onActivityResult(requestCode, resultCode, data);
   }
   
 /// Точка входа в native код
