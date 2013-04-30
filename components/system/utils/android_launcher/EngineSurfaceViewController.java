@@ -30,7 +30,7 @@ public class EngineSurfaceViewController extends EngineViewController
 
       getHolder ().addCallback (this);
 
-      getHolder ().setFormat (android.graphics.PixelFormat.RGBA_8888);
+      getHolder ().setFormat (android.graphics.PixelFormat.RGB_565); //RGBA_8888 not supported on some devices 
         
       if (getHolder ().getSurface () != null && getHolder ().getSurface ().isValid ())
         surfaceCreated (getHolder ());

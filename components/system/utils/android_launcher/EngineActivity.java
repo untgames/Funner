@@ -28,8 +28,11 @@ import android.widget.FrameLayout;
 import java.io.*;
 import java.net.CookieHandler;
 import java.security.MessageDigest;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Formatter;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
 import org.apache.http.client.CookieStore;
@@ -38,10 +41,25 @@ import org.apache.http.impl.client.DefaultHttpClient;
 /// Данный класс используется для запуска внешних shared-library
 public class EngineActivity extends Activity
 {
+	///Типы посылаемых событий
+	public enum EventType
+	{
+		ON_PAUSE, 
+		ON_RESUME, 
+		ON_DESTROY 
+	}
+	
+	///Интерфейс слушателя событий
+	public interface EngineActivityEventListener
+	{
+		void handleEngineActivityEvent (EventType eventType);
+	}
+
 	private static final String TAG = "funner";
 			
-  private static boolean isLoaded = false;
-  private ViewGroup      views    = null;
+  private static boolean isLoaded  = false;
+  private ViewGroup      views     = null;
+  private List           listeners = new ArrayList ();
 
 ///Загрузчик
   @Override
@@ -206,6 +224,8 @@ public class EngineActivity extends Activity
   {
     onPauseCallback ();
     super.onPause ();
+    
+    notify (EventType.ON_PAUSE);
   }  
   
 ///Восстановление приложения
@@ -214,6 +234,8 @@ public class EngineActivity extends Activity
   {
     onResumeCallback ();
     super.onResume ();
+    
+    notify (EventType.ON_RESUME);
   }    
     
 ///Завершение приложения
@@ -221,6 +243,8 @@ public class EngineActivity extends Activity
   public void onDestroy ()
   {
     super.onDestroy ();
+    
+    notify (EventType.ON_DESTROY);
   }        
     
 ///Нехватка памяти
@@ -424,6 +448,27 @@ public class EngineActivity extends Activity
     startActivity (intent);
   }
 
+/// Работа с событиями
+  public void addEventListener (EngineActivityEventListener listener)  
+  {
+    listeners.add (listener);
+  }
+  
+  public void removeEventListener (EngineActivityEventListener listener)   
+  {
+    listeners.remove (listener);
+  }
+ 
+  private void notify (EventType eventType) 
+  {
+    Iterator i = listeners.iterator ();
+    
+    while (i.hasNext())  
+    {
+      ((EngineActivityEventListener) i.next()).handleEngineActivityEvent(eventType);
+    }
+  }
+  
 /// Точка входа в native код
   public native int startApplication (String programName, String workDir, String programArgs, String envVars);  
 

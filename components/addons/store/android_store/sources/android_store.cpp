@@ -30,6 +30,7 @@ class AndroidStore
       , initialize_started (false)
       , can_buy_products (false)
       , store_class (0)
+      , store (0)
     {
     }
 
@@ -37,6 +38,8 @@ class AndroidStore
     {
       if (store_class)
         get_env ().DeleteLocalRef (store_class);
+      if (store)
+        get_env ().DeleteLocalRef (store);
     }
 
 ///Инициализация
@@ -57,9 +60,17 @@ class AndroidStore
 
       JNIEnv* env = &get_env ();
 
-      jmethodID initialize_method = find_static_method (env, store_class, "initialize", "(Lcom/untgames/funner/application/EngineActivity;)V");
+      if (!store)
+      {
+        store = env->NewObject (store_class, store_init_method);
 
-      env->CallStaticVoidMethod (store_class, initialize_method, get_activity ());
+        if (!store)
+          throw xtl::format_operation_exception ("store::android_store::AndroidStore::Initialize", "Can't create store object");
+      }
+
+      jmethodID initialize_method = find_method (env, store_class, "initialize", "(Lcom/untgames/funner/application/EngineActivity;)V");
+
+      env->CallVoidMethod (store, initialize_method, get_activity ());
 
       return return_value;
     }
@@ -156,9 +167,7 @@ class AndroidStore
 
         JNIEnv* env = &get_env ();
 
-        jmethodID buy_method = find_static_method (env, store_class, "buyProduct", "(Landroid/app/Activity;Ljava/lang/String;I)V");
-
-        env->CallStaticVoidMethod (store_class, buy_method, get_activity (), tojstring (product_id).get (), payload_value);
+        env->CallVoidMethod (store, buy_method, get_activity (), tojstring (product_id).get (), payload_value);
 
         pending_transactions.push_back (new_transaction);
 
@@ -188,6 +197,9 @@ class AndroidStore
        env->DeleteLocalRef (store_class);
 
      store_class = (jclass)env->NewGlobalRef (store_class_ref);
+
+     store_init_method = find_method (env, store_class, "<init>", "()V");
+     buy_method        = find_method (env, store_class, "buyProduct", "(Landroid/app/Activity;Ljava/lang/String;I)V");
 
      try
      {
@@ -243,6 +255,9 @@ class AndroidStore
     StoreSignal         store_signal;             //соединение оповещения обновления транзакций
     OnInitializedSignal on_initialized_signal;    //соединение оповещения завершения инициализации магазина
     jclass              store_class;              //класс Store
+    jobject             store;                    //объект Store
+    jmethodID           store_init_method;        //конструктор Store
+    jmethodID           buy_method;               //метод покупки
     TransactionsArray   pending_transactions;     //текущие незавершенные транзакции
 };
 

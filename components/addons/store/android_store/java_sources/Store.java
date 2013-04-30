@@ -6,20 +6,23 @@ import android.util.Log;
 
 import com.untgames.funner.application.EngineActivity;
 
-public class Store 
+public class Store implements EngineActivity.EngineActivityEventListener
 {
   private static final String TAG                   = "funner.Store";
   private static final int    PURCHASE_REQUEST_CODE = 343467;
 
-	private static IabHelper      helper;
-	private static EngineActivity activity;
-	private static boolean        purchase_in_progress;
+	private IabHelper      helper;
+	private EngineActivity activity;
+	private boolean        purchase_in_progress;
 	
-  public static void initialize (EngineActivity inActivity) 
+  public void initialize (EngineActivity inActivity) 
   {
+  	if (activity != null)
+  		activity.removeEventListener (this);
+  	
   	activity = inActivity;
   	
-  	//TODO signup for activity onDestroy and dispose helper
+  	activity.addEventListener (this);
   	
     if (helper != null)
     	throw new IllegalStateException ("Already initialized");
@@ -35,8 +38,22 @@ public class Store
       }
     });
   }
-  
-  public static void buyProduct (final Activity activity, final String sku, final int payloadValue)
+
+	public void handleEngineActivityEvent (EngineActivity.EventType eventType)
+	{
+		if (eventType != EngineActivity.EventType.ON_DESTROY)
+			return;
+
+    Log.d (TAG, "Destroying helper.");
+    
+    if (helper != null)
+    {
+      helper.dispose ();
+      helper = null;
+    }
+	}
+
+  public void buyProduct (final Activity activity, final String sku, final int payloadValue)
   {
   	//TODO make purchase queue
   	
@@ -60,5 +77,5 @@ public class Store
   	});
   }
   
-  public static native void onInitializedCallback(boolean canBuyProducts);
+  public native void onInitializedCallback(boolean canBuyProducts);
 }
