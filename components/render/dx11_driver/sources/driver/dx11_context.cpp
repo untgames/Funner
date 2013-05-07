@@ -71,7 +71,7 @@ void Context::ISSetInputLayout (IInputLayout* in_state)
 {
   try
   {
-    InputLayout* state = cast_object<InputLayout> (*this, in_state, "", "state");
+    InputLayout* state = cast_object<InputLayout> (in_state, "", "state");
 
     input_manager_context.SetInputLayout (state);
     shader_manager_context.SetInputLayout (state);

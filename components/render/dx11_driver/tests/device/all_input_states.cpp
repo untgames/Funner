@@ -1,6 +1,7 @@
 #include "shared.h"
 
-size_t output_mode = OutputMode_Default;
+//size_t output_mode = OutputMode_Default;
+size_t output_mode = OutputMode_All;
 size_t total_tests   = 0;
 size_t success_tests = 0;
 size_t wrong_tests   = 0;
@@ -44,24 +45,26 @@ void test_input_layout_desc(const InputLayoutDesc& desc, IDevice* device)
     device->GetImmediateContext ()->ISSetInputLayout(device->CreateInputLayout(desc));
     device->GetImmediateContext ()->Draw(PrimitiveType_PointList, 0, 0);
     
-    if (output_mode & OutputMode_Success)
+//    if (output_mode & OutputMode_Success)
     {
       print_input_layout_desc (desc);
 
       printf ("Testing... OK\n");
+      fflush (stdout);
     }
     success_tests++;
   }
-  catch (xtl::argument_exception&)
-  {
-    wrong_tests++;
-  }
+//  catch (xtl::argument_exception&)
+//  {
+//    wrong_tests++;
+//  }
   catch (std::exception& exception)
   {
-    if (output_mode & OutputMode_Fail)
+//    if (output_mode & OutputMode_Fail)
     {
       print_input_layout_desc (desc);
       printf ("Testing... FAIL! exception: %s\n", exception.what ());
+      fflush (stdout);
     }
     fail_tests++;
   }
