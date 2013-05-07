@@ -187,8 +187,8 @@ TargetConstantBuffer::TargetConstantBuffer (const DeviceManager& device_manager,
     switch (usage)
     {
       default:
-      case UsageMode_Default:  desc.Usage = D3D11_USAGE_DEFAULT; break;
-      case UsageMode_Static:   desc.Usage = D3D11_USAGE_IMMUTABLE; break;
+      case UsageMode_Static:   //desc.Usage = D3D11_USAGE_IMMUTABLE; break;
+      case UsageMode_Default:  //desc.Usage = D3D11_USAGE_DEFAULT; break;
       case UsageMode_Dynamic:  desc.Usage = D3D11_USAGE_DYNAMIC; break;
       case UsageMode_Stream:   desc.Usage = D3D11_USAGE_STAGING; break;
     }

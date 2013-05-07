@@ -1,5 +1,3 @@
-  //неверно сделана группировка: копирование накрест не работает!!!
-
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Синхронизатор буфера
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -11,12 +9,13 @@ class ShaderBuffersSynchronizer: public xtl::reference_counter, public xtl::trac
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     struct Chunk
     {
-      size_t slot;       //индекс слота
-      size_t src_offset; //смещение в исходном буфере
-      size_t dst_offset; //смещение в результирующем буфере
-      size_t size;       //размер блока
+      size_t                          slot;       //индекс слота
+      size_t                          src_offset; //смещение в исходном буфере
+      size_t                          dst_offset; //смещение в результирующем буфере
+      size_t                          size;       //размер блока
+      ShaderParameterConvertOperation operation;  //операция преобразования
 
-      Chunk () : slot (), src_offset (), dst_offset (), size () {}
+      Chunk () : slot (), src_offset (), dst_offset (), size (), operation (ShaderParameterConvertOperation_Copy) {}
 
       bool operator < (const Chunk&) const;
     };
@@ -61,7 +60,26 @@ class ShaderBuffersSynchronizer: public xtl::reference_counter, public xtl::trac
 
       for (; chunk->slot == slot_index; chunk++)
       {
-        memcpy (dst_buffer + chunk->dst_offset, src_buffer + chunk->src_offset, chunk->size);
+        const void* src = src_buffer + chunk->src_offset;
+        void*       dst = dst_buffer + chunk->dst_offset;
+
+        switch (chunk->operation)
+        {
+          case ShaderParameterConvertOperation_Copy:
+            memcpy (dst, src, chunk->size);
+            break;
+          case ShaderParameterConvertOperation_TransposeFloat2x2:
+            math::detail::matrix_transpose ()(*reinterpret_cast<const math::mat2f*> (src), *reinterpret_cast<math::mat2f*> (dst));
+            break;
+          case ShaderParameterConvertOperation_TransposeFloat3x3:
+            math::detail::matrix_transpose ()(*reinterpret_cast<const math::mat3f*> (src), *reinterpret_cast<math::mat3f*> (dst));
+            break;
+          case ShaderParameterConvertOperation_TransposeFloat4x4:
+            math::detail::matrix_transpose ()(*reinterpret_cast<const math::mat4f*> (src), *reinterpret_cast<math::mat4f*> (dst));
+            break;
+          default:
+            break;
+        }
       }
     }
 

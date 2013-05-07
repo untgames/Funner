@@ -53,6 +53,8 @@ ConstantBufferLayout::ConstantBufferLayout (ID3D11ShaderReflectionConstantBuffer
 
       memset (&param, 0, sizeof (param));
 
+      param.convert_operation = ShaderParameterConvertOperation_Copy;
+
       strings.Add (desc.Name);
 
       switch (type_desc.Type)
@@ -108,8 +110,20 @@ ConstantBufferLayout::ConstantBufferLayout (ID3D11ShaderReflectionConstantBuffer
 
           break;
         case D3D10_SVC_MATRIX_ROWS:
+        case D3D10_SVC_MATRIX_COLUMNS:
           if (type_desc.Columns != type_desc.Rows)
             throw xtl::format_not_supported_exception ("", "Non square matrices %ux%u are not supported for shader variable '%s'", type_desc.Rows, type_desc.Columns, desc.Name);
+
+          if (type_desc.Class == D3D10_SVC_MATRIX_COLUMNS)
+          {
+            switch (type_desc.Columns)
+            {
+              case 2:  param.convert_operation = ShaderParameterConvertOperation_TransposeFloat2x2; break;
+              case 3:  param.convert_operation = ShaderParameterConvertOperation_TransposeFloat3x3; break;
+              case 4:  param.convert_operation = ShaderParameterConvertOperation_TransposeFloat4x4; break;
+              default: throw xtl::format_not_supported_exception ("", "Matrix rank %u is not supported for shader variable '%s'", type_desc.Columns, desc.Name);
+            }
+          }
 
           switch (type_desc.Type)
           {
@@ -132,7 +146,7 @@ ConstantBufferLayout::ConstantBufferLayout (ID3D11ShaderReflectionConstantBuffer
           throw xtl::format_not_supported_exception ("", "Class %u is not supported for shader variable '%s'", type_desc.Class, desc.Name);
       }
 
-      param.count  = type_desc.Elements;
+      param.count  = type_desc.Elements ? type_desc.Elements : 1;
       param.offset = desc.StartOffset;
 
         //добавление параметра

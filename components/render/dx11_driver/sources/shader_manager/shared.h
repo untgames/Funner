@@ -18,6 +18,9 @@
 #include <xtl/trackable_ptr.h>
 #include <xtl/uninitialized_storage.h>
 
+#include <math/matrix.h>
+#include <math/utility.h>
+
 #include <common/file.h>
 #include <common/hash.h>
 #include <common/string.h>
@@ -47,26 +50,6 @@ namespace dx11
 
 //forwards
 class ShaderLibrary;
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Тип шейдера
-///////////////////////////////////////////////////////////////////////////////////////////////////
-enum ShaderType
-{
-  ShaderType_Compute,
-  ShaderType_Domain,
-  ShaderType_Geometry,
-  ShaderType_Hull,
-  ShaderType_Pixel,
-  ShaderType_Vertex,
-
-  ShaderType_Num
-};
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Описание параметра шейдера
-///////////////////////////////////////////////////////////////////////////////////////////////////
-struct ShaderParameter: public ProgramParameter {};
 
 #include "shader_code.h"
 #include "constant_buffer_layout.h"
