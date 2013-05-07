@@ -122,30 +122,28 @@ const char* tostring (D3D11_MESSAGE_SEVERITY severity)
 
 void DeviceDebugLayer::UpdateMessagesCore ()
 {
-  UINT64 total_count = info_queue->GetNumStoredMessages();
+  while (info_queue->GetNumStoredMessages() > processed_messages_count)
+  {
+    SIZE_T message_length = 0;
+    UINT64 message_index  = processed_messages_count;
+    
+    check_errors ("ID3D11InfoQueue::GetMessage", info_queue->GetMessage (message_index, 0, &message_length));
 
-  if (total_count < processed_messages_count)
-    return;
+    processed_messages_count++;
 
-  SIZE_T message_length = 0;
-  UINT64 message_index  = processed_messages_count;
-  
-  check_errors ("ID3D11InfoQueue::GetMessage", info_queue->GetMessage (message_index, 0, &message_length));
+    if (!message_length)
+      return;
 
-  processed_messages_count++;
+    message_buffer.resize (message_length + 1, false);
+    
+    char* end = message_buffer.data () + message_buffer.size () - 1;
 
-  if (!message_length)
-    return;
+    *end = 0;
 
-  message_buffer.resize (message_length + 1, false);
-  
-  char* end = message_buffer.data () + message_buffer.size () - 1;
+    D3D11_MESSAGE* message = (D3D11_MESSAGE*)message_buffer.data ();
 
-  *end = 0;
+    check_errors ("ID3D11InfoQueue::GetMessage", info_queue->GetMessage (message_index, message, &message_length));
 
-  D3D11_MESSAGE* message = (D3D11_MESSAGE*)message_buffer.data ();
-
-  check_errors ("ID3D11InfoQueue::GetMessage", info_queue->GetMessage (message_index, message, &message_length));
-
-  log.Printf ("%s/%s: %s", tostring (message->Category), tostring (message->Severity), message->pDescription ? message->pDescription : "<null>");  
+    log.Printf ("%s/%s: %s", tostring (message->Category), tostring (message->Severity), message->pDescription ? message->pDescription : "<null>");  
+  }
 }
