@@ -13,10 +13,14 @@ using namespace render::low_level::dx11;
     Описание реализации состояния контекста менеджера входного уровня
 */
 
+typedef xtl::com_ptr<InputBuffer> InputBufferPtr;
+
 struct InputManagerContextState::Impl: public DeviceObject
 {
-  InputLayoutPtr input_layout; //входной лэйаут  
-  bool           is_dirty;     //флаг "грязности"
+  InputLayoutPtr input_layout;                                      //входной лэйаут  
+  InputBufferPtr vertex_buffers [DEVICE_VERTEX_BUFFER_SLOTS_COUNT]; //вершинные буферы 
+  InputBufferPtr index_buffer;                                      //индексный буфер
+  bool           is_dirty;                                          //флаг "грязности"
 
 /// Конструктор
   Impl (const DeviceManager& device_manager)
@@ -82,28 +86,66 @@ InputLayout* InputManagerContextState::GetInputLayout () const
     Управление вершинными буферами
 */
 
-void InputManagerContextState::SetVertexBuffer (size_t vertex_buffer_slot, IBuffer* buffer)
+void InputManagerContextState::SetVertexBuffer (size_t vertex_buffer_slot, IBuffer* in_buffer)
 {
-  throw xtl::make_not_implemented_exception (__FUNCTION__);
+  try
+  {
+    InputBuffer* buffer = cast_object<InputBuffer> (*impl, in_buffer, "", "buffer");
+
+    if (vertex_buffer_slot >= DEVICE_VERTEX_BUFFER_SLOTS_COUNT)
+      throw xtl::make_range_exception ("", "vertex_buffer_slot", vertex_buffer_slot, DEVICE_VERTEX_BUFFER_SLOTS_COUNT);
+
+    impl->vertex_buffers [vertex_buffer_slot] = buffer;
+
+    impl->UpdateNotify ();
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::low_level::dx11::InputManagerContextState::SetVertexBuffer");
+    throw;
+  }
 }
 
 IBuffer* InputManagerContextState::GetVertexBuffer (size_t vertex_buffer_slot) const
 {
-  throw xtl::make_not_implemented_exception (__FUNCTION__);
+  try
+  {
+    if (vertex_buffer_slot >= DEVICE_VERTEX_BUFFER_SLOTS_COUNT)
+      throw xtl::make_range_exception ("", "vertex_buffer_slot", vertex_buffer_slot, DEVICE_VERTEX_BUFFER_SLOTS_COUNT);
+
+    return impl->vertex_buffers [vertex_buffer_slot].get ();
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::low_level::dx11::InputManagerContextState::GetVertexBuffer");
+    throw;
+  }
 }
 
 /*
     Управление индексным буфером
 */
 
-void InputManagerContextState::SetIndexBuffer (IBuffer* buffer)
+void InputManagerContextState::SetIndexBuffer (IBuffer* in_buffer)
 {
-  throw xtl::make_not_implemented_exception (__FUNCTION__);
+  try
+  {
+    InputBuffer* buffer = cast_object<InputBuffer> (*impl, in_buffer, "", "buffer");
+
+    impl->index_buffer = buffer;
+
+    impl->UpdateNotify ();
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::low_level::dx11::InputManagerContextState::SetIndexBuffer");
+    throw;
+  }
 }
 
 IBuffer* InputManagerContextState::GetIndexBuffer () const
 {
-  throw xtl::make_not_implemented_exception (__FUNCTION__);
+  return impl->index_buffer.get ();
 }
 
 /*
@@ -159,7 +201,20 @@ void InputManagerContext::Bind ()
 {
   try
   {
+      //проверка флага "грязности"
+
+    Impl& impl = GetImpl ();
+
+    if (!impl.is_dirty)
+      return;
+
+      //преобразование контекстной информации
+
     throw xtl::make_not_implemented_exception (__FUNCTION__);
+
+      //очистка флага "грязности"
+
+    impl.is_dirty = false;
   }
   catch (xtl::exception& e)
   {
