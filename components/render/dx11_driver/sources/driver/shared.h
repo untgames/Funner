@@ -342,6 +342,7 @@ class Context: virtual public IDeviceContext, public DeviceObject
 ///Установка состояния подуровней в контекст
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void Bind ();
+    void PrepareDraw (PrimitiveType type);
 
   private:
     DxContextPtr          context;                 //контекст отрисовки
@@ -349,6 +350,7 @@ class Context: virtual public IDeviceContext, public DeviceObject
     TextureManagerContext texture_manager_context; //контекст менеджера текстур
     InputManagerContext   input_manager_context;   //контекст менеджера входного уровня
     ShaderManagerContext  shader_manager_context;  //контекст менеджера шейдеров
+    PrimitiveType         current_primitive_type;  //текущий тип примитивов
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

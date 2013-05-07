@@ -14,6 +14,7 @@ Context::Context (const DxContextPtr& in_context, const DeviceManager& device_ma
   , texture_manager_context (device_manager, in_context)
   , input_manager_context (device_manager, in_context, default_input_layout)
   , shader_manager_context (shader_library, in_context, default_input_layout, default_program)
+  , current_primitive_type (PrimitiveType_Num)
 {
   if (!context)
     throw xtl::make_null_argument_exception ("render::low_level::dx11::Context::Context", "context");
@@ -617,13 +618,51 @@ void Context::Bind ()
     Рисование примитивов
 */
 
-void Context::Draw (PrimitiveType primitive_type, size_t first_vertex, size_t vertices_count)
+namespace
+{
+
+D3D11_PRIMITIVE_TOPOLOGY get_topology (PrimitiveType type)
+{
+  switch (type)
+  {
+    case PrimitiveType_PointList:       return D3D11_PRIMITIVE_TOPOLOGY_POINTLIST;
+    case PrimitiveType_LineList:        return D3D11_PRIMITIVE_TOPOLOGY_LINELIST;
+    case PrimitiveType_LineStrip:       return D3D11_PRIMITIVE_TOPOLOGY_LINESTRIP;
+    case PrimitiveType_TriangleList:    return D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
+    case PrimitiveType_TriangleStrip:   return D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP;
+    case PrimitiveType_TriangleFan:     throw xtl::format_not_supported_exception ("", "Primitive type %s not supported", get_name (type));
+    default:                            throw xtl::make_argument_exception ("", "primitive_type", type);
+  }
+}
+
+}
+
+void Context::PrepareDraw (PrimitiveType type)
 {
   try
   {
     Bind ();
 
-    throw xtl::make_not_implemented_exception (__FUNCTION__);
+    if (current_primitive_type != type)
+    {
+      context->IASetPrimitiveTopology (get_topology (type));
+
+      current_primitive_type = type;
+    }
+  }
+  catch (xtl::exception& exception)
+  {
+    exception.touch ("render::low_level::dx11::Context::PrepareDraw");
+    throw;
+  }  
+}
+
+void Context::Draw (PrimitiveType primitive_type, size_t first_vertex, size_t vertices_count)
+{
+  try
+  {
+    PrepareDraw   (primitive_type);
+    context->Draw (vertices_count, first_vertex);
   }
   catch (xtl::exception& exception)
   {
@@ -636,9 +675,8 @@ void Context::DrawIndexed (PrimitiveType primitive_type, size_t first_index, siz
 {
   try
   {
-    Bind ();
-
-    throw xtl::make_not_implemented_exception (__FUNCTION__);
+    PrepareDraw          (primitive_type);
+    context->DrawIndexed (indices_count, first_index, base_vertex);
   }
   catch (xtl::exception& exception)
   {
@@ -651,9 +689,8 @@ void Context::DrawInstanced (PrimitiveType primitive_type, size_t vertex_count_p
 {
   try
   {
-    Bind ();
-
-    throw xtl::make_not_implemented_exception (__FUNCTION__);
+    PrepareDraw            (primitive_type);
+    context->DrawInstanced (vertex_count_per_instance, instance_count, first_vertex, first_instance_location);
   }
   catch (xtl::exception& exception)
   {
@@ -666,9 +703,8 @@ void Context::DrawIndexedInstanced (PrimitiveType primitive_type, size_t index_c
 {
   try
   {
-    Bind ();
-
-    throw xtl::make_not_implemented_exception (__FUNCTION__);
+    PrepareDraw                   (primitive_type);
+    context->DrawIndexedInstanced (index_count_per_instance, instance_count, first_index, base_vertex, first_instance_location);
   }
   catch (xtl::exception& exception)
   {
@@ -681,9 +717,8 @@ void Context::DrawAuto (PrimitiveType primitive_type)
 {
   try
   {
-    Bind ();
-
-    throw xtl::make_not_implemented_exception (__FUNCTION__);
+    PrepareDraw       (primitive_type);
+    context->DrawAuto ();
   }
   catch (xtl::exception& exception)
   {
@@ -700,7 +735,7 @@ void Context::Flush ()
 {
   try
   {
-    throw xtl::make_not_implemented_exception (__FUNCTION__);
+    context->Flush ();
   }
   catch (xtl::exception& exception)
   {
