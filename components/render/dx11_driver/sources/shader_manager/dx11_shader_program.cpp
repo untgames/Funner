@@ -185,17 +185,7 @@ DxInputLayoutPtr Program::CreateInputLayout (const D3D11_INPUT_ELEMENT_DESC* des
 
       //создание лэйаута
 
-    for (size_t i=0; i<descs_count; i++)
-    {
-      const D3D11_INPUT_ELEMENT_DESC& desc = descs [i];
-
-      printf ("desc[%d]: semantic='%s' index=%u format=%u slot=%u offset=%u class=%u step_rate=%u\n", i, desc.SemanticName, desc.SemanticIndex, desc.Format, desc.InputSlot,
-        desc.AlignedByteOffset, desc.InputSlotClass, desc.InstanceDataStepRate);
-    }
-
     ID3D11InputLayout* dx_layout = 0;
-
-    printf ("code=%p code_size=%u\n", code.GetCompiledData (), code.GetCompiledDataSize ());
 
     check_errors ("ID3D11Device::CreateInputLayout", GetDevice ().CreateInputLayout (descs, descs_count, code.GetCompiledData (), code.GetCompiledDataSize (), &dx_layout));
 
