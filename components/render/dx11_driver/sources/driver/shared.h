@@ -351,6 +351,7 @@ class Context: virtual public IDeviceContext, public DeviceObject
     TextureManagerContext texture_manager_context; //контекст менеджера текстур
     InputManagerContext   input_manager_context;   //контекст менеджера входного уровня
     ShaderManagerContext  shader_manager_context;  //контекст менеджера шейдеров
+    OutputManagerContext  output_manager_context;  //контекст менеджера выходного уровня
     PrimitiveType         current_primitive_type;  //текущий тип примитивов
 };
 

@@ -14,6 +14,7 @@ Context::Context (const DxContextPtr& in_context, const DeviceManager& device_ma
   , texture_manager_context (device_manager, in_context)
   , input_manager_context (device_manager, in_context, default_input_layout)
   , shader_manager_context (shader_library, in_context, default_input_layout, default_program)
+  , output_manager_context (device_manager, in_context)
   , current_primitive_type (PrimitiveType_Num)
 {
   if (!context)
@@ -318,7 +319,7 @@ void Context::RSSetState (IRasterizerState* state)
 {
   try
   {
-    throw xtl::make_not_implemented_exception (__FUNCTION__);
+    output_manager_context.SetRasterizerState (state);
   }
   catch (xtl::exception& e)
   {
@@ -357,7 +358,7 @@ IRasterizerState* Context::RSGetState ()
 {
   try
   {
-    throw xtl::make_not_implemented_exception (__FUNCTION__);
+    return output_manager_context.GetRasterizerState ();
   }
   catch (xtl::exception& e)
   {
@@ -390,7 +391,6 @@ const Rect& Context::RSGetScissor (size_t render_target_slot)
     e.touch ("render::low_level::dx11::Context::RSGetScissor");
     throw;
   }
-
 }
 
 /*
@@ -399,32 +399,80 @@ const Rect& Context::RSGetScissor (size_t render_target_slot)
 
 void Context::OSSetBlendState (IBlendState* state)
 {
-  throw xtl::make_not_implemented_exception (__FUNCTION__);
+  try
+  {
+    output_manager_context.SetBlendState (state);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::low_level::dx11::Context::OSSetBlendState");
+    throw;
+  }
 }
 
 void Context::OSSetDepthStencilState (IDepthStencilState* state)
 {
-  throw xtl::make_not_implemented_exception (__FUNCTION__);
+  try
+  {
+    output_manager_context.SetDepthStencilState (state);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::low_level::dx11::Context::OSSetDepthStencilState");
+    throw;
+  }
 }
 
 void Context::OSSetStencilReference (size_t reference)
 {
-  throw xtl::make_not_implemented_exception (__FUNCTION__);
+  try
+  {
+    output_manager_context.SetStencilReference (reference);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::low_level::dx11::Context::OSSetStencilReference");
+    throw;
+  }
 }
 
 IBlendState* Context::OSGetBlendState ()
 {
-  throw xtl::make_not_implemented_exception (__FUNCTION__);
+  try
+  {
+    return output_manager_context.GetBlendState ();
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::low_level::dx11::Context::OSGetBlendState");
+    throw;
+  }
 }
 
 IDepthStencilState* Context::OSGetDepthStencilState ()
 {
-  throw xtl::make_not_implemented_exception (__FUNCTION__);
+  try
+  {
+    return output_manager_context.GetDepthStencilState ();
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::low_level::dx11::Context::OSGetDepthStencilState");
+    throw;
+  }
 }
 
 size_t Context::OSGetStencilReference ()
 {
-  throw xtl::make_not_implemented_exception (__FUNCTION__);
+  try
+  {
+    return output_manager_context.GetStencilReference ();
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::low_level::dx11::Context::OSGetStencilReference");
+    throw;
+  }
 }
 
 /*
