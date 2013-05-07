@@ -50,7 +50,7 @@ IBuffer* InputManager::CreateBuffer (const BufferDesc& desc)
 {
   try
   {
-    throw xtl::make_not_implemented_exception (__FUNCTION__);
+    return new InputBuffer (impl->GetDeviceManager (), desc);
   }
   catch (xtl::exception& e)
   {

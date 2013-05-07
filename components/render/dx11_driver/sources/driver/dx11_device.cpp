@@ -23,7 +23,7 @@ Device::Device (const AdapterPtr& in_adapter, const char* init_string)
 
     common::PropertyMap init_properties = common::parse_init_string (init_string);
 
-    bool is_debug = init_properties.GetInteger ("debug") != 0;
+    bool is_debug = init_properties.IsPresent ("debug") && init_properties.GetInteger ("debug");
 
       //сохранение аргументов
 
