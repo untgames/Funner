@@ -24,7 +24,7 @@ DeviceDebugLayer::DeviceDebugLayer (const DxDevicePtr& in_device)
 
     ID3D11InfoQueue* dx_info_queue = 0;
 
-    check_errors ("ID3D11Device::QueryInterface", device->QueryInterface (__uuidof (ID3D10InfoQueue), (void**)&dx_info_queue));
+    check_errors ("ID3D11Device::QueryInterface", device->QueryInterface (__uuidof (ID3D11InfoQueue), (void**)&dx_info_queue));
 
     if (!dx_info_queue)
       throw xtl::format_operation_exception ("", "ID3D11Device::QueryInterface failed");
