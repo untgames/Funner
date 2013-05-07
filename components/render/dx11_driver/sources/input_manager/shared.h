@@ -66,4 +66,3 @@ class InputBuffer: virtual public IBuffer, public DeviceObject
 }
 
 #endif
-

@@ -30,6 +30,7 @@
 #include <shared/error.h>
 #include <shared/input_manager.h>
 #include <shared/object.h>
+#include <shared/output_manager.h>
 #include <shared/render_target_manager.h>
 #include <shared/shader_manager.h>
 #include <shared/texture_manager.h>
@@ -463,6 +464,7 @@ class Device: virtual public IDevice, public Object
     stl::auto_ptr<TextureManager>      texture_manager;       //менеджер текстур
     stl::auto_ptr<InputManager>        input_manager;         //менеджер входного уровня
     stl::auto_ptr<ShaderManager>       shader_manager;        //менеджер шейдеров
+    stl::auto_ptr<OutputManager>       output_manager;        //менеджер выходного уровня
     InputLayoutPtr                     default_input_layout;  //входной лэйаут по умолчанию
     IProgramPtr                        default_program;       //программа по умолчанию
     stl::auto_ptr<DeviceDebugLayer>    debug_layer;           //отладочный слой

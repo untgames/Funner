@@ -69,6 +69,7 @@ Device::Device (const AdapterPtr& in_adapter, const char* init_string)
     texture_manager.reset       (new TextureManager (*device_manager));
     input_manager.reset         (new InputManager (*device_manager));
     shader_manager.reset        (new ShaderManager (*device_manager));
+    output_manager.reset        (new OutputManager (*device_manager));
 
       //инициализация ресурсов по умолчанию
 
@@ -440,7 +441,7 @@ IRasterizerState* Device::CreateRasterizerState (const RasterizerDesc& desc)
 {
   try
   {
-    throw xtl::make_not_implemented_exception (__FUNCTION__);
+    return output_manager->CreateRasterizerState (desc);
   }
   catch (xtl::exception& exception)
   {
@@ -457,7 +458,7 @@ IBlendState* Device::CreateBlendState (const BlendDesc& desc)
 {
   try
   {
-    throw xtl::make_not_implemented_exception (__FUNCTION__);
+    return output_manager->CreateBlendState (desc);
   }
   catch (xtl::exception& exception)
   {
@@ -470,7 +471,7 @@ IDepthStencilState* Device::CreateDepthStencilState (const DepthStencilDesc& des
 {
   try
   {
-    throw xtl::make_not_implemented_exception (__FUNCTION__);
+    return output_manager->CreateDepthStencilState (desc);
   }
   catch (xtl::exception& exception)
   {
@@ -530,7 +531,7 @@ IDeviceContext* Device::CreateDeferredContext ()
 {
   try
   {
-    throw xtl::make_not_implemented_exception (__FUNCTION__); //can't be implmented only via DX deferred contexts (need MT guard)
+    throw xtl::make_not_implemented_exception (__FUNCTION__); //can't be implemented only via DX deferred contexts (need MT guard)
   }
   catch (xtl::exception& e)
   {
