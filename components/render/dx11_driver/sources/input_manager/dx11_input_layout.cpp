@@ -10,12 +10,13 @@ using namespace render::low_level::dx11;
 typedef stl::vector<D3D11_INPUT_ELEMENT_DESC> InputElementArray;
 
 struct InputLayout::Impl
-{
-  InputElementArray vertex_elements;      //вершинные элементы
-  DXGI_FORMAT       index_format;         //формат индексов
-  size_t            index_buffer_offset;  //смещение в индексном буфере    
-  size_t            vertex_elements_hash; //хэш вершинных элементов
-  size_t            hash;                 //хэш
+{  
+  InputElementArray vertex_elements;                            //вершинные элементы
+  DXGI_FORMAT       index_format;                               //формат индексов
+  size_t            index_buffer_offset;                        //смещение в индексном буфере
+  size_t            vertex_elements_hash;                       //хэш вершинных элементов
+  UINT              strides [DEVICE_VERTEX_BUFFER_SLOTS_COUNT]; //шаги между вершинами
+  size_t            hash;                                       //хэш
 };
 
 /*
@@ -33,12 +34,12 @@ InputLayout::InputLayout (const InputLayoutDesc& desc)
 
       //преобразование вершинных атрибутов
 
+    memset (impl->strides, 0, sizeof (impl->strides));
+
     if (desc.vertex_attributes_count)
     {
       if (!desc.vertex_attributes)
         throw xtl::make_null_argument_exception ("", "desc.vertex_attributes_count");
-
-      size_t stride = 0;
 
       for (size_t i=0, count=desc.vertex_attributes_count; i<count; i++)
       {
@@ -152,26 +153,23 @@ InputLayout::InputLayout (const InputLayoutDesc& desc)
             throw xtl::format_exception<xtl::argument_exception> ("", "desc.vertex_attributes[%u].format", i, src_va.format);
         }
 
-          //обновление шага между элементами
-                 
-        size_t attribute_size = src_va.offset + elements_count * type_size;
-
-        if (attribute_size > stride)
-          stride = attribute_size;
-
           //добавление элемента
 
         impl->vertex_elements.push_back (dst_va);        
       }
 
-        //TODO: dummy stride
-      
       for (size_t i=0, count=desc.vertex_attributes_count; i<count; i++)
       {
         const VertexAttribute& src_va = desc.vertex_attributes [i];
 
-        if (src_va.stride != stride)
-          throw xtl::format_exception<xtl::not_supported_exception> ("", "Stride for desc.vertex_attributes[%u].stride=%u is not supported (not equal to total stride %u)", i, src_va.stride, stride);
+        size_t& slot_stride = impl->strides [src_va.slot];
+
+        if (slot_stride)
+        {
+          if (src_va.stride != slot_stride)
+            throw xtl::format_exception<xtl::not_supported_exception> ("", "Stride for desc.vertex_attributes[%u].stride=%u is not supported (not equal to slot stride %u)", i, src_va.stride, slot_stride);
+        }
+        else slot_stride = src_va.stride;
       }
     }
 
@@ -248,4 +246,13 @@ size_t InputLayout::GetHash () const
 size_t InputLayout::GetVertexElementsHash () const
 {
   return impl->vertex_elements_hash;
+}
+
+/*
+    Шаги между вершинами
+*/
+
+const UINT* InputLayout::GetStrides () const
+{
+  return &impl->strides [0];
 }

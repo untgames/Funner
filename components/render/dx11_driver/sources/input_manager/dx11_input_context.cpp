@@ -197,6 +197,13 @@ InputManagerContext::Impl& InputManagerContext::GetImpl () const
   return static_cast<Impl&> (InputManagerContextState::GetImpl ());
 }
 
+namespace
+{
+
+const UINT VB_OFFSETS [DEVICE_VERTEX_BUFFER_SLOTS_COUNT] = {0};
+
+}
+
 void InputManagerContext::Bind ()
 {
   try
@@ -210,7 +217,18 @@ void InputManagerContext::Bind ()
 
       //преобразование контекстной информации
 
-    throw xtl::make_not_implemented_exception (__FUNCTION__);
+    InputLayout* layout = impl.input_layout ? impl.input_layout.get () : impl.default_layout.get ();
+
+    ID3D11Buffer* buffers [DEVICE_VERTEX_BUFFER_SLOTS_COUNT];
+
+    ID3D11Buffer**  dst_buffer = buffers;
+    InputBufferPtr* src_buffer = impl.vertex_buffers;
+
+    for (size_t i=0; i<DEVICE_VERTEX_BUFFER_SLOTS_COUNT; i++, dst_buffer++, src_buffer++)
+      *dst_buffer = *src_buffer ? &(*src_buffer)->GetHandle () : (ID3D11Buffer*)0;
+
+    impl.context->IASetVertexBuffers (0, DEVICE_VERTEX_BUFFER_SLOTS_COUNT, buffers, layout->GetStrides (), VB_OFFSETS);
+    impl.context->IASetIndexBuffer   (impl.index_buffer ? &impl.index_buffer->GetHandle () : (ID3D11Buffer*)0, layout->GetIndexFormat (), layout->GetIndexBufferOffset ());
 
       //очистка флага "грязности"
 

@@ -49,6 +49,11 @@ class InputBuffer: virtual public IBuffer, public DeviceObject
     void SetData (size_t offset, size_t size, const void* data);
     void GetData (size_t offset, size_t size, void* data);
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Получение буфера
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    ID3D11Buffer& GetHandle () { return *buffer; }
+
   private:
     BufferDesc  desc;    //дескриптор буфера
     DxBufferPtr buffer;  //буфер      

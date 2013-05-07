@@ -604,7 +604,7 @@ void Context::Bind ()
   {
     render_target_context.Bind ();
     texture_manager_context.Bind ();
-//    input_manager_context.Bind ();
+    input_manager_context.Bind ();
     shader_manager_context.Bind ();
   }
   catch (xtl::exception& exception)
