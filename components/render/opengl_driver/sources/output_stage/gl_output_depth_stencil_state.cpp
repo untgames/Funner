@@ -44,7 +44,6 @@ GLenum get_gl_compare_mode (CompareMode mode, const char* source, const char* pa
     case CompareMode_GreaterEqual: return GL_GEQUAL;
     default:
       throw xtl::make_argument_exception (source, param, mode);
-      return 0;
   }
 }
 
@@ -60,7 +59,6 @@ GLenum get_gl_stencil_operation (StencilOperation operation, const char* source,
     case StencilOperation_Invert:    return GL_INVERT;
     default:
       throw xtl::make_argument_exception (source, param, operation);
-      return 0;
   }
 }
 
