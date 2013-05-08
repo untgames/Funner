@@ -70,7 +70,7 @@ class ApplicationThread: private ApplicationStartArgs
       : ApplicationStartArgs (program_name, in_args, in_env_vars)
       , thread (THREAD_NAME, syslib::Thread::Function (xtl::bind (&ApplicationThread::ThreadRoutine, this)))
     {
-      thread.SetPriority (syslib::ThreadPriority_High);
+//      thread.SetPriority (syslib::ThreadPriority_High);
     }
     
 /// Функция нити
@@ -152,7 +152,7 @@ class ApplicationThread: private ApplicationStartArgs
         
         if (apk_path)
           common::FileSystem::AddSearchPath (common::format ("/std/%s", apk_path).c_str ());
-          
+         
         const char* search_paths = getenv (SEARCH_PATHS);
         
         if (search_paths)
