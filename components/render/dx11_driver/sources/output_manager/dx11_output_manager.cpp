@@ -37,7 +37,7 @@ IBlendState* OutputManager::CreateBlendState (const BlendDesc& desc)
 {
   try
   {
-    throw xtl::make_not_implemented_exception (__FUNCTION__);
+    return new BlendState (impl->GetDeviceManager (), desc);
   }
   catch (xtl::exception& e)
   {

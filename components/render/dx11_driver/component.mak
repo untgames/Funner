@@ -20,6 +20,7 @@ RENDER.DX11_DRIVER.SOURCES.IMPORTS      := compile.render.low_level compile.rend
 RENDER.DX11_DRIVER.TESTS.TYPE          := test-suite
 RENDER.DX11_DRIVER.TESTS.SOURCE_DIRS   += tests/driver
 RENDER.DX11_DRIVER.TESTS.SOURCE_DIRS   += tests/device
+RENDER.DX11_DRIVER.TESTS.SOURCE_DIRS   += tests/unit
 RENDER.DX11_DRIVER.TESTS.IMPORTS       := link.render.low_level.dx11_driver run.render.low_level.dx11_driver compile.render.low_level \
                                           compile.system link.system link.common compile.media.image compile.media.geometry \
                                           link.media.image link.media.image.dds link.media.geometry.xmesh

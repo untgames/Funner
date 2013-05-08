@@ -11,7 +11,8 @@ using namespace render::low_level::dx11;
 
 struct OutputManagerContextState::Impl: public DeviceObject
 {
-  bool is_dirty; //флаг "грязности"
+  BlendStatePtr blend_state; //состояние подуровня смешивания цветов
+  bool          is_dirty;    //флаг "грязности"
 
 /// Конструктор
   Impl (const DeviceManager& manager)
@@ -83,11 +84,18 @@ IRasterizerState* OutputManagerContextState::GetRasterizerState () const
     Настройка подуровня смешивания цветов
 */
 
-void OutputManagerContextState::SetBlendState (IBlendState*)
+void OutputManagerContextState::SetBlendState (IBlendState* in_state)
 {
   try
   {
-    throw xtl::make_not_implemented_exception (__FUNCTION__);
+    BlendState* state = cast_object<BlendState> (*impl, in_state, "", "state");
+
+    if (state == impl->blend_state)
+      return;
+
+    impl->blend_state = state;
+
+    impl->UpdateNotify ();
   }
   catch (xtl::exception& e)
   {
@@ -98,7 +106,7 @@ void OutputManagerContextState::SetBlendState (IBlendState*)
 
 IBlendState* OutputManagerContextState::GetBlendState () const
 {
-  throw xtl::make_not_implemented_exception (__FUNCTION__);
+  return impl->blend_state.get ();
 }
 
 /*
@@ -195,6 +203,12 @@ void OutputManagerContext::Bind ()
 
     if (!impl.is_dirty)
       return;
+
+      //установка состояния контекста
+
+//    static const float blend_factors [] = {1.0f, 1.0f, 1.0f, 1.0f};
+
+//    impl.context->OMSetBlendState (impl.blend_state->GetHandle ());
 
     throw xtl::make_not_implemented_exception (__FUNCTION__);
 
