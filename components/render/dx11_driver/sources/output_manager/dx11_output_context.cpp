@@ -153,10 +153,12 @@ size_t OutputManagerContextState::GetStencilReference () const
 
 struct OutputManagerContext::Impl: public OutputManagerContextState::Impl
 {
-  DxContextPtr context; //контекст устройства
+  DxContextPtr  context;             //контекст устройства
+  BlendStatePtr default_blend_state; //состояние подуровня смешивания по умолчанию
+  BlendStatePtr null_blend_state;    //состояние подуровня смешивания с выключенной записью
 
 /// Конструктор
-  Impl (const DeviceManager& manager, const DxContextPtr& in_context)
+  Impl (const DeviceManager& manager, const DxContextPtr& in_context, const DefaultResources& default_resources)
     : OutputManagerContextState::Impl (manager)
     , context (in_context)
   {
@@ -164,6 +166,20 @@ struct OutputManagerContext::Impl: public OutputManagerContextState::Impl
 
     if (!context)
       throw xtl::make_null_argument_exception (METHOD_NAME, "context");
+
+    if (!default_resources.blend_state)
+      throw xtl::make_null_argument_exception (METHOD_NAME, "default_blend_state");
+
+    default_blend_state = cast_object<BlendState> (manager, default_resources.blend_state.get (), METHOD_NAME, "default_blend_state");
+
+    if (!default_resources.null_blend_state)
+      throw xtl::make_null_argument_exception (METHOD_NAME, "null_blend_state");
+
+    null_blend_state = cast_object<BlendState> (manager, default_resources.null_blend_state.get (), METHOD_NAME, "null_blend_state");    
+
+      //установка значений по умолчанию
+
+    blend_state = default_blend_state;
   }
 };
 
@@ -171,8 +187,8 @@ struct OutputManagerContext::Impl: public OutputManagerContextState::Impl
     Конструктор / деструктор
 */
 
-OutputManagerContext::OutputManagerContext (const DeviceManager& manager, const DxContextPtr& context)
-  : OutputManagerContextState (new Impl (manager, context))
+OutputManagerContext::OutputManagerContext (const DeviceManager& manager, const DxContextPtr& context, const DefaultResources& default_resources)
+  : OutputManagerContextState (new Impl (manager, context, default_resources))
 {
 }
 
@@ -206,9 +222,14 @@ void OutputManagerContext::Bind ()
 
       //установка состояния контекста
 
-//    static const float blend_factors [] = {1.0f, 1.0f, 1.0f, 1.0f};
+    BlendState* blend_state = impl.blend_state.get ();
 
-//    impl.context->OMSetBlendState (impl.blend_state->GetHandle ());
+    if (!blend_state)
+      blend_state = impl.null_blend_state.get ();    
+
+    static const float blend_factors [] = {1.0f, 1.0f, 1.0f, 1.0f};
+
+    impl.context->OMSetBlendState (&blend_state->GetHandle (), blend_factors, 0xffffffff);
 
     throw xtl::make_not_implemented_exception (__FUNCTION__);
 

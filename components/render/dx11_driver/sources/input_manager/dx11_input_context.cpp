@@ -160,10 +160,10 @@ struct InputManagerContext::Impl: public InputManagerContextState::Impl
   InputLayoutPtr default_layout; //лэйаут по умолчанию
 
 /// Конструктор
-  Impl (const DeviceManager& device_manager, const DxContextPtr& in_context, const InputLayoutPtr& in_default_layout)
+  Impl (const DeviceManager& device_manager, const DxContextPtr& in_context, const DefaultResources& default_resources)
     : InputManagerContextState::Impl (device_manager)
     , context (in_context)
-    , default_layout (in_default_layout)
+    , default_layout (default_resources.input_layout)
   {
     static const char* METHOD_NAME = "render::low_level::dx11::InputManagerContext::Impl::Impl";
 
@@ -179,8 +179,8 @@ struct InputManagerContext::Impl: public InputManagerContextState::Impl
     Конструктор / деструктор
 */
 
-InputManagerContext::InputManagerContext (const DeviceManager& device_manager, const DxContextPtr& context, const InputLayoutPtr& input_layout)
-  : InputManagerContextState (new Impl (device_manager, context, input_layout))
+InputManagerContext::InputManagerContext (const DeviceManager& device_manager, const DxContextPtr& context, const DefaultResources& default_resources)
+  : InputManagerContextState (new Impl (device_manager, context, default_resources))
 {
 }
 

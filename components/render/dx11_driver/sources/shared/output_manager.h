@@ -6,6 +6,7 @@
 #include <render/low_level/device.h>
 
 #include <shared/common.h>
+#include <shared/default_resources.h>
 #include <shared/device_manager.h>
 
 namespace render
@@ -73,7 +74,7 @@ class OutputManagerContext: public OutputManagerContextState
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструктор / деструктор
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    OutputManagerContext  (const DeviceManager&, const DxContextPtr&);
+    OutputManagerContext  (const DeviceManager&, const DxContextPtr&, const DefaultResources&);
     ~OutputManagerContext ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

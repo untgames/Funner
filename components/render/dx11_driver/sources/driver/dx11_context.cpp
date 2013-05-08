@@ -7,14 +7,14 @@ using namespace render::low_level::dx11;
     Конструктор
 */
 
-Context::Context (const DxContextPtr& in_context, const DeviceManager& device_manager, ShaderLibrary& shader_library, const InputLayoutPtr& default_input_layout, const IProgramPtr& default_program)
+Context::Context (const DxContextPtr& in_context, const DeviceManager& device_manager, ShaderLibrary& shader_library, const DefaultResources& default_resources)
   : DeviceObject (device_manager)
   , context (in_context)
   , render_target_context (device_manager, in_context)
   , texture_manager_context (device_manager, in_context)
-  , input_manager_context (device_manager, in_context, default_input_layout)
-  , shader_manager_context (shader_library, in_context, default_input_layout, default_program)
-  , output_manager_context (device_manager, in_context)
+  , input_manager_context (device_manager, in_context, default_resources)
+  , shader_manager_context (shader_library, in_context, default_resources)
+  , output_manager_context (device_manager, in_context, default_resources)
   , current_primitive_type (PrimitiveType_Num)
 {
   if (!context)

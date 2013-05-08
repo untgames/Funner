@@ -224,10 +224,10 @@ struct ShaderManagerContext::Impl: public ShaderManagerContextState::Impl
   size_t                 buffer_hashes [DEVICE_CONSTANT_BUFFER_SLOTS_COUNT]; //хэши буферов
 
 /// Конструктор
-  Impl (ShaderLibrary& library, const DxContextPtr& in_context, const InputLayoutPtr& in_default_input_layout, const IProgramPtr& in_default_program)
+  Impl (ShaderLibrary& library, const DxContextPtr& in_context, const DefaultResources& default_resources)
     : ShaderManagerContextState::Impl (library.GetDeviceManager ())
     , shader_library (&library)
-    , default_input_layout (in_default_input_layout)
+    , default_input_layout (default_resources.input_layout)
     , context (in_context)
   {
     static const char* METHOD_NAME = "render::low_level::dx11::ShaderManagerContext::Impl::Impl";
@@ -238,10 +238,10 @@ struct ShaderManagerContext::Impl: public ShaderManagerContextState::Impl
     if (!default_input_layout)
       throw xtl::make_null_argument_exception (METHOD_NAME, "default_input_layout");
 
-    if (!in_default_program)
+    if (!default_resources.program)
       throw xtl::make_null_argument_exception (METHOD_NAME, "default_program");
 
-    default_program = cast_object<Program> (library.GetDeviceManager (), in_default_program.get (), METHOD_NAME, "default_program");
+    default_program = cast_object<Program> (library.GetDeviceManager (), default_resources.program.get (), METHOD_NAME, "default_program");
 
     memset (buffer_hashes, 0, sizeof (buffer_hashes));
   }
@@ -251,8 +251,8 @@ struct ShaderManagerContext::Impl: public ShaderManagerContextState::Impl
     Конструктор / деструктор
 */
 
-ShaderManagerContext::ShaderManagerContext (ShaderLibrary& library, const DxContextPtr& context, const InputLayoutPtr& input_layout, const IProgramPtr& program)
-  : ShaderManagerContextState (new Impl (library, context, input_layout, program))
+ShaderManagerContext::ShaderManagerContext (ShaderLibrary& library, const DxContextPtr& context, const DefaultResources& default_resources)
+  : ShaderManagerContextState (new Impl (library, context, default_resources))
 {
 }
 

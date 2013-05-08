@@ -77,7 +77,7 @@ Device::Device (const AdapterPtr& in_adapter, const char* init_string)
 
       //создание контекста
 
-    immediate_context = ContextPtr (new Context (dx_immediate_context, *device_manager, shader_manager->GetShaderLibrary (), default_input_layout, default_program), false);      
+    immediate_context = ContextPtr (new Context (dx_immediate_context, *device_manager, shader_manager->GetShaderLibrary (), default_resources), false);      
 
       //создание отладочного уровня
 
@@ -128,7 +128,7 @@ void Device::InitDefaults ()
     default_layout_desc.vertex_attributes_count = 1;
     default_layout_desc.index_type              = InputDataType_UShort;
 
-    default_input_layout = InputLayoutPtr (input_manager->CreateInputLayout (default_layout_desc), false);
+    default_resources.input_layout = InputLayoutPtr (input_manager->CreateInputLayout (default_layout_desc), false);
 
       //создание программы по умолчанию
 
@@ -161,7 +161,23 @@ void Device::InitDefaults ()
     shader_descs [1].source_code      = DEFAULT_PIXEL_SHADER;
     shader_descs [1].profile          = "hlsl.ps";
 
-    default_program = IProgramPtr (CreateProgram (sizeof (shader_descs) / sizeof (*shader_descs), &shader_descs [0], LogFunction ()), false);    
+    default_resources.program = IProgramPtr (CreateProgram (sizeof (shader_descs) / sizeof (*shader_descs), &shader_descs [0], LogFunction ()), false);    
+
+      //инициализация BlendState
+       
+    BlendDesc blend_desc;
+    
+    memset (&blend_desc, 0, sizeof (blend_desc));
+
+    blend_desc.render_target [0].blend_enable     = false;
+    blend_desc.render_target [0].color_write_mask = ColorWriteFlag_All;
+    blend_desc.independent_blend_enable           = false;
+
+    default_resources.blend_state = IBlendStatePtr (output_manager->CreateBlendState (blend_desc), false);
+    
+    blend_desc.render_target [0].color_write_mask = 0;
+    
+    default_resources.null_blend_state = IBlendStatePtr (output_manager->CreateBlendState (blend_desc), false);
   }
   catch (xtl::exception& e)
   {

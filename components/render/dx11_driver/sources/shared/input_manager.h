@@ -6,6 +6,7 @@
 #include <render/low_level/device.h>
 
 #include <shared/common.h>
+#include <shared/default_resources.h>
 #include <shared/device_manager.h>
 #include <shared/input_layout.h>
 
@@ -72,7 +73,7 @@ class InputManagerContext: public InputManagerContextState
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструктор / деструктор
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    InputManagerContext  (const DeviceManager&, const DxContextPtr&, const InputLayoutPtr&);
+    InputManagerContext  (const DeviceManager&, const DxContextPtr&, const DefaultResources&);
     ~InputManagerContext ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

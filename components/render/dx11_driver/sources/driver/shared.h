@@ -227,7 +227,7 @@ class Context: virtual public IDeviceContext, public DeviceObject
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструктор
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    Context  (const DxContextPtr& context, const DeviceManager& device_manager, ShaderLibrary& shader_library, const InputLayoutPtr& default_input_layout, const IProgramPtr& default_program);
+    Context  (const DxContextPtr& context, const DeviceManager& device_manager, ShaderLibrary& shader_library, const DefaultResources& default_resources);
     ~Context ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -466,8 +466,7 @@ class Device: virtual public IDevice, public Object
     stl::auto_ptr<InputManager>        input_manager;         //менеджер входного уровня
     stl::auto_ptr<ShaderManager>       shader_manager;        //менеджер шейдеров
     stl::auto_ptr<OutputManager>       output_manager;        //менеджер выходного уровня
-    InputLayoutPtr                     default_input_layout;  //входной лэйаут по умолчанию
-    IProgramPtr                        default_program;       //программа по умолчанию
+    DefaultResources                   default_resources;     //ресурсы по умолчанию
     stl::auto_ptr<DeviceDebugLayer>    debug_layer;           //отладочный слой
 };
 

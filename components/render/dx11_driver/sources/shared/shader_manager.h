@@ -6,6 +6,7 @@
 #include <render/low_level/device.h>
 
 #include <shared/common.h>
+#include <shared/default_resources.h>
 #include <shared/device_manager.h>
 #include <shared/input_layout.h>
 
@@ -73,7 +74,7 @@ class ShaderManagerContext: public ShaderManagerContextState
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструктор / деструктор
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    ShaderManagerContext  (ShaderLibrary&, const DxContextPtr&, const InputLayoutPtr&, const IProgramPtr&);
+    ShaderManagerContext  (ShaderLibrary&, const DxContextPtr&, const DefaultResources&);
     ~ShaderManagerContext ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
