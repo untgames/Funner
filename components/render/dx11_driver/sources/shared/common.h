@@ -17,8 +17,9 @@ namespace low_level
 namespace dx11
 {
 
-typedef xtl::com_ptr<IProgram>    IProgramPtr;
-typedef xtl::com_ptr<IBlendState> IBlendStatePtr;
+typedef xtl::com_ptr<IProgram>           IProgramPtr;
+typedef xtl::com_ptr<IBlendState>        IBlendStatePtr;
+typedef xtl::com_ptr<IDepthStencilState> IDepthStencilStatePtr;
 
 typedef xtl::com_ptr<IDXGIAdapter>             DxAdapterPtr;
 typedef xtl::com_ptr<IDXGIFactory>             DxFactoryPtr;

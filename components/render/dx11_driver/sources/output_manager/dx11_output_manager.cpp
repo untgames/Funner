@@ -50,7 +50,7 @@ IDepthStencilState* OutputManager::CreateDepthStencilState (const DepthStencilDe
 {
   try
   {
-    throw xtl::make_not_implemented_exception (__FUNCTION__);
+    return new DepthStencilState (impl->GetDeviceManager (), desc);
   }
   catch (xtl::exception& e)
   {

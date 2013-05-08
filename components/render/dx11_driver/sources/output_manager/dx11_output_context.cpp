@@ -11,12 +11,15 @@ using namespace render::low_level::dx11;
 
 struct OutputManagerContextState::Impl: public DeviceObject
 {
-  BlendStatePtr blend_state; //состояние подуровня смешивания цветов
-  bool          is_dirty;    //флаг "грязности"
+  BlendStatePtr        blend_state;         //состояние подуровня смешивания цветов
+  DepthStencilStatePtr depth_stencil_state; //состояние подуровня отсечения
+  size_t               stencil_ref;         //референсное значение стенсила
+  bool                 is_dirty;            //флаг "грязности"
 
 /// Конструктор
   Impl (const DeviceManager& manager)
     : DeviceObject (manager)
+    , stencil_ref ()
     , is_dirty (true)
   {
   }
@@ -113,11 +116,18 @@ IBlendState* OutputManagerContextState::GetBlendState () const
     Настройка подуровня попиксельного отсечения
 */
 
-void OutputManagerContextState::SetDepthStencilState (IDepthStencilState* state)
+void OutputManagerContextState::SetDepthStencilState (IDepthStencilState* in_state)
 {
   try
   {
-    throw xtl::make_not_implemented_exception (__FUNCTION__);
+    DepthStencilState* state = cast_object<DepthStencilState> (*impl, in_state, "", "state");
+
+    if (state == impl->depth_stencil_state)
+      return;
+
+    impl->depth_stencil_state = state;
+
+    impl->UpdateNotify ();
   }
   catch (xtl::exception& e)
   {
@@ -128,17 +138,22 @@ void OutputManagerContextState::SetDepthStencilState (IDepthStencilState* state)
 
 void OutputManagerContextState::SetStencilReference (size_t reference)
 {
-  throw xtl::make_not_implemented_exception (__FUNCTION__);
+  if (impl->stencil_ref == reference)
+    return;
+
+  impl->stencil_ref = reference;
+
+  impl->UpdateNotify ();
 }
 
 IDepthStencilState* OutputManagerContextState::GetDepthStencilState () const
 {
-  throw xtl::make_not_implemented_exception (__FUNCTION__);
+  return impl->depth_stencil_state.get ();
 }
 
 size_t OutputManagerContextState::GetStencilReference () const
 {
-  throw xtl::make_not_implemented_exception (__FUNCTION__);
+  return impl->stencil_ref;
 }
 
 /*
@@ -153,9 +168,11 @@ size_t OutputManagerContextState::GetStencilReference () const
 
 struct OutputManagerContext::Impl: public OutputManagerContextState::Impl
 {
-  DxContextPtr  context;             //контекст устройства
-  BlendStatePtr default_blend_state; //состояние подуровня смешивания по умолчанию
-  BlendStatePtr null_blend_state;    //состояние подуровня смешивания с выключенной записью
+  DxContextPtr         context;                     //контекст устройства
+  BlendStatePtr        default_blend_state;         //состояние подуровня смешивания по умолчанию
+  BlendStatePtr        null_blend_state;            //состояние подуровня смешивания с выключенной записью
+  DepthStencilStatePtr default_depth_stencil_state; //состояние подуровня отсечения по умолчанию
+  DepthStencilStatePtr null_depth_stencil_state;    //состояние подуровня отсечения с вылюченными операциями
 
 /// Конструктор
   Impl (const DeviceManager& manager, const DxContextPtr& in_context, const DefaultResources& default_resources)
@@ -177,9 +194,20 @@ struct OutputManagerContext::Impl: public OutputManagerContextState::Impl
 
     null_blend_state = cast_object<BlendState> (manager, default_resources.null_blend_state.get (), METHOD_NAME, "null_blend_state");    
 
+    if (!default_resources.depth_stencil_state)
+      throw xtl::make_null_argument_exception (METHOD_NAME, "default_depth_stencil_state");
+
+    default_depth_stencil_state = cast_object<DepthStencilState> (manager, default_resources.depth_stencil_state.get (), METHOD_NAME, "default_depth_stencil_state");
+
+    if (!default_resources.null_depth_stencil_state)
+      throw xtl::make_null_argument_exception (METHOD_NAME, "null_depth_stencil_state");
+
+    null_depth_stencil_state = cast_object<DepthStencilState> (manager, default_resources.null_depth_stencil_state.get (), METHOD_NAME, "null_depth_stencil_state");    
+
       //установка значений по умолчанию
 
-    blend_state = default_blend_state;
+    blend_state         = default_blend_state;
+    depth_stencil_state = default_depth_stencil_state;
   }
 };
 
@@ -220,7 +248,7 @@ void OutputManagerContext::Bind ()
     if (!impl.is_dirty)
       return;
 
-      //установка состояния контекста
+      //установка состояния подуровня смешивания цветов
 
     BlendState* blend_state = impl.blend_state.get ();
 
@@ -230,6 +258,15 @@ void OutputManagerContext::Bind ()
     static const float blend_factors [] = {1.0f, 1.0f, 1.0f, 1.0f};
 
     impl.context->OMSetBlendState (&blend_state->GetHandle (), blend_factors, 0xffffffff);
+
+      //установка состояни подуровня отсечения
+
+    DepthStencilState* depth_stencil_state = impl.depth_stencil_state.get ();
+
+    if (!depth_stencil_state)
+      depth_stencil_state = impl.null_depth_stencil_state.get ();
+
+    impl.context->OMSetDepthStencilState (&depth_stencil_state->GetHandle (), impl.stencil_ref);
 
     throw xtl::make_not_implemented_exception (__FUNCTION__);
 

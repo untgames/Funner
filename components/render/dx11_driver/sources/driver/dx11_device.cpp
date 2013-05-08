@@ -178,6 +178,24 @@ void Device::InitDefaults ()
     blend_desc.render_target [0].color_write_mask = 0;
     
     default_resources.null_blend_state = IBlendStatePtr (output_manager->CreateBlendState (blend_desc), false);
+
+      //инициализация DepthStencilState
+      
+    DepthStencilDesc depth_stencil_desc;
+    
+    memset (&depth_stencil_desc, 0, sizeof (depth_stencil_desc));
+    
+    depth_stencil_desc.depth_test_enable  = true;
+    depth_stencil_desc.depth_write_enable = true;
+    depth_stencil_desc.depth_compare_mode = CompareMode_Less;
+    
+    default_resources.depth_stencil_state = IDepthStencilStatePtr (output_manager->CreateDepthStencilState (depth_stencil_desc), false);
+    
+    depth_stencil_desc.depth_test_enable  = false;
+    depth_stencil_desc.depth_write_enable = false;
+    depth_stencil_desc.depth_compare_mode = CompareMode_AlwaysPass;
+    
+    default_resources.null_depth_stencil_state = IDepthStencilStatePtr (output_manager->CreateDepthStencilState (depth_stencil_desc), false);
   }
   catch (xtl::exception& e)
   {
