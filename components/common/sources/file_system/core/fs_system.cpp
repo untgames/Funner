@@ -435,11 +435,11 @@ void FileSystemImpl::AddSearchPath (const char* _path,const LogHandler& log_hand
 
     return;
   }
+
+  size_t path_hash = strhash (path.c_str ());
   
   if (path [0] != '/')
-    path = format ("%s%s",prefix.c_str (),path.c_str ());    
-    
-  size_t path_hash = strhash (path.c_str ());
+    path = format ("%s%s",prefix.c_str (),path.c_str ());        
 
   if (file_info.is_dir)
   {
@@ -474,9 +474,6 @@ void FileSystemImpl::RemoveSearchPath (const char* _path)
     throw xtl::make_null_argument_exception ("common::FileSystem::RemoveSearchPath","path");
 
   string path = FileSystem::GetNormalizedFileName (_path);
-
-  if (path [0] != '/')
-    path = format ("%s/%s",default_path.c_str (),path.c_str ());
 
   size_t hash = strhash (path.c_str ());
 

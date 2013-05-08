@@ -1,0 +1,7 @@
+Results of search_path_zip_test:
+common.file_systems: Attempt to add search path 'data/test.zip'
+common.file_systems: Attempt to add search path 'search'
+common.file_systems: Add search path 'search'
+check file exist: true
+common.file_systems: Remove search path 'search'
+check file exist: false
