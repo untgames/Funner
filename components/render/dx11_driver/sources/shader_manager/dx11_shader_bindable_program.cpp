@@ -75,7 +75,7 @@ void BindableProgram::Bind
     }
 
       //поиск и биндинг буферов
-    
+//TODO: bindable buffers cache for dirty switch optimization    
 //    if (program_context.has_dirty_buffers)
     {
       ID3D11Buffer* buffers [ShaderType_Num][DEVICE_CONSTANT_BUFFER_SLOTS_COUNT];
