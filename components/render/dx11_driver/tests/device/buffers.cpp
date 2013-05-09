@@ -11,7 +11,7 @@ int main ()
 
   try
   {
-    common::LogFilter filter ("*", &log_print);
+//    common::LogFilter filter ("*", &log_print);
 
     Test test (L"DX11 device test window (buffers_test)", "debug=1");
     
@@ -30,6 +30,8 @@ int main ()
     test.device->GetImmediateContext ()->ISSetVertexBuffer(0, test.device.get()->CreateBuffer(vertex));
     test.device->GetImmediateContext ()->ISSetIndexBuffer(test.device.get()->CreateBuffer(index));
     test.device->GetImmediateContext ()->Draw (PrimitiveType_PointList, 0, 0);
+
+    printf ("done\n");
   }
   catch (std::exception& exception)
   {
