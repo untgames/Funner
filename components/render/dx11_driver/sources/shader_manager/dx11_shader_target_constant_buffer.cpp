@@ -143,6 +143,18 @@ TargetConstantBuffer& TargetConstantBufferPrototype::GetBuffer (const SourceCons
     Конструктор / деструктор
 */
 
+namespace
+{
+
+size_t align16 (size_t size)
+{
+  static const size_t align = 16;
+
+  return (size+align-1)&~(align-1);
+}
+
+}
+
 TargetConstantBuffer::TargetConstantBuffer (const DeviceManager& device_manager, const TargetConstantBufferPrototype& in_prototype, const SourceConstantBufferPtr buffers [DEVICE_CONSTANT_BUFFER_SLOTS_COUNT])
   : DeviceObject (device_manager)
   , prototype (in_prototype)
@@ -182,7 +194,7 @@ TargetConstantBuffer::TargetConstantBuffer (const DeviceManager& device_manager,
 
     memset (&desc, 0, sizeof (desc));
 
-    desc.ByteWidth = prototype.GetMinDestinationBufferSize ();
+    desc.ByteWidth = align16 (prototype.GetMinDestinationBufferSize ());
 
     switch (usage)
     {

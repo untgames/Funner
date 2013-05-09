@@ -7,7 +7,13 @@ using namespace render::low_level::dx11;
     Константы
 */
 
+namespace
+{
+
 const size_t MESSAGE_BUFFER_RESERVE_SIZE = 16384;
+const float  UPDATE_PERIOD               = 1.0f;
+
+}
 
 /*
     Конструктор / деструктор
@@ -33,7 +39,7 @@ DeviceDebugLayer::DeviceDebugLayer (const DxDevicePtr& in_device)
 
     message_buffer.resize (MESSAGE_BUFFER_RESERVE_SIZE);
 
-    update_action = common::ActionQueue::PushAction (xtl::bind (&DeviceDebugLayer::UpdateMessages, this), common::ActionThread_Background);
+    update_action = common::ActionQueue::PushAction (xtl::bind (&DeviceDebugLayer::UpdateMessages, this), common::ActionThread_Background, 0.0, UPDATE_PERIOD);
   }
   catch (xtl::exception& e)
   {
