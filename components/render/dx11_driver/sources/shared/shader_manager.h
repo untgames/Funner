@@ -54,6 +54,11 @@ class ShaderManagerContextState
     IProgram*                 GetProgram                 () const;
     IBuffer*                  GetConstantBuffer          (size_t buffer_slot) const;
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Копирование состояния
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void CopyTo (const StateBlockMask&, ShaderManagerContextState& dst_state) const;
+
   protected:
     struct Impl;
 

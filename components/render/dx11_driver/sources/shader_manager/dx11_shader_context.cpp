@@ -201,6 +201,58 @@ IBuffer* ShaderManagerContextState::GetConstantBuffer (size_t buffer_slot) const
 }
 
 /*
+    Копирование состояния
+*/
+
+void ShaderManagerContextState::CopyTo (const StateBlockMask& mask, ShaderManagerContextState& dst_state) const
+{
+  bool update_notify = false, reset_bindable_program_context = false, has_dirty_buffers = false, dirty_buffers [DEVICE_CONSTANT_BUFFER_SLOTS_COUNT];
+
+  memset (dirty_buffers, 0, sizeof (dirty_buffers));
+  
+  if (mask.ss_program && impl->program != dst_state.impl->program)
+  {
+    dst_state.impl->program        = impl->program;
+    update_notify                  = true;
+    reset_bindable_program_context = true;
+  }
+
+  if (mask.ss_program_parameters_layout && impl->parameters_layout != dst_state.impl->parameters_layout)
+  {
+    dst_state.impl->parameters_layout = impl->parameters_layout;
+    update_notify                     = true;
+    reset_bindable_program_context    = true;
+  }
+
+  for (size_t i = 0; i < DEVICE_CONSTANT_BUFFER_SLOTS_COUNT; i++)
+    if (mask.ss_constant_buffers [i] && impl->buffers [i] != dst_state.impl->buffers [i])
+    {
+      dst_state.impl->buffers [i] = impl->buffers [i];          
+      update_notify               = true;
+      has_dirty_buffers           = true;
+      dirty_buffers [i]           = true;
+    }
+
+  if (reset_bindable_program_context)
+  {
+    dst_state.impl->bindable_program_context.Reset ();    
+  }
+  else if (has_dirty_buffers)
+  {
+    bool*       dst = &dst_state.impl->bindable_program_context.dirty_buffers [0];
+    const bool* src = &dirty_buffers [0];
+
+    for (size_t i=0; i<DEVICE_CONSTANT_BUFFER_SLOTS_COUNT; i++, src++, dst++)
+      *dst = *dst || *src;
+
+    dst_state.impl->bindable_program_context.has_dirty_buffers = true;
+  }
+
+  if (update_notify)
+    dst_state.impl->UpdateNotify ();
+}
+
+/*
 ===================================================================================================
     ShaderManagerContext
 ===================================================================================================
