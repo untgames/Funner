@@ -15,11 +15,14 @@ using namespace render::low_level::dx11;
 
 struct QueryManagerContextState::Impl: public DeviceObject
 {
-  bool is_dirty; //флаг "грязности"
+  QueryPtr predicate;       //предикат отрисовки
+  bool     predicate_value; //значение предиката
+  bool     is_dirty;        //флаг "грязности"
 
 /// Конструктор
   Impl (const DeviceManager& manager)
     : DeviceObject (manager)
+    , predicate_value ()
     , is_dirty (true)
   {
   }
@@ -27,6 +30,12 @@ struct QueryManagerContextState::Impl: public DeviceObject
 /// Деструктор
   virtual ~Impl ()
   {
+  }
+
+/// Обновление состояния
+  void UpdateNotify ()
+  {
+    is_dirty = true;
   }
 };
 
@@ -61,11 +70,22 @@ QueryManagerContextState::Impl& QueryManagerContextState::GetImpl () const
     Управление предикатами отрисовки
 */
 
-void QueryManagerContextState::SetPredication (IPredicate* predicate, bool predicate_value)
+void QueryManagerContextState::SetPredication (IPredicate* in_predicate, bool predicate_value)
 {
   try
   {
-    throw xtl::make_not_implemented_exception (__FUNCTION__);
+    Query* query = cast_object<Query> (*impl, in_predicate, "", "predicate");
+
+    if (query && query->GetType () != QueryType_OcclusionPredicate)
+      throw xtl::format_operation_exception ("", "Query with type %s can used as predicate", get_name (query->GetType ()));
+
+    if (query == impl->predicate && predicate_value == impl->predicate_value)
+      return;
+
+    impl->predicate       = query;
+    impl->predicate_value = predicate_value;
+
+    impl->UpdateNotify ();
   }
   catch (xtl::exception& e)
   {
@@ -76,12 +96,12 @@ void QueryManagerContextState::SetPredication (IPredicate* predicate, bool predi
 
 IPredicate* QueryManagerContextState::GetPredicate ()
 {
-  throw xtl::make_not_implemented_exception (__FUNCTION__);
+  return impl->predicate.get ();
 }
 
 bool QueryManagerContextState::GetPredicateValue ()
 {  
-  throw xtl::make_not_implemented_exception (__FUNCTION__);
+  return impl->predicate_value;
 }
 
 /*
@@ -90,7 +110,16 @@ bool QueryManagerContextState::GetPredicateValue ()
 
 void QueryManagerContextState::CopyTo (const StateBlockMask& mask, QueryManagerContextState& dst_state) const
 {
-  throw xtl::make_not_implemented_exception (__FUNCTION__);
+  if (!mask.predication)
+    return;
+  
+  if (dst_state.impl->predicate == impl->predicate && dst_state.impl->predicate_value == impl->predicate_value)
+    return;
+
+  dst_state.impl->predicate       = impl->predicate;
+  dst_state.impl->predicate_value = impl->predicate_value;
+
+  impl->UpdateNotify ();
 }
 
 /*
@@ -147,7 +176,14 @@ void QueryManagerContext::Begin (IQuery* async)
 {
   try
   {
-    throw xtl::make_not_implemented_exception (__FUNCTION__);
+    Impl& impl = GetImpl ();
+
+    Query* query = cast_object<Query> (impl, async, "", "async");
+
+    if (!query)
+      throw xtl::make_null_argument_exception ("", "async");
+
+    impl.context->Begin (&query->GetHandle ());
   }
   catch (xtl::exception& e)
   {
@@ -160,7 +196,14 @@ void QueryManagerContext::End (IQuery* async)
 {
   try
   {
-    throw xtl::make_not_implemented_exception (__FUNCTION__);
+    Impl& impl = GetImpl ();
+
+    Query* query = cast_object<Query> (impl, async, "", "async");
+
+    if (!query)
+      throw xtl::make_null_argument_exception ("", "async");
+
+    impl.context->End (&query->GetHandle ());
   }
   catch (xtl::exception& e)
   {
@@ -177,7 +220,18 @@ void QueryManagerContext::Bind ()
 {
   try
   {
-    throw xtl::make_not_implemented_exception (__FUNCTION__);
+      //проверка флага "грязности"
+
+    Impl& impl = GetImpl ();
+
+    if (!impl.is_dirty)
+      return;
+
+    impl.context->SetPredication (impl.predicate ? static_cast<ID3D11Predicate*> (&impl.predicate->GetHandle ()) : (ID3D11Predicate*)0, impl.predicate_value);
+
+      //очистка флага "грязности"
+
+    impl.is_dirty = false;
   }
   catch (xtl::exception& e)
   {

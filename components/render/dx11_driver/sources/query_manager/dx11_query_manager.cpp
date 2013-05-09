@@ -37,7 +37,7 @@ IPredicate* QueryManager::CreatePredicate ()
 {
   try
   {
-    throw xtl::make_not_implemented_exception (__FUNCTION__);
+    return new Query (impl->GetDeviceManager (), QueryType_OcclusionPredicate);
   }
   catch (xtl::exception& e)
   {
@@ -50,7 +50,7 @@ IQuery* QueryManager::CreateQuery (QueryType type)
 {
   try
   {
-    throw xtl::make_not_implemented_exception (__FUNCTION__);
+    return new Query (impl->GetDeviceManager (), type);
   }
   catch (xtl::exception& e)
   {
