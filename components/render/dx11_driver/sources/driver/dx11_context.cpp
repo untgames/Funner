@@ -28,6 +28,7 @@ try
     OSSetDepthStencilView (initial_resources.depth_stencil_view.get ());
   }
 
+  ISSetInputLayout       (initial_resources.input_layout.get ());
   OSSetBlendState        (initial_resources.blend_state.get ());
   OSSetDepthStencilState (initial_resources.depth_stencil_state.get ());
   RSSetState             (initial_resources.rasterizer_state.get ());
@@ -814,4 +815,26 @@ void Context::Flush ()
     exception.touch ("render::low_level::dx11::Context::Flush");
     throw;
   }
+}
+
+/*
+    Копирование состояний
+*/
+
+void Context::Capture (const StateBlockMask& mask, ContextState& state) const
+{
+  render_target_context.CopyTo   (mask, state.render_target_context_state);
+  texture_manager_context.CopyTo (mask, state.texture_manager_context_state);
+  input_manager_context.CopyTo   (mask, state.input_manager_context_state);
+  shader_manager_context.CopyTo  (mask, state.shader_manager_context_state);
+  output_manager_context.CopyTo  (mask, state.output_manager_context_state);
+}
+
+void Context::Apply (const StateBlockMask& mask, const ContextState& state)
+{
+  state.render_target_context_state.CopyTo   (mask, render_target_context);
+  state.texture_manager_context_state.CopyTo (mask, texture_manager_context);
+  state.input_manager_context_state.CopyTo   (mask, input_manager_context);
+  state.shader_manager_context_state.CopyTo  (mask, shader_manager_context);
+  state.output_manager_context_state.CopyTo  (mask, output_manager_context);
 }

@@ -209,6 +209,13 @@ void ShaderManagerContextState::CopyTo (const StateBlockMask& mask, ShaderManage
   bool update_notify = false, reset_bindable_program_context = false, has_dirty_buffers = false, dirty_buffers [DEVICE_CONSTANT_BUFFER_SLOTS_COUNT];
 
   memset (dirty_buffers, 0, sizeof (dirty_buffers));
+
+  if (mask.is_layout && impl->input_layout != dst_state.impl->input_layout)
+  {
+    dst_state.impl->input_layout                          = impl->input_layout;
+    dst_state.impl->bindable_program_context.input_layout = DxInputLayoutPtr ();
+    update_notify                                         = true;
+  }
   
   if (mask.ss_program && impl->program != dst_state.impl->program)
   {

@@ -135,6 +135,7 @@ void Device::InitDefaults ()
     default_layout_desc.index_type              = InputDataType_UShort;
 
     default_resources.input_layout = InputLayoutPtr (input_manager->CreateInputLayout (default_layout_desc), false);
+    initial_resources.input_layout = default_resources.input_layout;
 
       //создание программы по умолчанию
 
@@ -396,7 +397,7 @@ IStateBlock* Device::CreateStateBlock (const StateBlockMask& mask)
 {
   try
   {
-    throw xtl::make_not_implemented_exception (__FUNCTION__);
+    return new StateBlock (*device_manager, mask);
   }
   catch (xtl::exception& exception)
   {
