@@ -3,6 +3,7 @@
 struct VS_INPUT
 {
   float4 Position : POSITION;
+  float3 Normal   : NORMAL;
 };
 
 struct VS_OUTPUT
@@ -13,22 +14,28 @@ struct VS_OUTPUT
 
 cbuffer MainBuffer: register(b0)
 {
-  float4x4 myProjMatrix;
-  float4x4 myViewMatrix;
   float4x4 myObjectMatrix;
+  float4x4 myViewMatrix;
+  float4x4 myProjMatrix;
   float3   lightPos;  
-  float3   lightDir;
-}
+};
 
 VS_OUTPUT main (in VS_INPUT In)
 {
   VS_OUTPUT Out;
 
-//  Out.Position = mul (In.Position, myProjMatrix * myViewMatrix * myObjectMatrix);
-//  Out.Position = mul (myProjMatrix * myViewMatrix * myObjectMatrix, In.Position);
-//  Out.Position = mul (myObjectMatrix * myViewMatrix * myProjMatrix, In.Position);
-  Out.Position = In.Position;
-  Out.Color    = float4 (1.0, 1.0, 1.0, 1.0);
+  float4x4 wvp = mul (myProjMatrix, mul (myViewMatrix, myObjectMatrix));
+
+  Out.Position = mul (wvp, In.Position);
+
+  float3 worldPos       = mul (myObjectMatrix, In.Position).xyz;
+  float3 lightDir       = normalize (lightPos - worldPos);
+  float3 normal         = normalize (mul (myObjectMatrix, float4 (In.Normal, 0.0)).xyz);
+  float  diffuseFactor  = clamp (dot (normal, lightDir), 0.0, 1.0);
+
+  const float4 fvDiffuse = float4 (1.0, 0.0, 0.0, 1.0);
+
+  Out.Color = fvDiffuse * diffuseFactor;
 
   return Out;
 }

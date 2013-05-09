@@ -76,7 +76,7 @@ void BindableProgram::Bind
 
       //поиск и биндинг буферов
     
-    if (program_context.has_dirty_buffers)
+//    if (program_context.has_dirty_buffers)
     {
       ID3D11Buffer* buffers [ShaderType_Num][DEVICE_CONSTANT_BUFFER_SLOTS_COUNT];
 
@@ -96,8 +96,8 @@ void BindableProgram::Bind
             break;
           }
 
-        if (!dirty)
-          continue;
+//        if (!dirty)
+//          continue;
 
         TargetConstantBuffer& buffer = prototype.GetBuffer (src_buffers, library);
 

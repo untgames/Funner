@@ -237,7 +237,6 @@ void TargetConstantBuffer::Bind (ID3D11DeviceContext& context, ID3D11Buffer* con
   try
   {
       //синхронизация
-
     D3D11_MAPPED_SUBRESOURCE subresource;
 
     void* dst_buffer_data = 0;
