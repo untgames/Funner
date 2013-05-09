@@ -149,6 +149,45 @@ IBuffer* InputManagerContextState::GetIndexBuffer () const
 }
 
 /*
+    Копирование состояния
+*/
+
+void InputManagerContextState::CopyTo (const StateBlockMask& mask, InputManagerContextState& dst_state) const
+{
+  try
+  {
+    bool update_notify = false;
+
+    if (mask.is_layout)
+    {
+      dst_state.impl->input_layout = impl->input_layout;
+      update_notify                = true;
+    }
+
+    for (size_t i=0; i<DEVICE_VERTEX_BUFFER_SLOTS_COUNT; i++)
+      if (mask.is_vertex_buffers [i])
+      {
+        dst_state.impl->vertex_buffers [i] = impl->vertex_buffers [i];
+        update_notify                      = true;
+      }
+
+    if (mask.is_index_buffer)
+    {
+      dst_state.impl->index_buffer = impl->index_buffer;
+      update_notify                = true;
+    }
+ 
+    if (update_notify)
+      dst_state.impl->UpdateNotify ();
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::low_level::dx11::InputManagerContextState::CopyTo");
+    throw;
+  }
+}
+
+/*
 ===================================================================================================
     InputManagerContext
 ===================================================================================================
