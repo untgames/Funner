@@ -16,13 +16,13 @@ namespace
 
 struct RenderTargetDesc
 {
-  ViewPtr  view;                      //текущее отображение буферов цвета
-  Viewport viewport;                  //область вывода
-  Rect     scissor;                   //область отсечения
-  size_t   viewport_hash;             //хеш области вывода
-  size_t   scissor_hash;              //хэш области отсечения
-  bool     need_recalc_viewport_hash; //флаг необходимости пересчёта хэша области вывода
-  bool     need_recalc_scissor_hash;  //флаг необходимости пересчёта хэша области отсечения
+  ViewPtr         view;                      //текущее отображение буферов цвета
+  Viewport        viewport;                  //область вывода
+  Rect            scissor;                   //область отсечения
+  mutable size_t  viewport_hash;             //хеш области вывода
+  mutable size_t  scissor_hash;              //хэш области отсечения
+  mutable bool    need_recalc_viewport_hash; //флаг необходимости пересчёта хэша области вывода
+  mutable bool    need_recalc_scissor_hash;  //флаг необходимости пересчёта хэша области отсечения
 
 /// Конструктор
   RenderTargetDesc () 
@@ -34,6 +34,30 @@ struct RenderTargetDesc
     memset (&viewport, 0, sizeof viewport);
     memset (&scissor, 0, sizeof scissor);
   }
+
+///Получение хэша области вывода
+  size_t GetViewportHash () const
+  {
+    if (need_recalc_viewport_hash)
+    {
+      viewport_hash             = common::crc32 (&viewport, sizeof viewport);
+      need_recalc_viewport_hash = false;
+    }
+
+    return viewport_hash;
+  }
+
+///Получение хэша области отсечения
+  size_t GetScissorHash () const
+  {
+    if (need_recalc_scissor_hash)
+    {
+      scissor_hash             = common::crc32 (&scissor, sizeof scissor);
+      need_recalc_scissor_hash = false;
+    }
+
+    return scissor_hash;
+  }    
 };
 
 }
@@ -72,29 +96,13 @@ struct RenderTargetContextState::Impl: public DeviceObject
 ///Получение хэша области вывода
   size_t GetViewportHash (size_t view_index)
   {
-    RenderTargetDesc& render_target = GetRenderTarget (view_index, "render::low_level::dx11::RenderTargetContextState::Impl::GetViewportHash");
-
-    if (render_target.need_recalc_viewport_hash)
-    {
-      render_target.viewport_hash             = common::crc32 (&render_target.viewport, sizeof render_target.viewport);
-      render_target.need_recalc_viewport_hash = false;
-    }
-
-    return render_target.viewport_hash;
+    return GetRenderTarget (view_index, "render::low_level::dx11::RenderTargetContextState::Impl::GetViewportHash").GetViewportHash ();
   }
 
 ///Получение хэша области отсечения
   size_t GetScissorHash (size_t view_index)
   {
-    RenderTargetDesc& render_target = GetRenderTarget (view_index, "render::low_level::dx11::RenderTargetContextState::Impl::GetScissorHash");
-
-    if (render_target.need_recalc_scissor_hash)
-    {
-      render_target.scissor_hash             = common::crc32 (&render_target.scissor, sizeof render_target.scissor);
-      render_target.need_recalc_scissor_hash = false;
-    }
-
-    return render_target.scissor_hash;
+    return GetRenderTarget (view_index, "render::low_level::dx11::RenderTargetContextState::Impl::GetScissorHash").GetScissorHash ();
   }    
 };
 
@@ -239,7 +247,7 @@ void RenderTargetContextState::CopyTo (const StateBlockMask& mask, RenderTargetC
       return;
 
     bool update_notify = false;
- 
+
     for (size_t i=0; i<DEVICE_RENDER_TARGET_SLOTS_COUNT; i++)
     {
       const RenderTargetDesc& src_desc = impl->render_targets [i];
@@ -251,14 +259,14 @@ void RenderTargetContextState::CopyTo (const StateBlockMask& mask, RenderTargetC
         update_notify = true;
       }
 
-      if (mask.rs_viewports && src_desc.viewport_hash != dst_desc.viewport_hash)
+      if (mask.rs_viewports && src_desc.GetViewportHash () != dst_desc.GetViewportHash ())
       {
         dst_desc.viewport                  = src_desc.viewport;
         dst_desc.need_recalc_viewport_hash = true;
         update_notify                      = true;
       }
 
-      if (mask.rs_scissors && src_desc.scissor_hash != dst_desc.scissor_hash)
+      if (mask.rs_scissors && src_desc.GetScissorHash () != dst_desc.GetScissorHash ())
       {
         dst_desc.scissor                  = src_desc.scissor;
         dst_desc.need_recalc_scissor_hash = true;

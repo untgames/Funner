@@ -46,8 +46,18 @@ int main ()
   {
     Test test;        
 
+    static const char* DEFAULT_VERTEX_SHADER = 
+      "struct VS_INPUT   { float4 Position : POSITION; };\n"
+      "struct VS_OUTPUT  { float4 Position : SV_POSITION; };\n"
+
+      "VS_OUTPUT main (in VS_INPUT In) {\n"
+      "  VS_OUTPUT Out;\n"
+      "  Out.Position = In.Position;\n"
+      "  return Out;\n"
+      "}\n";
+
     ShaderDesc shader_descs [] = {
-      {"ffp_shader", ~0, "", "ffp", ""},
+      {"ffp_shader", ~0, DEFAULT_VERTEX_SHADER, "hlsl.vs", ""},
     };    
 
     ProgramPtr shader (test.device->CreateProgram (sizeof shader_descs / sizeof *shader_descs, shader_descs, &print));        

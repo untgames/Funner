@@ -49,6 +49,8 @@ try
   {
     OSSetRenderTargetView (0, initial_resources.render_target_view.get ());
     OSSetDepthStencilView (initial_resources.depth_stencil_view.get ());
+    RSSetViewport         (0, initial_resources.viewport);
+    RSSetScissor          (0, initial_resources.scissor);
   }
 
   ISSetInputLayout       (initial_resources.input_layout.get ());
@@ -373,7 +375,9 @@ void Context::RSSetViewport (size_t render_target_slot, const Viewport& viewport
 {
   try
   {
-    return render_target_context.SetViewport (render_target_slot, viewport);
+    render_targets_changed = true;
+
+    render_target_context.SetViewport (render_target_slot, viewport);
   }
   catch (xtl::exception& e)
   {
@@ -386,7 +390,9 @@ void Context::RSSetScissor (size_t render_target_slot, const Rect& scissor_rect)
 {
   try
   {
-    return render_target_context.SetScissor (render_target_slot, scissor_rect);
+    render_targets_changed = true;
+
+    render_target_context.SetScissor (render_target_slot, scissor_rect);
   }
   catch (xtl::exception& e)
   {

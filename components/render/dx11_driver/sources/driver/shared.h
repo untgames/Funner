@@ -230,6 +230,8 @@ struct InitialResources
   IDepthStencilStatePtr depth_stencil_state;
   IRasterizerStatePtr   rasterizer_state;
   InputLayoutPtr        input_layout;
+  Viewport              viewport;
+  Rect                  scissor;
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

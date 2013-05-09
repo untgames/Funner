@@ -88,7 +88,7 @@ void TextureManagerContextState::SetTexture (size_t sampler_slot, ITexture* in_t
     SamplerSlot& slot = impl->samplers [sampler_slot];
 
     slot.texture      = texture;
-    slot.texture_view = &texture->GetShaderResourceView ();
+    slot.texture_view = texture ? &texture->GetShaderResourceView () : DxShaderResourceViewPtr ();
 
     impl->UpdateNotify ();
   }

@@ -27,7 +27,7 @@ struct State
 int main ()
 {
   printf ("Results of unit_texture_manager_state_block_test:\n");
-  
+
   try
   {
     Test test;
@@ -42,10 +42,9 @@ int main ()
     texture_desc.width                = 32;
     texture_desc.height               = 32;
     texture_desc.layers               = 1;
-    texture_desc.format               = PixelFormat_RGB8;
+    texture_desc.format               = PixelFormat_RGBA8;
     texture_desc.bind_flags           = BindFlag_Texture;
     texture_desc.generate_mips_enable = false;
-    texture_desc.access_flags         = AccessFlag_ReadWrite;    
     
     sampler_desc.min_filter           = TexMinFilter_LinearMipLinear;
     sampler_desc.max_anisotropy       = 1;

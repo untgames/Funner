@@ -395,7 +395,7 @@ ID3D11ShaderResourceView& Texture::GetShaderResourceView ()
 
     check_errors ("ID3D11Device::CreateShaderResourceView", GetDeviceManager ().GetDevice ().CreateShaderResourceView (impl->texture.get (), &view_desc, &dx_view));
 
-    if (dx_view)
+    if (!dx_view)
       throw xtl::format_operation_exception ("", "ID3D11Device::CreateShaderResourceView failed");
 
     impl->view = DxShaderResourceViewPtr (dx_view, false);

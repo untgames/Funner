@@ -253,10 +253,36 @@ void Device::InitRenderTargets (SwapChain& swap_chain)
     initial_resources.render_target_view = IViewPtr (CreateView (color_texture.get (), view_desc), false);
     initial_resources.depth_stencil_view = IViewPtr (CreateView (depth_stencil_texture.get (), view_desc), false);
 
+      //инициализация области вывода
+
+    Viewport default_viewport;
+
+    memset (&default_viewport, 0, sizeof default_viewport);
+
+    default_viewport.width     = swap_chain_desc.frame_buffer.width;
+    default_viewport.height    = swap_chain_desc.frame_buffer.height;
+    default_viewport.min_depth = 0.0f;
+    default_viewport.max_depth = 1.0f;
+
+    initial_resources.viewport = default_viewport;
+
+      //инициализация области отсечения
+
+    Rect default_scissor;      
+    
+    memset (&default_scissor, 0, sizeof default_scissor);      
+
+    default_scissor.width  = swap_chain_desc.frame_buffer.width;
+    default_scissor.height = swap_chain_desc.frame_buffer.height;        
+
+    initial_resources.scissor = default_scissor;
+
     if (!immediate_context->RenderTargetsChanged ())
     {
       immediate_context->OSSetRenderTargetView (0, initial_resources.render_target_view.get ());
-      immediate_context->OSSetDepthStencilView (initial_resources.depth_stencil_view.get ());
+      immediate_context->OSSetDepthStencilView (initial_resources.depth_stencil_view.get ());      
+      immediate_context->RSSetViewport         (0, initial_resources.viewport);
+      immediate_context->RSSetScissor          (0, initial_resources.scissor);      
     }
   }
   catch (xtl::exception& e)
