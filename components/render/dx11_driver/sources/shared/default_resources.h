@@ -21,11 +21,8 @@ struct DefaultResources
   InputLayoutPtr        input_layout;
   IProgramPtr           program;
   IBlendStatePtr        blend_state;
-  IBlendStatePtr        null_blend_state;
   IDepthStencilStatePtr depth_stencil_state;
-  IDepthStencilStatePtr null_depth_stencil_state;
   IRasterizerStatePtr   rasterizer_state;
-  IRasterizerStatePtr   null_rasterizer_state;
 };
 
 }

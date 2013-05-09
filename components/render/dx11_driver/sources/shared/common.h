@@ -7,6 +7,7 @@
 
 #include <render/low_level/shader.h>
 #include <render/low_level/state.h>
+#include <render/low_level/view.h>
 
 namespace render
 {
@@ -17,6 +18,7 @@ namespace low_level
 namespace dx11
 {
 
+typedef xtl::com_ptr<IView>              IViewPtr;
 typedef xtl::com_ptr<IProgram>           IProgramPtr;
 typedef xtl::com_ptr<IBlendState>        IBlendStatePtr;
 typedef xtl::com_ptr<IDepthStencilState> IDepthStencilStatePtr;

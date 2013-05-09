@@ -7,7 +7,8 @@ using namespace render::low_level::dx11;
     Конструктор
 */
 
-Context::Context (const DxContextPtr& in_context, const DeviceManager& device_manager, ShaderLibrary& shader_library, const DefaultResources& default_resources)
+Context::Context (const DxContextPtr& in_context, const DeviceManager& device_manager, ShaderLibrary& shader_library, const InitialResources& initial_resources, const DefaultResources& default_resources)
+try
   : DeviceObject (device_manager)
   , context (in_context)
   , render_target_context (device_manager, in_context)
@@ -18,7 +19,18 @@ Context::Context (const DxContextPtr& in_context, const DeviceManager& device_ma
   , current_primitive_type (PrimitiveType_Num)
 {
   if (!context)
-    throw xtl::make_null_argument_exception ("render::low_level::dx11::Context::Context", "context");
+    throw xtl::make_null_argument_exception ("", "context");
+
+  OSSetRenderTargetView  (0, initial_resources.render_target_view.get ());
+  OSSetDepthStencilView  (initial_resources.depth_stencil_view.get ());
+  OSSetBlendState        (initial_resources.blend_state.get ());
+  OSSetDepthStencilState (initial_resources.depth_stencil_state.get ());
+  RSSetState             (initial_resources.rasterizer_state.get ());
+}
+catch (xtl::exception& e)
+{
+  e.touch ("render::low_level::dx11::Context::Context");
+  throw;
 }
 
 Context::~Context ()

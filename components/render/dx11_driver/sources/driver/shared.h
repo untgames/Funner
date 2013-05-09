@@ -219,6 +219,18 @@ class SwapChain: public ISwapChainImpl
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+///Ресурсы инициализации
+///////////////////////////////////////////////////////////////////////////////////////////////////
+struct InitialResources
+{
+  IViewPtr              render_target_view;
+  IViewPtr              depth_stencil_view;
+  IBlendStatePtr        blend_state;
+  IDepthStencilStatePtr depth_stencil_state;
+  IRasterizerStatePtr   rasterizer_state;
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Контекст отрисовки
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 class Context: virtual public IDeviceContext, public DeviceObject
@@ -227,7 +239,7 @@ class Context: virtual public IDeviceContext, public DeviceObject
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструктор
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    Context  (const DxContextPtr& context, const DeviceManager& device_manager, ShaderLibrary& shader_library, const DefaultResources& default_resources);
+    Context  (const DxContextPtr& context, const DeviceManager& device_manager, ShaderLibrary& shader_library, const InitialResources& initial_resources, const DefaultResources& default_resources);
     ~Context ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -467,6 +479,7 @@ class Device: virtual public IDevice, public Object
     stl::auto_ptr<ShaderManager>       shader_manager;        //менеджер шейдеров
     stl::auto_ptr<OutputManager>       output_manager;        //менеджер выходного уровня
     DefaultResources                   default_resources;     //ресурсы по умолчанию
+    InitialResources                   initial_resources;     //ресурсы инициализации
     stl::auto_ptr<DeviceDebugLayer>    debug_layer;           //отладочный слой
 };
 

@@ -131,38 +131,50 @@ RenderTargetContextState::Impl& RenderTargetContextState::GetImpl () const
 
 void RenderTargetContextState::SetRenderTargetView (size_t view_index, IView* render_target_view)
 {
-  static const char* METHOD_NAME = "render::low_level::dx11::RenderTargetContextState::SetRenderTargetView";
+  try
+  {
+    View* view = cast_object<View> (*impl, render_target_view, "", "render_target_view");
 
-  View* view = cast_object<View> (*impl, render_target_view, METHOD_NAME, "render_target_view");
+    RenderTargetDesc& render_target = impl->GetRenderTarget (view_index, "");
 
-  RenderTargetDesc& render_target = impl->GetRenderTarget (view_index, METHOD_NAME);
+    if (render_target.view == view)
+      return;
 
-  if (render_target.view == view)
-    return;
+    if (view && view->GetType () != ViewType_RenderTarget)
+      throw xtl::make_argument_exception ("", "view", "<view>", "View type must have RenderTarget type");
 
-  if (view && view->GetType () != ViewType_RenderTarget)
-    throw xtl::make_argument_exception (METHOD_NAME, "view", "<view>", "View type must have RenderTarget type");
+    render_target.view = view;
 
-  render_target.view = view;
-  
-  impl->UpdateNotify ();
+    impl->UpdateNotify ();
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::low_level::dx11::RenderTargetContextState::SetRenderTargetView");
+    throw;
+  }
 }
 
 void RenderTargetContextState::SetDepthStencilView (IView* depth_stencil_view)
 {
-  static const char* METHOD_NAME = "render::low_level::dx11::RenderTargetContextState::SetDepthStencilView";
+  try
+  {
+    View* view = cast_object<View> (*impl, depth_stencil_view, "", "depth_stencil_view");
 
-  View* view = cast_object<View> (*impl, depth_stencil_view, METHOD_NAME, "depth_stencil_view");
+    if (impl->depth_stencil_view == view)
+      return;
 
-  if (impl->depth_stencil_view == view)
-    return;
+    if (view && view->GetType () != ViewType_DepthStencil)
+      throw xtl::make_argument_exception ("", "view", "<view>", "View type must have DepthStencil type");
 
-  if (view && view->GetType () != ViewType_DepthStencil)
-    throw xtl::make_argument_exception (METHOD_NAME, "view", "<view>", "View type must have DepthStencil type");
-
-  impl->depth_stencil_view = view;
-  
-  impl->UpdateNotify ();  
+    impl->depth_stencil_view = view;
+    
+    impl->UpdateNotify ();  
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::low_level::dx11::RenderTargetContextState::SetDepthStencilView");
+    throw;
+  }
 }
 
 IView* RenderTargetContextState::GetRenderTargetView (size_t view_index) const
@@ -475,6 +487,9 @@ void RenderTargetContext::Bind ()
 
       if (view != render_target_cache.view)
         need_update_render_targets = true;
+
+printf ("%s(%u)\n", __FUNCTION__, __LINE__); fflush (stdout);
+printf ("%d: %p %p\n", i, view, render_target_cache.view);
 
       viewport_hashes [i] = impl.GetViewportHash (i);
       scissor_hashes [i]  = impl.GetScissorHash (i);

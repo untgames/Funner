@@ -192,40 +192,19 @@ struct OutputManagerContext::Impl: public OutputManagerContextState::Impl
       throw xtl::make_null_argument_exception (METHOD_NAME, "context");
 
     if (!default_resources.blend_state)
-      throw xtl::make_null_argument_exception (METHOD_NAME, "default_blend_state");
-
-    BlendStatePtr default_blend_state = cast_object<BlendState> (manager, default_resources.blend_state.get (), METHOD_NAME, "default_blend_state");
-
-    if (!default_resources.null_blend_state)
       throw xtl::make_null_argument_exception (METHOD_NAME, "null_blend_state");
 
-    null_blend_state = cast_object<BlendState> (manager, default_resources.null_blend_state.get (), METHOD_NAME, "null_blend_state");    
+    null_blend_state = cast_object<BlendState> (manager, default_resources.blend_state.get (), METHOD_NAME, "null_blend_state");    
 
     if (!default_resources.depth_stencil_state)
-      throw xtl::make_null_argument_exception (METHOD_NAME, "default_depth_stencil_state");
-
-    DepthStencilStatePtr default_depth_stencil_state = cast_object<DepthStencilState> (manager, default_resources.depth_stencil_state.get (), METHOD_NAME, "default_depth_stencil_state");
-
-    if (!default_resources.null_depth_stencil_state)
       throw xtl::make_null_argument_exception (METHOD_NAME, "null_depth_stencil_state");
 
-    null_depth_stencil_state = cast_object<DepthStencilState> (manager, default_resources.null_depth_stencil_state.get (), METHOD_NAME, "null_depth_stencil_state");     
+    null_depth_stencil_state = cast_object<DepthStencilState> (manager, default_resources.depth_stencil_state.get (), METHOD_NAME, "null_depth_stencil_state");     
 
     if (!default_resources.rasterizer_state)
-      throw xtl::make_null_argument_exception (METHOD_NAME, "default_rasterizer_state");
-
-    RasterizerStatePtr default_rasterizer_state = cast_object<RasterizerState> (manager, default_resources.rasterizer_state.get (), METHOD_NAME, "default_rasterizer_state");
-
-    if (!default_resources.null_rasterizer_state)
       throw xtl::make_null_argument_exception (METHOD_NAME, "null_rasterizer_state");
 
-    null_rasterizer_state = cast_object<RasterizerState> (manager, default_resources.null_rasterizer_state.get (), METHOD_NAME, "null_rasterizer_state");
-
-      //установка значений по умолчанию
-
-    blend_state         = default_blend_state;
-    depth_stencil_state = default_depth_stencil_state;
-    rasterizer_state    = default_rasterizer_state;
+    null_rasterizer_state = cast_object<RasterizerState> (manager, default_resources.rasterizer_state.get (), METHOD_NAME, "null_rasterizer_state");
   }
 };
 

@@ -77,7 +77,7 @@ Device::Device (const AdapterPtr& in_adapter, const char* init_string)
 
       //создание контекста
 
-    immediate_context = ContextPtr (new Context (dx_immediate_context, *device_manager, shader_manager->GetShaderLibrary (), default_resources), false);      
+    immediate_context = ContextPtr (new Context (dx_immediate_context, *device_manager, shader_manager->GetShaderLibrary (), initial_resources, default_resources), false);      
 
       //создание отладочного уровня
 
@@ -107,7 +107,23 @@ Device::~Device ()
 void Device::InitDefaults ()
 {
   try
-  {
+  {    
+      //инициализация отображений
+
+/*    SwapChainDesc swap_chain_desc;
+
+    swap_chain->GetDesc (swap_chain_desc);        
+
+    xtl::com_ptr<ITexture> color_texture (render_target_registry.CreateColorBuffer (swap_chain, swap_chain_desc.buffers_count > 1 ? 1 : 0), false),
+                           depth_stencil_texture (render_target_registry.CreateDepthStencilBuffer (swap_chain), false);
+
+    ViewDesc view_desc;
+
+    memset (&view_desc, 0, sizeof (view_desc));
+
+    default_render_target_view = ViewPtr (CreateView (color_texture.get (), view_desc), false);
+    default_depth_stencil_view = ViewPtr (CreateView (depth_stencil_texture.get (), view_desc), false);    */
+
       //создание входного лэйаута по умолчанию
 
     InputLayoutDesc default_layout_desc;
@@ -173,11 +189,11 @@ void Device::InitDefaults ()
     blend_desc.render_target [0].color_write_mask = ColorWriteFlag_All;
     blend_desc.independent_blend_enable           = false;
 
-    default_resources.blend_state = IBlendStatePtr (output_manager->CreateBlendState (blend_desc), false);
+    initial_resources.blend_state = IBlendStatePtr (output_manager->CreateBlendState (blend_desc), false);
     
     blend_desc.render_target [0].color_write_mask = 0;
     
-    default_resources.null_blend_state = IBlendStatePtr (output_manager->CreateBlendState (blend_desc), false);
+    default_resources.blend_state = IBlendStatePtr (output_manager->CreateBlendState (blend_desc), false);
 
       //инициализация DepthStencilState
       
@@ -189,13 +205,13 @@ void Device::InitDefaults ()
     depth_stencil_desc.depth_write_enable = true;
     depth_stencil_desc.depth_compare_mode = CompareMode_Less;
     
-    default_resources.depth_stencil_state = IDepthStencilStatePtr (output_manager->CreateDepthStencilState (depth_stencil_desc), false);
+    initial_resources.depth_stencil_state = IDepthStencilStatePtr (output_manager->CreateDepthStencilState (depth_stencil_desc), false);
     
     depth_stencil_desc.depth_test_enable  = false;
     depth_stencil_desc.depth_write_enable = false;
     depth_stencil_desc.depth_compare_mode = CompareMode_AlwaysPass;
     
-    default_resources.null_depth_stencil_state = IDepthStencilStatePtr (output_manager->CreateDepthStencilState (depth_stencil_desc), false);
+    default_resources.depth_stencil_state = IDepthStencilStatePtr (output_manager->CreateDepthStencilState (depth_stencil_desc), false);
 
       //инициализация состояния растеризатора по умолчанию
 
@@ -211,8 +227,8 @@ void Device::InitDefaults ()
     rasterizer_desc.multisample_enable      = false;
     rasterizer_desc.antialiased_line_enable = false;
 
-    default_resources.rasterizer_state      = IRasterizerStatePtr (output_manager->CreateRasterizerState (rasterizer_desc), false);
-    default_resources.null_rasterizer_state = default_resources.rasterizer_state;
+    initial_resources.rasterizer_state = IRasterizerStatePtr (output_manager->CreateRasterizerState (rasterizer_desc), false);
+    default_resources.rasterizer_state = initial_resources.rasterizer_state;
   }
   catch (xtl::exception& e)
   {
