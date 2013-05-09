@@ -165,6 +165,40 @@ size_t OutputManagerContextState::GetStencilReference () const
 }
 
 /*
+    Копирование состояния
+*/
+
+void OutputManagerContextState::CopyTo (const StateBlockMask& mask, OutputManagerContextState& dst_state) const
+{
+  if (!mask.os_blend_state && !mask.os_depth_stencil_state && !mask.rs_state)
+    return;
+
+  bool update_notify = false; 
+
+  if (mask.os_blend_state)
+  {
+    dst_state.impl->blend_state = impl->blend_state;
+    update_notify               = true;
+  }
+
+  if (mask.os_depth_stencil_state)
+  {
+    dst_state.impl->depth_stencil_state = impl->depth_stencil_state;
+    dst_state.impl->stencil_ref         = impl->stencil_ref;
+    update_notify                       = true;
+  }
+
+  if (mask.rs_state)
+  {
+    dst_state.impl->rasterizer_state = impl->rasterizer_state;
+    update_notify                    = true;
+  }
+
+  if (update_notify)
+    dst_state.impl->UpdateNotify ();
+}
+
+/*
 ===================================================================================================
     OutputManagerContext
 ===================================================================================================

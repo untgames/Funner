@@ -50,6 +50,11 @@ class OutputManagerContextState
     IDepthStencilState* GetDepthStencilState () const;
     size_t              GetStencilReference  () const;
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Копирование состояния
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void CopyTo (const StateBlockMask&, OutputManagerContextState& dst_state) const;
+
   protected:
     struct Impl;
 
