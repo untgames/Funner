@@ -4,6 +4,28 @@ using namespace render::low_level;
 using namespace render::low_level::dx11;
 
 /*
+===================================================================================================
+    ContextState
+===================================================================================================
+*/
+
+ContextState::ContextState (const DeviceManager& manager)
+  : render_target_context_state (manager)
+  , texture_manager_context_state (manager)
+  , input_manager_context_state (manager)
+  , shader_manager_context_state (manager)
+  , output_manager_context_state (manager)
+  , query_manager_context_state (manager)
+{
+}
+
+/*
+===================================================================================================
+    Context
+===================================================================================================
+*/
+
+/*
     Конструктор
 */
 
@@ -16,6 +38,7 @@ try
   , input_manager_context (device_manager, in_context, default_resources)
   , shader_manager_context (shader_library, in_context, default_resources)
   , output_manager_context (device_manager, in_context, default_resources)
+  , query_manager_context (device_manager, in_context)
   , current_primitive_type (PrimitiveType_Num)
   , render_targets_changed ()
 {
@@ -60,7 +83,7 @@ void Context::Begin (IQuery* async)
 {
   try
   {
-    throw xtl::make_not_implemented_exception (__FUNCTION__);
+    query_manager_context.Begin (async);
   }
   catch (xtl::exception& e)
   {
@@ -73,7 +96,7 @@ void Context::End (IQuery* async)
 {
   try
   {
-    throw xtl::make_not_implemented_exception (__FUNCTION__);
+    query_manager_context.End (async);
   }
   catch (xtl::exception& e)
   {
@@ -639,17 +662,41 @@ void Context::GenerateMips (ITexture* texture)
 
 void Context::SetPredication (IPredicate* predicate, bool predicate_value)
 {
-  throw xtl::make_not_implemented_exception (__FUNCTION__);
+  try
+  {
+    query_manager_context.SetPredication (predicate, predicate_value);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::low_level::dx11::Context::SetPredication");
+    throw;
+  }
 }
 
 IPredicate* Context::GetPredicate ()
 {
-  throw xtl::make_not_implemented_exception (__FUNCTION__);
+  try
+  {
+    return query_manager_context.GetPredicate ();
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::low_level::dx11::Context::GetPredicate");
+    throw;
+  }
 }
 
 bool Context::GetPredicateValue ()
 {
-  throw xtl::make_not_implemented_exception (__FUNCTION__);
+  try
+  {
+    return query_manager_context.GetPredicateValue ();
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::low_level::dx11::Context::GetPredicateValue");
+    throw;
+  }
 }
 
 /*
@@ -679,6 +726,7 @@ void Context::Bind ()
     input_manager_context.Bind ();
     output_manager_context.Bind ();
     shader_manager_context.Bind ();  
+    query_manager_context.Bind ();
   }
   catch (xtl::exception& exception)
   {
@@ -828,6 +876,7 @@ void Context::Capture (const StateBlockMask& mask, ContextState& state) const
   input_manager_context.CopyTo   (mask, state.input_manager_context_state);
   shader_manager_context.CopyTo  (mask, state.shader_manager_context_state);
   output_manager_context.CopyTo  (mask, state.output_manager_context_state);
+  query_manager_context.CopyTo   (mask, state.query_manager_context_state);
 }
 
 void Context::Apply (const StateBlockMask& mask, const ContextState& state)
@@ -837,4 +886,5 @@ void Context::Apply (const StateBlockMask& mask, const ContextState& state)
   state.input_manager_context_state.CopyTo   (mask, input_manager_context);
   state.shader_manager_context_state.CopyTo  (mask, shader_manager_context);
   state.output_manager_context_state.CopyTo  (mask, output_manager_context);
+  state.query_manager_context_state.CopyTo   (mask, query_manager_context);
 }

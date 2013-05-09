@@ -14,6 +14,7 @@ RENDER.DX11_DRIVER.SOURCES.SOURCE_DIRS  += sources/texture_manager
 RENDER.DX11_DRIVER.SOURCES.SOURCE_DIRS  += sources/shader_manager
 RENDER.DX11_DRIVER.SOURCES.SOURCE_DIRS  += sources/input_manager
 RENDER.DX11_DRIVER.SOURCES.SOURCE_DIRS  += sources/output_manager
+RENDER.DX11_DRIVER.SOURCES.SOURCE_DIRS  += sources/query_manager
 RENDER.DX11_DRIVER.SOURCES.IMPORTS      := compile.render.low_level compile.render.low_level.helpers compile.common compile.system compile.extern.dxsdk compile.math.vecmath
 
 #DX11 render system tests

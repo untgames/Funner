@@ -31,6 +31,7 @@
 #include <shared/input_manager.h>
 #include <shared/object.h>
 #include <shared/output_manager.h>
+#include <shared/query_manager.h>
 #include <shared/render_target_manager.h>
 #include <shared/shader_manager.h>
 #include <shared/texture_manager.h>
@@ -241,6 +242,7 @@ struct ContextState
   InputManagerContextState   input_manager_context_state;   //состояние контекста менеджера входного уровня
   ShaderManagerContextState  shader_manager_context_state;  //состояние контекста менеджера шейдеров
   OutputManagerContextState  output_manager_context_state;  //состояние контекста менеджера выходного уровня
+  QueryManagerContextState   query_manager_context_state;   //состояние контекста менеджера запросов
 
 ///Конструктор
   ContextState (const DeviceManager&);
@@ -387,6 +389,7 @@ class Context: virtual public IDeviceContext, public DeviceObject
     InputManagerContext   input_manager_context;   //контекст менеджера входного уровня
     ShaderManagerContext  shader_manager_context;  //контекст менеджера шейдеров
     OutputManagerContext  output_manager_context;  //контекст менеджера выходного уровня
+    QueryManagerContext   query_manager_context;   //контекст менеджера запросов
     PrimitiveType         current_primitive_type;  //текущий тип примитивов
     bool                  render_targets_changed;  //были ли изменены целевые буферы
 };
@@ -507,6 +510,7 @@ class Device: virtual public IDevice, public Object
     stl::auto_ptr<InputManager>        input_manager;         //менеджер входного уровня
     stl::auto_ptr<ShaderManager>       shader_manager;        //менеджер шейдеров
     stl::auto_ptr<OutputManager>       output_manager;        //менеджер выходного уровня
+    stl::auto_ptr<QueryManager>        query_manager;         //менеджер запросов
     DefaultResources                   default_resources;     //ресурсы по умолчанию
     InitialResources                   initial_resources;     //ресурсы инициализации
     stl::auto_ptr<DeviceDebugLayer>    debug_layer;           //отладочный слой

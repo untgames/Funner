@@ -4,27 +4,6 @@ using namespace render::low_level;
 using namespace render::low_level::dx11;
 
 /*
-===================================================================================================
-    ContextState
-===================================================================================================
-*/
-
-ContextState::ContextState (const DeviceManager& manager)
-  : render_target_context_state (manager)
-  , texture_manager_context_state (manager)
-  , input_manager_context_state (manager)
-  , shader_manager_context_state (manager)
-  , output_manager_context_state (manager)
-{
-}
-
-/*
-===================================================================================================
-    StateBlock
-===================================================================================================
-*/
-
-/*
     Конструктор / деструктор
 */
 

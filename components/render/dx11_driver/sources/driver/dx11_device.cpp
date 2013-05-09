@@ -70,6 +70,7 @@ Device::Device (const AdapterPtr& in_adapter, const char* init_string)
     input_manager.reset         (new InputManager (*device_manager));
     shader_manager.reset        (new ShaderManager (*device_manager));
     output_manager.reset        (new OutputManager (*device_manager));
+    query_manager.reset         (new QueryManager (*device_manager));
 
       //инициализация ресурсов по умолчанию
 
@@ -369,7 +370,15 @@ const char* Device::GetVertexAttributeSemanticName (VertexAttributeSemantic sema
 
 IQuery* Device::CreateQuery (QueryType type)
 {
-  throw xtl::make_not_implemented_exception ("render::low_level::dx11::Device::CreateQuery");
+  try
+  {
+    return query_manager->CreateQuery (type);
+  }
+  catch (xtl::exception& exception)
+  {
+    exception.touch ("render::low_level::dx11::Device::CreateQuery");
+    throw;
+  }
 }
 
 /*
@@ -380,7 +389,7 @@ IPredicate* Device::CreatePredicate ()
 {
   try
   {
-    throw xtl::make_not_implemented_exception (__FUNCTION__);
+    return query_manager->CreatePredicate ();
   }
   catch (xtl::exception& exception)
   {
