@@ -196,6 +196,23 @@ void Device::InitDefaults ()
     depth_stencil_desc.depth_compare_mode = CompareMode_AlwaysPass;
     
     default_resources.null_depth_stencil_state = IDepthStencilStatePtr (output_manager->CreateDepthStencilState (depth_stencil_desc), false);
+
+      //инициализация состояния растеризатора по умолчанию
+
+    RasterizerDesc rasterizer_desc;
+
+    memset (&rasterizer_desc, 0, sizeof rasterizer_desc);
+
+    rasterizer_desc.fill_mode               = FillMode_Solid;
+    rasterizer_desc.cull_mode               = CullMode_None;
+    rasterizer_desc.front_counter_clockwise = true;
+    rasterizer_desc.depth_bias              = 0;
+    rasterizer_desc.scissor_enable          = false;
+    rasterizer_desc.multisample_enable      = false;
+    rasterizer_desc.antialiased_line_enable = false;
+
+    default_resources.rasterizer_state      = IRasterizerStatePtr (output_manager->CreateRasterizerState (rasterizer_desc), false);
+    default_resources.null_rasterizer_state = default_resources.rasterizer_state;
   }
   catch (xtl::exception& e)
   {

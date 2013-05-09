@@ -63,7 +63,7 @@ IRasterizerState* OutputManager::CreateRasterizerState (const RasterizerDesc& de
 {
   try
   {
-    throw xtl::make_not_implemented_exception (__FUNCTION__);
+    return new RasterizerState (impl->GetDeviceManager (), desc);
   }
   catch (xtl::exception& e)
   {
