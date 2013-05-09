@@ -302,6 +302,7 @@ class Context: virtual public IDeviceContext, public DeviceObject
     size_t              OSGetStencilReference  ();
     IView*              OSGetRenderTargetView  (size_t render_target_slot);
     IView*              OSGetDepthStencilView  ();
+    bool                RenderTargetsChanged   () const { return render_targets_changed; }
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Управление уровнем вывода вершин
@@ -365,6 +366,7 @@ class Context: virtual public IDeviceContext, public DeviceObject
     ShaderManagerContext  shader_manager_context;  //контекст менеджера шейдеров
     OutputManagerContext  output_manager_context;  //контекст менеджера выходного уровня
     PrimitiveType         current_primitive_type;  //текущий тип примитивов
+    bool                  render_targets_changed;  //были ли изменены целевые буферы
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -461,11 +463,16 @@ class Device: virtual public IDevice, public Object
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     IDeviceContext* GetImmediateContext ();
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Инициализация целевых буферов (в случае отсутствия буферов по умолчанию)
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void InitRenderTargets (SwapChain&);
+
   private:
-    ITexture* CreateTexture   (const TextureDesc&, const TextureData*);
-    void      InitDefaults    ();
-    void      StartDebugLayer ();
-    void      StopDebugLayer  ();
+    ITexture* CreateTexture     (const TextureDesc&, const TextureData*);
+    void      InitDefaults      ();
+    void      StartDebugLayer   ();
+    void      StopDebugLayer    ();
 
   private:
     AdapterPtr                         adapter;               //адаптер устройства

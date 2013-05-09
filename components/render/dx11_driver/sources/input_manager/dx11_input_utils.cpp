@@ -20,17 +20,17 @@ struct Semantic2Name
 };
 
 const Semantic2Name semantic_names [] = {
-  {VertexAttributeSemantic_Position,  "Position"},
-  {VertexAttributeSemantic_Normal,    "Normal"},
-  {VertexAttributeSemantic_Color,     "Color"},
-  {VertexAttributeSemantic_TexCoord0, "TexCoord0"},
-  {VertexAttributeSemantic_TexCoord1, "TexCoord1"},
-  {VertexAttributeSemantic_TexCoord2, "TexCoord2"},
-  {VertexAttributeSemantic_TexCoord3, "TexCoord3"},
-  {VertexAttributeSemantic_TexCoord4, "TexCoord4"},
-  {VertexAttributeSemantic_TexCoord5, "TexCoord5"},
-  {VertexAttributeSemantic_TexCoord6, "TexCoord6"},
-  {VertexAttributeSemantic_TexCoord7, "TexCoord7"},
+  {VertexAttributeSemantic_Position,  "POSITION"},
+  {VertexAttributeSemantic_Normal,    "NORMAL"},
+  {VertexAttributeSemantic_Color,     "COLOR"},
+  {VertexAttributeSemantic_TexCoord0, "TEXCOORD0"},
+  {VertexAttributeSemantic_TexCoord1, "TEXCOORD1"},
+  {VertexAttributeSemantic_TexCoord2, "TEXCOORD2"},
+  {VertexAttributeSemantic_TexCoord3, "TEXCOORD3"},
+  {VertexAttributeSemantic_TexCoord4, "TEXCOORD4"},
+  {VertexAttributeSemantic_TexCoord5, "TEXCOORD5"},
+  {VertexAttributeSemantic_TexCoord6, "TEXCOORD6"},
+  {VertexAttributeSemantic_TexCoord7, "TEXCOORD7"},
 };
 
 const size_t semantic_names_count = sizeof (semantic_names) / sizeof (*semantic_names);

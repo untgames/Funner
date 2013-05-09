@@ -488,9 +488,6 @@ void RenderTargetContext::Bind ()
       if (view != render_target_cache.view)
         need_update_render_targets = true;
 
-printf ("%s(%u)\n", __FUNCTION__, __LINE__); fflush (stdout);
-printf ("%d: %p %p\n", i, view, render_target_cache.view);
-
       viewport_hashes [i] = impl.GetViewportHash (i);
       scissor_hashes [i]  = impl.GetScissorHash (i);
 

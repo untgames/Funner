@@ -178,7 +178,13 @@ ISwapChain* Driver::CreateSwapChain (IDevice* in_device, const SwapChainDesc& de
 
     Device* device = cast_object<Device> (in_device, "", "device");
 
-    return new SwapChain (factory, device->GetAdapter (), &device->GetHandle (), desc);
+    xtl::com_ptr<SwapChain> swap_chain (new SwapChain (factory, device->GetAdapter (), &device->GetHandle (), desc), false);
+
+    device->InitRenderTargets (*swap_chain);
+
+    swap_chain->AddRef ();
+
+    return swap_chain.get ();
   }
   catch (xtl::exception& e)
   {

@@ -108,40 +108,30 @@ void Device::InitDefaults ()
 {
   try
   {    
-      //инициализация отображений
-
-/*    SwapChainDesc swap_chain_desc;
-
-    swap_chain->GetDesc (swap_chain_desc);        
-
-    xtl::com_ptr<ITexture> color_texture (render_target_registry.CreateColorBuffer (swap_chain, swap_chain_desc.buffers_count > 1 ? 1 : 0), false),
-                           depth_stencil_texture (render_target_registry.CreateDepthStencilBuffer (swap_chain), false);
-
-    ViewDesc view_desc;
-
-    memset (&view_desc, 0, sizeof (view_desc));
-
-    default_render_target_view = ViewPtr (CreateView (color_texture.get (), view_desc), false);
-    default_depth_stencil_view = ViewPtr (CreateView (depth_stencil_texture.get (), view_desc), false);    */
-
       //создание входного лэйаута по умолчанию
 
     InputLayoutDesc default_layout_desc;
     
     memset (&default_layout_desc, 0 , sizeof default_layout_desc);
 
-    VertexAttribute va;
+    VertexAttribute va [2];
 
     memset (&va, 0, sizeof (va));
 
-    va.semantic = "POSITION";
-    va.format   = InputDataFormat_Vector3;
-    va.type     = InputDataType_Float;
-    va.offset   = 0;
-    va.stride   = sizeof (float) * 3;
+    va [0].semantic = "POSITION";
+    va [0].format   = InputDataFormat_Vector3;
+    va [0].type     = InputDataType_Float;
+    va [0].offset   = 0;
+    va [0].stride   = sizeof (float) * 7;
 
-    default_layout_desc.vertex_attributes       = &va;
-    default_layout_desc.vertex_attributes_count = 1;
+    va [1].semantic = "COLOR";
+    va [1].format   = InputDataFormat_Vector4;
+    va [1].type     = InputDataType_Float;
+    va [1].offset   = 0;
+    va [1].stride   = sizeof (float) * 7;
+
+    default_layout_desc.vertex_attributes       = &va [0];
+    default_layout_desc.vertex_attributes_count = sizeof (va) / sizeof (*va);
     default_layout_desc.index_type              = InputDataType_UShort;
 
     default_resources.input_layout = InputLayoutPtr (input_manager->CreateInputLayout (default_layout_desc), false);
@@ -151,19 +141,20 @@ void Device::InitDefaults ()
     ShaderDesc shader_descs [2];
 
     static const char* DEFAULT_VERTEX_SHADER = 
-      "struct VS_INPUT   { float4 Position : POSITION; };\n"
-      "struct VS_OUTPUT  { float4 Position : POSITION; };\n"
+      "struct VS_INPUT   { float4 Position : POSITION; float4 Color : COLOR; };\n"
+      "struct VS_OUTPUT  { float4 Position : SV_POSITION; float4 Color : COLOR; };\n"
 
       "VS_OUTPUT main (in VS_INPUT In) {\n"
       "  VS_OUTPUT Out;\n"
       "  Out.Position = In.Position;\n"
+      "  Out.Color    = In.Color;\n"
       "  return Out;\n"
       "}\n";
 
     static const char* DEFAULT_PIXEL_SHADER = 
-      "struct PS_INPUT {};\n"
+      "struct PS_INPUT { float4 Position : SV_POSITION; float4 Color : COLOR; };\n"
       "float4 main (PS_INPUT Input) : SV_TARGET {\n"
-      "    return float4 (1.0, 1, 1.0, 1.0);\n"
+      "    return Input.Color;\n"
       "}\n";
 
     memset (&shader_descs, 0, sizeof (shader_descs));
@@ -189,11 +180,11 @@ void Device::InitDefaults ()
     blend_desc.render_target [0].color_write_mask = ColorWriteFlag_All;
     blend_desc.independent_blend_enable           = false;
 
-    initial_resources.blend_state = IBlendStatePtr (output_manager->CreateBlendState (blend_desc), false);
+    initial_resources.blend_state = IBlendStatePtr (CreateBlendState (blend_desc), false);
     
     blend_desc.render_target [0].color_write_mask = 0;
     
-    default_resources.blend_state = IBlendStatePtr (output_manager->CreateBlendState (blend_desc), false);
+    default_resources.blend_state = IBlendStatePtr (CreateBlendState (blend_desc), false);
 
       //инициализация DepthStencilState
       
@@ -205,13 +196,13 @@ void Device::InitDefaults ()
     depth_stencil_desc.depth_write_enable = true;
     depth_stencil_desc.depth_compare_mode = CompareMode_Less;
     
-    initial_resources.depth_stencil_state = IDepthStencilStatePtr (output_manager->CreateDepthStencilState (depth_stencil_desc), false);
+    initial_resources.depth_stencil_state = IDepthStencilStatePtr (CreateDepthStencilState (depth_stencil_desc), false);
     
     depth_stencil_desc.depth_test_enable  = false;
     depth_stencil_desc.depth_write_enable = false;
     depth_stencil_desc.depth_compare_mode = CompareMode_AlwaysPass;
     
-    default_resources.depth_stencil_state = IDepthStencilStatePtr (output_manager->CreateDepthStencilState (depth_stencil_desc), false);
+    default_resources.depth_stencil_state = IDepthStencilStatePtr (CreateDepthStencilState (depth_stencil_desc), false);
 
       //инициализация состояния растеризатора по умолчанию
 
@@ -227,12 +218,48 @@ void Device::InitDefaults ()
     rasterizer_desc.multisample_enable      = false;
     rasterizer_desc.antialiased_line_enable = false;
 
-    initial_resources.rasterizer_state = IRasterizerStatePtr (output_manager->CreateRasterizerState (rasterizer_desc), false);
+    initial_resources.rasterizer_state = IRasterizerStatePtr (CreateRasterizerState (rasterizer_desc), false);
     default_resources.rasterizer_state = initial_resources.rasterizer_state;
   }
   catch (xtl::exception& e)
   {
     e.touch ("render::low_level::dx11:Device::InitDefaults");
+    throw;
+  }
+}
+
+void Device::InitRenderTargets (SwapChain& swap_chain)
+{
+  try
+  {
+    if (initial_resources.render_target_view || initial_resources.depth_stencil_view)
+      return;
+
+      //инициализация отображений
+
+    SwapChainDesc swap_chain_desc;
+
+    swap_chain.GetDesc (swap_chain_desc);        
+
+    xtl::com_ptr<ITexture> color_texture (CreateRenderTargetTexture (&swap_chain, 0), false),
+                           depth_stencil_texture (CreateDepthStencilTexture (&swap_chain), false);
+
+    ViewDesc view_desc;
+
+    memset (&view_desc, 0, sizeof (view_desc));
+
+    initial_resources.render_target_view = IViewPtr (CreateView (color_texture.get (), view_desc), false);
+    initial_resources.depth_stencil_view = IViewPtr (CreateView (depth_stencil_texture.get (), view_desc), false);
+
+    if (!immediate_context->RenderTargetsChanged ())
+    {
+      immediate_context->OSSetRenderTargetView (0, initial_resources.render_target_view.get ());
+      immediate_context->OSSetDepthStencilView (initial_resources.depth_stencil_view.get ());
+    }
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::low_level::dx11:Device::InitRenderTargets");
     throw;
   }
 }

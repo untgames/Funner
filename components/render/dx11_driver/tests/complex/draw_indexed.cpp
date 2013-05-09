@@ -5,16 +5,11 @@ struct Vec3f
   float x, y, z;
 };
 
-struct Color4ub
-{
-  unsigned char red, green, blue, alpha;
-};
-
 struct MyVertex
 {
-  Vec3f    position;
-  Vec3f    normal;
-  Color4ub color;
+  Vec3f   position;
+  Vec3f   normal;
+  Color4f color;
 };
 
 void redraw (Test& test)
@@ -48,9 +43,9 @@ int main ()
     BufferPtr vb (test.device->CreateBuffer (vb_desc), false);
 
     static const MyVertex verts [] = {
-      {{-1, -1, 0}, {0, 0, 1}, {255, 0, 0, 0}},
-      {{ 1, -1, 0}, {0, 0, 1}, {0, 255, 0, 0}},
-      {{ 0, 1, 0}, {0, 0, 1}, {0, 0, 255, 0}},
+      {{-1, -1, 0}, {0, 0, 1}, {1.0f, 0, 0, 0}},
+      {{ 1, -1, 0}, {0, 0, 1}, {0, 1.0f, 0, 0}},
+      {{ 0, 1, 0}, {0, 0, 1}, {0, 0, 1.0f, 0}},
     };
 
     vb->SetData (0, vb_desc.size, verts);
@@ -77,7 +72,7 @@ int main ()
     VertexAttribute attributes [] = {
       {test.device->GetVertexAttributeSemanticName (VertexAttributeSemantic_Normal), InputDataFormat_Vector3, InputDataType_Float, 0, offsetof (MyVertex, normal), sizeof (MyVertex)},
       {test.device->GetVertexAttributeSemanticName (VertexAttributeSemantic_Position), InputDataFormat_Vector3, InputDataType_Float, 0, offsetof (MyVertex, position), sizeof (MyVertex)},
-      {test.device->GetVertexAttributeSemanticName (VertexAttributeSemantic_Color), InputDataFormat_Vector4, InputDataType_UByte, 0, offsetof (MyVertex, color), sizeof (MyVertex)},
+      {test.device->GetVertexAttributeSemanticName (VertexAttributeSemantic_Color), InputDataFormat_Vector4, InputDataType_Float, 0, offsetof (MyVertex, color), sizeof (MyVertex)},
     };
 
     InputLayoutDesc layout_desc;

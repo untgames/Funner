@@ -17,12 +17,17 @@ try
   , shader_manager_context (shader_library, in_context, default_resources)
   , output_manager_context (device_manager, in_context, default_resources)
   , current_primitive_type (PrimitiveType_Num)
+  , render_targets_changed ()
 {
   if (!context)
     throw xtl::make_null_argument_exception ("", "context");
 
-  OSSetRenderTargetView  (0, initial_resources.render_target_view.get ());
-  OSSetDepthStencilView  (initial_resources.depth_stencil_view.get ());
+  if (initial_resources.render_target_view && initial_resources.depth_stencil_view)
+  {
+    OSSetRenderTargetView (0, initial_resources.render_target_view.get ());
+    OSSetDepthStencilView (initial_resources.depth_stencil_view.get ());
+  }
+
   OSSetBlendState        (initial_resources.blend_state.get ());
   OSSetDepthStencilState (initial_resources.depth_stencil_state.get ());
   RSSetState             (initial_resources.rasterizer_state.get ());
@@ -498,6 +503,8 @@ void Context::OSSetRenderTargets (size_t count, IView** render_target_views, IVi
     if (!render_target_views && count)
       throw xtl::make_null_argument_exception ("", "render_target_views");
 
+    render_targets_changed = true;
+
     for (size_t i=0; i<count; i++)
       render_target_context.SetRenderTargetView (i, render_target_views [i]);
 
@@ -517,6 +524,8 @@ void Context::OSSetRenderTargetView (size_t render_target_slot, IView* render_ta
 {
   try
   {    
+    render_targets_changed = true;
+
     render_target_context.SetRenderTargetView (render_target_slot, render_target_view);
   }
   catch (xtl::exception& e)
@@ -530,6 +539,8 @@ void Context::OSSetDepthStencilView (IView* depth_stencil_view)
 {
   try
   {    
+    render_targets_changed = true;
+
     render_target_context.SetDepthStencilView (depth_stencil_view);
   }
   catch (xtl::exception& e)
