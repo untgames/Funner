@@ -102,7 +102,10 @@ class OutputStageState: public IStageState
         SetBlendState (source.GetBlendState ());
 
       if (mask.os_depth_stencil_state)
+      {
         SetDepthStencilState (source.GetDepthStencilState ());
+        SetStencilReference  (source.GetStencilReference ());
+      }
 
       if (mask.rs_state)
         SetRasterizerState (source.GetRasterizerState ());
