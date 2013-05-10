@@ -7,7 +7,7 @@ using namespace render::low_level::dx11;
      онструктор / деструктор
 */
 
-InputBuffer::InputBuffer (const DeviceManager& device_manager, const BufferDesc& in_desc)
+InputBuffer::InputBuffer (const DeviceManager& device_manager, const BufferDesc& in_desc, const void* data)
   : DeviceObject (device_manager)
   , desc (in_desc)
 {
@@ -23,8 +23,8 @@ InputBuffer::InputBuffer (const DeviceManager& device_manager, const BufferDesc&
 
     switch (desc.usage_mode)
     {
-      case UsageMode_Static:   //dx_desc.Usage = D3D11_USAGE_IMMUTABLE; break;
-      case UsageMode_Default:  //dx_desc.Usage = D3D11_USAGE_DEFAULT; break; //add data to constructor
+      case UsageMode_Static:   dx_desc.Usage = D3D11_USAGE_IMMUTABLE; break;
+      case UsageMode_Default:  dx_desc.Usage = D3D11_USAGE_DEFAULT; break;
       case UsageMode_Dynamic:  dx_desc.Usage = D3D11_USAGE_DYNAMIC; break;
       case UsageMode_Stream:   dx_desc.Usage = D3D11_USAGE_STAGING; break;
       default:
@@ -72,7 +72,13 @@ InputBuffer::InputBuffer (const DeviceManager& device_manager, const BufferDesc&
 
     ID3D11Buffer* dx_buffer = 0;
 
-    check_errors ("ID3D11Device::CreateBuffer", GetDevice ().CreateBuffer (&dx_desc, 0, &dx_buffer));
+    D3D11_SUBRESOURCE_DATA dx_data;
+
+    memset (&dx_data, 0, sizeof (dx_data));
+
+    dx_data.pSysMem = data;
+
+    check_errors ("ID3D11Device::CreateBuffer", GetDevice ().CreateBuffer (&dx_desc, data ? &dx_data : (D3D11_SUBRESOURCE_DATA*)0, &dx_buffer));
 
     if (!dx_buffer)
       throw xtl::format_operation_exception ("", "ID3D11Device::CreateBuffer failed");
@@ -103,7 +109,7 @@ void InputBuffer::GetDesc (BufferDesc& out_desc)
     „тение / запись из буфера
 */
 
-void InputBuffer::SetData (size_t offset, size_t size, const void* data)
+void InputBuffer::SetData (size_t offset, size_t size, const void* data, IDeviceContext* context)
 {
   try
   {
@@ -128,18 +134,22 @@ void InputBuffer::SetData (size_t offset, size_t size, const void* data)
     if (!data)
       throw xtl::make_null_argument_exception ("", "data");
 
+      //преобразование контекста
+
+    ID3D11DeviceContext& dx_context = get_dx_context (*this, context);
+
       //запись
 
     D3D11_MAPPED_SUBRESOURCE subresource;
 
-    check_errors ("ID3D11DeviceContext::Map", GetDeviceManager ().GetImmediateContext ().Map (buffer.get (), 0, size == desc.size ? D3D11_MAP_WRITE_DISCARD : D3D11_MAP_WRITE, 0, &subresource));
+    check_errors ("ID3D11DeviceContext::Map", dx_context.Map (buffer.get (), 0, size == desc.size ? D3D11_MAP_WRITE_DISCARD : D3D11_MAP_WRITE, 0, &subresource));
 
     if (!subresource.pData)
       throw xtl::format_operation_exception ("", "ID3D11DeviceContext::Map failed");
 
     memcpy (reinterpret_cast<char*> (subresource.pData) + offset, reinterpret_cast<const char*> (data), size);
 
-    GetDeviceManager ().GetImmediateContext ().Unmap (buffer.get (), 0);
+    dx_context.Unmap (buffer.get (), 0);
   }
   catch (xtl::exception& e)
   {
@@ -148,7 +158,7 @@ void InputBuffer::SetData (size_t offset, size_t size, const void* data)
   }
 }
 
-void InputBuffer::GetData (size_t offset, size_t size, void* data)
+void InputBuffer::GetData (size_t offset, size_t size, void* data, IDeviceContext* context)
 {
   try
   {
@@ -173,18 +183,22 @@ void InputBuffer::GetData (size_t offset, size_t size, void* data)
     if (!data)
       throw xtl::make_null_argument_exception ("", "data");
 
+      //преобразование контекста
+
+    ID3D11DeviceContext& dx_context = get_dx_context (*this, context);
+
       //чтение
 
     D3D11_MAPPED_SUBRESOURCE subresource;
 
-    check_errors ("ID3D11DeviceContext::Map", GetDeviceManager ().GetImmediateContext ().Map (buffer.get (), 0, D3D11_MAP_READ, 0, &subresource));
+    check_errors ("ID3D11DeviceContext::Map", dx_context.Map (buffer.get (), 0, D3D11_MAP_READ, 0, &subresource));
 
     if (!subresource.pData)
       throw xtl::format_operation_exception ("", "ID3D11DeviceContext::Map failed");
 
     memcpy (reinterpret_cast<char*> (data), reinterpret_cast<const char*> (subresource.pData) + offset, size);
 
-    GetDeviceManager ().GetImmediateContext ().Unmap (buffer.get (), 0);
+    dx_context.Unmap (buffer.get (), 0);
   }
   catch (xtl::exception& e)
   {

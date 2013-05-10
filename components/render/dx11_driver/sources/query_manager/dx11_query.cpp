@@ -92,14 +92,76 @@ Query::~Query ()
 }
 
 /*
-    Получение данных
+    Указание границ запроса
 */
 
-void Query::GetData (size_t size, void* data)
+void Query::Begin (IDeviceContext* context)
 {
   try
   {
-    throw xtl::make_not_implemented_exception (__FUNCTION__);
+    if (!context)
+      throw xtl::make_null_argument_exception ("", "context");
+
+    ID3D11DeviceContext& dx_context = get_dx_context (*this, context);
+
+    dx_context.Begin (query.get ());
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::low_level::dx11::Query::Begin");
+    throw;
+  }
+}
+
+void Query::End (IDeviceContext* context)
+{
+  try
+  {
+    if (!context)
+      throw xtl::make_null_argument_exception ("", "context");
+
+    ID3D11DeviceContext& dx_context = get_dx_context (*this, context);
+
+    dx_context.End (query.get ());
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::low_level::dx11::Query::End");
+    throw;
+  }
+}
+
+/*
+    Получение данных
+*/
+
+bool Query::GetDataCore (size_t size, void* data, IDeviceContext* context, UINT flags)
+{
+  ID3D11DeviceContext& dx_context = get_dx_context (*this, context);
+
+  if (!size)
+    return true;
+
+  if (!data)
+    throw xtl::make_null_argument_exception ("", "data");
+
+  HRESULT result = dx_context.GetData (query.get (), data, size, flags);
+
+  if (result == S_OK)
+    return true;
+
+  if (!flags && result)
+    check_errors ("ID3D11DeviceContext::GetData", result);
+
+  return false;
+}
+
+void Query::GetData (size_t size, void* data, IDeviceContext* context)
+{
+  try
+  {
+    if (!GetDataCore (size, data, context, 0))
+      throw xtl::format_operation_exception ("", "ID3D11DeviceContext::GetData failed");
   }
   catch (xtl::exception& e)
   {
@@ -108,11 +170,11 @@ void Query::GetData (size_t size, void* data)
   }
 }
 
-bool Query::TryGetData (size_t size, void* data)
+bool Query::TryGetData (size_t size, void* data, IDeviceContext* context)
 {
   try
   {
-    throw xtl::make_not_implemented_exception (__FUNCTION__);
+    return GetDataCore (size, data, context, D3D11_ASYNC_GETDATA_DONOTFLUSH);
   }
   catch (xtl::exception& e)
   {

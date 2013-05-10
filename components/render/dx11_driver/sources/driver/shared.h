@@ -253,7 +253,7 @@ struct ContextState
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Контекст отрисовки
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-class Context: virtual public IDeviceContext, public DeviceObject
+class Context: public IDeviceContextImpl
 {
   public:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -266,12 +266,6 @@ class Context: virtual public IDeviceContext, public DeviceObject
 ///Низкоуровневый дескриптор
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     ID3D11DeviceContext& GetHandle ();
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Указание границ запроса
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    void Begin (IQuery* async);
-    void End   (IQuery* async);
   
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Управление входным уровнем (input-stage)
@@ -467,7 +461,7 @@ class Device: virtual public IDevice, public Object
     IBlendState*              CreateBlendState              (const BlendDesc&);
     IDepthStencilState*       CreateDepthStencilState       (const DepthStencilDesc&);
     ISamplerState*            CreateSamplerState            (const SamplerDesc&);
-    IBuffer*                  CreateBuffer                  (const BufferDesc&);
+    IBuffer*                  CreateBuffer                  (const BufferDesc&, const void* data);
     IProgram*                 CreateProgram                 (size_t shaders_count, const ShaderDesc* shader_descs, const LogFunction& error_log);
     ITexture*                 CreateTexture                 (const TextureDesc&);
     ITexture*                 CreateTexture                 (const TextureDesc&, const TextureData&);
@@ -496,10 +490,10 @@ class Device: virtual public IDevice, public Object
     void InitRenderTargets (SwapChain&);
 
   private:
-    ITexture* CreateTexture     (const TextureDesc&, const TextureData*);
-    void      InitDefaults      ();
-    void      StartDebugLayer   ();
-    void      StopDebugLayer    ();
+    ITexture* CreateTexture   (const TextureDesc&, const TextureData*);
+    void      InitDefaults    ();
+    void      StartDebugLayer ();
+    void      StopDebugLayer  ();
 
   private:
     AdapterPtr                         adapter;               //адаптер устройства

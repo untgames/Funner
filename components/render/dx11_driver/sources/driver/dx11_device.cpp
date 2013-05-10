@@ -458,7 +458,7 @@ IInputLayout* Device::CreateInputLayout (const InputLayoutDesc& desc)
   }
 }
 
-IBuffer* Device::CreateBuffer (const BufferDesc& desc)
+IBuffer* Device::CreateBuffer (const BufferDesc& desc, const void* data)
 {
   static const char* METHOD_NAME = "render::low_level::dx11::Device::CreateBuffer";
 
@@ -472,8 +472,8 @@ IBuffer* Device::CreateBuffer (const BufferDesc& desc)
     switch (desc.bind_flags)
     {
       case BindFlag_VertexBuffer:
-      case BindFlag_IndexBuffer:    return input_manager->CreateBuffer (desc);
-      case BindFlag_ConstantBuffer: return shader_manager->CreateConstantBuffer (desc);
+      case BindFlag_IndexBuffer:    return input_manager->CreateBuffer (desc, data);
+      case BindFlag_ConstantBuffer: return shader_manager->CreateConstantBuffer (desc, data);
       default:
         throw xtl::format_not_supported_exception ("", "Incompatible desc.bind_flags=%s", get_name ((BindFlag)desc.bind_flags));
     }

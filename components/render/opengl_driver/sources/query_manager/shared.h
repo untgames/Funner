@@ -49,7 +49,7 @@ class IOpenGlPredicate: virtual public IPredicate
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Получение данных
 ///////////////////////////////////////////////////////////////////////////////////////////////////  
-    void GetData (IDeviceContext*, size_t size, void* data)
+    void GetData (size_t size, void* data, IDeviceContext*)
     {      
       if (size < sizeof (OcclusionPredicateQueryDesc))
         throw xtl::make_argument_exception ("render::low_level::opengl::IOpenGlPredicate::GetData", "size", size, "Size is too small");
@@ -57,7 +57,7 @@ class IOpenGlPredicate: virtual public IPredicate
       *reinterpret_cast<OcclusionPredicateQueryDesc*> (data) = GetResult ();
     }
 
-    bool TryGetData (IDeviceContext*, size_t size, void* data)
+    bool TryGetData (size_t size, void* data, IDeviceContext*)
     {
       if (size < sizeof (OcclusionPredicateQueryDesc))
         return false;

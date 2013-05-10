@@ -38,7 +38,7 @@ int main ()
     memset (&buffer_desc, 0, sizeof buffer_desc);
     
     buffer_desc.size       = 12;
-    buffer_desc.usage_mode = UsageMode_Default;
+    buffer_desc.usage_mode = UsageMode_Dynamic;
     buffer_desc.bind_flags = BindFlag_VertexBuffer;
     buffer_desc.access_flags = AccessFlag_ReadWrite;
     

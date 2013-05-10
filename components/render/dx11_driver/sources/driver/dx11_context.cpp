@@ -31,7 +31,7 @@ ContextState::ContextState (const DeviceManager& manager)
 
 Context::Context (const DxContextPtr& in_context, const DeviceManager& device_manager, ShaderLibrary& shader_library, const InitialResources& initial_resources, const DefaultResources& default_resources)
 try
-  : DeviceObject (device_manager)
+  : IDeviceContextImpl (device_manager)
   , context (in_context)
   , render_target_context (device_manager, in_context)
   , texture_manager_context (device_manager, in_context)
@@ -75,36 +75,6 @@ Context::~Context ()
 ID3D11DeviceContext& Context::GetHandle ()
 {
   return *context;
-}
-
-/*
-    Управление запросами
-*/
-
-void Context::Begin (IQuery* async)
-{
-  try
-  {
-    query_manager_context.Begin (async);
-  }
-  catch (xtl::exception& e)
-  {
-    e.touch ("render::low_level::dx11::Context::Begin");
-    throw;
-  }
-}
-
-void Context::End (IQuery* async)
-{
-  try
-  {
-    query_manager_context.End (async);
-  }
-  catch (xtl::exception& e)
-  {
-    e.touch ("render::low_level::dx11::Context::End");
-    throw;
-  }
 }
 
 /*

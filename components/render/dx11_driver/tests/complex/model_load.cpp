@@ -110,7 +110,7 @@ struct Model
           desc.size         = ib.Size () * sizeof (unsigned short);
           desc.usage_mode   = UsageMode_Default;
           desc.bind_flags   = BindFlag_IndexBuffer;
-          desc.access_flags = AccessFlag_ReadWrite;
+          desc.access_flags = 0;
           
           stl::vector<unsigned short> index_data (ib.Size ());
           
@@ -120,9 +120,7 @@ struct Model
           for (size_t i=0; i<ib.Size (); i++, src_index++, dst_index++)
             *dst_index = static_cast<unsigned short> (*src_index);
 
-          BufferPtr (device->CreateBuffer (desc), false).swap (ib_buffer);
-
-          ib_buffer->SetData (0, desc.size, &index_data [0]);
+          BufferPtr (device->CreateBuffer (desc, &index_data [0]), false).swap (ib_buffer);
         }
 
         index_buffers [ib.Id ()] = ib_buffer;
@@ -222,11 +220,9 @@ struct Model
             desc.size         = vs.Size () * vs.VertexSize ();
             desc.usage_mode   = UsageMode_Default;
             desc.bind_flags   = BindFlag_VertexBuffer;
-            desc.access_flags = AccessFlag_Read | AccessFlag_Write;
+            desc.access_flags = 0;
 
-            vs_buffer = BufferPtr (device->CreateBuffer (desc), false);
-
-            vs_buffer->SetData (0, desc.size, vs.Data ());
+            vs_buffer = BufferPtr (device->CreateBuffer (desc, vs.Data ()), false);
 
             vertex_streams [vs.Id ()] = vs_buffer;
           }

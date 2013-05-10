@@ -46,11 +46,11 @@ InputLayout* InputManager::CreateInputLayout (const InputLayoutDesc& desc)
   }
 }
 
-IBuffer* InputManager::CreateBuffer (const BufferDesc& desc)
+IBuffer* InputManager::CreateBuffer (const BufferDesc& desc, const void* data)
 {
   try
   {
-    return new InputBuffer (impl->GetDeviceManager (), desc);
+    return new InputBuffer (impl->GetDeviceManager (), desc, data);
   }
   catch (xtl::exception& e)
   {

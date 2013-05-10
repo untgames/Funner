@@ -413,7 +413,7 @@ ID3D11ShaderResourceView& Texture::GetShaderResourceView ()
     –абота с данными
 */
 
-void Texture::SetData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height, PixelFormat source_format, const void* buffer)
+void Texture::SetData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height, PixelFormat source_format, const void* buffer, IDeviceContext* context)
 {
   try
   {
@@ -468,6 +468,10 @@ void Texture::SetData (size_t layer, size_t mip_level, size_t x, size_t y, size_
     if (!is_compatible)
       throw xtl::format_not_supported_exception ("", "Texture format %s incompatible with source_format %s", get_name (impl->desc.format), get_name (source_format));
 
+      //преобразование контекста
+
+    ID3D11DeviceContext& dx_context = get_dx_context (*this, context);
+
     throw xtl::make_not_implemented_exception (__FUNCTION__);
   }
   catch (xtl::exception& e)
@@ -477,7 +481,7 @@ void Texture::SetData (size_t layer, size_t mip_level, size_t x, size_t y, size_
   }
 }
 
-void Texture::GetData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height, PixelFormat target_format, void* buffer)
+void Texture::GetData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height, PixelFormat target_format, void* buffer, IDeviceContext* context)
 {
   throw xtl::make_not_implemented_exception (__FUNCTION__);
 }

@@ -66,11 +66,11 @@ IProgram* ShaderManager::CreateProgram (size_t shaders_count, const ShaderDesc* 
     Создание константного буфера
 */
 
-IBuffer* ShaderManager::CreateConstantBuffer (const BufferDesc& desc)
+IBuffer* ShaderManager::CreateConstantBuffer (const BufferDesc& desc, const void* data)
 {
   try
   {
-    return new SourceConstantBuffer (desc);
+    return new SourceConstantBuffer (desc, data);
   }
   catch (xtl::exception& e)
   {

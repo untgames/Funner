@@ -18,12 +18,12 @@ int main ()
     BufferDesc index, vertex;
     
     index.size = 1;
-    index.usage_mode = UsageMode_Default;
+    index.usage_mode = UsageMode_Dynamic;
     index.bind_flags = BindFlag_IndexBuffer;
     index.access_flags = AccessFlag_ReadWrite;
     
     vertex.size = 1;
-    vertex.usage_mode = UsageMode_Default;
+    vertex.usage_mode = UsageMode_Dynamic;
     vertex.bind_flags = BindFlag_VertexBuffer;
     vertex.access_flags = AccessFlag_ReadWrite;
       

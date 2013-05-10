@@ -26,3 +26,17 @@ inline DstT* cast_object (const DeviceObject& owner, SrcT* ptr, const char* sour
 {
   return cast_object<DstT> (owner.GetDeviceManager (), ptr, source, argument_name);
 }
+
+/*
+    Получение контекста
+*/
+
+inline ID3D11DeviceContext& get_dx_context (const DeviceManager& owner, IDeviceContext* context, const char* source)
+{
+  return context ? cast_object<IDeviceContextImpl> (owner, context, source, "context")->GetHandle () : owner.GetImmediateContext (); 
+}
+
+inline ID3D11DeviceContext& get_dx_context (const DeviceObject& owner, IDeviceContext* context, const char* source)
+{
+  return get_dx_context (owner.GetDeviceManager (), context, source);
+}

@@ -7,7 +7,7 @@ using namespace render::low_level::dx11;
      онструктор
 */
 
-SourceConstantBuffer::SourceConstantBuffer (const BufferDesc& in_desc)
+SourceConstantBuffer::SourceConstantBuffer (const BufferDesc& in_desc, const void* data)
   : desc (in_desc)
   , hash ()
   , need_update_hash (true)
@@ -47,6 +47,9 @@ SourceConstantBuffer::SourceConstantBuffer (const BufferDesc& in_desc)
       throw xtl::make_null_argument_exception ("", "desc.size");
 
     buffer.resize (desc.size);
+
+    if (data)
+      memcpy (buffer.data (), data, desc.size);
   }
   catch (xtl::exception& e)
   {
@@ -68,10 +71,12 @@ void SourceConstantBuffer::GetDesc (BufferDesc& out_desc)
     „тение / запись из буфера
 */
 
-void SourceConstantBuffer::SetData (size_t offset, size_t size, const void* data)
+void SourceConstantBuffer::SetData (size_t offset, size_t size, const void* data, IDeviceContext* context)
 {
   try
   {
+    cast_object<DeviceObject> (context, "", "context");
+
       //проверка возможности установки данных
       
     if (!(desc.access_flags & AccessFlag_Write))
@@ -106,10 +111,12 @@ void SourceConstantBuffer::SetData (size_t offset, size_t size, const void* data
   }
 }
 
-void SourceConstantBuffer::GetData (size_t offset, size_t size, void* data)
+void SourceConstantBuffer::GetData (size_t offset, size_t size, void* data, IDeviceContext* context)
 {
   try
   {
+    cast_object<DeviceObject> (context, "", "context");
+
       //проверка возможности установки данных
       
     if (!(desc.access_flags & AccessFlag_Read))

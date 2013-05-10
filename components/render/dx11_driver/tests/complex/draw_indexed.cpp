@@ -38,9 +38,7 @@ int main ()
     vb_desc.size         = sizeof (MyVertex) * VERTICES_COUNT;
     vb_desc.usage_mode   = UsageMode_Default;
     vb_desc.bind_flags   = BindFlag_VertexBuffer;
-    vb_desc.access_flags = AccessFlag_Read | AccessFlag_Write;
-
-    BufferPtr vb (test.device->CreateBuffer (vb_desc), false);
+    vb_desc.access_flags = 0;
 
     static const MyVertex verts [] = {
       {{-1, -1, 0}, {0, 0, 1}, {1.0f, 0, 0, 0}},
@@ -48,7 +46,7 @@ int main ()
       {{ 0, 1, 0}, {0, 0, 1}, {0, 0, 1.0f, 0}},
     };
 
-    vb->SetData (0, vb_desc.size, verts);
+    BufferPtr vb (test.device->CreateBuffer (vb_desc, verts), false);
 
     printf ("Create index buffer\n");
 
@@ -61,11 +59,9 @@ int main ()
     ib_desc.size         = sizeof indices;
     ib_desc.usage_mode   = UsageMode_Default;
     ib_desc.bind_flags   = BindFlag_IndexBuffer;
-    ib_desc.access_flags = AccessFlag_ReadWrite;
+    ib_desc.access_flags = 0;
 
-    BufferPtr ib (test.device->CreateBuffer (ib_desc), false);
-
-    ib->SetData (0, ib_desc.size, indices);
+    BufferPtr ib (test.device->CreateBuffer (ib_desc, indices), false);
 
     printf ("Set input-stage\n");
 

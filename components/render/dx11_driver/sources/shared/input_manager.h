@@ -108,7 +108,7 @@ class InputManager
 ///Создание ресурсов уровня
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     InputLayout*  CreateInputLayout (const InputLayoutDesc& desc);
-    IBuffer*      CreateBuffer      (const BufferDesc& desc);
+    IBuffer*      CreateBuffer      (const BufferDesc& desc, const void* data);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Получение имени семантики
