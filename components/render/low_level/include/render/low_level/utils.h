@@ -36,6 +36,7 @@ const char* get_name (ColorWriteFlag);
 const char* get_name (SwapMethod);
 const char* get_name (ClearFlag);
 const char* get_name (PrimitiveType);
+const char* get_name (QueryType);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Получение информации о формате пикселей

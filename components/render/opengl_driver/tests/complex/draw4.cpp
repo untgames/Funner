@@ -42,9 +42,11 @@ void redraw (Test& test)
 
   PredicatePtr predicate (test.device->CreatePredicate (), false);
   
-  test.device->GetImmediateContext ()->Begin (predicate.get ());
+  predicate->Begin (test.device->GetImmediateContext ());
+
   test.device->GetImmediateContext ()->Draw (PrimitiveType_TriangleList, 3, 3);
-  test.device->GetImmediateContext ()->End (predicate.get ());
+
+  predicate->End (test.device->GetImmediateContext ());
 
   test.device->GetImmediateContext ()->SetPredication (predicate.get (), true);
 

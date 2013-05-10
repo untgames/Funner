@@ -131,32 +131,6 @@ IQuery* Device::CreateQuery (QueryType type)
   throw xtl::make_not_implemented_exception ("render::low_level::opengl::Device::CreateQuery");
 }
 
-void Device::Begin (IQuery* async)
-{
-  try
-  {
-    query_manager.Begin (async);
-  }
-  catch (xtl::exception& e)
-  {
-    e.touch ("render::low_level::opengl::Device::Begin");
-    throw;
-  }
-}
-
-void Device::End (IQuery* async)
-{
-  try
-  {
-    query_manager.End (async);
-  }
-  catch (xtl::exception& e)
-  {
-    e.touch ("render::low_level::opengl::Device::End");
-    throw;
-  }
-}
-
 /*
     Работа с блоками состояний
 */

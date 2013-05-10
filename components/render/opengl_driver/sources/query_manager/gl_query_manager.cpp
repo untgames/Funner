@@ -190,37 +190,3 @@ bool QueryManager::GetPredicateAsyncResult ()
 {
   return impl->GetPredicateAsyncResult ();
 }
-
-/*
-    Указание границ запроса
-*/
-
-void QueryManager::Begin (IQuery* async)
-{
-  static const char* METHOD_NAME = "render::low_level::opengl::QueryManager::Begin";
-
-  if (!async)
-    throw xtl::make_null_argument_exception (METHOD_NAME, "query");
-
-  IQueryScope* casted_object = cast_object<IQueryScope> (async, METHOD_NAME, "query");
-
-  if (!casted_object->IsCompatible (impl->GetContextManager ()))
-    throw xtl::format_not_supported_exception (METHOD_NAME, "Query can't be used with this context");
-
-  casted_object->Begin ();  
-}
-
-void QueryManager::End (IQuery* async)
-{
-  static const char* METHOD_NAME = "render::low_level::opengl::QueryManager::End";
-
-  if (!async)
-    throw xtl::make_null_argument_exception (METHOD_NAME, "query");
-
-  IQueryScope* casted_object = cast_object<IQueryScope> (async, METHOD_NAME, "query");
-
-  if (!casted_object->IsCompatible (impl->GetContextManager ()))
-    throw xtl::format_not_supported_exception (METHOD_NAME, "Query can't be used with this context");
-
-  casted_object->End ();
-}

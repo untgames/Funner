@@ -411,6 +411,23 @@ const char* get_name (PrimitiveType param)
   }
 }
 
+const char* get_name (QueryType type)
+{
+  switch (type)
+  {
+    case QueryType_Event:                   return "QueryType_Event";
+    case QueryType_Occlusion:               return "QueryType_Occlusion";
+    case QueryType_OcclusionPredicate:      return "QueryType_OcclusionPredicate";
+    case QueryType_PipelineStatistics:      return "QueryType_PipelineStatistics";
+    case QueryType_StreamOutput0Statistics: return "QueryType_StreamOutput0Statistics";
+    case QueryType_StreamOutput1Statistics: return "QueryType_StreamOutput1Statistics";
+    case QueryType_StreamOutput2Statistics: return "QueryType_StreamOutput2Statistics";
+    case QueryType_StreamOutput3Statistics: return "QueryType_StreamOutput3Statistics";
+    default:
+      throw xtl::make_argument_exception ("render::low_level::get_name(QueryType)", "type", type);
+  }
+}
+
 /*
     ѕолучение параметров формата пикселей
 */

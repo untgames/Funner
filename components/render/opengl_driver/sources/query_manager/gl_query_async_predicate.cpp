@@ -9,7 +9,7 @@ using namespace render::low_level::opengl;
      онструктор / деструктор
 */
 
-AsyncPredicate::AsyncPredicate  (const ContextManager& manager)
+AsyncPredicate::AsyncPredicate (const ContextManager& manager)
   : ContextObject (manager)
 {
     //установка текущего контекста
@@ -64,36 +64,45 @@ AsyncPredicate::~AsyncPredicate ()
     ”казание границ запроса
 */
 
-void AsyncPredicate::Begin ()
+/*
+    ”казание границ запроса
+*/
+void AsyncPredicate::Begin (IDeviceContext*)
 {
-  static const char* METHOD_NAME = "render::low_level::opengl::AsyncPredicate::Begin";
+  try
+  {
+      //проверка возможности открыти€ запроса
 
-    //проверка возможности открыти€ запроса
+    const size_t current_is_in_ranges = GetContextCacheValue (CacheEntry_IsInQueryRanges);
 
-  const size_t current_is_in_ranges = GetContextCacheValue (CacheEntry_IsInQueryRanges);
+    if (current_is_in_ranges)
+      throw xtl::format_operation_exception ("", "Begin already called without end call");
 
-  if (current_is_in_ranges)
-    throw xtl::format_operation_exception (METHOD_NAME, "Begin already called without end call");
+      //установка текущего контекста
 
-    //установка текущего контекста
+    MakeContextCurrent ();
 
-  MakeContextCurrent ();
+      //открытие запроса
 
-    //открытие запроса
+    if (glBeginQuery) glBeginQuery    (GL_SAMPLES_PASSED, query);
+    else              glBeginQueryARB (GL_SAMPLES_PASSED, query);
 
-  if (glBeginQuery) glBeginQuery    (GL_SAMPLES_PASSED, query);
-  else              glBeginQueryARB (GL_SAMPLES_PASSED, query);
+      //проверка ошибок
 
-    //проверка ошибок
+    CheckErrors ("");
 
-  CheckErrors (METHOD_NAME);
+      //установка кэш-переменных
 
-    //установка кэш-переменных
-
-  SetContextCacheValue (CacheEntry_IsInQueryRanges, 1);
+    SetContextCacheValue (CacheEntry_IsInQueryRanges, 1);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::low_level::opengl::AsyncPredicate::Begin");
+    throw;
+  }
 }
 
-void AsyncPredicate::End ()
+void AsyncPredicate::End (IDeviceContext*)
 {
   static const char* METHOD_NAME = "render::low_level::opengl::AsyncPredicate::End";
 
@@ -169,15 +178,6 @@ bool AsyncPredicate::IsResultAvailable ()
   CheckErrors ("render::low_level::opengl::AsyncPredicate::IsResultAvailable");
 
   return available != 0;
-}
-
-/*
-    ѕроверка на совместимость
-*/
-
-bool AsyncPredicate::IsCompatible (const ContextManager& manager)
-{
-  return manager.IsCompatible (GetContextManager ());
 }
 
 #endif
