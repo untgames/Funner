@@ -50,7 +50,9 @@ ScaledTexture::ScaledTexture
   horisontal_scale = (float)scaled_width  / (float)original_desc.width;
   vertical_scale   = (float)scaled_height / (float)original_desc.height;  
 
-  shadow_texture = TexturePtr (dynamic_cast<BindableTexture*> (texture_manager.CreateTexture (temp_desc, 0)), false);
+  ITexture* created_texture = texture_manager.CreateTexture (temp_desc, 0);
+
+  shadow_texture = TexturePtr (dynamic_cast<BindableTexture*> (created_texture), false);
 
   if (!shadow_texture.get ())
     throw xtl::format_operation_exception (METHOD_NAME, "TextureManager::CreateTexture returned texture with incompatible type");
@@ -143,7 +145,7 @@ void ScaledTexture::ScaleImage (size_t width, size_t height, PixelFormat source_
   }
 }
 
-void ScaledTexture::SetData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height, PixelFormat source_format, const void* buffer)
+void ScaledTexture::SetData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height, PixelFormat source_format, const void* buffer, IDeviceContext* context)
 {
   size_t scaled_width  = (size_t)ceil ((float)width * horisontal_scale),
          scaled_height = (size_t)ceil ((float)height * vertical_scale);
@@ -156,6 +158,9 @@ void ScaledTexture::SetData (size_t layer, size_t mip_level, size_t x, size_t y,
 
   try
   {
+    if (context)
+      throw xtl::format_operation_exception ("", "Context must be null");
+
     ScaleImage (width, height, source_format, buffer, scaled_buffer, scaled_format);
 
     shadow_texture->SetData (layer, mip_level, x, y, scaled_width, scaled_height, scaled_format, scaled_buffer.data ());    
@@ -167,7 +172,7 @@ void ScaledTexture::SetData (size_t layer, size_t mip_level, size_t x, size_t y,
   }
 }
 
-void ScaledTexture::GetData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height, PixelFormat target_format, void* buffer)
+void ScaledTexture::GetData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height, PixelFormat target_format, void* buffer, IDeviceContext* context)
 {
   const char* METHOD_NAME = "render::low_level::opengl::TextureEmulatedNPOT::GetData";
 
@@ -181,6 +186,9 @@ void ScaledTexture::GetData (size_t layer, size_t mip_level, size_t x, size_t y,
 
   try
   {
+    if (context)
+      throw xtl::format_operation_exception ("", "Context must be null");
+
     shadow_texture->GetData (layer, mip_level, x, y, scaled_width, scaled_height, target_format, scaled_buffer.data ());
   }
   catch (xtl::exception& exception)

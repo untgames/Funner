@@ -348,16 +348,20 @@ void Texture::SetCompressedData (size_t, size_t, size_t, size_t, size_t, size_t,
 */
 
 void Texture::SetData
- (size_t      layer,
-  size_t      mip_level,
-  size_t      x,
-  size_t      y,
-  size_t      width,
-  size_t      height,
-  PixelFormat source_format,
-  const void* buffer)
+ (size_t          layer,
+  size_t          mip_level,
+  size_t          x,
+  size_t          y,
+  size_t          width,
+  size_t          height,
+  PixelFormat     source_format,
+  const void*     buffer, 
+  IDeviceContext* context)
 {
   static const char* METHOD_NAME = "render::low_level::opengl::Texture::SetData";
+
+  if (context)
+    throw xtl::format_operation_exception (METHOD_NAME, "Context must be null");
   
     //проверка возможности записи
     
@@ -564,16 +568,20 @@ void Texture::SetData
 #ifndef OPENGL_ES_SUPPORT
 
 void Texture::GetData
- (size_t      layer,
-  size_t      mip_level,
-  size_t      x,
-  size_t      y,
-  size_t      width,
-  size_t      height,
-  PixelFormat target_format,
-  void*       buffer)
+ (size_t          layer,
+  size_t          mip_level,
+  size_t          x,
+  size_t          y,
+  size_t          width,
+  size_t          height,
+  PixelFormat     target_format,
+  void*           buffer,
+  IDeviceContext* context)
 {
   static const char* METHOD_NAME = "render::low_level::opengl::Texture::GetData";
+
+  if (context)
+    throw xtl::format_operation_exception (METHOD_NAME, "Context must be null");
 
     //проверка возможности чтения
 

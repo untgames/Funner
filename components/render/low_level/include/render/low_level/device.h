@@ -77,7 +77,7 @@ class IDevice: virtual public IObject
     virtual IBlendState*              CreateBlendState              (const BlendDesc&) = 0;
     virtual IDepthStencilState*       CreateDepthStencilState       (const DepthStencilDesc&) = 0;
     virtual ISamplerState*            CreateSamplerState            (const SamplerDesc&) = 0;
-    virtual IBuffer*                  CreateBuffer                  (const BufferDesc&) = 0;
+    virtual IBuffer*                  CreateBuffer                  (const BufferDesc&, const void* buffer_data = 0) = 0;
     virtual IProgram*                 CreateProgram                 (size_t shaders_count, const ShaderDesc* shader_descs, const LogFunction& error_log) = 0;
     virtual ITexture*                 CreateTexture                 (const TextureDesc&) = 0;
     virtual ITexture*                 CreateTexture                 (const TextureDesc&, const TextureData&) = 0;

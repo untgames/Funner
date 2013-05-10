@@ -165,7 +165,7 @@ IInputLayout* Device::CreateInputLayout (const InputLayoutDesc& desc)
   }
 }
 
-IBuffer* Device::CreateBuffer (const BufferDesc& desc)
+IBuffer* Device::CreateBuffer (const BufferDesc& desc, const void* data)
 {
   static const char* METHOD_NAME = "render::low_level::opengl::Device::CreateBuffer";
 
@@ -176,14 +176,29 @@ IBuffer* Device::CreateBuffer (const BufferDesc& desc)
     if (desc.bind_flags & BAD_FLAGS)
       throw xtl::make_argument_exception ("", "desc.bind_flags", get_name ((BindFlag)desc.bind_flags));
 
+    xtl::com_ptr<IBuffer> buffer;
+
     switch (desc.bind_flags)
     {
-      case BindFlag_VertexBuffer:   return input_stage.CreateVertexBuffer (desc);
-      case BindFlag_IndexBuffer:    return input_stage.CreateIndexBuffer (desc);
-      case BindFlag_ConstantBuffer: return input_stage.CreateConstantBuffer (desc);
+      case BindFlag_VertexBuffer:
+        buffer = xtl::com_ptr<IBuffer> (input_stage.CreateVertexBuffer (desc), false);
+        break;
+      case BindFlag_IndexBuffer:
+        buffer = xtl::com_ptr<IBuffer> (input_stage.CreateIndexBuffer (desc), false);
+        break;
+      case BindFlag_ConstantBuffer:
+        buffer = xtl::com_ptr<IBuffer> (input_stage.CreateConstantBuffer (desc), false);
+        break;
       default:
         throw xtl::format_not_supported_exception ("", "Incompatible desc.bind_flags=%s", get_name ((BindFlag)desc.bind_flags));
     }
+
+    if (data)
+      buffer->SetData (0, desc.size, data);
+
+    buffer->AddRef ();
+
+    return buffer.get ();
   }
   catch (xtl::exception& e)
   {

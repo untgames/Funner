@@ -53,9 +53,12 @@ void Buffer::GetDesc (BufferDesc& out_desc)
     Работа с данными буфера
 */
 
-void Buffer::SetData (size_t offset, size_t size, const void* data)
+void Buffer::SetData (size_t offset, size_t size, const void* data, IDeviceContext* context)
 {
   static const char* METHOD_NAME = "render::low_level::opengl::Buffer::SetData";
+
+  if (context)
+    throw xtl::format_operation_exception (METHOD_NAME, "Context must be null");
 
     //проверка возможности установки данных
     
@@ -83,9 +86,12 @@ void Buffer::SetData (size_t offset, size_t size, const void* data)
   SetDataCore (offset, size, data);
 }
 
-void Buffer::GetData (size_t offset, size_t size, void* data)
+void Buffer::GetData (size_t offset, size_t size, void* data, IDeviceContext* context)
 {
   static const char* METHOD_NAME = "render::low_level::opengl::Buffer::GetData";
+
+  if (context)
+    throw xtl::format_operation_exception (METHOD_NAME, "Context must be null");
 
     //проверка возможности установки данных
     

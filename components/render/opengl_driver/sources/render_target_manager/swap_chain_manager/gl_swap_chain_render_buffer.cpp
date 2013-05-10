@@ -347,13 +347,13 @@ void SwapChainFakeDepthStencilBuffer::GetDesc (TextureDesc& out_desc)
     Работа с данными
 */
 
-void SwapChainFakeDepthStencilBuffer::SetData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height, PixelFormat source_format, const void* buffer)
+void SwapChainFakeDepthStencilBuffer::SetData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height, PixelFormat source_format, const void* buffer, IDeviceContext*)
 {
   throw xtl::format_operation_exception ("render::low_level::opengl::SwapChainFakeDepthStencilBuffer::SetData",
     "Can't set render buffer data (no AccessFlag_Write in desc.access_flags)");
 }
 
-void SwapChainFakeDepthStencilBuffer::GetData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height, PixelFormat target_format, void* buffer)
+void SwapChainFakeDepthStencilBuffer::GetData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height, PixelFormat target_format, void* buffer, IDeviceContext*)
 {
   throw xtl::format_operation_exception ("render::low_level::opengl::SwapChainFakeDepthStencilBuffer::GetData",
     "Can't get render buffer data (no AccessFlag_Read in desc.access_flags)");

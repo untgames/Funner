@@ -278,9 +278,12 @@ GLenum get_glformat (PixelFormat format, const char* source, const char* param)
 
 #ifndef OPENGL_ES_SUPPORT
 
-void RenderBuffer::SetData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height, PixelFormat source_format, const void* buffer)
+void RenderBuffer::SetData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height, PixelFormat source_format, const void* buffer, IDeviceContext* context)
 {
   static const char* METHOD_NAME = "render::low_level::opengl::RenderBuffer::SetData";
+
+  if (context)
+    throw xtl::format_operation_exception (METHOD_NAME, "Context must be null");
 
   if (!(desc.access_flags & AccessFlag_Write))
     throw xtl::format_operation_exception (METHOD_NAME, "Can't set render buffer data (no AccessFlag_Write in desc.access_flags)");
@@ -440,16 +443,19 @@ void RenderBuffer::SetData (size_t layer, size_t mip_level, size_t x, size_t y, 
 
 #else //OPENGL_ES_SUPPORT
 
-void RenderBuffer::SetData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height, PixelFormat source_format, const void* buffer)
+void RenderBuffer::SetData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height, PixelFormat source_format, const void* buffer, IDeviceContext* context)
 {
   throw xtl::format_not_supported_exception ("render::low_level::opengl::RenderBuffer::SetData", "RenderBuffer::SetData not supported");  
 }
 
 #endif
 
-void RenderBuffer::GetData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height, PixelFormat target_format, void* buffer)
+void RenderBuffer::GetData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height, PixelFormat target_format, void* buffer, IDeviceContext* context)
 {
   static const char* METHOD_NAME = "render::low_level::opengl::RenderBuffer::GetData";
+
+  if (context)
+    throw xtl::format_operation_exception (METHOD_NAME, "Context must be null");
 
   if (!(desc.access_flags & AccessFlag_Read))
     throw xtl::format_operation_exception (METHOD_NAME, "Can't get render buffer data (no AccessFlag_Read in desc.access_flags)");

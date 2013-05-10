@@ -148,7 +148,7 @@ class Device: virtual public IDevice, virtual public IDeviceContext, public Obje
     IBlendState*              CreateBlendState              (const BlendDesc&);
     IDepthStencilState*       CreateDepthStencilState       (const DepthStencilDesc&);
     ISamplerState*            CreateSamplerState            (const SamplerDesc&);
-    IBuffer*                  CreateBuffer                  (const BufferDesc&);
+    IBuffer*                  CreateBuffer                  (const BufferDesc&, const void*);
     IProgram*                 CreateProgram                 (size_t shaders_count, const ShaderDesc* shader_descs, const LogFunction& error_log);
     ITexture*                 CreateTexture                 (const TextureDesc&);
     ITexture*                 CreateTexture                 (const TextureDesc&, const TextureData&);
