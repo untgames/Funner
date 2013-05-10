@@ -413,7 +413,7 @@ ID3D11ShaderResourceView& Texture::GetShaderResourceView ()
     Работа с данными
 */
 
-void Texture::SetData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height, PixelFormat source_format, const void* buffer, IDeviceContext* context)
+void Texture::SetData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height, PixelFormat format, const void* buffer, IDeviceContext* context)
 {
   try
   {
@@ -460,19 +460,66 @@ void Texture::SetData (size_t layer, size_t mip_level, size_t x, size_t y, size_
 
       //проверка совместимости форматов
 
-    bool is_depth_stencil_source_format = is_depth_stencil (source_format),
+    bool is_depth_stencil_source_format = is_depth_stencil (format),
          is_depth_stencil_tex_format    = is_depth_stencil (impl->desc.format),
          is_compatible                  = (is_depth_stencil_tex_format  && is_depth_stencil_source_format) ||
-                                          (!is_depth_stencil_tex_format && !is_depth_stencil_source_format);
+                                          (!is_depth_stencil_tex_format && !is_depth_stencil_source_format),
+         is_src_compressed              = is_compressed (format), 
+         is_dst_compressed              = is_compressed (impl->desc.format);
+
+    if (is_src_compressed != is_dst_compressed)           is_compatible = false;
+    if (is_src_compressed && format != impl->desc.format) is_compatible = false;
 
     if (!is_compatible)
-      throw xtl::format_not_supported_exception ("", "Texture format %s incompatible with source_format %s", get_name (impl->desc.format), get_name (source_format));
+      throw xtl::format_not_supported_exception ("", "Texture format %s incompatible with source_format %s", get_name (impl->desc.format), get_name (format));   
 
       //преобразование контекста
 
     ID3D11DeviceContext& dx_context = get_dx_context (*this, context);
 
-    throw xtl::make_not_implemented_exception (__FUNCTION__);
+      //отображение данных
+
+    D3D11_MAPPED_SUBRESOURCE subresource;
+
+    check_errors ("ID3D11DeviceContext::Map", dx_context.Map (impl->texture.get (), mip_level, impl->desc.layers == 1 && width == level_desc.width && height == level_desc.height ? D3D11_MAP_WRITE_DISCARD : D3D11_MAP_WRITE, 0, &subresource));
+
+    if (!subresource.pData)
+      throw xtl::format_operation_exception ("", "ID3D11DeviceContext::Map failed");
+
+    char* dst = (char*)subresource.pData + subresource.DepthPitch * layer;
+
+    try
+    {
+        //копирование данных
+
+      if (is_compressed (format))
+      {
+        if (x || y)
+          throw xtl::format_not_supported_exception ("", "Can't copy to compressed subimage x=%u y=%u format=%s", x, y, get_name (format));
+
+        if (width != level_desc.width || height != level_desc.height)
+          throw xtl::format_not_supported_exception ("", "Can't copy from compressed image %ux%u to image %ux%u format=%s", width, height, level_desc.width, level_desc.height, get_name (format));
+
+        size_t size = get_image_size (width, height, format);
+
+        memcpy (dst, data, size);
+      }
+      else
+      {
+        dst += y * subresource.RowPitch + x * get_texel_size (desc.format);
+        
+        copy (width, height, 1, get_image_size (width, format), format, src, subresource.RowPitch, desc.format, dst);
+      }
+
+        //отмена отображения
+
+      dx_context.Unmap (impl->texture.get (), mip_level);
+    }
+    catch (...)
+    {
+      dx_context.Unmap (impl->texture.get (), mip_level);
+      throw;
+    }
   }
   catch (xtl::exception& e)
   {

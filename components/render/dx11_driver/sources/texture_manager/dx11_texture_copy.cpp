@@ -159,67 +159,61 @@ inline void copy_pixel (const pixel_ds<T1, DepthBits1, StencilBits1>& src, pixel
     Копирование образов
 */
 
-inline void copy_direct (PixelFormat format, size_t width, size_t height, size_t depth, size_t src_row_pitch, size_t src_depth_pitch, const void* src_buffer, size_t dst_row_pitch, size_t dst_depth_pitch, void* dst_buffer)
+inline void copy_direct (PixelFormat format, size_t width, size_t height, size_t src_row_pitch, const void* src_buffer, size_t dst_row_pitch, void* dst_buffer)
 {
-  if (src_row_pitch != dst_row_pitch)
-    throw xtl::format_operation_exception ("", "Can't copy data in %s with src_row_pitch=%u and dst_row_pitch=%u", get_name (format), src_row_pitch, dst_row_pitch);
-
-  size_t layer_size = src_depth_pitch < dst_depth_pitch ? src_depth_pitch : dst_depth_pitch;
-
+  const size_t size = get_image_size (width, format);
+                
   const char* src = (const char*)src_buffer;
   char*       dst = (char*)dst_buffer;
   
-  for (size_t count=depth; count--; src += src_depth_pitch, dst += dst_depth_pitch) 
-    memcpy (dst, src, layer_size);
+  for (size_t count=height; count--; src += src_row_pitch, dst += dst_row_pitch)
+    memcpy (src, dst, size);
 }
 
 template <bool Value> struct selector {};
 
 template <class Src, class Dst>
-inline bool copy_dispatch (size_t width, size_t height, size_t depth, size_t src_row_pitch, size_t src_depth_pitch, const Src* src, size_t dst_row_pitch, size_t dst_depth_pitch, Dst* dst, selector<false>)
+inline bool copy_dispatch (size_t width, size_t height, size_t src_row_pitch, const Src* src, size_t dst_row_pitch, Dst* dst, selector<false>)
 {
   return false;
 }
 
 template <class Src, class Dst>
-inline bool copy_dispatch (size_t width, size_t height, size_t depth, size_t src_row_pitch, size_t src_depth_pitch, const Src* src_buffer, size_t dst_row_pitch, size_t dst_depth_pitch, Dst* dst_buffer, selector<true>)
+inline bool copy_dispatch (size_t width, size_t height, size_t src_row_pitch, const Src* src_buffer, size_t dst_row_pitch, Dst* dst_buffer, selector<true>)
 {
   const size_t src_row_skip   = src_row_pitch - width * sizeof (Src),
-               dst_row_skip   = dst_row_pitch - width * sizeof (Dst),
-               src_depth_skip = src_depth_pitch - height * src_row_pitch,
-               dst_depth_skip = dst_depth_pitch - height * dst_row_pitch;
+               dst_row_skip   = dst_row_pitch - width * sizeof (Dst);
 
   const char* src = (const char*)src_buffer;
   char*       dst = (char*)dst_buffer;
   
-  for (size_t count=depth; count--; src += src_depth_skip, dst += dst_depth_skip)  
-    for (size_t count=height; count--; src += src_row_skip, dst += dst_row_skip)
-      for (size_t count=width; count--; src += sizeof (Src), dst += sizeof (Dst))
-        copy_pixel (*reinterpret_cast<Src*> (src), *reinterpret_cast<Dst*> (dst));
+  for (size_t count=height; count--; src += src_row_skip, dst += dst_row_skip)
+    for (size_t count=width; count--; src += sizeof (Src), dst += sizeof (Dst))
+      copy_pixel (*reinterpret_cast<Src*> (src), *reinterpret_cast<Dst*> (dst));
 
   return true;
 }
 
 template <class Src, class Dst>
-inline bool copy_dispatch (size_t width, size_t height, size_t depth, size_t src_row_pitch, size_t src_depth_pitch, const Src* src, size_t dst_row_pitch, size_t dst_depth_pitch, Dst* dst)
+inline bool copy_dispatch (size_t width, size_t height, size_t src_row_pitch, const Src* src, size_t dst_row_pitch, Dst* dst)
 {
-  return copy_dispatch (width, height, depth, src_row_pitch, src_depth_pitch, src, dst_row_pitch, dst_depth_pitch, dst, selector<has_conversion<Src, Dst>::value> ());
+  return copy_dispatch (width, height, src_row_pitch, src, dst_row_pitch, dst, selector<has_conversion<Src, Dst>::value> ());
 }
 
 template <class Src>
-inline bool copy_dispatch (size_t width, size_t height, size_t depth, size_t src_row_pitch, size_t src_depth_pitch, const Src* src_buffer, size_t dst_row_pitch, size_t dst_depth_pitch, PixelFormat dst_format, void* dst_buffer)
+inline bool copy_dispatch (size_t width, size_t height, size_t src_row_pitch, const Src* src_buffer, size_t dst_row_pitch, PixelFormat dst_format, void* dst_buffer)
 {
   switch (dst_format)
   {
-    case PixelFormat_RGB8:    return copy_dispatch (width, height, depth, src_row_pitch, src_depth_pitch, src_buffer, dst_row_pitch, dst_depth_pitch, reinterpret_cast<const pixel_rgb*> (dst_buffer));
-    case PixelFormat_RGBA8:   return copy_dispatch (width, height, depth, src_row_pitch, src_depth_pitch, src_buffer, dst_row_pitch, dst_depth_pitch, reinterpret_cast<const pixel_rgba*> (dst_buffer));
-    case PixelFormat_L8:      return copy_dispatch (width, height, depth, src_row_pitch, src_depth_pitch, src_buffer, dst_row_pitch, dst_depth_pitch, reinterpret_cast<const pixel_luminance*> (dst_buffer));
-    case PixelFormat_A8:      return copy_dispatch (width, height, depth, src_row_pitch, src_depth_pitch, src_buffer, dst_row_pitch, dst_depth_pitch, reinterpret_cast<const pixel_alpha*> (dst_buffer));
-    case PixelFormat_LA8:     return copy_dispatch (width, height, depth, src_row_pitch, src_depth_pitch, src_buffer, dst_row_pitch, dst_depth_pitch, reinterpret_cast<const pixel_la*> (dst_buffer));
-    case PixelFormat_D16:     return copy_dispatch (width, height, depth, src_row_pitch, src_depth_pitch, src_buffer, dst_row_pitch, dst_depth_pitch, reinterpret_cast<const pixel_ds<unsigned short>*> (dst_buffer));
-    case PixelFormat_D24X8:   return copy_dispatch (width, height, depth, src_row_pitch, src_depth_pitch, src_buffer, dst_row_pitch, dst_depth_pitch, reinterpret_cast<const pixel_ds<unsigned int, 24, 0>*> (dst_buffer));
-    case PixelFormat_D24S8:   return copy_dispatch (width, height, depth, src_row_pitch, src_depth_pitch, src_buffer, dst_row_pitch, dst_depth_pitch, reinterpret_cast<const pixel_ds<unsigned int, 24, 8>*> (dst_buffer));
-    case PixelFormat_D32:     return copy_dispatch (width, height, depth, src_row_pitch, src_depth_pitch, src_buffer, dst_row_pitch, dst_depth_pitch, reinterpret_cast<const pixel_ds<unsigned int>*> (dst_buffer));
+    case PixelFormat_RGB8:    return copy_dispatch (width, height, src_row_pitch, src_buffer, dst_row_pitch, reinterpret_cast<const pixel_rgb*> (dst_buffer));
+    case PixelFormat_RGBA8:   return copy_dispatch (width, height, src_row_pitch, src_buffer, dst_row_pitch, reinterpret_cast<const pixel_rgba*> (dst_buffer));
+    case PixelFormat_L8:      return copy_dispatch (width, height, src_row_pitch, src_buffer, dst_row_pitch, reinterpret_cast<const pixel_luminance*> (dst_buffer));
+    case PixelFormat_A8:      return copy_dispatch (width, height, src_row_pitch, src_buffer, dst_row_pitch, reinterpret_cast<const pixel_alpha*> (dst_buffer));
+    case PixelFormat_LA8:     return copy_dispatch (width, height, src_row_pitch, src_buffer, dst_row_pitch, reinterpret_cast<const pixel_la*> (dst_buffer));
+    case PixelFormat_D16:     return copy_dispatch (width, height, src_row_pitch, src_buffer, dst_row_pitch, reinterpret_cast<const pixel_ds<unsigned short>*> (dst_buffer));
+    case PixelFormat_D24X8:   return copy_dispatch (width, height, src_row_pitch, src_buffer, dst_row_pitch, reinterpret_cast<const pixel_ds<unsigned int, 24, 0>*> (dst_buffer));
+    case PixelFormat_D24S8:   return copy_dispatch (width, height, src_row_pitch, src_buffer, dst_row_pitch, reinterpret_cast<const pixel_ds<unsigned int, 24, 8>*> (dst_buffer));
+    case PixelFormat_D32:     return copy_dispatch (width, height, src_row_pitch, src_buffer, dst_row_pitch, reinterpret_cast<const pixel_ds<unsigned int>*> (dst_buffer));
     default:                  return false;
   }
 }
@@ -229,19 +223,22 @@ inline bool copy_dispatch (size_t width, size_t height, size_t depth, size_t src
 void copy 
  (size_t      width,
   size_t      height,
-  size_t      depth,
   size_t      src_row_pitch,
-  size_t      src_depth_pitch,
   PixelFormat src_format,
   const void* src_buffer,
   size_t      dst_row_pitch,
-  size_t      dst_depth_pitch,
   PixelFormat dst_format,
   void*       dst_buffer)
 {
+  if (!src_buffer)
+    throw xtl::make_null_argument_exception ("", "src_buffer");
+
+  if (!dst_buffer)
+    throw xtl::make_null_argument_exception ("", "dst_buffer");
+
   if (src_format == dst_format)
   {
-    copy_direct (src_format, width, height, depth, src_row_pitch, src_depth_pitch, src_buffer, dst_row_pitch, dst_depth_pitch, dst_buffer);
+    copy_direct (src_format, width, height, src_row_pitch, src_buffer, dst_row_pitch, dst_buffer);
     return;
   }
 
@@ -249,22 +246,22 @@ void copy
 
   switch (src_format)
   {
-    case PixelFormat_RGB8:    result = copy_dispatch (width, height, depth, src_row_pitch, src_depth_pitch, reinterpret_cast<const pixel_rgb*> (src_buffer),                     dst_row_pitch, dst_depth_pitch, dst_format, dst_buffer); break;
-    case PixelFormat_RGBA8:   result = copy_dispatch (width, height, depth, src_row_pitch, src_depth_pitch, reinterpret_cast<const pixel_rgba*> (src_buffer),                    dst_row_pitch, dst_depth_pitch, dst_format, dst_buffer); break;
-    case PixelFormat_L8:      result = copy_dispatch (width, height, depth, src_row_pitch, src_depth_pitch, reinterpret_cast<const pixel_luminance*> (src_buffer),               dst_row_pitch, dst_depth_pitch, dst_format, dst_buffer); break;
-    case PixelFormat_A8:      result = copy_dispatch (width, height, depth, src_row_pitch, src_depth_pitch, reinterpret_cast<const pixel_alpha*> (src_buffer),                   dst_row_pitch, dst_depth_pitch, dst_format, dst_buffer); break;
-    case PixelFormat_LA8:     result = copy_dispatch (width, height, depth, src_row_pitch, src_depth_pitch, reinterpret_cast<const pixel_la*> (src_buffer),                      dst_row_pitch, dst_depth_pitch, dst_format, dst_buffer); break;
-    case PixelFormat_D16:     result = copy_dispatch (width, height, depth, src_row_pitch, src_depth_pitch, reinterpret_cast<const pixel_ds<unsigned short>*> (src_buffer),      dst_row_pitch, dst_depth_pitch, dst_format, dst_buffer); break;
-    case PixelFormat_D24X8:   result = copy_dispatch (width, height, depth, src_row_pitch, src_depth_pitch, reinterpret_cast<const pixel_ds<unsigned int, 24, 0>*> (src_buffer), dst_row_pitch, dst_depth_pitch, dst_format, dst_buffer); break;
-    case PixelFormat_D24S8:   result = copy_dispatch (width, height, depth, src_row_pitch, src_depth_pitch, reinterpret_cast<const pixel_ds<unsigned int, 24, 8>*> (src_buffer), dst_row_pitch, dst_depth_pitch, dst_format, dst_buffer); break;
-    case PixelFormat_D32:     result = copy_dispatch (width, height, depth, src_row_pitch, src_depth_pitch, reinterpret_cast<const pixel_ds<unsigned int>*> (src_buffer),        dst_row_pitch, dst_depth_pitch, dst_format, dst_buffer); break;
+    case PixelFormat_RGB8:    result = copy_dispatch (width, height, src_row_pitch, reinterpret_cast<const pixel_rgb*> (src_buffer),                     dst_row_pitch, dst_format, dst_buffer); break;
+    case PixelFormat_RGBA8:   result = copy_dispatch (width, height, src_row_pitch, reinterpret_cast<const pixel_rgba*> (src_buffer),                    dst_row_pitch, dst_format, dst_buffer); break;
+    case PixelFormat_L8:      result = copy_dispatch (width, height, src_row_pitch, reinterpret_cast<const pixel_luminance*> (src_buffer),               dst_row_pitch, dst_format, dst_buffer); break;
+    case PixelFormat_A8:      result = copy_dispatch (width, height, src_row_pitch, reinterpret_cast<const pixel_alpha*> (src_buffer),                   dst_row_pitch, dst_format, dst_buffer); break;
+    case PixelFormat_LA8:     result = copy_dispatch (width, height, src_row_pitch, reinterpret_cast<const pixel_la*> (src_buffer),                      dst_row_pitch, dst_format, dst_buffer); break;
+    case PixelFormat_D16:     result = copy_dispatch (width, height, src_row_pitch, reinterpret_cast<const pixel_ds<unsigned short>*> (src_buffer),      dst_row_pitch, dst_format, dst_buffer); break;
+    case PixelFormat_D24X8:   result = copy_dispatch (width, height, src_row_pitch, reinterpret_cast<const pixel_ds<unsigned int, 24, 0>*> (src_buffer), dst_row_pitch, dst_format, dst_buffer); break;
+    case PixelFormat_D24S8:   result = copy_dispatch (width, height, src_row_pitch, reinterpret_cast<const pixel_ds<unsigned int, 24, 8>*> (src_buffer), dst_row_pitch, dst_format, dst_buffer); break;
+    case PixelFormat_D32:     result = copy_dispatch (width, height, src_row_pitch, reinterpret_cast<const pixel_ds<unsigned int>*> (src_buffer),        dst_row_pitch, dst_format, dst_buffer); break;
     default:
       break;
   }
 
   if (!result)
-    throw xtl::format_operation_exception ("", "There is not conversion for image %s to %s (src_row_pitch=%u, src_depth_pitch=%u, dst_row_pitch=%u, dst_depth_pitch=%u)",
-      get_name (src_format), get_name (dst_format), src_row_pitch, src_depth_pitch, dst_row_pitch, dst_depth_pitch);
+    throw xtl::format_operation_exception ("", "There is not conversion for image %s to %s (src_row_pitch=%u, dst_row_pitch=%u)",
+      get_name (src_format), get_name (dst_format), src_row_pitch, dst_row_pitch);
 }
 
 }
