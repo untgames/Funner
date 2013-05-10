@@ -48,6 +48,11 @@ class SamplerState: virtual public ISamplerState, public DeviceObject
     SamplerDesc       desc;
 };
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Копирование данных
+///////////////////////////////////////////////////////////////////////////////////////////////////
+void copy (size_t src_line_width, size_t height, PixelFormat src_format, const void* src_buffer, size_t dst_line_width, PixelFormat dst_format, void* dst_buffer);
+
 }
 
 }
