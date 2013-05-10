@@ -502,13 +502,13 @@ void Texture::SetData (size_t layer, size_t mip_level, size_t x, size_t y, size_
 
         size_t size = get_image_size (width, height, format);
 
-        memcpy (dst, data, size);
+        memcpy (dst, buffer, size);
       }
       else
       {
-        dst += y * subresource.RowPitch + x * get_texel_size (desc.format);
+        dst += y * subresource.RowPitch + x * get_texel_size (impl->desc.format);
         
-        copy (width, height, 1, get_image_size (width, format), format, src, subresource.RowPitch, desc.format, dst);
+        copy (width, height, get_image_size (width, format), format, buffer, subresource.RowPitch, impl->desc.format, dst);
       }
 
         //отмена отображения

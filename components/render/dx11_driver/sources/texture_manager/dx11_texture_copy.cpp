@@ -167,7 +167,7 @@ inline void copy_direct (PixelFormat format, size_t width, size_t height, size_t
   char*       dst = (char*)dst_buffer;
   
   for (size_t count=height; count--; src += src_row_pitch, dst += dst_row_pitch)
-    memcpy (src, dst, size);
+    memcpy (dst, src, size);
 }
 
 template <bool Value> struct selector {};

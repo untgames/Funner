@@ -6,13 +6,20 @@ using namespace common;
 const size_t TEX_SIZE        = 128;
 const size_t IMAGE_DATA_SIZE = TEX_SIZE * TEX_SIZE * 4;
 
+void log_print (const char* stream, const char* message)
+{
+  printf ("%s: %s\n", stream, message);
+}
+
 int main ()
 {
   printf ("Results of texture_sampler_test:\n");
+
+  common::LogFilter filter ("*", &log_print);
   
   try
   {
-    Test test (L"DX11 device test window (texture_sampler_test)");
+    Test test (L"DX11 device test window (texture_sampler_test)", "debug=1");
 
     SamplerDesc desc;
 
@@ -40,8 +47,9 @@ int main ()
     tex_desc.layers               = 1;
     tex_desc.format               = PixelFormat_RGBA8;
     tex_desc.bind_flags           = BindFlag_Texture;
-//    tex_desc.access_flags         = AccessFlag_ReadWrite;
+    tex_desc.access_flags         = AccessFlag_Write;
     tex_desc.generate_mips_enable = false;
+    tex_desc.usage_mode           = UsageMode_Dynamic;
 
     xtl::com_ptr<ITexture> texture (test.device->CreateTexture (tex_desc), false);
 
