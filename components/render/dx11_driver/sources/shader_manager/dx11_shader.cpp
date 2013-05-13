@@ -108,7 +108,7 @@ Shader::Shader (ShaderType in_shader_type, const ShaderCodePtr& in_code, ShaderL
       //получение информации о шейдере
 
     ID3D11ShaderReflection* reflector = 0;
-    
+   
     check_errors ("D3DReflect", D3DReflect (code->GetCompiledData (), code->GetCompiledDataSize (), IID_ID3D11ShaderReflection, (void**)&reflector));
 
     if (!reflector)

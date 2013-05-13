@@ -1,9 +1,12 @@
 #ifndef RENDER_DX11_DRIVER_SHADER_STAGE_SHARED_HEADER
 #define RENDER_DX11_DRIVER_SHADER_STAGE_SHARED_HEADER
 
+#include <OBJBASE.H>
+#include <INITGUID.H>
+
+#include <D3D11Shader.h>
 #include <D3Dcommon.h>
 #include <D3DX11async.h>
-#include <D3D11Shader.h>
 #include <D3Dcompiler.h>
 
 #include <stl/deque>
