@@ -63,7 +63,7 @@ public class Store implements EngineActivity.EngineActivityEventListener, Engine
     return helper.handleActivityResult (requestCode, resultCode, data);
 	}
 
-  public void buyProduct (final Activity activity, final String sku, final int payloadValue)
+  public void buyProduct (final Activity activity, final String sku)
   {
   	//TODO make purchase queue
   	
@@ -72,6 +72,8 @@ public class Store implements EngineActivity.EngineActivityEventListener, Engine
   	
   	purchase_in_progress = true;
   	
+  	onPurchaseInitiatedCallback (sku);
+  	
   	activity.runOnUiThread (new Runnable () {
   		public void run ()
   		{
@@ -79,13 +81,28 @@ public class Store implements EngineActivity.EngineActivityEventListener, Engine
   			{
           public void onIabPurchaseFinished(IabResult result, Purchase info)
           {
-          	Log.d (TAG, "Purchase '" + info + "' finished, result: " + result);
           	purchase_in_progress = false;
+
+          	Log.d (TAG, "Purchase '" + info + "' finished, result: " + result);
+
+            if (result.isFailure ()) 
+            {
+            	onPurchaseFailedCallback (sku, result.getMessage ());
+              return;
+            }
+
+          	onPurchaseSucceededCallback (sku);
+
+          	//TODO restored callback
           }
-  			}, Integer.toString (payloadValue));
+  			});
   		}
   	});
   }
   
   public native void onInitializedCallback(boolean canBuyProducts);
+  public native void onPurchaseInitiatedCallback(String sku);
+  public native void onPurchaseFailedCallback(String sku, String error);
+  public native void onPurchaseSucceededCallback(String sku);
+  public native void onPurchaseRestoredCallback(String sku);
 }
