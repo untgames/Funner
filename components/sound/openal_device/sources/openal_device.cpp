@@ -57,7 +57,8 @@ void process_init_string (const char* property, const char* value, OpenALDeviceP
 
 OpenALDevice::OpenALDevice (const char* driver_name, const char* device_name, const char* init_string)
  : context        (device_name, init_string),
-   sample_buffer  (MAX_SOUND_SAMPLE_RATE * MAX_SOUND_CHANNELS * MAX_SOUND_BYTES_PER_SAMPLE / SOURCE_BUFFERS_UPDATE_FREQUENCY / (SOURCE_BUFFERS_COUNT - 2))
+//   sample_buffer  (MAX_SOUND_SAMPLE_RATE * MAX_SOUND_CHANNELS * MAX_SOUND_BYTES_PER_SAMPLE / SOURCE_BUFFERS_UPDATE_FREQUENCY / (SOURCE_BUFFERS_COUNT / 2))
+   sample_buffer  (MAX_SOUND_SAMPLE_RATE * MAX_SOUND_CHANNELS * MAX_SOUND_BYTES_PER_SAMPLE / SOURCE_BUFFERS_COUNT)
 {
   common::Lock lock (*this);
 
