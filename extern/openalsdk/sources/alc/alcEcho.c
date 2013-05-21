@@ -44,7 +44,7 @@ typedef struct ALechoState {
     } Tap[2];
     ALuint Offset;
     /* The panning gains for the two taps */
-    ALfloat Gain[2][MAXCHANNELS];
+    ALfloat Gain[2][MaxChannels];
 
     ALfloat FeedGain;
 
@@ -94,10 +94,9 @@ static ALvoid EchoUpdate(ALeffectState *effect, ALCdevice *Device, const ALeffec
 {
     ALechoState *state = (ALechoState*)effect;
     ALuint frequency = Device->Frequency;
-    ALfloat dirGain, ambientGain;
-    const ALfloat *ChannelGain;
     ALfloat lrpan, cw, g, gain;
-    ALuint i, pos;
+    ALfloat dirGain;
+    ALuint i;
 
     state->Tap[0].delay = fastf2u(Slot->effect.Echo.Delay * frequency) + 1;
     state->Tap[1].delay = fastf2u(Slot->effect.Echo.LRDelay * frequency);
@@ -107,42 +106,27 @@ static ALvoid EchoUpdate(ALeffectState *effect, ALCdevice *Device, const ALeffec
 
     state->FeedGain = Slot->effect.Echo.Feedback;
 
-    cw = aluCos(F_PI*2.0f * LOWPASSFREQREF / frequency);
+    cw = cosf(F_PI*2.0f * LOWPASSFREQREF / frequency);
     g = 1.0f - Slot->effect.Echo.Damping;
     state->iirFilter.coeff = lpCoeffCalc(g, cw);
 
     gain = Slot->Gain;
-    for(i = 0;i < MAXCHANNELS;i++)
+    for(i = 0;i < MaxChannels;i++)
     {
         state->Gain[0][i] = 0.0f;
         state->Gain[1][i] = 0.0f;
     }
 
-    ambientGain = aluSqrt(1.0f/Device->NumChan);
-    dirGain = aluFabs(lrpan);
+    dirGain = fabsf(lrpan);
 
     /* First tap panning */
-    pos = aluCart2LUTpos(0.0f, ((lrpan>0.0f)?-1.0f:1.0f));
-    ChannelGain = Device->PanningLUT[pos];
-
-    for(i = 0;i < Device->NumChan;i++)
-    {
-        enum Channel chan = Device->Speaker2Chan[i];
-        state->Gain[0][chan] = lerp(ambientGain, ChannelGain[chan], dirGain) * gain;
-    }
+    ComputeAngleGains(Device, atan2f(-lrpan, 0.0f), (1.0f-dirGain)*F_PI, gain, state->Gain[0]);
 
     /* Second tap panning */
-    pos = aluCart2LUTpos(0.0f, ((lrpan>0.0f)?1.0f:-1.0f));
-    ChannelGain = Device->PanningLUT[pos];
-
-    for(i = 0;i < Device->NumChan;i++)
-    {
-        enum Channel chan = Device->Speaker2Chan[i];
-        state->Gain[1][chan] = lerp(ambientGain, ChannelGain[chan], dirGain) * gain;
-    }
+    ComputeAngleGains(Device, atan2f(+lrpan, 0.0f), (1.0f-dirGain)*F_PI, gain, state->Gain[1]);
 }
 
-static ALvoid EchoProcess(ALeffectState *effect, ALuint SamplesToDo, const ALfloat *SamplesIn, ALfloat (*SamplesOut)[MAXCHANNELS])
+static ALvoid EchoProcess(ALeffectState *effect, ALuint SamplesToDo, const ALfloat *RESTRICT SamplesIn, ALfloat (*RESTRICT SamplesOut)[BUFFERSIZE])
 {
     ALechoState *state = (ALechoState*)effect;
     const ALuint mask = state->BufferLength-1;
@@ -156,13 +140,13 @@ static ALvoid EchoProcess(ALeffectState *effect, ALuint SamplesToDo, const ALflo
     {
         /* First tap */
         smp = state->SampleBuffer[(offset-tap1) & mask];
-        for(k = 0;k < MAXCHANNELS;k++)
-            SamplesOut[i][k] += smp * state->Gain[0][k];
+        for(k = 0;k < MaxChannels;k++)
+            SamplesOut[k][i] += smp * state->Gain[0][k];
 
         /* Second tap */
         smp = state->SampleBuffer[(offset-tap2) & mask];
-        for(k = 0;k < MAXCHANNELS;k++)
-            SamplesOut[i][k] += smp * state->Gain[1][k];
+        for(k = 0;k < MaxChannels;k++)
+            SamplesOut[k][i] += smp * state->Gain[1][k];
 
         // Apply damping and feedback gain to the second tap, and mix in the
         // new sample

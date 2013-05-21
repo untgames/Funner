@@ -4,6 +4,14 @@
 /* Define to the library version */
 #define ALSOFT_VERSION "1.12.854"
 
+#ifdef _MSC_VER
+  #define ALIGN(x) __declspec(align(x))
+#else
+  #define ALIGN(x) __attribute__((aligned(x)))
+#endif
+
+#define RESTRICT
+
 #ifdef LINUX
 
 /* Define if we have the ALSA backend */
@@ -184,6 +192,8 @@
 
 #elif defined (_WIN32)
 
+#define HAVE_WINDOWS_H
+
 #define AL_API  __declspec(dllexport)
 #define ALC_API __declspec(dllexport)
 
@@ -259,12 +269,12 @@
 #elif defined (ANDROID) && (defined (ARM) || defined (X86))
 
 /* Define if we have the Android backend */
-#define HAVE_ANDROID 1
+//#define HAVE_ANDROID 1
 
 /* Define if we have the OpenSL backend */
 #define HAVE_OPENSL 1
 
-#define HAVE_ANDROID_LOW_LATENCY
+//#define HAVE_ANDROID_LOW_LATENCY
 
 /* Define if we have the ALSA backend */
 /* #cmakedefine HAVE_ALSA */

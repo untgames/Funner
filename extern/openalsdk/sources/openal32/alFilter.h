@@ -1,12 +1,13 @@
 #ifndef _AL_FILTER_H_
 #define _AL_FILTER_H_
 
-#include "AL/al.h"
-#include "alu.h"
+#include "alMain.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+#define LOWPASSFREQREF  (5000)
 
 typedef struct {
     ALfloat coeff;
@@ -30,17 +31,6 @@ static __inline ALfloat lpFilter2P(FILTER *iir, ALuint offset, ALfloat input)
 
     return output;
 }
-static __inline ALfloat lpFilter1P(FILTER *iir, ALuint offset, ALfloat input)
-{
-    ALfloat *history = &iir->history[offset];
-    ALfloat a = iir->coeff;
-    ALfloat output = input;
-
-    output = output + (history[0]-output)*a;
-    history[0] = output;
-
-    return output;
-}
 
 static __inline ALfloat lpFilter2PC(const FILTER *iir, ALuint offset, ALfloat input)
 {
@@ -50,16 +40,6 @@ static __inline ALfloat lpFilter2PC(const FILTER *iir, ALuint offset, ALfloat in
 
     output = output + (history[0]-output)*a;
     output = output + (history[1]-output)*a;
-
-    return output;
-}
-static __inline ALfloat lpFilter1PC(FILTER *iir, ALuint offset, ALfloat input)
-{
-    const ALfloat *history = &iir->history[offset];
-    ALfloat a = iir->coeff;
-    ALfloat output = input;
-
-    output = output + (history[0]-output)*a;
 
     return output;
 }
@@ -87,8 +67,8 @@ typedef struct ALfilter {
     void (*GetParamf)(struct ALfilter *filter, ALCcontext *context, ALenum param, ALfloat *val);
     void (*GetParamfv)(struct ALfilter *filter, ALCcontext *context, ALenum param, ALfloat *vals);
 
-    // Index to itself
-    ALuint filter;
+    /* Self ID */
+    ALuint id;
 } ALfilter;
 
 #define ALfilter_SetParami(x, c, p, v)  ((x)->SetParami((x),(c),(p),(v)))

@@ -4,13 +4,11 @@
 #include <string.h>
 #include <stdio.h>
 #include <stdarg.h>
+#include <assert.h>
+#include <math.h>
 
 #ifdef HAVE_FENV_H
 #include <fenv.h>
-#endif
-
-#ifdef HAVE_FPU_CONTROL_H
-#include <fpu_control.h>
 #endif
 
 #include "AL/al.h"
@@ -47,18 +45,12 @@ typedef unsigned long long ALuint64;
 typedef ptrdiff_t ALintptrEXT;
 typedef ptrdiff_t ALsizeiptrEXT;
 
+#define MAKEU64(x,y) (((ALuint64)(x)<<32)|(ALuint64)(y))
+
 #ifdef HAVE_GCC_FORMAT
 #define PRINTF_STYLE(x, y) __attribute__((format(printf, (x), (y))))
 #else
 #define PRINTF_STYLE(x, y)
-#endif
-
-#if defined(HAVE_RESTRICT)
-#define RESTRICT restrict
-#elif defined(HAVE___RESTRICT)
-#define RESTRICT __restrict
-#else
-#define RESTRICT
 #endif
 
 
@@ -72,6 +64,7 @@ static const union {
 
 #ifdef _WIN32
 
+#define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 
 typedef DWORD pthread_key_t;
@@ -99,9 +92,6 @@ static __inline int sched_yield(void)
 #include <unistd.h>
 #include <assert.h>
 #include <pthread.h>
-#ifdef HAVE_PTHREAD_NP_H
-#include <pthread_np.h>
-#endif
 #include <sys/time.h>
 #include <time.h>
 #include <errno.h>
@@ -341,60 +331,47 @@ static __inline void LockUIntMapWrite(UIntMap *map)
 static __inline void UnlockUIntMapWrite(UIntMap *map)
 { WriteUnlock(&map->lock); }
 
-#include "alListener.h"
-#include "alu.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-
-#define DEFAULT_OUTPUT_RATE        (44100)
-#define MIN_OUTPUT_RATE            (8000)
-
-#define SPEEDOFSOUNDMETRESPERSEC   (343.3f)
-#define AIRABSORBGAINHF            (0.99426f) /* -0.05dB */
-
-#define LOWPASSFREQREF             (5000)
-
-
 struct Hrtf;
+
+
+#define DEFAULT_OUTPUT_RATE  (44100)
+#define MIN_OUTPUT_RATE      (8000)
 
 
 // Find the next power-of-2 for non-power-of-2 numbers.
 static __inline ALuint NextPowerOf2(ALuint value)
 {
-    ALuint powerOf2 = 1;
-
-    if(value)
+    if(value > 0)
     {
         value--;
-        while(value)
-        {
-            value >>= 1;
-            powerOf2 <<= 1;
-        }
+        value |= value>>1;
+        value |= value>>2;
+        value |= value>>4;
+        value |= value>>8;
+        value |= value>>16;
     }
-    return powerOf2;
+    return value+1;
 }
 
 /* Fast float-to-int conversion. Assumes the FPU is already in round-to-zero
  * mode. */
 static __inline ALint fastf2i(ALfloat f)
 {
+#ifdef HAVE_LRINTF
+    return lrintf(f);
+#elif defined(_MSC_VER) && defined(_M_IX86)
     ALint i;
-#if defined(_MSC_VER) && defined(_M_IX86)
     __asm fld f
     __asm fistp i
-#elif defined(__GNUC__) && (defined(__i386__) || defined(__x86_64__))
-    __asm__ __volatile__("flds %1\n\t"
-                         "fistpl %0\n\t"
-                         : "=m" (i)
-                         : "m" (f));
-#else
-    i = (ALint)f;
-#endif
     return i;
+#else
+    return (ALint)f;
+#endif
 }
 
 /* Fast float-to-uint conversion. Assumes the FPU is already in round-to-zero
@@ -421,6 +398,11 @@ typedef struct {
     void (*StopCapture)(ALCdevice*);
     ALCenum (*CaptureSamples)(ALCdevice*, void*, ALCuint);
     ALCuint (*AvailableSamples)(ALCdevice*);
+
+    void (*Lock)(ALCdevice*);
+    void (*Unlock)(ALCdevice*);
+
+    ALint64 (*GetLatency)(ALCdevice*);
 } BackendFuncs;
 
 struct BackendInfo {
@@ -467,15 +449,47 @@ void alc_ca_probe(enum DevProbe type);
 ALCboolean alc_opensl_init(BackendFuncs *func_list);
 void alc_opensl_deinit(void);
 void alc_opensl_probe(enum DevProbe type);
-ALCboolean alc_android_init(BackendFuncs *func_list);
-void alc_android_deinit(void);
-void alc_android_probe(enum DevProbe type);
 ALCboolean alc_null_init(BackendFuncs *func_list);
 void alc_null_deinit(void);
 void alc_null_probe(enum DevProbe type);
 ALCboolean alc_loopback_init(BackendFuncs *func_list);
 void alc_loopback_deinit(void);
 void alc_loopback_probe(enum DevProbe type);
+
+
+enum DistanceModel {
+    InverseDistanceClamped  = AL_INVERSE_DISTANCE_CLAMPED,
+    LinearDistanceClamped   = AL_LINEAR_DISTANCE_CLAMPED,
+    ExponentDistanceClamped = AL_EXPONENT_DISTANCE_CLAMPED,
+    InverseDistance  = AL_INVERSE_DISTANCE,
+    LinearDistance   = AL_LINEAR_DISTANCE,
+    ExponentDistance = AL_EXPONENT_DISTANCE,
+    DisableDistance  = AL_NONE,
+
+    DefaultDistanceModel = InverseDistanceClamped
+};
+
+enum Resampler {
+    PointResampler,
+    LinearResampler,
+    CubicResampler,
+
+    ResamplerMax,
+};
+
+enum Channel {
+    FrontLeft = 0,
+    FrontRight,
+    FrontCenter,
+    LFE,
+    BackLeft,
+    BackRight,
+    BackCenter,
+    SideLeft,
+    SideRight,
+
+    MaxChannels,
+};
 
 
 /* Device formats */
@@ -527,6 +541,22 @@ enum DeviceType {
     Loopback
 };
 
+
+/* Size for temporary storage of buffer data, in ALfloats. Larger values need
+ * more memory, while smaller values may need more iterations. The value needs
+ * to be a sensible size, however, as it constrains the max stepping value used
+ * for mixing, as well as the maximum number of samples per mixing iteration.
+ *
+ * The mixer requires being able to do two samplings per mixing loop. With the
+ * cubic resampler (which requires 3 padding samples), this limits a 2048
+ * buffer size to about 2044. This means that buffer_freq*source_pitch cannot
+ * exceed device_freq*2044 for a 32-bit buffer.
+ */
+#ifndef BUFFERSIZE
+#define BUFFERSIZE 2048
+#endif
+
+
 struct ALCdevice_struct
 {
     volatile RefCount ref;
@@ -542,7 +572,7 @@ struct ALCdevice_struct
     enum DevFmtChannels FmtChans;
     enum DevFmtType     FmtType;
 
-    ALCchar      *szDeviceName;
+    ALCchar      *DeviceName;
 
     volatile ALCenum LastError;
 
@@ -574,17 +604,21 @@ struct ALCdevice_struct
     // Device flags
     ALuint       Flags;
 
-    // Dry path buffer mix
-    ALfloat DryBuffer[BUFFERSIZE][MAXCHANNELS];
+    ALuint ChannelOffsets[MaxChannels];
 
-    enum Channel DevChannels[MAXCHANNELS];
-
-    enum Channel Speaker2Chan[MAXCHANNELS];
-    ALfloat PanningLUT[LUT_NUM][MAXCHANNELS];
+    enum Channel Speaker2Chan[MaxChannels];
+    ALfloat SpeakerAngle[MaxChannels];
     ALuint  NumChan;
 
-    ALfloat ClickRemoval[MAXCHANNELS];
-    ALfloat PendingClicks[MAXCHANNELS];
+    /* Temp storage used for mixing. +1 for the predictive sample. */
+    ALIGN(16) ALfloat SampleData1[BUFFERSIZE+1];
+    ALIGN(16) ALfloat SampleData2[BUFFERSIZE+1];
+
+    // Dry path buffer mix
+    ALIGN(16) ALfloat DryBuffer[MaxChannels][BUFFERSIZE];
+
+    ALIGN(16) ALfloat ClickRemoval[MaxChannels];
+    ALIGN(16) ALfloat PendingClicks[MaxChannels];
 
     /* Default effect slot */
     struct ALeffectslot *DefaultSlot;
@@ -609,9 +643,10 @@ struct ALCdevice_struct
 #define ALCdevice_StopCapture(a)         ((a)->Funcs->StopCapture((a)))
 #define ALCdevice_CaptureSamples(a,b,c)  ((a)->Funcs->CaptureSamples((a), (b), (c)))
 #define ALCdevice_AvailableSamples(a)    ((a)->Funcs->AvailableSamples((a)))
+#define ALCdevice_Lock(a)                ((a)->Funcs->Lock((a)))
+#define ALCdevice_Unlock(a)              ((a)->Funcs->Unlock((a)))
+#define ALCdevice_GetLatency(a)          ((a)->Funcs->GetLatency((a)))
 
-// Duplicate stereo sources on the side/rear channels
-#define DEVICE_DUPLICATE_STEREO                  (1<<0)
 // Frequency was requested by the app or config file
 #define DEVICE_FREQUENCY_REQUEST                 (1<<1)
 // Channel configuration was requested by the config file
@@ -619,8 +654,15 @@ struct ALCdevice_struct
 // Sample type was requested by the config file
 #define DEVICE_SAMPLE_TYPE_REQUEST               (1<<3)
 
+// Stereo sources cover 120-degree angles around +/-90
+#define DEVICE_WIDE_STEREO                       (1<<16)
+
 // Specifies if the device is currently running
 #define DEVICE_RUNNING                           (1<<31)
+
+/* Invalid channel offset */
+#define INVALID_OFFSET                           (~0u)
+
 
 #define LookupBuffer(m, k) ((struct ALbuffer*)LookupUIntMapKey(&(m)->BufferMap, (k)))
 #define LookupEffect(m, k) ((struct ALeffect*)LookupUIntMapKey(&(m)->EffectMap, (k)))
@@ -634,7 +676,7 @@ struct ALCcontext_struct
 {
     volatile RefCount ref;
 
-    ALlistener  Listener;
+    struct ALlistener *Listener;
 
     UIntMap SourceMap;
     UIntMap EffectSlotMap;
@@ -648,7 +690,7 @@ struct ALCcontext_struct
 
     volatile ALfloat DopplerFactor;
     volatile ALfloat DopplerVelocity;
-    volatile ALfloat flSpeedOfSound;
+    volatile ALfloat SpeedOfSound;
     volatile ALenum  DeferUpdates;
 
     struct ALsource **ActiveSources;
@@ -670,24 +712,37 @@ struct ALCcontext_struct
 #define RemoveSource(m, k) ((struct ALsource*)RemoveUIntMapKey(&(m)->SourceMap, (k)))
 #define RemoveEffectSlot(m, k) ((struct ALeffectslot*)RemoveUIntMapKey(&(m)->EffectSlotMap, (k)))
 
+
 ALCcontext *GetContextRef(void);
 
 void ALCcontext_IncRef(ALCcontext *context);
 void ALCcontext_DecRef(ALCcontext *context);
 
-void AppendAllDeviceList(const ALCchar *name);
+void AppendAllDevicesList(const ALCchar *name);
 void AppendCaptureDeviceList(const ALCchar *name);
 
-static __inline void LockDevice(ALCdevice *device)
-{ EnterCriticalSection(&device->Mutex); }
-static __inline void UnlockDevice(ALCdevice *device)
-{ LeaveCriticalSection(&device->Mutex); }
+void ALCdevice_LockDefault(ALCdevice *device);
+void ALCdevice_UnlockDefault(ALCdevice *device);
+ALint64 ALCdevice_GetLatencyDefault(ALCdevice *device);
 
 static __inline void LockContext(ALCcontext *context)
-{ LockDevice(context->Device); }
+{ ALCdevice_Lock(context->Device); }
 static __inline void UnlockContext(ALCcontext *context)
-{ UnlockDevice(context->Device); }
+{ ALCdevice_Unlock(context->Device); }
 
+
+void *al_malloc(size_t alignment, size_t size);
+void *al_calloc(size_t alignment, size_t size);
+void al_free(void *ptr);
+
+typedef struct {
+    int state;
+#ifdef HAVE_SSE
+    int sse_state;
+#endif
+} FPUCtl;
+void SetMixerFPUMode(FPUCtl *ctl);
+void RestoreFPUMode(const FPUCtl *ctl);
 
 ALvoid *StartThread(ALuint (*func)(ALvoid*), ALvoid *ptr);
 ALuint StopThread(ALvoid *thread);
@@ -717,18 +772,21 @@ void SetDefaultWFXChannelOrder(ALCdevice *device);
 const ALCchar *DevFmtTypeString(enum DevFmtType type);
 const ALCchar *DevFmtChannelsString(enum DevFmtChannels chans);
 
-#define HRIR_BITS        (5)
+#define HRIR_BITS        (7)
 #define HRIR_LENGTH      (1<<HRIR_BITS)
 #define HRIR_MASK        (HRIR_LENGTH-1)
-void InitHrtf(void);
-void FreeHrtf(void);
+#define HRTFDELAY_BITS    (20)
+#define HRTFDELAY_FRACONE (1<<HRTFDELAY_BITS)
+#define HRTFDELAY_MASK    (HRTFDELAY_FRACONE-1)
 const struct Hrtf *GetHrtf(ALCdevice *device);
+void FreeHrtfs(void);
+ALuint GetHrtfIrSize (const struct Hrtf *Hrtf);
 ALfloat CalcHrtfDelta(ALfloat oldGain, ALfloat newGain, const ALfloat olddir[3], const ALfloat newdir[3]);
 void GetLerpedHrtfCoeffs(const struct Hrtf *Hrtf, ALfloat elevation, ALfloat azimuth, ALfloat gain, ALfloat (*coeffs)[2], ALuint *delays);
 ALuint GetMovingHrtfCoeffs(const struct Hrtf *Hrtf, ALfloat elevation, ALfloat azimuth, ALfloat gain, ALfloat delta, ALint counter, ALfloat (*coeffs)[2], ALuint *delays, ALfloat (*coeffStep)[2], ALint *delayStep);
 
-void al_print(const char *func, const char *fmt, ...) PRINTF_STYLE(2,3);
-#define AL_PRINT(...) al_print(__FUNCTION__, __VA_ARGS__)
+void al_print(const char *type, const char *func, const char *fmt, ...) PRINTF_STYLE(3,4);
+#define AL_PRINT(T, ...) al_print((T), __FUNCTION__, __VA_ARGS__)
 
 extern FILE *LogFile;
 enum LogLevel {
@@ -742,26 +800,82 @@ extern enum LogLevel LogLevel;
 
 #define TRACEREF(...) do {                                                    \
     if(LogLevel >= LogRef)                                                    \
-        AL_PRINT(__VA_ARGS__);                                                \
+        AL_PRINT("(--)", __VA_ARGS__);                                        \
 } while(0)
 
 #define TRACE(...) do {                                                       \
     if(LogLevel >= LogTrace)                                                  \
-        AL_PRINT(__VA_ARGS__);                                                \
+        AL_PRINT("(II)", __VA_ARGS__);                                        \
 } while(0)
 
 #define WARN(...) do {                                                        \
     if(LogLevel >= LogWarning)                                                \
-        AL_PRINT(__VA_ARGS__);                                                \
+        AL_PRINT("(WW)", __VA_ARGS__);                                        \
 } while(0)
 
 #define ERR(...) do {                                                         \
     if(LogLevel >= LogError)                                                  \
-        AL_PRINT(__VA_ARGS__);                                                \
+        AL_PRINT("(EE)", __VA_ARGS__);                                        \
 } while(0)
 
 
 extern ALint RTPrioLevel;
+
+
+extern ALuint CPUCapFlags;
+enum {
+    CPU_CAP_SSE    = 1<<0,
+    CPU_CAP_NEON   = 1<<1,
+};
+
+void FillCPUCaps(ALuint capfilter);
+
+
+/**
+ * Starts a try block. Must not be nested within another try block within the
+ * same function.
+ */
+#define al_try do {                                                           \
+    int _al_err=0;                                                            \
+_al_try_label:                                                                \
+    if(_al_err == 0)
+/**
+ * After a try or another catch block, runs the next block if the given value
+ * was thrown.
+ */
+#define al_catch(val) else if(_al_err == (val))
+/**
+ * After a try or catch block, runs the next block for any value thrown and not
+ * caught.
+ */
+#define al_catchany() else
+/** Marks the end of the final catch (or the try) block. */
+#define al_endtry } while(0)
+
+/**
+ * The given integer value is "thrown" so as to be caught by a catch block.
+ * Must be called in a try block within the same function. The value must not
+ * be 0.
+ */
+#define al_throw(e) do {                                                      \
+    _al_err = (e);                                                            \
+    assert(_al_err != 0);                                                     \
+    goto _al_try_label;                                                       \
+} while(0)
+/** Sets an AL error on the given context, before throwing the error code. */
+#define al_throwerr(ctx, err) do {                                            \
+    alSetError((ctx), (err));                                                 \
+    al_throw((err));                                                          \
+} while(0)
+
+/**
+ * Throws an AL_INVALID_VALUE error with the given ctx if the given condition
+ * is false.
+ */
+#define CHECK_VALUE(ctx, cond) do {                                           \
+    if(!(cond))                                                               \
+        al_throwerr((ctx), AL_INVALID_VALUE);                                 \
+} while(0)
 
 #ifdef __cplusplus
 }

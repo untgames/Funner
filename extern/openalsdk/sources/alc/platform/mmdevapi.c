@@ -28,6 +28,7 @@
 #include <mmdeviceapi.h>
 #include <audioclient.h>
 #include <cguid.h>
+#include <devpropdef.h>
 #include <mmreg.h>
 #include <propsys.h>
 #include <propkey.h>
@@ -38,12 +39,13 @@
 #endif
 
 #include "alMain.h"
-#include "AL/al.h"
-#include "AL/alc.h"
+#include "alu.h"
 
 
 DEFINE_GUID(KSDATAFORMAT_SUBTYPE_PCM, 0x00000001, 0x0000, 0x0010, 0x80, 0x00, 0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71);
 DEFINE_GUID(KSDATAFORMAT_SUBTYPE_IEEE_FLOAT, 0x00000003, 0x0000, 0x0010, 0x80, 0x00, 0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71);
+
+DEFINE_DEVPROPKEY(DEVPKEY_Device_FriendlyName, 0xa45c254e, 0xdf1c, 0x4efd, 0x80,0x20, 0x67,0xd1,0x46,0xa8,0x50,0xe0, 14);
 
 #define MONO SPEAKER_FRONT_CENTER
 #define STEREO (SPEAKER_FRONT_LEFT|SPEAKER_FRONT_RIGHT)
@@ -60,9 +62,11 @@ typedef struct {
     IMMDevice *mmdev;
     IAudioClient *client;
     IAudioRenderClient *render;
-    HANDLE hNotifyEvent;
+    HANDLE NotifyEvent;
 
     HANDLE MsgEvent;
+
+    volatile UINT32 Padding;
 
     volatile int killNow;
     ALvoid *thread;
@@ -225,37 +229,34 @@ static ALuint MMDevApiProc(ALvoid *ptr)
     if(FAILED(hr))
     {
         ERR("CoInitialize(NULL) failed: 0x%08lx\n", hr);
+        ALCdevice_Lock(device);
         aluHandleDisconnect(device);
-        return 0;
-    }
-
-    hr = IAudioClient_GetBufferSize(data->client, &buffer_len);
-    if(FAILED(hr))
-    {
-        ERR("Failed to get audio buffer size: 0x%08lx\n", hr);
-        aluHandleDisconnect(device);
-        CoUninitialize();
+        ALCdevice_Unlock(device);
         return 0;
     }
 
     SetRTPriority();
 
     update_size = device->UpdateSize;
+    buffer_len = update_size * device->NumUpdates;
     while(!data->killNow)
     {
         hr = IAudioClient_GetCurrentPadding(data->client, &written);
         if(FAILED(hr))
         {
             ERR("Failed to get padding: 0x%08lx\n", hr);
+            ALCdevice_Lock(device);
             aluHandleDisconnect(device);
+            ALCdevice_Unlock(device);
             break;
         }
+        data->Padding = written;
 
         len = buffer_len - written;
         if(len < update_size)
         {
             DWORD res;
-            res = WaitForSingleObjectEx(data->hNotifyEvent, 2000, FALSE);
+            res = WaitForSingleObjectEx(data->NotifyEvent, 2000, FALSE);
             if(res != WAIT_OBJECT_0)
                 ERR("WaitForSingleObjectEx error: 0x%lx\n", res);
             continue;
@@ -265,16 +266,22 @@ static ALuint MMDevApiProc(ALvoid *ptr)
         hr = IAudioRenderClient_GetBuffer(data->render, len, &buffer);
         if(SUCCEEDED(hr))
         {
+            ALCdevice_Lock(device);
             aluMixData(device, buffer, len);
+            data->Padding = written + len;
+            ALCdevice_Unlock(device);
             hr = IAudioRenderClient_ReleaseBuffer(data->render, len, 0);
         }
         if(FAILED(hr))
         {
             ERR("Failed to buffer data: 0x%08lx\n", hr);
+            ALCdevice_Lock(device);
             aluHandleDisconnect(device);
+            ALCdevice_Unlock(device);
             break;
         }
     }
+    data->Padding = 0;
 
     CoUninitialize();
     return 0;
@@ -622,7 +629,7 @@ static DWORD CALLBACK MMDevApiMsgProc(void *ptr)
             if(SUCCEEDED(hr))
             {
                 data->client = ptr;
-                device->szDeviceName = get_device_name(data->mmdev);
+                device->DeviceName = get_device_name(data->mmdev);
             }
 
             if(FAILED(hr))
@@ -651,8 +658,8 @@ static DWORD CALLBACK MMDevApiMsgProc(void *ptr)
             device = (ALCdevice*)msg.lParam;
             data = device->ExtraData;
 
-            ResetEvent(data->hNotifyEvent);
-            hr = IAudioClient_SetEventHandle(data->client, data->hNotifyEvent);
+            ResetEvent(data->NotifyEvent);
+            hr = IAudioClient_SetEventHandle(data->client, data->NotifyEvent);
             if(FAILED(hr))
                 ERR("Failed to set event handle: 0x%08lx\n", hr);
             else
@@ -820,9 +827,9 @@ static ALCenum MMDevApiOpenPlayback(ALCdevice *device, const ALCchar *deviceName
     device->ExtraData = data;
 
     hr = S_OK;
-    data->hNotifyEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
+    data->NotifyEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
     data->MsgEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
-    if(data->hNotifyEvent == NULL || data->MsgEvent == NULL)
+    if(data->NotifyEvent == NULL || data->MsgEvent == NULL)
         hr = E_FAIL;
 
     if(SUCCEEDED(hr))
@@ -862,9 +869,9 @@ static ALCenum MMDevApiOpenPlayback(ALCdevice *device, const ALCchar *deviceName
 
     if(FAILED(hr))
     {
-        if(data->hNotifyEvent != NULL)
-            CloseHandle(data->hNotifyEvent);
-        data->hNotifyEvent = NULL;
+        if(data->NotifyEvent != NULL)
+            CloseHandle(data->NotifyEvent);
+        data->NotifyEvent = NULL;
         if(data->MsgEvent != NULL)
             CloseHandle(data->MsgEvent);
         data->MsgEvent = NULL;
@@ -890,8 +897,8 @@ static void MMDevApiClosePlayback(ALCdevice *device)
     CloseHandle(data->MsgEvent);
     data->MsgEvent = NULL;
 
-    CloseHandle(data->hNotifyEvent);
-    data->hNotifyEvent = NULL;
+    CloseHandle(data->NotifyEvent);
+    data->NotifyEvent = NULL;
 
     free(data->devid);
     data->devid = NULL;
@@ -934,6 +941,14 @@ static void MMDevApiStopPlayback(ALCdevice *device)
 }
 
 
+static ALint64 MMDevApiGetLatency(ALCdevice *device)
+{
+    MMDevApiData *data = device->ExtraData;
+
+    return (ALint64)data->Padding * 1000000000 / device->Frequency;
+}
+
+
 static const BackendFuncs MMDevApiFuncs = {
     MMDevApiOpenPlayback,
     MMDevApiClosePlayback,
@@ -945,7 +960,10 @@ static const BackendFuncs MMDevApiFuncs = {
     NULL,
     NULL,
     NULL,
-    NULL
+    NULL,
+    ALCdevice_LockDefault,
+    ALCdevice_UnlockDefault,
+    MMDevApiGetLatency
 };
 
 
@@ -1007,7 +1025,7 @@ void alcMMDevApiProbe(enum DevProbe type)
                 for(i = 0;i < NumPlaybackDevices;i++)
                 {
                     if(PlaybackDeviceList[i].name)
-                        AppendAllDeviceList(PlaybackDeviceList[i].name);
+                        AppendAllDevicesList(PlaybackDeviceList[i].name);
                 }
             }
             break;

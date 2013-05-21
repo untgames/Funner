@@ -21,9 +21,12 @@
 #include "config.h"
 
 #include <stdlib.h>
+#ifdef HAVE_WINDOWS_H
+#include <windows.h>
+#endif
+
 #include "alMain.h"
-#include "AL/al.h"
-#include "AL/alc.h"
+#include "alu.h"
 
 
 typedef struct {
@@ -84,7 +87,7 @@ static ALCenum null_open_playback(ALCdevice *device, const ALCchar *deviceName)
 
     data = (null_data*)calloc(1, sizeof(*data));
 
-    device->szDeviceName = strdup(deviceName);
+    device->DeviceName = strdup(deviceName);
     device->ExtraData = data;
     return ALC_NO_ERROR;
 }
@@ -140,7 +143,10 @@ static const BackendFuncs null_funcs = {
     NULL,
     NULL,
     NULL,
-    NULL
+    NULL,
+    ALCdevice_LockDefault,
+    ALCdevice_UnlockDefault,
+    ALCdevice_GetLatencyDefault
 };
 
 ALCboolean alc_null_init(BackendFuncs *func_list)
@@ -158,7 +164,7 @@ void alc_null_probe(enum DevProbe type)
     switch(type)
     {
         case ALL_DEVICE_PROBE:
-            AppendAllDeviceList(nullDevice);
+            AppendAllDevicesList(nullDevice);
             break;
         case CAPTURE_DEVICE_PROBE:
             break;

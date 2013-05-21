@@ -23,9 +23,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
 #include "alMain.h"
-#include "AL/al.h"
-#include "AL/alc.h"
+#include "alu.h"
 
 #include <sndio.h>
 
@@ -33,84 +33,8 @@
 static const ALCchar sndio_device[] = "SndIO Default";
 
 
-#ifdef HAVE_DYNLOAD
-static void *sndio_handle;
-#define MAKE_FUNC(x) static typeof(x) * p##x
-MAKE_FUNC(sio_initpar);
-MAKE_FUNC(sio_open);
-MAKE_FUNC(sio_close);
-MAKE_FUNC(sio_setpar);
-MAKE_FUNC(sio_getpar);
-MAKE_FUNC(sio_getcap);
-MAKE_FUNC(sio_onmove);
-MAKE_FUNC(sio_write);
-MAKE_FUNC(sio_read);
-MAKE_FUNC(sio_start);
-MAKE_FUNC(sio_stop);
-MAKE_FUNC(sio_nfds);
-MAKE_FUNC(sio_pollfd);
-MAKE_FUNC(sio_revents);
-MAKE_FUNC(sio_eof);
-MAKE_FUNC(sio_setvol);
-MAKE_FUNC(sio_onvol);
-
-#define sio_initpar psio_initpar
-#define sio_open psio_open
-#define sio_close psio_close
-#define sio_setpar psio_setpar
-#define sio_getpar psio_getpar
-#define sio_getcap psio_getcap
-#define sio_onmove psio_onmove
-#define sio_write psio_write
-#define sio_read psio_read
-#define sio_start psio_start
-#define sio_stop psio_stop
-#define sio_nfds psio_nfds
-#define sio_pollfd psio_pollfd
-#define sio_revents psio_revents
-#define sio_eof psio_eof
-#define sio_setvol psio_setvol
-#define sio_onvol psio_onvol
-#endif
-
-
 static ALCboolean sndio_load(void)
 {
-#ifdef HAVE_DYNLOAD
-    if(!sndio_handle)
-    {
-        sndio_handle = LoadLib("libsndio.so");
-        if(!sndio_handle)
-            return ALC_FALSE;
-
-#define LOAD_FUNC(f) do {                                                     \
-    p##f = GetSymbol(sndio_handle, #f);                                       \
-    if(p##f == NULL) {                                                        \
-        CloseLib(sndio_handle);                                               \
-        sndio_handle = NULL;                                                  \
-        return ALC_FALSE;                                                     \
-    }                                                                         \
-} while(0)
-        LOAD_FUNC(sio_initpar);
-        LOAD_FUNC(sio_open);
-        LOAD_FUNC(sio_close);
-        LOAD_FUNC(sio_setpar);
-        LOAD_FUNC(sio_getpar);
-        LOAD_FUNC(sio_getcap);
-        LOAD_FUNC(sio_onmove);
-        LOAD_FUNC(sio_write);
-        LOAD_FUNC(sio_read);
-        LOAD_FUNC(sio_start);
-        LOAD_FUNC(sio_stop);
-        LOAD_FUNC(sio_nfds);
-        LOAD_FUNC(sio_pollfd);
-        LOAD_FUNC(sio_revents);
-        LOAD_FUNC(sio_eof);
-        LOAD_FUNC(sio_setvol);
-        LOAD_FUNC(sio_onvol);
-#undef LOAD_FUNC
-    }
-#endif
     return ALC_TRUE;
 }
 
@@ -149,7 +73,9 @@ static ALuint sndio_proc(ALvoid *ptr)
             if(wrote == 0)
             {
                 ERR("sio_write failed\n");
+                ALCdevice_Lock(device);
                 aluHandleDisconnect(device);
+                ALCdevice_Unlock(device);
                 break;
             }
 
@@ -183,7 +109,7 @@ static ALCenum sndio_open_playback(ALCdevice *device, const ALCchar *deviceName)
         return ALC_INVALID_VALUE;
     }
 
-    device->szDeviceName = strdup(deviceName);
+    device->DeviceName = strdup(deviceName);
     device->ExtraData = data;
 
     return ALC_NO_ERROR;
@@ -339,7 +265,10 @@ static const BackendFuncs sndio_funcs = {
     NULL,
     NULL,
     NULL,
-    NULL
+    NULL,
+    ALCdevice_LockDefault,
+    ALCdevice_UnlockDefault,
+    ALCdevice_GetLatencyDefault
 };
 
 ALCboolean alc_sndio_init(BackendFuncs *func_list)
@@ -352,11 +281,6 @@ ALCboolean alc_sndio_init(BackendFuncs *func_list)
 
 void alc_sndio_deinit(void)
 {
-#ifdef HAVE_DYNLOAD
-    if(sndio_handle)
-        CloseLib(sndio_handle);
-    sndio_handle = NULL;
-#endif
 }
 
 void alc_sndio_probe(enum DevProbe type)
@@ -364,7 +288,7 @@ void alc_sndio_probe(enum DevProbe type)
     switch(type)
     {
         case ALL_DEVICE_PROBE:
-            AppendAllDeviceList(sndio_device);
+            AppendAllDevicesList(sndio_device);
             break;
         case CAPTURE_DEVICE_PROBE:
             break;

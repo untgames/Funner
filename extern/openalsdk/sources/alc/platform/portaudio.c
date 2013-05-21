@@ -23,9 +23,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
 #include "alMain.h"
-#include "AL/al.h"
-#include "AL/alc.h"
+#include "alu.h"
 
 #include <portaudio.h>
 
@@ -219,7 +219,7 @@ retry_open:
     }
 
     device->ExtraData = data;
-    device->szDeviceName = strdup(deviceName);
+    device->DeviceName = strdup(deviceName);
 
     return ALC_NO_ERROR;
 }
@@ -361,7 +361,7 @@ static ALCenum pa_open_capture(ALCdevice *device, const ALCchar *deviceName)
         goto error;
     }
 
-    device->szDeviceName = strdup(deviceName);
+    device->DeviceName = strdup(deviceName);
 
     device->ExtraData = data;
     return ALC_NO_ERROR;
@@ -430,7 +430,10 @@ static const BackendFuncs pa_funcs = {
     pa_start_capture,
     pa_stop_capture,
     pa_capture_samples,
-    pa_available_samples
+    pa_available_samples,
+    ALCdevice_LockDefault,
+    ALCdevice_UnlockDefault,
+    ALCdevice_GetLatencyDefault
 };
 
 ALCboolean alc_pa_init(BackendFuncs *func_list)
@@ -460,7 +463,7 @@ void alc_pa_probe(enum DevProbe type)
     switch(type)
     {
         case ALL_DEVICE_PROBE:
-            AppendAllDeviceList(pa_device);
+            AppendAllDevicesList(pa_device);
             break;
         case CAPTURE_DEVICE_PROBE:
             AppendCaptureDeviceList(pa_device);

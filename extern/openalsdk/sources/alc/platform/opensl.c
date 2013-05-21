@@ -22,9 +22,9 @@
 #include "config.h"
 
 #include <stdlib.h>
+
 #include "alMain.h"
-#include "AL/al.h"
-#include "AL/alc.h"
+#include "alu.h"
 
 
 #include <SLES/OpenSLES.h>
@@ -36,7 +36,6 @@
 #if 1
 #include <SLES/OpenSLES_Android.h>
 #else
-
 extern SLAPIENTRY const SLInterfaceID SL_IID_ANDROIDSIMPLEBUFFERQUEUE;
 
 struct SLAndroidSimpleBufferQueueItf_;
@@ -158,7 +157,7 @@ static const char *res_str(SLresult result)
         case SL_RESULT_UNKNOWN_ERROR: return "Unknown error";
         case SL_RESULT_OPERATION_ABORTED: return "Operation aborted";
         case SL_RESULT_CONTROL_LOST: return "Control lost";
-#ifdef SL_RESULT_READONLY        
+#ifdef SL_RESULT_READONLY
         case SL_RESULT_READONLY: return "ReadOnly";
 #endif
 #ifdef SL_RESULT_ENGINEOPTION_UNSUPPORTED
@@ -205,20 +204,7 @@ static ALCenum opensl_open_playback(ALCdevice *Device, const ALCchar *deviceName
         return ALC_OUT_OF_MEMORY;
 
     // create engine
-    
-    static const struct SLInterfaceID_ MY_SL_IID_ENGINE_ = { 0x8d97c260, 0xddd4, 0x11db, 0x958f, { 0x00, 0x02, 0xa5, 0xd5, 0xc5, 0x1b } };
-    const SLInterfaceID MY_SL_IID_ENGINE = &MY_SL_IID_ENGINE_;    
-    
-    const SLInterfaceID interfaces [] = {
-      MY_SL_IID_ENGINE, SL_IID_ENGINE, SL_IID_BUFFERQUEUE, SL_IID_PLAY, SL_IID_ANDROIDSIMPLEBUFFERQUEUE
-    };
-    SLboolean interfacesRequired [] = {
-      1, 1, 1, 1, 1
-    };
-    
-    printf ("CHECK FOR %u interfaces\n", sizeof (interfaces) / sizeof (*interfaces)); fflush (stdout);
-    
-    result = slCreateEngine(&data->engineObject, 0, NULL, sizeof (interfaces) / sizeof (*interfaces), interfaces, interfacesRequired);
+    result = slCreateEngine(&data->engineObject, 0, NULL, 0, NULL, NULL);
     PRINTERR(result, "slCreateEngine");
     if(SL_RESULT_SUCCESS == result)
     {
@@ -256,7 +242,7 @@ static ALCenum opensl_open_playback(ALCdevice *Device, const ALCchar *deviceName
         return ALC_INVALID_VALUE;
     }
 
-    Device->szDeviceName = strdup(deviceName);
+    Device->DeviceName = strdup(deviceName);
     Device->ExtraData = data;
 
     return ALC_NO_ERROR;
@@ -441,7 +427,10 @@ static const BackendFuncs opensl_funcs = {
     NULL,
     NULL,
     NULL,
-    NULL
+    NULL,
+    ALCdevice_LockDefault,
+    ALCdevice_UnlockDefault,
+    ALCdevice_GetLatencyDefault
 };
 
 
@@ -463,11 +452,11 @@ void alc_opensl_deinit(void)
 }
 
 void alc_opensl_probe(enum DevProbe type)
-{    
+{
     switch(type)
     {
         case ALL_DEVICE_PROBE:
-            AppendAllDeviceList(opensl_device);
+            AppendAllDevicesList(opensl_device);
             break;
         case CAPTURE_DEVICE_PROBE:
             break;

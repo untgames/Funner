@@ -21,14 +21,14 @@
 #include "config.h"
 
 #include <stdlib.h>
+
 #include "alMain.h"
-#include "AL/al.h"
-#include "AL/alc.h"
+#include "alu.h"
 
 
 static ALCenum loopback_open_playback(ALCdevice *device, const ALCchar *deviceName)
 {
-    device->szDeviceName = strdup(deviceName);
+    device->DeviceName = strdup(deviceName);
     return ALC_NO_ERROR;
 }
 
@@ -54,6 +54,7 @@ static void loopback_stop_playback(ALCdevice *device)
     (void)device;
 }
 
+
 static const BackendFuncs loopback_funcs = {
     loopback_open_playback,
     loopback_close_playback,
@@ -65,7 +66,10 @@ static const BackendFuncs loopback_funcs = {
     NULL,
     NULL,
     NULL,
-    NULL
+    NULL,
+    ALCdevice_LockDefault,
+    ALCdevice_UnlockDefault,
+    ALCdevice_GetLatencyDefault
 };
 
 ALCboolean alc_loopback_init(BackendFuncs *func_list)

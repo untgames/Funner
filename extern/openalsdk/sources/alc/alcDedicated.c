@@ -33,7 +33,7 @@ typedef struct ALdedicatedState {
     // Must be first in all effects!
     ALeffectState state;
 
-    ALfloat gains[MAXCHANNELS];
+    ALfloat gains[MaxChannels];
 } ALdedicatedState;
 
 
@@ -53,40 +53,29 @@ static ALboolean DedicatedDeviceUpdate(ALeffectState *effect, ALCdevice *Device)
 static ALvoid DedicatedUpdate(ALeffectState *effect, ALCdevice *device, const ALeffectslot *Slot)
 {
     ALdedicatedState *state = (ALdedicatedState*)effect;
-    const ALfloat *ChannelGain;
     ALfloat Gain;
-    ALint pos;
     ALsizei s;
 
     Gain = Slot->Gain * Slot->effect.Dedicated.Gain;
-    for(s = 0;s < MAXCHANNELS;s++)
+    for(s = 0;s < MaxChannels;s++)
         state->gains[s] = 0.0f;
 
     if(Slot->effect.type == AL_EFFECT_DEDICATED_DIALOGUE)
-    {
-        pos = aluCart2LUTpos(1.0f, 0.0f);
-        ChannelGain = device->PanningLUT[pos];
-
-        for(s = 0;s < MAXCHANNELS;s++)
-            state->gains[s] = ChannelGain[s] * Gain;
-    }
+        ComputeAngleGains(device, atan2f(0.0f, 1.0f), 0.0f, Gain, state->gains);
     else if(Slot->effect.type == AL_EFFECT_DEDICATED_LOW_FREQUENCY_EFFECT)
         state->gains[LFE] = Gain;
 }
 
-static ALvoid DedicatedProcess(ALeffectState *effect, ALuint SamplesToDo, const ALfloat *SamplesIn, ALfloat (*SamplesOut)[MAXCHANNELS])
+static ALvoid DedicatedProcess(ALeffectState *effect, ALuint SamplesToDo, const ALfloat *RESTRICT SamplesIn, ALfloat (*RESTRICT SamplesOut)[BUFFERSIZE])
 {
     ALdedicatedState *state = (ALdedicatedState*)effect;
     const ALfloat *gains = state->gains;
-    ALuint i, s;
+    ALuint i, c;
 
-    for(i = 0;i < SamplesToDo;i++)
+    for(c = 0;c < MaxChannels;c++)
     {
-        ALfloat sample;
-
-        sample = SamplesIn[i];
-        for(s = 0;s < MAXCHANNELS;s++)
-            SamplesOut[i][s] = sample * gains[s];
+        for(i = 0;i < SamplesToDo;i++)
+            SamplesOut[c][i] = SamplesIn[i] * gains[c];
     }
 }
 
@@ -104,7 +93,7 @@ ALeffectState *DedicatedCreate(void)
     state->state.Update = DedicatedUpdate;
     state->state.Process = DedicatedProcess;
 
-    for(s = 0;s < MAXCHANNELS;s++)
+    for(s = 0;s < MaxChannels;s++)
         state->gains[s] = 0.0f;
 
     return &state->state;

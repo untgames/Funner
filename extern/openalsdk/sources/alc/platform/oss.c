@@ -30,9 +30,9 @@
 #include <unistd.h>
 #include <errno.h>
 #include <math.h>
+
 #include "alMain.h"
-#include "AL/al.h"
-#include "AL/alc.h"
+#include "alu.h"
 
 #include <sys/soundcard.h>
 
@@ -79,21 +79,21 @@ static int log2i(ALCuint x)
 
 static ALuint OSSProc(ALvoid *ptr)
 {
-    ALCdevice *pDevice = (ALCdevice*)ptr;
-    oss_data *data = (oss_data*)pDevice->ExtraData;
+    ALCdevice *Device = (ALCdevice*)ptr;
+    oss_data *data = (oss_data*)Device->ExtraData;
     ALint frameSize;
     ssize_t wrote;
 
     SetRTPriority();
 
-    frameSize = FrameSizeFromDevFmt(pDevice->FmtChans, pDevice->FmtType);
+    frameSize = FrameSizeFromDevFmt(Device->FmtChans, Device->FmtType);
 
-    while(!data->killNow && pDevice->Connected)
+    while(!data->killNow && Device->Connected)
     {
         ALint len = data->data_size;
         ALubyte *WritePtr = data->mix_data;
 
-        aluMixData(pDevice, WritePtr, len/frameSize);
+        aluMixData(Device, WritePtr, len/frameSize);
         while(len > 0 && !data->killNow)
         {
             wrote = write(data->fd, WritePtr, len);
@@ -102,7 +102,9 @@ static ALuint OSSProc(ALvoid *ptr)
                 if(errno != EAGAIN && errno != EWOULDBLOCK && errno != EINTR)
                 {
                     ERR("write failed: %s\n", strerror(errno));
-                    aluHandleDisconnect(pDevice);
+                    ALCdevice_Lock(Device);
+                    aluHandleDisconnect(Device);
+                    ALCdevice_Unlock(Device);
                     break;
                 }
 
@@ -120,14 +122,14 @@ static ALuint OSSProc(ALvoid *ptr)
 
 static ALuint OSSCaptureProc(ALvoid *ptr)
 {
-    ALCdevice *pDevice = (ALCdevice*)ptr;
-    oss_data *data = (oss_data*)pDevice->ExtraData;
+    ALCdevice *Device = (ALCdevice*)ptr;
+    oss_data *data = (oss_data*)Device->ExtraData;
     int frameSize;
     int amt;
 
     SetRTPriority();
 
-    frameSize = FrameSizeFromDevFmt(pDevice->FmtChans, pDevice->FmtType);
+    frameSize = FrameSizeFromDevFmt(Device->FmtChans, Device->FmtType);
 
     while(!data->killNow)
     {
@@ -135,7 +137,9 @@ static ALuint OSSCaptureProc(ALvoid *ptr)
         if(amt < 0)
         {
             ERR("read failed: %s\n", strerror(errno));
-            aluHandleDisconnect(pDevice);
+            ALCdevice_Lock(Device);
+            aluHandleDisconnect(Device);
+            ALCdevice_Unlock(Device);
             break;
         }
         if(amt == 0)
@@ -170,7 +174,7 @@ static ALCenum oss_open_playback(ALCdevice *device, const ALCchar *deviceName)
         return ALC_INVALID_VALUE;
     }
 
-    device->szDeviceName = strdup(deviceName);
+    device->DeviceName = strdup(deviceName);
     device->ExtraData = data;
     return ALC_NO_ERROR;
 }
@@ -431,7 +435,7 @@ static ALCenum oss_open_capture(ALCdevice *device, const ALCchar *deviceName)
         return ALC_OUT_OF_MEMORY;
     }
 
-    device->szDeviceName = strdup(deviceName);
+    device->DeviceName = strdup(deviceName);
     return ALC_NO_ERROR;
 }
 
@@ -450,28 +454,28 @@ static void oss_close_capture(ALCdevice *device)
     device->ExtraData = NULL;
 }
 
-static void oss_start_capture(ALCdevice *pDevice)
+static void oss_start_capture(ALCdevice *Device)
 {
-    oss_data *data = (oss_data*)pDevice->ExtraData;
+    oss_data *data = (oss_data*)Device->ExtraData;
     data->doCapture = 1;
 }
 
-static void oss_stop_capture(ALCdevice *pDevice)
+static void oss_stop_capture(ALCdevice *Device)
 {
-    oss_data *data = (oss_data*)pDevice->ExtraData;
+    oss_data *data = (oss_data*)Device->ExtraData;
     data->doCapture = 0;
 }
 
-static ALCenum oss_capture_samples(ALCdevice *pDevice, ALCvoid *pBuffer, ALCuint lSamples)
+static ALCenum oss_capture_samples(ALCdevice *Device, ALCvoid *pBuffer, ALCuint lSamples)
 {
-    oss_data *data = (oss_data*)pDevice->ExtraData;
+    oss_data *data = (oss_data*)Device->ExtraData;
     ReadRingBuffer(data->ring, pBuffer, lSamples);
     return ALC_NO_ERROR;
 }
 
-static ALCuint oss_available_samples(ALCdevice *pDevice)
+static ALCuint oss_available_samples(ALCdevice *Device)
 {
-    oss_data *data = (oss_data*)pDevice->ExtraData;
+    oss_data *data = (oss_data*)Device->ExtraData;
     return RingBufferSize(data->ring);
 }
 
@@ -487,7 +491,10 @@ static const BackendFuncs oss_funcs = {
     oss_start_capture,
     oss_stop_capture,
     oss_capture_samples,
-    oss_available_samples
+    oss_available_samples,
+    ALCdevice_LockDefault,
+    ALCdevice_UnlockDefault,
+    ALCdevice_GetLatencyDefault
 };
 
 ALCboolean alc_oss_init(BackendFuncs *func_list)
@@ -511,9 +518,9 @@ void alc_oss_probe(enum DevProbe type)
         {
 #ifdef HAVE_STAT
             struct stat buf;
-            if(stat(oss_device, &buf) == 0)
+            if(stat(oss_driver, &buf) == 0)
 #endif
-                AppendAllDeviceList(oss_device);
+                AppendAllDevicesList(oss_device);
         }
         break;
 

@@ -43,7 +43,7 @@ typedef struct ALmodulatorState {
     ALuint index;
     ALuint step;
 
-    ALfloat Gain[MAXCHANNELS];
+    ALfloat Gain[MaxChannels];
 
     FILTER iirFilter;
     ALfloat history[1];
@@ -55,7 +55,7 @@ typedef struct ALmodulatorState {
 
 static __inline ALfloat Sin(ALuint index)
 {
-    return aluSin(index * (F_PI*2.0f / WAVEFORM_FRACONE));
+    return sinf(index * (F_PI*2.0f / WAVEFORM_FRACONE));
 }
 
 static __inline ALfloat Saw(ALuint index)
@@ -84,7 +84,8 @@ static __inline ALfloat hpFilter1P(FILTER *iir, ALuint offset, ALfloat input)
 
 #define DECL_TEMPLATE(func)                                                   \
 static void Process##func(ALmodulatorState *state, ALuint SamplesToDo,        \
-  const ALfloat *SamplesIn, ALfloat (*SamplesOut)[MAXCHANNELS])               \
+  const ALfloat *RESTRICT SamplesIn,                                          \
+  ALfloat (*RESTRICT SamplesOut)[BUFFERSIZE])                                 \
 {                                                                             \
     const ALuint step = state->step;                                          \
     ALuint index = state->index;                                              \
@@ -101,8 +102,8 @@ static void Process##func(ALmodulatorState *state, ALuint SamplesToDo,        \
                                                                               \
         samp = hpFilter1P(&state->iirFilter, 0, samp);                        \
                                                                               \
-        for(k = 0;k < MAXCHANNELS;k++)                                        \
-            SamplesOut[i][k] += state->Gain[k] * samp;                        \
+        for(k = 0;k < MaxChannels;k++)                                        \
+            SamplesOut[k][i] += state->Gain[k] * samp;                        \
     }                                                                         \
     state->index = index;                                                     \
 }
@@ -144,14 +145,14 @@ static ALvoid ModulatorUpdate(ALeffectState *effect, ALCdevice *Device, const AL
                           Device->Frequency);
     if(state->step == 0) state->step = 1;
 
-    cw = aluCos(F_PI*2.0f * Slot->effect.Modulator.HighPassCutoff /
-                            Device->Frequency);
-    a = (2.0f-cw) - aluSqrt(aluPow(2.0f-cw, 2.0f) - 1.0f);
+    cw = cosf(F_PI*2.0f * Slot->effect.Modulator.HighPassCutoff /
+                          Device->Frequency);
+    a = (2.0f-cw) - sqrtf(powf(2.0f-cw, 2.0f) - 1.0f);
     state->iirFilter.coeff = a;
 
-    gain = aluSqrt(1.0f/Device->NumChan);
+    gain = sqrtf(1.0f/Device->NumChan);
     gain *= Slot->Gain;
-    for(index = 0;index < MAXCHANNELS;index++)
+    for(index = 0;index < MaxChannels;index++)
         state->Gain[index] = 0.0f;
     for(index = 0;index < Device->NumChan;index++)
     {
@@ -160,7 +161,7 @@ static ALvoid ModulatorUpdate(ALeffectState *effect, ALCdevice *Device, const AL
     }
 }
 
-static ALvoid ModulatorProcess(ALeffectState *effect, ALuint SamplesToDo, const ALfloat *SamplesIn, ALfloat (*SamplesOut)[MAXCHANNELS])
+static ALvoid ModulatorProcess(ALeffectState *effect, ALuint SamplesToDo, const ALfloat *RESTRICT SamplesIn, ALfloat (*RESTRICT SamplesOut)[BUFFERSIZE])
 {
     ALmodulatorState *state = (ALmodulatorState*)effect;
 

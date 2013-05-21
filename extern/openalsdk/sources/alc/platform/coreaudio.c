@@ -25,8 +25,7 @@
 #include <string.h>
 
 #include "alMain.h"
-#include "AL/al.h"
-#include "AL/alc.h"
+#include "alu.h"
 
 #include <CoreServices/CoreServices.h>
 #include <unistd.h>
@@ -181,7 +180,7 @@ static ALCenum ca_open_playback(ALCdevice *device, const ALCchar *deviceName)
         return ALC_INVALID_VALUE;
     }
 
-    device->szDeviceName = strdup(deviceName);
+    device->DeviceName = strdup(deviceName);
     device->ExtraData = data;
     return ALC_NO_ERROR;
 }
@@ -277,38 +276,41 @@ static ALCboolean ca_reset_playback(ALCdevice *device)
     /* use channel count and sample rate from the default output unit's current
      * parameters, but reset everything else */
     streamFormat.mFramesPerPacket = 1;
+    streamFormat.mFormatFlags = 0;
     switch(device->FmtType)
     {
         case DevFmtUByte:
             device->FmtType = DevFmtByte;
             /* fall-through */
         case DevFmtByte:
+            streamFormat.mFormatFlags = kLinearPCMFormatFlagIsSignedInteger;
             streamFormat.mBitsPerChannel = 8;
-            streamFormat.mBytesPerPacket = streamFormat.mChannelsPerFrame;
-            streamFormat.mBytesPerFrame = streamFormat.mChannelsPerFrame;
             break;
         case DevFmtUShort:
-        case DevFmtFloat:
             device->FmtType = DevFmtShort;
             /* fall-through */
         case DevFmtShort:
+            streamFormat.mFormatFlags = kLinearPCMFormatFlagIsSignedInteger;
             streamFormat.mBitsPerChannel = 16;
-            streamFormat.mBytesPerPacket = 2 * streamFormat.mChannelsPerFrame;
-            streamFormat.mBytesPerFrame = 2 * streamFormat.mChannelsPerFrame;
             break;
         case DevFmtUInt:
             device->FmtType = DevFmtInt;
             /* fall-through */
         case DevFmtInt:
+            streamFormat.mFormatFlags = kLinearPCMFormatFlagIsSignedInteger;
             streamFormat.mBitsPerChannel = 32;
-            streamFormat.mBytesPerPacket = 2 * streamFormat.mChannelsPerFrame;
-            streamFormat.mBytesPerFrame = 2 * streamFormat.mChannelsPerFrame;
+            break;
+        case DevFmtFloat:
+            streamFormat.mFormatFlags = kLinearPCMFormatFlagIsFloat;
+            streamFormat.mBitsPerChannel = 32;
             break;
     }
+    streamFormat.mBytesPerFrame = streamFormat.mChannelsPerFrame *
+                                  streamFormat.mBitsPerChannel / 8;
+    streamFormat.mBytesPerPacket = streamFormat.mBytesPerFrame;
     streamFormat.mFormatID = kAudioFormatLinearPCM;
-    streamFormat.mFormatFlags = kLinearPCMFormatFlagIsSignedInteger |
-                                kAudioFormatFlagsNativeEndian |
-                                kLinearPCMFormatFlagIsPacked;
+    streamFormat.mFormatFlags |= kAudioFormatFlagsNativeEndian |
+                                 kLinearPCMFormatFlagIsPacked;
 
     err = AudioUnitSetProperty(data->audioUnit, kAudioUnitProperty_StreamFormat, kAudioUnitScope_Input, 0, &streamFormat, sizeof(AudioStreamBasicDescription));
     if(err != noErr)
@@ -674,7 +676,10 @@ static const BackendFuncs ca_funcs = {
     ca_start_capture,
     ca_stop_capture,
     ca_capture_samples,
-    ca_available_samples
+    ca_available_samples,
+    ALCdevice_LockDefault,
+    ALCdevice_UnlockDefault,
+    ALCdevice_GetLatencyDefault
 };
 
 ALCboolean alc_ca_init(BackendFuncs *func_list)
@@ -692,7 +697,7 @@ void alc_ca_probe(enum DevProbe type)
     switch(type)
     {
         case ALL_DEVICE_PROBE:
-            AppendAllDeviceList(ca_device);
+            AppendAllDevicesList(ca_device);
             break;
         case CAPTURE_DEVICE_PROBE:
             AppendCaptureDeviceList(ca_device);

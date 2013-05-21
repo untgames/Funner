@@ -30,9 +30,9 @@
 #include <unistd.h>
 #include <errno.h>
 #include <math.h>
+
 #include "alMain.h"
-#include "AL/al.h"
-#include "AL/alc.h"
+#include "alu.h"
 
 #include <sys/audioio.h>
 
@@ -53,21 +53,21 @@ typedef struct {
 
 static ALuint SolarisProc(ALvoid *ptr)
 {
-    ALCdevice *pDevice = (ALCdevice*)ptr;
-    solaris_data *data = (solaris_data*)pDevice->ExtraData;
+    ALCdevice *Device = (ALCdevice*)ptr;
+    solaris_data *data = (solaris_data*)Device->ExtraData;
     ALint frameSize;
     int wrote;
 
     SetRTPriority();
 
-    frameSize = FrameSizeFromDevFmt(pDevice->FmtChans, pDevice->FmtType);
+    frameSize = FrameSizeFromDevFmt(Device->FmtChans, Device->FmtType);
 
-    while(!data->killNow && pDevice->Connected)
+    while(!data->killNow && Device->Connected)
     {
         ALint len = data->data_size;
         ALubyte *WritePtr = data->mix_data;
 
-        aluMixData(pDevice, WritePtr, len/frameSize);
+        aluMixData(Device, WritePtr, len/frameSize);
         while(len > 0 && !data->killNow)
         {
             wrote = write(data->fd, WritePtr, len);
@@ -76,7 +76,9 @@ static ALuint SolarisProc(ALvoid *ptr)
                 if(errno != EAGAIN && errno != EWOULDBLOCK && errno != EINTR)
                 {
                     ERR("write failed: %s\n", strerror(errno));
-                    aluHandleDisconnect(pDevice);
+                    ALCdevice_Lock(Device);
+                    aluHandleDisconnect(Device);
+                    ALCdevice_Unlock(Device);
                     break;
                 }
 
@@ -113,7 +115,7 @@ static ALCenum solaris_open_playback(ALCdevice *device, const ALCchar *deviceNam
         return ALC_INVALID_VALUE;
     }
 
-    device->szDeviceName = strdup(deviceName);
+    device->DeviceName = strdup(deviceName);
     device->ExtraData = data;
     return ALC_NO_ERROR;
 }
@@ -247,7 +249,10 @@ static const BackendFuncs solaris_funcs = {
     NULL,
     NULL,
     NULL,
-    NULL
+    NULL,
+    ALCdevice_LockDefault,
+    ALCdevice_UnlockDefault,
+    ALCdevice_GetLatencyDefault
 };
 
 ALCboolean alc_solaris_init(BackendFuncs *func_list)
@@ -272,7 +277,7 @@ void alc_solaris_probe(enum DevProbe type)
             struct stat buf;
             if(stat(solaris_driver, &buf) == 0)
 #endif
-                AppendAllDeviceList(solaris_device);
+                AppendAllDevicesList(solaris_device);
         }
         break;
 

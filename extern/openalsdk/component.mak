@@ -1,7 +1,7 @@
 ###################################################################################################
 #Список целей
 ###################################################################################################
-#TARGETS.msvc    := EXTERN.OPENALLIB EXTERN.OPENAL_TESTS
+TARGETS.msvc    := EXTERN.OPENALLIB EXTERN.OPENAL_TESTS
 TARGETS.linux   := EXTERN.OPENALLIB EXTERN.OPENAL_TESTS
 TARGETS.android := EXTERN.OPENALLIB EXTERN.OPENAL_TESTS
 TARGETS.wp8     := EXTERN.OPENALLIB EXTERN.OPENAL_TESTS
@@ -17,7 +17,7 @@ else
 EXTERN.OPENALLIB.TYPE                       := dynamic-lib
 endif
 EXTERN.OPENALLIB.NAME                       := funner.extern.openal32
-EXTERN.OPENALLIB.INCLUDE_DIRS               := include sources sources/openal32
+EXTERN.OPENALLIB.INCLUDE_DIRS               := include sources sources/openal32 sources/alc/mixer_inc
 EXTERN.OPENALLIB.SOURCE_DIRS                := sources/openal32 sources/alc
 EXTERN.OPENALLIB.g++.COMPILER_DEFINES       := AL_ALEXT_PROTOTYPES _GNU_SOURCE=1 AL_BUILD_LIBRARY HAVE_GCC_VISIBILITY
 EXTERN.OPENALLIB.msvc.COMPILER_DEFINES      := AL_ALEXT_PROTOTYPES AL_BUILD_LIBRARY snprintf=_snprintf isfinite=_finite strcasecmp=_stricmp strncasecmp=_strnicmp

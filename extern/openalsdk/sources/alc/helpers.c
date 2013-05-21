@@ -21,8 +21,11 @@
 #include "config.h"
 
 #include <stdlib.h>
-#ifdef HAVE_DLFCN_H
-#include <dlfcn.h>
+#include <time.h>
+#include <errno.h>
+#include <stdarg.h>
+#ifdef HAVE_MALLOC_H
+#include <malloc.h>
 #endif
 
 #if defined(HAVE_GUIDDEF_H) || defined(HAVE_INITGUID_H)
@@ -46,13 +49,212 @@ DEFINE_GUID(IID_IAudioRenderClient,   0xf294acfc, 0x3146, 0x4483, 0xa7,0xbf, 0xa
 
 #ifdef HAVE_MMDEVAPI
 #include <devpropdef.h>
-
 DEFINE_DEVPROPKEY(DEVPKEY_Device_FriendlyName, 0xa45c254e, 0xdf1c, 0x4efd, 0x80,0x20, 0x67,0xd1,0x46,0xa8,0x50,0xe0, 14);
 #endif
-
+#endif
+#ifdef HAVE_DLFCN_H
+#include <dlfcn.h>
+#endif
+#ifdef HAVE_CPUID_H
+#include <cpuid.h>
+#endif
+#ifdef HAVE_FLOAT_H
+#include <float.h>
+#endif
+#ifdef HAVE_IEEEFP_H
+#include <ieeefp.h>
 #endif
 
 #include "alMain.h"
+
+ALuint CPUCapFlags = 0;
+
+
+void FillCPUCaps(ALuint capfilter)
+{
+    ALuint caps = 0;
+
+/* FIXME: We really should get this for all available CPUs in case different
+ * CPUs have different caps (is that possible on one machine?). */
+#if defined(HAVE_CPUID_H) && (defined(__i386__) || defined(__x86_64__) || \
+                              defined(_M_IX86) || defined(_M_X64))
+    union {
+        unsigned int regs[4];
+        char str[sizeof(unsigned int[4])];
+    } cpuinf[3];
+
+    if(!__get_cpuid(0, &cpuinf[0].regs[0], &cpuinf[0].regs[1], &cpuinf[0].regs[2], &cpuinf[0].regs[3]))
+        ERR("Failed to get CPUID\n");
+    else
+    {
+        unsigned int maxfunc = cpuinf[0].regs[0];
+        unsigned int maxextfunc = 0;
+
+        if(__get_cpuid(0x80000000, &cpuinf[0].regs[0], &cpuinf[0].regs[1], &cpuinf[0].regs[2], &cpuinf[0].regs[3]))
+            maxextfunc = cpuinf[0].regs[0];
+        TRACE("Detected max CPUID function: 0x%x (ext. 0x%x)\n", maxfunc, maxextfunc);
+
+        TRACE("Vendor ID: \"%.4s%.4s%.4s\"\n", cpuinf[0].str+4, cpuinf[0].str+12, cpuinf[0].str+8);
+        if(maxextfunc >= 0x80000004 &&
+           __get_cpuid(0x80000002, &cpuinf[0].regs[0], &cpuinf[0].regs[1], &cpuinf[0].regs[2], &cpuinf[0].regs[3]) &&
+           __get_cpuid(0x80000003, &cpuinf[1].regs[0], &cpuinf[1].regs[1], &cpuinf[1].regs[2], &cpuinf[1].regs[3]) &&
+           __get_cpuid(0x80000004, &cpuinf[2].regs[0], &cpuinf[2].regs[1], &cpuinf[2].regs[2], &cpuinf[2].regs[3]))
+            TRACE("Name: \"%.16s%.16s%.16s\"\n", cpuinf[0].str, cpuinf[1].str, cpuinf[2].str);
+
+        if(maxfunc >= 1 &&
+           __get_cpuid(1, &cpuinf[0].regs[0], &cpuinf[0].regs[1], &cpuinf[0].regs[2], &cpuinf[0].regs[3]))
+        {
+#ifdef bit_SSE
+            if((cpuinf[0].regs[3]&bit_SSE))
+                caps |= CPU_CAP_SSE;
+#endif
+        }
+    }
+#elif defined(HAVE_WINDOWS_H)
+    HMODULE k32 = GetModuleHandleA("kernel32.dll");
+    BOOL (WINAPI*IsProcessorFeaturePresent)(DWORD ProcessorFeature);
+    IsProcessorFeaturePresent = (BOOL(WINAPI*)(DWORD))GetProcAddress(k32, "IsProcessorFeaturePresent");
+    if(!IsProcessorFeaturePresent)
+        ERR("IsProcessorFeaturePresent not available; CPU caps not detected\n");
+    else
+    {
+        if(IsProcessorFeaturePresent(PF_XMMI_INSTRUCTIONS_AVAILABLE))
+            caps |= CPU_CAP_SSE;
+    }
+#endif
+#ifdef HAVE_NEON
+    /* Assume Neon support if compiled with it */
+    caps |= CPU_CAP_NEON;
+#endif
+
+    TRACE("Got caps:%s%s%s\n", ((caps&CPU_CAP_SSE)?((capfilter&CPU_CAP_SSE)?" SSE":" (SSE)"):""),
+                               ((caps&CPU_CAP_NEON)?((capfilter&CPU_CAP_NEON)?" Neon":" (Neon)"):""),
+                               ((!caps)?" -none-":""));
+    CPUCapFlags = caps & capfilter;
+}
+
+
+void *al_malloc(size_t alignment, size_t size)
+{
+#if defined(HAVE_ALIGNED_ALLOC)
+    size = (size+(alignment-1))&~(alignment-1);
+    return aligned_alloc(alignment, size);
+#elif defined(HAVE_POSIX_MEMALIGN)
+    void *ret;
+    if(posix_memalign(&ret, alignment, size) == 0)
+        return ret;
+    return NULL;
+#elif defined(HAVE__ALIGNED_MALLOC)
+    return _aligned_malloc(size, alignment);
+#else
+    char *ret = malloc(size+alignment);
+    if(ret != NULL)
+    {
+        *(ret++) = 0x00;
+        while(((ALintptrEXT)ret&(alignment-1)) != 0)
+            *(ret++) = 0x55;
+    }
+    return ret;
+#endif
+}
+
+void *al_calloc(size_t alignment, size_t size)
+{
+    void *ret = al_malloc(alignment, size);
+    if(ret) memset(ret, 0, size);
+    return ret;
+}
+
+void al_free(void *ptr)
+{
+#if defined(HAVE_ALIGNED_ALLOC) || defined(HAVE_POSIX_MEMALIGN)
+    free(ptr);
+#elif defined(HAVE__ALIGNED_MALLOC)
+    _aligned_free(ptr);
+#else
+    if(ptr != NULL)
+    {
+        char *finder = ptr;
+        do {
+            --finder;
+        } while(*finder == 0x55);
+        free(finder);
+    }
+#endif
+}
+
+
+#if (defined(HAVE___CONTROL87_2) || defined(HAVE__CONTROLFP)) && (defined(__x86_64__) || defined(_M_X64))
+/* Win64 doesn't allow us to set the precision control. */
+#undef _MCW_PC
+#define _MCW_PC 0
+#endif
+
+void SetMixerFPUMode(FPUCtl *ctl)
+{
+#if defined(__GNUC__) && (defined(__i386__) || defined(__x86_64__))
+    unsigned short fpuState;
+    __asm__ __volatile__("fnstcw %0" : "=m" (*&fpuState));
+    ctl->state = fpuState;
+    fpuState &= ~0x300; /* clear precision to single */
+    fpuState |=  0xC00; /* set round-to-zero */
+    __asm__ __volatile__("fldcw %0" : : "m" (*&fpuState));
+#ifdef HAVE_SSE
+    if((CPUCapFlags&CPU_CAP_SSE))
+    {
+        int sseState;
+        __asm__ __volatile__("stmxcsr %0" : "=m" (*&sseState));
+        ctl->sse_state = sseState;
+        sseState |= 0x0C00; /* set round-to-zero */
+        sseState |= 0x8000; /* set flush-to-zero */
+        __asm__ __volatile__("ldmxcsr %0" : : "m" (*&sseState));
+    }
+#endif
+#elif defined(HAVE___CONTROL87_2)
+    int mode;
+    __control87_2(0, 0, &ctl->state, NULL);
+    __control87_2(_RC_CHOP|_PC_24, _MCW_RC|_MCW_PC, &mode, NULL);
+#ifdef HAVE_SSE
+    if((CPUCapFlags&CPU_CAP_SSE))
+    {
+        __control87_2(0, 0, NULL, &ctl->sse_state);
+        __control87_2(_RC_CHOP|_DN_FLUSH, _MCW_RC|_MCW_DN, NULL, &mode);
+    }
+#endif
+#elif defined(HAVE__CONTROLFP)
+    ctl->state = _controlfp(0, 0);
+    (void)_controlfp(_RC_CHOP|_PC_24, _MCW_RC|_MCW_PC);
+#elif defined(HAVE_FESETROUND)
+    ctl->state = fegetround();
+#ifdef FE_TOWARDZERO
+    fesetround(FE_TOWARDZERO);
+#endif
+#endif
+}
+
+void RestoreFPUMode(const FPUCtl *ctl)
+{
+#if defined(__GNUC__) && (defined(__i386__) || defined(__x86_64__))
+    unsigned short fpuState = ctl->state;
+    __asm__ __volatile__("fldcw %0" : : "m" (*&fpuState));
+#ifdef HAVE_SSE
+    if((CPUCapFlags&CPU_CAP_SSE))
+        __asm__ __volatile__("ldmxcsr %0" : : "m" (*&ctl->sse_state));
+#endif
+#elif defined(HAVE___CONTROL87_2)
+    int mode;
+    __control87_2(ctl->state, _MCW_RC|_MCW_PC, &mode, NULL);
+#ifdef HAVE_SSE
+    if((CPUCapFlags&CPU_CAP_SSE))
+        __control87_2(ctl->sse_state, _MCW_RC|_MCW_DN, NULL, &mode);
+#endif
+#elif defined(HAVE__CONTROLFP)
+    _controlfp(ctl->state, _MCW_RC|_MCW_PC);
+#elif defined(HAVE_FESETROUND)
+    fesetround(ctl->state);
+#endif
+}
+
 
 #ifdef _WIN32
 void pthread_once(pthread_once_t *once, void (*callback)(void))
@@ -122,6 +324,12 @@ WCHAR *strdupW(const WCHAR *str)
 }
 
 #else
+
+#include <pthread.h>
+#ifdef HAVE_PTHREAD_NP_H
+#include <pthread_np.h>
+#endif
+#include <sched.h>
 
 void InitializeCriticalSection(CRITICAL_SECTION *cs)
 {
@@ -239,13 +447,13 @@ void *GetSymbol(void *handle, const char *name)
 #endif
 
 
-void al_print(const char *func, const char *fmt, ...)
+void al_print(const char *type, const char *func, const char *fmt, ...)
 {
     char str[256];
     int i;
 
-    i = snprintf(str, sizeof(str), "AL lib: %s: ", func);
-    if(i < (int)sizeof(str) && i > 0)
+    i = snprintf(str, sizeof(str), "AL lib: %s %s: ", type, func);
+    if(i > 0 && (unsigned int)i < sizeof(str))
     {
         va_list ap;
         va_start(ap, fmt);
