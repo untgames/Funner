@@ -840,7 +840,8 @@ void Texture::GetData
   size_t      width,
   size_t      height,
   PixelFormat target_format,
-  void*       buffer)
+  void*       buffer,
+  IDeviceContext*)
 {
   throw xtl::format_not_supported_exception ("render::low_level::opengl::Texture::GetData", "Get texture image data not supported");
 }
