@@ -18,7 +18,7 @@ const size_t        SEND_QUEUE_SIZE                   = 16;
 const size_t        KEEP_ALIVE_INTERVAL               = 30000;
 const size_t        COMPRESSION_THRESHOLD             = 1024;
 const unsigned char ENCRYPTION_KEY []                 = { 0xd0, 0x71, 0x73, 0x41, 0x0d, 0xee, 0xd2, 0x6f, 0x44, 0x3f, 0x7b, 0xa4, 0x42, 0x2f, 0x86, 0x03 };
-const char*         QUOTE_REPLACEMENT                 = "\\u0027";
+const char*         QUOTE_REPLACEMENT                 = "\\\\u0027";
 const size_t        QUOTE_REPLACEMENT_LENGTH          = strlen (QUOTE_REPLACEMENT);
 
 }
