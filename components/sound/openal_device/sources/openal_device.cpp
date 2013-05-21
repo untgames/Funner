@@ -585,7 +585,7 @@ void OpenALDevice::BufferUpdate ()
     //обновление источников
 
   for (OpenALSource* source=first_active_source; source; source=source->NextActive ())
-    source->BufferUpdate ();
+    source->BufferUpdate ();  
 }
 
 void OpenALDevice::SourceUpdate ()

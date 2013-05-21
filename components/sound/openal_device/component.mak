@@ -7,7 +7,7 @@ TARGETS := SOUND.OPENAL_DRIVER.SOURCES SOUND.OPENAL_DRIVER.TESTS
 SOUND.OPENAL_DRIVER.SOURCES.TYPE        := static-lib
 SOUND.OPENAL_DRIVER.SOURCES.NAME        := funner.sound.low_level.openal_driver
 SOUND.OPENAL_DRIVER.SOURCES.SOURCE_DIRS := sources
-SOUND.OPENAL_DRIVER.SOURCES.IMPORTS     := compile.sound.low_level compile.media.sound compile.system compile.extern.openal
+SOUND.OPENAL_DRIVER.SOURCES.IMPORTS     := compile.sound.low_level compile.media.sound compile.system compile.extern.openal compile.system
 
 #Öåëü ¹2 - OPENALDEVICE tests
 SOUND.OPENAL_DRIVER.TESTS.TYPE         := test-suite
