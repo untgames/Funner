@@ -279,6 +279,16 @@ public class EngineViewController implements View.OnTouchListener, View.OnKeyLis
   @Override
   public boolean onKey (View v, int keyCode, KeyEvent event)
   {
+    switch (event.getKeyCode ())
+    {
+      case KeyEvent.KEYCODE_VOLUME_UP:
+      case KeyEvent.KEYCODE_VOLUME_DOWN:
+      case KeyEvent.KEYCODE_VOLUME_MUTE:
+        return false;
+      default:
+        break;
+    }
+
     int     action           = event.getAction ();
     boolean is_alt_pressed   = event.isAltPressed (),
             is_shift_pressed = event.isShiftPressed (),
