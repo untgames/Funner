@@ -27,6 +27,9 @@
 
 #include <media/sound.h>
 
+#include <syslib/application.h>
+#include <syslib/thread.h>
+
 #include <sound/device.h>
 #include <sound/driver.h>
 
@@ -509,6 +512,7 @@ class OpenALDevice : public sound::low_level::IDevice, public common::Lockable, 
     const char* GetStringParam  (const char* name);
 
   private:
+    int  BufferUpdateLoop ();
     void BufferUpdate ();
     void ListenerUpdate ();
     void SourceUpdate ();
@@ -527,24 +531,25 @@ class OpenALDevice : public sound::low_level::IDevice, public common::Lockable, 
     typedef stl::vector<OpenALSource*>       ChannelsArray;
 
   private:
-    stl::string    name;                                       //имя устройства
-    OpenALContext  context;                                    //контекст
-    common::Action buffer_action;                              //таймер обновления буфера
-    common::Action listener_action;                            //таймер обновления слушателя
-    common::Action source_action;                              //таймер обновления источников
-    Capabilities   info;                                       //информация о устройстве
-    Listener       listener;                                   //слушатель
-    bool           listener_need_update;                       //слушатель требует обновления
-    SampleBuffer   sample_buffer;                              //буфер сэмплирования
-    float          gain;                                       //коэффициент усиления
-    bool           is_muted;                                   //флг блокировки проигрывания
-    ChannelsArray  channels;                                   //каналы проигрывания
-    size_t         buffer_update_frequency;                    //частота обновления буффера
-    size_t         source_properties_update_frequency;         //частота обновления свойств источника
-    size_t         listener_properties_update_frequency;       //частота обновления свойств слушателя
-    OpenALSource*  first_active_source;                        //первый активный источник
-    ALuint         al_buffers_pool [DEVICE_BUFFERS_POOL_SIZE]; //пул буферов
-    size_t         al_buffers_pool_size;                       //размер пула буферов
+    stl::string                   name;                                       //имя устройства
+    OpenALContext                 context;                                    //контекст
+    common::Action                listener_action;                            //таймер обновления слушателя
+    common::Action                source_action;                              //таймер обновления источников
+    Capabilities                  info;                                       //информация о устройстве
+    Listener                      listener;                                   //слушатель
+    bool                          listener_need_update;                       //слушатель требует обновления
+    SampleBuffer                  sample_buffer;                              //буфер сэмплирования
+    float                         gain;                                       //коэффициент усиления
+    bool                          is_muted;                                   //флг блокировки проигрывания
+    ChannelsArray                 channels;                                   //каналы проигрывания
+    volatile size_t               buffer_update_frequency;                    //частота обновления буффера
+    size_t                        source_properties_update_frequency;         //частота обновления свойств источника
+    size_t                        listener_properties_update_frequency;       //частота обновления свойств слушателя
+    OpenALSource*                 first_active_source;                        //первый активный источник
+    ALuint                        al_buffers_pool [DEVICE_BUFFERS_POOL_SIZE]; //пул буферов
+    size_t                        al_buffers_pool_size;                       //размер пула буферов
+    stl::auto_ptr<syslib::Thread> buffers_update_thread;                      //нить обновления буферов
+    volatile bool                 buffers_update_thread_stop_request;         //запрос остановки нити обновления буферов
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

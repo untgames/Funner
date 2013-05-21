@@ -57,8 +57,8 @@ void process_init_string (const char* property, const char* value, OpenALDeviceP
 
 OpenALDevice::OpenALDevice (const char* driver_name, const char* device_name, const char* init_string)
  : context        (device_name, init_string),
-//   sample_buffer  (MAX_SOUND_SAMPLE_RATE * MAX_SOUND_CHANNELS * MAX_SOUND_BYTES_PER_SAMPLE / SOURCE_BUFFERS_UPDATE_FREQUENCY / (SOURCE_BUFFERS_COUNT / 2))
-   sample_buffer  (MAX_SOUND_SAMPLE_RATE * MAX_SOUND_CHANNELS * MAX_SOUND_BYTES_PER_SAMPLE / SOURCE_BUFFERS_COUNT)
+   sample_buffer  (MAX_SOUND_SAMPLE_RATE * MAX_SOUND_CHANNELS * MAX_SOUND_BYTES_PER_SAMPLE / SOURCE_BUFFERS_UPDATE_FREQUENCY / (SOURCE_BUFFERS_COUNT / 2)),
+   buffers_update_thread_stop_request (false)
 {
   common::Lock lock (*this);
 
@@ -73,9 +73,18 @@ OpenALDevice::OpenALDevice (const char* driver_name, const char* device_name, co
   
   try
   {
-    buffer_action   = common::ActionQueue::PushAction (xtl::bind (&OpenALDevice::BufferUpdate, this), common::ActionThread_Background, 0, SOURCE_BUFFERS_UPDATE_MILLISECONDS / 1000.0f);
     listener_action = common::ActionQueue::PushAction (xtl::bind (&OpenALDevice::ListenerUpdate, this), common::ActionThread_Current, 0, DEFAULT_LISTENER_PROPERTIES_UPDATE_PERIOD);
     source_action   = common::ActionQueue::PushAction (xtl::bind (&OpenALDevice::SourceUpdate, this), common::ActionThread_Current, 0, DEFAULT_SOURCE_PROPERTIES_UPDATE_PERIOD);
+    
+    buffers_update_thread.reset (new syslib::Thread ("OpenAL buffers update thread", xtl::bind (&OpenALDevice::BufferUpdateLoop, this)));
+
+    try
+    {
+      buffers_update_thread->SetPriority (syslib::ThreadPriority_Low);
+    }
+    catch (...)
+    {
+    }
   
     OpenALContextManager::Instance context_manager;
 
@@ -123,7 +132,11 @@ OpenALDevice::OpenALDevice (const char* driver_name, const char* device_name, co
   }
   catch (...)
   {
-    buffer_action.Cancel ();
+    buffers_update_thread_stop_request = true;
+
+    if (buffers_update_thread)
+      buffers_update_thread->Join ();  
+
     listener_action.Cancel ();
     source_action.Cancel ();
 
@@ -133,13 +146,16 @@ OpenALDevice::OpenALDevice (const char* driver_name, const char* device_name, co
 
 OpenALDevice::~OpenALDevice ()
 {
-  Lock ();
-
   try
   {
-    buffer_action.Cancel ();
+    buffers_update_thread_stop_request = true;
+
+    buffers_update_thread->Join ();
+
+    Lock ();
+
     listener_action.Cancel ();
-    source_action.Cancel ();    
+    source_action.Cancel ();
 
     ClearALData ();
   }
@@ -528,6 +544,35 @@ bool OpenALDevice::IsPlaying (size_t channel)
     Обновление
 */
 
+int OpenALDevice::BufferUpdateLoop ()
+{
+  size_t update_period_ms = size_t (1000.0f / buffer_update_frequency),
+         last_update_time = milliseconds () - SOURCE_BUFFERS_UPDATE_MILLISECONDS;
+
+  while (!buffers_update_thread_stop_request)
+  {
+    update_period_ms = size_t (1000.0f / buffer_update_frequency);
+
+    size_t delay = milliseconds () - last_update_time;
+
+    if (delay < update_period_ms)
+    {      
+      static const size_t DELAY_EPS = 5;
+
+      size_t sleep_time = update_period_ms - delay - DELAY_EPS;  
+
+      if (sleep_time <= update_period_ms)
+        syslib::Application::Sleep (sleep_time);
+    }
+
+    BufferUpdate ();
+
+    last_update_time = milliseconds ();
+  }
+
+  return 0;
+}
+
 void OpenALDevice::BufferUpdate ()
 {
   common::Lock lock (*this);
@@ -633,7 +678,6 @@ void OpenALDevice::SetIntegerParam (const char* name, int value)
   if (!xstrcmp (name, "buffer_update_frequency"))
   {
     buffer_update_frequency = (size_t)value;
-    buffer_action           = common::ActionQueue::PushAction (xtl::bind (&OpenALDevice::BufferUpdate, this), common::ActionThread_Current, 0, 1.0f / buffer_update_frequency);
   }
   else if (!xstrcmp (name, "source_update_frequency"))
   {
