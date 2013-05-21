@@ -245,7 +245,10 @@ static const BackendFuncs android_funcs = {
     0,
     0,
     0,
-    0
+    0,
+    ALCdevice_LockDefault,
+    ALCdevice_UnlockDefault,
+    ALCdevice_GetLatencyDefault,
 };
 
 ALCboolean alc_android_init(BackendFuncs *func_list)
