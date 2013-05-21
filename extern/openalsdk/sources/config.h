@@ -2,7 +2,7 @@
 #define CONFIG_H
 
 /* Define to the library version */
-#define ALSOFT_VERSION "1.12.854"
+#define ALSOFT_VERSION "1.15.1"
 
 #ifdef _MSC_VER
   #define ALIGN(x) __declspec(align(x))
@@ -269,7 +269,7 @@
 #elif defined (ANDROID) && (defined (ARM) || defined (X86))
 
 /* Define if we have the Android backend */
-//#define HAVE_ANDROID 1
+#define HAVE_ANDROID 1
 
 /* Define if we have the OpenSL backend */
 #define HAVE_OPENSL 1

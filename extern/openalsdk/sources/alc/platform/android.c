@@ -26,6 +26,7 @@
 #include "alMain.h"
 #include "AL/al.h"
 #include "AL/alc.h"
+#include "alu.h"
 
 static const ALCchar android_device[] = "Android Default";
 
@@ -130,7 +131,7 @@ static void* thread_function(void* arg)
         }
         else
         {
-            AL_PRINT("Failed to get pointer to array bytes");
+            WARN("Failed to get pointer to array bytes");
         }
     }
     
@@ -157,7 +158,7 @@ static ALCenum android_open_playback(ALCdevice *device, const ALCchar *deviceNam
         cAudioTrack = (*env)->FindClass(env, "android/media/AudioTrack");
         if (!cAudioTrack)
         {
-            AL_PRINT("android.media.AudioTrack class is not found. Are you running at least 1.5 version?");
+            ERR("android.media.AudioTrack class is not found. Are you running at least 1.5 version?");
             return ALC_INVALID_VALUE;
         }
 
@@ -181,7 +182,7 @@ static ALCenum android_open_playback(ALCdevice *device, const ALCchar *deviceNam
     }
 
     data = (AndroidData*)calloc(1, sizeof(*data));
-    device->szDeviceName = strdup(deviceName);
+    device->DeviceName = strdup(deviceName);
     device->ExtraData = data;
 
 #ifdef HAVE_ANDROID_LOW_LATENCY
@@ -272,7 +273,7 @@ void alc_android_probe(enum DevProbe type)
     switch(type)
     {
         case ALL_DEVICE_PROBE:
-            AppendAllDeviceList(android_device);
+            AppendAllDevicesList(android_device);
             break;
         case CAPTURE_DEVICE_PROBE:
             break;
