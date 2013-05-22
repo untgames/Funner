@@ -14,6 +14,7 @@ namespace openal_driver
 
 const char* DRIVER_NAME    = "OpenAL";                 //имя драйвера
 const char* COMPONENT_NAME = "sound.low_level.openal"; //имя компонента
+const char* LOG_NAME       = COMPONENT_NAME;           //поток протоколирования
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Драйвер устройства воспроизведения
@@ -48,6 +49,13 @@ class Driver : virtual public IDriver, public xtl::reference_counter
         }
         else
           devices.push_back ("default");
+
+        common::Log log (LOG_NAME);
+
+        log.Printf ("OpenAL driver has found %u possible devices:", devices.size ());
+
+        for (DeviceArray::iterator iter = devices.begin (), end = devices.end (); iter != end; ++iter)
+          log.Printf ("...OpenAL device '%s'", iter->c_str ());
       }
       catch (...)
       {
@@ -95,7 +103,13 @@ class Driver : virtual public IDriver, public xtl::reference_counter
 
       for (DeviceArray::iterator iter = devices.begin (), end = devices.end (); iter != end; ++iter)
         if (!strcmp (iter->c_str (), name))
+        {
+          common::Log log (LOG_NAME);
+
+          log.Printf ("Attempt to create OpenAL device '%s'", name);
+
           return new sound::low_level::openal::OpenALDevice (DRIVER_NAME, name, init_string);
+        }
 
       throw xtl::make_argument_exception (METHOD_NAME, "name", name);
     }
