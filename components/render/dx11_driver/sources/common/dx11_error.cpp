@@ -14,7 +14,8 @@ namespace
 
 stl::string get_message (HRESULT result)
 {
-  return common::format ("%s: %s", DXGetErrorString (result), DXGetErrorDescription (result));
+  return common::format ("D3D error %08x", result);
+//  return common::format ("%s: %s", DXGetErrorString (result), DXGetErrorDescription (result));
 }
 
 }
