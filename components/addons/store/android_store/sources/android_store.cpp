@@ -17,7 +17,7 @@ void finish_transaction_handler (const Transaction& transaction);
 void on_initialized (JNIEnv& env, jobject, jboolean can_buy_products);
 void on_purchase_initiated (JNIEnv& env, jobject, jstring sku);
 void on_purchase_failed (JNIEnv& env, jobject, jstring sku, jstring error);
-void on_purchase_succeeded (JNIEnv& env, jobject, jstring sku);
+void on_purchase_succeeded (JNIEnv& env, jobject, jstring sku, jstring receipt, jstring signature);
 void on_purchase_restored (JNIEnv& env, jobject, jstring sku);
 
 /*
@@ -215,7 +215,7 @@ class AndroidStore
          {"onInitializedCallback", "(Z)V", (void*)&on_initialized},
          {"onPurchaseInitiatedCallback", "(Ljava/lang/String;)V", (void*)&on_purchase_initiated},
          {"onPurchaseFailedCallback", "(Ljava/lang/String;Ljava/lang/String;)V", (void*)&on_purchase_failed},
-         {"onPurchaseSucceededCallback", "(Ljava/lang/String;)V", (void*)&on_purchase_succeeded},
+         {"onPurchaseSucceededCallback", "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V", (void*)&on_purchase_succeeded},
          {"onPurchaseRestoredCallback", "(Ljava/lang/String;)V", (void*)&on_purchase_restored},
        };
 
@@ -271,7 +271,7 @@ class AndroidStore
      NotifyTransactionUpdated (transaction_desc.transaction);
    }
 
-   void OnPurchaseSucceeded (const stl::string& sku)
+   void OnPurchaseSucceeded (const stl::string& sku, const stl::string& receipt, const stl::string& signature)
    {
      //TODO fill receipt data
 
@@ -281,7 +281,10 @@ class AndroidStore
 
      transaction_desc.completed = true;
 
+     transaction_desc.transaction.SetReceipt (receipt.size (), receipt.data ());
      transaction_desc.transaction.SetState (TransactionState_Purchased);
+
+     transaction_desc.transaction.Properties ().SetProperty ("Signature", signature.c_str ());
 
      NotifyTransactionUpdated (transaction_desc.transaction);
    }
@@ -374,9 +377,9 @@ void on_purchase_failed (JNIEnv& env, jobject, jstring sku, jstring error)
   common::ActionQueue::PushAction (xtl::bind (&AndroidStore::OnPurchaseFailed, &*StoreSingleton::Instance (), tostring (sku), tostring (error)), common::ActionThread_Main);
 }
 
-void on_purchase_succeeded (JNIEnv& env, jobject, jstring sku)
+void on_purchase_succeeded (JNIEnv& env, jobject, jstring sku, jstring receipt, jstring signature)
 {
-  common::ActionQueue::PushAction (xtl::bind (&AndroidStore::OnPurchaseSucceeded, &*StoreSingleton::Instance (), tostring (sku)), common::ActionThread_Main);
+  common::ActionQueue::PushAction (xtl::bind (&AndroidStore::OnPurchaseSucceeded, &*StoreSingleton::Instance (), tostring (sku), tostring (receipt), tostring (signature)), common::ActionThread_Main);
 }
 
 void on_purchase_restored (JNIEnv& env, jobject, jstring sku)

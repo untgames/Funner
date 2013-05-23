@@ -120,7 +120,7 @@ public class Store implements EngineActivity.EngineActivityEventListener, Engine
           			onPurchaseFailedCallback (sku, result.getMessage ());
           		else
           		{
-          			onPurchaseSucceededCallback (sku);
+          			onPurchaseSucceededCallback (sku, info.getOriginalJson (), info.getSignature ());
 
           			//TODO restored callback
           		}
@@ -144,6 +144,6 @@ public class Store implements EngineActivity.EngineActivityEventListener, Engine
   public native void onInitializedCallback(boolean canBuyProducts);
   public native void onPurchaseInitiatedCallback(String sku);
   public native void onPurchaseFailedCallback(String sku, String error);
-  public native void onPurchaseSucceededCallback(String sku);
+  public native void onPurchaseSucceededCallback(String sku, String receipt, String signature);
   public native void onPurchaseRestoredCallback(String sku);
 }

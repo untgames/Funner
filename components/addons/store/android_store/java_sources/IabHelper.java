@@ -343,6 +343,7 @@ public class IabHelper {
             IabResult r = new IabResult(IABHELPER_SUBSCRIPTIONS_NOT_AVAILABLE, 
                     "Subscriptions are not available.");
             if (listener != null) listener.onIabPurchaseFinished(r, null);
+            flagEndAsync ();
             return;
         }
 
@@ -355,6 +356,7 @@ public class IabHelper {
 
                 result = new IabResult(response, "Unable to buy item");
                 if (listener != null) listener.onIabPurchaseFinished(result, null);
+                flagEndAsync ();
                 return;
             }
 
@@ -367,6 +369,8 @@ public class IabHelper {
                                            requestCode, new Intent(),
                                            Integer.valueOf(0), Integer.valueOf(0),
                                            Integer.valueOf(0));
+            
+            return; //return so end async flag not setted up
         }
         catch (SendIntentException e) {
             logError("SendIntentException while launching purchase flow for sku " + sku);
@@ -382,6 +386,8 @@ public class IabHelper {
             result = new IabResult(IABHELPER_REMOTE_EXCEPTION, "Remote exception while starting purchase flow");
             if (listener != null) listener.onIabPurchaseFinished(result, null);
         }
+
+        flagEndAsync ();
     }
 
     /**
