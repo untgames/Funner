@@ -19,6 +19,7 @@ public class Store implements EngineActivity.EngineActivityEventListener, Engine
 	private IabHelper        helper;
 	private EngineActivity   activity;
 	private volatile boolean purchase_in_progress;
+	private volatile boolean processing_stopped;
 	private List<Runnable>   purchase_queue = Collections.synchronizedList (new ArrayList ());
 	
   public void initialize (EngineActivity inActivity) 
@@ -49,6 +50,11 @@ public class Store implements EngineActivity.EngineActivityEventListener, Engine
     });
   }
 
+  public void stopProcessing ()
+  {
+  	processing_stopped = false;
+  }
+  
 	public void handleEngineActivityEvent (EngineActivity.EventType eventType)
 	{
 		if (eventType != EngineActivity.EventType.ON_DESTROY)
@@ -73,6 +79,9 @@ public class Store implements EngineActivity.EngineActivityEventListener, Engine
   	final Runnable queue_processor = new Runnable () {
   		public void run ()
   		{
+  			if (processing_stopped)
+  				return;
+  			
   			if (purchase_queue.isEmpty ())
   				return;
   			

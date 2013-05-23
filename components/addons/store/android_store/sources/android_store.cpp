@@ -40,10 +40,15 @@ class AndroidStore
 
     ~AndroidStore ()
     {
+      JNIEnv* env = &get_env ();
+
       if (store_class)
-        get_env ().DeleteGlobalRef (store_class);
+        env->DeleteGlobalRef (store_class);
       if (store)
-        get_env ().DeleteGlobalRef (store);
+      {
+        env->CallVoidMethod (store, stop_processing_method);
+        env->DeleteGlobalRef (store);
+      }
     }
 
 ///Инициализация
@@ -200,8 +205,9 @@ class AndroidStore
 
      store_class = (jclass)env->NewGlobalRef (store_class_ref);
 
-     store_init_method = find_method (env, store_class, "<init>", "()V");
-     buy_method        = find_method (env, store_class, "buyProduct", "(Landroid/app/Activity;Ljava/lang/String;)V");
+     store_init_method      = find_method (env, store_class, "<init>", "()V");
+     stop_processing_method = find_method (env, store_class, "stopProcessing", "()V");
+     buy_method             = find_method (env, store_class, "buyProduct", "(Landroid/app/Activity;Ljava/lang/String;)V");
 
      try
      {
@@ -347,6 +353,7 @@ class AndroidStore
     jobject             store;                    //объект Store
     jmethodID           store_init_method;        //конструктор Store
     jmethodID           buy_method;               //метод покупки
+    jmethodID           stop_processing_method;   //метод остановки обработки покупок
     TransactionsArray   pending_transactions;     //текущие незавершенные транзакции
 };
 
