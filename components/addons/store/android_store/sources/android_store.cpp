@@ -41,9 +41,9 @@ class AndroidStore
     ~AndroidStore ()
     {
       if (store_class)
-        get_env ().DeleteLocalRef (store_class);
+        get_env ().DeleteGlobalRef (store_class);
       if (store)
-        get_env ().DeleteLocalRef (store);
+        get_env ().DeleteGlobalRef (store);
     }
 
 ///Инициализация
@@ -66,7 +66,7 @@ class AndroidStore
 
       if (!store)
       {
-        store = env->NewObject (store_class, store_init_method);
+        store = env->NewGlobalRef (env->NewObject (store_class, store_init_method));
 
         if (!store)
           throw xtl::format_operation_exception ("store::android_store::AndroidStore::Initialize", "Can't create store object");
@@ -196,7 +196,7 @@ class AndroidStore
        throw xtl::format_operation_exception ("", "Can't find Store class\n");
 
      if (store_class)
-       env->DeleteLocalRef (store_class);
+       env->DeleteGlobalRef (store_class);
 
      store_class = (jclass)env->NewGlobalRef (store_class_ref);
 
@@ -223,7 +223,7 @@ class AndroidStore
      catch (...)
      {
        if (store_class)
-         env->DeleteLocalRef (store_class);
+         env->DeleteGlobalRef (store_class);
 
        store_class = 0;
 

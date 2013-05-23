@@ -5,16 +5,21 @@ import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 import com.untgames.funner.application.EngineActivity;
 
 public class Store implements EngineActivity.EngineActivityEventListener, EngineActivity.EngineActivityResultListener
 {
   private static final String TAG                   = "funner.Store";
   private static final int    PURCHASE_REQUEST_CODE = 343467;
-
-	private IabHelper      helper;
-	private EngineActivity activity;
-	private boolean        purchase_in_progress;
+  
+	private IabHelper        helper;
+	private EngineActivity   activity;
+	private volatile boolean purchase_in_progress;
+	private List<Runnable>   purchase_queue = Collections.synchronizedList (new ArrayList ());
 	
   public void initialize (EngineActivity inActivity) 
   {
@@ -65,39 +70,66 @@ public class Store implements EngineActivity.EngineActivityEventListener, Engine
 
   public void buyProduct (final Activity activity, final String sku)
   {
-  	//TODO make purchase queue
-  	
-  	if (purchase_in_progress)
-  		throw new IllegalStateException ("Another purchase in progress");
-  	
-  	purchase_in_progress = true;
-  	
-  	onPurchaseInitiatedCallback (sku);
-  	
-  	activity.runOnUiThread (new Runnable () {
+  	final Runnable queue_processor = new Runnable () {
   		public void run ()
   		{
+  			if (purchase_queue.isEmpty ())
+  				return;
+  			
+    		if (purchase_in_progress)
+  	  		return;
+  			
+    		purchase_in_progress = true;
+    		
+    		Runnable next_request = purchase_queue.remove (0);
+
+    		next_request.run ();
+  		}  		
+  	};
+  	
+  	Runnable request = new Runnable () {
+  		public void run ()
+  		{
+  			try
+  			{
+    	  	onPurchaseInitiatedCallback (sku);
+  			}
+  			catch (Exception e)
+  			{
+  				//ignore all exceptions
+  			}
+  	  	
   			helper.launchPurchaseFlow (activity, sku, PURCHASE_REQUEST_CODE, new IabHelper.OnIabPurchaseFinishedListener ()
   			{
           public void onIabPurchaseFinished(IabResult result, Purchase info)
           {
-          	purchase_in_progress = false;
+          	try
+          	{
+          		Log.d (TAG, "Purchase '" + info + "' finished, result: " + result);
 
-          	Log.d (TAG, "Purchase '" + info + "' finished, result: " + result);
+          		if (result.isFailure ()) 
+          			onPurchaseFailedCallback (sku, result.getMessage ());
+          		else
+          		{
+          			onPurchaseSucceededCallback (sku);
 
-            if (result.isFailure ()) 
-            {
-            	onPurchaseFailedCallback (sku, result.getMessage ());
-              return;
-            }
+          			//TODO restored callback
+          		}
+          	}
+          	finally
+          	{
+          		purchase_in_progress = false;
 
-          	onPurchaseSucceededCallback (sku);
-
-          	//TODO restored callback
+          		activity.runOnUiThread (queue_processor);          		
+          	}
           }
   			});
   		}
-  	});
+  	};
+
+		purchase_queue.add (request);
+
+  	activity.runOnUiThread (queue_processor);
   }
   
   public native void onInitializedCallback(boolean canBuyProducts);
