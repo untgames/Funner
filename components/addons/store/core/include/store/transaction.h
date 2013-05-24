@@ -36,7 +36,8 @@ class Transaction
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструктор / деструктор / копирование
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    typedef xtl::function <void (const Transaction&)> FinishTransactionHandler;
+    typedef xtl::function <void (bool success, const char* status)> OnFinishedCallback;
+    typedef xtl::function <void (const Transaction&, const OnFinishedCallback&)> FinishTransactionHandler;
 
     Transaction  (const FinishTransactionHandler& finish_handler = FinishTransactionHandler ());
     Transaction  (const Transaction&);
@@ -99,7 +100,7 @@ class Transaction
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Завершение транзакции (вызывать после окончания обработки транзакции для состояний Purchased, Failed и Restored)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void Finish ();
+    void Finish (const OnFinishedCallback& callback = OnFinishedCallback ());
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Обмен

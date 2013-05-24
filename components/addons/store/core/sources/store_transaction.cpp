@@ -213,9 +213,9 @@ void Transaction::SetHandle (const void* handle, const ReleaseHandleFunction& re
    Завершение транзакции (вызывать после окончания обработки транзакции для состояний Purchased, Failed и Restored)
 */
 
-void Transaction::Finish ()
+void Transaction::Finish (const OnFinishedCallback& callback)
 {
-  impl->finish_handler (*this);
+  impl->finish_handler (*this, callback);
 }
 
 /*

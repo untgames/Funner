@@ -20,12 +20,16 @@ namespace
 const char* LOG_NAME            = "store.ios_store.IOSStore";
 const char* SESSION_DESCRIPTION = "IOSStore";
 
-void finish_transaction_handler (const Transaction& transaction)
+void finish_transaction_handler (const Transaction& transaction, const Transaction::OnFinishedCallback& callback)
 {
   if (!transaction.Handle ())
+  {
+    callback (true, "");
     return;
+  }
 
   [[SKPaymentQueue defaultQueue] finishTransaction:(SKPaymentTransaction*)transaction.Handle ()];
+  callback (true, "");
 }
 
 // Слушатель событий обновления транзакций

@@ -69,7 +69,11 @@ void bind_transaction_library (Environment& environment)
   lib.Register ("get_Receipt",    make_invoker (&Transaction::ReceiptBase64));
   lib.Register ("get_Properties", make_invoker (xtl::implicit_cast<const common::PropertyMap& (Transaction::*) () const> (&Transaction::Properties)));
 
-  lib.Register ("Finish", make_invoker (&Transaction::Finish));
+  lib.Register ("CreateOnFinishedCallback", make_callback_invoker<Transaction::OnFinishedCallback::signature_type> ());
+  lib.Register ("Finish", make_invoker (
+      make_invoker (&Transaction::Finish),
+      make_invoker<void (Transaction&)> (xtl::bind (&Transaction::Finish, _1, Transaction::OnFinishedCallback ()))
+  ));
 
   environment.RegisterType<Transaction> (TRANSACTION_LIBRARY);
 }

@@ -12,13 +12,15 @@ namespace
 const char* LOG_NAME            = "store.android_store.AndroidStore";
 const char* SESSION_DESCRIPTION = "AndroidStore";
 
-void finish_transaction_handler (const Transaction& transaction);
+void finish_transaction_handler (const Transaction& transaction, const Transaction::OnFinishedCallback& callback);
 
 void on_initialized (JNIEnv& env, jobject, jboolean can_buy_products);
 void on_purchase_initiated (JNIEnv& env, jobject, jstring sku);
 void on_purchase_failed (JNIEnv& env, jobject, jstring sku, jstring error);
-void on_purchase_succeeded (JNIEnv& env, jobject, jstring sku, jstring receipt, jstring signature);
-void on_purchase_restored (JNIEnv& env, jobject, jstring sku, jstring receipt, jstring signature);
+void on_purchase_succeeded (JNIEnv& env, jobject, jstring sku, jobject purchase, jstring receipt, jstring signature);
+void on_purchase_restored (JNIEnv& env, jobject, jstring sku, jobject purchase, jstring receipt, jstring signature);
+void on_consume_failed (JNIEnv& env, jobject, jobject purchase, jstring error);
+void on_consume_succeeded (JNIEnv& env, jobject, jobject purchase);
 
 /*
    Реализация магазина
@@ -124,7 +126,7 @@ class AndroidStore
       TransactionsArray transactions = pending_transactions;
 
       for (TransactionsArray::iterator iter = transactions.begin (), end = transactions.end (); iter != end; ++iter)
-        callback (iter->transaction);
+        callback ((*iter)->transaction);
 
       return store_signal.connect (callback);
     }
@@ -168,9 +170,9 @@ class AndroidStore
 
         bool consumable = properties.IsPresent ("Consumable") && properties.GetInteger ("Consumable");
 
-        TransactionDesc new_transaction (product_id, consumable);
+        TransactionDescPtr new_transaction (new TransactionDesc (product_id, consumable), false);
 
-        NotifyTransactionUpdated (new_transaction.transaction);
+        NotifyTransactionUpdated (new_transaction->transaction);
 
         JNIEnv* env = &get_env ();
 
@@ -178,7 +180,7 @@ class AndroidStore
 
         pending_transactions.push_back (new_transaction);
 
-        return new_transaction.transaction;
+        return new_transaction->transaction;
       }
       catch (xtl::exception& e)
       {
@@ -208,6 +210,7 @@ class AndroidStore
      store_init_method      = find_method (env, store_class, "<init>", "()V");
      stop_processing_method = find_method (env, store_class, "stopProcessing", "()V");
      buy_method             = find_method (env, store_class, "buyProduct", "(Landroid/app/Activity;Ljava/lang/String;)V");
+     consume_method         = find_method (env, store_class, "consumeProduct", "(Lcom/untgames/funner/store/Purchase;)V");
 
      try
      {
@@ -215,8 +218,10 @@ class AndroidStore
          {"onInitializedCallback", "(Z)V", (void*)&on_initialized},
          {"onPurchaseInitiatedCallback", "(Ljava/lang/String;)V", (void*)&on_purchase_initiated},
          {"onPurchaseFailedCallback", "(Ljava/lang/String;Ljava/lang/String;)V", (void*)&on_purchase_failed},
-         {"onPurchaseSucceededCallback", "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V", (void*)&on_purchase_succeeded},
-         {"onPurchaseRestoredCallback", "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V", (void*)&on_purchase_restored},
+         {"onPurchaseSucceededCallback", "(Ljava/lang/String;Lcom/untgames/funner/store/Purchase;Ljava/lang/String;Ljava/lang/String;)V", (void*)&on_purchase_succeeded},
+         {"onPurchaseRestoredCallback", "(Ljava/lang/String;Lcom/untgames/funner/store/Purchase;Ljava/lang/String;Ljava/lang/String;)V", (void*)&on_purchase_restored},
+         {"onConsumeFailedCallback", "(Lcom/untgames/funner/store/Purchase;Ljava/lang/String;)V", (void*)&on_consume_failed},
+         {"onConsumeSucceededCallback", "(Lcom/untgames/funner/store/Purchase;)V", (void*)&on_consume_succeeded},
        };
 
        static const size_t methods_count = sizeof (methods) / sizeof (*methods);
@@ -238,77 +243,196 @@ class AndroidStore
    }
 
 ///Завершение транзакции
-   void FinishTransaction (const Transaction& transaction)
+   void FinishTransaction (const Transaction& transaction, const Transaction::OnFinishedCallback& callback)
    {
-     log.Printf ("Finishing transaction for product '%s'", transaction.ProductId ());
+     try
+     {
+       log.Printf ("Finishing transaction for product '%s'", transaction.ProductId ());
 
-     //TODO
+       for (TransactionsArray::iterator iter = pending_transactions.begin (), end = pending_transactions.end (); iter != end; ++iter)
+       {
+         TransactionDesc& transaction_desc = **iter;
+
+         if (transaction_desc.transaction.Id () == transaction.Id ())
+         {
+           if (transaction_desc.consumable && (transaction_desc.transaction.State () == TransactionState_Purchased || transaction_desc.transaction.State () == TransactionState_Restored))
+           {
+             transaction_desc.consume_callback = callback;
+
+             get_env ().CallVoidMethod (store, consume_method, transaction_desc.purchase.get ());
+           }
+           else
+           {
+             pending_transactions.erase (iter);
+             callback (true, "");
+           }
+
+           return;
+         }
+       }
+
+       throw xtl::format_operation_exception ("", "Can't find pending transaction for finishing with product id '%s'", transaction.ProductId ());
+     }
+     catch (xtl::exception& e)
+     {
+       e.touch ("store::android_store::AndroidStore::FinishTransaction");
+       throw;
+     }
+   }
+
+   void OnConsumeFailed (global_ref<jobject> purchase, const stl::string& error)
+   {
+     try
+     {
+       log.Printf ("Consume failed");
+
+       JNIEnv* env = &get_env ();
+
+       for (TransactionsArray::iterator iter = pending_transactions.begin (), end = pending_transactions.end (); iter != end; ++iter)
+       {
+         if (env->IsSameObject (purchase.get (), (*iter)->purchase.get ()))
+         {
+           (*iter)->consume_callback (false, error.c_str ());
+           return;
+         }
+       }
+     }
+     catch (xtl::exception& e)
+     {
+       e.touch ("store::android_store::AndroidStore::OnConsumeFailed");
+       throw;
+     }
+   }
+
+   void OnConsumeSucceeded (global_ref<jobject> purchase)
+   {
+     try
+     {
+       log.Printf ("Consume succeeded");
+
+       JNIEnv* env = &get_env ();
+
+       for (TransactionsArray::iterator iter = pending_transactions.begin (), end = pending_transactions.end (); iter != end; ++iter)
+       {
+         if (env->IsSameObject (purchase.get (), (*iter)->purchase.get ()))
+         {
+           Transaction::OnFinishedCallback consume_callback = (*iter)->consume_callback;
+
+           pending_transactions.erase (iter);
+
+           consume_callback (true, "");
+
+           return;
+         }
+       }
+     }
+     catch (xtl::exception& e)
+     {
+       e.touch ("store::android_store::AndroidStore::OnConsumeSucceeded");
+       throw;
+     }
    }
 
 ///Обновление транзакций
    void OnPurchaseInitiated (const stl::string& sku)
    {
-     TransactionDesc& transaction_desc = FindPendingTransaction (sku.c_str ());
+     try
+     {
+       TransactionDesc& transaction_desc = FindPendingTransaction (sku.c_str ());
 
-     log.Printf ("Purchase initiated for product '%s'", transaction_desc.transaction.ProductId ());
+       log.Printf ("Purchase initiated for product '%s'", transaction_desc.transaction.ProductId ());
 
-     transaction_desc.transaction.SetState (TransactionState_Purchasing);
+       transaction_desc.transaction.SetState (TransactionState_Purchasing);
 
-     NotifyTransactionUpdated (transaction_desc.transaction);
+       NotifyTransactionUpdated (transaction_desc.transaction);
+     }
+     catch (xtl::exception& e)
+     {
+       e.touch ("store::android_store::AndroidStore::OnPurchaseInitiated");
+       throw;
+     }
    }
 
    void OnPurchaseFailed (const stl::string& sku, const stl::string& error)
    {
-     TransactionDesc& transaction_desc = FindPendingTransaction (sku.c_str ());
+     try
+     {
+       TransactionDesc& transaction_desc = FindPendingTransaction (sku.c_str ());
 
-     log.Printf ("Purchase failed for product '%s', reason '%s'", transaction_desc.transaction.ProductId (), error.c_str ());
+       log.Printf ("Purchase failed for product '%s', reason '%s'", transaction_desc.transaction.ProductId (), error.c_str ());
 
-     transaction_desc.completed = true;
+       transaction_desc.completed = true;
 
-     transaction_desc.transaction.SetState (TransactionState_Failed);
-     transaction_desc.transaction.SetStatus (error.c_str ());
+       transaction_desc.transaction.SetState (TransactionState_Failed);
+       transaction_desc.transaction.SetStatus (error.c_str ());
 
-     NotifyTransactionUpdated (transaction_desc.transaction);
+       NotifyTransactionUpdated (transaction_desc.transaction);
+     }
+     catch (xtl::exception& e)
+     {
+       e.touch ("store::android_store::AndroidStore::OnPurchaseFailed");
+       throw;
+     }
    }
 
-   void OnPurchaseSucceeded (const stl::string& sku, const stl::string& receipt, const stl::string& signature)
+   void OnPurchaseSucceeded (const stl::string& sku, global_ref<jobject> purchase, const stl::string& receipt, const stl::string& signature)
    {
-     TransactionDesc& transaction_desc = FindPendingTransaction (sku.c_str ());
+     try
+     {
+       TransactionDesc& transaction_desc = FindPendingTransaction (sku.c_str ());
 
-     log.Printf ("Purchase succeeded for product '%s'", transaction_desc.transaction.ProductId ());
+       log.Printf ("Purchase succeeded for product '%s'", transaction_desc.transaction.ProductId ());
 
-     transaction_desc.completed = true;
+       transaction_desc.completed = true;
+       transaction_desc.purchase  = purchase;
 
-     transaction_desc.transaction.SetReceipt (receipt.size (), receipt.data ());
-     transaction_desc.transaction.SetState (TransactionState_Purchased);
+       transaction_desc.transaction.SetReceipt (receipt.size (), receipt.data ());
+       transaction_desc.transaction.SetState (TransactionState_Purchased);
 
-     transaction_desc.transaction.Properties ().SetProperty ("Signature", signature.c_str ());
+       transaction_desc.transaction.Properties ().SetProperty ("Signature", signature.c_str ());
 
-     NotifyTransactionUpdated (transaction_desc.transaction);
+       NotifyTransactionUpdated (transaction_desc.transaction);
+     }
+     catch (xtl::exception& e)
+     {
+       e.touch ("store::android_store::AndroidStore::OnPurchaseSucceeded");
+       throw;
+     }
    }
 
-   void OnPurchaseRestored (const stl::string& sku, const stl::string& receipt, const stl::string& signature)
+   void OnPurchaseRestored (const stl::string& sku, global_ref<jobject> purchase, const stl::string& receipt, const stl::string& signature)
    {
-     TransactionDesc& transaction_desc = FindPendingTransaction (sku.c_str ());
+     try
+     {
+       TransactionDesc& transaction_desc = FindPendingTransaction (sku.c_str ());
 
-     log.Printf ("Purchase restored for product '%s'", transaction_desc.transaction.ProductId ());
+       log.Printf ("Purchase restored for product '%s'", transaction_desc.transaction.ProductId ());
 
-     transaction_desc.completed = true;
+       transaction_desc.completed = true;
+       transaction_desc.purchase  = purchase;
 
-     transaction_desc.transaction.SetReceipt (receipt.size (), receipt.data ());
-     transaction_desc.transaction.SetState (TransactionState_Restored);
+       transaction_desc.transaction.SetReceipt (receipt.size (), receipt.data ());
+       transaction_desc.transaction.SetState (TransactionState_Restored);
 
-     transaction_desc.transaction.Properties ().SetProperty ("Signature", signature.c_str ());
+       transaction_desc.transaction.Properties ().SetProperty ("Signature", signature.c_str ());
 
-     NotifyTransactionUpdated (transaction_desc.transaction);
+       NotifyTransactionUpdated (transaction_desc.transaction);
+     }
+     catch (xtl::exception& e)
+     {
+       e.touch ("store::android_store::AndroidStore::OnPurchaseRestored");
+       throw;
+     }
    }
 
   private:
-    struct TransactionDesc
+    struct TransactionDesc : public xtl::reference_counter
     {
-      Transaction transaction;
-      bool        consumable;
-      bool        completed;
+      Transaction                     transaction;
+      bool                            consumable;
+      bool                            completed;
+      global_ref<jobject>             purchase;
+      Transaction::OnFinishedCallback consume_callback;
 
       TransactionDesc (const char* product_id, bool in_consumable)
         : transaction (finish_transaction_handler)
@@ -319,6 +443,10 @@ class AndroidStore
         transaction.SetProductId (product_id);
         transaction.SetQuantity (1);
       }
+
+      private:
+        TransactionDesc (const TransactionDesc&); //no impl
+        TransactionDesc& operator = (const TransactionDesc&); //no impl
     };
 
   private:
@@ -332,8 +460,8 @@ class AndroidStore
 
      for (TransactionsArray::iterator iter = pending_transactions.begin (), end = pending_transactions.end (); iter != end; ++iter)
      {
-       if (!iter->completed && !xtl::xstrcmp (iter->transaction.ProductId (), sku))
-         return *iter;
+       if (!(*iter)->completed && !xtl::xstrcmp ((*iter)->transaction.ProductId (), sku))
+         return **iter;
      }
 
      throw xtl::format_operation_exception (METHOD_NAME, "Can't find pending transaction for sku '%s'", sku);
@@ -342,7 +470,8 @@ class AndroidStore
   private:
     typedef xtl::signal<void (const Transaction&)> StoreSignal;
     typedef xtl::signal<void ()>                   OnInitializedSignal;
-    typedef stl::vector<TransactionDesc>           TransactionsArray;
+    typedef xtl::intrusive_ptr<TransactionDesc>    TransactionDescPtr;
+    typedef stl::vector<TransactionDescPtr>        TransactionsArray;
 
   public:
     common::Log         log;                      //протокол
@@ -355,6 +484,7 @@ class AndroidStore
     jobject             store;                    //объект Store
     jmethodID           store_init_method;        //конструктор Store
     jmethodID           buy_method;               //метод покупки
+    jmethodID           consume_method;           //метод поглощения покупки
     jmethodID           stop_processing_method;   //метод остановки обработки покупок
     TransactionsArray   pending_transactions;     //текущие незавершенные транзакции
 };
@@ -376,19 +506,29 @@ void on_purchase_failed (JNIEnv& env, jobject, jstring sku, jstring error)
   common::ActionQueue::PushAction (xtl::bind (&AndroidStore::OnPurchaseFailed, &*StoreSingleton::Instance (), tostring (sku), tostring (error)), common::ActionThread_Main);
 }
 
-void on_purchase_succeeded (JNIEnv& env, jobject, jstring sku, jstring receipt, jstring signature)
+void on_purchase_succeeded (JNIEnv& env, jobject, jstring sku, jobject purchase, jstring receipt, jstring signature)
 {
-  common::ActionQueue::PushAction (xtl::bind (&AndroidStore::OnPurchaseSucceeded, &*StoreSingleton::Instance (), tostring (sku), tostring (receipt), tostring (signature)), common::ActionThread_Main);
+  common::ActionQueue::PushAction (xtl::bind (&AndroidStore::OnPurchaseSucceeded, &*StoreSingleton::Instance (), tostring (sku), global_ref<jobject> (purchase), tostring (receipt), tostring (signature)), common::ActionThread_Main);
 }
 
-void on_purchase_restored (JNIEnv& env, jobject, jstring sku, jstring receipt, jstring signature)
+void on_purchase_restored (JNIEnv& env, jobject, jstring sku, jobject purchase, jstring receipt, jstring signature)
 {
-  common::ActionQueue::PushAction (xtl::bind (&AndroidStore::OnPurchaseRestored, &*StoreSingleton::Instance (), tostring (sku), tostring (receipt), tostring (signature)), common::ActionThread_Main);
+  common::ActionQueue::PushAction (xtl::bind (&AndroidStore::OnPurchaseRestored, &*StoreSingleton::Instance (), tostring (sku), global_ref<jobject> (purchase), tostring (receipt), tostring (signature)), common::ActionThread_Main);
 }
 
-void finish_transaction_handler (const Transaction& transaction)
+void on_consume_failed (JNIEnv& env, jobject, jobject purchase, jstring error)
 {
-  StoreSingleton::Instance ()->FinishTransaction (transaction);
+  common::ActionQueue::PushAction (xtl::bind (&AndroidStore::OnConsumeFailed, &*StoreSingleton::Instance (), global_ref<jobject> (purchase), tostring (error)), common::ActionThread_Main);
+}
+
+void on_consume_succeeded (JNIEnv& env, jobject, jobject purchase)
+{
+  common::ActionQueue::PushAction (xtl::bind (&AndroidStore::OnConsumeSucceeded, &*StoreSingleton::Instance (), global_ref<jobject> (purchase)), common::ActionThread_Main);
+}
+
+void finish_transaction_handler (const Transaction& transaction, const Transaction::OnFinishedCallback& callback)
+{
+  StoreSingleton::Instance ()->FinishTransaction (transaction, callback);
 }
 
 }

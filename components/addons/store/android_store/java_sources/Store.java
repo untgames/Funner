@@ -135,7 +135,7 @@ public class Store implements EngineActivity.EngineActivityEventListener, Engine
                 
                 if (info != null)
                 {
-            			onPurchaseRestoredCallback (sku, info.getOriginalJson (), info.getSignature ());
+            			onPurchaseRestoredCallback (sku, info, info.getOriginalJson (), info.getSignature ());
               		processPurchaseQueue ();
                 	return;
                 }
@@ -151,7 +151,7 @@ public class Store implements EngineActivity.EngineActivityEventListener, Engine
                   		if (result.isFailure ()) 
                   			onPurchaseFailedCallback (sku, result.getMessage ());
                   		else
-                  			onPurchaseSucceededCallback (sku, info.getOriginalJson (), info.getSignature ());
+                  			onPurchaseSucceededCallback (sku, info, info.getOriginalJson (), info.getSignature ());
                   	}
                   	finally
                   	{
@@ -174,10 +174,31 @@ public class Store implements EngineActivity.EngineActivityEventListener, Engine
 
   	activity.runOnUiThread (queue_processor);
   }
+
+  public void consumeProduct (final Purchase purchase)
+  {
+    (new Thread (new Runnable () {
+      public void run () {
+      	try
+      	{
+          helper.consume(purchase);
+          onConsumeSucceededCallback (purchase);
+        }
+        catch (IabException e) {
+          onConsumeFailedCallback (purchase, e.getResult ().getMessage ());
+        }
+      	catch (Throwable e) {
+          onConsumeFailedCallback (purchase, e.getMessage ());
+      	}
+      }
+    })).start ();
+  }
   
-  public native void onInitializedCallback(boolean canBuyProducts);
-  public native void onPurchaseInitiatedCallback(String sku);
-  public native void onPurchaseFailedCallback(String sku, String error);
-  public native void onPurchaseSucceededCallback(String sku, String receipt, String signature);
-  public native void onPurchaseRestoredCallback(String sku, String receipt, String signature);
+  private native void onInitializedCallback(boolean canBuyProducts);
+  private native void onPurchaseInitiatedCallback(String sku);
+  private native void onPurchaseFailedCallback(String sku, String error);
+  private native void onPurchaseSucceededCallback(String sku, Purchase purchase, String receipt, String signature);
+  private native void onPurchaseRestoredCallback(String sku, Purchase purchase, String receipt, String signature);
+  private native void onConsumeFailedCallback(Purchase purchase, String error);
+  private native void onConsumeSucceededCallback(Purchase purchase);
 }

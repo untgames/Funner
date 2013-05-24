@@ -50,6 +50,6 @@ public class EngineGCMManager
 		}
   }
   
-  public static native void onRegisteredCallback(String request);
-  public static native void onErrorCallback(String error);
+  private static native void onRegisteredCallback(String request);
+  private static native void onErrorCallback(String error);
 }

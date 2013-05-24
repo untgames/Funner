@@ -125,7 +125,7 @@ public class GCMIntentService extends GCMBaseIntentService {
       return super.onRecoverableError(context, errorId);
     }
 
-    public native void onRegisteredCallback(String request);
-    public native void onErrorCallback(String request);
-    public native void onMessageCallback(String request);
+    private native void onRegisteredCallback(String request);
+    private native void onErrorCallback(String request);
+    private native void onMessageCallback(String request);
 }
