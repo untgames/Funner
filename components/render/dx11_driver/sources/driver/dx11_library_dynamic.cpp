@@ -1,3 +1,5 @@
+#ifndef WINRT
+
 #include "shared.h"
 
 using namespace render::low_level;
@@ -292,3 +294,5 @@ HRESULT Library::D3DReflect (LPCVOID pSrcData, SIZE_T SrcDataSize, REFIID pInter
     throw;
   }
 }
+
+#endif
