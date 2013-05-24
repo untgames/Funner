@@ -475,16 +475,9 @@ math::mat4f get_ortho_proj (float left, float right, float bottom, float top, fl
   return proj_matrix;
 }
 
-void log_print (const char* stream, const char* message)
-{
-  printf ("%s: %s\n", stream, message);
-}
-
 int main ()
 {
   printf ("Results of model_load_test:\n");
-
-  common::LogFilter filter ("*", &log_print);
 
   try
   {

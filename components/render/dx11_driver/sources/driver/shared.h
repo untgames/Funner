@@ -19,6 +19,9 @@
 #include <common/strlib.h>
 #include <common/utf_converter.h>
 
+#include <syslib/dll.h>
+#include <syslib/mutex.h>
+
 #include <render/low_level/device.h>
 #include <render/low_level/driver.h>
 #include <render/low_level/utils.h>
@@ -26,6 +29,7 @@
 #include <render/low_level/helpers/object.h>
 #include <render/low_level/helpers/property_list.h>
 
+#include <shared/library.h>
 #include <shared/log.h>
 #include <shared/error.h>
 #include <shared/input_manager.h>
@@ -431,7 +435,7 @@ class Device: virtual public IDevice, public Object
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструктор / деструктор
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    Device  (const AdapterPtr& adapter, const char* init_string);
+    Device  (const Library& library, const AdapterPtr& adapter, const char* init_string);
     ~Device ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -496,6 +500,7 @@ class Device: virtual public IDevice, public Object
     void      StopDebugLayer  ();
 
   private:
+    Library                            library;               //библиотека драйвера
     AdapterPtr                         adapter;               //адаптер устройства
     PropertyList                       properties;            //свойства устройства
     DxDevicePtr                        device;                //устройство отрисовки
@@ -573,6 +578,7 @@ class Driver: virtual public IDriver, public Object
     typedef stl::vector<AdapterPtr> AdapterArray;
 
   private:
+    Library          library;             //библиотека драйвера
     DxFactoryPtr     factory;             //фабрика DXGI
     AdapterArray     adapters;            //адаптеры отрисовки
     AdapterWeakArray registered_adapters; //зарегистрированные адаптеры отрисовки

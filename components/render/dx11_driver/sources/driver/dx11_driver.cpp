@@ -26,7 +26,7 @@ Driver::Driver ()
 
     IDXGIFactory* factory_ptr = 0;
 
-    check_errors ("::CreateDXGIFactory", CreateDXGIFactory (__uuidof (IDXGIFactory), (void**)&factory_ptr));
+    check_errors ("::CreateDXGIFactory", library.CreateDXGIFactory (__uuidof (IDXGIFactory), (void**)&factory_ptr));
 
     if (!factory_ptr)
       throw xtl::format_operation_exception ("", "::CreateDXGIFactory failed");
@@ -240,7 +240,7 @@ IDevice* Driver::CreateDevice (size_t prefered_adapters_count, IAdapter** prefer
       {
         AdapterPtr adapter = cast_object<Adapter> (src_adapter, "", "adapter");
 
-        return new Device (adapter, init_string);
+        return new Device (library, adapter, init_string);
       }
       catch (std::exception& e)
       {

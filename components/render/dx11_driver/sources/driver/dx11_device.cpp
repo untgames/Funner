@@ -7,7 +7,8 @@ using namespace render::low_level::dx11;
     Конструктор / деструктор
 */
 
-Device::Device (const AdapterPtr& in_adapter, const char* init_string)
+Device::Device (const Library& in_library, const AdapterPtr& in_adapter, const char* init_string)
+  : library (in_library)
 {
   try
   {
@@ -50,7 +51,7 @@ Device::Device (const AdapterPtr& in_adapter, const char* init_string)
 
     if (is_debug) flags |= D3D11_CREATE_DEVICE_DEBUG;
 
-    check_errors ("::D3D11CreateDevice", D3D11CreateDevice (adapter->GetModule () ? (IDXGIAdapter*)0 : &adapter->GetHandle (), 
+    check_errors ("::D3D11CreateDevice", library.CreateDevice (adapter->GetModule () ? (IDXGIAdapter*)0 : &adapter->GetHandle (), 
       adapter->GetModule () ? D3D_DRIVER_TYPE_SOFTWARE : D3D_DRIVER_TYPE_UNKNOWN,
       adapter->GetModule (), flags, feature_levels_requested, feature_levels_requested_count, D3D11_SDK_VERSION, &dx_device, &feature_level, &dx_context));
 
