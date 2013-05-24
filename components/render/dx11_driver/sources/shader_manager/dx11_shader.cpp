@@ -109,7 +109,7 @@ Shader::Shader (ShaderType in_shader_type, const ShaderCodePtr& in_code, ShaderL
 
     ID3D11ShaderReflection* reflector = 0;
    
-    check_errors ("D3DReflect", D3DReflect (code->GetCompiledData (), code->GetCompiledDataSize (), IID_ID3D11ShaderReflection, (void**)&reflector));
+    check_errors ("D3DReflect", GetDeviceManager ().GetLibrary ().D3DReflect (code->GetCompiledData (), code->GetCompiledDataSize (), IID_ID3D11ShaderReflection, (void**)&reflector));
 
     if (!reflector)
       throw xtl::format_operation_exception ("", "D3DReflect failed");

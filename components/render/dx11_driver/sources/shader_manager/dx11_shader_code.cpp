@@ -174,7 +174,7 @@ ShaderCode::ShaderCode
 
     ID3D10Blob *dx_shader_blob = 0, *dx_error_msg_blob = 0;
 
-    HRESULT result = D3DX11CompileFromMemory (source_code, source_code_length, name, macro_mapper.Build (), &include_manager, "main",
+    HRESULT result = device_manager.GetLibrary ().D3DX11CompileFromMemory (source_code, source_code_length, name, macro_mapper.Build (), &include_manager, "main",
       profile, flags1, flags2, 0, &dx_shader_blob, &dx_error_msg_blob, 0);
 
     DxBlobPtr err_blob (dx_error_msg_blob, false);

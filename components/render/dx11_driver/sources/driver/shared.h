@@ -4,6 +4,7 @@
 #include <cmath>
 
 #include <D3D11.h>
+#include <D3Dcompiler.h>
 
 #include <stl/string>
 #include <stl/vector>

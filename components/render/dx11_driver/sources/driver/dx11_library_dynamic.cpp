@@ -19,14 +19,31 @@ const char* D3D11_LIBRARY_NAME = "d3d11.dll";
     Описание реализации библиотеки
 */
 
-typedef HRESULT (WINAPI *PFN_CREATE_DXGI_FACTORY) (REFIID riid, void **ppFactory);
+
+
+#if D3DX11_SDK_VERSION == 43
+
+  typedef HRESULT (WINAPI *PFN_CREATE_DXGI_FACTORY) (REFIID riid, void **ppFactory);
+
+  typedef HRESULT (WINAPI *PFN_D3DX11_COMPILE_FROM_MEMORY)(LPCSTR pSrcData, SIZE_T SrcDataLen, LPCSTR pFileName, CONST D3D10_SHADER_MACRO* pDefines, LPD3D10INCLUDE pInclude, 
+    LPCSTR pFunctionName, LPCSTR pProfile, UINT Flags1, UINT Flags2, ID3DX11ThreadPump* pPump, ID3D10Blob** ppShader, ID3D10Blob** ppErrorMsgs, HRESULT* pHResult);
+
+  typedef HRESULT (WINAPI* PFN_D3D_REFLECT)(LPCVOID pSrcData, SIZE_T SrcDataSize, REFIID pInterface, void** ppReflector);
+
+#else
+  #error DXSDK is not supported
+#endif
 
 struct Library::Impl: public xtl::reference_counter
 {
   stl::auto_ptr<syslib::DynamicLibrary> dxgi_library;           //библиотека DXGI
   stl::auto_ptr<syslib::DynamicLibrary> d3d11_library;          //библиотека D3D11
+  stl::auto_ptr<syslib::DynamicLibrary> d3dx11_library;         //библиотека D3DX11
+  stl::auto_ptr<syslib::DynamicLibrary> d3d_compiler_library;   //библиотека D3DCompiler
   PFN_D3D11_CREATE_DEVICE               create_device_fn;       //функция создания устройства
-  PFN_CREATE_DXGI_FACTORY               create_dxgi_factory_fn; //создание фабрики DXGI
+  PFN_CREATE_DXGI_FACTORY               create_dxgi_factory_fn; //функция создания фабрики DXGI
+  PFN_D3DX11_COMPILE_FROM_MEMORY        compile_from_memory_fn; //функция компиляции шейдера
+  PFN_D3D_REFLECT                       reflect_fn;             //функция получения информации о шейдере
 
   static Impl*         global_impl;
   static syslib::Mutex global_impl_mutex;
@@ -35,6 +52,8 @@ struct Library::Impl: public xtl::reference_counter
   Impl ()
     : create_device_fn ()
     , create_dxgi_factory_fn ()
+    , compile_from_memory_fn ()
+    , reflect_fn ()
   {
   }
 
@@ -85,6 +104,22 @@ struct Library::Impl: public xtl::reference_counter
 
     dxgi_library.reset (new syslib::DynamicLibrary (DXGI_LIBRARY_NAME));
   }
+
+  void LoadD3DX11Library ()
+  {
+    if (d3dx11_library)
+      return;
+
+    d3dx11_library.reset (new syslib::DynamicLibrary (D3DX11_DLL));
+  }
+
+  void LoadD3DCompilerLibrary ()
+  {
+    if (d3d_compiler_library)
+      return;
+
+    d3d_compiler_library.reset (new syslib::DynamicLibrary (D3DCOMPILER_DLL));
+  }
 };
 
 Library::Impl* Library::Impl::global_impl = 0;
@@ -123,7 +158,7 @@ Library& Library::operator = (const Library& library)
     Создание устройства
 */
 
-HRESULT Library::CreateDevice (
+HRESULT Library::D3D11CreateDevice (
  IDXGIAdapter*            pAdapter,
  D3D_DRIVER_TYPE          DriverType,
  HMODULE                  Software,
@@ -153,7 +188,7 @@ HRESULT Library::CreateDevice (
   }
   catch (xtl::exception& e)
   {
-    e.touch ("render::low_level::dx11::Library::CreateDevice");
+    e.touch ("render::low_level::dx11::Library::D3D11CreateDevice");
     throw;
   }
 }
@@ -183,6 +218,77 @@ HRESULT Library::CreateDXGIFactory (REFIID riid, void** ppFactory)
   catch (xtl::exception& e)
   {
     e.touch ("render::low_level::dx11::Library::CreateDXGIFactory");
+    throw;
+  }
+}
+
+/*
+    Компиляция шейдера
+*/
+
+HRESULT Library::D3DX11CompileFromMemory 
+ (LPCSTR                    pSrcData,
+  SIZE_T                    SrcDataLen,
+  LPCSTR                    pFileName,
+  const D3D10_SHADER_MACRO* pDefines,
+  LPD3D10INCLUDE            pInclude,
+  LPCSTR                    pFunctionName,
+  LPCSTR                    pProfile,
+  UINT                      Flags1,
+  UINT                      Flags2,
+  ID3DX11ThreadPump*        pPump,
+  ID3D10Blob**              ppShader,
+  ID3D10Blob**              ppErrorMsgs,
+  HRESULT*                  pHResult)
+{
+  try
+  {
+    if (!impl->compile_from_memory_fn)
+    {
+      impl->LoadD3DX11Library ();
+
+      static const char* ENTRY_NAME = "D3DX11CompileFromMemory";
+
+      impl->compile_from_memory_fn = (PFN_D3DX11_COMPILE_FROM_MEMORY)impl->d3dx11_library->GetSymbol (ENTRY_NAME);
+
+      if (!impl->compile_from_memory_fn)
+        throw xtl::format_operation_exception ("", "Symbol %s not found in %s", ENTRY_NAME, D3DX11_DLL);
+    }
+
+    return impl->compile_from_memory_fn (pSrcData, SrcDataLen, pFileName, pDefines, pInclude, pFunctionName, pProfile, Flags1, Flags2, pPump, ppShader, ppErrorMsgs, pHResult);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::low_level::dx11::Library::D3DX11CompileFromMemory");
+    throw;
+  }
+}
+
+/*
+    Получение информации о шейдере  
+*/
+
+HRESULT Library::D3DReflect (LPCVOID pSrcData, SIZE_T SrcDataSize, REFIID pInterface, void** ppReflector)
+{
+  try
+  {
+    if (!impl->reflect_fn)
+    {
+      impl->LoadD3DCompilerLibrary ();
+
+      static const char* ENTRY_NAME = "D3DReflect";
+
+      impl->reflect_fn = (PFN_D3D_REFLECT)impl->d3d_compiler_library->GetSymbol (ENTRY_NAME);
+
+      if (!impl->reflect_fn)
+        throw xtl::format_operation_exception ("", "Symbol %s not found in %s", ENTRY_NAME, D3DCOMPILER_DLL);
+    }
+
+    return impl->reflect_fn (pSrcData, SrcDataSize, pInterface, ppReflector);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::low_level::dx11::Library::D3DReflect");
     throw;
   }
 }

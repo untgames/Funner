@@ -9,10 +9,13 @@ using namespace render::low_level::dx11;
 
 struct DeviceManager::Impl: public xtl::reference_counter
 {
+  Library      library;
   DxDevicePtr  device;
   DxContextPtr context;
 
-  Impl (const DxDevicePtr& in_device) : device (in_device) 
+  Impl (const Library& in_library, const DxDevicePtr& in_device)
+    : library (in_library)
+    , device (in_device) 
   {
     static const char* METHOD_NAME = "render::low_level::dx11::DeviceManager::Impl::Impl";
 
@@ -30,8 +33,8 @@ struct DeviceManager::Impl: public xtl::reference_counter
   }
 };
 
-DeviceManager::DeviceManager (const DxDevicePtr& device)
-  : impl (new Impl (device))
+DeviceManager::DeviceManager (const Library& library, const DxDevicePtr& device)
+  : impl (new Impl (library, device))
 {
 }
 
@@ -61,6 +64,11 @@ ID3D11Device& DeviceManager::GetDevice () const
 ID3D11DeviceContext& DeviceManager::GetImmediateContext () const
 {
   return *impl->context;
+}
+
+Library& DeviceManager::GetLibrary () const
+{
+  return impl->library;
 }
 
 void DeviceManager::Swap (DeviceManager& manager)
