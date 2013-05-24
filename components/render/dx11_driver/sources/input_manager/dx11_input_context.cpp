@@ -149,6 +149,62 @@ IBuffer* InputManagerContextState::GetIndexBuffer () const
 }
 
 /*
+    Управление уровнем вывода вершин
+*/
+
+void InputManagerContextState::SOSetTargets (size_t buffers_count, IBuffer** buffers, const size_t* offsets)
+{
+  try
+  {
+    throw xtl::make_not_implemented_exception (__FUNCTION__);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::low_level::dx11::InputManagerContextState::SOSetTargets");
+    throw;
+  }
+}
+
+void InputManagerContextState::SOSetTarget (size_t stream_output_slot, IBuffer* buffer, size_t offset)
+{
+  try
+  {
+    throw xtl::make_not_implemented_exception (__FUNCTION__);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::low_level::dx11::InputManagerContextState::SOSetTarget");
+    throw;
+  }
+}
+
+IBuffer* InputManagerContextState::SOGetTarget (size_t stream_output_slot)
+{
+  try
+  {
+    throw xtl::make_not_implemented_exception (__FUNCTION__);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::low_level::dx11::InputManagerContextState::SOGetTarget");
+    throw;
+  }
+}
+
+size_t InputManagerContextState::SOGetTargetOffset (size_t stream_output_slot)
+{
+  try
+  {
+    throw xtl::make_not_implemented_exception (__FUNCTION__);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::low_level::dx11::InputManagerContextState::SOGetTargetOffset");
+    throw;
+  }
+}
+
+/*
     Копирование состояния
 */
 

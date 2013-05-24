@@ -168,22 +168,54 @@ IBuffer* Context::ISGetIndexBuffer ()
 
 void Context::SOSetTargets (size_t buffers_count, IBuffer** buffers, const size_t* offsets)
 {
-  throw xtl::make_not_implemented_exception (__FUNCTION__);
+  try
+  {
+    input_manager_context.SOSetTargets (buffers_count, buffers, offsets);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::low_level::dx11::Context::SOSetTargets");
+    throw;
+  }
 }
 
 void Context::SOSetTarget (size_t stream_output_slot, IBuffer* buffer, size_t offset)
 {
-  throw xtl::make_not_implemented_exception (__FUNCTION__);
+  try
+  {
+    input_manager_context.SOSetTarget (stream_output_slot, buffer, offset);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::low_level::dx11::Context::SOSetTarget");
+    throw;
+  }
 }
 
 IBuffer* Context::SOGetTarget (size_t stream_output_slot)
 {
-  throw xtl::make_not_implemented_exception (__FUNCTION__);
+  try
+  {
+    return input_manager_context.SOGetTarget (stream_output_slot);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::low_level::dx11::Context::SOGetTarget");
+    throw;
+  }
 }
 
 size_t Context::SOGetTargetOffset (size_t stream_output_slot)
 {
-  throw xtl::make_not_implemented_exception (__FUNCTION__);
+  try
+  {
+    return input_manager_context.SOGetTargetOffset (stream_output_slot);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::low_level::dx11::Context::SOGetTargetOffset");
+    throw;
+  }
 }
 
 /*
