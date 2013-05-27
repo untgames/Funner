@@ -11,6 +11,7 @@ import android.graphics.Point;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Looper;
 import android.os.Process;
 import android.os.SystemClock;
@@ -145,6 +146,15 @@ public class EngineActivity extends Activity
     envVars = envVars + " " + "TEMP='" + tmpDir + "'";
     envVars = envVars + " " + "ANDROID_DATA='" + getFilesDir ().getPath () + "'";
     
+    String externalDataDir;
+
+    if (Environment.getExternalStorageState ().equals (Environment.MEDIA_MOUNTED))
+    	externalDataDir = getExternalFilesDir (null).getPath ();
+    else
+    	externalDataDir = getFilesDir ().getPath ();
+
+    envVars = envVars + " " + "ANDROID_EXTERNAL_DATA='" + externalDataDir + "'";
+
     try
     {
       if (librariesString != null)
