@@ -78,14 +78,6 @@ OpenALDevice::OpenALDevice (const char* driver_name, const char* device_name, co
     
     buffers_update_thread.reset (new syslib::Thread ("OpenAL buffers update thread", xtl::bind (&OpenALDevice::BufferUpdateLoop, this)));
 
-    try
-    {
-      buffers_update_thread->SetPriority (syslib::ThreadPriority_Low);
-    }
-    catch (...)
-    {
-    }
-  
     OpenALContextManager::Instance context_manager;
 
     context_manager->SetCurrentContext (context);
