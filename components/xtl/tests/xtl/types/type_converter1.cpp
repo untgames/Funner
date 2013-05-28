@@ -2,8 +2,6 @@
 
 #include <xtl/custom_cast.h>
 
-//неверное приведение ссылка - ссылка
-
 using namespace xtl;
 
 class A {};
