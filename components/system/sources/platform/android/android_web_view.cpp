@@ -84,7 +84,7 @@ struct syslib::web_view_handle: public MessageQueue::Handler
 
     JNIEnv& env = get_env ();
 
-    local_ref<jclass> result_class = env.GetObjectClass (result.get ());
+    local_ref<jclass> result_class (env.GetObjectClass (result.get ()), false);
 
     if (!result_class)
       throw xtl::format_operation_exception ("", "JNIEnv::GetObjectClass failed (for UiAsyncResult)");
