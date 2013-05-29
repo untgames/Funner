@@ -375,7 +375,9 @@ void AndroidApplicationManager::GetSystemProperties (common::PropertyMap& proper
 
     jmethodID get_system_properties_method = find_method (&get_env (), activity_class.get (), "getSystemProperties", "()Ljava/lang/String;");
 
-    stl::string properties_line = tostring ((jstring)get_env ().CallObjectMethod (activity.get (), get_system_properties_method));
+    local_ref<jstring> properties_line_jstring ((jstring)get_env ().CallObjectMethod (activity.get (), get_system_properties_method), false);
+
+    stl::string properties_line = tostring (properties_line_jstring.get ());
 
     common::PropertyMap android_properties = common::parse_init_string (properties_line.c_str ());
 
