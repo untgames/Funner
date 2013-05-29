@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <time.h>
 #include <xtl/any.h>
 #include <xtl/any_reference.h>
 #include <xtl/ref.h>
