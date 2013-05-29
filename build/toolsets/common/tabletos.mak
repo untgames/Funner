@@ -44,6 +44,8 @@ PACKAGER                 := $(TABLETOS_NDK_GCC)/bin/blackberry-nativepackager
 DEPLOYER                 := $(TABLETOS_NDK_GCC)/bin/blackberry-deploy
 CONNECTOR                := $(TABLETOS_NDK_GCC)/bin/blackberry-connect
 DEBUG_TOKEN_REQUESTER    := $(TABLETOS_NDK_GCC)/bin/blackberry-debugtokenrequest
+SIGNER                   := $(TABLETOS_NDK_GCC)/bin/blackberry-signer
+KEYTOOL                  := $(TABLETOS_NDK_GCC)/bin/blackberry-keytool
 JRE_BIN                  := $(TABLETOS_NDK)/jre/bin
 JAVA                     := $(JRE_BIN)/java
 COMMON_CPPFLAGS          += -fexceptions -frtti
@@ -57,8 +59,9 @@ TABLETOS_PORT            := $(strip $(TABLETOS_PORT))
 VALID_TARGET_TYPES       += tabletos-bar
 TESTS_LAUNCHER           := $(DIST_LIB_DIR)/funner.application.bar
 TABLETOS_DEBUG_TOKEN     := $(BUILD_DIR)platforms/tabletos/debugtoken.bar
-TABLETOS_CSJ_FILE        := $(BUILD_DIR)platforms/tabletos/client-PBDT-1965718.csj
-TABLETOS_KEYSTORE        := $(BUILD_DIR)platforms/tabletos/keystore.p12
+TABLETOS_DEBUGTOKEN_CSJ_FILE  := $(BUILD_DIR)platforms/tabletos/client-PBDT-2002360.csj
+TABLETOS_APP_CSJ_FILE         := $(BUILD_DIR)platforms/tabletos/client-RDK-2002360.csj
+TABLETOS_KEYSTORE             := $(BUILD_DIR)platforms/tabletos/keystore.p12
 
 ifneq (,$(filter Win%,$(OS)))
 TABLETOS_KEY         := $(BUILD_DIR)/platforms/tabletos/id_rsa.ppk
@@ -192,7 +195,7 @@ define process_target.tabletos-bar
 
 endef
 
-.PHONY: connect debugtoken.register debugtoken.update
+.PHONY: connect debugtoken.register debugtoken.update tokens.register keystore.register
 
 connect:
 		@echo Connecting to TabletOS device...
@@ -208,7 +211,7 @@ ifeq (,$(TABLETOS_CSJ_PIN))
 		@echo Error: TABLETOS_CSJ_PIN variable is not set
 		@exit 1
 endif
-		@export PATH=/$(subst :,,$(call convert_path,$(TABLETOS_NDK_GCC)/bin)):/$(subst :,,$(call convert_path,$(JRE_BIN))):$$PATH && $(TABLETOS_DEVHOST_CMD_PREFIX) $(notdir $(DEBUG_TOKEN_REQUESTER)) -register -cskpass $(TABLETOS_DEBUG_TOKEN_PASSWORD) -csjpin $(TABLETOS_CSJ_PIN) $(TABLETOS_CSJ_FILE) $(TABLETOS_DEVHOST_CMD_SUFFIX)
+		@export PATH=/$(subst :,,$(call convert_path,$(TABLETOS_NDK_GCC)/bin)):/$(subst :,,$(call convert_path,$(JRE_BIN))):$$PATH && $(TABLETOS_DEVHOST_CMD_PREFIX) $(notdir $(DEBUG_TOKEN_REQUESTER)) -register -cskpass $(TABLETOS_DEBUG_TOKEN_PASSWORD) -csjpin $(TABLETOS_CSJ_PIN) $(TABLETOS_DEBUGTOKEN_CSJ_FILE) $(TABLETOS_DEVHOST_CMD_SUFFIX)
 
 debugtoken.update:
 		@echo Update token...
@@ -227,3 +230,27 @@ endif
 		@export PATH=/$(subst :,,$(call convert_path,$(TABLETOS_NDK_GCC)/bin)):/$(subst :,,$(call convert_path,$(JRE_BIN))):$$PATH && $(TABLETOS_DEVHOST_CMD_PREFIX) $(notdir $(DEBUG_TOKEN_REQUESTER)) -cskpass $(TABLETOS_DEBUG_TOKEN_PASSWORD) -keystore $(TABLETOS_KEYSTORE) -storepass $(TABLETOS_DEBUG_TOKEN_PASSWORD) -deviceid 0x$(TABLETOS_DEVICE_ID) $(TABLETOS_DEBUG_TOKEN) $(TABLETOS_DEVHOST_CMD_SUFFIX)
 		@echo Install debug token...
 		@export PATH=/$(subst :,,$(call convert_path,$(TABLETOS_NDK_GCC)/bin)):/$(subst :,,$(call convert_path,$(JRE_BIN))):$$PATH && $(TABLETOS_DEVHOST_CMD_PREFIX) $(notdir $(DEPLOYER)) -installDebugToken $(TABLETOS_DEBUG_TOKEN) -device $(TABLETOS_HOST) -password $(TABLETOS_PASSWORD) $(TABLETOS_DEVHOST_CMD_SUFFIX)
+
+tokens.register:
+		@echo Register tokens...
+ifeq (,$(TABLETOS_DEBUG_TOKEN_PASSWORD))
+		@echo Error: TABLETOS_DEBUG_TOKEN_PASSWORD variable is not set
+		@exit 1
+endif
+ifeq (,$(TABLETOS_CSJ_PIN))
+		@echo Error: TABLETOS_CSJ_PIN variable is not set
+		@exit 1
+endif
+		@export PATH=/$(subst :,,$(call convert_path,$(TABLETOS_NDK_GCC)/bin)):/$(subst :,,$(call convert_path,$(JRE_BIN))):$$PATH && $(TABLETOS_DEVHOST_CMD_PREFIX) $(notdir $(SIGNER)) -register -csjpin $(TABLETOS_CSJ_PIN) -storepass $(TABLETOS_DEBUG_TOKEN_PASSWORD) $(TABLETOS_APP_CSJ_FILE) $(TABLETOS_DEBUGTOKEN_CSJ_FILE) $(TABLETOS_DEVHOST_CMD_SUFFIX)
+
+keystore.register:
+		@echo Register keystore...
+ifeq (,$(TABLETOS_DEBUG_TOKEN_PASSWORD))
+		@echo Error: TABLETOS_DEBUG_TOKEN_PASSWORD variable is not set
+		@exit 1
+endif
+ifeq (,$(TABLETOS_SIGN_COMPANY_NAME))
+		@echo Error: TABLETOS_SIGN_COMPANY_NAME variable is not set
+		@exit 1
+endif
+		@export PATH=/$(subst :,,$(call convert_path,$(TABLETOS_NDK_GCC)/bin)):/$(subst :,,$(call convert_path,$(JRE_BIN))):$$PATH && $(TABLETOS_DEVHOST_CMD_PREFIX) $(notdir $(KEYTOOL)) -genkeypair -storepass $(TABLETOS_DEBUG_TOKEN_PASSWORD) -dname "cn=$(TABLETOS_SIGN_COMPANY_NAME)" $(TABLETOS_DEVHOST_CMD_SUFFIX)
