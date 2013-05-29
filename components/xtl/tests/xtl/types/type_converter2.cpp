@@ -8,6 +8,7 @@ class A {};
 class B : public A {};
 
 template class declcast<B, A>;
+template class declcast<A>;
 
 int main ()
 {
@@ -21,6 +22,25 @@ int main ()
   
   TEST (A&);
   TEST (A);
+  TEST (A*);
+  TEST (B&);
+  TEST (B);
+  TEST (B*);
+
+  A& a = caster.cast<A&> ();
+
+  printf ("&a == &b: %s\n", &a == &b ? "true" : "false");
+
+  caster = make_custom_ref_caster (a);
+
+  #undef TEST
+  #define TEST(TO) printf ("check convertion A -> %s: %s\n", #TO, caster.has_cast<TO> () ? "true" : "false");
+
+  TEST (B&);
+  TEST (B);
+  TEST (B*);
+  TEST (A);
+  TEST (A&);
   TEST (A*);
   
   return 0;

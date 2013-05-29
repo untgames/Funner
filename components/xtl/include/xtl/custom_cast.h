@@ -22,19 +22,26 @@ struct custom_ref_caster_type_info;
 template <class From, class To>
 struct static_caster
 {
-  To operator () (From value) { return static_cast<To> (value); }
+   To operator () (From& value) const { return static_cast<To> (value); }
 };
 
 template <class From, class To>
 struct dynamic_caster
 {
-  To operator () (From value) { return dynamic_cast<To> (value); }
+  To& operator () (From& value) const { return dynamic_cast<To&> (value); }
+  To* operator () (From* value) const { return dynamic_cast<To*> (value); }
+};
+
+template <class From, class To>
+struct dynamic_caster<From, To*>
+{
+  To* operator () (From& value) const { return dynamic_cast<To*> (value); }
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Декларация возможности приведения типов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-template <class From, class To, template <class, class> class CastTag = static_caster>
+template <class FromT, class ToT = FromT, template <class, class> class CastTag = static_caster>
 class declcast;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
