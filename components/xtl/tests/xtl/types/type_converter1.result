@@ -1,12 +1,12 @@
 Results of type_converter1_test:
 check convertion float -> int: true
-check convertion int -> float: false
+check convertion int -> float: true
 check convertion double -> int: true
-check convertion int -> double: false
-check convertion float -> double: false
-check convertion double -> float: false
-check convertion char -> long double: false
-check convertion long double -> char: false
+check convertion int -> double: true
+check convertion float -> double: true
+check convertion double -> float: true
+check convertion char -> long double: true
+check convertion long double -> char: true
 check convertion B& -> A&: true
 check convertion B -> A: true
 check convertion B* -> A*: true

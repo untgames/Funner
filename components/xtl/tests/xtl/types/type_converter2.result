@@ -1,0 +1,14 @@
+Results of type_converter2_test:
+check convertion B -> A&: true
+check convertion B -> A: true
+check convertion B -> A*: true
+check convertion B -> B&: true
+check convertion B -> B: true
+check convertion B -> B*: true
+&a == &b: true
+check convertion A -> B&: false
+check convertion A -> B: false
+check convertion A -> B*: false
+check convertion A -> A: true
+check convertion A -> A&: true
+check convertion A -> A*: true
