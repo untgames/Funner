@@ -10,6 +10,8 @@ struct B : A
   virtual const char* name () const { return "class B"; }
 };
 
+template class declcast<B, A>;
+
 int main ()
 {
   printf ("Results of any_cast_speed_test:\n");
@@ -23,7 +25,7 @@ int main ()
   static const size_t N = 10000000;
 
   for (size_t i=0; i<N; i++)
-    a.cast<B> ();
+    a.cast<A> ();
 
   clock_t end = clock ();
 
