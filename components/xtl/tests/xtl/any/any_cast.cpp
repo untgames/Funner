@@ -27,12 +27,26 @@ void print (double x)
   printf ("%g", x);
 }
 
+template class declcast<B, A>;
+template class declcast<C, A>;
+template class declcast<D, C>;
+template class declcast<D, A>;
+
+template class declcast<A, B, dynamic_caster>;
+template class declcast<A, C, dynamic_caster>;
+template class declcast<A, D, dynamic_caster>;
+
+template class declcast<A>;
+template class declcast<B>;
+template class declcast<C>;
+template class declcast<D>;
+
 namespace test_namespace
 {
 
 struct X
 {
-  X() {}
+  X() : value () {}
   X(int in_value) : value (in_value) {}
   
   int value;
@@ -44,15 +58,9 @@ struct Y : X
   Y(int value) : X (value) {}
 };
 
-void to_value (const stl::string& buffer, X& x)
-{
-  xtl::to_value (buffer, x.value);
-}
-
-void to_string (stl::string& buffer, X& x)
-{
-  xtl::to_string (buffer, x.value);
-}
+template class declcast<X>;
+template class declcast<Y>;
+template class declcast<Y, X>;
 
 }
 
@@ -122,6 +130,7 @@ template <class T>
 void test (const char* name, const any& a)
 {
   printf ("cast to '%s': ", name);
+  fflush (stdout);
 
   try
   {
@@ -130,14 +139,17 @@ void test (const char* name, const any& a)
   catch (bad_any_cast& exception)
   {
 //    printf ("fail: %s (at cast from '%s' to '%s')", exception.what (), exception.source_type ().name (), exception.target_type ().name ());
-    printf ("fail: %s", exception.what ());
+    printf ("fail: %s", exception.what ());   
+    fflush (stdout);
   }  
   catch (std::exception& exception)
   {
     printf ("fail: %s", exception.what ());
+    fflush (stdout);
   }
   
   printf ("\n");  
+  fflush (stdout);
 }
 
 int main ()
@@ -215,7 +227,7 @@ int main ()
     test<const volatile B*> ("const volatile class B", a5);
     test<const volatile C*> ("const volatile class C", a5);    
         
-    printf ("check complex-lexical_cast\n");
+    printf ("check static_cast with reference_wrapper\n");
     
     Y y (123);
     any a6 (xtl::ref (y));
@@ -253,25 +265,13 @@ int main ()
     try
     {      
       a7_auto_ptr.reset (); 
-      
+
       test<const D*> ("const class D", a7);
     }
     catch (std::exception& e)
     {
       printf ("%s\n", e.what ());
     }
-    
-    printf ("check set_content\n");    
-
-    to_value ("321", a6);
-    
-    printf ("y.value=%d\n", y.value);
-    
-    a6 = xtl::cref (y);
-    
-    to_value ("4321", a6);
-    
-    printf ("y.value=%d\n", y.value); //must be unreachable    
   }
   catch (std::exception& exception)
   {

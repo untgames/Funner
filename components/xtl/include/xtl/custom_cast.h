@@ -17,26 +17,10 @@ struct custom_ref_caster_type_info;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Приведение типов через static_cast
+///Приведение типов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-template <class From, class To>
-struct static_caster
-{
-   To operator () (From& value) const { return static_cast<To> (value); }
-};
-
-template <class From, class To>
-struct dynamic_caster
-{
-  To& operator () (From& value) const { return dynamic_cast<To&> (value); }
-  To* operator () (From* value) const { return dynamic_cast<To*> (value); }
-};
-
-template <class From, class To>
-struct dynamic_caster<From, To*>
-{
-  To* operator () (From& value) const { return dynamic_cast<To*> (value); }
-};
+template <class From, class To> struct static_caster;
+template <class From, class To> struct dynamic_caster;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Декларация возможности приведения типов
@@ -51,9 +35,11 @@ class custom_ref_caster
 {
   public:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Конструктор
+///Конструкторы
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+                          custom_ref_caster ();
     template <class From> custom_ref_caster (From& value);
+    template <class From> custom_ref_caster (From* value);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Приведение типа
@@ -64,6 +50,7 @@ class custom_ref_caster
   private:
     void*                                      source;
     const detail::custom_ref_caster_type_info* source_type;
+    void*                                      pointer_value;
 };
 
 template <class From>
@@ -72,7 +59,7 @@ custom_ref_caster make_custom_ref_caster (From& value);
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Приведение типа
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-template <class To, class From> To custom_cast (From);
+template <class To, class From> To custom_cast (From&);
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Проверка возможности приведения

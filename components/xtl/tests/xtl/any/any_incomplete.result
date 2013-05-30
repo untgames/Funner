@@ -1,3 +1,2 @@
 Results of any_incomplete_test:
 hello from B::test
-exception: xtl::bad_any_cast; reason: function 'to_string' not found

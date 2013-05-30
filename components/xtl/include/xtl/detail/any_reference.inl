@@ -43,7 +43,7 @@ inline T& any_reference::cast () const
   T* result = content<T> ();
 
   if (!result)
-    throw bad_any_cast (bad_any_cast::bad_direct_cast, *data_type, typeid (T));
+    throw bad_any_cast (*data_type, typeid (T));
 
   return *result;
 }

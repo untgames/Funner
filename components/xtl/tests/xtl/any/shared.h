@@ -2,6 +2,7 @@
 #include <time.h>
 #include <xtl/any.h>
 #include <xtl/any_reference.h>
+#include <xtl/dynamic_cast_root.h>
 #include <xtl/ref.h>
 #include <xtl/trackable_ptr.h>
 #include <stl/string>

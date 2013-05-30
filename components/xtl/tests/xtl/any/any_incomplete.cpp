@@ -15,6 +15,8 @@ class B: public A
     void test () { printf ("hello from B::test\n"); }
 };
 
+template class declcast<B, A>;
+
 int main ()
 {
   printf ("Results of any_incomplete_test:\n");

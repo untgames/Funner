@@ -1,172 +1,9 @@
 /*
-===================================================================================================
-    ќписание реализации any
-===================================================================================================
+    any
 */
 
 namespace detail
 {
-
-/*
-    ¬нутреннее исключение, возникающее при невозможности приведени€
-*/
-
-struct bad_any_cast_internal: public std::bad_cast
-{
-  bad_any_cast_internal (bad_any_cast::cast_error in_error_id) : error_id (in_error_id) {}
-
-  const char* what () const throw () { return "xtl::detail::bad_any_cast_internal"; }
-
-  bad_any_cast::cast_error error_id;
-};
-
-namespace adl_defaults
-{
-
-/*
-    —вободные функции по умолчанию, дл€ игнорировани€ отсутстви€ соответствующих псевдонимов при ADL
-*/
-
-using xtl::to_string;
-using xtl::to_value;
-using xtl::get_root;
-
-//по умолчанию типы не преобразуютс€ к строкам
-inline void to_string (stl::string&, default_cast_type)
-{
-  throw bad_any_cast_internal (bad_any_cast::bad_to_string_cast);
-}
-
-//по умолчанию типы не приводимы из строки
-inline void to_value (const stl::string& buffer, default_cast_type)
-{
-  throw bad_any_cast_internal (bad_any_cast::bad_to_value_cast);
-}
-
-//по умолчанию, тип не €вл€етс€ потомком dynamic_cast_root
-inline dynamic_cast_root* get_root (default_cast_type)
-{
-  return 0;
-}
-
-}
-
-/*
-    ќпределение маски квалификаторов типа
-*/
-
-enum {
-  any_qualifier_const_bit        = 1,
-  any_qualifier_volatile_bit     = 2,
-  any_qualifier_ptr_const_bit    = 4,
-  any_qualifier_ptr_volatile_bit = 8
-};
-
-template <class T> struct any_qualifier_mask                    { enum { value = 0 }; };
-template <class T> struct any_qualifier_mask<const T>           { enum { value = any_qualifier_const_bit | any_qualifier_mask<T>::value }; };
-template <class T> struct any_qualifier_mask<volatile T>        { enum { value = any_qualifier_volatile_bit | any_qualifier_mask<T>::value }; };
-template <class T> struct any_qualifier_mask<const volatile T>  { enum { value = any_qualifier_volatile_bit | any_qualifier_const_bit | any_qualifier_mask<T>::value }; };
-template <class T> struct any_qualifier_mask<T&>                { enum { value = any_qualifier_mask<T>::value }; };
-template <class T> struct any_qualifier_mask<T*>                { enum { value = any_qualifier_mask<T>::value }; };
-template <class T> struct any_qualifier_mask<T* const>          { enum { value = any_qualifier_mask<T>::value | any_qualifier_ptr_const_bit }; };
-template <class T> struct any_qualifier_mask<T* volatile>       { enum { value = any_qualifier_mask<T>::value | any_qualifier_ptr_volatile_bit }; };
-template <class T> struct any_qualifier_mask<T* const volatile> { enum { value = any_qualifier_mask<T>::value | any_qualifier_ptr_volatile_bit | any_qualifier_ptr_const_bit }; };
-
-template <class T> struct any_qualifier_mask<reference_wrapper<T> >          { enum { value = any_qualifier_mask<T>::value }; };
-template <class T> struct any_qualifier_mask<const reference_wrapper<T> >    { enum { value = any_qualifier_mask<T>::value | any_qualifier_const_bit }; };
-template <class T> struct any_qualifier_mask<volatile reference_wrapper<T> > { enum { value = any_qualifier_mask<T>::value | any_qualifier_volatile_bit }; };
-template <class T> struct any_qualifier_mask<const volatile reference_wrapper<T> > { enum { value = any_qualifier_mask<T>::value | any_qualifier_volatile_bit | any_qualifier_const_bit }; };
-
-/*
-    ќпределение хранимого типа
-*/
-
-template <class T> struct any_stored_type                    { typedef T type; };
-template <class T> struct any_stored_type<const T>           { typedef T type; };
-template <class T> struct any_stored_type<volatile T>        { typedef T type; };
-template <class T> struct any_stored_type<const volatile T>  { typedef T type; };
-template <class T> struct any_stored_type<T&>                { typedef typename any_stored_type<T>::type& type; };
-template <class T> struct any_stored_type<T*>                { typedef typename any_stored_type<T>::type* type; };
-template <class T> struct any_stored_type<T* const>          { typedef typename any_stored_type<T>::type* type; };
-template <class T> struct any_stored_type<T* volatile>       { typedef typename any_stored_type<T>::type* type; };
-template <class T> struct any_stored_type<T* const volatile> { typedef typename any_stored_type<T>::type* type; };
-
-template <class T> struct any_stored_type<reference_wrapper<T> >
-{
-  typedef reference_wrapper<typename any_stored_type<T>::type> type;
-};
-
-template <class T> struct any_stored_type<const reference_wrapper<T> >:          public any_stored_type<reference_wrapper<T> > {};
-template <class T> struct any_stored_type<volatile reference_wrapper<T> >:       public any_stored_type<reference_wrapper<T> > {};
-template <class T> struct any_stored_type<const volatile reference_wrapper<T> >: public any_stored_type<reference_wrapper<T> > {};
-
-/*
-    —н€тие константности
-*/
-
-template <class T>
-inline typename any_stored_type<T>::type& get_unqualified_value (T& value)
-{
-  return const_cast<typename any_stored_type<T>::type&> (value);
-}
-
-template <class T>
-inline typename any_stored_type<T>::type& get_unqualified_value (const T& value)
-{
-  return const_cast<typename any_stored_type<T>::type&> (value);
-}
-
-template <class T>
-inline typename any_stored_type<T>::type& get_unqualified_value (volatile T& value)
-{
-  return const_cast<typename any_stored_type<T>::type&> (value);
-}
-
-template <class T>
-inline typename any_stored_type<T>::type& get_unqualified_value (const volatile T& value)
-{
-  return const_cast<typename any_stored_type<T>::type&> (value);
-}
-
-template <class T>
-inline typename any_stored_type<T>::type& get_unqualified_value (reference_wrapper<T>& value)
-{
-  return get_unqualified_value (value.get ());
-}
-
-template <class T>
-inline typename any_stored_type<T>::type& get_unqualified_value (const reference_wrapper<T>& value)
-{
-  return get_unqualified_value (value.get ());
-}
-
-template <class T>
-inline typename any_stored_type<T>::type& get_unqualified_value (volatile reference_wrapper<T>& value)
-{
-  return get_unqualified_value (value.get ());
-}
-
-template <class T>
-inline typename any_stored_type<T>::type& get_unqualified_value (const volatile reference_wrapper<T>& value)
-{
-  return get_unqualified_value (value.get ());
-}
-
-/*
-    ќпределение RTTI-типа переменной
-*/
-
-template <class T>
-inline const std::type_info& get_typeid (T& value)
-{
-  return &value ? typeid (value) : typeid (T);
-}
-
-template <class T>
-inline const std::type_info& get_typeid (T* value)
-{
-  return value ? typeid (value) : typeid (T*);
-}
 
 /*
     ѕроверка на 0
@@ -192,16 +29,10 @@ struct any_holder: public reference_counter
 {
   virtual ~any_holder () {}
 
-  virtual any_holder*           clone                 () = 0;
-  virtual size_t                qualifier_mask        () = 0;
-  virtual const std::type_info& type                  () = 0;
-  virtual const std::type_info& stored_type           () = 0;
-  virtual const std::type_info& castable_type         () = 0;
-  virtual void                  dump                  (stl::string&) = 0;
-  virtual void                  set_content           (const stl::string&) = 0;
-  virtual dynamic_cast_root*    get_dynamic_cast_root () = 0;
-  virtual bool                  null                  () = 0;
-  virtual bool                  try_cast              (void*& target_ptr, const std::type_info& target_type) = 0;
+  virtual any_holder*           clone      () = 0;
+  virtual const std::type_info& type       () = 0;
+  virtual bool                  null       () = 0;
+  virtual custom_ref_caster     get_caster () = 0;
 };
 
 /*
@@ -217,73 +48,21 @@ struct any_holder: public reference_counter
     —одержимое вариативной переменной
 */
 
-template <class T>
-bool try_direct_cast (T& source, void*& target_ptr, const std::type_info& target_type)
-{
-  static const std::type_info& source_type = typeid (T);
-
-  if (&target_type != &source_type)
-    return false;
-    
-  target_ptr = &source;
-
-  return true;
-}
-
-template <class T>
-bool try_direct_cast (xtl::reference_wrapper<T>& source, void*& target_ptr, const std::type_info& target_type)
-{
-  static const std::type_info& source_type = typeid (T);
-
-  if (&target_type != &source_type)
-    return false;
-    
-  target_ptr = &source.get ();
-
-  return true;
-}
-
 template <class T> struct any_content: public any_holder
 {
-  typedef typename any_stored_type<T>::type base_type;
+  any_content (const T& in_value) : value (const_cast<T&> (in_value))  {}
+  
+  const std::type_info& type () { return typeid (T); }
+  bool                  null () { return is_null (value); }
 
-  any_content (const T& in_value) : value (get_unqualified_value (in_value)) {}
-  
-  const std::type_info& type           () { return typeid (T); }
-  const std::type_info& stored_type    () { return typeid (base_type); }
-  const std::type_info& castable_type  () { return get_typeid (get_castable_value (value)); }
-  size_t                qualifier_mask () { return any_qualifier_mask<T>::value; }
-  bool                  null           () { return is_null (get_castable_value (value)); }
-  
   any_holder* clone () { return new any_content<T> (*this); }
-  
-  bool try_cast (void*& target_ptr, const std::type_info& target_type)
+
+  custom_ref_caster get_caster ()
   {
-    return try_direct_cast (value, target_ptr, target_type);
+    return custom_ref_caster (get_castable_value (value));
   }
 
-  dynamic_cast_root* get_dynamic_cast_root ()
-  {
-    using adl_defaults::get_root;
-
-    return get_unqualified_value (get_root (get_castable_value (value)));
-  }
-
-  void dump (stl::string& buffer)
-  {
-    using adl_defaults::to_string;
-
-    to_string (buffer, get_castable_value (value));
-  }
-
-  void set_content (const stl::string& buffer)
-  {
-    using adl_defaults::to_value;
-
-    to_value (buffer, get_castable_value (value));
-  }
-
-  base_type value;
+  T value;
 };
 
 }
@@ -373,11 +152,6 @@ inline const std::type_info& any::type () const
   return content_ptr ? content_ptr->type () : typeid (void);
 }
 
-inline const std::type_info& any::castable_type () const
-{
-  return content_ptr ? content_ptr->castable_type () : typeid (void);
-}
-
 template <class T>
 inline T* any::content ()
 {
@@ -403,36 +177,6 @@ inline const T* any::content () const
 namespace detail
 {
 
-//обЄртки дл€ приведени€ типов через dynamic_cast
-template <class DstT, bool has_vtbl=type_traits::is_polymorphic<DstT>::value>
-struct dynamic_caster_helper
-{
-  static DstT* cast (dynamic_cast_root* source)
-  {
-    DstT* result = dynamic_cast<DstT*> (source);
-
-    if (!result)
-      throw bad_any_cast_internal (bad_any_cast::bad_dynamic_cast);
-
-    return result;
-  }
-};
-
-template <class DstT> struct dynamic_caster_helper<DstT, false>
-{
-  static DstT* cast (dynamic_cast_root*) { throw bad_any_cast_internal (bad_any_cast::bad_dynamic_cast); }
-};
-
-template <class DstT> struct dynamic_caster
-{
-  static DstT& cast (dynamic_cast_root* source) { return *dynamic_caster_helper<DstT>::cast (source); }
-};
-
-template <class DstT> struct dynamic_caster<DstT*>
-{
-  static DstT* cast (dynamic_cast_root* source) { return dynamic_caster_helper<DstT>::cast (source); }
-};
-
 template <class T> struct any_return_value_wrapper
 {
   T value;
@@ -440,153 +184,15 @@ template <class T> struct any_return_value_wrapper
   any_return_value_wrapper () : value () {}
 };
 
-//попытка приведени€ строки в значение
-template <class T>
-inline T try_lexical_cast (const stl::string& buffer, type<T>)
-{
-  using adl_defaults::to_value;
-
-  any_return_value_wrapper<T> value_wrapper;
-
-  to_value (buffer, value_wrapper.value);
-
-  return value_wrapper.value;
-}
-
-template <class T>
-inline T& try_lexical_cast (const stl::string&, type<T&>)
-{
-    //невозможно лексикографически приводить к ссылочным типам данных
-  throw bad_any_cast_internal (bad_any_cast::bad_to_reference_cast);
-}
-
-template <class T>
-inline T& try_lexical_cast (const stl::string&, type<reference_wrapper<T> >)
-{
-    //невозможно лексикографически приводить к ссылочным типам данных
-  throw bad_any_cast_internal (bad_any_cast::bad_to_reference_cast);
-}
-
 }
 
 template <class T>
 inline const T any::cast () const
 {
   if (!content_ptr)
-    throw bad_any_cast (bad_any_cast::bad_direct_cast, type (), typeid (T));
+    throw bad_any_cast (type (), typeid (T));
 
-  try
-  {
-    typedef typename type_traits::remove_reference<T>::type  nonref;
-    typedef typename detail::any_stored_type<nonref>::type   stored_type;
-
-      //проверка возможности const_cast приведени€
-
-    static const size_t target_qualifier_mask = detail::any_qualifier_mask<nonref>::value;
-
-    bool is_lost_qualifiers = (content_ptr->qualifier_mask () & ~target_qualifier_mask) != 0;
-    
-    if (is_lost_qualifiers)
-    {
-        //преобразование невозможно, из-за понижени€ уровн€ cv-квалификаторов
-
-      throw bad_any_cast (bad_any_cast::bad_const_cast, type (), typeid (T));
-    }    
-
-       //попытка пр€мого преобразовани€
-       
-//    typedef typename type_traits::remove_cv<nonref>::type direct_cast_type;
-    typedef stored_type direct_cast_type;
-
-    static const std::type_info& target_type = typeid (direct_cast_type);
-    
-    void* result = 0;
-
-    if (!type_traits::is_abstract<direct_cast_type>::value && content_ptr->try_cast (result, target_type))      
-      return *reinterpret_cast<direct_cast_type*> (result);
-
-      //попытка приведени€ через dynamic_cast_root
-
-    if (dynamic_cast_root* dc_root = content_ptr->get_dynamic_cast_root ())
-    {
-      if (is_lost_qualifiers)
-      {
-          //преобразование невозможно, из-за понижени€ уровн€ cv-квалификаторов
-
-        throw bad_any_cast (bad_any_cast::bad_const_cast, type (), typeid (T));
-      }
-
-      return detail::dynamic_caster<nonref>::cast (dc_root);
-    }
-
-      //попытка лексикографического приведени€
-
-    stl::string buffer;
-
-    content_ptr->dump (buffer);
-
-    return detail::try_lexical_cast (buffer, xtl::type<typename detail::any_stored_type<T>::type> ());
-  }
-  catch (detail::bad_any_cast_internal& exception)
-  {
-    throw bad_any_cast (exception.error_id, type (), typeid (T));
-  }
-}
-
-/*
-    Ћексикографическое приведение
-*/
-
-inline void any::to_string (stl::string& buffer) const
-{
-  if (!content_ptr)
-  {
-    buffer.clear ();
-    return;
-  }
-
-  try
-  {
-    content_ptr->dump (buffer);
-  }
-  catch (detail::bad_any_cast_internal& exception)
-  {
-    throw bad_any_cast (exception.error_id, type (), typeid (stl::string));
-  }
-}
-
-inline void any::set_content (const stl::string& buffer)
-{
-  if (!content_ptr)
-    return;
-
-    //проверка возможности const_cast приведени€
-
-  if (content_ptr->qualifier_mask () & (detail::any_qualifier_const_bit | detail::any_qualifier_ptr_const_bit))
-  {
-      //преобразование невозможно, из-за понижени€ уровн€ cv-квалификаторов
-
-    throw bad_any_cast (bad_any_cast::bad_const_cast, typeid (const stl::string), type ());
-  }
-
-  try
-  {
-    content_ptr->set_content (buffer);
-  }
-  catch (detail::bad_any_cast_internal& exception)
-  {
-    throw bad_any_cast (exception.error_id, typeid (const stl::string), type ());
-  }
-}
-
-inline void to_string (stl::string& buffer, const volatile any& value)
-{
-  const_cast<const any&> (value).to_string (buffer);
-}
-
-inline void to_value  (const stl::string& buffer, volatile any& value)
-{
-  const_cast<any&> (value).set_content (buffer);
+  return content_ptr->get_caster ().cast<T> ();
 }
 
 /*
@@ -608,9 +214,7 @@ inline void swap (any& a1, any& a2)
 }
 
 /*
-===================================================================================================
     ”тилиты
-===================================================================================================
 */
 
 /*
@@ -637,7 +241,7 @@ inline T any_cast (any& a)
   nonref* result = any_cast<nonref> (&a);
 
   if (!result)
-    throw bad_any_cast (bad_any_cast::bad_direct_cast, a.type (), typeid (T));
+    throw bad_any_cast (a.type (), typeid (T));
 
   return *result;
 }
@@ -650,7 +254,7 @@ inline const T any_cast (const any& a)
   const nonref* result = any_cast<nonref> (&a);
 
   if (!result)
-    throw bad_any_cast (bad_any_cast::bad_direct_cast, a.type (), typeid (T));
+    throw bad_any_cast (a.type (), typeid (T));
 
   return *result;
 }
@@ -676,9 +280,9 @@ inline T& get_castable_value (T& value)
 }
 
 template <class T>
-inline T& get_castable_value (T* ptr)
+inline T* get_castable_value (T* ptr)
 {
-  return *ptr;
+  return ptr;
 }
 
 inline char* get_castable_value (char* ptr)
@@ -692,37 +296,37 @@ inline wchar_t* get_castable_value (wchar_t* ptr)
 }
 
 template <class T>
-inline T& get_castable_value (stl::auto_ptr<T>& ptr)
+inline T* get_castable_value (stl::auto_ptr<T>& ptr)
 {
-  return *ptr;
+  return &*ptr;
 }
 
 template <class T>
-inline T& get_castable_value (shared_ptr<T>& ptr)
+inline T* get_castable_value (shared_ptr<T>& ptr)
 {
-  return *ptr;
+  return &*ptr;
 }
 
 template <class T, template <class > class Strategy>
-inline T& get_castable_value (intrusive_ptr<T, Strategy>& ptr)
+inline T* get_castable_value (intrusive_ptr<T, Strategy>& ptr)
 {
-  return *ptr;
+  return &*ptr;
 }
 
 template <class T>
-inline T& get_castable_value (com_ptr<T>& ptr)
+inline T* get_castable_value (com_ptr<T>& ptr)
 {
-  return *ptr;
+  return &*ptr;
 }
 
 template <class T>
-inline T& get_castable_value (reference_wrapper<T>& ref)
+inline T* get_castable_value (reference_wrapper<T>& ref)
 {
-  return ref.get ();
+  return &ref.get ();
 }
 
 template <class T>
-inline T& get_castable_value (trackable_ptr<T>& ptr)
+inline T* get_castable_value (trackable_ptr<T>& ptr)
 {
-  return *ptr;
+  return &*ptr;
 }
