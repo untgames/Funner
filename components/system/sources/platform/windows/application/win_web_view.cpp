@@ -52,7 +52,7 @@ class SysTempFile
       if (!GetTempFileNameW (dir_name.c_str (), L"TEMP", 0, &wfile_name [0]))
         raise_error ("::GetTempFileName");
 
-      file_name = common::tostring (wfile_name);
+      file_name = common::tostring (wfile_name) + ".html";
         
         //копирование содержимого
       
@@ -75,7 +75,7 @@ class SysTempFile
     {
       try
       {
-        common::FileSystem::Remove (Path ().c_str ());
+//        common::FileSystem::Remove (Path ().c_str ());
       }
       catch (...)
       {

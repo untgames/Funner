@@ -87,11 +87,12 @@ public class EngineWebViewController extends EngineViewController
 
       getSettings ().setJavaScriptEnabled (true);
 
+//      setBackgroundColor (android.graphics.Color.WHITE);
+      setBackgroundColor (android.graphics.Color.TRANSPARENT);
+
       setWebViewClient (new EngineWebViewClient (controller));      
       
-      requestFocus (View.FOCUS_DOWN);
-      
-//      setBackgroundColor (android.graphics.Color.WHITE);
+      requestFocus (View.FOCUS_DOWN);      
     }
     
     @Override
