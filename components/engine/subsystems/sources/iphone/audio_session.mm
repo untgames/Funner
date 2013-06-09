@@ -145,6 +145,13 @@ class AudioSessionManager
       [video_player_listener release];
     }
 
+    ///Change audio category
+    void SetAudioCategory (int category)
+    {
+      check_audio_session_error (AudioSessionSetProperty (kAudioSessionProperty_AudioCategory,
+                                 sizeof (category), &category), "engine::AudioSessionManage::SetAudioCategory");
+    }
+
     ///Установка/получение подсистемы
     IPhoneAudioSessionSubsystem* ActiveSubsystem ()
     {
@@ -217,6 +224,30 @@ IPhoneAudioSessionSubsystem::IPhoneAudioSessionSubsystem (common::ParseNode& nod
 {
   try
   {
+    const char* audio_category = common::get<const char*> (node, "AudioCategory", 0);
+
+    if (audio_category)
+    {
+      int category;
+
+      if (!xtl::xstrcmp (audio_category, "AmbientSound"))
+        category = kAudioSessionCategory_AmbientSound;
+      else if (!xtl::xstrcmp (audio_category, "SoloAmbientSound"))
+        category = kAudioSessionCategory_SoloAmbientSound;
+      else if (!xtl::xstrcmp (audio_category, "MediaPlayback"))
+        category = kAudioSessionCategory_MediaPlayback;
+      else if (!xtl::xstrcmp (audio_category, "RecordAudio"))
+        category = kAudioSessionCategory_RecordAudio;
+      else if (!xtl::xstrcmp (audio_category, "PlayAndRecord"))
+        category = kAudioSessionCategory_PlayAndRecord;
+      else if (!xtl::xstrcmp (audio_category, "AudioProcessing"))
+        category = kAudioSessionCategory_AudioProcessing;
+      else
+        throw xtl::format_operation_exception ("", "Unknown audio category '%s'", audio_category);
+
+      AudioSessionManagerSingleton::Instance ()->SetAudioCategory (category);
+    }
+
     for (common::ParseNamesakeIterator iter = node.First ("InterruptionAffectedSubsystems"); iter; ++iter)
     {
       common::StringArray wildcards        = common::split (common::get<const char*> (*iter, "Wildcards"));
