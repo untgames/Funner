@@ -176,6 +176,8 @@ template <class T> struct type_converter_base_impl
   public:
     type_converter_base_impl ()
       : converter (type_converter::instance ())
+      , identity_converter (singleton_default<identity_converter_impl<T>, false>::instance ())
+      , pointer_address_converter (singleton_default<pointer_address_converter_impl<T>, false>::instance ())
     {
       add (typeid (T), &identity_converter);
       add (typeid (T*), &pointer_address_converter);
@@ -197,8 +199,8 @@ template <class T> struct type_converter_base_impl
 
   private:
     type_converter&                    converter;
-    identity_converter_impl<T>         identity_converter;
-    pointer_address_converter_impl<T>  pointer_address_converter;
+    identity_converter_impl<T>&        identity_converter;
+    pointer_address_converter_impl<T>& pointer_address_converter;
 };
 
 template <class T> struct type_converter_impl: public type_converter_base_impl<T> {};
@@ -264,7 +266,6 @@ inline const type_converter_item* find_converter (bool throwOnCV = false)
 template <class Ret>
 inline const type_converter_item* find_converter (const custom_ref_caster_type_info& source_type, bool throwOnCV = false)
 {
-//printf ("!!! search %s -> %s /// %d %d  %d %d\n", source_type.source_type->name (), typeid (Ret).name (), source_type.is_const, source_type.is_volatile, converter_get_cv<Ret>::is_const, converter_get_cv<Ret>::is_volatile);
   if (source_type.is_const && !converter_get_cv<Ret>::is_const)
   {
     if (throwOnCV)
@@ -282,6 +283,9 @@ inline const type_converter_item* find_converter (const custom_ref_caster_type_i
   }
 
   typedef typename converter_remove_cv<Ret>::type To;
+
+  if (&typeid (To) == source_type.source_type)
+    return &singleton_default<identity_converter_impl<To>, false>::instance ();
 
   return type_converter::instance ().find (*source_type.source_type, typeid (To));
 }
@@ -339,7 +343,6 @@ inline custom_ref_caster::custom_ref_caster (From* value)
   , source_type (&singleton_default<detail::custom_ref_caster_type_info_impl<From*>, false>::instance ())
   , pointer_value ((void*)value)
 {
-//  printf ("construct %s\n", typeid (From*).name ());
 }
 
 namespace detail

@@ -119,7 +119,7 @@ template <class T> const T any_multicast (const any&);
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Получение приводимого значения. Используется как базовое при работе any_multicast
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-template <class T> T& get_castable_value (T&);
+template <class T> T* get_castable_value (T&);
 template <class T> T* get_castable_value (T*);
 template <class T> T* get_castable_value (stl::auto_ptr<T>&);
 template <class T> T* get_castable_value (shared_ptr<T>&);
