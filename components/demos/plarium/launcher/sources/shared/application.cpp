@@ -187,20 +187,20 @@ struct Application::Impl : public INotificationListener, public IHsConnectionEve
 
   void OnMessageReceived (HsConnection& sender, unsigned char sender_plugin_id, unsigned char receiver_plugin_id, const unsigned char* message, size_t size)
   {
-    bool quote_found = false;
+    bool replace_symbol_found = false;
 
     for (const unsigned char* m = message; *m; m++)
     {
-      if (*m == '\'')
+      if (*m == '\'' || *m == '\\')
       {
-        quote_found = true;
+        replace_symbol_found = true;
         break;
       }
     }
 
-    if (quote_found)
+    if (replace_symbol_found)
     {
-      size_t escaped_message_size = size * 5;
+      size_t escaped_message_size = size * QUOTE_REPLACEMENT_LENGTH;
 
       if (message_buffer_size < escaped_message_size)
       {
@@ -229,6 +229,12 @@ struct Application::Impl : public INotificationListener, public IHsConnectionEve
           memcpy (replaced_char, QUOTE_REPLACEMENT, QUOTE_REPLACEMENT_LENGTH);
 
           replaced_char += QUOTE_REPLACEMENT_LENGTH - 1;
+        }
+        else if (*m == '\\')
+        {
+          memcpy (replaced_char, "\\\\", 2);
+
+          replaced_char++;
         }
         else
         {

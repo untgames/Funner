@@ -57,10 +57,16 @@ class SysTempFile
     
     ~SysTempFile ()
     {
-      FileSystem::Remove (tostring(file_name).c_str ());
+      try
+      {
+        FileSystem::Remove (tostring(file_name).c_str ());
+      }
+      catch (...)
+      {
+      }
     }
     
-    const char* Path () const { return tostring(file_name).c_str (); }
+    stl::string Path () const { return tostring(file_name); }
   
   private:
     stl::wstring file_name; //טלÿ פאיכא
@@ -1279,7 +1285,7 @@ cursor_t WindowsWindowManager::CreateCursor (const char* file_name, int hotspot_
       
     SysTempFile cursor_file (file_name);
       
-    HANDLE cursor = LoadImageA (0, cursor_file.Path (), IMAGE_CURSOR, 0, 0, LR_LOADFROMFILE);
+    HANDLE cursor = LoadImageA (0, cursor_file.Path ().c_str (), IMAGE_CURSOR, 0, 0, LR_LOADFROMFILE);
     
     if (!cursor)
       raise_error ("::LoadImageA");

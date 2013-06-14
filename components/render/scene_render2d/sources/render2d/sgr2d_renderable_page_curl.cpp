@@ -357,7 +357,7 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
     rasterizer_desc.front_counter_clockwise = true;
     rasterizer_desc.depth_bias              = 0;
     rasterizer_desc.scissor_enable          = scissor_enable;
-    rasterizer_desc.multisample_enable      = false;
+    rasterizer_desc.multisample_enable      = true;
     rasterizer_desc.antialiased_line_enable = false;
 
     return RasterizerStatePtr (device.CreateRasterizerState (rasterizer_desc), false);

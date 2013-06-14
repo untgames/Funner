@@ -25,6 +25,69 @@ struct WebViewInitializer
 
 typedef common::Singleton<WebViewInitializer> WebViewInitializerSingleton;
 
+/*
+    Копирование файла в папку temp
+*/
+
+class SysTempFile
+{
+  public:
+    SysTempFile (const char* data, size_t data_size)
+    {
+        //генерация имени нового файла
+        
+      stl::wstring dir_name;
+      
+      dir_name.fast_resize (MAX_PATH);
+      
+      DWORD dir_len = GetTempPathW (dir_name.size (), &dir_name [0]);
+      
+      if (!dir_len || dir_len > MAX_PATH)
+        raise_error ("::GetTempPath");
+
+      stl::wstring wfile_name;
+        
+      wfile_name.fast_resize (MAX_PATH);
+        
+      if (!GetTempFileNameW (dir_name.c_str (), L"TEMP", 0, &wfile_name [0]))
+        raise_error ("::GetTempFileName");
+
+      file_name = common::tostring (wfile_name) + ".html";
+        
+        //копирование содержимого
+      
+      #ifndef WINCE
+        #undef CopyFile
+      #endif
+
+      common::OutputFile file (Path ().c_str ());
+
+      size_t write_size = file.Write (data, data_size);
+
+      if (write_size != data_size)
+      {
+        common::FileSystem::Remove (Path ().c_str ());
+        throw xtl::format_operation_exception ("syslib::WebView::SysTempFile::SysTempFile", "Can't write data to file");
+      }
+    }
+    
+    ~SysTempFile ()
+    {
+      try
+      {
+//        common::FileSystem::Remove (Path ().c_str ());
+      }
+      catch (...)
+      {
+      }
+    }
+    
+    stl::string Path () const { return file_name; }
+  
+  private:
+    stl::string file_name; //имя файла
+};
+
 }
 
 /*
@@ -657,9 +720,30 @@ void WindowsWindowManager::LoadRequest (web_view_t handle, const char* request)
   }
 }
 
-void WindowsWindowManager::LoadData (web_view_t, const char*, size_t, const char*, const char*, const char*)
+void WindowsWindowManager::LoadData (web_view_t handle, const char* data, size_t data_size, const char*, const char*, const char*)
 {
-  throw xtl::make_not_implemented_exception ("syslib::WindowsWindowManager::LoadData");
+  try
+  {
+    WebViewImpl* view = (WebViewImpl*)handle;
+  
+    if (!handle)
+      throw xtl::make_null_argument_exception ("", "handle");    
+      
+    if (!data)
+      throw xtl::make_null_argument_exception ("", "data");
+
+    if (!data_size)
+      throw xtl::make_null_argument_exception ("", "data_size");
+
+    SysTempFile temp_file (data, data_size);
+
+    LoadRequest (handle, common::format ("file:///%s", temp_file.Path ().c_str ()).c_str ());
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("syslib::WindowsWindowManager::LoadData");
+    throw;
+  }
 }
 
 /*
