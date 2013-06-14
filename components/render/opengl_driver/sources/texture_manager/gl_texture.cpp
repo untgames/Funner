@@ -360,8 +360,8 @@ void Texture::SetData
 {
   static const char* METHOD_NAME = "render::low_level::opengl::Texture::SetData";
 
-  if (context)
-    throw xtl::format_operation_exception (METHOD_NAME, "Context must be null");
+//  if (context)
+//    throw xtl::format_operation_exception (METHOD_NAME, "Context must be null");
   
     //проверка возможности записи
     
@@ -580,8 +580,8 @@ void Texture::GetData
 {
   static const char* METHOD_NAME = "render::low_level::opengl::Texture::GetData";
 
-  if (context)
-    throw xtl::format_operation_exception (METHOD_NAME, "Context must be null");
+//  if (context)
+//    throw xtl::format_operation_exception (METHOD_NAME, "Context must be null");
 
     //проверка возможности чтения
 
