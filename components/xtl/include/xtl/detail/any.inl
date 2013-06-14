@@ -5,6 +5,30 @@
 namespace detail
 {
 
+namespace adl_defaults
+{
+
+/*
+    Свободные функции по умолчанию, для игнорирования отсутствия соответствующих псевдонимов при ADL
+*/
+
+using xtl::to_string;
+
+struct cast_type
+{
+  template <class T> cast_type (const T&) : info (&typeid (T)) {}
+
+  const std::type_info* info;
+};
+
+//по умолчанию типы не преобразуются к строкам
+inline void to_string (stl::string& s, cast_type type)
+{
+  s += type.info->name ();
+}
+
+}
+
 /*
     Проверка на 0
 */
@@ -33,6 +57,7 @@ struct any_holder: public reference_counter
   virtual const std::type_info& type       () = 0;
   virtual bool                  null       () = 0;
   virtual custom_ref_caster     get_caster () = 0;
+  virtual void                  dump       (stl::string&) = 0;
 };
 
 /*
@@ -60,6 +85,13 @@ template <class T> struct any_content: public any_holder
   custom_ref_caster get_caster ()
   {
     return custom_ref_caster (get_castable_value (value));
+  }
+
+  void dump (stl::string& buffer)
+  {
+    using adl_defaults::to_string;
+
+    to_string (buffer, get_castable_value (value));
   }
 
   T value;
@@ -193,6 +225,26 @@ inline const T any::cast () const
     throw bad_any_cast (type (), typeid (T));
 
   return content_ptr->get_caster ().cast<T> ();
+}
+
+/*
+    Печать в строку
+*/
+
+inline void any::to_string (stl::string& buffer) const
+{
+  if (!content_ptr)
+  {
+    buffer.clear ();
+    return;
+  }
+
+  content_ptr->dump (buffer);
+}
+
+inline void to_string (stl::string& buffer, const volatile any& value)
+{
+  const_cast<const any&> (value).to_string (buffer);
 }
 
 /*
