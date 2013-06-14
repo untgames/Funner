@@ -28,8 +28,6 @@
 
 using namespace script;
 
-void to_string (stl::string& buffer, const xtl::any& a);
-
 class MySymbol: public ISymbol
 {
   public:
@@ -211,27 +209,6 @@ struct A
   stl::string name;
 };
 
-void to_string (stl::string& buffer, const xtl::any& a)
-{
-  buffer.clear ();
-
-/*  if (&a.type () == &typeid (int))
-  {
-    xtl::to_string (buffer, a.cast<int&> ());
-    return;
-  }
-
-  if (&a.type () == &typeid (float))
-  {
-    xtl::to_string (buffer, a.cast<float&> ());
-    return;
-  }
-
-  if (&a.type () == &typeid (stl::string))
-  {
-    xtl::to_string (buffer, a.cast<stl::string&> ());
-    return;
-  }*/
-}
+template xtl::declcast<A>;
 
 #endif
