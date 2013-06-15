@@ -1,0 +1,10 @@
+Results of type_converter3_test:
+check convertion A -> B&: true
+check convertion A -> B: true
+check convertion A -> B*: true
+check convertion A -> A: true
+check convertion A -> A&: true
+check convertion A -> A*: true
+a == &b: true
+b1 == &b: true
+xtl::bad_any_cast

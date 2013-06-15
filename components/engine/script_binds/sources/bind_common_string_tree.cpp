@@ -17,6 +17,8 @@ using namespace xtl;
 namespace
 {
 
+template class xtl::declcast<StringNode>;
+
 /*
     Константы
 */

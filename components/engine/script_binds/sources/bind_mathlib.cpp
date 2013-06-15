@@ -381,6 +381,10 @@ void bind_vec_library (InvokerRegistry& vec_lib)
   typedef matrix<T, Size>       matrix_type;
   typedef matrix<T, Size+1>     big_matrix_type;
 
+  xtl::singleton_default<xtl::declcast<vec_type>, false>::instance ();
+  xtl::singleton_default<xtl::declcast<matrix_type>, false>::instance ();
+  xtl::singleton_default<xtl::declcast<big_matrix_type>, false>::instance ();
+
     //регистрация скалярных селекторов
 
   vec_lib.Register ("get_x", make_invoker<T (const vec_type&)> (vec_get_element<vec_type> (0)));
@@ -440,6 +444,10 @@ void bind_matrix_library (InvokerRegistry& mat_lib)
   typedef math::vector<T, Size>   vec_type;
   typedef math::vector<T, Size-1> small_vec_type;
 
+  xtl::singleton_default<xtl::declcast<matrix_type>, false>::instance ();
+  xtl::singleton_default<xtl::declcast<vec_type>, false>::instance ();
+  xtl::singleton_default<xtl::declcast<small_vec_type>, false>::instance ();
+
     //регистрация селекторов
 
   mat_lib.Register ("get", make_invoker (&matrix_get_element<T, Size>));
@@ -481,6 +489,8 @@ void bind_quat_library (InvokerRegistry& quat_lib)
 //  typedef matrix<T, Size> matrix_type;
 //  typedef vector<T, Size>    vec_type;
   typedef quat<T>         quat_type;  
+
+  xtl::singleton_default<xtl::declcast<quat_type>, false>::instance ();
 
     //регистрация селекторов
 
