@@ -45,11 +45,11 @@ struct dynamic_caster<From, To*>
 namespace detail
 {
 
-template <class T> struct converter_type                    { typedef T                                          type; };
-template <class T> struct converter_type<T&>                { typedef typename converter_type<T*>::type          type; };
-template <class T> struct converter_type<const T&>          { typedef typename converter_type<const T*>::type    type; };
-template <class T> struct converter_type<volatile T&>       { typedef typename converter_type<volatile T*>::type type; };
-template <class T> struct converter_type<const volatile T&> { typedef typename converter_type<volatile T*>::type type; };
+template <class T> struct converter_type                    { typedef T                                                type; };
+template <class T> struct converter_type<T&>                { typedef typename converter_type<T*>::type                type; };
+template <class T> struct converter_type<const T&>          { typedef typename converter_type<const T*>::type          type; };
+template <class T> struct converter_type<volatile T&>       { typedef typename converter_type<volatile T*>::type       type; };
+template <class T> struct converter_type<const volatile T&> { typedef typename converter_type<const volatile T*>::type type; };
 
 template <class T> struct converter_remove_cv                    { typedef typename type_traits::remove_cv<T>::type type; };
 template <class T> struct converter_remove_cv<const T*>          { typedef typename converter_remove_cv<T*>::type   type; };
@@ -249,7 +249,7 @@ inline const type_converter_item* find_converter (bool throwOnCV = false)
     return 0;
   }
     
-  if (converter_get_cv<Arg>::is_volatile<Arg> && !converter_get_cv<Ret>::is_volatile)
+  if (converter_get_cv<Arg>::is_volatile && !converter_get_cv<Ret>::is_volatile)
   {
     if (throwOnCV)
       throw xtl::bad_cv_any_cast (typeid (Arg), typeid (Ret));
@@ -325,7 +325,6 @@ inline bool has_custom_cast ()
 inline custom_ref_caster::custom_ref_caster ()
   : source ()
   , source_type (&singleton_default<detail::custom_ref_caster_type_info_impl<void>, false>::instance ())
-  , pointer_value ()
 {
 }
 
@@ -333,15 +332,6 @@ template <class From>
 inline custom_ref_caster::custom_ref_caster (From& value)
   : source ((void*)&value)
   , source_type (&singleton_default<detail::custom_ref_caster_type_info_impl<From>, false>::instance ())
-  , pointer_value ()
-{
-}
-
-template <class From>
-inline custom_ref_caster::custom_ref_caster (From* value)
-  : source (&pointer_value)
-  , source_type (&singleton_default<detail::custom_ref_caster_type_info_impl<From*>, false>::instance ())
-  , pointer_value ((void*)value)
 {
 }
 

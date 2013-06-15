@@ -210,5 +210,14 @@ struct A
 };
 
 template xtl::declcast<A>;
+void to_string (stl::string& buffer, const X& value)
+{
+  buffer = value.name ();
+}
+
+void to_string (stl::string& buffer, const A& value)
+{
+  buffer = common::format ("A('%s')", value.name.c_str ());
+}
 
 #endif

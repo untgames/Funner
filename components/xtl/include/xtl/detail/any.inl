@@ -73,22 +73,6 @@ struct any_holder: public reference_counter
     Содержимое вариативной переменной
 */
 
-template <class T> 
-inline T& unref (T* value)
-{
-  return *value;
-}
-
-inline void*                unref (void* value)          { return value; }
-inline const void*          unref (const void* value)    { return value; }
-inline volatile void*       unref (volatile void* value) { return value; }
-inline const volatile void* unref (const volatile void* value) { return value; }
-
-inline char*                unref (char* value)          { return value; }
-inline const char*          unref (const char* value)    { return value; }
-inline volatile char*       unref (volatile char* value) { return value; }
-inline const volatile char* unref (const volatile char* value) { return value; }
-
 template <class T> struct any_content: public any_holder
 {
   any_content (const T& in_value) : value (const_cast<T&> (in_value))  {}
@@ -100,14 +84,14 @@ template <class T> struct any_content: public any_holder
 
   custom_ref_caster get_caster ()
   {
-    return custom_ref_caster (unref (get_castable_value (value)));
+    return custom_ref_caster (get_castable_value (value));
   }
 
   void dump (stl::string& buffer)
   {
     using adl_defaults::to_string;
 
-    to_string (buffer, unref (get_castable_value (value)));
+    to_string (buffer, get_castable_value (value));
   }
 
   T value;
@@ -342,60 +326,43 @@ inline const T any_multicast (const any& a)
 */
 
 template <class T>
-inline T* get_castable_value (T& value)
+inline T& get_castable_value (T& value)
 {
-  return &value;
+  return value;
 }
 
 template <class T>
-inline T* get_castable_value (T* ptr)
+inline T& get_castable_value (stl::auto_ptr<T>& ptr)
 {
-  return ptr;
-}
-
-inline char* get_castable_value (char* ptr)
-{
-  return ptr;
-}
-
-inline wchar_t* get_castable_value (wchar_t* ptr)
-{
-  return ptr;
+  return *ptr;
 }
 
 template <class T>
-inline T* get_castable_value (stl::auto_ptr<T>& ptr)
+inline T& get_castable_value (shared_ptr<T>& ptr)
 {
-  return &*ptr;
-}
-
-template <class T>
-inline T* get_castable_value (shared_ptr<T>& ptr)
-{
-  return &*ptr;
+  return *ptr;
 }
 
 template <class T, template <class > class Strategy>
-inline T* get_castable_value (intrusive_ptr<T, Strategy>& ptr)
+inline T& get_castable_value (intrusive_ptr<T, Strategy>& ptr)
 {
-  return &*ptr;
+  return *ptr;
 }
 
 template <class T>
-inline T* get_castable_value (com_ptr<T>& ptr)
+inline T& get_castable_value (com_ptr<T>& ptr)
 {
-  return &*ptr;
+  return *ptr;
 }
 
 template <class T>
-inline T* get_castable_value (reference_wrapper<T>& ref)
+inline T& get_castable_value (reference_wrapper<T>& ref)
 {
-  return &ref.get ();
+  return ref.get ();
 }
 
 template <class T>
-inline T* get_castable_value (trackable_ptr<T>& ptr)
+inline T& get_castable_value (trackable_ptr<T>& ptr)
 {
-  return &*ptr;
+  return *ptr;
 }
-

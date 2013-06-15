@@ -39,7 +39,6 @@ class custom_ref_caster
 ///////////////////////////////////////////////////////////////////////////////////////////////////
                           custom_ref_caster ();
     template <class From> custom_ref_caster (From& value);
-    template <class From> custom_ref_caster (From* value);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Приведение типа
@@ -50,7 +49,6 @@ class custom_ref_caster
   private:
     void*                                      source;
     const detail::custom_ref_caster_type_info* source_type;
-    void*                                      pointer_value;
 };
 
 template <class From>
