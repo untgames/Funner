@@ -53,11 +53,12 @@ struct any_holder: public reference_counter
 {
   virtual ~any_holder () {}
 
-  virtual any_holder*           clone      () = 0;
-  virtual const std::type_info& type       () = 0;
-  virtual bool                  null       () = 0;
-  virtual custom_ref_caster     get_caster () = 0;
-  virtual void                  dump       (stl::string&) = 0;
+  virtual any_holder*           clone         () = 0;
+  virtual const std::type_info& type          () = 0;
+  virtual const std::type_info& castable_type () = 0;
+  virtual bool                  null          () = 0;
+  virtual custom_ref_caster     get_caster    () = 0;
+  virtual void                  dump          (stl::string&) = 0;
 };
 
 /*
@@ -77,8 +78,9 @@ template <class T> struct any_content: public any_holder
 {
   any_content (const T& in_value) : value (const_cast<T&> (in_value))  {}
   
-  const std::type_info& type () { return typeid (T); }
-  bool                  null () { return is_null (value); }
+  const std::type_info& type          () { return typeid (T); }
+  const std::type_info& castable_type () { return typeid (get_castable_value (value)); }
+  bool                  null          () { return is_null (value); }
 
   any_holder* clone () { return new any_content<T> (*this); }
 
@@ -182,6 +184,11 @@ inline bool any::null () const
 inline const std::type_info& any::type () const
 {
   return content_ptr ? content_ptr->type () : typeid (void);
+}
+
+inline const std::type_info& any::castable_type () const
+{
+  return content_ptr ? content_ptr->castable_type () : typeid (void);
 }
 
 template <class T>
