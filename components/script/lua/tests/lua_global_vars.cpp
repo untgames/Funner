@@ -14,6 +14,8 @@ struct A
   int id;
 };
 
+template class xtl::declcast<A>;
+
 enum MyEnum
 {
   MyEnum_Zero,

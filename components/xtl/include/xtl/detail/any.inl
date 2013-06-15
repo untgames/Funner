@@ -80,11 +80,11 @@ template <class T> struct any_content: public any_holder
   
   const std::type_info& type          () { return typeid (T); }
   const std::type_info& castable_type () { return typeid (get_castable_value (value)); }
-  bool                  null          () { return is_null (value); }
+  bool                  null          () { return is_null (get_castable_value (value)); } //optimize
 
   any_holder* clone () { return new any_content<T> (*this); }
 
-  custom_ref_caster get_caster ()
+  custom_ref_caster get_caster () //optimize
   {
     return custom_ref_caster (get_castable_value (value));
   }

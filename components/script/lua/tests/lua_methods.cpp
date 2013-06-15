@@ -13,6 +13,8 @@ struct A
   int id;
 };
 
+template class xtl::declcast<A>;
+
 A f (const A& object, int x)
 {
   printf ("f(A(%d),%d)\n", object.id, x);
