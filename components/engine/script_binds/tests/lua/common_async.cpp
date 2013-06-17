@@ -23,6 +23,8 @@ int main ()
     printf ("Test library:\n");
 
     invoke<void> (*script, "test");
+
+    fflush (stdout);
     
     syslib::Application::Run ();    
   }

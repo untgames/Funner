@@ -2,7 +2,7 @@ function test_async_post()
   print "Async post test"
   
   local function OnLoad (data)
---    print ("File data: '" .. data .. "'")
+    print ("File data: '" .. data .. "'")
     if data ~= "" then print ("Data received") end
     
     System.Application.Exit (0)
