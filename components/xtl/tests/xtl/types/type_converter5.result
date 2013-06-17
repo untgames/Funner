@@ -1,0 +1,4 @@
+Results of type_converter5_test:
+check convertion B& -> A&: true
+check convertion B -> A: false
+check convertion B* -> A*: true
