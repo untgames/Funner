@@ -76,9 +76,6 @@ void bind_axis_aligned_box_library (Environment& environment)
   typedef axis_aligned_box<T>         box_type;
   typedef typename box_type::vec_type vec_type;  
 
-  xtl::singleton_default<xtl::declcast<box_type>, false>::instance ();
-  xtl::singleton_default<xtl::declcast<vec_type>, false>::instance ();
-
   InvokerRegistry lib        = environment.CreateLibrary (BV_AXIS_ALIGNED_BOX_LIBRARY);
   InvokerRegistry global_lib = environment.Library ("global");
   

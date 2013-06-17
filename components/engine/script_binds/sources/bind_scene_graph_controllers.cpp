@@ -19,6 +19,13 @@ namespace engine
 namespace scene_graph_script_binds
 {
 
+template class xtl::declcast<controllers::AlignWithNode*,     Controller*>;
+template class xtl::declcast<controllers::LookToNodePoint*,   Controller*>;
+template class xtl::declcast<controllers::MoveToNodePoint*,   Controller*>;
+template class xtl::declcast<controllers::SyncPhysicsToNode*, Controller*>;
+template class xtl::declcast<controllers::Water*,             Controller*>;
+
+
 /*
     Регистрация библиотеки работы с контроллером воды
 */

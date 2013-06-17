@@ -8,6 +8,18 @@ namespace engine
 namespace scene_graph_script_binds
 {
 
+template class xtl::declcast<Light*,       Entity*>;
+template class xtl::declcast<Light*,       Node*>;
+template class xtl::declcast<DirectLight*, Light*>;
+template class xtl::declcast<DirectLight*, Entity*>;
+template class xtl::declcast<DirectLight*, Node*>;
+template class xtl::declcast<PointLight*,  Light*>;
+template class xtl::declcast<PointLight*,  Entity*>;
+template class xtl::declcast<PointLight*,  Node*>;
+template class xtl::declcast<SpotLight*,   Light*>;
+template class xtl::declcast<SpotLight*,   Entity*>;
+template class xtl::declcast<SpotLight*,   Node*>;
+
 /*
     Создание источников света
 */

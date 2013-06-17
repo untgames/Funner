@@ -8,9 +8,6 @@ namespace engine
 namespace scene_graph_script_binds
 {
 
-template class xtl::declcast<Node>;
-template class xtl::declcast<NodeArray>;
-
 /*
     Создание узлов сцены
 */

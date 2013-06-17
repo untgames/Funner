@@ -8,6 +8,21 @@ namespace engine
 namespace scene_graph_script_binds
 {
 
+template class xtl::declcast<SpriteModel*, Entity*>;
+template class xtl::declcast<SpriteModel*, Node*>;
+template class xtl::declcast<Sprite*,      SpriteModel*>;
+template class xtl::declcast<Sprite*,      Entity*>;
+template class xtl::declcast<Sprite*,      Node*>;
+template class xtl::declcast<SpriteList*,  SpriteModel*>;
+template class xtl::declcast<SpriteList*,  Entity*>;
+template class xtl::declcast<SpriteList*,  Node*>;
+template class xtl::declcast<TextLine*,    Entity*>;
+template class xtl::declcast<TextLine*,    Node*>;
+template class xtl::declcast<HeightMap*,   Entity*>;
+template class xtl::declcast<HeightMap*,   Node*>;
+template class xtl::declcast<VisualModel*, Entity*>;
+template class xtl::declcast<VisualModel*, Node*>;
+
 /*
     Создание спрайта
 */

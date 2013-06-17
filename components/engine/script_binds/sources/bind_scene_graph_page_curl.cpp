@@ -18,6 +18,9 @@ namespace engine
 namespace scene_graph_script_binds
 {
 
+template class xtl::declcast<PageCurl*, Entity*>;
+template class xtl::declcast<PageCurl*, Node*>;
+
 /*
     Создание листания
 */
