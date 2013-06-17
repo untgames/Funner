@@ -159,18 +159,6 @@ template <class T> struct pointer_address_converter_impl: public type_converter_
   static T* cast (T& value) { return &value; }
 };
 
-template <class T> struct pointer_dereference_converter_impl: public type_converter_item
-{
-  pointer_dereference_converter_impl ()
-  {
-    source_type = &typeid (T*);
-    target_type = &typeid (T);
-    handler     = &cast;
-  }
-
-  static T cast (T*& value) { return *value; }
-};
-
 template <class T> struct type_converter_base_impl
 {
   public:
@@ -205,20 +193,6 @@ template <class T> struct type_converter_base_impl
 
 template <class T> struct type_converter_impl: public type_converter_base_impl<T> {};
 
-template <class T> struct type_converter_impl<T*>: public type_converter_base_impl<T*>
-{
-  public:
-    using type_converter_base_impl<T*>::add;
-
-    type_converter_impl ()
-    {
-      add (typeid (T), &pointer_dereference_converter);
-    }
-
-  private:
-    pointer_dereference_converter_impl<T> pointer_dereference_converter;
-};
-
 struct custom_ref_caster_type_info
 {
   const std::type_info* source_type;
@@ -235,33 +209,10 @@ template <class T> struct custom_ref_caster_type_info_impl: public custom_ref_ca
     source_type = &typeid (from_type);
     is_const    = converter_get_cv<T>::is_const;
     is_volatile = converter_get_cv<T>::is_volatile;
+
+    singleton_default<declcast<T>, false>::instance ();
   }
 };
-
-template <class Ret, class Arg>
-inline const type_converter_item* find_converter (bool throwOnCV = false)
-{
-  if (converter_get_cv<Arg>::is_const && !converter_get_cv<Ret>::is_const)
-  {
-    if (throwOnCV)
-      throw xtl::bad_cv_any_cast (typeid (Arg), typeid (Ret));
-
-    return 0;
-  }
-    
-  if (converter_get_cv<Arg>::is_volatile && !converter_get_cv<Ret>::is_volatile)
-  {
-    if (throwOnCV)
-      throw xtl::bad_cv_any_cast (typeid (Arg), typeid (Ret));
-
-    return 0;
-  }
-
-  typedef typename converter_remove_cv<Ret>::type To;
-  typedef typename converter_remove_cv<Arg>::type From;
-
-  return singleton_default<type_converter_impl<From>, false>::instance ().find (typeid (To));
-}
 
 template <class Ret>
 inline const type_converter_item* find_converter (const custom_ref_caster_type_info& source_type, bool throwOnCV = false)
@@ -299,7 +250,7 @@ inline const type_converter_item* find_converter (const custom_ref_caster_type_i
 template <class To, class From>
 inline To custom_cast (From& value)
 {
-  const detail::type_converter_item* item = detail::find_converter<typename detail::converter_type<To>::type, typename detail::converter_type<From>::type> (true);
+  const detail::type_converter_item* item = detail::find_converter<typename detail::converter_type<To>::type> (singleton_default<detail::custom_ref_caster_type_info_impl<From>, false>::instance (), true);
 
   if (!item)
     throw bad_any_cast (bad_any_cast::bad_cast, typeid (From), typeid (To));
@@ -315,7 +266,7 @@ inline To custom_cast (From& value)
 template <class From, class To>
 inline bool has_custom_cast ()
 {
-  return detail::find_converter<typename detail::converter_type<To>::type, typename detail::converter_type<From>::type> () != 0;
+  return detail::find_converter<typename detail::converter_type<To>::type> (singleton_default<detail::custom_ref_caster_type_info_impl<From>, false>::instance ()) != 0;
 }
 
 /*
@@ -324,7 +275,7 @@ inline bool has_custom_cast ()
 
 inline custom_ref_caster::custom_ref_caster ()
   : source ()
-  , source_type (&singleton_default<detail::custom_ref_caster_type_info_impl<void>, false>::instance ())
+  , source_type (&singleton_default<detail::custom_ref_caster_type_info_impl<void*>, false>::instance ())
 {
 }
 
@@ -474,4 +425,3 @@ class declcast<T, T, CastTag>
       singleton_default<detail::declcast_impl<From, From*, detail::cast_to_pointer<From, From, static_caster> >, false>::instance ();
     }
 };
-
