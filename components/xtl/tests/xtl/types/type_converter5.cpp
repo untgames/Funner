@@ -18,6 +18,8 @@ int main ()
   TEST (B&, A&);
   TEST (B, A);
   TEST (B*, A*);
+  TEST (B, A*);
+  TEST (B*, A);
  
   return 0;
 }

@@ -405,10 +405,24 @@ class declcast
     declcast ()
     {
       typedef typename detail::converter_remove_cv<typename detail::converter_type<ToT>::type>::type   To;
-      typedef typename detail::converter_remove_cv<typename detail::converter_type<FromT>::type>::type From;      
+      typedef typename detail::converter_remove_cv<typename detail::converter_type<FromT>::type>::type From;
 
       detail::register_converter<From, To, CastTag> (detail::converter_selector<type_traits::is_class<From>::value && type_traits::is_class<To>::value> (),
         detail::converter_selector<type_traits::is_abstract<To>::value> ());
+    }
+};
+
+template <class FromT, class ToT, template <class, class> class CastTag> 
+class declcast<FromT*, ToT*, CastTag>
+{
+  public:
+    declcast ()
+    {
+      typedef typename detail::converter_remove_cv<typename detail::converter_type<ToT>::type>::type   To;
+      typedef typename detail::converter_remove_cv<typename detail::converter_type<FromT>::type>::type From;      
+
+      detail::register_converter<From, To, CastTag> (detail::converter_selector<type_traits::is_class<From>::value && type_traits::is_class<To>::value> (),
+        detail::converter_selector<true> ());
     }
 };
 
@@ -419,6 +433,20 @@ class declcast<T, T, CastTag>
     declcast ()
     {
       typedef typename detail::converter_remove_cv<typename detail::converter_type<T>::type>::type From;
+
+      detail::register_converter<From> (detail::converter_selector<type_traits::is_abstract<From>::value> ());
+
+      singleton_default<detail::declcast_impl<From, From*, detail::cast_to_pointer<From, From, static_caster> >, false>::instance ();
+    }
+};
+
+template <class T, template <class, class> class CastTag>
+class declcast<T*, T*, CastTag>
+{
+  public:
+    declcast ()
+    {
+      typedef typename detail::converter_remove_cv<typename detail::converter_type<T>::type>::type* From;
 
       detail::register_converter<From> (detail::converter_selector<type_traits::is_abstract<From>::value> ());
 
