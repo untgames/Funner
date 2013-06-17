@@ -80,9 +80,9 @@ const LookToNodePoint::AccelerationFunction& LookToNodePoint::AccelerationHandle
    Запуск движения
 */
 
-void LookToNodePoint::Start (Node::ConstPointer node, const math::vec3f& node_space_position, NodeOrt look_axis, NodeOrt rotation_axis)
+void LookToNodePoint::Start (const Node& node, const math::vec3f& node_space_position, NodeOrt look_axis, NodeOrt rotation_axis)
 {
-  impl->target_node   = node;
+  impl->target_node   = &node;
   impl->target_point  = node_space_position;
   impl->rotation_axis = rotation_axis;
   impl->look_axis     = look_axis;

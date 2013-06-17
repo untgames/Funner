@@ -35,7 +35,7 @@ class AlignWithNode: public Controller
 ///Запуск выравнивания (ось target_node_axis в системе координат target_node, node_axis в системе
 ///координат узла контроллера)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void Start (Node::ConstPointer target_node, NodeOrt target_node_axis, NodeOrt node_axis, NodeOrt node_rotation_axis);
+    void Start (const Node& target_node, NodeOrt target_node_axis, NodeOrt node_axis, NodeOrt node_rotation_axis);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Остановка выравнивания
