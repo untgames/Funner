@@ -130,20 +130,24 @@ Collision filter called
 Body collision callback called for event Begin at point 2.21565 1.06546 7.18535
 Collision callback called for event Begin at point 2.21565 1.06546 7.18535
 body transform updated
-Body collision callback called for event Begin at point 3.08196 1.55121 0.627734
-Collision callback called for event Begin at point 3.08196 1.55121 0.627734
+Body collision callback called for event Begin at point 3.08196 1.55121 0.627735
+Collision callback called for event Begin at point 3.08196 1.55121 0.627735
 body transform updated
 Collision filter called
-Body collision callback called for event Begin at point 0.836673 0.982243 6.8548
-Collision callback called for event Begin at point 0.836673 0.982243 6.8548
+Body collision callback called for event Begin at point 0.83667 0.982244 6.8548
+Collision callback called for event Begin at point 0.83667 0.982244 6.8548
 body transform updated
 body transform updated
 Collision filter called
-Body collision callback called for event Begin at point 0.896952 1.35522 0.83903
-Collision callback called for event Begin at point 0.896952 1.35522 0.83903
+Body collision callback called for event Begin at point 0.896958 1.35522 0.839029
+Collision callback called for event Begin at point 0.896958 1.35522 0.839029
 body transform updated
-Body collision callback called for event Begin at point 3.54049 1.41768 7.02281
-Collision callback called for event Begin at point 3.54049 1.41768 7.02281
+Body collision callback called for event Begin at point 3.54048 1.41769 7.02281
+Collision callback called for event Begin at point 3.54048 1.41769 7.02281
+body transform updated
+Collision filter called
+Body collision callback called for event Begin at point -0.402415 1.58518 6.26219
+Collision callback called for event Begin at point -0.402415 1.58518 6.26219
 body transform updated
 Node position = [0.00 0.00 0.00]
-Node position = [2.15 2.97 3.91]
+Node position = [2.14 2.95 3.91]

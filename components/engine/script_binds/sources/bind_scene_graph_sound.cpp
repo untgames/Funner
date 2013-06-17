@@ -10,6 +10,8 @@ namespace scene_graph_script_binds
 
 template class xtl::declcast<SoundEmitter*, Node*>;
 template class xtl::declcast<SoundEmitter*, Entity*>;
+template class xtl::declcast<Listener*,     Node*>;
+template class xtl::declcast<Listener*,     Entity*>;
 
 /*
     Создание слушателя

@@ -220,10 +220,12 @@ Text =
 Font = 
 Color = 1 1 1 1
 Horizontal aligment = Left/Top vertical aligment = Left/Top
+Spacing Multiplier = 1
 Text = text
 Font = font
 Color = 0.1 0.2 0.3 0.4
 Horizontal aligment = Center vertical aligment = Right/Bottom
+Spacing Multiplier = 2
 Text = Non-unicode text
 Color = 0.4 0.3 0.2 0.1
 Color = 0.1 0.2 0.3 0.1
@@ -331,10 +333,17 @@ AlignWithNode controller test
 node2 orientation is 0.186730 0.000000 0.000000 0.982411
 node2 orientation is 0.186730 0.000000 0.000000 0.982411
 Scene input test
+viewport='viewport1' notification='OnScreenTouchMove' touch=-1 button=-1 world_position=50 12.5 0 local_position=0 0
 viewport='viewport1' notification='OnTouchEnter' touch=-1 button=-1 world_position=50 -50 0 local_position=0 0
 viewport='viewport1' notification='OnScreenTouchMove' touch=-1 button=-1 world_position=50 -50 0 local_position=0 0
+viewport='viewport1' notification='OnTouchEnter' touch=-1 button=0 world_position=50 -50 0 local_position=0 0
+viewport='viewport1' notification='OnPressEnter' touch=-1 button=0 world_position=50 -50 0 local_position=0 0
 viewport='viewport1' notification='OnTouchDown' touch=-1 button=0 world_position=50 -50 0 local_position=0 0
+viewport='viewport1' notification='OnPress' touch=-1 button=0 world_position=50 -50 0 local_position=0 0
 viewport='viewport1' notification='OnScreenTouchDown' touch=-1 button=0 world_position=50 -50 0 local_position=0 0
 viewport='viewport1' notification='OnTouchUpInside' touch=-1 button=0 world_position=50 -50 0 local_position=0 0
 viewport='viewport1' notification='OnTouchClick' touch=-1 button=0 world_position=50 -50 0 local_position=0 0
+viewport='viewport1' notification='OnClick' touch=-1 button=0 world_position=50 -50 0 local_position=0 0
+viewport='viewport1' notification='OnTouchLeave' touch=-1 button=0 world_position=50 -50 0 local_position=0 0
+viewport='viewport1' notification='OnPressLeave' touch=-1 button=0 world_position=50 -50 0 local_position=0 0
 viewport='viewport1' notification='OnScreenTouchUp' touch=-1 button=0 world_position=50 -50 0 local_position=0 0

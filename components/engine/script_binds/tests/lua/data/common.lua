@@ -53,7 +53,7 @@ end
 function test_post()
   print "Post test"
 
-  local FILE_NAME = "http://www.google.com" 
+  local FILE_NAME = "http://www.untgames.com" 
 
   local data = Common.File.PostString (FILE_NAME, "post_string")
 
