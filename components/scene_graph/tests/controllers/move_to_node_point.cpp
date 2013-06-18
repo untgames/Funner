@@ -22,8 +22,8 @@ int main ()
   mover1->SetAccelerationHandler (acceleration);
   mover2->SetAccelerationHandler (acceleration);
 
-  mover1->Start (&scene.Root (), math::vec3f (10, 0, 0));
-  mover2->Start (node1, math::vec3f (0, 10, 0));
+  mover1->Start (scene.Root (), math::vec3f (10, 0, 0));
+  mover2->Start (*node1, math::vec3f (0, 10, 0));
   
   scene.Root ().Update (0);  
   scene.Root ().Update (1);

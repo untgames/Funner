@@ -93,9 +93,9 @@ NodeTransformSpace MoveToNodePoint::TransformSpace () const
    Запуск движения
 */
 
-void MoveToNodePoint::Start (Node::ConstPointer node, const math::vec3f& node_space_position)
+void MoveToNodePoint::Start (const Node& node, const math::vec3f& node_space_position)
 {
-  impl->target_node  = node;
+  impl->target_node  = &node;
   impl->target_point = node_space_position;
 }
 

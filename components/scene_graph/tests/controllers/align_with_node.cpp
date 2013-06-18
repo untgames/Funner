@@ -21,7 +21,7 @@ int main ()
 
   mover1->SetAccelerationHandler (acceleration);
 
-  mover1->Start (node1, NodeOrt_Z, NodeOrt_Z, NodeOrt_X);
+  mover1->Start (*node1, NodeOrt_Z, NodeOrt_Z, NodeOrt_X);
 
   node1->SetOrientation (math::degree (90.f), math::degree (0.f), math::degree (0.f));
   

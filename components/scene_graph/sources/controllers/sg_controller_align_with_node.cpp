@@ -79,9 +79,9 @@ const AlignWithNode::AccelerationFunction& AlignWithNode::AccelerationHandler ()
    Запуск движения
 */
 
-void AlignWithNode::Start (Node::ConstPointer target_node, NodeOrt target_node_axis, NodeOrt node_axis, NodeOrt node_rotation_axis)
+void AlignWithNode::Start (const Node& target_node, NodeOrt target_node_axis, NodeOrt node_axis, NodeOrt node_rotation_axis)
 {
-  impl->target_node        = target_node;
+  impl->target_node        = &target_node;
   impl->target_node_axis   = target_node_axis;
   impl->node_rotation_axis = node_rotation_axis;
   impl->node_axis          = node_axis;

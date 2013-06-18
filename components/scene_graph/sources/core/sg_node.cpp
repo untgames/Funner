@@ -4,12 +4,12 @@ using namespace scene_graph;
 using namespace math;
 using namespace common;
 
+namespace scene_graph
+{
+
 /*
     Композиция аффинных преобразований
 */
-
-namespace scene_graph
-{
 
 //композиция преобразований
 void affine_compose (const vec3f& position, const quatf& orientation, const vec3f& scale, mat4f& tm)
@@ -64,6 +64,27 @@ void affine_decompose (const math::mat4f& matrix, math::vec3f& position, math::q
   m [1] = normalize (cross (m [2], m [0]));
   
   rotation = normalize (to_quat (m));
+}
+
+/*
+    Получение имени сообщения
+*/
+
+const char* get_name (NodeEvent event)
+{
+  switch (event)
+  {    
+    case NodeEvent_AfterUpdate:         return "AfterUpdate";
+    case NodeEvent_BeforeDestroy:       return "BeforeDestroy";
+    case NodeEvent_AfterDestroy:        return "AfterDestroy";
+    case NodeEvent_AfterBind:           return "AfterBind";
+    case NodeEvent_BeforeUnbind:        return "BeforeUnbind";
+    case NodeEvent_AfterSceneAttach:    return "AfterSceneAttach";
+    case NodeEvent_BeforeSceneDetach:   return "BeforeSceneDetach";
+    case NodeEvent_AfterSceneChange:    return "AfterSceneChange";
+    default:
+      throw xtl::make_argument_exception ("scene_graph::get_name(NodeEvent)", "event", event);
+  }
 }
 
 }
@@ -941,13 +962,27 @@ struct Node::Impl: public xtl::instance_counter<Node>
     
       //вызываем обработчики событий
 
+    static const char* METHOD_NAME = "scene_graph::Node::Impl::Notify(NodeEvent)";
+
     try
     {     
       signals [event] (*this_node, event);
     }
+    catch (std::exception& e)
+    {
+      common::Log log (LOG_NAME);
+
+      log.Printf ("'%s': node '%s' event %s handler exception '%s'", METHOD_NAME, name.c_str (), get_name (event), e.what ());
+
+      //подавление всех исключений
+    }
     catch (...)
     {
-      //все исключения клиентских обработчиков событий узла поглощаются
+      common::Log log (LOG_NAME);
+
+      log.Printf ("'%s': node '%s' event %s handler unknown exception", METHOD_NAME, name.c_str (), get_name (event));
+
+      //подавление всех исключений
     }
     
       //снимаем флаг обработки события
@@ -1096,7 +1131,7 @@ struct Node::Impl: public xtl::instance_counter<Node>
       
       this_node->EndUpdate ();
     }
-    catch (xtl::exception& e)
+    catch (std::exception& e)
     {
       common::Log log (LOG_NAME);
 

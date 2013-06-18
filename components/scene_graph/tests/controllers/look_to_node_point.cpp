@@ -20,7 +20,7 @@ int main ()
 
   mover1->SetAccelerationHandler (acceleration);
 
-  mover1->Start (&scene.Root (), math::vec3f (10, 0, 0), NodeOrt_Z, NodeOrt_Y);
+  mover1->Start (scene.Root (), math::vec3f (10, 0, 0), NodeOrt_Z, NodeOrt_Y);
   
   scene.Root ().Update (0);
   scene.Root ().Update (TimeValue (2, 10));
