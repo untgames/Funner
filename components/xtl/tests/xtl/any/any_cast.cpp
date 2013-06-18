@@ -182,7 +182,7 @@ int main ()
     printf ("check dynamic any_multicast (source type - class C, casted to A)\n");
     
     const any a3 (static_cast<A*> (&c));
-    
+
     test<A*> ("class A", a3);
     test<B*> ("class B", a3);    
     test<C*> ("class C", a3);
