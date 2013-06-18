@@ -10,7 +10,7 @@ struct B : A
   virtual const char* name () const { return "class B"; }
 };
 
-template class declcast<B, A>;
+template class declcast<B*, A*, reinterpret_caster>;
 
 int main ()
 {
@@ -18,14 +18,14 @@ int main ()
 
   B b;
 
-  xtl::any a (b);
+  xtl::any a (&b);
   
   clock_t start = clock ();
 
   static const size_t N = 10000000;
 
   for (size_t i=0; i<N; i++)
-    a.cast<A> ();
+    a.cast<A*> ();
 
   clock_t end = clock ();
 
