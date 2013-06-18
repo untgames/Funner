@@ -16,14 +16,14 @@ int main ()
 
   B b;
 
-  xtl::any a (b);
+  xtl::any a (&b);
   
   clock_t start = clock ();
 
   static const size_t N = 10000000;
 
   for (size_t i=0; i<N; i++)
-    a.cast<B> ();
+    a.cast<A*> ();
 
   clock_t end = clock ();
 
