@@ -292,6 +292,7 @@ function test_events ()
   scene = nil
   
   collectgarbage ("collect")
+  collectgarbage ("collect")
 end
 
 function test_node_properties ()

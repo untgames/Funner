@@ -29,7 +29,8 @@ namespace scene_graph
 
 inline void push_argument (script::IStack& stack, Node& node)
 {
-  stack.Push (xtl::any (&node));
+//  stack.Push (xtl::any (&node));
+  stack.Push (xtl::any (Node::Pointer (&node)));
 }
 
 }
