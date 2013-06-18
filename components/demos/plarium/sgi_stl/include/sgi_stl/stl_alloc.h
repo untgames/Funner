@@ -281,7 +281,7 @@ typedef malloc_alloc single_client_alloc;
 #if defined(__SUNPRO_CC) || defined(__GNUC__)
 // breaks if we make these template class members:
   enum {_ALIGN = 8};
-  enum {_MAX_BYTES = 128};
+  enum {_MAX_BYTES = 0};
   enum {_NFREELISTS = 16}; // _MAX_BYTES/_ALIGN
 #endif
 
@@ -293,7 +293,7 @@ private:
   // instead of enum { x = N }, but few compilers accept the former.
 #if ! (defined(__SUNPRO_CC) || defined(__GNUC__))
     enum {_ALIGN = 8};
-    enum {_MAX_BYTES = 128};
+    enum {_MAX_BYTES = 0};
     enum {_NFREELISTS = 16}; // _MAX_BYTES/_ALIGN
 # endif
   static size_t
