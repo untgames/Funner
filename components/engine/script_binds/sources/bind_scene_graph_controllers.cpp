@@ -76,7 +76,7 @@ void bind_controller_move_to_node_point_library (Environment& environment)
   lib.Register ("set_AccelerationHandler", make_invoker<void (MoveToNodePoint::*) (const LinearAccelerationEvaluator&)> (&MoveToNodePoint::SetAccelerationHandler));
   lib.Register ("set_TransformSpace",      make_invoker (&MoveToNodePoint::SetTransformSpace));
   lib.Register ("get_TransformSpace",      make_invoker (&MoveToNodePoint::TransformSpace));
-  lib.Register ("Start",                   make_invoker<void (MoveToNodePoint::*) (Node::Pointer node, const math::vec3f&)> (&MoveToNodePoint::Start));
+  lib.Register ("Start",                   make_invoker (&MoveToNodePoint::Start));
   lib.Register ("Stop",                    make_invoker (&MoveToNodePoint::Stop));
 
     //регистрация типа данных
@@ -103,7 +103,7 @@ void bind_controller_look_to_node_point_library (Environment& environment)
     //регистрация операций
 
   lib.Register ("set_AccelerationHandler", make_invoker<void (LookToNodePoint::*) (const LinearAccelerationEvaluator&)> (&LookToNodePoint::SetAccelerationHandler));
-  lib.Register ("Start",                   make_invoker<void (LookToNodePoint::*) (Node::Pointer node, const math::vec3f&, NodeOrt, NodeOrt)> (&LookToNodePoint::Start));
+  lib.Register ("Start",                   make_invoker (&LookToNodePoint::Start));
   lib.Register ("Stop",                    make_invoker (&LookToNodePoint::Stop));
 
     //регистрация типа данных
@@ -130,7 +130,7 @@ void bind_controller_align_with_node_library (Environment& environment)
     //регистрация операций
 
   lib.Register ("set_AccelerationHandler", make_invoker<void (AlignWithNode::*) (const LinearAccelerationEvaluator&)> (&AlignWithNode::SetAccelerationHandler));
-  lib.Register ("Start",                   make_invoker<void (AlignWithNode::*) (Node::Pointer node, NodeOrt, NodeOrt, NodeOrt)> (&AlignWithNode::Start));
+  lib.Register ("Start",                   make_invoker (&AlignWithNode::Start));
   lib.Register ("Stop",                    make_invoker (&AlignWithNode::Stop));
 
     //регистрация типа данных
