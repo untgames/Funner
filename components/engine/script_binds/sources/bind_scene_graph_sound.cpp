@@ -8,10 +8,10 @@ namespace engine
 namespace scene_graph_script_binds
 {
 
-template class xtl::declcast<SoundEmitter*, Node*>;
-template class xtl::declcast<SoundEmitter*, Entity*>;
-template class xtl::declcast<Listener*,     Node*>;
-template class xtl::declcast<Listener*,     Entity*>;
+template class xtl::declcast<SoundEmitter*, Node*, reinterpret_caster>;
+template class xtl::declcast<SoundEmitter*, Entity*, reinterpret_caster>;
+template class xtl::declcast<Listener*,     Node*, reinterpret_caster>;
+template class xtl::declcast<Listener*,     Entity*, reinterpret_caster>;
 
 /*
     Создание слушателя

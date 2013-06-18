@@ -1,5 +1,5 @@
 function test ()
-  local node = Scene.Node.Create ()
+  local node = Scene.Sprite.Create ()
   local pos  = vec3 (1, 2, 3)
   local count = 1000000
 

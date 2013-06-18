@@ -8,14 +8,14 @@ namespace engine
 namespace scene_graph_script_binds
 {
 
-template class xtl::declcast<Camera*,            Node*>;
-template class xtl::declcast<Camera*,            Entity*>;
-template class xtl::declcast<OrthoCamera*,       Node*>;
-template class xtl::declcast<OrthoCamera*,       Entity*>;
-template class xtl::declcast<OrthoCamera*,       Camera*>;
-template class xtl::declcast<PerspectiveCamera*, Node*>;
-template class xtl::declcast<PerspectiveCamera*, Entity*>;
-template class xtl::declcast<PerspectiveCamera*, Camera*>;
+template class xtl::declcast<Camera*,            Node*, reinterpret_caster>;
+template class xtl::declcast<Camera*,            Entity*, reinterpret_caster>;
+template class xtl::declcast<OrthoCamera*,       Node*, reinterpret_caster>;
+template class xtl::declcast<OrthoCamera*,       Entity*, reinterpret_caster>;
+template class xtl::declcast<OrthoCamera*,       Camera*, reinterpret_caster>;
+template class xtl::declcast<PerspectiveCamera*, Node*, reinterpret_caster>;
+template class xtl::declcast<PerspectiveCamera*, Entity*, reinterpret_caster>;
+template class xtl::declcast<PerspectiveCamera*, Camera*, reinterpret_caster>;
 
 /*
     Создание камер

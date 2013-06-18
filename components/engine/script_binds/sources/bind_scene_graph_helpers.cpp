@@ -8,14 +8,14 @@ namespace engine
 namespace scene_graph_script_binds
 {
 
-template class xtl::declcast<helpers::Helper*,  Node*>;
-template class xtl::declcast<helpers::Helper*,  Entity*>;
-template class xtl::declcast<helpers::Box*,     Node*>;
-template class xtl::declcast<helpers::Box*,     Entity*>;
-template class xtl::declcast<helpers::Box*,     helpers::Helper*>;
-template class xtl::declcast<helpers::Sphere*,  Node*>;
-template class xtl::declcast<helpers::Sphere*,  Entity*>;
-template class xtl::declcast<helpers::Sphere*,  helpers::Helper*>;
+template class xtl::declcast<helpers::Helper*,  Node*, reinterpret_caster>;
+template class xtl::declcast<helpers::Helper*,  Entity*, reinterpret_caster>;
+template class xtl::declcast<helpers::Box*,     Node*, reinterpret_caster>;
+template class xtl::declcast<helpers::Box*,     Entity*, reinterpret_caster>;
+template class xtl::declcast<helpers::Box*,     helpers::Helper*, reinterpret_caster>;
+template class xtl::declcast<helpers::Sphere*,  Node*, reinterpret_caster>;
+template class xtl::declcast<helpers::Sphere*,  Entity*, reinterpret_caster>;
+template class xtl::declcast<helpers::Sphere*,  helpers::Helper*, reinterpret_caster>;
 
 /*
     Создание хелперов
