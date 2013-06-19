@@ -124,7 +124,7 @@ class ApplicationDelegateImpl: public IApplicationDelegate, public xtl::referenc
       }
       @catch (NSException* e)
       {
-        throw xtl::format_operation_exception (METHOD_NAME, "%s", [[e reason] cStringUsingEncoding:NSASCIIStringEncoding]);
+        throw xtl::format_operation_exception (METHOD_NAME, "%s, at %s", [[e reason] cStringUsingEncoding:NSASCIIStringEncoding], [[[e callStackSymbols] description] cStringUsingEncoding:NSASCIIStringEncoding]);
       }
     }
 
