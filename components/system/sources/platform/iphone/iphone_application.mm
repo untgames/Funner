@@ -261,10 +261,11 @@ typedef stl::vector<syslib::iphone::IApplicationListener*> ListenerArray;
 @interface ApplicationDelegateInternal : NSObject
 {
   @private
-    ListenerArray *listeners;             //слушатели событий
-    CADisplayLink *idle_timer;            //таймер вызова OnIdle
-    NSTimer       *background_idle_timer; //таймер вызова OnIdle в неактивном состоянии
-    bool          main_view_visible;      //виден ли главный view приложения
+    ListenerArray *listeners;                   //слушатели событий
+    CADisplayLink *idle_timer;                  //таймер вызова OnIdle
+    NSTimer       *background_idle_timer;       //таймер вызова OnIdle в неактивном состоянии
+    bool          background_execution_enabled; //нужно ли вызывать OnIdle в неактивном состоянии
+    bool          main_view_visible;            //виден ли главный view приложения
 }
 
 @property (nonatomic, readonly) ListenerArray* listeners;
@@ -297,6 +298,9 @@ typedef stl::vector<syslib::iphone::IApplicationListener*> ListenerArray;
 
 -(void)startBackgroundIdleTimer
 {
+  if (!background_execution_enabled)
+    return;
+
   [self deleteBackgroundIdleTimer];
 
   background_idle_timer = [[NSTimer scheduledTimerWithTimeInterval:BACKGROUND_IDLE_TIMER_PERIOD target:self selector:@selector (onIdle:) userInfo:nil repeats:YES] retain];
