@@ -894,6 +894,7 @@ local function test_scene_input ()
   camera.Bottom = -100
   camera.ZNear = -1
   camera.ZFar = 1
+  camera.Name = "camera1"
     
   camera:Translate (0, 0, 1)
   
@@ -924,6 +925,10 @@ local function test_scene_input ()
   screen:SetArea (0, 0, 1000, 1000)
     
   screen:Attach (viewport)
+
+  local cam = viewport.Camera
+
+  print ("check camera name " .. cam.Name)
   
   local manager = Scene.InputManager.Create ()
 

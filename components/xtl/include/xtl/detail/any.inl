@@ -339,6 +339,17 @@ inline T& get_castable_value (T& value)
 }
 
 template <class T>
+inline T& get_castable_value (T* value)
+{
+  return *value;
+}
+
+inline const char*& get_castable_value (const char*& value)
+{
+  return value;
+}
+
+template <class T>
 inline T& get_castable_value (stl::auto_ptr<T>& ptr)
 {
   return *ptr;
