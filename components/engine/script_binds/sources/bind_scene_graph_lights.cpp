@@ -8,17 +8,17 @@ namespace engine
 namespace scene_graph_script_binds
 {
 
-template class xtl::declcast<Light*,       Entity*, reinterpret_caster>;
-template class xtl::declcast<Light*,       Node*, reinterpret_caster>;
-template class xtl::declcast<DirectLight*, Light*, reinterpret_caster>;
-template class xtl::declcast<DirectLight*, Entity*, reinterpret_caster>;
-template class xtl::declcast<DirectLight*, Node*, reinterpret_caster>;
-template class xtl::declcast<PointLight*,  Light*, reinterpret_caster>;
-template class xtl::declcast<PointLight*,  Entity*, reinterpret_caster>;
-template class xtl::declcast<PointLight*,  Node*, reinterpret_caster>;
-template class xtl::declcast<SpotLight*,   Light*, reinterpret_caster>;
-template class xtl::declcast<SpotLight*,   Entity*, reinterpret_caster>;
-template class xtl::declcast<SpotLight*,   Node*, reinterpret_caster>;
+template class engine::decl_sg_cast<Light,       Entity>;
+template class engine::decl_sg_cast<Light,       Node>;
+template class engine::decl_sg_cast<DirectLight, Light>;
+template class engine::decl_sg_cast<DirectLight, Entity>;
+template class engine::decl_sg_cast<DirectLight, Node>;
+template class engine::decl_sg_cast<PointLight,  Light>;
+template class engine::decl_sg_cast<PointLight,  Entity>;
+template class engine::decl_sg_cast<PointLight,  Node>;
+template class engine::decl_sg_cast<SpotLight,   Light>;
+template class engine::decl_sg_cast<SpotLight,   Entity>;
+template class engine::decl_sg_cast<SpotLight,   Node>;
 
 /*
     Создание источников света

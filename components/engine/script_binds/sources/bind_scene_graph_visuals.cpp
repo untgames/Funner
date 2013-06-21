@@ -8,20 +8,20 @@ namespace engine
 namespace scene_graph_script_binds
 {
 
-template class xtl::declcast<SpriteModel*, Entity*, reinterpret_caster>;
-template class xtl::declcast<SpriteModel*, Node*, reinterpret_caster>;
-template class xtl::declcast<Sprite*,      SpriteModel*, reinterpret_caster>;
-template class xtl::declcast<Sprite*,      Entity*, reinterpret_caster>;
-template class xtl::declcast<Sprite*,      Node*, reinterpret_caster>;
-template class xtl::declcast<SpriteList*,  SpriteModel*, reinterpret_caster>;
-template class xtl::declcast<SpriteList*,  Entity*, reinterpret_caster>;
-template class xtl::declcast<SpriteList*,  Node*, reinterpret_caster>;
-template class xtl::declcast<TextLine*,    Entity*, reinterpret_caster>;
-template class xtl::declcast<TextLine*,    Node*, reinterpret_caster>;
-template class xtl::declcast<HeightMap*,   Entity*, reinterpret_caster>;
-template class xtl::declcast<HeightMap*,   Node*, reinterpret_caster>;
-template class xtl::declcast<VisualModel*, Entity*, reinterpret_caster>;
-template class xtl::declcast<VisualModel*, Node*, reinterpret_caster>;
+template class engine::decl_sg_cast<SpriteModel, Entity>;
+template class engine::decl_sg_cast<SpriteModel, Node>;
+template class engine::decl_sg_cast<Sprite,      SpriteModel>;
+template class engine::decl_sg_cast<Sprite,      Entity>;
+template class engine::decl_sg_cast<Sprite,      Node>;
+template class engine::decl_sg_cast<SpriteList,  SpriteModel>;
+template class engine::decl_sg_cast<SpriteList,  Entity>;
+template class engine::decl_sg_cast<SpriteList,  Node>;
+template class engine::decl_sg_cast<TextLine,    Entity>;
+template class engine::decl_sg_cast<TextLine,    Node>;
+template class engine::decl_sg_cast<HeightMap,   Entity>;
+template class engine::decl_sg_cast<HeightMap,   Node>;
+template class engine::decl_sg_cast<VisualModel, Entity>;
+template class engine::decl_sg_cast<VisualModel, Node>;
 
 /*
     Создание спрайта

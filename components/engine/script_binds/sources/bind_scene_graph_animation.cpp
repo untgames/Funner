@@ -3,7 +3,7 @@
 using namespace scene_graph;
 using namespace scene_graph::controllers;
 
-template class xtl::declcast<controllers::AnimationController*, Controller*, reinterpret_caster>;
+template class engine::decl_sg_cast<controllers::AnimationController, Controller>;
 
 namespace
 {

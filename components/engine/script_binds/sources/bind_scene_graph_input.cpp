@@ -8,14 +8,14 @@ namespace engine
 namespace scene_graph_script_binds
 {
 
-template class xtl::declcast<InputZoneModel*, Node*, reinterpret_caster>;
-template class xtl::declcast<InputZoneModel*, Entity*, reinterpret_caster>;
-template class xtl::declcast<InputZone*,      InputZoneModel*, reinterpret_caster>;
-template class xtl::declcast<InputZone*,      Node*, reinterpret_caster>;
-template class xtl::declcast<InputZone*,      Entity*, reinterpret_caster>;
-template class xtl::declcast<InputZoneList*,  InputZoneModel*, reinterpret_caster>;
-template class xtl::declcast<InputZoneList*,  Node*, reinterpret_caster>;
-template class xtl::declcast<InputZoneList*,  Entity*, reinterpret_caster>;
+template class engine::decl_sg_cast<InputZoneModel, Node>;
+template class engine::decl_sg_cast<InputZoneModel, Entity>;
+template class engine::decl_sg_cast<InputZone,      InputZoneModel>;
+template class engine::decl_sg_cast<InputZone,      Node>;
+template class engine::decl_sg_cast<InputZone,      Entity>;
+template class engine::decl_sg_cast<InputZoneList,  InputZoneModel>;
+template class engine::decl_sg_cast<InputZoneList,  Node>;
+template class engine::decl_sg_cast<InputZoneList,  Entity>;
 
 /*
     Регистрация библиотеки InputZoneNotification
