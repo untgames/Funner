@@ -337,6 +337,16 @@ inline bool custom_ref_caster::has_cast () const
   return detail::find_converter<typename detail::converter_type<To>::type> (*source_type) != 0;
 }
 
+inline bool custom_ref_caster::empty () const
+{
+  return source == 0;
+}
+
+inline const std::type_info& custom_ref_caster::type () const
+{
+  return *source_type->source_type;
+}
+
 template <class From>
 inline custom_ref_caster make_custom_ref_caster (From& value)
 {
