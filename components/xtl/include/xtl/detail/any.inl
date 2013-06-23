@@ -56,9 +56,13 @@ inline bool is_null (const char*& value)
 
 struct any_holder: public reference_counter
 {
+  custom_ref_caster caster;
+
+  template <class T>
+  any_holder (T& content) : caster (content) {}
+ 
   virtual ~any_holder () {}
 
-  virtual custom_ref_caster     get_caster () = 0;
   virtual any_holder*           clone      () = 0;
   virtual const std::type_info& type       () = 0;
   virtual void                  dump       (stl::string&) = 0;
@@ -77,27 +81,57 @@ struct any_holder: public reference_counter
     Содержимое вариативной переменной
 */
 
-template <class T> struct any_content: public any_holder
+template <class T> struct any_content
 {
-  any_content (const T& in_value) : value (const_cast<T&> (in_value))  {}
+  any_content (T& in_value) : value (in_value)  {}
+
+  T value;
+};
+
+template <class Ptr> struct trackable_ptr_content
+{
+  Ptr             value;
+  auto_connection connection;
+
+  virtual void update_castable_value () = 0;
+
+  struct destroy_fn
+  {
+    trackable_ptr_content* content;
+
+    destroy_fn (trackable_ptr_content* in_content) : content (in_content) {}
+
+    void operator () () { content->update_castable_value (); }
+  };
+
+  trackable_ptr_content (Ptr& in_value) : value (in_value), connection (value.connect (destroy_fn (this))) { }
+
+  virtual ~trackable_ptr_content () {}
+};
+
+template <class T> struct any_content<trackable_ptr<T> >:  public trackable_ptr_content<trackable_ptr<T> > 
+{
+  any_content (trackable_ptr<T>& ptr) : trackable_ptr_content<trackable_ptr<T> > (ptr) {}
+};
+
+template <class T> struct any_impl: public any_content<T>, public any_holder
+{
+  typedef any_content<T> content;
+
+  any_impl (T& value) : content (value), any_holder (get_castable_value (content::value)) {}
   
   const std::type_info& type () { return typeid (T); }
 
-  any_holder* clone () { return new any_content<T> (*this); }
+  void update_castable_value () { caster = get_castable_value (content::value); }
 
-  custom_ref_caster get_caster () //optimize
-  {
-    return custom_ref_caster (get_castable_value (value));
-  }
+  any_holder* clone () { return new any_impl<T> (*this); }
 
   void dump (stl::string& buffer)
   {
     using adl_defaults::to_string;
 
-    to_string (buffer, get_castable_value (value));
+    to_string (buffer, get_castable_value (content::value));
   }
-
-  T value;
 };
 
 }
@@ -118,9 +152,9 @@ inline any::any ()
 
 template <class T>
 inline any::any (const T& value)
-  : content_ptr (new detail::any_content<T> (value))
+  : content_ptr (new detail::any_impl<T> (const_cast<T&> (value))) //fix it
   {}
-  
+
 inline any::any (detail::any_holder* in_content_ptr)
   : content_ptr (in_content_ptr)
   {}  
@@ -175,7 +209,7 @@ inline bool any::empty () const
 
 inline bool any::null () const
 {
-  return !content_ptr || content_ptr->get_caster ().empty ();
+  return !content_ptr || content_ptr->caster.empty ();
 }
 
 /*
@@ -189,7 +223,7 @@ inline const std::type_info& any::type () const
 
 inline const std::type_info& any::castable_type () const
 {
-  return content_ptr ? content_ptr->get_caster ().type () : typeid (void);
+  return content_ptr ? content_ptr->caster.type () : typeid (void);
 }
 
 template <class T>
@@ -207,7 +241,7 @@ inline const T* any::content () const
   if (&typeid (T) != &content_ptr->type ())
     return 0; //преобразование невозможно, из-за неэквивалентности базовых типов
 
-  return &static_cast<detail::any_content<T>*> (const_cast<detail::any_holder*> (content_ptr))->value;
+  return &static_cast<detail::any_impl<T>*> (const_cast<detail::any_holder*> (content_ptr))->value;
 }
 
 /*
@@ -220,7 +254,7 @@ inline const T any::cast () const
   if (!content_ptr)
     throw bad_any_cast (type (), typeid (T));
 
-  return content_ptr->get_caster ().cast<T> ();
+  return content_ptr->caster.cast<T> ();
 }
 
 /*
@@ -371,5 +405,5 @@ inline T& get_castable_value (reference_wrapper<T>& ref)
 template <class T>
 inline T& get_castable_value (trackable_ptr<T>& ptr)
 {
-  return *ptr;
+  return *ptr.get ();
 }

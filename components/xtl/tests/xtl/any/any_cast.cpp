@@ -134,6 +134,9 @@ void test (const char* name, const any& a)
 
   try
   {
+    if (a.null ())
+      throw xtl::format_operation_exception ("", "null any");
+
     print (any_multicast<T> (a));
   }
   catch (bad_any_cast& exception)

@@ -1,6 +1,7 @@
 #ifndef XTL_ANY_HEADER
 #define XTL_ANY_HEADER
 
+#include <xtl/connection.h>
 #include <xtl/custom_cast.h>
 #include <xtl/lexical_cast.h>
 #include <xtl/ref.h>
