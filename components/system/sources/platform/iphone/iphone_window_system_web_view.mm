@@ -28,7 +28,7 @@ using namespace syslib;
 
 -(id)initWithListener:(IWebViewListener*)in_listener
 {
-  self = [super init];
+  self = [super initWithFrame:CGRectMake (-2, -2, 1, 1)];
 
   if (!self)
     return nil;
@@ -85,7 +85,8 @@ using namespace syslib;
 
 -(void)webViewDidStartLoad:(UIWebView *)webView
 {
-  listener->OnLoadStarted ([[webView.request.URL absoluteString] UTF8String]);
+  if (webView.request.URL)
+    listener->OnLoadStarted ([[webView.request.URL absoluteString] UTF8String]);
 
   [self layoutSubviews];
 

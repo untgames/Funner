@@ -23,9 +23,10 @@ class ApplicationDelegateImpl;
 bool                     application_launched = false;
 ApplicationDelegateImpl* application_delegate = 0;
 
-NSString*   USER_DEFAULTS_UUID                     = @"UUID";
-const char* LOG_NAME                               = "syslib.IPhoneApplication";
-const char* REGISTER_FOR_PUSH_NOTIFICATIONS_PREFIX = "RegisterForPushNotification Register ";
+NSString*            USER_DEFAULTS_UUID                     = @"UUID";
+const char*          LOG_NAME                               = "syslib.IPhoneApplication";
+const char*          REGISTER_FOR_PUSH_NOTIFICATIONS_PREFIX = "RegisterForPushNotification Register ";
+const NSTimeInterval BACKGROUND_IDLE_TIMER_PERIOD           = 1.f / 20.f; //idle timer calling interval when app is in background state
 
 //Functions for printing objective-c objects to json
 void ns_object_to_json (id obj, stl::string& output);
@@ -123,7 +124,7 @@ class ApplicationDelegateImpl: public IApplicationDelegate, public xtl::referenc
       }
       @catch (NSException* e)
       {
-        throw xtl::format_operation_exception (METHOD_NAME, "%s", [[e reason] cStringUsingEncoding:NSASCIIStringEncoding]);
+        throw xtl::format_operation_exception (METHOD_NAME, "%s, at %s", [[e reason] cStringUsingEncoding:NSASCIIStringEncoding], [[[e callStackSymbols] description] cStringUsingEncoding:NSASCIIStringEncoding]);
       }
     }
 
@@ -260,9 +261,11 @@ typedef stl::vector<syslib::iphone::IApplicationListener*> ListenerArray;
 @interface ApplicationDelegateInternal : NSObject
 {
   @private
-    ListenerArray *listeners;        //слушатели событий
-    CADisplayLink *idle_timer;       //таймер вызова OnIdle
-    bool          main_view_visible; //виден ли главный view приложения
+    ListenerArray *listeners;                   //слушатели событий
+    CADisplayLink *idle_timer;                  //таймер вызова OnIdle
+    NSTimer       *background_idle_timer;       //таймер вызова OnIdle в неактивном состоянии
+    bool          background_execution_enabled; //нужно ли вызывать OnIdle в неактивном состоянии
+    bool          main_view_visible;            //виден ли главный view приложения
 }
 
 @property (nonatomic, readonly) ListenerArray* listeners;
@@ -283,6 +286,24 @@ typedef stl::vector<syslib::iphone::IApplicationListener*> ListenerArray;
   idle_timer = [[CADisplayLink displayLinkWithTarget:self selector:@selector (onIdle:)] retain];
 
   [idle_timer addToRunLoop:[NSRunLoop mainRunLoop] forMode:NSDefaultRunLoopMode];
+}
+
+-(void)deleteBackgroundIdleTimer
+{
+  [background_idle_timer invalidate];
+  [background_idle_timer release];
+
+  background_idle_timer = nil;
+}
+
+-(void)startBackgroundIdleTimer
+{
+  if (!background_execution_enabled)
+    return;
+
+  [self deleteBackgroundIdleTimer];
+
+  background_idle_timer = [[NSTimer scheduledTimerWithTimeInterval:BACKGROUND_IDLE_TIMER_PERIOD target:self selector:@selector (onIdle:) userInfo:nil repeats:YES] retain];
 }
 
 -(id) init
@@ -316,6 +337,8 @@ typedef stl::vector<syslib::iphone::IApplicationListener*> ListenerArray;
 -(void) dealloc
 {
   application_launched = false;
+
+  [self deleteBackgroundIdleTimer];
 
   [idle_timer invalidate];
   [idle_timer release];
@@ -420,6 +443,7 @@ typedef stl::vector<syslib::iphone::IApplicationListener*> ListenerArray;
 {
   impl.idle_timer.paused = YES;
   [impl.idle_timer invalidate];
+  [impl startBackgroundIdleTimer];
 
   if (application_delegate)
     application_delegate->OnPause ();
@@ -427,6 +451,7 @@ typedef stl::vector<syslib::iphone::IApplicationListener*> ListenerArray;
 
 -(void) applicationDidBecomeActive:(UIApplication*)application
 {
+  [impl deleteBackgroundIdleTimer];
   [impl initIdleTimer];
 
   if (application_delegate)

@@ -4,6 +4,7 @@
 #include <cstddef>
 #include <typeinfo>
 
+#include <xtl/any_cast_exception.h>
 #include <xtl/functional_traits.h>
 #include <xtl/singleton_default.h>
 #include <xtl/type.h>

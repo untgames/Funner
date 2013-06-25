@@ -54,7 +54,7 @@ struct Test
 
     mover->SetAccelerationHandler (move_acceleration);
 
-    mover->Start (sprite1, 0.f);
+    mover->Start (*sprite1, 0.f);
 
     look_to = LookToNodePoint::Create (*sprite2);
 
@@ -66,7 +66,7 @@ struct Test
 
     look_to->SetAccelerationHandler (look_acceleration);
 
-    look_to->Start (sprite1, 0.f, NodeOrt_Y, NodeOrt_Z);
+    look_to->Start (*sprite1, 0.f, NodeOrt_Y, NodeOrt_Z);
 
     aligner1 = AlignWithNode::Create (*sprite1_child1);
     aligner2 = AlignWithNode::Create (*sprite1_child2);
@@ -80,8 +80,8 @@ struct Test
     aligner1->SetAccelerationHandler (align_acceleration);
     aligner2->SetAccelerationHandler (align_acceleration);
 
-    aligner1->Start (sprite2, NodeOrt_Y, NodeOrt_Y, NodeOrt_Z);
-    aligner2->Start (sprite2, NodeOrt_Y, NodeOrt_Y, NodeOrt_Z);
+    aligner1->Start (*sprite2, NodeOrt_Y, NodeOrt_Y, NodeOrt_Z);
+    aligner2->Start (*sprite2, NodeOrt_Y, NodeOrt_Y, NodeOrt_Z);
 
       //создание сцены
     camera = OrthoCamera::Create ();
