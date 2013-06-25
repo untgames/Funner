@@ -2,6 +2,18 @@
 
 using namespace scene_graph;
 
+template class engine::decl_sg_cast<Light,       Entity>;
+template class engine::decl_sg_cast<Light,       Node>;
+template class engine::decl_sg_cast<DirectLight, Light>;
+template class engine::decl_sg_cast<DirectLight, Entity>;
+template class engine::decl_sg_cast<DirectLight, Node>;
+template class engine::decl_sg_cast<PointLight,  Light>;
+template class engine::decl_sg_cast<PointLight,  Entity>;
+template class engine::decl_sg_cast<PointLight,  Node>;
+template class engine::decl_sg_cast<SpotLight,   Light>;
+template class engine::decl_sg_cast<SpotLight,   Entity>;
+template class engine::decl_sg_cast<SpotLight,   Node>;
+
 namespace engine
 {
 

@@ -18,154 +18,98 @@ const char* GLOBAL_LIBRARY_NAME = "global";
 */
 
 //диспетчер вызовов
-int unsafe_invoke_dispatch (lua_State* state)
+struct InvokeDispatch
 {
-    //получение указателя на шлюз
-
-  const Invoker* invoker      = reinterpret_cast<const Invoker*> (lua_touserdata (state, lua_upvalueindex (1)));
-  Interpreter*   interpreter  = reinterpret_cast<Interpreter*> (lua_touserdata (state, lua_upvalueindex (2)));
-  const char*    invoker_name = lua_tostring (state, lua_upvalueindex (3));
-
-  if (!invoker || !interpreter || !invoker_name)
-    throw xtl::format_exception<RuntimeException> ("script::lua::invoke_dispatch", "Bad invoker call (no up-values found)");
-
-    //проверка количества переданных аргументов
-
-//  if ((int)invoker->ArgumentsCount () > lua_gettop (state))
-//    throw xtl::format_exception<StackException> ("script::lua::invoke_dispatch(%s)", "Arguments count mismatch (expected %u, got %u)", 
-//                           invoker_name, invoker->ArgumentsCount (), lua_gettop (state));
-
-    //вызов шлюза
-
-  try
+  static const char* GetInvokerName (lua_State* state)
   {
-    size_t results_count = (*invoker)(interpreter->Interpreter::Stack ());
-    
-    return results_count;
-  }
-  catch (xtl::exception& exception)
-  {
-    stl::string stack;
-    
-    dump_stack (state, stack);
-    
-    exception.touch ("script::lua::invoke_dispatch(\"%s\", %s)", invoker_name, stack.c_str ());
-    throw;
-  }
-  catch (xtl::bad_any_cast& exception)
-  {
-    stl::string stack;
-    
-    dump_stack (state, stack);    
-    
-    throw xtl::format_exception<RuntimeException> (format ("script::lua::invoke_dispatch(\"%s\", %s)", invoker_name).c_str (),
-      "%s: %s->%s", exception.what (), exception.source_type ().name (), exception.target_type ().name (), stack.c_str ());
-  }
-  catch (std::exception& exception)
-  {
-    stl::string stack;
-    
-    dump_stack (state, stack);
+    const char* invoker_name = lua_tostring (state, lua_upvalueindex (3));
 
-    throw xtl::format_exception<RuntimeException> (format ("script::lua::invoke_dispatch(\"%s\", %s)", invoker_name).c_str (),
-      "%s", exception.what (), stack.c_str ());
+    return invoker_name ? invoker_name : "";
   }
 
-  return 0;
-}
+  static int Invoke (lua_State* state)
+  {
+      //получение указателя на шлюз
+
+    const Invoker& invoker     = *reinterpret_cast<const Invoker*> (lua_touserdata (state, lua_upvalueindex (1)));
+    Interpreter&   interpreter = *reinterpret_cast<Interpreter*> (lua_touserdata (state, lua_upvalueindex (2)));
+
+      //вызов шлюза
+
+    try
+    {
+      size_t results_count = invoker (interpreter.Interpreter::Stack ());
+      
+      return results_count;
+    }
+    catch (xtl::exception& e)
+    {
+      stl::string stack;
+      
+      dump_stack (state, stack);
+      
+      e.touch ("script::lua::invoke_dispatch(\"%s\", %s)", GetInvokerName (state), stack.c_str ());
+
+      throw;
+    }
+    catch (xtl::bad_any_cast& e)
+    {
+      stl::string stack;
+      
+      dump_stack (state, stack);    
+      
+      throw xtl::format_exception<RuntimeException> (format ("script::lua::invoke_dispatch(\"%s\", %s)", GetInvokerName (state)).c_str (),
+        "%s: %s->%s", e.what (), e.source_type ().name (), e.target_type ().name (), stack.c_str ());
+    }
+    catch (std::exception& e)
+    {
+      stl::string stack;
+      
+      dump_stack (state, stack);
+
+      throw xtl::format_exception<RuntimeException> (format ("script::lua::invoke_dispatch(\"%s\", %s)", GetInvokerName (state)).c_str (),
+        "%s", e.what (), stack.c_str ());
+    }
+
+    return 0;
+  }
+};
 
 int invoke_dispatch (lua_State* state)
 {
-  return safe_call (state, &unsafe_invoke_dispatch);
+  return safe_call<InvokeDispatch> (state);
 }
 
 //получение поля по имени
-int unsafe_variant_get_field (lua_State* state)
+struct VariantGetField
 {
-  static const char* METHOD_NAME = "script::lua::variant_get_field";
-
-  if (!lua_getmetatable (state, 1))
-    throw xtl::format_exception<RuntimeException> (METHOD_NAME, "Bad '__index' call. Object isn't variant");
-
-  lua_pushvalue (state, 2);
-  lua_rawget    (state, -2);
-
-  if (!lua_isnil (state, -1)) //поле с заданным именем найдено
+  static int Invoke (lua_State* state)
   {
-    lua_remove (state, -2); //удаление метатаблицы
-    return 1;
-  }
+    static const char* METHOD_NAME = "script::lua::variant_get_field";
 
-    //пытаемся найти поле с префиксом get_
+    if (!lua_getmetatable (state, 1))
+      throw xtl::format_exception<RuntimeException> (METHOD_NAME, "Bad '__index' call. Object isn't variant");
 
-  lua_pop         (state, 1); //удаляем результат предыдущего поиска
-  lua_pushfstring (state, "get_%s", lua_tostring (state, 2));
-  lua_rawget      (state, -2);
-  lua_remove      (state, -2); //удаление метатаблицы
+    lua_pushvalue (state, 2);
+    lua_rawget    (state, -2);
 
-  if (lua_isnil (state, -1)) //свойство с указанным именем не найдено  
-  {
-    lua_pop (state, 1); //удаление результата поиска
-    
-      //получение имени библиотеки
-      
-    stl::string library_name = "unknown";
-
-    lua_getmetatable (state, 1);
-    lua_pushstring   (state, "__library_name");
-    lua_rawget       (state, -2);
-
-    if (!lua_isnil (state, -1))
-      library_name = lua_tostring (state, -1);
-      
-    lua_pop (state, 2);
-    
-      //генерация исключения
-    
-    throw xtl::format_exception<UndefinedFunctionCallException> (METHOD_NAME, "Field '%s' not found (library='%s')", lua_tostring (state, 2), library_name.c_str ());
-  }
-
-  bool is_static_call = lua_isuserdata (state, 1) == 0;
-
-    //помещение аргумента вызова шлюза в стек
-
-  if (is_static_call)
-  {
-    lua_call (state, 0, 1);
-  }
-  else
-  {
-    lua_pushvalue (state, 1);
-    lua_call      (state, 1, 1);      
-  }
-  
-  return 1;
-}
-
-int variant_get_field (lua_State* state)
-{
-  return safe_call (state, &unsafe_variant_get_field);
-}
-
-//установка значения поля
-int unsafe_variant_set_field (lua_State* state)
-{
-  static const char* METHOD_NAME = "script::lua::variant_set_field";  
-
-  if (!lua_getmetatable (state, 1))
-    throw xtl::format_exception<RuntimeException> (METHOD_NAME, "Bad '__newindex' call. Object isn't variant");            
-
-    //пытаемся найти поле с префиксом set_
-
-  lua_pushfstring (state, "set_%s", lua_tostring (state, 2));
-  lua_rawget      (state, -2);
-
-  if (lua_isnil (state, -1)) //свойство с указанным именем не найдено
-  {
-    lua_pop (state, 2); //удаление результата и метатаблицы
-    
-    if (!lua_istable (state, 3))
+    if (!lua_isnil (state, -1)) //поле с заданным именем найдено
     {
+      lua_remove (state, -2); //удаление метатаблицы
+      return 1;
+    }
+
+      //пытаемся найти поле с префиксом get_
+
+    lua_pop         (state, 1); //удаляем результат предыдущего поиска
+    lua_pushfstring (state, "get_%s", lua_tostring (state, 2));
+    lua_rawget      (state, -2);
+    lua_remove      (state, -2); //удаление метатаблицы
+
+    if (lua_isnil (state, -1)) //свойство с указанным именем не найдено  
+    {
+      lua_pop (state, 1); //удаление результата поиска
+      
         //получение имени библиотеки
         
       stl::string library_name = "unknown";
@@ -179,42 +123,105 @@ int unsafe_variant_set_field (lua_State* state)
         
       lua_pop (state, 2);
       
-        //генерация исключения      
+        //генерация исключения
       
-      throw xtl::format_exception<UndefinedFunctionCallException> (METHOD_NAME, "Field '%s' not found or read-only (library='%s')", lua_tostring (state, 2), library_name.c_str ());
+      throw xtl::format_exception<UndefinedFunctionCallException> (METHOD_NAME, "Field '%s' not found (library='%s')", lua_tostring (state, 2), library_name.c_str ());
     }
-      
-      //добавление вложенной таблицы
 
-    lua_rawset (state, 1);
+    bool is_static_call = lua_isuserdata (state, 1) == 0;
 
-    return 0;
+      //помещение аргумента вызова шлюза в стек
+
+    if (is_static_call)
+    {
+      lua_call (state, 0, 1);
+    }
+    else
+    {
+      lua_pushvalue (state, 1);
+      lua_call      (state, 1, 1);      
+    }
+    
+    return 1;
   }
-  
-    //удаление метатаблицы
-    
-  lua_remove (state, -2);
-    
-  bool is_static_call = lua_isuserdata (state, 1) == 0; //является ли вызов статическим    
-  int  args_count     = is_static_call ? 1 : 2;
+};
 
-    //помещение аргументов вызова шлюза в стек
-
-  if (!is_static_call)
-    lua_pushvalue (state, 1);
-
-  lua_pushvalue (state, 3);
-
-  int top_index = lua_gettop (state) - args_count - 1;
-
-  lua_call (state, args_count, LUA_MULTRET);
-
-  return lua_gettop (state) - top_index;
+int variant_get_field (lua_State* state)
+{
+  return safe_call<VariantGetField> (state);
 }
+
+//установка значения поля
+struct VariantSetField
+{
+  static int Invoke (lua_State* state)
+  {
+    static const char* METHOD_NAME = "script::lua::variant_set_field";  
+
+    if (!lua_getmetatable (state, 1))
+      throw xtl::format_exception<RuntimeException> (METHOD_NAME, "Bad '__newindex' call. Object isn't variant");            
+
+      //пытаемся найти поле с префиксом set_
+
+    lua_pushfstring (state, "set_%s", lua_tostring (state, 2));
+    lua_rawget      (state, -2);
+
+    if (lua_isnil (state, -1)) //свойство с указанным именем не найдено
+    {
+      lua_pop (state, 2); //удаление результата и метатаблицы
+      
+      if (!lua_istable (state, 3))
+      {
+          //получение имени библиотеки
+          
+        stl::string library_name = "unknown";
+
+        lua_getmetatable (state, 1);
+        lua_pushstring   (state, "__library_name");
+        lua_rawget       (state, -2);
+
+        if (!lua_isnil (state, -1))
+          library_name = lua_tostring (state, -1);
+          
+        lua_pop (state, 2);
+        
+          //генерация исключения      
+        
+        throw xtl::format_exception<UndefinedFunctionCallException> (METHOD_NAME, "Field '%s' not found or read-only (library='%s')", lua_tostring (state, 2), library_name.c_str ());
+      }
+        
+        //добавление вложенной таблицы
+
+      lua_rawset (state, 1);
+
+      return 0;
+    }
+    
+      //удаление метатаблицы
+      
+    lua_remove (state, -2);
+      
+    bool is_static_call = lua_isuserdata (state, 1) == 0; //является ли вызов статическим    
+    int  args_count     = is_static_call ? 1 : 2;
+
+      //помещение аргументов вызова шлюза в стек
+
+    if (!is_static_call)
+      lua_pushvalue (state, 1);
+
+    lua_pushvalue (state, 3);
+
+    int top_index = lua_gettop (state) - args_count - 1;
+
+    lua_call (state, args_count, LUA_MULTRET);
+
+    return lua_gettop (state) - top_index;
+  }
+};
 
 int variant_set_field (lua_State* state)
 {
-  return safe_call (state, &unsafe_variant_set_field);
+  return safe_call<VariantSetField> (state);
 }
 
 }

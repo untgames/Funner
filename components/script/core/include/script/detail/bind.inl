@@ -939,7 +939,7 @@ template <class Ret> class callback_dispatcher
     Ret invoke (T1& arg1, T2& arg2, T3& arg3, T4& arg4, T5& arg5, T6& arg6, T7& arg7, T8& arg8, T9& arg9, T10& arg10)
     {
       if (!interpreter)
-        throw xtl::format_operation_exception ("script::callback_dispatcher::invoke", "Interpreter has already destroyed");
+        throw xtl::format_operation_exception ("script::callback_dispatcher::invoke", "Interpreter has been already destroyed");
 
       return detail::invoke_dispatch<ArgsCount> (*interpreter, symbol->Name (), arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8,
         arg9, arg10, xtl::type<Ret> ());

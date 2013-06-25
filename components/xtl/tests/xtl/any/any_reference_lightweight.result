@@ -1,3 +1,3 @@
 Results of any_reference_lightweight_test:
-fail: xtl::bad_any_cast; reason: types aren't equal
+fail: xtl::bad_any_cast
 cast to string ok: 'Hello world'

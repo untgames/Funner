@@ -2,6 +2,15 @@
 
 using namespace scene_graph;
 
+template class engine::decl_sg_cast<InputZoneModel, Node>;
+template class engine::decl_sg_cast<InputZoneModel, Entity>;
+template class engine::decl_sg_cast<InputZone,      InputZoneModel>;
+template class engine::decl_sg_cast<InputZone,      Node>;
+template class engine::decl_sg_cast<InputZone,      Entity>;
+template class engine::decl_sg_cast<InputZoneList,  InputZoneModel>;
+template class engine::decl_sg_cast<InputZoneList,  Node>;
+template class engine::decl_sg_cast<InputZoneList,  Entity>;
+
 namespace engine
 {
 

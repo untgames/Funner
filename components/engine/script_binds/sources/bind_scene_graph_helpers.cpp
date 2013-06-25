@@ -2,6 +2,15 @@
 
 using namespace scene_graph;
 
+template class engine::decl_sg_cast<helpers::Helper,  Node>;
+template class engine::decl_sg_cast<helpers::Helper,  Entity>;
+template class engine::decl_sg_cast<helpers::Box,     Node>;
+template class engine::decl_sg_cast<helpers::Box,     Entity>;
+template class engine::decl_sg_cast<helpers::Box,     helpers::Helper>;
+template class engine::decl_sg_cast<helpers::Sphere,  Node>;
+template class engine::decl_sg_cast<helpers::Sphere,  Entity>;
+template class engine::decl_sg_cast<helpers::Sphere,  helpers::Helper>;
+
 namespace engine
 {
 

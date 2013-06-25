@@ -10,6 +10,8 @@ struct B : A
   virtual const char* name () const { return "class B"; }
 };
 
+template class declcast<B*, A*, reinterpret_caster>;
+
 int main ()
 {
   printf ("Results of any_cast_speed_test:\n");

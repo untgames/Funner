@@ -13,6 +13,7 @@
 #include <xtl/connection.h>
 #include <xtl/implicit_cast.h>
 #include <xtl/common_exceptions.h>
+#include <xtl/lexical_cast.h>
 
 #include <common/component.h>
 #include <common/strlib.h>
@@ -174,7 +175,7 @@ class MyInterpreter: public IInterpreter, public xtl::trackable
     MyStack stack;
 };
 
-struct X: public xtl::dynamic_cast_root
+struct X
 {
   virtual const char* name () const { return "struct X"; }
 
@@ -187,6 +188,9 @@ struct Y: X
 
   const char* test () const { return "Y::test"; }
 };
+
+template class xtl::declcast<Y, X>;
+template class xtl::declcast<X, Y, xtl::dynamic_caster>;
 
 struct A
 {
@@ -205,6 +209,7 @@ struct A
   stl::string name;
 };
 
+template xtl::declcast<A>;
 void to_string (stl::string& buffer, const X& value)
 {
   buffer = value.name ();

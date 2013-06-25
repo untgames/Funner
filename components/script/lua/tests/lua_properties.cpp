@@ -17,6 +17,8 @@ struct A
   int id;
 };
 
+template class xtl::declcast<A>;
+
 void to_string (stl::string& buffer, const A& value)
 {
   buffer = common::format ("A(%d)", value.id);

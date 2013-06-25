@@ -27,7 +27,7 @@ int main ()
 {
   try
   {
-    printf ("Results of invoke_speed_test:\n");
+    printf ("Results of invoke_speed1_test:\n");
 
     Environment env;
 
@@ -52,7 +52,7 @@ int main ()
 
     size_t end = common::milliseconds ();
 
-    printf ("Invokations per second: %.2fk\n", float (TOTAL)/float (end-start)*1000.0f);
+    printf ("Invokations per second: %.2fM\n", float (TOTAL)/float (end-start)*1000.0f / 1000000.0f);
   }
   catch (std::exception& exception)
   {

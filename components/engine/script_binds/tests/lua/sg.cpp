@@ -2,12 +2,19 @@
 
 const char* SCRIPT_FILE_NAME = "data/sg.lua";
 
+void log_handler (const char* log_name, const char* event)
+{
+  printf ("%s: %s\n", log_name, event);
+}
+
 int main ()
 {
   printf ("Results of sg_test:\n");
   
   try
   {
+    common::LogFilter filter ("scene_graph.*", &log_handler);
+
     Environment env;
     
     Shell shell ("lua", env);

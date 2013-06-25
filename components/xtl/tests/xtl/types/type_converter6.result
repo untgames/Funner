@@ -1,0 +1,11 @@
+Results of type_converter6_test:
+check convertion B& -> A&: true
+check convertion B -> A: false
+check convertion B* -> A*: true
+check convertion B -> A*: true
+check convertion B* -> A: false
+check convertion A& -> B&: true
+check convertion A -> B: false
+check convertion A* -> B*: true
+check convertion A -> B*: true
+check convertion A* -> B: false

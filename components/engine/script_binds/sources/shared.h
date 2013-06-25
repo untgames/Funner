@@ -156,6 +156,20 @@ void bind_common_crypto                (script::Environment&);
 void bind_common_base64                (script::Environment&);
 void bind_math_splines_library         (script::Environment&);
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Декларация преобразования типов
+///////////////////////////////////////////////////////////////////////////////////////////////////
+template <class Derived, class Base>
+class decl_sg_cast
+{
+  public:
+    decl_sg_cast ()
+    {
+      xtl::singleton_default<xtl::declcast<Derived*, Base*, xtl::reinterpret_caster>, false>::instance ();
+      xtl::singleton_default<xtl::declcast<Base*, Derived*, xtl::reinterpret_caster>, false>::instance ();
+    }
+};
+
 }
 
 #endif

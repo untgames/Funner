@@ -1,14 +1,13 @@
 #ifndef XTL_ANY_HEADER
 #define XTL_ANY_HEADER
 
-#include <xtl/any_cast_exception.h>
-#include <xtl/dynamic_cast_root.h>
-#include <xtl/default_cast_type.h>
+#include <xtl/connection.h>
+#include <xtl/custom_cast.h>
 #include <xtl/lexical_cast.h>
+#include <xtl/ref.h>
 #include <xtl/reference_counter.h>
 #include <xtl/type.h>
 #include <xtl/type_traits> //for is_polymorphic, remove_reference
-#include <xtl/ref.h>
 
 namespace stl
 {
@@ -31,10 +30,19 @@ struct any_holder;
 
 //forward declaration
 template <class T> class shared_ptr;
+template <class T> class weak_ptr;
 template <class T> class com_ptr;
 template <class T> class trackable_ptr;
 
-template <class T, template <class > class Strategy>  class intrusive_ptr;
+template <class T, template <class > class Strategy> class intrusive_ptr;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Проверка возможности автоматического изменения значения
+///////////////////////////////////////////////////////////////////////////////////////////////////
+template <class T> struct any_value_self_changable { enum { value = 0 }; };
+
+template <class T> struct any_value_self_changable<trackable_ptr<T> > { enum { value = 1 }; };
+template <class T> struct any_value_self_changable<weak_ptr<T> >      { enum { value = 1 }; };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Обёртка для хранения объектов различных типов
@@ -72,7 +80,7 @@ class any
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Тип и данные
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    const std::type_info& type () const;
+    const std::type_info& type          () const;
     const std::type_info& castable_type () const;
 
     template <class T>       T* content ();
@@ -84,10 +92,9 @@ class any
     template <class T> const T cast () const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Лексикографическое приведение
+///Печать содержимого в строку
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void to_string   (stl::string& buffer) const;
-    void set_content (const stl::string& buffer);
+    void to_string (stl::string& buffer) const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Обмен
@@ -116,9 +123,7 @@ template <class T> const T  any_cast (const any&);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Многоуровневое приведение типов:
-///   - попытка приведений квалификаторов (const, volataile, const volataile)
-///   - попытка dynamic_cast приведений (для типов приводимых к dynamic_cast_root)
-///   - попытка лексикографических приведений (lexical_cast)
+/// - попытка custom_cast приведения
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 template <class T> const T any_multicast (const any&);
 
@@ -129,6 +134,7 @@ template <class T> T& get_castable_value (T&);
 template <class T> T& get_castable_value (T*);
 template <class T> T& get_castable_value (stl::auto_ptr<T>&);
 template <class T> T& get_castable_value (shared_ptr<T>&);
+template <class T> T& get_castable_value (weak_ptr<T>&);
 template <class T> T& get_castable_value (com_ptr<T>&);
 template <class T> T& get_castable_value (reference_wrapper<T>&);
 template <class T> T& get_castable_value (trackable_ptr<T>&);
@@ -136,14 +142,12 @@ template <class T> T& get_castable_value (trackable_ptr<T>&);
 template <class T, template <class > class Strategy>
 T& get_castable_value (intrusive_ptr<T, Strategy>&);
 
-char*    get_castable_value (char*);
-wchar_t* get_castable_value (wchar_t*);
+const char*& get_castable_value (const char*&);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Лексикографическое приведение типов any (без изменения типа any)
+///Печать содержимого в строку
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 void to_string (stl::string& buffer, const volatile any& value);
-void to_value  (const stl::string& buffer, volatile any& value);
 
 #include <xtl/detail/any.inl>
 

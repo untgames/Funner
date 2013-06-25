@@ -2,6 +2,11 @@
 
 using namespace scene_graph;
 
+template class engine::decl_sg_cast<SoundEmitter, Node>;
+template class engine::decl_sg_cast<SoundEmitter, Entity>;
+template class engine::decl_sg_cast<Listener,     Node>;
+template class engine::decl_sg_cast<Listener,     Entity>;
+
 namespace engine
 {
 
