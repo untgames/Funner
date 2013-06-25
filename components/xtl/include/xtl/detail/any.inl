@@ -35,11 +35,12 @@ inline void to_string (stl::string& s, cast_type type)
 
 struct any_holder: public reference_counter
 {
-  custom_ref_caster caster;
-  const bool        is_self_changable;
+  custom_ref_caster     caster;
+  const std::type_info* castable_type;
+  const bool            is_self_changable;
 
   template <class T>
-  any_holder (T& content, bool in_is_self_changable) : caster (content), is_self_changable (in_is_self_changable) {}
+  any_holder (T& content, bool in_is_self_changable) : caster (content), is_self_changable (in_is_self_changable), castable_type (&content ? &typeid (content) : &typeid (void)) {}
 
   virtual ~any_holder () {}
 
@@ -77,7 +78,11 @@ template <class T> struct any_impl: public any_content<T>, public any_holder
   
   const std::type_info& type () { return typeid (T); }
 
-  void update_castable_value () { caster = get_castable_value (content::value); }
+  void update_castable_value ()
+  {
+    caster        = get_castable_value (content::value);
+    castable_type = &typeid (get_castable_value (content::value));
+  }
 
   any_holder* clone () { return new any_impl<T> (*this); }
 
@@ -178,7 +183,7 @@ inline const std::type_info& any::type () const
 
 inline const std::type_info& any::castable_type () const
 {
-  return content_ptr ? content_ptr->caster.type () : typeid (void);
+  return content_ptr ? *content_ptr->castable_type : typeid (void);
 }
 
 template <class T>
