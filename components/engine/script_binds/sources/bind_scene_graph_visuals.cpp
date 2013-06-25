@@ -2,12 +2,6 @@
 
 using namespace scene_graph;
 
-namespace engine
-{
-
-namespace scene_graph_script_binds
-{
-
 template class engine::decl_sg_cast<SpriteModel, Entity>;
 template class engine::decl_sg_cast<SpriteModel, Node>;
 template class engine::decl_sg_cast<Sprite,      SpriteModel>;
@@ -22,6 +16,12 @@ template class engine::decl_sg_cast<HeightMap,   Entity>;
 template class engine::decl_sg_cast<HeightMap,   Node>;
 template class engine::decl_sg_cast<VisualModel, Entity>;
 template class engine::decl_sg_cast<VisualModel, Node>;
+
+namespace engine
+{
+
+namespace scene_graph_script_binds
+{
 
 /*
     Создание спрайта

@@ -2,12 +2,6 @@
 
 using namespace scene_graph;
 
-namespace engine
-{
-
-namespace scene_graph_script_binds
-{
-
 template class engine::decl_sg_cast<InputZoneModel, Node>;
 template class engine::decl_sg_cast<InputZoneModel, Entity>;
 template class engine::decl_sg_cast<InputZone,      InputZoneModel>;
@@ -16,6 +10,12 @@ template class engine::decl_sg_cast<InputZone,      Entity>;
 template class engine::decl_sg_cast<InputZoneList,  InputZoneModel>;
 template class engine::decl_sg_cast<InputZoneList,  Node>;
 template class engine::decl_sg_cast<InputZoneList,  Entity>;
+
+namespace engine
+{
+
+namespace scene_graph_script_binds
+{
 
 /*
     Регистрация библиотеки InputZoneNotification

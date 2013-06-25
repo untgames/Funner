@@ -12,14 +12,14 @@ const char* SCENE_STATIC_PAGE_CURL_MODE_LIBRARY       = "Scene.PageCurlMode";
 
 }
 
+template class engine::decl_sg_cast<PageCurl, Entity>;
+template class engine::decl_sg_cast<PageCurl, Node>;
+
 namespace engine
 {
 
 namespace scene_graph_script_binds
 {
-
-template class engine::decl_sg_cast<PageCurl, Entity>;
-template class engine::decl_sg_cast<PageCurl, Node>;
 
 /*
     Создание листания

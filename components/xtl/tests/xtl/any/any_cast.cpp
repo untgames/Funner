@@ -58,11 +58,11 @@ struct Y : X
   Y(int value) : X (value) {}
 };
 
-template class declcast<X>;
-template class declcast<Y>;
-template class declcast<Y, X>;
-
 }
+
+template class declcast<test_namespace::X>;
+template class declcast<test_namespace::Y>;
+template class declcast<test_namespace::Y, test_namespace::X>;
 
 void print (const volatile A& a)
 {

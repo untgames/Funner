@@ -2,12 +2,6 @@
 
 using namespace scene_graph;
 
-namespace engine
-{
-
-namespace scene_graph_script_binds
-{
-
 template class engine::decl_sg_cast<Light,       Entity>;
 template class engine::decl_sg_cast<Light,       Node>;
 template class engine::decl_sg_cast<DirectLight, Light>;
@@ -19,6 +13,12 @@ template class engine::decl_sg_cast<PointLight,  Node>;
 template class engine::decl_sg_cast<SpotLight,   Light>;
 template class engine::decl_sg_cast<SpotLight,   Entity>;
 template class engine::decl_sg_cast<SpotLight,   Node>;
+
+namespace engine
+{
+
+namespace scene_graph_script_binds
+{
 
 /*
     Создание источников света

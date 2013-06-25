@@ -2,12 +2,6 @@
 
 using namespace scene_graph;
 
-namespace engine
-{
-
-namespace scene_graph_script_binds
-{
-
 template class engine::decl_sg_cast<Camera,            Node>;
 template class engine::decl_sg_cast<Camera,            Entity>;
 template class engine::decl_sg_cast<OrthoCamera,       Node>;
@@ -16,6 +10,12 @@ template class engine::decl_sg_cast<OrthoCamera,       Camera>;
 template class engine::decl_sg_cast<PerspectiveCamera, Node>;
 template class engine::decl_sg_cast<PerspectiveCamera, Entity>;
 template class engine::decl_sg_cast<PerspectiveCamera, Camera>;
+
+namespace engine
+{
+
+namespace scene_graph_script_binds
+{
 
 /*
     Создание камер

@@ -13,18 +13,17 @@ const char* SCENE_CONTROLLER_WATER_LIBRARY                = "Scene.Controllers.W
 
 }
 
-namespace engine
-{
-
-namespace scene_graph_script_binds
-{
-
 template class engine::decl_sg_cast<controllers::AlignWithNode,     Controller>;
 template class engine::decl_sg_cast<controllers::LookToNodePoint,   Controller>;
 template class engine::decl_sg_cast<controllers::MoveToNodePoint,   Controller>;
 template class engine::decl_sg_cast<controllers::SyncPhysicsToNode, Controller>;
 template class engine::decl_sg_cast<controllers::Water,             Controller>;
 
+namespace engine
+{
+
+namespace scene_graph_script_binds
+{
 
 /*
     Регистрация библиотеки работы с контроллером воды

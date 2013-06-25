@@ -149,7 +149,7 @@ template <class T> struct identity_converter_impl: public type_converter_item
     source_type           = &typeid (T);
     target_type           = &typeid (T);
     is_reinterpret_casted = true;
-    handler               = &cast;
+    handler               = (void*)&cast;
   }
 
   static T& cast (T& value) { throw bad_any_cast (typeid (T), typeid (T)); } //do not remove reference at return type
@@ -161,7 +161,7 @@ template <class T> struct pointer_address_converter_impl: public type_converter_
   {
     source_type = &typeid (T);
     target_type = &typeid (T*);
-    handler     = &cast;
+    handler     = (void*)&cast;
   }
 
   static T* cast (T& value) { return &value; }
@@ -255,13 +255,28 @@ inline const type_converter_item* find_converter (const custom_ref_caster_type_i
     Преобразователь типов
 */
 
+namespace detail
+{
+
+template <class To> struct identity_ref_caster
+{
+  To& operator () (void* source) const { return *reinterpret_cast<To*> (source); }
+};
+
+template <class To> struct identity_ref_caster<To&>
+{
+  To& operator () (void* source) const { return **reinterpret_cast<To**> (source); }
+};
+
+}
+
 template <class To, class From>
 inline To custom_cast (From& value)
 {
   const detail::type_converter_item* item = detail::find_converter<typename detail::converter_type<To>::type> (singleton_default<detail::custom_ref_caster_type_info_impl<From>, false>::instance (), true);
 
   if (!item)
-    throw bad_any_cast (bad_any_cast::bad_cast, typeid (From), typeid (To));
+    throw bad_any_cast (typeid (From), typeid (To));
 
   if (item->is_reinterpret_casted)
     return detail::identity_ref_caster<To> ()(const_cast<void*> (&value));
@@ -302,21 +317,6 @@ inline custom_ref_caster::custom_ref_caster (From*& value)
   : source (value ? (void*)&value : (void*)0)
   , source_type (&singleton_default<detail::custom_ref_caster_type_info_impl<From*>, false>::instance ())
 {
-}
-
-namespace detail
-{
-
-template <class To> struct identity_ref_caster
-{
-  To& operator () (void* source) const { return *reinterpret_cast<To*> (source); }
-};
-
-template <class To> struct identity_ref_caster<To&>
-{
-  To& operator () (void* source) const { return **reinterpret_cast<To**> (source); }
-};
-
 }
 
 template <class To>
@@ -374,7 +374,7 @@ struct declcast_impl_base: public type_converter_item
   {
     source_type = &typeid (From);
     target_type = &typeid (To);
-    handler     = &cast;
+    handler     = (void*)&cast;
 
     type_converter_impl<From>& converter_impl = singleton_default<type_converter_impl<From>, false>::instance ();
 
@@ -392,9 +392,11 @@ struct declcast_impl: public declcast_impl_base<From, To, CastTag>
 template <class From, class To>
 struct declcast_impl<From, To, reinterpret_caster<From, To> >: public declcast_impl_base<From, To, reinterpret_caster<From, To> >
 {
+  typedef declcast_impl_base<From, To, reinterpret_caster<From, To> > base;
+
   declcast_impl ()
   {
-    is_reinterpret_casted = true;
+    base::is_reinterpret_casted = true;
   }
 };
 

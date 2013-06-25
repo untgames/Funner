@@ -40,7 +40,11 @@ struct any_holder: public reference_counter
   const bool            is_self_changable;
 
   template <class T>
-  any_holder (T& content, bool in_is_self_changable) : caster (content), is_self_changable (in_is_self_changable), castable_type (&content ? &typeid (content) : &typeid (void)) {}
+  any_holder (T& content, bool in_is_self_changable)
+    : caster (content)
+    , castable_type (&content ? &typeid (content) : &typeid (void))
+    , is_self_changable (in_is_self_changable)
+  {}
 
   virtual ~any_holder () {}
 
