@@ -322,6 +322,33 @@ void check_stack      (lua_State* state, size_t count = 1); //проверка возможнос
 void check_item       (lua_State* state, size_t index, int expected_type, const char* function_name); //проверка корректности типа элемента, извлекаемого из стека
 void raise_error      (lua_State* state, const char* source); //получение сообщения об ошибке
 
+//получение строки с местом вызова
+stl::string get_lua_position (lua_State* state);
+
+//безопасный вызов шлюзов
+template <class Fn>
+int safe_call (lua_State* state)
+{
+  try
+  {
+    return Fn::Invoke (state);
+  }
+  catch (xtl::bad_any_cast& e)
+  {
+    luaL_error (state, "%s: %s -> %s%s", e.what (), e.source_type ().name (), e.target_type ().name (), get_lua_position (state).c_str ());
+  }
+  catch (std::exception& e)
+  {
+    luaL_error (state, "%s%s", e.what (), get_lua_position (state).c_str ());
+  }
+  catch (...)
+  {
+    luaL_error (state, "%s%s", lua_gettop (state) ? lua_tostring (state, -1) : "internal error", get_lua_position (state).c_str ());
+  }
+
+  return 0;
+}
+
 }
 
 }
