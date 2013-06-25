@@ -1,25 +1,4 @@
 /*
-    Проверка на 0
-*/
-
-template <class T>
-inline bool is_null (const T& value)
-{
-  return &value == 0;
-}
-
-template <class T>
-inline bool is_null (const T* value)
-{
-  return value == 0;
-}
-
-inline bool is_null (const char*& value)
-{
-  return value == 0;
-}
-
-/*
     Приведение типов
 */
 
@@ -313,8 +292,15 @@ inline custom_ref_caster::custom_ref_caster ()
 
 template <class From>
 inline custom_ref_caster::custom_ref_caster (From& value)
-  : source (is_null (value) ? (void*)0 : (void*)&value)
+  : source ((void*)&value)
   , source_type (&singleton_default<detail::custom_ref_caster_type_info_impl<From>, false>::instance ())
+{
+}
+
+template <class From>
+inline custom_ref_caster::custom_ref_caster (From*& value)
+  : source (value ? (void*)&value : (void*)0)
+  , source_type (&singleton_default<detail::custom_ref_caster_type_info_impl<From*>, false>::instance ())
 {
 }
 

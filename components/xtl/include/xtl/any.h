@@ -30,10 +30,19 @@ struct any_holder;
 
 //forward declaration
 template <class T> class shared_ptr;
+template <class T> class weak_ptr;
 template <class T> class com_ptr;
 template <class T> class trackable_ptr;
 
-template <class T, template <class > class Strategy>  class intrusive_ptr;
+template <class T, template <class > class Strategy> class intrusive_ptr;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Проверка возможности автоматического изменения значения
+///////////////////////////////////////////////////////////////////////////////////////////////////
+template <class T> struct any_value_self_changable { enum { value = 0 }; };
+
+template <class T> struct any_value_self_changable<trackable_ptr<T> > { enum { value = 1 }; };
+template <class T> struct any_value_self_changable<weak_ptr<T> >      { enum { value = 1 }; };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Обёртка для хранения объектов различных типов
@@ -125,6 +134,7 @@ template <class T> T& get_castable_value (T&);
 template <class T> T& get_castable_value (T*);
 template <class T> T& get_castable_value (stl::auto_ptr<T>&);
 template <class T> T& get_castable_value (shared_ptr<T>&);
+template <class T> T& get_castable_value (weak_ptr<T>&);
 template <class T> T& get_castable_value (com_ptr<T>&);
 template <class T> T& get_castable_value (reference_wrapper<T>&);
 template <class T> T& get_castable_value (trackable_ptr<T>&);

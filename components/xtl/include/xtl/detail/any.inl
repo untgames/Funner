@@ -30,42 +30,23 @@ inline void to_string (stl::string& s, cast_type type)
 }
 
 /*
-    Проверка на 0
-*/
-
-template <class T>
-inline bool is_null (const T& value)
-{
-  return &value == 0;
-}
-
-template <class T>
-inline bool is_null (const T* value)
-{
-  return value == 0;
-}
-
-inline bool is_null (const char*& value)
-{
-  return value == 0;
-}
-
-/*
     Интерфейс хранилища вариантных данных
 */
 
 struct any_holder: public reference_counter
 {
   custom_ref_caster caster;
+  const bool        is_self_changable;
 
   template <class T>
-  any_holder (T& content) : caster (content) {}
- 
+  any_holder (T& content, bool in_is_self_changable) : caster (content), is_self_changable (in_is_self_changable) {}
+
   virtual ~any_holder () {}
 
-  virtual any_holder*           clone      () = 0;
-  virtual const std::type_info& type       () = 0;
-  virtual void                  dump       (stl::string&) = 0;
+  virtual any_holder*           clone                 () = 0;
+  virtual const std::type_info& type                  () = 0;
+  virtual void                  dump                  (stl::string&) = 0;
+  virtual void                  update_castable_value () = 0;
 };
 
 /*
@@ -88,37 +69,11 @@ template <class T> struct any_content
   T value;
 };
 
-template <class Ptr> struct trackable_ptr_content
-{
-  Ptr             value;
-  auto_connection connection;
-
-  virtual void update_castable_value () = 0;
-
-  struct destroy_fn
-  {
-    trackable_ptr_content* content;
-
-    destroy_fn (trackable_ptr_content* in_content) : content (in_content) {}
-
-    void operator () () { content->update_castable_value (); }
-  };
-
-  trackable_ptr_content (Ptr& in_value) : value (in_value), connection (value.connect (destroy_fn (this))) { }
-
-  virtual ~trackable_ptr_content () {}
-};
-
-template <class T> struct any_content<trackable_ptr<T> >:  public trackable_ptr_content<trackable_ptr<T> > 
-{
-  any_content (trackable_ptr<T>& ptr) : trackable_ptr_content<trackable_ptr<T> > (ptr) {}
-};
-
 template <class T> struct any_impl: public any_content<T>, public any_holder
 {
   typedef any_content<T> content;
 
-  any_impl (T& value) : content (value), any_holder (get_castable_value (content::value)) {}
+  any_impl (T& value) : content (value), any_holder (get_castable_value (content::value), any_value_self_changable<typename type_traits::remove_cv<T>::type>::value != 0) {}
   
   const std::type_info& type () { return typeid (T); }
 
@@ -254,6 +209,11 @@ inline const T any::cast () const
   if (!content_ptr)
     throw bad_any_cast (type (), typeid (T));
 
+  if (!content_ptr->is_self_changable)
+    return content_ptr->caster.cast<T> ();
+
+  content_ptr->update_castable_value ();
+
   return content_ptr->caster.cast<T> ();
 }
 
@@ -384,6 +344,12 @@ inline T& get_castable_value (shared_ptr<T>& ptr)
   return *ptr;
 }
 
+template <class T>
+inline T& get_castable_value (weak_ptr<T>& ptr)
+{
+  return *ptr;
+}
+
 template <class T, template <class > class Strategy>
 inline T& get_castable_value (intrusive_ptr<T, Strategy>& ptr)
 {
@@ -405,5 +371,5 @@ inline T& get_castable_value (reference_wrapper<T>& ref)
 template <class T>
 inline T& get_castable_value (trackable_ptr<T>& ptr)
 {
-  return *ptr.get ();
+  return *ptr;
 }

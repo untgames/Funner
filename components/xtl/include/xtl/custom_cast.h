@@ -1,6 +1,8 @@
 #ifndef XTL_CUSTOM_CAST_HEADER
 #define XTL_CUSTOM_CAST_HEADER
 
+#include <memory.h>
+
 #include <xtl/any_cast_exception.h>
 #include <xtl/singleton_default.h>
 #include <xtl/type_traits>
@@ -40,6 +42,7 @@ class custom_ref_caster
 ///////////////////////////////////////////////////////////////////////////////////////////////////
                           custom_ref_caster ();
     template <class From> custom_ref_caster (From& value);
+    template <class From> custom_ref_caster (From*& value);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Приведение типа
@@ -74,13 +77,6 @@ template <class To, class From> To custom_cast (From&);
 ///Проверка возможности приведения
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 template <class From, class To> bool has_custom_cast ();
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Проверка на ноль
-///////////////////////////////////////////////////////////////////////////////////////////////////
-template <class T> bool is_null (const T&);
-template <class T> bool is_null (const T*);
-                   bool is_null (const char*&);
 
 #include <xtl/detail/custom_cast.inl>
 
