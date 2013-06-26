@@ -707,10 +707,6 @@ struct RenderOperationsExecutor
     primitive.state_block->Apply (&device_context);
     operation.state_block->Apply (&device_context);
 
-    render::low_level::StateBlockMask mask;      
-
-    primitive.state_block->GetMask (mask);
-
       //обработка области отсечения объекта
 
     if (operation_scissor != current_local_scissor)
