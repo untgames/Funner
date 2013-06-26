@@ -1,6 +1,7 @@
 #include <cstdio>
 
 #include <xtl/custom_cast.h>
+#include <xtl/custom_cast_builtin.h>
 
 using namespace xtl;
 
