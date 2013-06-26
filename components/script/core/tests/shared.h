@@ -209,7 +209,7 @@ struct A
   stl::string name;
 };
 
-template xtl::declcast<A>;
+template class xtl::declcast<A>;
 void to_string (stl::string& buffer, const X& value)
 {
   buffer = value.name ();
