@@ -35,9 +35,24 @@ const char* RenderManager::Description () const
   return impl->Description ();
 }
 
-Window RenderManager::CreateWindow (syslib::Window& window, common::PropertyMap& properties)
+Window RenderManager::CreateWindow (INativeWindow* window, common::PropertyMap& properties)
 {
   return Wrappers::Wrap<render::Window> (impl->CreateWindow (window, properties));
+}
+
+Window RenderManager::CreateWindow (syslib::Window& window, common::PropertyMap& properties)
+{
+  try
+  {
+    xtl::com_ptr<INativeWindow> native_window (make_native_window (window), false);
+
+    return CreateWindow (native_window.get (), properties);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::RenderManager::CreateWindow(syslib::Window&,common::PropertyMap&)");
+    throw;
+  }
 }
 
 size_t RenderManager::WindowsCount () const

@@ -8,10 +8,12 @@ using namespace render::low_level;
 */
 
 typedef xtl::signal<void (Window&)> WindowSignal;
+typedef xtl::com_ptr<INativeWindow> INativeWindowPtr;
 
-struct WindowImpl::Impl: public xtl::trackable
+struct WindowImpl::Impl: public xtl::trackable, public INativeWindowListener
 {
   WindowImpl*              owner;                     //окно-владелец
+  INativeWindowPtr         native_window;             //нативное окно
   stl::string              name;                      //имя окна
   DeviceManagerPtr         device_manager;            //менеджер устройства отрисовки  
   low_level::SwapChainDesc swap_chain_desc;           //параметры цепочки обмена
@@ -33,9 +35,22 @@ struct WindowImpl::Impl: public xtl::trackable
   {
     memset (&swap_chain_desc, 0, sizeof swap_chain_desc);    
   }
+
+///Деструктор
+  ~Impl ()
+  {
+    try
+    {
+      if (native_window)
+        native_window->DetachListener (this);
+    }
+    catch (...)
+    {
+    }
+  }
   
 ///Создание цепочки обмена
-  void CreateSwapChain (syslib::Window& window)
+  void CreateSwapChain (void* handle)
   {
     try
     {
@@ -44,7 +59,7 @@ struct WindowImpl::Impl: public xtl::trackable
       if (!device_manager)
         throw xtl::format_operation_exception ("", "Null device manager");
 
-      swap_chain_desc.window_handle = window.Handle ();
+      swap_chain_desc.window_handle = handle;
       
       low_level::IAdapter* adapter_ptr = &*adapter;
           
@@ -110,22 +125,14 @@ struct WindowImpl::Impl: public xtl::trackable
   }
   
 ///Обновление размеров окна
-  void UpdateSizes (syslib::Window& window)
+  void UpdateSizes (size_t in_width, size_t in_height)
   {
-    try
-    {
-      width  = window.ClientWidth ();
-      height = window.ClientHeight ();
-    }
-    catch (xtl::exception& e)
-    {
-      e.touch ("render::WindowImpl::Impl::UpdateSizes");
-      throw;
-    }
+    width  = in_width;
+    height = in_height;
   }
 
 ///Обработка события перерисовки окна
-  void OnUpdate ()
+  void OnPaint ()
   {
     try
     {
@@ -147,17 +154,14 @@ struct WindowImpl::Impl: public xtl::trackable
   }
 
 ///Обработка события изменения размеров окна
-  void OnResize (syslib::Window& window)
+  void OnSizeChanged (size_t width, size_t height)
   {
     try
     {
-      UpdateSizes (window);    
+      UpdateSizes (width, height);  
       
       if (signals [WindowEvent_OnResize].empty ())
         return;
-        
-      width  = window.ClientWidth ();
-      height = window.ClientHeight ();
       
       if (color_buffer)
       {
@@ -180,18 +184,18 @@ struct WindowImpl::Impl: public xtl::trackable
   }
   
 ///Обработка события смены оконного дескриптора
-  void OnChangeHandle (syslib::Window& window)
+  void OnHandleChanged (void* handle)
   {
     try
     {
-      log.Printf ("Swap chain handle changed (handle=%p)", window.Handle ());
+      log.Printf ("Swap chain handle changed (handle=%p)", handle);
       
       swap_chain = 0;
       
-      if (!window.Handle ())
+      if (!handle)
         return;
 
-      CreateSwapChain (window);
+      CreateSwapChain (handle);
       
       try
       {        
@@ -218,27 +222,22 @@ struct WindowImpl::Impl: public xtl::trackable
   }
   
 ///Обработчик события изменения области вывода
-  void OnChangeViewport (syslib::Window& window)
+  void OnViewportChanged (const Rect& viewport)
   {
     try
     {
-      syslib::Rect viewport = window.Viewport ();            
-      
-      size_t width  = viewport.right - viewport.left,
-             height = viewport.bottom - viewport.top;      
-      
-      log.Printf ("Window viewport changed: x=%d, y=%d, widht=%u, height=%u", viewport.left, viewport.top, width, height);
+      log.Printf ("Window viewport changed: x=%d, y=%d, widht=%u, height=%u", viewport.x, viewport.y, viewport.width, viewport.height);
       
       if (color_buffer)
       {
-        color_buffer->Resize (width, height);
-        color_buffer->SetViewportOffset (math::vec2ui (viewport.left, viewport.top));
+        color_buffer->Resize (viewport.width, viewport.height);
+        color_buffer->SetViewportOffset (math::vec2ui (viewport.x, viewport.y));
       }
       
       if (depth_stencil_buffer)
       {
-        depth_stencil_buffer->Resize (width, height);
-        depth_stencil_buffer->SetViewportOffset (math::vec2ui (viewport.left, viewport.top));
+        depth_stencil_buffer->Resize (viewport.width, viewport.height);
+        depth_stencil_buffer->SetViewportOffset (math::vec2ui (viewport.x, viewport.y));
       }
     }
     catch (std::exception& e)
@@ -277,7 +276,7 @@ const char* get_string_property (const common::PropertyMap& properties, const ch
 
 }
 
-WindowImpl::WindowImpl (const DeviceManagerPtr& device_manager, syslib::Window& window, const common::PropertyMap& properties, const SettingsPtr& settings, const CacheManagerPtr& cache_manager)
+WindowImpl::WindowImpl (const DeviceManagerPtr& device_manager, INativeWindow& window, const common::PropertyMap& properties, const SettingsPtr& settings, const CacheManagerPtr& cache_manager)
 {
   try
   {
@@ -318,6 +317,7 @@ WindowImpl::WindowImpl (const DeviceManagerPtr& device_manager, syslib::Window& 
     
     impl = new Impl (this, settings);
     
+    impl->native_window   = &window;
     impl->swap_chain_desc = swap_chain_desc;
     
     if (!device_manager)
@@ -331,7 +331,7 @@ WindowImpl::WindowImpl (const DeviceManagerPtr& device_manager, syslib::Window& 
       LowLevelDevicePtr device;
       LowLevelDriverPtr driver;
       
-      swap_chain_desc.window_handle = window.Handle ();
+      swap_chain_desc.window_handle = window.GetHandle ();
 
       low_level::DriverManager::CreateSwapChainAndDevice (driver_mask, adapter_mask, swap_chain_desc, init_string, impl->swap_chain, device, driver);
       
@@ -360,19 +360,16 @@ WindowImpl::WindowImpl (const DeviceManagerPtr& device_manager, syslib::Window& 
       
       log.Printf ("Creating swap chain");
       
-      impl->CreateSwapChain (window);
+      impl->CreateSwapChain (window.GetHandle ());
     }
     
       //обновление размеров
       
-    impl->UpdateSizes (window);
+    impl->UpdateSizes (window.GetWidth (), window.GetHeight ());
     
       //подписка на события окна
-      
-    impl->connect_tracker (window.RegisterEventHandler (syslib::WindowEvent_OnSize, xtl::bind (&Impl::OnResize, &*impl, _1)));
-    impl->connect_tracker (window.RegisterEventHandler (syslib::WindowEvent_OnChangeHandle, xtl::bind (&Impl::OnChangeHandle, &*impl, _1)));
-    impl->connect_tracker (window.RegisterEventHandler (syslib::WindowEvent_OnPaint, xtl::bind (&Impl::OnUpdate, &*impl)));
-    impl->connect_tracker (window.RegisterEventHandler (syslib::WindowEvent_OnChangeViewport, xtl::bind (&Impl::OnChangeViewport, &*impl, _1)));
+
+    window.AttachListener (&*impl);
     
       //создание целей рендеринга
       

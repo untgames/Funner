@@ -137,17 +137,17 @@ class INativeWindow
     virtual void AttachListener (INativeWindowListener*) = 0;
     virtual void DetachListener (INativeWindowListener*) = 0;
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Подсчет ссылок
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    virtual void AddRef  () = 0;
+    virtual void Release () = 0;
+
   protected:
     virtual ~INativeWindow () {}
 };
 
-class IDestroyableNativeWindow: public INativeWindow
-{
-  public:
-    ~IDestroyableNativeWindow () {}
-};
-
-IDestroyableNativeWindow* make_native_window (syslib::Window&);
+INativeWindow* make_native_window (syslib::Window&);
 
 }
 

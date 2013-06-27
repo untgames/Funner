@@ -99,6 +99,20 @@ NativeWindow::~NativeWindow ()
 }
 
 /*
+    Подсчет ссылок
+*/
+
+void NativeWindow::AddRef ()
+{
+  addref (this);
+}
+
+void NativeWindow::Release ()
+{
+  release (this);
+}
+
+/*
     Размеры окна
 */
 
@@ -191,7 +205,7 @@ void NativeWindow::DetachListener (INativeWindowListener* listener)
 namespace render
 {
 
-IDestroyableNativeWindow* make_native_window (syslib::Window& window)
+INativeWindow* make_native_window (syslib::Window& window)
 {
   return new NativeWindow (window);
 }

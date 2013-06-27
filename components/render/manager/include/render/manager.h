@@ -90,7 +90,7 @@ class RenderManager
 ///Создание окна рендеринга
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     render::Window CreateWindow (syslib::Window& window, common::PropertyMap& properties);
-    render::Window CreateWindow (INativeWindow& window, common::PropertyMap& properties);
+    render::Window CreateWindow (INativeWindow* window, common::PropertyMap& properties);
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Перебор окон рендеринга

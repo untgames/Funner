@@ -262,11 +262,11 @@ EffectManager& RenderManagerImpl::EffectManager ()
     Создание окна рендеринга
 */
 
-WindowPtr RenderManagerImpl::CreateWindow (syslib::Window& sys_window, common::PropertyMap& properties)
+WindowPtr RenderManagerImpl::CreateWindow (INativeWindow* native_window, common::PropertyMap& properties)
 {
   try
   {
-    WindowPtr window (new WindowImpl (impl->device_manager, sys_window, properties, impl->settings, impl->cache_manager), false);
+    WindowPtr window (new WindowImpl (impl->device_manager, *native_window, properties, impl->settings, impl->cache_manager), false);
     
     window->connect_tracker (xtl::bind (&Impl::OnWindowDestroy, &*impl, &*window), *impl);
 
