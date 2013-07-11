@@ -1,4 +1,14 @@
-#include "shared.h"
+#include <FLAC/stream_decoder.h>
+
+#include <xtl/reference_counter.h>
+#include <xtl/common_exceptions.h>
+
+#include <common/file.h>
+#include <common/component.h>
+#include <common/log.h>
+#include <common/singleton.h>
+
+#include <media/sound.h>
 
 using namespace media;
 using namespace common;

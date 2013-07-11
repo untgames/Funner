@@ -30,23 +30,36 @@ int main ()
 
   try
   {
+    size_t wav_decoding_time;
+
 	for (size_t i = 0, count = sizeof (FILE_NAMES) / sizeof (*FILE_NAMES); i < count; i++)
 	{
 	  const char* file_name = FILE_NAMES [i];
 
 	  printf ("Testing file '%s':\n", file_name);
 
-	  //test file open speed
+	  //test first file open speed
 	  size_t start_time = common::milliseconds ();
 
-	  for (size_t j = 0; j < OPEN_FILE_COUNT; j++)
 	  {
         SoundSample sample (file_name);
 	  }
 
 	  size_t test_time = common::milliseconds () - start_time;
 
-	  printf ("  new sound sample per second = %.0f\n", OPEN_FILE_COUNT / (test_time / 1000.f));
+	  printf ("  new sound sample first open = %ums\n", test_time);
+
+	  //test open file multiple times
+      start_time = common::milliseconds ();
+
+      for (size_t j = 0; j < OPEN_FILE_COUNT; j++)
+      {
+        SoundSample sample (file_name);
+      }
+
+      test_time = common::milliseconds () - start_time;
+
+      printf ("  new sound sample per second = %.0f\n", OPEN_FILE_COUNT / (test_time / 1000.f));
 
 	  //test file decode speed
       SoundSample sample (file_name);
@@ -67,7 +80,10 @@ int main ()
 
       test_time = common::milliseconds () - start_time;
 
-      printf ("  decoding speed = %.2fx\n", total_duration / (test_time / 1000.f));
+      if (!i)
+        wav_decoding_time = test_time;
+
+      printf ("  decoding speed = %.2fx (%g times slower then wav decoding)\n", total_duration / (test_time / 1000.f), test_time / (double)wav_decoding_time);
 
       delete [] data_buffer;
 	}
