@@ -13,7 +13,7 @@ MEDIA.SOUND.SOURCES.IMPORTS     := compile.media.sound compile.media.shared
 MEDIA.SOUND.DEFAULT_DECODERS.TYPE             := static-lib
 MEDIA.SOUND.DEFAULT_DECODERS.NAME             := funner.media.sound.default_decoders
 MEDIA.SOUND.DEFAULT_DECODERS.SOURCE_DIRS      := sources/default_decoders
-MEDIA.SOUND.DEFAULT_DECODERS.IMPORTS          := compile.media.sound compile.extern.vorbisfile
+MEDIA.SOUND.DEFAULT_DECODERS.IMPORTS          := compile.media.sound compile.extern.vorbisfile compile.extern.flac
 MEDIA.SOUND.DEFAULT_DECODERS.msvc.COMPILER_CFLAGS  := -wd4244
 
 #Öåëü ¹3 - Sound sources

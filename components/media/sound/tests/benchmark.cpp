@@ -1,6 +1,7 @@
 #include <cstdio>
 #include <exception>
 
+#include <common/log.h>
 #include <common/time.h>
 
 #include <media/sound.h>
@@ -10,14 +11,23 @@ using namespace media;
 const char* FILE_NAMES [] = {
   "data/benchmark.wav",
   "data/benchmark_q2.ogg",
-  "data/benchmark_q8.ogg"
+  "data/benchmark_q8.ogg",
+  "data/benchmark_level_1.flac",
+  "data/benchmark_level_7.flac"
 };
 
 const size_t OPEN_FILE_COUNT   = 5000;
 const size_t DECODE_FILE_COUNT = 4;
 
+void log_print (const char* log, const char* message)
+{
+  printf ("'%s': '%s'\n", log, message);
+}
+
 int main ()
 {
+  common::LogFilter log_filter ("media.sound.*", &log_print);
+
   try
   {
 	for (size_t i = 0, count = sizeof (FILE_NAMES) / sizeof (*FILE_NAMES); i < count; i++)

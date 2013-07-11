@@ -6,6 +6,8 @@
 #include <ogg/os_types.h>
 #include <vorbis/vorbisfile.h>
 
+#include <FLAC/stream_decoder.h>
+
 #include <stl/algorithm>
 
 #include <xtl/reference_counter.h>
