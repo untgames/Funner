@@ -100,7 +100,7 @@ FLAC__StreamDecoderSeekStatus flac_seek_func (const FLAC__StreamDecoder *decoder
 {
   try
   {
-     if (absolute_byte_offset == ((FlacInputStream*)client_data)->file.Seek ((filepos_t)absolute_byte_offset))
+     if (absolute_byte_offset == (size_t)((FlacInputStream*)client_data)->file.Seek ((filepos_t)absolute_byte_offset))
        return FLAC__STREAM_DECODER_SEEK_STATUS_OK;
      else
        return FLAC__STREAM_DECODER_SEEK_STATUS_ERROR;
@@ -333,8 +333,6 @@ size_t FlacInputStream::Read (size_t first_sample, size_t samples_count, void* d
 {
   if (!samples_count)
     return 0;
-
-  static const char* METHOD_NAME = "media::sound::FlacInputStream::Read";
 
   output_buffer      = (char*)data;
   output_buffer_size = samples_count;
