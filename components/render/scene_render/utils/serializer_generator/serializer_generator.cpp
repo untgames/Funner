@@ -18,7 +18,9 @@ const char* SERIALIZE_PARAM_PREFIX  = "Serialize(";               //префикс сери
 const char* SERIALIZE_HEADER_PREFIX = "SerializeHeader(";         //префикс сериализации заголовка
 const char* SERIALIZE_TAIL          = "SerializeTail();";         //хвостовая сериализация
 const char* COMMAND_ID_ENUM_NAME    = "CommandId";                //идентификатор команды
-const char* SERIALIZER_CLASS_NAME   = "CommandSerializer";        //имя класса сериализаци
+const char* SERIALIZER_CLASS_NAME   = "CommandSerializer";        //имя класса сериализации
+const char* DESERIALIZER_CLASS_NAME = "CommandDeserializer";      //имя класса десериализации
+const char* DESERIALIZE_METHOD_NAME = "Deserialize";              //имя метода десериализации
 
 /*
     Структуры
@@ -283,6 +285,9 @@ void dump_serialization (const MethodArray& methods, stl::string& result)
   {
     const Method& method = *iter;
 
+    if (iter != methods.begin ())
+      result += "\n";
+
     dump_signature (method, result, SERIALIZER_CLASS_NAME);
 
     result += "\n{\n";
@@ -295,8 +300,16 @@ void dump_serialization (const MethodArray& methods, stl::string& result)
       dump_param_serialization (param, result);
     }    
 
-    result += common::format ("\n  %s\n}\n\n", SERIALIZE_TAIL);
+    result += common::format ("\n  %s\n}\n", SERIALIZE_TAIL);
   }
+}
+
+void dump_param_deserialization (const Param& param, stl::string& result)
+{
+  result += DESERIALIZE_METHOD_NAME;
+  result += "<";
+  result += param.type;
+  result += "> ()";
 }
 
 void dump_deserialization (const MethodArray& methods, stl::string& result)
@@ -305,19 +318,24 @@ void dump_deserialization (const MethodArray& methods, stl::string& result)
   {
     const Method& method = *iter;
 
-/*    dump_signature (method, result, DESERIALIZER_CLASS_NAME);
+    if (iter != methods.begin ())
+      result += "\n";
 
-    result += "\n{\n";
-    result += common::format ("  %s%s_%s);\n", SERIALIZE_HEADER_PREFIX, COMMAND_ID_ENUM_NAME, method.name.c_str ());
+    result += common::format ("template <class Dispatcher> void %s::%s(Dispatcher& dispatcher)\n{\n", DESERIALIZER_CLASS_NAME, method.name.c_str ());
+
+    result += common::format ("  dispatcher.%s(", method.name.c_str ());
 
     for (ParamArray::const_iterator iter=method.params.begin (), end=method.params.end (); iter!=end; ++iter)
     {
+      if (iter != method.params.begin ())
+        result += ", ";
+
       const Param& param = *iter;
 
-      dump_param_serialization (param, result);
+      dump_param_deserialization (param, result);      
     }    
 
-    result += common::format ("\n  %s\n}\n\n", SERIALIZE_TAIL);*/
+    result += ");\n}\n";
   }
 }
 
@@ -380,10 +398,11 @@ void generate_source (const char* template_file_name, const char* source_name, c
 
       //замены
 
-    if      (tag == "ENUMS")           dump_enums           (methods, result);
-    else if (tag == "METHODS")         dump_signatures      (methods, result);
-    else if (tag == "SERIALIZATION")   dump_serialization   (methods, result);
-    else if (tag == "DESERIALIZATION") dump_deserialization (methods, result);
+    if      (tag == "ENUMS")                    dump_enums           (methods, result);
+    else if (tag == "METHODS")                  dump_signatures      (methods, result);
+    else if (tag == "SERIALIZATION")            dump_serialization   (methods, result);
+    else if (tag == "DESERIALIZATION")          dump_deserialization (methods, result);
+    else if (tag == "DESERIALIZATION_DISPATCH") dump_deserialization_dispatch (methods, result);
     else
     {
       printf ("Bad tag '%s' in file '%s'\n", tag.c_str (), template_file_name);
