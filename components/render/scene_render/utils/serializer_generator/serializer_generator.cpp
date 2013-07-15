@@ -11,8 +11,14 @@
     Константы
 */
 
-const char* INPUT_FILE_NAME             = "input/signatures.h";  //файл с сигнатурами
-const char* OUTPUT_SIGNATURES_FILE_NAME = "output/signatures.h"; //выходной файл с сигнатурами
+const char* INPUT_FILE_NAME                = "input/signatures.h";       //файл с сигнатурами
+const char* OUTPUT_ENUM_FILE_NAME          = "output/enums.h";           //выходной файл с перечислениями
+const char* OUTPUT_SIGNATURES_FILE_NAME    = "output/signatures.h";      //выходной файл с сигнатурами
+const char* OUTPUT_SERIALIZATION_FILE_NAME = "output/serialization.cpp"; //выходной файл сериализации
+const char* SERIALIZE_PARAM_PREFIX         = "Serialize(";               //префикс сериализации параметра
+const char* SERIALIZE_HEADER_PREFIX        = "SerializeHeader(";         //префикс сериализации заголовка
+const char* SERIALIZE_TAIL                 = "SerializeTail();";         //хвостовая сериализация
+const char* COMMAND_ID_ENUM_NAME           = "CommandId";                //идентификатор команды
 
 /*
     Структуры
@@ -231,10 +237,25 @@ void parse_signatures (MethodArray& methods)
   }
 }
 
+void dump_signature (FILE* file, const Method& method)
+{
+  fprintf (file, "%s %s(", method.result_type.c_str (), method.name.c_str ());
+
+  for (ParamArray::const_iterator iter=method.params.begin (), end=method.params.end (); iter!=end; ++iter)
+  {
+    const Param& param = *iter;
+
+    if (iter != method.params.begin ())
+      fprintf (file, ", ");
+
+    fprintf (file, "%s %s", param.type.c_str (), param.name.c_str ());
+  }
+
+  fprintf (file, ")");
+}
+
 void dump_signatures (const char* file_name, const MethodArray& methods)
 {
-  printf ("file name is '%s'\n", file_name);
-
   FILE* file = fopen (file_name, "wt");
 
   if (!file)
@@ -244,26 +265,71 @@ void dump_signatures (const char* file_name, const MethodArray& methods)
   {
     const Method& method = *iter;
 
-    fprintf (file, "%s %s(", method.result_type.c_str (), method.name.c_str ());
+    dump_signature (file, method);
 
-    for (ParamArray::const_iterator iter=method.params.begin (), end=method.params.end (); iter!=end; ++iter)
-    {
-      const Param& param = *iter;
-
-      if (iter != method.params.begin ())
-        printf (", ");
-
-      fprintf (file, "%s %s", param.type.c_str (), param.name.c_str ());
-    }
-
-    fprintf (file, ");\n");
+    fprintf (file, ";\n");
   }
 
   fclose (file);
 }
 
-void dump_serialization ()
+void dump_param_serialization (FILE* file, const Param& param)
 {
+  fprintf (file, "  %s%s);", SERIALIZE_PARAM_PREFIX, param.name.c_str ());
+}
+
+void dump_serialization (const char* file_name, const MethodArray& methods)
+{
+  FILE* file = fopen (file_name, "wt");
+
+  if (!file)
+    throw xtl::format_operation_exception ("", "Can't open file '%s'", file_name);
+
+  for (MethodArray::const_iterator iter=methods.begin (), end=methods.end (); iter!=end; ++iter)
+  {
+    const Method& method = *iter;
+
+    dump_signature (file, method);
+
+    fprintf (file, "\n{\n");
+
+    fprintf (file, "  %s%s_%s);\n", SERIALIZE_HEADER_PREFIX, COMMAND_ID_ENUM_NAME, method.name.c_str ());
+
+    for (ParamArray::const_iterator iter=method.params.begin (), end=method.params.end (); iter!=end; ++iter)
+    {
+      const Param& param = *iter;
+
+      dump_param_serialization (file, param);
+    }    
+
+    fprintf (file, "\n  %s", SERIALIZE_TAIL);
+
+    fprintf (file, "\n}\n\n");
+  }  
+
+  fclose (file);
+}
+
+void dump_enums (const char* file_name, const MethodArray& methods)
+{
+  FILE* file = fopen (file_name, "wt");
+
+  if (!file)
+    throw xtl::format_operation_exception ("", "Can't open file '%s'", file_name);
+
+  fprintf (file, "enum %s\n", COMMAND_ID_ENUM_NAME);
+  fprintf (file, "{\n");
+
+  for (MethodArray::const_iterator iter=methods.begin (), end=methods.end (); iter!=end; ++iter)
+  {
+    const Method& method = *iter;    
+
+    fprintf (file, "  %s_%s,\n", COMMAND_ID_ENUM_NAME, method.name.c_str ());
+  }
+
+  fprintf (file, "};\n\n");
+
+  fclose (file);
 }
 
 int main ()
@@ -275,6 +341,8 @@ int main ()
     parse_signatures (methods);
 
     dump_signatures (OUTPUT_SIGNATURES_FILE_NAME, methods);
+    dump_serialization (OUTPUT_SERIALIZATION_FILE_NAME, methods);
+    dump_enums (OUTPUT_ENUM_FILE_NAME, methods);
 
     return 0;
   }
