@@ -11,14 +11,14 @@
     Константы
 */
 
-const char* INPUT_FILE_NAME                = "input/signatures.h";       //файл с сигнатурами
-const char* OUTPUT_ENUM_FILE_NAME          = "output/enums.h";           //выходной файл с перечислениями
-const char* OUTPUT_SIGNATURES_FILE_NAME    = "output/signatures.h";      //выходной файл с сигнатурами
-const char* OUTPUT_SERIALIZATION_FILE_NAME = "output/serialization.cpp"; //выходной файл сериализации
-const char* SERIALIZE_PARAM_PREFIX         = "Serialize(";               //префикс сериализации параметра
-const char* SERIALIZE_HEADER_PREFIX        = "SerializeHeader(";         //префикс сериализации заголовка
-const char* SERIALIZE_TAIL                 = "SerializeTail();";         //хвостовая сериализация
-const char* COMMAND_ID_ENUM_NAME           = "CommandId";                //идентификатор команды
+const char* INPUT_FILE_NAME         = "input/signatures.h";       //файл с сигнатурами
+const char* TEMPLATES_MASK          = "input/templates/*";        //маска имён файлов-шаблонов
+const char* RESULT_DIR              = "results";                  //каталог с результирующими файлами
+const char* SERIALIZE_PARAM_PREFIX  = "Serialize(";               //префикс сериализации параметра
+const char* SERIALIZE_HEADER_PREFIX = "SerializeHeader(";         //префикс сериализации заголовка
+const char* SERIALIZE_TAIL          = "SerializeTail();";         //хвостовая сериализация
+const char* COMMAND_ID_ENUM_NAME    = "CommandId";                //идентификатор команды
+const char* SERIALIZER_CLASS_NAME   = "CommandSerializer";        //имя класса сериализаци
 
 /*
     Структуры
@@ -211,9 +211,9 @@ void parse_signature (const char* line, Method& method)
   parse_params (stl::string (start_params+1, end_params).c_str (), method.params);
 }
 
-void parse_signatures (MethodArray& methods)
+void parse_signatures (const char* file_name, MethodArray& methods)
 {
-  stl::string signatures = common::FileSystem::LoadTextFile (INPUT_FILE_NAME);
+  stl::string signatures = common::FileSystem::LoadTextFile (file_name);
 
   common::StringArray lines = common::split (signatures.c_str (), "\n", "");
 
@@ -237,99 +237,166 @@ void parse_signatures (MethodArray& methods)
   }
 }
 
-void dump_signature (FILE* file, const Method& method)
+void dump_signature (const Method& method, stl::string& result, const char* class_name = "")
 {
-  fprintf (file, "%s %s(", method.result_type.c_str (), method.name.c_str ());
+  if (*class_name) result += common::format ("%s %s::%s(", method.result_type.c_str (), class_name, method.name.c_str ());
+  else             result += common::format ("%s %s(", method.result_type.c_str (), method.name.c_str ());
 
   for (ParamArray::const_iterator iter=method.params.begin (), end=method.params.end (); iter!=end; ++iter)
   {
     const Param& param = *iter;
 
     if (iter != method.params.begin ())
-      fprintf (file, ", ");
+      result += ", ";
 
-    fprintf (file, "%s %s", param.type.c_str (), param.name.c_str ());
+    result += common::format ("%s %s", param.type.c_str (), param.name.c_str ());
   }
 
-  fprintf (file, ")");
+  result += ")";
 }
 
-void dump_signatures (const char* file_name, const MethodArray& methods)
+void dump_signatures (const MethodArray& methods, stl::string& result)
 {
-  FILE* file = fopen (file_name, "wt");
-
-  if (!file)
-    throw xtl::format_operation_exception ("", "Can't open file '%s'", file_name);
-
   for (MethodArray::const_iterator iter=methods.begin (), end=methods.end (); iter!=end; ++iter)
   {
     const Method& method = *iter;
 
-    dump_signature (file, method);
+    if (iter != methods.begin ())
+      result += "\n";
 
-    fprintf (file, ";\n");
+    result += "    ";
+
+    dump_signature (method, result);
+
+    result += ";";
   }
-
-  fclose (file);
 }
 
-void dump_param_serialization (FILE* file, const Param& param)
+void dump_param_serialization (const Param& param, stl::string& result)
 {
-  fprintf (file, "  %s%s);", SERIALIZE_PARAM_PREFIX, param.name.c_str ());
+  result += common::format ("  %s%s);", SERIALIZE_PARAM_PREFIX, param.name.c_str ());
 }
 
-void dump_serialization (const char* file_name, const MethodArray& methods)
+void dump_serialization (const MethodArray& methods, stl::string& result)
 {
-  FILE* file = fopen (file_name, "wt");
-
-  if (!file)
-    throw xtl::format_operation_exception ("", "Can't open file '%s'", file_name);
-
   for (MethodArray::const_iterator iter=methods.begin (), end=methods.end (); iter!=end; ++iter)
   {
     const Method& method = *iter;
 
-    dump_signature (file, method);
+    dump_signature (method, result, SERIALIZER_CLASS_NAME);
 
-    fprintf (file, "\n{\n");
-
-    fprintf (file, "  %s%s_%s);\n", SERIALIZE_HEADER_PREFIX, COMMAND_ID_ENUM_NAME, method.name.c_str ());
+    result += "\n{\n";
+    result += common::format ("  %s%s_%s);\n", SERIALIZE_HEADER_PREFIX, COMMAND_ID_ENUM_NAME, method.name.c_str ());
 
     for (ParamArray::const_iterator iter=method.params.begin (), end=method.params.end (); iter!=end; ++iter)
     {
       const Param& param = *iter;
 
-      dump_param_serialization (file, param);
+      dump_param_serialization (param, result);
     }    
 
-    fprintf (file, "\n  %s", SERIALIZE_TAIL);
-
-    fprintf (file, "\n}\n\n");
-  }  
-
-  fclose (file);
+    result += common::format ("\n  %s\n}\n\n", SERIALIZE_TAIL);
+  }
 }
 
-void dump_enums (const char* file_name, const MethodArray& methods)
+void dump_deserialization (const MethodArray& methods, stl::string& result)
 {
-  FILE* file = fopen (file_name, "wt");
+  for (MethodArray::const_iterator iter=methods.begin (), end=methods.end (); iter!=end; ++iter)
+  {
+    const Method& method = *iter;
 
-  if (!file)
-    throw xtl::format_operation_exception ("", "Can't open file '%s'", file_name);
+/*    dump_signature (method, result, DESERIALIZER_CLASS_NAME);
 
-  fprintf (file, "enum %s\n", COMMAND_ID_ENUM_NAME);
-  fprintf (file, "{\n");
+    result += "\n{\n";
+    result += common::format ("  %s%s_%s);\n", SERIALIZE_HEADER_PREFIX, COMMAND_ID_ENUM_NAME, method.name.c_str ());
+
+    for (ParamArray::const_iterator iter=method.params.begin (), end=method.params.end (); iter!=end; ++iter)
+    {
+      const Param& param = *iter;
+
+      dump_param_serialization (param, result);
+    }    
+
+    result += common::format ("\n  %s\n}\n\n", SERIALIZE_TAIL);*/
+  }
+}
+
+void dump_enums (const MethodArray& methods, stl::string& result)
+{
+  result += common::format ("enum %s\n{\n", COMMAND_ID_ENUM_NAME);
 
   for (MethodArray::const_iterator iter=methods.begin (), end=methods.end (); iter!=end; ++iter)
   {
     const Method& method = *iter;    
 
-    fprintf (file, "  %s_%s,\n", COMMAND_ID_ENUM_NAME, method.name.c_str ());
+    result += common::format ("  %s_%s,\n", COMMAND_ID_ENUM_NAME, method.name.c_str ());
   }
 
-  fprintf (file, "};\n\n");
+  result += "};";
+}
 
-  fclose (file);
+//генерация исходного текста
+void generate_source (const char* template_file_name, const char* source_name, const MethodArray& methods)
+{
+    //загрузка шаблона
+
+  stl::string tmpl;
+
+  common::FileSystem::LoadTextFile (template_file_name, tmpl);
+  
+    //формирование текста на выходе
+    
+  stl::string result;
+  
+  result.reserve (tmpl.size ());
+    
+  static const char*  BEGIN_REPLACEMENT_TAG      = "<<<";
+  static const char*  END_REPLACEMENT_TAG        = ">>>";  
+  static const size_t BEGIN_REPLACEMENT_TAG_SIZE = strlen (BEGIN_REPLACEMENT_TAG);
+  static const size_t END_REPLACEMENT_TAG_SIZE   = strlen (END_REPLACEMENT_TAG);
+
+  for (stl::string::size_type pos=0, end=0;; pos=end)
+  {
+    pos = tmpl.find (BEGIN_REPLACEMENT_TAG, pos);
+
+    if (pos == stl::string::npos)
+    {
+      result.append (tmpl, end, stl::string::npos);
+      break;
+    }
+      
+    result.append (tmpl, end, pos - end);
+
+    pos  += BEGIN_REPLACEMENT_TAG_SIZE;
+    end   = tmpl.find (END_REPLACEMENT_TAG, pos);
+    
+    if (end == stl::string::npos)
+    {
+      end = pos;
+      continue;
+    }
+
+    stl::string tag = tmpl.substr (pos, end - pos);
+
+      //замены
+
+    if      (tag == "ENUMS")           dump_enums           (methods, result);
+    else if (tag == "METHODS")         dump_signatures      (methods, result);
+    else if (tag == "SERIALIZATION")   dump_serialization   (methods, result);
+    else if (tag == "DESERIALIZATION") dump_deserialization (methods, result);
+    else
+    {
+      printf ("Bad tag '%s' in file '%s'\n", tag.c_str (), template_file_name);
+    }
+
+    end += END_REPLACEMENT_TAG_SIZE;
+  }
+  
+    //сохранение сформированного файла
+    
+  common::OutputFile file (source_name);
+  
+  file.Write (result.c_str (), result.size ());
 }
 
 int main ()
@@ -338,11 +405,21 @@ int main ()
   {
     MethodArray methods;
 
-    parse_signatures (methods);
+    parse_signatures (INPUT_FILE_NAME, methods);
 
-    dump_signatures (OUTPUT_SIGNATURES_FILE_NAME, methods);
-    dump_serialization (OUTPUT_SERIALIZATION_FILE_NAME, methods);
-    dump_enums (OUTPUT_ENUM_FILE_NAME, methods);
+      //создание нового каталога с результирующими файлами
+
+    if (!common::FileSystem::IsFileExist (RESULT_DIR))
+      common::FileSystem::Mkdir (RESULT_DIR);
+
+      //генерация файлов
+
+    for (common::FileListIterator iter = common::FileSystem::Search (TEMPLATES_MASK); iter; ++iter)
+    {
+      stl::string result_file_name = common::format ("%s/%s", RESULT_DIR, common::notdir (iter->name).c_str ());
+
+      generate_source (iter->name, result_file_name.c_str (), methods);
+    }
 
     return 0;
   }
