@@ -11,7 +11,8 @@
     Константы
 */
 
-const char* INPUT_FILE_NAME = "input/signatures.h"; //файл с сигнатурами
+const char* INPUT_FILE_NAME             = "input/signatures.h";  //файл с сигнатурами
+const char* OUTPUT_SIGNATURES_FILE_NAME = "output/signatures.h"; //выходной файл с сигнатурами
 
 /*
     Структуры
@@ -230,13 +231,20 @@ void parse_signatures (MethodArray& methods)
   }
 }
 
-void dump (const MethodArray& methods)
+void dump_signatures (const char* file_name, const MethodArray& methods)
 {
+  printf ("file name is '%s'\n", file_name);
+
+  FILE* file = fopen (file_name, "wt");
+
+  if (!file)
+    throw xtl::format_operation_exception ("", "Can't open file '%s'", file_name);
+
   for (MethodArray::const_iterator iter=methods.begin (), end=methods.end (); iter!=end; ++iter)
   {
     const Method& method = *iter;
 
-    printf ("%s %s(", method.result_type.c_str (), method.name.c_str ());
+    fprintf (file, "%s %s(", method.result_type.c_str (), method.name.c_str ());
 
     for (ParamArray::const_iterator iter=method.params.begin (), end=method.params.end (); iter!=end; ++iter)
     {
@@ -245,11 +253,17 @@ void dump (const MethodArray& methods)
       if (iter != method.params.begin ())
         printf (", ");
 
-      printf ("%s %s", param.type.c_str (), param.name.c_str ());
+      fprintf (file, "%s %s", param.type.c_str (), param.name.c_str ());
     }
 
-    printf (")\n");
+    fprintf (file, ");\n");
   }
+
+  fclose (file);
+}
+
+void dump_serialization ()
+{
 }
 
 int main ()
@@ -260,7 +274,7 @@ int main ()
 
     parse_signatures (methods);
 
-    dump (methods);
+    dump_signatures (OUTPUT_SIGNATURES_FILE_NAME, methods);
 
     return 0;
   }
