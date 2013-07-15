@@ -248,10 +248,10 @@ FLAC__StreamDecoderWriteStatus flac_write_func (const FLAC__StreamDecoder *decod
       copy_flac_decoded_data (buffer, stream->excessive_data.data (), stream->channels_count, stream->sample_size, copied_samples, excessive_samples_count);
 
       stream->excessive_data_samples_count = excessive_samples_count;
-      stream->excessive_data_first_sample  = frame->header.number.sample_number + copied_samples;
+      stream->excessive_data_first_sample  = (size_t)frame->header.number.sample_number + copied_samples;
     }
 
-    stream->current_sample_index = frame->header.number.sample_number + decoded_samples_count;
+    stream->current_sample_index = (size_t)frame->header.number.sample_number + decoded_samples_count;
 
     return FLAC__STREAM_DECODER_WRITE_STATUS_CONTINUE;
   }
@@ -314,7 +314,7 @@ FlacInputStream::FlacInputStream (const char* file_name, SoundSampleInfo& sound_
     if (bits_per_sample != 16)
       throw xtl::format_operation_exception ("", "File has unsupported bits_per_sample %u", bits_per_sample);
 
-    samples_count = FLAC__stream_decoder_get_total_samples (decoder);
+    samples_count = (size_t)FLAC__stream_decoder_get_total_samples (decoder);
 
     if (!samples_count)
       throw xtl::format_operation_exception ("::FLAC__stream_decoder_get_total_samples", "Can't get samples count");
