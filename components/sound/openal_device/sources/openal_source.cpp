@@ -106,7 +106,7 @@ void OpenALSource::Deactivate ()
 
   context.alSourceStop (al_source);
 
-  context.alSourcei (al_source, AL_BUFFER, 0);
+  context.alSourcei (al_source, AL_BUFFER, 0); //detach all buffers
 
   for (size_t i=0; i<SOURCE_BUFFERS_COUNT; i++)
     device.DeallocateSourceBuffer (al_buffers [i]);
@@ -475,15 +475,7 @@ void OpenALSource::BufferUpdate ()
 
       context.alSourceStop (al_source);
 
-        //очищаем очередь проигрываемых буферов
-
-      ALint  queued_buffers_count = 0;
-      ALuint queued_buffers [SOURCE_BUFFERS_COUNT];
-
-      context.alGetSourcei (al_source, AL_BUFFERS_QUEUED, &queued_buffers_count);
-
-      if (queued_buffers_count)
-        context.alSourceUnqueueBuffers (al_source, queued_buffers_count, queued_buffers);
+      context.alSourcei (al_source, AL_BUFFER, 0);  //detach all buffers
 
       play_sample_position = sound_sample ? sound_sample->SecondsToSamples (Tell ()) : 0;
 
