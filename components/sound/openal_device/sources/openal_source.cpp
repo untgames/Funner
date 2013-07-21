@@ -98,6 +98,16 @@ void OpenALSource::Deactivate ()
   if (!is_active)
     return;
 
+  OpenALContext& context = device.Context ();
+
+  OpenALContextManager::Instance context_manager;
+
+  context_manager->SetCurrentContext (context);
+
+  context.alSourceStop (al_source);
+
+  context.alSourcei (al_source, AL_BUFFER, 0);
+
   for (size_t i=0; i<SOURCE_BUFFERS_COUNT; i++)
     device.DeallocateSourceBuffer (al_buffers [i]);
 
@@ -445,19 +455,10 @@ void OpenALSource::BufferUpdate ()
 
     if (is_playing != is_active)
     {
-      if (is_playing) Activate   ();
+      if (is_playing)
+        Activate ();
       else                                      //проигрывание завершено
       {
-        context.alSourceStop (al_source);
-
-        ALint  queued_buffers_count = 0;
-        ALuint queued_buffers [SOURCE_BUFFERS_COUNT];
-
-        context.alGetSourcei (al_source, AL_BUFFERS_QUEUED, &queued_buffers_count);
-
-        if (queued_buffers_count)
-          context.alSourceUnqueueBuffers (al_source, queued_buffers_count, queued_buffers);
-
         Deactivate ();
 
         return;
