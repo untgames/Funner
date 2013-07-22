@@ -2,6 +2,7 @@
 #define MEDIA_RMS_SERVER_HEADER
 
 #include <media/rms/binding.h>
+#include <media/rms/event_batcher.h>
 #include <media/rms/group.h>
 
 namespace media
@@ -102,7 +103,7 @@ void swap (ServerGroup&, ServerGroup&);
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Связывание ресурсного сервера с группой серверов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-class ServerGroupAttachment
+class ServerGroupAttachment: private ICustomServer
 {
   public:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -117,13 +118,27 @@ class ServerGroupAttachment
     ICustomServer&   Server      () const;
     rms::ServerGroup ServerGroup () const;
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Управление оповещениями
+///////////////////////////////////////////////////////////////////////////////////////////////////    
+    void SetNotificationsState (bool state);
+    bool NotificationsState    () const;
+    void EnableNotifications   () { SetNotificationsState (true); }
+    void DisableNotifications  () { SetNotificationsState (false); }
+
   private:
     ServerGroupAttachment (const ServerGroupAttachment&); //no impl
     ServerGroupAttachment& operator = (const ServerGroupAttachment&); //no impl
 
+    void PrefetchResource (const char* resource_name);
+    void LoadResource     (const char* resource_name);
+    void UnloadResource   (const char* resource_name);
+
   private:
     rms::ServerGroup group;
     ICustomServer*   server;
+    EventBatcher     event_batcher;
+    bool             notifications_state;
 };
 
 }

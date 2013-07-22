@@ -1,0 +1,7 @@
+Results of event_batcher1_test:
+MyServer::LoadResource(A1)
+MyServer::LoadResource(A2)
+MyServer::PrefetchResource(B2)
+MyServer::UnloadResource(C3)
+MyServer::LoadResource(B1)
+MyServer::PrefetchResource(C2)
