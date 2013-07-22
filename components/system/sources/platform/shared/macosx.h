@@ -254,6 +254,7 @@ class MacOsPlatform
  , public MacOsScreenManager
  , public DefaultSensorManager 
  , public CocoaCookieManager
+ , public DefaultScreenKeyboardManager
 {
 };
 

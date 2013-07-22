@@ -19,6 +19,7 @@
 #include <syslib/cookie.h>
 #include <syslib/dll.h>
 #include <syslib/screen.h>
+#include <syslib/screen_keyboard.h>
 #include <syslib/sensor.h>
 #include <syslib/timer.h>
 #include <syslib/web_view.h>

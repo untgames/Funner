@@ -283,6 +283,7 @@ class AndroidPlatform
  , public AndroidScreenManager
  , public AndroidSensorManager 
  , public AndroidCookieManager
+ , public DefaultScreenKeyboardManager
 {
 };
 

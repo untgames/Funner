@@ -288,6 +288,7 @@ class IPhonePlatform
  , public IPhoneScreenManager
  , public IPhoneSensorManager
  , public CocoaCookieManager
+ , public DefaultScreenKeyboardManager
 {
 };
 

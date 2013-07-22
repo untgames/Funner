@@ -542,6 +542,19 @@ const void* Window::DisplayHandle () const
   }
 }
 
+const void* Window::InternalHandle () const
+{
+  try
+  {
+    return impl->Handle ();
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("syslib::Window::InternalHandle");
+    throw;
+  }
+}
+
 /*
     Стиль окна
 */
