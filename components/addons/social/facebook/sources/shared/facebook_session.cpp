@@ -129,7 +129,7 @@ bool FacebookSessionImpl::ProcessDialogRequest (const char* request, const Windo
         stl::string error = get_url_parameter (request_copy.c_str (), "error_code=");
 
         if (error.empty ())
-          callback (OperationStatus_Success, "");
+          callback (OperationStatus_Success, request);
         else
           callback (OperationStatus_Failure, error.c_str ());
       }
