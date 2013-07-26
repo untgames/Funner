@@ -21,7 +21,7 @@ class DefaultScreenKeyboardManager
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Создание и уничтожение экранной клавиатуры
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    static screen_keyboard_t CreateScreenKeyboard  (window_t window, ScreenKeyboardType type, const char* platform_specific_name);
+    static screen_keyboard_t CreateScreenKeyboard  (window_t window, ScreenKeyboardType type, const char* platform_specific);
     static void              DestroyScreenKeyboard (screen_keyboard_t);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -34,7 +34,7 @@ class DefaultScreenKeyboardManager
 ///Проверка поддержки клавиатуры
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     static bool IsScreenKeyboardSupported (ScreenKeyboardType type);
-    static bool IsScreenKeyboardSupported (const char* platform_specific);
+    static bool IsScreenKeyboardSupported (const char* keyboard_name);
 };
 
 }

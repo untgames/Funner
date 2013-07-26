@@ -49,7 +49,7 @@ class ScreenKeyboard
 ///Проверка поддержки клавиатуры
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     static bool IsSupported (ScreenKeyboardType type);
-    static bool IsSupported (const char* platform_specific);
+    static bool IsSupported (const char* keyboard_name);
 
   private:
     ScreenKeyboard (const ScreenKeyboard&); //no implementation

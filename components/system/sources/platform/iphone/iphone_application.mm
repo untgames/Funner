@@ -525,9 +525,14 @@ typedef stl::vector<syslib::iphone::IApplicationListener*> ListenerArray;
 namespace syslib
 {
 
+namespace iphone
+{
+
 bool is_in_run_loop () //запущен ли главный цикл
 {
   return application_launched;
+}
+
 }
 
 }
