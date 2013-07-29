@@ -2,6 +2,7 @@
 #define RENDER_SCENE_INTERCHANGE_STREAMS_HEADER
 
 #include <xtl/common_exceptions.h>
+#include <xtl/type.h>
 
 #include <render/scene/interchange/command_buffer.h>
 
@@ -27,6 +28,11 @@ class OutputStream
     ~OutputStream ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+///Сброс
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void Reset (const CommandBuffer&);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Сериализация заголовка и конца команды
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void BeginCommand (command_id_t);
@@ -36,11 +42,6 @@ class OutputStream
 ///Подготовка достаточного места в буфере для записи
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void EnsureSpaceAvailable (size_t size);
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Запись поля
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    template <class T> void Write (const T&);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Запись блока данных
@@ -53,10 +54,10 @@ class OutputStream
     OutputStream& operator = (const OutputStream&); //no implementation
 
   private:
-    char*          command_start; //указатель на начало команды
-    char*          buffer_end;    //указатель на конец буфера
-    char*          pos;           //позиция указателя записи
-    CommandBuffer& buffer;        //буфер
+    char*         command_start; //указатель на начало команды
+    char*         buffer_end;    //указатель на конец буфера
+    char*         pos;           //позиция указателя записи
+    CommandBuffer buffer;        //буфер
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -72,6 +73,11 @@ class InputStream
     ~InputStream ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+///Сброс
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void Reset (const CommandBuffer&);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Количество доступных для считывания данных
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     size_t Available () const;
@@ -83,9 +89,9 @@ class InputStream
     void ReadDataUnsafe (void* data, size_t size);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Чтение поля
-///////////////////////////////////////////////////////////////////////////////////////////////////    
-    template <class T> T Read ();
+///Пропуск
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void Skip (size_t size);
 
   private:
     InputStream (const InputStream&); //no implementation
@@ -108,13 +114,16 @@ void write (OutputStream&, int8);
 void write (OutputStream&, uint8);
 void write (OutputStream&, float32);
 
-void read (InputStream&, int32&);
-void read (InputStream&, uint32&);
-void read (InputStream&, int16&);
-void read (InputStream&, uint16&);
-void read (InputStream&, int8&);
-void read (InputStream&, uint8&);
-void read (InputStream&, float32&);
+int32&   read (InputStream&, xtl::type<int32>);
+uint32&  read (InputStream&, xtl::type<uint32>);
+int16&   read (InputStream&, xtl::type<int16>);
+uint16&  read (InputStream&, xtl::type<uint16>);
+int8&    read (InputStream&, xtl::type<int8>);
+uint8&   read (InputStream&, xtl::type<uint8>);
+float32& read (InputStream&, xtl::type<float32>);
+
+void     write (OutputStream&, const Command&);
+Command& read  (InputStream&, xtl::type<Command>);
 
 }
 

@@ -1,7 +1,10 @@
-#ifndef RENDER_SCENE_CONTEXT_HEADER
-#define RENDER_SCENE_CONTEXT_HEADER
+#ifndef RENDER_SCENE_INTERCHANGE_CONTEXT_HEADER
+#define RENDER_SCENE_INTERCHANGE_CONTEXT_HEADER
 
-//in progress
+#include <common/log.h>
+
+#include <render/scene/interchange/connection.h>
+#include <render/scene/interchange/streams.h>
 
 namespace render
 {
@@ -9,57 +12,61 @@ namespace render
 namespace scene
 {
 
+namespace interchange
+{
+
+namespace detail
+{
+
+//implementation forwards
+template <class Deserializer> class IIncomingCommandsProcessor;
+
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Контекст обработки потоков данных рендеринга
+///////////////////////////////////////////////////////////////////////////////////////////////////
 template <class Serializer, class Deserializer>
 class Context: public Serializer, private Deserializer, private IConnectionListener
 {
   public:
+    typedef xtl::com_ptr<IConnection> ConnectionPtr;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Конструктор
+///////////////////////////////////////////////////////////////////////////////////////////////////
     template <class Processor> Context (const ConnectionPtr&, Processor&);
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Отсылка исходящих команд на выполнение
+///////////////////////////////////////////////////////////////////////////////////////////////////
     void Flush ();
 
-    void WaitFeedback ();
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Обработка входящих команд
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void ProcessIncomingCommands ();
 
   private:
-    void OnFeedback (const CommandBuffer&);
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Обработка входящих команд
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void OnIncomingCommands (const CommandBuffer&);
 
   private:
-    typedef IFeedbackProcessor<Deserializer> FeedbackProcessor;
-    typedef stl::auto_ptr<FeedbackProcessor> FeedbackProcessorPtr;
+    typedef detail::IIncomingCommandsProcessor<Deserializer> IncomingCommandsProcessor;
+    typedef stl::auto_ptr<IncomingCommandsProcessor>         IncomingCommandsProcessorPtr;
 
   private:
-///todo: impl
-    ConnectionPtr connection;
-    FeedbackProcessorPtr feedback_processor;
+    ConnectionPtr                connection;
+    CommandBufferPool            command_buffer_pool;
+    IncomingCommandsProcessorPtr incoming_commands_processor;
+    common::Log                  log;
 };
 
-template <class Deserializer> class IFeedbackProcessor
-{
-  public:
-    virtual ~IFeedbackProcessor () {}
+#include <render/scene/interchange/context.inl>
 
-    virtual void ProcessFeedback (Deserializer& deserializer) = 0;
-};
-
-template <class Processor, class Deserializer> class FeedbackProcessor: public IFeedbackProcessor<Deserializer>
-{
-  public:
-    FeedbackProcessor (Processor* in_processor) : processor (in_processor) {}
-
-    void ProcessFeedback (Deserializer& deserializer)
-    {
-      while (Command* command = deserializer.DeserializerHeader ())
-      {
-        if (deserializer.Available () < command->command_size - sizeof (Command))
-          throw exception; 
-
-        if (!deserializer.Deserialize (command->command_id, *processor))
-          log error about unknown command id and skip;
-      }
-    }
-
-  private:
-    Processor* processor;
-};
+}
 
 }
 
