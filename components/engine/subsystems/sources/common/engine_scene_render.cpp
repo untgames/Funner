@@ -42,9 +42,11 @@ class SceneRenderSubsystem : public ISubsystem, public IAttachmentRegistryListen
   public:
 ///Конструктор
     SceneRenderSubsystem (common::ParseNode& node, SubsystemManager& in_manager)
-      : log (LOG_NAME),
-        render (get<const char*> (node, "DriverMask"), get<const char*> (node, "RendererMask"), get<const char*> (node, "RenderPathMasks", "*")),
-        manager (in_manager)
+      : log (LOG_NAME)
+      , render (get<const char*> (node, "DriverMask"), get<const char*> (node, "RendererMask"), get<const char*> (node, "RenderPathMasks", "*"))
+      , on_app_pause_connection (syslib::Application::RegisterEventHandler (syslib::ApplicationEvent_OnPause, xtl::bind (&SceneRenderSubsystem::OnPause, this)))
+      , on_app_resume_connection (syslib::Application::RegisterEventHandler (syslib::ApplicationEvent_OnResume, xtl::bind (&SceneRenderSubsystem::OnResume, this)))
+      , manager (in_manager)
     {
       try
       {
