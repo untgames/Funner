@@ -27,7 +27,12 @@ class ConnectionManager
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     static void RegisterConnection       (const char* manager_name, const char* mask, const ConnectionCreator& creator);
     static void UnregisterConnection     (const char* manager_name);
-    static void UrnegisterAllConnections ();
+    static void UnregisterAllConnections ();
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Создание соединения
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    static IConnection* CreateConnection (const char* name, const char* init_string);
 };
 
 }
