@@ -127,8 +127,8 @@ void swap (Render&, Render&);
 
 }
 
-typedef scene::RenderTarget SceneRenderTarget;
-typedef scene::Render       SceneRender;
+using scene::RenderTarget;
+using scene::Render;
 
 }
 
