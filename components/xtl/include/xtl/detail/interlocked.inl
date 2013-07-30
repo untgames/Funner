@@ -33,56 +33,11 @@
   {
     return XTL_INTERLOCKED_DECREMENT ((volatile long*)&rc) + 1;
   }
-  
-  inline int atomic_conditional_increment (volatile int& rc)
-  {
-    for (;;)
-    {
-      long tmp = *(const volatile long*)&rc;
-      
-      if (tmp == 0)
-        return tmp;
 
-      if (XTL_INTERLOCKED_COMPARE_EXCHANGE ((volatile long*)&rc, tmp + 1, tmp) == tmp)
-        return tmp;
-    }
-  }
-  
-  inline int atomic_conditional_decrement (volatile int& rc)
+  inline int atomic_compare_and_swap (volatile int& value, int old_value, int new_value)
   {
-    for (;;)
-    {
-      long tmp = *(const volatile long*)&rc;
-      
-      if (tmp == 0)
-        return tmp;
-
-      if (XTL_INTERLOCKED_COMPARE_EXCHANGE ((volatile long*)&rc, tmp - 1, tmp) == tmp)
-        return tmp;
-    }  
-  }
-  
-  inline int atomic_increment (volatile int& rc, int value)
-  {
-    for (;;)
-    {
-      long tmp = *(const volatile long*)&rc;
-      
-      if (XTL_INTERLOCKED_COMPARE_EXCHANGE ((volatile long*)&rc, tmp + value, tmp) == tmp)
-        return tmp;
-    }
-  }
-  
-  inline int atomic_decrement (volatile int& rc, int value)
-  {
-    for (;;)
-    {
-      long tmp = *(const volatile long*)&rc;
-      
-      if (XTL_INTERLOCKED_COMPARE_EXCHANGE ((volatile long*)&rc, tmp - value, tmp) == tmp)
-        return tmp;
-    }  
-  }  
+    return XTL_INTERLOCKED_COMPARE_EXCHANGE ((volatile long*)&value, new_value, old_value);
+  } 
 
 #elif defined (__GNUC__) && (defined( __i386__) || defined (__x86_64__))
 
@@ -90,7 +45,7 @@
       from boost
   */
   
-  inline int atomic_increment (volatile int& rc, int val)
+  inline int atomic_increment (volatile int& rc)
   {
     int r;
 
@@ -99,74 +54,32 @@
        "lock\n\t"
        "xadd %1, %0":
        "+m"( rc ), "=r"( r ): // outputs (%0, %1)
-       "1"( val ): // inputs (%2 == %1)
+       "1"( 1 ): // inputs (%2 == %1)
        "memory", "cc" // clobbers
     );
 
     return r;
-  }    
-  
-  inline int atomic_decrement (volatile int& rc, int val)
-  {
-    return atomic_increment (rc, -val);
   }
-  
-  inline int atomic_increment (volatile int& rc)
+
+  inline int atomic_compare_and_swap (volatile int& value, int old_value, int new_value)
   {
-    return atomic_increment (rc, 1);
+    int prev = old_value;    
+
+    __asm__ volatile
+    (
+      "lock\n\t"
+      "cmpxchg %3,%1"
+      : "=a" (prev), "=m" (*(&value))
+      : "0" (prev), "r" (new_value)
+      : "memory", "cc"
+    );
+
+    return prev;
   }  
 
   inline int atomic_decrement (volatile int& rc)
   {
     return atomic_increment (rc, -1);
-  }
-
-  inline int atomic_conditional_increment (volatile int& rc)
-  {
-      int rv, tmp;
-
-      __asm__
-      (
-          "movl %0, %%eax\n\t"
-          "0:\n\t"
-          "test %%eax, %%eax\n\t"
-          "je 1f\n\t"
-          "movl %%eax, %2\n\t"
-          "incl %2\n\t"
-          "lock\n\t"
-          "cmpxchgl %2, %0\n\t"
-          "jne 0b\n\t"
-          "1:":
-          "=m"( rc ), "=&a"( rv ), "=&r"( tmp ): // outputs (%0, %1, %2)
-          "m"( rc ): // input (%3)
-          "cc" // clobbers
-      );
-
-      return rv;
-  }
-
-  inline int atomic_conditional_decrement (volatile int& rc)
-  {
-      int rv, tmp;
-
-      __asm__
-      (
-          "movl %0, %%eax\n\t"
-          "0:\n\t"
-          "test %%eax, %%eax\n\t"
-          "je 1f\n\t"
-          "movl %%eax, %2\n\t"
-          "decl %2\n\t"
-          "lock\n\t"
-          "cmpxchgl %2, %0\n\t"
-          "jne 0b\n\t"
-          "1:":
-          "=m"( rc ), "=&a"( rv ), "=&r"( tmp ): // outputs (%0, %1, %2)
-          "m"( rc ): // input (%3)
-          "cc" // clobbers
-      );
-
-      return rv;
   }
   
 #elif defined (ARM)
@@ -294,15 +207,7 @@ inline int atomic_decrement (volatile int& rc)
   return __sync_fetch_and_sub (&rc, 1);
 }
 
-inline int atomic_increment (volatile int& rc, int val)
-{
-  return __sync_fetch_and_add (&rc, val);
-}
-
-inline int atomic_decrement (volatile int& rc, int val)
-{
-  return __sync_fetch_and_sub (&rc, val);
-}
+#endif
 
 inline int atomic_conditional_increment (volatile int& rc)
 {
@@ -313,7 +218,7 @@ inline int atomic_conditional_increment (volatile int& rc)
     if (tmp == 0)
       return tmp;
 
-    if (__sync_val_compare_and_swap (&rc, tmp, tmp + 1) == tmp)
+    if (atomic_compare_and_swap (rc, tmp, tmp + 1) == tmp)
       return tmp;
   }
 }
@@ -327,9 +232,29 @@ inline int atomic_conditional_decrement (volatile int& rc)
     if (tmp == 0)
       return tmp;
 
-    if (__sync_val_compare_and_swap (&rc, tmp, tmp - 1) == tmp)
+    if (atomic_compare_and_swap (rc, tmp, tmp - 1) == tmp)
+      return tmp;
+  }  
+}
+
+inline int atomic_increment (volatile int& rc, int value)
+{
+  for (;;)
+  {
+    int tmp = rc;
+    
+    if (atomic_compare_and_swap (rc, tmp, tmp + value) == tmp)
       return tmp;
   }
 }
 
-#endif
+inline int atomic_decrement (volatile int& rc, int value)
+{
+  for (;;)
+  {
+    int tmp = rc;
+    
+    if (atomic_compare_and_swap (rc, tmp, tmp - value) == tmp)
+      return tmp;
+  }  
+}  
