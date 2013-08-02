@@ -12,7 +12,8 @@ class AndroidApplicationDelegate;
 
 AndroidApplicationDelegate* volatile application_delegate = 0;
 
-static bool screen_saver_state = true;
+static bool                      screen_saver_state = true;
+static ApplicationBackgroundMode background_mode    = ApplicationBackgroundMode_Suspend;
 
 template <class Fn> class ActivityMessage: public MessageQueue::Message
 {
@@ -128,23 +129,6 @@ class AndroidApplicationDelegate: public IApplicationDelegate, public xtl::refer
       
       if (state)
         message_queue.PushEmptyMessage ();
-    }
-
-///Управление режимом работы в фоне
-    ApplicationBackgroundMode BackgroundMode () { return background_mode; }
-
-    void SetBackgroundMode (ApplicationBackgroundMode mode)
-    {
-      background_mode = mode;
-
-      switch (mode)
-      {
-        case ApplicationBackgroundMode_Active:
-          SetActivityState (true);
-          break;
-        default:
-          break;
-      }
     }
 
 ///Установка слушателя событий приложения
@@ -271,15 +255,14 @@ class AndroidApplicationDelegate: public IApplicationDelegate, public xtl::refer
     }
 
   private:
-    bool                      idle_enabled;
-    bool                      is_exited;
-    volatile bool             is_paused;
-    ApplicationBackgroundMode background_mode;
-    Mutex                     pause_mutex;
-    Condition                 pause_condition;
-    IApplicationListener*     listener;
-    MessageQueue&             message_queue;
-    common::Log               log;
+    bool                  idle_enabled;
+    bool                  is_exited;
+    volatile bool         is_paused;
+    Mutex                 pause_mutex;
+    Condition             pause_condition;
+    IApplicationListener* listener;
+    MessageQueue&         message_queue;
+    common::Log           log;
 };
 
 /*
@@ -423,10 +406,15 @@ void AndroidApplicationManager::GetSystemProperties (common::PropertyMap& proper
 
 void AndroidApplicationManager::SetApplicationBackgroundMode (syslib::ApplicationBackgroundMode mode)
 {
+  background_mode = mode;
+
+  if (background_mode == ApplicationBackgroundMode_Active && application_delegate)
+    application_delegate->SetActivityState (true);    
 }
 
 ApplicationBackgroundMode AndroidApplicationManager::GetApplicationBackgroundMode ()
 {
+  return background_mode;
 }
 
 namespace syslib

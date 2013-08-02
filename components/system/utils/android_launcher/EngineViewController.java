@@ -252,7 +252,7 @@ public class EngineViewController implements View.OnTouchListener, View.OnKeyLis
   public native void onTouchCallback            (int pointerId, int action, float x, float y);
   public native void onDoubletapCallback        (int pointerId, float x, float y);
   public native void onTrackballCallback        (int pointerId, int action, float x, float y);
-  public native void onKeyCallback              (int keycode, int action, boolean alt_pressed, boolean shift_pressed, boolean is_sym_pressed);
+  public native void onKeyCallback              (int keycode, int action, boolean alt_pressed, boolean shift_pressed, boolean is_sym_pressed, int unicodeChar);
   public native void onFocusCallback            (boolean focusGained);
   public native void onSurfaceCreatedCallback   ();
   public native void onSurfaceChangedCallback   (int format, int width, int height);  
@@ -294,7 +294,7 @@ public class EngineViewController implements View.OnTouchListener, View.OnKeyLis
             is_shift_pressed = event.isShiftPressed (),
             is_sym_pressed   = event.isSymPressed ();
             
-    onKeyCallback (keyCode, action, is_alt_pressed, is_shift_pressed, is_sym_pressed);
+    onKeyCallback (keyCode, action, is_alt_pressed, is_shift_pressed, is_sym_pressed, event.getUnicodeChar ());
 
     return true;
   }  

@@ -14,6 +14,7 @@
 #include <common/log.h>
 #include <common/property_map.h>
 #include <common/time.h>
+#include <common/utf_converter.h>
 
 #include <syslib/application.h>
 #include <syslib/cookie.h>

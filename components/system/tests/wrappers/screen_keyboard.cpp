@@ -2,7 +2,7 @@
 
 void on_char (Window& window, WindowEvent event, const WindowEventContext& context)
 {
-  printf ("char '%C'\n", context.char_code);
+  printf ("char '%s'\n", common::to_utf8_string (&context.char_code, 1).c_str ());
   fflush (stdout);  
 }
 
@@ -42,6 +42,7 @@ int main ()
     ScreenKeyboard keyboard (window, ScreenKeyboardType_Ascii);
 
     keyboard.Show ();
+//    keyboard.Hide ();
 
     Application::Run ();
 
