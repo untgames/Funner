@@ -130,6 +130,23 @@ class AndroidApplicationDelegate: public IApplicationDelegate, public xtl::refer
         message_queue.PushEmptyMessage ();
     }
 
+///Управление режимом работы в фоне
+    ApplicationBackgroundMode BackgroundMode () { return background_mode; }
+
+    void SetBackgroundMode (ApplicationBackgroundMode mode)
+    {
+      background_mode = mode;
+
+      switch (mode)
+      {
+        case ApplicationBackgroundMode_Active:
+          SetActivityState (true);
+          break;
+        default:
+          break;
+      }
+    }
+
 ///Установка слушателя событий приложения
     void SetListener (IApplicationListener* in_listener)
     {
@@ -159,6 +176,12 @@ class AndroidApplicationDelegate: public IApplicationDelegate, public xtl::refer
 ///Оповещение о приостановке приложения
     void OnPause ()
     {        
+      if (background_mode == ApplicationBackgroundMode_Active)
+      {
+        SetActivityState (true);
+        return;
+      }
+
       if (listener)
         listener->OnPause ();
         
@@ -170,8 +193,8 @@ class AndroidApplicationDelegate: public IApplicationDelegate, public xtl::refer
         while (is_paused)
           pause_condition.Wait (pause_mutex);        
       }
-      
-      log.Printf ("Application resumed");      
+
+      log.Printf ("Application resumed");
 
       if (listener)
         listener->OnResume ();      
@@ -193,7 +216,7 @@ class AndroidApplicationDelegate: public IApplicationDelegate, public xtl::refer
     void Release ()
     {
       release (this);
-    }    
+    }
     
   private:
 ///Отложенное события выхода из приложения
@@ -245,17 +268,18 @@ class AndroidApplicationDelegate: public IApplicationDelegate, public xtl::refer
         exception.touch ("syslib::android::AndroidApplicationDelegate::DoNextEvent");
         throw;
       }
-    }      
+    }
 
   private:
-    bool                  idle_enabled;
-    bool                  is_exited;
-    volatile bool         is_paused;
-    Mutex                 pause_mutex;
-    Condition             pause_condition;
-    IApplicationListener* listener;
-    MessageQueue&         message_queue;    
-    common::Log           log;
+    bool                      idle_enabled;
+    bool                      is_exited;
+    volatile bool             is_paused;
+    ApplicationBackgroundMode background_mode;
+    Mutex                     pause_mutex;
+    Condition                 pause_condition;
+    IApplicationListener*     listener;
+    MessageQueue&             message_queue;
+    common::Log               log;
 };
 
 /*
@@ -391,6 +415,18 @@ void AndroidApplicationManager::GetSystemProperties (common::PropertyMap& proper
     e.touch ("syslib::AndroidApplicationManager::GetSystemProperties");
     throw;
   }
+}
+
+/*
+    Управление режимом работы в фоне
+*/
+
+void AndroidApplicationManager::SetApplicationBackgroundMode (syslib::ApplicationBackgroundMode mode)
+{
+}
+
+ApplicationBackgroundMode AndroidApplicationManager::GetApplicationBackgroundMode ()
+{
 }
 
 namespace syslib
