@@ -19,19 +19,21 @@ const size_t CONFIG_MAX_ATTRIBUTES = 128; //максимальное количество атрибутов в 
     Описание реализации первичной цепочки обмена
 */
 
-typedef xtl::com_ptr<Adapter> AdapterPtr;
-typedef Output::Pointer       OutputPtr;
+typedef xtl::com_ptr<Adapter>     AdapterPtr;
+typedef Output::Pointer           OutputPtr;
+typedef stl::auto_ptr<EglSurface> EglSurfacePtr;
 
 struct PrimarySwapChain::Impl
 {
-  AdapterPtr    adapter;     //адаптер, которому принадлежит устройство
-  OutputPtr     output;      //целевое устройство вывода
-  Log           log;         //протокол
-  EGLDisplay    egl_display; //целевое устройство вывода
-  EGLConfig     egl_config;  //целевая конфигурация
-  EGLSurface    egl_surface; //целевая поверхность отрисовки
-  SwapChainDesc desc;        //дескриптор цепочки обмена
-  PropertyList  properties;  //свойства цепочки обмена
+  AdapterPtr    adapter;            //адаптер, которому принадлежит устройство
+  OutputPtr     output;             //целевое устройство вывода
+  EglSurfacePtr egl_surface_holder; //хранилище поверхности отрисовки
+  Log           log;                //протокол
+  EGLDisplay    egl_display;        //целевое устройство вывода
+  EGLConfig     egl_config;         //целевая конфигурация
+  EGLSurface    egl_surface;        //целевая поверхность отрисовки
+  SwapChainDesc desc;               //дескриптор цепочки обмена
+  PropertyList  properties;         //свойства цепочки обмена
 
 ///Конструктор
   Impl (Adapter* in_adapter, const SwapChainDesc& in_desc)
@@ -41,92 +43,72 @@ struct PrimarySwapChain::Impl
     , egl_config (0)
     , egl_surface (0)    
   {
-    try
-    {
-      DisplayLock lock (output->GetDisplay ());
-      
-        //выбор конфигурации
+    DisplayLock lock (output->GetDisplay ());
+    
+      //выбор конфигурации
 
-      desc = in_desc;
+    desc = in_desc;
 
 #ifdef TABLETOS
-      desc.frame_buffer.color_bits   = 24;
-      desc.frame_buffer.depth_bits   = 24;
+    desc.frame_buffer.color_bits   = 24;
+    desc.frame_buffer.depth_bits   = 24;
 //      desc.frame_buffer.alpha_bits   = 8;
 //      desc.frame_buffer.stencil_bits = 8;
 #endif
 
-      egl_config = ChooseConfig (desc);
+    egl_config = ChooseConfig (desc);
 
-      desc.frame_buffer.alpha_bits   = GetConfigAttribute (EGL_ALPHA_SIZE);
-      desc.frame_buffer.color_bits   = GetConfigAttribute (EGL_BUFFER_SIZE) - desc.frame_buffer.alpha_bits;
-      desc.frame_buffer.depth_bits   = GetConfigAttribute (EGL_DEPTH_SIZE);
-      desc.frame_buffer.stencil_bits = GetConfigAttribute (EGL_STENCIL_SIZE);
-      desc.samples_count             = GetConfigAttribute (EGL_SAMPLES);
-      desc.buffers_count             = 2;
-      desc.fullscreen                = false;
-        
-      if (!egl_config)
-        throw xtl::format_operation_exception ("", "Bad EGL configuration (RGB/A: %u/%u, D/S: %u/%u, Samples: %u)",
-          in_desc.frame_buffer.color_bits, in_desc.frame_buffer.alpha_bits, in_desc.frame_buffer.depth_bits,
-          in_desc.frame_buffer.stencil_bits, in_desc.samples_count);
+    desc.frame_buffer.alpha_bits   = GetConfigAttribute (EGL_ALPHA_SIZE);
+    desc.frame_buffer.color_bits   = GetConfigAttribute (EGL_BUFFER_SIZE) - desc.frame_buffer.alpha_bits;
+    desc.frame_buffer.depth_bits   = GetConfigAttribute (EGL_DEPTH_SIZE);
+    desc.frame_buffer.stencil_bits = GetConfigAttribute (EGL_STENCIL_SIZE);
+    desc.samples_count             = GetConfigAttribute (EGL_SAMPLES);
+    desc.buffers_count             = 2;
+    desc.fullscreen                = false;
+      
+    if (!egl_config)
+      throw xtl::format_operation_exception ("", "Bad EGL configuration (RGB/A: %u/%u, D/S: %u/%u, Samples: %u)",
+        in_desc.frame_buffer.color_bits, in_desc.frame_buffer.alpha_bits, in_desc.frame_buffer.depth_bits,
+        in_desc.frame_buffer.stencil_bits, in_desc.samples_count);
 
-      EGLint format = 0;
-          
-      eglGetConfigAttrib (egl_display, egl_config, EGL_NATIVE_VISUAL_ID, &format);                
+    EGLint format = 0;
         
-      log.Printf ("...choose configuration #%u (VisualId: %d, RGB/A: %u/%u, D/S: %u/%u, Samples: %u)",
-        egl_config, format, desc.frame_buffer.color_bits, desc.frame_buffer.alpha_bits, desc.frame_buffer.depth_bits,
-        desc.frame_buffer.stencil_bits, desc.samples_count);
+    eglGetConfigAttrib (egl_display, egl_config, EGL_NATIVE_VISUAL_ID, &format);                
+      
+    log.Printf ("...choose configuration #%u (VisualId: %d, RGB/A: %u/%u, D/S: %u/%u, Samples: %u)",
+      egl_config, format, desc.frame_buffer.color_bits, desc.frame_buffer.alpha_bits, desc.frame_buffer.depth_bits,
+      desc.frame_buffer.stencil_bits, desc.samples_count);
 
 #ifdef TABLETOS
-      log.Printf ("...setup window");              
+    log.Printf ("...setup window");              
 
-      setup_window (output->GetWindowHandle (), desc, log);
+    setup_window (output->GetWindowHandle (), desc, log);
 #endif
-        
-      log.Printf ("...create window surface");              
-
-#ifdef ANDROID
-
-      egl_surface = eglCreateWindowSurfaceAndroid (egl_display, egl_config, output->GetWindowHandle (), format);  
-#else
-
-        //создание поверхности отрисовки
-
-      egl_surface = eglCreateWindowSurface (egl_display, egl_config, (NativeWindowType)output->GetWindowHandle (), 0);
       
-#endif      
+    log.Printf ("...create window surface");              
+
+    egl_surface_holder.reset (new EglSurface (egl_display, egl_config, output->GetWindowHandle ()));
+
+    egl_surface = egl_surface_holder->GetSurface ();      
+
+      //сохранение дескриптора устройства        
+
+    desc.frame_buffer.width  = GetSurfaceAttribute (EGL_WIDTH);
+    desc.frame_buffer.height = GetSurfaceAttribute (EGL_HEIGHT);
+
+      //установка свойств цепочки обмена
       
-      if (!egl_surface)
-        raise_error ("::eglCreateWindowSurface");
-
-        //сохранение дескриптора устройства        
-
-      desc.frame_buffer.width  = GetSurfaceAttribute (EGL_WIDTH);
-      desc.frame_buffer.height = GetSurfaceAttribute (EGL_HEIGHT);
-
-        //установка свойств цепочки обмена
-        
-      try
-      {
-        properties.AddProperty ("egl_vendor",      GetEglString (EGL_VENDOR));
-        properties.AddProperty ("egl_version",     GetEglString (EGL_VERSION));
-        properties.AddProperty ("egl_extensions",  GetEglString (EGL_EXTENSIONS));
-        properties.AddProperty ("egl_client_apis", GetEglString (EGL_CLIENT_APIS));
-      }
-      catch (...)
-      {
-        //исключения при взятии свойств EGL не являются критичными для работы
-        //(обход бага egl для bada)
-      }
+    try
+    {
+      properties.AddProperty ("egl_vendor",      GetEglString (EGL_VENDOR));
+      properties.AddProperty ("egl_version",     GetEglString (EGL_VERSION));
+      properties.AddProperty ("egl_extensions",  GetEglString (EGL_EXTENSIONS));
+      properties.AddProperty ("egl_client_apis", GetEglString (EGL_CLIENT_APIS));
     }
     catch (...)
     {
-      if (egl_surface)
-        eglDestroySurface (egl_display, egl_surface);
-
-      throw;
+      //исключения при взятии свойств EGL не являются критичными для работы
+      //(обход бага egl для bada)
     }
   }
   
@@ -138,8 +120,6 @@ struct PrimarySwapChain::Impl
       DisplayLock lock (output->GetDisplay ());
 
       eglWaitGL ();
-
-      eglDestroySurface (egl_display, egl_surface);
     }
     catch (...)
     {

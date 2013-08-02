@@ -1,5 +1,7 @@
 #include "../shared.h"
 
+#include <syslib/platform/android.h>
+
 /*
     Useful links:
       http://www.netmite.com/android/mydroid/donut/frameworks/base/core/jni/com_google_android_gles_jni_EGLImpl.cpp
@@ -8,22 +10,10 @@
       http://www.netmite.com/android/mydroid/frameworks/base/libs/ui/EGLDisplaySurface.cpp    
 */
 
+using namespace syslib::android;
 using namespace render::low_level;
 using namespace render::low_level::opengl;
 using namespace render::low_level::opengl::egl;
-
-namespace syslib
-{
-
-namespace android
-{
-
-/// получение окружения текущей нити
-JNIEnv& get_env ();
-
-}
-
-}
 
 namespace
 {
@@ -36,50 +26,27 @@ const char* EGL_CLASS_NAME         = "com/google/android/gles_jni/EGLImpl";
 const char* EGL_CONFIG_CLASS_NAME  = "com/google/android/gles_jni/EGLConfigImpl";
 const char* EGL_DISPLAY_CLASS_NAME = "com/google/android/gles_jni/EGLDisplayImpl";
 
-/*
-    JNI wrappers
-*/
-
-///Стратегия владения локальной JNI ссылкой
-template <class T> struct jni_local_ref_strategy
-{
-  static T*   clone   (T* ptr) { return (T*)syslib::android::get_env ().NewLocalRef (ptr); }
-  static void release (T* ptr) { syslib::android::get_env ().DeleteLocalRef (ptr); }  
-};
-
-/// Локальная JNI ссылка
-template <class T> class local_ref: public xtl::intrusive_ptr<typename xtl::type_traits::remove_pointer<T>::type, jni_local_ref_strategy>
-{
-  typedef xtl::intrusive_ptr<typename xtl::type_traits::remove_pointer<T>::type, jni_local_ref_strategy> base;
-  public:
-    typedef typename base::element_type element_type;
-
-    local_ref () {}
-    local_ref (element_type* ptr, bool addref = true) : base (ptr, addref) {}
-    local_ref (const local_ref& ref) : base (ref) {}
-
-    template <class T1> local_ref (const local_ref<T1>& ref) : base (ref) {}    
-};
-
 }
 
-namespace render
-{
-
-namespace low_level
-{
-
-namespace opengl
-{
-
-namespace egl
-{
-
 /*
-    Создание экранной поверхности (для Android)
+    Описание реализации поверхности
 */
 
-EGLSurface eglCreateWindowSurfaceAndroid (EGLDisplay egl_display, EGLConfig egl_config, const void* window_handle, EGLint format)
+struct EglSurface::Impl
+{
+  global_ref<jobject> egl;
+  global_ref<jobject> egl_surface;
+  global_ref<jobject> egl_display;
+  EGLSurface          egl_surface_field;
+  jmethodID           egl_destroy_surface;
+};
+
+/*
+    Конструктор / деструктор
+*/
+
+EglSurface::EglSurface (EGLDisplay egl_display, EGLConfig egl_config, const void* window_handle)
+  : impl (new Impl)
 {
   try
   {
@@ -90,7 +57,7 @@ EGLSurface eglCreateWindowSurfaceAndroid (EGLDisplay egl_display, EGLConfig egl_
 
       //создание поверхности через JNI
 
-    JNIEnv& env = syslib::android::get_env ();
+    JNIEnv& env = get_env ();
 
     local_ref<jclass> egl_class         = env.FindClass (EGL_CLASS_NAME);
     local_ref<jclass> egl_config_class  = env.FindClass (EGL_CONFIG_CLASS_NAME);
@@ -105,22 +72,11 @@ EGLSurface eglCreateWindowSurfaceAndroid (EGLDisplay egl_display, EGLConfig egl_
     if (!egl_display_class)
       throw xtl::format_operation_exception ("", "EGLDisplayImpl class '%s' not found in JNI environment", EGL_DISPLAY_CLASS_NAME);
 
-    jmethodID egl_class_constructor         = env.GetMethodID (egl_class.get (), "<init>", "()V");
-    jmethodID egl_config_class_constructor  = env.GetMethodID (egl_config_class.get (), "<init>", "(I)V");
-    jmethodID egl_display_class_constructor = env.GetMethodID (egl_display_class.get (), "<init>", "(I)V");
-    jmethodID egl_create_window_surface     = env.GetMethodID (egl_class.get (), "eglCreateWindowSurface", "(Ljavax/microedition/khronos/egl/EGLDisplay;Ljavax/microedition/khronos/egl/EGLConfig;Ljava/lang/Object;[I)Ljavax/microedition/khronos/egl/EGLSurface;");
-
-    if (!egl_class_constructor)
-      throw xtl::format_operation_exception ("", "EGLImpl default constructor not found in class '%s'", EGL_CLASS_NAME);
-      
-    if (!egl_config_class_constructor)
-      throw xtl::format_operation_exception ("", "EGLConfigImpl constructor not found in class '%s'", EGL_CONFIG_CLASS_NAME);
-      
-    if (!egl_display_class_constructor)
-      throw xtl::format_operation_exception ("", "EGLDisplayImpl constructor not found in class '%s'", EGL_DISPLAY_CLASS_NAME);
-      
-    if (!egl_create_window_surface)
-      throw xtl::format_operation_exception ("", "EGLImpl::eglCreateWindowSurface not found in class '%s'", EGL_CLASS_NAME);
+    jmethodID egl_class_constructor         = find_method (&env, egl_class.get (), "<init>", "()V");
+    jmethodID egl_config_class_constructor  = find_method (&env, egl_config_class.get (), "<init>", "(I)V");
+    jmethodID egl_display_class_constructor = find_method (&env, egl_display_class.get (), "<init>", "(I)V");
+    jmethodID egl_create_window_surface     = find_method (&env, egl_class.get (), "eglCreateWindowSurface", "(Ljavax/microedition/khronos/egl/EGLDisplay;Ljavax/microedition/khronos/egl/EGLConfig;Ljava/lang/Object;[I)Ljavax/microedition/khronos/egl/EGLSurface;");
+    jmethodID egl_destroy_surface           = find_method (&env, egl_class.get (), "eglDestroySurface", "(Ljavax/microedition/khronos/egl/EGLDisplay;Ljavax/microedition/khronos/egl/EGLSurface;)Z");
 
     local_ref<jobject> egl = env.NewObject (egl_class.get (), egl_class_constructor);
 
@@ -139,7 +95,7 @@ EGLSurface eglCreateWindowSurfaceAndroid (EGLDisplay egl_display, EGLConfig egl_
 
     eglWaitGL ();
 
-    local_ref<jobject> egl_surface_wrapper = env.CallObjectMethod (egl.get (), egl_create_window_surface, egl_display_wrapper.get (), egl_config_wrapper.get (), view, 0);
+    local_ref<jobject> egl_surface_wrapper = syslib::android::check_errors (env.CallObjectMethod (egl.get (), egl_create_window_surface, egl_display_wrapper.get (), egl_config_wrapper.get (), view, 0));
 
     if (!egl_surface_wrapper)
       throw xtl::format_operation_exception ("", "EGLImpl::eglCreateWindowSurface failed");
@@ -154,19 +110,37 @@ EGLSurface eglCreateWindowSurfaceAndroid (EGLDisplay egl_display, EGLConfig egl_
     if (!egl_surface_field)
       throw xtl::format_operation_exception ("", "Field 'mEGLSurface' not found for EGLSurfaceImpl");
 
-    return (EGLSurface)env.GetIntField (egl_surface_wrapper.get (), egl_surface_field);
+    impl->egl                 = egl;
+    impl->egl_surface         = egl_surface_wrapper;
+    impl->egl_display         = egl_display_wrapper;
+    impl->egl_surface_field   = (EGLSurface)env.GetIntField (egl_surface_wrapper.get (), egl_surface_field);
+    impl->egl_destroy_surface = egl_destroy_surface;
   }
   catch (xtl::exception& e)
   {
-    e.touch ("render::low_level::opengl::egl::eglCreateWindowSurfaceAndroid");
+    e.touch ("render::low_level::opengl::egl::android::EglSurface::EglSurface");
     throw;
   }
 }
 
+EglSurface::~EglSurface ()
+{
+  try
+  {
+    JNIEnv& env = get_env ();
+
+    syslib::android::check_errors (env.CallBooleanMethod (impl->egl.get (), impl->egl_destroy_surface, impl->egl_display.get (), impl->egl_surface.get ()));
+  }
+  catch (...)
+  {
+  }
 }
 
-}
+/*
+    Поверхность
+*/
 
-}
-
+EGLSurface EglSurface::GetSurface () const
+{
+  return impl->egl_surface_field;
 }
