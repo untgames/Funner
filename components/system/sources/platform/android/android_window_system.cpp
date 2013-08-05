@@ -1045,14 +1045,18 @@ bool AndroidWindowManager::GetBackgroundState (window_t window)
 struct syslib::screen_keyboard_handle: public xtl::reference_counter, public xtl::trackable
 {
   global_ref<jobject> view;                       //android окно    
+  global_ref<jobject> controller;                 //контроллер
   global_ref<jclass>  input_method_manager_class; //класс менеджера ввода
   global_ref<jobject> input_method_manager;       //менеджер ввода
+  jmethodID           request_focus_method;       //метод запроса фокуса
   jmethodID           show_keyboard_method;       //метод показа клавиатуры
   jmethodID           hide_keyboard_method;       //метод скрытия клавиатуры
 
 /// Конструктор
   screen_keyboard_handle (window_t window)
     : view (window->view)
+    , controller (window->controller)
+    , request_focus_method (window->request_focus_method)
   {
     JNIEnv& env = syslib::android::get_env ();
 
@@ -1128,6 +1132,9 @@ void AndroidScreenKeyboardManager::ShowScreenKeyboard (screen_keyboard_t keyboar
       throw xtl::make_null_argument_exception ("", "keyboard");
 
     JNIEnv& env = syslib::android::get_env ();
+
+    if (!check_errors (env.CallBooleanMethod (keyboard->controller.get (), keyboard->request_focus_method)))
+      throw xtl::format_operation_exception ("", "EngineViewController::requestFocusThreadSafe failed");
 
     static const int SHOW_FORCED = 2;
 

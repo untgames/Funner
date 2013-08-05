@@ -335,7 +335,7 @@ void AndroidApplicationManager::OpenUrl (const char* url)
 }
 
 /*
-   Управление энергосбережением
+    Управление энергосбережением
 */
 
 void AndroidApplicationManager::SetScreenSaverState (bool state)
