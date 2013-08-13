@@ -9,7 +9,7 @@
 #import <UIKit/UIScreen.h>
 #import <UIKit/UIWindow.h>
 
-#import "Tracking.h"
+#import "AdXTracking.h"
 
 #import <MobileAppTracker/MobileAppTracker.h>
 
@@ -120,7 +120,7 @@ static NSString* MAT_AD_KEY = @"3fa11cf8822ff1d86461c44ac1ee09b2";
 
 @interface TrackingWrapper : NSObject
 {
-  Tracking* tracker;
+  AdXTracking* tracker;
 }
 
 @end
@@ -140,7 +140,7 @@ static NSString* MAT_AD_KEY = @"3fa11cf8822ff1d86461c44ac1ee09b2";
 {
   if (!tracker)
   {
-    tracker = [[Tracking alloc] init];
+    tracker = [[AdXTracking alloc] init];
     [tracker setURLScheme:UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad ? PAD_ADX_URL_SCHEME : PHONE_ADX_URL_SCHEME];
     [tracker setClientId:@"PLR7hjus768DP"];
     [tracker setAppleId:UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad ? PAD_APPLE_ID : PHONE_APPLE_ID];
