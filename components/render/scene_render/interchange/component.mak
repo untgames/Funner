@@ -14,4 +14,4 @@ RENDER.SCENE_RENDER.INTERCHANGE.UTILS.SERIALIZER_GENERATOR.IMPORTS     := compil
 RENDER.SCENE_RENDER.INTERCHANGE.SOURCES.TYPE        := static-lib
 RENDER.SCENE_RENDER.INTERCHANGE.SOURCES.NAME        := funner.render.scene_render.interchange
 RENDER.SCENE_RENDER.INTERCHANGE.SOURCES.SOURCE_DIRS := sources
-RENDER.SCENE_RENDER.INTERCHANGE.SOURCES.IMPORTS     := compile.render.scene_render.interchange compile.common
+RENDER.SCENE_RENDER.INTERCHANGE.SOURCES.IMPORTS     := compile.render.scene_render.interchange compile.common compile.system
