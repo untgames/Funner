@@ -9,7 +9,6 @@ inline spin_lock::spin_lock ()
 
 inline spin_lock::~spin_lock ()
 {
-  lock ();
 }
 
 /*
