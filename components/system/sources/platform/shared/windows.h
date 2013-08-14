@@ -177,6 +177,7 @@ class WindowsThreadManager: public DefaultThreadManager
 ///Установка приоритета нити
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     static void SetThreadPriority (thread_t thread, ThreadPriority thread_priority);
+    static void SetThreadAffinity (thread_t thread, size_t affinity);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Работа с локальными данными нити

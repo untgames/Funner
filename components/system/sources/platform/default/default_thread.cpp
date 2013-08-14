@@ -65,4 +65,9 @@ void DefaultThreadManager::SetThreadPriority (thread_t thread, ThreadPriority th
   raise ("syslib::DefaultThreadManager::SetThreadPriority");
 }
 
+void DefaultThreadManager::SetThreadAffinity (thread_t thread, size_t affinity)
+{
+  raise ("syslib::DefaultThreadManager::SetThreadAffinity");
+}
+
 }
