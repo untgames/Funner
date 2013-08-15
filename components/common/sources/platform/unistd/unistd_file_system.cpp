@@ -56,7 +56,7 @@ class UnistdFileSystem: public StdioFileSystem
         {
           case EEXIST: throw xtl::format_operation_exception (METHOD_NAME,"Path '%s' already exist",dir_name); break;
           case ENOENT: throw xtl::format_operation_exception (METHOD_NAME,"Path '%s' not found",dir_name); break;
-          default:     throw xtl::format_operation_exception (METHOD_NAME,"Unknown error"); break;
+          default:     throw xtl::format_operation_exception (METHOD_NAME, "Can't create directory '%s'. Reason: %s", dir_name, common::strerror (errno)); break;
         }
       }
     }
