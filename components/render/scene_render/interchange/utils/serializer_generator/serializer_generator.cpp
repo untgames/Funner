@@ -11,16 +11,15 @@
     Константы
 */
 
-const char* INPUT_FILE_NAME                   = "input/signatures.h";               //файл с сигнатурами
-const char* TEMPLATES_MASK                    = "input/templates/*";                //маска имён файлов-шаблонов
-const char* RESULT_DIR                        = "results";                          //каталог с результирующими файлами
-const char* SERIALIZE_PARAM_PREFIX            = "Serialize(";                       //префикс сериализации параметра
-const char* SERIALIZE_HEADER_PREFIX           = "SerializeHeader(";                 //префикс сериализации заголовка
-const char* SERIALIZE_TAIL                    = "SerializeTail();";                 //хвостовая сериализация
-const char* COMMAND_ID_ENUM_NAME              = "CommandId";                        //идентификатор команды
-const char* SERIALIZER_CLASS_NAME             = "CommandSerializer";                //имя класса сериализации
-const char* DESERIALIZER_DISPATCH_METHOD_NAME = "CommandDeserializer::Deserialize"; //имя метода десериализации
-const char* DESERIALIZE_METHOD_NAME           = "Deserialize";                      //имя метода десериализации
+const char* INPUT_FILE_NAME                   = "input/signatures.h";        //файл с сигнатурами
+const char* TEMPLATES_MASK                    = "input/templates/*";         //маска имён файлов-шаблонов
+const char* RESULT_DIR                        = "results";                   //каталог с результирующими файлами
+const char* SERIALIZE_PARAM_PREFIX            = "write";                     //префикс сериализации параметра
+const char* SERIALIZE_HEADER_PREFIX           = "BeginCommand(";             //префикс сериализации заголовка
+const char* SERIALIZE_TAIL                    = "EndCommand();";             //хвостовая сериализация
+const char* COMMAND_ID_ENUM_NAME              = "CommandId";                 //идентификатор команды
+const char* DESERIALIZER_DISPATCH_METHOD_NAME = "Deserializer::Deserialize"; //имя метода десериализации
+const char* DESERIALIZE_METHOD_NAME           = "read";                     //имя метода десериализации
 
 /*
     Структуры
@@ -40,8 +39,9 @@ typedef stl::vector<Param> ParamArray;
 //метод
 struct Method
 {
+  stl::string section;     //имя секции
   stl::string name;        //имя метода
-  stl::string result_type; //имя возвращаемого типа
+  stl::string result_type; //имя возвращаемого типа  
   ParamArray  params;      //список параметров
 };
 
@@ -213,9 +213,32 @@ void parse_signature (const char* line, Method& method)
   parse_params (stl::string (start_params+1, end_params).c_str (), method.params);
 }
 
+void parse_section (const char* iter, stl::string& section)
+{
+  bool loop = true;
+
+  for (;loop;iter++)
+  {
+    switch (*iter)
+    {
+      case ' ':
+      case '\t':
+        loop = false;
+        --iter;
+        break;
+      default:
+        break;
+    }
+  }
+
+  skip_space (iter);
+
+  section = parse_method_name (iter);
+}
+
 void parse_signatures (const char* file_name, MethodArray& methods)
 {
-  stl::string signatures = common::FileSystem::LoadTextFile (file_name);
+  stl::string signatures = common::FileSystem::LoadTextFile (file_name), section_name = ""; 
 
   common::StringArray lines = common::split (signatures.c_str (), "\n", "");
 
@@ -223,18 +246,34 @@ void parse_signatures (const char* file_name, MethodArray& methods)
   {
     const char* line = lines [i];
 
-    methods.push_back ();
+    skip_space (line);
 
-    try
+    if (!*line || *line == '\n' || *line == '\r')
+      continue;
+
+    static const char* SECTION_TAG = "#section";
+
+    if (!strncmp (SECTION_TAG, line, strlen (SECTION_TAG)))
     {
-      Method& method = methods.back ();
-
-      parse_signature (line, method);
+      parse_section (line, section_name);
     }
-    catch (...)
+    else
     {
-      methods.pop_back ();
-      throw;
+      methods.push_back ();
+
+      try
+      {
+        Method& method = methods.back ();
+
+        parse_signature (line, method);
+
+        method.section = section_name;
+      }
+      catch (...)
+      {
+        methods.pop_back ();
+        throw;
+      }
     }
   }
 }
@@ -257,11 +296,14 @@ void dump_signature (const Method& method, stl::string& result, const char* clas
   result += ")";
 }
 
-void dump_signatures (const MethodArray& methods, stl::string& result)
+void dump_signatures (const MethodArray& methods, stl::string& result, const char* section)
 {
   for (MethodArray::const_iterator iter=methods.begin (), end=methods.end (); iter!=end; ++iter)
   {
     const Method& method = *iter;
+
+    if (method.section != section && *section)
+      continue;
 
     if (iter != methods.begin ())
       result += "\n";
@@ -276,19 +318,22 @@ void dump_signatures (const MethodArray& methods, stl::string& result)
 
 void dump_param_serialization (const Param& param, stl::string& result)
 {
-  result += common::format ("  %s%s);", SERIALIZE_PARAM_PREFIX, param.name.c_str ());
+  result += common::format ("  %s(*this, %s);", SERIALIZE_PARAM_PREFIX, param.name.c_str ());
 }
 
-void dump_serialization (const MethodArray& methods, stl::string& result)
+void dump_serialization (const MethodArray& methods, stl::string& result, const char* section)
 {
   for (MethodArray::const_iterator iter=methods.begin (), end=methods.end (); iter!=end; ++iter)
   {
     const Method& method = *iter;
 
+    if (method.section != section && *section)
+      continue;
+
     if (iter != methods.begin ())
       result += "\n";
 
-    dump_signature (method, result, SERIALIZER_CLASS_NAME);
+    dump_signature (method, result, common::format ("%sSerializer", section).c_str ());
 
     result += "\n{\n";
     result += common::format ("  %s%s_%s);\n", SERIALIZE_HEADER_PREFIX, COMMAND_ID_ENUM_NAME, method.name.c_str ());
@@ -307,32 +352,22 @@ void dump_serialization (const MethodArray& methods, stl::string& result)
 void dump_param_deserialization (const Param& param, stl::string& result)
 {
   result += DESERIALIZE_METHOD_NAME;
-  result += "<";
+  result += "(*this, xtl::type<";
   result += param.type;
-  result += "> ()";
+  result += "> ())";
 }
 
-/*template <class Dispatcher> void CommandDeserializer::Deserialize(CommandId command_id, Dispatcher& dispatcher)
+void dump_deserialization (const MethodArray& methods, stl::string& result, const char* section)
 {
-  switch (command_id)
-  {
-    case CommandId_LoadResource:
-      dispatcher.LoadResource(Deserialize<const char*> ());
-      return true;
-    default:
-      return false;
-  }
-}
-*/
-
-void dump_deserialization (const MethodArray& methods, stl::string& result)
-{
-  result += common::format ("template <class Dispatcher> bool %s(%s id, Dispatcher& dispatcher)\n{\n", DESERIALIZER_DISPATCH_METHOD_NAME, COMMAND_ID_ENUM_NAME);
+  result += common::format ("template <class Dispatcher> bool %s%s(%s id, Dispatcher& dispatcher)\n{\n", section, DESERIALIZER_DISPATCH_METHOD_NAME, COMMAND_ID_ENUM_NAME);
   result += "  switch (id)\n  {\n";
 
   for (MethodArray::const_iterator iter=methods.begin (), end=methods.end (); iter!=end; ++iter)
   {
     const Method& method = *iter;
+
+    if (method.section != section && *section)
+      continue;
 
     result += common::format ("    case %s_%s:\n", COMMAND_ID_ENUM_NAME, method.name.c_str ());
     result += common::format ("      dispatcher.%s(", method.name.c_str ());
@@ -367,6 +402,18 @@ void dump_enums (const MethodArray& methods, stl::string& result)
   }
 
   result += "};";
+}
+
+stl::string get_section_name_from_tag (const char* tag)
+{
+  const char* colon = strchr (tag, ':');
+
+  if (!colon)
+    return "";
+
+  colon++;
+
+  return colon;
 }
 
 //генерация исходного текста
@@ -410,14 +457,17 @@ void generate_source (const char* template_file_name, const char* source_name, c
       continue;
     }
 
-    stl::string tag = tmpl.substr (pos, end - pos);
+    stl::string tag = tmpl.substr (pos, end - pos), section = get_section_name_from_tag (tag.c_str ());
+
+    if (const char* pos = strchr (tag.c_str (), ':'))
+      tag.erase (pos - tag.c_str ());
 
       //замены
 
     if      (tag == "ENUMS")            dump_enums           (methods, result);
-    else if (tag == "METHODS")          dump_signatures      (methods, result);
-    else if (tag == "SERIALIZATION")    dump_serialization   (methods, result);
-    else if (tag == "DESERIALIZATION")  dump_deserialization (methods, result);
+    else if (tag == "DECLARATIONS")     dump_signatures      (methods, result, section.c_str ());
+    else if (tag == "SERIALIZATION")    dump_serialization   (methods, result, section.c_str ());
+    else if (tag == "DESERIALIZATION")  dump_deserialization (methods, result, section.c_str ());
     else
     {
       printf ("Bad tag '%s' in file '%s'\n", tag.c_str (), template_file_name);
