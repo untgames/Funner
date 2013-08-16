@@ -83,7 +83,7 @@ struct Params
   MapFileList   map_files;           //список map-файлов
   SegmentList   segments;            //список сегментов
   bool          silent;              //включен ли режим без вывода сообщений
-  bool          print_help;          //нужно ли печатать сообщение помощи  
+  bool          print_help;          //нужно ли печатать сообщение помощи
 };
 
 //получение подсказки по программе
@@ -220,8 +220,6 @@ void parse_segment (Params& params, const char* line)
 
   for (MapFileList::iterator i=params.map_files.begin (), end=params.map_files.end (); i!=end; ++i)
   {
-    MapFileDesc& desc = *i;
-
     if (i->map_file_base_name != module_base_name)
       continue;
 
