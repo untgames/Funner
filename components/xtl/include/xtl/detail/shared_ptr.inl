@@ -291,7 +291,7 @@ inline Deleter* shared_ptr<T>::get_deleter () const
 template <class Deleter, class T>
 inline Deleter* get_deleter (const shared_ptr<T>& p)
 {
-  return p.get_deleter<Deleter> ();
+  return p.template get_deleter<Deleter> ();
 }
 
 /*

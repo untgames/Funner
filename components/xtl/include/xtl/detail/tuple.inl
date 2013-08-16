@@ -468,14 +468,14 @@ template <size_t number, class T0, class T1, class T2, class T3, class T4, class
 inline typename tuple<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9>::template element<number>::const_type get
  (const tuple<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9>& t)
 {
-  return t.get<number> ();
+  return t.template get<number> ();
 }
 
 template <size_t number, class T0, class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8, class T9>
 inline typename tuple<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9>::template element<number>::non_const_type get
  (tuple<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9>& t)
 {
-  return t.get<number> ();
+  return t.template get<number> ();
 }
 
 /*

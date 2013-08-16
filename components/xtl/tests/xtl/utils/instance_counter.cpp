@@ -34,11 +34,15 @@ int main ()
   {
     A a [3];
     
+    (void)a;
+
     dump ();
   
     {
       C c;
       B b [2];
+
+      (void)b;
       
       dump ();
     }
