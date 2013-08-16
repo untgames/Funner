@@ -75,15 +75,15 @@ Texture3D::Texture3D  (const ContextManager& manager, const TextureDesc& tex_des
     throw xtl::format_not_supported_exception (METHOD_NAME, "Can't create 3d texture %ux%ux%u@%s (proxy texture fail)", 
       tex_desc.width, tex_desc.height, tex_desc.layers, get_name (tex_desc.format));
       
-    //настройка расположения данных в буфере    
+    //настройка расположения данных в буфере
 
   glPixelStorei (GL_UNPACK_ALIGNMENT,   1);    //выравнивание начала строк
   glPixelStorei (GL_UNPACK_SKIP_ROWS,   0);    //количество пропускаемых строк
   glPixelStorei (GL_UNPACK_SKIP_PIXELS, 0);    //количество пропускаемых пикселей
   glPixelStorei (GL_PACK_SKIP_IMAGES_EXT,  0); //количество пропускаемых слоев
-  glPixelStorei (GL_PACK_IMAGE_HEIGHT_EXT, 0); //высота слоя в пикселях  
+  glPixelStorei (GL_PACK_IMAGE_HEIGHT_EXT, 0); //высота слоя в пикселях
 
-    //создание mip-уровней        
+    //создание mip-уровней
 
   TextureDataSelector data_selector (tex_desc, data);
 
@@ -120,14 +120,15 @@ Texture3D::Texture3D  (const ContextManager& manager, const TextureDesc& tex_des
 */
 
 void Texture3D::GetData
- (size_t      layer,
-  size_t      mip_level,
-  size_t      x,
-  size_t      y,
-  size_t      width,
-  size_t      height,
-  PixelFormat target_format,
-  void*       buffer)
+ (size_t          layer,
+  size_t          mip_level,
+  size_t          x,
+  size_t          y,
+  size_t          width,
+  size_t          height,
+  PixelFormat     target_format,
+  void*           buffer,
+  IDeviceContext* context)
 {  
     /*
         Функция всегда проходит через "ручное" копирование, поскольку определить баг на старых версиях драйверов ATI невозможно
@@ -160,7 +161,7 @@ void Texture3D::GetData
 
       xtl::uninitialized_storage<char> tmp_buffer (get_image_size (width, height, tmp_format));
 
-      Texture::GetData (layer, mip_level, x, y, width, height, tmp_format, tmp_buffer.data ());
+      Texture::GetData (layer, mip_level, x, y, width, height, tmp_format, tmp_buffer.data (), context);
 
       copy_image (width * height, tmp_format, tmp_buffer.data (), PixelFormat_RGB8, buffer);
 
@@ -174,7 +175,7 @@ void Texture3D::GetData
       {
         xtl::uninitialized_storage<char> tmp_buffer (get_image_size (width, height, GetFormat ()));
 
-        Texture3D::GetData (layer, mip_level, x, y, width, height, GetFormat (), tmp_buffer.data ());
+        Texture3D::GetData (layer, mip_level, x, y, width, height, GetFormat (), tmp_buffer.data (), context);
 
         copy_image (width * height, GetFormat (), tmp_buffer.data (), target_format, buffer);        
 
@@ -183,7 +184,7 @@ void Texture3D::GetData
 
         //no break
     default:
-      Texture::GetData (layer, mip_level, x, y, width, height, target_format, buffer);
+      Texture::GetData (layer, mip_level, x, y, width, height, target_format, buffer, context);
       break;
   }
 }
