@@ -41,7 +41,7 @@ Library::~Library ()
    Получение адреса точки входа
 */
 
-const void* Library::GetProcAddress (const char* name, size_t search_flags)
+void* Library::GetProcAddress (const char* name, size_t search_flags)
 {
   static const char* METHOD_NAME = "render::low_level::opengl::macosx::Library::GetProcAddress";
 

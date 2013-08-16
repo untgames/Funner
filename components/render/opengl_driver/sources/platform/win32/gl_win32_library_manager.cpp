@@ -369,7 +369,7 @@ class WglAdapterLibrary: public AdapterLibrary
     }    
 
 ///Получение адреса точки входа OpenGL
-    const void* GetProcAddress (const char* name, size_t search_flags)
+    void* GetProcAddress (const char* name, size_t search_flags)
     {
       static const char* METHOD_NAME = "render::low_level::opengl::windows::WglAdapterLibrary::GetProcAddress";
 
@@ -469,7 +469,7 @@ class IcdAdapterLibrary: public AdapterLibrary
         if (!fDrvValidateVersion (REQUIRED_ICD_VERSION))
           throw xtl::format_not_supported_exception ("", "Adapter library '%s' doesn't support version %u", GetName (), REQUIRED_ICD_VERSION);          
 
-          //проверка наличия неподдерживаемый функций          
+          //проверка наличия неподдерживаемый функций
 
         void* set_callback_procs_fn = 0;
 
@@ -612,7 +612,7 @@ class IcdAdapterLibrary: public AdapterLibrary
     }    
     
 ///Получение адреса точки входа OpenGL
-    const void* GetProcAddress (const char* name, size_t search_flags)
+    void* GetProcAddress (const char* name, size_t search_flags)
     {
       static const char* METHOD_NAME = "render::low_level::opengl::windows::WglAdapterLibrary::GetProcAddress";
 
@@ -742,7 +742,7 @@ AdapterLibraryPtr LibraryManager::LoadLibrary (const char* name)
   {
     Log log;        
     
-      //загрузка динамической библиотеки    
+      //загрузка динамической библиотеки
       
     log.Printf ("...load library '%s'", name);
       

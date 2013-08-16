@@ -278,7 +278,7 @@ class AdapterLibrary: virtual public ILibrary, public xtl::reference_counter
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Получение адреса точки входа
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    const void* GetProcAddress (const char* name, size_t search_flags);
+    void* GetProcAddress (const char* name, size_t search_flags);
 
   private:
     AdapterLibrary (stl::auto_ptr<DynamicLibrary>&);

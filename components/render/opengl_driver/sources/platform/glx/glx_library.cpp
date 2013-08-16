@@ -481,7 +481,7 @@ const char* AdapterLibrary::GetExtensionsString (Display *dpy, int screen)
     Получение адреса точки входа
 */
 
-const void* AdapterLibrary::GetProcAddress (const char* name, size_t search_flags)
+void* AdapterLibrary::GetProcAddress (const char* name, size_t search_flags)
 {
   static const char* METHOD_NAME = "render::low_level::opengl::glx::AdapterLibrary::GetProcAddress";
 
