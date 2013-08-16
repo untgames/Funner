@@ -42,7 +42,7 @@ enum PixelFormat
   #pragma pack(push,1)
   #define PACKED_STRUCTURE
 #else
-  #define PACKED_STRUCTURE __attribute__ ((__packed__)
+  #define PACKED_STRUCTURE __attribute__ ((__packed__))
 #endif
 
 struct PACKED_STRUCTURE PVRTexHeader
