@@ -79,14 +79,14 @@ struct RenderableView::Impl: public scene_graph::IViewportListener, public scene
   }
 
 ///Область экрана обновлена
-  void OnScreenChangeArea (const Rect&)
+  void OnScreenChangeArea (const scene_graph::Rect&)
   {
     need_reconfiguration       = true;    
     need_update_render_targets = true;
   }
 
 ///Область вывода обновлена
-  void OnViewportChangeArea (const Rect&)
+  void OnViewportChangeArea (const scene_graph::Rect&, float min_depth_range, float max_depth_range)
   {
     need_reconfiguration       = true;
     need_update_render_targets = true;
