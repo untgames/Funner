@@ -231,7 +231,6 @@ struct TranslationMapRegistry::Impl : public xtl::reference_counter
 
   private:
     RegistryNode root;
-    size_t       size;
 };
 
 /*

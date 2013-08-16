@@ -143,7 +143,7 @@ class InputPort: public xtl::reference_counter, public scene_graph::IViewportLis
     bool                     need_update;            //нужно обновление
     float                    touch_size;             //размер тача
     InputTransformSpace      touch_size_space;       //система координат размеров тача
-    math::vec3f              touch_scale;            //коэффициент масштабирования тача    
+    math::vec3f              touch_scale;            //коэффициент масштабирования тача
     xtl::auto_connection     on_camera_updated;      //соединение с событием обновления камеры
     xtl::auto_connection     on_scene_changed;       //соединение с событием изменения сцены
     math::mat4f              normalized_position_tm; //матрица преобразования координат (в систему координат проекции)
@@ -200,8 +200,8 @@ class InputEventListener: public xtl::noncopyable
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструктор / деструктор
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    InputEventListener  ();
-    ~InputEventListener ();
+    InputEventListener ();
+    virtual ~InputEventListener ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Обработка события
