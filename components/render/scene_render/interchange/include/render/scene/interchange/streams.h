@@ -33,6 +33,11 @@ class OutputStream
     void Reset (const CommandBuffer&);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+///Обмен
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void Swap (CommandBuffer&);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Сериализация заголовка и конца команды
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void BeginCommand (command_id_t);
@@ -126,15 +131,17 @@ void write (OutputStream&, uint16);
 void write (OutputStream&, int8);
 void write (OutputStream&, uint8);
 void write (OutputStream&, float32);
+void write (OutputStream&, const char*);
 
-int32&   read (InputStream&, xtl::type<int32>);
-uint32&  read (InputStream&, xtl::type<uint32>);
-int16&   read (InputStream&, xtl::type<int16>);
-uint16&  read (InputStream&, xtl::type<uint16>);
-int8&    read (InputStream&, xtl::type<int8>);
-uint8&   read (InputStream&, xtl::type<uint8>);
-float32& read (InputStream&, xtl::type<float32>);
-Command& read (InputStream&, xtl::type<Command>);
+const int32&   read (InputStream&, xtl::type<int32>);
+const uint32&  read (InputStream&, xtl::type<uint32>);
+const int16&   read (InputStream&, xtl::type<int16>);
+const uint16&  read (InputStream&, xtl::type<uint16>);
+const int8&    read (InputStream&, xtl::type<int8>);
+const uint8&   read (InputStream&, xtl::type<uint8>);
+const float32& read (InputStream&, xtl::type<float32>);
+const Command& read (InputStream&, xtl::type<Command>);
+const char*    read (InputStream&, xtl::type<const char*>);
 
 #include <render/scene/interchange/detail/streams.inl>
 

@@ -15,11 +15,12 @@ const char* INPUT_FILE_NAME                   = "input/signatures.h";        //ф
 const char* TEMPLATES_MASK                    = "input/templates/*";         //маска имён файлов-шаблонов
 const char* RESULT_DIR                        = "results";                   //каталог с результирующими файлами
 const char* SERIALIZE_PARAM_PREFIX            = "write";                     //префикс сериализации параметра
+const char* COMMAND_NAME_FUNC_NAME            = "get_command_name";          //имя функции получения имени команды
 const char* SERIALIZE_HEADER_PREFIX           = "BeginCommand(";             //префикс сериализации заголовка
 const char* SERIALIZE_TAIL                    = "EndCommand();";             //хвостовая сериализация
 const char* COMMAND_ID_ENUM_NAME              = "CommandId";                 //идентификатор команды
 const char* DESERIALIZER_DISPATCH_METHOD_NAME = "Deserializer::Deserialize"; //имя метода десериализации
-const char* DESERIALIZE_METHOD_NAME           = "read";                     //имя метода десериализации
+const char* DESERIALIZE_METHOD_NAME           = "read";                      //имя метода десериализации
 
 /*
     Структуры
@@ -404,6 +405,22 @@ void dump_enums (const MethodArray& methods, stl::string& result)
   result += "};";
 }
 
+void dump_enum_names (const MethodArray& methods, stl::string& result)
+{
+  result += common::format ("const char* %s(%s command_id)\n{\n", COMMAND_NAME_FUNC_NAME, COMMAND_ID_ENUM_NAME);
+  result += "  switch (command_id)\n  {\n";
+
+  for (MethodArray::const_iterator iter=methods.begin (), end=methods.end (); iter!=end; ++iter)
+  {
+    const Method& method = *iter;    
+
+    result += common::format ("    case %s_%s: return \"%s\";\n", COMMAND_ID_ENUM_NAME, method.name.c_str (), method.name.c_str ());
+  }  
+
+  result += common::format ("    default: throw xtl::make_argument_exception (\"render::scene::interchange::get_command_name\", \"command_id\", command_id);\n");
+  result += "  }\n}";
+}
+
 stl::string get_section_name_from_tag (const char* tag)
 {
   const char* colon = strchr (tag, ':');
@@ -468,6 +485,7 @@ void generate_source (const char* template_file_name, const char* source_name, c
     else if (tag == "DECLARATIONS")     dump_signatures      (methods, result, section.c_str ());
     else if (tag == "SERIALIZATION")    dump_serialization   (methods, result, section.c_str ());
     else if (tag == "DESERIALIZATION")  dump_deserialization (methods, result, section.c_str ());
+    else if (tag == "ENUMNAMES")        dump_enum_names      (methods, result);
     else
     {
       printf ("Bad tag '%s' in file '%s'\n", tag.c_str (), template_file_name);

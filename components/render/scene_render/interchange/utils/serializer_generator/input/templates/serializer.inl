@@ -1,3 +1,5 @@
+<<<ENUMNAMES>>>
+
 /*
     Client to server
 */

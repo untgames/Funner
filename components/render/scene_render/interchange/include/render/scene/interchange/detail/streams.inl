@@ -28,6 +28,23 @@ inline void OutputStream::Reset (const CommandBuffer& in_buffer)
 }
 
 /*
+    Обмен
+*/
+
+void OutputStream::Swap (CommandBuffer& in_buffer)
+{
+  CommandBuffer old_buffer = buffer;
+
+  size_t size = pos - reinterpret_cast<char*> (buffer.Data ());
+
+  Reset (in_buffer);
+
+  old_buffer.Resize (size);
+
+  in_buffer = old_buffer;
+}
+
+/*
     Сериализация заголовка и конца команды
 */
 
@@ -56,7 +73,7 @@ inline void OutputStream::EndCommand ()
 
 inline void OutputStream::EnsureSpaceAvailable (size_t size)
 {
-  if (buffer_end - pos < size)
+  if (size_t (buffer_end - pos) < size)
     Resize (buffer.Size () + size);
 }
 
@@ -140,7 +157,7 @@ inline size_t InputStream::Available () const
 
 inline void InputStream::ReadData (void* data, size_t size)
 {
-  if (size >= Available ())
+  if (size <= Available ())
   {
     ReadDataUnsafe (data, size);
   }
@@ -157,11 +174,11 @@ inline void InputStream::ReadDataUnsafe (void* data, size_t size)
 
 inline const void* InputStream::ReadData (size_t size)
 {
-  if (siz >= Available ())
+  if (size <= Available ())
   {
-    void* result = pos;
+    const void* result = pos;
 
-    pos += siz;
+    pos += size;
 
     return result;
   }
@@ -204,11 +221,30 @@ inline void write (OutputStream& s, int8 value)    { s.Write (value); }
 inline void write (OutputStream& s, uint8 value)   { s.Write (value); }
 inline void write (OutputStream& s, float32 value) { s.Write (value); }
 
-inline int32&   read (InputStream& s, xtl::type<int32>)   { return s.Read<int32> (); }
-inline uint32&  read (InputStream& s, xtl::type<uint32>)  { return s.Read<uint32> (); }
-inline int16&   read (InputStream& s, xtl::type<int16>)   { return s.Read<int16> (); }
-inline uint16&  read (InputStream& s, xtl::type<uint16>)  { return s.Read<uint16> (); }
-inline int8&    read (InputStream& s, xtl::type<int8>)    { return s.Read<int8> (); }
-inline uint8&   read (InputStream& s, xtl::type<uint8>)   { return s.Read<uint8> (); }
-inline float32& read (InputStream& s, xtl::type<float32>) { return s.Read<float32> (); }
-inline Command& read (InputStream& s, xtl::type<Command>) { return s.Read<Command> (); }
+inline const int32&   read (InputStream& s, xtl::type<int32>)   { return s.Read<int32> (); }
+inline const uint32&  read (InputStream& s, xtl::type<uint32>)  { return s.Read<uint32> (); }
+inline const int16&   read (InputStream& s, xtl::type<int16>)   { return s.Read<int16> (); }
+inline const uint16&  read (InputStream& s, xtl::type<uint16>)  { return s.Read<uint16> (); }
+inline const int8&    read (InputStream& s, xtl::type<int8>)    { return s.Read<int8> (); }
+inline const uint8&   read (InputStream& s, xtl::type<uint8>)   { return s.Read<uint8> (); }
+inline const float32& read (InputStream& s, xtl::type<float32>) { return s.Read<float32> (); }
+inline const Command& read (InputStream& s, xtl::type<Command>) { return s.Read<Command> (); }
+
+inline void write (OutputStream& s, const char* str)
+{
+  if (!str)
+    str = "";
+
+  int32 length = strlen (str);
+
+  write (s, length);
+  
+  s.WriteData (str, length + 1);
+}
+
+inline const char* read (InputStream& s, xtl::type<const char*>)
+{
+  int32 length = s.Read<int32> ();
+
+  return reinterpret_cast<const char*> (s.ReadData (length + 1));
+}

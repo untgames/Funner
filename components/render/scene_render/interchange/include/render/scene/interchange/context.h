@@ -1,8 +1,11 @@
 #ifndef RENDER_SCENE_INTERCHANGE_CONTEXT_HEADER
 #define RENDER_SCENE_INTERCHANGE_CONTEXT_HEADER
 
+#include <stl/auto_ptr.h>
+
 #include <common/log.h>
 
+#include <render/scene/interchange/command_buffer.h>
 #include <render/scene/interchange/connection.h>
 #include <render/scene/interchange/streams.h>
 
@@ -33,9 +36,16 @@ class Context: public Serializer, private Deserializer, private IConnectionListe
     typedef xtl::com_ptr<IConnection> ConnectionPtr;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Конструктор
+///Конструктор / деструктор
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    template <class Processor> Context (const ConnectionPtr&, Processor&);
+    template <class Processor> Context  (Processor&);
+                               ~Context ();
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Установка активного соединения
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void                 SetConnection (const ConnectionPtr&);
+    const ConnectionPtr& Connection    () const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Отсылка исходящих команд на выполнение
@@ -48,9 +58,9 @@ class Context: public Serializer, private Deserializer, private IConnectionListe
     void ProcessIncomingCommands ();
 
   private:
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Обработка входящих команд
-///////////////////////////////////////////////////////////////////////////////////////////////////
+    Context (const Context&); //no impl
+    Context& operator = (const Context&); //no impl
+
     void OnIncomingCommands (const CommandBuffer&);
 
   private:
@@ -64,7 +74,7 @@ class Context: public Serializer, private Deserializer, private IConnectionListe
     common::Log                  log;
 };
 
-#include <render/scene/interchange/context.inl>
+#include <render/scene/interchange/detail/context.inl>
 
 }
 
