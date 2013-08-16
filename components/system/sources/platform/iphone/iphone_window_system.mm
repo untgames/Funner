@@ -405,10 +405,9 @@ struct WindowImpl
 
   return_value.touches_count = [touches count];
 
-  UIView                 *view              = self.rootViewController.view;
-  NSEnumerator           *enumerator        = [touches objectEnumerator];
-  Touch                  *touch_description = return_value.touches;
-  CGSize                 view_size          = view.frame.size;
+  UIView       *view              = self.rootViewController.view;
+  NSEnumerator *enumerator        = [touches objectEnumerator];
+  Touch        *touch_description = return_value.touches;
 
   for (UITouch *iter = [enumerator nextObject]; iter; iter = [enumerator nextObject], touch_description++)
   {
