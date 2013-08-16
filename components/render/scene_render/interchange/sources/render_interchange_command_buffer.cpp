@@ -2,6 +2,8 @@
 
 using namespace render::scene::interchange;
 
+///TODO: special case for default buffer!!!
+
 /*
     Описание реализации буфера команд
 */
