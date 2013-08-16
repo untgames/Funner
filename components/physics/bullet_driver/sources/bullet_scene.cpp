@@ -238,14 +238,14 @@ class DebugDrawer : public btIDebugDraw
       render.DrawLine (vertices [0], vertices [1]);
     }
 
-    void drawBox (const btVector3& box_min, const btVector3& box_max, const btVector3& bt_color, btScalar alpha)
+    void drawBox (const btVector3& box_min, const btVector3& box_max, const btVector3& bt_color)
     {
       math::vec3f min, max;
 
       vector_from_bullet_vector (box_min, min);
       vector_from_bullet_vector (box_max, max);
 
-      render.DrawWireBox (min, max, math::vec4f (bt_color.x (), bt_color.y (), bt_color.z (), alpha));
+      render.DrawWireBox (min, max, math::vec4f (bt_color.x (), bt_color.y (), bt_color.z ()));
     }
 
     void drawSphere (const btVector3& p, btScalar radius, const btVector3& bt_color)
