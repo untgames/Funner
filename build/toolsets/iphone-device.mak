@@ -9,6 +9,7 @@ export IPHONEOS_DEPLOYMENT_TARGET
 REMOTE_DEBUG_DIR  ?= //private/var/work/funner
 PROFILES          += arm
 COMMON_CFLAGS     += -miphoneos-version-min=$(IPHONEOS_DEPLOYMENT_TARGET) -DARM #-gdwarf-2 #флаг gdwarf-2 - необходим для профилирования
+COMMON_CPPFLAGS   += -fexceptions -frtti
 COMMON_LINK_FLAGS += -miphoneos-version-min=$(IPHONEOS_DEPLOYMENT_TARGET)
 COMPILER_GCC      := /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/llvm-gcc-4.2
 LINKER_GCC        := /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/llvm-g++-4.2
