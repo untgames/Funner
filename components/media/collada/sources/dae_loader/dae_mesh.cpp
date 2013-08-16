@@ -302,12 +302,10 @@ class VertexStreamReader
 {
   public:
 ///Конструктор
-    VertexStreamReader (DaeParser&        in_parser,
-                        const ParseNode&  in_surface_node,
+    VertexStreamReader (const ParseNode&  in_surface_node,
                         MeshInputBuilder& in_inputs,
                         MeshVertexBuffer& in_vertex_buffer)
-       : parser (in_parser),
-         surface_node (in_surface_node),
+       : surface_node (in_surface_node),
          inputs (in_inputs),
          vertex_buffer (in_vertex_buffer) {}
 
@@ -416,7 +414,6 @@ class VertexStreamReader
     }
   
   private:
-    DaeParser&        parser;
     ParseNode         surface_node;
     MeshInputBuilder& inputs;
     MeshVertexBuffer& vertex_buffer;
@@ -675,7 +672,7 @@ void DaeParser::ParseSurfaceBuffers (Parser::Iterator p_iter, Parser::Iterator s
 
     //создание объекта, читающего каналы вершинных данных
 
-  VertexStreamReader stream_reader (*this, *surface_iter, surface_info.inputs, vertex_buffer);
+  VertexStreamReader stream_reader (*surface_iter, surface_info.inputs, vertex_buffer);
  
     //построение результирующего буфера вершин
     
