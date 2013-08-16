@@ -162,7 +162,7 @@ class AsyncProcessor
     }
 
 ///Деструктор
-    ~AsyncProcessor ()
+    virtual ~AsyncProcessor ()
     {
       try
       {
