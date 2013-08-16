@@ -426,7 +426,7 @@ struct RenderTargetManager::Impl: public ContextObject, public RenderTargetManag
         {
           const Viewport& viewport = GetViewport (render_target_slot);
 
-          glViewport (viewport.x, viewport.y, viewport.width >= 0 ? viewport.width : 0, viewport.height >= 0 ? viewport.height : 0);
+          glViewport (viewport.x, viewport.y, viewport.width, viewport.height);
 
 #ifndef OPENGL_ES_SUPPORT
           glDepthRange  (viewport.min_depth, viewport.max_depth);
@@ -441,7 +441,7 @@ struct RenderTargetManager::Impl: public ContextObject, public RenderTargetManag
         {        
           const Rect& scissor = GetScissor (render_target_slot);
           
-          glScissor (scissor.x >= 0 ? scissor.x : 0, scissor.y >= 0 ? scissor.y : 0, scissor.width >= 0 ? scissor.width : 0, scissor.height >= 0 ? scissor.height : 0);
+          glScissor (scissor.x >= 0 ? scissor.x : 0, scissor.y >= 0 ? scissor.y : 0, scissor.width, scissor.height);
 
           SetContextCacheValue (CacheEntry_ScissorHash0 + render_target_slot, scissor_hash);
         }
@@ -584,7 +584,7 @@ struct RenderTargetManager::Impl: public ContextObject, public RenderTargetManag
           {
             const Viewport& viewport = GetViewport (0);
 
-            glScissor (viewport.x >= 0 ? viewport.x : 0, viewport.y >= 0 ? viewport.y : 0, viewport.width >= 0 ? viewport.width : 0, viewport.height >= 0 ? viewport.height : 0);
+            glScissor (viewport.x >= 0 ? viewport.x : 0, viewport.y >= 0 ? viewport.y : 0, viewport.width, viewport.height);
 
             SetContextCacheValue (CacheEntry_ScissorHash0, viewport_rect_hash);
 
@@ -600,7 +600,7 @@ struct RenderTargetManager::Impl: public ContextObject, public RenderTargetManag
             need_restore_scissor_test = true;
           }
 
-            //оповещение об обновлении буферов рендеринга          
+            //оповещение об обновлении буферов рендеринга
 
           GetCurrentFrameBuffer ().InvalidateRenderTargets (0);
         }
