@@ -1,0 +1,4 @@
+Results of context1_test:
+ServerProcessor::LoadResource('resource1')
+ServerProcessor::~Processor()
+ClientProcessor::~Processor()

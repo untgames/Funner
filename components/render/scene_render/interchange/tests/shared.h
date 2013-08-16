@@ -2,7 +2,6 @@
 #define RENDER_SCENE_INTERCHANGE_TESTS_SHARED_HEADER
 
 #include <stl/string>
-#include <stl/vector>
 
 #include <xtl/intrusive_ptr.h>
 #include <xtl/reference_counter.h>

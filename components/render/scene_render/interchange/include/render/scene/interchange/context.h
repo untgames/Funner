@@ -3,6 +3,8 @@
 
 #include <stl/auto_ptr.h>
 
+#include <xtl/trackable_ptr.h>
+
 #include <common/log.h>
 
 #include <render/scene/interchange/command_buffer.h>
@@ -30,11 +32,9 @@ template <class Deserializer> class IIncomingCommandsProcessor;
 ///Контекст обработки потоков данных рендеринга
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 template <class Serializer, class Deserializer>
-class Context: public Serializer, private Deserializer, private IConnectionListener
+class Context: public Serializer, private Deserializer
 {
   public:
-    typedef xtl::com_ptr<IConnection> ConnectionPtr;
-
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструктор / деструктор
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -42,30 +42,30 @@ class Context: public Serializer, private Deserializer, private IConnectionListe
                                ~Context ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Установка активного соединения
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    void                 SetConnection (const ConnectionPtr&);
-    const ConnectionPtr& Connection    () const;
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Отсылка исходящих команд на выполнение
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void Flush ();
 
+  protected:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Обработка входящих команд
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void ProcessIncomingCommands ();
+    void ProcessCommands (const CommandBuffer&);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Установка связанного соединения
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void         SetCounterparty (IConnection* connection);
+    IConnection* Counterparty () const;
 
   private:
     Context (const Context&); //no impl
     Context& operator = (const Context&); //no impl
 
-    void OnIncomingCommands (const CommandBuffer&);
-
   private:
     typedef detail::IIncomingCommandsProcessor<Deserializer> IncomingCommandsProcessor;
     typedef stl::auto_ptr<IncomingCommandsProcessor>         IncomingCommandsProcessorPtr;
+    typedef xtl::trackable_ptr<IConnection>                  ConnectionPtr;
 
   private:
     ConnectionPtr                connection;

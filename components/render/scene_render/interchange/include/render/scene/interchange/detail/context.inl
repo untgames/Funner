@@ -64,7 +64,7 @@ inline Context<Serializer, Deserializer>::~Context ()
 {
   try
   {
-    SetConnection (ConnectionPtr ());
+    SetCounterparty (0);
   }
   catch (...)
   {
@@ -76,24 +76,15 @@ inline Context<Serializer, Deserializer>::~Context ()
 */
 
 template <class Serializer, class Deserializer>
-inline void Context<Serializer, Deserializer>::SetConnection (const ConnectionPtr& in_connection)
+inline void Context<Serializer, Deserializer>::SetCounterparty (IConnection* in_connection)
 {
-  if (connection)
-  {
-    connection->DetachListener (this);
-    connection = ConnectionPtr ();
-  }
-
-  if (in_connection)
-    in_connection->AttachListener (this);
-
   connection = in_connection;
 }
 
 template <class Serializer, class Deserializer>
-inline const typename Context<Serializer, Deserializer>::ConnectionPtr& Context<Serializer, Deserializer>::Connection () const
+inline IConnection* Context<Serializer, Deserializer>::Counterparty () const
 {
-  return connection;
+  return connection.get ();
 }
 
 /*
@@ -106,7 +97,7 @@ inline void Context<Serializer, Deserializer>::Flush ()
   try
   {
     if (!connection)
-      return;
+      throw xtl::format_operation_exception ("", "Can't send rendering commands. No counterparty");
 
     CommandBuffer buffer = command_buffer_pool.CreateBuffer ();
 
@@ -114,7 +105,7 @@ inline void Context<Serializer, Deserializer>::Flush ()
 
     try
     {
-      connection->Send (buffer);
+      connection->ProcessCommands (buffer);
     }
     catch (...)
     {
@@ -134,34 +125,17 @@ inline void Context<Serializer, Deserializer>::Flush ()
 */
 
 template <class Serializer, class Deserializer>
-inline void Context<Serializer, Deserializer>::ProcessIncomingCommands ()
-{
-  try
-  {
-    if (!connection)
-      return;
-
-    connection->ProcessIncomingCommands ();
-  }
-  catch (xtl::exception& e)
-  {
-    e.touch ("render::scene::interchange::Context::ProcessIncomingCommands");
-    throw;
-  }
-}
-
-template <class Serializer, class Deserializer>
-inline void Context<Serializer, Deserializer>::OnIncomingCommands (const CommandBuffer& buffer)
+inline void Context<Serializer, Deserializer>::ProcessCommands (const CommandBuffer& buffer)
 {
   try
   {
     Deserializer::Reset (buffer);
 
-    incoming_commands_processor->ProcessFeedback (*this, log); 
+    incoming_commands_processor->ProcessFeedback (*this, log);     
   }
   catch (xtl::exception& e)
   {
-    e.touch ("render::scene::interchange::Context::OnIncomingCommands");
+    e.touch ("render::scene::interchange::Context::ProcessIncomingCommands");
     throw;
   }
 }
