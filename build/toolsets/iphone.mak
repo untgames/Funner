@@ -22,6 +22,8 @@ MAP_FILE_LINK_OPTION_PREFIX := -Wl,-map,
 
 include $(TOOLSETS_DIR)/g++.mak
 
+PROFILES := $(filter-out g++,$(PROFILES))
+
 SOURCE_FILES_SUFFIXES += mm         #Расширения исходных файлов
 
 ###################################################################################################
