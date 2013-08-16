@@ -231,18 +231,6 @@ protected:
 
 #endif /* __STL_USE_STD_ALLOCATORS */
 
-// Helper functions for exception handling.
-template <class _Tp, class _Alloc> 
-void _String_base<_Tp,_Alloc>::_M_throw_length_error() const {
-  __STL_THROW(length_error("basic_string"));
-}
-
-template <class _Tp, class _Alloc> 
-void _String_base<_Tp, _Alloc>::_M_throw_out_of_range() const {
-  __STL_THROW(out_of_range("basic_string"));
-}
-
-
 // ------------------------------------------------------------
 // Class basic_string.  
 
@@ -1091,7 +1079,16 @@ public:                        // Helper function for compare.
   }
 };
 
+// Helper functions for exception handling.
+template <class _Tp, class _Alloc>
+void _String_base<_Tp,_Alloc>::_M_throw_length_error() const {
+  __STL_THROW(length_error("basic_string"));
+}
 
+template <class _Tp, class _Alloc>
+void _String_base<_Tp, _Alloc>::_M_throw_out_of_range() const {
+  __STL_THROW(out_of_range("basic_string"));
+}
 
 // ------------------------------------------------------------
 // Non-inline declarations.
