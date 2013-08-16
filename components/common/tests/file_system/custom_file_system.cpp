@@ -131,13 +131,13 @@ class MyFileSystem : public ICustomFileSystem, public xtl::reference_counter
 ///Подсчёт ссылок
     void AddRef ()
     {
-      printf ("MyFileSystem::AddRef\n");
+//      printf ("MyFileSystem::AddRef\n");
       addref (this);
     }
 
     void Release ()
     {
-      printf ("MyFileSystem::Release\n");
+//      printf ("MyFileSystem::Release\n");
       release (this);
     }
 };

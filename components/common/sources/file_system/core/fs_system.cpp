@@ -599,18 +599,8 @@ void FileSystemImpl::Mount (const char* path_prefix,const char* _path,bool link,
       {
         ICustomFileSystemPtr pack_file_system (i->creater (path.c_str ()),false);
 
-        pack_files.push_front (PackFile (strihash (path.c_str ()),0,pack_file_system));                  
+        Mount (path_prefix, pack_file_system.get ());          
 
-        try
-        {
-          Mount (path_prefix, pack_file_system.get ());          
-        }
-        catch (...)
-        {
-          pack_files.pop_front ();
-          throw;
-        }
-        
         return;
       }
 
@@ -635,12 +625,21 @@ void FileSystemImpl::Unmount (const char* _path_prefix)
     
   prefix  = _path_prefix;  
   prefix += "/";
+
+  for (PackFileList::iterator i=pack_files.begin (), end=pack_files.end (); i!=end; ++i)
+  {
+    if (i->file_name_hash == hash)
+    {
+      pack_files.erase (i);
+      break;
+    }
+  }
     
   for (SymbolicLinkList::iterator i=symbolic_links.begin (), end=symbolic_links.end (); i!=end; ++i)
     if (!xstrncmp (prefix.c_str (), i->prefix.c_str (), i->prefix.size ()))
     {
       symbolic_links.erase (i);
-      return;
+      break;
     }
 }
 
