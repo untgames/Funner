@@ -510,7 +510,6 @@ class Application: public IEngine
   private:
     SubsystemManager           manager;                    //менеджер подсистем
     bool                       has_main_loop;              //есть ли главный цикл приложения
-    bool                       has_explicit_configuration; //конфигурация приложения указана явно
     stl::string                configuration_name;         //имя конфигурации
     bool                       need_print_version;         //нужно распечатать строку версии
     bool                       need_print_help;            //нужно распечатать помощь по запуску приложения
