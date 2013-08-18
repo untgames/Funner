@@ -36,7 +36,7 @@ using namespace media;
 namespace
 {
 
-const float EPS = 0.001;
+const float EPS = 0.001f;
 
 const char* LOG_NAME = "sound::SoundManager";  //имя потока протоколирования
 

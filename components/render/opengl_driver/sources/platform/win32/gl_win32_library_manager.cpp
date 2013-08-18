@@ -381,7 +381,7 @@ class WglAdapterLibrary: public AdapterLibrary
         throw xtl::make_null_argument_exception (METHOD_NAME, "name");
       }
 
-      const void* address = 0;
+      void* address = 0;
 
       if (!address && (search_flags & EntrySearch_Context))
         address = (void*)fwglGetProcAddress (name);    
@@ -624,7 +624,7 @@ class IcdAdapterLibrary: public AdapterLibrary
         throw xtl::make_null_argument_exception (METHOD_NAME, "name");
       }
 
-      const void* address = 0;
+      void* address = 0;
 
       if (!address && (search_flags & EntrySearch_Context))
         address = (void*)fDrvGetProcAddress (name);
