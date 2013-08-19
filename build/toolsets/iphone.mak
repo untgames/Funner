@@ -16,7 +16,7 @@ DLL_LIB_SUFFIX := .dylib
 PROFILES += iphone cocoa unistd has_windows haswchar gles no_dll has_iconv
 DLL_PATH := DYLD_LIBRARY_PATH
 
-COMMON_CFLAGS               += -Os -isysroot $(IPHONE_SDK_PATH) -DIPHONE -fvisibility=hidden
+COMMON_CFLAGS               += -Os -isysroot $(IPHONE_SDK_PATH) -DIPHONE -fvisibility=hidden -Wno-unused-function
 COMMON_LINK_FLAGS           += -isysroot $(IPHONE_SDK_PATH)
 MAP_FILE_LINK_OPTION_PREFIX := -Wl,-map,
 
