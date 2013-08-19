@@ -421,10 +421,17 @@ void FileSystemImpl::AddSearchPath (const char* _path,const LogHandler& log_hand
 
   log.Printf ("Attempt to add search path '%s'", path.c_str ());
 
+  FileInfo file_info;
+
+  bool need_add_trailing_splash = GetFileInfo (path.c_str (), file_info) && file_info.is_dir && (path.empty () || path [path.size ()-1] != '/');
+
+  if (need_add_trailing_splash) path += '/';
+
   ICustomFileSystemPtr owner_file_system = FindFileSystem (path.c_str (),mount_path,&prefix);
-  FileInfo             file_info;
+
+  if (need_add_trailing_splash) path.pop_back ();
   
-  if (!owner_file_system || !owner_file_system->GetFileInfo (mount_path.c_str (),file_info))
+  if (!owner_file_system || (!mount_path.empty () && !owner_file_system->GetFileInfo (mount_path.c_str (),file_info)))
   {
     path = FileSystem::GetNormalizedFileName (_path);
 
@@ -434,7 +441,7 @@ void FileSystemImpl::AddSearchPath (const char* _path,const LogHandler& log_hand
     AddPackFile (path.c_str (),0,log_handler);
 
     return;
-  }
+  }  
 
   size_t path_hash = strhash (path.c_str ());
   
