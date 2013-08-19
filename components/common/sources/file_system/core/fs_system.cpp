@@ -423,14 +423,8 @@ void FileSystemImpl::AddSearchPath (const char* _path,const LogHandler& log_hand
 
   FileInfo file_info;
 
-  bool need_add_trailing_splash = GetFileInfo (path.c_str (), file_info) && file_info.is_dir && (path.empty () || path [path.size ()-1] != '/');
+  ICustomFileSystemPtr owner_file_system = FindFileSystem (path.c_str (),mount_path,&prefix,true);
 
-  if (need_add_trailing_splash) path += '/';
-
-  ICustomFileSystemPtr owner_file_system = FindFileSystem (path.c_str (),mount_path,&prefix);
-
-  if (need_add_trailing_splash) path.pop_back ();
-  
   if (!owner_file_system || (!mount_path.empty () && !owner_file_system->GetFileInfo (mount_path.c_str (),file_info)))
   {
     path = FileSystem::GetNormalizedFileName (_path);
@@ -469,8 +463,10 @@ void FileSystemImpl::AddSearchPath (const char* _path,const LogHandler& log_hand
     search_paths.push_front (SearchPath (path.c_str (),path_hash));
 
     for (FileList::Iterator list_iter=list_builder.Build (true);list_iter;++list_iter)
+    {
       if (!list_iter->info.is_dir)
         AddPackFile (list_iter->name,path_hash,log_handler);
+    }
   }
   else AddPackFile (path.c_str (),0,log_handler);
 }
@@ -869,7 +865,7 @@ void FileSystemImpl::RemoveFileAttribute (const char* src_file_name, const char*
     ќпределение принадлежности файла к файловой системе
 */
 
-ICustomFileSystemPtr FileSystemImpl::FindMountFileSystem (const char* file_name, string& result_file_name, string* prefix_name)
+ICustomFileSystemPtr FileSystemImpl::FindMountFileSystem (const char* file_name, string& result_file_name, string* prefix_name, bool ignore_mount_point_fs)
 {
   LoadFileSystems ();
 
@@ -880,12 +876,24 @@ ICustomFileSystemPtr FileSystemImpl::FindMountFileSystem (const char* file_name,
       switch (file_name [i->prefix.size ()-1])
       {
         case '\0': //запрос к точке монтировани€
-          result_file_name = file_name;
+          if (!ignore_mount_point_fs)
+          {
+            result_file_name = file_name;
 
-          if (prefix_name)
-            *prefix_name = "";
+            if (prefix_name)
+              *prefix_name = "";
 
-          return &i->mount_point_file_system;
+            return &i->mount_point_file_system;
+          }
+          else 
+          {
+            result_file_name = file_name + i->prefix.size () - 1;
+
+            if (prefix_name)
+              *prefix_name = i->prefix;
+
+            return i->file_system;
+          }
         case '/': //запрос к смонтированной файловой системе
           result_file_name = file_name + i->prefix.size ();
 
@@ -905,7 +913,7 @@ ICustomFileSystemPtr FileSystemImpl::FindMountFileSystem (const char* file_name,
   return NULL;
 }
 
-ICustomFileSystemPtr FileSystemImpl::FindFileSystem (const char* src_file_name,string& result_file_name,string* prefix_name)
+ICustomFileSystemPtr FileSystemImpl::FindFileSystem (const char* src_file_name,string& result_file_name,string* prefix_name,bool ignore_mount_point_fs)
 {
   static const char* METHOD_NAME = "common::FileSystemImpl::FindFileSystem";  
   
@@ -921,7 +929,7 @@ ICustomFileSystemPtr FileSystemImpl::FindFileSystem (const char* src_file_name,s
   {
     if (!xstrncmp (file_name.c_str (), iter->prefix.c_str (), iter->prefix.size () - 1))    
     {
-      if (file_name.size () > iter->prefix.size () && file_name [iter->prefix.size () - 1] == '/')
+      if (file_name.size () >= iter->prefix.size () && file_name [iter->prefix.size () - 1] == '/')
       {
         file_name.replace (0, iter->prefix.size () - 1, iter->link);
       }
@@ -944,12 +952,12 @@ ICustomFileSystemPtr FileSystemImpl::FindFileSystem (const char* src_file_name,s
     }    
     else ++iter;
   }  
-  
+
     //пытаемс€ найти файл не использу€ путей поиска
 
   if (file_name [0] == '/')
   {
-    ICustomFileSystemPtr return_value = FindMountFileSystem (file_name.c_str (), result_file_name, prefix_name);
+    ICustomFileSystemPtr return_value = FindMountFileSystem (file_name.c_str (), result_file_name, prefix_name, ignore_mount_point_fs);
 
     if (!return_value)
       throw xtl::make_argument_exception (METHOD_NAME, "src_file_name", src_file_name, common::format ("Can't find mount file system for this file (resolved name is '%s')", file_name.c_str ()).c_str ());
@@ -966,7 +974,7 @@ ICustomFileSystemPtr FileSystemImpl::FindFileSystem (const char* src_file_name,s
   for (SearchPathList::iterator i=search_paths.begin ();i!=search_paths.end ();++i)
   {
     full_name         = format ("%s/%s",i->path.c_str (),file_name.c_str ());
-    owner_file_system = FindMountFileSystem (full_name.c_str (),mount_name);
+    owner_file_system = FindMountFileSystem (full_name.c_str (),mount_name,0,ignore_mount_point_fs);
     
     if (owner_file_system && owner_file_system->IsFileExist (mount_name.c_str ()))
     {
@@ -1013,7 +1021,7 @@ ICustomFileSystemPtr FileSystemImpl::FindFileSystem (const char* src_file_name,s
     //пытаемс€ найти файл по дефолтному пути поиска
     
   full_name         = format ("%s/%s",default_path.c_str (),file_name.c_str ());
-  owner_file_system = FindMountFileSystem (full_name.c_str (),mount_name);
+  owner_file_system = FindMountFileSystem (full_name.c_str (),mount_name,0,ignore_mount_point_fs);
   
   if (owner_file_system && owner_file_system->IsFileExist (mount_name.c_str ()))
   {

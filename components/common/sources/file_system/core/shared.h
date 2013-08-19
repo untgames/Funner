@@ -573,8 +573,8 @@ class FileSystemImpl
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Определение файловой системы ассоциированной с указанным путём
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    ICustomFileSystemPtr FindMountFileSystem (const char* path, stl::string& result_file_name, stl::string* prefix_name = 0);
-    ICustomFileSystemPtr FindFileSystem      (const char* path, stl::string& result_file_name, stl::string* prefix_name = 0);
+    ICustomFileSystemPtr FindMountFileSystem (const char* path, stl::string& result_file_name, stl::string* prefix_name = 0, bool ignore_mount_point_fs = false);
+    ICustomFileSystemPtr FindFileSystem      (const char* path, stl::string& result_file_name, stl::string* prefix_name = 0, bool ignore_mount_point_fs = false);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Добавление пак-файла
