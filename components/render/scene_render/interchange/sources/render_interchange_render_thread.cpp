@@ -15,7 +15,6 @@ typedef xtl::com_ptr<IConnection> ConnectionPtr;
 struct RenderThread::Impl: public IConnection, public xtl::reference_counter, public xtl::trackable
 {
   stl::string                   connection_name;        //имя соединения
-  stl::string                   target_connection_name; //имя целевого соединения
   ConnectionPtr                 target_connection;      //целевое соединение
   common::Log                   log;                    //поток протоколирования
   stl::string                   manager_name;           //имя менеджера соединения
@@ -24,10 +23,9 @@ struct RenderThread::Impl: public IConnection, public xtl::reference_counter, pu
   stl::auto_ptr<syslib::Thread> thread;                 //нить
 
 /// Конструктор
-  Impl (const char* thread_connection_name, size_t render_queue_size, const char* in_target_connection_name, const char* target_connection_init_string)
+  Impl (const char* thread_connection_name, size_t render_queue_size, const ConnectionPtr& connection)
     : connection_name (thread_connection_name)
-    , target_connection_name (in_target_connection_name)
-    , target_connection (ConnectionManager::CreateConnection (target_connection_name.c_str (), target_connection_init_string), false)
+    , target_connection (connection)
     , log (common::format ("%s.%s", LOG_NAME, thread_connection_name).c_str ())
     , manager_name (common::format ("RenderThread.%s", thread_connection_name))
     , command_queue (render_queue_size)
@@ -138,11 +136,29 @@ RenderThread::RenderThread (const char* thread_connection_name, size_t render_qu
     if (!target_connection_init_string)
       target_connection_init_string = "";
 
-    impl = new Impl (thread_connection_name, render_queue_size, target_connection_name, target_connection_init_string);
+    ConnectionPtr connection (ConnectionManager::CreateConnection (target_connection_name, target_connection_init_string), false);
+
+    impl = new Impl (thread_connection_name, render_queue_size, connection);
   } 
   catch (xtl::exception& e)
   {
-    e.touch ("render::scene::interchange::RenderThread::RenderThread");
+    e.touch ("render::scene::interchange::RenderThread::RenderThread(const char*,size_t,const char*,const char*)");
+    throw;
+  }
+}
+
+RenderThread::RenderThread (const char* thread_connection_name, size_t render_queue_size, IConnection* connection)
+{
+  try
+  {
+    if (!connection)
+      throw xtl::make_null_argument_exception ("", "connection");
+
+    impl = new Impl (thread_connection_name, render_queue_size, connection);
+  } 
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::scene::interchange::RenderThread::RenderThread(const char*,size_t,const Connection&)");
     throw;
   }
 }
@@ -174,9 +190,4 @@ RenderThread& RenderThread::operator = (const RenderThread& thread)
 const char* RenderThread::ConnectionName () const
 {
   return impl->connection_name.c_str ();
-}
-
-const char* RenderThread::TargetConnectionName () const
-{
-  return impl->target_connection_name.c_str ();
 }
