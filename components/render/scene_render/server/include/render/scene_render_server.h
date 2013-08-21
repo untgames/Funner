@@ -14,17 +14,23 @@ class Window;
 namespace render
 {
 
+namespace scene
+{
+
+namespace server
+{
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Сервер рендеринга
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-class SceneRenderServer
+class Server
 {
   public:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструктор / деструктор
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    SceneRenderServer  (const char* name);
-    ~SceneRenderServer ();
+    Server  (const char* name);
+    ~Server ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Присоединение окон
@@ -34,13 +40,19 @@ class SceneRenderServer
     void DetachAllWindows ();
 
   private:
-    SceneRenderServer (const SceneRenderServer&); //no impl
-    SceneRenderServer& operator = (const SceneRenderServer&); //no impl
+    Server (const Server&); //no impl
+    Server& operator = (const Server&); //no impl
 
   private:
     struct Impl;
     stl::auto_ptr<Impl> impl;
 };
+
+}
+
+}
+
+using scene::server::Server;
 
 }
 
