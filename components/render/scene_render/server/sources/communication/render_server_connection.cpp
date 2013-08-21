@@ -22,17 +22,27 @@ class ContextImpl: public Context
     Описание реализации соединения
 */
 
+typedef xtl::com_ptr<interchange::IConnection> ConnectionPtr;
+
 struct Connection::Impl: public xtl::trackable
 {
-  xtl::trackable_ptr<ServerImpl> server;  //ссылка на сервер
-  ConnectionState                state;   //состояние соединения
-  ContextImpl                    context; //контекст
+  xtl::trackable_ptr<ServerImpl> server;               //ссылка на сервер
+  ConnectionState                state;                //состояние соединения
+  ContextImpl                    context;              //контекст
+  ConnectionPtr                  response_connection;  //обратное соединение с клиентом
 
 /// Конструктор
   Impl (ServerImpl& in_server, const char* init_string)
     : server (&in_server)
     , context (state)
   {
+    common::PropertyMap properties = common::parse_init_string (init_string);
+
+    stl::string initiator = properties.GetString ("initiator");
+
+    response_connection = ConnectionPtr (interchange::ConnectionManager::CreateConnection (initiator.c_str (), "initiator=render::scene::server::Connection"), false);
+
+    context.SetCounterparty (response_connection.get ());
   } 
 };
 
