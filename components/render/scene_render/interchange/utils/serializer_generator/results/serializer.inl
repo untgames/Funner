@@ -1,4 +1,4 @@
-const char* get_command_name(CommandId command_id)
+inline const char* get_command_name(CommandId command_id)
 {
   switch (command_id)
   {
@@ -13,21 +13,21 @@ const char* get_command_name(CommandId command_id)
     Client to server
 */
 
-void ClientToServerSerializer::LoadResource(const char* name)
+inline void ClientToServerSerializer::LoadResource(const char* name)
 {
   BeginCommand(CommandId_LoadResource);
   write(*this, name);
   EndCommand();
 }
 
-void ClientToServerSerializer::UnloadResource(const char* name)
+inline void ClientToServerSerializer::UnloadResource(const char* name)
 {
   BeginCommand(CommandId_UnloadResource);
   write(*this, name);
   EndCommand();
 }
 
-template <class Dispatcher> bool ClientToServerDeserializer::Deserialize(CommandId id, Dispatcher& dispatcher)
+template <class Dispatcher> inline bool ClientToServerDeserializer::Deserialize(CommandId id, Dispatcher& dispatcher)
 {
   switch (id)
   {
@@ -48,14 +48,14 @@ template <class Dispatcher> bool ClientToServerDeserializer::Deserialize(Command
 */
 
 
-void ServerToClientSerializer::Dummy()
+inline void ServerToClientSerializer::Dummy()
 {
   BeginCommand(CommandId_Dummy);
 
   EndCommand();
 }
 
-template <class Dispatcher> bool ServerToClientDeserializer::Deserialize(CommandId id, Dispatcher& dispatcher)
+template <class Dispatcher> inline bool ServerToClientDeserializer::Deserialize(CommandId id, Dispatcher& dispatcher)
 {
   switch (id)
   {

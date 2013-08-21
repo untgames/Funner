@@ -31,7 +31,7 @@ inline void OutputStream::Reset (const CommandBuffer& in_buffer)
     Ξαμεν
 */
 
-void OutputStream::Swap (CommandBuffer& in_buffer)
+inline void OutputStream::Swap (CommandBuffer& in_buffer)
 {
   CommandBuffer old_buffer = buffer;
 

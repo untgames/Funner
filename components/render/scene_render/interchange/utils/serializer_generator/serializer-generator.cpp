@@ -334,6 +334,8 @@ void dump_serialization (const MethodArray& methods, stl::string& result, const 
     if (iter != methods.begin ())
       result += "\n";
 
+    result += "inline ";
+
     dump_signature (method, result, common::format ("%sSerializer", section).c_str ());
 
     result += "\n{\n";
@@ -360,7 +362,7 @@ void dump_param_deserialization (const Param& param, stl::string& result)
 
 void dump_deserialization (const MethodArray& methods, stl::string& result, const char* section)
 {
-  result += common::format ("template <class Dispatcher> bool %s%s(%s id, Dispatcher& dispatcher)\n{\n", section, DESERIALIZER_DISPATCH_METHOD_NAME, COMMAND_ID_ENUM_NAME);
+  result += common::format ("template <class Dispatcher> inline bool %s%s(%s id, Dispatcher& dispatcher)\n{\n", section, DESERIALIZER_DISPATCH_METHOD_NAME, COMMAND_ID_ENUM_NAME);
   result += "  switch (id)\n  {\n";
 
   for (MethodArray::const_iterator iter=methods.begin (), end=methods.end (); iter!=end; ++iter)
@@ -407,7 +409,7 @@ void dump_enums (const MethodArray& methods, stl::string& result)
 
 void dump_enum_names (const MethodArray& methods, stl::string& result)
 {
-  result += common::format ("const char* %s(%s command_id)\n{\n", COMMAND_NAME_FUNC_NAME, COMMAND_ID_ENUM_NAME);
+  result += common::format ("inline const char* %s(%s command_id)\n{\n", COMMAND_NAME_FUNC_NAME, COMMAND_ID_ENUM_NAME);
   result += "  switch (command_id)\n  {\n";
 
   for (MethodArray::const_iterator iter=methods.begin (), end=methods.end (); iter!=end; ++iter)
