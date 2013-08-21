@@ -23,17 +23,16 @@ class RenderThread
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструктор / деструктор / присваивание
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    RenderThread  (const char* thread_connection_name, size_t render_queue_size, const char* target_connection_name, const char* target_connection_init_string = "");
-    RenderThread  (const char* thread_connection_name, size_t render_queue_size, IConnection* connection);
+    RenderThread  (const char* name, size_t render_queue_size);
     RenderThread  (const RenderThread&);
     ~RenderThread ();
 
     RenderThread& operator = (const RenderThread&);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Имя соединения
+///Создание соединения-посредника
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    const char* ConnectionName () const;
+    IConnection* CreateConnection (IConnection* source_connection);
 
   private:
     struct Impl;

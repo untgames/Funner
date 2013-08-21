@@ -13,7 +13,7 @@ const size_t SPIN_WAIT_TIME_MS = 1000 / DESIRED_FPS;
     Описание реализации очереди команд
 */
 
-typedef syslib::SharedQueue<CommandBuffer> Queue;
+typedef syslib::SharedQueue<CommandQueueItem> Queue;
 
 struct CommandQueue::Impl
 {
@@ -59,12 +59,12 @@ bool CommandQueue::IsEmpty () const
     Помещение элемента в очередь / извлечение из очереди
 */
 
-void CommandQueue::Push (const CommandBuffer& buffer)
+void CommandQueue::Push (const CommandQueueItem& command)
 {
-  impl->queue.Push (buffer);
+  impl->queue.Push (command);
 }
 
-bool CommandQueue::Pop (CommandBuffer& buffer, size_t timeout)
+bool CommandQueue::Pop (CommandQueueItem& command, size_t timeout)
 {
-  return impl->queue.TryPop (buffer, timeout);
+  return impl->queue.TryPop (command, timeout);
 }

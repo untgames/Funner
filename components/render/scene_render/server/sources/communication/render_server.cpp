@@ -8,11 +8,12 @@ using namespace render::scene::server;
 
 struct Server::Impl
 {
+  ServerImpl         server;   //сервер рендеринга
   ConnectionAcceptor acceptor; //объект, принимающий входящие подключения
 
 /// Конструктор
-  Impl (const char* name)
-    : acceptor (name)
+  Impl (const char* name, ServerThreadingModel threading_model)
+    : acceptor (name, server, threading_model)
   {
   }
 };
@@ -21,14 +22,23 @@ struct Server::Impl
     Конструктор / деструктор
 */
 
-Server::Server (const char* name)
+Server::Server (const char* name, ServerThreadingModel threading_model)
 {
   try
   {
     if (!name)
       throw xtl::make_null_argument_exception ("", "name");
 
-    impl.reset (new Impl (name));    
+    switch (threading_model)
+    {
+      case ServerThreadingModel_SingleThreaded:
+      case ServerThreadingModel_MultiThreaded:
+        break;
+      default:
+        throw xtl::make_argument_exception ("", "threading_model", threading_model);
+    }
+
+    impl.reset (new Impl (name, threading_model));    
   }
   catch (xtl::exception& e)
   {

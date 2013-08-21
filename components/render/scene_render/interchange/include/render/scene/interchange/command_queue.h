@@ -1,7 +1,10 @@
 #ifndef RENDER_SCENE_COMMAND_QUEUE_HEADER
 #define RENDER_SCENE_COMMAND_QUEUE_HEADER
 
+#include <xtl/intrusive_ptr.h>
+
 #include <render/scene/interchange/command_buffer.h>
+#include <render/scene/interchange/connection.h>
 
 namespace render
 {
@@ -11,6 +14,19 @@ namespace scene
 
 namespace interchange
 {
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Команда
+///////////////////////////////////////////////////////////////////////////////////////////////////
+struct CommandQueueItem
+{
+  xtl::com_ptr<IConnection> connection; //соединение
+  CommandBuffer             buffer;     //буфер команд
+
+/// Конструкторы
+  CommandQueueItem () {}  
+  CommandQueueItem (IConnection* in_connection, const CommandBuffer& in_buffer) : connection (in_connection), buffer (in_buffer) {}
+};
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Очередь команд
@@ -33,8 +49,8 @@ class CommandQueue
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Помещение элемента в очередь / извлечение из очереди
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void Push (const CommandBuffer& buffer);
-    bool Pop  (CommandBuffer& buffer, size_t timeout = size_t (-1));
+    void Push (const CommandQueueItem& command);
+    bool Pop  (CommandQueueItem& command, size_t timeout = size_t (-1));
 
   private:
     CommandQueue (const CommandQueue&); //no impl

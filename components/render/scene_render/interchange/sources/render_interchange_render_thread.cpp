@@ -12,36 +12,23 @@ const size_t MAX_POP_TIMEOUT_MS = 100;
 
 typedef xtl::com_ptr<IConnection> ConnectionPtr;
 
-struct RenderThread::Impl: public IConnection, public xtl::reference_counter, public xtl::trackable
+struct RenderThread::Impl: public xtl::reference_counter
 {
-  stl::string                   connection_name;        //имя соединения
-  ConnectionPtr                 target_connection;      //целевое соединение
-  common::Log                   log;                    //поток протоколирования
-  stl::string                   manager_name;           //имя менеджера соединения
-  CommandQueue                  command_queue;          //очередь команд
-  volatile bool                 stop_request;           //флаг запроса остановки нити  
-  stl::auto_ptr<syslib::Thread> thread;                 //нить
+  stl::string    name;                   //имя нити
+  common::Log    log;                    //поток протоколирования
+  stl::string    manager_name;           //имя менеджера соединения
+  CommandQueue   command_queue;          //очередь команд
+  volatile bool  stop_request;           //флаг запроса остановки нити  
+  syslib::Thread thread;                 //нить
 
 /// Конструктор
-  Impl (const char* thread_connection_name, size_t render_queue_size, const ConnectionPtr& connection)
-    : connection_name (thread_connection_name)
-    , target_connection (connection)
-    , log (common::format ("%s.%s", LOG_NAME, thread_connection_name).c_str ())
-    , manager_name (common::format ("RenderThread.%s", thread_connection_name))
+  Impl (const char* in_name, size_t render_queue_size)
+    : name (common::format ("%s.%s", LOG_NAME, in_name))
+    , log (name.c_str ())
     , command_queue (render_queue_size)
     , stop_request ()
+    , thread (name.c_str (), xtl::bind (&Impl::Run, this))
   {
-    ConnectionManager::RegisterConnection (manager_name.c_str (), thread_connection_name, xtl::bind (&Impl::CreateConnection, this, _2));
-
-    try
-    {
-      thread.reset (new syslib::Thread (thread_connection_name, xtl::bind (&Impl::Run, this)));
-    }
-    catch (...)
-    {
-      ConnectionManager::UnregisterConnection (manager_name.c_str ());
-      throw;
-    }
   }
 
 /// Деструктор
@@ -49,24 +36,47 @@ struct RenderThread::Impl: public IConnection, public xtl::reference_counter, pu
   {
     try
     {
-      ConnectionManager::UnregisterConnection (manager_name.c_str ());
-
       stop_request = true;
 
-      thread->Join ();
+      thread.Join ();
     }
     catch (...)
     {
     }
   }
 
-///Создание соединения
-  IConnection* CreateConnection (const char* init_string)
+///Соединение посредник
+  class ProxyConnection: public IConnection, public xtl::reference_counter, public xtl::trackable
   {
-    addref (this);
+    public:
+      /// Конструктор
+      ProxyConnection (Impl* in_impl, IConnection* in_source_connection) : impl (in_impl), source_connection (in_source_connection) {}
 
-    return this;
-  }
+      /// Обработка входного потока данных
+      void ProcessCommands (const CommandBuffer& commands)
+      {
+        try
+        {
+          impl->command_queue.Push (CommandQueueItem (source_connection.get (), commands));
+        }
+        catch (xtl::exception& e)
+        {
+          e.touch ("render::scene::interchange::RenderThread::Impl::ProxyConnection::ProcessCommands");
+          throw;
+        }
+      }
+
+      /// Получение события оповещения об удалении
+      xtl::trackable& GetTrackable () { return *this; }
+
+      /// Подсчет ссылок
+      void AddRef  () { addref (this); }
+      void Release () { release (this); }
+
+    private:
+      xtl::intrusive_ptr<Impl> impl;
+      ConnectionPtr            source_connection;
+  };
 
 /// Цикл нити
   int Run ()
@@ -75,14 +85,14 @@ struct RenderThread::Impl: public IConnection, public xtl::reference_counter, pu
     {
       try
       {
-        CommandBuffer buffer;
+        CommandQueueItem command;
 
 //TODO: optimize buffer pop
 
-        if (!command_queue.Pop (buffer, MAX_POP_TIMEOUT_MS))
+        if (!command_queue.Pop (command, MAX_POP_TIMEOUT_MS))
           continue; 
 
-        target_connection->ProcessCommands (buffer);
+        command.connection->ProcessCommands (command.buffer);
       }
       catch (std::exception& e)
       {
@@ -96,69 +106,24 @@ struct RenderThread::Impl: public IConnection, public xtl::reference_counter, pu
 
     return 0;
   }
-
-///Обработка входного потока данных
-  void ProcessCommands (const CommandBuffer& commands)
-  {
-    try
-    {
-      command_queue.Push (commands);
-    }
-    catch (xtl::exception& e)
-    {
-      e.touch ("render::scene::interchange::RenderThread::Impl::ProcessCommands");
-      throw;
-    }
-  }
-
-///Получение события оповещения об удалении
-  xtl::trackable& GetTrackable () { return *this; }
-
-///Подсчет ссылок
-  void AddRef  () { addref (this); }
-  void Release () { release (this); }
 };
 
 /*
     Конструктор / деструктор / присваивание
 */
 
-RenderThread::RenderThread (const char* thread_connection_name, size_t render_queue_size, const char* target_connection_name, const char* target_connection_init_string)
+RenderThread::RenderThread (const char* name, size_t render_queue_size)
 {
   try
   {
-    if (!thread_connection_name)
-      throw xtl::make_null_argument_exception ("", "thread_connection_name");
+    if (!name)
+      throw xtl::make_null_argument_exception ("", "name");
 
-    if (!target_connection_name)
-      throw xtl::make_null_argument_exception ("", "target_connection_name");
-
-    if (!target_connection_init_string)
-      target_connection_init_string = "";
-
-    ConnectionPtr connection (ConnectionManager::CreateConnection (target_connection_name, target_connection_init_string), false);
-
-    impl = new Impl (thread_connection_name, render_queue_size, connection);
+    impl = new Impl (name, render_queue_size);
   } 
   catch (xtl::exception& e)
   {
-    e.touch ("render::scene::interchange::RenderThread::RenderThread(const char*,size_t,const char*,const char*)");
-    throw;
-  }
-}
-
-RenderThread::RenderThread (const char* thread_connection_name, size_t render_queue_size, IConnection* connection)
-{
-  try
-  {
-    if (!connection)
-      throw xtl::make_null_argument_exception ("", "connection");
-
-    impl = new Impl (thread_connection_name, render_queue_size, connection);
-  } 
-  catch (xtl::exception& e)
-  {
-    e.touch ("render::scene::interchange::RenderThread::RenderThread(const char*,size_t,const Connection&)");
+    e.touch ("render::scene::interchange::RenderThread::RenderThread");
     throw;
   }
 }
@@ -184,10 +149,21 @@ RenderThread& RenderThread::operator = (const RenderThread& thread)
 }
 
 /*
-    Имена соединений
+    Создание соединения-посредника
 */
 
-const char* RenderThread::ConnectionName () const
+IConnection* RenderThread::CreateConnection (IConnection* source_connection)
 {
-  return impl->connection_name.c_str ();
+  try
+  {
+    if (!source_connection)
+      throw xtl::make_null_argument_exception ("", "source_connection");
+
+    return new Impl::ProxyConnection (impl, source_connection);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::scene::interchange::RenderThread::CreateConnection");
+    throw;
+  }
 }
