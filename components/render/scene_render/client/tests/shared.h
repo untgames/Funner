@@ -10,7 +10,7 @@
 #include <common/property_map.h>
 #include <common/strlib.h>
 
-#include <render/scene_render.h>
+#include <render/scene_render_client.h>
 
 #include <render/scene/interchange/connection_manager.h>
 

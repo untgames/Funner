@@ -22,7 +22,7 @@ enum State
 class ContextImpl: public Context
 {
   public:
-    ContextImpl (SceneRenderImpl& render) : Context (render) {}
+    ContextImpl (ClientImpl& render) : Context (render) {}
 
     using Context::SetCounterparty;
     using Context::ProcessCommands;
@@ -34,15 +34,15 @@ typedef xtl::com_ptr<interchange::IConnection> ConnectionPtr;
 
 struct Connection::Impl: public xtl::reference_counter, public xtl::trackable
 {
-  stl::string                    response_connection_name;    //имя соединения для ответов
-  syslib::Condition              logon_ack_waiter;            //семафор ожидания ответа на логин
-  syslib::Mutex                  mutex;                       //мьютекс данных
-  volatile State                 state;                       //состояние соединения
-  stl::string                    description;                 //описание соединения
-  ConnectionPtr                  client_to_server_connection; //соединение от клиента к серверу
-  size_t                         owner_thread_id;             //идентификатор нити владельца соединения
-  stl::auto_ptr<SceneRenderImpl> scene_render;                //реализация рендера сцены  
-  stl::auto_ptr<ContextImpl>     context;                     //контекст
+  stl::string                response_connection_name;    //имя соединения для ответов
+  syslib::Condition          logon_ack_waiter;            //семафор ожидания ответа на логин
+  syslib::Mutex              mutex;                       //мьютекс данных
+  volatile State             state;                       //состояние соединения
+  stl::string                description;                 //описание соединения
+  ConnectionPtr              client_to_server_connection; //соединение от клиента к серверу
+  size_t                     owner_thread_id;             //идентификатор нити владельца соединения
+  stl::auto_ptr<ClientImpl>  client;                      //реализация рендера сцены
+  stl::auto_ptr<ContextImpl> context;                     //контекст
 
 /// Конструктор
   Impl ()
@@ -203,8 +203,8 @@ Connection::Connection (const char* connection_name, const char* init_string, si
 
       //создание контекста
 
-    impl->scene_render.reset (new SceneRenderImpl);
-    impl->context.reset (new ContextImpl (*impl->scene_render));
+    impl->client.reset (new ClientImpl);
+    impl->context.reset (new ContextImpl (*impl->client));
 
     impl->context->SetCounterparty (&*impl->client_to_server_connection);
   }
@@ -233,9 +233,9 @@ const char* Connection::Description ()
     Рендер сцены
 */
 
-SceneRenderImpl& Connection::Render ()
+ClientImpl& Connection::Client ()
 {
-  return *impl->scene_render;
+  return *impl->client;
 }
 
 /*

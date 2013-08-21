@@ -6,7 +6,7 @@ using namespace render::scene::client;
     Описание реализации рендера сцены
 */
 
-struct SceneRenderImpl::Impl
+struct ClientImpl::Impl
 {
 };
 
@@ -14,12 +14,12 @@ struct SceneRenderImpl::Impl
     Конструктор / деструктор
 */
 
-SceneRenderImpl::SceneRenderImpl ()
+ClientImpl::ClientImpl ()
   : impl (new Impl)
 {
 }
 
-SceneRenderImpl::~SceneRenderImpl ()
+ClientImpl::~ClientImpl ()
 {
 }
 
@@ -27,6 +27,6 @@ SceneRenderImpl::~SceneRenderImpl ()
     Обработчики ответов сервера
 */
 
-void SceneRenderImpl::Dummy ()
+void ClientImpl::Dummy ()
 {
 }

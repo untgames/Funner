@@ -6,7 +6,7 @@ using namespace render::scene::client;
     Описание реализации рендера сцены
 */
 
-struct Render::Impl: public xtl::reference_counter
+struct Client::Impl: public xtl::reference_counter
 {
   stl::auto_ptr<Connection> connection; //ссылка на соединение
 };
@@ -15,7 +15,7 @@ struct Render::Impl: public xtl::reference_counter
     Конструктор / деструктор
 */
 
-Render::Render (const char* connection_name, const char* init_string, size_t logon_timeout_ms)
+Client::Client (const char* connection_name, const char* init_string, size_t logon_timeout_ms)
 {
   try
   {
@@ -31,25 +31,25 @@ Render::Render (const char* connection_name, const char* init_string, size_t log
   }
   catch (xtl::exception& e)
   {
-    e.touch ("render::scene::client::Render::Render");
+    e.touch ("render::scene::client::Client::Client");
     throw;
   }
 }
 
-Render::Render (const Render& render)
+Client::Client (const Client& render)
   : impl (render.impl)
 {
   addref (impl);
 }
 
-Render::~Render ()
+Client::~Client ()
 {
   release (impl);
 }
 
-Render& Render::operator = (const Render& render)
+Client& Client::operator = (const Client& render)
 {
-  Render (render).Swap (*this);
+  Client (render).Swap (*this);
 
   return *this;
 }
@@ -58,7 +58,7 @@ Render& Render::operator = (const Render& render)
     Описание системы рендеринга
 */
 
-const char* Render::Description () const
+const char* Client::Description () const
 {
   return impl->connection->Description ();
 }
@@ -67,7 +67,7 @@ const char* Render::Description () const
     Создание цели рендеринга
 */
 
-RenderTarget Render::CreateRenderTarget (const char* target_name)
+RenderTarget Client::CreateRenderTarget (const char* target_name)
 {
   throw xtl::make_not_implemented_exception (__FUNCTION__);
 }
@@ -76,12 +76,12 @@ RenderTarget Render::CreateRenderTarget (const char* target_name)
     Максимальный уровень вложенности рендеринга
 */
 
-void Render::SetMaxDrawDepth (size_t level)
+void Client::SetMaxDrawDepth (size_t level)
 {
   throw xtl::make_not_implemented_exception (__FUNCTION__);
 }
 
-size_t Render::MaxDrawDepth () const
+size_t Client::MaxDrawDepth () const
 {
   throw xtl::make_not_implemented_exception (__FUNCTION__);
 }
@@ -90,12 +90,12 @@ size_t Render::MaxDrawDepth () const
     Работа с ресурсами
 */
 
-void Render::LoadResource (const char* file_name)
+void Client::LoadResource (const char* file_name)
 {
   throw xtl::make_not_implemented_exception (__FUNCTION__);
 }
 
-void Render::UnloadResource (const char* file_name)
+void Client::UnloadResource (const char* file_name)
 {
   throw xtl::make_not_implemented_exception (__FUNCTION__);
 }
@@ -104,7 +104,7 @@ void Render::UnloadResource (const char* file_name)
     Обмен
 */
 
-void Render::Swap (Render& render)
+void Client::Swap (Client& render)
 {
   stl::swap (impl, render.impl);
 }
@@ -115,7 +115,7 @@ namespace render
 namespace scene
 {
 
-void swap (Render& render1, Render& render2)
+void swap (Client& render1, Client& render2)
 {
   render1.Swap (render2);
 }

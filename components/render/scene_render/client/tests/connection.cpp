@@ -51,7 +51,7 @@ int main ()
 
     scene::interchange::ConnectionManager::RegisterConnection (CONNECTION_NAME, CONNECTION_NAME, &MyConnection::CreateConnection);
 
-    Render render (CONNECTION_NAME);
+    Client render (CONNECTION_NAME);
 
     scene::interchange::ConnectionManager::UnregisterConnection (CONNECTION_NAME);
 
