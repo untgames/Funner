@@ -134,8 +134,8 @@ struct Connection::Impl: public xtl::reference_counter, public xtl::trackable
 
       common::PropertyMap properties = common::parse_init_string (init_string);
 
-      if (properties.IsPresent ("initiator_name"))
-        description = properties.GetString ("initiator_name");
+      if (properties.IsPresent ("initiator"))
+        description = properties.GetString ("initiator");
 
       state = State_Connected;
 
@@ -185,7 +185,7 @@ Connection::Connection (const char* connection_name, const char* init_string, si
     size_t start_time = common::milliseconds ();
 
     impl->state                       = State_LogonAckWaiting;
-    impl->client_to_server_connection = ConnectionPtr (interchange::ConnectionManager::CreateConnection (connection_name, common::format ("%s logon_timeout=%d initiator_name='%s'", init_string, logon_timeout, impl->response_connection_name.c_str ()).c_str ()), false);
+    impl->client_to_server_connection = ConnectionPtr (interchange::ConnectionManager::CreateConnection (connection_name, common::format ("%s logon_timeout=%d initiator='%s'", init_string, logon_timeout, impl->response_connection_name.c_str ()).c_str ()), false);
 
       //ожидание ответа от сервера
 

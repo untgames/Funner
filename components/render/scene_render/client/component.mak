@@ -13,4 +13,4 @@ RENDER.SCENE_RENDER.CLIENT.SOURCES.IMPORTS     := compile.render.scene_render.cl
 #Цель - scene render server tests
 RENDER.SCENE_RENDER.CLIENT.TESTS.TYPE        := test-suite
 RENDER.SCENE_RENDER.CLIENT.TESTS.SOURCE_DIRS := tests
-RENDER.SCENE_RENDER.CLIENT.TESTS.IMPORTS     := compile.render.scene_render.server link.render.scene_render.server
+RENDER.SCENE_RENDER.CLIENT.TESTS.IMPORTS     := compile.render.scene_render.client link.render.scene_render.client compile.render.scene_render.interchange compile.common
