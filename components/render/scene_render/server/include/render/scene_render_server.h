@@ -34,6 +34,10 @@ class SceneRenderServer
     void DetachAllWindows ();
 
   private:
+    SceneRenderServer (const SceneRenderServer&); //no impl
+    SceneRenderServer& operator = (const SceneRenderServer&); //no impl
+
+  private:
     struct Impl;
     stl::auto_ptr<Impl> impl;
 };

@@ -1,1 +1,1 @@
-COMPONENT_DIRS := core interchange renderer
+COMPONENT_DIRS := client interchange server
