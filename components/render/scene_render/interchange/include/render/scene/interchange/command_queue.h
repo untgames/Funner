@@ -35,10 +35,13 @@ class CommandQueue
 {
   public:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Конструктор / деструктор
+///Конструкторы / деструктор / присваивание
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     CommandQueue  (size_t max_queue_size);
+    CommandQueue  (const CommandQueue&);
     ~CommandQueue ();
+
+    CommandQueue& operator = (const CommandQueue&);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Размер очереди / проверка на пустоту
@@ -53,12 +56,8 @@ class CommandQueue
     bool Pop  (CommandQueueItem& command, size_t timeout = size_t (-1));
 
   private:
-    CommandQueue (const CommandQueue&); //no impl
-    CommandQueue& operator = (const CommandQueue&); //no impl
-
-  private:
     struct Impl;
-    stl::auto_ptr<Impl> impl;
+    Impl* impl;
 };
 
 }

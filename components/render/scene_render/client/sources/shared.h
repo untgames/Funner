@@ -7,15 +7,15 @@
 #include <xtl/reference_counter.h>
 #include <xtl/trackable_ptr.h>
 
-#include <common/action_queue.h>
 #include <common/property_map.h>
 #include <common/strlib.h>
+#include <common/time.h>
 
 #include <syslib/condition.h>
-#include <syslib/thread.h>
 
 #include <render/scene_render_client.h>
 
+#include <render/scene/interchange/command_queue.h>
 #include <render/scene/interchange/connection_manager.h>
 #include <render/scene/interchange/context.h>
 #include <render/scene/interchange/serializer.h>
@@ -79,6 +79,12 @@ class Connection: public xtl::noncopyable
 ///Контекст
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     client::Context& Context ();
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Ожидание ответа от сервера
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void WaitServerFeedback    ();
+    bool TryWaitServerFeedback (size_t timeout_ms);
 
   private:
     struct Impl;

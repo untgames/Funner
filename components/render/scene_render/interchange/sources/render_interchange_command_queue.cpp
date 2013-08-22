@@ -15,7 +15,7 @@ const size_t SPIN_WAIT_TIME_MS = 1000 / DESIRED_FPS;
 
 typedef syslib::SharedQueue<CommandQueueItem> Queue;
 
-struct CommandQueue::Impl
+struct CommandQueue::Impl: public xtl::reference_counter
 {
   Queue queue; //очередь буферов
 
@@ -37,8 +37,24 @@ CommandQueue::CommandQueue (size_t max_queue_size)
 {
 }
 
+CommandQueue::CommandQueue (const CommandQueue& queue)
+  : impl (queue.impl)
+{
+  addref (impl);
+}
+
 CommandQueue::~CommandQueue ()
 {
+  release (impl);
+}
+
+CommandQueue& CommandQueue::operator = (const CommandQueue& queue)
+{
+  CommandQueue tmp (queue);
+
+  stl::swap (impl, tmp.impl);
+
+  return *this;
 }
 
 /*

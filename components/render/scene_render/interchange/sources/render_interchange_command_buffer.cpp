@@ -2,8 +2,6 @@
 
 using namespace render::scene::interchange;
 
-///TODO: special case for default buffer!!!
-
 /*
     Описание реализации буфера команд
 */
@@ -13,6 +11,11 @@ typedef xtl::uninitialized_storage<char> Buffer;
 struct CommandBuffer::Impl: public xtl::reference_counter
 {
   Buffer buffer; //буфер с данными
+
+  static Impl* GetDefault ()
+  {
+    return &xtl::singleton_default<Impl, true>::instance ();
+  }
 };
 
 /*
@@ -20,8 +23,9 @@ struct CommandBuffer::Impl: public xtl::reference_counter
 */
 
 CommandBuffer::CommandBuffer ()
-  : impl (new Impl)
+  : impl (Impl::GetDefault ())
 {
+  addref (impl);
 }
 
 CommandBuffer::CommandBuffer (const CommandBuffer& buffer)
@@ -80,6 +84,9 @@ void* CommandBuffer::Data ()
 
 void CommandBuffer::Resize (size_t new_size, bool copy_data)
 {
+  if (impl == Impl::GetDefault ())
+    impl = new Impl;
+
   impl->buffer.resize (new_size, copy_data);
 }
 
@@ -94,6 +101,9 @@ size_t CommandBuffer::Capacity () const
 
 void CommandBuffer::Reserve (size_t new_size)
 {
+  if (impl == Impl::GetDefault ())
+    impl = new Impl;
+
   impl->buffer.reserve (new_size);
 }
 

@@ -4,6 +4,13 @@ using namespace render::scene::client;
 using namespace render::scene;
 
 /*
+    Максимальное ожидание ответа от сервера
+*/
+
+const size_t DEFAULT_WAIT_FEEDBACK_TIMEOUT = 1000; //время ожидания ответа от сервера в миллисекундах
+const size_t RESPONSE_QUEUE_SIZE           = 128;  //размер очереди ответов от сервера
+
+/*
     Описание реализации соединения с сервером
 */
 
@@ -40,14 +47,14 @@ struct Connection::Impl: public xtl::reference_counter, public xtl::trackable
   volatile State             state;                       //состояние соединения
   stl::string                description;                 //описание соединения
   ConnectionPtr              client_to_server_connection; //соединение от клиента к серверу
-  size_t                     owner_thread_id;             //идентификатор нити владельца соединения
   stl::auto_ptr<ClientImpl>  client;                      //реализация рендера сцены
   stl::auto_ptr<ContextImpl> context;                     //контекст
+  interchange::CommandQueue  response_queue;              //очередь команд
 
 /// Конструктор
   Impl ()
     : state (State_Disconnected)
-    , owner_thread_id (syslib::Thread::GetCurrentThreadId ())
+    , response_queue (RESPONSE_QUEUE_SIZE)
   {
     response_connection_name = common::format ("response_connection.%p", this);
 
@@ -72,14 +79,14 @@ struct Connection::Impl: public xtl::reference_counter, public xtl::trackable
   class ServerToClientConnection: public interchange::IConnection, public xtl::reference_counter, public xtl::trackable
   {
     public:
-      ServerToClientConnection (Impl* in_impl) : impl (in_impl), owner_thread_id (impl->owner_thread_id) {}
+      ServerToClientConnection (const interchange::CommandQueue& in_queue) : queue (in_queue)  {}
 
       ///Обработка входного потока данных
       void ProcessCommands (const interchange::CommandBuffer& commands)
       {
         try
         {
-          common::ActionQueue::PushAction (xtl::bind (&ServerToClientConnection::ProcessCommandsCore, xtl::intrusive_ptr<ServerToClientConnection> (this), commands), owner_thread_id);
+          queue.Push (interchange::CommandQueueItem (static_cast<interchange::IConnection*> (0), commands));
         }
         catch (xtl::exception& e)
         {
@@ -96,27 +103,7 @@ struct Connection::Impl: public xtl::reference_counter, public xtl::trackable
       void Release () { release (this); }
 
     private:
-      void ProcessCommandsCore (const interchange::CommandBuffer& commands)
-      {
-        try
-        {
-          xtl::intrusive_ptr<Impl> local_impl (&*impl);
-
-          if (!local_impl)
-            return;
-
-          local_impl->ProcessResponseFromServer (commands);
-        }
-        catch (xtl::exception& e)
-        {
-          e.touch ("render::scene::client::Connection::Impl::ServerToClientConnection::ProcessCommandsCore");
-          throw;
-        }
-      }
-
-    private:
-      xtl::trackable_ptr<Impl> impl;
-      size_t                   owner_thread_id;
+      interchange::CommandQueue queue;
   };
 
 /// Функция создания соединения для получения ответов от сервера
@@ -141,7 +128,7 @@ struct Connection::Impl: public xtl::reference_counter, public xtl::trackable
 
       logon_ack_waiter.NotifyOne ();
 
-      return new ServerToClientConnection (this);
+      return new ServerToClientConnection (response_queue);
     }
     catch (xtl::exception& e)
     {
@@ -194,7 +181,7 @@ Connection::Connection (const char* connection_name, const char* init_string, si
       size_t elapsed_time = common::milliseconds () - start_time;
 
       if (elapsed_time > logon_timeout)
-        throw xtl::format_operation_exception ("", "Can't create rendering connection '%s' with init_string '%s' for %u ms", connection_name, init_string, logon_timeout);     
+        throw xtl::format_operation_exception ("", "Can't create rendering connection '%s' with init_string '%s' for %u ms", connection_name, init_string, logon_timeout);
 
       size_t wait_timeout = logon_timeout - elapsed_time;
 
@@ -245,4 +232,42 @@ ClientImpl& Connection::Client ()
 Context& Connection::Context ()
 {
   return *impl->context;
+}
+
+/*
+    Ожидание ответа от сервера
+*/
+
+void Connection::WaitServerFeedback ()
+{
+  try
+  {
+    if (!TryWaitServerFeedback (DEFAULT_WAIT_FEEDBACK_TIMEOUT))
+      throw xtl::format_operation_exception ("", "No feedback from server is received for %u ms", DEFAULT_WAIT_FEEDBACK_TIMEOUT);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::scene::client::Connection::WaitServerFeedback");
+    throw;
+  }
+}
+
+bool Connection::TryWaitServerFeedback (size_t timeout_ms)
+{
+  try
+  {
+    interchange::CommandQueueItem item;
+
+    if (!impl->response_queue.Pop (item, timeout_ms))
+      return false;
+
+    impl->ProcessResponseFromServer (item.buffer);
+
+    return true;
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::scene::client::Connection::TryWaitServerFeedback");
+    throw;
+  }
 }
