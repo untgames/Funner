@@ -20,7 +20,13 @@ int main ()
 
     Server server (SERVER_NAME);
 
-    server.AttachWindow ("my_window", window, "");
+    common::PropertyMap properties;
+    
+    properties.SetProperty ("ColorBits", 24);
+    properties.SetProperty ("DepthBits", 16);
+
+    server.AttachWindow ("my_window", window, properties);
+    server.Finish ();
   }
   catch (std::exception& e)
   {

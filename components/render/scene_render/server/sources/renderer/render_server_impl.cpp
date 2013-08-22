@@ -9,18 +9,31 @@ using namespace render::scene;
 
 struct ServerImpl::Impl
 {
-  server::WindowManager window_manager; //менеджер окон
+  stl::string            server_name;    //имя сервера
+  server::RenderManager  render_manager; //менеджер рендеринга
+  server::WindowManager  window_manager; //менеджер окон
+
+/// Конструктор
+  Impl (const char* name)
+    : server_name (name)
+    , render_manager (name)
+    , window_manager (render_manager)
+  {
+  }
 };
 
 /*
     Конструктор / деструктор
 */
 
-ServerImpl::ServerImpl ()
+ServerImpl::ServerImpl (const char* name)
 {
   try
   {
-    impl.reset (new Impl);
+    if (!name)
+      throw xtl::make_null_argument_exception ("", "name");
+
+    impl.reset (new Impl (name));
   }
   catch (xtl::exception& e)
   {
@@ -34,8 +47,22 @@ ServerImpl::~ServerImpl ()
 }
 
 /*
+    Поток отладочного протоколирования
+*/
+
+common::Log& ServerImpl::Log ()
+{
+  return impl->render_manager.Log ();
+}
+
+/*
     Менеджеры
 */
+
+render::manager::RenderManager& ServerImpl::RenderManager ()
+{
+  return impl->render_manager.Manager ();
+}
 
 WindowManager& ServerImpl::WindowManager ()
 {

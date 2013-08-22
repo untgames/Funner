@@ -1,9 +1,9 @@
-#ifndef RENDER_SCENE_WINDOW_MANAGER_SHARED_HEADER
-#define RENDER_SCENE_WINDOW_MANAGER_SHARED_HEADER
+#ifndef RENDER_SCENE_SERVER_WINDOW_MANAGER_SHARED_HEADER
+#define RENDER_SCENE_SERVER_WINDOW_MANAGER_SHARED_HEADER
 
 #include <stl/auto_ptr.h>
 
-#include <render/manager/window.h>
+#include <shared/render_manager.h>
 
 namespace render
 {
@@ -23,7 +23,7 @@ class WindowManager
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструктор / деструктор
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    WindowManager  ();
+    WindowManager  (const RenderManager&);
     ~WindowManager ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

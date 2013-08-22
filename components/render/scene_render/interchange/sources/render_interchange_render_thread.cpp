@@ -14,12 +14,12 @@ typedef xtl::com_ptr<IConnection> ConnectionPtr;
 
 struct RenderThread::Impl: public xtl::reference_counter
 {
-  stl::string    name;                   //имя нити
-  common::Log    log;                    //поток протоколирования
-  stl::string    manager_name;           //имя менеджера соединения
-  CommandQueue   command_queue;          //очередь команд
-  volatile bool  stop_request;           //флаг запроса остановки нити  
-  syslib::Thread thread;                 //нить
+  stl::string       name;                   //имя нити
+  common::Log       log;                    //поток протоколирования
+  stl::string       manager_name;           //имя менеджера соединения
+  CommandQueue      command_queue;          //очередь команд
+  volatile bool     stop_request;           //флаг запроса остановки нити  
+  syslib::Thread    thread;                 //нить
 
 /// Конструктор
   Impl (const char* in_name, size_t render_queue_size)
@@ -86,8 +86,6 @@ struct RenderThread::Impl: public xtl::reference_counter
       try
       {
         CommandQueueItem command;
-
-//TODO: optimize buffer pop
 
         if (!command_queue.Pop (command, MAX_POP_TIMEOUT_MS))
           continue; 
@@ -166,4 +164,78 @@ IConnection* RenderThread::CreateConnection (IConnection* source_connection)
     e.touch ("render::scene::interchange::RenderThread::CreateConnection");
     throw;
   }
+}
+
+/*
+    Ожидание незавершеных операций
+*/
+
+namespace
+{
+
+typedef xtl::shared_ptr<syslib::Semaphore> SemaphorePtr;
+
+class WaiterConnection: public IConnection, public xtl::reference_counter, public xtl::trackable
+{
+  public:
+    /// Конструктор
+    WaiterConnection (const SemaphorePtr& in_semaphore) : semaphore (in_semaphore) {}
+
+    /// Деструктор
+    ~WaiterConnection () 
+    {
+      try
+      {
+        semaphore->Post ();
+      }
+      catch (...)
+      {
+      }
+    }
+
+    /// Обработка входного потока данных
+    void ProcessCommands (const CommandBuffer&) { }
+
+    /// Получение события оповещения об удалении
+    xtl::trackable& GetTrackable () { return *this; }
+
+    /// Подсчет ссылок
+    void AddRef  () { addref (this); }
+    void Release () { release (this); }
+
+  private:
+    SemaphorePtr semaphore;
+};
+
+}
+
+bool RenderThread::WaitQueuedCommands (size_t timeout_ms)
+{
+  try
+  {
+    SemaphorePtr semaphore (new syslib::Semaphore (0));
+
+    ConnectionPtr connection (new WaiterConnection (semaphore), false);
+
+    impl->command_queue.Push (CommandQueueItem (connection.get (), CommandBuffer ()));
+
+    connection = ConnectionPtr ();
+
+    if (timeout_ms == size_t (-1)) 
+    {
+      semaphore->Wait ();
+      return true;
+    }
+    else return semaphore->TryWait (timeout_ms);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::scene::interchange::RenderThread::WaitQueuedCommands");
+    throw;
+  }
+}
+
+void RenderThread::WaitQueuedCommands ()
+{
+  while (!WaitQueuedCommands (size_t (-1)));
 }

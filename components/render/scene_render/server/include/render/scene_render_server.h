@@ -11,6 +11,14 @@ class Window;
 
 }
 
+namespace common
+{
+
+//forward declaration
+class PropertyMap;
+
+}
+
 namespace render
 {
 
@@ -46,9 +54,15 @@ class Server
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Присоединение окон
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void AttachWindow     (const char* name, syslib::Window& window, const char* init_string);
+    void AttachWindow     (const char* name, syslib::Window& window, const common::PropertyMap& properties);
     void DetachWindow     (const char* name);
     void DetachAllWindows ();
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Ожидание незавершенных операций
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void Finish ();
+    bool Finish (size_t timeout_ms);
 
   private:
     Server (const Server&); //no impl

@@ -10,12 +10,14 @@
 #include <xtl/function.h>
 #include <xtl/intrusive_ptr.h>
 #include <xtl/reference_counter.h>
+#include <xtl/shared_ptr.h>
 #include <xtl/uninitialized_storage.h>
 
 #include <common/log.h>
 #include <common/singleton.h>
 #include <common/strlib.h>
 
+#include <syslib/semaphore.h>
 #include <syslib/shared_queue.h>
 #include <syslib/thread.h>
 

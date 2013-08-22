@@ -1,9 +1,11 @@
-#ifndef RENDER_SCENE_INTERCHANGE_RENDER_THREAD_HEADER
-#define RENDER_SCENE_INTERCHANGE_RENDER_THREAD_HEADER
+#ifndef RENDER_SCENE_SERVER_RENDER_MANAGER_SHARED_HEADER
+#define RENDER_SCENE_SERVER_RENDER_MANAGER_SHARED_HEADER
 
-#include <cstddef>
+#include <stl/auto_ptr.h>
 
-#include <render/scene/interchange/connection.h>
+#include <common/log.h>
+
+#include <render/manager.h>
 
 namespace render
 {
@@ -11,34 +13,33 @@ namespace render
 namespace scene
 {
 
-namespace interchange
+namespace server
 {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Нить рендеринга
+///Обертка над менеджером рендеринга
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-class RenderThread
+class RenderManager: public xtl::noncopyable
 {
   public:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Конструктор / деструктор / присваивание
+///Конструкторы / деструктор / присваивание
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    RenderThread  (const char* name, size_t render_queue_size);
-    RenderThread  (const RenderThread&);
-    ~RenderThread ();
+    RenderManager  (const char* name);
+    RenderManager  (const RenderManager&);
+    ~RenderManager ();
 
-    RenderThread& operator = (const RenderThread&);
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Создание соединения-посредника
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    IConnection* CreateConnection (IConnection* source_connection);
+    RenderManager& operator = (const RenderManager&);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Ожидание незавершенных операций
+///Поток отладочного протоколирования
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void WaitQueuedCommands ();
-    bool WaitQueuedCommands (size_t timeout_ms);
+    common::Log& Log ();
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Менеджер
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    manager::RenderManager& Manager ();
 
   private:
     struct Impl;

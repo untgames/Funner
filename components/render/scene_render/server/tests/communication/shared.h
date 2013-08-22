@@ -11,6 +11,7 @@
 #include <math/utility.h>
 
 #include <common/log.h>
+#include <common/property_map.h>
 #include <common/time.h>
 
 #include <syslib/application.h>

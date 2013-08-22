@@ -8,6 +8,12 @@ namespace
 {
 
 /*
+    Константы
+*/
+
+const size_t INIT_STRING_RESERVE_SIZE = 256; //резервируемый объем строки инициализации
+
+/*
     Окно
 */
 
@@ -151,20 +157,33 @@ ClientWindowManager::~ClientWindowManager ()
     Присоединение окон
 */
 
-void ClientWindowManager::AttachWindow (const char* name, syslib::Window& window, const char* init_string)
+void ClientWindowManager::AttachWindow (const char* name, syslib::Window& window, const common::PropertyMap& properties)
 {
   try
   {
     if (!name)
       throw xtl::make_null_argument_exception ("", "name");
 
-    if (!init_string)
-      init_string = "";
-
     if (impl->windows.find (name) != impl->windows.end ())
       throw xtl::format_operation_exception ("", "Window '%s' has been already attached", name);
 
-    WindowPtr window (new ClientWindow (window, impl->current_id, name, init_string, impl->connection), false);
+    stl::string init_string, value;
+
+    init_string.reserve (INIT_STRING_RESERVE_SIZE);
+
+    for (size_t i=0, count=properties.Size (); i<count; i++)
+    {
+      const char* name = properties.PropertyName (i);
+
+      properties.GetProperty (i, value);
+
+      init_string += name;
+      init_string += "='";
+      init_string += value;
+      init_string += "' ";
+    }
+
+    WindowPtr window (new ClientWindow (window, impl->current_id, name, init_string.c_str (), impl->connection), false);
 
     impl->windows [name] = window;
 

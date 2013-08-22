@@ -1,3 +1,4 @@
+#include <stl/hash_map>
 #include <stl/string>
 
 #include <xtl/common_exceptions.h>
@@ -8,7 +9,11 @@
 #include <xtl/trackable.h>
 
 #include <common/property_map.h>
+#include <common/singleton.h>
 #include <common/strlib.h>
 
+#include <shared/render_manager.h>
 #include <shared/server.h>
 #include <shared/window_manager.h>
+
+#include <render/manager.h>

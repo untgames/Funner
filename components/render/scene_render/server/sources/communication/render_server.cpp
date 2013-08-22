@@ -15,7 +15,8 @@ struct Server::Impl
 
 /// Конструктор
   Impl (const char* name, ServerThreadingModel threading_model)
-    : acceptor (name, server, threading_model)
+    : server (name)
+    , acceptor (name, server, threading_model)
     , loopback_connection (name)
     , window_manager (loopback_connection)
   {
@@ -59,11 +60,11 @@ Server::~Server ()
     Присоединение окон
 */
 
-void Server::AttachWindow (const char* name, syslib::Window& window, const char* init_string)
+void Server::AttachWindow (const char* name, syslib::Window& window, const common::PropertyMap& properties)
 {
   try
   {
-    impl->window_manager.AttachWindow (name, window, init_string);
+    impl->window_manager.AttachWindow (name, window, properties);
   }
   catch (xtl::exception& e)
   {
@@ -96,4 +97,26 @@ void Server::DetachAllWindows ()
     e.touch ("render::scene::server::Server::DetachAllWindows");
     throw;
   }
+}
+
+/*
+    Ожидание незавершенных операций
+*/
+
+bool Server::Finish (size_t timeout_ms)
+{
+  try
+  {
+    return impl->acceptor.WaitQueuedCommands (timeout_ms);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::scene::server::Server::Finish");
+    throw;
+  }  
+}
+
+void Server::Finish ()
+{
+  while (!Finish (size_t (-1)));
 }

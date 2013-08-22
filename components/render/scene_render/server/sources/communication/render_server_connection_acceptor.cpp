@@ -105,3 +105,23 @@ ConnectionAcceptor::ConnectionAcceptor (const char* name, ServerImpl& server, Se
 ConnectionAcceptor::~ConnectionAcceptor ()
 {
 }
+
+/*
+    ќжидание незавершенных команд
+*/
+
+bool ConnectionAcceptor::WaitQueuedCommands (size_t timeout_ms)
+{
+  try
+  {
+    if (!impl->render_thread)
+      return true;
+
+    return impl->render_thread->WaitQueuedCommands (timeout_ms);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::scene::server::ConnectionAcceptor::WaitQueuedCommands");
+    throw;
+  }
+}

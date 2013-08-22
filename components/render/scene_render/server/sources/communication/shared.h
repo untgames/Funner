@@ -58,6 +58,11 @@ class ConnectionAcceptor
     ConnectionAcceptor  (const char* name, ServerImpl& server, ServerThreadingModel model);
     ~ConnectionAcceptor ();
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Ожидание незавершенных команд
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    bool WaitQueuedCommands (size_t timeout_ms);
+
   private:
     struct Impl;
     stl::auto_ptr<Impl> impl;
@@ -191,7 +196,7 @@ class ClientWindowManager: public xtl::noncopyable
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Присоединение окон
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void AttachWindow     (const char* name, syslib::Window& window, const char* init_string);
+    void AttachWindow     (const char* name, syslib::Window& window, const common::PropertyMap& properties);
     void DetachWindow     (const char* name);
     void DetachAllWindows ();
 
