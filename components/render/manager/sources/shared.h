@@ -39,6 +39,8 @@
 namespace render
 {
 
+namespace manager
+{
 
 //implementation forwards
 class CacheManager;
@@ -136,7 +138,7 @@ class Wrappers
     static Ret Wrap (T* ptr)
     {
       if (!ptr)
-        throw xtl::format_operation_exception ("render::Wrappers::Wrap", "Attempt to wrap null internal object for of type '%s'", typeid (T).name ());
+        throw xtl::format_operation_exception ("render::manager::Wrappers::Wrap", "Attempt to wrap null internal object for of type '%s'", typeid (T).name ());
     
       return Ret (ptr);
     }
@@ -145,7 +147,7 @@ class Wrappers
     static Ret Wrap (const xtl::intrusive_ptr<T>& ptr)
     {
       if (!ptr)
-        throw xtl::format_operation_exception ("render::Wrappers::Wrap", "Attempt to wrap null internal object for of type '%s'", typeid (T).name ());
+        throw xtl::format_operation_exception ("render::manager::Wrappers::Wrap", "Attempt to wrap null internal object for of type '%s'", typeid (T).name ());
     
       return Ret (ptr.get ());
     }
@@ -168,7 +170,7 @@ class DebugIdHolder: public xtl::noncopyable
       {
         --current_id;
 
-        throw xtl::format_operation_exception ("render::DebugIdHolder::DebugIdHolder", "Too many render objects");
+        throw xtl::format_operation_exception ("render::manager::DebugIdHolder::DebugIdHolder", "Too many render objects");
       }
     }
     
@@ -218,6 +220,8 @@ class DebugIdHolder: public xtl::noncopyable
 #include "texture_manager.h"
 #include "viewport.h"
 #include "window.h"
+
+}
 
 }
 

@@ -3,7 +3,7 @@
 
 //TODO: добавить генерацию стандартных примитивов!!!
 
-#include <render/material.h>
+#include <render/manager/material.h>
 
 namespace media
 {
@@ -23,6 +23,9 @@ class MeshLibrary;
 }
 
 namespace render
+{
+
+namespace manager
 {
 
 //implementation forwards
@@ -220,6 +223,8 @@ class Primitive
 ///Обмен
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 void swap (Primitive&, Primitive&);
+
+}
 
 }
 

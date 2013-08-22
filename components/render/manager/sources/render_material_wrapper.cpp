@@ -1,6 +1,6 @@
 #include "shared.h"
 
-using namespace render;
+using namespace render::manager;
 
 Material::Material (MaterialImpl* in_impl)
   : impl (in_impl)
@@ -62,9 +62,14 @@ void Material::Swap (Material& material)
 namespace render
 {
 
+namespace manager
+{
+
 void swap (Material& material1, Material& material2)
 {
   material1.Swap (material2);
+}
+
 }
 
 }

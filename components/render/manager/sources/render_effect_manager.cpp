@@ -1,6 +1,6 @@
 #include "shared.h"
 
-using namespace render;
+using namespace render::manager;
 
 namespace
 {
@@ -172,7 +172,7 @@ EffectManager::EffectManager (const DeviceManagerPtr& device_manager, const Text
   }
   catch (xtl::exception& e)
   {
-    e.touch ("render::EffectManager::EffectManager");
+    e.touch ("render::manager::EffectManager::EffectManager");
     throw;
   }
 }
@@ -236,7 +236,7 @@ void EffectManager::LoadEffectLibrary (const char* name)
   }
   catch (xtl::exception& e)
   {
-    e.touch ("render::EffectManager::LoadEffectLibrary");
+    e.touch ("render::manager::EffectManager::LoadEffectLibrary");
     throw;
   }
 }
@@ -340,7 +340,7 @@ void EffectManager::ChangeSettings (const common::PropertyMap& settings)
   }
   catch (xtl::exception& e)
   {
-    e.touch ("render::EffectManager::ChangeSettings");
+    e.touch ("render::manager::EffectManager::ChangeSettings");
     throw;
   }
 }
@@ -365,7 +365,7 @@ common::ParseNode EffectManager::Configuration ()
   }
   catch (xtl::exception& e)
   {
-    e.touch ("render::EffectManager::Configuration");
+    e.touch ("render::manager::EffectManager::Configuration");
     throw;
   }
 }

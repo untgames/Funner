@@ -1,6 +1,6 @@
 #include "shared.h"
 
-using namespace render;
+using namespace render::manager;
 
 /*
     Описание реализации менеджера примитивов
@@ -102,7 +102,7 @@ struct PrimitiveManager::Impl
     }
     catch (xtl::exception& e)
     {
-      e.touch ("render::PrimitiveManager::LoadMeshLibrary");
+      e.touch ("render::manager::PrimitiveManager::LoadMeshLibrary");
       throw;
     }
   }
@@ -151,7 +151,7 @@ PrimitivePtr PrimitiveManager::CreatePrimitive ()
   }
   catch (xtl::exception& e)
   {
-    e.touch ("render::PrimitiveManager::CreatePrimitive()");
+    e.touch ("render::manager::PrimitiveManager::CreatePrimitive()");
     throw;
   }
 }
@@ -164,7 +164,7 @@ PrimitivePtr PrimitiveManager::CreatePrimitive (const PrimitiveBuffersPtr& buffe
   }
   catch (xtl::exception& e)
   {
-    e.touch ("render::PrimitiveManager::CreatePrimitive(const PrimitiveBuffersPtr&)");
+    e.touch ("render::manager::PrimitiveManager::CreatePrimitive(const PrimitiveBuffersPtr&)");
     throw;
   }
 }
@@ -177,7 +177,7 @@ PrimitiveBuffersPtr PrimitiveManager::CreatePrimitiveBuffers (MeshBufferUsage li
   }
   catch (xtl::exception& e)
   {
-    e.touch ("render::PrimitiveManager::CreatePrimitiveBuffers");
+    e.touch ("render::manager::PrimitiveManager::CreatePrimitiveBuffers");
     throw;
   }
 }
@@ -208,7 +208,7 @@ void PrimitiveManager::LoadMeshLibrary (const char* name)
   }
   catch (xtl::exception& e)
   {
-    e.touch ("render::PrimitiveManager::LoadMeshLibrary(const char*)");
+    e.touch ("render::manager::PrimitiveManager::LoadMeshLibrary(const char*)");
     throw;
   }
 }
@@ -221,7 +221,7 @@ void PrimitiveManager::LoadMeshLibrary (const media::geometry::MeshLibrary& libr
   }
   catch (xtl::exception& e)
   {
-    e.touch ("render::PrimitiveManager::LoadMeshLibrary(const media::geometry::MeshLibrary&)");
+    e.touch ("render::manager::PrimitiveManager::LoadMeshLibrary(const media::geometry::MeshLibrary&)");
     throw;
   }
 }
@@ -266,7 +266,7 @@ void PrimitiveManager::SharePrimitive (const char* name, const PrimitivePtr& pri
   }
   catch (xtl::exception& e)
   {
-    e.touch ("render::PrimitiveManager::SharePrimitive");
+    e.touch ("render::manager::PrimitiveManager::SharePrimitive");
     throw;
   }
 }

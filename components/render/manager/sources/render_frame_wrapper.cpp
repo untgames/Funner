@@ -1,6 +1,6 @@
 #include "shared.h"
 
-using namespace render;
+using namespace render::manager;
 
 Frame::Frame (FrameImpl* in_impl)
   : impl (in_impl)
@@ -25,17 +25,17 @@ Frame& Frame::operator = (const Frame& frame)
   return *this;
 }
 
-void Frame::SetRenderTarget (const char* name, const render::RenderTarget& target)
+void Frame::SetRenderTarget (const char* name, const render::manager::RenderTarget& target)
 {
   impl->SetRenderTarget (name, Wrappers::Unwrap<RenderTargetImpl> (target));
 }
 
-void Frame::SetRenderTarget (const char* name, const render::RenderTarget& target, const render::Viewport& viewport)
+void Frame::SetRenderTarget (const char* name, const render::manager::RenderTarget& target, const render::manager::Viewport& viewport)
 {
   impl->SetRenderTarget (name, Wrappers::Unwrap<RenderTargetImpl> (target), Wrappers::Unwrap<ViewportImpl> (viewport));
 }
 
-void Frame::SetRenderTarget (const char* name, const render::RenderTarget& target, const render::Viewport& viewport, const RectArea& scissor)
+void Frame::SetRenderTarget (const char* name, const render::manager::RenderTarget& target, const render::manager::Viewport& viewport, const RectArea& scissor)
 {
   impl->SetRenderTarget (name, Wrappers::Unwrap<RenderTargetImpl> (target), Wrappers::Unwrap<ViewportImpl> (viewport), Wrappers::Unwrap<RectAreaImpl> (scissor));
 }
@@ -57,12 +57,12 @@ bool Frame::HasRenderTarget (const char* name) const
 
 RenderTarget Frame::RenderTarget (const char* name) const
 {
-  return Wrappers::Wrap<render::RenderTarget> (impl->RenderTarget (name));
+  return Wrappers::Wrap<render::manager::RenderTarget> (impl->RenderTarget (name));
 }
 
 Viewport Frame::Viewport (const char* name) const
 {
-  return Wrappers::Wrap<render::Viewport> (impl->Viewport (name));
+  return Wrappers::Wrap<render::manager::Viewport> (impl->Viewport (name));
 }
 
 RectArea Frame::Scissor (const char* name) const
@@ -120,7 +120,7 @@ unsigned char Frame::ClearStencilIndex () const
   return impl->ClearStencilIndex ();
 }
 
-void Frame::SetLocalTexture (const char* name, const render::Texture& texture)
+void Frame::SetLocalTexture (const char* name, const render::manager::Texture& texture)
 {
   impl->SetLocalTexture (name, Wrappers::Unwrap<TextureImpl> (texture));
 }
@@ -248,9 +248,14 @@ void Frame::Swap (Frame& frame)
 namespace render
 {
 
+namespace manager
+{
+
 void swap (Frame& frame1, Frame& frame2)
 {
   frame1.Swap (frame2);
+}
+
 }
 
 }

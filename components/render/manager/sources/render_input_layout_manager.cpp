@@ -1,6 +1,6 @@
 #include "shared.h"
 
-using namespace render;
+using namespace render::manager;
 
 namespace media
 {
@@ -36,7 +36,7 @@ struct InputLayoutManager::Impl
     : device (in_device)
     , settings (in_settings)
   {
-    static const char* METHOD_NAME = "render::InputLayoutManager::Impl";
+    static const char* METHOD_NAME = "render::manager::InputLayoutManager::Impl";
     
     if (!device)
       throw xtl::make_null_argument_exception (METHOD_NAME, "device");
@@ -83,7 +83,7 @@ media::geometry::VertexFormat InputLayoutManager::Clone (const media::geometry::
   }
   catch (xtl::exception& e)
   {
-    e.touch ("render::InputLayoutManager::Clone");
+    e.touch ("render::manager::InputLayoutManager::Clone");
     throw;
   }
 }
@@ -172,7 +172,7 @@ LowLevelInputLayoutPtr InputLayoutManager::CreateInputLayout (size_t hash, const
   }
   catch (xtl::exception& e)
   {
-    e.touch ("render::InputLayoutManager::CreateInputLayout");
+    e.touch ("render::manager::InputLayoutManager::CreateInputLayout");
     throw;
   }
 }

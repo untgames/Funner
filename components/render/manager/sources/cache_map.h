@@ -144,7 +144,7 @@ Value& CacheMap<Key, Value>::AddCore (const Key& key, const Value& value)
   stl::pair<typename ItemMap::iterator, bool> result = item_map.insert_pair (key, item);
   
   if (!result.second)
-    throw xtl::make_argument_exception ("render::CacheMap<Key, Value>::Add", "Internal error: item with specified key/value has been already inserted");    
+    throw xtl::make_argument_exception ("render::manager::CacheMap<Key, Value>::Add", "Internal error: item with specified key/value has been already inserted");    
     
   try
   {
@@ -167,7 +167,7 @@ void CacheMap<Key, Value>::Add (const Key& key, const Value& value)
   typename ItemMap::iterator iter = item_map.find (key);
   
   if (iter != item_map.end ())
-    throw xtl::make_argument_exception ("render::CacheMap<Key, Value>::Add", "Item with specified key/value has been already inserted");
+    throw xtl::make_argument_exception ("render::manager::CacheMap<Key, Value>::Add", "Item with specified key/value has been already inserted");
     
   AddCore (key, value);
 }

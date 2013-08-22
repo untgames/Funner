@@ -1,6 +1,6 @@
 #include "shared.h"
 
-using namespace render;
+using namespace render::manager;
 
 /*
     Описание реализации нативного окна
@@ -30,7 +30,7 @@ struct NativeWindow::Impl: public xtl::trackable
   syslib::Window& Window ()
   {
     if (!window)
-      throw xtl::format_operation_exception ("render::NativeWindow::Impl::Window", "Window has been already destroyed");
+      throw xtl::format_operation_exception ("render::manager::NativeWindow::Impl::Window", "Window has been already destroyed");
 
     return *window;
   }
@@ -89,7 +89,7 @@ NativeWindow::NativeWindow (syslib::Window& window)
   }
   catch (xtl::exception& e)
   {
-    e.touch ("render::NativeWindow::NativeWindow");
+    e.touch ("render::manager::NativeWindow::NativeWindow");
     throw;
   }
 }
@@ -124,7 +124,7 @@ size_t NativeWindow::GetWidth ()
   }
   catch (xtl::exception& e)
   {
-    e.touch ("render::NativeWindow::GetWidth");
+    e.touch ("render::manager::NativeWindow::GetWidth");
     throw;
   }
 }
@@ -137,7 +137,7 @@ size_t NativeWindow::GetHeight ()
   }
   catch (xtl::exception& e)
   {
-    e.touch ("render::NativeWindow::GetHeight");
+    e.touch ("render::manager::NativeWindow::GetHeight");
     throw;
   }
 }
@@ -154,7 +154,7 @@ Rect NativeWindow::GetViewport ()
   }
   catch (xtl::exception& e)
   {
-    e.touch ("render::NativeWindow::GetViewport");
+    e.touch ("render::manager::NativeWindow::GetViewport");
     throw;
   }
 }
@@ -171,7 +171,7 @@ void* NativeWindow::GetHandle ()
   }
   catch (xtl::exception& e)
   {
-    e.touch ("render::NativeWindow::GetHandle");
+    e.touch ("render::manager::NativeWindow::GetHandle");
     throw;
   }
 }
@@ -188,7 +188,7 @@ void NativeWindow::AttachListener (INativeWindowListener* listener)
   }
   catch (xtl::exception& e)
   {
-    e.touch ("render::NativeWindow::AttachListener");
+    e.touch ("render::manager::NativeWindow::AttachListener");
     throw;
   }
 }
@@ -205,9 +205,14 @@ void NativeWindow::DetachListener (INativeWindowListener* listener)
 namespace render
 {
 
+namespace manager
+{
+
 INativeWindow* make_native_window (syslib::Window& window)
 {
   return new NativeWindow (window);
+}
+
 }
 
 }

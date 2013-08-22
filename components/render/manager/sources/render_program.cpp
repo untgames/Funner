@@ -1,6 +1,7 @@
 #include "shared.h"
 
 using namespace render;
+using namespace render::manager;
 
 namespace
 {
@@ -51,7 +52,7 @@ struct ProgramCommonData: public xtl::reference_counter, public DebugIdHolder
     }
     catch (xtl::exception& e)
     {
-      e.touch ("render::ProgramCommonData::ProgramCommonData");
+      e.touch ("render::manager::ProgramCommonData::ProgramCommonData");
       throw;
     }
   }
@@ -105,7 +106,7 @@ struct ProgramCommonData: public xtl::reference_counter, public DebugIdHolder
     }
     catch (xtl::exception& e)
     {
-      e.touch ("render::ProgramCommonData::Update");
+      e.touch ("render::manager::ProgramCommonData::Update");
       throw;
     }
   }
@@ -182,7 +183,7 @@ struct Program::Impl: public DebugIdHolder
     }
     catch (xtl::exception& e)
     {
-      e.touch ("render::Program::Impl::Impl");
+      e.touch ("render::manager::Program::Impl::Impl");
       throw;
     }
   }
@@ -232,7 +233,7 @@ Program::Program (const DeviceManagerPtr& device_manager, const char* name, cons
   }
   catch (xtl::exception& e)
   {
-    e.touch ("render::Program::Program");
+    e.touch ("render::manager::Program::Program");
     throw;
   }
 }
@@ -318,7 +319,7 @@ bool Program::HasFramemaps ()
   }
   catch (xtl::exception& e)
   {
-    e.touch ("render::Program::HasFramemaps");
+    e.touch ("render::manager::Program::HasFramemaps");
     throw;
   }
 }
@@ -334,14 +335,14 @@ const TexmapDesc* Program::Texmaps ()
 const TexmapDesc& Program::Texmap (size_t index)
 {
   if (index >= impl->common_data->texmaps.size ())
-    throw xtl::make_range_exception ("render::Program::Texmap", "index", index, impl->common_data->texmaps.size ());
+    throw xtl::make_range_exception ("render::manager::Program::Texmap", "index", index, impl->common_data->texmaps.size ());
     
   return impl->common_data->texmaps [index];
 }
 
 void Program::SetTexmap (size_t index, size_t channel, const char* semantic, const char* param_name, bool is_framemap)
 {
-  static const char* METHOD_NAME = "render::Program::SetTexmap";
+  static const char* METHOD_NAME = "render::manager::Program::SetTexmap";
 
   if (!semantic)
     throw xtl::make_null_argument_exception (METHOD_NAME, "semantic");
@@ -422,7 +423,7 @@ Program& Program::DerivedProgram (const ShaderOptions& options)
   }
   catch (xtl::exception& e)
   {
-    e.touch ("render::Program::DerivedProgram(const ShaderOptions&)");
+    e.touch ("render::manager::Program::DerivedProgram(const ShaderOptions&)");
     throw;
   }
 }
@@ -437,7 +438,7 @@ Program& Program::DerivedProgram (ShaderOptionsCache& cache)
   }
   catch (xtl::exception& e)
   {
-    e.touch ("render::Program::DerivedProgram(const ShaderOptionsCache&)");
+    e.touch ("render::manager::Program::DerivedProgram(const ShaderOptionsCache&)");
     throw;
   }
 }
@@ -489,7 +490,7 @@ Program& Program::DerivedProgram (ShaderOptionsCache& cache1, ShaderOptionsCache
   }
   catch (xtl::exception& e)
   {
-    e.touch ("render::Program::DerivedProgramShaderOptionsCache&,ShaderOptionsCache&)");
+    e.touch ("render::manager::Program::DerivedProgramShaderOptionsCache&,ShaderOptionsCache&)");
     throw;
   }
 }
@@ -593,7 +594,7 @@ const LowLevelProgramPtr& Program::LowLevelProgram ()
   }
   catch (xtl::exception& e)
   {
-    e.touch ("render::Program::LowLevelProgram");
+    e.touch ("render::manager::Program::LowLevelProgram");
     throw;
   }
 }
@@ -615,7 +616,7 @@ LowLevelStateBlockPtr Program::StateBlock ()
   }
   catch (xtl::exception& e)
   {
-    e.touch ("render::Program::StateBlock");
+    e.touch ("render::manager::Program::StateBlock");
     throw;
   }
 }
@@ -637,7 +638,7 @@ ProgramParametersLayoutPtr Program::ParametersLayout ()
   }
   catch (xtl::exception& e)
   {
-    e.touch ("render::Program::ParametersLayout");
+    e.touch ("render::manager::Program::ParametersLayout");
     throw;
   }
 }

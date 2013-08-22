@@ -1,6 +1,6 @@
 #include "shared.h"
 
-using namespace render;
+using namespace render::manager;
 
 Texture::Texture (TextureImpl* in_impl)
   : impl (in_impl)
@@ -52,7 +52,7 @@ size_t Texture::Depth () const
 
 RenderTarget Texture::RenderTarget (size_t layer, size_t mip_level) const
 {
-  return Wrappers::Wrap<render::RenderTarget> (impl->RenderTarget (layer, mip_level));
+  return Wrappers::Wrap<render::manager::RenderTarget> (impl->RenderTarget (layer, mip_level));
 }
 
 void Texture::Update (const media::Image& image)
@@ -78,9 +78,14 @@ void Texture::Swap (Texture& texture)
 namespace render
 {
 
+namespace manager
+{
+
 void swap (Texture& texture1, Texture& texture2)
 {
   texture1.Swap (texture2);
+}
+
 }
 
 }

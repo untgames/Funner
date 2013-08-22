@@ -1,6 +1,6 @@
 #include "shared.h"
 
-using namespace render;
+using namespace render::manager;
 
 //TODO: program/parameters_layout/local_textures FIFO cache
 
@@ -294,7 +294,7 @@ EffectRenderer::EffectRenderer (const EffectPtr& effect, const DeviceManagerPtr&
   }
   catch (xtl::exception& e)
   {
-    e.touch ("render::EffectRenderer::EffectRenderer");
+    e.touch ("render::manager::EffectRenderer::EffectRenderer");
     throw;
   }
 }
@@ -314,7 +314,7 @@ void EffectRenderer::AddOperations
   render::low_level::IBuffer*  property_buffer,
   ProgramParametersLayout*     property_layout)
 {
-  static const char* METHOD_NAME = "render::EffectRenderer::AddOperations(const RendererOperationList&)";
+  static const char* METHOD_NAME = "render::manager::EffectRenderer::AddOperations(const RendererOperationList&)";
   
     //проверка корректности аргументов
 
@@ -818,7 +818,7 @@ void EffectRenderer::ExecuteOperations (RenderingContext& context)
   }
   catch (xtl::exception& e)
   {
-    e.touch ("render::EffectRenderer::ExecuteOperations");
+    e.touch ("render::manager::EffectRenderer::ExecuteOperations");
     throw;
   }
 }

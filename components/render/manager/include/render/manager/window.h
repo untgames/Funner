@@ -3,8 +3,8 @@
 
 #include <xtl/functional_fwd>
 
-#include <render/common.h>
-#include <render/render_target.h>
+#include <render/manager/common.h>
+#include <render/manager/render_target.h>
 
 namespace syslib
 {
@@ -15,6 +15,9 @@ class Window;
 }
 
 namespace render
+{
+
+namespace manager
 {
 
 //implementation forwards
@@ -148,6 +151,8 @@ class INativeWindow
 };
 
 INativeWindow* make_native_window (syslib::Window&);
+
+}
 
 }
 

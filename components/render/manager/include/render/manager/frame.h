@@ -3,11 +3,14 @@
 
 #include <math/matrix.h>
 
-#include <render/common.h>
-#include <render/entity.h>
-#include <render/render_target.h>
+#include <render/manager/common.h>
+#include <render/manager/entity.h>
+#include <render/manager/render_target.h>
 
 namespace render
+{
+
+namespace manager
 {
 
 //implementation forwards
@@ -40,7 +43,7 @@ class Viewport
 ///Конструкторы / деструктор / присваивание
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     Viewport  ();
-    Viewport  (const render::Rect& rect, float min_depth = 0.0f, float max_depth = 1.0f);
+    Viewport  (const manager::Rect& rect, float min_depth = 0.0f, float max_depth = 1.0f);
     ~Viewport ();
     
     Viewport& operator = (const Viewport&);
@@ -48,14 +51,14 @@ class Viewport
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Размеры области
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void                SetRect (const render::Rect& rect);
-    void                SetRect (int x, int y, size_t width, size_t height);
-    RectArea            Area    () const;
-    const render::Rect& Rect    () const;
-    int                 X       () const;
-    int                 Y       () const;
-    size_t              Width   () const;
-    size_t              Height  () const;
+    void                 SetRect (const manager::Rect& rect);
+    void                 SetRect (int x, int y, size_t width, size_t height);
+    RectArea             Area    () const;
+    const manager::Rect& Rect    () const;
+    int                  X       () const;
+    int                  Y       () const;
+    size_t               Width   () const;
+    size_t               Height  () const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Диапазон глубины для области вывода
@@ -109,9 +112,9 @@ class Frame
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Регистрация целевых буферов отрисовки
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void SetRenderTarget        (const char* name, const render::RenderTarget& target);
-    void SetRenderTarget        (const char* name, const render::RenderTarget& target, const render::Viewport& viewport);
-    void SetRenderTarget        (const char* name, const render::RenderTarget& target, const render::Viewport& viewport, const RectArea& scissor);
+    void SetRenderTarget        (const char* name, const manager::RenderTarget& target);
+    void SetRenderTarget        (const char* name, const manager::RenderTarget& target, const manager::Viewport& viewport);
+    void SetRenderTarget        (const char* name, const manager::RenderTarget& target, const manager::Viewport& viewport, const RectArea& scissor);
     void RemoveRenderTarget     (const char* name);
     void RemoveAllRenderTargets ();
 
@@ -119,8 +122,8 @@ class Frame
 ///Получение целевых буферов отрисовки
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     bool                  HasRenderTarget (const char* name) const;
-    render::RenderTarget  RenderTarget    (const char* name) const;
-    render::Viewport      Viewport        (const char* name) const;
+    manager::RenderTarget RenderTarget    (const char* name) const;
+    manager::Viewport     Viewport        (const char* name) const;
     RectArea              Scissor         (const char* name) const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -234,6 +237,8 @@ class Frame
 ///Обмен
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 void swap (Frame&, Frame&);
+
+}
 
 }
 

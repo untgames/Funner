@@ -68,8 +68,8 @@ class EffectPass: public Object
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Тип сортировки примитивов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void             SetSortMode (render::SortMode mode);
-    render::SortMode SortMode    ();
+    void                      SetSortMode (render::manager::SortMode mode);
+    render::manager::SortMode SortMode    ();
 
   private:
     struct Impl;

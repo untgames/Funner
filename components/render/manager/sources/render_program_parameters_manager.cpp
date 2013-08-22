@@ -1,6 +1,6 @@
 #include "shared.h"
 
-using namespace render;
+using namespace render::manager;
 using namespace render::low_level;
 
 /*
@@ -24,7 +24,7 @@ struct ProgramParametersManager::Impl: public xtl::trackable
     , composite_layouts (cache_manager)
     , settings (in_settings)
   {
-    static const char* METHOD_NAME = "render::ProgramParametersManager::Impl";
+    static const char* METHOD_NAME = "render::manager::ProgramParametersManager::Impl";
     
     if (!device)
       throw xtl::make_null_argument_exception (METHOD_NAME, "device");
@@ -67,7 +67,7 @@ ProgramParametersManager::ProgramParametersManager (const LowLevelDevicePtr& dev
   }
   catch (xtl::exception& e)
   {
-    e.touch ("render::ProgramParametersManager::ProgramParametersManager");
+    e.touch ("render::manager::ProgramParametersManager::ProgramParametersManager");
     throw;
   }
 }
@@ -102,7 +102,7 @@ ProgramParametersLayoutPtr ProgramParametersManager::GetParameters (ProgramParam
   }
   catch (xtl::exception& e)
   {
-    e.touch ("render::ProgramParametersManager::GetParameters(const common::PropertyLayout&)");
+    e.touch ("render::manager::ProgramParametersManager::GetParameters(const common::PropertyLayout&)");
     throw;
   }
 }
@@ -138,7 +138,7 @@ ProgramParametersLayoutPtr ProgramParametersManager::GetParameters
   }
   catch (xtl::exception& e)
   {
-    e.touch ("render::ProgramParametersManager::GetParameters(const common::ProgramParametersLayout*,const ProgramParametersLayout*,const ProgramParametersLayout*)");
+    e.touch ("render::manager::ProgramParametersManager::GetParameters(const common::ProgramParametersLayout*,const ProgramParametersLayout*,const ProgramParametersLayout*)");
     throw;
   }
 }

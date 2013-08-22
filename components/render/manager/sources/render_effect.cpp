@@ -1,6 +1,6 @@
 #include "shared.h"
 
-using namespace render;
+using namespace render::manager;
 
 namespace
 {
@@ -68,7 +68,7 @@ Effect::~Effect ()
 void Effect::SetTags (const char* tags)
 {
   if (!tags)
-    throw xtl::make_null_argument_exception ("render::Effect::SetTags", "tags");
+    throw xtl::make_null_argument_exception ("render::manager::Effect::SetTags", "tags");
 
   SetTags (common::split (tags, " ")); 
 }
@@ -95,7 +95,7 @@ size_t Effect::TagsCount ()
 const char* Effect::Tag (size_t index)
 {
   if (index >= impl->tags.Size ())
-    throw xtl::make_range_exception ("render::Effect::Tag", "index", index, impl->tags.Size ());
+    throw xtl::make_range_exception ("render::manager::Effect::Tag", "index", index, impl->tags.Size ());
     
   return impl->tags [index];
 }
@@ -103,7 +103,7 @@ const char* Effect::Tag (size_t index)
 size_t Effect::TagHash (size_t index)
 {
   if (index >= impl->tag_hashes.size ())
-    throw xtl::make_range_exception ("render::Effect::TagHash", "index", index, impl->tag_hashes.size ());
+    throw xtl::make_range_exception ("render::manager::Effect::TagHash", "index", index, impl->tag_hashes.size ());
     
   return impl->tag_hashes [index];
 }
@@ -135,7 +135,7 @@ size_t Effect::OperationsCount ()
 EffectPassPtr Effect::OperationPass (size_t order_number)
 {
   if (order_number >= impl->operations.size ())
-    throw xtl::make_range_exception ("render::Effect::OperationPass", "order_number", order_number, impl->operations.size ());
+    throw xtl::make_range_exception ("render::manager::Effect::OperationPass", "order_number", order_number, impl->operations.size ());
     
   EffectOperationPtr operation = impl->operations [order_number];
   
@@ -148,7 +148,7 @@ EffectPassPtr Effect::OperationPass (size_t order_number)
 InstantiatedEffectPtr Effect::OperationEffect (size_t order_number)
 {
   if (order_number >= impl->operations.size ())
-    throw xtl::make_range_exception ("render::Effect::OperationEffect", "order_number", order_number, impl->operations.size ());
+    throw xtl::make_range_exception ("render::manager::Effect::OperationEffect", "order_number", order_number, impl->operations.size ());
     
   EffectOperationPtr operation = impl->operations [order_number];
   

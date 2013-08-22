@@ -1,6 +1,6 @@
 #include "shared.h"
 
-using namespace render;
+using namespace render::manager;
 using namespace render::low_level;
 
 /*
@@ -177,7 +177,7 @@ LowLevelBufferPtr PrimitiveBuffersImpl::CreateVertexStream (const media::geometr
   }
   catch (xtl::exception& e)
   {
-    e.touch ("render::PrimitiveBuffersImpl::CreateVertexStream");
+    e.touch ("render::manager::PrimitiveBuffersImpl::CreateVertexStream");
     throw;
   }
 }
@@ -208,7 +208,7 @@ VertexBufferPtr PrimitiveBuffersImpl::CreateVertexBuffer (const media::geometry:
   }
   catch (xtl::exception& e)
   {
-    e.touch ("render::PrimitiveBuffersImpl::CreateVertexBuffer");
+    e.touch ("render::manager::PrimitiveBuffersImpl::CreateVertexBuffer");
     throw;
   }
 }
@@ -264,7 +264,7 @@ LowLevelBufferPtr PrimitiveBuffersImpl::CreateIndexBuffer (const media::geometry
   }
   catch (xtl::exception& e)
   {
-    e.touch ("render::PrimitiveBuffersImpl::CreateIndexBuffer");
+    e.touch ("render::manager::PrimitiveBuffersImpl::CreateIndexBuffer");
     throw;
   }
 }
@@ -288,7 +288,7 @@ void PrimitiveBuffersImpl::Add (const media::geometry::VertexStream& vs, MeshBuf
   }
   catch (xtl::exception& e)
   {
-    e.touch ("render::PrimitiveBuffersImpl::Add(const VertexStream&,MeshBufferUsage)");
+    e.touch ("render::manager::PrimitiveBuffersImpl::Add(const VertexStream&,MeshBufferUsage)");
     throw;
   }
 }
@@ -308,7 +308,7 @@ void PrimitiveBuffersImpl::Add (const media::geometry::VertexBuffer& vb, MeshBuf
   }
   catch (xtl::exception& e)
   {
-    e.touch ("render::PrimitiveBuffersImpl::Add(const VertexBuffer&,MeshBufferUsage)");
+    e.touch ("render::manager::PrimitiveBuffersImpl::Add(const VertexBuffer&,MeshBufferUsage)");
     throw;
   }
 }
@@ -328,7 +328,7 @@ void PrimitiveBuffersImpl::Add (const media::geometry::IndexBuffer& ib, MeshBuff
   }
   catch (xtl::exception& e)
   {
-    e.touch ("render::PrimitiveBuffersImpl::Add(const IndexBuffer&,MeshBufferUsage)");
+    e.touch ("render::manager::PrimitiveBuffersImpl::Add(const IndexBuffer&,MeshBufferUsage)");
     throw;
   }
 }
@@ -358,7 +358,7 @@ void PrimitiveBuffersImpl::Update (const media::geometry::VertexStream& vs)
   }
   catch (xtl::exception& e)
   {
-    e.touch ("render::PrimitiveBuffersImpl::Update(const VertexStream&)");
+    e.touch ("render::manager::PrimitiveBuffersImpl::Update(const VertexStream&)");
     throw;
   }
 }
@@ -381,7 +381,7 @@ void PrimitiveBuffersImpl::Update (const media::geometry::IndexBuffer& ib)
   }
   catch (xtl::exception& e)
   {
-    e.touch ("render::PrimitiveBuffersImpl::Update(const IndexBuffer&)");
+    e.touch ("render::manager::PrimitiveBuffersImpl::Update(const IndexBuffer&)");
     throw;
   }
 }

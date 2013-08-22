@@ -1,8 +1,11 @@
 #include "shared.h"
 
-using namespace render;
+using namespace render::manager;
 
 namespace render
+{
+
+namespace manager
 {
 
 /*
@@ -75,6 +78,8 @@ template <class Ptr> struct ResourceProxyImpl: public xtl::reference_counter, pu
 
 }
 
+}
+
 /*
     Конструкторы / деструктор / присваивание
 */
@@ -90,7 +95,7 @@ ResourceProxy<Ptr>::ResourceProxy (ManagerImpl& manager, const char* name)
       stl::pair<typename Impl::ProxyMapIterator, bool> result = impl->manager->proxies.insert_pair (impl->name.c_str (), impl);
 
       if (!result.second)
-        throw xtl::format_operation_exception ("render::ResourceProxy<Ptr>::ResourceProxy", "Internal error: resource with name '%s' already exists", impl->name.c_str ());
+        throw xtl::format_operation_exception ("render::manager::ResourceProxy<Ptr>::ResourceProxy", "Internal error: resource with name '%s' already exists", impl->name.c_str ());
               
       impl->proxy_position = result.first;      
     }      
@@ -287,7 +292,7 @@ template <class Ptr>
 typename ResourceProxyManager<Ptr>::Proxy ResourceProxyManager<Ptr>::GetProxy (const char* name)
 {
   if (!name)
-    throw xtl::make_null_argument_exception ("render::ResourceProxyManager::GetProxy", "name");
+    throw xtl::make_null_argument_exception ("render::manager::ResourceProxyManager::GetProxy", "name");
     
     //поиск прокси в кэше
     

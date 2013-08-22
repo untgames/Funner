@@ -1,6 +1,6 @@
 #include "shared.h"
 
-using namespace render;
+using namespace render::manager;
 
 /*
      онструкторы / деструктор / присваивание
@@ -137,9 +137,14 @@ void PrimitiveBuffers::Swap (PrimitiveBuffers& buffers)
 namespace render
 {
 
+namespace manager
+{
+
 void swap (PrimitiveBuffers& buffers1, PrimitiveBuffers& buffers2)
 {
   buffers1.Swap (buffers2);
+}
+
 }
 
 }

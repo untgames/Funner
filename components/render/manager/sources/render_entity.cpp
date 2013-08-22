@@ -1,6 +1,7 @@
 #include "shared.h"
 
 using namespace render;
+using namespace render::manager;
 using namespace render::low_level;
 
 namespace
@@ -139,7 +140,7 @@ class EntityLodCommonData: public CacheHolder, public DebugIdHolder
     }
     
 ///Кэш опций шейдера
-    render::ShaderOptionsCache& ShaderOptionsCache () { return shader_options_cache; }
+    render::manager::ShaderOptionsCache& ShaderOptionsCache () { return shader_options_cache; }
     
 ///Режим отсечения
     void SetScissorState (bool state)
@@ -213,7 +214,7 @@ class EntityLodCommonData: public CacheHolder, public DebugIdHolder
       }
       catch (xtl::exception& e)
       {
-        e.touch ("render::EntityLodCommonData::Impl::UpdateCacheCore");
+        e.touch ("render::manager::EntityLodCommonData::Impl::UpdateCacheCore");
         throw;
       }
     }    
@@ -236,7 +237,7 @@ class EntityLodCommonData: public CacheHolder, public DebugIdHolder
         , dynamic_textures (common_data.TextureManager (), in_material, common_data.Entity ())
       {
         if (!material)
-          throw xtl::make_null_argument_exception ("render::EntityLodCommonData::MaterialState::MaterialState", "material");
+          throw xtl::make_null_argument_exception ("render::manager::EntityLodCommonData::MaterialState::MaterialState", "material");
           
         common_data.AttachCacheSource (*this);
         
@@ -298,7 +299,7 @@ class EntityLodCommonData: public CacheHolder, public DebugIdHolder
         catch (xtl::exception& e)
         {
           state_block = LowLevelStateBlockPtr ();
-          e.touch ("render::EntityLodCommonData::MaterialState::UpdateCacheCore");
+          e.touch ("render::manager::EntityLodCommonData::MaterialState::UpdateCacheCore");
           throw;
         }
         catch (...)
@@ -313,17 +314,17 @@ class EntityLodCommonData: public CacheHolder, public DebugIdHolder
     typedef stl::hash_map<MaterialImpl*, StatePtr> StateMap;
 
   private:  
-    EntityImpl&                 entity;                   //обратная ссылка на объект
-    DeviceManagerPtr            device_manager;           //менеджер устройства отрисовки
-    TextureManagerPtr           texture_manager;          //менеджер текстур    
-    PropertyBuffer              properties;               //свойства рендеринга
-    ProgramParametersLayout     entity_parameters_layout; //объект расположения свойств
-    StateMap                    states;                   //карта состояний
-    DynamicTextureEntityStorage dynamic_textures;         //хранилище динамических текстур объекта рендеринга
-    render::ShaderOptionsCache  shader_options_cache;     //кэш опций шейдера
-    bool                        scissor_state;            //состояние режима отсечения
-    RectArea                    scissor_rect;             //область отсечения
-    LowLevelStateBlockPtr       default_state_block;      //блок состояний по умолчанию
+    EntityImpl&                          entity;                   //обратная ссылка на объект
+    DeviceManagerPtr                     device_manager;           //менеджер устройства отрисовки
+    TextureManagerPtr                    texture_manager;          //менеджер текстур
+    PropertyBuffer                       properties;               //свойства рендеринга
+    ProgramParametersLayout              entity_parameters_layout; //объект расположения свойств
+    StateMap                             states;                   //карта состояний
+    DynamicTextureEntityStorage          dynamic_textures;         //хранилище динамических текстур объекта рендеринга
+    render::manager::ShaderOptionsCache  shader_options_cache;     //кэш опций шейдера
+    bool                                 scissor_state;            //состояние режима отсечения
+    RectArea                             scissor_rect;             //область отсечения
+    LowLevelStateBlockPtr                default_state_block;      //блок состояний по умолчанию
 };
 
 /*
@@ -442,7 +443,7 @@ struct EntityLod: public xtl::reference_counter, public CacheHolder, public Debu
     }
     catch (xtl::exception& e)
     {
-      e.touch ("render::EntityLod::UpdateCacheCore");
+      e.touch ("render::manager::EntityLod::UpdateCacheCore");
       throw;
     }
   }  
@@ -550,7 +551,7 @@ EntityImpl::EntityImpl (const DeviceManagerPtr& device_manager, const TextureMan
   }
   catch (xtl::exception& e)
   {
-    e.touch ("render::EntityImpl::EntityImpl");
+    e.touch ("render::manager::EntityImpl::EntityImpl");
     throw;
   }
 }
@@ -596,7 +597,7 @@ void EntityImpl::SetShaderOptions (const common::PropertyMap& properties)
   }
   catch (xtl::exception& e)
   {
-    e.touch ("render::EntityImpl::SetShaderOptions");
+    e.touch ("render::manager::EntityImpl::SetShaderOptions");
     throw;
   }
 }
@@ -613,22 +614,22 @@ const common::PropertyMap& EntityImpl::ShaderOptions () const
 
 void EntityImpl::SetJointsCount (size_t count)
 {
-  throw xtl::make_not_implemented_exception ("render::EntityImpl::SetJointsCount");
+  throw xtl::make_not_implemented_exception ("render::manager::EntityImpl::SetJointsCount");
 }
 
 size_t EntityImpl::JointsCount ()
 {
-  throw xtl::make_not_implemented_exception ("render::EntityImpl::JointsCount");
+  throw xtl::make_not_implemented_exception ("render::manager::EntityImpl::JointsCount");
 }
 
 void EntityImpl::SetJointTransformation (size_t joint_index, const math::mat4f&)
 {
-  throw xtl::make_not_implemented_exception ("render::EntityImpl::SetJointTransformation");
+  throw xtl::make_not_implemented_exception ("render::manager::EntityImpl::SetJointTransformation");
 }
 
 const math::mat4f& EntityImpl::JointTransformation (size_t joint_index)
 {
-  throw xtl::make_not_implemented_exception ("render::EntityImpl::JointTransformation");
+  throw xtl::make_not_implemented_exception ("render::manager::EntityImpl::JointTransformation");
 }
 
 /*
@@ -646,7 +647,7 @@ size_t EntityImpl::LodsCount ()
 
 PrimitivePtr EntityImpl::Primitive (size_t level_of_detail)
 {
-  static const char* METHOD_NAME = "render::EntityImpl::Primitive";
+  static const char* METHOD_NAME = "render::manager::EntityImpl::Primitive";
 
   EntityLodPtr lod = impl->FindLod (level_of_detail);
 
@@ -666,7 +667,7 @@ PrimitivePtr EntityImpl::Primitive (size_t level_of_detail)
 
 const char* EntityImpl::PrimitiveName (size_t level_of_detail)
 {
-  static const char* METHOD_NAME = "render::EntityImpl::PrimitiveName";
+  static const char* METHOD_NAME = "render::manager::EntityImpl::PrimitiveName";
 
   EntityLodPtr lod = impl->FindLod (level_of_detail);
 
@@ -707,7 +708,7 @@ void EntityImpl::SetPrimitive (const PrimitivePtr& primitive, size_t level_of_de
   }
   catch (xtl::exception& e)
   {
-    e.touch ("render::EntityImpl::SetPrimitive(const PrimitivePtr&,size_t)");
+    e.touch ("render::manager::EntityImpl::SetPrimitive(const PrimitivePtr&,size_t)");
     throw;
   }
 }
@@ -735,7 +736,7 @@ void EntityImpl::SetPrimitive (const char* name, size_t level_of_detail)
   }
   catch (xtl::exception& e)
   {
-    e.touch ("render::EntityImpl::SetPrimitive(const char*,size_t)");
+    e.touch ("render::manager::EntityImpl::SetPrimitive(const char*,size_t)");
     throw;
   }  
 }
@@ -811,7 +812,7 @@ const RendererOperationList& EntityImpl::RendererOperations (size_t level_of_det
   }
   catch (xtl::exception& e)
   {
-    e.touch ("render::EntityImpl::RendererOperations");
+    e.touch ("render::manager::EntityImpl::RendererOperations");
     throw;
   }
 }

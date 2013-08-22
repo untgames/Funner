@@ -5,9 +5,12 @@
 
 #include <math/matrix.h>
 
-#include <render/primitive.h>
+#include <render/manager/primitive.h>
 
 namespace render
+{
+
+namespace manager
 {
 
 //implementation forwards
@@ -58,13 +61,13 @@ class Entity
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Работа с примитивом
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    render::Primitive Primitive           (size_t level_of_detail = 0) const;
-    const char*       PrimitiveName       (size_t level_of_detail = 0) const;
-    void              SetPrimitive        (const render::Primitive&, size_t level_of_detail = 0);
-    void              SetPrimitive        (const char* name, size_t level_of_detail = 0);
-    void              ResetPrimitive      (size_t level_of_detail = 0);
-    bool              HasPrimitive        (size_t level_of_detail = 0) const;
-    void              ResetAllPrimitives  ();
+    manager::Primitive Primitive           (size_t level_of_detail = 0) const;
+    const char*        PrimitiveName       (size_t level_of_detail = 0) const;
+    void               SetPrimitive        (const manager::Primitive&, size_t level_of_detail = 0);
+    void               SetPrimitive        (const char* name, size_t level_of_detail = 0);
+    void               ResetPrimitive      (size_t level_of_detail = 0);
+    bool               HasPrimitive        (size_t level_of_detail = 0) const;
+    void               ResetAllPrimitives  ();
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Точка в локальной системе координат объекта для расчёта удаленности от камеры
@@ -104,6 +107,8 @@ class Entity
 ///Обмен
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 void swap (Entity&, Entity&);
+
+}
 
 }
 

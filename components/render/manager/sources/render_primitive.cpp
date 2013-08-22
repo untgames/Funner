@@ -1,6 +1,6 @@
 #include "shared.h"
 
-using namespace render;
+using namespace render::manager;
 using namespace render::low_level;
 
 /*
@@ -21,7 +21,7 @@ struct MeshCommonData
     : device_manager (in_device_manager)
   {
     if (!device_manager)
-      throw xtl::make_null_argument_exception ("render::MeshCommonData::MeshCommonData", "device_manager");
+      throw xtl::make_null_argument_exception ("render::manager::MeshCommonData::MeshCommonData", "device_manager");
   }
 };
 
@@ -170,7 +170,7 @@ struct MeshPrimitive: public xtl::reference_counter, public CacheHolder, public 
     }
     catch (xtl::exception& e)
     {
-      e.touch ("render::MeshPrimitive::UpdateCacheCore");
+      e.touch ("render::manager::MeshPrimitive::UpdateCacheCore");
       throw;
     }
   }
@@ -196,7 +196,7 @@ struct Mesh: public xtl::reference_counter, public MeshCommonData, public CacheH
     : MeshCommonData (device_manager)    
   {
     if (!in_name)
-      throw xtl::make_null_argument_exception ("render::Mesh::Mesh", "name");
+      throw xtl::make_null_argument_exception ("render::manager::Mesh::Mesh", "name");
 
     name = in_name;
     
@@ -268,7 +268,7 @@ struct Mesh: public xtl::reference_counter, public MeshCommonData, public CacheH
     }
     catch (xtl::exception& e)
     {
-      e.touch ("render::Mesh::UpdateCacheCore");
+      e.touch ("render::manager::Mesh::UpdateCacheCore");
       throw;
     }
   }  
@@ -299,7 +299,7 @@ struct PrimitiveImpl::Impl: public DebugIdHolder
     , material_manager (in_material_manager)
     , buffers (in_buffers)
   {
-    static const char* METHOD_NAME = "render::PrimitiveImpl::Impl::Impl";
+    static const char* METHOD_NAME = "render::manager::PrimitiveImpl::Impl::Impl";
     
     if (!device_manager)
       throw xtl::format_operation_exception (METHOD_NAME, "No DeviceManager binded");
@@ -341,7 +341,7 @@ PrimitiveImpl::PrimitiveImpl (const DeviceManagerPtr& device_manager, const Mate
   }
   catch (xtl::exception& e)
   {
-    e.touch ("render::PrimitiveImpl::PrimitiveImpl");
+    e.touch ("render::manager::PrimitiveImpl::PrimitiveImpl");
     throw;
   }
 }
@@ -362,7 +362,7 @@ const char* PrimitiveImpl::Name ()
 void PrimitiveImpl::SetName (const char* name)
 {
   if (!name)
-    throw xtl::make_null_argument_exception ("render::PrimitiveImpl::SetName", "name");
+    throw xtl::make_null_argument_exception ("render::manager::PrimitiveImpl::SetName", "name");
     
   if (impl->device_manager->Settings ().HasDebugLog ())
     impl->log.Printf ("Primitive '%s' name changed to '%s' (id=%u)", impl->name.c_str (), name, impl->Id ());
@@ -486,7 +486,7 @@ size_t PrimitiveImpl::AddMesh (const media::geometry::Mesh& source, MeshBufferUs
   }
   catch (xtl::exception& e)
   {
-    e.touch ("render::PrimitiveImpl::AddMesh");
+    e.touch ("render::manager::PrimitiveImpl::AddMesh");
     throw;
   }
 }
@@ -517,37 +517,37 @@ void PrimitiveImpl::RemoveAllMeshes ()
 
 size_t PrimitiveImpl::LinesCount ()
 {
-  throw xtl::make_not_implemented_exception ("render::PrimitiveImpl::LinesCount");
+  throw xtl::make_not_implemented_exception ("render::manager::PrimitiveImpl::LinesCount");
 }
 
 size_t PrimitiveImpl::AddLines (size_t lines_count, const Line* lines, const MaterialPtr& material)
 {
-  throw xtl::make_not_implemented_exception ("render::PrimitiveImpl::AddLines");
+  throw xtl::make_not_implemented_exception ("render::manager::PrimitiveImpl::AddLines");
 }
 
 void PrimitiveImpl::UpdateLines (size_t first_lines, size_t lines_count, const Line* Lines)
 {
-  throw xtl::make_not_implemented_exception ("render::PrimitiveImpl::UpdateLines");
+  throw xtl::make_not_implemented_exception ("render::manager::PrimitiveImpl::UpdateLines");
 }
 
 void PrimitiveImpl::SetLinesMaterial (size_t first_lines, size_t lines_count, const MaterialPtr& material)
 {
-  throw xtl::make_not_implemented_exception ("render::PrimitiveImpl::SetLinesMaterial");
+  throw xtl::make_not_implemented_exception ("render::manager::PrimitiveImpl::SetLinesMaterial");
 }
 
 void PrimitiveImpl::RemoveLines (size_t first_lines, size_t lines_count)
 {
-  throw xtl::make_not_implemented_exception ("render::PrimitiveImpl::ReserveLines");
+  throw xtl::make_not_implemented_exception ("render::manager::PrimitiveImpl::ReserveLines");
 }
 
 void PrimitiveImpl::RemoveAllLines ()
 {
-  throw xtl::make_not_implemented_exception ("render::PrimitiveImpl::ReserveAllLines");
+  throw xtl::make_not_implemented_exception ("render::manager::PrimitiveImpl::ReserveAllLines");
 }
 
 void PrimitiveImpl::ReserveLines (size_t lines_count)
 {
-  throw xtl::make_not_implemented_exception ("render::PrimitiveImpl::ReserveLines");
+  throw xtl::make_not_implemented_exception ("render::manager::PrimitiveImpl::ReserveLines");
 }
 
 /*
@@ -556,37 +556,37 @@ void PrimitiveImpl::ReserveLines (size_t lines_count)
 
 size_t PrimitiveImpl::SpritesCount ()
 {
-  throw xtl::make_not_implemented_exception ("render::PrimitiveImpl::SpritesCount");
+  throw xtl::make_not_implemented_exception ("render::manager::PrimitiveImpl::SpritesCount");
 }
 
 size_t PrimitiveImpl::AddSprites (size_t sprites_count, const Sprite* sprites, const MaterialPtr& material)
 {
-  throw xtl::make_not_implemented_exception ("render::PrimitiveImpl::AddSprites");
+  throw xtl::make_not_implemented_exception ("render::manager::PrimitiveImpl::AddSprites");
 }
 
 void PrimitiveImpl::UpdateSprites (size_t first_sprite, size_t sprites_count, const Sprite* sprites)
 {
-  throw xtl::make_not_implemented_exception ("render::PrimitiveImpl::UpdateSprites");
+  throw xtl::make_not_implemented_exception ("render::manager::PrimitiveImpl::UpdateSprites");
 }
 
 void PrimitiveImpl::SetSpritesMaterial (size_t first_sprite, size_t sprites_count, const MaterialPtr& material)
 {
-  throw xtl::make_not_implemented_exception ("render::PrimitiveImpl::SetSpritesMaterial");
+  throw xtl::make_not_implemented_exception ("render::manager::PrimitiveImpl::SetSpritesMaterial");
 }
 
 void PrimitiveImpl::RemoveSprites (size_t first_sprite, size_t sprites_count)
 {
-  throw xtl::make_not_implemented_exception ("render::PrimitiveImpl::RemoveSprites");
+  throw xtl::make_not_implemented_exception ("render::manager::PrimitiveImpl::RemoveSprites");
 }
 
 void PrimitiveImpl::RemoveAllSprites ()
 {
-  throw xtl::make_not_implemented_exception ("render::PrimitiveImpl::RemoveAllSprites");
+  throw xtl::make_not_implemented_exception ("render::manager::PrimitiveImpl::RemoveAllSprites");
 }
 
 void PrimitiveImpl::ReserveSprites (size_t sprites_count)
 {
-  throw xtl::make_not_implemented_exception ("render::PrimitiveImpl::ReserveSprites");
+  throw xtl::make_not_implemented_exception ("render::manager::PrimitiveImpl::ReserveSprites");
 }
 
 /*
@@ -643,7 +643,7 @@ void PrimitiveImpl::UpdateCacheCore ()
   }
   catch (xtl::exception& e)
   {
-    e.touch ("render::PrimitiveImpl::UpdateCacheCore");
+    e.touch ("render::manager::PrimitiveImpl::UpdateCacheCore");
     throw;
   }
 }

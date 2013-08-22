@@ -1,6 +1,6 @@
 #include "shared.h"
 
-using namespace render;
+using namespace render::manager;
 using namespace render::low_level;
 
 /*
@@ -130,7 +130,7 @@ VertexBuffer::VertexBuffer (const media::geometry::VertexBuffer& source, Primiti
   }
   catch (xtl::exception& e)
   {
-    e.touch ("render::VertexBuffer::VertexBuffer");
+    e.touch ("render::manager::VertexBuffer::VertexBuffer");
     throw;
   }
 }
@@ -151,7 +151,7 @@ media::geometry::VertexFormat VertexBuffer::Clone (InputLayoutManager& manager, 
   }
   catch (xtl::exception& e)
   {
-    e.touch ("render::VertexBuffer::Clone");
+    e.touch ("render::manager::VertexBuffer::Clone");
     throw;
   }
 }
@@ -208,7 +208,7 @@ LowLevelInputLayoutPtr VertexBuffer::CreateInputLayout (InputLayoutManager& layo
   }
   catch (xtl::exception& e)
   {
-    e.touch ("render::VertexBuffer::CreateInputLayout");
+    e.touch ("render::manager::VertexBuffer::CreateInputLayout");
     throw;
   }
 }

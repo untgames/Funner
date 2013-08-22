@@ -1,6 +1,6 @@
 #include "shared.h"
 
-using namespace render;
+using namespace render::manager;
 
 /*
 ===================================================================================================
@@ -30,10 +30,10 @@ CacheHolder::~CacheHolder ()
 void CacheHolder::AttachCacheSource (CacheHolder& source)
 {
   if (IsParentOf (source))
-    throw xtl::format_operation_exception ("render::CacheHolder::AttachCacheSource", "Cache source has been already attached (to this holder or it's children)");
+    throw xtl::format_operation_exception ("render::manager::CacheHolder::AttachCacheSource", "Cache source has been already attached (to this holder or it's children)");
     
   if (source.IsParentOf (*this))
-    throw xtl::format_operation_exception ("render::CacheHolder::AttachCacheSource", "Cache source is a parent of this cache holder");  
+    throw xtl::format_operation_exception ("render::manager::CacheHolder::AttachCacheSource", "Cache source is a parent of this cache holder");  
     
   sources.push_back (&source);
   
@@ -151,11 +151,11 @@ void CacheHolder::ResetCache ()
     }
     catch (std::exception& e)
     {
-      Log ().Printf ("Unexpected exception: %s\n    at render::CacheHolder::ResetCache", e.what ());
+      Log ().Printf ("Unexpected exception: %s\n    at render::manager::CacheHolder::ResetCache", e.what ());
     }
     catch (...)
     {
-      Log ().Printf ("Unexpected exception at render::CacheHolder::ResetCache");
+      Log ().Printf ("Unexpected exception at render::manager::CacheHolder::ResetCache");
     }
     
     state = CacheState_Reset;
@@ -173,11 +173,11 @@ void CacheHolder::UpdateCacheAfterReset ()
   }
   catch (std::exception& e)
   {
-    Log ().Printf ("Unexpected exception: %s\n    at render::CacheHolder::UpdateCacheAfterReset", e.what ());
+    Log ().Printf ("Unexpected exception: %s\n    at render::manager::CacheHolder::UpdateCacheAfterReset", e.what ());
   }
   catch (...)
   {
-    Log ().Printf ("Unexpected exception at render::CacheHolder::UpdateCacheAfterReset");
+    Log ().Printf ("Unexpected exception at render::manager::CacheHolder::UpdateCacheAfterReset");
   }    
 
   for (HolderList::iterator iter=dependencies.begin (), end=dependencies.end (); iter!=end; ++iter)

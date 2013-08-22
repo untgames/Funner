@@ -1,6 +1,6 @@
 #include "shared.h"
 
-using namespace render;
+using namespace render::manager;
 using namespace render::low_level;
 
 /*
@@ -66,11 +66,11 @@ struct WindowImpl::Impl: public xtl::trackable, public INativeWindowListener
       swap_chain = device_manager->Driver ().CreateSwapChain (1, &adapter_ptr, swap_chain_desc);
 
       if (!swap_chain)
-        throw xtl::format_operation_exception ("", "Null swap chain after render::low_level::IDriver::CreateSwapChain");
+        throw xtl::format_operation_exception ("", "Null swap chain after render::manager::low_level::IDriver::CreateSwapChain");
     }
     catch (xtl::exception& e)
     {
-      e.touch ("render::WindowImpl::Impl::CreateSwapChain");
+      e.touch ("render::manager::WindowImpl::Impl::CreateSwapChain");
       throw;
     }
   }
@@ -119,7 +119,7 @@ struct WindowImpl::Impl: public xtl::trackable, public INativeWindowListener
     }
     catch (xtl::exception& e)
     {
-      e.touch ("render::WindowImpl::Impl::CreateRenderTargets");
+      e.touch ("render::manager::WindowImpl::Impl::CreateRenderTargets");
       throw;
     }
   }
@@ -145,11 +145,11 @@ struct WindowImpl::Impl: public xtl::trackable, public INativeWindowListener
     }
     catch (std::exception& e)
     {
-      log.Printf ("%s\n    at render::WindowImpl::Impl::OnUpdate", e.what ());      
+      log.Printf ("%s\n    at render::manager::WindowImpl::Impl::OnUpdate", e.what ());      
     }
     catch (...)
     {
-      log.Printf ("unknown exception\n    at render::WindowImpl::Impl::OnUpdate");
+      log.Printf ("unknown exception\n    at render::manager::WindowImpl::Impl::OnUpdate");
     }
   }
 
@@ -175,11 +175,11 @@ struct WindowImpl::Impl: public xtl::trackable, public INativeWindowListener
     }
     catch (std::exception& e)
     {
-      log.Printf ("%s\n    at render::WindowImpl::Impl::OnResize", e.what ());
+      log.Printf ("%s\n    at render::manager::WindowImpl::Impl::OnResize", e.what ());
     }
     catch (...)
     {
-      log.Printf ("unknown exception\n    at render::WindowImpl::Impl::OnResize");
+      log.Printf ("unknown exception\n    at render::manager::WindowImpl::Impl::OnResize");
     }
   }
   
@@ -213,11 +213,11 @@ struct WindowImpl::Impl: public xtl::trackable, public INativeWindowListener
     }
     catch (std::exception& e)
     {
-      log.Printf ("%s\n    at render::WindowImpl::Impl::OnChangeHandle", e.what ());
+      log.Printf ("%s\n    at render::manager::WindowImpl::Impl::OnChangeHandle", e.what ());
     }
     catch (...)
     {
-      log.Printf ("unknown exception\n    at render::WindowImpl::Impl::OnChangeHandle");
+      log.Printf ("unknown exception\n    at render::manager::WindowImpl::Impl::OnChangeHandle");
     }
   }
   
@@ -242,11 +242,11 @@ struct WindowImpl::Impl: public xtl::trackable, public INativeWindowListener
     }
     catch (std::exception& e)
     {
-      log.Printf ("%s\n    at render::WindowImpl::Impl::OnChangeViewport", e.what ());      
+      log.Printf ("%s\n    at render::manager::WindowImpl::Impl::OnChangeViewport", e.what ());      
     }
     catch (...)
     {
-      log.Printf ("unknown exception\n    at render::WindowImpl::Impl::OnChangeViewport");
+      log.Printf ("unknown exception\n    at render::manager::WindowImpl::Impl::OnChangeViewport");
     }
   }  
 };
@@ -349,7 +349,7 @@ WindowImpl::WindowImpl (const DeviceManagerPtr& device_manager, INativeWindow& w
       if (!adapter)
         throw xtl::format_operation_exception ("", "Null adapter after render::low_level::DriverManager::CreateSwapChainAndDevice");
 
-      impl->device_manager = DeviceManagerPtr (new render::DeviceManager (device, driver, settings, cache_manager), false);
+      impl->device_manager = DeviceManagerPtr (new render::manager::DeviceManager (device, driver, settings, cache_manager), false);
       impl->adapter        = impl->swap_chain->GetAdapter ();
       
       log.Printf ("...device manager and swap chain have been successfully created");
@@ -377,7 +377,7 @@ WindowImpl::WindowImpl (const DeviceManagerPtr& device_manager, INativeWindow& w
   }
   catch (xtl::exception& e)
   {
-    e.touch ("render::WindowImpl::WindowImpl");
+    e.touch ("render::manager::WindowImpl::WindowImpl");
     throw;
   }
 }
@@ -402,7 +402,7 @@ DeviceManagerPtr& WindowImpl::DeviceManager ()
 void WindowImpl::SetName (const char* name)
 {
   if (!name)
-    throw xtl::make_null_argument_exception ("render::WindowImpl::SetName", "name");
+    throw xtl::make_null_argument_exception ("render::manager::WindowImpl::SetName", "name");
     
   impl->name = name;
 }
@@ -419,7 +419,7 @@ const char* WindowImpl::Name ()
 const RenderTargetPtr& WindowImpl::ColorBuffer ()
 {
   if (!impl->color_buffer)
-    throw xtl::format_operation_exception ("render::WindowImpl::ColorBuffer", "No color buffer binded");
+    throw xtl::format_operation_exception ("render::manager::WindowImpl::ColorBuffer", "No color buffer binded");
     
   return impl->color_buffer;
 }
@@ -427,7 +427,7 @@ const RenderTargetPtr& WindowImpl::ColorBuffer ()
 const RenderTargetPtr& WindowImpl::DepthStencilBuffer ()
 {
   if (!impl->depth_stencil_buffer)
-    throw xtl::format_operation_exception ("render::WindowImpl::DepthStencilBuffer", "No depth-stencil buffer binded");
+    throw xtl::format_operation_exception ("render::manager::WindowImpl::DepthStencilBuffer", "No depth-stencil buffer binded");
     
   return impl->depth_stencil_buffer;
 }
@@ -458,7 +458,7 @@ void WindowImpl::SwapBuffers ()
   }
   catch (xtl::exception& e)
   {
-    e.touch ("render::Window::SwapBuffers");
+    e.touch ("render::manager::Window::SwapBuffers");
     throw;
   }
 }
@@ -475,6 +475,6 @@ xtl::connection WindowImpl::RegisterEventHandler (WindowEvent event, const Event
     case WindowEvent_OnResize:
       return impl->signals [event].connect (handler);
     default:
-      throw xtl::make_argument_exception ("render::WindowImpl::RegisterEventHandler", "event", event);
+      throw xtl::make_argument_exception ("render::manager::WindowImpl::RegisterEventHandler", "event", event);
   }
 }

@@ -1,6 +1,6 @@
 #include "shared.h"
 
-using namespace render;
+using namespace render::manager;
 using namespace render::low_level;
 
 namespace
@@ -62,7 +62,7 @@ struct Texmap: public xtl::reference_counter, public CacheHolder
     }
     catch (xtl::exception& e)
     {
-      e.touch ("render::Texmap::UpdateCacheCore");
+      e.touch ("render::manager::Texmap::UpdateCacheCore");
       throw;
     }
   }
@@ -110,7 +110,7 @@ struct MaterialImpl::Impl: public CacheHolder, public DebugIdHolder
     , cached_state_block_mask_hash (0)
   {
     if (!in_name)
-      throw xtl::make_null_argument_exception ("render::MaterialImpl::Impl::Impl", "name");
+      throw xtl::make_null_argument_exception ("render::manager::MaterialImpl::Impl::Impl", "name");
       
     name = in_name;
     
@@ -260,7 +260,7 @@ struct MaterialImpl::Impl: public CacheHolder, public DebugIdHolder
     }
     catch (xtl::exception& e)
     {
-      e.touch ("render::MaterialImpl::Impl::UpdateCacheCore");
+      e.touch ("render::manager::MaterialImpl::Impl::UpdateCacheCore");
       throw;
     }
   }
@@ -296,7 +296,7 @@ const char* MaterialImpl::Name ()
 void MaterialImpl::SetName (const char* name)
 {
   if (!name)
-    throw xtl::make_null_argument_exception ("render::MaterialImpl::SetName", "name");
+    throw xtl::make_null_argument_exception ("render::manager::MaterialImpl::SetName", "name");
     
   if (impl->device_manager->Settings ().HasDebugLog ())
     impl->log.Printf ("Material '%s' name changed to '%s' (id=%u)", impl->name.c_str (), name, impl->Id ());
@@ -357,7 +357,7 @@ size_t MaterialImpl::TexturesCount ()
 TexturePtr MaterialImpl::Texture (size_t index)
 {
   if (index >= impl->texmaps.size ())
-    throw xtl::make_range_exception ("render::MaterialImpl::Texture", "index", index, impl->texmaps.size ());
+    throw xtl::make_range_exception ("render::manager::MaterialImpl::Texture", "index", index, impl->texmaps.size ());
     
   Texmap& texmap = *impl->texmaps [index];  
   
@@ -369,7 +369,7 @@ TexturePtr MaterialImpl::Texture (size_t index)
 LowLevelTexturePtr MaterialImpl::DeviceTexture (size_t index)
 {
   if (index >= impl->texmaps.size ())
-    throw xtl::make_range_exception ("render::MaterialImpl::DeviceTexture", "index", index, impl->texmaps.size ());
+    throw xtl::make_range_exception ("render::manager::MaterialImpl::DeviceTexture", "index", index, impl->texmaps.size ());
     
   Texmap& texmap = *impl->texmaps [index];
     
@@ -381,7 +381,7 @@ LowLevelTexturePtr MaterialImpl::DeviceTexture (size_t index)
 const char* MaterialImpl::TextureName (size_t index)
 {
   if (index >= impl->texmaps.size ())
-    throw xtl::make_range_exception ("render::MaterialImpl::TextureName", "index", index, impl->texmaps.size ());
+    throw xtl::make_range_exception ("render::manager::MaterialImpl::TextureName", "index", index, impl->texmaps.size ());
     
   return impl->texmaps [index]->texture.Name ();
 }
@@ -389,7 +389,7 @@ const char* MaterialImpl::TextureName (size_t index)
 LowLevelSamplerStatePtr MaterialImpl::Sampler (size_t index)
 {
   if (index >= impl->texmaps.size ())
-    throw xtl::make_range_exception ("render::MaterialImpl::Sampler", "index", index, impl->texmaps.size ());
+    throw xtl::make_range_exception ("render::manager::MaterialImpl::Sampler", "index", index, impl->texmaps.size ());
     
   Texmap& texmap = *impl->texmaps [index];    
   
@@ -481,7 +481,7 @@ void MaterialImpl::Update (const media::rfx::Material& material)
   }
   catch (xtl::exception& e)
   {
-    e.touch ("render::MaterialImpl::Update");
+    e.touch ("render::manager::MaterialImpl::Update");
     throw;
   }
 }
@@ -500,7 +500,7 @@ ProgramParametersLayoutPtr MaterialImpl::ParametersLayout ()
   }
   catch (xtl::exception& e)
   {
-    e.touch ("render::MaterialImpl::ParametersLayout");
+    e.touch ("render::manager::MaterialImpl::ParametersLayout");
     throw;
   }
 }

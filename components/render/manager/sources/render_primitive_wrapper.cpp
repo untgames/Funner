@@ -1,6 +1,6 @@
 #include "shared.h"
 
-using namespace render;
+using namespace render::manager;
 
 Primitive::Primitive (PrimitiveImpl* in_impl)
   : impl (in_impl)
@@ -152,9 +152,14 @@ void Primitive::Swap (Primitive& primitive)
 namespace render
 {
 
+namespace manager
+{
+
 void swap (Primitive& primitive1, Primitive& primitive2)
 {
   primitive1.Swap (primitive2);
+}
+
 }
 
 }

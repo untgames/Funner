@@ -1,6 +1,6 @@
 #include "shared.h"
 
-using namespace render;
+using namespace render::manager;
 
 #ifdef _MSC_VER
   #pragma warning (disable : 4355) // this used in base initializer list
@@ -175,7 +175,7 @@ const ShaderOptions& ShaderOptionsCache::GetShaderOptions (ShaderOptionsLayout& 
   }
   catch (xtl::exception& e)
   {
-    e.touch ("render::ShaderOptionsCache::GetShaderOptions");
+    e.touch ("render::manager::ShaderOptionsCache::GetShaderOptions");
     throw;
   }
 }

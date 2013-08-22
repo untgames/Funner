@@ -15,6 +15,9 @@ class CompressedImage;
 namespace render
 {
 
+namespace manager
+{
+
 //implementation forwards
 class RenderTargetImpl;
 class Wrappers;
@@ -61,6 +64,8 @@ class RenderTarget
 ///Ξαμεν
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 void swap (RenderTarget&, RenderTarget&);
+
+}
 
 }
 

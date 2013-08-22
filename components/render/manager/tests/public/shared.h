@@ -23,7 +23,7 @@
 #include <syslib/window.h>
 
 using namespace common;
-using namespace render;
+using namespace render::manager;
 
 //константы
 const size_t WINDOW_WIDTH  = 800;
@@ -63,13 +63,13 @@ class Test: private xtl::trackable, private TestLogFilter
     }
     
 ///Получение менеджера рендеринга
-    render::RenderManager RenderManager ()
+    render::manager::RenderManager RenderManager ()
     {
       return render_manager;
     }
     
 ///Получение окна
-    render::Window Window ()
+    render::manager::Window Window ()
     {
       return render_window;
     }
@@ -99,7 +99,7 @@ class Test: private xtl::trackable, private TestLogFilter
     
   private:
 ///Создание окна рендеринга
-    render::Window CreateRenderWindow ()
+    render::manager::Window CreateRenderWindow ()
     {
       connect_tracker (render_manager.RegisterWindowEventHandler (RenderManagerWindowEvent_OnAdded, xtl::bind (&Test::OnWindowAdded, this, _2)));
       connect_tracker (render_manager.RegisterWindowEventHandler (RenderManagerWindowEvent_OnRemoved, xtl::bind (&Test::OnWindowRemoved, this, _2)));
@@ -113,7 +113,7 @@ class Test: private xtl::trackable, private TestLogFilter
     }
     
 ///Обработка события добавления окна
-    void OnWindowAdded (render::Window& window)
+    void OnWindowAdded (render::manager::Window& window)
     {
       printf ("window %ux%u added\n", window.Width (), window.Height ());
       
@@ -121,13 +121,13 @@ class Test: private xtl::trackable, private TestLogFilter
     }
     
 ///Обработка события удаления окна
-    void OnWindowRemoved (render::Window& window)
+    void OnWindowRemoved (render::manager::Window& window)
     {
       printf ("window %ux%u removed\n", window.Width (), window.Height ());
     }
     
 ///Обработка события изменения размеров окна
-    void OnWindowResize (render::Window& window)
+    void OnWindowResize (render::manager::Window& window)
     {
       printf ("window resize %ux%u\n", window.Width (), window.Height ());
     }
@@ -141,9 +141,9 @@ class Test: private xtl::trackable, private TestLogFilter
 ///Обработка
   
   private:
-    syslib::Window         window;
-    render::RenderManager  render_manager;
-    render::Window         render_window;
+    syslib::Window                  window;
+    render::manager::RenderManager  render_manager;
+    render::manager::Window         render_window;
 };
 
 #endif

@@ -112,9 +112,9 @@ class FrameImpl: public Object
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Макро-определения шейдера
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void                        SetShaderOptions   (const common::PropertyMap&);
-    const common::PropertyMap&  ShaderOptions      ();
-    render::ShaderOptionsCache& ShaderOptionsCache ();
+    void                                 SetShaderOptions   (const common::PropertyMap&);
+    const common::PropertyMap&           ShaderOptions      ();
+    render::manager::ShaderOptionsCache& ShaderOptionsCache ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Список отрисовки

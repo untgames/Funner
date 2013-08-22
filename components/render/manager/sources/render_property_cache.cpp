@@ -1,6 +1,6 @@
 #include "shared.h"
 
-using namespace render;
+using namespace render::manager;
 
 namespace
 {
@@ -42,7 +42,7 @@ struct BufferPool: public xtl::reference_counter, private Cache
     , settings (&device_manager->Settings ())
   {
     if (!settings)
-      throw xtl::make_null_argument_exception ("render::BufferPool::BufferPool", "settings");
+      throw xtl::make_null_argument_exception ("render::manager::BufferPool::BufferPool", "settings");
     
     buffers.reserve (RESERVED_BUFFER_POOL_SIZE);
     
@@ -188,7 +188,7 @@ PropertyCache::PropertyCache (const DeviceManagerPtr& device_manager)
   }
   catch (xtl::exception& e)
   {
-    e.touch ("render::PropertyCache::PropertyCache");
+    e.touch ("render::manager::PropertyCache::PropertyCache");
     throw;
   }
 }
@@ -254,7 +254,7 @@ void PropertyCache::Convert (const common::PropertyMap& source_map, LowLevelBuff
   }
   catch (xtl::exception& e)
   {
-    e.touch ("render::PropertyCache::Convert");
+    e.touch ("render::manager::PropertyCache::Convert");
     
     throw;
   }

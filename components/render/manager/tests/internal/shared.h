@@ -23,7 +23,7 @@
 #include "../../sources/shared.h"
 
 using namespace common;
-using namespace render;
+using namespace render::manager;
 
 //константы
 const size_t WINDOW_WIDTH  = 800;
@@ -64,7 +64,7 @@ class Test: private xtl::trackable, private TestLogFilter
     }
     
 ///Получение менеджера рендеринга
-    render::RenderManager RenderManager ()
+    render::manager::RenderManager RenderManager ()
     {
       return render_manager;
     }
@@ -128,9 +128,9 @@ class Test: private xtl::trackable, private TestLogFilter
 ///Обработка
   
   private:
-    syslib::Window         window;
-    render::RenderManager  render_manager;
-    Window                 render_window;
+    syslib::Window                 window;
+    render::manager::RenderManager render_manager;
+    Window                         render_window;
 };
 
 #endif

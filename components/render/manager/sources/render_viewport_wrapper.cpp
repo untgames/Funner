@@ -1,13 +1,13 @@
 #include "shared.h"
 
-using namespace render;
+using namespace render::manager;
 
 Viewport::Viewport ()
   : impl (new ViewportImpl)
 {
 }
 
-Viewport::Viewport (const render::Rect& rect, float min_depth, float max_depth)
+Viewport::Viewport (const render::manager::Rect& rect, float min_depth, float max_depth)
   : impl (new ViewportImpl (rect, min_depth, max_depth))
 {
 }
@@ -35,17 +35,17 @@ RectArea Viewport::Area () const
   return Wrappers::Wrap<RectArea> (&impl->Area ());
 }
 
-void Viewport::SetRect (const render::Rect& rect)
+void Viewport::SetRect (const render::manager::Rect& rect)
 {
   impl->Area ().SetRect (rect);
 }
 
 void Viewport::SetRect (int x, int y, size_t width, size_t height)
 {
-  SetRect (render::Rect (x, y, width, height));
+  SetRect (render::manager::Rect (x, y, width, height));
 }
 
-const render::Rect& Viewport::Rect () const
+const render::manager::Rect& Viewport::Rect () const
 {
   return impl->Area ().Rect ();
 }
@@ -98,9 +98,14 @@ void Viewport::Swap (Viewport& viewport)
 namespace render
 {
 
+namespace manager
+{
+
 void swap (Viewport& viewport1, Viewport& viewport2)
 {
   viewport1.Swap (viewport2);
+}
+
 }
 
 }

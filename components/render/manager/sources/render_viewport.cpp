@@ -1,6 +1,6 @@
 #include "shared.h"
 
-using namespace render;
+using namespace render::manager;
 
 /*
     Конструкторы
@@ -13,7 +13,7 @@ ViewportImpl::ViewportImpl ()
 {
 }
 
-ViewportImpl::ViewportImpl (const render::Rect& rect, float in_min_depth, float in_max_depth)
+ViewportImpl::ViewportImpl (const render::manager::Rect& rect, float in_min_depth, float in_max_depth)
   : area (new RectAreaImpl (rect), false)
   , min_depth (in_min_depth)
   , max_depth (in_max_depth)

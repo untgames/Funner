@@ -35,13 +35,13 @@ class RenderManagerImpl: public Object, public xtl::trackable
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Менеджеры ресурсов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    render::DeviceManager&    DeviceManager    ();
-    render::CacheManager&     CacheManager     ();
-    render::TextureManager&   TextureManager   ();
-    render::PrimitiveManager& PrimitiveManager ();
-    render::ProgramManager&   ProgramManager   ();
-    render::MaterialManager&  MaterialManager  ();
-    render::EffectManager&    EffectManager    ();
+    render::manager::DeviceManager&    DeviceManager    ();
+    render::manager::CacheManager&     CacheManager     ();
+    render::manager::TextureManager&   TextureManager   ();
+    render::manager::PrimitiveManager& PrimitiveManager ();
+    render::manager::ProgramManager&   ProgramManager   ();
+    render::manager::MaterialManager&  MaterialManager  ();
+    render::manager::EffectManager&    EffectManager    ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Создание объектов
@@ -77,7 +77,7 @@ class RenderManagerImpl: public Object, public xtl::trackable
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Настройки менеджера рендеринга
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    render::Settings& Settings ();
+    render::manager::Settings& Settings ();
     
   private:
     struct Impl;

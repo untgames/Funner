@@ -1,7 +1,7 @@
 #ifndef RENDER_MANAGER_MATERIAL_HEADER
 #define RENDER_MANAGER_MATERIAL_HEADER
 
-#include <render/texture.h>
+#include <render/manager/texture.h>
 
 namespace media
 {
@@ -20,6 +20,9 @@ class ShaderLibrary;
 }
 
 namespace render
+{
+
+namespace manager
 {
 
 //implementation forwards
@@ -74,6 +77,8 @@ class Material
 ///Ξαμεν
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 void swap (Material&, Material&);
+
+}
 
 }
 

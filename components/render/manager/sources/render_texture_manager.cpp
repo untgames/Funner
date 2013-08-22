@@ -1,6 +1,6 @@
 #include "shared.h"
 
-using namespace render;
+using namespace render::manager;
 
 namespace
 {
@@ -103,7 +103,7 @@ TexturePtr TextureManager::CreateTexture (const char* name)
   }
   catch (xtl::exception& e)
   {
-    e.touch ("render::TextureManager::CreateTexture(const char*)");
+    e.touch ("render::manager::TextureManager::CreateTexture(const char*)");
     throw;
   }
 }
@@ -131,12 +131,12 @@ TexturePtr TextureManager::CreateTexture (const media::Image& image, bool genera
   }
   catch (xtl::exception& e)
   {
-    e.touch ("render::TextureManager::CreateTexture(const media::Image&,bool)");
+    e.touch ("render::manager::TextureManager::CreateTexture(const media::Image&,bool)");
     throw;
   }
 }
 
-TexturePtr TextureManager::CreateTexture (const media::Image& image, render::TextureDimension dimension, bool generate_mips_enable, const char* name)
+TexturePtr TextureManager::CreateTexture (const media::Image& image, render::manager::TextureDimension dimension, bool generate_mips_enable, const char* name)
 {
   try
   {
@@ -177,7 +177,7 @@ TexturePtr TextureManager::CreateTexture (const media::Image& image, render::Tex
   }
   catch (xtl::exception& e)
   {
-    e.touch ("render::TextureManager::CreateTexture(const media::Image&,TextureDimension,bool)");
+    e.touch ("render::manager::TextureManager::CreateTexture(const media::Image&,TextureDimension,bool)");
     throw;
   }
 }
@@ -205,12 +205,12 @@ TexturePtr TextureManager::CreateTexture (const media::CompressedImage& image, c
   }
   catch (xtl::exception& e)
   {
-    e.touch ("render::TextureManager::CreateTexture(const media::CompressedImage&)");
+    e.touch ("render::manager::TextureManager::CreateTexture(const media::CompressedImage&)");
     throw;
   }
 }
 
-TexturePtr TextureManager::CreateTexture (const media::CompressedImage& image, render::TextureDimension dimension, const char* name)
+TexturePtr TextureManager::CreateTexture (const media::CompressedImage& image, render::manager::TextureDimension dimension, const char* name)
 {
   try
   {
@@ -218,19 +218,19 @@ TexturePtr TextureManager::CreateTexture (const media::CompressedImage& image, r
   }
   catch (xtl::exception& e)
   {
-    e.touch ("render::TextureManager::CreateTexture(const media::CompressedImage&,TextureDimension)");
+    e.touch ("render::manager::TextureManager::CreateTexture(const media::CompressedImage&,TextureDimension)");
     throw;
   }
 }
 
 TexturePtr TextureManager::CreateTexture
- (render::TextureDimension dimension,
-  size_t                   width,
-  size_t                   height,
-  size_t                   depth,
-  render::PixelFormat      format,
-  bool                     generate_mips_enable,
-  const char*              name)
+ (render::manager::TextureDimension dimension,
+  size_t                            width,
+  size_t                            height,
+  size_t                            depth,
+  render::manager::PixelFormat      format,
+  bool                              generate_mips_enable,
+  const char*                       name)
 {
   try
   {
@@ -238,7 +238,7 @@ TexturePtr TextureManager::CreateTexture
   }
   catch (xtl::exception& e)
   {
-    e.touch ("render::TextureManager::CreateTexture(TextureDimension,size_t,size_t,size_t,PixelFormat,bool)");
+    e.touch ("render::manager::TextureManager::CreateTexture(TextureDimension,size_t,size_t,size_t,PixelFormat,bool)");
     throw;
   }
 }
@@ -294,7 +294,7 @@ void TextureManager::LoadTexture (const char* name)
   }
   catch (xtl::exception& e)
   {
-    e.touch ("render::TextureManager::LoadTexture");
+    e.touch ("render::manager::TextureManager::LoadTexture");
     throw;
   }
 }
@@ -325,7 +325,7 @@ void TextureManager::ShareTexture (const char* name, const TexturePtr& texture)
   }
   catch (xtl::exception& e)
   {
-    e.touch ("render::TextureManager::ShareTexture");
+    e.touch ("render::manager::TextureManager::ShareTexture");
     throw;
   }
 }
@@ -406,7 +406,7 @@ DynamicTexturePtr TextureManager::CreateDynamicTexture (const char* name, Entity
   }
   catch (xtl::exception& e)
   {
-    e.touch (name ? "render::TextureManager::CreateDynamicTexture('%s')" : "render::TextureManager::CreateDynamicTexture", name);
+    e.touch (name ? "render::manager::TextureManager::CreateDynamicTexture('%s')" : "render::manager::TextureManager::CreateDynamicTexture", name);
     throw;
   }
 }
@@ -417,7 +417,7 @@ DynamicTexturePtr TextureManager::CreateDynamicTexture (const char* name, Entity
 
 void TextureManager::RegisterDynamicTexture (const char* name_mask, const DynamicTextureCreator& creator)
 {
-  static const char* METHOD_NAME = "render::TextureManager::RegisterDynamicTexture";
+  static const char* METHOD_NAME = "render::manager::TextureManager::RegisterDynamicTexture";
 
   if (!name_mask)
     throw xtl::make_argument_exception (METHOD_NAME, "name_mask");
