@@ -78,6 +78,14 @@ class ConnectionState: public xtl::noncopyable
     void LoadResource (const char*);
     void UnloadResource (const char*);
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Внутренние команды
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void OnSizeChanged     (size_t width, size_t height);
+    void OnViewportChanged (size_t left, size_t top, size_t right, size_t bottom);
+    void OnHandleChanged   (void* handle);
+    void OnPaint           ();
+
   private:
     struct Impl;
     stl::auto_ptr<Impl> impl;
@@ -134,14 +142,14 @@ class Connection: public interchange::IConnection, public xtl::reference_counter
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Исходящее соединение от сервера к серверу
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-class OutputServerLoopbackConnection: public xtl::noncopyable
+class ServerLoopbackConnection: public xtl::noncopyable
 {
   public:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструктор / деструктор
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    OutputServerLoopbackConnection  (const char* name);
-    ~OutputServerLoopbackConnection ();
+    ServerLoopbackConnection  (const char* name);
+    ~ServerLoopbackConnection ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Сообщения серверу
@@ -150,6 +158,11 @@ class OutputServerLoopbackConnection: public xtl::noncopyable
     void OnViewportChanged (size_t left, size_t top, size_t right, size_t bottom);
     void OnHandleChanged   (void* handle);
     void OnPaint           ();
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Обработка входящей команды
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    static bool ProcessIncomingCommand (InternalCommandId id, interchange::InputStream&, ConnectionState& state);
 
   private:
     struct Impl;

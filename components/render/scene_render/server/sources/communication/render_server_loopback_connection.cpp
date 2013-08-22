@@ -19,6 +19,11 @@ inline void write (interchange::OutputStream& s, void* value)
   s.Write (value);
 }
 
+inline void* read (interchange::InputStream& s, xtl::type<void*>)
+{
+  return s.Read<void*> ();
+}
+
 }
 
 /*
@@ -28,7 +33,7 @@ inline void write (interchange::OutputStream& s, void* value)
 
 typedef xtl::com_ptr<interchange::IConnection> ConnectionPtr;
 
-struct OutputServerLoopbackConnection::Impl
+struct ServerLoopbackConnection::Impl
 {
   ConnectionPtr                  connection; //внутреннее соединение от сервера к серверу
   interchange::CommandBufferPool pool;       //пул буферов
@@ -58,7 +63,7 @@ struct OutputServerLoopbackConnection::Impl
     Конструктор / деструктор
 */
 
-OutputServerLoopbackConnection::OutputServerLoopbackConnection (const char* name)
+ServerLoopbackConnection::ServerLoopbackConnection (const char* name)
   : impl (new Impl)
 {
   try
@@ -70,12 +75,12 @@ OutputServerLoopbackConnection::OutputServerLoopbackConnection (const char* name
   }
   catch (xtl::exception& e)
   {
-    e.touch ("render::scene::OutputServerLoopbackConnection::OutputServerLoopbackConnection");
+    e.touch ("render::scene::ServerLoopbackConnection::ServerLoopbackConnection");
     throw;
   }
 }
 
-OutputServerLoopbackConnection::~OutputServerLoopbackConnection ()
+ServerLoopbackConnection::~ServerLoopbackConnection ()
 {
 }
 
@@ -83,7 +88,7 @@ OutputServerLoopbackConnection::~OutputServerLoopbackConnection ()
     Сообщения серверу
 */
 
-void OutputServerLoopbackConnection::OnSizeChanged (size_t width, size_t height)
+void ServerLoopbackConnection::OnSizeChanged (size_t width, size_t height)
 {
   try
   {
@@ -100,12 +105,12 @@ void OutputServerLoopbackConnection::OnSizeChanged (size_t width, size_t height)
   }
   catch (xtl::exception& e)
   {
-    e.touch ("render::scene::OutputServerLoopbackConnection::OnSizeChanged");
+    e.touch ("render::scene::ServerLoopbackConnection::OnSizeChanged");
     throw;
   }
 }
 
-void OutputServerLoopbackConnection::OnViewportChanged (size_t left, size_t top, size_t right, size_t bottom)
+void ServerLoopbackConnection::OnViewportChanged (size_t left, size_t top, size_t right, size_t bottom)
 {
   try
   {
@@ -124,12 +129,12 @@ void OutputServerLoopbackConnection::OnViewportChanged (size_t left, size_t top,
   }
   catch (xtl::exception& e)
   {
-    e.touch ("render::scene::OutputServerLoopbackConnection::OnViewportChanged");
+    e.touch ("render::scene::ServerLoopbackConnection::OnViewportChanged");
     throw;
   }
 }
 
-void OutputServerLoopbackConnection::OnHandleChanged (void* handle)
+void ServerLoopbackConnection::OnHandleChanged (void* handle)
 {
   try
   {
@@ -145,12 +150,12 @@ void OutputServerLoopbackConnection::OnHandleChanged (void* handle)
   }
   catch (xtl::exception& e)
   {
-    e.touch ("render::scene::OutputServerLoopbackConnection::OnHandleChanged");
+    e.touch ("render::scene::ServerLoopbackConnection::OnHandleChanged");
     throw;
   }
 }
 
-void OutputServerLoopbackConnection::OnPaint ()
+void ServerLoopbackConnection::OnPaint ()
 {
   try
   {
@@ -163,7 +168,59 @@ void OutputServerLoopbackConnection::OnPaint ()
   }
   catch (xtl::exception& e)
   {
-    e.touch ("render::scene::OutputServerLoopbackConnection::OnPaint");
+    e.touch ("render::scene::ServerLoopbackConnection::OnPaint");
+    throw;
+  }
+}
+
+/*
+    Обработка входящей команды
+*/
+
+bool ServerLoopbackConnection::ProcessIncomingCommand (InternalCommandId id, interchange::InputStream& stream, ConnectionState& state)
+{
+  try
+  {
+    switch (id)
+    {
+      case InternalCommandId_OnSizeChanged:
+      {
+        size_t width  = read (stream, xtl::type<uint32> ()), 
+               height = read (stream, xtl::type<uint32> ());
+
+        state.OnSizeChanged (width, height);
+
+        return true;
+      }
+      case InternalCommandId_OnViewportChanged:
+      {
+        size_t left   = read (stream, xtl::type<uint32> ()), 
+               top    = read (stream, xtl::type<uint32> ()),
+               right  = read (stream, xtl::type<uint32> ()),
+               bottom = read (stream, xtl::type<uint32> ());
+
+        state.OnViewportChanged (left, top, right, bottom);
+
+        return true;
+      }
+      case InternalCommandId_OnHandleChanged:
+      {
+        void* handle = read (stream, xtl::type<void*> ()); 
+
+        state.OnHandleChanged (handle);
+
+        return true;
+      }
+      case InternalCommandId_OnPaint:
+        state.OnPaint ();
+        return true;
+      default:
+        return false;
+    }
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::scene::ServerLoopbackConnection::ProcessIncomingCommand");
     throw;
   }
 }

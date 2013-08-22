@@ -8,9 +8,9 @@ using namespace render::scene::server;
 
 struct Server::Impl
 {
-  ServerImpl                     server;              //сервер рендеринга
-  ConnectionAcceptor             acceptor;            //объект, принимающий входящие подключения
-  OutputServerLoopbackConnection loopback_connection; //соединение для взаимодействия с сервером
+  ServerImpl               server;              //сервер рендеринга
+  ConnectionAcceptor       acceptor;            //объект, принимающий входящие подключения
+  ServerLoopbackConnection loopback_connection; //соединение для взаимодействия с сервером
 
 /// Конструктор
   Impl (const char* name, ServerThreadingModel threading_model)

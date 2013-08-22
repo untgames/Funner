@@ -10,10 +10,18 @@ namespace
 class ContextImpl: public Context
 {
   public:
-    ContextImpl (ConnectionState& state) : Context (state) {}
+    ContextImpl (ConnectionState& in_state) : Context (in_state), state (in_state) {}
 
     using Context::SetCounterparty;
     using Context::ProcessCommands;
+
+    bool DeserializeUnknownCommand (interchange::CommandId id) 
+    { 
+      return ServerLoopbackConnection::ProcessIncomingCommand (static_cast<InternalCommandId> (id), *this, state); 
+    }
+
+  private:
+    ConnectionState& state;
 };
 
 }
