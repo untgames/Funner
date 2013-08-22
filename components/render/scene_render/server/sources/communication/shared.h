@@ -19,6 +19,8 @@
 #include <render/scene/interchange/render_thread.h>
 #include <render/scene/interchange/serializer.h>
 
+#include <shared/server.h>
+
 namespace render
 {
 
@@ -28,10 +30,18 @@ namespace scene
 namespace server
 {
 
-typedef interchange::Context<interchange::ServerToClientSerializer, interchange::ClientToServerDeserializer> Context;
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Внутренние команды сервера
+///////////////////////////////////////////////////////////////////////////////////////////////////
+enum InternalCommandId
+{
+  InternalCommandId_OnSizeChanged = interchange::CommandId_FirstUserDefined,
+  InternalCommandId_OnViewportChanged,
+  InternalCommandId_OnHandleChanged,
+  InternalCommandId_OnPaint,
+};
 
-/// forward declarations
-class ServerImpl;
+typedef interchange::Context<interchange::ServerToClientSerializer, interchange::ClientToServerDeserializer> Context;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Объект принимающий входящие подключения рендеринга
@@ -122,16 +132,24 @@ class Connection: public interchange::IConnection, public xtl::reference_counter
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Реализация сервера рендеринга
+///Исходящее соединение от сервера к серверу
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-class ServerImpl: public xtl::noncopyable, public xtl::trackable
+class OutputServerLoopbackConnection: public xtl::noncopyable
 {
   public:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструктор / деструктор
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    ServerImpl  ();
-    ~ServerImpl ();
+    OutputServerLoopbackConnection  (const char* name);
+    ~OutputServerLoopbackConnection ();
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Сообщения серверу
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void OnSizeChanged     (size_t width, size_t height);
+    void OnViewportChanged (size_t left, size_t top, size_t right, size_t bottom);
+    void OnHandleChanged   (void* handle);
+    void OnPaint           ();
 
   private:
     struct Impl;

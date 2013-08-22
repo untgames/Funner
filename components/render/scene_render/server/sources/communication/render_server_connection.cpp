@@ -38,11 +38,14 @@ struct Connection::Impl: public xtl::trackable
   {
     common::PropertyMap properties = common::parse_init_string (init_string);
 
-    stl::string initiator = properties.GetString ("initiator");
+    if (properties.IsPresent ("initiator"))
+    {
+      stl::string initiator = properties.GetString ("initiator");
 
-    response_connection = ConnectionPtr (interchange::ConnectionManager::CreateConnection (initiator.c_str (), "initiator=render::scene::server::Connection"), false);
-
-    context.SetCounterparty (response_connection.get ());
+      response_connection = ConnectionPtr (interchange::ConnectionManager::CreateConnection (initiator.c_str (), "initiator=render::scene::server::Connection"), false);
+   
+      context.SetCounterparty (response_connection.get ());
+    }
   } 
 };
 
