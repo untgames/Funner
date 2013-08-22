@@ -11,16 +11,17 @@
     Константы
 */
 
-const char* INPUT_FILE_NAME                   = "input/signatures.h";        //файл с сигнатурами
-const char* TEMPLATES_MASK                    = "input/templates/*";         //маска имён файлов-шаблонов
-const char* RESULT_DIR                        = "results";                   //каталог с результирующими файлами
-const char* SERIALIZE_PARAM_PREFIX            = "write";                     //префикс сериализации параметра
-const char* COMMAND_NAME_FUNC_NAME            = "get_command_name";          //имя функции получения имени команды
-const char* SERIALIZE_HEADER_PREFIX           = "BeginCommand(";             //префикс сериализации заголовка
-const char* SERIALIZE_TAIL                    = "EndCommand();";             //хвостовая сериализация
-const char* COMMAND_ID_ENUM_NAME              = "CommandId";                 //идентификатор команды
-const char* DESERIALIZER_DISPATCH_METHOD_NAME = "Deserializer::Deserialize"; //имя метода десериализации
-const char* DESERIALIZE_METHOD_NAME           = "read";                      //имя метода десериализации
+const char*  INPUT_FILE_NAME                   = "input/signatures.h";        //файл с сигнатурами
+const char*  TEMPLATES_MASK                    = "input/templates/*";         //маска имён файлов-шаблонов
+const char*  RESULT_DIR                        = "results";                   //каталог с результирующими файлами
+const char*  SERIALIZE_PARAM_PREFIX            = "write";                     //префикс сериализации параметра
+const char*  COMMAND_NAME_FUNC_NAME            = "get_command_name";          //имя функции получения имени команды
+const char*  SERIALIZE_HEADER_PREFIX           = "BeginCommand(";             //префикс сериализации заголовка
+const char*  SERIALIZE_TAIL                    = "EndCommand();";             //хвостовая сериализация
+const char*  COMMAND_ID_ENUM_NAME              = "CommandId";                 //идентификатор команды
+const char*  DESERIALIZER_DISPATCH_METHOD_NAME = "Deserializer::Deserialize"; //имя метода десериализации
+const char*  DESERIALIZE_METHOD_NAME           = "read";                      //имя метода десериализации
+const size_t COMMAND_ID_FIRST_USER_ID          = 10000;                       //первый индекс пользовательской команды
 
 /*
     Структуры
@@ -389,7 +390,7 @@ void dump_deserialization (const MethodArray& methods, stl::string& result, cons
     result += "      return true;\n";
   }
 
-  result += "    default:\n      return false;\n";
+  result += "    default:\n      return DeserializeUnknownCommand (id);\n";
   result += "  }\n}\n";
 }
 
@@ -403,6 +404,8 @@ void dump_enums (const MethodArray& methods, stl::string& result)
 
     result += common::format ("  %s_%s,\n", COMMAND_ID_ENUM_NAME, method.name.c_str ());
   }
+
+  result += common::format ("  %s_FirstUserDefined = %u,\n", COMMAND_ID_ENUM_NAME, methods.size () < COMMAND_ID_FIRST_USER_ID ? COMMAND_ID_FIRST_USER_ID : methods.size ());
 
   result += "};";
 }

@@ -3,6 +3,8 @@
 using namespace render::scene::server;
 using namespace render::scene;
 
+//TODO: server lost
+
 namespace
 {
 
@@ -42,6 +44,7 @@ struct Connection::Impl: public xtl::trackable
 /// Конструктор
   Impl (ServerImpl& in_server, const char* init_string)
     : server (&in_server)
+    , state (in_server)
     , context (state)
   {
     common::PropertyMap properties = common::parse_init_string (init_string);

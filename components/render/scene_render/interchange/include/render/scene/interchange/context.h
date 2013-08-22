@@ -32,7 +32,7 @@ template <class Deserializer> class IIncomingCommandsProcessor;
 /// онтекст обработки потоков данных рендеринга
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 template <class Serializer, class Deserializer>
-class Context: public Serializer, private Deserializer
+class Context: public Serializer, protected Deserializer
 {
   public:
 ///////////////////////////////////////////////////////////////////////////////////////////////////

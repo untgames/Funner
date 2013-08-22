@@ -35,10 +35,12 @@ namespace server
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 enum InternalCommandId
 {
-  InternalCommandId_OnSizeChanged = interchange::CommandId_FirstUserDefined,
-  InternalCommandId_OnViewportChanged,
-  InternalCommandId_OnHandleChanged,
-  InternalCommandId_OnPaint,
+  InternalCommandId_OnWindowAttached = interchange::CommandId_FirstUserDefined,
+  InternalCommandId_OnWindowDetached,
+  InternalCommandId_OnWindowSizeChanged,
+  InternalCommandId_OnWindowViewportChanged,
+  InternalCommandId_OnWindowHandleChanged,
+  InternalCommandId_OnWindowPaint,
 };
 
 typedef interchange::Context<interchange::ServerToClientSerializer, interchange::ClientToServerDeserializer> Context;
@@ -69,7 +71,7 @@ class ConnectionState: public xtl::noncopyable
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструктор / деструктор
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    ConnectionState  ();
+    ConnectionState  (ServerImpl&);
     ~ConnectionState ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -81,10 +83,12 @@ class ConnectionState: public xtl::noncopyable
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Внутренние команды
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void OnSizeChanged     (size_t width, size_t height);
-    void OnViewportChanged (size_t left, size_t top, size_t right, size_t bottom);
-    void OnHandleChanged   (void* handle);
-    void OnPaint           ();
+    void OnWindowAttached        (size_t window_id, const char* name, void* handle, size_t width, size_t height, size_t left, size_t top, size_t right, size_t bottom);
+    void OnWindowDetached        (size_t window_id);
+    void OnWindowSizeChanged     (size_t window_id, size_t width, size_t height);
+    void OnWindowViewportChanged (size_t window_id, size_t left, size_t top, size_t right, size_t bottom);
+    void OnWindowHandleChanged   (size_t window_id, void* handle);
+    void OnWindowPaint           (size_t window_id);
 
   private:
     struct Impl;
@@ -154,10 +158,12 @@ class ServerLoopbackConnection: public xtl::noncopyable
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Сообщения серверу
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void OnSizeChanged     (size_t width, size_t height);
-    void OnViewportChanged (size_t left, size_t top, size_t right, size_t bottom);
-    void OnHandleChanged   (void* handle);
-    void OnPaint           ();
+    void OnWindowAttached        (size_t id, const char* name, void* handle, size_t width, size_t height, size_t left, size_t top, size_t right, size_t bottom);
+    void OnWindowDetached        (size_t id);
+    void OnWindowSizeChanged     (size_t id, size_t width, size_t height);
+    void OnWindowViewportChanged (size_t id, size_t left, size_t top, size_t right, size_t bottom);
+    void OnWindowHandleChanged   (size_t id, void* handle);
+    void OnWindowPaint           (size_t id);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Обработка входящей команды

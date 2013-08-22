@@ -9,6 +9,7 @@ using namespace render::scene;
 
 struct ServerImpl::Impl
 {
+  server::WindowManager window_manager; //менеджер окон
 };
 
 /*
@@ -30,4 +31,13 @@ ServerImpl::ServerImpl ()
 
 ServerImpl::~ServerImpl ()
 {
+}
+
+/*
+    Менеджеры
+*/
+
+WindowManager& ServerImpl::WindowManager ()
+{
+  return impl->window_manager;
 }

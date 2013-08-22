@@ -88,36 +88,19 @@ ServerLoopbackConnection::~ServerLoopbackConnection ()
     Сообщения серверу
 */
 
-void ServerLoopbackConnection::OnSizeChanged (size_t width, size_t height)
+void ServerLoopbackConnection::OnWindowAttached (size_t id, const char* name, void* handle, size_t width, size_t height, size_t left, size_t top, size_t right, size_t bottom)
 {
   try
   {
     interchange::OutputStream& stream = impl->stream;
 
-    stream.BeginCommand (InternalCommandId_OnSizeChanged);
+    stream.BeginCommand (InternalCommandId_OnWindowAttached);
     
+    write (stream, uint32 (id));
+    write (stream, name);
+    write (stream, handle);
     write (stream, uint32 (width));
     write (stream, uint32 (height));
-
-    stream.EndCommand ();
-
-    impl->SendCommands ();
-  }
-  catch (xtl::exception& e)
-  {
-    e.touch ("render::scene::ServerLoopbackConnection::OnSizeChanged");
-    throw;
-  }
-}
-
-void ServerLoopbackConnection::OnViewportChanged (size_t left, size_t top, size_t right, size_t bottom)
-{
-  try
-  {
-    interchange::OutputStream& stream = impl->stream;
-
-    stream.BeginCommand (InternalCommandId_OnViewportChanged);
-    
     write (stream, uint32 (left));
     write (stream, uint32 (top));
     write (stream, uint32 (right));
@@ -129,19 +112,89 @@ void ServerLoopbackConnection::OnViewportChanged (size_t left, size_t top, size_
   }
   catch (xtl::exception& e)
   {
-    e.touch ("render::scene::ServerLoopbackConnection::OnViewportChanged");
+    e.touch ("render::scene::ServerLoopbackConnection::OnWindowAttached");
     throw;
   }
 }
 
-void ServerLoopbackConnection::OnHandleChanged (void* handle)
+void ServerLoopbackConnection::OnWindowDetached (size_t id)
 {
   try
   {
     interchange::OutputStream& stream = impl->stream;
 
-    stream.BeginCommand (InternalCommandId_OnHandleChanged);
+    stream.BeginCommand (InternalCommandId_OnWindowDetached);
     
+    write (stream, uint32 (id));
+
+    stream.EndCommand ();
+
+    impl->SendCommands ();
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::scene::ServerLoopbackConnection::OnWindowDetached");
+    throw;
+  }
+}
+
+void ServerLoopbackConnection::OnWindowSizeChanged (size_t id, size_t width, size_t height)
+{
+  try
+  {
+    interchange::OutputStream& stream = impl->stream;
+
+    stream.BeginCommand (InternalCommandId_OnWindowSizeChanged);
+    
+    write (stream, uint32 (id));
+    write (stream, uint32 (width));
+    write (stream, uint32 (height));
+
+    stream.EndCommand ();
+
+    impl->SendCommands ();
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::scene::ServerLoopbackConnection::OnWindowSizeChanged");
+    throw;
+  }
+}
+
+void ServerLoopbackConnection::OnWindowViewportChanged (size_t id, size_t left, size_t top, size_t right, size_t bottom)
+{
+  try
+  {
+    interchange::OutputStream& stream = impl->stream;
+
+    stream.BeginCommand (InternalCommandId_OnWindowViewportChanged);
+    
+    write (stream, uint32 (id));
+    write (stream, uint32 (left));
+    write (stream, uint32 (top));
+    write (stream, uint32 (right));
+    write (stream, uint32 (bottom));
+
+    stream.EndCommand ();
+
+    impl->SendCommands ();
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::scene::ServerLoopbackConnection::OnWindowViewportChanged");
+    throw;
+  }
+}
+
+void ServerLoopbackConnection::OnWindowHandleChanged (size_t id, void* handle)
+{
+  try
+  {
+    interchange::OutputStream& stream = impl->stream;
+
+    stream.BeginCommand (InternalCommandId_OnWindowHandleChanged);
+    
+    write (stream, uint32 (id));
     write (stream, handle);
 
     stream.EndCommand ();
@@ -150,25 +203,28 @@ void ServerLoopbackConnection::OnHandleChanged (void* handle)
   }
   catch (xtl::exception& e)
   {
-    e.touch ("render::scene::ServerLoopbackConnection::OnHandleChanged");
+    e.touch ("render::scene::ServerLoopbackConnection::OnWindowHandleChanged");
     throw;
   }
 }
 
-void ServerLoopbackConnection::OnPaint ()
+void ServerLoopbackConnection::OnWindowPaint (size_t id)
 {
   try
   {
     interchange::OutputStream& stream = impl->stream;
 
-    stream.BeginCommand (InternalCommandId_OnPaint);
+    stream.BeginCommand (InternalCommandId_OnWindowPaint);
+
+    write (stream, uint32 (id));
+
     stream.EndCommand ();
 
     impl->SendCommands ();
   }
   catch (xtl::exception& e)
   {
-    e.touch ("render::scene::ServerLoopbackConnection::OnPaint");
+    e.touch ("render::scene::ServerLoopbackConnection::OnWindowPaint");
     throw;
   }
 }
@@ -183,37 +239,69 @@ bool ServerLoopbackConnection::ProcessIncomingCommand (InternalCommandId id, int
   {
     switch (id)
     {
-      case InternalCommandId_OnSizeChanged:
+      case InternalCommandId_OnWindowAttached:
       {
-        size_t width  = read (stream, xtl::type<uint32> ()), 
-               height = read (stream, xtl::type<uint32> ());
+        size_t      id     = read (stream, xtl::type<uint32> ());
+        const char* name   = read (stream, xtl::type<const char*> ());
+        void*       handle = read (stream, xtl::type<void*> ());
+        size_t      width  = read (stream, xtl::type<uint32> ()), 
+                    height = read (stream, xtl::type<uint32> ()),
+                    left   = read (stream, xtl::type<uint32> ()),
+                    top    = read (stream, xtl::type<uint32> ()),
+                    right  = read (stream, xtl::type<uint32> ()),
+                    bottom = read (stream, xtl::type<uint32> ());
 
-        state.OnSizeChanged (width, height);
+        state.OnWindowAttached (id, name, handle, width, height, left, top, right, bottom);
 
         return true;
       }
-      case InternalCommandId_OnViewportChanged:
+      case InternalCommandId_OnWindowDetached:
       {
-        size_t left   = read (stream, xtl::type<uint32> ()), 
+        size_t id = read (stream, xtl::type<uint32> ());
+
+        state.OnWindowDetached (id);
+
+        return true;
+      }
+      case InternalCommandId_OnWindowSizeChanged:
+      {
+        size_t id     = read (stream, xtl::type<uint32> ()),
+               width  = read (stream, xtl::type<uint32> ()), 
+               height = read (stream, xtl::type<uint32> ());
+
+        state.OnWindowSizeChanged (id, width, height);
+
+        return true;
+      }
+      case InternalCommandId_OnWindowViewportChanged:
+      {
+        size_t id     = read (stream, xtl::type<uint32> ()),
+               left   = read (stream, xtl::type<uint32> ()), 
                top    = read (stream, xtl::type<uint32> ()),
                right  = read (stream, xtl::type<uint32> ()),
                bottom = read (stream, xtl::type<uint32> ());
 
-        state.OnViewportChanged (left, top, right, bottom);
+        state.OnWindowViewportChanged (id, left, top, right, bottom);
 
         return true;
       }
-      case InternalCommandId_OnHandleChanged:
+      case InternalCommandId_OnWindowHandleChanged:
       {
-        void* handle = read (stream, xtl::type<void*> ()); 
+        size_t id     = read (stream, xtl::type<uint32> ());
+        void*  handle = read (stream, xtl::type<void*> ()); 
 
-        state.OnHandleChanged (handle);
+        state.OnWindowHandleChanged (id, handle);
 
         return true;
       }
-      case InternalCommandId_OnPaint:
-        state.OnPaint ();
+      case InternalCommandId_OnWindowPaint:
+      {
+        size_t id = read (stream, xtl::type<uint32> ());
+
+        state.OnWindowPaint (id);
+
         return true;
+      }
       default:
         return false;
     }

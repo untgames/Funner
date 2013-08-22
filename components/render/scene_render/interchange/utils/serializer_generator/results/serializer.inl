@@ -38,7 +38,7 @@ template <class Dispatcher> inline bool ClientToServerDeserializer::Deserialize(
       dispatcher.UnloadResource(read(*this, xtl::type<const char*> ()));
       return true;
     default:
-      return false;
+      return DeserializeUnknownCommand (id);
   }
 }
 
@@ -63,7 +63,7 @@ template <class Dispatcher> inline bool ServerToClientDeserializer::Deserialize(
       dispatcher.Dummy();
       return true;
     default:
-      return false;
+      return DeserializeUnknownCommand (id);
   }
 }
 

@@ -11,3 +11,4 @@
 #include <common/strlib.h>
 
 #include <shared/server.h>
+#include <shared/window_manager.h>
