@@ -88,7 +88,7 @@ ServerLoopbackConnection::~ServerLoopbackConnection ()
     Сообщения серверу
 */
 
-void ServerLoopbackConnection::OnWindowAttached (size_t id, const char* name, void* handle, size_t width, size_t height, size_t left, size_t top, size_t right, size_t bottom)
+void ServerLoopbackConnection::OnWindowAttached (size_t id, const char* name, const char* init_string, void* handle, size_t width, size_t height, size_t left, size_t top, size_t right, size_t bottom)
 {
   try
   {
@@ -98,6 +98,7 @@ void ServerLoopbackConnection::OnWindowAttached (size_t id, const char* name, vo
     
     write (stream, uint32 (id));
     write (stream, name);
+    write (stream, init_string);
     write (stream, handle);
     write (stream, uint32 (width));
     write (stream, uint32 (height));
@@ -241,17 +242,18 @@ bool ServerLoopbackConnection::ProcessIncomingCommand (InternalCommandId id, int
     {
       case InternalCommandId_OnWindowAttached:
       {
-        size_t      id     = read (stream, xtl::type<uint32> ());
-        const char* name   = read (stream, xtl::type<const char*> ());
-        void*       handle = read (stream, xtl::type<void*> ());
-        size_t      width  = read (stream, xtl::type<uint32> ()), 
-                    height = read (stream, xtl::type<uint32> ()),
-                    left   = read (stream, xtl::type<uint32> ()),
-                    top    = read (stream, xtl::type<uint32> ()),
-                    right  = read (stream, xtl::type<uint32> ()),
-                    bottom = read (stream, xtl::type<uint32> ());
+        size_t      id           = read (stream, xtl::type<uint32> ());
+        const char  *name        = read (stream, xtl::type<const char*> ()),
+                    *init_string = read (stream, xtl::type<const char*> ());
+        void*       handle       = read (stream, xtl::type<void*> ());
+        size_t      width        = read (stream, xtl::type<uint32> ()),
+                    height       = read (stream, xtl::type<uint32> ()),
+                    left         = read (stream, xtl::type<uint32> ()),
+                    top          = read (stream, xtl::type<uint32> ()),
+                    right        = read (stream, xtl::type<uint32> ()),
+                    bottom       = read (stream, xtl::type<uint32> ());
 
-        state.OnWindowAttached (id, name, handle, width, height, left, top, right, bottom);
+        state.OnWindowAttached (id, name, init_string, handle, width, height, left, top, right, bottom);
 
         return true;
       }

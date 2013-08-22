@@ -1,3 +1,4 @@
+#include <stl/hash_map>
 #include <stl/string>
 
 #include <xtl/common_exceptions.h>
@@ -83,7 +84,7 @@ class ConnectionState: public xtl::noncopyable
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Внутренние команды
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void OnWindowAttached        (size_t window_id, const char* name, void* handle, size_t width, size_t height, size_t left, size_t top, size_t right, size_t bottom);
+    void OnWindowAttached        (size_t window_id, const char* name, const char* init_string, void* handle, size_t width, size_t height, size_t left, size_t top, size_t right, size_t bottom);
     void OnWindowDetached        (size_t window_id);
     void OnWindowSizeChanged     (size_t window_id, size_t width, size_t height);
     void OnWindowViewportChanged (size_t window_id, size_t left, size_t top, size_t right, size_t bottom);
@@ -158,7 +159,7 @@ class ServerLoopbackConnection: public xtl::noncopyable
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Сообщения серверу
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void OnWindowAttached        (size_t id, const char* name, void* handle, size_t width, size_t height, size_t left, size_t top, size_t right, size_t bottom);
+    void OnWindowAttached        (size_t id, const char* name, const char* init_string, void* handle, size_t width, size_t height, size_t left, size_t top, size_t right, size_t bottom);
     void OnWindowDetached        (size_t id);
     void OnWindowSizeChanged     (size_t id, size_t width, size_t height);
     void OnWindowViewportChanged (size_t id, size_t left, size_t top, size_t right, size_t bottom);
@@ -169,6 +170,30 @@ class ServerLoopbackConnection: public xtl::noncopyable
 ///Обработка входящей команды
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     static bool ProcessIncomingCommand (InternalCommandId id, interchange::InputStream&, ConnectionState& state);
+
+  private:
+    struct Impl;
+    stl::auto_ptr<Impl> impl;
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Внутренний менеджер окон
+///////////////////////////////////////////////////////////////////////////////////////////////////
+class ClientWindowManager: public xtl::noncopyable
+{
+  public:
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Конструктор / деструктор
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    ClientWindowManager  (ServerLoopbackConnection&);
+    ~ClientWindowManager ();
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Присоединение окон
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void AttachWindow     (const char* name, syslib::Window& window, const char* init_string);
+    void DetachWindow     (const char* name);
+    void DetachAllWindows ();
 
   private:
     struct Impl;

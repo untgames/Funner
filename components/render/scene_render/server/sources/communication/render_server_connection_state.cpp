@@ -50,11 +50,11 @@ void ConnectionState::UnloadResource (const char* name)
   throw xtl::make_not_implemented_exception (__FUNCTION__);
 }
 
-void ConnectionState::OnWindowAttached (size_t id, const char* name, void* handle, size_t width, size_t height, size_t left, size_t top, size_t right, size_t bottom)
+void ConnectionState::OnWindowAttached (size_t id, const char* name, const char* init_string, void* handle, size_t width, size_t height, size_t left, size_t top, size_t right, size_t bottom)
 {
   try
   {
-    impl->server.WindowManager ().AttachWindow (id, name, handle, width, height, manager::Rect (int (left), int (top), right - left, bottom - top));
+    impl->server.WindowManager ().AttachWindow (id, name, init_string, handle, width, height, manager::Rect (int (left), int (top), right - left, bottom - top));
   }
   catch (xtl::exception& e)
   {

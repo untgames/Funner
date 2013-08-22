@@ -11,11 +11,13 @@ struct Server::Impl
   ServerImpl               server;              //сервер рендеринга
   ConnectionAcceptor       acceptor;            //объект, принимающий входящие подключения
   ServerLoopbackConnection loopback_connection; //соединение для взаимодействия с сервером
+  ClientWindowManager      window_manager;      //менеджер окон
 
 /// Конструктор
   Impl (const char* name, ServerThreadingModel threading_model)
     : acceptor (name, server, threading_model)
     , loopback_connection (name)
+    , window_manager (loopback_connection)
   {
   }
 };
@@ -44,7 +46,7 @@ Server::Server (const char* name, ServerThreadingModel threading_model)
   }
   catch (xtl::exception& e)
   {
-    e.touch ("render::scene::server::Server");
+    e.touch ("render::scene::server::Server::Server");
     throw;
   }
 }
@@ -59,15 +61,39 @@ Server::~Server ()
 
 void Server::AttachWindow (const char* name, syslib::Window& window, const char* init_string)
 {
-  throw xtl::make_not_implemented_exception (__FUNCTION__);
+  try
+  {
+    impl->window_manager.AttachWindow (name, window, init_string);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::scene::server::Server::AttachWindow");
+    throw;
+  }
 }
 
 void Server::DetachWindow (const char* name)
 {
-  throw xtl::make_not_implemented_exception (__FUNCTION__);
+  try
+  {
+    impl->window_manager.DetachWindow (name);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::scene::server::Server::DetachWindow");
+    throw;
+  }
 }
 
 void Server::DetachAllWindows ()
 {
-  throw xtl::make_not_implemented_exception (__FUNCTION__);
+  try
+  {
+    impl->window_manager.DetachAllWindows ();
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::scene::server::Server::DetachAllWindows");
+    throw;
+  }
 }
