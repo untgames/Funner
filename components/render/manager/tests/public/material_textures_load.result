@@ -4,7 +4,7 @@ render.manager: Create device manager (driver='*', adapter='*', init_string='')
 render.manager: ...device manager and swap chain have been successfully created
 render.manager: Initialize render targets for swap chain
 render.manager: ...render targets for swap chain created
-window 784x562 added
+window 784x561 added
 render.manager: Loading material library 'data/test.xmtl' with 4 materials
 render.manager: ...loading material 'canyon.archway_1'
 render.manager: Material 'canyon.archway_1' created (id=1)
@@ -68,7 +68,7 @@ render.manager: Program parameters layout created (id=15)
 render.manager: ...create state block for material
 render.manager: ...material cache updated
 All resources have loaded
-window 784x562 removed
+window 784x561 removed
 render.manager: Program 'helper' destroyed for options = '' (id=10)
 render.manager: Program 'helper' common data destroyed (id=11)
 render.manager: Program 'shadow_map' destroyed for options = '' (id=8)

@@ -4,7 +4,7 @@ render.manager: Create device manager (driver='*', adapter='*', init_string='')
 render.manager: ...device manager and swap chain have been successfully created
 render.manager: Initialize render targets for swap chain
 render.manager: ...render targets for swap chain created
-window 784x562 added
+window 784x561 added
 render.manager: Effect blend state 'solid' loaded
 render.manager: Effect blend state 'transparent' loaded
 render.manager: Effect blend state 'additive' loaded
@@ -33,7 +33,7 @@ render.manager: Effect 'main' loaded
 render.manager: Effect 'shadow' loaded
 render.manager: Effect 'lighting' loaded
 Effects loaded
-window 784x562 removed
+window 784x561 removed
 render.manager: Program 'helper' destroyed for options = '' (id=5)
 render.manager: Program 'helper' common data destroyed (id=6)
 render.manager: Program 'shadow_map' destroyed for options = '' (id=3)
