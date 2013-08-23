@@ -21,7 +21,7 @@ typedef xtl::trackable_ptr<screen_keyboard_handle> screen_keyboard_ptr;
 struct syslib::window_handle: public MessageQueue::Handler
 {
   global_ref<jobject>  controller;                                //контроллер android окна
-  global_ref<jobject>  view;                                      //android окно  
+  global_ref<jobject>  view;                                      //android окно
   screen_keyboard_ptr  screen_keyboards [ScreenKeyboardType_Num]; //экранные клавиатуры
   WindowMessageHandler message_handler;                           //обработчик сообщений
   void*                user_data;                                 //пользовательские данные окна
@@ -306,7 +306,7 @@ struct syslib::window_handle: public MessageQueue::Handler
 
       //получение поверхности
 
-    local_ref<jobject> surface = check_errors (get_env ().CallObjectMethod (view.get (), get_surface_method));
+    local_ref<jobject> surface = check_errors (get_env ().CallObjectMethod (controller.get (), get_surface_method));
 
     if (!surface)
       throw xtl::format_operation_exception ("", "EngineViewController::getSurfaceThreadSafe failed");                  
@@ -1044,7 +1044,7 @@ bool AndroidWindowManager::GetBackgroundState (window_t window)
 
 struct syslib::screen_keyboard_handle: public xtl::reference_counter, public xtl::trackable
 {
-  global_ref<jobject> view;                       //android окно    
+  global_ref<jobject> view;                       //android окно
   global_ref<jobject> controller;                 //контроллер
   global_ref<jclass>  input_method_manager_class; //класс менеджера ввода
   global_ref<jobject> input_method_manager;       //менеджер ввода
