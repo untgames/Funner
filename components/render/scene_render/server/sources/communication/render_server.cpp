@@ -8,15 +8,13 @@ using namespace render::scene::server;
 
 struct Server::Impl
 {
-  ServerImpl               server;              //сервер рендеринга
   ConnectionAcceptor       acceptor;            //объект, принимающий входящие подключения
   ServerLoopbackConnection loopback_connection; //соединение для взаимодействия с сервером
   ClientWindowManager      window_manager;      //менеджер окон
 
 /// Конструктор
   Impl (const char* name, ServerThreadingModel threading_model)
-    : server (name)
-    , acceptor (name, server, threading_model)
+    : acceptor (name, threading_model)
     , loopback_connection (name)
     , window_manager (loopback_connection)
   {
@@ -103,7 +101,7 @@ void Server::DetachAllWindows ()
     Ожидание незавершенных операций
 */
 
-bool Server::Finish (size_t timeout_ms)
+bool Server::TryFinish (size_t timeout_ms)
 {
   try
   {
@@ -111,12 +109,18 @@ bool Server::Finish (size_t timeout_ms)
   }
   catch (xtl::exception& e)
   {
-    e.touch ("render::scene::server::Server::Finish");
+    e.touch ("render::scene::server::Server::TryFinish");
     throw;
   }  
 }
 
+void Server::Finish (size_t timeout_ms)
+{
+  if (!TryFinish (timeout_ms))
+    throw xtl::format_operation_exception ("render::scene::server::Server::Finish", "Can't finish queued tasks for %u ms", timeout_ms);
+}
+
 void Server::Finish ()
 {
-  while (!Finish (size_t (-1)));
+  Finish (size_t (-1));
 }

@@ -3,8 +3,6 @@
 using namespace render::scene::server;
 using namespace render::scene;
 
-//TODO: server lost
-
 namespace
 {
 
@@ -26,24 +24,19 @@ class ContextImpl: public Context
     ConnectionState& state;
 };
 
-}
-
-/*
-    Описание реализации соединения
-*/
-
 typedef xtl::com_ptr<interchange::IConnection> ConnectionPtr;
 
-struct Connection::Impl: public xtl::trackable
+/// Внутреннее состояние соединения
+struct ConnectionInternalState: public xtl::reference_counter
 {
-  xtl::trackable_ptr<ServerImpl> server;               //ссылка на сервер
-  ConnectionState                state;                //состояние соединения
-  ContextImpl                    context;              //контекст
-  ConnectionPtr                  response_connection;  //обратное соединение с клиентом
+  ServerImpl&     server;               //ссылка на сервер
+  ConnectionState state;                //состояние соединения
+  ContextImpl     context;              //контекст
+  ConnectionPtr   response_connection;  //обратное соединение с клиентом
 
 /// Конструктор
-  Impl (ServerImpl& in_server, const char* init_string)
-    : server (&in_server)
+  ConnectionInternalState (ServerImpl& in_server, const char* init_string)
+    : server (in_server)
     , state (in_server)
     , context (state)
   {
@@ -58,6 +51,32 @@ struct Connection::Impl: public xtl::trackable
       context.SetCounterparty (response_connection.get ());
     }
   } 
+};
+
+typedef xtl::intrusive_ptr<ConnectionInternalState> StatePtr;
+
+}
+
+/*
+    Описание реализации соединения
+*/
+
+struct Connection::Impl: public xtl::trackable
+{
+  StatePtr state; //внутреннее состояние соединения  
+
+/// Конструктор
+  Impl (ServerImpl& server, const char* init_string)
+    : state (new ConnectionInternalState (server, init_string), false)
+  {
+    connect_tracker (server.connect_tracker (xtl::bind (&Impl::OnServerShutdown, this)));
+  } 
+
+/// Оповещение об удалении сервера
+  void OnServerShutdown ()
+  {
+    state = StatePtr ();
+  }
 };
 
 /*
@@ -87,33 +106,6 @@ Connection::~Connection ()
 }
 
 /*
-    Рендер сцены
-*/
-
-ServerImpl& Connection::Server ()
-{
-  return *impl->server;
-}
-
-/*
-    Контекст
-*/
-
-server::Context& Connection::Context ()
-{
-  return impl->context;
-}
-
-/*
-    Состояние соединения
-*/
-
-ConnectionState& Connection::State ()
-{
-  return impl->state;
-}
-
-/*
     Обработка входного потока данных
 */
 
@@ -121,10 +113,10 @@ void Connection::ProcessCommands (const interchange::CommandBuffer& commands)
 {
   try
   {
-    if (!impl->server)
+    if (!impl->state)
       throw xtl::format_operation_exception ("", "Server is lost");
 
-    impl->context.ProcessCommands (commands);
+    impl->state->context.ProcessCommands (commands);
   }
   catch (xtl::exception& e)
   {
