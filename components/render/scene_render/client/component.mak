@@ -8,7 +8,7 @@ TARGETS += RENDER.SCENE_RENDER.CLIENT.TESTS
 RENDER.SCENE_RENDER.CLIENT.SOURCES.TYPE        := static-lib
 RENDER.SCENE_RENDER.CLIENT.SOURCES.NAME        := funner.render.scene_render.client
 RENDER.SCENE_RENDER.CLIENT.SOURCES.SOURCE_DIRS := sources
-RENDER.SCENE_RENDER.CLIENT.SOURCES.IMPORTS     := compile.render.scene_render.client compile.render.scene_render.interchange compile.common compile.system
+RENDER.SCENE_RENDER.CLIENT.SOURCES.IMPORTS     := compile.render.scene_render.client compile.render.scene_render.interchange compile.common compile.system compile.media.image
 
 #Цель - scene render server tests
 RENDER.SCENE_RENDER.CLIENT.TESTS.TYPE        := test-suite

@@ -96,4 +96,3 @@ render::manager::RenderManager& RenderManager::Manager ()
 {
   return impl->render_manager;
 }
-

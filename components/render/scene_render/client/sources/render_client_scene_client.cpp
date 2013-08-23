@@ -8,7 +8,7 @@ using namespace render::scene::client;
 
 struct Client::Impl: public xtl::reference_counter
 {
-  stl::auto_ptr<Connection> connection; //ссылка на соединение
+  ConnectionPtr connection; //ссылка на соединение
 };
 
 /*
@@ -27,7 +27,7 @@ Client::Client (const char* connection_name, const char* init_string, size_t log
 
     impl = new Impl;
 
-    impl->connection.reset (new Connection (connection_name, init_string, logon_timeout_ms));
+    impl->connection = ConnectionPtr (new Connection (connection_name, init_string, logon_timeout_ms), false);
   }
   catch (xtl::exception& e)
   {
@@ -67,9 +67,29 @@ const char* Client::Description () const
     Создание цели рендеринга
 */
 
+namespace
+{
+
+struct RenderTargetWrapper: public RenderTarget
+{
+  RenderTargetWrapper (RenderTargetImpl* impl) : RenderTarget (impl) {}
+};
+
+}
+
 RenderTarget Client::CreateRenderTarget (const char* target_name)
 {
-  throw xtl::make_not_implemented_exception (__FUNCTION__);
+  try
+  {
+    RenderTargetPtr render_target (new RenderTargetImpl (impl->connection, target_name), false);    
+
+    return RenderTargetWrapper (render_target.get ());
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::scene::client::Client::CreateRenderTarget");
+    throw;
+  }
 }
 
 /*
@@ -92,12 +112,34 @@ size_t Client::MaxDrawDepth () const
 
 void Client::LoadResource (const char* file_name)
 {
-  throw xtl::make_not_implemented_exception (__FUNCTION__);
+  try
+  {
+    if (!file_name)
+      throw xtl::make_null_argument_exception ("", "file_name");
+
+    impl->connection->Context ().LoadResource (file_name);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::scene::client::Client::LoadResource");
+    throw;
+  }
 }
 
 void Client::UnloadResource (const char* file_name)
 {
-  throw xtl::make_not_implemented_exception (__FUNCTION__);
+  try
+  {
+    if (!file_name)
+      throw xtl::make_null_argument_exception ("", "file_name");
+
+    impl->connection->Context ().UnloadResource (file_name);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::scene::client::Client::UnloadResource");
+    throw;
+  }
 }
 
 /*
