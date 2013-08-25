@@ -90,6 +90,8 @@ void FacebookSessionImpl::ShowWindow (const char* window_name, const WindowCallb
 
     dialog_web_view.reset (new syslib::WebView);
 
+    last_dialog_base_request = common::format ("https://m.facebook.com/dialog/%s", window_name);
+
     dialog_web_view_filter_connection     = dialog_web_view->RegisterFilter (xtl::bind (&FacebookSessionImpl::ProcessDialogRequest, this, _2, callback));
     dialog_web_view_load_start_connection = dialog_web_view->RegisterEventHandler (syslib::WebViewEvent_OnLoadStart, xtl::bind (&FacebookSessionImpl::ProcessDialogRequest, this, (const char*)0, callback));
     dialog_web_view_load_fail_connection  = dialog_web_view->RegisterEventHandler (syslib::WebViewEvent_OnLoadFail, xtl::bind (&FacebookSessionImpl::ProcessDialogFail, this, callback));
@@ -117,6 +119,12 @@ bool FacebookSessionImpl::ProcessDialogRequest (const char* request, const Windo
   if (request)
   {
     log.Printf ("Dialog load request '%s'", request);
+
+    if (request == last_dialog_base_request) //this url loads when user taps action button, so we needs to hide window after this
+    {
+      dialog_web_view->Window ().Hide ();
+      dialog_web_view->Window ().SetFocus (false);
+    }
 
     if (strstr (request, "fbconnect://success") == request) //dialog finished
     {
@@ -502,7 +510,19 @@ void FacebookSessionImpl::CloseDialogWebView ()
 
   if (dialog_web_view)
   {
-    dialog_web_view->Window ().Hide ();
+    try
+    {
+      dialog_web_view->Window ().Hide ();
+      dialog_web_view->Window ().SetFocus (false);
+    }
+    catch (xtl::exception& e)
+    {
+      log.Printf ("Exception while closing dialog web view: '%s'", e.what ());
+    }
+    catch (...)
+    {
+      log.Printf ("Unknown exception while closing dialog web view");
+    }
 
     common::ActionQueue::PushAction (xtl::bind (&delete_web_view, dialog_web_view), common::ActionThread_Main, DESTROY_WEB_VIEW_DELAY);
 
