@@ -20,6 +20,7 @@ public class EngineSurfaceViewController extends EngineViewController
   class EngineSurfaceView extends SurfaceView implements SurfaceHolder.Callback 
   {
     private boolean is_surface_created = false;
+    private boolean is_visible = false;
     private EngineSurfaceViewController controller;
     
     public EngineSurfaceView (Context context, EngineSurfaceViewController controller)
@@ -57,7 +58,22 @@ public class EngineSurfaceViewController extends EngineViewController
     {
       controller.onDrawCallback ();
     }
-     
+
+    @Override
+    protected void onWindowVisibilityChanged (int visibility)
+    {
+    	super.onWindowVisibilityChanged (visibility);
+
+    	boolean is_visible_now = visibility == View.VISIBLE;
+    	
+      if (is_visible == is_visible_now)
+      	return;
+    	
+    	is_visible = is_visible_now;
+    			
+    	controller.onVisibilityChange (is_visible);
+    }
+    
     @Override    
     public void surfaceChanged (SurfaceHolder holder, int format, int width, int height)
     {

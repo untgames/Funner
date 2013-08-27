@@ -35,6 +35,7 @@ struct syslib::window_handle: public MessageQueue::Handler
   jmethodID            layout_method;                             //метод установки размеров и положения окна
   jmethodID            set_visibility_method;                     //метод установки видимости окна
   jmethodID            get_visibility_method;                     //метод получения видимости окна
+  jmethodID            clear_focus_method;                        //метод отмены фокуса ввода
   jmethodID            request_focus_method;                      //метод запроса фокуса ввода
   jmethodID            set_background_color_method;               //метод установки цвета заднего плана окна
   jmethodID            maximize_method;                           //метод максимизации окна
@@ -297,6 +298,16 @@ struct syslib::window_handle: public MessageQueue::Handler
     else        Notify (WindowEvent_OnLostFocus, context);
   }
 
+  void OnVisibilityCallback (bool is_visible)
+  {
+    WindowEventContext context;
+
+    memset (&context, 0, sizeof (context));
+
+    if (is_visible) Notify (WindowEvent_OnShow, context);
+    else            Notify (WindowEvent_OnHide, context);
+  }
+
   void OnSurfaceCreatedCallback ()
   {
     if (is_surface_created)
@@ -513,6 +524,11 @@ void on_focus_callback (JNIEnv& env, jobject controller, jboolean gained)
   push_message (controller, xtl::bind (&window_handle::OnFocusCallback, _1, gained != 0));
 }
 
+void on_visibility_callback (JNIEnv& env, jobject controller, jboolean is_visible)
+{
+  push_message (controller, xtl::bind (&window_handle::OnVisibilityCallback, _1, is_visible != 0));
+}
+
 void on_surface_created_callback (JNIEnv& env, jobject controller)
 {
   try
@@ -589,6 +605,7 @@ window_t AndroidWindowManager::CreateWindow (WindowStyle, WindowMessageHandler h
     window->layout_method                    = find_method (&env, controller_class.get (), "layoutThreadSafe", "(IIII)V");
     window->set_visibility_method            = find_method (&env, controller_class.get (), "setVisibilityThreadSafe", "(I)V");
     window->get_visibility_method            = find_method (&env, controller_class.get (), "getVisibilityThreadSafe", "()I");
+    window->clear_focus_method               = find_method (&env, controller_class.get (), "clearFocusThreadSafe", "(Landroid/content/Context;)V");
     window->request_focus_method             = find_method (&env, controller_class.get (), "requestFocusThreadSafe", "()Z");
     window->bring_to_front_method            = find_method (&env, controller_class.get (), "bringToFrontThreadSafe", "()V");
     window->set_background_color_method      = find_method (&env, controller_class.get (), "setBackgroundColorThreadSafe", "(I)V");
@@ -837,8 +854,16 @@ void AndroidWindowManager::SetWindowFlag (window_t window, WindowFlag flag, bool
         check_errors ();
         break;
       case WindowFlag_Focus:
-        if (!check_errors (env.CallBooleanMethod (window->controller.get (), window->request_focus_method)))
-          throw xtl::format_operation_exception ("", "EngineViewController::requestFocusThreadSafe failed");
+        if (state)
+        {
+          if (!check_errors (env.CallBooleanMethod (window->controller.get (), window->request_focus_method)))
+            throw xtl::format_operation_exception ("", "EngineViewController::requestFocusThreadSafe failed");
+        }
+        else
+        {
+          env.CallVoidMethod (window->controller.get (), window->clear_focus_method, get_activity ());
+          check_errors ();
+        }
 
         break;
       case WindowFlag_Maximized:
@@ -1226,6 +1251,7 @@ void register_window_callbacks (JNIEnv* env)
       {"onSurfaceCreatedCallback", "()V", (void*)&on_surface_created_callback},
       {"onSurfaceDestroyedCallback", "()V", (void*)&on_surface_destroyed_callback},
       {"onSurfaceChangedCallback", "(III)V", (void*)&on_surface_changed_callback},
+      {"onVisibilityCallback", "(Z)V", (void*)&on_visibility_callback},
     };
 
     static const size_t methods_count = sizeof (methods) / sizeof (*methods);

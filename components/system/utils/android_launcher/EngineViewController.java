@@ -12,6 +12,7 @@ import android.graphics.Canvas;
 import android.graphics.Rect;
 import android.widget.AbsoluteLayout;
 import android.view.InputDevice;
+import android.view.inputmethod.InputMethodManager;
 import android.content.Context;
 import android.util.*;
 import java.io.*;
@@ -229,6 +230,22 @@ public class EngineViewController implements View.OnTouchListener, View.OnKeyLis
     });
   }
   
+  public void clearFocusThreadSafe (final Context context)
+  {
+    UiDispatch.run (view, new UiRunnable () {
+      public Object run ()
+      {
+        view.clearFocus ();
+        
+        InputMethodManager input_manager = (InputMethodManager)context.getSystemService (Context.INPUT_METHOD_SERVICE);
+        
+        input_manager.hideSoftInputFromWindow (view.getWindowToken (), 0);
+        
+        return null;
+      }
+    });
+  }
+  
   public boolean requestFocusThreadSafe ()
   {
     Boolean result = (Boolean)UiDispatch.run (view, new UiRunnable () {
@@ -257,6 +274,7 @@ public class EngineViewController implements View.OnTouchListener, View.OnKeyLis
   public native void onSurfaceCreatedCallback   ();
   public native void onSurfaceChangedCallback   (int format, int width, int height);  
   public native void onSurfaceDestroyedCallback ();  
+  public native void onVisibilityCallback       (boolean is_visible);
   
   @Override
   public boolean onTouch (View v, MotionEvent event)
@@ -303,5 +321,10 @@ public class EngineViewController implements View.OnTouchListener, View.OnKeyLis
   public void onFocusChange (View v, boolean has_focus)
   {
     onFocusCallback (has_focus);
+  }
+  
+  public void onVisibilityChange (boolean is_visible)
+  {
+    onVisibilityCallback (is_visible);
   }
 }
