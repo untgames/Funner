@@ -1348,8 +1348,15 @@ void FileSystem::AddSearchPath (const char* path,const LogHandler& log_handler)
   FileSystemSingleton::Instance ()->AddSearchPath (path,log_handler);
 }
 
-static void DummyLogHandler (const char*)
+static void DummyLogHandler (const char* message)
 {
+  try
+  {
+    Log (LOG_NAME).Print (message);
+  }
+  catch (...)
+  {
+  }
 }
 
 void FileSystem::AddSearchPath (const char* path)
