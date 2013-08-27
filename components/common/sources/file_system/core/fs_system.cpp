@@ -423,6 +423,8 @@ void FileSystemImpl::AddSearchPath (const char* _path,const LogHandler& log_hand
 
   FileInfo file_info;
 
+  memset (&file_info, 0, sizeof (file_info));
+
   ICustomFileSystemPtr owner_file_system = FindFileSystem (path.c_str (),mount_path,&prefix,true);
 
   if (!owner_file_system || (!mount_path.empty () && !owner_file_system->GetFileInfo (mount_path.c_str (),file_info)))
@@ -442,7 +444,7 @@ void FileSystemImpl::AddSearchPath (const char* _path,const LogHandler& log_hand
   if (path [0] != '/')
     path = format ("%s%s",prefix.c_str (),path.c_str ());        
 
-  if (file_info.is_dir)
+  if (file_info.is_dir || mount_path.empty ())
   {
     for (SearchPathList::iterator i=search_paths.begin ();i!=search_paths.end ();++i)
       if (i->hash == path_hash)
@@ -920,7 +922,7 @@ ICustomFileSystemPtr FileSystemImpl::FindFileSystem (const char* src_file_name,s
   LoadFileSystems ();  
 
   string file_name = FileSystem::GetNormalizedFileName (src_file_name);
-  
+
     //обработка символьных ссылок
 
   size_t replacement_count = 0;      
