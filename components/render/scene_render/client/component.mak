@@ -11,6 +11,8 @@ RENDER.SCENE_RENDER.CLIENT.SOURCES.SOURCE_DIRS := sources
 RENDER.SCENE_RENDER.CLIENT.SOURCES.IMPORTS     := compile.render.scene_render.client compile.render.scene_render.interchange compile.common compile.system compile.media.image
 
 #Цель - scene render server tests
-RENDER.SCENE_RENDER.CLIENT.TESTS.TYPE        := test-suite
-RENDER.SCENE_RENDER.CLIENT.TESTS.SOURCE_DIRS := tests
-RENDER.SCENE_RENDER.CLIENT.TESTS.IMPORTS     := compile.render.scene_render.client link.render.scene_render.client compile.render.scene_render.interchange compile.common
+RENDER.SCENE_RENDER.CLIENT.TESTS.TYPE         := test-suite
+RENDER.SCENE_RENDER.CLIENT.TESTS.SOURCE_DIRS  := tests
+RENDER.SCENE_RENDER.CLIENT.TESTS.INCLUDE_DIRS := sources
+RENDER.SCENE_RENDER.CLIENT.TESTS.IMPORTS      := compile.render.scene_render.client link.render.scene_render.client compile.render.scene_render.interchange compile.common \
+                                                 compile.media.image compile.system

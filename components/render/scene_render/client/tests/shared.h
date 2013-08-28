@@ -2,6 +2,8 @@
 
 #include <exception>
 
+#include <stl/vector>
+
 #include <xtl/function.h>
 #include <xtl/intrusive_ptr.h>
 #include <xtl/reference_counter.h>
@@ -14,4 +16,6 @@
 
 #include <render/scene/interchange/connection_manager.h>
 
-using namespace render;
+#include "../sources/shared.h"
+
+using namespace render::scene::client;
