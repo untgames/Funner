@@ -100,6 +100,7 @@ struct DefaultDevice::Impl : private xtl::trackable
                                       WindowEvent_OnScreenLock,
                                       WindowEvent_OnScreenUnlock,
                                       WindowEvent_OnSize,
+                                      WindowEvent_OnChangeHandle,
       };
 
       static size_t events_num = sizeof (events) / sizeof (*events);
@@ -380,6 +381,10 @@ struct DefaultDevice::Impl : private xtl::trackable
         break;
       case WindowEvent_OnSize:
         Notify ("Window resized");
+        break;
+      case WindowEvent_OnChangeHandle:
+        xsnprintf (message, MESSAGE_BUFFER_SIZE, "Window change_handle %u", window_event_context.handle);
+        Notify (message);
         break;
       default:
         break;
