@@ -230,6 +230,18 @@ inline const uint8&   read (InputStream& s, xtl::type<uint8>)   { return s.Read<
 inline const float32& read (InputStream& s, xtl::type<float32>) { return s.Read<float32> (); }
 inline const Command& read (InputStream& s, xtl::type<Command>) { return s.Read<Command> (); }
 
+template <class T>
+inline const T& read (InputStream& s, xtl::type<T&>)
+{
+  return read (s, xtl::type<T> ());
+}
+
+template <class T>
+inline const T& read (InputStream& s, xtl::type<const T&>)
+{
+  return read (s, xtl::type<T> ());
+}
+
 inline void write (OutputStream& s, const char* str)
 {
   if (!str)
@@ -247,4 +259,40 @@ inline const char* read (InputStream& s, xtl::type<const char*>)
   int32 length = s.Read<int32> ();
 
   return reinterpret_cast<const char*> (s.ReadData (length + 1));
+}
+
+template <class T, unsigned int Size>
+inline void write (OutputStream& s, const math::vector<T, Size>& value)
+{
+  s.Write (value);
+}
+
+template <class T, unsigned int Size>
+inline void write (OutputStream& s, const math::matrix<T, Size>& value)
+{
+  s.Write (value);
+}
+
+template <class T>
+inline void write (OutputStream& s, const math::quat<T>& value)
+{
+  s.Write (value);
+}
+
+template <class T, unsigned int Size>
+inline const math::vector<T, Size>& read (InputStream& s, xtl::type<math::vector<T, Size> >)
+{
+  return s.Read<math::vector<T, Size> > ();
+}
+
+template <class T, unsigned int Size>
+inline const math::matrix<T, Size>& read (InputStream& s, xtl::type<math::matrix<T, Size> >)
+{
+  return s.Read<math::matrix<T, Size> > ();
+}
+
+template <class T>
+inline const math::quat<T>& read (InputStream& s, xtl::type<math::quat<T> >)
+{
+  return s.Read<math::quat<T> > ();
 }

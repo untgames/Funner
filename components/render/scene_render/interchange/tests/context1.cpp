@@ -3,6 +3,119 @@
 namespace
 {
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Сериализатор команд от клиента к серверу
+///////////////////////////////////////////////////////////////////////////////////////////////////
+class MyClientToServerSerializer: private OutputStream
+{
+  public:
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Доступные команды сериализации (кодогенерация)
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void LoadResource(const char* name);
+    void UnloadResource(const char* name);
+
+  protected:
+    using OutputStream::Swap;
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Десериализатор команд от клиента к серверу
+///////////////////////////////////////////////////////////////////////////////////////////////////
+class MyClientToServerDeserializer: public BasicDeserializer, public InputStream
+{
+  public:
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Диспетчер десериализации
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    template <class Dispatcher> bool Deserialize (CommandId id, Dispatcher& dispatcher);
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Сериализатор команд от сервера к клиенту
+///////////////////////////////////////////////////////////////////////////////////////////////////
+class MyServerToClientSerializer: private OutputStream
+{
+  public:
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Доступные команды сериализации (кодогенерация)
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+    void Dummy();
+
+  protected:
+    using OutputStream::Swap;
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Десериализатор команд от сервера к клиенту
+///////////////////////////////////////////////////////////////////////////////////////////////////
+class MyServerToClientDeserializer: public BasicDeserializer, public InputStream
+{
+  public:
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Диспетчер десериализации
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    template <class Dispatcher> bool Deserialize (CommandId id, Dispatcher& dispatcher);
+};
+
+/*
+    Client to server
+*/
+
+inline void MyClientToServerSerializer::LoadResource(const char* name)
+{
+  BeginCommand(CommandId_LoadResource);
+  write(*this, name);
+  EndCommand();
+}
+
+inline void MyClientToServerSerializer::UnloadResource(const char* name)
+{
+  BeginCommand(CommandId_UnloadResource);
+  write(*this, name);
+  EndCommand();
+}
+
+template <class Dispatcher> inline bool MyClientToServerDeserializer::Deserialize(CommandId id, Dispatcher& dispatcher)
+{
+  switch (id)
+  {
+    case CommandId_LoadResource:
+      dispatcher.LoadResource(read(*this, xtl::type<const char*> ()));
+      return true;
+    case CommandId_UnloadResource:
+      dispatcher.UnloadResource(read(*this, xtl::type<const char*> ()));
+      return true;
+    default:
+      return DeserializeUnknownCommand (id);
+  }
+}
+
+
+/*
+    Server to client
+*/
+
+inline void MyServerToClientSerializer::Dummy()
+{
+  BeginCommand(CommandId_Dummy);
+
+  EndCommand();
+}
+
+template <class Dispatcher> inline bool MyServerToClientDeserializer::Deserialize(CommandId id, Dispatcher& dispatcher)
+{
+  switch (id)
+  {
+    case CommandId_Dummy:
+      dispatcher.Dummy();
+      return true;
+    default:
+      return DeserializeUnknownCommand (id);
+  }
+}
+
 class Processor
 {
   public:
@@ -58,8 +171,8 @@ int main ()
 
     common::LogFilter filter ("render.*", &print_log);
 
-    typedef Connection<ClientToServerSerializer, ServerToClientDeserializer> ClientToServer;
-    typedef Connection<ServerToClientSerializer, ClientToServerDeserializer> ServerToClient;
+    typedef Connection<MyClientToServerSerializer, MyServerToClientDeserializer> ClientToServer;
+    typedef Connection<MyServerToClientSerializer, MyClientToServerDeserializer> ServerToClient;
 
     xtl::com_ptr<ClientToServer> client_to_server (new ClientToServer ("Client"), false);
     xtl::com_ptr<ServerToClient> server_to_client (new ServerToClient ("Server"), false);

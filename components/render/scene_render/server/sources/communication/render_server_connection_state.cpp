@@ -50,6 +50,214 @@ void ConnectionState::UnloadResource (const char* name)
   throw xtl::make_not_implemented_exception (__FUNCTION__);
 }
 
+void ConnectionState::CreateViewport (uint32 id)
+{
+  try
+  {
+    throw xtl::make_not_implemented_exception (__FUNCTION__);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::scene::ConnectionState::CreateViewport");
+    throw;
+  }
+}
+
+void ConnectionState::SetViewportArea (uint32 id, int8 left, int8 top, int8 width, int8 height)
+{
+  try
+  {
+    throw xtl::make_not_implemented_exception (__FUNCTION__);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::scene::ConnectionState::SetViewportArea");
+    throw;
+  }
+}
+
+void ConnectionState::SetViewportZOrder (uint32 id, int8 zorder)
+{
+  try
+  {
+    throw xtl::make_not_implemented_exception (__FUNCTION__);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::scene::ConnectionState::SetViewportZOrder");
+    throw;
+  }
+}
+
+void ConnectionState::SetViewportActive (uint32 id, bool8 is_active)
+{
+  try
+  {
+    throw xtl::make_not_implemented_exception (__FUNCTION__);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::scene::ConnectionState::SetViewportActive");
+    throw;
+  }
+}
+
+void ConnectionState::SetViewportName (uint32 id, const char* name)
+{
+  try
+  {
+    throw xtl::make_not_implemented_exception (__FUNCTION__);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::scene::ConnectionState::SetViewportName");
+    throw;
+  }
+}
+
+void ConnectionState::SetViewportTechnique (uint32 id, const char* name)
+{
+  try
+  {
+    throw xtl::make_not_implemented_exception (__FUNCTION__);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::scene::ConnectionState::SetViewportTechnique");
+    throw;
+  }
+}
+
+void ConnectionState::SetViewportBackground (uint32 id, bool8 state, const math::vec4f& color)
+{
+  try
+  {
+    throw xtl::make_not_implemented_exception (__FUNCTION__);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::scene::ConnectionState::SetViewportBackground");
+    throw;
+  }
+}
+
+void ConnectionState::DestroyViewport (uint32 id)
+{
+  try
+  {
+    throw xtl::make_not_implemented_exception (__FUNCTION__);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::scene::ConnectionState::DestroyViewport");
+    throw;
+  }
+}
+
+void ConnectionState::CreateRenderTarget (uint32 id, const char* name)
+{
+  try
+  {
+    throw xtl::make_not_implemented_exception (__FUNCTION__);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::scene::ConnectionState::CreateRenderTarget");
+    throw;
+  }
+}
+
+void ConnectionState::DestroyRenderTarget (uint32 id)
+{
+  try
+  {
+    throw xtl::make_not_implemented_exception (__FUNCTION__);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::scene::ConnectionState::DestroyRenderTarget");
+    throw;
+  }
+}
+
+void ConnectionState::SetRenderTargetActive (uint32 id, bool8 active)
+{
+  try
+  {
+    throw xtl::make_not_implemented_exception (__FUNCTION__);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::scene::ConnectionState::SetRenderTargetActive");
+    throw;
+  }
+}
+
+void ConnectionState::SetRenderTargetScreenArea (uint32 id, int8 left, int8 top, int8 width, int8 height)
+{
+  try
+  {
+    throw xtl::make_not_implemented_exception (__FUNCTION__);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::scene::ConnectionState::SetRenderTargetScreenArea");
+    throw;
+  }
+}
+
+void ConnectionState::SetRenderTargetBackground (uint32 id, bool8 state, const math::vec4f& color)
+{
+  try
+  {
+    throw xtl::make_not_implemented_exception (__FUNCTION__);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::scene::ConnectionState::SetRenderTargetBackground");
+    throw;
+  }
+}
+
+void ConnectionState::AttachViewportToRenderTarget (uint32 render_target_id, uint32 viewport_id)
+{
+  try
+  {
+    throw xtl::make_not_implemented_exception (__FUNCTION__);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::scene::ConnectionState::AttachViewportToRenderTarget");
+    throw;
+  }
+}
+
+void ConnectionState::DetachViewportFromRenderTarget (uint32 render_target_id, uint32 viewport_id)
+{
+  try
+  {
+    throw xtl::make_not_implemented_exception (__FUNCTION__);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::scene::ConnectionState::DetachViewportFromRenderTarget");
+    throw;
+  }
+}
+
+void ConnectionState::UpdateRenderTarget (uint32 id)
+{
+  try
+  {
+    throw xtl::make_not_implemented_exception (__FUNCTION__);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::scene::ConnectionState::UpdateRenderTarget");
+    throw;
+  }
+}
+
 void ConnectionState::OnWindowAttached (size_t id, const char* name, const char* init_string, void* handle, size_t width, size_t height, size_t left, size_t top, size_t right, size_t bottom)
 {
   try

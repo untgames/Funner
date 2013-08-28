@@ -4,6 +4,10 @@
 #include <xtl/common_exceptions.h>
 #include <xtl/type.h>
 
+#include <math/matrix.h>
+#include <math/quat.h>
+#include <math/vector.h>
+
 #include <render/scene/interchange/command_buffer.h>
 
 namespace render
@@ -133,6 +137,13 @@ void write (OutputStream&, uint8);
 void write (OutputStream&, float32);
 void write (OutputStream&, const char*);
 
+template <class T, unsigned int Size> void write (OutputStream&, const math::vector<T, Size>&);
+template <class T, unsigned int Size> void write (OutputStream&, const math::matrix<T, Size>&);
+template <class T>                    void write (OutputStream&, const math::quat<T>&);
+
+template <class T> const T& read (InputStream&, xtl::type<T&>);
+template <class T> const T& read (InputStream&, xtl::type<const T&>);
+
 const int32&   read (InputStream&, xtl::type<int32>);
 const uint32&  read (InputStream&, xtl::type<uint32>);
 const int16&   read (InputStream&, xtl::type<int16>);
@@ -142,6 +153,10 @@ const uint8&   read (InputStream&, xtl::type<uint8>);
 const float32& read (InputStream&, xtl::type<float32>);
 const Command& read (InputStream&, xtl::type<Command>);
 const char*    read (InputStream&, xtl::type<const char*>);
+
+template <class T, unsigned int Size> const math::vector<T, Size>& read (InputStream&, xtl::type<math::vector<T, Size> >);
+template <class T, unsigned int Size> const math::matrix<T, Size>& read (InputStream&, xtl::type<math::matrix<T, Size> >);
+template <class T>                    const math::quat<T>&         read (InputStream&, xtl::type<math::quat<T> >);
 
 #include <render/scene/interchange/detail/streams.inl>
 

@@ -10,35 +10,53 @@ struct RenderableView::Impl: public scene_graph::IViewportListener
 {
   ConnectionPtr                     connection;                   //соединение
   scene_graph::Viewport&            viewport;                     //ссылка на область вывода
+  size_t                            id;                           //идентификатор области вывода
   common::PropertyMap::EventHandler properties_update_handler;    //обработчик обновлени€ свойств
   xtl::auto_connection              properties_update_connection; //соединение обновлени€ свойств
   bool                              is_active;                    //активна ли области отрисовки
   bool                              need_reconfiguration;         //конфигураци€ изменена
   bool                              need_update_renderer;         //требуетс€ обновить рендер
-  bool                              need_update_render_targets;   //требуетс€ обновить буферы отрисовки
   bool                              need_update_background;       //требуетс€ обновить параметры очистки
   bool                              need_update_camera;           //требуетс€ обновить камеру
   bool                              need_update_properties;       //требуетс€ обновление свойств
+  bool                              need_update_activity;         //требуетс€ обновление активности области вывода
+  bool                              need_update_name;             //требуетс€ обновление имени
+  bool                              need_update_area;             //требуетс€ обновление области вывода
 
 ///  онструктор
   Impl (const ConnectionPtr& in_connection, scene_graph::Viewport& in_viewport)
     : connection (in_connection)
     , viewport (in_viewport)
+    , id ()
     , properties_update_handler (xtl::bind (&Impl::OnPropertiesUpdate, this))
     , is_active (viewport.IsActive ())
     , need_reconfiguration (true)
     , need_update_renderer (true)
-    , need_update_render_targets (true)    
     , need_update_background (true)
     , need_update_camera (true)
     , need_update_properties (true)
+    , need_update_activity (true)
+    , need_update_name (true)
+    , need_update_area (true)
   {
     if (!connection)
       throw xtl::make_null_argument_exception ("", "connection");
 
-    properties_update_connection = viewport.Properties ().RegisterEventHandler (common::PropertyMapEvent_OnUpdate, properties_update_handler);
+    id = connection->Client ().AllocateId (ObjectType_Viewport);
 
-    viewport.AttachListener (this);    
+    connection->Context ().CreateViewport (id);
+
+    try
+    {
+      properties_update_connection = viewport.Properties ().RegisterEventHandler (common::PropertyMapEvent_OnUpdate, properties_update_handler);          
+
+      viewport.AttachListener (this);
+    }
+    catch (...)
+    {
+      connection->Context ().DestroyViewport (id);
+      throw;
+    }
   }
 
 /// ƒеструктор
@@ -47,6 +65,10 @@ struct RenderableView::Impl: public scene_graph::IViewportListener
     try
     {
       viewport.DetachListener (this);
+
+      connection->Context ().DestroyViewport (id);
+
+      connection->Client ().DeallocateId (ObjectType_Viewport, id);
     }
     catch (...)
     {
@@ -56,8 +78,15 @@ struct RenderableView::Impl: public scene_graph::IViewportListener
 ///ќбласть вывода обновлена
   void OnViewportChangeArea (const scene_graph::Rect&)
   {
-    need_reconfiguration       = true;
-    need_update_render_targets = true;
+    need_reconfiguration = true;
+    need_update_area     = true;
+  }
+
+///»м€ обновлено
+  void OnViewportChangeName (const char*)
+  {
+    need_reconfiguration = true;
+    need_update_name     = true;
   }
 
 ///»зменена камера
@@ -71,6 +100,7 @@ struct RenderableView::Impl: public scene_graph::IViewportListener
   void OnViewportChangeActive (bool)
   {
     need_reconfiguration = true;
+    need_update_activity = true;
   }
   
 ///»зменены параметры очистки области вывода
@@ -109,26 +139,50 @@ struct RenderableView::Impl: public scene_graph::IViewportListener
     {
       if (!need_reconfiguration)
         return;
+
+      Context& context = connection->Context ();
+
+        //переконфигураци€ имени
+
+      if (need_update_name)
+      {
+        context.SetViewportName (id, viewport.Name ());
+
+        need_update_name = false;
+      }
         
+        //переконфигураци€ области вывода
+
+      if (need_update_area)
+      {
+        const scene_graph::Rect& r = viewport.Area ();
+
+        context.SetViewportArea (id, r.x, r.y, r.width, r.height);
+      }
+
         //переконфигураци€ рендера
         
       if (need_update_renderer)
       {        
+        context.SetViewportTechnique (id, viewport.Technique ());
 
-        need_update_renderer       = false;
+        need_update_renderer = false;
       }
 
         //переконфигураци€ активности
 
-      if (is_active != viewport.IsActive ())
+      if (need_update_activity)
       {
-        //????
+        context.SetViewportActive (id, viewport.IsActive ());
+
+        need_update_activity = false;
       }
             
         //переконфигураци€ параметров очистки
         
       if (need_update_background)
       {
+        context.SetViewportBackground (id, viewport.BackgroundState (), viewport.BackgroundColor ());
 
         need_update_background = false;
       }
@@ -137,22 +191,16 @@ struct RenderableView::Impl: public scene_graph::IViewportListener
 
       if (need_update_camera)
       {
+        //?????????????
 
         need_update_camera = false;
       }
-
-        //переконфигураци€ целевых буферов отрисовки
-        
-      if (need_update_render_targets)
-      {        
-        
-        need_update_render_targets = false;
-      }     
       
         //переконфигураци€ свойств
 
       if (need_update_properties)
       {
+        //?????????????
 
         need_update_properties = false;
       }
@@ -195,6 +243,15 @@ RenderableView::~RenderableView ()
 const scene_graph::Viewport& RenderableView::Viewport ()
 {
   return impl->viewport;
+}
+
+/*
+    »дентификатор
+*/
+
+render::scene::interchange::uint8 RenderableView::Id ()
+{
+  return impl->id;
 }
 
 /*

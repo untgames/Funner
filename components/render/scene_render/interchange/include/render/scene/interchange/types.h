@@ -20,6 +20,7 @@ typedef unsigned short uint16;
 typedef   signed char  int8;
 typedef unsigned char  uint8;
 typedef float          float32;
+typedef int8           bool8;
 
 typedef uint32         command_id_t;
 
