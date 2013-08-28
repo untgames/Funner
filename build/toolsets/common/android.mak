@@ -257,6 +257,7 @@ define process_target.android-pak
   $1.JARS              := $$($1.JARS)
   $1.CLASSES_DIR       := $$($1.TMP_DIR)/classes
   $1.CLASSES_FLAG      := $$($1.TMP_DIR)/compilation-flag
+  $1.JAR_CLASSES_FLAG  := $$($1.TMP_DIR)/jar-extract-flag
   $1.COMPILER_FLAGS    := $(COMMON_JAVA_FLAGS) $$($1.COMPILER_FLAGS)
   $1.MANIFEST_FILE     := $$(call specialize_paths,$$($1.MANIFEST_FILE))
   $1.R_DIR             := $$($1.TMP_DIR)/r_files
@@ -290,9 +291,14 @@ endif
 		
   .PHONY: create-dirs
   
-  $$($1.CLASSES_FLAG): $$($1.SOURCE_FILES) $$($1.JARS) $$($1.PACKAGED_RES_FILE)
+  $$($1.CLASSES_FLAG): $$($1.SOURCE_FILES) $$($1.JARS) $$($1.PACKAGED_RES_FILE) $$($1.JAR_CLASSES_FLAG)
 		@echo Compile sources for $$(notdir $$($1.TARGET))...
 		@export R_FILES=$$$$(/usr/bin/find $$($1.R_DIR) -name '*.java') && $(JAVA_CC) $$($1.SOURCE_FILES) $$$$R_FILES $$($1.COMPILER_FLAGS) -d $$($1.CLASSES_DIR) -classpath '$(ANDROID_JAR)$$(if $$($1.JARS),$(PATH_SEPARATOR)$$(subst ; ,$(PATH_SEPARATOR),$$($1.JARS:%=%$(PATH_SEPARATOR))))'
+		@touch $$@
+
+  $$($1.JAR_CLASSES_FLAG): $$($1.JARS)
+		@echo Unpack jar files...
+		@cd $$($1.CLASSES_DIR) && $$(foreach jar,$$($1.JARS), $(JAVA_JAR) xf "$(CURDIR)/$$(jar)" && ) true
 		@touch $$@
   
   $$($1.DEX_FILE): $$($1.CLASSES_FLAG)
