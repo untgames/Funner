@@ -41,15 +41,15 @@ typedef xtl::com_ptr<interchange::IConnection> ConnectionPtr;
 
 struct Connection::Impl: public xtl::reference_counter, public xtl::trackable
 {
-  stl::string                response_connection_name;    //имя соединения для ответов
-  syslib::Condition          logon_ack_waiter;            //семафор ожидания ответа на логин
-  syslib::Mutex              mutex;                       //мьютекс данных
-  volatile State             state;                       //состояние соединения
-  stl::string                description;                 //описание соединения
-  ConnectionPtr              client_to_server_connection; //соединение от клиента к серверу
-  stl::auto_ptr<ClientImpl>  client;                      //реализация рендера сцены
-  stl::auto_ptr<ContextImpl> context;                     //контекст
-  interchange::CommandQueue  response_queue;              //очередь команд
+  stl::string                            response_connection_name;    //имя соединения для ответов
+  syslib::Condition                      logon_ack_waiter;            //семафор ожидания ответа на логин
+  syslib::Mutex                          mutex;                       //мьютекс данных
+  volatile State                         state;                       //состояние соединения
+  stl::string                            description;                 //описание соединения
+  xtl::com_ptr<interchange::IConnection> client_to_server_connection; //соединение от клиента к серверу
+  stl::auto_ptr<ClientImpl>              client;                      //реализация рендера сцены
+  stl::auto_ptr<ContextImpl>             context;                     //контекст
+  interchange::CommandQueue              response_queue;              //очередь команд
 
 /// Конструктор
   Impl ()
@@ -172,7 +172,7 @@ Connection::Connection (const char* connection_name, const char* init_string, si
     size_t start_time = common::milliseconds ();
 
     impl->state                       = State_LogonAckWaiting;
-    impl->client_to_server_connection = ConnectionPtr (interchange::ConnectionManager::CreateConnection (connection_name, common::format ("%s logon_timeout=%d initiator='%s'", init_string, logon_timeout, impl->response_connection_name.c_str ()).c_str ()), false);
+    impl->client_to_server_connection = xtl::com_ptr<interchange::IConnection> (interchange::ConnectionManager::CreateConnection (connection_name, common::format ("%s logon_timeout=%d initiator='%s'", init_string, logon_timeout, impl->response_connection_name.c_str ()).c_str ()), false);
 
       //ожидание ответа от сервера
 

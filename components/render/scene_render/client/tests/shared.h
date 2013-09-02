@@ -18,4 +18,5 @@
 
 #include "../sources/shared.h"
 
+using namespace render;
 using namespace render::scene::client;
