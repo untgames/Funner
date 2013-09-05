@@ -47,6 +47,8 @@ public class EngineActivity extends Activity
 	{
 		ON_PAUSE, 
 		ON_RESUME, 
+		ON_STOP, 
+		ON_START, 
 		ON_DESTROY 
 	}
 	
@@ -239,20 +241,38 @@ public class EngineActivity extends Activity
   @Override
   public void onPause ()
   {
-    onPauseCallback ();
     super.onPause ();
     
     notify (EventType.ON_PAUSE);
   }  
   
-///Восстановление приложения
+///Возобновление работы приложения
   @Override
   public void onResume ()
   {
-    onResumeCallback ();
     super.onResume ();
     
     notify (EventType.ON_RESUME);
+  }    
+    
+///Остановка приложения  
+  @Override
+  public void onStop ()
+  {
+    onPauseCallback ();
+    super.onStop ();
+    
+    notify (EventType.ON_STOP);
+  }  
+  
+///Восстановление приложения
+  @Override
+  public void onStart ()
+  {
+    onResumeCallback ();
+    super.onStart ();
+    
+    notify (EventType.ON_START);
   }    
     
 ///Завершение приложения
@@ -262,6 +282,8 @@ public class EngineActivity extends Activity
     super.onDestroy ();
     
     notify (EventType.ON_DESTROY);
+    
+    android.os.Process.killProcess (android.os.Process.myPid ()); //kill our process, so singletons will die with activity. Activity is destroyed on device lock on Galaxy S3
   }        
     
 ///Нехватка памяти
