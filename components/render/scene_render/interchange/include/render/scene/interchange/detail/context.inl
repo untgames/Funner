@@ -25,10 +25,9 @@ template <class Processor, class Deserializer> class IncomingCommandsProcessor: 
 
         if (deserializer.Available () < body_size)
         {
-          const char* command_name = get_command_name ((CommandId)command.command_id);
+          stl::string command_name = get_command_name ((CommandId)command.command_id);
 
-          if (command_name) log.Printf ("Can't read command %s with size %u: only %u bytes is available", command_name, command.command_size, body_size);
-          else              log.Printf ("Can't read command %u with size %u: only %u bytes is available", command.command_id, command.command_size, body_size);
+          log.Printf ("Can't read command %s with size %u: only %u bytes is available", command_name.c_str (), command.command_size, body_size);
 
           return; //no more data
         }

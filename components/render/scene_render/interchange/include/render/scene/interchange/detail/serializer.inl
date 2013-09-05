@@ -1,4 +1,4 @@
-inline const char* get_command_name(CommandId command_id)
+inline stl::string get_command_name(CommandId command_id)
 {
   switch (command_id)
   {
@@ -21,7 +21,9 @@ inline const char* get_command_name(CommandId command_id)
     case CommandId_DetachViewportFromRenderTarget: return "DetachViewportFromRenderTarget";
     case CommandId_UpdateRenderTarget: return "UpdateRenderTarget";
     case CommandId_Dummy: return "Dummy";
-    default: throw xtl::make_argument_exception ("render::scene::interchange::get_command_name", "command_id", command_id);
+    case CommandId_PropertyLayout: return "PropertyLayout";
+    case CommandId_PropertyMap: return "PropertyMap";
+    default: return common::format ("CommandId#%u", command_id);
   }
 }
 

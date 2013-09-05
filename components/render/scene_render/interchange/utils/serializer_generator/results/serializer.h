@@ -1,6 +1,8 @@
 #ifndef RENDER_SCENE_INTERCHANGE_SERIALIZER_HEADER
 #define RENDER_SCENE_INTERCHANGE_SERIALIZER_HEADER
 
+#include <common/strlib.h>
+
 #include <render/scene/interchange/streams.h>
 
 namespace render
@@ -36,16 +38,18 @@ enum CommandId
   CommandId_DetachViewportFromRenderTarget,
   CommandId_UpdateRenderTarget,
   CommandId_Dummy,
+  CommandId_PropertyLayout,
+  CommandId_PropertyMap,
   CommandId_FirstUserDefined = 10000,
 };
 
 ///имена команд
-const char* get_command_name (CommandId command_id);
+stl::string get_command_name (CommandId command_id);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///—ериализатор команд от клиента к серверу
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-class ClientToServerSerializer: private OutputStream
+class ClientToServerSerializer: public OutputStream
 {
   public:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -104,7 +108,7 @@ class ClientToServerDeserializer: public BasicDeserializer, public InputStream
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///—ериализатор команд от сервера к клиенту
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-class ServerToClientSerializer: private OutputStream
+class ServerToClientSerializer: public OutputStream
 {
   public:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
