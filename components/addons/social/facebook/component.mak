@@ -16,8 +16,8 @@ SOCIAL.FACEBOOK.SOURCES.IMPORTS             := compile.social.core compile.syste
 SOCIAL.ANDROID_SESSION.JAVA.TYPE        := android-jar
 SOCIAL.ANDROID_SESSION.JAVA.NAME        := funner.facebook_session
 SOCIAL.ANDROID_SESSION.JAVA.SOURCE_DIRS := java_sources
-SOCIAL.ANDROID_SESSION.JAVA.JARS        := funner.application facebooksdk
-SOCIAL.ANDROID_SESSION.JAVA.IMPORTS     := compile.extern.facebook_sdk
+SOCIAL.ANDROID_SESSION.JAVA.JARS        := funner.application
+SOCIAL.ANDROID_SESSION.JAVA.IMPORTS     := compile.extern.facebook_sdk compile.extern.android_support_v4
 
 #Цель - tests
 SOCIAL.FACEBOOK.TESTS.TYPE        := test-suite
