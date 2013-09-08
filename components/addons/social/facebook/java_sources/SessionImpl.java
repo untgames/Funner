@@ -1,5 +1,8 @@
 package com.untgames.funner.facebook_session;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -41,7 +44,7 @@ public class SessionImpl implements EngineActivity.EngineActivityEventListener, 
 	{
 	  Session activeSession = Session.getActiveSession ();
 	
-	  if (activeSession)
+	  if (activeSession != null)
       activeSession.onActivityResult (activity, requestCode, resultCode, data);
     
     return false;
@@ -62,17 +65,17 @@ public class SessionImpl implements EngineActivity.EngineActivityEventListener, 
     
     return false; //TODO implement custom login
     
-    Log.d (TAG, "Check can login. SDK version = " + Settings.getSdkVersion () + " resourcesVersion = " + resourcesVersion);
+/*    Log.d (TAG, "Check can login. SDK version = " + Settings.getSdkVersion () + " resourcesVersion = " + resourcesVersion);
 
     if (!Settings.getSdkVersion ().equals (resourcesVersion))
     	throw new IllegalStateException ("Facebook SDK and Facebook SDK resources version mismatch");
     
-		return true;
+		return true;*/
 	}
 	
 	private boolean isReadPermission (String permission)
 	{
-		static final String [] readPermissions = {
+		final String [] readPermissions = {
 			
 		};
 
