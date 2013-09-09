@@ -16,15 +16,14 @@ public class EngineGCMManager
   public static String getSenderId(Context context) {
   		String packageName = context.getPackageName();
       int    resId       = context.getResources().getIdentifier("GCMSenderID", "string", packageName);
-      String senderID    = context.getString(resId);
-      
-  		if (senderID == null)
+
+      if (resId == 0)
   		{
   			Log.e (TAG, "'GCMSenderID' metadata not setted in application manifest");
   			return null;
   		}
 
-  		return senderID;
+  		return context.getString(resId);
   }
 	
 	//Регистрация на получение сообщений

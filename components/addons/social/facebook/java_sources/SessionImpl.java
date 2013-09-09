@@ -53,15 +53,16 @@ public class SessionImpl implements EngineActivity.EngineActivityEventListener, 
 	//check if we can use sdk login
 	public boolean canLogin ()
 	{
-		String packageName      = activity.getPackageName ();
-    int    resId            = activity.getResources ().getIdentifier ("FacebookSdkResourcesVersion", "string", packageName);
-    String resourcesVersion = activity.getString (resId);
-		
-    if (resourcesVersion == null)
+		String packageName = activity.getPackageName ();
+    int    resId       = activity.getResources ().getIdentifier ("FacebookSdkResourcesVersion", "string", packageName);
+    
+    if (resId == 0)
     {
     	Log.d (TAG, "Application has no Facebook SDK resources, sdk login unavailable");
     	return false;
     }
+    
+    String resourcesVersion = activity.getString (resId);
     
     return false; //TODO implement custom login
     
