@@ -20,13 +20,13 @@ MACOSX_DEPLOYMENT_TARGET := $(MACOSX_VERSION)
 
 export MACOSX_DEPLOYMENT_TARGET
 
-MACOSX_SDK_PATH := /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.7.sdk
+MACOSX_SDK_PATH := /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.8.sdk
 
 COMMON_CFLAGS               += -msse3 -isysroot $(MACOSX_SDK_PATH) -mmacosx-version-min=$(MACOSX_VERSION) -arch i386 -fvisibility=hidden -Wno-unused-function
 COMMON_LINK_FLAGS           += -isysroot $(MACOSX_SDK_PATH) -mmacosx-version-min=$(MACOSX_VERSION) -arch i386
 MAP_FILE_LINK_OPTION_PREFIX := -Wl,-map,
-COMPILER_GCC                := /Applications/Xcode5-DP5.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang
-LINKER_GCC                  := /Applications/Xcode5-DP5.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang++
+COMPILER_GCC                := /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang
+LINKER_GCC                  := /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang++
 
 include $(TOOLSETS_DIR)/g++.mak
 
