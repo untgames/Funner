@@ -1853,6 +1853,47 @@ PropertyLayout PropertyMap::Layout () const
 }
 
 /*
+    Сброс лэйаута
+*/
+
+void PropertyMap::Reset (const PropertyLayout& in_layout)
+{
+  try
+  {
+    PropertyLayout layout (in_layout);
+
+    layout.Capture ();
+
+    StringArray strings;    
+    Buffer      buffer (layout.BufferSize ());
+
+    memset (buffer.data (), 0, buffer.size ());
+    
+    const PropertyDesc* desc = layout.Properties ();
+    
+    for (size_t i=0, count=layout.Size (); i<count; i++, desc++)
+    {
+      if (desc->type == PropertyType_String)
+        *reinterpret_cast<unsigned int*> (buffer.data () + desc->offset) = strings.Add ("");
+    }    
+
+    impl->layout      = layout;
+    impl->hash        = 0;
+    impl->need_update = true;
+    impl->strings     = strings;
+    
+    impl->buffer.swap (buffer);
+
+    impl->UpdateNotify ();
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("common::PropertyMap::Reset");
+    throw;
+  }
+}
+
+/*
     Работа с буфером
 */
 
