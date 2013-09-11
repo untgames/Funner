@@ -1,0 +1,11 @@
+Results of properties_set_buffer_test:
+before:map has 3 properties (hash=f3d34923, layout_hash=a8d5908f):
+ #0: name='X', type=string, value=''
+ #1: name='Y', type=integer, value='0'
+ #2: name='Z', type=float, value='0'
+after:map has 3 properties (hash=772e4050, layout_hash=a8d5908f):
+ #0: name='X', type=string, value=''
+ #1: name='Y', type=integer, value='1'
+ #2: name='Z', type=float, value='3.14'
+exception: Can't set buffer to the property map because property[0] has string index 1000 which is large than strings count 1
+    at common::PropertyMap::SetBufferData

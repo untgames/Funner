@@ -10,6 +10,7 @@
 #include <xtl/lexical_cast.h>
 #include <xtl/ref.h>
 #include <xtl/signal.h>
+#include <xtl/uninitialized_storage.h>
 
 #include <math/vector.h>
 #include <math/matrix.h>
