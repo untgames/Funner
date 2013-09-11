@@ -21,6 +21,10 @@ void AttachViewportToRenderTarget (uint32 render_target_id, uint32 viewport_id);
 void DetachViewportFromRenderTarget (uint32 render_target_id, uint32 viewport_id);
 void UpdateRenderTarget (uint32 id);
 
+void UpdatePropertyMap (...);
+void RemovePropertyMap (uint64 id);
+void RemovePropertyLayout (uint64 id);
+
 #section ServerToClient
 
 void Dummy();

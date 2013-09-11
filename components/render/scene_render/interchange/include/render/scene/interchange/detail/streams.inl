@@ -213,6 +213,9 @@ inline void InputStream::Skip (size_t size)
     Сериализация базовых типов
 */
 
+inline void write (OutputStream& s, bool value)    { s.Write (static_cast<bool8> (value)); }
+inline void write (OutputStream& s, int64 value)   { s.Write (value); }
+inline void write (OutputStream& s, uint64 value)  { s.Write (value); }
 inline void write (OutputStream& s, int32 value)   { s.Write (value); }
 inline void write (OutputStream& s, uint32 value)  { s.Write (value); }
 inline void write (OutputStream& s, int16 value)   { s.Write (value); }
@@ -221,6 +224,9 @@ inline void write (OutputStream& s, int8 value)    { s.Write (value); }
 inline void write (OutputStream& s, uint8 value)   { s.Write (value); }
 inline void write (OutputStream& s, float32 value) { s.Write (value); }
 
+inline       bool     read (InputStream& s, xtl::type<bool>)    { return s.Read<bool8> () != 0; }
+inline const int64&   read (InputStream& s, xtl::type<int64>)   { return s.Read<int64> (); }
+inline const uint64&  read (InputStream& s, xtl::type<uint64>)  { return s.Read<uint64> (); }
 inline const int32&   read (InputStream& s, xtl::type<int32>)   { return s.Read<int32> (); }
 inline const uint32&  read (InputStream& s, xtl::type<uint32>)  { return s.Read<uint32> (); }
 inline const int16&   read (InputStream& s, xtl::type<int16>)   { return s.Read<int16> (); }

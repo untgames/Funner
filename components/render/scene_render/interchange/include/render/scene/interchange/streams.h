@@ -128,6 +128,9 @@ class InputStream
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Сериализация базовых типов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+void write (OutputStream&, bool);
+void write (OutputStream&, int64);
+void write (OutputStream&, uint64);
 void write (OutputStream&, int32);
 void write (OutputStream&, uint32);
 void write (OutputStream&, int16);
@@ -144,6 +147,9 @@ template <class T>                    void write (OutputStream&, const math::qua
 template <class T> const T& read (InputStream&, xtl::type<T&>);
 template <class T> const T& read (InputStream&, xtl::type<const T&>);
 
+bool           read (InputStream&, xtl::type<bool>);
+const int64&   read (InputStream&, xtl::type<int64>);
+const uint64&  read (InputStream&, xtl::type<uint64>);
 const int32&   read (InputStream&, xtl::type<int32>);
 const uint32&  read (InputStream&, xtl::type<uint32>);
 const int16&   read (InputStream&, xtl::type<int16>);

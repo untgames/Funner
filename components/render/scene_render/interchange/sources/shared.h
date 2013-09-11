@@ -26,5 +26,6 @@
 #include <render/scene/interchange/connection_manager.h>
 #include <render/scene/interchange/render_thread.h>
 #include <render/scene/interchange/property_synchronizer.h>
+#include <render/scene/interchange/serializer.h>
 
 #endif

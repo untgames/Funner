@@ -7,6 +7,7 @@
 #include <xtl/reference_counter.h>
 
 #include <render/scene/interchange/context.h>
+#include <render/scene/interchange/property_synchronizer.h>
 #include <render/scene/interchange/serializer.h>
 
 using namespace render::scene::interchange;

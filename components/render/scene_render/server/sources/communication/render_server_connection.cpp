@@ -15,9 +15,9 @@ class ContextImpl: public Context
     using Context::SetCounterparty;
     using Context::ProcessCommands;
 
-    bool DeserializeUnknownCommand (interchange::CommandId id) 
+    bool DeserializeUnknownCommand (interchange::CommandId id, InputStream& stream) 
     { 
-      return ServerLoopbackConnection::ProcessIncomingCommand (static_cast<InternalCommandId> (id), *this, state); 
+      return ServerLoopbackConnection::ProcessIncomingCommand (static_cast<InternalCommandId> (id), stream, state); 
     }
 
   private:

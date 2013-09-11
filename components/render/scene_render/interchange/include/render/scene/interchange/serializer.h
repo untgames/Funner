@@ -37,9 +37,10 @@ enum CommandId
   CommandId_AttachViewportToRenderTarget,
   CommandId_DetachViewportFromRenderTarget,
   CommandId_UpdateRenderTarget,
+  CommandId_UpdatePropertyMap,
+  CommandId_RemovePropertyMap,
+  CommandId_RemovePropertyLayout,
   CommandId_Dummy,
-  CommandId_PropertyLayout,
-  CommandId_PropertyMap,
   CommandId_FirstUserDefined = 10000,
 };
 
@@ -49,7 +50,7 @@ stl::string get_command_name (CommandId command_id);
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Сериализатор команд от клиента к серверу
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-class ClientToServerSerializer: public OutputStream
+class ClientToServerSerializer: private OutputStream
 {
   public:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -73,6 +74,9 @@ class ClientToServerSerializer: public OutputStream
     void AttachViewportToRenderTarget(uint32 render_target_id, uint32 viewport_id);
     void DetachViewportFromRenderTarget(uint32 render_target_id, uint32 viewport_id);
     void UpdateRenderTarget(uint32 id);
+    OutputStream& UpdatePropertyMap();
+    void RemovePropertyMap(uint64 id);
+    void RemovePropertyLayout(uint64 id);
 
   protected:
     using OutputStream::Swap;
@@ -90,13 +94,13 @@ class BasicDeserializer
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Обработчик неизвестной команды
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    virtual bool DeserializeUnknownCommand (CommandId id) { return false; }
+    virtual bool DeserializeUnknownCommand (CommandId id, InputStream& stream) { return false; }
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Десериализатор команд от клиента к серверу
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-class ClientToServerDeserializer: public BasicDeserializer, public InputStream
+class ClientToServerDeserializer: public BasicDeserializer, private InputStream
 {
   public:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -108,7 +112,7 @@ class ClientToServerDeserializer: public BasicDeserializer, public InputStream
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Сериализатор команд от сервера к клиенту
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-class ServerToClientSerializer: public OutputStream
+class ServerToClientSerializer: private OutputStream
 {
   public:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -124,7 +128,7 @@ class ServerToClientSerializer: public OutputStream
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Десериализатор команд от сервера к клиенту
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-class ServerToClientDeserializer: public BasicDeserializer, public InputStream
+class ServerToClientDeserializer: public BasicDeserializer, private InputStream
 {
   public:
 ///////////////////////////////////////////////////////////////////////////////////////////////////

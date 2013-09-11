@@ -43,6 +43,9 @@ struct Method
   stl::string name;        //имя метода
   stl::string result_type; //имя возвращаемого типа  
   ParamArray  params;      //список параметров
+  bool        is_manual;   //является ли метод сериализуемым вручную
+
+  Method () : is_manual () {}
 };
 
 typedef stl::vector<Method> MethodArray;
@@ -178,12 +181,24 @@ Param parse_param (const char* line)
   return Param (stl::string (name_start, name_end+1).c_str (), stl::string (type_start, type_end+1).c_str ());
 }
 
-void parse_params (const char* line, ParamArray& params)
+void parse_params (const char* line, Method& method)
 {
+  ParamArray& params = method.params;
+
   common::StringArray tokens = common::split (line, ",", " \t", "");
 
   for (size_t i=0; i<tokens.Size (); i++)
   {
+    if (!strcmp (tokens [i], "..."))
+    {
+      if (i)
+        throw xtl::format_operation_exception ("", "Method can't have ellipsis and parameters list simultaneously. For line '%s'", line);
+
+      method.is_manual = true;
+
+      continue;
+    }
+
     Param param = parse_param (tokens [i]);
 
     params.push_back (param);
@@ -210,7 +225,7 @@ void parse_signature (const char* line, Method& method)
   if (!start_params || !end_params || end_params <= start_params)
     throw xtl::format_operation_exception ("", "Bad line '%s'", line);
 
-  parse_params (stl::string (start_params+1, end_params).c_str (), method.params);
+  parse_params (stl::string (start_params+1, end_params).c_str (), method);
 }
 
 void parse_section (const char* iter, stl::string& section)
@@ -280,20 +295,28 @@ void parse_signatures (const char* file_name, MethodArray& methods)
 
 void dump_signature (const Method& method, stl::string& result, const char* class_name = "")
 {
-  if (*class_name) result += common::format ("%s %s::%s(", method.result_type.c_str (), class_name, method.name.c_str ());
-  else             result += common::format ("%s %s(", method.result_type.c_str (), method.name.c_str ());
-
-  for (ParamArray::const_iterator iter=method.params.begin (), end=method.params.end (); iter!=end; ++iter)
+  if (method.is_manual)
   {
-    const Param& param = *iter;
-
-    if (iter != method.params.begin ())
-      result += ", ";
-
-    result += common::format ("%s %s", param.type.c_str (), param.name.c_str ());
+    if (*class_name) result += common::format ("OutputStream& %s::%s()", class_name, method.name.c_str ());
+    else             result += common::format ("OutputStream& %s()", method.name.c_str ());
   }
+  else
+  {
+    if (*class_name) result += common::format ("%s %s::%s(", method.result_type.c_str (), class_name, method.name.c_str ());
+    else             result += common::format ("%s %s(", method.result_type.c_str (), method.name.c_str ());
 
-  result += ")";
+    for (ParamArray::const_iterator iter=method.params.begin (), end=method.params.end (); iter!=end; ++iter)
+    {
+      const Param& param = *iter;
+
+      if (iter != method.params.begin ())
+        result += ", ";
+
+      result += common::format ("%s %s", param.type.c_str (), param.name.c_str ());
+    }
+
+    result += ")";
+  }
 }
 
 void dump_signatures (const MethodArray& methods, stl::string& result, const char* section)
@@ -340,14 +363,25 @@ void dump_serialization (const MethodArray& methods, stl::string& result, const 
     result += "\n{\n";
     result += common::format ("  %s%s_%s);\n", SERIALIZE_HEADER_PREFIX, COMMAND_ID_ENUM_NAME, method.name.c_str ());
 
-    for (ParamArray::const_iterator iter=method.params.begin (), end=method.params.end (); iter!=end; ++iter)
+    if (method.is_manual)
     {
-      const Param& param = *iter;
+      result += "  return *this;";
+      result += "\n}\n";
+    }
+    else
+    {
+      for (ParamArray::const_iterator iter=method.params.begin (), end=method.params.end (); iter!=end; ++iter)
+      {
+        const Param& param = *iter;
 
-      dump_param_serialization (param, result);
-    }    
+        if (iter != method.params.begin ())
+          result += "\n";
 
-    result += common::format ("\n  %s\n}\n", SERIALIZE_TAIL);
+        dump_param_serialization (param, result);
+      }
+
+      result += common::format ("\n  %s\n}\n", SERIALIZE_TAIL);
+    }
   }
 }
 
@@ -374,21 +408,28 @@ void dump_deserialization (const MethodArray& methods, stl::string& result, cons
     result += common::format ("    case %s_%s:\n", COMMAND_ID_ENUM_NAME, method.name.c_str ());
     result += common::format ("      dispatcher.%s(", method.name.c_str ());
 
-    for (ParamArray::const_iterator iter=method.params.begin (), end=method.params.end (); iter!=end; ++iter)
+    if (method.is_manual)
     {
-      if (iter != method.params.begin ())
-        result += ", ";
+      result += "*this";
+    }
+    else
+    {
+      for (ParamArray::const_iterator iter=method.params.begin (), end=method.params.end (); iter!=end; ++iter)
+      {
+        if (iter != method.params.begin ())
+          result += ", ";
 
-      const Param& param = *iter;
+        const Param& param = *iter;
 
-      dump_param_deserialization (param, result);      
-    }    
+        dump_param_deserialization (param, result);      
+      }
+    }
 
     result += ");\n";
     result += "      return true;\n";
   }
 
-  result += "    default:\n      return DeserializeUnknownCommand (id);\n";
+  result += "    default:\n      return DeserializeUnknownCommand (id, *this);\n";
   result += "  }\n}\n";
 }
 
