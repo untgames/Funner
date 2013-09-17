@@ -2,6 +2,9 @@
 
 using namespace render::scene::interchange;
 
+//TODO: output/input stream rollback
+//TODO: exception safe
+
 namespace
 {
 
@@ -67,19 +70,20 @@ struct PropertyMapWriter::Impl: public xtl::trackable
   }
 
 /// Запись лэйаута
-  void WriteLayout (OutputStream& stream, const common::PropertyLayout& layout, LayoutDescPtr& desc)
+/// (exception safe instead of stream writing)
+  void WriteLayout (OutputStream& stream, const common::PropertyLayout& layout, LayoutDescPtr& out_desc)
   {
     try
     {
         //создание лэйаута
+
+      LayoutDescPtr desc = out_desc;
 
       if (!desc)
       {
         layout.Trackable ().connect_tracker (xtl::bind (&Impl::RemoveLayout, this, layout.Id ()), *this);
 
         desc = LayoutDescPtr (new LayoutDesc (layout.Id ()), false);
-
-        layouts.insert_pair (layout.Id (), desc);
       }
 
         //синхронизация идентификатора лэйаута
@@ -107,8 +111,8 @@ struct PropertyMapWriter::Impl: public xtl::trackable
 
         //синхронизация строк
 
+      desc->string_indices.reserve (strings_count); //clear after reserve for exception safeness
       desc->string_indices.clear ();
-      desc->string_indices.reserve (strings_count);
 
       property = layout.Properties ();
 
@@ -121,6 +125,13 @@ struct PropertyMapWriter::Impl: public xtl::trackable
         //обновление хэша
 
       desc->hash = layout.Hash ();
+
+        //обновление таблицы лэйаутов
+
+      if (!out_desc)
+        layouts.insert_pair (layout.Id (), desc);
+
+      out_desc = desc;
     }
     catch (xtl::exception& e)
     {
@@ -285,7 +296,7 @@ void PropertyMapWriter::Write (OutputStream& stream, const common::PropertyMap& 
     }
     catch (...)
     {
-      stream.EndCommand ();
+      stream.EndCommand (); //FIX
       throw;
     }
   }
