@@ -52,12 +52,15 @@ class Checker: private IPropertyMapWriterListener
         switch (command.command_id)
         {
           case CommandId_UpdatePropertyMap:
+            printf ("reader: update property map command received\n");
             reader.Read (in_stream);
             break;
           case CommandId_RemovePropertyMap:
+            printf ("reader: remove property map command received\n");
             reader.RemoveProperties (static_cast<size_t> (read (in_stream, xtl::type<uint64> ())));
             break;
           case CommandId_RemovePropertyLayout:
+            printf ("reader: remove property layout command received\n");
             reader.RemoveLayout (static_cast<size_t> (read (in_stream, xtl::type<uint64> ())));
             break;
           default:
@@ -101,33 +104,59 @@ int main ()
 
       dump_properties (properties2);
 
-      properties1.SetProperty ("Z", "hello1");
-
-      checker.Sync (properties1);
-
-      printf ("sync after binding\n");
-
-      dump_properties (properties2);
+      printf ("sync two maps with same layout\n");
 
       PropertyMap properties3 (properties1.Layout ());
 
+      properties3.SetProperty ("X", "hello2");
       properties3.SetProperty ("Y", 14);
-      properties3.SetProperty ("Z", "hello2");
-
-      printf ("sync two maps with same layout\n");
 
       checker.Sync (properties3);
 
       PropertyMap properties4 = checker.GetProperties (properties3.Id ());
 
+      printf ("properties2:\n");
+
+      dump_properties (properties2);
+
       printf ("properties4:\n");
 
       dump_properties (properties4);
 
+      if (properties2.Layout ().Id () != properties4.Layout ().Id ())
+        printf ("error: layouts are not same!\n");
+
+      printf ("sync after layout change\n");
+
+      properties1.SetProperty ("Z", "hello1");
+
+      checker.Sync (properties1);
+
       printf ("properties2:\n");
 
       dump_properties (properties2);
+
+      printf ("properties4:\n");
+
+      dump_properties (properties4);
+
+      printf ("sync without layout change:\n");
+
+      properties1.SetProperty ("Z", "hello3");
+      properties1.SetProperty ("Y", 15);
+
+      checker.Sync (properties1);
+
+      dump_properties (properties2);
+
+      printf ("empty update\n");
+
+      checker.Sync (properties1);
+
+      printf ("before exit from scope\n");
     }
+
+    printf ("after exit from scope\n");
   }
   catch (std::exception& e)
   {

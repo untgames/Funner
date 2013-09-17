@@ -499,16 +499,23 @@ void PropertyMapReader::Read (InputStream& stream)
     {
       map_desc = map_iter->second;
 
-        //обновление лэйаута существующей карты
-       
-      const common::PropertyLayout& layout = layout_desc->layout;
-
-      if (map_desc->layout != layout_desc || map_desc->layout_hash != layout.Hash ())
+      if (layout_desc)
       {
-        map_desc->properties.Reset (layout);
+          //обновление лэйаута существующей карты
+         
+        const common::PropertyLayout& layout = layout_desc->layout;
 
-        map_desc->layout      = layout_desc;
-        map_desc->layout_hash = layout.Hash ();
+        if (map_desc->layout != layout_desc || map_desc->layout_hash != layout.Hash ())
+        {
+          map_desc->properties.Reset (layout);
+
+          map_desc->layout      = layout_desc;
+          map_desc->layout_hash = layout.Hash ();
+        }
+      }
+      else
+      {
+        layout_desc = map_desc->layout;
       }
     }
 
