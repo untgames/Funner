@@ -148,12 +148,13 @@ public class EngineActivity extends Activity
     envVars = envVars + " " + "TEMP='" + tmpDir + "'";
     envVars = envVars + " " + "ANDROID_DATA='" + getFilesDir ().getPath () + "'";
     
-    String externalDataDir;
+    String externalDataDir = null;
 
     if (Environment.getExternalStorageState ().equals (Environment.MEDIA_MOUNTED))
     	externalDataDir = getExternalFilesDir (null).getPath ();
-    else
-    	externalDataDir = getFilesDir ().getPath ();
+
+    if (externalDataDir == null)
+      externalDataDir = getFilesDir ().getPath ();
 
     envVars = envVars + " " + "ANDROID_EXTERNAL_DATA='" + externalDataDir + "'";
 
