@@ -24,6 +24,7 @@ inline void OutputStream::Reset (const CommandBuffer& in_buffer)
   buffer        = in_buffer;
   pos           = reinterpret_cast<char*> (buffer.Data ());
   command_start = pos;
+  buffer_start  = pos;
   buffer_end    = pos + buffer.Size ();
 }
 
@@ -79,8 +80,6 @@ inline void OutputStream::EnsureSpaceAvailable (size_t size)
 
 inline void OutputStream::Resize (size_t new_size)
 {
-  char* buffer_start = reinterpret_cast<char*> (buffer.Data ());
-
   size_t pos_offset           = pos - buffer_start,
          command_start_offset = command_start - buffer_start;
 
@@ -115,6 +114,23 @@ template <class T> inline void OutputStream::Write (const T& value)
 }
 
 /*
+    Позиция потока
+*/
+
+inline void OutputStream::SetPosition (size_t position)
+{
+  if (position > buffer.Size ())
+    throw xtl::format_operation_exception ("render::scene::interchange::OutputStream::SetPosition", "Can't set output stream position to %u because current stream size is %u", position, buffer.Size ());
+
+  pos = buffer_start + position;
+}
+
+inline size_t OutputStream::Position () const
+{
+  return pos - buffer_start;
+}
+
+/*
     InputStream
 */
 
@@ -137,9 +153,10 @@ inline InputStream::~InputStream ()
 
 inline void InputStream::Reset (const CommandBuffer& in_buffer)
 {
-  buffer     = in_buffer;
-  pos        = reinterpret_cast<const char*> (buffer.Data ());
-  buffer_end = pos + buffer.Size ();
+  buffer       = in_buffer;
+  pos          = reinterpret_cast<const char*> (buffer.Data ());
+  buffer_start = pos;
+  buffer_end   = pos + buffer.Size ();
 }
 
 /*
@@ -207,6 +224,23 @@ inline void InputStream::Skip (size_t size)
   {
     throw xtl::format_operation_exception ("render::scene::interchange::InputStream::Skip", "Can't skip %u bytes from input stream with %u bytes available", size, Available ());
   }
+}
+
+/*
+    Позиция потока
+*/
+
+inline void InputStream::SetPosition (size_t position)
+{
+  if (position > buffer.Size ())
+    throw xtl::format_operation_exception ("render::scene::interchange::InputStream::SetPosition", "Can't set input stream position to %u because current stream size is %u", position, buffer.Size ());
+
+  pos = buffer_start + position;
+}
+
+inline size_t InputStream::Position () const
+{
+  return pos - buffer_start;
 }
 
 /*

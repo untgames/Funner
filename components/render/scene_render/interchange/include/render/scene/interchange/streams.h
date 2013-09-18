@@ -63,6 +63,12 @@ class OutputStream
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     template <class T> void Write (const T& value);
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Позиция потока
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void   SetPosition (size_t position);
+    size_t Position    () const;
+
   private:
     OutputStream (const OutputStream&); //no implementation
     OutputStream& operator = (const OutputStream&); //no implementation
@@ -71,6 +77,7 @@ class OutputStream
 
   private:
     char*         command_start; //указатель на начало команды
+    char*         buffer_start;  //указатель на начало буфера
     char*         buffer_end;    //указатель на конец буфера
     char*         pos;           //позиция указателя записи
     CommandBuffer buffer;        //буфер
@@ -115,12 +122,19 @@ class InputStream
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void Skip (size_t size);
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Позиция потока
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void   SetPosition (size_t position);
+    size_t Position    () const;
+
   private:
     InputStream (const InputStream&); //no implementation
     InputStream& operator = (const InputStream&); //no implementation   
 
   private:
     const char*   pos;
+    const char*   buffer_start;
     const char*   buffer_end;
     CommandBuffer buffer;
 };
