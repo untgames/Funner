@@ -34,168 +34,378 @@ inline stl::string get_command_name(CommandId command_id)
 
 inline void ClientToServerSerializer::LoadResource(const char* name)
 {
-  BeginCommand(CommandId_LoadResource);
-  write(*this, name);
-  EndCommand();
+  size_t saved_position = Position ();
+
+  try
+  {
+    BeginCommand(CommandId_LoadResource);
+    write(*this, name);
+    EndCommand();
+  }
+  catch (...)
+  {
+    SetPosition (saved_position);
+    throw;
+  }
 }
 
 inline void ClientToServerSerializer::UnloadResource(const char* name)
 {
-  BeginCommand(CommandId_UnloadResource);
-  write(*this, name);
-  EndCommand();
+  size_t saved_position = Position ();
+
+  try
+  {
+    BeginCommand(CommandId_UnloadResource);
+    write(*this, name);
+    EndCommand();
+  }
+  catch (...)
+  {
+    SetPosition (saved_position);
+    throw;
+  }
 }
 
 inline void ClientToServerSerializer::CreateViewport(uint32 id)
 {
-  BeginCommand(CommandId_CreateViewport);
-  write(*this, id);
-  EndCommand();
+  size_t saved_position = Position ();
+
+  try
+  {
+    BeginCommand(CommandId_CreateViewport);
+    write(*this, id);
+    EndCommand();
+  }
+  catch (...)
+  {
+    SetPosition (saved_position);
+    throw;
+  }
 }
 
 inline void ClientToServerSerializer::SetViewportArea(uint32 id, int8 left, int8 top, int8 width, int8 height)
 {
-  BeginCommand(CommandId_SetViewportArea);
-  write(*this, id);
-  write(*this, left);
-  write(*this, top);
-  write(*this, width);
-  write(*this, height);
-  EndCommand();
+  size_t saved_position = Position ();
+
+  try
+  {
+    BeginCommand(CommandId_SetViewportArea);
+    write(*this, id);
+    write(*this, left);
+    write(*this, top);
+    write(*this, width);
+    write(*this, height);
+    EndCommand();
+  }
+  catch (...)
+  {
+    SetPosition (saved_position);
+    throw;
+  }
 }
 
 inline void ClientToServerSerializer::SetViewportZOrder(uint32 id, int8 zorder)
 {
-  BeginCommand(CommandId_SetViewportZOrder);
-  write(*this, id);
-  write(*this, zorder);
-  EndCommand();
+  size_t saved_position = Position ();
+
+  try
+  {
+    BeginCommand(CommandId_SetViewportZOrder);
+    write(*this, id);
+    write(*this, zorder);
+    EndCommand();
+  }
+  catch (...)
+  {
+    SetPosition (saved_position);
+    throw;
+  }
 }
 
 inline void ClientToServerSerializer::SetViewportActive(uint32 id, bool8 is_active)
 {
-  BeginCommand(CommandId_SetViewportActive);
-  write(*this, id);
-  write(*this, is_active);
-  EndCommand();
+  size_t saved_position = Position ();
+
+  try
+  {
+    BeginCommand(CommandId_SetViewportActive);
+    write(*this, id);
+    write(*this, is_active);
+    EndCommand();
+  }
+  catch (...)
+  {
+    SetPosition (saved_position);
+    throw;
+  }
 }
 
 inline void ClientToServerSerializer::SetViewportName(uint32 id, const char* name)
 {
-  BeginCommand(CommandId_SetViewportName);
-  write(*this, id);
-  write(*this, name);
-  EndCommand();
+  size_t saved_position = Position ();
+
+  try
+  {
+    BeginCommand(CommandId_SetViewportName);
+    write(*this, id);
+    write(*this, name);
+    EndCommand();
+  }
+  catch (...)
+  {
+    SetPosition (saved_position);
+    throw;
+  }
 }
 
 inline void ClientToServerSerializer::SetViewportTechnique(uint32 id, const char* name)
 {
-  BeginCommand(CommandId_SetViewportTechnique);
-  write(*this, id);
-  write(*this, name);
-  EndCommand();
+  size_t saved_position = Position ();
+
+  try
+  {
+    BeginCommand(CommandId_SetViewportTechnique);
+    write(*this, id);
+    write(*this, name);
+    EndCommand();
+  }
+  catch (...)
+  {
+    SetPosition (saved_position);
+    throw;
+  }
 }
 
 inline void ClientToServerSerializer::SetViewportBackground(uint32 id, bool8 state, const math::vec4f& color)
 {
-  BeginCommand(CommandId_SetViewportBackground);
-  write(*this, id);
-  write(*this, state);
-  write(*this, color);
-  EndCommand();
+  size_t saved_position = Position ();
+
+  try
+  {
+    BeginCommand(CommandId_SetViewportBackground);
+    write(*this, id);
+    write(*this, state);
+    write(*this, color);
+    EndCommand();
+  }
+  catch (...)
+  {
+    SetPosition (saved_position);
+    throw;
+  }
 }
 
 inline void ClientToServerSerializer::DestroyViewport(uint32 id)
 {
-  BeginCommand(CommandId_DestroyViewport);
-  write(*this, id);
-  EndCommand();
+  size_t saved_position = Position ();
+
+  try
+  {
+    BeginCommand(CommandId_DestroyViewport);
+    write(*this, id);
+    EndCommand();
+  }
+  catch (...)
+  {
+    SetPosition (saved_position);
+    throw;
+  }
 }
 
 inline void ClientToServerSerializer::CreateRenderTarget(uint32 id, const char* name)
 {
-  BeginCommand(CommandId_CreateRenderTarget);
-  write(*this, id);
-  write(*this, name);
-  EndCommand();
+  size_t saved_position = Position ();
+
+  try
+  {
+    BeginCommand(CommandId_CreateRenderTarget);
+    write(*this, id);
+    write(*this, name);
+    EndCommand();
+  }
+  catch (...)
+  {
+    SetPosition (saved_position);
+    throw;
+  }
 }
 
 inline void ClientToServerSerializer::DestroyRenderTarget(uint32 id)
 {
-  BeginCommand(CommandId_DestroyRenderTarget);
-  write(*this, id);
-  EndCommand();
+  size_t saved_position = Position ();
+
+  try
+  {
+    BeginCommand(CommandId_DestroyRenderTarget);
+    write(*this, id);
+    EndCommand();
+  }
+  catch (...)
+  {
+    SetPosition (saved_position);
+    throw;
+  }
 }
 
 inline void ClientToServerSerializer::SetRenderTargetActive(uint32 id, bool8 active)
 {
-  BeginCommand(CommandId_SetRenderTargetActive);
-  write(*this, id);
-  write(*this, active);
-  EndCommand();
+  size_t saved_position = Position ();
+
+  try
+  {
+    BeginCommand(CommandId_SetRenderTargetActive);
+    write(*this, id);
+    write(*this, active);
+    EndCommand();
+  }
+  catch (...)
+  {
+    SetPosition (saved_position);
+    throw;
+  }
 }
 
 inline void ClientToServerSerializer::SetRenderTargetScreenArea(uint32 id, int8 left, int8 top, int8 width, int8 height)
 {
-  BeginCommand(CommandId_SetRenderTargetScreenArea);
-  write(*this, id);
-  write(*this, left);
-  write(*this, top);
-  write(*this, width);
-  write(*this, height);
-  EndCommand();
+  size_t saved_position = Position ();
+
+  try
+  {
+    BeginCommand(CommandId_SetRenderTargetScreenArea);
+    write(*this, id);
+    write(*this, left);
+    write(*this, top);
+    write(*this, width);
+    write(*this, height);
+    EndCommand();
+  }
+  catch (...)
+  {
+    SetPosition (saved_position);
+    throw;
+  }
 }
 
 inline void ClientToServerSerializer::SetRenderTargetBackground(uint32 id, bool8 state, const math::vec4f& color)
 {
-  BeginCommand(CommandId_SetRenderTargetBackground);
-  write(*this, id);
-  write(*this, state);
-  write(*this, color);
-  EndCommand();
+  size_t saved_position = Position ();
+
+  try
+  {
+    BeginCommand(CommandId_SetRenderTargetBackground);
+    write(*this, id);
+    write(*this, state);
+    write(*this, color);
+    EndCommand();
+  }
+  catch (...)
+  {
+    SetPosition (saved_position);
+    throw;
+  }
 }
 
 inline void ClientToServerSerializer::AttachViewportToRenderTarget(uint32 render_target_id, uint32 viewport_id)
 {
-  BeginCommand(CommandId_AttachViewportToRenderTarget);
-  write(*this, render_target_id);
-  write(*this, viewport_id);
-  EndCommand();
+  size_t saved_position = Position ();
+
+  try
+  {
+    BeginCommand(CommandId_AttachViewportToRenderTarget);
+    write(*this, render_target_id);
+    write(*this, viewport_id);
+    EndCommand();
+  }
+  catch (...)
+  {
+    SetPosition (saved_position);
+    throw;
+  }
 }
 
 inline void ClientToServerSerializer::DetachViewportFromRenderTarget(uint32 render_target_id, uint32 viewport_id)
 {
-  BeginCommand(CommandId_DetachViewportFromRenderTarget);
-  write(*this, render_target_id);
-  write(*this, viewport_id);
-  EndCommand();
+  size_t saved_position = Position ();
+
+  try
+  {
+    BeginCommand(CommandId_DetachViewportFromRenderTarget);
+    write(*this, render_target_id);
+    write(*this, viewport_id);
+    EndCommand();
+  }
+  catch (...)
+  {
+    SetPosition (saved_position);
+    throw;
+  }
 }
 
 inline void ClientToServerSerializer::UpdateRenderTarget(uint32 id)
 {
-  BeginCommand(CommandId_UpdateRenderTarget);
-  write(*this, id);
-  EndCommand();
+  size_t saved_position = Position ();
+
+  try
+  {
+    BeginCommand(CommandId_UpdateRenderTarget);
+    write(*this, id);
+    EndCommand();
+  }
+  catch (...)
+  {
+    SetPosition (saved_position);
+    throw;
+  }
 }
 
 inline OutputStream& ClientToServerSerializer::UpdatePropertyMap()
 {
-  BeginCommand(CommandId_UpdatePropertyMap);
-  return *this;
+  size_t saved_position = Position ();
+
+  try
+  {
+    BeginCommand(CommandId_UpdatePropertyMap);
+    return *this;
+  }
+  catch (...)
+  {
+    SetPosition (saved_position);
+    throw;
+  }
 }
 
 inline void ClientToServerSerializer::RemovePropertyMap(uint64 id)
 {
-  BeginCommand(CommandId_RemovePropertyMap);
-  write(*this, id);
-  EndCommand();
+  size_t saved_position = Position ();
+
+  try
+  {
+    BeginCommand(CommandId_RemovePropertyMap);
+    write(*this, id);
+    EndCommand();
+  }
+  catch (...)
+  {
+    SetPosition (saved_position);
+    throw;
+  }
 }
 
 inline void ClientToServerSerializer::RemovePropertyLayout(uint64 id)
 {
-  BeginCommand(CommandId_RemovePropertyLayout);
-  write(*this, id);
-  EndCommand();
+  size_t saved_position = Position ();
+
+  try
+  {
+    BeginCommand(CommandId_RemovePropertyLayout);
+    write(*this, id);
+    EndCommand();
+  }
+  catch (...)
+  {
+    SetPosition (saved_position);
+    throw;
+  }
 }
 
 template <class Dispatcher> inline bool ClientToServerDeserializer::Deserialize(CommandId id, Dispatcher& dispatcher)
@@ -278,9 +488,19 @@ template <class Dispatcher> inline bool ClientToServerDeserializer::Deserialize(
 
 inline void ServerToClientSerializer::Dummy()
 {
-  BeginCommand(CommandId_Dummy);
+  size_t saved_position = Position ();
 
-  EndCommand();
+  try
+  {
+    BeginCommand(CommandId_Dummy);
+
+    EndCommand();
+  }
+  catch (...)
+  {
+    SetPosition (saved_position);
+    throw;
+  }
 }
 
 template <class Dispatcher> inline bool ServerToClientDeserializer::Deserialize(CommandId id, Dispatcher& dispatcher)

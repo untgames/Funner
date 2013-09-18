@@ -32,11 +32,28 @@ template <class Processor, class Deserializer> class IncomingCommandsProcessor: 
           return; //no more data
         }
 
-        if (!deserializer.Deserialize ((CommandId)command.command_id, *processor))
-        {
-          log.Printf ("Unknown command %u with size %u. Will be skipped", command.command_id, command.command_size);
+        size_t finish_position = deserializer.Position () + body_size;
 
-          deserializer.Skip (body_size);
+        try
+        {
+          if (!deserializer.Deserialize ((CommandId)command.command_id, *processor))
+          {
+            log.Printf ("Unknown command %u with size %u. Will be skipped", command.command_id, command.command_size);
+
+            deserializer.Skip (body_size);
+          }
+        }
+        catch (std::exception& e)
+        {
+          log.Printf ("Error at processing command %s: %s", get_command_name ((CommandId)command.command_id).c_str (), e.what ());
+
+          deserializer.SetPosition (finish_position);
+        }
+        catch (...)
+        {
+          log.Printf ("Unknown exception at processing command %s", get_command_name ((CommandId)command.command_id).c_str ());
+
+          deserializer.SetPosition (finish_position);
         }
       }
     }

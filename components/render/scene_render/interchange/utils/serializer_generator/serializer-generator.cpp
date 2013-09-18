@@ -341,7 +341,7 @@ void dump_signatures (const MethodArray& methods, stl::string& result, const cha
 
 void dump_param_serialization (const Param& param, stl::string& result)
 {
-  result += common::format ("  %s(*this, %s);", SERIALIZE_PARAM_PREFIX, param.name.c_str ());
+  result += common::format ("    %s(*this, %s);", SERIALIZE_PARAM_PREFIX, param.name.c_str ());
 }
 
 void dump_serialization (const MethodArray& methods, stl::string& result, const char* section)
@@ -361,12 +361,14 @@ void dump_serialization (const MethodArray& methods, stl::string& result, const 
     dump_signature (method, result, common::format ("%sSerializer", section).c_str ());
 
     result += "\n{\n";
-    result += common::format ("  %s%s_%s);\n", SERIALIZE_HEADER_PREFIX, COMMAND_ID_ENUM_NAME, method.name.c_str ());
+    result += "  size_t saved_position = Position ();\n\n";
+    result += "  try\n  {\n";
+    result += common::format ("    %s%s_%s);\n", SERIALIZE_HEADER_PREFIX, COMMAND_ID_ENUM_NAME, method.name.c_str ());
 
     if (method.is_manual)
     {
-      result += "  return *this;";
-      result += "\n}\n";
+      result += "    return *this;";
+      result += "\n  }\n";
     }
     else
     {
@@ -380,8 +382,13 @@ void dump_serialization (const MethodArray& methods, stl::string& result, const 
         dump_param_serialization (param, result);
       }
 
-      result += common::format ("\n  %s\n}\n", SERIALIZE_TAIL);
+      result += common::format ("\n    %s\n  }\n", SERIALIZE_TAIL);
     }
+
+    result += "  catch (...)\n  {\n";
+    result += "    SetPosition (saved_position);\n";
+    result += "    throw;\n";
+    result += "  }\n}\n";
   }
 }
 
