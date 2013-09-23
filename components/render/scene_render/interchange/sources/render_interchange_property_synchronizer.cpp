@@ -2,9 +2,6 @@
 
 using namespace render::scene::interchange;
 
-//TODO: output/input stream rollback
-//TODO: exception safe
-
 namespace
 {
 
@@ -185,11 +182,13 @@ PropertyMapWriter::~PropertyMapWriter ()
 }
 
 /*
-    Синхронизация карты свойств
+    Синхронизация карты свойств (exception safe)
 */
 
 void PropertyMapWriter::Write (OutputStream& stream, const common::PropertyMap& properties)
 {
+  size_t saved_position = stream.Position ();
+
   try
   {
     bool need_send_layout_id = false;
@@ -236,73 +235,79 @@ void PropertyMapWriter::Write (OutputStream& stream, const common::PropertyMap& 
     {
       header.has_layout = true;
     }
-    else if (!map_desc || map_desc->layout != layout_desc)
+    else //we always send layout id so reader will have possibility to restore layout after exception
     {
       header.has_layout_id = true;
     }
 
     stream.BeginCommand (CommandId_UpdatePropertyMap);
 
-    try
+    stream.WriteData (&header, sizeof (header));
+
+      //синхронизация лэйаута
+
+    if (header.has_layout)
     {
-      stream.WriteData (&header, sizeof (header));
-
-        //синхронизация лэйаута
-
-      if (header.has_layout)
-      {
-        impl->WriteLayout (stream, layout, layout_desc);
-
-        if (map_desc)
-          map_desc->layout = layout_desc;
-      }
-      
-      if (header.has_layout_id)
-      {
-        write (stream, static_cast<uint64> (layout.Id ()));
-      }
-
-        //создание объекта слежения за картой свойств
-
-      if (!map_desc)
-      {
-        map_desc = Impl::MapDescPtr (new Impl::MapDesc, false);
-
-        map_desc->layout = layout_desc;
-
-        properties.Trackable ().connect_tracker (xtl::bind (&Impl::RemovePropertyMap, &*impl, properties.Id ()), *impl);
-
-        impl->property_maps.insert_pair (properties.Id (), map_desc);
-      }
-
-        //синхронизация буфера карты свойств
-
-      write (stream, static_cast<uint32> (properties.BufferSize ()));
-
-      stream.WriteData (properties.BufferData (), properties.BufferSize ());
-
-        //синхронизация строк
-
-      for (IndexArray::iterator iter=layout_desc->string_indices.begin (), end=layout_desc->string_indices.end (); iter!=end; ++iter)
-        write (stream, properties.GetString (*iter));
-
-        //обновление хэша
-
-      map_desc->hash = properties.Hash ();
-
-        //закрытие команды
-
-      stream.EndCommand ();
+      impl->WriteLayout (stream, layout, layout_desc);
     }
-    catch (...)
+    
+    if (header.has_layout_id)
     {
-      stream.EndCommand (); //FIX
-      throw;
+      write (stream, static_cast<uint64> (layout.Id ()));
     }
+
+      //создание объекта слежения за картой свойств
+
+    bool need_add_new_map = !map_desc;
+
+    if (!map_desc)
+    {
+      map_desc         = Impl::MapDescPtr (new Impl::MapDesc, false);
+      map_desc->layout = layout_desc;
+    }
+
+      //синхронизация буфера карты свойств
+
+    write (stream, static_cast<uint32> (properties.BufferSize ()));
+
+    stream.WriteData (properties.BufferData (), properties.BufferSize ());
+
+      //синхронизация строк
+
+    for (IndexArray::iterator iter=layout_desc->string_indices.begin (), end=layout_desc->string_indices.end (); iter!=end; ++iter)
+      write (stream, properties.GetString (*iter));
+
+      //обновление полей и карт
+
+    if (need_add_new_map)
+    {
+      properties.Trackable ().connect_tracker (xtl::bind (&Impl::RemovePropertyMap, &*impl, properties.Id ()), *impl);
+
+      impl->property_maps.insert_pair (properties.Id (), map_desc);
+    }
+
+    if (map_desc->layout != layout_desc)
+      map_desc->layout = layout_desc;
+
+      //обновление хэша
+
+    map_desc->hash = properties.Hash ();
+
+      //закрытие команды
+
+    stream.EndCommand ();
   }
   catch (xtl::exception& e)
   {
+    stream.SetPosition (saved_position);
+
     e.touch ("render::scene::interchange::PropertyMapWriter::Write");
+
+    throw;
+  }
+  catch (...)
+  {
+    stream.SetPosition (saved_position);
     throw;
   }
 }
@@ -321,8 +326,9 @@ struct PropertyMapReader::Impl
 {
   struct LayoutDesc: public xtl::reference_counter
   {
+    size_t                 source_id;      //идентификатор исходного лэйаута
     common::PropertyLayout layout;         //расположение свойств
-    IndexArray             string_indices; //индексы строк в лэйауте
+    IndexArray             string_indices; //индексы строк в лэйауте    
   };
 
   typedef xtl::intrusive_ptr<LayoutDesc>             LayoutDescPtr;
@@ -344,8 +350,11 @@ struct PropertyMapReader::Impl
   MapDescMap property_maps; //карты свойств
 
 /// Чтение лэйаута
+/// (базовая гарантия безопасности)
   LayoutDescPtr ReadLayout (InputStream& stream)
   {
+    Impl::LayoutDescPtr desc;
+
     try
     {
         //чтение идентификатора лэйаута
@@ -355,8 +364,6 @@ struct PropertyMapReader::Impl
         //получение лэйаута
 
       Impl::LayoutMap::iterator iter = layouts.find (layout_id);
-
-      Impl::LayoutDescPtr desc;
 
       if (iter == layouts.end ())
       {
@@ -407,7 +414,9 @@ struct PropertyMapReader::Impl
           desc->string_indices.push_back (i);
       }      
 
-        //добавление лэйаута в карту лэйаутов
+        //добавление лэйаута в карту лэйаутов      
+
+      desc->source_id = layout_id;
 
       if (iter == layouts.end ())
         layouts.insert_pair (layout_id, desc);
@@ -416,7 +425,24 @@ struct PropertyMapReader::Impl
     }
     catch (xtl::exception& e)
     {
+      if (desc)
+      {
+        desc->layout.Clear ();
+        desc->string_indices.clear ();
+      }
+
       e.touch ("render::scene::interchange::PropertyMapReader::Impl::ReadLayout");
+
+      throw;
+    }
+    catch (...)
+    {
+      if (desc)
+      {
+        desc->layout.Clear ();
+        desc->string_indices.clear ();
+      }
+
       throw;
     }
   }
@@ -458,7 +484,7 @@ common::PropertyMap PropertyMapReader::GetProperties (size_t id) const
 }
 
 /*
-    Обновление карты
+    Обновление карты (базовая гарантия безопасности)
 */
 
 void PropertyMapReader::Read (InputStream& stream)
@@ -471,20 +497,16 @@ void PropertyMapReader::Read (InputStream& stream)
 
     Impl::LayoutDescPtr layout_desc;
 
+    size_t layout_id = 0;
+
     if (header.has_layout)
     {      
       layout_desc = impl->ReadLayout (stream);
+      layout_id   = layout_desc->source_id;
     }
     else if (header.has_layout_id)
     {
-      size_t layout_id = static_cast<size_t> (read (stream, xtl::type<uint64> ()));
-
-      Impl::LayoutMap::iterator iter = impl->layouts.find (layout_id);
-
-      if (iter == impl->layouts.end ())
-        throw xtl::format_operation_exception ("", "Internal error: can't read property map %u because corresponding layout %u has not been registered", (size_t)header.id, layout_id);
-
-      layout_desc = iter->second;
+      layout_id = static_cast<size_t> (read (stream, xtl::type<uint64> ()));
     }
 
       //синхронизация карты свойств
@@ -493,65 +515,93 @@ void PropertyMapReader::Read (InputStream& stream)
 
     Impl::MapDescPtr map_desc;
 
-    if (map_iter == impl->property_maps.end ())
-    {
-      if (!layout_desc)
-        throw xtl::format_operation_exception ("", "Internal error: no layout for new property map %u", size_t (header.id));
-
-        //новая карта свойств
-
-      Impl::MapDescPtr desc (new Impl::MapDesc (layout_desc), false);
-
-      impl->property_maps.insert_pair (static_cast<size_t> (header.id), desc);
-
-      map_desc = desc;
-    }
-    else
+    if (map_iter != impl->property_maps.end ())
     {
       map_desc = map_iter->second;
 
-      if (layout_desc)
-      {
-          //обновление лэйаута существующей карты
-         
-        const common::PropertyLayout& layout = layout_desc->layout;
-
-        if (map_desc->layout != layout_desc || map_desc->layout_hash != layout.Hash ())
-        {
-          map_desc->properties.Reset (layout);
-
-          map_desc->layout      = layout_desc;
-          map_desc->layout_hash = layout.Hash ();
-        }
-      }
-      else
+      if (!(header.has_layout_id || header.has_layout) || (!layout_desc && map_desc->layout->source_id == layout_id && map_desc->layout_hash == map_desc->layout->layout.Hash ()))
       {
         layout_desc = map_desc->layout;
       }
+      else
+      {
+        Impl::LayoutMap::iterator iter = impl->layouts.find (layout_id);
+
+        if (iter == impl->layouts.end ())
+          throw xtl::format_operation_exception ("", "Internal error: can't find layout %u to update property map %u", layout_id, size_t (header.id));
+
+        layout_desc = iter->second;
+
+          //обновление лэйаута существующей карты
+
+        const common::PropertyLayout& layout = layout_desc->layout;
+
+        map_desc->properties.Reset (layout);
+
+        map_desc->layout      = layout_desc;
+        map_desc->layout_hash = layout.Hash ();          
+      }
+    }
+    else
+    {
+        //поиск лэйаута
+
+      Impl::LayoutMap::iterator iter = impl->layouts.find (layout_id);
+
+      if (iter == impl->layouts.end ())
+        throw xtl::format_operation_exception ("", "Internal error: no layout %u for new property map %u", layout_id, size_t (header.id));
+
+      layout_desc = iter->second;
+
+        //новая карта свойств
+
+      map_desc = Impl::MapDescPtr (new Impl::MapDesc (layout_desc), false);
     }
 
       //синхронизация карты свойств
 
     common::PropertyMap& properties = map_desc->properties;
 
-      //синхронизация буфера карты свойств
-
-    size_t      src_buffer_size = stream.Read<uint32> ();
-    const void* src_buffer      = stream.ReadData (src_buffer_size);
-
-    if (src_buffer_size != properties.BufferSize ())
-      throw xtl::format_operation_exception ("", "Internal error: can't sync property map %u. Incoming buffer data size is %u but actual is %u", size_t (header.id), src_buffer_size, properties.BufferSize ());
-
-    properties.SetBufferData (src_buffer);
-
-      //синхронизация строк
-
-    for (IndexArray::iterator iter=layout_desc->string_indices.begin (), end=layout_desc->string_indices.end (); iter!=end; ++iter)
+    try
     {
-      const char* string = read (stream, xtl::type<const char*> ());
+        //синхронизация буфера карты свойств
 
-      properties.SetProperty (*iter, string);
+      size_t      src_buffer_size = stream.Read<uint32> ();
+      const void* src_buffer      = stream.ReadData (src_buffer_size);
+
+      if (src_buffer_size != properties.BufferSize ())
+        throw xtl::format_operation_exception ("", "Internal error: can't sync property map %u. Incoming buffer data size is %u but actual is %u", size_t (header.id), src_buffer_size, properties.BufferSize ());
+
+      properties.SetBufferData (src_buffer);
+
+        //синхронизация строк
+
+      for (IndexArray::iterator iter=layout_desc->string_indices.begin (), end=layout_desc->string_indices.end (); iter!=end; ++iter)
+      {
+        const char* string = read (stream, xtl::type<const char*> ());
+
+        properties.SetProperty (*iter, string);
+      }
     }
+    catch (...)
+    {
+        //reset strings, because SetBufferData is atomic operation
+
+      const common::PropertyDesc* property = properties.Layout ().Properties ();
+      
+      for (size_t i=0, count=properties.Layout ().Size (); i<count; i++, property++)
+      {
+        if (property->type == common::PropertyType_String)
+          properties.SetProperty (i, "");
+      }
+
+      throw;
+    }
+
+      //обновление структур данных
+
+    if (map_iter == impl->property_maps.end ())
+      impl->property_maps.insert_pair (static_cast<size_t> (header.id), map_desc);
   }
   catch (xtl::exception& e)
   {
