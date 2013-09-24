@@ -100,28 +100,15 @@ void ClientImpl::DeallocateId (ObjectType type, render::scene::interchange::uint
     Синхронизация свойств
 */
 
-void ClientImpl::StartPropertyMapSynchronization (const common::PropertyMap& properties)
+PropertyMapSynchronizer ClientImpl::CreateSynchronizer (const common::PropertyMap& properties)
 {
   try
   {
-    impl->properties_writer.Attach (properties);
+    return impl->properties_writer.CreateSynchronizer (properties);
   }
   catch (xtl::exception& e)
   {
-    e.touch ("render::scene::client::ClientImpl::StartPropertyMapSynchronization");
-    throw;
-  }
-}
-
-void ClientImpl::StopPropertyMapSynchronization (const common::PropertyMap& properties)
-{
-  try
-  {
-    impl->properties_writer.Detach (properties);
-  }
-  catch (xtl::exception& e)
-  {
-    e.touch ("render::scene::client::ClientImpl::StopPropertyMapSynchronization");
+    e.touch ("render::scene::client::ClientImpl::CreateSynchronizer");
     throw;
   }
 }

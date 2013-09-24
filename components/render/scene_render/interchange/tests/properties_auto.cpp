@@ -21,9 +21,9 @@ class Checker
   public:
     Checker () {}
 
-    void Attach (const PropertyMap& properties)
+    PropertyMapAutoWriter::Synchronizer CreateSynchronizer (const PropertyMap& properties)
     {
-      writer.Attach (properties);
+      return writer.CreateSynchronizer (properties);
     }
 
     void Sync ()
@@ -101,7 +101,7 @@ int main ()
         properties1.SetProperty ("X", "hello1");
         properties1.SetProperty ("Y", 1);
 
-        checker.Attach (properties2);
+        PropertyMapAutoWriter::Synchronizer s1 = checker.CreateSynchronizer (properties2);
 
         properties2.SetProperty ("X", "hello2");
         properties2.SetProperty ("Y", 2);
@@ -109,7 +109,8 @@ int main ()
         id1 = properties1.Id ();
         id2 = properties2.Id ();
 
-        checker.Attach (properties1);
+        PropertyMapAutoWriter::Synchronizer s2 = checker.CreateSynchronizer (properties1);
+
         checker.Sync ();
 
         PropertyMap properties3 = checker.GetProperties (id1);

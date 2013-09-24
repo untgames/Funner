@@ -24,9 +24,8 @@ class ClientImpl: public xtl::noncopyable
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Синхронизация свойств
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void                StartPropertyMapSynchronization (const common::PropertyMap&);
-    void                StopPropertyMapSynchronization  (const common::PropertyMap&);
-    common::PropertyMap GetServerProperties             (uint64 id); 
+    PropertyMapSynchronizer CreateSynchronizer  (const common::PropertyMap&);
+    common::PropertyMap     GetServerProperties (uint64 id); 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Выполнение синхронизации с сервером

@@ -19,13 +19,8 @@ const size_t LAYOUT_REMOVE_LIST_RESERVE_SIZE = 128;                        //рез
     Описание реализации автоматического синхронизатора карты свойств
 */
 
-namespace
-{
-
-struct MapDesc;
-
 /// Список обновления
-struct MapDescList
+struct PropertyMapAutoWriter::MapDescList
 {
   MapDesc* first;
   MapDesc* last; 
@@ -33,69 +28,12 @@ struct MapDescList
   MapDescList () : first (), last () {}
 };
 
-/// Дескриптор карты свойств
-struct MapDesc: public xtl::reference_counter
-{
-  const common::PropertyMap& properties;
-  bool                       dirty;              //нужна ли синхронизация
-  xtl::auto_connection       update_connection;  //соединение с сигналом оповещения об обновлении карты свойств
-  MapDescList&               list;               //список обновления
-  MapDesc*                   next;               //следующий элемент в списке обновления
+typedef stl::vector<uint64> IdArray;
 
-/// Конструктор
-  MapDesc (const common::PropertyMap& in_properties, MapDescList& in_list)
-    : properties (in_properties)
-    , dirty (true)
-    , update_connection (properties.RegisterEventHandler (common::PropertyMapEvent_OnUpdate, xtl::bind (&MapDesc::OnUpdate, this)))
-    , list (in_list)
-    , next ()
-  {
-    AddToList ();
-  }
-
-/// Оповещение об обновлении
-  void OnUpdate ()
-  {
-    if (dirty)
-      return;
-
-    dirty = true;
-
-    AddToList ();
-  }
-
-/// Снятие флага обновления
-  void ClearDirtyFlag ()
-  {
-    dirty = false;
-  }
-
-/// Добавление в список
-  void AddToList ()
-  {
-    next = 0;
-
-    if (list.last)
-    {
-      list.last->next = this;
-      return;
-    }
-
-    list.last = list.first = this;
-  }
-};
-
-typedef xtl::intrusive_ptr<MapDesc>       MapDescPtr;
-typedef stl::hash_map<uint64, MapDescPtr> MapDescMap;
-typedef stl::vector<uint64>               IdArray;
-
-}
-
-struct PropertyMapAutoWriter::Impl: public IPropertyMapWriterListener
+struct PropertyMapAutoWriter::Impl: public IPropertyMapWriterListener, public xtl::reference_counter
 {
   IPropertyMapWriterListener* listener;           //слушатель событий синхронизатора
   PropertyMapWriter           writer;             //синхронизатор
-  MapDescMap                  descs;              //дескрипторы карт свойств
   MapDescList                 update_list;        //список обновлений
   IdArray                     map_remove_list;    //список идентификаторов на удаление
   IdArray                     layout_remove_list; //список идентификаторов на удаление
@@ -111,19 +49,11 @@ struct PropertyMapAutoWriter::Impl: public IPropertyMapWriterListener
     layout_remove_list.reserve (LAYOUT_REMOVE_LIST_RESERVE_SIZE);
   }
 
-/// Удаление карты свойств
-  void Detach (uint64 id)
-  {
-    descs.erase (id);
-  }
-
 /// Обработчики событий
   void OnPropertyMapRemoved (uint64 id)
   {
     try
     {
-      Detach (id);
-
       map_remove_list.push_back (id);
 
       if (listener)
@@ -160,6 +90,60 @@ struct PropertyMapAutoWriter::Impl: public IPropertyMapWriterListener
 
 };
 
+/// Дескриптор карты свойств
+struct PropertyMapAutoWriter::MapDesc: public xtl::reference_counter
+{
+  const common::PropertyMap& properties;
+  bool                       dirty;              //нужна ли синхронизация
+  xtl::auto_connection       update_connection;  //соединение с сигналом оповещения об обновлении карты свойств
+  xtl::intrusive_ptr<Impl>   impl;               //реализация синхронизатора
+  MapDesc*                   next;               //следующий элемент в списке обновления
+
+/// Конструктор
+  MapDesc (const common::PropertyMap& in_properties, Impl* in_impl)
+    : properties (in_properties)
+    , dirty (true)
+    , update_connection (properties.RegisterEventHandler (common::PropertyMapEvent_OnUpdate, xtl::bind (&MapDesc::OnUpdate, this)))
+    , impl (in_impl)
+    , next ()
+  {
+    AddToList ();
+  }
+
+/// Оповещение об обновлении
+  void OnUpdate ()
+  {
+    if (dirty)
+      return;
+
+    dirty = true;
+
+    AddToList ();
+  }
+
+/// Снятие флага обновления
+  void ClearDirtyFlag ()
+  {
+    dirty = false;
+  }
+
+/// Добавление в список
+  void AddToList ()
+  {
+    MapDescList& list = impl->update_list;
+
+    next = 0;
+
+    if (list.last)
+    {
+      list.last->next = this;
+      return;
+    }
+
+    list.last = list.first = this;
+  }
+};
+
 /*
     Конструктор / деструктор
 */
@@ -171,29 +155,24 @@ PropertyMapAutoWriter::PropertyMapAutoWriter (IPropertyMapWriterListener* listen
 
 PropertyMapAutoWriter::~PropertyMapAutoWriter ()
 {
+  release (impl);
 }
 
 /*
     Слежение за картой свойств
 */
 
-void PropertyMapAutoWriter::Attach (const common::PropertyMap& properties)
+PropertyMapAutoWriter::Synchronizer PropertyMapAutoWriter::CreateSynchronizer (const common::PropertyMap& properties)
 {
-  uint64 id = properties.Id ();
-
-  MapDescMap::iterator iter = impl->descs.find (id);
-
-  if (iter != impl->descs.end ())
-    return;
-
-  MapDescPtr desc (new MapDesc (properties, impl->update_list), false);
-
-  impl->descs.insert_pair (id, desc);
-}
-
-void PropertyMapAutoWriter::Detach (const common::PropertyMap& properties)
-{
-  impl->Detach (properties.Id ());
+  try
+  {
+    return Synchronizer (new MapDesc (properties, impl));
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::scene::interchange::PropertyMapAutoWriter::CreateSynchronizer");
+    throw;
+  }
 }
 
 /*
@@ -300,4 +279,33 @@ void PropertyMapAutoWriter::Write (OutputStream& stream)
     e.touch ("render::scene::interchange::PropertyMapAutoWriter::Write(OutputStream&)");
     throw;
   }  
+}
+
+/*
+    Synchronizer
+*/
+
+PropertyMapAutoWriter::Synchronizer::Synchronizer (MapDesc* in_impl)
+  : impl (in_impl)
+{
+}
+
+PropertyMapAutoWriter::Synchronizer::Synchronizer (const Synchronizer& s)
+  : impl (s.impl)
+{
+  addref (impl);
+}
+
+PropertyMapAutoWriter::Synchronizer::~Synchronizer ()
+{
+  release (impl);
+}
+
+PropertyMapAutoWriter::Synchronizer& PropertyMapAutoWriter::Synchronizer::operator = (const Synchronizer& s)
+{
+  Synchronizer tmp (s);
+
+  stl::swap (impl, tmp.impl);
+
+  return *this;
 }
