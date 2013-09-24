@@ -37,6 +37,20 @@ ConnectionState::~ConnectionState ()
 }
 
 /*
+    Синхронизация свойств
+*/
+
+PropertyMapSynchronizer ConnectionState::CreateSynchronizer (const common::PropertyMap& properties)
+{
+  throw xtl::make_not_implemented_exception (__FUNCTION__);
+}
+
+common::PropertyMap ConnectionState::GetClientProperties (uint64 id)
+{
+  throw xtl::make_not_implemented_exception (__FUNCTION__);
+}
+
+/*
     Команды клиента
 */
 
@@ -137,6 +151,19 @@ void ConnectionState::SetViewportBackground (uint32 id, bool8 state, const math:
   catch (xtl::exception& e)
   {
     e.touch ("render::scene::ConnectionState::SetViewportBackground");
+    throw;
+  }
+}
+
+void ConnectionState::SetViewportProperties (uint32 id, uint64 properties_id)
+{
+  try
+  {
+    throw xtl::make_not_implemented_exception (__FUNCTION__);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::scene::ConnectionState::SetViewportProperties");
     throw;
   }
 }
@@ -332,6 +359,45 @@ void ConnectionState::OnWindowPaint (size_t id)
   catch (xtl::exception& e)
   {
     e.touch ("render::scene::ConnectionState::OnWindowPaint");
+    throw;
+  }
+}
+
+void ConnectionState::UpdatePropertyMap (interchange::InputStream&)
+{
+  try
+  {
+    throw xtl::make_not_implemented_exception (__FUNCTION__);    
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::scene::ConnectionState::UpdatePropertyMap");
+    throw;
+  }
+}
+
+void ConnectionState::RemovePropertyMap (uint64 id)
+{
+  try
+  {
+    throw xtl::make_not_implemented_exception (__FUNCTION__);    
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::scene::ConnectionState::RemovePropertyMap");
+    throw;
+  }
+}
+
+void ConnectionState::RemovePropertyLayout (uint64 id)
+{
+  try
+  {
+    throw xtl::make_not_implemented_exception (__FUNCTION__);    
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::scene::ConnectionState::RemovePropertyLayout");
     throw;
   }
 }

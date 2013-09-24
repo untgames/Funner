@@ -19,6 +19,7 @@
 
 #include <render/scene/interchange/connection_manager.h>
 #include <render/scene/interchange/context.h>
+#include <render/scene/interchange/property_synchronizer.h>
 #include <render/scene/interchange/render_thread.h>
 #include <render/scene/interchange/serializer.h>
 
@@ -33,6 +34,8 @@ namespace scene
 namespace server
 {
 
+using interchange::uint64;
+using interchange::int64;
 using interchange::uint32;
 using interchange::int32;
 using interchange::uint16;
@@ -56,6 +59,7 @@ enum InternalCommandId
 };
 
 typedef interchange::Context<interchange::ServerToClientSerializer, interchange::ClientToServerDeserializer> Context;
+typedef interchange::PropertyMapAutoWriter::Synchronizer                                                     PropertyMapSynchronizer;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Объект принимающий входящие подключения рендеринга
@@ -92,6 +96,12 @@ class ConnectionState: public xtl::noncopyable
     ~ConnectionState ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+///Синхронизация свойств
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    PropertyMapSynchronizer CreateSynchronizer  (const common::PropertyMap&);
+    common::PropertyMap     GetClientProperties (uint64 id); 
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Команды клиента
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void LoadResource (const char*);
@@ -104,6 +114,7 @@ class ConnectionState: public xtl::noncopyable
     void SetViewportName (uint32 id, const char* name);
     void SetViewportTechnique (uint32 id, const char* name);
     void SetViewportBackground (uint32 id, bool8 state, const math::vec4f& color);
+    void SetViewportProperties (uint32 id, uint64 properties_id);
     void DestroyViewport (uint32 id);
 
     void CreateRenderTarget (uint32 id, const char* name);
@@ -114,6 +125,10 @@ class ConnectionState: public xtl::noncopyable
     void AttachViewportToRenderTarget (uint32 render_target_id, uint32 viewport_id);
     void DetachViewportFromRenderTarget (uint32 render_target_id, uint32 viewport_id);
     void UpdateRenderTarget (uint32 id);
+
+    void UpdatePropertyMap (interchange::InputStream&);
+    void RemovePropertyMap (uint64 id);
+    void RemovePropertyLayout (uint64 id);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Внутренние команды
