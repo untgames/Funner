@@ -11,6 +11,7 @@ inline stl::string get_command_name(CommandId command_id)
     case CommandId_SetViewportName: return "SetViewportName";
     case CommandId_SetViewportTechnique: return "SetViewportTechnique";
     case CommandId_SetViewportBackground: return "SetViewportBackground";
+    case CommandId_SetViewportProperties: return "SetViewportProperties";
     case CommandId_DestroyViewport: return "DestroyViewport";
     case CommandId_CreateRenderTarget: return "CreateRenderTarget";
     case CommandId_DestroyRenderTarget: return "DestroyRenderTarget";
@@ -185,6 +186,24 @@ inline void ClientToServerSerializer::SetViewportBackground(uint32 id, bool8 sta
     write(*this, id);
     write(*this, state);
     write(*this, color);
+    EndCommand();
+  }
+  catch (...)
+  {
+    SetPosition (saved_position);
+    throw;
+  }
+}
+
+inline void ClientToServerSerializer::SetViewportProperties(uint32 id, uint64 properties_id)
+{
+  size_t saved_position = Position ();
+
+  try
+  {
+    BeginCommand(CommandId_SetViewportProperties);
+    write(*this, id);
+    write(*this, properties_id);
     EndCommand();
   }
   catch (...)
@@ -437,6 +456,9 @@ template <class Dispatcher> inline bool ClientToServerDeserializer::Deserialize(
       return true;
     case CommandId_SetViewportBackground:
       dispatcher.SetViewportBackground(read(*this, xtl::type<uint32> ()), read(*this, xtl::type<bool8> ()), read(*this, xtl::type<const math::vec4f&> ()));
+      return true;
+    case CommandId_SetViewportProperties:
+      dispatcher.SetViewportProperties(read(*this, xtl::type<uint32> ()), read(*this, xtl::type<uint64> ()));
       return true;
     case CommandId_DestroyViewport:
       dispatcher.DestroyViewport(read(*this, xtl::type<uint32> ()));

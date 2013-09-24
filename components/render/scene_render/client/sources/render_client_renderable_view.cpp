@@ -8,18 +8,19 @@ using namespace render::scene::client;
 
 struct RenderableView::Impl: public scene_graph::IViewportListener
 {
-  ConnectionPtr          connection;                   //соединение
-  scene_graph::Viewport& viewport;                     //ссылка на область вывода
-  size_t                 id;                           //идентификатор области вывода
-  bool                   is_active;                    //активна ли области отрисовки
-  bool                   need_reconfiguration;         //конфигурация изменена
-  bool                   need_update_renderer;         //требуется обновить рендер
-  bool                   need_update_background;       //требуется обновить параметры очистки
-  bool                   need_update_camera;           //требуется обновить камеру
-  bool                   need_update_properties;       //требуется обновление свойств
-  bool                   need_update_activity;         //требуется обновление активности области вывода
-  bool                   need_update_name;             //требуется обновление имени
-  bool                   need_update_area;             //требуется обновление области вывода
+  ConnectionPtr           connection;                   //соединение
+  scene_graph::Viewport&  viewport;                     //ссылка на область вывода
+  PropertyMapSynchronizer properties_sync;              //синхронизатор свойств
+  size_t                  id;                           //идентификатор области вывода
+  bool                    is_active;                    //активна ли области отрисовки
+  bool                    need_reconfiguration;         //конфигурация изменена
+  bool                    need_update_renderer;         //требуется обновить рендер
+  bool                    need_update_background;       //требуется обновить параметры очистки
+  bool                    need_update_camera;           //требуется обновить камеру
+  bool                    need_update_properties;       //требуется обновление свойств
+  bool                    need_update_activity;         //требуется обновление активности области вывода
+  bool                    need_update_name;             //требуется обновление имени
+  bool                    need_update_area;             //требуется обновление области вывода
 
 /// Конструктор
   Impl (const ConnectionPtr& in_connection, scene_graph::Viewport& in_viewport)
@@ -45,6 +46,10 @@ struct RenderableView::Impl: public scene_graph::IViewportListener
 
     try
     {
+      properties_sync = connection->Client ().CreateSynchronizer (viewport.Properties ());
+
+      connection->Context ().SetViewportProperties (id, viewport.Properties ().Id ());
+
       viewport.AttachListener (this);
     }
     catch (...)
@@ -192,8 +197,12 @@ struct RenderableView::Impl: public scene_graph::IViewportListener
         //переконфигурация свойств
 
       if (need_update_properties)
-      {
-        //?????????????
+      {        
+        properties_sync = connection->Client ().CreateSynchronizer (viewport.Properties ());
+
+        connection->Client ().Synchronize ();
+
+        context.SetViewportProperties (id, viewport.Properties ().Id ());
 
         need_update_properties = false;
       }
@@ -255,6 +264,8 @@ void RenderableView::Synchronize ()
 {
   try
   {
+    impl->connection->Client ().Synchronize ();
+
     impl->Synchronize ();
   }
   catch (xtl::exception& e)

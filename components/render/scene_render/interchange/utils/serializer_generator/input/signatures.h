@@ -10,6 +10,7 @@ void SetViewportActive (uint32 id, bool8 is_active);
 void SetViewportName (uint32 id, const char* name);
 void SetViewportTechnique (uint32 id, const char* name);
 void SetViewportBackground (uint32 id, bool8 state, const math::vec4f& color);
+void SetViewportProperties (uint32 id, uint64 properties_id);
 void DestroyViewport (uint32 id);
 
 void CreateRenderTarget (uint32 id, const char* name);

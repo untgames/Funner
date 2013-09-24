@@ -285,6 +285,11 @@ void PropertyMapAutoWriter::Write (OutputStream& stream)
     Synchronizer
 */
 
+PropertyMapAutoWriter::Synchronizer::Synchronizer ()
+  : impl ()
+{
+}
+
 PropertyMapAutoWriter::Synchronizer::Synchronizer (MapDesc* in_impl)
   : impl (in_impl)
 {
@@ -293,12 +298,14 @@ PropertyMapAutoWriter::Synchronizer::Synchronizer (MapDesc* in_impl)
 PropertyMapAutoWriter::Synchronizer::Synchronizer (const Synchronizer& s)
   : impl (s.impl)
 {
-  addref (impl);
+  if (impl)
+    addref (impl);
 }
 
 PropertyMapAutoWriter::Synchronizer::~Synchronizer ()
 {
-  release (impl);
+  if (impl)
+    release (impl);
 }
 
 PropertyMapAutoWriter::Synchronizer& PropertyMapAutoWriter::Synchronizer::operator = (const Synchronizer& s)

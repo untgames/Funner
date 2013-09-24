@@ -58,7 +58,7 @@ void ClientImpl::SetContext (Context* context)
     Выполнение синхронизации с сервером
 */
 
-void ClientImpl::Sync ()
+void ClientImpl::Synchronize ()
 {
   try
   {
@@ -66,7 +66,7 @@ void ClientImpl::Sync ()
   }
   catch (xtl::exception& e)
   {
-    e.touch ("render::scene::client::ClientImpl::Sync");
+    e.touch ("render::scene::client::ClientImpl::Synchronize");
     throw;
   }
 }
