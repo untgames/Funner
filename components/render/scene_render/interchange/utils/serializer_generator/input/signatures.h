@@ -27,4 +27,6 @@ void RemovePropertyLayout (uint64 id);
 
 #section ServerToClient
 
-void Dummy();
+void UpdatePropertyMap (...);
+void RemovePropertyMap (uint64 id);
+void RemovePropertyLayout (uint64 id);

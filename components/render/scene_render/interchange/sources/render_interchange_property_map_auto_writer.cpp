@@ -3,6 +3,19 @@
 using namespace render::scene::interchange;
 
 /*
+    Константы
+*/
+
+namespace
+{
+
+const char*  LOG_NAME                        = "render.scene.interchange"; //имя потока отладочного протоколирования
+const size_t MAP_REMOVE_LIST_RESERVE_SIZE    = 1024;                       //резервируемое количество элементов в списке удаления
+const size_t LAYOUT_REMOVE_LIST_RESERVE_SIZE = 128;                        //резервируемое количество элементов в списке удаления
+
+}
+
+/*
     Описание реализации автоматического синхронизатора карты свойств
 */
 
@@ -74,21 +87,28 @@ struct MapDesc: public xtl::reference_counter
 
 typedef xtl::intrusive_ptr<MapDesc>       MapDescPtr;
 typedef stl::hash_map<size_t, MapDescPtr> MapDescMap;
+typedef stl::vector<size_t>               IdArray;
 
 }
 
 struct PropertyMapAutoWriter::Impl: public IPropertyMapWriterListener
 {
-  IPropertyMapWriterListener* listener;    //слушатель событий синхронизатора
-  PropertyMapWriter           writer;      //синхронизатор
-  MapDescMap                  descs;       //дескрипторы карт свойств
-  MapDescList                 update_list; //список обновлений
+  IPropertyMapWriterListener* listener;           //слушатель событий синхронизатора
+  PropertyMapWriter           writer;             //синхронизатор
+  MapDescMap                  descs;              //дескрипторы карт свойств
+  MapDescList                 update_list;        //список обновлений
+  IdArray                     map_remove_list;    //список идентификаторов на удаление
+  IdArray                     layout_remove_list; //список идентификаторов на удаление
+  common::Log                 log;                //поток отладочного протоколирования
 
 /// Конструктор
   Impl (IPropertyMapWriterListener* in_listener)
     : listener (in_listener)
     , writer (this)
+    , log (LOG_NAME)
   {
+    map_remove_list.reserve (MAP_REMOVE_LIST_RESERVE_SIZE);
+    layout_remove_list.reserve (LAYOUT_REMOVE_LIST_RESERVE_SIZE);
   }
 
 /// Удаление карты свойств
@@ -100,17 +120,44 @@ struct PropertyMapAutoWriter::Impl: public IPropertyMapWriterListener
 /// Обработчики событий
   void OnPropertyMapRemoved (size_t id)
   {
-    Detach (id);
+    try
+    {
+      Detach (id);
 
-    if (listener)
-      listener->OnPropertyMapRemoved (id);
+      map_remove_list.push_back (id);
+
+      if (listener)
+        listener->OnPropertyMapRemoved (id);
+    }
+    catch (std::exception& e)
+    {
+      log.Printf ("%s\n    at render::scene::interchange::PropertyMapAutoWriter::Impl::OnPropertyMapRemoved", e.what ());
+    }
+    catch (...)
+    {
+      log.Printf ("unknown exception\n    at render::scene::interchange::PropertyMapAutoWriter::Impl::OnPropertyMapRemoved");
+    }
   }
 
   void OnPropertyLayoutRemoved (size_t id)
   {
-    if (listener)
-      listener->OnPropertyLayoutRemoved (id);
+    try
+    {
+      layout_remove_list.push_back (id);
+
+      if (listener)
+        listener->OnPropertyLayoutRemoved (id);
+    }
+    catch (std::exception& e)
+    {
+      log.Printf ("%s\n    at render::scene::interchange::PropertyMapAutoWriter::Impl::OnPropertyLayoutRemoved", e.what ());
+    }
+    catch (...)
+    {
+      log.Printf ("unknown exception\n    at render::scene::interchange::PropertyMapAutoWriter::Impl::OnPropertyLayoutRemoved");
+    }
   }
+
 };
 
 /*
@@ -174,6 +221,52 @@ void PropertyMapAutoWriter::Write (OutputStream& stream)
 {
   try
   {
+      //обработка списов удаления
+
+    for (IdArray::iterator iter=impl->layout_remove_list.begin (), end=impl->layout_remove_list.end (); iter!=end; ++iter)
+    {
+      size_t saved_position = stream.Position ();
+
+      try
+      {
+        stream.BeginCommand (CommandId_RemovePropertyLayout);
+        write               (stream, static_cast<uint64> (*iter));
+        stream.EndCommand   ();
+      }
+      catch (...)
+      {
+        stream.SetPosition (saved_position);
+
+        impl->layout_remove_list.erase (impl->layout_remove_list.begin (), iter);
+
+        throw;
+      }
+    }
+
+    impl->layout_remove_list.clear ();
+
+    for (IdArray::iterator iter=impl->map_remove_list.begin (), end=impl->map_remove_list.end (); iter!=end; ++iter)
+    {
+      size_t saved_position = stream.Position ();
+
+      try
+      {
+        stream.BeginCommand (CommandId_RemovePropertyMap);
+        write               (stream, static_cast<uint64> (*iter));
+        stream.EndCommand   ();
+      }
+      catch (...)
+      {
+        stream.SetPosition (saved_position);
+
+        impl->map_remove_list.erase (impl->map_remove_list.begin (), iter);
+
+        throw;
+      }
+    }
+
+    impl->map_remove_list.clear ();
+
       //обработка списка обновлений
 
     for (MapDesc* desc = impl->update_list.first; desc; desc = desc->next)

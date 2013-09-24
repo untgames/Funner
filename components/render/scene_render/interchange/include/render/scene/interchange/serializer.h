@@ -40,7 +40,6 @@ enum CommandId
   CommandId_UpdatePropertyMap,
   CommandId_RemovePropertyMap,
   CommandId_RemovePropertyLayout,
-  CommandId_Dummy,
   CommandId_FirstUserDefined = 10000,
 };
 
@@ -119,7 +118,9 @@ class ServerToClientSerializer: private OutputStream
 ///ƒоступные команды сериализации (кодогенераци€)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-    void Dummy();
+    OutputStream& UpdatePropertyMap();
+    void RemovePropertyMap(uint64 id);
+    void RemovePropertyLayout(uint64 id);
 
   protected:
     using OutputStream::Swap;

@@ -16,10 +16,10 @@ void dump_properties (const PropertyMap& properties)
   }
 }
 
-class Checker: private IPropertyMapWriterListener
+class Checker
 {
   public:
-    Checker () : writer (this) {}
+    Checker () {}
 
     void Attach (const PropertyMap& properties)
     {
@@ -49,7 +49,7 @@ class Checker: private IPropertyMapWriterListener
         {
           stl::string command_name = get_command_name ((CommandId)command.command_id);
 
-          printf ("Can't read command %s with size %u: only %u bytes is available", command_name.c_str (), command.command_size, body_size);
+          printf ("Can't read command %s with size %u: only %u bytes is available\n", command_name.c_str (), command.command_size, body_size);
 
           break; //no more data
         }
@@ -77,10 +77,7 @@ class Checker: private IPropertyMapWriterListener
     }
 
     PropertyMap GetProperties (size_t id) { return reader.GetProperties (id); }
-
-  private:
-    void OnPropertyMapRemoved    (size_t id) { printf ("PropertyMapWriterListener::OnPropertyMapRemoved\n"); }
-    void OnPropertyLayoutRemoved (size_t id) { printf ("PropertyMapWriterListener::OnPropertyLayoutRemoved\n"); }
+    bool        HasProperties (size_t id) { return reader.HasProperties (id); }
 
   private:
     PropertyMapAutoWriter writer;
@@ -96,27 +93,41 @@ int main ()
     Checker checker;
 
     {
-      PropertyMap properties1, properties2;
+      size_t id1 = 0, id2 = 0;
 
-      properties1.SetProperty ("X", "hello1");
-      properties1.SetProperty ("Y", 1);
+      {     
+        PropertyMap properties1, properties2;
 
-      checker.Attach (properties2);
+        properties1.SetProperty ("X", "hello1");
+        properties1.SetProperty ("Y", 1);
 
-      properties2.SetProperty ("X", "hello2");
-      properties2.SetProperty ("Y", 2);
+        checker.Attach (properties2);
 
-      checker.Attach (properties1);
+        properties2.SetProperty ("X", "hello2");
+        properties2.SetProperty ("Y", 2);
+
+        id1 = properties1.Id ();
+        id2 = properties2.Id ();
+
+        checker.Attach (properties1);
+        checker.Sync ();
+
+        PropertyMap properties3 = checker.GetProperties (id1);
+        PropertyMap properties4 = checker.GetProperties (id2);
+
+        dump_properties (properties3);
+        dump_properties (properties4);
+
+        printf ("dummy update\n");
+
+        checker.Sync (); 
+      }
+
+      printf ("remove properties\n");
+
       checker.Sync ();
 
-      PropertyMap properties3 = checker.GetProperties (properties1.Id ()), properties4 = checker.GetProperties (properties2.Id ());
-
-      dump_properties (properties3);
-      dump_properties (properties4);
-
-      printf ("dummy update\n");
-
-      checker.Sync ();
+      printf ("has properties: %s %s\n", checker.HasProperties (id1) ? "true" : "false", checker.HasProperties (id2) ? "true" : "false");
     }
 
     printf ("after exit from scope\n");

@@ -23,7 +23,6 @@ inline stl::string get_command_name(CommandId command_id)
     case CommandId_UpdatePropertyMap: return "UpdatePropertyMap";
     case CommandId_RemovePropertyMap: return "RemovePropertyMap";
     case CommandId_RemovePropertyLayout: return "RemovePropertyLayout";
-    case CommandId_Dummy: return "Dummy";
     default: return common::format ("CommandId#%u", command_id);
   }
 }
@@ -486,14 +485,47 @@ template <class Dispatcher> inline bool ClientToServerDeserializer::Deserialize(
 */
 
 
-inline void ServerToClientSerializer::Dummy()
+inline OutputStream& ServerToClientSerializer::UpdatePropertyMap()
 {
   size_t saved_position = Position ();
 
   try
   {
-    BeginCommand(CommandId_Dummy);
+    BeginCommand(CommandId_UpdatePropertyMap);
+    return *this;
+  }
+  catch (...)
+  {
+    SetPosition (saved_position);
+    throw;
+  }
+}
 
+inline void ServerToClientSerializer::RemovePropertyMap(uint64 id)
+{
+  size_t saved_position = Position ();
+
+  try
+  {
+    BeginCommand(CommandId_RemovePropertyMap);
+    write(*this, id);
+    EndCommand();
+  }
+  catch (...)
+  {
+    SetPosition (saved_position);
+    throw;
+  }
+}
+
+inline void ServerToClientSerializer::RemovePropertyLayout(uint64 id)
+{
+  size_t saved_position = Position ();
+
+  try
+  {
+    BeginCommand(CommandId_RemovePropertyLayout);
+    write(*this, id);
     EndCommand();
   }
   catch (...)
@@ -507,8 +539,14 @@ template <class Dispatcher> inline bool ServerToClientDeserializer::Deserialize(
 {
   switch (id)
   {
-    case CommandId_Dummy:
-      dispatcher.Dummy();
+    case CommandId_UpdatePropertyMap:
+      dispatcher.UpdatePropertyMap(*this);
+      return true;
+    case CommandId_RemovePropertyMap:
+      dispatcher.RemovePropertyMap(read(*this, xtl::type<uint64> ()));
+      return true;
+    case CommandId_RemovePropertyLayout:
+      dispatcher.RemovePropertyLayout(read(*this, xtl::type<uint64> ()));
       return true;
     default:
       return DeserializeUnknownCommand (id, *this);

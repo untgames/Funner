@@ -1,6 +1,6 @@
 #include <stdio.h>
 
-#include <stl/vector>
+#include <stl/hash_set>
 
 #include <xtl/common_exceptions.h>
 
@@ -442,12 +442,20 @@ void dump_deserialization (const MethodArray& methods, stl::string& result, cons
 
 void dump_enums (const MethodArray& methods, stl::string& result)
 {
+  stl::hash_set<stl::hash_key<const char*> > names;
+
   for (MethodArray::const_iterator iter=methods.begin (), end=methods.end (); iter!=end; ++iter)
   {
+    const Method& method = *iter;
+
+    if (names.count (method.name.c_str ()))
+      continue;
+
+    names.insert (method.name.c_str ());
+
     if (iter != methods.begin ())
       result += "\n";
 
-    const Method& method = *iter;    
 
     result += common::format ("  %s_%s,", COMMAND_ID_ENUM_NAME, method.name.c_str ());
   }
@@ -455,12 +463,19 @@ void dump_enums (const MethodArray& methods, stl::string& result)
 
 void dump_enum_names (const MethodArray& methods, stl::string& result)
 {
+  stl::hash_set<stl::hash_key<const char*> > names;
+
   for (MethodArray::const_iterator iter=methods.begin (), end=methods.end (); iter!=end; ++iter)
   {
+    const Method& method = *iter;    
+
+    if (names.count (method.name.c_str ()))
+      continue;
+
+    names.insert (method.name.c_str ());
+
     if (iter != methods.begin ())
       result += "\n";
-
-    const Method& method = *iter;    
 
     result += common::format ("    case %s_%s: return \"%s\";", COMMAND_ID_ENUM_NAME, method.name.c_str (), method.name.c_str ());
   }

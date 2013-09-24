@@ -483,6 +483,11 @@ common::PropertyMap PropertyMapReader::GetProperties (size_t id) const
   }
 }
 
+bool PropertyMapReader::HasProperties (size_t id) const
+{
+  return impl->property_maps.find (id) != impl->property_maps.end ();
+}
+
 /*
     ќбновление карты (базова€ гаранти€ безопасности)
 */
@@ -616,10 +621,10 @@ void PropertyMapReader::Read (InputStream& stream)
 
 void PropertyMapReader::RemoveProperties (size_t id)
 {
-  impl->layouts.erase (id);
+  impl->property_maps.erase (id);
 }
 
 void PropertyMapReader::RemoveLayout (size_t id)
 {
-  impl->property_maps.erase (id);
+  impl->layouts.erase (id);
 }
