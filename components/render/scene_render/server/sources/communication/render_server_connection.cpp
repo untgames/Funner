@@ -40,6 +40,8 @@ struct ConnectionInternalState: public xtl::reference_counter
     , state (in_server)
     , context (state)
   {
+    state.SetContext (&context);
+
     common::PropertyMap properties = common::parse_init_string (init_string);
 
     if (properties.IsPresent ("initiator"))
@@ -51,6 +53,12 @@ struct ConnectionInternalState: public xtl::reference_counter
       context.SetCounterparty (response_connection.get ());
     }
   } 
+
+/// Деструктор
+  ~ConnectionInternalState ()
+  {
+    state.SetContext (0);
+  }
 };
 
 typedef xtl::intrusive_ptr<ConnectionInternalState> StatePtr;

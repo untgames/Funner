@@ -9,10 +9,26 @@ using namespace render::scene;
 
 struct ConnectionState::Impl
 {
-  ServerImpl& server; //ссылка на сервер
+  ServerImpl&                        server;             //ссылка на сервер
+  server::Context*                   context;            //контекст
+  interchange::PropertyMapAutoWriter properties_writer;  //синхронизатор свойств (запись на клиент)
+  interchange::PropertyMapReader     properties_reader;  //синхронизатор свойств (чтение с клиента)
 
 /// Конструктор
-  Impl (ServerImpl& in_server) : server (in_server) {}  
+  Impl (ServerImpl& in_server)
+    : server (in_server)
+    , context ()
+  {
+  }  
+
+/// Получение контекста
+  server::Context& Context ()
+  {
+    if (!context)
+      throw xtl::format_operation_exception ("render::server::ConnectionState::Impl::Context", "Context is null");
+
+    return *context;
+  }
 };
 
 /*
@@ -37,17 +53,55 @@ ConnectionState::~ConnectionState ()
 }
 
 /*
+    Установка контекста
+*/
+
+void ConnectionState::SetContext (Context* context)
+{
+  impl->context = context;
+}
+
+/*
     Синхронизация свойств
 */
 
 PropertyMapSynchronizer ConnectionState::CreateSynchronizer (const common::PropertyMap& properties)
 {
-  throw xtl::make_not_implemented_exception (__FUNCTION__);
+  try
+  {
+    return impl->properties_writer.CreateSynchronizer (properties);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::scene::server::ClientState::CreateSynchronizer");
+    throw;
+  }
 }
 
 common::PropertyMap ConnectionState::GetClientProperties (uint64 id)
 {
-  throw xtl::make_not_implemented_exception (__FUNCTION__);
+  try
+  {
+    return impl->properties_reader.GetProperties (id);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::scene::server::ClientState::GetClientProperties");
+    throw;
+  }
+}
+
+void ConnectionState::SynchronizeProperties ()
+{
+  try
+  {
+    impl->properties_writer.Write (impl->Context ());
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::scene::server::ClientState::SynchronizeProperties");
+    throw;
+  }  
 }
 
 /*
@@ -363,11 +417,11 @@ void ConnectionState::OnWindowPaint (size_t id)
   }
 }
 
-void ConnectionState::UpdatePropertyMap (interchange::InputStream&)
+void ConnectionState::UpdatePropertyMap (interchange::InputStream& stream)
 {
   try
   {
-    throw xtl::make_not_implemented_exception (__FUNCTION__);    
+    impl->properties_reader.Read (stream);
   }
   catch (xtl::exception& e)
   {
@@ -380,7 +434,7 @@ void ConnectionState::RemovePropertyMap (uint64 id)
 {
   try
   {
-    throw xtl::make_not_implemented_exception (__FUNCTION__);    
+    impl->properties_reader.RemoveProperties (id);
   }
   catch (xtl::exception& e)
   {
@@ -393,7 +447,7 @@ void ConnectionState::RemovePropertyLayout (uint64 id)
 {
   try
   {
-    throw xtl::make_not_implemented_exception (__FUNCTION__);    
+    impl->properties_reader.RemoveLayout (id);
   }
   catch (xtl::exception& e)
   {
