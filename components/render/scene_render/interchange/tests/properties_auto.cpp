@@ -62,11 +62,11 @@ class Checker
             break;
           case CommandId_RemovePropertyMap:
             printf ("reader: remove property map command received\n");
-            reader.RemoveProperties (static_cast<size_t> (read (in_stream, xtl::type<uint64> ())));
+            reader.RemoveProperties (read (in_stream, xtl::type<uint64> ()));
             break;
           case CommandId_RemovePropertyLayout:
             printf ("reader: remove property layout command received\n");
-            reader.RemoveLayout (static_cast<size_t> (read (in_stream, xtl::type<uint64> ())));
+            reader.RemoveLayout (read (in_stream, xtl::type<uint64> ()));
             break;
           default:
             printf ("Unknown command %u with size %u. Will be skipped", command.command_id, command.command_size);
@@ -76,8 +76,8 @@ class Checker
       }
     }
 
-    PropertyMap GetProperties (size_t id) { return reader.GetProperties (id); }
-    bool        HasProperties (size_t id) { return reader.HasProperties (id); }
+    PropertyMap GetProperties (uint64 id) { return reader.GetProperties (id); }
+    bool        HasProperties (uint64 id) { return reader.HasProperties (id); }
 
   private:
     PropertyMapAutoWriter writer;
@@ -93,7 +93,7 @@ int main ()
     Checker checker;
 
     {
-      size_t id1 = 0, id2 = 0;
+      uint64 id1 = 0, id2 = 0;
 
       {     
         PropertyMap properties1, properties2;

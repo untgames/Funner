@@ -22,8 +22,8 @@ namespace interchange
 class IPropertyMapWriterListener
 {
   public:
-    virtual void OnPropertyMapRemoved    (size_t id) = 0;
-    virtual void OnPropertyLayoutRemoved (size_t id) = 0;
+    virtual void OnPropertyMapRemoved    (uint64 id) = 0;
+    virtual void OnPropertyLayoutRemoved (uint64 id) = 0;
 
   protected:
     virtual ~IPropertyMapWriterListener () {}
@@ -99,8 +99,8 @@ class PropertyMapReader: public xtl::noncopyable
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Получение карты свойств
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    common::PropertyMap GetProperties (size_t id) const;
-    bool                HasProperties (size_t id) const;
+    common::PropertyMap GetProperties (uint64 id) const;
+    bool                HasProperties (uint64 id) const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Обновление карты
@@ -110,8 +110,8 @@ class PropertyMapReader: public xtl::noncopyable
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Удаление карты свойств и лэйаута
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void RemoveProperties (size_t id);
-    void RemoveLayout     (size_t id);
+    void RemoveProperties (uint64 id);
+    void RemoveLayout     (uint64 id);
 
   private:
     struct Impl;

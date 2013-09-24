@@ -67,6 +67,8 @@ class Context: public Serializer, protected Deserializer
     typedef stl::auto_ptr<IncomingCommandsProcessor>         IncomingCommandsProcessorPtr;
     typedef xtl::trackable_ptr<IConnection>                  ConnectionPtr;
 
+    template <class Processor> class IncomingCommandsProcessorImpl;
+
   private:
     ConnectionPtr                connection;
     CommandBufferPool            command_buffer_pool;

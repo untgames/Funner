@@ -22,6 +22,7 @@
 #include <render/scene/interchange/command_queue.h>
 #include <render/scene/interchange/connection_manager.h>
 #include <render/scene/interchange/context.h>
+#include <render/scene/interchange/property_synchronizer.h>
 #include <render/scene/interchange/serializer.h>
 
 namespace render
@@ -32,6 +33,17 @@ namespace scene
 
 namespace client
 {
+
+using interchange::int64;
+using interchange::uint64;
+using interchange::int32;
+using interchange::uint32;
+using interchange::int16;
+using interchange::uint16;
+using interchange::int8;
+using interchange::uint8;
+using interchange::float32;
+using interchange::bool8;
 
 typedef interchange::Context<interchange::ClientToServerSerializer, interchange::ServerToClientDeserializer> Context;
 

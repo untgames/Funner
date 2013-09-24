@@ -44,7 +44,7 @@ class Checker: private IPropertyMapWriterListener
         {
           stl::string command_name = get_command_name ((CommandId)command.command_id);
 
-          printf ("Can't read command %s with size %u: only %u bytes is available", command_name.c_str (), command.command_size, body_size);
+          printf ("Can't read command %s with size %u: only %u bytes is available\n", command_name.c_str (), command.command_size, body_size);
 
           break; //no more data
         }
@@ -57,11 +57,11 @@ class Checker: private IPropertyMapWriterListener
             break;
           case CommandId_RemovePropertyMap:
             printf ("reader: remove property map command received\n");
-            reader.RemoveProperties (static_cast<size_t> (read (in_stream, xtl::type<uint64> ())));
+            reader.RemoveProperties (read (in_stream, xtl::type<uint64> ()));
             break;
           case CommandId_RemovePropertyLayout:
             printf ("reader: remove property layout command received\n");
-            reader.RemoveLayout (static_cast<size_t> (read (in_stream, xtl::type<uint64> ())));
+            reader.RemoveLayout (read (in_stream, xtl::type<uint64> ()));
             break;
           default:
             printf ("Unknown command %u with size %u. Will be skipped", command.command_id, command.command_size);
@@ -71,11 +71,11 @@ class Checker: private IPropertyMapWriterListener
       }
     }
 
-    PropertyMap GetProperties (size_t id) { return reader.GetProperties (id); }
+    PropertyMap GetProperties (uint64 id) { return reader.GetProperties (id); }
 
   private:
-    void OnPropertyMapRemoved    (size_t id) { printf ("PropertyMapWriterListener::OnPropertyMapRemoved\n"); }
-    void OnPropertyLayoutRemoved (size_t id) { printf ("PropertyMapWriterListener::OnPropertyLayoutRemoved\n"); }
+    void OnPropertyMapRemoved    (uint64 id) { printf ("PropertyMapWriterListener::OnPropertyMapRemoved\n"); }
+    void OnPropertyLayoutRemoved (uint64 id) { printf ("PropertyMapWriterListener::OnPropertyLayoutRemoved\n"); }
 
   private:
     PropertyMapWriter writer;

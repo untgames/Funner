@@ -86,8 +86,8 @@ struct MapDesc: public xtl::reference_counter
 };
 
 typedef xtl::intrusive_ptr<MapDesc>       MapDescPtr;
-typedef stl::hash_map<size_t, MapDescPtr> MapDescMap;
-typedef stl::vector<size_t>               IdArray;
+typedef stl::hash_map<uint64, MapDescPtr> MapDescMap;
+typedef stl::vector<uint64>               IdArray;
 
 }
 
@@ -112,13 +112,13 @@ struct PropertyMapAutoWriter::Impl: public IPropertyMapWriterListener
   }
 
 /// Удаление карты свойств
-  void Detach (size_t id)
+  void Detach (uint64 id)
   {
     descs.erase (id);
   }
 
 /// Обработчики событий
-  void OnPropertyMapRemoved (size_t id)
+  void OnPropertyMapRemoved (uint64 id)
   {
     try
     {
@@ -139,7 +139,7 @@ struct PropertyMapAutoWriter::Impl: public IPropertyMapWriterListener
     }
   }
 
-  void OnPropertyLayoutRemoved (size_t id)
+  void OnPropertyLayoutRemoved (uint64 id)
   {
     try
     {
@@ -179,7 +179,7 @@ PropertyMapAutoWriter::~PropertyMapAutoWriter ()
 
 void PropertyMapAutoWriter::Attach (const common::PropertyMap& properties)
 {
-  size_t id = properties.Id ();
+  uint64 id = properties.Id ();
 
   MapDescMap::iterator iter = impl->descs.find (id);
 

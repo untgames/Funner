@@ -10,11 +10,14 @@ template <class Deserializer> class IIncomingCommandsProcessor
     virtual void ProcessFeedback (Deserializer& deserializer, common::Log& log) = 0;
 };
 
+}
+
 /// Обработчик входящих команд
-template <class Processor, class Deserializer> class IncomingCommandsProcessor: public IIncomingCommandsProcessor<Deserializer>
+template <class Serializer, class Deserializer> template <class Processor>
+class Context<Serializer, Deserializer>::IncomingCommandsProcessorImpl: public detail::IIncomingCommandsProcessor<Deserializer>
 {
   public:
-    IncomingCommandsProcessor (Processor* in_processor) : processor (in_processor) {}
+    IncomingCommandsProcessorImpl (Processor* in_processor) : processor (in_processor) {}
 
     void ProcessFeedback (Deserializer& deserializer, common::Log& log)
     {
@@ -62,15 +65,13 @@ template <class Processor, class Deserializer> class IncomingCommandsProcessor: 
     Processor* processor;
 };
 
-}
-
 /*
     Конструктор / деструктор
 */
 
 template <class Serializer, class Deserializer> template <class Processor>
 inline Context<Serializer, Deserializer>::Context (Processor& processor)
-  : incoming_commands_processor (new detail::IncomingCommandsProcessor<Processor, Deserializer> (&processor))
+  : incoming_commands_processor (new IncomingCommandsProcessorImpl<Processor> (&processor))
   , log ("render.scene.interchange.Context")
 {
 }

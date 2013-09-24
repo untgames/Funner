@@ -68,6 +68,9 @@ struct Connection::Impl: public xtl::reference_counter, public xtl::trackable
     {
       mutex.Lock ();
 
+      if (client)
+        client->SetContext (0);      
+
       interchange::ConnectionManager::UnregisterConnection (response_connection_name.c_str ());
     }
     catch (...)
@@ -191,9 +194,11 @@ Connection::Connection (const char* connection_name, const char* init_string, si
       //создание контекста
 
     impl->client.reset (new ClientImpl);
-    impl->context.reset (new ContextImpl (*impl->client));
+    impl->context.reset (new ContextImpl (*impl->client));    
 
     impl->context->SetCounterparty (&*impl->client_to_server_connection);
+
+    impl->client->SetContext (&*impl->context);
   }
   catch (xtl::exception& e)
   {

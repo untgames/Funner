@@ -36,14 +36,14 @@ struct PropertyMapWriter::Impl: public xtl::trackable
   struct LayoutDesc: public xtl::reference_counter
   {
     IndexArray string_indices; //индексы строк в лэйауте
-    size_t     id;             //индентификатор лэйаута
+    uint64     id;             //индентификатор лэйаута
     size_t     hash;           //хэш лэйаута
 
-    LayoutDesc (size_t in_id) : id (in_id), hash () {}
+    LayoutDesc (uint64 in_id) : id (in_id), hash () {}
   };
 
   typedef xtl::intrusive_ptr<LayoutDesc>       LayoutDescPtr;
-  typedef stl::hash_map<size_t, LayoutDescPtr> LayoutMap;
+  typedef stl::hash_map<uint64, LayoutDescPtr> LayoutMap;
 
   struct MapDesc: public xtl::reference_counter
   {
@@ -54,7 +54,7 @@ struct PropertyMapWriter::Impl: public xtl::trackable
   };
 
   typedef xtl::intrusive_ptr<MapDesc>       MapDescPtr;
-  typedef stl::hash_map<size_t, MapDescPtr> MapDescMap;
+  typedef stl::hash_map<uint64, MapDescPtr> MapDescMap;
 
   IPropertyMapWriterListener* listener;      //слушатель событий
   LayoutMap                   layouts;       //синхронизированные лэйауты
@@ -138,7 +138,7 @@ struct PropertyMapWriter::Impl: public xtl::trackable
   }
 
 /// Удаление лэйаута
-  void RemoveLayout (size_t id)
+  void RemoveLayout (uint64 id)
   {
     layouts.erase (id);
 
@@ -153,7 +153,7 @@ struct PropertyMapWriter::Impl: public xtl::trackable
   }
 
 /// Удаление карты свойств
-  void RemovePropertyMap (size_t id)
+  void RemovePropertyMap (uint64 id)
   {
     property_maps.erase (id);
 
@@ -326,13 +326,13 @@ struct PropertyMapReader::Impl
 {
   struct LayoutDesc: public xtl::reference_counter
   {
-    size_t                 source_id;      //идентификатор исходного лэйаута
+    uint64                 source_id;      //идентификатор исходного лэйаута
     common::PropertyLayout layout;         //расположение свойств
     IndexArray             string_indices; //индексы строк в лэйауте    
   };
 
   typedef xtl::intrusive_ptr<LayoutDesc>             LayoutDescPtr;
-  typedef stl::hash_map<size_t, LayoutDescPtr>       LayoutMap;
+  typedef stl::hash_map<uint64, LayoutDescPtr>       LayoutMap;
 
   struct MapDesc: public xtl::reference_counter
   {
@@ -344,7 +344,7 @@ struct PropertyMapReader::Impl
   };
 
   typedef xtl::intrusive_ptr<MapDesc>       MapDescPtr;
-  typedef stl::hash_map<size_t, MapDescPtr> MapDescMap;
+  typedef stl::hash_map<uint64, MapDescPtr> MapDescMap;
 
   LayoutMap  layouts;       //расположения свойств
   MapDescMap property_maps; //карты свойств
@@ -359,7 +359,7 @@ struct PropertyMapReader::Impl
     {
         //чтение идентификатора лэйаута
 
-      size_t layout_id = static_cast<size_t> (read (stream, xtl::type<uint64> ()));
+      uint64 layout_id = read (stream, xtl::type<uint64> ());
 
         //получение лэйаута
 
@@ -465,14 +465,14 @@ PropertyMapReader::~PropertyMapReader ()
     Получение карты свойств
 */
 
-common::PropertyMap PropertyMapReader::GetProperties (size_t id) const
+common::PropertyMap PropertyMapReader::GetProperties (uint64 id) const
 {
   try
   {
     Impl::MapDescMap::iterator iter = impl->property_maps.find (id);
 
     if (iter == impl->property_maps.end ())
-      throw xtl::make_argument_exception ("", "id", id, "PropertyMap with such id has not been registered");
+      throw xtl::format_operation_exception ("", "PropertyMap with id %llu has not been registered", id);
 
     return iter->second->properties;
   }
@@ -483,7 +483,7 @@ common::PropertyMap PropertyMapReader::GetProperties (size_t id) const
   }
 }
 
-bool PropertyMapReader::HasProperties (size_t id) const
+bool PropertyMapReader::HasProperties (uint64 id) const
 {
   return impl->property_maps.find (id) != impl->property_maps.end ();
 }
@@ -502,7 +502,7 @@ void PropertyMapReader::Read (InputStream& stream)
 
     Impl::LayoutDescPtr layout_desc;
 
-    size_t layout_id = 0;
+    uint64 layout_id = 0;
 
     if (header.has_layout)
     {      
@@ -511,12 +511,12 @@ void PropertyMapReader::Read (InputStream& stream)
     }
     else if (header.has_layout_id)
     {
-      layout_id = static_cast<size_t> (read (stream, xtl::type<uint64> ()));
+      layout_id = read (stream, xtl::type<uint64> ());
     }
 
       //синхронизация карты свойств
 
-    Impl::MapDescMap::iterator map_iter = impl->property_maps.find (static_cast<size_t> (header.id));
+    Impl::MapDescMap::iterator map_iter = impl->property_maps.find (header.id);
 
     Impl::MapDescPtr map_desc;
 
@@ -533,7 +533,7 @@ void PropertyMapReader::Read (InputStream& stream)
         Impl::LayoutMap::iterator iter = impl->layouts.find (layout_id);
 
         if (iter == impl->layouts.end ())
-          throw xtl::format_operation_exception ("", "Internal error: can't find layout %u to update property map %u", layout_id, size_t (header.id));
+          throw xtl::format_operation_exception ("", "Internal error: can't find layout %llu to update property map %llu", layout_id, header.id);
 
         layout_desc = iter->second;
 
@@ -554,7 +554,7 @@ void PropertyMapReader::Read (InputStream& stream)
       Impl::LayoutMap::iterator iter = impl->layouts.find (layout_id);
 
       if (iter == impl->layouts.end ())
-        throw xtl::format_operation_exception ("", "Internal error: no layout %u for new property map %u", layout_id, size_t (header.id));
+        throw xtl::format_operation_exception ("", "Internal error: no layout %llu for new property map %llu", layout_id, header.id);
 
       layout_desc = iter->second;
 
@@ -575,7 +575,7 @@ void PropertyMapReader::Read (InputStream& stream)
       const void* src_buffer      = stream.ReadData (src_buffer_size);
 
       if (src_buffer_size != properties.BufferSize ())
-        throw xtl::format_operation_exception ("", "Internal error: can't sync property map %u. Incoming buffer data size is %u but actual is %u", size_t (header.id), src_buffer_size, properties.BufferSize ());
+        throw xtl::format_operation_exception ("", "Internal error: can't sync property map %llu. Incoming buffer data size is %u but actual is %u", header.id, src_buffer_size, properties.BufferSize ());
 
       properties.SetBufferData (src_buffer);
 
@@ -606,7 +606,7 @@ void PropertyMapReader::Read (InputStream& stream)
       //обновление структур данных
 
     if (map_iter == impl->property_maps.end ())
-      impl->property_maps.insert_pair (static_cast<size_t> (header.id), map_desc);
+      impl->property_maps.insert_pair (header.id, map_desc);
   }
   catch (xtl::exception& e)
   {
@@ -619,12 +619,12 @@ void PropertyMapReader::Read (InputStream& stream)
     Удаление карты свойств и лэйаута
 */
 
-void PropertyMapReader::RemoveProperties (size_t id)
+void PropertyMapReader::RemoveProperties (uint64 id)
 {
   impl->property_maps.erase (id);
 }
 
-void PropertyMapReader::RemoveLayout (size_t id)
+void PropertyMapReader::RemoveLayout (uint64 id)
 {
   impl->layouts.erase (id);
 }
