@@ -1,0 +1,15 @@
+Results of properties_auto_test:
+reader: update property map command received
+reader: update property map command received
+map has 2 properties:
+ #0: name='X', type=string, value='hello1'
+ #1: name='Y', type=integer, value='1'
+map has 2 properties:
+ #0: name='X', type=string, value='hello2'
+ #1: name='Y', type=integer, value='2'
+dummy update
+PropertyMapWriterListener::OnPropertyLayoutRemoved
+PropertyMapWriterListener::OnPropertyMapRemoved
+PropertyMapWriterListener::OnPropertyLayoutRemoved
+PropertyMapWriterListener::OnPropertyMapRemoved
+after exit from scope
