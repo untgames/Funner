@@ -6,7 +6,7 @@ using namespace render::scene::client;
     Описание реализации рендера сцены
 */
 
-typedef xtl::array<render::scene::interchange::uint32, ObjectType_Num> IdArray;
+typedef xtl::array<render::scene::interchange::object_id_t, ObjectType_Num> IdArray;
 
 struct ClientImpl::Impl
 {
@@ -75,14 +75,14 @@ void ClientImpl::Synchronize ()
     Выделение идентификаторов
 */
 
-render::scene::interchange::uint32 ClientImpl::AllocateId (ObjectType type)
+render::scene::interchange::object_id_t ClientImpl::AllocateId (ObjectType type)
 {
   static const char* METHOD_NAME = "render::scene::client::ClientImpl::AllocateId";
 
   if (type < 0 || type >= ObjectType_Num)
     throw xtl::make_argument_exception (METHOD_NAME, "type", type);
 
-  render::scene::interchange::uint32& id = impl->id_pool [type];
+  render::scene::interchange::object_id_t& id = impl->id_pool [type];
 
   if (!(id + 1))
     throw xtl::format_operation_exception (METHOD_NAME, "ID pool is full for object type %d", type);
@@ -90,7 +90,7 @@ render::scene::interchange::uint32 ClientImpl::AllocateId (ObjectType type)
   return id++;
 }
 
-void ClientImpl::DeallocateId (ObjectType type, render::scene::interchange::uint32 id)
+void ClientImpl::DeallocateId (ObjectType type, render::scene::interchange::object_id_t id)
 {
   if (type < 0 || type >= ObjectType_Num)
     return;
@@ -113,7 +113,7 @@ PropertyMapSynchronizer ClientImpl::CreateSynchronizer (const common::PropertyMa
   }
 }
 
-common::PropertyMap ClientImpl::GetServerProperties (uint64 id)
+common::PropertyMap ClientImpl::GetServerProperties (object_id_t id)
 {
   try
   {
@@ -130,12 +130,12 @@ common::PropertyMap ClientImpl::GetServerProperties (uint64 id)
     Обработчики ответов сервера
 */
 
-void ClientImpl::RemovePropertyMap (uint64 id)
+void ClientImpl::RemovePropertyMap (object_id_t id)
 {
   impl->properties_reader.RemoveProperties (id);
 }
 
-void ClientImpl::RemovePropertyLayout (uint64 id)
+void ClientImpl::RemovePropertyLayout (object_id_t id)
 {
   impl->properties_reader.RemoveLayout (id);
 }

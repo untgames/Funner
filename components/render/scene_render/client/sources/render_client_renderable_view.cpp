@@ -11,7 +11,7 @@ struct RenderableView::Impl: public scene_graph::IViewportListener
   ConnectionPtr           connection;                   //соединение
   scene_graph::Viewport&  viewport;                     //ссылка на область вывода
   PropertyMapSynchronizer properties_sync;              //синхронизатор свойств
-  size_t                  id;                           //идентификатор области вывода
+  object_id_t             id;                           //идентификатор области вывода
   bool                    is_active;                    //активна ли области отрисовки
   bool                    need_reconfiguration;         //конфигурация изменена
   bool                    need_update_renderer;         //требуется обновить рендер
@@ -251,7 +251,7 @@ const scene_graph::Viewport& RenderableView::Viewport ()
     Идентификатор
 */
 
-render::scene::interchange::uint8 RenderableView::Id ()
+object_id_t RenderableView::Id ()
 {
   return impl->id;
 }

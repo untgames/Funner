@@ -57,11 +57,11 @@ class Checker: private IPropertyMapWriterListener
             break;
           case CommandId_RemovePropertyMap:
             printf ("reader: remove property map command received\n");
-            reader.RemoveProperties (read (in_stream, xtl::type<uint64> ()));
+            reader.RemoveProperties (read (in_stream, xtl::type<object_id_t> ()));
             break;
           case CommandId_RemovePropertyLayout:
             printf ("reader: remove property layout command received\n");
-            reader.RemoveLayout (read (in_stream, xtl::type<uint64> ()));
+            reader.RemoveLayout (read (in_stream, xtl::type<object_id_t> ()));
             break;
           default:
             printf ("Unknown command %u with size %u. Will be skipped", command.command_id, command.command_size);
@@ -71,11 +71,11 @@ class Checker: private IPropertyMapWriterListener
       }
     }
 
-    PropertyMap GetProperties (uint64 id) { return reader.GetProperties (id); }
+    PropertyMap GetProperties (object_id_t id) { return reader.GetProperties (id); }
 
   private:
-    void OnPropertyMapRemoved    (uint64 id) { printf ("PropertyMapWriterListener::OnPropertyMapRemoved\n"); }
-    void OnPropertyLayoutRemoved (uint64 id) { printf ("PropertyMapWriterListener::OnPropertyLayoutRemoved\n"); }
+    void OnPropertyMapRemoved    (object_id_t id) { printf ("PropertyMapWriterListener::OnPropertyMapRemoved\n"); }
+    void OnPropertyLayoutRemoved (object_id_t id) { printf ("PropertyMapWriterListener::OnPropertyLayoutRemoved\n"); }
 
   private:
     PropertyMapWriter writer;

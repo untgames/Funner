@@ -3,31 +3,31 @@
 void LoadResource (const char* name);
 void UnloadResource (const char* name);
 
-void CreateViewport (uint32 id);
-void SetViewportArea (uint32 id, int8 left, int8 top, int8 width, int8 height);
-void SetViewportZOrder (uint32 id, int8 zorder);
-void SetViewportActive (uint32 id, bool8 is_active);
-void SetViewportName (uint32 id, const char* name);
-void SetViewportTechnique (uint32 id, const char* name);
-void SetViewportBackground (uint32 id, bool8 state, const math::vec4f& color);
-void SetViewportProperties (uint32 id, uint64 properties_id);
-void DestroyViewport (uint32 id);
+void CreateViewport (object_id_t id);
+void SetViewportArea (object_id_t id, int32 left, int32 top, int32 width, int32 height);
+void SetViewportZOrder (object_id_t id, int32 zorder);
+void SetViewportActive (object_id_t id, bool8 is_active);
+void SetViewportName (object_id_t id, const char* name);
+void SetViewportTechnique (object_id_t id, const char* name);
+void SetViewportBackground (object_id_t id, bool8 state, const math::vec4f& color);
+void SetViewportProperties (object_id_t id, uint64 properties_id);
+void DestroyViewport (object_id_t id);
 
-void CreateRenderTarget (uint32 id, const char* name);
-void DestroyRenderTarget (uint32 id);
-void SetRenderTargetActive (uint32 id, bool8 active);
-void SetRenderTargetScreenArea (uint32 id, int8 left, int8 top, int8 width, int8 height);
-void SetRenderTargetBackground (uint32 id, bool8 state, const math::vec4f& color);
-void AttachViewportToRenderTarget (uint32 render_target_id, uint32 viewport_id);
-void DetachViewportFromRenderTarget (uint32 render_target_id, uint32 viewport_id);
-void UpdateRenderTarget (uint32 id);
+void CreateRenderTarget (object_id_t id, const char* name);
+void DestroyRenderTarget (object_id_t id);
+void SetRenderTargetActive (object_id_t id, bool8 active);
+void SetRenderTargetScreenArea (object_id_t id, int32 left, int32 top, int32 width, int32 height);
+void SetRenderTargetBackground (object_id_t id, bool8 state, const math::vec4f& color);
+void AttachViewportToRenderTarget (object_id_t render_target_id, object_id_t viewport_id);
+void DetachViewportFromRenderTarget (object_id_t render_target_id, object_id_t viewport_id);
+void UpdateRenderTarget (object_id_t id);
 
 void UpdatePropertyMap (...);
-void RemovePropertyMap (uint64 id);
-void RemovePropertyLayout (uint64 id);
+void RemovePropertyMap (object_id_t id);
+void RemovePropertyLayout (object_id_t id);
 
 #section ServerToClient
 
 void UpdatePropertyMap (...);
-void RemovePropertyMap (uint64 id);
-void RemovePropertyLayout (uint64 id);
+void RemovePropertyMap (object_id_t id);
+void RemovePropertyLayout (object_id_t id);

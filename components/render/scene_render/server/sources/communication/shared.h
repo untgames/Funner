@@ -44,6 +44,7 @@ using interchange::uint8;
 using interchange::int8;
 using interchange::bool8;
 using interchange::float32;
+using interchange::object_id_t;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Внутренние команды сервера

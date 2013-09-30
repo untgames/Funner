@@ -25,6 +25,7 @@ typedef float              float32;
 typedef int8               bool8;
 
 typedef uint32             command_id_t;
+typedef uint64             object_id_t;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Заголовок команды рендеру

@@ -78,7 +78,7 @@ PropertyMapSynchronizer ConnectionState::CreateSynchronizer (const common::Prope
   }
 }
 
-common::PropertyMap ConnectionState::GetClientProperties (uint64 id)
+common::PropertyMap ConnectionState::GetClientProperties (object_id_t id)
 {
   try
   {
@@ -118,7 +118,7 @@ void ConnectionState::UnloadResource (const char* name)
   throw xtl::make_not_implemented_exception (__FUNCTION__);
 }
 
-void ConnectionState::CreateViewport (uint32 id)
+void ConnectionState::CreateViewport (object_id_t id)
 {
   try
   {
@@ -131,7 +131,7 @@ void ConnectionState::CreateViewport (uint32 id)
   }
 }
 
-void ConnectionState::SetViewportArea (uint32 id, int8 left, int8 top, int8 width, int8 height)
+void ConnectionState::SetViewportArea (object_id_t id, int32 left, int32 top, int32 width, int32 height)
 {
   try
   {
@@ -144,7 +144,7 @@ void ConnectionState::SetViewportArea (uint32 id, int8 left, int8 top, int8 widt
   }
 }
 
-void ConnectionState::SetViewportZOrder (uint32 id, int8 zorder)
+void ConnectionState::SetViewportZOrder (object_id_t id, int32 zorder)
 {
   try
   {
@@ -157,7 +157,7 @@ void ConnectionState::SetViewportZOrder (uint32 id, int8 zorder)
   }
 }
 
-void ConnectionState::SetViewportActive (uint32 id, bool8 is_active)
+void ConnectionState::SetViewportActive (object_id_t id, bool8 is_active)
 {
   try
   {
@@ -170,7 +170,7 @@ void ConnectionState::SetViewportActive (uint32 id, bool8 is_active)
   }
 }
 
-void ConnectionState::SetViewportName (uint32 id, const char* name)
+void ConnectionState::SetViewportName (object_id_t id, const char* name)
 {
   try
   {
@@ -183,7 +183,7 @@ void ConnectionState::SetViewportName (uint32 id, const char* name)
   }
 }
 
-void ConnectionState::SetViewportTechnique (uint32 id, const char* name)
+void ConnectionState::SetViewportTechnique (object_id_t id, const char* name)
 {
   try
   {
@@ -196,7 +196,7 @@ void ConnectionState::SetViewportTechnique (uint32 id, const char* name)
   }
 }
 
-void ConnectionState::SetViewportBackground (uint32 id, bool8 state, const math::vec4f& color)
+void ConnectionState::SetViewportBackground (object_id_t id, bool8 state, const math::vec4f& color)
 {
   try
   {
@@ -209,7 +209,7 @@ void ConnectionState::SetViewportBackground (uint32 id, bool8 state, const math:
   }
 }
 
-void ConnectionState::SetViewportProperties (uint32 id, uint64 properties_id)
+void ConnectionState::SetViewportProperties (object_id_t id, object_id_t properties_id)
 {
   try
   {
@@ -222,7 +222,7 @@ void ConnectionState::SetViewportProperties (uint32 id, uint64 properties_id)
   }
 }
 
-void ConnectionState::DestroyViewport (uint32 id)
+void ConnectionState::DestroyViewport (object_id_t id)
 {
   try
   {
@@ -235,7 +235,7 @@ void ConnectionState::DestroyViewport (uint32 id)
   }
 }
 
-void ConnectionState::CreateRenderTarget (uint32 id, const char* name)
+void ConnectionState::CreateRenderTarget (object_id_t id, const char* name)
 {
   try
   {
@@ -248,7 +248,7 @@ void ConnectionState::CreateRenderTarget (uint32 id, const char* name)
   }
 }
 
-void ConnectionState::DestroyRenderTarget (uint32 id)
+void ConnectionState::DestroyRenderTarget (object_id_t id)
 {
   try
   {
@@ -261,7 +261,7 @@ void ConnectionState::DestroyRenderTarget (uint32 id)
   }
 }
 
-void ConnectionState::SetRenderTargetActive (uint32 id, bool8 active)
+void ConnectionState::SetRenderTargetActive (object_id_t id, bool8 active)
 {
   try
   {
@@ -274,7 +274,7 @@ void ConnectionState::SetRenderTargetActive (uint32 id, bool8 active)
   }
 }
 
-void ConnectionState::SetRenderTargetScreenArea (uint32 id, int8 left, int8 top, int8 width, int8 height)
+void ConnectionState::SetRenderTargetScreenArea (object_id_t id, int32 left, int32 top, int32 width, int32 height)
 {
   try
   {
@@ -287,7 +287,7 @@ void ConnectionState::SetRenderTargetScreenArea (uint32 id, int8 left, int8 top,
   }
 }
 
-void ConnectionState::SetRenderTargetBackground (uint32 id, bool8 state, const math::vec4f& color)
+void ConnectionState::SetRenderTargetBackground (object_id_t id, bool8 state, const math::vec4f& color)
 {
   try
   {
@@ -300,7 +300,7 @@ void ConnectionState::SetRenderTargetBackground (uint32 id, bool8 state, const m
   }
 }
 
-void ConnectionState::AttachViewportToRenderTarget (uint32 render_target_id, uint32 viewport_id)
+void ConnectionState::AttachViewportToRenderTarget (object_id_t render_target_id, object_id_t viewport_id)
 {
   try
   {
@@ -313,7 +313,7 @@ void ConnectionState::AttachViewportToRenderTarget (uint32 render_target_id, uin
   }
 }
 
-void ConnectionState::DetachViewportFromRenderTarget (uint32 render_target_id, uint32 viewport_id)
+void ConnectionState::DetachViewportFromRenderTarget (object_id_t render_target_id, object_id_t viewport_id)
 {
   try
   {
@@ -326,7 +326,7 @@ void ConnectionState::DetachViewportFromRenderTarget (uint32 render_target_id, u
   }
 }
 
-void ConnectionState::UpdateRenderTarget (uint32 id)
+void ConnectionState::UpdateRenderTarget (object_id_t id)
 {
   try
   {
@@ -430,7 +430,7 @@ void ConnectionState::UpdatePropertyMap (interchange::InputStream& stream)
   }
 }
 
-void ConnectionState::RemovePropertyMap (uint64 id)
+void ConnectionState::RemovePropertyMap (object_id_t id)
 {
   try
   {
@@ -443,7 +443,7 @@ void ConnectionState::RemovePropertyMap (uint64 id)
   }
 }
 
-void ConnectionState::RemovePropertyLayout (uint64 id)
+void ConnectionState::RemovePropertyLayout (object_id_t id)
 {
   try
   {

@@ -18,14 +18,14 @@ class ClientImpl: public xtl::noncopyable
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Выделение идентификаторов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    interchange::uint32 AllocateId   (ObjectType type);
-    void                DeallocateId (ObjectType type, interchange::uint32 id);
+    interchange::object_id_t AllocateId   (ObjectType type);
+    void                     DeallocateId (ObjectType type, interchange::object_id_t id);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Синхронизация свойств
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     PropertyMapSynchronizer CreateSynchronizer  (const common::PropertyMap&);
-    common::PropertyMap     GetServerProperties (uint64 id); 
+    common::PropertyMap     GetServerProperties (object_id_t id); 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Выполнение синхронизации с сервером
@@ -36,8 +36,8 @@ class ClientImpl: public xtl::noncopyable
 ///Обработчики ответов сервера
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void UpdatePropertyMap    (interchange::InputStream&);
-    void RemovePropertyMap    (uint64 id);
-    void RemovePropertyLayout (uint64 id);
+    void RemovePropertyMap    (object_id_t id);
+    void RemovePropertyLayout (object_id_t id);
 
   private:
     struct Impl;

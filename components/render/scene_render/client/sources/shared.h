@@ -44,6 +44,7 @@ using interchange::int8;
 using interchange::uint8;
 using interchange::float32;
 using interchange::bool8;
+using interchange::object_id_t;
 
 typedef interchange::Context<interchange::ClientToServerSerializer, interchange::ServerToClientDeserializer> Context;
 typedef interchange::PropertyMapAutoWriter::Synchronizer                                                     PropertyMapSynchronizer;

@@ -18,7 +18,7 @@ struct RenderTargetImpl::Impl: public scene_graph::IScreenListener
 {
   stl::string          name;                   //имя цели
   ConnectionPtr        connection;             //соединение
-  size_t               id;                     //идентификатор цели
+  object_id_t          id;                     //идентификатор цели
   scene_graph::Screen* screen;                 //экран
   ViewList             views;                  //области вывода
   bool                 need_update;            //требуется обновление
