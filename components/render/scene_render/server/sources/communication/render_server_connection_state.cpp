@@ -239,7 +239,7 @@ void ConnectionState::CreateRenderTarget (object_id_t id, const char* name)
 {
   try
   {
-    throw xtl::make_not_implemented_exception (__FUNCTION__);
+    impl->server.ScreenManager ().CreateScreen (id, name);
   }
   catch (xtl::exception& e)
   {
@@ -252,7 +252,7 @@ void ConnectionState::DestroyRenderTarget (object_id_t id)
 {
   try
   {
-    throw xtl::make_not_implemented_exception (__FUNCTION__);
+    impl->server.ScreenManager ().RemoveScreen (id);
   }
   catch (xtl::exception& e)
   {
@@ -265,7 +265,7 @@ void ConnectionState::SetRenderTargetActive (object_id_t id, bool8 active)
 {
   try
   {
-    throw xtl::make_not_implemented_exception (__FUNCTION__);
+    impl->server.ScreenManager ().GetScreen (id).SetActive (active != 0);
   }
   catch (xtl::exception& e)
   {
@@ -278,7 +278,7 @@ void ConnectionState::SetRenderTargetScreenArea (object_id_t id, int32 left, int
 {
   try
   {
-    throw xtl::make_not_implemented_exception (__FUNCTION__);
+    impl->server.ScreenManager ().GetScreen (id).SetScreenArea (Rect (left, top, width, height));
   }
   catch (xtl::exception& e)
   {
@@ -291,7 +291,7 @@ void ConnectionState::SetRenderTargetBackground (object_id_t id, bool8 state, co
 {
   try
   {
-    throw xtl::make_not_implemented_exception (__FUNCTION__);
+    impl->server.ScreenManager ().GetScreen (id).SetBackground (state != 0, color);
   }
   catch (xtl::exception& e)
   {
@@ -330,7 +330,7 @@ void ConnectionState::UpdateRenderTarget (object_id_t id)
 {
   try
   {
-    throw xtl::make_not_implemented_exception (__FUNCTION__);
+    impl->server.ScreenManager ().GetScreen (id).Update ();
   }
   catch (xtl::exception& e)
   {

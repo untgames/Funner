@@ -23,7 +23,9 @@
 #include <render/scene/interchange/render_thread.h>
 #include <render/scene/interchange/serializer.h>
 
+#include <shared/screen_manager.h>
 #include <shared/server.h>
+#include <shared/window_manager.h>
 
 namespace render
 {

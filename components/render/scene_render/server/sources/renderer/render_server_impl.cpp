@@ -12,12 +12,14 @@ struct ServerImpl::Impl
   stl::string            server_name;    //имя сервера
   server::RenderManager  render_manager; //менеджер рендеринга
   server::WindowManager  window_manager; //менеджер окон
+  server::ScreenManager  screen_manager; //менеджер экранов
 
 /// Конструктор
   Impl (const char* name)
     : server_name (name)
     , render_manager (name)
     , window_manager (render_manager)
+    , screen_manager (window_manager)
   {
   }
 };
@@ -67,4 +69,9 @@ render::manager::RenderManager& ServerImpl::RenderManager ()
 WindowManager& ServerImpl::WindowManager ()
 {
   return impl->window_manager;
+}
+
+ScreenManager& ServerImpl::ScreenManager ()
+{
+  return impl->screen_manager;
 }

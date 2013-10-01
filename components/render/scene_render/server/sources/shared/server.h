@@ -9,8 +9,6 @@
 
 #include <render/manager.h>
 
-#include <shared/window_manager.h>
-
 namespace render
 {
 
@@ -19,6 +17,10 @@ namespace scene
 
 namespace server
 {
+
+//forward declarations
+class ScreenManager;
+class WindowManager;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Реализация сервера рендеринга
@@ -42,6 +44,7 @@ class ServerImpl: public xtl::noncopyable, public xtl::trackable
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     manager::RenderManager& RenderManager ();
     server::WindowManager&  WindowManager ();
+    server::ScreenManager&  ScreenManager ();
 
   private:
     struct Impl;
