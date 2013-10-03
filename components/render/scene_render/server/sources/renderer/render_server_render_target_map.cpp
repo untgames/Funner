@@ -49,9 +49,14 @@ const char* RenderTargetDesc::Name () const
   return impl->name.c_str ();
 }
 
-const Rect& RenderTargetDesc::Rect () const
+const Rect& RenderTargetDesc::Area () const
 {
   return impl->rect;
+}
+
+void RenderTargetDesc::SetArea (const Rect& rect)
+{
+  impl->rect = rect;
 }
 
 const manager::RenderTarget& RenderTargetDesc::Target () const
@@ -59,9 +64,14 @@ const manager::RenderTarget& RenderTargetDesc::Target () const
   return impl->target;
 }
 
-manager::RenderTarget RenderTargetDesc::Target ()
+manager::RenderTarget& RenderTargetDesc::Target ()
 {
   return impl->target;
+}
+
+void RenderTargetDesc::SetTarget (const manager::RenderTarget& target)
+{
+  impl->target = target;
 }
 
 /*
@@ -94,7 +104,12 @@ RenderTargetMap::RenderTargetMap (const RenderTargetMap& map)
 
 RenderTargetMap::~RenderTargetMap ()
 {
-  release (impl);
+  if (impl->decrement ())
+  {
+    Clear ();
+
+    delete impl;
+  }
 }
 
 RenderTargetMap& RenderTargetMap::operator = (const RenderTargetMap& map)
@@ -153,15 +168,73 @@ void RenderTargetMap::Add (const char* name, const manager::RenderTarget& target
   if (iter != impl->targets.end ())
     throw xtl::make_argument_exception (METHOD_NAME, "name", name, "RenderTarget with such name has been already registered");
 
-  RenderTargetDesc desc (name, target, rect);
-
-  impl->targets.insert_pair (name, desc);
+  RenderTargetDesc& desc = impl->targets.insert_pair (name, RenderTargetDesc (name, target, rect)).first->second;
 
   for (ListenerArray::iterator iter=impl->listeners.begin (), end=impl->listeners.end (); iter!=end; ++iter)
   {
     try
     {
       (*iter)->OnRenderTargetAdded (desc);
+    }
+    catch (...)
+    {
+    }
+  }
+}
+
+/*
+    Обновление целей 
+*/
+
+void RenderTargetMap::SetRenderTarget (const char* name, const manager::RenderTarget& target)
+{
+  static const char* METHOD_NAME = "render::scene::server::RenderTargetMap::SetRenderTarget";
+
+  if (!name)
+    throw xtl::make_null_argument_exception (METHOD_NAME, "name");
+
+  DescMap::iterator iter = impl->targets.find (name);
+
+  if (iter == impl->targets.end ())
+    throw xtl::make_argument_exception (METHOD_NAME, "name", name, "RenderTarget with such name has not been registered");
+
+  RenderTargetDesc& desc = iter->second;
+
+  desc.SetTarget (target);
+
+  for (ListenerArray::iterator iter=impl->listeners.begin (), end=impl->listeners.end (); iter!=end; ++iter)
+  {
+    try
+    {
+      (*iter)->OnRenderTargetUpdated (desc);
+    }
+    catch (...)
+    {
+    }
+  }
+}
+
+void RenderTargetMap::SetArea (const char* name, const Rect& rect)
+{
+  static const char* METHOD_NAME = "render::scene::server::RenderTargetMap::SetArea";
+
+  if (!name)
+    throw xtl::make_null_argument_exception (METHOD_NAME, "name");
+
+  DescMap::iterator iter = impl->targets.find (name);
+
+  if (iter == impl->targets.end ())
+    throw xtl::make_argument_exception (METHOD_NAME, "name", name, "RenderTarget with such name has not been registered");
+
+  RenderTargetDesc& desc = iter->second;
+
+  desc.SetArea (rect);
+
+  for (ListenerArray::iterator iter=impl->listeners.begin (), end=impl->listeners.end (); iter!=end; ++iter)
+  {
+    try
+    {
+      (*iter)->OnRenderTargetUpdated (desc);
     }
     catch (...)
     {
@@ -178,18 +251,23 @@ void RenderTargetMap::Remove (const char* name)
   if (!name)
     return;
 
-  impl->targets.erase (name);
+  DescMap::iterator desc_iter = impl->targets.find (name);
+
+  if (desc_iter == impl->targets.end ())
+    return;
 
   for (ListenerArray::iterator iter=impl->listeners.begin (), end=impl->listeners.end (); iter!=end; ++iter)
   {
     try
     {
-      (*iter)->OnRenderTargetRemoved (name);
+      (*iter)->OnRenderTargetRemoved (desc_iter->second);
     }
     catch (...)
     {
     }
   }
+
+  impl->targets.erase (desc_iter);
 }
 
 /*
@@ -200,13 +278,13 @@ void RenderTargetMap::Clear ()
 {
   for (DescMap::iterator iter=impl->targets.begin (), end=impl->targets.end (); iter!=end; ++iter)
   {
-    const char* name = iter->second.Name ();
+    const RenderTargetDesc& desc = iter->second;
 
     for (ListenerArray::iterator iter=impl->listeners.begin (), end=impl->listeners.end (); iter!=end; ++iter)
     {
       try
       {
-        (*iter)->OnRenderTargetRemoved (name);
+        (*iter)->OnRenderTargetRemoved (desc);
       }
       catch (...)
       {
@@ -227,6 +305,9 @@ void RenderTargetMap::AttachListener (IRenderTargetMapListener* listener)
     throw xtl::make_null_argument_exception ("render::scene::server::RenderTargetMap::AttachListener", "listener");
 
   impl->listeners.push_back (listener);
+
+  for (DescMap::iterator iter=impl->targets.begin (), end=impl->targets.end (); iter!=end; ++iter)
+    listener->OnRenderTargetAdded (iter->second);
 }
 
 void RenderTargetMap::DetachListener (IRenderTargetMapListener* listener)
