@@ -33,7 +33,7 @@ class Viewport
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 /// онструкторы / деструктор / присваивание
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    Viewport  (RenderManager& render_manager, const RenderTargetMap& render_target_map);
+    Viewport  (RenderManager& render_manager, const RenderTargetMap& render_target_map); //TODO: RenderTargetMap as getter/setter
     Viewport  (const Viewport&);
     ~Viewport ();
 
