@@ -13,6 +13,7 @@
 #include <common/strlib.h>
 
 #include <shared/render_manager.h>
+#include <shared/render_target_map.h>
 #include <shared/screen_manager.h>
 #include <shared/server.h>
 #include <shared/window_manager.h>
