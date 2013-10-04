@@ -1,0 +1,183 @@
+#include "shared.h"
+
+using namespace render;
+using namespace render::scene::server;
+
+/*
+    ќписание реализации техники рендеринга
+*/
+
+struct Technique::Impl
+{
+  stl::string                                           name;                            //им€ техники
+  common::PropertyMap                                   properties;                      //свойства
+  common::PropertyMap                                   default_properties;              //свойства по умолчанию
+  common::PropertyBindingMap                            property_bindings;               //св€зывание методом техники со свойствами
+  stl::auto_ptr<common::PropertyBindingMapSynchronizer> default_properties_synchronizer; //синхронизатор свойств по умолчанию
+  stl::auto_ptr<common::PropertyBindingMapSynchronizer> properties_synchronizer;         //синхронизатор свойств
+  bool                                                  need_update_properties;          //флаг необходимости обновлени€ свойств
+  bool                                                  need_bind_properties;            //флаг необходимости биндинга свойств
+  xtl::auto_connection                                  properties_update_connection;    //соединение с сигналом обновлени€ свойств
+  common::PropertyMap::EventHandler                     properties_update_handler;       //обработчик сигнала обновлени€ свойств
+  
+/// онструктор
+  Impl ()
+    : need_update_properties (true) 
+    , need_bind_properties (true)
+  {
+  }
+};
+
+/*
+     онструктор / деструктор
+*/
+
+Technique::Technique ()
+  : impl (new Impl)
+{
+  impl->properties_update_handler = xtl::bind (&Technique::UpdateProperties, this);
+}
+
+Technique::~Technique ()
+{
+}
+
+/*
+    »м€ техники
+*/
+
+void Technique::SetName (const char* name)
+{
+  if (!name)
+    throw xtl::make_null_argument_exception ("render::scene::server::Technique::SetName", "name");
+    
+  impl->name = name;
+}
+
+const char* Technique::Name () const
+{
+  return impl->name.c_str ();
+}
+
+/*
+     амера
+*/
+
+/*
+    —войства по умолчанию
+*/
+
+void Technique::SetDefaultProperties (const common::PropertyMap& properties)
+{
+  impl->default_properties     = properties;    
+  impl->need_update_properties = true;
+
+  impl->default_properties_synchronizer.reset ();
+}
+
+void Technique::SetDefaultProperties (const common::ParseNode& node)
+{
+  try
+  {
+    SetDefaultProperties (to_properties (node));
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::scene::server::Technique::SetDefaultProperties(const common::ParseNode&)");
+    throw;
+  }
+}
+
+const common::PropertyMap& Technique::DefaultProperties ()
+{
+  return impl->default_properties;
+}
+
+/*
+    —войства рендеринга
+*/
+
+void Technique::SetProperties (const common::PropertyMap& properties)
+{
+  try
+  {
+    impl->properties                   = properties;
+    impl->need_update_properties       = true;
+    impl->properties_update_connection = properties.RegisterEventHandler (common::PropertyMapEvent_OnUpdate, impl->properties_update_handler);
+
+    impl->properties_synchronizer.reset ();
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::scene::server::Technique::UpdateProperties");
+    throw;
+  }
+}
+
+void Technique::UpdateProperties ()
+{
+  impl->need_update_properties = true;
+}
+
+/*
+    —в€зывание свойств техники с методами техники
+*/
+
+void Technique::BindProperties (common::PropertyBindingMap&)
+{
+}
+
+/*
+    ќтрисовка
+*/
+
+void Technique::UpdateFrame (Context& context)
+{
+  try
+  {
+      //обновление свойств
+
+    if (impl->need_update_properties)
+    {
+        //биндинг свойств
+
+      if (impl->need_bind_properties)
+      {        
+        BindProperties (impl->property_bindings);
+
+        impl->need_bind_properties = false;
+      }
+
+        //обновление свойств по умолчанию
+
+      if (!impl->default_properties_synchronizer)
+      {
+        impl->default_properties_synchronizer.reset (new common::PropertyBindingMapSynchronizer (impl->property_bindings, impl->default_properties));
+
+        impl->default_properties_synchronizer->CopyFromPropertyMap (); //updates only once
+      }
+
+        //обновление свойств
+
+      if (!impl->properties_synchronizer)
+        impl->properties_synchronizer.reset (new common::PropertyBindingMapSynchronizer (impl->property_bindings, impl->properties));
+
+      impl->properties_synchronizer->CopyFromPropertyMap ();
+
+        //оповещение об обновлении
+
+      UpdatePropertiesCore ();
+
+      impl->need_update_properties = false;
+    }
+
+      //отрисовка кадра
+
+    UpdateFrameCore (context);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::scene::server::Technique::UpdateFrame");
+    throw;
+  }
+}

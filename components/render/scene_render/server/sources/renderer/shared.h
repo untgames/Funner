@@ -8,7 +8,9 @@
 #include <xtl/reference_counter.h>
 #include <xtl/trackable.h>
 
+#include <common/parser.h>
 #include <common/property_map.h>
+#include <common/property_binding_map.h>
 #include <common/singleton.h>
 #include <common/strlib.h>
 
@@ -16,7 +18,26 @@
 #include <shared/render_target_map.h>
 #include <shared/screen_manager.h>
 #include <shared/server.h>
+#include <shared/technique_manager.h>
 #include <shared/viewport_manager.h>
 #include <shared/window_manager.h>
 
 #include <render/manager.h>
+
+namespace render
+{
+
+namespace scene
+{
+
+namespace server
+{
+
+///Преобразование узла конфигурации в карту свойств
+common::PropertyMap to_properties (const common::ParseNode& node);
+
+}
+
+}
+
+}
