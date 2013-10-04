@@ -11,6 +11,7 @@ struct RenderableView::Impl: public scene_graph::IViewportListener
   ConnectionPtr           connection;                   //соединение
   scene_graph::Viewport&  viewport;                     //ссылка на область вывода
   PropertyMapSynchronizer properties_sync;              //синхронизатор свойств
+  object_id_t             render_target_id;             //идентификатор цели рендеринга
   object_id_t             id;                           //идентификатор области вывода
   bool                    is_active;                    //активна ли области отрисовки
   bool                    need_reconfiguration;         //конфигураци€ изменена
@@ -23,9 +24,10 @@ struct RenderableView::Impl: public scene_graph::IViewportListener
   bool                    need_update_area;             //требуетс€ обновление области вывода
 
 ///  онструктор
-  Impl (const ConnectionPtr& in_connection, scene_graph::Viewport& in_viewport)
+  Impl (const ConnectionPtr& in_connection, scene_graph::Viewport& in_viewport, object_id_t in_render_target_id)
     : connection (in_connection)
     , viewport (in_viewport)
+    , render_target_id (in_render_target_id)
     , id ()
     , is_active (viewport.IsActive ())
     , need_reconfiguration (true)
@@ -42,10 +44,14 @@ struct RenderableView::Impl: public scene_graph::IViewportListener
 
     id = connection->Client ().AllocateId (ObjectType_Viewport);
 
-    connection->Context ().CreateViewport (id);
+    bool attached = false;
 
     try
     {
+      connection->Context ().AttachViewportToRenderTarget (render_target_id, id);
+
+      attached = true;
+
       properties_sync = connection->Client ().CreateSynchronizer (viewport.Properties ());
 
       connection->Context ().SetViewportProperties (id, viewport.Properties ().Id ());
@@ -54,7 +60,11 @@ struct RenderableView::Impl: public scene_graph::IViewportListener
     }
     catch (...)
     {
-      connection->Context ().DestroyViewport (id);
+      if (attached)
+        connection->Context ().DetachViewportFromRenderTarget (render_target_id, id);
+
+      connection->Client ().DeallocateId (ObjectType_Viewport, id);
+
       throw;
     }
   }
@@ -66,7 +76,7 @@ struct RenderableView::Impl: public scene_graph::IViewportListener
     {
       viewport.DetachListener (this);
 
-      connection->Context ().DestroyViewport (id);
+      connection->Context ().DetachViewportFromRenderTarget (render_target_id, id);
 
       connection->Client ().DeallocateId (ObjectType_Viewport, id);
     }
@@ -221,11 +231,11 @@ struct RenderableView::Impl: public scene_graph::IViewportListener
      онструктор / деструктор
 */
 
-RenderableView::RenderableView (const ConnectionPtr& connection, scene_graph::Viewport& viewport)
+RenderableView::RenderableView (const ConnectionPtr& connection, scene_graph::Viewport& viewport, object_id_t render_target_id)
 {
   try
   {
-    impl.reset (new Impl (connection, viewport));
+    impl.reset (new Impl (connection, viewport, render_target_id));
   }
   catch (xtl::exception& e)
   {

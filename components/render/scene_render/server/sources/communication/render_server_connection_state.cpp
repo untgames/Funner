@@ -105,239 +105,8 @@ void ConnectionState::SynchronizeProperties ()
 }
 
 /*
-    Команды клиента
+    Команды клиента: окна
 */
-
-void ConnectionState::LoadResource (const char* name)
-{
-  throw xtl::make_not_implemented_exception (__FUNCTION__);
-}
-
-void ConnectionState::UnloadResource (const char* name)
-{
-  throw xtl::make_not_implemented_exception (__FUNCTION__);
-}
-
-void ConnectionState::CreateViewport (object_id_t id)
-{
-  try
-  {
-    throw xtl::make_not_implemented_exception (__FUNCTION__);
-  }
-  catch (xtl::exception& e)
-  {
-    e.touch ("render::scene::ConnectionState::CreateViewport");
-    throw;
-  }
-}
-
-void ConnectionState::SetViewportArea (object_id_t id, int32 left, int32 top, int32 width, int32 height)
-{
-  try
-  {
-    throw xtl::make_not_implemented_exception (__FUNCTION__);
-  }
-  catch (xtl::exception& e)
-  {
-    e.touch ("render::scene::ConnectionState::SetViewportArea");
-    throw;
-  }
-}
-
-void ConnectionState::SetViewportZOrder (object_id_t id, int32 zorder)
-{
-  try
-  {
-    throw xtl::make_not_implemented_exception (__FUNCTION__);
-  }
-  catch (xtl::exception& e)
-  {
-    e.touch ("render::scene::ConnectionState::SetViewportZOrder");
-    throw;
-  }
-}
-
-void ConnectionState::SetViewportActive (object_id_t id, bool8 is_active)
-{
-  try
-  {
-    throw xtl::make_not_implemented_exception (__FUNCTION__);
-  }
-  catch (xtl::exception& e)
-  {
-    e.touch ("render::scene::ConnectionState::SetViewportActive");
-    throw;
-  }
-}
-
-void ConnectionState::SetViewportName (object_id_t id, const char* name)
-{
-  try
-  {
-    throw xtl::make_not_implemented_exception (__FUNCTION__);
-  }
-  catch (xtl::exception& e)
-  {
-    e.touch ("render::scene::ConnectionState::SetViewportName");
-    throw;
-  }
-}
-
-void ConnectionState::SetViewportTechnique (object_id_t id, const char* name)
-{
-  try
-  {
-    throw xtl::make_not_implemented_exception (__FUNCTION__);
-  }
-  catch (xtl::exception& e)
-  {
-    e.touch ("render::scene::ConnectionState::SetViewportTechnique");
-    throw;
-  }
-}
-
-void ConnectionState::SetViewportBackground (object_id_t id, bool8 state, const math::vec4f& color)
-{
-  try
-  {
-    throw xtl::make_not_implemented_exception (__FUNCTION__);
-  }
-  catch (xtl::exception& e)
-  {
-    e.touch ("render::scene::ConnectionState::SetViewportBackground");
-    throw;
-  }
-}
-
-void ConnectionState::SetViewportProperties (object_id_t id, object_id_t properties_id)
-{
-  try
-  {
-    throw xtl::make_not_implemented_exception (__FUNCTION__);
-  }
-  catch (xtl::exception& e)
-  {
-    e.touch ("render::scene::ConnectionState::SetViewportProperties");
-    throw;
-  }
-}
-
-void ConnectionState::DestroyViewport (object_id_t id)
-{
-  try
-  {
-    throw xtl::make_not_implemented_exception (__FUNCTION__);
-  }
-  catch (xtl::exception& e)
-  {
-    e.touch ("render::scene::ConnectionState::DestroyViewport");
-    throw;
-  }
-}
-
-void ConnectionState::CreateRenderTarget (object_id_t id, const char* name)
-{
-  try
-  {
-    impl->server.ScreenManager ().CreateScreen (id, name);
-  }
-  catch (xtl::exception& e)
-  {
-    e.touch ("render::scene::ConnectionState::CreateRenderTarget");
-    throw;
-  }
-}
-
-void ConnectionState::DestroyRenderTarget (object_id_t id)
-{
-  try
-  {
-    impl->server.ScreenManager ().RemoveScreen (id);
-  }
-  catch (xtl::exception& e)
-  {
-    e.touch ("render::scene::ConnectionState::DestroyRenderTarget");
-    throw;
-  }
-}
-
-void ConnectionState::SetRenderTargetActive (object_id_t id, bool8 active)
-{
-  try
-  {
-    impl->server.ScreenManager ().GetScreen (id).SetActive (active != 0);
-  }
-  catch (xtl::exception& e)
-  {
-    e.touch ("render::scene::ConnectionState::SetRenderTargetActive");
-    throw;
-  }
-}
-
-void ConnectionState::SetRenderTargetScreenArea (object_id_t id, int32 left, int32 top, int32 width, int32 height)
-{
-  try
-  {
-    impl->server.ScreenManager ().GetScreen (id).SetScreenArea (Rect (left, top, width, height));
-  }
-  catch (xtl::exception& e)
-  {
-    e.touch ("render::scene::ConnectionState::SetRenderTargetScreenArea");
-    throw;
-  }
-}
-
-void ConnectionState::SetRenderTargetBackground (object_id_t id, bool8 state, const math::vec4f& color)
-{
-  try
-  {
-    impl->server.ScreenManager ().GetScreen (id).SetBackground (state != 0, color);
-  }
-  catch (xtl::exception& e)
-  {
-    e.touch ("render::scene::ConnectionState::SetRenderTargetBackground");
-    throw;
-  }
-}
-
-void ConnectionState::AttachViewportToRenderTarget (object_id_t render_target_id, object_id_t viewport_id)
-{
-  try
-  {
-    throw xtl::make_not_implemented_exception (__FUNCTION__);
-  }
-  catch (xtl::exception& e)
-  {
-    e.touch ("render::scene::ConnectionState::AttachViewportToRenderTarget");
-    throw;
-  }
-}
-
-void ConnectionState::DetachViewportFromRenderTarget (object_id_t render_target_id, object_id_t viewport_id)
-{
-  try
-  {
-    throw xtl::make_not_implemented_exception (__FUNCTION__);
-  }
-  catch (xtl::exception& e)
-  {
-    e.touch ("render::scene::ConnectionState::DetachViewportFromRenderTarget");
-    throw;
-  }
-}
-
-void ConnectionState::UpdateRenderTarget (object_id_t id)
-{
-  try
-  {
-    impl->server.ScreenManager ().GetScreen (id).Update ();
-  }
-  catch (xtl::exception& e)
-  {
-    e.touch ("render::scene::ConnectionState::UpdateRenderTarget");
-    throw;
-  }
-}
 
 void ConnectionState::OnWindowAttached (size_t id, const char* name, const char* init_string, void* handle, size_t width, size_t height, size_t left, size_t top, size_t right, size_t bottom)
 {
@@ -417,6 +186,10 @@ void ConnectionState::OnWindowPaint (size_t id)
   }
 }
 
+/*
+    Команды клиента: свойства
+*/
+
 void ConnectionState::UpdatePropertyMap (interchange::InputStream& stream)
 {
   try
@@ -452,6 +225,219 @@ void ConnectionState::RemovePropertyLayout (object_id_t id)
   catch (xtl::exception& e)
   {
     e.touch ("render::scene::ConnectionState::RemovePropertyLayout");
+    throw;
+  }
+}
+
+/*
+    Команды клиента: работа с ресурсами
+*/
+
+void ConnectionState::LoadResource (const char* name)
+{
+  throw xtl::make_not_implemented_exception (__FUNCTION__);
+}
+
+void ConnectionState::UnloadResource (const char* name)
+{
+  throw xtl::make_not_implemented_exception (__FUNCTION__);
+}
+
+/*
+    Команды клиента: области вывода и цели рендеринга
+*/
+
+void ConnectionState::SetViewportArea (object_id_t id, int32 left, int32 top, int32 width, int32 height)
+{
+  try
+  {
+    impl->server.ScreenManager ().GetViewport (id).SetArea (Rect (left, top, width, height));
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::scene::ConnectionState::SetViewportArea");
+    throw;
+  }
+}
+
+void ConnectionState::SetViewportZOrder (object_id_t id, int32 zorder)
+{
+  try
+  {
+    impl->server.ScreenManager ().GetViewport (id).SetZOrder (zorder);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::scene::ConnectionState::SetViewportZOrder");
+    throw;
+  }
+}
+
+void ConnectionState::SetViewportActive (object_id_t id, bool8 is_active)
+{
+  try
+  {
+    impl->server.ScreenManager ().GetViewport (id).SetActive (is_active != 0);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::scene::ConnectionState::SetViewportActive");
+    throw;
+  }
+}
+
+void ConnectionState::SetViewportName (object_id_t id, const char* name)
+{
+  try
+  {
+    impl->server.ScreenManager ().GetViewport (id).SetName (name);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::scene::ConnectionState::SetViewportName");
+    throw;
+  }
+}
+
+void ConnectionState::SetViewportTechnique (object_id_t id, const char* name)
+{
+  try
+  {
+    impl->server.ScreenManager ().GetViewport (id).SetTechnique (name);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::scene::ConnectionState::SetViewportTechnique");
+    throw;
+  }
+}
+
+void ConnectionState::SetViewportBackground (object_id_t id, bool8 state, const math::vec4f& color)
+{
+  try
+  {
+    impl->server.ScreenManager ().GetViewport (id).SetBackground (state != 0, color);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::scene::ConnectionState::SetViewportBackground");
+    throw;
+  }
+}
+
+void ConnectionState::SetViewportProperties (object_id_t id, object_id_t properties_id)
+{
+  try
+  {
+    impl->server.ScreenManager ().GetViewport (id).SetProperties (GetClientProperties (properties_id));
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::scene::ConnectionState::SetViewportProperties");
+    throw;
+  }
+}
+
+void ConnectionState::CreateRenderTarget (object_id_t id, const char* name, const char* init_string)
+{
+  try
+  {
+    impl->server.ScreenManager ().CreateScreen (id, name, init_string);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::scene::ConnectionState::CreateRenderTarget");
+    throw;
+  }
+}
+
+void ConnectionState::DestroyRenderTarget (object_id_t id)
+{
+  try
+  {
+    impl->server.ScreenManager ().RemoveScreen (id);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::scene::ConnectionState::DestroyRenderTarget");
+    throw;
+  }
+}
+
+void ConnectionState::SetRenderTargetActive (object_id_t id, bool8 active)
+{
+  try
+  {
+    impl->server.ScreenManager ().GetScreen (id).SetActive (active != 0);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::scene::ConnectionState::SetRenderTargetActive");
+    throw;
+  }
+}
+
+void ConnectionState::SetRenderTargetScreenArea (object_id_t id, int32 left, int32 top, int32 width, int32 height)
+{
+  try
+  {
+    impl->server.ScreenManager ().GetScreen (id).SetArea (Rect (left, top, width, height));
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::scene::ConnectionState::SetRenderTargetScreenArea");
+    throw;
+  }
+}
+
+void ConnectionState::SetRenderTargetBackground (object_id_t id, bool8 state, const math::vec4f& color)
+{
+  try
+  {
+    impl->server.ScreenManager ().GetScreen (id).SetBackground (state != 0, color);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::scene::ConnectionState::SetRenderTargetBackground");
+    throw;
+  }
+}
+
+void ConnectionState::AttachViewportToRenderTarget (object_id_t render_target_id, object_id_t viewport_id)
+{
+  try
+  {
+    impl->server.ScreenManager ().GetScreen (render_target_id).AttachViewport (viewport_id);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::scene::ConnectionState::AttachViewportToRenderTarget");
+    throw;
+  }
+}
+
+void ConnectionState::DetachViewportFromRenderTarget (object_id_t render_target_id, object_id_t viewport_id)
+{
+  try
+  {
+    impl->server.ScreenManager ().GetScreen (render_target_id).DetachViewport (viewport_id);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::scene::ConnectionState::DetachViewportFromRenderTarget");
+    throw;
+  }
+}
+
+void ConnectionState::UpdateRenderTarget (object_id_t id)
+{
+  try
+  {
+    impl->server.ScreenManager ().GetScreen (id).Update ();
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::scene::ConnectionState::UpdateRenderTarget");
     throw;
   }
 }

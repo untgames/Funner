@@ -182,8 +182,9 @@ class Window: public xtl::reference_counter
     stl::auto_ptr<manager::Window> render_window;
 };
 
-typedef xtl::intrusive_ptr<Window>       WindowPtr;
-typedef stl::hash_map<size_t, WindowPtr> WindowMap;
+typedef xtl::intrusive_ptr<Window>                           WindowPtr;
+typedef stl::hash_map<size_t, WindowPtr>                     WindowMap;
+typedef stl::hash_map<stl::hash_key<const char*>, WindowPtr> WindowNamedMap;
 
 }
 
@@ -193,8 +194,9 @@ typedef stl::hash_map<size_t, WindowPtr> WindowMap;
 
 struct WindowManager::Impl
 {
-  RenderManager render_manager; //менеджер рендеринга
-  WindowMap     windows;        //окна
+  RenderManager  render_manager; //менеджер рендеринга
+  WindowMap      windows;        //окна
+  WindowNamedMap named_windows;  //именованные окна
 
 /// Конструктор
   Impl (const RenderManager& in_render_manager)
@@ -252,6 +254,16 @@ void WindowManager::AttachWindow (size_t id, const char* name, const char* init_
     WindowPtr window (new Window (impl->render_manager, name, init_string, handle, width, height, rect), false);
 
     impl->windows.insert_pair (id, window);
+
+    try
+    {
+      impl->named_windows.insert_pair (name, window);
+    }
+    catch (...)
+    {
+      impl->windows.erase (id);
+      throw;
+    }
   }
   catch (xtl::exception& e)
   {
@@ -264,11 +276,43 @@ void WindowManager::DetachWindow (size_t id)
 {
   try
   {
-    impl->windows.erase (id);
+    WindowMap::iterator iter = impl->windows.find (id);
+
+    if (iter == impl->windows.end ())
+      return;
+
+    impl->named_windows.erase (iter->second->Name ());
+
+    impl->windows.erase (iter);
   }
   catch (xtl::exception& e)
   {
     e.touch ("render::scene::server::WindowManager::DetachWindow");
+    throw;
+  }
+}
+
+/*
+    Поиск окна по имени
+*/
+
+manager::Window& WindowManager::GetWindow (const char* name) const
+{
+  try
+  {
+    if (!name)
+      throw xtl::make_null_argument_exception ("", "name");
+
+    WindowNamedMap::iterator iter = impl->named_windows.find (name);
+
+    if (iter == impl->named_windows.end ())
+      throw xtl::make_argument_exception ("", "name", name, "Window with such name has not been found");
+
+    return iter->second->RenderWindow ();
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::scene::server::WindowManager::GetWindow");
     throw;
   }
 }

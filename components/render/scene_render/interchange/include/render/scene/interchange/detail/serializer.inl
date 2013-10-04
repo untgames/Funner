@@ -4,7 +4,6 @@ inline stl::string get_command_name(CommandId command_id)
   {
     case CommandId_LoadResource: return "LoadResource";
     case CommandId_UnloadResource: return "UnloadResource";
-    case CommandId_CreateViewport: return "CreateViewport";
     case CommandId_SetViewportArea: return "SetViewportArea";
     case CommandId_SetViewportZOrder: return "SetViewportZOrder";
     case CommandId_SetViewportActive: return "SetViewportActive";
@@ -12,7 +11,6 @@ inline stl::string get_command_name(CommandId command_id)
     case CommandId_SetViewportTechnique: return "SetViewportTechnique";
     case CommandId_SetViewportBackground: return "SetViewportBackground";
     case CommandId_SetViewportProperties: return "SetViewportProperties";
-    case CommandId_DestroyViewport: return "DestroyViewport";
     case CommandId_CreateRenderTarget: return "CreateRenderTarget";
     case CommandId_DestroyRenderTarget: return "DestroyRenderTarget";
     case CommandId_SetRenderTargetActive: return "SetRenderTargetActive";
@@ -57,23 +55,6 @@ inline void ClientToServerSerializer::UnloadResource(const char* name)
   {
     BeginCommand(CommandId_UnloadResource);
     write(*this, name);
-    EndCommand();
-  }
-  catch (...)
-  {
-    SetPosition (saved_position);
-    throw;
-  }
-}
-
-inline void ClientToServerSerializer::CreateViewport(object_id_t id)
-{
-  size_t saved_position = Position ();
-
-  try
-  {
-    BeginCommand(CommandId_CreateViewport);
-    write(*this, id);
     EndCommand();
   }
   catch (...)
@@ -213,24 +194,7 @@ inline void ClientToServerSerializer::SetViewportProperties(object_id_t id, uint
   }
 }
 
-inline void ClientToServerSerializer::DestroyViewport(object_id_t id)
-{
-  size_t saved_position = Position ();
-
-  try
-  {
-    BeginCommand(CommandId_DestroyViewport);
-    write(*this, id);
-    EndCommand();
-  }
-  catch (...)
-  {
-    SetPosition (saved_position);
-    throw;
-  }
-}
-
-inline void ClientToServerSerializer::CreateRenderTarget(object_id_t id, const char* name)
+inline void ClientToServerSerializer::CreateRenderTarget(object_id_t id, const char* name, const char* init_string)
 {
   size_t saved_position = Position ();
 
@@ -239,6 +203,7 @@ inline void ClientToServerSerializer::CreateRenderTarget(object_id_t id, const c
     BeginCommand(CommandId_CreateRenderTarget);
     write(*this, id);
     write(*this, name);
+    write(*this, init_string);
     EndCommand();
   }
   catch (...)
@@ -323,14 +288,14 @@ inline void ClientToServerSerializer::SetRenderTargetBackground(object_id_t id, 
   }
 }
 
-inline void ClientToServerSerializer::AttachViewportToRenderTarget(object_id_t render_target_id, object_id_t viewport_id)
+inline void ClientToServerSerializer::AttachViewportToRenderTarget(object_id_t id, object_id_t viewport_id)
 {
   size_t saved_position = Position ();
 
   try
   {
     BeginCommand(CommandId_AttachViewportToRenderTarget);
-    write(*this, render_target_id);
+    write(*this, id);
     write(*this, viewport_id);
     EndCommand();
   }
@@ -341,14 +306,14 @@ inline void ClientToServerSerializer::AttachViewportToRenderTarget(object_id_t r
   }
 }
 
-inline void ClientToServerSerializer::DetachViewportFromRenderTarget(object_id_t render_target_id, object_id_t viewport_id)
+inline void ClientToServerSerializer::DetachViewportFromRenderTarget(object_id_t id, object_id_t viewport_id)
 {
   size_t saved_position = Position ();
 
   try
   {
     BeginCommand(CommandId_DetachViewportFromRenderTarget);
-    write(*this, render_target_id);
+    write(*this, id);
     write(*this, viewport_id);
     EndCommand();
   }
@@ -436,9 +401,6 @@ template <class Dispatcher> inline bool ClientToServerDeserializer::Deserialize(
     case CommandId_UnloadResource:
       dispatcher.UnloadResource(read(*this, xtl::type<const char*> ()));
       return true;
-    case CommandId_CreateViewport:
-      dispatcher.CreateViewport(read(*this, xtl::type<object_id_t> ()));
-      return true;
     case CommandId_SetViewportArea:
       dispatcher.SetViewportArea(read(*this, xtl::type<object_id_t> ()), read(*this, xtl::type<int32> ()), read(*this, xtl::type<int32> ()), read(*this, xtl::type<int32> ()), read(*this, xtl::type<int32> ()));
       return true;
@@ -460,11 +422,8 @@ template <class Dispatcher> inline bool ClientToServerDeserializer::Deserialize(
     case CommandId_SetViewportProperties:
       dispatcher.SetViewportProperties(read(*this, xtl::type<object_id_t> ()), read(*this, xtl::type<uint64> ()));
       return true;
-    case CommandId_DestroyViewport:
-      dispatcher.DestroyViewport(read(*this, xtl::type<object_id_t> ()));
-      return true;
     case CommandId_CreateRenderTarget:
-      dispatcher.CreateRenderTarget(read(*this, xtl::type<object_id_t> ()), read(*this, xtl::type<const char*> ()));
+      dispatcher.CreateRenderTarget(read(*this, xtl::type<object_id_t> ()), read(*this, xtl::type<const char*> ()), read(*this, xtl::type<const char*> ()));
       return true;
     case CommandId_DestroyRenderTarget:
       dispatcher.DestroyRenderTarget(read(*this, xtl::type<object_id_t> ()));

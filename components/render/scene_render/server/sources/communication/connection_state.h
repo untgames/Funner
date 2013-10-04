@@ -28,7 +28,6 @@ class ConnectionState: public xtl::noncopyable
     void LoadResource (const char*);
     void UnloadResource (const char*);
 
-    void CreateViewport (object_id_t id);
     void SetViewportArea (object_id_t id, int32 left, int32 top, int32 width, int32 height);
     void SetViewportZOrder (object_id_t id, int32 zorder);
     void SetViewportActive (object_id_t id, bool8 is_active);
@@ -36,9 +35,8 @@ class ConnectionState: public xtl::noncopyable
     void SetViewportTechnique (object_id_t id, const char* name);
     void SetViewportBackground (object_id_t id, bool8 state, const math::vec4f& color);
     void SetViewportProperties (object_id_t id, object_id_t properties_id);
-    void DestroyViewport (object_id_t id);
 
-    void CreateRenderTarget (object_id_t id, const char* name);
+    void CreateRenderTarget (object_id_t id, const char* name, const char* init_string);
     void DestroyRenderTarget (object_id_t id);
     void SetRenderTargetActive (object_id_t id, bool8 active);
     void SetRenderTargetScreenArea (object_id_t id, int32 left, int32 top, int32 width, int32 height);

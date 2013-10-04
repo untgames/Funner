@@ -43,8 +43,8 @@ class ServerImpl: public xtl::noncopyable, public xtl::trackable
 ///Менеджеры
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     manager::RenderManager& RenderManager ();
-    server::WindowManager&  WindowManager ();
     server::ScreenManager&  ScreenManager ();
+    server::WindowManager&  WindowManager ();
 
   private:
     struct Impl;

@@ -105,6 +105,79 @@ struct Viewport::Impl: public xtl::reference_counter, public IRenderTargetMapLis
     need_update_render_targets = true;
     need_reconfiguration       = true;    
   }
+
+/// Переконфигурация
+  void Reconfigure ()
+  {
+    try
+    {
+      if (!need_reconfiguration)
+        return;
+//?????????
+        //переконфигурация параметров очистки
+        
+      if (need_update_background)
+      {
+        if (background_state)
+        {
+          frame.SetClearColor (background_color);
+          frame.SetClearFlags (manager::ClearFlag_All | manager::ClearFlag_ViewportOnly);
+        }
+        else
+        {
+          frame.SetClearFlags (0u);
+        }
+
+        need_update_background = false;
+      }
+
+        //переконфигурация целевых буферов отрисовки
+        
+      if (need_update_render_targets || need_update_area)
+      {        
+        const Rect& viewport_area = area;
+                                
+        for (RenderTargetEntryMap::iterator iter=render_target_entries.begin (), end=render_target_entries.end (); iter!=end; ++iter)
+        {
+          RenderTargetEntry& entry = iter->second;
+
+          if (!need_update_area && !entry.need_update)
+            continue;
+
+          const Rect& screen_area = entry.desc.Area ();
+
+          const manager::RenderTarget& target = entry.desc.Target ();
+
+          const size_t target_width = target.Width (), target_height = target.Height ();
+
+          const double x_scale = screen_area.width ? double (target_width) / screen_area.width : 0.0,
+                       y_scale = screen_area.height ? double (target_height) / screen_area.height : 0.0;
+
+          Rect target_rect (int ((viewport_area.x - screen_area.x) * x_scale),
+                            int ((viewport_area.y - screen_area.y) * y_scale),
+                            size_t (ceil (viewport_area.width * x_scale)),
+                            size_t (ceil (viewport_area.height * y_scale)));                               
+
+          frame.SetRenderTarget (entry.desc.Name (), target, manager::Viewport (target_rect, min_depth, max_depth));
+
+          entry.need_update = false;
+        }
+        
+        need_update_render_targets = false;
+        need_update_area           = false;
+      }
+//??????????????
+
+        //обновленеи флагов
+
+      need_reconfiguration = false;
+    }
+    catch (xtl::exception& e)
+    {
+      e.touch ("render::scene::server::Viewport::Impl::Reconfigure");
+      throw;
+    }
+  }
 };
 
 /*
@@ -309,7 +382,35 @@ manager::Frame& Viewport::Frame () const
 
 void Viewport::Update (manager::Frame* parent_frame)
 {
-  throw xtl::make_not_implemented_exception (__FUNCTION__);
+  try
+  {
+      //отрисовка только в случае активности области вывода
+    
+    if (!impl->is_active)
+      return;
+
+      //переконфигурация в случае изменения существенных параметров
+
+    if (impl->need_reconfiguration)
+      impl->Reconfigure ();
+
+//?????????
+
+      //отрисовка
+      
+    manager::Frame& frame = impl->frame;
+    
+    if (frame.EntitiesCount () || frame.FramesCount ())
+    {
+      if (parent_frame) parent_frame->AddFrame (frame);
+      else              frame.Draw ();    
+    }
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::scene::server::Viewport::Update(viewport='%s')", impl->name.c_str ());
+    throw;
+  }
 }
 
 /*

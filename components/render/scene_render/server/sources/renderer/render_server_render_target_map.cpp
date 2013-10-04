@@ -216,7 +216,7 @@ void RenderTargetMap::SetRenderTarget (const char* name, const manager::RenderTa
 
 void RenderTargetMap::SetArea (const char* name, const Rect& rect)
 {
-  static const char* METHOD_NAME = "render::scene::server::RenderTargetMap::SetArea";
+  static const char* METHOD_NAME = "render::scene::server::RenderTargetMap::SetArea(const char*,const Rect&)";
 
   if (!name)
     throw xtl::make_null_argument_exception (METHOD_NAME, "name");
@@ -238,6 +238,27 @@ void RenderTargetMap::SetArea (const char* name, const Rect& rect)
     }
     catch (...)
     {
+    }
+  }
+}
+
+void RenderTargetMap::SetArea (const Rect& rect)
+{
+  for (DescMap::iterator iter=impl->targets.begin (), end=impl->targets.end (); iter!=end; ++iter)
+  {  
+    RenderTargetDesc& desc = iter->second;
+
+    desc.SetArea (rect);
+
+    for (ListenerArray::iterator iter=impl->listeners.begin (), end=impl->listeners.end (); iter!=end; ++iter)
+    {
+      try
+      {
+        (*iter)->OnRenderTargetUpdated (desc);
+      }
+      catch (...)
+      {
+      }
     }
   }
 }

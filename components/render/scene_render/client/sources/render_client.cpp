@@ -77,11 +77,11 @@ struct RenderTargetWrapper: public RenderTarget
 
 }
 
-RenderTarget Client::CreateRenderTarget (const char* target_name)
+RenderTarget Client::CreateRenderTarget (const char* target_name, const char* init_string)
 {
   try
   {
-    RenderTargetPtr render_target (new RenderTargetImpl (impl->connection, target_name), false);    
+    RenderTargetPtr render_target (new RenderTargetImpl (impl->connection, target_name, init_string), false);    
 
     return RenderTargetWrapper (render_target.get ());
   }

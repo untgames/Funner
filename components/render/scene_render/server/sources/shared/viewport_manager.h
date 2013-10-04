@@ -1,10 +1,20 @@
 #ifndef RENDER_SCENE_SERVER_VIEWPORT_SHARED_HEADER
 #define RENDER_SCENE_SERVER_VIEWPORT_SHARED_HEADER
 
+#include <stl/auto_ptr.h>
+
 #include <shared/render_target_map.h>
 
 namespace render
 {
+
+namespace manager
+{
+
+//forward declarations
+class Frame;
+
+}
 
 namespace scene
 {
@@ -18,7 +28,7 @@ namespace server
 class IViewportListener
 {
   public:
-    virtual void OnViewportZOrderUpdated (int zorder) {}
+    virtual void OnViewportZOrderUpdated (int zorder) = 0;
 
   protected:
     virtual ~IViewportListener () {}
@@ -33,7 +43,7 @@ class Viewport
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструкторы / деструктор / присваивание
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    Viewport  (RenderManager& render_manager, const RenderTargetMap& render_target_map); //TODO: RenderTargetMap as getter/setter
+    Viewport  (RenderManager& render_manager, const RenderTargetMap& render_target_map);
     Viewport  (const Viewport&);
     ~Viewport ();
 
@@ -119,29 +129,28 @@ class ViewportManager
 {
   public:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Конструктор / деструктор
+///Конструкторы / деструктор / присваивание
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    ViewportManager  (WindowManager&);
+    ViewportManager  ();
+    ViewportManager  (const ViewportManager&);
     ~ViewportManager ();
+
+    ViewportManager& operator = (const ViewportManager&);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Получение области вывода
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    Viewport GetViewport (object_id_t id);
+    Viewport& GetViewport (object_id_t id);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Создание области вывода / удаление области вывода
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    Viewport CreateViewport (object_id_t id);
-    void     RemoveViewport (object_id_t id);
-
-  private:
-    ViewportManager (const ViewportManager&); //no impl
-    ViewportManager& operator = (const ViewportManager&); //no impl
+    void AddViewport    (object_id_t id, const Viewport& viewport);
+    void RemoveViewport (object_id_t id);
 
   private:
     struct Impl;
-    stl::auto_ptr<Impl> impl;
+    Impl* impl;
 };
 
 }

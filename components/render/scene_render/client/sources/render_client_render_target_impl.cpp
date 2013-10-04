@@ -26,7 +26,7 @@ struct RenderTargetImpl::Impl: public scene_graph::IScreenListener
   bool                 need_update_background; //требуется обновление бэкграунда  
 
 /// Конструктор
-  Impl (const ConnectionPtr& in_connection, const char* render_target_name)
+  Impl (const ConnectionPtr& in_connection, const char* render_target_name, const char* init_string)
     : connection (in_connection)
     , id ()
     , screen ()
@@ -41,13 +41,16 @@ struct RenderTargetImpl::Impl: public scene_graph::IScreenListener
 
     if (!render_target_name)
       throw xtl::make_null_argument_exception (METHOD_NAME, "render_target_name");
+
+    if (!init_string)
+      init_string = "";
     
     id   = connection->Client ().AllocateId (ObjectType_RenderTarget);
     name = render_target_name;    
 
     views.reserve (RESERVE_VIEWS_COUNT);
 
-    connection->Context ().CreateRenderTarget (id, name.c_str ());
+    connection->Context ().CreateRenderTarget (id, name.c_str (), init_string);
   }
 
 ///Деструктор
@@ -55,6 +58,8 @@ struct RenderTargetImpl::Impl: public scene_graph::IScreenListener
   {
     try
     {
+      views.clear ();
+
       connection->Context ().DestroyRenderTarget (id);
 
       connection->Client ().DeallocateId (ObjectType_RenderTarget, id);
@@ -79,19 +84,9 @@ struct RenderTargetImpl::Impl: public scene_graph::IScreenListener
       if (!screen)
         return;
 
-      RenderableViewPtr view (new RenderableView (connection, viewport), false);      
+      RenderableViewPtr view (new RenderableView (connection, viewport, id), false);      
 
       views.push_back (view);
-
-      try
-      {
-        connection->Context ().AttachViewportToRenderTarget (id, view->Id ());
-      }
-      catch (...)
-      {
-        views.pop_back ();
-        throw;
-      }
     }
     catch (xtl::exception& e)
     {
@@ -110,14 +105,6 @@ struct RenderTargetImpl::Impl: public scene_graph::IScreenListener
       for (ViewList::iterator iter=views.begin (), end=views.end (); iter!=end; ++iter)
         if ((*iter)->Viewport ().Id () == id)
         {
-          try
-          {
-            connection->Context ().DetachViewportFromRenderTarget (id, (*iter)->Id ());
-          }
-          catch (...)
-          {
-          }
-
           views.erase (iter);
 
           return;
@@ -191,8 +178,8 @@ struct RenderTargetImpl::Impl: public scene_graph::IScreenListener
   Конструктор / деструктор
 */
 
-RenderTargetImpl::RenderTargetImpl (const ConnectionPtr& connection, const char* render_target_name)
-  : impl (new Impl (connection, render_target_name))
+RenderTargetImpl::RenderTargetImpl (const ConnectionPtr& connection, const char* render_target_name, const char* init_string)
+  : impl (new Impl (connection, render_target_name, init_string))
 {
 }
 

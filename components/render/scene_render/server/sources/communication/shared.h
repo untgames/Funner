@@ -25,6 +25,7 @@
 
 #include <shared/screen_manager.h>
 #include <shared/server.h>
+#include <shared/viewport_manager.h>
 #include <shared/window_manager.h>
 
 namespace render
