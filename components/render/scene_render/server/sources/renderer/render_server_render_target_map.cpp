@@ -4,6 +4,12 @@ using namespace render;
 using namespace render::scene::server;
 
 /*
+     онстанты
+*/
+
+const size_t LISTENER_ARRAY_RESERVE_SIZE = 16; //резервируемое количество слушателей
+
+/*
     RenderTargetDesc
 */
 
@@ -85,6 +91,12 @@ struct RenderTargetMap::Impl: public xtl::reference_counter
 {
   DescMap       targets;   //цели рендеринга
   ListenerArray listeners; //слушатели
+
+///  онструктор
+  Impl ()
+  {
+    listeners.reserve (LISTENER_ARRAY_RESERVE_SIZE);
+  }
 };
 
 /*

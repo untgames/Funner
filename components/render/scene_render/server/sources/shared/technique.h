@@ -135,6 +135,8 @@ class Technique: public xtl::reference_counter
 
 typedef xtl::intrusive_ptr<Technique> TechniquePtr;
 
+#include <shared/detail/technique.inl>
+
 }
 
 }

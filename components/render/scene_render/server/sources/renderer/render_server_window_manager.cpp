@@ -7,6 +7,12 @@ namespace
 {
 
 /*
+    Константы
+*/
+
+const size_t LISTENER_ARRAY_RESERVE_SIZE = 4; //резервируемое количество слушателей
+
+/*
     Вспомогательные классы
 */
 
@@ -25,6 +31,8 @@ class NativeWindow: public manager::INativeWindow, public xtl::reference_counter
 
       if (!handle)
         throw xtl::make_null_argument_exception (METHOD_NAME, "handle");
+
+      listeners.reserve (LISTENER_ARRAY_RESERVE_SIZE);
     }
 
 ///Установка размеров экрана
