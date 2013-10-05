@@ -1,4 +1,5 @@
 Results of context1_test:
 ServerProcessor::LoadResource('resource1')
+ClientProcessor::Dummy(1, 2)
 ServerProcessor::~Processor()
 ClientProcessor::~Processor()

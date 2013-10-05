@@ -396,65 +396,184 @@ template <class Dispatcher> inline bool ClientToServerDeserializer::Deserialize(
   switch (id)
   {
     case CommandId_LoadResource:
-      dispatcher.LoadResource(read(*this, xtl::type<const char*> ()));
+    {
+      const char* arg1 = read(*this, xtl::type<const char*> ());
+
+      dispatcher.LoadResource(arg1);
+
       return true;
+    }
     case CommandId_UnloadResource:
-      dispatcher.UnloadResource(read(*this, xtl::type<const char*> ()));
+    {
+      const char* arg1 = read(*this, xtl::type<const char*> ());
+
+      dispatcher.UnloadResource(arg1);
+
       return true;
+    }
     case CommandId_SetViewportArea:
-      dispatcher.SetViewportArea(read(*this, xtl::type<object_id_t> ()), read(*this, xtl::type<int32> ()), read(*this, xtl::type<int32> ()), read(*this, xtl::type<int32> ()), read(*this, xtl::type<int32> ()));
+    {
+      object_id_t arg1 = read(*this, xtl::type<object_id_t> ());
+      int32 arg2 = read(*this, xtl::type<int32> ());
+      int32 arg3 = read(*this, xtl::type<int32> ());
+      int32 arg4 = read(*this, xtl::type<int32> ());
+      int32 arg5 = read(*this, xtl::type<int32> ());
+
+      dispatcher.SetViewportArea(arg1, arg2, arg3, arg4, arg5);
+
       return true;
+    }
     case CommandId_SetViewportZOrder:
-      dispatcher.SetViewportZOrder(read(*this, xtl::type<object_id_t> ()), read(*this, xtl::type<int32> ()));
+    {
+      object_id_t arg1 = read(*this, xtl::type<object_id_t> ());
+      int32 arg2 = read(*this, xtl::type<int32> ());
+
+      dispatcher.SetViewportZOrder(arg1, arg2);
+
       return true;
+    }
     case CommandId_SetViewportActive:
-      dispatcher.SetViewportActive(read(*this, xtl::type<object_id_t> ()), read(*this, xtl::type<bool8> ()));
+    {
+      object_id_t arg1 = read(*this, xtl::type<object_id_t> ());
+      bool8 arg2 = read(*this, xtl::type<bool8> ());
+
+      dispatcher.SetViewportActive(arg1, arg2);
+
       return true;
+    }
     case CommandId_SetViewportName:
-      dispatcher.SetViewportName(read(*this, xtl::type<object_id_t> ()), read(*this, xtl::type<const char*> ()));
+    {
+      object_id_t arg1 = read(*this, xtl::type<object_id_t> ());
+      const char* arg2 = read(*this, xtl::type<const char*> ());
+
+      dispatcher.SetViewportName(arg1, arg2);
+
       return true;
+    }
     case CommandId_SetViewportTechnique:
-      dispatcher.SetViewportTechnique(read(*this, xtl::type<object_id_t> ()), read(*this, xtl::type<const char*> ()));
+    {
+      object_id_t arg1 = read(*this, xtl::type<object_id_t> ());
+      const char* arg2 = read(*this, xtl::type<const char*> ());
+
+      dispatcher.SetViewportTechnique(arg1, arg2);
+
       return true;
+    }
     case CommandId_SetViewportBackground:
-      dispatcher.SetViewportBackground(read(*this, xtl::type<object_id_t> ()), read(*this, xtl::type<bool8> ()), read(*this, xtl::type<const math::vec4f&> ()));
+    {
+      object_id_t arg1 = read(*this, xtl::type<object_id_t> ());
+      bool8 arg2 = read(*this, xtl::type<bool8> ());
+      const math::vec4f& arg3 = read(*this, xtl::type<const math::vec4f&> ());
+
+      dispatcher.SetViewportBackground(arg1, arg2, arg3);
+
       return true;
+    }
     case CommandId_SetViewportProperties:
-      dispatcher.SetViewportProperties(read(*this, xtl::type<object_id_t> ()), read(*this, xtl::type<uint64> ()));
+    {
+      object_id_t arg1 = read(*this, xtl::type<object_id_t> ());
+      uint64 arg2 = read(*this, xtl::type<uint64> ());
+
+      dispatcher.SetViewportProperties(arg1, arg2);
+
       return true;
+    }
     case CommandId_CreateRenderTarget:
-      dispatcher.CreateRenderTarget(read(*this, xtl::type<object_id_t> ()), read(*this, xtl::type<const char*> ()), read(*this, xtl::type<const char*> ()));
+    {
+      object_id_t arg1 = read(*this, xtl::type<object_id_t> ());
+      const char* arg2 = read(*this, xtl::type<const char*> ());
+      const char* arg3 = read(*this, xtl::type<const char*> ());
+
+      dispatcher.CreateRenderTarget(arg1, arg2, arg3);
+
       return true;
+    }
     case CommandId_DestroyRenderTarget:
-      dispatcher.DestroyRenderTarget(read(*this, xtl::type<object_id_t> ()));
+    {
+      object_id_t arg1 = read(*this, xtl::type<object_id_t> ());
+
+      dispatcher.DestroyRenderTarget(arg1);
+
       return true;
+    }
     case CommandId_SetRenderTargetActive:
-      dispatcher.SetRenderTargetActive(read(*this, xtl::type<object_id_t> ()), read(*this, xtl::type<bool8> ()));
+    {
+      object_id_t arg1 = read(*this, xtl::type<object_id_t> ());
+      bool8 arg2 = read(*this, xtl::type<bool8> ());
+
+      dispatcher.SetRenderTargetActive(arg1, arg2);
+
       return true;
+    }
     case CommandId_SetRenderTargetScreenArea:
-      dispatcher.SetRenderTargetScreenArea(read(*this, xtl::type<object_id_t> ()), read(*this, xtl::type<int32> ()), read(*this, xtl::type<int32> ()), read(*this, xtl::type<int32> ()), read(*this, xtl::type<int32> ()));
+    {
+      object_id_t arg1 = read(*this, xtl::type<object_id_t> ());
+      int32 arg2 = read(*this, xtl::type<int32> ());
+      int32 arg3 = read(*this, xtl::type<int32> ());
+      int32 arg4 = read(*this, xtl::type<int32> ());
+      int32 arg5 = read(*this, xtl::type<int32> ());
+
+      dispatcher.SetRenderTargetScreenArea(arg1, arg2, arg3, arg4, arg5);
+
       return true;
+    }
     case CommandId_SetRenderTargetBackground:
-      dispatcher.SetRenderTargetBackground(read(*this, xtl::type<object_id_t> ()), read(*this, xtl::type<bool8> ()), read(*this, xtl::type<const math::vec4f&> ()));
+    {
+      object_id_t arg1 = read(*this, xtl::type<object_id_t> ());
+      bool8 arg2 = read(*this, xtl::type<bool8> ());
+      const math::vec4f& arg3 = read(*this, xtl::type<const math::vec4f&> ());
+
+      dispatcher.SetRenderTargetBackground(arg1, arg2, arg3);
+
       return true;
+    }
     case CommandId_AttachViewportToRenderTarget:
-      dispatcher.AttachViewportToRenderTarget(read(*this, xtl::type<object_id_t> ()), read(*this, xtl::type<object_id_t> ()));
+    {
+      object_id_t arg1 = read(*this, xtl::type<object_id_t> ());
+      object_id_t arg2 = read(*this, xtl::type<object_id_t> ());
+
+      dispatcher.AttachViewportToRenderTarget(arg1, arg2);
+
       return true;
+    }
     case CommandId_DetachViewportFromRenderTarget:
-      dispatcher.DetachViewportFromRenderTarget(read(*this, xtl::type<object_id_t> ()), read(*this, xtl::type<object_id_t> ()));
+    {
+      object_id_t arg1 = read(*this, xtl::type<object_id_t> ());
+      object_id_t arg2 = read(*this, xtl::type<object_id_t> ());
+
+      dispatcher.DetachViewportFromRenderTarget(arg1, arg2);
+
       return true;
+    }
     case CommandId_UpdateRenderTarget:
-      dispatcher.UpdateRenderTarget(read(*this, xtl::type<object_id_t> ()));
+    {
+      object_id_t arg1 = read(*this, xtl::type<object_id_t> ());
+
+      dispatcher.UpdateRenderTarget(arg1);
+
       return true;
+    }
     case CommandId_UpdatePropertyMap:
-      dispatcher.UpdatePropertyMap(*this);
+    {
+      dispatcher.%s(*this);
       return true;
+    }
     case CommandId_RemovePropertyMap:
-      dispatcher.RemovePropertyMap(read(*this, xtl::type<object_id_t> ()));
+    {
+      object_id_t arg1 = read(*this, xtl::type<object_id_t> ());
+
+      dispatcher.RemovePropertyMap(arg1);
+
       return true;
+    }
     case CommandId_RemovePropertyLayout:
-      dispatcher.RemovePropertyLayout(read(*this, xtl::type<object_id_t> ()));
+    {
+      object_id_t arg1 = read(*this, xtl::type<object_id_t> ());
+
+      dispatcher.RemovePropertyLayout(arg1);
+
       return true;
+    }
     default:
       return DeserializeUnknownCommand (id, *this);
   }
@@ -521,14 +640,26 @@ template <class Dispatcher> inline bool ServerToClientDeserializer::Deserialize(
   switch (id)
   {
     case CommandId_UpdatePropertyMap:
-      dispatcher.UpdatePropertyMap(*this);
+    {
+      dispatcher.%s(*this);
       return true;
+    }
     case CommandId_RemovePropertyMap:
-      dispatcher.RemovePropertyMap(read(*this, xtl::type<object_id_t> ()));
+    {
+      object_id_t arg1 = read(*this, xtl::type<object_id_t> ());
+
+      dispatcher.RemovePropertyMap(arg1);
+
       return true;
+    }
     case CommandId_RemovePropertyLayout:
-      dispatcher.RemovePropertyLayout(read(*this, xtl::type<object_id_t> ()));
+    {
+      object_id_t arg1 = read(*this, xtl::type<object_id_t> ());
+
+      dispatcher.RemovePropertyLayout(arg1);
+
       return true;
+    }
     default:
       return DeserializeUnknownCommand (id, *this);
   }

@@ -42,8 +42,7 @@ class MyServerToClientSerializer: private OutputStream
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///ƒоступные команды сериализации (кодогенераци€)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-
-    void Dummy();
+    void Dummy(int a, int b);
 
   protected:
     using OutputStream::Swap;
@@ -99,10 +98,11 @@ template <class Dispatcher> inline bool MyClientToServerDeserializer::Deserializ
     Server to client
 */
 
-inline void MyServerToClientSerializer::Dummy()
+inline void MyServerToClientSerializer::Dummy(int a, int b)
 {
   BeginCommand(CommandId_Dummy);
-
+  write(*this, a);
+  write(*this, b);
   EndCommand();
 }
 
@@ -111,8 +111,13 @@ template <class Dispatcher> inline bool MyServerToClientDeserializer::Deserializ
   switch (id)
   {
     case CommandId_Dummy:
-      dispatcher.Dummy();
+    {
+      int arg1 = read(*this, xtl::type<int> ());
+      int arg2 = read(*this, xtl::type<int> ());
+
+      dispatcher.Dummy(arg1, arg2);
       return true;
+    }
     default:
       return DeserializeUnknownCommand (id, *this);
   }
@@ -126,7 +131,7 @@ class Processor
 
     void LoadResource (const char* name) { printf ("%sProcessor::LoadResource('%s')\n", processor_name.c_str (), name); };
     void UnloadResource (const char* name) { printf ("%sProcessor::UnloadResource('%s')\n", processor_name.c_str (), name); };
-    void Dummy () { printf ("%sProcessor::Dummy()\n", processor_name.c_str ()); }
+    void Dummy (int a, int b) { printf ("%sProcessor::Dummy(%d, %d)\n", processor_name.c_str (), a, b); }
 
   private:
     stl::string processor_name;
@@ -184,6 +189,9 @@ int main ()
 
     client_to_server->LoadResource ("resource1");
     client_to_server->Flush ();
+
+    server_to_client->Dummy (1, 2);
+    server_to_client->Flush ();
   }
   catch (std::exception& e)
   {

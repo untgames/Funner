@@ -392,12 +392,9 @@ void dump_serialization (const MethodArray& methods, stl::string& result, const 
   }
 }
 
-void dump_param_deserialization (const Param& param, stl::string& result)
+void dump_param_deserialization (const Param& param, stl::string& result, size_t arg_index)
 {
-  result += DESERIALIZE_METHOD_NAME;
-  result += "(*this, xtl::type<";
-  result += param.type;
-  result += "> ())";
+  result += common::format ("%s arg%u = %s(*this, xtl::type<%s> ());", param.type.c_str (), arg_index, DESERIALIZE_METHOD_NAME, param.type.c_str ());
 }
 
 void dump_deserialization (const MethodArray& methods, stl::string& result, const char* section)
@@ -412,28 +409,39 @@ void dump_deserialization (const MethodArray& methods, stl::string& result, cons
     if (method.section != section && *section)
       continue;
 
-    result += common::format ("    case %s_%s:\n", COMMAND_ID_ENUM_NAME, method.name.c_str ());
-    result += common::format ("      dispatcher.%s(", method.name.c_str ());
+    result += common::format ("    case %s_%s:\n    {\n", COMMAND_ID_ENUM_NAME, method.name.c_str ());
 
     if (method.is_manual)
     {
-      result += "*this";
+      result += "      dispatcher.%s(*this);\n";
     }
     else
     {
       for (ParamArray::const_iterator iter=method.params.begin (), end=method.params.end (); iter!=end; ++iter)
       {
+        const Param& param = *iter;
+
+        result += "      ";
+
+        dump_param_deserialization (param, result, iter - method.params.begin () + 1);
+
+        result += "\n";
+      }
+
+      result += common::format ("\n      dispatcher.%s(", method.name.c_str ());
+
+      for (ParamArray::const_iterator iter=method.params.begin (), end=method.params.end (); iter!=end; ++iter)
+      {
         if (iter != method.params.begin ())
           result += ", ";
 
-        const Param& param = *iter;
-
-        dump_param_deserialization (param, result);      
+        result += common::format ("arg%u", iter - method.params.begin () + 1);
       }
+
+      result += ");\n\n";
     }
 
-    result += ");\n";
-    result += "      return true;\n";
+    result += "      return true;\n    }\n";
   }
 
   result += "    default:\n      return DeserializeUnknownCommand (id, *this);\n";
