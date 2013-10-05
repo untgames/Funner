@@ -9,6 +9,29 @@ namespace
     Реализация менеджера соединений
 */
 
+struct ConnectionCreatorResult
+{
+  ConnectionManager::ConnectionCreator creator;
+  common::Lockable*                    lockable;
+
+  ConnectionCreatorResult ()
+    : lockable ()
+  {
+  }
+
+  ~ConnectionCreatorResult ()
+  {
+    try
+    {
+      if (lockable)
+        lockable->Unlock ();
+    }
+    catch (...)
+    {
+    }
+  }
+};
+
 class ConnectionManagerImpl
 {
   public:
@@ -48,36 +71,38 @@ class ConnectionManagerImpl
       managers.clear ();
     }
 
-///Создание соединения
-    IConnection* CreateConnection (const char* name, const char* init_string)
+///Получение порождающего функтора
+    void GetCreator (const char* name, ConnectionCreatorResult& result)
     {
       try
       {
         if (!name)
           throw xtl::make_null_argument_exception ("", "name");
 
-        if (!init_string)
-          init_string = "";
-
         for (ConnectionManagerMap::iterator iter=managers.begin (), end=managers.end (); iter!=end; ++iter)
         {
           if (!common::wcmatch (name, iter->second->mask.c_str ()))
             continue;
 
-          return iter->second->creator (name, init_string);
+          iter->second->Lock ();
+
+          result.creator  = iter->second->creator;
+          result.lockable = &*iter->second;
+
+          return;
         }
 
         throw xtl::format_operation_exception ("", "Can't find connection manager for connection '%s'", name);
       }
       catch (xtl::exception& e)
       {
-        e.touch ("render::scene::interchange::ConnectionManager::CreateConnection");
+        e.touch ("render::scene::interchange::ConnectionManager::GetCreator");
         throw;
       }
-    }
+    }    
 
   private:
-    struct ConnectionManagerDesc: public xtl::reference_counter
+    struct ConnectionManagerDesc: public xtl::reference_counter, public common::Lockable
     {
       stl::string       mask;
       ConnectionCreator creator;
@@ -86,6 +111,17 @@ class ConnectionManagerImpl
         : mask (in_mask)
         , creator (in_creator)
       {
+      }
+
+      ~ConnectionManagerDesc ()
+      {
+        try
+        {
+          Lock ();
+        }
+        catch (...)
+        {
+        }     
       }
     };
 
@@ -121,5 +157,20 @@ void ConnectionManager::UnregisterAllConnections ()
 
 IConnection* ConnectionManager::CreateConnection (const char* name, const char* init_string)
 {
-  return ConnectionManagerSingleton::Instance ()->CreateConnection (name, init_string);
+  try
+  {
+    if (!init_string)
+      init_string = "";
+
+    ConnectionCreatorResult result;
+
+    ConnectionManagerSingleton::Instance ()->GetCreator (name, result);
+
+    return result.creator (name, init_string);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::scene::interchange::ConnectionManager::CreateConnection");
+    throw;
+  }
 }
