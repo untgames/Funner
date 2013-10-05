@@ -87,7 +87,7 @@ render::scene::interchange::object_id_t ClientImpl::AllocateId (ObjectType type)
   if (!(id + 1))
     throw xtl::format_operation_exception (METHOD_NAME, "ID pool is full for object type %d", type);
 
-  return id++;
+  return ++id;
 }
 
 void ClientImpl::DeallocateId (ObjectType type, render::scene::interchange::object_id_t id)

@@ -170,12 +170,12 @@ Connection::Connection (const char* connection_name, const char* init_string, si
 
       //создание соединения
 
-    syslib::Lock lock (impl->mutex);
-
     size_t start_time = common::milliseconds ();
 
     impl->state                       = State_LogonAckWaiting;
     impl->client_to_server_connection = xtl::com_ptr<interchange::IConnection> (interchange::ConnectionManager::CreateConnection (connection_name, common::format ("%s logon_timeout=%d initiator='%s'", init_string, logon_timeout, impl->response_connection_name.c_str ()).c_str ()), false);
+
+    syslib::Lock lock (impl->mutex);
 
       //ожидание ответа от сервера
 
