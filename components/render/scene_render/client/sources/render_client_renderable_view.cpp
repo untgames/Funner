@@ -52,10 +52,6 @@ struct RenderableView::Impl: public scene_graph::IViewportListener
 
       attached = true;
 
-      properties_sync = connection->Client ().CreateSynchronizer (viewport.Properties ());
-
-      connection->Context ().SetViewportProperties (id, viewport.Properties ().Id ());
-
       viewport.AttachListener (this);
     }
     catch (...)
