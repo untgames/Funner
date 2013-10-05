@@ -555,7 +555,7 @@ template <class Dispatcher> inline bool ClientToServerDeserializer::Deserialize(
     }
     case CommandId_UpdatePropertyMap:
     {
-      dispatcher.%s(*this);
+      dispatcher.UpdatePropertyMap(*this);
       return true;
     }
     case CommandId_RemovePropertyMap:
@@ -641,7 +641,7 @@ template <class Dispatcher> inline bool ServerToClientDeserializer::Deserialize(
   {
     case CommandId_UpdatePropertyMap:
     {
-      dispatcher.%s(*this);
+      dispatcher.UpdatePropertyMap(*this);
       return true;
     }
     case CommandId_RemovePropertyMap:

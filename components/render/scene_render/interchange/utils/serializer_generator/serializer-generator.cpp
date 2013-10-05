@@ -413,7 +413,7 @@ void dump_deserialization (const MethodArray& methods, stl::string& result, cons
 
     if (method.is_manual)
     {
-      result += "      dispatcher.%s(*this);\n";
+      result += common::format ("      dispatcher.%s(*this);\n", method.name.c_str ());
     }
     else
     {
