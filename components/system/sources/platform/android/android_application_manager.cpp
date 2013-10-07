@@ -35,7 +35,8 @@ class AndroidApplicationDelegate: public IApplicationDelegate, public xtl::refer
   public:
 ///Конструктор
     AndroidApplicationDelegate ()
-      : message_queue (*MessageQueueSingleton::Instance ())    
+      : background_mode_after_pause (ApplicationBackgroundMode_Suspend)
+      , message_queue (*MessageQueueSingleton::Instance ())    
       , log (LOG_NAME)
     {
       if (application_delegate)
@@ -149,27 +150,34 @@ class AndroidApplicationDelegate: public IApplicationDelegate, public xtl::refer
           return;
           
         is_paused = in_is_paused;
+
+        if (in_is_paused)
+          background_mode_after_pause = background_mode;
         
         pause_condition.NotifyOne ();
       }
 
       if (!state)
-        PushMessage (xtl::bind (&AndroidApplicationDelegate::OnPause, this));        
+      {
+        PushMessage (xtl::bind (&AndroidApplicationDelegate::OnPause, this));
+      }
+      else
+      {
+        if (background_mode_after_pause == ApplicationBackgroundMode_Active)
+          PushMessage (xtl::bind (&AndroidApplicationDelegate::OnResumeInActiveMode, this));
+      }
     }
     
 ///Оповещение о приостановке приложения
     void OnPause ()
     {        
-      if (background_mode == ApplicationBackgroundMode_Active)
-      {
-        SetActivityState (true);
-        return;
-      }
-
       if (listener)
         listener->OnPause ();
         
       log.Printf ("Application paused");
+
+      if (background_mode_after_pause == ApplicationBackgroundMode_Active)
+        return;       
 
       {
         Lock lock (pause_mutex);
@@ -178,10 +186,21 @@ class AndroidApplicationDelegate: public IApplicationDelegate, public xtl::refer
           pause_condition.Wait (pause_mutex);        
       }
 
+      OnResume ();
+    }
+
+    void OnResume ()
+    {
       log.Printf ("Application resumed");
 
       if (listener)
-        listener->OnResume ();      
+        listener->OnResume ();
+    }
+
+///Оповещение о возврате приложения из сна (вызывается только в случае ApplicationBackgroundMode_Active)
+    void OnResumeInActiveMode ()
+    {
+      OnResume ();
     }
 
 ///Оповещение о недостаточности памяти
@@ -255,14 +274,15 @@ class AndroidApplicationDelegate: public IApplicationDelegate, public xtl::refer
     }
 
   private:
-    bool                  idle_enabled;
-    bool                  is_exited;
-    volatile bool         is_paused;
-    Mutex                 pause_mutex;
-    Condition             pause_condition;
-    IApplicationListener* listener;
-    MessageQueue&         message_queue;
-    common::Log           log;
+    bool                      idle_enabled;
+    bool                      is_exited;
+    volatile bool             is_paused;
+    Mutex                     pause_mutex;
+    Condition                 pause_condition;
+    ApplicationBackgroundMode background_mode_after_pause;
+    IApplicationListener*     listener;
+    MessageQueue&             message_queue;
+    common::Log               log;
 };
 
 /*
