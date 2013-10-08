@@ -333,7 +333,7 @@ class TestView: public IGameView
     
     void OnTime ()
     {
-      static size_t last = MyApplication::Milliseconds ();
+//      static size_t last = MyApplication::Milliseconds ();
       
 //      float dt = (MyApplication::Milliseconds () - last) / 1000.0f;
       
@@ -341,7 +341,7 @@ class TestView: public IGameView
       {
         UpdateWater ();
 
-        last = MyApplication::Milliseconds ();
+//        last = MyApplication::Milliseconds ();
       }      
     }
     
