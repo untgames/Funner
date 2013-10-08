@@ -79,7 +79,7 @@ struct InputLayout::ShaderAttributeLayout: public xtl::reference_counter
 
           if (location >= 0)
           {
-            if (location >= MAX_SHADER_ATTRIBUTES_COUNT)
+            if (location >= (int)MAX_SHADER_ATTRIBUTES_COUNT)
               throw xtl::format_not_supported_exception ("", "Vertex attribute '%s' location %d is greater than available attributes count %d", names [attribute->name_index], location, MAX_SHADER_ATTRIBUTES_COUNT);
 
             used_semantics_mask |= 1 << location;
@@ -437,7 +437,7 @@ void InputLayout::SetDesc (const InputLayoutDesc& desc)
 
       new_semantics_mask |= 1 << semantic;
 
-        //отсечение повторной установки вершинной семантики           
+        //отсечение повторной установки вершинной семантики
 
       if (semantic_attribute [semantic] != NO_ATTRIBUTE)
         throw xtl::format_exception<xtl::bad_argument> (METHOD_NAME, "Invalid argument desc.vertex_attributes[%u].semantic=%s (semantic has been "
@@ -861,7 +861,7 @@ void InputLayout::Bind
 
     size_t shader_layout_hash = shader_layout ? shader_layout->hash : 0;
 
-      //установка вершинных атрибутов  
+      //установка вершинных атрибутов
 
     if (current_base_vertex != base_vertex || current_layout_hash != attributes_hash || buffers_hash != current_buffers_hash || current_shader_layout_hash != shader_layout_hash)
     {

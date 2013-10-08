@@ -414,22 +414,14 @@ struct RenderablePageCurl::Impl : public ILowLevelFrame::IDrawCallback
   {
     GetTexRect (material, texture_size, min_s, max_s, min_t, max_t);
 
-    bool crop_max_s = true, crop_min_s = true;
-
     if (page_curl->Mode () == PageCurlMode_DoublePageSingleMaterial)
     {
       float half_texture_width = (max_s - min_s) * 0.5f;
 
       if (left)
-      {
-        max_s     -= half_texture_width;
-        crop_max_s = false;
-      }
+        max_s -= half_texture_width;
       else
-      {
-        min_s     += half_texture_width;
-        crop_min_s = false;
-      }
+        min_s += half_texture_width;
     }
   }
 

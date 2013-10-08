@@ -30,7 +30,7 @@ int main ()
 
   try
   {
-    size_t wav_decoding_time;
+    size_t wav_decoding_time = 0;
 
 	for (size_t i = 0, count = sizeof (FILE_NAMES) / sizeof (*FILE_NAMES); i < count; i++)
 	{

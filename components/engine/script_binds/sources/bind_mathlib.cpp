@@ -424,7 +424,7 @@ void bind_vec_library (InvokerRegistry& vec_lib)
 
     //регистрация функций
 
-  vec_lib.Register ("get_length",  make_invoker<T (vec_type)> (xtl::implicit_cast<typename vec_type::value_type (*)(const vec_type&)> (&math::length)));
+  vec_lib.Register ("get_length",  make_invoker<T (vec_type)> (xtl::implicit_cast<typename vec_type::value_type (*)(const vec_type&)> (&math::length<T, Size>)));
   vec_lib.Register ("get_qlength", make_invoker<T (vec_type)> (&math::qlen<T, Size>));
   vec_lib.Register ("normalize",   make_invoker<vec_type (vec_type)> (&vec_normalize<T, Size>));
   vec_lib.Register ("dot",         make_invoker<T (vec_type, vec_type)> (&math::dot<T, Size>));

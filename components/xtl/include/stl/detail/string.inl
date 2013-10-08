@@ -87,7 +87,7 @@ template <class T,class Traits,class Alloc>
 void basic_string<T,Traits,Alloc>::_init (size_type count,value_type value)
 {
   if (count > max_size ())
-    stl_raise_length_error (*this,count);
+    stl_raise_length_error (*this,count,0);
 
   allocate_block (count+1);  
     
@@ -134,7 +134,7 @@ void basic_string<T,Traits,Alloc>::_init (Iter first,Iter last,forward_iterator_
   size_type count = static_cast<size_type> (distance (first,last));
   
   if (count > max_size ())
-    stl_raise_length_error (*this,count);
+    stl_raise_length_error (*this,count,0);
 
   allocate_block (count+1);
   
@@ -208,7 +208,7 @@ inline void basic_string<T,Traits,Alloc>::deallocate (pointer p,size_type count)
 }
 
 /*
-    Методы реализации    
+    Методы реализации
 */
 
 //инициализация завершающим нулём
@@ -662,7 +662,7 @@ inline basic_string<T,Traits,Alloc>& basic_string<T,Traits,Alloc>::operator = (T
 }
 
 /*
-    Конкатенация  
+    Конкатенация
 */
 
 template <class T,class Traits,class Alloc> 

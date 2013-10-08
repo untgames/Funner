@@ -142,7 +142,7 @@ void RenderableHeightMap::Update ()
       const scene_graph::HeightMap::VertexDesc*    src_vertex = height_map->Vertices ();
       render::mid_level::renderer2d::SpriteVertex* dst_vertex = &dst_vertices [0];
       
-      int indices [4] = {0, 1, height_map->ColumnsCount () + 1, height_map->ColumnsCount ()};
+      size_t indices [4] = {0, 1, height_map->ColumnsCount () + 1, height_map->ColumnsCount ()};
       
       float dx = 1.0f / height_map->ColumnsCount (),
             dy = 1.0f / height_map->RowsCount (),
