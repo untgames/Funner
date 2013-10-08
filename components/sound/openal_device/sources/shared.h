@@ -53,10 +53,14 @@ class OpenALContextManagerImpl;
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 const size_t DEVICE_BUFFERS_POOL_SIZE        = 32;     //размер пула буферов
 const size_t MAX_SOUND_SAMPLE_RATE           = 176400; //максимальная частота дискретизации (Generic устройства проигрывают 192000 некорректно)
-//const size_t SOURCE_BUFFERS_COUNT            = 4;      //количество буферов проигрывания на источник
-//const size_t SOURCE_BUFFERS_UPDATE_FREQUENCY = 10;     //частота обновления буферов
-const size_t SOURCE_BUFFERS_COUNT            = 8;      //количество буферов проигрывания на источник
-const size_t SOURCE_BUFFERS_UPDATE_FREQUENCY = 30;     //частота обновления буферов
+
+#ifdef IPHONE
+  const size_t SOURCE_BUFFERS_COUNT            = 4;      //количество буферов проигрывания на источник
+  const size_t SOURCE_BUFFERS_UPDATE_FREQUENCY = 10;     //частота обновления буферов
+#else
+  const size_t SOURCE_BUFFERS_COUNT            = 8;      //количество буферов проигрывания на источник
+  const size_t SOURCE_BUFFERS_UPDATE_FREQUENCY = 30;     //частота обновления буферов
+#endif
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Исключение OpenAL
