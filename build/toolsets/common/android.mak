@@ -87,7 +87,6 @@ COMMON_CFLAGS              += -I$(NDK_ROOT)/sources/cxx-stl/gnu-libstdc++/$(ANDR
 COMMON_LINK_FLAGS          += -Wl,-L,$(NDK_ROOT)/sources/cxx-stl/gnu-libstdc++/$(ANDROID_TOOLCHAIN_VERSION)/libs/$(ANDROID_ABI)
 endif
 
-ANDROID_EXE_LINK_FLAGS     += -z $(PLATFORM_DIR)/arch-$(ANDROID_ARCH)/usr/lib/crtbegin_dynamic.o
 ANDROID_SO_LINK_FLAGS       = -Wl,-soname,$(notdir $1) -shared -Wl,--no-undefined -Wl,-z,noexecstack
 VALID_TARGET_TYPES         += android-pak android-jar
 ANDROID_AIDL               := $(ANDROID_SDK)/platforms/$(ANDROID_SDK_PLATFORM)/framework.aidl
