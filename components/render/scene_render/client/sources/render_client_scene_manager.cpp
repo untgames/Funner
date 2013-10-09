@@ -87,3 +87,21 @@ ScenePtr SceneManager::GetScene (scene_graph::Scene& scene, Connection& connecti
     throw;
   }
 }
+
+/*
+    Синхронизация сцен
+*/
+
+void SceneManager::Update ()
+{
+  try
+  {
+    for (SceneMap::iterator iter=impl->scenes.begin (), end=impl->scenes.end (); iter!=end; ++iter)
+      iter->second.scene->Update ();
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::scene::client::SceneManager::Update");
+    throw;
+  }
+}
