@@ -14,6 +14,8 @@ struct RenderableView::Impl: public scene_graph::IViewportListener
   object_id_t             render_target_id;             //идентификатор цели рендеринга
   object_id_t             id;                           //идентификатор области вывода
   bool                    is_active;                    //активна ли области отрисовки
+  scene_graph::Camera*    camera;                       //текущая камера
+  ScenePtr                scene;                        //текущая сцена
   bool                    need_reconfiguration;         //конфигурация изменена
   bool                    need_update_renderer;         //требуется обновить рендер
   bool                    need_update_background;       //требуется обновить параметры очистки
@@ -30,6 +32,7 @@ struct RenderableView::Impl: public scene_graph::IViewportListener
     , render_target_id (in_render_target_id)
     , id ()
     , is_active (viewport.IsActive ())
+    , camera ()
     , need_reconfiguration (true)
     , need_update_renderer (true)
     , need_update_background (true)
@@ -100,6 +103,17 @@ struct RenderableView::Impl: public scene_graph::IViewportListener
   {
     need_reconfiguration = true;
     need_update_camera   = true;
+    camera               = new_camera;
+
+    if (scene)
+    {
+      if (camera)
+      { 
+        if (camera->Scene () != &scene->SourceScene ())
+          scene = ScenePtr ();
+      }
+      else scene = ScenePtr ();
+    }
   }  
 
 ///Изменена активность области вывода
@@ -195,7 +209,14 @@ struct RenderableView::Impl: public scene_graph::IViewportListener
 
       if (need_update_camera)
       {
-        //?????????????
+/*        if (camera)
+        {
+          scene_graph::Scene* source_scene = camera->Scene ();
+
+          if (!scene)
+            scene = connection->Client ().SceneManager ().GetScene ();
+        }
+        else scene = ScenePtr ();*/
 
         need_update_camera = false;
       }

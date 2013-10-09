@@ -14,6 +14,7 @@ struct ClientImpl::Impl
   IdArray                            id_pool;            //пул идентификаторов
   interchange::PropertyMapAutoWriter properties_writer;  //синхронизатор свойств (запись на сервер)
   interchange::PropertyMapReader     properties_reader;  //синхронизатор свойств (чтение с сервера)
+  client::SceneManager               scene_manager;      //менеджер сцены
 
 /// Конструктор
   Impl ()
@@ -151,4 +152,13 @@ void ClientImpl::UpdatePropertyMap (render::scene::interchange::InputStream& str
     e.touch ("render::scene::client::ClientImpl::UpdatePropertyMap");
     throw;
   }
+}
+
+/*
+    Менеджер сцены
+*/
+
+SceneManager& ClientImpl::SceneManager ()
+{
+  return impl->scene_manager;
 }

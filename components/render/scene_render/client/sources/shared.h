@@ -1,5 +1,5 @@
 #include <stl/auto_ptr.h>
-#include <stl/vector>
+#include <stl/hash_map>
 
 #include <xtl/array>
 #include <xtl/bind.h>
@@ -16,6 +16,8 @@
 #include <media/image.h>
 
 #include <syslib/condition.h>
+
+#include <sg/scene.h>
 
 #include <render/scene_render_client.h>
 
@@ -64,6 +66,8 @@ enum ObjectType
 #include "connection.h"
 #include "render_target.h"
 #include "renderable_view.h"
+#include "scene.h"
+#include "scene_manager.h"
 
 }
 
