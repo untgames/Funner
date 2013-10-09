@@ -1,9 +1,9 @@
 ###################################################################################################
-#������ �����
+#Targets list
 ###################################################################################################
 TARGETS := EXTERN.FREETYPE
 
-#���� �1 - Freetype
+#Target Freetype
 EXTERN.FREETYPE.TYPE                     := static-lib
 EXTERN.FREETYPE.NAME                     := funner.extern.freetype
 EXTERN.FREETYPE.INCLUDE_DIRS             := include
@@ -13,8 +13,4 @@ EXTERN.FREETYPE.SOURCE_DIRS              := sources/autofit sources/base sources
 EXTERN.FREETYPE.COMPILER_DEFINES         := FT2_BUILD_LIBRARY
 EXTERN.FREETYPE.msvc.COMPILER_DEFINES    := WIN32
 EXTERN.FREETYPE.msvc.COMPILER_CFLAGS     := -wd4244
-EXTERN.FREETYPE.clang.COMPILER_CFLAGS    := -w
 EXTERN.FREETYPE.linux.COMPILER_CFLAGS    := --no-warn
-EXTERN.FREETYPE.macosx.COMPILER_CFLAGS   := -Wno-implicit
-EXTERN.FREETYPE.iphone.COMPILER_DEFINES  := DARWIN_NO_CARBON
-EXTERN.FREETYPE.bada.COMPILER_CFLAGS     := --no-warn
