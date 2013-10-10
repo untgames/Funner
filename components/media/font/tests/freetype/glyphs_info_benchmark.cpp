@@ -9,11 +9,12 @@
 #include <ft2build.h>
 #include <freetype/freetype.h>
 
-const char*  FILE_NAME                 = "data/times_new_roman.ttf";
-const size_t FIRST_GLYPH               = 50;
-const size_t GLYPHS_COUNT              = 1000;
-const size_t ADVANCES_ITERATIONS_COUNT = 1000;
-const size_t KERNINGS_ITERATIONS_COUNT = 10;
+const char*  FILE_NAME                  = "data/times_new_roman.ttf";
+const size_t FIRST_GLYPH                = 50;
+const size_t GLYPHS_COUNT               = 1000;
+const size_t ADVANCES_ITERATIONS_COUNT  = 1000;
+const size_t RASTERIZE_ITERATIONS_COUNT = 100;
+const size_t KERNINGS_ITERATIONS_COUNT  = 10;
 
 const char* get_free_type_error_name (int error)
 {
@@ -159,6 +160,18 @@ int main ()
       }
 
       printf ("Get glyphs sizes speed is %f/s\n", ADVANCES_ITERATIONS_COUNT / ((common::milliseconds () - start_time) / 1000.f));
+    }
+
+    {
+      size_t start_time = common::milliseconds ();
+
+      for (size_t i = 0; i < RASTERIZE_ITERATIONS_COUNT; i++)
+      {
+        for (size_t j = FIRST_GLYPH; j < FIRST_GLYPH + GLYPHS_COUNT; j++)
+          FT_Load_Char (face, j, FT_LOAD_RENDER);
+      }
+
+      printf ("Rasterize glyphs speed is %f/s\n", RASTERIZE_ITERATIONS_COUNT / ((common::milliseconds () - start_time) / 1000.f));
     }
 
     {
