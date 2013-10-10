@@ -24,7 +24,14 @@ typedef stl::hash_map<scene_graph::Scene*, SceneDesc> SceneMap;
 
 struct SceneManager::Impl
 {
-  SceneMap scenes; //сцены
+  object_id_t current_id; //текущий доступный идентификатор
+  SceneMap    scenes;     //сцены
+
+/// Конструктор
+  Impl ()
+    : current_id ()
+  {
+  }
 
 /// Оповещение об удалении сцены
   void OnDestroyScene (scene_graph::Scene* scene)
@@ -62,7 +69,12 @@ ScenePtr SceneManager::GetScene (scene_graph::Scene& scene, Connection& connecti
     if (iter != impl->scenes.end ())
       return iter->second.scene;
 
-    ScenePtr new_scene (new Scene (scene, connection), false);
+    object_id_t& id = impl->current_id;
+
+    if (!(id + 1))
+      throw xtl::format_operation_exception ("", "ID pool is full for a new scene");
+
+    ScenePtr new_scene (new Scene (scene, connection, id + 1), false);
 
     xtl::trackable::function_type destroy_handler (xtl::bind (&Impl::OnDestroyScene, &*impl, &scene));
 
@@ -72,6 +84,8 @@ ScenePtr SceneManager::GetScene (scene_graph::Scene& scene, Connection& connecti
     {
       iter->second.on_destroy_source_scene = scene.Root ().RegisterEventHandler (scene_graph::NodeEvent_BeforeDestroy, xtl::bind (&Impl::OnDestroyScene, &*impl, &scene));
       iter->second.on_destroy_target_scene = new_scene->connect_tracker (destroy_handler);
+
+      ++id;
 
       return new_scene;
     }

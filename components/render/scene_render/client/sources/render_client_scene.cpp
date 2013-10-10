@@ -8,12 +8,14 @@ using namespace render::scene::client;
 
 struct Scene::Impl
 {
+  object_id_t         id;         //èäåíòèôèêàòîğ ñöåíû
   scene_graph::Scene& scene;      //ñöåíà
   Connection&         connection; //ñîåäèíåíèå
 
 /// Êîíñòğóêòîğ
-  Impl (scene_graph::Scene& in_scene, Connection& in_connection)
-    : scene (in_scene)
+  Impl (scene_graph::Scene& in_scene, Connection& in_connection, object_id_t in_id)
+    : id (in_id)
+    , scene (in_scene)
     , connection (in_connection)
   {
   }
@@ -23,11 +25,11 @@ struct Scene::Impl
     Êîíñòğóêòîğ / äåñòğóêòîğ
 */
 
-Scene::Scene (scene_graph::Scene& scene, Connection& connection)  
+Scene::Scene (scene_graph::Scene& scene, Connection& connection, object_id_t id)
 {
   try
   {
-    impl.reset (new Impl (scene, connection));
+    impl.reset (new Impl (scene, connection, id));
   }
   catch (xtl::exception& e)
   {
@@ -38,6 +40,15 @@ Scene::Scene (scene_graph::Scene& scene, Connection& connection)
 
 Scene::~Scene ()
 {
+}
+
+/*
+    Èäåíòèôèêàòîğ ñöåíû
+*/
+
+object_id_t Scene::Id ()
+{
+  return impl->id;
 }
 
 /*

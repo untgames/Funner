@@ -17,10 +17,12 @@ struct RenderableView::Impl: public scene_graph::IViewportListener
   scene_graph::Camera*    camera;                       //текущая камера
   ScenePtr                scene;                        //текущая сцена
   xtl::auto_connection    on_scene_changed_connection;  //соединение с сигналом оповещения об изменении сцены
+  xtl::auto_connection    on_camera_updated_connection; //соединение с сигналом оповещения об обновлении трансформаций
   bool                    need_reconfiguration;         //конфигурация изменена
   bool                    need_update_renderer;         //требуется обновить рендер
   bool                    need_update_background;       //требуется обновить параметры очистки
   bool                    need_update_camera;           //требуется обновить камеру
+  bool                    need_update_transormations;   //требуется обновить трансформации
   bool                    need_update_scene;            //требуется обновить сцену
   bool                    need_update_properties;       //требуется обновление свойств
   bool                    need_update_activity;         //требуется обновление активности области вывода
@@ -39,6 +41,7 @@ struct RenderableView::Impl: public scene_graph::IViewportListener
     , need_update_renderer (true)
     , need_update_background (true)
     , need_update_camera (true)
+    , need_update_transormations (true)
     , need_update_scene (true)
     , need_update_properties (true)
     , need_update_activity (true)
@@ -109,23 +112,9 @@ struct RenderableView::Impl: public scene_graph::IViewportListener
     camera               = new_camera;
 
     on_scene_changed_connection.disconnect ();
+    on_camera_updated_connection.disconnect ();
 
-    if (scene)
-    {
-      if (camera)
-      { 
-        if (camera->Scene () != &scene->SourceScene ())
-        {
-          scene             = ScenePtr ();
-          need_update_scene = true;
-        }
-      }
-      else
-      {
-        scene             = ScenePtr ();
-        need_update_scene = true;
-      }
-    }
+    ResetSceneIfChanged ();
   }  
 
 ///Изменена активность области вывода
@@ -162,6 +151,14 @@ struct RenderableView::Impl: public scene_graph::IViewportListener
     need_reconfiguration   = true;
   }
 
+///Обновлены параметры камеры
+  void OnCameraUpdated ()
+  {
+    need_update_transormations = true;
+
+    //установка флага переконфигурации не нужна
+  }
+
 ///Установка сцены
   void SetScene (scene_graph::Scene* new_scene)
   {
@@ -193,6 +190,31 @@ struct RenderableView::Impl: public scene_graph::IViewportListener
 /// Оповещение об изменении сцены
   void OnSceneChanged ()
   {
+    need_update_scene    = true;
+    need_reconfiguration = true;
+
+    ResetSceneIfChanged ();
+  }
+
+///Сброс сцены в случае необходимости
+  void ResetSceneIfChanged ()
+  {
+    if (!scene)
+      return;
+
+    if (camera)
+    { 
+      if (camera->Scene () != &scene->SourceScene ())
+      {
+        scene             = ScenePtr ();
+        need_update_scene = true;
+      }
+    }
+    else
+    {
+      scene             = ScenePtr ();
+      need_update_scene = true;
+    }
   }
   
 ///Синхронизация
@@ -258,23 +280,31 @@ struct RenderableView::Impl: public scene_graph::IViewportListener
         {
             //подписка на изменение сцены в камере
 
-          on_scene_changed_connection = camera->RegisterEventHandler (scene_graph::NodeEvent_AfterSceneChange, xtl::bind (&Impl::OnSceneChanged, this));
+          on_scene_changed_connection  = camera->RegisterEventHandler (scene_graph::NodeEvent_AfterSceneChange, xtl::bind (&Impl::OnSceneChanged, this));
+          on_camera_updated_connection = camera->RegisterEventHandler (scene_graph::NodeEvent_AfterUpdate, xtl::bind (&Impl::OnCameraUpdated, this));
 
-          SetScene (camera->Scene ());
+          if (!scene || camera->Scene () != &scene->SourceScene ())
+            need_update_scene = true;
         }
         else
         {
-          SetScene (0);
+          on_scene_changed_connection.disconnect ();
+          on_camera_updated_connection.disconnect ();
+
+          if (scene)
+            need_update_scene = true;
         }
 
-        need_update_camera = false;
+        need_update_camera         = false;
+        need_update_transormations = true;
       }
       
         //переконфигурация сцены
 
       if (need_update_scene)
       {
-///?????????????????????
+        if (camera) SetScene (camera->Scene ());
+        else        SetScene (0);
 
         need_update_scene = false;
       }
@@ -349,9 +379,22 @@ void RenderableView::Synchronize ()
 {
   try
   {
+      //синхронизация параметров клиента
+
     impl->connection->Client ().Synchronize ();
 
+      //синхронизация области вывода
+
     impl->Synchronize ();
+
+      //синхронизация трансформаций
+
+    if (impl->need_update_transormations)
+    {
+      //TODO: transformations sync
+
+      impl->need_update_transormations = false;
+    }
   }
   catch (xtl::exception& e)
   {
