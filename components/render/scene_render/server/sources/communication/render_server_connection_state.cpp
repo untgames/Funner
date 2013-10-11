@@ -338,6 +338,56 @@ void ConnectionState::SetViewportProperties (object_id_t id, object_id_t propert
   }
 }
 
+void ConnectionState::SetViewportScene (object_id_t id, object_id_t scene_id)
+{
+  try
+  {
+    throw xtl::make_not_implemented_exception (__FUNCTION__);
+//    impl->server.ScreenManager ().GetViewport (id).SetScene (???);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::scene::ConnectionState::SetViewportScene");
+    throw;
+  }
+}
+
+void ConnectionState::SetViewportCameraWorldMatrix (object_id_t id, const math::mat4f& tm)
+{
+  try
+  {
+    Camera* camera = impl->server.ScreenManager ().GetViewport (id).Camera ();
+
+    if (!camera)
+      throw xtl::format_operation_exception ("", "Camera has not been set");
+
+    camera->SetWorldMatrix (tm);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::scene::ConnectionState::SetViewportCameraWorldMatrix");
+    throw;
+  }
+}
+
+void ConnectionState::SetViewportCameraProjectionMatrix (object_id_t id, const math::mat4f& tm)
+{
+  try
+  {
+    Camera* camera = impl->server.ScreenManager ().GetViewport (id).Camera ();
+
+    if (!camera)
+      throw xtl::format_operation_exception ("", "Camera has not been set");
+
+    camera->SetProjectionMatrix (tm);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::scene::ConnectionState::SetViewportCameraProjectionMatrix");
+    throw;
+  }
+}
+
 void ConnectionState::CreateRenderTarget (object_id_t id, const char* name, const char* init_string)
 {
   try

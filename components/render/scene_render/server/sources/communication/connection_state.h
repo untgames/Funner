@@ -35,6 +35,9 @@ class ConnectionState: public xtl::noncopyable
     void SetViewportTechnique (object_id_t id, const char* name);
     void SetViewportBackground (object_id_t id, bool8 state, const math::vec4f& color);
     void SetViewportProperties (object_id_t id, object_id_t properties_id);
+    void SetViewportScene(object_id_t id, object_id_t scene_id);
+    void SetViewportCameraWorldMatrix(object_id_t id, const math::mat4f& tm);
+    void SetViewportCameraProjectionMatrix(object_id_t id, const math::mat4f& tm);
 
     void CreateRenderTarget (object_id_t id, const char* name, const char* init_string);
     void DestroyRenderTarget (object_id_t id);

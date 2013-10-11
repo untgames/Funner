@@ -11,6 +11,9 @@ inline stl::string get_command_name(CommandId command_id)
     case CommandId_SetViewportTechnique: return "SetViewportTechnique";
     case CommandId_SetViewportBackground: return "SetViewportBackground";
     case CommandId_SetViewportProperties: return "SetViewportProperties";
+    case CommandId_SetViewportScene: return "SetViewportScene";
+    case CommandId_SetViewportCameraWorldMatrix: return "SetViewportCameraWorldMatrix";
+    case CommandId_SetViewportCameraProjectionMatrix: return "SetViewportCameraProjectionMatrix";
     case CommandId_CreateRenderTarget: return "CreateRenderTarget";
     case CommandId_DestroyRenderTarget: return "DestroyRenderTarget";
     case CommandId_SetRenderTargetActive: return "SetRenderTargetActive";
@@ -185,6 +188,60 @@ inline void ClientToServerSerializer::SetViewportProperties(object_id_t id, uint
     BeginCommand(CommandId_SetViewportProperties);
     write(*this, id);
     write(*this, properties_id);
+    EndCommand();
+  }
+  catch (...)
+  {
+    SetPosition (saved_position);
+    throw;
+  }
+}
+
+inline void ClientToServerSerializer::SetViewportScene(object_id_t id, object_id_t scene_id)
+{
+  size_t saved_position = Position ();
+
+  try
+  {
+    BeginCommand(CommandId_SetViewportScene);
+    write(*this, id);
+    write(*this, scene_id);
+    EndCommand();
+  }
+  catch (...)
+  {
+    SetPosition (saved_position);
+    throw;
+  }
+}
+
+inline void ClientToServerSerializer::SetViewportCameraWorldMatrix(object_id_t id, const math::mat4f& tm)
+{
+  size_t saved_position = Position ();
+
+  try
+  {
+    BeginCommand(CommandId_SetViewportCameraWorldMatrix);
+    write(*this, id);
+    write(*this, tm);
+    EndCommand();
+  }
+  catch (...)
+  {
+    SetPosition (saved_position);
+    throw;
+  }
+}
+
+inline void ClientToServerSerializer::SetViewportCameraProjectionMatrix(object_id_t id, const math::mat4f& tm)
+{
+  size_t saved_position = Position ();
+
+  try
+  {
+    BeginCommand(CommandId_SetViewportCameraProjectionMatrix);
+    write(*this, id);
+    write(*this, tm);
     EndCommand();
   }
   catch (...)
@@ -475,6 +532,33 @@ template <class Dispatcher> inline bool ClientToServerDeserializer::Deserialize(
       uint64 arg2 = read(*this, xtl::type<uint64> ());
 
       dispatcher.SetViewportProperties(arg1, arg2);
+
+      return true;
+    }
+    case CommandId_SetViewportScene:
+    {
+      object_id_t arg1 = read(*this, xtl::type<object_id_t> ());
+      object_id_t arg2 = read(*this, xtl::type<object_id_t> ());
+
+      dispatcher.SetViewportScene(arg1, arg2);
+
+      return true;
+    }
+    case CommandId_SetViewportCameraWorldMatrix:
+    {
+      object_id_t arg1 = read(*this, xtl::type<object_id_t> ());
+      const math::mat4f& arg2 = read(*this, xtl::type<const math::mat4f&> ());
+
+      dispatcher.SetViewportCameraWorldMatrix(arg1, arg2);
+
+      return true;
+    }
+    case CommandId_SetViewportCameraProjectionMatrix:
+    {
+      object_id_t arg1 = read(*this, xtl::type<object_id_t> ());
+      const math::mat4f& arg2 = read(*this, xtl::type<const math::mat4f&> ());
+
+      dispatcher.SetViewportCameraProjectionMatrix(arg1, arg2);
 
       return true;
     }

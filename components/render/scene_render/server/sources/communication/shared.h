@@ -23,6 +23,7 @@
 #include <render/scene/interchange/render_thread.h>
 #include <render/scene/interchange/serializer.h>
 
+#include <shared/camera.h>
 #include <shared/screen_manager.h>
 #include <shared/server.h>
 #include <shared/viewport_manager.h>

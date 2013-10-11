@@ -48,6 +48,7 @@ struct Viewport::Impl: public xtl::reference_counter, public IRenderTargetMapLis
   math::vec4f          background_color;           //цвет фона
   bool                 background_state;           //состо€ние фона
   common::PropertyMap  properties;                 //свойства области вывода
+  server::Camera       camera;                     //камера
   ListenerArray        listeners;                  //слушатели событий области вывода
   bool                 need_reconfiguration;       //конфигураци€ изменена
   bool                 need_update_technique;      //обновление техники
@@ -576,6 +577,20 @@ void Viewport::SetProperties (const common::PropertyMap& properties)
 const common::PropertyMap& Viewport::Properties () const
 {
   return impl->properties;
+}
+
+/*
+     амера
+*/
+
+Camera* Viewport::Camera ()
+{
+  return &impl->camera;
+}
+
+const Camera* Viewport::Camera () const
+{
+  return &impl->camera;
 }
 
 /*

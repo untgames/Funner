@@ -28,6 +28,9 @@ enum CommandId
   CommandId_SetViewportTechnique,
   CommandId_SetViewportBackground,
   CommandId_SetViewportProperties,
+  CommandId_SetViewportScene,
+  CommandId_SetViewportCameraWorldMatrix,
+  CommandId_SetViewportCameraProjectionMatrix,
   CommandId_CreateRenderTarget,
   CommandId_DestroyRenderTarget,
   CommandId_SetRenderTargetActive,
@@ -63,6 +66,9 @@ class ClientToServerSerializer: public OutputStream
     void SetViewportTechnique(object_id_t id, const char* name);
     void SetViewportBackground(object_id_t id, bool8 state, const math::vec4f& color);
     void SetViewportProperties(object_id_t id, uint64 properties_id);
+    void SetViewportScene(object_id_t id, object_id_t scene_id);
+    void SetViewportCameraWorldMatrix(object_id_t id, const math::mat4f& tm);
+    void SetViewportCameraProjectionMatrix(object_id_t id, const math::mat4f& tm);
     void CreateRenderTarget(object_id_t id, const char* name, const char* init_string);
     void DestroyRenderTarget(object_id_t id);
     void SetRenderTargetActive(object_id_t id, bool8 active);

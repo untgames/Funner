@@ -8,8 +8,9 @@ TARGETS += RENDER.SCENE_RENDER.SERVER.TESTS
 RENDER.SCENE_RENDER.SERVER.SOURCES.TYPE         := static-lib
 RENDER.SCENE_RENDER.SERVER.SOURCES.NAME         := funner.render.scene_render.server
 RENDER.SCENE_RENDER.SERVER.SOURCES.INCLUDE_DIRS := sources
-RENDER.SCENE_RENDER.SERVER.SOURCES.SOURCE_DIRS  := sources/communication sources/renderer
-RENDER.SCENE_RENDER.SERVER.SOURCES.IMPORTS      := compile.render.scene_render.server compile.render.scene_render.interchange compile.common compile.system compile.render.manager
+RENDER.SCENE_RENDER.SERVER.SOURCES.SOURCE_DIRS  := sources/communication sources/renderer sources/scene sources/techniques
+RENDER.SCENE_RENDER.SERVER.SOURCES.IMPORTS      := compile.render.scene_render.server compile.render.scene_render.interchange compile.common compile.system compile.render.manager \
+                                                   compile.math.bound_volumes
 
 #Цель - scene render server tests
 RENDER.SCENE_RENDER.SERVER.TESTS.TYPE        := test-suite

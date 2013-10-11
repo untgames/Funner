@@ -22,7 +22,7 @@ struct RenderableView::Impl: public scene_graph::IViewportListener
   bool                    need_update_renderer;         //требуется обновить рендер
   bool                    need_update_background;       //требуется обновить параметры очистки
   bool                    need_update_camera;           //требуется обновить камеру
-  bool                    need_update_transormations;   //требуется обновить трансформации
+  bool                    need_update_transformations;  //требуется обновить трансформации
   bool                    need_update_scene;            //требуется обновить сцену
   bool                    need_update_properties;       //требуется обновление свойств
   bool                    need_update_activity;         //требуется обновление активности области вывода
@@ -41,7 +41,7 @@ struct RenderableView::Impl: public scene_graph::IViewportListener
     , need_update_renderer (true)
     , need_update_background (true)
     , need_update_camera (true)
-    , need_update_transormations (true)
+    , need_update_transformations (true)
     , need_update_scene (true)
     , need_update_properties (true)
     , need_update_activity (true)
@@ -154,7 +154,7 @@ struct RenderableView::Impl: public scene_graph::IViewportListener
 ///Обновлены параметры камеры
   void OnCameraUpdated ()
   {
-    need_update_transormations = true;
+    need_update_transformations = true;
 
     //установка флага переконфигурации не нужна
   }
@@ -176,9 +176,14 @@ struct RenderableView::Impl: public scene_graph::IViewportListener
       scene = ScenePtr ();
 
       if (!new_scene)
+      {
+        connection->Context ().SetViewportScene (id, 0);
         return;
+      }
 
       scene = connection->Client ().SceneManager ().GetScene (*new_scene, *connection);
+
+      connection->Context ().SetViewportScene (id, scene->Id ());
     }
     catch (xtl::exception& e)
     {
@@ -295,8 +300,8 @@ struct RenderableView::Impl: public scene_graph::IViewportListener
             need_update_scene = true;
         }
 
-        need_update_camera         = false;
-        need_update_transormations = true;
+        need_update_camera          = false;
+        need_update_transformations = true;
       }
       
         //переконфигурация сцены
@@ -389,11 +394,20 @@ void RenderableView::Synchronize ()
 
       //синхронизация трансформаций
 
-    if (impl->need_update_transormations)
+    if (impl->need_update_transformations)
     {
-      //TODO: transformations sync
+      if (impl->camera)
+      {
+        impl->connection->Context ().SetViewportCameraWorldMatrix (impl->id, impl->camera->WorldTM ());
+        impl->connection->Context ().SetViewportCameraProjectionMatrix (impl->id, impl->camera->ProjectionMatrix ());
+      }
+      else
+      {
+        impl->connection->Context ().SetViewportCameraWorldMatrix (impl->id, math::mat4f (1.0f));
+        impl->connection->Context ().SetViewportCameraProjectionMatrix (impl->id, math::mat4f (1.0f));
+      }
 
-      impl->need_update_transormations = false;
+      impl->need_update_transformations = false;
     }
   }
   catch (xtl::exception& e)
