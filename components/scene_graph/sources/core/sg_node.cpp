@@ -1211,6 +1211,11 @@ const char* Node::Name () const
   return impl->name.c_str ();
 }
 
+size_t Node::NameHash () const
+{
+  return impl->name_hash;
+}
+
 void Node::SetName (const char* name)
 {
   if (!name)
