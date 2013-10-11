@@ -1,3 +1,4 @@
+#include <stl/hash_map>
 #include <stl/string>
 
 #include <xtl/common_exceptions.h>
@@ -8,5 +9,6 @@
 #include <xtl/trackable.h>
 
 #include <shared/camera.h>
+#include <shared/scene_manager.h>
 
 #include <render/manager.h>

@@ -3,6 +3,8 @@
 
 #include <stl/auto_ptr.h>
 
+#include <render/scene/interchange/types.h>
+
 #include <shared/render_target_map.h>
 
 namespace render

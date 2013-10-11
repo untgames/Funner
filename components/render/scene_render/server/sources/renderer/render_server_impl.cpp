@@ -14,6 +14,7 @@ struct ServerImpl::Impl
   server::WindowManager   window_manager;   //менеджер окон
   server::ViewportManager viewport_manager; //менеджер областей вывода
   server::ScreenManager   screen_manager;   //менеджер экранов
+  server::SceneManager    scene_manager;    //менеджер сцены
 
 /// Конструктор
   Impl (const char* name)
@@ -22,6 +23,7 @@ struct ServerImpl::Impl
     , window_manager (render_manager)
     , viewport_manager ()
     , screen_manager (window_manager, render_manager, viewport_manager)
+    , scene_manager ()
   {
   }
 };
@@ -76,4 +78,9 @@ WindowManager& ServerImpl::WindowManager ()
 ScreenManager& ServerImpl::ScreenManager ()
 {
   return impl->screen_manager;
+}
+
+SceneManager& ServerImpl::SceneManager ()
+{
+  return impl->scene_manager;
 }

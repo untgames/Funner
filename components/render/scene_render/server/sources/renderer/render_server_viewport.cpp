@@ -191,7 +191,7 @@ struct Viewport::Impl: public xtl::reference_counter, public IRenderTargetMapLis
         return;
       }
 
-      throw xtl::format_operation_exception ("", "Technique '%s' has not been found at the render manager configuration file '%s'", technique_name.c_str (), common::get<const char*> (configuration, "", ""));
+      throw xtl::format_operation_exception ("", "Technique '%s' has not been found in the render manager configuration file '%s'", technique_name.c_str (), common::get<const char*> (configuration, "", ""));
     }
     catch (xtl::exception& e)
     {

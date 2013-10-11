@@ -18,6 +18,7 @@ struct RenderableView::Impl: public scene_graph::IViewportListener
   ScenePtr                scene;                        //текущая сцена
   xtl::auto_connection    on_scene_changed_connection;  //соединение с сигналом оповещения об изменении сцены
   xtl::auto_connection    on_camera_updated_connection; //соединение с сигналом оповещения об обновлении трансформаций
+  size_t                  camera_name_hash;             //хэш имени камеры
   bool                    need_reconfiguration;         //конфигурация изменена
   bool                    need_update_renderer;         //требуется обновить рендер
   bool                    need_update_background;       //требуется обновить параметры очистки
@@ -37,6 +38,7 @@ struct RenderableView::Impl: public scene_graph::IViewportListener
     , id ()
     , is_active (viewport.IsActive ())
     , camera ()
+    , camera_name_hash ()
     , need_reconfiguration (true)
     , need_update_renderer (true)
     , need_update_background (true)
@@ -398,13 +400,23 @@ void RenderableView::Synchronize ()
     {
       if (impl->camera)
       {
+        if (impl->camera->NameHash () != impl->camera_name_hash)
+        {
+          impl->connection->Context ().SetViewportCameraName (impl->id, impl->camera->Name ());
+
+          impl->camera_name_hash = impl->camera->NameHash ();
+        }
+
         impl->connection->Context ().SetViewportCameraWorldMatrix (impl->id, impl->camera->WorldTM ());
         impl->connection->Context ().SetViewportCameraProjectionMatrix (impl->id, impl->camera->ProjectionMatrix ());
       }
       else
       {
+        impl->connection->Context ().SetViewportCameraName (impl->id, "");
         impl->connection->Context ().SetViewportCameraWorldMatrix (impl->id, math::mat4f (1.0f));
         impl->connection->Context ().SetViewportCameraProjectionMatrix (impl->id, math::mat4f (1.0f));
+
+        impl->camera_name_hash = 0;
       }
 
       impl->need_update_transformations = false;

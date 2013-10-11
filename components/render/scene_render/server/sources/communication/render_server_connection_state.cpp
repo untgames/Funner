@@ -388,6 +388,24 @@ void ConnectionState::SetViewportCameraProjectionMatrix (object_id_t id, const m
   }
 }
 
+void ConnectionState::SetViewportCameraName (object_id_t id, const char* name)
+{
+  try
+  {
+    Camera* camera = impl->server.ScreenManager ().GetViewport (id).Camera ();
+
+    if (!camera)
+      throw xtl::format_operation_exception ("", "Camera has not been set");
+
+    camera->SetName (name);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::scene::ConnectionState::SetViewportCameraName");
+    throw;
+  }
+}
+
 void ConnectionState::CreateRenderTarget (object_id_t id, const char* name, const char* init_string)
 {
   try
@@ -488,6 +506,49 @@ void ConnectionState::UpdateRenderTarget (object_id_t id)
   catch (xtl::exception& e)
   {
     e.touch ("render::scene::ConnectionState::UpdateRenderTarget");
+    throw;
+  }
+}
+
+/*
+    Работа со сценой
+*/
+
+void ConnectionState::CreateScene (object_id_t id)
+{
+  try
+  {
+    impl->server.SceneManager ().CreateScene (id);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::scene::ConnectionState::CreateScene");
+    throw;
+  }
+}
+
+void ConnectionState::DestroyScene (object_id_t id)
+{
+  try
+  {
+    impl->server.SceneManager ().RemoveScene (id);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::scene::ConnectionState::DestroyScene");
+    throw;
+  }
+}
+
+void ConnectionState::SetSceneName (object_id_t id, const char* name)
+{
+  try
+  {
+    impl->server.SceneManager ().GetScene (id).SetName (name);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::scene::ConnectionState::SetSceneName");
     throw;
   }
 }

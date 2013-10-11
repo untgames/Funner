@@ -14,6 +14,7 @@ inline stl::string get_command_name(CommandId command_id)
     case CommandId_SetViewportScene: return "SetViewportScene";
     case CommandId_SetViewportCameraWorldMatrix: return "SetViewportCameraWorldMatrix";
     case CommandId_SetViewportCameraProjectionMatrix: return "SetViewportCameraProjectionMatrix";
+    case CommandId_SetViewportCameraName: return "SetViewportCameraName";
     case CommandId_CreateRenderTarget: return "CreateRenderTarget";
     case CommandId_DestroyRenderTarget: return "DestroyRenderTarget";
     case CommandId_SetRenderTargetActive: return "SetRenderTargetActive";
@@ -25,6 +26,9 @@ inline stl::string get_command_name(CommandId command_id)
     case CommandId_UpdatePropertyMap: return "UpdatePropertyMap";
     case CommandId_RemovePropertyMap: return "RemovePropertyMap";
     case CommandId_RemovePropertyLayout: return "RemovePropertyLayout";
+    case CommandId_CreateScene: return "CreateScene";
+    case CommandId_DestroyScene: return "DestroyScene";
+    case CommandId_SetSceneName: return "SetSceneName";
     default: return common::format ("CommandId#%u", command_id);
   }
 }
@@ -251,6 +255,24 @@ inline void ClientToServerSerializer::SetViewportCameraProjectionMatrix(object_i
   }
 }
 
+inline void ClientToServerSerializer::SetViewportCameraName(object_id_t id, const char* name)
+{
+  size_t saved_position = Position ();
+
+  try
+  {
+    BeginCommand(CommandId_SetViewportCameraName);
+    write(*this, id);
+    write(*this, name);
+    EndCommand();
+  }
+  catch (...)
+  {
+    SetPosition (saved_position);
+    throw;
+  }
+}
+
 inline void ClientToServerSerializer::CreateRenderTarget(object_id_t id, const char* name, const char* init_string)
 {
   size_t saved_position = Position ();
@@ -448,6 +470,58 @@ inline void ClientToServerSerializer::RemovePropertyLayout(object_id_t id)
   }
 }
 
+inline void ClientToServerSerializer::CreateScene(object_id_t id)
+{
+  size_t saved_position = Position ();
+
+  try
+  {
+    BeginCommand(CommandId_CreateScene);
+    write(*this, id);
+    EndCommand();
+  }
+  catch (...)
+  {
+    SetPosition (saved_position);
+    throw;
+  }
+}
+
+inline void ClientToServerSerializer::DestroyScene(object_id_t id)
+{
+  size_t saved_position = Position ();
+
+  try
+  {
+    BeginCommand(CommandId_DestroyScene);
+    write(*this, id);
+    EndCommand();
+  }
+  catch (...)
+  {
+    SetPosition (saved_position);
+    throw;
+  }
+}
+
+inline void ClientToServerSerializer::SetSceneName(object_id_t id, const char* name)
+{
+  size_t saved_position = Position ();
+
+  try
+  {
+    BeginCommand(CommandId_SetSceneName);
+    write(*this, id);
+    write(*this, name);
+    EndCommand();
+  }
+  catch (...)
+  {
+    SetPosition (saved_position);
+    throw;
+  }
+}
+
 template <class Dispatcher> inline bool ClientToServerDeserializer::Deserialize(CommandId id, Dispatcher& dispatcher)
 {
   switch (id)
@@ -562,6 +636,15 @@ template <class Dispatcher> inline bool ClientToServerDeserializer::Deserialize(
 
       return true;
     }
+    case CommandId_SetViewportCameraName:
+    {
+      object_id_t arg1 = read(*this, xtl::type<object_id_t> ());
+      const char* arg2 = read(*this, xtl::type<const char*> ());
+
+      dispatcher.SetViewportCameraName(arg1, arg2);
+
+      return true;
+    }
     case CommandId_CreateRenderTarget:
     {
       object_id_t arg1 = read(*this, xtl::type<object_id_t> ());
@@ -655,6 +738,31 @@ template <class Dispatcher> inline bool ClientToServerDeserializer::Deserialize(
       object_id_t arg1 = read(*this, xtl::type<object_id_t> ());
 
       dispatcher.RemovePropertyLayout(arg1);
+
+      return true;
+    }
+    case CommandId_CreateScene:
+    {
+      object_id_t arg1 = read(*this, xtl::type<object_id_t> ());
+
+      dispatcher.CreateScene(arg1);
+
+      return true;
+    }
+    case CommandId_DestroyScene:
+    {
+      object_id_t arg1 = read(*this, xtl::type<object_id_t> ());
+
+      dispatcher.DestroyScene(arg1);
+
+      return true;
+    }
+    case CommandId_SetSceneName:
+    {
+      object_id_t arg1 = read(*this, xtl::type<object_id_t> ());
+      const char* arg2 = read(*this, xtl::type<const char*> ());
+
+      dispatcher.SetSceneName(arg1, arg2);
 
       return true;
     }

@@ -38,6 +38,7 @@ class ConnectionState: public xtl::noncopyable
     void SetViewportScene(object_id_t id, object_id_t scene_id);
     void SetViewportCameraWorldMatrix(object_id_t id, const math::mat4f& tm);
     void SetViewportCameraProjectionMatrix(object_id_t id, const math::mat4f& tm);
+    void SetViewportCameraName(object_id_t id, const char* name);
 
     void CreateRenderTarget (object_id_t id, const char* name, const char* init_string);
     void DestroyRenderTarget (object_id_t id);
@@ -51,6 +52,10 @@ class ConnectionState: public xtl::noncopyable
     void UpdatePropertyMap (interchange::InputStream&);
     void RemovePropertyMap (object_id_t id);
     void RemovePropertyLayout (object_id_t id);
+
+    void CreateScene (object_id_t id);
+    void DestroyScene (object_id_t id);
+    void SetSceneName (object_id_t id, const char* name);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Внутренние команды

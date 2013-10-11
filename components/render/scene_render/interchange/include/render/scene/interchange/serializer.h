@@ -31,6 +31,7 @@ enum CommandId
   CommandId_SetViewportScene,
   CommandId_SetViewportCameraWorldMatrix,
   CommandId_SetViewportCameraProjectionMatrix,
+  CommandId_SetViewportCameraName,
   CommandId_CreateRenderTarget,
   CommandId_DestroyRenderTarget,
   CommandId_SetRenderTargetActive,
@@ -42,6 +43,9 @@ enum CommandId
   CommandId_UpdatePropertyMap,
   CommandId_RemovePropertyMap,
   CommandId_RemovePropertyLayout,
+  CommandId_CreateScene,
+  CommandId_DestroyScene,
+  CommandId_SetSceneName,
   CommandId_FirstUserDefined = 10000,
 };
 
@@ -69,6 +73,7 @@ class ClientToServerSerializer: public OutputStream
     void SetViewportScene(object_id_t id, object_id_t scene_id);
     void SetViewportCameraWorldMatrix(object_id_t id, const math::mat4f& tm);
     void SetViewportCameraProjectionMatrix(object_id_t id, const math::mat4f& tm);
+    void SetViewportCameraName(object_id_t id, const char* name);
     void CreateRenderTarget(object_id_t id, const char* name, const char* init_string);
     void DestroyRenderTarget(object_id_t id);
     void SetRenderTargetActive(object_id_t id, bool8 active);
@@ -80,6 +85,9 @@ class ClientToServerSerializer: public OutputStream
     OutputStream& UpdatePropertyMap();
     void RemovePropertyMap(object_id_t id);
     void RemovePropertyLayout(object_id_t id);
+    void CreateScene(object_id_t id);
+    void DestroyScene(object_id_t id);
+    void SetSceneName(object_id_t id, const char* name);
 
   protected:
     using OutputStream::Swap;

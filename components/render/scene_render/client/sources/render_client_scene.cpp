@@ -18,6 +18,20 @@ struct Scene::Impl
     , scene (in_scene)
     , connection (in_connection)
   {
+    connection.Context ().CreateScene (id);
+    connection.Context ().SetSceneName (id, scene.Name ());
+  }
+
+/// Деструктор
+  ~Impl ()
+  {
+    try
+    {
+      connection.Context ().DestroyScene (id);
+    }
+    catch (...)
+    {
+    }
   }
 };
 
