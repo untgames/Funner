@@ -314,6 +314,7 @@ public class EngineActivity extends Activity
     views.addView (view, new AbsoluteLayout.LayoutParams (new ViewGroup.LayoutParams (FrameLayout.LayoutParams.WRAP_CONTENT, FrameLayout.LayoutParams.WRAP_CONTENT)));
     
     view.bringToFront ();
+    view.requestFocus ();
     
     if (needSetContentView)    
       getWindow ().setContentView (views, new ViewGroup.LayoutParams (ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
