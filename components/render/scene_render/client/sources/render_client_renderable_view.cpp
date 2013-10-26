@@ -183,7 +183,7 @@ struct RenderableView::Impl: public scene_graph::IViewportListener
         return;
       }
 
-      scene = connection->Client ().SceneManager ().GetScene (*new_scene, *connection);
+      scene = connection->Client ().SceneManager ().GetScene (*new_scene);
 
       connection->Context ().SetViewportScene (id, scene->Id ());
     }

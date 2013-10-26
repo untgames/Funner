@@ -6,8 +6,8 @@ using namespace render::scene::client;
     Конструктор / деструктор
 */
 
-SceneObject::SceneObject (Scene& in_scene)
-  : scene (in_scene)
+SceneObject::SceneObject (SceneManager& in_scene_manager)
+  : scene_manager (in_scene_manager)
 {
   need_update = false;
 
@@ -18,7 +18,7 @@ SceneObject::~SceneObject ()
 {
   if (need_update)
   {
-    SceneUpdateList& list = scene.UpdateList ();
+    SceneUpdateList& list = scene_manager.UpdateList ();
 
     if (prev_update) prev_update->next_update = next_update;
     else             list.first               = next_update;
@@ -32,7 +32,7 @@ SceneObject::~SceneObject ()
     Имя объекта
 */
 
-stl::string SceneObject::NameCore ()
+const char* SceneObject::NameCore ()
 {
   return "";
 }
@@ -46,7 +46,7 @@ void SceneObject::UpdateNotify ()
   if (need_update)
     return;
 
-  SceneUpdateList& list = scene.UpdateList ();
+  SceneUpdateList& list = scene_manager.UpdateList ();
 
   need_update = true;
   next_update = 0;
@@ -60,21 +60,21 @@ void SceneObject::UpdateNotify ()
     Синхронизация
 */
 
-void SceneObject::Update ()
+void SceneObject::Update (Context& context)
 {
   try
   {
     need_update = false;
 
-    UpdateCore ();
+    UpdateCore (context);  
   }
   catch (xtl::exception& e)
   {
     try
     {
-      stl::string name = NameCore ();
+      const char* name = NameCore ();
 
-      e.touch ("render::scene::client::SceneObject::Update(%s)", name.c_str ());
+      e.touch ("render::scene::client::SceneObject::Update(%s)", name);
       throw;
     }
     catch (...)

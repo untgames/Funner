@@ -51,6 +51,10 @@ using interchange::object_id_t;
 typedef interchange::Context<interchange::ClientToServerSerializer, interchange::ServerToClientDeserializer> Context;
 typedef interchange::PropertyMapAutoWriter::Synchronizer                                                     PropertyMapSynchronizer;
 
+//forwards
+class ClientImpl;
+class SceneManager;
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Тип синхронизируемого объекта
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -64,11 +68,12 @@ enum ObjectType
 
 #include "client.h"
 #include "connection.h"
+#include "scene_object.h"
+#include "node.h"
 #include "render_target.h"
 #include "renderable_view.h"
 #include "scene.h"
 #include "scene_manager.h"
-#include "scene_object.h"
 
 }
 

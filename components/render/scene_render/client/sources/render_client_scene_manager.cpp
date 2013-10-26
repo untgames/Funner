@@ -31,18 +31,33 @@ struct SceneDesc
 
 typedef stl::hash_map<scene_graph::Scene*, SceneDesc> SceneMap;
 
+struct NodeDesc
+{
+  NodePtr              node;
+  xtl::auto_connection on_destroy_source_node;
+
+  NodeDesc (const NodePtr& in_node) : node (in_node) {}
+};
+
+typedef stl::hash_map<scene_graph::Node*, NodeDesc> NodeMap;
+
 }
 
 struct SceneManager::Impl
 {
+  ClientImpl&      client;      //клиент
+  client::Context& context;     //контекст
   common::Log      log;         //поток отладочного протоколирования
   SceneUpdateList  update_list; //список обновлений
   object_id_t      current_id;  //текущий доступный идентификатор  
   SceneMap         scenes;      //сцены
+  NodeMap          nodes;       //узлы
 
 /// Конструктор
-  Impl ()
-    : log (LOG_NAME)
+  Impl (ClientImpl& in_client, client::Context& in_context)
+    : client (in_client)
+    , context (in_context)
+    , log (LOG_NAME)
     , current_id ()
   {
     ResetUpdateList ();
@@ -57,6 +72,15 @@ struct SceneManager::Impl
     scenes.erase (scene);
   }
 
+/// Оповещение об удалении узла
+  void OnDestroyNode (scene_graph::Node* node)
+  {
+    if (!node)
+      return;
+
+    nodes.erase (node);
+  }
+
 /// Сброк списка обновлений
   void ResetUpdateList ()
   {
@@ -68,8 +92,8 @@ struct SceneManager::Impl
     Конструктор / деструктор
 */
 
-SceneManager::SceneManager ()
-  : impl (new Impl)
+SceneManager::SceneManager (ClientImpl& client, render::scene::client::Context& context)
+  : impl (new Impl (client, context))
 {
 }
 
@@ -81,7 +105,7 @@ SceneManager::~SceneManager ()
     Получение сцены
 */
 
-ScenePtr SceneManager::GetScene (scene_graph::Scene& scene, Connection& connection)
+ScenePtr SceneManager::GetScene (scene_graph::Scene& scene)
 {
   try
   {
@@ -95,7 +119,7 @@ ScenePtr SceneManager::GetScene (scene_graph::Scene& scene, Connection& connecti
     if (!(id + 1))
       throw xtl::format_operation_exception ("", "ID pool is full for a new scene");
 
-    ScenePtr new_scene (new Scene (scene, connection, impl->update_list, id + 1), false);
+    ScenePtr new_scene (new Scene (scene, *this, id + 1), false);
 
     xtl::trackable::function_type destroy_handler (xtl::bind (&Impl::OnDestroyScene, &*impl, &scene));
 
@@ -133,6 +157,63 @@ SceneUpdateList& SceneManager::UpdateList ()
 }
 
 /*
+    Клиент
+*/
+
+ClientImpl& SceneManager::Client ()
+{
+  return impl->client;
+}
+
+/*
+    Контекст
+*/
+
+Context& SceneManager::Context ()
+{
+  return impl->context;
+}
+
+/*
+    Получение узла
+*/
+
+NodePtr SceneManager::GetNode (scene_graph::Node& src_node)
+{
+  try
+  {
+    NodeMap::iterator iter = impl->nodes.find (&src_node);
+
+    if (iter != impl->nodes.end ())
+      return iter->second.node;
+
+    NodePtr node (SceneFactory::Create (src_node, *this), false);
+
+    iter = impl->nodes.insert_pair (&src_node, node).first;
+
+    if (node)
+    {
+      try
+      {
+        iter->second.on_destroy_source_node = src_node.RegisterEventHandler (scene_graph::NodeEvent_BeforeDestroy, xtl::bind (&Impl::OnDestroyNode, &*impl, &src_node));
+      }
+      catch (...)
+      {
+        impl->nodes.erase (iter);
+        throw;
+      }
+    }
+
+    return node;
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::scene::client::SceneManager::GetNode");
+    throw;
+  }
+}
+
+/*
     Синхронизация сцен
 */
 
@@ -142,11 +223,13 @@ void SceneManager::Update ()
 
   impl->ResetUpdateList ();
 
+  client::Context& context = impl->context;
+
   for (SceneObject* object=first; object; object=object->next_update)
   {
     try
     {
-      object->Update ();
+      object->Update (context);
     }
     catch (std::exception& e)
     {

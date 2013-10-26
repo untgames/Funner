@@ -10,11 +10,11 @@ typedef xtl::array<render::scene::interchange::object_id_t, ObjectType_Num> IdAr
 
 struct ClientImpl::Impl
 {
-  client::Context*                   context;            //контекст (получать только через вызов Context ())
-  IdArray                            id_pool;            //пул идентификаторов
-  interchange::PropertyMapAutoWriter properties_writer;  //синхронизатор свойств (запись на сервер)
-  interchange::PropertyMapReader     properties_reader;  //синхронизатор свойств (чтение с сервера)
-  client::SceneManager               scene_manager;      //менеджер сцены
+  client::Context*                    context;            //контекст (получать только через вызов Context ())
+  IdArray                             id_pool;            //пул идентификаторов
+  interchange::PropertyMapAutoWriter  properties_writer;  //синхронизатор свойств (запись на сервер)
+  interchange::PropertyMapReader      properties_reader;  //синхронизатор свойств (чтение с сервера)
+  stl::auto_ptr<client::SceneManager> scene_manager;      //менеджер сцен
 
 /// Конструктор
   Impl ()
@@ -52,7 +52,30 @@ ClientImpl::~ClientImpl ()
 
 void ClientImpl::SetContext (Context* context)
 {
-  impl->context = context;
+  try
+  {
+    impl->context = context;
+
+    try
+    {
+      impl->scene_manager.reset ();
+
+      if (context)
+      {
+        impl->scene_manager.reset (new client::SceneManager (*this, *context));
+      }
+    }
+    catch (...)
+    {
+      impl->context = 0;
+      throw;
+    }
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::scene::client::ClientImpl::SetContext");
+    throw;
+  }
 }
 
 /*
@@ -160,5 +183,8 @@ void ClientImpl::UpdatePropertyMap (render::scene::interchange::InputStream& str
 
 SceneManager& ClientImpl::SceneManager ()
 {
-  return impl->scene_manager;
+  if (!impl->context)
+    throw xtl::format_operation_exception ("render::scene::client::ClientImpl::SceneManager", "Can't return SceneManger: context is null");
+
+  return *impl->scene_manager;
 }
