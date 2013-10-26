@@ -3,6 +3,17 @@
 using namespace render::scene::client;
 
 /*
+    Константы
+*/
+
+namespace
+{
+
+const char* LOG_NAME = "render.scene.client"; //имя потока отладочного протоколирования
+
+}
+
+/*
     Описание реализации менеджера сцен
 */
 
@@ -24,13 +35,17 @@ typedef stl::hash_map<scene_graph::Scene*, SceneDesc> SceneMap;
 
 struct SceneManager::Impl
 {
-  object_id_t current_id; //текущий доступный идентификатор
-  SceneMap    scenes;     //сцены
+  common::Log      log;         //поток отладочного протоколирования
+  SceneUpdateList  update_list; //список обновлений
+  object_id_t      current_id;  //текущий доступный идентификатор  
+  SceneMap         scenes;      //сцены
 
 /// Конструктор
   Impl ()
-    : current_id ()
+    : log (LOG_NAME)
+    , current_id ()
   {
+    ResetUpdateList ();
   }
 
 /// Оповещение об удалении сцены
@@ -40,6 +55,12 @@ struct SceneManager::Impl
       return;
 
     scenes.erase (scene);
+  }
+
+/// Сброк списка обновлений
+  void ResetUpdateList ()
+  {
+    update_list.first = update_list.last = 0;
   }
 };
 
@@ -74,7 +95,7 @@ ScenePtr SceneManager::GetScene (scene_graph::Scene& scene, Connection& connecti
     if (!(id + 1))
       throw xtl::format_operation_exception ("", "ID pool is full for a new scene");
 
-    ScenePtr new_scene (new Scene (scene, connection, id + 1), false);
+    ScenePtr new_scene (new Scene (scene, connection, impl->update_list, id + 1), false);
 
     xtl::trackable::function_type destroy_handler (xtl::bind (&Impl::OnDestroyScene, &*impl, &scene));
 
@@ -103,19 +124,37 @@ ScenePtr SceneManager::GetScene (scene_graph::Scene& scene, Connection& connecti
 }
 
 /*
+    Список обновлений
+*/
+
+SceneUpdateList& SceneManager::UpdateList ()
+{
+  return impl->update_list;
+}
+
+/*
     Синхронизация сцен
 */
 
 void SceneManager::Update ()
 {
-  try
+  SceneObject* first = impl->update_list.first;
+
+  impl->ResetUpdateList ();
+
+  for (SceneObject* object=first; object; object=object->next_update)
   {
-    for (SceneMap::iterator iter=impl->scenes.begin (), end=impl->scenes.end (); iter!=end; ++iter)
-      iter->second.scene->Update ();
-  }
-  catch (xtl::exception& e)
-  {
-    e.touch ("render::scene::client::SceneManager::Update");
-    throw;
+    try
+    {
+      object->Update ();
+    }
+    catch (std::exception& e)
+    {
+      impl->log.Printf ("%s\n    at render::scene::client::SceneManager::Update", e.what ());
+    }
+    catch (...)
+    {
+      impl->log.Printf ("unknown exception\n    at render::scene::client::SceneManager::Update");
+    }
   }
 }

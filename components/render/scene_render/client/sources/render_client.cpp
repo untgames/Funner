@@ -3,12 +3,25 @@
 using namespace render::scene::client;
 
 /*
+     онстанты
+*/
+
+const size_t DEFAULT_MAX_DRAW_DEPTH = 3; //разрешенна€ глубина вложенного рендеринга по умолчанию
+
+/*
     ќписание реализации рендера сцены
 */
 
 struct Client::Impl: public xtl::reference_counter
 {
-  ConnectionPtr connection; //ссылка на соединение
+  ConnectionPtr connection;     //ссылка на соединение
+  size_t        max_draw_depth; //разрешенна€ глубина вложенного рендеринга
+
+///  онструктор
+  Impl ()
+    : max_draw_depth (DEFAULT_MAX_DRAW_DEPTH)
+  {
+  }
 };
 
 /*
@@ -28,6 +41,8 @@ Client::Client (const char* connection_name, const char* init_string, size_t log
     impl = new Impl;
 
     impl->connection = ConnectionPtr (new Connection (connection_name, init_string, logon_timeout_ms), false);
+
+    impl->connection->Context ().SetMaxDrawDepth (static_cast<uint32> (impl->max_draw_depth));
   }
   catch (xtl::exception& e)
   {
@@ -98,12 +113,25 @@ RenderTarget Client::CreateRenderTarget (const char* target_name, const char* in
 
 void Client::SetMaxDrawDepth (size_t level)
 {
-  throw xtl::make_not_implemented_exception (__FUNCTION__);
+  try
+  {
+    if (level == impl->max_draw_depth)
+      return;
+
+    impl->max_draw_depth = level;
+
+    impl->connection->Context ().SetMaxDrawDepth (static_cast<uint32> (level));
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::scene::client::Client::SetMaxDrawDepth");
+    throw;
+  }
 }
 
 size_t Client::MaxDrawDepth () const
 {
-  throw xtl::make_not_implemented_exception (__FUNCTION__);
+  return impl->max_draw_depth;
 }
 
 /*

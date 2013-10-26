@@ -68,6 +68,7 @@ enum ObjectType
 #include "renderable_view.h"
 #include "scene.h"
 #include "scene_manager.h"
+#include "scene_object.h"
 
 }
 
