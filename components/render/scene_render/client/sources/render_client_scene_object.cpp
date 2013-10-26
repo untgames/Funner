@@ -29,6 +29,15 @@ SceneObject::~SceneObject ()
 }
 
 /*
+    Имя объекта
+*/
+
+stl::string SceneObject::NameCore ()
+{
+  return "";
+}
+
+/*
     Запрос синхронизации
 */
 
@@ -61,7 +70,17 @@ void SceneObject::Update ()
   }
   catch (xtl::exception& e)
   {
-    e.touch ("render::scene::client::SceneObject::Update");
-    throw;
+    try
+    {
+      stl::string name = NameCore ();
+
+      e.touch ("render::scene::client::SceneObject::Update(%s)", name.c_str ());
+      throw;
+    }
+    catch (...)
+    {
+      e.touch ("render::scene::client::SceneObject::Update");
+      throw;
+    }
   }
 }
