@@ -1,7 +1,8 @@
 ###################################################################################################
 #Определения и константы
 ###################################################################################################
-TARGETS := SOCIAL.FACEBOOK.SOURCES SOCIAL.ANDROID_SESSION.JAVA SOCIAL.FACEBOOK.TESTS
+TARGETS := SOCIAL.FACEBOOK.SOURCES SOCIAL.FACEBOOK.TESTS
+TARGETS.android += SOCIAL.ANDROID_SESSION.JAVA
 
 #Цель - sources
 SOCIAL.FACEBOOK.SOURCES.TYPE                := static-lib
@@ -22,4 +23,4 @@ SOCIAL.ANDROID_SESSION.JAVA.IMPORTS     := compile.extern.facebook_sdk compile.e
 #Цель - tests
 SOCIAL.FACEBOOK.TESTS.TYPE        := test-suite
 SOCIAL.FACEBOOK.TESTS.SOURCE_DIRS := tests
-SOCIAL.FACEBOOK.TESTS.IMPORTS			:= compile.social.core compile.common compile.system link.social.facebook link.common.json
+SOCIAL.FACEBOOK.TESTS.IMPORTS     := compile.social.core compile.common compile.system link.social.facebook link.common.json
