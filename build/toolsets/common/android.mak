@@ -41,6 +41,7 @@ SDK_ROOT                   := /$(subst :,,$(call convert_path,$(ANDROID_SDK)))
 JAVA_ROOT                  := /$(subst :,,$(call convert_path,$(JAVA_SDK)))
 PLATFORM_DIR               := $(NDK_ROOT)/platforms/$(ANDROID_NDK_PLATFORM)
 ANDROID_PLATFORM_TOOLS_DIR := $(call convert_path,$(ANDROID_SDK))/platform-tools
+ANDROID_BUILD_TOOLS_DIR    := $(call convert_path,$(ANDROID_SDK))/build-tools/18.1.1
 ABI_DIR                    := $(NDK_ROOT)/toolchains/$(ANDROID_TOOLCHAIN)-$(ANDROID_TOOLCHAIN_VERSION)/prebuilt/$(ANDROID_NDK_HOST)
 GCC_TOOLS_DIR              := $(ABI_DIR)/bin
 COMPILER_GCC               := $(GCC_TOOLS_DIR)/$(ANDROID_TOOLS_PREFIX)-gcc
@@ -50,11 +51,11 @@ ADDR2LINE                  := $(GCC_TOOLS_DIR)/$(ANDROID_TOOLS_PREFIX)-addr2line
 ANDROID_TOOLS_DIR          := $(SDK_ROOT)/tools
 ADB                        := $(ANDROID_PLATFORM_TOOLS_DIR)/adb
 AIDL                       := $(ANDROID_PLATFORM_TOOLS_DIR)/aidl
-APK_BUILDER                := $(ANDROID_SDK)/tools/apkbuilder
-DX_TOOL                    := $(ANDROID_PLATFORM_TOOLS_DIR)/dx
+APK_BUILDER                := $(BUILD_DIR)platforms/android/apkbuilder
+DX_TOOL                    := $(ANDROID_BUILD_TOOLS_DIR)/dx
 JAVA_JAR                   := "$(JAVA_ROOT)/bin/jar"
 JAVA_CC                    := "$(JAVA_ROOT)/bin/javac"
-JAVA_AAPT                  := $(ANDROID_PLATFORM_TOOLS_DIR)/aapt
+JAVA_AAPT                  := $(ANDROID_BUILD_TOOLS_DIR)/aapt
 JAVA_JAR_SIGNER            := "$(JAVA_ROOT)/bin/jarsigner"
 ZIP_ALIGNER                := $(ANDROID_SDK)/tools/zipalign
 BUILD_PATHS                := $(GCC_TOOLS_DIR):$(ABI_DIR)/libexec/gcc/$(ANDROID_TOOLCHAIN)/$(ANDROID_TOOLCHAIN_VERSION)
@@ -93,6 +94,7 @@ ANDROID_AIDL               := $(ANDROID_SDK)/platforms/$(ANDROID_SDK_PLATFORM)/f
 ANDROID_KEY_STORE          := $(BUILD_DIR)platforms/android/my-release-key.keystore
 ANDROID_KEY_PASS           := android
 ANDROID_JAR                := $(ANDROID_SDK)/platforms/$(ANDROID_SDK_PLATFORM)/android.jar
+ANDROID_SDKLIB_JAR         := $(ANDROID_SDK)/tools/lib/sdklib.jar
 DEFAULT_PACKAGE_PREFIX     := com.untgames.
 GDB_SERVER_FLAG_FILE       := $(ROOT)/$(TMP_DIR_SHORT_NAME)/$(CURRENT_TOOLSET)/gdb-installed
 GDB_SERVER_FILE            := $(ABI_DIR)/../gdbserver
@@ -302,7 +304,7 @@ endif
   
   $$($1.DEX_FILE): $$($1.CLASSES_FLAG)
 		@echo Convert $$(notdir $$@) to Dalvik bytecodes...
-ifeq ($(ANDROID_NDK_HOST),windows)
+ifneq (,$(filter windows%,$(ANDROID_NDK_HOST)))
 		@export TMP_DIR_PREFIX=$$$$($$(call get_system_dir,$$($1.TMP_DIR))) && cmd //C "$(DX_TOOL).bat --dex --output=$$$$TMP_DIR_PREFIX\$$(notdir $$@) $$$$TMP_DIR_PREFIX\$$(notdir $$($1.CLASSES_DIR))"
 else
 		@$(DX_TOOL) --dex --output=$$@ $$($1.CLASSES_DIR)
@@ -310,10 +312,10 @@ endif
 
   $$($1.UNSIGNED_TARGET): $$($1.DEX_FILE) $$($1.PACKAGED_RES_FILE) $$($1.TARGET_DLLS)
 		@echo Create unsigned APK $$(notdir $$@)...
-ifeq ($(ANDROID_NDK_HOST),windows)		
-		@export LIB_DIR_PREFIX=$$$$(cmd "\\/C" "cd . && cd") TMP_DIR_PREFIX=$$$$($$(call get_system_dir,$$($1.TMP_DIR))) && if ! cmd //C "$(APK_BUILDER) %TMP_DIR_PREFIX%\$$(notdir $$@) -u -z %TMP_DIR_PREFIX%\$$(notdir $$($1.PACKAGED_RES_FILE)) -f %TMP_DIR_PREFIX%\$$(notdir $$($1.DEX_FILE)) -rf %TMP_DIR_PREFIX%\\bin $$(foreach jar,$$($1.JARS),-rj %LIB_DIR_PREFIX%\\$$(subst /,\,$$(jar)))"; then $(RM) $$@; exit 1; fi
+ifneq (,$(filter windows%,$(ANDROID_NDK_HOST)))
+		@export PATH="$(JAVA_ROOT)/bin":$$$$PATH SDKLIB_JAR=$(subst /,\\,$(subst \,\\,$(ANDROID_SDKLIB_JAR))) LIB_DIR_PREFIX=$$$$(cmd "\\/C" "cd . && cd") TMP_DIR_PREFIX=$$$$($$(call get_system_dir,$$($1.TMP_DIR))) && if ! cmd //C "$(subst /,\,$(APK_BUILDER)).bat %TMP_DIR_PREFIX%\$$(notdir $$@) -u -z %TMP_DIR_PREFIX%\$$(notdir $$($1.PACKAGED_RES_FILE)) -f %TMP_DIR_PREFIX%\$$(notdir $$($1.DEX_FILE)) -rf %TMP_DIR_PREFIX%\\bin $$(foreach jar,$$($1.JARS),-rj %LIB_DIR_PREFIX%\\$$(subst /,\,$$(jar)))"; then $(RM) $$@; exit 1; fi
 else
-		@if ! $$$$($(APK_BUILDER) $$@ -u -z $$($1.PACKAGED_RES_FILE) -f $$($1.DEX_FILE) -rf $$($1.TMP_DIR)/bin $$(foreach jar,$$($1.JARS),-rj $$(jar))); then $(RM) $$@; exit 1; fi
+		@export PATH="$(JAVA_ROOT)/bin":$$$$PATH SDKLIB_JAR=$(ANDROID_SDKLIB_JAR) && if ! $$$$($(APK_BUILDER) $$@ -u -z $$($1.PACKAGED_RES_FILE) -f $$($1.DEX_FILE) -rf $$($1.TMP_DIR)/bin $$(foreach jar,$$($1.JARS),-rj $$(jar))); then $(RM) $$@; exit 1; fi
 endif
 
   $$($1.SIGNED_TARGET): $$($1.UNSIGNED_TARGET)
