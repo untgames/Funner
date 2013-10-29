@@ -8,11 +8,58 @@
 namespace media
 {
 
+//TODO: cache index
+
+struct FontCreationParams
+{
+  size_t      font_size;
+  size_t      font_size_eps;
+  size_t      weight;      //+constants
+  int         escapement;
+  bool        bold;
+  bool        itallic;
+  bool        underlined;
+  bool        striked;
+  size_t      horizontal_dpi;
+  size_t      vertical_dpi;
+  const char* charset;
+};
+
+//TODO: add global charset class
+
+class FontDesc
+{
+  public:
+    FontDesc (const char* source, const char* family_name, const char* style_name, IFontDesc* desc);
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Имя файла
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    const char* Source () const;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Имя гарнитуры / имя семейства / имя стиля
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    const char* FamilyName () const;
+    const char* StyleName  () const;
+
+    bool IsRasterFont () const;
+    
+
+    Font CreateFont     (const FontCreationParams&) const;
+    bool CanCreateFont  (const FontCreationParams&) const;
+
+  private:
+    struct Impl
+    Impl* impl;
+};
+
 class FontLibrary
 {
   public:
-    typedef xtl::iterator<Font>       Iterator;
-    typedef xtl::iterator<const Font> ConstIterator;
+    typedef xtl::iterator<FontDesc>       Iterator;
+    typedef xtl::iterator<const FontDesc> ConstIterator;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструкторы / деструктор / присваивание
@@ -30,7 +77,7 @@ class FontLibrary
     void        SetName (const char* name);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Количество материалов в библиотеке / проверка на пустоту
+///Количество дескрипторов шрифтов в библиотеке / проверка на пустоту
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     size_t Size    () const;
     bool   IsEmpty () const;
@@ -42,15 +89,15 @@ class FontLibrary
     ConstIterator CreateIterator () const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Получение идентификатора материала
+///Получение идентификатора шрифта
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     const char* ItemId (const ConstIterator&) const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Поиск
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-          Font* Find (const char* name);
-    const Font* Find (const char* name) const;
+          FontDesc* Find (const char* name);
+    const FontDesc* Find (const char* name) const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Очистка библиотеки
@@ -66,23 +113,9 @@ class FontLibrary
     void UnloadFonts (const char* wildcard);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Количество загруженных шрифтов
+///Создание шрифта
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    size_t FontsCount () const;
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Поиск шрифтка по атрибутам
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    int FindFont (const char* name, const char* family, const char* style) const;  //возвращает -1 если точного совпадения не найдено
-    int FindAnyFont (const char* name_wildcard, const char* family_wildcard, const char* style_wildcard) const;  //возвращает -1 если совпадения не найдено
-
-
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Рендеринг шрифта (в шрифте необходимо возвращать не картинку, а список картинок) (кеширование????) (создание по имени)
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    Font RenderFont (size_t font_index, float size, bool nearest_size, const char* language) const;
-    Font RenderFont (size_t font_index, float size, bool nearest_size, const char* language, float horizontal_dpi, float vertical_dpi) const;
+    Font CreateFont (const char* name, const FontCreationParams& params);
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Обмен
