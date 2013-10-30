@@ -311,8 +311,18 @@ public class EngineViewController implements View.OnTouchListener, View.OnKeyLis
     boolean is_alt_pressed   = event.isAltPressed (),
             is_shift_pressed = event.isShiftPressed (),
             is_sym_pressed   = event.isSymPressed ();
-            
-    onKeyCallback (keyCode, action, is_alt_pressed, is_shift_pressed, is_sym_pressed, event.getUnicodeChar ());
+
+    int unicode_char = event.getUnicodeChar ();
+    
+    if (unicode_char == 0 && keyCode == KeyEvent.KEYCODE_UNKNOWN && action == KeyEvent.ACTION_MULTIPLE)
+    {
+      String characters = event.getCharacters ();
+    
+      if (characters != null && characters.length () > 0)
+    	  unicode_char = characters.codePointAt (0);
+    }
+    
+    onKeyCallback (keyCode, action, is_alt_pressed, is_shift_pressed, is_sym_pressed, unicode_char);
 
     return true;
   }  
