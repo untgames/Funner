@@ -4,6 +4,7 @@ inline stl::string get_command_name(CommandId command_id)
   {
     case CommandId_LoadResource: return "LoadResource";
     case CommandId_UnloadResource: return "UnloadResource";
+    case CommandId_SetMaxDrawDepth: return "SetMaxDrawDepth";
     case CommandId_SetViewportArea: return "SetViewportArea";
     case CommandId_SetViewportZOrder: return "SetViewportZOrder";
     case CommandId_SetViewportActive: return "SetViewportActive";
@@ -29,6 +30,10 @@ inline stl::string get_command_name(CommandId command_id)
     case CommandId_CreateScene: return "CreateScene";
     case CommandId_DestroyScene: return "DestroyScene";
     case CommandId_SetSceneName: return "SetSceneName";
+    case CommandId_CreateNode: return "CreateNode";
+    case CommandId_DestroyNode: return "DestroyNode";
+    case CommandId_SetNodeName: return "SetNodeName";
+    case CommandId_SetNodeWorldMatrix: return "SetNodeWorldMatrix";
     default: return common::format ("CommandId#%u", command_id);
   }
 }
@@ -62,6 +67,23 @@ inline void ClientToServerSerializer::UnloadResource(const char* name)
   {
     BeginCommand(CommandId_UnloadResource);
     write(*this, name);
+    EndCommand();
+  }
+  catch (...)
+  {
+    SetPosition (saved_position);
+    throw;
+  }
+}
+
+inline void ClientToServerSerializer::SetMaxDrawDepth(uint32 depth)
+{
+  size_t saved_position = Position ();
+
+  try
+  {
+    BeginCommand(CommandId_SetMaxDrawDepth);
+    write(*this, depth);
     EndCommand();
   }
   catch (...)
@@ -522,6 +544,77 @@ inline void ClientToServerSerializer::SetSceneName(object_id_t id, const char* n
   }
 }
 
+inline void ClientToServerSerializer::CreateNode(object_id_t id, NodeType type)
+{
+  size_t saved_position = Position ();
+
+  try
+  {
+    BeginCommand(CommandId_CreateNode);
+    write(*this, id);
+    write(*this, type);
+    EndCommand();
+  }
+  catch (...)
+  {
+    SetPosition (saved_position);
+    throw;
+  }
+}
+
+inline void ClientToServerSerializer::DestroyNode(object_id_t id)
+{
+  size_t saved_position = Position ();
+
+  try
+  {
+    BeginCommand(CommandId_DestroyNode);
+    write(*this, id);
+    EndCommand();
+  }
+  catch (...)
+  {
+    SetPosition (saved_position);
+    throw;
+  }
+}
+
+inline void ClientToServerSerializer::SetNodeName(object_id_t id, const char* name)
+{
+  size_t saved_position = Position ();
+
+  try
+  {
+    BeginCommand(CommandId_SetNodeName);
+    write(*this, id);
+    write(*this, name);
+    EndCommand();
+  }
+  catch (...)
+  {
+    SetPosition (saved_position);
+    throw;
+  }
+}
+
+inline void ClientToServerSerializer::SetNodeWorldMatrix(object_id_t id, const math::mat4f& tm)
+{
+  size_t saved_position = Position ();
+
+  try
+  {
+    BeginCommand(CommandId_SetNodeWorldMatrix);
+    write(*this, id);
+    write(*this, tm);
+    EndCommand();
+  }
+  catch (...)
+  {
+    SetPosition (saved_position);
+    throw;
+  }
+}
+
 template <class Dispatcher> inline bool ClientToServerDeserializer::Deserialize(CommandId id, Dispatcher& dispatcher)
 {
   switch (id)
@@ -539,6 +632,14 @@ template <class Dispatcher> inline bool ClientToServerDeserializer::Deserialize(
       const char* arg1 = read(*this, xtl::type<const char*> ());
 
       dispatcher.UnloadResource(arg1);
+
+      return true;
+    }
+    case CommandId_SetMaxDrawDepth:
+    {
+      uint32 arg1 = read(*this, xtl::type<uint32> ());
+
+      dispatcher.SetMaxDrawDepth(arg1);
 
       return true;
     }
@@ -763,6 +864,41 @@ template <class Dispatcher> inline bool ClientToServerDeserializer::Deserialize(
       const char* arg2 = read(*this, xtl::type<const char*> ());
 
       dispatcher.SetSceneName(arg1, arg2);
+
+      return true;
+    }
+    case CommandId_CreateNode:
+    {
+      object_id_t arg1 = read(*this, xtl::type<object_id_t> ());
+      NodeType arg2 = read(*this, xtl::type<NodeType> ());
+
+      dispatcher.CreateNode(arg1, arg2);
+
+      return true;
+    }
+    case CommandId_DestroyNode:
+    {
+      object_id_t arg1 = read(*this, xtl::type<object_id_t> ());
+
+      dispatcher.DestroyNode(arg1);
+
+      return true;
+    }
+    case CommandId_SetNodeName:
+    {
+      object_id_t arg1 = read(*this, xtl::type<object_id_t> ());
+      const char* arg2 = read(*this, xtl::type<const char*> ());
+
+      dispatcher.SetNodeName(arg1, arg2);
+
+      return true;
+    }
+    case CommandId_SetNodeWorldMatrix:
+    {
+      object_id_t arg1 = read(*this, xtl::type<object_id_t> ());
+      const math::mat4f& arg2 = read(*this, xtl::type<const math::mat4f&> ());
+
+      dispatcher.SetNodeWorldMatrix(arg1, arg2);
 
       return true;
     }

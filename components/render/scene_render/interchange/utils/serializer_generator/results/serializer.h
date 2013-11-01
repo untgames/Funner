@@ -21,6 +21,7 @@ enum CommandId
 {
   CommandId_LoadResource,
   CommandId_UnloadResource,
+  CommandId_SetMaxDrawDepth,
   CommandId_SetViewportArea,
   CommandId_SetViewportZOrder,
   CommandId_SetViewportActive,
@@ -46,6 +47,10 @@ enum CommandId
   CommandId_CreateScene,
   CommandId_DestroyScene,
   CommandId_SetSceneName,
+  CommandId_CreateNode,
+  CommandId_DestroyNode,
+  CommandId_SetNodeName,
+  CommandId_SetNodeWorldMatrix,
   CommandId_FirstUserDefined = 10000,
 };
 
@@ -63,6 +68,7 @@ class ClientToServerSerializer: public OutputStream
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void LoadResource(const char* name);
     void UnloadResource(const char* name);
+    void SetMaxDrawDepth(uint32 depth);
     void SetViewportArea(object_id_t id, int32 left, int32 top, int32 width, int32 height);
     void SetViewportZOrder(object_id_t id, int32 zorder);
     void SetViewportActive(object_id_t id, bool8 is_active);
@@ -88,6 +94,10 @@ class ClientToServerSerializer: public OutputStream
     void CreateScene(object_id_t id);
     void DestroyScene(object_id_t id);
     void SetSceneName(object_id_t id, const char* name);
+    void CreateNode(object_id_t id, NodeType type);
+    void DestroyNode(object_id_t id);
+    void SetNodeName(object_id_t id, const char* name);
+    void SetNodeWorldMatrix(object_id_t id, const math::mat4f& tm);
 
   protected:
     using OutputStream::Swap;

@@ -62,6 +62,7 @@ enum ObjectType
 {
   ObjectType_Viewport,
   ObjectType_RenderTarget,
+  ObjectType_Node,
 
   ObjectType_Num
 };
