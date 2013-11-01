@@ -72,14 +72,15 @@ enum NodeTraverseMode
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 enum NodeEvent
 {
-  NodeEvent_AfterUpdate,       //срабатывает после обновления состояния узла
-  NodeEvent_BeforeDestroy,     //срабатывает перед удалением узла
-  NodeEvent_AfterDestroy,      //срабатывает после удаления узла
-  NodeEvent_AfterBind,         //срабатывает после присоединения узла к родителю
-  NodeEvent_BeforeUnbind,      //срабатывает перед отсоединением узла от родителя
-  NodeEvent_AfterSceneAttach,  //срабатывает после присоединения объекта к сцене
-  NodeEvent_BeforeSceneDetach, //срабатывает перед отсоединением объекта от сцены
-  NodeEvent_AfterSceneChange,  //срабатывает после изменения сцены
+  NodeEvent_AfterUpdate,               //срабатывает после обновления состояния узла
+  NodeEvent_BeforeDestroy,             //срабатывает перед удалением узла
+  NodeEvent_AfterDestroy,              //срабатывает после удаления узла
+  NodeEvent_AfterBind,                 //срабатывает после присоединения узла к родителю
+  NodeEvent_BeforeUnbind,              //срабатывает перед отсоединением узла от родителя
+  NodeEvent_AfterSceneAttach,          //срабатывает после присоединения объекта к сцене
+  NodeEvent_BeforeSceneDetach,         //срабатывает перед отсоединением объекта от сцены
+  NodeEvent_AfterSceneChange,          //срабатывает после изменения сцены
+  NodeEvent_AfterWorldTransformUpdate, //срабатывает после обновления мировых трансформаций
 
   NodeEvent_Num
 };

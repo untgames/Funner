@@ -74,14 +74,15 @@ const char* get_name (NodeEvent event)
 {
   switch (event)
   {    
-    case NodeEvent_AfterUpdate:         return "AfterUpdate";
-    case NodeEvent_BeforeDestroy:       return "BeforeDestroy";
-    case NodeEvent_AfterDestroy:        return "AfterDestroy";
-    case NodeEvent_AfterBind:           return "AfterBind";
-    case NodeEvent_BeforeUnbind:        return "BeforeUnbind";
-    case NodeEvent_AfterSceneAttach:    return "AfterSceneAttach";
-    case NodeEvent_BeforeSceneDetach:   return "BeforeSceneDetach";
-    case NodeEvent_AfterSceneChange:    return "AfterSceneChange";
+    case NodeEvent_AfterUpdate:               return "AfterUpdate";
+    case NodeEvent_BeforeDestroy:             return "BeforeDestroy";
+    case NodeEvent_AfterDestroy:              return "AfterDestroy";
+    case NodeEvent_AfterBind:                 return "AfterBind";
+    case NodeEvent_BeforeUnbind:              return "BeforeUnbind";
+    case NodeEvent_AfterSceneAttach:          return "AfterSceneAttach";
+    case NodeEvent_BeforeSceneDetach:         return "BeforeSceneDetach";
+    case NodeEvent_AfterSceneChange:          return "AfterSceneChange";
+    case NodeEvent_AfterWorldTransformUpdate: return "AfterWorldTransformUpdate";
     default:
       throw xtl::make_argument_exception ("scene_graph::get_name(NodeEvent)", "event", event);
   }
@@ -494,6 +495,12 @@ struct Node::Impl: public xtl::instance_counter<Node>
 
   void UpdateWorldTransformNotify ()
   {
+      //оповещение клиентов об изменениях мировых координат
+
+    Notify (NodeEvent_AfterWorldTransformUpdate);
+
+      //оповещение об изменении
+
     UpdateNotify ();
 
     if (need_world_transform_update)
