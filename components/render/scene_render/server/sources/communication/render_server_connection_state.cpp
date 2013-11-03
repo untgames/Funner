@@ -576,20 +576,52 @@ void ConnectionState::SetSceneName (object_id_t id, const char* name)
 
 void ConnectionState::CreateNode (object_id_t id, interchange::NodeType type)
 {
-  throw xtl::make_not_implemented_exception (__FUNCTION__);
+  try
+  {
+    impl->server.SceneManager ().CreateNode (id, type);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::scene::ConnectionState::CreateNode");
+    throw;
+  }
 }
 
 void ConnectionState::DestroyNode (object_id_t id)
 {
-  throw xtl::make_not_implemented_exception (__FUNCTION__);
+  try
+  {
+    impl->server.SceneManager ().RemoveNode (id);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::scene::ConnectionState::DestroyNode");
+    throw;
+  }
 }
 
 void ConnectionState::SetNodeName (object_id_t id, const char* name)
 {
-  throw xtl::make_not_implemented_exception (__FUNCTION__);
+  try
+  {
+    impl->server.SceneManager ().GetNode (id).SetName (name);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::scene::ConnectionState::SetNodeName");
+    throw;
+  }
 }
 
 void ConnectionState::SetNodeWorldMatrix (object_id_t id, const math::mat4f& tm)
 {
-  throw xtl::make_not_implemented_exception (__FUNCTION__);
+  try
+  {
+    impl->server.SceneManager ().GetNode (id).SetWorldMatrix (tm);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::scene::ConnectionState::SetNodeWorldMatrix");
+    throw;
+  }
 }

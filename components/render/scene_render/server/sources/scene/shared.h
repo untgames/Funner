@@ -8,7 +8,9 @@
 #include <xtl/reference_counter.h>
 #include <xtl/trackable.h>
 
+#include <render/manager.h>
+
 #include <shared/camera.h>
 #include <shared/scene_manager.h>
 
-#include <render/manager.h>
+#include <shared/sg/node.h>

@@ -30,6 +30,8 @@
 #include <shared/viewport_manager.h>
 #include <shared/window_manager.h>
 
+#include <shared/sg/node.h>
+
 namespace render
 {
 
