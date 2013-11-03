@@ -153,6 +153,7 @@ void write (OutputStream&, int8);
 void write (OutputStream&, uint8);
 void write (OutputStream&, float32);
 void write (OutputStream&, const char*);
+void write (OutputStream&, NodeType);
 
 template <class T, unsigned int Size> void write (OutputStream&, const math::vector<T, Size>&);
 template <class T, unsigned int Size> void write (OutputStream&, const math::matrix<T, Size>&);
@@ -161,18 +162,19 @@ template <class T>                    void write (OutputStream&, const math::qua
 template <class T> const T& read (InputStream&, xtl::type<T&>);
 template <class T> const T& read (InputStream&, xtl::type<const T&>);
 
-bool           read (InputStream&, xtl::type<bool>);
-const int64&   read (InputStream&, xtl::type<int64>);
-const uint64&  read (InputStream&, xtl::type<uint64>);
-const int32&   read (InputStream&, xtl::type<int32>);
-const uint32&  read (InputStream&, xtl::type<uint32>);
-const int16&   read (InputStream&, xtl::type<int16>);
-const uint16&  read (InputStream&, xtl::type<uint16>);
-const int8&    read (InputStream&, xtl::type<int8>);
-const uint8&   read (InputStream&, xtl::type<uint8>);
-const float32& read (InputStream&, xtl::type<float32>);
-const Command& read (InputStream&, xtl::type<Command>);
-const char*    read (InputStream&, xtl::type<const char*>);
+bool            read (InputStream&, xtl::type<bool>);
+const int64&    read (InputStream&, xtl::type<int64>);
+const uint64&   read (InputStream&, xtl::type<uint64>);
+const int32&    read (InputStream&, xtl::type<int32>);
+const uint32&   read (InputStream&, xtl::type<uint32>);
+const int16&    read (InputStream&, xtl::type<int16>);
+const uint16&   read (InputStream&, xtl::type<uint16>);
+const int8&     read (InputStream&, xtl::type<int8>);
+const uint8&    read (InputStream&, xtl::type<uint8>);
+const float32&  read (InputStream&, xtl::type<float32>);
+const Command&  read (InputStream&, xtl::type<Command>);
+const char*     read (InputStream&, xtl::type<const char*>);
+const NodeType& read (InputStream&, xtl::type<NodeType>);
 
 template <class T, unsigned int Size> const math::vector<T, Size>& read (InputStream&, xtl::type<math::vector<T, Size> >);
 template <class T, unsigned int Size> const math::matrix<T, Size>& read (InputStream&, xtl::type<math::matrix<T, Size> >);

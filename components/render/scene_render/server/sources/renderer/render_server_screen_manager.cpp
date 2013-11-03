@@ -102,3 +102,25 @@ void ScreenManager::RemoveScreen (object_id_t id)
 {
   impl->screens.erase (id);
 }
+
+/*
+    ћаксимальный уровень вложенности рендеринга
+*/
+
+void ScreenManager::SetMaxDrawDepth (size_t level)
+{
+  try
+  {
+    impl->viewport_manager.SetMaxDrawDepth (level);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::scene::server::ScreenManager::SetMaxDrawDepth");
+    throw;
+  }
+}
+
+size_t ScreenManager::MaxDrawDepth () const
+{
+  return impl->viewport_manager.MaxDrawDepth ();
+}

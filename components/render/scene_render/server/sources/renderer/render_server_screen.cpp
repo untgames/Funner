@@ -270,7 +270,7 @@ Viewport Screen::AttachViewport (object_id_t id)
 {
   try
   {
-    ViewportPtr viewport (new ViewportDesc (Viewport (impl->render_manager, impl->render_targets), id, impl->need_reorder), false);
+    ViewportPtr viewport (new ViewportDesc (Viewport (impl->render_manager, impl->render_targets, impl->viewport_manager.MaxDrawDepth ()), id, impl->need_reorder), false);
 
     impl->viewport_manager.AddViewport (id, viewport->viewport);
 

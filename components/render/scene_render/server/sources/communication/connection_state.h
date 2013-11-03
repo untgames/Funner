@@ -28,6 +28,8 @@ class ConnectionState: public xtl::noncopyable
     void LoadResource (const char*);
     void UnloadResource (const char*);
 
+    void SetMaxDrawDepth (uint32 depth);
+
     void SetViewportArea (object_id_t id, int32 left, int32 top, int32 width, int32 height);
     void SetViewportZOrder (object_id_t id, int32 zorder);
     void SetViewportActive (object_id_t id, bool8 is_active);
@@ -56,6 +58,11 @@ class ConnectionState: public xtl::noncopyable
     void CreateScene (object_id_t id);
     void DestroyScene (object_id_t id);
     void SetSceneName (object_id_t id, const char* name);
+
+    void CreateNode (object_id_t id, interchange::NodeType type);
+    void DestroyNode (object_id_t id);
+    void SetNodeName (object_id_t id, const char* name);
+    void SetNodeWorldMatrix (object_id_t id, const math::mat4f& tm);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Внутренние команды

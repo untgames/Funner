@@ -28,6 +28,22 @@ struct RenderTargetEntry
 typedef stl::hash_map<const RenderTargetDesc*, RenderTargetEntry> RenderTargetEntryMap;
 typedef stl::vector<IViewportListener*>                           ListenerArray;
 typedef stl::vector<TechniquePtr>                                 TechniqueArray;
+typedef stl::vector<TechniquePrivateData>                         TechniquePrivateDataArray;
+
+struct Frame: public xtl::reference_counter
+{
+  manager::Frame            frame;
+  TechniquePrivateDataArray private_data;  
+
+  Frame (const manager::Frame& in_frame, size_t techniques_count)
+    : frame (in_frame)
+  {
+    private_data.resize (techniques_count);
+  }
+};
+
+typedef xtl::intrusive_ptr<Frame> FramePtr;
+typedef stl::vector<FramePtr>     FrameArray;
 
 }
 
@@ -49,6 +65,7 @@ struct Viewport::Impl: public xtl::reference_counter, public IRenderTargetMapLis
   bool                 background_state;           //состояние фона
   common::PropertyMap  properties;                 //свойства области вывода
   server::Camera       camera;                     //камера
+  size_t               max_draw_depth;             //максимальная глубина вложенности рендеринга
   ListenerArray        listeners;                  //слушатели событий области вывода
   bool                 need_reconfiguration;       //конфигурация изменена
   bool                 need_update_technique;      //обновление техники
@@ -59,7 +76,7 @@ struct Viewport::Impl: public xtl::reference_counter, public IRenderTargetMapLis
   bool                 need_update_properties;     //требуется обновление свойств
 
 /// Конструктор
-  Impl (const RenderManager& in_render_manager, const RenderTargetMap& in_render_targets)
+  Impl (const RenderManager& in_render_manager, const RenderTargetMap& in_render_targets, size_t in_max_draw_depth)
     : render_manager (in_render_manager)
     , render_targets (in_render_targets)
     , area (0, 0, 100, 100)
@@ -69,6 +86,7 @@ struct Viewport::Impl: public xtl::reference_counter, public IRenderTargetMapLis
     , is_active (true)
     , frame (render_manager.Manager ().CreateFrame ())
     , background_state (false)
+    , max_draw_depth (in_max_draw_depth)
     , need_reconfiguration (true)
     , need_update_area (true)
     , need_update_render_targets (true)
@@ -210,7 +228,6 @@ struct Viewport::Impl: public xtl::reference_counter, public IRenderTargetMapLis
       CreateSubTechniques ();
 
       need_update_properties = true;
-      //TODO: need_update_camera = true
       need_update_technique  = false;
     }
     catch (xtl::exception& e)
@@ -369,11 +386,11 @@ struct Viewport::Impl: public xtl::reference_counter, public IRenderTargetMapLis
     Конструкторы / деструктор / присваивание
 */
 
-Viewport::Viewport (const RenderManager& render_manager, const RenderTargetMap& render_target_map)
+Viewport::Viewport (const RenderManager& render_manager, const RenderTargetMap& render_target_map, size_t max_draw_depth)
 {
   try
   {
-    impl = new Impl (render_manager, render_target_map);
+    impl = new Impl (render_manager, render_target_map, max_draw_depth);
   }
   catch (xtl::exception& e)
   {
@@ -594,12 +611,22 @@ const Camera* Viewport::Camera () const
 }
 
 /*
-    Присоединенный кадр
+    Максимальный уровень вложенности рендеринга
 */
 
-manager::Frame& Viewport::Frame () const
+void Viewport::SetMaxDrawDepth (size_t level)
 {
-  return impl->frame;
+  if (level == impl->max_draw_depth)
+    return;
+
+  impl->max_draw_depth = level;
+
+  throw xtl::make_not_implemented_exception (__FUNCTION__);
+}
+
+size_t Viewport::MaxDrawDepth () const
+{
+  return impl->max_draw_depth;
 }
 
 /*
@@ -630,7 +657,7 @@ void Viewport::Update (manager::Frame* parent_frame)
     {
       try
       {
-        (*iter)->UpdateFrame (context);
+        (*iter)->UpdateFrame (context, TechniquePrivateData ());
         
         ++iter;
         

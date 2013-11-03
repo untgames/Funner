@@ -244,6 +244,23 @@ void ConnectionState::UnloadResource (const char* name)
 }
 
 /*
+     оманды клиента: максимальна€ глубина рендеринга
+*/
+
+void ConnectionState::SetMaxDrawDepth (uint32 depth)
+{
+  try
+  {
+    impl->server.ScreenManager ().SetMaxDrawDepth (depth);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::scene::ConnectionState::SetMaxDrawDepth");
+    throw;
+  }
+}
+
+/*
      оманды клиента: области вывода и цели рендеринга
 */
 
@@ -551,4 +568,28 @@ void ConnectionState::SetSceneName (object_id_t id, const char* name)
     e.touch ("render::scene::ConnectionState::SetSceneName");
     throw;
   }
+}
+
+/*
+    –абота с узлами
+*/
+
+void ConnectionState::CreateNode (object_id_t id, interchange::NodeType type)
+{
+  throw xtl::make_not_implemented_exception (__FUNCTION__);
+}
+
+void ConnectionState::DestroyNode (object_id_t id)
+{
+  throw xtl::make_not_implemented_exception (__FUNCTION__);
+}
+
+void ConnectionState::SetNodeName (object_id_t id, const char* name)
+{
+  throw xtl::make_not_implemented_exception (__FUNCTION__);
+}
+
+void ConnectionState::SetNodeWorldMatrix (object_id_t id, const math::mat4f& tm)
+{
+  throw xtl::make_not_implemented_exception (__FUNCTION__);
 }

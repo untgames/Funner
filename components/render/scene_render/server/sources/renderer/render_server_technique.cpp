@@ -131,7 +131,7 @@ void Technique::BindProperties (common::PropertyBindingMap&)
     Отрисовка
 */
 
-void Technique::UpdateFrame (Context& context)
+void Technique::UpdateFrame (Context& context, TechniquePrivateData& private_data)
 {
   try
   {
@@ -173,11 +173,21 @@ void Technique::UpdateFrame (Context& context)
 
       //отрисовка кадра
 
-    UpdateFrameCore (context);
+    UpdateFrameCore (context, private_data);
   }
   catch (xtl::exception& e)
   {
     e.touch ("render::scene::server::Technique::UpdateFrame");
     throw;
   }
+}
+
+/*
+    TechniquePrivateData
+*/
+
+void TechniquePrivateData::RaiseSizeError (const std::type_info& type, size_t size)
+{
+  throw xtl::format_operation_exception ("render::scene::server::Technique::RaiseSizeError", "Can't convert TechniquePrivateData to %s because its size %u is larger than max buffer size %u",
+    type.name (), size, DATA_BUFFER_SIZE);
 }

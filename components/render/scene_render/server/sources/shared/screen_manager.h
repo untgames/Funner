@@ -115,6 +115,12 @@ class ScreenManager
     Screen CreateScreen (object_id_t id, const char* name, const char* init_string);
     void   RemoveScreen (object_id_t id);
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///ћаксимальный уровень вложенности рендеринга
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void   SetMaxDrawDepth (size_t level);
+    size_t MaxDrawDepth    () const;
+
   private:
     ScreenManager (const ScreenManager&); //no impl
     ScreenManager& operator = (const ScreenManager&); //no impl
