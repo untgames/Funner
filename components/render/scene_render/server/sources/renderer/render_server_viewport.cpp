@@ -9,6 +9,7 @@ using namespace render::scene::server;
 
 const size_t LISTENER_ARRAY_RESERVE_SIZE = 4;  //резервируемое количество слушателей
 const size_t TECNIQUE_ARRAY_RESERVE_SIZE = 16; //резервируемое количество техник
+const size_t FRAME_ARRAY_RESERVE_SIZE    = 4;  //резервируемое количество кадров
 
 /*
     Описание реализации области вывода
@@ -60,7 +61,7 @@ struct Viewport::Impl: public xtl::reference_counter, public IRenderTargetMapLis
   float                max_depth;                  //максимальная глубина
   int                  zorder;                     //порядок вывода
   bool                 is_active;                  //активна ли область отрисовки
-  manager::Frame       frame;                      //присоединенный кадр
+  FrameArray           frames;                     //присоединенные кадры
   math::vec4f          background_color;           //цвет фона
   bool                 background_state;           //состояние фона
   common::PropertyMap  properties;                 //свойства области вывода
@@ -84,7 +85,6 @@ struct Viewport::Impl: public xtl::reference_counter, public IRenderTargetMapLis
     , max_depth (1.0f)
     , zorder (0)
     , is_active (true)
-    , frame (render_manager.Manager ().CreateFrame ())
     , background_state (false)
     , max_draw_depth (in_max_draw_depth)
     , need_reconfiguration (true)
@@ -96,6 +96,9 @@ struct Viewport::Impl: public xtl::reference_counter, public IRenderTargetMapLis
   {
     listeners.reserve (LISTENER_ARRAY_RESERVE_SIZE);
     sub_techniques.reserve (TECNIQUE_ARRAY_RESERVE_SIZE);
+    frames.reserve (FRAME_ARRAY_RESERVE_SIZE);
+
+    frames.push_back (FramePtr (new Frame (render_manager.Manager ().CreateFrame (), 0))); //?????????????????????!!!!!!!!!!!!!!!!!! remove after draw depth implementation
 
     render_targets.AttachListener (this);
 
@@ -206,6 +209,12 @@ struct Viewport::Impl: public xtl::reference_counter, public IRenderTargetMapLis
           }
         }
 
+        for (FrameArray::iterator iter=frames.begin (), end=frames.end (); iter!=end; ++iter)
+        {
+          (*iter)->private_data.clear ();
+          (*iter)->private_data.resize (sub_techniques.size ());
+        }
+
         return;
       }
 
@@ -242,14 +251,19 @@ struct Viewport::Impl: public xtl::reference_counter, public IRenderTargetMapLis
   {
     try
     {
-      if (background_state)
+      for (FrameArray::iterator iter=frames.begin (), end=frames.end (); iter!=end; ++iter)
       {
-        frame.SetClearColor (background_color);
-        frame.SetClearFlags (manager::ClearFlag_All | manager::ClearFlag_ViewportOnly);
-      }
-      else
-      {
-        frame.SetClearFlags (0u);
+        manager::Frame& frame = (*iter)->frame;
+
+        if (background_state)
+        {
+          frame.SetClearColor (background_color);
+          frame.SetClearFlags (manager::ClearFlag_All | manager::ClearFlag_ViewportOnly);
+        }
+        else
+        {
+          frame.SetClearFlags (0u);
+        }
       }
 
       need_update_background = false;
@@ -288,8 +302,8 @@ struct Viewport::Impl: public xtl::reference_counter, public IRenderTargetMapLis
                           int ((viewport_area.y - screen_area.y) * y_scale),
                           size_t (ceil (viewport_area.width * x_scale)),
                           size_t (ceil (viewport_area.height * y_scale)));                               
-
-        frame.SetRenderTarget (entry.desc.Name (), target, manager::Viewport (target_rect, min_depth, max_depth));
+                 //TODO: draw depth!!!!!!!!!!!!!!!
+        frames [0]->frame.SetRenderTarget (entry.desc.Name (), target, manager::Viewport (target_rect, min_depth, max_depth));
 
         entry.need_update = false;
       }
@@ -619,7 +633,14 @@ void Viewport::SetMaxDrawDepth (size_t level)
   if (level == impl->max_draw_depth)
     return;
 
+  level++;
+
   impl->max_draw_depth = level;
+
+  impl->frames.reserve (level);
+
+  if (level > impl->frames.size ())
+    impl->frames.erase (impl->frames.begin () + level);
 
   throw xtl::make_not_implemented_exception (__FUNCTION__);
 }
@@ -648,8 +669,8 @@ void Viewport::Update (manager::Frame* parent_frame)
       impl->Reconfigure ();
 
       //подготовка кэша результатов обхода сцены
-     
-    Context context (impl->frame); 
+//TODO: draw depth implementation     
+    Context context (impl->frames [0]->frame); //TODO: draw depth implementation
 
       //обновление кадра
 
@@ -657,7 +678,7 @@ void Viewport::Update (manager::Frame* parent_frame)
     {
       try
       {
-        (*iter)->UpdateFrame (context, TechniquePrivateData ());
+        (*iter)->UpdateFrame (context, impl->frames [0]->private_data [iter - impl->sub_techniques.begin ()]); //TODO: draw depth implementation
         
         ++iter;
         
@@ -679,7 +700,7 @@ void Viewport::Update (manager::Frame* parent_frame)
 
       //отрисовка
       
-    manager::Frame& frame = impl->frame;
+    manager::Frame& frame = impl->frames [0]->frame; //?????????????????TODO: draw depth implementation
     
     if (frame.EntitiesCount () || frame.FramesCount ())
     {
