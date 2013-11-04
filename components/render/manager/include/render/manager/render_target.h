@@ -22,6 +22,7 @@ namespace manager
 
 //implementation forwards
 class RenderTargetImpl;
+class RenderTargetMapImpl;
 class ViewportImpl;
 class Wrappers;
 
@@ -160,8 +161,7 @@ class RenderTargetMap
     void Swap (RenderTargetMap&);
     
   private:
-    struct Impl;
-    Impl* impl;
+    RenderTargetMapImpl* impl;
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
