@@ -295,6 +295,7 @@ typedef stl::vector<syslib::iphone::IApplicationListener*> ListenerArray;
     ListenerArray             *listeners;                     //слушатели событий
     CADisplayLink             *idle_timer;                    //таймер вызова OnIdle
     NSTimer                   *background_idle_timer;         //таймер вызова OnIdle в неактивном состо€нии
+    NSDictionary              *launch_options;                //параметры запуска приложени€
     bool                      main_view_visible;              //виден ли главный view приложени€
     ApplicationBackgroundMode background_mode;                //режим фоновой работы приложени€
     int                       suspend_audio_session_category; //аудио-категори€, бывша€ активной до установки режима ApplicationBackgroundMode_Active
@@ -302,6 +303,7 @@ typedef stl::vector<syslib::iphone::IApplicationListener*> ListenerArray;
 
 @property (nonatomic, readonly) ListenerArray*            listeners;
 @property (nonatomic, readonly) CADisplayLink*            idle_timer;
+@property (nonatomic, retain)   NSDictionary*             launch_options;
 @property (nonatomic)           bool                      main_view_visible;
 @property (nonatomic)           ApplicationBackgroundMode background_mode;
 @property (nonatomic)           int                       suspend_audio_session_category;
@@ -310,7 +312,7 @@ typedef stl::vector<syslib::iphone::IApplicationListener*> ListenerArray;
 
 @implementation ApplicationDelegateInternal
 
-@synthesize listeners, idle_timer, main_view_visible, background_mode, suspend_audio_session_category;
+@synthesize listeners, idle_timer, launch_options, main_view_visible, background_mode, suspend_audio_session_category;
 
 -(void)initIdleTimer
 {
@@ -464,6 +466,11 @@ typedef stl::vector<syslib::iphone::IApplicationListener*> ListenerArray;
   }
 }
 
+-(NSDictionary*)launchOptions
+{
+  return impl.launch_options;
+}
+
 -(ApplicationBackgroundMode) backgroundMode
 {
   return impl.background_mode;
@@ -488,6 +495,8 @@ typedef stl::vector<syslib::iphone::IApplicationListener*> ListenerArray;
 
 -(BOOL) application:(UIApplication*)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
+  impl.launch_options = launchOptions;
+
   application_launched = true;
   
   application_delegate->OnInitialize ();
@@ -650,6 +659,15 @@ void ApplicationManager::DetachApplicationListener (syslib::iphone::IApplication
     return;
 
   [(ApplicationDelegate*)([UIApplication sharedApplication].delegate) detachListener:listener];
+}
+
+/*
+   ѕолучение параметров запуска приложени€
+*/
+
+NSDictionary* ApplicationManager::GetLaunchOptions ()
+{
+  return [(ApplicationDelegate*)([UIApplication sharedApplication].delegate) launchOptions];
 }
 
 /*
