@@ -24,6 +24,7 @@
 #include <render/scene/interchange/serializer.h>
 
 #include <shared/camera.h>
+#include <shared/resource_manager.h>
 #include <shared/scene_manager.h>
 #include <shared/screen_manager.h>
 #include <shared/server.h>

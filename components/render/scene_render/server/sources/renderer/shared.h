@@ -17,6 +17,7 @@
 #include <shared/camera.h>
 #include <shared/render_manager.h>
 #include <shared/render_target_map.h>
+#include <shared/resource_manager.h>
 #include <shared/scene_manager.h>
 #include <shared/screen_manager.h>
 #include <shared/server.h>

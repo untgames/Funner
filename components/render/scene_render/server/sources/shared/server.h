@@ -19,6 +19,7 @@ namespace server
 {
 
 //forward declarations
+class ResourceManager;
 class SceneManager;
 class ScreenManager;
 class WindowManager;
@@ -43,10 +44,11 @@ class ServerImpl: public xtl::noncopyable, public xtl::trackable
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Менеджеры
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    manager::RenderManager& RenderManager ();
-    server::ScreenManager&  ScreenManager ();
-    server::WindowManager&  WindowManager ();
-    server::SceneManager&   SceneManager  ();
+    manager::RenderManager&  RenderManager   ();
+    server::ScreenManager&   ScreenManager   ();
+    server::WindowManager&   WindowManager   ();
+    server::SceneManager&    SceneManager    ();
+    server::ResourceManager& ResourceManager ();
 
   private:
     struct Impl;

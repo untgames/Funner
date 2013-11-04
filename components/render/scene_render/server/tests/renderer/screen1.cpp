@@ -28,6 +28,8 @@ int main ()
 
     server.AttachWindow ("my_window", window, window_properties);
 
+    client.LoadResource ("data/render.rfx");
+
     RenderTarget target = client.CreateRenderTarget ("my_window");
 
     scene_graph::Screen screen;

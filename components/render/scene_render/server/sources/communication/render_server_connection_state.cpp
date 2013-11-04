@@ -13,11 +13,13 @@ struct ConnectionState::Impl
   server::Context*                   context;            //контекст
   interchange::PropertyMapAutoWriter properties_writer;  //синхронизатор свойств (запись на клиент)
   interchange::PropertyMapReader     properties_reader;  //синхронизатор свойств (чтение с клиента)
+  ResourceClient                     resource_client;    //клиент менеджера ресурсов
 
 /// Конструктор
   Impl (ServerImpl& in_server)
     : server (in_server)
     , context ()
+    , resource_client (server.ResourceManager ().CreateClient ())
   {
   }  
 
@@ -235,12 +237,28 @@ void ConnectionState::RemovePropertyLayout (object_id_t id)
 
 void ConnectionState::LoadResource (const char* name)
 {
-  throw xtl::make_not_implemented_exception (__FUNCTION__);
+  try
+  {
+    impl->resource_client.LoadResource (name);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::scene::ConnectionState::LoadResource");
+    throw;
+  }
 }
 
 void ConnectionState::UnloadResource (const char* name)
 {
-  throw xtl::make_not_implemented_exception (__FUNCTION__);
+  try
+  {
+    impl->resource_client.UnloadResource (name);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::scene::ConnectionState::UnloadResource");
+    throw;
+  }
 }
 
 /*
