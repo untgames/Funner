@@ -17,8 +17,7 @@ const size_t RESERVED_FRAMES_COUNT   = 32;  //резервируемое количество отображае
     Вспомогательные структуры
 */
 
-typedef stl::hash_map<stl::hash_key<const char*>, RenderTargetDescPtr> RenderTargetDescMap;
-typedef stl::hash_map<stl::hash_key<const char*>, TexturePtr>          TextureMap;
+typedef stl::hash_map<stl::hash_key<const char*>, TexturePtr> TextureMap;
 
 /*
     Хранилище для эффекта
@@ -106,7 +105,7 @@ struct FrameImpl::Impl: public CacheHolder
   PropertyBuffer                       properties;              //свойства кадра
   PropertyCachePtr                     entities_properties;     //динамические свойства объектов
   render::manager::ShaderOptionsCache  shader_options_cache;    //кэш опций шейдера
-  RenderTargetDescMap                  render_targets;          //целевые буферы отрисовки
+  RenderTargetMapPtr                   render_targets;          //целевые буферы отрисовки
   TextureMap                           textures;                //локальные текстуры фрейма
   bool                                 scissor_state;           //включено ли отсечение
   size_t                               clear_flags;             //флаги очистки
@@ -123,6 +122,7 @@ struct FrameImpl::Impl: public CacheHolder
     , properties (device_manager)
     , entities_properties (in_property_cache)
     , shader_options_cache (&device_manager->CacheManager ())
+    , render_targets (new RenderTargetMapImpl, false)
     , scissor_state (false)
     , clear_flags (ClearFlag_All)
     , clear_depth_value (1.0f)
@@ -199,161 +199,17 @@ FrameImpl::~FrameImpl ()
 }
 
 /*
-    Регистрация целевых буферов отрисовки
+    Карта целей рендеринга
 */
 
-void FrameImpl::SetRenderTarget (const char* name, const RenderTargetPtr& target)
+void FrameImpl::SetRenderTargets (RenderTargetMapImpl& map)
 {
-  SetRenderTarget (name, target, ViewportPtr (), RectAreaPtr ());
+  impl->render_targets = &map;
 }
 
-void FrameImpl::SetRenderTarget (const char* name, const RenderTargetPtr& target, const ViewportPtr& viewport)
+RenderTargetMapImpl& FrameImpl::RenderTargets ()
 {
-  SetRenderTarget (name, target, viewport, RectAreaPtr ());
-}
-
-void FrameImpl::SetRenderTarget (const char* name, const RenderTargetPtr& target, const ViewportPtr& viewport, const RectAreaPtr& scissor)
-{
-  try
-  {
-    if (!name)
-      throw xtl::make_null_argument_exception ("", "name");
-      
-    if (!target)
-      throw xtl::make_null_argument_exception ("", "target");
-
-    RenderTargetDescMap::iterator iter = impl->render_targets.find (name);
-
-    if (iter != impl->render_targets.end ())
-      throw xtl::make_argument_exception ("", "name", name, "Render target has already registered");
-
-    impl->render_targets.insert_pair (name, RenderTargetDescPtr (new render::manager::RenderTargetDesc (target, viewport, scissor), false));
-  }
-  catch (xtl::exception& e)
-  {
-    e.touch ("render::manager::FrameImpl::SetRenderTarget(const char*,const RenderTargetPtr&,const RectAreaPtr&,const RectAreaPtr&)");
-    throw;
-  }
-}
-
-void FrameImpl::RemoveRenderTarget (const char* name)
-{
-  if (!name)
-    return;
-    
-  impl->render_targets.erase (name);
-}
-
-void FrameImpl::RemoveAllRenderTargets ()
-{
-  impl->render_targets.clear ();
-}
-
-/*
-    Получение целевых буферов отрисовки
-*/
-
-RenderTargetPtr FrameImpl::FindRenderTarget (const char* name)
-{
-  RenderTargetDescPtr desc = FindRenderTargetDesc (name);
-  
-  if (!desc)
-    return RenderTargetPtr ();
-  
-  return desc->render_target;
-}
-
-ViewportPtr FrameImpl::FindViewport (const char* name)
-{
-  RenderTargetDescPtr desc = FindRenderTargetDesc (name);
-  
-  if (!desc)
-    return ViewportPtr ();
-    
-  return desc->viewport;
-}
-
-RectAreaPtr FrameImpl::FindScissor (const char* name)
-{
-  RenderTargetDescPtr desc = FindRenderTargetDesc (name);
-
-  if (!desc)
-    return RectAreaPtr ();
-
-  return desc->scissor;
-}
-
-RenderTargetDescPtr FrameImpl::FindRenderTargetDesc (const char* name)
-{
-  if (!name)
-    return RenderTargetDescPtr ();
-
-  RenderTargetDescMap::iterator iter = impl->render_targets.find (name);
-
-  if (iter == impl->render_targets.end ())
-    return RenderTargetDescPtr ();
-    
-  return iter->second;
-}
-
-RenderTargetPtr FrameImpl::RenderTarget (const char* name)
-{
-  static const char* METHOD_NAME = "render::manager::FrameImpl::RenderTarget";
-  
-  if (!name)
-    throw xtl::make_null_argument_exception (METHOD_NAME, "name");
-    
-  RenderTargetPtr target = FindRenderTarget (name);
-  
-  if (target)
-    return target;
-    
-  throw xtl::make_argument_exception (METHOD_NAME, "name", name, "Render target not found");
-}
-
-ViewportPtr FrameImpl::Viewport (const char* name)
-{
-  static const char* METHOD_NAME = "render::manager::FrameImpl::Viewport";
-  
-  if (!name)
-    throw xtl::make_null_argument_exception (METHOD_NAME, "name");
-    
-  ViewportPtr viewport = FindViewport (name);
-  
-  if (viewport)
-    return viewport;
-    
-  throw xtl::make_argument_exception (METHOD_NAME, "name", name, "Viewport not found");
-}
-
-RectAreaPtr FrameImpl::Scissor (const char* name)
-{
-  static const char* METHOD_NAME = "render::manager::FrameImpl::Scissor";
-  
-  if (!name)
-    throw xtl::make_null_argument_exception (METHOD_NAME, "name");
-    
-  RectAreaPtr area = FindScissor (name);
-  
-  if (area)
-    return area;
-    
-  throw xtl::make_argument_exception (METHOD_NAME, "name", name, "Scissor not found");
-}
-
-RenderTargetDescPtr FrameImpl::RenderTargetDesc (const char* name)
-{
-  static const char* METHOD_NAME = "render::manager::FrameImpl::RenderTargetDesc";
-  
-  if (!name)
-    throw xtl::make_null_argument_exception (METHOD_NAME, "name");
-    
-  RenderTargetDescPtr desc = FindRenderTargetDesc (name);
-  
-  if (desc)
-    return desc;
-    
-  throw xtl::make_argument_exception (METHOD_NAME, "name", name, "Render target not found");
+  return *impl->render_targets;
 }
 
 /*

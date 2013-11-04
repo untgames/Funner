@@ -159,6 +159,9 @@ class RenderTargetMap
 ///Ξαμεν
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void Swap (RenderTargetMap&);
+
+  protected:
+    RenderTargetMap (RenderTargetMapImpl*);
     
   private:
     RenderTargetMapImpl* impl;

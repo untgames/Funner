@@ -5,6 +5,11 @@ using namespace render::manager;
 RenderTargetMap::RenderTargetMap ()
   : impl (new RenderTargetMapImpl)
 {
+}
+
+RenderTargetMap::RenderTargetMap (RenderTargetMapImpl* in_impl)
+  : impl (in_impl)
+{
   addref (impl);
 }
 
@@ -68,6 +73,11 @@ Viewport RenderTargetMap::Viewport (const char* name) const
 RectArea RenderTargetMap::Scissor (const char* name) const
 {
   return Wrappers::Wrap<RectArea> (impl->Scissor (name));
+}
+
+void RenderTargetMap::Swap (RenderTargetMap& map)
+{
+  stl::swap (impl, map.impl);
 }
 
 namespace render

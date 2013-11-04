@@ -9,27 +9,12 @@ class FrameImpl: public Object
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     FrameImpl  (const DeviceManagerPtr&, const EffectManagerPtr&, const PropertyCachePtr&);
     ~FrameImpl ();
-    
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Регистрация целевых буферов отрисовки
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    void SetRenderTarget        (const char* name, const RenderTargetPtr& target);
-    void SetRenderTarget        (const char* name, const RenderTargetPtr& target, const ViewportPtr& viewport);
-    void SetRenderTarget        (const char* name, const RenderTargetPtr& target, const ViewportPtr& viewport, const RectAreaPtr& scissor);
-    void RemoveRenderTarget     (const char* name);
-    void RemoveAllRenderTargets ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Получение целевых буферов отрисовки
+///Карта целей рендеринга
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    RenderTargetPtr     FindRenderTarget     (const char* name);
-    ViewportPtr         FindViewport         (const char* name);
-    RectAreaPtr         FindScissor          (const char* name);
-    RenderTargetDescPtr FindRenderTargetDesc (const char* name);
-    RenderTargetPtr     RenderTarget         (const char* name);
-    ViewportPtr         Viewport             (const char* name);
-    RectAreaPtr         Scissor              (const char* name);
-    RenderTargetDescPtr RenderTargetDesc     (const char* name);
+    void                 SetRenderTargets (RenderTargetMapImpl&);
+    RenderTargetMapImpl& RenderTargets    ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Управление отсечением

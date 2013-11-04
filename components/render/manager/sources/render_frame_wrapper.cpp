@@ -25,49 +25,107 @@ Frame& Frame::operator = (const Frame& frame)
   return *this;
 }
 
+void Frame::SetRenderTargets (const RenderTargetMap& map)
+{
+  impl->SetRenderTargets (*Wrappers::Unwrap<RenderTargetMapImpl> (map));
+}
+
+RenderTargetMap Frame::RenderTargets () const
+{
+  return Wrappers::Wrap<RenderTargetMap> (&impl->RenderTargets ());
+}
+
 void Frame::SetRenderTarget (const char* name, const render::manager::RenderTarget& target)
 {
-  impl->SetRenderTarget (name, Wrappers::Unwrap<RenderTargetImpl> (target));
+  try
+  {
+    impl->RenderTargets ().SetRenderTarget (name, Wrappers::Unwrap<RenderTargetImpl> (target));
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::manager::Frame::SetRenderTarget(const char*,const RenderTarget&)");
+    throw;
+  }
 }
 
 void Frame::SetRenderTarget (const char* name, const render::manager::RenderTarget& target, const render::manager::Viewport& viewport)
 {
-  impl->SetRenderTarget (name, Wrappers::Unwrap<RenderTargetImpl> (target), Wrappers::Unwrap<ViewportImpl> (viewport));
+  try
+  {
+    impl->RenderTargets ().SetRenderTarget (name, Wrappers::Unwrap<RenderTargetImpl> (target), Wrappers::Unwrap<ViewportImpl> (viewport));
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::manager::Frame::SetRenderTarget(const char*,const RenderTarget&,const Viewport&)");
+    throw;
+  }
 }
 
 void Frame::SetRenderTarget (const char* name, const render::manager::RenderTarget& target, const render::manager::Viewport& viewport, const RectArea& scissor)
 {
-  impl->SetRenderTarget (name, Wrappers::Unwrap<RenderTargetImpl> (target), Wrappers::Unwrap<ViewportImpl> (viewport), Wrappers::Unwrap<RectAreaImpl> (scissor));
+  try
+  {
+    impl->RenderTargets ().SetRenderTarget (name, Wrappers::Unwrap<RenderTargetImpl> (target), Wrappers::Unwrap<ViewportImpl> (viewport), Wrappers::Unwrap<RectAreaImpl> (scissor));
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::manager::Frame::SetRenderTarget(const char*,const RenderTarget&,const Viewport&,const RectArea&)");
+    throw;
+  }
 }
 
 void Frame::RemoveRenderTarget (const char* name)
 {
-  impl->RemoveRenderTarget (name);
+  impl->RenderTargets ().RemoveRenderTarget (name);
 }
 
 void Frame::RemoveAllRenderTargets ()
 {
-  impl->RemoveAllRenderTargets ();
+  impl->RenderTargets ().RemoveAllRenderTargets ();
 }
 
 bool Frame::HasRenderTarget (const char* name) const
 {
-  return impl->FindRenderTarget (name) != RenderTargetPtr ();
+  return impl->RenderTargets ().FindRenderTarget (name) != RenderTargetPtr ();
 }
 
 RenderTarget Frame::RenderTarget (const char* name) const
 {
-  return Wrappers::Wrap<render::manager::RenderTarget> (impl->RenderTarget (name));
+  try
+  {
+    return Wrappers::Wrap<render::manager::RenderTarget> (impl->RenderTargets ().RenderTarget (name));
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::manager::Frame::RenderTarget");
+    throw;
+  }
 }
 
 Viewport Frame::Viewport (const char* name) const
 {
-  return Wrappers::Wrap<render::manager::Viewport> (impl->Viewport (name));
+  try
+  {
+    return Wrappers::Wrap<render::manager::Viewport> (impl->RenderTargets ().Viewport (name));
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::manager::Frame::Viewport");
+    throw;
+  }
 }
 
 RectArea Frame::Scissor (const char* name) const
 {
-  return Wrappers::Wrap<RectArea> (impl->Scissor (name));
+  try
+  {
+    return Wrappers::Wrap<RectArea> (impl->RenderTargets ().Scissor (name));
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::manager::Frame::Scissor");
+    throw;
+  }
 }
 
 void Frame::SetScissorState (bool state)
