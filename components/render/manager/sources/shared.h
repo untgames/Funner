@@ -213,6 +213,7 @@ class DebugIdHolder: public xtl::noncopyable
 #include "property_cache.h"
 #include "rect_area.h"
 #include "render_target.h"
+#include "render_target_map.h"
 #include "rendering_context.h"
 #include "settings.h"
 #include "shader_options.h"
