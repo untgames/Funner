@@ -1,0 +1,25 @@
+#ifndef ANALYTICS_FLURRY_PLATFORM_HEADER
+#define ANALYTICS_FLURRY_PLATFORM_HEADER
+
+#include <shared/default.h>
+
+namespace analytics
+{
+
+namespace flurry
+{
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///”казание текущей платформы
+///////////////////////////////////////////////////////////////////////////////////////////////////
+//#ifdef IPHONE
+//  typedef IOsPlatform Platform;
+//#else
+  typedef DefaultPlatform Platform;
+//#endif
+
+}
+
+}
+
+#endif

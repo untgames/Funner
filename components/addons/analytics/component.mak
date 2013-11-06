@@ -1,8 +1,8 @@
 ###################################################################################################
 #Определения и константы
 ###################################################################################################
-TARGETS := ADDONS_COMPONENTS
+TARGETS := ANALYTICS_COMPONENTS
 
 #Цель - пакет
-ADDONS_COMPONENTS.TYPE       := package
-ADDONS_COMPONENTS.COMPONENTS := social store analytics
+ANALYTICS_COMPONENTS.TYPE       := package
+ANALYTICS_COMPONENTS.COMPONENTS := flurry
