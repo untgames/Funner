@@ -15,12 +15,14 @@ class FlurrySessionImpl
     /// онструктор
     FlurrySessionImpl ()
       : started (false)
-      {}
+    {
+      Platform::GetReleaseVersion (release_version); //this must be called before 'StartSession' according to flurry documentation
+    }
 
     ///ѕолучение имени версии используемой библиотеки
     const char* GetReleaseVersion ()
     {
-      return Platform::GetReleaseVersion ();
+      return release_version.c_str ();
     }
 
     ///«апуск аналитики
@@ -193,7 +195,8 @@ class FlurrySessionImpl
     }
 
   private:
-    bool started;
+    bool        started;           //запущена ли сесси€
+    stl::string release_version;   //верси€ используемой библиотеки flurry
 };
 
 typedef common::Singleton<FlurrySessionImpl> FlurrySessionSingleton;

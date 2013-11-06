@@ -25,6 +25,10 @@ ifneq (,$(filter android,$(PROFILES)))
   COMPONENT_DIRS += gcm google_play_billing facebook_android_sdk android_support_v4
 endif
 
+ifneq (,$(filter iphone,$(PROFILES)))
+  COMPONENT_DIRS += flurry
+endif
+
 ifeq (,$(filter android,$(PROFILES)))
 ifneq (,$(filter x86,$(PROFILES)))
   COMPONENT_DIRS += geekinfo

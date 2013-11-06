@@ -19,7 +19,7 @@ bool DefaultPlatform::IsSupported ()
    ѕолучение имени версии используемой библиотеки
 */
 
-const char* DefaultPlatform::GetReleaseVersion ()
+void DefaultPlatform::GetReleaseVersion (stl::string& version)
 {
   throw xtl::make_not_implemented_exception ("analytics::flurry::DefaultPlatform::GetReleaseVersion");
 }
