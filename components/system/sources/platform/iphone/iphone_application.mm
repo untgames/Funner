@@ -495,10 +495,10 @@ typedef stl::vector<syslib::iphone::IApplicationListener*> ListenerArray;
 
 -(BOOL) application:(UIApplication*)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
+  application_launched = true;
+
   impl.launch_options = launchOptions;
 
-  application_launched = true;
-  
   application_delegate->OnInitialize ();
 
   impl.idle_timer.paused = NO;
@@ -667,6 +667,9 @@ void ApplicationManager::DetachApplicationListener (syslib::iphone::IApplication
 
 NSDictionary* ApplicationManager::GetLaunchOptions ()
 {
+  if (!application_launched)
+    throw xtl::format_operation_exception ("syslib::iphone::ApplicationManager::GetLaunchOptions", "Application was not launched yet");
+
   return [(ApplicationDelegate*)([UIApplication sharedApplication].delegate) launchOptions];
 }
 

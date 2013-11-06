@@ -5,8 +5,6 @@ using namespace analytics::flurry;
 namespace
 {
 
-const char* LOG_NAME = "analytics.flurry.IOsPlatform";
-
 NSDictionary* property_map_to_ns_dictionary (const common::PropertyMap& parameters)
 {
   size_t parameters_count = parameters.Size ();
@@ -62,11 +60,7 @@ void IOsPlatform::StartSession (const char* api_key)
   if (launch_options)
     [::Flurry startSession:[NSString stringWithUTF8String:api_key] withOptions:launch_options];
   else
-  {
-    common::Log (LOG_NAME).Printf ("Flurry was started without iOS launch options, make sure that StartSession is called after application initialized");
-
     [::Flurry startSession:[NSString stringWithUTF8String:api_key]];
-  }
 }
 
 /*
