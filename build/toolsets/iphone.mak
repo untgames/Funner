@@ -75,7 +75,7 @@ define process_target.fat-static-lib
 
   $$($1.LIB_FILE): $$($1.LIB_DEPS)
 		@echo Create fat static library $$(notdir $$($1.LIB_FILE))..
-		@libtool -c -o $$@ $$(sort $$($1.LIB_DEPS))
+		@libtool -c -o $$@ $$(sort $$($1.LIB_DEPS)) -arch_only $(FAT_LIB_ARCH_TYPE) 
 endef
 
 #Обработка цели объединения библиотек, собранных для разных архитектур (имя цели)
