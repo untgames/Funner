@@ -79,3 +79,7 @@ export.link.engine.script_binds.media.image.IMPORTS       := link.engine.script_
 # Link render exports
 export.link.engine.script_binds.render.scene_render2d.LINK_INCLUDES := RenderScriptBind
 export.link.engine.script_binds.render.scene_render2d.IMPORTS       := link.engine.script_binds link.render.scene_render2d
+
+# Link flurry analytics exports
+export.link.engine.script_binds.analytics.flurry.LINK_INCLUDES := FlurryAnalyticsScriptBind
+export.link.engine.script_binds.analytics.flurry.IMPORTS       := link.engine.script_binds link.analytics.flurry
