@@ -370,6 +370,7 @@ struct WindowImpl
 
   [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector (onShow) name:UIWindowDidBecomeVisibleNotification object:self];
   [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector (onHide) name:UIWindowDidBecomeHiddenNotification object:self];
+  [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector (onKeyboardHide) name:UIKeyboardDidHideNotification object:self];
 
   return self;
 }
@@ -387,6 +388,11 @@ struct WindowImpl
 -(void)onHide
 {
   window_impl->Notify (WindowEvent_OnHide, [self getEventContext]);
+}
+
+-(void)onKeyboardHide
+{
+  window_impl->Notify (WindowEvent_OnScreenKeyboardHide, [self getEventContext]);
 }
 
 -(WindowEventContext&) getEventContext

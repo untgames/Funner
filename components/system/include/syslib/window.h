@@ -78,6 +78,7 @@ enum WindowEvent
   WindowEvent_OnScreenLock,              //экран заблокирован
   WindowEvent_OnScreenUnlock,            //экран разблокирован
   WindowEvent_OnChangeStyle,             //окно изменило стиль
+  WindowEvent_OnScreenKeyboardHide,      //экранная клавиатура скрыта пользователем
   
   WindowEvent_Num
 };
