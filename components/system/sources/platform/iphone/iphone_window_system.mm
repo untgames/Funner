@@ -299,44 +299,6 @@ struct WindowImpl
   [super dealloc];
 }
 
--(CGFloat)contentScaleFactor
-{
-  if (has_ios_4_0)
-    return super.contentScaleFactor;
-
-  return 1;
-}
-
--(UIViewController*)rootViewController
-{
-  if (has_ios_4_0)
-    return super.rootViewController;
-  else
-    return root_view_controller;
-}
-
--(void)setRootViewController:(UIViewController*)in_root_view_controller
-{
-  if (has_ios_4_0)
-  {
-    super.rootViewController = in_root_view_controller;
-  }
-  else
-  {
-    if (root_view_controller == in_root_view_controller)
-      return;
-
-    [root_view_controller.view removeFromSuperview];
-
-    [root_view_controller release];
-    root_view_controller = [in_root_view_controller retain];
-
-    [self addSubview:root_view_controller.view];
-
-    [root_view_controller.view becomeFirstResponder];
-  }
-}
-
 -(id) initWithFrame:(CGRect)rect
 {
   self = [super initWithFrame:rect];
@@ -345,7 +307,6 @@ struct WindowImpl
     return nil;
 
   allowed_orientations = UIInterfaceOrientationMaskAll;
-  has_ios_4_0          = [[[UIDevice currentDevice] systemVersion] compare:@"4.0" options:NSNumericSearch] != NSOrderedAscending;
 
   try
   {
@@ -370,7 +331,7 @@ struct WindowImpl
 
   [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector (onShow) name:UIWindowDidBecomeVisibleNotification object:self];
   [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector (onHide) name:UIWindowDidBecomeHiddenNotification object:self];
-  [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector (onKeyboardHide) name:UIKeyboardDidHideNotification object:self];
+  [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector (onKeyboardHide) name:UIKeyboardDidHideNotification object:nil];
 
   return self;
 }

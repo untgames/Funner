@@ -81,7 +81,6 @@ struct WindowImpl;
     syslib::WindowEventContext          *event_context;        //контекст, передаваемый обработчикам событий
     UIViewController                    *root_view_controller; //корневой контроллер
     int                                 allowed_orientations;  //разрешенные ориентации окна
-    bool                                has_ios_4_0;           //версия операционной системы >= 4.0
 }
 
 -(void)onCharInput:(wchar_t)char_code;
