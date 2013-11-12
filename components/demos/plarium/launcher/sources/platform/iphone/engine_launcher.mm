@@ -5,6 +5,7 @@
 #import <UIKit/UIApplication.h>
 #import <UIKit/UIImage.h>
 #import <UIKit/UIImageView.h>
+#import <UIKit/UILocalNotification.h>
 #import <UIKit/UIViewController.h>
 #import <UIKit/UIScreen.h>
 #import <UIKit/UIWindow.h>
@@ -366,6 +367,80 @@ class SystemAlertHandler : public INotificationListener
 
 const char* SystemAlertHandler::SYSTEM_ALERT_NOTIFICATION_PREFIX = "ShowSystemAlert ";
 
+class LocalNotificationsHandler : public INotificationListener
+{
+  private:
+    static const char* LOCAL_NOTIFICATIONS_PREFIX;
+
+  public:
+    ///Constructor/destructor
+    LocalNotificationsHandler (engine::IEngine* in_engine)
+      : engine (in_engine)
+    {
+      engine->AttachNotificationListener (plarium::utility::format ("%s*", LOCAL_NOTIFICATIONS_PREFIX).c_str (), this);
+    }
+
+    ~LocalNotificationsHandler ()
+    {
+      engine->DetachNotificationListener (this);
+    }
+
+    ///Notification handler
+    void OnNotification (const char* notification)
+    {
+      notification += strlen (LOCAL_NOTIFICATIONS_PREFIX);
+
+      sgi_stl::vector<sgi_stl::string> components = plarium::utility::split (notification, "|");
+
+      if (components.empty ())
+        throw sgi_stl::invalid_argument (plarium::utility::format ("LocalNotificationsHandler::OnNotification: invalid 'LocalNotifications' arguments '%s'", notification));
+
+      for (size_t i = 0, count = components.size (); i < count; i++)
+        if (components [i] == " ")
+          components [i] = "";
+
+      if (components [0] == "RemoveAll")
+      {
+        [[UIApplication sharedApplication] cancelAllLocalNotifications];
+      }
+      else if (components [0] == "Schedule")
+      {
+        if (components.size () < 3)
+          throw sgi_stl::invalid_argument (plarium::utility::format ("LocalNotificationsHandler::OnNotification: invalid 'LocalNotifications' arguments '%s'", notification));
+
+        NSString* alertBody = nil;
+
+        if (!components [1].empty ())
+          alertBody = [NSString stringWithUTF8String:components [1].c_str ()];
+
+        for (size_t i = 2; i < components.size (); i++)
+        {
+          UILocalNotification* localNotification = [[UILocalNotification alloc] init];
+
+          localNotification.alertBody                  = alertBody;
+          localNotification.applicationIconBadgeNumber = 1;
+          localNotification.soundName                  = UILocalNotificationDefaultSoundName;
+          localNotification.fireDate                   = [NSDate dateWithTimeIntervalSinceNow:atoi (components [i].c_str ())];
+
+          [[UIApplication sharedApplication] scheduleLocalNotification:localNotification];
+
+          [localNotification release];
+        }
+      }
+      else
+        throw sgi_stl::invalid_argument (plarium::utility::format ("LocalNotificationsHandler::OnNotification: invalid 'LocalNotifications' first argument '%s'", components [0].c_str ()));
+    }
+
+  private:
+    LocalNotificationsHandler (const LocalNotificationsHandler&);             //no impl
+    LocalNotificationsHandler& operator = (const LocalNotificationsHandler&); //no impl
+
+  private:
+    engine::IEngine *engine;
+};
+
+const char* LocalNotificationsHandler::LOCAL_NOTIFICATIONS_PREFIX = "LocalNotifications ";
+
 }
 
 //точка входа
@@ -417,7 +492,8 @@ int main (int argc, const char* argv [], const char* env [])
     [[NSNotificationCenter defaultCenter] addObserver:tracking selector:@selector (reportAppOpen) name:UIApplicationWillEnterForegroundNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:mat_tracking selector:@selector (reportAppInstall) name:UIApplicationDidFinishLaunchingNotification object:nil];
 
-    SystemAlertHandler system_alert_handler (funner);
+    SystemAlertHandler        system_alert_handler (funner);
+    LocalNotificationsHandler local_notifications_handler (funner);
 
     OpenUrlHandler open_url_handler (tracking);
 
