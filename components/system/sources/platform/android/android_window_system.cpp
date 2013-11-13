@@ -1101,7 +1101,6 @@ struct syslib::screen_keyboard_handle: public xtl::reference_counter, public xtl
 
     show_keyboard_method = find_method (&env, input_method_manager_class.get (), "showSoftInput", "(Landroid/view/View;I)Z");
     hide_keyboard_method = find_method (&env, input_method_manager_class.get (), "hideSoftInputFromWindow", "(Landroid/os/IBinder;I)Z");
-
   }
 };
 

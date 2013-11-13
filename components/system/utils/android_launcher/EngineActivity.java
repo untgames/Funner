@@ -4,11 +4,15 @@ import android.app.Activity;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.content.Context;
 import android.content.ContextWrapper;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Point;
+import android.net.NetworkInfo;
 import android.net.Uri;
+import android.net.wifi.WifiInfo;
+import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
@@ -429,6 +433,33 @@ public class EngineActivity extends Activity
     catch (Exception e)
     {
     	Log.e (TAG, "Exception while getting application version: " + e.getMessage ());
+    }
+    
+    boolean hasWifi = false;
+    
+    try
+    {
+    	WifiManager wifiManager = (WifiManager)getSystemService (Context.WIFI_SERVICE);
+
+    	if (wifiManager != null && wifiManager.getWifiState () == WifiManager.WIFI_STATE_ENABLED)
+    	{
+    		WifiInfo wifiInfo = wifiManager.getConnectionInfo ();
+    		
+    		if (wifiInfo != null)
+    		{
+    			hasWifi = wifiInfo.getSupplicantState () == android.net.wifi.SupplicantState.COMPLETED;
+    		}
+    	}
+    }
+    catch (Exception e)
+    {
+    	Log.e (TAG, "Exception while getting wifi state: " + e.getMessage ());
+    	hasWifi = true;
+    }
+    
+    if (!hasWifi)
+    {
+      result += " CellularOnlyInternet=1";
     }
     
     return result;
