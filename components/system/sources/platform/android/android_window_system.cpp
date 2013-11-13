@@ -245,7 +245,7 @@ struct syslib::window_handle: public MessageQueue::Handler
       case AKEYCODE_TAB:           syslib_key = Key_Tab;          break;
       case AKEYCODE_SPACE:         syslib_key = Key_Space;        break;
       case AKEYCODE_ENTER:         syslib_key = Key_Enter;        break;
-      case AKEYCODE_DEL:           syslib_key = Key_Delete;       break;
+      case AKEYCODE_DEL:           syslib_key = Key_BackSpace;    break;
       case AKEYCODE_MINUS:         syslib_key = Key_Minus;        break;
       case AKEYCODE_LEFT_BRACKET:  syslib_key = Key_LeftBracket;  break;
       case AKEYCODE_RIGHT_BRACKET: syslib_key = Key_RightBracket; break;

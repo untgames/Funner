@@ -306,7 +306,7 @@ public class EngineViewController implements View.OnTouchListener, View.OnKeyLis
       default:
         break;
     }
-
+    
     int     action           = event.getAction ();
     boolean is_alt_pressed   = event.isAltPressed (),
             is_shift_pressed = event.isShiftPressed (),
@@ -321,6 +321,9 @@ public class EngineViewController implements View.OnTouchListener, View.OnKeyLis
       if (characters != null && characters.length () > 0)
     	  unicode_char = characters.codePointAt (0);
     }
+
+    if (keyCode == KeyEvent.KEYCODE_DEL) //Backspace not sending char code
+    	unicode_char = 8;
     
     onKeyCallback (keyCode, action, is_alt_pressed, is_shift_pressed, is_sym_pressed, unicode_char);
 
