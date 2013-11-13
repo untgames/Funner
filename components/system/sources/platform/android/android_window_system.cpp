@@ -1194,7 +1194,7 @@ void AndroidScreenKeyboardManager::HideScreenKeyboard (screen_keyboard_t keyboar
   }
   catch (xtl::exception& e)
   {
-    e.touch ("syslib::android::AndroidScreenKeyboardManager::ShowScreenKeyboard");
+    e.touch ("syslib::android::AndroidScreenKeyboardManager::HideScreenKeyboard");
     throw;
   }
 }
