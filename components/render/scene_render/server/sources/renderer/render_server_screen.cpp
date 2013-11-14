@@ -57,7 +57,7 @@ struct ViewportDesc: public xtl::reference_counter, public IViewportListener
 };
 
 typedef xtl::intrusive_ptr<ViewportDesc> ViewportPtr;
-typedef stl::vector<ViewportPtr>         ViewportList;
+typedef stl::vector<ViewportPtr>         ViewportDescList;
 
 }
 
@@ -67,16 +67,17 @@ typedef stl::vector<ViewportPtr>         ViewportList;
 
 struct Screen::Impl: public xtl::reference_counter
 {
-  RenderManager   render_manager;   //менеджер рендеринга
-  RenderTargetMap render_targets;   //цели рендеринга
-  stl::string     name;             //имя экрана
-  bool            active;           //активность экрана
-  Rect            area;             //область экрана
-  bool            background_state; //состояние заднего фона
-  math::vec4f     background_color; //цвет заднего фона
-  bool            need_reorder;     //необходимость пересортировки областей вывода
-  ViewportManager viewport_manager; //менеджер областей вывода
-  ViewportList    viewports;        //области вывода
+  RenderManager    render_manager;    //менеджер рендеринга
+  RenderTargetMap  render_targets;    //цели рендеринга
+  stl::string      name;              //имя экрана
+  bool             active;            //активность экрана
+  Rect             area;              //область экрана
+  bool             background_state;  //состояние заднего фона
+  math::vec4f      background_color;  //цвет заднего фона
+  bool             need_reorder;      //необходимость пересортировки областей вывода
+  ViewportManager  viewport_manager;  //менеджер областей вывода
+  ViewportDescList viewports;         //области вывода
+  ViewportDrawList drawing_viewports; //отрисовываемые области вывода
 
 /// Конструктор
   Impl (const char* in_name, const char* init_string, WindowManager& window_manager, const RenderManager& in_render_manager, const ViewportManager& in_viewport_manager)
@@ -88,6 +89,7 @@ struct Screen::Impl: public xtl::reference_counter
     , background_color (0, 0, 0, 1.0f)
     , need_reorder (false)
     , viewport_manager (in_viewport_manager)
+    , drawing_viewports (viewport_manager.DrawingViewports ())
   {
     viewports.reserve (RESERVED_VIEWPORTS_COUNT);
 
@@ -97,7 +99,7 @@ struct Screen::Impl: public xtl::reference_counter
 /// Деструктор
   ~Impl ()
   {
-    for (ViewportList::iterator iter=viewports.begin (), end=viewports.end (); iter!=end; ++iter)
+    for (ViewportDescList::iterator iter=viewports.begin (), end=viewports.end (); iter!=end; ++iter)
       viewport_manager.RemoveViewport ((*iter)->id);
 
     viewports.clear ();
@@ -270,7 +272,7 @@ Viewport Screen::AttachViewport (object_id_t id)
 {
   try
   {
-    ViewportPtr viewport (new ViewportDesc (Viewport (impl->render_manager, impl->render_targets, impl->viewport_manager.MaxDrawDepth ()), id, impl->need_reorder), false);
+    ViewportPtr viewport (new ViewportDesc (Viewport (impl->render_manager, impl->render_targets, impl->viewport_manager.DrawingViewports (), impl->viewport_manager.MaxDrawDepth ()), id, impl->need_reorder), false);
 
     impl->viewport_manager.AddViewport (id, viewport->viewport);
 
@@ -295,7 +297,7 @@ Viewport Screen::AttachViewport (object_id_t id)
 
 void Screen::DetachViewport (object_id_t id)
 {
-  for (ViewportList::iterator iter=impl->viewports.begin (), end=impl->viewports.end (); iter!=end; ++iter)
+  for (ViewportDescList::iterator iter=impl->viewports.begin (), end=impl->viewports.end (); iter!=end; ++iter)
     if ((*iter)->id == id)
     {
       impl->viewports.erase (iter);
@@ -323,7 +325,7 @@ void Screen::Update (manager::Frame* parent_frame)
 
       //обход областей вывода
 
-    for (ViewportList::iterator iter=impl->viewports.begin (), end=impl->viewports.end (); iter!=end; ++iter)
+    for (ViewportDescList::iterator iter=impl->viewports.begin (), end=impl->viewports.end (); iter!=end; ++iter)
     {
       Viewport& viewport = (*iter)->viewport;
 
@@ -340,6 +342,11 @@ void Screen::Update (manager::Frame* parent_frame)
         impl->render_manager.Log ().Printf ("unknown exception\n    at render::scene::server::Screen::Update(screen='%s')", impl->name.c_str ());
       }      
     }
+
+      //очистка данных
+
+    if (!parent_frame)
+      impl->drawing_viewports.CleanupViewports ();
   }
   catch (xtl::exception& e)
   {

@@ -11,8 +11,9 @@ typedef stl::hash_map<object_id_t, Viewport> ViewportMap;
 
 struct ViewportManager::Impl: public xtl::reference_counter
 {
-  ViewportMap viewports;      //области вывода
-  size_t      max_draw_depth; //максимальный уровень вложенности рендеринга
+  ViewportMap      viewports;         //области вывода
+  ViewportDrawList drawing_viewports; //области вывода, в которые производилась отрисовка
+  size_t           max_draw_depth;    //максимальный уровень вложенности рендеринга
 
 /// Конструктор
   Impl ()
@@ -109,4 +110,18 @@ void ViewportManager::SetMaxDrawDepth (size_t level)
 size_t ViewportManager::MaxDrawDepth () const
 {
   return impl->max_draw_depth;
+}
+
+/*
+    Список областей вывода, в которые производилась отрисовка
+*/
+
+const ViewportDrawList& ViewportManager::DrawingViewports () const
+{
+  return impl->drawing_viewports;
+}
+
+ViewportDrawList& ViewportManager::DrawingViewports ()
+{
+  return impl->drawing_viewports;
 }

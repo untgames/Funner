@@ -3,6 +3,105 @@
 using namespace render;
 using namespace render::scene::server;
 
+//TODO: корректирующая матрица для отрисовки плоских зеркал
+//TODO: хранение фрастума и использование внутреннего фрастума области вывода в случае наличия корректирующей матрицы
+
+/*
+===================================================================================================
+    Common structures
+===================================================================================================
+*/
+
+namespace
+{
+
+struct ViewportDrawListNode;
+
+/// ViewportDrawList head
+struct ViewportDrawListHead: public xtl::reference_counter
+{
+  ViewportDrawListNode* first;
+  ViewportDrawListNode* last;
+
+  ViewportDrawListHead () : first (), last () {}
+};
+
+typedef xtl::intrusive_ptr<ViewportDrawListHead> ViewportDrawListHeadPtr;
+
+/// ViewportDrawList visible part
+struct ViewportDrawListNode
+{
+  ViewportDrawListHeadPtr head;
+  ViewportDrawListNode*   prev;
+  ViewportDrawListNode*   next;
+  bool                    is_added_to_list;
+
+  ViewportDrawListNode (const ViewportDrawListHeadPtr& in_head)
+    : head (in_head)
+    , prev ()
+    , next ()
+    , is_added_to_list ()
+  {
+  }
+
+  ~ViewportDrawListNode ()
+  {
+    RemoveFromDrawingList ();
+  }
+
+  void AddToDrawingList ()
+  {
+    if (is_added_to_list)
+      return;
+
+    next = 0;
+    prev = head->last;
+
+    head->last = this;
+
+    if (prev) prev->next  = this;
+    else      head->first = this;
+
+    is_added_to_list = true;
+  }
+
+  void RemoveFromDrawingList ()
+  {
+    if (!is_added_to_list)
+      return;
+
+    if (prev) prev->next  = next;
+    else      head->first = next;
+
+    if (next) next->prev = prev;
+    else      head->last = prev;
+
+    next = prev = 0;
+
+    is_added_to_list = false;
+  }
+
+  virtual void Cleanup () = 0;
+};
+
+}
+
+/*
+===================================================================================================
+    ViewportDrawList
+===================================================================================================
+*/
+
+struct ViewportDrawList::Impl: public ViewportDrawListHead
+{
+};
+
+/*
+===================================================================================================
+    Viewport
+===================================================================================================
+*/
+
 /*
     Константы
 */
@@ -48,43 +147,47 @@ typedef stl::vector<FramePtr>     FrameArray;
 
 }
 
-struct Viewport::Impl: public xtl::reference_counter, public IRenderTargetMapListener, public IRenderManagerListener
+struct Viewport::Impl: public xtl::reference_counter, public ViewportDrawListNode, public IRenderTargetMapListener, public IRenderManagerListener
 {
-  RenderManager        render_manager;             //менеджер рендеринга
-  RenderTargetMap      render_targets;             //цели рендеринга
-  RenderTargetEntryMap render_target_entries;      //дескрипторы целей рендеринга
-  stl::string          name;                       //имя области вывода
-  stl::string          technique_name;             //имя техники
-  TechniqueArray       sub_techniques;             //техники
-  Rect                 area;                       //область вывода
-  float                min_depth;                  //минимальная глубина
-  float                max_depth;                  //максимальная глубина
-  int                  zorder;                     //порядок вывода
-  bool                 is_active;                  //активна ли область отрисовки
-  FrameArray           frames;                     //присоединенные кадры
-  math::vec4f          background_color;           //цвет фона
-  bool                 background_state;           //состояние фона
-  common::PropertyMap  properties;                 //свойства области вывода
-  server::Camera       camera;                     //камера
-  size_t               max_draw_depth;             //максимальная глубина вложенности рендеринга
-  ListenerArray        listeners;                  //слушатели событий области вывода
-  bool                 need_reconfiguration;       //конфигурация изменена
-  bool                 need_update_technique;      //обновление техники
-  bool                 need_update_area;           //обновилась область
-  bool                 need_update_render_targets; //требуется обновить буферы отрисовки
-  bool                 need_update_background;     //требуется обновить параметры очистки
-  bool                 need_update_camera;         //требуется обновить камеру
-  bool                 need_update_properties;     //требуется обновление свойств
+  RenderManager            render_manager;             //менеджер рендеринга
+  RenderTargetMap          render_targets;             //цели рендеринга
+  manager::RenderTargetMap frame_render_targets;       //цели рендеринга фреймов
+  RenderTargetEntryMap     render_target_entries;      //дескрипторы целей рендеринга
+  stl::string              name;                       //имя области вывода
+  stl::string              technique_name;             //имя техники
+  TechniqueArray           sub_techniques;             //техники
+  Rect                     area;                       //область вывода
+  float                    min_depth;                  //минимальная глубина
+  float                    max_depth;                  //максимальная глубина
+  int                      zorder;                     //порядок вывода
+  bool                     is_active;                  //активна ли область отрисовки
+  FrameArray               frames;                     //присоединенные кадры
+  size_t                   current_frame_index;        //индекс текущего кадра
+  math::vec4f              background_color;           //цвет фона
+  bool                     background_state;           //состояние фона
+  common::PropertyMap      properties;                 //свойства области вывода
+  server::Camera           camera;                     //камера
+  size_t                   max_draw_depth;             //максимальная глубина вложенности рендеринга
+  ListenerArray            listeners;                  //слушатели событий области вывода
+  bool                     need_reconfiguration;       //конфигурация изменена
+  bool                     need_update_technique;      //обновление техники
+  bool                     need_update_area;           //обновилась область
+  bool                     need_update_render_targets; //требуется обновить буферы отрисовки
+  bool                     need_update_background;     //требуется обновить параметры очистки
+  bool                     need_update_camera;         //требуется обновить камеру
+  bool                     need_update_properties;     //требуется обновление свойств
 
 /// Конструктор
-  Impl (const RenderManager& in_render_manager, const RenderTargetMap& in_render_targets, size_t in_max_draw_depth)
-    : render_manager (in_render_manager)
+  Impl (const RenderManager& in_render_manager, const RenderTargetMap& in_render_targets, const ViewportDrawList& viewports, size_t in_max_draw_depth)
+    : ViewportDrawListNode (viewports.impl)
+    , render_manager (in_render_manager)
     , render_targets (in_render_targets)
     , area (0, 0, 100, 100)
     , min_depth (0.0f)
     , max_depth (1.0f)
     , zorder (0)
     , is_active (true)
+    , current_frame_index (0)
     , background_state (false)
     , max_draw_depth (in_max_draw_depth)
     , need_reconfiguration (true)
@@ -97,8 +200,6 @@ struct Viewport::Impl: public xtl::reference_counter, public IRenderTargetMapLis
     listeners.reserve (LISTENER_ARRAY_RESERVE_SIZE);
     sub_techniques.reserve (TECNIQUE_ARRAY_RESERVE_SIZE);
     frames.reserve (FRAME_ARRAY_RESERVE_SIZE);
-
-    frames.push_back (FramePtr (new Frame (render_manager.Manager ().CreateFrame (), 0))); //?????????????????????!!!!!!!!!!!!!!!!!! remove after draw depth implementation
 
     render_targets.AttachListener (this);
 
@@ -120,6 +221,34 @@ struct Viewport::Impl: public xtl::reference_counter, public IRenderTargetMapLis
 
     render_manager.DetachListener (this);
     render_targets.DetachListener (this);
+  }
+
+/// Получение текущего кадра
+  Frame* CurrentFrame ()
+  {
+    try
+    {
+      if (current_frame_index >= max_draw_depth)
+        return 0;
+
+      if (current_frame_index < frames.size ())
+        return &*frames [current_frame_index];
+
+      FramePtr frame_desc (new Frame (render_manager.Manager ().CreateFrame (), sub_techniques.size ()), false);
+
+      frame_desc->frame.SetRenderTargets (frame_render_targets);
+
+      ConfigureBackground (frame_desc->frame);
+
+      frames.push_back (frame_desc);
+
+      return &*frame_desc;      
+    }
+    catch (xtl::exception& e)
+    {
+      e.touch ("render::scene::server::Viewport::Impl::CurrentFrame");
+      throw;
+    }
   }
 
 /// Оповещение о добавлении новой области вывода
@@ -209,11 +338,7 @@ struct Viewport::Impl: public xtl::reference_counter, public IRenderTargetMapLis
           }
         }
 
-        for (FrameArray::iterator iter=frames.begin (), end=frames.end (); iter!=end; ++iter)
-        {
-          (*iter)->private_data.clear ();
-          (*iter)->private_data.resize (sub_techniques.size ());
-        }
+        frames.clear ();
 
         return;
       }
@@ -246,25 +371,27 @@ struct Viewport::Impl: public xtl::reference_counter, public IRenderTargetMapLis
     }
   }
 
+/// Конфигурация параметров очистки
+  void ConfigureBackground (manager::Frame& frame)
+  {
+    if (background_state)
+    {
+      frame.SetClearColor (background_color);
+      frame.SetClearFlags (manager::ClearFlag_All | manager::ClearFlag_ViewportOnly);
+    }
+    else
+    {
+      frame.SetClearFlags (0u);
+    }
+  }
+
 /// Переконфигурация параметров очистки
   void ReconfigureBackground ()
   {
     try
     {
       for (FrameArray::iterator iter=frames.begin (), end=frames.end (); iter!=end; ++iter)
-      {
-        manager::Frame& frame = (*iter)->frame;
-
-        if (background_state)
-        {
-          frame.SetClearColor (background_color);
-          frame.SetClearFlags (manager::ClearFlag_All | manager::ClearFlag_ViewportOnly);
-        }
-        else
-        {
-          frame.SetClearFlags (0u);
-        }
-      }
+        ConfigureBackground ((*iter)->frame);
 
       need_update_background = false;
     }
@@ -301,9 +428,9 @@ struct Viewport::Impl: public xtl::reference_counter, public IRenderTargetMapLis
         Rect target_rect (int ((viewport_area.x - screen_area.x) * x_scale),
                           int ((viewport_area.y - screen_area.y) * y_scale),
                           size_t (ceil (viewport_area.width * x_scale)),
-                          size_t (ceil (viewport_area.height * y_scale)));                               
-                 //TODO: draw depth!!!!!!!!!!!!!!!
-        frames [0]->frame.SetRenderTarget (entry.desc.Name (), target, manager::Viewport (target_rect, min_depth, max_depth));
+                          size_t (ceil (viewport_area.height * y_scale)));
+
+        frame_render_targets.SetRenderTarget (entry.desc.Name (), target, manager::Viewport (target_rect, min_depth, max_depth));
 
         entry.need_update = false;
       }
@@ -394,17 +521,23 @@ struct Viewport::Impl: public xtl::reference_counter, public IRenderTargetMapLis
       throw;
     }
   }
+
+/// Очистка после отрисовки кадра
+  void Cleanup ()
+  {
+    current_frame_index = 0;
+  }
 };
 
 /*
     Конструкторы / деструктор / присваивание
 */
 
-Viewport::Viewport (const RenderManager& render_manager, const RenderTargetMap& render_target_map, size_t max_draw_depth)
+Viewport::Viewport (const RenderManager& render_manager, const RenderTargetMap& render_target_map, const ViewportDrawList& viewports, size_t max_draw_depth)
 {
   try
   {
-    impl = new Impl (render_manager, render_target_map, max_draw_depth);
+    impl = new Impl (render_manager, render_target_map, viewports, max_draw_depth);
   }
   catch (xtl::exception& e)
   {
@@ -637,10 +770,12 @@ void Viewport::SetMaxDrawDepth (size_t level)
 
   impl->max_draw_depth = level;
 
+  if (level < impl->frames.size ())
+    impl->frames.erase (impl->frames.begin () + level);
+
   impl->frames.reserve (level);
 
-  if (level > impl->frames.size ())
-    impl->frames.erase (impl->frames.begin () + level);
+//?????????????
 
   throw xtl::make_not_implemented_exception (__FUNCTION__);
 }
@@ -663,14 +798,27 @@ void Viewport::Update (manager::Frame* parent_frame)
     if (!impl->is_active)
       return;
 
+      //добавление области вывода в список отрисовки
+
+    impl->AddToDrawingList ();
+
       //переконфигурация в случае изменения существенных параметров
 
     if (impl->need_reconfiguration)
       impl->Reconfigure ();
 
+      //получение текущего кадра
+
+    Frame* frame_desc = impl->CurrentFrame ();
+
+    if (!frame_desc)
+      return; //достигнута максимальная глубина вложенности кадров
+
+    impl->current_frame_index++;
+
       //подготовка кэша результатов обхода сцены
-//TODO: draw depth implementation     
-    Context context (impl->frames [0]->frame); //TODO: draw depth implementation
+
+    Context context (frame_desc->frame);
 
       //обновление кадра
 
@@ -678,7 +826,7 @@ void Viewport::Update (manager::Frame* parent_frame)
     {
       try
       {
-        (*iter)->UpdateFrame (context, impl->frames [0]->private_data [iter - impl->sub_techniques.begin ()]); //TODO: draw depth implementation
+        (*iter)->UpdateFrame (context, frame_desc->private_data [iter - impl->sub_techniques.begin ()]);
         
         ++iter;
         
@@ -700,7 +848,7 @@ void Viewport::Update (manager::Frame* parent_frame)
 
       //отрисовка
       
-    manager::Frame& frame = impl->frames [0]->frame; //?????????????????TODO: draw depth implementation
+    manager::Frame& frame = frame_desc->frame;
     
     if (frame.EntitiesCount () || frame.FramesCount ())
     {
@@ -735,4 +883,48 @@ void Viewport::DetachListener (IViewportListener* listener)
 void Viewport::DetachAllListeners ()
 {
   impl->listeners.clear ();
+}
+
+/*
+===================================================================================================
+    ViewportDrawList
+===================================================================================================
+*/
+
+ViewportDrawList::ViewportDrawList ()
+  : impl (new Impl)
+{
+}
+
+ViewportDrawList::ViewportDrawList (const ViewportDrawList& list)
+  : impl (list.impl)
+{
+  addref (impl);
+}
+
+ViewportDrawList::~ViewportDrawList ()
+{
+  release (impl);
+}
+
+ViewportDrawList& ViewportDrawList::operator = (const ViewportDrawList& list)
+{
+  ViewportDrawList tmp (list);
+
+  stl::swap (impl, tmp.impl);
+
+  return *this;
+}
+
+void ViewportDrawList::CleanupViewports ()
+{
+  for (ViewportDrawListNode* node=impl->first; node;)
+  {
+    ViewportDrawListNode* next = node->next;
+
+    node->Cleanup ();
+    node->RemoveFromDrawingList ();
+
+    node = next;
+  }
 }
