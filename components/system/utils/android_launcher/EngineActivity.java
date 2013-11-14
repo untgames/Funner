@@ -305,6 +305,11 @@ public class EngineActivity extends Activity
   {    
   }
   
+///Обработка событий приложения
+  protected void onApplicationNotification (String notification)
+  {
+  }
+  
 ///Добавление окна
   void addView (View view)
   {
