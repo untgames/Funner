@@ -19,6 +19,12 @@ namespace
 const float  INFINITE_BOUND_VALUE       = 1e8f; //значение бесконечности дл€ ограничивающих объЄмов
 const size_t INTERSECTIONS_RESERVE_SIZE = 16;   //резервируемое число пересечений
 
+//получение хэша от ограничивающего параллелипиппеда
+inline size_t hash (const bound_volumes::aaboxf& box)
+{
+  return common::crc32 (&box, sizeof (box));
+}
+
 }
 
 /*
@@ -30,6 +36,8 @@ struct Entity::Impl: public SceneObject, public xtl::instance_counter<Entity>
   vec3f  wire_color;               //цвет проволочного представлени€ объекта
   aaboxf local_bound_box;          //ограничивающий параллелипиппед в локальной системе координат
   aaboxf world_bound_box;          //ограничивающий параллелипиппед в мировой системе координат
+  size_t local_bounds_hash;        //хэш локального ограничивающего параллелипиппеда
+  size_t world_bounds_hash;        //хэш мирового ограничивающего параллелипиппеда
   bool   need_local_bounds_update; //локальные ограничивающие объЄмы требуют пересчЄта
   bool   need_world_bounds_update; //мировые ограничивающие объЄмы требуют пересчЄта
   bool   infinite_bounds;          //€вл€ютс€ ли ограничивающие объЄмы узла бесконечными
@@ -50,6 +58,8 @@ Entity::Entity ()
   impl->infinite_bounds          = true;
   impl->local_bound_box          = impl->world_bound_box = aaboxf (vec3f (-INFINITE_BOUND_VALUE), vec3f (INFINITE_BOUND_VALUE));
   impl->visible                  = true;
+  impl->local_bounds_hash        = hash (impl->local_bound_box);
+  impl->world_bounds_hash        = hash (impl->world_bound_box);
 }
   
 Entity::~Entity ()
@@ -102,6 +112,8 @@ bool Entity::IsVisible () const
 void Entity::UpdateBoundsNotify ()
 {
   impl->need_local_bounds_update = true;
+
+  UpdateNotify ();
 }
 
 //оповещение об обновлении мировых ограничивающих объЄмов
@@ -116,6 +128,7 @@ void Entity::UpdateWorldBounds () const
   if (impl->infinite_bounds) impl->world_bound_box = impl->local_bound_box;
   else                       impl->world_bound_box = impl->local_bound_box * WorldTM ();
 
+  impl->world_bounds_hash        = hash (impl->world_bound_box);
   impl->need_world_bounds_update = false;
 }
 
@@ -135,6 +148,8 @@ const aaboxf& Entity::BoundBox () const
   if (impl->need_local_bounds_update)
   {
     const_cast <Entity&> (*this).UpdateBoundsCore ();
+    
+    impl->local_bounds_hash        = hash (impl->local_bound_box);
     impl->need_local_bounds_update = false;
   }
 
@@ -148,6 +163,26 @@ const aaboxf& Entity::WorldBoundBox () const
     UpdateWorldBounds ();
 
   return impl->world_bound_box;
+}
+
+size_t Entity::BoundBoxHash () const
+{
+  if (!impl->need_local_bounds_update)
+    return impl->local_bounds_hash;
+
+  BoundBox ();
+
+  return impl->local_bounds_hash;
+}
+
+size_t Entity::WorldBoundBoxHash () const
+{
+  if (!impl->need_world_bounds_update)
+    return impl->world_bounds_hash;
+
+  WorldBoundBox ();
+
+  return impl->world_bounds_hash;
 }
 
 //установка бесконечных ограничивающий объЄмов

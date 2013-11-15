@@ -54,7 +54,7 @@ void PerspectiveCamera::SetFovX (const math::anglef& fov_x)
 {
   impl->fov_x = fov_x;
   UpdateBoundsNotify ();
-  UpdateNotify ();
+  UpdateCameraNotify ();
 }
 
 const math::anglef& PerspectiveCamera::FovX () const
@@ -66,7 +66,7 @@ void PerspectiveCamera::SetFovY (const math::anglef& fov_y)
 {
   impl->fov_y = fov_y;
   UpdateBoundsNotify ();
-  UpdateNotify ();
+  UpdateCameraNotify ();
 }
 
 const math::anglef& PerspectiveCamera::FovY () const
@@ -78,7 +78,7 @@ void PerspectiveCamera::SetZNear (float z_near)
 {
   impl->z_near = z_near;
   UpdateBoundsNotify ();
-  UpdateNotify ();
+  UpdateCameraNotify ();
 }
 
 float PerspectiveCamera::ZNear () const
@@ -90,7 +90,7 @@ void PerspectiveCamera::SetZFar  (float z_far)
 {
   impl->z_far = z_far;
   UpdateBoundsNotify ();
-  UpdateNotify ();
+  UpdateCameraNotify ();
 }
 
 float PerspectiveCamera::ZFar () const

@@ -58,7 +58,7 @@ void OrthoCamera::SetLeft (float left)
 {
   impl->left = left;
   UpdateBoundsNotify ();
-  UpdateNotify ();  
+  UpdateCameraNotify ();  
 }
 
 float OrthoCamera::Left () const
@@ -70,7 +70,7 @@ void OrthoCamera::SetRight (float right)
 {
   impl->right = right;
   UpdateBoundsNotify ();
-  UpdateNotify ();
+  UpdateCameraNotify ();
 }
 
 float OrthoCamera::Right () const
@@ -82,7 +82,7 @@ void OrthoCamera::SetTop (float top)
 {
   impl->top = top;
   UpdateBoundsNotify ();
-  UpdateNotify ();
+  UpdateCameraNotify ();
 }
 
 float OrthoCamera::Top () const
@@ -94,7 +94,7 @@ void OrthoCamera::SetBottom (float bottom)
 {
   impl->bottom = bottom;
   UpdateBoundsNotify ();
-  UpdateNotify ();
+  UpdateCameraNotify ();
 }
 
 float OrthoCamera::Bottom () const
@@ -106,7 +106,7 @@ void OrthoCamera::SetZNear (float z_near)
 {
   impl->z_near = z_near;
   UpdateBoundsNotify ();
-  UpdateNotify ();
+  UpdateCameraNotify ();
 }
 
 float OrthoCamera::ZNear () const
@@ -118,7 +118,7 @@ void OrthoCamera::SetZFar  (float z_far)
 {
   impl->z_far = z_far;
   UpdateBoundsNotify ();
-  UpdateNotify ();
+  UpdateCameraNotify ();
 }
 
 float OrthoCamera::ZFar () const
