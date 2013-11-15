@@ -2,9 +2,9 @@
 
 int main ()
 {
-  printf ("Results of visual_model_basic_test:\n");
+  printf ("Results of mesh_static_basic_test:\n");
   
-  VisualModel::Pointer model (VisualModel::Create ());
+  StaticMesh::Pointer model (StaticMesh::Create ());
 
   model->SetMeshName ("mesh1.mesh");
   

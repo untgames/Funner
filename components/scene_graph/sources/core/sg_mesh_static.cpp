@@ -5,10 +5,10 @@ using namespace stl;
 using namespace common;
 
 /*
-    Описание реализации VisualModel
+    Описание реализации StaticMesh
 */
 
-struct VisualModel::Impl: public xtl::instance_counter<VisualModel>
+struct StaticMesh::Impl: public xtl::instance_counter<StaticMesh>
 {
   string mesh_name;       //имя меша  
   size_t mesh_name_hash;  //хэш имени мэша
@@ -21,11 +21,11 @@ struct VisualModel::Impl: public xtl::instance_counter<VisualModel>
     Конструктор / деструктор
 */
 
-VisualModel::VisualModel ()
+StaticMesh::StaticMesh ()
   : impl (new Impl)
   {}
 
-VisualModel::~VisualModel ()
+StaticMesh::~StaticMesh ()
 {
   delete impl;
 }
@@ -34,30 +34,30 @@ VisualModel::~VisualModel ()
     Создание модели
 */
 
-VisualModel::Pointer VisualModel::Create ()
+StaticMesh::Pointer StaticMesh::Create ()
 {
-  return Pointer (new VisualModel, false);
+  return Pointer (new StaticMesh, false);
 }
 
 /*
     Установка имени меша модели
 */
 
-void VisualModel::SetMeshName (const char* name)
+void StaticMesh::SetMeshName (const char* name)
 {
   if (!name)
-    throw xtl::make_null_argument_exception ("scene_graph::VisualModel::SetMeshName", "name");
+    throw xtl::make_null_argument_exception ("scene_graph::StaticMesh::SetMeshName", "name");
     
   impl->mesh_name      = name;
   impl->mesh_name_hash = strhash (name);
 }
 
-const char* VisualModel::MeshName () const
+const char* StaticMesh::MeshName () const
 {
   return impl->mesh_name.c_str ();
 }
 
-size_t VisualModel::MeshNameHash () const
+size_t StaticMesh::MeshNameHash () const
 {
   return impl->mesh_name_hash;
 }
@@ -66,7 +66,7 @@ size_t VisualModel::MeshNameHash () const
     Метод, вызываемый при посещении объекта
 */
 
-void VisualModel::AcceptCore (Visitor& visitor)
+void StaticMesh::AcceptCore (Visitor& visitor)
 {
   if (!TryAccept (*this, visitor))
     Entity::AcceptCore (visitor);
@@ -76,9 +76,9 @@ void VisualModel::AcceptCore (Visitor& visitor)
     Связывание свойств
 */
 
-void VisualModel::BindProperties (common::PropertyBindingMap& bindings)
+void StaticMesh::BindProperties (common::PropertyBindingMap& bindings)
 {
   Entity::BindProperties (bindings);
 
-  bindings.AddProperty ("Mesh", xtl::bind (&VisualModel::MeshName, this), xtl::bind (&VisualModel::SetMeshName, this, _1));
+  bindings.AddProperty ("Mesh", xtl::bind (&StaticMesh::MeshName, this), xtl::bind (&StaticMesh::SetMeshName, this, _1));
 }

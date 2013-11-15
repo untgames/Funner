@@ -25,6 +25,7 @@
 #include <sg/input.h>
 #include <sg/light.h>
 #include <sg/listener.h>
+#include <sg/mesh.h>
 #include <sg/node.h>
 #include <sg/node_array.h>
 #include <sg/page_curl.h>
@@ -34,7 +35,6 @@
 #include <sg/sound_emitter.h>
 #include <sg/sprite.h>
 #include <sg/text_line.h>
-#include <sg/visual_model.h>
 
 using namespace scene_graph;
 using namespace scene_graph::controllers;
