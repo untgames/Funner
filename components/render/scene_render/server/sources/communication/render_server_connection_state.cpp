@@ -643,3 +643,8 @@ void ConnectionState::SetNodeWorldMatrix (object_id_t id, const math::mat4f& tm)
     throw;
   }
 }
+
+void ConnectionState::SetEntityBounds (object_id_t id, bool is_infinite, const bound_volumes::aaboxf& box)
+{
+  throw xtl::make_not_implemented_exception (__FUNCTION__);
+}

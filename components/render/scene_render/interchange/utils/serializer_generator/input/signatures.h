@@ -39,6 +39,8 @@ void DestroyNode (object_id_t id);
 void SetNodeName (object_id_t id, const char* name);
 void SetNodeWorldMatrix (object_id_t id, const math::mat4f& tm);
 
+void SetEntityBounds (object_id_t id, bool is_infinite, const bound_volumes::aaboxf& box);
+
 #section ServerToClient
 
 void UpdatePropertyMap (...);

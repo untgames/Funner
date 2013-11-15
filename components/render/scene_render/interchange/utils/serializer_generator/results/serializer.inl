@@ -34,6 +34,7 @@ inline stl::string get_command_name(CommandId command_id)
     case CommandId_DestroyNode: return "DestroyNode";
     case CommandId_SetNodeName: return "SetNodeName";
     case CommandId_SetNodeWorldMatrix: return "SetNodeWorldMatrix";
+    case CommandId_SetEntityBounds: return "SetEntityBounds";
     default: return common::format ("CommandId#%u", command_id);
   }
 }
@@ -615,6 +616,25 @@ inline void ClientToServerSerializer::SetNodeWorldMatrix(object_id_t id, const m
   }
 }
 
+inline void ClientToServerSerializer::SetEntityBounds(object_id_t id, bool is_infinite, const bound_volumes::aaboxf& box)
+{
+  size_t saved_position = Position ();
+
+  try
+  {
+    BeginCommand(CommandId_SetEntityBounds);
+    write(*this, id);
+    write(*this, is_infinite);
+    write(*this, box);
+    EndCommand();
+  }
+  catch (...)
+  {
+    SetPosition (saved_position);
+    throw;
+  }
+}
+
 template <class Dispatcher> inline bool ClientToServerDeserializer::Deserialize(CommandId id, Dispatcher& dispatcher)
 {
   switch (id)
@@ -899,6 +919,16 @@ template <class Dispatcher> inline bool ClientToServerDeserializer::Deserialize(
       const math::mat4f& arg2 = read(*this, xtl::type<const math::mat4f&> ());
 
       dispatcher.SetNodeWorldMatrix(arg1, arg2);
+
+      return true;
+    }
+    case CommandId_SetEntityBounds:
+    {
+      object_id_t arg1 = read(*this, xtl::type<object_id_t> ());
+      bool arg2 = read(*this, xtl::type<bool> ());
+      const bound_volumes::aaboxf& arg3 = read(*this, xtl::type<const bound_volumes::aaboxf&> ());
+
+      dispatcher.SetEntityBounds(arg1, arg2, arg3);
 
       return true;
     }

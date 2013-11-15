@@ -8,6 +8,8 @@
 #include <math/quat.h>
 #include <math/vector.h>
 
+#include <bv/axis_aligned_box.h>
+
 #include <render/scene/interchange/command_buffer.h>
 
 namespace render
@@ -158,6 +160,7 @@ void write (OutputStream&, NodeType);
 template <class T, unsigned int Size> void write (OutputStream&, const math::vector<T, Size>&);
 template <class T, unsigned int Size> void write (OutputStream&, const math::matrix<T, Size>&);
 template <class T>                    void write (OutputStream&, const math::quat<T>&);
+template <class T>                    void write (OutputStream&, const bound_volumes::axis_aligned_box<T>&);
 
 template <class T> const T& read (InputStream&, xtl::type<T&>);
 template <class T> const T& read (InputStream&, xtl::type<const T&>);
@@ -179,6 +182,8 @@ const NodeType& read (InputStream&, xtl::type<NodeType>);
 template <class T, unsigned int Size> const math::vector<T, Size>& read (InputStream&, xtl::type<math::vector<T, Size> >);
 template <class T, unsigned int Size> const math::matrix<T, Size>& read (InputStream&, xtl::type<math::matrix<T, Size> >);
 template <class T>                    const math::quat<T>&         read (InputStream&, xtl::type<math::quat<T> >);
+
+template <class T> const bound_volumes::axis_aligned_box<T>& read (InputStream&, xtl::type<bound_volumes::axis_aligned_box<T> >);
 
 #include <render/scene/interchange/detail/streams.inl>
 

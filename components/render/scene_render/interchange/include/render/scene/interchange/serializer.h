@@ -51,6 +51,7 @@ enum CommandId
   CommandId_DestroyNode,
   CommandId_SetNodeName,
   CommandId_SetNodeWorldMatrix,
+  CommandId_SetEntityBounds,
   CommandId_FirstUserDefined = 10000,
 };
 
@@ -98,6 +99,7 @@ class ClientToServerSerializer: public OutputStream
     void DestroyNode(object_id_t id);
     void SetNodeName(object_id_t id, const char* name);
     void SetNodeWorldMatrix(object_id_t id, const math::mat4f& tm);
+    void SetEntityBounds(object_id_t id, bool is_infinite, const bound_volumes::aaboxf& box);
 
   protected:
     using OutputStream::Swap;

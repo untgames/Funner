@@ -321,6 +321,12 @@ inline void write (OutputStream& s, const math::quat<T>& value)
   s.Write (value);
 }
 
+template <class T>
+inline void write (OutputStream& s, const bound_volumes::axis_aligned_box<T>& value)
+{
+  s.Write (value);
+}
+
 template <class T, unsigned int Size>
 inline const math::vector<T, Size>& read (InputStream& s, xtl::type<math::vector<T, Size> >)
 {
@@ -337,4 +343,10 @@ template <class T>
 inline const math::quat<T>& read (InputStream& s, xtl::type<math::quat<T> >)
 {
   return s.Read<math::quat<T> > ();
+}
+
+template <class T>
+const bound_volumes::axis_aligned_box<T>& read (InputStream& s, xtl::type<bound_volumes::axis_aligned_box<T> >)
+{
+  return s.Read<bound_volumes::axis_aligned_box<T> > ();  
 }

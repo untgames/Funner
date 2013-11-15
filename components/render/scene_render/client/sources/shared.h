@@ -62,7 +62,7 @@ enum ObjectType
 {
   ObjectType_Viewport,
   ObjectType_RenderTarget,
-  ObjectType_Node,
+  ObjectType_Node,  
 
   ObjectType_Num
 };
@@ -71,6 +71,7 @@ enum ObjectType
 #include "connection.h"
 #include "scene_object.h"
 #include "node.h"
+#include "entity.h"
 #include "render_target.h"
 #include "renderable_view.h"
 #include "scene.h"
