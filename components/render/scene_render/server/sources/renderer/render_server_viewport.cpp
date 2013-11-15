@@ -133,7 +133,7 @@ typedef stl::vector<TechniquePrivateData>                         TechniquePriva
 struct Frame: public xtl::reference_counter
 {
   manager::Frame            frame;
-  TechniquePrivateDataArray private_data;  
+  TechniquePrivateDataArray private_data;
 
   Frame (const manager::Frame& in_frame, size_t techniques_count)
     : frame (in_frame)

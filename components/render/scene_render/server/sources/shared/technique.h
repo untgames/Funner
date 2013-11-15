@@ -1,8 +1,9 @@
 #ifndef RENDER_SCENE_SERVER_TECHNIQUE_SHARED_HEADER
 #define RENDER_SCENE_SERVER_TECHNIQUE_SHARED_HEADER
 
-#include <typeinfo>
 #include <cstring>
+#include <new>
+#include <typeinfo>
 
 #include <stl/auto_ptr.h>
 
@@ -46,9 +47,13 @@ class TechniquePrivateData
 {
   public:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Конструктор / деструктор
+///Конструкторы / деструктор / присваивание
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    TechniquePrivateData ();
+    TechniquePrivateData  ();
+    TechniquePrivateData  (const TechniquePrivateData&);
+    ~TechniquePrivateData ();
+
+    TechniquePrivateData& operator = (const TechniquePrivateData&);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Получение данных
@@ -62,8 +67,13 @@ class TechniquePrivateData
   private:
     enum { DATA_BUFFER_SIZE = 256 };
 
+    struct ITypeInfo;
+
+    template <class T> struct TypeInfoImpl;
+
   private:
-    char buffer [DATA_BUFFER_SIZE];
+    char       buffer [DATA_BUFFER_SIZE];
+    ITypeInfo* type_info;
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
