@@ -32,9 +32,11 @@
 #include <sg/particle_emitter.h>
 #include <sg/physics.h>
 #include <sg/scene.h>
+#include <sg/scissor.h>
 #include <sg/sound_emitter.h>
 #include <sg/sprite.h>
 #include <sg/text_line.h>
+#include <sg/visual_model.h>
 
 using namespace scene_graph;
 using namespace scene_graph::controllers;
