@@ -103,7 +103,7 @@ const SpriteModel::SpriteDesc* SpriteModel::SpriteDescs () const
 void SpriteModel::AcceptCore (Visitor& visitor)
 {
   if (!TryAccept (*this, visitor))
-    Entity::AcceptCore (visitor);
+    VisualModel::AcceptCore (visitor);
 }
 
 /*
@@ -140,7 +140,7 @@ void SpriteModel::UpdateSpriteDescsNotify ()
 
 void SpriteModel::BindProperties (common::PropertyBindingMap& bindings)
 {
-  Entity::BindProperties (bindings);
+  VisualModel::BindProperties (bindings);
 
   bindings.AddProperty ("Material", xtl::bind (&SpriteModel::Material, this), xtl::bind (&SpriteModel::SetMaterial, this, _1));
   bindings.AddProperty ("AlphaReference", xtl::bind (&SpriteModel::AlphaReference, this), xtl::bind (&SpriteModel::SetAlphaReference, this, _1));

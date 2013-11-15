@@ -1,7 +1,7 @@
 #ifndef SCENE_GRAPH_PARTICLE_EMITTER_HEADER
 #define SCENE_GRAPH_PARTICLE_EMITTER_HEADER
 
-#include <sg/entity.h>
+#include <sg/visual_model.h>
 
 namespace scene_graph
 {
@@ -9,11 +9,11 @@ namespace scene_graph
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Эмиттер частиц
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-class ParticleEmitter : public Entity
+class ParticleEmitter: public VisualModel
 {
   public:  
-    typedef xtl::com_ptr <ParticleEmitter> Pointer;
-    typedef xtl::com_ptr <const ParticleEmitter> ConstPointer;
+    typedef xtl::com_ptr<ParticleEmitter>       Pointer;
+    typedef xtl::com_ptr<const ParticleEmitter> ConstPointer;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Создание эмиттера частиц

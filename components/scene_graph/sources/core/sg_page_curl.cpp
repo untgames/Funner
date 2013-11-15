@@ -391,5 +391,5 @@ void PageCurl::UpdateBoundsCore ()
 void PageCurl::AcceptCore (Visitor& visitor)
 {
   if (!TryAccept (*this, visitor))
-    Entity::AcceptCore (visitor);  
+    VisualModel::AcceptCore (visitor);  
 }

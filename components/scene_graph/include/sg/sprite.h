@@ -2,7 +2,7 @@
 #define SCENE_GRAPH_SPRITE_HEADER
 
 #include <stl/auto_ptr.h>
-#include <sg/entity.h>
+#include <sg/visual_model.h>
 
 namespace scene_graph
 {
@@ -20,7 +20,7 @@ enum SpriteModelEvent
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Модель, состоящая из спрайтов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-class SpriteModel: public Entity
+class SpriteModel: public VisualModel
 {
   public:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -59,7 +59,7 @@ class SpriteModel: public Entity
 
     xtl::connection RegisterEventHandler (SpriteModelEvent event_id, const EventHandler& event_handler);
     
-    using Entity::RegisterEventHandler;
+    using VisualModel::RegisterEventHandler;
 
   protected:
 ///////////////////////////////////////////////////////////////////////////////////////////////////

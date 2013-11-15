@@ -1,7 +1,7 @@
 #ifndef SCENE_GRAPH_PAGE_CURL_HEADER
 #define SCENE_GRAPH_PAGE_CURL_HEADER
 
-#include <sg/entity.h>
+#include <sg/visual_model.h>
 
 namespace scene_graph
 {
@@ -46,7 +46,7 @@ enum PageCurlMode
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Класс описания параметров перелистывания страницы
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-class PageCurl : public Entity
+class PageCurl : public VisualModel
 {
   public:
     typedef xtl::com_ptr<PageCurl>       Pointer;

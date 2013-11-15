@@ -69,7 +69,7 @@ size_t StaticMesh::MeshNameHash () const
 void StaticMesh::AcceptCore (Visitor& visitor)
 {
   if (!TryAccept (*this, visitor))
-    Entity::AcceptCore (visitor);
+    VisualModel::AcceptCore (visitor);
 }
 
 /*
@@ -78,7 +78,7 @@ void StaticMesh::AcceptCore (Visitor& visitor)
 
 void StaticMesh::BindProperties (common::PropertyBindingMap& bindings)
 {
-  Entity::BindProperties (bindings);
+  VisualModel::BindProperties (bindings);
 
   bindings.AddProperty ("Mesh", xtl::bind (&StaticMesh::MeshName, this), xtl::bind (&StaticMesh::SetMeshName, this, _1));
 }

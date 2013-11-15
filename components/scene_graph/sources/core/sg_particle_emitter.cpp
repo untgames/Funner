@@ -74,5 +74,5 @@ Node::Pointer ParticleEmitter::ParticlesParent () const
 void ParticleEmitter::AcceptCore (Visitor& visitor)
 {
   if (!TryAccept (*this, visitor))
-    Entity::AcceptCore (visitor);
+    VisualModel::AcceptCore (visitor);
 }

@@ -2,7 +2,7 @@
 #define SCENE_GRAPH_HEIGHT_MAP_HEADER
 
 #include <stl/auto_ptr.h>
-#include <sg/entity.h>
+#include <sg/visual_model.h>
 
 namespace scene_graph
 {
@@ -21,7 +21,7 @@ enum HeightMapEvent
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Карта высот
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-class HeightMap: public Entity
+class HeightMap: public VisualModel
 {
   public:
     typedef xtl::com_ptr<HeightMap>       Pointer;
@@ -86,7 +86,7 @@ class HeightMap: public Entity
 
     xtl::connection RegisterEventHandler (HeightMapEvent event, const EventHandler& handler);
     
-    using Entity::RegisterEventHandler;    
+    using VisualModel::RegisterEventHandler;    
 
   protected:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
