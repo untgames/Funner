@@ -41,7 +41,10 @@ struct Command
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 enum NodeType
 {
-  NodeType_Node, //узел
+  NodeType_Node,        //узел
+  NodeType_Entity,      //сущность
+  NodeType_VisualModel, //отображаемая модель
+  NodeType_SpriteModel, //спрайты
 
   NodeType_Num
 };
