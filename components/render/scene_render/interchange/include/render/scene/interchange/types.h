@@ -43,6 +43,7 @@ enum NodeType
 {
   NodeType_Node,        //узел
   NodeType_Entity,      //сущность
+  NodeType_Scissor,     //область отсечения
   NodeType_VisualModel, //отображаемая модель
   NodeType_SpriteModel, //спрайты
 
