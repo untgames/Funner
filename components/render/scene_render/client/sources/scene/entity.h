@@ -1,9 +1,9 @@
-#ifndef RENDER_SCENE_CLIENT_ENTITY_SHARED_HEADER
-#define RENDER_SCENE_CLIENT_ENTITY_SHARED_HEADER
+#ifndef RENDER_SCENE_CLIENT_IMPL_SCENE_ENTITY_SHARED_HEADER
+#define RENDER_SCENE_CLIENT_IMPL_SCENE_ENTITY_SHARED_HEADER
 
 #include <sg/entity.h>
 
-#include <shared/node.h>
+#include "node.h"
 
 namespace render
 {

@@ -1,9 +1,9 @@
-#ifndef RENDER_SCENE_CLIENT_VISUAL_MODEL_SHARED_HEADER
-#define RENDER_SCENE_CLIENT_VISUAL_MODEL_SHARED_HEADER
+#ifndef RENDER_SCENE_CLIENT_IMPL_SCENE_VISUAL_MODEL_SHARED_HEADER
+#define RENDER_SCENE_CLIENT_IMPL_SCENE_VISUAL_MODEL_SHARED_HEADER
 
 #include <sg/visual_model.h>
 
-#include <shared/entity.h>
+#include "entity.h"
 
 namespace render
 {

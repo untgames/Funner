@@ -3,7 +3,6 @@
 
 #include <stl/auto_ptr.h>
 
-#include <shared/node.h>
 #include <shared/scene.h>
 
 namespace render
@@ -17,6 +16,7 @@ namespace client
 
 //forward declarations
 class  ClientImpl;
+class  Node;
 class  SceneObject;
 struct SceneUpdateList;
 
@@ -27,6 +27,8 @@ class SceneManager: public xtl::noncopyable
 {
   friend class SceneObject;
   public:
+    typedef xtl::intrusive_ptr<Node> NodePtr;
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструктор / деструктор
 ///////////////////////////////////////////////////////////////////////////////////////////////////
