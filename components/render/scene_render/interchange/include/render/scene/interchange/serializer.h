@@ -52,6 +52,7 @@ enum CommandId
   CommandId_SetNodeName,
   CommandId_SetNodeWorldMatrix,
   CommandId_SetEntityBounds,
+  CommandId_SetVisualModelScissor,
   CommandId_FirstUserDefined = 10000,
 };
 
@@ -100,6 +101,7 @@ class ClientToServerSerializer: public OutputStream
     void SetNodeName(object_id_t id, const char* name);
     void SetNodeWorldMatrix(object_id_t id, const math::mat4f& tm);
     void SetEntityBounds(object_id_t id, bool is_infinite, const bound_volumes::aaboxf& box);
+    void SetVisualModelScissor(object_id_t id, object_id_t scissor_id);
 
   protected:
     using OutputStream::Swap;

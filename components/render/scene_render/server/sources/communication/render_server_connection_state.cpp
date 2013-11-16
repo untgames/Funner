@@ -648,3 +648,8 @@ void ConnectionState::SetEntityBounds (object_id_t id, bool is_infinite, const b
 {
   throw xtl::make_not_implemented_exception (__FUNCTION__);
 }
+
+void ConnectionState::SetVisualModelScissor (object_id_t id, object_id_t scissor_id)
+{
+  throw xtl::make_not_implemented_exception (__FUNCTION__);
+}
