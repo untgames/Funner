@@ -10,6 +10,8 @@
 #include <common/property_map.h>
 #include <common/strlib.h>
 
+#include <sg/scissor.h>
+
 #include <shared/client.h>
 #include <shared/entity.h>
 #include <shared/scene_manager.h>

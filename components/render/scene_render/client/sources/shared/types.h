@@ -24,6 +24,7 @@ using interchange::uint8;
 using interchange::float32;
 using interchange::bool8;
 using interchange::object_id_t;
+using interchange::NodeType;
 
 typedef interchange::Context<interchange::ClientToServerSerializer, interchange::ServerToClientDeserializer> Context;
 
