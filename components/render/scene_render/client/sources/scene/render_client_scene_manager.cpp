@@ -213,6 +213,16 @@ NodePtr SceneManager::GetNode (scene_graph::Node& src_node)
   }
 }
 
+NodePtr SceneManager::FindNode (scene_graph::Node& src_node)
+{
+  NodeMap::iterator iter = impl->nodes.find (&src_node);
+
+  if (iter != impl->nodes.end ())
+    return iter->second.node;
+
+  return NodePtr ();
+}
+
 /*
     Синхронизация сцен
 */

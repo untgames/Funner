@@ -1,9 +1,9 @@
-#ifndef RENDER_SCENE_CLIENT_ENTITY_SHARED_HEADER
-#define RENDER_SCENE_CLIENT_ENTITY_SHARED_HEADER
+#ifndef RENDER_SCENE_CLIENT_VISUAL_MODEL_SHARED_HEADER
+#define RENDER_SCENE_CLIENT_VISUAL_MODEL_SHARED_HEADER
 
-#include <sg/entity.h>
+#include <sg/visual_model.h>
 
-#include <shared/node.h>
+#include <shared/entity.h>
 
 namespace render
 {
@@ -16,21 +16,21 @@ namespace client
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Сущность
+///Отображаемая модель
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-class Entity: public Node
+class VisualModel: public Entity
 {
   public:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструктор / деструктор
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    Entity  (scene_graph::Entity&, SceneManager&, interchange::NodeType node_type = interchange::NodeType_Entity);
-    ~Entity ();
+    VisualModel  (scene_graph::VisualModel&, SceneManager&, interchange::NodeType node_type = interchange::NodeType_VisualModel);
+    ~VisualModel ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Исходный узел
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    scene_graph::Entity& SourceNode () const { return static_cast<scene_graph::Entity&> (Node::SourceNode ()); }
+    scene_graph::VisualModel& SourceNode () const { return static_cast<scene_graph::VisualModel&> (Node::SourceNode ()); }
 
   protected:
 ///////////////////////////////////////////////////////////////////////////////////////////////////

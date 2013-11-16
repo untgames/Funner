@@ -21,6 +21,7 @@ struct Entity::Impl
 
 Entity::Entity (scene_graph::Entity& entity, SceneManager& manager, interchange::NodeType node_type)
   : Node (entity, manager, node_type)
+  , impl (new Impl)
 {
 }
 

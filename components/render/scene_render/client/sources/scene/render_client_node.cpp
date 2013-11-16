@@ -91,9 +91,18 @@ render::scene::interchange::NodeType Node::Type () const
     Исходный узел
 */
 
-scene_graph::Node& Node::SourceNode ()
+scene_graph::Node& Node::SourceNode () const
 {
   return impl->node;
+}
+
+/*
+    Менеджер сцены
+*/
+
+SceneManager& Node::Scenes () const
+{
+  return impl->scene_manager;
 }
 
 /*

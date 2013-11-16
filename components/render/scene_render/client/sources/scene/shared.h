@@ -15,6 +15,7 @@
 #include <shared/client.h>
 #include <shared/entity.h>
 #include <shared/scene_manager.h>
+#include <shared/visual_model.h>
 
 namespace render
 {
