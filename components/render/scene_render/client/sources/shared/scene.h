@@ -1,27 +1,60 @@
+#ifndef RENDER_SCENE_CLIENT_SCENE_SHARED_HEADER
+#define RENDER_SCENE_CLIENT_SCENE_SHARED_HEADER
+
+#include <stl/auto_ptr.h>
+
+#include <xtl/intrusive_ptr.h>
+#include <xtl/reference_counter.h>
+#include <xtl/trackable.h>
+
+#include <sg/scene.h>
+
+namespace render
+{
+
+namespace scene
+{
+
+namespace client
+{
+
+
+//forward declarations
+class SceneManager;
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Сущность
+///Сцена
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-class Entity: public Node
+class Scene: public xtl::reference_counter, public xtl::trackable, public xtl::noncopyable
 {
   public:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструктор / деструктор
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    Entity  (scene_graph::Entity&, SceneManager&, interchange::NodeType node_type = interchange::NodeType_Entity);
-    ~Entity ();
+    Scene  (scene_graph::Scene&, SceneManager& scene_manager, object_id_t id);
+    ~Scene ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Исходный узел
+///Идентификатор сцены
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    scene_graph::Entity& SourceNode () { return static_cast<scene_graph::Entity&> (Node::SourceNode ()); }
+    object_id_t Id ();
 
-  private:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Реализация синхронизации
+///Сцена-источник
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void UpdateCore (client::Context&);
+    scene_graph::Scene& SourceScene ();
 
   private:
     struct Impl;
     stl::auto_ptr<Impl> impl;
 };
+
+typedef xtl::intrusive_ptr<Scene> ScenePtr;
+
+}
+
+}
+
+}
+
+#endif

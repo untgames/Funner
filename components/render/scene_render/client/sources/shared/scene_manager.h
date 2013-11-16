@@ -1,4 +1,23 @@
+#ifndef RENDER_SCENE_CLIENT_SCENE_MANAGER_SHARED_HEADER
+#define RENDER_SCENE_CLIENT_SCENE_MANAGER_SHARED_HEADER
+
+#include <stl/auto_ptr.h>
+
+#include <shared/node.h>
+#include <shared/scene.h>
+
+namespace render
+{
+
+namespace scene
+{
+
+namespace client
+{
+
 //forward declarations
+class  ClientImpl;
+class  SceneObject;
 struct SceneUpdateList;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -50,11 +69,10 @@ class SceneManager: public xtl::noncopyable
     stl::auto_ptr<Impl> impl;
 };
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Фабрика объектов
-///////////////////////////////////////////////////////////////////////////////////////////////////
-class SceneFactory
-{
-  public:
-    static Node* Create (scene_graph::Node& src_node, SceneManager& scene_manager);
-};
+}
+
+}
+
+}
+
+#endif

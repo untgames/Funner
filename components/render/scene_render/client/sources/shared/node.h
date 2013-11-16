@@ -1,3 +1,29 @@
+#ifndef RENDER_SCENE_CLIENT_NODE_SHARED_HEADER
+#define RENDER_SCENE_CLIENT_NODE_SHARED_HEADER
+
+#include <stl/auto_ptr.h>
+
+#include <xtl/intrusive_ptr.h>
+#include <xtl/reference_counter.h>
+#include <xtl/trackable.h>
+
+#include <sg/node.h>
+
+#include <shared/scene_object.h>
+#include <shared/types.h>
+
+namespace render
+{
+
+namespace scene
+{
+
+namespace client
+{
+
+//forward declarations
+class SceneManager;
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Узел
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -39,3 +65,11 @@ class Node: protected SceneObject, public xtl::reference_counter, public xtl::tr
 };
 
 typedef xtl::intrusive_ptr<Node> NodePtr;
+
+}
+
+}
+
+}
+
+#endif
