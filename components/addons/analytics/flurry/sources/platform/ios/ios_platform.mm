@@ -16,8 +16,8 @@ NSDictionary* property_map_to_ns_dictionary (const common::PropertyMap& paramete
 
   for (size_t i = 0; i < parameters_count; i++)
   {
-    NSString* key   = [NSString stringWithUTF8String:parameters.GetString (i)];
-    NSString* value = [NSString stringWithUTF8String:parameters.PropertyName (i)];
+    NSString* key   = [NSString stringWithUTF8String:parameters.PropertyName (i)];
+    NSString* value = [NSString stringWithUTF8String:parameters.GetString (i)];
 
     [return_value setObject:value forKey:key];
   }
