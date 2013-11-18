@@ -1,3 +1,6 @@
+export.compile.extern.flurry.android.JAR_DIRS := dist
+export.compile.extern.flurry.android.JARS     := FlurryAnalytics_3.3.0
+
 export.compile.extern.flurry.iphone.INCLUDE_DIRS := include
 
 export.link.extern.flurry.iphone.LIB_DIRS   := lib/ios
