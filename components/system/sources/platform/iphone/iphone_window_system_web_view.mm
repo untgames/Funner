@@ -66,6 +66,9 @@ using namespace syslib;
 
 -(void)webView:(UIWebView *)webView didFailLoadWithError:(NSError *)error
 {
+  if ([error code] == NSURLErrorCancelled) //web view was redirected to another URL or load was cancelled by user
+    return;
+
   listener->OnLoadFailed ([[error description] UTF8String]);
 
   [activity_indicator removeFromSuperview];
