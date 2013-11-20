@@ -138,6 +138,8 @@ bool FacebookSessionImpl::ProcessDialogRequest (const char* request, const Windo
 
         if (error.empty ())
           callback (OperationStatus_Success, replace_percent_escapes (request).c_str ());
+        else if (error == "4201")
+          callback (OperationStatus_Canceled, "");
         else
           callback (OperationStatus_Failure, error.c_str ());
       }
