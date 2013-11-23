@@ -590,7 +590,26 @@ void ConnectionState::SetSceneName (object_id_t id, const char* name)
 
 void ConnectionState::SetSceneNodes (object_id_t id, const interchange::RawArray<object_id_t>& nodes)
 {
-  throw xtl::make_not_implemented_exception (__FUNCTION__);
+  try
+  {
+    SceneManager& scene_manager = impl->server.SceneManager ();
+
+    Scene& scene = scene_manager.GetScene (id);
+
+    const object_id_t* node_id = nodes.data;
+
+    for (size_t i=0, count=nodes.size; i<count; i++, node_id++)
+    {
+      Node& node = scene_manager.GetNode (*node_id);
+
+      node.SetSceneOwner (&scene);
+    }
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::scene::ConnectionState::SetSceneNodes");
+    throw;
+  }
 }
 
 /*
@@ -649,9 +668,17 @@ void ConnectionState::SetNodeWorldMatrix (object_id_t id, const math::mat4f& tm)
   }
 }
 
-void ConnectionState::SetNodeScene(object_id_t id, object_id_t scene_id)
+void ConnectionState::SetNodeScene (object_id_t id, object_id_t scene_id)
 {
-  throw xtl::make_not_implemented_exception (__FUNCTION__);
+  try
+  {
+    SetSceneNodes (scene_id, interchange::RawArray<object_id_t> (&id, 1));
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::scene::ConnectionState::SetNodeScene");
+    throw;
+  }
 }
 
 void ConnectionState::SetEntityBounds (object_id_t id, bool is_infinite, const bound_volumes::aaboxf& box)
