@@ -1,7 +1,7 @@
 #include "shared.h"
 
-using namespace render;
-using namespace render::scene_render3d;
+using namespace render::scene::server;
+using namespace render::scene;
 
 /*
 ===================================================================================================
@@ -23,20 +23,12 @@ CollectionVisitor::CollectionVisitor (TraverseResult& in_result, size_t in_filte
     Диспетчеризация по типам
 */
 
-void CollectionVisitor::Visit (Renderable& entity)
-{
-  if (!(filter & Collect_Renderables))
-    return;
-    
-  result.renderables.push_back (&entity);
-}
-
 void CollectionVisitor::Visit (VisualModel& entity)
 {
-  if (!(filter & Collect_Renderables))
+  if (!(filter & Collect_VisualModels))
     return;
     
-  result.renderables.push_back (&entity);
+  result.visual_models.push_back (&entity);
 }
 
 void CollectionVisitor::Visit (Light& entity)

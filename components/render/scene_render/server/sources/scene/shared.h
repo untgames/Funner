@@ -13,5 +13,6 @@
 #include <shared/camera.h>
 #include <shared/scene_manager.h>
 
-#include <shared/sg/visitor.h>
+#include <shared/sg/collection_visitor.h>
+#include <shared/sg/traverse_result.h>
 #include <shared/sg/visual_model.h>

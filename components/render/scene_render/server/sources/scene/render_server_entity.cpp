@@ -48,3 +48,12 @@ const bound_volumes::aaboxf& Entity::BoundBox () const
 {
   return impl->bound_box;
 }
+
+/*
+    Обход
+*/
+
+void Entity::VisitCore (ISceneVisitor& visitor)
+{
+  visitor.Visit (*this);
+}

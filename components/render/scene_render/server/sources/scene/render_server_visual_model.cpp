@@ -38,3 +38,12 @@ Node* VisualModel::Scissor () const
 {
   return impl->scissor.get ();
 }
+
+/*
+    Обход
+*/
+
+void VisualModel::VisitCore (ISceneVisitor& visitor)
+{
+  visitor.Visit (*this);
+}

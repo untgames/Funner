@@ -14,6 +14,7 @@ namespace server
 class Node;
 class Entity;
 class VisualModel;
+class Light;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Интерфейс диспетчера объектов при обходе сцены
@@ -27,11 +28,12 @@ class ISceneVisitor
     virtual void Visit (Node& entity) {}
     virtual void Visit (Entity& entity) {}
     virtual void Visit (VisualModel& entity) {}
+    virtual void Visit (Light& entity) {}
 
   protected:
     virtual ~ISceneVisitor () {}
 };
-
+	
 }
 
 }

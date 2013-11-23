@@ -1,0 +1,56 @@
+#ifndef RENDER_SCENE_SERVER_TRAVERSE_RESULT_SHARED_HEADER
+#define RENDER_SCENE_SERVER_TRAVERSE_RESULT_SHARED_HEADER
+
+#include <stl/vector>
+
+namespace render
+{
+
+namespace scene
+{
+
+namespace server
+{
+
+//forward declarations
+class Light;
+class VisualModel;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Результат обхода сцены
+///////////////////////////////////////////////////////////////////////////////////////////////////
+struct TraverseResult
+{
+  typedef stl::vector<VisualModel*> VisualModelArray;
+  typedef stl::vector<Light*>       LightArray;
+  
+  VisualModelArray visual_models; //список отображаемых объектов
+  LightArray       lights;        //список источников света
+
+  void Clear ();
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Интерфейс кэша результата обхода сцены
+///////////////////////////////////////////////////////////////////////////////////////////////////
+class ITraverseResultCache
+{
+  public:
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Получение результата
+///////////////////////////////////////////////////////////////////////////////////////////////////  
+    virtual TraverseResult& Result () = 0;
+  
+  protected:
+    virtual ~ITraverseResultCache () {}
+};
+
+#include <shared/sg/detail/traverse_result.inl>
+
+}
+
+}
+
+}
+
+#endif
