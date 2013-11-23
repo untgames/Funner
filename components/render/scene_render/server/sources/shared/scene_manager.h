@@ -3,6 +3,8 @@
 
 #include <xtl/intrusive_ptr.h>
 
+#include <bv/plane_list.h>
+
 #include <render/scene/interchange/types.h>
 
 namespace render
@@ -15,14 +17,17 @@ namespace server
 {
 
 //forward declaration
-class Node;
+class  Entity;
+class  Node;
+class  ISceneVisitor;
+struct TraverseResult;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Сцена
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 class Scene
 {
-  friend class Node;
+  friend class Entity;
   public:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструкторы / деструктор / присваивание
@@ -39,12 +44,19 @@ class Scene
     void        SetName (const char* name);
     const char* Name    () const;
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Обход сцены
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void Traverse (const bound_volumes::plane_listf& frustum, ISceneVisitor& visitor);
+    void Traverse (const bound_volumes::plane_listf& frustum, TraverseResult& result);
+    void Traverse (const bound_volumes::plane_listf& frustum, TraverseResult& result, size_t filter);
+
   private:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Присоединение узла
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void AttachNode (const xtl::intrusive_ptr<Node>& node);
-    void DetachNode (const xtl::intrusive_ptr<Node>& node);
+    void AttachNode (const xtl::intrusive_ptr<Entity>& node);
+    void DetachNode (const xtl::intrusive_ptr<Entity>& node);
 
   private:
     struct Impl;

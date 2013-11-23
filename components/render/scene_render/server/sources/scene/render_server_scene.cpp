@@ -7,14 +7,15 @@ using namespace render::scene;
     Описание реализации сцены
 */
 
-typedef stl::list<NodePtr>                       NodeList;
-typedef stl::hash_map<Node*, NodeList::iterator> NodeMap;
+typedef xtl::intrusive_ptr<Entity>                 EntityPtr;
+typedef stl::list<EntityPtr>                       EntityList;
+typedef stl::hash_map<Node*, EntityList::iterator> EntityMap;
 
 struct Scene::Impl: public xtl::reference_counter
 {
-  stl::string name;      //имя сцены
-  NodeList    node_list; //список узлов
-  NodeMap     node_map;  //карта узлов
+  stl::string name;        //имя сцены
+  EntityList  entity_list; //список узлов
+  EntityMap   entity_map;  //карта узлов
 };
 
 /*
@@ -67,27 +68,27 @@ const char* Scene::Name () const
     Присоединение узла
 */
 
-void Scene::AttachNode (const NodePtr& node)
+void Scene::AttachNode (const EntityPtr& node)
 {
   try
   {
     if (!node)
       throw xtl::make_null_argument_exception ("", "node");
 
-    NodeMap::iterator map_iter = impl->node_map.find (&*node);
+    EntityMap::iterator map_iter = impl->entity_map.find (&*node);
 
-    if (map_iter != impl->node_map.end ())
+    if (map_iter != impl->entity_map.end ())
       throw xtl::make_argument_exception ("", "node", node->Name (), "This node has been already added to scene");
 
-    NodeList::iterator list_iter = impl->node_list.insert (impl->node_list.end (), node);
+    EntityList::iterator list_iter = impl->entity_list.insert (impl->entity_list.end (), node);
     
     try
     {
-      impl->node_map.insert_pair (&*node, list_iter);
+      impl->entity_map.insert_pair (&*node, list_iter);
     }
     catch (...)
     {
-      impl->node_list.erase (list_iter);
+      impl->entity_list.erase (list_iter);
       throw;
     }
   }
@@ -98,16 +99,49 @@ void Scene::AttachNode (const NodePtr& node)
   }
 }
 
-void Scene::DetachNode (const NodePtr& node)
+void Scene::DetachNode (const EntityPtr& node)
 {
   if (!node)
     return;
 
-  NodeMap::iterator iter = impl->node_map.find (&*node);
+  EntityMap::iterator iter = impl->entity_map.find (&*node);
 
-  if (iter == impl->node_map.end ())
+  if (iter == impl->entity_map.end ())
     return;
 
-  impl->node_list.erase (iter->second);
-  impl->node_map.erase (iter);  
+  impl->entity_list.erase (iter->second);
+  impl->entity_map.erase (iter);  
+}
+
+void Scene::Traverse (const bound_volumes::plane_listf& frustum, ISceneVisitor& visitor)
+{
+  for (EntityList::iterator iter=impl->entity_list.begin (), end=impl->entity_list.end (); iter!=end; ++iter)
+  {
+    Entity& entity = **iter;
+
+      //если объект имеет бесконечные ограничивающие объёмы - обрабатываем его
+
+    if (entity.IsInfiniteBounds ())
+    {
+      visitor.Visit (entity);
+      continue;
+    }
+
+      //если объект имеет конечные ограничивающие объёмы - проверяем его попадание в заданный объём
+
+    if (intersects (frustum, entity.BoundBox ()))
+      visitor.Visit (entity);
+  }
+}
+
+void Scene::Traverse (const bound_volumes::plane_listf& frustum, TraverseResult& result, size_t filter)
+{
+  result.Clear ();
+
+  Traverse (frustum, CollectionVisitor (result, filter));
+}
+
+void Scene::Traverse (const bound_volumes::plane_listf& frustum, TraverseResult& result)
+{
+  Traverse (frustum, result, Collect_All);
 }

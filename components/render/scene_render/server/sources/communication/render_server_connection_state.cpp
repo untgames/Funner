@@ -602,7 +602,7 @@ void ConnectionState::SetSceneNodes (object_id_t id, const interchange::RawArray
     {
       Node& node = scene_manager.GetNode (*node_id);
 
-      node.SetSceneOwner (&scene);
+      node.Cast<Entity> ().SetSceneOwner (&scene);
     }
   }
   catch (xtl::exception& e)
