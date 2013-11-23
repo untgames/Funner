@@ -62,3 +62,25 @@ const math::mat4f& Node::WorldMatrix () const
 {
   return impl->world_tm;
 }
+
+/*
+    Œ·ıÓ‰
+*/
+
+void Node::Visit (ISceneVisitor& visitor)
+{
+  try
+  {
+    VisitCore (visitor);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::scene::server::Visit(%s='%s')", typeid (*this).name (), Name ());
+    throw;
+  }
+}
+
+void Node::VisitCore (ISceneVisitor& visitor)
+{
+  visitor.Visit (*this);
+}
