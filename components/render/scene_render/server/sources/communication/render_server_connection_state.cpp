@@ -588,6 +588,11 @@ void ConnectionState::SetSceneName (object_id_t id, const char* name)
   }
 }
 
+void ConnectionState::SetSceneNodes (object_id_t id, const interchange::RawArray<object_id_t>& nodes)
+{
+  throw xtl::make_not_implemented_exception (__FUNCTION__);
+}
+
 /*
     Работа с узлами
 */
@@ -642,6 +647,11 @@ void ConnectionState::SetNodeWorldMatrix (object_id_t id, const math::mat4f& tm)
     e.touch ("render::scene::ConnectionState::SetNodeWorldMatrix");
     throw;
   }
+}
+
+void ConnectionState::SetNodeScene(object_id_t id, object_id_t scene_id)
+{
+  throw xtl::make_not_implemented_exception (__FUNCTION__);
 }
 
 void ConnectionState::SetEntityBounds (object_id_t id, bool is_infinite, const bound_volumes::aaboxf& box)

@@ -6,6 +6,64 @@ using namespace render::scene::client;
     Описание реализации сцены
 */
 
+namespace
+{
+
+typedef stl::vector<object_id_t> ObjectIdArray;
+
+struct NodeCollector
+{
+  SceneManager*  scene_manager;
+  ObjectIdArray* ids;
+
+  NodeCollector (SceneManager& in_scene_manager, ObjectIdArray& in_ids) : scene_manager (&in_scene_manager), ids (&in_ids) {}
+
+  void operator () (scene_graph::Entity& entity)
+  {
+    try
+    {
+      NodePtr node = scene_manager->GetNode (entity);
+
+      if (!node)
+        return;
+
+      ids->push_back (node->Id ());
+    }
+    catch (xtl::exception& e)
+    {
+      e.touch ("render::scene::server::NodeCollector::operator ()");
+      throw;
+    }
+  }
+};
+
+struct NodeSceneReseter
+{
+  SceneManager* scene_manager;
+
+  NodeSceneReseter (SceneManager& in_scene_manager) : scene_manager (&in_scene_manager) {}
+
+  void operator () (scene_graph::Entity& entity)
+  {
+    try
+    {
+      NodePtr node = scene_manager->FindNode (entity);
+
+      if (!node)
+        return;
+
+      node->ResetSceneOwner ();
+    }
+    catch (xtl::exception& e)
+    {
+      e.touch ("render::scene::server::NodeSceneReseter::operator ()");
+      throw;
+    }
+  }
+};
+
+}
+
 struct Scene::Impl
 {
   object_id_t          id;                      //идентификатор сцены
@@ -23,6 +81,14 @@ struct Scene::Impl
 
     scene_manager.Context ().CreateScene (id);
     scene_manager.Context ().SetSceneName (id, scene.Name ());
+
+    ObjectIdArray ids;
+
+    ids.reserve (scene.EntitiesCount ());
+
+    scene.Traverse (NodeCollector (scene_manager, ids));
+
+    scene_manager.Context ().SetSceneNodes (id, render::scene::interchange::RawArray<object_id_t> (&ids [0], ids.size ()));
   }
 
 /// Деструктор
@@ -31,6 +97,8 @@ struct Scene::Impl
     try
     {
       scene_manager.Context ().DestroyScene (id);
+
+      scene.Traverse (NodeSceneReseter (scene_manager));
     }
     catch (...)
     {
@@ -42,12 +110,7 @@ struct Scene::Impl
   {
     try
     {
-      NodePtr node = scene_manager.GetNode (src_node);
-
-      if (!node)
-        return;
-
-      ///???????????????? attach to scene
+      scene_manager.GetNode (src_node);
     }
     catch (xtl::exception& e)
     {

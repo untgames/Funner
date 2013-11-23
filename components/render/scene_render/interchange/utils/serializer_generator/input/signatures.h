@@ -33,11 +33,13 @@ void RemovePropertyLayout (object_id_t id);
 void CreateScene (object_id_t id);
 void DestroyScene (object_id_t id);
 void SetSceneName (object_id_t id, const char* name);
+void SetSceneNodes (object_id_t id, const RawArray<object_id_t>& nodes);
 
 void CreateNode (object_id_t id, NodeType type);
 void DestroyNode (object_id_t id);
 void SetNodeName (object_id_t id, const char* name);
 void SetNodeWorldMatrix (object_id_t id, const math::mat4f& tm);
+void SetNodeScene (object_id_t id, object_id_t scene_id);
 
 void SetEntityBounds (object_id_t id, bool is_infinite, const bound_volumes::aaboxf& box);
 

@@ -1,4 +1,15 @@
 /*
+    RawArray
+*/
+
+template <class T>
+inline RawArray<T>::RawArray (const T* in_data, size_t in_size)
+  : size (in_size)
+  , data (in_data)
+{
+}
+
+/*
     OutputStream
 */
 
@@ -349,4 +360,22 @@ template <class T>
 const bound_volumes::axis_aligned_box<T>& read (InputStream& s, xtl::type<bound_volumes::axis_aligned_box<T> >)
 {
   return s.Read<bound_volumes::axis_aligned_box<T> > ();  
+}
+
+template <class T>
+inline void write (OutputStream& s, const RawArray<T>& value)
+{
+  write (s, value.size);
+
+  s.WriteData (value.data, value.size * sizeof (T));
+}
+
+template <class T>
+inline const RawArray<T>& read (InputStream& s, xtl::type<RawArray<T> >)
+{
+  const uint32& count = read (s, xtl::type<uint32> ());
+
+  s.Skip (count * sizeof (T));
+
+  return *reinterpret_cast<const RawArray<T>*> (&count);
 }

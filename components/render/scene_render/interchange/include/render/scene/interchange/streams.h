@@ -142,6 +142,17 @@ class InputStream
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+///Массив
+///////////////////////////////////////////////////////////////////////////////////////////////////
+template <class T> struct RawArray
+{
+  uint32   size; //количество элементов
+  const T* data; //данные
+
+  RawArray (const T* data, size_t size);
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Сериализация базовых типов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 void write (OutputStream&, bool);
@@ -161,6 +172,8 @@ template <class T, unsigned int Size> void write (OutputStream&, const math::vec
 template <class T, unsigned int Size> void write (OutputStream&, const math::matrix<T, Size>&);
 template <class T>                    void write (OutputStream&, const math::quat<T>&);
 template <class T>                    void write (OutputStream&, const bound_volumes::axis_aligned_box<T>&);
+
+template <class T> void write (OutputStream&, const RawArray<T>&);
 
 template <class T> const T& read (InputStream&, xtl::type<T&>);
 template <class T> const T& read (InputStream&, xtl::type<const T&>);
@@ -184,6 +197,8 @@ template <class T, unsigned int Size> const math::matrix<T, Size>& read (InputSt
 template <class T>                    const math::quat<T>&         read (InputStream&, xtl::type<math::quat<T> >);
 
 template <class T> const bound_volumes::axis_aligned_box<T>& read (InputStream&, xtl::type<bound_volumes::axis_aligned_box<T> >);
+
+template <class T> const RawArray<T>& read (InputStream&, xtl::type<RawArray<T> >);
 
 #include <render/scene/interchange/detail/streams.inl>
 

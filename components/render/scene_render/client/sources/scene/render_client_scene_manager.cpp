@@ -147,6 +147,16 @@ ScenePtr SceneManager::GetScene (scene_graph::Scene& scene)
   }
 }
 
+ScenePtr SceneManager::FindScene (scene_graph::Scene& scene)
+{
+  SceneMap::iterator iter = impl->scenes.find (&scene);
+
+  if (iter != impl->scenes.end ())
+    return iter->second.scene;
+
+  return ScenePtr ();
+}
+
 /*
     Список обновлений
 */

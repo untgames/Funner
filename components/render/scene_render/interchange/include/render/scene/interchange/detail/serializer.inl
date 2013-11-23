@@ -30,10 +30,12 @@ inline stl::string get_command_name(CommandId command_id)
     case CommandId_CreateScene: return "CreateScene";
     case CommandId_DestroyScene: return "DestroyScene";
     case CommandId_SetSceneName: return "SetSceneName";
+    case CommandId_SetSceneNodes: return "SetSceneNodes";
     case CommandId_CreateNode: return "CreateNode";
     case CommandId_DestroyNode: return "DestroyNode";
     case CommandId_SetNodeName: return "SetNodeName";
     case CommandId_SetNodeWorldMatrix: return "SetNodeWorldMatrix";
+    case CommandId_SetNodeScene: return "SetNodeScene";
     case CommandId_SetEntityBounds: return "SetEntityBounds";
     case CommandId_SetVisualModelScissor: return "SetVisualModelScissor";
     default: return common::format ("CommandId#%u", command_id);
@@ -546,6 +548,24 @@ inline void ClientToServerSerializer::SetSceneName(object_id_t id, const char* n
   }
 }
 
+inline void ClientToServerSerializer::SetSceneNodes(object_id_t id, const RawArray<object_id_t>& nodes)
+{
+  size_t saved_position = Position ();
+
+  try
+  {
+    BeginCommand(CommandId_SetSceneNodes);
+    write(*this, id);
+    write(*this, nodes);
+    EndCommand();
+  }
+  catch (...)
+  {
+    SetPosition (saved_position);
+    throw;
+  }
+}
+
 inline void ClientToServerSerializer::CreateNode(object_id_t id, NodeType type)
 {
   size_t saved_position = Position ();
@@ -608,6 +628,24 @@ inline void ClientToServerSerializer::SetNodeWorldMatrix(object_id_t id, const m
     BeginCommand(CommandId_SetNodeWorldMatrix);
     write(*this, id);
     write(*this, tm);
+    EndCommand();
+  }
+  catch (...)
+  {
+    SetPosition (saved_position);
+    throw;
+  }
+}
+
+inline void ClientToServerSerializer::SetNodeScene(object_id_t id, object_id_t scene_id)
+{
+  size_t saved_position = Position ();
+
+  try
+  {
+    BeginCommand(CommandId_SetNodeScene);
+    write(*this, id);
+    write(*this, scene_id);
     EndCommand();
   }
   catch (...)
@@ -906,6 +944,15 @@ template <class Dispatcher> inline bool ClientToServerDeserializer::Deserialize(
 
       return true;
     }
+    case CommandId_SetSceneNodes:
+    {
+      object_id_t arg1 = read(*this, xtl::type<object_id_t> ());
+      const RawArray<object_id_t>& arg2 = read(*this, xtl::type<const RawArray<object_id_t>&> ());
+
+      dispatcher.SetSceneNodes(arg1, arg2);
+
+      return true;
+    }
     case CommandId_CreateNode:
     {
       object_id_t arg1 = read(*this, xtl::type<object_id_t> ());
@@ -938,6 +985,15 @@ template <class Dispatcher> inline bool ClientToServerDeserializer::Deserialize(
       const math::mat4f& arg2 = read(*this, xtl::type<const math::mat4f&> ());
 
       dispatcher.SetNodeWorldMatrix(arg1, arg2);
+
+      return true;
+    }
+    case CommandId_SetNodeScene:
+    {
+      object_id_t arg1 = read(*this, xtl::type<object_id_t> ());
+      object_id_t arg2 = read(*this, xtl::type<object_id_t> ());
+
+      dispatcher.SetNodeScene(arg1, arg2);
 
       return true;
     }
