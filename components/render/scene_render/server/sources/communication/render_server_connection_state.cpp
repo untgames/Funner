@@ -646,10 +646,26 @@ void ConnectionState::SetNodeWorldMatrix (object_id_t id, const math::mat4f& tm)
 
 void ConnectionState::SetEntityBounds (object_id_t id, bool is_infinite, const bound_volumes::aaboxf& box)
 {
-  throw xtl::make_not_implemented_exception (__FUNCTION__);
+  try
+  {
+    impl->server.SceneManager ().GetNode (id).Cast<Entity> ().SetBounds (is_infinite, box);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::scene::ConnectionState::SetEntityBounds");
+    throw;
+  }
 }
 
 void ConnectionState::SetVisualModelScissor (object_id_t id, object_id_t scissor_id)
 {
-  throw xtl::make_not_implemented_exception (__FUNCTION__);
+  try
+  {
+    impl->server.SceneManager ().GetNode (id).Cast<VisualModel> ().SetScissor (scissor_id ? &impl->server.SceneManager ().GetNode (scissor_id) : static_cast<Node*> (0));
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::scene::ConnectionState::SetVisualModelScissor");
+    throw;
+  }
 }

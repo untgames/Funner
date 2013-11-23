@@ -14,8 +14,17 @@ typedef stl::hash_map<object_id_t, NodePtr> NodeMap;
 
 struct SceneManager::Impl
 {
-  SceneMap scenes; //сцены
-  NodeMap  nodes;  //узлы
+  SceneMap    scenes;         //сцены
+  NodeMap     nodes;          //узлы
+  object_id_t cached_node_id; //закэшированный идентификатор узла (для последовательных обновлений одного узла)
+  Node*       cached_node;    //закэшированный узел (для последовательных обновлений одного узла)
+
+/// Конструктор
+  Impl ()
+    : cached_node_id ()
+    , cached_node ()
+  {
+  }
 };
 
 /*
@@ -75,12 +84,25 @@ xtl::intrusive_ptr<Node> SceneManager::CreateNode (interchange::object_id_t id, 
   if (iter != impl->nodes.end ())
     throw xtl::format_operation_exception ("render::scene::server::SceneManager::CreateNode", "Node with id %llu has been already added", id);
 
-  return impl->nodes.insert_pair (id, NodePtr (NodeFactory::CreateNode (type), false)).first->second;
+  NodePtr node (NodeFactory::CreateNode (type), false);
+
+  impl->nodes.insert_pair (id, node);
+
+  impl->cached_node_id = id;
+  impl->cached_node    = node.get ();
+
+  return node;
 }
 
 void SceneManager::RemoveNode (interchange::object_id_t id)
 {
   impl->nodes.erase (id);
+
+  if (id == impl->cached_node_id)
+  {
+    impl->cached_node_id = 0;
+    impl->cached_node    = 0;
+  }
 }
 
 /*
@@ -89,10 +111,16 @@ void SceneManager::RemoveNode (interchange::object_id_t id)
 
 Node& SceneManager::GetNode (interchange::object_id_t id) const
 {
+  if (id == impl->cached_node_id && id)
+    return *impl->cached_node;
+
   NodeMap::iterator iter = impl->nodes.find (id);
 
   if (iter == impl->nodes.end ())
     throw xtl::format_operation_exception ("render::scene::server::SceneManager::GetNode", "Node with id %llu has not been added", id);
 
-  return *iter->second;
+  impl->cached_node_id = id;
+  impl->cached_node    = &*iter->second;
+
+  return *impl->cached_node;
 }

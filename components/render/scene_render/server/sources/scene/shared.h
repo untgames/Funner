@@ -13,4 +13,4 @@
 #include <shared/camera.h>
 #include <shared/scene_manager.h>
 
-#include <shared/sg/node.h>
+#include <shared/sg/visual_model.h>

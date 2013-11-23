@@ -41,6 +41,11 @@ class Node: public xtl::reference_counter, public xtl::noncopyable
     void               SetWorldMatrix (const math::mat4f&);
     const math::mat4f& WorldMatrix    () const;
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Приведение
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    template <class T> T& Cast () { return *static_cast<T*> (this); }
+
   private:
     struct Impl;
     stl::auto_ptr<Impl> impl;
