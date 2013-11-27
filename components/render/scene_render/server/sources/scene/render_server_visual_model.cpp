@@ -39,6 +39,7 @@ VisualModel::VisualModel (RenderManager& render_manager)
 VisualModel::VisualModel (manager::Entity& entity)
   : impl (new Impl (entity))
 {
+  entity.SetUserData (this);
 }
 
 VisualModel::~VisualModel ()
@@ -86,11 +87,11 @@ void VisualModel::VisitCore (ISceneVisitor& visitor)
     Отрисовка
 */
 
-void VisualModel::Draw (RenderingContext& context)
+void VisualModel::Draw (RenderingContext& context, void* user_data)
 {
   try
-  {
-    DrawCore (context);
+  {    
+    DrawCore (context, user_data);    
   }
   catch (xtl::exception& e)
   {
@@ -99,7 +100,9 @@ void VisualModel::Draw (RenderingContext& context)
   }
 }
 
-void VisualModel::DrawCore (RenderingContext& context)
+void VisualModel::DrawCore (RenderingContext& context, void* user_data)
 {
   //TODO: set scissor
+
+  context.Frame ().AddEntity (impl->entity, user_data);
 }

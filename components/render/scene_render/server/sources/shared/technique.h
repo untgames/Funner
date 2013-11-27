@@ -114,8 +114,8 @@ class Technique: public xtl::reference_counter
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Отрисовка массива отображаемых моделей
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void Draw (RenderingContext& context, size_t visual_models_count, VisualModel* const* models) const;
-    void Draw (RenderingContext& context, const stl::vector<VisualModel*>& models) const;
+    void Draw (RenderingContext& context, size_t visual_models_count, VisualModel* const* models, void* user_data = 0) const;
+    void Draw (RenderingContext& context, const stl::vector<VisualModel*>& models, void* user_data = 0) const;
 
   private:
 ///////////////////////////////////////////////////////////////////////////////////////////////////

@@ -56,12 +56,3 @@ const char* StaticMesh::MeshName () const
 {
   return impl->mesh_name.c_str ();
 }
-
-/*
-    Отрисовка
-*/
-
-void StaticMesh::DrawCore (RenderingContext& context)
-{
-  context.Frame ().AddEntity (impl->entity);
-}

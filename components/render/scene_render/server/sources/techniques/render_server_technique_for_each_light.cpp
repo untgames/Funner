@@ -4,6 +4,9 @@ using namespace render;
 using namespace render::scene;
 using namespace render::scene::server;
 
+//TODO: recursive rendering!!
+//TODO: use code from DrawWithoutLightsTechnique (ForEachLightTechnique is not ready)
+
 namespace render
 {
 
@@ -76,7 +79,7 @@ class ForEachLightTechnique: public Technique
         
         TraverseResult& result = context.TraverseResult ();
 
-          //обход источников
+          //обход источников        
           
         size_t light_index = 0;
 
