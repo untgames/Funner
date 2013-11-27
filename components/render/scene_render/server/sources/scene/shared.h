@@ -12,8 +12,8 @@
 
 #include <shared/camera.h>
 #include <shared/render_manager.h>
+#include <shared/rendering_context.h>
 #include <shared/scene_manager.h>
-#include <shared/technique.h>
 
 #include <shared/sg/collection_visitor.h>
 #include <shared/sg/light.h>
