@@ -31,7 +31,7 @@ class ForEachLightTechnique: public Technique
 ///Конструктор / деструктор
     ForEachLightTechnique (RenderManager& in_manager, const common::ParseNode& node)
       : manager (in_manager)
-      , entity_draw_handler (xtl::bind (&ForEachLightTechnique::EntityDrawHandler, this, _1, _2, _3))
+      , entity_draw_handler (xtl::bind (&ForEachLightTechnique::EntityDrawHandler, this, _1, _2, _3, _4))
       , properties_update_counter (1)
     {
       light_frames.reserve (LIGHTS_RESERVE_SIZE);    
@@ -111,7 +111,7 @@ class ForEachLightTechnique: public Technique
     }
 
 ///Обработчик отрисовки объектов
-    void EntityDrawHandler (manager::Frame& frame, manager::Entity& entity, manager::EntityDrawParams& out_params)
+    void EntityDrawHandler (manager::Frame& frame, manager::Entity& entity, void* user_data, manager::EntityDrawParams& out_params)
     {
 //    common::PropertyMap& properties = out_params.properties;
       
