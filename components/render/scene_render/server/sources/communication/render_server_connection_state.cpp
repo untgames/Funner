@@ -377,8 +377,13 @@ void ConnectionState::SetViewportScene (object_id_t id, object_id_t scene_id)
 {
   try
   {
-    throw xtl::make_not_implemented_exception (__FUNCTION__);
-//    impl->server.ScreenManager ().GetViewport (id).SetScene (???);
+    if (scene_id)
+    {
+      Scene& scene = impl->server.SceneManager ().GetScene (scene_id);
+
+      impl->server.ScreenManager ().GetViewport (id).SetScene (&scene);
+    }
+    else impl->server.ScreenManager ().GetViewport (id).SetScene (0);
   }
   catch (xtl::exception& e)
   {

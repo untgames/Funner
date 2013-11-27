@@ -1,5 +1,7 @@
 #include "shared.h"
 
+#include <shared/sg/collection_visitor.h>
+
 using namespace render;
 using namespace render::scene::server;
 
@@ -84,6 +86,43 @@ struct ViewportDrawListNode
   virtual void Cleanup () = 0;
 };
 
+/// Кэш результата обхода сцены 
+struct CameraTraverseResult: public ITraverseResultCache
+{
+  const bound_volumes::plane_listf& frustum;  //пирамида отсечения
+  Scene&                            scene;    //сцена
+  TraverseResult&                   result;   //результат обхода
+  bool                              computed; //результат рассчитан
+  
+///Конструктор
+  CameraTraverseResult (const bound_volumes::plane_listf& in_frustum, Scene& in_scene, TraverseResult& in_result)
+    : frustum (in_frustum)
+    , scene (in_scene)
+    , result (in_result)
+    , computed (false) { }
+  
+///Получение результата
+  TraverseResult& Result ()
+  {
+    try
+    {
+      if (computed)
+        return result;
+        
+      scene.Traverse (frustum, result, Collect_All);
+       
+      computed = true;
+      
+      return result;
+    }
+    catch (xtl::exception& e)
+    {
+      e.touch ("render::scene::server::CameraTraverseResult::Result");
+      throw;
+    }
+  }
+};
+
 }
 
 /*
@@ -106,9 +145,11 @@ struct ViewportDrawList::Impl: public ViewportDrawListHead
     Константы
 */
 
-const size_t LISTENER_ARRAY_RESERVE_SIZE = 4;  //резервируемое количество слушателей
-const size_t TECNIQUE_ARRAY_RESERVE_SIZE = 16; //резервируемое количество техник
-const size_t FRAME_ARRAY_RESERVE_SIZE    = 4;  //резервируемое количество кадров
+const size_t LISTENER_ARRAY_RESERVE_SIZE                = 4;    //резервируемое количество слушателей
+const size_t TECNIQUE_ARRAY_RESERVE_SIZE                = 16;   //резервируемое количество техник
+const size_t FRAME_ARRAY_RESERVE_SIZE                   = 4;    //резервируемое количество кадров
+const size_t TRAVERSE_RESULT_LIGHTS_RESERVE_SIZE        = 64;   //резервируемое количество источников света
+const size_t TRAVERSE_RESULT_VISUAL_MODELS_RESERVE_SIZE = 1024; //резервируемое количество визуализируемых моделей
 
 /*
     Описание реализации области вывода
@@ -149,33 +190,34 @@ typedef stl::vector<FramePtr>     FrameArray;
 
 struct Viewport::Impl: public xtl::reference_counter, public ViewportDrawListNode, public IRenderTargetMapListener, public IRenderManagerListener
 {
-  RenderManager            render_manager;             //менеджер рендеринга
-  RenderTargetMap          render_targets;             //цели рендеринга
-  manager::RenderTargetMap frame_render_targets;       //цели рендеринга фреймов
-  RenderTargetEntryMap     render_target_entries;      //дескрипторы целей рендеринга
-  stl::string              name;                       //имя области вывода
-  stl::string              technique_name;             //имя техники
-  TechniqueArray           sub_techniques;             //техники
-  Rect                     area;                       //область вывода
-  float                    min_depth;                  //минимальная глубина
-  float                    max_depth;                  //максимальная глубина
-  int                      zorder;                     //порядок вывода
-  bool                     is_active;                  //активна ли область отрисовки
-  FrameArray               frames;                     //присоединенные кадры
-  size_t                   current_frame_index;        //индекс текущего кадра
-  math::vec4f              background_color;           //цвет фона
-  bool                     background_state;           //состояние фона
-  common::PropertyMap      properties;                 //свойства области вывода
-  server::Camera           camera;                     //камера
-  size_t                   max_draw_depth;             //максимальная глубина вложенности рендеринга
-  ListenerArray            listeners;                  //слушатели событий области вывода
-  bool                     need_reconfiguration;       //конфигурация изменена
-  bool                     need_update_technique;      //обновление техники
-  bool                     need_update_area;           //обновилась область
-  bool                     need_update_render_targets; //требуется обновить буферы отрисовки
-  bool                     need_update_background;     //требуется обновить параметры очистки
-  bool                     need_update_camera;         //требуется обновить камеру
-  bool                     need_update_properties;     //требуется обновление свойств
+  RenderManager                render_manager;             //менеджер рендеринга
+  RenderTargetMap              render_targets;             //цели рендеринга
+  manager::RenderTargetMap     frame_render_targets;       //цели рендеринга фреймов
+  RenderTargetEntryMap         render_target_entries;      //дескрипторы целей рендеринга
+  stl::string                  name;                       //имя области вывода
+  stl::string                  technique_name;             //имя техники
+  TechniqueArray               sub_techniques;             //техники
+  Rect                         area;                       //область вывода
+  float                        min_depth;                  //минимальная глубина
+  float                        max_depth;                  //максимальная глубина
+  int                          zorder;                     //порядок вывода
+  bool                         is_active;                  //активна ли область отрисовки
+  FrameArray                   frames;                     //присоединенные кадры
+  size_t                       current_frame_index;        //индекс текущего кадра
+  math::vec4f                  background_color;           //цвет фона
+  bool                         background_state;           //состояние фона
+  common::PropertyMap          properties;                 //свойства области вывода
+  server::Camera               camera;                     //камера
+  stl::auto_ptr<server::Scene> scene;                      //текущая сцена
+  size_t                       max_draw_depth;             //максимальная глубина вложенности рендеринга
+  ListenerArray                listeners;                  //слушатели событий области вывода
+  bool                         need_reconfiguration;       //конфигурация изменена
+  bool                         need_update_technique;      //обновление техники
+  bool                         need_update_area;           //обновилась область
+  bool                         need_update_render_targets; //требуется обновить буферы отрисовки
+  bool                         need_update_background;     //требуется обновить параметры очистки
+  bool                         need_update_camera;         //требуется обновить камеру
+  bool                         need_update_properties;     //требуется обновление свойств
 
 /// Конструктор
   Impl (const RenderManager& in_render_manager, const RenderTargetMap& in_render_targets, const ViewportDrawList& viewports, size_t in_max_draw_depth)
@@ -758,6 +800,26 @@ const Camera* Viewport::Camera () const
 }
 
 /*
+    Сцена
+*/
+
+void Viewport::SetScene (render::scene::server::Scene* scene)
+{
+  if (scene) impl->scene.reset (new server::Scene (*scene));
+  else       impl->scene.reset ();
+}
+
+render::scene::server::Scene* Viewport::Scene ()
+{
+  return impl->scene.get ();
+}
+
+const render::scene::server::Scene* Viewport::Scene () const
+{
+  return impl->scene.get ();
+}
+
+/*
     Максимальный уровень вложенности рендеринга
 */
 
@@ -798,6 +860,11 @@ void Viewport::Update (manager::Frame* parent_frame)
     if (!impl->is_active)
       return;
 
+      //отрисовка только в случае наличия присоединенной сцены
+
+    if (!impl->scene)
+      return;
+
       //добавление области вывода в список отрисовки
 
     impl->AddToDrawingList ();
@@ -818,13 +885,18 @@ void Viewport::Update (manager::Frame* parent_frame)
 
       //подготовка кэша результатов обхода сцены
 
-    struct MyTraverseResultCacheTemp: public ITraverseResultCache {
-      TraverseResult& Result () { throw xtl::make_not_implemented_exception (__FUNCTION__); }
-    };
+    TraverseResult& traverse_result = impl->render_manager.TraverseResultStorage ();
 
-    MyTraverseResultCacheTemp traverse_result_cache;
+    traverse_result.Clear ();
 
-    RenderingContext context (frame_desc->frame, impl->render_manager, traverse_result_cache);
+    traverse_result.visual_models.reserve (TRAVERSE_RESULT_VISUAL_MODELS_RESERVE_SIZE);
+    traverse_result.lights.reserve (TRAVERSE_RESULT_LIGHTS_RESERVE_SIZE);
+
+    CameraTraverseResult camera_traverse_result (impl->camera.Frustum (), *impl->scene, traverse_result);
+
+      //создание контекста рендеринга
+
+    RenderingContext context (frame_desc->frame, impl->render_manager, camera_traverse_result);
 
       //обновление кадра
 

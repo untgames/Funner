@@ -39,6 +39,7 @@ typedef stl::vector<IRenderManagerListener*> ListenerArray;
 struct RenderManager::Impl: public ServerLog, public xtl::reference_counter
 {
   manager::RenderManager render_manager;                   //менеджер рендеринга
+  TraverseResult         traverse_result_storage;          //хранилище результатов обхода сцены
   xtl::auto_connection   configuration_changed_connection; //соединение с обработчиком изменения конфигурации
   ListenerArray          listeners;                        //слушатели событий
 
@@ -125,6 +126,15 @@ common::Log& RenderManager::Log ()
 render::manager::RenderManager& RenderManager::Manager ()
 {
   return impl->render_manager;
+}
+
+/*
+    Результат обхода сцены
+*/
+
+TraverseResult& RenderManager::TraverseResultStorage ()
+{
+  return impl->traverse_result_storage;
 }
 
 /*
