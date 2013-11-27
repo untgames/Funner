@@ -896,7 +896,7 @@ void Viewport::Update (manager::Frame* parent_frame)
 
       //создание контекста рендеринга
 
-    RenderingContext context (frame_desc->frame, impl->render_manager, camera_traverse_result);
+    RenderingContext context (frame_desc->frame, impl->render_manager, camera_traverse_result, impl->camera);
 
       //обновление кадра
 
