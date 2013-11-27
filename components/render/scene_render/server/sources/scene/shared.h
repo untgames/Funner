@@ -11,8 +11,35 @@
 #include <render/manager.h>
 
 #include <shared/camera.h>
+#include <shared/render_manager.h>
 #include <shared/scene_manager.h>
+#include <shared/technique.h>
 
 #include <shared/sg/collection_visitor.h>
+#include <shared/sg/static_mesh.h>
 #include <shared/sg/traverse_result.h>
 #include <shared/sg/visual_model.h>
+
+namespace render
+{
+
+namespace scene
+{
+
+namespace server
+{
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Фабрика узлов
+///////////////////////////////////////////////////////////////////////////////////////////////////
+class NodeFactory
+{
+  public:
+    static Node* CreateNode (RenderManager& render_manager, interchange::NodeType type);
+};
+
+}
+
+}
+
+}

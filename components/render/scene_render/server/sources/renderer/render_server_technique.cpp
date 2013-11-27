@@ -131,7 +131,7 @@ void Technique::BindProperties (common::PropertyBindingMap&)
     Отрисовка
 */
 
-void Technique::UpdateFrame (Context& context, TechniquePrivateData& private_data)
+void Technique::UpdateFrame (RenderingContext& context, TechniquePrivateData& private_data)
 {
   try
   {

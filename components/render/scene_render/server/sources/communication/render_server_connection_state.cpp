@@ -706,3 +706,16 @@ void ConnectionState::SetVisualModelScissor (object_id_t id, object_id_t scissor
     throw;
   }
 }
+
+void ConnectionState::SetStaticMeshName (object_id_t id, const char* name)
+{
+  try
+  {
+    impl->server.SceneManager ().GetNode (id).Cast<StaticMesh> ().SetMeshName (name);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::scene::ConnectionState::SetStaticMeshName");
+    throw;
+  }
+}

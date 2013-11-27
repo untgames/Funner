@@ -1,8 +1,8 @@
 /*
-    Context
+    RenderingContext
 */
 
-inline Context::Context (manager::Frame& in_frame)
+inline RenderingContext::RenderingContext (manager::Frame& in_frame)
   : frame (in_frame)
 {
 }

@@ -14,15 +14,17 @@ typedef stl::hash_map<object_id_t, NodePtr> NodeMap;
 
 struct SceneManager::Impl
 {
-  SceneMap    scenes;         //сцены
-  NodeMap     nodes;          //узлы
-  object_id_t cached_node_id; //закэшированный идентификатор узла (для последовательных обновлений одного узла)
-  Node*       cached_node;    //закэшированный узел (для последовательных обновлений одного узла)
+  RenderManager render_manager; //менеджер рендеринга
+  SceneMap      scenes;         //сцены
+  NodeMap       nodes;          //узлы
+  object_id_t   cached_node_id; //закэшированный идентификатор узла (для последовательных обновлений одного узла)
+  Node*         cached_node;    //закэшированный узел (для последовательных обновлений одного узла)
 
 /// Конструктор
-  Impl ()
-    : cached_node_id ()
-    , cached_node ()
+  Impl (const RenderManager& in_render_manager)
+    : render_manager (in_render_manager)
+    , cached_node_id ()
+    , cached_node ()   
   {
   }
 };
@@ -31,8 +33,8 @@ struct SceneManager::Impl
     Конструктор / деструктор
 */
 
-SceneManager::SceneManager  ()
-  : impl (new Impl)
+SceneManager::SceneManager (const RenderManager& render_manager)
+  : impl (new Impl (render_manager))
 {
 }
 
@@ -84,7 +86,7 @@ xtl::intrusive_ptr<Node> SceneManager::CreateNode (interchange::object_id_t id, 
   if (iter != impl->nodes.end ())
     throw xtl::format_operation_exception ("render::scene::server::SceneManager::CreateNode", "Node with id %llu has been already added", id);
 
-  NodePtr node (NodeFactory::CreateNode (type), false);
+  NodePtr node (NodeFactory::CreateNode (impl->render_manager, type), false);
 
   impl->nodes.insert_pair (id, node);
 

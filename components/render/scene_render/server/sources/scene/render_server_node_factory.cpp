@@ -5,13 +5,14 @@ using namespace render::scene;
 
 using interchange::NodeType;
 
-Node* NodeFactory::CreateNode (NodeType type)
+Node* NodeFactory::CreateNode (RenderManager& render_manager, NodeType type)
 {
   try
   {
     switch (type)
     {
-      case interchange::NodeType_Node: return new Node;
+      case interchange::NodeType_Node:       return new Node;  
+      case interchange::NodeType_StaticMesh: return new StaticMesh (render_manager);
       default:
         throw xtl::make_argument_exception ("", "type", type);
     }

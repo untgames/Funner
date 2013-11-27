@@ -818,7 +818,7 @@ void Viewport::Update (manager::Frame* parent_frame)
 
       //подготовка кэша результатов обхода сцены
 
-    Context context (frame_desc->frame);
+    RenderingContext context (frame_desc->frame);
 
       //обновление кадра
 
