@@ -39,6 +39,7 @@ inline stl::string get_command_name(CommandId command_id)
     case CommandId_SetEntityBounds: return "SetEntityBounds";
     case CommandId_SetVisualModelScissor: return "SetVisualModelScissor";
     case CommandId_SetStaticMeshName: return "SetStaticMeshName";
+    case CommandId_SetLightParams: return "SetLightParams";
     default: return common::format ("CommandId#%u", command_id);
   }
 }
@@ -711,6 +712,24 @@ inline void ClientToServerSerializer::SetStaticMeshName(object_id_t id, const ch
   }
 }
 
+inline void ClientToServerSerializer::SetLightParams(object_id_t id, const LightParams& params)
+{
+  size_t saved_position = Position ();
+
+  try
+  {
+    BeginCommand(CommandId_SetLightParams);
+    write(*this, id);
+    write(*this, params);
+    EndCommand();
+  }
+  catch (...)
+  {
+    SetPosition (saved_position);
+    throw;
+  }
+}
+
 template <class Dispatcher> inline bool ClientToServerDeserializer::Deserialize(CommandId id, Dispatcher& dispatcher)
 {
   switch (id)
@@ -1041,6 +1060,15 @@ template <class Dispatcher> inline bool ClientToServerDeserializer::Deserialize(
       const char* arg2 = read(*this, xtl::type<const char*> ());
 
       dispatcher.SetStaticMeshName(arg1, arg2);
+
+      return true;
+    }
+    case CommandId_SetLightParams:
+    {
+      object_id_t arg1 = read(*this, xtl::type<object_id_t> ());
+      const LightParams& arg2 = read(*this, xtl::type<const LightParams&> ());
+
+      dispatcher.SetLightParams(arg1, arg2);
 
       return true;
     }

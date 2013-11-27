@@ -10,8 +10,9 @@
 #include <common/property_map.h>
 #include <common/strlib.h>
 
-#include <sg/scissor.h>
+#include <sg/light.h>
 #include <sg/mesh.h>
+#include <sg/scissor.h>
 
 #include <shared/client.h>
 #include <shared/scene_manager.h>
@@ -40,7 +41,9 @@ class SceneFactory
 ///Создание различных типов объектов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 Node* create_node (scene_graph::StaticMesh&, SceneManager& scene_manager);
-//Node* create_node (scene_graph::StaticMesh&);
+Node* create_node (scene_graph::PointLight&, SceneManager& scene_manager);
+Node* create_node (scene_graph::DirectLight&, SceneManager& scene_manager);
+Node* create_node (scene_graph::SpotLight&, SceneManager& scene_manager);
 
 }
 

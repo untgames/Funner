@@ -1,6 +1,9 @@
 #ifndef RENDER_SCENE_INTERCHANGE_TYPES_HEADER
 #define RENDER_SCENE_INTERCHANGE_TYPES_HEADER
 
+#include <math/angle.h>
+#include <math/vector.h>
+
 namespace render
 {
 
@@ -47,8 +50,25 @@ enum NodeType
   NodeType_VisualModel, //отображаемая модель
   NodeType_SpriteModel, //спрайты
   NodeType_StaticMesh,  //статический меш
+  NodeType_PointLight,  //точечный источник света
+  NodeType_SpotLight,   //конусоидальный источник света
+  NodeType_DirectLight, //направленный источник света
 
   NodeType_Num
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Источник света
+///////////////////////////////////////////////////////////////////////////////////////////////////
+struct LightParams
+{
+  math::vec3f  color;       //цвет
+  float        intensity;   //интенсивность
+  math::vec3f  attenuation; //затенение
+  float        range;       //расстояние действия
+  float        exponent;    //экспонента рассеивания света (для spot-light)
+  math::anglef angle;       //угол действия (для spot-light)
+  float        radius;      //радиус действия (для direct-light)
 };
 
 }

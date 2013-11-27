@@ -47,6 +47,8 @@ void SetVisualModelScissor (object_id_t id, object_id_t scissor_id);
 
 void SetStaticMeshName (object_id_t id, const char* mesh_name);
 
+void SetLightParams (object_id_t id, const LightParams& params);
+
 #section ServerToClient
 
 void UpdatePropertyMap (...);
