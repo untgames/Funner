@@ -539,6 +539,20 @@ const Frame::EntityDrawFunction& FrameImpl::EntityDrawHandler ()
 }
 
 /*
+    Установка начальных свойств пары frame-entity
+*/
+
+void FrameImpl::SetInitialEntityDrawProperties (const common::PropertyMap& properties)
+{
+  impl->entity_draw_params.properties = properties;
+}
+
+const common::PropertyMap& FrameImpl::InitialEntityDrawProperties ()
+{
+  return impl->entity_draw_params.properties;
+}
+
+/*
     Подготовка к отрисовке кадра
 */
 
