@@ -45,6 +45,16 @@ const common::PropertyMap& Entity::ShaderOptions () const
   return impl->ShaderOptions ();
 }
 
+void Entity::SetUserData (void* data)
+{
+  impl->SetUserData (data);
+}
+
+void* Entity::UserData () const
+{
+  return impl->UserData ();
+}
+
 void Entity::SetJointsCount (size_t count)
 {
   impl->SetJointsCount (count);

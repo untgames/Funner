@@ -490,12 +490,14 @@ struct EntityImpl::Impl: public EntityLodCommonData
   bool                need_resort;       //уровни детализации требуют пересортировки
   PrimitiveManagerPtr primitive_manager; //менеджер примитивов
   math::vec3f         lod_point;         //точка расчЄта lod-уровн€
+  void*               user_data;         //пользовательские данные
 
 /// онструктор
   Impl (EntityImpl& owner, const DeviceManagerPtr& device_manager, const TextureManagerPtr& texture_manager, const PrimitiveManagerPtr& in_primitive_manager)
     : EntityLodCommonData (owner, texture_manager, device_manager)
     , need_resort (false)
     , primitive_manager (in_primitive_manager)
+    , user_data ()
   {
     lods.reserve (LODS_RESERVE);
   }
@@ -602,9 +604,23 @@ void EntityImpl::SetShaderOptions (const common::PropertyMap& properties)
   }
 }
 
-const common::PropertyMap& EntityImpl::ShaderOptions () const
+const common::PropertyMap& EntityImpl::ShaderOptions ()
 {
   return impl->ShaderOptionsCache ().Properties ();
+}
+
+/*
+    ѕользовательские данные
+*/
+
+void EntityImpl::SetUserData (void* data)
+{
+  impl->user_data = data;
+}
+
+void* EntityImpl::UserData ()
+{
+  return impl->user_data;
 }
 
 /*
