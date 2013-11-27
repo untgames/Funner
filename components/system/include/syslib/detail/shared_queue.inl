@@ -91,7 +91,7 @@ template <class T, class Allocator> struct SharedQueue<T, Allocator>::Impl
         if (delay >= timeout)
           return false;  //timeout
 
-        semaphore.Wait (timeout - delay);
+        semaphore.TryWait (timeout - delay);
       }
       catch (...)
       {
