@@ -283,6 +283,8 @@ struct RenderableView::Impl: public scene_graph::IViewportListener
 
       if (need_update_camera)
       {
+        camera = viewport.Camera ();
+
         if (camera)
         {
             //подписка на изменение сцены в камере

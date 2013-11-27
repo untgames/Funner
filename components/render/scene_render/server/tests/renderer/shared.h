@@ -18,6 +18,7 @@
 #include <syslib/window.h>
 
 #include <sg/camera.h>
+#include <sg/mesh.h>
 #include <sg/scene.h>
 
 #include <render/scene_render_client.h>

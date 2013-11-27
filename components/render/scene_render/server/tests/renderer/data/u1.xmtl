@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<material_library>
+  <layouts/>
+  <texmaps/>
+  <materials>
+    <material id="u1.ph_U_1_glass" name="ph_U_1_glass" program="phong" tags="translucent">
+      <property name="Reflectivity" type="float" value="1"/>
+      <property name="Transparency" type="float" value="1"/>
+      <property name="Shininess" type="float" value="50"/>
+      <property name="DiffuseColor" type="vector">
+        0 0 0 1
+      </property>
+      <property name="AmbientColor" type="vector">
+        0 0 0 1
+      </property>
+      <property name="SpecularColor" type="vector">
+        1 1 1 1
+      </property>
+      <property name="EmissionColor" type="vector">
+        0 0 0 1
+      </property>
+    </material>
+    <material id="u1.ph_U_1" name="ph_U_1" program="phong" tags="solid">
+      <property name="Reflectivity" type="float" value="0.4"/>
+      <property name="Transparency" type="float" value="1"/>
+      <property name="Shininess" type="float" value="20"/>
+      <property name="DiffuseColor" type="vector">
+        0 0 0 0
+      </property>
+      <property name="AmbientColor" type="vector">
+        0 0 0 1
+      </property>
+      <property name="SpecularColor" type="vector">
+        0 0 0 0
+      </property>
+      <property name="EmissionColor" type="vector">
+        0 0 0 1
+      </property>
+      <property name="BumpAmount" type="float" value="1"/>
+      <texmap semantic="diffuse" image="data/u1/texture0000.dds" sampler="default"/>
+      <texmap semantic="specular" image="data/u1/texture0001.dds" sampler="default"/>
+      <texmap semantic="bump" image="data/u1/texture0002.dds" sampler="default"/>
+    </material>
+  </materials>
+</material_library>

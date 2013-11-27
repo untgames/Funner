@@ -297,8 +297,5 @@ effect "lighting"
 
 technique 'default'
 {
-//  for_each_light
-//  {
-//    effect 'lighting'
-//  }
+  draw_without_lights
 }

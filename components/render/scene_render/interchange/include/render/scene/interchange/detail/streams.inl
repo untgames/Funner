@@ -227,7 +227,7 @@ template <class T> inline const T& InputStream::Read ()
 
 inline void InputStream::Skip (size_t size)
 {
-  if (size >= Available ())
+  if (size < Available ())
   {
     pos += size;
   }
