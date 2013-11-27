@@ -23,7 +23,6 @@ class DrawWithoutLights: public Technique
     DrawWithoutLights (RenderManager& in_manager, const common::ParseNode& node)
       : manager (in_manager)
       , frame (manager.Manager ().CreateFrame ())
-      , entity_draw_handler (xtl::bind (&DrawWithoutLights::EntityDrawHandler, this, _1, _2, _3, _4))
     {
         //задание начальных свойств для пар frame-entity
 
@@ -36,6 +35,7 @@ class DrawWithoutLights: public Technique
       mvp_matrix_property_index  = properties.IndexOf ("ModelViewProjectionMatrix");      
 
       frame.SetInitialEntityDrawProperties (properties);
+      frame.SetEntityDrawHandler (xtl::bind (&DrawWithoutLights::EntityDrawHandler, this, _1, _2, _3, _4));
 
         //задание начальных свойств кадра
 
@@ -44,6 +44,9 @@ class DrawWithoutLights: public Technique
       frame.SetProperties (frame_properties);
 
       view_matrix_property_index = frame_properties.IndexOf ("ViewMatrix");
+
+//for test!!!!!!!!!!!!
+      frame.SetEffect ("main");
     }    
 
 /// Имена для регистрации
@@ -100,6 +103,10 @@ class DrawWithoutLights: public Technique
         RenderingContext context (parent_context, frame);
 
         Technique::Draw (context, result.visual_models);
+
+          //добавление дочернего кадра
+
+        parent_context.Frame ().AddFrame (frame);
       }
       catch (xtl::exception& e)
       {
@@ -114,10 +121,10 @@ class DrawWithoutLights: public Technique
       common::PropertyMap& properties    = out_params.properties;
       PrivateData&         private_data  = *reinterpret_cast<PrivateData*> (user_data);
       VisualModel&         model         = *reinterpret_cast<VisualModel*> (entity.UserData ());
-
+printf ("%s(%u)\n", __FUNCTION__, __LINE__); fflush (stdout);
       if (!&private_data || !&model)
         return;
-
+printf ("%s(%u)\n", __FUNCTION__, __LINE__); fflush (stdout);
       const math::mat4f& object_tm = model.WorldMatrix ();
       
       out_params.mvp_matrix = private_data.view_proj_tm * object_tm;
@@ -133,13 +140,12 @@ class DrawWithoutLights: public Technique
     void BindProperties (common::PropertyBindingMap&) {}
 
   private:
-    RenderManager                      manager;                    //менеджер рендеринга
-    manager::Frame                     frame;                      //фрейм техники
-    manager::Frame::EntityDrawFunction entity_draw_handler;        //обработчик отрисовки объектов
-    common::PropertyMap                frame_properties;           //свойства кадра
-    size_t                             mv_matrix_property_index;   //индекс свойства матрицы ModelView
-    size_t                             mvp_matrix_property_index;  //индекс свойства матрицы ModelViewProjection
-    size_t                             view_matrix_property_index; //индекс свойства матрицы View (в свойствах кадра)
+    RenderManager       manager;                    //менеджер рендеринга
+    manager::Frame      frame;                      //фрейм техники
+    common::PropertyMap frame_properties;           //свойства кадра
+    size_t              mv_matrix_property_index;   //индекс свойства матрицы ModelView
+    size_t              mvp_matrix_property_index;  //индекс свойства матрицы ModelViewProjection
+    size_t              view_matrix_property_index; //индекс свойства матрицы View (в свойствах кадра)
 };
 
 }
@@ -151,6 +157,6 @@ class DrawWithoutLights: public Technique
 extern "C"
 {
 
-TechniqueComponentRegistrator<DrawWithoutLights> DrawWithoutLights;
+TechniqueComponentRegistrator<render::scene::server::DrawWithoutLights> DrawWithoutLights;
 
 }

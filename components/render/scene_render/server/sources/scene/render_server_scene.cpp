@@ -81,7 +81,7 @@ void Scene::AttachNode (const EntityPtr& node)
       throw xtl::make_argument_exception ("", "node", node->Name (), "This node has been already added to scene");
 
     EntityList::iterator list_iter = impl->entity_list.insert (impl->entity_list.end (), node);
-    
+
     try
     {
       impl->entity_map.insert_pair (&*node, list_iter);
@@ -123,14 +123,15 @@ void Scene::Traverse (const bound_volumes::plane_listf& frustum, ISceneVisitor& 
 
     if (entity.IsInfiniteBounds ())
     {
-      visitor.Visit (entity);
+      entity.Visit (visitor);
       continue;
     }
+
 
       //если объект имеет конечные ограничивающие объёмы - проверяем его попадание в заданный объём
 
     if (intersects (frustum, entity.BoundBox ()))
-      visitor.Visit (entity);
+      entity.Visit (visitor);
   }
 }
 

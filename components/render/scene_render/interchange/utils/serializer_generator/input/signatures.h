@@ -33,7 +33,7 @@ void RemovePropertyLayout (object_id_t id);
 void CreateScene (object_id_t id);
 void DestroyScene (object_id_t id);
 void SetSceneName (object_id_t id, const char* name);
-void SetSceneNodes (object_id_t id, const RawArray<object_id_t>& nodes);
+void SetSceneNodes (object_id_t id, RawArray<object_id_t> nodes);
 
 void CreateNode (object_id_t id, NodeType type);
 void DestroyNode (object_id_t id);

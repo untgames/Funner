@@ -103,6 +103,6 @@ void VisualModel::Draw (RenderingContext& context, void* user_data)
 void VisualModel::DrawCore (RenderingContext& context, void* user_data)
 {
   //TODO: set scissor
-printf ("%s(%u)\n", __FUNCTION__, __LINE__); fflush (stdout);
+
   context.Frame ().AddEntity (impl->entity, user_data);
 }

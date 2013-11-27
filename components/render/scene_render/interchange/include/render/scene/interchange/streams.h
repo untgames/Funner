@@ -202,7 +202,7 @@ template <class T>                    const math::angle<T>&        read (InputSt
 
 template <class T> const bound_volumes::axis_aligned_box<T>& read (InputStream&, xtl::type<bound_volumes::axis_aligned_box<T> >);
 
-template <class T> const RawArray<T>& read (InputStream&, xtl::type<RawArray<T> >);
+template <class T> RawArray<T> read (InputStream&, xtl::type<RawArray<T> >);
 
 #include <render/scene/interchange/detail/streams.inl>
 

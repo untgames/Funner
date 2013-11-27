@@ -385,11 +385,11 @@ inline void write (OutputStream& s, const RawArray<T>& value)
 }
 
 template <class T>
-inline const RawArray<T>& read (InputStream& s, xtl::type<RawArray<T> >)
+inline RawArray<T> read (InputStream& s, xtl::type<RawArray<T> >)
 {
   const uint32& count = read (s, xtl::type<uint32> ());
 
   s.Skip (count * sizeof (T));
 
-  return *reinterpret_cast<const RawArray<T>*> (&count);
+  return RawArray<T> (reinterpret_cast<T*> (reinterpret_cast<unsigned char*> (&const_cast<uint32&> (count)) + sizeof (uint32)), count);
 }

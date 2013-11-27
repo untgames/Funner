@@ -550,7 +550,7 @@ inline void ClientToServerSerializer::SetSceneName(object_id_t id, const char* n
   }
 }
 
-inline void ClientToServerSerializer::SetSceneNodes(object_id_t id, const RawArray<object_id_t>& nodes)
+inline void ClientToServerSerializer::SetSceneNodes(object_id_t id, RawArray<object_id_t> nodes)
 {
   size_t saved_position = Position ();
 
@@ -985,7 +985,7 @@ template <class Dispatcher> inline bool ClientToServerDeserializer::Deserialize(
     case CommandId_SetSceneNodes:
     {
       object_id_t arg1 = read(*this, xtl::type<object_id_t> ());
-      const RawArray<object_id_t>& arg2 = read(*this, xtl::type<const RawArray<object_id_t>&> ());
+      RawArray<object_id_t> arg2 = read(*this, xtl::type<RawArray<object_id_t>> ());
 
       dispatcher.SetSceneNodes(arg1, arg2);
 

@@ -78,6 +78,7 @@ struct Screen::Impl: public xtl::reference_counter
   ViewportManager  viewport_manager;  //менеджер областей вывода
   ViewportDescList viewports;         //области вывода
   ViewportDrawList drawing_viewports; //отрисовываемые области вывода
+  manager::Window* window;            //св€занное окно
 
 ///  онструктор
   Impl (const char* in_name, const char* init_string, WindowManager& window_manager, const RenderManager& in_render_manager, const ViewportManager& in_viewport_manager)
@@ -90,6 +91,7 @@ struct Screen::Impl: public xtl::reference_counter
     , need_reorder (false)
     , viewport_manager (in_viewport_manager)
     , drawing_viewports (viewport_manager.DrawingViewports ())
+    , window ()
   {
     viewports.reserve (RESERVED_VIEWPORTS_COUNT);
 
@@ -110,6 +112,8 @@ struct Screen::Impl: public xtl::reference_counter
   {
     try
     {
+      this->window = 0;
+
         //поиск окна
 
       manager::Window& window = window_manager.GetWindow (name.c_str ());
@@ -123,6 +127,8 @@ struct Screen::Impl: public xtl::reference_counter
 
       render_targets.Add (color_binding, window.ColorBuffer (), area);
       render_targets.Add (depth_stencil_binding, window.DepthStencilBuffer (), area);
+
+      this->window = &window;
     }
     catch (xtl::exception& e)
     {
@@ -347,6 +353,11 @@ void Screen::Update (manager::Frame* parent_frame)
 
     if (!parent_frame)
       impl->drawing_viewports.CleanupViewports ();
+
+     //вывод на экран
+
+    if (impl->window)
+      impl->window->SwapBuffers ();
   }
   catch (xtl::exception& e)
   {

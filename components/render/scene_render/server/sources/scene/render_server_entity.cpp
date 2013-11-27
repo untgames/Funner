@@ -47,7 +47,7 @@ void Entity::SetSceneOwner (Scene* scene)
 
     impl->scene = 0;
 
-    impl->scene->AttachNode (this);
+    scene->AttachNode (this);
 
     impl->scene = scene;
   }

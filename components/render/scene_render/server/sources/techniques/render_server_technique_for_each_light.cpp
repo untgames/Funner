@@ -172,6 +172,6 @@ class ForEachLightTechnique: public Technique
 extern "C"
 {
 
-TechniqueComponentRegistrator<ForEachLightTechnique> ForEachLightTechnique;
+TechniqueComponentRegistrator<render::scene::server::ForEachLightTechnique> ForEachLightTechnique;
 
 }
