@@ -31,6 +31,7 @@
 #include <shared/viewport_manager.h>
 #include <shared/window_manager.h>
 
+#include <shared/sg/light.h>
 #include <shared/sg/static_mesh.h>
 
 namespace render

@@ -719,3 +719,16 @@ void ConnectionState::SetStaticMeshName (object_id_t id, const char* name)
     throw;
   }
 }
+
+void ConnectionState::SetLightParams (object_id_t id, const interchange::LightParams& params)
+{
+  try
+  {
+    impl->server.SceneManager ().GetNode (id).Cast<Light> ().SetParams (params);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::scene::ConnectionState::SetLightParams");
+    throw;
+  }
+}

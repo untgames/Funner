@@ -86,7 +86,7 @@ xtl::intrusive_ptr<Node> SceneManager::CreateNode (interchange::object_id_t id, 
   if (iter != impl->nodes.end ())
     throw xtl::format_operation_exception ("render::scene::server::SceneManager::CreateNode", "Node with id %llu has been already added", id);
 
-  NodePtr node (NodeFactory::CreateNode (impl->render_manager, type), false);
+  NodePtr node (NodeFactory::CreateNode (impl->render_manager, type), false);  
 
   impl->nodes.insert_pair (id, node);
 
