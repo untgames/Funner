@@ -15,7 +15,7 @@
 #include <shared/client.h>
 #include <shared/scene_manager.h>
 
-#include "visual_model.h"
+#include "static_mesh.h"
 
 namespace render
 {

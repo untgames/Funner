@@ -20,6 +20,7 @@ struct VisualModel::Impl
 
 VisualModel::VisualModel (scene_graph::VisualModel& entity, SceneManager& manager, interchange::NodeType node_type)
   : Entity (entity, manager, node_type)
+  , impl (new Impl)
 {
 }
 

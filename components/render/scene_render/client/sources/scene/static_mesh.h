@@ -1,9 +1,9 @@
-#ifndef RENDER_SCENE_CLIENT_IMPL_SCENE_VISUAL_MODEL_SHARED_HEADER
-#define RENDER_SCENE_CLIENT_IMPL_SCENE_VISUAL_MODEL_SHARED_HEADER
+#ifndef RENDER_SCENE_CLIENT_IMPL_SCENE_STATIC_MESH_SHARED_HEADER
+#define RENDER_SCENE_CLIENT_IMPL_SCENE_STATIC_MESH_SHARED_HEADER
 
-#include <sg/visual_model.h>
+#include <sg/mesh.h>
 
-#include "entity.h"
+#include "visual_model.h"
 
 namespace render
 {
@@ -15,21 +15,21 @@ namespace client
 {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Отображаемая модель
+///Статический меш
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-class VisualModel: public Entity
+class StaticMesh: public VisualModel
 {
   public:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструктор / деструктор
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    VisualModel  (scene_graph::VisualModel&, SceneManager&, interchange::NodeType node_type = interchange::NodeType_VisualModel);
-    ~VisualModel ();
+    StaticMesh  (scene_graph::StaticMesh&, SceneManager&, interchange::NodeType node_type = interchange::NodeType_StaticMesh);
+    ~StaticMesh ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Исходный узел
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    scene_graph::VisualModel& SourceNode () const { return static_cast<scene_graph::VisualModel&> (Node::SourceNode ()); }
+    scene_graph::StaticMesh& SourceNode () const { return static_cast<scene_graph::StaticMesh&> (Node::SourceNode ()); }
 
   protected:
 ///////////////////////////////////////////////////////////////////////////////////////////////////

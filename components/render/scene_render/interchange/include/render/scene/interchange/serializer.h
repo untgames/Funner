@@ -55,6 +55,7 @@ enum CommandId
   CommandId_SetNodeScene,
   CommandId_SetEntityBounds,
   CommandId_SetVisualModelScissor,
+  CommandId_SetStaticMeshName,
   CommandId_FirstUserDefined = 10000,
 };
 
@@ -106,6 +107,7 @@ class ClientToServerSerializer: public OutputStream
     void SetNodeScene(object_id_t id, object_id_t scene_id);
     void SetEntityBounds(object_id_t id, bool is_infinite, const bound_volumes::aaboxf& box);
     void SetVisualModelScissor(object_id_t id, object_id_t scissor_id);
+    void SetStaticMeshName(object_id_t id, const char* mesh_name);
 
   protected:
     using OutputStream::Swap;

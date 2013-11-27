@@ -38,6 +38,7 @@ inline stl::string get_command_name(CommandId command_id)
     case CommandId_SetNodeScene: return "SetNodeScene";
     case CommandId_SetEntityBounds: return "SetEntityBounds";
     case CommandId_SetVisualModelScissor: return "SetVisualModelScissor";
+    case CommandId_SetStaticMeshName: return "SetStaticMeshName";
     default: return common::format ("CommandId#%u", command_id);
   }
 }
@@ -692,6 +693,24 @@ inline void ClientToServerSerializer::SetVisualModelScissor(object_id_t id, obje
   }
 }
 
+inline void ClientToServerSerializer::SetStaticMeshName(object_id_t id, const char* mesh_name)
+{
+  size_t saved_position = Position ();
+
+  try
+  {
+    BeginCommand(CommandId_SetStaticMeshName);
+    write(*this, id);
+    write(*this, mesh_name);
+    EndCommand();
+  }
+  catch (...)
+  {
+    SetPosition (saved_position);
+    throw;
+  }
+}
+
 template <class Dispatcher> inline bool ClientToServerDeserializer::Deserialize(CommandId id, Dispatcher& dispatcher)
 {
   switch (id)
@@ -1013,6 +1032,15 @@ template <class Dispatcher> inline bool ClientToServerDeserializer::Deserialize(
       object_id_t arg2 = read(*this, xtl::type<object_id_t> ());
 
       dispatcher.SetVisualModelScissor(arg1, arg2);
+
+      return true;
+    }
+    case CommandId_SetStaticMeshName:
+    {
+      object_id_t arg1 = read(*this, xtl::type<object_id_t> ());
+      const char* arg2 = read(*this, xtl::type<const char*> ());
+
+      dispatcher.SetStaticMeshName(arg1, arg2);
 
       return true;
     }

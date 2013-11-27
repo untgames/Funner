@@ -45,6 +45,8 @@ void SetEntityBounds (object_id_t id, bool is_infinite, const bound_volumes::aab
 
 void SetVisualModelScissor (object_id_t id, object_id_t scissor_id);
 
+void SetStaticMeshName (object_id_t id, const char* mesh_name);
+
 #section ServerToClient
 
 void UpdatePropertyMap (...);

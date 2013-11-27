@@ -46,6 +46,7 @@ enum NodeType
   NodeType_Scissor,     //область отсечения
   NodeType_VisualModel, //отображаемая модель
   NodeType_SpriteModel, //спрайты
+  NodeType_StaticMesh,  //статический меш
 
   NodeType_Num
 };
