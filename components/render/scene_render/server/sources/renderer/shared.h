@@ -27,6 +27,8 @@
 
 #include <render/manager.h>
 
+#include <shared/sg/visual_model.h>
+
 namespace render
 {
 

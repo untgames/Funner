@@ -200,6 +200,39 @@ void Technique::UpdateFrame (RenderingContext& context, TechniquePrivateData& pr
 }
 
 /*
+    Отрисовка массива отображаемых моделей
+*/
+
+void Technique::Draw (RenderingContext& context, size_t visual_models_count, VisualModel* const* model_ptr) const
+{
+  for (;visual_models_count--; model_ptr++)
+  {
+    VisualModel& model = **model_ptr;
+
+    try
+    {
+      model.Draw (context);
+    }
+    catch (std::exception& e)
+    {
+      context.RenderManager ().Log ().Printf ("%s\n    at render::scene::server::Technique::Draw(technique='%s')", e.what (), Name ());
+    }
+    catch (...)
+    {
+      context.RenderManager ().Log ().Printf ("unknown exception\n    at render::scene::server::Technique::Draw(technique='%s')", Name ());
+    }
+  }
+}
+
+void Technique::Draw (RenderingContext& context, const stl::vector<VisualModel*>& models) const
+{
+  if (models.empty ())
+    return;
+
+  Draw (context, models.size (), &models [0]);
+}
+
+/*
     TechniquePrivateData
 */
 

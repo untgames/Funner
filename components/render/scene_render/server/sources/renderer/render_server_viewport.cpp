@@ -818,7 +818,13 @@ void Viewport::Update (manager::Frame* parent_frame)
 
       //подготовка кэша результатов обхода сцены
 
-    RenderingContext context (frame_desc->frame);
+    struct MyTraverseResultCacheTemp: public ITraverseResultCache {
+      TraverseResult& Result () { throw xtl::make_not_implemented_exception (__FUNCTION__); }
+    };
+
+    MyTraverseResultCacheTemp traverse_result_cache;
+
+    RenderingContext context (frame_desc->frame, impl->render_manager, traverse_result_cache);
 
       //обновление кадра
 

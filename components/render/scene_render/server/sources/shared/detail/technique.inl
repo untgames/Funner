@@ -2,9 +2,35 @@
     RenderingContext
 */
 
-inline RenderingContext::RenderingContext (manager::Frame& in_frame)
+inline RenderingContext::RenderingContext (manager::Frame& in_frame, server::RenderManager& in_render_manager, ITraverseResultCache& in_traverse_result_cache)
   : frame (in_frame)
+  , render_manager (in_render_manager)
+  , traverse_result ()
+  , traverse_result_cache (in_traverse_result_cache)
 {
+}
+
+inline server::RenderManager& RenderingContext::RenderManager ()
+{
+  return render_manager;
+}
+
+inline server::TraverseResult& RenderingContext::TraverseResult ()
+{
+  if (traverse_result)
+    return *traverse_result;
+
+  try
+  {
+    traverse_result = &traverse_result_cache.Result ();
+
+    return *traverse_result;
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::scene::server::RenderingContext::TraverseResult");
+    throw;
+  }
 }
 
 /*
@@ -29,7 +55,7 @@ struct TechniquePrivateData::TypeInfoImpl: public ITypeInfo
 
   void clone (const void* src, void* dst)
   {
-    new (dst) T (*reinterpret_cast<T*> (src));
+    new (dst) T (*reinterpret_cast<const T*> (src));
   }
 
   static TypeInfoImpl instance;
@@ -80,7 +106,7 @@ template <class T> inline T& TechniquePrivateData::Get ()
   if (type_info == this_type_info)
     return *reinterpret_cast<T*> (buffer);
 
-  if (sizeof (T) > sizeof (data))
+  if (sizeof (T) > sizeof (buffer))
     RaiseSizeError (typeid (T), sizeof (T));
 
   if (type_info)
