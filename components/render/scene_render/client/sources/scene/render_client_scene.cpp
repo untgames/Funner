@@ -14,9 +14,10 @@ typedef stl::vector<object_id_t> ObjectIdArray;
 struct NodeCollector
 {
   SceneManager*  scene_manager;
+  Scene*         scene;
   ObjectIdArray* ids;
 
-  NodeCollector (SceneManager& in_scene_manager, ObjectIdArray& in_ids) : scene_manager (&in_scene_manager), ids (&in_ids) {}
+  NodeCollector (SceneManager& in_scene_manager, Scene& in_scene, ObjectIdArray& in_ids) : scene_manager (&in_scene_manager), scene (&in_scene), ids (&in_ids) {}
 
   void operator () (scene_graph::Entity& entity)
   {
@@ -28,6 +29,8 @@ struct NodeCollector
         return;
 
       ids->push_back (node->Id ());
+
+      node->SetSceneOwner (scene, false);
     }
     catch (xtl::exception& e)
     {
@@ -52,7 +55,7 @@ struct NodeSceneReseter
       if (!node)
         return;
 
-      node->ResetSceneOwner ();
+      node->SetSceneOwner (0, true);
     }
     catch (xtl::exception& e)
     {
@@ -72,7 +75,7 @@ struct Scene::Impl
   xtl::auto_connection on_node_bind_connection; //оповещение о появлении нового узла в сцене
 
 /// Конструктор
-  Impl (scene_graph::Scene& in_scene, SceneManager& in_scene_manager, object_id_t in_id)
+  Impl (Scene& owner, scene_graph::Scene& in_scene, SceneManager& in_scene_manager, object_id_t in_id)
     : id (in_id)
     , scene (in_scene)
     , scene_manager (in_scene_manager)
@@ -86,9 +89,18 @@ struct Scene::Impl
 
     ids.reserve (scene.EntitiesCount ());
 
-    scene.Traverse (NodeCollector (scene_manager, ids));
+    try
+    {
+      scene.Traverse (NodeCollector (scene_manager, owner, ids));
 
-    scene_manager.Context ().SetSceneNodes (id, render::scene::interchange::RawArray<object_id_t> (&ids [0], ids.size ()));
+      scene_manager.Context ().SetSceneNodes (id, render::scene::interchange::RawArray<object_id_t> (&ids [0], ids.size ()));
+    }
+    catch (...)
+    {
+      scene.Traverse (NodeSceneReseter (scene_manager));
+
+      throw;
+    }
   }
 
 /// Деструктор
@@ -128,7 +140,7 @@ Scene::Scene (scene_graph::Scene& scene, SceneManager& scene_manager, object_id_
 {
   try
   {
-    impl.reset (new Impl (scene, scene_manager, id));
+    impl.reset (new Impl (*this, scene, scene_manager, id));
   }
   catch (xtl::exception& e)
   {

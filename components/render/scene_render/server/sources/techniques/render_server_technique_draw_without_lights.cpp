@@ -40,13 +40,15 @@ class DrawWithoutLights: public Technique
         //задание начальных свойств кадра
 
       frame_properties.SetProperty ("ViewMatrix", math::mat4f (1.0f));
+      frame_properties.SetProperty ("ProjectionMatrix", math::mat4f (1.0f));
 
       frame.SetProperties (frame_properties);
 
       view_matrix_property_index = frame_properties.IndexOf ("ViewMatrix");
+      proj_matrix_property_index = frame_properties.IndexOf ("ProjectionMatrix");
 
 //for test!!!!!!!!!!!!
-      frame.SetEffect ("main");
+      frame.SetEffect ("lighting");
     }    
 
 /// Имена для регистрации
@@ -57,12 +59,14 @@ class DrawWithoutLights: public Technique
     struct PrivateData
     {
       size_t      view_transaction_id;
+      size_t      proj_transaction_id;
       size_t      view_proj_transaction_id;
       math::mat4f view_tm;
       math::mat4f view_proj_tm;
 
       PrivateData ()
         : view_transaction_id ()
+        , proj_transaction_id ()
         , view_proj_transaction_id ()
         , view_tm (1.0f)
         , view_proj_tm (1.0f)
@@ -94,6 +98,13 @@ class DrawWithoutLights: public Technique
           frame_properties.SetProperty (view_matrix_property_index, parent_context.Camera ().ViewMatrix ());
         }
 
+        if (private_data.proj_transaction_id != parent_context.Camera ().ProjectionMatrixTransactionId ())
+        {
+          private_data.proj_transaction_id = parent_context.Camera ().ProjectionMatrixTransactionId ();
+
+          frame_properties.SetProperty (proj_matrix_property_index, parent_context.Camera ().ProjectionMatrix ());
+        }
+
           //построение списка моделей на отрисовку
 
         TraverseResult& result = parent_context.TraverseResult ();
@@ -102,7 +113,7 @@ class DrawWithoutLights: public Technique
 
         RenderingContext context (parent_context, frame);
 
-        Technique::Draw (context, result.visual_models);
+        Technique::Draw (context, result.visual_models, &private_data);
 
           //добавление дочернего кадра
 
@@ -121,10 +132,10 @@ class DrawWithoutLights: public Technique
       common::PropertyMap& properties    = out_params.properties;
       PrivateData&         private_data  = *reinterpret_cast<PrivateData*> (user_data);
       VisualModel&         model         = *reinterpret_cast<VisualModel*> (entity.UserData ());
-printf ("%s(%u)\n", __FUNCTION__, __LINE__); fflush (stdout);
+
       if (!&private_data || !&model)
         return;
-printf ("%s(%u)\n", __FUNCTION__, __LINE__); fflush (stdout);
+
       const math::mat4f& object_tm = model.WorldMatrix ();
       
       out_params.mvp_matrix = private_data.view_proj_tm * object_tm;
@@ -146,6 +157,7 @@ printf ("%s(%u)\n", __FUNCTION__, __LINE__); fflush (stdout);
     size_t              mv_matrix_property_index;   //индекс свойства матрицы ModelView
     size_t              mvp_matrix_property_index;  //индекс свойства матрицы ModelViewProjection
     size_t              view_matrix_property_index; //индекс свойства матрицы View (в свойствах кадра)
+    size_t              proj_matrix_property_index; //индекс свойства матрицы Projection (в свойства кадра)
 };
 
 }

@@ -27,6 +27,8 @@ VisualModel::VisualModel (RenderManager& render_manager)
   {
     manager::Entity entity = render_manager.Manager ().CreateEntity ();
 
+    entity.SetUserData (this);
+
     impl.reset (new Impl (entity));
   }
   catch (xtl::exception& e)

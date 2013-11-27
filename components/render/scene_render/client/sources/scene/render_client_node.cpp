@@ -55,13 +55,13 @@ struct Node::Impl
   }
 
 /// Изменение сцены
-  void SetScene (Scene* new_scene)
+  void SetScene (Scene* new_scene, bool need_notify = true)
   {
     if (new_scene == scene)
       return;
 
     scene             = new_scene;
-    need_update_scene = true;
+    need_update_scene = need_notify;
 
     owner.UpdateNotify ();
   }
@@ -209,7 +209,7 @@ Scene* Node::SceneOwner () const
   return impl->scene;
 }
 
-void Node::ResetSceneOwner ()
+void Node::SetSceneOwner (Scene* scene, bool need_notify)
 {
-  impl->SetScene (0);
+  impl->SetScene (scene, need_notify);
 }

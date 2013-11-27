@@ -150,6 +150,14 @@ program "phong"
   framemap "shadow"   "ShadowTexture"
 }
 
+//program instance for flat program, specified by (material, entity, frame)
+program "flat"
+{
+  shader "flat" "glsl.vs" "glsl.ps" //reference to shader source
+
+  texmap "diffuse"  "DiffuseTexture"
+}
+
 //shading instance for rendering shadow maps
 program "shadow_map"
 {
@@ -272,6 +280,7 @@ effect "lighting"
   pass
   {
     tags                  "solid"                       //render only non-transparent geometry
+    clear                 all
     sort                  states                        //sort geometry for decrease state switches
     color_targets         "main_color_target"           //render to effect color buffer
     depth_stencil_target  "main_depth_stencil_target"   //render to effect depth stencil buffer

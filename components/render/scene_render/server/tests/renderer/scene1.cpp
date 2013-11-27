@@ -85,7 +85,7 @@ int main ()
     client.LoadResource ("data/u1.xmtl");
     client.LoadResource ("data/u1.binmesh");
 
-    RenderTarget target = client.CreateRenderTarget ("my_window");
+    RenderTarget target = client.CreateRenderTarget ("my_window", "color_binding=main_color_target depth_stencil_binding=main_depth_stencil_target");
 
     scene_graph::Screen screen;
     
@@ -95,12 +95,15 @@ int main ()
 
     scene_graph::OrthoCamera::Pointer camera = scene_graph::OrthoCamera::Create ();
     
-    camera->SetLeft   (-1000.0f);
-    camera->SetRight  (1000.0f);    
-    camera->SetBottom (-1000.0f);
-    camera->SetTop    (1000.0f);    
+    camera->SetLeft   (-10.0f);
+    camera->SetRight  (10.0f);    
+    camera->SetBottom (-10.0f);
+    camera->SetTop    (10.0f);    
     camera->SetZNear  (-1000.0f);
     camera->SetZFar   (1000.0f);    
+
+    camera->SetPosition (0, 400.0f, 0.0f);
+    camera->LookTo (math::vec3f (0.0f), math::vec3f (0, 1.0f, 0), scene_graph::NodeTransformSpace_World);
     
     scene_graph::Scene scene;
     
@@ -108,7 +111,7 @@ int main ()
     
     scene_graph::StaticMesh::Pointer model = scene_graph::StaticMesh::Create ();
     
-    model->SetMeshName ("u1");
+    model->SetMeshName ("u1.polySurface2.mesh#0");
 
     model->BindToScene (scene);    
     

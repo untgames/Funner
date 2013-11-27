@@ -15,7 +15,7 @@ namespace
 const size_t RESERVED_VIEWPORTS_COUNT                     = 8;                        //резервируемое количество областей вывода
 const char*  COLOR_BINDING_PROPERTY_NAME                  = "color_binding";          //имя свойства биндинга буфера цвета
 const char*  DEPTH_STENCIL_BINDING_PROPERTY_NAME          = "depth_stencil_binding";  //имя свойства биндинга буфера глубины
-const char*  DEFAULT_COLOR_BINDING_PROPERTYVALUE          = "default_color";          //значение по умолчанию свойства биндинга буфера цвета
+const char*  DEFAULT_COLOR_BINDING_PROPERTY_VALUE         = "default_color";          //значение по умолчанию свойства биндинга буфера цвета
 const char*  DEFAULT_DEPTH_STENCIL_BINDING_PROPERTY_VALUE = "default_depth_stencil";  //значение по умолчанию буфера глубины
 
 /*
@@ -122,7 +122,7 @@ struct Screen::Impl: public xtl::reference_counter
 
       common::PropertyMap properties = common::parse_init_string (init_string);
 
-      const char *color_binding         = properties.IsPresent (COLOR_BINDING_PROPERTY_NAME) ? properties.GetString (COLOR_BINDING_PROPERTY_NAME) : DEFAULT_COLOR_BINDING_PROPERTYVALUE,
+      const char *color_binding         = properties.IsPresent (COLOR_BINDING_PROPERTY_NAME) ? properties.GetString (COLOR_BINDING_PROPERTY_NAME) : DEFAULT_COLOR_BINDING_PROPERTY_VALUE,
                  *depth_stencil_binding = properties.IsPresent (DEPTH_STENCIL_BINDING_PROPERTY_NAME) ? properties.GetString (DEPTH_STENCIL_BINDING_PROPERTY_NAME) : DEFAULT_DEPTH_STENCIL_BINDING_PROPERTY_VALUE;
 
       render_targets.Add (color_binding, window.ColorBuffer (), area);

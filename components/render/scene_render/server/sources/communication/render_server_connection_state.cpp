@@ -599,7 +599,7 @@ void ConnectionState::SetSceneNodes (object_id_t id, const interchange::RawArray
   {
     SceneManager& scene_manager = impl->server.SceneManager ();
 
-    Scene& scene = scene_manager.GetScene (id);
+    Scene* scene = id ? &scene_manager.GetScene (id) : (Scene*)0;
 
     const object_id_t* node_id = nodes.data;
 
@@ -607,7 +607,7 @@ void ConnectionState::SetSceneNodes (object_id_t id, const interchange::RawArray
     {
       Node& node = scene_manager.GetNode (*node_id);
 
-      node.Cast<Entity> ().SetSceneOwner (&scene);
+      node.Cast<Entity> ().SetSceneOwner (scene);
     }
   }
   catch (xtl::exception& e)

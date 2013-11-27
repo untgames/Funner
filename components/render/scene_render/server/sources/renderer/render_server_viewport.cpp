@@ -934,7 +934,7 @@ void Viewport::Update (manager::Frame* parent_frame)
     if (frame.EntitiesCount () || frame.FramesCount ())
     {
       if (parent_frame) parent_frame->AddFrame (frame);
-      else              frame.Draw ();    
+      else              frame.Draw ();
     }
   }
   catch (xtl::exception& e)

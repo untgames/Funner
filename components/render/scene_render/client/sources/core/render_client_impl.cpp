@@ -87,6 +87,9 @@ void ClientImpl::Synchronize ()
   try
   {
     impl->properties_writer.Write (impl->Context ());
+
+    if (impl->scene_manager)
+      impl->scene_manager->Update ();
   }
   catch (xtl::exception& e)
   {
