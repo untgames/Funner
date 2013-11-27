@@ -11,11 +11,12 @@
 #include <common/strlib.h>
 
 #include <sg/scissor.h>
+#include <sg/mesh.h>
 
 #include <shared/client.h>
 #include <shared/scene_manager.h>
 
-#include "static_mesh.h"
+#include "visual_model.h"
 
 namespace render
 {
@@ -34,6 +35,12 @@ class SceneFactory
   public:
     static Node* Create (scene_graph::Node& src_node, SceneManager& scene_manager);
 };
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Создание различных типов объектов
+///////////////////////////////////////////////////////////////////////////////////////////////////
+Node* create_node (scene_graph::StaticMesh&, SceneManager& scene_manager);
+//Node* create_node (scene_graph::StaticMesh&);
 
 }
 
