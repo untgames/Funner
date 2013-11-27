@@ -226,7 +226,7 @@ struct WindowImpl::Impl: public xtl::trackable, public INativeWindowListener
   {
     try
     {
-      log.Printf ("Window viewport changed: x=%d, y=%d, widht=%u, height=%u", viewport.x, viewport.y, viewport.width, viewport.height);
+      log.Printf ("Window viewport changed: x=%d, y=%d, width=%u, height=%u", viewport.x, viewport.y, viewport.width, viewport.height);
       
       if (color_buffer)
       {
