@@ -52,6 +52,8 @@ class TechniqueManagerImpl
         if (!technique)
           throw xtl::make_null_argument_exception ("", "technique");
 
+        static common::ComponentLoader loader ("render.scene.server.techniques.*");
+
         TechniqueMap::iterator iter = techniques.find (technique);
 
         if (iter == techniques.end ())
