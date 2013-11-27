@@ -705,7 +705,9 @@ struct RenderOperationsExecutor
       //применение состояния операции
 
     primitive.state_block->Apply (&device_context);
-    operation.state_block->Apply (&device_context);
+
+    if (operation.state_block)
+      operation.state_block->Apply (&device_context);
 
       //обработка области отсечения объекта
 

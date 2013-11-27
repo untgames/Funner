@@ -122,7 +122,7 @@ ProgramParametersLayoutPtr ProgramParametersManager::GetParameters
 
     if (ProgramParametersLayoutPtr* layout = impl->composite_layouts.Find (hash))
       return *layout;
-      
+
     if (impl->settings->HasDebugLog ())
       impl->log.Printf ("Create composite program parameters layout for <%d,%d,%d>", layout1 ? layout1->Id () : 0, layout2 ? layout2->Id () : 0, layout3 ? layout3->Id () : 0);
 

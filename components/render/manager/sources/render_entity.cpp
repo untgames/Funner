@@ -93,7 +93,7 @@ class EntityLodCommonData: public CacheHolder, public DebugIdHolder
       
       if (result)
         return result;
-        
+
       if (!material->HasDynamicTextures ())
       {        
         if (properties.Properties ().Size () == 0)
