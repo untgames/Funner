@@ -139,7 +139,7 @@ class Frame
 ///Список отрисовки
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     size_t EntitiesCount     () const;
-    void   AddEntity         (const Entity& entity);
+    void   AddEntity         (const Entity& entity, void* user_data = 0);
     void   RemoveAllEntities ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -153,11 +153,19 @@ class Frame
 ///Удаление всех объектов из кадра
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void RemoveAllFramesAndEntities ();
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Автоматическая очистка кадра после отрисовки
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void SetAutoCleanup       (bool state);
+    bool IsAutoCleanupEnabled () const;
+    void EnableAutoCleanup    () { SetAutoCleanup (true); }
+    void DisableAutoCleanup   () { SetAutoCleanup (false); }
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Пользовательский обработчик отрисовки объектов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    typedef xtl::function<void (Frame& frame, Entity& entity, EntityDrawParams& out_params)> EntityDrawFunction;
+    typedef xtl::function<void (Frame& frame, Entity& entity, void* user_data, EntityDrawParams& out_params)> EntityDrawFunction;
 
     void                      SetEntityDrawHandler (const EntityDrawFunction& handler);
     const EntityDrawFunction& EntityDrawHandler    () const;

@@ -79,11 +79,13 @@ struct EffectHolder: public CacheSource
 struct EntityDesc
 {
   EntityPtr                  entity;          //объект
+  void*                      user_data;       //пользовательские данные
   LowLevelBufferPtr          property_buffer; //буфер динамических свойств объекта
   ProgramParametersLayoutPtr layout;          //расположение динамических свойств объекта
   
-  EntityDesc (const EntityPtr& in_entity)
+  EntityDesc (const EntityPtr& in_entity, void* in_user_data)
     : entity (in_entity)
+    , user_data (in_user_data)
   {
   }
 };
@@ -115,6 +117,7 @@ struct FrameImpl::Impl: public CacheHolder
   LowLevelBufferPtr                    cached_properties;       //закэшированные свойства
   EntityDrawFunction                   entity_draw_handler;     //обработчик рисования объектов
   EntityDrawParams                     entity_draw_params;      //параметры рисования объектов (кэш)
+  bool                                 auto_cleanup_state;      //самоочистка кадра после отрисовки
 
 ///Конструктор
   Impl (const DeviceManagerPtr& device_manager, const EffectManagerPtr& effect_manager, const PropertyCachePtr& in_property_cache)
@@ -127,6 +130,7 @@ struct FrameImpl::Impl: public CacheHolder
     , clear_flags (ClearFlag_All)
     , clear_depth_value (1.0f)
     , clear_stencil_index (0)
+    , auto_cleanup_state (true)
   {
     AttachCacheSource (*effect_holder);
     AttachCacheSource (properties);
@@ -477,9 +481,9 @@ size_t FrameImpl::EntitiesCount ()
   return impl->entities.size ();
 }
 
-void FrameImpl::AddEntity (const EntityPtr& entity)
+void FrameImpl::AddEntity (const EntityPtr& entity, void* user_data)
 {
-  impl->entities.push_back (EntityDesc (entity));  
+  impl->entities.push_back (EntityDesc (entity, user_data));
 }
 
 void FrameImpl::RemoveAllEntities ()
@@ -504,6 +508,20 @@ void FrameImpl::AddFrame (const FramePtr& frame)
 void FrameImpl::RemoveAllFrames ()
 {
   impl->frames.clear ();  
+}
+
+/*
+    Автоматическая очистка кадра после отрисовки
+*/
+
+void FrameImpl::SetAutoCleanup (bool state)
+{
+  impl->auto_cleanup_state = state;
+}
+
+bool FrameImpl::IsAutoCleanupEnabled ()
+{
+  return impl->auto_cleanup_state;
 }
 
 /*
@@ -561,7 +579,7 @@ void FrameImpl::Prerender (EntityDrawFunction entity_draw_handler)
     {
       Entity entity_wrap = Wrappers::Wrap<Entity> (desc.entity);
 
-      entity_draw_handler (frame, entity_wrap, entity_draw_params);
+      entity_draw_handler (frame, entity_wrap, desc.user_data, entity_draw_params);
       
         //заполнение константного буфера соответствующего паре frame-entity
       
@@ -618,6 +636,14 @@ void FrameImpl::Draw (RenderingContext* previous_context)
         //выполнение операций рендеринга
 
       impl->effect_holder->effect_renderer->ExecuteOperations (context);
+
+        //самоочистка кадра
+
+      if (impl->auto_cleanup_state)
+      {
+        RemoveAllFrames ();
+        RemoveAllEntities ();
+      }
       
         //очистка временных данных
       

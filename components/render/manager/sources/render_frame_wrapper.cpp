@@ -238,9 +238,9 @@ size_t Frame::EntitiesCount () const
   return impl->EntitiesCount ();
 }
 
-void Frame::AddEntity (const Entity& entity)
+void Frame::AddEntity (const Entity& entity, void* user_data)
 {
-  impl->AddEntity (Wrappers::Unwrap<EntityImpl> (entity));
+  impl->AddEntity (Wrappers::Unwrap<EntityImpl> (entity), user_data);
 }
 
 void Frame::RemoveAllEntities ()
@@ -267,6 +267,16 @@ void Frame::RemoveAllFramesAndEntities ()
 {
   impl->RemoveAllFrames ();
   impl->RemoveAllEntities ();
+}
+
+void Frame::SetAutoCleanup (bool state)
+{
+  impl->SetAutoCleanup (state);
+}
+
+bool Frame::IsAutoCleanupEnabled () const
+{
+  return impl->IsAutoCleanupEnabled ();
 }
 
 void Frame::SetEntityDrawHandler (const EntityDrawFunction& handler)
