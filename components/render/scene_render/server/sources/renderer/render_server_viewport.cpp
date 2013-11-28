@@ -472,7 +472,8 @@ struct Viewport::Impl: public xtl::reference_counter, public ViewportDrawListNod
                           size_t (ceil (viewport_area.width * x_scale)),
                           size_t (ceil (viewport_area.height * y_scale)));
 
-        frame_render_targets.SetRenderTarget (entry.desc.Name (), target, manager::Viewport (target_rect, min_depth, max_depth));
+        frame_render_targets.RemoveRenderTarget (entry.desc.Name ());
+        frame_render_targets.SetRenderTarget    (entry.desc.Name (), target, manager::Viewport (target_rect, min_depth, max_depth));
 
         entry.need_update = false;
       }

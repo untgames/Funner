@@ -136,7 +136,6 @@ void Scene::Traverse (const bound_volumes::plane_listf& frustum, ISceneVisitor& 
       continue;
     }
 
-
       //если объект имеет конечные ограничивающие объёмы - проверяем его попадание в заданный объём
 
     if (intersects (frustum, entity.BoundBox ()))

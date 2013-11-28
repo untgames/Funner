@@ -329,6 +329,29 @@ void RenderTargetMap::Clear ()
 }
 
 /*
+    ѕринудительное оповещение об обновлении целей рендеринга
+*/
+
+void RenderTargetMap::ForceUpdateNotify ()
+{
+  for (DescMap::iterator iter=impl->targets.begin (), end=impl->targets.end (); iter!=end; ++iter)
+  {  
+    RenderTargetDesc& desc = iter->second;
+
+    for (ListenerArray::iterator iter=impl->listeners.begin (), end=impl->listeners.end (); iter!=end; ++iter)
+    {
+      try
+      {
+        (*iter)->OnRenderTargetUpdated (desc);
+      }
+      catch (...)
+      {
+      }
+    }
+  }
+}
+
+/*
     ƒобавление слушателей
 */
 

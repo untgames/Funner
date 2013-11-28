@@ -67,18 +67,20 @@ typedef stl::vector<ViewportPtr>         ViewportDescList;
 
 struct Screen::Impl: public xtl::reference_counter
 {
-  RenderManager    render_manager;    //менеджер рендеринга
-  RenderTargetMap  render_targets;    //цели рендеринга
-  stl::string      name;              //им€ экрана
-  bool             active;            //активность экрана
-  Rect             area;              //область экрана
-  bool             background_state;  //состо€ние заднего фона
-  math::vec4f      background_color;  //цвет заднего фона
-  bool             need_reorder;      //необходимость пересортировки областей вывода
-  ViewportManager  viewport_manager;  //менеджер областей вывода
-  ViewportDescList viewports;         //области вывода
-  ViewportDrawList drawing_viewports; //отрисовываемые области вывода
-  manager::Window* window;            //св€занное окно
+  RenderManager        render_manager;              //менеджер рендеринга
+  RenderTargetMap      render_targets;              //цели рендеринга
+  stl::string          name;                        //им€ экрана
+  bool                 active;                      //активность экрана
+  Rect                 area;                        //область экрана
+  bool                 background_state;            //состо€ние заднего фона
+  math::vec4f          background_color;            //цвет заднего фона
+  bool                 need_reorder;                //необходимость пересортировки областей вывода
+  ViewportManager      viewport_manager;            //менеджер областей вывода
+  ViewportDescList     viewports;                   //области вывода
+  ViewportDrawList     drawing_viewports;           //отрисовываемые области вывода
+  manager::Window*     window;                      //св€занное окно
+  xtl::auto_connection on_window_resize_connection; //соединение с сигналом оповещени€ об изменении размеров окна
+  xtl::auto_connection on_window_update_connection; //соединение с сигналом оповещени€ об обновлении окна
 
 ///  онструктор
   Impl (const char* in_name, const char* init_string, WindowManager& window_manager, const RenderManager& in_render_manager, const ViewportManager& in_viewport_manager)
@@ -112,11 +114,14 @@ struct Screen::Impl: public xtl::reference_counter
   {
     try
     {
-      this->window = 0;
-
         //поиск окна
 
       manager::Window& window = window_manager.GetWindow (name.c_str ());
+
+        //регистраци€ обработчиков событий окна
+
+      on_window_resize_connection = window.RegisterEventHandler (manager::WindowEvent_OnResize, xtl::bind (&Impl::OnWindowResize, this));
+      on_window_update_connection = window.RegisterEventHandler (manager::WindowEvent_OnUpdate, xtl::bind (&Impl::OnWindowUpdate, this));
 
         //заполнение биндингов цели отрисовки
 
@@ -133,6 +138,34 @@ struct Screen::Impl: public xtl::reference_counter
     catch (xtl::exception& e)
     {
       e.touch ("render::scene::server::Screen::Impl::InitRenderTargets");
+      throw;
+    }
+  }
+
+/// ќповещение об изменении размеров окна
+  void OnWindowResize ()
+  {
+    try
+    {
+      render_targets.ForceUpdateNotify ();
+    }
+    catch (xtl::exception& e)
+    {
+      e.touch ("render::scene::server::Screen::Impl::OnWindowResize");
+      throw;
+    }
+  }
+
+/// ќповещение об обновлении окна
+  void OnWindowUpdate ()
+  {
+    try
+    {
+      Update (0);
+    }
+    catch (xtl::exception& e)
+    {
+      e.touch ("render::scene::server::Screen::Impl::OnWindowUpdate");
       throw;
     }
   }
@@ -155,6 +188,56 @@ struct Screen::Impl: public xtl::reference_counter
     stl::sort (viewports.begin (), viewports.end (), ViewComparator ());
 
     need_reorder = false;
+  }
+
+/// ќбновление
+  void Update (manager::Frame* parent_frame)
+  {
+    try
+    {
+      if (!active)
+        return;
+
+        //сортировки областей вывода
+
+      if (need_reorder)
+        Reorder ();
+
+        //обход областей вывода
+
+      for (ViewportDescList::iterator iter=viewports.begin (), end=viewports.end (); iter!=end; ++iter)
+      {
+        Viewport& viewport = (*iter)->viewport;
+
+        try
+        {
+          viewport.Update (parent_frame);
+        }
+        catch (std::exception& e)
+        {
+          render_manager.Log ().Printf ("%s\n    at render::scene::server::Screen::Update(screen='%s')", e.what (), name.c_str ());
+        }
+        catch (...)
+        {
+          render_manager.Log ().Printf ("unknown exception\n    at render::scene::server::Screen::Update(screen='%s')", name.c_str ());
+        }      
+      }
+
+        //очистка данных
+
+      if (!parent_frame)
+        drawing_viewports.CleanupViewports ();
+
+       //вывод на экран
+
+      if (window)
+        window->SwapBuffers ();
+    }
+    catch (xtl::exception& e)
+    {
+      e.touch ("render::scene::server::Screen::Update");
+      throw;
+    }
   }
 };
 
@@ -319,49 +402,5 @@ void Screen::DetachViewport (object_id_t id)
 
 void Screen::Update (manager::Frame* parent_frame)
 {
-  try
-  {
-    if (!impl->active)
-      return;
-
-      //сортировки областей вывода
-
-    if (impl->need_reorder)
-      impl->Reorder ();
-
-      //обход областей вывода
-
-    for (ViewportDescList::iterator iter=impl->viewports.begin (), end=impl->viewports.end (); iter!=end; ++iter)
-    {
-      Viewport& viewport = (*iter)->viewport;
-
-      try
-      {
-        viewport.Update (parent_frame);
-      }
-      catch (std::exception& e)
-      {
-        impl->render_manager.Log ().Printf ("%s\n    at render::scene::server::Screen::Update(screen='%s')", e.what (), impl->name.c_str ());
-      }
-      catch (...)
-      {
-        impl->render_manager.Log ().Printf ("unknown exception\n    at render::scene::server::Screen::Update(screen='%s')", impl->name.c_str ());
-      }      
-    }
-
-      //очистка данных
-
-    if (!parent_frame)
-      impl->drawing_viewports.CleanupViewports ();
-
-     //вывод на экран
-
-    if (impl->window)
-      impl->window->SwapBuffers ();
-  }
-  catch (xtl::exception& e)
-  {
-    e.touch ("render::scene::server::Screen::Update");
-    throw;
-  }
+  impl->Update (parent_frame);
 }
