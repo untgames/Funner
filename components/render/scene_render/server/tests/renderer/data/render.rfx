@@ -308,3 +308,16 @@ technique 'default'
 {
   draw_without_lights
 }
+
+technique 'my_test'
+{
+  effect       'main'       //name of the root effect for this technique
+  clear_effect 'clearing'   //name of the clearing effect
+
+  program      'for_each_light'
+  {
+    first_light_effect  'effect for first light'
+    other_lights_effect 'effect for other lights'
+  }
+}
+
