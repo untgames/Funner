@@ -101,6 +101,12 @@ struct RenderThread::Impl: public xtl::reference_counter
     {
       try
       {
+          //обработка системных сообщений
+
+        syslib::Application::ProcessThreadMessages ();
+
+          //обработка очереди команд
+
         CommandQueueItem command;
 
         if (!command_queue.Pop (command, MAX_POP_TIMEOUT_MS))

@@ -18,6 +18,7 @@
 #include <common/singleton.h>
 #include <common/strlib.h>
 
+#include <syslib/application.h>
 #include <syslib/semaphore.h>
 #include <syslib/shared_queue.h>
 #include <syslib/thread.h>
