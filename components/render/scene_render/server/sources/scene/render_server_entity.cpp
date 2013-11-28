@@ -47,9 +47,12 @@ void Entity::SetSceneOwner (Scene* scene)
 
     impl->scene = 0;
 
-    scene->AttachNode (this);
+    if (scene)
+    {
+      scene->AttachNode (this);
 
-    impl->scene = scene;
+      impl->scene = scene;
+    }
   }
   catch (xtl::exception& e)
   {

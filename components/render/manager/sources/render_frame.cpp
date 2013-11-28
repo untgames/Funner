@@ -57,7 +57,7 @@ struct EffectHolder: public CacheSource
       
       if (!cached_effect)
         return;
-        
+
       effect_renderer = EffectRendererPtr (new render::manager::EffectRenderer (cached_effect, device_manager, &properties_layout), false);      
     }
     catch (xtl::exception& e)
@@ -158,7 +158,7 @@ struct FrameImpl::Impl: public CacheHolder
     try
     {
       effect_holder->UpdateCache ();
-      
+
       cached_properties = properties.Buffer ();
     }
     catch (xtl::exception& e)
@@ -366,7 +366,10 @@ void FrameImpl::SetEffect (const char* name)
   {
     if (!name)
       throw xtl::make_null_argument_exception ("", "name");
-    
+
+    if (!strcmp (impl->effect_holder->effect.Name (), name))
+      return;
+
     impl->effect_holder->effect = impl->effect_holder->effect_manager->GetEffectProxy (name);    
     
     impl->effect_holder->InvalidateCache ();
@@ -569,7 +572,7 @@ void FrameImpl::Prerender (EntityDrawFunction entity_draw_handler)
   renderer.RemoveAllOperations ();
   
   entity_draw_params.mvp_matrix = math::mat4f (1.0f);
-  
+
   for (EntityArray::iterator iter=impl->entities.begin (), end=impl->entities.end (); iter!=end; ++iter)
   {
     EntityDesc& desc = *iter;
@@ -610,7 +613,7 @@ void FrameImpl::Prerender (EntityDrawFunction entity_draw_handler)
 
     renderer.AddOperations (desc.entity->RendererOperations (lod, true), eye_distance, entity_draw_params.mvp_matrix, desc.property_buffer.get (), desc.layout.get ());
   }
-  
+
   for (FrameArray::iterator iter=impl->frames.begin (), end=impl->frames.end (); iter!=end; ++iter)
   {
     renderer.AddOperations (**iter);
@@ -626,14 +629,14 @@ void FrameImpl::Draw (RenderingContext* previous_context)
   try
   {
       //обновление кэша
-    
+
     UpdateCache ();
-    
+
       //обновление маркеров отрисовки для корневых кадров
     
     if (!previous_context)
       impl->effect_holder->device_manager->CacheManager ().UpdateMarkers ();
-      
+
     try
     {
         //формирование контекста отрисовки
@@ -658,7 +661,7 @@ void FrameImpl::Draw (RenderingContext* previous_context)
         RemoveAllFrames ();
         RemoveAllEntities ();
       }
-      
+
         //очистка временных данных
       
       if (!previous_context)
@@ -696,7 +699,7 @@ void FrameImpl::Cleanup ()
 void FrameImpl::UpdateCache ()
 {
   impl->UpdateCache ();
-  
+
   for (EntityArray::iterator iter=impl->entities.begin (), end=impl->entities.end (); iter!=end; ++iter)
     iter->entity->UpdateCache ();
 }

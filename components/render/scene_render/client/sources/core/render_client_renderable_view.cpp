@@ -330,6 +330,10 @@ struct RenderableView::Impl: public scene_graph::IViewportListener
 
         need_update_properties = false;
       }
+
+        //синхронизация сцены
+
+      connection->Client ().SceneManager ().Update ();
       
       need_reconfiguration = false;
     }

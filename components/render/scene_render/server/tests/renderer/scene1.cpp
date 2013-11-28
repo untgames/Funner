@@ -42,7 +42,7 @@ void idle (Test& test)
     
     frames_count++;
     
-    float angle = common::milliseconds () / 10000.0f;
+    float angle = common::milliseconds () / 100.0f;
     
     test.mesh.SetWorldOrientation (math::degree (angle), 0.0f, 0.0f, 1.0f);        
 

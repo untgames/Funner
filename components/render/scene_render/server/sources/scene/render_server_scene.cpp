@@ -16,6 +16,15 @@ struct Scene::Impl: public xtl::reference_counter
   stl::string name;        //имя сцены
   EntityList  entity_list; //список узлов
   EntityMap   entity_map;  //карта узлов
+
+/// Деструктор
+  ~Impl ()
+  {
+    while (!entity_map.empty ())
+      entity_map.erase (entity_map.begin ());
+
+    entity_list.clear ();
+  }
 };
 
 /*
@@ -110,7 +119,7 @@ void Scene::DetachNode (const EntityPtr& node)
     return;
 
   impl->entity_list.erase (iter->second);
-  impl->entity_map.erase (iter);  
+  impl->entity_map.erase (iter);
 }
 
 void Scene::Traverse (const bound_volumes::plane_listf& frustum, ISceneVisitor& visitor)
