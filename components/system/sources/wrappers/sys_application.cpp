@@ -185,6 +185,39 @@ class ApplicationImpl: private IApplicationListener
       return !signals [ApplicationEvent_OnIdle].empty () || ActionQueue::ActionsCount (ActionThread_Main) != 0 || ActionQueue::ActionsCount (main_thread_id) != 0;
     }
 
+///Обработка действий
+    static void ProcessActions (ActionThread thread)
+    {
+      try
+      {
+        size_t count = ActionQueue::ActionsCount (thread);
+        
+        for (size_t i=0; i<count; i++)
+        {
+          try
+          {
+            Action action = ActionQueue::PopAction (thread);
+
+            if (action.IsEmpty ())
+              continue;
+              
+            action.Perform ();
+          }
+          catch (std::exception& e)
+          {
+            common::Log (LOG_NAME).Printf ("Exception in Application::ProcessActions: %s", e.what ());
+          }
+          catch (...)
+          {
+            common::Log (LOG_NAME).Printf ("Unknown exception in Application::ProcessActions");
+          }
+        }
+      }
+      catch (...)
+      {
+      }
+    }
+
   private:
     typedef xtl::signal<void ()>             ApplicationSignal;
     typedef xtl::signal<void (const char*)>  NotificationSignal;
@@ -204,34 +237,7 @@ class ApplicationImpl: private IApplicationListener
       {
         log.Printf ("Unknown exception in Application::Notify");
       }
-    }          
-    
-///Обработка действий
-    void ProcessActions (ActionThread thread)
-    {
-      size_t count = ActionQueue::ActionsCount (thread);
-      
-      for (size_t i=0; i<count; i++)
-      {
-        try
-        {
-          Action action = ActionQueue::PopAction (thread);
-
-          if (action.IsEmpty ())
-            continue;
-            
-          action.Perform ();
-        }
-        catch (std::exception& e)
-        {
-          log.Printf ("Exception in Application::ProcessActions: %s", e.what ());
-        }
-        catch (...)
-        {
-          log.Printf ("Unknown exception in Application::ProcessActions");
-        }
-      }  
-    }    
+    }             
 
 ///Обновление idle-режима
     void UpdateIdleState ()
@@ -458,6 +464,21 @@ void Application::Run (IApplicationDelegate* in_delegate)
 bool Application::IsMessageLoop ()
 {
   return ApplicationSingleton::Instance ()->IsMessageLoop ();
+}
+
+void Application::ProcessThreadMessages ()
+{
+  try
+  {
+    Platform::ProcessThreadMessages ();
+
+    ApplicationImpl::ProcessActions (ActionThread_Current);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("syslib::Application::ProcessThreadMessages");
+    throw;
+  }  
 }
 
 void Application::Exit (int code)
