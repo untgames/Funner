@@ -128,6 +128,11 @@ void Scene::Traverse (const bound_volumes::plane_listf& frustum, ISceneVisitor& 
   {
     Entity& entity = **iter;
 
+      //если объект невидим - исключаем его из обхода
+
+    if (!entity.IsVisible ())
+      continue;
+
       //если объект имеет бесконечные ограничивающие объёмы - обрабатываем его
 
     if (entity.IsInfiniteBounds ())

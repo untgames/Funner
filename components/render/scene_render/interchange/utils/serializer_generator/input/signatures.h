@@ -42,6 +42,7 @@ void SetNodeWorldMatrix (object_id_t id, const math::mat4f& tm);
 void SetNodeScene (object_id_t id, object_id_t scene_id);
 
 void SetEntityBounds (object_id_t id, bool is_infinite, const bound_volumes::aaboxf& box);
+void SetEntityVisibility (object_id_t id, bool state);
 
 void SetVisualModelScissor (object_id_t id, object_id_t scissor_id);
 

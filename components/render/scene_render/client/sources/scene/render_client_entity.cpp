@@ -11,8 +11,9 @@ struct Entity::Impl
 {
   size_t world_bounds_hash;
   bool   is_infinite;
+  bool   is_visible;
 
-  Impl () : world_bounds_hash (~0u), is_infinite (false) {}
+  Impl () : world_bounds_hash (~0u), is_infinite (false), is_visible (true) {}
 };
 
 /*
@@ -40,6 +41,17 @@ void Entity::UpdateCore (client::Context& context)
     Node::UpdateCore (context);
 
     scene_graph::Entity& entity = SourceNode ();
+
+      //синхронизация видимости
+
+    bool is_visible = entity.IsVisible ();
+
+    if (is_visible != impl->is_visible)
+    {
+      context.SetEntityVisibility (Id (), is_visible);
+
+      impl->is_visible = is_visible;
+    }
 
       //синхронизация ограничивающего объема
 

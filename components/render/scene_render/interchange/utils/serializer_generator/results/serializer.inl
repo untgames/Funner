@@ -37,6 +37,7 @@ inline stl::string get_command_name(CommandId command_id)
     case CommandId_SetNodeWorldMatrix: return "SetNodeWorldMatrix";
     case CommandId_SetNodeScene: return "SetNodeScene";
     case CommandId_SetEntityBounds: return "SetEntityBounds";
+    case CommandId_SetEntityVisibility: return "SetEntityVisibility";
     case CommandId_SetVisualModelScissor: return "SetVisualModelScissor";
     case CommandId_SetStaticMeshName: return "SetStaticMeshName";
     case CommandId_SetLightParams: return "SetLightParams";
@@ -676,6 +677,24 @@ inline void ClientToServerSerializer::SetEntityBounds(object_id_t id, bool is_in
   }
 }
 
+inline void ClientToServerSerializer::SetEntityVisibility(object_id_t id, bool state)
+{
+  size_t saved_position = Position ();
+
+  try
+  {
+    BeginCommand(CommandId_SetEntityVisibility);
+    write(*this, id);
+    write(*this, state);
+    EndCommand();
+  }
+  catch (...)
+  {
+    SetPosition (saved_position);
+    throw;
+  }
+}
+
 inline void ClientToServerSerializer::SetVisualModelScissor(object_id_t id, object_id_t scissor_id)
 {
   size_t saved_position = Position ();
@@ -1042,6 +1061,15 @@ template <class Dispatcher> inline bool ClientToServerDeserializer::Deserialize(
       const bound_volumes::aaboxf& arg3 = read(*this, xtl::type<const bound_volumes::aaboxf&> ());
 
       dispatcher.SetEntityBounds(arg1, arg2, arg3);
+
+      return true;
+    }
+    case CommandId_SetEntityVisibility:
+    {
+      object_id_t arg1 = read(*this, xtl::type<object_id_t> ());
+      bool arg2 = read(*this, xtl::type<bool> ());
+
+      dispatcher.SetEntityVisibility(arg1, arg2);
 
       return true;
     }

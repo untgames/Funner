@@ -11,10 +11,11 @@ struct Entity::Impl
 {
   bool                  is_infinite; //бесконечен ли ограничивающий объем
   bound_volumes::aaboxf bound_box;   //ограничивающий бокс
+  bool                  is_visible;  //является ли данная сущность видимой
   Scene*                scene;       //сцена
 
 ///Конструктор
-  Impl () : is_infinite (true), scene () {}
+  Impl () : is_infinite (true), is_visible (true), scene () {}
 };
 
 /*
@@ -84,6 +85,20 @@ bool Entity::IsInfiniteBounds () const
 const bound_volumes::aaboxf& Entity::BoundBox () const
 {
   return impl->bound_box;
+}
+
+/*
+    Видимость объекта
+*/
+
+void Entity::SetVisible (bool state)
+{
+  impl->is_visible = state;
+}
+
+bool Entity::IsVisible () const
+{
+  return impl->is_visible;
 }
 
 /*

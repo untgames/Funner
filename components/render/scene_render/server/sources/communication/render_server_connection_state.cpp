@@ -699,6 +699,19 @@ void ConnectionState::SetEntityBounds (object_id_t id, bool is_infinite, const b
   }
 }
 
+void ConnectionState::SetEntityVisibility (object_id_t id, bool is_visible)
+{
+  try
+  {
+    impl->server.SceneManager ().GetNode (id).Cast<Entity> ().SetVisible (is_visible);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::scene::ConnectionState::SetEntityVisibility");
+    throw;
+  }
+}
+
 void ConnectionState::SetVisualModelScissor (object_id_t id, object_id_t scissor_id)
 {
   try
