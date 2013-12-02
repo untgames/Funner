@@ -168,18 +168,15 @@ struct RenderTargetEntry
 
 typedef stl::hash_map<const RenderTargetDesc*, RenderTargetEntry> RenderTargetEntryMap;
 typedef stl::vector<IViewportListener*>                           ListenerArray;
-typedef stl::vector<TechniquePtr>                                 TechniqueArray;
-typedef stl::vector<TechniquePrivateData>                         TechniquePrivateDataArray;
 
 struct Frame: public xtl::reference_counter
 {
-  manager::Frame            frame;
-  TechniquePrivateDataArray private_data;
+  manager::Frame       frame;
+  TechniquePrivateData private_data;
 
-  Frame (const manager::Frame& in_frame, size_t techniques_count)
+  Frame (const manager::Frame& in_frame)
     : frame (in_frame)
   {
-    private_data.resize (techniques_count);
   }
 };
 
@@ -196,7 +193,7 @@ struct Viewport::Impl: public xtl::reference_counter, public ViewportDrawListNod
   RenderTargetEntryMap         render_target_entries;      //дескрипторы целей рендеринга
   stl::string                  name;                       //им€ области вывода
   stl::string                  technique_name;             //им€ техники
-  TechniqueArray               sub_techniques;             //техники
+  TechniquePtr                 technique;                  //техника
   Rect                         area;                       //область вывода
   float                        min_depth;                  //минимальна€ глубина
   float                        max_depth;                  //максимальна€ глубина
@@ -240,7 +237,6 @@ struct Viewport::Impl: public xtl::reference_counter, public ViewportDrawListNod
     , need_update_properties (true)
   {
     listeners.reserve (LISTENER_ARRAY_RESERVE_SIZE);
-    sub_techniques.reserve (TECNIQUE_ARRAY_RESERVE_SIZE);
     frames.reserve (FRAME_ARRAY_RESERVE_SIZE);
 
     render_targets.AttachListener (this);
@@ -259,7 +255,7 @@ struct Viewport::Impl: public xtl::reference_counter, public ViewportDrawListNod
 /// ƒеструктор
   ~Impl ()
   {
-    sub_techniques.clear ();
+    technique = TechniquePtr ();
 
     render_manager.DetachListener (this);
     render_targets.DetachListener (this);
@@ -276,7 +272,7 @@ struct Viewport::Impl: public xtl::reference_counter, public ViewportDrawListNod
       if (current_frame_index < frames.size ())
         return &*frames [current_frame_index];
 
-      FramePtr frame_desc (new Frame (render_manager.Manager ().CreateFrame (), sub_techniques.size ()), false);
+      FramePtr frame_desc (new Frame (render_manager.Manager ().CreateFrame ()), false);
 
       frame_desc->frame.SetRenderTargets (frame_render_targets);
 
@@ -332,14 +328,14 @@ struct Viewport::Impl: public xtl::reference_counter, public ViewportDrawListNod
 /// ќповещение об изменении конфигурации
   void OnRenderManagerConfigurationChanged (const common::ParseNode&)
   {
-    sub_techniques.clear ();
+    technique = TechniquePtr ();
 
     need_update_technique = true;
     need_reconfiguration  = true;
   }
 
 /// —оздание техник
-  void CreateSubTechniques ()
+  void CreateTechique ()
   {
     try
     {
@@ -348,39 +344,40 @@ struct Viewport::Impl: public xtl::reference_counter, public ViewportDrawListNod
 
       for (common::Parser::NamesakeIterator iter=configuration.First ("technique"); iter; ++iter)
       {
-        const char* technique = common::get<const char*> (*iter, "", "");        
-        
-        if (xtl::xstrcmp (technique, technique_name.c_str ()))
+        const char* technique_name = common::get<const char*> (*iter, "", "");        
+
+        if (xtl::xstrcmp (technique_name, this->technique_name.c_str ()))
           continue;
 
         common::ParseNode parent_technique_node = *iter;
 
-        for (common::Parser::Iterator iter=parent_technique_node.First (); iter; ++iter)
+        try
         {
-          try
-          {
-            TechniquePtr technique = TechniqueManager::CreateTechnique (iter->Name (), render_manager, *iter);
-            
-            if (!technique)
-              throw xtl::format_operation_exception ("", "Can't create technique '%s'", iter->Name ());
-            
-            technique->SetName (iter->Name ());
+          const char* program_name = common::get<const char*> (*iter, "program");
 
-            sub_techniques.push_back (technique);
-          }
-          catch (std::exception& e)
-          {
-            log.Printf ("%s\n    at create sub-technique '%s' for technique '%s' at viewport '%s'\n    at render::scene::server::Viewport::Impl::CreateSubTechniques",
-              e.what (), iter->Name (), technique_name.c_str (), name.c_str ());
-          }
-          catch (...)
-          {
-            log.Printf ("unknown exception\n    at create sub-technique '%s' for technique '%s' at viewport '%s'\n    at render::scene::server::Viewport::Impl::CreateSubTechniques",
-              iter->Name (), technique_name.c_str (), name.c_str ());
-          }
+          TechniquePtr technique = TechniqueManager::CreateTechnique (program_name, render_manager, iter->First ("program"));
+
+          if (!technique)
+            throw xtl::format_operation_exception ("", "Can't create technique '%s'", program_name);
+
+          technique->SetName (program_name);
+
+          this->technique = technique;
         }
+        catch (std::exception& e)
+        {
+          log.Printf ("%s\n    at create technique '%s' at viewport '%s'\n    at render::scene::server::Viewport::Impl::CreateTechique",
+            e.what (), technique_name, name.c_str ());
 
-        frames.clear ();
+          technique = TechniquePtr ();
+        }
+        catch (...)
+        {
+          log.Printf ("unknown exception\n    at create technique '%s' at viewport '%s'\n    at render::scene::server::Viewport::Impl::CreateTechique",
+            technique_name, name.c_str ());
+
+          technique = TechniquePtr ();
+        }
 
         return;
       }
@@ -389,7 +386,7 @@ struct Viewport::Impl: public xtl::reference_counter, public ViewportDrawListNod
     }
     catch (xtl::exception& e)
     {
-      e.touch ("render::scene::server::Viewport::Impl::CreateSubTechniques(technique='%s')", technique_name.c_str ());
+      e.touch ("render::scene::server::Viewport::Impl::CreateTechique(technique='%s')", technique_name.c_str ());
       throw;
     }
   }
@@ -401,7 +398,7 @@ struct Viewport::Impl: public xtl::reference_counter, public ViewportDrawListNod
     {
       render_manager.Log ().Printf ("Initializing technique '%s' for viewport '%s'", technique_name.c_str (), name.c_str ());
 
-      CreateSubTechniques ();
+      CreateTechique ();
 
       need_update_properties = true;
       need_update_technique  = false;
@@ -493,29 +490,25 @@ struct Viewport::Impl: public xtl::reference_counter, public ViewportDrawListNod
   {
     try
     {
-      for (TechniqueArray::iterator iter=sub_techniques.begin (), end=sub_techniques.end (); iter!=end;)
+      if (!technique)
+        return;
+
+      try
       {
-        try
-        {
-          (*iter)->SetProperties (properties);
-          
-           ++iter;
-           
-           continue;
-        }
-        catch (std::exception& e)
-        {
-          render_manager.Log ().Printf ("%s\n    at update sub-technique '%s' properties for technique '%s' at viewport '%s'\n    at render::scene::server::Viewport::Impl::ReconfigureProperties", e.what (), (*iter)->Name (), technique_name.c_str (), name.c_str ());
-        }
-        catch (...)
-        {
-          render_manager.Log ().Printf ("unknown exception\n    at update sub-technique '%s' properties for technique '%s' at viewport '%s'\n    at render::scene::server::Viewport::Impl::ReconfigureProperties", (*iter)->Name (), technique_name.c_str (), name.c_str ());
-        }
-        
-        sub_techniques.erase (iter);
-        
-        end = sub_techniques.end ();
-      }            
+        technique->SetProperties (properties);
+      }
+      catch (std::exception& e)
+      {
+        render_manager.Log ().Printf ("%s\n    at update sub-technique '%s' properties for technique '%s' at viewport '%s'\n    at render::scene::server::Viewport::Impl::ReconfigureProperties", e.what (), technique->Name (), technique_name.c_str (), name.c_str ());
+
+        technique = TechniquePtr ();
+      }
+      catch (...)
+      {
+        render_manager.Log ().Printf ("unknown exception\n    at update sub-technique '%s' properties for technique '%s' at viewport '%s'\n    at render::scene::server::Viewport::Impl::ReconfigureProperties", technique->Name (), technique_name.c_str (), name.c_str ());
+
+        technique = TechniquePtr ();
+      }      
 
       need_update_properties = false;
     }
@@ -758,8 +751,7 @@ void Viewport::SetTechnique (const char* name)
   if (name == impl->technique_name)
     return;
 
-  impl->sub_techniques.clear ();
-
+  impl->technique             = TechniquePtr ();
   impl->technique_name        = name;
   impl->need_update_technique = true;
   impl->need_reconfiguration  = true;
@@ -904,28 +896,24 @@ void Viewport::Update (manager::Frame* parent_frame)
 
       //обновление кадра
 
-    for (TechniqueArray::iterator iter=impl->sub_techniques.begin (), end=impl->sub_techniques.end (); iter!=end;)
+    if (impl->technique)
     {
       try
       {
-        (*iter)->UpdateFrame (context, frame_desc->private_data [iter - impl->sub_techniques.begin ()]);
-        
-        ++iter;
-        
-        continue;
+        impl->technique->UpdateFrame (context, frame_desc->private_data);
       }
       catch (std::exception& e)
       {
-        impl->render_manager.Log ().Printf ("%s\n    at update sub-technique '%s' frame for technique '%s' at viewport '%s'\n    at render::scene::server::Viewport::Update", e.what (), (*iter)->Name (), impl->technique_name.c_str (), impl->name.c_str ());
+        impl->render_manager.Log ().Printf ("%s\n    at update sub-technique '%s' frame for technique '%s' at viewport '%s'\n    at render::scene::server::Viewport::Update", e.what (), impl->technique->Name (), impl->technique_name.c_str (), impl->name.c_str ());
+
+        impl->technique = TechniquePtr ();
       }
       catch (...)
       {
-        impl->render_manager.Log ().Printf ("unknown exception\n    at update sub-technique '%s' frame for technique '%s' at viewport '%s'\n    at render::scene::server::Viewport::Update", (*iter)->Name (), impl->technique_name.c_str (), impl->name.c_str ());
+        impl->render_manager.Log ().Printf ("unknown exception\n    at update sub-technique '%s' frame for technique '%s' at viewport '%s'\n    at render::scene::server::Viewport::Update", impl->technique->Name (), impl->technique_name.c_str (), impl->name.c_str ());
+
+        impl->technique = TechniquePtr ();
       }
-
-      impl->sub_techniques.erase (iter);
-
-      end = impl->sub_techniques.end ();
     }
 
       //отрисовка

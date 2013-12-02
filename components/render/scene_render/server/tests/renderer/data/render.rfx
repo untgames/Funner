@@ -306,7 +306,7 @@ effect "lighting"
 
 technique 'default'
 {
-  draw_without_lights
+  program 'draw_without_lights'
 }
 
 technique 'my_test'
