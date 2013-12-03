@@ -51,7 +51,7 @@ class ForEachLightTechnique: public Technique
     {
       size_t properties_update_counter;
 
-      PrivateData ()
+      PrivateData (ForEachLightTechnique& technique)
         : properties_update_counter ()
       {
       }
@@ -66,7 +66,7 @@ class ForEachLightTechnique: public Technique
       {
           //получение приватных данных техники
 
-        PrivateData& private_data = private_data_holder.Get<PrivateData> ();
+        PrivateData& private_data = private_data_holder.Get<PrivateData> (*this);
 
         if (private_data.properties_update_counter != properties_update_counter)
         {

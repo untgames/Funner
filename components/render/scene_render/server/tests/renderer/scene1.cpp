@@ -91,7 +91,8 @@ int main ()
     
     target.SetScreen (&screen);
     
-    screen.SetBackgroundState (false);    
+    screen.SetBackgroundState (true);
+    screen.SetBackgroundColor (math::vec4f (0.0f, 1.0f, 1.0f, 1.0f));
 
     scene_graph::OrthoCamera::Pointer camera = scene_graph::OrthoCamera::Create ();
     

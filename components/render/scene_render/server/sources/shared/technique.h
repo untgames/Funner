@@ -50,8 +50,8 @@ class TechniquePrivateData
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Получение данных
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    template <class T>       T& Get ();
-    template <class T> const T& Get () const;
+    template <class T, class Technique>       T& Get (Technique&);
+    template <class T, class Technique> const T& Get (Technique&) const;
 
   private:
     void RaiseSizeError (const std::type_info&, size_t size);

@@ -171,8 +171,9 @@ typedef stl::vector<IViewportListener*>                           ListenerArray;
 
 struct Frame: public xtl::reference_counter
 {
-  manager::Frame       frame;
-  TechniquePrivateData private_data;
+  manager::Frame                frame;
+  stl::auto_ptr<manager::Frame> clear_frame;
+  TechniquePrivateData          private_data;
 
   Frame (const manager::Frame& in_frame)
     : frame (in_frame)
@@ -193,6 +194,8 @@ struct Viewport::Impl: public xtl::reference_counter, public ViewportDrawListNod
   RenderTargetEntryMap         render_target_entries;      //дескрипторы целей рендеринга
   stl::string                  name;                       //имя области вывода
   stl::string                  technique_name;             //имя техники
+  stl::string                  effect_name;                //имя эффекта
+  stl::string                  clear_effect_name;          //имя эффекта очистки
   TechniquePtr                 technique;                  //техника
   Rect                         area;                       //область вывода
   float                        min_depth;                  //минимальная глубина
@@ -274,9 +277,11 @@ struct Viewport::Impl: public xtl::reference_counter, public ViewportDrawListNod
 
       FramePtr frame_desc (new Frame (render_manager.Manager ().CreateFrame ()), false);
 
+      frame_desc->frame.SetEffect (effect_name.c_str ());
       frame_desc->frame.SetRenderTargets (frame_render_targets);
-
-      ConfigureBackground (frame_desc->frame);
+printf ("%s(%u)\n", __FUNCTION__, __LINE__); fflush (stdout);
+      ConfigureBackground (*frame_desc);
+      ConfigureEffects (*frame_desc);
 
       frames.push_back (frame_desc);
 
@@ -334,11 +339,28 @@ struct Viewport::Impl: public xtl::reference_counter, public ViewportDrawListNod
     need_reconfiguration  = true;
   }
 
-/// Создание техник
-  void CreateTechique ()
+/// Сброс техники
+  void ResetTechnique ()
+  {
+    frames.clear ();
+
+    technique = TechniquePtr ();
+
+    effect_name.clear ();
+    clear_effect_name.clear ();
+  }
+
+/// Создание техники
+  void CreateTechnique ()
   {
     try
     {
+        //сброс техники
+
+      ResetTechnique ();
+
+        //конфигурация
+
       common::Log&      log           = render_manager.Log ();
       common::ParseNode configuration = render_manager.Manager ().Configuration ();
 
@@ -354,29 +376,33 @@ struct Viewport::Impl: public xtl::reference_counter, public ViewportDrawListNod
         try
         {
           const char* program_name = common::get<const char*> (*iter, "program");
+          const char* effect       = common::get<const char*> (*iter, "effect");
+          const char* clear_effect = common::get<const char*> (*iter, "clear_effect", "");
 
           TechniquePtr technique = TechniqueManager::CreateTechnique (program_name, render_manager, iter->First ("program"));
 
           if (!technique)
             throw xtl::format_operation_exception ("", "Can't create technique '%s'", program_name);
 
-          technique->SetName (program_name);
+          technique->SetName (program_name);          
 
-          this->technique = technique;
+          this->technique         = technique;
+          this->effect_name       = effect;
+          this->clear_effect_name = clear_effect;
         }
         catch (std::exception& e)
         {
-          log.Printf ("%s\n    at create technique '%s' at viewport '%s'\n    at render::scene::server::Viewport::Impl::CreateTechique",
+          log.Printf ("%s\n    at create technique '%s' at viewport '%s'\n    at render::scene::server::Viewport::Impl::CreateTechnique",
             e.what (), technique_name, name.c_str ());
 
-          technique = TechniquePtr ();
+          ResetTechnique ();
         }
         catch (...)
         {
-          log.Printf ("unknown exception\n    at create technique '%s' at viewport '%s'\n    at render::scene::server::Viewport::Impl::CreateTechique",
+          log.Printf ("unknown exception\n    at create technique '%s' at viewport '%s'\n    at render::scene::server::Viewport::Impl::CreateTechnique",
             technique_name, name.c_str ());
 
-          technique = TechniquePtr ();
+          ResetTechnique ();
         }
 
         return;
@@ -386,7 +412,7 @@ struct Viewport::Impl: public xtl::reference_counter, public ViewportDrawListNod
     }
     catch (xtl::exception& e)
     {
-      e.touch ("render::scene::server::Viewport::Impl::CreateTechique(technique='%s')", technique_name.c_str ());
+      e.touch ("render::scene::server::Viewport::Impl::CreateTechnique(technique='%s')", technique_name.c_str ());
       throw;
     }
   }
@@ -398,10 +424,20 @@ struct Viewport::Impl: public xtl::reference_counter, public ViewportDrawListNod
     {
       render_manager.Log ().Printf ("Initializing technique '%s' for viewport '%s'", technique_name.c_str (), name.c_str ());
 
-      CreateTechique ();
+      try
+      {
+        CreateTechnique ();
 
-      need_update_properties = true;
-      need_update_technique  = false;
+        need_update_properties = true;
+        need_update_technique  = false;
+      }
+      catch (...)
+      {
+        need_update_properties = false;
+        need_update_technique  = false;
+
+        throw;
+      }
     }
     catch (xtl::exception& e)
     {
@@ -410,17 +446,43 @@ struct Viewport::Impl: public xtl::reference_counter, public ViewportDrawListNod
     }
   }
 
-/// Конфигурация параметров очистки
-  void ConfigureBackground (manager::Frame& frame)
+/// Конфигурация эффектов
+  void ConfigureEffects (Frame& desc)
   {
+    desc.frame.SetEffect (effect_name.c_str ());
+
+    if (clear_effect_name.empty ())
+      return;
+
+    desc.clear_frame.reset (new manager::Frame (render_manager.Manager ().CreateFrame ()));
+
+    desc.clear_frame->SetEffect (clear_effect_name.c_str ());
+  }
+
+/// Конфигурация параметров очистки
+  void ConfigureBackground (Frame& desc)
+  {
+printf ("%s(%u)\n", __FUNCTION__, __LINE__); fflush (stdout);
     if (background_state)
     {
-      frame.SetClearColor (background_color);
-      frame.SetClearFlags (manager::ClearFlag_All | manager::ClearFlag_ViewportOnly);
+      desc.frame.SetClearColor (background_color);
+      desc.frame.SetClearFlags (manager::ClearFlag_All | manager::ClearFlag_ViewportOnly);
+printf ("%s(%u)\n", __FUNCTION__, __LINE__); fflush (stdout);
+      if (desc.clear_frame)
+      {
+printf ("%s(%u)\n", __FUNCTION__, __LINE__); fflush (stdout);
+        desc.clear_frame->SetClearColor (background_color);
+        desc.clear_frame->SetClearFlags (manager::ClearFlag_All | manager::ClearFlag_ViewportOnly);
+printf ("%s(%u)\n", __FUNCTION__, __LINE__); fflush (stdout);
+      }
     }
     else
     {
-      frame.SetClearFlags (0u);
+printf ("%s(%u)\n", __FUNCTION__, __LINE__); fflush (stdout);
+      desc.frame.SetClearFlags (0u);
+
+      if (desc.clear_frame)
+        desc.clear_frame->SetClearFlags (0u);
     }
   }
 
@@ -430,7 +492,7 @@ struct Viewport::Impl: public xtl::reference_counter, public ViewportDrawListNod
     try
     {
       for (FrameArray::iterator iter=frames.begin (), end=frames.end (); iter!=end; ++iter)
-        ConfigureBackground ((*iter)->frame);
+        ConfigureBackground (**iter);
 
       need_update_background = false;
     }
@@ -501,13 +563,13 @@ struct Viewport::Impl: public xtl::reference_counter, public ViewportDrawListNod
       {
         render_manager.Log ().Printf ("%s\n    at update sub-technique '%s' properties for technique '%s' at viewport '%s'\n    at render::scene::server::Viewport::Impl::ReconfigureProperties", e.what (), technique->Name (), technique_name.c_str (), name.c_str ());
 
-        technique = TechniquePtr ();
+        ResetTechnique ();
       }
       catch (...)
       {
         render_manager.Log ().Printf ("unknown exception\n    at update sub-technique '%s' properties for technique '%s' at viewport '%s'\n    at render::scene::server::Viewport::Impl::ReconfigureProperties", technique->Name (), technique_name.c_str (), name.c_str ());
 
-        technique = TechniquePtr ();
+        ResetTechnique ();
       }      
 
       need_update_properties = false;
@@ -751,7 +813,8 @@ void Viewport::SetTechnique (const char* name)
   if (name == impl->technique_name)
     return;
 
-  impl->technique             = TechniquePtr ();
+  impl->ResetTechnique ();
+
   impl->technique_name        = name;
   impl->need_update_technique = true;
   impl->need_reconfiguration  = true;
@@ -829,10 +892,6 @@ void Viewport::SetMaxDrawDepth (size_t level)
     impl->frames.erase (impl->frames.begin () + level);
 
   impl->frames.reserve (level);
-
-//?????????????
-
-  throw xtl::make_not_implemented_exception (__FUNCTION__);
 }
 
 size_t Viewport::MaxDrawDepth () const
@@ -889,37 +948,43 @@ void Viewport::Update (manager::Frame* parent_frame)
 
       //создание контекста рендеринга
 
-//test!!! 
-    frame_desc->frame.SetEffect ("main");
-
     RenderingContext context (frame_desc->frame, impl->render_manager, camera_traverse_result, impl->camera);
 
       //обновление кадра
 
-    if (impl->technique)
+    if (!impl->technique)
+      return;
+
+    try
     {
-      try
-      {
-        impl->technique->UpdateFrame (context, frame_desc->private_data);
-      }
-      catch (std::exception& e)
-      {
-        impl->render_manager.Log ().Printf ("%s\n    at update sub-technique '%s' frame for technique '%s' at viewport '%s'\n    at render::scene::server::Viewport::Update", e.what (), impl->technique->Name (), impl->technique_name.c_str (), impl->name.c_str ());
-
-        impl->technique = TechniquePtr ();
-      }
-      catch (...)
-      {
-        impl->render_manager.Log ().Printf ("unknown exception\n    at update sub-technique '%s' frame for technique '%s' at viewport '%s'\n    at render::scene::server::Viewport::Update", impl->technique->Name (), impl->technique_name.c_str (), impl->name.c_str ());
-
-        impl->technique = TechniquePtr ();
-      }
+      impl->technique->UpdateFrame (context, frame_desc->private_data);
     }
+    catch (std::exception& e)
+    {
+      impl->render_manager.Log ().Printf ("%s\n    at update sub-technique '%s' frame for technique '%s' at viewport '%s'\n    at render::scene::server::Viewport::Update", e.what (), impl->technique->Name (), impl->technique_name.c_str (), impl->name.c_str ());
+
+      impl->ResetTechnique ();
+
+      return;
+    }
+    catch (...)
+    {
+      impl->render_manager.Log ().Printf ("unknown exception\n    at update sub-technique '%s' frame for technique '%s' at viewport '%s'\n    at render::scene::server::Viewport::Update", impl->technique->Name (), impl->technique_name.c_str (), impl->name.c_str ());
+
+      impl->ResetTechnique ();
+
+      return;
+    }
+
+      //очистка
+
+    if (frame_desc->clear_frame)
+      frame_desc->frame.AddFrame (*frame_desc->clear_frame);
 
       //отрисовка
       
-    manager::Frame& frame = frame_desc->frame;
-    
+    manager::Frame& frame = frame_desc->frame;   
+
     if (frame.EntitiesCount () || frame.FramesCount ())
     {
       if (parent_frame) parent_frame->AddFrame (frame);

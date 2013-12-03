@@ -60,7 +60,7 @@ inline TechniquePrivateData& TechniquePrivateData::operator = (const TechniquePr
   return *this;
 }
 
-template <class T> inline T& TechniquePrivateData::Get ()
+template <class T, class Technique> inline T& TechniquePrivateData::Get (Technique& technique)
 {
   static ITypeInfo* const this_type_info = &TypeInfoImpl<T>::instance;
 
@@ -77,14 +77,14 @@ template <class T> inline T& TechniquePrivateData::Get ()
     type_info = 0;
   }
 
-  T* result = new (buffer) T;
+  T* result = new (buffer) T (technique);
 
   type_info = this_type_info;
 
   return *result;
 }
 
-template <class T> inline const T& TechniquePrivateData::Get () const
+template <class T, class Technique> inline const T& TechniquePrivateData::Get (Technique& technique) const
 {
-  return const_cast<TechniquePrivateData&> (*this).template Get<T> ();
+  return const_cast<TechniquePrivateData&> (*this).template Get<T> (technique);
 }

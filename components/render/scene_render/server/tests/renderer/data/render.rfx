@@ -206,6 +206,8 @@ effect "main"
   //description of child effects rendering: rendering shadow maps
   effect_group "shadow" //list of effect tags which will be added to this subeffects loop
 
+  effect_group "clearing"        //clear frame
+
   //rendering of geometry without lighting (for early z-test)
   pass
   {
@@ -304,20 +306,25 @@ effect "lighting"
   }
 }
 
-technique 'default'
+effect "clearing"
 {
-  program 'draw_without_lights'
-}
+  tags "clearing"
 
-technique 'my_test'
-{
-  effect       'main'       //name of the root effect for this technique
-  clear_effect 'clearing'   //name of the clearing effect
-
-  program      'for_each_light'
+  pass
   {
-    first_light_effect  'effect for first light'
-    other_lights_effect 'effect for other lights'
+    tags                  ""
+    clear                 all
+    color_targets         "main_color_target"
+    depth_stencil_target  "main_depth_stencil_target"
   }
 }
 
+technique "default"
+{
+  effect       "main"                    //name of the root effect for this technique
+  clear_effect "clearing"                //name of the clearing effect               
+  program      "draw_without_lights"     //name of the builtin program for scene enumeration
+  {
+    effect "lighting"
+  }
+}

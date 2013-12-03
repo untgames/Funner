@@ -22,33 +22,18 @@ class DrawWithoutLights: public Technique
 ///Конструктор / деструктор
     DrawWithoutLights (RenderManager& in_manager, const common::ParseNode& node)
       : manager (in_manager)
-      , frame (manager.Manager ().CreateFrame ())
     {
-        //задание начальных свойств для пар frame-entity
+        //чтение имени эффекта
 
-      common::PropertyMap properties;
-
-      properties.SetProperty ("ModelViewMatrix",           math::mat4f (1.0f));
-      properties.SetProperty ("ModelViewProjectionMatrix", math::mat4f (1.0f));
-
-      mv_matrix_property_index   = properties.IndexOf ("ModelViewMatrix");
-      mvp_matrix_property_index  = properties.IndexOf ("ModelViewProjectionMatrix");      
-
-      frame.SetInitialEntityDrawProperties (properties);
-      frame.SetEntityDrawHandler (xtl::bind (&DrawWithoutLights::EntityDrawHandler, this, _1, _2, _3, _4));
+      effect_name = common::get<const char*> (node, "effect");
 
         //задание начальных свойств кадра
 
       frame_properties.SetProperty ("ViewMatrix", math::mat4f (1.0f));
       frame_properties.SetProperty ("ProjectionMatrix", math::mat4f (1.0f));
 
-      frame.SetProperties (frame_properties);
-
       view_matrix_property_index = frame_properties.IndexOf ("ViewMatrix");
       proj_matrix_property_index = frame_properties.IndexOf ("ProjectionMatrix");
-
-//for test!!!!!!!!!!!!
-      frame.SetEffect ("lighting");
     }    
 
 /// Имена для регистрации
@@ -58,14 +43,16 @@ class DrawWithoutLights: public Technique
   private:
     struct PrivateData
     {
-      size_t      view_transaction_id;
-      size_t      proj_transaction_id;
-      size_t      view_proj_transaction_id;
-      math::mat4f view_tm;
-      math::mat4f view_proj_tm;
+      manager::Frame  frame;                      //фрейм
+      size_t          view_transaction_id;        //счетчик обновлений матрицы вида
+      size_t          proj_transaction_id;        //счетчик обновлений матрицы проекции
+      size_t          view_proj_transaction_id;   //счетчик обновлений матрицы вид-проекция
+      math::mat4f     view_tm;                    //матрица вида
+      math::mat4f     view_proj_tm;               //матрица вид-проекция
 
-      PrivateData ()
-        : view_transaction_id ()
+      PrivateData (DrawWithoutLights& technique)
+        : frame (technique.CreateFrame ())
+        , view_transaction_id ()
         , proj_transaction_id ()
         , view_proj_transaction_id ()
         , view_tm (1.0f)
@@ -73,6 +60,43 @@ class DrawWithoutLights: public Technique
       {
       }
     };
+
+/// Создание кадра
+    manager::Frame CreateFrame ()
+    {
+      try
+      {
+        manager::Frame frame = manager.Manager ().CreateFrame ();
+
+          //задание эффекта
+   
+        frame.SetEffect (effect_name.c_str ());
+
+          //задание начальных свойств для пар frame-entity
+
+        common::PropertyMap properties;
+
+        properties.SetProperty ("ModelViewMatrix",           math::mat4f (1.0f));
+        properties.SetProperty ("ModelViewProjectionMatrix", math::mat4f (1.0f));
+
+        mv_matrix_property_index   = properties.IndexOf ("ModelViewMatrix");
+        mvp_matrix_property_index  = properties.IndexOf ("ModelViewProjectionMatrix");      
+
+        frame.SetInitialEntityDrawProperties (properties);
+        frame.SetEntityDrawHandler (xtl::bind (&DrawWithoutLights::EntityDrawHandler, this, _1, _2, _3, _4));
+
+          //задание свойств фрейма
+
+        frame.SetProperties (frame_properties);
+
+        return frame;
+      }
+      catch (xtl::exception& e)
+      {
+        e.touch ("render::scene::server::DrawWithoutLights::CreateFrame");
+        throw;
+      }
+    }
   
   private:
 ///Обновление кадра
@@ -82,7 +106,7 @@ class DrawWithoutLights: public Technique
       {
           //получение приватных данных техники
 
-        PrivateData& private_data = private_data_holder.Get<PrivateData> ();
+        PrivateData& private_data = private_data_holder.Get<PrivateData> (*this);
 
         if (private_data.view_proj_transaction_id != parent_context.Camera ().ViewProjectionMatrixTransactionId ())
         {
@@ -111,13 +135,13 @@ class DrawWithoutLights: public Technique
         
           //обновление визуализируемых объектов
 
-        RenderingContext context (parent_context, frame);
+        RenderingContext context (parent_context, private_data.frame);
 
         Technique::Draw (context, result.visual_models, &private_data);
 
           //добавление дочернего кадра
 
-        parent_context.Frame ().AddFrame (frame);
+        parent_context.Frame ().AddFrame (private_data.frame);
       }
       catch (xtl::exception& e)
       {
@@ -152,7 +176,7 @@ class DrawWithoutLights: public Technique
 
   private:
     RenderManager       manager;                    //менеджер рендеринга
-    manager::Frame      frame;                      //фрейм техники
+    stl::string         effect_name;                //имя эффекта
     common::PropertyMap frame_properties;           //свойства кадра
     size_t              mv_matrix_property_index;   //индекс свойства матрицы ModelView
     size_t              mvp_matrix_property_index;  //индекс свойства матрицы ModelViewProjection
