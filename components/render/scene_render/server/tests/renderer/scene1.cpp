@@ -85,7 +85,7 @@ int main ()
     client.LoadResource ("data/u1.xmtl");
     client.LoadResource ("data/u1.binmesh");
 
-    RenderTarget target = client.CreateRenderTarget ("my_window", "color_binding=main_color_target depth_stencil_binding=main_depth_stencil_target");
+    RenderTarget target = client.CreateRenderTarget ("my_window");
 
     scene_graph::Screen screen;
     
