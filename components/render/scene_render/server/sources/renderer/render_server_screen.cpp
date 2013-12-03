@@ -3,8 +3,6 @@
 using namespace render;
 using namespace render::scene::server;
 
-//TODO: screen background
-
 namespace
 {
 
@@ -12,11 +10,13 @@ namespace
     Константы
 */
 
-const size_t RESERVED_VIEWPORTS_COUNT                     = 8;                        //резервируемое количество областей вывода
-const char*  COLOR_BINDING_PROPERTY_NAME                  = "color_binding";          //имя свойства биндинга буфера цвета
-const char*  DEPTH_STENCIL_BINDING_PROPERTY_NAME          = "depth_stencil_binding";  //имя свойства биндинга буфера глубины
-const char*  DEFAULT_COLOR_BINDING_PROPERTY_VALUE         = "default_color";          //значение по умолчанию свойства биндинга буфера цвета
-const char*  DEFAULT_DEPTH_STENCIL_BINDING_PROPERTY_VALUE = "default_depth_stencil";  //значение по умолчанию буфера глубины
+const size_t RESERVED_VIEWPORTS_COUNT                       = 8;                         //резервируемое количество областей вывода
+const char*  DEPTH_STENCIL_BINDING_PROPERTY_NAME            = "depth_stencil_binding";   //имя свойства биндинга буфера глубины
+const char*  COLOR_BINDING_PROPERTY_NAME                    = "color_binding";           //имя свойства биндинга буфера цвета
+const char*  CLEARING_EFFECT_BINDING_PROPERTY_NAME          = "clearing_effect_binding"; //имя эффекта очистки экрана
+const char*  DEFAULT_COLOR_BINDING_PROPERTY_VALUE           = "default_color";           //значение по умолчанию свойства биндинга буфера цвета
+const char*  DEFAULT_DEPTH_STENCIL_BINDING_PROPERTY_VALUE   = "default_depth_stencil";   //значение по умолчанию буфера глубины
+const char*  DEFAULT_CLEARING_EFFECT_BINDING_PROPERTY_VALUE = "clearing";                //значение по умолчанию имени эффекта очистки экрана
 
 /*
     Вспомогательные структуры
@@ -67,20 +67,21 @@ typedef stl::vector<ViewportPtr>         ViewportDescList;
 
 struct Screen::Impl: public xtl::reference_counter
 {
-  RenderManager        render_manager;              //менеджер рендеринга
-  RenderTargetMap      render_targets;              //цели рендеринга
-  stl::string          name;                        //имя экрана
-  bool                 active;                      //активность экрана
-  Rect                 area;                        //область экрана
-  bool                 background_state;            //состояние заднего фона
-  math::vec4f          background_color;            //цвет заднего фона
-  bool                 need_reorder;                //необходимость пересортировки областей вывода
-  ViewportManager      viewport_manager;            //менеджер областей вывода
-  ViewportDescList     viewports;                   //области вывода
-  ViewportDrawList     drawing_viewports;           //отрисовываемые области вывода
-  manager::Window*     window;                      //связанное окно
-  xtl::auto_connection on_window_resize_connection; //соединение с сигналом оповещения об изменении размеров окна
-  xtl::auto_connection on_window_update_connection; //соединение с сигналом оповещения об обновлении окна
+  RenderManager                 render_manager;              //менеджер рендеринга
+  RenderTargetMap               render_targets;              //цели рендеринга
+  stl::string                   name;                        //имя экрана
+  bool                          active;                      //активность экрана
+  Rect                          area;                        //область экрана
+  bool                          background_state;            //состояние заднего фона
+  math::vec4f                   background_color;            //цвет заднего фона
+  bool                          need_reorder;                //необходимость пересортировки областей вывода
+  ViewportManager               viewport_manager;            //менеджер областей вывода
+  ViewportDescList              viewports;                   //области вывода
+  ViewportDrawList              drawing_viewports;           //отрисовываемые области вывода
+  manager::Window*              window;                      //связанное окно
+  xtl::auto_connection          on_window_resize_connection; //соединение с сигналом оповещения об изменении размеров окна
+  xtl::auto_connection          on_window_update_connection; //соединение с сигналом оповещения об обновлении окна
+  stl::auto_ptr<manager::Frame> clear_frame;                 //кадр очистки
 
 /// Конструктор
   Impl (const char* in_name, const char* init_string, WindowManager& window_manager, const RenderManager& in_render_manager, const ViewportManager& in_viewport_manager)
@@ -97,7 +98,15 @@ struct Screen::Impl: public xtl::reference_counter
   {
     viewports.reserve (RESERVED_VIEWPORTS_COUNT);
 
-    InitRenderTargets (window_manager, init_string);
+    common::PropertyMap properties = common::parse_init_string (init_string);
+
+      //инициализация параметров очистки
+
+    InitClearing (properties);
+
+      //инициализация целей рендеринга
+
+    InitRenderTargets (window_manager, properties);
   }
 
 /// Деструктор
@@ -110,7 +119,7 @@ struct Screen::Impl: public xtl::reference_counter
   }
 
 /// Инициализация целей отрисовки
-  void InitRenderTargets (WindowManager& window_manager, const char* init_string)
+  void InitRenderTargets (WindowManager& window_manager, const common::PropertyMap& properties)
   {
     try
     {
@@ -125,19 +134,46 @@ struct Screen::Impl: public xtl::reference_counter
 
         //заполнение биндингов цели отрисовки
 
-      common::PropertyMap properties = common::parse_init_string (init_string);
-
       const char *color_binding         = properties.IsPresent (COLOR_BINDING_PROPERTY_NAME) ? properties.GetString (COLOR_BINDING_PROPERTY_NAME) : DEFAULT_COLOR_BINDING_PROPERTY_VALUE,
                  *depth_stencil_binding = properties.IsPresent (DEPTH_STENCIL_BINDING_PROPERTY_NAME) ? properties.GetString (DEPTH_STENCIL_BINDING_PROPERTY_NAME) : DEFAULT_DEPTH_STENCIL_BINDING_PROPERTY_VALUE;
 
       render_targets.Add (color_binding, window.ColorBuffer (), area);
       render_targets.Add (depth_stencil_binding, window.DepthStencilBuffer (), area);
 
+//TODO: init clearing for all targets
+
+      if (clear_frame)
+      {
+        clear_frame->SetRenderTarget (color_binding, window.ColorBuffer ());
+        clear_frame->SetRenderTarget (depth_stencil_binding, window.DepthStencilBuffer ());
+      }
+
       this->window = &window;
     }
     catch (xtl::exception& e)
     {
       e.touch ("render::scene::server::Screen::Impl::InitRenderTargets");
+      throw;
+    }
+  }
+
+/// Инициализация параметров очистки
+  void InitClearing (const common::PropertyMap& properties)
+  {
+    try
+    {
+      const char* clear_effect = properties.IsPresent (CLEARING_EFFECT_BINDING_PROPERTY_NAME) ? properties.GetString (CLEARING_EFFECT_BINDING_PROPERTY_NAME) : DEFAULT_CLEARING_EFFECT_BINDING_PROPERTY_VALUE;
+
+      if (!*clear_effect)
+        return;
+
+      clear_frame.reset (new manager::Frame (render_manager.Manager ().CreateFrame ()));
+
+      clear_frame->SetEffect (clear_effect);
+    }
+    catch (xtl::exception& e)
+    {
+      e.touch ("render::scene::server::Screen::Impl::InitClearing");
       throw;
     }
   }
@@ -202,6 +238,14 @@ struct Screen::Impl: public xtl::reference_counter
 
       if (need_reorder)
         Reorder ();
+
+        //очистка
+
+      if (clear_frame && background_state)
+      {
+        if (parent_frame) parent_frame->AddFrame (*clear_frame);
+        else              clear_frame->Draw ();
+      }
 
         //обход областей вывода
 
@@ -337,10 +381,29 @@ const Rect& Screen::Area () const
 
 void Screen::SetBackground (bool state, const math::vec4f& color)
 {
-  impl->background_state = state;
-  impl->background_color = color;
+  try
+  {
+    impl->background_state = state;
+    impl->background_color = color;
 
-//??????????????????
+    if (!impl->clear_frame)
+      return;
+
+    if (state)
+    {
+      impl->clear_frame->SetClearColor (color);
+      impl->clear_frame->SetClearFlags (manager::ClearFlag_All | manager::ClearFlag_ViewportOnly);
+    }
+    else
+    {
+      impl->clear_frame->SetClearFlags (0u);
+    }
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::scene::server::Screen::SetBackground");
+    throw;
+  }
 }
 
 bool Screen::BackgroundState () const

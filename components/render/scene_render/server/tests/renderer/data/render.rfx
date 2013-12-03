@@ -282,7 +282,6 @@ effect "lighting"
   pass
   {
     tags                  "solid"                   //render only non-transparent geometry
-    clear                 all
     sort                  states                    //sort geometry for decrease state switches
     color_targets         "default_color"           //render to effect color buffer
     depth_stencil_target  "default_depth_stencil"   //render to effect depth stencil buffer
@@ -321,9 +320,8 @@ effect "clearing"
 
 technique "default"
 {
-  effect       "main"                    //name of the root effect for this technique
-  clear_effect "clearing"                //name of the clearing effect               
-  program      "draw_without_lights"     //name of the builtin program for scene enumeration
+  effect  "main"                    //name of the root effect for this technique
+  program "draw_without_lights"     //name of the builtin program for scene enumeration
   {
     effect "lighting"
   }

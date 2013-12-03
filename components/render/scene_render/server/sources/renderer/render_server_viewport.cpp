@@ -171,9 +171,8 @@ typedef stl::vector<IViewportListener*>                           ListenerArray;
 
 struct Frame: public xtl::reference_counter
 {
-  manager::Frame                frame;
-  stl::auto_ptr<manager::Frame> clear_frame;
-  TechniquePrivateData          private_data;
+  manager::Frame       frame;
+  TechniquePrivateData private_data;
 
   Frame (const manager::Frame& in_frame)
     : frame (in_frame)
@@ -195,7 +194,6 @@ struct Viewport::Impl: public xtl::reference_counter, public ViewportDrawListNod
   stl::string                  name;                       //имя области вывода
   stl::string                  technique_name;             //имя техники
   stl::string                  effect_name;                //имя эффекта
-  stl::string                  clear_effect_name;          //имя эффекта очистки
   TechniquePtr                 technique;                  //техника
   Rect                         area;                       //область вывода
   float                        min_depth;                  //минимальная глубина
@@ -279,7 +277,7 @@ struct Viewport::Impl: public xtl::reference_counter, public ViewportDrawListNod
 
       frame_desc->frame.SetEffect (effect_name.c_str ());
       frame_desc->frame.SetRenderTargets (frame_render_targets);
-printf ("%s(%u)\n", __FUNCTION__, __LINE__); fflush (stdout);
+
       ConfigureBackground (*frame_desc);
       ConfigureEffects (*frame_desc);
 
@@ -347,7 +345,6 @@ printf ("%s(%u)\n", __FUNCTION__, __LINE__); fflush (stdout);
     technique = TechniquePtr ();
 
     effect_name.clear ();
-    clear_effect_name.clear ();
   }
 
 /// Создание техники
@@ -377,7 +374,6 @@ printf ("%s(%u)\n", __FUNCTION__, __LINE__); fflush (stdout);
         {
           const char* program_name = common::get<const char*> (*iter, "program");
           const char* effect       = common::get<const char*> (*iter, "effect");
-          const char* clear_effect = common::get<const char*> (*iter, "clear_effect", "");
 
           TechniquePtr technique = TechniqueManager::CreateTechnique (program_name, render_manager, iter->First ("program"));
 
@@ -386,9 +382,8 @@ printf ("%s(%u)\n", __FUNCTION__, __LINE__); fflush (stdout);
 
           technique->SetName (program_name);          
 
-          this->technique         = technique;
-          this->effect_name       = effect;
-          this->clear_effect_name = clear_effect;
+          this->technique   = technique;
+          this->effect_name = effect;
         }
         catch (std::exception& e)
         {
@@ -450,39 +445,19 @@ printf ("%s(%u)\n", __FUNCTION__, __LINE__); fflush (stdout);
   void ConfigureEffects (Frame& desc)
   {
     desc.frame.SetEffect (effect_name.c_str ());
-
-    if (clear_effect_name.empty ())
-      return;
-
-    desc.clear_frame.reset (new manager::Frame (render_manager.Manager ().CreateFrame ()));
-
-    desc.clear_frame->SetEffect (clear_effect_name.c_str ());
   }
 
 /// Конфигурация параметров очистки
   void ConfigureBackground (Frame& desc)
   {
-printf ("%s(%u)\n", __FUNCTION__, __LINE__); fflush (stdout);
     if (background_state)
     {
       desc.frame.SetClearColor (background_color);
       desc.frame.SetClearFlags (manager::ClearFlag_All | manager::ClearFlag_ViewportOnly);
-printf ("%s(%u)\n", __FUNCTION__, __LINE__); fflush (stdout);
-      if (desc.clear_frame)
-      {
-printf ("%s(%u)\n", __FUNCTION__, __LINE__); fflush (stdout);
-        desc.clear_frame->SetClearColor (background_color);
-        desc.clear_frame->SetClearFlags (manager::ClearFlag_All | manager::ClearFlag_ViewportOnly);
-printf ("%s(%u)\n", __FUNCTION__, __LINE__); fflush (stdout);
-      }
     }
     else
     {
-printf ("%s(%u)\n", __FUNCTION__, __LINE__); fflush (stdout);
       desc.frame.SetClearFlags (0u);
-
-      if (desc.clear_frame)
-        desc.clear_frame->SetClearFlags (0u);
     }
   }
 
@@ -975,11 +950,6 @@ void Viewport::Update (manager::Frame* parent_frame)
 
       return;
     }
-
-      //очистка
-
-    if (frame_desc->clear_frame)
-      frame_desc->frame.AddFrame (*frame_desc->clear_frame);
 
       //отрисовка
       
