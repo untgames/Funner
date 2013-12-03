@@ -2,6 +2,8 @@
 
 using namespace scene_graph;
 
+template class engine::decl_sg_cast<Entity, Node>;
+
 namespace engine
 {
 
