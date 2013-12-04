@@ -580,4 +580,7 @@ public class EngineActivity extends Activity
   public native void onPauseCallback ();
   public native void onResumeCallback ();
   public native void onLowMemoryCallback ();
+
+/// Посылка сообщения в приложение
+  public native void postNotification (String notification);
 }

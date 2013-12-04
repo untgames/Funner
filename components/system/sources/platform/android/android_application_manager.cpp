@@ -315,6 +315,20 @@ void on_low_memory_callback (JNIEnv& env, jobject activity)
   AndroidApplicationDelegate::PushMessage (xtl::bind (&AndroidApplicationDelegate::OnMemoryWarning, application_delegate));
 }
 
+/*
+    Посылка сообщения приложению
+*/
+
+void post_notification_impl (const stl::string& notification)
+{
+  Application::PostNotification (notification.c_str ());
+}
+
+void post_notification (JNIEnv& env, jobject, jstring notification)
+{
+  AndroidApplicationDelegate::PushMessage (xtl::bind (&post_notification_impl, tostring (notification)));
+}
+
 }
 
 /*
@@ -458,6 +472,7 @@ void register_activity_callbacks (JNIEnv* env, jclass activity_class)
       {"onPauseCallback", "()V", (void*)&on_pause_callback},
       {"onResumeCallback", "()V", (void*)&on_resume_callback},
       {"onLowMemoryCallback", "()V", (void*)&on_low_memory_callback},
+      {"postNotification", "(Ljava/lang/String;)V", (void*)&post_notification},
     };
 
     static const size_t methods_count = sizeof (methods) / sizeof (*methods);
