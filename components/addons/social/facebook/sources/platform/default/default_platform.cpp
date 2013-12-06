@@ -20,6 +20,10 @@ void DefaultPlatform::CancelLogin ()
 {
 }
 
+void DefaultPlatform::LogOut ()
+{
+}
+
 /*
    Публикация события установки приложения
 */

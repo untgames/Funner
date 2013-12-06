@@ -219,7 +219,7 @@ void FacebookSessionImpl::LogIn (const LoginCallback& callback, const common::Pr
   }
 }
 
-void FacebookSessionImpl::OnPlatformLogInFinished (bool platform_login_result, OperationStatus status, const char* error, const char* login_url, const LoginCallback& callback)
+void FacebookSessionImpl::OnPlatformLogInFinished (bool platform_login_result, OperationStatus status, const char* error, const char* in_token, const LoginCallback& callback)
 {
   try
   {
@@ -227,10 +227,12 @@ void FacebookSessionImpl::OnPlatformLogInFinished (bool platform_login_result, O
 
     if (platform_login_result)
     {
-      if (status == OperationStatus_Success)
-        HandleLoginResultUrl (login_url, callback);
-      else
+      token = in_token;
+
+      if (token.empty ())
         callback (status, error);
+      else
+        OnLoginTokenUpdated (callback);
 
       return;
     }
@@ -385,6 +387,8 @@ void FacebookSessionImpl::ProcessLoginFail (const LoginCallback& callback)
 void FacebookSessionImpl::LogOut ()
 {
   CloseSession ();
+
+  Platform::LogOut ();
 
   syslib::CookieManager::DeleteAllCookies ();
 }

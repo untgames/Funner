@@ -20,12 +20,13 @@ class DefaultPlatform
 {
   public:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Логин
+///Логин/логаут
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    typedef xtl::function<void (bool platform_login_result, OperationStatus status, const char* error, const char* login_url)> PlatformLoginCallback;
+    typedef xtl::function<void (bool platform_login_result, OperationStatus status, const char* error, const char* token)> PlatformLoginCallback;
 
     static void Login       (const char* app_id, const PlatformLoginCallback& callback, const common::PropertyMap& properties);
     static void CancelLogin ();
+    static void LogOut      ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Публикация события установки приложения

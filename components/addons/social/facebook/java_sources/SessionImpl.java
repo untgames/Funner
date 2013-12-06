@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.util.Log;
 
 import com.facebook.AppEventsLogger;
+import com.facebook.FacebookOperationCanceledException;
 import com.facebook.Session;
 import com.facebook.SessionState;
 import com.facebook.Settings;
@@ -63,52 +64,28 @@ public class SessionImpl implements EngineActivity.EngineActivityEventListener, 
     }
     
     String resourcesVersion = activity.getString (resId);
-    
-    return false; //TODO implement custom login
-    
-/*    Log.d (TAG, "Check can login. SDK version = " + Settings.getSdkVersion () + " resourcesVersion = " + resourcesVersion);
+
+    Log.d (TAG, "Check can login. SDK version = " + Settings.getSdkVersion () + " resourcesVersion = " + resourcesVersion);
 
     if (!Settings.getSdkVersion ().equals (resourcesVersion))
     	throw new IllegalStateException ("Facebook SDK and Facebook SDK resources version mismatch");
     
-		return true;*/
-	}
-	
-	private boolean isReadPermission (String permission)
-	{
-		final String [] readPermissions = {
-			
-		};
-
-		for (String readPermission : readPermissions)
-		{
-//TODO 			if ()
-		}
-		
-		return false;
-	}
-	
-	private boolean isWritePermission (String permission)
-	{
-	//TODO
-		return false;
+		return true;
 	}
 	
 	public void login (String permissions)
 	{
 		String [] permissionsArray = permissions.split (",");
 		
-		List<String> readPermissions  = new ArrayList<String> (permissionsArray.length); 
-		List<String> writePermissions = new ArrayList<String> (permissionsArray.length); 
+		final List<String> readPermissions  = new ArrayList<String> (permissionsArray.length); 
+		final List<String> writePermissions = new ArrayList<String> (permissionsArray.length); 
 		
 		for (String permission : permissionsArray)
 		{
-			if (isReadPermission (permission))
-				readPermissions.add (permission);
-			else if (isWritePermission (permission))
-				writePermissions.add (permission);
+			if (Session.isPublishPermission (permission))
+			  writePermissions.add (permission);
 			else
-				throw new IllegalArgumentException ("Unknown permission requested: " + permission);
+			  readPermissions.add (permission);
 		}
 		
 		if (!writePermissions.isEmpty ()) //TODO
@@ -123,6 +100,9 @@ public class SessionImpl implements EngineActivity.EngineActivityEventListener, 
   		{
   			try
   			{
+  			  if (Session.getActiveSession () != null)
+  			    Session.getActiveSession ().closeAndClearTokenInformation ();
+  			  
   				Session.Builder sessionBuilder = new Session.Builder (activity);
   				
   				sessionBuilder.setApplicationId (applicationId);
@@ -138,9 +118,34 @@ public class SessionImpl implements EngineActivity.EngineActivityEventListener, 
             @Override
             public void call(Session session, SessionState state, Exception exception) 
             {
-            	//TODO call ok/cancel/error/request permissions
+            	if (session.isOpened ())
+            	{
+            	  if (writePermissions.isEmpty ())
+            	  {
+                  onLoginSucceeded (session.getAccessToken ());
+            	  }
+            	  else
+            	  {
+            	    //TODO request publish permissions
+            	  }
+            	}
+            	else
+            	{
+            		switch (session.getState ())
+            		{
+            		  case CLOSED_LOGIN_FAILED:
+            		    if (exception instanceof FacebookOperationCanceledException)
+                      onLoginCanceled ();
+            		    else
+              		  	onLoginFailed (exception.toString ());
+            		    
+            		  	break;
+            		}
+            	}
             }
       	  });
+  				
+  				openRequest.setPermissions (readPermissions);
   				
       	  activeSession.openForRead (openRequest);
   			}
@@ -148,13 +153,19 @@ public class SessionImpl implements EngineActivity.EngineActivityEventListener, 
   			{
   				Log.e (TAG, "Exception while logging in: " + e.getMessage () + "\n stack: ");
   				e.printStackTrace ();
-  				//TODO call error
+  				onLoginFailed (e.getMessage ());
   			}
   		}
 		});
 	}
 	
-  public void publishInstall ()
+  public static void logout ()
+  {
+    if (Session.getActiveSession () != null)
+      Session.getActiveSession ().closeAndClearTokenInformation ();
+  }
+
+	public void publishInstall ()
   {
 		Log.d (TAG, "Publishing install");
 
@@ -173,4 +184,8 @@ public class SessionImpl implements EngineActivity.EngineActivityEventListener, 
   		}
   	});
   }
+
+	private native void onLoginSucceeded (String token);
+  private native void onLoginFailed (String error);
+  private native void onLoginCanceled ();
 }
