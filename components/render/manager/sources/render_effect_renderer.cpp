@@ -4,6 +4,25 @@ using namespace render::manager;
 
 //TODO: program/parameters_layout/local_textures FIFO cache
 
+/*
+  Sprite integration:
+    - operations merge condition:
+      * same PassOperation::frame_entity_parameters_layout
+      * same PassOperation::frame_entity_parameters_buffer
+      * same RendererOperation::scissor
+      * same RendererOperation::shader_options_cache
+      * same RendererOperation::entity_parameters_layout
+      * same RendererOperation::state_block (hard!!! material dependent)
+      * same RendererOperation::entity
+      * same RendererPrimitive::material
+      * same RendererPrimitive::state_block (???)
+      * same RendererPrimitive::indexed
+      * same RendererPrimitive::type
+      * same RendererPrimitive::base_vertex
+
+  maybe, grouping id/hash should be use instead of all parameters
+*/
+
 namespace
 {
 

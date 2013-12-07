@@ -4,6 +4,8 @@ using namespace render;
 using namespace render::manager;
 using namespace render::low_level;
 
+//TODO: если материал не содержит динамических текстур - возвращаеть StateBlock от Entity
+
 namespace
 {
 
