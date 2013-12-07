@@ -5,6 +5,7 @@ using namespace render::manager;
 using namespace render::low_level;
 
 //TODO: если материал не содержит динамических текстур - возвращаеть StateBlock от Entity
+//TODO: ќбработчик оповещени€ об обновлении примитивов
 
 namespace
 {
@@ -335,7 +336,7 @@ class EntityLodCommonData: public CacheHolder, public DebugIdHolder
 
 typedef stl::vector<RendererOperation> RendererOperationArray;
 
-struct EntityLod: public xtl::reference_counter, public CacheHolder, public DebugIdHolder
+struct EntityLod: public xtl::reference_counter, public CacheHolder, public DebugIdHolder, public IPrimitiveUpdateListener
 {
   EntityLodCommonData&   common_data;           //общие данные дл€ всех уровней детализации
   size_t                 level_of_detail;       //номер уровн€ детализации
@@ -363,6 +364,9 @@ struct EntityLod: public xtl::reference_counter, public CacheHolder, public Debu
 ///ƒеструктор
   ~EntityLod ()
   {
+    if (cached_primitive)
+      cached_primitive->DetachListener (this);
+
     if (common_data.DeviceManager ()->Settings ().HasDebugLog ())
       Log ().Printf ("Entity lod destroyed (entity_id=%u, id=%u)", common_data.Id (), Id ());
   }
@@ -372,6 +376,9 @@ struct EntityLod: public xtl::reference_counter, public CacheHolder, public Debu
   {
     if (common_data.DeviceManager ()->Settings ().HasDebugLog ())
       Log ().Printf ("Reset entity lod cache (entity_id=%u, id=%u)", common_data.Id (), Id ());
+
+    if (cached_primitive)
+      cached_primitive->DetachListener (this);
         
     cached_primitive = PrimitivePtr ();
     
@@ -391,6 +398,10 @@ struct EntityLod: public xtl::reference_counter, public CacheHolder, public Debu
 
       if (!cached_primitive)
         throw xtl::format_operation_exception ("", "Primitive '%s' not found", primitive.Name ());
+
+        //регистраци€ слушател€
+      
+      cached_primitive->AttachListener (this);
         
         //получение групп
 
@@ -449,6 +460,12 @@ struct EntityLod: public xtl::reference_counter, public CacheHolder, public Debu
       throw;
     }
   }  
+
+/// ќбработчик оповещени€ об обновлении примитивов
+  void UpdateRendererPrimitives (size_t group_index, size_t first_primitive_index, size_t primitives_count)
+  {
+//TODO: обработчик оповещени€
+  }
   
   using CacheHolder::UpdateCache;
   using CacheHolder::ResetCache;  

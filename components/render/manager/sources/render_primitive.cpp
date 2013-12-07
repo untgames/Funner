@@ -292,6 +292,7 @@ struct PrimitiveImpl::Impl: public DebugIdHolder
   stl::string                name;             //имя примитива
   RenderPrimitiveGroupsArray render_groups;    //группы  
   Log                        log;              //поток протоколирования
+  PrimitiveUpdateNotifier    update_notifier;  //оповещатель обновлений примитива
 
 ///Конструктор
   Impl (const DeviceManagerPtr& in_device_manager, const MaterialManagerPtr& in_material_manager, const BuffersPtr& in_buffers, const char* in_name)
@@ -608,6 +609,20 @@ RendererPrimitiveGroup* PrimitiveImpl::RendererPrimitiveGroups ()
     return 0;
   
   return &impl->render_groups [0];
+}
+
+/*
+    Регистрация слушателей обновления примитивов рендеринга
+*/
+
+void PrimitiveImpl::AttachListener (IPrimitiveUpdateListener* listener)
+{
+  impl->update_notifier.Attach (listener);
+}
+
+void PrimitiveImpl::DetachListener (IPrimitiveUpdateListener* listener)
+{
+  impl->update_notifier.Detach (listener);
 }
 
 /*
