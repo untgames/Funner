@@ -3,6 +3,8 @@
 using namespace render::manager;
 using namespace render::low_level;
 
+//TODO: расчет вершинного буфера для спрайтов для каждого кадра
+
 /*
     Описание реализации примитива
 */
