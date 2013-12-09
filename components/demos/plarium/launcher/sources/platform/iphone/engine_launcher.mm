@@ -441,6 +441,58 @@ class LocalNotificationsHandler : public INotificationListener
 
 const char* LocalNotificationsHandler::LOCAL_NOTIFICATIONS_PREFIX = "LocalNotifications ";
 
+class HasOffersTrackEventHandler : public INotificationListener
+{
+  private:
+    static const char* HAS_OFFERS_TRACK_EVENT_PREFIX;
+
+  public:
+    ///Constructor/destructor
+    HasOffersTrackEventHandler (engine::IEngine* in_engine)
+      : engine (in_engine)
+    {
+      engine->AttachNotificationListener (plarium::utility::format ("%s*", HAS_OFFERS_TRACK_EVENT_PREFIX).c_str (), this);
+    }
+
+    ~HasOffersTrackEventHandler ()
+    {
+      engine->DetachNotificationListener (this);
+    }
+
+    ///Notification handler
+    void OnNotification (const char* notification)
+    {
+      notification += strlen (HAS_OFFERS_TRACK_EVENT_PREFIX);
+
+      sgi_stl::vector<sgi_stl::string> components = plarium::utility::split (notification, "|");
+
+      if (components.empty ())
+        throw sgi_stl::invalid_argument (plarium::utility::format ("HasOffersTrackEventHandler::OnNotification: invalid 'HasOffersTrackEvent' arguments '%s'", notification));
+
+      for (size_t i = 0, count = components.size (); i < count; i++)
+        if (components [i] == " ")
+          components [i] = "";
+
+      NSString* eventName = [NSString stringWithUTF8String:components [0].c_str ()];
+
+      if (components.size () == 1)
+        [[MobileAppTracker sharedManager] trackActionForEventIdOrName:eventName eventIsId:NO];
+      else if (components.size () == 2)
+        [[MobileAppTracker sharedManager] trackActionForEventIdOrName:eventName eventIsId:NO revenueAmount:atof (components [1].c_str ()) currencyCode:@""];
+      else
+        throw sgi_stl::invalid_argument (plarium::utility::format ("HasOffersTrackEventHandler::OnNotification: invalid 'HasOffersTrackEvent' arguments '%s'", notification));
+    }
+
+  private:
+    HasOffersTrackEventHandler (const HasOffersTrackEventHandler&);             //no impl
+    HasOffersTrackEventHandler& operator = (const HasOffersTrackEventHandler&); //no impl
+
+  private:
+    engine::IEngine *engine;
+};
+
+const char* HasOffersTrackEventHandler::HAS_OFFERS_TRACK_EVENT_PREFIX = "HasOffersTrackEvent ";
+
 }
 
 //точка входа
@@ -492,8 +544,9 @@ int main (int argc, const char* argv [], const char* env [])
     [[NSNotificationCenter defaultCenter] addObserver:tracking selector:@selector (reportAppOpen) name:UIApplicationWillEnterForegroundNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:mat_tracking selector:@selector (reportAppInstall) name:UIApplicationDidFinishLaunchingNotification object:nil];
 
-    SystemAlertHandler        system_alert_handler (funner);
-    LocalNotificationsHandler local_notifications_handler (funner);
+    SystemAlertHandler         system_alert_handler (funner);
+    LocalNotificationsHandler  local_notifications_handler (funner);
+    HasOffersTrackEventHandler has_offers_track_event_handler (funner);
 
     OpenUrlHandler open_url_handler (tracking);
 
