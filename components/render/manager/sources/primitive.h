@@ -8,15 +8,16 @@ class PrimitiveUpdateNotifier;
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 struct RendererPrimitive
 {
-  MaterialImpl*                    material;    //материал
-  render::low_level::IStateBlock*  state_block; //блок состояний примитива
-  bool                             indexed;     //является ли данный примитив индексированным или состоящим только из вершин без индексов
-  render::low_level::PrimitiveType type;        //тип примитива
-  size_t                           first;       //индекс первой вершины/индекса
-  size_t                           count;       //количество примитивов
-  size_t                           base_vertex; //индекс базовой вершины
-  size_t                           tags_count;  //количество тэгов материала
-  const size_t*                    tags;        //тэги материала
+  MaterialImpl*                    material;        //материал
+  render::low_level::IStateBlock*  state_block;     //блок состояний примитива
+  bool                             indexed;         //является ли данный примитив индексированным или состоящим только из вершин без индексов
+  render::low_level::PrimitiveType type;            //тип примитива
+  size_t                           first;           //индекс первой вершины/индекса
+  size_t                           count;           //количество примитивов
+  size_t                           base_vertex;     //индекс базовой вершины
+  size_t                           tags_count;      //количество тэгов материала
+  const size_t*                    tags;            //тэги материала
+  const unsigned short*            dynamic_indices; //динамические индексы
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -26,6 +27,25 @@ struct RendererPrimitiveGroup
 {
   size_t                   primitives_count; //количество примитивов в группе
   const RendererPrimitive* primitives;       //примитивы
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Реализация спрайта
+///////////////////////////////////////////////////////////////////////////////////////////////////
+struct SpriteImpl: public Sprite
+{
+  MaterialProxy      material;    //материал
+  RendererPrimitive* primitive;   //примитив, соответствующий спрайту
+  unsigned short     indices [6]; //индексы вершин спрайта
+
+/// Конструкторы
+  SpriteImpl (const Sprite& in_sprite, const MaterialProxy& in_material) : Sprite (in_sprite), material (in_material), primitive () {}
+
+  SpriteImpl (const SpriteImpl& sprite) : Sprite (sprite), material (sprite.material), primitive (sprite.primitive) //indices is a temporary structure
+  {
+    if (primitive)
+      primitive->dynamic_indices = &indices [0];
+  }
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -65,9 +85,9 @@ class PrimitiveImpl: public Object, public CacheSource
 ///Работа с линиями
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     size_t LinesCount       ();
-    size_t AddLines         (size_t lines_count, const Line* lines, const MaterialPtr& material);
+    size_t AddLines         (size_t lines_count, const Line* lines, const char* material);
     void   UpdateLines      (size_t first_lines, size_t lines_count, const Line* lines);
-    void   SetLinesMaterial (size_t first_lines, size_t lines_count, const MaterialPtr& material);
+    void   SetLinesMaterial (size_t first_lines, size_t lines_count, const char* material);
     void   RemoveLines      (size_t first_lines, size_t lines_count);
     void   RemoveAllLines   ();
     void   ReserveLines     (size_t lines_count);
@@ -76,9 +96,9 @@ class PrimitiveImpl: public Object, public CacheSource
 ///Работа со спрайтами
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     size_t SpritesCount       ();
-    size_t AddSprites         (size_t sprites_count, const Sprite* sprites, const MaterialPtr& material);
+    size_t AddSprites         (size_t sprites_count, const Sprite* sprites, const char* material);
     void   UpdateSprites      (size_t first_sprite, size_t sprites_count, const Sprite* sprites);
-    void   SetSpritesMaterial (size_t first_sprite, size_t sprites_count, const MaterialPtr& material);
+    void   SetSpritesMaterial (size_t first_sprite, size_t sprites_count, const char* material);
     void   RemoveSprites      (size_t first_sprite, size_t sprites_count);
     void   RemoveAllSprites   ();
     void   ReserveSprites     (size_t sprites_count);

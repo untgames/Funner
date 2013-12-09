@@ -183,9 +183,9 @@ class Primitive
 ///Работа с линиями
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     size_t LinesCount       () const;
-    size_t AddLines         (size_t lines_count, const Line* lines, const Material& material);
+    size_t AddLines         (size_t lines_count, const Line* lines, const char* material);
     void   UpdateLines      (size_t first_lines, size_t lines_count, const Line* lines);
-    void   SetLinesMaterial (size_t first_lines, size_t lines_count, const Material& material);
+    void   SetLinesMaterial (size_t first_lines, size_t lines_count, const char* material);
     void   RemoveLines      (size_t first_lines, size_t lines_count);
     void   RemoveAllLines   ();
     void   ReserveLines     (size_t lines_count);
@@ -194,9 +194,9 @@ class Primitive
 ///Работа со спрайтами
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     size_t SpritesCount       () const;
-    size_t AddSprites         (size_t sprites_count, const Sprite* sprites, const Material& material);
+    size_t AddSprites         (size_t sprites_count, const Sprite* sprites, const char* material);
     void   UpdateSprites      (size_t first_sprite, size_t sprites_count, const Sprite* sprites);
-    void   SetSpritesMaterial (size_t first_sprite, size_t sprites_count, const Material& material);
+    void   SetSpritesMaterial (size_t first_sprite, size_t sprites_count, const char* material);
     void   RemoveSprites      (size_t first_sprite, size_t sprites_count);
     void   RemoveAllSprites   ();
     void   ReserveSprites     (size_t sprites_count);

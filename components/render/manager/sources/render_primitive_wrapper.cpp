@@ -65,9 +65,9 @@ size_t Primitive::LinesCount () const
   return impl->LinesCount ();
 }
 
-size_t Primitive::AddLines (size_t lines_count, const Line* lines, const Material& material)
+size_t Primitive::AddLines (size_t lines_count, const Line* lines, const char* material)
 {
-  return impl->AddLines (lines_count, lines, Wrappers::Unwrap<MaterialImpl> (material));
+  return impl->AddLines (lines_count, lines, material);
 }
 
 void Primitive::UpdateLines (size_t first_lines, size_t lines_count, const Line* lines)
@@ -75,9 +75,9 @@ void Primitive::UpdateLines (size_t first_lines, size_t lines_count, const Line*
   impl->UpdateLines (first_lines, lines_count, lines);
 }
 
-void Primitive::SetLinesMaterial (size_t first_lines, size_t lines_count, const Material& material)
+void Primitive::SetLinesMaterial (size_t first_lines, size_t lines_count, const char* material)
 {
-  impl->SetLinesMaterial (first_lines, lines_count, Wrappers::Unwrap<MaterialImpl> (material));
+  impl->SetLinesMaterial (first_lines, lines_count, material);
 }
 
 void Primitive::RemoveLines (size_t first_lines, size_t lines_count)
@@ -100,9 +100,9 @@ size_t Primitive::SpritesCount () const
   return impl->SpritesCount ();
 }
 
-size_t Primitive::AddSprites (size_t sprites_count, const Sprite* sprites, const Material& material)
+size_t Primitive::AddSprites (size_t sprites_count, const Sprite* sprites, const char* material)
 {
-  return impl->AddSprites (sprites_count, sprites, Wrappers::Unwrap<MaterialImpl> (material));
+  return impl->AddSprites (sprites_count, sprites, material);
 }
 
 void Primitive::UpdateSprites (size_t first_sprite, size_t sprites_count, const Sprite* sprites)
@@ -110,9 +110,9 @@ void Primitive::UpdateSprites (size_t first_sprite, size_t sprites_count, const 
   impl->UpdateSprites (first_sprite, sprites_count, sprites);
 }
 
-void Primitive::SetSpritesMaterial (size_t first_sprite, size_t sprites_count, const Material& material)
+void Primitive::SetSpritesMaterial (size_t first_sprite, size_t sprites_count, const char* material)
 {
-  impl->SetSpritesMaterial (first_sprite, sprites_count, Wrappers::Unwrap<MaterialImpl> (material));
+  impl->SetSpritesMaterial (first_sprite, sprites_count, material);
 }
 
 void Primitive::RemoveSprites (size_t first_sprite, size_t sprites_count)
@@ -131,7 +131,7 @@ void Primitive::ReserveSprites (size_t sprites_count)
 }
 
 /*
-    Управление кэшированием
+    ╙яЁртыхэшх ъ¤°шЁютрэшхь
 */
 
 void Primitive::UpdateCache ()
