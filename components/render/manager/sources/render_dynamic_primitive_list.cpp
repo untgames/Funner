@@ -123,6 +123,8 @@ size_t DynamicPrimitiveListImpl<T>::Add (size_t count, const Item* items)
 
     impl->items.insert (impl->items.end (), items, items + count);
 
+    InvalidateCacheDependencies ();
+
     return impl->items.size () - 1;    
   }
   catch (xtl::exception& e)
@@ -158,6 +160,8 @@ void DynamicPrimitiveListImpl<T>::Update (size_t first, size_t count, const Item
 
     for (size_t i=0; i<count; i++, src++, dst++)
       *dst = *src;
+
+    InvalidateCacheDependencies ();
   }
   catch (xtl::exception& e)
   {
@@ -183,12 +187,16 @@ void DynamicPrimitiveListImpl<T>::Remove (size_t first, size_t count)
     return;
 
   impl->items.erase (impl->items.begin () + first, impl->items.begin () + first + count);
+
+  InvalidateCacheDependencies ();
 }
 
 template <class T>
 void DynamicPrimitiveListImpl<T>::Clear ()
 {
   impl->items.clear ();
+
+  InvalidateCacheDependencies ();
 }
 
 /*
@@ -198,7 +206,12 @@ void DynamicPrimitiveListImpl<T>::Clear ()
 template <class T>
 void DynamicPrimitiveListImpl<T>::Reserve (size_t count)
 {
+  size_t capacity = impl->items.capacity ();
+
   impl->items.reserve (count);
+
+  if (capacity < count)
+    InvalidateCacheDependencies ();
 }
 
 template <class T>

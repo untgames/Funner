@@ -29,6 +29,8 @@
   - LineInputLayout, SpriteInputLayout PrimitiveManager
   - добавить общие вершинный и индексный буферы для построение спрайтов (использовать PrimitiveBuffers)
 
+  - StandaloneDynamicPrimitive
+  - BatchingDynamicPrimitive
   - добавить Entity::SetWorldMatrix
   - ввести SpriteImpl, ссылающийся на RendererOperation
   - перед отрисовкой прохода построить индексный буфер пакетных примитивов
@@ -39,4 +41,4 @@
   - перед отрисовкой кадра строить вершинный буфер спрайтов (получать списки спрайтов у каждого Entity), обновлять индексы в SpriteImpl, 
     обновлять RendererOperation, на который ссылается SpriteImpl
   - в процессе отрисовки определять группы примитивов с общим хэшем пакета и отрисовывать их пакетом
-
+  - terminate propogation for AttachCacheSource /// update transactionid в Primitive???
