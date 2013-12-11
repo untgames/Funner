@@ -83,8 +83,8 @@ class PrimitiveImpl: public Object, public CacheSource
 ///Работа со спрайтами
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     size_t SpriteListsCount        ();
-    size_t AddStandaloneSpriteList (const SpriteListPtr&, MeshBufferUsage vb_usage, MeshBufferUsage ib_usage);
-    size_t AddBatchingSpriteList   (const SpriteListPtr&, SpriteMode sprite_mode);
+    size_t AddStandaloneSpriteList (const SpriteListPtr&, const math::vec3f& up, MeshBufferUsage vb_usage, MeshBufferUsage ib_usage);
+    size_t AddBatchingSpriteList   (const SpriteListPtr&, const math::vec3f& up, SpriteMode sprite_mode);
     void   RemoveSpriteList        (size_t index);
     void   RemoveAllSpriteLists    ();
 

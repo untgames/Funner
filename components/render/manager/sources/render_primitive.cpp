@@ -524,12 +524,12 @@ size_t PrimitiveImpl::SpriteListsCount ()
   throw xtl::make_not_implemented_exception (__FUNCTION__);
 }
 
-size_t PrimitiveImpl::AddStandaloneSpriteList (const SpriteListPtr& list, MeshBufferUsage vb_usage, MeshBufferUsage ib_usage)
+size_t PrimitiveImpl::AddStandaloneSpriteList (const SpriteListPtr& list, const math::vec3f& up, MeshBufferUsage vb_usage, MeshBufferUsage ib_usage)
 {
   throw xtl::make_not_implemented_exception (__FUNCTION__);
 }
 
-size_t PrimitiveImpl::AddBatchingSpriteList (const SpriteListPtr& list, SpriteMode sprite_mode)
+size_t PrimitiveImpl::AddBatchingSpriteList (const SpriteListPtr& list, const math::vec3f& up, SpriteMode sprite_mode)
 {
   throw xtl::make_not_implemented_exception (__FUNCTION__);
 }

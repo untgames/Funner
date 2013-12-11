@@ -65,14 +65,14 @@ size_t Primitive::SpriteListsCount () const
   return impl->SpriteListsCount ();
 }
 
-size_t Primitive::AddStandaloneSpriteList (const SpriteList& list, MeshBufferUsage vb_usage, MeshBufferUsage ib_usage)
+size_t Primitive::AddStandaloneSpriteList (const SpriteList& list, const math::vec3f& up, MeshBufferUsage vb_usage, MeshBufferUsage ib_usage)
 {
-  return impl->AddStandaloneSpriteList (Wrappers::Unwrap<SpriteListImpl> (list), vb_usage, ib_usage);
+  return impl->AddStandaloneSpriteList (Wrappers::Unwrap<SpriteListImpl> (list), up, vb_usage, ib_usage);
 }
 
-size_t Primitive::AddBatchingSpriteList (const SpriteList& list, SpriteMode mode)
+size_t Primitive::AddBatchingSpriteList (const SpriteList& list, const math::vec3f& up, SpriteMode mode)
 {
-  return impl->AddBatchingSpriteList (Wrappers::Unwrap<SpriteListImpl> (list), mode);
+  return impl->AddBatchingSpriteList (Wrappers::Unwrap<SpriteListImpl> (list), up, mode);
 }
 
 void Primitive::RemoveSpriteList (size_t index)

@@ -3,6 +3,8 @@
 
 //TODO: добавить генерацию стандартных примитивов!!!
 
+#include <math/angle.h>
+
 #include <render/manager/material.h>
 
 namespace media
@@ -64,11 +66,13 @@ enum SpriteMode
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 struct Sprite
 {
-  math::vec3f position;   //положение центра спрайта
-  math::vec2f size;       //размер спрайта
-  math::vec4f color;      //цвет спрайта
-  math::vec2f tex_offset; //смещение начала спрайта в текстуре [0;1]
-  math::vec2f tex_size;   //размер спрайта в текстуре [0;1]
+  math::vec3f  position;   //положение центра спрайта
+  math::vec3f  normal;     //нормаль (в SpriteMode_Billboard используется в системе координат View, по умолчанию должна быть (0,0,1))
+  math::anglef rotation;   //поворот относительно нормали
+  math::vec2f  size;       //размер спрайта
+  math::vec4f  color;      //цвет спрайта
+  math::vec2f  tex_offset; //смещение начала спрайта в текстуре [0;1]
+  math::vec2f  tex_size;   //размер спрайта в текстуре [0;1]
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -191,8 +195,8 @@ class Primitive
 ///Работа со спрайтами
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     size_t SpriteListsCount         () const;
-    size_t AddStandaloneSpriteList  (const SpriteList& list, MeshBufferUsage vb_usage = MeshBufferUsage_Default,  MeshBufferUsage ib_usage = MeshBufferUsage_Default);
-    size_t AddBatchingSpriteList    (const SpriteList& list, SpriteMode mode = SpriteMode_Default);
+    size_t AddStandaloneSpriteList  (const SpriteList& list, const math::vec3f& up, MeshBufferUsage vb_usage = MeshBufferUsage_Default,  MeshBufferUsage ib_usage = MeshBufferUsage_Default);
+    size_t AddBatchingSpriteList    (const SpriteList& list, const math::vec3f& up, SpriteMode mode = SpriteMode_Default);
     void   RemoveSpriteList         (size_t index);
     void   RemoveAllSpriteLists     ();
 
