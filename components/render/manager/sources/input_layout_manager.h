@@ -23,8 +23,7 @@ class InputLayoutManager: public xtl::noncopyable
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Лэйауты для спрайтов и линий
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    const LowLevelInputLayoutPtr& SpritesInputLayout () const;
-    const LowLevelInputLayoutPtr& LinesInputLayout   () const;
+    const LowLevelInputLayoutPtr& DynamicPrimitivesInputLayout () const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Получение хэша атрибутов
@@ -32,8 +31,7 @@ class InputLayoutManager: public xtl::noncopyable
     static size_t GetVertexAttributesHash (size_t count, const low_level::VertexAttribute* attributes);
 
   private:
-    void InitSpritesLayout ();
-    void InitLinesLayout   ();
+    void InitDynamicPrimitivesLayout ();
 
   private:
     struct Impl;

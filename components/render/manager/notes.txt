@@ -26,9 +26,9 @@
   - типы спрайтов: Billboard, Oriented
   - ввести группы спрайтов: SpriteList, LineList
   - DynamicBuffer
-
   - LineInputLayout, SpriteInputLayout PrimitiveManager
   - добавить общие вершинный и индексный буферы для построение спрайтов (использовать PrimitiveBuffers)
+
   - добавить Entity::SetWorldMatrix
   - ввести SpriteImpl, ссылающийся на RendererOperation
   - перед отрисовкой прохода построить индексный буфер пакетных примитивов

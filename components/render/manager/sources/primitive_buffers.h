@@ -50,16 +50,15 @@ class PrimitiveBuffersImpl: public Object
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Резервирование вспомогательных примитивов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void   ReserveLines    (size_t count);
-    void   ReserveSprites  (size_t count);
-    size_t LinesCapacity   ();
-    size_t SpritesCapacity ();
-    
+    void   ReserveDynamicPrimitives (size_t sprites_count, size_t lines_count);
+    size_t LinesCapacity            ();
+    size_t SpritesCapacity          ();
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Режим использования буферов вспомогательных примитивов
+///Динамические буферы
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    MeshBufferUsage LinesBufferUsage   ();
-    MeshBufferUsage SpritesBufferUsage ();
+    manager::DynamicVertexBuffer& DynamicVertexBuffer ();
+    manager::DynamicIndexBuffer&  DynamicIndexBuffer  ();
 
   private:
     struct Impl;

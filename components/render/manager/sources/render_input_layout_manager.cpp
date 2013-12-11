@@ -32,13 +32,12 @@ typedef stl::hash_set<media::geometry::VertexFormat>  VertexFormatSet;
 
 struct InputLayoutManager::Impl
 {
-  LowLevelDevicePtr      device;         //устройство отрисовки
-  InputLayoutMap         layouts;        //закэшированные лэйауты
-  VertexFormatSet        vertex_formats; //вершинные форматы
-  Log                    log;            //протокол отладочных сообщений
-  SettingsPtr            settings;       //настройки менеджера рендеринга
-  LowLevelInputLayoutPtr sprites_layout; //лэйаут для спрайтов
-  LowLevelInputLayoutPtr lines_layout;   //лэйаут для линий
+  LowLevelDevicePtr      device;                    //устройство отрисовки
+  InputLayoutMap         layouts;                   //закэшированные лэйауты
+  VertexFormatSet        vertex_formats;            //вершинные форматы
+  Log                    log;                       //протокол отладочных сообщений
+  SettingsPtr            settings;                  //настройки менеджера рендеринга
+  LowLevelInputLayoutPtr dynamic_primitives_layout; //лэйаут для спрайтов
   
   Impl (const LowLevelDevicePtr& in_device, const SettingsPtr& in_settings)
     : device (in_device)
@@ -64,8 +63,7 @@ InputLayoutManager::InputLayoutManager (const LowLevelDevicePtr& device, const S
   {
     impl.reset (new Impl (device, settings));
 
-    InitSpritesLayout ();
-    InitLinesLayout ();
+    InitDynamicPrimitivesLayout ();
   }
   catch (xtl::exception& e)
   {
@@ -200,63 +198,42 @@ LowLevelInputLayoutPtr InputLayoutManager::CreateInputLayout (size_t hash, const
     Лэйауты для спрайтов и линий
 */
 
-void InputLayoutManager::InitSpritesLayout ()
+void InputLayoutManager::InitDynamicPrimitivesLayout ()
 {
-  static const render::low_level::VertexAttribute attributes [] = {
-    {impl->device->GetVertexAttributeSemanticName (render::low_level::VertexAttributeSemantic_Position),  render::low_level::InputDataFormat_Vector3, render::low_level::InputDataType_Float, 0, VERTEX_OFFSETOF (SpriteVertex, position),  sizeof (SpriteVertex)},
-    {impl->device->GetVertexAttributeSemanticName (render::low_level::VertexAttributeSemantic_Normal),    render::low_level::InputDataFormat_Vector3, render::low_level::InputDataType_Float, 0, VERTEX_OFFSETOF (SpriteVertex, normal),    sizeof (SpriteVertex)},
-    {impl->device->GetVertexAttributeSemanticName (render::low_level::VertexAttributeSemantic_Color),     render::low_level::InputDataFormat_Vector4, render::low_level::InputDataType_Float, 0, VERTEX_OFFSETOF (SpriteVertex, color),     sizeof (SpriteVertex)},
-    {impl->device->GetVertexAttributeSemanticName (render::low_level::VertexAttributeSemantic_TexCoord0), render::low_level::InputDataFormat_Vector2, render::low_level::InputDataType_Float, 0, VERTEX_OFFSETOF (SpriteVertex, tex_coord), sizeof (SpriteVertex)},
-  };
+  try
+  {
+    static const render::low_level::VertexAttribute attributes [] = {
+      {impl->device->GetVertexAttributeSemanticName (render::low_level::VertexAttributeSemantic_Position),  render::low_level::InputDataFormat_Vector3, render::low_level::InputDataType_Float, 0, VERTEX_OFFSETOF (DynamicPrimitiveVertex, position),  sizeof (DynamicPrimitiveVertex)},
+      {impl->device->GetVertexAttributeSemanticName (render::low_level::VertexAttributeSemantic_Normal),    render::low_level::InputDataFormat_Vector3, render::low_level::InputDataType_Float, 0, VERTEX_OFFSETOF (DynamicPrimitiveVertex, normal),    sizeof (DynamicPrimitiveVertex)},
+      {impl->device->GetVertexAttributeSemanticName (render::low_level::VertexAttributeSemantic_Color),     render::low_level::InputDataFormat_Vector4, render::low_level::InputDataType_Float, 0, VERTEX_OFFSETOF (DynamicPrimitiveVertex, color),     sizeof (DynamicPrimitiveVertex)},
+      {impl->device->GetVertexAttributeSemanticName (render::low_level::VertexAttributeSemantic_TexCoord0), render::low_level::InputDataFormat_Vector2, render::low_level::InputDataType_Float, 0, VERTEX_OFFSETOF (DynamicPrimitiveVertex, tex_coord), sizeof (DynamicPrimitiveVertex)},
+    };
 
-  static const size_t attributes_count = sizeof (attributes) / sizeof (*attributes);
+    static const size_t attributes_count = sizeof (attributes) / sizeof (*attributes);
 
-  size_t attributes_hash = GetVertexAttributesHash (attributes_count, attributes);
+    size_t attributes_hash = GetVertexAttributesHash (attributes_count, attributes);
 
-  render::low_level::InputLayoutDesc desc;
+    render::low_level::InputLayoutDesc desc;
 
-  memset (&desc, 0, sizeof desc);
+    memset (&desc, 0, sizeof desc);
 
-  desc.vertex_attributes_count = attributes_count;
-  desc.vertex_attributes       = &attributes [0];
-  desc.index_type              = render::low_level::InputDataType_UShort;
-  desc.index_buffer_offset     = 0;
+    desc.vertex_attributes_count = attributes_count;
+    desc.vertex_attributes       = &attributes [0];
+    desc.index_type              = render::low_level::InputDataType_UShort;
+    desc.index_buffer_offset     = 0;
 
-  impl->sprites_layout = CreateInputLayout (attributes_hash, desc);
+    impl->dynamic_primitives_layout = CreateInputLayout (attributes_hash, desc);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::manager::InputLayoutManager::InitDynamicPrimitivesLayout");
+    throw;
+  }
 }
 
-void InputLayoutManager::InitLinesLayout ()
+const LowLevelInputLayoutPtr& InputLayoutManager::DynamicPrimitivesInputLayout () const
 {
-  static const render::low_level::VertexAttribute attributes [] = {
-    {impl->device->GetVertexAttributeSemanticName (render::low_level::VertexAttributeSemantic_Position),  render::low_level::InputDataFormat_Vector3, render::low_level::InputDataType_Float, 0, VERTEX_OFFSETOF (LineVertex, position),   sizeof (LineVertex)},
-    {impl->device->GetVertexAttributeSemanticName (render::low_level::VertexAttributeSemantic_Color),     render::low_level::InputDataFormat_Vector4, render::low_level::InputDataType_Float, 0, VERTEX_OFFSETOF (LineVertex, color),      sizeof (LineVertex)},
-    {impl->device->GetVertexAttributeSemanticName (render::low_level::VertexAttributeSemantic_TexCoord0), render::low_level::InputDataFormat_Vector2, render::low_level::InputDataType_Float, 0, VERTEX_OFFSETOF (LineVertex, tex_offset), sizeof (LineVertex)},
-  };
-
-  static const size_t attributes_count = sizeof (attributes) / sizeof (*attributes);
-
-  size_t attributes_hash = GetVertexAttributesHash (attributes_count, attributes);
-
-  render::low_level::InputLayoutDesc desc;
-
-  memset (&desc, 0, sizeof desc);
-
-  desc.vertex_attributes_count = attributes_count;
-  desc.vertex_attributes       = &attributes [0];
-  desc.index_type              = render::low_level::InputDataType_UShort;
-  desc.index_buffer_offset     = 0;
-
-  impl->lines_layout = CreateInputLayout (attributes_hash, desc);
-}
-
-const LowLevelInputLayoutPtr& InputLayoutManager::SpritesInputLayout () const
-{
-  return impl->sprites_layout;
-}
-
-const LowLevelInputLayoutPtr& InputLayoutManager::LinesInputLayout () const
-{
-  return impl->lines_layout;
+  return impl->dynamic_primitives_layout;
 }
 
 /*

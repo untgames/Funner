@@ -91,14 +91,19 @@ void PrimitiveBuffers::RemoveAll ()
     –езервирование вспомогательных примитивов
 */
 
+void PrimitiveBuffers::ReserveDynamicPrimitives (size_t sprites_count, size_t lines_count)
+{
+  impl->ReserveDynamicPrimitives (sprites_count, lines_count);
+}
+
 void PrimitiveBuffers::ReserveLines (size_t count)
 {
-  impl->ReserveLines (count);
+  impl->ReserveDynamicPrimitives (SpritesCapacity (), count);
 }
 
 void PrimitiveBuffers::ReserveSprites (size_t count)
 {
-  impl->ReserveSprites (count);
+  impl->ReserveDynamicPrimitives (count, LinesCapacity ());
 }
 
 size_t PrimitiveBuffers::LinesCapacity () const

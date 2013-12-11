@@ -6,8 +6,7 @@ class PrimitiveUpdateNotifier;
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Вершина спрайта / вершина линии
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-//change InputLayoutManager sprite layout initialization if SpriteVertex will be changed
-struct SpriteVertex
+struct DynamicPrimitiveVertex
 {
   math::vec3f position;
   math::vec3f normal;
@@ -15,9 +14,8 @@ struct SpriteVertex
   math::vec2f tex_coord;
 };
 
-typedef LinePoint LineVertex;
-
-typedef DynamicPrimitiveBuffer<unsigned short> DynamicIndexBuffer;
+typedef DynamicPrimitiveBuffer<unsigned short>         DynamicIndexBuffer;
+typedef DynamicPrimitiveBuffer<DynamicPrimitiveVertex> DynamicVertexBuffer;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Описание примитива рендеринга

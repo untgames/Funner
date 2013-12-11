@@ -2,7 +2,7 @@
 ///Описание примитива рендеринга
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 template <class T> 
-class DynamicPrimitiveBuffer
+class DynamicPrimitiveBuffer: public xtl::noncopyable
 {
   public:
     typedef T Item;
@@ -96,6 +96,12 @@ inline size_t DynamicPrimitiveBuffer<T>::Capacity () const
 }
 
 template <class T>
+inline void DynamicPrimitiveBuffer<T>::Reserve (size_t count)
+{
+  src_buffer.reserve (count);
+}
+
+template <class T>
 inline typename DynamicPrimitiveBuffer<T>::Item* DynamicPrimitiveBuffer<T>::Data ()
 {
   return src_buffer.data ();
@@ -116,5 +122,5 @@ inline void DynamicPrimitiveBuffer<T>::Clear ()
 template <class T>
 inline void DynamicPrimitiveBuffer<T>::SyncBuffers (low_level::IDevice& device)
 {
-  sync_buffers (device, bind_flags, &src_buffer.data (), src_buffer.size () * sizeof (Item), dst_buffer_size, dst_buffer);  
+  sync_buffers (device, bind_flags, src_buffer.data (), src_buffer.size () * sizeof (Item), dst_buffer_size, dst_buffer);  
 }
