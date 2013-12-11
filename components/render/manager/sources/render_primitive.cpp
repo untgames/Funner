@@ -284,30 +284,25 @@ struct Mesh: public xtl::reference_counter, public MeshCommonData, public CacheH
 typedef xtl::intrusive_ptr<Mesh>            MeshPtr;
 typedef stl::vector<MeshPtr>                MeshArray;
 typedef stl::vector<RendererPrimitiveGroup> RenderPrimitiveGroupsArray;
-typedef stl::vector<SpriteImpl>             SpriteArray;
 
 }
 
 struct PrimitiveImpl::Impl: public DebugIdHolder
 {
-  DeviceManagerPtr           device_manager;                 //менеджер устройства
-  MaterialManagerPtr         material_manager;               //менеджер материалов
-  BuffersPtr                 buffers;                        //буферы примитива
-  MeshArray                  meshes;                         //меши
-  SpriteArray                sprites;                        //спрайты
-  RendererPrimitiveArray     dynamic_primitives;             //динамические примитивы
-  stl::string                name;                           //им€ примитива
-  RenderPrimitiveGroupsArray render_groups;                  //группы
-  Log                        log;                            //поток протоколировани€
-  PrimitiveUpdateNotifier    update_notifier;                //оповещатель обновлений примитива
-  bool                       need_update_dynamic_primitives; //требуетс€ обновление динамических примитивов
+  DeviceManagerPtr           device_manager;    //менеджер устройства
+  MaterialManagerPtr         material_manager;  //менеджер материалов
+  BuffersPtr                 buffers;           //буферы примитива
+  MeshArray                  meshes;            //меши
+  stl::string                name;              //им€ примитива
+  RenderPrimitiveGroupsArray render_groups;     //группы
+  Log                        log;               //поток протоколировани€
+  PrimitiveUpdateNotifier    update_notifier;   //оповещатель обновлений примитива
 
 /// онструктор
   Impl (const DeviceManagerPtr& in_device_manager, const MaterialManagerPtr& in_material_manager, const BuffersPtr& in_buffers, const char* in_name)
     : device_manager (in_device_manager)
     , material_manager (in_material_manager)
     , buffers (in_buffers)
-    , need_update_dynamic_primitives (false)
   {
     static const char* METHOD_NAME = "render::manager::PrimitiveImpl::Impl::Impl";
     
@@ -336,45 +331,6 @@ struct PrimitiveImpl::Impl: public DebugIdHolder
     
     if (device_manager->Settings ().HasDebugLog ())
       log.Printf ("Primitive '%s' destroyed (id=%u)", name.c_str (), Id ());
-  }
-
-/// ќбновление примитива
-  void UpdateDynamicPrimitive (render::low_level::PrimitiveType type, MaterialImpl* material, size_t primitives_count, const unsigned short* dynamic_indices, RendererPrimitive& primitive)
-  {
-    memset (&primitive, 0, sizeof (RendererPrimitive));
-
-//TODO: material state block
-//TODO: maybe vertex buffer binding????
-//TODO: maybe index buffer binding???
-
-    primitive.material        = material;
-//    primitive.state_block = ????
-    primitive.indexed         = true;
-    primitive.type            = type;
-    primitive.count           = primitives_count;
-    primitive.tags_count      = material ? material->TagsCount () : 0;
-    primitive.tags            = material ? material->Tags () : (const size_t*)0;
-    primitive.dynamic_indices = dynamic_indices;
-  }
-
-/// ќбновление динамических примитивов
-  void UpdateDynamicPrimitives ()
-  {
-    dynamic_primitives.clear ();
-    dynamic_primitives.reserve (sprites.capacity ());
-
-    for (SpriteArray::iterator iter=sprites.begin (), end=sprites.end (); iter!=end; ++iter)
-    {
-      SpriteImpl& sprite = *iter;
-
-      RendererPrimitive primitive;
-
-      UpdateDynamicPrimitive (render::low_level::PrimitiveType_TriangleList, &*sprite.material.Resource (), 2, &sprite.indices [0], primitive);
-
-      dynamic_primitives.push_back (primitive);
-
-      sprite.primitive = &dynamic_primitives.back ();
-    }
   }
 };
 
@@ -564,192 +520,58 @@ void PrimitiveImpl::RemoveAllMeshes ()
     –абота со спрайтами
 */
 
-size_t PrimitiveImpl::SpritesCount ()
+size_t PrimitiveImpl::SpriteListsCount ()
 {
-  return impl->sprites.size ();
+  throw xtl::make_not_implemented_exception (__FUNCTION__);
 }
 
-size_t PrimitiveImpl::AddSprites (size_t sprites_count, const Sprite* sprites, const char* material)
+size_t PrimitiveImpl::AddStandaloneSpriteList (const SpriteListPtr& list, MeshBufferUsage vb_usage, MeshBufferUsage ib_usage)
 {
-  try
-  {
-      //проверка корректности аргументов
-
-    if (!sprites_count)
-      return impl->sprites.size (); //not sprites.size () - 1
-
-    if (!sprites)
-      throw xtl::make_null_argument_exception ("", "sprites");
-
-    if (!material)
-      throw xtl::make_null_argument_exception ("", "material");
-
-      //получение материала
-
-    MaterialProxy material_proxy = impl->material_manager->GetMaterialProxy (material);
-
-      //добавление спрайтов
-
-    ReserveSprites (impl->sprites.size () + sprites_count);
-
-    const Sprite* src_sprite = sprites;
-
-    for (size_t i=0; i<sprites_count; i++, src_sprite++)
-      impl->sprites.push_back (SpriteImpl (*src_sprite, material_proxy));
-
-    //TODO: subscribe to material updates!!!!!!
-
-    impl->need_update_dynamic_primitives = true;
-
-    return impl->sprites.size () - 1;    
-  }
-  catch (xtl::exception& e)
-  {
-    e.touch ("render::manager::PrimitiveImpl::AddSprites");
-    throw;
-  }
+  throw xtl::make_not_implemented_exception (__FUNCTION__);
 }
 
-void PrimitiveImpl::UpdateSprites (size_t first_sprite, size_t sprites_count, const Sprite* sprites)
+size_t PrimitiveImpl::AddBatchingSpriteList (const SpriteListPtr& list, SpriteMode sprite_mode)
 {
-  try
-  {
-      //проверка корректности аргументов
-
-    if (!sprites_count)
-      return;
-
-    if (!sprites)
-      throw xtl::make_null_argument_exception ("", "sprites");
-
-    if (first_sprite >= impl->sprites.size ())
-      throw xtl::make_range_exception ("", "first_sprite", first_sprite, impl->sprites.size ());
-    
-    if (impl->sprites.size () - first_sprite < sprites_count)
-      throw xtl::make_range_exception ("", "sprites_count", sprites_count, impl->sprites.size () - first_sprite);
-
-      //обновление спрайтов
-
-    const Sprite* src_sprite = sprites;
-    SpriteImpl*   dst_sprite = &impl->sprites [first_sprite];
-
-    for (size_t i=0; i<sprites_count; i++, src_sprite++, dst_sprite++)
-      static_cast<Sprite&> (*dst_sprite) = *src_sprite;
-
-      //обновление need_update_dynamic_primitives не требуетс€
-  }
-  catch (xtl::exception& e)
-  {
-    e.touch ("render::manager::PrimitiveImpl::UpdateSprites");
-    throw;
-  }
+  throw xtl::make_not_implemented_exception (__FUNCTION__);
 }
 
-void PrimitiveImpl::SetSpritesMaterial (size_t first_sprite, size_t sprites_count, const char* material)
+void PrimitiveImpl::RemoveSpriteList (size_t index)
 {
-  try
-  {
-      //проверка корректности аргументов
-
-    if (!sprites_count)
-      return;
-
-    if (!material)
-      throw xtl::make_null_argument_exception ("", "material");
-
-    if (first_sprite >= impl->sprites.size ())
-      throw xtl::make_range_exception ("", "first_sprite", first_sprite, impl->sprites.size ());
-    
-    if (impl->sprites.size () - first_sprite < sprites_count)
-      throw xtl::make_range_exception ("", "sprites_count", sprites_count, impl->sprites.size () - first_sprite);
-
-      //получение материала
-
-    MaterialProxy material_proxy = impl->material_manager->GetMaterialProxy (material);
-
-      //обновление спрайтов
-
-    SpriteImpl* dst_sprite = &impl->sprites [first_sprite];
-
-    for (size_t i=0; i<sprites_count; i++, dst_sprite++)
-      dst_sprite->material = material_proxy;
-
-      //TODO: подписка на обновлений материала, отписка от обновлений материала
-
-    impl->need_update_dynamic_primitives = true;
-  }
-  catch (xtl::exception& e)
-  {
-    e.touch ("render::manager::PrimitiveImpl::SetSpritesMaterial");
-    throw;
-  }
+  throw xtl::make_not_implemented_exception (__FUNCTION__);
 }
 
-void PrimitiveImpl::RemoveSprites (size_t first_sprite, size_t sprites_count)
+void PrimitiveImpl::RemoveAllSpriteLists ()
 {
-  if (first_sprite >= impl->sprites.size ())
-    return;
-
-  if (impl->sprites.size () - first_sprite < sprites_count)
-    sprites_count = impl->sprites.size () - first_sprite;
-
-  if (!sprites_count)
-    return;
-
-  impl->sprites.erase (impl->sprites.begin () + first_sprite, impl->sprites.begin () + first_sprite + sprites_count);
-
-  impl->need_update_dynamic_primitives = true;
-}
-
-void PrimitiveImpl::RemoveAllSprites ()
-{
-  impl->sprites.clear ();
-
-  impl->need_update_dynamic_primitives = true;
-}
-
-void PrimitiveImpl::ReserveSprites (size_t sprites_count)
-{
-  impl->sprites.reserve (sprites_count);
+  throw xtl::make_not_implemented_exception (__FUNCTION__);
 }
 
 /*
     –абота с лини€ми
 */
 
-size_t PrimitiveImpl::LinesCount ()
+size_t PrimitiveImpl::LineListsCount ()
 {
-  throw xtl::make_not_implemented_exception ("render::manager::PrimitiveImpl::LinesCount");
+  throw xtl::make_not_implemented_exception (__FUNCTION__);
 }
 
-size_t PrimitiveImpl::AddLines (size_t lines_count, const Line* lines, const char* material)
+size_t PrimitiveImpl::AddStandaloneLineList (const LineListPtr& list, MeshBufferUsage vb_usage, MeshBufferUsage ib_usage)
 {
-  throw xtl::make_not_implemented_exception ("render::manager::PrimitiveImpl::AddLines");
+  throw xtl::make_not_implemented_exception (__FUNCTION__);
 }
 
-void PrimitiveImpl::UpdateLines (size_t first_lines, size_t lines_count, const Line* Lines)
+size_t PrimitiveImpl::AddBatchingLineList (const LineListPtr& list)
 {
-  throw xtl::make_not_implemented_exception ("render::manager::PrimitiveImpl::UpdateLines");
+  throw xtl::make_not_implemented_exception (__FUNCTION__);
 }
 
-void PrimitiveImpl::SetLinesMaterial (size_t first_lines, size_t lines_count, const char* material)
+void PrimitiveImpl::RemoveLineList (size_t index)
 {
-  throw xtl::make_not_implemented_exception ("render::manager::PrimitiveImpl::SetLinesMaterial");
+  throw xtl::make_not_implemented_exception (__FUNCTION__);
 }
 
-void PrimitiveImpl::RemoveLines (size_t first_lines, size_t lines_count)
+void PrimitiveImpl::RemoveAllLineLists ()
 {
-  throw xtl::make_not_implemented_exception ("render::manager::PrimitiveImpl::ReserveLines");
-}
-
-void PrimitiveImpl::RemoveAllLines ()
-{
-  throw xtl::make_not_implemented_exception ("render::manager::PrimitiveImpl::ReserveAllLines");
-}
-
-void PrimitiveImpl::ReserveLines (size_t lines_count)
-{
-  throw xtl::make_not_implemented_exception ("render::manager::PrimitiveImpl::ReserveLines");
+  throw xtl::make_not_implemented_exception (__FUNCTION__);
 }
 
 /*

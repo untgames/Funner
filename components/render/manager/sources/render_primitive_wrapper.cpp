@@ -60,74 +60,54 @@ void Primitive::RemoveAllMeshes ()
   impl->RemoveAllMeshes ();
 }
 
-size_t Primitive::LinesCount () const
+size_t Primitive::SpriteListsCount () const
 {
-  return impl->LinesCount ();
+  return impl->SpriteListsCount ();
 }
 
-size_t Primitive::AddLines (size_t lines_count, const Line* lines, const char* material)
+size_t Primitive::AddStandaloneSpriteList (const SpriteList& list, MeshBufferUsage vb_usage, MeshBufferUsage ib_usage)
 {
-  return impl->AddLines (lines_count, lines, material);
+  return impl->AddStandaloneSpriteList (Wrappers::Unwrap<SpriteListImpl> (list), vb_usage, ib_usage);
 }
 
-void Primitive::UpdateLines (size_t first_lines, size_t lines_count, const Line* lines)
+size_t Primitive::AddBatchingSpriteList (const SpriteList& list, SpriteMode mode)
 {
-  impl->UpdateLines (first_lines, lines_count, lines);
+  return impl->AddBatchingSpriteList (Wrappers::Unwrap<SpriteListImpl> (list), mode);
 }
 
-void Primitive::SetLinesMaterial (size_t first_lines, size_t lines_count, const char* material)
+void Primitive::RemoveSpriteList (size_t index)
 {
-  impl->SetLinesMaterial (first_lines, lines_count, material);
+  impl->RemoveSpriteList (index);
 }
 
-void Primitive::RemoveLines (size_t first_lines, size_t lines_count)
+void Primitive::RemoveAllSpriteLists ()
 {
-  impl->RemoveLines (first_lines, lines_count);
+  impl->RemoveAllSpriteLists ();
 }
 
-void Primitive::RemoveAllLines ()
+size_t Primitive::LineListsCount () const
 {
-  impl->RemoveAllLines ();
+  return impl->LineListsCount ();
 }
 
-void Primitive::ReserveLines (size_t lines_count)
+size_t Primitive::AddStandaloneLineList (const LineList& list, MeshBufferUsage vb_usage, MeshBufferUsage ib_usage)
 {
-  impl->ReserveLines (lines_count);
+  return impl->AddStandaloneLineList (Wrappers::Unwrap<LineListImpl> (list), vb_usage, ib_usage);
 }
 
-size_t Primitive::SpritesCount () const
+size_t Primitive::AddBatchingLineList (const LineList& list)
 {
-  return impl->SpritesCount ();
+  return impl->AddBatchingLineList (Wrappers::Unwrap<LineListImpl> (list));
 }
 
-size_t Primitive::AddSprites (size_t sprites_count, const Sprite* sprites, const char* material)
+void Primitive::RemoveLineList (size_t index)
 {
-  return impl->AddSprites (sprites_count, sprites, material);
+  impl->RemoveLineList (index);
 }
 
-void Primitive::UpdateSprites (size_t first_sprite, size_t sprites_count, const Sprite* sprites)
+void Primitive::RemoveAllLineLists ()
 {
-  impl->UpdateSprites (first_sprite, sprites_count, sprites);
-}
-
-void Primitive::SetSpritesMaterial (size_t first_sprite, size_t sprites_count, const char* material)
-{
-  impl->SetSpritesMaterial (first_sprite, sprites_count, material);
-}
-
-void Primitive::RemoveSprites (size_t first_sprite, size_t sprites_count)
-{
-  impl->RemoveSprites (first_sprite, sprites_count);
-}
-
-void Primitive::RemoveAllSprites ()
-{
-  impl->RemoveAllSprites ();
-}
-
-void Primitive::ReserveSprites (size_t sprites_count)
-{
-  impl->ReserveSprites (sprites_count);
+  impl->RemoveAllLineLists ();
 }
 
 /*

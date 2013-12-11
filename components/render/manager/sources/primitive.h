@@ -1,6 +1,6 @@
 ///forward declarations
 class PrimitiveBuffersImpl;
-class IPrimitiveUpdateListener;
+class IPrimitiveUpdateListener; //TODO: нужно ли???
 class PrimitiveUpdateNotifier;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -27,25 +27,6 @@ struct RendererPrimitiveGroup
 {
   size_t                   primitives_count; //количество примитивов в группе
   const RendererPrimitive* primitives;       //примитивы
-};
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Реализация спрайта
-///////////////////////////////////////////////////////////////////////////////////////////////////
-struct SpriteImpl: public Sprite
-{
-  MaterialProxy      material;    //материал
-  RendererPrimitive* primitive;   //примитив, соответствующий спрайту
-  unsigned short     indices [6]; //индексы вершин спрайта
-
-/// Конструкторы
-  SpriteImpl (const Sprite& in_sprite, const MaterialProxy& in_material) : Sprite (in_sprite), material (in_material), primitive () {}
-
-  SpriteImpl (const SpriteImpl& sprite) : Sprite (sprite), material (sprite.material), primitive (sprite.primitive) //indices is a temporary structure
-  {
-    if (primitive)
-      primitive->dynamic_indices = &indices [0];
-  }
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -82,26 +63,22 @@ class PrimitiveImpl: public Object, public CacheSource
     void   RemoveAllMeshes ();
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Работа с линиями
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    size_t LinesCount       ();
-    size_t AddLines         (size_t lines_count, const Line* lines, const char* material);
-    void   UpdateLines      (size_t first_lines, size_t lines_count, const Line* lines);
-    void   SetLinesMaterial (size_t first_lines, size_t lines_count, const char* material);
-    void   RemoveLines      (size_t first_lines, size_t lines_count);
-    void   RemoveAllLines   ();
-    void   ReserveLines     (size_t lines_count);
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Работа со спрайтами
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    size_t SpritesCount       ();
-    size_t AddSprites         (size_t sprites_count, const Sprite* sprites, const char* material);
-    void   UpdateSprites      (size_t first_sprite, size_t sprites_count, const Sprite* sprites);
-    void   SetSpritesMaterial (size_t first_sprite, size_t sprites_count, const char* material);
-    void   RemoveSprites      (size_t first_sprite, size_t sprites_count);
-    void   RemoveAllSprites   ();
-    void   ReserveSprites     (size_t sprites_count);
+    size_t SpriteListsCount        ();
+    size_t AddStandaloneSpriteList (const SpriteListPtr&, MeshBufferUsage vb_usage, MeshBufferUsage ib_usage);
+    size_t AddBatchingSpriteList   (const SpriteListPtr&, SpriteMode sprite_mode);
+    void   RemoveSpriteList        (size_t index);
+    void   RemoveAllSpriteLists    ();
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Работа с линиями
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    size_t LineListsCount        ();
+    size_t AddStandaloneLineList (const LineListPtr&, MeshBufferUsage vb_usage, MeshBufferUsage ib_usage);
+    size_t AddBatchingLineList   (const LineListPtr&);
+    void   RemoveLineList        (size_t index);
+    void   RemoveAllLineLists    ();
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Группы примитивов рендеринга
@@ -125,6 +102,54 @@ class PrimitiveImpl: public Object, public CacheSource
     void UpdateCacheCore ();
     void ResetCacheCore ();
     
+  private:
+    struct Impl;
+    stl::auto_ptr<Impl> impl;
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Группа динамических примитивов
+///////////////////////////////////////////////////////////////////////////////////////////////////
+template <class T> class DynamicPrimitiveListImpl: public Object, public CacheSource
+{
+  public:
+    typedef T Item;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Конструктор / деструктор
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    DynamicPrimitiveListImpl  (const MaterialManagerPtr& material_manager);
+    ~DynamicPrimitiveListImpl ();
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Количество примитивов
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    size_t Size ();
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Материал
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void        SetMaterial (const char* material);
+    const char* Material    ();
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Добавление / обновление примитивов
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    size_t Add    (size_t count, const Item* items);
+    void   Update (size_t first, size_t count, const Item* items);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Удаление примитивов
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void Remove (size_t first, size_t count);
+    void Clear  ();
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Резервируемое пространство
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void   Reserve  (size_t count);
+    size_t Capacity ();
+
   private:
     struct Impl;
     stl::auto_ptr<Impl> impl;

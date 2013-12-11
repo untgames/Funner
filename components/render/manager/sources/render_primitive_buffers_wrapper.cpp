@@ -112,20 +112,6 @@ size_t PrimitiveBuffers::SpritesCapacity () const
 }
 
 /*
-    Режим использования буферов вспомогательных примитивов
-*/
-
-MeshBufferUsage PrimitiveBuffers::LinesBufferUsage () const
-{
-  return impl->LinesBufferUsage ();  
-}
-
-MeshBufferUsage PrimitiveBuffers::SpritesBufferUsage () const
-{
-  return impl->SpritesBufferUsage ();
-}
-
-/*
     Обмен
 */
 

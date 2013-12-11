@@ -15,7 +15,7 @@ class PrimitiveManager: public Object
 ///////////////////////////////////////////////////////////////////////////////////////////////////    
     PrimitivePtr        CreatePrimitive        ();
     PrimitivePtr        CreatePrimitive        (const PrimitiveBuffersPtr&);
-    PrimitiveBuffersPtr CreatePrimitiveBuffers (MeshBufferUsage lines_usage = MeshBufferUsage_Stream, MeshBufferUsage sprites_usage = MeshBufferUsage_Stream);    
+    PrimitiveBuffersPtr CreatePrimitiveBuffers ();
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///ѕроверка: €вл€етс€ ли ресурс библиотекой мешей

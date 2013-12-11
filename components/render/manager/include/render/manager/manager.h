@@ -111,9 +111,11 @@ class RenderManager
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Создание примитивов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+    SpriteList       CreateSpriteList       ();
+    LineList         CreateLineList         ();
     Primitive        CreatePrimitive        ();
     Primitive        CreatePrimitive        (const PrimitiveBuffers&);
-    PrimitiveBuffers CreatePrimitiveBuffers (MeshBufferUsage lines_usage = MeshBufferUsage_Stream, MeshBufferUsage sprites_usage = MeshBufferUsage_Stream);    
+    PrimitiveBuffers CreatePrimitiveBuffers ();
     Frame            CreateFrame            ();
     Entity           CreateEntity           ();
     Texture          CreateTexture          (const char* name);

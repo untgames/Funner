@@ -90,9 +90,9 @@ Primitive RenderManager::CreatePrimitive (const PrimitiveBuffers& buffers)
   return Wrappers::Wrap<Primitive> (impl->PrimitiveManager ().CreatePrimitive (Wrappers::Unwrap<PrimitiveBuffersImpl> (buffers)));
 }
 
-PrimitiveBuffers RenderManager::CreatePrimitiveBuffers (MeshBufferUsage lines_usage, MeshBufferUsage sprites_usage)
+PrimitiveBuffers RenderManager::CreatePrimitiveBuffers ()
 {
-  return Wrappers::Wrap<PrimitiveBuffers> (impl->PrimitiveManager ().CreatePrimitiveBuffers (lines_usage, sprites_usage));
+  return Wrappers::Wrap<PrimitiveBuffers> (impl->PrimitiveManager ().CreatePrimitiveBuffers ());
 }
 
 Entity RenderManager::CreateEntity ()

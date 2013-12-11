@@ -68,6 +68,9 @@ struct RendererOperationList;
 struct RenderTargetDesc;
 struct ShaderOptions;
 
+typedef DynamicPrimitiveListImpl<Line>   LineListImpl;
+typedef DynamicPrimitiveListImpl<Sprite> SpriteListImpl;
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Указатели на объекты рендера среднего уровня
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -81,6 +84,7 @@ typedef xtl::intrusive_ptr<EffectRenderer>          EffectRendererPtr;
 typedef xtl::intrusive_ptr<EntityImpl>              EntityPtr;
 typedef xtl::intrusive_ptr<FrameImpl>               FramePtr;
 typedef xtl::intrusive_ptr<InstantiatedEffect>      InstantiatedEffectPtr;
+typedef xtl::intrusive_ptr<LineListImpl>            LineListPtr;
 typedef xtl::intrusive_ptr<MaterialImpl>            MaterialPtr;
 typedef xtl::intrusive_ptr<MaterialManager>         MaterialManagerPtr;
 typedef xtl::intrusive_ptr<NativeWindow>            NativeWindowPtr;
@@ -96,6 +100,7 @@ typedef xtl::intrusive_ptr<RenderManagerImpl>       RenderManagerPtr;
 typedef xtl::intrusive_ptr<RenderTargetImpl>        RenderTargetPtr;
 typedef xtl::intrusive_ptr<RenderTargetDesc>        RenderTargetDescPtr;
 typedef xtl::intrusive_ptr<RenderTargetMapImpl>     RenderTargetMapPtr;
+typedef xtl::intrusive_ptr<SpriteListImpl>          SpriteListPtr;
 typedef xtl::intrusive_ptr<Settings>                SettingsPtr;
 typedef xtl::intrusive_ptr<TextureImpl>             TexturePtr;
 typedef xtl::intrusive_ptr<TextureManager>          TextureManagerPtr;

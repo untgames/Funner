@@ -68,7 +68,7 @@ struct PrimitiveManager::Impl
       
         //создание буферов примитивов библиотеки мэшей
         
-      PrimitiveBuffersPtr primitive_buffers (new PrimitiveBuffersImpl (device_manager, MeshBufferUsage_Default, MeshBufferUsage_Default), false);
+      PrimitiveBuffersPtr primitive_buffers (new PrimitiveBuffersImpl (device_manager), false);
       
         //создание новой библиотеки
         
@@ -169,11 +169,11 @@ PrimitivePtr PrimitiveManager::CreatePrimitive (const PrimitiveBuffersPtr& buffe
   }
 }
 
-PrimitiveBuffersPtr PrimitiveManager::CreatePrimitiveBuffers (MeshBufferUsage lines_usage, MeshBufferUsage sprites_usage)
+PrimitiveBuffersPtr PrimitiveManager::CreatePrimitiveBuffers ()
 {
   try
   {
-    return PrimitiveBuffersPtr (new PrimitiveBuffersImpl (impl->device_manager, lines_usage, sprites_usage), false);
+    return PrimitiveBuffersPtr (new PrimitiveBuffersImpl (impl->device_manager), false);
   }
   catch (xtl::exception& e)
   {
