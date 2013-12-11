@@ -154,16 +154,15 @@ struct MeshPrimitive: public xtl::reference_counter, public CacheHolder, public 
       
         //кэширование параметров примитива для отрисовки
       
-      cached_primitive.material        = cached_material.get ();
-      cached_primitive.state_block     = cached_state_block.get ();
-      cached_primitive.indexed         = common_data.index_buffer != LowLevelBufferPtr ();
-      cached_primitive.type            = type;
-      cached_primitive.first           = first;
-      cached_primitive.count           = count;
-      cached_primitive.base_vertex     = base_vertex;
-      cached_primitive.tags_count      = cached_material ? cached_material->TagsCount () : 0;
-      cached_primitive.tags            = cached_material ? cached_material->Tags () : (const size_t*)0;
-      cached_primitive.dynamic_indices = 0;
+      cached_primitive.material    = cached_material.get ();
+      cached_primitive.state_block = cached_state_block.get ();
+      cached_primitive.indexed     = common_data.index_buffer != LowLevelBufferPtr ();
+      cached_primitive.type        = type;
+      cached_primitive.first       = first;
+      cached_primitive.count       = count;
+      cached_primitive.base_vertex = base_vertex;
+      cached_primitive.tags_count  = cached_material ? cached_material->TagsCount () : 0;
+      cached_primitive.tags        = cached_material ? cached_material->Tags () : (const size_t*)0;
       
         //обновление зависимостей всегда, поскольку любые изменения материала/примитива должны быть отображены на зависимые кэши
         

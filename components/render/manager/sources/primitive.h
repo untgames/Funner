@@ -3,6 +3,8 @@ class PrimitiveBuffersImpl;
 class IPrimitiveUpdateListener; //TODO: нужно ли???
 class PrimitiveUpdateNotifier;
 
+typedef DynamicPrimitiveBuffer<unsigned short> DynamicIndexBuffer;
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Описание примитива рендеринга
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -18,6 +20,7 @@ struct RendererPrimitive
   size_t                           tags_count;      //количество тэгов материала
   const size_t*                    tags;            //тэги материала
   const unsigned short*            dynamic_indices; //динамические индексы
+  DynamicIndexBuffer*              dynamic_ib;      //динамический индексный буфер  
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
