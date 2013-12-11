@@ -3,6 +3,20 @@ class PrimitiveBuffersImpl;
 class IPrimitiveUpdateListener; //TODO: нужно ли???
 class PrimitiveUpdateNotifier;
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///¬ершина спрайта / вершина линии
+///////////////////////////////////////////////////////////////////////////////////////////////////
+//change InputLayoutManager sprite layout initialization if SpriteVertex will be changed
+struct SpriteVertex
+{
+  math::vec3f position;
+  math::vec3f normal;
+  math::vec4f color;
+  math::vec2f tex_coord;
+};
+
+typedef LinePoint LineVertex;
+
 typedef DynamicPrimitiveBuffer<unsigned short> DynamicIndexBuffer;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
