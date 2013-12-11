@@ -16,6 +16,7 @@
 #include <xtl/shared_ptr.h>
 #include <xtl/signal.h>
 #include <xtl/trackable.h>
+#include <xtl/uninitialized_storage.h>
 
 #include <common/hash.h>
 #include <common/log.h>
@@ -67,6 +68,8 @@ class InstantiatedEffect;
 struct RendererOperationList;
 struct RenderTargetDesc;
 struct ShaderOptions;
+
+template <class T> class DynamicPrimitiveBuffer;
 
 typedef DynamicPrimitiveListImpl<Line>   LineListImpl;
 typedef DynamicPrimitiveListImpl<Sprite> SpriteListImpl;
@@ -199,6 +202,7 @@ class DebugIdHolder: public xtl::noncopyable
 
 #include "cache_manager.h"
 #include "cache_map.h"
+#include "dynamic_primitive_buffer.h"
 #include "dynamic_texture.h"
 #include "effect.h"
 #include "effect_loader_library.h"
