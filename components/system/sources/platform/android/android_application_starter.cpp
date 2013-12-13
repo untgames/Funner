@@ -175,6 +175,30 @@ class ApplicationThread: private ApplicationStartArgs
     common::StringArray  args;
 };
 
+void on_application_notification (const char* notification)
+{
+  try
+  {
+    if (!notification)
+      throw xtl::make_null_argument_exception ("", "notification");
+
+    local_ref<jobject> activity (get_activity ());
+    local_ref<jclass>  activity_class (get_env ().GetObjectClass (get_activity ()), false);
+
+    if (!activity_class)
+      throw xtl::format_operation_exception ("", "JNIEnv::GetObjectClass failed");
+
+    jmethodID on_application_notification_method = find_method (&get_env (), activity_class.get (), "onApplicationNotification", "(Ljava/lang/String;)V");
+
+    get_env ().CallVoidMethod (activity.get (), on_application_notification_method, tojstring (notification).get ());
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("syslib::android::on_application_notification");
+    throw;
+  }
+}
+
 }
 
 namespace syslib
@@ -219,7 +243,9 @@ void start_application (JavaVM* vm, jobject activity, const char* program_name, 
     
   if (!application_context.sensor_event_listener_class)
     throw xtl::format_operation_exception ("", "Can't find EngineSensorEventListener class\n");    
-    
+
+  Application::RegisterNotificationHandler ("*", &on_application_notification);
+
     //запуск нити приложения
     
   ApplicationThread::Start (program_name, args, env_vars);

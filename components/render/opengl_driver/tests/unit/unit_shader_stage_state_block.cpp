@@ -47,7 +47,7 @@ int main ()
     Test test;        
 
     ShaderDesc shader_descs [] = {
-      {"ffp_shader", ~0, "", "ffp", ""},
+      {"ffp_shader", ~0u, "", "ffp", ""},
     };    
 
     ProgramPtr shader (test.device->CreateProgram (sizeof shader_descs / sizeof *shader_descs, shader_descs, &print));        

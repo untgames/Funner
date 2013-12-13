@@ -18,7 +18,7 @@ struct X {};
 int main()
 {
   typedef int (*func_ptr)(float, double);
-  typedef int (&func_ref)(float, double);
+//  typedef int (&func_ref)(float, double);
   typedef int (X::*mem_func_ptr)(float);
   typedef int (X::*mem_func_ptr_c)(float) const;
   typedef int (X::*mem_func_ptr_v)(float) volatile;

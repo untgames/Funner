@@ -3,6 +3,10 @@
 
 #include <syslib/window.h>
 
+#ifdef __OBJC__
+  #import <Foundation/NSDictionary.h>
+#endif
+
 namespace syslib
 {
 
@@ -89,6 +93,14 @@ class ApplicationManager
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     static void AttachApplicationListener (IApplicationListener* listener);
     static void DetachApplicationListener (IApplicationListener* listener);
+
+#ifdef __OBJC__
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///ѕолучение параметров запуска приложени€
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    static NSDictionary* GetLaunchOptions ();
+#endif
+
 };
 
 }

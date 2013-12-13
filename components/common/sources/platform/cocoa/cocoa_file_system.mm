@@ -151,12 +151,7 @@ class CocoaFileSystem: public StdioFileSystem
 
     bool HasFileAttribute (const char* file_name, const char* attribute)
     {
-      static const char* METHOD_NAME = "common::CocoaFileSystem::HasFileAttribute";
-
       size_t attributes_length = listxattr (file_name, 0, 0, 0);
-
-      if (attributes_length < 0)
-        throw xtl::format_operation_exception (METHOD_NAME, "Can't get attributes list length for file '%s', error '%s'", file_name, ::strerror (errno));
 
       if (!attributes_length)
         return false;
@@ -164,9 +159,6 @@ class CocoaFileSystem: public StdioFileSystem
       xtl::uninitialized_storage<char> names (attributes_length);
 
       attributes_length = listxattr (file_name, names.data (), names.size (), 0);
-
-      if (attributes_length < 0)
-        throw xtl::format_operation_exception (METHOD_NAME, "Can't get attributes list for file '%s', error '%s'", file_name, ::strerror (errno));
 
       const char *current_attribute = names.data (),
                  *end               = current_attribute + attributes_length;

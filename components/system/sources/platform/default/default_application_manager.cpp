@@ -128,6 +128,19 @@ bool DefaultApplicationManager::GetScreenSaverState ()
 }
 
 /*
+    Управление режимом работы в фоне
+*/
+
+void DefaultApplicationManager::SetApplicationBackgroundMode (syslib::ApplicationBackgroundMode)
+{
+}
+
+ApplicationBackgroundMode DefaultApplicationManager::GetApplicationBackgroundMode ()
+{
+  return ApplicationBackgroundMode_Active;
+}
+
+/*
     Получение системных свойств
 */
 

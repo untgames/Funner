@@ -71,7 +71,7 @@ typedef xtl::com_ptr<IPrimitive>                      PrimitivePtr;
 class RendererListener : public IRendererListener
 {
   public:
-    void OnFrameBufferCreate (IFrameBuffer* frame_buffer)
+    void OnFrameBufferCreate (IFrameBuffer* frame_buffer, size_t tag)
     {
       printf ("Created frame buffer %p\n", frame_buffer);
     }

@@ -15,7 +15,7 @@ class Test: public BasicTest
 {
   public:
 ///Конструктор
-    Test () : BasicTest (L"Window driver test #3"), current_style (0)
+    Test () : BasicTest (L"Window driver test #3")
     {
         //инициализация параметров теста
 
@@ -60,7 +60,6 @@ class Test: public BasicTest
   private:
     float        rotation_angle; //угол поворота спрайтов
     PrimitivePtr primitive;      //примитив, содержащий спрайты
-    size_t       current_style;
 };
 
 int main ()

@@ -189,6 +189,11 @@ inline void check_arguments_count (size_t stack_arguments_count)
     throw xtl::format_exception<script::ArgumentException> ("script::detail::check_arguments_count", "Too few arguments (expected %u, got %u)", expected_arguments_count, stack_arguments_count);
 }
 
+template <>
+inline void check_arguments_count<0> (size_t stack_arguments_count)
+{
+}
+
 /*
     Помещение аргумента в стек
 */
@@ -258,7 +263,7 @@ struct invoker_impl_base: public IInvoker
   {
     enum { arguments_count = func_traits::arguments_count + func_traits::is_memfun };
 
-      //проверка наличия достаточного числа аргументов в стеке    
+      //проверка наличия достаточного числа аргументов в стеке
 
     check_arguments_count<arguments_count> (stack.Size ());
 
@@ -285,7 +290,7 @@ struct invoker_impl_base<Signature, Fn, void>: public IInvoker
   {
     enum { arguments_count = func_traits::arguments_count + func_traits::is_memfun };
 
-      //проверка наличия достаточного числа аргументов в стеке    
+      //проверка наличия достаточного числа аргументов в стеке
 
     check_arguments_count<arguments_count> (stack.Size ());
 
@@ -848,8 +853,6 @@ inline Ret invoke
 {
   using namespace detail;
   
-  static ignore dummy;
-
   return invoke_dispatch<10> (interpreter, fn_name, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, xtl::type<Ret> ());
 }
 
@@ -961,7 +964,7 @@ template <class Signature> struct callback_invoker: public SimpleInvoker, public
 {
   size_t operator () (IStack& stack)
   {
-      //проверка наличия достаточного числа аргументов в стеке    
+      //проверка наличия достаточного числа аргументов в стеке
 
     check_arguments_count<1> (stack.Size ());  
   

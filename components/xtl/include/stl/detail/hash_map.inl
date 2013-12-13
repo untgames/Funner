@@ -318,7 +318,7 @@ template <class Key,class T,class HashFn,class EqualKey,class Allocator>
 inline pair<typename hash_map<Key,T,HashFn,EqualKey,Allocator>::iterator,bool> 
 hash_map<Key,T,HashFn,EqualKey,Allocator>::insert_pair (const key_type& key,const T& x)
 { 
-  return insert (make_pair<const key_type, T> (key, x));
+  return insert (stl::make_pair<const key_type, T> (key, x));
 }
 
 template <class Key,class T,class HashFn,class EqualKey,class Allocator> template <class Iter> 

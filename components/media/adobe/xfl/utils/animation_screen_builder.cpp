@@ -873,6 +873,7 @@ Track& create_channel (ConvertData& data, const char* target_name, const char* p
 ///компоновка трека
 void write_track
  (track3f&                 track,
+  float                    time_offset,
   const PropertyAnimation& x_track,
   const PropertyAnimation& y_track,
   const char*              name_prefix,
@@ -941,27 +942,27 @@ void write_track
     prev_time  = time;
     value      = (value + offset) * scale;
     
-    track.add_key (time, math::vec3f (value, z)); 
+    track.add_key (time + time_offset, math::vec3f (value, z));
   }
 }
 
-void write_track (trackf& dst_track, const PropertyAnimation& src_track, float scale = 1.0f)
+void write_track (trackf& dst_track, float time_offset, const PropertyAnimation& src_track, float scale = 1.0f)
 {
   for (size_t i=0, count=src_track.Keyframes ().Size (); i<count; i++)
   {
     const PropertyAnimationKeyframe &frame = src_track.Keyframes ()[i];
     
-    dst_track.add_key (frame.time, frame.value * scale);
+    dst_track.add_key (frame.time + time_offset, frame.value * scale);
   }
 }
 
-void write_angle_track (track3f& dst_track, const PropertyAnimation& src_track, float scale = 1.0f)
+void write_angle_track (track3f& dst_track, float time_offset, const PropertyAnimation& src_track, float scale = 1.0f)
 {
   for (size_t i=0, count=src_track.Keyframes ().Size (); i<count; i++)
   {
     const PropertyAnimationKeyframe &frame = src_track.Keyframes ()[i];
     
-    dst_track.add_key (frame.time, math::vec3f (0.0f, 0.0f, frame.value * scale));
+    dst_track.add_key (frame.time + time_offset, math::vec3f (0.0f, 0.0f, frame.value * scale));
   }
 }
 
@@ -1009,6 +1010,8 @@ void process_sprite_common
   const PropertyAnimation *x_track = animation.Properties ().Find ("headContainer.Basic_Motion.Motion_X"),
                           *y_track = animation.Properties ().Find ("headContainer.Basic_Motion.Motion_Y");
                           
+  float frame_time_offset = frame.FirstFrame () / data.document.FrameRate ();
+
   if (x_track && y_track)
   {
     math::vec2f track_scale  = math::vec2f (params.need_inverse_x ? -1.0f : 1.0f, params.need_inverse_y ? -1.0f : 1.0f) * scale * params.total_scale,
@@ -1027,7 +1030,7 @@ void process_sprite_common
     {      
       track3f& track = create_channel<track3f> (data, name, params.need_relative ? "offset" : "position");
 
-      write_track (track, *x_track, *y_track, name, 0.0f, track_offset, track_scale);
+      write_track (track, frame_time_offset, *x_track, *y_track, name, 0.0f, track_offset, track_scale);
     }
   }
   else if (!equal (position, math::vec2f (.0f), EPSILON) && !params.need_relative)
@@ -1051,7 +1054,7 @@ void process_sprite_common
     {
       track3f& track = create_channel<track3f> (data, name, "scale");
     
-      write_track (track, *x_scale_track, *y_scale_track, name, 1.0f, math::vec2f (0.0f), math::vec2f (0.01f));
+      write_track (track, frame_time_offset, *x_scale_track, *y_scale_track, name, 1.0f, math::vec2f (0.0f), math::vec2f (0.01f));
     }
   }
 
@@ -1091,7 +1094,7 @@ void process_sprite_common
     {
       track3f& track = create_channel<track3f> (data, name, "rotation");    
 
-      write_angle_track (track, *skewx_track, -1.0f);      
+      write_angle_track (track, frame_time_offset, *skewx_track, -1.0f);
     }    
   }
   else if (angle_track)
@@ -1104,7 +1107,7 @@ void process_sprite_common
     {    
       track3f& track = create_channel<track3f> (data, name, "rotation");
 
-      write_angle_track (track, *angle_track, -1.0f);
+      write_angle_track (track, frame_time_offset, *angle_track, -1.0f);
     }
   }
 
@@ -1122,7 +1125,7 @@ void process_sprite_common
     {
       trackf& track = create_channel<trackf> (data, name, "alpha");
     
-      write_track (track, *alpha_track, 0.01f);
+      write_track (track, frame_time_offset, *alpha_track, 0.01f);
     }
   }
 }

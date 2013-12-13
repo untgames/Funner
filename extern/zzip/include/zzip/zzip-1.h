@@ -235,5 +235,9 @@
 /* Define to `int' if <sys/types.h> does not define. */
 /* #undef ssize_t */
 
+#if defined(__APPLE__) && !defined(IPHONE)
+    #define _zzip_export extern __attribute__ ((visibility ("default")))
+#endif
+
 /* once: _ZZIP__CONFIG_H */
 #endif

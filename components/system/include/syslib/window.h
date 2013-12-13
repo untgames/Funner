@@ -78,6 +78,7 @@ enum WindowEvent
   WindowEvent_OnScreenLock,              //экран заблокирован
   WindowEvent_OnScreenUnlock,            //экран разблокирован
   WindowEvent_OnChangeStyle,             //окно изменило стиль
+  WindowEvent_OnScreenKeyboardHide,      //экранная клавиатура скрыта пользователем
   
   WindowEvent_Num
 };
@@ -389,6 +390,11 @@ class Window: public xtl::dynamic_cast_root //убрать!!
 ///Получение объекта оповещения об удалении окна
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     xtl::trackable& Trackable () const;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Получение дескриптора реализации
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    const void* InternalHandle () const;
 
   private:
     Window (const Window&); //no impl

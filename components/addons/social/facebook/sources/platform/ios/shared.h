@@ -16,3 +16,5 @@
 #include <common/strlib.h>
 
 #include <shared/ios.h>
+
+#include "../../shared/shared.h"

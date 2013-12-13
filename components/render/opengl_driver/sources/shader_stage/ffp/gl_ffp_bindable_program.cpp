@@ -70,13 +70,13 @@ FfpBindableProgram::FfpBindableProgram
         const ProgramParameter& src_param = src_group.parameters [j];
         Parameter               dst_param;
         
-          //поиск параметра в шейдере        
+          //поиск параметра в шейдере
 
         dst_param.location = program.FindDynamicParameter (src_param.name);
         dst_param.offset   = src_param.offset;
 
         if (!dst_param.location)
-          continue; //если параметр отсутствует - игнорируем его 
+          continue; //если параметр отсутствует - игнорируем его
 
           //проверка соответствия типов
           
@@ -236,7 +236,7 @@ void FfpBindableProgram::Bind (ConstantBufferPtr* constant_buffers)
 
 #ifndef OPENGL_ES_SUPPORT               
                
-    //отключение glsl-шейдеров  
+    //отключение glsl-шейдеров
 
   if (current_program != GetId ())
   {    
@@ -309,7 +309,7 @@ void FfpBindableProgram::Bind (ConstantBufferPtr* constant_buffers)
     UpdateHashes ();
   }
 
-    //установка состояния в контекст OpenGL    
+    //установка состояния в контекст OpenGL
     
   bool need_update_modelview_matrix = false,
        need_update_modes            = current_modes_hash != modes_hash,
@@ -398,7 +398,7 @@ void FfpBindableProgram::Bind (ConstantBufferPtr* constant_buffers)
           continue;
         }
 
-        float position [4] = {light.position [0], light.position [1], light.position [2], light.type != LightType_Remote};
+        float position [4] = {light.position [0], light.position [1], light.position [2], light.type == LightType_Remote ? 0.f : 1.f };
 
         glEnable  (light_id);
         glLightfv (light_id, GL_POSITION,              position);
@@ -590,7 +590,7 @@ void FfpBindableProgram::Bind (ConstantBufferPtr* constant_buffers)
     SetContextCacheValue (CacheEntry_FfpTexmapsStateHash, texmaps_hash);
   }
   
-    //установка параметров наблюдателя    
+    //установка параметров наблюдателя
     
   bool need_compute_view_object_matrix = false;
 

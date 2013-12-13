@@ -1,0 +1,7 @@
+Results of event_batcher2_test:
+start recording...
+notifications:
+MyServer::LoadResource(A1)
+MyServer::LoadResource(C1)
+MyServer::UnloadResource(C1)
+MyServer::UnloadResource(A1)

@@ -1,6 +1,7 @@
 COMPONENT_DIRS := zzip pcre tiff devil libpsd gles_win32 gles_wince bullet ogg vorbis \
                   vorbisfile theora lua luajit firebreath mongoose beagleboard openalsdk shiny meego \
-                  wcecompat libffi pthreads_wince qualcomm_texture_converter lib64 dxsdk angle libiconv win32_load_dll win8_compat
+                  wcecompat libffi pthreads_wince qualcomm_texture_converter lib64 dxsdk angle \
+                  libiconv win32_load_dll win8_compat flac
 
 ifeq (,$(filter beagleboard,$(PROFILES))$(filter tabletos,$(PROFILES)))
   COMPONENT_DIRS += curl
@@ -21,7 +22,11 @@ ifneq (,$(filter android-arm,$(PROFILES)))
 endif
 
 ifneq (,$(filter android,$(PROFILES)))
-  COMPONENT_DIRS += gcm google_play_billing
+  COMPONENT_DIRS += gcm google_play_billing facebook_android_sdk android_support_v4 flurry
+endif
+
+ifneq (,$(filter iphone,$(PROFILES)))
+  COMPONENT_DIRS += flurry
 endif
 
 ifeq (,$(filter android,$(PROFILES)))

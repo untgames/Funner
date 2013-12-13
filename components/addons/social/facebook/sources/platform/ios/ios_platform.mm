@@ -345,7 +345,33 @@ class IOsPlatformImpl
     //Обработка открытия приложения по ссылке
     void OnOpenUrl (const char* notification)
     {
-      login_handler (true, OperationStatus_Success, "", notification + strlen (OPEN_URL_NOTIFICATION_PREFIX));
+      const char* url = notification + strlen (OPEN_URL_NOTIFICATION_PREFIX);
+
+      stl::string token = get_url_parameter (url, "access_token=");
+
+      if (token.empty ())  //login failed
+      {
+        stl::string error = get_url_parameter (url, "error_reason=");
+
+        if (error == "user_denied")
+        {
+          log.Printf ("Login canceled");
+
+          login_handler (true, OperationStatus_Canceled, "", "");
+        }
+        else
+        {
+          log.Printf ("Login failed, error '%s'", error.c_str ());
+
+          login_handler (true, OperationStatus_Failure, error.c_str (), "");
+        }
+      }
+      else
+      {
+        log.Printf ("Logged in");
+
+        login_handler (true, OperationStatus_Success, "", token.c_str ());
+      }
 
       RemoveLoginHandler ();
     }

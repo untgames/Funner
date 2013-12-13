@@ -12,6 +12,8 @@
 
 #import <SystemConfiguration/SCNetworkReachability.h>
 
+#import <AudioToolbox/AudioServices.h>
+
 using namespace syslib;
 using namespace syslib::iphone;
 
@@ -26,7 +28,7 @@ ApplicationDelegateImpl* application_delegate = 0;
 NSString*            USER_DEFAULTS_UUID                     = @"UUID";
 const char*          LOG_NAME                               = "syslib.IPhoneApplication";
 const char*          REGISTER_FOR_PUSH_NOTIFICATIONS_PREFIX = "RegisterForPushNotification Register ";
-const NSTimeInterval BACKGROUND_IDLE_TIMER_PERIOD           = 1.f / 20.f; //idle timer calling interval when app is in background state
+const NSTimeInterval BACKGROUND_IDLE_TIMER_PERIOD           = 1.f / 60.f; //idle timer calling interval when app is in background state
 
 //Functions for printing objective-c objects to json
 void ns_object_to_json (id obj, stl::string& output);
@@ -83,6 +85,35 @@ void ns_object_to_json (id obj, stl::string& output)
     ns_array_to_json (obj, output);
   else
     output += "\"\"";
+}
+
+//получение имени ошибки Audio Services
+const char* get_audio_session_error_name (OSStatus error)
+{
+  switch (error)
+  {
+    case kAudioSessionNoError:                  return "No error has occurred.";
+    case kAudioSessionNotInitialized:           return "An Audio Session Services function was called without first initializing the session.";
+    case kAudioSessionAlreadyInitialized:       return "The AudioSessionInitialize function was called more than once during the lifetime of your application.";
+    case kAudioSessionInitializationError:      return "There was an error during audio session initialization.";
+    case kAudioSessionUnsupportedPropertyError: return "The audio session property is not supported.";
+    case kAudioSessionBadPropertySizeError:     return "The size of the audio session property data was not correct.";
+    case kAudioSessionNotActiveError:           return "The operation failed because your application's audio session was not active.";
+    case kAudioServicesNoHardwareError:         return "The audio operation failed because the device has no audio input available.";
+    case kAudioSessionNoCategorySet:            return "The audio operation failed because it requires the audio session to have an explicitly-set category, but none was set. To use a hardware codec you must explicitly initialize the audio session and explicitly set an audio session category.";
+    case kAudioSessionIncompatibleCategory:     return "The specified audio session category cannot be used for the attempted audio operation. For example, you attempted to play or record audio with the audio session category set to kAudioSessionCategory_AudioProcessing.";
+    case kAudioSessionUnspecifiedError:         return "An unspecified audio session error has occurred. This typically results from the audio system being in an inconsistent state.";
+    default:                                    return "Unknown error";
+  }
+}
+
+//проверка ошибок Audio Services
+void check_audio_session_error (OSStatus error_code, const char* source)
+{
+  if (error_code == kAudioSessionNoError)
+    return;
+
+  throw xtl::format_operation_exception (source, "Audio session error. %s. Code %d.", get_audio_session_error_name (error_code), error_code);
 }
 
 class ApplicationDelegateImpl: public IApplicationDelegate, public xtl::reference_counter
@@ -261,22 +292,27 @@ typedef stl::vector<syslib::iphone::IApplicationListener*> ListenerArray;
 @interface ApplicationDelegateInternal : NSObject
 {
   @private
-    ListenerArray *listeners;                   //слушатели событий
-    CADisplayLink *idle_timer;                  //таймер вызова OnIdle
-    NSTimer       *background_idle_timer;       //таймер вызова OnIdle в неактивном состоянии
-    bool          background_execution_enabled; //нужно ли вызывать OnIdle в неактивном состоянии
-    bool          main_view_visible;            //виден ли главный view приложения
+    ListenerArray             *listeners;                     //слушатели событий
+    CADisplayLink             *idle_timer;                    //таймер вызова OnIdle
+    NSTimer                   *background_idle_timer;         //таймер вызова OnIdle в неактивном состоянии
+    NSDictionary              *launch_options;                //параметры запуска приложения
+    bool                      main_view_visible;              //виден ли главный view приложения
+    ApplicationBackgroundMode background_mode;                //режим фоновой работы приложения
+    int                       suspend_audio_session_category; //аудио-категория, бывшая активной до установки режима ApplicationBackgroundMode_Active
 }
 
-@property (nonatomic, readonly) ListenerArray* listeners;
-@property (nonatomic, readonly) CADisplayLink* idle_timer;
-@property (nonatomic)           bool           main_view_visible;
+@property (nonatomic, readonly) ListenerArray*            listeners;
+@property (nonatomic, readonly) CADisplayLink*            idle_timer;
+@property (nonatomic, retain)   NSDictionary*             launch_options;
+@property (nonatomic)           bool                      main_view_visible;
+@property (nonatomic)           ApplicationBackgroundMode background_mode;
+@property (nonatomic)           int                       suspend_audio_session_category;
 
 @end
 
 @implementation ApplicationDelegateInternal
 
-@synthesize listeners, idle_timer, main_view_visible;
+@synthesize listeners, idle_timer, launch_options, main_view_visible, background_mode, suspend_audio_session_category;
 
 -(void)initIdleTimer
 {
@@ -298,9 +334,6 @@ typedef stl::vector<syslib::iphone::IApplicationListener*> ListenerArray;
 
 -(void)startBackgroundIdleTimer
 {
-  if (!background_execution_enabled)
-    return;
-
   [self deleteBackgroundIdleTimer];
 
   background_idle_timer = [[NSTimer scheduledTimerWithTimeInterval:BACKGROUND_IDLE_TIMER_PERIOD target:self selector:@selector (onIdle:) userInfo:nil repeats:YES] retain];
@@ -312,6 +345,8 @@ typedef stl::vector<syslib::iphone::IApplicationListener*> ListenerArray;
 
   if (!self)
     return nil;
+
+  background_mode = ApplicationBackgroundMode_Suspend;
 
   try
   {
@@ -383,6 +418,64 @@ typedef stl::vector<syslib::iphone::IApplicationListener*> ListenerArray;
   [super dealloc];
 }
 
+-(void) setBackgroundMode:(ApplicationBackgroundMode)new_background_mode
+{
+  if (impl.background_mode == new_background_mode)
+    return;
+
+  try
+  {
+    switch (new_background_mode)
+    {
+      case ApplicationBackgroundMode_Active:
+      {
+        int suspend_audio_session_category = impl.suspend_audio_session_category;
+
+        UInt32 buffer_size = sizeof (suspend_audio_session_category);
+
+        check_audio_session_error (AudioSessionGetProperty (kAudioSessionProperty_AudioCategory, &buffer_size, &suspend_audio_session_category), "::AudioSessionGetProperty");
+
+        impl.suspend_audio_session_category = suspend_audio_session_category;
+
+        int background_execution_category = kAudioSessionCategory_MediaPlayback;
+
+        check_audio_session_error (AudioSessionSetProperty (kAudioSessionProperty_AudioCategory,
+                                   sizeof (background_execution_category), &background_execution_category), "::AudioSessionSetProperty");
+
+        break;
+      }
+      case ApplicationBackgroundMode_Suspend:
+      {
+        int suspend_audio_session_category = impl.suspend_audio_session_category;
+
+        check_audio_session_error (AudioSessionSetProperty (kAudioSessionProperty_AudioCategory,
+                                   sizeof (suspend_audio_session_category), &suspend_audio_session_category), "::AudioSessionSetProperty");
+        
+        break;
+      }
+      default:
+        throw xtl::make_argument_exception ("", "mode", new_background_mode);
+    }
+
+    impl.background_mode = new_background_mode;
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("syslib::iphone::ApplicationDelegate::setBackgroundMode");
+    throw;
+  }
+}
+
+-(NSDictionary*)launchOptions
+{
+  return impl.launch_options;
+}
+
+-(ApplicationBackgroundMode) backgroundMode
+{
+  return impl.background_mode;
+}
+
 -(void) onRemoteNotificationReceived:(NSDictionary*)notification_data whileActive:(bool)while_active
 {
   NSMutableDictionary* data = [NSMutableDictionary dictionaryWithDictionary:notification_data];
@@ -403,7 +496,9 @@ typedef stl::vector<syslib::iphone::IApplicationListener*> ListenerArray;
 -(BOOL) application:(UIApplication*)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
   application_launched = true;
-  
+
+  impl.launch_options = launchOptions;
+
   application_delegate->OnInitialize ();
 
   impl.idle_timer.paused = NO;
@@ -443,7 +538,9 @@ typedef stl::vector<syslib::iphone::IApplicationListener*> ListenerArray;
 {
   impl.idle_timer.paused = YES;
   [impl.idle_timer invalidate];
-  [impl startBackgroundIdleTimer];
+
+  if (impl.background_mode == ApplicationBackgroundMode_Active)
+    [impl startBackgroundIdleTimer];
 
   if (application_delegate)
     application_delegate->OnPause ();
@@ -525,9 +622,14 @@ typedef stl::vector<syslib::iphone::IApplicationListener*> ListenerArray;
 namespace syslib
 {
 
+namespace iphone
+{
+
 bool is_in_run_loop () //запущен ли главный цикл
 {
   return application_launched;
+}
+
 }
 
 }
@@ -560,6 +662,18 @@ void ApplicationManager::DetachApplicationListener (syslib::iphone::IApplication
 }
 
 /*
+   Получение параметров запуска приложения
+*/
+
+NSDictionary* ApplicationManager::GetLaunchOptions ()
+{
+  if (!application_launched)
+    throw xtl::format_operation_exception ("syslib::iphone::ApplicationManager::GetLaunchOptions", "Application was not launched yet");
+
+  return [(ApplicationDelegate*)([UIApplication sharedApplication].delegate) launchOptions];
+}
+
+/*
     Создание делегата приложения
 */
 
@@ -584,6 +698,20 @@ void IPhoneApplicationManager::OpenUrl (const char* url)
 
   if (!result)
     throw xtl::format_operation_exception ("::UIApplication::openURL", "Can't open URL '%s'", url);
+}
+
+/*
+   Управление режимом работы в фоне
+*/
+
+void IPhoneApplicationManager::SetApplicationBackgroundMode (syslib::ApplicationBackgroundMode mode)
+{
+  [(ApplicationDelegate*)([UIApplication sharedApplication].delegate) setBackgroundMode:mode];
+}
+
+syslib::ApplicationBackgroundMode IPhoneApplicationManager::GetApplicationBackgroundMode ()
+{
+  return [(ApplicationDelegate*)([UIApplication sharedApplication].delegate) backgroundMode];
 }
 
 /*

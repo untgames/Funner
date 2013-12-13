@@ -12,6 +12,7 @@ import android.graphics.Canvas;
 import android.graphics.Rect;
 import android.widget.AbsoluteLayout;
 import android.view.InputDevice;
+import android.view.inputmethod.InputMethodManager;
 import android.content.Context;
 import android.util.*;
 import java.io.*;
@@ -229,6 +230,22 @@ public class EngineViewController implements View.OnTouchListener, View.OnKeyLis
     });
   }
   
+  public void clearFocusThreadSafe (final Context context)
+  {
+    UiDispatch.run (view, new UiRunnable () {
+      public Object run ()
+      {
+        view.clearFocus ();
+        
+        InputMethodManager input_manager = (InputMethodManager)context.getSystemService (Context.INPUT_METHOD_SERVICE);
+        
+        input_manager.hideSoftInputFromWindow (view.getWindowToken (), 0);
+        
+        return null;
+      }
+    });
+  }
+  
   public boolean requestFocusThreadSafe ()
   {
     Boolean result = (Boolean)UiDispatch.run (view, new UiRunnable () {
@@ -252,11 +269,12 @@ public class EngineViewController implements View.OnTouchListener, View.OnKeyLis
   public native void onTouchCallback            (int pointerId, int action, float x, float y);
   public native void onDoubletapCallback        (int pointerId, float x, float y);
   public native void onTrackballCallback        (int pointerId, int action, float x, float y);
-  public native void onKeyCallback              (int keycode, int action, boolean alt_pressed, boolean shift_pressed, boolean is_sym_pressed);
+  public native void onKeyCallback              (int keycode, int action, boolean alt_pressed, boolean shift_pressed, boolean is_sym_pressed, int unicodeChar);
   public native void onFocusCallback            (boolean focusGained);
   public native void onSurfaceCreatedCallback   ();
   public native void onSurfaceChangedCallback   (int format, int width, int height);  
   public native void onSurfaceDestroyedCallback ();  
+  public native void onVisibilityCallback       (boolean is_visible);
   
   @Override
   public boolean onTouch (View v, MotionEvent event)
@@ -288,13 +306,26 @@ public class EngineViewController implements View.OnTouchListener, View.OnKeyLis
       default:
         break;
     }
-
+    
     int     action           = event.getAction ();
     boolean is_alt_pressed   = event.isAltPressed (),
             is_shift_pressed = event.isShiftPressed (),
             is_sym_pressed   = event.isSymPressed ();
-            
-    onKeyCallback (keyCode, action, is_alt_pressed, is_shift_pressed, is_sym_pressed);
+
+    int unicode_char = event.getUnicodeChar ();
+    
+    if (unicode_char == 0 && keyCode == KeyEvent.KEYCODE_UNKNOWN && action == KeyEvent.ACTION_MULTIPLE)
+    {
+      String characters = event.getCharacters ();
+    
+      if (characters != null && characters.length () > 0)
+    	  unicode_char = characters.codePointAt (0);
+    }
+
+    if (keyCode == KeyEvent.KEYCODE_DEL) //Backspace not sending char code
+    	unicode_char = 8;
+    
+    onKeyCallback (keyCode, action, is_alt_pressed, is_shift_pressed, is_sym_pressed, unicode_char);
 
     return true;
   }  
@@ -303,5 +334,10 @@ public class EngineViewController implements View.OnTouchListener, View.OnKeyLis
   public void onFocusChange (View v, boolean has_focus)
   {
     onFocusCallback (has_focus);
+  }
+  
+  public void onVisibilityChange (boolean is_visible)
+  {
+    onVisibilityCallback (is_visible);
   }
 }

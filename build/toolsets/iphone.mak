@@ -16,11 +16,13 @@ DLL_LIB_SUFFIX := .dylib
 PROFILES += iphone cocoa unistd has_windows haswchar gles no_dll has_iconv
 DLL_PATH := DYLD_LIBRARY_PATH
 
-COMMON_CFLAGS               += -Os -isysroot $(IPHONE_SDK_PATH) -DIPHONE -fvisibility=hidden
+COMMON_CFLAGS               += -Os -isysroot $(IPHONE_SDK_PATH) -DIPHONE -fvisibility=hidden -Wno-unused-function
 COMMON_LINK_FLAGS           += -isysroot $(IPHONE_SDK_PATH)
 MAP_FILE_LINK_OPTION_PREFIX := -Wl,-map,
 
 include $(TOOLSETS_DIR)/g++.mak
+
+PROFILES := $(filter-out g++,$(PROFILES))
 
 SOURCE_FILES_SUFFIXES += mm         #Расширения исходных файлов
 
@@ -73,7 +75,7 @@ define process_target.fat-static-lib
 
   $$($1.LIB_FILE): $$($1.LIB_DEPS)
 		@echo Create fat static library $$(notdir $$($1.LIB_FILE))..
-		@libtool -c -o $$@ $$(sort $$($1.LIB_DEPS))
+		@libtool -c -o $$@ $$(sort $$($1.LIB_DEPS)) -arch_only $(FAT_LIB_ARCH_TYPE) 
 endef
 
 #Обработка цели объединения библиотек, собранных для разных архитектур (имя цели)

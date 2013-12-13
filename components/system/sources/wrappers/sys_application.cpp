@@ -562,7 +562,7 @@ void Application::SetScreenSaverState (bool state)
   }  
 }
 
-bool Application::GetScreenSaverState ()
+bool Application::ScreenSaverState ()
 {
   try
   {
@@ -570,9 +570,48 @@ bool Application::GetScreenSaverState ()
   }
   catch (xtl::exception& exception)
   {
-    exception.touch ("syslib::Application::GetScreenSaverState");
+    exception.touch ("syslib::Application::ScreenSaverState");
     throw;
   }  
+}
+
+/*
+    ”правление режимом работы в фоне
+*/
+
+void Application::SetBackgroundMode (ApplicationBackgroundMode mode)
+{
+  try
+  {
+    switch (mode)
+    {
+      case ApplicationBackgroundMode_Active:
+      case ApplicationBackgroundMode_Suspend:
+        break;
+      default:
+        throw xtl::make_argument_exception ("", "mode", mode);
+    }
+
+    Platform::SetApplicationBackgroundMode (mode);
+  }
+  catch (xtl::exception& exception)
+  {
+    exception.touch ("syslib::Application::SetBackgroundMode");
+    throw;
+  }
+}
+
+ApplicationBackgroundMode Application::BackgroundMode ()
+{
+  try
+  {
+    return Platform::GetApplicationBackgroundMode ();
+  }
+  catch (xtl::exception& exception)
+  {
+    exception.touch ("syslib::Application::BackgroundMode");
+    throw;
+  }
 }
 
 /*

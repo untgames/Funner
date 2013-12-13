@@ -88,10 +88,16 @@ inline char const* stl_get_container_name (const Container&)
 }
 
 template <class Container>
-inline void stl_raise_length_error (const Container& c,size_t new_size)
+inline void stl_raise_length_error (const Container& c,size_t new_size, size_t old_size)
 {
   raise<length_error> ("%s: Container is too long (new_size=%u, current_size=%u, max_size=%u)",
-                       stl_get_container_name (c),new_size,c.size (),c.max_size ());
+                       stl_get_container_name (c),new_size,old_size,c.max_size ());
+}
+
+template <class Container>
+inline void stl_raise_length_error (const Container& c,size_t new_size)
+{
+  stl_raise_length_error (c, new_size, c.size ());
 }
 
 template <class Container>

@@ -420,7 +420,7 @@ class IOSStore : public ITransactionObserverListener, public IProductsRequestLis
 
         pending_transactions.push_back (new_transaction);
 
-        NSMutableSet* ns_products = [[NSMutableSet alloc] initWithObject:[NSString stringWithUTF8String:product_id]];
+        NSMutableSet* ns_products = [[NSMutableSet alloc] initWithObjects:[NSString stringWithUTF8String:product_id], nil];
 
         SKProductsRequest* request = [[SKProductsRequest alloc] initWithProductIdentifiers:ns_products];
 

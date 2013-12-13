@@ -177,6 +177,8 @@ class MyInterpreter: public IInterpreter, public xtl::trackable
 
 struct X
 {
+  virtual ~X () {}
+
   virtual const char* name () const { return "struct X"; }
 
   virtual const char* test () const { return "X::test"; }

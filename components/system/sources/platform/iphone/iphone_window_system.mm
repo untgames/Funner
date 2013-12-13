@@ -16,6 +16,8 @@ using namespace syslib::iphone;
 namespace
 {
 
+const char* LOG_NAME = "syslib.iphone.window";
+
 InterfaceOrientation get_interface_orientation (UIInterfaceOrientation interface_orientation)
 {
   switch (interface_orientation)
@@ -32,19 +34,27 @@ CGRect get_transformed_view_rect_size (CGRect frame, UIView* view)
 {
   if (!CGAffineTransformIsIdentity (view.transform))
   {
-      float temp = frame.size.width;
+    float temp = frame.size.width;
 
-      frame.size.width  = frame.size.height;
-      frame.size.height = temp;
+    frame.size.width  = frame.size.height;
+    frame.size.height = temp;
 
-      temp = frame.origin.x;
+    temp = frame.origin.x;
 
-      frame.origin.x = frame.origin.y;
-      frame.origin.y = temp;
+    frame.origin.x = frame.origin.y;
+    frame.origin.y = temp;
   }
 
   return frame;
 }
+
+}
+
+namespace syslib
+{
+
+namespace iphone
+{
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///ќписание реализации окна
@@ -54,10 +64,14 @@ struct WindowImpl
   void*                user_data;       //указатель на пользовательские данные
   WindowMessageHandler message_handler; //функци€ обработки сообщений окна
   window_t             cocoa_window;    //окно
+  common::Log          log;             //поток протоколировани€
 
   // онструктор/деструктор
   WindowImpl (WindowMessageHandler handler, void* in_user_data, void* new_window)
-    : user_data (in_user_data), message_handler (handler), cocoa_window ((window_t)new_window)
+    : user_data (in_user_data)
+    , message_handler (handler)
+    , cocoa_window ((window_t)new_window)
+    , log (LOG_NAME)
     {}
 
   ~WindowImpl ()
@@ -72,33 +86,25 @@ struct WindowImpl
     {
       message_handler (cocoa_window, event, context, user_data);
     }
+    catch (std::exception& e)
+    {
+      log.Printf ("%s\n    at syslib::iphone::WindowImpl::Notify", e.what ());
+    }
     catch (...)
     {
-      //подавление всех исключений
+      log.Printf ("unknown exception\n    at syslib::iphone::WindowImpl::Notify");
     }
   }
 };
 
 }
 
-typedef stl::vector <IWindowListener*> ListenerArray;
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///–аспределитель событий окна
-///////////////////////////////////////////////////////////////////////////////////////////////////
-@interface UIWindowWrapper : UIWindow
-{
-  @private
-    WindowImpl         *window_impl;          //окно
-    ListenerArray      *listeners;            //подписчика на событи€
-    WindowEventContext *event_context;        //контекст, передаваемый обработчикам событий
-    UIViewController   *root_view_controller; //корневой контроллер
-    int                allowed_orientations;  //разрешенные ориентации окна
-    bool               has_ios_4_0;           //верси€ операционной системы >= 4.0
 }
 
-@property (nonatomic, assign) WindowImpl* window_impl;
-@property (nonatomic)         int         allowed_orientations;
+@interface UIWindowWrapper ()
+
+@property (nonatomic, assign) syslib::iphone::WindowImpl* window_impl;
+@property (nonatomic)         int                         allowed_orientations;
 
 -(void)onPaint;
 
@@ -293,44 +299,6 @@ typedef stl::vector <IWindowListener*> ListenerArray;
   [super dealloc];
 }
 
--(CGFloat)contentScaleFactor
-{
-  if (has_ios_4_0)
-    return super.contentScaleFactor;
-
-  return 1;
-}
-
--(UIViewController*)rootViewController
-{
-  if (has_ios_4_0)
-    return super.rootViewController;
-  else
-    return root_view_controller;
-}
-
--(void)setRootViewController:(UIViewController*)in_root_view_controller
-{
-  if (has_ios_4_0)
-  {
-    super.rootViewController = in_root_view_controller;
-  }
-  else
-  {
-    if (root_view_controller == in_root_view_controller)
-      return;
-
-    [root_view_controller.view removeFromSuperview];
-
-    [root_view_controller release];
-    root_view_controller = [in_root_view_controller retain];
-
-    [self addSubview:root_view_controller.view];
-
-    [root_view_controller.view becomeFirstResponder];
-  }
-}
-
 -(id) initWithFrame:(CGRect)rect
 {
   self = [super initWithFrame:rect];
@@ -339,7 +307,6 @@ typedef stl::vector <IWindowListener*> ListenerArray;
     return nil;
 
   allowed_orientations = UIInterfaceOrientationMaskAll;
-  has_ios_4_0          = [[[UIDevice currentDevice] systemVersion] compare:@"4.0" options:NSNumericSearch] != NSOrderedAscending;
 
   try
   {
@@ -347,7 +314,7 @@ typedef stl::vector <IWindowListener*> ListenerArray;
 
     event_context->handle = self;
 
-    listeners = new ListenerArray;
+    listeners = new WindowListenerArray;
   }
   catch (...)
   {
@@ -364,6 +331,7 @@ typedef stl::vector <IWindowListener*> ListenerArray;
 
   [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector (onShow) name:UIWindowDidBecomeVisibleNotification object:self];
   [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector (onHide) name:UIWindowDidBecomeHiddenNotification object:self];
+  [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector (onKeyboardHide) name:UIKeyboardDidHideNotification object:nil];
 
   return self;
 }
@@ -383,6 +351,11 @@ typedef stl::vector <IWindowListener*> ListenerArray;
   window_impl->Notify (WindowEvent_OnHide, [self getEventContext]);
 }
 
+-(void)onKeyboardHide
+{
+  window_impl->Notify (WindowEvent_OnScreenKeyboardHide, [self getEventContext]);
+}
+
 -(WindowEventContext&) getEventContext
 {
   event_context->touches_count = 0;
@@ -399,10 +372,9 @@ typedef stl::vector <IWindowListener*> ListenerArray;
 
   return_value.touches_count = [touches count];
 
-  UIView                 *view              = self.rootViewController.view;
-  NSEnumerator           *enumerator        = [touches objectEnumerator];
-  Touch                  *touch_description = return_value.touches;
-  CGSize                 view_size          = view.frame.size;
+  UIView       *view              = self.rootViewController.view;
+  NSEnumerator *enumerator        = [touches objectEnumerator];
+  Touch        *touch_description = return_value.touches;
 
   for (UITouch *iter = [enumerator nextObject]; iter; iter = [enumerator nextObject], touch_description++)
   {
@@ -454,7 +426,7 @@ typedef stl::vector <IWindowListener*> ListenerArray;
   if (motion != UIEventSubtypeMotionShake)
     return;
 
-  for (ListenerArray::iterator iter = listeners->begin (), end = listeners->end (); iter != end; ++iter)
+  for (WindowListenerArray::iterator iter = listeners->begin (), end = listeners->end (); iter != end; ++iter)
     (*iter)->OnShakeMotionBegan ();
 }
 
@@ -463,7 +435,7 @@ typedef stl::vector <IWindowListener*> ListenerArray;
   if (motion != UIEventSubtypeMotionShake)
     return;
 
-  for (ListenerArray::iterator iter = listeners->begin (), end = listeners->end (); iter != end; ++iter)
+  for (WindowListenerArray::iterator iter = listeners->begin (), end = listeners->end (); iter != end; ++iter)
     (*iter)->OnShakeMotionEnded ();
 }
 
@@ -474,16 +446,25 @@ typedef stl::vector <IWindowListener*> ListenerArray;
 
 -(void)onInterfaceOrientationWillChangeFrom:(InterfaceOrientation)from_orientation to:(InterfaceOrientation)to_orientation duration:(float)duration
 {
-  for (ListenerArray::iterator iter = listeners->begin (), end = listeners->end (); iter != end; ++iter)
+  for (WindowListenerArray::iterator iter = listeners->begin (), end = listeners->end (); iter != end; ++iter)
     (*iter)->OnInterfaceOrientationWillChange (from_orientation, to_orientation, duration);
 }
 
 -(void)onInterfaceOrientationChangedFrom:(InterfaceOrientation)from_orientation to:(InterfaceOrientation)to_orientation
 {
-  for (ListenerArray::iterator iter = listeners->begin (), end = listeners->end (); iter != end; ++iter)
+  for (WindowListenerArray::iterator iter = listeners->begin (), end = listeners->end (); iter != end; ++iter)
     (*iter)->OnInterfaceOrientationChanged (from_orientation, to_orientation);
 
   window_impl->Notify (WindowEvent_OnSize, [self getEventContext]);
+}
+
+-(void)onCharInput:(wchar_t)char_code
+{
+  WindowEventContext& current_event_context = [self getEventContext];
+
+  current_event_context.char_code = char_code;
+
+  window_impl->Notify (WindowEvent_OnChar, current_event_context);
 }
 
 /*

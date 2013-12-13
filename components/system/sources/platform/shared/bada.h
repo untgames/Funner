@@ -148,6 +148,7 @@ class BadaPlatform
  , public DefaultScreenManager
  , public DefaultSensorManager 
  , public DefaultCookieManager
+ , public DefaultScreenKeyboardManager
 {
 };
 

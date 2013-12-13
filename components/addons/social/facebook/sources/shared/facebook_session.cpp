@@ -90,6 +90,8 @@ void FacebookSessionImpl::ShowWindow (const char* window_name, const WindowCallb
 
     dialog_web_view.reset (new syslib::WebView);
 
+    last_dialog_base_request = common::format ("https://m.facebook.com/dialog/%s", window_name);
+
     dialog_web_view_filter_connection     = dialog_web_view->RegisterFilter (xtl::bind (&FacebookSessionImpl::ProcessDialogRequest, this, _2, callback));
     dialog_web_view_load_start_connection = dialog_web_view->RegisterEventHandler (syslib::WebViewEvent_OnLoadStart, xtl::bind (&FacebookSessionImpl::ProcessDialogRequest, this, (const char*)0, callback));
     dialog_web_view_load_fail_connection  = dialog_web_view->RegisterEventHandler (syslib::WebViewEvent_OnLoadFail, xtl::bind (&FacebookSessionImpl::ProcessDialogFail, this, callback));
@@ -118,6 +120,12 @@ bool FacebookSessionImpl::ProcessDialogRequest (const char* request, const Windo
   {
     log.Printf ("Dialog load request '%s'", request);
 
+    if (request == last_dialog_base_request) //this url loads when user taps action button, so we needs to hide window after this
+    {
+      dialog_web_view->Window ().Hide ();
+      dialog_web_view->Window ().SetFocus (false);
+    }
+
     if (strstr (request, "fbconnect://success") == request) //dialog finished
     {
       stl::string request_copy = request;
@@ -129,7 +137,9 @@ bool FacebookSessionImpl::ProcessDialogRequest (const char* request, const Windo
         stl::string error = get_url_parameter (request_copy.c_str (), "error_code=");
 
         if (error.empty ())
-          callback (OperationStatus_Success, "");
+          callback (OperationStatus_Success, replace_percent_escapes (request).c_str ());
+        else if (error == "4201")
+          callback (OperationStatus_Canceled, "");
         else
           callback (OperationStatus_Failure, error.c_str ());
       }
@@ -209,7 +219,7 @@ void FacebookSessionImpl::LogIn (const LoginCallback& callback, const common::Pr
   }
 }
 
-void FacebookSessionImpl::OnPlatformLogInFinished (bool platform_login_result, OperationStatus status, const char* error, const char* login_url, const LoginCallback& callback)
+void FacebookSessionImpl::OnPlatformLogInFinished (bool platform_login_result, OperationStatus status, const char* error, const char* in_token, const LoginCallback& callback)
 {
   try
   {
@@ -217,10 +227,12 @@ void FacebookSessionImpl::OnPlatformLogInFinished (bool platform_login_result, O
 
     if (platform_login_result)
     {
-      if (status == OperationStatus_Success)
-        HandleLoginResultUrl (login_url, callback);
-      else
+      token = in_token;
+
+      if (token.empty ())
         callback (status, error);
+      else
+        OnLoginTokenUpdated (callback);
 
       return;
     }
@@ -376,6 +388,8 @@ void FacebookSessionImpl::LogOut ()
 {
   CloseSession ();
 
+  Platform::LogOut ();
+
   syslib::CookieManager::DeleteAllCookies ();
 }
 
@@ -502,7 +516,19 @@ void FacebookSessionImpl::CloseDialogWebView ()
 
   if (dialog_web_view)
   {
-    dialog_web_view->Window ().Hide ();
+    try
+    {
+      dialog_web_view->Window ().Hide ();
+      dialog_web_view->Window ().SetFocus (false);
+    }
+    catch (xtl::exception& e)
+    {
+      log.Printf ("Exception while closing dialog web view: '%s'", e.what ());
+    }
+    catch (...)
+    {
+      log.Printf ("Unknown exception while closing dialog web view");
+    }
 
     common::ActionQueue::PushAction (xtl::bind (&delete_web_view, dialog_web_view), common::ActionThread_Main, DESTROY_WEB_VIEW_DELAY);
 

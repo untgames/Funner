@@ -7,12 +7,13 @@ IPHONEOS_DEPLOYMENT_TARGET := 4.3
 export IPHONEOS_DEPLOYMENT_TARGET
 
 REMOTE_DEBUG_DIR  ?= //private/var/work/funner
-PROFILES          += arm
+PROFILES          += arm clang
 COMMON_CFLAGS     += -miphoneos-version-min=$(IPHONEOS_DEPLOYMENT_TARGET) -DARM #-gdwarf-2 #флаг gdwarf-2 - необходим для профилирования
+COMMON_CPPFLAGS   += -fexceptions -frtti
 COMMON_LINK_FLAGS += -miphoneos-version-min=$(IPHONEOS_DEPLOYMENT_TARGET)
-COMPILER_GCC      := /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/llvm-gcc-4.2
-LINKER_GCC        := /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/llvm-g++-4.2
-IPHONE_SDK_PATH   := /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS6.1.sdk
+COMPILER_GCC      := /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang
+LINKER_GCC        := /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang++
+IPHONE_SDK_PATH   := /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS7.0.sdk
 
 include $(TOOLSETS_DIR)/iphone.mak
 

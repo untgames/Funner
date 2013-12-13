@@ -36,6 +36,8 @@ using namespace media;
 namespace
 {
 
+const float EPS = 0.001f;
+
 const char* LOG_NAME = "sound::SoundManager";  //имя потока протоколирования
 
 SeekMode get_seek_mode (bool looping)
@@ -226,6 +228,9 @@ struct SoundManager::Impl : public xtl::trackable
 
         manager_emitter->sample_chosen = true;
       }
+
+      if (!manager_emitter->sound_declaration.Looping () && offset > manager_emitter->duration - EPS) //ignore attempts to play sound beyond end
+        return;
 
       if (!manager_emitter->is_playing || manager_emitter->channel_number == -1)
       {

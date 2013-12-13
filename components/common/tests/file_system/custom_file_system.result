@@ -1,0 +1,6 @@
+Results of custom_file_system_test:
+Mount my file system
+MyFileSystem::MyFileSystem
+Unmount my file system
+MyFileSystem::~MyFileSystem
+My file system unmounted

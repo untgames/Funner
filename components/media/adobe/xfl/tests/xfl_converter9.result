@@ -1,0 +1,89 @@
+Results of xfl_converter_test9
+Processing textures...
+Processing scene...
+Save animations...
+<?xml version="1.0" encoding="utf-8"?>
+<xscene>
+  <scene id="win_coins" version="1.0">
+    <resource name="results9/scene.xanim"/>
+    <node id="win_coins.Null 2" pivot="0.000; 0.000; 0" scale_pivot="true" orientation_pivot="true" scale="1.000; 1.000; 1" rotation="0; 0; -0.000">
+      <sprite id="win_coins.Null 2.Layer 1" material="Null 1/1.png" bind_space="local" scale_pivot="false" orientation_pivot="true" layout="Null 1/1.png" visible="false" pivot="0.000; 0.000; 0" scale="100; 100; 1" position="50.000; 50.000; 0" alpha="0.000"/>
+    </node>
+    <node id="win_coins.Null 1" pivot="0.000; 0.000; 0" scale_pivot="true" orientation_pivot="true" scale="1.000; 1.000; 1" rotation="0; 0; -0.000">
+      <sprite id="win_coins.Null 1.Layer 1" material="Null 1/1.png" bind_space="local" scale_pivot="false" orientation_pivot="true" layout="Null 1/1.png" visible="false" pivot="0.000; 0.000; 0" scale="100; 100; 1" position="50.000; 50.000; 0" alpha="0.000"/>
+    </node>
+  </scene>
+</xscene>
+<?xml version="1.0" encoding="utf-8"?>
+<animation_library>
+  <animation id="win_coins" name="">
+    <channels>
+      <channel target_name="win_coins.Null 2" parameter_name="position" track_type="basic_spline&lt;spline_tcb_key&lt;vec3f&gt;&gt;">
+        <key time="0.133" value="608.000 198.000 0.000" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.167" value="608.000 245.125 0.000" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.200" value="608.000 292.250 0.000" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.233" value="608.000 339.377 0.000" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.267" value="608.000 386.500 0.000" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.300" value="608.000 433.624 0.000" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.333" value="608.000 480.750 0.000" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.367" value="608.000 527.874 0.000" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.400" value="608.000 575.000 0.000" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.600" value="608.000 575.000 0.000" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.633" value="570.091 571.306 0.000" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.667" value="532.723 563.955 0.000" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.700" value="495.970 553.900 0.000" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.733" value="459.933 541.563 0.000" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.767" value="424.684 527.109 0.000" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.800" value="390.356 510.571 0.000" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.833" value="357.161 491.901 0.000" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.867" value="325.350 470.949 0.000" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.900" value="295.323 447.514 0.000" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.933" value="267.654 421.344 0.000" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.967" value="242.567 389.716 0.000" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="1.000" value="219.891 356.290 0.000" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="1.033" value="198.316 322.138 0.000" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="1.067" value="177.485 287.526 0.000" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="1.100" value="157.263 252.558 0.000" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="1.133" value="137.602 217.271 0.000" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="1.167" value="118.525 181.667 0.000" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="1.200" value="100.122 145.702 0.000" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="1.233" value="82.631 109.291 0.000" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="1.267" value="66.668 72.191 0.000" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="1.300" value="55.500 33.500 0.000" tension="0.000" continuity="0.000" bias="0.000"/>
+      </channel>
+      <channel target_name="win_coins.Null 1" parameter_name="position" track_type="basic_spline&lt;spline_tcb_key&lt;vec3f&gt;&gt;">
+        <key time="0.000" value="512.000 174.000 0.000" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.033" value="512.000 221.125 0.000" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.067" value="512.000 268.250 0.000" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.100" value="512.000 315.377 0.000" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.133" value="512.000 362.500 0.000" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.167" value="512.000 409.624 0.000" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.200" value="512.000 456.750 0.000" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.233" value="512.000 503.874 0.000" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.267" value="512.000 551.000 0.000" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.467" value="512.000 551.000 0.000" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.500" value="474.145 547.341 0.000" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.533" value="436.820 540.061 0.000" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.567" value="400.103 530.091 0.000" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.600" value="364.096 517.840 0.000" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.633" value="328.874 503.470 0.000" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.667" value="294.573 487.010 0.000" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.700" value="261.405 468.408 0.000" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.733" value="229.623 447.514 0.000" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.767" value="199.631 424.128 0.000" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.800" value="172.000 398.000 0.000" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.833" value="149.592 370.696 0.000" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.867" value="130.737 340.797 0.000" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.900" value="114.924 309.183 0.000" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.933" value="101.664 276.414 0.000" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="0.967" value="90.556 242.849 0.000" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="1.000" value="81.285 208.735 0.000" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="1.033" value="73.607 174.218 0.000" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="1.067" value="67.341 139.423 0.000" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="1.100" value="62.356 104.422 0.000" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="1.133" value="58.576 69.265 0.000" tension="0.000" continuity="0.000" bias="0.000"/>
+        <key time="1.167" value="56.000 34.000 0.000" tension="0.000" continuity="0.000" bias="0.000"/>
+      </channel>
+    </channels>
+  </animation>
+</animation_library>

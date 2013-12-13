@@ -5,11 +5,12 @@
 #import <UIKit/UIApplication.h>
 #import <UIKit/UIImage.h>
 #import <UIKit/UIImageView.h>
+#import <UIKit/UILocalNotification.h>
 #import <UIKit/UIViewController.h>
 #import <UIKit/UIScreen.h>
 #import <UIKit/UIWindow.h>
 
-#import "Tracking.h"
+#import "AdXTracking.h"
 
 #import <MobileAppTracker/MobileAppTracker.h>
 
@@ -120,7 +121,7 @@ static NSString* MAT_AD_KEY = @"3fa11cf8822ff1d86461c44ac1ee09b2";
 
 @interface TrackingWrapper : NSObject
 {
-  Tracking* tracker;
+  AdXTracking* tracker;
 }
 
 @end
@@ -140,7 +141,7 @@ static NSString* MAT_AD_KEY = @"3fa11cf8822ff1d86461c44ac1ee09b2";
 {
   if (!tracker)
   {
-    tracker = [[Tracking alloc] init];
+    tracker = [[AdXTracking alloc] init];
     [tracker setURLScheme:UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad ? PAD_ADX_URL_SCHEME : PHONE_ADX_URL_SCHEME];
     [tracker setClientId:@"PLR7hjus768DP"];
     [tracker setAppleId:UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad ? PAD_APPLE_ID : PHONE_APPLE_ID];
@@ -366,6 +367,132 @@ class SystemAlertHandler : public INotificationListener
 
 const char* SystemAlertHandler::SYSTEM_ALERT_NOTIFICATION_PREFIX = "ShowSystemAlert ";
 
+class LocalNotificationsHandler : public INotificationListener
+{
+  private:
+    static const char* LOCAL_NOTIFICATIONS_PREFIX;
+
+  public:
+    ///Constructor/destructor
+    LocalNotificationsHandler (engine::IEngine* in_engine)
+      : engine (in_engine)
+    {
+      engine->AttachNotificationListener (plarium::utility::format ("%s*", LOCAL_NOTIFICATIONS_PREFIX).c_str (), this);
+    }
+
+    ~LocalNotificationsHandler ()
+    {
+      engine->DetachNotificationListener (this);
+    }
+
+    ///Notification handler
+    void OnNotification (const char* notification)
+    {
+      notification += strlen (LOCAL_NOTIFICATIONS_PREFIX);
+
+      sgi_stl::vector<sgi_stl::string> components = plarium::utility::split (notification, "|");
+
+      if (components.empty ())
+        throw sgi_stl::invalid_argument (plarium::utility::format ("LocalNotificationsHandler::OnNotification: invalid 'LocalNotifications' arguments '%s'", notification));
+
+      for (size_t i = 0, count = components.size (); i < count; i++)
+        if (components [i] == " ")
+          components [i] = "";
+
+      if (components [0] == "RemoveAll")
+      {
+        [[UIApplication sharedApplication] cancelAllLocalNotifications];
+      }
+      else if (components [0] == "Schedule")
+      {
+        if (components.size () < 3)
+          throw sgi_stl::invalid_argument (plarium::utility::format ("LocalNotificationsHandler::OnNotification: invalid 'LocalNotifications' arguments '%s'", notification));
+
+        NSString* alertBody = nil;
+
+        if (!components [1].empty ())
+          alertBody = [NSString stringWithUTF8String:components [1].c_str ()];
+
+        for (size_t i = 2; i < components.size (); i++)
+        {
+          UILocalNotification* localNotification = [[UILocalNotification alloc] init];
+
+          localNotification.alertBody                  = alertBody;
+          localNotification.applicationIconBadgeNumber = 1;
+          localNotification.soundName                  = UILocalNotificationDefaultSoundName;
+          localNotification.fireDate                   = [NSDate dateWithTimeIntervalSinceNow:atoi (components [i].c_str ())];
+
+          [[UIApplication sharedApplication] scheduleLocalNotification:localNotification];
+
+          [localNotification release];
+        }
+      }
+      else
+        throw sgi_stl::invalid_argument (plarium::utility::format ("LocalNotificationsHandler::OnNotification: invalid 'LocalNotifications' first argument '%s'", components [0].c_str ()));
+    }
+
+  private:
+    LocalNotificationsHandler (const LocalNotificationsHandler&);             //no impl
+    LocalNotificationsHandler& operator = (const LocalNotificationsHandler&); //no impl
+
+  private:
+    engine::IEngine *engine;
+};
+
+const char* LocalNotificationsHandler::LOCAL_NOTIFICATIONS_PREFIX = "LocalNotifications ";
+
+class HasOffersTrackEventHandler : public INotificationListener
+{
+  private:
+    static const char* HAS_OFFERS_TRACK_EVENT_PREFIX;
+
+  public:
+    ///Constructor/destructor
+    HasOffersTrackEventHandler (engine::IEngine* in_engine)
+      : engine (in_engine)
+    {
+      engine->AttachNotificationListener (plarium::utility::format ("%s*", HAS_OFFERS_TRACK_EVENT_PREFIX).c_str (), this);
+    }
+
+    ~HasOffersTrackEventHandler ()
+    {
+      engine->DetachNotificationListener (this);
+    }
+
+    ///Notification handler
+    void OnNotification (const char* notification)
+    {
+      notification += strlen (HAS_OFFERS_TRACK_EVENT_PREFIX);
+
+      sgi_stl::vector<sgi_stl::string> components = plarium::utility::split (notification, "|");
+
+      if (components.empty ())
+        throw sgi_stl::invalid_argument (plarium::utility::format ("HasOffersTrackEventHandler::OnNotification: invalid 'HasOffersTrackEvent' arguments '%s'", notification));
+
+      for (size_t i = 0, count = components.size (); i < count; i++)
+        if (components [i] == " ")
+          components [i] = "";
+
+      NSString* eventName = [NSString stringWithUTF8String:components [0].c_str ()];
+
+      if (components.size () == 1)
+        [[MobileAppTracker sharedManager] trackActionForEventIdOrName:eventName eventIsId:NO];
+      else if (components.size () == 2)
+        [[MobileAppTracker sharedManager] trackActionForEventIdOrName:eventName eventIsId:NO revenueAmount:atof (components [1].c_str ()) currencyCode:@""];
+      else
+        throw sgi_stl::invalid_argument (plarium::utility::format ("HasOffersTrackEventHandler::OnNotification: invalid 'HasOffersTrackEvent' arguments '%s'", notification));
+    }
+
+  private:
+    HasOffersTrackEventHandler (const HasOffersTrackEventHandler&);             //no impl
+    HasOffersTrackEventHandler& operator = (const HasOffersTrackEventHandler&); //no impl
+
+  private:
+    engine::IEngine *engine;
+};
+
+const char* HasOffersTrackEventHandler::HAS_OFFERS_TRACK_EVENT_PREFIX = "HasOffersTrackEvent ";
+
 }
 
 //точка входа
@@ -417,7 +544,9 @@ int main (int argc, const char* argv [], const char* env [])
     [[NSNotificationCenter defaultCenter] addObserver:tracking selector:@selector (reportAppOpen) name:UIApplicationWillEnterForegroundNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:mat_tracking selector:@selector (reportAppInstall) name:UIApplicationDidFinishLaunchingNotification object:nil];
 
-    SystemAlertHandler system_alert_handler (funner);
+    SystemAlertHandler         system_alert_handler (funner);
+    LocalNotificationsHandler  local_notifications_handler (funner);
+    HasOffersTrackEventHandler has_offers_track_event_handler (funner);
 
     OpenUrlHandler open_url_handler (tracking);
 

@@ -18,6 +18,7 @@ EXTERN.DEVIL.COMPILER_DEFINES                := HAVE_CONFIG_H
 EXTERN.DEVIL.linux.COMPILER_DEFINES          := MM_MALLOC
 EXTERN.DEVIL.msvc.COMPILER_CFLAGS            := -wd4101
 EXTERN.DEVIL.g++.COMPILER_CFLAGS             := --no-warn
+EXTERN.DEVIL.clang.COMPILER_CFLAGS           := -w
 EXTERN.DEVIL.mingw.COMPILER_DEFINES          := XMD_H
 EXTERN.DEVIL.bada_simulator.COMPILER_DEFINES := XMD_H
 EXTERN.DEVIL.bada_simulator.IMPORTS          := link.extern.bada_addons
@@ -25,14 +26,15 @@ EXTERN.DEVIL.wince.IMPORTS                   := link.extern.wcecompat
 
 #Цель - ILUDLL sources
 ifeq (,$(filter no_dll,$(PROFILES)))
-EXTERN.ILU.TYPE                := dynamic-lib
+EXTERN.ILU.TYPE                  := dynamic-lib
 else
-EXTERN.ILU.TYPE                := static-lib
+EXTERN.ILU.TYPE                  := static-lib
 endif
-EXTERN.ILU.NAME                := funner.extern.ilu
-EXTERN.ILU.INCLUDE_DIRS        := components/il/include/IL components/il/include components/ilu/include ../zlib/include
-EXTERN.ILU.IMPORTS             := compile.extern.devil
-EXTERN.ILU.SOURCE_DIRS         := components/ilu/sources
-EXTERN.ILU.LIBS                := funner.extern.devil
-EXTERN.ILU.COMPILER_DEFINES    := HAVE_CONFIG_H
-EXTERN.ILU.g++.COMPILER_CFLAGS := --no-warn
+EXTERN.ILU.NAME                  := funner.extern.ilu
+EXTERN.ILU.INCLUDE_DIRS          := components/il/include/IL components/il/include components/ilu/include ../zlib/include
+EXTERN.ILU.IMPORTS               := compile.extern.devil
+EXTERN.ILU.SOURCE_DIRS           := components/ilu/sources
+EXTERN.ILU.LIBS                  := funner.extern.devil
+EXTERN.ILU.COMPILER_DEFINES      := HAVE_CONFIG_H
+EXTERN.ILU.g++.COMPILER_CFLAGS   := --no-warn
+EXTERN.ILU.clang.COMPILER_CFLAGS := -w

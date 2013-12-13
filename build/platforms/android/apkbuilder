@@ -1,0 +1,6 @@
+#!/bin/sh
+
+# might need more memory, e.g. -Xmx128M
+exec java -Xmx128M -classpath "$SDKLIB_JAR" com.android.sdklib.build.ApkBuilderMain "$@"
+
+

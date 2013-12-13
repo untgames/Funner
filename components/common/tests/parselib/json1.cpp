@@ -2,7 +2,7 @@
 
 using namespace common;
 
-const char* file_name [] = { "data/test1.json", "data/test2.json", "data/error_test1.json", "data/error_test2.json" };
+const char* file_name [] = { "data/test1.json", "data/test2.json", "data/test3.json", "data/error_test1.json", "data/error_test2.json" };
 const size_t elements = sizeof file_name / sizeof *file_name;
 
 int main ()

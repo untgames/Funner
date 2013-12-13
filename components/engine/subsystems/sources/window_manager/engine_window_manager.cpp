@@ -80,7 +80,7 @@ class WindowManagerSubsystem: public ISubsystem, private media::rms::ICustomServ
         
         if (ParseNode screen_saver_node = node.First ("ScreenSaver"))
         {
-          screen_saver_saved_state  = syslib::Application::GetScreenSaverState ();          
+          screen_saver_saved_state  = syslib::Application::ScreenSaverState ();          
           need_restore_screen_saver = true;
           
           bool screen_saver_state = get<int> (screen_saver_node, "", 1) != 0;                    

@@ -172,6 +172,7 @@ class TabletOsPlatform
  , public DefaultScreenManager
  , public TabletOsSensorManager 
  , public DefaultCookieManager
+ , public DefaultScreenKeyboardManager
 {
 };
 

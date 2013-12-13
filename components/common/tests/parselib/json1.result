@@ -473,6 +473,1132 @@ root (source='', line=0): {}
    (source='data/test2.json', line=58): {2e-00}
    (source='data/test2.json', line=59): {rosebud}
 root (source='', line=0): {}
+  (source='data/test3.json', line=1): {}
+   (source='data/test3.json', line=1): {}
+   event (source='data/test3.json', line=1): {user.authenticate}
+   userId (source='data/test3.json', line=1): {8355302}
+   isLiked (source='data/test3.json', line=1): {false}
+   status (source='data/test3.json', line=1): {0}
+   (source='data/test3.json', line=1): {}
+   event (source='data/test3.json', line=1): {lobby.init}
+   bets (source='data/test3.json', line=1): {}
+     (source='data/test3.json', line=1): {}
+      (source='data/test3.json', line=1): {}
+      id (source='data/test3.json', line=1): {1}
+      money (source='data/test3.json', line=1): {10}
+      (source='data/test3.json', line=1): {}
+      id (source='data/test3.json', line=1): {2}
+      money (source='data/test3.json', line=1): {25}
+      (source='data/test3.json', line=1): {}
+      id (source='data/test3.json', line=1): {3}
+      money (source='data/test3.json', line=1): {50}
+      (source='data/test3.json', line=1): {}
+      id (source='data/test3.json', line=1): {4}
+      money (source='data/test3.json', line=1): {100}
+      (source='data/test3.json', line=1): {}
+      id (source='data/test3.json', line=1): {5}
+      money (source='data/test3.json', line=1): {200}
+      (source='data/test3.json', line=1): {}
+      id (source='data/test3.json', line=1): {6}
+      money (source='data/test3.json', line=1): {500}
+      (source='data/test3.json', line=1): {}
+      id (source='data/test3.json', line=1): {7}
+      money (source='data/test3.json', line=1): {1000}
+      (source='data/test3.json', line=1): {}
+      id (source='data/test3.json', line=1): {8}
+      money (source='data/test3.json', line=1): {1500}
+      (source='data/test3.json', line=1): {}
+      id (source='data/test3.json', line=1): {9}
+      money (source='data/test3.json', line=1): {2000}
+      (source='data/test3.json', line=1): {}
+      id (source='data/test3.json', line=1): {10}
+      money (source='data/test3.json', line=1): {2500}
+      (source='data/test3.json', line=1): {}
+      id (source='data/test3.json', line=1): {11}
+      money (source='data/test3.json', line=1): {5000}
+      (source='data/test3.json', line=1): {}
+      id (source='data/test3.json', line=1): {12}
+      money (source='data/test3.json', line=1): {10000}
+      (source='data/test3.json', line=1): {}
+      id (source='data/test3.json', line=1): {13}
+      money (source='data/test3.json', line=1): {15000}
+      (source='data/test3.json', line=1): {}
+      id (source='data/test3.json', line=1): {14}
+      money (source='data/test3.json', line=1): {20000}
+      (source='data/test3.json', line=1): {}
+      id (source='data/test3.json', line=1): {15}
+      money (source='data/test3.json', line=1): {25000}
+      (source='data/test3.json', line=1): {}
+      id (source='data/test3.json', line=1): {16}
+      money (source='data/test3.json', line=1): {50000}
+      (source='data/test3.json', line=1): {}
+      id (source='data/test3.json', line=1): {17}
+      money (source='data/test3.json', line=1): {100000}
+      (source='data/test3.json', line=1): {}
+      id (source='data/test3.json', line=1): {18}
+      money (source='data/test3.json', line=1): {200000}
+      (source='data/test3.json', line=1): {}
+      id (source='data/test3.json', line=1): {19}
+      money (source='data/test3.json', line=1): {500000}
+      (source='data/test3.json', line=1): {}
+      id (source='data/test3.json', line=1): {20}
+      money (source='data/test3.json', line=1): {1000000}
+      (source='data/test3.json', line=1): {}
+      id (source='data/test3.json', line=1): {21}
+      money (source='data/test3.json', line=1): {2000000}
+      (source='data/test3.json', line=1): {}
+      id (source='data/test3.json', line=1): {22}
+      money (source='data/test3.json', line=1): {5000000}
+      (source='data/test3.json', line=1): {}
+      id (source='data/test3.json', line=1): {23}
+      money (source='data/test3.json', line=1): {10000000}
+   maxPresentsToSent (source='data/test3.json', line=1): {999}
+   grantTime (source='data/test3.json', line=1): {60}
+   tutorial (source='data/test3.json', line=1): {0}
+   loginServerUrl (source='data/test3.json', line=1): {http://slsrv1.soft-games.com.ua/vk/develop/applePayment.ashx}
+   giftsTimeLimit (source='data/test3.json', line=1): {24}
+   giftsFriendsLimit (source='data/test3.json', line=1): {1}
+   bonus (source='data/test3.json', line=1): {}
+     (source='data/test3.json', line=1): {}
+   tutorials (source='data/test3.json', line=1): {}
+     (source='data/test3.json', line=1): {0, 1, 3}
+   bonuses (source='data/test3.json', line=1): {}
+     (source='data/test3.json', line=1): {}
+   (source='data/test3.json', line=1): {}
+   event (source='data/test3.json', line=1): {user.level}
+   levels (source='data/test3.json', line=1): {}
+     (source='data/test3.json', line=1): {}
+     currentLevel (source='data/test3.json', line=1): {}
+       (source='data/test3.json', line=1): {}
+       id (source='data/test3.json', line=1): {46}
+       wagering (source='data/test3.json', line=1): {520000000}
+       maxBetId (source='data/test3.json', line=1): {16}
+       bonus (source='data/test3.json', line=1): {}
+         (source='data/test3.json', line=1): {}
+         coins (source='data/test3.json', line=1): {460000}
+         diamonds (source='data/test3.json', line=1): {15}
+       megaBonus (source='data/test3.json', line=1): {}
+         (source='data/test3.json', line=1): {}
+         coins (source='data/test3.json', line=1): {1100000}
+         diamonds (source='data/test3.json', line=1): {50}
+       superBonus (source='data/test3.json', line=1): {}
+         (source='data/test3.json', line=1): {}
+         coins (source='data/test3.json', line=1): {50000}
+         diamonds (source='data/test3.json', line=1): {5}
+     nextLevel (source='data/test3.json', line=1): {}
+       (source='data/test3.json', line=1): {}
+       id (source='data/test3.json', line=1): {47}
+       wagering (source='data/test3.json', line=1): {570000000}
+       maxBetId (source='data/test3.json', line=1): {16}
+       bonus (source='data/test3.json', line=1): {}
+         (source='data/test3.json', line=1): {}
+         coins (source='data/test3.json', line=1): {470000}
+         diamonds (source='data/test3.json', line=1): {15}
+       megaBonus (source='data/test3.json', line=1): {}
+         (source='data/test3.json', line=1): {}
+         coins (source='data/test3.json', line=1): {1100000}
+         diamonds (source='data/test3.json', line=1): {50}
+       superBonus (source='data/test3.json', line=1): {}
+         (source='data/test3.json', line=1): {}
+         coins (source='data/test3.json', line=1): {50000}
+         diamonds (source='data/test3.json', line=1): {5}
+     nextSlotId (source='data/test3.json', line=1): {0}
+   (source='data/test3.json', line=1): {}
+   event (source='data/test3.json', line=1): {slots.update}
+   slots (source='data/test3.json', line=1): {}
+     (source='data/test3.json', line=1): {}
+      (source='data/test3.json', line=1): {}
+      id (source='data/test3.json', line=1): {1}
+      level (source='data/test3.json', line=1): {1}
+      gameLevel (source='data/test3.json', line=1): {1}
+      path (source='data/test3.json', line=1): {Farmandia}
+      hasDouble (source='data/test3.json', line=1): {false}
+      updated (source='data/test3.json', line=1): {false}
+      tooltip (source='data/test3.json', line=1): {}
+      gameName (source='data/test3.json', line=1): {Farmandia}
+      feature (source='data/test3.json', line=1): {40}
+      status (source='data/test3.json', line=1): {0}
+      (source='data/test3.json', line=1): {}
+      id (source='data/test3.json', line=1): {2}
+      level (source='data/test3.json', line=1): {2}
+      gameLevel (source='data/test3.json', line=1): {2}
+      path (source='data/test3.json', line=1): {Forest}
+      hasDouble (source='data/test3.json', line=1): {false}
+      updated (source='data/test3.json', line=1): {false}
+      tooltip (source='data/test3.json', line=1): {lobby_game_new_lines_30}
+      gameName (source='data/test3.json', line=1): {Miracle Forest}
+      feature (source='data/test3.json', line=1): {40}
+      status (source='data/test3.json', line=1): {0}
+      (source='data/test3.json', line=1): {}
+      id (source='data/test3.json', line=1): {3}
+      level (source='data/test3.json', line=1): {4}
+      gameLevel (source='data/test3.json', line=1): {4}
+      path (source='data/test3.json', line=1): {Pirates}
+      hasDouble (source='data/test3.json', line=1): {true}
+      updated (source='data/test3.json', line=1): {false}
+      tooltip (source='data/test3.json', line=1): {lobby_game_new_lines_30}
+      gameName (source='data/test3.json', line=1): {Pirates - Tides of Fortune}
+      feature (source='data/test3.json', line=1): {1}
+      status (source='data/test3.json', line=1): {0}
+      (source='data/test3.json', line=1): {}
+      id (source='data/test3.json', line=1): {23}
+      level (source='data/test3.json', line=1): {1}
+      gameLevel (source='data/test3.json', line=1): {1}
+      path (source='data/test3.json', line=1): {AroundTheGlobe}
+      hasDouble (source='data/test3.json', line=1): {false}
+      updated (source='data/test3.json', line=1): {false}
+      tooltip (source='data/test3.json', line=1): {}
+      gameName (source='data/test3.json', line=1): {Around The Globe}
+      feature (source='data/test3.json', line=1): {0}
+      status (source='data/test3.json', line=1): {0}
+      (source='data/test3.json', line=1): {}
+      id (source='data/test3.json', line=1): {18}
+      level (source='data/test3.json', line=1): {6}
+      gameLevel (source='data/test3.json', line=1): {6}
+      path (source='data/test3.json', line=1): {Baghdad}
+      hasDouble (source='data/test3.json', line=1): {false}
+      updated (source='data/test3.json', line=1): {false}
+      tooltip (source='data/test3.json', line=1): {}
+      gameName (source='data/test3.json', line=1): {Sultan's Secret}
+      feature (source='data/test3.json', line=1): {0}
+      status (source='data/test3.json', line=1): {0}
+      (source='data/test3.json', line=1): {}
+      id (source='data/test3.json', line=1): {13}
+      level (source='data/test3.json', line=1): {9}
+      gameLevel (source='data/test3.json', line=1): {9}
+      path (source='data/test3.json', line=1): {UnderTheSea}
+      hasDouble (source='data/test3.json', line=1): {false}
+      updated (source='data/test3.json', line=1): {false}
+      tooltip (source='data/test3.json', line=1): {}
+      gameName (source='data/test3.json', line=1): {Pristine Marine}
+      feature (source='data/test3.json', line=1): {40}
+      status (source='data/test3.json', line=1): {0}
+      (source='data/test3.json', line=1): {}
+      id (source='data/test3.json', line=1): {6}
+      level (source='data/test3.json', line=1): {12}
+      gameLevel (source='data/test3.json', line=1): {12}
+      path (source='data/test3.json', line=1): {Bingo}
+      hasDouble (source='data/test3.json', line=1): {false}
+      updated (source='data/test3.json', line=1): {false}
+      tooltip (source='data/test3.json', line=1): {lobby_game_new_lines_30}
+      gameName (source='data/test3.json', line=1): {Back to the Bingo}
+      feature (source='data/test3.json', line=1): {2}
+      status (source='data/test3.json', line=1): {0}
+      (source='data/test3.json', line=1): {}
+      id (source='data/test3.json', line=1): {7}
+      level (source='data/test3.json', line=1): {15}
+      gameLevel (source='data/test3.json', line=1): {15}
+      path (source='data/test3.json', line=1): {Vampires}
+      hasDouble (source='data/test3.json', line=1): {false}
+      updated (source='data/test3.json', line=1): {false}
+      tooltip (source='data/test3.json', line=1): {}
+      gameName (source='data/test3.json', line=1): {Bloody night}
+      feature (source='data/test3.json', line=1): {0}
+      status (source='data/test3.json', line=1): {0}
+      (source='data/test3.json', line=1): {}
+      id (source='data/test3.json', line=1): {8}
+      level (source='data/test3.json', line=1): {18}
+      gameLevel (source='data/test3.json', line=1): {18}
+      path (source='data/test3.json', line=1): {TotalDomination}
+      hasDouble (source='data/test3.json', line=1): {false}
+      updated (source='data/test3.json', line=1): {false}
+      tooltip (source='data/test3.json', line=1): {}
+      gameName (source='data/test3.json', line=1): {Total Domination}
+      feature (source='data/test3.json', line=1): {40}
+      status (source='data/test3.json', line=1): {0}
+      (source='data/test3.json', line=1): {}
+      id (source='data/test3.json', line=1): {9}
+      level (source='data/test3.json', line=1): {21}
+      gameLevel (source='data/test3.json', line=1): {21}
+      path (source='data/test3.json', line=1): {Gangsters}
+      hasDouble (source='data/test3.json', line=1): {false}
+      updated (source='data/test3.json', line=1): {false}
+      tooltip (source='data/test3.json', line=1): {}
+      gameName (source='data/test3.json', line=1): {Gang in the city}
+      feature (source='data/test3.json', line=1): {2}
+      status (source='data/test3.json', line=1): {0}
+      (source='data/test3.json', line=1): {}
+      id (source='data/test3.json', line=1): {10}
+      level (source='data/test3.json', line=1): {24}
+      gameLevel (source='data/test3.json', line=1): {24}
+      path (source='data/test3.json', line=1): {Knights}
+      hasDouble (source='data/test3.json', line=1): {false}
+      updated (source='data/test3.json', line=1): {false}
+      tooltip (source='data/test3.json', line=1): {}
+      gameName (source='data/test3.json', line=1): {Knights of fun}
+      feature (source='data/test3.json', line=1): {0}
+      status (source='data/test3.json', line=1): {0}
+      (source='data/test3.json', line=1): {}
+      id (source='data/test3.json', line=1): {11}
+      level (source='data/test3.json', line=1): {27}
+      gameLevel (source='data/test3.json', line=1): {27}
+      path (source='data/test3.json', line=1): {StrangeAliens}
+      hasDouble (source='data/test3.json', line=1): {false}
+      updated (source='data/test3.json', line=1): {false}
+      tooltip (source='data/test3.json', line=1): {}
+      gameName (source='data/test3.json', line=1): {Strange Aliens}
+      feature (source='data/test3.json', line=1): {16}
+      status (source='data/test3.json', line=1): {0}
+      (source='data/test3.json', line=1): {}
+      id (source='data/test3.json', line=1): {12}
+      level (source='data/test3.json', line=1): {30}
+      gameLevel (source='data/test3.json', line=1): {30}
+      path (source='data/test3.json', line=1): {MarketCity}
+      hasDouble (source='data/test3.json', line=1): {false}
+      updated (source='data/test3.json', line=1): {false}
+      tooltip (source='data/test3.json', line=1): {}
+      gameName (source='data/test3.json', line=1): {Market City}
+      feature (source='data/test3.json', line=1): {0}
+      status (source='data/test3.json', line=1): {0}
+      (source='data/test3.json', line=1): {}
+      id (source='data/test3.json', line=1): {5}
+      level (source='data/test3.json', line=1): {33}
+      gameLevel (source='data/test3.json', line=1): {33}
+      path (source='data/test3.json', line=1): {Bugz}
+      hasDouble (source='data/test3.json', line=1): {false}
+      updated (source='data/test3.json', line=1): {false}
+      tooltip (source='data/test3.json', line=1): {lobby_game_new_lines_40}
+      gameName (source='data/test3.json', line=1): {Bug Wars}
+      feature (source='data/test3.json', line=1): {8}
+      status (source='data/test3.json', line=1): {0}
+      (source='data/test3.json', line=1): {}
+      id (source='data/test3.json', line=1): {14}
+      level (source='data/test3.json', line=1): {36}
+      gameLevel (source='data/test3.json', line=1): {36}
+      path (source='data/test3.json', line=1): {Halloween}
+      hasDouble (source='data/test3.json', line=1): {false}
+      updated (source='data/test3.json', line=1): {false}
+      tooltip (source='data/test3.json', line=1): {}
+      gameName (source='data/test3.json', line=1): {Halloween Party}
+      feature (source='data/test3.json', line=1): {0}
+      status (source='data/test3.json', line=1): {0}
+      (source='data/test3.json', line=1): {}
+      id (source='data/test3.json', line=1): {15}
+      level (source='data/test3.json', line=1): {39}
+      gameLevel (source='data/test3.json', line=1): {39}
+      path (source='data/test3.json', line=1): {WildWildWest}
+      hasDouble (source='data/test3.json', line=1): {false}
+      updated (source='data/test3.json', line=1): {false}
+      tooltip (source='data/test3.json', line=1): {}
+      gameName (source='data/test3.json', line=1): {Double Danger}
+      feature (source='data/test3.json', line=1): {0}
+      status (source='data/test3.json', line=1): {0}
+      (source='data/test3.json', line=1): {}
+      id (source='data/test3.json', line=1): {16}
+      level (source='data/test3.json', line=1): {42}
+      gameLevel (source='data/test3.json', line=1): {42}
+      path (source='data/test3.json', line=1): {Rock}
+      hasDouble (source='data/test3.json', line=1): {false}
+      updated (source='data/test3.json', line=1): {false}
+      tooltip (source='data/test3.json', line=1): {}
+      gameName (source='data/test3.json', line=1): {Rock 'n' Spin}
+      feature (source='data/test3.json', line=1): {0}
+      status (source='data/test3.json', line=1): {0}
+      (source='data/test3.json', line=1): {}
+      id (source='data/test3.json', line=1): {17}
+      level (source='data/test3.json', line=1): {45}
+      gameLevel (source='data/test3.json', line=1): {45}
+      path (source='data/test3.json', line=1): {Christmas}
+      hasDouble (source='data/test3.json', line=1): {false}
+      updated (source='data/test3.json', line=1): {false}
+      tooltip (source='data/test3.json', line=1): {}
+      gameName (source='data/test3.json', line=1): {Christmas Boom}
+      feature (source='data/test3.json', line=1): {0}
+      status (source='data/test3.json', line=1): {0}
+      (source='data/test3.json', line=1): {}
+      id (source='data/test3.json', line=1): {4}
+      level (source='data/test3.json', line=1): {48}
+      gameLevel (source='data/test3.json', line=1): {48}
+      path (source='data/test3.json', line=1): {SummerDream}
+      hasDouble (source='data/test3.json', line=1): {false}
+      updated (source='data/test3.json', line=1): {false}
+      tooltip (source='data/test3.json', line=1): {lobby_game_new_lines_40}
+      gameName (source='data/test3.json', line=1): {Summer Dream}
+      feature (source='data/test3.json', line=1): {32}
+      status (source='data/test3.json', line=1): {0}
+      (source='data/test3.json', line=1): {}
+      id (source='data/test3.json', line=1): {19}
+      level (source='data/test3.json', line=1): {54}
+      gameLevel (source='data/test3.json', line=1): {54}
+      path (source='data/test3.json', line=1): {Jungle}
+      hasDouble (source='data/test3.json', line=1): {false}
+      updated (source='data/test3.json', line=1): {false}
+      tooltip (source='data/test3.json', line=1): {}
+      gameName (source='data/test3.json', line=1): {Jungle Rumble}
+      feature (source='data/test3.json', line=1): {40}
+      status (source='data/test3.json', line=1): {0}
+      (source='data/test3.json', line=1): {}
+      id (source='data/test3.json', line=1): {21}
+      level (source='data/test3.json', line=1): {57}
+      gameLevel (source='data/test3.json', line=1): {57}
+      path (source='data/test3.json', line=1): {Circus}
+      hasDouble (source='data/test3.json', line=1): {true}
+      updated (source='data/test3.json', line=1): {false}
+      tooltip (source='data/test3.json', line=1): {}
+      gameName (source='data/test3.json', line=1): {Circus Fantasticus}
+      feature (source='data/test3.json', line=1): {43}
+      status (source='data/test3.json', line=1): {1}
+      (source='data/test3.json', line=1): {}
+      id (source='data/test3.json', line=1): {20}
+      level (source='data/test3.json', line=1): {51}
+      gameLevel (source='data/test3.json', line=1): {51}
+      path (source='data/test3.json', line=1): {ValentineDay}
+      hasDouble (source='data/test3.json', line=1): {false}
+      updated (source='data/test3.json', line=1): {false}
+      tooltip (source='data/test3.json', line=1): {}
+      gameName (source='data/test3.json', line=1): {Hearts and Arrows}
+      feature (source='data/test3.json', line=1): {40}
+      status (source='data/test3.json', line=1): {0}
+      (source='data/test3.json', line=1): {}
+      id (source='data/test3.json', line=1): {220}
+      level (source='data/test3.json', line=1): {51}
+      gameLevel (source='data/test3.json', line=1): {51}
+      path (source='data/test3.json', line=1): {ValentineDay}
+      hasDouble (source='data/test3.json', line=1): {false}
+      updated (source='data/test3.json', line=1): {false}
+      tooltip (source='data/test3.json', line=1): {}
+      gameName (source='data/test3.json', line=1): {Hearts and Arrows}
+      feature (source='data/test3.json', line=1): {40}
+      status (source='data/test3.json', line=1): {0}
+      (source='data/test3.json', line=1): {}
+      id (source='data/test3.json', line=1): {320}
+      level (source='data/test3.json', line=1): {-1}
+      gameLevel (source='data/test3.json', line=1): {-1}
+      path (source='data/test3.json', line=1): {ValentineDay}
+      hasDouble (source='data/test3.json', line=1): {false}
+      updated (source='data/test3.json', line=1): {false}
+      tooltip (source='data/test3.json', line=1): {}
+      gameName (source='data/test3.json', line=1): {Hearts and Arrows}
+      feature (source='data/test3.json', line=1): {40}
+      status (source='data/test3.json', line=1): {3}
+      (source='data/test3.json', line=1): {}
+      id (source='data/test3.json', line=1): {24}
+      level (source='data/test3.json', line=1): {1}
+      gameLevel (source='data/test3.json', line=1): {1}
+      path (source='data/test3.json', line=1): {PhantomFrenzy}
+      hasDouble (source='data/test3.json', line=1): {true}
+      updated (source='data/test3.json', line=1): {false}
+      tooltip (source='data/test3.json', line=1): {}
+      gameName (source='data/test3.json', line=1): {Phantom Frenzy}
+      feature (source='data/test3.json', line=1): {9}
+      status (source='data/test3.json', line=1): {0}
+      (source='data/test3.json', line=1): {}
+      id (source='data/test3.json', line=1): {22}
+      level (source='data/test3.json', line=1): {60}
+      gameLevel (source='data/test3.json', line=1): {60}
+      path (source='data/test3.json', line=1): {JapanJam}
+      hasDouble (source='data/test3.json', line=1): {false}
+      updated (source='data/test3.json', line=1): {true}
+      tooltip (source='data/test3.json', line=1): {}
+      gameName (source='data/test3.json', line=1): {Japan Jam}
+      feature (source='data/test3.json', line=1): {44}
+      status (source='data/test3.json', line=1): {2}
+      (source='data/test3.json', line=1): {}
+      id (source='data/test3.json', line=1): {222}
+      level (source='data/test3.json', line=1): {1}
+      gameLevel (source='data/test3.json', line=1): {1}
+      path (source='data/test3.json', line=1): {JapanJam}
+      hasDouble (source='data/test3.json', line=1): {false}
+      updated (source='data/test3.json', line=1): {false}
+      tooltip (source='data/test3.json', line=1): {}
+      gameName (source='data/test3.json', line=1): {Japan Jam}
+      feature (source='data/test3.json', line=1): {44}
+      status (source='data/test3.json', line=1): {0}
+      (source='data/test3.json', line=1): {}
+      id (source='data/test3.json', line=1): {101}
+      level (source='data/test3.json', line=1): {1}
+      gameLevel (source='data/test3.json', line=1): {1}
+      path (source='data/test3.json', line=1): {Farmandia}
+      hasDouble (source='data/test3.json', line=1): {false}
+      updated (source='data/test3.json', line=1): {false}
+      tooltip (source='data/test3.json', line=1): {}
+      gameName (source='data/test3.json', line=1): {Farmandia}
+      feature (source='data/test3.json', line=1): {40}
+      status (source='data/test3.json', line=1): {0}
+      (source='data/test3.json', line=1): {}
+      id (source='data/test3.json', line=1): {102}
+      level (source='data/test3.json', line=1): {1}
+      gameLevel (source='data/test3.json', line=1): {1}
+      path (source='data/test3.json', line=1): {Forest}
+      hasDouble (source='data/test3.json', line=1): {false}
+      updated (source='data/test3.json', line=1): {false}
+      tooltip (source='data/test3.json', line=1): {lobby_game_new_lines_30}
+      gameName (source='data/test3.json', line=1): {Miracle Forest}
+      feature (source='data/test3.json', line=1): {40}
+      status (source='data/test3.json', line=1): {0}
+      (source='data/test3.json', line=1): {}
+      id (source='data/test3.json', line=1): {103}
+      level (source='data/test3.json', line=1): {1}
+      gameLevel (source='data/test3.json', line=1): {1}
+      path (source='data/test3.json', line=1): {Pirates}
+      hasDouble (source='data/test3.json', line=1): {true}
+      updated (source='data/test3.json', line=1): {false}
+      tooltip (source='data/test3.json', line=1): {lobby_game_new_lines_30}
+      gameName (source='data/test3.json', line=1): {Pirates - Tides of Fortune}
+      feature (source='data/test3.json', line=1): {1}
+      status (source='data/test3.json', line=1): {0}
+      (source='data/test3.json', line=1): {}
+      id (source='data/test3.json', line=1): {123}
+      level (source='data/test3.json', line=1): {1}
+      gameLevel (source='data/test3.json', line=1): {1}
+      path (source='data/test3.json', line=1): {AroundTheGlobe}
+      hasDouble (source='data/test3.json', line=1): {false}
+      updated (source='data/test3.json', line=1): {false}
+      tooltip (source='data/test3.json', line=1): {}
+      gameName (source='data/test3.json', line=1): {Around The Globe}
+      feature (source='data/test3.json', line=1): {0}
+      status (source='data/test3.json', line=1): {0}
+      (source='data/test3.json', line=1): {}
+      id (source='data/test3.json', line=1): {118}
+      level (source='data/test3.json', line=1): {1}
+      gameLevel (source='data/test3.json', line=1): {1}
+      path (source='data/test3.json', line=1): {Baghdad}
+      hasDouble (source='data/test3.json', line=1): {false}
+      updated (source='data/test3.json', line=1): {false}
+      tooltip (source='data/test3.json', line=1): {}
+      gameName (source='data/test3.json', line=1): {Sultan's Secret}
+      feature (source='data/test3.json', line=1): {0}
+      status (source='data/test3.json', line=1): {0}
+      (source='data/test3.json', line=1): {}
+      id (source='data/test3.json', line=1): {113}
+      level (source='data/test3.json', line=1): {1}
+      gameLevel (source='data/test3.json', line=1): {1}
+      path (source='data/test3.json', line=1): {UnderTheSea}
+      hasDouble (source='data/test3.json', line=1): {false}
+      updated (source='data/test3.json', line=1): {false}
+      tooltip (source='data/test3.json', line=1): {}
+      gameName (source='data/test3.json', line=1): {Pristine Marine}
+      feature (source='data/test3.json', line=1): {40}
+      status (source='data/test3.json', line=1): {0}
+      (source='data/test3.json', line=1): {}
+      id (source='data/test3.json', line=1): {106}
+      level (source='data/test3.json', line=1): {1}
+      gameLevel (source='data/test3.json', line=1): {1}
+      path (source='data/test3.json', line=1): {Bingo}
+      hasDouble (source='data/test3.json', line=1): {false}
+      updated (source='data/test3.json', line=1): {false}
+      tooltip (source='data/test3.json', line=1): {lobby_game_new_lines_30}
+      gameName (source='data/test3.json', line=1): {Back to the Bingo}
+      feature (source='data/test3.json', line=1): {2}
+      status (source='data/test3.json', line=1): {0}
+      (source='data/test3.json', line=1): {}
+      id (source='data/test3.json', line=1): {107}
+      level (source='data/test3.json', line=1): {1}
+      gameLevel (source='data/test3.json', line=1): {1}
+      path (source='data/test3.json', line=1): {Vampires}
+      hasDouble (source='data/test3.json', line=1): {false}
+      updated (source='data/test3.json', line=1): {false}
+      tooltip (source='data/test3.json', line=1): {}
+      gameName (source='data/test3.json', line=1): {Bloody night}
+      feature (source='data/test3.json', line=1): {0}
+      status (source='data/test3.json', line=1): {0}
+      (source='data/test3.json', line=1): {}
+      id (source='data/test3.json', line=1): {108}
+      level (source='data/test3.json', line=1): {1}
+      gameLevel (source='data/test3.json', line=1): {1}
+      path (source='data/test3.json', line=1): {TotalDomination}
+      hasDouble (source='data/test3.json', line=1): {false}
+      updated (source='data/test3.json', line=1): {false}
+      tooltip (source='data/test3.json', line=1): {}
+      gameName (source='data/test3.json', line=1): {Total Domination}
+      feature (source='data/test3.json', line=1): {40}
+      status (source='data/test3.json', line=1): {0}
+      (source='data/test3.json', line=1): {}
+      id (source='data/test3.json', line=1): {109}
+      level (source='data/test3.json', line=1): {1}
+      gameLevel (source='data/test3.json', line=1): {1}
+      path (source='data/test3.json', line=1): {Gangsters}
+      hasDouble (source='data/test3.json', line=1): {false}
+      updated (source='data/test3.json', line=1): {false}
+      tooltip (source='data/test3.json', line=1): {}
+      gameName (source='data/test3.json', line=1): {Gang in the city}
+      feature (source='data/test3.json', line=1): {2}
+      status (source='data/test3.json', line=1): {0}
+      (source='data/test3.json', line=1): {}
+      id (source='data/test3.json', line=1): {110}
+      level (source='data/test3.json', line=1): {1}
+      gameLevel (source='data/test3.json', line=1): {1}
+      path (source='data/test3.json', line=1): {Knights}
+      hasDouble (source='data/test3.json', line=1): {false}
+      updated (source='data/test3.json', line=1): {false}
+      tooltip (source='data/test3.json', line=1): {}
+      gameName (source='data/test3.json', line=1): {Knights of fun}
+      feature (source='data/test3.json', line=1): {0}
+      status (source='data/test3.json', line=1): {0}
+      (source='data/test3.json', line=1): {}
+      id (source='data/test3.json', line=1): {111}
+      level (source='data/test3.json', line=1): {1}
+      gameLevel (source='data/test3.json', line=1): {1}
+      path (source='data/test3.json', line=1): {StrangeAliens}
+      hasDouble (source='data/test3.json', line=1): {false}
+      updated (source='data/test3.json', line=1): {false}
+      tooltip (source='data/test3.json', line=1): {}
+      gameName (source='data/test3.json', line=1): {Strange Aliens}
+      feature (source='data/test3.json', line=1): {16}
+      status (source='data/test3.json', line=1): {0}
+      (source='data/test3.json', line=1): {}
+      id (source='data/test3.json', line=1): {112}
+      level (source='data/test3.json', line=1): {1}
+      gameLevel (source='data/test3.json', line=1): {1}
+      path (source='data/test3.json', line=1): {MarketCity}
+      hasDouble (source='data/test3.json', line=1): {false}
+      updated (source='data/test3.json', line=1): {false}
+      tooltip (source='data/test3.json', line=1): {}
+      gameName (source='data/test3.json', line=1): {Market City}
+      feature (source='data/test3.json', line=1): {0}
+      status (source='data/test3.json', line=1): {0}
+      (source='data/test3.json', line=1): {}
+      id (source='data/test3.json', line=1): {105}
+      level (source='data/test3.json', line=1): {1}
+      gameLevel (source='data/test3.json', line=1): {1}
+      path (source='data/test3.json', line=1): {Bugz}
+      hasDouble (source='data/test3.json', line=1): {false}
+      updated (source='data/test3.json', line=1): {false}
+      tooltip (source='data/test3.json', line=1): {lobby_game_new_lines_40}
+      gameName (source='data/test3.json', line=1): {Bug Wars}
+      feature (source='data/test3.json', line=1): {8}
+      status (source='data/test3.json', line=1): {0}
+      (source='data/test3.json', line=1): {}
+      id (source='data/test3.json', line=1): {114}
+      level (source='data/test3.json', line=1): {1}
+      gameLevel (source='data/test3.json', line=1): {1}
+      path (source='data/test3.json', line=1): {Halloween}
+      hasDouble (source='data/test3.json', line=1): {false}
+      updated (source='data/test3.json', line=1): {false}
+      tooltip (source='data/test3.json', line=1): {}
+      gameName (source='data/test3.json', line=1): {Halloween Party}
+      feature (source='data/test3.json', line=1): {0}
+      status (source='data/test3.json', line=1): {0}
+      (source='data/test3.json', line=1): {}
+      id (source='data/test3.json', line=1): {115}
+      level (source='data/test3.json', line=1): {1}
+      gameLevel (source='data/test3.json', line=1): {1}
+      path (source='data/test3.json', line=1): {WildWildWest}
+      hasDouble (source='data/test3.json', line=1): {false}
+      updated (source='data/test3.json', line=1): {false}
+      tooltip (source='data/test3.json', line=1): {}
+      gameName (source='data/test3.json', line=1): {Double Danger}
+      feature (source='data/test3.json', line=1): {0}
+      status (source='data/test3.json', line=1): {0}
+      (source='data/test3.json', line=1): {}
+      id (source='data/test3.json', line=1): {116}
+      level (source='data/test3.json', line=1): {1}
+      gameLevel (source='data/test3.json', line=1): {1}
+      path (source='data/test3.json', line=1): {Rock}
+      hasDouble (source='data/test3.json', line=1): {false}
+      updated (source='data/test3.json', line=1): {false}
+      tooltip (source='data/test3.json', line=1): {}
+      gameName (source='data/test3.json', line=1): {Rock 'n' Spin}
+      feature (source='data/test3.json', line=1): {0}
+      status (source='data/test3.json', line=1): {0}
+      (source='data/test3.json', line=1): {}
+      id (source='data/test3.json', line=1): {117}
+      level (source='data/test3.json', line=1): {1}
+      gameLevel (source='data/test3.json', line=1): {1}
+      path (source='data/test3.json', line=1): {Christmas}
+      hasDouble (source='data/test3.json', line=1): {false}
+      updated (source='data/test3.json', line=1): {false}
+      tooltip (source='data/test3.json', line=1): {}
+      gameName (source='data/test3.json', line=1): {Christmas Boom}
+      feature (source='data/test3.json', line=1): {0}
+      status (source='data/test3.json', line=1): {0}
+      (source='data/test3.json', line=1): {}
+      id (source='data/test3.json', line=1): {104}
+      level (source='data/test3.json', line=1): {1}
+      gameLevel (source='data/test3.json', line=1): {1}
+      path (source='data/test3.json', line=1): {SummerDream}
+      hasDouble (source='data/test3.json', line=1): {false}
+      updated (source='data/test3.json', line=1): {false}
+      tooltip (source='data/test3.json', line=1): {lobby_game_new_lines_40}
+      gameName (source='data/test3.json', line=1): {Summer Dream}
+      feature (source='data/test3.json', line=1): {32}
+      status (source='data/test3.json', line=1): {0}
+      (source='data/test3.json', line=1): {}
+      id (source='data/test3.json', line=1): {119}
+      level (source='data/test3.json', line=1): {1}
+      gameLevel (source='data/test3.json', line=1): {1}
+      path (source='data/test3.json', line=1): {Jungle}
+      hasDouble (source='data/test3.json', line=1): {false}
+      updated (source='data/test3.json', line=1): {false}
+      tooltip (source='data/test3.json', line=1): {}
+      gameName (source='data/test3.json', line=1): {Jungle Rumble}
+      feature (source='data/test3.json', line=1): {40}
+      status (source='data/test3.json', line=1): {0}
+      (source='data/test3.json', line=1): {}
+      id (source='data/test3.json', line=1): {121}
+      level (source='data/test3.json', line=1): {1}
+      gameLevel (source='data/test3.json', line=1): {1}
+      path (source='data/test3.json', line=1): {Circus}
+      hasDouble (source='data/test3.json', line=1): {true}
+      updated (source='data/test3.json', line=1): {false}
+      tooltip (source='data/test3.json', line=1): {}
+      gameName (source='data/test3.json', line=1): {Circus Fantasticus}
+      feature (source='data/test3.json', line=1): {43}
+      status (source='data/test3.json', line=1): {1}
+      (source='data/test3.json', line=1): {}
+      id (source='data/test3.json', line=1): {120}
+      level (source='data/test3.json', line=1): {1}
+      gameLevel (source='data/test3.json', line=1): {1}
+      path (source='data/test3.json', line=1): {ValentineDay}
+      hasDouble (source='data/test3.json', line=1): {false}
+      updated (source='data/test3.json', line=1): {false}
+      tooltip (source='data/test3.json', line=1): {}
+      gameName (source='data/test3.json', line=1): {Hearts and Arrows}
+      feature (source='data/test3.json', line=1): {40}
+      status (source='data/test3.json', line=1): {0}
+      (source='data/test3.json', line=1): {}
+      id (source='data/test3.json', line=1): {124}
+      level (source='data/test3.json', line=1): {1}
+      gameLevel (source='data/test3.json', line=1): {1}
+      path (source='data/test3.json', line=1): {PhantomFrenzy}
+      hasDouble (source='data/test3.json', line=1): {true}
+      updated (source='data/test3.json', line=1): {false}
+      tooltip (source='data/test3.json', line=1): {}
+      gameName (source='data/test3.json', line=1): {Phantom Frenzy}
+      feature (source='data/test3.json', line=1): {9}
+      status (source='data/test3.json', line=1): {0}
+      (source='data/test3.json', line=1): {}
+      id (source='data/test3.json', line=1): {122}
+      level (source='data/test3.json', line=1): {1}
+      gameLevel (source='data/test3.json', line=1): {1}
+      path (source='data/test3.json', line=1): {JapanJam}
+      hasDouble (source='data/test3.json', line=1): {false}
+      updated (source='data/test3.json', line=1): {true}
+      tooltip (source='data/test3.json', line=1): {}
+      gameName (source='data/test3.json', line=1): {Japan Jam}
+      feature (source='data/test3.json', line=1): {44}
+      status (source='data/test3.json', line=1): {2}
+   (source='data/test3.json', line=1): {}
+   event (source='data/test3.json', line=1): {friends.update}
+   friends (source='data/test3.json', line=1): {}
+     (source='data/test3.json', line=1): {}
+      (source='data/test3.json', line=1): {}
+      userId (source='data/test3.json', line=1): {697}
+      loginId (source='data/test3.json', line=1): {175655941}
+      firstName (source='data/test3.json', line=1): {Андрей}
+      lastName (source='data/test3.json', line=1): {Роджер}
+      photo (source='data/test3.json', line=1): {http://cs407718.vk.me/u175655941/a_e34802bd.jpg}
+      money (source='data/test3.json', line=1): {154640560}
+      level (source='data/test3.json', line=1): {104}
+      achievGroupId (source='data/test3.json', line=1): {0}
+      allowGift (source='data/test3.json', line=1): {false}
+      wins (source='data/test3.json', line=1): {97}
+      loses (source='data/test3.json', line=1): {125}
+      (source='data/test3.json', line=1): {}
+      userId (source='data/test3.json', line=1): {620}
+      loginId (source='data/test3.json', line=1): {26460226}
+      firstName (source='data/test3.json', line=1): {Windows}
+      lastName (source='data/test3.json', line=1): {Windows}
+      photo (source='data/test3.json', line=1): {http://cs912.userapi.com/u93339557/a_57700b24.jpg}
+      money (source='data/test3.json', line=1): {45860348650}
+      level (source='data/test3.json', line=1): {102}
+      achievGroupId (source='data/test3.json', line=1): {1}
+      allowGift (source='data/test3.json', line=1): {false}
+      wins (source='data/test3.json', line=1): {28}
+      loses (source='data/test3.json', line=1): {59}
+      (source='data/test3.json', line=1): {}
+      userId (source='data/test3.json', line=1): {229}
+      loginId (source='data/test3.json', line=1): {176480760}
+      firstName (source='data/test3.json', line=1): {Аномим}
+      lastName (source='data/test3.json', line=1): {Аноним}
+      photo (source='data/test3.json', line=1): {http://cs403029.vk.me/u176480760/e_b7fb87ca.jpg}
+      money (source='data/test3.json', line=1): {1418615687}
+      level (source='data/test3.json', line=1): {85}
+      achievGroupId (source='data/test3.json', line=1): {0}
+      allowGift (source='data/test3.json', line=1): {false}
+      wins (source='data/test3.json', line=1): {38}
+      loses (source='data/test3.json', line=1): {20}
+      (source='data/test3.json', line=1): {}
+      userId (source='data/test3.json', line=1): {8355302}
+      loginId (source='data/test3.json', line=1): {93339557}
+      firstName (source='data/test3.json', line=1): {Anonym}
+      lastName (source='data/test3.json', line=1): {Anonym}
+      photo (source='data/test3.json', line=1): {http://cs306610.vk.me/u93339557/e_89c9bf5a.jpg}
+      money (source='data/test3.json', line=1): {2218800}
+      level (source='data/test3.json', line=1): {46}
+      achievGroupId (source='data/test3.json', line=1): {0}
+      allowGift (source='data/test3.json', line=1): {false}
+      wins (source='data/test3.json', line=1): {0}
+      loses (source='data/test3.json', line=1): {0}
+      (source='data/test3.json', line=1): {}
+      userId (source='data/test3.json', line=1): {308}
+      loginId (source='data/test3.json', line=1): {4920904}
+      firstName (source='data/test3.json', line=1): {Дмитрий}
+      lastName (source='data/test3.json', line=1): {Мирецкий}
+      photo (source='data/test3.json', line=1): {http://cs417525.vk.me/v417525904/61b5/Of5_zB5iNxQ.jpg}
+      money (source='data/test3.json', line=1): {111756200}
+      level (source='data/test3.json', line=1): {3}
+      achievGroupId (source='data/test3.json', line=1): {0}
+      allowGift (source='data/test3.json', line=1): {false}
+      wins (source='data/test3.json', line=1): {0}
+      loses (source='data/test3.json', line=1): {0}
+   (source='data/test3.json', line=1): {}
+   event (source='data/test3.json', line=1): {top.players}
+   type (source='data/test3.json', line=1): {2}
+   players (source='data/test3.json', line=1): {}
+     (source='data/test3.json', line=1): {}
+      (source='data/test3.json', line=1): {}
+      userId (source='data/test3.json', line=1): {8355306}
+      firstName (source='data/test3.json', line=1): {Дмитрий}
+      lastName (source='data/test3.json', line=1): {Луганский}
+      photo (source='data/test3.json', line=1): {http://cs696.vk.me/v696063/a/NuhaR-2BuEo.jpg}
+      money (source='data/test3.json', line=1): {115949100}
+      level (source='data/test3.json', line=1): {5}
+      achievGroupId (source='data/test3.json', line=1): {0}
+      wagering (source='data/test3.json', line=1): {583750}
+      rating (source='data/test3.json', line=1): {13750}
+      place (source='data/test3.json', line=1): {0}
+   (source='data/test3.json', line=1): {}
+   event (source='data/test3.json', line=1): {top.daily}
+   players (source='data/test3.json', line=1): {}
+     (source='data/test3.json', line=1): {}
+      (source='data/test3.json', line=1): {}
+      userId (source='data/test3.json', line=1): {8355306}
+      firstName (source='data/test3.json', line=1): {Дмитрий}
+      lastName (source='data/test3.json', line=1): {Луганский}
+      photo (source='data/test3.json', line=1): {http://cs696.vk.me/v696063/a/NuhaR-2BuEo.jpg}
+      money (source='data/test3.json', line=1): {115949100}
+      level (source='data/test3.json', line=1): {5}
+      achievGroupId (source='data/test3.json', line=1): {0}
+      wagering (source='data/test3.json', line=1): {583750}
+      rating (source='data/test3.json', line=1): {13750}
+      place (source='data/test3.json', line=1): {0}
+      (source='data/test3.json', line=1): {}
+      (source='data/test3.json', line=1): {}
+   (source='data/test3.json', line=1): {}
+   event (source='data/test3.json', line=1): {payments.update}
+   payments (source='data/test3.json', line=1): {}
+     (source='data/test3.json', line=1): {}
+      (source='data/test3.json', line=1): {}
+      id (source='data/test3.json', line=1): {6}
+      money (source='data/test3.json', line=1): {15000000}
+      bonus (source='data/test3.json', line=1): {200}
+      totalMoney (source='data/test3.json', line=1): {22500000}
+      networkMoney (source='data/test3.json', line=1): {9999}
+      totalBonusMoney (source='data/test3.json', line=1): {67500000}
+      productId (source='data/test3.json', line=1): {com.plarium.slots.chips_6}
+      tag (source='data/test3.json', line=1): {1}
+      (source='data/test3.json', line=1): {}
+      id (source='data/test3.json', line=1): {5}
+      money (source='data/test3.json', line=1): {7500000}
+      bonus (source='data/test3.json', line=1): {100}
+      totalMoney (source='data/test3.json', line=1): {11250000}
+      networkMoney (source='data/test3.json', line=1): {5999}
+      totalBonusMoney (source='data/test3.json', line=1): {22500000}
+      productId (source='data/test3.json', line=1): {com.plarium.slots.chips_5}
+      tag (source='data/test3.json', line=1): {0}
+      (source='data/test3.json', line=1): {}
+      id (source='data/test3.json', line=1): {4}
+      money (source='data/test3.json', line=1): {3750000}
+      bonus (source='data/test3.json', line=1): {50}
+      totalMoney (source='data/test3.json', line=1): {5625000}
+      networkMoney (source='data/test3.json', line=1): {2999}
+      totalBonusMoney (source='data/test3.json', line=1): {8437500}
+      productId (source='data/test3.json', line=1): {com.plarium.slots.chips_4}
+      tag (source='data/test3.json', line=1): {2}
+      (source='data/test3.json', line=1): {}
+      id (source='data/test3.json', line=1): {3}
+      money (source='data/test3.json', line=1): {1500000}
+      bonus (source='data/test3.json', line=1): {20}
+      totalMoney (source='data/test3.json', line=1): {2250000}
+      networkMoney (source='data/test3.json', line=1): {1199}
+      totalBonusMoney (source='data/test3.json', line=1): {2700000}
+      productId (source='data/test3.json', line=1): {com.plarium.slots.chips_3}
+      tag (source='data/test3.json', line=1): {0}
+      (source='data/test3.json', line=1): {}
+      id (source='data/test3.json', line=1): {2}
+      money (source='data/test3.json', line=1): {750000}
+      bonus (source='data/test3.json', line=1): {10}
+      totalMoney (source='data/test3.json', line=1): {1125000}
+      networkMoney (source='data/test3.json', line=1): {599}
+      totalBonusMoney (source='data/test3.json', line=1): {1237500}
+      productId (source='data/test3.json', line=1): {com.plarium.slots.chips_2}
+      tag (source='data/test3.json', line=1): {0}
+      (source='data/test3.json', line=1): {}
+      id (source='data/test3.json', line=1): {1}
+      money (source='data/test3.json', line=1): {250000}
+      bonus (source='data/test3.json', line=1): {0}
+      totalMoney (source='data/test3.json', line=1): {375000}
+      networkMoney (source='data/test3.json', line=1): {199}
+      totalBonusMoney (source='data/test3.json', line=1): {375000}
+      productId (source='data/test3.json', line=1): {com.plarium.slots.chips_1}
+      tag (source='data/test3.json', line=1): {0}
+   bonuses (source='data/test3.json', line=1): {}
+     (source='data/test3.json', line=1): {}
+      (source='data/test3.json', line=1): {}
+      id (source='data/test3.json', line=1): {1}
+      levelFrom (source='data/test3.json', line=1): {0}
+      bonus (source='data/test3.json', line=1): {0}
+      (source='data/test3.json', line=1): {}
+      id (source='data/test3.json', line=1): {2}
+      levelFrom (source='data/test3.json', line=1): {10}
+      bonus (source='data/test3.json', line=1): {50}
+      (source='data/test3.json', line=1): {}
+      id (source='data/test3.json', line=1): {3}
+      levelFrom (source='data/test3.json', line=1): {50}
+      bonus (source='data/test3.json', line=1): {100}
+      (source='data/test3.json', line=1): {}
+      id (source='data/test3.json', line=1): {4}
+      levelFrom (source='data/test3.json', line=1): {100}
+      bonus (source='data/test3.json', line=1): {200}
+   promoPercent (source='data/test3.json', line=1): {0}
+   firstBuy (source='data/test3.json', line=1): {true}
+   (source='data/test3.json', line=1): {}
+   event (source='data/test3.json', line=1): {diamonds.update}
+   payments (source='data/test3.json', line=1): {}
+     (source='data/test3.json', line=1): {}
+      (source='data/test3.json', line=1): {}
+      id (source='data/test3.json', line=1): {16}
+      money (source='data/test3.json', line=1): {600}
+      bonus (source='data/test3.json', line=1): {50}
+      totalMoney (source='data/test3.json', line=1): {600}
+      networkMoney (source='data/test3.json', line=1): {5999}
+      totalBonusMoney (source='data/test3.json', line=1): {900}
+      productId (source='data/test3.json', line=1): {com.plarium.slots.diamonds_6}
+      tag (source='data/test3.json', line=1): {1}
+      (source='data/test3.json', line=1): {}
+      id (source='data/test3.json', line=1): {15}
+      money (source='data/test3.json', line=1): {300}
+      bonus (source='data/test3.json', line=1): {40}
+      totalMoney (source='data/test3.json', line=1): {300}
+      networkMoney (source='data/test3.json', line=1): {2999}
+      totalBonusMoney (source='data/test3.json', line=1): {420}
+      productId (source='data/test3.json', line=1): {com.plarium.slots.diamonds_5}
+      tag (source='data/test3.json', line=1): {0}
+      (source='data/test3.json', line=1): {}
+      id (source='data/test3.json', line=1): {14}
+      money (source='data/test3.json', line=1): {150}
+      bonus (source='data/test3.json', line=1): {30}
+      totalMoney (source='data/test3.json', line=1): {150}
+      networkMoney (source='data/test3.json', line=1): {1499}
+      totalBonusMoney (source='data/test3.json', line=1): {195}
+      productId (source='data/test3.json', line=1): {com.plarium.slots.diamonds_4}
+      tag (source='data/test3.json', line=1): {2}
+      (source='data/test3.json', line=1): {}
+      id (source='data/test3.json', line=1): {13}
+      money (source='data/test3.json', line=1): {60}
+      bonus (source='data/test3.json', line=1): {20}
+      totalMoney (source='data/test3.json', line=1): {60}
+      networkMoney (source='data/test3.json', line=1): {599}
+      totalBonusMoney (source='data/test3.json', line=1): {72}
+      productId (source='data/test3.json', line=1): {com.plarium.slots.diamonds_3}
+      tag (source='data/test3.json', line=1): {0}
+      (source='data/test3.json', line=1): {}
+      id (source='data/test3.json', line=1): {12}
+      money (source='data/test3.json', line=1): {30}
+      bonus (source='data/test3.json', line=1): {10}
+      totalMoney (source='data/test3.json', line=1): {30}
+      networkMoney (source='data/test3.json', line=1): {299}
+      totalBonusMoney (source='data/test3.json', line=1): {33}
+      productId (source='data/test3.json', line=1): {com.plarium.slots.diamonds_2}
+      tag (source='data/test3.json', line=1): {0}
+      (source='data/test3.json', line=1): {}
+      id (source='data/test3.json', line=1): {11}
+      money (source='data/test3.json', line=1): {10}
+      bonus (source='data/test3.json', line=1): {0}
+      totalMoney (source='data/test3.json', line=1): {10}
+      networkMoney (source='data/test3.json', line=1): {99}
+      totalBonusMoney (source='data/test3.json', line=1): {10}
+      productId (source='data/test3.json', line=1): {com.plarium.slots.diamonds_1}
+      tag (source='data/test3.json', line=1): {0}
+   (source='data/test3.json', line=1): {}
+   event (source='data/test3.json', line=1): {powerup.store}
+   powerups (source='data/test3.json', line=1): {}
+     (source='data/test3.json', line=1): {}
+      (source='data/test3.json', line=1): {}
+      id (source='data/test3.json', line=1): {1}
+      type (source='data/test3.json', line=1): {1}
+      price (source='data/test3.json', line=1): {3}
+      value (source='data/test3.json', line=1): {5}
+      duration (source='data/test3.json', line=1): {5}
+      (source='data/test3.json', line=1): {}
+      id (source='data/test3.json', line=1): {2}
+      type (source='data/test3.json', line=1): {2}
+      price (source='data/test3.json', line=1): {2}
+      value (source='data/test3.json', line=1): {2}
+      duration (source='data/test3.json', line=1): {1}
+      (source='data/test3.json', line=1): {}
+      id (source='data/test3.json', line=1): {3}
+      type (source='data/test3.json', line=1): {3}
+      price (source='data/test3.json', line=1): {1}
+      value (source='data/test3.json', line=1): {1}
+      duration (source='data/test3.json', line=1): {2}
+   (source='data/test3.json', line=1): {}
+   event (source='data/test3.json', line=1): {powerup.update}
+   powerups (source='data/test3.json', line=1): {}
+     (source='data/test3.json', line=1): {}
+      (source='data/test3.json', line=1): {}
+      id (source='data/test3.json', line=1): {1}
+      count (source='data/test3.json', line=1): {0}
+      enable (source='data/test3.json', line=1): {false}
+      spinsLeft (source='data/test3.json', line=1): {0}
+      (source='data/test3.json', line=1): {}
+      id (source='data/test3.json', line=1): {2}
+      count (source='data/test3.json', line=1): {0}
+      enable (source='data/test3.json', line=1): {false}
+      spinsLeft (source='data/test3.json', line=1): {0}
+      (source='data/test3.json', line=1): {}
+      id (source='data/test3.json', line=1): {3}
+      count (source='data/test3.json', line=1): {0}
+      enable (source='data/test3.json', line=1): {false}
+      spinsLeft (source='data/test3.json', line=1): {0}
+   (source='data/test3.json', line=1): {}
+   event (source='data/test3.json', line=1): {gifts.update}
+   receivedGifts (source='data/test3.json', line=1): {}
+     (source='data/test3.json', line=1): {}
+   sentGifts (source='data/test3.json', line=1): {}
+     (source='data/test3.json', line=1): {}
+   countOfSentGifts (source='data/test3.json', line=1): {0}
+   (source='data/test3.json', line=1): {}
+   event (source='data/test3.json', line=1): {user.update}
+   level (source='data/test3.json', line=1): {46}
+   wagering (source='data/test3.json', line=1): {520000000}
+   money (source='data/test3.json', line=1): {2218800}
+   diamonds (source='data/test3.json', line=1): {105}
+   (source='data/test3.json', line=1): {}
+   event (source='data/test3.json', line=1): {grant.update}
+   level (source='data/test3.json', line=1): {3}
+   time (source='data/test3.json', line=1): {0}
+   (source='data/test3.json', line=1): {}
+   event (source='data/test3.json', line=1): {promo.init}
+   promoActions (source='data/test3.json', line=1): {}
+     (source='data/test3.json', line=1): {}
+   (source='data/test3.json', line=1): {}
+   event (source='data/test3.json', line=1): {battle.init}
+   battles (source='data/test3.json', line=1): {}
+     (source='data/test3.json', line=1): {}
+      (source='data/test3.json', line=1): {}
+      slotId (source='data/test3.json', line=1): {1}
+      modes (source='data/test3.json', line=1): {}
+        (source='data/test3.json', line=1): {}
+         (source='data/test3.json', line=1): {}
+         id (source='data/test3.json', line=1): {1}
+         time (source='data/test3.json', line=1): {45}
+         betId (source='data/test3.json', line=1): {3}
+         coinsFee (source='data/test3.json', line=1): {10000}
+         diamondsFee (source='data/test3.json', line=1): {5}
+         level (source='data/test3.json', line=1): {1}
+         winType (source='data/test3.json', line=1): {0}
+         winMoney (source='data/test3.json', line=1): {0}
+         (source='data/test3.json', line=1): {}
+         id (source='data/test3.json', line=1): {2}
+         time (source='data/test3.json', line=1): {90}
+         betId (source='data/test3.json', line=1): {4}
+         coinsFee (source='data/test3.json', line=1): {20000}
+         diamondsFee (source='data/test3.json', line=1): {10}
+         level (source='data/test3.json', line=1): {4}
+         winType (source='data/test3.json', line=1): {0}
+         winMoney (source='data/test3.json', line=1): {0}
+         (source='data/test3.json', line=1): {}
+         id (source='data/test3.json', line=1): {3}
+         time (source='data/test3.json', line=1): {300}
+         betId (source='data/test3.json', line=1): {5}
+         coinsFee (source='data/test3.json', line=1): {50000}
+         diamondsFee (source='data/test3.json', line=1): {15}
+         level (source='data/test3.json', line=1): {7}
+         winType (source='data/test3.json', line=1): {1}
+         winMoney (source='data/test3.json', line=1): {100000}
+      (source='data/test3.json', line=1): {}
+      slotId (source='data/test3.json', line=1): {13}
+      modes (source='data/test3.json', line=1): {}
+        (source='data/test3.json', line=1): {}
+         (source='data/test3.json', line=1): {}
+         id (source='data/test3.json', line=1): {4}
+         time (source='data/test3.json', line=1): {45}
+         betId (source='data/test3.json', line=1): {6}
+         coinsFee (source='data/test3.json', line=1): {100000}
+         diamondsFee (source='data/test3.json', line=1): {20}
+         level (source='data/test3.json', line=1): {10}
+         winType (source='data/test3.json', line=1): {0}
+         winMoney (source='data/test3.json', line=1): {0}
+         (source='data/test3.json', line=1): {}
+         id (source='data/test3.json', line=1): {5}
+         time (source='data/test3.json', line=1): {90}
+         betId (source='data/test3.json', line=1): {7}
+         coinsFee (source='data/test3.json', line=1): {200000}
+         diamondsFee (source='data/test3.json', line=1): {30}
+         level (source='data/test3.json', line=1): {15}
+         winType (source='data/test3.json', line=1): {0}
+         winMoney (source='data/test3.json', line=1): {0}
+         (source='data/test3.json', line=1): {}
+         id (source='data/test3.json', line=1): {6}
+         time (source='data/test3.json', line=1): {300}
+         betId (source='data/test3.json', line=1): {9}
+         coinsFee (source='data/test3.json', line=1): {500000}
+         diamondsFee (source='data/test3.json', line=1): {40}
+         level (source='data/test3.json', line=1): {20}
+         winType (source='data/test3.json', line=1): {1}
+         winMoney (source='data/test3.json', line=1): {1000000}
+      (source='data/test3.json', line=1): {}
+      slotId (source='data/test3.json', line=1): {15}
+      modes (source='data/test3.json', line=1): {}
+        (source='data/test3.json', line=1): {}
+         (source='data/test3.json', line=1): {}
+         id (source='data/test3.json', line=1): {7}
+         time (source='data/test3.json', line=1): {45}
+         betId (source='data/test3.json', line=1): {10}
+         coinsFee (source='data/test3.json', line=1): {500000}
+         diamondsFee (source='data/test3.json', line=1): {50}
+         level (source='data/test3.json', line=1): {30}
+         winType (source='data/test3.json', line=1): {0}
+         winMoney (source='data/test3.json', line=1): {0}
+         (source='data/test3.json', line=1): {}
+         id (source='data/test3.json', line=1): {8}
+         time (source='data/test3.json', line=1): {90}
+         betId (source='data/test3.json', line=1): {11}
+         coinsFee (source='data/test3.json', line=1): {1000000}
+         diamondsFee (source='data/test3.json', line=1): {60}
+         level (source='data/test3.json', line=1): {40}
+         winType (source='data/test3.json', line=1): {0}
+         winMoney (source='data/test3.json', line=1): {0}
+         (source='data/test3.json', line=1): {}
+         id (source='data/test3.json', line=1): {9}
+         time (source='data/test3.json', line=1): {300}
+         betId (source='data/test3.json', line=1): {12}
+         coinsFee (source='data/test3.json', line=1): {2500000}
+         diamondsFee (source='data/test3.json', line=1): {75}
+         level (source='data/test3.json', line=1): {50}
+         winType (source='data/test3.json', line=1): {1}
+         winMoney (source='data/test3.json', line=1): {5000000}
+      (source='data/test3.json', line=1): {}
+      slotId (source='data/test3.json', line=1): {19}
+      modes (source='data/test3.json', line=1): {}
+        (source='data/test3.json', line=1): {}
+         (source='data/test3.json', line=1): {}
+         id (source='data/test3.json', line=1): {10}
+         time (source='data/test3.json', line=1): {30}
+         betId (source='data/test3.json', line=1): {13}
+         coinsFee (source='data/test3.json', line=1): {2500000}
+         diamondsFee (source='data/test3.json', line=1): {100}
+         level (source='data/test3.json', line=1): {60}
+         winType (source='data/test3.json', line=1): {0}
+         winMoney (source='data/test3.json', line=1): {0}
+         (source='data/test3.json', line=1): {}
+         id (source='data/test3.json', line=1): {11}
+         time (source='data/test3.json', line=1): {60}
+         betId (source='data/test3.json', line=1): {15}
+         coinsFee (source='data/test3.json', line=1): {5000000}
+         diamondsFee (source='data/test3.json', line=1): {150}
+         level (source='data/test3.json', line=1): {70}
+         winType (source='data/test3.json', line=1): {0}
+         winMoney (source='data/test3.json', line=1): {0}
+         (source='data/test3.json', line=1): {}
+         id (source='data/test3.json', line=1): {12}
+         time (source='data/test3.json', line=1): {300}
+         betId (source='data/test3.json', line=1): {16}
+         coinsFee (source='data/test3.json', line=1): {10000000}
+         diamondsFee (source='data/test3.json', line=1): {200}
+         level (source='data/test3.json', line=1): {80}
+         winType (source='data/test3.json', line=1): {1}
+         winMoney (source='data/test3.json', line=1): {25000000}
+   timeout (source='data/test3.json', line=1): {15}
+   (source='data/test3.json', line=1): {}
+   event (source='data/test3.json', line=1): {wheel.update}
+   diamonds (source='data/test3.json', line=1): {}
+     (source='data/test3.json', line=1): {50, 30, 20, 10, 10, 5, 40, 30, 20, 10, 5, 5}
+   coins (source='data/test3.json', line=1): {}
+     (source='data/test3.json', line=1): {1100000, 450000, 250000, 170000, 120000, 85000, 560000, 350000, 200000, 140000, 100000, 75000}
+root (source='', line=0): {}
   (source='data/error_test1.json', line=2): {val1, val2}
 data/error_test1.json(1): error: syntax error. Unexpected token 'obj'. Object or array expected.
 data/error_test1.json(1): error: syntax error. Unexpected token ''. Object or array expected.

@@ -72,7 +72,7 @@ struct BindableTextureDesc
 struct TextureLevelData
 {
   size_t      size; //размер буфера
-  const void* data; //буфер с данными  
+  const void* data; //буфер с данными
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -213,7 +213,7 @@ class Texture: public BindableTexture
     void BuildMipmaps (size_t x, size_t y, size_t z, size_t width, size_t unclamped_width, size_t height, PixelFormat format, const void* data);
     
   private:
-    TextureDesc   desc;                //дескриптор текстуры  
+    TextureDesc   desc;                //дескриптор текстуры
     GLenum        target;              //тип текстуры
     GLuint        texture_id;          //идентификатор текстуры
     size_t        mips_count;          //количество мип-уровней
@@ -345,7 +345,7 @@ class Texture3D : public Texture, public xtl::instance_counter<Texture3D>
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Работа с данными
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void GetData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height, PixelFormat target_format, void* buffer);
+    void GetData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height, PixelFormat target_format, void* buffer, IDeviceContext* context);
 
   private:
 ///////////////////////////////////////////////////////////////////////////////////////////////////

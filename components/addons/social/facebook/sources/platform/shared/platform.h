@@ -1,6 +1,7 @@
 #ifndef SOCIAL_FACEBOOK_PLATFORM_HEADER
 #define SOCIAL_FACEBOOK_PLATFORM_HEADER
 
+#include <shared/android.h>
 #include <shared/default.h>
 #include <shared/ios.h>
 
@@ -15,6 +16,8 @@ namespace facebook
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 #ifdef IPHONE
   typedef IOsPlatform Platform;
+#elif defined ANDROID
+  typedef AndroidPlatform Platform;
 #else
   typedef DefaultPlatform Platform;
 #endif

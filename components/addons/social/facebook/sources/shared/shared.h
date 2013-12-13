@@ -150,7 +150,7 @@ class FacebookSessionImpl: public IAchievementManager, public ILeaderboardManage
     void OnCurrentUserInfoLoaded (bool succeeded, const stl::string& status, common::ParseNode response, const LoginCallback& callback);
     bool ProcessLoginRequest     (const char* request, const LoginCallback& callback);
     void ProcessLoginFail        (const LoginCallback& callback);
-    void OnPlatformLogInFinished (bool platform_login_result, OperationStatus status, const char* error, const char* login_url, const LoginCallback& callback);
+    void OnPlatformLogInFinished (bool platform_login_result, OperationStatus status, const char* error, const char* token, const LoginCallback& callback);
     void HandleLoginResultUrl    (const char* url, const LoginCallback& callback);
     void OnLoginTokenUpdated     (const LoginCallback& callback);
 
@@ -175,19 +175,20 @@ class FacebookSessionImpl: public IAchievementManager, public ILeaderboardManage
     typedef xtl::shared_ptr<syslib::WebView> WebViewPtr;
 
   private:
-    common::Log          log;
-    common::PropertyMap  login_properties;
-    stl::string          app_id;
-    stl::string          token;
-    bool                 logged_in;
-    User                 current_user;
-    WebViewPtr           dialog_web_view;
-    xtl::auto_connection dialog_web_view_filter_connection;
-    xtl::auto_connection dialog_web_view_load_start_connection;
-    xtl::auto_connection dialog_web_view_load_fail_connection;
-    xtl::auto_connection on_activate_connection;
-    ActionsList          pending_actions;
-    common::Action       activate_after_dialog_show_action;
+    common::Log          log;                                      //logging
+    common::PropertyMap  login_properties;                         //custom login properties
+    stl::string          app_id;                                   //FB application id
+    stl::string          token;                                    //user token
+    stl::string          last_dialog_base_request;                 //last dialog web-view request
+    bool                 logged_in;                                //is logged in
+    User                 current_user;                             //logged in user info
+    WebViewPtr           dialog_web_view;                          //web view used for dialogs
+    xtl::auto_connection dialog_web_view_filter_connection;        //dialog web view requests filter connection
+    xtl::auto_connection dialog_web_view_load_start_connection;    //dialog web view requests load connection
+    xtl::auto_connection dialog_web_view_load_fail_connection;     //dialog web view requests error connection
+    xtl::auto_connection on_activate_connection;                   //application activate connection
+    ActionsList          pending_actions;                          //actions queue
+    common::Action       activate_after_dialog_show_action;        //action for web view window activation
 };
 
 //utils

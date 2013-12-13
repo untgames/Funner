@@ -15,6 +15,7 @@ namespace
 class base
 {
    public:
+   base () { (void)filler; }
    virtual ~base(){}
    int filler [5];
 };
@@ -22,7 +23,7 @@ class base
 class base2
 {
 public:
-
+    base2 () { (void)filler; }
     virtual ~base2(){}
     int filler [5];
 };
@@ -30,12 +31,18 @@ public:
 class derived
    : public base, public base2 
 {
+  public:
+    derived () { (void)filler; }
+  private:
     int filler [5];
 };
 
 class derived_derived
    : public derived
 {
+  public:
+    derived_derived () { (void)filler; }
+  private:
     int filler [5];
 };
 

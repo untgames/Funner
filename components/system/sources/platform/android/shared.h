@@ -18,6 +18,7 @@
 #include <xtl/function.h>
 #include <xtl/ref.h>
 #include <xtl/reference_counter.h>
+#include <xtl/trackable_ptr.h>
 
 #include <common/component.h>
 #include <common/file.h>

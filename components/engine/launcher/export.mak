@@ -4,7 +4,7 @@ export.link.engine.launcher_shared.LIBS                := funner.engine.shared
 export.link.engine.launcher_shared.has_windows.IMPORTS := link.render.low_level.opengl_driver link.engine.subsystems.window_input_driver \
                                              link.engine.subsystems.window_manager link.engine.subsystems.window_renderer link.media.image.dds
 export.link.engine.launcher_shared.win32.IMPORTS       := link.input.direct_input_driver
-export.link.engine.launcher_shared.iphone.IMPORTS      := link.media.image.pvr link.input.iphone_driver link.media.players.iphone \
+export.link.engine.launcher_shared.iphone.IMPORTS      := link.media.image.pvr link.media.players.iphone \
                                              link.engine.subsystems.iphone_audio_session link.engine.subsystems.iphone_configuration \
                                              link.social.game_kit link.store.ios_store
 export.link.engine.launcher_shared.android.IMPORTS     := link.media.image.pvr link.store.android_store
@@ -23,7 +23,7 @@ export.link.engine.launcher_shared.IMPORTS := link.common.default_console_handle
                                 link.engine.script_binds.physics link.engine.script_binds.math.spline_loader \
                                 link.engine.script_binds.social link.engine.script_binds.debug \
                                 link.engine.script_binds.scene_input link.engine.script_binds.store \
-                                link.engine.script_binds.render.scene_render2d \
+                                link.engine.script_binds.render.scene_render2d link.engine.script_binds.analytics.flurry \
                                 link.sound.low_level.openal_driver run.sound.low_level.openal_driver \
                                 link.engine.subsystems.scene_render link.engine.subsystems.scene_player \
                                 link.engine.subsystems.input_manager link.engine.subsystems.shell \

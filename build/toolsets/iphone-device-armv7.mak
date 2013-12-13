@@ -4,5 +4,6 @@
 
 COMMON_CFLAGS     += -DARM7 -arch armv7 -mfpu=neon -mthumb
 COMMON_LINK_FLAGS += -arch armv7
+FAT_LIB_ARCH_TYPE := armv7
 
 include $(TOOLSETS_DIR)/iphone-device.mak

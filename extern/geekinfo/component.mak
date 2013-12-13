@@ -17,6 +17,7 @@ EXTERN.GEEKINFO.SOURCES.x86.SOURCE_DIRS        := sources/x86
 EXTERN.GEEKINFO.SOURCES.msvc.COMPILER_CFLAGS   := -W0
 EXTERN.GEEKINFO.SOURCES.msvc.SOURCE_DIRS       := sources/intel sources/intel/msvc sources/win32/msvc
 EXTERN.GEEKINFO.SOURCES.g++.COMPILER_CFLAGS    := --no-warn
+EXTERN.GEEKINFO.SOURCES.clang.COMPILER_CFLAGS  := -w
 EXTERN.GEEKINFO.SOURCES.mingw.SOURCE_DIRS      := sources/win32/mingw sources/intel sources/intel/mingw-x86
 EXTERN.GEEKINFO.SOURCES.mingw.INCLUDE_DIRS     := sources/intel/mingw-x86
 EXTERN.GEEKINFO.SOURCES.mingw.COMPILER_DEFINES := _WIN32_WINNT=0x600

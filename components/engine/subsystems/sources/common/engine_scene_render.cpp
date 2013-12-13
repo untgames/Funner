@@ -42,13 +42,16 @@ class SceneRenderSubsystem : public ISubsystem, public IAttachmentRegistryListen
   public:
 ///Конструктор
     SceneRenderSubsystem (common::ParseNode& node, SubsystemManager& in_manager)
-      : log (LOG_NAME),
-        render (get<const char*> (node, "DriverMask"), get<const char*> (node, "RendererMask"), get<const char*> (node, "RenderPathMasks", "*")),
-        idle_connection (syslib::Application::RegisterEventHandler (syslib::ApplicationEvent_OnIdle, xtl::bind (&SceneRenderSubsystem::OnIdle, this))),
-        manager (in_manager)
+      : log (LOG_NAME)
+      , render (get<const char*> (node, "DriverMask"), get<const char*> (node, "RendererMask"), get<const char*> (node, "RenderPathMasks", "*"))
+      , on_app_pause_connection (syslib::Application::RegisterEventHandler (syslib::ApplicationEvent_OnPause, xtl::bind (&SceneRenderSubsystem::OnPause, this)))
+      , on_app_resume_connection (syslib::Application::RegisterEventHandler (syslib::ApplicationEvent_OnResume, xtl::bind (&SceneRenderSubsystem::OnResume, this)))
+      , manager (in_manager)
     {
       try
       {
+        SubscribeToOnIdle ();
+
         const char* log_name = get<const char*> (node, "Log", "");
 
         if (*log_name)
@@ -267,6 +270,28 @@ class SceneRenderSubsystem : public ISubsystem, public IAttachmentRegistryListen
       render_target.SetScreen (screen);
     }
 
+      //пауза приложения
+    void OnPause ()
+    {
+      resource_server->DisableNotifications ();
+
+      idle_connection.disconnect ();
+    }
+
+      //восстановление приложения
+    void OnResume ()
+    {
+      resource_server->EnableNotifications ();
+
+      SubscribeToOnIdle ();
+    }
+
+      //подспика на событие OnIdle
+    void SubscribeToOnIdle ()
+    {
+      idle_connection = syslib::Application::RegisterEventHandler (syslib::ApplicationEvent_OnIdle, xtl::bind (&SceneRenderSubsystem::OnIdle, this));
+    }
+
   private:
     SceneRenderSubsystem (const SceneRenderSubsystem&);             //no impl
     SceneRenderSubsystem& operator = (const SceneRenderSubsystem&); //no impl
@@ -305,12 +330,14 @@ class SceneRenderSubsystem : public ISubsystem, public IAttachmentRegistryListen
     typedef stl::vector<RenderTargetPtr>                      RenderTargetArray;
 
   private:
-    Log                                              log;                 //лог
-    render::obsolete::SceneRender                    render;              //рендер
-    stl::auto_ptr<media::rms::ServerGroupAttachment> resource_server;     //сервер ресурсов рендеринга
-    ScreenMap                                        screen_map;          //соответствие экранов и рендер-таргетов
-    xtl::auto_connection                             idle_connection;     //соединение обновления рендер-таргетов
-    RenderTargetArray                                idle_render_targets; //список автоматически обновляемых целей рендеринга
+    Log                                              log;                      //лог
+    render::obsolete::SceneRender                    render;                   //рендер
+    stl::auto_ptr<media::rms::ServerGroupAttachment> resource_server;          //сервер ресурсов рендеринга
+    ScreenMap                                        screen_map;               //соответствие экранов и рендер-таргетов
+    xtl::auto_connection                             idle_connection;          //соединение обновления рендер-таргетов
+    xtl::auto_connection                             on_app_pause_connection;  //соединение паузы приложения
+    xtl::auto_connection                             on_app_resume_connection; //соединение восстановления приложения
+    RenderTargetArray                                idle_render_targets;      //список автоматически обновляемых целей рендеринга
     SubsystemManager&                                manager;
 };
 

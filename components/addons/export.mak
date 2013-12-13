@@ -1,1 +1,1 @@
-COMPONENT_DIRS := social store
+COMPONENT_DIRS := social store analytics

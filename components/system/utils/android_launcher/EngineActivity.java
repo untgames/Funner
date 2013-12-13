@@ -4,11 +4,15 @@ import android.app.Activity;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.content.Context;
 import android.content.ContextWrapper;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Point;
+import android.net.NetworkInfo;
 import android.net.Uri;
+import android.net.wifi.WifiInfo;
+import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
@@ -47,6 +51,8 @@ public class EngineActivity extends Activity
 	{
 		ON_PAUSE, 
 		ON_RESUME, 
+		ON_STOP, 
+		ON_START, 
 		ON_DESTROY 
 	}
 	
@@ -146,12 +152,13 @@ public class EngineActivity extends Activity
     envVars = envVars + " " + "TEMP='" + tmpDir + "'";
     envVars = envVars + " " + "ANDROID_DATA='" + getFilesDir ().getPath () + "'";
     
-    String externalDataDir;
+    String externalDataDir = null;
 
     if (Environment.getExternalStorageState ().equals (Environment.MEDIA_MOUNTED))
     	externalDataDir = getExternalFilesDir (null).getPath ();
-    else
-    	externalDataDir = getFilesDir ().getPath ();
+
+    if (externalDataDir == null)
+      externalDataDir = getFilesDir ().getPath ();
 
     envVars = envVars + " " + "ANDROID_EXTERNAL_DATA='" + externalDataDir + "'";
 
@@ -239,20 +246,38 @@ public class EngineActivity extends Activity
   @Override
   public void onPause ()
   {
-    onPauseCallback ();
     super.onPause ();
     
     notify (EventType.ON_PAUSE);
   }  
   
-///Восстановление приложения
+///Возобновление работы приложения
   @Override
   public void onResume ()
   {
-    onResumeCallback ();
     super.onResume ();
     
     notify (EventType.ON_RESUME);
+  }    
+    
+///Остановка приложения  
+  @Override
+  public void onStop ()
+  {
+    onPauseCallback ();
+    super.onStop ();
+    
+    notify (EventType.ON_STOP);
+  }  
+  
+///Восстановление приложения
+  @Override
+  public void onStart ()
+  {
+    onResumeCallback ();
+    super.onStart ();
+    
+    notify (EventType.ON_START);
   }    
     
 ///Завершение приложения
@@ -262,6 +287,8 @@ public class EngineActivity extends Activity
     super.onDestroy ();
     
     notify (EventType.ON_DESTROY);
+    
+    android.os.Process.killProcess (android.os.Process.myPid ()); //kill our process, so singletons will die with activity. Activity is destroyed on device lock on Galaxy S3
   }        
     
 ///Нехватка памяти
@@ -278,6 +305,11 @@ public class EngineActivity extends Activity
   {    
   }
   
+///Обработка событий приложения
+  protected void onApplicationNotification (String notification)
+  {
+  }
+  
 ///Добавление окна
   void addView (View view)
   {
@@ -291,6 +323,7 @@ public class EngineActivity extends Activity
     views.addView (view, new AbsoluteLayout.LayoutParams (new ViewGroup.LayoutParams (FrameLayout.LayoutParams.WRAP_CONTENT, FrameLayout.LayoutParams.WRAP_CONTENT)));
     
     view.bringToFront ();
+    view.requestFocus ();
     
     if (needSetContentView)    
       getWindow ().setContentView (views, new ViewGroup.LayoutParams (ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
@@ -407,6 +440,33 @@ public class EngineActivity extends Activity
     	Log.e (TAG, "Exception while getting application version: " + e.getMessage ());
     }
     
+    boolean hasWifi = false;
+    
+    try
+    {
+    	WifiManager wifiManager = (WifiManager)getSystemService (Context.WIFI_SERVICE);
+
+    	if (wifiManager != null && wifiManager.getWifiState () == WifiManager.WIFI_STATE_ENABLED)
+    	{
+    		WifiInfo wifiInfo = wifiManager.getConnectionInfo ();
+    		
+    		if (wifiInfo != null)
+    		{
+    			hasWifi = wifiInfo.getSupplicantState () == android.net.wifi.SupplicantState.COMPLETED;
+    		}
+    	}
+    }
+    catch (Exception e)
+    {
+    	Log.e (TAG, "Exception while getting wifi state: " + e.getMessage ());
+    	hasWifi = true;
+    }
+    
+    if (!hasWifi)
+    {
+      result += " CellularOnlyInternet=1";
+    }
+    
     return result;
   }
   
@@ -520,4 +580,7 @@ public class EngineActivity extends Activity
   public native void onPauseCallback ();
   public native void onResumeCallback ();
   public native void onLowMemoryCallback ();
+
+/// Посылка сообщения в приложение
+  public native void postNotification (String notification);
 }

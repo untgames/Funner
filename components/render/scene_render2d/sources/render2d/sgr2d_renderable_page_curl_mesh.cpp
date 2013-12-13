@@ -202,12 +202,18 @@ struct RenderablePageCurlMesh::Impl
           dy = -dy;
         }
 
-        for (size_t i = 0; i < grid_size.x; i++, vertex++, x += dx, y += dy, z += dz)
+        for (size_t i = 0; i < grid_size.x - 1; i++, vertex++, x += dx, y += dy, z += dz)
         {
           vertex->position.x = x;
           vertex->position.y = y;
           vertex->position.z = z;
         }
+
+        vertex->position.x = max_x;
+        vertex->position.y = y;
+        vertex->position.z = max_z;
+
+        vertex++;
       }
 
       return;

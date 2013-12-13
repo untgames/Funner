@@ -14,34 +14,40 @@ const char* LOG_NAME = "android.syslib.window";
     Окно
 */
 
+enum { ScreenKeyboardType_Num = ScreenKeyboardType_PlatformSpecific };
+
+typedef xtl::trackable_ptr<screen_keyboard_handle> screen_keyboard_ptr;
+
 struct syslib::window_handle: public MessageQueue::Handler
 {
-  global_ref<jobject>  controller;                       //контроллер android окна
-  global_ref<jobject>  view;                             //android окно  
-  WindowMessageHandler message_handler;                  //обработчик сообщений
-  void*                user_data;                        //пользовательские данные окна
-  unsigned int         background_color;                 //цвет заднего плана
-  unsigned int         background_state;                 //наличие заднего фона
-  jmethodID            get_view_method;                  //метод получения окна
-  jmethodID            get_top_method;                   //метод получения верхнего угла окна
-  jmethodID            get_left_method;                  //метод получения левого угла окна
-  jmethodID            get_width_method;                 //метод получения ширины окна
-  jmethodID            get_height_method;                //метод получения высоты окна
-  jmethodID            layout_method;                    //метод установки размеров и положения окна
-  jmethodID            set_visibility_method;            //метод установки видимости окна
-  jmethodID            get_visibility_method;            //метод получения видимости окна
-  jmethodID            request_focus_method;             //метод запроса фокуса ввода
-  jmethodID            set_background_color_method;      //метод установки цвета заднего плана окна
-  jmethodID            maximize_method;                  //метод максимизации окна
-  jmethodID            get_surface_method;               //метод получения поверхности
-  jmethodID            post_invalidate_method;           //метод оповещения о необходимости перерисовки окна
-  jmethodID            bring_to_front_method;            //метод перемещения окна на передний план
-  jmethodID            remove_from_parent_window_method; //метод удаления окна
-  bool                 is_multitouch_enabled;            //включен ли multitouch
-  int                  current_touch_id;                 //текущий идентификатор касания
-  bool                 is_surface_created;               //состояние поверхности
-  volatile bool        is_native_handle_received;        //получен ли android window handle
-  common::Log          log;                              //поток протоколирования
+  global_ref<jobject>  controller;                                //контроллер android окна
+  global_ref<jobject>  view;                                      //android окно
+  screen_keyboard_ptr  screen_keyboards [ScreenKeyboardType_Num]; //экранные клавиатуры
+  WindowMessageHandler message_handler;                           //обработчик сообщений
+  void*                user_data;                                 //пользовательские данные окна
+  unsigned int         background_color;                          //цвет заднего плана
+  unsigned int         background_state;                          //наличие заднего фона
+  jmethodID            get_view_method;                           //метод получения окна
+  jmethodID            get_top_method;                            //метод получения верхнего угла окна
+  jmethodID            get_left_method;                           //метод получения левого угла окна
+  jmethodID            get_width_method;                          //метод получения ширины окна
+  jmethodID            get_height_method;                         //метод получения высоты окна
+  jmethodID            layout_method;                             //метод установки размеров и положения окна
+  jmethodID            set_visibility_method;                     //метод установки видимости окна
+  jmethodID            get_visibility_method;                     //метод получения видимости окна
+  jmethodID            clear_focus_method;                        //метод отмены фокуса ввода
+  jmethodID            request_focus_method;                      //метод запроса фокуса ввода
+  jmethodID            set_background_color_method;               //метод установки цвета заднего плана окна
+  jmethodID            maximize_method;                           //метод максимизации окна
+  jmethodID            get_surface_method;                        //метод получения поверхности
+  jmethodID            post_invalidate_method;                    //метод оповещения о необходимости перерисовки окна
+  jmethodID            bring_to_front_method;                     //метод перемещения окна на передний план
+  jmethodID            remove_from_parent_window_method;          //метод удаления окна
+  bool                 is_multitouch_enabled;                     //включен ли multitouch
+  int                  current_touch_id;                          //текущий идентификатор касания
+  bool                 is_surface_created;                        //состояние поверхности
+  volatile bool        is_native_handle_received;                 //получен ли android window handle
+  common::Log          log;                                       //поток протоколирования
   
 ///Конструктор
   window_handle ()
@@ -179,7 +185,7 @@ struct syslib::window_handle: public MessageQueue::Handler
 //    fflush (stdout);
   }
 
-  void OnKeyCallback (int key, int action, bool is_alt_pressed, bool is_shift_pressed, bool is_sym_pressed)
+  void OnKeyCallback (int key, int action, bool is_alt_pressed, bool is_shift_pressed, bool is_sym_pressed, int unicode_char)
   {
     WindowEventContext context;
 
@@ -239,7 +245,7 @@ struct syslib::window_handle: public MessageQueue::Handler
       case AKEYCODE_TAB:           syslib_key = Key_Tab;          break;
       case AKEYCODE_SPACE:         syslib_key = Key_Space;        break;
       case AKEYCODE_ENTER:         syslib_key = Key_Enter;        break;
-      case AKEYCODE_DEL:           syslib_key = Key_Delete;       break;
+      case AKEYCODE_DEL:           syslib_key = Key_BackSpace;    break;
       case AKEYCODE_MINUS:         syslib_key = Key_Minus;        break;
       case AKEYCODE_LEFT_BRACKET:  syslib_key = Key_LeftBracket;  break;
       case AKEYCODE_RIGHT_BRACKET: syslib_key = Key_RightBracket; break;
@@ -258,12 +264,21 @@ struct syslib::window_handle: public MessageQueue::Handler
 
     context.key = syslib_key;
     
-    static const int ACTION_DOWN = 0, ACTION_UP = 1;
-    
+    static const int ACTION_DOWN = 0, ACTION_UP = 1, ACTION_MULTIPLE = 2;
+
     switch (action)
     {
       case ACTION_DOWN:
         Notify (WindowEvent_OnKeyDown, context);
+
+        context.char_code = (wchar_t)unicode_char;
+
+        Notify (WindowEvent_OnChar, context);
+        break;
+      case ACTION_MULTIPLE:
+        context.char_code = (wchar_t)unicode_char;
+
+        Notify (WindowEvent_OnChar, context);
         break;
       case ACTION_UP:
         Notify (WindowEvent_OnKeyUp, context);
@@ -283,6 +298,16 @@ struct syslib::window_handle: public MessageQueue::Handler
     else        Notify (WindowEvent_OnLostFocus, context);
   }
 
+  void OnVisibilityCallback (bool is_visible)
+  {
+    WindowEventContext context;
+
+    memset (&context, 0, sizeof (context));
+
+    if (is_visible) Notify (WindowEvent_OnShow, context);
+    else            Notify (WindowEvent_OnHide, context);
+  }
+
   void OnSurfaceCreatedCallback ()
   {
     if (is_surface_created)
@@ -292,7 +317,7 @@ struct syslib::window_handle: public MessageQueue::Handler
 
       //получение поверхности
 
-    local_ref<jobject> surface = check_errors (get_env ().CallObjectMethod (view.get (), get_surface_method));
+    local_ref<jobject> surface = check_errors (get_env ().CallObjectMethod (controller.get (), get_surface_method));
 
     if (!surface)
       throw xtl::format_operation_exception ("", "EngineViewController::getSurfaceThreadSafe failed");                  
@@ -489,14 +514,19 @@ void on_trackball_callback (JNIEnv& env, jobject controller, int pointer_id, int
   push_message (controller, xtl::bind (&window_handle::OnTrackballCallback, _1, pointer_id, action, x, y));
 }
 
-void on_key_callback (JNIEnv& env, jobject controller, int key, int action, jboolean is_alt_pressed, jboolean is_shift_pressed, jboolean is_sym_pressed)
+void on_key_callback (JNIEnv& env, jobject controller, int key, int action, jboolean is_alt_pressed, jboolean is_shift_pressed, jboolean is_sym_pressed, jint unicode_char)
 {
-  push_message (controller, xtl::bind (&window_handle::OnKeyCallback, _1, key, action, is_alt_pressed != 0, is_shift_pressed != 0, is_sym_pressed != 0));
+  push_message (controller, xtl::bind (&window_handle::OnKeyCallback, _1, key, action, is_alt_pressed != 0, is_shift_pressed != 0, is_sym_pressed != 0, unicode_char));
 }
 
 void on_focus_callback (JNIEnv& env, jobject controller, jboolean gained)
 {
   push_message (controller, xtl::bind (&window_handle::OnFocusCallback, _1, gained != 0));
+}
+
+void on_visibility_callback (JNIEnv& env, jobject controller, jboolean is_visible)
+{
+  push_message (controller, xtl::bind (&window_handle::OnVisibilityCallback, _1, is_visible != 0));
 }
 
 void on_surface_created_callback (JNIEnv& env, jobject controller)
@@ -575,6 +605,7 @@ window_t AndroidWindowManager::CreateWindow (WindowStyle, WindowMessageHandler h
     window->layout_method                    = find_method (&env, controller_class.get (), "layoutThreadSafe", "(IIII)V");
     window->set_visibility_method            = find_method (&env, controller_class.get (), "setVisibilityThreadSafe", "(I)V");
     window->get_visibility_method            = find_method (&env, controller_class.get (), "getVisibilityThreadSafe", "()I");
+    window->clear_focus_method               = find_method (&env, controller_class.get (), "clearFocusThreadSafe", "(Landroid/content/Context;)V");
     window->request_focus_method             = find_method (&env, controller_class.get (), "requestFocusThreadSafe", "()Z");
     window->bring_to_front_method            = find_method (&env, controller_class.get (), "bringToFrontThreadSafe", "()V");
     window->set_background_color_method      = find_method (&env, controller_class.get (), "setBackgroundColorThreadSafe", "(I)V");
@@ -823,8 +854,16 @@ void AndroidWindowManager::SetWindowFlag (window_t window, WindowFlag flag, bool
         check_errors ();
         break;
       case WindowFlag_Focus:
-        if (!check_errors (env.CallBooleanMethod (window->controller.get (), window->request_focus_method)))
-          throw xtl::format_operation_exception ("", "EngineViewController::requestFocusThreadSafe failed");
+        if (state)
+        {
+          if (!check_errors (env.CallBooleanMethod (window->controller.get (), window->request_focus_method)))
+            throw xtl::format_operation_exception ("", "EngineViewController::requestFocusThreadSafe failed");
+        }
+        else
+        {
+          env.CallVoidMethod (window->controller.get (), window->clear_focus_method, get_activity ());
+          check_errors ();
+        }
 
         break;
       case WindowFlag_Maximized:
@@ -1024,6 +1063,162 @@ bool AndroidWindowManager::GetBackgroundState (window_t window)
   }
 }
 
+/*
+    Создание и уничтожение экранной клавиатуры
+*/
+
+struct syslib::screen_keyboard_handle: public xtl::reference_counter, public xtl::trackable
+{
+  global_ref<jobject> view;                       //android окно
+  global_ref<jobject> controller;                 //контроллер
+  global_ref<jclass>  input_method_manager_class; //класс менеджера ввода
+  global_ref<jobject> input_method_manager;       //менеджер ввода
+  jmethodID           request_focus_method;       //метод запроса фокуса
+  jmethodID           show_keyboard_method;       //метод показа клавиатуры
+  jmethodID           hide_keyboard_method;       //метод скрытия клавиатуры
+
+/// Конструктор
+  screen_keyboard_handle (window_t window)
+    : view (window->view)
+    , controller (window->controller)
+    , request_focus_method (window->request_focus_method)
+  {
+    JNIEnv& env = syslib::android::get_env ();
+
+    jobject   activity           = get_activity ();
+    jclass    activity_class     = env.GetObjectClass (activity);
+    jmethodID get_system_service = find_method (&env, activity_class, "getSystemService", "(Ljava/lang/String;)Ljava/lang/Object;");
+
+    input_method_manager = check_errors (env.CallObjectMethod (activity, get_system_service, tojstring ("input_method").get ()));
+
+    if (!input_method_manager)
+      throw xtl::format_operation_exception ("", "getSystemService for InputMethodManager failed");
+
+    input_method_manager_class = env.GetObjectClass (input_method_manager.get ());
+
+    if (!input_method_manager_class)
+      throw xtl::format_operation_exception ("", "Can't get input manager class");
+
+    show_keyboard_method = find_method (&env, input_method_manager_class.get (), "showSoftInput", "(Landroid/view/View;I)Z");
+    hide_keyboard_method = find_method (&env, input_method_manager_class.get (), "hideSoftInputFromWindow", "(Landroid/os/IBinder;I)Z");
+  }
+};
+
+screen_keyboard_t AndroidScreenKeyboardManager::CreateScreenKeyboard (window_t window, ScreenKeyboardType type, const char*)
+{  
+  try
+  {
+    if (!window)
+      throw xtl::make_null_argument_exception ("", "window");
+
+    if (type < 0 || type >= (ScreenKeyboardType)ScreenKeyboardType_Num)
+      throw xtl::make_argument_exception ("", "type", type);
+
+    screen_keyboard_ptr& keyboard = window->screen_keyboards [type];
+
+    if (keyboard)
+    {
+      addref (&*keyboard);
+
+      return keyboard.get ();
+    }
+
+    stl::auto_ptr<screen_keyboard_handle> new_keyboard (new screen_keyboard_handle (window));
+
+    keyboard = new_keyboard.get ();
+
+    return new_keyboard.release ();
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("syslib::android::AndroidScreenKeyboardManager::CreateScreenKeyboard");
+    throw;
+  }
+}
+
+void AndroidScreenKeyboardManager::DestroyScreenKeyboard (screen_keyboard_t keyboard)
+{
+  if (!keyboard)
+    return;
+
+  release (keyboard);
+}
+
+/*
+    Показ и скрытие клавиатуры
+*/
+
+void AndroidScreenKeyboardManager::ShowScreenKeyboard (screen_keyboard_t keyboard)
+{
+  try
+  {
+    if (!keyboard)
+      throw xtl::make_null_argument_exception ("", "keyboard");
+
+    JNIEnv& env = syslib::android::get_env ();
+
+    if (!check_errors (env.CallBooleanMethod (keyboard->controller.get (), keyboard->request_focus_method)))
+      throw xtl::format_operation_exception ("", "EngineViewController::requestFocusThreadSafe failed");
+
+    static const int SHOW_FORCED = 2;
+
+    bool result = check_errors (env.CallBooleanMethod (keyboard->input_method_manager.get (), keyboard->show_keyboard_method, keyboard->view.get (), SHOW_FORCED));
+
+    if (!result)
+      throw xtl::format_operation_exception ("", "ShowScreenKeyboard failed");
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("syslib::android::AndroidScreenKeyboardManager::ShowScreenKeyboard");
+    throw;
+  }
+}
+
+void AndroidScreenKeyboardManager::HideScreenKeyboard (screen_keyboard_t keyboard)
+{
+  try
+  {
+    if (!keyboard)
+      throw xtl::make_null_argument_exception ("", "keyboard");
+
+    JNIEnv& env = syslib::android::get_env ();
+
+    jclass    view_class       = env.GetObjectClass (keyboard->view.get ());
+    jmethodID get_window_token = find_method (&env, view_class, "getWindowToken", "()Landroid/os/IBinder;");
+    jobject   window_token     = check_errors (env.CallObjectMethod (keyboard->view.get (), get_window_token));
+
+    bool result = check_errors (env.CallBooleanMethod (keyboard->input_method_manager.get (), keyboard->hide_keyboard_method, window_token, 0));
+
+    if (!result)
+      throw xtl::format_operation_exception ("", "HideScreenKeyboard failed");
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("syslib::android::AndroidScreenKeyboardManager::HideScreenKeyboard");
+    throw;
+  }
+}
+
+/*
+    Проверка поддержки клавиатуры
+*/
+
+bool AndroidScreenKeyboardManager::IsScreenKeyboardSupported (ScreenKeyboardType type)
+{
+  switch (type)
+  {
+    case ScreenKeyboardType_Ascii:
+      return true;
+    default:
+      return false;
+  }
+}
+
+bool AndroidScreenKeyboardManager::IsScreenKeyboardSupported (const char*)
+{
+  return false;
+}
+
 namespace syslib
 {
 
@@ -1050,11 +1245,12 @@ void register_window_callbacks (JNIEnv* env)
       {"onTouchCallback", "(IIFF)V", (void*)&on_touch_callback},
       {"onDoubletapCallback", "(IFF)V", (void*)&on_doubletap_callback},
       {"onTrackballCallback", "(IIFF)V", (void*)&on_trackball_callback},
-      {"onKeyCallback", "(IIZZZ)V", (void*)&on_key_callback},
+      {"onKeyCallback", "(IIZZZI)V", (void*)&on_key_callback},
       {"onFocusCallback", "(Z)V", (void*)&on_focus_callback},
       {"onSurfaceCreatedCallback", "()V", (void*)&on_surface_created_callback},
       {"onSurfaceDestroyedCallback", "()V", (void*)&on_surface_destroyed_callback},
       {"onSurfaceChangedCallback", "(III)V", (void*)&on_surface_changed_callback},
+      {"onVisibilityCallback", "(Z)V", (void*)&on_visibility_callback},
     };
 
     static const size_t methods_count = sizeof (methods) / sizeof (*methods);

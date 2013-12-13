@@ -82,8 +82,6 @@ class TestInput: virtual public IDevice, public xtl::reference_counter
     typedef xtl::signal<void (const char*)> DeviceSignal;
 
   private:
-    float        dead_zone;
-    float        saturation_zone;
     DeviceSignal signals;
     stl::wstring control_name;
 };

@@ -99,7 +99,7 @@ const char* get_audio_session_error_name (OSStatus error)
     case kAudioSessionInitializationError:      return "There was an error during audio session initialization.";
     case kAudioSessionUnsupportedPropertyError: return "The audio session property is not supported.";
     case kAudioSessionBadPropertySizeError:     return "The size of the audio session property data was not correct.";
-    case kAudioSessionNotActiveError:           return "The operation failed because your application’s audio session was not active.";
+    case kAudioSessionNotActiveError:           return "The operation failed because your application's audio session was not active.";
     case kAudioServicesNoHardwareError:         return "The audio operation failed because the device has no audio input available.";
     case kAudioSessionNoCategorySet:            return "The audio operation failed because it requires the audio session to have an explicitly-set category, but none was set. To use a hardware codec you must explicitly initialize the audio session and explicitly set an audio session category.";
     case kAudioSessionIncompatibleCategory:     return "The specified audio session category cannot be used for the attempted audio operation. For example, you attempted to play or record audio with the audio session category set to kAudioSessionCategory_AudioProcessing.";

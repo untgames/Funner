@@ -3,6 +3,7 @@
 
 #include <shared/default_cookie_manager.h>
 #include <shared/default_screen_manager.h>
+#include <shared/default_screen_keyboard_manager.h>
 #include <shared/default_sensor_manager.h>
 #include <shared/default_window_manager.h>
 #include <shared/default_library_manager.h>
@@ -355,6 +356,7 @@ class WindowsPlatform
  , public WindowsScreenManager
  , public DefaultSensorManager
  , public DefaultCookieManager
+ , public DefaultScreenKeyboardManager
 {
 };
 

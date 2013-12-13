@@ -209,7 +209,7 @@ struct SceneInputManager::Impl: public xtl::reference_counter, public IScreenLis
     }
   }
   
-///Изменение размеров экрана  
+///Изменение размеров экрана
   void OnScreenChangeArea (const Rect& rect)
   {
     screen_size   = math::vec2f (float (rect.right () - rect.left ()), float (rect.bottom () - rect.top ()));
@@ -424,8 +424,6 @@ struct SceneInputManager::Impl: public xtl::reference_counter, public IScreenLis
       
       //диспетчеризация события
 
-    math::vec2f position = event.position;
-    
     TouchProcessingContext touch_context (event);
 
       //поиск зоны

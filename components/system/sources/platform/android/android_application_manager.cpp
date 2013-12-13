@@ -12,7 +12,8 @@ class AndroidApplicationDelegate;
 
 AndroidApplicationDelegate* volatile application_delegate = 0;
 
-static bool screen_saver_state = true;
+static bool                      screen_saver_state = true;
+static ApplicationBackgroundMode background_mode    = ApplicationBackgroundMode_Suspend;
 
 template <class Fn> class ActivityMessage: public MessageQueue::Message
 {
@@ -34,7 +35,8 @@ class AndroidApplicationDelegate: public IApplicationDelegate, public xtl::refer
   public:
 ///Конструктор
     AndroidApplicationDelegate ()
-      : message_queue (*MessageQueueSingleton::Instance ())    
+      : background_mode_after_pause (ApplicationBackgroundMode_Suspend)
+      , message_queue (*MessageQueueSingleton::Instance ())    
       , log (LOG_NAME)
     {
       if (application_delegate)
@@ -148,12 +150,22 @@ class AndroidApplicationDelegate: public IApplicationDelegate, public xtl::refer
           return;
           
         is_paused = in_is_paused;
+
+        if (in_is_paused)
+          background_mode_after_pause = background_mode;
         
         pause_condition.NotifyOne ();
       }
 
       if (!state)
-        PushMessage (xtl::bind (&AndroidApplicationDelegate::OnPause, this));        
+      {
+        PushMessage (xtl::bind (&AndroidApplicationDelegate::OnPause, this));
+      }
+      else
+      {
+        if (background_mode_after_pause == ApplicationBackgroundMode_Active)
+          PushMessage (xtl::bind (&AndroidApplicationDelegate::OnResumeInActiveMode, this));
+      }
     }
     
 ///Оповещение о приостановке приложения
@@ -164,17 +176,31 @@ class AndroidApplicationDelegate: public IApplicationDelegate, public xtl::refer
         
       log.Printf ("Application paused");
 
+      if (background_mode_after_pause == ApplicationBackgroundMode_Active)
+        return;       
+
       {
         Lock lock (pause_mutex);
 
         while (is_paused)
           pause_condition.Wait (pause_mutex);        
       }
-      
-      log.Printf ("Application resumed");      
+
+      OnResume ();
+    }
+
+    void OnResume ()
+    {
+      log.Printf ("Application resumed");
 
       if (listener)
-        listener->OnResume ();      
+        listener->OnResume ();
+    }
+
+///Оповещение о возврате приложения из сна (вызывается только в случае ApplicationBackgroundMode_Active)
+    void OnResumeInActiveMode ()
+    {
+      OnResume ();
     }
 
 ///Оповещение о недостаточности памяти
@@ -193,7 +219,7 @@ class AndroidApplicationDelegate: public IApplicationDelegate, public xtl::refer
     void Release ()
     {
       release (this);
-    }    
+    }
     
   private:
 ///Отложенное события выхода из приложения
@@ -245,17 +271,18 @@ class AndroidApplicationDelegate: public IApplicationDelegate, public xtl::refer
         exception.touch ("syslib::android::AndroidApplicationDelegate::DoNextEvent");
         throw;
       }
-    }      
+    }
 
   private:
-    bool                  idle_enabled;
-    bool                  is_exited;
-    volatile bool         is_paused;
-    Mutex                 pause_mutex;
-    Condition             pause_condition;
-    IApplicationListener* listener;
-    MessageQueue&         message_queue;    
-    common::Log           log;
+    bool                      idle_enabled;
+    bool                      is_exited;
+    volatile bool             is_paused;
+    Mutex                     pause_mutex;
+    Condition                 pause_condition;
+    ApplicationBackgroundMode background_mode_after_pause;
+    IApplicationListener*     listener;
+    MessageQueue&             message_queue;
+    common::Log               log;
 };
 
 /*
@@ -286,6 +313,20 @@ void on_low_memory_callback (JNIEnv& env, jobject activity)
     return;
 
   AndroidApplicationDelegate::PushMessage (xtl::bind (&AndroidApplicationDelegate::OnMemoryWarning, application_delegate));
+}
+
+/*
+    Посылка сообщения приложению
+*/
+
+void post_notification_impl (const stl::string& notification)
+{
+  Application::PostNotification (notification.c_str ());
+}
+
+void post_notification (JNIEnv& env, jobject, jstring notification)
+{
+  AndroidApplicationDelegate::PushMessage (xtl::bind (&post_notification_impl, tostring (notification)));
 }
 
 }
@@ -328,7 +369,7 @@ void AndroidApplicationManager::OpenUrl (const char* url)
 }
 
 /*
-   Управление энергосбережением
+    Управление энергосбережением
 */
 
 void AndroidApplicationManager::SetScreenSaverState (bool state)
@@ -393,6 +434,23 @@ void AndroidApplicationManager::GetSystemProperties (common::PropertyMap& proper
   }
 }
 
+/*
+    Управление режимом работы в фоне
+*/
+
+void AndroidApplicationManager::SetApplicationBackgroundMode (syslib::ApplicationBackgroundMode mode)
+{
+  background_mode = mode;
+
+  if (background_mode == ApplicationBackgroundMode_Active && application_delegate)
+    application_delegate->SetActivityState (true);    
+}
+
+ApplicationBackgroundMode AndroidApplicationManager::GetApplicationBackgroundMode ()
+{
+  return background_mode;
+}
+
 namespace syslib
 {
 
@@ -414,6 +472,7 @@ void register_activity_callbacks (JNIEnv* env, jclass activity_class)
       {"onPauseCallback", "()V", (void*)&on_pause_callback},
       {"onResumeCallback", "()V", (void*)&on_resume_callback},
       {"onLowMemoryCallback", "()V", (void*)&on_low_memory_callback},
+      {"postNotification", "(Ljava/lang/String;)V", (void*)&post_notification},
     };
 
     static const size_t methods_count = sizeof (methods) / sizeof (*methods);

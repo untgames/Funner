@@ -74,8 +74,6 @@ class XmlAnimationLibraryLoader
 
     template <class T> void ParseSpecificKeyInfo (Parser::Iterator key_iter, math::spline_bezier_key<T>& key)
     {
-      typedef typename math::spline_bezier_key<T>::value_type value_type;
-
       const char *inner_value_string = get<const char*> (*key_iter, "inner_value"),
                  *outer_value_string = get<const char*> (*key_iter, "outer_value");
 

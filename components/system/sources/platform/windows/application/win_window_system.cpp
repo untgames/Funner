@@ -554,7 +554,7 @@ LRESULT CALLBACK WindowMessageHandler (HWND wnd, UINT message, WPARAM wparam, LP
 
 #ifndef WINCE
     case WM_SYSCOMMAND:
-      if (wparam == SC_SCREENSAVE && !Application::GetScreenSaverState ())
+      if (wparam == SC_SCREENSAVE && !Application::ScreenSaverState ())
         return 0;
 
       break;

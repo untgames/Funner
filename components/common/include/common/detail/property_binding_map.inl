@@ -54,14 +54,20 @@ inline void copy_float_from (const PropertyMap& map, size_t property_index, T& v
   value = static_cast<T> (map.GetFloat (property_index));
 }
 
-template <class T, unsigned int Size>
-inline void copy_vector_from (const PropertyMap& map, size_t property_index, math::vector<T, Size>& value)
+template <class Intermediate, class T, unsigned int Size>
+inline void copy_vector_from_helper (const PropertyMap& map, size_t property_index, math::vector<T, Size>& value)
 {
-  math::vector<float, 4> src;
+  Intermediate src;
   
   map.GetProperty (property_index, src);
 
   value = src;
+}
+
+template <class T, unsigned int Size>
+inline void copy_vector_from (const PropertyMap& map, size_t property_index, math::vector<T, Size>& value)
+{
+  copy_vector_from_helper<math::vector<float, 4> > (map, property_index, value);
 }
 
 inline void copy_vector_from (const PropertyMap& map, size_t property_index, math::vector<float, 4>& value)
@@ -69,14 +75,20 @@ inline void copy_vector_from (const PropertyMap& map, size_t property_index, mat
   map.GetProperty (property_index, value);
 }
 
-template <class T, unsigned int Size>
-inline void copy_matrix_from (const PropertyMap& map, size_t property_index, math::matrix<T, Size>& value)
+template <class Intermediate, class T, unsigned int Size>
+inline void copy_matrix_from_helper (const PropertyMap& map, size_t property_index, math::matrix<T, Size>& value)
 {
-  math::matrix<float, 4> src;
+  Intermediate src;
   
   map.GetProperty (property_index, src);
 
   value = src;
+}
+
+template <class T, unsigned int Size>
+inline void copy_matrix_from (const PropertyMap& map, size_t property_index, math::matrix<T, Size>& value)
+{
+  copy_matrix_from_helper<math::matrix<float, 4> > (map, property_index, value);
 }
 
 inline void copy_matrix_from (const PropertyMap& map, size_t property_index, math::matrix<float, 4>& value)
@@ -342,12 +354,18 @@ inline void copy_to (const math::matrix<T, 4>& value, PropertyMap& map, const Pr
   detail::copy_value_to<math::matrix<float, 4> > (value, map, property_selector);
 }
 
+template <class Intermediate, class T>
+inline void copy_to_helper (const math::quat<T>& value, PropertyMap& map, const PropertySelector& property_selector)
+{
+  Intermediate v = reinterpret_cast<const math::vector<T, 4>&> (value);
+
+  set_property (map, property_selector, v);
+}
+
 template <class T>
 inline void copy_to (const math::quat<T>& value, PropertyMap& map, const PropertySelector& property_selector)
 {
-  math::vector<float, 4> v = reinterpret_cast<const math::vector<T, 4>&> (value);
-
-  set_property (map, property_selector, v);
+  copy_to_helper<math::vector<float, 4> > (value, map, property_selector);
 }
 
 inline void copy_to (const math::quat<float>& value, PropertyMap& map, const PropertySelector& property_selector)

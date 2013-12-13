@@ -40,10 +40,23 @@
 namespace syslib
 {
 
+namespace iphone
+{
+
 bool is_in_run_loop (); //запущен ли главный цикл
+
+typedef stl::vector <IWindowListener*> WindowListenerArray;
+
+//forward declarations
+struct WindowImpl;
 
 }
 
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Делегат приложения
+///////////////////////////////////////////////////////////////////////////////////////////////////
 @class ApplicationDelegateInternal;
 
 @interface ApplicationDelegate : NSObject
@@ -54,6 +67,23 @@ bool is_in_run_loop (); //запущен ли главный цикл
 
 -(void)setMainViewVisible:(bool)state;
 -(bool)isMainViewVisible;
+
+@end
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Распределитель событий окна
+///////////////////////////////////////////////////////////////////////////////////////////////////
+@interface UIWindowWrapper : UIWindow
+{
+  @private
+    syslib::iphone::WindowListenerArray *listeners;            //подписчика на события
+    syslib::iphone::WindowImpl          *window_impl;          //окно
+    syslib::WindowEventContext          *event_context;        //контекст, передаваемый обработчикам событий
+    UIViewController                    *root_view_controller; //корневой контроллер
+    int                                 allowed_orientations;  //разрешенные ориентации окна
+}
+
+-(void)onCharInput:(wchar_t)char_code;
 
 @end
 

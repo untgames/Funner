@@ -23,13 +23,15 @@ typedef xtl::com_ptr<FrameBuffer> FrameBufferPtr;
 
 struct WindowEntry: public xtl::trackable, public xtl::reference_counter
 {
-  Window&        window;          //окно
-  FrameBufferPtr frame_buffer;    //буфера кадров
-  SwapChainDesc  swap_chain_desc; //дескриптор цепочки обмена
+  Window&        window;              //окно
+  const void*    saved_window_handle; //сохраненный дескриптор окна
+  FrameBufferPtr frame_buffer;        //буфера кадров
+  SwapChainDesc  swap_chain_desc;     //дескриптор цепочки обмена
 
 ///Конструктор
     WindowEntry (syslib::Window& in_window, const ParseNode& cfg_node)
       : window (in_window)
+      , saved_window_handle (window.Handle ())
     {
         //чтение параметров инициализации устройства отрисовки
 
@@ -271,7 +273,12 @@ class Driver::RendererEntry: public xtl::reference_counter
 ///Обработчик события смены оконного дескриптора
     void OnChangeWindowHandle (WindowEntry& window_entry)
     {
-      if (!window_entry.window.Handle ())
+      const void* current_window_handle = window_entry.window.Handle ();
+
+      if (window_entry.saved_window_handle == current_window_handle)
+        return;
+
+      if (!current_window_handle)
       {
         if (renderer)          
           renderer->RemoveFrameBuffer (window_entry.frame_buffer.get ());
@@ -289,6 +296,8 @@ class Driver::RendererEntry: public xtl::reference_counter
 
       if (renderer)
         renderer->AddFrameBuffer (window_entry.frame_buffer.get (), reinterpret_cast<size_t> (&window_entry));
+
+      window_entry.saved_window_handle = current_window_handle;
     }
 
 ///Обработчик события изменения области вывода

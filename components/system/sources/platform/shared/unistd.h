@@ -5,6 +5,7 @@
 #include <shared/default_library_manager.h>
 #include <shared/default_timer_manager.h>
 #include <shared/default_application_manager.h>
+#include <shared/default_screen_keyboard_manager.h>
 #include <shared/pthread_manager.h>
 
 namespace syslib
@@ -66,6 +67,7 @@ class UnistdPlatform
  , public DefaultScreenManager 
  , public DefaultSensorManager 
  , public DefaultCookieManager
+ , public DefaultScreenKeyboardManager
 {
 };
 

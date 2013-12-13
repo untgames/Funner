@@ -288,7 +288,7 @@ void ContextCaps::Init (const ExtensionSet& available_extension_set, const Exten
                    OES_texture_cube_map           = "GL_OES_texture_cube_map",
                    OES_packed_depth_stencil       = "GL_OES_packed_depth_stencil",
                    EXT_texture_compression_s3tc   = "GL_EXT_texture_compression_s3tc",
-                   EXT_texture_filter_anisotropic = "GL_EXT_texture_filter_anisotropic",
+//                   EXT_texture_filter_anisotropic = "GL_EXT_texture_filter_anisotropic",
                    IMG_texture_compression_pvrtc  = "GL_IMG_texture_compression_pvrtc",
                    AMD_compressed_ATC_texture     = "GL_AMD_compressed_ATC_texture",
                    ATI_texture_compression_atitc  = "GL_ATI_texture_compression_atitc";

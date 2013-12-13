@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<License LicenseHash="80cb51647709662635d095f94ea3a197" SinceDate="2013-01-16" TillDate="2013-03-16">
+<License LicenseHash="2c6bd3ccb59b616668bacaf65dd65c6e" SinceDate="2013-11-01" TillDate="2014-01-01">
   <AllowedComponents>
     <Component Wildcard="*"/>
   </AllowedComponents>

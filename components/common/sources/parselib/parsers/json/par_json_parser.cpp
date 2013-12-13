@@ -143,11 +143,11 @@ class JsonParser
 
       builder.BeginNode (ARRAY_NODE_NAME, lexer.LineNumber ());
 
-      lexer.NextLexem ();
-
       bool has_objects  = lexer.ArrayHasObjects (),
            value_parsed = false, //value was parsed, but comma was not occured
            comma_active = false; //no value was parsed after last comma
+
+      lexer.NextLexem ();
 
       for (;;lexer.NextLexem ())
       {

@@ -17,7 +17,7 @@ enum EntrySearch
 {
   EntrySearch_Library = 1, //искать в библиотеке
   EntrySearch_Context = 2, //искать в контексте
-  EntrySearch_NoThrow = 4, //без исключений, возвращать 0 в случае ошибки    
+  EntrySearch_NoThrow = 4, //без исключений, возвращать 0 в случае ошибки
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -29,7 +29,7 @@ class ILibrary
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Получение адреса точки входа
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    virtual const void* GetProcAddress (const char* name, size_t search_flags) = 0;
+    virtual void* GetProcAddress (const char* name, size_t search_flags) = 0;
 
   protected:
     virtual ~ILibrary () {}

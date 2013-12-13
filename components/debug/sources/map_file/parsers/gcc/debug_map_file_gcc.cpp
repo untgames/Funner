@@ -202,7 +202,7 @@ class GccMapFileParser
       {        
         if (char* s = strstr (line, "*("))
         {
-          if (s = strstr (s, "*)"))
+          if ((s = strstr (s, "*)")))
             line = s + 2;
         }
 
@@ -316,7 +316,7 @@ class GccMapFileParser
     stl::string file_content;      //содержимое файла
     size_t      line_number;       //номер строки разбора
     State       state;             //состояние разбора
-    TokenList   tokens;            //токены строки разбора        
+    TokenList   tokens;            //токены строки разбора
     const char* sym_header;        //заголовок символа
     size_t      sym_start_address; //начальный адрес
     size_t      sym_size;          //размер символа

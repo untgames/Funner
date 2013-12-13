@@ -168,6 +168,7 @@ class LinuxPlatform
  , public DefaultScreenManager 
  , public DefaultSensorManager 
  , public DefaultCookieManager
+ , public DefaultScreenKeyboardManager
 {
 };
 

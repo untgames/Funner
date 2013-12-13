@@ -14,6 +14,7 @@ EXTERN.LUALIB.INCLUDE_DIRS         := include				   #Относительные пути к катало
 EXTERN.LUALIB.SOURCE_DIRS          := sources           #Относительные пути к каталогам c исходными файлами
 EXTERN.LUALIB.msvc.COMPILER_CFLAGS := -TP               #Флаги сборки (зависят от конфигурации)
 EXTERN.LUALIB.g++.COMPILER_CFLAGS  := -x c++
+EXTERN.LUALIB.clang.COMPILER_CFLAGS   := -w -x c++
 EXTERN.LUALIB.android.COMPILER_CFLAGS := -include android_lconv_wrapper.h
 EXTERN.LUALIB.wince.COMPILER_CFLAGS   := -FIwince_wrapper.h -DLUA_ANSI
 EXTERN.LUALIB.wp8.COMPILER_CFLAGS     := -FIwp8_wrapper.h
@@ -26,6 +27,7 @@ EXTERN.LUA_UTILS.LIBS                   := funner.extern.lua       #Список испол
 EXTERN.LUA_UTILS.TARGET_DIR              = $(DIST_BIN_DIR)
 EXTERN.LUA_UTILS.msvc.COMPILER_CFLAGS   := -TP              #Флаги сборки (зависят от конфигурации)
 EXTERN.LUA_UTILS.g++.COMPILER_CFLAGS    := -x c++
+EXTERN.LUA_UTILS.clang.COMPILER_CFLAGS  := -x c++
 EXTERN.LUA_UTILS.bada_simulator.IMPORTS := link.extern.bada_addons
 EXTERN.LUA_UTILS.wp8.COMPILER_CFLAGS    := -FIwp8_wrapper.h
 

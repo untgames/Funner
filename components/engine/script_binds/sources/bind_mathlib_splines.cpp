@@ -81,9 +81,6 @@ typename T::value_type eval (T& spline, typename T::time_type time)
 template <class T>
 void bind_spline_library (InvokerRegistry& lib)
 {
-  typedef typename T::time_type  time_type;
-  typedef typename T::value_type value_type;
-
     //регистрация функций
 
   lib.Register ("get_BeginWrap",  make_invoker (&T::begin_wrap));
