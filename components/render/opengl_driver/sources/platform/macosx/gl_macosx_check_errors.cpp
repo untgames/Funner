@@ -36,11 +36,11 @@ const char* get_quartz_error_name (CGError error)
     case kCGErrorInvalidConnection: return "kCGErrorInvalidConnection";
     case kCGErrorInvalidContext:    return "kCGErrorInvalidContext";
     case kCGErrorCannotComplete:    return "kCGErrorCannotComplete";
-    case kCGErrorNameTooLong:       return "kCGErrorNameTooLong";
+    case 1005:                      return "kCGErrorNameTooLong";           //was kCGErrorNameTooLong till 10.8 SDK
     case kCGErrorNotImplemented:    return "kCGErrorNotImplemented";
     case kCGErrorRangeCheck:        return "kCGErrorRangeCheck";
     case kCGErrorTypeCheck:         return "kCGErrorTypeCheck";
-    case kCGErrorNoCurrentPoint:    return "kCGErrorNoCurrentPoint";
+    case 1009:                      return "kCGErrorNoCurrentPoint";        //was kCGErrorNoCurrentPoint till 10.8 SDK
     case kCGErrorInvalidOperation:  return "kCGErrorInvalidOperation";
     case kCGErrorNoneAvailable:     return "kCGErrorNoneAvailable";
     default:                        return "Unknown error";
