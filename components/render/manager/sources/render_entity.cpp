@@ -336,7 +336,7 @@ class EntityLodCommonData: public CacheHolder, public DebugIdHolder
 
 typedef stl::vector<RendererOperation> RendererOperationArray;
 
-struct EntityLod: public xtl::reference_counter, public CacheHolder, public DebugIdHolder, public IPrimitiveUpdateListener
+struct EntityLod: public xtl::reference_counter, public CacheHolder, public DebugIdHolder
 {
   EntityLodCommonData&          common_data;           //общие данные для всех уровней детализации
   size_t                        level_of_detail;       //номер уровня детализации
@@ -367,9 +367,6 @@ struct EntityLod: public xtl::reference_counter, public CacheHolder, public Debu
 ///Деструктор
   ~EntityLod ()
   {
-    if (cached_primitive)
-      cached_primitive->DetachListener (this);
-
     if (common_data.DeviceManager ()->Settings ().HasDebugLog ())
       Log ().Printf ("Entity lod destroyed (entity_id=%u, id=%u)", common_data.Id (), Id ());
   }
@@ -380,9 +377,6 @@ struct EntityLod: public xtl::reference_counter, public CacheHolder, public Debu
     if (common_data.DeviceManager ()->Settings ().HasDebugLog ())
       Log ().Printf ("Reset entity lod cache (entity_id=%u, id=%u)", common_data.Id (), Id ());
 
-    if (cached_primitive)
-      cached_primitive->DetachListener (this);
-        
     cached_primitive = PrimitivePtr ();
 
     dynamic_primitives.RemoveAllPrimitives ();
@@ -409,10 +403,6 @@ struct EntityLod: public xtl::reference_counter, public CacheHolder, public Debu
 
       if (!cached_primitive)
         throw xtl::format_operation_exception ("", "Primitive '%s' not found", primitive.Name ());
-
-        //регистрация слушателя
-      
-      cached_primitive->AttachListener (this);
 
         //заполнение динамических примитивов
 
