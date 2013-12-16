@@ -129,7 +129,7 @@ inline SharedQueue<T, Allocator>::~SharedQueue ()
 template <class T, class Allocator>
 inline size_t SharedQueue<T, Allocator>::Size () const
 {
-  Impl::Guard guard (&impl->lock);
+  typename Impl::Guard guard (&impl->lock);
 
   return impl->queue.size ();
 }
@@ -143,7 +143,7 @@ inline size_t SharedQueue<T, Allocator>::MaxSize () const
 template <class T, class Allocator>
 inline bool SharedQueue<T, Allocator>::IsEmpty () const
 {
-  Impl::Guard guard (&impl->lock);
+  typename Impl::Guard guard (&impl->lock);
 
   return impl->queue.empty ();
 }
@@ -189,7 +189,7 @@ inline T SharedQueue<T, Allocator>::Pop ()
 template <class T, class Allocator>
 inline bool SharedQueue<T, Allocator>::TryPush (const T& value, size_t timeout)
 {
-  Impl::Guard guard (&impl->lock);
+  typename Impl::Guard guard (&impl->lock);
 
   if (impl->WaitOverflow (timeout))
   {
@@ -207,7 +207,7 @@ inline bool SharedQueue<T, Allocator>::TryPush (const T& value, size_t timeout)
 template <class T, class Allocator>
 inline bool SharedQueue<T, Allocator>::TryPop (T& value, size_t timeout)
 {
-  Impl::Guard guard (&impl->lock);
+  typename Impl::Guard guard (&impl->lock);
 
   if (impl->WaitUnderflow (timeout))
   {

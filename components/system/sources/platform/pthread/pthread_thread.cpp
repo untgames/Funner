@@ -215,6 +215,9 @@ void PThreadManager::SetThreadPriority (thread_t thread, ThreadPriority thread_p
 
 void PThreadManager::SetThreadAffinity (thread_t thread, size_t affinity)
 {
+#ifdef __APPLE__
+  throw xtl::format_not_supported_exception ("syslib::PThreadManager::SetThreadAffinity");
+#else
   try
   {
     if (!thread || !thread->thread)
@@ -240,4 +243,5 @@ void PThreadManager::SetThreadAffinity (thread_t thread, size_t affinity)
     exception.touch ("syslib::PThreadManager::SetThreadAffinity");
     throw;
   }
+#endif
 }
