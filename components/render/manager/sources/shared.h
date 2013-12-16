@@ -66,6 +66,8 @@ class ShaderOptionsCache;
 class TextureManager;
 class InstantiatedEffect;
 struct RendererOperationList;
+struct RendererPrimitive;
+struct RendererPrimitiveGroup;
 struct RenderTargetDesc;
 struct ShaderOptions;
 
@@ -202,6 +204,7 @@ class DebugIdHolder: public xtl::noncopyable
 
 #include "cache_manager.h"
 #include "cache_map.h"
+#include "dynamic_primitive.h"
 #include "dynamic_primitive_buffer.h"
 #include "dynamic_texture.h"
 #include "effect.h"

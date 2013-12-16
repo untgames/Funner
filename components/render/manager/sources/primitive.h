@@ -2,6 +2,7 @@
 class PrimitiveBuffersImpl;
 class IPrimitiveUpdateListener; //TODO: нужно ли???
 class PrimitiveUpdateNotifier;
+class IDynamicPrimitive;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///¬ершина спрайта / вершина линии
