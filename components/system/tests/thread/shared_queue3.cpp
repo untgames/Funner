@@ -56,8 +56,14 @@ int main ()
 
     Thread consumer_thread (&consumer), producer_thread (&producer);
 
-    consumer_thread.SetAffinity (1 << 1);
-    producer_thread.SetAffinity (1 << 3);
+    try
+    {
+      consumer_thread.SetAffinity (1 << 1);
+      producer_thread.SetAffinity (1 << 3);
+    }
+    catch (...)
+    {
+    }
 
     consumer_thread.Join ();
     producer_thread.Join ();
