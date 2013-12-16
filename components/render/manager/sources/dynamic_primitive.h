@@ -52,6 +52,16 @@ class DynamicPrimitiveEntityStorage: public CacheSource
     size_t                  RendererPrimitiveGroupsCount ();
     RendererPrimitiveGroup* RendererPrimitiveGroups      ();
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Управление кэшированием
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    using CacheSource::UpdateCache;
+    using CacheSource::ResetCache;
+      
+  private:
+    void UpdateCacheCore ();
+    void ResetCacheCore ();
+
   private:
     struct Impl;
     stl::auto_ptr<Impl> impl;

@@ -595,6 +595,23 @@ RendererPrimitiveGroup* PrimitiveImpl::RendererPrimitiveGroups ()
 }
 
 /*
+    ѕолучение динамических примитивов
+*/
+
+void PrimitiveImpl::FillDynamicPrimitiveStorage (DynamicPrimitiveEntityStorage& storage)
+{
+  try
+  {
+//    throw xtl::make_not_implemented_exception (__FUNCTION__);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::manager::PrimitiveImpl::FillDynamicPrimitiveStorage");
+    throw;
+  }
+}
+
+/*
     –егистраци€ слушателей обновлени€ примитивов рендеринга
 */
 

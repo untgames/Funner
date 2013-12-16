@@ -27,12 +27,10 @@ struct DynamicPrimitiveEntityStorage::Impl
   EntityImpl&           entity;             //ссылка на объект
   DynamicPrimitiveArray primitives;         //список динамических примитивов
   GroupArray            groups;             //группы примитивов рендеринга
-  bool                  need_update_groups; //требуется ли обновление групп
 
 /// Конструктор
   Impl (EntityImpl& in_entity)
     : entity (in_entity)
-    , need_update_groups ()
   {
   }
 };
@@ -59,22 +57,10 @@ void DynamicPrimitiveEntityStorage::UpdateOnPrerender ()
 {
   try
   {
-      //очистка групп
-
-    impl->groups.clear ();
-
-    impl->need_update_groups = false;
-
-      //обновление примитивов и групп
-
-    impl->groups.reserve (impl->primitives.size ());
+      //обновление примитивов
 
     for (DynamicPrimitiveArray::iterator iter=impl->primitives.begin (), end=impl->primitives.end (); iter!=end; ++iter)
-    {
       iter->primitive->UpdateOnPrerender (impl->entity);
-
-      impl->groups.push_back (iter->primitive->RendererPrimitiveGroup ());
-    }
   }
   catch (xtl::exception& e)
   {
@@ -121,7 +107,7 @@ void DynamicPrimitiveEntityStorage::AddPrimitive (DynamicPrimitive* primitive)
 
       AttachCacheSource (*primitive);
 
-      impl->need_update_groups = true;
+      InvalidateCacheDependencies ();
     }
     catch (...)
     {
@@ -148,7 +134,7 @@ void DynamicPrimitiveEntityStorage::RemovePrimitive (DynamicPrimitive* primitive
 
       impl->primitives.erase (iter);
 
-      impl->need_update_groups = true;
+      InvalidateCacheDependencies ();
 
       return;
     }
@@ -159,9 +145,8 @@ void DynamicPrimitiveEntityStorage::RemoveAllPrimitives ()
   DetachAllCacheSources ();
 
   impl->primitives.clear ();
-  impl->groups.clear ();
 
-  impl->need_update_groups = true;
+  InvalidateCacheDependencies ();
 }
 
 /*
@@ -170,27 +155,52 @@ void DynamicPrimitiveEntityStorage::RemoveAllPrimitives ()
 
 size_t DynamicPrimitiveEntityStorage::RendererPrimitiveGroupsCount ()
 {
-  if (impl->need_update_groups)
-  {
-    impl->groups.clear ();
-
-    impl->need_update_groups = true;
-  }
+  UpdateCache ();
 
   return impl->groups.size ();
 }
 
 RendererPrimitiveGroup* DynamicPrimitiveEntityStorage::RendererPrimitiveGroups ()
 {
-  if (impl->need_update_groups)
-  {
-    impl->groups.clear ();
-
-    impl->need_update_groups = true;
-  }
+  UpdateCache ();
 
   if (impl->groups.empty ())
     return 0;
 
   return &impl->groups [0];
+}
+
+/*
+    Управление кэшированием
+*/
+      
+void DynamicPrimitiveEntityStorage::UpdateCacheCore ()
+{
+  try
+  {
+      //очистка групп
+
+    impl->groups.clear ();
+
+      //обновление групп
+
+    impl->groups.reserve (impl->primitives.size ());
+
+    for (DynamicPrimitiveArray::iterator iter=impl->primitives.begin (), end=impl->primitives.end (); iter!=end; ++iter)
+      impl->groups.push_back (iter->primitive->RendererPrimitiveGroup ());
+
+      //обновление зависимостей
+
+    InvalidateCacheDependencies ();
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::manager::DynamicPrimitiveEntityStorage::UpdateCacheCore");
+    throw;
+  }
+}
+
+void DynamicPrimitiveEntityStorage::ResetCacheCore ()
+{
+  impl->groups.clear ();
 }
