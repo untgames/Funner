@@ -28,6 +28,9 @@ const char* get_event_manager_error_name (OSStatus error)
 
 const char* get_quartz_error_name (CGError error)
 {
+  static const int kCGErrorNameTooLong    = 1005; //gone after 10.8 SDK
+  static const int kCGErrorNoCurrentPoint = 1009; //gone after 10.8 SDK
+
   switch (error)
   {
     case kCGErrorSuccess:           return "kCGErrorSuccess";
@@ -36,11 +39,11 @@ const char* get_quartz_error_name (CGError error)
     case kCGErrorInvalidConnection: return "kCGErrorInvalidConnection";
     case kCGErrorInvalidContext:    return "kCGErrorInvalidContext";
     case kCGErrorCannotComplete:    return "kCGErrorCannotComplete";
-    case 1005:                      return "kCGErrorNameTooLong";           //was kCGErrorNameTooLong till 10.8 SDK
+    case kCGErrorNameTooLong:       return "kCGErrorNameTooLong";
     case kCGErrorNotImplemented:    return "kCGErrorNotImplemented";
     case kCGErrorRangeCheck:        return "kCGErrorRangeCheck";
     case kCGErrorTypeCheck:         return "kCGErrorTypeCheck";
-    case 1009:                      return "kCGErrorNoCurrentPoint";        //was kCGErrorNoCurrentPoint till 10.8 SDK
+    case kCGErrorNoCurrentPoint:    return "kCGErrorNoCurrentPoint";
     case kCGErrorInvalidOperation:  return "kCGErrorInvalidOperation";
     case kCGErrorNoneAvailable:     return "kCGErrorNoneAvailable";
     default:                        return "Unknown error";
