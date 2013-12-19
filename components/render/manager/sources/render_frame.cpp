@@ -614,9 +614,14 @@ void FrameImpl::Prerender (EntityDrawFunction entity_draw_handler)
       //заполнение константного буфера соответствующего паре frame-entity
 
     if (has_entity_draw_handler && lod_desc.has_frame_independent_operations)
+    {
       entities_properties.Convert (entity_draw_params.properties, desc.property_buffer, desc.layout);
-
-      //TODO: use NULL property buffer in the 'else' case
+    }
+    else
+    {
+      desc.property_buffer = LowLevelBufferPtr ();
+      desc.layout          = ProgramParametersLayoutPtr ();
+    }
 
       //добавление операций рендеринга
 
