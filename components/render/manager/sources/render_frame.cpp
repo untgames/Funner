@@ -611,7 +611,13 @@ void FrameImpl::Prerender (EntityDrawFunction entity_draw_handler)
       lod          = impl->GetLod (distance);
     }    
 
-    renderer.AddOperations (desc.entity->RendererOperations (lod, true), eye_distance, entity_draw_params.mvp_matrix, desc.property_buffer.get (), desc.layout.get ());
+      //получение информации об уровне детализации
+
+    const EntityLodDesc& lod_desc = desc.entity->GetLod (lod, true); 
+
+      //добавление операций рендеринга
+
+    renderer.AddOperations (lod_desc.operations, eye_distance, entity_draw_params.mvp_matrix, desc.property_buffer.get (), desc.layout.get ());
   }
 
   for (FrameArray::iterator iter=impl->frames.begin (), end=impl->frames.end (); iter!=end; ++iter)

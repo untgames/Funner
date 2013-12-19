@@ -114,7 +114,7 @@ size_t DynamicPrimitiveListImpl<T>::Add (size_t count, const Item* items)
       //проверка корректности аргументов
 
     if (!count)
-      return;
+      return impl->items.size ();
 
     if (!items)
       throw xtl::make_null_argument_exception ("", "items");
@@ -219,3 +219,10 @@ size_t DynamicPrimitiveListImpl<T>::Capacity ()
 {
   return impl->items.capacity (); 
 }
+
+/*
+    Инстанцирование
+*/
+
+template class DynamicPrimitiveListImpl<Sprite>;
+template class DynamicPrimitiveListImpl<Line>;

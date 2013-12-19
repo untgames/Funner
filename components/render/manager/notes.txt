@@ -31,14 +31,10 @@
 
   - StandaloneDynamicPrimitive
   - BatchingDynamicPrimitive
-  - добавить Entity::SetWorldMatrix
-  - ввести SpriteImpl, ссылающийся на RendererOperation
-  - перед отрисовкой прохода построить индексный буфер пакетных примитивов
+
+  - перед отрисовкой прохода построить индексный буфер пакетных примитивов UpdateOnPrerender
   - индексы в RendererPrimitive
-  - индексы в RendererOperation (для спрайтов и линий)
-  - добавить Frame::SetViewDirection
-  - добавить Frame::SetDynamicPrimitivesParams(const EntityDrawParams&)
-  - перед отрисовкой кадра строить вершинный буфер спрайтов (получать списки спрайтов у каждого Entity), обновлять индексы в SpriteImpl, 
-    обновлять RendererOperation, на который ссылается SpriteImpl
+  - добавить Frame::SetIdentityEntityDrawProperties(const common::PropertyMap&)
+  - перед отрисовкой кадра строить вершинный буфер спрайтов (получать списки спрайтов у каждого Entity)
   - в процессе отрисовки определять группы примитивов с общим хэшем пакета и отрисовывать их пакетом
-  - terminate propogation for AttachCacheSource /// update transactionid в Primitive???
+

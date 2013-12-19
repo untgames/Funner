@@ -23,6 +23,25 @@ struct RendererOperationList
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+///Информация о уровне детализации
+///////////////////////////////////////////////////////////////////////////////////////////////////
+struct EntityLodDesc
+{
+  RendererOperationList&         operations;                       //операции рендеринга
+  DynamicPrimitiveEntityStorage& dynamic_primitive_storage;        //хранилище динамических примитивов
+  bool                           has_frame_dependent_operations;   //есть ли операции зависящие от кадра
+  bool                           has_frame_independent_operations; //есть ли операции не зависящие от кадра
+
+  EntityLodDesc (RendererOperationList& in_operations, DynamicPrimitiveEntityStorage& in_storage)
+    : operations (in_operations)
+    , dynamic_primitive_storage (in_storage)
+    , has_frame_dependent_operations ()
+    , has_frame_independent_operations ()
+  {
+  }
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Объект рендеринга
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 class EntityImpl: public Object
@@ -85,21 +104,27 @@ class EntityImpl: public Object
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Точка в локальной системе координат объекта для расчёта удаленности от камеры
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-   void               SetLodPoint (const math::vec3f&);
-   const math::vec3f& LodPoint    ();
+    void               SetLodPoint (const math::vec3f&);
+    const math::vec3f& LodPoint    ();
    
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Управление областью отсечения объекта
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-   void            SetScissor      (const RectArea& scissor);
-   const RectArea& Scissor         ();
-   void            SetScissorState (bool state);
-   bool            ScissorState    ();
+    void            SetScissor      (const RectArea& scissor);
+    const RectArea& Scissor         ();
+    void            SetScissorState (bool state);
+    bool            ScissorState    ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Получение операций рендеринга
+///Получение информации об уровне детализации
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    const RendererOperationList& RendererOperations (size_t level_of_detail, bool find_nearest = false);
+    const EntityLodDesc& GetLod (size_t level_of_detail, bool find_nearest = false);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Обновление перед отрисовкой
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void UpdateOnPrerender (size_t level_of_detail, bool find_nearest);
+    void UpdateOnRender    (size_t level_of_detail, bool find_nearest, FrameImpl& frame);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Управление кэшированием

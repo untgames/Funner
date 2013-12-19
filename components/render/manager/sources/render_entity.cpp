@@ -336,7 +336,7 @@ class EntityLodCommonData: public CacheHolder, public DebugIdHolder
 
 typedef stl::vector<RendererOperation> RendererOperationArray;
 
-struct EntityLod: public xtl::reference_counter, public CacheHolder, public DebugIdHolder
+struct EntityLod: public xtl::reference_counter, public EntityLodDesc, public CacheHolder, public DebugIdHolder
 {
   EntityLodCommonData&          common_data;           //общие данные дл€ всех уровней детализации
   size_t                        level_of_detail;       //номер уровн€ детализации
@@ -348,7 +348,8 @@ struct EntityLod: public xtl::reference_counter, public CacheHolder, public Debu
 
 /// онструктор
   EntityLod (EntityLodCommonData& in_common_data, size_t in_level_of_detail, const PrimitiveProxy& in_primitive)
-    : common_data (in_common_data)
+    : EntityLodDesc (cached_operation_list, dynamic_primitives)
+    , common_data (in_common_data)
     , level_of_detail (in_level_of_detail)
     , primitive (in_primitive)
     , dynamic_primitives (common_data.Entity ())
@@ -845,10 +846,10 @@ bool EntityImpl::ScissorState ()
 }
 
 /*
-    ѕолучение операций рендеринга
+    ѕолучение информации об уровне детализации
 */
 
-const RendererOperationList& EntityImpl::RendererOperations (size_t level_of_detail, bool find_nearest)
+const EntityLodDesc& EntityImpl::GetLod (size_t level_of_detail, bool find_nearest)
 {
   try
   {    
@@ -861,13 +862,34 @@ const RendererOperationList& EntityImpl::RendererOperations (size_t level_of_det
 
     lod->UpdateCache ();
 
-    return lod->cached_operation_list;
+    return *lod;
   }
   catch (xtl::exception& e)
   {
-    e.touch ("render::manager::EntityImpl::RendererOperations");
+    e.touch ("render::manager::EntityImpl::GetLod");
     throw;
   }
+}
+
+/*
+    ќбновление перед отрисовкой
+*/
+
+void EntityImpl::UpdateOnPrerender (size_t level_of_detail, bool find_nearest)
+{
+  try
+  {    
+
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::manager::EntityImpl::UpdateOnPrerender");
+    throw;
+  }
+}
+
+void EntityImpl::UpdateOnRender (size_t level_of_detail, bool find_nearest, FrameImpl& frame)
+{
 }
 
 /*
