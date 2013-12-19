@@ -78,24 +78,24 @@ EglSurface::EglSurface (EGLDisplay egl_display, EGLConfig egl_config, const void
     jmethodID egl_create_window_surface     = find_method (&env, egl_class.get (), "eglCreateWindowSurface", "(Ljavax/microedition/khronos/egl/EGLDisplay;Ljavax/microedition/khronos/egl/EGLConfig;Ljava/lang/Object;[I)Ljavax/microedition/khronos/egl/EGLSurface;");
     jmethodID egl_destroy_surface           = find_method (&env, egl_class.get (), "eglDestroySurface", "(Ljavax/microedition/khronos/egl/EGLDisplay;Ljavax/microedition/khronos/egl/EGLSurface;)Z");
 
-    local_ref<jobject> egl = env.NewObject (egl_class.get (), egl_class_constructor);
+    local_ref<jobject> egl (env.NewObject (egl_class.get (), egl_class_constructor), false);
 
     if (!egl)
       throw xtl::format_operation_exception ("", "EGLImpl constructor failed");
 
-    local_ref<jobject> egl_config_wrapper = env.NewObject (egl_config_class.get (), egl_config_class_constructor, egl_config);
+    local_ref<jobject> egl_config_wrapper (env.NewObject (egl_config_class.get (), egl_config_class_constructor, egl_config), false);
 
     if (!egl_config_wrapper)
       throw xtl::format_operation_exception ("", "EGLConfigImpl constructor failed");
 
-    local_ref<jobject> egl_display_wrapper = env.NewObject (egl_display_class.get (), egl_display_class_constructor, egl_display);
+    local_ref<jobject> egl_display_wrapper (env.NewObject (egl_display_class.get (), egl_display_class_constructor, egl_display), false);
 
     if (!egl_display_wrapper)
       throw xtl::format_operation_exception ("", "EGLDisplayImpl constructor failed");      
 
     eglWaitGL ();
 
-    local_ref<jobject> egl_surface_wrapper = syslib::android::check_errors (env.CallObjectMethod (egl.get (), egl_create_window_surface, egl_display_wrapper.get (), egl_config_wrapper.get (), view, 0));
+    local_ref<jobject> egl_surface_wrapper (syslib::android::check_errors (env.CallObjectMethod (egl.get (), egl_create_window_surface, egl_display_wrapper.get (), egl_config_wrapper.get (), view, 0)), false);
 
     if (!egl_surface_wrapper)
       throw xtl::format_operation_exception ("", "EGLImpl::eglCreateWindowSurface failed");
