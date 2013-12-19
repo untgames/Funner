@@ -11,22 +11,21 @@ namespace
 
 struct DynamicPrimitiveDesc
 {
-  DynamicPrimitive*    primitive;
   xtl::auto_connection trackable_connection;
-
-  DynamicPrimitiveDesc () : primitive () { }
 };
 
 }
 
-typedef stl::vector<DynamicPrimitiveDesc>   DynamicPrimitiveArray;
+typedef stl::vector<DynamicPrimitive*>      DynamicPrimitiveArray;
+typedef stl::vector<DynamicPrimitiveDesc>   DescArray;
 typedef stl::vector<RendererPrimitiveGroup> GroupArray;
 
 struct DynamicPrimitiveEntityStorage::Impl
 {
-  EntityImpl&           entity;             //ссылка на объект
-  DynamicPrimitiveArray primitives;         //список динамических примитивов
-  GroupArray            groups;             //группы примитивов рендеринга
+  EntityImpl&           entity;     //ссылка на объект
+  DescArray             descs;      //дескрипторы динамических примитивов
+  DynamicPrimitiveArray primitives; //список динамических примитивов
+  GroupArray            groups;     //группы примитивов рендеринга
 
 /// Конструктор
   Impl (EntityImpl& in_entity)
@@ -50,6 +49,27 @@ DynamicPrimitiveEntityStorage::~DynamicPrimitiveEntityStorage ()
 }
 
 /*
+    Количество примитивов
+*/
+
+size_t DynamicPrimitiveEntityStorage::PrimitivesCount ()
+{
+  return impl->primitives.size ();
+}
+
+/*
+    Получение примитивов
+*/
+
+DynamicPrimitive** DynamicPrimitiveEntityStorage::Primitives ()
+{
+  if (impl->primitives.empty ())
+    return 0;
+
+  return &impl->primitives [0];
+}
+
+/*
     Добавление динамических примитивов
 */
 
@@ -60,18 +80,27 @@ void DynamicPrimitiveEntityStorage::AddPrimitive (DynamicPrimitive* primitive)
     if (!primitive)
       throw xtl::make_null_argument_exception ("", "primitive");
 
-    impl->primitives.push_back ();
-
-    DynamicPrimitiveDesc& desc = impl->primitives.back ();
+    impl->primitives.push_back (primitive);
 
     try
     {
-      desc.primitive            = primitive;
-      desc.trackable_connection = primitive->connect_tracker (xtl::bind (&DynamicPrimitiveEntityStorage::RemovePrimitive, this, primitive));
+      impl->descs.push_back ();
 
-      AttachCacheSource (*primitive);
+      DynamicPrimitiveDesc& desc = impl->descs.back ();
 
-      InvalidateCacheDependencies ();
+      try
+      {  
+        desc.trackable_connection = primitive->connect_tracker (xtl::bind (&DynamicPrimitiveEntityStorage::RemovePrimitive, this, primitive));
+
+        AttachCacheSource (*primitive);
+
+        InvalidateCacheDependencies ();
+      }
+      catch (...)
+      {
+        impl->descs.pop_back ();
+        throw;
+      }
     }
     catch (...)
     {
@@ -92,10 +121,11 @@ void DynamicPrimitiveEntityStorage::RemovePrimitive (DynamicPrimitive* primitive
     return;
 
   for (DynamicPrimitiveArray::iterator iter=impl->primitives.begin (), end=impl->primitives.end (); iter!=end; ++iter)
-    if (iter->primitive == primitive)
+    if (*iter == primitive)
     {
       DetachCacheSource (*primitive);
 
+      impl->descs.erase (impl->descs.begin () + (iter - impl->primitives.begin ()));
       impl->primitives.erase (iter);
 
       InvalidateCacheDependencies ();
@@ -108,6 +138,7 @@ void DynamicPrimitiveEntityStorage::RemoveAllPrimitives ()
 {
   DetachAllCacheSources ();
 
+  impl->descs.clear ();
   impl->primitives.clear ();
 
   InvalidateCacheDependencies ();
@@ -151,7 +182,7 @@ void DynamicPrimitiveEntityStorage::UpdateCacheCore ()
     impl->groups.reserve (impl->primitives.size ());
 
     for (DynamicPrimitiveArray::iterator iter=impl->primitives.begin (), end=impl->primitives.end (); iter!=end; ++iter)
-      impl->groups.push_back (iter->primitive->RendererPrimitiveGroup ());
+      impl->groups.push_back ((*iter)->RendererPrimitiveGroup ());
 
       //обновление зависимостей
 
