@@ -12,6 +12,7 @@ struct RendererOperation
   ProgramParametersLayout*        entity_parameters_layout;       //расположение параметров объекта
   const RendererPrimitive*        primitive;                      //примитив
   DynamicPrimitive*               dynamic_primitive;              //динамический примитив, соответствующий операции (может быть 0)
+  bool                            frame_dependent;                //зависит ли операция от кадра
   ShaderOptionsCache*             shader_options_cache;           //кэш опций шейдера
   const RectAreaImpl*             scissor;                        //область отсечения (может быть null)
 };

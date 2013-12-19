@@ -3,6 +3,10 @@
 using namespace render::manager;
 
 /*
+    DynamicPrimitiveEntityStorage
+*/
+
+/*
     Описание реализации хранилища динамических примитивов
 */
 
@@ -167,4 +171,14 @@ void DynamicPrimitiveEntityStorage::UpdateCacheCore ()
 void DynamicPrimitiveEntityStorage::ResetCacheCore ()
 {
   impl->groups.clear ();
+}
+
+/*
+    DynamicPrimitive
+*/
+
+DynamicPrimitive::DynamicPrimitive (const render::manager::RendererPrimitiveGroup& in_group, bool in_frame_dependent)
+  : group (in_group)
+  , frame_dependent (in_frame_dependent)
+{
 }
