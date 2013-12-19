@@ -50,42 +50,6 @@ DynamicPrimitiveEntityStorage::~DynamicPrimitiveEntityStorage ()
 }
 
 /*
-    ќбновление
-*/
-
-void DynamicPrimitiveEntityStorage::UpdateOnPrerender ()
-{
-  try
-  {
-      //обновление примитивов
-
-    for (DynamicPrimitiveArray::iterator iter=impl->primitives.begin (), end=impl->primitives.end (); iter!=end; ++iter)
-      iter->primitive->UpdateOnPrerender (impl->entity);
-  }
-  catch (xtl::exception& e)
-  {
-    e.touch ("render::manager::DynamicPrimitiveEntityStorage::UpdateOnPrerender");
-    throw;
-  }
-}
-
-void DynamicPrimitiveEntityStorage::UpdateOnRender (FrameImpl& frame)
-{
-  try
-  {
-      //обновление примитивов
-
-    for (DynamicPrimitiveArray::iterator iter=impl->primitives.begin (), end=impl->primitives.end (); iter!=end; ++iter)
-      iter->primitive->UpdateOnRender (impl->entity, frame);
-  }
-  catch (xtl::exception& e)
-  {
-    e.touch ("render::manager::DynamicPrimitiveEntityStorage::UpdateOnRender");
-    throw;
-  }
-}
-
-/*
     ƒобавление динамических примитивов
 */
 

@@ -872,27 +872,6 @@ const EntityLodDesc& EntityImpl::GetLod (size_t level_of_detail, bool find_neare
 }
 
 /*
-    Обновление перед отрисовкой
-*/
-
-void EntityImpl::UpdateOnPrerender (size_t level_of_detail, bool find_nearest)
-{
-  try
-  {    
-
-  }
-  catch (xtl::exception& e)
-  {
-    e.touch ("render::manager::EntityImpl::UpdateOnPrerender");
-    throw;
-  }
-}
-
-void EntityImpl::UpdateOnRender (size_t level_of_detail, bool find_nearest, FrameImpl& frame)
-{
-}
-
-/*
     Управление кэшированием
 */
 
