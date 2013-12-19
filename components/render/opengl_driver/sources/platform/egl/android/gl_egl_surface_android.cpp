@@ -59,9 +59,9 @@ EglSurface::EglSurface (EGLDisplay egl_display, EGLConfig egl_config, const void
 
     JNIEnv& env = get_env ();
 
-    local_ref<jclass> egl_class         = env.FindClass (EGL_CLASS_NAME);
-    local_ref<jclass> egl_config_class  = env.FindClass (EGL_CONFIG_CLASS_NAME);
-    local_ref<jclass> egl_display_class = env.FindClass (EGL_DISPLAY_CLASS_NAME);
+    local_ref<jclass> egl_class (env.FindClass (EGL_CLASS_NAME), false);
+    local_ref<jclass> egl_config_class (env.FindClass (EGL_CONFIG_CLASS_NAME), false);
+    local_ref<jclass> egl_display_class (env.FindClass (EGL_DISPLAY_CLASS_NAME), false);
 
     if (!egl_class)
       throw xtl::format_operation_exception ("", "EGLImpl class '%s' not found in JNI environment", EGL_CLASS_NAME);
