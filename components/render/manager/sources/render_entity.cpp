@@ -415,8 +415,8 @@ struct EntityLod: public xtl::reference_counter, public EntityLodDesc, public Ca
              dynamic_groups_count = dynamic_primitives.RendererPrimitiveGroupsCount (),
              operations_count     = 0;
       
-      const RendererPrimitiveGroup* groups         = cached_primitive->RendererPrimitiveGroups ();
-      const RendererPrimitiveGroup* dynamic_groups = dynamic_primitives.RendererPrimitiveGroups ();
+      const RendererPrimitiveGroup*        groups         = cached_primitive->RendererPrimitiveGroups ();
+      const RendererDynamicPrimitiveGroup* dynamic_groups = dynamic_primitives.RendererPrimitiveGroups ();
       
         //резервирование операций рендеринга
 
@@ -432,14 +432,18 @@ struct EntityLod: public xtl::reference_counter, public EntityLodDesc, public Ca
       const RectAreaImpl* scissor = common_data.ScissorState () ? Wrappers::Unwrap<RectAreaImpl> (common_data.Scissor ()).get () : (const RectAreaImpl*)0;
       
         //построение списка операций рендеринга статических примитивов
+
+      const RendererPrimitiveGroup* group = groups;
         
-      for (size_t i=0; i<groups_count; i++)
-        BuildRendererOperations (groups [i], scissor);
+      for (size_t i=0; i<groups_count; i++, group++)
+        BuildRendererOperations (*group, scissor, 0);
 
         //построение списка операций рендеринга динамических примитивов
 
-      for (size_t i=0; i<dynamic_groups_count; i++)
-        BuildRendererOperations (dynamic_groups [i], scissor);
+      const RendererDynamicPrimitiveGroup* dynamic_group = dynamic_groups;
+
+      for (size_t i=0; i<dynamic_groups_count; i++, dynamic_group++)
+        BuildRendererOperations (*dynamic_group, scissor, dynamic_group->dynamic_primitive);
         
       cached_operation_list.operations_count = cached_operations.size ();
       cached_operation_list.operations       = cached_operations.empty () ? (RendererOperation*)0 : &cached_operations [0];
@@ -453,7 +457,7 @@ struct EntityLod: public xtl::reference_counter, public EntityLodDesc, public Ca
     }
   }  
 
-  void BuildRendererOperations (const RendererPrimitiveGroup& group, const RectAreaImpl* scissor)
+  void BuildRendererOperations (const RendererPrimitiveGroup& group, const RectAreaImpl* scissor, DynamicPrimitive* dynamic_primitive)
   {
     const RendererPrimitive* primitives       = group.primitives;        
     size_t                   primitives_count = group.primitives_count;
@@ -466,8 +470,9 @@ struct EntityLod: public xtl::reference_counter, public EntityLodDesc, public Ca
       
       memset (&operation, 0, sizeof (operation));
       
-      operation.primitive = &renderer_primitive;
-      operation.entity    = &common_data.Entity ();
+      operation.primitive         = &renderer_primitive;
+      operation.dynamic_primitive = dynamic_primitive;
+      operation.entity            = &common_data.Entity ();
 
       MaterialImpl* material = renderer_primitive.material;
 
@@ -480,12 +485,6 @@ struct EntityLod: public xtl::reference_counter, public EntityLodDesc, public Ca
     }
   }
 
-/// Обработчик оповещения об обновлении примитивов
-  void UpdateRendererPrimitives (size_t group_index, size_t first_primitive_index, size_t primitives_count)
-  {
-//TODO: обработчик оповещения
-  }
-  
   using CacheHolder::UpdateCache;
   using CacheHolder::ResetCache;  
   using CacheHolder::InvalidateCache;

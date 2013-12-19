@@ -204,7 +204,6 @@ class DebugIdHolder: public xtl::noncopyable
 
 #include "cache_manager.h"
 #include "cache_map.h"
-#include "dynamic_primitive.h"
 #include "dynamic_primitive_buffer.h"
 #include "dynamic_texture.h"
 #include "effect.h"
@@ -219,6 +218,7 @@ class DebugIdHolder: public xtl::noncopyable
 #include "material_manager.h"
 #include "vertex_buffer.h"
 #include "primitive.h"
+#include "dynamic_primitive.h"
 #include "primitive_buffers.h"
 #include "primitive_manager.h"
 #include "program.h"

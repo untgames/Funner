@@ -1,3 +1,5 @@
+class  DynamicPrimitive;
+class  DynamicPrimitiveEntityStorage;
 struct RendererPrimitive;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -9,6 +11,7 @@ struct RendererOperation
   render::low_level::IStateBlock* state_block;                    //блок состояний объекта
   ProgramParametersLayout*        entity_parameters_layout;       //расположение параметров объекта
   const RendererPrimitive*        primitive;                      //примитив
+  DynamicPrimitive*               dynamic_primitive;              //динамический примитив, соответствующий операции (может быть 0)
   ShaderOptionsCache*             shader_options_cache;           //кэш опций шейдера
   const RectAreaImpl*             scissor;                        //область отсечения (может быть null)
 };
