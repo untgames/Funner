@@ -597,11 +597,7 @@ void FrameImpl::Prerender (EntityDrawFunction entity_draw_handler)
       Entity entity_wrap = Wrappers::Wrap<Entity> (desc.entity);
 
       entity_draw_handler (frame, entity_wrap, desc.user_data, entity_draw_params);
-      
-        //заполнение константного буфера соответствующего паре frame-entity
-      
-      entities_properties.Convert (entity_draw_params.properties, desc.property_buffer, desc.layout);
-      
+            
         //расчёт расстояния от z-near до объекта        
         
       math::vec4f mvp_lod_point = entity_draw_params.mvp_matrix * math::vec4f (desc.entity->LodPoint (), 1.0f); 
@@ -614,6 +610,11 @@ void FrameImpl::Prerender (EntityDrawFunction entity_draw_handler)
       //получение информации об уровне детализации
 
     const EntityLodDesc& lod_desc = desc.entity->GetLod (lod, true); 
+
+      //заполнение константного буфера соответствующего паре frame-entity
+
+    if (has_entity_draw_handler && lod_desc.has_frame_independent_operations)
+      entities_properties.Convert (entity_draw_params.properties, desc.property_buffer, desc.layout);
 
       //добавление операций рендеринга
 
