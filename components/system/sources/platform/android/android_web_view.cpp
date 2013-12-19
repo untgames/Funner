@@ -10,9 +10,9 @@ struct syslib::web_view_handle: public MessageQueue::Handler
   window_t            window;                 //дескриптор окна
   jmethodID           is_loading_method;      //метод проверки состояния офрмы
   jmethodID           load_url_method;        //метод загрузки URL ресурса
-  jmethodID           load_data_method;       //метод загрузки данных  
+  jmethodID           load_data_method;       //метод загрузки данных
   jmethodID           reload_method;          //метод перезагрузки страницы
-  jmethodID           stop_loading_method;    //метод перезагрузки страницы  
+  jmethodID           stop_loading_method;    //метод перезагрузки страницы
   jmethodID           can_go_back_method;     //метод проверки возможности возвращения назад
   jmethodID           can_go_forward_method;  //метод проверки возможности перемещения вперед
   jmethodID           go_back_method;         //метод возвращения назад
@@ -110,7 +110,7 @@ web_view_t find_web_view (jobject controller)
 
      JNIEnv& env = get_env ();
 
-     local_ref<jclass> controller_class = env.GetObjectClass (controller);
+     local_ref<jclass> controller_class (env.GetObjectClass (controller), false);
 
      if (!controller_class)
        throw xtl::format_operation_exception ("", "JNIEnv::GetObjectClass failed (for EngineWebViewController)");
@@ -207,7 +207,7 @@ web_view_t AndroidWindowManager::CreateWebView (IWebViewListener* listener)
     
     JNIEnv& env = get_env ();
 
-    local_ref<jclass> controller_class = env.GetObjectClass (view->controller.get ());
+    local_ref<jclass> controller_class (env.GetObjectClass (view->controller.get ()), false);
         
     if (!controller_class)
       throw xtl::format_operation_exception ("", "JNIEnv::GetObjectClass failed (for EngingeViewController)");
@@ -513,6 +513,8 @@ void register_web_view_callbacks (JNIEnv* env)
     
     jint status = env->RegisterNatives (controller_class, methods, methods_count);
     
+    env->DeleteLocalRef (controller_class);
+
     if (status)
       throw xtl::format_operation_exception ("", "Can't register natives (status=%d)", status);    
   }

@@ -24,7 +24,7 @@ struct sensor_handle
 
         //создание слушателя
 
-      event_listener = get_env ().NewObject (get_context ().sensor_event_listener_class.get (), event_listener_class_constructor, (jlong)this, get_activity ());
+      event_listener = local_ref<jobject> (get_env ().NewObject (get_context ().sensor_event_listener_class.get (), event_listener_class_constructor, (jlong)this, get_activity ()), false);
 
       if (!event_listener)
         throw xtl::format_operation_exception ("", "EngineSensorEventListener constructor failed");      
@@ -127,12 +127,12 @@ class JniSensorManager
         if (!activity)
           throw xtl::format_operation_exception ("", "Null activity");
           
-        local_ref<jclass> activity_class = env.GetObjectClass (activity.get ());
+        local_ref<jclass> activity_class (env.GetObjectClass (activity.get ()), false);
         
         if (!activity_class)
           throw xtl::format_operation_exception ("", "JNIEnv::GetObjectClass failed");
         
-        sensor_manager_class = env.FindClass (ANDROID_SENSOR_MANAGER_CLASS_NAME);
+        sensor_manager_class = local_ref<jclass> (env.FindClass (ANDROID_SENSOR_MANAGER_CLASS_NAME), false);
       
         if (!sensor_manager_class)
           throw xtl::format_operation_exception ("", "Class %s not found in JNI environment", ANDROID_SENSOR_MANAGER_CLASS_NAME);
@@ -143,7 +143,7 @@ class JniSensorManager
         
           //сохранение общих методов и классов List
         
-        list_class = env.FindClass (ANDROID_LIST_CLASS_NAME);
+        list_class = local_ref<jclass> (env.FindClass (ANDROID_LIST_CLASS_NAME), false);
         
         if (!list_class)
           throw xtl::format_operation_exception ("", "Class %s not found in JNI environment", ANDROID_LIST_CLASS_NAME);
@@ -153,7 +153,7 @@ class JniSensorManager
         
           //сохранение общих методов и классов Sensor
           
-        sensor_class = env.FindClass (ANDROID_SENSOR_CLASS_NAME);
+        sensor_class = local_ref<jclass> (env.FindClass (ANDROID_SENSOR_CLASS_NAME), false);
         
         if (!sensor_class)
           throw xtl::format_operation_exception ("", "Class %s not found in JNI environment", ANDROID_SENSOR_CLASS_NAME);
@@ -302,7 +302,7 @@ class JniSensorManager
       if (!activity)
         throw xtl::format_operation_exception ("", "Null activity");
         
-      local_ref<jclass> activity_class = env.GetObjectClass (activity.get ());
+      local_ref<jclass> activity_class (env.GetObjectClass (activity.get ()), false);
       
       if (!activity_class)
         throw xtl::format_operation_exception ("", "JNIEnv::GetObjectClass failed");        
@@ -328,7 +328,7 @@ class JniSensorManager
 
         local_ref<jobject> sensor_manager = GetSensorManager ();
         
-        local_ref<jobject> sensors_list = env.CallObjectMethod (sensor_manager.get (), get_sensor_list_method, type);
+        local_ref<jobject> sensors_list (env.CallObjectMethod (sensor_manager.get (), get_sensor_list_method, type), false);
         
         if (!sensors_list)
           throw xtl::format_operation_exception ("", "android.hardware.SensorManager.getSensorList failed");
@@ -340,7 +340,7 @@ class JniSensorManager
           
         for (int i=0; i<items_count; i++)
         {
-          local_ref<jobject> sensor = env.CallObjectMethod (sensors_list.get (), get_list_item_method, i);
+          local_ref<jobject> sensor (env.CallObjectMethod (sensors_list.get (), get_list_item_method, i), false);
           
           if (!sensor)
             continue;
@@ -365,7 +365,7 @@ class JniSensorManager
     global_ref<jclass>  sensor_manager_class;          //класс менеджера сенсоров
     jmethodID           get_sensor_list_method;        //метод получения списка сенсоров
     jmethodID           register_listener_method;      //метод подписки на события сенсоров
-    jmethodID           unregister_listener_method;    //метод отмены подписки на события сенсоров    
+    jmethodID           unregister_listener_method;    //метод отмены подписки на события сенсоров
     global_ref<jclass>  list_class;                    //класс работы со списком
     jmethodID           get_list_size_method;          //метод получения количества элементов в списке
     jmethodID           get_list_item_method;          //метод получения элемента списка
@@ -374,7 +374,7 @@ class JniSensorManager
     jmethodID           get_sensor_type_method;        //метод получения типа сенсора
     jmethodID           get_sensor_vendor_method;      //метод получения производителя сенсора
     jmethodID           get_sensor_max_range_method;   //метод получения максимального значения сенсора
-    jmethodID           get_sensor_min_delay_method;   //метод получения минимальной задержки между событиями сенсора    
+    jmethodID           get_sensor_min_delay_method;   //метод получения минимальной задержки между событиями сенсора
     jmethodID           get_sensor_version_method;     //метод получения версии сенсора
     jmethodID           get_sensor_resolution_method;  //метод получения разрешающей способности сенсора
     jmethodID           get_sensor_power_method;       //метод получения потребления энергии сенсором
@@ -674,6 +674,8 @@ void register_sensor_manager_callbacks (JNIEnv* env)
     static const size_t methods_count = sizeof (methods) / sizeof (*methods);
 
     jint status = env->RegisterNatives (event_listener_class, methods, methods_count);
+
+    env->DeleteLocalRef (event_listener_class);
 
     if (status)
       throw xtl::format_operation_exception ("", "Can't register natives (status=%d)", status);    

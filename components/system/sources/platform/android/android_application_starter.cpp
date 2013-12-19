@@ -235,8 +235,8 @@ void start_application (JavaVM* vm, jobject activity, const char* program_name, 
   
   current_activity = activity;
   
-  application_context.utils_class                 = get_env ().FindClass (ENGINE_UTILS_CLASS_NAME);
-  application_context.sensor_event_listener_class = get_env ().FindClass (ENGINE_SENSOR_EVENT_LISTENER_CLASS_NAME);
+  application_context.utils_class                 = local_ref<jclass> (get_env ().FindClass (ENGINE_UTILS_CLASS_NAME), false);
+  application_context.sensor_event_listener_class = local_ref<jclass> (get_env ().FindClass (ENGINE_SENSOR_EVENT_LISTENER_CLASS_NAME), false);
   
   if (!application_context.utils_class)
     throw xtl::format_operation_exception ("", "EngineUtils class '%s' not found", ENGINE_UTILS_CLASS_NAME);    

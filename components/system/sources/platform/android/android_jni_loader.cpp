@@ -212,6 +212,8 @@ __attribute__ ((visibility("default"))) extern JNIEXPORT jint JNICALL JNI_OnLoad
     register_screen_callbacks (env, skeletonActivityClass);
     register_gcm_callbacks (env);
 
+    env->DeleteLocalRef (skeletonActivityClass);
+
     static common::ComponentLoader loader (COMPONENTS_MASK);
 
     ApplicationManagerSingleton::Instance ()->OnLoad (env);

@@ -100,7 +100,7 @@ EglSurface::EglSurface (EGLDisplay egl_display, EGLConfig egl_config, const void
     if (!egl_surface_wrapper)
       throw xtl::format_operation_exception ("", "EGLImpl::eglCreateWindowSurface failed");
 
-    local_ref<jclass> egl_surface_class = env.GetObjectClass (egl_surface_wrapper.get ());
+    local_ref<jclass> egl_surface_class (env.GetObjectClass (egl_surface_wrapper.get ()), false);
 
     if (!egl_surface_class)
       throw xtl::format_operation_exception ("", "JNIEnv::GetObjectClass failed (for EGLSurfaceImpl)");

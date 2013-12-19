@@ -207,6 +207,8 @@ class AndroidStore
 
      store_class = (jclass)env->NewGlobalRef (store_class_ref);
 
+     env->DeleteLocalRef (store_class_ref);
+
      store_init_method      = find_method (env, store_class, "<init>", "()V");
      stop_processing_method = find_method (env, store_class, "stopProcessing", "()V");
      buy_method             = find_method (env, store_class, "buyProduct", "(Landroid/app/Activity;Ljava/lang/String;)V");

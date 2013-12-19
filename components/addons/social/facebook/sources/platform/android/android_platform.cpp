@@ -131,6 +131,8 @@ class AndroidPlatformImpl
 
      session_class = (jclass)env->NewGlobalRef (session_class_ref);
 
+     env->DeleteLocalRef (session_class_ref);
+
      session_init_method        = find_method (env, session_class, "<init>", "(Lcom/untgames/funner/application/EngineActivity;Ljava/lang/String;)V");
      can_login_method           = find_method (env, session_class, "canLogin", "()Z");
      login_method               = find_method (env, session_class, "login", "(Ljava/lang/String;)V");

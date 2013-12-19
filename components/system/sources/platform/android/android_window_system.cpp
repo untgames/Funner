@@ -316,8 +316,7 @@ struct syslib::window_handle: public MessageQueue::Handler
     log.Printf ("Surface created for window %p", view.get ());
 
       //получение поверхности
-
-    local_ref<jobject> surface = check_errors (get_env ().CallObjectMethod (controller.get (), get_surface_method));
+    local_ref<jobject> surface (check_errors (get_env ().CallObjectMethod (controller.get (), get_surface_method)), false);
 
     if (!surface)
       throw xtl::format_operation_exception ("", "EngineViewController::getSurfaceThreadSafe failed");                  
@@ -373,7 +372,7 @@ class JniWindowManager
       {          
           //получение класса Activity
 
-        activity_class = get_env ().GetObjectClass (get_activity ());
+        activity_class = local_ref<jclass> (get_env ().GetObjectClass (get_activity ()), false);
         
         if (!activity_class)
           throw xtl::format_operation_exception ("", "JNIEnv::GetObjectClass failed");
@@ -419,7 +418,7 @@ class JniWindowManager
 
         JNIEnv& env = get_env ();
 
-        local_ref<jclass> controller_class = env.GetObjectClass (controller);
+        local_ref<jclass> controller_class (env.GetObjectClass (controller), false);
 
         if (!controller_class)
           throw xtl::format_operation_exception ("", "JNIEnv::GetObjectClass failed (for EngineViewController)");
@@ -592,7 +591,7 @@ window_t AndroidWindowManager::CreateWindow (WindowStyle, WindowMessageHandler h
     
     JNIEnv& env = get_env ();
 
-    local_ref<jclass> controller_class = env.GetObjectClass (window->controller.get ());
+    local_ref<jclass> controller_class (env.GetObjectClass (window->controller.get ()), false);
         
     if (!controller_class)
       throw xtl::format_operation_exception ("", "JNIEnv::GetObjectClass failed (for View)");      
@@ -616,7 +615,7 @@ window_t AndroidWindowManager::CreateWindow (WindowStyle, WindowMessageHandler h
     
       //получение объекта окна
 
-    window->view = check_errors (env.CallObjectMethod (window->controller.get (), window->get_view_method));
+    window->view = local_ref<jobject> (check_errors (env.CallObjectMethod (window->controller.get (), window->get_view_method)), false);
 
     if (!window->view)
       throw xtl::format_operation_exception ("", "EngineViewController::getView failed");
@@ -1085,16 +1084,16 @@ struct syslib::screen_keyboard_handle: public xtl::reference_counter, public xtl
   {
     JNIEnv& env = syslib::android::get_env ();
 
-    jobject   activity           = get_activity ();
-    jclass    activity_class     = env.GetObjectClass (activity);
-    jmethodID get_system_service = find_method (&env, activity_class, "getSystemService", "(Ljava/lang/String;)Ljava/lang/Object;");
+    jobject           activity           = get_activity ();
+    local_ref<jclass> activity_class (env.GetObjectClass (activity), false);
+    jmethodID         get_system_service = find_method (&env, activity_class.get (), "getSystemService", "(Ljava/lang/String;)Ljava/lang/Object;");
 
     input_method_manager = check_errors (env.CallObjectMethod (activity, get_system_service, tojstring ("input_method").get ()));
 
     if (!input_method_manager)
       throw xtl::format_operation_exception ("", "getSystemService for InputMethodManager failed");
 
-    input_method_manager_class = env.GetObjectClass (input_method_manager.get ());
+    input_method_manager_class = local_ref<jclass> (env.GetObjectClass (input_method_manager.get ()), false);
 
     if (!input_method_manager_class)
       throw xtl::format_operation_exception ("", "Can't get input manager class");
@@ -1183,8 +1182,8 @@ void AndroidScreenKeyboardManager::HideScreenKeyboard (screen_keyboard_t keyboar
 
     JNIEnv& env = syslib::android::get_env ();
 
-    jclass    view_class       = env.GetObjectClass (keyboard->view.get ());
-    jmethodID get_window_token = find_method (&env, view_class, "getWindowToken", "()Landroid/os/IBinder;");
+    local_ref<jclass> view_class (env.GetObjectClass (keyboard->view.get ()), false);
+    jmethodID get_window_token = find_method (&env, view_class.get (), "getWindowToken", "()Landroid/os/IBinder;");
     jobject   window_token     = check_errors (env.CallObjectMethod (keyboard->view.get (), get_window_token));
 
     bool result = check_errors (env.CallBooleanMethod (keyboard->input_method_manager.get (), keyboard->hide_keyboard_method, window_token, 0));
@@ -1257,6 +1256,8 @@ void register_window_callbacks (JNIEnv* env)
     
     jint status = env->RegisterNatives (controller_class, methods, methods_count);
     
+    env->DeleteLocalRef (controller_class);
+
     if (status)
       throw xtl::format_operation_exception ("", "Can't register natives (status=%d)", status);    
   }

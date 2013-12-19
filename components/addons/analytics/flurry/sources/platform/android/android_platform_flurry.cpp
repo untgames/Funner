@@ -117,6 +117,11 @@ struct FlurryImpl::Impl
     constants_class    = (jclass)env->NewGlobalRef (constants_class_ref);
     hash_map_class     = (jclass)env->NewGlobalRef (hash_map_class_ref);
 
+    env->DeleteLocalRef (flurry_class_ref);
+    env->DeleteLocalRef (flurry_agent_class_ref);
+    env->DeleteLocalRef (constants_class_ref);
+    env->DeleteLocalRef (hash_map_class_ref);
+
     //flurry methods
     flurry_init_method   = find_method (env, flurry_class, "<init>", "(Lcom/untgames/funner/application/EngineActivity;Ljava/lang/String;)V");
     start_session_method = find_method (env, flurry_class, "startSession", "()V");
@@ -169,7 +174,7 @@ struct FlurryImpl::Impl
 
       JNIEnv& env = get_env ();
 
-      flurry = env.NewObject (flurry_class, flurry_init_method, get_activity (), tojstring (api_key).get ());
+      flurry = local_ref<jobject> (env.NewObject (flurry_class, flurry_init_method, get_activity (), tojstring (api_key).get ()), false);
 
       if (!flurry)
         throw xtl::format_operation_exception ("", "Can't create flurry object");
@@ -281,7 +286,7 @@ struct FlurryImpl::Impl
 
     size_t properties_count = properties.Size ();
 
-    local_ref<jobject> return_value = env.NewObject (hash_map_class, hash_map_init_method, properties_count);
+    local_ref<jobject> return_value (env.NewObject (hash_map_class, hash_map_init_method, properties_count), false);
 
     if (!return_value)
       throw xtl::format_operation_exception (METHOD_NAME, "Can't create hash map object");
@@ -362,7 +367,7 @@ struct FlurryImpl::Impl
 
       JNIEnv& env = get_env ();
 
-      jclass log_class = env.FindClass ("android/util/Log");
+      local_ref<jclass> log_class (env.FindClass ("android/util/Log"), false);
 
       if (!log_class)
         throw xtl::format_operation_exception ("", "Can't find android log class");
@@ -372,16 +377,16 @@ struct FlurryImpl::Impl
       switch (level)
       {
         case LogLevel_None:
-          constant_field = env.GetStaticFieldID (log_class, "ASSERT", "I");
+          constant_field = env.GetStaticFieldID (log_class.get (), "ASSERT", "I");
           break;
         case LogLevel_CriticalOnly:
-          constant_field = env.GetStaticFieldID (log_class, "ERROR", "I");
+          constant_field = env.GetStaticFieldID (log_class.get (), "ERROR", "I");
           break;
         case LogLevel_Debug:
-          constant_field = env.GetStaticFieldID (log_class, "DEBUG", "I");
+          constant_field = env.GetStaticFieldID (log_class.get (), "DEBUG", "I");
           break;
         case LogLevel_All:
-          constant_field = env.GetStaticFieldID (log_class, "VERBOSE", "I");
+          constant_field = env.GetStaticFieldID (log_class.get (), "VERBOSE", "I");
           break;
         default:
           throw xtl::make_argument_exception ("", "level", level);
@@ -390,7 +395,7 @@ struct FlurryImpl::Impl
       if (!constant_field)
         throw xtl::format_operation_exception ("", "Can't find log level field for level %d", level);
 
-      int android_level = env.GetStaticIntField (log_class, constant_field);
+      int android_level = env.GetStaticIntField (log_class.get (), constant_field);
 
       env.CallStaticVoidMethod (flurry_agent_class, set_log_level_method, android_level);
     }

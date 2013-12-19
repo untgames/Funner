@@ -34,7 +34,7 @@ class GcmManagerImpl : public MessageQueue::Handler, xtl::noncopyable
         throw xtl::make_null_argument_exception ("syslib::GcmManager::RegisterForNotifications", "gcm_manager_class");
 
       if (gcm_manager_class)
-        env->DeleteLocalRef (gcm_manager_class);
+        env->DeleteGlobalRef (gcm_manager_class);
 
       gcm_manager_class = (jclass)env->NewGlobalRef (in_gcm_manager_class);
 
@@ -170,6 +170,8 @@ void register_gcm_callbacks (JNIEnv* env)
 
     jint status = env->RegisterNatives (gcm_intent_service_class, methods, methods_count);
 
+    env->DeleteLocalRef (gcm_intent_service_class);
+
     if (status)
       throw xtl::format_operation_exception ("", "Can't register natives (status=%d)", status);
 
@@ -188,10 +190,15 @@ void register_gcm_callbacks (JNIEnv* env)
     status = env->RegisterNatives (gcm_manager_class, manager_methods, manager_methods_count);
 
     if (status)
+    {
+      env->DeleteLocalRef (gcm_manager_class);
       throw xtl::format_operation_exception ("", "Can't register natives (status=%d)", status);
+    }
 
     //Инициализация синглтона
     GcmManagerSingleton::Instance ()->RegisterForNotifications (env, gcm_manager_class);
+
+    env->DeleteLocalRef (gcm_manager_class);
   }
   catch (xtl::exception& e)
   {
