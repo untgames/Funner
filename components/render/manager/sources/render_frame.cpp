@@ -616,6 +616,8 @@ void FrameImpl::Prerender (EntityDrawFunction entity_draw_handler)
     if (has_entity_draw_handler && lod_desc.has_frame_independent_operations)
       entities_properties.Convert (entity_draw_params.properties, desc.property_buffer, desc.layout);
 
+      //TODO: use NULL property buffer in the 'else' case
+
       //добавление операций рендеринга
 
     renderer.AddOperations (lod_desc.operations, eye_distance, entity_draw_params.mvp_matrix, desc.property_buffer.get (), desc.layout.get ());
