@@ -20,8 +20,8 @@ const size_t MIN_BUFER_SIZE            = 64;
 struct BufferPoolEntry
 {
   LowLevelBufferPtr buffer;          //буфер данных
-  size_t            last_use_time;   //последнее время использования
-  size_t            last_use_frame;  //последний кадр использования
+  FrameTime         last_use_time;   //последнее время использования
+  FrameId           last_use_frame;  //последний кадр использования
 };
 
 typedef stl::vector<BufferPoolEntry> BufferArray;

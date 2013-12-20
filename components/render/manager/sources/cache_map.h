@@ -58,8 +58,8 @@ class CacheMap: public Cache
     
     struct Item: public Value
     {
-      size_t                      last_use_frame; //кадр последнего использования элемента
-      size_t                      last_use_time;  //время последнего использования элемента
+      FrameId                     last_use_frame; //кадр последнего использования элемента
+      FrameTime                   last_use_time;  //время последнего использования элемента
       typename ItemList::iterator position;       //положение в списке элементов      
     };        
 
@@ -213,10 +213,8 @@ void CacheMap<Key, Value>::ForEach (Fn fn)
 template <class Key, class Value>
 void CacheMap<Key, Value>::FlushCache ()
 {
-  size_t current_time  = CurrentTime (),
-         current_frame = CurrentFrame (),
-         time_delay    = TimeDelay (),
-         frame_delay   = FrameDelay ();
+  FrameTime current_time  = CurrentTime (), time_delay = TimeDelay ();
+  FrameId   current_frame = CurrentFrame (), frame_delay = FrameDelay ();
 
   while (!item_list.empty ())
   {

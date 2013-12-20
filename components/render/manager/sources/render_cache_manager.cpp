@@ -29,16 +29,16 @@ typedef stl::list<Cache*> CacheList;
 struct CacheManager::Impl
 {
   CacheList caches;        //список кэшей
-  size_t    time_delay;    //задержка по времени до удаления объекта из кэша
-  size_t    frame_delay;   //задержка по количеству кадров до удаления объекта из кэша
-  size_t    current_frame; //текущий кадр
-  size_t    current_time;  //текущее время
+  FrameTime time_delay;    //задержка по времени до удаления объекта из кэша
+  FrameId   frame_delay;   //задержка по количеству кадров до удаления объекта из кэша
+  FrameId   current_frame; //текущий кадр
+  FrameTime current_time;  //текущее время
   
   Impl ()
     : time_delay (DEFAULT_TIME_DELAY)
     , frame_delay (DEFAULT_FRAME_DELAY)
-    , current_frame (0)
-    , current_time (0)
+    , current_frame ()
+    , current_time ()
   {
   }
 };
@@ -60,22 +60,22 @@ CacheManager::~CacheManager ()
     Параметры кэширования
 */
 
-void CacheManager::SetTimeDelay (size_t milliseconds)
+void CacheManager::SetTimeDelay (FrameTime milliseconds)
 {
   impl->time_delay = milliseconds;
 }
 
-void CacheManager::SetFrameDelay (size_t frames_count)
+void CacheManager::SetFrameDelay (FrameId frames_count)
 {
   impl->frame_delay = frames_count;
 }
 
-size_t CacheManager::TimeDelay ()
+FrameTime CacheManager::TimeDelay ()
 {
   return impl->time_delay;
 }
 
-size_t CacheManager::FrameDelay ()
+FrameId CacheManager::FrameDelay ()
 {
   return impl->frame_delay;
 }
@@ -160,12 +160,12 @@ Cache::~Cache ()
     Параметры кэширования
 */
 
-size_t Cache::TimeDelay ()
+FrameTime Cache::TimeDelay ()
 {
   return manager ? manager->TimeDelay () : 0;
 }
 
-size_t Cache::FrameDelay ()
+FrameId Cache::FrameDelay ()
 {
   return manager ? manager->FrameDelay () : 0;
 }

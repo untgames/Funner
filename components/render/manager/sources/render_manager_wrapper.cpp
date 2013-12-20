@@ -340,12 +340,12 @@ void RenderManager::SetCacheFrameDelay (size_t frames_count)
 
 size_t RenderManager::CacheTimeDelay () const
 {
-  return impl->CacheManager ().TimeDelay ();
+  return static_cast<size_t> (impl->CacheManager ().TimeDelay ());
 }
 
 size_t RenderManager::CacheFrameDelay () const
 {
-  return impl->CacheManager ().FrameDelay ();
+  return static_cast<size_t> (impl->CacheManager ().FrameDelay ());
 }
 
 void RenderManager::ChangeSettings (const common::PropertyMap& settings)
