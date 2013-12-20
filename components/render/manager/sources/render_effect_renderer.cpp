@@ -2,6 +2,7 @@
 
 using namespace render::manager;
 
+//TODO: shared EffectRenderer buffers (operations, passes, etc)
 //TODO: program/parameters_layout/local_textures FIFO cache
 
 /*
@@ -20,7 +21,7 @@ using namespace render::manager;
       * same RendererPrimitive::type
       * same RendererPrimitive::base_vertex
 
-  maybe, grouping id/hash should be use instead of all parameters
+  maybe, grouping id/hash should be used instead of all parameters
 */
 
 namespace
@@ -30,8 +31,9 @@ namespace
     Константы
 */
 
-const size_t RESERVE_OPERATION_ARRAY = 512; //резервируемое число операций в массиве операций прохода
-const size_t RESERVE_FRAME_ARRAY     = 32;  //резервируемое число вложенных фреймов в эффекте
+const size_t RESERVE_OPERATION_ARRAY  = 512; //резервируемое число операций в массиве операций прохода
+const size_t RESERVE_FRAME_ARRAY      = 32;  //резервируемое число вложенных фреймов в эффекте
+const size_t RESERVE_MVP_MATRIX_ARRAY = 512; //резервируемое число матриц MVP (для динамических примитивов)
 
 /*
     Вспомогательные структуры
@@ -43,16 +45,19 @@ struct PassOperation: public RendererOperation
   ProgramParametersLayout*     frame_entity_parameters_layout; //расположение параметров пары фрейм-объект
   render::low_level::IBuffer*  frame_entity_parameters_buffer; //буфер параметров пары фрейм-объект
   size_t                       eye_distance;                   //расстояние от z-near
+  int                          mvp_matrix_index;               //ссылка на матрицу Model-View-Projection
   
 ///Конструктор
   PassOperation (const RendererOperation&    base,
                  ProgramParametersLayout*    in_frame_entity_parameters_layout,
                  render::low_level::IBuffer* in_frame_entity_parameters_buffer,
-                 size_t                      in_eye_distance)
+                 size_t                      in_eye_distance,
+                 int                         in_mvp_matrix_index)
     : RendererOperation (base)
     , frame_entity_parameters_layout (in_frame_entity_parameters_layout)
     , frame_entity_parameters_buffer (in_frame_entity_parameters_buffer)
     , eye_distance (in_eye_distance)
+    , mvp_matrix_index (in_mvp_matrix_index)
   {
   }
 };
@@ -197,6 +202,7 @@ typedef stl::hash_multimap<size_t, RenderPass*>               RenderPassMap;
 typedef stl::hash_multimap<size_t, RenderInstantiatedEffect*> RenderInstantiatedEffectMap;
 typedef stl::vector<RenderEffectOperationPtr>                 RenderEffectOperationArray;
 typedef stl::vector<size_t>                                   TagHashArray;
+typedef stl::vector<math::mat4f>                              MatrixArray;
 
 }
 
@@ -211,6 +217,7 @@ struct EffectRenderer::Impl
   RenderPassMap               passes;              //проходы рендеринга
   RenderInstantiatedEffectMap effects;             //инстанцированные эффекты
   RenderEffectOperationArray  operations;          //операции рендеринга
+  MatrixArray                 mvp_matrices;        //матрицы
   bool                        right_hand_viewport; //является ли область вывода правосторонней
   
   Impl (const DeviceManagerPtr& in_device_manager) : device_manager (in_device_manager), right_hand_viewport (false) { }
@@ -241,6 +248,10 @@ EffectRenderer::EffectRenderer (const EffectPtr& effect, const DeviceManagerPtr&
       
     if (effect->TagsCount ())
       impl->effect_tags.assign (effect->TagHashes (), effect->TagHashes () + effect->TagsCount ());
+
+      //резервирование места для массива матриц
+
+    impl->mvp_matrices.reserve (RESERVE_MVP_MATRIX_ARRAY);
       
       //построение структуры диспетчеризации операций рендеринга
 
@@ -371,9 +382,21 @@ void EffectRenderer::AddOperations
 
         //предварительное обновление динамических примитивов
 
-      if (range.first != range.second && operation->dynamic_primitive)
+      int mvp_matrix_index = -1;
+
+      if (range.first != range.second)
       {
-        operation->dynamic_primitive->UpdateOnPrerender (current_frame_id);
+        if (DynamicPrimitive* dynamic_primitive = operation->dynamic_primitive)
+        {
+          dynamic_primitive->UpdateOnPrerender (current_frame_id);
+
+          if (operation->frame_dependent)
+          {
+            impl->mvp_matrices.push_back (mvp_matrix);
+
+            mvp_matrix_index = impl->mvp_matrices.size () - 1;
+          }
+        }
       }
 
         //добавление операции в проход
@@ -390,7 +413,7 @@ void EffectRenderer::AddOperations
           
           //добавление операции к списку операций прохода
 
-        pass.operations.push_back (PassOperation (*operation, property_layout, property_buffer, eye_distance));
+        pass.operations.push_back (PassOperation (*operation, property_layout, property_buffer, eye_distance, mvp_matrix_index));
 
         PassOperation& result_operation = pass.operations.back ();
         
@@ -473,6 +496,8 @@ void EffectRenderer::RemoveAllOperations ()
       operation.effect->last_frame = 0;
     }
   }
+
+  impl->mvp_matrices.clear ();
 }
 
 /*
@@ -493,10 +518,11 @@ struct RenderOperationsExecutor
   FrameImpl&                         frame;                      //фрейм
   ShaderOptionsCache&                frame_shader_options_cache; //кэш опций шейдеров для кадра
   LowLevelBufferPtr                  frame_property_buffer;      //буфер параметров кадра
+  const MatrixArray&                 mvp_matrices;               //массив матриц Model-View-Projection
   bool                               right_hand_viewport;        //является ли область вывода правосторонней
   
 ///Конструктор
-  RenderOperationsExecutor (RenderingContext& in_context, DeviceManager& in_device_manager, bool in_right_hand_viewport)
+  RenderOperationsExecutor (RenderingContext& in_context, DeviceManager& in_device_manager, const MatrixArray& in_mvp_matrices, bool in_right_hand_viewport)
     : context (in_context)
     , device_manager (in_device_manager)
     , device (device_manager.Device ())
@@ -505,6 +531,7 @@ struct RenderOperationsExecutor
     , frame (context.Frame ())    
     , frame_shader_options_cache (frame.ShaderOptionsCache ())
     , frame_property_buffer (frame.DevicePropertyBuffer ())
+    , mvp_matrices (in_mvp_matrices)
     , right_hand_viewport (in_right_hand_viewport)
   {
   }
@@ -695,10 +722,10 @@ struct RenderOperationsExecutor
     {
       PassOperation& operation = **iter;
 
-      if (!operation.frame_dependent || !operation.dynamic_primitive)
+      if (!operation.frame_dependent || !operation.dynamic_primitive || operation.mvp_matrix_index == -1)
         continue;
 
-      math::mat4f mvp_matrix (1.0f); //!!!TODO: change to the real matrix
+      const math::mat4f& mvp_matrix = mvp_matrices [operation.mvp_matrix_index];
 
       operation.dynamic_primitive->UpdateOnRender (frame, *operation.entity, mvp_matrix);
     }
@@ -870,7 +897,7 @@ void EffectRenderer::ExecuteOperations (RenderingContext& context)
 {
   try
   {
-    RenderOperationsExecutor executor (context, *impl->device_manager, impl->right_hand_viewport);
+    RenderOperationsExecutor executor (context, *impl->device_manager, impl->mvp_matrices, impl->right_hand_viewport);
 
     executor.Draw (impl->operations);
   }
