@@ -4,8 +4,8 @@ using namespace render;
 using namespace render::manager;
 using namespace render::low_level;
 
-//TODO: если материал не содержит динамических текстур - возвращаеть StateBlock от Entity
 //TODO: Обработчик оповещения об обновлении примитивов
+//TODO: EntityLodCommonData::states cache (flush, update after MaterialProxy was changed)
 
 namespace
 {
@@ -125,7 +125,7 @@ class EntityLodCommonData: public CacheHolder, public DebugIdHolder
       {
         if (properties.Properties ().Size () == 0)
           return material->ParametersLayout ();
-        
+
         StatePtr state (new MaterialState (*this, material), false);
         
         states.insert_pair (material, state);
@@ -271,29 +271,33 @@ class EntityLodCommonData: public CacheHolder, public DebugIdHolder
         {
           if (common_data.DeviceManager ()->Settings ().HasDebugLog ())
             Log ().Printf ("Update entity material instance cache (entity_id=%u, id=%u)", common_data.Id (), Id ());
-          
-          StateBlockMask mask;
-          
-          mask.ss_constant_buffers [ProgramParametersSlot_Entity] = true;
-          
-          dynamic_textures.UpdateMask (mask);
-          
-          render::low_level::IDevice&        device  = common_data.DeviceManager ()->Device ();
-          render::low_level::IDeviceContext& context = common_data.DeviceManager ()->ImmediateContext ();
-          
-          size_t mask_hash = mask.Hash ();
-          
-          if (!state_block || state_block_mask_hash != mask_hash)
-          {
-            state_block           = LowLevelStateBlockPtr (device.CreateStateBlock (mask), false);
-            state_block_mask_hash = mask_hash;
-          }
-            
-          dynamic_textures.Apply (context);
 
-          context.SSSetConstantBuffer (ProgramParametersSlot_Entity, common_data.Properties ().Buffer ().get ());
-          
-          state_block->Capture (&context);
+          if (material->HasDynamicTextures ())
+          {          
+            StateBlockMask mask;
+            
+            mask.ss_constant_buffers [ProgramParametersSlot_Entity] = true;
+            
+            dynamic_textures.UpdateMask (mask);
+            
+            render::low_level::IDevice&        device  = common_data.DeviceManager ()->Device ();
+            render::low_level::IDeviceContext& context = common_data.DeviceManager ()->ImmediateContext ();
+            
+            size_t mask_hash = mask.Hash ();
+            
+            if (!state_block || state_block_mask_hash != mask_hash)
+            {
+              state_block           = LowLevelStateBlockPtr (device.CreateStateBlock (mask), false);
+              state_block_mask_hash = mask_hash;
+            }
+              
+            dynamic_textures.Apply (context);
+
+            context.SSSetConstantBuffer (ProgramParametersSlot_Entity, common_data.Properties ().Buffer ().get ());
+            
+            state_block->Capture (&context);
+          }
+          else state_block = common_data.default_state_block;
           
           parameters_layout->DetachAll ();
           parameters_layout->Attach (*material->ParametersLayout ());
