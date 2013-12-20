@@ -121,13 +121,15 @@ struct RenderPass: public xtl::reference_counter
   OperationArray           operations;              //операции рендеринга
   OperationPtrArray        operation_ptrs;          //указатели на операции
   const RendererOperation* last_operation;          //последняя добавленная операция
+  FrameImpl&               frame;                   //ссылка на родительский кадр
 
 ///Конструктор
-  RenderPass (const DeviceManagerPtr& device_manager)
+  RenderPass (const DeviceManagerPtr& device_manager, FrameImpl& in_frame)
     : sort_mode (SortMode_Default)
     , parameters_layout (&device_manager->Device (), &device_manager->Settings ())
     , clear_flags (ClearFlag_All)
-    , last_operation (0)
+    , last_operation ()
+    , frame (in_frame)
   {
     operations.reserve (RESERVE_OPERATION_ARRAY);
     operation_ptrs.reserve (operations.size ());
@@ -218,7 +220,7 @@ struct EffectRenderer::Impl
     Конструктор / деструктор
 */
 
-EffectRenderer::EffectRenderer (const EffectPtr& effect, const DeviceManagerPtr& device_manager, ProgramParametersLayout* parent_layout)
+EffectRenderer::EffectRenderer (const EffectPtr& effect, const DeviceManagerPtr& device_manager, FrameImpl& frame, ProgramParametersLayout* parent_layout)
   : impl (new Impl (device_manager))
 {
   try
@@ -256,7 +258,7 @@ EffectRenderer::EffectRenderer (const EffectPtr& effect, const DeviceManagerPtr&
       {
           //обработка операции рендеринга - прохода рендеринга
         
-        RenderPassPtr pass (new RenderPass (device_manager), false);
+        RenderPassPtr pass (new RenderPass (device_manager, frame), false);
         
           //построение карты соответствия: тэг материала -> проход рендеринга
         
@@ -683,10 +685,32 @@ struct RenderOperationsExecutor
 
     device_context.RSSetScissor (rt_index, dst_rect);
   }
+
+///Обновление динамических примитивов
+  void UpdateDynamicPrimitives (RenderPass& pass)
+  {
+    FrameImpl& frame = pass.frame;
+
+    for (OperationPtrArray::iterator iter=pass.operation_ptrs.begin (), end=pass.operation_ptrs.end (); iter!=end; ++iter)
+    {
+      PassOperation& operation = **iter;
+
+      if (!operation.frame_dependent || !operation.dynamic_primitive)
+        continue;
+
+      math::mat4f mvp_matrix (1.0f); //!!!TODO: change to the real matrix
+
+      operation.dynamic_primitive->UpdateOnRender (frame, *operation.entity, mvp_matrix);
+    }
+  }
   
 ///Рендеринг прохода
   void DrawPass (RenderPass& pass)
   {
+      //обновление динамических примитивов
+ 
+    UpdateDynamicPrimitives (pass); 
+
       //сортировка операций
       
     pass.Sort ();

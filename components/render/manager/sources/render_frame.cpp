@@ -25,6 +25,7 @@ typedef stl::hash_map<stl::hash_key<const char*>, TexturePtr> TextureMap;
 
 struct EffectHolder: public CacheSource
 {
+  FrameImpl&               frame;                  //ссылка на кадр
   DeviceManagerPtr         device_manager;         //менеджер устройства отрисовки
   EffectManagerPtr         effect_manager;         //ссылка на менеджер эффектов
   EffectProxy              effect;                 //эффект кадра
@@ -33,8 +34,9 @@ struct EffectHolder: public CacheSource
   ProgramParametersLayout  properties_layout;      //расположение свойств
   
 ///Конструктор
-  EffectHolder (const EffectManagerPtr& in_effect_manager, const DeviceManagerPtr& in_device_manager)
-    : device_manager (in_device_manager)
+  EffectHolder (const EffectManagerPtr& in_effect_manager, const DeviceManagerPtr& in_device_manager, FrameImpl& in_frame)
+    : frame (in_frame)
+    , device_manager (in_device_manager)
     , effect_manager (in_effect_manager)
     , effect (effect_manager->GetEffectProxy (""))
     , properties_layout (&device_manager->Device (), &device_manager->Settings ())
@@ -58,7 +60,7 @@ struct EffectHolder: public CacheSource
       if (!cached_effect)
         return;
 
-      effect_renderer = EffectRendererPtr (new render::manager::EffectRenderer (cached_effect, device_manager, &properties_layout), false);      
+      effect_renderer = EffectRendererPtr (new render::manager::EffectRenderer (cached_effect, device_manager, frame, &properties_layout), false);
     }
     catch (xtl::exception& e)
     {
@@ -120,8 +122,8 @@ struct FrameImpl::Impl: public CacheHolder
   bool                                 auto_cleanup_state;      //самоочистка кадра после отрисовки
 
 ///Конструктор
-  Impl (const DeviceManagerPtr& device_manager, const EffectManagerPtr& effect_manager, const PropertyCachePtr& in_property_cache)
-    : effect_holder (new EffectHolder (effect_manager, device_manager))
+  Impl (FrameImpl& owner, const DeviceManagerPtr& device_manager, const EffectManagerPtr& effect_manager, const PropertyCachePtr& in_property_cache)
+    : effect_holder (new EffectHolder (effect_manager, device_manager, owner))
     , properties (device_manager)
     , entities_properties (in_property_cache)
     , shader_options_cache (&device_manager->CacheManager ())
@@ -189,7 +191,7 @@ FrameImpl::FrameImpl (const DeviceManagerPtr& device_manager, const EffectManage
     if (!property_cache)
       throw xtl::make_null_argument_exception ("", "property_cache");
     
-    impl = new Impl (device_manager, effect_manager, property_cache);
+    impl = new Impl (*this, device_manager, effect_manager, property_cache);
   }
   catch (xtl::exception& e)
   {

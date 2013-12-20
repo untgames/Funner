@@ -13,7 +13,7 @@ class DynamicPrimitive: public CacheSource, public xtl::trackable
 ///Обновление
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void UpdateOnPrerender (FrameId frame_id);
-    void UpdateOnRender    (EntityImpl& entity, FrameImpl& frame, const math::mat4f& mvp_matrix);
+    void UpdateOnRender    (FrameImpl& frame, EntityImpl& entity, const math::mat4f& mvp_matrix);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Группа примитивов рендеринга
@@ -36,7 +36,7 @@ class DynamicPrimitive: public CacheSource, public xtl::trackable
 ///Обновление
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     virtual void UpdateOnPrerenderCore () = 0;
-    virtual void UpdateOnRenderCore    (EntityImpl& entity, FrameImpl& frame, const math::mat4f& mvp_matrix) = 0;
+    virtual void UpdateOnRenderCore    (FrameImpl& frame, EntityImpl& entity, const math::mat4f& mvp_matrix) = 0;
 
   private:
     const manager::RendererPrimitiveGroup& group;
@@ -130,14 +130,14 @@ inline void DynamicPrimitive::UpdateOnPrerender (FrameId frame_id)
   }
 }
 
-inline void DynamicPrimitive::UpdateOnRender (EntityImpl& entity, FrameImpl& frame, const math::mat4f& mvp_matrix)
+inline void DynamicPrimitive::UpdateOnRender (FrameImpl& frame, EntityImpl& entity, const math::mat4f& mvp_matrix)
 {
   if (&entity == cached_entity && &frame == cached_frame)
     return;
 
   try
   {
-    UpdateOnRenderCore (entity, frame, mvp_matrix);
+    UpdateOnRenderCore (frame, entity, mvp_matrix);
   }
   catch (xtl::exception& e)
   {
