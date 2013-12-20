@@ -177,8 +177,9 @@ void DynamicPrimitiveEntityStorage::ResetCacheCore ()
     DynamicPrimitive
 */
 
-DynamicPrimitive::DynamicPrimitive (const render::manager::RendererPrimitiveGroup& in_group, bool in_frame_dependent)
+DynamicPrimitive::DynamicPrimitive (const render::manager::RendererPrimitiveGroup& in_group, size_t flags)
   : group (in_group)
-  , frame_dependent (in_frame_dependent)
+  , frame_dependent ((flags & DynamicPrimitiveFlag_FrameDependent) != 0)
+  , entity_dependent ((flags & DynamicPrimitiveFlag_EntityDependent) != 0)
 {
 }

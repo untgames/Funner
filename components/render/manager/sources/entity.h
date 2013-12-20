@@ -12,7 +12,6 @@ struct RendererOperation
   ProgramParametersLayout*        entity_parameters_layout;       //расположение параметров объекта
   const RendererPrimitive*        primitive;                      //примитив
   DynamicPrimitive*               dynamic_primitive;              //динамический примитив, соответствующий операции (может быть 0)
-  bool                            frame_dependent;                //зависит ли операция от кадра
   ShaderOptionsCache*             shader_options_cache;           //кэш опций шейдера
   const RectAreaImpl*             scissor;                        //область отсечения (может быть null)
 };
@@ -31,16 +30,20 @@ struct RendererOperationList
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 struct EntityLodDesc
 {
-  RendererOperationList&         operations;                       //операции рендеринга
-  DynamicPrimitiveEntityStorage& dynamic_primitive_storage;        //хранилище динамических примитивов
-  bool                           has_frame_dependent_operations;   //есть ли операции зависящие от кадра
-  bool                           has_frame_independent_operations; //есть ли операции не зависящие от кадра
+  RendererOperationList&         operations;                         //операции рендеринга
+  DynamicPrimitiveEntityStorage& dynamic_primitive_storage;          //хранилище динамических примитивов
+  bool                           has_frame_dependent_operations;     //есть ли операции зависящие от кадра
+  bool                           has_frame_independent_operations;   //есть ли операции не зависящие от кадра
+  bool                           has_entity_dependent_operations;    //есть ли операции зависящие от объекта
+  bool                           has_entity_independent_operations;  //есть ли операции не зависящие от объекта
 
   EntityLodDesc (RendererOperationList& in_operations, DynamicPrimitiveEntityStorage& in_storage)
     : operations (in_operations)
     , dynamic_primitive_storage (in_storage)
     , has_frame_dependent_operations ()
     , has_frame_independent_operations ()
+    , has_entity_dependent_operations ()
+    , has_entity_independent_operations ()
   {
   }
 };

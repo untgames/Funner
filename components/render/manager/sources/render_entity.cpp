@@ -388,8 +388,10 @@ struct EntityLod: public xtl::reference_counter, public EntityLodDesc, public Ca
     
     cached_operations.clear ();
 
-    has_frame_dependent_operations   = false;
-    has_frame_independent_operations = false;
+    has_frame_dependent_operations    = false;
+    has_frame_independent_operations  = false;
+    has_entity_dependent_operations   = false;
+    has_entity_independent_operations = false;
     
     memset (&cached_operation_list, 0, sizeof (cached_operation_list));
   }  
@@ -402,8 +404,10 @@ struct EntityLod: public xtl::reference_counter, public EntityLodDesc, public Ca
 
       dynamic_primitives.RemoveAllPrimitives ();
 
-      has_frame_dependent_operations   = false;
-      has_frame_independent_operations = false;
+      has_frame_dependent_operations    = false;
+      has_frame_independent_operations  = false;
+      has_entity_dependent_operations   = false;
+      has_entity_independent_operations = false;
 
          //протоколирование
 
@@ -482,11 +486,15 @@ struct EntityLod: public xtl::reference_counter, public EntityLodDesc, public Ca
       
       operation.primitive         = &renderer_primitive;
       operation.dynamic_primitive = dynamic_primitive;
-      operation.frame_dependent   = dynamic_primitive ? dynamic_primitive->IsFrameDependent () : false;
       operation.entity            = &common_data.Entity ();
 
-      has_frame_dependent_operations   = has_frame_dependent_operations || operation.frame_dependent;
-      has_frame_independent_operations = has_frame_independent_operations || !operation.frame_dependent;
+      bool frame_dependent  = dynamic_primitive ? dynamic_primitive->IsFrameDependent () : false,
+           entity_dependent = dynamic_primitive ? dynamic_primitive->IsEntityDependent () : false;
+
+      has_frame_dependent_operations    = has_frame_dependent_operations || frame_dependent;
+      has_frame_independent_operations  = has_frame_independent_operations || !frame_dependent;
+      has_entity_dependent_operations   = has_entity_dependent_operations || entity_dependent;
+      has_entity_independent_operations = has_entity_independent_operations || !entity_dependent;
 
       MaterialImpl* material = renderer_primitive.material;
 

@@ -171,11 +171,11 @@ class Frame
     const EntityDrawFunction& EntityDrawHandler    () const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Установка начальных свойств пары frame-entity
+///Установка свойств пары frame-entity
 /// (могут быть изменены в процессе вызова пользовательского обработчика отрисовки объектов)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void                       SetInitialEntityDrawProperties (const common::PropertyMap&);
-    const common::PropertyMap& InitialEntityDrawProperties    () const;
+    void                       SetEntityDependentProperties (const common::PropertyMap&);
+    const common::PropertyMap& EntityDependentProperties    () const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Рисование кадра

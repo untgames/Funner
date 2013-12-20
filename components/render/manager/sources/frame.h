@@ -113,10 +113,10 @@ class FrameImpl: public Object
     const EntityDrawFunction& EntityDrawHandler    ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Установка начальных свойств пары frame-entity
+///Установка свойств пары frame-entity
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void                       SetInitialEntityDrawProperties (const common::PropertyMap&);
-    const common::PropertyMap& InitialEntityDrawProperties    ();
+    void                       SetEntityDependentProperties (const common::PropertyMap&);
+    const common::PropertyMap& EntityDependentProperties    ();
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Рисование кадра

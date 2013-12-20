@@ -1,4 +1,15 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+///Флаги создания динамического примитива
+///////////////////////////////////////////////////////////////////////////////////////////////////
+enum DynamicPrimitiveFlag
+{
+  DynamicPrimitiveFlag_FrameDependent  = 1, //динамический примитив зависит от кадра
+  DynamicPrimitiveFlag_EntityDependent = 2, //динамический примитив зависит от сущности
+
+  DynamicPrimitiveFlag_Default = DynamicPrimitiveFlag_EntityDependent
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Динамический примитив
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 class DynamicPrimitive: public CacheSource, public xtl::trackable
@@ -21,15 +32,16 @@ class DynamicPrimitive: public CacheSource, public xtl::trackable
     const manager::RendererPrimitiveGroup& RendererPrimitiveGroup ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Является ли примитив зависимым от кадра
+///Является ли примитив зависимым от кадра / является ли примитив зависимым от EntityDrawParams
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    bool IsFrameDependent ();
+    bool IsFrameDependent  ();
+    bool IsEntityDependent ();
 
   protected:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструктор
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    DynamicPrimitive (const manager::RendererPrimitiveGroup& group, bool frame_dependent = false);
+    DynamicPrimitive (const manager::RendererPrimitiveGroup& group, size_t flags = DynamicPrimitiveFlag_Default);
 
   private:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -41,6 +53,7 @@ class DynamicPrimitive: public CacheSource, public xtl::trackable
   private:
     const manager::RendererPrimitiveGroup& group;
     bool                                   frame_dependent;
+    bool                                   entity_dependent;
     FrameId                                cached_frame_id;
     EntityImpl*                            cached_entity;
     FrameImpl*                             cached_frame;
@@ -112,6 +125,11 @@ inline const RendererPrimitiveGroup& DynamicPrimitive::RendererPrimitiveGroup ()
 inline bool DynamicPrimitive::IsFrameDependent ()
 {
   return frame_dependent;
+}
+
+inline bool DynamicPrimitive::IsEntityDependent ()
+{
+  return entity_dependent;
 }
 
 inline void DynamicPrimitive::UpdateOnPrerender (FrameId frame_id)

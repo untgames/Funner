@@ -32,9 +32,8 @@
   - StandaloneDynamicPrimitive
   - BatchingDynamicPrimitive
 
-  - перед отрисовкой прохода построить индексный буфер пакетных примитивов UpdateOnPrerender
-  - индексы в RendererPrimitive
   - добавить Frame::SetIdentityEntityDrawProperties(const common::PropertyMap&)
+  - перед отрисовкой прохода построить индексный буфер пакетных примитивов UpdateOnPrerender
   - перед отрисовкой кадра строить вершинный буфер спрайтов (получать списки спрайтов у каждого Entity)
   - в процессе отрисовки определять группы примитивов с общим хэшем пакета и отрисовывать их пакетом
 

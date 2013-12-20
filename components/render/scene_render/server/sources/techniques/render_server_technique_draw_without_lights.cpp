@@ -82,7 +82,7 @@ class DrawWithoutLights: public Technique
         mv_matrix_property_index   = properties.IndexOf ("ModelViewMatrix");
         mvp_matrix_property_index  = properties.IndexOf ("ModelViewProjectionMatrix");      
 
-        frame.SetInitialEntityDrawProperties (properties);
+        frame.SetEntityDependentProperties (properties);
         frame.SetEntityDrawHandler (xtl::bind (&DrawWithoutLights::EntityDrawHandler, this, _1, _2, _3, _4));
 
           //задание свойств фрейма

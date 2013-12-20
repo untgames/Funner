@@ -343,8 +343,10 @@ void EffectRenderer::AddOperations
  (const RendererOperationList& operations_desc,
   size_t                       eye_distance,
   const math::mat4f&           mvp_matrix,
-  render::low_level::IBuffer*  property_buffer,
-  ProgramParametersLayout*     property_layout)
+  render::low_level::IBuffer*  entity_dependent_property_buffer,
+  ProgramParametersLayout*     entity_dependent_property_layout,
+  render::low_level::IBuffer*  entity_independent_property_buffer,
+  ProgramParametersLayout*     entity_independent_property_layout)
 {
   static const char* METHOD_NAME = "render::manager::EffectRenderer::AddOperations(const RendererOperationList&)";  
   
@@ -380,22 +382,32 @@ void EffectRenderer::AddOperations
       
       stl::pair<RenderPassMap::iterator, RenderPassMap::iterator> range = passes.equal_range (*tag);
 
+        //определение буфера / лэйаута пары frame-entity
+
+      render::low_level::IBuffer* property_buffer = entity_dependent_property_buffer;
+      ProgramParametersLayout*    property_layout = entity_dependent_property_layout;
+
         //предварительное обновление динамических примитивов
 
       int mvp_matrix_index = -1;
 
-      if (range.first != range.second)
+      DynamicPrimitive* dynamic_primitive = operation->dynamic_primitive;
+
+      if (range.first != range.second && dynamic_primitive)
       {
-        if (DynamicPrimitive* dynamic_primitive = operation->dynamic_primitive)
+        dynamic_primitive->UpdateOnPrerender (current_frame_id);
+
+        if (dynamic_primitive->IsFrameDependent ())
         {
-          dynamic_primitive->UpdateOnPrerender (current_frame_id);
+          impl->mvp_matrices.push_back (mvp_matrix);
 
-          if (operation->frame_dependent)
-          {
-            impl->mvp_matrices.push_back (mvp_matrix);
+          mvp_matrix_index = impl->mvp_matrices.size () - 1;
+        }
 
-            mvp_matrix_index = impl->mvp_matrices.size () - 1;
-          }
+        if (!dynamic_primitive->IsEntityDependent ())
+        {
+          property_buffer = entity_independent_property_buffer;
+          property_layout = entity_independent_property_layout;
         }
       }
 
@@ -720,14 +732,15 @@ struct RenderOperationsExecutor
 
     for (OperationPtrArray::iterator iter=pass.operation_ptrs.begin (), end=pass.operation_ptrs.end (); iter!=end; ++iter)
     {
-      PassOperation& operation = **iter;
+      PassOperation&    operation         = **iter;
+      DynamicPrimitive* dynamic_primitive = operation.dynamic_primitive;
 
-      if (!operation.frame_dependent || !operation.dynamic_primitive || operation.mvp_matrix_index == -1)
+      if (!dynamic_primitive || !dynamic_primitive->IsFrameDependent () || operation.mvp_matrix_index == -1)
         continue;
 
       const math::mat4f& mvp_matrix = mvp_matrices [operation.mvp_matrix_index];
 
-      operation.dynamic_primitive->UpdateOnRender (frame, *operation.entity, mvp_matrix);
+      dynamic_primitive->UpdateOnRender (frame, *operation.entity, mvp_matrix);
     }
   }
   

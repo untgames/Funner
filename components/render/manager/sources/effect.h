@@ -162,7 +162,9 @@ class EffectRenderer: public Object
                         size_t                       eye_distance,
                         const math::mat4f&           mvp_matrix,
                         render::low_level::IBuffer*  property_buffer = 0,
-                        ProgramParametersLayout*     property_layour= 0);
+                        ProgramParametersLayout*     property_layour = 0,
+                        render::low_level::IBuffer*  entity_independent_property_buffer = 0,
+                        ProgramParametersLayout*     entity_independent_property_layour = 0);
     void AddOperations (FrameImpl& frame);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

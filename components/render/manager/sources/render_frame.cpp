@@ -119,7 +119,9 @@ struct FrameImpl::Impl: public CacheHolder
   LowLevelBufferPtr                    cached_properties;       //закэшированные свойства
   EntityDrawFunction                   entity_draw_handler;     //обработчик рисования объектов
   EntityDrawParams                     entity_draw_params;      //параметры рисования объектов (кэш)
-  bool                                 auto_cleanup_state;      //самоочистка кадра после отрисовки
+  LowLevelBufferPtr                    entity_independent_property_buffer; //буфер динамических свойств объекта (начальное состояние)
+  ProgramParametersLayoutPtr           entity_independent_layout;          //расположение динамических свойств объекта (начальное состояние)
+  bool                                 auto_cleanup_state;                 //самоочистка кадра после отрисовки
 
 ///Конструктор
   Impl (FrameImpl& owner, const DeviceManagerPtr& device_manager, const EffectManagerPtr& effect_manager, const PropertyCachePtr& in_property_cache)
@@ -544,15 +546,15 @@ const Frame::EntityDrawFunction& FrameImpl::EntityDrawHandler ()
 }
 
 /*
-    Установка начальных свойств пары frame-entity
+    Установка свойств пары frame-entity
 */
 
-void FrameImpl::SetInitialEntityDrawProperties (const common::PropertyMap& properties)
+void FrameImpl::SetEntityDependentProperties (const common::PropertyMap& properties)
 {
   impl->entity_draw_params.properties = properties;
 }
 
-const common::PropertyMap& FrameImpl::InitialEntityDrawProperties ()
+const common::PropertyMap& FrameImpl::EntityDependentProperties ()
 {
   return impl->entity_draw_params.properties;
 }
@@ -563,17 +565,26 @@ const common::PropertyMap& FrameImpl::InitialEntityDrawProperties ()
 
 void FrameImpl::Prerender (EntityDrawFunction entity_draw_handler)
 {
-    //построение списка операций
+    //кэширование переменных
     
   render::manager::EffectRenderer& renderer                = *impl->effect_holder->effect_renderer;    
   Frame                            frame                   = Wrappers::Wrap<Frame> (this);
   bool                             has_entity_draw_handler = entity_draw_handler;
   EntityDrawParams&                entity_draw_params      = impl->entity_draw_params;
   PropertyCache&                   entities_properties     = *impl->entities_properties;
+
+    //заполнение константного буфера соответствующего паре frame-entity (начальное состояние)
+
+  LowLevelBufferPtr&          entity_independent_property_buffer = impl->entity_independent_property_buffer;
+  ProgramParametersLayoutPtr& entity_independent_layout          = impl->entity_independent_layout;
+
+  entities_properties.Convert (entity_draw_params.properties, entity_independent_property_buffer, entity_independent_layout);
+
+    //удаление предыдущих операций
   
   renderer.RemoveAllOperations ();
-  
-  entity_draw_params.mvp_matrix = math::mat4f (1.0f);
+
+    //построение списка операций
 
   for (EntityArray::iterator iter=impl->entities.begin (), end=impl->entities.end (); iter!=end; ++iter)
   {
@@ -627,7 +638,8 @@ void FrameImpl::Prerender (EntityDrawFunction entity_draw_handler)
 
       //добавление операций рендеринга
 
-    renderer.AddOperations (lod_desc.operations, eye_distance, entity_draw_params.mvp_matrix, desc.property_buffer.get (), desc.layout.get ());
+    renderer.AddOperations (lod_desc.operations, eye_distance, entity_draw_params.mvp_matrix, desc.property_buffer.get (), desc.layout.get (),
+      entity_independent_property_buffer.get (), entity_independent_layout.get ());
   }
 
   for (FrameArray::iterator iter=impl->frames.begin (), end=impl->frames.end (); iter!=end; ++iter)
@@ -677,6 +689,11 @@ void FrameImpl::Draw (RenderingContext* previous_context)
         RemoveAllFrames ();
         RemoveAllEntities ();
       }
+
+        //сброс вспомогательных структур
+
+      impl->entity_independent_property_buffer = LowLevelBufferPtr ();
+      impl->entity_independent_layout          = ProgramParametersLayoutPtr ();
 
         //очистка временных данных
       

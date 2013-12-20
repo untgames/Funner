@@ -289,14 +289,14 @@ const Frame::EntityDrawFunction& Frame::EntityDrawHandler () const
   return impl->EntityDrawHandler ();
 }
 
-void Frame::SetInitialEntityDrawProperties (const common::PropertyMap& properties)
+void Frame::SetEntityDependentProperties (const common::PropertyMap& properties)
 {
-  impl->SetInitialEntityDrawProperties (properties);
+  impl->SetEntityDependentProperties (properties);
 }
 
-const common::PropertyMap& Frame::InitialEntityDrawProperties () const
+const common::PropertyMap& Frame::EntityDependentProperties () const
 {
-  return impl->InitialEntityDrawProperties ();
+  return impl->EntityDependentProperties ();
 }
 
 void Frame::Draw ()

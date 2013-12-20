@@ -107,10 +107,8 @@ struct BufferPool: public xtl::reference_counter, private Cache
     if (buffers.empty ())
       return;
     
-    size_t current_time  = CurrentTime (),
-           current_frame = CurrentFrame (),
-           time_delay    = TimeDelay (),
-           frame_delay   = FrameDelay ();
+    FrameTime current_time  = CurrentTime (), time_delay = TimeDelay ();
+    FrameId   current_frame = CurrentFrame (), frame_delay = FrameDelay ();
 
     for (BufferArray::iterator iter=buffers.end ()-1, end=buffers.begin ()-1; iter!=end; --iter)
       if (current_time - iter->last_use_time <= time_delay && current_frame - iter->last_use_frame <= frame_delay)
