@@ -333,12 +333,16 @@ void EffectRenderer::AddOperations
   render::low_level::IBuffer*  property_buffer,
   ProgramParametersLayout*     property_layout)
 {
-  static const char* METHOD_NAME = "render::manager::EffectRenderer::AddOperations(const RendererOperationList&)";
+  static const char* METHOD_NAME = "render::manager::EffectRenderer::AddOperations(const RendererOperationList&)";  
   
     //проверка корректности аргументов
 
   if (!operations_desc.operations && operations_desc.operations_count)
     throw xtl::make_null_argument_exception (METHOD_NAME, "operations.operations");
+
+    //получение идентификатора текущего кадра
+
+  FrameId current_frame_id = impl->device_manager->CacheManager ().CurrentFrame ();
     
     //кэширование карты проходов
     
@@ -362,6 +366,15 @@ void EffectRenderer::AddOperations
         //поиск проходов по тэгу операции
       
       stl::pair<RenderPassMap::iterator, RenderPassMap::iterator> range = passes.equal_range (*tag);
+
+        //предварительное обновление динамических примитивов
+
+      if (range.first != range.second && operation->dynamic_primitive)
+      {
+        operation->dynamic_primitive->UpdateOnPrerender (current_frame_id);
+      }
+
+        //добавление операции в проход
       
       for (;range.first!=range.second; ++range.first)
       {

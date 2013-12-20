@@ -37,7 +37,7 @@ struct CacheManager::Impl
   Impl ()
     : time_delay (DEFAULT_TIME_DELAY)
     , frame_delay (DEFAULT_FRAME_DELAY)
-    , current_frame ()
+    , current_frame (1)
     , current_time ()
   {
   }
@@ -78,6 +78,20 @@ FrameTime CacheManager::TimeDelay ()
 FrameId CacheManager::FrameDelay ()
 {
   return impl->frame_delay;
+}
+
+/*
+    Текущий кадр / текущий фрейм
+*/
+
+FrameTime CacheManager::CurrentTime ()
+{
+  return impl->current_time;
+}
+
+FrameId CacheManager::CurrentFrame ()
+{
+  return impl->current_frame - 1;
 }
 
 /*

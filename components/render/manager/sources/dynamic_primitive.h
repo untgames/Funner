@@ -12,20 +12,18 @@ class DynamicPrimitive: public CacheSource, public xtl::trackable
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///ќбновление
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    virtual void UpdateOnPrerender (EntityImpl& entity) = 0;
-    virtual void UpdateOnRender    (EntityImpl& entity, FrameImpl& frame) = 0;
+    void UpdateOnPrerender (FrameId frame_id);
+    void UpdateOnRender    (EntityImpl& entity, FrameImpl& frame, const math::mat4f& mvp_matrix);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///√руппа примитивов рендеринга
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    const manager::RendererPrimitiveGroup& RendererPrimitiveGroup () { return group; }
+    const manager::RendererPrimitiveGroup& RendererPrimitiveGroup ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///явл€етс€ ли примитив зависимым от кадра
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    bool IsFrameDependent () { return frame_dependent; }
-
-//TODO: добавить ссылки на обновленный кадр и объект
+    bool IsFrameDependent ();
 
   protected:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -34,8 +32,18 @@ class DynamicPrimitive: public CacheSource, public xtl::trackable
     DynamicPrimitive (const manager::RendererPrimitiveGroup& group, bool frame_dependent = false);
 
   private:
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///ќбновление
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    virtual void UpdateOnPrerenderCore () = 0;
+    virtual void UpdateOnRenderCore    (EntityImpl& entity, FrameImpl& frame, const math::mat4f& mvp_matrix) = 0;
+
+  private:
     const manager::RendererPrimitiveGroup& group;
     bool                                   frame_dependent;
+    FrameId                                cached_frame_id;
+    EntityImpl*                            cached_entity;
+    FrameImpl*                             cached_frame;
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -91,3 +99,49 @@ class DynamicPrimitiveEntityStorage: public CacheSource
     struct Impl;
     stl::auto_ptr<Impl> impl;
 };
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///–еализаци€
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+inline const RendererPrimitiveGroup& DynamicPrimitive::RendererPrimitiveGroup ()
+{
+  return group;
+}
+
+inline bool DynamicPrimitive::IsFrameDependent ()
+{
+  return frame_dependent;
+}
+
+inline void DynamicPrimitive::UpdateOnPrerender (FrameId frame_id)
+{
+  if (frame_id == cached_frame_id)
+    return;
+
+  try
+  {
+    UpdateOnPrerenderCore ();
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::manager::DynamicPrimitive::UpdateOnPrerender");
+    throw;
+  }
+}
+
+inline void DynamicPrimitive::UpdateOnRender (EntityImpl& entity, FrameImpl& frame, const math::mat4f& mvp_matrix)
+{
+  if (&entity == cached_entity && &frame == cached_frame)
+    return;
+
+  try
+  {
+    UpdateOnRenderCore (entity, frame, mvp_matrix);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::manager::DynamicPrimitive::UpdateOnRender");
+    throw;
+  }  
+}
