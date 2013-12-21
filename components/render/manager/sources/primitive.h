@@ -78,20 +78,18 @@ class PrimitiveImpl: public Object, public CacheSource
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Работа со спрайтами
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    size_t SpriteListsCount        ();
-    size_t AddStandaloneSpriteList (const SpriteListPtr&, const math::vec3f& up, MeshBufferUsage vb_usage, MeshBufferUsage ib_usage);
-    size_t AddBatchingSpriteList   (const SpriteListPtr&, const math::vec3f& up, SpriteMode sprite_mode);
-    void   RemoveSpriteList        (size_t index);
-    void   RemoveAllSpriteLists    ();
+    size_t        SpriteListsCount        ();
+    SpriteListPtr AddStandaloneSpriteList (const math::vec3f& up, MeshBufferUsage vb_usage, MeshBufferUsage ib_usage);
+    SpriteListPtr AddBatchingSpriteList   (const math::vec3f& up, SpriteMode sprite_mode);
+    void          RemoveAllSpriteLists    ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Работа с линиями
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    size_t LineListsCount        ();
-    size_t AddStandaloneLineList (const LineListPtr&, MeshBufferUsage vb_usage, MeshBufferUsage ib_usage);
-    size_t AddBatchingLineList   (const LineListPtr&);
-    void   RemoveLineList        (size_t index);
-    void   RemoveAllLineLists    ();
+    size_t      LineListsCount        ();
+    LineListPtr AddStandaloneLineList (MeshBufferUsage vb_usage, MeshBufferUsage ib_usage);
+    LineListPtr AddBatchingLineList   ();
+    void        RemoveAllLineLists    ();
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Группы примитивов рендеринга
@@ -161,6 +159,11 @@ template <class T> class DynamicPrimitiveListImpl: public Object, public CacheSo
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void   Reserve  (size_t count);
     size_t Capacity ();
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Удаление из примитива
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void RemoveFromPrimitive (PrimitiveImpl&);
 
   private:
     struct Impl;

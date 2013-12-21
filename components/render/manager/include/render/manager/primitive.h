@@ -195,20 +195,20 @@ class Primitive
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Работа со спрайтами
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    size_t SpriteListsCount         () const;
-    size_t AddStandaloneSpriteList  (const SpriteList& list, const math::vec3f& up, MeshBufferUsage vb_usage = MeshBufferUsage_Default,  MeshBufferUsage ib_usage = MeshBufferUsage_Default);
-    size_t AddBatchingSpriteList    (const SpriteList& list, const math::vec3f& up, SpriteMode mode = SpriteMode_Default);
-    void   RemoveSpriteList         (size_t index);
-    void   RemoveAllSpriteLists     ();
+    size_t     SpriteListsCount        () const;
+    SpriteList AddStandaloneSpriteList (const math::vec3f& up, MeshBufferUsage vb_usage = MeshBufferUsage_Default,  MeshBufferUsage ib_usage = MeshBufferUsage_Default);
+    SpriteList AddBatchingSpriteList   (const math::vec3f& up, SpriteMode mode = SpriteMode_Default);
+    void       RemoveSpriteList        (SpriteList&);
+    void       RemoveAllSpriteLists    ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Работа с линиями
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    size_t LineListsCount         () const;
-    size_t AddStandaloneLineList  (const LineList& list, MeshBufferUsage vb_usage = MeshBufferUsage_Default,  MeshBufferUsage ib_usage = MeshBufferUsage_Default);
-    size_t AddBatchingLineList    (const LineList& list);
-    void   RemoveLineList         (size_t index);
-    void   RemoveAllLineLists     ();
+    size_t   LineListsCount        () const;
+    LineList AddStandaloneLineList (MeshBufferUsage vb_usage = MeshBufferUsage_Default,  MeshBufferUsage ib_usage = MeshBufferUsage_Default);
+    LineList AddBatchingLineList   ();
+    void     RemoveLineList        (LineList&);
+    void     RemoveAllLineLists    ();
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Управление кэшированием
@@ -239,6 +239,7 @@ void swap (Primitive&, Primitive&);
 template <class T> class DynamicPrimitiveList
 {
   friend class Wrappers;
+  friend class Primitive;
   public:
     typedef T Item;
 
@@ -278,6 +279,11 @@ template <class T> class DynamicPrimitiveList
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void   Reserve  (size_t count);
     size_t Capacity () const;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Отсоединение от примитива   
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void RemoveFromMesh ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Обмен

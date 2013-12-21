@@ -523,17 +523,12 @@ size_t PrimitiveImpl::SpriteListsCount ()
   throw xtl::make_not_implemented_exception (__FUNCTION__);
 }
 
-size_t PrimitiveImpl::AddStandaloneSpriteList (const SpriteListPtr& list, const math::vec3f& up, MeshBufferUsage vb_usage, MeshBufferUsage ib_usage)
+SpriteListPtr PrimitiveImpl::AddStandaloneSpriteList (const math::vec3f& up, MeshBufferUsage vb_usage, MeshBufferUsage ib_usage)
 {
   throw xtl::make_not_implemented_exception (__FUNCTION__);
 }
 
-size_t PrimitiveImpl::AddBatchingSpriteList (const SpriteListPtr& list, const math::vec3f& up, SpriteMode sprite_mode)
-{
-  throw xtl::make_not_implemented_exception (__FUNCTION__);
-}
-
-void PrimitiveImpl::RemoveSpriteList (size_t index)
+SpriteListPtr  PrimitiveImpl::AddBatchingSpriteList (const math::vec3f& up, SpriteMode sprite_mode)
 {
   throw xtl::make_not_implemented_exception (__FUNCTION__);
 }
@@ -552,17 +547,12 @@ size_t PrimitiveImpl::LineListsCount ()
   throw xtl::make_not_implemented_exception (__FUNCTION__);
 }
 
-size_t PrimitiveImpl::AddStandaloneLineList (const LineListPtr& list, MeshBufferUsage vb_usage, MeshBufferUsage ib_usage)
+LineListPtr PrimitiveImpl::AddStandaloneLineList (MeshBufferUsage vb_usage, MeshBufferUsage ib_usage)
 {
   throw xtl::make_not_implemented_exception (__FUNCTION__);
 }
 
-size_t PrimitiveImpl::AddBatchingLineList (const LineListPtr& list)
-{
-  throw xtl::make_not_implemented_exception (__FUNCTION__);
-}
-
-void PrimitiveImpl::RemoveLineList (size_t index)
+LineListPtr PrimitiveImpl::AddBatchingLineList ()
 {
   throw xtl::make_not_implemented_exception (__FUNCTION__);
 }

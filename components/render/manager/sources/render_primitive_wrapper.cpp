@@ -65,19 +65,19 @@ size_t Primitive::SpriteListsCount () const
   return impl->SpriteListsCount ();
 }
 
-size_t Primitive::AddStandaloneSpriteList (const SpriteList& list, const math::vec3f& up, MeshBufferUsage vb_usage, MeshBufferUsage ib_usage)
+SpriteList Primitive::AddStandaloneSpriteList (const math::vec3f& up, MeshBufferUsage vb_usage, MeshBufferUsage ib_usage)
 {
-  return impl->AddStandaloneSpriteList (Wrappers::Unwrap<SpriteListImpl> (list), up, vb_usage, ib_usage);
+  return Wrappers::Wrap<SpriteList> (impl->AddStandaloneSpriteList (up, vb_usage, ib_usage));
 }
 
-size_t Primitive::AddBatchingSpriteList (const SpriteList& list, const math::vec3f& up, SpriteMode mode)
+SpriteList Primitive::AddBatchingSpriteList (const math::vec3f& up, SpriteMode mode)
 {
-  return impl->AddBatchingSpriteList (Wrappers::Unwrap<SpriteListImpl> (list), up, mode);
+  return Wrappers::Wrap<SpriteList> (impl->AddBatchingSpriteList (up, mode));
 }
 
-void Primitive::RemoveSpriteList (size_t index)
+void Primitive::RemoveSpriteList (SpriteList& list)
 {
-  impl->RemoveSpriteList (index);
+  list.impl->RemoveFromPrimitive (*impl);
 }
 
 void Primitive::RemoveAllSpriteLists ()
@@ -90,19 +90,19 @@ size_t Primitive::LineListsCount () const
   return impl->LineListsCount ();
 }
 
-size_t Primitive::AddStandaloneLineList (const LineList& list, MeshBufferUsage vb_usage, MeshBufferUsage ib_usage)
+LineList Primitive::AddStandaloneLineList (MeshBufferUsage vb_usage, MeshBufferUsage ib_usage)
 {
-  return impl->AddStandaloneLineList (Wrappers::Unwrap<LineListImpl> (list), vb_usage, ib_usage);
+  return Wrappers::Wrap<LineList> (impl->AddStandaloneLineList (vb_usage, ib_usage));
 }
 
-size_t Primitive::AddBatchingLineList (const LineList& list)
+LineList Primitive::AddBatchingLineList ()
 {
-  return impl->AddBatchingLineList (Wrappers::Unwrap<LineListImpl> (list));
+  return Wrappers::Wrap<LineList> (impl->AddBatchingLineList ());
 }
 
-void Primitive::RemoveLineList (size_t index)
+void Primitive::RemoveLineList (LineList& list)
 {
-  impl->RemoveLineList (index);
+  list.impl->RemoveFromPrimitive (*impl);
 }
 
 void Primitive::RemoveAllLineLists ()

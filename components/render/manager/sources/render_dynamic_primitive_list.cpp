@@ -221,6 +221,16 @@ size_t DynamicPrimitiveListImpl<T>::Capacity ()
 }
 
 /*
+    Удаление из примитива
+*/
+
+template <class T>
+void DynamicPrimitiveListImpl<T>::RemoveFromPrimitive (PrimitiveImpl&)
+{
+  throw xtl::make_not_implemented_exception (__FUNCTION__);
+}
+
+/*
     Инстанцирование
 */
 

@@ -111,8 +111,6 @@ class RenderManager
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Создание примитивов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    SpriteList       CreateSpriteList       ();
-    LineList         CreateLineList         ();
     Primitive        CreatePrimitive        ();
     Primitive        CreatePrimitive        (const PrimitiveBuffers&);
     PrimitiveBuffers CreatePrimitiveBuffers ();
