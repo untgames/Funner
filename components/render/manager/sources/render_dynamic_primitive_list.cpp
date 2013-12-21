@@ -2,6 +2,8 @@
 
 using namespace render::manager;
 
+//TODO: material cache update & buffers cache update
+
 /*
     Описание реализации группы динамических примитивов
 */
@@ -11,13 +13,15 @@ template <class T> struct DynamicPrimitiveListImpl<T>::Impl
   typedef typename DynamicPrimitiveListImpl<T>::Item Item;
   typedef stl::vector<Item>                          ItemArray;
 
-  MaterialManagerPtr            material_manager; //менеджер материалов
-  stl::auto_ptr<MaterialProxy>  material;         //материал
-  ItemArray                     items;            //хранимые элементы
+  MaterialManagerPtr            material_manager;    //менеджер материалов
+  stl::auto_ptr<MaterialProxy>  material;            //материал
+  ItemArray                     items;               //хранимые элементы
+  bool                          need_update_buffers; //требуется обновление буферов
 
 /// Конструктор
   Impl (const MaterialManagerPtr& in_material_manager)
     : material_manager (in_material_manager)
+    , need_update_buffers (true)
   {
     if (!material_manager)
       throw xtl::make_null_argument_exception ("render::manager::DynamicPrimitiveListImpl<T>::DynamicPrimitiveListImpl", "material_manager");
@@ -50,8 +54,22 @@ size_t DynamicPrimitiveListImpl<T>::Size ()
 }
 
 /*
+    Получение примитивов
+*/
+
+template <class T>
+typename DynamicPrimitiveListImpl<T>::Item* DynamicPrimitiveListImpl<T>::Items ()
+{
+  if (impl->items.empty ())
+    return 0;
+
+  return &impl->items [0];
+}
+
+/*
     Материал
 */
+
 template <class T>
 void DynamicPrimitiveListImpl<T>::SetMaterial (const char* material)
 {
@@ -123,6 +141,8 @@ size_t DynamicPrimitiveListImpl<T>::Add (size_t count, const Item* items)
 
     impl->items.insert (impl->items.end (), items, items + count);
 
+    impl->need_update_buffers = true;
+
     InvalidateCacheDependencies ();
 
     return impl->items.size () - 1;    
@@ -161,7 +181,9 @@ void DynamicPrimitiveListImpl<T>::Update (size_t first, size_t count, const Item
     for (size_t i=0; i<count; i++, src++, dst++)
       *dst = *src;
 
-    InvalidateCacheDependencies ();
+    impl->need_update_buffers = true;
+
+    InvalidateCache ();
   }
   catch (xtl::exception& e)
   {
@@ -188,6 +210,8 @@ void DynamicPrimitiveListImpl<T>::Remove (size_t first, size_t count)
 
   impl->items.erase (impl->items.begin () + first, impl->items.begin () + first + count);
 
+  impl->need_update_buffers = true;
+
   InvalidateCacheDependencies ();
 }
 
@@ -195,6 +219,8 @@ template <class T>
 void DynamicPrimitiveListImpl<T>::Clear ()
 {
   impl->items.clear ();
+
+  impl->need_update_buffers = true;
 
   InvalidateCacheDependencies ();
 }
@@ -211,7 +237,11 @@ void DynamicPrimitiveListImpl<T>::Reserve (size_t count)
   impl->items.reserve (count);
 
   if (capacity < count)
+  {
+    impl->need_update_buffers = true;
+
     InvalidateCacheDependencies ();
+  }
 }
 
 template <class T>
@@ -228,6 +258,24 @@ template <class T>
 void DynamicPrimitiveListImpl<T>::RemoveFromPrimitive (PrimitiveImpl&)
 {
   throw xtl::make_not_implemented_exception (__FUNCTION__);
+}
+
+/*
+    Обновление кэша
+*/
+
+template <class T>
+void DynamicPrimitiveListImpl<T>::UpdateCacheCore ()
+{
+  try
+  {
+///?????????????    
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::manager::DynamicPrimitiveListImpl<T>::UpdateCacheCore");
+    throw;
+  }
 }
 
 /*
