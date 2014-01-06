@@ -22,7 +22,7 @@ ifneq (,$(filter android-arm,$(PROFILES)))
 endif
 
 ifneq (,$(filter android,$(PROFILES)))
-  COMPONENT_DIRS += gcm google_play_billing facebook_android_sdk android_support_v4 flurry
+  COMPONENT_DIRS += gcm google_play_billing facebook_android_sdk android_support_v4 flurry amazon_in_app_purchasing
 endif
 
 ifneq (,$(filter iphone,$(PROFILES)))
