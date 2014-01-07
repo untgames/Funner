@@ -87,6 +87,12 @@ size_t DynamicPrimitiveList<T>::Capacity () const
 }
 
 template <class T>
+void DynamicPrimitiveList<T>::RemoveFromPrimitive ()
+{
+  throw xtl::make_not_implemented_exception (__FUNCTION__);
+}
+
+template <class T>
 void DynamicPrimitiveList<T>::Swap (DynamicPrimitiveList& list)
 {
   stl::swap (impl, list.impl);

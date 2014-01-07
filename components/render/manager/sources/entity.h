@@ -1,29 +1,4 @@
-class  DynamicPrimitive;
-class  DynamicPrimitiveEntityStorage;
-struct RendererPrimitive;
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Описание операции рендеринга
-///////////////////////////////////////////////////////////////////////////////////////////////////
-struct RendererOperation
-{
-  EntityImpl*                     entity;                         //объект
-  render::low_level::IStateBlock* state_block;                    //блок состояний объекта
-  ProgramParametersLayout*        entity_parameters_layout;       //расположение параметров объекта
-  const RendererPrimitive*        primitive;                      //примитив
-  DynamicPrimitive*               dynamic_primitive;              //динамический примитив, соответствующий операции (может быть 0)
-  ShaderOptionsCache*             shader_options_cache;           //кэш опций шейдера
-  const RectAreaImpl*             scissor;                        //область отсечения (может быть null)
-};
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Описание списка операций
-///////////////////////////////////////////////////////////////////////////////////////////////////
-struct RendererOperationList
-{
-  size_t                   operations_count; //количество операций
-  const RendererOperation* operations;       //операции
-};
+class DynamicPrimitiveEntityStorage;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Информация о уровне детализации
