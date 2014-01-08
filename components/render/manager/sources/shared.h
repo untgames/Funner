@@ -19,6 +19,8 @@
 #include <xtl/trackable.h>
 #include <xtl/uninitialized_storage.h>
 
+#include <math/utility.h>
+
 #include <common/hash.h>
 #include <common/log.h>
 #include <common/parser.h>
