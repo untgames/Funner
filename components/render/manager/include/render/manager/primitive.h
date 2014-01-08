@@ -51,28 +51,26 @@ enum MeshBufferUsage
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Режим отображения спрайтов
-///////////////////////////////////////////////////////////////////////////////////////////////////
-enum SpriteMode
-{
-  SpriteMode_Billboard, //параллельно плоскости камеры
-  SpriteMode_Oriented,  //согласно заданной ориентации объекта
-
-  SpriteMode_Default = SpriteMode_Billboard
-};
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Спрайт
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 struct Sprite
 {
-  math::vec3f  position;   //положение центра спрайта
-  math::vec3f  normal;     //нормаль (в SpriteMode_Billboard используется в системе координат View, по умолчанию должна быть (0,0,1))
-  math::anglef rotation;   //поворот относительно нормали
-  math::vec2f  size;       //размер спрайта
-  math::vec4f  color;      //цвет спрайта
-  math::vec2f  tex_offset; //смещение начала спрайта в текстуре [0;1]
-  math::vec2f  tex_size;   //размер спрайта в текстуре [0;1]
+  math::vec3f position;   //положение центра спрайта
+  math::vec2f size;       //размер спрайта
+  math::vec4f color;      //цвет спрайта
+  math::vec2f tex_offset; //смещение начала спрайта в текстуре [0;1]
+  math::vec2f tex_size;   //размер спрайта в текстуре [0;1]
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Виды спрайтов
+///////////////////////////////////////////////////////////////////////////////////////////////////
+struct BillboardSprite: public Sprite {};
+
+struct OrientedSprite: public Sprite
+{
+  math::vec3f  normal;   //нормаль
+  math::anglef rotation; //поворот относительно нормали
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -93,8 +91,9 @@ struct Line
   LinePoint point [2]; //концы линии
 };
 
-typedef DynamicPrimitiveList<Sprite> SpriteList;
-typedef DynamicPrimitiveList<Line>   LineList;
+typedef DynamicPrimitiveList<BillboardSprite> BillboardSpriteList;
+typedef DynamicPrimitiveList<OrientedSprite>  OrientedSpriteList;
+typedef DynamicPrimitiveList<Line>            LineList;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Буфер примитивов
@@ -195,11 +194,14 @@ class Primitive
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Работа со спрайтами
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    size_t     SpriteListsCount        () const;
-    SpriteList AddStandaloneSpriteList (const math::vec3f& up, MeshBufferUsage vb_usage = MeshBufferUsage_Default,  MeshBufferUsage ib_usage = MeshBufferUsage_Default);
-    SpriteList AddBatchingSpriteList   (const math::vec3f& up, SpriteMode mode = SpriteMode_Default);
-    void       RemoveSpriteList        (SpriteList&);
-    void       RemoveAllSpriteLists    ();
+    size_t              SpriteListsCount                 () const;
+    BillboardSpriteList AddStandaloneBillboardSpriteList (const math::vec3f& up, MeshBufferUsage vb_usage = MeshBufferUsage_Default,  MeshBufferUsage ib_usage = MeshBufferUsage_Default);
+    OrientedSpriteList  AddStandaloneOrientedSpriteList  (const math::vec3f& up, MeshBufferUsage vb_usage = MeshBufferUsage_Default,  MeshBufferUsage ib_usage = MeshBufferUsage_Default);
+    BillboardSpriteList AddBatchingBillboardSpriteList   (const math::vec3f& up);
+    OrientedSpriteList  AddBatchingOrientedSpriteList    (const math::vec3f& up);
+    void                RemoveSpriteList                 (OrientedSpriteList&);
+    void                RemoveSpriteList                 (BillboardSpriteList&);
+    void                RemoveAllSpriteLists             ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Работа с линиями

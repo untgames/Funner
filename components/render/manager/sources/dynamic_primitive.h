@@ -98,6 +98,27 @@ class DynamicPrimitiveEntityStorage: public CacheSource
     struct Impl;
     stl::auto_ptr<Impl> impl;
 };
+                 /*
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Генератор спрайтов
+///////////////////////////////////////////////////////////////////////////////////////////////////
+class DynamicPrimitiveBillboardSpriteGenerator
+{
+  public:
+    enum {
+      VERTICES_PER_PRIMITIVE = 4,
+      INDICES_PER_PRIMITIVE  = 6
+    };
+
+    DynamicPrimitiveBillboardSpriteGenerator (const math::mat4f& inv_view_projection_tm, const math::mat4f& model_tm);
+
+    void Generate (const Sprite& src_sprite, size_t base_vertex, DynamicPrimitiveVertex* dst_vertices, DynamicPrimitiveIndex* dst_indices);
+
+  private:
+    math::mat4f& model_tm;
+//    math::quatf  rotation;
+    math::vec3f  scale; //???
+};             */
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Группа динамических примитивов
@@ -219,3 +240,40 @@ inline void DynamicPrimitive::UpdateOnRender (FrameImpl& frame, EntityImpl& enti
     throw;
   }  
 }
+/*
+template <> inline void DynamicPrimitiveGenerator<Sprite>::Generate (const Sprite& src_sprite, size_t base_vertex, DynamicPrimitiveVertex* dst_vertices, DynamicPrimitiveIndex* dst_indices)
+{  
+    //заполнение вершин
+
+  math::vec3f position;
+  math::vec3f normal;
+
+  math::vec3f  position;   //положение центра спрайта
+  math::vec3f  normal;     //нормаль (в SpriteMode_Billboard используется в системе координат View, по умолчанию должна быть (0,0,1))
+  math::anglef rotation;   //поворот относительно нормали
+  math::vec2f  size;       //размер спрайта
+
+
+//???????????
+
+  DynamicPrimitiveVertex* dst_vertex = dst_vertices;
+
+  for (size_t i=0; i<VERTICES_PER_PRIMITIVE; i++, dst_vertex++)
+    dst_vertex = src_sprite.color;
+
+  dst_vertices [0].tex_coord = src_sprite.tex_offset;
+  dst_vertices [1].tex_coord = src_sprite.tex_offset + math::vec2f (src_sprite.tex_size.x, 0);
+  dst_vertices [2].tex_coord = src_sprite.tex_offset + src_sprite.tex_size;
+  dst_vertices [3].tex_coord = src_sprite.tex_offset + math::vec2f (0, src_sprite.tex_size.y);
+
+    //заполнение индексов
+
+  static const DynamicPrimitiveIndex indices [INDICES_PER_PRIMITIVE] = {0, 2, 3, 0, 1, 2};
+
+  const DynamicPrimitiveIndex* src_index = indices;
+  DynamicPrimitiveIndex*       dst_index = dst_indices;
+
+  for (size_t i=0; i<INDICES_PER_PRIMITIVE; i++, dst_index++, src_index++)
+    *dst_index = *src_index + base_vertex;
+}
+                   */

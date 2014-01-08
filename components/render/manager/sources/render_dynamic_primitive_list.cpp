@@ -282,5 +282,6 @@ void DynamicPrimitiveListImpl<T>::UpdateCacheCore ()
     Инстанцирование
 */
 
-template class DynamicPrimitiveListImpl<Sprite>;
+template class DynamicPrimitiveListImpl<BillboardSprite>;
+template class DynamicPrimitiveListImpl<OrientedSprite>;
 template class DynamicPrimitiveListImpl<Line>;

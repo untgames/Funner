@@ -8,6 +8,7 @@
 #include <stl/string>
 #include <stl/vector>
 
+#include <xtl/type_traits>
 #include <xtl/bind.h>
 #include <xtl/common_exceptions.h>
 #include <xtl/intrusive_ptr.h>
@@ -73,12 +74,14 @@ struct ShaderOptions;
 
 template <class T> class DynamicPrimitiveBuffer;
 
-typedef DynamicPrimitiveListImpl<Line>   LineListImpl;
-typedef DynamicPrimitiveListImpl<Sprite> SpriteListImpl;
+typedef DynamicPrimitiveListImpl<Line>            LineListImpl;
+typedef DynamicPrimitiveListImpl<BillboardSprite> BillboardSpriteListImpl;
+typedef DynamicPrimitiveListImpl<OrientedSprite>  OrientedSpriteListImpl;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Указатели на объекты рендера среднего уровня
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+typedef xtl::intrusive_ptr<BillboardSpriteListImpl> BillboardSpriteListPtr;
 typedef xtl::intrusive_ptr<CacheManager>            CacheManagerPtr;
 typedef xtl::intrusive_ptr<DeviceManager>           DeviceManagerPtr;
 typedef xtl::intrusive_ptr<DynamicTextureImpl>      DynamicTexturePtr;
@@ -93,6 +96,7 @@ typedef xtl::intrusive_ptr<LineListImpl>            LineListPtr;
 typedef xtl::intrusive_ptr<MaterialImpl>            MaterialPtr;
 typedef xtl::intrusive_ptr<MaterialManager>         MaterialManagerPtr;
 typedef xtl::intrusive_ptr<NativeWindow>            NativeWindowPtr;
+typedef xtl::intrusive_ptr<OrientedSpriteListImpl>  OrientedSpriteListPtr;
 typedef xtl::intrusive_ptr<PrimitiveImpl>           PrimitivePtr;
 typedef xtl::intrusive_ptr<PrimitiveBuffersImpl>    PrimitiveBuffersPtr;
 typedef xtl::intrusive_ptr<PrimitiveManager>        PrimitiveManagerPtr;
@@ -105,7 +109,6 @@ typedef xtl::intrusive_ptr<RenderManagerImpl>       RenderManagerPtr;
 typedef xtl::intrusive_ptr<RenderTargetImpl>        RenderTargetPtr;
 typedef xtl::intrusive_ptr<RenderTargetDesc>        RenderTargetDescPtr;
 typedef xtl::intrusive_ptr<RenderTargetMapImpl>     RenderTargetMapPtr;
-typedef xtl::intrusive_ptr<SpriteListImpl>          SpriteListPtr;
 typedef xtl::intrusive_ptr<Settings>                SettingsPtr;
 typedef xtl::intrusive_ptr<TextureImpl>             TexturePtr;
 typedef xtl::intrusive_ptr<TextureManager>          TextureManagerPtr;

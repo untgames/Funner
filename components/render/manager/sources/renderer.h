@@ -18,7 +18,8 @@ struct DynamicPrimitiveVertex
   math::vec2f tex_coord;
 };
 
-typedef DynamicPrimitiveBuffer<unsigned short>         DynamicIndexBuffer;
+typedef unsigned short                                 DynamicPrimitiveIndex;
+typedef DynamicPrimitiveBuffer<DynamicPrimitiveIndex>  DynamicIndexBuffer;
 typedef DynamicPrimitiveBuffer<DynamicPrimitiveVertex> DynamicVertexBuffer;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -35,7 +36,7 @@ struct RendererPrimitive
   size_t                           base_vertex;     //индекс базовой вершины
   size_t                           tags_count;      //количество тэгов материала
   const size_t*                    tags;            //тэги материала
-  const unsigned short*            dynamic_indices; //динамические индексы
+  const DynamicPrimitiveIndex*     dynamic_indices; //динамические индексы
   DynamicIndexBuffer*              dynamic_ib;      //динамический индексный буфер  
 };
 

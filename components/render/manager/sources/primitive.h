@@ -37,10 +37,12 @@ class PrimitiveImpl: public Object, public CacheSource
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Работа со спрайтами
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    size_t        SpriteListsCount        ();
-    SpriteListPtr AddStandaloneSpriteList (const math::vec3f& up, MeshBufferUsage vb_usage, MeshBufferUsage ib_usage);
-    SpriteListPtr AddBatchingSpriteList   (const math::vec3f& up, SpriteMode sprite_mode);
-    void          RemoveAllSpriteLists    ();
+    size_t                 SpriteListsCount                 ();
+    BillboardSpriteListPtr AddStandaloneBillboardSpriteList (const math::vec3f& up, MeshBufferUsage vb_usage, MeshBufferUsage ib_usage);
+    BillboardSpriteListPtr AddBatchingBillboardSpriteList   (const math::vec3f& up);
+    OrientedSpriteListPtr  AddStandaloneOrientedSpriteList  (const math::vec3f& up, MeshBufferUsage vb_usage, MeshBufferUsage ib_usage);
+    OrientedSpriteListPtr  AddBatchingOrientedSpriteList    (const math::vec3f& up);
+    void                   RemoveAllSpriteLists             ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Работа с линиями

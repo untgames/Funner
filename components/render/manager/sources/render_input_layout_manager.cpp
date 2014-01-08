@@ -217,6 +217,8 @@ void InputLayoutManager::InitDynamicPrimitivesLayout ()
 
     memset (&desc, 0, sizeof desc);
 
+    (void)xtl::compile_time_assert<xtl::type_traits::is_same<unsigned short, DynamicPrimitiveIndex>::value>::value;
+
     desc.vertex_attributes_count = attributes_count;
     desc.vertex_attributes       = &attributes [0];
     desc.index_type              = render::low_level::InputDataType_UShort;

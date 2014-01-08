@@ -523,12 +523,22 @@ size_t PrimitiveImpl::SpriteListsCount ()
   throw xtl::make_not_implemented_exception (__FUNCTION__);
 }
 
-SpriteListPtr PrimitiveImpl::AddStandaloneSpriteList (const math::vec3f& up, MeshBufferUsage vb_usage, MeshBufferUsage ib_usage)
+BillboardSpriteListPtr PrimitiveImpl::AddStandaloneBillboardSpriteList (const math::vec3f& up, MeshBufferUsage vb_usage, MeshBufferUsage ib_usage)
 {
   throw xtl::make_not_implemented_exception (__FUNCTION__);
 }
 
-SpriteListPtr  PrimitiveImpl::AddBatchingSpriteList (const math::vec3f& up, SpriteMode sprite_mode)
+BillboardSpriteListPtr PrimitiveImpl::AddBatchingBillboardSpriteList (const math::vec3f& up)
+{
+  throw xtl::make_not_implemented_exception (__FUNCTION__);
+}
+
+OrientedSpriteListPtr PrimitiveImpl::AddStandaloneOrientedSpriteList (const math::vec3f& up, MeshBufferUsage vb_usage, MeshBufferUsage ib_usage)
+{
+  throw xtl::make_not_implemented_exception (__FUNCTION__);
+}
+
+OrientedSpriteListPtr PrimitiveImpl::AddBatchingOrientedSpriteList (const math::vec3f& up)
 {
   throw xtl::make_not_implemented_exception (__FUNCTION__);
 }
