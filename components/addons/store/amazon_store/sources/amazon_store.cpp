@@ -15,10 +15,10 @@ void finish_transaction_handler (const Transaction& transaction, const Transacti
 void on_initialized (JNIEnv& env, jobject, jboolean can_buy_products);
 void on_purchase_initiated (JNIEnv& env, jobject, jstring sku);
 void on_purchase_failed (JNIEnv& env, jobject, jstring sku, jstring error);
-void on_purchase_succeeded (JNIEnv& env, jobject, jstring sku, jobject purchase, jstring receipt, jstring signature);
-void on_purchase_restored (JNIEnv& env, jobject, jstring sku, jobject purchase, jstring receipt, jstring signature);
-void on_consume_failed (JNIEnv& env, jobject, jobject purchase, jstring error);
-void on_consume_succeeded (JNIEnv& env, jobject, jobject purchase);
+void on_purchase_succeeded (JNIEnv& env, jobject, jstring sku, jstring user_id, jstring purchase_token);
+void on_purchase_restored (JNIEnv& env, jobject, jstring sku, jstring user_id, jstring purchase_token);
+void on_transaction_finish_failed (JNIEnv& env, jobject, jstring purchase_token, jstring error);
+void on_transaction_finish_succeeded (JNIEnv& env, jobject, jstring purchase_token);
 
 /*
    Реализация магазина
@@ -186,6 +186,9 @@ class AmazonStore
 
       try
       {
+        if (!can_buy_products)
+          throw xtl::format_operation_exception ("", "Can't buy products, amazon user id not available");
+
         if (!product_id)
           throw xtl::make_null_argument_exception ("", "product_id");
 
@@ -194,9 +197,7 @@ class AmazonStore
 
         log.Printf ("Buy product '%s' requested", product_id);
 
-        bool consumable = properties.IsPresent ("Consumable") && properties.GetInteger ("Consumable");
-
-        TransactionDescPtr new_transaction (new TransactionDesc (product_id, consumable), false);
+        TransactionDescPtr new_transaction (new TransactionDesc (product_id), false);
 
         NotifyTransactionUpdated (new_transaction->transaction);
 
@@ -243,18 +244,18 @@ class AmazonStore
 
      try
      {
-       stop_processing_method = find_method (env, store_class, "stopProcessing", "()V");
-       buy_method             = find_method (env, store_class, "buyProduct", "(Ljava/lang/String;)V");
-//       consume_method         = find_method (env, store_class, "consumeProduct", "(Lcom/untgames/funner/store/Purchase;)V");
+       stop_processing_method    = find_method (env, store_class, "stopProcessing", "()V");
+       buy_method                = find_method (env, store_class, "buyProduct", "(Ljava/lang/String;)V");
+       finish_transaction_method = find_method (env, store_class, "finishTransaction", "(Ljava/lang/String;)V");
 
        static const JNINativeMethod methods [] = {
          {"onInitializedCallback", "(Z)V", (void*)&on_initialized},
          {"onPurchaseInitiatedCallback", "(Ljava/lang/String;)V", (void*)&on_purchase_initiated},
-/*         {"onPurchaseFailedCallback", "(Ljava/lang/String;Ljava/lang/String;)V", (void*)&on_purchase_failed},
-         {"onPurchaseSucceededCallback", "(Ljava/lang/String;Lcom/untgames/funner/store/Purchase;Ljava/lang/String;Ljava/lang/String;)V", (void*)&on_purchase_succeeded},
-         {"onPurchaseRestoredCallback", "(Ljava/lang/String;Lcom/untgames/funner/store/Purchase;Ljava/lang/String;Ljava/lang/String;)V", (void*)&on_purchase_restored},
-         {"onConsumeFailedCallback", "(Lcom/untgames/funner/store/Purchase;Ljava/lang/String;)V", (void*)&on_consume_failed},
-         {"onConsumeSucceededCallback", "(Lcom/untgames/funner/store/Purchase;)V", (void*)&on_consume_succeeded},*/
+         {"onPurchaseFailedCallback", "(Ljava/lang/String;Ljava/lang/String;)V", (void*)&on_purchase_failed},
+         {"onPurchaseSucceededCallback", "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V", (void*)&on_purchase_succeeded},
+         {"onPurchaseRestoredCallback", "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V", (void*)&on_purchase_restored},
+         {"onTransactionFinishFailedCallback", "(Ljava/lang/String;Ljava/lang/String;)V", (void*)&on_transaction_finish_failed},
+         {"onTransactionFinishSucceededCallback", "(Ljava/lang/String;)V", (void*)&on_transaction_finish_succeeded},
        };
 
        static const size_t methods_count = sizeof (methods) / sizeof (*methods);
@@ -288,11 +289,11 @@ class AmazonStore
 
          if (transaction_desc.transaction.Id () == transaction.Id ())
          {
-           if (transaction_desc.consumable && (transaction_desc.transaction.State () == TransactionState_Purchased || transaction_desc.transaction.State () == TransactionState_Restored))
+           if (transaction_desc.transaction.State () == TransactionState_Purchased || transaction_desc.transaction.State () == TransactionState_Restored)
            {
-             transaction_desc.consume_callback = callback;
+             transaction_desc.finish_callback = callback;
 
-             get_env ().CallVoidMethod (store, consume_method, transaction_desc.purchase.get ());
+             get_env ().CallVoidMethod (store, finish_transaction_method, tojstring (transaction_desc.purchase_token.c_str ()).get ());
            }
            else
            {
@@ -313,19 +314,17 @@ class AmazonStore
      }
    }
 
-   void OnConsumeFailed (global_ref<jobject> purchase, const stl::string& error)
+   void OnTransactionFinishFailed (const stl::string& purchase_token, const stl::string& error)
    {
      try
      {
-       log.Printf ("Consume failed");
-
-       JNIEnv* env = &get_env ();
+       log.Printf ("Transaction finish failed");
 
        for (TransactionsArray::iterator iter = pending_transactions.begin (), end = pending_transactions.end (); iter != end; ++iter)
        {
-         if (env->IsSameObject (purchase.get (), (*iter)->purchase.get ()))
+         if (purchase_token == (*iter)->purchase_token)
          {
-           (*iter)->consume_callback (false, error.c_str ());
+           (*iter)->finish_callback (false, error.c_str ());
            return;
          }
        }
@@ -337,23 +336,21 @@ class AmazonStore
      }
    }
 
-   void OnConsumeSucceeded (global_ref<jobject> purchase)
+   void OnTransactionFinishSucceeded (const stl::string& purchase_token)
    {
      try
      {
-       log.Printf ("Consume succeeded");
-
-       JNIEnv* env = &get_env ();
+       log.Printf ("Transaction finish succeeded");
 
        for (TransactionsArray::iterator iter = pending_transactions.begin (), end = pending_transactions.end (); iter != end; ++iter)
        {
-         if (env->IsSameObject (purchase.get (), (*iter)->purchase.get ()))
+         if (purchase_token == (*iter)->purchase_token)
          {
-           Transaction::OnFinishedCallback consume_callback = (*iter)->consume_callback;
+           Transaction::OnFinishedCallback finish_callback = (*iter)->finish_callback;
 
            pending_transactions.erase (iter);
 
-           consume_callback (true, "");
+           finish_callback (true, "");
 
            return;
          }
@@ -408,7 +405,7 @@ class AmazonStore
      }
    }
 
-   void OnPurchaseSucceeded (const stl::string& sku, global_ref<jobject> purchase, const stl::string& receipt, const stl::string& signature)
+   void OnPurchaseSucceeded (const stl::string& sku, const stl::string& user_id, const stl::string& purchase_token)
    {
      try
      {
@@ -416,13 +413,13 @@ class AmazonStore
 
        log.Printf ("Purchase succeeded for product '%s'", transaction_desc.transaction.ProductId ());
 
-       transaction_desc.completed = true;
-       transaction_desc.purchase  = purchase;
+       transaction_desc.completed      = true;
+       transaction_desc.purchase_token = purchase_token;
 
-       transaction_desc.transaction.SetReceipt (receipt.size (), receipt.data ());
+       transaction_desc.transaction.SetReceipt (purchase_token.size (), purchase_token.data ());
        transaction_desc.transaction.SetState (TransactionState_Purchased);
 
-       transaction_desc.transaction.Properties ().SetProperty ("Signature", signature.c_str ());
+       transaction_desc.transaction.Properties ().SetProperty ("UserId", user_id.c_str ());
 
        NotifyTransactionUpdated (transaction_desc.transaction);
      }
@@ -433,7 +430,7 @@ class AmazonStore
      }
    }
 
-   void OnPurchaseRestored (const stl::string& sku, global_ref<jobject> purchase, const stl::string& receipt, const stl::string& signature)
+   void OnPurchaseRestored (const stl::string& sku, const stl::string& user_id, const stl::string& purchase_token)
    {
      try
      {
@@ -442,12 +439,11 @@ class AmazonStore
        log.Printf ("Purchase restored for product '%s'", transaction_desc.transaction.ProductId ());
 
        transaction_desc.completed = true;
-       transaction_desc.purchase  = purchase;
 
-       transaction_desc.transaction.SetReceipt (receipt.size (), receipt.data ());
+       transaction_desc.transaction.SetReceipt (purchase_token.size (), purchase_token.data ());
        transaction_desc.transaction.SetState (TransactionState_Restored);
 
-       transaction_desc.transaction.Properties ().SetProperty ("Signature", signature.c_str ());
+       transaction_desc.transaction.Properties ().SetProperty ("UserId", user_id.c_str ());
 
        NotifyTransactionUpdated (transaction_desc.transaction);
      }
@@ -462,14 +458,12 @@ class AmazonStore
     struct TransactionDesc : public xtl::reference_counter
     {
       Transaction                     transaction;
-      bool                            consumable;
       bool                            completed;
-      global_ref<jobject>             purchase;
-      Transaction::OnFinishedCallback consume_callback;
+      stl::string                     purchase_token;
+      Transaction::OnFinishedCallback finish_callback;
 
-      TransactionDesc (const char* product_id, bool in_consumable)
+      TransactionDesc (const char* product_id)
         : transaction (finish_transaction_handler)
-        , consumable (in_consumable)
         , completed (false)
       {
         transaction.SetState (TransactionState_New);
@@ -507,18 +501,18 @@ class AmazonStore
     typedef stl::vector<TransactionDescPtr>        TransactionsArray;
 
   public:
-    common::Log         log;                      //протокол
-    bool                initialized;              //завершена ли инициализация магазина
-    bool                initialize_started;       //начата ли инициализация магазина
-    bool                can_buy_products;         //доступны ли покупки
-    StoreSignal         store_signal;             //соединение оповещения обновления транзакций
-    OnInitializedSignal on_initialized_signal;    //соединение оповещения завершения инициализации магазина
-    jclass              store_class;              //класс Store
-    jobject             store;                    //объект Store
-    jmethodID           buy_method;               //метод покупки
-    jmethodID           consume_method;           //метод поглощения покупки
-    jmethodID           stop_processing_method;   //метод остановки обработки покупок
-    TransactionsArray   pending_transactions;     //текущие незавершенные транзакции
+    common::Log         log;                       //протокол
+    bool                initialized;               //завершена ли инициализация магазина
+    bool                initialize_started;        //начата ли инициализация магазина
+    bool                can_buy_products;          //доступны ли покупки
+    StoreSignal         store_signal;              //соединение оповещения обновления транзакций
+    OnInitializedSignal on_initialized_signal;     //соединение оповещения завершения инициализации магазина
+    jclass              store_class;               //класс Store
+    jobject             store;                     //объект Store
+    jmethodID           buy_method;                //метод покупки
+    jmethodID           finish_transaction_method; //метод завершения транзакции
+    jmethodID           stop_processing_method;    //метод остановки обработки покупок
+    TransactionsArray   pending_transactions;      //текущие незавершенные транзакции
 };
 
 typedef common::Singleton<AmazonStore> StoreSingleton;
@@ -538,24 +532,24 @@ void on_purchase_failed (JNIEnv& env, jobject, jstring sku, jstring error)
   common::ActionQueue::PushAction (xtl::bind (&AmazonStore::OnPurchaseFailed, &*StoreSingleton::Instance (), tostring (sku), tostring (error)), common::ActionThread_Main);
 }
 
-void on_purchase_succeeded (JNIEnv& env, jobject, jstring sku, jobject purchase, jstring receipt, jstring signature)
+void on_purchase_succeeded (JNIEnv& env, jobject, jstring sku, jstring user_id, jstring purchase_token)
 {
-  common::ActionQueue::PushAction (xtl::bind (&AmazonStore::OnPurchaseSucceeded, &*StoreSingleton::Instance (), tostring (sku), global_ref<jobject> (purchase), tostring (receipt), tostring (signature)), common::ActionThread_Main);
+  common::ActionQueue::PushAction (xtl::bind (&AmazonStore::OnPurchaseSucceeded, &*StoreSingleton::Instance (), tostring (sku), tostring (user_id), tostring (purchase_token)), common::ActionThread_Main);
 }
 
-void on_purchase_restored (JNIEnv& env, jobject, jstring sku, jobject purchase, jstring receipt, jstring signature)
+void on_purchase_restored (JNIEnv& env, jobject, jstring sku, jstring user_id, jstring purchase_token)
 {
-  common::ActionQueue::PushAction (xtl::bind (&AmazonStore::OnPurchaseRestored, &*StoreSingleton::Instance (), tostring (sku), global_ref<jobject> (purchase), tostring (receipt), tostring (signature)), common::ActionThread_Main);
+  common::ActionQueue::PushAction (xtl::bind (&AmazonStore::OnPurchaseRestored, &*StoreSingleton::Instance (), tostring (sku), tostring (user_id), tostring (purchase_token)), common::ActionThread_Main);
 }
 
-void on_consume_failed (JNIEnv& env, jobject, jobject purchase, jstring error)
+void on_transaction_finish_failed (JNIEnv& env, jobject, jstring purchase_token, jstring error)
 {
-  common::ActionQueue::PushAction (xtl::bind (&AmazonStore::OnConsumeFailed, &*StoreSingleton::Instance (), global_ref<jobject> (purchase), tostring (error)), common::ActionThread_Main);
+  common::ActionQueue::PushAction (xtl::bind (&AmazonStore::OnTransactionFinishFailed, &*StoreSingleton::Instance (), tostring (purchase_token), tostring (error)), common::ActionThread_Main);
 }
 
-void on_consume_succeeded (JNIEnv& env, jobject, jobject purchase)
+void on_transaction_finish_succeeded (JNIEnv& env, jobject, jstring purchase_token)
 {
-  common::ActionQueue::PushAction (xtl::bind (&AmazonStore::OnConsumeSucceeded, &*StoreSingleton::Instance (), global_ref<jobject> (purchase)), common::ActionThread_Main);
+  common::ActionQueue::PushAction (xtl::bind (&AmazonStore::OnTransactionFinishSucceeded, &*StoreSingleton::Instance (), tostring (purchase_token)), common::ActionThread_Main);
 }
 
 void finish_transaction_handler (const Transaction& transaction, const Transaction::OnFinishedCallback& callback)

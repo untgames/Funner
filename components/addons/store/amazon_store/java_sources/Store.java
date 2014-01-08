@@ -9,19 +9,26 @@ import java.util.List;
 
 import com.amazon.inapp.purchasing.BasePurchasingObserver;
 import com.amazon.inapp.purchasing.GetUserIdResponse;
+import com.amazon.inapp.purchasing.Item;
 import com.amazon.inapp.purchasing.ItemDataResponse;
+import com.amazon.inapp.purchasing.Offset;
 import com.amazon.inapp.purchasing.PurchaseResponse;
 import com.amazon.inapp.purchasing.PurchaseUpdatesResponse;
 import com.amazon.inapp.purchasing.PurchasingManager;
+import com.amazon.inapp.purchasing.Receipt;
 
 public class Store
 {
   private static final String LOG_TAG = "funner.AmazonStore";
   
 	private Activity         activity;
+	private boolean          sdk_available;
+	private String           user_id;  
 	private volatile boolean purchase_in_progress;
 	private volatile boolean processing_stopped;
 	private List<Runnable>   purchase_queue = Collections.synchronizedList (new ArrayList ());
+	private String           current_purchase_sku;  
+	java.util.Set<Receipt>   purchased_skus = new java.util.HashSet<Receipt> ();
 
   public Store (Activity inActivity)
   {
@@ -41,22 +48,22 @@ public class Store
             
             public void onGetUserIdResponse(final GetUserIdResponse response) 
             {
-              Log.d (LOG_TAG, "USER ID RESPONSE: " + response);
+              onGetUserIdResponseImpl (response);
             }
             
             public void onItemDataResponse(final ItemDataResponse response) 
             {
-              Log.d (LOG_TAG, "ITEM DATA RESPONSE: " + response);
+              //TODO
             }
             
             public void onPurchaseResponse(final PurchaseResponse response) 
             {
-              Log.d (LOG_TAG, "PURCHASE RESPONSE: " + response);
+              onPurchaseResponseImpl (response);
             }
             
             public void onPurchaseUpdatesResponse(final PurchaseUpdatesResponse response) 
             {
-              Log.d (LOG_TAG, "PURCHASE UPDATES RESPONSE: " + response);
+              onPurchaseUpdatesResponseImpl (response);
             }
           });
         }
@@ -70,9 +77,19 @@ public class Store
 
   public void onSdkAvailableImpl ()
   {
-    onInitializedCallback (true);
+    sdk_available = true;
+
+    PurchasingManager.initiateGetUserIdRequest (); //all applications are closed when user deregister device, so we can get user id only once per session
   }
-  
+
+  public void onGetUserIdResponseImpl (final GetUserIdResponse response) 
+  {
+    if (response.getUserIdRequestStatus () == GetUserIdResponse.GetUserIdRequestStatus.SUCCESSFUL) 
+      user_id = response.getUserId ();
+    
+    onInitializedCallback (response.getUserIdRequestStatus () == GetUserIdResponse.GetUserIdRequestStatus.SUCCESSFUL);
+  }
+
 	private final Runnable queue_processor = new Runnable () {
 		public void run ()
 		{
@@ -101,6 +118,7 @@ public class Store
 	private void processPurchaseQueue ()
 	{
 		purchase_in_progress = false;
+    current_purchase_sku = null;
 
 		activity.runOnUiThread (queue_processor);          		
 	}
@@ -110,6 +128,8 @@ public class Store
   	Runnable request = new Runnable () {
   		public void run ()
   		{
+  		  current_purchase_sku = sku;
+  		  
   			try
   			{
     	  	onPurchaseInitiatedCallback (sku);
@@ -118,64 +138,18 @@ public class Store
   			{
   				//ignore all exceptions
   			}
-  	  	
   			
-        String requestId = PurchasingManager.initiatePurchaseRequest (sku); //DEBUG
-  			
-  			
-  			
-  			  //check if this item already bought
-/*  			helper.queryInventoryAsync (false, new IabHelper.QueryInventoryFinishedListener ()
-  			{
-          public void onQueryInventoryFinished(IabResult result, Inventory inv)
-          {
-          	try
-          	{
-          		Log.d(TAG, "Query inventory '" + inv + "' finished, result: " + result);
-
-          		if (result.isFailure())
-          		{
-          			onPurchaseFailedCallback (sku, result.getMessage ());
-            		processPurchaseQueue ();
-          		}
-          		else
-          		{
-                Purchase info = inv.getPurchase (sku);
-                
-                if (info != null)
-                {
-            			onPurchaseRestoredCallback (sku, info, info.getOriginalJson (), info.getSignature ());
-              		processPurchaseQueue ();
-                	return;
-                }
-          			
-          			helper.launchPurchaseFlow (activity, sku, PURCHASE_REQUEST_CODE, new IabHelper.OnIabPurchaseFinishedListener ()
-          			{
-                  public void onIabPurchaseFinished(IabResult result, Purchase info)
-                  {
-                  	try
-                  	{
-                  		Log.d (TAG, "Purchase '" + info + "' finished, result: " + result);
-
-                  		if (result.isFailure ()) 
-                  			onPurchaseFailedCallback (sku, result.getMessage ());
-                  		else
-                  			onPurchaseSucceededCallback (sku, info, info.getOriginalJson (), info.getSignature ());
-                  	}
-                  	finally
-                  	{
-                  		processPurchaseQueue ();
-                    }
-                  }
-          			});
-          		}
-          	}
-          	catch (Throwable e) 
-          	{
-          		processPurchaseQueue ();
-          	}
-          }
-  			});*/
+  			  //update list of already purchased items
+        try
+        {
+          purchased_skus.clear ();
+          
+          PurchasingManager.initiatePurchaseUpdatesRequest (Offset.BEGINNING);
+        }
+        catch (Throwable e) 
+        {
+          processPurchaseQueue ();
+        }
   		}
   	};
 
@@ -184,30 +158,136 @@ public class Store
   	activity.runOnUiThread (queue_processor);
   }
 
-  public void consumeProduct ()
+  public void onPurchaseUpdatesResponseImpl (final PurchaseUpdatesResponse response) 
   {
-/*    (new Thread (new Runnable () {
-      public void run () {
-      	try
-      	{
-          helper.consume(purchase);
-          onConsumeSucceededCallback (purchase);
-        }
-        catch (IabException e) {
-          onConsumeFailedCallback (purchase, e.getResult ().getMessage ());
-        }
-      	catch (Throwable e) {
-          onConsumeFailedCallback (purchase, e.getMessage ());
-      	}
+    try
+    {
+      if (response.getPurchaseUpdatesRequestStatus () == PurchaseUpdatesResponse.PurchaseUpdatesRequestStatus.FAILED)
+      {
+        onPurchaseFailedCallback (current_purchase_sku, "Purchase updates request failed");
+        processPurchaseQueue ();      
+        return;
       }
-    })).start ();*/
+      
+      purchased_skus.addAll (response.getReceipts ());
+      
+      if (response.isMore ())
+      {
+        PurchasingManager.initiatePurchaseUpdatesRequest (response.getOffset ());
+        return;
+      }
+      
+      //all purchases history received, check that item already purchased
+      for (Receipt receipt : purchased_skus)
+      {
+        if (receipt.getSku () == current_purchase_sku)
+        {
+          onPurchaseRestoredCallback (current_purchase_sku, user_id, receipt.getPurchaseToken ());
+          processPurchaseQueue ();      
+          return;
+        }
+      }
+      
+      //TODO check stored consumable receipts
+      
+      //this sku has not been purchased yet or consumable, launch purchase
+      PurchasingManager.initiatePurchaseRequest (current_purchase_sku);
+    }
+    catch (Throwable e) 
+    {
+      onPurchaseFailedCallback (current_purchase_sku, e.getMessage ());
+      processPurchaseQueue ();
+    }
+  }
+
+  private void saveConsumableReceipt (String sku, String userId, String purchaseToken)
+  {
+    //TODO
   }
   
-  private native void onInitializedCallback(boolean canBuyProducts);
-  private native void onPurchaseInitiatedCallback(String sku);
-  private native void onPurchaseFailedCallback(String sku, String error);
-  private native void onPurchaseSucceededCallback(String sku, String receipt, String signature);
-  private native void onPurchaseRestoredCallback(String sku, String receipt, String signature);
-  private native void onConsumeFailedCallback(String error);
-  private native void onConsumeSucceededCallback();
+  public void onPurchaseResponseImpl (final PurchaseResponse response) 
+  {
+    Receipt receipt = response.getReceipt ();
+    
+    try
+    {
+      if (response.getPurchaseRequestStatus () == PurchaseResponse.PurchaseRequestStatus.SUCCESSFUL)
+      {
+        //check that it is responce for currently purchasing item, store receipt anyway
+        if ((!user_id.equals (response.getUserId ()) || !current_purchase_sku.equals (receipt.getSku ())) && receipt.getItemType () == Item.ItemType.CONSUMABLE)
+        {
+          saveConsumableReceipt (receipt.getSku (), response.getUserId (), receipt.getPurchaseToken ());
+          return;
+        }
+      }
+    }
+    catch (Throwable e)
+    {
+      //ignore all errors
+    }
+    
+    try
+    {
+      switch (response.getPurchaseRequestStatus ())
+      {
+        case FAILED:
+        {
+          onPurchaseFailedCallback (current_purchase_sku, "Purchase request failed");
+          processPurchaseQueue ();      
+          return;
+        }
+        case INVALID_SKU:
+        {
+          onPurchaseFailedCallback (current_purchase_sku, "Purchase request failed, invalid sku");
+          processPurchaseQueue ();      
+          return;
+        }
+        default:
+        {
+          if (receipt != null)
+          {
+            saveConsumableReceipt (current_purchase_sku, user_id, receipt.getPurchaseToken ());
+            
+            onPurchaseSucceededCallback (current_purchase_sku, user_id, receipt.getPurchaseToken ());
+            
+            processPurchaseQueue ();      
+          }
+          else
+          {
+            onPurchaseFailedCallback (current_purchase_sku, "Purchase request failed");
+            processPurchaseQueue ();      
+          }
+          
+          return;
+        }
+      }
+    }
+    catch (Throwable e) 
+    {
+      onPurchaseFailedCallback (current_purchase_sku, e.getMessage ());
+      processPurchaseQueue ();
+    }
+  }
+
+  public void finishTransaction (String purchaseToken)
+  {
+  	try
+  	{
+  	  //TODO delete record
+  	  
+      onTransactionFinishSucceededCallback (purchaseToken);
+    }
+  	catch (Throwable e) 
+  	{
+      onTransactionFinishFailedCallback (purchaseToken, e.getMessage ());
+  	}
+  }
+  
+  private native void onInitializedCallback (boolean canBuyProducts);
+  private native void onPurchaseInitiatedCallback (String sku);
+  private native void onPurchaseFailedCallback (String sku, String error);
+  private native void onPurchaseSucceededCallback (String sku, String userId, String purchaseToken);
+  private native void onPurchaseRestoredCallback (String sku, String userId, String purchaseToken);
+  private native void onTransactionFinishFailedCallback (String purchaseToken, String error);
+  private native void onTransactionFinishSucceededCallback (String purchaseToken);
 }
