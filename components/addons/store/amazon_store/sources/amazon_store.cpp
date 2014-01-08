@@ -202,7 +202,7 @@ class AmazonStore
 
         JNIEnv* env = &get_env ();
 
-        env->CallVoidMethod (store, buy_method, get_activity (), tojstring (product_id).get ());
+        env->CallVoidMethod (store, buy_method, tojstring (product_id).get ());
 
         pending_transactions.push_back (new_transaction);
 
@@ -244,17 +244,17 @@ class AmazonStore
      try
      {
        stop_processing_method = find_method (env, store_class, "stopProcessing", "()V");
-//       buy_method             = find_method (env, store_class, "buyProduct", "(Landroid/app/Activity;Ljava/lang/String;)V");
+       buy_method             = find_method (env, store_class, "buyProduct", "(Ljava/lang/String;)V");
 //       consume_method         = find_method (env, store_class, "consumeProduct", "(Lcom/untgames/funner/store/Purchase;)V");
 
-/*       static const JNINativeMethod methods [] = {
+       static const JNINativeMethod methods [] = {
          {"onInitializedCallback", "(Z)V", (void*)&on_initialized},
          {"onPurchaseInitiatedCallback", "(Ljava/lang/String;)V", (void*)&on_purchase_initiated},
-         {"onPurchaseFailedCallback", "(Ljava/lang/String;Ljava/lang/String;)V", (void*)&on_purchase_failed},
+/*         {"onPurchaseFailedCallback", "(Ljava/lang/String;Ljava/lang/String;)V", (void*)&on_purchase_failed},
          {"onPurchaseSucceededCallback", "(Ljava/lang/String;Lcom/untgames/funner/store/Purchase;Ljava/lang/String;Ljava/lang/String;)V", (void*)&on_purchase_succeeded},
          {"onPurchaseRestoredCallback", "(Ljava/lang/String;Lcom/untgames/funner/store/Purchase;Ljava/lang/String;Ljava/lang/String;)V", (void*)&on_purchase_restored},
          {"onConsumeFailedCallback", "(Lcom/untgames/funner/store/Purchase;Ljava/lang/String;)V", (void*)&on_consume_failed},
-         {"onConsumeSucceededCallback", "(Lcom/untgames/funner/store/Purchase;)V", (void*)&on_consume_succeeded},
+         {"onConsumeSucceededCallback", "(Lcom/untgames/funner/store/Purchase;)V", (void*)&on_consume_succeeded},*/
        };
 
        static const size_t methods_count = sizeof (methods) / sizeof (*methods);
@@ -262,7 +262,7 @@ class AmazonStore
        jint status = env->RegisterNatives (store_class, methods, methods_count);
 
        if (status)
-         throw xtl::format_operation_exception ("", "Can't register natives (status=%d)", status);*/
+         throw xtl::format_operation_exception ("", "Can't register natives (status=%d)", status);
      }
      catch (...)
      {

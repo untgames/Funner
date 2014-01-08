@@ -7,6 +7,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import com.amazon.inapp.purchasing.BasePurchasingObserver;
+import com.amazon.inapp.purchasing.GetUserIdResponse;
+import com.amazon.inapp.purchasing.ItemDataResponse;
+import com.amazon.inapp.purchasing.PurchaseResponse;
+import com.amazon.inapp.purchasing.PurchaseUpdatesResponse;
 import com.amazon.inapp.purchasing.PurchasingManager;
 
 public class Store
@@ -18,21 +23,56 @@ public class Store
 	private volatile boolean processing_stopped;
 	private List<Runnable>   purchase_queue = Collections.synchronizedList (new ArrayList ());
 
-  public Store (Activity inActivity) throws Throwable 
+  public Store (Activity inActivity)
   {
     activity = inActivity;
 
-    try
-    {
-      PurchasingManager.registerObserver (new PurchasingObserver (activity));
-    }
-    catch (Throwable e)
-    {
-      Log.d (LOG_TAG, "Exception while creating store object: " + e.getMessage ());
-      throw e;
-    }
+    activity.runOnUiThread (new Runnable () {
+      public void run ()
+      {
+        try
+        {
+          PurchasingManager.registerObserver (new BasePurchasingObserver (activity)
+          {
+            public void onSdkAvailable(final boolean isSandboxMode) 
+            {
+              onSdkAvailableImpl ();
+            }
+            
+            public void onGetUserIdResponse(final GetUserIdResponse response) 
+            {
+              Log.d (LOG_TAG, "USER ID RESPONSE: " + response);
+            }
+            
+            public void onItemDataResponse(final ItemDataResponse response) 
+            {
+              Log.d (LOG_TAG, "ITEM DATA RESPONSE: " + response);
+            }
+            
+            public void onPurchaseResponse(final PurchaseResponse response) 
+            {
+              Log.d (LOG_TAG, "PURCHASE RESPONSE: " + response);
+            }
+            
+            public void onPurchaseUpdatesResponse(final PurchaseUpdatesResponse response) 
+            {
+              Log.d (LOG_TAG, "PURCHASE UPDATES RESPONSE: " + response);
+            }
+          });
+        }
+        catch (Throwable e)
+        {
+          Log.d (LOG_TAG, "Exception while creating store object: " + e.getMessage ());
+        }
+      }
+    });
   }
 
+  public void onSdkAvailableImpl ()
+  {
+    onInitializedCallback (true);
+  }
+  
 	private final Runnable queue_processor = new Runnable () {
 		public void run ()
 		{
@@ -65,9 +105,9 @@ public class Store
 		activity.runOnUiThread (queue_processor);          		
 	}
 	
-  public void buyProduct (final Activity activity, final String sku)
+  public void buyProduct (final String sku)
   {
-/*  	Runnable request = new Runnable () {
+  	Runnable request = new Runnable () {
   		public void run ()
   		{
   			try
@@ -79,8 +119,13 @@ public class Store
   				//ignore all exceptions
   			}
   	  	
+  			
+        String requestId = PurchasingManager.initiatePurchaseRequest (sku); //DEBUG
+  			
+  			
+  			
   			  //check if this item already bought
-  			helper.queryInventoryAsync (false, new IabHelper.QueryInventoryFinishedListener ()
+/*  			helper.queryInventoryAsync (false, new IabHelper.QueryInventoryFinishedListener ()
   			{
           public void onQueryInventoryFinished(IabResult result, Inventory inv)
           {
@@ -130,13 +175,13 @@ public class Store
           		processPurchaseQueue ();
           	}
           }
-  			});
+  			});*/
   		}
   	};
 
 		purchase_queue.add (request);
 
-  	activity.runOnUiThread (queue_processor);*/
+  	activity.runOnUiThread (queue_processor);
   }
 
   public void consumeProduct ()
