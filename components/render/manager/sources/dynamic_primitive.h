@@ -141,7 +141,7 @@ class SpriteGenerator
       INDICES_PER_PRIMITIVE  = 6
     };
 
-    static void Generate (const Sprite& src_sprite, size_t base_vertex, DynamicPrimitiveVertex* dst_vertices, DynamicPrimitiveIndex* dst_indices);
+    static void Generate (const Sprite& src_sprite, const math::vec3f& normal, size_t base_vertex, DynamicPrimitiveVertex* dst_vertices, DynamicPrimitiveIndex* dst_indices);
 };
 
 class BillboardSpriteGenerator: public SpriteGenerator
@@ -158,15 +158,26 @@ class BillboardSpriteGenerator: public SpriteGenerator
     math::vec3f        right;
 };
 
-////????batching+oriented; worldtmis needed
-class OrientedSpriteGenerator: public SpriteGenerator
+class StandaloneOrientedSpriteGenerator: public SpriteGenerator
 {
   public:
-    OrientedSpriteGenerator (const math::vec3f& local_up);
+    StandaloneOrientedSpriteGenerator (const math::vec3f& local_up);
 
     void Generate (const OrientedSprite& src_sprite, size_t base_vertex, DynamicPrimitiveVertex* dst_vertices, DynamicPrimitiveIndex* dst_indices);  
 
   private:
+    const math::vec3f& up;    
+};
+
+class BatchingOrientedSpriteGenerator: public SpriteGenerator
+{
+  public:
+    BatchingOrientedSpriteGenerator (const math::vec3f& local_up, const math::mat4f& world_tm);
+
+    void Generate (const OrientedSprite& src_sprite, size_t base_vertex, DynamicPrimitiveVertex* dst_vertices, DynamicPrimitiveIndex* dst_indices);  
+
+  private:
+    const math::mat4f& world_tm;
     const math::vec3f& up;    
 };
 
@@ -329,12 +340,15 @@ inline void BatchingLineGenerator::Generate (const Line& src_line, size_t base_v
     dst_vertex->position = world_tm * src_point->position;
 }
 
-inline void SpriteGenerator::Generate (const Sprite& src_sprite, size_t base_vertex, DynamicPrimitiveVertex* dst_vertices, DynamicPrimitiveIndex* dst_indices)
+inline void SpriteGenerator::Generate (const Sprite& src_sprite, const math::vec3f& normal, size_t base_vertex, DynamicPrimitiveVertex* dst_vertices, DynamicPrimitiveIndex* dst_indices)
 {  
   DynamicPrimitiveVertex* dst_vertex = dst_vertices;
 
   for (size_t i=0; i<VERTICES_PER_PRIMITIVE; i++, dst_vertex++)
-    dst_vertex->color = src_sprite.color;
+  {
+    dst_vertex->color  = src_sprite.color;
+    dst_vertex->normal = normal;
+  }
 
   dst_vertices [0].tex_coord = src_sprite.tex_offset;
   dst_vertices [1].tex_coord = src_sprite.tex_offset + math::vec2f (src_sprite.tex_size.x, 0);
@@ -368,15 +382,15 @@ inline void BillboardSpriteGenerator::Generate (const BillboardSprite& src_sprit
   dst_vertices [2].position = world_tm * (src_sprite.position + ortx + orty);
   dst_vertices [3].position = world_tm * (src_sprite.position - ortx + orty);
 
-  DynamicPrimitiveVertex* dst_vertex = dst_vertices;
-
-  for (size_t i=0; i<VERTICES_PER_PRIMITIVE; i++, dst_vertex++)
-    dst_vertex->normal = world_normal;
-
-  SpriteGenerator::Generate (src_sprite, base_vertex, dst_vertices, dst_indices);
+  SpriteGenerator::Generate (src_sprite, world_normal, base_vertex, dst_vertices, dst_indices);
 }
 
-inline void OrientedSpriteGenerator::Generate (const OrientedSprite& src_sprite, size_t base_vertex, DynamicPrimitiveVertex* dst_vertices, DynamicPrimitiveIndex* dst_indices)
+inline StandaloneOrientedSpriteGenerator::StandaloneOrientedSpriteGenerator (const math::vec3f& local_up)
+  : up (local_up)
+{
+}
+
+inline void StandaloneOrientedSpriteGenerator::Generate (const OrientedSprite& src_sprite, size_t base_vertex, DynamicPrimitiveVertex* dst_vertices, DynamicPrimitiveIndex* dst_indices)
 {  
   math::vec3f ortx = cross (up, src_sprite.normal);
 
@@ -393,10 +407,31 @@ inline void OrientedSpriteGenerator::Generate (const OrientedSprite& src_sprite,
   dst_vertices [2].position = src_sprite.position + ortx + orty;
   dst_vertices [3].position = src_sprite.position - ortx + orty;
 
-  DynamicPrimitiveVertex* dst_vertex = dst_vertices;
+  SpriteGenerator::Generate (src_sprite, src_sprite.normal, base_vertex, dst_vertices, dst_indices);
+}
 
-  for (size_t i=0; i<VERTICES_PER_PRIMITIVE; i++, dst_vertex++)
-    dst_vertex->normal = src_sprite.normal;
+inline BatchingOrientedSpriteGenerator::BatchingOrientedSpriteGenerator (const math::vec3f& local_up, const math::mat4f& in_world_tm)
+  : up (local_up)
+  , world_tm (in_world_tm)
+{
+}
 
-  SpriteGenerator::Generate (src_sprite, base_vertex, dst_vertices, dst_indices);
+inline void BatchingOrientedSpriteGenerator::Generate (const OrientedSprite& src_sprite, size_t base_vertex, DynamicPrimitiveVertex* dst_vertices, DynamicPrimitiveIndex* dst_indices)
+{  
+  math::vec3f ortx = cross (up, src_sprite.normal);
+
+  if (src_sprite.rotation != math::anglef ())
+    ortx = math::rotate (src_sprite.rotation, src_sprite.normal) * math::vec4f (ortx, 0);
+
+  math::vec3f orty = cross (src_sprite.normal, ortx);
+
+  ortx *= src_sprite.size.x * 0.5f;
+  orty *= src_sprite.size.y * 0.5f;
+
+  dst_vertices [0].position = world_tm * (src_sprite.position - ortx - orty);
+  dst_vertices [1].position = world_tm * (src_sprite.position + ortx - orty);
+  dst_vertices [2].position = world_tm * (src_sprite.position + ortx + orty);
+  dst_vertices [3].position = world_tm * (src_sprite.position - ortx + orty);
+
+  SpriteGenerator::Generate (src_sprite, src_sprite.normal, base_vertex, dst_vertices, dst_indices);
 }
