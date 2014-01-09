@@ -1,11 +1,16 @@
 package com.untgames.funner.amazon_store;
 
 import android.app.Activity;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+
+import org.json.JSONObject;
 
 import com.amazon.inapp.purchasing.BasePurchasingObserver;
 import com.amazon.inapp.purchasing.GetUserIdResponse;
@@ -19,16 +24,18 @@ import com.amazon.inapp.purchasing.Receipt;
 
 public class Store
 {
-  private static final String LOG_TAG = "funner.AmazonStore";
+  private static final String LOG_TAG                          = "funner.AmazonStore";
+  private static final String SAVED_PURCHASES_PREFERENCES_NAME = "com.untgames.funner.AmazonStore.SavedPurchases"; 
   
-	private Activity         activity;
-	private boolean          sdk_available;
-	private String           user_id;  
-	private volatile boolean purchase_in_progress;
-	private volatile boolean processing_stopped;
-	private List<Runnable>   purchase_queue = Collections.synchronizedList (new ArrayList ());
-	private String           current_purchase_sku;  
-	java.util.Set<Receipt>   purchased_skus = new java.util.HashSet<Receipt> ();
+	private Activity               activity;
+	private boolean                sdk_available;
+	private String                 user_id;  
+	private volatile boolean       purchase_in_progress;
+	private volatile boolean       processing_stopped;
+	private List<Runnable>         purchase_queue = Collections.synchronizedList (new ArrayList ());
+	private String                 current_purchase_sku;  
+	private java.util.Set<Receipt> purchased_skus = new java.util.HashSet<Receipt> ();
+	private SharedPreferences      saved_purchases;
 
   public Store (Activity inActivity)
   {
@@ -180,7 +187,7 @@ public class Store
       //all purchases history received, check that item already purchased
       for (Receipt receipt : purchased_skus)
       {
-        if (receipt.getSku () == current_purchase_sku)
+        if (receipt.getSku ().equals (current_purchase_sku))
         {
           onPurchaseRestoredCallback (current_purchase_sku, user_id, receipt.getPurchaseToken ());
           processPurchaseQueue ();      
@@ -188,7 +195,21 @@ public class Store
         }
       }
       
-      //TODO check stored consumable receipts
+      SharedPreferences saved_purchases = getSavedPurchases ();
+      
+      Map<String, ?> all_purchase_data = saved_purchases.getAll ();
+      
+      for (Map.Entry<String, ?> purchase_data_entry : all_purchase_data.entrySet ())
+      {
+        PurchaseData purchase_data = PurchaseDataJSON.fromJSON ((String)purchase_data_entry.getValue ());
+        
+        if (purchase_data.sku.equals (current_purchase_sku))
+        {
+          onPurchaseRestoredCallback (current_purchase_sku, purchase_data.user_id, purchase_data.purchase_token);
+          processPurchaseQueue ();      
+          return;
+        }
+      }
       
       //this sku has not been purchased yet or consumable, launch purchase
       PurchasingManager.initiatePurchaseRequest (current_purchase_sku);
@@ -200,9 +221,77 @@ public class Store
     }
   }
 
-  private void saveConsumableReceipt (String sku, String userId, String purchaseToken)
+  private SharedPreferences getSavedPurchases () 
   {
-    //TODO
+    if (saved_purchases != null)
+      return saved_purchases;
+    
+    saved_purchases = activity.getSharedPreferences (SAVED_PURCHASES_PREFERENCES_NAME, Activity.MODE_PRIVATE);
+    
+    return saved_purchases;
+  }
+  
+  private static class PurchaseData 
+  {
+    public String user_id;
+    public String purchase_token;
+    public String sku;
+
+    public PurchaseData (String in_sku, String in_user_id, String in_purchase_token) 
+    {
+      user_id        = in_user_id;
+      purchase_token = in_purchase_token;
+      sku            = in_sku;
+    }
+
+    public String keyName () 
+    {
+      return purchase_token;
+    }
+
+  }
+
+  private static class PurchaseDataJSON 
+  {
+    private static final String USER_ID = "userId";
+    private static final String PURCHASE_TOKEN = "purchaseToken";
+    private static final String SKU = "sku";
+
+    public static String toJSON (PurchaseData data) throws org.json.JSONException
+    {
+      JSONObject obj = new JSONObject ();
+      
+      obj.put (USER_ID,        data.user_id);
+      obj.put (PURCHASE_TOKEN, data.purchase_token);
+      obj.put (SKU,            data.sku);
+
+      return obj.toString ();
+    }
+
+    public static PurchaseData fromJSON (String json) throws org.json.JSONException
+    {
+      if (json == null)
+        return null;
+      
+      JSONObject obj = new JSONObject(json);
+
+      String user_id        = obj.getString (USER_ID);
+      String purchase_token = obj.optString(PURCHASE_TOKEN);
+      String sku            = obj.optString(SKU);
+
+      return new PurchaseData (sku, user_id, purchase_token);
+    }
+  }
+  
+  private void saveConsumableReceipt (String sku, String userId, String purchaseToken) throws org.json.JSONException
+  {
+    PurchaseData purchase_data = new PurchaseData (sku, userId, purchaseToken);
+    
+    SharedPreferences saved_purchases = getSavedPurchases ();
+    
+    Editor editor = saved_purchases.edit ();
+    editor.putString (purchase_data.keyName (), PurchaseDataJSON.toJSON (purchase_data));
+    editor.apply ();
   }
   
   public void onPurchaseResponseImpl (final PurchaseResponse response) 
@@ -269,17 +358,21 @@ public class Store
     }
   }
 
-  public void finishTransaction (String purchaseToken)
+  public void finishTransaction (String purchase_token)
   {
   	try
   	{
-  	  //TODO delete record
+      SharedPreferences saved_purchases = getSavedPurchases ();
+      
+      Editor editor = saved_purchases.edit ();
+      editor.remove (purchase_token);
+      editor.apply ();
   	  
-      onTransactionFinishSucceededCallback (purchaseToken);
+      onTransactionFinishSucceededCallback (purchase_token);
     }
   	catch (Throwable e) 
   	{
-      onTransactionFinishFailedCallback (purchaseToken, e.getMessage ());
+      onTransactionFinishFailedCallback (purchase_token, e.getMessage ());
   	}
   }
   
