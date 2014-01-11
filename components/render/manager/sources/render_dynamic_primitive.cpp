@@ -1,5 +1,7 @@
 #include "shared.h"
 
+//TODO: DynamicPrimitive life time
+
 using namespace render::manager;
 
 /*

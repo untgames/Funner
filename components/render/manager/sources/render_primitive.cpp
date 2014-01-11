@@ -671,6 +671,13 @@ void PrimitiveImpl::FillDynamicPrimitiveStorage (DynamicPrimitiveEntityStorage& 
 {
   try
   {
+    for (DynamicPrimitiveListArray::iterator iter=impl->entity_dependent_dynamic_primitive_lists.begin (), end=impl->entity_dependent_dynamic_primitive_lists.end (); iter!=end; ++iter)
+    {
+      DynamicPrimitiveListImplBase& list = *iter->list;
+
+      //TODO:::
+    }
+//    virtual DynamicPrimitive* CreateDynamicPrimitiveInstanceCore () = 0;
 //    throw xtl::make_not_implemented_exception (__FUNCTION__);
   }
   catch (xtl::exception& e)
