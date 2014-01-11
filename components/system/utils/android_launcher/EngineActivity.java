@@ -155,7 +155,12 @@ public class EngineActivity extends Activity
     String externalDataDir = null;
 
     if (Environment.getExternalStorageState ().equals (Environment.MEDIA_MOUNTED))
-    	externalDataDir = getExternalFilesDir (null).getPath ();
+    {
+      File externalFilesDir = getExternalFilesDir (null);
+      
+      if (externalFilesDir != null)
+        externalDataDir = externalFilesDir.getPath ();
+    }
 
     if (externalDataDir == null)
       externalDataDir = getFilesDir ().getPath ();
