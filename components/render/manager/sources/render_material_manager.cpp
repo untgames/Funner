@@ -295,3 +295,12 @@ MaterialPtr MaterialManager::DefaultMaterial ()
 {
   return impl->proxy_manager.DefaultResource ();
 }
+
+/*
+    —сылка на менеджер устройства   
+*/
+
+render::manager::DeviceManager& MaterialManager::DeviceManager ()
+{
+  return *impl->device_manager;
+}

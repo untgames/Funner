@@ -87,12 +87,12 @@ OrientedSpriteList Primitive::AddBatchingOrientedSpriteList (const math::vec3f& 
 
 void Primitive::RemoveSpriteList (BillboardSpriteList& list)
 {
-  list.impl->RemoveFromPrimitive (*impl);
+  impl->RemoveSpriteList (Wrappers::Unwrap<BillboardSpriteListImpl> (list));
 }
 
 void Primitive::RemoveSpriteList (OrientedSpriteList& list)
 {
-  list.impl->RemoveFromPrimitive (*impl);
+  impl->RemoveSpriteList (Wrappers::Unwrap<OrientedSpriteListImpl> (list));
 }
 
 void Primitive::RemoveAllSpriteLists ()
@@ -117,7 +117,7 @@ LineList Primitive::AddBatchingLineList ()
 
 void Primitive::RemoveLineList (LineList& list)
 {
-  list.impl->RemoveFromPrimitive (*impl);
+  impl->RemoveLineList (Wrappers::Unwrap<LineListImpl> (list));
 }
 
 void Primitive::RemoveAllLineLists ()

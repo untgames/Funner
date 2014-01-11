@@ -543,6 +543,16 @@ OrientedSpriteListPtr PrimitiveImpl::AddBatchingOrientedSpriteList (const math::
   throw xtl::make_not_implemented_exception (__FUNCTION__);
 }
 
+void PrimitiveImpl::RemoveSpriteList (const BillboardSpriteListPtr&)
+{
+  throw xtl::make_not_implemented_exception (__FUNCTION__);
+}
+
+void PrimitiveImpl::RemoveSpriteList (const OrientedSpriteListPtr&)
+{
+  throw xtl::make_not_implemented_exception (__FUNCTION__);
+}
+
 void PrimitiveImpl::RemoveAllSpriteLists ()
 {
   throw xtl::make_not_implemented_exception (__FUNCTION__);
@@ -559,10 +569,45 @@ size_t PrimitiveImpl::LineListsCount ()
 
 LineListPtr PrimitiveImpl::AddStandaloneLineList (MeshBufferUsage vb_usage, MeshBufferUsage ib_usage)
 {
-  throw xtl::make_not_implemented_exception (__FUNCTION__);
+  try
+  {
+    switch (vb_usage)
+    {
+      case MeshBufferUsage_Static:
+      case MeshBufferUsage_Dynamic:
+      case MeshBufferUsage_Stream:
+      default:
+        throw xtl::make_argument_exception ("", "vb_usage", vb_usage);
+    }
+
+    switch (ib_usage)
+    {
+      case MeshBufferUsage_Static:
+      case MeshBufferUsage_Dynamic:
+      case MeshBufferUsage_Stream:
+      default:
+        throw xtl::make_argument_exception ("", "ib_usage", ib_usage);
+    }
+
+    LineListPtr list (create_standalone_line_list (impl->material_manager, vb_usage, ib_usage), false);
+
+    //?????TODO
+
+    return list;
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::manager::PrimitiveImpl::AddStandaloneLineList");
+    throw;
+  }
 }
 
 LineListPtr PrimitiveImpl::AddBatchingLineList ()
+{
+  throw xtl::make_not_implemented_exception (__FUNCTION__);
+}
+
+void PrimitiveImpl::RemoveLineList (const LineListPtr&)
 {
   throw xtl::make_not_implemented_exception (__FUNCTION__);
 }

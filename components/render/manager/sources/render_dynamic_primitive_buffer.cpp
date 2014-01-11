@@ -6,7 +6,7 @@ namespace render
 namespace manager
 {
 
-void sync_buffers (low_level::IDevice& device, low_level::BindFlag bind_flags, const void* src_data, size_t src_data_size, size_t& dst_buffer_size, LowLevelBufferPtr& dst_buffer)
+void sync_buffers (low_level::IDevice& device, low_level::UsageMode usage_mode, low_level::BindFlag bind_flags, const void* src_data, size_t src_data_size, size_t& dst_buffer_size, LowLevelBufferPtr& dst_buffer)
 {
   try
   {
@@ -24,8 +24,8 @@ void sync_buffers (low_level::IDevice& device, low_level::BindFlag bind_flags, c
 
       desc.size         = src_data_size;
       desc.bind_flags   = bind_flags;
-      desc.access_flags = low_level::AccessFlag_Read | low_level::AccessFlag_Write;
-      desc.usage_mode   = low_level::UsageMode_Stream;
+      desc.access_flags = low_level::AccessFlag_Write;
+      desc.usage_mode   = usage_mode;
 
       LowLevelBufferPtr buffer (device.CreateBuffer (desc), false);
 

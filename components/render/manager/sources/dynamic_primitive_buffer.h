@@ -10,7 +10,7 @@ class DynamicPrimitiveBuffer: public xtl::noncopyable
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструктор
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    DynamicPrimitiveBuffer (low_level::BindFlag flags);
+    DynamicPrimitiveBuffer (low_level::UsageMode usage_mode, low_level::BindFlag flags);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Низкроуровневый буфер
@@ -49,24 +49,26 @@ class DynamicPrimitiveBuffer: public xtl::noncopyable
     typedef xtl::uninitialized_storage<Item> ItemBuffer;
 
   private:
-    ItemBuffer          src_buffer;
-    LowLevelBufferPtr   dst_buffer;
-    size_t              dst_buffer_size;
-    low_level::BindFlag bind_flags;
+    ItemBuffer           src_buffer;
+    LowLevelBufferPtr    dst_buffer;
+    size_t               dst_buffer_size;
+    low_level::UsageMode usage_mode;
+    low_level::BindFlag  bind_flags;
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Синхронизация буферов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-void sync_buffers (low_level::IDevice& device, low_level::BindFlag bind_flags, const void* src_data, size_t src_data_size, size_t& dst_buffer_size, LowLevelBufferPtr& dst_buffer);
+void sync_buffers (low_level::IDevice& device, low_level::UsageMode usage_mode, low_level::BindFlag bind_flags, const void* src_data, size_t src_data_size, size_t& dst_buffer_size, LowLevelBufferPtr& dst_buffer);
 
 /*
     Реализация
 */
 
 template <class T>
-inline DynamicPrimitiveBuffer<T>::DynamicPrimitiveBuffer (low_level::BindFlag flags)
+inline DynamicPrimitiveBuffer<T>::DynamicPrimitiveBuffer (low_level::UsageMode mode, low_level::BindFlag flags)
   : dst_buffer_size ()
+  , usage_mode (mode)
   , bind_flags (flags)
 {
 }
@@ -74,7 +76,7 @@ inline DynamicPrimitiveBuffer<T>::DynamicPrimitiveBuffer (low_level::BindFlag fl
 template <class T> 
 inline const LowLevelBufferPtr& DynamicPrimitiveBuffer<T>::LowLevelBuffer () const
 {
-  return dst_buffer.get ();
+  return dst_buffer;
 }
 
 template <class T> 
@@ -122,5 +124,5 @@ inline void DynamicPrimitiveBuffer<T>::Clear ()
 template <class T>
 inline void DynamicPrimitiveBuffer<T>::SyncBuffers (low_level::IDevice& device)
 {
-  sync_buffers (device, bind_flags, src_buffer.data (), src_buffer.size () * sizeof (Item), dst_buffer_size, dst_buffer);  
+  sync_buffers (device, usage_mode, bind_flags, src_buffer.data (), src_buffer.size () * sizeof (Item), dst_buffer_size, dst_buffer);  
 }

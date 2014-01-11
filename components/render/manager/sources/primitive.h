@@ -42,6 +42,8 @@ class PrimitiveImpl: public Object, public CacheSource
     BillboardSpriteListPtr AddBatchingBillboardSpriteList   (const math::vec3f& up);
     OrientedSpriteListPtr  AddStandaloneOrientedSpriteList  (const math::vec3f& up, MeshBufferUsage vb_usage, MeshBufferUsage ib_usage);
     OrientedSpriteListPtr  AddBatchingOrientedSpriteList    (const math::vec3f& up);
+    void                   RemoveSpriteList                 (const BillboardSpriteListPtr&);
+    void                   RemoveSpriteList                 (const OrientedSpriteListPtr&);
     void                   RemoveAllSpriteLists             ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -50,6 +52,7 @@ class PrimitiveImpl: public Object, public CacheSource
     size_t      LineListsCount        ();
     LineListPtr AddStandaloneLineList (MeshBufferUsage vb_usage, MeshBufferUsage ib_usage);
     LineListPtr AddBatchingLineList   ();
+    void        RemoveLineList        (const LineListPtr&);
     void        RemoveAllLineLists    ();
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////

@@ -88,8 +88,8 @@ struct PrimitiveBuffersImpl::Impl
     , cache_state (false)
     , lines_capacity ()
     , sprites_capacity ()
-    , dynamic_vb (render::low_level::BindFlag_VertexBuffer)
-    , dynamic_ib (render::low_level::BindFlag_IndexBuffer)
+    , dynamic_vb (render::low_level::UsageMode_Stream, render::low_level::BindFlag_VertexBuffer)
+    , dynamic_ib (render::low_level::UsageMode_Stream, render::low_level::BindFlag_IndexBuffer)
   {
   }
 
