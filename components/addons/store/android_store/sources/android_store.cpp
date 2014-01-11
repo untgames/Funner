@@ -54,7 +54,7 @@ class AndroidStore
     }
 
 ///Инициализация
-    xtl::connection Initialize (const Store::OnInitializedCallback& callback)
+    xtl::connection Initialize (const IStore::OnInitializedCallback& callback)
     {
       if (initialized)
       {
@@ -68,6 +68,12 @@ class AndroidStore
         return return_value;
 
       initialize_started = true;
+
+      if (!store_class)
+      {
+        OnInitialized (false);
+        return xtl::connection ();
+      }
 
       JNIEnv* env = &get_env ();
 
@@ -88,6 +94,7 @@ class AndroidStore
 
     void OnInitialized (bool in_can_buy_products)
     {
+      initialized      = true;
       can_buy_products = in_can_buy_products;
 
       on_initialized_signal ();
@@ -108,6 +115,9 @@ class AndroidStore
       {
         if (!product_ids)
           throw xtl::make_null_argument_exception ("", "product_ids");
+
+        if (!can_buy_products)
+          throw xtl::format_operation_exception ("", "Purchases not supported");
 
         common::StringArray products = common::split (product_ids);
 
@@ -135,10 +145,13 @@ class AndroidStore
     {
       log.Printf ("Restoring transactions");
 
+      if (!can_buy_products)
+        throw xtl::format_operation_exception ("", "Purchases not supported");
+
       //TODO
     }
 
-    void NotifyTransactionUpdated (const Transaction& transaction)
+    void NotifyTransactionUpdated (Transaction transaction) //get copy of transaction, because original entry can be deleted in callbacks
     {
       try
       {
@@ -165,6 +178,9 @@ class AndroidStore
 
         if (count > 1)
           throw xtl::make_range_exception ("", "count", count, 0u, 1u);
+
+        if (!can_buy_products)
+          throw xtl::format_operation_exception ("", "Purchases not supported");
 
         log.Printf ("Buy product '%s' requested", product_id);
 
@@ -200,7 +216,13 @@ class AndroidStore
      jclass store_class_ref = env->FindClass ("com/untgames/funner/store/Store");
 
      if (!store_class_ref)
-       throw xtl::format_operation_exception ("", "Can't find Store class\n");
+     {
+       if (env->ExceptionOccurred ())
+         env->ExceptionClear ();
+
+       log_error ("Google Play store linked, but store class not found. Purchasing not supported.\n");
+       return;
+     }
 
      if (store_class)
        env->DeleteGlobalRef (store_class);
@@ -266,6 +288,7 @@ class AndroidStore
            else
            {
              pending_transactions.erase (iter);
+
              callback (true, "");
            }
 
@@ -551,7 +574,7 @@ StoreImpl::~StoreImpl ()
    Инициализация
 */
 
-void StoreImpl::Initialize (const Store::OnInitializedCallback& callback)
+void StoreImpl::Initialize (const IStore::OnInitializedCallback& callback)
 {
   on_initialized_connection = StoreSingleton::Instance ()->Initialize (callback);
 }

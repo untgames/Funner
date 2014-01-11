@@ -68,7 +68,7 @@ class AmazonStore
     }
 
 ///Инициализация
-    xtl::connection Initialize (const Store::OnInitializedCallback& callback)
+    xtl::connection Initialize (const IStore::OnInitializedCallback& callback)
     {
       static const char* METHOD_NAME = "store::android_store::AndroidStore::Initialize";
 
@@ -84,6 +84,12 @@ class AmazonStore
         return return_value;
 
       initialize_started = true;
+
+      if (!store_class)
+      {
+        OnInitialized (false);
+        return xtl::connection ();
+      }
 
       JNIEnv* env = &get_env ();
 
@@ -114,6 +120,7 @@ class AmazonStore
 
     void OnInitialized (bool in_can_buy_products)
     {
+      initialized      = true;
       can_buy_products = in_can_buy_products;
 
       on_initialized_signal ();
@@ -134,6 +141,9 @@ class AmazonStore
       {
         if (!product_ids)
           throw xtl::make_null_argument_exception ("", "product_ids");
+
+        if (!can_buy_products)
+          throw xtl::format_operation_exception ("", "Purchases not supported");
 
         common::StringArray products = common::split (product_ids);
 
@@ -161,10 +171,13 @@ class AmazonStore
     {
       log.Printf ("Restoring transactions");
 
+      if (!can_buy_products)
+        throw xtl::format_operation_exception ("", "Purchases not supported");
+
       //TODO
     }
 
-    void NotifyTransactionUpdated (const Transaction& transaction)
+    void NotifyTransactionUpdated (Transaction transaction) //get copy of transaction, because original entry can be deleted in callbacks
     {
       try
       {
@@ -186,14 +199,14 @@ class AmazonStore
 
       try
       {
-        if (!can_buy_products)
-          throw xtl::format_operation_exception ("", "Can't buy products, amazon user id not available");
-
         if (!product_id)
           throw xtl::make_null_argument_exception ("", "product_id");
 
         if (count > 1)
           throw xtl::make_range_exception ("", "count", count, 0u, 1u);
+
+        if (!can_buy_products)
+          throw xtl::format_operation_exception ("", "Can't buy products, amazon user id not available");
 
         log.Printf ("Buy product '%s' requested", product_id);
 
@@ -575,7 +588,7 @@ StoreImpl::~StoreImpl ()
    Инициализация
 */
 
-void StoreImpl::Initialize (const Store::OnInitializedCallback& callback)
+void StoreImpl::Initialize (const IStore::OnInitializedCallback& callback)
 {
   on_initialized_connection = StoreSingleton::Instance ()->Initialize (callback);
 }

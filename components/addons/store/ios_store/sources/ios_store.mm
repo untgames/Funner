@@ -358,7 +358,7 @@ class IOSStore : public ITransactionObserverListener, public IProductsRequestLis
       return [[SKPaymentQueue defaultQueue] restoreCompletedTransactions];
     }
 
-    void NotifyTransactionUpdated (const Transaction& transaction)
+    void NotifyTransactionUpdated (Transaction transaction) //get copy of transaction, because original entry can be deleted in callbacks
     {
       try
       {
@@ -626,7 +626,7 @@ StoreImpl::~StoreImpl ()
    Инициализация
 */
 
-void StoreImpl::Initialize (const Store::OnInitializedCallback& callback)
+void StoreImpl::Initialize (const IStore::OnInitializedCallback& callback)
 {
   callback ();
 }

@@ -18,7 +18,7 @@ struct Store::Impl : public xtl::reference_counter
   TransactionsMap      updated_transactions;          //транзакции, обновленные за время работы приложения
   xtl::auto_connection transaction_update_connection; //соединение оповещения о обновлениях транзакций
 
-  Impl (const char* store_name, const OnInitializedCallback& callback)
+  Impl (const char* store_name)
     : store (0)
   {
     try
@@ -29,8 +29,6 @@ struct Store::Impl : public xtl::reference_counter
       store = StoreManagerSingleton::Instance ()->CreateStore (store_name);
 
       transaction_update_connection = store->RegisterTransactionUpdateHandler (xtl::bind (&Store::Impl::OnTransactionUpdated, this, _1));
-
-      store->Initialize (callback);
     }
     catch (xtl::exception& e)
     {
@@ -118,8 +116,20 @@ struct Store::Impl : public xtl::reference_counter
 */
 
 Store::Store (const char* store_name, const OnInitializedCallback& callback)
-  : impl (new Impl (store_name, callback))
-  {}
+  : impl (new Impl (store_name))
+{
+  try
+  {
+    impl->store->Initialize (xtl::bind (callback, xtl::make_const_ref (*this)));
+  }
+  catch (xtl::exception& e)
+  {
+    delete impl;
+
+    e.touch ("store::Store::Store");
+    throw;
+  }
+}
 
 Store::Store (const Store& source)
   : impl (source.impl)
