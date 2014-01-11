@@ -212,6 +212,7 @@ class DebugIdHolder: public xtl::noncopyable
 #include "cache_map.h"
 #include "dynamic_primitive.h"
 #include "dynamic_primitive_buffer.h"
+#include "dynamic_primitive_list.h"
 #include "dynamic_texture.h"
 #include "effect.h"
 #include "effect_loader_library.h"
