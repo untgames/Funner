@@ -14,8 +14,7 @@ class DynamicPrimitiveListImplBase: public Object, public CacheSource
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Группы примитивов рендеринга
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    size_t                  RendererPrimitiveGroupsCount ();
-    RendererPrimitiveGroup* RendererPrimitiveGroups      ();
+    manager::RendererPrimitive* RendererPrimitive ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Создание экземпляра
@@ -25,12 +24,11 @@ class DynamicPrimitiveListImplBase: public Object, public CacheSource
   protected:
     DynamicPrimitiveListImplBase (bool is_entity_dependent);
 
-    void SetRendererPrimitiveGroups (size_t count, RendererPrimitiveGroup* groups);
+    void SetRendererPrimitive (manager::RendererPrimitive* primitive);
 
   private:  
-    bool                    entity_dependent;
-    size_t                  primitive_groups_count;
-    RendererPrimitiveGroup* primitive_groups;
+    bool                        entity_dependent;
+    manager::RendererPrimitive* renderer_primitive;
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -79,3 +77,27 @@ template <class T> class DynamicPrimitiveListImpl: public DynamicPrimitiveListIm
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 LineListImpl*           create_standalone_line_list            (const MaterialManagerPtr&, MeshBufferUsage vb_usage, MeshBufferUsage ib_usage);
 OrientedSpriteListImpl* create_standalone_oriented_sprite_list (const MaterialManagerPtr&, const math::vec3f& up, MeshBufferUsage vb_usage, MeshBufferUsage ib_usage);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Реализация
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+inline DynamicPrimitiveListImplBase::DynamicPrimitiveListImplBase (bool is_entity_dependent)
+  : entity_dependent (is_entity_dependent)
+{
+}
+
+inline bool DynamicPrimitiveListImplBase::IsEntityDependent ()
+{
+  return entity_dependent;
+}
+
+inline render::manager::RendererPrimitive* DynamicPrimitiveListImplBase::RendererPrimitive ()
+{
+  return renderer_primitive;
+}
+
+inline void DynamicPrimitiveListImplBase::SetRendererPrimitive (manager::RendererPrimitive* primitive)
+{
+  renderer_primitive = primitive;
+}

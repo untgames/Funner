@@ -611,13 +611,13 @@ template <class T, class Generator> class StandaloneLineAndOrientedSpriteDynamic
     }
 
   private:
-    DynamicVertexBuffer   vb;
-    DynamicIndexBuffer    ib;
-    bool                  need_update_buffers;
-    bool                  need_update_primitives;
-    RendererPrimitive     cached_primitive;
-    LowLevelStateBlockPtr cached_state_block;
-    size_t                cached_state_block_mask_hash;
+    DynamicVertexBuffer                vb;
+    DynamicIndexBuffer                 ib;
+    bool                               need_update_buffers;
+    bool                               need_update_primitives;
+    render::manager::RendererPrimitive cached_primitive;
+    LowLevelStateBlockPtr              cached_state_block;
+    size_t                             cached_state_block_mask_hash;
 };
 
 }
