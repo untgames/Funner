@@ -1,0 +1,4 @@
+Results of push_notifications_center_test:
+exception: Push notifications center 'test' not registered
+    at push_notifications::PushNotificationsCentersManagerImpl::CreateCenter
+    at push_notifications::PushNotificationsCenter::PushNotificationsCenter
