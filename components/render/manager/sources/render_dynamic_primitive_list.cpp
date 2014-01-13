@@ -2,6 +2,10 @@
 
 using namespace render::manager;
 
+#ifdef _MSC_VER
+  #pragma warning (disable : 4250) //inheritance via dominance
+#endif
+
 //TODO: check IB size (64k)
 
 namespace
@@ -33,13 +37,12 @@ render::low_level::UsageMode get_mode (MeshBufferUsage usage)
     Хранилище для материалов
 */
 
-template <class T>
-class DynamicPrimitiveListMaterialHolder: public DynamicPrimitiveListImpl<T>
+class DynamicPrimitiveListMaterialHolder: virtual public DynamicPrimitiveListImplBase
 {
   public:
 /// Конструктор
     DynamicPrimitiveListMaterialHolder (const MaterialManagerPtr& in_material_manager, bool is_entity_dependent)
-      : DynamicPrimitiveListImpl<T> (is_entity_dependent)
+      : DynamicPrimitiveListImplBase (is_entity_dependent)
       , material_manager (in_material_manager)
     {
       if (!material_manager)
@@ -340,10 +343,11 @@ inline void generate (Generator& generator, size_t items_count, const Item* item
     Standalone Oriented Sprites & Lines
 */
 
-template <class T, class Generator> class StandaloneLineAndOrientedSpriteDynamicPrimitiveList: public DynamicPrimitiveListMaterialHolder<T>, private Generator
+template <class T, class Generator>
+class StandaloneLineAndOrientedSpriteDynamicPrimitiveList: public DynamicPrimitiveListMaterialHolder, public DynamicPrimitiveListImpl<T>, private Generator
 {
   public:
-    using DynamicPrimitiveListMaterialHolder<T>::Item;
+    using DynamicPrimitiveListImpl<T>::Item;
 
     enum { VERTICES_PER_PRIMITIVE = Generator::VERTICES_PER_PRIMITIVE, INDICES_PER_PRIMITIVE = Generator::INDICES_PER_PRIMITIVE };
 
@@ -351,7 +355,9 @@ template <class T, class Generator> class StandaloneLineAndOrientedSpriteDynamic
 
 /// Конструктор
     StandaloneLineAndOrientedSpriteDynamicPrimitiveList (const MaterialManagerPtr& material_manager, MeshBufferUsage vb_usage, MeshBufferUsage ib_usage, const Generator& generator)
-      : DynamicPrimitiveListMaterialHolder<T> (material_manager, ENTITY_INDEPENDENT)
+      : DynamicPrimitiveListImplBase (ENTITY_INDEPENDENT)
+      , DynamicPrimitiveListMaterialHolder (material_manager, ENTITY_INDEPENDENT)
+      , DynamicPrimitiveListImpl<T> (ENTITY_INDEPENDENT)
       , Generator (generator)
       , vb (get_mode (vb_usage), render::low_level::BindFlag_VertexBuffer)
       , ib (get_mode (ib_usage), render::low_level::BindFlag_IndexBuffer)
@@ -618,6 +624,168 @@ template <class T, class Generator> class StandaloneLineAndOrientedSpriteDynamic
     render::manager::RendererPrimitive cached_primitive;
     LowLevelStateBlockPtr              cached_state_block;
     size_t                             cached_state_block_mask_hash;
+};
+
+/*
+    Хранилище элементов списка днамических примитивов
+*/
+
+template <class T> class DynamicPrimitiveListStorage: public DynamicPrimitiveListMaterialHolder, public DynamicPrimitiveListImpl<T>
+{
+  public:
+    using DynamicPrimitiveListImpl<T>::Item;
+
+/// Конструктор
+    DynamicPrimitiveListStorage (const MaterialManagerPtr& material_manager)
+      : DynamicPrimitiveListImplBase (ENTITY_DEPENDENT)
+      , DynamicPrimitiveListMaterialHolder (material_manager, ENTITY_DEPENDENT)
+      , DynamicPrimitiveListImpl<T> (ENTITY_DEPENDENT)
+      , need_update_buffers (true)
+    {
+    }
+
+/// Количество примитивов
+    size_t Size () { return items.size (); }
+
+/// Получение примитивов
+    Item* Items () { return items.empty () ? (Item*)0 : &items [0]; }
+
+/// Добавление / обновление примитивов
+    size_t Add (size_t count, const Item* items)
+    {
+      try
+      {
+          //проверка корректности аргументов
+
+        if (!count)
+          return items.size ();
+
+        if (!items)
+          throw xtl::make_null_argument_exception ("", "items");
+
+          //добавление
+
+        items.insert (impl->items.end (), items, items + count);
+
+        need_update_buffers = true;
+
+        InvalidateCacheDependencies ();
+
+        return items.size () - count;    
+      }
+      catch (xtl::exception& e)
+      {
+        e.touch ("render::manager::DynamicPrimitiveListStorage<T>::Add");
+        throw;
+      }
+    }
+
+    void Update (size_t first, size_t count, const Item* src_items)
+    {
+      try
+      {
+          //проверка корректности аргументов
+
+        if (!count)
+          return;
+
+        if (!src_items)
+          throw xtl::make_null_argument_exception ("", "items");
+
+        if (first >= items.size ())
+          throw xtl::make_range_exception ("", "first", first, items.size ());
+        
+        if (items.size () - first < count)
+          throw xtl::make_range_exception ("", "count", count, items.size () - first);
+
+          //обновление спрайтов
+
+        stl::copy (src_items, src_items + count, &items [first]);
+
+        InvalidateCache ();
+      }
+      catch (xtl::exception& e)
+      {
+        e.touch ("render::manager::DynamicPrimitiveListStorage<T>::Update");
+        throw;
+      }
+    }
+
+/// Удаление примитивов
+    void Remove (size_t first, size_t count) 
+    {
+      if (first >= items.size ())
+        return;
+
+      if (items.size () - first < count)
+        count = items.size () - first;
+
+      if (!count)
+        return;
+
+      items.erase (items.begin () + first, items.begin () + first + count);
+
+      need_update_buffers = true;
+
+      InvalidateCacheDependencies ();
+    }
+
+    void Clear ()
+    {
+      items.clear ();
+
+      need_update_buffers = true;
+
+      InvalidateCacheDependencies ();
+    }
+
+/// Резервируемое пространство
+    void Reserve (size_t count)
+    {
+      size_t capacity = items.capacity ();
+
+      items.reserve (count);
+
+      if (capacity < count)
+      {
+        need_update_buffers = true;
+
+        InvalidateCacheDependencies ();
+      }
+    }
+
+    size_t Capacity () { return items.capacity (); }
+
+  protected:
+    void UpdateCacheCore ()
+    {
+      try
+      {
+        DynamicPrimitiveListMaterialHolder::UpdateCacheCore ();
+
+        if (need_update_buffers)
+        {
+          UpdateBuffersCore ();
+
+          need_update_buffers = false;
+        }
+      }
+      catch (xtl::exception& e)
+      {
+        e.touch ("render::manager::DynamicPrimitiveListStorage<T>::UpdateCacheCore");
+        throw;
+      }
+    }
+
+  private:
+    virtual void UpdateBuffersCore () = 0;
+
+  private:
+    typedef stl::vector<Item> ItemArray;
+
+  private:
+    ItemArray items;
+    bool      need_update_buffers;
 };
 
 }
