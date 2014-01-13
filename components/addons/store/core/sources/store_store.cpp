@@ -219,6 +219,9 @@ namespace store
 /*
    Ξαμεν
 */
-void swap (Store&, Store&);
+void swap (Store& store1, Store& store2)
+{
+  store1.Swap (store2);
+}
 
 }
