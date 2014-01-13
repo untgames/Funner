@@ -675,10 +675,13 @@ void PrimitiveImpl::FillDynamicPrimitiveStorage (DynamicPrimitiveEntityStorage& 
     {
       DynamicPrimitiveListImplBase& list = *iter->list;
 
-      //TODO:::
+      if (storage.FindPrimitive (&list, true))
+        continue;
+
+      DynamicPrimitivePtr primitive (list.CreateDynamicPrimitiveInstanceCore (), false);
+
+      storage.AddPrimitive (primitive, &list);
     }
-//    virtual DynamicPrimitive* CreateDynamicPrimitiveInstanceCore () = 0;
-//    throw xtl::make_not_implemented_exception (__FUNCTION__);
   }
   catch (xtl::exception& e)
   {

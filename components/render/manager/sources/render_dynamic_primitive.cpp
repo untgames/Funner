@@ -1,7 +1,5 @@
 #include "shared.h"
 
-//TODO: DynamicPrimitive life time
-
 using namespace render::manager;
 
 /*
@@ -17,10 +15,16 @@ namespace
 
 struct DynamicPrimitiveDesc
 {
-  DynamicPrimitive*    primitive;
-  xtl::auto_connection trackable_connection;
+  DynamicPrimitivePtr primitive;
+  void*               source_tag;
+  size_t              update_id;
 
-  DynamicPrimitiveDesc () : primitive () { }
+  DynamicPrimitiveDesc (const DynamicPrimitivePtr& in_primitive, void* in_source_tag, size_t in_update_id)
+    : primitive (in_primitive) 
+    , source_tag (in_source_tag)
+    , update_id (in_update_id)
+  {
+  }
 };
 
 }
@@ -30,13 +34,15 @@ typedef stl::vector<RendererDynamicPrimitiveGroup> GroupArray;
 
 struct DynamicPrimitiveEntityStorage::Impl
 {
-  EntityImpl&           entity;             //ссылка на объект
-  DynamicPrimitiveArray primitives;         //список динамических примитивов
-  GroupArray            groups;             //группы примитивов рендеринга
+  EntityImpl&           entity;     //ссылка на объект
+  DynamicPrimitiveArray primitives; //список динамических примитивов
+  GroupArray            groups;     //группы примитивов рендеринга
+  size_t                update_id;  //идентификатор транзакции обновления
 
 /// Конструктор
   Impl (EntityImpl& in_entity)
     : entity (in_entity)
+    , update_id ()
   {
   }
 };
@@ -59,22 +65,17 @@ DynamicPrimitiveEntityStorage::~DynamicPrimitiveEntityStorage ()
     Добавление динамических примитивов
 */
 
-void DynamicPrimitiveEntityStorage::AddPrimitive (DynamicPrimitive* primitive)
+void DynamicPrimitiveEntityStorage::AddPrimitive (const DynamicPrimitivePtr& primitive, void* source_tag)
 {
   try
   {
     if (!primitive)
       throw xtl::make_null_argument_exception ("", "primitive");
 
-    impl->primitives.push_back ();
-
-    DynamicPrimitiveDesc& desc = impl->primitives.back ();
+    impl->primitives.push_back (DynamicPrimitiveDesc (primitive, source_tag, impl->update_id));
 
     try
     {
-      desc.primitive            = primitive;
-      desc.trackable_connection = primitive->connect_tracker (xtl::bind (&DynamicPrimitiveEntityStorage::RemovePrimitive, this, primitive));
-
       AttachCacheSource (*primitive);
 
       InvalidateCacheDependencies ();
@@ -92,7 +93,7 @@ void DynamicPrimitiveEntityStorage::AddPrimitive (DynamicPrimitive* primitive)
   }
 }
 
-void DynamicPrimitiveEntityStorage::RemovePrimitive (DynamicPrimitive* primitive)
+void DynamicPrimitiveEntityStorage::RemovePrimitive (const DynamicPrimitivePtr& primitive)
 {
   if (!primitive)
     return;
@@ -117,6 +118,52 @@ void DynamicPrimitiveEntityStorage::RemoveAllPrimitives ()
   impl->primitives.clear ();
 
   InvalidateCacheDependencies ();
+}
+
+/*
+    Поиск примитива по тэгу
+*/
+
+DynamicPrimitivePtr DynamicPrimitiveEntityStorage::FindPrimitive (void* source_tag, bool touch)
+{
+  for (DynamicPrimitiveArray::iterator iter=impl->primitives.begin (), end=impl->primitives.end (); iter!=end; ++iter)
+    if (iter->source_tag == source_tag)
+    {
+      if (touch)
+        iter->update_id = impl->update_id;
+
+      return iter->primitive;
+    }
+
+  return DynamicPrimitivePtr ();
+}
+
+/*
+    Управление автоматической сборкой неиспользуемых динамических примитивов
+*/
+
+void DynamicPrimitiveEntityStorage::BeginUpdate ()
+{
+  impl->update_id++;
+}
+
+void DynamicPrimitiveEntityStorage::EndUpdate ()
+{
+  bool need_invalidate = false;
+
+  for (DynamicPrimitiveArray::iterator iter=impl->primitives.begin (); iter!=impl->primitives.end ();)
+    if (iter->update_id != impl->update_id)
+    {
+      DetachCacheSource (*iter->primitive);
+
+      impl->primitives.erase (iter);
+
+      need_invalidate = true;
+    }
+    else ++iter;
+  
+  if (need_invalidate)
+    InvalidateCacheDependencies ();
 }
 
 /*
@@ -157,7 +204,7 @@ void DynamicPrimitiveEntityStorage::UpdateCacheCore ()
     impl->groups.reserve (impl->primitives.size ());
 
     for (DynamicPrimitiveArray::iterator iter=impl->primitives.begin (), end=impl->primitives.end (); iter!=end; ++iter)
-      impl->groups.push_back (RendererDynamicPrimitiveGroup (iter->primitive->RendererPrimitiveGroup (), iter->primitive));
+      impl->groups.push_back (RendererDynamicPrimitiveGroup (iter->primitive->RendererPrimitiveGroup (), &*iter->primitive));
 
       //обновление зависимостей
 

@@ -400,10 +400,6 @@ struct EntityLod: public xtl::reference_counter, public EntityLodDesc, public Ca
   {
     try
     {
-         //сброс данных
-
-      dynamic_primitives.RemoveAllPrimitives ();
-
       has_frame_dependent_operations    = false;
       has_frame_independent_operations  = false;
       has_entity_dependent_operations   = false;
@@ -417,11 +413,19 @@ struct EntityLod: public xtl::reference_counter, public EntityLodDesc, public Ca
       cached_primitive = primitive.Resource ();
 
       if (!cached_primitive)
+      {  
+        dynamic_primitives.RemoveAllPrimitives ();
+
         throw xtl::format_operation_exception ("", "Primitive '%s' not found", primitive.Name ());
+      }
 
-        //заполнение динамических примитивов
+        //заполнение динамических примитивов (устаревшие примитивы автоматически будут удалены при вызове EndUpdate)
 
-      cached_primitive->FillDynamicPrimitiveStorage (dynamic_primitives);
+      {
+        DynamicPrimitiveEntityStorage::UpdateScope scope (dynamic_primitives);
+
+        cached_primitive->FillDynamicPrimitiveStorage (dynamic_primitives);
+      }
         
         //получение групп
 

@@ -49,6 +49,7 @@ namespace manager
 //implementation forwards
 class CacheManager;
 class DeviceManager;
+class DynamicPrimitive;
 class DynamicTextureImpl;
 class Effect;
 class EffectLoaderLibrary;
@@ -86,6 +87,7 @@ typedef DynamicPrimitiveListImpl<OrientedSprite>  OrientedSpriteListImpl;
 typedef xtl::intrusive_ptr<BillboardSpriteListImpl> BillboardSpriteListPtr;
 typedef xtl::intrusive_ptr<CacheManager>            CacheManagerPtr;
 typedef xtl::intrusive_ptr<DeviceManager>           DeviceManagerPtr;
+typedef xtl::intrusive_ptr<DynamicPrimitive>        DynamicPrimitivePtr;
 typedef xtl::intrusive_ptr<DynamicTextureImpl>      DynamicTexturePtr;
 typedef xtl::intrusive_ptr<EffectPass>              EffectPassPtr;
 typedef xtl::intrusive_ptr<Effect>                  EffectPtr;
