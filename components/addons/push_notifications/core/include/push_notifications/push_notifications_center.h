@@ -1,8 +1,6 @@
 #ifndef PUSH_NOTIFICATIONS_CENTER_HEADER
 #define PUSH_NOTIFICATIONS_CENTER_HEADER
 
-#include <push_notifications/notification.h>
-
 namespace common
 {
 
@@ -37,14 +35,15 @@ class PushNotificationsCenter
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Регистрация на пуш-сообщения
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    typedef xtl::function<void (bool success, const char* status, const char* token, const common::PropertyMap& properties)> RegisterCallback;
+    typedef xtl::function<void (bool success, const char* status, const char* token)> RegisterCallback;
 
-    void RegisterForNotifications (const RegisterCallback& callback, const common::PropertyMap& properties = common::PropertyMap ()) const;
+    void RegisterForNotifications   (const RegisterCallback& callback, const common::PropertyMap& properties = common::PropertyMap ());
+    void UnregisterForNotifications ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Подписка на пуш-сообщения
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    typedef xtl::function<void (const Notification&)> NotificationsHandler;
+    typedef xtl::function<void (const char*)> NotificationsHandler;
     
     xtl::connection RegisterNotificationsHandler (const NotificationsHandler&);
 
@@ -82,7 +81,8 @@ class IPushNotificationsCenter
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Регистрация на пуш-сообщения
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    virtual void RegisterForNotifications (const PushNotificationsCenter::RegisterCallback& callback, const common::PropertyMap& properties) = 0;
+    virtual void RegisterForNotifications   (const PushNotificationsCenter::RegisterCallback& callback, const common::PropertyMap& properties) = 0;
+    virtual void UnregisterForNotifications () = 0;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Подписка на пуш-сообщения

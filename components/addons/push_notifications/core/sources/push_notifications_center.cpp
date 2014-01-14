@@ -72,9 +72,14 @@ const char* PushNotificationsCenter::Description () const
    Регистрация на пуш-сообщения
 */
 
-void PushNotificationsCenter::RegisterForNotifications (const RegisterCallback& callback, const common::PropertyMap& properties) const
+void PushNotificationsCenter::RegisterForNotifications (const RegisterCallback& callback, const common::PropertyMap& properties)
 {
   impl->center->RegisterForNotifications (callback, properties);
+}
+
+void PushNotificationsCenter::UnregisterForNotifications ()
+{
+  impl->center->UnregisterForNotifications ();
 }
 
 /*
