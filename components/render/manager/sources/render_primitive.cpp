@@ -644,7 +644,7 @@ void PrimitiveImpl::RemoveSpriteList (const OrientedSpriteListPtr& list)
 
 void PrimitiveImpl::RemoveAllSpriteLists ()
 {
-  throw xtl::make_not_implemented_exception (__FUNCTION__);
+  RemoveAllDynamicPrimitiveLists (DynamicPrimitiveListType_Sprite);
 }
 
 /*
@@ -703,7 +703,7 @@ void PrimitiveImpl::RemoveLineList (const LineListPtr& list)
 
 void PrimitiveImpl::RemoveAllLineLists ()
 {
-  throw xtl::make_not_implemented_exception (__FUNCTION__);
+  RemoveAllDynamicPrimitiveLists (DynamicPrimitiveListType_Line);
 }
 
 /*
@@ -804,13 +804,41 @@ void PrimitiveImpl::RemoveDynamicPrimitiveList (DynamicPrimitiveListImplBase* li
             break;
         }
 
-        lists.erase (iter);
-
         DetachCacheSource (*list);
+
+        lists.erase (iter);
 
         return;
       }
   }
+}
+
+void PrimitiveImpl::RemoveAllDynamicPrimitiveLists (int type)
+{
+  switch (type)
+  {
+    case DynamicPrimitiveListType_Sprite:
+    case DynamicPrimitiveListType_Line:
+      break;
+    default:
+      return;
+  }
+
+  DynamicPrimitiveListArray* arrays [2] = {&impl->entity_dependent_dynamic_primitive_lists, &impl->entity_independent_dynamic_primitive_lists};
+
+  for (size_t i=0; i<sizeof (arrays) / sizeof (*arrays); i++)
+  {
+    DynamicPrimitiveListArray& lists = *arrays [i];
+
+    for (DynamicPrimitiveListArray::iterator iter=lists.begin (); iter!=lists.end ();)
+      if (iter->type == type)
+      {
+        DetachCacheSource (*iter->list);
+
+        lists.erase (iter);
+      }
+      else ++iter;
+  }  
 }
 
 /*

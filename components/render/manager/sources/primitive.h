@@ -73,8 +73,9 @@ class PrimitiveImpl: public Object, public CacheSource
     using CacheSource::ResetCache;
 
   private:
-    void AddDynamicPrimitiveList    (DynamicPrimitiveListImplBase*, int type);
-    void RemoveDynamicPrimitiveList (DynamicPrimitiveListImplBase*);
+    void AddDynamicPrimitiveList        (DynamicPrimitiveListImplBase*, int type);
+    void RemoveDynamicPrimitiveList     (DynamicPrimitiveListImplBase*);
+    void RemoveAllDynamicPrimitiveLists (int type);
       
   private:
     void UpdateCacheCore ();
