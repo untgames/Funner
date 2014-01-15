@@ -317,6 +317,8 @@ struct PrimitiveImpl::Impl: public DebugIdHolder
   DynamicPrimitiveListArray  entity_independent_dynamic_primitive_lists;   //списки динамических примитивов
   DynamicPrimitiveListArray  entity_dependent_dynamic_primitive_lists;     //списки динамических примитивов
   RendererPrimitiveArray     cached_entity_independent_dynamic_primitives; //закэшированные динамические примитивы не зависящие от объекта
+  size_t                     line_lists_count;                             //количество списков с линиями
+  size_t                     sprite_lists_count;                           //количество списков со спрайтами
   stl::string                name;                                         //имя примитива
   RenderPrimitiveGroupsArray render_groups;                                //группы
   Log                        log;                                          //поток протоколирования
@@ -326,6 +328,8 @@ struct PrimitiveImpl::Impl: public DebugIdHolder
     : device_manager (in_device_manager)
     , material_manager (in_material_manager)
     , buffers (in_buffers)
+    , line_lists_count ()
+    , sprite_lists_count ()
   {
     static const char* METHOD_NAME = "render::manager::PrimitiveImpl::Impl::Impl";
     
@@ -545,7 +549,7 @@ void PrimitiveImpl::RemoveAllMeshes ()
 
 size_t PrimitiveImpl::SpriteListsCount ()
 {
-  throw xtl::make_not_implemented_exception (__FUNCTION__);
+  return impl->sprite_lists_count;
 }
 
 BillboardSpriteListPtr PrimitiveImpl::AddStandaloneBillboardSpriteList (const math::vec3f& up, MeshBufferUsage vb_usage, MeshBufferUsage ib_usage)
@@ -649,7 +653,7 @@ void PrimitiveImpl::RemoveAllSpriteLists ()
 
 size_t PrimitiveImpl::LineListsCount ()
 {
-  throw xtl::make_not_implemented_exception (__FUNCTION__);
+  return impl->line_lists_count;
 }
 
 LineListPtr PrimitiveImpl::AddStandaloneLineList (MeshBufferUsage vb_usage, MeshBufferUsage ib_usage)
@@ -760,6 +764,18 @@ void PrimitiveImpl::AddDynamicPrimitiveList (DynamicPrimitiveListImplBase* list,
   else                            impl->entity_independent_dynamic_primitive_lists.push_back (DynamicPrimitiveListDesc (list, (DynamicPrimitiveListType)type));
 
   AttachCacheSource (*list);
+
+  switch (type)
+  {
+    case DynamicPrimitiveListType_Sprite:
+      impl->sprite_lists_count++;
+      break;
+    case DynamicPrimitiveListType_Line:
+      impl->line_lists_count++;
+      break;
+    default:
+      break;
+  }
 }
 
 void PrimitiveImpl::RemoveDynamicPrimitiveList (DynamicPrimitiveListImplBase* list)
@@ -776,6 +792,18 @@ void PrimitiveImpl::RemoveDynamicPrimitiveList (DynamicPrimitiveListImplBase* li
     for (DynamicPrimitiveListArray::iterator iter=lists.begin (), end=lists.end (); iter!=end; ++iter)
       if (iter->list == list)
       {
+        switch (iter->type)
+        {
+          case DynamicPrimitiveListType_Sprite:
+            impl->sprite_lists_count--;
+            break;
+          case DynamicPrimitiveListType_Line:
+            impl->line_lists_count--;
+            break;
+          default:
+            break;
+        }
+
         lists.erase (iter);
 
         DetachCacheSource (*list);
