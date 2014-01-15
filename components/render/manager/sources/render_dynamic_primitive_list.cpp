@@ -901,6 +901,11 @@ class StandaloneBillboardSpriteDynamicPrimitiveList: public DynamicPrimitiveList
         BillboardSpriteGenerator generator (local_normal, local_up, world_tm);
 
         generate (generator, Base::Size (), Base::Items (), 0, VertexBuffer ().Data (), IndexBuffer ().Data ());
+
+        render::low_level::IDevice& device = DeviceManager ().Device ();
+
+        VertexBuffer ().SyncBuffers (device);
+        IndexBuffer ().SyncBuffers (device);
       }
       catch (xtl::exception& e)
       {
