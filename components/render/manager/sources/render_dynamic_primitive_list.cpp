@@ -362,6 +362,8 @@ class DynamicPrimitiveListStandalonePrimitiveHolder: public DynamicPrimitiveList
     DynamicVertexBuffer& VertexBuffer () { return vb; }
     DynamicIndexBuffer&  IndexBuffer  () { return ib; }
 
+    render::manager::RendererPrimitive& Primitive () { return cached_primitive; }
+
 /// Оповещение о необходимости обновления примитива
     void PrimitivesUpdateNotify () { need_update_primitives = true; }
 
@@ -689,7 +691,7 @@ class StandaloneLineAndOrientedSpriteDynamicPrimitiveList: public DynamicPrimiti
     Хранилище элементов списка днамических примитивов
 */
 
-template <class T> class DynamicPrimitiveListStorage: public DynamicPrimitiveListMaterialHolder, public DynamicPrimitiveListImpl<T>
+template <class T, class Base> class DynamicPrimitiveListStorage: public Base, public DynamicPrimitiveListImpl<T>
 {
   public:
     using DynamicPrimitiveListImpl<T>::Item;
@@ -697,11 +699,20 @@ template <class T> class DynamicPrimitiveListStorage: public DynamicPrimitiveLis
 /// Конструктор
     DynamicPrimitiveListStorage (const MaterialManagerPtr& material_manager)
       : DynamicPrimitiveListImplBase (ENTITY_DEPENDENT)
-      , DynamicPrimitiveListMaterialHolder (material_manager, ENTITY_DEPENDENT)
+      , Base (material_manager, ENTITY_DEPENDENT)
       , DynamicPrimitiveListImpl<T> (ENTITY_DEPENDENT)
       , need_update_buffers (true)
     {
     }
+
+    template <class T1, class T2, class T3>
+    DynamicPrimitiveListStorage (const MaterialManagerPtr& material_manager, const T1& arg1, const T2& arg2, const T3& arg3)
+      : DynamicPrimitiveListImplBase (ENTITY_DEPENDENT)
+      , Base (material_manager, arg1, arg2, arg3, ENTITY_DEPENDENT)
+      , DynamicPrimitiveListImpl<T> (ENTITY_DEPENDENT)
+      , need_update_buffers (true)
+    {
+    } 
 
 /// Количество примитивов
     size_t Size () { return items.size (); }
@@ -710,7 +721,7 @@ template <class T> class DynamicPrimitiveListStorage: public DynamicPrimitiveLis
     Item* Items () { return items.empty () ? (Item*)0 : &items [0]; }
 
 /// Добавление / обновление примитивов
-    size_t Add (size_t count, const Item* items)
+    size_t Add (size_t count, const Item* src_items)
     {
       try
       {
@@ -719,12 +730,12 @@ template <class T> class DynamicPrimitiveListStorage: public DynamicPrimitiveLis
         if (!count)
           return items.size ();
 
-        if (!items)
+        if (!src_items)
           throw xtl::make_null_argument_exception ("", "items");
 
           //добавление
 
-        items.insert (impl->items.end (), items, items + count);
+        items.insert (items.end (), src_items, src_items + count);
 
         need_update_buffers = true;
 
@@ -809,6 +820,8 @@ template <class T> class DynamicPrimitiveListStorage: public DynamicPrimitiveLis
       {
         need_update_buffers = true;
 
+        PrimitivesUpdateNotify ();
+
         InvalidateCacheDependencies ();
       }
     }
@@ -820,14 +833,14 @@ template <class T> class DynamicPrimitiveListStorage: public DynamicPrimitiveLis
     {
       try
       {
-        DynamicPrimitiveListMaterialHolder::UpdateCacheCore ();
-
         if (need_update_buffers)
         {
           UpdateBuffersCore ();
 
           need_update_buffers = false;
         }
+
+        DynamicPrimitiveListMaterialHolder::UpdateCacheCore ();
       }
       catch (xtl::exception& e)
       {
@@ -845,6 +858,79 @@ template <class T> class DynamicPrimitiveListStorage: public DynamicPrimitiveLis
   private:
     ItemArray items;
     bool      need_update_buffers;
+};
+
+/*
+    Standalone BillboardSprite list
+*/
+
+class StandaloneBillboardSpriteDynamicPrimitiveList: public DynamicPrimitiveListStorage<BillboardSprite, DynamicPrimitiveListStandalonePrimitiveHolder>,
+  private render::manager::RendererPrimitiveGroup, public DynamicPrimitive
+{
+  typedef DynamicPrimitiveListStorage<BillboardSprite, DynamicPrimitiveListStandalonePrimitiveHolder> Base;
+  public:
+    enum { VERTICES_PER_PRIMITIVE = BillboardSpriteGenerator::VERTICES_PER_PRIMITIVE, INDICES_PER_PRIMITIVE = BillboardSpriteGenerator::INDICES_PER_PRIMITIVE };
+
+/// Конструктор
+    StandaloneBillboardSpriteDynamicPrimitiveList (const MaterialManagerPtr& material_manager, const math::vec3f& in_local_up, MeshBufferUsage vb_usage, MeshBufferUsage ib_usage)
+      : DynamicPrimitiveListImplBase (ENTITY_DEPENDENT)
+      , Base (material_manager, vb_usage, ib_usage, BillboardSpriteGenerator::PRIMITIVE_TYPE)
+      , DynamicPrimitive (*this, DynamicPrimitiveFlag_FrameDependent | DynamicPrimitiveFlag_EntityDependent)
+      , local_up (in_local_up)
+    {
+      primitives_count = 1;
+      primitives       = &Base::Primitive ();
+    }
+
+///Создание экземпляра
+    DynamicPrimitive* CreateDynamicPrimitiveInstanceCore () { return this; }
+
+  private:
+///Обновление
+    void UpdateOnPrerenderCore () {}
+
+    void UpdateOnRenderCore (FrameImpl& frame, EntityImpl& entity, const math::mat4f& mvp_matrix)
+    {
+      try
+      {
+        size_t sprites_count = Base::Size ();
+
+        math::mat4f world_tm (1.0f); //TODO: compute the real world TM
+        math::vec3f local_normal (0, 0, 1); //TODO: compute the real normal
+
+        BillboardSpriteGenerator generator (local_normal, local_up, world_tm);
+
+        generate (generator, Base::Size (), Base::Items (), 0, VertexBuffer ().Data (), IndexBuffer ().Data ());
+      }
+      catch (xtl::exception& e)
+      {
+        e.touch ("render::manager::StandaloneBillboardSpriteDynamicPrimitiveList::UpdateOnRenderCore");
+        throw;
+      }
+    }
+
+/// Обновление буферов
+    void UpdateBuffersCore ()
+    {      
+      try
+      {
+        size_t sprites_count = Base::Size ();
+
+        VertexBuffer ().Clear ();
+        IndexBuffer ().Clear ();
+
+        VertexBuffer ().Resize (sprites_count * VERTICES_PER_PRIMITIVE);
+        IndexBuffer ().Resize (sprites_count * INDICES_PER_PRIMITIVE);
+      }
+      catch (xtl::exception& e)
+      {
+        e.touch ("render::manager::StandaloneBillboardSpriteDynamicPrimitiveList::UpdateBuffersCore");
+        throw;
+      }
+    }
+
+  private:    
+    math::vec3f local_up;
 };
 
 }
@@ -867,6 +953,11 @@ LineListImpl* create_standalone_line_list (const MaterialManagerPtr& material_ma
 OrientedSpriteListImpl* create_standalone_oriented_sprite_list (const MaterialManagerPtr& material_manager, const math::vec3f& up, MeshBufferUsage vb_usage, MeshBufferUsage ib_usage)
 {
   return new StandaloneLineAndOrientedSpriteDynamicPrimitiveList<OrientedSprite, StandaloneOrientedSpriteGenerator> (material_manager, vb_usage, ib_usage, StandaloneOrientedSpriteGenerator (up));
+}
+
+BillboardSpriteListImpl* create_standalone_billboard_sprite_list (const MaterialManagerPtr& material_manager, const math::vec3f& up, MeshBufferUsage vb_usage, MeshBufferUsage ib_usage)
+{
+  return new StandaloneBillboardSpriteDynamicPrimitiveList (material_manager, up, vb_usage, ib_usage);
 }
 
 }
