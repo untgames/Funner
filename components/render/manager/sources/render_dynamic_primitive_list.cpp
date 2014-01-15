@@ -34,99 +34,6 @@ render::low_level::UsageMode get_mode (MeshBufferUsage usage)
 }
 
 /*
-    Хранилище для материалов
-*/
-
-class DynamicPrimitiveListMaterialHolder: virtual public DynamicPrimitiveListImplBase
-{
-  public:
-/// Конструктор
-    DynamicPrimitiveListMaterialHolder (const MaterialManagerPtr& in_material_manager, bool is_entity_dependent)
-      : DynamicPrimitiveListImplBase (is_entity_dependent)
-      , material_manager (in_material_manager)
-    {
-      if (!material_manager)
-        throw xtl::make_null_argument_exception ("render::manager::DynamicPrimitiveListMaterialHolder<T>::DynamicPrimitiveListMaterialHolder", "material_manager");
-    }
-
-    void SetMaterial (const char* material_name)
-    {
-      try
-      {
-          //проверка корректности аргументов
-
-        if (!material_name)
-          throw xtl::make_null_argument_exception ("", "material");
-
-          //замена материала
-
-        MaterialProxy proxy = material_manager->GetMaterialProxy (material_name);
-
-        if (material)
-        {
-          material->DetachCacheHolder (*this);
-
-          *material = proxy;
-        }
-        else
-        {
-          material.reset (new MaterialProxy (proxy));
-        }    
-
-        try
-        {
-          proxy.AttachCacheHolder (*this);
-
-          InvalidateCacheDependencies ();
-        }
-        catch (...)
-        {
-          material.reset ();
-          throw;
-        }
-      }
-      catch (xtl::exception& e)
-      {
-        e.touch ("render::manager::DynamicPrimitiveListMaterialHolder::SetMaterial");
-        throw;
-      }
-    }
-
-    const char* Material () 
-    {
-      return material ? material->Name () : "";
-    }
-
-    MaterialImpl* CachedMaterial () { return cached_material.get (); }
-
-    render::manager::DeviceManager& DeviceManager () { return material_manager->DeviceManager (); }
-
-  protected:
-    void ResetCacheCore ()
-    {
-      cached_material = 0;
-    }
-
-    void UpdateCacheCore ()
-    {
-      try
-      {
-        cached_material = material ? material->Resource () : MaterialPtr ();
-      }
-      catch (xtl::exception& e)
-      {
-        e.touch ("render::manager::DynamicPrimitiveListMaterialHolder::UpdateCacheCore");
-        throw;
-      }
-    }
-
-  private:
-    MaterialManagerPtr            material_manager; //менеджер материалов
-    stl::auto_ptr<MaterialProxy>  material;         //материал
-    MaterialPtr                   cached_material;  //закэшированный материал
-};
-
-/*
     Генератор линий
 */
 
@@ -340,196 +247,134 @@ inline void generate (Generator& generator, size_t items_count, const Item* item
 }
 
 /*
-    Standalone Oriented Sprites & Lines
+    Хранилище для материалов
 */
 
-template <class T, class Generator>
-class StandaloneLineAndOrientedSpriteDynamicPrimitiveList: public DynamicPrimitiveListMaterialHolder, public DynamicPrimitiveListImpl<T>, private Generator
+class DynamicPrimitiveListMaterialHolder: virtual public DynamicPrimitiveListImplBase
 {
   public:
-    using DynamicPrimitiveListImpl<T>::Item;
-
-    enum { VERTICES_PER_PRIMITIVE = Generator::VERTICES_PER_PRIMITIVE, INDICES_PER_PRIMITIVE = Generator::INDICES_PER_PRIMITIVE };
-
-    static const render::low_level::PrimitiveType PRIMITIVE_TYPE = Generator::PRIMITIVE_TYPE;
-
 /// Конструктор
-    StandaloneLineAndOrientedSpriteDynamicPrimitiveList (const MaterialManagerPtr& material_manager, MeshBufferUsage vb_usage, MeshBufferUsage ib_usage, const Generator& generator)
-      : DynamicPrimitiveListImplBase (ENTITY_INDEPENDENT)
-      , DynamicPrimitiveListMaterialHolder (material_manager, ENTITY_INDEPENDENT)
-      , DynamicPrimitiveListImpl<T> (ENTITY_INDEPENDENT)
-      , Generator (generator)
-      , vb (get_mode (vb_usage), render::low_level::BindFlag_VertexBuffer)
-      , ib (get_mode (ib_usage), render::low_level::BindFlag_IndexBuffer)
-      , need_update_buffers (true)
-      , need_update_primitives (true)
-      , cached_state_block_mask_hash (0)
+    DynamicPrimitiveListMaterialHolder (const MaterialManagerPtr& in_material_manager, bool is_entity_dependent)
+      : DynamicPrimitiveListImplBase (is_entity_dependent)
+      , material_manager (in_material_manager)
     {
+      if (!material_manager)
+        throw xtl::make_null_argument_exception ("render::manager::DynamicPrimitiveListMaterialHolder<T>::DynamicPrimitiveListMaterialHolder", "material_manager");
     }
 
-///Создание экземпляра
-    DynamicPrimitive* CreateDynamicPrimitiveInstanceCore ()
-    {
-      throw xtl::format_not_supported_exception ("render::manager::StandaloneLineAndOrientedSpriteDynamicPrimitiveList<T>::CreateDynamicPrimitiveInstanceCore", "Dynamic primitives are not supported for this list");
-    }
-
-///Количество примитивов
-    size_t Size () { return vb.Size () / VERTICES_PER_PRIMITIVE; }
-
-///Добавление / обновление примитивов
-    size_t Add (size_t count, const Item* items)
+    void SetMaterial (const char* material_name)
     {
       try
       {
           //проверка корректности аргументов
 
-        if (!count)
-          return vb.Size () / VERTICES_PER_PRIMITIVE;
+        if (!material_name)
+          throw xtl::make_null_argument_exception ("", "material");
 
-        if (!items)
-          throw xtl::make_null_argument_exception ("", "items");      
+          //замена материала
 
-          //добавление
+        MaterialProxy proxy = material_manager->GetMaterialProxy (material_name);
 
-        size_t new_verts_count = vb.Size () + count * VERTICES_PER_PRIMITIVE,
-               new_inds_count  = ib.Size () + count * INDICES_PER_PRIMITIVE,
-               base_vertex     = vb.Size (),
-               base_index      = ib.Size ();
-
-        vb.Reserve (new_verts_count);
-        ib.Reserve (new_inds_count);
-        vb.Resize (new_verts_count);
-        ib.Resize (new_inds_count);
-
-        generate (static_cast<Generator&> (*this), count, items, base_vertex, vb.Data () + base_vertex, ib.Data () + base_index);
-
-        need_update_buffers    = true;
-        need_update_primitives = true;
-
-        InvalidateCacheDependencies ();
-
-        return new_verts_count / VERTICES_PER_PRIMITIVE - 1;
-      }
-      catch (xtl::exception& e)
-      {
-        e.touch ("render::manager::StandaloneLineAndOrientedSpriteDynamicPrimitiveList<T>::Add");
-        throw;
-      }
-    }
-
-    void Update (size_t first, size_t count, const Item* src_items)
-    {
-      try
-      {
-          //проверка корректности аргументов
-
-        if (!count)
-          return;
-
-        if (!src_items)
-          throw xtl::make_null_argument_exception ("", "items");
-
-        const size_t current_items_count = vb.Size () / VERTICES_PER_PRIMITIVE;
-
-        if (first >= current_items_count)
-          throw xtl::make_range_exception ("", "first", first, current_items_count);
-        
-        if (current_items_count - first < count)
-          throw xtl::make_range_exception ("", "count", count, current_items_count - first);
-
-          //обновление элементов
-
-        size_t base_vertex = first * VERTICES_PER_PRIMITIVE,
-               base_index  = first * INDICES_PER_PRIMITIVE;
-
-        generate (static_cast<Generator&> (*this), count, src_items, base_vertex, vb.Data () + base_vertex, ib.Data () + base_index);
-
-        need_update_buffers = true;
-
-        InvalidateCache ();
-      }
-      catch (xtl::exception& e)
-      {
-        e.touch ("render::manager::StandaloneLineAndOrientedSpriteDynamicPrimitiveList<T>::Update");
-        throw;
-      }
-    }
-
-///Удаление примитивов
-    void Remove (size_t first, size_t count)
-    {
-      const size_t current_items_count = vb.Size () / VERTICES_PER_PRIMITIVE;
-
-      if (first >= current_items_count)
-        return;
-
-      if (current_items_count - first < count)
-        count = current_items_count - first;
-
-      if (!count)
-        return;
-
-      size_t base_vertex = first * VERTICES_PER_PRIMITIVE,
-             base_index  = first * INDICES_PER_PRIMITIVE,
-             verts_count = count * VERTICES_PER_PRIMITIVE,
-             inds_count  = count * INDICES_PER_PRIMITIVE;
-
-      memmove (vb.Data () + first, vb.Data () + first + verts_count, sizeof (DynamicPrimitiveVertex) * verts_count);
-      memmove (ib.Data () + first, ib.Data () + first + inds_count, sizeof (DynamicPrimitiveIndex) * inds_count);
-
-      need_update_buffers    = true;
-      need_update_primitives = true;
-
-      InvalidateCacheDependencies ();
-    }
-
-    void Clear ()
-    {
-      vb.Clear ();
-      ib.Clear ();
-
-      need_update_buffers    = true;
-      need_update_primitives = true;
-
-      InvalidateCacheDependencies ();
-    }
-
-///Резервируемое пространство
-    size_t Capacity () { return vb.Capacity () / VERTICES_PER_PRIMITIVE; }
-
-    void Reserve (size_t count)
-    {
-      try
-      {
-        const size_t current_capacity = vb.Capacity () / VERTICES_PER_PRIMITIVE;
-
-        vb.Reserve (count * VERTICES_PER_PRIMITIVE);
-        ib.Reserve (count * INDICES_PER_PRIMITIVE);
-
-        if (current_capacity < count)
+        if (material)
         {
-          need_update_buffers    = true;
-          need_update_primitives = true;
+          material->DetachCacheHolder (*this);
+
+          *material = proxy;
+        }
+        else
+        {
+          material.reset (new MaterialProxy (proxy));
+        }    
+
+        try
+        {
+          proxy.AttachCacheHolder (*this);
 
           InvalidateCacheDependencies ();
+        }
+        catch (...)
+        {
+          material.reset ();
+          throw;
         }
       }
       catch (xtl::exception& e)
       {
-        e.touch ("render::manager::StandaloneLineAndOrientedSpriteDynamicPrimitiveList<T>::Reserve");
+        e.touch ("render::manager::DynamicPrimitiveListMaterialHolder::SetMaterial");
         throw;
-      }      
+      }
+    }
+
+    const char* Material () 
+    {
+      return material ? material->Name () : "";
+    }
+
+    MaterialImpl* CachedMaterial () { return cached_material.get (); }
+
+    render::manager::DeviceManager& DeviceManager () { return material_manager->DeviceManager (); }
+
+  protected:
+    void ResetCacheCore ()
+    {
+      cached_material = 0;
+    }
+
+    void UpdateCacheCore ()
+    {
+      try
+      {
+        cached_material = material ? material->Resource () : MaterialPtr ();
+      }
+      catch (xtl::exception& e)
+      {
+        e.touch ("render::manager::DynamicPrimitiveListMaterialHolder::UpdateCacheCore");
+        throw;
+      }
     }
 
   private:
+    MaterialManagerPtr            material_manager; //менеджер материалов
+    stl::auto_ptr<MaterialProxy>  material;         //материал
+    MaterialPtr                   cached_material;  //закэшированный материал
+};
+
+/*
+    Standalone primitve holder
+*/
+
+class DynamicPrimitiveListStandalonePrimitiveHolder: public DynamicPrimitiveListMaterialHolder
+{
+  public:
+/// Конструктор
+    DynamicPrimitiveListStandalonePrimitiveHolder (const MaterialManagerPtr& material_manager, MeshBufferUsage vb_usage, MeshBufferUsage ib_usage, render::low_level::PrimitiveType in_primitive_type, bool entity_dependent)
+      : DynamicPrimitiveListImplBase (entity_dependent)
+      , DynamicPrimitiveListMaterialHolder (material_manager, entity_dependent)
+      , primitive_type (in_primitive_type)
+      , vb (get_mode (vb_usage), render::low_level::BindFlag_VertexBuffer)
+      , ib (get_mode (ib_usage), render::low_level::BindFlag_IndexBuffer)
+      , cached_state_block_mask_hash (0)
+      , need_update_primitives (true)
+    {
+    }
+
+  protected:
+    DynamicVertexBuffer& VertexBuffer () { return vb; }
+    DynamicIndexBuffer&  IndexBuffer  () { return ib; }
+
+/// Оповещение о необходимости обновления примитива
+    void PrimitivesUpdateNotify () { need_update_primitives = true; }
+
+/// Сброс кэша
     void ResetCacheCore ()
     {
       DynamicPrimitiveListMaterialHolder::ResetCacheCore ();
 
       cached_state_block           = LowLevelStateBlockPtr ();
       cached_state_block_mask_hash = 0;
-    }
+    }   
 
+/// Обновление кэша
     void UpdateCacheCore ()
     {
       try
@@ -539,14 +384,6 @@ class StandaloneLineAndOrientedSpriteDynamicPrimitiveList: public DynamicPrimiti
         render::manager::DeviceManager&    device_manager = DeviceManager ();
         render::low_level::IDevice&        device         = device_manager.Device ();
         render::low_level::IDeviceContext& context        = device_manager.ImmediateContext ();
-
-        if (need_update_buffers)
-        {
-          vb.SyncBuffers (device);
-          ib.SyncBuffers (device);
-
-          need_update_buffers = false;
-        }
 
         if (need_update_primitives)
         {
@@ -595,7 +432,7 @@ class StandaloneLineAndOrientedSpriteDynamicPrimitiveList: public DynamicPrimiti
           cached_primitive.material    = cached_material;
           cached_primitive.state_block = cached_state_block.get ();
           cached_primitive.indexed     = true;
-          cached_primitive.type        = PRIMITIVE_TYPE;
+          cached_primitive.type        = primitive_type;
           cached_primitive.first       = 0;
           cached_primitive.count       = ib.Size ();
           cached_primitive.base_vertex = 0;
@@ -611,19 +448,241 @@ class StandaloneLineAndOrientedSpriteDynamicPrimitiveList: public DynamicPrimiti
       }
       catch (xtl::exception& e)
       {
+        e.touch ("render::manager::DynamicPrimitiveListStandalonePrimitiveHolder::UpdateCacheCore");
+        throw;
+      }
+    }
+
+  private:
+    render::low_level::PrimitiveType   primitive_type;
+    DynamicVertexBuffer                vb;
+    DynamicIndexBuffer                 ib;
+    render::manager::RendererPrimitive cached_primitive;
+    LowLevelStateBlockPtr              cached_state_block;
+    size_t                             cached_state_block_mask_hash;
+    bool                               need_update_primitives;
+};
+
+/*
+    Standalone Oriented Sprites & Lines
+*/
+
+template <class T, class Generator>
+class StandaloneLineAndOrientedSpriteDynamicPrimitiveList: public DynamicPrimitiveListStandalonePrimitiveHolder, public DynamicPrimitiveListImpl<T>, private Generator
+{
+  public:
+    using DynamicPrimitiveListImpl<T>::Item;
+
+    enum { VERTICES_PER_PRIMITIVE = Generator::VERTICES_PER_PRIMITIVE, INDICES_PER_PRIMITIVE = Generator::INDICES_PER_PRIMITIVE };
+
+    static const render::low_level::PrimitiveType PRIMITIVE_TYPE = Generator::PRIMITIVE_TYPE;
+
+/// Конструктор
+    StandaloneLineAndOrientedSpriteDynamicPrimitiveList (const MaterialManagerPtr& material_manager, MeshBufferUsage vb_usage, MeshBufferUsage ib_usage, const Generator& generator)
+      : DynamicPrimitiveListImplBase (ENTITY_INDEPENDENT)
+      , DynamicPrimitiveListStandalonePrimitiveHolder (material_manager, vb_usage, ib_usage, PRIMITIVE_TYPE, ENTITY_INDEPENDENT)
+      , DynamicPrimitiveListImpl<T> (ENTITY_INDEPENDENT)
+      , Generator (generator)
+      , need_update_buffers (true)
+    {
+    }
+
+///Создание экземпляра
+    DynamicPrimitive* CreateDynamicPrimitiveInstanceCore ()
+    {
+      throw xtl::format_not_supported_exception ("render::manager::StandaloneLineAndOrientedSpriteDynamicPrimitiveList<T>::CreateDynamicPrimitiveInstanceCore", "Dynamic primitives are not supported for this list");
+    }
+
+///Количество примитивов
+    size_t Size () { return VertexBuffer ().Size () / VERTICES_PER_PRIMITIVE; }
+
+///Добавление / обновление примитивов
+    size_t Add (size_t count, const Item* items)
+    {
+      try
+      {
+        DynamicVertexBuffer& vb = VertexBuffer ();
+        DynamicIndexBuffer&  ib = IndexBuffer ();
+
+          //проверка корректности аргументов
+
+        if (!count)
+          return vb.Size () / VERTICES_PER_PRIMITIVE;
+
+        if (!items)
+          throw xtl::make_null_argument_exception ("", "items");      
+
+          //добавление
+
+        size_t new_verts_count = vb.Size () + count * VERTICES_PER_PRIMITIVE,
+               new_inds_count  = ib.Size () + count * INDICES_PER_PRIMITIVE,
+               base_vertex     = vb.Size (),
+               base_index      = ib.Size ();
+
+        vb.Reserve (new_verts_count);
+        ib.Reserve (new_inds_count);
+        vb.Resize (new_verts_count);
+        ib.Resize (new_inds_count);
+
+        generate (static_cast<Generator&> (*this), count, items, base_vertex, vb.Data () + base_vertex, ib.Data () + base_index);
+
+        need_update_buffers = true;
+
+        PrimitivesUpdateNotify ();
+
+        InvalidateCacheDependencies ();
+
+        return new_verts_count / VERTICES_PER_PRIMITIVE - 1;
+      }
+      catch (xtl::exception& e)
+      {
+        e.touch ("render::manager::StandaloneLineAndOrientedSpriteDynamicPrimitiveList<T>::Add");
+        throw;
+      }
+    }
+
+    void Update (size_t first, size_t count, const Item* src_items)
+    {
+      try
+      {
+        DynamicVertexBuffer& vb = VertexBuffer ();
+        DynamicIndexBuffer&  ib = IndexBuffer ();
+
+          //проверка корректности аргументов
+
+        if (!count)
+          return;
+
+        if (!src_items)
+          throw xtl::make_null_argument_exception ("", "items");
+
+        const size_t current_items_count = vb.Size () / VERTICES_PER_PRIMITIVE;
+
+        if (first >= current_items_count)
+          throw xtl::make_range_exception ("", "first", first, current_items_count);
+        
+        if (current_items_count - first < count)
+          throw xtl::make_range_exception ("", "count", count, current_items_count - first);
+
+          //обновление элементов
+
+        size_t base_vertex = first * VERTICES_PER_PRIMITIVE,
+               base_index  = first * INDICES_PER_PRIMITIVE;
+
+        generate (static_cast<Generator&> (*this), count, src_items, base_vertex, vb.Data () + base_vertex, ib.Data () + base_index);
+
+        need_update_buffers = true;
+
+        InvalidateCache ();
+      }
+      catch (xtl::exception& e)
+      {
+        e.touch ("render::manager::StandaloneLineAndOrientedSpriteDynamicPrimitiveList<T>::Update");
+        throw;
+      }
+    }
+
+///Удаление примитивов
+    void Remove (size_t first, size_t count)
+    {
+      DynamicVertexBuffer& vb = VertexBuffer ();
+      DynamicIndexBuffer&  ib = IndexBuffer ();
+
+      const size_t current_items_count = vb.Size () / VERTICES_PER_PRIMITIVE;
+
+      if (first >= current_items_count)
+        return;
+
+      if (current_items_count - first < count)
+        count = current_items_count - first;
+
+      if (!count)
+        return;
+
+      size_t base_vertex = first * VERTICES_PER_PRIMITIVE,
+             base_index  = first * INDICES_PER_PRIMITIVE,
+             verts_count = count * VERTICES_PER_PRIMITIVE,
+             inds_count  = count * INDICES_PER_PRIMITIVE;
+
+      memmove (vb.Data () + first, vb.Data () + first + verts_count, sizeof (DynamicPrimitiveVertex) * verts_count);
+      memmove (ib.Data () + first, ib.Data () + first + inds_count, sizeof (DynamicPrimitiveIndex) * inds_count);
+
+      need_update_buffers = true;
+
+      PrimitivesUpdateNotify ();
+
+      InvalidateCacheDependencies ();
+    }
+
+    void Clear ()
+    {
+      VertexBuffer ().Clear ();
+      IndexBuffer ().Clear ();
+
+      need_update_buffers = true;
+
+      PrimitivesUpdateNotify ();
+
+      InvalidateCacheDependencies ();
+    }
+
+///Резервируемое пространство
+    size_t Capacity () { return VertexBuffer ().Capacity () / VERTICES_PER_PRIMITIVE; }
+
+    void Reserve (size_t count)
+    {
+      try
+      {
+        DynamicVertexBuffer& vb = VertexBuffer ();
+        DynamicIndexBuffer&  ib = IndexBuffer ();
+
+        const size_t current_capacity = vb.Capacity () / VERTICES_PER_PRIMITIVE;
+
+        vb.Reserve (count * VERTICES_PER_PRIMITIVE);
+        ib.Reserve (count * INDICES_PER_PRIMITIVE);
+
+        if (current_capacity < count)
+        {
+          need_update_buffers = true;
+
+          PrimitivesUpdateNotify ();  
+
+          InvalidateCacheDependencies ();
+        }
+      }
+      catch (xtl::exception& e)
+      {
+        e.touch ("render::manager::StandaloneLineAndOrientedSpriteDynamicPrimitiveList<T>::Reserve");
+        throw;
+      }      
+    }
+
+  private:
+    void UpdateCacheCore ()
+    {
+      try
+      {
+        if (need_update_buffers)
+        {
+          render::low_level::IDevice& device = DeviceManager ().Device ();
+
+          VertexBuffer ().SyncBuffers (device);
+          IndexBuffer ().SyncBuffers (device);
+
+          need_update_buffers = false;
+        }
+
+        DynamicPrimitiveListStandalonePrimitiveHolder::UpdateCacheCore ();
+      }
+      catch (xtl::exception& e)
+      {
         e.touch ("render::manager::StandaloneLineAndOrientedSpriteDynamicPrimitiveList::UpdateCacheCore");
         throw;
       }
     }
 
   private:
-    DynamicVertexBuffer                vb;
-    DynamicIndexBuffer                 ib;
-    bool                               need_update_buffers;
-    bool                               need_update_primitives;
-    render::manager::RendererPrimitive cached_primitive;
-    LowLevelStateBlockPtr              cached_state_block;
-    size_t                             cached_state_block_mask_hash;
+    bool need_update_buffers;
 };
 
 /*
