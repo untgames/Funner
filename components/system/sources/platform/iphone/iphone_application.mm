@@ -25,10 +25,9 @@ class ApplicationDelegateImpl;
 bool                     application_launched = false;
 ApplicationDelegateImpl* application_delegate = 0;
 
-NSString*            USER_DEFAULTS_UUID                     = @"UUID";
-const char*          LOG_NAME                               = "syslib.IPhoneApplication";
-const char*          REGISTER_FOR_PUSH_NOTIFICATIONS_PREFIX = "RegisterForPushNotification Register ";
-const NSTimeInterval BACKGROUND_IDLE_TIMER_PERIOD           = 1.f / 60.f; //idle timer calling interval when app is in background state
+NSString*            USER_DEFAULTS_UUID           = @"UUID";
+const char*          LOG_NAME                     = "syslib.IPhoneApplication";
+const NSTimeInterval BACKGROUND_IDLE_TIMER_PERIOD = 1.f / 60.f; //idle timer calling interval when app is in background state
 
 //Functions for printing objective-c objects to json
 void ns_object_to_json (id obj, stl::string& output);
@@ -140,9 +139,6 @@ class ApplicationDelegateImpl: public IApplicationDelegate, public xtl::referenc
       if (application_delegate)
         throw xtl::format_operation_exception (METHOD_NAME, "Loop already runned");
 
-      register_for_push_notifications_connection = Application::RegisterNotificationHandler (common::format ("%s*", REGISTER_FOR_PUSH_NOTIFICATIONS_PREFIX).c_str (),
-                                                                                             xtl::bind (&ApplicationDelegateImpl::RegisterForPushNotifications, this, _1));
-
       @try
       {
         NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
@@ -242,47 +238,11 @@ class ApplicationDelegateImpl: public IApplicationDelegate, public xtl::referenc
       [pool release];
     }
 
-///Регистрация обработки push-сообщений
-    void RegisterForPushNotifications (const char* notification)
-    {
-      common::PropertyMap params = common::parse_init_string (notification + strlen (REGISTER_FOR_PUSH_NOTIFICATIONS_PREFIX));
-
-      UIRemoteNotificationType types = UIRemoteNotificationTypeBadge | UIRemoteNotificationTypeSound | UIRemoteNotificationTypeAlert;
-
-      if (params.IsPresent ("Types"))
-      {
-        common::StringArray params_types = common::split (params.GetString ("Types"));
-
-        types = 0;
-
-        for (size_t i = 0, count = params_types.Size (); i < count; i++)
-        {
-          const char* type = params_types [i];
-
-          if (!xtl::xstrcmp (type, "Badge"))
-            types |= UIRemoteNotificationTypeBadge;
-          else if (!xtl::xstrcmp (type, "Sound"))
-            types |= UIRemoteNotificationTypeSound;
-          else if (!xtl::xstrcmp (type, "Alert"))
-            types |= UIRemoteNotificationTypeAlert;
-          else
-            log.Printf ("Ignored unknown push notification type '%s'", type);
-        }
-      }
-
-      NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
-
-      [[UIApplication sharedApplication] registerForRemoteNotificationTypes:types];
-
-      [pool release];
-    }
-
   private:
-    common::Log                   log;                                        //протокол
-    bool                          idle_enabled;                               //необходимо ли вызывать события idle
-    syslib::IApplicationListener* listener;                                   //слушатель событий
-    xtl::auto_connection          system_properties_update_connection;        //соединение обновления системных свойств
-    xtl::auto_connection          register_for_push_notifications_connection; //соединение события инициации подписки на push-сообщения
+    common::Log                   log;                                 //протокол
+    bool                          idle_enabled;                        //необходимо ли вызывать события idle
+    syslib::IApplicationListener* listener;                            //слушатель событий
+    xtl::auto_connection          system_properties_update_connection; //соединение обновления системных свойств
 };
 
 }

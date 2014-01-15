@@ -6,8 +6,9 @@ export.link.engine.launcher_shared.has_windows.IMPORTS := link.render.low_level.
 export.link.engine.launcher_shared.win32.IMPORTS       := link.input.direct_input_driver
 export.link.engine.launcher_shared.iphone.IMPORTS      := link.media.image.pvr link.media.players.iphone \
                                              link.engine.subsystems.iphone_audio_session link.engine.subsystems.iphone_configuration \
-                                             link.social.game_kit link.store.ios_store
-export.link.engine.launcher_shared.android.IMPORTS     := link.media.image.pvr link.store.android_store link.store.amazon_store
+                                             link.social.game_kit link.store.ios_store link.push_notifications.ios_push_notifications
+export.link.engine.launcher_shared.android.IMPORTS     := link.media.image.pvr link.store.android_store link.store.amazon_store \
+                                                          link.push_notifications.google_push_notifications
 export.link.engine.launcher_shared.tabletos.IMPORTS    := link.media.image.pvr
 export.link.engine.launcher_shared.beagleboard.IMPORTS := link.media.image.pvr
 export.link.engine.launcher_shared.IMPORTS := link.common.default_console_handler link.common.zip_file_system link.common.aes \
@@ -24,6 +25,7 @@ export.link.engine.launcher_shared.IMPORTS := link.common.default_console_handle
                                 link.engine.script_binds.social link.engine.script_binds.debug \
                                 link.engine.script_binds.scene_input link.engine.script_binds.store \
                                 link.engine.script_binds.render.scene_render2d link.engine.script_binds.analytics.flurry \
+                                link.engine.script_binds.push_notifications \
                                 link.sound.low_level.openal_driver run.sound.low_level.openal_driver \
                                 link.engine.subsystems.scene_render link.engine.subsystems.scene_player \
                                 link.engine.subsystems.input_manager link.engine.subsystems.shell \

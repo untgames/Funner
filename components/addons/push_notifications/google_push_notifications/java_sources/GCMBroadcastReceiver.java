@@ -1,4 +1,4 @@
-package com.untgames.funner.application;
+package com.untgames.funner.push_notifications;
 
 import android.content.Context;
 
@@ -12,6 +12,6 @@ public class GCMBroadcastReceiver extends com.google.android.gcm.GCMBroadcastRec
     @Override
     protected String getGCMIntentServiceClassName (Context context)
     {
-    	return "com.untgames.funner.application.GCMIntentService";
+    	return "com.untgames.funner.push_notifications.GCMIntentService";
     }
 }

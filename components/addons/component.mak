@@ -5,4 +5,4 @@ TARGETS := ADDONS_COMPONENTS
 
 #Цель - пакет
 ADDONS_COMPONENTS.TYPE       := package
-ADDONS_COMPONENTS.COMPONENTS := social store analytics
+ADDONS_COMPONENTS.COMPONENTS := social store analytics push_notifications

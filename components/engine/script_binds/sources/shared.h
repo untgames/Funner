@@ -39,6 +39,8 @@
 
 #include <physics/manager.h>
 
+#include <push_notifications/push_notifications_center.h>
+
 #include <social/session.h>
 
 #include <store/store.h>

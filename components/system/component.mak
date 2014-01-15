@@ -61,13 +61,11 @@ SYSTEMLIB.UTILS.ANDROID_LAUNCHER.DLLS          := android
 SYSTEMLIB.UTILS.ANDROID_LAUNCHER.SOURCE_DIRS   := utils/android_launcher
 SYSTEMLIB.UTILS.ANDROID_LAUNCHER.MANIFEST_FILE := utils/android_launcher/AndroidManifest.xml
 SYSTEMLIB.UTILS.ANDROID_LAUNCHER.RES_DIR       := utils/android_launcher/res
-SYSTEMLIB.UTILS.ANDROID_LAUNCHER.IMPORTS       := compile.extern.gcm
 
 #Цель - Android launcher common
 SYSTEMLIB.UTILS.ANDROID_LAUNCHER_COMMON.TYPE         := android-jar
 SYSTEMLIB.UTILS.ANDROID_LAUNCHER_COMMON.NAME         := funner.application
 SYSTEMLIB.UTILS.ANDROID_LAUNCHER_COMMON.SOURCE_DIRS  := utils/android_launcher
-SYSTEMLIB.UTILS.ANDROID_LAUNCHER_COMMON.IMPORTS      := compile.extern.gcm
 
 #Цель - Tabletos launcher
 SYSTEMLIB.UTILS.TABLETOS_LAUNCHER.TYPE          := tabletos-bar

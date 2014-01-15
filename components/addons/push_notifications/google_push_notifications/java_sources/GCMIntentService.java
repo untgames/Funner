@@ -1,4 +1,4 @@
-package com.untgames.funner.application;
+package com.untgames.funner.push_notifications;
 
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -63,7 +63,7 @@ public class GCMIntentService extends GCMBaseIntentService {
     	try
     	{
     		//Send broadcast with this message
-    		Intent broadcastIntent = new Intent ("com.untgames.funner.application.PROCESS_GCM_MESSAGE");
+    		Intent broadcastIntent = new Intent ("com.untgames.funner.push_notifications.PROCESS_GCM_MESSAGE");
     		
     		broadcastIntent.putExtras (intent);
     		broadcastIntent.addCategory (getApplicationContext().getPackageName());

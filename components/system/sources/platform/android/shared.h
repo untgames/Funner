@@ -77,9 +77,6 @@ void register_crash_handlers ();
 /// регистрация методов обратного вызова screen manager
 void register_screen_callbacks (JNIEnv* env, jclass activity_class);
 
-/// регистрация методов обратного вызова google cloud messaging
-void register_gcm_callbacks (JNIEnv* env);
-
 /// получение контекста запуска приложения
 const ApplicationContext& get_context ();
 

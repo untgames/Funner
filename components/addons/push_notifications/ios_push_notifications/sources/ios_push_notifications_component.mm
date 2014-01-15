@@ -13,7 +13,7 @@ const char* CENTER_NAME_MASK = "IOSCenter";                            //маска и
 }
 
 /*
-   Компонент магазина
+   Компонент центра обработки пуш-сообщений
 */
 
 namespace components

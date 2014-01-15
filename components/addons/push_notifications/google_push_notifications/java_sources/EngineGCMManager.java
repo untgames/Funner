@@ -1,4 +1,4 @@
-package com.untgames.funner.application;
+package com.untgames.funner.push_notifications;
 
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
@@ -48,7 +48,12 @@ public class EngineGCMManager
 			onRegisteredCallback(regId);
 		}
   }
-  
+
+  public static void unregisterForGCMMessages (Context context)
+  {
+    GCMRegistrar.unregister (context);
+  }
+
   private static native void onRegisteredCallback(String request);
   private static native void onErrorCallback(String error);
 }

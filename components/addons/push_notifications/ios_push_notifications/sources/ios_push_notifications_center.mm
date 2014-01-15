@@ -117,6 +117,7 @@ class IOSCenter
       is_registering_for_notifications = false;
 
       register_for_notifications_callback (true, "", notification + xtl::xstrlen (REGISTER_FOR_NOTIFICATIONS_SUCCEEDED_PREFIX));
+      register_for_notifications_callback = PushNotificationsCenter::RegisterCallback ();
     }
 
     void OnRegisterForNotificationsFailed (const char* notification)
@@ -124,6 +125,7 @@ class IOSCenter
       is_registering_for_notifications = false;
 
       register_for_notifications_callback (false, notification + xtl::xstrlen (REGISTER_FOR_NOTIFICATIONS_FAILED_PREFIX), "");
+      register_for_notifications_callback = PushNotificationsCenter::RegisterCallback ();
     }
 
   private:

@@ -83,3 +83,7 @@ export.link.engine.script_binds.render.scene_render2d.IMPORTS       := link.engi
 # Link flurry analytics exports
 export.link.engine.script_binds.analytics.flurry.LINK_INCLUDES := FlurryAnalyticsScriptBind
 export.link.engine.script_binds.analytics.flurry.IMPORTS       := link.engine.script_binds link.analytics.flurry
+
+# Link push notifications exports
+export.link.engine.script_binds.push_notifications.LINK_INCLUDES := PushNotificationsScriptBind
+export.link.engine.script_binds.push_notifications.IMPORTS       := link.engine.script_binds link.push_notifications.core

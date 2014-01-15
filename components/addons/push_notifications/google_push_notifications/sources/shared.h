@@ -1,25 +1,26 @@
-#ifndef PUSH_NOTIFICATIONS_IOS_SHARED_HEADER
-#define PUSH_NOTIFICATIONS_IOS_SHARED_HEADER
+#ifndef PUSH_NOTIFICATIONS_GOOGLE_SHARED_HEADER
+#define PUSH_NOTIFICATIONS_GOOGLE_SHARED_HEADER
 
 #include <xtl/bind.h>
 #include <xtl/common_exceptions.h>
 #include <xtl/function.h>
 #include <xtl/signal.h>
 
+#include <common/action_queue.h>
 #include <common/component.h>
 #include <common/log.h>
 #include <common/property_map.h>
 #include <common/singleton.h>
 #include <common/strlib.h>
 
-#include <syslib/application.h>
+#include <syslib/platform/android.h>
 
 #include <push_notifications/push_notifications_center.h>
 
 namespace push_notifications
 {
 
-namespace ios_push_notifications
+namespace google_push_notifications
 {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -49,6 +50,11 @@ class PushNotificationsCenterImpl : public IPushNotificationsCenter
 ///Подписка на пуш-сообщения
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     xtl::connection RegisterNotificationsHandler (const PushNotificationsCenter::NotificationsHandler&);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Инициализация java-биндинга
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    static void InitJavaBindings (JNIEnv* env);
 };
 
 }
