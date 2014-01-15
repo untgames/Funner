@@ -55,6 +55,9 @@ class AmazonCenter
         register_for_notifications_callback = callback;
 
         env.CallStaticVoidMethod (adm_manager_class, register_method, activity.get ());
+
+        if (env.ExceptionOccurred ())
+          env.ExceptionClear ();
       }
       catch (xtl::exception& e)
       {
@@ -80,6 +83,9 @@ class AmazonCenter
         jmethodID unregister_method = find_static_method (&env, adm_manager_class, "unregisterForADMMessages", "(Landroid/content/Context;)V");
 
         env.CallStaticVoidMethod (adm_manager_class, unregister_method, activity.get ());
+
+        if (env.ExceptionOccurred ())
+          env.ExceptionClear ();
       }
       catch (xtl::exception& e)
       {
@@ -125,17 +131,6 @@ class AmazonCenter
       if (!env)
         throw xtl::make_null_argument_exception (METHOD_NAME, "env");
 
-      jclass adm_service_class = env->FindClass ("com/untgames/funner/push_notifications/ADMService");
-
-      if (!adm_service_class)
-      {
-        if (env->ExceptionOccurred ())
-          env->ExceptionClear ();
-
-        log_error ("Amazon push notifications linked, but ADMService class not found. Push notifications not supported.\n");
-        return;
-      }
-
       jclass adm_manager_class_ref = env->FindClass ("com/untgames/funner/push_notifications/EngineADMManager");
 
       if (!adm_manager_class_ref)
@@ -144,6 +139,22 @@ class AmazonCenter
           env->ExceptionClear ();
 
         log_error ("Amazon push notifications linked, but EngineADMManager class not found. Push notifications not supported.\n");
+        return;
+      }
+
+      jmethodID is_api_available_method = find_static_method (env, adm_manager_class_ref, "isAPIAvailable", "()Z");
+
+      if (!env->CallStaticBooleanMethod (adm_manager_class_ref, is_api_available_method))
+        return;
+
+      jclass adm_service_class = env->FindClass ("com/untgames/funner/push_notifications/ADMService");
+
+      if (!adm_service_class)
+      {
+        if (env->ExceptionOccurred ())
+          env->ExceptionClear ();
+
+        log_error ("Amazon push notifications linked, but ADMService class not found. Push notifications not supported.\n");
         return;
       }
 
