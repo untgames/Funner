@@ -46,19 +46,11 @@ class PrimitiveBuffersImpl: public Object
     void Remove    (const media::geometry::VertexBuffer& buffer);    
     void Remove    (const media::geometry::IndexBuffer& buffer);
     void RemoveAll ();
-    
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Резервирование вспомогательных примитивов
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    void   ReserveDynamicPrimitives (size_t sprites_count, size_t lines_count);
-    size_t LinesCapacity            ();
-    size_t SpritesCapacity          ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Динамические буферы
+///Менеджер пакетирования
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    manager::DynamicVertexBuffer& DynamicVertexBuffer ();
-    manager::DynamicIndexBuffer&  DynamicIndexBuffer  ();
+    manager::BatchingManager& BatchingManager ();
 
   private:
     struct Impl;

@@ -93,27 +93,27 @@ void PrimitiveBuffers::RemoveAll ()
 
 void PrimitiveBuffers::ReserveDynamicPrimitives (size_t sprites_count, size_t lines_count)
 {
-  impl->ReserveDynamicPrimitives (sprites_count, lines_count);
+  impl->BatchingManager ().ReserveDynamicPrimitives (sprites_count, lines_count);
 }
 
 void PrimitiveBuffers::ReserveLines (size_t count)
 {
-  impl->ReserveDynamicPrimitives (SpritesCapacity (), count);
+  impl->BatchingManager ().ReserveDynamicPrimitives (SpritesCapacity (), count);
 }
 
 void PrimitiveBuffers::ReserveSprites (size_t count)
 {
-  impl->ReserveDynamicPrimitives (count, LinesCapacity ());
+  impl->BatchingManager ().ReserveDynamicPrimitives (count, LinesCapacity ());
 }
 
 size_t PrimitiveBuffers::LinesCapacity () const
 {
-  return impl->LinesCapacity ();
+  return impl->BatchingManager ().LinesCapacity ();
 }
 
 size_t PrimitiveBuffers::SpritesCapacity () const
 {
-  return impl->SpritesCapacity ();
+  return impl->BatchingManager ().SpritesCapacity ();
 }
 
 /*

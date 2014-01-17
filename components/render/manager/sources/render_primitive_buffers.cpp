@@ -70,50 +70,20 @@ typedef stl::hash_map<size_t, VertexBufferPtr>    CacheVertexBufferMap;
 
 struct PrimitiveBuffersImpl::Impl
 {
-  DeviceManagerPtr                      device_manager;       //менеджер устройства отрисовки
-  VertexStreamMap                       vertex_streams;       //вершинные потоки
-  VertexBufferMap                       vertex_buffers;       //вершинные буферы
-  IndexBufferMap                        index_buffers;        //индексные буферы
-  CacheBufferMap                        vertex_streams_cache; //кэш вершинных потоков
-  CacheBufferMap                        index_buffers_cache;  //кэш индексных буферов
-  CacheVertexBufferMap                  vertex_buffers_cache; //кэш вершинных буферов
-  bool                                  cache_state;          //состояние кэша
-  size_t                                lines_capacity;       //резервируемое количество линий
-  size_t                                sprites_capacity;     //резервируемое количество спрайтов
-  render::manager::DynamicVertexBuffer  dynamic_vb;           //динамический вершинный буфер
-  render::manager::DynamicIndexBuffer   dynamic_ib;           //динамический индексный буфер
+  DeviceManagerPtr                        device_manager;       //менеджер устройства отрисовки
+  VertexStreamMap                         vertex_streams;       //вершинные потоки
+  VertexBufferMap                         vertex_buffers;       //вершинные буферы
+  IndexBufferMap                          index_buffers;        //индексные буферы
+  CacheBufferMap                          vertex_streams_cache; //кэш вершинных потоков
+  CacheBufferMap                          index_buffers_cache;  //кэш индексных буферов
+  CacheVertexBufferMap                    vertex_buffers_cache; //кэш вершинных буферов
+  bool                                    cache_state;          //состояние кэша
+  stl::auto_ptr<manager::BatchingManager> batching_manager;     //менеджер пакетирования
   
   Impl (const DeviceManagerPtr& in_device_manager)
-    : device_manager (in_device_manager)
+    : device_manager (in_device_manager)   
     , cache_state (false)
-    , lines_capacity ()
-    , sprites_capacity ()
-    , dynamic_vb (render::low_level::UsageMode_Stream, render::low_level::BindFlag_VertexBuffer)
-    , dynamic_ib (render::low_level::UsageMode_Stream, render::low_level::BindFlag_IndexBuffer)
   {
-  }
-
-  void ReserveDynamicPrimitives (size_t sprites_count, size_t lines_count)
-  {
-    try
-    {
-      size_t vertices_count = 4 * sprites_count + 2 * lines_count,
-             indices_count  = 6 * sprites_count + 2 * lines_count;
-
-      dynamic_vb.Reserve (vertices_count);
-      dynamic_ib.Reserve (indices_count);
-
-      dynamic_vb.SyncBuffers (device_manager->Device ());
-      dynamic_ib.SyncBuffers (device_manager->Device ());
-
-      sprites_capacity = sprites_count;
-      lines_capacity   = lines_capacity;
-    }
-    catch (xtl::exception& e)
-    {
-      e.touch ("render::manager::PrimitiveBuffersImpl::ReserveDynamicPrimitives");
-      throw;
-    }
   }
 };
 
@@ -421,44 +391,25 @@ void PrimitiveBuffersImpl::RemoveAll ()
 }
 
 /*
-    Резервирование вспомогательных примитивов
+    Менеджер пакетирования
 */
 
-void PrimitiveBuffersImpl::ReserveDynamicPrimitives (size_t sprites_count, size_t lines_count)
+render::manager::BatchingManager& PrimitiveBuffersImpl::BatchingManager ()
 {
   try
   {
-    impl->ReserveDynamicPrimitives (sprites_count, lines_count);
+    if (impl->batching_manager)
+      return *impl->batching_manager;
+
+    impl->batching_manager.reset (new manager::BatchingManager (impl->device_manager));
+
+    return *impl->batching_manager;
   }
   catch (xtl::exception& e)
   {
-    e.touch ("render::low_level::manager::PrimitiveBuffersImpl::ReserveDynamicPrimitives");
+    e.touch ("render::manager::PrimitiveBuffersImpl::BatchingManager");
     throw;
   }
-}
-
-size_t PrimitiveBuffersImpl::LinesCapacity ()
-{
-  return impl->lines_capacity;
-}
-
-size_t PrimitiveBuffersImpl::SpritesCapacity ()
-{
-  return impl->sprites_capacity;
-}
-
-/*
-    Динамические буферы
-*/
-
-render::manager::DynamicVertexBuffer& PrimitiveBuffersImpl::DynamicVertexBuffer ()
-{
-  return impl->dynamic_vb;
-}
-
-render::manager::DynamicIndexBuffer& PrimitiveBuffersImpl::DynamicIndexBuffer ()
-{
-  return impl->dynamic_ib;
 }
 
 /*
