@@ -25,6 +25,21 @@ Entity& Entity::operator = (const Entity& entity)
   return *this;
 }
 
+void Entity::SetWorldMatrix (const math::mat4f& tm)
+{
+  impl->SetWorldMatrix (tm);
+}
+
+const math::mat4f& Entity::WorldMatrix () const
+{
+  return impl->WorldMatrix ();
+}
+
+const math::mat4f& Entity::InverseWorldMatrix () const
+{
+  return impl->InverseWorldMatrix ();
+}
+
 void Entity::SetProperties (const common::PropertyMap& properties)
 {
   return impl->SetProperties (properties);  

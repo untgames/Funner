@@ -34,6 +34,9 @@ class EntityLodCommonData: public CacheHolder, public DebugIdHolder
       , entity_parameters_layout (&in_device_manager->Device (), &in_device_manager->Settings ())
       , shader_options_cache (&in_device_manager->CacheManager ())
       , scissor_state (false)
+      , world_tm (1.0f)
+      , inv_world_tm (1.0f)
+      , need_update_inv_world_tm (false)
     {
       StateBlockMask mask;
       
@@ -167,6 +170,26 @@ class EntityLodCommonData: public CacheHolder, public DebugIdHolder
     }
     
     const RectArea& Scissor () { return scissor_rect; }
+
+///Матрица мировых преобразований
+    void SetWorldMatrix (const math::mat4f& tm)
+    {
+      world_tm                 = tm;
+      need_update_inv_world_tm = true;
+    }
+
+    const math::mat4f& WorldMatrix () { return world_tm; }
+
+    const math::mat4f& InverseWorldMatrix ()
+    {
+      if (!need_update_inv_world_tm)
+        return inv_world_tm;
+
+      inv_world_tm             = math::inverse (world_tm);
+      need_update_inv_world_tm = false;
+
+      return inv_world_tm;
+    }
 
 ///Управление кэшированием
     using CacheHolder::UpdateCache;
@@ -332,6 +355,9 @@ class EntityLodCommonData: public CacheHolder, public DebugIdHolder
     bool                                 scissor_state;            //состояние режима отсечения
     RectArea                             scissor_rect;             //область отсечения
     LowLevelStateBlockPtr                default_state_block;      //блок состояний по умолчанию
+    math::mat4f                          world_tm;                 //мировая матрица преобразований
+    math::mat4f                          inv_world_tm;             //инверсная матрица преобразований
+    bool                                 need_update_inv_world_tm; //необходимо обновить инверсную матрицу преобразований
 };
 
 /*
@@ -623,6 +649,25 @@ EntityImpl::EntityImpl (const DeviceManagerPtr& device_manager, const TextureMan
 
 EntityImpl::~EntityImpl ()
 {
+}
+
+/*
+    Матрица мировых преобразований
+*/
+
+void EntityImpl::SetWorldMatrix (const math::mat4f& tm)
+{
+  impl->SetWorldMatrix (tm);
+}
+
+const math::mat4f& EntityImpl::WorldMatrix ()
+{
+  return impl->WorldMatrix ();
+}
+
+const math::mat4f& EntityImpl::InverseWorldMatrix ()
+{
+  return impl->InverseWorldMatrix ();
 }
 
 /*
@@ -919,3 +964,4 @@ void EntityImpl::ResetCache ()
   for (EntityLodArray::iterator iter=impl->lods.begin (), end=impl->lods.end (); iter!=end; ++iter)
     (*iter)->ResetCache ();  
 }
+  

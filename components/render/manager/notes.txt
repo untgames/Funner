@@ -28,8 +28,8 @@
   - DynamicBuffer
   - LineInputLayout, SpriteInputLayout PrimitiveManager
   - добавить общие вершинный и индексный буферы для построение спрайтов (использовать PrimitiveBuffers)
-
   - StandaloneDynamicPrimitive
+
   - BatchingDynamicPrimitive
 
   - добавить Frame::SetIdentityEntityDrawProperties(const common::PropertyMap&)
