@@ -669,7 +669,7 @@ void FrameImpl::Draw (RenderingContext* previous_context)
     {
         //формирование контекста отрисовки
       
-      RenderingContext context (*this, previous_context);
+      RenderingContext context (*this, impl->entity_draw_params.mvp_matrix, previous_context);
       
       if (!impl->effect_holder->effect_renderer)
         throw xtl::format_operation_exception ("", "No effect assigned");

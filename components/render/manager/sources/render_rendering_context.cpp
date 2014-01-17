@@ -6,9 +6,11 @@ using namespace render::manager;
     Конструкторы
 */
 
-RenderingContext::RenderingContext (FrameImpl& in_frame, RenderingContext* in_previous)
+RenderingContext::RenderingContext (FrameImpl& in_frame, const math::mat4f& in_vp_tm, RenderingContext* in_previous)
   : frame (in_frame)
   , previous (in_previous)
+  , vp_tm (in_vp_tm)
+  , inv_vp_tm (math::inverse (vp_tm))
 {
 }
 

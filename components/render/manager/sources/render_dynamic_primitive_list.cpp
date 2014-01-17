@@ -889,16 +889,17 @@ class StandaloneBillboardSpriteDynamicPrimitiveList: public DynamicPrimitiveList
 ///Обновление
     void UpdateOnPrerenderCore () {}
 
-    void UpdateOnRenderCore (FrameImpl& frame, EntityImpl& entity, const math::mat4f& mvp_matrix)
+    void UpdateOnRenderCore (FrameImpl& frame, EntityImpl& entity, RenderingContext& context, const math::mat4f& mvp_matrix)
     {
       try
-      {
-        size_t sprites_count = Base::Size ();
-
-        math::mat4f world_tm (1.0f); //TODO: compute the real world TM
-        math::vec3f local_normal (0, 0, 1); //TODO: compute the real normal
+      {        
+        const math::mat4f& world_tm     = entity.WorldMatrix ();
+        math::mat4f        inv_mvp_tm   = context.InverseViewProjectionMatrix () * entity.InverseWorldMatrix ();
+        math::vec3f        local_normal = inv_mvp_tm * math::vec4f (0, 0, -1.0f, 0);      
 
         BillboardSpriteGenerator generator (local_normal, local_up, world_tm);
+
+        size_t sprites_count = Base::Size ();
 
         generate (generator, Base::Size (), Base::Items (), 0, VertexBuffer ().Data (), IndexBuffer ().Data ());
 

@@ -740,7 +740,7 @@ struct RenderOperationsExecutor
 
       const math::mat4f& mvp_matrix = mvp_matrices [operation.mvp_matrix_index];
 
-      dynamic_primitive->UpdateOnRender (frame, *operation.entity, mvp_matrix);
+      dynamic_primitive->UpdateOnRender (frame, *operation.entity, context, mvp_matrix);
     }
   }
   
