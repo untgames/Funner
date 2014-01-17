@@ -47,6 +47,7 @@ namespace manager
 {
 
 //implementation forwards
+class BatchStateBlock;
 class CacheManager;
 class DeviceManager;
 class DynamicPrimitive;
@@ -84,6 +85,7 @@ typedef DynamicPrimitiveListImpl<OrientedSprite>  OrientedSpriteListImpl;
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Указатели на объекты рендера среднего уровня
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+typedef xtl::intrusive_ptr<BatchStateBlock>         BatchStateBlockPtr;
 typedef xtl::intrusive_ptr<BillboardSpriteListImpl> BillboardSpriteListPtr;
 typedef xtl::intrusive_ptr<CacheManager>            CacheManagerPtr;
 typedef xtl::intrusive_ptr<DeviceManager>           DeviceManagerPtr;
@@ -212,6 +214,8 @@ class DebugIdHolder: public xtl::noncopyable
 
 #include "cache_manager.h"
 #include "cache_map.h"
+
+#include "batching_manager.h"
 #include "dynamic_primitive.h"
 #include "dynamic_primitive_buffer.h"
 #include "dynamic_primitive_list.h"
