@@ -4,6 +4,8 @@ using namespace render;
 using namespace render::scene;
 using namespace render::scene::server;
 
+//TODO: update entity world matrix (from render::manager)
+
 /*
     Описание реализации отображаемой модели
 */
