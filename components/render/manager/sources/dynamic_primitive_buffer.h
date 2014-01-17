@@ -59,7 +59,7 @@ class DynamicPrimitiveBuffer: public xtl::noncopyable
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Синхронизация буферов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-void sync_buffers (low_level::IDevice& device, low_level::UsageMode usage_mode, low_level::BindFlag bind_flags, const void* src_data, size_t src_data_size, size_t& dst_buffer_size, LowLevelBufferPtr& dst_buffer);
+void sync_buffers (low_level::IDevice& device, low_level::UsageMode usage_mode, low_level::BindFlag bind_flags, const void* src_data, size_t src_data_size, size_t buffer_capacity, size_t& dst_buffer_size, LowLevelBufferPtr& dst_buffer);
 
 /*
     Реализация
@@ -124,5 +124,5 @@ inline void DynamicPrimitiveBuffer<T>::Clear ()
 template <class T>
 inline void DynamicPrimitiveBuffer<T>::SyncBuffers (low_level::IDevice& device)
 {
-  sync_buffers (device, usage_mode, bind_flags, src_buffer.data (), src_buffer.size () * sizeof (Item), dst_buffer_size, dst_buffer);  
+  sync_buffers (device, usage_mode, bind_flags, src_buffer.data (), src_buffer.size () * sizeof (Item), src_buffer.capacity () * sizeof (Item), dst_buffer_size, dst_buffer);  
 }

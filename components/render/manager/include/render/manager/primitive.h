@@ -134,11 +134,9 @@ class PrimitiveBuffers
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Резервирование буферов для динамических примитивов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void   ReserveDynamicPrimitives (size_t sprites_count, size_t lines_count);
-    void   ReserveLines             (size_t count);
-    void   ReserveSprites           (size_t count);
-    size_t LinesCapacity            () const;
-    size_t SpritesCapacity          () const;
+    void   ReserveDynamicBuffers (size_t vertices_count, size_t indices_count);
+    size_t DynamicVerticesCount  () const;
+    size_t DynamicIndicesCount   () const;
       
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Обмен

@@ -412,6 +412,11 @@ render::manager::BatchingManager& PrimitiveBuffersImpl::BatchingManager ()
   }
 }
 
+bool PrimitiveBuffersImpl::HasBatchingManager ()
+{
+  return impl->batching_manager.get () != 0;
+}
+
 /*
     Управление кэшем
 */

@@ -62,42 +62,83 @@ void BatchStateBlock::ResetCacheCore ()
     Описание реализации менеджера пакетирования
 */
 
+namespace
+{
+
+/// Пул для выделения динамических вершин / индексов
+template <class T> class Pool: public xtl::noncopyable
+{
+  public:
+/// Конструктор
+    Pool () : start (), pos (), end () {}
+
+/// Выделение
+    T* Allocate (size_t count)
+    {
+      pos += count;
+
+      if (pos <= end)
+        return pos;
+
+      pos -= count;
+
+      return 0;
+    }    
+
+/// Сброс
+    void Reset (T* new_start, size_t size, bool save_relative_position)
+    {
+      size_t offset = pos - start;
+
+      start = new_start;
+      end   = new_start + size;
+      pos   = save_relative_position ? start + offset : start;
+    }
+
+  private:
+    T* start;
+    T* pos;
+    T* end;  
+};
+
+typedef Pool<DynamicPrimitiveVertex> DynamicVertexPool;
+typedef Pool<DynamicPrimitiveIndex>  DynamicIndexPool;
+
+}
+
 struct BatchingManager::Impl
 {
   DeviceManagerPtr                      device_manager;       //менеджер устройства отрисовки
-  size_t                                lines_capacity;       //резервируемое количество линий
-  size_t                                sprites_capacity;     //резервируемое количество спрайтов
   render::manager::DynamicVertexBuffer  dynamic_vb;           //динамический вершинный буфер
   render::manager::DynamicIndexBuffer   dynamic_ib;           //динамический индексный буфер
+  DynamicVertexPool                     dynamic_vertex_pool;  //пул динамических вершин
+  DynamicIndexPool                      dynamic_index_pool;   //пул динамических индексов
 
+/// Конструктор
   Impl (const DeviceManagerPtr& in_device_manager)
     : device_manager (in_device_manager)
-    , lines_capacity ()
-    , sprites_capacity ()
     , dynamic_vb (render::low_level::UsageMode_Stream, render::low_level::BindFlag_VertexBuffer)
     , dynamic_ib (render::low_level::UsageMode_Stream, render::low_level::BindFlag_IndexBuffer)
   {
   }
 
-  void ReserveDynamicPrimitives (size_t sprites_count, size_t lines_count)
+/// Резервирование динамических буферов
+  void ReserveDynamicBuffers (size_t vertices_count, size_t indices_count)
   {
     try
     {
-      size_t vertices_count = 4 * sprites_count + 2 * lines_count,
-             indices_count  = 6 * sprites_count + 2 * lines_count;
-
       dynamic_vb.Reserve (vertices_count);
       dynamic_ib.Reserve (indices_count);
 
       dynamic_vb.SyncBuffers (device_manager->Device ());
       dynamic_ib.SyncBuffers (device_manager->Device ());
 
-      sprites_capacity = sprites_count;
-      lines_capacity   = lines_capacity;
+      dynamic_vertex_pool.Reset (dynamic_vb.Data (), vertices_count, true);
+      dynamic_index_pool.Reset (dynamic_ib.Data (), indices_count, true);
     }
     catch (xtl::exception& e)
     {
-      e.touch ("render::manager::BatchingManager::ReserveDynamicPrimitives");
+      e.touch ("render::manager::BatchingManager::ReserveDynamicBuffers");
       throw;
     }
   }
@@ -122,34 +163,26 @@ BatchingManager::~BatchingManager ()
 
 render::manager::DeviceManager& BatchingManager::DeviceManager ()
 {
-  throw xtl::make_not_implemented_exception (__FUNCTION__);
+  return *impl->device_manager;
 }
 
 /*
-    Резервирование вспомогательных примитивов
+    Резервирование буферов для динамических примитивов
 */
 
-void BatchingManager::ReserveDynamicPrimitives (size_t sprites_count, size_t lines_count)
+void BatchingManager::ReserveDynamicBuffers (size_t vertices_count, size_t indices_count)
 {
-  try
-  {
-    impl->ReserveDynamicPrimitives (sprites_count, lines_count);
-  }
-  catch (xtl::exception& e)
-  {
-    e.touch ("render::low_level::manager::BatchingManager::ReserveDynamicPrimitives");
-    throw;
-  }
+  impl->ReserveDynamicBuffers (vertices_count, indices_count);
 }
 
-size_t BatchingManager::LinesCapacity ()
+size_t BatchingManager::DynamicVerticesCount () const
 {
-  return impl->lines_capacity;
+  return impl->dynamic_vb.Capacity ();
 }
 
-size_t BatchingManager::SpritesCapacity ()
+size_t BatchingManager::DynamicIndicesCount () const
 {
-  return impl->sprites_capacity;
+  return impl->dynamic_ib.Capacity ();
 }
 
 /*
@@ -170,24 +203,59 @@ render::manager::DynamicIndexBuffer& BatchingManager::DynamicIndexBuffer ()
     Выделение вершин и индексов
 */
 
-size_t BatchingManager::AllocateDynamicVertices (size_t count)
+DynamicPrimitiveVertex* BatchingManager::AllocateDynamicVertices (size_t count, size_t* out_base_vertex_index)
 {
-  throw xtl::make_not_implemented_exception (__FUNCTION__);
+  DynamicPrimitiveVertex* result = impl->dynamic_vertex_pool.Allocate (count);
+
+  if (result)
+  {
+    if (out_base_vertex_index)
+      *out_base_vertex_index = result - impl->dynamic_vb.Data ();
+
+    return result;
+  }
+
+  impl->dynamic_vb.Reserve (impl->dynamic_vb.Capacity () * 2);
+
+  impl->dynamic_vertex_pool.Reset (impl->dynamic_vb.Data (), impl->dynamic_vb.Size (), true);
+
+  result = impl->dynamic_vertex_pool.Allocate (count);
+
+  if (!result)
+    return 0;
+
+  if (out_base_vertex_index)
+    *out_base_vertex_index = result - impl->dynamic_vb.Data ();
+
+  return result;
 }
 
-size_t BatchingManager::AllocateDynamicIndices (size_t count)
+DynamicPrimitiveIndex* BatchingManager::AllocateDynamicIndices (size_t count)
 {
-  throw xtl::make_not_implemented_exception (__FUNCTION__);
+  DynamicPrimitiveIndex* result = impl->dynamic_index_pool.Allocate (count);
+
+  if (result)
+    return result;
+
+  impl->dynamic_ib.Reserve (impl->dynamic_ib.Capacity () * 2);
+
+  impl->dynamic_index_pool.Reset (impl->dynamic_ib.Data (), impl->dynamic_ib.Size (), true);
+
+  result = impl->dynamic_index_pool.Allocate (count);
+
+  if (!result)
+    return 0;
+
+  return result;
 }
 
-void BatchingManager::DeallocateDynamicVertices (size_t first, size_t count)
+void BatchingManager::ResetDynamicBuffers ()
 {
-  throw xtl::make_not_implemented_exception (__FUNCTION__);
-}
+  impl->dynamic_vb.Clear ();
+  impl->dynamic_ib.Clear ();
 
-void BatchingManager::DeallocateDynamicIndices (size_t first, size_t count)
-{
-  throw xtl::make_not_implemented_exception (__FUNCTION__);
+  impl->dynamic_vertex_pool.Reset (impl->dynamic_vb.Data (), impl->dynamic_vb.Size (), false);
+  impl->dynamic_index_pool.Reset (impl->dynamic_ib.Data (), impl->dynamic_ib.Size (), false);
 }
 
 /*

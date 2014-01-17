@@ -91,29 +91,22 @@ void PrimitiveBuffers::RemoveAll ()
     –езервирование вспомогательных примитивов
 */
 
-void PrimitiveBuffers::ReserveDynamicPrimitives (size_t sprites_count, size_t lines_count)
+void PrimitiveBuffers::ReserveDynamicBuffers (size_t vertices_count, size_t indices_count)
 {
-  impl->BatchingManager ().ReserveDynamicPrimitives (sprites_count, lines_count);
+  if (!vertices_count && !indices_count)
+    return;
+
+  impl->BatchingManager ().ReserveDynamicBuffers (vertices_count, indices_count);
 }
 
-void PrimitiveBuffers::ReserveLines (size_t count)
+size_t PrimitiveBuffers::DynamicVerticesCount () const
 {
-  impl->BatchingManager ().ReserveDynamicPrimitives (SpritesCapacity (), count);
+  return impl->HasBatchingManager () ? impl->BatchingManager ().DynamicVerticesCount () : 0;
 }
 
-void PrimitiveBuffers::ReserveSprites (size_t count)
+size_t PrimitiveBuffers::DynamicIndicesCount () const
 {
-  impl->BatchingManager ().ReserveDynamicPrimitives (count, LinesCapacity ());
-}
-
-size_t PrimitiveBuffers::LinesCapacity () const
-{
-  return impl->BatchingManager ().LinesCapacity ();
-}
-
-size_t PrimitiveBuffers::SpritesCapacity () const
-{
-  return impl->BatchingManager ().SpritesCapacity ();
+  return impl->HasBatchingManager () ? impl->BatchingManager ().DynamicIndicesCount () : 0;
 }
 
 /*

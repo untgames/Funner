@@ -50,11 +50,11 @@ class BatchingManager: public Object
     manager::DeviceManager& DeviceManager ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Резервирование вспомогательных примитивов
+///Резервирование буферов для динамических примитивов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void   ReserveDynamicPrimitives (size_t sprites_count, size_t lines_count);
-    size_t LinesCapacity            ();
-    size_t SpritesCapacity          ();
+    void   ReserveDynamicBuffers (size_t vertices_count, size_t indices_count);
+    size_t DynamicVerticesCount  () const;
+    size_t DynamicIndicesCount   () const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Динамические буферы
@@ -65,10 +65,9 @@ class BatchingManager: public Object
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Выделение вершин и индексов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    size_t AllocateDynamicVertices   (size_t count);
-    size_t AllocateDynamicIndices    (size_t count);
-    void   DeallocateDynamicVertices (size_t first, size_t count);
-    void   DeallocateDynamicIndices  (size_t first, size_t count);
+    DynamicPrimitiveVertex* AllocateDynamicVertices (size_t count, size_t* out_base_vertex_index = 0);
+    DynamicPrimitiveIndex*  AllocateDynamicIndices  (size_t count);
+    void                    ResetDynamicBuffers     ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Получение блока состояний по материалу
