@@ -22,14 +22,19 @@ import com.amazon.inapp.purchasing.PurchaseUpdatesResponse;
 import com.amazon.inapp.purchasing.PurchasingManager;
 import com.amazon.inapp.purchasing.Receipt;
 
-public class Store
+import com.untgames.funner.application.EngineActivity;
+
+public class Store implements EngineActivity.EngineActivityEventListener
 {
   private static final String LOG_TAG                          = "funner.AmazonStore";
   private static final String SAVED_PURCHASES_PREFERENCES_NAME = "com.untgames.funner.AmazonStore.SavedPurchases"; 
   
-	private Activity               activity;
-	private boolean                sdk_available;
+	private EngineActivity         activity;
+	private volatile boolean       sdk_available;
+  private volatile boolean       initialized;
+  private String                 previous_user_id;  
 	private String                 user_id;  
+	private boolean                needs_update_user_id;
 	private volatile boolean       purchase_in_progress;
 	private volatile boolean       processing_stopped;
 	private List<Runnable>         purchase_queue = Collections.synchronizedList (new ArrayList ());
@@ -37,9 +42,11 @@ public class Store
 	private java.util.Set<Receipt> purchased_skus = new java.util.HashSet<Receipt> ();
 	private SharedPreferences      saved_purchases;
 
-  public Store (Activity inActivity)
+  public Store (EngineActivity inActivity)
   {
     activity = inActivity;
+    
+    activity.addEventListener (this);
 
     activity.runOnUiThread (new Runnable () {
       public void run ()
@@ -82,19 +89,70 @@ public class Store
     });
   }
 
+  private synchronized String getUserId ()
+  {
+    return user_id;
+  }
+  
+  private synchronized void setUserId (String new_user_id)
+  {
+    user_id = new_user_id;
+  }
+  
+  public void handleEngineActivityEvent (EngineActivity.EventType eventType)
+  {
+    switch (eventType)
+    {
+      case ON_STOP:
+      {
+        if (!needs_update_user_id)
+        {
+          needs_update_user_id = true;
+        
+          setUserId (null);
+        
+          break;
+        }
+      }
+      case ON_START:
+      {
+        if (needs_update_user_id)
+        {
+          needs_update_user_id = false;
+          
+          if (sdk_available)
+            PurchasingManager.initiateGetUserIdRequest ();
+        }
+        
+        break;
+      }
+      default:
+        break;
+    }
+  }
+
   public void onSdkAvailableImpl ()
   {
     sdk_available = true;
 
-    PurchasingManager.initiateGetUserIdRequest (); //all applications are closed when user deregister device, so we can get user id only once per session
+    PurchasingManager.initiateGetUserIdRequest ();
   }
 
   public void onGetUserIdResponseImpl (final GetUserIdResponse response) 
   {
     if (response.getUserIdRequestStatus () == GetUserIdResponse.GetUserIdRequestStatus.SUCCESSFUL) 
-      user_id = response.getUserId ();
+      setUserId (response.getUserId ());
     
-    onInitializedCallback (response.getUserIdRequestStatus () == GetUserIdResponse.GetUserIdRequestStatus.SUCCESSFUL);
+    if (previous_user_id != null && !previous_user_id.equals (response.getUserId ()))  //user changed, clear queue so we don't process purchases initiated by another user
+      purchase_queue.clear ();
+    
+    previous_user_id = response.getUserId ();
+
+    if (!initialized)
+    {
+      initialized = true;
+      onInitializedCallback (response.getUserIdRequestStatus () == GetUserIdResponse.GetUserIdRequestStatus.SUCCESSFUL);
+    }
   }
 
 	private final Runnable queue_processor = new Runnable () {
@@ -105,10 +163,13 @@ public class Store
 			
 			if (purchase_queue.isEmpty ())
 				return;
-			
+
   		if (purchase_in_progress)
 	  		return;
-			
+
+  		if (getUserId () == null)
+  		  return;
+  		
   		purchase_in_progress = true;
   		
   		Runnable next_request = purchase_queue.remove (0);
@@ -132,6 +193,12 @@ public class Store
 	
   public void buyProduct (final String sku)
   {
+    if (user_id == null)
+    {
+      onPurchaseFailedCallback (sku, "User id not obtained");
+      return;
+    }
+    
   	Runnable request = new Runnable () {
   		public void run ()
   		{
@@ -184,12 +251,14 @@ public class Store
         return;
       }
       
+      String current_user_id = getUserId ();
+      
       //all purchases history received, check that item already purchased
       for (Receipt receipt : purchased_skus)
       {
         if (receipt.getSku ().equals (current_purchase_sku))
         {
-          onPurchaseRestoredCallback (current_purchase_sku, user_id, receipt.getPurchaseToken ());
+          onPurchaseRestoredCallback (current_purchase_sku, current_user_id, receipt.getPurchaseToken ());
           processPurchaseQueue ();      
           return;
         }
@@ -248,7 +317,6 @@ public class Store
     {
       return purchase_token;
     }
-
   }
 
   private static class PurchaseDataJSON 
@@ -257,8 +325,11 @@ public class Store
     private static final String PURCHASE_TOKEN = "purchaseToken";
     private static final String SKU = "sku";
 
-    public static String toJSON (PurchaseData data) throws org.json.JSONException
+    public static String toJSON (PurchaseData data) throws org.json.JSONException, IllegalArgumentException
     {
+      if (data.user_id == null || data.purchase_token == null || data.sku == null)
+        throw new IllegalArgumentException ("Purchase data has null fields"); 
+      
       JSONObject obj = new JSONObject ();
       
       obj.put (USER_ID,        data.user_id);
@@ -296,14 +367,15 @@ public class Store
   
   public void onPurchaseResponseImpl (final PurchaseResponse response) 
   {
-    Receipt receipt = response.getReceipt ();
+    String  current_user_id = getUserId ();
+    Receipt receipt         = response.getReceipt ();
     
     try
     {
       if (response.getPurchaseRequestStatus () == PurchaseResponse.PurchaseRequestStatus.SUCCESSFUL)
       {
         //check that it is responce for currently purchasing item, store receipt anyway
-        if ((!user_id.equals (response.getUserId ()) || !current_purchase_sku.equals (receipt.getSku ())) && receipt.getItemType () == Item.ItemType.CONSUMABLE)
+        if ((current_user_id == null || (!current_user_id.equals (response.getUserId ()) || !current_purchase_sku.equals (receipt.getSku ()))) && receipt.getItemType () == Item.ItemType.CONSUMABLE)
         {
           saveConsumableReceipt (receipt.getSku (), response.getUserId (), receipt.getPurchaseToken ());
           return;
@@ -335,9 +407,10 @@ public class Store
         {
           if (receipt != null)
           {
-            saveConsumableReceipt (current_purchase_sku, user_id, receipt.getPurchaseToken ());
+            if (receipt.getItemType () == Item.ItemType.CONSUMABLE)
+              saveConsumableReceipt (current_purchase_sku, current_user_id, receipt.getPurchaseToken ());
             
-            onPurchaseSucceededCallback (current_purchase_sku, user_id, receipt.getPurchaseToken ());
+            onPurchaseSucceededCallback (current_purchase_sku, current_user_id, receipt.getPurchaseToken ());
             
             processPurchaseQueue ();      
           }
@@ -363,11 +436,11 @@ public class Store
   	try
   	{
       SharedPreferences saved_purchases = getSavedPurchases ();
-      
+
       Editor editor = saved_purchases.edit ();
       editor.remove (purchase_token);
       editor.apply ();
-  	  
+
       onTransactionFinishSucceededCallback (purchase_token);
     }
   	catch (Throwable e) 

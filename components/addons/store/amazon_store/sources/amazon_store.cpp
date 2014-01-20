@@ -95,7 +95,7 @@ class AmazonStore
 
       try
       {
-        jmethodID store_init_method = find_method (env, store_class, "<init>", "(Landroid/app/Activity;)V");
+        jmethodID store_init_method = find_method (env, store_class, "<init>", "(Lcom/untgames/funner/application/EngineActivity;)V");
 
         store = env->NewGlobalRef (env->NewObject (store_class, store_init_method, get_activity ()));
 
@@ -451,7 +451,8 @@ class AmazonStore
 
        log.Printf ("Purchase restored for product '%s'", transaction_desc.transaction.ProductId ());
 
-       transaction_desc.completed = true;
+       transaction_desc.completed      = true;
+       transaction_desc.purchase_token = purchase_token;
 
        transaction_desc.transaction.SetReceipt (purchase_token.size (), purchase_token.data ());
        transaction_desc.transaction.SetState (TransactionState_Restored);
