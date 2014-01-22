@@ -33,7 +33,7 @@ class Node: protected SceneObject, public xtl::reference_counter, public xtl::tr
 ///Конструктор / деструктор
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     Node  (scene_graph::Node&, SceneManager&, interchange::NodeType node_type = interchange::NodeType_Node);
-    ~Node ();
+    virtual ~Node ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Идентификатор узла / тип узла

@@ -93,7 +93,7 @@ struct RenderableView::Impl: public scene_graph::IViewportListener
   }
 
 ///Область вывода обновлена
-  void OnViewportChangeArea (const scene_graph::Rect&)
+  void OnViewportChangeArea (const scene_graph::Rect&, float, float)
   {
     need_reconfiguration = true;
     need_update_area     = true;
