@@ -148,6 +148,8 @@ template <class Serializer, class Deserializer>
 class Connection: public IConnection, private ProcessorHolder, public Context<Serializer, Deserializer>, public xtl::reference_counter, public xtl::trackable
 {
   public:
+    typedef Context<Serializer, Deserializer> Context;
+
     Connection (const char* name) : ProcessorHolder (name), Context (processor) { }
 
     void ProcessCommands (const CommandBuffer& commands)

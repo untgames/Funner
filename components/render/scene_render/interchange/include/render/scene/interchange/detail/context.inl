@@ -21,6 +21,8 @@ class Context<Serializer, Deserializer>::IncomingCommandsProcessorImpl: public d
 
     void ProcessFeedback (Deserializer& deserializer, common::Log& log)
     {
+      typedef typename Deserializer::CommandId CommandId;
+
       while (deserializer.Available ())
       {
         const Command& command   = read (deserializer, xtl::type<Command> ());

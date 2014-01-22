@@ -123,6 +123,8 @@ class ClientToServerSerializer: public OutputStream
 class BasicDeserializer
 {
   public:
+    typedef interchange::CommandId CommandId;
+
     virtual ~BasicDeserializer () {}
 
   protected:

@@ -755,7 +755,7 @@ template <class Dispatcher> inline bool ClientToServerDeserializer::Deserialize(
   {
     case CommandId_LoadResource:
     {
-      const char* arg1 = read(*this, xtl::type<const char*> ());
+      const char* arg1 = read(*this, xtl::type<const char* > ());
 
       dispatcher.LoadResource(arg1);
 
@@ -763,7 +763,7 @@ template <class Dispatcher> inline bool ClientToServerDeserializer::Deserialize(
     }
     case CommandId_UnloadResource:
     {
-      const char* arg1 = read(*this, xtl::type<const char*> ());
+      const char* arg1 = read(*this, xtl::type<const char* > ());
 
       dispatcher.UnloadResource(arg1);
 
@@ -771,7 +771,7 @@ template <class Dispatcher> inline bool ClientToServerDeserializer::Deserialize(
     }
     case CommandId_SetMaxDrawDepth:
     {
-      uint32 arg1 = read(*this, xtl::type<uint32> ());
+      uint32 arg1 = read(*this, xtl::type<uint32 > ());
 
       dispatcher.SetMaxDrawDepth(arg1);
 
@@ -779,11 +779,11 @@ template <class Dispatcher> inline bool ClientToServerDeserializer::Deserialize(
     }
     case CommandId_SetViewportArea:
     {
-      object_id_t arg1 = read(*this, xtl::type<object_id_t> ());
-      int32 arg2 = read(*this, xtl::type<int32> ());
-      int32 arg3 = read(*this, xtl::type<int32> ());
-      int32 arg4 = read(*this, xtl::type<int32> ());
-      int32 arg5 = read(*this, xtl::type<int32> ());
+      object_id_t arg1 = read(*this, xtl::type<object_id_t > ());
+      int32 arg2 = read(*this, xtl::type<int32 > ());
+      int32 arg3 = read(*this, xtl::type<int32 > ());
+      int32 arg4 = read(*this, xtl::type<int32 > ());
+      int32 arg5 = read(*this, xtl::type<int32 > ());
 
       dispatcher.SetViewportArea(arg1, arg2, arg3, arg4, arg5);
 
@@ -791,8 +791,8 @@ template <class Dispatcher> inline bool ClientToServerDeserializer::Deserialize(
     }
     case CommandId_SetViewportZOrder:
     {
-      object_id_t arg1 = read(*this, xtl::type<object_id_t> ());
-      int32 arg2 = read(*this, xtl::type<int32> ());
+      object_id_t arg1 = read(*this, xtl::type<object_id_t > ());
+      int32 arg2 = read(*this, xtl::type<int32 > ());
 
       dispatcher.SetViewportZOrder(arg1, arg2);
 
@@ -800,8 +800,8 @@ template <class Dispatcher> inline bool ClientToServerDeserializer::Deserialize(
     }
     case CommandId_SetViewportActive:
     {
-      object_id_t arg1 = read(*this, xtl::type<object_id_t> ());
-      bool8 arg2 = read(*this, xtl::type<bool8> ());
+      object_id_t arg1 = read(*this, xtl::type<object_id_t > ());
+      bool8 arg2 = read(*this, xtl::type<bool8 > ());
 
       dispatcher.SetViewportActive(arg1, arg2);
 
@@ -809,8 +809,8 @@ template <class Dispatcher> inline bool ClientToServerDeserializer::Deserialize(
     }
     case CommandId_SetViewportName:
     {
-      object_id_t arg1 = read(*this, xtl::type<object_id_t> ());
-      const char* arg2 = read(*this, xtl::type<const char*> ());
+      object_id_t arg1 = read(*this, xtl::type<object_id_t > ());
+      const char* arg2 = read(*this, xtl::type<const char* > ());
 
       dispatcher.SetViewportName(arg1, arg2);
 
@@ -818,8 +818,8 @@ template <class Dispatcher> inline bool ClientToServerDeserializer::Deserialize(
     }
     case CommandId_SetViewportTechnique:
     {
-      object_id_t arg1 = read(*this, xtl::type<object_id_t> ());
-      const char* arg2 = read(*this, xtl::type<const char*> ());
+      object_id_t arg1 = read(*this, xtl::type<object_id_t > ());
+      const char* arg2 = read(*this, xtl::type<const char* > ());
 
       dispatcher.SetViewportTechnique(arg1, arg2);
 
@@ -827,9 +827,9 @@ template <class Dispatcher> inline bool ClientToServerDeserializer::Deserialize(
     }
     case CommandId_SetViewportBackground:
     {
-      object_id_t arg1 = read(*this, xtl::type<object_id_t> ());
-      bool8 arg2 = read(*this, xtl::type<bool8> ());
-      const math::vec4f& arg3 = read(*this, xtl::type<const math::vec4f&> ());
+      object_id_t arg1 = read(*this, xtl::type<object_id_t > ());
+      bool8 arg2 = read(*this, xtl::type<bool8 > ());
+      const math::vec4f& arg3 = read(*this, xtl::type<const math::vec4f& > ());
 
       dispatcher.SetViewportBackground(arg1, arg2, arg3);
 
@@ -837,8 +837,8 @@ template <class Dispatcher> inline bool ClientToServerDeserializer::Deserialize(
     }
     case CommandId_SetViewportProperties:
     {
-      object_id_t arg1 = read(*this, xtl::type<object_id_t> ());
-      uint64 arg2 = read(*this, xtl::type<uint64> ());
+      object_id_t arg1 = read(*this, xtl::type<object_id_t > ());
+      uint64 arg2 = read(*this, xtl::type<uint64 > ());
 
       dispatcher.SetViewportProperties(arg1, arg2);
 
@@ -846,8 +846,8 @@ template <class Dispatcher> inline bool ClientToServerDeserializer::Deserialize(
     }
     case CommandId_SetViewportScene:
     {
-      object_id_t arg1 = read(*this, xtl::type<object_id_t> ());
-      object_id_t arg2 = read(*this, xtl::type<object_id_t> ());
+      object_id_t arg1 = read(*this, xtl::type<object_id_t > ());
+      object_id_t arg2 = read(*this, xtl::type<object_id_t > ());
 
       dispatcher.SetViewportScene(arg1, arg2);
 
@@ -855,8 +855,8 @@ template <class Dispatcher> inline bool ClientToServerDeserializer::Deserialize(
     }
     case CommandId_SetViewportCameraWorldMatrix:
     {
-      object_id_t arg1 = read(*this, xtl::type<object_id_t> ());
-      const math::mat4f& arg2 = read(*this, xtl::type<const math::mat4f&> ());
+      object_id_t arg1 = read(*this, xtl::type<object_id_t > ());
+      const math::mat4f& arg2 = read(*this, xtl::type<const math::mat4f& > ());
 
       dispatcher.SetViewportCameraWorldMatrix(arg1, arg2);
 
@@ -864,8 +864,8 @@ template <class Dispatcher> inline bool ClientToServerDeserializer::Deserialize(
     }
     case CommandId_SetViewportCameraProjectionMatrix:
     {
-      object_id_t arg1 = read(*this, xtl::type<object_id_t> ());
-      const math::mat4f& arg2 = read(*this, xtl::type<const math::mat4f&> ());
+      object_id_t arg1 = read(*this, xtl::type<object_id_t > ());
+      const math::mat4f& arg2 = read(*this, xtl::type<const math::mat4f& > ());
 
       dispatcher.SetViewportCameraProjectionMatrix(arg1, arg2);
 
@@ -873,8 +873,8 @@ template <class Dispatcher> inline bool ClientToServerDeserializer::Deserialize(
     }
     case CommandId_SetViewportCameraName:
     {
-      object_id_t arg1 = read(*this, xtl::type<object_id_t> ());
-      const char* arg2 = read(*this, xtl::type<const char*> ());
+      object_id_t arg1 = read(*this, xtl::type<object_id_t > ());
+      const char* arg2 = read(*this, xtl::type<const char* > ());
 
       dispatcher.SetViewportCameraName(arg1, arg2);
 
@@ -882,9 +882,9 @@ template <class Dispatcher> inline bool ClientToServerDeserializer::Deserialize(
     }
     case CommandId_CreateRenderTarget:
     {
-      object_id_t arg1 = read(*this, xtl::type<object_id_t> ());
-      const char* arg2 = read(*this, xtl::type<const char*> ());
-      const char* arg3 = read(*this, xtl::type<const char*> ());
+      object_id_t arg1 = read(*this, xtl::type<object_id_t > ());
+      const char* arg2 = read(*this, xtl::type<const char* > ());
+      const char* arg3 = read(*this, xtl::type<const char* > ());
 
       dispatcher.CreateRenderTarget(arg1, arg2, arg3);
 
@@ -892,7 +892,7 @@ template <class Dispatcher> inline bool ClientToServerDeserializer::Deserialize(
     }
     case CommandId_DestroyRenderTarget:
     {
-      object_id_t arg1 = read(*this, xtl::type<object_id_t> ());
+      object_id_t arg1 = read(*this, xtl::type<object_id_t > ());
 
       dispatcher.DestroyRenderTarget(arg1);
 
@@ -900,8 +900,8 @@ template <class Dispatcher> inline bool ClientToServerDeserializer::Deserialize(
     }
     case CommandId_SetRenderTargetActive:
     {
-      object_id_t arg1 = read(*this, xtl::type<object_id_t> ());
-      bool8 arg2 = read(*this, xtl::type<bool8> ());
+      object_id_t arg1 = read(*this, xtl::type<object_id_t > ());
+      bool8 arg2 = read(*this, xtl::type<bool8 > ());
 
       dispatcher.SetRenderTargetActive(arg1, arg2);
 
@@ -909,11 +909,11 @@ template <class Dispatcher> inline bool ClientToServerDeserializer::Deserialize(
     }
     case CommandId_SetRenderTargetScreenArea:
     {
-      object_id_t arg1 = read(*this, xtl::type<object_id_t> ());
-      int32 arg2 = read(*this, xtl::type<int32> ());
-      int32 arg3 = read(*this, xtl::type<int32> ());
-      int32 arg4 = read(*this, xtl::type<int32> ());
-      int32 arg5 = read(*this, xtl::type<int32> ());
+      object_id_t arg1 = read(*this, xtl::type<object_id_t > ());
+      int32 arg2 = read(*this, xtl::type<int32 > ());
+      int32 arg3 = read(*this, xtl::type<int32 > ());
+      int32 arg4 = read(*this, xtl::type<int32 > ());
+      int32 arg5 = read(*this, xtl::type<int32 > ());
 
       dispatcher.SetRenderTargetScreenArea(arg1, arg2, arg3, arg4, arg5);
 
@@ -921,9 +921,9 @@ template <class Dispatcher> inline bool ClientToServerDeserializer::Deserialize(
     }
     case CommandId_SetRenderTargetBackground:
     {
-      object_id_t arg1 = read(*this, xtl::type<object_id_t> ());
-      bool8 arg2 = read(*this, xtl::type<bool8> ());
-      const math::vec4f& arg3 = read(*this, xtl::type<const math::vec4f&> ());
+      object_id_t arg1 = read(*this, xtl::type<object_id_t > ());
+      bool8 arg2 = read(*this, xtl::type<bool8 > ());
+      const math::vec4f& arg3 = read(*this, xtl::type<const math::vec4f& > ());
 
       dispatcher.SetRenderTargetBackground(arg1, arg2, arg3);
 
@@ -931,8 +931,8 @@ template <class Dispatcher> inline bool ClientToServerDeserializer::Deserialize(
     }
     case CommandId_AttachViewportToRenderTarget:
     {
-      object_id_t arg1 = read(*this, xtl::type<object_id_t> ());
-      object_id_t arg2 = read(*this, xtl::type<object_id_t> ());
+      object_id_t arg1 = read(*this, xtl::type<object_id_t > ());
+      object_id_t arg2 = read(*this, xtl::type<object_id_t > ());
 
       dispatcher.AttachViewportToRenderTarget(arg1, arg2);
 
@@ -940,8 +940,8 @@ template <class Dispatcher> inline bool ClientToServerDeserializer::Deserialize(
     }
     case CommandId_DetachViewportFromRenderTarget:
     {
-      object_id_t arg1 = read(*this, xtl::type<object_id_t> ());
-      object_id_t arg2 = read(*this, xtl::type<object_id_t> ());
+      object_id_t arg1 = read(*this, xtl::type<object_id_t > ());
+      object_id_t arg2 = read(*this, xtl::type<object_id_t > ());
 
       dispatcher.DetachViewportFromRenderTarget(arg1, arg2);
 
@@ -949,7 +949,7 @@ template <class Dispatcher> inline bool ClientToServerDeserializer::Deserialize(
     }
     case CommandId_UpdateRenderTarget:
     {
-      object_id_t arg1 = read(*this, xtl::type<object_id_t> ());
+      object_id_t arg1 = read(*this, xtl::type<object_id_t > ());
 
       dispatcher.UpdateRenderTarget(arg1);
 
@@ -962,7 +962,7 @@ template <class Dispatcher> inline bool ClientToServerDeserializer::Deserialize(
     }
     case CommandId_RemovePropertyMap:
     {
-      object_id_t arg1 = read(*this, xtl::type<object_id_t> ());
+      object_id_t arg1 = read(*this, xtl::type<object_id_t > ());
 
       dispatcher.RemovePropertyMap(arg1);
 
@@ -970,7 +970,7 @@ template <class Dispatcher> inline bool ClientToServerDeserializer::Deserialize(
     }
     case CommandId_RemovePropertyLayout:
     {
-      object_id_t arg1 = read(*this, xtl::type<object_id_t> ());
+      object_id_t arg1 = read(*this, xtl::type<object_id_t > ());
 
       dispatcher.RemovePropertyLayout(arg1);
 
@@ -978,7 +978,7 @@ template <class Dispatcher> inline bool ClientToServerDeserializer::Deserialize(
     }
     case CommandId_CreateScene:
     {
-      object_id_t arg1 = read(*this, xtl::type<object_id_t> ());
+      object_id_t arg1 = read(*this, xtl::type<object_id_t > ());
 
       dispatcher.CreateScene(arg1);
 
@@ -986,7 +986,7 @@ template <class Dispatcher> inline bool ClientToServerDeserializer::Deserialize(
     }
     case CommandId_DestroyScene:
     {
-      object_id_t arg1 = read(*this, xtl::type<object_id_t> ());
+      object_id_t arg1 = read(*this, xtl::type<object_id_t > ());
 
       dispatcher.DestroyScene(arg1);
 
@@ -994,8 +994,8 @@ template <class Dispatcher> inline bool ClientToServerDeserializer::Deserialize(
     }
     case CommandId_SetSceneName:
     {
-      object_id_t arg1 = read(*this, xtl::type<object_id_t> ());
-      const char* arg2 = read(*this, xtl::type<const char*> ());
+      object_id_t arg1 = read(*this, xtl::type<object_id_t > ());
+      const char* arg2 = read(*this, xtl::type<const char* > ());
 
       dispatcher.SetSceneName(arg1, arg2);
 
@@ -1003,8 +1003,8 @@ template <class Dispatcher> inline bool ClientToServerDeserializer::Deserialize(
     }
     case CommandId_SetSceneNodes:
     {
-      object_id_t arg1 = read(*this, xtl::type<object_id_t> ());
-      RawArray<object_id_t> arg2 = read(*this, xtl::type<RawArray<object_id_t>> ());
+      object_id_t arg1 = read(*this, xtl::type<object_id_t > ());
+      RawArray<object_id_t> arg2 = read(*this, xtl::type<RawArray<object_id_t> > ());
 
       dispatcher.SetSceneNodes(arg1, arg2);
 
@@ -1012,8 +1012,8 @@ template <class Dispatcher> inline bool ClientToServerDeserializer::Deserialize(
     }
     case CommandId_CreateNode:
     {
-      object_id_t arg1 = read(*this, xtl::type<object_id_t> ());
-      NodeType arg2 = read(*this, xtl::type<NodeType> ());
+      object_id_t arg1 = read(*this, xtl::type<object_id_t > ());
+      NodeType arg2 = read(*this, xtl::type<NodeType > ());
 
       dispatcher.CreateNode(arg1, arg2);
 
@@ -1021,7 +1021,7 @@ template <class Dispatcher> inline bool ClientToServerDeserializer::Deserialize(
     }
     case CommandId_DestroyNode:
     {
-      object_id_t arg1 = read(*this, xtl::type<object_id_t> ());
+      object_id_t arg1 = read(*this, xtl::type<object_id_t > ());
 
       dispatcher.DestroyNode(arg1);
 
@@ -1029,8 +1029,8 @@ template <class Dispatcher> inline bool ClientToServerDeserializer::Deserialize(
     }
     case CommandId_SetNodeName:
     {
-      object_id_t arg1 = read(*this, xtl::type<object_id_t> ());
-      const char* arg2 = read(*this, xtl::type<const char*> ());
+      object_id_t arg1 = read(*this, xtl::type<object_id_t > ());
+      const char* arg2 = read(*this, xtl::type<const char* > ());
 
       dispatcher.SetNodeName(arg1, arg2);
 
@@ -1038,8 +1038,8 @@ template <class Dispatcher> inline bool ClientToServerDeserializer::Deserialize(
     }
     case CommandId_SetNodeWorldMatrix:
     {
-      object_id_t arg1 = read(*this, xtl::type<object_id_t> ());
-      const math::mat4f& arg2 = read(*this, xtl::type<const math::mat4f&> ());
+      object_id_t arg1 = read(*this, xtl::type<object_id_t > ());
+      const math::mat4f& arg2 = read(*this, xtl::type<const math::mat4f& > ());
 
       dispatcher.SetNodeWorldMatrix(arg1, arg2);
 
@@ -1047,8 +1047,8 @@ template <class Dispatcher> inline bool ClientToServerDeserializer::Deserialize(
     }
     case CommandId_SetNodeScene:
     {
-      object_id_t arg1 = read(*this, xtl::type<object_id_t> ());
-      object_id_t arg2 = read(*this, xtl::type<object_id_t> ());
+      object_id_t arg1 = read(*this, xtl::type<object_id_t > ());
+      object_id_t arg2 = read(*this, xtl::type<object_id_t > ());
 
       dispatcher.SetNodeScene(arg1, arg2);
 
@@ -1056,9 +1056,9 @@ template <class Dispatcher> inline bool ClientToServerDeserializer::Deserialize(
     }
     case CommandId_SetEntityBounds:
     {
-      object_id_t arg1 = read(*this, xtl::type<object_id_t> ());
-      bool arg2 = read(*this, xtl::type<bool> ());
-      const bound_volumes::aaboxf& arg3 = read(*this, xtl::type<const bound_volumes::aaboxf&> ());
+      object_id_t arg1 = read(*this, xtl::type<object_id_t > ());
+      bool arg2 = read(*this, xtl::type<bool > ());
+      const bound_volumes::aaboxf& arg3 = read(*this, xtl::type<const bound_volumes::aaboxf& > ());
 
       dispatcher.SetEntityBounds(arg1, arg2, arg3);
 
@@ -1066,8 +1066,8 @@ template <class Dispatcher> inline bool ClientToServerDeserializer::Deserialize(
     }
     case CommandId_SetEntityVisibility:
     {
-      object_id_t arg1 = read(*this, xtl::type<object_id_t> ());
-      bool arg2 = read(*this, xtl::type<bool> ());
+      object_id_t arg1 = read(*this, xtl::type<object_id_t > ());
+      bool arg2 = read(*this, xtl::type<bool > ());
 
       dispatcher.SetEntityVisibility(arg1, arg2);
 
@@ -1075,8 +1075,8 @@ template <class Dispatcher> inline bool ClientToServerDeserializer::Deserialize(
     }
     case CommandId_SetVisualModelScissor:
     {
-      object_id_t arg1 = read(*this, xtl::type<object_id_t> ());
-      object_id_t arg2 = read(*this, xtl::type<object_id_t> ());
+      object_id_t arg1 = read(*this, xtl::type<object_id_t > ());
+      object_id_t arg2 = read(*this, xtl::type<object_id_t > ());
 
       dispatcher.SetVisualModelScissor(arg1, arg2);
 
@@ -1084,8 +1084,8 @@ template <class Dispatcher> inline bool ClientToServerDeserializer::Deserialize(
     }
     case CommandId_SetStaticMeshName:
     {
-      object_id_t arg1 = read(*this, xtl::type<object_id_t> ());
-      const char* arg2 = read(*this, xtl::type<const char*> ());
+      object_id_t arg1 = read(*this, xtl::type<object_id_t > ());
+      const char* arg2 = read(*this, xtl::type<const char* > ());
 
       dispatcher.SetStaticMeshName(arg1, arg2);
 
@@ -1093,8 +1093,8 @@ template <class Dispatcher> inline bool ClientToServerDeserializer::Deserialize(
     }
     case CommandId_SetLightParams:
     {
-      object_id_t arg1 = read(*this, xtl::type<object_id_t> ());
-      const LightParams& arg2 = read(*this, xtl::type<const LightParams&> ());
+      object_id_t arg1 = read(*this, xtl::type<object_id_t > ());
+      const LightParams& arg2 = read(*this, xtl::type<const LightParams& > ());
 
       dispatcher.SetLightParams(arg1, arg2);
 
@@ -1172,7 +1172,7 @@ template <class Dispatcher> inline bool ServerToClientDeserializer::Deserialize(
     }
     case CommandId_RemovePropertyMap:
     {
-      object_id_t arg1 = read(*this, xtl::type<object_id_t> ());
+      object_id_t arg1 = read(*this, xtl::type<object_id_t > ());
 
       dispatcher.RemovePropertyMap(arg1);
 
@@ -1180,7 +1180,7 @@ template <class Dispatcher> inline bool ServerToClientDeserializer::Deserialize(
     }
     case CommandId_RemovePropertyLayout:
     {
-      object_id_t arg1 = read(*this, xtl::type<object_id_t> ());
+      object_id_t arg1 = read(*this, xtl::type<object_id_t > ());
 
       dispatcher.RemovePropertyLayout(arg1);
 

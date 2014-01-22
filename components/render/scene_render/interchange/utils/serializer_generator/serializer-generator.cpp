@@ -41,7 +41,7 @@ struct Method
 {
   stl::string section;     //имя секции
   stl::string name;        //имя метода
-  stl::string result_type; //имя возвращаемого типа  
+  stl::string result_type; //имя возвращаемого типа
   ParamArray  params;      //список параметров
   bool        is_manual;   //является ли метод сериализуемым вручную
 
@@ -394,7 +394,7 @@ void dump_serialization (const MethodArray& methods, stl::string& result, const 
 
 void dump_param_deserialization (const Param& param, stl::string& result, size_t arg_index)
 {
-  result += common::format ("%s arg%u = %s(*this, xtl::type<%s> ());", param.type.c_str (), arg_index, DESERIALIZE_METHOD_NAME, param.type.c_str ());
+  result += common::format ("%s arg%u = %s(*this, xtl::type<%s > ());", param.type.c_str (), arg_index, DESERIALIZE_METHOD_NAME, param.type.c_str ());
 }
 
 void dump_deserialization (const MethodArray& methods, stl::string& result, const char* section)
