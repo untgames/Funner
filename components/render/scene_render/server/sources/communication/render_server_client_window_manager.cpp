@@ -126,7 +126,7 @@ typedef stl::hash_map<stl::hash_key<const char*>, WindowPtr> WindowMap;
 }
 
 /*
-    Описание реализации внутреннего менеджера окон 
+    Описание реализации внутреннего менеджера окон
 */
 
 struct ClientWindowManager::Impl
@@ -157,7 +157,7 @@ ClientWindowManager::~ClientWindowManager ()
     Присоединение окон
 */
 
-void ClientWindowManager::AttachWindow (const char* name, syslib::Window& window, const common::PropertyMap& properties)
+void ClientWindowManager::AttachWindow (const char* name, syslib::Window& in_window, const common::PropertyMap& properties)
 {
   try
   {
@@ -183,7 +183,7 @@ void ClientWindowManager::AttachWindow (const char* name, syslib::Window& window
       init_string += "' ";
     }
 
-    WindowPtr window (new ClientWindow (window, impl->current_id, name, init_string.c_str (), impl->connection), false);
+    WindowPtr window (new ClientWindow (in_window, impl->current_id, name, init_string.c_str (), impl->connection), false);
 
     impl->windows [name] = window;
 

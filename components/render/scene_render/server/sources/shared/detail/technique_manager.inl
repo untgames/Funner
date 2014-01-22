@@ -17,6 +17,6 @@ inline TechniqueRegistrator<T>::TechniqueRegistrator ()
 
 template <class T>
 inline TechniqueComponentRegistrator<T>::TechniqueComponentRegistrator ()
-  : ComponentRegistrator (T::ComponentName ())
+  : common::ComponentRegistrator<TechniqueRegistrator<T> > (T::ComponentName ())
 {
 }

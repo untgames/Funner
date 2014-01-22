@@ -1,5 +1,4 @@
 #include "shared.h"
-#include <windows.h>
 
 void log_print (const char* log_name, const char* message)
 {

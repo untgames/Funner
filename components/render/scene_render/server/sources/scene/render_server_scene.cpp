@@ -152,7 +152,9 @@ void Scene::Traverse (const bound_volumes::plane_listf& frustum, TraverseResult&
 {
   result.Clear ();
 
-  Traverse (frustum, CollectionVisitor (result, filter));
+  CollectionVisitor visitor (result, filter);
+
+  Traverse (frustum, visitor);
 }
 
 void Scene::Traverse (const bound_volumes::plane_listf& frustum, TraverseResult& result)

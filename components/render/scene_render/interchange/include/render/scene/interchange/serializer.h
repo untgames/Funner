@@ -141,6 +141,9 @@ class ClientToServerDeserializer: public BasicDeserializer, protected InputStrea
 {
   public:
     using InputStream::Available;
+    using InputStream::Position;
+    using InputStream::Skip;
+    using InputStream::SetPosition;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Диспетчер десериализации
@@ -173,6 +176,9 @@ class ServerToClientDeserializer: public BasicDeserializer, protected InputStrea
 {
   public:
     using InputStream::Available;
+    using InputStream::Position;
+    using InputStream::Skip;
+    using InputStream::SetPosition;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Диспетчер десериализации
