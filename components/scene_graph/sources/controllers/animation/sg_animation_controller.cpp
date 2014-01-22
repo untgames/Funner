@@ -72,7 +72,7 @@ struct AnimationImpl: public xtl::reference_counter, public xtl::trackable, publ
   float                            duration;                     //длительность анимации
   Mode                             mode;                         //текущий режим
   bool                             looped;                       //флаг цикличности анимации
-  Signal                           signals [AnimationEvent_Num]; //сигналы  
+  Signal                           signals [AnimationEvent_Num]; //сигналы
 
 ///Конструктор
   AnimationImpl (const AnimationBlender& in_blender, const media::animation::Animation& in_source)
@@ -518,7 +518,10 @@ void AnimationController::Update (const TimeValue& value)
       AnimationImpl& animation = **iter;
       
       if (animation.mode != AnimationImpl::Playing)
+      {
+        animation.time = value;
         continue;
+      }
       
         //обновление времени
       
