@@ -39,7 +39,6 @@ VertexBuffer::VertexBuffer (const media::geometry::VertexBuffer& source, Primiti
       LowLevelBufferPtr vs_buffer = buffers.CreateVertexStream (vs, usage);
 
       media::geometry::VertexFormat vertex_format = Clone (layout_manager, vs.Format ());      
-      size_t                        vs_hash       = vertex_format.Hash ();
 
       for (size_t j=0, attr_count=vertex_format.AttributesCount (); j<attr_count; j++)
       {

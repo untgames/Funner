@@ -4,7 +4,7 @@ render.manager: Create device manager (driver='*', adapter='*', init_string='')
 render.manager: ...device manager and swap chain have been successfully created
 render.manager: Initialize render targets for swap chain
 render.manager: ...render targets for swap chain created
-window 784x561 added
+window added
 render.manager: Primitive 'mesh1(data/test.xmesh)' created (id=1)
 render.manager: Mesh 'mesh1' created (id=2)
 render.manager: Mesh 'mesh1' primitive #0 created (id=3)
@@ -107,7 +107,7 @@ render.manager: ...mesh cache updated
 render.manager: Update primitive 'mesh2(data/test.xmesh)' cache (id=5)
 render.manager: ...primitive cache updated
 Mesh library loaded (1 meshes in primitive 'mesh2')
-window 784x561 removed
+window removed
 render.manager: Program 'helper' destroyed for options = '' (id=18)
 render.manager: Program 'helper' common data destroyed (id=19)
 render.manager: Program 'shadow_map' destroyed for options = '' (id=16)

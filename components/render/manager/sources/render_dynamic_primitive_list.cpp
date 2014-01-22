@@ -160,8 +160,8 @@ class BillboardSpriteGenerator: public SpriteGenerator
   private:
     const math::mat4f& world_tm;
     math::vec3f        world_normal;
-    math::vec3f        up;
     math::vec3f        right;
+    math::vec3f        up;
 };
 
 class StandaloneOrientedSpriteGenerator: public SpriteGenerator
@@ -200,8 +200,8 @@ class BatchingOrientedSpriteGenerator: public SpriteGenerator
 {
   public:
     BatchingOrientedSpriteGenerator (const math::vec3f& local_up, const math::mat4f& in_world_tm)
-      : up (local_up)
-      , world_tm (in_world_tm)
+      : world_tm (in_world_tm)
+      , up (local_up)
     {
     }
 
@@ -391,7 +391,7 @@ class DynamicPrimitiveListStandalonePrimitiveHolder: public DynamicPrimitiveList
         {
           memset (&cached_primitive, 0, sizeof (cached_primitive));
           
-            //запрос состояния материала 
+            //запрос состояния материала
 
           MaterialImpl* cached_material = CachedMaterial ();       
           
@@ -473,7 +473,7 @@ template <class T, class Generator>
 class StandaloneLineAndOrientedSpriteDynamicPrimitiveList: public DynamicPrimitiveListStandalonePrimitiveHolder, public DynamicPrimitiveListImpl<T>, private Generator
 {
   public:
-    using DynamicPrimitiveListImpl<T>::Item;
+    typedef typename DynamicPrimitiveListImpl<T>::Item Item;
 
     enum { VERTICES_PER_PRIMITIVE = Generator::VERTICES_PER_PRIMITIVE, INDICES_PER_PRIMITIVE = Generator::INDICES_PER_PRIMITIVE };
 
@@ -606,8 +606,8 @@ class StandaloneLineAndOrientedSpriteDynamicPrimitiveList: public DynamicPrimiti
              verts_count = count * VERTICES_PER_PRIMITIVE,
              inds_count  = count * INDICES_PER_PRIMITIVE;
 
-      memmove (vb.Data () + first, vb.Data () + first + verts_count, sizeof (DynamicPrimitiveVertex) * verts_count);
-      memmove (ib.Data () + first, ib.Data () + first + inds_count, sizeof (DynamicPrimitiveIndex) * inds_count);
+      memmove (vb.Data () + base_vertex, vb.Data () + base_vertex + verts_count, sizeof (DynamicPrimitiveVertex) * verts_count);
+      memmove (ib.Data () + base_index, ib.Data () + base_index + inds_count, sizeof (DynamicPrimitiveIndex) * inds_count);
 
       need_update_buffers = true;
 
@@ -694,7 +694,11 @@ class StandaloneLineAndOrientedSpriteDynamicPrimitiveList: public DynamicPrimiti
 template <class T, class Base> class DynamicPrimitiveListStorage: public Base, public DynamicPrimitiveListImpl<T>
 {
   public:
-    using DynamicPrimitiveListImpl<T>::Item;
+    typedef typename DynamicPrimitiveListImpl<T>::Item Item;
+
+    using Base::InvalidateCacheDependencies;
+    using Base::InvalidateCache;
+    using Base::PrimitivesUpdateNotify;
 
 /// Конструктор
     DynamicPrimitiveListStorage (const MaterialManagerPtr& material_manager)
@@ -898,8 +902,6 @@ class StandaloneBillboardSpriteDynamicPrimitiveList: public DynamicPrimitiveList
         math::vec3f        local_normal = inv_mvp_tm * math::vec4f (0, 0, -1.0f, 0);      
 
         BillboardSpriteGenerator generator (local_normal, local_up, world_tm);
-
-        size_t sprites_count = Base::Size ();
 
         generate (generator, Base::Size (), Base::Items (), 0, VertexBuffer ().Data (), IndexBuffer ().Data ());
 

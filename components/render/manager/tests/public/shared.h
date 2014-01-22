@@ -115,7 +115,7 @@ class Test: private xtl::trackable, private TestLogFilter
 ///Обработка события добавления окна
     void OnWindowAdded (render::manager::Window& window)
     {
-      printf ("window %ux%u added\n", window.Width (), window.Height ());
+      printf ("window added\n");
       
       connect_tracker (window.RegisterEventHandler (WindowEvent_OnResize, xtl::bind (&Test::OnWindowResize, this, _1)));
     }
@@ -123,13 +123,13 @@ class Test: private xtl::trackable, private TestLogFilter
 ///Обработка события удаления окна
     void OnWindowRemoved (render::manager::Window& window)
     {
-      printf ("window %ux%u removed\n", window.Width (), window.Height ());
+      printf ("window removed\n");
     }
     
 ///Обработка события изменения размеров окна
     void OnWindowResize (render::manager::Window& window)
     {
-      printf ("window resize %ux%u\n", window.Width (), window.Height ());
+      printf ("window resize\n");
     }
     
 ///Обработка события закрытия окна

@@ -1,8 +1,8 @@
 Results of texture2_test:
-window 784x561 added
+window added
 Texture:
   width:  512
   height: 512
   depth:  1
   format: rgb8
-window 784x561 removed
+window removed
