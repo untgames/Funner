@@ -4,6 +4,8 @@ using namespace render::low_level;
 using namespace render::low_level::opengl;
 using namespace common;
 
+//TODO check that there no duplicates in names
+
 /*
      онстанты
 */
@@ -433,53 +435,53 @@ void InputLayout::SetDesc (const InputLayoutDesc& desc)
           default:
             throw xtl::format_exception<xtl::bad_argument> (METHOD_NAME, "Invalid argument desc.vertex_attributes[%u].semantic=%s", i, va.semantic);
         }
+
+        //отсечение повторной установки вершинной семантики
+
+        if (semantic_attribute [semantic] != NO_ATTRIBUTE)
+          throw xtl::format_exception<xtl::bad_argument> (METHOD_NAME, "Invalid argument desc.vertex_attributes[%u].semantic=%s (semantic has been "
+            "already defined in attribute %u)", i, va.semantic, semantic_attribute [semantic]);
+
+        semantic_attribute [semantic] = i;
+
+          //проверка корректности формата данных и типа элементов
+
+        switch (va.format)
+        {
+          case InputDataFormat_Value:
+          case InputDataFormat_Vector2:
+          case InputDataFormat_Vector3:
+          case InputDataFormat_Vector4:
+            if (!VertexAttributeSemanticTraits::IsCompatible (semantic, va.format))
+              throw xtl::format_exception<xtl::not_supported_exception> (METHOD_NAME, "Bad desc.vertex_attribute[%u] (semantic %s incompatible with format %s)", i,
+                                            va.semantic, get_name (va.format));
+
+            break;
+          default:
+            throw xtl::format_exception<xtl::bad_argument> (METHOD_NAME, "Invalid argument desc.vertex_attributes[%u].format=%d", i, va.format);
+        }
+
+        switch (va.type)
+        {
+          case InputDataType_Byte:
+          case InputDataType_UByte:
+          case InputDataType_Short:
+          case InputDataType_UShort:
+          case InputDataType_Int:
+          case InputDataType_UInt:
+          case InputDataType_Float:
+            if (!VertexAttributeSemanticTraits::IsCompatible (semantic, va.type))
+              throw xtl::format_exception<xtl::not_supported_exception> (METHOD_NAME, "Bad desc.vertex_attribute[%u] (semantic %s incompatible with type %s)", i,
+                                            va.semantic, get_name (va.type));
+
+            break;
+          default:
+            throw xtl::format_exception<xtl::bad_argument> (METHOD_NAME, "Invalid argument desc.vertex_attributes[%u].type=%d", i, va.type);
+        }
       }
 
       new_semantics_mask |= 1 << semantic;
 
-        //отсечение повторной установки вершинной семантики
-
-      if (semantic_attribute [semantic] != NO_ATTRIBUTE)
-        throw xtl::format_exception<xtl::bad_argument> (METHOD_NAME, "Invalid argument desc.vertex_attributes[%u].semantic=%s (semantic has been "
-          "already defined in attribute %u)", i, va.semantic, semantic_attribute [semantic]);
-
-      semantic_attribute [semantic] = i;
-
-        //проверка корректности формата данных и типа элементов
-
-      switch (va.format)
-      {
-        case InputDataFormat_Value:
-        case InputDataFormat_Vector2:
-        case InputDataFormat_Vector3:
-        case InputDataFormat_Vector4:
-          if (!VertexAttributeSemanticTraits::IsCompatible (semantic, va.format))
-            throw xtl::format_exception<xtl::not_supported_exception> (METHOD_NAME, "Bad desc.vertex_attribute[%u] (semantic %s incompatible with format %s)", i,
-                                          va.semantic, get_name (va.format));
-
-          break;
-        default:
-          throw xtl::format_exception<xtl::bad_argument> (METHOD_NAME, "Invalid argument desc.vertex_attributes[%u].format=%d", i, va.format);
-      }
-      
-      switch (va.type)
-      {
-        case InputDataType_Byte:
-        case InputDataType_UByte:
-        case InputDataType_Short:
-        case InputDataType_UShort:
-        case InputDataType_Int:
-        case InputDataType_UInt:
-        case InputDataType_Float:
-          if (!VertexAttributeSemanticTraits::IsCompatible (semantic, va.type))
-            throw xtl::format_exception<xtl::not_supported_exception> (METHOD_NAME, "Bad desc.vertex_attribute[%u] (semantic %s incompatible with type %s)", i,
-                                          va.semantic, get_name (va.type));
-
-          break;
-        default:
-          throw xtl::format_exception<xtl::bad_argument> (METHOD_NAME, "Invalid argument desc.vertex_attributes[%u].type=%d", i, va.type);
-      }
-      
         //проверка корректности номера слота
 
       if (va.slot >= DEVICE_VERTEX_BUFFER_SLOTS_COUNT)
