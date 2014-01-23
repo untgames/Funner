@@ -74,9 +74,6 @@ VertexBuffer::VertexBuffer (const media::geometry::VertexBuffer& source, Primiti
             case media::geometry::VertexAttributeSemantic_TexCoord7:          
               dst_va.semantic = device.GetVertexAttributeSemanticName ((VertexAttributeSemantic)(VertexAttributeSemantic_TexCoord0 + src_va.semantic - media::geometry::VertexAttributeSemantic_TexCoord0));
               break;
-            case media::geometry::VertexAttributeSemantic_Custom:
-              dst_va.semantic = src_va.name;
-              break;
             default:
               continue;
           }
