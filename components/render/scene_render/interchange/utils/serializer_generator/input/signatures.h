@@ -50,6 +50,8 @@ void SetStaticMeshName (object_id_t id, const char* mesh_name);
 
 void SetLightParams (object_id_t id, const LightParams& params);
 
+void SetPageCurlParams (object_id_t id, const PageCurlParams& params, const char* front_left_material, const char* front_right_material, const char* back_left_material, const char* back_right_material);
+
 #section ServerToClient
 
 void UpdatePropertyMap (...);

@@ -41,6 +41,7 @@ inline stl::string get_command_name(CommandId command_id)
     case CommandId_SetVisualModelScissor: return "SetVisualModelScissor";
     case CommandId_SetStaticMeshName: return "SetStaticMeshName";
     case CommandId_SetLightParams: return "SetLightParams";
+    case CommandId_SetPageCurlParams: return "SetPageCurlParams";
     default: return common::format ("CommandId#%u", command_id);
   }
 }
@@ -749,6 +750,28 @@ inline void ClientToServerSerializer::SetLightParams(object_id_t id, const Light
   }
 }
 
+inline void ClientToServerSerializer::SetPageCurlParams(object_id_t id, const PageCurlParams& params, const char* front_left_material, const char* front_right_material, const char* back_left_material, const char* back_right_material)
+{
+  size_t saved_position = Position ();
+
+  try
+  {
+    BeginCommand(CommandId_SetPageCurlParams);
+    write(*this, id);
+    write(*this, params);
+    write(*this, front_left_material);
+    write(*this, front_right_material);
+    write(*this, back_left_material);
+    write(*this, back_right_material);
+    EndCommand();
+  }
+  catch (...)
+  {
+    SetPosition (saved_position);
+    throw;
+  }
+}
+
 template <class Dispatcher> inline bool ClientToServerDeserializer::Deserialize(CommandId id, Dispatcher& dispatcher)
 {
   switch (id)
@@ -1097,6 +1120,19 @@ template <class Dispatcher> inline bool ClientToServerDeserializer::Deserialize(
       const LightParams& arg2 = read(*this, xtl::type<const LightParams& > ());
 
       dispatcher.SetLightParams(arg1, arg2);
+
+      return true;
+    }
+    case CommandId_SetPageCurlParams:
+    {
+      object_id_t arg1 = read(*this, xtl::type<object_id_t > ());
+      const PageCurlParams& arg2 = read(*this, xtl::type<const PageCurlParams& > ());
+      const char* arg3 = read(*this, xtl::type<const char* > ());
+      const char* arg4 = read(*this, xtl::type<const char* > ());
+      const char* arg5 = read(*this, xtl::type<const char* > ());
+      const char* arg6 = read(*this, xtl::type<const char* > ());
+
+      dispatcher.SetPageCurlParams(arg1, arg2, arg3, arg4, arg5, arg6);
 
       return true;
     }

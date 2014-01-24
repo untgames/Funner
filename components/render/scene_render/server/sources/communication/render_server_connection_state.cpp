@@ -750,3 +750,18 @@ void ConnectionState::SetLightParams (object_id_t id, const interchange::LightPa
     throw;
   }
 }
+
+void ConnectionState::SetPageCurlParams (object_id_t id, const interchange::PageCurlParams& params, const char* front_left_material,
+                                         const char* front_right_material, const char* back_left_material, const char* back_right_material)
+{
+  try
+  {
+    impl->server.SceneManager ().GetNode (id).Cast<PageCurl> ().SetParams (params, front_left_material, front_right_material,
+                                                                           back_left_material, back_right_material);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::scene::ConnectionState::SetLightParams");
+    throw;
+  }
+}

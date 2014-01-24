@@ -53,6 +53,7 @@ enum NodeType
   NodeType_PointLight,  //точечный источник света
   NodeType_SpotLight,   //конусоидальный источник света
   NodeType_DirectLight, //направленный источник света
+  NodeType_PageCurl,    //разворот книги
 
   NodeType_Num
 };
@@ -69,6 +70,29 @@ struct LightParams
   float        exponent;    //экспонента рассеивания света (для spot-light)
   math::anglef angle;       //угол действия (для spot-light)
   float        radius;      //радиус действия (для direct-light)
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Разворот книги
+///////////////////////////////////////////////////////////////////////////////////////////////////
+struct PageCurlParams
+{
+  math::vec4f  page_color;                    //цвет страницы
+  math::vec2f  size;                          //полный размера страниц
+  math::vec2f  curl_point;                    //точка перетаскивания
+  math::vec2f  curl_point_position;           //текущее положение точки перетаскивания
+  math::vec2ui grid_size;                     //детализация разбиения сетки
+  size_t       find_best_curl_steps;          //количество итераций поиска наилучшей позиции загиба
+  int          mode;                          //режим (PageCurlMode)
+  float        curl_radius;                   //настройка изгиба
+  float        minimum_curl_radius;           //настройка изгиба
+  float        corner_shadow_offset;          //смещение тени от угла
+  float        shadow_width;                  //ширина тени
+  float        shadow_log_base;               //основание логарифма генерации тени
+  float        shadow_min_log_value;          //минимальное значение тени при логарифмировании
+  float        binding_mismatch_weight;       //вес отклонения позиции сгиба страницы при поиске наилучешй позиции загиба
+  float        rigid_page_perspective_factor; //коэффициент увеличения края жесткой страницы для симуляции перспективы
+  bool         is_rigid_page;                 //является ли страница жесткой
 };
 
 }

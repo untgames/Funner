@@ -75,6 +75,8 @@ class ConnectionState: public xtl::noncopyable
 
     void SetLightParams (object_id_t id, const interchange::LightParams& params);
 
+    void SetPageCurlParams(object_id_t id, const interchange::PageCurlParams& params, const char* front_left_material, const char* front_right_material, const char* back_left_material, const char* back_right_material);
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Внутренние команды
 ///////////////////////////////////////////////////////////////////////////////////////////////////

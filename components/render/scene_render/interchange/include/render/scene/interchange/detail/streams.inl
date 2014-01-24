@@ -258,32 +258,34 @@ inline size_t InputStream::Position () const
     Сериализация базовых типов
 */
 
-inline void write (OutputStream& s, bool value)               { s.Write (static_cast<bool8> (value)); }
-inline void write (OutputStream& s, int64 value)              { s.Write (value); }
-inline void write (OutputStream& s, uint64 value)             { s.Write (value); }
-inline void write (OutputStream& s, int32 value)              { s.Write (value); }
-inline void write (OutputStream& s, uint32 value)             { s.Write (value); }
-inline void write (OutputStream& s, int16 value)              { s.Write (value); }
-inline void write (OutputStream& s, uint16 value)             { s.Write (value); }
-inline void write (OutputStream& s, int8 value)               { s.Write (value); }
-inline void write (OutputStream& s, uint8 value)              { s.Write (value); }
-inline void write (OutputStream& s, float32 value)            { s.Write (value); }
-inline void write (OutputStream& s, NodeType value)           { write (s, static_cast<int32> (value)); }
-inline void write (OutputStream& s, const LightParams& value) { s.Write (value); }
+inline void write (OutputStream& s, bool value)                  { s.Write (static_cast<bool8> (value)); }
+inline void write (OutputStream& s, int64 value)                 { s.Write (value); }
+inline void write (OutputStream& s, uint64 value)                { s.Write (value); }
+inline void write (OutputStream& s, int32 value)                 { s.Write (value); }
+inline void write (OutputStream& s, uint32 value)                { s.Write (value); }
+inline void write (OutputStream& s, int16 value)                 { s.Write (value); }
+inline void write (OutputStream& s, uint16 value)                { s.Write (value); }
+inline void write (OutputStream& s, int8 value)                  { s.Write (value); }
+inline void write (OutputStream& s, uint8 value)                 { s.Write (value); }
+inline void write (OutputStream& s, float32 value)               { s.Write (value); }
+inline void write (OutputStream& s, NodeType value)              { write (s, static_cast<int32> (value)); }
+inline void write (OutputStream& s, const LightParams& value)    { s.Write (value); }
+inline void write (OutputStream& s, const PageCurlParams& value) { s.Write (value); }
 
-inline       bool         read (InputStream& s, xtl::type<bool>)        { return s.Read<bool8> () != 0; }
-inline const int64&       read (InputStream& s, xtl::type<int64>)       { return s.Read<int64> (); }
-inline const uint64&      read (InputStream& s, xtl::type<uint64>)      { return s.Read<uint64> (); }
-inline const int32&       read (InputStream& s, xtl::type<int32>)       { return s.Read<int32> (); }
-inline const uint32&      read (InputStream& s, xtl::type<uint32>)      { return s.Read<uint32> (); }
-inline const int16&       read (InputStream& s, xtl::type<int16>)       { return s.Read<int16> (); }
-inline const uint16&      read (InputStream& s, xtl::type<uint16>)      { return s.Read<uint16> (); }
-inline const int8&        read (InputStream& s, xtl::type<int8>)        { return s.Read<int8> (); }
-inline const uint8&       read (InputStream& s, xtl::type<uint8>)       { return s.Read<uint8> (); }
-inline const float32&     read (InputStream& s, xtl::type<float32>)     { return s.Read<float32> (); }
-inline const Command&     read (InputStream& s, xtl::type<Command>)     { return s.Read<Command> (); }
-inline const NodeType&    read (InputStream& s, xtl::type<NodeType>)    { return *reinterpret_cast<const NodeType*> (&read (s, xtl::type<int32> ())); }
-inline const LightParams& read (InputStream& s, xtl::type<LightParams>) { return s.Read<LightParams> (); }
+inline       bool            read (InputStream& s, xtl::type<bool>)           { return s.Read<bool8> () != 0; }
+inline const int64&          read (InputStream& s, xtl::type<int64>)          { return s.Read<int64> (); }
+inline const uint64&         read (InputStream& s, xtl::type<uint64>)         { return s.Read<uint64> (); }
+inline const int32&          read (InputStream& s, xtl::type<int32>)          { return s.Read<int32> (); }
+inline const uint32&         read (InputStream& s, xtl::type<uint32>)         { return s.Read<uint32> (); }
+inline const int16&          read (InputStream& s, xtl::type<int16>)          { return s.Read<int16> (); }
+inline const uint16&         read (InputStream& s, xtl::type<uint16>)         { return s.Read<uint16> (); }
+inline const int8&           read (InputStream& s, xtl::type<int8>)           { return s.Read<int8> (); }
+inline const uint8&          read (InputStream& s, xtl::type<uint8>)          { return s.Read<uint8> (); }
+inline const float32&        read (InputStream& s, xtl::type<float32>)        { return s.Read<float32> (); }
+inline const Command&        read (InputStream& s, xtl::type<Command>)        { return s.Read<Command> (); }
+inline const NodeType&       read (InputStream& s, xtl::type<NodeType>)       { return *reinterpret_cast<const NodeType*> (&read (s, xtl::type<int32> ())); }
+inline const LightParams&    read (InputStream& s, xtl::type<LightParams>)    { return s.Read<LightParams> (); }
+inline const PageCurlParams& read (InputStream& s, xtl::type<PageCurlParams>) { return s.Read<PageCurlParams> (); }
 
 template <class T>
 inline const T& read (InputStream& s, xtl::type<T&>)

@@ -20,5 +20,8 @@ Node* SceneFactory::Create (scene_graph::Node& src_node, SceneManager& scene_man
   if (scene_graph::DirectLight* node = dynamic_cast<scene_graph::DirectLight*> (&src_node))
     return create_node (*node, scene_manager);
 
+  if (scene_graph::PageCurl* node = dynamic_cast<scene_graph::PageCurl*> (&src_node))
+    return create_node (*node, scene_manager);
+
   return 0;
 }
