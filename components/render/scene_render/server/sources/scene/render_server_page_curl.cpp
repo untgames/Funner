@@ -9,33 +9,29 @@ using namespace render::scene::server;
 
 struct PageCurl::Impl
 {
-  PageCurlParams params;               //параметры
-  stl::string    front_left_material;  //материал страницы
-  stl::string    front_right_material; //материал страницы
-  stl::string    back_left_material;   //материал страницы
-  stl::string    back_right_material;  //материал страницы
+  PageCurlParams   params;               //параметры
+  stl::string      front_left_material;  //материал страницы
+  stl::string      front_right_material; //материал страницы
+  stl::string      back_left_material;   //материал страницы
+  stl::string      back_right_material;  //материал страницы
+  manager::Entity& entity;               //сущность
+
+  ///  онструктор
+    Impl (manager::Entity& in_entity) : entity (in_entity) {}
 };
 
 /*
      онструкторы / деструктор / присваивание
 */
 
-PageCurl::PageCurl ()
-  : impl (new Impl)
+PageCurl::PageCurl (RenderManager& render_manager)
+  : VisualModel (render_manager)
+  , impl (new Impl (Entity ()))
 {
 }
 
 PageCurl::~PageCurl ()
 {
-}
-
-/*
-    “ип
-*/
-
-interchange::NodeType PageCurl::Type () const
-{
-  return interchange::NodeType_PageCurl;
 }
 
 /*
@@ -72,10 +68,12 @@ const PageCurlParams& PageCurl::Params () const
 }
 
 /*
-    ќбход
+   ќтрисовка
 */
 
-void PageCurl::VisitCore (ISceneVisitor& visitor)
+void PageCurl::DrawCore (RenderingContext& context, void* user_data)
 {
-  visitor.Visit (*this);
+
+
+  VisualModel::DrawCore (context, user_data);
 }
