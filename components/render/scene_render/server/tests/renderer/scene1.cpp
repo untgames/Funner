@@ -73,8 +73,8 @@ int main ()
 
     common::PropertyMap window_properties;
     
-    window_properties.SetProperty ("ColorBits", 24);
-    window_properties.SetProperty ("DepthBits", 16);
+    window_properties.SetProperty ("ColorBits", 32);
+    window_properties.SetProperty ("DepthBits", 24);
 
     server.AttachWindow ("my_window", window, window_properties);
 
@@ -82,6 +82,7 @@ int main ()
     client.LoadResource ("data/u1/texture0000.dds");
     client.LoadResource ("data/u1/texture0001.dds");
     client.LoadResource ("data/u1/texture0002.dds");
+    client.LoadResource ("data/u1/EnvGala_020_D.dds");
     client.LoadResource ("data/u1.xmtl");
     client.LoadResource ("data/u1.binmesh");
 
@@ -97,9 +98,9 @@ int main ()
     scene_graph::OrthoCamera::Pointer camera = scene_graph::OrthoCamera::Create ();
     
     camera->SetLeft   (-10.0f);
-    camera->SetRight  (10.0f);    
+    camera->SetRight  (10.0f);
     camera->SetBottom (-10.0f);
-    camera->SetTop    (10.0f);    
+    camera->SetTop    (10.0f);
     camera->SetZNear  (-1000.0f);
     camera->SetZFar   (1000.0f);    
 

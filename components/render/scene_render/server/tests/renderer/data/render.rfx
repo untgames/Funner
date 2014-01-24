@@ -145,6 +145,8 @@ program "phong"
 
   texmap   "diffuse"  "DiffuseTexture"
   texmap   "specular" "SpecularTexture"
+  texmap   "bump"     "BumpTexture"
+  texmap   "reflection"  "ReflectionTexture"
   texmap   "ambient"  "AmbientTexture"
   texmap   "emission" "EmissionTexture"
   framemap "shadow"   "ShadowTexture"
