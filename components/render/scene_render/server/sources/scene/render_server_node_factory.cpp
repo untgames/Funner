@@ -16,6 +16,7 @@ Node* NodeFactory::CreateNode (RenderManager& render_manager, NodeType type)
       case interchange::NodeType_PointLight:
       case interchange::NodeType_SpotLight:
       case interchange::NodeType_DirectLight: return new Light (type);
+      case interchange::NodeType_PageCurl:    return new PageCurl ();
       default:
         throw xtl::make_argument_exception ("", "type", type);
     }
