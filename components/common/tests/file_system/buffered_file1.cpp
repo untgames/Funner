@@ -392,7 +392,7 @@ int main ()
 
     memset (buffer,0,sizeof (buffer));
 
-    file.Read (buffer,file.Size ());
+    file.Read (buffer, (size_t)file.Size ());
 
     printf ("%s",buffer);
 

@@ -7,6 +7,9 @@
 #endif
 
 #include <windows.h>
+
+#undef GetFreeSpace
+
 #include <stdlib.h>
 
 #ifndef WP8

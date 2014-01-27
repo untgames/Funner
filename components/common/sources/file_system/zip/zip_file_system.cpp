@@ -151,7 +151,7 @@ zzip_off_t zip_seek_func (int fd, zzip_off_t offset, int whence)
         throw xtl::make_argument_exception ("common::zip_seek_func", "whence", whence);
     }
 
-    return ((StdFile*)fd)->Seek (offset, seek_mode);
+    return (zzip_off_t)((StdFile*)fd)->Seek (offset, seek_mode);
   }
   catch (std::exception& exception)
   {
@@ -169,7 +169,7 @@ zzip_off_t zip_size_func (int fd)
 {
   try
   {
-    return ((StdFile*)fd)->Size ();
+    return (zzip_off_t)((StdFile*)fd)->Size ();
   }
   catch (std::exception& exception)
   {
@@ -282,7 +282,7 @@ class ZipFileSystem: public ICustomFileSystem, public Lockable
     struct ZipFile
     {
       ZZIP_FILE* handle;
-      size_t     size;
+      filesize_t size;
     };
 
     typedef vector<FileListItem>    EntryList;
@@ -535,7 +535,7 @@ filepos_t ZipFileSystem::FileSeek (file_t _file,filepos_t pos)
 
   ZipFile* file = (ZipFile*)_file;
 
-  filepos_t new_pos = zzip_seek (file->handle,pos,SEEK_SET);
+  filepos_t new_pos = zzip_seek (file->handle, (zzip_off_t)pos, SEEK_SET);
 
   CheckError ();
 
