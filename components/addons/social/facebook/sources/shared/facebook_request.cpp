@@ -77,7 +77,7 @@ void FacebookSessionImpl::PerformRequestImpl (common::Action& action, const stl:
 
   try
   {
-    size_t initial_buffer_size = input_file.Size ();
+    size_t initial_buffer_size = (size_t)input_file.Size ();
 
     if (!initial_buffer_size)
       initial_buffer_size = DEFAULT_RESPONSE_BUFFER_SIZE;

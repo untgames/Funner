@@ -49,9 +49,9 @@ struct BufferedFileImpl::Impl
       if (base_file->Seek (data_dirty_start_pos) != data_dirty_start_pos)
         throw xtl::format_operation_exception ("", "Can't seek file");      
         
-      char*  data       = buffer.data () + (data_dirty_start_pos - data_start_pos);
-      size_t size       = data_dirty_end_pos - data_dirty_start_pos;
-      size_t write_size = base_file->Write (data, size);
+      char*     data       = buffer.data () + (data_dirty_start_pos - data_start_pos);
+      filepos_t size       = data_dirty_end_pos - data_dirty_start_pos;
+      size_t    write_size = base_file->Write (data, size);
 
       if (write_size != size)
         throw xtl::format_operation_exception ("", "Can't write file");
@@ -90,7 +90,7 @@ struct BufferedFileImpl::Impl
 
             //изменение размеров буферов
 
-          size_t available_size = base_file->Size () - data_start_pos;
+          filesize_t available_size = base_file->Size () - data_start_pos;
 
           if (available_size > buffer.size ())
             available_size = buffer.size ();
@@ -241,7 +241,7 @@ size_t BufferedFileImpl::Read (void* buf, size_t size)
       //усечение файла при чтении
 
     if (impl->file_size - impl->file_pos < size)
-      size = impl->file_size - impl->file_pos;
+      size = (size_t)(impl->file_size - impl->file_pos);
 
     if (size > impl->buffer.capacity ())
     {      
@@ -275,8 +275,8 @@ size_t BufferedFileImpl::Read (void* buf, size_t size)
 
         //копирование данных
 
-      size_t      offset         = pos - impl->data_start_pos;
-      size_t      available_size = impl->data_end_pos - pos;
+      filepos_t   offset         = pos - impl->data_start_pos;
+      filesize_t  available_size = impl->data_end_pos - pos;
       size_t      read_size      = size < available_size ? size : available_size;
       const char* src            = impl->buffer.data () + offset;
 
@@ -296,7 +296,7 @@ size_t BufferedFileImpl::Read (void* buf, size_t size)
 
       //обновление файлового указателя
 
-    size_t result = pos - impl->file_pos;
+    filesize_t result = pos - impl->file_pos;
 
     impl->file_pos = pos;
 
@@ -316,7 +316,7 @@ size_t BufferedFileImpl::Write (const void* buf,size_t size)
     if ((filesize_t)(impl->file_size - impl->file_pos) < (filesize_t)size)
     {
       if (Mode () & FileMode_Resize) Resize (impl->file_pos + size);
-      else                           size = impl->file_size - impl->file_pos;
+      else                           size = (size_t)(impl->file_size - impl->file_pos);
     }
 
     if (!size)
@@ -357,10 +357,10 @@ size_t BufferedFileImpl::Write (const void* buf,size_t size)
 
         //копирование данных
 
-      size_t offset         = pos - impl->data_start_pos;
-      size_t available_size = impl->data_end_pos - pos;
-      size_t write_size     = size < available_size ? size : available_size;
-      char*  dst            = impl->buffer.data () + offset;
+      filepos_t  offset         = pos - impl->data_start_pos;
+      filesize_t available_size = impl->data_end_pos - pos;
+      size_t     write_size     = size < available_size ? size : available_size;
+      char*      dst            = impl->buffer.data () + offset;
 
       if (!write_size)
         break;
@@ -387,7 +387,7 @@ size_t BufferedFileImpl::Write (const void* buf,size_t size)
 
       //обновление файлового указателя
 
-    size_t result = pos - impl->file_pos;
+    filesize_t result = pos - impl->file_pos;
 
     impl->file_pos = pos;
 

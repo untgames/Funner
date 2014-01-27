@@ -198,6 +198,16 @@ void set_file_int_attribute (const char* file_name, const char* attribute, int v
   FileSystem::SetFileAttribute (file_name, attribute, &value, sizeof (value));
 }
 
+double get_background_copy_state_file_size (const BackgroundCopyState& state)
+{
+  return (double)state.FileSize ();
+}
+
+double get_background_copy_state_bytes_copied (const BackgroundCopyState& state)
+{
+  return (double)state.BytesCopied ();
+}
+
 }
 
 namespace engine
@@ -221,8 +231,8 @@ void bind_common_background_copy_state (script::Environment& environment)
 
   bind_static_background_copy_state_library (environment);
 
-  lib.Register ("get_BytesCopied", make_invoker (&BackgroundCopyState::BytesCopied));
-  lib.Register ("get_FileSize",    make_invoker (&BackgroundCopyState::FileSize));
+  lib.Register ("get_BytesCopied", make_invoker (&get_background_copy_state_bytes_copied));
+  lib.Register ("get_FileSize",    make_invoker (&get_background_copy_state_file_size));
   lib.Register ("get_Status",      make_invoker (&BackgroundCopyState::Status));
   lib.Register ("get_StatusText",  make_invoker (&BackgroundCopyState::StatusText));
 

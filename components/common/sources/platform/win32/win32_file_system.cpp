@@ -362,6 +362,30 @@ bool Win32FileSystem::GetFileInfo (const char* file_name, FileInfo& info)
 }
 
 /*
+   Информация о файловой системе
+*/
+
+filesize_t Win32FileSystem::GetFreeSpace (const char* path)
+{
+  ULARGE_INTEGER free_space;
+
+  if (!GetDiskFreeSpaceExW (GetFullFileName (path).c_str (), &free_space, 0, 0))
+     return (filesize_t)-1;
+
+  return free_space.QuadPart;
+}
+
+filesize_t Win32FileSystem::GetTotalSpace (const char* path)
+{
+  ULARGE_INTEGER total_space;
+
+  if (!GetDiskFreeSpaceExW (GetFullFileName (path).c_str (), 0, &total_space, 0))
+     return (filesize_t)-1;
+
+  return total_space.QuadPart;
+}
+
+/*
     Поиск файлов
 */
 

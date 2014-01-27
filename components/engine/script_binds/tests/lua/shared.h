@@ -67,9 +67,9 @@ void load_script (IInterpreter& interpreter, const char* file_name)
 {
   common::InputFile file (file_name);
 
-  stl::string buffer (file.Size (), ' ');
+  stl::string buffer ((size_t)file.Size (), ' ');
 
-  file.Read (&buffer [0], buffer.size ());
+  file.Read (&buffer [0], (size_t)buffer.size ());
 
   interpreter.DoCommands (file_name, buffer.c_str (), buffer.size ());
 }

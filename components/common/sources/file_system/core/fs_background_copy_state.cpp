@@ -8,8 +8,8 @@ using namespace common;
 
 struct BackgroundCopyState::Impl : public xtl::reference_counter
 {
-  size_t                    file_size;
-  size_t                    bytes_copied;
+  filesize_t                file_size;
+  filesize_t                bytes_copied;
   BackgroundCopyStateStatus status;
   stl::string               error;
 
@@ -65,12 +65,12 @@ BackgroundCopyState BackgroundCopyState::Clone () const
    Получение размера файла
 */
 
-void BackgroundCopyState::SetFileSize (size_t size)
+void BackgroundCopyState::SetFileSize (filesize_t size)
 {
   impl->file_size = size;
 }
 
-size_t BackgroundCopyState::FileSize () const
+filesize_t BackgroundCopyState::FileSize () const
 {
   return impl->file_size;
 }
@@ -79,12 +79,12 @@ size_t BackgroundCopyState::FileSize () const
    Получение количества скопированных байт
 */
 
-void BackgroundCopyState::SetBytesCopied (size_t size)
+void BackgroundCopyState::SetBytesCopied (filesize_t size)
 {
   impl->bytes_copied = size;
 }
 
-size_t BackgroundCopyState::BytesCopied () const
+filesize_t BackgroundCopyState::BytesCopied () const
 {
   return impl->bytes_copied;
 }
