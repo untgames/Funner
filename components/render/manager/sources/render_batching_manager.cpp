@@ -14,6 +14,18 @@ using namespace render::manager;
 
 struct BatchStateBlock::Impl
 {
+  BatchingManager&      batching_manager;             //ссылка на менеджер упаковки
+  MaterialImpl&         material;                     //ссылка на материал
+  LowLevelStateBlockPtr cached_state_block;           //состояние устройства
+  size_t                cached_state_block_mask_hash; //хэш маски состояния устройства
+
+/// Конструктор
+  Impl (BatchingManager& in_batching_manager, MaterialImpl& in_material)
+    : batching_manager (in_batching_manager)
+    , material (in_material)
+    , cached_state_block_mask_hash ()
+  {
+  }
 };
 
 /*
@@ -21,8 +33,10 @@ struct BatchStateBlock::Impl
 */
 
 BatchStateBlock::BatchStateBlock (BatchingManager& batching_manager, MaterialImpl& material)
+  : impl (new Impl (batching_manager, material))
 {
-  throw xtl::make_not_implemented_exception (__FUNCTION__);
+  AttachCacheSource (batching_manager);
+  AttachCacheSource (material);
 }
 
 BatchStateBlock::~BatchStateBlock ()
@@ -35,7 +49,9 @@ BatchStateBlock::~BatchStateBlock ()
 
 LowLevelStateBlockPtr BatchStateBlock::StateBlock ()
 {
-  throw xtl::make_not_implemented_exception (__FUNCTION__);
+  UpdateCache ();
+
+  return impl->cached_state_block;
 }
 
 /*
@@ -44,12 +60,58 @@ LowLevelStateBlockPtr BatchStateBlock::StateBlock ()
 
 void BatchStateBlock::UpdateCacheCore ()
 {
-  throw xtl::make_not_implemented_exception (__FUNCTION__);
+  try
+  {
+    BatchingManager&                   batching_manager = impl->batching_manager;
+    render::manager::DeviceManager&    device_manager   = batching_manager.DeviceManager ();
+    render::low_level::IDevice&        device           = device_manager.Device ();
+    render::low_level::IDeviceContext& context          = device_manager.ImmediateContext ();
+
+    impl->cached_state_block = LowLevelStateBlockPtr ();
+
+    LowLevelStateBlockPtr material_state_block = impl->material.StateBlock ();
+      
+    render::low_level::StateBlockMask mask;
+
+    if (material_state_block)
+    {
+      material_state_block->Apply (&context);
+      material_state_block->GetMask (mask);
+    }
+    
+      //установка вершинных/индексного буфера
+      
+    mask.is_index_buffer       = true;
+    mask.is_layout             = true;
+    mask.is_vertex_buffers [0] = true;
+
+    context.ISSetVertexBuffer (0, batching_manager.DynamicVertexBuffer ().LowLevelBuffer ().get ());
+    context.ISSetInputLayout  (device_manager.InputLayoutManager ().DynamicPrimitivesInputLayout ().get ());
+    context.ISSetIndexBuffer  (batching_manager.DynamicIndexBuffer ().LowLevelBuffer ().get ());
+    
+      //обновление блока состояний примитива
+    
+    size_t mask_hash = mask.Hash ();
+    
+    if (impl->cached_state_block_mask_hash != mask_hash)
+    {
+      impl->cached_state_block           = LowLevelStateBlockPtr (device.CreateStateBlock (mask), false);
+      impl->cached_state_block_mask_hash = mask_hash;
+    }
+
+    impl->cached_state_block->Capture (&context);    
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::manager::BatchStateBlock::UpdateCacheCore");
+    throw;
+  }
 }
 
 void BatchStateBlock::ResetCacheCore ()
 {
-  throw xtl::make_not_implemented_exception (__FUNCTION__);
+  impl->cached_state_block           = LowLevelStateBlockPtr ();
+  impl->cached_state_block_mask_hash = 0;
 }
 
 /*
