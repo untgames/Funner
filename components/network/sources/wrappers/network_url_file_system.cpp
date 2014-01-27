@@ -143,7 +143,7 @@ class UrlFile: public Lockable
     File          request_file;      //файла записи данных запроса
     bool          is_post;           //является ли соедиенние POST запросом
     bool          is_finish_sending; //флаг - завершение передачи
-    bool          end_of_request;    //флаг - запрос отправлен  
+    bool          end_of_request;    //флаг - запрос отправлен
     common::Log   log;               //поток протоколирования
 };
 
@@ -303,7 +303,7 @@ class SeekableUrlFile: public UrlFile
 
   private:
     File   response_file;  //файл чтения данных ответа
-    size_t buffer_size;    //размер кеша буфера чтения    
+    size_t buffer_size;    //размер кеша буфера чтения
 };
 
 class StreamUrlFile: public UrlFile
@@ -690,6 +690,17 @@ class UrlCustomFileSystem: public ICustomFileSystem, public xtl::reference_count
     bool GetFileInfo (const char* file_name, FileInfo& info)
     {
       return false;
+    }
+
+///Информация о файловой системе
+    filesize_t GetFreeSpace (const char* path)
+    {
+      return (filesize_t)-1;
+    }
+
+    filesize_t GetTotalSpace (const char* path)
+    {
+      return (filesize_t)-1;
     }
 
 //Файловые атрибуты

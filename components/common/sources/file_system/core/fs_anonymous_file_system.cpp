@@ -167,6 +167,22 @@ bool AnonymousFileSystem::GetFileInfo (const char* file_name, FileInfo& info)
   return false;
 }
 
+filesize_t AnonymousFileSystem::GetFreeSpace (const char* path)
+{
+  if (!path)
+    throw xtl::make_null_argument_exception ("common::AnonymousFileSystem::GetFreeSpace", "path");
+
+  return (filesize_t)-1;
+}
+
+filesize_t AnonymousFileSystem::GetTotalSpace (const char* path)
+{
+  if (!path)
+    throw xtl::make_null_argument_exception ("common::AnonymousFileSystem::GetFreeSpace", "path");
+
+  return (filesize_t)-1;
+}
+
 void AnonymousFileSystem::SetFileAttribute (const char* file_name, const char* attribute, const void* data, size_t size)
 {
   throw xtl::format_not_supported_exception ("AnonymousFileSystem::SetFileAttribute");

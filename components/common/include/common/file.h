@@ -31,7 +31,7 @@ typedef xtl::com_ptr<ICustomFileSystem>  ICustomFileSystemPtr;
 */
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Файловые атрибуты 
+///Файловые атрибуты
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 enum FileMode
 {
@@ -72,10 +72,11 @@ enum FileSeekMode
   FileSeekMode_End      //установка позиции от конца файла
 };
 
-typedef size_t filesize_t, filemode_t;
-typedef time_t filetime_t;
-typedef int    filepos_t;
-typedef char   filecryptokey_t [16];
+typedef size_t             filemode_t;
+typedef unsigned long long filesize_t;
+typedef time_t             filetime_t;
+typedef long long          filepos_t;
+typedef char               filecryptokey_t [16];
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Информация о файле
@@ -138,6 +139,12 @@ class ICustomFileSystem
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     virtual bool IsFileExist (const char* file_name) = 0;
     virtual bool GetFileInfo (const char* file_name, FileInfo& info) = 0;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Информация о файловой системе
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    virtual filesize_t GetFreeSpace (const char* path) = 0;   //returns (filesize_t)-1 if free space can't be determined
+    virtual filesize_t GetTotalSpace (const char* path) = 0;  //returns (filesize_t)-1 if free space can't be determined
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Файловые атрибуты
@@ -667,6 +674,12 @@ class FileSystem
     static bool       IsDir       (const char* file_name);
     static filetime_t GetFileTime (const char* file_name);
     static filesize_t GetFileSize (const char* file_name);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Информация о файловой системе
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    static filesize_t GetFreeSpace (const char* path);   //returns (unsigned long long)-1 if free space can't be determined
+    static filesize_t GetTotalSpace (const char* path);  //returns (unsigned long long)-1 if free space can't be determined
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Рассчёт хэш сумм содержимого файла

@@ -308,6 +308,20 @@ bool StdioFileSystem::GetFileInfo (const char* file_name,FileInfo& info)
 }
 
 /*
+   Информация о файловой системе
+*/
+
+filesize_t StdioFileSystem::GetFreeSpace (const char* path)
+{
+  return (filesize_t)-1;
+}
+
+filesize_t StdioFileSystem::GetTotalSpace (const char* path)
+{
+  return (filesize_t)-1;
+}
+
+/*
    Файловые атрибуты
 */
 

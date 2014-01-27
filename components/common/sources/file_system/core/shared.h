@@ -304,7 +304,7 @@ class FileListBuilder: public xtl::noncopyable
 struct PackFileType
 {
   FileSystem::PackFileCreater creater;        //функтор создания пак-файла
-  size_t                      extension_hash; //хэш расширения  
+  size_t                      extension_hash; //хэш расширения
   stl::string                 extension;      //расширение
   
   PackFileType (const char* extension,size_t hash,const FileSystem::PackFileCreater&);
@@ -357,6 +357,8 @@ class MountPointFileSystem: public ICustomFileSystem
     void       Mkdir               (const char* dir_name);
     bool       IsFileExist         (const char* file_name);
     bool       GetFileInfo         (const char* file_name,FileInfo& info);
+    filesize_t GetFreeSpace        (const char* path);
+    filesize_t GetTotalSpace       (const char* path);
     void       SetFileAttribute    (const char* file_name, const char* attribute, const void* data, size_t size);
     void       GetFileAttribute    (const char* file_name, const char* attribute, void* data, size_t size);
     bool       HasFileAttribute    (const char* file_name, const char* attribute);
@@ -424,6 +426,8 @@ class AnonymousFileSystem: public ICustomFileSystem, public xtl::reference_count
     void       Mkdir               (const char* dir_name);
     bool       IsFileExist         (const char* file_name);
     bool       GetFileInfo         (const char* file_name,FileInfo& info);
+    filesize_t GetFreeSpace        (const char* path);
+    filesize_t GetTotalSpace       (const char* path);
     void       SetFileAttribute    (const char* file_name, const char* attribute, const void* data, size_t size);
     void       GetFileAttribute    (const char* file_name, const char* attribute, void* data, size_t size);
     bool       HasFileAttribute    (const char* file_name, const char* attribute);
@@ -560,6 +564,12 @@ class FileSystemImpl
     bool IsFileExist (const char* file_name);
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+///Информация о файловой системе
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    filesize_t GetFreeSpace (const char* path);   //returns (filesize_t)-1 if free space can't be determined
+    filesize_t GetTotalSpace (const char* path);  //returns (filesize_t)-1 if free space can't be determined
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Информация о файле
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     FileList Search (const char* wc_mask,size_t flags);
@@ -606,9 +616,9 @@ class FileSystemImpl
     PackFileList           pack_files;               //список пак-файлов и пользовательских файловых систем
     MountList              mounts;                   //список смонтированных файловых систем
     SymbolicLinkList       symbolic_links;           //список символических ссылок
-    SearchPathList         search_paths;             //список путей поиска    
+    SearchPathList         search_paths;             //список путей поиска
     FileImplPtr            closed_file;              //закрытый файл
-    AnonymousFileSystemPtr anonymous_file_system;    //система анонимных файлов    
+    AnonymousFileSystemPtr anonymous_file_system;    //система анонимных файлов
     CryptoMap              crypto_parameters;        //параметры шифрования файлов
     stl::string            default_path;             //путь по умолчанию (аналог текущего каталога)
     stl::string            compress_path;            //буфер для формирования сокращённого пути

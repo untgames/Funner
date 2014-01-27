@@ -100,6 +100,22 @@ bool MountPointFileSystem::GetFileInfo (const char* name,FileInfo& info)
   return true;
 }
 
+filesize_t MountPointFileSystem::GetFreeSpace (const char* path)
+{
+  if (!path)
+    throw xtl::make_null_argument_exception ("common::MountPointFileSystem::GetFreeSpace", "path");
+
+  return (filesize_t)-1;
+}
+
+filesize_t MountPointFileSystem::GetTotalSpace (const char* path)
+{
+  if (!path)
+    throw xtl::make_null_argument_exception ("common::MountPointFileSystem::GetFreeSpace", "path");
+
+  return (filesize_t)-1;
+}
+
 void MountPointFileSystem::SetFileAttribute (const char* file_name, const char* attribute, const void* data, size_t size)
 {
   throw xtl::format_not_supported_exception ("MountPointFileSystem::SetFileAttribute");

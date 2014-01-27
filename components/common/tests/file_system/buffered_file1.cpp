@@ -134,7 +134,7 @@ class LogFileSystem: public ICustomFileSystem, public xtl::reference_counter
         if (!file)
           throw xtl::make_null_argument_exception ("", "file");
 
-        printf ("seek file '%s' to position %u\n", file->Path (), pos);
+        printf ("seek file '%s' to position %lld\n", file->Path (), pos);
 
         return file->Seek (pos);
       }
@@ -194,7 +194,7 @@ class LogFileSystem: public ICustomFileSystem, public xtl::reference_counter
         if (!file)
           throw xtl::make_null_argument_exception ("", "file");        
 
-        printf ("resize file '%s' to %u\n", file->Path (), new_size);
+        printf ("resize file '%s' to %llu\n", file->Path (), new_size);
 
         return file->Resize (new_size);
       }
@@ -268,6 +268,17 @@ class LogFileSystem: public ICustomFileSystem, public xtl::reference_counter
     bool GetFileInfo (const char* file_name, FileInfo& info)
     {
       return false;
+    }
+
+///Информация о файловой системе
+    filesize_t GetFreeSpace (const char* path)
+    {
+      return (filesize_t)-1;
+    }
+
+    filesize_t GetTotalSpace (const char* path)
+    {
+      return (filesize_t)-1;
     }
 
 //Файловые атрибуты

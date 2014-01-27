@@ -1338,6 +1338,54 @@ bool FileSystemImpl::GetFileInfo (const char* src_file_name,FileInfo& info)
 }
 
 /*
+   Информация о файловой системе
+*/
+
+filesize_t FileSystemImpl::GetFreeSpace (const char* path)
+{
+  if (!path)
+    throw xtl::make_null_argument_exception ("common::FileSystem::GetFreeSpace", "path");
+
+  try
+  {
+    string fs_path;
+
+    ICustomFileSystemPtr file_system = FindFileSystem (path, fs_path);
+
+    if (!fs_path.empty () && fs_path [fs_path.size () - 1] == '/')
+      fs_path.pop_back ();
+
+    return file_system->GetFreeSpace (fs_path.c_str ());
+  }
+  catch (...)
+  {
+    return (filesize_t)-1;
+  }
+}
+
+filesize_t FileSystemImpl::GetTotalSpace (const char* path)
+{
+  if (!path)
+    throw xtl::make_null_argument_exception ("common::FileSystem::GetTotalSpace", "path");
+
+  try
+  {
+    string fs_path;
+
+    ICustomFileSystemPtr file_system = FindFileSystem (path, fs_path);
+
+    if (!fs_path.empty () && fs_path [fs_path.size () - 1] == '/')
+      fs_path.pop_back ();
+
+    return file_system->GetTotalSpace (fs_path.c_str ());
+  }
+  catch (...)
+  {
+    return (filesize_t)-1;
+  }
+}
+
+/*
     FileSystem
 */
 
@@ -1465,6 +1513,16 @@ filesize_t FileSystem::GetFileSize (const char* file_name)
   FileInfo info;
 
   return FileSystemSingleton::Instance ()->GetFileInfo (file_name,info) ? info.size : 0;
+}
+
+filesize_t FileSystem::GetFreeSpace (const char* path)
+{
+  return FileSystemSingleton::Instance ()->GetFreeSpace (path);
+}
+
+filesize_t FileSystem::GetTotalSpace (const char* path)
+{
+  return FileSystemSingleton::Instance ()->GetTotalSpace (path);
 }
 
 FileList FileSystem::Search (const char* wc_mask,size_t flags)

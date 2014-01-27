@@ -1,5 +1,9 @@
 #include <sys/xattr.h>
 
+#if !defined IPHONE && __MAC_OS_X_VERSION_MIN_REQUIRED < 1050
+  #include <sys/statvfs.h>
+#endif
+
 #import <Foundation/NSArray.h>
 #import <Foundation/NSAutoreleasePool.h>
 #import <Foundation/NSDate.h>
@@ -134,6 +138,69 @@ class CocoaFileSystem: public StdioFileSystem
       [pool release];
 
       return true;
+    }
+
+///Информация о файловой системе
+    filesize_t GetFreeSpace (const char* path)
+    {
+#if defined IPHONE || __MAC_OS_X_VERSION_MIN_REQUIRED >= 1050
+      NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+
+      NSString* ns_path = [file_manager stringWithFileSystemRepresentation:path length:xtl::xstrlen (path)];
+
+      NSDictionary* fs_attributes = [file_manager attributesOfFileSystemForPath:ns_path error:nil];
+
+      if (!fs_attributes)
+      {
+        [pool release];
+
+        return (filesize_t)-1;
+      }
+
+      filesize_t return_value = [(NSNumber*)[fs_attributes objectForKey:NSFileSystemFreeSize] unsignedLongLongValue];
+
+      [pool release];
+
+      return return_value;
+#else
+      struct statvfs result;
+
+      if (statvfs (path, &result))
+        return (filesize_t)-1;
+
+      return (filesize_t)result.f_frsize * result.f_bavail;
+#endif
+    }
+
+    filesize_t GetTotalSpace (const char* path)
+    {
+#if defined IPHONE || __MAC_OS_X_VERSION_MIN_REQUIRED >= 1050
+      NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+
+      NSString* ns_path = [file_manager stringWithFileSystemRepresentation:path length:xtl::xstrlen (path)];
+
+      NSDictionary* fs_attributes = [file_manager attributesOfFileSystemForPath:ns_path error:nil];
+
+      if (!fs_attributes)
+      {
+        [pool release];
+
+        return (filesize_t)-1;
+      }
+
+      filesize_t return_value = [(NSNumber*)[fs_attributes objectForKey:NSFileSystemSize] unsignedLongLongValue];
+
+      [pool release];
+
+      return return_value;
+#else
+      struct statvfs result;
+
+      if (statvfs (path, &result))
+        return (filesize_t)-1;
+
+      return (filesize_t)result.f_frsize * result.f_blocks;
+#endif
     }
 
 ///Файловые атрибуты

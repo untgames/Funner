@@ -15,12 +15,12 @@ int main ()
     StdFile file (CRYPTO_FILE_NAME, FileMode_ReadWrite);
     CryptoFile crypto_file (file, DECRYPT_METHOD, ENCRYPT_METHOD, KEY, KEY_BITS);
 
-    printf ("file size: %u / %u\n", crypto_file.Size (), file.Size ());
+    printf ("file size: %llu / %llu\n", crypto_file.Size (), file.Size ());
     
     crypto_file.Resize (113);
     crypto_file.Flush ();
     
-    printf ("file size: %u / %u\n", crypto_file.Size (), file.Size ());    
+    printf ("file size: %llu / %llu\n", crypto_file.Size (), file.Size ());
 
     crypto_file.Close ();
     file.Close ();

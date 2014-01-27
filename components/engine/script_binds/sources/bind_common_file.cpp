@@ -173,6 +173,16 @@ stl::string file_hash (const char* file_name)
   return file_hash_string (file_hash);
 }
 
+double get_free_space (const char* path)
+{
+  return (double)FileSystem::GetFreeSpace (path);
+}
+
+double get_total_space (const char* path)
+{
+  return (double)FileSystem::GetTotalSpace (path);
+}
+
 void set_file_string_attribute (const char* file_name, const char* attribute, const char* value)
 {
   if (!value)
@@ -240,6 +250,8 @@ void bind_common_file_library (Environment& environment)
   lib.Register ("IsFileExist",            make_invoker (&FileSystem::IsFileExist));
   lib.Register ("Mkdir",                  make_invoker (&FileSystem::Mkdir));
   lib.Register ("Remove",                 make_invoker (&FileSystem::Remove));
+  lib.Register ("GetFreeSpace",           make_invoker (&get_free_space));
+  lib.Register ("GetTotalSpace",          make_invoker (&get_total_space));
   lib.Register ("SetFileStringAttribute", make_invoker (&set_file_string_attribute));
   lib.Register ("SetFileIntAttribute",    make_invoker (&set_file_int_attribute));
   lib.Register ("RemoveFileAttribute",    make_invoker (&FileSystem::RemoveFileAttribute));

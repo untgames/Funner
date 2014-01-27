@@ -242,6 +242,12 @@ class ZipFileSystem: public ICustomFileSystem, public Lockable
     bool GetFileInfo (const char* file_name,FileInfo& info);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+///Информация о файловой системе
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    filesize_t GetFreeSpace (const char* path);   //returns (filesize_t)-1 if free space can't be determined
+    filesize_t GetTotalSpace (const char* path);  //returns (filesize_t)-1 if free space can't be determined
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Файловые атрибуты
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void SetFileAttribute    (const char* file_name, const char* attribute, const void* data, size_t size);
@@ -617,6 +623,20 @@ bool ZipFileSystem::GetFileInfo (const char* file_name,FileInfo& info)
   info = entries [i->second].info;
 
   return true;
+}
+
+/*
+   Информация о файловой системе
+*/
+
+filesize_t ZipFileSystem::GetFreeSpace (const char* path)
+{
+  return 0;
+}
+
+filesize_t ZipFileSystem::GetTotalSpace (const char* path)
+{
+  return (filesize_t)-1;
 }
 
 /*

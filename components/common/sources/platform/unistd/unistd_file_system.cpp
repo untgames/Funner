@@ -4,6 +4,14 @@
   #include <dirent.h>
 #endif
 
+#ifdef ANDROID
+  #include <sys/vfs.h>
+
+  #define statvfs statfs
+#else
+  #include <sys/statvfs.h>
+#endif
+
 #include <sys/stat.h>
 #include <errno.h>
 #include <stdio.h>
@@ -91,6 +99,27 @@ class UnistdFileSystem: public StdioFileSystem
       closedir (dir);
     }
 #endif
+
+///Информация о файловой системе
+    filesize_t GetFreeSpace (const char* path)
+    {
+      struct statvfs result;
+
+      if (statvfs (path, &result))
+        return (filesize_t)-1;
+
+      return (filesize_t)result.f_frsize * result.f_bavail;
+    }
+
+    filesize_t GetTotalSpace (const char* path)
+    {
+      struct statvfs result;
+
+      if (statvfs (path, &result))
+        return (filesize_t)-1;
+
+      return (filesize_t)result.f_frsize * result.f_blocks;
+    }
 };
 
 }

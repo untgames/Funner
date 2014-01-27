@@ -101,6 +101,17 @@ class MyFileSystem : public ICustomFileSystem, public xtl::reference_counter
       return false;
     }
 
+///Информация о файловой системе
+    filesize_t GetFreeSpace (const char* path)
+    {
+      return (filesize_t)-1;
+    }
+
+    filesize_t GetTotalSpace (const char* path)
+    {
+      return (filesize_t)-1;
+    }
+
 //Файловые атрибуты
     void SetFileAttribute (const char* file_name, const char* attribute, const void* data, size_t size)
     {
