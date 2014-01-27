@@ -166,19 +166,38 @@ template <class T> class Pool: public xtl::noncopyable
 typedef Pool<DynamicPrimitiveVertex> DynamicVertexPool;
 typedef Pool<DynamicPrimitiveIndex>  DynamicIndexPool;
 
+/// Вхождение в кэш
+struct BatchStateBlockEntry
+{
+  BatchStateBlockPtr state_block;     //блок состояний
+  FrameTime          last_use_time;   //последнее время использования
+  FrameId            last_use_frame;  //последний кадр использования
+
+  BatchStateBlockEntry (const BatchStateBlockPtr& in_state_block, FrameTime use_time, FrameId use_frame)
+    : state_block (in_state_block)
+    , last_use_time (use_time)
+    , last_use_frame (use_frame)
+  {
+  }
+};
+
+typedef stl::hash_map<MaterialImpl*, BatchStateBlockEntry> StateBlockMap;
+
 }
 
-struct BatchingManager::Impl
+struct BatchingManager::Impl: public Cache
 {
   DeviceManagerPtr                      device_manager;       //менеджер устройства отрисовки
   render::manager::DynamicVertexBuffer  dynamic_vb;           //динамический вершинный буфер
   render::manager::DynamicIndexBuffer   dynamic_ib;           //динамический индексный буфер
   DynamicVertexPool                     dynamic_vertex_pool;  //пул динамических вершин
   DynamicIndexPool                      dynamic_index_pool;   //пул динамических индексов
+  StateBlockMap                         state_blocks;         //блоки состояний
 
 /// Конструктор
   Impl (const DeviceManagerPtr& in_device_manager)
-    : device_manager (in_device_manager)
+    : Cache (&in_device_manager->CacheManager ())
+    , device_manager (in_device_manager)
     , dynamic_vb (render::low_level::UsageMode_Stream, render::low_level::BindFlag_VertexBuffer)
     , dynamic_ib (render::low_level::UsageMode_Stream, render::low_level::BindFlag_IndexBuffer)
   {
@@ -203,6 +222,29 @@ struct BatchingManager::Impl
       e.touch ("render::manager::BatchingManager::ReserveDynamicBuffers");
       throw;
     }
+  }
+
+/// Сброс кэша
+  void FlushCache ()
+  {
+    if (state_blocks.empty ())
+      return;
+
+    FrameTime current_time  = CurrentTime (), time_delay = TimeDelay ();
+    FrameId   current_frame = CurrentFrame (), frame_delay = FrameDelay ();
+
+    for (StateBlockMap::iterator iter=state_blocks.begin (); iter!=state_blocks.end ();)
+      if (iter->second.state_block->use_count () == 1 && current_time - iter->second.last_use_time <= time_delay && current_frame - iter->second.last_use_frame <= frame_delay)
+      {
+        StateBlockMap::iterator next = iter;
+
+        ++next;
+
+        state_blocks.erase (iter);  
+
+        iter = next;
+      }
+      else ++iter;
   }
 };
 
@@ -235,6 +277,8 @@ render::manager::DeviceManager& BatchingManager::DeviceManager ()
 void BatchingManager::ReserveDynamicBuffers (size_t vertices_count, size_t indices_count)
 {
   impl->ReserveDynamicBuffers (vertices_count, indices_count);
+
+  InvalidateCacheDependencies ();
 }
 
 size_t BatchingManager::DynamicVerticesCount () const
@@ -279,6 +323,8 @@ DynamicPrimitiveVertex* BatchingManager::AllocateDynamicVertices (size_t count, 
 
   impl->dynamic_vb.Reserve (impl->dynamic_vb.Capacity () * 2);
 
+  InvalidateCacheDependencies ();
+
   impl->dynamic_vertex_pool.Reset (impl->dynamic_vb.Data (), impl->dynamic_vb.Size (), true);
 
   result = impl->dynamic_vertex_pool.Allocate (count);
@@ -300,6 +346,8 @@ DynamicPrimitiveIndex* BatchingManager::AllocateDynamicIndices (size_t count)
     return result;
 
   impl->dynamic_ib.Reserve (impl->dynamic_ib.Capacity () * 2);
+
+  InvalidateCacheDependencies ();
 
   impl->dynamic_index_pool.Reset (impl->dynamic_ib.Data (), impl->dynamic_ib.Size (), true);
 
@@ -326,5 +374,30 @@ void BatchingManager::ResetDynamicBuffers ()
 
 BatchStateBlockPtr BatchingManager::GetStateBlock (MaterialImpl* material)
 {
-  throw xtl::make_not_implemented_exception (__FUNCTION__);
+  try
+  {
+    if (!material)
+      return BatchStateBlockPtr ();
+
+    StateBlockMap::iterator iter = impl->state_blocks.find (material);
+
+    if (iter != impl->state_blocks.end ())
+    {
+      iter->second.last_use_time  = impl->CurrentTime ();
+      iter->second.last_use_frame = impl->CurrentFrame ();
+
+      return iter->second.state_block;
+    }
+
+    BatchStateBlockPtr state_block (new BatchStateBlock (*this, *material), false);
+
+    impl->state_blocks.insert_pair (material, BatchStateBlockEntry (state_block, impl->CurrentTime (), impl->CurrentFrame ()));
+
+    return state_block;
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::manager::BatchingManager::GetStateBlock");
+    throw;
+  }
 }
