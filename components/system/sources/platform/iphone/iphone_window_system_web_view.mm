@@ -6,11 +6,20 @@
 
 using namespace syslib;
 
+namespace
+{
+
+size_t MAX_WAIT_FOR_FINISH_LOAD_TIME = 10000; //time for wait for page complete loading. Some pages crashes if user clicks it before complete load.
+
+}
+
 @interface UIWebViewWrapper : UIWebView <UIWebViewDelegate>
 {
   @private
     IWebViewListener*        listener;
     UIActivityIndicatorView* activity_indicator;
+    NSTimer*                 on_load_finished_timer;  //timer for checking that page actually loaded
+    size_t                   finish_load_time;     //time when didFinishLoad called
 }
 
 -(id)initWithListener:(IWebViewListener*)in_listener;
@@ -19,8 +28,18 @@ using namespace syslib;
 
 @implementation UIWebViewWrapper
 
+-(void)deleteOnLoadFinishedTimer
+{
+  [on_load_finished_timer invalidate];
+  [on_load_finished_timer release];
+
+  on_load_finished_timer = nil;
+}
+
 -(void)dealloc
 {
+  [self deleteOnLoadFinishedTimer];
+
   [activity_indicator release];
 
   [super dealloc];
@@ -79,15 +98,44 @@ using namespace syslib;
   return listener->ShouldStartLoading ([[request.URL absoluteString] UTF8String]);
 }
 
--(void)webViewDidFinishLoad:(UIWebView *)webView
+-(void)onLoadFinished
 {
+  self.userInteractionEnabled = YES;
+
   listener->OnLoadFinished ();
 
   [activity_indicator removeFromSuperview];
+
+  [self deleteOnLoadFinishedTimer];
+}
+
+-(void)checkPageReadyState
+{
+  if ((common::milliseconds () - finish_load_time < MAX_WAIT_FOR_FINISH_LOAD_TIME) && ![[self stringByEvaluatingJavaScriptFromString:@"document.readyState"] isEqualToString:@"complete"])
+    return;
+
+  [self deleteOnLoadFinishedTimer];
+
+  float delay = 2.f / pow ([[NSProcessInfo processInfo] processorCount], 2);
+
+  on_load_finished_timer = [[NSTimer scheduledTimerWithTimeInterval:delay target:self selector:@selector (onLoadFinished) userInfo:nil repeats:YES] retain];
+}
+
+-(void)webViewDidFinishLoad:(UIWebView *)webView
+{
+  finish_load_time = common::milliseconds ();
+
+  [self deleteOnLoadFinishedTimer];
+
+  on_load_finished_timer = [[NSTimer scheduledTimerWithTimeInterval:0.1 target:self selector:@selector (checkPageReadyState) userInfo:nil repeats:YES] retain];
 }
 
 -(void)webViewDidStartLoad:(UIWebView *)webView
 {
+  [self deleteOnLoadFinishedTimer];
+
+  self.userInteractionEnabled = NO;
+
   if (webView.request.URL)
     listener->OnLoadStarted ([[webView.request.URL absoluteString] UTF8String]);
 
