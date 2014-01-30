@@ -1,5 +1,5 @@
-#ifndef MEDIALIB_FontRenderer_RENDERER_HEADER
-#define MEDIALIB_FontRenderer_RENDERER_HEADER
+#ifndef MEDIALIB_FONT_LIBRARY_HEADER
+#define MEDIALIB_FONT_LIBRARY_HEADER
 
 #include <media/font.h>
 
@@ -7,8 +7,6 @@
 
 namespace media
 {
-
-//TODO: cache index
 
 struct FontCreationParams
 {
@@ -20,18 +18,36 @@ struct FontCreationParams
   bool        itallic;
   bool        underlined;
   bool        striked;
+  float       stroke_size;
   size_t      horizontal_dpi;
   size_t      vertical_dpi;
   const char* charset;
 };
 
-//TODO: add global charset class
+class IFontDesc
+{
+  public:
+    virtual size_t FontsCount () = 0;
+    virtual const char* FamilyName (size_t index) = 0;
+    virtual const char* StyleName (size_t index) = 0;
+
+    virtual Font CreateFont    (size_t index, const FontCreationParams&) = 0;
+    virtual bool CanCreateFont (size_t index, const FontCreationParams&) = 0;
+
+    virtual void AddRef () = 0;
+    virtual void Release () = 0;
+
+ protected:
+    virtual ~IFontDesc () {}
+};
 
 class FontDesc
 {
   public:
-    FontDesc (const char* source, const char* family_name, const char* style_name, IFontDesc* desc);
+    FontDesc  (const FontDesc&);
+    ~FontDesc ();    
 
+    FontDesc& operator = (const FontDesc&);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Имя файла
@@ -43,12 +59,12 @@ class FontDesc
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     const char* FamilyName () const;
     const char* StyleName  () const;
-
-    bool IsRasterFont () const;
     
-
     Font CreateFont     (const FontCreationParams&) const;
     bool CanCreateFont  (const FontCreationParams&) const;
+
+  private:
+    FontDesc (const char* source, IFontDesc* desc, size_t index);
 
   private:
     struct Impl
@@ -96,8 +112,7 @@ class FontLibrary
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Поиск
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-          FontDesc* Find (const char* name);
-    const FontDesc* Find (const char* name) const;
+    FontDesc Find (const char* name) const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Очистка библиотеки
@@ -116,7 +131,18 @@ class FontLibrary
 ///Создание шрифта
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     Font CreateFont (const char* name, const FontCreationParams& params);
-    
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Управление параметрами кэширования
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void EnableCache   () { SetCacheState (true); }
+    void DisableCache  () { SetCacheState (false); }
+    void SetCacheState (bool state);
+    bool CacheState    () const;
+
+    void        SetCacheDir (const char* dir_name);
+    const char* CacheDir    () const;
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Обмен
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -131,6 +157,11 @@ class FontLibrary
 ///Обмен
 //////////////////////////////////////////////////////////////////////////////////////////////////
 void swap (FontLibrary&, FontLibrary&);
+
+//////////////////////////////////////////////////////////////////////////////////////////////////
+///Менеджер шрифтов
+//////////////////////////////////////////////////////////////////////////////////////////////////
+typedef common::ResourceSerializerManager<IFontDesc* (const char*), void (const char*, const Font&)> FontManager;
 
 }
 
