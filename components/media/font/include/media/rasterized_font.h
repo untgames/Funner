@@ -9,7 +9,6 @@ namespace media
 //forward declarations
 class Font;
 class Image;
-class RasterizedFontImpl;
 
 //////////////////////////////////////////////////////////////////////////////////////////////////
 ///Информация о растеризованном глифе
@@ -67,7 +66,8 @@ class RasterizedFont
     RasterizedFont (IFontRasterizer*);
 
   private:
-    RasterizedFontImpl* impl;
+    struct Impl;
+    Impl* impl;
 };
 
 //////////////////////////////////////////////////////////////////////////////////////////////////
