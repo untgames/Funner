@@ -8,6 +8,7 @@
 #include <xtl/uninitialized_storage.h>
 
 #include <common/hash.h>
+#include <common/singleton.h>
 
 #include <media/charset_manager.h>
 #include <media/font_library.h>
