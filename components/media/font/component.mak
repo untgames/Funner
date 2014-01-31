@@ -1,7 +1,7 @@
 ###################################################################################################
 #Определения и константы
 ###################################################################################################
-TARGETS := MEDIA.FONT.SOURCES MEDIA.FONT.XFONT MEDIA.FONT.FONT_CONVERTER MEDIA.FONT.TESTS \
+TARGETS := MEDIA.FONT.SOURCES #MEDIA.FONT.XFONT MEDIA.FONT.FONT_CONVERTER MEDIA.FONT.TESTS \
            MEDIA.FONT.IMAGE2XFONT MEDIA.FONT.TTF2XFONT MEDIA.FONT.TTF2XFONT.TESTS
 
 #Цель - MediaLib sources

@@ -1,6 +1,6 @@
 # Compile exports
 export.compile.media.font.INCLUDE_DIRS := include
-export.compile.media.font.IMPORTS      := compile.common
+export.compile.media.font.IMPORTS      := compile.media.image
 
 # Link exports
 export.link.media.font.LIBS           := funner.media.font

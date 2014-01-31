@@ -5,6 +5,14 @@
 
 #include <xtl/functional_fwd>
 
+namespace xtl
+{
+
+//forward declarations
+template <class T> class iterator;
+
+}
+
 namespace media
 {
 
@@ -125,7 +133,7 @@ class FontDesc
     FontDesc (const char* source, IFontDesc* desc, size_t index);
 
   private:
-    struct Impl
+    struct Impl;
     Impl* impl;
 };
 
