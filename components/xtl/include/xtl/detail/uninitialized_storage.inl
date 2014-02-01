@@ -43,6 +43,16 @@ inline uninitialized_storage<T, Allocator>& uninitialized_storage<T, Allocator>:
 }
 
 /*
+    Аллокатор
+*/
+
+template <class T, class Allocator>
+inline typename uninitialized_storage<T, Allocator>::allocator_type uninitialized_storage<T, Allocator>::get_allocator () const
+{
+  return *this;
+}
+
+/*
     Размер буфера / объём буфера (количество доступной памяти)
 */
 

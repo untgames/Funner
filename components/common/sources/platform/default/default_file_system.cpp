@@ -134,7 +134,11 @@ void StdioFileSystem::FileRewind (file_t file)
 
 filepos_t StdioFileSystem::FileSeek (file_t file,filepos_t pos)
 {
+#ifdef _MSC_VER
+  if (_fseeki64 ((FILE*)file,pos,SEEK_SET))
+#else
   if (fseek ((FILE*)file,pos,SEEK_SET))
+#endif
   {
     switch (errno)
     {
@@ -148,7 +152,11 @@ filepos_t StdioFileSystem::FileSeek (file_t file,filepos_t pos)
 
 filepos_t StdioFileSystem::FileTell (file_t file)
 {
-  filepos_t pos = (filepos_t)ftell ((FILE*)file);
+#ifdef _MSC_VER
+  filepos_t pos = _ftelli64 ((FILE*)file);
+#else
+  filepos_t pos = ftell ((FILE*)file);
+#endif
   
   if (pos == -1)
   {
@@ -193,7 +201,11 @@ filesize_t StdioFileSystem::FileSize (file_t file)
 void StdioFileSystem::FileResize (file_t file,filesize_t new_size)
 {
 #if (defined(_WIN32))&&(!defined(WINCE))
+#ifdef _MSC_VER
+  if (_chsize_s (fileno ((FILE*)file),new_size) == -1)
+#else
   if (chsize (fileno ((FILE*)file),new_size) == -1)
+#endif
   {
     switch (errno)
     {

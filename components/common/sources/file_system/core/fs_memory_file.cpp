@@ -50,7 +50,7 @@ MemFileImpl::MemFileImpl (FileImplPtr base_file)
     if (base_file->Mode () & (FileMode_Resize|FileMode_Write))
       throw xtl::format_not_supported_exception ("", "Memory files with FileMode_Resize|FileMode_Write mode not supported");
 
-    size_t buffer_size = base_file->Size ();
+    size_t buffer_size = (size_t)base_file->Size (); //this constructor called only if base file size is less then buffer size, so cast to size_t is safe
 
     impl->buffer.resize (buffer_size);
 
@@ -147,7 +147,10 @@ filesize_t MemFileImpl::Size ()
 
 void MemFileImpl::Resize (filesize_t new_file_size)
 {
-  impl->resize (new_file_size);  
+  if (new_file_size > impl->buffer.get_allocator ().max_size ())
+    throw xtl::format_operation_exception ("common::MemFileImpl::Resize", "Can't resize memory file to %llu", new_file_size);
+
+  impl->resize ((size_t)new_file_size);
 }
 
 bool MemFileImpl::Eof ()

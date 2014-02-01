@@ -1714,9 +1714,12 @@ void FileSystem::LoadTextFile (const char* file_name, string& buffer)
   {
     InputFile file (file_name);
 
-    buffer.resize (file.Size (), ' ');
+    if (file.Size () > buffer.max_size ())
+      throw xtl::format_operation_exception ("", "File too large, can't load to stl::string");
 
-    file.Read (&buffer [0], file.Size ());
+    buffer.resize ((size_t)file.Size (), ' ');
+
+    file.Read (&buffer [0], (size_t)file.Size ());
   }
   catch (xtl::exception& exception)
   {
