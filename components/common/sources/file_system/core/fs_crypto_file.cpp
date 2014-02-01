@@ -170,7 +170,7 @@ struct CryptoFileImpl::Impl
             if (source_file->Seek (data_start_pos) != data_start_pos)
               throw xtl::format_operation_exception ("", "Can't seek file");
 
-            size_t result = source_file->Read (read_write_buffer.data (), available_size);
+            size_t result = source_file->Read (read_write_buffer.data (), (size_t)available_size);
 
             if (result)
             {
