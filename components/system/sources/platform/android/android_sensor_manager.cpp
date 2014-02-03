@@ -12,15 +12,17 @@ struct sensor_handle
   global_ref<jobject>   sensor;
   global_ref<jobject>   event_listener;
   ISensorEventListener* app_listener;
+  jmethodID             reset_reference_method;
   
   sensor_handle (const global_ref<jobject>& in_sensor) : sensor (in_sensor), app_listener ()
   {
     try
     {
-        //получение метода создания слушателя
+        //получение методов создания и удаления слушателя
 
       jmethodID event_listener_class_constructor = find_method (&get_env (), get_context ().sensor_event_listener_class.get (), "<init>", "(JLandroid/content/Context;)V");
 
+      reset_reference_method = find_method (&get_env (), get_context ().sensor_event_listener_class.get (), "resetSensorRef", "()V");
 
         //создание слушателя
 
@@ -40,13 +42,9 @@ struct sensor_handle
   {
     try
     {
-        //получение метода сброса ссылки
-
-      jmethodID event_listener_reset_reference = find_method (&get_env (), get_context ().sensor_event_listener_class.get (), "resetSensorRef", "()V");
-
         //сброс ссылки
 
-      get_env ().CallVoidMethod (event_listener.get (), event_listener_reset_reference);
+      get_env ().CallVoidMethod (event_listener.get (), reset_reference_method);
     }
     catch (...)
     {
