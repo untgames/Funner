@@ -45,6 +45,12 @@ class AndroidPlatformImpl
     {
       try
       {
+        if (!IsFacebookSDKSupported ())
+        {
+          callback (false, OperationStatus_Failure, "", "");
+          return;
+        }
+
         InitSession (app_id);
 
         JNIEnv* env = &get_env ();
@@ -75,11 +81,17 @@ class AndroidPlatformImpl
 
     void CancelLogin ()
     {
+      if (!IsFacebookSDKSupported ())
+        return;
+
       login_handler = social::facebook::DefaultPlatform::PlatformLoginCallback ();
     }
 
     void LogOut ()
     {
+      if (!IsFacebookSDKSupported ())
+        return;
+
       try
       {
         JNIEnv* env = &get_env ();
@@ -96,6 +108,9 @@ class AndroidPlatformImpl
     //Track app install
     void PublishInstall (const char* app_id)
     {
+      if (!IsFacebookSDKSupported ())
+        return;
+
       try
       {
         log.Printf ("Publishing install app event");
@@ -124,7 +139,13 @@ class AndroidPlatformImpl
       jclass session_class_ref = env->FindClass ("com/untgames/funner/facebook_session/SessionImpl");
 
      if (!session_class_ref)
-       throw xtl::format_operation_exception (METHOD_NAME, "Can't find SessionImpl class\n");
+     {
+       if (env->ExceptionOccurred ())
+         env->ExceptionClear ();
+
+       log_error ("Facebook session linked, but SessionImpl class not found. Facebook SDK features not supported.\n");
+       return;
+     }
 
      if (session_class)
        env->DeleteGlobalRef (session_class);
@@ -178,6 +199,12 @@ class AndroidPlatformImpl
     void OnLoginCanceled ()
     {
       login_handler (true, OperationStatus_Canceled, "", "");
+    }
+
+    //Проверка, поддерживается ли Facebook SDK
+    bool IsFacebookSDKSupported ()
+    {
+      return session_class;
     }
 
   private:
