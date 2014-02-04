@@ -2,7 +2,7 @@
 
 using namespace network;
 
-const unsigned short CONNECTION_PORT = 12973;
+const unsigned short CONNECTION_PORT = 12974;
 const char*          MESSAGE1        = "First hello from socket!";
 const char*          MESSAGE2        = "Last hello from socket!";
 

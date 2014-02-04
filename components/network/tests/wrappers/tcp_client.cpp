@@ -14,11 +14,11 @@ int client ()
 
     while (!client.IsClosed ())
     {
-      char receive_buffer [10];
+      char receive_buffer [11];
 
       memset (receive_buffer, 0, sizeof (receive_buffer));
       
-      size_t required_size = sizeof (receive_buffer);
+      size_t required_size = sizeof (receive_buffer) - 1;
           
       if (!client.ReceiveExactly (receive_buffer, required_size, 3000))
       {      

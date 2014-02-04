@@ -71,10 +71,18 @@ struct BackgroundCopyFileData : public xtl::reference_counter
   ~BackgroundCopyFileData ()
   {
     if (!finished)
-    {
-      output_file.Close ();
-      FileSystem::Remove (destination_file_name.c_str ());
-    }
+      OnCopyFailed ();
+  }
+
+  void OnCopyFailed ()
+  {
+    if (finished)
+      return;
+
+    output_file.Close ();
+    FileSystem::Remove (destination_file_name.c_str ());
+
+    finished = true;
   }
 };
 
@@ -131,6 +139,8 @@ void background_copy_file_impl (Action& action, BackgroundCopyFileDataPtr data)
   }
   catch (std::exception& e)
   {
+    data->OnCopyFailed ();
+
     data->copy_state.SetStatus (BackgroundCopyStateStatus_Failed);
     data->copy_state.SetStatusText (e.what ());
     background_copy_file_notify (data->callback, data->thread, data->copy_state);
@@ -138,6 +148,8 @@ void background_copy_file_impl (Action& action, BackgroundCopyFileDataPtr data)
   }
   catch (...)
   {
+    data->OnCopyFailed ();
+
     data->copy_state.SetStatus (BackgroundCopyStateStatus_Failed);
     data->copy_state.SetStatusText ("Unknown exception");
     background_copy_file_notify (data->callback, data->thread, data->copy_state);
