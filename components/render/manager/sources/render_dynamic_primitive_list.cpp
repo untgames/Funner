@@ -580,7 +580,7 @@ class StandaloneLineAndOrientedSpriteDynamicPrimitiveList: public DynamicPrimiti
 
         InvalidateCacheDependencies ();
 
-        return new_verts_count / VERTICES_PER_PRIMITIVE - 1;
+        return base_vertex / VERTICES_PER_PRIMITIVE;
       }
       catch (xtl::exception& e)
       {
@@ -654,6 +654,9 @@ class StandaloneLineAndOrientedSpriteDynamicPrimitiveList: public DynamicPrimiti
 
       memmove (vb.Data () + base_vertex, vb.Data () + base_vertex + verts_count, sizeof (DynamicPrimitiveVertex) * verts_count);
       memmove (ib.Data () + base_index, ib.Data () + base_index + inds_count, sizeof (DynamicPrimitiveIndex) * inds_count);
+
+      vb.Resize (vb.Size () - verts_count);
+      ib.Resize (ib.Size () - inds_count);
 
       need_update_buffers = true;
 
@@ -985,6 +988,153 @@ class StandaloneBillboardSpriteDynamicPrimitiveList: public DynamicPrimitiveList
 
   private:    
     math::vec3f local_up;
+};
+
+/*
+    Batching Oriented Sprites & Lines
+*/
+
+template <class T, class Generator>
+class BatchingLineAndOrientedSpriteDynamicPrimitiveList: public DynamicPrimitiveListMaterialHolder, public DynamicPrimitiveListImpl<T>, private Generator
+{
+  public:
+    typedef typename DynamicPrimitiveListImpl<T>::Item Item;
+
+    enum { VERTICES_PER_PRIMITIVE = Generator::VERTICES_PER_PRIMITIVE, INDICES_PER_PRIMITIVE = Generator::INDICES_PER_PRIMITIVE };
+
+    static const render::low_level::PrimitiveType PRIMITIVE_TYPE = Generator::PRIMITIVE_TYPE;
+
+/// Конструктор
+    BatchingLineAndOrientedSpriteDynamicPrimitiveList (const MaterialManagerPtr& material_manager, const Generator& generator)
+      : DynamicPrimitiveListImplBase (ENTITY_DEPENDENT)
+      , DynamicPrimitiveListStandalonePrimitiveHolder (material_manager, vb_usage, ib_usage, PRIMITIVE_TYPE, ENTITY_DEPENDENT)
+      , DynamicPrimitiveListImpl<T> (ENTITY_DEPENDENT)
+      , Generator (generator)
+    {
+    }
+
+///Создание экземпляра
+    DynamicPrimitive* CreateDynamicPrimitiveInstanceCore ()
+    {
+      throw xtl::format_not_supported_exception ("render::manager::BatchingLineAndOrientedSpriteDynamicPrimitiveList<T>::CreateDynamicPrimitiveInstanceCore", "Dynamic primitives are not supported for this list");
+    }
+
+///Количество примитивов
+    size_t Size () { return vertices.size () / VERTICES_PER_PRIMITIVE; }
+
+///Добавление / обновление примитивов
+    size_t Add (size_t count, const Item* items)
+    {
+      try
+      {
+          //проверка корректности аргументов
+
+        if (!count)
+          return vertices.size () / VERTICES_PER_PRIMITIVE;
+
+        if (!items)
+          throw xtl::make_null_argument_exception ("", "items");      
+
+          //добавление
+
+        size_t new_verts_count = vertices.size () + count * VERTICES_PER_PRIMITIVE, base_vertex = vertices.size ();
+
+        vertices.resize (new_verts_count);
+
+        generate (static_cast<Generator&> (*this), count, items, vertices.data () + base_vertex);
+
+        return base_vertex / VERTICES_PER_PRIMITIVE;
+      }
+      catch (xtl::exception& e)
+      {
+        e.touch ("render::manager::BatchingLineAndOrientedSpriteDynamicPrimitiveList<T>::Add");
+        throw;
+      }
+    }
+
+    void Update (size_t first, size_t count, const Item* src_items)
+    {
+      try
+      {
+          //проверка корректности аргументов
+
+        if (!count)
+          return;
+
+        if (!src_items)
+          throw xtl::make_null_argument_exception ("", "items");
+
+        const size_t current_items_count = vertices.ыize () / VERTICES_PER_PRIMITIVE;
+
+        if (first >= current_items_count)
+          throw xtl::make_range_exception ("", "first", first, current_items_count);
+        
+        if (current_items_count - first < count)
+          throw xtl::make_range_exception ("", "count", count, current_items_count - first);
+
+          //обновление элементов
+
+        size_t base_vertex = first * VERTICES_PER_PRIMITIVE;
+
+        generate (static_cast<Generator&> (*this), count, src_items, vertices.data () + base_vertex);
+      }
+      catch (xtl::exception& e)
+      {
+        e.touch ("render::manager::BatchingLineAndOrientedSpriteDynamicPrimitiveList<T>::Update");
+        throw;
+      }
+    }
+
+///Удаление примитивов
+    void Remove (size_t first, size_t count)
+    {
+      const size_t current_items_count = vertices.size () / VERTICES_PER_PRIMITIVE;
+
+      if (first >= current_items_count)
+        return;
+
+      if (current_items_count - first < count)
+        count = current_items_count - first;
+
+      if (!count)
+        return;
+
+      size_t base_vertex = first * VERTICES_PER_PRIMITIVE,
+             verts_count = count * VERTICES_PER_PRIMITIVE;
+
+      memmove (vertices.data () + base_vertex, vertices.data () + base_vertex + verts_count, sizeof (DynamicPrimitiveVertex) * verts_count);
+
+      vertices.resize (vertices.size () - verts_count);
+    }
+
+    void Clear ()
+    {
+      vertices.resize (0);
+    }
+
+///Резервируемое пространство
+    size_t Capacity () { return vertices.Capacity () / VERTICES_PER_PRIMITIVE; }
+
+    void Reserve (size_t count)
+    {
+      try
+      {
+        const size_t current_capacity = vertices.capacity () / VERTICES_PER_PRIMITIVE;
+
+        vertices.reserve (count * VERTICES_PER_PRIMITIVE);
+      }
+      catch (xtl::exception& e)
+      {
+        e.touch ("render::manager::BatchingLineAndOrientedSpriteDynamicPrimitiveList<T>::Reserve");
+        throw;
+      }      
+    }
+
+  private:
+    typedef xtl::uninitialized_storage<DynamicPrimitiveVertex> VertexArray;
+
+  private:
+    VertexArray vertices;
 };
 
 }
