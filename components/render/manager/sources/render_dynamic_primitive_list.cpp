@@ -46,7 +46,7 @@ struct LineGenerator
 
   static const render::low_level::PrimitiveType PRIMITIVE_TYPE = render::low_level::PrimitiveType_LineList;
 
-  static void Generate (const Line& src_line, size_t base_vertex, DynamicPrimitiveVertex* dst_vertices, DynamicPrimitiveIndex* dst_indices)
+  static void Generate (const Line& src_line, DynamicPrimitiveVertex* dst_vertices)
   {
     DynamicPrimitiveVertex* dst_vertex = dst_vertices;
     const LinePoint*        src_point  = src_line.point;
@@ -56,7 +56,10 @@ struct LineGenerator
       dst_vertex->color     = src_point->color;
       dst_vertex->tex_coord = src_point->tex_offset;
     }
+  }
 
+  static void Generate (size_t base_vertex, DynamicPrimitiveIndex* dst_indices)
+  {
     dst_indices [0] = base_vertex;
     dst_indices [1] = base_vertex + 1;
   }
@@ -64,13 +67,17 @@ struct LineGenerator
 
 struct StandaloneLineGenerator: public LineGenerator
 {
-  static void Generate (const Line& src_line, size_t base_vertex, DynamicPrimitiveVertex* dst_vertices, DynamicPrimitiveIndex* dst_indices)
+  using LineGenerator::Generate;
+
+  static void Generate (const Line& src_line, DynamicPrimitiveVertex* dst_vertices)
   {
     DynamicPrimitiveVertex* dst_vertex = dst_vertices;
     const LinePoint*        src_point  = src_line.point;
 
     for (size_t i=0; i<VERTICES_PER_PRIMITIVE; i++, dst_vertex++, src_point++)
       dst_vertex->position = src_point->position;
+
+    LineGenerator::Generate (src_line, dst_vertices);
   }
 };
 
@@ -82,13 +89,17 @@ class BatchingLineGenerator: public LineGenerator
     {
     }
 
-    void Generate (const Line& src_line, size_t base_vertex, DynamicPrimitiveVertex* dst_vertices, DynamicPrimitiveIndex* dst_indices)
+    using LineGenerator::Generate;
+
+    void Generate (const Line& src_line, DynamicPrimitiveVertex* dst_vertices)
     {
       DynamicPrimitiveVertex* dst_vertex = dst_vertices;
       const LinePoint*        src_point  = src_line.point;
 
       for (size_t i=0; i<VERTICES_PER_PRIMITIVE; i++, dst_vertex++, src_point++)
         dst_vertex->position = world_tm * src_point->position;
+
+      LineGenerator::Generate (src_line, dst_vertices);
     }
 
   private:
@@ -108,7 +119,7 @@ struct SpriteGenerator
 
   static const render::low_level::PrimitiveType PRIMITIVE_TYPE = render::low_level::PrimitiveType_TriangleList;
 
-  static void Generate (const Sprite& src_sprite, const math::vec3f& normal, size_t base_vertex, DynamicPrimitiveVertex* dst_vertices, DynamicPrimitiveIndex* dst_indices)
+  static void Generate (const Sprite& src_sprite, const math::vec3f& normal, DynamicPrimitiveVertex* dst_vertices)
   {
     DynamicPrimitiveVertex* dst_vertex = dst_vertices;
 
@@ -122,7 +133,10 @@ struct SpriteGenerator
     dst_vertices [1].tex_coord = src_sprite.tex_offset + math::vec2f (src_sprite.tex_size.x, 0);
     dst_vertices [2].tex_coord = src_sprite.tex_offset + src_sprite.tex_size;
     dst_vertices [3].tex_coord = src_sprite.tex_offset + math::vec2f (0, src_sprite.tex_size.y);
+  }
 
+  static void Generate (size_t base_vertex, DynamicPrimitiveIndex* dst_indices)
+  {
     static const DynamicPrimitiveIndex indices [INDICES_PER_PRIMITIVE] = {0, 2, 3, 0, 1, 2};
 
     const DynamicPrimitiveIndex* src_index = indices;
@@ -144,7 +158,9 @@ class BillboardSpriteGenerator: public SpriteGenerator
     {
     }
 
-    void Generate (const BillboardSprite& src_sprite, size_t base_vertex, DynamicPrimitiveVertex* dst_vertices, DynamicPrimitiveIndex* dst_indices)
+    using SpriteGenerator::Generate;
+
+    void Generate (const BillboardSprite& src_sprite, DynamicPrimitiveVertex* dst_vertices)
     {
       math::vec3f ortx = right * src_sprite.size.x * 0.5f,
                   orty = up * src_sprite.size.y * 0.5f;
@@ -154,7 +170,7 @@ class BillboardSpriteGenerator: public SpriteGenerator
       dst_vertices [2].position = world_tm * (src_sprite.position + ortx + orty);
       dst_vertices [3].position = world_tm * (src_sprite.position - ortx + orty);
 
-      SpriteGenerator::Generate (src_sprite, world_normal, base_vertex, dst_vertices, dst_indices);
+      SpriteGenerator::Generate (src_sprite, world_normal, dst_vertices);
     }
 
   private:
@@ -172,7 +188,9 @@ class StandaloneOrientedSpriteGenerator: public SpriteGenerator
     {
     }
 
-    void Generate (const OrientedSprite& src_sprite, size_t base_vertex, DynamicPrimitiveVertex* dst_vertices, DynamicPrimitiveIndex* dst_indices)
+    using SpriteGenerator::Generate;
+
+    void Generate (const OrientedSprite& src_sprite, DynamicPrimitiveVertex* dst_vertices)
     {
       math::vec3f ortx = cross (up, src_sprite.normal);
 
@@ -189,7 +207,7 @@ class StandaloneOrientedSpriteGenerator: public SpriteGenerator
       dst_vertices [2].position = src_sprite.position + ortx + orty;
       dst_vertices [3].position = src_sprite.position - ortx + orty;
 
-      SpriteGenerator::Generate (src_sprite, src_sprite.normal, base_vertex, dst_vertices, dst_indices);
+      SpriteGenerator::Generate (src_sprite, src_sprite.normal, dst_vertices);
     }
 
   private:
@@ -205,7 +223,9 @@ class BatchingOrientedSpriteGenerator: public SpriteGenerator
     {
     }
 
-    void Generate (const OrientedSprite& src_sprite, size_t base_vertex, DynamicPrimitiveVertex* dst_vertices, DynamicPrimitiveIndex* dst_indices)
+    using SpriteGenerator::Generate;
+
+    void Generate (const OrientedSprite& src_sprite, DynamicPrimitiveVertex* dst_vertices)
     {
       math::vec3f ortx = cross (up, src_sprite.normal);
 
@@ -222,7 +242,7 @@ class BatchingOrientedSpriteGenerator: public SpriteGenerator
       dst_vertices [2].position = world_tm * (src_sprite.position + ortx + orty);
       dst_vertices [3].position = world_tm * (src_sprite.position - ortx + orty);
 
-      SpriteGenerator::Generate (src_sprite, src_sprite.normal, base_vertex, dst_vertices, dst_indices);
+      SpriteGenerator::Generate (src_sprite, src_sprite.normal, dst_vertices);
     }
 
   private:
@@ -236,12 +256,38 @@ inline void generate (Generator& generator, size_t items_count, const Item* item
 {
   while (items_count--)
   {
-    generator.Generate (*item, base_vertex, dst_vertex, dst_index);
+    generator.Generate (*item, dst_vertex);
+    generator.Generate (base_vertex, dst_index);
 
     item++;
     
     base_vertex += Generator::VERTICES_PER_PRIMITIVE;
     dst_vertex  += Generator::VERTICES_PER_PRIMITIVE;
+    dst_index   += Generator::INDICES_PER_PRIMITIVE;
+  }
+}
+
+template <class Generator, class Item>
+inline void generate (Generator& generator, size_t items_count, const Item* item, DynamicPrimitiveVertex* dst_vertex)
+{
+  while (items_count--)
+  {
+    generator.Generate (*item, dst_vertex);
+
+    item++;
+    
+    dst_vertex += Generator::VERTICES_PER_PRIMITIVE;
+  }
+}
+
+template <class Generator, class Item>
+inline void generate (Generator& generator, size_t items_count, size_t base_vertex, DynamicPrimitiveIndex* dst_index)
+{
+  while (items_count--)
+  {
+    generator.Generate (base_vertex, dst_index);
+   
+    base_vertex += Generator::VERTICES_PER_PRIMITIVE;
     dst_index   += Generator::INDICES_PER_PRIMITIVE;
   }
 }
