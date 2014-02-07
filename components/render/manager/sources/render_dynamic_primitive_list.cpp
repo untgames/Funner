@@ -205,7 +205,7 @@ inline void generate (Generator& generator, size_t items_count, const Item* item
   }
 }
 
-template <class Generator, class Item>
+template <class Generator>
 inline void generate (Generator& generator, size_t items_count, size_t base_vertex, DynamicPrimitiveIndex* dst_index)
 {
   while (items_count--)
@@ -963,8 +963,10 @@ class BatchingLineAndOrientedSpriteDynamicPrimitiveList: public DynamicPrimitive
 
               //выделение индексов
 
-            DynamicPrimitiveIndex*             indices      = batching_manager->AllocateDynamicIndices (IndexPoolType_Temporary);
-            const DynamicPrimitiveIndex const* indices_base = batching_manager->TempIndexBuffer ();
+            size_t inds_count = prototype->Size () * INDICES_PER_PRIMITIVE;
+
+            DynamicPrimitiveIndex*               indices      = batching_manager->AllocateDynamicIndices (IndexPoolType_Temporary, inds_count);
+            const DynamicPrimitiveIndex * const* indices_base = batching_manager->TempIndexBuffer ();
 
               //формирование примитива
 
@@ -973,11 +975,11 @@ class BatchingLineAndOrientedSpriteDynamicPrimitiveList: public DynamicPrimitive
             memset (&cached_primitive, 0, sizeof (cached_primitive));
             
             cached_primitive.material         = prototype->CachedMaterial ();
-            cached_primitive.state_block      = prototype->StateBlock ();
+            cached_primitive.state_block      = &*prototype->StateBlock ();
             cached_primitive.indexed          = true;
             cached_primitive.type             = PRIMITIVE_TYPE;
             cached_primitive.first            = indices - *indices_base;
-            cached_primitive.count            = prototype->Size () * INDICES_PER_PRIMITIVE;
+            cached_primitive.count            = inds_count;
             cached_primitive.base_vertex      = 0;
             cached_primitive.tags_count       = cached_primitive.material ? cached_primitive.material->TagsCount () : 0;
             cached_primitive.tags             = cached_primitive.material ? cached_primitive.material->Tags () : (const size_t*)0;
@@ -1035,7 +1037,15 @@ class BatchingLineAndOrientedSpriteDynamicPrimitiveList: public DynamicPrimitive
 ///Создание экземпляра
     DynamicPrimitive* CreateDynamicPrimitiveInstanceCore ()
     {
-      throw xtl::format_not_supported_exception ("render::manager::BatchingLineAndOrientedSpriteDynamicPrimitiveList<T>::CreateDynamicPrimitiveInstanceCore", "Dynamic primitives are not supported for this list");
+      try
+      {
+        return new Instance (this);
+      }
+      catch (xtl::exception& e)
+      {
+        e.touch ("render::manager::BatchingLineAndOrientedSpriteDynamicPrimitiveList<T>::CreateDynamicPrimitiveInstanceCore");
+        throw;
+      }
     }
 
 ///Количество примитивов
@@ -1162,7 +1172,7 @@ class BatchingLineAndOrientedSpriteDynamicPrimitiveList: public DynamicPrimitive
 /// Вершины
     size_t VerticesCount () { return vertices.size (); }
 
-    const DynamicPrimitiveVertex* Vertices () { return vertices.empty () ? (DynamicPrimitiveVertex*)0 : &vertices [0]; }
+    const DynamicPrimitiveVertex* Vertices () { return vertices.data (); }
 
 /// Сброс кэша
     void ResetCacheCore ()
