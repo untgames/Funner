@@ -395,7 +395,7 @@ void EffectRenderer::AddOperations
 
       if (range.first != range.second && dynamic_primitive)
       {
-        dynamic_primitive->UpdateOnPrerender (current_frame_id);
+        dynamic_primitive->UpdateOnPrerender (current_frame_id, *operation->entity);
 
         if (dynamic_primitive->IsFrameDependent ())
         {

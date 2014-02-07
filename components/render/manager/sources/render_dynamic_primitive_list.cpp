@@ -53,8 +53,10 @@ struct LineGenerator
 
     for (size_t i=0; i<VERTICES_PER_PRIMITIVE; i++, dst_vertex++, src_point++)
     {
+      dst_vertex->position  = src_point->position;
       dst_vertex->color     = src_point->color;
       dst_vertex->tex_coord = src_point->tex_offset;
+      dst_vertex->normal    = math::vec3f (0, 0, 1.0f);
     }
   }
 
@@ -63,47 +65,6 @@ struct LineGenerator
     dst_indices [0] = base_vertex;
     dst_indices [1] = base_vertex + 1;
   }
-};
-
-struct StandaloneLineGenerator: public LineGenerator
-{
-  using LineGenerator::Generate;
-
-  static void Generate (const Line& src_line, DynamicPrimitiveVertex* dst_vertices)
-  {
-    DynamicPrimitiveVertex* dst_vertex = dst_vertices;
-    const LinePoint*        src_point  = src_line.point;
-
-    for (size_t i=0; i<VERTICES_PER_PRIMITIVE; i++, dst_vertex++, src_point++)
-      dst_vertex->position = src_point->position;
-
-    LineGenerator::Generate (src_line, dst_vertices);
-  }
-};
-
-class BatchingLineGenerator: public LineGenerator
-{
-  public:
-    BatchingLineGenerator (const math::mat4f& in_world_tm)
-      : world_tm (in_world_tm)
-    {
-    }
-
-    using LineGenerator::Generate;
-
-    void Generate (const Line& src_line, DynamicPrimitiveVertex* dst_vertices)
-    {
-      DynamicPrimitiveVertex* dst_vertex = dst_vertices;
-      const LinePoint*        src_point  = src_line.point;
-
-      for (size_t i=0; i<VERTICES_PER_PRIMITIVE; i++, dst_vertex++, src_point++)
-        dst_vertex->position = world_tm * src_point->position;
-
-      LineGenerator::Generate (src_line, dst_vertices);
-    }
-
-  private:
-    const math::mat4f& world_tm;
 };
 
 /*
@@ -180,10 +141,10 @@ class BillboardSpriteGenerator: public SpriteGenerator
     math::vec3f        up;
 };
 
-class StandaloneOrientedSpriteGenerator: public SpriteGenerator
+class OrientedSpriteGenerator: public SpriteGenerator
 {
   public:
-    StandaloneOrientedSpriteGenerator (const math::vec3f& local_up)
+    OrientedSpriteGenerator (const math::vec3f& local_up)
       : up (local_up)
     {
     }
@@ -211,42 +172,6 @@ class StandaloneOrientedSpriteGenerator: public SpriteGenerator
     }
 
   private:
-    const math::vec3f& up;    
-};
-
-class BatchingOrientedSpriteGenerator: public SpriteGenerator
-{
-  public:
-    BatchingOrientedSpriteGenerator (const math::vec3f& local_up, const math::mat4f& in_world_tm)
-      : world_tm (in_world_tm)
-      , up (local_up)
-    {
-    }
-
-    using SpriteGenerator::Generate;
-
-    void Generate (const OrientedSprite& src_sprite, DynamicPrimitiveVertex* dst_vertices)
-    {
-      math::vec3f ortx = cross (up, src_sprite.normal);
-
-      if (src_sprite.rotation != math::anglef ())
-        ortx = math::rotate (src_sprite.rotation, src_sprite.normal) * math::vec4f (ortx, 0);
-
-      math::vec3f orty = cross (src_sprite.normal, ortx);
-
-      ortx *= src_sprite.size.x * 0.5f;
-      orty *= src_sprite.size.y * 0.5f;
-
-      dst_vertices [0].position = world_tm * (src_sprite.position - ortx - orty);
-      dst_vertices [1].position = world_tm * (src_sprite.position + ortx - orty);
-      dst_vertices [2].position = world_tm * (src_sprite.position + ortx + orty);
-      dst_vertices [3].position = world_tm * (src_sprite.position - ortx + orty);
-
-      SpriteGenerator::Generate (src_sprite, src_sprite.normal, dst_vertices);
-    }
-
-  private:
-    const math::mat4f& world_tm;
     const math::vec3f& up;    
 };
 
@@ -940,7 +865,7 @@ class StandaloneBillboardSpriteDynamicPrimitiveList: public DynamicPrimitiveList
 
   private:
 ///Обновление
-    void UpdateOnPrerenderCore () {}
+    void UpdateOnPrerenderCore (EntityImpl&) {}
 
     void UpdateOnRenderCore (FrameImpl& frame, EntityImpl& entity, RenderingContext& context, const math::mat4f& mvp_matrix)
     {
@@ -1004,12 +929,106 @@ class BatchingLineAndOrientedSpriteDynamicPrimitiveList: public DynamicPrimitive
 
     static const render::low_level::PrimitiveType PRIMITIVE_TYPE = Generator::PRIMITIVE_TYPE;
 
+/// Экземпляр списка примитивов
+    class Instance: public DynamicPrimitive, private render::manager::RendererPrimitiveGroup
+    {
+      public:
+        typedef xtl::intrusive_ptr<BatchingLineAndOrientedSpriteDynamicPrimitiveList> PrototypePtr;
+
 /// Конструктор
-    BatchingLineAndOrientedSpriteDynamicPrimitiveList (const MaterialManagerPtr& material_manager, const Generator& generator)
+        Instance (const PrototypePtr& in_prototype)
+          : DynamicPrimitive (*this, DynamicPrimitiveFlag_EntityDependent)
+          , prototype (in_prototype)
+          , batching_manager (prototype->batching_manager)
+        {
+          primitives_count = 1;
+          primitives       = &cached_primitive;
+        }
+
+      private:
+///Обновление
+        void UpdateOnPrerenderCore (EntityImpl& entity)
+        {
+          try
+          {
+              //обновление кэша
+
+            prototype->UpdateCache ();
+
+              //выделение вершин
+
+            size_t base_vertex = 0, verts_count = prototype->VerticesCount ();
+
+            DynamicPrimitiveVertex* vertices = batching_manager->AllocateDynamicVertices (verts_count, &base_vertex);              
+
+              //выделение индексов
+
+            DynamicPrimitiveIndex*             indices      = batching_manager->AllocateDynamicIndices (IndexPoolType_Temporary);
+            const DynamicPrimitiveIndex const* indices_base = batching_manager->TempIndexBuffer ();
+
+              //формирование примитива
+
+              //TODO: кэшировать статические поля
+
+            memset (&cached_primitive, 0, sizeof (cached_primitive));
+            
+            cached_primitive.material         = prototype->CachedMaterial ();
+            cached_primitive.state_block      = prototype->StateBlock ();
+            cached_primitive.indexed          = true;
+            cached_primitive.type             = PRIMITIVE_TYPE;
+            cached_primitive.first            = indices - *indices_base;
+            cached_primitive.count            = prototype->Size () * INDICES_PER_PRIMITIVE;
+            cached_primitive.base_vertex      = 0;
+            cached_primitive.tags_count       = cached_primitive.material ? cached_primitive.material->TagsCount () : 0;
+            cached_primitive.tags             = cached_primitive.material ? cached_primitive.material->Tags () : (const size_t*)0;
+            cached_primitive.dynamic_indices  = indices_base;
+            cached_primitive.batching_manager = &*batching_manager;
+
+              //формирование вершин и индексов
+
+            if (!indices || !vertices)
+            {
+              cached_primitive.count = 0;
+              return;
+            }
+
+            generate (static_cast<Generator&> (*prototype), prototype->Size (), base_vertex, indices);
+
+            const math::mat4f& world_tm = entity.WorldMatrix ();
+              
+            const DynamicPrimitiveVertex* src_vert = prototype->Vertices ();
+            DynamicPrimitiveVertex*       dst_vert = vertices;
+
+              //TODO: кэшировать вершины (копировать, если не изменялись)
+
+            for (size_t count=verts_count; count--; src_vert++, dst_vert++)
+            {
+              dst_vert->position = world_tm * src_vert->position;
+              dst_vert->normal   = world_tm * math::vec4f (src_vert->normal, 0.0f);
+            }
+          }
+          catch (xtl::exception& e)
+          {
+            e.touch ("render::manager::BatchingLineAndOrientedSpriteDynamicPrimitiveList::Instance::UpdateOnPrerenderCore");
+            throw;
+          }
+        }
+
+        void UpdateOnRenderCore (FrameImpl& frame, EntityImpl& entity, RenderingContext& context, const math::mat4f& mvp_matrix) {}
+
+      private:
+        PrototypePtr                       prototype;
+        BatchingManagerPtr                 batching_manager;
+        render::manager::RendererPrimitive cached_primitive;
+    };
+
+/// Конструктор
+    BatchingLineAndOrientedSpriteDynamicPrimitiveList (const BatchingManagerPtr& in_batching_manager, const MaterialManagerPtr& material_manager, const Generator& generator)
       : DynamicPrimitiveListImplBase (ENTITY_DEPENDENT)
-      , DynamicPrimitiveListStandalonePrimitiveHolder (material_manager, vb_usage, ib_usage, PRIMITIVE_TYPE, ENTITY_DEPENDENT)
+      , DynamicPrimitiveListMaterialHolder (material_manager, ENTITY_DEPENDENT)
       , DynamicPrimitiveListImpl<T> (ENTITY_DEPENDENT)
       , Generator (generator)
+      , batching_manager (in_batching_manager)
     {
     }
 
@@ -1064,7 +1083,7 @@ class BatchingLineAndOrientedSpriteDynamicPrimitiveList: public DynamicPrimitive
         if (!src_items)
           throw xtl::make_null_argument_exception ("", "items");
 
-        const size_t current_items_count = vertices.ыize () / VERTICES_PER_PRIMITIVE;
+        const size_t current_items_count = vertices.size () / VERTICES_PER_PRIMITIVE;
 
         if (first >= current_items_count)
           throw xtl::make_range_exception ("", "first", first, current_items_count);
@@ -1113,7 +1132,7 @@ class BatchingLineAndOrientedSpriteDynamicPrimitiveList: public DynamicPrimitive
     }
 
 ///Резервируемое пространство
-    size_t Capacity () { return vertices.Capacity () / VERTICES_PER_PRIMITIVE; }
+    size_t Capacity () { return vertices.capacity () / VERTICES_PER_PRIMITIVE; }
 
     void Reserve (size_t count)
     {
@@ -1131,10 +1150,55 @@ class BatchingLineAndOrientedSpriteDynamicPrimitiveList: public DynamicPrimitive
     }
 
   private:
+/// Блок состояния
+    LowLevelStateBlockPtr StateBlock ()
+    {
+      if (cached_state_block)
+        return cached_state_block->StateBlock ();
+
+      return LowLevelStateBlockPtr ();      
+    }    
+
+/// Вершины
+    size_t VerticesCount () { return vertices.size (); }
+
+    const DynamicPrimitiveVertex* Vertices () { return vertices.empty () ? (DynamicPrimitiveVertex*)0 : &vertices [0]; }
+
+/// Сброс кэша
+    void ResetCacheCore ()
+    {
+      DynamicPrimitiveListMaterialHolder::ResetCacheCore ();
+
+      cached_state_block = BatchStateBlockPtr ();      
+    }   
+
+/// Обновление кэша
+    void UpdateCacheCore ()
+    {
+      try
+      {
+        cached_state_block = BatchStateBlockPtr ();
+
+        DynamicPrimitiveListMaterialHolder::UpdateCacheCore ();
+
+        MaterialImpl* cached_material = CachedMaterial ();
+          
+        cached_state_block = cached_material ? batching_manager->GetStateBlock (cached_material) : BatchStateBlockPtr ();
+      }
+      catch (xtl::exception& e)
+      {
+        e.touch ("render::manager::BatchingLineAndOrientedSpriteDynamicPrimitiveList::UpdateCacheCore");
+        throw;
+      }
+    }
+
+  private:
     typedef xtl::uninitialized_storage<DynamicPrimitiveVertex> VertexArray;
 
   private:
-    VertexArray vertices;
+    BatchingManagerPtr batching_manager;
+    VertexArray        vertices;
+    BatchStateBlockPtr cached_state_block;
 };
 
 }
@@ -1151,17 +1215,27 @@ namespace manager
 
 LineListImpl* create_standalone_line_list (const MaterialManagerPtr& material_manager, MeshBufferUsage vb_usage, MeshBufferUsage ib_usage)
 {
-  return new StandaloneLineAndOrientedSpriteDynamicPrimitiveList<Line, StandaloneLineGenerator> (material_manager, vb_usage, ib_usage, StandaloneLineGenerator ());
+  return new StandaloneLineAndOrientedSpriteDynamicPrimitiveList<Line, LineGenerator> (material_manager, vb_usage, ib_usage, LineGenerator ());
 }
 
 OrientedSpriteListImpl* create_standalone_oriented_sprite_list (const MaterialManagerPtr& material_manager, const math::vec3f& up, MeshBufferUsage vb_usage, MeshBufferUsage ib_usage)
 {
-  return new StandaloneLineAndOrientedSpriteDynamicPrimitiveList<OrientedSprite, StandaloneOrientedSpriteGenerator> (material_manager, vb_usage, ib_usage, StandaloneOrientedSpriteGenerator (up));
+  return new StandaloneLineAndOrientedSpriteDynamicPrimitiveList<OrientedSprite, OrientedSpriteGenerator> (material_manager, vb_usage, ib_usage, OrientedSpriteGenerator (up));
 }
 
 BillboardSpriteListImpl* create_standalone_billboard_sprite_list (const MaterialManagerPtr& material_manager, const math::vec3f& up, MeshBufferUsage vb_usage, MeshBufferUsage ib_usage)
 {
   return new StandaloneBillboardSpriteDynamicPrimitiveList (material_manager, up, vb_usage, ib_usage);
+}
+
+LineListImpl* create_batching_line_list (const BatchingManagerPtr& batching_manager, const MaterialManagerPtr& material_manager)
+{
+  return new BatchingLineAndOrientedSpriteDynamicPrimitiveList<Line, LineGenerator> (batching_manager, material_manager, LineGenerator ());
+}
+
+OrientedSpriteListImpl* create_batching_oriented_sprite_list (const BatchingManagerPtr& batching_manager, const MaterialManagerPtr& material_manager, const math::vec3f& up)
+{
+  return new BatchingLineAndOrientedSpriteDynamicPrimitiveList<OrientedSprite, OrientedSpriteGenerator> (batching_manager, material_manager, OrientedSpriteGenerator (up));
 }
 
 }

@@ -78,6 +78,8 @@ template <class T> class DynamicPrimitiveListImpl: virtual public DynamicPrimiti
 LineListImpl*            create_standalone_line_list             (const MaterialManagerPtr&, MeshBufferUsage vb_usage, MeshBufferUsage ib_usage);
 OrientedSpriteListImpl*  create_standalone_oriented_sprite_list  (const MaterialManagerPtr&, const math::vec3f& up, MeshBufferUsage vb_usage, MeshBufferUsage ib_usage);
 BillboardSpriteListImpl* create_standalone_billboard_sprite_list (const MaterialManagerPtr&, const math::vec3f& up, MeshBufferUsage vb_usage, MeshBufferUsage ib_usage);
+LineListImpl*            create_batching_line_list               (const BatchingManagerPtr&, const MaterialManagerPtr&);
+OrientedSpriteListImpl*  create_batching_oriented_sprite_list    (const BatchingManagerPtr&, const MaterialManagerPtr&, const math::vec3f& up);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Реализация

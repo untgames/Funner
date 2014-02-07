@@ -38,7 +38,6 @@ struct RendererPrimitive
   size_t                              tags_count;       //количество тэгов материала
   const size_t*                       tags;             //тэги материала
   const DynamicPrimitiveIndex* const* dynamic_indices;  //указатель на массив динамических индексов
-  size_t                              base_index;       //номер первого динамического индекса
   BatchingManager*                    batching_manager; //менеджер упаковки
 };
 
