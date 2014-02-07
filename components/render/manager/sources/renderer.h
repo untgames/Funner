@@ -4,6 +4,7 @@ class ProgramParametersLayout;
 class DynamicPrimitive;
 class ShaderOptionsCache;
 class RectAreaImpl;
+class BatchingManager;
 
 template <class T> class DynamicPrimitiveBuffer;
 
@@ -27,17 +28,18 @@ typedef DynamicPrimitiveBuffer<DynamicPrimitiveVertex> DynamicVertexBuffer;
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 struct RendererPrimitive
 {
-  MaterialImpl*                    material;        //материал
-  render::low_level::IStateBlock*  state_block;     //блок состояний примитива
-  bool                             indexed;         //является ли данный примитив индексированным или состоящим только из вершин без индексов
-  render::low_level::PrimitiveType type;            //тип примитива
-  size_t                           first;           //индекс первой вершины/индекса
-  size_t                           count;           //количество примитивов
-  size_t                           base_vertex;     //индекс базовой вершины
-  size_t                           tags_count;      //количество тэгов материала
-  const size_t*                    tags;            //тэги материала
-  const DynamicPrimitiveIndex*     dynamic_indices; //динамические индексы
-  DynamicIndexBuffer*              dynamic_ib;      //динамический индексный буфер  
+  MaterialImpl*                       material;         //материал
+  render::low_level::IStateBlock*     state_block;      //блок состояний примитива
+  bool                                indexed;          //является ли данный примитив индексированным или состоящим только из вершин без индексов
+  render::low_level::PrimitiveType    type;             //тип примитива
+  size_t                              first;            //индекс первой вершины/индекса
+  size_t                              count;            //количество примитивов
+  size_t                              base_vertex;      //индекс базовой вершины
+  size_t                              tags_count;       //количество тэгов материала
+  const size_t*                       tags;             //тэги материала
+  const DynamicPrimitiveIndex* const* dynamic_indices;  //указатель на массив динамических индексов
+  size_t                              base_index;       //номер первого динамического индекса
+  BatchingManager*                    batching_manager; //менеджер упаковки
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

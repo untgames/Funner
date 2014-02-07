@@ -193,8 +193,8 @@ class Primitive
 ///Работа со спрайтами
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     size_t              SpriteListsCount                 () const;
-    BillboardSpriteList AddStandaloneBillboardSpriteList (const math::vec3f& up, MeshBufferUsage vb_usage = MeshBufferUsage_Default,  MeshBufferUsage ib_usage = MeshBufferUsage_Default);
-    OrientedSpriteList  AddStandaloneOrientedSpriteList  (const math::vec3f& up, MeshBufferUsage vb_usage = MeshBufferUsage_Default,  MeshBufferUsage ib_usage = MeshBufferUsage_Default);
+    BillboardSpriteList AddStandaloneBillboardSpriteList (const math::vec3f& up, MeshBufferUsage vb_usage = MeshBufferUsage_Default, MeshBufferUsage ib_usage = MeshBufferUsage_Default);
+    OrientedSpriteList  AddStandaloneOrientedSpriteList  (const math::vec3f& up, MeshBufferUsage vb_usage = MeshBufferUsage_Default, MeshBufferUsage ib_usage = MeshBufferUsage_Default);
     BillboardSpriteList AddBatchingBillboardSpriteList   (const math::vec3f& up);
     OrientedSpriteList  AddBatchingOrientedSpriteList    (const math::vec3f& up);
     void                RemoveSpriteList                 (OrientedSpriteList&);
@@ -205,7 +205,7 @@ class Primitive
 ///Работа с линиями
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     size_t   LineListsCount        () const;
-    LineList AddStandaloneLineList (MeshBufferUsage vb_usage = MeshBufferUsage_Default,  MeshBufferUsage ib_usage = MeshBufferUsage_Default);
+    LineList AddStandaloneLineList (MeshBufferUsage vb_usage = MeshBufferUsage_Default, MeshBufferUsage ib_usage = MeshBufferUsage_Default);
     LineList AddBatchingLineList   ();
     void     RemoveLineList        (LineList&);
     void     RemoveAllLineLists    ();

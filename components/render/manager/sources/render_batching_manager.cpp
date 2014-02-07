@@ -134,6 +134,9 @@ template <class T> class Pool: public xtl::noncopyable
 /// Конструктор
     Pool () : start (), pos (), end () {}
 
+/// Начало буфера
+    T* const* DataStart () { return &start; }
+
 /// Выделение
     T* Allocate (size_t count)
     {
@@ -185,13 +188,17 @@ typedef stl::hash_map<MaterialImpl*, BatchStateBlockEntry> StateBlockMap;
 
 }
 
+typedef xtl::uninitialized_storage<DynamicPrimitiveIndex> IndexArray;
+
 struct BatchingManager::Impl: public Cache
 {
   DeviceManagerPtr                      device_manager;       //менеджер устройства отрисовки
   render::manager::DynamicVertexBuffer  dynamic_vb;           //динамический вершинный буфер
   render::manager::DynamicIndexBuffer   dynamic_ib;           //динамический индексный буфер
+  IndexArray                            temp_ib;              //временный индексный буфер
   DynamicVertexPool                     dynamic_vertex_pool;  //пул динамических вершин
   DynamicIndexPool                      dynamic_index_pool;   //пул динамических индексов
+  DynamicIndexPool                      temp_index_pool;      //пул динамических индексов для построения примитивов
   StateBlockMap                         state_blocks;         //блоки состояний
 
 /// Конструктор
@@ -210,12 +217,14 @@ struct BatchingManager::Impl: public Cache
     {
       dynamic_vb.Reserve (vertices_count);
       dynamic_ib.Reserve (indices_count);
+      temp_ib.reserve (indices_count);
 
       dynamic_vb.SyncBuffers (device_manager->Device ());
       dynamic_ib.SyncBuffers (device_manager->Device ());
 
       dynamic_vertex_pool.Reset (dynamic_vb.Data (), vertices_count, true);
       dynamic_index_pool.Reset (dynamic_ib.Data (), indices_count, true);
+      temp_index_pool.Reset (temp_ib.data (), indices_count, true);
     }
     catch (xtl::exception& e)
     {
@@ -305,6 +314,11 @@ render::manager::DynamicIndexBuffer& BatchingManager::DynamicIndexBuffer ()
   return impl->dynamic_ib;
 }
 
+const DynamicPrimitiveIndex* const* BatchingManager::TempIndexBuffer ()
+{
+  return impl->temp_index_pool.DataStart ();
+}
+
 /*
     Выделение вершин и индексов
 */
@@ -338,34 +352,62 @@ DynamicPrimitiveVertex* BatchingManager::AllocateDynamicVertices (size_t count, 
   return result;
 }
 
-DynamicPrimitiveIndex* BatchingManager::AllocateDynamicIndices (size_t count)
+DynamicPrimitiveIndex* BatchingManager::AllocateDynamicIndices (IndexPoolType pool_type, size_t count)
 {
-  DynamicPrimitiveIndex* result = impl->dynamic_index_pool.Allocate (count);
+  switch (pool_type)
+  {
+    case IndexPoolType_Linear:
+    {
+      DynamicPrimitiveIndex* result = impl->dynamic_index_pool.Allocate (count);
 
-  if (result)
-    return result;
+      if (result)
+        return result;
 
-  impl->dynamic_ib.Reserve (impl->dynamic_ib.Capacity () * 2);
+      impl->dynamic_ib.Reserve (impl->dynamic_ib.Capacity () * 2);
 
-  InvalidateCacheDependencies ();
+      InvalidateCacheDependencies ();
 
-  impl->dynamic_index_pool.Reset (impl->dynamic_ib.Data (), impl->dynamic_ib.Size (), true);
+      impl->dynamic_index_pool.Reset (impl->dynamic_ib.Data (), impl->dynamic_ib.Size (), true);
 
-  result = impl->dynamic_index_pool.Allocate (count);
+      result = impl->dynamic_index_pool.Allocate (count);
 
-  if (!result)
-    return 0;
+      if (!result)
+        return 0;
 
-  return result;
+      return result;
+    }
+    case IndexPoolType_Temporary: 
+    {
+      DynamicPrimitiveIndex* result = impl->temp_index_pool.Allocate (count);
+
+      if (result)
+        return result;
+
+      impl->temp_ib.reserve (impl->temp_ib.capacity () * 2);
+
+      impl->temp_index_pool.Reset (impl->temp_ib.data (), impl->temp_ib.size (), true);
+
+      result = impl->temp_index_pool.Allocate (count);
+
+      if (!result)
+        return 0;
+
+      return result;
+    }
+    default:
+      throw xtl::make_argument_exception ("render::manager::BatchingManager::AllocateDynamicIndices", "pool_type", pool_type);
+  }  
 }
 
 void BatchingManager::ResetDynamicBuffers ()
 {
   impl->dynamic_vb.Clear ();
   impl->dynamic_ib.Clear ();
+  impl->temp_ib.resize (0, false);
 
   impl->dynamic_vertex_pool.Reset (impl->dynamic_vb.Data (), impl->dynamic_vb.Size (), false);
   impl->dynamic_index_pool.Reset (impl->dynamic_ib.Data (), impl->dynamic_ib.Size (), false);
+  impl->temp_index_pool.Reset (impl->temp_ib.data (), impl->temp_ib.size (), false);
 }
 
 /*
