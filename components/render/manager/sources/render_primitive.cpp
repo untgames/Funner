@@ -629,7 +629,19 @@ OrientedSpriteListPtr PrimitiveImpl::AddStandaloneOrientedSpriteList (const math
 
 OrientedSpriteListPtr PrimitiveImpl::AddBatchingOrientedSpriteList (const math::vec3f& up)
 {
-  throw xtl::make_not_implemented_exception (__FUNCTION__);
+  try
+  {
+    OrientedSpriteListPtr list (create_batching_oriented_sprite_list (&impl->buffers->BatchingManager (), impl->material_manager, up), false);
+
+    AddDynamicPrimitiveList (list.get (), DynamicPrimitiveListType_Sprite);
+
+    return list;
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::manager::PrimitiveImpl::AddBatchingOrientedSpriteList");
+    throw;
+  }
 }
 
 void PrimitiveImpl::RemoveSpriteList (const BillboardSpriteListPtr& list)
@@ -693,7 +705,19 @@ LineListPtr PrimitiveImpl::AddStandaloneLineList (MeshBufferUsage vb_usage, Mesh
 
 LineListPtr PrimitiveImpl::AddBatchingLineList ()
 {
-  throw xtl::make_not_implemented_exception (__FUNCTION__);
+  try
+  {
+    LineListPtr list (create_batching_line_list (&impl->buffers->BatchingManager (), impl->material_manager), false);
+
+    AddDynamicPrimitiveList (list.get (), DynamicPrimitiveListType_Line);
+
+    return list;
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::manager::PrimitiveImpl::AddBatchingLineList");
+    throw;
+  }
 }
 
 void PrimitiveImpl::RemoveLineList (const LineListPtr& list)

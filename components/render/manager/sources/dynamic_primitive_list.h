@@ -69,7 +69,7 @@ template <class T> class DynamicPrimitiveListImpl: virtual public DynamicPrimiti
     virtual size_t Capacity () = 0;
 
   protected:
-    DynamicPrimitiveListImpl (bool is_entity_dependent);
+    DynamicPrimitiveListImpl (bool is_entity_dependent) : DynamicPrimitiveListImplBase (is_entity_dependent) {}
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
