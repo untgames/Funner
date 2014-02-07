@@ -49,7 +49,7 @@ inline uninitialized_storage<T, Allocator>& uninitialized_storage<T, Allocator>:
 template <class T, class Allocator>
 inline typename uninitialized_storage<T, Allocator>::allocator_type uninitialized_storage<T, Allocator>::get_allocator () const
 {
-  return static_cast<const allocator_type&> (*this)
+  return static_cast<const allocator_type&> (*this);
 }
 
 /*
