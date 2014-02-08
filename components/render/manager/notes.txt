@@ -29,17 +29,9 @@
   - LineInputLayout, SpriteInputLayout PrimitiveManager
   - добавить общие вершинный и индексный буферы для построение спрайтов (использовать PrimitiveBuffers)
   - StandaloneDynamicPrimitive
-
   - BatchingDynamicPrimitive
-
-  - добавить Frame::SetIdentityEntityDrawProperties(const common::PropertyMap&)
   - перед отрисовкой прохода построить индексный буфер пакетных примитивов UpdateOnPrerender
   - перед отрисовкой кадра строить вершинный буфер спрайтов (получать списки спрайтов у каждого Entity)
+
+
   - в процессе отрисовки определять группы примитивов с общим хэшем пакета и отрисовывать их пакетом
-
-
-DynamicPrimitiveList:
-  - Standalone
-    - хранить примитивы не нужно, можно сразу писать вершины и индексы
-  - Batching
-    - нужно хранить примитивы, поскольку они могут рисоваться одновременно из нескольких кадров
