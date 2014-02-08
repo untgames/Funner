@@ -589,7 +589,19 @@ BillboardSpriteListPtr PrimitiveImpl::AddStandaloneBillboardSpriteList (const ma
 
 BillboardSpriteListPtr PrimitiveImpl::AddBatchingBillboardSpriteList (const math::vec3f& up)
 {
-  throw xtl::make_not_implemented_exception (__FUNCTION__);
+  try
+  {
+    BillboardSpriteListPtr list (create_batching_billboard_sprite_list (&impl->buffers->BatchingManager (), impl->material_manager, up), false);
+
+    AddDynamicPrimitiveList (list.get (), DynamicPrimitiveListType_Sprite);
+
+    return list;
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::manager::PrimitiveImpl::AddBatchingBillboardSpriteList");
+    throw;
+  }
 }
 
 OrientedSpriteListPtr PrimitiveImpl::AddStandaloneOrientedSpriteList (const math::vec3f& up, MeshBufferUsage vb_usage, MeshBufferUsage ib_usage)
