@@ -247,16 +247,16 @@ inline void generate (size_t items_count, size_t base_vertex, DynamicPrimitiveIn
     Хранилище для материалов
 */
 
-class DynamicPrimitiveListMaterialHolder: virtual public DynamicPrimitiveListImplBase
+class MaterialHolder: virtual public DynamicPrimitiveListImplBase
 {
   public:
 /// Конструктор
-    DynamicPrimitiveListMaterialHolder (const MaterialManagerPtr& in_material_manager, bool is_entity_dependent)
+    MaterialHolder (const MaterialManagerPtr& in_material_manager, bool is_entity_dependent)
       : DynamicPrimitiveListImplBase (is_entity_dependent)
       , material_manager (in_material_manager)
     {
       if (!material_manager)
-        throw xtl::make_null_argument_exception ("render::manager::DynamicPrimitiveListMaterialHolder<T>::DynamicPrimitiveListMaterialHolder", "material_manager");
+        throw xtl::make_null_argument_exception ("render::manager::MaterialHolder<T>::MaterialHolder", "material_manager");
     }
 
     void SetMaterial (const char* material_name)
@@ -297,7 +297,7 @@ class DynamicPrimitiveListMaterialHolder: virtual public DynamicPrimitiveListImp
       }
       catch (xtl::exception& e)
       {
-        e.touch ("render::manager::DynamicPrimitiveListMaterialHolder::SetMaterial");
+        e.touch ("render::manager::MaterialHolder::SetMaterial");
         throw;
       }
     }
@@ -325,7 +325,7 @@ class DynamicPrimitiveListMaterialHolder: virtual public DynamicPrimitiveListImp
       }
       catch (xtl::exception& e)
       {
-        e.touch ("render::manager::DynamicPrimitiveListMaterialHolder::UpdateCacheCore");
+        e.touch ("render::manager::MaterialHolder::UpdateCacheCore");
         throw;
       }
     }
@@ -340,13 +340,13 @@ class DynamicPrimitiveListMaterialHolder: virtual public DynamicPrimitiveListImp
     Standalone primitive holder
 */
 
-class DynamicPrimitiveListStandalonePrimitiveHolder: public DynamicPrimitiveListMaterialHolder
+class StandalonePrimitiveHolder: public MaterialHolder
 {
   public:
 /// Конструктор
-    DynamicPrimitiveListStandalonePrimitiveHolder (const MaterialManagerPtr& material_manager, MeshBufferUsage vb_usage, MeshBufferUsage ib_usage, render::low_level::PrimitiveType in_primitive_type, bool entity_dependent)
+    StandalonePrimitiveHolder (const MaterialManagerPtr& material_manager, MeshBufferUsage vb_usage, MeshBufferUsage ib_usage, render::low_level::PrimitiveType in_primitive_type, bool entity_dependent)
       : DynamicPrimitiveListImplBase (entity_dependent)
-      , DynamicPrimitiveListMaterialHolder (material_manager, entity_dependent)
+      , MaterialHolder (material_manager, entity_dependent)
       , primitive_type (in_primitive_type)
       , vb (get_mode (vb_usage), render::low_level::BindFlag_VertexBuffer)
       , ib (get_mode (ib_usage), render::low_level::BindFlag_IndexBuffer)
@@ -367,7 +367,7 @@ class DynamicPrimitiveListStandalonePrimitiveHolder: public DynamicPrimitiveList
 /// Сброс кэша
     void ResetCacheCore ()
     {
-      DynamicPrimitiveListMaterialHolder::ResetCacheCore ();
+      MaterialHolder::ResetCacheCore ();
 
       cached_state_block           = LowLevelStateBlockPtr ();
       cached_state_block_mask_hash = 0;
@@ -378,7 +378,7 @@ class DynamicPrimitiveListStandalonePrimitiveHolder: public DynamicPrimitiveList
     {
       try
       {
-        DynamicPrimitiveListMaterialHolder::UpdateCacheCore ();
+        MaterialHolder::UpdateCacheCore ();
 
         render::manager::DeviceManager&    device_manager = DeviceManager ();
         render::low_level::IDevice&        device         = device_manager.Device ();
@@ -447,7 +447,7 @@ class DynamicPrimitiveListStandalonePrimitiveHolder: public DynamicPrimitiveList
       }
       catch (xtl::exception& e)
       {
-        e.touch ("render::manager::DynamicPrimitiveListStandalonePrimitiveHolder::UpdateCacheCore");
+        e.touch ("render::manager::StandalonePrimitiveHolder::UpdateCacheCore");
         throw;
       }
     }
@@ -466,15 +466,15 @@ class DynamicPrimitiveListStandalonePrimitiveHolder: public DynamicPrimitiveList
     Batching state block holder
 */
 
-class DynamicPrimitiveListBatchingStateBlockHolder: public DynamicPrimitiveListMaterialHolder
+class BatchingStateBlockHolder: public MaterialHolder
 {
   public:
-    using DynamicPrimitiveListMaterialHolder::UpdateCache;
+    using MaterialHolder::UpdateCache;
 
 /// Конструктор
-    DynamicPrimitiveListBatchingStateBlockHolder (const MaterialManagerPtr& material_manager, const BatchingManagerPtr& in_batching_manager, bool entity_dependent)
+    BatchingStateBlockHolder (const MaterialManagerPtr& material_manager, const BatchingManagerPtr& in_batching_manager, bool entity_dependent)
       : DynamicPrimitiveListImplBase (entity_dependent)
-      , DynamicPrimitiveListMaterialHolder (material_manager, entity_dependent)
+      , MaterialHolder (material_manager, entity_dependent)
       , batching_manager (in_batching_manager)
     {
     }
@@ -500,7 +500,7 @@ class DynamicPrimitiveListBatchingStateBlockHolder: public DynamicPrimitiveListM
 /// Сброс кэша
     void ResetCacheCore ()
     {
-      DynamicPrimitiveListMaterialHolder::ResetCacheCore ();
+      MaterialHolder::ResetCacheCore ();
 
       cached_state_block = BatchStateBlockPtr ();      
     }   
@@ -512,7 +512,7 @@ class DynamicPrimitiveListBatchingStateBlockHolder: public DynamicPrimitiveListM
       {
         cached_state_block = BatchStateBlockPtr ();
 
-        DynamicPrimitiveListMaterialHolder::UpdateCacheCore ();
+        MaterialHolder::UpdateCacheCore ();
 
         MaterialImpl* cached_material = CachedMaterial ();
           
@@ -520,7 +520,7 @@ class DynamicPrimitiveListBatchingStateBlockHolder: public DynamicPrimitiveListM
       }
       catch (xtl::exception& e)
       {
-        e.touch ("render::manager::DynamicPrimitiveListBatchingStateBlockHolder::UpdateCacheCore");
+        e.touch ("render::manager::BatchingStateBlockHolder::UpdateCacheCore");
         throw;
       }
     }
@@ -534,7 +534,7 @@ class DynamicPrimitiveListBatchingStateBlockHolder: public DynamicPrimitiveListM
     Хранилище элементов списка днамических примитивов
 */
 
-template <class T, class Base> class DynamicPrimitiveListStorage: public Base, public DynamicPrimitiveListImpl<T>
+template <class T, class Base> class PrimitiveListStorage: public Base, public DynamicPrimitiveListImpl<T>
 {
   public:
     typedef typename DynamicPrimitiveListImpl<T>::Item Item;
@@ -544,7 +544,7 @@ template <class T, class Base> class DynamicPrimitiveListStorage: public Base, p
     using Base::PrimitivesUpdateNotify;
 
 /// Конструктор
-    DynamicPrimitiveListStorage (const MaterialManagerPtr& material_manager)
+    PrimitiveListStorage (const MaterialManagerPtr& material_manager)
       : DynamicPrimitiveListImplBase (ENTITY_DEPENDENT)
       , Base (material_manager, ENTITY_DEPENDENT)
       , DynamicPrimitiveListImpl<T> (ENTITY_DEPENDENT)
@@ -553,7 +553,7 @@ template <class T, class Base> class DynamicPrimitiveListStorage: public Base, p
     }
 
     template <class T1>
-    DynamicPrimitiveListStorage (const MaterialManagerPtr& material_manager, const T1& arg1)
+    PrimitiveListStorage (const MaterialManagerPtr& material_manager, const T1& arg1)
       : DynamicPrimitiveListImplBase (ENTITY_DEPENDENT)
       , Base (material_manager, arg1, ENTITY_DEPENDENT)
       , DynamicPrimitiveListImpl<T> (ENTITY_DEPENDENT)
@@ -562,7 +562,7 @@ template <class T, class Base> class DynamicPrimitiveListStorage: public Base, p
     }
 
     template <class T1, class T2>
-    DynamicPrimitiveListStorage (const MaterialManagerPtr& material_manager, const T1& arg1, const T2& arg2)
+    PrimitiveListStorage (const MaterialManagerPtr& material_manager, const T1& arg1, const T2& arg2)
       : DynamicPrimitiveListImplBase (ENTITY_DEPENDENT)
       , Base (material_manager, arg1, arg2, ENTITY_DEPENDENT)
       , DynamicPrimitiveListImpl<T> (ENTITY_DEPENDENT)
@@ -571,7 +571,7 @@ template <class T, class Base> class DynamicPrimitiveListStorage: public Base, p
     }
 
     template <class T1, class T2, class T3>
-    DynamicPrimitiveListStorage (const MaterialManagerPtr& material_manager, const T1& arg1, const T2& arg2, const T3& arg3)
+    PrimitiveListStorage (const MaterialManagerPtr& material_manager, const T1& arg1, const T2& arg2, const T3& arg3)
       : DynamicPrimitiveListImplBase (ENTITY_DEPENDENT)
       , Base (material_manager, arg1, arg2, arg3, ENTITY_DEPENDENT)
       , DynamicPrimitiveListImpl<T> (ENTITY_DEPENDENT)
@@ -610,7 +610,7 @@ template <class T, class Base> class DynamicPrimitiveListStorage: public Base, p
       }
       catch (xtl::exception& e)
       {
-        e.touch ("render::manager::DynamicPrimitiveListStorage<T>::Add");
+        e.touch ("render::manager::PrimitiveListStorage<T>::Add");
         throw;
       }
     }
@@ -641,7 +641,7 @@ template <class T, class Base> class DynamicPrimitiveListStorage: public Base, p
       }
       catch (xtl::exception& e)
       {
-        e.touch ("render::manager::DynamicPrimitiveListStorage<T>::Update");
+        e.touch ("render::manager::PrimitiveListStorage<T>::Update");
         throw;
       }
     }
@@ -709,7 +709,7 @@ template <class T, class Base> class DynamicPrimitiveListStorage: public Base, p
       }
       catch (xtl::exception& e)
       {
-        e.touch ("render::manager::DynamicPrimitiveListStorage<T>::UpdateCacheCore");
+        e.touch ("render::manager::PrimitiveListStorage<T>::UpdateCacheCore");
         throw;
       }
     }
@@ -729,13 +729,13 @@ template <class T, class Base> class DynamicPrimitiveListStorage: public Base, p
     Экземпляр пакетного списка примитивов
 */
 
-class DynamicPrimitiveListBatchingInstance: public DynamicPrimitive, private render::manager::RendererPrimitiveGroup
+class BatchingInstance: public DynamicPrimitive, private render::manager::RendererPrimitiveGroup
 {
   public:
-    typedef xtl::intrusive_ptr<DynamicPrimitiveListBatchingStateBlockHolder> PrototypePtr;
+    typedef xtl::intrusive_ptr<BatchingStateBlockHolder> PrototypePtr;
 
 /// Конструктор
-    DynamicPrimitiveListBatchingInstance (const PrototypePtr& in_prototype, size_t flags = 0)
+    BatchingInstance (const PrototypePtr& in_prototype, size_t flags = 0)
       : DynamicPrimitive (*this, flags | DynamicPrimitiveFlag_EntityDependent)
       , prototype (in_prototype)
       , batching_manager (&prototype->BatchingManager ())
@@ -746,7 +746,7 @@ class DynamicPrimitiveListBatchingInstance: public DynamicPrimitive, private ren
 
   protected:
 /// Прототип
-    DynamicPrimitiveListBatchingStateBlockHolder& Prototype () { return *prototype; }
+    BatchingStateBlockHolder& Prototype () { return *prototype; }
 
 /// Примитив
     render::manager::RendererPrimitive& Primitive () { return cached_primitive; }
@@ -800,7 +800,7 @@ class DynamicPrimitiveListBatchingInstance: public DynamicPrimitive, private ren
       }
       catch (xtl::exception& e)
       {
-        e.touch ("render::manager::DynamicPrimitiveListBatchingInstance::UpdatePrimitive");
+        e.touch ("render::manager::BatchingInstance::UpdatePrimitive");
         throw;
       }
     }
@@ -822,7 +822,7 @@ class DynamicPrimitiveListBatchingInstance: public DynamicPrimitive, private ren
 */
 
 template <class T, class Generator>
-class StandaloneLineAndOrientedSpriteDynamicPrimitiveList: public DynamicPrimitiveListStandalonePrimitiveHolder, public DynamicPrimitiveListImpl<T>, private Generator
+class StandaloneLineAndOrientedSpriteList: public StandalonePrimitiveHolder, public DynamicPrimitiveListImpl<T>, private Generator
 {
   public:
     typedef typename DynamicPrimitiveListImpl<T>::Item Item;
@@ -832,9 +832,9 @@ class StandaloneLineAndOrientedSpriteDynamicPrimitiveList: public DynamicPrimiti
     static const render::low_level::PrimitiveType PRIMITIVE_TYPE = Generator::PRIMITIVE_TYPE;
 
 /// Конструктор
-    StandaloneLineAndOrientedSpriteDynamicPrimitiveList (const MaterialManagerPtr& material_manager, MeshBufferUsage vb_usage, MeshBufferUsage ib_usage, const Generator& generator)
+    StandaloneLineAndOrientedSpriteList (const MaterialManagerPtr& material_manager, MeshBufferUsage vb_usage, MeshBufferUsage ib_usage, const Generator& generator)
       : DynamicPrimitiveListImplBase (ENTITY_INDEPENDENT)
-      , DynamicPrimitiveListStandalonePrimitiveHolder (material_manager, vb_usage, ib_usage, PRIMITIVE_TYPE, ENTITY_INDEPENDENT)
+      , StandalonePrimitiveHolder (material_manager, vb_usage, ib_usage, PRIMITIVE_TYPE, ENTITY_INDEPENDENT)
       , DynamicPrimitiveListImpl<T> (ENTITY_INDEPENDENT)
       , Generator (generator)
       , need_update_buffers (true)
@@ -844,7 +844,7 @@ class StandaloneLineAndOrientedSpriteDynamicPrimitiveList: public DynamicPrimiti
 ///Создание экземпляра
     DynamicPrimitive* CreateDynamicPrimitiveInstanceCore ()
     {
-      throw xtl::format_not_supported_exception ("render::manager::StandaloneLineAndOrientedSpriteDynamicPrimitiveList<T>::CreateDynamicPrimitiveInstanceCore", "Dynamic primitives are not supported for this list");
+      throw xtl::format_not_supported_exception ("render::manager::StandaloneLineAndOrientedSpriteList<T>::CreateDynamicPrimitiveInstanceCore", "Dynamic primitives are not supported for this list");
     }
 
 ///Количество примитивов
@@ -890,7 +890,7 @@ class StandaloneLineAndOrientedSpriteDynamicPrimitiveList: public DynamicPrimiti
       }
       catch (xtl::exception& e)
       {
-        e.touch ("render::manager::StandaloneLineAndOrientedSpriteDynamicPrimitiveList<T>::Add");
+        e.touch ("render::manager::StandaloneLineAndOrientedSpriteList<T>::Add");
         throw;
       }
     }
@@ -931,7 +931,7 @@ class StandaloneLineAndOrientedSpriteDynamicPrimitiveList: public DynamicPrimiti
       }
       catch (xtl::exception& e)
       {
-        e.touch ("render::manager::StandaloneLineAndOrientedSpriteDynamicPrimitiveList<T>::Update");
+        e.touch ("render::manager::StandaloneLineAndOrientedSpriteList<T>::Update");
         throw;
       }
     }
@@ -1009,7 +1009,7 @@ class StandaloneLineAndOrientedSpriteDynamicPrimitiveList: public DynamicPrimiti
       }
       catch (xtl::exception& e)
       {
-        e.touch ("render::manager::StandaloneLineAndOrientedSpriteDynamicPrimitiveList<T>::Reserve");
+        e.touch ("render::manager::StandaloneLineAndOrientedSpriteList<T>::Reserve");
         throw;
       }      
     }
@@ -1029,11 +1029,11 @@ class StandaloneLineAndOrientedSpriteDynamicPrimitiveList: public DynamicPrimiti
           need_update_buffers = false;
         }
 
-        DynamicPrimitiveListStandalonePrimitiveHolder::UpdateCacheCore ();
+        StandalonePrimitiveHolder::UpdateCacheCore ();
       }
       catch (xtl::exception& e)
       {
-        e.touch ("render::manager::StandaloneLineAndOrientedSpriteDynamicPrimitiveList::UpdateCacheCore");
+        e.touch ("render::manager::StandaloneLineAndOrientedSpriteList::UpdateCacheCore");
         throw;
       }
     }
@@ -1047,7 +1047,7 @@ class StandaloneLineAndOrientedSpriteDynamicPrimitiveList: public DynamicPrimiti
 */
 
 template <class T, class Generator>
-class BatchingLineAndOrientedSpriteDynamicPrimitiveList: public DynamicPrimitiveListBatchingStateBlockHolder, public DynamicPrimitiveListImpl<T>, private Generator
+class BatchingLineAndOrientedSpriteList: public BatchingStateBlockHolder, public DynamicPrimitiveListImpl<T>, private Generator
 {
   public:
     typedef typename DynamicPrimitiveListImpl<T>::Item Item;
@@ -1057,11 +1057,11 @@ class BatchingLineAndOrientedSpriteDynamicPrimitiveList: public DynamicPrimitive
     static const render::low_level::PrimitiveType PRIMITIVE_TYPE = Generator::PRIMITIVE_TYPE;
 
 /// Экземпляр списка примитивов
-    class Instance: public DynamicPrimitiveListBatchingInstance
+    class Instance: public BatchingInstance
     {
       public:
 /// Конструктор
-        Instance (const PrototypePtr& prototype) : DynamicPrimitiveListBatchingInstance (prototype) { }
+        Instance (const PrototypePtr& prototype) : BatchingInstance (prototype) { }
 
       private:
 ///Обновление
@@ -1069,7 +1069,7 @@ class BatchingLineAndOrientedSpriteDynamicPrimitiveList: public DynamicPrimitive
         {
           try
           {
-            BatchingLineAndOrientedSpriteDynamicPrimitiveList& prototype = static_cast<BatchingLineAndOrientedSpriteDynamicPrimitiveList&> (Prototype ());
+            BatchingLineAndOrientedSpriteList& prototype = static_cast<BatchingLineAndOrientedSpriteList&> (Prototype ());
 
             size_t verts_count = prototype.VerticesCount (), items_count = verts_count / VERTICES_PER_PRIMITIVE, inds_count = items_count * INDICES_PER_PRIMITIVE, base_vertex = 0;
 
@@ -1098,7 +1098,7 @@ class BatchingLineAndOrientedSpriteDynamicPrimitiveList: public DynamicPrimitive
           }
           catch (xtl::exception& e)
           {
-            e.touch ("render::manager::BatchingLineAndOrientedSpriteDynamicPrimitiveList::Instance::UpdateOnPrerenderCore");
+            e.touch ("render::manager::BatchingLineAndOrientedSpriteList::Instance::UpdateOnPrerenderCore");
             throw;
           }
         }
@@ -1107,9 +1107,9 @@ class BatchingLineAndOrientedSpriteDynamicPrimitiveList: public DynamicPrimitive
     };
 
 /// Конструктор
-    BatchingLineAndOrientedSpriteDynamicPrimitiveList (const BatchingManagerPtr& batching_manager, const MaterialManagerPtr& material_manager, const Generator& generator)
+    BatchingLineAndOrientedSpriteList (const BatchingManagerPtr& batching_manager, const MaterialManagerPtr& material_manager, const Generator& generator)
       : DynamicPrimitiveListImplBase (ENTITY_DEPENDENT)
-      , DynamicPrimitiveListBatchingStateBlockHolder (material_manager, batching_manager, ENTITY_DEPENDENT)
+      , BatchingStateBlockHolder (material_manager, batching_manager, ENTITY_DEPENDENT)
       , DynamicPrimitiveListImpl<T> (ENTITY_DEPENDENT)
       , Generator (generator)
     {
@@ -1124,7 +1124,7 @@ class BatchingLineAndOrientedSpriteDynamicPrimitiveList: public DynamicPrimitive
       }
       catch (xtl::exception& e)
       {
-        e.touch ("render::manager::BatchingLineAndOrientedSpriteDynamicPrimitiveList<T>::CreateDynamicPrimitiveInstanceCore");
+        e.touch ("render::manager::BatchingLineAndOrientedSpriteList<T>::CreateDynamicPrimitiveInstanceCore");
         throw;
       }
     }
@@ -1157,7 +1157,7 @@ class BatchingLineAndOrientedSpriteDynamicPrimitiveList: public DynamicPrimitive
       }
       catch (xtl::exception& e)
       {
-        e.touch ("render::manager::BatchingLineAndOrientedSpriteDynamicPrimitiveList<T>::Add");
+        e.touch ("render::manager::BatchingLineAndOrientedSpriteList<T>::Add");
         throw;
       }
     }
@@ -1190,7 +1190,7 @@ class BatchingLineAndOrientedSpriteDynamicPrimitiveList: public DynamicPrimitive
       }
       catch (xtl::exception& e)
       {
-        e.touch ("render::manager::BatchingLineAndOrientedSpriteDynamicPrimitiveList<T>::Update");
+        e.touch ("render::manager::BatchingLineAndOrientedSpriteList<T>::Update");
         throw;
       }
     }
@@ -1235,7 +1235,7 @@ class BatchingLineAndOrientedSpriteDynamicPrimitiveList: public DynamicPrimitive
       }
       catch (xtl::exception& e)
       {
-        e.touch ("render::manager::BatchingLineAndOrientedSpriteDynamicPrimitiveList<T>::Reserve");
+        e.touch ("render::manager::BatchingLineAndOrientedSpriteList<T>::Reserve");
         throw;
       }      
     }
@@ -1257,15 +1257,14 @@ class BatchingLineAndOrientedSpriteDynamicPrimitiveList: public DynamicPrimitive
     Standalone BillboardSprite list
 */
 
-class StandaloneBillboardSpriteDynamicPrimitiveList: public DynamicPrimitiveListStorage<BillboardSprite, DynamicPrimitiveListStandalonePrimitiveHolder>,
-  private render::manager::RendererPrimitiveGroup, public DynamicPrimitive
+class StandaloneBillboardSpriteList: public PrimitiveListStorage<BillboardSprite, StandalonePrimitiveHolder>, private render::manager::RendererPrimitiveGroup, public DynamicPrimitive
 {
-  typedef DynamicPrimitiveListStorage<BillboardSprite, DynamicPrimitiveListStandalonePrimitiveHolder> Base;
+  typedef PrimitiveListStorage<BillboardSprite, StandalonePrimitiveHolder> Base;
   public:
     enum { VERTICES_PER_PRIMITIVE = BillboardSpriteGenerator::VERTICES_PER_PRIMITIVE, INDICES_PER_PRIMITIVE = BillboardSpriteGenerator::INDICES_PER_PRIMITIVE };
 
 /// Конструктор
-    StandaloneBillboardSpriteDynamicPrimitiveList (const MaterialManagerPtr& material_manager, const math::vec3f& in_local_up, MeshBufferUsage vb_usage, MeshBufferUsage ib_usage)
+    StandaloneBillboardSpriteList (const MaterialManagerPtr& material_manager, const math::vec3f& in_local_up, MeshBufferUsage vb_usage, MeshBufferUsage ib_usage)
       : DynamicPrimitiveListImplBase (ENTITY_DEPENDENT)
       , Base (material_manager, vb_usage, ib_usage, BillboardSpriteGenerator::PRIMITIVE_TYPE)
       , DynamicPrimitive (*this, DynamicPrimitiveFlag_FrameDependent | DynamicPrimitiveFlag_EntityDependent)
@@ -1297,7 +1296,7 @@ class StandaloneBillboardSpriteDynamicPrimitiveList: public DynamicPrimitiveList
       }
       catch (xtl::exception& e)
       {
-        e.touch ("render::manager::StandaloneBillboardSpriteDynamicPrimitiveList::UpdateOnRenderCore");
+        e.touch ("render::manager::StandaloneBillboardSpriteList::UpdateOnRenderCore");
         throw;
       }
     }
@@ -1317,7 +1316,7 @@ class StandaloneBillboardSpriteDynamicPrimitiveList: public DynamicPrimitiveList
       }
       catch (xtl::exception& e)
       {
-        e.touch ("render::manager::StandaloneBillboardSpriteDynamicPrimitiveList::UpdateBuffersCore");
+        e.touch ("render::manager::StandaloneBillboardSpriteList::UpdateBuffersCore");
         throw;
       }
     }
@@ -1330,19 +1329,19 @@ class StandaloneBillboardSpriteDynamicPrimitiveList: public DynamicPrimitiveList
     Batching BillboardSprite list
 */
 
-class BatchingBillboardSpriteDynamicPrimitiveList: public DynamicPrimitiveListStorage<BillboardSprite, DynamicPrimitiveListBatchingStateBlockHolder>
+class BatchingBillboardSpriteList: public PrimitiveListStorage<BillboardSprite, BatchingStateBlockHolder>
 {
-  typedef DynamicPrimitiveListStorage<BillboardSprite, DynamicPrimitiveListBatchingStateBlockHolder> Base;
+  typedef PrimitiveListStorage<BillboardSprite, BatchingStateBlockHolder> Base;
   public:
     enum { VERTICES_PER_PRIMITIVE = BillboardSpriteGenerator::VERTICES_PER_PRIMITIVE, INDICES_PER_PRIMITIVE = BillboardSpriteGenerator::INDICES_PER_PRIMITIVE };
 
 /// Экземпляр списка примитивов
-    class Instance: public DynamicPrimitiveListBatchingInstance
+    class Instance: public BatchingInstance
     {
       public:
 /// Конструктор
         Instance (const PrototypePtr& prototype)
-          : DynamicPrimitiveListBatchingInstance (prototype, DynamicPrimitiveFlag_FrameDependent) 
+          : BatchingInstance (prototype, DynamicPrimitiveFlag_FrameDependent) 
           , vertices ()
           , indices ()
         { }
@@ -1353,9 +1352,9 @@ class BatchingBillboardSpriteDynamicPrimitiveList: public DynamicPrimitiveListSt
         {
           try
           {
-            BatchingBillboardSpriteDynamicPrimitiveList& prototype = static_cast<BatchingBillboardSpriteDynamicPrimitiveList&> (Prototype ());
+            BatchingBillboardSpriteList& prototype = static_cast<BatchingBillboardSpriteList&> (Prototype ());
 
-            size_t items_count = prototype.BatchingBillboardSpriteDynamicPrimitiveList::Size (),
+            size_t items_count = prototype.BatchingBillboardSpriteList::Size (),
                    verts_count = items_count * VERTICES_PER_PRIMITIVE,
                    inds_count  = items_count * INDICES_PER_PRIMITIVE, 
                    base_vertex = 0;
@@ -1374,7 +1373,7 @@ class BatchingBillboardSpriteDynamicPrimitiveList: public DynamicPrimitiveListSt
           }
           catch (xtl::exception& e)
           {
-            e.touch ("render::manager::BatchingLineAndOrientedSpriteDynamicPrimitiveList::Instance::UpdateOnPrerenderCore");
+            e.touch ("render::manager::BatchingLineAndOrientedSpriteList::Instance::UpdateOnPrerenderCore");
             throw;
           }
         }
@@ -1386,9 +1385,9 @@ class BatchingBillboardSpriteDynamicPrimitiveList: public DynamicPrimitiveListSt
             if (!vertices || !indices)
               return;
 
-            BatchingBillboardSpriteDynamicPrimitiveList& prototype = static_cast<BatchingBillboardSpriteDynamicPrimitiveList&> (Prototype ());
+            BatchingBillboardSpriteList& prototype = static_cast<BatchingBillboardSpriteList&> (Prototype ());
 
-            size_t items_count = prototype.BatchingBillboardSpriteDynamicPrimitiveList::Size ();
+            size_t items_count = prototype.BatchingBillboardSpriteList::Size ();
 
               //формирование вершин
 
@@ -1398,7 +1397,7 @@ class BatchingBillboardSpriteDynamicPrimitiveList: public DynamicPrimitiveListSt
           }
           catch (xtl::exception& e)
           {
-            e.touch ("render::manager::BatchingLineAndOrientedSpriteDynamicPrimitiveList::Instance::UpdateOnRenderCore");
+            e.touch ("render::manager::BatchingLineAndOrientedSpriteList::Instance::UpdateOnRenderCore");
             throw;
           }
         }
@@ -1409,7 +1408,7 @@ class BatchingBillboardSpriteDynamicPrimitiveList: public DynamicPrimitiveListSt
     };
 
 /// Конструктор
-    BatchingBillboardSpriteDynamicPrimitiveList (const BatchingManagerPtr& batching_manager, const MaterialManagerPtr& material_manager, const math::vec3f& in_local_up)
+    BatchingBillboardSpriteList (const BatchingManagerPtr& batching_manager, const MaterialManagerPtr& material_manager, const math::vec3f& in_local_up)
       : DynamicPrimitiveListImplBase (ENTITY_DEPENDENT)
       , Base (material_manager, batching_manager)
       , local_up (in_local_up)
@@ -1425,7 +1424,7 @@ class BatchingBillboardSpriteDynamicPrimitiveList: public DynamicPrimitiveListSt
       }
       catch (xtl::exception& e)
       {
-        e.touch ("render::manager::BatchingBillboardSpriteDynamicPrimitiveList::CreateDynamicPrimitiveInstanceCore");
+        e.touch ("render::manager::BatchingBillboardSpriteList::CreateDynamicPrimitiveInstanceCore");
         throw;
       }
     }
@@ -1452,32 +1451,32 @@ namespace manager
 
 LineListImpl* create_standalone_line_list (const MaterialManagerPtr& material_manager, MeshBufferUsage vb_usage, MeshBufferUsage ib_usage)
 {
-  return new StandaloneLineAndOrientedSpriteDynamicPrimitiveList<Line, LineGenerator> (material_manager, vb_usage, ib_usage, LineGenerator ());
+  return new StandaloneLineAndOrientedSpriteList<Line, LineGenerator> (material_manager, vb_usage, ib_usage, LineGenerator ());
 }
 
 OrientedSpriteListImpl* create_standalone_oriented_sprite_list (const MaterialManagerPtr& material_manager, const math::vec3f& up, MeshBufferUsage vb_usage, MeshBufferUsage ib_usage)
 {
-  return new StandaloneLineAndOrientedSpriteDynamicPrimitiveList<OrientedSprite, OrientedSpriteGenerator> (material_manager, vb_usage, ib_usage, OrientedSpriteGenerator (up));
+  return new StandaloneLineAndOrientedSpriteList<OrientedSprite, OrientedSpriteGenerator> (material_manager, vb_usage, ib_usage, OrientedSpriteGenerator (up));
 }
 
 BillboardSpriteListImpl* create_standalone_billboard_sprite_list (const MaterialManagerPtr& material_manager, const math::vec3f& up, MeshBufferUsage vb_usage, MeshBufferUsage ib_usage)
 {
-  return new StandaloneBillboardSpriteDynamicPrimitiveList (material_manager, up, vb_usage, ib_usage);
+  return new StandaloneBillboardSpriteList (material_manager, up, vb_usage, ib_usage);
 }
 
 LineListImpl* create_batching_line_list (const BatchingManagerPtr& batching_manager, const MaterialManagerPtr& material_manager)
 {
-  return new BatchingLineAndOrientedSpriteDynamicPrimitiveList<Line, LineGenerator> (batching_manager, material_manager, LineGenerator ());
+  return new BatchingLineAndOrientedSpriteList<Line, LineGenerator> (batching_manager, material_manager, LineGenerator ());
 }
 
 OrientedSpriteListImpl* create_batching_oriented_sprite_list (const BatchingManagerPtr& batching_manager, const MaterialManagerPtr& material_manager, const math::vec3f& up)
 {
-  return new BatchingLineAndOrientedSpriteDynamicPrimitiveList<OrientedSprite, OrientedSpriteGenerator> (batching_manager, material_manager, OrientedSpriteGenerator (up));
+  return new BatchingLineAndOrientedSpriteList<OrientedSprite, OrientedSpriteGenerator> (batching_manager, material_manager, OrientedSpriteGenerator (up));
 }
 
 BillboardSpriteListImpl* create_batching_billboard_sprite_list (const BatchingManagerPtr& batching_manager, const MaterialManagerPtr& material_manager, const math::vec3f& up)
 {
-  return new BatchingBillboardSpriteDynamicPrimitiveList (batching_manager, material_manager, up);
+  return new BatchingBillboardSpriteList (batching_manager, material_manager, up);
 }
 
 }
