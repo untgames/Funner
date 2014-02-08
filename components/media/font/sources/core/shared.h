@@ -1,14 +1,22 @@
 #ifndef MEDIA_FONT_CORE_SHARED_HEADER
 #define MEDIA_FONT_CORE_SHARED_HEADER
 
+#include <stl/algorithm>
 #include <stl/hash_map>
 #include <stl/string>
+#include <stl/vector>
 
+#include <xtl/bind.h>
 #include <xtl/common_exceptions.h>
+#include <xtl/intrusive_ptr.h>
+#include <xtl/iterator.h>
 #include <xtl/uninitialized_storage.h>
 
+#include <common/file.h>
 #include <common/hash.h>
+#include <common/log.h>
 #include <common/singleton.h>
+#include <common/strlib.h>
 
 #include <media/charset_manager.h>
 #include <media/font_library.h>

@@ -11,18 +11,11 @@ namespace media
 
 struct RasterizedFont::Impl : public xtl::reference_counter
 {
-  IFontRasterizer* rasterizer;
+  xtl::com_ptr<IFontRasterizer> rasterizer;
 
   Impl (IFontRasterizer* in_rasterizer)
     : rasterizer (in_rasterizer)
-  {
-    rasterizer->AddRef ();
-  }
-
-  ~Impl ()
-  {
-    rasterizer->Release ();
-  }
+    {}
 };
 
 }
