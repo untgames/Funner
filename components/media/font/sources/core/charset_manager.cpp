@@ -13,7 +13,7 @@ class CharsetManagerImpl
     {
       CharsetsMap::iterator iter = charsets.find (name);
 
-      if (iter == charsets.end ())
+      if (iter != charsets.end ())
         iter->second = chars;
       else
         charsets.insert_pair (name, chars);

@@ -1,0 +1,4 @@
+Results of charset_manager test:
+Charset '1' found = 0
+Charset '1' found = 1
+Charset '1' = 'abcd'

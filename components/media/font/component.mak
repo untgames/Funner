@@ -1,7 +1,7 @@
 ###################################################################################################
 #Определения и константы
 ###################################################################################################
-TARGETS := MEDIA.FONT.SOURCES #MEDIA.FONT.XFONT MEDIA.FONT.FONT_CONVERTER MEDIA.FONT.TESTS \
+TARGETS := MEDIA.FONT.SOURCES MEDIA.FONT.TESTS #MEDIA.FONT.XFONT MEDIA.FONT.FONT_CONVERTER \
            MEDIA.FONT.IMAGE2XFONT MEDIA.FONT.TTF2XFONT MEDIA.FONT.TTF2XFONT.TESTS
 
 #Цель - MediaLib sources
@@ -26,8 +26,7 @@ MEDIA.FONT.FONT_CONVERTER.IMPORTS          := compile.media.font compile.media.i
 #Цель - MediaLib tests
 MEDIA.FONT.TESTS.TYPE             := test-suite
 MEDIA.FONT.TESTS.SOURCE_DIRS      := tests/font
-MEDIA.FONT.TESTS.IMPORTS          := compile.media.font link.media.font link.media.font.xfont link.media.font.font_converter \
-                                     compile.media.image link.media.image link.media.image.left_bottom_packer
+MEDIA.FONT.TESTS.IMPORTS          := compile.media.font link.media.font compile.media.image link.media.image link.media.image.left_bottom_packer
 
 #Цель - Imave to xfont converter
 MEDIA.FONT.IMAGE2XFONT.TYPE             := application
