@@ -8,24 +8,33 @@ namespace
 
 const char* LOG_NAME = "media::freetype::FreetypeFontDesc";
 
+typedef xtl::uninitialized_storage<char> DataBuffer;
+typedef xtl::shared_ptr<DataBuffer>      DataBufferPtr;
+
 //Шрифт free type
 class FreeTypeFace : public xtl::reference_counter
 {
-  public: //TODO hold library and memory, threading protection
-    FreeTypeFace (FT_Library library, const FT_Byte* data, size_t data_size, size_t face_index)
-      : face (0)
+  public:
+    FreeTypeFace (const DataBufferPtr& in_data, const FreetypeLibrary& in_library, size_t face_index)
+      : data (in_data)
+      , library (in_library)
+      , face (0)
     {
-      check_free_type_error (FT_New_Memory_Face (library, data, data_size, face_index, &face), "::FT_New_Memory_Face");
+      library.FT_New_Memory_Face ((const FT_Byte*)data->data (), data->size (), face_index, &face);
     }
 
     ~FreeTypeFace ()
     {
-      if (face)
+      try
       {
-        FT_Error result = FT_Done_Face (face);
-
-        if (!result)
-          common::Log (LOG_NAME).Printf ("Can't destroy freetype face, error '%s'", get_free_type_error_name (result));
+        if (face)
+        {
+          library.FT_Done_Face (face);
+        }
+      }
+      catch (xtl::exception& e)
+      {
+        common::Log (LOG_NAME).Printf ("Can't destroy freetype face, exception '%s'", e.what ());
       }
     }
 
@@ -39,7 +48,9 @@ class FreeTypeFace : public xtl::reference_counter
     FreeTypeFace& operator = (const FreeTypeFace&); //no impl
 
   private:
-    FT_Face face;
+    DataBufferPtr   data;     //данные файла шрифта
+    FreetypeLibrary library;  //библиотека
+    FT_Face         face;     //шрифт
 };
 
 typedef xtl::intrusive_ptr<FreeTypeFace> FreeTypeFacePtr;
@@ -59,65 +70,38 @@ namespace freetype
 
 struct FreetypeFontDesc::Impl
 {
-  xtl::uninitialized_storage<char> font_data; //данные файла шрифта
-  FT_Library                       library;   //freetype библиотека, создаем каждый раз новую для возможной работы со шрифтами в разных нитях
-  FacesArray                       faces;     //шрифты
+  DataBufferPtr   font_data; //данные файла шрифта
+  FreetypeLibrary library;   //freetype библиотека, создаем каждый раз новую для возможной работы со шрифтами в разных нитях
+  FacesArray      faces;     //шрифты
 
   ///Конструктор / деструктор
   Impl (const char* file_name)
-    : library (0)
   {
     try
     {
       common::InputFile font_file (file_name);
 
-      font_data.resize (font_file.Size (), false);
+      font_data = DataBufferPtr (new DataBuffer (font_file.Size ()));
 
-      font_file.Read (font_data.data (), font_data.size ());
-
-      check_free_type_error (FT_Init_FreeType (&library), "::FT_Init_FreeType");
+      font_file.Read (font_data->data (), font_data->size ());
 
       FT_Face test_face;
 
-      check_free_type_error (FT_New_Memory_Face (library, (const FT_Byte*)font_data.data (), font_data.size (), -1, &test_face), "::FT_New_Memory_Face");
+      library.FT_New_Memory_Face ((const FT_Byte*)font_data->data (), font_data->size (), -1, &test_face);
 
       FT_Long faces_count = test_face->num_faces;
 
-      check_free_type_error (FT_Done_Face (test_face), "::FT_Done_Face");
+      library.FT_Done_Face (test_face);
 
       faces.reserve (faces_count);
 
       for (size_t i = 0; i < faces_count; i++)
-        faces.push_back (FreeTypeFacePtr (new FreeTypeFace (library, (const FT_Byte*)font_data.data (), font_data.size (), i), false));
+        faces.push_back (FreeTypeFacePtr (new FreeTypeFace (font_data, library, i), false));
     }
     catch (xtl::exception& e)
     {
-      Cleanup ();
       e.touch ("media::freetype::FreetypeFontDesc::FreetypeFontDesc");
       throw;
-    }
-    catch (...)
-    {
-      Cleanup ();
-      throw;
-    }
-  }
-
-  ~Impl ()
-  {
-    Cleanup ();
-  }
-
-  void Cleanup ()
-  {
-    faces.clear ();
-
-    if (library)
-    {
-      FT_Error result = FT_Done_FreeType (library);
-
-      if (!result)
-        common::Log (LOG_NAME).Printf ("Can't destroy freetype library, error '%s'", get_free_type_error_name (result));
     }
   }
 };
