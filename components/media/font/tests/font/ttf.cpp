@@ -2,7 +2,8 @@
 
 using namespace media;
 
-const char* FONT_NAME = "data/times_new_roman.ttf";
+const char* BAD_FONT_NAME = "data/bad_font.ttf";
+const char* FONT_NAME     = "data/times_new_roman.ttf";
 
 int main ()
 {
@@ -20,6 +21,8 @@ int main ()
     {
       printf ("  %s - %s\n", iter->FamilyName (), iter->StyleName ());
     }
+
+    library.LoadFont (BAD_FONT_NAME);
   }
   catch (std::exception& exception)
   {

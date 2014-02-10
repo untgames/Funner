@@ -226,7 +226,7 @@ void FontLibrary::LoadFont (const char* file_name)
   }
   catch (xtl::exception& e)
   {
-    e.touch ("media::FontLibrary::LoadFont");
+    e.touch ("media::FontLibrary::LoadFont ('%s')", file_name ? file_name : "(null)");
     throw;
   }
 }
@@ -268,7 +268,7 @@ void FontLibrary::LoadFonts (const char* wildcard)
   }
   catch (xtl::exception& e)
   {
-    e.touch ("media::FontLibrary::LoadFonts");
+    e.touch ("media::FontLibrary::LoadFonts ('%s')", wildcard ? wildcard : "(null)");
     throw;
   }
 }
