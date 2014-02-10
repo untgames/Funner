@@ -399,6 +399,13 @@ DynamicPrimitiveIndex* BatchingManager::AllocateDynamicIndices (IndexPoolType po
   }  
 }
 
+void BatchingManager::ResetLinearIndexBuffer ()
+{
+  impl->dynamic_ib.Clear ();
+
+  impl->dynamic_index_pool.Reset (impl->dynamic_ib.Data (), impl->dynamic_ib.Size (), false);
+}
+
 void BatchingManager::ResetDynamicBuffers ()
 {
   impl->dynamic_vb.Clear ();

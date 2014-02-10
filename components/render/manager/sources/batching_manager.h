@@ -78,6 +78,7 @@ class BatchingManager: public Object, public CacheSource
     DynamicPrimitiveVertex* AllocateDynamicVertices (size_t count, size_t* out_base_vertex_index = 0);
     DynamicPrimitiveIndex*  AllocateDynamicIndices  (IndexPoolType type, size_t count);
     void                    ResetDynamicBuffers     ();
+    void                    ResetLinearIndexBuffer  ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///ѕолучение блока состо€ний по материалу

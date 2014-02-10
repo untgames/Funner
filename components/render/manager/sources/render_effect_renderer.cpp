@@ -2,6 +2,7 @@
 
 using namespace render::manager;
 
+//TODO: update/sync dynamic vertex buffer
 //TODO: shared EffectRenderer buffers (operations, passes, etc)
 //TODO: program/parameters_layout/local_textures FIFO cache
 
@@ -49,8 +50,11 @@ struct PassOperation: public RendererOperation
   {
       //обновление хэша
 
-    batching_hash = common::crc32 (&frame_entity_parameters_layout, sizeof (frame_entity_parameters_layout),
-      common::crc32 (&frame_entity_parameters_buffer, sizeof (frame_entity_parameters_buffer), batching_hash));
+    if (batching_hash)
+    {
+      batching_hash = common::crc32 (&frame_entity_parameters_layout, sizeof (frame_entity_parameters_layout),
+        common::crc32 (&frame_entity_parameters_buffer, sizeof (frame_entity_parameters_buffer), batching_hash));
+    }
   }
 };
 
@@ -78,7 +82,7 @@ struct BackToFrontComparator
 ///Компаратор по кэшированию состояний
 struct StateSwitchComparator
 {
-  template <class T> bool compare (const T* obj1, const T* obj2, bool& result) const
+  template <class T> bool compare (const T& obj1, const T& obj2, bool& result) const
   {
     if (obj1 == obj2)
       return false;
@@ -91,11 +95,16 @@ struct StateSwitchComparator
   bool operator () (const PassOperation* op1, const PassOperation* op2) const
   {
     bool result = false;
+
+    const RendererPrimitive *primitive1 = op1->primitive, *primitive2 = op2->primitive;
+
+    if (compare (primitive1->batching_hash, primitive2->batching_hash, result))
+      return result;
           
-    if (compare (op1->primitive, op2->primitive, result))
+    if (compare (primitive1, primitive2, result))
       return result;    
       
-    if (compare (op1->primitive->material, op2->primitive->material, result))
+    if (compare (primitive1->material, primitive2->material, result))
       return result;
 
     if (compare (op1->entity, op2->entity, result))
@@ -734,6 +743,8 @@ struct RenderOperationsExecutor
 
       dynamic_primitive->UpdateOnRender (frame, *operation.entity, context, mvp_matrix);
     }
+
+    //TODO: update vertex buffer
   }
   
 ///Рендеринг прохода
@@ -769,12 +780,13 @@ struct RenderOperationsExecutor
       //выполнение операций                    
 
     for (OperationPtrArray::iterator iter=pass.operation_ptrs.begin (), end=pass.operation_ptrs.end (); iter!=end; ++iter)
-      DrawPassOperation (pass, **iter, scissor ? &*scissor : (RectAreaImpl*)0, current_local_scissor);
+      DrawPassOperation (pass, iter, end, scissor ? &*scissor : (RectAreaImpl*)0, current_local_scissor);
   }
   
 ///Выполнение операции прохода рендеринга
-  void DrawPassOperation (RenderPass& pass, const PassOperation& operation, RectAreaImpl* common_scissor, const RectAreaImpl*& current_local_scissor)
+  void DrawPassOperation (RenderPass& pass, OperationPtrArray::iterator& operation_iter, OperationPtrArray::iterator operation_end, RectAreaImpl* common_scissor, const RectAreaImpl*& current_local_scissor)
   {
+    const PassOperation&     operation                   = **operation_iter;
     const RendererPrimitive& primitive                   = *operation.primitive;
     ShaderOptionsCache&      entity_shader_options_cache = *operation.shader_options_cache;
     const RectAreaImpl*      operation_scissor           = operation.scissor;
@@ -882,8 +894,56 @@ struct RenderOperationsExecutor
 
       //рисование
 
-    if (primitive.indexed) device_context.DrawIndexed (primitive.type, primitive.first, primitive.count, primitive.base_vertex);
-    else                   device_context.Draw        (primitive.type, primitive.first + primitive.base_vertex, primitive.count);
+    if (primitive.indexed)
+    {
+      if (operation.batching_hash)
+      {
+        size_t           batching_hash    = operation.batching_hash;
+        BatchingManager* batching_manager = operation.primitive->batching_manager;
+
+          //сброс текущего пакета
+
+        batching_manager->ResetLinearIndexBuffer ();
+
+          //определение границ пакета и копирование индексов в линейный буфер
+
+        OperationPtrArray::iterator iter = operation_iter + 1;
+
+        size_t indices_count = 0;
+
+        for (;iter!=operation_end && (*iter)->batching_hash == batching_hash; ++iter)
+        {
+          const RendererPrimitive& primitive = *(*iter)->primitive;
+
+          DynamicPrimitiveIndex* dst_indices = batching_manager->AllocateDynamicIndices (IndexPoolType_Linear, primitive.count);
+
+          if (!dst_indices)
+            break;
+
+          memcpy (dst_indices, primitive.dynamic_indices, primitive.count * sizeof (DynamicPrimitiveIndex));
+
+          indices_count += primitive.count;
+        }
+
+        operation_iter = iter - 1;
+
+          //синхронизация буферов
+
+        batching_manager->DynamicIndexBuffer ().SyncBuffers (device);
+
+          //рисование
+
+        device_context.DrawIndexed (primitive.type, 0, indices_count, 0);
+      }
+      else
+      {
+        device_context.DrawIndexed (primitive.type, primitive.first, primitive.count, primitive.base_vertex);
+      }
+    }
+    else
+    {
+      device_context.Draw (primitive.type, primitive.first + primitive.base_vertex, primitive.count);
+    }
   }
   
 ///Рендеринг вложенного эффекта

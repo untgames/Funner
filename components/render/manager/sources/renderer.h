@@ -87,6 +87,9 @@ struct RendererOperation
 
 inline size_t get_batching_hash (const RendererOperation& op)
 {
+  if (!op.primitive->batching_hash)
+    return 0;
+
   return common::crc32 (&op.scissor, sizeof (op.scissor), common::crc32 (&op.state_block, sizeof (op.state_block), common::crc32 (&op.entity_parameters_layout, sizeof (op.entity_parameters_layout),
     common::crc32 (&op.shader_options_cache, sizeof (op.shader_options_cache), op.primitive->batching_hash))));
 }
