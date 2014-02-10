@@ -1,7 +1,7 @@
 ###################################################################################################
 #Определения и константы
 ###################################################################################################
-TARGETS := MEDIA.FONT.SOURCES MEDIA.FONT.TESTS #MEDIA.FONT.XFONT MEDIA.FONT.FONT_CONVERTER \
+TARGETS := MEDIA.FONT.SOURCES MEDIA.FONT.FREETYPE MEDIA.FONT.TESTS #MEDIA.FONT.XFONT MEDIA.FONT.FONT_CONVERTER \
            MEDIA.FONT.IMAGE2XFONT MEDIA.FONT.TTF2XFONT MEDIA.FONT.TTF2XFONT.TESTS
 
 #Цель - MediaLib sources
@@ -9,6 +9,12 @@ MEDIA.FONT.SOURCES.TYPE             := static-lib
 MEDIA.FONT.SOURCES.NAME             := funner.media.font
 MEDIA.FONT.SOURCES.SOURCE_DIRS      := sources/core
 MEDIA.FONT.SOURCES.IMPORTS          := compile.media.font
+
+#Цель - freetype
+MEDIA.FONT.FREETYPE.TYPE        := static-lib
+MEDIA.FONT.FREETYPE.NAME        := funner.media.font.freetype
+MEDIA.FONT.FREETYPE.SOURCE_DIRS := sources/freetype
+MEDIA.FONT.FREETYPE.IMPORTS     := compile.media.font compile.extern.freetype
 
 #Цель - xfont
 MEDIA.FONT.XFONT.TYPE             := static-lib
@@ -26,7 +32,8 @@ MEDIA.FONT.FONT_CONVERTER.IMPORTS          := compile.media.font compile.media.i
 #Цель - MediaLib tests
 MEDIA.FONT.TESTS.TYPE             := test-suite
 MEDIA.FONT.TESTS.SOURCE_DIRS      := tests/font
-MEDIA.FONT.TESTS.IMPORTS          := compile.media.font link.media.font compile.media.image link.media.image link.media.image.left_bottom_packer
+MEDIA.FONT.TESTS.IMPORTS          := compile.media.font link.media.font compile.media.image link.media.image \
+                                     link.media.image.left_bottom_packer link.media.font.freetype
 
 #Цель - Imave to xfont converter
 MEDIA.FONT.IMAGE2XFONT.TYPE             := application

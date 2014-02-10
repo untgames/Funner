@@ -12,6 +12,7 @@
 #include <xtl/iterator.h>
 #include <xtl/uninitialized_storage.h>
 
+#include <common/component.h>
 #include <common/file.h>
 #include <common/hash.h>
 #include <common/log.h>

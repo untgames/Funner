@@ -9,7 +9,8 @@ using namespace media;
 namespace
 {
 
-const char* LOG_NAME = "media.FontLibrary"; //имя протокола
+const char* FONT_LOADERS_MASK = "media.font.loaders.*"; //маска имён компонентов загрузки шрифтов
+const char* LOG_NAME          = "media.FontLibrary";    //имя протокола
 
 //Элемент карты загруженных шрифтов
 struct FontEntry : public xtl::reference_counter
@@ -215,7 +216,9 @@ void FontLibrary::LoadFont (const char* file_name)
     if (!file_name)
       throw xtl::make_null_argument_exception ("", "file_name");
 
-    const FontManager::LoadHandler& loader = FontManager::GetLoader (file_name);
+    static common::ComponentLoader components_loader (FONT_LOADERS_MASK);
+
+     const FontManager::LoadHandler& loader = FontManager::GetLoader (file_name, common::SerializerFindMode_ByName);
 
     impl->LoadFont (file_name, &loader);
 
@@ -238,9 +241,11 @@ void FontLibrary::LoadFonts (const char* wildcard)
 
     common::FileList file_list = common::FileSystem::Search (wildcard, common::FileSearch_Files);
 
+    static common::ComponentLoader components_loader (FONT_LOADERS_MASK);
+
     for (common::FileListIterator iter = file_list.GetIterator (); iter; ++iter)
     {
-      const FontManager::LoadHandler *loader = FontManager::FindLoader (iter->name);
+      const FontManager::LoadHandler *loader = FontManager::FindLoader (iter->name, common::SerializerFindMode_ByName);
 
       if (!loader)
         continue;
