@@ -39,7 +39,13 @@ struct RendererPrimitive
   const size_t*                       tags;             //тэги материала
   const DynamicPrimitiveIndex* const* dynamic_indices;  //указатель на массив динамических индексов
   BatchingManager*                    batching_manager; //менеджер упаковки
+  size_t                              batching_hash;    //хэш пакета
 };
+
+inline size_t get_batching_hash (const RendererPrimitive& p)
+{
+  return common::crc32 (&p.state_block, sizeof (p.state_block), common::crc32 (&p.type, sizeof (p.type), common::crc32 (&p.base_vertex, sizeof (p.base_vertex))));
+}
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Описание группы примитивов рендеринга
@@ -76,7 +82,14 @@ struct RendererOperation
   DynamicPrimitive*               dynamic_primitive;              //динамический примитив, соответствующий операции (может быть 0)
   ShaderOptionsCache*             shader_options_cache;           //кэш опций шейдера
   const RectAreaImpl*             scissor;                        //область отсечения (может быть null)
+  size_t                          batching_hash;                  //хэш пакета
 };
+
+inline size_t get_batching_hash (const RendererOperation& op)
+{
+  return common::crc32 (&op.scissor, sizeof (op.scissor), common::crc32 (&op.state_block, sizeof (op.state_block), common::crc32 (&op.entity_parameters_layout, sizeof (op.entity_parameters_layout),
+    common::crc32 (&op.shader_options_cache, sizeof (op.shader_options_cache), op.primitive->batching_hash))));
+}
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Описание списка операций

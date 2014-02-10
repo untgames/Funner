@@ -532,6 +532,7 @@ struct EntityLod: public xtl::reference_counter, public EntityLodDesc, public Ca
       operation.entity_parameters_layout = common_data.GetProgramParametersLayout (material).get ();
       operation.shader_options_cache     = &common_data.ShaderOptionsCache ();
       operation.scissor                  = scissor;
+      operation.batching_hash            = get_batching_hash (operation);
 
       cached_operations.push_back (operation);
     }

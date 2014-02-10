@@ -8,20 +8,8 @@ using namespace render::manager;
 /*
   Sprite integration:
     - operations merge condition:
-      * same PassOperation::frame_entity_parameters_layout
-      * same PassOperation::frame_entity_parameters_buffer
-      * same RendererOperation::scissor
-      * same RendererOperation::shader_options_cache
-      * same RendererOperation::entity_parameters_layout
-      * same RendererOperation::state_block (hard!!! material dependent)
-      * same RendererOperation::entity
-      * same RendererPrimitive::material
-      * same RendererPrimitive::state_block (???)
-      * same RendererPrimitive::indexed
-      * same RendererPrimitive::type
-      * same RendererPrimitive::base_vertex
-
-  maybe, grouping id/hash should be used instead of all parameters
+      * RendererPrimitive::indexed == true
+      * same RendererOperation::batching_hash
 */
 
 namespace
@@ -59,6 +47,10 @@ struct PassOperation: public RendererOperation
     , eye_distance (in_eye_distance)
     , mvp_matrix_index (in_mvp_matrix_index)
   {
+      //обновление хэша
+
+    batching_hash = common::crc32 (&frame_entity_parameters_layout, sizeof (frame_entity_parameters_layout),
+      common::crc32 (&frame_entity_parameters_buffer, sizeof (frame_entity_parameters_buffer), batching_hash));
   }
 };
 
