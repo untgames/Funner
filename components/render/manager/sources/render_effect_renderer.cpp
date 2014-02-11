@@ -2,7 +2,6 @@
 
 using namespace render::manager;
 
-//TODO: update/sync dynamic vertex buffer
 //TODO: shared EffectRenderer buffers (operations, passes, etc)
 //TODO: program/parameters_layout/local_textures FIFO cache
 
