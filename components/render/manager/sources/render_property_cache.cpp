@@ -213,7 +213,7 @@ void PropertyCache::Convert (const common::PropertyMap& source_map, LowLevelBuff
       
     if (impl->last_hash != hash)
     {
-      impl->last_layout = impl->device_manager->ProgramParametersManager ().GetParameters (ProgramParametersSlot_FrameEntity, layout);
+      impl->last_layout = impl->device_manager->ProgramParametersManager ().GetParameters (ProgramParametersSlot_FrameEntity, layout, true);
       impl->last_hash   = hash;
     }    
     

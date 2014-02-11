@@ -89,7 +89,7 @@ struct ProgramCommonData: public xtl::reference_counter, public DebugIdHolder
         
         new_properties.SetProperty (desc.param_name.c_str (), (int)desc.channel);
       }
-      
+
       ProgramParametersLayoutPtr new_layout = device_manager->ProgramParametersManager ().GetParameters (ProgramParametersSlot_Program, new_properties.Layout ());
       
       properties.SetProperties (new_properties);

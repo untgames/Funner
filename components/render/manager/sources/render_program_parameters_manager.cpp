@@ -4,23 +4,55 @@ using namespace render::manager;
 using namespace render::low_level;
 
 /*
+    Утилиты
+*/
+
+namespace
+{
+
+struct LayoutKey
+{
+  size_t hash;
+  size_t parameters_count;
+
+  LayoutKey (const common::PropertyLayout& layout)
+    : hash (layout.Hash ())
+    , parameters_count (layout.Size ())
+  {
+  }
+
+  bool operator == (const LayoutKey& key) const { return hash == key.hash && parameters_count == key.parameters_count; }
+  bool operator != (const LayoutKey& key) const { return !(*this == key); }
+};
+
+inline size_t hash (const LayoutKey& key)
+{
+  return key.hash;
+}
+
+}
+
+/*
     Описание реализации менеджера параметров программ шэйдинга
 */
 
 typedef stl::hash_multimap<size_t, ProgramParametersLayout*> LayoutMap;
+typedef CacheMap<LayoutKey, ProgramParametersLayoutPtr>      LayoutCacheMap;
 typedef CacheMap<size_t, ProgramParametersLayoutPtr>         CompositeLayoutMap;
 
 struct ProgramParametersManager::Impl: public xtl::trackable
 {
-  LowLevelDevicePtr   device;            //устройство визуализации
-  LayoutMap           layouts;           //лэйауты параметров различной конфигурации
-  CompositeLayoutMap  composite_layouts; //составные лэйауты параметров различной конфигурации
-  SettingsPtr         settings;          //настройки менеджера рендеринга
-  Log                 log;               //поток отладочного протоколирования
+  LowLevelDevicePtr   device;             //устройство визуализации
+  LayoutMap           layouts;            //лэйауты параметров различной конфигурации
+  LayoutCacheMap      layouts_temp_cache; //кэш лэйаутов
+  CompositeLayoutMap  composite_layouts;  //составные лэйауты параметров различной конфигурации
+  SettingsPtr         settings;           //настройки менеджера рендеринга
+  Log                 log;                //поток отладочного протоколирования
 
 ///Конструктор
   Impl (const LowLevelDevicePtr& in_device, const SettingsPtr& in_settings, const CacheManagerPtr& cache_manager)
     : device (in_device)
+    , layouts_temp_cache (cache_manager)
     , composite_layouts (cache_manager)
     , settings (in_settings)
   {
@@ -80,10 +112,16 @@ ProgramParametersManager::~ProgramParametersManager ()
     Получение объекта параметров
 */
 
-ProgramParametersLayoutPtr ProgramParametersManager::GetParameters (ProgramParametersSlot slot, const common::PropertyLayout& layout)
+ProgramParametersLayoutPtr ProgramParametersManager::GetParameters (ProgramParametersSlot slot, const common::PropertyLayout& layout, bool is_temporary)
 {
   try
-  {        
+  {
+    if (is_temporary)
+    {
+      if (ProgramParametersLayoutPtr* result_layout = impl->layouts_temp_cache.Find (layout))
+        return *result_layout;
+    }
+
     stl::pair<LayoutMap::iterator, LayoutMap::iterator> range = impl->layouts.equal_range (layout.Hash ());    
     
     for (size_t parameters_count=layout.Size (); range.first!=range.second; ++range.first)
@@ -97,6 +135,9 @@ ProgramParametersLayoutPtr ProgramParametersManager::GetParameters (ProgramParam
     result_layout->connect_tracker (xtl::bind (&Impl::RemoveLayout, &*impl, layout.Hash (), &*result_layout), *impl);
     
     impl->layouts.insert_pair (layout.Hash (), result_layout.get ());
+
+    if (is_temporary)
+      impl->layouts_temp_cache.Add (layout, result_layout);
 
     return result_layout;
   }
