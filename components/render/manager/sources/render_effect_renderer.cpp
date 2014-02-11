@@ -23,6 +23,7 @@ namespace
 const size_t RESERVE_OPERATION_ARRAY  = 512; //резервируемое число операций в массиве операций прохода
 const size_t RESERVE_FRAME_ARRAY      = 32;  //резервируемое число вложенных фреймов в эффекте
 const size_t RESERVE_MVP_MATRIX_ARRAY = 512; //резервируемое число матриц MVP (для динамических примитивов)
+const size_t RESERVE_BATCHES_ARRAY    = 128; //резервируемое количество пакетов
 
 /*
     Вспомогательные структуры
@@ -58,8 +59,9 @@ struct PassOperation: public RendererOperation
   }
 };
 
-typedef stl::vector<PassOperation*> OperationPtrArray;
-typedef stl::vector<PassOperation>  OperationArray;
+typedef stl::vector<PassOperation*>   OperationPtrArray;
+typedef stl::vector<PassOperation>    OperationArray;
+typedef stl::vector<BatchingManager*> BatchingManagerArray;
 
 ///Компаратор от наиболее близкого объекта к наиболее удаленному
 struct FrontToBackComparator
@@ -219,9 +221,15 @@ struct EffectRenderer::Impl
   RenderInstantiatedEffectMap effects;             //инстанцированные эффекты
   RenderEffectOperationArray  operations;          //операции рендеринга
   MatrixArray                 mvp_matrices;        //матрицы
+  BatchingManagerArray        batching_managers;   //менеджеры пакетирования
   bool                        right_hand_viewport; //является ли область вывода правосторонней
   
-  Impl (const DeviceManagerPtr& in_device_manager) : device_manager (in_device_manager), right_hand_viewport (false) { }
+  Impl (const DeviceManagerPtr& in_device_manager)
+    : device_manager (in_device_manager)
+    , right_hand_viewport (false)
+  {
+    batching_managers.reserve (RESERVE_BATCHES_ARRAY);
+  }
 };
 
 /*
@@ -532,10 +540,11 @@ struct RenderOperationsExecutor
   ShaderOptionsCache&                frame_shader_options_cache; //кэш опций шейдеров для кадра
   LowLevelBufferPtr                  frame_property_buffer;      //буфер параметров кадра
   const MatrixArray&                 mvp_matrices;               //массив матриц Model-View-Projection
+  BatchingManagerArray&              batching_managers;          //менеджеры пакетирования
   bool                               right_hand_viewport;        //является ли область вывода правосторонней
   
 ///Конструктор
-  RenderOperationsExecutor (RenderingContext& in_context, DeviceManager& in_device_manager, const MatrixArray& in_mvp_matrices, bool in_right_hand_viewport)
+  RenderOperationsExecutor (RenderingContext& in_context, DeviceManager& in_device_manager, const MatrixArray& in_mvp_matrices, BatchingManagerArray& in_batching_managers, bool in_right_hand_viewport)
     : context (in_context)
     , device_manager (in_device_manager)
     , device (device_manager.Device ())
@@ -545,6 +554,7 @@ struct RenderOperationsExecutor
     , frame_shader_options_cache (frame.ShaderOptionsCache ())
     , frame_property_buffer (frame.DevicePropertyBuffer ())
     , mvp_matrices (in_mvp_matrices)
+    , batching_managers (in_batching_managers)
     , right_hand_viewport (in_right_hand_viewport)
   {
   }
@@ -731,20 +741,51 @@ struct RenderOperationsExecutor
   {
     FrameImpl& frame = pass.frame;
 
-    for (OperationPtrArray::iterator iter=pass.operation_ptrs.begin (), end=pass.operation_ptrs.end (); iter!=end; ++iter)
+    batching_managers.clear ();
+
+    try
     {
-      PassOperation&    operation         = **iter;
-      DynamicPrimitive* dynamic_primitive = operation.dynamic_primitive;
+      for (OperationPtrArray::iterator iter=pass.operation_ptrs.begin (), end=pass.operation_ptrs.end (); iter!=end; ++iter)
+      {
+        PassOperation&    operation         = **iter;
+        DynamicPrimitive* dynamic_primitive = operation.dynamic_primitive;
+        BatchingManager*  batching_manager  = operation.primitive->batching_manager;
 
-      if (!dynamic_primitive || !dynamic_primitive->IsFrameDependent () || operation.mvp_matrix_index == -1)
-        continue;
+        if (!dynamic_primitive || !dynamic_primitive->IsFrameDependent () || operation.mvp_matrix_index == -1)
+          continue;
 
-      const math::mat4f& mvp_matrix = mvp_matrices [operation.mvp_matrix_index];
+        const math::mat4f& mvp_matrix = mvp_matrices [operation.mvp_matrix_index];
 
-      dynamic_primitive->UpdateOnRender (frame, *operation.entity, context, mvp_matrix);
+        dynamic_primitive->UpdateOnRender (frame, *operation.entity, context, mvp_matrix);
+
+        if (batching_manager && batching_manager->PassUserData () != this)
+        {
+          batching_managers.push_back (batching_manager);
+
+          batching_manager->SetPassUserData (this);
+        }
+      }
+
+        //обновление вершинных буферов
+
+      for (BatchingManagerArray::iterator iter=batching_managers.begin (), end=batching_managers.end (); iter!=end; ++iter)
+      {
+        BatchingManager& batching_manager = **iter;
+
+        batching_manager.DynamicVertexBuffer ().SyncBuffers (device);
+
+        batching_manager.SetPassUserData (0);
+      }
     }
+    catch (...)
+    {
+      for (BatchingManagerArray::iterator iter=batching_managers.begin (), end=batching_managers.end (); iter!=end; ++iter)
+        (*iter)->SetPassUserData (0);
 
-    //TODO: update vertex buffer
+      batching_managers.clear ();
+
+      throw;
+    }    
   }
   
 ///Рендеринг прохода
@@ -962,7 +1003,7 @@ void EffectRenderer::ExecuteOperations (RenderingContext& context)
 {
   try
   {
-    RenderOperationsExecutor executor (context, *impl->device_manager, impl->mvp_matrices, impl->right_hand_viewport);
+    RenderOperationsExecutor executor (context, *impl->device_manager, impl->mvp_matrices, impl->batching_managers, impl->right_hand_viewport);
 
     executor.Draw (impl->operations);
   }

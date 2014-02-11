@@ -200,6 +200,7 @@ struct BatchingManager::Impl: public Cache
   DynamicIndexPool                      dynamic_index_pool;   //пул динамических индексов
   DynamicIndexPool                      temp_index_pool;      //пул динамических индексов для построения примитивов
   StateBlockMap                         state_blocks;         //блоки состояний
+  const void*                           pass_tag;             //тэг прохода
 
 /// Конструктор
   Impl (const DeviceManagerPtr& in_device_manager)
@@ -207,6 +208,7 @@ struct BatchingManager::Impl: public Cache
     , device_manager (in_device_manager)
     , dynamic_vb (render::low_level::UsageMode_Stream, render::low_level::BindFlag_VertexBuffer)
     , dynamic_ib (render::low_level::UsageMode_Stream, render::low_level::BindFlag_IndexBuffer)
+    , pass_tag ()
   {
   }
 
@@ -449,4 +451,18 @@ BatchStateBlockPtr BatchingManager::GetStateBlock (MaterialImpl* material)
     e.touch ("render::manager::BatchingManager::GetStateBlock");
     throw;
   }
+}
+
+/*
+    Тэг текущего прохода
+*/
+
+void BatchingManager::SetPassUserData (const void* tag)
+{
+  impl->pass_tag = tag;
+}
+
+const void* BatchingManager::PassUserData ()
+{
+  return impl->pass_tag;
 }
