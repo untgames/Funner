@@ -403,6 +403,7 @@ void EffectRenderer::AddOperations
 
       if (range.first != range.second && dynamic_primitive)
       {
+printf ("%s(%u)\n", __FUNCTION__, __LINE__); fflush (stdout);
         dynamic_primitive->UpdateOnPrerender (current_frame_id, *operation->entity);
 
         if (dynamic_primitive->IsFrameDependent ())

@@ -94,7 +94,8 @@ int main ()
     Entity     entity    = render_manager.CreateEntity ();
     Primitive  primitive = render_manager.CreatePrimitive ();
 //    SpriteList sprites   = primitive.AddStandaloneSpriteList (SpriteMode_Oriented, math::vec3f (0, 1.0f, 0));
-    SpriteList sprites   = primitive.AddStandaloneSpriteList (SpriteMode_OrientedBillboard, math::vec3f (0, 1.0f, 0));
+//    SpriteList sprites   = primitive.AddStandaloneSpriteList (SpriteMode_Billboard, math::vec3f (0, 1.0f, 0));
+    SpriteList sprites   = primitive.AddBatchingSpriteList (SpriteMode_Oriented, math::vec3f (0, 1.0f, 0));
     Sprite     sprite;
 
     sprite.position   = math::vec3f (0.0f);

@@ -1090,16 +1090,17 @@ class BatchingLineAndOrientedSpriteList: public BatchingStateBlockHolder, public
         {
           try
           {
+printf ("%s(%u)\n", __FUNCTION__, __LINE__); fflush (stdout);
             BatchingLineAndOrientedSpriteList& prototype = static_cast<BatchingLineAndOrientedSpriteList&> (Prototype ());
 
             size_t verts_count = prototype.VerticesCount (), items_count = verts_count / VERTICES_PER_PRIMITIVE, inds_count = items_count * INDICES_PER_PRIMITIVE, base_vertex = 0;
 
             DynamicPrimitiveVertex* vertices = 0;
             DynamicPrimitiveIndex*  indices  = 0;
-
+printf ("%s(%u)\n", __FUNCTION__, __LINE__); fflush (stdout);
             if (!UpdatePrimitive (PRIMITIVE_TYPE, verts_count, inds_count, vertices, indices, base_vertex))
               return;
-
+printf ("%s(%u)\n", __FUNCTION__, __LINE__); fflush (stdout);
               //формирование вершин и индексов
 
             generate (static_cast<Generator&> (prototype), items_count, base_vertex, indices);
@@ -1142,6 +1143,7 @@ class BatchingLineAndOrientedSpriteList: public BatchingStateBlockHolder, public
     {
       try
       {
+printf ("%s(%u)\n", __FUNCTION__, __LINE__); fflush (stdout);
         return new Instance (this);
       }
       catch (xtl::exception& e)
