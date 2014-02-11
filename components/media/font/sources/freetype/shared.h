@@ -1,6 +1,7 @@
 #ifndef MEDIA_FONT_FREETYPE_SHARED_HEADER
 #define MEDIA_FONT_FREETYPE_SHARED_HEADER
 
+#include <stl/string>
 #include <stl/vector>
 
 #include <xtl/common_exceptions.h>
@@ -11,7 +12,9 @@
 #include <common/file.h>
 #include <common/lockable.h>
 #include <common/log.h>
+#include <common/strlib.h>
 
+#include <media/charset_manager.h>
 #include <media/font_library.h>
 #include <media/rasterized_font.h>
 
@@ -42,8 +45,9 @@ class FreetypeLibrary
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Freetype API
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    FT_Error FT_Done_Face       (FT_Face face);
-    FT_Error FT_New_Memory_Face (const FT_Byte* file_base, FT_Long file_size, FT_Long face_index, FT_Face *aface);
+    void FT_Done_Face       (FT_Face face);
+    void FT_New_Memory_Face (const FT_Byte* file_base, FT_Long file_size, FT_Long face_index, FT_Face *aface);
+    void FT_Select_Charmap  (FT_Face face, FT_Encoding  encoding);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Ξαμεν

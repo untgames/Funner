@@ -24,6 +24,9 @@ class FreetypeLoaderComponent
     FreetypeLoaderComponent ()
     {
       FontManager::RegisterLoader ("ttf", &LoadFont);
+      FontManager::RegisterLoader ("ttc", &LoadFont);
+      FontManager::RegisterLoader ("otf", &LoadFont);
+      FontManager::RegisterLoader ("fon", &LoadFont);
     }
 
   private:

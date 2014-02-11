@@ -96,18 +96,25 @@ FreetypeLibrary& FreetypeLibrary::operator = (const FreetypeLibrary& source)
    Freetype API
 */
 
-FT_Error FreetypeLibrary::FT_Done_Face (FT_Face face)
+void FreetypeLibrary::FT_Done_Face (FT_Face face)
 {
   common::Lock lock (*impl);
 
   check_free_type_error (::FT_Done_Face (face), "::FT_Done_Face");
 }
 
-FT_Error FreetypeLibrary::FT_New_Memory_Face (const FT_Byte* file_base, FT_Long file_size, FT_Long face_index, FT_Face *aface)
+void FreetypeLibrary::FT_New_Memory_Face (const FT_Byte* file_base, FT_Long file_size, FT_Long face_index, FT_Face *aface)
 {
   common::Lock lock (*impl);
 
   check_free_type_error (::FT_New_Memory_Face (impl->library, file_base, file_size, face_index, aface), "::FT_New_Memory_Face");
+}
+
+void FreetypeLibrary::FT_Select_Charmap (FT_Face face, FT_Encoding  encoding)
+{
+  common::Lock lock (*impl);
+
+  check_free_type_error (::FT_Select_Charmap (face, encoding), "::FT_Select_Charmap");
 }
 
 /*
