@@ -35,8 +35,8 @@ class PrimitiveBuffersImpl;
 class PrimitiveImpl;
 class Wrappers;
 
-template <class T> class DynamicPrimitiveList;
-template <class T> class DynamicPrimitiveListImpl;
+template <class T> class SimplePrimitiveList;
+template <class T> class SimplePrimitiveListImpl;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Режим использования меша
@@ -92,8 +92,8 @@ struct Line
   LinePoint point [2]; //концы линии
 };
 
-typedef DynamicPrimitiveList<Sprite> SpriteList;
-typedef DynamicPrimitiveList<Line>   LineList;
+typedef SimplePrimitiveList<Sprite> SpriteList;
+typedef SimplePrimitiveList<Line>   LineList;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Буфер примитивов
@@ -233,7 +233,7 @@ void swap (Primitive&, Primitive&);
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Группа динамических примитивов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-template <class T> class DynamicPrimitiveList
+template <class T> class SimplePrimitiveList
 {
   friend class Wrappers;
   friend class Primitive;
@@ -243,10 +243,10 @@ template <class T> class DynamicPrimitiveList
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструкторы / деструктор / присваивание
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    DynamicPrimitiveList  (const DynamicPrimitiveList&);
-    ~DynamicPrimitiveList ();
+    SimplePrimitiveList  (const SimplePrimitiveList&);
+    ~SimplePrimitiveList ();
 
-    DynamicPrimitiveList& operator = (const DynamicPrimitiveList&);
+    SimplePrimitiveList& operator = (const SimplePrimitiveList&);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Количество примитивов
@@ -285,12 +285,12 @@ template <class T> class DynamicPrimitiveList
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Обмен
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void Swap (DynamicPrimitiveList&);  
+    void Swap (SimplePrimitiveList&);  
 
   private:
-    typedef DynamicPrimitiveListImpl<Item> Impl;
+    typedef SimplePrimitiveListImpl<Item> Impl;
 
-    DynamicPrimitiveList (Impl*);
+    SimplePrimitiveList (Impl*);
 
   private:
     Impl* impl;
@@ -299,7 +299,7 @@ template <class T> class DynamicPrimitiveList
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Обмен
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-template <class T> void swap (DynamicPrimitiveList<T>&, DynamicPrimitiveList<T>&);
+template <class T> void swap (SimplePrimitiveList<T>&, SimplePrimitiveList<T>&);
 
 }
 

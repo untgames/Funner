@@ -283,7 +283,7 @@ inline void generate (size_t items_count, size_t base_vertex, DynamicPrimitiveIn
     Хранилище для материалов
 */
 
-class MaterialHolder: virtual public DynamicPrimitiveListImplBase
+class MaterialHolder: virtual public SimplePrimitiveListImplBase
 {
   public:
 /// Конструктор
@@ -564,10 +564,10 @@ class BatchingStateBlockHolder: public MaterialHolder
     Хранилище элементов списка днамических примитивов
 */
 
-template <class T, class Base> class PrimitiveListStorage: public Base, public DynamicPrimitiveListImpl<T>
+template <class T, class Base> class PrimitiveListStorage: public Base, public SimplePrimitiveListImpl<T>
 {
   public:
-    typedef typename DynamicPrimitiveListImpl<T>::Item Item;
+    typedef typename SimplePrimitiveListImpl<T>::Item Item;
 
     using Base::InvalidateCacheDependencies;
     using Base::InvalidateCache;
@@ -842,10 +842,10 @@ class BatchingInstance: public DynamicPrimitive, private render::manager::Render
 */
 
 template <class T, class Generator>
-class StandaloneLineAndOrientedSpriteList: public StandalonePrimitiveHolder, public DynamicPrimitiveListImpl<T>, private Generator
+class StandaloneLineAndOrientedSpriteList: public StandalonePrimitiveHolder, public SimplePrimitiveListImpl<T>, private Generator
 {
   public:
-    typedef typename DynamicPrimitiveListImpl<T>::Item Item;
+    typedef typename SimplePrimitiveListImpl<T>::Item Item;
 
     enum { VERTICES_PER_PRIMITIVE = Generator::VERTICES_PER_PRIMITIVE, INDICES_PER_PRIMITIVE = Generator::INDICES_PER_PRIMITIVE };
 
@@ -1068,10 +1068,10 @@ class StandaloneLineAndOrientedSpriteList: public StandalonePrimitiveHolder, pub
 */
 
 template <class T, class Generator>
-class BatchingLineAndOrientedSpriteList: public BatchingStateBlockHolder, public DynamicPrimitiveListImpl<T>, private Generator
+class BatchingLineAndOrientedSpriteList: public BatchingStateBlockHolder, public SimplePrimitiveListImpl<T>, private Generator
 {
   public:
-    typedef typename DynamicPrimitiveListImpl<T>::Item Item;
+    typedef typename SimplePrimitiveListImpl<T>::Item Item;
 
     enum { VERTICES_PER_PRIMITIVE = Generator::VERTICES_PER_PRIMITIVE, INDICES_PER_PRIMITIVE = Generator::INDICES_PER_PRIMITIVE };
 

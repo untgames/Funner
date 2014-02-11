@@ -1,5 +1,6 @@
 ///forward declarations
 class PrimitiveBuffersImpl;
+class SimplePrimitiveListImplBase;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Меш
@@ -70,9 +71,9 @@ class PrimitiveImpl: public Object, public CacheSource
     using CacheSource::ResetCache;
 
   private:
-    void AddDynamicPrimitiveList        (DynamicPrimitiveListImplBase*, int type);
-    void RemoveDynamicPrimitiveList     (DynamicPrimitiveListImplBase*);
-    void RemoveAllDynamicPrimitiveLists (int type);
+    void AddSimplePrimitiveList        (SimplePrimitiveListImplBase*, int type);
+    void RemoveSimplePrimitiveList     (SimplePrimitiveListImplBase*);
+    void RemoveAllSimplePrimitiveLists (int type);
       
   private:
     void UpdateCacheCore ();

@@ -79,8 +79,8 @@ struct ShaderOptions;
 
 template <class T> class DynamicPrimitiveBuffer;
 
-typedef DynamicPrimitiveListImpl<Line>   LineListImpl;
-typedef DynamicPrimitiveListImpl<Sprite> SpriteListImpl;
+typedef SimplePrimitiveListImpl<Line>   LineListImpl;
+typedef SimplePrimitiveListImpl<Sprite> SpriteListImpl;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Указатели на объекты рендера среднего уровня
@@ -218,7 +218,6 @@ class DebugIdHolder: public xtl::noncopyable
 #include "batching_manager.h"
 #include "dynamic_primitive.h"
 #include "dynamic_primitive_buffer.h"
-#include "dynamic_primitive_list.h"
 #include "dynamic_texture.h"
 #include "effect.h"
 #include "effect_loader_library.h"
@@ -244,6 +243,7 @@ class DebugIdHolder: public xtl::noncopyable
 #include "rendering_context.h"
 #include "settings.h"
 #include "shader_options.h"
+#include "simple_primitive_list.h"
 #include "texture.h"
 #include "texture_manager.h"
 #include "viewport.h"

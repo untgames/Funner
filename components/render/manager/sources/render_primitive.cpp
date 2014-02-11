@@ -280,24 +280,24 @@ struct Mesh: public xtl::reference_counter, public MeshCommonData, public CacheH
   using CacheHolder::ResetCache;
 };
 
-typedef xtl::intrusive_ptr<Mesh>                         MeshPtr;
-typedef stl::vector<MeshPtr>                             MeshArray;
-typedef stl::vector<RendererPrimitiveGroup>              RenderPrimitiveGroupsArray;
-typedef xtl::intrusive_ptr<DynamicPrimitiveListImplBase> DynamicPrimitiveListPtr;
+typedef xtl::intrusive_ptr<Mesh>                        MeshPtr;
+typedef stl::vector<MeshPtr>                            MeshArray;
+typedef stl::vector<RendererPrimitiveGroup>             RenderPrimitiveGroupsArray;
+typedef xtl::intrusive_ptr<SimplePrimitiveListImplBase> SimplePrimitiveListPtr;
 
-enum DynamicPrimitiveListType
+enum SimplePrimitiveListType
 {
-  DynamicPrimitiveListType_Sprite,
-  DynamicPrimitiveListType_Line,
+  SimplePrimitiveListType_Sprite,
+  SimplePrimitiveListType_Line,
 };
 
-struct DynamicPrimitiveListDesc
+struct SimplePrimitiveListDesc
 {
-  DynamicPrimitiveListPtr  list;
-  DynamicPrimitiveListType type;
-  RendererPrimitive*       primitive;
+  SimplePrimitiveListPtr  list;
+  SimplePrimitiveListType type;
+  RendererPrimitive*      primitive;
 
-  DynamicPrimitiveListDesc (const DynamicPrimitiveListPtr& in_list, DynamicPrimitiveListType in_type, RendererPrimitive* in_primitive)
+  SimplePrimitiveListDesc (const SimplePrimitiveListPtr& in_list, SimplePrimitiveListType in_type, RendererPrimitive* in_primitive)
     : list (in_list)
     , type (in_type)
     , primitive (in_primitive)
@@ -306,7 +306,7 @@ struct DynamicPrimitiveListDesc
 };
 
 
-typedef stl::vector<DynamicPrimitiveListDesc> DynamicPrimitiveListArray;
+typedef stl::vector<SimplePrimitiveListDesc> SimplePrimitiveListArray;
 
 }
 
@@ -316,8 +316,8 @@ struct PrimitiveImpl::Impl: public DebugIdHolder
   MaterialManagerPtr         material_manager;                             //менеджер материалов
   BuffersPtr                 buffers;                                      //буферы примитива
   MeshArray                  meshes;                                       //меши
-  DynamicPrimitiveListArray  entity_independent_dynamic_primitive_lists;   //списки динамических примитивов
-  DynamicPrimitiveListArray  entity_dependent_dynamic_primitive_lists;     //списки динамических примитивов
+  SimplePrimitiveListArray   entity_independent_dynamic_primitive_lists;   //списки динамических примитивов
+  SimplePrimitiveListArray   entity_dependent_dynamic_primitive_lists;     //списки динамических примитивов
   RendererPrimitiveArray     cached_entity_independent_dynamic_primitives; //закэшированные динамические примитивы не завис€щие от объекта
   size_t                     line_lists_count;                             //количество списков с лини€ми
   size_t                     sprite_lists_count;                           //количество списков со спрайтами
@@ -590,7 +590,7 @@ SpriteListPtr PrimitiveImpl::AddStandaloneSpriteList (SpriteMode mode, const mat
 
     SpriteListPtr list (create_standalone_sprite_list (impl->material_manager, mode, up, vb_usage, ib_usage), false);
 
-    AddDynamicPrimitiveList (list.get (), DynamicPrimitiveListType_Sprite);
+    AddSimplePrimitiveList (list.get (), SimplePrimitiveListType_Sprite);
 
     return list;
   }
@@ -617,7 +617,7 @@ SpriteListPtr PrimitiveImpl::AddBatchingSpriteList (SpriteMode mode, const math:
 
     SpriteListPtr list (create_batching_sprite_list (&impl->buffers->BatchingManager (), impl->material_manager, mode, up), false);
 
-    AddDynamicPrimitiveList (list.get (), DynamicPrimitiveListType_Sprite);
+    AddSimplePrimitiveList (list.get (), SimplePrimitiveListType_Sprite);
 
     return list;
   }
@@ -630,12 +630,12 @@ SpriteListPtr PrimitiveImpl::AddBatchingSpriteList (SpriteMode mode, const math:
 
 void PrimitiveImpl::RemoveSpriteList (const SpriteListPtr& list)
 {
-  RemoveDynamicPrimitiveList (list.get ());
+  RemoveSimplePrimitiveList (list.get ());
 }
 
 void PrimitiveImpl::RemoveAllSpriteLists ()
 {
-  RemoveAllDynamicPrimitiveLists (DynamicPrimitiveListType_Sprite);
+  RemoveAllSimplePrimitiveLists (SimplePrimitiveListType_Sprite);
 }
 
 /*
@@ -671,7 +671,7 @@ LineListPtr PrimitiveImpl::AddStandaloneLineList (MeshBufferUsage vb_usage, Mesh
 
     LineListPtr list (create_standalone_line_list (impl->material_manager, vb_usage, ib_usage), false);
 
-    AddDynamicPrimitiveList (list.get (), DynamicPrimitiveListType_Line);
+    AddSimplePrimitiveList (list.get (), SimplePrimitiveListType_Line);
 
     return list;
   }
@@ -688,7 +688,7 @@ LineListPtr PrimitiveImpl::AddBatchingLineList ()
   {
     LineListPtr list (create_batching_line_list (&impl->buffers->BatchingManager (), impl->material_manager), false);
 
-    AddDynamicPrimitiveList (list.get (), DynamicPrimitiveListType_Line);
+    AddSimplePrimitiveList (list.get (), SimplePrimitiveListType_Line);
 
     return list;
   }
@@ -701,12 +701,12 @@ LineListPtr PrimitiveImpl::AddBatchingLineList ()
 
 void PrimitiveImpl::RemoveLineList (const LineListPtr& list)
 {
-  RemoveDynamicPrimitiveList (list.get ());
+  RemoveSimplePrimitiveList (list.get ());
 }
 
 void PrimitiveImpl::RemoveAllLineLists ()
 {
-  RemoveAllDynamicPrimitiveLists (DynamicPrimitiveListType_Line);
+  RemoveAllSimplePrimitiveLists (SimplePrimitiveListType_Line);
 }
 
 /*
@@ -738,9 +738,9 @@ void PrimitiveImpl::FillDynamicPrimitiveStorage (DynamicPrimitiveEntityStorage& 
 {
   try
   {
-    for (DynamicPrimitiveListArray::iterator iter=impl->entity_dependent_dynamic_primitive_lists.begin (), end=impl->entity_dependent_dynamic_primitive_lists.end (); iter!=end; ++iter)
+    for (SimplePrimitiveListArray::iterator iter=impl->entity_dependent_dynamic_primitive_lists.begin (), end=impl->entity_dependent_dynamic_primitive_lists.end (); iter!=end; ++iter)
     {
-      DynamicPrimitiveListImplBase& list = *iter->list;
+      SimplePrimitiveListImplBase& list = *iter->list;
 
       if (storage.FindPrimitive (&list, true))
         continue;
@@ -761,21 +761,21 @@ void PrimitiveImpl::FillDynamicPrimitiveStorage (DynamicPrimitiveEntityStorage& 
     –егистраци€ динамических примитивов
 */
 
-void PrimitiveImpl::AddDynamicPrimitiveList (DynamicPrimitiveListImplBase* list, int type)
+void PrimitiveImpl::AddSimplePrimitiveList (SimplePrimitiveListImplBase* list, int type)
 {
   RendererPrimitive* primitive = list->StandaloneRendererPrimitive ();
 
-  if (primitive) impl->entity_independent_dynamic_primitive_lists.push_back (DynamicPrimitiveListDesc (list, (DynamicPrimitiveListType)type, primitive));
-  else           impl->entity_dependent_dynamic_primitive_lists.push_back (DynamicPrimitiveListDesc (list, (DynamicPrimitiveListType)type, primitive));
+  if (primitive) impl->entity_independent_dynamic_primitive_lists.push_back (SimplePrimitiveListDesc (list, (SimplePrimitiveListType)type, primitive));
+  else           impl->entity_dependent_dynamic_primitive_lists.push_back (SimplePrimitiveListDesc (list, (SimplePrimitiveListType)type, primitive));
 
   AttachCacheSource (*list);
 
   switch (type)
   {
-    case DynamicPrimitiveListType_Sprite:
+    case SimplePrimitiveListType_Sprite:
       impl->sprite_lists_count++;
       break;
-    case DynamicPrimitiveListType_Line:
+    case SimplePrimitiveListType_Line:
       impl->line_lists_count++;
       break;
     default:
@@ -783,26 +783,26 @@ void PrimitiveImpl::AddDynamicPrimitiveList (DynamicPrimitiveListImplBase* list,
   }
 }
 
-void PrimitiveImpl::RemoveDynamicPrimitiveList (DynamicPrimitiveListImplBase* list)
+void PrimitiveImpl::RemoveSimplePrimitiveList (SimplePrimitiveListImplBase* list)
 {
   if (!list)
     return;
 
-  DynamicPrimitiveListArray* arrays [2] = {&impl->entity_dependent_dynamic_primitive_lists, &impl->entity_independent_dynamic_primitive_lists};
+  SimplePrimitiveListArray* arrays [2] = {&impl->entity_dependent_dynamic_primitive_lists, &impl->entity_independent_dynamic_primitive_lists};
 
   for (size_t i=0; i<sizeof (arrays) / sizeof (*arrays); i++)
   {
-    DynamicPrimitiveListArray& lists = *arrays [i];
+    SimplePrimitiveListArray& lists = *arrays [i];
 
-    for (DynamicPrimitiveListArray::iterator iter=lists.begin (), end=lists.end (); iter!=end; ++iter)
+    for (SimplePrimitiveListArray::iterator iter=lists.begin (), end=lists.end (); iter!=end; ++iter)
       if (iter->list == list)
       {
         switch (iter->type)
         {
-          case DynamicPrimitiveListType_Sprite:
+          case SimplePrimitiveListType_Sprite:
             impl->sprite_lists_count--;
             break;
-          case DynamicPrimitiveListType_Line:
+          case SimplePrimitiveListType_Line:
             impl->line_lists_count--;
             break;
           default:
@@ -818,24 +818,24 @@ void PrimitiveImpl::RemoveDynamicPrimitiveList (DynamicPrimitiveListImplBase* li
   }
 }
 
-void PrimitiveImpl::RemoveAllDynamicPrimitiveLists (int type)
+void PrimitiveImpl::RemoveAllSimplePrimitiveLists (int type)
 {
   switch (type)
   {
-    case DynamicPrimitiveListType_Sprite:
-    case DynamicPrimitiveListType_Line:
+    case SimplePrimitiveListType_Sprite:
+    case SimplePrimitiveListType_Line:
       break;
     default:
       return;
   }
 
-  DynamicPrimitiveListArray* arrays [2] = {&impl->entity_dependent_dynamic_primitive_lists, &impl->entity_independent_dynamic_primitive_lists};
+  SimplePrimitiveListArray* arrays [2] = {&impl->entity_dependent_dynamic_primitive_lists, &impl->entity_independent_dynamic_primitive_lists};
 
   for (size_t i=0; i<sizeof (arrays) / sizeof (*arrays); i++)
   {
-    DynamicPrimitiveListArray& lists = *arrays [i];
+    SimplePrimitiveListArray& lists = *arrays [i];
 
-    for (DynamicPrimitiveListArray::iterator iter=lists.begin (); iter!=lists.end ();)
+    for (SimplePrimitiveListArray::iterator iter=lists.begin (); iter!=lists.end ();)
       if (iter->type == type)
       {
         DetachCacheSource (*iter->list);
@@ -875,10 +875,10 @@ void PrimitiveImpl::UpdateCacheCore ()
       impl->render_groups.push_back (mesh.cached_group);
     }
 
-    for (DynamicPrimitiveListArray::iterator iter=impl->entity_independent_dynamic_primitive_lists.begin (), end=impl->entity_independent_dynamic_primitive_lists.end (); iter!=end; ++iter)
+    for (SimplePrimitiveListArray::iterator iter=impl->entity_independent_dynamic_primitive_lists.begin (), end=impl->entity_independent_dynamic_primitive_lists.end (); iter!=end; ++iter)
     {
-      DynamicPrimitiveListImplBase& list             = *iter->list;
-      RendererPrimitive*            cached_primitive = iter->primitive;
+      SimplePrimitiveListImplBase& list             = *iter->list;
+      RendererPrimitive*           cached_primitive = iter->primitive;
 
       if (!cached_primitive)
         continue;
