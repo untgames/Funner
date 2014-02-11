@@ -193,10 +193,10 @@ class Primitive
 ///Работа со спрайтами
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     size_t              SpriteListsCount                 () const;
-    BillboardSpriteList AddStandaloneBillboardSpriteList (const math::vec3f& up, MeshBufferUsage vb_usage = MeshBufferUsage_Default, MeshBufferUsage ib_usage = MeshBufferUsage_Default);
-    OrientedSpriteList  AddStandaloneOrientedSpriteList  (const math::vec3f& up, MeshBufferUsage vb_usage = MeshBufferUsage_Default, MeshBufferUsage ib_usage = MeshBufferUsage_Default);
-    BillboardSpriteList AddBatchingBillboardSpriteList   (const math::vec3f& up);
-    OrientedSpriteList  AddBatchingOrientedSpriteList    (const math::vec3f& up);
+    BillboardSpriteList AddStandaloneBillboardSpriteList (const math::vec3f& view_up, MeshBufferUsage vb_usage = MeshBufferUsage_Default, MeshBufferUsage ib_usage = MeshBufferUsage_Default);
+    OrientedSpriteList  AddStandaloneOrientedSpriteList  (const math::vec3f& local_up, MeshBufferUsage vb_usage = MeshBufferUsage_Default, MeshBufferUsage ib_usage = MeshBufferUsage_Default);
+    BillboardSpriteList AddBatchingBillboardSpriteList   (const math::vec3f& view_up);
+    OrientedSpriteList  AddBatchingOrientedSpriteList    (const math::vec3f& local_up);
     void                RemoveSpriteList                 (OrientedSpriteList&);
     void                RemoveSpriteList                 (BillboardSpriteList&);
     void                RemoveAllSpriteLists             ();
