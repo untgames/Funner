@@ -65,34 +65,19 @@ size_t Primitive::SpriteListsCount () const
   return impl->SpriteListsCount ();
 }
 
-BillboardSpriteList Primitive::AddStandaloneBillboardSpriteList (const math::vec3f& up, MeshBufferUsage vb_usage, MeshBufferUsage ib_usage)
+SpriteList Primitive::AddStandaloneSpriteList (SpriteMode mode, const math::vec3f& up, MeshBufferUsage vb_usage, MeshBufferUsage ib_usage)
 {
-  return Wrappers::Wrap<BillboardSpriteList> (impl->AddStandaloneBillboardSpriteList (up, vb_usage, ib_usage));
+  return Wrappers::Wrap<SpriteList> (impl->AddStandaloneSpriteList (mode, up, vb_usage, ib_usage));
 }
 
-BillboardSpriteList Primitive::AddBatchingBillboardSpriteList (const math::vec3f& up)
+SpriteList Primitive::AddBatchingSpriteList (SpriteMode mode, const math::vec3f& up)
 {
-  return Wrappers::Wrap<BillboardSpriteList> (impl->AddBatchingBillboardSpriteList (up));
+  return Wrappers::Wrap<SpriteList> (impl->AddBatchingSpriteList (mode, up));
 }
 
-OrientedSpriteList Primitive::AddStandaloneOrientedSpriteList (const math::vec3f& up, MeshBufferUsage vb_usage, MeshBufferUsage ib_usage)
+void Primitive::RemoveSpriteList (SpriteList& list)
 {
-  return Wrappers::Wrap<OrientedSpriteList> (impl->AddStandaloneOrientedSpriteList (up, vb_usage, ib_usage));
-}
-
-OrientedSpriteList Primitive::AddBatchingOrientedSpriteList (const math::vec3f& up)
-{
-  return Wrappers::Wrap<OrientedSpriteList> (impl->AddBatchingOrientedSpriteList (up));
-}
-
-void Primitive::RemoveSpriteList (BillboardSpriteList& list)
-{
-  impl->RemoveSpriteList (Wrappers::Unwrap<BillboardSpriteListImpl> (list));
-}
-
-void Primitive::RemoveSpriteList (OrientedSpriteList& list)
-{
-  impl->RemoveSpriteList (Wrappers::Unwrap<OrientedSpriteListImpl> (list));
+  impl->RemoveSpriteList (Wrappers::Unwrap<SpriteListImpl> (list));
 }
 
 void Primitive::RemoveAllSpriteLists ()

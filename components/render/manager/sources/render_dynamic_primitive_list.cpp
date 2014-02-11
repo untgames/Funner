@@ -129,7 +129,7 @@ class BillboardSpriteGenerator: public SpriteGenerator
 
     using SpriteGenerator::Generate;
 
-    void Generate (const BillboardSprite& src_sprite, DynamicPrimitiveVertex* dst_vertices)
+    void Generate (const Sprite& src_sprite, DynamicPrimitiveVertex* dst_vertices)
     {
       math::vec3f ortx = right * src_sprite.size.x * 0.5f,
                   orty = up * src_sprite.size.y * 0.5f;
@@ -161,7 +161,7 @@ class OrientedSpriteGenerator: public SpriteGenerator
 
     using SpriteGenerator::Generate;
 
-    void Generate (const OrientedSprite& src_sprite, DynamicPrimitiveVertex* dst_vertices)
+    void Generate (const Sprite& src_sprite, DynamicPrimitiveVertex* dst_vertices)
     {
       math::vec3f ortx = cross (up, src_sprite.normal);
 
@@ -183,6 +183,47 @@ class OrientedSpriteGenerator: public SpriteGenerator
 
   private:
     const math::vec3f& up;    
+};
+
+class OrientedBillboardSpriteGenerator: public SpriteGenerator
+{
+  public:
+    OrientedBillboardSpriteGenerator (EntityImpl& entity, const math::vec3f& in_view_up, const math::mat4f& inv_view_proj_tm)
+      : world_tm (entity.WorldMatrix ())
+      , src_view_up (in_view_up)
+      , inv_mvp_tm (inv_view_proj_tm * entity.InverseWorldMatrix ())
+    {
+    }
+
+    using SpriteGenerator::Generate;
+
+    void Generate (const Sprite& src_sprite, DynamicPrimitiveVertex* dst_vertices)
+    {
+      math::vec3f local_normal = inv_mvp_tm * math::vec4f (src_sprite.normal, 0), world_normal = world_tm * local_normal;
+      math::vec4f view_up (src_view_up, 0);
+
+      if (src_sprite.rotation != math::anglef ())
+        view_up = math::rotate (src_sprite.rotation, src_sprite.normal) * view_up;
+
+      math::vec3f local_up = inv_mvp_tm * view_up,
+                  right    = cross (local_up, local_normal),
+                  up       = cross (local_normal, right);
+
+      math::vec3f ortx = right * src_sprite.size.x * 0.5f,
+                  orty = up * src_sprite.size.y * 0.5f;
+
+      dst_vertices [0].position = world_tm * (src_sprite.position - ortx - orty);
+      dst_vertices [1].position = world_tm * (src_sprite.position + ortx - orty);
+      dst_vertices [2].position = world_tm * (src_sprite.position + ortx + orty);
+      dst_vertices [3].position = world_tm * (src_sprite.position - ortx + orty);
+
+      SpriteGenerator::Generate (src_sprite, world_normal, dst_vertices);
+    }
+
+  private:
+    const math::mat4f& world_tm;
+    const math::vec3f& src_view_up;
+    math::mat4f        inv_mvp_tm;
 };
 
 /// Применение генератора к блоку спрайтов
@@ -1257,17 +1298,17 @@ class BatchingLineAndOrientedSpriteList: public BatchingStateBlockHolder, public
 };
 
 /*
-    Standalone BillboardSprite list
+    Standalone billboard Sprite list
 */
 
-class StandaloneBillboardSpriteList: public PrimitiveListStorage<BillboardSprite, StandalonePrimitiveHolder>, private render::manager::RendererPrimitiveGroup, public DynamicPrimitive
+class StandaloneBillboardSpriteListBase: public PrimitiveListStorage<Sprite, StandalonePrimitiveHolder>, private render::manager::RendererPrimitiveGroup, public DynamicPrimitive
 {
-  typedef PrimitiveListStorage<BillboardSprite, StandalonePrimitiveHolder> Base;
+  typedef PrimitiveListStorage<Sprite, StandalonePrimitiveHolder> Base;
   public:
     enum { VERTICES_PER_PRIMITIVE = BillboardSpriteGenerator::VERTICES_PER_PRIMITIVE, INDICES_PER_PRIMITIVE = BillboardSpriteGenerator::INDICES_PER_PRIMITIVE };
 
 /// Конструктор
-    StandaloneBillboardSpriteList (const MaterialManagerPtr& material_manager, const math::vec3f& in_view_up, MeshBufferUsage vb_usage, MeshBufferUsage ib_usage)
+    StandaloneBillboardSpriteListBase (const MaterialManagerPtr& material_manager, const math::vec3f& in_view_up, MeshBufferUsage vb_usage, MeshBufferUsage ib_usage)
       : DynamicPrimitiveListImplBase (ENTITY_DEPENDENT)
       , Base (material_manager, vb_usage, ib_usage, BillboardSpriteGenerator::PRIMITIVE_TYPE)
       , DynamicPrimitive (*this, DynamicPrimitiveFlag_FrameDependent | DynamicPrimitiveFlag_EntityDependent)
@@ -1280,29 +1321,19 @@ class StandaloneBillboardSpriteList: public PrimitiveListStorage<BillboardSprite
 ///Создание экземпляра
     DynamicPrimitive* CreateDynamicPrimitiveInstanceCore () { return this; }
 
+  protected:
+/// Синхронизация буферов
+    void SyncBuffers ()
+    {
+      render::low_level::IDevice& device = DeviceManager ().Device ();
+
+      VertexBuffer ().SyncBuffers (device);
+      IndexBuffer ().SyncBuffers (device);
+    }
+
   private:
 ///Обновление
     void UpdateOnPrerenderCore (EntityImpl&) {}
-
-    void UpdateOnRenderCore (FrameImpl& frame, EntityImpl& entity, RenderingContext& context, const math::mat4f& mvp_matrix)
-    {
-      try
-      {        
-        BillboardSpriteGenerator generator (entity, view_up, context.InverseViewProjectionMatrix ());
-
-        generate (generator, Base::Size (), Base::Items (), 0, VertexBuffer ().Data (), IndexBuffer ().Data ());
-
-        render::low_level::IDevice& device = DeviceManager ().Device ();
-
-        VertexBuffer ().SyncBuffers (device);
-        IndexBuffer ().SyncBuffers (device);
-      }
-      catch (xtl::exception& e)
-      {
-        e.touch ("render::manager::StandaloneBillboardSpriteList::UpdateOnRenderCore");
-        throw;
-      }
-    }
 
 /// Обновление буферов
     void UpdateBuffersCore ()
@@ -1324,26 +1355,55 @@ class StandaloneBillboardSpriteList: public PrimitiveListStorage<BillboardSprite
       }
     }
 
-  private:    
+  protected: 
     math::vec3f view_up;
 };
 
+template <class Generator>
+class StandaloneBillboardSpriteList: public StandaloneBillboardSpriteListBase
+{
+  public:
+/// Конструктор
+    StandaloneBillboardSpriteList (const MaterialManagerPtr& material_manager, const math::vec3f& view_up, MeshBufferUsage vb_usage, MeshBufferUsage ib_usage)
+      : DynamicPrimitiveListImplBase (ENTITY_DEPENDENT)
+      , StandaloneBillboardSpriteListBase (material_manager, view_up, vb_usage, ib_usage)
+    {
+    }
+
+  private:
+///Обновление
+    void UpdateOnRenderCore (FrameImpl& frame, EntityImpl& entity, RenderingContext& context, const math::mat4f& mvp_matrix)
+    {
+      try
+      {        
+        Generator generator (entity, view_up, context.InverseViewProjectionMatrix ());
+
+        generate (generator, StandaloneBillboardSpriteListBase::Size (), StandaloneBillboardSpriteListBase::Items (), 0, VertexBuffer ().Data (), IndexBuffer ().Data ());
+      }
+      catch (xtl::exception& e)
+      {
+        e.touch ("render::manager::StandaloneBillboardSpriteList::UpdateOnRenderCore");
+        throw;
+      }
+    }
+};
+
 /*
-    Batching BillboardSprite list
+    Batching billboard Sprite list
 */
 
-class BatchingBillboardSpriteList: public PrimitiveListStorage<BillboardSprite, BatchingStateBlockHolder>
+class BatchingBillboardSpriteList: public PrimitiveListStorage<Sprite, BatchingStateBlockHolder>
 {
-  typedef PrimitiveListStorage<BillboardSprite, BatchingStateBlockHolder> Base;
+  typedef PrimitiveListStorage<Sprite, BatchingStateBlockHolder> Base;
   public:
     enum { VERTICES_PER_PRIMITIVE = BillboardSpriteGenerator::VERTICES_PER_PRIMITIVE, INDICES_PER_PRIMITIVE = BillboardSpriteGenerator::INDICES_PER_PRIMITIVE };
 
 /// Экземпляр списка примитивов
-    class Instance: public BatchingInstance
+    class InstanceBase: public BatchingInstance
     {
       public:
 /// Конструктор
-        Instance (const PrototypePtr& prototype)
+        InstanceBase (const PrototypePtr& prototype)
           : BatchingInstance (prototype, DynamicPrimitiveFlag_FrameDependent) 
           , vertices ()
           , indices ()
@@ -1372,15 +1432,28 @@ class BatchingBillboardSpriteList: public PrimitiveListStorage<BillboardSprite, 
 
               //формирование индексов
 
-            generate<BillboardSpriteGenerator> (items_count, base_vertex, indices);
+            generate<SpriteGenerator> (items_count, base_vertex, indices);
           }
           catch (xtl::exception& e)
           {
-            e.touch ("render::manager::BatchingLineAndOrientedSpriteList::Instance::UpdateOnPrerenderCore");
+            e.touch ("render::manager::BatchingLineAndOrientedSpriteList::InstanceBase::UpdateOnPrerenderCore");
             throw;
           }
         }
 
+      protected:
+        DynamicPrimitiveVertex* vertices;
+        DynamicPrimitiveIndex*  indices;
+    };
+
+    template <class Generator>
+    class Instance: public InstanceBase
+    {
+      public:
+/// Конструктор
+        Instance (const PrototypePtr& prototype) : InstanceBase (prototype) { }
+
+      private:
         void UpdateOnRenderCore (FrameImpl& frame, EntityImpl& entity, RenderingContext& context, const math::mat4f& mvp_matrix)
         {
           try
@@ -1394,26 +1467,23 @@ class BatchingBillboardSpriteList: public PrimitiveListStorage<BillboardSprite, 
 
               //формирование вершин
 
-            BillboardSpriteGenerator generator (entity, prototype.view_up, context.InverseViewProjectionMatrix ());
+            Generator generator (entity, prototype.view_up, context.InverseViewProjectionMatrix ());
 
             generate (generator, items_count, prototype.Items (), vertices);
           }
           catch (xtl::exception& e)
           {
-            e.touch ("render::manager::BatchingLineAndOrientedSpriteList::Instance::UpdateOnRenderCore");
+            e.touch ("render::manager::BatchingLineAndOrientedSpriteList::Instance<T>::UpdateOnRenderCore");
             throw;
           }
         }
-
-      private:
-        DynamicPrimitiveVertex* vertices;
-        DynamicPrimitiveIndex*  indices;
     };
 
 /// Конструктор
-    BatchingBillboardSpriteList (const BatchingManagerPtr& batching_manager, const MaterialManagerPtr& material_manager, const math::vec3f& in_view_up)
+    BatchingBillboardSpriteList (const BatchingManagerPtr& batching_manager, const MaterialManagerPtr& material_manager, SpriteMode in_mode, const math::vec3f& in_view_up)
       : DynamicPrimitiveListImplBase (ENTITY_DEPENDENT)
       , Base (material_manager, batching_manager)
+      , mode (in_mode)
       , view_up (in_view_up)
     {
     }
@@ -1423,7 +1493,8 @@ class BatchingBillboardSpriteList: public PrimitiveListStorage<BillboardSprite, 
     {
       try
       {
-        return new Instance (this);
+        if (mode == SpriteMode_Billboard) return new Instance<BillboardSpriteGenerator> (this);
+        else                              return new Instance<OrientedBillboardSpriteGenerator> (this);
       }
       catch (xtl::exception& e)
       {
@@ -1437,6 +1508,7 @@ class BatchingBillboardSpriteList: public PrimitiveListStorage<BillboardSprite, 
     void UpdateBuffersCore () { }
 
   private:    
+    SpriteMode  mode;
     math::vec3f view_up;
 };
 
@@ -1457,29 +1529,31 @@ LineListImpl* create_standalone_line_list (const MaterialManagerPtr& material_ma
   return new StandaloneLineAndOrientedSpriteList<Line, LineGenerator> (material_manager, vb_usage, ib_usage, LineGenerator ());
 }
 
-OrientedSpriteListImpl* create_standalone_oriented_sprite_list (const MaterialManagerPtr& material_manager, const math::vec3f& local_up, MeshBufferUsage vb_usage, MeshBufferUsage ib_usage)
-{
-  return new StandaloneLineAndOrientedSpriteList<OrientedSprite, OrientedSpriteGenerator> (material_manager, vb_usage, ib_usage, OrientedSpriteGenerator (local_up));
-}
-
-BillboardSpriteListImpl* create_standalone_billboard_sprite_list (const MaterialManagerPtr& material_manager, const math::vec3f& view_up, MeshBufferUsage vb_usage, MeshBufferUsage ib_usage)
-{
-  return new StandaloneBillboardSpriteList (material_manager, view_up, vb_usage, ib_usage);
-}
-
 LineListImpl* create_batching_line_list (const BatchingManagerPtr& batching_manager, const MaterialManagerPtr& material_manager)
 {
   return new BatchingLineAndOrientedSpriteList<Line, LineGenerator> (batching_manager, material_manager, LineGenerator ());
 }
 
-OrientedSpriteListImpl* create_batching_oriented_sprite_list (const BatchingManagerPtr& batching_manager, const MaterialManagerPtr& material_manager, const math::vec3f& local_up)
+SpriteListImpl* create_standalone_sprite_list (const MaterialManagerPtr& material_manager, SpriteMode mode, const math::vec3f& up, MeshBufferUsage vb_usage, MeshBufferUsage ib_usage)
 {
-  return new BatchingLineAndOrientedSpriteList<OrientedSprite, OrientedSpriteGenerator> (batching_manager, material_manager, OrientedSpriteGenerator (local_up));
+  switch (mode)
+  {
+    case SpriteMode_Oriented:          return new StandaloneLineAndOrientedSpriteList<Sprite, OrientedSpriteGenerator> (material_manager, vb_usage, ib_usage, OrientedSpriteGenerator (up));
+    case SpriteMode_Billboard:         return new StandaloneBillboardSpriteList<BillboardSpriteGenerator> (material_manager, up, vb_usage, ib_usage);
+    case SpriteMode_OrientedBillboard: return new StandaloneBillboardSpriteList<OrientedBillboardSpriteGenerator> (material_manager, up, vb_usage, ib_usage);
+    default:                           throw xtl::make_argument_exception ("render::manager::create_standalone_sprite_list", "mode", mode);
+  }
 }
 
-BillboardSpriteListImpl* create_batching_billboard_sprite_list (const BatchingManagerPtr& batching_manager, const MaterialManagerPtr& material_manager, const math::vec3f& view_up)
+SpriteListImpl* create_batching_sprite_list (const BatchingManagerPtr& batching_manager, const MaterialManagerPtr& material_manager, SpriteMode mode, const math::vec3f& up)
 {
-  return new BatchingBillboardSpriteList (batching_manager, material_manager, view_up);
+  switch (mode)
+  {
+    case SpriteMode_Oriented:          return new BatchingLineAndOrientedSpriteList<Sprite, OrientedSpriteGenerator> (batching_manager, material_manager, OrientedSpriteGenerator (up));
+    case SpriteMode_Billboard:         
+    case SpriteMode_OrientedBillboard: return new BatchingBillboardSpriteList (batching_manager, material_manager, mode, up);
+    default:                           throw xtl::make_argument_exception ("render::manager::create_batching_sprite_list", "mode", mode);
+  }
 }
 
 }

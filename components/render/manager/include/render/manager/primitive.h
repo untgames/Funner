@@ -51,26 +51,27 @@ enum MeshBufferUsage
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+///–ежим спрайтов
+///////////////////////////////////////////////////////////////////////////////////////////////////
+enum SpriteMode
+{
+  SpriteMode_Billboard         = 1,                                          //up vector is view up,  normal & rotation is ignored
+  SpriteMode_Oriented          = 2,                                          //up vector is local up, normal & rotation is used
+  SpriteMode_OrientedBillboard = SpriteMode_Billboard | SpriteMode_Oriented, //up vector is view up,  normal & rotation is used
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 ///—прайт
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 struct Sprite
 {
-  math::vec3f position;   //положение центра спрайта
-  math::vec2f size;       //размер спрайта
-  math::vec4f color;      //цвет спрайта
-  math::vec2f tex_offset; //смещение начала спрайта в текстуре [0;1]
-  math::vec2f tex_size;   //размер спрайта в текстуре [0;1]
-};
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///¬иды спрайтов
-///////////////////////////////////////////////////////////////////////////////////////////////////
-struct BillboardSprite: public Sprite {};
-
-struct OrientedSprite: public Sprite
-{
-  math::vec3f  normal;   //нормаль
-  math::anglef rotation; //поворот относительно нормали
+  math::vec3f  position;   //положение центра спрайта
+  math::vec2f  size;       //размер спрайта
+  math::vec4f  color;      //цвет спрайта
+  math::vec2f  tex_offset; //смещение начала спрайта в текстуре [0;1]
+  math::vec2f  tex_size;   //размер спрайта в текстуре [0;1]
+  math::vec3f  normal;     //нормаль
+  math::anglef rotation;   //поворот относительно нормали
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -91,9 +92,8 @@ struct Line
   LinePoint point [2]; //концы линии
 };
 
-typedef DynamicPrimitiveList<BillboardSprite> BillboardSpriteList;
-typedef DynamicPrimitiveList<OrientedSprite>  OrientedSpriteList;
-typedef DynamicPrimitiveList<Line>            LineList;
+typedef DynamicPrimitiveList<Sprite> SpriteList;
+typedef DynamicPrimitiveList<Line>   LineList;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Ѕуфер примитивов
@@ -192,14 +192,11 @@ class Primitive
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///–абота со спрайтами
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    size_t              SpriteListsCount                 () const;
-    BillboardSpriteList AddStandaloneBillboardSpriteList (const math::vec3f& view_up, MeshBufferUsage vb_usage = MeshBufferUsage_Default, MeshBufferUsage ib_usage = MeshBufferUsage_Default);
-    OrientedSpriteList  AddStandaloneOrientedSpriteList  (const math::vec3f& local_up, MeshBufferUsage vb_usage = MeshBufferUsage_Default, MeshBufferUsage ib_usage = MeshBufferUsage_Default);
-    BillboardSpriteList AddBatchingBillboardSpriteList   (const math::vec3f& view_up);
-    OrientedSpriteList  AddBatchingOrientedSpriteList    (const math::vec3f& local_up);
-    void                RemoveSpriteList                 (OrientedSpriteList&);
-    void                RemoveSpriteList                 (BillboardSpriteList&);
-    void                RemoveAllSpriteLists             ();
+    size_t     SpriteListsCount        () const;
+    SpriteList AddStandaloneSpriteList (SpriteMode mode, const math::vec3f& up, MeshBufferUsage vb_usage = MeshBufferUsage_Default, MeshBufferUsage ib_usage = MeshBufferUsage_Default);
+    SpriteList AddBatchingSpriteList   (SpriteMode mode, const math::vec3f& up);
+    void       RemoveSpriteList        (SpriteList&);
+    void       RemoveAllSpriteLists    ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///–абота с лини€ми

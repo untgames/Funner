@@ -118,6 +118,5 @@ void swap (DynamicPrimitiveList<T>& list1, DynamicPrimitiveList<T>& list2)
     Инстанцирование
 */
 
-template class DynamicPrimitiveList<BillboardSprite>;
-template class DynamicPrimitiveList<OrientedSprite>;
+template class DynamicPrimitiveList<Sprite>;
 template class DynamicPrimitiveList<Line>;

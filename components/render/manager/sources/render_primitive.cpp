@@ -552,7 +552,7 @@ size_t PrimitiveImpl::SpriteListsCount ()
   return impl->sprite_lists_count;
 }
 
-BillboardSpriteListPtr PrimitiveImpl::AddStandaloneBillboardSpriteList (const math::vec3f& up, MeshBufferUsage vb_usage, MeshBufferUsage ib_usage)
+SpriteListPtr PrimitiveImpl::AddStandaloneSpriteList (SpriteMode mode, const math::vec3f& up, MeshBufferUsage vb_usage, MeshBufferUsage ib_usage)
 {
   try
   {
@@ -561,6 +561,7 @@ BillboardSpriteListPtr PrimitiveImpl::AddStandaloneBillboardSpriteList (const ma
       case MeshBufferUsage_Static:
       case MeshBufferUsage_Dynamic:
       case MeshBufferUsage_Stream:
+        break;
       default:
         throw xtl::make_argument_exception ("", "vb_usage", vb_usage);
     }
@@ -570,63 +571,22 @@ BillboardSpriteListPtr PrimitiveImpl::AddStandaloneBillboardSpriteList (const ma
       case MeshBufferUsage_Static:
       case MeshBufferUsage_Dynamic:
       case MeshBufferUsage_Stream:
+        break;
       default:
         throw xtl::make_argument_exception ("", "ib_usage", ib_usage);
     }
 
-    BillboardSpriteListPtr list (create_standalone_billboard_sprite_list (impl->material_manager, up, vb_usage, ib_usage), false);
-
-    AddDynamicPrimitiveList (list.get (), DynamicPrimitiveListType_Sprite);
-
-    return list;
-  }
-  catch (xtl::exception& e)
-  {
-    e.touch ("render::manager::PrimitiveImpl::AddStandaloneBillboardSpriteList");
-    throw;
-  }
-}
-
-BillboardSpriteListPtr PrimitiveImpl::AddBatchingBillboardSpriteList (const math::vec3f& up)
-{
-  try
-  {
-    BillboardSpriteListPtr list (create_batching_billboard_sprite_list (&impl->buffers->BatchingManager (), impl->material_manager, up), false);
-
-    AddDynamicPrimitiveList (list.get (), DynamicPrimitiveListType_Sprite);
-
-    return list;
-  }
-  catch (xtl::exception& e)
-  {
-    e.touch ("render::manager::PrimitiveImpl::AddBatchingBillboardSpriteList");
-    throw;
-  }
-}
-
-OrientedSpriteListPtr PrimitiveImpl::AddStandaloneOrientedSpriteList (const math::vec3f& up, MeshBufferUsage vb_usage, MeshBufferUsage ib_usage)
-{
-  try
-  {
-    switch (vb_usage)
+    switch (mode)
     {
-      case MeshBufferUsage_Static:
-      case MeshBufferUsage_Dynamic:
-      case MeshBufferUsage_Stream:
+      case SpriteMode_Billboard:
+      case SpriteMode_Oriented:
+      case SpriteMode_OrientedBillboard:
+        break;
       default:
-        throw xtl::make_argument_exception ("", "vb_usage", vb_usage);
+        throw xtl::make_argument_exception ("", "mode", mode);
     }
 
-    switch (ib_usage)
-    {
-      case MeshBufferUsage_Static:
-      case MeshBufferUsage_Dynamic:
-      case MeshBufferUsage_Stream:
-      default:
-        throw xtl::make_argument_exception ("", "ib_usage", ib_usage);
-    }
-
-    OrientedSpriteListPtr list (create_standalone_oriented_sprite_list (impl->material_manager, up, vb_usage, ib_usage), false);
+    SpriteListPtr list (create_standalone_sprite_list (impl->material_manager, mode, up, vb_usage, ib_usage), false);
 
     AddDynamicPrimitiveList (list.get (), DynamicPrimitiveListType_Sprite);
 
@@ -634,16 +594,26 @@ OrientedSpriteListPtr PrimitiveImpl::AddStandaloneOrientedSpriteList (const math
   }
   catch (xtl::exception& e)
   {
-    e.touch ("render::manager::PrimitiveImpl::AddStandaloneOrientedSpriteList");
+    e.touch ("render::manager::PrimitiveImpl::AddStandaloneSpriteList");
     throw;
   }
 }
 
-OrientedSpriteListPtr PrimitiveImpl::AddBatchingOrientedSpriteList (const math::vec3f& up)
+SpriteListPtr PrimitiveImpl::AddBatchingSpriteList (SpriteMode mode, const math::vec3f& up)
 {
   try
   {
-    OrientedSpriteListPtr list (create_batching_oriented_sprite_list (&impl->buffers->BatchingManager (), impl->material_manager, up), false);
+    switch (mode)
+    {
+      case SpriteMode_Billboard:
+      case SpriteMode_Oriented:
+      case SpriteMode_OrientedBillboard:
+        break;
+      default:
+        throw xtl::make_argument_exception ("", "mode", mode);
+    }
+
+    SpriteListPtr list (create_batching_sprite_list (&impl->buffers->BatchingManager (), impl->material_manager, mode, up), false);
 
     AddDynamicPrimitiveList (list.get (), DynamicPrimitiveListType_Sprite);
 
@@ -651,17 +621,12 @@ OrientedSpriteListPtr PrimitiveImpl::AddBatchingOrientedSpriteList (const math::
   }
   catch (xtl::exception& e)
   {
-    e.touch ("render::manager::PrimitiveImpl::AddBatchingOrientedSpriteList");
+    e.touch ("render::manager::PrimitiveImpl::AddBatchingSpriteList");
     throw;
   }
 }
 
-void PrimitiveImpl::RemoveSpriteList (const BillboardSpriteListPtr& list)
-{
-  RemoveDynamicPrimitiveList (list.get ());
-}
-
-void PrimitiveImpl::RemoveSpriteList (const OrientedSpriteListPtr& list)
+void PrimitiveImpl::RemoveSpriteList (const SpriteListPtr& list)
 {
   RemoveDynamicPrimitiveList (list.get ());
 }
