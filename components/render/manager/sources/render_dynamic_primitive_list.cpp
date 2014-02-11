@@ -12,13 +12,6 @@ namespace
 {
 
 /*
-    Константы
-*/
-
-const bool ENTITY_INDEPENDENT = false;
-const bool ENTITY_DEPENDENT   = true;
-
-/*
     Утилиты
 */
 
@@ -294,9 +287,8 @@ class MaterialHolder: virtual public DynamicPrimitiveListImplBase
 {
   public:
 /// Конструктор
-    MaterialHolder (const MaterialManagerPtr& in_material_manager, bool is_entity_dependent)
-      : DynamicPrimitiveListImplBase (is_entity_dependent)
-      , material_manager (in_material_manager)
+    MaterialHolder (const MaterialManagerPtr& in_material_manager)
+      : material_manager (in_material_manager)
     {
       if (!material_manager)
         throw xtl::make_null_argument_exception ("render::manager::MaterialHolder<T>::MaterialHolder", "material_manager");
@@ -387,9 +379,8 @@ class StandalonePrimitiveHolder: public MaterialHolder
 {
   public:
 /// Конструктор
-    StandalonePrimitiveHolder (const MaterialManagerPtr& material_manager, MeshBufferUsage vb_usage, MeshBufferUsage ib_usage, render::low_level::PrimitiveType in_primitive_type, bool entity_dependent)
-      : DynamicPrimitiveListImplBase (entity_dependent)
-      , MaterialHolder (material_manager, entity_dependent)
+    StandalonePrimitiveHolder (const MaterialManagerPtr& material_manager, MeshBufferUsage vb_usage, MeshBufferUsage ib_usage, render::low_level::PrimitiveType in_primitive_type)
+      : MaterialHolder (material_manager)
       , primitive_type (in_primitive_type)
       , vb (get_mode (vb_usage), render::low_level::BindFlag_VertexBuffer)
       , ib (get_mode (ib_usage), render::low_level::BindFlag_IndexBuffer)
@@ -515,9 +506,8 @@ class BatchingStateBlockHolder: public MaterialHolder
     using MaterialHolder::UpdateCache;
 
 /// Конструктор
-    BatchingStateBlockHolder (const MaterialManagerPtr& material_manager, const BatchingManagerPtr& in_batching_manager, bool entity_dependent)
-      : DynamicPrimitiveListImplBase (entity_dependent)
-      , MaterialHolder (material_manager, entity_dependent)
+    BatchingStateBlockHolder (const MaterialManagerPtr& material_manager, const BatchingManagerPtr& in_batching_manager)
+      : MaterialHolder (material_manager)
       , batching_manager (in_batching_manager)
     {
     }
@@ -537,9 +527,6 @@ class BatchingStateBlockHolder: public MaterialHolder
     }
 
   protected:
-/// Заглушка
-    void PrimitivesUpdateNotify () {}
-
 /// Сброс кэша
     void ResetCacheCore ()
     {
@@ -584,40 +571,31 @@ template <class T, class Base> class PrimitiveListStorage: public Base, public D
 
     using Base::InvalidateCacheDependencies;
     using Base::InvalidateCache;
-    using Base::PrimitivesUpdateNotify;
 
 /// Конструктор
     PrimitiveListStorage (const MaterialManagerPtr& material_manager)
-      : DynamicPrimitiveListImplBase (ENTITY_DEPENDENT)
-      , Base (material_manager, ENTITY_DEPENDENT)
-      , DynamicPrimitiveListImpl<T> (ENTITY_DEPENDENT)
+      : Base (material_manager)
       , need_update_buffers (true)
     {
     }
 
     template <class T1>
     PrimitiveListStorage (const MaterialManagerPtr& material_manager, const T1& arg1)
-      : DynamicPrimitiveListImplBase (ENTITY_DEPENDENT)
-      , Base (material_manager, arg1, ENTITY_DEPENDENT)
-      , DynamicPrimitiveListImpl<T> (ENTITY_DEPENDENT)
+      : Base (material_manager, arg1)
       , need_update_buffers (true)
     {
     }
 
     template <class T1, class T2>
     PrimitiveListStorage (const MaterialManagerPtr& material_manager, const T1& arg1, const T2& arg2)
-      : DynamicPrimitiveListImplBase (ENTITY_DEPENDENT)
-      , Base (material_manager, arg1, arg2, ENTITY_DEPENDENT)
-      , DynamicPrimitiveListImpl<T> (ENTITY_DEPENDENT)
+      : Base (material_manager, arg1, arg2)
       , need_update_buffers (true)
     {
     }
 
     template <class T1, class T2, class T3>
     PrimitiveListStorage (const MaterialManagerPtr& material_manager, const T1& arg1, const T2& arg2, const T3& arg3)
-      : DynamicPrimitiveListImplBase (ENTITY_DEPENDENT)
-      , Base (material_manager, arg1, arg2, arg3, ENTITY_DEPENDENT)
-      , DynamicPrimitiveListImpl<T> (ENTITY_DEPENDENT)
+      : Base (material_manager, arg1, arg2, arg3)
       , need_update_buffers (true)
     {
     } 
@@ -727,8 +705,6 @@ template <class T, class Base> class PrimitiveListStorage: public Base, public D
       if (capacity < count)
       {
         need_update_buffers = true;
-
-        PrimitivesUpdateNotify ();
 
         InvalidateCacheDependencies ();
       }
@@ -877,13 +853,14 @@ class StandaloneLineAndOrientedSpriteList: public StandalonePrimitiveHolder, pub
 
 /// Конструктор
     StandaloneLineAndOrientedSpriteList (const MaterialManagerPtr& material_manager, MeshBufferUsage vb_usage, MeshBufferUsage ib_usage, const Generator& generator)
-      : DynamicPrimitiveListImplBase (ENTITY_INDEPENDENT)
-      , StandalonePrimitiveHolder (material_manager, vb_usage, ib_usage, PRIMITIVE_TYPE, ENTITY_INDEPENDENT)
-      , DynamicPrimitiveListImpl<T> (ENTITY_INDEPENDENT)
+      : StandalonePrimitiveHolder (material_manager, vb_usage, ib_usage, PRIMITIVE_TYPE)
       , Generator (generator)
       , need_update_buffers (true)
     {
     }
+
+///Статический примитив рендеринга
+    render::manager::RendererPrimitive* StandaloneRendererPrimitive () { return &StandalonePrimitiveHolder::Primitive (); }
 
 ///Создание экземпляра
     DynamicPrimitive* CreateDynamicPrimitiveInstanceCore ()
@@ -1152,12 +1129,13 @@ class BatchingLineAndOrientedSpriteList: public BatchingStateBlockHolder, public
 
 /// Конструктор
     BatchingLineAndOrientedSpriteList (const BatchingManagerPtr& batching_manager, const MaterialManagerPtr& material_manager, const Generator& generator)
-      : DynamicPrimitiveListImplBase (ENTITY_DEPENDENT)
-      , BatchingStateBlockHolder (material_manager, batching_manager, ENTITY_DEPENDENT)
-      , DynamicPrimitiveListImpl<T> (ENTITY_DEPENDENT)
+      : BatchingStateBlockHolder (material_manager, batching_manager)
       , Generator (generator)
     {
     }
+
+///Статический примитив рендеринга
+    render::manager::RendererPrimitive* StandaloneRendererPrimitive () { return 0; }
 
 ///Создание экземпляра
     DynamicPrimitive* CreateDynamicPrimitiveInstanceCore ()
@@ -1309,14 +1287,16 @@ class StandaloneBillboardSpriteListBase: public PrimitiveListStorage<Sprite, Sta
 
 /// Конструктор
     StandaloneBillboardSpriteListBase (const MaterialManagerPtr& material_manager, const math::vec3f& in_view_up, MeshBufferUsage vb_usage, MeshBufferUsage ib_usage)
-      : DynamicPrimitiveListImplBase (ENTITY_DEPENDENT)
-      , Base (material_manager, vb_usage, ib_usage, BillboardSpriteGenerator::PRIMITIVE_TYPE)
+      : Base (material_manager, vb_usage, ib_usage, BillboardSpriteGenerator::PRIMITIVE_TYPE)
       , DynamicPrimitive (*this, DynamicPrimitiveFlag_FrameDependent | DynamicPrimitiveFlag_EntityDependent)
       , view_up (in_view_up)
     {
       primitives_count = 1;
       primitives       = &Base::Primitive ();
     }
+
+///Статический примитив рендеринга
+    render::manager::RendererPrimitive* StandaloneRendererPrimitive () { return 0; }
 
 ///Создание экземпляра
     DynamicPrimitive* CreateDynamicPrimitiveInstanceCore () { return this; }
@@ -1365,8 +1345,7 @@ class StandaloneBillboardSpriteList: public StandaloneBillboardSpriteListBase
   public:
 /// Конструктор
     StandaloneBillboardSpriteList (const MaterialManagerPtr& material_manager, const math::vec3f& view_up, MeshBufferUsage vb_usage, MeshBufferUsage ib_usage)
-      : DynamicPrimitiveListImplBase (ENTITY_DEPENDENT)
-      , StandaloneBillboardSpriteListBase (material_manager, view_up, vb_usage, ib_usage)
+      : StandaloneBillboardSpriteListBase (material_manager, view_up, vb_usage, ib_usage)
     {
     }
 
@@ -1481,12 +1460,14 @@ class BatchingBillboardSpriteList: public PrimitiveListStorage<Sprite, BatchingS
 
 /// Конструктор
     BatchingBillboardSpriteList (const BatchingManagerPtr& batching_manager, const MaterialManagerPtr& material_manager, SpriteMode in_mode, const math::vec3f& in_view_up)
-      : DynamicPrimitiveListImplBase (ENTITY_DEPENDENT)
-      , Base (material_manager, batching_manager)
+      : Base (material_manager, batching_manager)
       , mode (in_mode)
       , view_up (in_view_up)
     {
     }
+
+///Статический примитив рендеринга
+    render::manager::RendererPrimitive* StandaloneRendererPrimitive () { return 0; }
 
 ///Создание экземпляра
     DynamicPrimitive* CreateDynamicPrimitiveInstanceCore ()

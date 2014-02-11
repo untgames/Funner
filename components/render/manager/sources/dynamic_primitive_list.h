@@ -4,18 +4,6 @@
 class DynamicPrimitiveListImplBase: public Object, public CacheSource
 {
   public:
-    virtual ~DynamicPrimitiveListImplBase () {}
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Свойства группы
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    bool IsEntityDependent ();
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Группы примитивов рендеринга
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    manager::RendererPrimitive* RendererPrimitive ();
-
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Материал
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -23,18 +11,14 @@ class DynamicPrimitiveListImplBase: public Object, public CacheSource
     virtual const char* Material    () = 0;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+///Статический примитив рендеринга
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    virtual manager::RendererPrimitive* StandaloneRendererPrimitive () = 0;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Создание экземпляра
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     virtual DynamicPrimitive* CreateDynamicPrimitiveInstanceCore () = 0;
-
-  protected:
-    DynamicPrimitiveListImplBase (bool is_entity_dependent);
-
-    void SetRendererPrimitive (manager::RendererPrimitive* primitive);
-
-  private:  
-    bool                        entity_dependent;
-    manager::RendererPrimitive* renderer_primitive;
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -67,9 +51,6 @@ template <class T> class DynamicPrimitiveListImpl: virtual public DynamicPrimiti
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     virtual void   Reserve  (size_t count) = 0;
     virtual size_t Capacity () = 0;
-
-  protected:
-    DynamicPrimitiveListImpl (bool is_entity_dependent) : DynamicPrimitiveListImplBase (is_entity_dependent) {}
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -79,27 +60,3 @@ LineListImpl*   create_standalone_line_list   (const MaterialManagerPtr&, MeshBu
 SpriteListImpl* create_standalone_sprite_list (const MaterialManagerPtr&, SpriteMode mode, const math::vec3f& up, MeshBufferUsage vb_usage, MeshBufferUsage ib_usage);
 LineListImpl*   create_batching_line_list     (const BatchingManagerPtr&, const MaterialManagerPtr&);
 SpriteListImpl* create_batching_sprite_list   (const BatchingManagerPtr&, const MaterialManagerPtr&, SpriteMode mode, const math::vec3f& up);
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Реализация
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-inline DynamicPrimitiveListImplBase::DynamicPrimitiveListImplBase (bool is_entity_dependent)
-  : entity_dependent (is_entity_dependent)
-{
-}
-
-inline bool DynamicPrimitiveListImplBase::IsEntityDependent ()
-{
-  return entity_dependent;
-}
-
-inline render::manager::RendererPrimitive* DynamicPrimitiveListImplBase::RendererPrimitive ()
-{
-  return renderer_primitive;
-}
-
-inline void DynamicPrimitiveListImplBase::SetRendererPrimitive (manager::RendererPrimitive* primitive)
-{
-  renderer_primitive = primitive;
-}

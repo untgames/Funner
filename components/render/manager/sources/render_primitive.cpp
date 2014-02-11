@@ -295,10 +295,12 @@ struct DynamicPrimitiveListDesc
 {
   DynamicPrimitiveListPtr  list;
   DynamicPrimitiveListType type;
+  RendererPrimitive*       primitive;
 
-  DynamicPrimitiveListDesc (const DynamicPrimitiveListPtr& in_list, DynamicPrimitiveListType in_type)
+  DynamicPrimitiveListDesc (const DynamicPrimitiveListPtr& in_list, DynamicPrimitiveListType in_type, RendererPrimitive* in_primitive)
     : list (in_list)
     , type (in_type)
+    , primitive (in_primitive)
   {
   }
 };
@@ -761,8 +763,10 @@ void PrimitiveImpl::FillDynamicPrimitiveStorage (DynamicPrimitiveEntityStorage& 
 
 void PrimitiveImpl::AddDynamicPrimitiveList (DynamicPrimitiveListImplBase* list, int type)
 {
-  if (list->IsEntityDependent ()) impl->entity_dependent_dynamic_primitive_lists.push_back (DynamicPrimitiveListDesc (list, (DynamicPrimitiveListType)type));
-  else                            impl->entity_independent_dynamic_primitive_lists.push_back (DynamicPrimitiveListDesc (list, (DynamicPrimitiveListType)type));
+  RendererPrimitive* primitive = list->StandaloneRendererPrimitive ();
+
+  if (primitive) impl->entity_independent_dynamic_primitive_lists.push_back (DynamicPrimitiveListDesc (list, (DynamicPrimitiveListType)type, primitive));
+  else           impl->entity_dependent_dynamic_primitive_lists.push_back (DynamicPrimitiveListDesc (list, (DynamicPrimitiveListType)type, primitive));
 
   AttachCacheSource (*list);
 
@@ -874,7 +878,7 @@ void PrimitiveImpl::UpdateCacheCore ()
     for (DynamicPrimitiveListArray::iterator iter=impl->entity_independent_dynamic_primitive_lists.begin (), end=impl->entity_independent_dynamic_primitive_lists.end (); iter!=end; ++iter)
     {
       DynamicPrimitiveListImplBase& list             = *iter->list;
-      RendererPrimitive*            cached_primitive = list.RendererPrimitive ();
+      RendererPrimitive*            cached_primitive = iter->primitive;
 
       if (!cached_primitive)
         continue;
