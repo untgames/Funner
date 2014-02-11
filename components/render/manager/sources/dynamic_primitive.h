@@ -146,7 +146,8 @@ inline void DynamicPrimitive::UpdateOnPrerender (FrameId frame_id, EntityImpl& e
     return;  
 
   cached_frame_id = frame_id;
-  cached_entity   = &entity;
+  cached_entity   = 0;
+  cached_frame    = 0;
 
   try
   {

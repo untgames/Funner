@@ -374,7 +374,7 @@ void EffectRenderer::AddOperations
     //перебор операций
     
   const RendererOperation* operation = operations_desc.operations;    
-    
+
   for (size_t i=0, count=operations_desc.operations_count; i!=count; i++, operation++)
   {
       //определение списка тэгов данной операции
@@ -436,7 +436,7 @@ void EffectRenderer::AddOperations
         pass.operations.push_back (PassOperation (*operation, property_layout, property_buffer, eye_distance, mvp_matrix_index));
 
         PassOperation& result_operation = pass.operations.back ();
-        
+
         pass.operation_ptrs.push_back (&result_operation);        
         
           //запоминание последней добавленной операции для обработки частного случая добавления операции в один и тот же проход несколько раз

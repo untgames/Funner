@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<material_library>
+  <layouts>
+    <layout id="layout#1">
+      <property name="diffuseColor" type="vector"/>
+      <property name="specularColor" type="vector"/>
+    </layout>
+  </layouts>
+  <texmaps/>
+  <materials>
+    <material id="sprite" name="sprite" program="spy" layout="layout#1" tags="solid">
+      <property name="diffuseColor" value="1 0 0 0"/>
+      <property name="specularColor" value="1 0 0 0"/>
+    </material>
+  </materials>
+</material_library>

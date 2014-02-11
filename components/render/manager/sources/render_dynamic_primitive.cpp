@@ -230,5 +230,8 @@ DynamicPrimitive::DynamicPrimitive (const render::manager::RendererPrimitiveGrou
   : group (in_group)
   , frame_dependent ((flags & DynamicPrimitiveFlag_FrameDependent) != 0)
   , entity_dependent ((flags & DynamicPrimitiveFlag_EntityDependent) != 0)
+  , cached_frame_id ()
+  , cached_entity ()
+  , cached_frame ()
 {
 }

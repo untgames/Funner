@@ -1,0 +1,93 @@
+library "data/shaders/*"
+
+//blend stage state for rendering solid (non transaparent) geometry
+blend "solid"
+{
+  blend_enable     false //blending is disabled
+  color_write_mask rgba  //write color to all color planes
+}
+
+//blend stage state for additive rendering of transparent geometry (effects, particles, etc.)
+blend "additive"
+{
+  blend_enable     true          //blending is enabled
+  blend_color      add one one   //blend mode for additive blending
+  blend_alpha      add one one   //blend mode for additive blending
+  color_write_mask rgba          //write color to all color planes
+}
+
+//depth stencil stage state for rendering solid (non transparent) geometry
+depth_stencil "solid"
+{
+  depth_test   true     //z-test is enabled
+  depth_write  true     //write to z-buffer is enabled
+  stencil_test false    //stencil test is disabled
+}
+
+//depth stencil stage state for rendering
+depth_stencil "no_z_test"
+{
+  depth_test   true    //z-test is enabled
+  depth_write  false   //write to z-buffer is disabled
+}
+
+//default rasterizer stage settings
+rasterizer "default"
+{
+  fill_mode                solid  //draw geometry as solid (filled) triangles
+  front_counter_clockwise  false   //front faces is described as clockwise
+  cull_mode                back   //cull back faces
+  depth_bias               0      //depth bias (offset for each depth value on rendering)
+  multisample              true   //multisampling is enabled
+  line_antialiasing        false  //antialiasing for lines is disabled
+    //scissor settings are described in frame
+}
+
+//default rasterizer stage settings
+rasterizer "back_wire"
+{
+  fill_mode                wireframe  //draw geometry as solid (filled) triangles
+  front_counter_clockwise  false   //front faces is described as clockwise
+  cull_mode                front   //cull back faces
+  depth_bias               0      //depth bias (offset for each depth value on rendering)
+  multisample              true   //multisampling is enabled
+  line_antialiasing        true  //antialiasing for lines is disabled
+    //scissor settings are described in frame
+}
+
+//program instance for phong program, specified by (material, entity, frame)
+program "spy"
+{
+  shader "spy" "ffp" //reference to shader source
+}
+
+//description of effects rendering
+effect "main"
+{
+  tags "main_effect_tag" //list of tags for this effect (used in effect_group)
+
+  //render solid (non-transaparent) geometry
+  pass
+  {
+    tags                  "solid"                       //render only non-transparent geometry
+    clear                 all                           //clear all render targets & depth-stencil target
+    sort                  states                        //sort geometry for decrease state switches
+    color_targets         "main_color_target"           //render to effect color buffer
+    depth_stencil_target  "main_depth_stencil_target"   //render to effect depth stencil buffer
+    blend_state           "solid"                       //use blend stage settings for solid geometry
+    depth_stencil_state   "solid"                       //use depth stencil stage settings for solid geometry
+    rasterizer_state      "default"                     //use default rasterizer
+  }
+
+  //render wireframe transaparent geometry
+  pass
+  {
+    tags                  "solid"                       //render only non-transparent geometry
+    sort                  states                        //sort geometry for decrease state switches
+    color_targets         "main_color_target"           //render to effect color buffer
+    depth_stencil_target  "main_depth_stencil_target"   //render to effect depth stencil buffer
+    blend_state           "additive"                    //use blend stage settings for translucent geometry
+    depth_stencil_state   "no_z_test"                   //use depth stencil stage settings for translucent geometry
+    rasterizer_state      "back_wire"                   //use back rasterizer
+  }
+}
