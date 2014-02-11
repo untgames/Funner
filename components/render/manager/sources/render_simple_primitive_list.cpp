@@ -1143,7 +1143,6 @@ printf ("%s(%u)\n", __FUNCTION__, __LINE__); fflush (stdout);
     {
       try
       {
-printf ("%s(%u)\n", __FUNCTION__, __LINE__); fflush (stdout);
         return new Instance (this);
       }
       catch (xtl::exception& e)
