@@ -12,13 +12,16 @@ typedef xtl::uninitialized_storage<char> DataBuffer;
 typedef xtl::shared_ptr<DataBuffer>      DataBufferPtr;
 
 //Шрифт free type
-class FreetypeFace : public xtl::reference_counter
+class FreetypeFace : public common::Lockable, public xtl::reference_counter
 {
   public:
     FreetypeFace (const DataBufferPtr& in_data, const FreetypeLibrary& in_library, size_t face_index)
       : data (in_data)
       , library (in_library)
       , face (0)
+      , current_size (0)
+      , current_horizontal_dpi (0)
+      , current_vertical_dpi (0)
     {
       library.FT_New_Memory_Face ((const FT_Byte*)data->data (), data->size (), face_index, &face);
       library.FT_Select_Charmap (face, FT_ENCODING_UNICODE);
@@ -87,14 +90,30 @@ class FreetypeFace : public xtl::reference_counter
       return size_found ? best_size : 0;
     }
 
+    //Установка размера шрифта
+    void SetSize (size_t size, size_t horizontal_dpi, size_t vertical_dpi)
+    {
+      if (size == current_size && horizontal_dpi == current_horizontal_dpi && vertical_dpi == current_vertical_dpi)
+        return;
+
+      library.FT_Set_Char_Size (face, size << 6, 0, horizontal_dpi, vertical_dpi);
+
+      current_size           = size;
+      current_horizontal_dpi = horizontal_dpi;
+      current_vertical_dpi   = vertical_dpi;
+    }
+
   private:
     FreetypeFace (const FreetypeFace&);             //no impl
     FreetypeFace& operator = (const FreetypeFace&); //no impl
 
   private:
-    DataBufferPtr   data;     //данные файла шрифта
-    FreetypeLibrary library;  //библиотека
-    FT_Face         face;     //шрифт
+    DataBufferPtr   data;                    //данные файла шрифта
+    FreetypeLibrary library;                 //библиотека
+    FT_Face         face;                    //шрифт
+    size_t          current_size;            //текущий установленный размер шрифта
+    size_t          current_horizontal_dpi;  //текущее установленное разрешение целевого устройства вывода
+    size_t          current_vertical_dpi;    //текущее установленное разрешение целевого устройства вывода
 };
 
 typedef xtl::intrusive_ptr<FreetypeFace> FreetypeFacePtr;
@@ -217,6 +236,25 @@ Font FreetypeFontDesc::CreateFont (size_t index, const FontCreationParams& param
     if (!charset)
       throw xtl::make_argument_exception ("", "params.charset");
 
+      //convert charset to utf32
+    size_t           charset_size = xtl::xstrlen (charset);
+    stl::vector<int> utf32_charset (charset_size);
+
+    const void* source_ptr  = charset;
+    size_t      source_size = charset_size;
+    void*       dst_ptr     = &utf32_charset.front ();
+    size_t      dst_size    = utf32_charset.size () * sizeof (int);
+
+    common::convert_encoding (common::Encoding_UTF8, source_ptr, source_size, common::Encoding_UTF32LE, dst_ptr, dst_size);
+
+    if (source_size)
+      throw xtl::format_operation_exception ("", "Can't convert charset to utf32");
+
+    utf32_charset.resize (utf32_charset.size () - dst_size / sizeof (int));
+
+    stl::sort (utf32_charset.begin (), utf32_charset.end ());
+
+      //fill result font
     FreetypeFacePtr face        = impl->faces [index];
     FT_Face         face_handle = face->FaceHandle ();
 
@@ -226,7 +264,23 @@ Font FreetypeFontDesc::CreateFont (size_t index, const FontCreationParams& param
     builder.Rename        (common::format ("%s %s", face_handle->family_name, face_handle->style_name).c_str ());
     builder.SetFamilyName (face_handle->family_name);
     builder.SetStyleName  (face_handle->style_name);
-    builder.SetFontSize   (face->GetNearestFontSize (params.font_size, params.font_size_eps));
+
+    size_t choosen_size = face->GetNearestFontSize (params.font_size, params.font_size_eps);
+
+    builder.SetFontSize (choosen_size);
+
+    if (!utf32_charset.empty ())
+    {
+      builder.SetFirstGlyphCode (utf32_charset.front ());
+      builder.SetGlyphsCount (utf32_charset.back () - utf32_charset.front () + 1);
+
+        //Get glyphs data
+      {
+        common::Lock lock (*face);
+
+        face->SetSize (choosen_size, params.horizontal_dpi, params.vertical_dpi);
+      }
+    }
 
     return builder.Font ();
   }

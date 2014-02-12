@@ -13,6 +13,7 @@
 #include <common/lockable.h>
 #include <common/log.h>
 #include <common/strlib.h>
+#include <common/utf_converter.h>
 
 #include <media/charset_manager.h>
 #include <media/font_library.h>
@@ -47,7 +48,8 @@ class FreetypeLibrary
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void FT_Done_Face       (FT_Face face);
     void FT_New_Memory_Face (const FT_Byte* file_base, FT_Long file_size, FT_Long face_index, FT_Face *aface);
-    void FT_Select_Charmap  (FT_Face face, FT_Encoding  encoding);
+    void FT_Select_Charmap  (FT_Face face, FT_Encoding encoding);
+    void FT_Set_Char_Size   (FT_Face face, FT_F26Dot6 char_width, FT_F26Dot6 char_height, FT_UInt horz_resolution, FT_UInt vert_resolution);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Ξαμεν
