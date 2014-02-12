@@ -40,6 +40,8 @@ int main ()
     builder.SetFirstGlyphCode (32);
     builder.SetFontSize       (10);
 
+    memset (builder.Glyphs (), 0, sizeof (media::GlyphInfo) * builder.GlyphsCount ());
+
     KerningInfo kerning_info = { 2.f, 4.f};
 
     builder.InsertKerning (0, 1, kerning_info);

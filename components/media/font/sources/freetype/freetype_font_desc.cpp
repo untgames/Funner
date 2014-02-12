@@ -6,7 +6,7 @@ using namespace media::freetype;
 namespace
 {
 
-const char* LOG_NAME = "media::freetype::FreetypeFontDesc";
+const char* LOG_NAME = "media.freetype.FreetypeFontDesc";
 
 typedef xtl::uninitialized_storage<char> DataBuffer;
 typedef xtl::shared_ptr<DataBuffer>      DataBufferPtr;
@@ -133,6 +133,7 @@ namespace freetype
 
 struct FreetypeFontDesc::Impl
 {
+  common::Log     log;       //протокол
   DataBufferPtr   font_data; //данные файла шрифта
   FreetypeLibrary library;   //freetype библиотека, создаем каждый раз новую для возможной работы со шрифтами в разных нитях
   FacesArray      faces;     //шрифты
@@ -140,7 +141,8 @@ struct FreetypeFontDesc::Impl
 
   ///Конструктор / деструктор
   Impl (const char* file_name)
-    : source (file_name)
+    : log (LOG_NAME)
+    , source (file_name)
   {
     try
     {
@@ -237,11 +239,11 @@ Font FreetypeFontDesc::CreateFont (size_t index, const FontCreationParams& param
       throw xtl::make_argument_exception ("", "params.charset");
 
       //convert charset to utf32
-    size_t           charset_size = xtl::xstrlen (charset);
-    stl::vector<int> utf32_charset (charset_size);
+    size_t           charset_length = xtl::xstrlen (charset);
+    stl::vector<int> utf32_charset (charset_length);
 
     const void* source_ptr  = charset;
-    size_t      source_size = charset_size;
+    size_t      source_size = charset_length;
     void*       dst_ptr     = &utf32_charset.front ();
     size_t      dst_size    = utf32_charset.size () * sizeof (int);
 
@@ -250,7 +252,9 @@ Font FreetypeFontDesc::CreateFont (size_t index, const FontCreationParams& param
     if (source_size)
       throw xtl::format_operation_exception ("", "Can't convert charset to utf32");
 
-    utf32_charset.resize (utf32_charset.size () - dst_size / sizeof (int));
+    size_t charset_size = utf32_charset.size () - dst_size / sizeof (int);
+
+    utf32_charset.resize (charset_size);
 
     stl::sort (utf32_charset.begin (), utf32_charset.end ());
 
@@ -269,16 +273,79 @@ Font FreetypeFontDesc::CreateFont (size_t index, const FontCreationParams& param
 
     builder.SetFontSize (choosen_size);
 
-    if (!utf32_charset.empty ())
+    if (charset_size)
     {
       builder.SetFirstGlyphCode (utf32_charset.front ());
-      builder.SetGlyphsCount (utf32_charset.back () - utf32_charset.front () + 1);
+
+      size_t glyphs_count = utf32_charset.back () - utf32_charset.front () + 1;
+
+      builder.SetGlyphsCount (glyphs_count);
+
+      GlyphInfo *current_glyph = builder.Glyphs ();
+
+      xtl::uninitialized_storage<FT_UInt> ft_char_indices (charset_size);
+
+      for (size_t i = 0; i < charset_size; i++)
+        ft_char_indices.data () [i] = impl->library.FT_Get_Char_Index (face_handle, utf32_charset [i]);
 
         //Get glyphs data
       {
         common::Lock lock (*face);
 
         face->SetSize (choosen_size, params.horizontal_dpi, params.vertical_dpi);
+
+        GlyphInfo null_glyph;
+
+        if (impl->library.FT_Load_Char (face_handle, '?', FT_LOAD_DEFAULT, true))
+        {
+          null_glyph.width     = face_handle->glyph->metrics.width / 64.f;
+          null_glyph.height    = face_handle->glyph->metrics.height / 64.f;
+          null_glyph.bearing_x = face_handle->glyph->metrics.horiBearingX / 64.f;
+          null_glyph.bearing_y = face_handle->glyph->metrics.horiBearingY / 64.f;
+          null_glyph.advance_x = face_handle->glyph->metrics.horiAdvance / 64.f;
+          null_glyph.advance_y = 0;
+        }
+        else
+          memset (&null_glyph, 0, sizeof (null_glyph));
+
+        size_t previous_glyph_code = utf32_charset.front ();
+
+        for (size_t i = 0; i < charset_size; i++, current_glyph++)
+        {
+          size_t char_code = utf32_charset [i];
+
+          for (size_t j = previous_glyph_code; j < char_code; j++, current_glyph++)
+            memcpy (current_glyph, &null_glyph, sizeof (GlyphInfo));
+
+          previous_glyph_code = char_code;
+
+          FT_UInt char_index = ft_char_indices.data () [i];
+
+          if (!char_index)
+          {
+            memcpy (current_glyph, &null_glyph, sizeof (GlyphInfo));
+
+            impl->log.Printf ("Font '%s' has no char %lu.", impl->source.c_str (), char_code);
+
+            continue;
+          }
+
+          if (!impl->library.FT_Load_Char (face_handle, char_code, FT_LOAD_DEFAULT, true))
+          {
+            memcpy (current_glyph, &null_glyph, sizeof (GlyphInfo));
+
+            impl->log.Printf ("Can't load char %lu.", char_code);
+
+            continue;
+          }
+
+          current_glyph->width     = face_handle->glyph->metrics.width / 64.f;
+          current_glyph->height    = face_handle->glyph->metrics.height / 64.f;
+          current_glyph->bearing_x = face_handle->glyph->metrics.horiBearingX / 64.f;
+          current_glyph->bearing_y = face_handle->glyph->metrics.horiBearingY / 64.f;
+          current_glyph->advance_x = face_handle->glyph->metrics.horiAdvance / 64.f;
+          current_glyph->advance_y = 0;
+        }
       }
     }
 

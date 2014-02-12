@@ -8,12 +8,19 @@ const char* FONT_NAME     = "data/times_new_roman.ttf";
 
 const char* CHARSET_NAME = "charset";
 
+void log_handler (const char* source, const char* message)
+{
+  printf ("'%s': '%s'\n", source, message);
+}
+
 int main ()
 {
   printf ("Results of ttf test:\n");
 
   try
   {
+    common::LogFilter filter ("media.*", log_handler);
+
     CharsetManager::RegisterCharset (CHARSET_NAME, "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ");
 
     FontLibrary library;

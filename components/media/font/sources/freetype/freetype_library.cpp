@@ -103,6 +103,27 @@ void FreetypeLibrary::FT_Done_Face (FT_Face face)
   check_free_type_error (::FT_Done_Face (face), "::FT_Done_Face");
 }
 
+FT_UInt FreetypeLibrary::FT_Get_Char_Index (FT_Face face, FT_ULong charcode)
+{
+  common::Lock lock (*impl);
+
+  return ::FT_Get_Char_Index (face, charcode);
+}
+
+bool FreetypeLibrary::FT_Load_Char (FT_Face face, FT_ULong charcode, FT_Int32 load_flags, bool nothrow)
+{
+  common::Lock lock (*impl);
+
+  FT_Error result = ::FT_Load_Char (face, charcode, load_flags);
+
+  if (nothrow)
+    return result == 0;
+
+  check_free_type_error (result, "::FT_Load_Char");
+
+  return true;
+}
+
 void FreetypeLibrary::FT_New_Memory_Face (const FT_Byte* file_base, FT_Long file_size, FT_Long face_index, FT_Face *aface)
 {
   common::Lock lock (*impl);
