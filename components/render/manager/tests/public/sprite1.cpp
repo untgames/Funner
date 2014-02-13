@@ -34,19 +34,12 @@ void idle (Test& test, Entity& entity, Frame& frame)
 {
   try
   {
-    static size_t last = 0;
-    static float angle;
+    static size_t start = common::milliseconds ();
 
     static size_t last_fps = 0;
     static size_t frames_count = 0;
 
-    float dt = float (common::milliseconds () - last) / 1000.f;
-
-    if (common::milliseconds () - last > 25)
-    {
-      last = common::milliseconds ();
-      return;
-    }
+    float t = float (common::milliseconds () - start) / 1000.f;
 
     if (common::milliseconds () - last_fps > 1000)
     {
@@ -64,16 +57,11 @@ void idle (Test& test, Entity& entity, Frame& frame)
     common::PropertyMap frame_properties = frame.Properties ();
     common::PropertyMap entity_properties = entity.Properties ();  
 
-    angle += 0.05f*dt;
+    float angle = t * 3.1415926f / 4.0f;
     
-//    entity_properties.SetProperty ("myObjectMatrix", math::rotate (math::radian (angle), math::vec3f (0, 0, 1)) *
-//      math::rotate (math::radian (angle*0.2f), math::vec3f (1, 0, 0)));
     entity.SetWorldMatrix (math::rotate (math::radian (angle), math::vec3f (0, 0, 1)));
-      
-    math::vec3f light_pos = math::vec3f (0, 0, 10);
-      
-    frame_properties.SetProperty ("lightPos", light_pos);
-    frame_properties.SetProperty ("lightDir", -math::normalize (light_pos));
+//    entity.SetWorldMatrix (math::rotate (math::radian (angle), math::vec3f (0, 0, 1)) *
+//      math::rotate (math::radian (angle*0.2f), math::vec3f (1, 0, 0)));
 
     common::PropertyMap entity_dependent_properties = frame.EntityDependentProperties ();
 
@@ -104,6 +92,7 @@ int main ()
     RenderManager render_manager = test.RenderManager ();
         
     render_manager.LoadResource ("data/sprites.rfx");    
+    render_manager.LoadResource ("data/bottom.jpg");
     render_manager.LoadResource ("data/sprites.xmtl");
     
     Entity     entity    = render_manager.CreateEntity ();
@@ -147,7 +136,7 @@ int main ()
     common::PropertyMap frame_properties = frame.Properties ();
     common::PropertyMap entity_properties = entity.Properties ();
     
-    frame_properties.SetProperty ("myProjMatrix", get_ortho_proj (-2, 2, -2, 2, -1000, 1000));
+    frame_properties.SetProperty ("myProjMatrix", get_ortho_proj (-2, 2, -2, 2, -15, 15));
     frame_properties.SetProperty ("myViewMatrix", inverse (math::lookat (math::vec3f (0, 0, 10), math::vec3f (0.0f), math::vec3f (0, 1, 0))));
     
     frame.AddEntity (entity); 
@@ -165,3 +154,4 @@ int main ()
 
   return 0;
 }
+

@@ -838,7 +838,7 @@ class BatchingInstance: public DynamicPrimitive, private render::manager::Render
       try
       {
         prototype->UpdateCache ();
-
+printf ("%s(%u)\n", __FUNCTION__, __LINE__); fflush (stdout);
         const DynamicPrimitiveIndex * const* indices_base = batching_manager->TempIndexBuffer ();
 
         cached_primitive.material         = prototype->CachedMaterial ();
@@ -849,6 +849,8 @@ class BatchingInstance: public DynamicPrimitive, private render::manager::Render
         cached_primitive.dynamic_indices  = indices_base;
         cached_primitive.batching_manager = &*batching_manager;
         cached_primitive.batching_hash    = get_batching_hash (cached_primitive);
+
+        InvalidateCacheDependencies ();
       }
       catch (xtl::exception& e)
       {
@@ -1143,9 +1145,11 @@ class BatchingLineAndOrientedSpriteList: public BatchingStateBlockHolder, public
               //TODO: кэшировать вершины (копировать, если не изменялись)
 
             for (size_t count=verts_count; count--; src_vert++, dst_vert++)
-            {
-              dst_vert->position = world_tm * src_vert->position;
-              dst_vert->normal   = world_tm * math::vec4f (src_vert->normal, 0.0f);
+            {             
+              dst_vert->position  = world_tm * src_vert->position;
+              dst_vert->normal    = world_tm * math::vec4f (src_vert->normal, 0.0f);
+              dst_vert->color     = src_vert->color;
+              dst_vert->tex_coord = src_vert->tex_coord;
             }
           }
           catch (xtl::exception& e)

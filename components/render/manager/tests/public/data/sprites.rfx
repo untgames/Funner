@@ -56,9 +56,25 @@ rasterizer "back_wire"
 }
 
 //program instance for phong program, specified by (material, entity, frame)
-program "spy"
+program "sprites"
 {
-  shader "spy" "ffp" //reference to shader source
+  shader "sprites" "ffp" //reference to shader source
+
+  texmap "diffuse" "DiffuseTexture"
+}
+
+//texture sampler description
+sampler "default"
+{
+  min_filter      linear            //use trilinear filtering for minification
+  mag_filter      linear            //use linear filtering for magnitude
+  wrap_uvw        clamp_to_border   //wrap all textue coordinates to border color
+  comparision     always            //always pass texture comparision test
+  mip_lod_bias    0                 //don't bias texture lod levels
+  min_lod         0                 //use 0 as start mip level
+  max_lod         max               //use max possible mip level
+  max_anisotropy  16                //texture anisotroping filtering constant
+  border_color    0 0 0 0           //color of texture's border
 }
 
 //description of effects rendering
