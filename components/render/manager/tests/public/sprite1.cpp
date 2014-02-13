@@ -63,10 +63,6 @@ void idle (Test& test, Entity& entity, Frame& frame)
     entity.SetWorldMatrix (math::rotate (math::radian (angle), math::vec3f (0, 0, 1)) *
       math::rotate (math::radian (angle*0.2f), math::vec3f (1, 0, 0)));
 
-    common::PropertyMap entity_dependent_properties = frame.EntityDependentProperties ();
-
-    entity_dependent_properties.SetProperty ("myObjectMatrix", math::mat4f (1.0f));
-
     frame.Draw ();
       
     test.Window ().SwapBuffers ();
@@ -138,6 +134,8 @@ int main ()
     
     frame_properties.SetProperty ("myProjMatrix", get_ortho_proj (-2, 2, -2, 2, -15, 15));
     frame_properties.SetProperty ("myViewMatrix", inverse (math::lookat (math::vec3f (0, 0, 10), math::vec3f (0.0f), math::vec3f (0, 1, 0))));
+
+    frame.SetViewProjectionMatrix (frame_properties.GetMatrix ("myProjMatrix") * frame_properties.GetMatrix ("myViewMatrix"));
     
     frame.AddEntity (entity); 
     

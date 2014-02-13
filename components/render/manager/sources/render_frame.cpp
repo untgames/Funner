@@ -119,6 +119,7 @@ struct FrameImpl::Impl: public CacheHolder
   LowLevelBufferPtr                    cached_properties;       //закэшированные свойства
   EntityDrawFunction                   entity_draw_handler;     //обработчик рисования объектов
   EntityDrawParams                     entity_draw_params;      //параметры рисования объектов (кэш)
+  math::mat4f                          view_proj_tm;            //матрица view * projection
   LowLevelBufferPtr                    entity_independent_property_buffer; //буфер динамических свойств объекта (начальное состояние)
   ProgramParametersLayoutPtr           entity_independent_layout;          //расположение динамических свойств объекта (начальное состояние)
   bool                                 auto_cleanup_state;                 //самоочистка кадра после отрисовки
@@ -134,6 +135,7 @@ struct FrameImpl::Impl: public CacheHolder
     , clear_flags (ClearFlag_All)
     , clear_depth_value (1.0f)
     , clear_stencil_index (0)
+    , view_proj_tm (1.0f)
     , auto_cleanup_state (true)
   {
     AttachCacheSource (*effect_holder);
@@ -560,6 +562,20 @@ const common::PropertyMap& FrameImpl::EntityDependentProperties ()
 }
 
 /*
+    Установка матрицы vipew * projection
+*/
+
+void FrameImpl::SetViewProjectionMatrix (const math::mat4f& tm)
+{
+  impl->view_proj_tm = tm;
+}
+
+const math::mat4f& FrameImpl::ViewProjectionMatrix ()
+{
+  return impl->view_proj_tm;
+}
+
+/*
     Подготовка к отрисовке кадра
 */
 
@@ -669,7 +685,7 @@ void FrameImpl::Draw (RenderingContext* previous_context)
     {
         //формирование контекста отрисовки
       
-      RenderingContext context (*this, impl->entity_draw_params.mvp_matrix, previous_context);
+      RenderingContext context (*this, impl->view_proj_tm, previous_context);
       
       if (!impl->effect_holder->effect_renderer)
         throw xtl::format_operation_exception ("", "No effect assigned");

@@ -112,7 +112,7 @@ class BillboardSpriteGenerator: public SpriteGenerator
   public:
     BillboardSpriteGenerator (EntityImpl& entity, const math::vec3f& view_up, const math::mat4f& inv_view_proj_tm)
       : world_tm (entity.WorldMatrix ())
-      , inv_mvp_tm (inv_view_proj_tm * entity.InverseWorldMatrix ())
+      , inv_mvp_tm (entity.InverseWorldMatrix () * inv_view_proj_tm)
       , local_normal (math::normalize (inv_mvp_tm * math::vec4f (0, 0, -1.0f, 0)))
       , world_normal (math::normalize (world_tm * math::vec4f (local_normal, 0.0f)))
       , right (cross (math::normalize (math::vec3f (inv_mvp_tm * math::vec4f (view_up, 0))), local_normal))
@@ -184,7 +184,7 @@ class OrientedBillboardSpriteGenerator: public SpriteGenerator
     OrientedBillboardSpriteGenerator (EntityImpl& entity, const math::vec3f& in_view_up, const math::mat4f& inv_view_proj_tm)
       : world_tm (entity.WorldMatrix ())
       , src_view_up (in_view_up)
-      , inv_mvp_tm (inv_view_proj_tm * entity.InverseWorldMatrix ())
+      , inv_mvp_tm (entity.InverseWorldMatrix () * inv_view_proj_tm)
     {
     }
 
@@ -838,7 +838,7 @@ class BatchingInstance: public DynamicPrimitive, private render::manager::Render
       try
       {
         prototype->UpdateCache ();
-printf ("%s(%u)\n", __FUNCTION__, __LINE__); fflush (stdout);
+
         const DynamicPrimitiveIndex * const* indices_base = batching_manager->TempIndexBuffer ();
 
         cached_primitive.material         = prototype->CachedMaterial ();
@@ -1391,6 +1391,7 @@ class StandaloneBillboardSpriteList: public PrimitiveListStorage<Sprite, Standal
       try
       {           
         Generator generator (entity, view_up, context.InverseViewProjectionMatrix ());
+//        Generator generator (entity, view_up, mvp_matrix);
 
         generate (generator, Base::Size (), Base::Items (), 0, VertexBuffer ().Data (), IndexBuffer ().Data ());
 

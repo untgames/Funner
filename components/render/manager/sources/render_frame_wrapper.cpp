@@ -299,14 +299,20 @@ const common::PropertyMap& Frame::EntityDependentProperties () const
   return impl->EntityDependentProperties ();
 }
 
+void Frame::SetViewProjectionMatrix (const math::mat4f& tm)
+{
+  impl->SetViewProjectionMatrix (tm);
+}
+
+const math::mat4f& Frame::ViewProjectionMatrix () const
+{
+  return impl->ViewProjectionMatrix ();
+}
+
 void Frame::Draw ()
 {
   impl->Draw ();
 }
-
-/*
-    Управление кэшированием
-*/
 
 void Frame::UpdateCache ()
 {
