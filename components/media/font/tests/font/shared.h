@@ -30,8 +30,14 @@ void dump (const media::Font& font)
     printf ("      w = %.2f h = %.2f bx = %.2f by = %.2f ax = %.2f ay = %.2f\n", glyph.width, glyph.height, glyph.bearing_x, glyph.bearing_y, glyph.advance_x, glyph.advance_y);
   }
 
-  printf ("    has kerning 0 - 1 = %d\n", font.HasKerning (0, 1));
-  printf ("    has kerning 1 - 0 = %d\n", font.HasKerning (1, 0));
+  printf ("    kernings:\n");
 
-  printf ("    kerning 0 - 1     = %.2f %.2f\n", font.Kerning (0, 1).x_kerning, font.Kerning (0, 1).y_kerning);
+  for (size_t i = 0, count = font.GlyphsCount (); i < count ; i++)
+  {
+    for (size_t j = 0; j < count; j++)
+    {
+      if (font.HasKerning (i, j))
+        printf ("      kerning %lu - %lu = %.2f %.2f\n", i, j, font.Kerning (i, j).x_kerning, font.Kerning (i, j).y_kerning);
+    }
+  }
 }

@@ -18,9 +18,7 @@ Empty builder:
     glyphs count      = 0
     first glyph code  = 0
     font size         = 0
-    has kerning 0 - 1 = 0
-    has kerning 1 - 0 = 0
-    kerning 0 - 1     = 0.00 0.00
+    kernings:
 Filled builder:
   source            = 'source_name'
   name              = 'builder1'
@@ -43,6 +41,5 @@ Filled builder:
     glyphs:
       w = 0.00 h = 0.00 bx = 0.00 by = 0.00 ax = 0.00 ay = 0.00
       w = 0.00 h = 0.00 bx = 0.00 by = 0.00 ax = 0.00 ay = 0.00
-    has kerning 0 - 1 = 1
-    has kerning 1 - 0 = 0
-    kerning 0 - 1     = 2.00 4.00
+    kernings:
+      kerning 0 - 1 = 2.00 4.00
