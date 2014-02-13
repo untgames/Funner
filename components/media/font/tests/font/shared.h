@@ -27,7 +27,7 @@ void dump (const media::Font& font)
   {
     const media::GlyphInfo& glyph = font.Glyphs () [i];
 
-    printf ("      w = %.2f h = %.2f bx = %.2f by = %.2f ax = %.2f ay = %.2f\n", glyph.width, glyph.height, glyph.bearing_x, glyph.bearing_y, glyph.advance_x, glyph.advance_y);
+    printf ("      '%C' = w = %.2f h = %.2f bx = %.2f by = %.2f ax = %.2f ay = %.2f\n", font.FirstGlyphCode () + i, glyph.width, glyph.height, glyph.bearing_x, glyph.bearing_y, glyph.advance_x, glyph.advance_y);
   }
 
   printf ("    kernings:\n");
@@ -37,7 +37,7 @@ void dump (const media::Font& font)
     for (size_t j = 0; j < count; j++)
     {
       if (font.HasKerning (i, j))
-        printf ("      kerning %lu - %lu = %.2f %.2f\n", i, j, font.Kerning (i, j).x_kerning, font.Kerning (i, j).y_kerning);
+        printf ("      kerning '%C' - '%C' = %.2f %.2f\n", font.FirstGlyphCode () + i, font.FirstGlyphCode () + j, font.Kerning (i, j).x_kerning, font.Kerning (i, j).y_kerning);
     }
   }
 }

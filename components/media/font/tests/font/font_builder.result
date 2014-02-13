@@ -39,7 +39,7 @@ Filled builder:
     first glyph code  = 32
     font size         = 10
     glyphs:
-      w = 0.00 h = 0.00 bx = 0.00 by = 0.00 ax = 0.00 ay = 0.00
-      w = 0.00 h = 0.00 bx = 0.00 by = 0.00 ax = 0.00 ay = 0.00
+      ' ' = w = 0.00 h = 0.00 bx = 0.00 by = 0.00 ax = 0.00 ay = 0.00
+      '!' = w = 0.00 h = 0.00 bx = 0.00 by = 0.00 ax = 0.00 ay = 0.00
     kernings:
-      kerning 0 - 1 = 2.00 4.00
+      kerning ' ' - '!' = 2.00 4.00

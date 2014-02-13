@@ -110,6 +110,20 @@ FT_UInt FreetypeLibrary::FT_Get_Char_Index (FT_Face face, FT_ULong charcode)
   return ::FT_Get_Char_Index (face, charcode);
 }
 
+bool FreetypeLibrary::FT_Get_Kerning (FT_Face face, FT_UInt left_glyph, FT_UInt right_glyph, FT_UInt kern_mode, FT_Vector *akerning, bool nothrow)
+{
+  common::Lock lock (*impl);
+
+  FT_Error result = ::FT_Get_Kerning (face, left_glyph, right_glyph, kern_mode, akerning);
+
+  if (nothrow)
+    return result == 0;
+
+  check_free_type_error (result, "::FT_Get_Kerning");
+
+  return true;
+}
+
 bool FreetypeLibrary::FT_Load_Char (FT_Face face, FT_ULong charcode, FT_Int32 load_flags, bool nothrow)
 {
   common::Lock lock (*impl);

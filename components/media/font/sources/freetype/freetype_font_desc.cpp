@@ -239,8 +239,8 @@ Font FreetypeFontDesc::CreateFont (size_t index, const FontCreationParams& param
       throw xtl::make_argument_exception ("", "params.charset");
 
       //convert charset to utf32
-    size_t           charset_length = xtl::xstrlen (charset);
-    stl::vector<int> utf32_charset (charset_length);
+    size_t                    charset_length = xtl::xstrlen (charset);
+    stl::vector<unsigned int> utf32_charset (charset_length);
 
     const void* source_ptr  = charset;
     size_t      source_size = charset_length;
@@ -275,13 +275,13 @@ Font FreetypeFontDesc::CreateFont (size_t index, const FontCreationParams& param
 
     if (charset_size)
     {
-      builder.SetFirstGlyphCode (utf32_charset.front ());
+      unsigned int first_glyph_code = utf32_charset.front ();
+
+      builder.SetFirstGlyphCode (first_glyph_code);
 
       size_t glyphs_count = utf32_charset.back () - utf32_charset.front () + 1;
 
       builder.SetGlyphsCount (glyphs_count);
-
-      GlyphInfo *current_glyph = builder.Glyphs ();
 
       xtl::uninitialized_storage<FT_UInt> ft_char_indices (charset_size);
 
@@ -310,11 +310,13 @@ Font FreetypeFontDesc::CreateFont (size_t index, const FontCreationParams& param
 
         size_t previous_glyph_code = utf32_charset.front ();
 
+        GlyphInfo *current_glyph = builder.Glyphs ();
+
         for (size_t i = 0; i < charset_size; i++, current_glyph++)
         {
           size_t char_code = utf32_charset [i];
 
-          for (size_t j = previous_glyph_code; j < char_code; j++, current_glyph++)
+          for (size_t j = previous_glyph_code + 1; j < char_code; j++, current_glyph++)
             memcpy (current_glyph, &null_glyph, sizeof (GlyphInfo));
 
           previous_glyph_code = char_code;
@@ -345,6 +347,32 @@ Font FreetypeFontDesc::CreateFont (size_t index, const FontCreationParams& param
           current_glyph->bearing_y = face_handle->glyph->metrics.horiBearingY / 64.f;
           current_glyph->advance_x = face_handle->glyph->metrics.horiAdvance / 64.f;
           current_glyph->advance_y = 0;
+        }
+
+          //Формирование кёрнингов
+
+        for (size_t i = 0; i < charset_size; i++)
+        {
+          for (size_t j = 0; j < charset_size; j++)
+          {
+            FT_Vector kerning;
+
+            if (!impl->library.FT_Get_Kerning (face_handle, ft_char_indices.data () [i], ft_char_indices.data () [j], FT_KERNING_UNFITTED, &kerning, true))
+            {
+              impl->log.Printf ("Can't get kerning for pair %u-%u.", utf32_charset [i], utf32_charset [j]);
+              continue;
+            }
+
+            if (kerning.x || kerning.y)
+            {
+              media::KerningInfo kerning_info;
+
+              kerning_info.x_kerning = kerning.x / 64.f;
+              kerning_info.y_kerning = kerning.y / 64.f;
+
+              builder.InsertKerning (utf32_charset [i] - first_glyph_code, utf32_charset [j] - first_glyph_code, kerning_info);
+            }
+          }
         }
       }
     }

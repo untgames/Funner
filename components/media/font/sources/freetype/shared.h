@@ -48,6 +48,7 @@ class FreetypeLibrary
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void    FT_Done_Face       (FT_Face face);
     FT_UInt FT_Get_Char_Index  (FT_Face face, FT_ULong charcode);
+    bool    FT_Get_Kerning     (FT_Face face, FT_UInt left_glyph, FT_UInt right_glyph, FT_UInt kern_mode, FT_Vector *akerning, bool nothrow = false);
     bool    FT_Load_Char       (FT_Face face, FT_ULong charcode, FT_Int32 load_flags, bool nothrow = false);
     void    FT_New_Memory_Face (const FT_Byte* file_base, FT_Long file_size, FT_Long face_index, FT_Face *aface);
     void    FT_Select_Charmap  (FT_Face face, FT_Encoding encoding);
