@@ -59,9 +59,9 @@ void idle (Test& test, Entity& entity, Frame& frame)
 
     float angle = t * 3.1415926f / 4.0f;
     
-    entity.SetWorldMatrix (math::rotate (math::radian (angle), math::vec3f (0, 0, 1)));
-//    entity.SetWorldMatrix (math::rotate (math::radian (angle), math::vec3f (0, 0, 1)) *
-//      math::rotate (math::radian (angle*0.2f), math::vec3f (1, 0, 0)));
+//    entity.SetWorldMatrix (math::rotate (math::radian (angle), math::vec3f (0, 0, 1)));
+    entity.SetWorldMatrix (math::rotate (math::radian (angle), math::vec3f (0, 0, 1)) *
+      math::rotate (math::radian (angle*0.2f), math::vec3f (1, 0, 0)));
 
     common::PropertyMap entity_dependent_properties = frame.EntityDependentProperties ();
 
