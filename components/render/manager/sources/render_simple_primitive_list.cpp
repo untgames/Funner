@@ -789,6 +789,9 @@ class BatchingInstance: public DynamicPrimitive, private render::manager::Render
       }
     }
 
+/// ћенеджер пакетировани€
+    render::manager::BatchingManager& BatchingManager () { return *batching_manager; }
+
   protected:
 /// ѕрототип
     BatchingStateBlockHolder& Prototype () { return *prototype; }
@@ -800,23 +803,24 @@ class BatchingInstance: public DynamicPrimitive, private render::manager::Render
     }
 
 ///«аполнение примитива
-    void UpdatePrimitive (size_t verts_count, size_t inds_count, DynamicPrimitiveVertex*& out_vertices, DynamicPrimitiveIndex*& out_indices, size_t& out_base_vertex)
+    void UpdatePrimitive (size_t verts_count, size_t inds_count, DynamicPrimitiveVertex** out_vertices, DynamicPrimitiveIndex** out_indices, size_t* out_base_vertex)
     {
       try
       {
           //выделение вершин
 
-        out_vertices = batching_manager->AllocateDynamicVertices (verts_count, &out_base_vertex);
+        if (out_vertices) *out_vertices = batching_manager->AllocateDynamicVertices (verts_count, out_base_vertex);
+        else              batching_manager->PreallocateDynamicVertices (verts_count);
 
-          //выделение индексов
+            //выделение индексов
 
         const DynamicPrimitiveIndex * const* indices_base = batching_manager->TempIndexBuffer ();
 
-        out_indices = batching_manager->AllocateDynamicIndices (IndexPoolType_Temporary, inds_count);
+        *out_indices = batching_manager->AllocateDynamicIndices (IndexPoolType_Temporary, inds_count);
 
-          //формирование примитива
+            //формирование примитива
 
-        cached_primitive.first = out_indices - *indices_base;
+        cached_primitive.first = *out_indices - *indices_base;
         cached_primitive.count = inds_count;
       }
       catch (xtl::exception& e)
@@ -1124,7 +1128,7 @@ class BatchingLineAndOrientedSpriteList: public BatchingStateBlockHolder, public
             DynamicPrimitiveVertex* vertices = 0;
             DynamicPrimitiveIndex*  indices  = 0;
 
-            UpdatePrimitive (verts_count, inds_count, vertices, indices, base_vertex);
+            UpdatePrimitive (verts_count, inds_count, &vertices, &indices, &base_vertex);
 
               //формирование вершин и индексов
 
@@ -1441,7 +1445,6 @@ class BatchingBillboardSpriteList: public PrimitiveListStorage<Sprite, BatchingS
 ///  онструктор
         InstanceBase (const PrototypePtr& prototype)
           : BatchingInstance (prototype, BillboardSpriteGenerator::PRIMITIVE_TYPE, DynamicPrimitiveFlag_FrameDependent) 
-          , vertices ()
           , indices ()
         { }
 
@@ -1455,14 +1458,9 @@ class BatchingBillboardSpriteList: public PrimitiveListStorage<Sprite, BatchingS
 
             size_t items_count = prototype.BatchingBillboardSpriteList::Size (),
                    verts_count = items_count * VERTICES_PER_PRIMITIVE,
-                   inds_count  = items_count * INDICES_PER_PRIMITIVE, 
-                   base_vertex = 0;
+                   inds_count  = items_count * INDICES_PER_PRIMITIVE;
 
-            UpdatePrimitive (verts_count, inds_count, vertices, indices, base_vertex);
-
-              //формирование индексов
-
-            generate<SpriteGenerator> (items_count, base_vertex, indices);
+            UpdatePrimitive (verts_count, inds_count, 0, &indices, 0);
           }
           catch (xtl::exception& e)
           {
@@ -1472,8 +1470,7 @@ class BatchingBillboardSpriteList: public PrimitiveListStorage<Sprite, BatchingS
         }
 
       protected:
-        DynamicPrimitiveVertex* vertices;
-        DynamicPrimitiveIndex*  indices;
+        DynamicPrimitiveIndex* indices;
     };
 
     template <class Generator>
@@ -1488,18 +1485,21 @@ class BatchingBillboardSpriteList: public PrimitiveListStorage<Sprite, BatchingS
         {
           try
           {
-            if (!vertices || !indices)
-              return;
-
             BatchingBillboardSpriteList& prototype = static_cast<BatchingBillboardSpriteList&> (Prototype ());
 
-            size_t items_count = prototype.BatchingBillboardSpriteList::Size ();
+            size_t items_count = prototype.BatchingBillboardSpriteList::Size (), verts_count = items_count * VERTICES_PER_PRIMITIVE, base_vertex = 0;
+
+            DynamicPrimitiveVertex* vertices = BatchingManager ().AllocateDynamicVertices (verts_count, &base_vertex);
 
               //формирование вершин
 
             Generator generator (entity, prototype.view_up, context.InverseViewProjectionMatrix ());
 
             generate (generator, items_count, prototype.Items (), vertices);
+
+              //формирование индексов
+
+            generate<SpriteGenerator> (items_count, base_vertex, indices);
           }
           catch (xtl::exception& e)
           {

@@ -19,6 +19,17 @@ math::mat4f get_ortho_proj (float left, float right, float bottom, float top, fl
   return proj_matrix;
 }
 
+void update_entity_frame_transformations (Frame& frame, Entity& entity, void* user_data, EntityDrawParams& out_params)
+{
+  PropertyMap properties = out_params.properties;
+  
+  math::mat4f model_view_tm = frame.Properties ().GetMatrix ("myViewMatrix") * entity.WorldMatrix ();  
+
+  out_params.mvp_matrix = frame.Properties ().GetMatrix ("myProjMatrix") * model_view_tm;
+
+  properties.SetProperty ("myObjectMatrix", entity.WorldMatrix ());
+}
+
 void idle (Test& test, Entity& entity, Frame& frame)
 {
   try
@@ -57,12 +68,16 @@ void idle (Test& test, Entity& entity, Frame& frame)
     
 //    entity_properties.SetProperty ("myObjectMatrix", math::rotate (math::radian (angle), math::vec3f (0, 0, 1)) *
 //      math::rotate (math::radian (angle*0.2f), math::vec3f (1, 0, 0)));
-    entity_properties.SetProperty ("myObjectMatrix", math::rotate (math::radian (angle), math::vec3f (0, 0, 1)));
+    entity.SetWorldMatrix (math::rotate (math::radian (angle), math::vec3f (0, 0, 1)));
       
     math::vec3f light_pos = math::vec3f (0, 0, 10);
       
     frame_properties.SetProperty ("lightPos", light_pos);
     frame_properties.SetProperty ("lightDir", -math::normalize (light_pos));
+
+    common::PropertyMap entity_dependent_properties = frame.EntityDependentProperties ();
+
+    entity_dependent_properties.SetProperty ("myObjectMatrix", math::mat4f (1.0f));
 
     frame.Draw ();
       
@@ -70,11 +85,11 @@ void idle (Test& test, Entity& entity, Frame& frame)
   }
   catch (std::exception& e)
   {
-    printf ("exception: %s\n    at idle", e.what ());
+    printf ("exception: %s\n    at idle\n", e.what ());
   }
   catch (...)
   {
-    printf ("unknown exception\n    at idle");
+    printf ("unknown exception\n    at idle\n");
   }
 }
 
@@ -98,6 +113,8 @@ int main ()
     SpriteList sprites   = primitive.AddBatchingSpriteList (SpriteMode_Oriented, math::vec3f (0, 1.0f, 0));
     Sprite     sprite;
 
+    primitive.Buffers ().ReserveDynamicBuffers (8192, 8192);
+
     sprite.position   = math::vec3f (0.0f);
     sprite.size       = math::vec2f (1.0f);
     sprite.color      = math::vec4f (1.0f);
@@ -118,13 +135,19 @@ int main ()
     frame.SetRenderTarget ("main_depth_stencil_target", test.Window ().DepthStencilBuffer ());
     frame.SetEffect ("main");
     frame.SetClearColor (math::vec4f (0.0f, 0.0f, 1.0f, 1.0f));
+    frame.SetEntityDrawHandler (&update_entity_frame_transformations);
+
+    common::PropertyMap entity_dependent_properties;
+
+    frame.SetEntityDependentProperties (entity_dependent_properties);
+
+    entity_dependent_properties.SetProperty ("myObjectMatrix", math::mat4f (1.0f));
     
     common::PropertyMap frame_properties = frame.Properties ();
     common::PropertyMap entity_properties = entity.Properties ();
     
     frame_properties.SetProperty ("myProjMatrix", get_ortho_proj (-2, 2, -2, 2, -1000, 1000));
     frame_properties.SetProperty ("myViewMatrix", inverse (math::lookat (math::vec3f (0, 0, 10), math::vec3f (0.0f), math::vec3f (0, 1, 0))));
-    entity_properties.SetProperty ("myObjectMatrix", math::mat4f (1.0f));        
     
     frame.AddEntity (entity); 
     

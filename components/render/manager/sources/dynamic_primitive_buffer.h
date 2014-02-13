@@ -43,7 +43,7 @@ class DynamicPrimitiveBuffer: public xtl::noncopyable
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Синхронизация буферов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void SyncBuffers (low_level::IDevice& device, bool sync_data = true);
+    void SyncBuffers (low_level::IDevice& device, size_t first = 0);
 
   private:
     typedef xtl::uninitialized_storage<Item> ItemBuffer;
@@ -59,7 +59,8 @@ class DynamicPrimitiveBuffer: public xtl::noncopyable
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Синхронизация буферов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-void sync_buffers (low_level::IDevice& device, low_level::UsageMode usage_mode, low_level::BindFlag bind_flags, const void* src_data, size_t src_data_size, size_t buffer_capacity, size_t& dst_buffer_size, LowLevelBufferPtr& dst_buffer);
+void sync_buffers (low_level::IDevice& device, low_level::UsageMode usage_mode, low_level::BindFlag bind_flags, size_t offset, const void* src_data, size_t src_data_size, 
+  size_t buffer_capacity, size_t& dst_buffer_size, LowLevelBufferPtr& dst_buffer);
 
 /*
     Реализация
@@ -122,7 +123,10 @@ inline void DynamicPrimitiveBuffer<T>::Clear ()
 }
 
 template <class T>
-inline void DynamicPrimitiveBuffer<T>::SyncBuffers (low_level::IDevice& device, bool sync_data)
+inline void DynamicPrimitiveBuffer<T>::SyncBuffers (low_level::IDevice& device, size_t first)
 {
-  sync_buffers (device, usage_mode, bind_flags, src_buffer.data (), sync_data ? src_buffer.size () * sizeof (Item) : 0, src_buffer.capacity () * sizeof (Item), dst_buffer_size, dst_buffer);
+  size_t offset = first * sizeof (Item);
+
+  sync_buffers (device, usage_mode, bind_flags, offset, src_buffer.data () + offset, src_buffer.size () * sizeof (Item) - offset, src_buffer.capacity () * sizeof (Item),
+    dst_buffer_size, dst_buffer);
 }

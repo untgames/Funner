@@ -28,7 +28,7 @@ const size_t RESERVE_BATCHES_ARRAY    = 128; //резервируемое количество пакетов
     Вспомогательные структуры
 */
 
-//Операция прохода
+///Операция прохода
 struct PassOperation: public RendererOperation
 {
   ProgramParametersLayout*     frame_entity_parameters_layout; //расположение параметров пары фрейм-объект
@@ -58,9 +58,18 @@ struct PassOperation: public RendererOperation
   }
 };
 
-typedef stl::vector<PassOperation*>   OperationPtrArray;
-typedef stl::vector<PassOperation>    OperationArray;
-typedef stl::vector<BatchingManager*> BatchingManagerArray;
+///Дескриптор менеджера упаковки
+struct BatchingManagerDesc
+{
+  BatchingManager* manager;
+  size_t           saved_dynamic_vertices_count;
+
+  BatchingManagerDesc (BatchingManager* in_manager) : manager (in_manager), saved_dynamic_vertices_count (manager->AllocatedDynamicVerticesCount ()) {}
+};
+
+typedef stl::vector<PassOperation*>      OperationPtrArray;
+typedef stl::vector<PassOperation>       OperationArray;
+typedef stl::vector<BatchingManagerDesc> BatchingManagerArray;
 
 ///Компаратор от наиболее близкого объекта к наиболее удаленному
 struct FrontToBackComparator
@@ -361,7 +370,7 @@ void EffectRenderer::AddOperations
     //проверка корректности аргументов
 
   if (!operations_desc.operations && operations_desc.operations_count)
-    throw xtl::make_null_argument_exception (METHOD_NAME, "operations.operations");
+    throw xtl::make_null_argument_exception (METHOD_NAME, "operations.operations");  
 
     //получение идентификатора текущего кадра
 
@@ -418,6 +427,8 @@ void EffectRenderer::AddOperations
               batching_manager->ResetDynamicBuffers ();
 
               batching_manager->SetActiveFrame (current_frame_id);
+
+              impl->batching_managers.push_back (batching_manager);
             }
 
             dynamic_primitive->UpdateOnPrerender (current_frame_id, *operation->entity);
@@ -536,6 +547,8 @@ void EffectRenderer::RemoveAllOperations ()
   }
 
   impl->mvp_matrices.clear ();
+
+  impl->batching_managers.clear ();
 }
 
 /*
@@ -574,6 +587,19 @@ struct RenderOperationsExecutor
     , batching_managers (in_batching_managers)
     , right_hand_viewport (in_right_hand_viewport)
   {
+      //обновление динамических данных
+
+    if (!batching_managers.empty ())
+    {
+      for (BatchingManagerArray::iterator iter=batching_managers.begin (), end=batching_managers.end (); iter!=end; ++iter)
+      {
+        BatchingManager& batching_manager = *iter->manager;
+
+        batching_manager.DynamicVertexBuffer ().SyncBuffers (device);
+      }  
+
+      batching_managers.clear ();
+    }
   }
   
 ///Выполнение массива операций
@@ -753,6 +779,20 @@ struct RenderOperationsExecutor
     device_context.RSSetScissor (rt_index, dst_rect);
   }
 
+///Восстановление состояния менеджеров упаковки
+  void RestoreBatchingManagers ()
+  {
+    for (BatchingManagerArray::iterator iter=batching_managers.begin (), end=batching_managers.end (); iter!=end; ++iter)
+    {
+      BatchingManager& batching_manager = *iter->manager;
+
+      batching_manager.SetPassUserData (0);
+      batching_manager.SetAllocatedDynamicVerticesCount (iter->saved_dynamic_vertices_count);
+    }
+
+    batching_managers.clear ();
+  }
+
 ///Обновление динамических примитивов
   void UpdateDynamicPrimitives (RenderPass& pass)
   {
@@ -785,19 +825,20 @@ struct RenderOperationsExecutor
 
       for (BatchingManagerArray::iterator iter=batching_managers.begin (), end=batching_managers.end (); iter!=end; ++iter)
       {
-        BatchingManager& batching_manager = **iter;
+        BatchingManager& batching_manager = *iter->manager;
 
-        batching_manager.DynamicVertexBuffer ().SyncBuffers (device);
-
-        batching_manager.SetPassUserData (0);
+        batching_manager.DynamicVertexBuffer ().SyncBuffers (device, iter->saved_dynamic_vertices_count);
       }
+
+        //восстановление состояния менеджеров упаковки
+
+      RestoreBatchingManagers ();
     }
     catch (...)
     {
-      for (BatchingManagerArray::iterator iter=batching_managers.begin (), end=batching_managers.end (); iter!=end; ++iter)
-        (*iter)->SetPassUserData (0);
+        //восстановление состояния менеджеров упаковки
 
-      batching_managers.clear ();
+      RestoreBatchingManagers ();
 
       throw;
     }    
@@ -966,7 +1007,7 @@ struct RenderOperationsExecutor
 
           //определение границ пакета и копирование индексов в линейный буфер
 
-        OperationPtrArray::iterator iter = operation_iter + 1;
+        OperationPtrArray::iterator iter = operation_iter;
 
         size_t indices_count = 0;
 
@@ -974,12 +1015,10 @@ struct RenderOperationsExecutor
         {
           const RendererPrimitive& primitive = *(*iter)->primitive;
 
-          DynamicPrimitiveIndex* dst_indices = batching_manager->AllocateDynamicIndices (IndexPoolType_Linear, primitive.count);
+          const DynamicPrimitiveIndex* src_indices = *primitive.dynamic_indices + primitive.first;
+          DynamicPrimitiveIndex*       dst_indices = batching_manager->AllocateDynamicIndices (IndexPoolType_Linear, primitive.count);
 
-          if (!dst_indices)
-            break;
-
-          memcpy (dst_indices, primitive.dynamic_indices, primitive.count * sizeof (DynamicPrimitiveIndex));
+          memcpy (dst_indices, src_indices, primitive.count * sizeof (DynamicPrimitiveIndex));
 
           indices_count += primitive.count;
         }
@@ -1021,6 +1060,8 @@ void EffectRenderer::ExecuteOperations (RenderingContext& context)
 {
   try
   {
+      //исполнение операций
+
     RenderOperationsExecutor executor (context, *impl->device_manager, impl->mvp_matrices, impl->batching_managers, impl->right_hand_viewport);
 
     executor.Draw (impl->operations);

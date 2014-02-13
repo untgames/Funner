@@ -83,7 +83,7 @@ void BatchStateBlock::UpdateCacheCore ()
     mask.is_index_buffer       = true;
     mask.is_layout             = true;
     mask.is_vertex_buffers [0] = true;
-printf ("!!! %p\n", batching_manager.DynamicVertexBuffer ().LowLevelBuffer ().get ());
+
     context.ISSetVertexBuffer (0, batching_manager.DynamicVertexBuffer ().LowLevelBuffer ().get ());
     context.ISSetInputLayout  (device_manager.InputLayoutManager ().DynamicPrimitivesInputLayout ().get ());
     context.ISSetIndexBuffer  (batching_manager.DynamicIndexBuffer ().LowLevelBuffer ().get ());
@@ -153,15 +153,30 @@ template <class T> class Pool: public xtl::noncopyable
 /// Выделение
     T* Allocate (size_t count)
     {
+      T* prev_pos = pos;
+
       pos += count;
 
       if (pos <= end)
-        return pos;
+        return prev_pos;
 
-      pos -= count;
+      pos = prev_pos;
 
       return 0;
     }    
+
+/// Предвыделение
+    bool Preallocate (size_t count)
+    {
+      end -= count;
+
+      if (end >= pos)
+        return true;
+
+      end += count;
+
+      return false;
+    }
 
 /// Сброс
     void Reset (T* new_start, size_t size, bool save_relative_position)
@@ -171,6 +186,20 @@ template <class T> class Pool: public xtl::noncopyable
       start = new_start;
       end   = new_start + size;
       pos   = save_relative_position ? start + offset : start;
+    }
+
+/// Размер
+    size_t Size () { return pos - start; }   
+
+/// Установка размера
+    bool SetSize (size_t size)
+    {
+      if (size > size_t (end - start))
+        return false;
+
+      pos = start + size;
+
+      return true;
     }
 
 /// Размер в байтах
@@ -408,6 +437,42 @@ void BatchingManager::ResetDynamicBuffers ()
   impl->dynamic_vertex_pool.Reset (impl->dynamic_vb.Data (), impl->dynamic_vb.Capacity (), false);
   impl->dynamic_index_pool.Reset (impl->dynamic_ib.Data (), impl->dynamic_ib.Capacity (), false);
   impl->temp_index_pool.Reset (impl->temp_ib.data (), impl->temp_ib.capacity (), false);
+}
+
+/*
+    Предвыделение вершин
+*/
+
+void BatchingManager::PreallocateDynamicVertices (size_t count)
+{
+  if (impl->dynamic_vertex_pool.Preallocate (count))
+    return;
+
+  throw xtl::format_operation_exception ("render::manager::BatchingManager::PreallocateDynamicVertices", "Can't preallocate %u vertices in dynamic vertex buffer", count);
+}
+
+void BatchingManager::ResetDynamicVerticesPreallocations ()
+{
+  impl->dynamic_vertex_pool.Reset (impl->dynamic_vb.Data (), impl->dynamic_vb.Capacity (), true);
+}
+
+/*
+    Текущее количество выделенных вершин
+*/
+
+void BatchingManager::SetAllocatedDynamicVerticesCount (size_t count)
+{
+  if (impl->dynamic_vertex_pool.SetSize (count))
+    return;
+
+  impl->dynamic_vb.Resize (impl->dynamic_vertex_pool.SizeInBytes ());
+
+  throw xtl::format_operation_exception ("render::manager::BatchingManager::SetAllocatedDynamicVerticesCount", "Can't change dynamic vertex pool size to %u", count);  
+}
+
+size_t BatchingManager::AllocatedDynamicVerticesCount ()
+{
+  return impl->dynamic_vertex_pool.Size ();
 }
 
 /*

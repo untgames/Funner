@@ -75,10 +75,22 @@ class BatchingManager: public Object, public CacheSource
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Выделение вершин и индексов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    DynamicPrimitiveVertex* AllocateDynamicVertices (size_t count, size_t* out_base_vertex_index = 0);
-    DynamicPrimitiveIndex*  AllocateDynamicIndices  (IndexPoolType type, size_t count);
-    void                    ResetDynamicBuffers     ();
-    void                    ResetLinearIndexBuffer  ();
+    DynamicPrimitiveVertex* AllocateDynamicVertices    (size_t count, size_t* out_base_vertex_index = 0);
+    DynamicPrimitiveIndex*  AllocateDynamicIndices     (IndexPoolType type, size_t count);
+    void                    ResetDynamicBuffers        ();
+    void                    ResetLinearIndexBuffer     ();
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Предвыделение вершин
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void PreallocateDynamicVertices         (size_t count);
+    void ResetDynamicVerticesPreallocations ();
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Текущее количество выделенных вершин
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void   SetAllocatedDynamicVerticesCount (size_t count);
+    size_t AllocatedDynamicVerticesCount    ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Получение блока состояний по материалу
