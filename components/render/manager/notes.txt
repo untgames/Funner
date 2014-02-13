@@ -20,17 +20,3 @@
   1.3.2. Instancing
     - добавить возможность группировки примитивов по параметру instancing в блоке
     program {}
-
-
-!!! 1.4. Sprites:
-  - типы спрайтов: Billboard, Oriented
-  - ввести группы спрайтов: SpriteList, LineList
-  - DynamicBuffer
-  - LineInputLayout, SpriteInputLayout PrimitiveManager
-  - добавить общие вершинный и индексный буферы для построение спрайтов (использовать PrimitiveBuffers)
-  - StandaloneDynamicPrimitive
-  - BatchingDynamicPrimitive
-  - перед отрисовкой прохода построить индексный буфер пакетных примитивов UpdateOnPrerender
-  - перед отрисовкой кадра строить вершинный буфер спрайтов (получать списки спрайтов у каждого Entity)
-  - синхронизация вершинных буферов в effect_renderer
-  - в процессе отрисовки определять группы примитивов с общим хэшем пакета и отрисовывать их пакетом

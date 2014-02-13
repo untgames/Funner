@@ -113,9 +113,9 @@ class BillboardSpriteGenerator: public SpriteGenerator
     BillboardSpriteGenerator (EntityImpl& entity, const math::vec3f& view_up, const math::mat4f& inv_view_proj_tm)
       : world_tm (entity.WorldMatrix ())
       , inv_mvp_tm (inv_view_proj_tm * entity.InverseWorldMatrix ())
-      , local_normal (inv_mvp_tm * math::vec4f (0, 0, 1.0f, 0))
-      , world_normal (world_tm * local_normal)
-      , right (cross (math::vec3f (inv_mvp_tm * math::vec4f (view_up, 0)), local_normal))
+      , local_normal (math::normalize (inv_mvp_tm * math::vec4f (0, 0, -1.0f, 0)))
+      , world_normal (math::normalize (world_tm * math::vec4f (local_normal, 0.0f)))
+      , right (cross (math::normalize (math::vec3f (inv_mvp_tm * math::vec4f (view_up, 0))), local_normal))
       , up (cross (local_normal, right))
     {
     }
@@ -192,13 +192,14 @@ class OrientedBillboardSpriteGenerator: public SpriteGenerator
 
     void Generate (const Sprite& src_sprite, DynamicPrimitiveVertex* dst_vertices)
     {
-      math::vec3f local_normal = inv_mvp_tm * math::vec4f (src_sprite.normal, 0), world_normal = world_tm * local_normal;
+      math::vec3f local_normal = math::normalize (inv_mvp_tm * math::vec4f (-src_sprite.normal, 0)),
+                  world_normal = math::normalize (world_tm * local_normal);
       math::vec4f view_up (src_view_up, 0);
 
       if (src_sprite.rotation != math::anglef ())
-        view_up = math::rotate (src_sprite.rotation, src_sprite.normal) * view_up;
+        view_up = math::rotate (src_sprite.rotation, -src_sprite.normal) * view_up;
 
-      math::vec3f local_up = inv_mvp_tm * view_up,
+      math::vec3f local_up = math::normalize (inv_mvp_tm * view_up),
                   right    = cross (local_up, local_normal),
                   up       = cross (local_normal, right);
 
@@ -1491,15 +1492,11 @@ class BatchingBillboardSpriteList: public PrimitiveListStorage<Sprite, BatchingS
 
             DynamicPrimitiveVertex* vertices = BatchingManager ().AllocateDynamicVertices (verts_count, &base_vertex);
 
-              //формирование вершин
+              //формирование вершин и индексов
 
             Generator generator (entity, prototype.view_up, context.InverseViewProjectionMatrix ());
 
-            generate (generator, items_count, prototype.Items (), vertices);
-
-              //формирование индексов
-
-            generate<SpriteGenerator> (items_count, base_vertex, indices);
+            generate (generator, items_count, prototype.Items (), base_vertex, vertices, indices);
           }
           catch (xtl::exception& e)
           {

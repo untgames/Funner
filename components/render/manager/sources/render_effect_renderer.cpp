@@ -809,16 +809,16 @@ struct RenderOperationsExecutor
         if (!dynamic_primitive || !dynamic_primitive->IsFrameDependent () || operation.mvp_matrix_index == -1)
           continue;
 
-        const math::mat4f& mvp_matrix = mvp_matrices [operation.mvp_matrix_index];
-
-        dynamic_primitive->UpdateOnRender (frame, *operation.entity, context, mvp_matrix);
-
         if (batching_manager && batching_manager->PassUserData () != this)
         {
           batching_managers.push_back (batching_manager);
 
           batching_manager->SetPassUserData (this);
         }
+
+        const math::mat4f& mvp_matrix = mvp_matrices [operation.mvp_matrix_index];
+
+        dynamic_primitive->UpdateOnRender (frame, *operation.entity, context, mvp_matrix);
       }
 
         //обновление вершинных буферов
