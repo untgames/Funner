@@ -510,21 +510,14 @@ class BatchingStateBlockHolder: public MaterialHolder
       : MaterialHolder (material_manager)
       , batching_manager (in_batching_manager)
     {
+      AttachCacheSource (*batching_manager);
     }
 
 /// Менеджер пакетирования
     render::manager::BatchingManager& BatchingManager () { return *batching_manager; }
 
 /// Блок состояния
-    LowLevelStateBlockPtr StateBlock ()
-    {
-      UpdateCache ();
-
-      if (cached_state_block)
-        return cached_state_block->StateBlock ();
-
-      return LowLevelStateBlockPtr ();      
-    }
+    LowLevelStateBlockPtr StateBlock () { return cached_low_level_state_block; }
 
   protected:
 /// Сброс кэша
@@ -540,13 +533,31 @@ class BatchingStateBlockHolder: public MaterialHolder
     {
       try
       {
+        BatchStateBlockPtr    prev_state_block           = cached_state_block;
+        LowLevelStateBlockPtr prev_low_level_state_block = cached_low_level_state_block;
+        MaterialImpl*         prev_material              = CachedMaterial ();
+
         cached_state_block = BatchStateBlockPtr ();
 
         MaterialHolder::UpdateCacheCore ();
 
         MaterialImpl* cached_material = CachedMaterial ();
-          
+
         cached_state_block = cached_material ? batching_manager->GetStateBlock (cached_material) : BatchStateBlockPtr ();
+
+        if (cached_state_block)
+          cached_state_block->UpdateCache ();
+
+        if (prev_state_block != cached_state_block)
+        {
+          if (prev_state_block)   DetachCacheSource (*prev_state_block);
+          if (cached_state_block) AttachCacheSource (*cached_state_block);
+        }
+
+        cached_low_level_state_block = cached_state_block ? cached_state_block->StateBlock () : LowLevelStateBlockPtr ();
+
+        if (cached_material != prev_material || prev_low_level_state_block != cached_low_level_state_block)
+          InvalidateCacheDependencies ();
       }
       catch (xtl::exception& e)
       {
@@ -556,8 +567,9 @@ class BatchingStateBlockHolder: public MaterialHolder
     }
 
   private:
-    BatchingManagerPtr batching_manager;
-    BatchStateBlockPtr cached_state_block;
+    BatchingManagerPtr    batching_manager;
+    BatchStateBlockPtr    cached_state_block;
+    LowLevelStateBlockPtr cached_low_level_state_block;
 };
 
 /*
@@ -754,13 +766,27 @@ class BatchingInstance: public DynamicPrimitive, private render::manager::Render
     typedef xtl::intrusive_ptr<BatchingStateBlockHolder> PrototypePtr;
 
 /// Конструктор
-    BatchingInstance (const PrototypePtr& in_prototype, size_t flags = 0)
+    BatchingInstance (const PrototypePtr& in_prototype, render::low_level::PrimitiveType primitive_type, size_t flags = 0)
       : DynamicPrimitive (*this, flags | DynamicPrimitiveFlag_EntityDependent)
       , prototype (in_prototype)
-      , batching_manager (&prototype->BatchingManager ())
+      , batching_manager (&prototype->BatchingManager ()) 
     {
-      primitives_count = 1;
-      primitives       = &cached_primitive;
+      try
+      {
+        AttachCacheSource (*prototype);
+
+        primitives_count = 1;
+        primitives       = &cached_primitive;
+
+        memset (&cached_primitive, 0, sizeof (cached_primitive));
+
+        cached_primitive.type = primitive_type;
+      }
+      catch (xtl::exception& e)
+      {
+        e.touch ("render::manager::BatchingInstance::BatchingInstance");
+        throw;
+      }
     }
 
   protected:
@@ -768,17 +794,16 @@ class BatchingInstance: public DynamicPrimitive, private render::manager::Render
     BatchingStateBlockHolder& Prototype () { return *prototype; }
 
 /// Примитив
-    render::manager::RendererPrimitive& Primitive () { return cached_primitive; }
+    render::manager::RendererPrimitive& Primitive ()
+    {
+      return cached_primitive; 
+    }
 
 ///Заполнение примитива
-    bool UpdatePrimitive (render::low_level::PrimitiveType primitive_type, size_t verts_count, size_t inds_count, DynamicPrimitiveVertex*& out_vertices, DynamicPrimitiveIndex*& out_indices, size_t& out_base_vertex)
+    bool UpdatePrimitive (size_t verts_count, size_t inds_count, DynamicPrimitiveVertex*& out_vertices, DynamicPrimitiveIndex*& out_indices, size_t& out_base_vertex)
     {
       try
       {
-          //обновление кэша
-
-        prototype->UpdateCache ();
-
           //выделение вершин
 
         out_vertices = batching_manager->AllocateDynamicVertices (verts_count, &out_base_vertex);
@@ -791,28 +816,17 @@ class BatchingInstance: public DynamicPrimitive, private render::manager::Render
 
           //формирование примитива
 
-          //TODO: кэшировать статические поля
-
-        memset (&cached_primitive, 0, sizeof (cached_primitive));
-        
-        cached_primitive.material         = prototype->CachedMaterial ();
-        cached_primitive.state_block      = &*prototype->StateBlock ();
-        cached_primitive.indexed          = true;
-        cached_primitive.type             = primitive_type;
-        cached_primitive.first            = out_indices - *indices_base;
-        cached_primitive.count            = inds_count;
-        cached_primitive.base_vertex      = 0;
-        cached_primitive.tags_count       = cached_primitive.material ? cached_primitive.material->TagsCount () : 0;
-        cached_primitive.tags             = cached_primitive.material ? cached_primitive.material->Tags () : (const size_t*)0;
-        cached_primitive.dynamic_indices  = indices_base;
-        cached_primitive.batching_manager = &*batching_manager;
-        cached_primitive.batching_hash    = get_batching_hash (cached_primitive);
+        cached_primitive.first = out_indices - *indices_base;
+        cached_primitive.count = inds_count;
 
           //формирование вершин и индексов
 
         if (!out_indices || !out_vertices)
         {
           cached_primitive.count = 0;
+          out_vertices           = 0;
+          out_indices            = 0;
+
           return false;
         }
 
@@ -821,6 +835,32 @@ class BatchingInstance: public DynamicPrimitive, private render::manager::Render
       catch (xtl::exception& e)
       {
         e.touch ("render::manager::BatchingInstance::UpdatePrimitive");
+        throw;
+      }
+    }
+
+  private:
+/// Обновление кэша
+    void UpdateCacheCore ()
+    {
+      try
+      {
+        prototype->UpdateCache ();
+
+        const DynamicPrimitiveIndex * const* indices_base = batching_manager->TempIndexBuffer ();
+
+        cached_primitive.material         = prototype->CachedMaterial ();
+        cached_primitive.tags_count       = cached_primitive.material ? cached_primitive.material->TagsCount () : 0;
+        cached_primitive.tags             = cached_primitive.material ? cached_primitive.material->Tags () : (const size_t*)0;
+        cached_primitive.state_block      = &*prototype->StateBlock ();
+        cached_primitive.indexed          = true;
+        cached_primitive.dynamic_indices  = indices_base;
+        cached_primitive.batching_manager = &*batching_manager;
+        cached_primitive.batching_hash    = get_batching_hash (cached_primitive);
+      }
+      catch (xtl::exception& e)
+      {
+        e.touch ("render::manager::BatchingInstance::UpdateCacheCore");
         throw;
       }
     }
@@ -1082,7 +1122,7 @@ class BatchingLineAndOrientedSpriteList: public BatchingStateBlockHolder, public
     {
       public:
 /// Конструктор
-        Instance (const PrototypePtr& prototype) : BatchingInstance (prototype) { }
+        Instance (const PrototypePtr& prototype) : BatchingInstance (prototype, PRIMITIVE_TYPE) { }
 
       private:
 ///Обновление
@@ -1090,17 +1130,16 @@ class BatchingLineAndOrientedSpriteList: public BatchingStateBlockHolder, public
         {
           try
           {
-printf ("%s(%u)\n", __FUNCTION__, __LINE__); fflush (stdout);
             BatchingLineAndOrientedSpriteList& prototype = static_cast<BatchingLineAndOrientedSpriteList&> (Prototype ());
 
             size_t verts_count = prototype.VerticesCount (), items_count = verts_count / VERTICES_PER_PRIMITIVE, inds_count = items_count * INDICES_PER_PRIMITIVE, base_vertex = 0;
 
             DynamicPrimitiveVertex* vertices = 0;
             DynamicPrimitiveIndex*  indices  = 0;
-printf ("%s(%u)\n", __FUNCTION__, __LINE__); fflush (stdout);
-            if (!UpdatePrimitive (PRIMITIVE_TYPE, verts_count, inds_count, vertices, indices, base_vertex))
+
+            if (!UpdatePrimitive (verts_count, inds_count, vertices, indices, base_vertex))
               return;
-printf ("%s(%u)\n", __FUNCTION__, __LINE__); fflush (stdout);
+
               //формирование вершин и индексов
 
             generate (static_cast<Generator&> (prototype), items_count, base_vertex, indices);
@@ -1415,7 +1454,7 @@ class BatchingBillboardSpriteList: public PrimitiveListStorage<Sprite, BatchingS
       public:
 /// Конструктор
         InstanceBase (const PrototypePtr& prototype)
-          : BatchingInstance (prototype, DynamicPrimitiveFlag_FrameDependent) 
+          : BatchingInstance (prototype, BillboardSpriteGenerator::PRIMITIVE_TYPE, DynamicPrimitiveFlag_FrameDependent) 
           , vertices ()
           , indices ()
         { }
@@ -1433,7 +1472,7 @@ class BatchingBillboardSpriteList: public PrimitiveListStorage<Sprite, BatchingS
                    inds_count  = items_count * INDICES_PER_PRIMITIVE, 
                    base_vertex = 0;
 
-            if (!UpdatePrimitive (BillboardSpriteGenerator::PRIMITIVE_TYPE, verts_count, inds_count, vertices, indices, base_vertex))
+            if (!UpdatePrimitive (verts_count, inds_count, vertices, indices, base_vertex))
             {
               vertices = 0;
               indices  = 0;

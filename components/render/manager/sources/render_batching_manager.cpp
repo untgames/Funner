@@ -3,6 +3,12 @@
 using namespace render::manager;
 
 /*
+    Константы
+*/
+
+const size_t DYNAMIC_BUFFER_MIN_CAPACITY = 8192; //минимальная ёмкость динамического буфера
+
+/*
 ===================================================================================================
     BatchStateBlock
 ===================================================================================================
@@ -66,11 +72,10 @@ void BatchStateBlock::UpdateCacheCore ()
     render::manager::DeviceManager&    device_manager   = batching_manager.DeviceManager ();
     render::low_level::IDevice&        device           = device_manager.Device ();
     render::low_level::IDeviceContext& context          = device_manager.ImmediateContext ();
-
-    impl->cached_state_block = LowLevelStateBlockPtr ();
+    LowLevelStateBlockPtr              prev_state_block = impl->cached_state_block;
 
     LowLevelStateBlockPtr material_state_block = impl->material.StateBlock ();
-      
+
     render::low_level::StateBlockMask mask;
 
     if (material_state_block)
@@ -78,21 +83,21 @@ void BatchStateBlock::UpdateCacheCore ()
       material_state_block->Apply (&context);
       material_state_block->GetMask (mask);
     }
-    
+
       //установка вершинных/индексного буфера
-      
+
     mask.is_index_buffer       = true;
     mask.is_layout             = true;
     mask.is_vertex_buffers [0] = true;
-
+printf ("!!! %p\n", batching_manager.DynamicVertexBuffer ().LowLevelBuffer ().get ());
     context.ISSetVertexBuffer (0, batching_manager.DynamicVertexBuffer ().LowLevelBuffer ().get ());
     context.ISSetInputLayout  (device_manager.InputLayoutManager ().DynamicPrimitivesInputLayout ().get ());
     context.ISSetIndexBuffer  (batching_manager.DynamicIndexBuffer ().LowLevelBuffer ().get ());
-    
+
       //обновление блока состояний примитива
     
     size_t mask_hash = mask.Hash ();
-    
+
     if (impl->cached_state_block_mask_hash != mask_hash)
     {
       impl->cached_state_block           = LowLevelStateBlockPtr (device.CreateStateBlock (mask), false);
@@ -100,10 +105,24 @@ void BatchStateBlock::UpdateCacheCore ()
     }
 
     impl->cached_state_block->Capture (&context);    
+
+    if (prev_state_block != impl->cached_state_block)
+      InvalidateCacheDependencies ();
   }
   catch (xtl::exception& e)
   {
+    impl->cached_state_block           = LowLevelStateBlockPtr ();
+    impl->cached_state_block_mask_hash = 0;
+
     e.touch ("render::manager::BatchStateBlock::UpdateCacheCore");
+
+    throw;
+  }
+  catch (...)
+  {
+    impl->cached_state_block           = LowLevelStateBlockPtr ();
+    impl->cached_state_block_mask_hash = 0;
+
     throw;
   }
 }
@@ -159,6 +178,9 @@ template <class T> class Pool: public xtl::noncopyable
       end   = new_start + size;
       pos   = save_relative_position ? start + offset : start;
     }
+
+/// Размер в байтах
+    size_t SizeInBytes () { return (unsigned char*)pos - (unsigned char*)start; }
 
   private:
     T* start;
@@ -224,9 +246,9 @@ struct BatchingManager::Impl: public Cache
       dynamic_vb.SyncBuffers (device_manager->Device ());
       dynamic_ib.SyncBuffers (device_manager->Device ());
 
-      dynamic_vertex_pool.Reset (dynamic_vb.Data (), vertices_count, true);
-      dynamic_index_pool.Reset (dynamic_ib.Data (), indices_count, true);
-      temp_index_pool.Reset (temp_ib.data (), indices_count, true);
+      dynamic_vertex_pool.Reset (dynamic_vb.Data (), vertices_count, false);
+      dynamic_index_pool.Reset (dynamic_ib.Data (), indices_count, false);
+      temp_index_pool.Reset (temp_ib.data (), indices_count, false);
     }
     catch (xtl::exception& e)
     {
@@ -331,22 +353,28 @@ DynamicPrimitiveVertex* BatchingManager::AllocateDynamicVertices (size_t count, 
 
   if (result)
   {
+    impl->dynamic_vb.Resize (impl->dynamic_vertex_pool.SizeInBytes ());
+
     if (out_base_vertex_index)
       *out_base_vertex_index = result - impl->dynamic_vb.Data ();
 
     return result;
   }
 
-  impl->dynamic_vb.Reserve (impl->dynamic_vb.Capacity () * 2);
+  size_t new_capacity = stl::max (impl->dynamic_vb.Capacity () * 2, DYNAMIC_BUFFER_MIN_CAPACITY);
+ 
+  impl->dynamic_vb.Reserve (new_capacity);
 
   InvalidateCacheDependencies ();
 
-  impl->dynamic_vertex_pool.Reset (impl->dynamic_vb.Data (), impl->dynamic_vb.Size (), true);
+  impl->dynamic_vertex_pool.Reset (impl->dynamic_vb.Data (), impl->dynamic_vb.Capacity (), true);
 
   result = impl->dynamic_vertex_pool.Allocate (count);
 
   if (!result)
     return 0;
+
+  impl->dynamic_vb.Resize (impl->dynamic_vertex_pool.SizeInBytes ());
 
   if (out_base_vertex_index)
     *out_base_vertex_index = result - impl->dynamic_vb.Data ();
@@ -363,18 +391,25 @@ DynamicPrimitiveIndex* BatchingManager::AllocateDynamicIndices (IndexPoolType po
       DynamicPrimitiveIndex* result = impl->dynamic_index_pool.Allocate (count);
 
       if (result)
+      {
+        impl->dynamic_ib.Resize (impl->dynamic_index_pool.SizeInBytes ());
         return result;
+      }
 
-      impl->dynamic_ib.Reserve (impl->dynamic_ib.Capacity () * 2);
+      size_t new_capacity = stl::max (impl->dynamic_ib.Capacity () * 2, DYNAMIC_BUFFER_MIN_CAPACITY);
+
+      impl->dynamic_ib.Reserve (new_capacity);
 
       InvalidateCacheDependencies ();
 
-      impl->dynamic_index_pool.Reset (impl->dynamic_ib.Data (), impl->dynamic_ib.Size (), true);
+      impl->dynamic_index_pool.Reset (impl->dynamic_ib.Data (), impl->dynamic_ib.Capacity (), true);
 
       result = impl->dynamic_index_pool.Allocate (count);
 
       if (!result)
         return 0;
+
+      impl->dynamic_ib.Resize (impl->dynamic_index_pool.SizeInBytes ());
 
       return result;
     }
@@ -385,9 +420,11 @@ DynamicPrimitiveIndex* BatchingManager::AllocateDynamicIndices (IndexPoolType po
       if (result)
         return result;
 
-      impl->temp_ib.reserve (impl->temp_ib.capacity () * 2);
+      size_t new_capacity = stl::max (impl->temp_ib.capacity () * 2, DYNAMIC_BUFFER_MIN_CAPACITY);
 
-      impl->temp_index_pool.Reset (impl->temp_ib.data (), impl->temp_ib.size (), true);
+      impl->temp_ib.reserve (new_capacity);
+
+      impl->temp_index_pool.Reset (impl->temp_ib.data (), impl->temp_ib.capacity (), true);
 
       result = impl->temp_index_pool.Allocate (count);
 
@@ -405,7 +442,7 @@ void BatchingManager::ResetLinearIndexBuffer ()
 {
   impl->dynamic_ib.Clear ();
 
-  impl->dynamic_index_pool.Reset (impl->dynamic_ib.Data (), impl->dynamic_ib.Size (), false);
+  impl->dynamic_index_pool.Reset (impl->dynamic_ib.Data (), impl->dynamic_ib.Capacity (), false);
 }
 
 void BatchingManager::ResetDynamicBuffers ()
@@ -414,9 +451,9 @@ void BatchingManager::ResetDynamicBuffers ()
   impl->dynamic_ib.Clear ();
   impl->temp_ib.resize (0, false);
 
-  impl->dynamic_vertex_pool.Reset (impl->dynamic_vb.Data (), impl->dynamic_vb.Size (), false);
-  impl->dynamic_index_pool.Reset (impl->dynamic_ib.Data (), impl->dynamic_ib.Size (), false);
-  impl->temp_index_pool.Reset (impl->temp_ib.data (), impl->temp_ib.size (), false);
+  impl->dynamic_vertex_pool.Reset (impl->dynamic_vb.Data (), impl->dynamic_vb.Capacity (), false);
+  impl->dynamic_index_pool.Reset (impl->dynamic_ib.Data (), impl->dynamic_ib.Capacity (), false);
+  impl->temp_index_pool.Reset (impl->temp_ib.data (), impl->temp_ib.capacity (), false);
 }
 
 /*

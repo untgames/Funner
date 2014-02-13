@@ -381,8 +381,15 @@ void EffectRenderer::AddOperations
     
     size_t        tags_count = operation->primitive->tags_count;    
     const size_t* tag        = operation->primitive->tags;
+
+      //определение буфера / лэйаута пары frame-entity
+
+    render::low_level::IBuffer* property_buffer = entity_dependent_property_buffer;
+    ProgramParametersLayout*    property_layout = entity_dependent_property_layout;
     
       //сопоставление тэга операции проходу рендеринга
+
+    bool dynamic_primitives_added = false;
 
     for (size_t j=0; j!=tags_count; j++, tag++)
     {
@@ -390,40 +397,41 @@ void EffectRenderer::AddOperations
       
       stl::pair<RenderPassMap::iterator, RenderPassMap::iterator> range = passes.equal_range (*tag);
 
-        //определение буфера / лэйаута пары frame-entity
-
-      render::low_level::IBuffer* property_buffer = entity_dependent_property_buffer;
-      ProgramParametersLayout*    property_layout = entity_dependent_property_layout;
-
-        //предварительное обновление динамических примитивов
+        //добавление операции в проход
 
       int mvp_matrix_index = -1;
-
-      DynamicPrimitive* dynamic_primitive = operation->dynamic_primitive;
-
-      if (range.first != range.second && dynamic_primitive)
-      {
-printf ("%s(%u)\n", __FUNCTION__, __LINE__); fflush (stdout);
-        dynamic_primitive->UpdateOnPrerender (current_frame_id, *operation->entity);
-
-        if (dynamic_primitive->IsFrameDependent ())
-        {
-          impl->mvp_matrices.push_back (mvp_matrix);
-
-          mvp_matrix_index = impl->mvp_matrices.size () - 1;
-        }
-
-        if (!dynamic_primitive->IsEntityDependent ())
-        {
-          property_buffer = entity_independent_property_buffer;
-          property_layout = entity_independent_property_layout;
-        }
-      }
-
-        //добавление операции в проход
       
       for (;range.first!=range.second; ++range.first)
       {
+          //предварительное обновление динамических примитивов
+
+        if (!dynamic_primitives_added)
+        {
+          if (DynamicPrimitive* dynamic_primitive = operation->dynamic_primitive)
+          {
+            dynamic_primitive->UpdateCache ();
+
+            dynamic_primitive->UpdateOnPrerender (current_frame_id, *operation->entity);
+
+            if (dynamic_primitive->IsFrameDependent ())
+            {
+              impl->mvp_matrices.push_back (mvp_matrix);
+
+              mvp_matrix_index = impl->mvp_matrices.size () - 1;
+            }
+
+            if (!dynamic_primitive->IsEntityDependent ())
+            {
+              property_buffer = entity_independent_property_buffer;
+              property_layout = entity_independent_property_layout;
+            }
+          }
+
+          dynamic_primitives_added = true;
+        }
+
+          //добавление операции в проход
+
         RenderPass& pass = *range.first->second;
         
           //обработка частного случая: добавление операции несколько раз в один и тот же проход
@@ -831,6 +839,9 @@ struct RenderOperationsExecutor
     const RendererPrimitive& primitive                   = *operation.primitive;
     ShaderOptionsCache&      entity_shader_options_cache = *operation.shader_options_cache;
     const RectAreaImpl*      operation_scissor           = operation.scissor;
+
+    if (!primitive.count)
+      return;
 
       //поиск программы (TODO: кэширование поиска по адресам кэшей, FIFO)
       

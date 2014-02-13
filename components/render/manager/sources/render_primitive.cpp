@@ -742,10 +742,15 @@ void PrimitiveImpl::FillDynamicPrimitiveStorage (DynamicPrimitiveEntityStorage& 
     {
       SimplePrimitiveListImplBase& list = *iter->list;
 
-      if (storage.FindPrimitive (&list, true))
+      if (DynamicPrimitivePtr primitive = storage.FindPrimitive (&list, true))
+      {
+        primitive->UpdateCache ();
         continue;
+      }
 
       DynamicPrimitivePtr primitive (list.CreateDynamicPrimitiveInstanceCore (), false);
+
+      primitive->UpdateCache ();
 
       storage.AddPrimitive (primitive, &list);
     }
