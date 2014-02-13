@@ -800,7 +800,7 @@ class BatchingInstance: public DynamicPrimitive, private render::manager::Render
     }
 
 ///Заполнение примитива
-    bool UpdatePrimitive (size_t verts_count, size_t inds_count, DynamicPrimitiveVertex*& out_vertices, DynamicPrimitiveIndex*& out_indices, size_t& out_base_vertex)
+    void UpdatePrimitive (size_t verts_count, size_t inds_count, DynamicPrimitiveVertex*& out_vertices, DynamicPrimitiveIndex*& out_indices, size_t& out_base_vertex)
     {
       try
       {
@@ -818,19 +818,6 @@ class BatchingInstance: public DynamicPrimitive, private render::manager::Render
 
         cached_primitive.first = out_indices - *indices_base;
         cached_primitive.count = inds_count;
-
-          //формирование вершин и индексов
-
-        if (!out_indices || !out_vertices)
-        {
-          cached_primitive.count = 0;
-          out_vertices           = 0;
-          out_indices            = 0;
-
-          return false;
-        }
-
-        return true;
       }
       catch (xtl::exception& e)
       {
@@ -1137,8 +1124,7 @@ class BatchingLineAndOrientedSpriteList: public BatchingStateBlockHolder, public
             DynamicPrimitiveVertex* vertices = 0;
             DynamicPrimitiveIndex*  indices  = 0;
 
-            if (!UpdatePrimitive (verts_count, inds_count, vertices, indices, base_vertex))
-              return;
+            UpdatePrimitive (verts_count, inds_count, vertices, indices, base_vertex);
 
               //формирование вершин и индексов
 
@@ -1472,13 +1458,7 @@ class BatchingBillboardSpriteList: public PrimitiveListStorage<Sprite, BatchingS
                    inds_count  = items_count * INDICES_PER_PRIMITIVE, 
                    base_vertex = 0;
 
-            if (!UpdatePrimitive (verts_count, inds_count, vertices, indices, base_vertex))
-            {
-              vertices = 0;
-              indices  = 0;
-
-              return;
-            }
+            UpdatePrimitive (verts_count, inds_count, vertices, indices, base_vertex);
 
               //формирование индексов
 

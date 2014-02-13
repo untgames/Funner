@@ -411,6 +411,15 @@ void EffectRenderer::AddOperations
           {
             dynamic_primitive->UpdateCache ();
 
+            BatchingManager* batching_manager = operation->primitive->batching_manager;
+
+            if (batching_manager && batching_manager->ActiveFrame () != current_frame_id)
+            {
+              batching_manager->ResetDynamicBuffers ();
+
+              batching_manager->SetActiveFrame (current_frame_id);
+            }
+
             dynamic_primitive->UpdateOnPrerender (current_frame_id, *operation->entity);
 
             if (dynamic_primitive->IsFrameDependent ())
@@ -748,8 +757,6 @@ struct RenderOperationsExecutor
   void UpdateDynamicPrimitives (RenderPass& pass)
   {
     FrameImpl& frame = pass.frame;
-
-    batching_managers.clear ();
 
     try
     {

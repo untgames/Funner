@@ -3,12 +3,6 @@
 using namespace render::manager;
 
 /*
-    Константы
-*/
-
-const size_t DYNAMIC_BUFFER_MIN_CAPACITY = 8192; //минимальная ёмкость динамического буфера
-
-/*
 ===================================================================================================
     BatchStateBlock
 ===================================================================================================
@@ -223,6 +217,7 @@ struct BatchingManager::Impl: public Cache
   DynamicIndexPool                      temp_index_pool;      //пул динамических индексов для построения примитивов
   StateBlockMap                         state_blocks;         //блоки состояний
   const void*                           pass_tag;             //тэг прохода
+  FrameId                               active_frame;         //номер активного кадра
 
 /// Конструктор
   Impl (const DeviceManagerPtr& in_device_manager)
@@ -231,6 +226,7 @@ struct BatchingManager::Impl: public Cache
     , dynamic_vb (render::low_level::UsageMode_Stream, render::low_level::BindFlag_VertexBuffer)
     , dynamic_ib (render::low_level::UsageMode_Stream, render::low_level::BindFlag_IndexBuffer)
     , pass_tag ()
+    , active_frame ()
   {
   }
 
@@ -361,29 +357,13 @@ DynamicPrimitiveVertex* BatchingManager::AllocateDynamicVertices (size_t count, 
     return result;
   }
 
-  size_t new_capacity = stl::max (impl->dynamic_vb.Capacity () * 2, DYNAMIC_BUFFER_MIN_CAPACITY);
- 
-  impl->dynamic_vb.Reserve (new_capacity);
-
-  InvalidateCacheDependencies ();
-
-  impl->dynamic_vertex_pool.Reset (impl->dynamic_vb.Data (), impl->dynamic_vb.Capacity (), true);
-
-  result = impl->dynamic_vertex_pool.Allocate (count);
-
-  if (!result)
-    return 0;
-
-  impl->dynamic_vb.Resize (impl->dynamic_vertex_pool.SizeInBytes ());
-
-  if (out_base_vertex_index)
-    *out_base_vertex_index = result - impl->dynamic_vb.Data ();
-
-  return result;
+  throw xtl::format_operation_exception ("render::manager::BatchingManager::AllocateDynamicVertices", "Can't allocate %u vertices in dynamic vertex buffer", count);
 }
 
 DynamicPrimitiveIndex* BatchingManager::AllocateDynamicIndices (IndexPoolType pool_type, size_t count)
 {
+  static const char* METHOD_NAME = "render::manager::BatchingManager::AllocateDynamicIndices";
+
   switch (pool_type)
   {
     case IndexPoolType_Linear:
@@ -396,22 +376,7 @@ DynamicPrimitiveIndex* BatchingManager::AllocateDynamicIndices (IndexPoolType po
         return result;
       }
 
-      size_t new_capacity = stl::max (impl->dynamic_ib.Capacity () * 2, DYNAMIC_BUFFER_MIN_CAPACITY);
-
-      impl->dynamic_ib.Reserve (new_capacity);
-
-      InvalidateCacheDependencies ();
-
-      impl->dynamic_index_pool.Reset (impl->dynamic_ib.Data (), impl->dynamic_ib.Capacity (), true);
-
-      result = impl->dynamic_index_pool.Allocate (count);
-
-      if (!result)
-        return 0;
-
-      impl->dynamic_ib.Resize (impl->dynamic_index_pool.SizeInBytes ());
-
-      return result;
+      throw xtl::format_operation_exception (METHOD_NAME, "Can't allocate %u indices in dynamic linear index buffer", count);
     }
     case IndexPoolType_Temporary: 
     {
@@ -420,21 +385,10 @@ DynamicPrimitiveIndex* BatchingManager::AllocateDynamicIndices (IndexPoolType po
       if (result)
         return result;
 
-      size_t new_capacity = stl::max (impl->temp_ib.capacity () * 2, DYNAMIC_BUFFER_MIN_CAPACITY);
-
-      impl->temp_ib.reserve (new_capacity);
-
-      impl->temp_index_pool.Reset (impl->temp_ib.data (), impl->temp_ib.capacity (), true);
-
-      result = impl->temp_index_pool.Allocate (count);
-
-      if (!result)
-        return 0;
-
-      return result;
+      throw xtl::format_operation_exception (METHOD_NAME, "Can't allocate %u indices in dynamic temporary index buffer", count);
     }
     default:
-      throw xtl::make_argument_exception ("render::manager::BatchingManager::AllocateDynamicIndices", "pool_type", pool_type);
+      throw xtl::make_argument_exception (METHOD_NAME, "pool_type", pool_type);
   }  
 }
 
@@ -502,4 +456,18 @@ void BatchingManager::SetPassUserData (const void* tag)
 const void* BatchingManager::PassUserData ()
 {
   return impl->pass_tag;
+}
+
+/*
+    Номер активного кадра
+*/
+
+void BatchingManager::SetActiveFrame (FrameId frame_id)
+{
+  impl->active_frame = frame_id;
+}
+
+FrameId BatchingManager::ActiveFrame ()
+{
+  return impl->active_frame;
 }

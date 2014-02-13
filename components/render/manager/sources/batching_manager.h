@@ -91,6 +91,12 @@ class BatchingManager: public Object, public CacheSource
     void        SetPassUserData (const void* tag);
     const void* PassUserData    ();
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Номер активного кадра
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void    SetActiveFrame (FrameId frame_id);
+    FrameId ActiveFrame    ();
+
   private:
     struct Impl;
     stl::auto_ptr<Impl> impl;
