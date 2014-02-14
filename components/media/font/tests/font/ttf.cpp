@@ -21,6 +21,7 @@ int main ()
   {
     common::LogFilter filter ("media.*", log_handler);
 
+//    CharsetManager::RegisterCharset (CHARSET_NAME, "ҐґЄєІіЇїАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯабвгдеёжзийклмнопрстуфхцчшщъыьэюя „“”«»¡!#$£€¥%'()*+,-–./0123456789:;=?¿@ABCDEFGHIJKLMNOPQRSTUVWXYZ[]^_`abcdefghijklmnopqrstuvwxyz{|}~©ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖ×ØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõöøùúûüýþÿıŒœŠšŸŽžğƒˆˇ˘˙˚˛αδεπστφΑAΒBΓGΔDΕEΖZΗHΘQΙIΚKΛLΜMΝNΞCΟOΠPΡRΣSΤTΥUΦFΧXΨYΩWαaβbγgδdεeζzηhθqιiκkλlμmνnξcοoπpρrσsςjVτtυuφfχxψyωwŞşİª’ Ğğ…º&");
     CharsetManager::RegisterCharset (CHARSET_NAME, "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ");
 
     FontLibrary library;
@@ -53,6 +54,17 @@ int main ()
       Font font = library.CreateFont (iter->FamilyName (), creation_params);
 
       dump (font);
+
+      RasterizedFontCreationParams rasterization_params;
+
+      rasterization_params.max_image_size = 128;
+      rasterization_params.pot            = true;
+      rasterization_params.glyph_margin   = 10;
+      rasterization_params.image_format   = media::PixelFormat_L8;
+
+      RasterizedFont rasterized_font = font.CreateRasterizedFont (rasterization_params);
+
+      dump (rasterized_font, font);
     }
 
     library.LoadFont (BAD_FONT_NAME);

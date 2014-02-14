@@ -18,6 +18,7 @@
 #include <common/log.h>
 #include <common/singleton.h>
 #include <common/strlib.h>
+#include <common/utf_converter.h>
 
 #include <media/charset_manager.h>
 #include <media/font_library.h>

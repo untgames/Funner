@@ -114,7 +114,7 @@ bool Font::HasKerning (size_t left_glyph_index, size_t right_glyph_index) const
 
 RasterizedFont Font::CreateRasterizedFont (const RasterizedFontCreationParams& params) const
 {
-  return RasterizedFont (impl->Rasterizer () (*this, params));
+  return RasterizedFont (impl->Rasterizer () (params));
 }
 
 /*

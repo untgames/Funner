@@ -8,116 +8,7 @@ namespace
 
 const char* LOG_NAME = "media.freetype.FreetypeFontDesc";
 
-typedef xtl::uninitialized_storage<char> DataBuffer;
-typedef xtl::shared_ptr<DataBuffer>      DataBufferPtr;
-
-//Шрифт free type
-class FreetypeFace : public common::Lockable, public xtl::reference_counter
-{
-  public:
-    FreetypeFace (const DataBufferPtr& in_data, const FreetypeLibrary& in_library, size_t face_index)
-      : data (in_data)
-      , library (in_library)
-      , face (0)
-      , current_size (0)
-      , current_horizontal_dpi (0)
-      , current_vertical_dpi (0)
-    {
-      library.FT_New_Memory_Face ((const FT_Byte*)data->data (), data->size (), face_index, &face);
-      library.FT_Select_Charmap (face, FT_ENCODING_UNICODE);
-    }
-
-    ~FreetypeFace ()
-    {
-      try
-      {
-        if (face)
-        {
-          library.FT_Done_Face (face);
-        }
-      }
-      catch (xtl::exception& e)
-      {
-        common::Log (LOG_NAME).Printf ("Can't destroy freetype face, exception '%s'", e.what ());
-      }
-    }
-
-    FT_Face FaceHandle ()
-    {
-      return face;
-    }
-
-    //Получение ближайшего доступного размера шрифта, если такой не найден - возвращает 0
-    size_t GetNearestFontSize (size_t size, size_t size_eps)
-    {
-      if (face->face_flags & FT_FACE_FLAG_SCALABLE)
-        return size;
-
-      if (!face->num_fixed_sizes)
-        return 0;
-
-      size_t min_size = size > size_eps ? size - size_eps : 1;
-      size_t max_size = size + size_eps;
-
-      if (max_size < size)
-        max_size = (size_t)-1;
-
-      size_t best_size;
-      size_t size_diff  = (size_t)-1;
-      bool   size_found = false;
-
-      for (size_t i = 0; i < face->num_fixed_sizes; i++)
-      {
-        size_t current_size = face->available_sizes [i].width;
-
-        if (current_size >= min_size && current_size <= max_size)
-        {
-          size_found = true;
-
-          size_t current_size_diff = size > current_size ? size - current_size : current_size - size;
-
-          if (!current_size_diff)
-            return size;
-
-          if (current_size_diff < size_diff)
-          {
-            size_diff = current_size_diff;
-            best_size = current_size;
-          }
-        }
-      }
-
-      return size_found ? best_size : 0;
-    }
-
-    //Установка размера шрифта
-    void SetSize (size_t size, size_t horizontal_dpi, size_t vertical_dpi)
-    {
-      if (size == current_size && horizontal_dpi == current_horizontal_dpi && vertical_dpi == current_vertical_dpi)
-        return;
-
-      library.FT_Set_Char_Size (face, size << 6, 0, horizontal_dpi, vertical_dpi);
-
-      current_size           = size;
-      current_horizontal_dpi = horizontal_dpi;
-      current_vertical_dpi   = vertical_dpi;
-    }
-
-  private:
-    FreetypeFace (const FreetypeFace&);             //no impl
-    FreetypeFace& operator = (const FreetypeFace&); //no impl
-
-  private:
-    DataBufferPtr   data;                    //данные файла шрифта
-    FreetypeLibrary library;                 //библиотека
-    FT_Face         face;                    //шрифт
-    size_t          current_size;            //текущий установленный размер шрифта
-    size_t          current_horizontal_dpi;  //текущее установленное разрешение целевого устройства вывода
-    size_t          current_vertical_dpi;    //текущее установленное разрешение целевого устройства вывода
-};
-
-typedef xtl::intrusive_ptr<FreetypeFace> FreetypeFacePtr;
-typedef stl::vector<FreetypeFacePtr>     FacesArray;
+typedef stl::vector<FreetypeFacePtr> FacesArray;
 
 }
 
@@ -233,30 +124,27 @@ Font FreetypeFontDesc::CreateFont (size_t index, const FontCreationParams& param
     if (!CanCreateFont (index, params))
       throw xtl::make_argument_exception ("", "params");
 
-    const char* charset = CharsetManager::FindCharset (params.charset_name);
+    const unsigned int* charset = CharsetManager::FindSortedUtf32Charset (params.charset_name);
 
     if (!charset)
       throw xtl::make_argument_exception ("", "params.charset");
 
-      //convert charset to utf32
-    size_t                    charset_length = xtl::xstrlen (charset);
-    stl::vector<unsigned int> utf32_charset (charset_length);
+    size_t charset_size = 0;
 
-    const void* source_ptr  = charset;
-    size_t      source_size = charset_length;
-    void*       dst_ptr     = &utf32_charset.front ();
-    size_t      dst_size    = utf32_charset.size () * sizeof (int);
+    for (const unsigned int* current_char = charset; *current_char; current_char++)
+      charset_size++;
 
-    common::convert_encoding (common::Encoding_UTF8, source_ptr, source_size, common::Encoding_UTF32LE, dst_ptr, dst_size);
+    RasterizedFontParamsPtr rasterized_font_params (new RasterizedFontParams, false);
 
-    if (source_size)
-      throw xtl::format_operation_exception ("", "Can't convert charset to utf32");
+    rasterized_font_params->library = impl->library;
 
-    size_t charset_size = utf32_charset.size () - dst_size / sizeof (int);
+    memcpy (&rasterized_font_params->font_params, &params, sizeof (params));
+
+    CharCodesBuffer& utf32_charset = rasterized_font_params->utf32_charset;
 
     utf32_charset.resize (charset_size);
 
-    stl::sort (utf32_charset.begin (), utf32_charset.end ());
+    memcpy (utf32_charset.data (), charset, charset_size * sizeof (unsigned int));
 
       //fill result font
     FreetypeFacePtr face        = impl->faces [index];
@@ -273,20 +161,25 @@ Font FreetypeFontDesc::CreateFont (size_t index, const FontCreationParams& param
 
     builder.SetFontSize (choosen_size);
 
+    rasterized_font_params->choosen_size = choosen_size;
+    rasterized_font_params->face         = face;
+
     if (charset_size)
     {
-      unsigned int first_glyph_code = utf32_charset.front ();
+      unsigned int first_glyph_code = utf32_charset.data () [0];
 
       builder.SetFirstGlyphCode (first_glyph_code);
 
-      size_t glyphs_count = utf32_charset.back () - utf32_charset.front () + 1;
+      size_t glyphs_count = utf32_charset.data () [charset_size - 1] - first_glyph_code + 1;
 
       builder.SetGlyphsCount (glyphs_count);
 
-      xtl::uninitialized_storage<FT_UInt> ft_char_indices (charset_size);
+      xtl::uninitialized_storage<FT_UInt>& ft_char_indices = rasterized_font_params->ft_char_indices;
+
+      ft_char_indices.resize (charset_size);
 
       for (size_t i = 0; i < charset_size; i++)
-        ft_char_indices.data () [i] = impl->library.FT_Get_Char_Index (face_handle, utf32_charset [i]);
+        ft_char_indices.data () [i] = impl->library.FT_Get_Char_Index (face_handle, utf32_charset.data () [i]);
 
         //Get glyphs data
       {
@@ -308,18 +201,20 @@ Font FreetypeFontDesc::CreateFont (size_t index, const FontCreationParams& param
         else
           memset (&null_glyph, 0, sizeof (null_glyph));
 
-        size_t previous_glyph_code = utf32_charset.front ();
+        size_t previous_glyph_code = first_glyph_code;
 
-        GlyphInfo *current_glyph = builder.Glyphs ();
+        GlyphInfo          *current_glyph     = builder.Glyphs ();
+        const unsigned int *current_char_code = utf32_charset.data ();
 
-        for (size_t i = 0; i < charset_size; i++, current_glyph++)
+        for (size_t i = 0; i < charset_size; i++, current_glyph++, current_char_code++)
         {
-          size_t char_code = utf32_charset [i];
+          if (current_glyph - builder.Glyphs () >= *current_char_code)
+            exit (0);
 
-          for (size_t j = previous_glyph_code + 1; j < char_code; j++, current_glyph++)
+          for (size_t j = previous_glyph_code + 1; j < *current_char_code; j++, current_glyph++)
             memcpy (current_glyph, &null_glyph, sizeof (GlyphInfo));
 
-          previous_glyph_code = char_code;
+          previous_glyph_code = *current_char_code;
 
           FT_UInt char_index = ft_char_indices.data () [i];
 
@@ -327,19 +222,21 @@ Font FreetypeFontDesc::CreateFont (size_t index, const FontCreationParams& param
           {
             memcpy (current_glyph, &null_glyph, sizeof (GlyphInfo));
 
-            impl->log.Printf ("Font '%s' has no char %lu.", impl->source.c_str (), char_code);
+            impl->log.Printf ("Font '%s' has no char %lu.", impl->source.c_str (), *current_char_code);
 
             continue;
           }
 
-          if (!impl->library.FT_Load_Char (face_handle, char_code, FT_LOAD_DEFAULT, true))
+          if (!impl->library.FT_Load_Char (face_handle, *current_char_code, FT_LOAD_DEFAULT, true))
           {
             memcpy (current_glyph, &null_glyph, sizeof (GlyphInfo));
 
-            impl->log.Printf ("Can't load char %lu.", char_code);
+            impl->log.Printf ("Can't load char %lu.", *current_char_code);
 
             continue;
           }
+
+          //TODO проверить, есть ли прирост скорости, если сохрянать глифы и для рендеринга использовать FT_Glyph_To_Bitmap
 
           current_glyph->width     = face_handle->glyph->metrics.width / 64.f;
           current_glyph->height    = face_handle->glyph->metrics.height / 64.f;
@@ -359,7 +256,7 @@ Font FreetypeFontDesc::CreateFont (size_t index, const FontCreationParams& param
 
             if (!impl->library.FT_Get_Kerning (face_handle, ft_char_indices.data () [i], ft_char_indices.data () [j], FT_KERNING_UNFITTED, &kerning, true))
             {
-              impl->log.Printf ("Can't get kerning for pair %u-%u.", utf32_charset [i], utf32_charset [j]);
+              impl->log.Printf ("Can't get kerning for pair %u-%u.", utf32_charset.data () [i], utf32_charset.data () [j]);
               continue;
             }
 
@@ -370,11 +267,13 @@ Font FreetypeFontDesc::CreateFont (size_t index, const FontCreationParams& param
               kerning_info.x_kerning = kerning.x / 64.f;
               kerning_info.y_kerning = kerning.y / 64.f;
 
-              builder.InsertKerning (utf32_charset [i] - first_glyph_code, utf32_charset [j] - first_glyph_code, kerning_info);
+              builder.InsertKerning (utf32_charset.data () [i] - first_glyph_code, utf32_charset.data () [j] - first_glyph_code, kerning_info);
             }
           }
         }
       }
+
+      builder.SetRasterizer (FreetypeRasterizedFont (rasterized_font_params));
     }
 
     return builder.Font ();

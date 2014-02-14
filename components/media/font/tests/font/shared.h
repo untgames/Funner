@@ -41,3 +41,16 @@ void dump (const media::Font& font)
     }
   }
 }
+
+void dump (const media::RasterizedFont& font, const media::Font& source_font)
+{
+  printf ("    images count = %lu\n", font.ImagesCount ());
+  printf ("    rasterized glyphs:\n");
+
+  for (size_t i = 0, glyphs_count = source_font.GlyphsCount (); i < glyphs_count; i++)
+  {
+    const media::RasterizedGlyphInfo& glyph = font.RasterizedGlyphs () [i];
+
+    printf ("      '%C' = image = %lu x = %lu y = %lu w = %lu h = %lu\n", source_font.FirstGlyphCode () + i, glyph.image_index, glyph.x_pos, glyph.y_pos, glyph.width, glyph.height);
+  }
+}

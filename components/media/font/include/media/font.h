@@ -199,7 +199,7 @@ class FontBuilder
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Установка растеризатора
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    typedef xtl::function<IFontRasterizer* (const Font&, const RasterizedFontCreationParams&)> RasterizerHandler;
+    typedef xtl::function<IFontRasterizer* (const RasterizedFontCreationParams&)> RasterizerHandler;
 
     void                     SetRasterizer (const RasterizerHandler&);
     const RasterizerHandler& Rasterizer    () const;
