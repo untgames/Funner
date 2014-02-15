@@ -50,6 +50,29 @@ struct WindowImpl::Impl: public xtl::trackable, public INativeWindowListener
   }
   
 ///Создание цепочки обмена
+  void CreateSwapChain (void* handle, const char* adapter_mask)
+  {
+    try
+    {
+      swap_chain = 0;
+      
+      if (!device_manager)
+        throw xtl::format_operation_exception ("", "Null device manager");
+
+      swap_chain_desc.window_handle = handle;      
+         
+      swap_chain = low_level::DriverManager::CreateSwapChain (&device_manager->Driver (), adapter_mask, swap_chain_desc);
+
+      if (!swap_chain)
+        throw xtl::format_operation_exception ("", "Null swap chain after render::manager::low_level::IDriver::CreateSwapChain");
+    }
+    catch (xtl::exception& e)
+    {
+      e.touch ("render::manager::WindowImpl::Impl::CreateSwapChain(void*,const char*)");
+      throw;
+    }
+  }
+
   void CreateSwapChain (void* handle)
   {
     try
@@ -70,7 +93,7 @@ struct WindowImpl::Impl: public xtl::trackable, public INativeWindowListener
     }
     catch (xtl::exception& e)
     {
-      e.touch ("render::manager::WindowImpl::Impl::CreateSwapChain");
+      e.touch ("render::manager::WindowImpl::Impl::CreateSwapChain(void*)");
       throw;
     }
   }
@@ -351,16 +374,18 @@ WindowImpl::WindowImpl (const DeviceManagerPtr& device_manager, INativeWindow& w
 
       impl->device_manager = DeviceManagerPtr (new render::manager::DeviceManager (device, driver, settings, cache_manager), false);
       impl->adapter        = impl->swap_chain->GetAdapter ();
-      
+
       log.Printf ("...device manager and swap chain have been successfully created");
     }
     else
     {
+      const char* adapter_mask = get_string_property (properties, "AdapterMask", "*");
+                                  
       impl->device_manager = device_manager;
       
-      log.Printf ("Creating swap chain");
+      log.Printf ("Creating swap chain (adapter='%s')", adapter_mask);
       
-      impl->CreateSwapChain (window.GetHandle ());
+      impl->CreateSwapChain (window.GetHandle (), adapter_mask);
     }
     
       //обновление размеров

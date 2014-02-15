@@ -66,20 +66,7 @@ void Server::AttachWindow (const char* name, syslib::Window& window, const commo
   }
   catch (xtl::exception& e)
   {
-    e.touch ("render::scene::server::Server::AttachWindow(const char*,syslib::Window&,const common::PropertyMap&)");
-    throw;
-  }
-}
-
-void Server::AttachWindow (const char* name, syslib::Window& window, const common::ParseNode& properties)
-{
-  try
-  {
-    impl->window_manager.AttachWindow (name, window, to_properties (properties));
-  }
-  catch (xtl::exception& e)
-  {
-    e.touch ("render::scene::server::Server::AttachWindow(const char*,syslib::Window&,const common::ParseNode&)");
+    e.touch ("render::scene::server::Server::AttachWindow");
     throw;
   }
 }

@@ -72,9 +72,6 @@ enum InternalCommandId
 typedef interchange::Context<interchange::ServerToClientSerializer, interchange::ClientToServerDeserializer> Context;
 typedef interchange::PropertyMapAutoWriter::Synchronizer                                                     PropertyMapSynchronizer;
 
-///Преобразование узла конфигурации в карту свойств
-common::PropertyMap to_properties (const common::ParseNode& node);
-
 #include "connection_acceptor.h"
 #include "connection_state.h"
 #include "connection.h"

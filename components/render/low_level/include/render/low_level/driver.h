@@ -240,6 +240,9 @@ class DriverManager
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Создание цепочки обмена
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+    static ISwapChain* CreateSwapChain (IDriver*             driver,           //драйвер
+                                        const char*          adapter_mask,     //маска имени адаптера
+                                        const SwapChainDesc& swap_chain_desc); //дескриптор цепочки обмена
     static ISwapChain* CreateSwapChain (const char*          driver_mask,      //маска имени драйвера
                                         const char*          adapter_mask,     //маска имени адаптера
                                         const SwapChainDesc& swap_chain_desc); //дескриптор цепочки обмена

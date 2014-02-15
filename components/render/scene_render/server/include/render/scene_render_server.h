@@ -16,7 +16,6 @@ namespace common
 
 //forward declaration
 class PropertyMap;
-class ParseNode;
 
 }
 
@@ -56,7 +55,6 @@ class Server
 ///Присоединение окон
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void AttachWindow     (const char* name, syslib::Window& window, const common::PropertyMap& properties);
-    void AttachWindow     (const char* name, syslib::Window& window, const common::ParseNode& properties);
     void DetachWindow     (const char* name);
     void DetachAllWindows ();
 

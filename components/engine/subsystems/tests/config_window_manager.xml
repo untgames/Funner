@@ -28,8 +28,9 @@
       Parent   = "ParentWindow"
     />
   </WindowManager>
-  <WindowRenderer Id="MyRenderer" AdapterMask="OpenGL32" DriverMask="*">
-    <FrameBuffer
+  <SceneRenderServer Id="MyRenderer" ThreadingModel="MultiThreaded" AdapterMask="OpenGL32" DriverMask="*">
+    <RenderTarget
+      Id           = "RT1" 
       Window       = "Window1"
       ColorBits    = "24"
       AlphaBits    = "0"
@@ -40,9 +41,9 @@
       SwapMethod   = "Discard"
       SamplesCount = "1024"
       VSync        = "0"
-      FullScreen   = "0"
     />
-    <FrameBuffer
+    <RenderTarget
+      Id           = "RT2" 
       Window       = "Window2"
       ColorBits    = "24"
       AlphaBits    = "0"
@@ -53,18 +54,13 @@
       SwapMethod   = "Discard"
       SamplesCount = "1024"
       VSync        = "0"
-      FullScreen   = "0"
     />
-  </WindowRenderer>
-  <SceneRender
-    DriverMask     = "*"
-    RendererMask   = "MyRenderer"
-    Log            = "render.scene_render"
-    >
-    <RenderTarget Screen = "Screen1"/>
-    <RenderTarget Screen = "Screen2"/>
-  </SceneRender>
-  <ScenePlayer Listener = "ScenePlayer1" DriverMask = "*" DeviceMask = "*" InitString = ""/>
+  </SceneRenderServer>
+  <SceneRenderClient ConnectionName = "MyRenderer" Log = "render.scene_render">
+    <RenderTarget Id = "RT1" Screen = "Screen1"/>
+    <RenderTarget Id = "RT2" Screen = "Screen2"/>
+  </SceneRenderClient>
+<!--  <ScenePlayer Listener = "ScenePlayer1" DriverMask = "*" DeviceMask = "*" InitString = ""/> -->
   <WindowInputDriver>
     <Device Id="Device1" Window="Window1"/>
     <Device Window="Window2"/>
