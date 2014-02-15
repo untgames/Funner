@@ -10,9 +10,11 @@
 #include <sg/input.h>
 #include <sg/light.h>
 #include <sg/listener.h>
+#include <sg/mesh.h>
 #include <sg/node_array.h>
 #include <sg/page_curl.h>
 #include <sg/scene.h>
+#include <sg/scissor.h>
 #include <sg/sound_emitter.h>
 #include <sg/sprite.h>
 #include <sg/text_line.h>
@@ -94,6 +96,8 @@ extern const char* SCENE_NODE_PROPERTIES_LIBRARY;
 extern const char* SCENE_NODE_ARRAY_LIBRARY;
 extern const char* SCENE_CONTROLLER_LIBRARY;
 extern const char* SCENE_ENTITY_LIBRARY;
+extern const char* SCENE_VISUAL_MODEL_LIBRARY;
+extern const char* SCENE_SCISSOR_LIBRARY;
 extern const char* SCENE_PERSPECTIVE_CAMERA_LIBRARY;
 extern const char* SCENE_ORTHO_CAMERA_LIBRARY;
 extern const char* SCENE_LIGHT_LIBRARY;
@@ -106,7 +110,7 @@ extern const char* SCENE_SOUND_EMITTER_LIBRARY;
 extern const char* SCENE_SPRITE_MODEL_LIBRARY;
 extern const char* SCENE_SPRITE_LIBRARY;
 extern const char* SCENE_TEXT_LINE_LIBRARY;
-extern const char* SCENE_VISUAL_MODEL_LIBRARY;
+extern const char* SCENE_STATIC_MESH_LIBRARY;
 extern const char* SCENE_HEIGHT_MAP_LIBRARY;
 extern const char* SCENE_INPUT_ZONE_MODEL_LIBRARY;
 extern const char* SCENE_INPUT_ZONE_LIBRARY;
@@ -122,6 +126,8 @@ void bind_node_array_library                      (script::Environment&);
 void bind_controller_owner_mode_library           (script::Environment&);
 void bind_controller_library                      (script::Environment&);
 void bind_entity_library                          (script::Environment&);
+void bind_visual_model_library                    (script::Environment&);
+void bind_scissor_library                         (script::Environment&);
 void bind_perspective_camera_library              (script::Environment&);
 void bind_ortho_camera_library                    (script::Environment&);
 void bind_light_library                           (script::Environment&);
@@ -158,3 +164,4 @@ using namespace script;
 using namespace scene_graph::controllers;
 using namespace math;
 using namespace xtl;
+

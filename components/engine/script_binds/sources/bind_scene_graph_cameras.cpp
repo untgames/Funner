@@ -4,11 +4,14 @@ using namespace scene_graph;
 
 template class engine::decl_sg_cast<Camera,            Node>;
 template class engine::decl_sg_cast<Camera,            Entity>;
+template class engine::decl_sg_cast<Camera,            VisualModel>;
 template class engine::decl_sg_cast<OrthoCamera,       Node>;
 template class engine::decl_sg_cast<OrthoCamera,       Entity>;
+template class engine::decl_sg_cast<OrthoCamera,       VisualModel>;
 template class engine::decl_sg_cast<OrthoCamera,       Camera>;
 template class engine::decl_sg_cast<PerspectiveCamera, Node>;
 template class engine::decl_sg_cast<PerspectiveCamera, Entity>;
+template class engine::decl_sg_cast<PerspectiveCamera, VisualModel>;
 template class engine::decl_sg_cast<PerspectiveCamera, Camera>;
 
 namespace engine
@@ -41,7 +44,7 @@ void bind_perspective_camera_library (Environment& environment)
 
     //наследование
 
-  lib.Register (environment, SCENE_ENTITY_LIBRARY);
+  lib.Register (environment, SCENE_VISUAL_MODEL_LIBRARY);
 
     //регистрация функций создания
 
@@ -69,7 +72,7 @@ void bind_ortho_camera_library (Environment& environment)
 
     //наследование
 
-  lib.Register (environment, SCENE_ENTITY_LIBRARY);
+  lib.Register (environment, SCENE_VISUAL_MODEL_LIBRARY);
 
     //регистрация функций создания
 

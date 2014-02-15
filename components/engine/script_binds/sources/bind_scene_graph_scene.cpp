@@ -2,7 +2,11 @@
 
 using namespace scene_graph;
 
-template class engine::decl_sg_cast<Entity, Node>;
+template class engine::decl_sg_cast<VisualModel, Node>;
+template class engine::decl_sg_cast<VisualModel, Entity>;
+template class engine::decl_sg_cast<Scissor,     Entity>;
+template class engine::decl_sg_cast<Scissor,     Node>;
+template class engine::decl_sg_cast<Entity,      Node>;
 
 namespace engine
 {
@@ -84,6 +88,37 @@ void bind_entity_library (Environment& environment)
     //регистрация типов данных
 
   environment.RegisterType<Entity> (SCENE_ENTITY_LIBRARY);
+}
+
+void bind_visual_model_library (Environment& environment)
+{
+  InvokerRegistry lib = environment.CreateLibrary (SCENE_VISUAL_MODEL_LIBRARY);
+
+    //наследование
+
+  lib.Register (environment, SCENE_ENTITY_LIBRARY);
+
+    //регистрация операций
+
+  lib.Register ("set_Scissor", make_invoker (&VisualModel::SetScissor));
+  lib.Register ("get_Scissor", make_invoker (implicit_cast<Scissor* (VisualModel::*)()> (&VisualModel::Scissor)));
+
+    //регистрация типов данных
+
+  environment.RegisterType<VisualModel> (SCENE_VISUAL_MODEL_LIBRARY);
+}
+
+void bind_scissor_library (Environment& environment)
+{
+  InvokerRegistry lib = environment.CreateLibrary (SCENE_SCISSOR_LIBRARY);
+
+    //наследование
+
+  lib.Register (environment, SCENE_ENTITY_LIBRARY);
+
+    //регистрация типов данных
+
+  environment.RegisterType<VisualModel> (SCENE_SCISSOR_LIBRARY);
 }
 
 }
