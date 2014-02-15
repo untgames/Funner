@@ -37,7 +37,7 @@ class SceneRenderServerSubsystem: public ISubsystem, public xtl::reference_count
 ///Конструктор
     SceneRenderServerSubsystem (ParseNode& node)    
     {
-      const char* name                 = get<const char*> (node, "Id");
+      const char* name                 = get<const char*> (node, "ConnectionName");
       const char* threading_model_name = get<const char*> (node, "ThreadingModel", "SingleThreaded");
       
       ServerThreadingModel threading_model = ServerThreadingModel_SingleThreaded;
@@ -48,10 +48,10 @@ class SceneRenderServerSubsystem: public ISubsystem, public xtl::reference_count
 
       server.reset (new Server (name, threading_model));
 
-      for (Parser::NamesakeIterator iter=node.First ("Window"); iter; ++iter)
+      for (Parser::NamesakeIterator iter=node.First ("RenderTarget"); iter; ++iter)
       {
-        const char*     attachment = get<const char*> (*iter, "Id");
-        const char*     name       = get<const char*> (*iter, "Name", attachment);
+        const char*     attachment = get<const char*> (*iter, "Window");
+        const char*     name       = get<const char*> (*iter, "Id", attachment);
         syslib::Window& window     = AttachmentRegistry::Get<syslib::Window> (attachment);
 
         server->AttachWindow (name, window, *iter);
