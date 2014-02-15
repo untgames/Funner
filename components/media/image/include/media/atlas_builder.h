@@ -4,12 +4,10 @@
 #include <xtl/functional_fwd>
 
 #include <media/atlas.h>
+#include <media/image.h>
 
 namespace media
 {
-
-//forward declaration
-class Image;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Режим вставки изображений в построитель атласа
@@ -87,8 +85,9 @@ class AtlasBuilder
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Добавление изображений
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void Insert (media::Image&, AtlasBuilderInsertMode mode = AtlasBuilderInsertMode_Default);
-    void Insert (const char* image_name, bool keep_in_memory = true);
+    void Insert (Image&, AtlasBuilderInsertMode mode = AtlasBuilderInsertMode_Default, size_t tag = 0);
+    void Insert (const char* image_name, bool keep_in_memory = true, size_t tag = 0);
+    void Insert (size_t width, size_t height, PixelFormat format, const void* data, bool copy_data = true, const char* name = "", size_t tag = 0);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Сброс

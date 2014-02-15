@@ -76,7 +76,9 @@ void xatlas_load (const char* file_name, Atlas& atlas)
       size.x   = common::get<unsigned int> (*j, "Width");
       size.y   = common::get<unsigned int> (*j, "Height");
 
-      new_atlas.Insert (tile_name, image_name, origin, size);
+      size_t tag = common::get<unsigned int> (*j, "Tag", 0);
+
+      new_atlas.Insert (tile_name, image_name, origin, size, tag);
     }
 
     new_atlas.SetImageSize (image_name, image_width, image_height);

@@ -152,34 +152,37 @@ class IImageHolder : public xtl::reference_counter
   public:
     virtual ~IImageHolder () {}
 
-    //Получение картинки
-    virtual media::Image Image () = 0;
+    //Загрузка/выгрузка картинки
+    virtual void LoadImage () {};
+    virtual void UnloadImage () {};
 
     //Получение атрибутов картинки
+    virtual const void* ImageBitmap () = 0;
     virtual size_t      ImageWidth  () = 0;
     virtual size_t      ImageHeight () = 0;
     virtual size_t      ImageHash   () = 0;
     virtual PixelFormat ImageFormat () = 0;
     virtual const char* ImageName   () = 0;
+    virtual size_t      ImageTag    () = 0;
 };
 
 //Класс, хранящий картинку в памяти
 class MemoryImageHolder : public IImageHolder
 {
   public:
-    MemoryImageHolder (const media::Image& in_image)
+    MemoryImageHolder (const media::Image& in_image, size_t in_tag)
       : image (in_image)
+      , tag (in_tag)
     {
       image_hash = common::crc32 (image.Bitmap (), image.Width () * image.Height () * get_bytes_per_pixel (image.Format ()));
     }
 
-    //Получение картинки
-    media::Image Image ()
+    //Получение атрибутов картинки
+    const void* ImageBitmap ()
     {
-      return image;
+      return image.Bitmap ();
     }
 
-    //Получение атрибутов картинки
     size_t ImageWidth ()
     {
       return image.Width ();
@@ -205,33 +208,50 @@ class MemoryImageHolder : public IImageHolder
       return image.Name ();
     }
 
+    size_t ImageTag ()
+    {
+      return tag;
+    }
+
   private:
     media::Image image;
     size_t       image_hash;
+    size_t       tag;
 };
 
 //Класс, загружающий картинку из файла по требованию
 class LoadOnDemandImageHolder : public IImageHolder
 {
   public:
-    LoadOnDemandImageHolder (const char* in_image_name)
+    LoadOnDemandImageHolder (const char* in_image_name, size_t in_tag)
       : image_name (in_image_name)
+      , tag (in_tag)
     {
-      media::Image image (in_image_name);
+      media::Image tmp_image (in_image_name);
 
-      image_format = image.Format ();
-      image_width  = image.Width  ();
-      image_height = image.Height ();
-      image_hash   = common::crc32 (image.Bitmap (), image.Width () * image.Height () * get_bytes_per_pixel (image.Format ()));
+      image_format = tmp_image.Format ();
+      image_width  = tmp_image.Width  ();
+      image_height = tmp_image.Height ();
+      image_hash   = common::crc32 (tmp_image.Bitmap (), tmp_image.Width () * tmp_image.Height () * get_bytes_per_pixel (tmp_image.Format ()));
     }
 
-    //Получение картинки
-    media::Image Image ()
+    //Загрузка/выгрузка картинки
+    void LoadImage ()
     {
-      return media::Image (image_name.c_str ());
+      image.Load (image_name.c_str ());
+    }
+
+    void UnloadImage ()
+    {
+      Image ().Swap (image);
     }
 
     //Получение атрибутов картинки
+    const void* ImageBitmap ()
+    {
+      return image.Bitmap ();
+    }
+
     size_t ImageWidth ()
     {
       return image_width;
@@ -257,12 +277,79 @@ class LoadOnDemandImageHolder : public IImageHolder
       return image_name.c_str ();
     }
 
+    size_t ImageTag ()
+    {
+      return tag;
+    }
+
   private:
+    Image       image;
     stl::string image_name;
     PixelFormat image_format;
     size_t      image_width;
     size_t      image_height;
     size_t      image_hash;
+    size_t      tag;
+};
+
+//Класс, хранящий данные о картинке
+class DataImageHolder : public IImageHolder
+{
+  public:
+    DataImageHolder (size_t in_width, size_t in_height, PixelFormat in_format, const void* in_data, const char* in_name, size_t in_tag)
+      : width (in_width)
+      , height (in_height)
+      , hash (common::crc32 (in_data, in_width * in_height * get_bytes_per_pixel (in_format)))
+      , tag (in_tag)
+      , data (in_data)
+      , format (in_format)
+      , name (in_name)
+      {}
+
+    //Получение атрибутов картинки
+    const void* ImageBitmap ()
+    {
+      return data;
+    }
+
+    size_t ImageWidth ()
+    {
+      return width;
+    }
+
+    size_t ImageHeight ()
+    {
+      return height;
+    }
+
+    size_t ImageHash ()
+    {
+      return hash;
+    }
+
+    PixelFormat ImageFormat ()
+    {
+      return format;
+    }
+
+    const char* ImageName ()
+    {
+      return name.c_str ();
+    }
+
+    size_t ImageTag ()
+    {
+      return tag;
+    }
+
+  private:
+    size_t      width;
+    size_t      height;
+    size_t      hash;
+    size_t      tag;
+    const void* data;
+    PixelFormat format;
+    stl::string name;
 };
 
 typedef xtl::intrusive_ptr<IImageHolder> ImageHolderPtr;
@@ -317,14 +404,14 @@ struct AtlasBuilder::Impl
     {}
 
   ///Добавление изображений
-  void Insert (Image& image, AtlasBuilderInsertMode mode)
+  void Insert (Image& image, AtlasBuilderInsertMode mode, size_t tag)
   {
     try
     {
       switch (mode)
       {
         case AtlasBuilderInsertMode_Copy:
-          images.push_back (GetImageDesc (ImageHolderPtr (new MemoryImageHolder (image.Clone ()), false)));
+          images.push_back (GetImageDesc (ImageHolderPtr (new MemoryImageHolder (image.Clone (), tag), false)));
           break;
         case AtlasBuilderInsertMode_Capture:
         {
@@ -332,13 +419,13 @@ struct AtlasBuilder::Impl
 
           new_image.Swap (image);
 
-          images.push_back (GetImageDesc (ImageHolderPtr (new MemoryImageHolder (new_image), false)));
+          images.push_back (GetImageDesc (ImageHolderPtr (new MemoryImageHolder (new_image, tag), false)));
 
           break;
         }
         case AtlasBuilderInsertMode_Reference:
         {
-          images.push_back (GetImageDesc (ImageHolderPtr (new MemoryImageHolder (image))));
+          images.push_back (GetImageDesc (ImageHolderPtr (new MemoryImageHolder (image, tag), false)));
           break;
         }
         default:
@@ -352,16 +439,16 @@ struct AtlasBuilder::Impl
     }
   }
 
-  void Insert (const char* image_name, bool keep_in_memory)
+  void Insert (const char* image_name, bool keep_in_memory, size_t tag)
   {
     try
     {
       ImageHolderPtr image_holder;
 
       if (keep_in_memory)
-        image_holder = ImageHolderPtr (new MemoryImageHolder (Image (image_name)), false);
+        image_holder = ImageHolderPtr (new MemoryImageHolder (Image (image_name), tag), false);
       else
-        image_holder = ImageHolderPtr (new LoadOnDemandImageHolder (image_name), false);
+        image_holder = ImageHolderPtr (new LoadOnDemandImageHolder (image_name, tag), false);
 
       images.push_back (GetImageDesc (image_holder));
     }
@@ -370,6 +457,22 @@ struct AtlasBuilder::Impl
       exception.touch ("media::AtlasBuilder::Insert");
       throw;
     }
+  }
+
+  void Insert (size_t width, size_t height, PixelFormat format, const void* data, bool copy_data, const char* name, size_t tag)
+  {
+    if (copy_data)
+    {
+      Image image (width, height, 1, format, data);
+
+      image.Rename (name);
+
+      Insert (image, AtlasBuilderInsertMode_Reference, tag);
+
+      return;
+    }
+
+    images.push_back (GetImageDesc (ImageHolderPtr (new DataImageHolder (width, height, format, data, name, tag), false)));
   }
 
   ImageDescPtr GetImageDesc (ImageHolderPtr image_holder)
@@ -590,6 +693,7 @@ struct AtlasBuilder::Impl
       new_tile.image  = atlas_image_name;
       new_tile.origin = origin;
       new_tile.size   = size;
+      new_tile.tag    = image_holder->ImageTag ();
 
       result.Insert (new_tile);
     }
@@ -625,11 +729,13 @@ struct AtlasBuilder::Impl
       if (current_image_desc->duplicate_of_index != *current_index)
         continue;
 
-      Image image (image_holder->Image ());
+      image_holder->LoadImage ();
 
       result_image.PutImage (current_origin->x, current_origin->y, 0,
                              image_holder->ImageWidth (), image_holder->ImageHeight (), 1,
-                             image_holder->ImageFormat (), image.Bitmap ());
+                             image_holder->ImageFormat (), image_holder->ImageBitmap ());
+
+      image_holder->UnloadImage ();
     }
 
     result_image.Swap (out_atlas_image);
@@ -717,19 +823,34 @@ size_t AtlasBuilder::PackFlags () const
    Добавление изображений
 */
 
-void AtlasBuilder::Insert (Image& image, AtlasBuilderInsertMode mode)
+void AtlasBuilder::Insert (Image& image, AtlasBuilderInsertMode mode, size_t tag)
 {
-  impl->Insert (image, mode);
+  impl->Insert (image, mode, tag);
 
   impl->needs_rebuild = true;
 }
 
-void AtlasBuilder::Insert (const char* image_name, bool keep_in_memory)
+void AtlasBuilder::Insert (const char* image_name, bool keep_in_memory, size_t tag)
 {
   if (!image_name)
-    throw xtl::make_null_argument_exception ("media::AtlasBuilder::Insert (const char*, bool)", "image_name");
+    throw xtl::make_null_argument_exception ("media::AtlasBuilder::Insert (const char*, bool, size_t)", "image_name");
 
-  impl->Insert (image_name, keep_in_memory);
+  impl->Insert (image_name, keep_in_memory, tag);
+
+  impl->needs_rebuild = true;
+}
+
+void AtlasBuilder::Insert (size_t width, size_t height, PixelFormat format, const void* data, bool copy_data, const char* name, size_t tag)
+{
+  static const char* METHOD_NAME = "media::AtlasBuilder::Insert (size_t, size_t, PixelFormat, const void*, bool, const char*, size_t)";
+
+  if (!data)
+    throw xtl::make_null_argument_exception (METHOD_NAME, "data");
+
+  if (!name)
+    throw xtl::make_null_argument_exception (METHOD_NAME, "name");
+
+  impl->Insert (width, height, format, data, copy_data, name, tag);
 
   impl->needs_rebuild = true;
 }

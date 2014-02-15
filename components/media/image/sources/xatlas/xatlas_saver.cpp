@@ -63,6 +63,9 @@ class XmlAtlasSaver
       writer.WriteAttribute ("Bottom", tile.origin.y);
       writer.WriteAttribute ("Width",  tile.size.x);
       writer.WriteAttribute ("Height", tile.size.y);
+
+      if (tile.tag)
+        writer.WriteAttribute ("Tag", tile.tag);
     }
     
   private:
