@@ -28,7 +28,7 @@ export.link.engine.subsystems.scene_player.LINK_INCLUDES := ScenePlayerSubsystem
 export.link.engine.subsystems.scene_player.IMPORTS       := link.engine.subsystems link.sound.scene_player link.media.sound
 
 # Link render exports
-export.link.engine.subsystems.scene_render.LINK_INCLUDES := SceneRenderSubsystem SceneRenderServerSubsystem
+export.link.engine.subsystems.scene_render.LINK_INCLUDES := SceneRenderSubsystem SceneRenderServerSubsystem SceneRenderClientSubsystem
 export.link.engine.subsystems.scene_render.IMPORTS       := link.engine.subsystems link.render.scene_render2d link.render.scene_render.server link.render.scene_render.client
 
 # Link scene manager exports
