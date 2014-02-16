@@ -207,6 +207,11 @@ inline int atomic_decrement (volatile int& rc)
   return __sync_fetch_and_sub (&rc, 1);
 }
 
+inline int atomic_compare_and_swap (volatile int& value, int old_value, int new_value)
+{
+  return __sync_val_compare_and_swap ((volatile int*)&value, old_value, new_value);
+}
+
 #endif
 
 inline int atomic_conditional_increment (volatile int& rc)
