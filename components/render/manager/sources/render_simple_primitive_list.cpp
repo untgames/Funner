@@ -107,6 +107,8 @@ struct SpriteGenerator
   }
 };
 
+const render::low_level::PrimitiveType SpriteGenerator::PRIMITIVE_TYPE;
+
 class BillboardSpriteGenerator: public SpriteGenerator
 {
   public:
