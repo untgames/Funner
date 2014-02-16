@@ -87,7 +87,7 @@ void bind_scene_graph_library (Environment& environment)
   bind_sprite_model_library                    (environment);
   bind_sprite_library                          (environment);
   bind_text_line_library                       (environment);
-  bind_visual_model_library                    (environment);
+  bind_static_mesh_library                     (environment);
   bind_height_map_library                      (environment);
   bind_controller_water_library                (environment);
   bind_controller_move_to_node_point_library   (environment);

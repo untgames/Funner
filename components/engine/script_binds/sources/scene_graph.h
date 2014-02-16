@@ -141,7 +141,7 @@ void bind_sound_emitter_library                   (script::Environment&);
 void bind_sprite_model_library                    (script::Environment&);
 void bind_sprite_library                          (script::Environment&);
 void bind_text_line_library                       (script::Environment&);
-void bind_visual_model_library                    (script::Environment&);
+void bind_static_mesh_library                     (script::Environment&);
 void bind_height_map_library                      (script::Environment&);
 void bind_controller_water_library                (script::Environment&);
 void bind_controller_water_library                (script::Environment&);
