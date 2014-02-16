@@ -7,6 +7,8 @@
 #include <common/property_map.h>
 #include <common/strlib.h>
 
+#include <syslib/window.h>
+
 #include <render/scene_render_server.h>
 
 #include <engine/attachments.h>
