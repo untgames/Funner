@@ -78,9 +78,11 @@ class DrawWithoutLights: public Technique
 
         properties.SetProperty ("ModelViewMatrix",           math::mat4f (1.0f));
         properties.SetProperty ("ModelViewProjectionMatrix", math::mat4f (1.0f));
+        properties.SetProperty ("ObjectMatrix",              math::mat4f (1.0f));
 
-        mv_matrix_property_index   = properties.IndexOf ("ModelViewMatrix");
-        mvp_matrix_property_index  = properties.IndexOf ("ModelViewProjectionMatrix");      
+        mv_matrix_property_index     = properties.IndexOf ("ModelViewMatrix");
+        mvp_matrix_property_index    = properties.IndexOf ("ModelViewProjectionMatrix");
+        object_matrix_property_index = properties.IndexOf ("ObjectMatrix");
 
         frame.SetEntityDependentProperties (properties);
         frame.SetEntityDrawHandler (xtl::bind (&DrawWithoutLights::EntityDrawHandler, this, _1, _2, _3, _4));
@@ -166,6 +168,7 @@ class DrawWithoutLights: public Technique
 
       properties.SetProperty (mv_matrix_property_index,  private_data.view_tm * object_tm);
       properties.SetProperty (mvp_matrix_property_index, out_params.mvp_matrix);
+      properties.SetProperty (object_matrix_property_index, object_tm);
     }
 
 ///Обновление свойств
@@ -175,13 +178,14 @@ class DrawWithoutLights: public Technique
     void BindProperties (common::PropertyBindingMap&) {}
 
   private:
-    RenderManager       manager;                    //менеджер рендеринга
-    stl::string         effect_name;                //имя эффекта
-    common::PropertyMap frame_properties;           //свойства кадра
-    size_t              mv_matrix_property_index;   //индекс свойства матрицы ModelView
-    size_t              mvp_matrix_property_index;  //индекс свойства матрицы ModelViewProjection
-    size_t              view_matrix_property_index; //индекс свойства матрицы View (в свойствах кадра)
-    size_t              proj_matrix_property_index; //индекс свойства матрицы Projection (в свойства кадра)
+    RenderManager       manager;                      //менеджер рендеринга
+    stl::string         effect_name;                  //имя эффекта
+    common::PropertyMap frame_properties;             //свойства кадра
+    size_t              mv_matrix_property_index;     //индекс свойства матрицы ModelView
+    size_t              mvp_matrix_property_index;    //индекс свойства матрицы ModelViewProjection
+    size_t              object_matrix_property_index; //индекс свойства матрицы ObjectMatrix
+    size_t              view_matrix_property_index;   //индекс свойства матрицы View (в свойствах кадра)
+    size_t              proj_matrix_property_index;   //индекс свойства матрицы Projection (в свойства кадра)
 };
 
 }
