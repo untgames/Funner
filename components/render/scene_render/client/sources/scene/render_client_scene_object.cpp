@@ -9,7 +9,7 @@ using namespace render::scene::client;
 SceneObject::SceneObject (SceneManager& in_scene_manager)
   : scene_manager (in_scene_manager)
 {
-  need_update = true;
+  need_update = false;
 
   UpdateNotify ();
 }
