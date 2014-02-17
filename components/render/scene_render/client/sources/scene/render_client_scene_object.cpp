@@ -51,9 +51,10 @@ void SceneObject::UpdateNotify ()
   need_update = true;
   next_update = 0;
   prev_update = list.last;
+  list.last   = this;
   
   if (prev_update) prev_update->next_update = this;
-  else             list.last = list.first   = this;
+  else             list.first               = this;
 }
 
 /*
