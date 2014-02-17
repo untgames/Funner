@@ -10,7 +10,7 @@ using namespace common;
 
 struct StaticMesh::Impl: public xtl::instance_counter<StaticMesh>
 {
-  string mesh_name;       //имя меша  
+  string mesh_name;       //имя меша
   size_t mesh_name_hash;  //хэш имени мэша
   
 ///Конструктор
@@ -50,6 +50,8 @@ void StaticMesh::SetMeshName (const char* name)
     
   impl->mesh_name      = name;
   impl->mesh_name_hash = strhash (name);
+
+  UpdateNotify ();
 }
 
 const char* StaticMesh::MeshName () const
