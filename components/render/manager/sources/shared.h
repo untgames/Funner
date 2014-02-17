@@ -1,6 +1,8 @@
 #ifndef RENDER_MANAGER_SHARED_HEADER
 #define RENDER_MANAGER_SHARED_HEADER
 
+#include <float.h>
+
 #include <stl/auto_ptr.h>
 #include <stl/hash_map>
 #include <stl/hash_set>

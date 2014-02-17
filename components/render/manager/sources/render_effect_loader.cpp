@@ -455,6 +455,17 @@ class EffectLoader
       return TexcoordWrap_Repeat;
     }
 
+///Разбор уровня детализацтии сэмплера
+    static float ParseSamplerLod (const ParseNode& node, const char* tag)
+    {
+      const char* value = get<const char*> (node, tag, "0");
+
+      if (!strcmp (value, "max"))
+        return FLT_MAX;
+
+      return get<float> (node, tag);
+    }
+
 ///Разбор состояния сэмплера
     void ParseSamplerState (Parser::Iterator iter)
     {
@@ -470,9 +481,9 @@ class EffectLoader
       desc.wrap_v               = ParseTexcoordWrap (iter->First ("wrap_v"));
       desc.wrap_w               = ParseTexcoordWrap (iter->First ("wrap_w"));
       desc.comparision_function = iter->First ("comparision_function") ? ParseCompareMode (iter->First ("comparision_function")) : CompareMode_AlwaysPass;
-      desc.mip_lod_bias         = get<float> (*iter, "mip_lod_bias", 0.0f);
-      desc.min_lod              = get<float> (*iter, "min_lod", 0.0f);
-      desc.max_lod              = get<float> (*iter, "max_lod", 0.0f);
+      desc.mip_lod_bias         = ParseSamplerLod (*iter, "mip_lod_bias");
+      desc.min_lod              = ParseSamplerLod (*iter, "min_lod");
+      desc.max_lod              = ParseSamplerLod (*iter, "max_lod");
       desc.max_anisotropy       = get<size_t> (*iter, "max_anisotropy", 1u);
       
       math::vec4f border_color = get<math::vec4f> (*iter, "border_color", math::vec4f (0.0f));
