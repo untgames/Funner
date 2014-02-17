@@ -74,7 +74,7 @@ struct PrimitiveManager::Impl
         
       MeshLibraryEntryPtr entry (new MeshLibraryEntry, false);
       
-      entry->source_library = &library;
+      entry->source_library = name ? (media::geometry::MeshLibrary*)0 : &library;
       entry->resource_name  = name;
       
       entry->primitives.reserve (library.Size ());

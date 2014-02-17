@@ -75,7 +75,7 @@ struct MaterialManager::Impl
         
       MaterialLibraryEntryPtr entry (new MaterialLibraryEntry, false);
       
-      entry->source_library = &library;
+      entry->source_library = name ? (media::rfx::MaterialLibrary*)0 : &library;
       entry->resource_name  = name;
       
       entry->materials.reserve (library.Size ());
@@ -297,7 +297,7 @@ MaterialPtr MaterialManager::DefaultMaterial ()
 }
 
 /*
-    —сылка на менеджер устройства   
+    —сылка на менеджер устройства
 */
 
 render::manager::DeviceManager& MaterialManager::DeviceManager ()
