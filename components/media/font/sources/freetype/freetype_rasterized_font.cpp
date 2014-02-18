@@ -192,17 +192,22 @@ struct FreetypeRasterizedFont::Impl : public xtl::reference_counter
     if (offset + bitmap_size > bitmap_data.size ())
       bitmap_data.resize (bitmap_data.size () * 2);
 
-    unsigned char* src_row  = bitmap->pitch > 0 ? bitmap->buffer : bitmap->buffer - bitmap->pitch * bitmap->rows - 1;
     unsigned char* dst_row  = bitmap_data.data () + offset;
     size_t         row_size = bitmap->width;
 
-    if (bitmap->pitch > 0 && bitmap->pitch == bitmap->width)
+    if (bitmap->pitch < 0 && -bitmap->pitch == bitmap->width)
     {
-      memcpy (dst_row, src_row, bitmap->width * bitmap->rows);
+      memcpy (dst_row, bitmap->buffer, bitmap->width * bitmap->rows);
     }
     else
     {
-      for (int i = 0; i < bitmap->rows; i++, src_row += bitmap->pitch, dst_row += row_size)
+      unsigned char* src_row  = bitmap->buffer;
+      int            src_step = abs (bitmap->pitch);
+      int            dst_step = bitmap->pitch > 0 ? -row_size : row_size;
+
+      dst_row = bitmap->pitch > 0 ? dst_row + (bitmap->rows - 1) * row_size : dst_row;
+
+      for (int i = 0; i < bitmap->rows; i++, src_row += src_step, dst_row += dst_step)
         memcpy (dst_row, src_row, row_size);
     }
 
