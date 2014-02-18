@@ -38,7 +38,7 @@ int main ()
 
       memset (&creation_params, 0, sizeof (creation_params));
 
-      creation_params.font_size      = 12;
+      creation_params.font_size      = 50;
       creation_params.font_size_eps  = 10;
       creation_params.weight         = FontWeight_Normal;
       creation_params.escapement     = 0;
@@ -46,7 +46,7 @@ int main ()
       creation_params.italic         = false;
       creation_params.underlined     = false;
       creation_params.striked        = false;
-      creation_params.stroke_size    = 0;
+      creation_params.stroke_size    = 1000;
       creation_params.horizontal_dpi = 72;
       creation_params.vertical_dpi   = 72;
       creation_params.charset_name   = CHARSET_NAME;
@@ -66,14 +66,14 @@ int main ()
 
       dump (rasterized_font, font);
 
-/*      for (size_t i = 0; i < rasterized_font.ImagesCount (); i++)
+      for (size_t i = 0; i < rasterized_font.ImagesCount (); i++)
       {
         Image image;
 
         rasterized_font.BuildImage (i, image);
 
         image.Save (common::format ("result_%d.png", i).c_str ());
-      }*/
+      }
     }
 
     library.LoadFont (BAD_FONT_NAME);

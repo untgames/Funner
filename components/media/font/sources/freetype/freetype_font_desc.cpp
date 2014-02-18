@@ -311,8 +311,5 @@ bool FreetypeFontDesc::CanCreateFont (size_t index, const FontCreationParams& pa
   if (params.striked)  //not implemented
     return false;
 
-  if (params.stroke_size)  //not implemented
-    return false;
-
   return true;
 }

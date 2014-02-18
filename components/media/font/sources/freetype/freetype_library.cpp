@@ -103,11 +103,25 @@ void FreetypeLibrary::FT_Done_Face (FT_Face face)
   check_free_type_error (::FT_Done_Face (face), "::FT_Done_Face");
 }
 
+void FreetypeLibrary::FT_Done_Glyph (FT_Glyph glyph)
+{
+  common::Lock lock (*impl);
+
+  ::FT_Done_Glyph (glyph);
+}
+
 FT_UInt FreetypeLibrary::FT_Get_Char_Index (FT_Face face, FT_ULong charcode)
 {
   common::Lock lock (*impl);
 
   return ::FT_Get_Char_Index (face, charcode);
+}
+
+void FreetypeLibrary::FT_Get_Glyph (FT_GlyphSlot slot, FT_Glyph *aglyph)
+{
+  common::Lock lock (*impl);
+
+  check_free_type_error (::FT_Get_Glyph (slot, aglyph), "::FT_Get_Glyph");
 }
 
 bool FreetypeLibrary::FT_Get_Kerning (FT_Face face, FT_UInt left_glyph, FT_UInt right_glyph, FT_UInt kern_mode, FT_Vector *akerning, bool nothrow)
@@ -122,6 +136,20 @@ bool FreetypeLibrary::FT_Get_Kerning (FT_Face face, FT_UInt left_glyph, FT_UInt 
   check_free_type_error (result, "::FT_Get_Kerning");
 
   return true;
+}
+
+void FreetypeLibrary::FT_Glyph_Stroke (FT_Glyph *pglyph, FT_Stroker stroker, FT_Bool destroy)
+{
+  common::Lock lock (*impl);
+
+  check_free_type_error (::FT_Glyph_Stroke (pglyph, stroker, destroy), "::FT_Glyph_Stroke");
+}
+
+void FreetypeLibrary::FT_Glyph_To_Bitmap (FT_Glyph* the_glyph, FT_Render_Mode render_mode, FT_Vector* origin, FT_Bool destroy)
+{
+  common::Lock lock (*impl);
+
+  check_free_type_error (::FT_Glyph_To_Bitmap (the_glyph, render_mode, origin, destroy), "::FT_Glyph_To_Bitmap");
 }
 
 bool FreetypeLibrary::FT_Load_Char (FT_Face face, FT_ULong charcode, FT_Int32 load_flags, bool nothrow)
@@ -164,6 +192,27 @@ void FreetypeLibrary::FT_Set_Char_Size (FT_Face face, FT_F26Dot6 char_width, FT_
   common::Lock lock (*impl);
 
   check_free_type_error (::FT_Set_Char_Size (face, char_width, char_height, horz_resolution, vert_resolution), "::FT_Set_Char_Size");
+}
+
+void FreetypeLibrary::FT_Stroker_Done (FT_Stroker stroker)
+{
+  common::Lock lock (*impl);
+
+  ::FT_Stroker_Done (stroker);
+}
+
+void FreetypeLibrary::FT_Stroker_New (FT_Stroker *astroker)
+{
+  common::Lock lock (*impl);
+
+  check_free_type_error (::FT_Stroker_New (impl->library, astroker), "::FT_Stroker_New");
+}
+
+void FreetypeLibrary::FT_Stroker_Set (FT_Stroker stroker, FT_Fixed radius, FT_Stroker_LineCap line_cap, FT_Stroker_LineJoin line_join, FT_Fixed miter_limit)
+{
+  common::Lock lock (*impl);
+
+  ::FT_Stroker_Set (stroker, radius, line_cap, line_join, miter_limit);
 }
 
 /*

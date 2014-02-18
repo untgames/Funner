@@ -24,6 +24,8 @@
 #include <media/rasterized_font.h>
 
 #include <ft2build.h>
+#include <ftglyph.h>
+#include <ftstroke.h>
 #include <freetype.h>
 
 namespace media
@@ -55,13 +57,20 @@ class FreetypeLibrary
 ///Freetype API
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void    FT_Done_Face       (FT_Face face);
+    void    FT_Done_Glyph      (FT_Glyph glyph);
     FT_UInt FT_Get_Char_Index  (FT_Face face, FT_ULong charcode);
+    void    FT_Get_Glyph       (FT_GlyphSlot slot, FT_Glyph *aglyph);
     bool    FT_Get_Kerning     (FT_Face face, FT_UInt left_glyph, FT_UInt right_glyph, FT_UInt kern_mode, FT_Vector *akerning, bool nothrow = false);
+    void    FT_Glyph_Stroke    (FT_Glyph *pglyph, FT_Stroker stroker, FT_Bool destroy);
+    void    FT_Glyph_To_Bitmap (FT_Glyph* the_glyph, FT_Render_Mode render_mode, FT_Vector* origin, FT_Bool destroy);
     bool    FT_Load_Char       (FT_Face face, FT_ULong charcode, FT_Int32 load_flags, bool nothrow = false);
     void    FT_New_Memory_Face (const FT_Byte* file_base, FT_Long file_size, FT_Long face_index, FT_Face *aface);
     void    FT_Select_Charmap  (FT_Face face, FT_Encoding encoding);
     void    FT_Select_Size     (FT_Face face, FT_Int strike_index);
     void    FT_Set_Char_Size   (FT_Face face, FT_F26Dot6 char_width, FT_F26Dot6 char_height, FT_UInt horz_resolution, FT_UInt vert_resolution);
+    void    FT_Stroker_Done    (FT_Stroker stroker);
+    void    FT_Stroker_New     (FT_Stroker *astroker);
+    void    FT_Stroker_Set     (FT_Stroker stroker, FT_Fixed radius, FT_Stroker_LineCap line_cap, FT_Stroker_LineJoin line_join, FT_Fixed miter_limit);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Ξαμεν

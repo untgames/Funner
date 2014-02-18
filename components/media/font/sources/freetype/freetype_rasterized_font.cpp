@@ -8,6 +8,108 @@ namespace
 
 const char* LOG_NAME = "media.freetype.FreetypeRasterizedFont";
 
+//Обводчик глифов
+class FreetypeStroker
+{
+  public:
+    //Конструктор/деструктор
+    FreetypeStroker (const FreetypeLibrary& in_library, size_t stroke_size)
+      : library (in_library)
+      , stroker (0)
+    {
+      if (!stroke_size)
+        return;
+
+      library.FT_Stroker_New (&stroker);
+
+      library.FT_Stroker_Set (stroker, (FT_Fixed)(stroke_size / 1000.f * 64.f), FT_STROKER_LINECAP_ROUND, FT_STROKER_LINEJOIN_ROUND, 0);
+    }
+
+    ~FreetypeStroker ()
+    {
+      if (stroker)
+        library.FT_Stroker_Done (stroker);
+    }
+
+    //Получение обводичка
+    FT_Stroker Stroker ()
+    {
+      return stroker;
+    }
+
+  private:
+    FreetypeStroker (const FreetypeStroker&);             //no impl
+    FreetypeStroker& operator = (const FreetypeStroker&); //no impl
+
+  private:
+    FreetypeLibrary library;  //библиотека
+    FT_Stroker      stroker;  //обводчик
+};
+
+//Растеризатор глифа
+class FreetypeGlyphRasterizer
+{
+  public:
+    //Конструктор/деструктор
+    FreetypeGlyphRasterizer (FT_ULong char_code, const RasterizedFontParams& params, FT_Stroker stroker)
+      : library (params.library)
+      , bitmap (0)
+      , glyph (0)
+    {
+      FT_Face face_handle    = params.face->FaceHandle ();
+      int     load_char_mode = stroker ? FT_LOAD_DEFAULT : FT_LOAD_RENDER;
+
+      if (!library.FT_Load_Char (face_handle, char_code, load_char_mode, true))
+        return;
+
+      if (!stroker)
+      {
+        bitmap = &face_handle->glyph->bitmap;
+        return;
+      }
+
+      library.FT_Get_Glyph (face_handle->glyph, &glyph);
+
+      try
+      {
+        library.FT_Glyph_Stroke (&glyph, stroker, true);
+
+        if (glyph->format != FT_GLYPH_FORMAT_BITMAP)
+        {
+          library.FT_Glyph_To_Bitmap (&glyph, FT_RENDER_MODE_NORMAL, 0, true);
+        }
+      }
+      catch (...)
+      {
+        library.FT_Done_Glyph (glyph);
+        throw;
+      }
+
+      bitmap = &((FT_BitmapGlyph)glyph)->bitmap;
+    }
+
+    ~FreetypeGlyphRasterizer ()
+    {
+      if (glyph)
+        library.FT_Done_Glyph (glyph);
+    }
+
+    //Получение битовой карты
+    FT_Bitmap* Bitmap ()
+    {
+      return bitmap;
+    }
+
+  private:
+    FreetypeGlyphRasterizer (const FreetypeGlyphRasterizer&);             //no impl
+    FreetypeGlyphRasterizer& operator = (const FreetypeGlyphRasterizer&); //no impl
+
+  private:
+    FreetypeLibrary library; //библиотека
+    FT_Bitmap*      bitmap;  //битовая карта
+    FT_Glyph        glyph;   //глиф
+};
+
 }
 
 namespace media
@@ -58,6 +160,8 @@ struct FreetypeRasterizedFont::Impl : public xtl::reference_counter
     if (utf32_charset.empty ())
       return;
 
+    FreetypeStroker stroker (font_params->library, font_params->font_params.stroke_size);
+
     glyph_map.resize (glyphs_count);
 
     size_t unique_glyphs_count    = utf32_charset.size () + 1;
@@ -72,30 +176,32 @@ struct FreetypeRasterizedFont::Impl : public xtl::reference_counter
 
     font_params->face->SetSize (font_params->choosen_size, font_params->font_params.horizontal_dpi, font_params->font_params.vertical_dpi);
 
-    FT_Face face_handle = font_params->face->FaceHandle ();
-
     size_t current_glyph_bitmap_offset = 0;
 
     math::vec2ui* current_size          = sizes.data ();
     size_t*       current_bitmap_offset = bitmaps_offsets.data ();
 
-    if (font_params->library.FT_Load_Char (face_handle, '?', FT_LOAD_RENDER, true) && face_handle->glyph->bitmap.buffer)
     {
-      FT_Bitmap *bitmap = &face_handle->glyph->bitmap;
+      FreetypeGlyphRasterizer glyph_rasterizer ('?', *font_params, stroker.Stroker ());
 
-      current_size->x = bitmap->width;
-      current_size->y = bitmap->rows;
+      FT_Bitmap *bitmap = glyph_rasterizer.Bitmap ();
 
-      current_glyph_bitmap_offset += CopyBitmapToBuffer (bitmap, 0);
+      if (bitmap)
+      {
+        current_size->x = bitmap->width;
+        current_size->y = bitmap->rows;
 
-      size_t bitmap_hash = common::crc32 (bitmap_data.data (), bitmap->width * bitmap->rows);
+        current_glyph_bitmap_offset += CopyBitmapToBuffer (bitmap, 0);
 
-      bitmaps_hash_map [bitmap_hash] = 0;
-    }
-    else
-    {
-      current_size->x = 0;
-      current_size->y = 0;
+        size_t bitmap_hash = common::crc32 (bitmap_data.data (), bitmap->width * bitmap->rows);
+
+        bitmaps_hash_map [bitmap_hash] = 0;
+      }
+      else
+      {
+        current_size->x = 0;
+        current_size->y = 0;
+      }
     }
 
     *current_bitmap_offset = 0; //'?' glyph is first in bitmap
@@ -126,7 +232,11 @@ struct FreetypeRasterizedFont::Impl : public xtl::reference_counter
         continue;
       }
 
-      if (!font_params->library.FT_Load_Char (face_handle, *current_char_code, FT_LOAD_RENDER, true) || !face_handle->glyph->bitmap.buffer)
+      FreetypeGlyphRasterizer glyph_rasterizer (*current_char_code, *font_params, stroker.Stroker ());
+
+      FT_Bitmap *bitmap = glyph_rasterizer.Bitmap ();
+
+      if (!bitmap)
       {
         *current_mapping = 0;
 
@@ -134,8 +244,6 @@ struct FreetypeRasterizedFont::Impl : public xtl::reference_counter
 
         continue;
       }
-
-      FT_Bitmap *bitmap = &face_handle->glyph->bitmap;
 
       size_t new_offset = CopyBitmapToBuffer (bitmap, current_glyph_bitmap_offset);
 
