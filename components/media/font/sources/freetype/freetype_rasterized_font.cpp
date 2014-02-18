@@ -63,9 +63,8 @@ struct FreetypeRasterizedFont::Impl : public xtl::reference_counter
     size_t unique_glyphs_count    = utf32_charset.size () + 1;
     size_t estimated_bitmaps_size = unique_glyphs_count * font_params->choosen_size * font_params->choosen_size / 2;
 
-    sizes.resize           (unique_glyphs_count);
-    bitmap_pointers.resize (unique_glyphs_count);
-    bitmap_data.resize     (estimated_bitmaps_size);
+    sizes.resize       (unique_glyphs_count);
+    bitmap_data.resize (estimated_bitmaps_size);
 
     xtl::uninitialized_storage<size_t> bitmaps_offsets (unique_glyphs_count);
 
@@ -100,6 +99,9 @@ struct FreetypeRasterizedFont::Impl : public xtl::reference_counter
     }
 
     *current_bitmap_offset = 0; //'?' glyph is first in bitmap
+
+    current_size++;
+    current_bitmap_offset++;
 
     size_t              previous_glyph_code  = utf32_charset.data () [0];
     size_t              current_unique_index = 1;
@@ -148,6 +150,8 @@ struct FreetypeRasterizedFont::Impl : public xtl::reference_counter
         continue;
       }
 
+      *current_mapping = current_unique_index;
+
       bitmaps_hash_map [bitmap_hash] = current_unique_index;
 
       current_size->x        = bitmap->width;
@@ -163,9 +167,18 @@ struct FreetypeRasterizedFont::Impl : public xtl::reference_counter
 
     size_t actual_unique_glyphs = current_unique_index - 1;
 
-    bitmap_pointers.resize (actual_unique_glyphs);
     sizes.resize (actual_unique_glyphs);
     bitmap_data.resize (current_glyph_bitmap_offset);
+
+    bitmap_pointers.resize (actual_unique_glyphs);
+
+    current_bitmap_offset = bitmaps_offsets.data ();
+
+    unsigned char*  bitmap_data_base          = bitmap_data.data ();
+    unsigned char** current_dst_bitmap_offset = bitmap_pointers.data ();
+
+    for (size_t i = 0; i < actual_unique_glyphs; i++, current_bitmap_offset++, current_dst_bitmap_offset++)
+      *current_dst_bitmap_offset = bitmap_data_base + *current_bitmap_offset;
 
     rasterized = true;
 
@@ -244,28 +257,28 @@ size_t FreetypeRasterizedFont::UniqueGlyphsCount () const
 {
   impl->Rasterize ();
 
-  return impl->bitmaps_hash_map.size ();
+  return impl->sizes.size ();
 }
 
-unsigned int* FreetypeRasterizedFont::GlyphsMap () const
+const unsigned int* FreetypeRasterizedFont::GlyphsMap () const
 {
   impl->Rasterize ();
 
   return impl->glyph_map.data ();
 }
 
-math::vec2ui* FreetypeRasterizedFont::GlyphsSizes () const
+const math::vec2ui* FreetypeRasterizedFont::GlyphsSizes () const
 {
   impl->Rasterize ();
 
   return impl->sizes.data ();
 }
 
-unsigned char** FreetypeRasterizedFont::GlyphsBitmaps () const
+const unsigned char** FreetypeRasterizedFont::GlyphsBitmaps () const
 {
   impl->Rasterize ();
 
-  return impl->bitmap_pointers.data ();
+  return (const unsigned char**)impl->bitmap_pointers.data ();
 }
 
 /*

@@ -18,6 +18,7 @@
 #include <common/log.h>
 #include <common/strlib.h>
 
+#include <media/atlas_builder.h>
 #include <media/charset_manager.h>
 #include <media/font_library.h>
 #include <media/rasterized_font.h>
@@ -187,10 +188,10 @@ class FreetypeRasterizedFont
 //////////////////////////////////////////////////////////////////////////////////////////////////
 ///Получение растеризованных глифов
 //////////////////////////////////////////////////////////////////////////////////////////////////
-    size_t          UniqueGlyphsCount () const;  //количество глифов с уникальными битмапами
-    unsigned int*   GlyphsMap         () const;  //соответствие глифа уникальному глифу (количество - GlyphsCount)
-    math::vec2ui*   GlyphsSizes       () const;  //размеры глифов (количество - UniqueGlyphsCount)
-    unsigned char** GlyphsBitmaps     () const;  //битовые карты глифов (8 битные монохромные) (количество - UniqueGlyphsCount)
+    size_t                UniqueGlyphsCount () const;  //количество глифов с уникальными битмапами
+    const unsigned int*   GlyphsMap         () const;  //соответствие глифа уникальному глифу (количество - GlyphsCount)
+    const math::vec2ui*   GlyphsSizes       () const;  //размеры глифов (количество - UniqueGlyphsCount)
+    const unsigned char** GlyphsBitmaps     () const;  //битовые карты глифов (8 битные монохромные) (количество - UniqueGlyphsCount)
 
 //////////////////////////////////////////////////////////////////////////////////////////////////
 ///Создание растеризатора
