@@ -165,7 +165,7 @@ struct FreetypeRasterizedFont::Impl : public xtl::reference_counter
       current_unique_index++;
     }
 
-    size_t actual_unique_glyphs = current_unique_index - 1;
+    size_t actual_unique_glyphs = current_unique_index;
 
     sizes.resize (actual_unique_glyphs);
     bitmap_data.resize (current_glyph_bitmap_offset);

@@ -4,6 +4,7 @@
 #include <xtl/iterator.h>
 
 #include <common/log.h>
+#include <common/strlib.h>
 
 #include <media/charset_manager.h>
 #include <media/font_library.h>

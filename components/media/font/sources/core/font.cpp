@@ -114,7 +114,15 @@ bool Font::HasKerning (size_t left_glyph_index, size_t right_glyph_index) const
 
 RasterizedFont Font::CreateRasterizedFont (const RasterizedFontCreationParams& params) const
 {
-  return RasterizedFont (impl->Rasterizer () (params));
+  try
+  {
+    return RasterizedFont (impl->Rasterizer () (params));
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("media::Font::CreateRasterizedFont");
+    throw;
+  }
 }
 
 /*
