@@ -181,8 +181,6 @@ struct FreetypeRasterizedFont::Impl : public xtl::reference_counter
       *current_dst_bitmap_offset = bitmap_data_base + *current_bitmap_offset;
 
     rasterized = true;
-
-    printf ("Actual unique glyphs = %lu, estimated unique glyphs = %lu, actual bitmap data size = %lu, estimate bitmap data size = %lu\n", actual_unique_glyphs, unique_glyphs_count, current_glyph_bitmap_offset, estimated_bitmaps_size);
   }
 
   size_t CopyBitmapToBuffer (FT_Bitmap* bitmap, size_t offset)

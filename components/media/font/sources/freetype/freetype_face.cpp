@@ -106,7 +106,23 @@ struct FreetypeFace::Impl
     if (size == current_size && horizontal_dpi == current_horizontal_dpi && vertical_dpi == current_vertical_dpi)
       return;
 
-    library.FT_Set_Char_Size (face, size << 6, 0, horizontal_dpi, vertical_dpi);
+    for (size_t i = 0; i < face->num_fixed_sizes; i++)
+    {
+      size_t current_fixed_size = face->available_sizes [i].width;
+
+      if (size == current_fixed_size)
+      {
+        library.FT_Select_Size (face, i);
+
+        current_size           = size;
+        current_horizontal_dpi = horizontal_dpi;
+        current_vertical_dpi   = vertical_dpi;
+
+        return;
+      }
+    }
+
+    library.FT_Set_Char_Size (face, (size << 6) * (72.f / horizontal_dpi), 0, horizontal_dpi, vertical_dpi);
 
     current_size           = size;
     current_horizontal_dpi = horizontal_dpi;

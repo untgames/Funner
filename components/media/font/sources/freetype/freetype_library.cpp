@@ -152,6 +152,13 @@ void FreetypeLibrary::FT_Select_Charmap (FT_Face face, FT_Encoding  encoding)
   check_free_type_error (::FT_Select_Charmap (face, encoding), "::FT_Select_Charmap");
 }
 
+void FreetypeLibrary::FT_Select_Size (FT_Face face, FT_Int strike_index)
+{
+  common::Lock lock (*impl);
+
+  check_free_type_error (::FT_Select_Size (face, strike_index), "::FT_Select_Size");
+}
+
 void FreetypeLibrary::FT_Set_Char_Size (FT_Face face, FT_F26Dot6 char_width, FT_F26Dot6 char_height, FT_UInt horz_resolution, FT_UInt vert_resolution)
 {
   common::Lock lock (*impl);

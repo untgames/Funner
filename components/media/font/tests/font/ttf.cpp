@@ -57,7 +57,7 @@ int main ()
 
       RasterizedFontCreationParams rasterization_params;
 
-      rasterization_params.max_image_size = 128;
+      rasterization_params.max_image_size = 1024;
       rasterization_params.pot            = true;
       rasterization_params.glyph_margin   = 10;
       rasterization_params.image_format   = media::PixelFormat_L8;
@@ -65,6 +65,15 @@ int main ()
       RasterizedFont rasterized_font = font.CreateRasterizedFont (rasterization_params);
 
       dump (rasterized_font, font);
+
+/*      for (size_t i = 0; i < rasterized_font.ImagesCount (); i++)
+      {
+        Image image;
+
+        rasterized_font.BuildImage (i, image);
+
+        image.Save (common::format ("result_%d.png", i).c_str ());
+      }*/
     }
 
     library.LoadFont (BAD_FONT_NAME);
