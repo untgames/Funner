@@ -50,7 +50,7 @@ struct PropertyMapAutoWriter::Impl: public IPropertyMapWriterListener, public xt
   }
 
 /// Обработчики событий
-  void OnPropertyMapRemoved (uint64 id)
+  void OnPropertyMapRemoved (object_id_t id)
   {
     try
     {
@@ -69,7 +69,7 @@ struct PropertyMapAutoWriter::Impl: public IPropertyMapWriterListener, public xt
     }
   }
 
-  void OnPropertyLayoutRemoved (uint64 id)
+  void OnPropertyLayoutRemoved (object_id_t id)
   {
     try
     {
