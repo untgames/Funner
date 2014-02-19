@@ -242,7 +242,7 @@ void PropertyMapWriter::Write (OutputStream& stream, const common::PropertyMap& 
 
     stream.BeginCommand (CommandId_UpdatePropertyMap);
 
-    stream.WriteData (&header, sizeof (header));
+    stream.Write (header);
 
       //синхронизация лэйаута
 

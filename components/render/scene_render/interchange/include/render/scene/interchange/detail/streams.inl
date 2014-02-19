@@ -56,16 +56,33 @@ inline void OutputStream::Swap (CommandBuffer& in_buffer)
   in_buffer = old_buffer;
 }
 
+namespace detail
+{
+
+template <size_t Size> inline size_t aligned_size ()
+{
+  return (Size + DATA_ALIGN - 1) & ~(DATA_ALIGN - 1);
+}
+
+inline size_t aligned_size (size_t size)
+{
+  return (size + DATA_ALIGN - 1) & ~(DATA_ALIGN - 1);
+}
+
+}
+
 /*
     Сериализация заголовка и конца команды
 */
 
 inline void OutputStream::BeginCommand (command_id_t id)
 {
-  EnsureSpaceAvailable (sizeof (Command));
+  static const size_t size = detail::aligned_size<sizeof (Command)> ();
+
+  EnsureSpaceAvailable (size);
 
   command_start  = pos;
-  pos           += sizeof (Command);
+  pos           += size;
 
   Command* command = reinterpret_cast<Command*> (command_start);
 
@@ -108,8 +125,12 @@ inline void OutputStream::Resize (size_t new_size)
 
 inline void OutputStream::WriteData (const void* data, size_t size)
 {
-  EnsureSpaceAvailable (size);
+  const size_t aligned_size = detail::aligned_size (size);
+
+  EnsureSpaceAvailable (aligned_size);
   WriteDataUnsafe      (data, size);
+
+  pos += aligned_size - size;
 }
 
 inline void OutputStream::WriteDataUnsafe (const void* data, size_t size)
@@ -121,7 +142,26 @@ inline void OutputStream::WriteDataUnsafe (const void* data, size_t size)
 
 template <class T> inline void OutputStream::Write (const T& value)
 {
-  WriteData (&value, sizeof (T));
+  static const size_t aligned_size = detail::aligned_size<sizeof (T)> ();
+
+  EnsureSpaceAvailable (aligned_size);
+  WriteDataUnsafe      (&value, sizeof (T));
+
+  pos += aligned_size - sizeof (T);
+}
+
+/*
+    Пропуск
+*/
+
+inline void OutputStream::Skip (size_t size)
+{
+  if (!size)
+    return;
+
+  EnsureSpaceAvailable (size);
+
+  pos += size;
 }
 
 /*
@@ -185,40 +225,61 @@ inline size_t InputStream::Available () const
 
 inline void InputStream::ReadData (void* data, size_t size)
 {
-  if (size <= Available ())
+  const size_t aligned_size = detail::aligned_size (size);
+
+  if (aligned_size <= Available ())
   {
     ReadDataUnsafe (data, size);
+
+    pos += aligned_size - size;
   }
   else
   {
-    throw xtl::format_operation_exception ("render::scene::interchange::InputStream::ReadData(void*,size_t)", "Can't read %u bytes from input stream with %u bytes available", size, Available ());
+    throw xtl::format_operation_exception ("render::scene::interchange::InputStream::ReadData(void*,size_t)", "Can't read %u bytes from input stream with %u bytes available", aligned_size, Available ());
   }
 }
 
 inline void InputStream::ReadDataUnsafe (void* data, size_t size)
 {
   memcpy (data, pos, size);
+
+  pos += size;
 }
 
 inline const void* InputStream::ReadData (size_t size)
 {
-  if (size <= Available ())
+  const size_t aligned_size = detail::aligned_size (size);
+
+  if (aligned_size <= Available ())
   {
     const void* result = pos;
 
-    pos += size;
+    pos += aligned_size;
 
     return result;
   }
   else
   {
-    throw xtl::format_operation_exception ("render::scene::interchange::InputStream::ReadData(size_t)", "Can't read %u bytes from input stream with %u bytes available", size, Available ());
+    throw xtl::format_operation_exception ("render::scene::interchange::InputStream::ReadData(size_t)", "Can't read %u bytes from input stream with %u bytes available", aligned_size, Available ());
   }
 }
 
 template <class T> inline const T& InputStream::Read ()
 {
-  return *reinterpret_cast<const T*> (ReadData (sizeof (T)));
+  static const size_t aligned_size = detail::aligned_size<sizeof (T)> ();
+
+  if (aligned_size <= Available ())
+  {
+    const void* result = pos;
+
+    pos += aligned_size;
+
+    return *reinterpret_cast<const T*> (result);
+  }
+  else
+  {
+    throw xtl::format_operation_exception ("render::scene::interchange::InputStream::Read<T>", "Can't read %u bytes from input stream with %u bytes available", aligned_size, Available ());
+  }
 }
 
 /*
@@ -227,7 +288,7 @@ template <class T> inline const T& InputStream::Read ()
 
 inline void InputStream::Skip (size_t size)
 {
-  if (size < Available ())
+  if (size <= Available ())
   {
     pos += size;
   }
@@ -307,6 +368,8 @@ inline void write (OutputStream& s, const char* str)
   int32 length = strlen (str);
 
   write (s, length);
+
+  const size_t size = length + 1;
   
   s.WriteData (str, length + 1);
 }
@@ -391,7 +454,7 @@ inline RawArray<T> read (InputStream& s, xtl::type<RawArray<T> >)
 {
   const uint32& count = read (s, xtl::type<uint32> ());
 
-  s.Skip (count * sizeof (T));
+  s.Skip (detail::aligned_size (count * sizeof (T)));
 
-  return RawArray<T> (reinterpret_cast<T*> (reinterpret_cast<unsigned char*> (&const_cast<uint32&> (count)) + sizeof (uint32)), count);
+  return RawArray<T> (reinterpret_cast<T*> (reinterpret_cast<unsigned char*> (&const_cast<uint32&> (count)) + detail::aligned_size<sizeof (uint32)> ()), count);
 }
