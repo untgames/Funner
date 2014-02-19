@@ -369,8 +369,6 @@ inline void write (OutputStream& s, const char* str)
 
   write (s, length);
 
-  const size_t size = length + 1;
-  
   s.WriteData (str, length + 1);
 }
 
