@@ -125,7 +125,7 @@ void FreetypeFontRasterizer::BuildImage (size_t image_index, media::Image& out_i
   {
     impl->atlas_builder.BuildAtlasImage (image_index, out_image);
 
-    if (out_image.Format () != impl->image_format && out_image.Format () != media::PixelFormat_Default)
+    if (out_image.Format () != impl->image_format && impl->image_format != media::PixelFormat_Default)
     {
       common::Log (LOG_NAME).Printf ("Requested pixel format '%s' requires image convertation from '%s'", impl->image_format, out_image.Format ());
       out_image.Convert (impl->image_format);

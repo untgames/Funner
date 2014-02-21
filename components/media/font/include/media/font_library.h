@@ -240,7 +240,7 @@ void swap (FontLibrary&, FontLibrary&);
 //////////////////////////////////////////////////////////////////////////////////////////////////
 ///Менеджер шрифтов
 //////////////////////////////////////////////////////////////////////////////////////////////////
-typedef common::ResourceSerializerManager<IFontDesc* (const char*), void (const char*, const Font&)> FontManager;
+typedef common::ResourceSerializerManager<IFontDesc* (const char*), void (const char*, const Font&, const char*, const RasterizedFontCreationParams&)> FontManager;
 
 }
 
