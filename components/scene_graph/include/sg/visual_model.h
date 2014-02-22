@@ -37,6 +37,22 @@ class VisualModel: public Entity
     const scene_graph::Scissor* Scissor    () const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+///Динамические свойства шейдера (могут быть NULL)
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    common::PropertyMap*       DynamicShaderProperties    ();
+    const common::PropertyMap* DynamicShaderProperties    () const;
+    void                       SetDynamicShaderProperties (common::PropertyMap* properties);
+    void                       SetDynamicShaderProperties (const common::PropertyMap& properties);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Статические свойства шейдера (могут быть NULL)
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    common::PropertyMap*       StaticShaderProperties    ();
+    const common::PropertyMap* StaticShaderProperties    () const;
+    void                       SetStaticShaderProperties (common::PropertyMap* properties);
+    void                       SetStaticShaderProperties (const common::PropertyMap& properties);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Подписка на события модели
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     typedef xtl::function<void (VisualModel& sender, VisualModelEvent event_id)> EventHandler;

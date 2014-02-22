@@ -66,6 +66,21 @@ class TestEntity: public Entity
     }
 };
 
+class TestVisualModel: public VisualModel
+{
+  public:
+    typedef xtl::com_ptr<TestVisualModel> Pointer;
+    
+    static Pointer Create () { return Pointer (new TestVisualModel, false); }
+    
+  protected:
+    void AcceptCore (Visitor& visitor)
+    {
+      if (!TryAccept (*this, visitor))
+        VisualModel::AcceptCore (visitor);
+    }
+};
+
 float prepare_float (float v)
 {
   if (fabs (v) < 0.001f)

@@ -8,11 +8,14 @@ using namespace math;
 */
 
 typedef xtl::signal<void (VisualModel& sender, VisualModelEvent event_id)> VisualModelSignal;
+typedef stl::auto_ptr<common::PropertyMap>                                 PropertyMapPtr;
 
 struct VisualModel::Impl: public xtl::instance_counter<VisualModel>
 {
   scene_graph::Scissor* scissor;                        //область отсечения
   xtl::auto_connection  on_scissor_destroy_connection;  //соединение с событием удаления области отсечения
+  PropertyMapPtr        dynamic_shader_properties;      //динамические свойства шейдера
+  PropertyMapPtr        static_shader_properties;       //статические свойства шейдера
   VisualModelSignal     signals [VisualModelEvent_Num]; //сигналы модели 
   bool                  need_release_scissor;           //нужно ли освобождать область отсечения
 
@@ -137,6 +140,74 @@ Scissor* VisualModel::Scissor ()
 const Scissor* VisualModel::Scissor () const
 {
   return impl->scissor;
+}
+
+/*
+    Динамические свойства шейдера (могут быть NULL)
+*/
+
+common::PropertyMap* VisualModel::DynamicShaderProperties ()
+{
+  return impl->dynamic_shader_properties.get ();
+}
+
+const common::PropertyMap* VisualModel::DynamicShaderProperties () const
+{
+  return impl->dynamic_shader_properties.get ();
+}
+
+void VisualModel::SetDynamicShaderProperties (common::PropertyMap* properties)
+{
+  if (properties)
+  {
+    if (impl->dynamic_shader_properties) *impl->dynamic_shader_properties = *properties;
+    else                                 impl->dynamic_shader_properties.reset (new common::PropertyMap (*properties));
+  }
+  else
+  {
+    impl->dynamic_shader_properties.reset ();
+  }
+
+  UpdateNotify ();
+}
+
+void VisualModel::SetDynamicShaderProperties (const common::PropertyMap& properties)
+{
+  SetDynamicShaderProperties (&const_cast<common::PropertyMap&> (properties));
+}
+
+/*
+    Статические свойства шейдера (могут быть NULL)
+*/
+
+common::PropertyMap* VisualModel::StaticShaderProperties ()
+{
+  return impl->static_shader_properties.get ();
+}
+
+const common::PropertyMap* VisualModel::StaticShaderProperties () const
+{
+  return impl->static_shader_properties.get ();
+}
+
+void VisualModel::SetStaticShaderProperties (common::PropertyMap* properties)
+{
+  if (properties)
+  {
+    if (impl->static_shader_properties) *impl->static_shader_properties = *properties;
+    else                                 impl->static_shader_properties.reset (new common::PropertyMap (*properties));
+  }
+  else
+  {
+    impl->static_shader_properties.reset ();
+  }
+
+  UpdateNotify ();
+}
+
+void VisualModel::SetStaticShaderProperties (const common::PropertyMap& properties)
+{
+  SetStaticShaderProperties (&const_cast<common::PropertyMap&> (properties));
 }
 
 /*
