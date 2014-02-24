@@ -50,8 +50,6 @@ struct FreetypeFontRasterizer::Impl
     const math::vec2ui*   current_glyph_size   = rasterized_font.GlyphsSizes ();
     const unsigned char** current_glyph_bitmap = rasterized_font.GlyphsBitmaps ();
 
-    printf ("Unique glyphs count = %lu\n", unique_glyphs_count);
-
     for (size_t i = 0; i < unique_glyphs_count; i++, current_glyph_size++, current_glyph_bitmap++)
       atlas_builder.Insert (current_glyph_size->x, current_glyph_size->y, media::PixelFormat_L8, *current_glyph_bitmap, false, "", i);
 
