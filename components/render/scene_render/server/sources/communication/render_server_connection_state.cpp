@@ -725,6 +725,32 @@ void ConnectionState::SetVisualModelScissor (object_id_t id, object_id_t scissor
   }
 }
 
+void ConnectionState::SetVisualModelDynamicShaderProperties (object_id_t id, object_id_t properties_id)
+{
+  try
+  {
+    impl->server.SceneManager ().GetNode (id).Cast<VisualModel> ().SetDynamicShaderProperties (GetClientProperties (properties_id));
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::scene::ConnectionState::SetVisualModelDynamicShaderProperties");
+    throw;
+  }
+}
+
+void ConnectionState::SetVisualModelStaticShaderProperties (object_id_t id, object_id_t properties_id)
+{
+  try
+  {
+    impl->server.SceneManager ().GetNode (id).Cast<VisualModel> ().SetStaticShaderProperties (GetClientProperties (properties_id));
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::scene::ConnectionState::SetVisualModelStaticShaderProperties");
+    throw;
+  }
+}
+
 void ConnectionState::SetStaticMeshName (object_id_t id, const char* name)
 {
   try

@@ -70,6 +70,8 @@ class ConnectionState: public xtl::noncopyable
     void SetEntityVisibility (object_id_t id, bool is_visible);
 
     void SetVisualModelScissor (object_id_t id, object_id_t scissor_id);
+    void SetVisualModelDynamicShaderProperties (object_id_t id, object_id_t properties_id);
+    void SetVisualModelStaticShaderProperties (object_id_t id, object_id_t properties_id);
 
     void SetStaticMeshName (object_id_t id, const char* name);
 

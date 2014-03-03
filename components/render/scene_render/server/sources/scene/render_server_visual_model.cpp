@@ -65,6 +65,30 @@ Node* VisualModel::Scissor () const
 }
 
 /*
+    Свойства шейдера
+*/
+
+void VisualModel::SetDynamicShaderProperties (const common::PropertyMap& properties)
+{
+  impl->entity.SetProperties (properties);
+}
+
+void VisualModel::SetStaticShaderProperties (const common::PropertyMap& properties)
+{
+  impl->entity.SetShaderOptions (properties);
+}
+
+const common::PropertyMap& VisualModel::DynamicShaderProperties () const
+{
+  return impl->entity.Properties ();
+}
+
+const common::PropertyMap& VisualModel::StaticShaderProperties () const
+{
+  return impl->entity.ShaderOptions ();
+}
+
+/*
     Отображаемая сущность
 */
 

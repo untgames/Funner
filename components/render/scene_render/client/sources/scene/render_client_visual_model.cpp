@@ -7,9 +7,52 @@ using namespace render::scene::client;
     Описание реализации сущности
 */
 
+namespace
+{
+
+struct ShaderPropertiesSync
+{
+  PropertyMapSynchronizer synchronizer;
+  size_t                  cached_id;
+
+  ShaderPropertiesSync ()
+    : cached_id ()
+  {
+  }
+
+  bool Sync (const common::PropertyMap* properties, SceneManager& manager)
+  {
+    size_t id = properties ? properties->Id () : 0;
+
+    if (id == cached_id)
+      return false;
+
+    ClientImpl& client = manager.Client ();
+
+    if (properties)
+    {
+      synchronizer = client.CreateSynchronizer (*properties);
+    }
+    else
+    {
+      synchronizer = PropertyMapSynchronizer ();
+    }
+
+    client.Synchronize ();
+
+    cached_id = id;
+
+    return true;
+  }
+};
+
+}
+
 struct VisualModel::Impl
 {
-  scene_graph::Scissor* scissor; //сохраненная область отсечения
+  scene_graph::Scissor* scissor;                   //сохраненная область отсечения
+  ShaderPropertiesSync  dynamic_shader_properties; //динамические свойства шейдера
+  ShaderPropertiesSync  static_shader_properties;  //статические свойства шейдера
 
   Impl () : scissor () {}
 };
@@ -56,6 +99,14 @@ void VisualModel::UpdateCore (client::Context& context)
 
       impl->scissor = scissor;
     }    
+
+      //синхронизация свойств шейдера
+
+    if (impl->dynamic_shader_properties.Sync (model.DynamicShaderProperties (), Scenes ()))
+      context.SetVisualModelDynamicShaderProperties (Id (), impl->dynamic_shader_properties.cached_id);
+
+    if (impl->static_shader_properties.Sync (model.StaticShaderProperties (), Scenes ()))
+      context.SetVisualModelStaticShaderProperties (Id (), impl->static_shader_properties.cached_id);
   }
   catch (xtl::exception& e)
   {

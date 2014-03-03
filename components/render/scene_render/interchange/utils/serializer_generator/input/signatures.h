@@ -45,6 +45,8 @@ void SetEntityBounds (object_id_t id, bool is_infinite, const bound_volumes::aab
 void SetEntityVisibility (object_id_t id, bool state);
 
 void SetVisualModelScissor (object_id_t id, object_id_t scissor_id);
+void SetVisualModelDynamicShaderProperties (object_id_t id, object_id_t properties_id);
+void SetVisualModelStaticShaderProperties (object_id_t id, object_id_t properties_id);
 
 void SetStaticMeshName (object_id_t id, const char* mesh_name);
 

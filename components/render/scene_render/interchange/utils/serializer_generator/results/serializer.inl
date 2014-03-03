@@ -39,6 +39,8 @@ inline stl::string get_command_name(CommandId command_id)
     case CommandId_SetEntityBounds: return "SetEntityBounds";
     case CommandId_SetEntityVisibility: return "SetEntityVisibility";
     case CommandId_SetVisualModelScissor: return "SetVisualModelScissor";
+    case CommandId_SetVisualModelDynamicShaderProperties: return "SetVisualModelDynamicShaderProperties";
+    case CommandId_SetVisualModelStaticShaderProperties: return "SetVisualModelStaticShaderProperties";
     case CommandId_SetStaticMeshName: return "SetStaticMeshName";
     case CommandId_SetLightParams: return "SetLightParams";
     case CommandId_SetPageCurlParams: return "SetPageCurlParams";
@@ -714,6 +716,42 @@ inline void ClientToServerSerializer::SetVisualModelScissor(object_id_t id, obje
   }
 }
 
+inline void ClientToServerSerializer::SetVisualModelDynamicShaderProperties(object_id_t id, object_id_t properties_id)
+{
+  size_t saved_position = Position ();
+
+  try
+  {
+    BeginCommand(CommandId_SetVisualModelDynamicShaderProperties);
+    write(*this, id);
+    write(*this, properties_id);
+    EndCommand();
+  }
+  catch (...)
+  {
+    SetPosition (saved_position);
+    throw;
+  }
+}
+
+inline void ClientToServerSerializer::SetVisualModelStaticShaderProperties(object_id_t id, object_id_t properties_id)
+{
+  size_t saved_position = Position ();
+
+  try
+  {
+    BeginCommand(CommandId_SetVisualModelStaticShaderProperties);
+    write(*this, id);
+    write(*this, properties_id);
+    EndCommand();
+  }
+  catch (...)
+  {
+    SetPosition (saved_position);
+    throw;
+  }
+}
+
 inline void ClientToServerSerializer::SetStaticMeshName(object_id_t id, const char* mesh_name)
 {
   size_t saved_position = Position ();
@@ -1102,6 +1140,24 @@ template <class Dispatcher> inline bool ClientToServerDeserializer::Deserialize(
       object_id_t arg2 = read(*this, xtl::type<object_id_t > ());
 
       dispatcher.SetVisualModelScissor(arg1, arg2);
+
+      return true;
+    }
+    case CommandId_SetVisualModelDynamicShaderProperties:
+    {
+      object_id_t arg1 = read(*this, xtl::type<object_id_t > ());
+      object_id_t arg2 = read(*this, xtl::type<object_id_t > ());
+
+      dispatcher.SetVisualModelDynamicShaderProperties(arg1, arg2);
+
+      return true;
+    }
+    case CommandId_SetVisualModelStaticShaderProperties:
+    {
+      object_id_t arg1 = read(*this, xtl::type<object_id_t > ());
+      object_id_t arg2 = read(*this, xtl::type<object_id_t > ());
+
+      dispatcher.SetVisualModelStaticShaderProperties(arg1, arg2);
 
       return true;
     }

@@ -68,7 +68,7 @@ int main ()
 
     const char* SERVER_NAME = "MyServer";
 
-    Server server (SERVER_NAME);
+    Server server (SERVER_NAME/*, render::scene::server::ServerThreadingModel_SingleThreaded*/);
     Client client (SERVER_NAME);
 
     common::PropertyMap window_properties;
