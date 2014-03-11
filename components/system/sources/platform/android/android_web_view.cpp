@@ -3,6 +3,64 @@
 using namespace syslib;
 using namespace syslib::android;
 
+namespace
+{
+
+//Класс, устанавливающий значение async result в случае удаления, если он не был установлен
+class AsyncResultHolder : public xtl::reference_counter
+{
+  public:
+    //Конструктор/деструктор
+    AsyncResultHolder (global_ref<jobject> in_result)
+      : result (in_result)
+      , result_setted (false)
+      {}
+
+    ~AsyncResultHolder ()
+    {
+      try
+      {
+        if (!result_setted)
+          SetResultValue (false);
+      }
+      catch (...)
+      {
+        //Подавление исключений
+      }
+    }
+
+    //Установка значения результата
+    void SetResultValue (bool value)
+    {
+      JNIEnv& env = get_env ();
+
+      local_ref<jclass> result_class (env.GetObjectClass (result.get ()), false);
+
+      if (!result_class)
+        throw xtl::format_operation_exception ("", "JNIEnv::GetObjectClass failed (for UiAsyncResult)");
+
+      jmethodID set_value_method = find_method (&env, result_class.get (), "setValue", "(Z)V");
+
+      env.CallVoidMethod (result.get (), set_value_method, (jboolean)value);
+
+      check_errors ();
+
+      result_setted = true;
+    }
+
+  private:
+    AsyncResultHolder (const AsyncResultHolder&);             //no impl
+    AsyncResultHolder& operator = (const AsyncResultHolder&); //no impl
+
+  private:
+    global_ref<jobject> result;        //результат
+    bool                result_setted; //было ли задано значение результата
+};
+
+typedef xtl::intrusive_ptr<AsyncResultHolder> AsyncResultHolderPtr;
+
+}
+
 struct syslib::web_view_handle: public MessageQueue::Handler
 {
   IWebViewListener*   listener;               //слушатель событий web-view
@@ -29,7 +87,27 @@ struct syslib::web_view_handle: public MessageQueue::Handler
 ///Деструктор
   ~web_view_handle ()
   {
-    MessageQueueSingleton::Instance ()->UnregisterHandler (*this);
+    try
+    {
+      MessageQueueSingleton::Instance ()->UnregisterHandler (*this);
+
+      JNIEnv& env = get_env ();
+
+      local_ref<jclass> controller_class (env.GetObjectClass (controller.get ()), false);
+
+      if (!controller_class)
+        throw xtl::format_operation_exception ("", "JNIEnv::GetObjectClass failed (for EngineWebViewController)");
+
+      jmethodID set_web_view_ref = find_method (&env, controller_class.get (), "setWebViewRef", "(J)V");
+
+      env.CallVoidMethod (controller.get (), set_web_view_ref, (jlong)0);
+
+      check_errors ();
+    }
+    catch (...)
+    {
+      //Подавление исключений
+    }
   }
 
 ///Обработчик событий окна
@@ -75,25 +153,14 @@ struct syslib::web_view_handle: public MessageQueue::Handler
   }
 
 ///Проверка необходимости открытия ссылки
-  void ShouldStartLoadingCallback (const stl::string& request, const global_ref<jobject>& result)
+  void ShouldStartLoadingCallback (const stl::string& request, AsyncResultHolderPtr result)
   {
     bool bool_result = true;
-    
+
     if (listener)
       bool_result = listener->ShouldStartLoading (request.c_str ());
 
-    JNIEnv& env = get_env ();
-
-    local_ref<jclass> result_class (env.GetObjectClass (result.get ()), false);
-
-    if (!result_class)
-      throw xtl::format_operation_exception ("", "JNIEnv::GetObjectClass failed (for UiAsyncResult)");
-
-    jmethodID set_value_method = find_method (&env, result_class.get (), "setValue", "(Z)V");
-    
-    env.CallVoidMethod (result.get (), set_value_method, (jboolean)bool_result);
-
-    check_errors ();           
+    result->SetResultValue (bool_result);
   }
 };
 
@@ -155,6 +222,8 @@ template <class Fn> void push_message (jobject controller, const Fn& fn)
     if (!view)
       return;
 
+    //TODO web_view_t can be deleted at this point in other thread
+
     MessageQueueSingleton::Instance ()->PushMessage (*view, MessageQueue::MessagePtr (new WebViewMessage<Fn> (view, fn), false));
   }
   catch (...)
@@ -180,7 +249,7 @@ void on_load_failed (JNIEnv& env, jobject controller, jstring error_message)
 
 void should_start_loading (JNIEnv& env, jobject controller, jstring request, jobject result)
 {
-  push_message (controller, xtl::bind (&web_view_handle::ShouldStartLoadingCallback, _1, tostring (request), global_ref<jobject> (result)));
+  push_message (controller, xtl::bind (&web_view_handle::ShouldStartLoadingCallback, _1, tostring (request), AsyncResultHolderPtr (new AsyncResultHolder (global_ref<jobject> (result)), false)));
 }
 
 }
