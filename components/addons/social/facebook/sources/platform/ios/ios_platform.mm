@@ -1,6 +1,5 @@
 #include "shared.h"
 
-#import <AdSupport/ASIdentifierManager.h>
 #import <UIKit/UIPasteboard.h>
 
 using namespace social;
@@ -208,24 +207,16 @@ class IOsPlatformImpl
         }
 
         NSString *attributionID = [[UIPasteboard pasteboardWithName:@"fb_app_attribution" create:NO] string];
-        NSString *advertiserID  = nil;
 
-        if ([ASIdentifierManager class])
-        {
-          ASIdentifierManager *manager = [ASIdentifierManager sharedManager];
-          advertiserID = [[manager advertisingIdentifier] UUIDString];
-        }
-
-        if (attributionID || advertiserID)
+        if (attributionID)
         {
           stl::string attribution_id = attributionID ? [attributionID UTF8String] : "";
-          stl::string advertiser_id  = advertiserID ? [advertiserID UTF8String] : "";
 
-          common::ActionQueue::PushAction (xtl::bind (&IOsPlatformImpl::PerformPublishInstall, this, attribution_id, advertiser_id, app_id), common::ActionThread_Background);
+          common::ActionQueue::PushAction (xtl::bind (&IOsPlatformImpl::PerformPublishInstall, this, attribution_id, app_id), common::ActionThread_Background);
         }
         else
         {
-          log.Printf ("Can't publish install app event, no attribution and no advertiser id found");
+          log.Printf ("Can't publish install app event, attribution id not found");
         }
       }
       catch (xtl::exception& e)
@@ -235,7 +226,7 @@ class IOsPlatformImpl
       }
     }
 
-    void PerformPublishInstall (stl::string attribution_id, stl::string advertiser_id, stl::string app_id)
+    void PerformPublishInstall (stl::string attribution_id, stl::string app_id)
     {
       NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 
@@ -272,10 +263,6 @@ class IOsPlatformImpl
           [body appendWithKey:@"format" formValue:@"json"];
           [body appendWithKey:@"migration_bundle" formValue:@"fbsdk:20121003"];
           [body appendWithKey:@"sdk" formValue:@"ios"];
-
-          if (!advertiser_id.empty ())
-            [body appendWithKey:@"advertiser_id" formValue:[NSString stringWithUTF8String:advertiser_id.c_str ()]];
-
           [body appendWithKey:@"event" formValue:@"MOBILE_APP_INSTALL"];
 
           if (!attribution_id.empty ())
