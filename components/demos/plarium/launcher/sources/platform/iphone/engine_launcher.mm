@@ -174,42 +174,10 @@ static NSString* MAT_AD_KEY = @"3fa11cf8822ff1d86461c44ac1ee09b2";
 
 -(void)reportAppInstall
 {
-  NSError *error = nil;
-
-  [[MobileAppTracker sharedManager] startTrackerWithAdvertiserId:MAT_AD_ID advertiserKey:MAT_AD_KEY withError:&error];
-
-  if (error)
-  {
-    NSLog (@"Error while starting MobileAppTracker - '%@'", error);
-    return;
-  }
-
-  [[MobileAppTracker sharedManager] setDelegate:self];
-
-  NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-
-  NSString* uuid = [defaults objectForKey:@"UUID"];
-
-  if (!uuid)
-  {
-    if ([[[UIDevice currentDevice] systemVersion] compare:@"6.0" options:NSNumericSearch] != NSOrderedAscending)
-    {
-      uuid = [[[UIDevice currentDevice] identifierForVendor] UUIDString];
-    }
-    else
-    {
-      CFUUIDRef cf_uuid = CFUUIDCreate (0);
-
-      uuid = [(NSString*)CFUUIDCreateString (0, cf_uuid) autorelease];
-
-      CFRelease (cf_uuid);
-
-      [defaults setObject:uuid forKey:@"UUID"];
-      [defaults synchronize];
-    }
-  }
-
-  [[MobileAppTracker sharedManager] setDeviceId:uuid];
+  [MobileAppTracker initializeWithMATAdvertiserId:MAT_AD_ID MATConversionKey:MAT_AD_KEY];
+//  [MobileAppTracker setDebugMode:YES];               //DEBUG
+//  [MobileAppTracker setAllowDuplicateRequests:YES];  //DEBUG
+  [MobileAppTracker setDelegate:self];
 
   NSArray*       paths        = NSSearchPathForDirectoriesInDomains (NSLibraryDirectory, NSUserDomainMask, YES);
   NSFileManager* file_manager = [NSFileManager defaultManager];
@@ -217,19 +185,17 @@ static NSString* MAT_AD_KEY = @"3fa11cf8822ff1d86461c44ac1ee09b2";
 
   bool mat_flag_exists = [file_manager fileExistsAtPath:[path stringByAppendingPathComponent:@"Plarium/mat_report_sent.flag"]];
 
-  if ([file_manager fileExistsAtPath:[path stringByAppendingPathComponent:@"Plarium/Slots/Downloads_1"]] && !mat_flag_exists)
-  {
-    NSLog (@"MAT track update");
-    [[MobileAppTracker sharedManager] trackUpdate];
-  }
-  else
-  {
-    NSLog (@"MAT track install");
-    [[MobileAppTracker sharedManager] trackInstall];
-  }
+  [MobileAppTracker setExistingUser:[file_manager fileExistsAtPath:[path stringByAppendingPathComponent:@"Plarium/Slots/Downloads_1"]] && !mat_flag_exists];
 
   if (!mat_flag_exists)
     [file_manager createFileAtPath:[path stringByAppendingPathComponent:@"Plarium/mat_report_sent.flag"] contents:nil attributes:nil];
+
+  [self reportAppOpen];
+}
+
+-(void)reportAppOpen
+{
+  [MobileAppTracker measureSession];
 }
 
 /*!
@@ -476,9 +442,9 @@ class HasOffersTrackEventHandler : public INotificationListener
       NSString* eventName = [NSString stringWithUTF8String:components [0].c_str ()];
 
       if (components.size () == 1)
-        [[MobileAppTracker sharedManager] trackActionForEventIdOrName:eventName eventIsId:NO];
+        [MobileAppTracker measureAction:eventName];
       else if (components.size () == 2)
-        [[MobileAppTracker sharedManager] trackActionForEventIdOrName:eventName eventIsId:NO revenueAmount:atof (components [1].c_str ()) currencyCode:@""];
+        [MobileAppTracker measureAction:eventName revenueAmount:atof (components [1].c_str ()) currencyCode:@""];
       else
         throw sgi_stl::invalid_argument (plarium::utility::format ("HasOffersTrackEventHandler::OnNotification: invalid 'HasOffersTrackEvent' arguments '%s'", notification));
     }
@@ -543,6 +509,7 @@ int main (int argc, const char* argv [], const char* env [])
     [[NSNotificationCenter defaultCenter] addObserver:tracking selector:@selector (reportAppOpen) name:UIApplicationDidFinishLaunchingNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:tracking selector:@selector (reportAppOpen) name:UIApplicationWillEnterForegroundNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:mat_tracking selector:@selector (reportAppInstall) name:UIApplicationDidFinishLaunchingNotification object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:mat_tracking selector:@selector (reportAppOpen) name:UIApplicationWillEnterForegroundNotification object:nil];
 
     SystemAlertHandler         system_alert_handler (funner);
     LocalNotificationsHandler  local_notifications_handler (funner);
