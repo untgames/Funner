@@ -234,20 +234,6 @@ struct MaterialImpl::Impl: public CacheHolder, public DebugIdHolder
       
         //установка статических текстурных карт и их сэмплеров в контекст устройства отрисовки
 
-      for (size_t i=0, count=stl::min (texmaps.size (), DEVICE_SAMPLER_SLOTS_COUNT); i<count; i++)
-      {
-        Texmap& texmap = *texmaps [i];
-        
-        if (!texmap.cached_device_texture)        
-          log.Printf ("Texmap[%u] for material '%s' will be ignored. Bad texture '%s'", i, name.c_str (), texmap.texture.Name ());          
-
-        if (!texmap.cached_sampler)        
-          log.Printf ("Texmap[%u] for material '%s' will be ignored. Bad sampler '%s'", i, name.c_str (), texmap.sampler.Name ());
-        
-        context.SSSetTexture (i, texmap.cached_device_texture.get ());
-        context.SSSetSampler (i, texmap.cached_sampler.get ());
-      }
-
       if (cached_program)
       {
         const TexmapDesc* program_texmap = cached_program->Texmaps ();
