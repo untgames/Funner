@@ -133,7 +133,7 @@ struct OptionsCacheCombinationKey
 struct OptionsCacheCombinationValue: public xtl::reference_counter
 {
   ShaderOptions options; //список опций программы
-  ProgramPtr    program; //программа    
+  ProgramPtr    program; //программа
 };
 
 size_t hash (const OptionsCacheCombinationKey& key)
@@ -248,6 +248,15 @@ Program::~Program ()
 }
 
 /*
+   Имя программы
+*/
+
+const char* Program::Name ()
+{
+  return impl->common_data->name.c_str ();
+}
+
+/*
     Шейдеры программы
 */
 
@@ -340,6 +349,25 @@ const TexmapDesc& Program::Texmap (size_t index)
   return impl->common_data->texmaps [index];
 }
 
+const TexmapDesc* Program::FindTexmapBySemantic (size_t semantic_hash)
+{
+  for (TexmapDescArray::iterator iter = impl->common_data->texmaps.begin (), end = impl->common_data->texmaps.end (); iter != end; ++iter)
+  {
+    if (semantic_hash == iter->semantic_hash)
+      return &*iter;
+  }
+
+  return 0;
+}
+
+const TexmapDesc* Program::FindTexmapBySemantic (const char* semantic)
+{
+  if (!semantic)
+    return 0;
+
+  return FindTexmapBySemantic (common::strhash (semantic));
+}
+
 void Program::SetTexmap (size_t index, size_t channel, const char* semantic, const char* param_name, bool is_framemap)
 {
   static const char* METHOD_NAME = "render::manager::Program::SetTexmap";
@@ -355,10 +383,11 @@ void Program::SetTexmap (size_t index, size_t channel, const char* semantic, con
     
   TexmapDesc& desc = impl->common_data->texmaps [index];
   
-  desc.channel     = channel;
-  desc.semantic    = semantic;
-  desc.param_name  = param_name;
-  desc.is_framemap = is_framemap;
+  desc.channel       = channel;
+  desc.semantic      = semantic;
+  desc.param_name    = param_name;
+  desc.is_framemap   = is_framemap;
+  desc.semantic_hash = common::strhash (semantic);
   
   impl->common_data->need_update = true;
 }

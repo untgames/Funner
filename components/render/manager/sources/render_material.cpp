@@ -20,15 +20,17 @@ struct Texmap: public xtl::reference_counter, public CacheHolder
 {
   TextureProxy            texture;               //прокси текстуры
   SamplerProxy            sampler;               //сэмплер текстуры
-  bool                    is_dynamic;            //является ли текстура динамической  
+  bool                    is_dynamic;            //является ли текстура динамической
+  size_t                  semantic_hash;         //хеш имени семантики
   TexturePtr              cached_texture;        //закэшированная текстура
   LowLevelSamplerStatePtr cached_sampler;        //закэшированный сэмплер
   LowLevelTexturePtr      cached_device_texture; //закэшированная текстура
   
-  Texmap (CacheHolder& owner, const TextureProxy& in_texture_proxy, const SamplerProxy& in_sampler_proxy, bool in_is_dynamic)
+  Texmap (CacheHolder& owner, const TextureProxy& in_texture_proxy, const SamplerProxy& in_sampler_proxy, bool in_is_dynamic, const char* semantic)
     : texture (in_texture_proxy)
     , sampler (in_sampler_proxy)
     , is_dynamic (in_is_dynamic)
+    , semantic_hash (semantic ? common::strhash (semantic) : 0)
   {
     owner.AttachCacheSource (*this);
     
@@ -92,11 +94,11 @@ struct MaterialImpl::Impl: public CacheHolder, public DebugIdHolder
   PropertyBuffer             properties;                   //свойства материала
   ProgramParametersLayoutPtr material_properties_layout;   //расположение свойств материала
   TexmapArray                texmaps;                      //текстурные карты
-  bool                       has_dynamic_textures;         //есть ли в материале динамические текстуры  
+  bool                       has_dynamic_textures;         //есть ли в материале динамические текстуры
   size_t                     cached_state_block_mask_hash; //хэш закэшированной маски блока состояний материала
   ProgramPtr                 cached_program;               //закэшированная программа
   LowLevelStateBlockPtr      cached_state_block;           //закэшированный блок состояний
-  ProgramParametersLayoutPtr cached_properties_layout;     //расположение свойств материала и программы  
+  ProgramParametersLayoutPtr cached_properties_layout;     //расположение свойств материала и программы
   Log                        log;                          //протокол отладочных сообщений
   
 ///Конструктор
@@ -123,7 +125,7 @@ struct MaterialImpl::Impl: public CacheHolder, public DebugIdHolder
 ///Деструктор
   ~Impl ()
   {
-      //предварительная очистка коллекция для возможности отслеживать порядок удаления объектов до и после удаления данного    
+      //предварительная очистка коллекция для возможности отслеживать порядок удаления объектов до и после удаления данного
       
     cached_program               = ProgramPtr ();
     cached_properties_layout     = ProgramParametersLayoutPtr ();
@@ -244,6 +246,44 @@ struct MaterialImpl::Impl: public CacheHolder, public DebugIdHolder
         
         context.SSSetTexture (i, texmap.cached_device_texture.get ());
         context.SSSetSampler (i, texmap.cached_sampler.get ());
+      }
+
+      if (cached_program)
+      {
+        const TexmapDesc* program_texmap = cached_program->Texmaps ();
+
+        for (size_t i = 0, count = cached_program->TexmapsCount (); i < count; i++, program_texmap++)
+        {
+          Texmap* texmap = 0;
+
+          for (TexmapArray::iterator iter = texmaps.begin (), end = texmaps.end (); iter != end; ++iter)
+          {
+            if ((*iter)->semantic_hash == program_texmap->semantic_hash)
+            {
+              texmap = &**iter;
+              break;
+            }
+          }
+
+          size_t channel = program_texmap->channel;
+
+          if (texmap)
+          {
+            if (!texmap->cached_device_texture)
+              log.Printf ("Texmap[%u] in program '%s' for material '%s' will be ignored. Bad texture '%s'", channel, cached_program->Name (), name.c_str (), texmap->texture.Name ());
+
+            if (!texmap->cached_sampler)
+              log.Printf ("Texmap[%u] in program '%s' for material '%s' will be ignored. Bad sampler '%s'", channel, cached_program->Name (), name.c_str (), texmap->sampler.Name ());
+
+            context.SSSetTexture (channel, texmap->cached_device_texture.get ());
+            context.SSSetSampler (channel, texmap->cached_sampler.get ());
+          }
+          else
+          {
+            context.SSSetTexture (channel, 0);
+            context.SSSetSampler (channel, 0);
+          }
+        }
       }
 
         //сохранение состояния контекста устройства отрисовки
@@ -420,7 +460,7 @@ void MaterialImpl::Update (const media::rfx::Material& material)
     common::PropertyMap new_properties = material.Properties ();
     ProgramProxy        new_program    = impl->program_manager->GetProgramProxy (material.Program ());    
     
-      //создание текстурных карт      
+      //создание текстурных карт
     
     TexmapArray new_texmaps;
 
@@ -432,7 +472,7 @@ void MaterialImpl::Update (const media::rfx::Material& material)
     {
       const media::rfx::Texmap& texmap = material.Texmap (i);
       
-        //определение является ли текстура динамической производится по префиксу её имени и потому может быть выполнено однократно      
+        //определение является ли текстура динамической производится по префиксу её имени и потому может быть выполнено однократно
       
       bool is_dynamic_image = impl->texture_manager->IsDynamicTexture (texmap.Image ());
 
@@ -440,7 +480,7 @@ void MaterialImpl::Update (const media::rfx::Material& material)
         new_has_dynamic_textures = true;        
       
       TexmapPtr new_texmap (new Texmap (*impl, impl->texture_manager->GetTextureProxy (texmap.Image ()),
-        impl->texture_manager->GetSamplerProxy (texmap.Sampler ()), is_dynamic_image), false);
+        impl->texture_manager->GetSamplerProxy (texmap.Sampler ()), is_dynamic_image, texmap.Semantic ()), false);
 
       new_texmaps.push_back (new_texmap);
     }
@@ -475,7 +515,7 @@ void MaterialImpl::Update (const media::rfx::Material& material)
     impl->material_properties_layout = new_layout;
     impl->has_dynamic_textures       = new_has_dynamic_textures;
     
-      //обновление кэша с зависимостями (поскольку может измениться состояние тэгов и динамических текстур)    
+      //обновление кэша с зависимостями (поскольку может измениться состояние тэгов и динамических текстур)
       
     impl->InvalidateCache ();
   }

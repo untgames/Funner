@@ -3,10 +3,11 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 struct TexmapDesc
 {
-  size_t      channel;     //номер текстурного канала
-  stl::string semantic;    //имя семантики в media::rfx::Texmap
-  stl::string param_name;  //имя параметра в шейдере
-  bool        is_framemap; //является ли текстурная карта контекстной картой кадра
+  size_t      channel;       //номер текстурного канала
+  stl::string semantic;      //имя семантики в media::rfx::Texmap
+  stl::string param_name;    //имя параметра в шейдере
+  bool        is_framemap;   //является ли текстурная карта контекстной картой кадра
+  size_t      semantic_hash; //хеш имени семантики
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -20,7 +21,12 @@ class Program: public Object
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     Program  (const DeviceManagerPtr& device_manager, const char* name, const char* static_options, const char* dynamic_options);
     ~Program ();
-    
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Имя программы
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    const char* Name ();
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Шейдеры данной программы
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -38,14 +44,16 @@ class Program: public Object
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Отображение семантики текстурной карты на номер канала и имя параметра
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    size_t            TexmapsCount     ();
-    bool              HasFramemaps     ();
-    const TexmapDesc* Texmaps          ();
-    const TexmapDesc& Texmap           (size_t index);
-    void              SetTexmap        (size_t index, size_t channel, const char* semantic, const char* param_name, bool is_framemap = false);
-    size_t            AddTexmap        (size_t channel, const char* semantic, const char* param_name, bool is_framemap = false);
-    void              RemoveTexmap     (size_t index);
-    void              RemoveAllTexmaps ();
+    size_t            TexmapsCount         ();
+    bool              HasFramemaps         ();
+    const TexmapDesc* Texmaps              ();
+    const TexmapDesc& Texmap               (size_t index);
+    const TexmapDesc* FindTexmapBySemantic (size_t semantic_hash);
+    const TexmapDesc* FindTexmapBySemantic (const char* semantic);
+    void              SetTexmap            (size_t index, size_t channel, const char* semantic, const char* param_name, bool is_framemap = false);
+    size_t            AddTexmap            (size_t channel, const char* semantic, const char* param_name, bool is_framemap = false);
+    void              RemoveTexmap         (size_t index);
+    void              RemoveAllTexmaps     ();
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Получение производной программы
