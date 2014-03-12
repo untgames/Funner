@@ -52,8 +52,8 @@ class AttachmentRegistry
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Регистрация точек привязки
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    template <class T> static void Register      (const char* name, T& object);
-    template <class T> static void Unregister    (const char* name, T& object); //only if equal
+    template <class T> static void Register      (const char* name, const T& object);
+    template <class T> static void Unregister    (const char* name, const T& object); //only if equal
     template <class T> static void Unregister    (const char* name);
     template <class T> static void UnregisterAll ();
     
