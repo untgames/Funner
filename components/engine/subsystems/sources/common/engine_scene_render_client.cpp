@@ -274,7 +274,11 @@ class SceneRenderClientSubsystem : public ISubsystem, public IAttachmentRegistry
         , last_update_time (0)
       {
         if (!target_attachment.empty ())
-          AttachmentRegistry::Register (target_attachment.c_str (), xtl::ref (target));
+        {
+          xtl::reference_wrapper<RenderTarget> target_ref (target);
+
+          AttachmentRegistry::Register (target_attachment.c_str (), target_ref);
+        }
       }
       
       ~RenderTargetDesc ()
