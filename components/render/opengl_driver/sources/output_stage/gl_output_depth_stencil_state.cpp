@@ -172,19 +172,23 @@ void DepthStencilState::SetDesc (const DepthStencilDesc& in_desc)
                         gl_stencil_operation [FaceMode_Back][2]);
         }
       }
+#ifndef OPENGL_ES2_SUPPORT
       else if (caps.has_ext_stencil_two_side)
       {
-        cmd_list.Add (glEnable, GL_STENCIL_TEST_TWO_SIDE_EXT);        
+        cmd_list.Add (glEnable, GL_STENCIL_TEST_TWO_SIDE_EXT);
         cmd_list.Add (glActiveStencilFaceEXT, GL_FRONT);
         cmd_list.Add (glStencilOp, gl_stencil_operation [0][0], gl_stencil_operation [0][1], gl_stencil_operation [0][2]);
         cmd_list.Add (glActiveStencilFaceEXT, GL_BACK);
         cmd_list.Add (glStencilOp, gl_stencil_operation [1][0], gl_stencil_operation [1][1], gl_stencil_operation [1][2]);
       }
+#endif
     }
     else
     {
+#ifndef OPENGL_ES2_SUPPORT
       if (caps.has_ext_stencil_two_side)
         cmd_list.Add (glDisable, GL_STENCIL_TEST_TWO_SIDE_EXT);
+#endif
 
       cmd_list.Add (glStencilOp, gl_stencil_operation [0][0], gl_stencil_operation [0][1], gl_stencil_operation [0][2]);
     }
@@ -278,6 +282,7 @@ void DepthStencilState::Bind (size_t reference)
           glStencilFuncSeparateATI (GL_BACK, gl_stencil_func [1], reference, desc.stencil_read_mask);
         }
       }
+#ifndef OPENGL_ES2_SUPPORT
       else if (caps.has_ext_stencil_two_side)
       {
         glActiveStencilFaceEXT (GL_FRONT);
@@ -285,6 +290,7 @@ void DepthStencilState::Bind (size_t reference)
         glActiveStencilFaceEXT (GL_BACK);
         glStencilFunc          (gl_stencil_func [1], reference, desc.stencil_read_mask);
       }
+#endif
     }
     else
 #endif    

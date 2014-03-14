@@ -185,7 +185,7 @@ struct InputStage::Impl: public ContextObject
     {
       try
       {
-#ifndef OPENGL_ES_SUPPORT
+#if !defined (OPENGL_ES_SUPPORT) && !defined(OPENGL_ES2_SUPPORT)
         if (GetCaps ().has_arb_vertex_buffer_object)
         {
           return new VboBuffer (GetContextManager (), buffer_target, desc);

@@ -23,8 +23,16 @@ GlslProgram::GlslProgram (const ContextManager& manager, size_t shaders_count, I
 
       //создание программы
 
-    if (glCreateProgram) handle = glCreateProgram ();
-    else                 handle = glCreateProgramObjectARB ();
+    if (glCreateProgram)
+    {
+      handle = glCreateProgram ();
+    }
+#ifndef OPENGL_ES2_SUPPORT
+    else
+    {
+      handle = glCreateProgramObjectARB ();
+    }
+#endif
 
     if (!handle)
       RaiseError (METHOD_NAME);
@@ -40,8 +48,16 @@ GlslProgram::GlslProgram (const ContextManager& manager, size_t shaders_count, I
       if (!shader)
         throw xtl::format_exception<xtl::null_argument_exception> (METHOD_NAME, "shaders[%u]", i);
 
-      if (glAttachShader) glAttachShader    (handle, shader->GetHandle ());
-      else                glAttachObjectARB (handle, shader->GetHandle ());
+      if (glAttachShader)
+      {
+        glAttachShader (handle, shader->GetHandle ());
+      }
+#ifndef OPENGL_ES2_SUPPORT
+      else
+      {
+        glAttachObjectARB (handle, shader->GetHandle ());
+      }
+#endif
 
       shaders.push_back (shader);
     }
@@ -50,13 +66,29 @@ GlslProgram::GlslProgram (const ContextManager& manager, size_t shaders_count, I
 
     GLint link_status = 0;
 
-    if (glLinkProgram) glLinkProgram    (handle);
-    else               glLinkProgramARB (handle);
+    if (glLinkProgram)
+    {
+      glLinkProgram (handle);
+    }
+#ifndef OPENGL_ES2_SUPPORT
+    else
+    {
+      glLinkProgramARB (handle);
+    }
+#endif
 
       //протоколирование ошибок
 
-    if (glGetProgramiv) glGetProgramiv            (handle, GL_LINK_STATUS, &link_status);
-    else                glGetObjectParameterivARB (handle, GL_LINK_STATUS, &link_status);
+    if (glGetProgramiv)
+    {
+      glGetProgramiv (handle, GL_LINK_STATUS, &link_status);
+    }
+#ifndef OPENGL_ES2_SUPPORT
+    else
+    {
+      glGetObjectParameterivARB (handle, GL_LINK_STATUS, &link_status);
+    }
+#endif
 
     stl::string log_buffer;
 
@@ -67,9 +99,19 @@ GlslProgram::GlslProgram (const ContextManager& manager, size_t shaders_count, I
     
     GLint parameters_count = 0, max_parameter_name_length = 0;
     
-    glGetObjectParameterivARB (handle, GL_OBJECT_ACTIVE_UNIFORMS_ARB, &parameters_count);
-    glGetObjectParameterivARB (handle, GL_OBJECT_ACTIVE_UNIFORM_MAX_LENGTH_ARB, &max_parameter_name_length);
-    
+    if (glGetProgramiv)
+    {
+      glGetProgramiv (handle, GL_ACTIVE_UNIFORMS, &parameters_count);
+      glGetProgramiv (handle, GL_ACTIVE_UNIFORM_MAX_LENGTH, &max_parameter_name_length);
+    }
+#ifndef OPENGL_ES2_SUPPORT
+    else
+    {
+      glGetObjectParameterivARB (handle, GL_OBJECT_ACTIVE_UNIFORMS_ARB, &parameters_count);
+      glGetObjectParameterivARB (handle, GL_OBJECT_ACTIVE_UNIFORM_MAX_LENGTH_ARB, &max_parameter_name_length);
+    }
+#endif
+
     parameters.reserve (parameters_count);        
     
     stl::string parameter_name;    
@@ -140,14 +182,16 @@ GlslProgram::GlslProgram (const ContextManager& manager, size_t shaders_count, I
         case GL_FLOAT_MAT4_ARB:
           parameter.type = ProgramParameterType_Float4x4;
           break;
-        case GL_SAMPLER_1D_ARB:
         case GL_SAMPLER_2D_ARB:
-        case GL_SAMPLER_3D_ARB:
         case GL_SAMPLER_CUBE_ARB:
+#ifndef OPENGL_ES2_SUPPORT
+        case GL_SAMPLER_1D_ARB:
+        case GL_SAMPLER_3D_ARB:
         case GL_SAMPLER_1D_SHADOW_ARB:
         case GL_SAMPLER_2D_SHADOW_ARB:
         case GL_SAMPLER_2D_RECT_ARB:
         case GL_SAMPLER_2D_RECT_SHADOW_ARB:
+#endif
           parameter.type = ProgramParameterType_Int;
           break;                
         default:
@@ -211,14 +255,30 @@ void GlslProgram::DeleteProgram ()
 
   for (ShaderArray::iterator iter=shaders.begin (), end=shaders.end (); iter!=end; ++iter)
   {
-    if (glDetachShader) glDetachShader    (handle, (*iter)->GetHandle ());
-    else                glDetachObjectARB (handle, (*iter)->GetHandle ());
+    if (glDetachShader)
+    {
+      glDetachShader (handle, (*iter)->GetHandle ());
+    }
+#ifndef OPENGL_ES2_SUPPORT
+    else
+    {
+      glDetachObjectARB (handle, (*iter)->GetHandle ());
+    }
+#endif
   }
 
     //удаление программы
 
-  if (glDeleteProgram) glDeleteProgram   (handle);
-  else                 glDeleteObjectARB (handle);
+  if (glDeleteProgram)
+  {
+    glDeleteProgram (handle);
+  }
+#ifndef OPENGL_ES2_SUPPORT
+  else
+  {
+    glDeleteObjectARB (handle);
+  }
+#endif
 
     //проверка ошибок
 
@@ -243,8 +303,16 @@ void GlslProgram::GetProgramLog (stl::string& log_buffer)
 
   GLint log_length = 0;
 
-  if (glGetProgramiv) glGetProgramiv            (handle, GL_INFO_LOG_LENGTH, &log_length);
-  else                glGetObjectParameterivARB (handle, GL_INFO_LOG_LENGTH, &log_length);
+  if (glGetProgramiv)
+  {
+    glGetProgramiv (handle, GL_INFO_LOG_LENGTH, &log_length);
+  }
+#ifndef OPENGL_ES2_SUPPORT
+  else
+  {
+    glGetObjectParameterivARB (handle, GL_INFO_LOG_LENGTH, &log_length);
+  }
+#endif
 
   if (!log_length)
     return;
@@ -255,8 +323,16 @@ void GlslProgram::GetProgramLog (stl::string& log_buffer)
 
   log_buffer.resize (log_length - 1);
 
-  if (glGetProgramInfoLog) glGetProgramInfoLog (handle, log_length, &getted_log_size, &log_buffer [0]);
-  else                     glGetInfoLogARB     (handle, log_length, &getted_log_size, &log_buffer [0]);
+  if (glGetProgramInfoLog)
+  {
+    glGetProgramInfoLog (handle, log_length, &getted_log_size, &log_buffer [0]);
+  }
+#ifndef OPENGL_ES2_SUPPORT
+  else
+  {
+    glGetInfoLogARB (handle, log_length, &getted_log_size, &log_buffer [0]);
+  }
+#endif
 
   if (getted_log_size)
     log_buffer.resize (getted_log_size - 1);

@@ -54,29 +54,13 @@ Texture2D::Texture2D (const ContextManager& manager, const TextureDesc& tex_desc
       break;    
   }
 
-#ifndef OPENGL_ES_SUPPORT
-
-    //проверка возможности создания текстуры
-
-//  glTexImage2D (GL_PROXY_TEXTURE_2D, 1, gl_internal_format, tex_desc.width, tex_desc.height, 0, gl_uncompressed_format, gl_uncompressed_type, 0);
-
-//  GLint proxy_width = 0;
-
-//  glGetTexLevelParameteriv (GL_PROXY_TEXTURE_2D, 1, GL_TEXTURE_WIDTH, &proxy_width);
-
-//  if (!proxy_width)
-//    throw xtl::format_not_supported_exception (METHOD_NAME, "Can't create 2D texture %ux%u@%s. Reason: proxy texure fail", tex_desc.width,
-//      tex_desc.height, get_name (tex_desc.format));
-            
-#endif
-
   if (data || !ignore_null_data)
   {    
       //настройка расположения данных в буфере    
 
     glPixelStorei (GL_UNPACK_ALIGNMENT, 1); //выравнивание начала строк
 
-#ifndef OPENGL_ES_SUPPORT
+#if !defined(OPENGL_ES_SUPPORT) && !defined(OPENGL_ES2_SUPPORT)
 
     glPixelStorei (GL_UNPACK_SKIP_ROWS,   0); //количество пропускаемых строк
     glPixelStorei (GL_UNPACK_SKIP_PIXELS, 0); //количество пропускаемых пикселей
@@ -151,7 +135,7 @@ Texture2D::Texture2D (const ContextManager& manager, const TextureDesc& tex_desc
       }
       else
       {
-#ifndef OPENGL_ES_SUPPORT
+#if !defined(OPENGL_ES_SUPPORT) && !defined(OPENGL_ES2_SUPPORT)
 
         glPixelStorei (GL_UNPACK_ROW_LENGTH, level_desc.width); //длина строки в пикселях (для нулевого mip-уровня)
         
@@ -171,7 +155,7 @@ Texture2D::Texture2D (const ContextManager& manager, const TextureDesc& tex_desc
 
       data_selector.Next ();
 
-#ifndef OPENGL_ES_SUPPORT
+#if !defined(OPENGL_ES_SUPPORT) && !defined(OPENGL_ES2_SUPPORT)
 
       glGetTexLevelParameteriv (GL_TEXTURE_2D, i, GL_TEXTURE_INTERNAL_FORMAT, (GLint*)&gl_internal_format);
 

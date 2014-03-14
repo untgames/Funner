@@ -86,7 +86,9 @@ struct ContextCaps
   PFNGLBLENDFUNCSEPARATEPROC                   glBlendFuncSeparate_fn;
   PFNGLBUFFERDATAPROC                          glBufferData_fn;
   PFNGLBUFFERSUBDATAPROC                       glBufferSubData_fn;
+#ifndef OPENGL_ES2_SUPPORT
   PFNGLCLIENTACTIVETEXTUREPROC                 glClientActiveTexture_fn;
+#endif
   PFNGLCOMPRESSEDTEXIMAGE2DPROC                glCompressedTexImage2D_fn;
   PFNGLCOMPRESSEDTEXSUBIMAGE2DPROC             glCompressedTexSubImage2D_fn;
   PFNGLDELETEBUFFERSPROC                       glDeleteBuffers_fn;
@@ -109,13 +111,20 @@ struct ContextCaps
   PFNGLGENERATEMIPMAPPROC                      glGenerateMipmap_fn;
 
 #ifndef OPENGL_ES_SUPPORT
+
+#ifndef OPENGL_ES2_SUPPORT
   PFNGLGETBUFFERSUBDATAPROC         glGetBufferSubData_fn;
   PFNGLGETCOMPRESSEDTEXIMAGEPROC    glGetCompressedTexImage_fn;
-  PFNGLGETUNIFORMLOCATIONPROC       glGetUniformLocation_fn;
   PFNGLLOADTRANSPOSEMATRIXDPROC     glLoadTransposeMatrixd_fn;    
   PFNGLLOADTRANSPOSEMATRIXFPROC     glLoadTransposeMatrixf_fn;
   PFNGLMULTTRANSPOSEMATRIXDPROC     glMultTransposeMatrixd_fn;
-  PFNGLMULTTRANSPOSEMATRIXFPROC     glMultTransposeMatrixf_fn;  
+  PFNGLMULTTRANSPOSEMATRIXFPROC     glMultTransposeMatrixf_fn;
+  PFNGLVERTEXATTRIBIPOINTERPROC     glVertexAttribIPointer_fn;
+  PFNGLVERTEXATTRIBLPOINTERPROC     glVertexAttribLPointer_fn;
+  PFNGLFRAMEBUFFERTEXTURE1DPROC     glFramebufferTexture1D_fn;
+#endif
+
+  PFNGLGETUNIFORMLOCATIONPROC       glGetUniformLocation_fn;
   PFNGLUNIFORM1FVPROC               glUniform1fv_fn;
   PFNGLUNIFORM1IVPROC               glUniform1iv_fn;
   PFNGLUNIFORM2FVPROC               glUniform2fv_fn;
@@ -129,13 +138,9 @@ struct ContextCaps
   PFNGLUNIFORMMATRIX4FVPROC         glUniformMatrix4fv_fn;
   PFNGLUSEPROGRAMPROC               glUseProgram_fn;
   PFNGLVERTEXATTRIBPOINTERPROC      glVertexAttribPointer_fn;
-  PFNGLVERTEXATTRIBIPOINTERPROC     glVertexAttribIPointer_fn;
-  PFNGLVERTEXATTRIBLPOINTERPROC     glVertexAttribLPointer_fn;
   PFNGLDISABLEVERTEXATTRIBARRAYPROC glDisableVertexAttribArray_fn;
   PFNGLENABLEVERTEXATTRIBARRAYPROC  glEnableVertexAttribArray_fn;
-
-  PFNGLFRAMEBUFFERTEXTURE1DPROC    glFramebufferTexture1D_fn;
-  PFNGLFRAMEBUFFERTEXTURE3DPROC    glFramebufferTexture3D_fn;
+  PFNGLFRAMEBUFFERTEXTURE3DPROC     glFramebufferTexture3D_fn;
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

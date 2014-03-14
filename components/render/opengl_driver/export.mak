@@ -28,3 +28,9 @@ export.link.render.low_level.opengl_driver.win32.IMPORTS := link.extern.gles_win
 export.run.render.low_level.opengl_driver.win32.IMPORTS  := run.extern.gles_win32
 export.link.render.low_level.opengl_driver.wince.IMPORTS := link.extern.gles_wince
 endif
+
+ifneq (,$(filter gles2,$(PROFILES)))
+export.link.render.low_level.opengl_driver.win32.IMPORTS := link.extern.gles2_win32
+export.run.render.low_level.opengl_driver.win32.IMPORTS  := run.extern.gles2_win32
+export.link.render.low_level.opengl_driver.wince.IMPORTS := link.extern.gles2_wince
+endif

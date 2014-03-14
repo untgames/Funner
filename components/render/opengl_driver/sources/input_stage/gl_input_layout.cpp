@@ -6,6 +6,10 @@ using namespace common;
 
 //TODO check that there no duplicates in names
 
+#ifdef _MSC_VER
+  #pragma warning (disable : 4065) // switch statement contains 'default' but no 'case' labels
+#endif
+
 /*
     Константы
 */
@@ -378,6 +382,7 @@ void InputLayout::SetDesc (const InputLayoutDesc& desc)
 #ifndef OPENGL_ES_SUPPORT
         switch (va.type)
         {
+#ifndef OPENGL_ES2_SUPPORT
           case InputDataType_Byte:
           case InputDataType_UByte:
           case InputDataType_Short:
@@ -386,7 +391,7 @@ void InputLayout::SetDesc (const InputLayoutDesc& desc)
           case InputDataType_UInt:
             if (!caps.glVertexAttribIPointer_fn)
               throw xtl::format_exception<xtl::not_supported_exception> (METHOD_NAME, "Integer vertex attribute '%s' is not supported (no GL_NV_vertex_program4 extension)", va.semantic);
-
+#endif
           case InputDataType_Float:
             if (!caps.glVertexAttribPointer_fn)
               throw xtl::format_exception<xtl::not_supported_exception> (METHOD_NAME, "Vertex attribute '%s' is not supported (no GL_ARB_vertex_shader extension)", va.semantic);
@@ -640,6 +645,8 @@ void InputLayout::SetDesc (const InputLayoutDesc& desc)
     Установка состояния в контекст OpenGL
 */
 
+#ifndef OPENGL_ES2_SUPPORT
+
 namespace
 {
 
@@ -662,6 +669,8 @@ void set_client_capability (GLenum capability, size_t current_mask, size_t requi
 
 }
 
+#endif
+
 void InputLayout::BindVertexAttributes (size_t base_vertex, BufferPtr* vertex_buffers, ShaderAttributeLayout* shader_layout)
 {
   static const char* METHOD_NAME = "render::low_level::opengl::InputLayout::BindVertexAttributes";
@@ -673,6 +682,8 @@ void InputLayout::BindVertexAttributes (size_t base_vertex, BufferPtr* vertex_bu
   for (GlVertexAttributeGroupArray::iterator iter=vertex_attribute_groups.begin (), end=vertex_attribute_groups.end (); iter!=end; ++iter)
     if (!vertex_buffers [iter->slot])
       throw xtl::format_operation_exception (METHOD_NAME, "Null vertex buffer #%u", iter->slot);
+
+#ifndef OPENGL_ES2_SUPPORT
       
     //отключение неиспользуемых и включение используемых вершинных массивов
     
@@ -712,6 +723,8 @@ void InputLayout::BindVertexAttributes (size_t base_vertex, BufferPtr* vertex_bu
 
     SetContextCacheValue (CacheEntry_EnabledSemantics, used_semantics_mask);
   }
+
+#endif
 
 #ifndef OPENGL_ES_SUPPORT
   const size_t current_enabled_shader_semantics_mask = GetContextCacheValue (CacheEntry_EnabledShaderSemantics),
@@ -765,6 +778,7 @@ void InputLayout::BindVertexAttributes (size_t base_vertex, BufferPtr* vertex_bu
       
       switch (va.semantic)
       {
+#ifndef OPENGL_ES2_SUPPORT
         case VertexAttributeSemantic_Position:
           glVertexPointer (va.components, va.type, va.stride, offset);          
           break;
@@ -793,6 +807,7 @@ void InputLayout::BindVertexAttributes (size_t base_vertex, BufferPtr* vertex_bu
           glTexCoordPointer (va.components, va.type, va.stride, offset);
           break;
         }
+#endif
         default:
         {
           if (va.semantic >= 0 || !attribute_location)
@@ -806,6 +821,7 @@ void InputLayout::BindVertexAttributes (size_t base_vertex, BufferPtr* vertex_bu
 #ifndef OPENGL_ES_SUPPORT
           switch (va.type)
           {
+#ifndef OPENGL_ES2_SUPPORT
             case GL_BYTE:
             case GL_UNSIGNED_BYTE:
             case GL_SHORT:
@@ -817,6 +833,7 @@ void InputLayout::BindVertexAttributes (size_t base_vertex, BufferPtr* vertex_bu
             case GL_DOUBLE:
               caps.glVertexAttribLPointer_fn ((GLuint)location, va.components, va.type, va.stride, offset);
               break;
+#endif
             default:
               caps.glVertexAttribPointer_fn ((GLuint)location, va.components, va.type, GL_FALSE, va.stride, offset);
               break;

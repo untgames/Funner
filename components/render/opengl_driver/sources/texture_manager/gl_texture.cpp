@@ -113,12 +113,14 @@ Texture::Texture
   {
     Bind ();
 
-#ifndef OPENGL_ES_SUPPORT
+#if !defined(OPENGL_ES_SUPPORT) && !defined(OPENGL_ES2_SUPPORT)
     glTexParameteri (target, GL_TEXTURE_MAX_LEVEL, mips_count - 1);
 #endif
 
+#ifndef OPENGL_ES2_SUPPORT
     if (desc.generate_mips_enable && GetCaps ().has_sgis_generate_mipmap)
       glTexParameteri (target, GL_GENERATE_MIPMAP, GL_TRUE);
+#endif
   }
 
     //проверка ошибок
@@ -311,7 +313,7 @@ void Texture::BuildMipmaps
     x               /= 2;
     y               /= 2;    
     
-#ifndef OPENGL_ES_SUPPORT
+#if !defined(OPENGL_ES_SUPPORT) && !defined(OPENGL_ES2_SUPPORT)
 
     if (target != GL_TEXTURE_CUBE_MAP)
       z /= 2;
@@ -410,7 +412,7 @@ void Texture::SetData
 
   Bind ();  
   
-#ifndef OPENGL_ES_SUPPORT
+#if !defined(OPENGL_ES_SUPPORT) && !defined(OPENGL_ES2_SUPPORT)
 
     //настройка параметров расположения данных в буфере
 
@@ -565,7 +567,7 @@ void Texture::SetData
 }
 
 
-#ifndef OPENGL_ES_SUPPORT
+#if !defined(OPENGL_ES_SUPPORT) && !defined(OPENGL_ES2_SUPPORT)
 
 void Texture::GetData
  (size_t          layer,

@@ -180,6 +180,7 @@ struct ShaderStage::Impl: public ContextObject, public ShaderStageState
 
 #endif
 
+#ifndef OPENGL_ES2_SUPPORT
         if (GetCaps ().has_ffp)
         {
           RegisterManager (ShaderManagerPtr (create_ffp_shader_manager (context_manager), false));
@@ -197,6 +198,7 @@ struct ShaderStage::Impl: public ContextObject, public ShaderStageState
           
           default_program = ProgramPtr (CreateProgram (1, &shader_desc, xtl::bind (&Impl::LogShaderMessage, this, _1)), false);
         }
+#endif
 
 #ifndef OPENGL_ES_SUPPORT
 

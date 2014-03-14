@@ -238,13 +238,29 @@ void GlslBindableProgram::Validate ()
     
       //проверка состо€ни€ программы
 
-    if (glValidateProgram) glValidateProgram    (handle);
-    else                   glValidateProgramARB (handle);
+    if (glValidateProgram)
+    {
+      glValidateProgram (handle);
+    }
+#ifndef OPENGL_ES2_SUPPORT
+    else
+    {
+      glValidateProgramARB (handle);
+    }
+#endif
     
     GLint status = 0;
 
-    if (glGetProgramiv) glGetProgramiv            (handle, GL_OBJECT_VALIDATE_STATUS_ARB, &status);        
-    else                glGetObjectParameterivARB (handle, GL_OBJECT_VALIDATE_STATUS_ARB, &status);
+    if (glGetProgramiv)
+    {
+      glGetProgramiv (handle, GL_OBJECT_VALIDATE_STATUS_ARB, &status);
+    }
+#ifndef OPENGL_ES2_SUPPORT
+    else
+    {
+      glGetObjectParameterivARB (handle, GL_OBJECT_VALIDATE_STATUS_ARB, &status);
+    }
+#endif
     
       //проверка ошибок
     

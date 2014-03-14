@@ -160,7 +160,7 @@ struct TextureManager::Impl: public ContextObject
       texture_manager (in_texture_manager),
       state (this)
     {
-#ifndef OPENGL_ES_SUPPORT
+#if !defined(OPENGL_ES_SUPPORT) && !defined(OPENGL_ES2_SUPPORT)
       //выбор текущего контекста
 
       MakeContextCurrent ();
@@ -406,7 +406,7 @@ struct TextureManager::Impl: public ContextObject
 
       if (is_pot || caps.has_arb_texture_non_power_of_two)
       {
-#ifndef OPENGL_ES_SUPPORT        
+#if !defined(OPENGL_ES_SUPPORT) && !defined(OPENGL_ES2_SUPPORT)
         static Extension BUG_texture_no_subimage = "GLBUG_texture_no_subimage";
 
         if (IsSupported (BUG_texture_no_subimage))
@@ -416,7 +416,7 @@ struct TextureManager::Impl: public ContextObject
         return new Texture2D (GetContextManager (), desc, data);
       }      
       
-#ifndef OPENGL_ES_SUPPORT      
+#if !defined(OPENGL_ES_SUPPORT) && !defined(OPENGL_ES2_SUPPORT)
 
       if (caps.has_arb_texture_rectangle && !is_compressed (desc.format) && !desc.generate_mips_enable)
       {
@@ -469,7 +469,7 @@ struct TextureManager::Impl: public ContextObject
       return new ScaledTexture (GetContextManager (), texture_manager, desc, data);
     }              
     
-#ifndef OPENGL_ES_SUPPORT
+#if !defined(OPENGL_ES_SUPPORT) && !defined(OPENGL_ES2_SUPPORT)
 
       //создание одномерной текстуры
     ITexture* CreateTexture1D (const TextureDesc& in_desc, const TextureData* data)

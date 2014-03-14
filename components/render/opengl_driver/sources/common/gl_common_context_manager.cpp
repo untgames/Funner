@@ -51,7 +51,7 @@ class ContextImpl: public xtl::reference_counter, private IContextListener
 
           //отключение буферов отрисовки          
           
-#ifndef OPENGL_ES_SUPPORT
+#if !defined(OPENGL_ES_SUPPORT) && !defined(OPENGL_ES2_SUPPORT)
 
         glDrawBuffer (0);
         glReadBuffer (0);
@@ -103,7 +103,11 @@ class ContextImpl: public xtl::reference_counter, private IContextListener
         };        
 
         static VersionEntry version_entries [] = {
+#ifndef OPENGL_ES2_SUPPORT
           VersionEntry ("1.1", "GL_VERSION_1_1"),
+#else
+          VersionEntry ("2.0", "GL_VERSION_2_0"),
+#endif
 
 #ifndef OPENGL_ES_SUPPORT
           VersionEntry ("1.2", "GL_VERSION_1_2"),

@@ -5,7 +5,7 @@ using namespace render::low_level::opengl;
 namespace
 {
 
-#ifndef OPENGL_ES_SUPPORT
+#if !defined(OPENGL_ES_SUPPORT) && !defined(OPENGL_ES2_SUPPORT)
 
 /*
     Версии OpenGL
@@ -96,7 +96,7 @@ ContextCaps::ContextCaps ()
 
 void ContextCaps::Init (const ExtensionSet& available_extension_set, const ExtensionSet& enabled_extension_set, const ContextSettings& settings)
 {
-#ifndef OPENGL_ES_SUPPORT  
+#if !defined(OPENGL_ES_SUPPORT) && !defined(OPENGL_ES2_SUPPORT)
 
     //маркеры используемых расширений
 
@@ -293,7 +293,6 @@ void ContextCaps::Init (const ExtensionSet& available_extension_set, const Exten
                    AMD_compressed_ATC_texture     = "GL_AMD_compressed_ATC_texture",
                    ATI_texture_compression_atitc  = "GL_ATI_texture_compression_atitc";
 
-  has_arb_multisample                = true;
   has_arb_multitexture               = true;
   has_arb_texture_cube_map           = ext.Get (OES_texture_cube_map);
   has_arb_vertex_buffer_object       = true;
@@ -306,7 +305,18 @@ void ContextCaps::Init (const ExtensionSet& available_extension_set, const Exten
   has_ext_texture_filter_anisotropic = false; //ext.Get (EXT_texture_filter_anisotropic);   //supported on Qualcomm Adreno 205 but generates error
   has_img_texture_compression_pvrtc  = ext.Get (IMG_texture_compression_pvrtc);
   has_amd_compressed_atc_texture     = ext.Get (AMD_compressed_ATC_texture) || ext.Get (ATI_texture_compression_atitc);
+#ifdef OPENGL_ES_SUPPORT
   has_sgis_generate_mipmap           = true;
+  has_arb_multisample                = true;
+#elif defined(OPENGL_ES2_SUPPORT)
+  has_arb_multisample                = false;
+  has_sgis_generate_mipmap           = false;
+  has_ext_blend_equation_separate    = true;
+  has_ext_blend_func_separate        = true;
+  has_ext_blend_subtract             = true;
+  has_ati_separate_stencil           = true;
+  has_arb_texture_border_clamp       = ext.Get ("GL_NV_texture_border_clamp");
+#endif
 
   glActiveTexture_fn           = glActiveTexture;
   glBindBuffer_fn              = glBindBuffer;
@@ -315,11 +325,14 @@ void ContextCaps::Init (const ExtensionSet& available_extension_set, const Exten
   glBlendFuncSeparate_fn       = has_ext_blend_func_separate ? glBlendFuncSeparateOES : 0;
   glBufferData_fn              = glBufferData;
   glBufferSubData_fn           = glBufferSubData;
-  glClientActiveTexture_fn     = glClientActiveTexture;
   glCompressedTexImage2D_fn    = glCompressedTexImage2D;
   glCompressedTexSubImage2D_fn = glCompressedTexSubImage2D;
   glDeleteBuffers_fn           = glDeleteBuffers;
   glGenBuffers_fn              = glGenBuffers;
+
+#ifndef OPENGL_ES2_SUPPORT
+  glClientActiveTexture_fn = glClientActiveTexture;
+#endif
   
   if (has_ext_framebuffer_object)
   {
@@ -341,11 +354,19 @@ void ContextCaps::Init (const ExtensionSet& available_extension_set, const Exten
     glGenerateMipmap_fn                      = glGenerateMipmapOES;
   }
 
+#ifdef OPENGL_ES_SUPPORT
   glGetIntegerv (GL_MAX_TEXTURE_UNITS, (GLint*)&texture_units_count);  //has_arb_multitexture always true
+#elif defined(OPENGL_ES2_SUPPORT)
+  glGetIntegerv (GL_MAX_TEXTURE_IMAGE_UNITS, (GLint*)&texture_units_count);  //has_arb_multitexture always true
+#endif
 
 #endif
 
+#ifdef OPENGL_ES2_SUPPORT
+  has_ffp = false;
+#else
   has_ffp = settings.IsFfpAllowed ();
+#endif
 
   glGetIntegerv (GL_MAX_TEXTURE_SIZE, (GLint*)&max_texture_size);
 
@@ -354,8 +375,10 @@ void ContextCaps::Init (const ExtensionSet& available_extension_set, const Exten
 
   if (has_ffp)
   {
+#ifndef OPENGL_ES2_SUPPORT
     if (has_arb_multitexture) glGetIntegerv (GL_MAX_TEXTURE_UNITS, (GLint*)&texture_units_count);
     else                      texture_units_count = 1;
+#endif
   }
 #ifndef OPENGL_ES_SUPPORT  
   else
@@ -363,7 +386,7 @@ void ContextCaps::Init (const ExtensionSet& available_extension_set, const Exten
     if (has_arb_vertex_shader)
     {
       int vertex_shader_texture_units_count, pixel_shader_texture_units_count;
-      
+
       glGetIntegerv (GL_MAX_VERTEX_TEXTURE_IMAGE_UNITS_ARB, (GLint*)&vertex_shader_texture_units_count);
       glGetIntegerv (GL_MAX_TEXTURE_IMAGE_UNITS_ARB, (GLint*)&pixel_shader_texture_units_count);
 
@@ -374,7 +397,12 @@ void ContextCaps::Init (const ExtensionSet& available_extension_set, const Exten
   }
 
   if (has_arb_vertex_shader)
-  { 
+  {
+#ifdef OPENGL_ES2_SUPPORT
+    glVertexAttribPointer_fn       = glVertexAttribPointer;
+    glDisableVertexAttribArray_fn  = glDisableVertexAttribArray;
+    glEnableVertexAttribArray_fn   = glEnableVertexAttribArray;
+#else
     glVertexAttribPointer_fn       = glVertexAttribPointer ? glVertexAttribPointer : glVertexAttribPointerARB;
     glDisableVertexAttribArray_fn  = glDisableVertexAttribArray ? glDisableVertexAttribArray : glDisableVertexAttribArrayARB;
     glEnableVertexAttribArray_fn   = glEnableVertexAttribArray ? glEnableVertexAttribArray : glEnableVertexAttribArrayARB;
@@ -384,6 +412,7 @@ void ContextCaps::Init (const ExtensionSet& available_extension_set, const Exten
 
     if (ext.Get ("GL_ARB_vertex_attrib_64bit") || ext.Get ("GL_EXT_vertex_attrib_64bit"))
       glVertexAttribLPointer_fn  = glVertexAttribLPointer ? glVertexAttribLPointer : glVertexAttribLPointerEXT;
+#endif
   }
 
 #endif
@@ -412,12 +441,12 @@ void ContextCaps::GetDeviceCaps (render::low_level::DeviceCaps& caps) const
 {
   memset (&caps, 0, sizeof (DeviceCaps));
   
-#ifndef OPENGL_ES_SUPPORT
+#if !defined(OPENGL_ES_SUPPORT) && !defined(OPENGL_ES2_SUPPORT)
   caps.has_texture1d = true;
 #else
   caps.has_texture1d = false;
-#endif  
-  
+#endif
+
   caps.max_texture_2d_size            = max_rectangle_texture_size > max_texture_size ? max_rectangle_texture_size : max_texture_size;
   caps.max_texture_1d_size            = caps.has_texture1d ? caps.max_texture_2d_size : 0;
   caps.max_texture_3d_size            = max_3d_texture_size;

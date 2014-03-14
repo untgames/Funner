@@ -91,6 +91,7 @@ void SamplerState::Bind (GLenum tex_target, bool is_depth)
       break;
   }  
 
+#ifndef OPENGL_ES2_SUPPORT
   if (caps.has_sgis_texture_lod)
   {
     glTexParameterf (tex_target, GL_TEXTURE_MIN_LOD, impl->desc.min_lod);
@@ -112,6 +113,7 @@ void SamplerState::Bind (GLenum tex_target, bool is_depth)
   }
   
   glTexParameterfv (tex_target, GL_TEXTURE_BORDER_COLOR, (const float*)impl->desc.border_color);  
+#endif
 
 #endif
 
@@ -254,13 +256,21 @@ void SamplerState::SetDesc (const SamplerDesc& in_desc)
         break;
       case TexcoordWrap_ClampToBorder: 
         if (caps.has_arb_texture_border_clamp)
+#ifndef OPENGL_ES2_SUPPORT
           gl_wrap [i] = GL_CLAMP_TO_BORDER;
+#else
+          gl_wrap [i] = GL_CLAMP_TO_BORDER_NV;
+#endif
         else
           throw xtl::format_not_supported_exception (METHOD_NAME, "Can't set %s=%s (GL_ARB_texture_border_clamp not supported)", wrap_name [i], get_name (wrap [i]));
           
         break;
       case TexcoordWrap_Clamp:
+#ifndef OPENGL_ES2_SUPPORT
         gl_wrap [i] = caps.has_sgis_texture_edge_clamp ? GL_CLAMP_TO_EDGE : GL_CLAMP;
+#else
+        gl_wrap [i] = GL_CLAMP_TO_EDGE;
+#endif
         break;
       case TexcoordWrap_Repeat:
         gl_wrap [i] = GL_REPEAT;

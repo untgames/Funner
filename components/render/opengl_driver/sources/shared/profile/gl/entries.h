@@ -28,12 +28,12 @@ namespace opengl
 class ILibrary;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///’®çª¨ ¢å®¤  OpenGL
+///Òî÷êè âõîäà OpenGL
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 struct GlEntries
 {
   /*
-      ’®çª¨ ¢å®¤  OpenGL 1.1  
+      Òî÷êè âõîäà OpenGL 1.1  
   */
 
   void (APIENTRY* Accum)(GLenum op, GLfloat value);
@@ -374,7 +374,7 @@ struct GlEntries
   void (APIENTRY* Viewport)(GLint x, GLint y, GLsizei width, GLsizei height);
   
   /*
-      ’®çª¨ ¢å®¤  à áè¨à¥­¨© OpenGL
+      Òî÷êè âõîäà ðàñøèðåíèé OpenGL
   */
 
   PFNGLBLENDCOLORPROC BlendColor;
@@ -2460,18 +2460,18 @@ struct GlEntries
   PFNGLTEXTURESTORAGESPARSEAMDPROC TextureStorageSparseAMD;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///ˆ­¨æ¨ «¨§ æ¨ï â®ç¥ª ¢å®¤ 
+///Èíèöèàëèçàöèÿ òî÷åê âõîäà
 ///////////////////////////////////////////////////////////////////////////////////////////////////
   void Init (ILibrary&);
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///®«ãç¥­¨¥ â ¡«¨æë â®ç¥ª ¢å®¤  ¤«ï â¥ªãé¥£® ª®­â¥ªáâ 
+///Ïîëó÷åíèå òàáëèöû òî÷åê âõîäà äëÿ òåêóùåãî êîíòåêñòà
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 const GlEntries* get_gl_entries ();
 
 /*
-    ¥à¥®¯à¥¤¥«¥­¨ï OpenGL 1.1
+    Ïåðåîïðåäåëåíèÿ OpenGL 1.1
 */
 
 #define glAccum get_gl_entries ()->Accum
@@ -2812,7 +2812,7 @@ const GlEntries* get_gl_entries ();
 #define glViewport get_gl_entries ()->Viewport
 
 /*
-    ¥à¥®¯à¥¤¥«¥­¨ï à áè¨à¥­¨© OpenGL
+    Ïåðåîïðåäåëåíèÿ ðàñøèðåíèé OpenGL
 */
 
 #define glBlendColor get_gl_entries ()->BlendColor
