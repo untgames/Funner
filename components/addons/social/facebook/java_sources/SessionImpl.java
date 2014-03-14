@@ -6,6 +6,7 @@ import java.util.List;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.ApplicationInfo;
 import android.util.Log;
 
 import com.facebook.AppEventsLogger;
@@ -163,6 +164,20 @@ public class SessionImpl implements EngineActivity.EngineActivityEventListener, 
   {
     if (Session.getActiveSession () != null)
       Session.getActiveSession ().closeAndClearTokenInformation ();
+  }
+
+  public static boolean isFacebookAppInstalled (Context context)
+  {
+    try
+    {
+      ApplicationInfo info = context.getPackageManager ().getApplicationInfo ("com.facebook.katana", 0);
+
+      return true;
+    } 
+    catch (Throwable e)
+    {
+      return false;
+    }
   }
 
 	public void publishInstall ()

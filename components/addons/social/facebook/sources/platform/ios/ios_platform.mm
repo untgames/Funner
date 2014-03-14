@@ -443,6 +443,15 @@ void IOsPlatform::CancelLogin ()
 }
 
 /*
+   ѕроверка, установлено ли приложение facebook
+*/
+
+bool IOsPlatform::IsFacebookAppInstalled ()
+{
+  return [[UIApplication sharedApplication] canOpenURL:[NSURL URLWithString:@"fbauth://"]];
+}
+
+/*
    ѕубликаци€ событи€ установки приложени€
 */
 

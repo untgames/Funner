@@ -105,6 +105,25 @@ class AndroidPlatformImpl
       }
     }
 
+    //ѕроверка, установлено ли приложение facebook
+    bool IsFacebookAppInstalled ()
+    {
+      if (!IsFacebookSDKSupported ())
+        return false;
+
+      try
+      {
+        JNIEnv* env = &get_env ();
+
+        return env->CallStaticBooleanMethod (session_class, is_facebook_app_installed_method, get_activity ());
+      }
+      catch (xtl::exception& e)
+      {
+        e.touch ("social::facebook::AndroidPlatformImpl::IsFacebookAppInstalled");
+        throw;
+      }
+    }
+
     //Track app install
     void PublishInstall (const char* app_id)
     {
@@ -154,11 +173,12 @@ class AndroidPlatformImpl
 
      env->DeleteLocalRef (session_class_ref);
 
-     session_init_method        = find_method (env, session_class, "<init>", "(Lcom/untgames/funner/application/EngineActivity;Ljava/lang/String;)V");
-     can_login_method           = find_method (env, session_class, "canLogin", "()Z");
-     login_method               = find_method (env, session_class, "login", "(Ljava/lang/String;)V");
-     logout_method              = find_static_method (env, session_class, "logout", "()V");
-     publish_app_install_method = find_method (env, session_class, "publishInstall", "()V");
+     session_init_method              = find_method (env, session_class, "<init>", "(Lcom/untgames/funner/application/EngineActivity;Ljava/lang/String;)V");
+     can_login_method                 = find_method (env, session_class, "canLogin", "()Z");
+     login_method                     = find_method (env, session_class, "login", "(Ljava/lang/String;)V");
+     logout_method                    = find_static_method (env, session_class, "logout", "()V");
+     publish_app_install_method       = find_method (env, session_class, "publishInstall", "()V");
+     is_facebook_app_installed_method = find_static_method (env, session_class, "isFacebookAppInstalled", "(Landroid/content/Context;)Z");
 
      try
      {
@@ -222,14 +242,15 @@ class AndroidPlatformImpl
     }
 
   private:
-    common::Log log;                        //logger
-    jclass      session_class;              //session class
-    jobject     session;                    //session isntance
-    jmethodID   session_init_method;        //session constructor
-    jmethodID   can_login_method;           //check if login available method
-    jmethodID   login_method;               //login method
-    jmethodID   logout_method;              //logout method
-    jmethodID   publish_app_install_method; //session publish install method
+    common::Log log;                              //logger
+    jclass      session_class;                    //session class
+    jobject     session;                          //session isntance
+    jmethodID   session_init_method;              //session constructor
+    jmethodID   can_login_method;                 //check if login available method
+    jmethodID   login_method;                     //login method
+    jmethodID   logout_method;                    //logout method
+    jmethodID   publish_app_install_method;       //session publish install method
+    jmethodID   is_facebook_app_installed_method; //check if facebook application is installed on device
     social::facebook::DefaultPlatform::PlatformLoginCallback login_handler; //login result handler
 };
 
@@ -273,6 +294,15 @@ void AndroidPlatform::CancelLogin ()
 void AndroidPlatform::LogOut ()
 {
   AndroidPlatformSingleton::Instance ()->LogOut ();
+}
+
+/*
+   ѕроверка, установлено ли приложение facebook
+*/
+
+bool AndroidPlatform::IsFacebookAppInstalled ()
+{
+  return AndroidPlatformSingleton::Instance ()->IsFacebookAppInstalled ();
 }
 
 /*

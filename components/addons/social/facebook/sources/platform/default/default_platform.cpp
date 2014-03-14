@@ -25,6 +25,15 @@ void DefaultPlatform::LogOut ()
 }
 
 /*
+   ѕроверка, установлено ли приложение facebook
+*/
+
+bool DefaultPlatform::IsFacebookAppInstalled ()
+{
+  return false;
+}
+
+/*
    ѕубликаци€ событи€ установки приложени€
 */
 

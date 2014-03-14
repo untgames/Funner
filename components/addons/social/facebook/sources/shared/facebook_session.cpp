@@ -367,6 +367,7 @@ void FacebookSessionImpl::OnCurrentUserInfoLoaded (bool succeeded, const stl::st
   current_user = logged_in_user;
 
   current_user.Properties ().SetProperty ("Token", token.c_str ());
+  current_user.Properties ().SetProperty ("IsFacebookAppInstalled", Platform::IsFacebookAppInstalled () ? 1 : 0);
 
   logged_in = true;
 
