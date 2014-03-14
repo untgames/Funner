@@ -99,10 +99,12 @@ struct Output::Impl
     {
       log.Printf ("...get device context");
 
+#ifndef OPENGL_ES2_SUPPORT
       native_display = ::GetDC (native_window);      
 
       if (!native_display)
         throw xtl::format_operation_exception ("::GetDC", "Operation failed"); //сделать через raise_error!!!
+#endif
 
       log.Printf ("...get window name");
 
