@@ -8,7 +8,7 @@
 #endif
 
 #ifndef GL_APIENTRY
-#define GL_APIENTRY
+#define GL_APIENTRY KHRONOS_APIENTRY
 #endif
 
 #endif

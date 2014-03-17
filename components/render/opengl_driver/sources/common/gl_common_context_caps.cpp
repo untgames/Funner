@@ -278,15 +278,9 @@ void ContextCaps::Init (const ExtensionSet& available_extension_set, const Exten
   }
   
 #else
-
   ExtensionSet ext = available_extension_set;
 
-  static Extension OES_blend_equation_separate    = "GL_OES_blend_equation_separate",
-                   OES_blend_func_separate        = "GL_OES_blend_func_separate",
-                   OES_blend_subtract             = "GL_OES_blend_subtract",
-                   OES_framebuffer_object         = "GL_OES_framebuffer_object",
-                   OES_texture_cube_map           = "GL_OES_texture_cube_map",
-                   OES_packed_depth_stencil       = "GL_OES_packed_depth_stencil",
+  static Extension OES_packed_depth_stencil       = "GL_OES_packed_depth_stencil",
                    EXT_texture_compression_s3tc   = "GL_EXT_texture_compression_s3tc",
 //                   EXT_texture_filter_anisotropic = "GL_EXT_texture_filter_anisotropic",
                    IMG_texture_compression_pvrtc  = "GL_IMG_texture_compression_pvrtc",
@@ -294,21 +288,30 @@ void ContextCaps::Init (const ExtensionSet& available_extension_set, const Exten
                    ATI_texture_compression_atitc  = "GL_ATI_texture_compression_atitc";
 
   has_arb_multitexture               = true;
-  has_arb_texture_cube_map           = ext.Get (OES_texture_cube_map);
   has_arb_vertex_buffer_object       = true;
-  has_ext_blend_equation_separate    = ext.Get (OES_blend_equation_separate);
-  has_ext_blend_func_separate        = ext.Get (OES_blend_func_separate);
-  has_ext_blend_subtract             = ext.Get (OES_blend_subtract);
-  has_ext_framebuffer_object         = ext.Get (OES_framebuffer_object);
   has_ext_packed_depth_stencil       = ext.Get (OES_packed_depth_stencil);
   has_ext_texture_compression_s3tc   = ext.Get (EXT_texture_compression_s3tc);
   has_ext_texture_filter_anisotropic = false; //ext.Get (EXT_texture_filter_anisotropic);   //supported on Qualcomm Adreno 205 but generates error
   has_img_texture_compression_pvrtc  = ext.Get (IMG_texture_compression_pvrtc);
   has_amd_compressed_atc_texture     = ext.Get (AMD_compressed_ATC_texture) || ext.Get (ATI_texture_compression_atitc);
+
 #ifdef OPENGL_ES_SUPPORT
+  static Extension OES_blend_equation_separate = "GL_OES_blend_equation_separate",
+                   OES_blend_func_separate     = "GL_OES_blend_func_separate",
+                   OES_blend_subtract          = "GL_OES_blend_subtract",
+                   OES_framebuffer_object      = "GL_OES_framebuffer_object",
+                   OES_texture_cube_map        = "GL_OES_texture_cube_map";
+
+  has_arb_texture_cube_map           = ext.Get (OES_texture_cube_map);
+  has_ext_blend_equation_separate    = ext.Get (OES_blend_equation_separate);
+  has_ext_blend_func_separate        = ext.Get (OES_blend_func_separate);
+  has_ext_blend_subtract             = ext.Get (OES_blend_subtract);
+  has_ext_framebuffer_object         = ext.Get (OES_framebuffer_object);
   has_sgis_generate_mipmap           = true;
   has_arb_multisample                = true;
 #elif defined(OPENGL_ES2_SUPPORT)
+  has_arb_texture_cube_map           = true;
+  has_ext_framebuffer_object         = true;
   has_arb_multisample                = false;
   has_sgis_generate_mipmap           = false;
   has_ext_blend_equation_separate    = true;
@@ -317,7 +320,6 @@ void ContextCaps::Init (const ExtensionSet& available_extension_set, const Exten
   has_ati_separate_stencil           = true;
   has_arb_texture_border_clamp       = ext.Get ("GL_NV_texture_border_clamp");
 #endif
-
   glActiveTexture_fn           = glActiveTexture;
   glBindBuffer_fn              = glBindBuffer;
   glBlendEquation_fn           = has_ext_blend_subtract ? glBlendEquationOES : 0;
@@ -329,11 +331,10 @@ void ContextCaps::Init (const ExtensionSet& available_extension_set, const Exten
   glCompressedTexSubImage2D_fn = glCompressedTexSubImage2D;
   glDeleteBuffers_fn           = glDeleteBuffers;
   glGenBuffers_fn              = glGenBuffers;
-
 #ifndef OPENGL_ES2_SUPPORT
   glClientActiveTexture_fn = glClientActiveTexture;
 #endif
-  
+
   if (has_ext_framebuffer_object)
   {
     glBindFramebuffer_fn                     = glBindFramebufferOES;
@@ -385,7 +386,7 @@ void ContextCaps::Init (const ExtensionSet& available_extension_set, const Exten
   {
     if (has_arb_vertex_shader)
     {
-      int vertex_shader_texture_units_count, pixel_shader_texture_units_count;
+      int vertex_shader_texture_units_count = 0, pixel_shader_texture_units_count = 0;
 
       glGetIntegerv (GL_MAX_VERTEX_TEXTURE_IMAGE_UNITS_ARB, (GLint*)&vertex_shader_texture_units_count);
       glGetIntegerv (GL_MAX_TEXTURE_IMAGE_UNITS_ARB, (GLint*)&pixel_shader_texture_units_count);
@@ -414,12 +415,11 @@ void ContextCaps::Init (const ExtensionSet& available_extension_set, const Exten
       glVertexAttribLPointer_fn  = glVertexAttribLPointer ? glVertexAttribLPointer : glVertexAttribLPointerEXT;
 #endif
   }
-
 #endif
-  
+
   size_t settings_max_texture_size    = settings.GetInteger (ContextSettingsInteger_MaxTextureSize),
          settings_max_anisotropy      = settings.GetInteger (ContextSettingsInteger_MaxAnisotropy),
-         settings_texture_units_count = settings.GetInteger (ContextSettingsInteger_TextureUnitsCount);         
+         settings_texture_units_count = settings.GetInteger (ContextSettingsInteger_TextureUnitsCount);
 
   if (settings_max_texture_size)
   {

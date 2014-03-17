@@ -42,7 +42,7 @@ class ContextImpl: public xtl::reference_counter, private IContextListener
         context->AttachListener (this);
 
           //выбор активного контекста          
-        
+
         context->MakeCurrent (swap_chain);
 
           //инициализация таблицы точек входа OpenGL 1.1
@@ -156,7 +156,7 @@ class ContextImpl: public xtl::reference_counter, private IContextListener
               extensions.Set (version_entries [i].extension, false);
           }        
         }
-        
+
           //определение багов работы OpenGL
 
         stl::string bug_string;

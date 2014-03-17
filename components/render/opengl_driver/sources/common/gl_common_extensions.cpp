@@ -810,6 +810,8 @@ const char* extensions [] = {
   "GL_QCOM_tiled_rendering",
   "GL_QCOM_writeonly_rendering",
   "GL_VIV_shader_binary",
+
+  "GL_ATI_texture_compression_atitc",
 #endif
 };
 
