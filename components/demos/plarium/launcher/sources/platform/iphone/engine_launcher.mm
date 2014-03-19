@@ -12,8 +12,6 @@
 
 #import "AdXTracking.h"
 
-#import <MobileAppTracker/MobileAppTracker.h>
-
 #include <cstdio>
 
 #include <utility/utils.h>
@@ -28,10 +26,6 @@ static NSString* PHONE_ADX_URL_SCHEME = @"ADX1144";
 static NSString* PAD_ADX_URL_SCHEME   = @"ADX1145";
 static NSString* PHONE_APPLE_ID       = @"543831789";
 static NSString* PAD_APPLE_ID         = @"586574454";
-
-//MobileAppTracking constants
-static NSString* MAT_AD_ID  = @"5740";
-static NSString* MAT_AD_KEY = @"3fa11cf8822ff1d86461c44ac1ee09b2";
 
 @interface Startup : NSObject
 {
@@ -153,69 +147,6 @@ static NSString* MAT_AD_KEY = @"3fa11cf8822ff1d86461c44ac1ee09b2";
 -(void)handleOpenURL:(const char*)url
 {
   [tracker handleOpenURL:[NSURL URLWithString:[NSString stringWithUTF8String:url]]];
-}
-
-@end
-
-@interface MobileAppTrackerWrapper : NSObject<MobileAppTrackerDelegate>
-{
-}
-
-@end
-
-@implementation MobileAppTrackerWrapper
-
--(void)dealloc
-{
-  [[NSNotificationCenter defaultCenter] removeObserver:self];
-
-  [super dealloc];
-}
-
--(void)reportAppInstall
-{
-  [MobileAppTracker initializeWithMATAdvertiserId:MAT_AD_ID MATConversionKey:MAT_AD_KEY];
-//  [MobileAppTracker setDebugMode:YES];               //DEBUG
-//  [MobileAppTracker setAllowDuplicateRequests:YES];  //DEBUG
-  [MobileAppTracker setDelegate:self];
-
-  NSArray*       paths        = NSSearchPathForDirectoriesInDomains (NSLibraryDirectory, NSUserDomainMask, YES);
-  NSFileManager* file_manager = [NSFileManager defaultManager];
-  NSString*      path         = [paths count] ? [paths objectAtIndex:0] : nil;
-
-  bool mat_flag_exists = [file_manager fileExistsAtPath:[path stringByAppendingPathComponent:@"Plarium/mat_report_sent.flag"]];
-
-  [MobileAppTracker setExistingUser:[file_manager fileExistsAtPath:[path stringByAppendingPathComponent:@"Plarium/Slots/Downloads_1"]] && !mat_flag_exists];
-
-  if (!mat_flag_exists)
-    [file_manager createFileAtPath:[path stringByAppendingPathComponent:@"Plarium/mat_report_sent.flag"] contents:nil attributes:nil];
-
-  [self reportAppOpen];
-}
-
--(void)reportAppOpen
-{
-  [MobileAppTracker measureSession];
-}
-
-/*!
- Delegate method called when a track action succeeds.
- @param tracker The MobileAppTracker instance.
- @param data The success data returned by the MobileAppTracker.
- */
-- (void)mobileAppTracker:(MobileAppTracker *)tracker didSucceedWithData:(NSData *)data
-{
-  NSLog (@"MAT tracking succeeded '%@'", [[[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding] autorelease]);
-}
-
-/*!
- Delegate method called when a track action fails.
- @param tracker The MobileAppTracker instance.
- @param error Error object returned by the MobileAppTracker.
- */
-- (void)mobileAppTracker:(MobileAppTracker *)tracker didFailWithError:(NSError *)error
-{
-  NSLog (@"MAT tracking failed with error '%@'", error);
 }
 
 @end
@@ -407,58 +338,6 @@ class LocalNotificationsHandler : public INotificationListener
 
 const char* LocalNotificationsHandler::LOCAL_NOTIFICATIONS_PREFIX = "LocalNotifications ";
 
-class HasOffersTrackEventHandler : public INotificationListener
-{
-  private:
-    static const char* HAS_OFFERS_TRACK_EVENT_PREFIX;
-
-  public:
-    ///Constructor/destructor
-    HasOffersTrackEventHandler (engine::IEngine* in_engine)
-      : engine (in_engine)
-    {
-      engine->AttachNotificationListener (plarium::utility::format ("%s*", HAS_OFFERS_TRACK_EVENT_PREFIX).c_str (), this);
-    }
-
-    ~HasOffersTrackEventHandler ()
-    {
-      engine->DetachNotificationListener (this);
-    }
-
-    ///Notification handler
-    void OnNotification (const char* notification)
-    {
-      notification += strlen (HAS_OFFERS_TRACK_EVENT_PREFIX);
-
-      sgi_stl::vector<sgi_stl::string> components = plarium::utility::split (notification, "|");
-
-      if (components.empty ())
-        throw sgi_stl::invalid_argument (plarium::utility::format ("HasOffersTrackEventHandler::OnNotification: invalid 'HasOffersTrackEvent' arguments '%s'", notification));
-
-      for (size_t i = 0, count = components.size (); i < count; i++)
-        if (components [i] == " ")
-          components [i] = "";
-
-      NSString* eventName = [NSString stringWithUTF8String:components [0].c_str ()];
-
-      if (components.size () == 1)
-        [MobileAppTracker measureAction:eventName];
-      else if (components.size () == 2)
-        [MobileAppTracker measureAction:eventName revenueAmount:atof (components [1].c_str ()) currencyCode:@""];
-      else
-        throw sgi_stl::invalid_argument (plarium::utility::format ("HasOffersTrackEventHandler::OnNotification: invalid 'HasOffersTrackEvent' arguments '%s'", notification));
-    }
-
-  private:
-    HasOffersTrackEventHandler (const HasOffersTrackEventHandler&);             //no impl
-    HasOffersTrackEventHandler& operator = (const HasOffersTrackEventHandler&); //no impl
-
-  private:
-    engine::IEngine *engine;
-};
-
-const char* HasOffersTrackEventHandler::HAS_OFFERS_TRACK_EVENT_PREFIX = "HasOffersTrackEvent ";
-
 }
 
 //точка входа
@@ -503,17 +382,12 @@ int main (int argc, const char* argv [], const char* env [])
 
     TrackingWrapper* tracking = [[TrackingWrapper alloc] init];
 
-    MobileAppTrackerWrapper* mat_tracking = [[MobileAppTrackerWrapper alloc] init];
-
     [[NSNotificationCenter defaultCenter] addObserver:startup selector:@selector (onStartup) name:UIApplicationDidFinishLaunchingNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:tracking selector:@selector (reportAppOpen) name:UIApplicationDidFinishLaunchingNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:tracking selector:@selector (reportAppOpen) name:UIApplicationWillEnterForegroundNotification object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:mat_tracking selector:@selector (reportAppInstall) name:UIApplicationDidFinishLaunchingNotification object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:mat_tracking selector:@selector (reportAppOpen) name:UIApplicationWillEnterForegroundNotification object:nil];
 
     SystemAlertHandler         system_alert_handler (funner);
     LocalNotificationsHandler  local_notifications_handler (funner);
-    HasOffersTrackEventHandler has_offers_track_event_handler (funner);
 
     OpenUrlHandler open_url_handler (tracking);
 

@@ -37,7 +37,6 @@ PLARIUM.LAUNCHER.SOURCES.linux.SOURCE_DIRS     := sources/platform/linux
 PLARIUM.LAUNCHER.SOURCES.iphone.SOURCE_DIRS    := sources/platform/iphone
 PLARIUM.LAUNCHER.SOURCES.android.SOURCE_DIRS   := sources/platform/android
 PLARIUM.LAUNCHER.SOURCES.tabletos.SOURCE_DIRS  := sources/platform/tabletos
-PLARIUM.LAUNCHER.SOURCES.iphone.COMPILER_CFLAGS := -F$(COMPONENT_DIR)sources/platform/iphone/Frameworks
 PLARIUM.LAUNCHER.SOURCES.IMPORTS               := compile.engine.launcher compile.plarium.hsserver compile.plarium.system link.plarium.hsserver compile.plarium.sgi_stl
 PLARIUM.LAUNCHER.SOURCES.android.IMPORTS       := link.engine.launcher
 ifneq (,$(filter android,$(PROFILES)))
