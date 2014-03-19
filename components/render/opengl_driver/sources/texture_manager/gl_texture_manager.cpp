@@ -258,8 +258,18 @@ struct TextureManager::Impl: public ContextObject
 
         if (need_change_mode)
         {
-          if (current_texture_target [i]) glDisable (current_texture_target [i]);
-          if (texture_target)             glEnable  (texture_target);
+          if (current_texture_target [i])
+            glDisable (current_texture_target [i]);
+
+          if (texture_target)
+          {
+            glEnable (texture_target);
+          }
+          else
+          {
+            if (current_texture_target [i])
+              glBindTexture (current_texture_target [i], 0);
+          }
 
           current_texture_target [i] = texture_target;
         }
@@ -410,7 +420,7 @@ struct TextureManager::Impl: public ContextObject
         static Extension BUG_texture_no_subimage = "GLBUG_texture_no_subimage";
 
         if (IsSupported (BUG_texture_no_subimage))
-          return new Texture2DNoSubimage (GetContextManager (), desc, data); //создание текстуры в режиме эмул€ции          
+          return new Texture2DNoSubimage (GetContextManager (), desc, data); //создание текстуры в режиме эмул€ции
 #endif
 
         return new Texture2D (GetContextManager (), desc, data);
