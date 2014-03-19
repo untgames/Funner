@@ -257,7 +257,6 @@ struct RenderTargetManager::Impl: public ContextObject, public RenderTargetManag
       RenderTargetManagerState (static_cast<ContextObject*> (this)),
       need_update_render_targets (false)
     {
-printf ("%s(%u)\n", __FUNCTION__, __LINE__); fflush (stdout);        
         //регистрация менеджеров буферов кадра
 
       register_swap_chain_manager (render_target_registry, GetContextManager (), swap_chain);
@@ -326,7 +325,6 @@ printf ("%s(%u)\n", __FUNCTION__, __LINE__); fflush (stdout);
 
       for (size_t i=0; i<DEVICE_RENDER_TARGET_SLOTS_COUNT; i++)
         SetScissor (i, default_scissor);
-printf ("%s(%u)\n", __FUNCTION__, __LINE__); fflush (stdout);        
     }
     
 ///Получение реестра буферов кадра
