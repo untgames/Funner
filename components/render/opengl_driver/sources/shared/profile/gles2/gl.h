@@ -8,7 +8,6 @@
 #define glBlendEquationOES glBlendEquation
 #define glBlendEquationSeparateOES glBlendEquationSeparate
 #define glBlendFuncSeparateOES glBlendFuncSeparate
-#define glBindFramebufferOES glBindFramebuffer
 #define glIsRenderbufferOES glIsRenderbuffer
 #define glBindRenderbufferOES glBindRenderbuffer
 #define glDeleteRenderbuffersOES glDeleteRenderbuffers

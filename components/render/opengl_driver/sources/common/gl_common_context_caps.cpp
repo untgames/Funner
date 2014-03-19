@@ -221,7 +221,6 @@ void ContextCaps::Init (const ExtensionSet& available_extension_set, const Exten
     glRenderbufferStorage_fn                 = glRenderbufferStorageEXT;
     glGetRenderbufferParameteriv_fn          = glGetRenderbufferParameterivEXT;
     glIsFramebuffer_fn                       = glIsFramebufferEXT;
-    glBindFramebuffer_fn                     = glBindFramebufferEXT;
     glDeleteFramebuffers_fn                  = glDeleteFramebuffersEXT;
     glGenFramebuffers_fn                     = glGenFramebuffersEXT;
     glCheckFramebufferStatus_fn              = glCheckFramebufferStatusEXT;
@@ -310,6 +309,9 @@ void ContextCaps::Init (const ExtensionSet& available_extension_set, const Exten
   has_sgis_generate_mipmap           = true;
   has_arb_multisample                = true;
 #elif defined(OPENGL_ES2_SUPPORT)
+  has_arb_shading_language_100       = true;
+  has_arb_fragment_shader            = true;
+  has_arb_vertex_shader              = true;
   has_arb_texture_cube_map           = true;
   has_ext_framebuffer_object         = true;
   has_arb_multisample                = false;
@@ -345,7 +347,6 @@ void ContextCaps::Init (const ExtensionSet& available_extension_set, const Exten
     glRenderbufferStorage_fn                 = glRenderbufferStorageOES;
     glGetRenderbufferParameteriv_fn          = glGetRenderbufferParameterivOES;
     glIsFramebuffer_fn                       = glIsFramebufferOES;
-    glBindFramebuffer_fn                     = glBindFramebufferOES;
     glDeleteFramebuffers_fn                  = glDeleteFramebuffersOES;
     glGenFramebuffers_fn                     = glGenFramebuffersOES;
     glCheckFramebufferStatus_fn              = glCheckFramebufferStatusOES;
