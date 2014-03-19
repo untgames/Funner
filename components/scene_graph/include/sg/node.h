@@ -203,7 +203,7 @@ class Node: public xtl::dynamic_cast_root
     void UnbindChild (const char* name, NodeTransformSpace invariant_space = NodeTransformSpace_Local);
     void UnbindChild (const char* name, NodeSearchMode find_mode, NodeTransformSpace invariant_space = NodeTransformSpace_Local);
 
-      //отсоединение всех потомков    
+      //отсоединение всех потомков
     void UnbindAllChildren ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -422,7 +422,7 @@ class Node: public xtl::dynamic_cast_root
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     virtual void AfterUpdateWorldTransformEvent () {} //после изменения положения объекта
     virtual void AfterSceneAttachEvent () {}          //после присоединения объекта к сцене
-    virtual void BeforeSceneDetachEvent () {}         //перед отсоединением объекта от сцены    
+    virtual void BeforeSceneDetachEvent () {}         //перед отсоединением объекта от сцены
 
   private:
     static void DestroyNode (Node*);
@@ -469,12 +469,6 @@ class NodeUpdateLock
 ///Обмен
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 void swap (NodeUpdateLock&, NodeUpdateLock&);
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Афинная композиция и декомпозиция преобразований
-///////////////////////////////////////////////////////////////////////////////////////////////////
-void affine_compose (const math::vec3f& position, const math::quatf& orientation, const math::vec3f& scale, math::mat4f& tm);
-void affine_decompose (const math::mat4f& matrix, math::vec3f& position, math::quatf& rotation, math::vec3f& scale);
 
 #include <sg/detail/node.inl>
 
