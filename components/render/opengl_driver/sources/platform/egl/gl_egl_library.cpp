@@ -460,7 +460,7 @@ void* Library::GetProcAddress (const char* name, size_t search_flags)
     EntryMap::iterator iter = impl->entries.find (name);
 
     address = iter != impl->entries.end () ? iter->second : 0;
-  }  
+  }
 
   if (address)
     return address;

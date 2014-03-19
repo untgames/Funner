@@ -47,7 +47,7 @@ struct Context::Impl
     LostCurrentNotify ();
     
     DisplayLock lock (display);
-      
+
     eglMakeCurrent (egl_display, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT);
 
     current_context = 0;
@@ -124,7 +124,13 @@ Context::Context (ISwapChain* in_swap_chain)
 
     impl->log.Printf ("Create context (id=%d)...", GetId ());
     
+#ifdef OPENGL_ES_SUPPORT
     EGLint context_attribs [] = {EGL_CONTEXT_CLIENT_VERSION, 1, EGL_NONE};
+#endif
+
+#ifdef OPENGL_ES2_SUPPORT
+    EGLint context_attribs [] = {EGL_CONTEXT_CLIENT_VERSION, 2, EGL_NONE};
+#endif
 
     impl->egl_context = eglCreateContext (swap_chain->GetEglDisplay (), swap_chain->GetEglConfig (), 0, context_attribs);
     
@@ -213,7 +219,7 @@ void Context::MakeCurrent (ISwapChain* swap_chain)
     DisplayLock lock (impl->display);
     
       //установка текущего контекста                
-      
+
     if (!eglMakeCurrent (impl->egl_display, impl->egl_surface, impl->egl_surface, impl->egl_context))
       raise_error ("::eglMakeCurrent");
       
