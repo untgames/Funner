@@ -212,26 +212,6 @@ struct MaterialImpl::Impl: public CacheHolder, public DebugIdHolder
       mask.ss_constant_buffers [ProgramParametersSlot_Material] = true;
       mask.ss_constant_buffers [ProgramParametersSlot_Program]  = true;
 
-      for (size_t i=0, count=stl::min (texmaps.size (), DEVICE_SAMPLER_SLOTS_COUNT); i<count; i++)
-      {
-        mask.ss_textures [i] = !texmaps [i]->is_dynamic;
-        mask.ss_samplers [i] = true;
-      }
-
-        //проверка необходимости пересоздания блока состояний материала
-        
-      size_t state_block_mask_hash = mask.Hash ();
-      
-      if (!cached_state_block || cached_state_block_mask_hash != state_block_mask_hash) 
-      {
-        if (has_debug_log)
-          log.Printf ("...create state block for material");
-                
-        cached_state_block           = LowLevelStateBlockPtr (device.CreateStateBlock (mask), false);
-        cached_state_block_mask_hash = state_block_mask_hash;
-        need_invalidate_deps         = true;
-      }
-      
         //установка статических текстурных карт и их сэмплеров в контекст устройства отрисовки
 
       if (cached_program)
@@ -240,6 +220,11 @@ struct MaterialImpl::Impl: public CacheHolder, public DebugIdHolder
 
         for (size_t i = 0, count = cached_program->TexmapsCount (); i < count; i++, program_texmap++)
         {
+          size_t channel = program_texmap->channel;
+
+          if (channel >= DEVICE_SAMPLER_SLOTS_COUNT)
+            continue;
+
           Texmap* texmap = 0;
 
           for (TexmapArray::iterator iter = texmaps.begin (), end = texmaps.end (); iter != end; ++iter)
@@ -251,7 +236,8 @@ struct MaterialImpl::Impl: public CacheHolder, public DebugIdHolder
             }
           }
 
-          size_t channel = program_texmap->channel;
+          mask.ss_textures [channel] = !texmap || !texmap->is_dynamic;
+          mask.ss_samplers [channel] = true;
 
           if (texmap)
           {
@@ -270,6 +256,20 @@ struct MaterialImpl::Impl: public CacheHolder, public DebugIdHolder
             context.SSSetSampler (channel, 0);
           }
         }
+      }
+
+        //проверка необходимости пересоздания блока состояний материала
+
+      size_t state_block_mask_hash = mask.Hash ();
+
+      if (!cached_state_block || cached_state_block_mask_hash != state_block_mask_hash)
+      {
+        if (has_debug_log)
+          log.Printf ("...create state block for material");
+
+        cached_state_block           = LowLevelStateBlockPtr (device.CreateStateBlock (mask), false);
+        cached_state_block_mask_hash = state_block_mask_hash;
+        need_invalidate_deps         = true;
       }
 
         //сохранение состояния контекста устройства отрисовки
