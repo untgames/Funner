@@ -1,8 +1,16 @@
-#ifndef __eglplatform_h_
-#define __eglplatform_h_
+/* -*- mode: c; tab-width: 8; -*- */
+/* vi: set sw=4 ts=8: */
+/* Platform-specific types and definitions for egl.h
+ * Last modified 2008/10/22
+ *
+ * If you make additions or modifications to eglplatform.h specific to
+ * your implementation or runtime environment, please send them to
+ * Khronos (preferably by filing a bug in the member or public Bugzillas
+ * and attaching a copy) for possible inclusion in future versions.
+ */
 
 /*
-** Copyright (c) 2007-2009 The Khronos Group Inc.
+** Copyright (c) 2007-2008 The Khronos Group Inc.
 **
 ** Permission is hereby granted, free of charge, to any person obtaining a
 ** copy of this software and/or associated documentation files (the
@@ -24,52 +32,54 @@
 ** MATERIALS OR THE USE OR OTHER DEALINGS IN THE MATERIALS.
 */
 
-/* Platform-specific types and definitions for egl.h
- * $Revision: 12306 $ on $Date: 2010-08-25 09:51:28 -0700 (Wed, 25 Aug 2010) $
- *
- * Adopters may modify khrplatform.h and this file to suit their platform.
- * You are encouraged to submit all modifications to the Khronos group so that
- * they can be included in future versions of this file.  Please submit changes
- * by sending them to the public Khronos Bugzilla (http://khronos.org/bugzilla)
- * by filing a bug against product "EGL" component "Registry".
- */
+#ifndef __eglplatform_h_
+#define __eglplatform_h_
 
+// AMD commented out this include so WinCE would build
+//#include <sys/types.h>
 #include <KHR/khrplatform.h>
 
 /* Macros used in EGL function prototype declarations.
  *
- * EGL functions should be prototyped as:
- *
  * EGLAPI return-type EGLAPIENTRY eglFunction(arguments);
  * typedef return-type (EXPAPIENTRYP PFNEGLFUNCTIONPROC) (arguments);
  *
- * KHRONOS_APICALL and KHRONOS_APIENTRY are defined in KHR/khrplatform.h
+ * On Windows, EGLAPIENTRY can be defined like APIENTRY.
+ * On most other platforms, it should be empty.
  */
 
 #ifndef EGLAPI
-#define EGLAPI KHRONOS_APICALL
+#  if (defined(_WIN32) || defined(__VC32__)) && !defined(__CYGWIN__) && !defined(__SCITECH_SNAP__) /* Win32 and WinCE */
+#    ifdef __EGL_EXPORTS
+#      define EGLAPI __declspec(dllexport)
+#    else
+#      define EGLAPI __declspec(dllimport)
+#    endif
+#  elif defined (__SYMBIAN32__)            /* Symbian */
+#    define EGLAPI IMPORT_C
+#  else
+#    define EGLAPI
+#  endif
 #endif
 
-#ifndef EGLAPIENTRY
-#define EGLAPIENTRY  KHRONOS_APIENTRY
+#if (defined(_WIN32) || defined(__VC32__)) && !defined(__CYGWIN__) && !defined(__SCITECH_SNAP__) && !defined(_WIN32_WCE) /* Win32 */
+#define EGLAPIENTRY __stdcall
+#else
+#define EGLAPIENTRY
 #endif
-#define EGLAPIENTRYP EGLAPIENTRY*
+
+#define EGLAPIENTRYP EGLAPIENTRY *
 
 /* The types NativeDisplayType, NativeWindowType, and NativePixmapType
  * are aliases of window-system-dependent types, such as X Display * or
  * Windows Device Context. They must be defined in platform-specific
  * code below. The EGL-prefixed versions of Native*Type are the same
  * types, renamed in EGL 1.3 so all types in the API start with "EGL".
- *
- * Khronos STRONGLY RECOMMENDS that you use the default definitions
- * provided below, since these changes affect both binary and source
- * portability of applications using EGL running on different EGL
- * implementations.
  */
 
-#if defined(_WIN32) || defined(__VC32__) && !defined(__CYGWIN__) && !defined(__SCITECH_SNAP__) /* Win32 and WinCE */
+#if defined(_WIN32) || defined(__VC32__) && !defined(__CYGWIN__) && !defined(__SCITECH_SNAP__)  /* Win32 and WinCE */
 #ifndef WIN32_LEAN_AND_MEAN
-#define WIN32_LEAN_AND_MEAN 1
+#   define WIN32_LEAN_AND_MEAN 1
 #endif
 #include <windows.h>
 
@@ -77,17 +87,22 @@ typedef HDC     EGLNativeDisplayType;
 typedef HBITMAP EGLNativePixmapType;
 typedef HWND    EGLNativeWindowType;
 
-#elif defined(SUPPORT_X11)
+/*
+typedef HDC NativeDisplayType;
+typedef HBITMAP NativePixmapType;
+typedef HWND NativeWindowType;
+*/
 
-/* X11 (tentative)  */
-#include <X11/Xlib.h>
-#include <X11/Xutil.h>
+#elif defined(__WINSCW__) || defined(__SYMBIAN32__) /* Symbian */
 
-typedef Display *EGLNativeDisplayType;
-typedef Pixmap   EGLNativePixmapType;
-typedef Window   EGLNativeWindowType;
-
-
+typedef int   EGLNativeDisplayType;
+typedef void *EGLNativeWindowType;
+typedef void *EGLNativePixmapType;
+/*
+typedef int NativeDisplayType;
+typedef void *NativeWindowType;
+typedef void *NativePixmapType;
+*/
 #elif defined(__ANDROID__) || defined(ANDROID)
 
 #include <android/native_window.h>
@@ -98,17 +113,37 @@ typedef struct ANativeWindow*           EGLNativeWindowType;
 typedef struct egl_native_pixmap_t*     EGLNativePixmapType;
 typedef void*                           EGLNativeDisplayType;
 
-#else
+#elif defined (__ARMCC_VERSION) || defined(__ARM__) || defined(_LINUX)
 
-#if defined(_WIN64) ||  __WORDSIZE == 64
-typedef khronos_int64_t EGLNativeDisplayType;
-#else
-typedef int EGLNativeDisplayType;
-#endif
-
+typedef void *EGLNativeDisplayType;
 typedef void *EGLNativeWindowType;
 typedef void *EGLNativePixmapType;
+#define NativeDisplayType void *
+#define NativeWindowType  void *
+#define NativePixmapType  void *
 
+/*
+#define NativeDisplayType void *
+#define NativeWindowType  void *
+#define NativePixmapType  void *
+*/
+
+#elif defined(__APPLE__) || defined(__linux__)
+
+/* X11 (tentative)  */
+#include <X11/Xlib.h>
+#include <X11/Xutil.h>
+
+typedef Display *EGLNativeDisplayType;
+typedef Pixmap   EGLNativePixmapType;
+typedef Window   EGLNativeWindowType;
+/*
+typedef Display *NativeDisplayType;
+typedef Pixmap NativePixmapType;
+typedef Window NativeWindowType;
+*/
+#else
+#error "Platform not recognized"
 #endif
 
 /* EGL 1.2 types, renamed for consistency in EGL 1.3 */
@@ -117,13 +152,34 @@ typedef EGLNativePixmapType  NativePixmapType;
 typedef EGLNativeWindowType  NativeWindowType;
 
 
-/* Define EGLint. This must be a signed integral type large enough to contain
- * all legal attribute names and values passed into and out of EGL, whether
- * their type is boolean, bitmask, enumerant (symbolic constant), integer,
- * handle, or other.  While in general a 32-bit integer will suffice, if
- * handles are 64 bit types, then EGLint should be defined as a signed 64-bit
+/*
+typedef NativeDisplayType EGLNativeDisplayType;
+typedef NativePixmapType  EGLNativePixmapType;
+typedef NativeWindowType  EGLNativeWindowType;
+*/
+/*
+ Define EGLint. This must be an integral type large enough to contain
+ * all legal attribute names and values passed into and out of EGL,
+ * whether their type is boolean, bitmask, enumerant (symbolic
+ * constant), integer, handle, or other.
+ * While in general a 32-bit integer will suffice, if handles are
+ * represented as pointers, then EGLint should be defined as a 64-bit
  * integer type.
  */
-typedef khronos_int32_t EGLint;
+
+ typedef khronos_int32_t EGLint;
+
+ 
+ /*
+ #if (defined(__STDC__) && __STDC__ && __STDC_VERSION__ >= 199901L) || defined(__GNUC__) || defined (__ARMCC_VERSION) || defined(__ARM__) || defined(_LINUX)
+#include <stdint.h>
+typedef int32_t EGLint;
+#elif (defined(_WIN32) || defined(__VC32__)) && !defined(__CYGWIN__) && !defined(__SCITECH_SNAP__)  // Win32 and WinCE
+#include <windows.h>
+typedef INT32 EGLint;
+#else
+typedef int EGLint;
+#endif
+*/
 
 #endif /* __eglplatform_h */

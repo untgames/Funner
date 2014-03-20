@@ -206,8 +206,13 @@ struct ShaderStage::Impl: public ContextObject, public ShaderStageState
         {
             //регистрация программы "по умолчанию"
 
+#ifndef OPENGL_ES2_SUPPORT
             const char* PIXEL_SHADER  = "void main (void) {gl_FragColor = vec4 (0.0, 0.0, 0.0, 1.0);}";
             const char* VERTEX_SHADER = "void main (void) {gl_Position = gl_Vertex;}";
+#else
+            const char* PIXEL_SHADER  = "void main (void) {gl_FragColor = vec4 (0.0, 0.0, 0.0, 1.0);}";
+            const char* VERTEX_SHADER = "attribute vec4 aVertex; void main (void) {gl_Position = aVertex;}";
+#endif
 
             ShaderDesc shader_descs [] = {
               {"Default shader-stage pixel shader", strlen (PIXEL_SHADER), PIXEL_SHADER, "glsl.ps", ""},
@@ -241,7 +246,7 @@ struct ShaderStage::Impl: public ContextObject, public ShaderStageState
           //установка программы в контекст OpenGL
 
         bindable_program.Bind (GetConstantBuffers ());
-        
+
           //сохранение текущей программы
           
         current_binded_program = &bindable_program;

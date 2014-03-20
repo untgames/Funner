@@ -60,7 +60,8 @@ else
 
 #OpenGL ES 2
 
-RENDER.OPENGL_DRIVER.SOURCES.win32.IMPORTS  := compile.extern.gles2_win32
+#RENDER.OPENGL_DRIVER.SOURCES.win32.IMPORTS  := compile.extern.gles2_win32
+RENDER.OPENGL_DRIVER.SOURCES.win32.IMPORTS  := compile.extern.angle
 
 endif
 

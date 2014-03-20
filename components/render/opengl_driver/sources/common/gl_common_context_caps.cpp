@@ -321,6 +321,18 @@ void ContextCaps::Init (const ExtensionSet& available_extension_set, const Exten
   has_ext_blend_subtract             = true;
   has_ati_separate_stencil           = true;
   has_arb_texture_border_clamp       = ext.Get ("GL_NV_texture_border_clamp");
+  glUniform1fv_fn                    = glUniform1fv;
+  glUniform1iv_fn                    = glUniform1iv;
+  glUniform2fv_fn                    = glUniform2fv;
+  glUniform2iv_fn                    = glUniform2iv;
+  glUniform3fv_fn                    = glUniform3fv;
+  glUniform3iv_fn                    = glUniform3iv;
+  glUniform4fv_fn                    = glUniform4fv;
+  glUniform4iv_fn                    = glUniform4iv;
+  glUniformMatrix2fv_fn              = glUniformMatrix2fv;
+  glUniformMatrix3fv_fn              = glUniformMatrix3fv;
+  glUniformMatrix4fv_fn              = glUniformMatrix4fv;
+  glUseProgram_fn                    = glUseProgram;
 #endif
   glActiveTexture_fn           = glActiveTexture;
   glBindBuffer_fn              = glBindBuffer;

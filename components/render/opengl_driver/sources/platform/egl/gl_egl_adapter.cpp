@@ -214,8 +214,15 @@ void Adapter::EnumPixelFormats (EGLDisplay display, PixelFormatArray& pixel_form
         continue;
 #endif
 
+#ifdef OPENGL_ES_SUPPORT
       if (!(get_config_attribute (display, config, EGL_CONFORMANT) & EGL_OPENGL_ES_BIT))
         continue;
+#endif
+
+#ifdef OPENGL_ES2_SUPPORT
+      if (!(get_config_attribute (display, config, EGL_CONFORMANT) & EGL_OPENGL_ES2_BIT))
+        continue;
+#endif
 
       PixelFormatDesc desc;
 
