@@ -150,14 +150,14 @@ struct Test
       
       device->GetCaps (caps);
       
-      if (caps.has_right_hand_viewport)
-        vp.y = window.Height () - vp.height - vp.y;
+//      if (caps.has_right_hand_viewport)
+//        vp.y = window.Height () - vp.height - vp.y;
 
       device->GetImmediateContext ()->RSSetViewport (0, vp);
     }
     catch (std::exception& e)
     {
-      printf ("resize exception: %s\n", e.what ());
+      printf ("resize exception: %s\n", e.what ()); fflush (stdout);
     }
   }
 
@@ -185,7 +185,7 @@ struct Test
     }
     catch (std::exception& e)
     {
-      printf ("redraw exception: %s\n", e.what ());
+      printf ("redraw exception: %s\n", e.what ()); fflush (stdout);
     }
   }
 

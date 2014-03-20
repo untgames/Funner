@@ -22,7 +22,6 @@ struct Semantic2Name
 };
 
 const Semantic2Name semantic_names [] = {
-#ifdef OPENGL_ES2_SUPPORT
   {VertexAttributeSemantic_Position,  "aVertex"},
   {VertexAttributeSemantic_Normal,    "aNormal"},
   {VertexAttributeSemantic_Color,     "aColor"},
@@ -34,19 +33,6 @@ const Semantic2Name semantic_names [] = {
   {VertexAttributeSemantic_TexCoord5, "aTexCoord5"},
   {VertexAttributeSemantic_TexCoord6, "aTexCoord6"},
   {VertexAttributeSemantic_TexCoord7, "aTexCoord7"},
-#else
-  {VertexAttributeSemantic_Position,  "gl_Vertex"},
-  {VertexAttributeSemantic_Normal,    "gl_Normal"},
-  {VertexAttributeSemantic_Color,     "gl_Color"},
-  {VertexAttributeSemantic_TexCoord0, "gl_TexCoord0"},
-  {VertexAttributeSemantic_TexCoord1, "gl_TexCoord1"},
-  {VertexAttributeSemantic_TexCoord2, "gl_TexCoord2"},
-  {VertexAttributeSemantic_TexCoord3, "gl_TexCoord3"},
-  {VertexAttributeSemantic_TexCoord4, "gl_TexCoord4"},
-  {VertexAttributeSemantic_TexCoord5, "gl_TexCoord5"},
-  {VertexAttributeSemantic_TexCoord6, "gl_TexCoord6"},
-  {VertexAttributeSemantic_TexCoord7, "gl_TexCoord7"},
-#endif
 };
 
 const size_t semantic_names_count = sizeof (semantic_names) / sizeof (*semantic_names);

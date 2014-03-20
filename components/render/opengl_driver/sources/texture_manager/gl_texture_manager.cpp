@@ -258,6 +258,7 @@ struct TextureManager::Impl: public ContextObject
 
         if (need_change_mode)
         {
+#ifndef OPENGL_ES2_SUPPORT
           if (current_texture_target [i])
             glDisable (current_texture_target [i]);
 
@@ -266,6 +267,7 @@ struct TextureManager::Impl: public ContextObject
             glEnable (texture_target);
           }
           else
+#endif
           {
             if (current_texture_target [i])
               glBindTexture (current_texture_target [i], 0);

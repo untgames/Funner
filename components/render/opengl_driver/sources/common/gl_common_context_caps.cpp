@@ -316,11 +316,13 @@ void ContextCaps::Init (const ExtensionSet& available_extension_set, const Exten
   has_ext_framebuffer_object         = true;
   has_arb_multisample                = false;
   has_sgis_generate_mipmap           = false;
+  has_ext_texture3d                  = true;
   has_ext_blend_equation_separate    = true;
   has_ext_blend_func_separate        = true;
   has_ext_blend_subtract             = true;
   has_ati_separate_stencil           = true;
   has_arb_texture_border_clamp       = ext.Get ("GL_NV_texture_border_clamp");
+  has_ext_shadow_funcs               = ext.Get ("GL_EXT_shadow_samplers");
   glUniform1fv_fn                    = glUniform1fv;
   glUniform1iv_fn                    = glUniform1iv;
   glUniform2fv_fn                    = glUniform2fv;
@@ -333,6 +335,7 @@ void ContextCaps::Init (const ExtensionSet& available_extension_set, const Exten
   glUniformMatrix3fv_fn              = glUniformMatrix3fv;
   glUniformMatrix4fv_fn              = glUniformMatrix4fv;
   glUseProgram_fn                    = glUseProgram;
+  glGetUniformLocation_fn            = glGetUniformLocation;
 #endif
   glActiveTexture_fn           = glActiveTexture;
   glBindBuffer_fn              = glBindBuffer;

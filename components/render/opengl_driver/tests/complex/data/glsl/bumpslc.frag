@@ -6,10 +6,12 @@
 //
 // Copyright (c) 2002: 3Dlabs, Inc.
 //
+precision mediump float;
 uniform sampler2D bump_sampler2d; // value of sampler2d = 3
 uniform sampler2D diffuse_sampler2d; // value of sampler2d = 3
 varying vec3 lightDir; 	  // interpolated surface local coordinate light direction 
 varying vec3 viewDir;     // interpolated surface local coordinate view direction
+varying vec4 texcoord;
 
 const float diffuseFactor  = 1.0;
 //const float specularFactor = 0.7;
@@ -27,7 +29,7 @@ void main (void)
 
     // Fetch normal from normal map
 
-    norm = vec3(texture2D(bump_sampler2d, vec2 (gl_TexCoord[0])));
+    norm = vec3(texture2D(bump_sampler2d, vec2 (texcoord)));
     norm = (norm - 0.5) * 2.0;
     norm.y = -norm.y;
 
@@ -44,7 +46,7 @@ void main (void)
      // Compute final color value
 
 //    color = clamp(basecolor * intensity, 0.0, 1.0);
-    vec3 diffuse_color = vec3 (texture2D (diffuse_sampler2d, vec2 (gl_TexCoord [0])));
+    vec3 diffuse_color = vec3 (texture2D (diffuse_sampler2d, vec2 (texcoord)));
 
     color = clamp(diffuse_color * intensity, 0.0, 1.0);
  
