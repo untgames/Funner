@@ -30,7 +30,11 @@ class ShaderStageState: public IStageState
       if (in_program == program)
         return;
 
-      program = in_program;
+      program                     = in_program;
+      vertex_attribute_dictionary = in_program ? in_program->GetVertexAttributeDictionary () : VertexAttributeDictionaryPtr ();
+
+      if (owner) //because of vertex attribute dictionary
+        owner->GetContextManager ().StageRebindNotify (Stage_Input);
 
       UpdateNotify ();
     }
@@ -39,6 +43,12 @@ class ShaderStageState: public IStageState
     ICompiledProgram* GetProgram () const
     {
       return program.get ();
+    }
+
+      //получение словар€ вершинных атрибутов
+    IVertexAttributeDictionary* GetVertexAttributeDictionary ()
+    {
+      return vertex_attribute_dictionary.get ();
     }
 
       //установка константного буффера
@@ -120,16 +130,18 @@ class ShaderStageState: public IStageState
     }
 
   private:
-    typedef xtl::trackable_ptr<ShaderStageState>        ShaderStageStatePtr;
-    typedef xtl::trackable_ptr<ProgramParametersLayout> ProgramParametersLayoutPtr;
-    typedef xtl::trackable_ptr<ICompiledProgram>        ProgramPtr;
+    typedef xtl::trackable_ptr<ShaderStageState>           ShaderStageStatePtr;
+    typedef xtl::trackable_ptr<ProgramParametersLayout>    ProgramParametersLayoutPtr;
+    typedef xtl::trackable_ptr<ICompiledProgram>           ProgramPtr;
+    typedef xtl::trackable_ptr<IVertexAttributeDictionary> VertexAttributeDictionaryPtr;
 
   private:
-    ContextObject*             owner;                                                 //владелец состо€ни€
-    ShaderStageStatePtr        main_state;                                            //основное состо€ние уровн€
-    ProgramParametersLayoutPtr parameters_layout;                                     //расположение параметров шейдера
-    ProgramPtr                 program;                                               //шейдер
-    ConstantBufferPtr          constant_buffers [DEVICE_CONSTANT_BUFFER_SLOTS_COUNT]; //константные буферы шейдера
+    ContextObject*               owner;                                                 //владелец состо€ни€
+    ShaderStageStatePtr          main_state;                                            //основное состо€ние уровн€
+    ProgramParametersLayoutPtr   parameters_layout;                                     //расположение параметров шейдера
+    ProgramPtr                   program;                                               //шейдер
+    VertexAttributeDictionaryPtr vertex_attribute_dictionary;                           //словарь вершинных атрибутов
+    ConstantBufferPtr            constant_buffers [DEVICE_CONSTANT_BUFFER_SLOTS_COUNT]; //константные буферы шейдера
 };
 
 /*
@@ -226,6 +238,8 @@ struct ShaderStage::Impl: public ContextObject, public ShaderStageState
 
         if (!default_program)
           throw xtl::format_operation_exception ("", "Can't create default program, no supported profiles");
+
+        default_vertex_attribute_dictionary = default_program->GetVertexAttributeDictionary ();
       }
       catch (xtl::exception& exception)
       {
@@ -372,6 +386,17 @@ struct ShaderStage::Impl: public ContextObject, public ShaderStageState
     const char* GetShaderProfilesString () const
     {
       return supported_profiles.c_str ();
+    }
+
+///ѕолучение словар€ вершинных атрибутов
+    IVertexAttributeDictionary& GetVertexAttributeDictionary ()
+    {
+      IVertexAttributeDictionary* dictionary = ShaderStageState::GetVertexAttributeDictionary ();
+
+      if (dictionary)
+        return *dictionary;
+
+      return *default_vertex_attribute_dictionary; 
     }
     
   private:
@@ -578,12 +603,13 @@ struct ShaderStage::Impl: public ContextObject, public ShaderStageState
     }
 
   private:
-    ShaderMap          shaders;                //скомпилированные шейдеры
-    BindableProgramMap bindable_programs;      //карта программ шейдинга с возможностью установки в контекст OpenGL
-    ProfileMap         profiles;               //соответствие профиль -> менеджер шейдеров
-    ProgramPtr         default_program;        //программа "по умолчанию"
-    stl::string        supported_profiles;     //поддерживаемые профили шейдеров
-    IBindableProgram*  current_binded_program; //текуща€ программа, установленна€ в контекст OpenGL
+    ShaderMap                   shaders;                             //скомпилированные шейдеры
+    BindableProgramMap          bindable_programs;                   //карта программ шейдинга с возможностью установки в контекст OpenGL
+    ProfileMap                  profiles;                            //соответствие профиль -> менеджер шейдеров
+    ProgramPtr                  default_program;                     //программа "по умолчанию"
+    IVertexAttributeDictionary* default_vertex_attribute_dictionary; //словарь вершинных атрибутов "по умолчанию"
+    stl::string                 supported_profiles;                  //поддерживаемые профили шейдеров
+    IBindableProgram*           current_binded_program;              //текуща€ программа, установленна€ в контекст OpenGL
 };
 
 /*
@@ -708,6 +734,11 @@ IProgramParametersLayout* ShaderStage::GetProgramParametersLayout () const
 IProgram* ShaderStage::GetProgram () const
 {
   return impl->GetProgram ();
+}
+
+IVertexAttributeDictionary* ShaderStage::GetVertexAttributeDictionary () const
+{
+  return &impl->GetVertexAttributeDictionary ();
 }
 
 IBuffer* ShaderStage::GetConstantBuffer (size_t buffer_slot) const

@@ -4,6 +4,7 @@
 #include "../shared.h"
 
 #include <stl/algorithm>
+#include <stl/hash_map>
 #include <stl/string>
 #include <stl/vector>
 
@@ -43,7 +44,7 @@ class GlslShader: virtual public IShader, public ContextObject
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///GLSL-программа
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-class GlslProgram: virtual public ICompiledProgram, public ContextObject
+class GlslProgram: virtual public ICompiledProgram, public ContextObject, public IVertexAttributeDictionary
 {
   public:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -67,6 +68,21 @@ class GlslProgram: virtual public ICompiledProgram, public ContextObject
 ///Создание программы, устанавливаемой в контекст OpenGL
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     IBindableProgram* CreateBindableProgram (ProgramParametersLayout* layout);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Получение словаря атрибутов
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    IVertexAttributeDictionary* GetVertexAttributeDictionary ();
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Получение индекса атрибута по имени
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    int FindAttribute (const char* name); //returns -1 in case of fail
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Получение trackable
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    xtl::trackable& GetDictionaryTrackable () { return GetTrackable (); }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Получение OpenGL дескриптора программы
@@ -97,14 +113,22 @@ class GlslProgram: virtual public ICompiledProgram, public ContextObject
     void DeleteProgram ();
 
   private:
+    struct Attribute
+    {
+      stl::string name;      //имя атрибута
+      size_t      name_hash; //хэш имени
+    };
+
     typedef xtl::com_ptr<GlslShader> ShaderPtr;
     typedef stl::vector<ShaderPtr>   ShaderArray;
     typedef stl::vector<Parameter>   ParameterArray;
+    typedef stl::vector<Attribute>   AttributeArray;
 
   private:
     GLhandleARB    handle;                   //дескриптор программы
     ShaderArray    shaders;                  //используемые шейдеры
     ParameterArray parameters;               //параметры программы
+    AttributeArray attributes;               //атрибуты программы
     size_t         last_bindable_program_id; //идентификатор последней установленной программы
 };
 

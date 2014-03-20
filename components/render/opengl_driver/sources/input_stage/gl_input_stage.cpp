@@ -284,7 +284,7 @@ struct InputStage::Impl: public ContextObject
         Установка состояния уровня в контекст OpenGL
     */
       
-    void Bind (size_t base_vertex, size_t base_index, VertexAttributeDictionary* dictionary, IndicesLayout* out_indices_layout)  
+    void Bind (size_t base_vertex, size_t base_index, IVertexAttributeDictionary* dictionary, IndicesLayout* out_indices_layout)  
     {
       try
       {
@@ -467,7 +467,7 @@ IBuffer* InputStage::GetIndexBuffer () const
     Установка состояния уровня в контекст OpenGL
 */
 
-void InputStage::Bind (size_t base_vertex, size_t base_index, VertexAttributeDictionary* dictionary, IndicesLayout* out_indices_layout)
+void InputStage::Bind (size_t base_vertex, size_t base_index, IVertexAttributeDictionary* dictionary, IndicesLayout* out_indices_layout)
 {
   try
   {

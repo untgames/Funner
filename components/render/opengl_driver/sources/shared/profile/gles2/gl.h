@@ -41,6 +41,7 @@
 #define glStencilFuncSeparateATI glStencilFuncSeparate
 
 #define glGetActiveUniformARB glGetActiveUniform
+#define glGetActiveAttribARB glGetActiveAttrib
 
 #define GL_OBJECT_VALIDATE_STATUS_ARB GL_VALIDATE_STATUS
 #define GL_FLOAT_VEC2_ARB GL_FLOAT_VEC2

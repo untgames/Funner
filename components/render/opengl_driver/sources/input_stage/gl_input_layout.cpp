@@ -52,7 +52,7 @@ struct InputLayout::ShaderAttributeLayout: public xtl::reference_counter
   size_t               used_semantics_mask;   //маска использованных семантик
 
 ///Конструктор
-  ShaderAttributeLayout (VertexAttributeDictionary& dictionary, size_t slots_count, const GlVertexAttributeGroup* groups, const common::StringArray& names)
+  ShaderAttributeLayout (IVertexAttributeDictionary& dictionary, size_t slots_count, const GlVertexAttributeGroup* groups, const common::StringArray& names)
     : used_semantics_mask ()
   {
     try
@@ -262,30 +262,30 @@ InputLayout::~InputLayout ()
     Работа с расположениями вершинных атрибутов
 */
 
-InputLayout::ShaderAttributeLayout& InputLayout::GetShaderLayout (VertexAttributeDictionary& dictionary)
+InputLayout::ShaderAttributeLayout& InputLayout::GetShaderLayout (IVertexAttributeDictionary& dictionary)
 {
-  size_t id = dictionary.GetId ();
+//TODO: last used dictionary optimiziation without search in hash map
 
-  ShaderAttributeLayoutMap::iterator iter = shader_layouts.find (id);
+  ShaderAttributeLayoutMap::iterator iter = shader_layouts.find (&dictionary);
 
   if (iter != shader_layouts.end ())
     return *iter->second;
 
   ShaderAttributeLayoutPtr layout (new ShaderAttributeLayout (dictionary, vertex_attribute_groups.size (), &vertex_attribute_groups [0], shader_attribute_names), false);
 
-  layout->on_dictionary_destroy = dictionary.GetTrackable ().connect_tracker (xtl::bind (&InputLayout::RemoveShaderLayout, this, id));
+  layout->on_dictionary_destroy = dictionary.GetDictionaryTrackable ().connect_tracker (xtl::bind (&InputLayout::RemoveShaderLayout, this, &dictionary));
 
   if (shader_layouts.empty ())
     shader_layouts.resize (SHADER_LAYOUTS_TABLE_SIZE);
 
-  shader_layouts.insert_pair (id, layout);
+  shader_layouts.insert_pair (&dictionary, layout);
 
   return *layout;
 }
 
-void InputLayout::RemoveShaderLayout (size_t id)
+void InputLayout::RemoveShaderLayout (IVertexAttributeDictionary* dictionary)
 {
-  shader_layouts.erase (id);
+  shader_layouts.erase (dictionary);
 }
 
 /*
@@ -375,7 +375,11 @@ void InputLayout::SetDesc (const InputLayoutDesc& desc)
 
         //проверка корректности вершинной семантики
 
+#ifndef OPENGL_ES2_SUPPORT
       VertexAttributeSemantic semantic = get_semantic_by_name (va.semantic);
+#else
+      static const VertexAttributeSemantic semantic = (VertexAttributeSemantic)-1;
+#endif
 
       if (semantic < 0)
       {
@@ -408,6 +412,7 @@ void InputLayout::SetDesc (const InputLayoutDesc& desc)
         throw xtl::format_exception<xtl::not_supported_exception> (METHOD_NAME, "Vertex attribute '%s' is not supported", va.semantic);
 #endif
       }
+#ifndef OPENGL_ES2_SUPPORT
       else
       {
         switch (semantic)
@@ -483,9 +488,10 @@ void InputLayout::SetDesc (const InputLayoutDesc& desc)
           default:
             throw xtl::format_exception<xtl::bad_argument> (METHOD_NAME, "Invalid argument desc.vertex_attributes[%u].type=%d", i, va.type);
         }
-      }
 
-      new_semantics_mask |= 1 << semantic;
+        new_semantics_mask |= 1 << semantic;
+      }
+#endif
 
         //проверка корректности номера слота
 
@@ -502,12 +508,18 @@ void InputLayout::SetDesc (const InputLayoutDesc& desc)
       
     size_t position_attribute = semantic_attribute [VertexAttributeSemantic_Position];
 
-    if (position_attribute == NO_ATTRIBUTE)
+    if (position_attribute != NO_ATTRIBUTE)
+    {
+        //сортировка вершинных атрибутов для оптимизации установки в контекст OpenGL
+
+      stl::sort (va_ptrs.begin (), va_ptrs.end (), VertexAttributeComparator (desc.vertex_attributes [position_attribute].slot));
+    }
+#ifdef OPENGL_ES_SUPPORT
+    else
+    {    
       throw xtl::format_exception<xtl::bad_argument> (METHOD_NAME, "Invalid argument desc.vertex_attributes. Attribute with semantic 'VertexAttributeSemantic_Position' not found");
-
-      //сортировка вершинных атрибутов для оптимизации установки в контекст OpenGL
-
-    stl::sort (va_ptrs.begin (), va_ptrs.end (), VertexAttributeComparator (desc.vertex_attributes [position_attribute].slot));
+    }
+#endif
 
       //преобразование вершинных атрибутов
 
@@ -775,7 +787,7 @@ void InputLayout::BindVertexAttributes (size_t base_vertex, BufferPtr* vertex_bu
     {
       const GlVertexAttribute& va     = *va_iter;
       const void*              offset = base_offset + va.offset + base_vertex * va.stride; //расчёт начального смещения вершиных атрибутов
-      
+
       switch (va.semantic)
       {
 #ifndef OPENGL_ES2_SUPPORT
@@ -848,12 +860,12 @@ void InputLayout::BindVertexAttributes (size_t base_vertex, BufferPtr* vertex_bu
 }
 
 void InputLayout::Bind
- (size_t                     base_vertex,
-  size_t                     base_index,
-  BufferPtr*                 vertex_buffers,
-  VertexAttributeDictionary* dictionary,
-  Buffer*                    index_buffer,
-  IndicesLayout*             out_indices_layout)
+ (size_t                      base_vertex,
+  size_t                      base_index,
+  BufferPtr*                  vertex_buffers,
+  IVertexAttributeDictionary* dictionary,
+  Buffer*                     index_buffer,
+  IndicesLayout*              out_indices_layout)
 {
   try
   {

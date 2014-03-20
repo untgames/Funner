@@ -95,27 +95,31 @@ GlslProgram::GlslProgram (const ContextManager& manager, size_t shaders_count, I
     GetProgramLog (log_buffer);
     error_log     (common::format ("linker: %s", log_buffer.c_str ()).c_str ());
     
-      //получение описания параметров программы
+      //получение описания параметров и атрибутов программы
     
-    GLint parameters_count = 0, max_parameter_name_length = 0;
+    GLint parameters_count = 0, max_parameter_name_length = 0, attributes_count = 0, max_attribute_name_length = 0;
     
     if (glGetProgramiv)
     {
       glGetProgramiv (handle, GL_ACTIVE_UNIFORMS, &parameters_count);
       glGetProgramiv (handle, GL_ACTIVE_UNIFORM_MAX_LENGTH, &max_parameter_name_length);
+      glGetProgramiv (handle, GL_ACTIVE_ATTRIBUTES, &attributes_count);
+      glGetProgramiv (handle, GL_ACTIVE_ATTRIBUTE_MAX_LENGTH, &max_attribute_name_length);
     }
 #ifndef OPENGL_ES2_SUPPORT
     else
     {
       glGetObjectParameterivARB (handle, GL_OBJECT_ACTIVE_UNIFORMS_ARB, &parameters_count);
       glGetObjectParameterivARB (handle, GL_OBJECT_ACTIVE_UNIFORM_MAX_LENGTH_ARB, &max_parameter_name_length);
+      glGetObjectParameterivARB (handle, GL_OBJECT_ACTIVE_ATTRIBUTES_ARB, &attributes_count);
+      glGetObjectParameterivARB (handle, GL_OBJECT_ACTIVE_ATTRIBUTE_MAX_LENGTH_ARB, &max_attribute_name_length);
     }
 #endif
 
     parameters.reserve (parameters_count);        
     
     stl::string parameter_name;    
-    
+
     for (GLint location=0; location<parameters_count; location++)
     {            
       parameter_name.fast_resize (max_parameter_name_length);      
@@ -140,7 +144,7 @@ GlslProgram::GlslProgram (const ContextManager& manager, size_t shaders_count, I
       
       parameter.name           = parameter_name;
       parameter.name_hash      = common::strhash (parameter.name.c_str ());
-      parameter.elements_count = (size_t)elements_count;
+      parameter.elements_count = (size_t)elements_count;      
       
       switch (type)
       {
@@ -200,6 +204,38 @@ GlslProgram::GlslProgram (const ContextManager& manager, size_t shaders_count, I
       
       parameters.push_back (parameter);
     }    
+
+    attributes.reserve (attributes_count);
+    
+    stl::string attribute_name;
+
+    for (GLint location=0; location<attributes_count; location++)
+    {
+      attribute_name.fast_resize (max_attribute_name_length);      
+
+      GLint  name_length = 0, elements_count = 0;
+      GLenum type = 0;
+      
+      glGetActiveAttribARB (handle, location, attribute_name.size (), &name_length, &elements_count, &type, &attribute_name [0]);
+      
+      if ((size_t)name_length > attribute_name.size ())
+        name_length = attribute_name.size ();
+        
+      if (name_length < 0)
+        name_length = 0;
+        
+      attribute_name.fast_resize (name_length);
+
+      if (strstr (attribute_name.c_str (), "[0]") == attribute_name.end () - 3)  //Обход особенности именования массивов в драйверах nVidia
+        attribute_name.fast_resize (attribute_name.size () - 3);
+      
+      Attribute attribute;
+      
+      attribute.name      = attribute_name;
+      attribute.name_hash = common::strhash (attribute.name.c_str ());
+
+      attributes.push_back (attribute);
+    }
 
       //проверка ошибок
 
@@ -357,6 +393,33 @@ IBindableProgram* GlslProgram::CreateBindableProgram (ProgramParametersLayout* l
     exception.touch ("render::low_level::opengl::GlslProgram::CreateBindableProgram");
     throw;
   }
+}
+
+/*
+    Получение словаря атрибутов
+*/
+
+IVertexAttributeDictionary* GlslProgram::GetVertexAttributeDictionary ()
+{
+  return this;
+}
+
+/*
+    Получение индекса атрибута по имени
+*/
+
+int GlslProgram::FindAttribute (const char* name)
+{
+  if (!name)
+    return -1;
+
+  size_t name_hash = common::strhash (name);
+
+  for (AttributeArray::iterator iter=attributes.begin (), end=attributes.end (); iter!=end; ++iter)
+    if (iter->name_hash == name_hash)
+      return iter - attributes.begin ();
+
+  return -1;
 }
 
 /*

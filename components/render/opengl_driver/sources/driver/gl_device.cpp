@@ -703,13 +703,31 @@ void Device::Bind (size_t base_vertex, size_t base_index, IndicesLayout* out_ind
       context_manager.StageRebindNotify (Stage_Output); //сделать внутреннее кэширование состояния has_render_target/has_depth_stencil!!!
       
       is_program_validate_needed = true;
+    }   
+
+      //установка состояния менеджера текстур
+
+    if (context_manager.NeedStageRebind (Stage_TextureManager))
+    {
+      texture_manager.Bind ();
+      
+      is_program_validate_needed = true;      
     }
-    
+
+      //установка состояния шейдерного уровня
+
+    if (context_manager.NeedStageRebind (Stage_Shading))
+    {
+      shader_stage.Bind ();            
+      
+      is_program_validate_needed = true;      
+    }
+
       //установка состояния входного уровня
 
     if (context_manager.NeedStageRebind (Stage_Input) || base_vertex != cached_base_vertex || (base_index != cached_base_index && out_indices_layout))
     {
-      input_stage.Bind (base_vertex, base_index, 0, out_indices_layout);
+      input_stage.Bind (base_vertex, base_index, shader_stage.GetVertexAttributeDictionary (), out_indices_layout);
       
       cached_base_vertex = base_vertex;
 
@@ -731,24 +749,6 @@ void Device::Bind (size_t base_vertex, size_t base_index, IndicesLayout* out_ind
     {
       if (out_indices_layout)
         *out_indices_layout = cached_indices_layout;
-    }
-
-      //установка состояния менеджера текстур
-
-    if (context_manager.NeedStageRebind (Stage_TextureManager))
-    {
-      texture_manager.Bind ();
-      
-      is_program_validate_needed = true;      
-    }
-
-      //установка состояния шейдерного уровня
-
-    if (context_manager.NeedStageRebind (Stage_Shading))
-    {
-      shader_stage.Bind ();            
-      
-      is_program_validate_needed = true;      
     }
 
       //установка состояния выходного уровня

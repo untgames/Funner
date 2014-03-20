@@ -22,7 +22,7 @@ struct Semantic2Name
 };
 
 const Semantic2Name semantic_names [] = {
-#ifndef OPENGL_ES2_SUPPORT
+#ifdef OPENGL_ES2_SUPPORT
   {VertexAttributeSemantic_Position,  "aVertex"},
   {VertexAttributeSemantic_Normal,    "aNormal"},
   {VertexAttributeSemantic_Color,     "aColor"},
