@@ -85,7 +85,7 @@ struct Output::Impl
       eglTerminate (egl_display);
       
         //платформо-зависимое освобождение ресурсов
-      
+
       PlatformDone ();
     }
     catch (...)

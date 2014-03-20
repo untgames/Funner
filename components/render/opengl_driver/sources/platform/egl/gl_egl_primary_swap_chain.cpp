@@ -119,7 +119,9 @@ struct PrimarySwapChain::Impl
     {    
       DisplayLock lock (output->GetDisplay ());
 
+#ifdef ANDROID
       eglWaitGL ();
+#endif
     }
     catch (...)
     {

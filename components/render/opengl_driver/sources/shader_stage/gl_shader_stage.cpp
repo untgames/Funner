@@ -222,8 +222,8 @@ struct ShaderStage::Impl: public ContextObject, public ShaderStageState
             const char* PIXEL_SHADER  = "void main (void) {gl_FragColor = vec4 (0.0, 0.0, 0.0, 1.0);}";
             const char* VERTEX_SHADER = "void main (void) {gl_Position = gl_Vertex;}";
 #else
-            const char* PIXEL_SHADER  = "void main (void) {gl_FragColor = vec4 (0.0, 0.0, 0.0, 1.0);}";
-            const char* VERTEX_SHADER = "attribute vec4 aVertex; void main (void) {gl_Position = aVertex;}";
+            const char* PIXEL_SHADER  = "precision highp float; varying vec4 vColor; void main (void) {gl_FragColor = vColor;}";
+            const char* VERTEX_SHADER = "attribute vec4 aVertex; attribute vec4 aColor; varying vec4 vColor; void main (void) {vColor = aColor; gl_Position = aVertex;}";
 #endif
 
             ShaderDesc shader_descs [] = {
