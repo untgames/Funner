@@ -4,12 +4,16 @@ using namespace render::low_level;
 using namespace render::low_level::opengl;
 using namespace common;
 
+namespace
+{
+
 /*
     Константы
 */
 
-const size_t DXT_EDGE_SIZE  = 4;                             //размер стороны блока DXT-сжатия
-const size_t DXT_BLOCK_SIZE = DXT_EDGE_SIZE * DXT_EDGE_SIZE; //размер блока DXT-сжатия
+const size_t DXT_EDGE_SIZE  = 4;  //размер стороны блока DXT-сжатия
+
+}
 
 /*
    Конструктор / деструктор
