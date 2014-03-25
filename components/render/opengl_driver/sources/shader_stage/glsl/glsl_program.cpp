@@ -127,7 +127,14 @@ GlslProgram::GlslProgram (const ContextManager& manager, size_t shaders_count, I
       GLint  name_length = 0, elements_count = 0;
       GLenum type = 0;
       
-      glGetActiveUniformARB (handle, location, parameter_name.size (), &name_length, &elements_count, &type, &parameter_name [0]);
+      if (glGetActiveUniform)
+      {
+        glGetActiveUniform (handle, location, parameter_name.size (), &name_length, &elements_count, &type, &parameter_name [0]);
+      }
+      else
+      {
+        glGetActiveUniformARB (handle, location, parameter_name.size (), &name_length, &elements_count, &type, &parameter_name [0]);
+      }
       
       if ((size_t)name_length > parameter_name.size ())
         name_length = parameter_name.size ();
@@ -216,7 +223,14 @@ GlslProgram::GlslProgram (const ContextManager& manager, size_t shaders_count, I
       GLint  name_length = 0, elements_count = 0;
       GLenum type = 0;
       
-      glGetActiveAttribARB (handle, location, attribute_name.size (), &name_length, &elements_count, &type, &attribute_name [0]);
+      if (glGetActiveAttrib)
+      {
+        glGetActiveAttrib (handle, location, attribute_name.size (), &name_length, &elements_count, &type, &attribute_name [0]);
+      }
+      else
+      {
+        glGetActiveAttribARB (handle, location, attribute_name.size (), &name_length, &elements_count, &type, &attribute_name [0]);
+      }
       
       if ((size_t)name_length > attribute_name.size ())
         name_length = attribute_name.size ();
@@ -228,11 +242,21 @@ GlslProgram::GlslProgram (const ContextManager& manager, size_t shaders_count, I
 
       if (strstr (attribute_name.c_str (), "[0]") == attribute_name.end () - 3)  //Обход особенности именования массивов в драйверах nVidia
         attribute_name.fast_resize (attribute_name.size () - 3);
-      
+
       Attribute attribute;
       
       attribute.name      = attribute_name;
       attribute.name_hash = common::strhash (attribute.name.c_str ());
+
+      if (glGetAttribLocation)
+      {
+        attribute.location = glGetAttribLocation (handle, attribute_name.c_str ());
+      }
+      else
+      {
+        attribute.location = glGetAttribLocationARB (handle, attribute_name.c_str ());
+      }
+
 
       attributes.push_back (attribute);
     }
@@ -417,7 +441,7 @@ int GlslProgram::FindAttribute (const char* name)
 
   for (AttributeArray::iterator iter=attributes.begin (), end=attributes.end (); iter!=end; ++iter)
     if (iter->name_hash == name_hash)
-      return iter - attributes.begin ();
+      return iter->location;
 
   return -1;
 }

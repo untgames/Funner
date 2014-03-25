@@ -750,7 +750,7 @@ void InputLayout::BindVertexAttributes (size_t base_vertex, BufferPtr* vertex_bu
     {
       if (current_enabled_shader_semantics_mask & ~used_shader_semantics_mask & mask)
       {
-	caps.glDisableVertexAttribArray_fn (i);
+        caps.glDisableVertexAttribArray_fn (i);
         continue;
       }
 

@@ -117,6 +117,7 @@ class GlslProgram: virtual public ICompiledProgram, public ContextObject, public
     {
       stl::string name;      //имя атрибута
       size_t      name_hash; //хэш имени
+      int         location;  //индекс атрибута
     };
 
     typedef xtl::com_ptr<GlslShader> ShaderPtr;
