@@ -629,6 +629,20 @@ class Converter
       for (size_t i=0; i<src_mesh.Surfaces ().Size (); i++)
         ConvertSurface (src_mesh.Surfaces () [i], *dst_mesh);
 
+        //Преобразование индексов в минимально возможный тип данных
+      unsigned int max_index_value = 0;
+      unsigned int *current_index  = dst_mesh->index_buffer.Data<unsigned int> ();
+
+      for (size_t i = 0, size = dst_mesh->index_buffer.Size (); i < size; i++, current_index++)
+      {
+        max_index_value = stl::max (max_index_value, *current_index);
+      }
+
+      if (max_index_value <= 0xff)
+        dst_mesh->index_buffer.SetDataType (media::geometry::IndexType_UInt8);
+      else if (max_index_value <= 0xffff)
+        dst_mesh->index_buffer.SetDataType (media::geometry::IndexType_UInt16);
+
         //регистрация меша
 
       mesh_map.insert_pair (id, dst_mesh);
