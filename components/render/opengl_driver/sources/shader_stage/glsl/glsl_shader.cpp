@@ -3,6 +3,15 @@
 using namespace render::low_level;
 using namespace render::low_level::opengl;
 
+namespace
+{
+
+//Константы
+const char*  DEFINE_TEXT              = "#define ";
+const size_t DEFINE_ADDITIONAL_LENGTH = xtl::xstrlen (DEFINE_TEXT) + 1;
+
+}
+
 /*
     Конструктор
 */
@@ -57,14 +66,33 @@ GlslShader::GlslShader (const ContextManager& manager, GLenum type, const Shader
 
     GLint compile_status = 0;
 
+    common::StringArray defines = common::split (desc.options);
+
+    stl::string defines_string;
+
+    defines_string.reserve (xtl::xstrlen (desc.options) + defines.Size () * DEFINE_ADDITIONAL_LENGTH);
+
+    for (size_t i = 0, count = defines.Size (); i < count; i++)
+      defines_string += common::format ("%s %s\n", DEFINE_TEXT, defines [i]);
+
+      //replace '=' with ' '
+    for (char* current_symbol = defines_string.begin (); *current_symbol; current_symbol++)
+    {
+      if (*current_symbol == '=')
+        *current_symbol = ' ';
+    }
+
+    const char* source_codes []       = { defines_string.c_str (), desc.source_code };
+    GLint       source_codes_sizes [] = { defines_string.length (), desc.source_code_size };
+
     if (glShaderSource)
     {
-      glShaderSource (handle, 1, (const char**)&desc.source_code, (GLint*)&desc.source_code_size);
+      glShaderSource (handle, 2, source_codes, source_codes_sizes);
     }
 #ifndef OPENGL_ES2_SUPPORT
     else
     {
-      glShaderSourceARB (handle, 1, (const char**)&desc.source_code, (GLint*)&desc.source_code_size);
+      glShaderSourceARB (handle, 2, source_codes, source_codes_sizes);
     }
 #endif
 
