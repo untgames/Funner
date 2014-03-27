@@ -6,7 +6,6 @@
 //
 // Copyright (c) 2002: 3Dlabs, Inc.
 //
-precision mediump float;
 uniform sampler2D bump_sampler2d; // value of sampler2d = 3
 uniform sampler2D diffuse_sampler2d; // value of sampler2d = 3
 varying vec3 lightDir; 	  // interpolated surface local coordinate light direction 

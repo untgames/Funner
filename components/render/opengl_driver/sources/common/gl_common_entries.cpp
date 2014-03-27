@@ -31,7 +31,7 @@ void GlEntries::Init (ILibrary& library)
   memset (this, 0, sizeof (GlEntries));
 
 #if !defined(OPENGL_ES_SUPPORT) && !defined(OPENGL_ES2_SUPPORT)
-  
+
     //получение адресов точек входа OpenGL 1.1
 
   init_entry (library, "glAccum", Accum);
