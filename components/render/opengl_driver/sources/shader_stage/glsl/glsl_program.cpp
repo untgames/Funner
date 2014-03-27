@@ -252,11 +252,12 @@ GlslProgram::GlslProgram (const ContextManager& manager, size_t shaders_count, I
       {
         attribute.location = glGetAttribLocation (handle, attribute_name.c_str ());
       }
+#ifndef OPENGL_ES2_SUPPORT
       else
       {
         attribute.location = glGetAttribLocationARB (handle, attribute_name.c_str ());
       }
-
+#endif
 
       attributes.push_back (attribute);
     }
