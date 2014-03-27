@@ -8,6 +8,8 @@
 #include <stl/string>
 #include <stl/vector>
 
+#include <math/matrix.h>
+
 namespace render
 {
 
@@ -154,6 +156,13 @@ class GlslBindableProgram: virtual public IBindableProgram, public ContextObject
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void Validate ();
     
+  private:
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Получение транспонированных матриц
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    template <unsigned int Size>
+    float* GetTransposedMatrixes (size_t count, float* data);
+
   private:
     struct Parameter;
     struct Group;

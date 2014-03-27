@@ -8,6 +8,14 @@ namespace
 
 /*
 ===================================================================================================
+    Константы
+===================================================================================================
+*/
+
+const size_t DEFAULT_TEMP_BUFFER_SIZE = 256; //дефолтный размер буфера для временных данных
+
+/*
+===================================================================================================
     Утилиты
 ===================================================================================================    
 */
@@ -41,7 +49,7 @@ class ContextImpl: public xtl::reference_counter, private IContextListener
 
         context->AttachListener (this);
 
-          //выбор активного контекста          
+          //выбор активного контекста
 
         context->MakeCurrent (swap_chain);
 
@@ -49,7 +57,7 @@ class ContextImpl: public xtl::reference_counter, private IContextListener
 
         gl_entries.Init (context->GetLibrary ());
 
-          //отключение буферов отрисовки          
+          //отключение буферов отрисовки
           
 #if !defined(OPENGL_ES_SUPPORT) && !defined(OPENGL_ES2_SUPPORT)
 
@@ -58,14 +66,14 @@ class ContextImpl: public xtl::reference_counter, private IContextListener
 
 #endif
 
-          //определение поддержки расширений        
+          //определение поддержки расширений
 
         extensions_string = reinterpret_cast<const char*> (glGetString (GL_EXTENSIONS));
         version_string    = reinterpret_cast<const char*> (glGetString (GL_VERSION));
         vendor_string     = reinterpret_cast<const char*> (glGetString (GL_VENDOR));
         renderer_string   = reinterpret_cast<const char*> (glGetString (GL_RENDERER));        
 
-          //добавление непереносимых расширений 
+          //добавление непереносимых расширений
 
         IPropertyList* swap_chain_properties = swap_chain->GetProperties ();        
 
@@ -239,7 +247,7 @@ class ContextImpl: public xtl::reference_counter, private IContextListener
     bool         need_check_errors;  //нужно ли проверять ошибки
 
   private:
-    static ContextImpl* current_context; //указатель на текущий контекст        
+    static ContextImpl* current_context; //указатель на текущий контекст
 };
 
 ContextImpl* ContextImpl::current_context = 0;
@@ -258,6 +266,7 @@ struct ContextManager::Impl: public xtl::reference_counter
 ///Конструктор
     Impl (ISwapChain* swap_chain, const char* init_string)
       : context (swap_chain, init_string),
+        temp_buffer (DEFAULT_TEMP_BUFFER_SIZE),
         current_swap_chain (0),
         check_gl_errors (true),
         need_change_context (true),
@@ -336,6 +345,14 @@ struct ContextManager::Impl: public xtl::reference_counter
 ///Получение текущего контекста и цепочек обмена
     ISwapChain*  GetSwapChain () { return current_swap_chain; }
     ContextImpl& GetContext   () { return context; }
+
+///Получение буфера памяти для временного размещения данных
+    void* GetTempBuffer (size_t size)
+    {
+      temp_buffer.resize (size, false);
+
+      return temp_buffer.data ();
+    }
 
 ///Создание совместимой цепочки обмена
     ISwapChain* CreateCompatibleSwapChain (ISwapChain* swap_chain)
@@ -459,18 +476,20 @@ struct ContextManager::Impl: public xtl::reference_counter
     }
 
   private:
-    typedef xtl::com_ptr<IAdapter> AdapterPtr;
+    typedef xtl::com_ptr<IAdapter>           AdapterPtr;
+    typedef xtl::uninitialized_storage<char> DataBuffer;
 
   private:
     Log                       log;                           //протокол
     ContextImpl               context;                       //контекст
+    DataBuffer                temp_buffer;                   //буфер памяти для временных данных
     LogHandler                log_handler;                   //обработчик протоколирования
-    AdapterPtr                adapter;                       //адаптер менеджера контекстов    
+    AdapterPtr                adapter;                       //адаптер менеджера контекстов
     ISwapChain*               current_swap_chain;            //текущая цепочка обмена
     bool                      check_gl_errors;               //нужно ли проверять ошибки OpenGL
     bool                      need_change_context;           //необходимо сменить контекст
     xtl::trackable::slot_type on_destroy_swap_chain;         //обработчик удаления цепочки обмена
-    bool                      need_stage_rebind [Stage_Num]; //флаги, определяющие необходимость ребиндинга уровня    
+    bool                      need_stage_rebind [Stage_Num]; //флаги, определяющие необходимость ребиндинга уровня
 };
 
 /*
@@ -582,6 +601,15 @@ size_t ContextManager::GetContextCacheValue (size_t entry_id) const
     throw xtl::make_range_exception ("render::low_level::opengl::GetContextCacheValue", "entry_id", entry_id, size_t (CacheEntry_Num));
     
   return GetContextCache ()[entry_id];
+}
+
+/*
+   Получение буфера памяти для временного размещения данных
+*/
+
+void* ContextManager::GetTempBuffer (size_t size) const
+{
+  return impl->GetTempBuffer (size);
 }
 
 /*

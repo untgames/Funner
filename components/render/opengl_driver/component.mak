@@ -28,7 +28,7 @@ endif
 RENDER.OPENGL_DRIVER.SOURCES.SOURCE_DIRS            += sources/output_stage
 RENDER.OPENGL_DRIVER.SOURCES.SOURCE_DIRS            += sources/query_manager
 RENDER.OPENGL_DRIVER.SOURCES.SOURCE_DIRS            += sources/render_target_manager/swap_chain_manager
-RENDER.OPENGL_DRIVER.SOURCES.IMPORTS                := compile.render.low_level compile.render.low_level.helpers compile.common compile.system
+RENDER.OPENGL_DRIVER.SOURCES.IMPORTS                := compile.render.low_level compile.render.low_level.helpers compile.common compile.system compile.math.vecmath
 RENDER.OPENGL_DRIVER.SOURCES.msvc.COMPILER_CFLAGS   := -wd4355
 RENDER.OPENGL_DRIVER.SOURCES.gles.COMPILER_DEFINES  := OPENGL_ES_SUPPORT
 RENDER.OPENGL_DRIVER.SOURCES.gles2.COMPILER_DEFINES := OPENGL_ES2_SUPPORT
