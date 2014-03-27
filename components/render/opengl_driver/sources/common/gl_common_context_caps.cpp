@@ -254,26 +254,6 @@ void ContextCaps::Init (const ExtensionSet& available_extension_set, const Exten
     glUniformMatrix4fv_fn        = glUniformMatrix4fv ? glUniformMatrix4fv : glUniformMatrix4fvARB;
     glUseProgram_fn              = glUseProgram ? glUseProgram : (PFNGLUSEPROGRAMPROC)glUseProgramObjectARB;
   }
-
-  if (has_ffp)
-  {
-    if (has_arb_multitexture) glGetIntegerv (GL_MAX_TEXTURE_UNITS, (GLint*)&texture_units_count);
-    else                      texture_units_count = 1;
-  }
-  else
-  {
-    if (has_arb_vertex_shader)
-    {
-      int vertex_shader_texture_units_count, pixel_shader_texture_units_count;
-
-      glGetIntegerv (GL_MAX_VERTEX_TEXTURE_IMAGE_UNITS_ARB, (GLint*)&vertex_shader_texture_units_count);
-      glGetIntegerv (GL_MAX_TEXTURE_IMAGE_UNITS_ARB, (GLint*)&pixel_shader_texture_units_count);
-
-      texture_units_count = stl::min (vertex_shader_texture_units_count, pixel_shader_texture_units_count);
-    }
-    else
-      texture_units_count = 1;
-  }
   
 #else
   ExtensionSet ext = available_extension_set;
@@ -370,12 +350,6 @@ void ContextCaps::Init (const ExtensionSet& available_extension_set, const Exten
     glGenerateMipmap_fn                      = glGenerateMipmapOES;
   }
 
-#ifdef OPENGL_ES_SUPPORT
-  glGetIntegerv (GL_MAX_TEXTURE_UNITS, (GLint*)&texture_units_count);  //has_arb_multitexture always true
-#elif defined(OPENGL_ES2_SUPPORT)
-  glGetIntegerv (GL_MAX_TEXTURE_IMAGE_UNITS, (GLint*)&texture_units_count);  //has_arb_multitexture always true
-#endif
-
 #endif
 
 #ifdef OPENGL_ES2_SUPPORT
@@ -403,14 +377,7 @@ void ContextCaps::Init (const ExtensionSet& available_extension_set, const Exten
   else
   {
     if (has_arb_vertex_shader)
-    {
-      int vertex_shader_texture_units_count = 0, pixel_shader_texture_units_count = 0;
-
-      glGetIntegerv (GL_MAX_VERTEX_TEXTURE_IMAGE_UNITS_ARB, (GLint*)&vertex_shader_texture_units_count);
-      glGetIntegerv (GL_MAX_TEXTURE_IMAGE_UNITS_ARB, (GLint*)&pixel_shader_texture_units_count);
-
-      texture_units_count = stl::min (vertex_shader_texture_units_count, pixel_shader_texture_units_count);
-    }
+      glGetIntegerv (GL_MAX_TEXTURE_IMAGE_UNITS, (GLint*)&texture_units_count);  //has_arb_multitexture always true
     else
       texture_units_count = 1;
   }
