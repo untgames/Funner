@@ -70,7 +70,11 @@ GlslShader::GlslShader (const ContextManager& manager, GLenum type, const Shader
 
     stl::string defines_string;
 
-    defines_string.reserve (xtl::xstrlen (desc.options) + defines.Size () * DEFINE_ADDITIONAL_LENGTH);
+#ifdef OPENGL_ES2_SUPPORT
+    defines_string = "#define OPENGL_ES2_SUPPORT\n";
+#endif
+
+    defines_string.reserve (defines_string.length () + xtl::xstrlen (desc.options) + defines.Size () * DEFINE_ADDITIONAL_LENGTH);
 
     for (size_t i = 0, count = defines.Size (); i < count; i++)
       defines_string += common::format ("%s %s\n", DEFINE_TEXT, defines [i]);

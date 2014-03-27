@@ -191,9 +191,8 @@ void ContextCaps::Init (const ExtensionSet& available_extension_set, const Exten
   has_sgis_texture_lod               = ext.Get (SGIS_texture_lod);
   has_amd_compressed_atc_texture     = false;
 
-  if (has_arb_texture_rectangle) glGetIntegerv (GL_MAX_RECTANGLE_TEXTURE_SIZE_ARB, (GLint*)&max_rectangle_texture_size);
-  if (has_arb_texture_cube_map)  glGetIntegerv (GL_MAX_CUBE_MAP_TEXTURE_SIZE_ARB, (GLint*)&max_cube_map_texture_size);
-  if (has_ext_texture3d)         glGetIntegerv (GL_MAX_3D_TEXTURE_SIZE_EXT, (GLint*)&max_3d_texture_size);
+  if (has_arb_texture_rectangle)
+    glGetIntegerv (GL_MAX_RECTANGLE_TEXTURE_SIZE_ARB, (GLint*)&max_rectangle_texture_size);
 
   glActiveTexture_fn           = has_arb_multitexture ? (glActiveTexture ? glActiveTexture : glActiveTextureARB) : 0;
   glBindBuffer_fn              = has_arb_vertex_buffer_object ? (glBindBuffer ? glBindBuffer : glBindBufferARB) : 0;
@@ -386,6 +385,9 @@ void ContextCaps::Init (const ExtensionSet& available_extension_set, const Exten
 #endif
 
   glGetIntegerv (GL_MAX_TEXTURE_SIZE, (GLint*)&max_texture_size);
+
+  if (has_arb_texture_cube_map) glGetIntegerv (GL_MAX_CUBE_MAP_TEXTURE_SIZE, (GLint*)&max_cube_map_texture_size);
+  if (has_ext_texture3d)        glGetIntegerv (GL_MAX_3D_TEXTURE_SIZE_EXT, (GLint*)&max_3d_texture_size);
 
   if (has_ext_texture_filter_anisotropic) glGetIntegerv (GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, (GLint*)&max_anisotropy);
   else                                    max_anisotropy = 1;

@@ -84,7 +84,9 @@ void SamplerState::Bind (GLenum tex_target, bool is_depth)
   switch (tex_target)
   {
     case GL_TEXTURE_3D:
+#ifndef OPENGL_ES2_SUPPORT
     case GL_TEXTURE_CUBE_MAP:
+#endif
       glTexParameteri (tex_target, GL_TEXTURE_WRAP_R, impl->gl_wrap [Texcoord_W]);
       break;
     default:
@@ -194,7 +196,7 @@ void SamplerState::SetDesc (const SamplerDesc& in_desc)
   if (in_desc.mip_lod_bias != 0.0f)
     throw xtl::format_not_supported_exception (METHOD_NAME, "desc.mip_lod_bias=%g not supported", in_desc.mip_lod_bias);    
 
-    //преобразование дескриптора сэмплера    
+    //преобразование дескриптора сэмплера
   
   GLenum gl_min_filter, gl_mag_filter, gl_wrap [Texcoord_Num], gl_comparision_function;
   
