@@ -146,6 +146,8 @@ class ApplicationImpl: private IApplicationListener
           case ApplicationEvent_OnInitialize:
           case ApplicationEvent_OnPause:
           case ApplicationEvent_OnResume:
+          case ApplicationEvent_OnStop:
+          case ApplicationEvent_OnStart:
           case ApplicationEvent_OnMemoryWarning:
             return signals [event].connect (handler);
           case ApplicationEvent_OnIdle:
@@ -176,7 +178,7 @@ class ApplicationImpl: private IApplicationListener
       notification_signal (notification);
     }
     
-///ѕодписка на событие обновлени€ системных свойств   
+///ѕодписка на событие обновлени€ системных свойств
     PropertyMap& CustomProperties () { return custom_properties; }
 
 ///¬ключен ли Idle режим?
@@ -287,6 +289,32 @@ class ApplicationImpl: private IApplicationListener
       }
     }
 
+///ќбработка остановки приложени€
+    void OnStop ()
+    {
+      try
+      {
+        Notify (ApplicationEvent_OnStop);
+      }
+      catch (...)
+      {
+        //подавление всех исключений
+      }
+    }
+
+///ќбработка восстановлени€ приложени€
+    void OnStart ()
+    {
+      try
+      {
+        Notify (ApplicationEvent_OnStart);
+      }
+      catch (...)
+      {
+        //подавление всех исключений
+      }
+    }
+
 ///ќбработка недостаточности пам€ти
     void OnMemoryWarning ()
     {
@@ -377,7 +405,7 @@ class ApplicationImpl: private IApplicationListener
 
   private:
     common::Log             log;                            //протоколирование
-    DelegatePtr             current_delegate;               //текущий делегат приложени€        
+    DelegatePtr             current_delegate;               //текущий делегат приложени€
     ApplicationSignal       signals [ApplicationEvent_Num]; //сигналы приложени€
     NotificationSignal      notification_signal;            //сигнал сообщений
     PropertyMap             custom_properties;              //пользовательские свойства
@@ -385,7 +413,7 @@ class ApplicationImpl: private IApplicationListener
     bool                    is_exit_detected;               //получен сигнал завершени€ приложени€
     size_t                  message_loop_count;             //количество вхождений в обработчик очереди сообщений
     xtl::auto_connection    on_push_action;                 //в очередь добавлено действие
-    size_t                  main_thread_id;                 //идентификатор главной нити    
+    size_t                  main_thread_id;                 //идентификатор главной нити
 };
 
 typedef Singleton<ApplicationImpl> ApplicationSingleton;

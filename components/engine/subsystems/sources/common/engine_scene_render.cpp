@@ -44,8 +44,8 @@ class SceneRenderSubsystem : public ISubsystem, public IAttachmentRegistryListen
     SceneRenderSubsystem (common::ParseNode& node, SubsystemManager& in_manager)
       : log (LOG_NAME)
       , render (get<const char*> (node, "DriverMask"), get<const char*> (node, "RendererMask"), get<const char*> (node, "RenderPathMasks", "*"))
-      , on_app_pause_connection (syslib::Application::RegisterEventHandler (syslib::ApplicationEvent_OnPause, xtl::bind (&SceneRenderSubsystem::OnPause, this)))
-      , on_app_resume_connection (syslib::Application::RegisterEventHandler (syslib::ApplicationEvent_OnResume, xtl::bind (&SceneRenderSubsystem::OnResume, this)))
+      , on_app_stop_connection (syslib::Application::RegisterEventHandler (syslib::ApplicationEvent_OnStop, xtl::bind (&SceneRenderSubsystem::OnStop, this)))
+      , on_app_start_connection (syslib::Application::RegisterEventHandler (syslib::ApplicationEvent_OnStart, xtl::bind (&SceneRenderSubsystem::OnStart, this)))
       , manager (in_manager)
     {
       try
@@ -271,7 +271,7 @@ class SceneRenderSubsystem : public ISubsystem, public IAttachmentRegistryListen
     }
 
       //пауза приложения
-    void OnPause ()
+    void OnStop ()
     {
       resource_server->DisableNotifications ();
 
@@ -279,7 +279,7 @@ class SceneRenderSubsystem : public ISubsystem, public IAttachmentRegistryListen
     }
 
       //восстановление приложения
-    void OnResume ()
+    void OnStart ()
     {
       resource_server->EnableNotifications ();
 
@@ -335,8 +335,8 @@ class SceneRenderSubsystem : public ISubsystem, public IAttachmentRegistryListen
     stl::auto_ptr<media::rms::ServerGroupAttachment> resource_server;          //сервер ресурсов рендеринга
     ScreenMap                                        screen_map;               //соответствие экранов и рендер-таргетов
     xtl::auto_connection                             idle_connection;          //соединение обновления рендер-таргетов
-    xtl::auto_connection                             on_app_pause_connection;  //соединение паузы приложения
-    xtl::auto_connection                             on_app_resume_connection; //соединение восстановления приложения
+    xtl::auto_connection                             on_app_stop_connection;   //соединение остановки приложения
+    xtl::auto_connection                             on_app_start_connection;  //соединение восстановления приложения
     RenderTargetArray                                idle_render_targets;      //список автоматически обновляемых целей рендеринга
     SubsystemManager&                                manager;
 };

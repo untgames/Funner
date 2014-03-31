@@ -25,6 +25,12 @@ class IApplicationListener
 ///Приложение восстановлено
     virtual void OnResume () {}
     
+///Приложение остановлено
+    virtual void OnStop () {}
+
+///Приложение восстановлено
+    virtual void OnStart () {}
+
 ///Приложение получило предупреждение о недостаточности памяти
     virtual void OnMemoryWarning () {}
 

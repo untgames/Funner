@@ -31,6 +31,8 @@ enum ApplicationEvent
   ApplicationEvent_OnInitialize,    //событие иницализации приложения
   ApplicationEvent_OnPause,         //приложение приостановлено
   ApplicationEvent_OnResume,        //приложение восстановлено
+  ApplicationEvent_OnStop,          //приложение остановлено
+  ApplicationEvent_OnStart,         //приложение восстановлено
   ApplicationEvent_OnMemoryWarning, //приложение получило предупреждение об использовании большого объема памяти
 
   ApplicationEvent_Num

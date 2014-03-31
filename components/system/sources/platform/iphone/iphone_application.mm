@@ -195,13 +195,19 @@ class ApplicationDelegateImpl: public IApplicationDelegate, public xtl::referenc
     void OnResume ()
     {
       if (listener)
+      {
+        listener->OnStart ();
         listener->OnResume ();
+      }
     }
 
     void OnPause ()
     {
       if (listener)
+      {
         listener->OnPause ();
+        listener->OnStop ();
+      }
     }
 
 ///Подписка на обновления системных свойств

@@ -251,6 +251,7 @@ public class EngineActivity extends Activity
   @Override
   public void onPause ()
   {
+    onPauseCallback ();
     super.onPause ();
     
     notify (EventType.ON_PAUSE);
@@ -260,6 +261,7 @@ public class EngineActivity extends Activity
   @Override
   public void onResume ()
   {
+    onResumeCallback ();
     super.onResume ();
     
     notify (EventType.ON_RESUME);
@@ -269,7 +271,7 @@ public class EngineActivity extends Activity
   @Override
   public void onStop ()
   {
-    onPauseCallback ();
+    onStopCallback ();
     super.onStop ();
     
     notify (EventType.ON_STOP);
@@ -279,7 +281,7 @@ public class EngineActivity extends Activity
   @Override
   public void onStart ()
   {
-    onResumeCallback ();
+    onStartCallback ();
     super.onStart ();
     
     notify (EventType.ON_START);
@@ -584,6 +586,8 @@ public class EngineActivity extends Activity
 /// Оповещение о возникновении событий
   public native void onPauseCallback ();
   public native void onResumeCallback ();
+  public native void onStartCallback ();
+  public native void onStopCallback ();
   public native void onLowMemoryCallback ();
 
 /// Посылка сообщения в приложение

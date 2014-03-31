@@ -52,6 +52,8 @@ void bind_application_events_library (Environment& environment)
   lib.Register ("get_OnIdle",   make_const (ApplicationEvent_OnIdle));
   lib.Register ("get_OnPause",  make_const (ApplicationEvent_OnPause));
   lib.Register ("get_OnResume", make_const (ApplicationEvent_OnResume));
+  lib.Register ("get_OnStop",   make_const (ApplicationEvent_OnStop));
+  lib.Register ("get_OnStart",  make_const (ApplicationEvent_OnStart));
 }
 
 void bind_window_styles_library (Environment& environment)
