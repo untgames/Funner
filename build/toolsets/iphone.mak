@@ -13,7 +13,7 @@ EXE_SUFFIX     :=
 DLL_SUFFIX     := .dylib
 DLL_LIB_SUFFIX := .dylib
 
-PROFILES += iphone cocoa unistd has_windows haswchar gles no_dll has_iconv
+PROFILES += iphone cocoa unistd has_windows haswchar gles2 no_dll has_iconv
 DLL_PATH := DYLD_LIBRARY_PATH
 
 COMMON_CFLAGS               += -Os -isysroot $(IPHONE_SDK_PATH) -DIPHONE -fvisibility=hidden -Wno-unused-function
