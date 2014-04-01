@@ -84,7 +84,7 @@ int main ()
     client.LoadResource ("data/u1/texture0002.dds");
     client.LoadResource ("data/u1/EnvGala_020_D.dds");
     client.LoadResource ("data/u1.xmtl");
-    client.LoadResource ("data/u1.binmesh");
+    client.LoadResource ("data/u1.xmesh");
 
     RenderTarget target = client.CreateRenderTarget ("my_window");
 
