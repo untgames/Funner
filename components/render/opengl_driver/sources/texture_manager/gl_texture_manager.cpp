@@ -258,19 +258,31 @@ struct TextureManager::Impl: public ContextObject
 
         if (need_change_mode)
         {
-#ifndef OPENGL_ES2_SUPPORT
-          if (current_texture_target [i])
-            glDisable (current_texture_target [i]);
-
-          if (texture_target)
-          {
-            glEnable (texture_target);
-          }
-          else
-#endif
+          if (caps.has_ffp)
           {
             if (current_texture_target [i])
+              glDisable (current_texture_target [i]);
+
+            if (texture_target)
+            {
+              glEnable (texture_target);
+            }
+            else
+            {
+              if (current_texture_target [i])
+              {
+                current_texture_id [i] = 0;
+                glBindTexture (current_texture_target [i], 0);
+              }
+            }
+          }
+          else
+          {
+            if (current_texture_target [i] && !texture_target)
+            {
+              current_texture_id [i] = 0;
               glBindTexture (current_texture_target [i], 0);
+            }
           }
 
           current_texture_target [i] = texture_target;
