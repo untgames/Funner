@@ -27,7 +27,7 @@ SOURCE_FILES_SUFFIXES       += s
 #список дефайнов, флаги компиляции, pch файл, список каталогов с dll)
 ###################################################################################################
 define tools.gcc.compile
-echo $1 && $(COMPILER_GCC) -c -o "$4/$$(basename $$src $${src##*.})o" $(patsubst %,-I "%",$2) $(patsubst %,-include "%",$3) $6 $(foreach def,$5,-D $(subst %,$(SPACE),$(def))) $1
+echo $1 && $(COMPILER_GCC) -c -o "$4/$$(basename $$src $${src##*.})$(OBJ_SUFFIX:.%=%)" $(patsubst %,-I "%",$2) $(patsubst %,-include "%",$3) $6 $(foreach def,$5,-D $(subst %,$(SPACE),$(def))) $1
 endef
 
 define tools.g++.c++compile
