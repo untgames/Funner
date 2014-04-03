@@ -1,2 +1,2 @@
 #!/bin/sh
-cmd //C "$EMAR.bat $@"
+python $EMAR $@

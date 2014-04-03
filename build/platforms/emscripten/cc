@@ -1,2 +1,2 @@
 #!/bin/sh
-cmd //C "$EMCC.bat $@"
+python $EMCC $@
