@@ -148,13 +148,13 @@ template <class Serializer, class Deserializer>
 class Connection: public IConnection, private ProcessorHolder, public Context<Serializer, Deserializer>, public xtl::reference_counter, public xtl::trackable
 {
   public:
-    typedef Context<Serializer, Deserializer> Context;
+    typedef Context<Serializer, Deserializer> ConnectionContext;
 
-    Connection (const char* name) : ProcessorHolder (name), Context (processor) { }
+    Connection (const char* name) : ProcessorHolder (name), ConnectionContext (processor) { }
 
     void ProcessCommands (const CommandBuffer& commands)
     {
-      Context::ProcessCommands (commands);
+      ConnectionContext::ProcessCommands (commands);
     }
 
     xtl::trackable& GetTrackable () { return *this; }
@@ -162,7 +162,7 @@ class Connection: public IConnection, private ProcessorHolder, public Context<Se
     void AddRef  () { addref (this); }
     void Release () { release (this); }    
 
-    using Context::SetCounterparty;
+    using ConnectionContext::SetCounterparty;
 };
 
 void print_log (const char* stream, const char* message)
