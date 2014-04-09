@@ -362,9 +362,24 @@ void OpenALSource::FillBuffer (ALuint al_buffer)
   }
   else
   {
+#ifdef __APPLE__  //Mac OSX and iOS skips some samples at the beginning of each sound
+    const size_t NULL_SAMPLES = 150 * sound_sample->Channels ();
+
+    size_t null_samples      = stl::min ((int)available_samples_count, stl::max (0, (int)NULL_SAMPLES - (int)play_sample_position));
+    size_t null_samples_size = sound_sample->SamplesToBytes (null_samples);
+
+    if (null_samples)
+      memset (buffer, 0, null_samples_size);
+
+    size_t samples_count = sound_sample_decoder->Read (stl::max (0, (int)play_sample_position - (int)NULL_SAMPLES), stl::max (0, (int)available_samples_count - (int)null_samples), buffer + null_samples_size);
+
+    available_samples_count -= samples_count + null_samples;
+    play_sample_position    += samples_count + null_samples;
+#else
     size_t samples_count     = sound_sample_decoder->Read (play_sample_position, available_samples_count, buffer);
     available_samples_count -= samples_count;
     play_sample_position    += samples_count;
+#endif
   }
 
   size_t readed_samples_count = max_samples_count - available_samples_count;
