@@ -11,9 +11,9 @@ int main ()
 
   high_precision_time_t start_time = high_precision_time ();
 
-  static const size_t DELAY = 2000;
+  static const size_t DELAY = 2 * CLOCKS_PER_SEC;
 
-  for (size_t start=clock (); clock () - start < 2000;);
+  for (size_t start=clock (); clock () - start < DELAY;);
 
   high_precision_time_t end_time = high_precision_time ();
 
@@ -23,15 +23,15 @@ int main ()
 
   convert_high_precision_time (span, seconds, nanoseconds);
 
-//  printf ("seconds=%u nanoseconds=%u\n", seconds, nanoseconds);
+//  printf ("seconds=%u nanoseconds=%u span=%llu\n", seconds, nanoseconds, span);
 
-  high_precision_time_t diff = high_precision_time_t (nanoseconds) + high_precision_time_t (seconds) * 1000000000 - 2000000000;
+  long long int diff = high_precision_time_t (nanoseconds) + high_precision_time_t (seconds) * 1000000000 - 2000000000;
 
-//  printf ("diff=%u\n", diff);
+//  printf ("diff=%lld\n", diff);
 
-  static const high_precision_time_t EPS = 10000000; //10 milliseconds
+  static const long long int EPS = 10000000; //10 milliseconds
 
-  if (diff > EPS || diff < -EPS) printf ("test failed. diff is %d\n", int (diff));
+  if (diff > EPS || diff < -EPS) printf ("test failed. diff is %lld\n", diff);
   else                           printf ("test passed\n");
 
   return 0;
