@@ -3,7 +3,14 @@
 
 #include <cstddef>
 
-#ifndef _WIN32
+#ifdef __APPLE__
+  #ifdef IPHONE
+    #include <mach/clock.h>
+    #include <mach/mach_host.h>
+  #else
+    #include <mach/mach_time.h>
+  #endif
+#elif !defined (_WIN32)
   #include <time.h>
 #endif
 

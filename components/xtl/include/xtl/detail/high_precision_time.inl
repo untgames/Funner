@@ -25,7 +25,49 @@ inline high_precision_time_t high_precision_time_frequency ()
   return 0;
 }
 
-#elif defined (BEAGLEBOARD) || defined (__APPLE__) || defined (MEEGO)
+#elif defined (__APPLE__)
+
+#ifdef IPHONE //mach_absolute_time returns wrong time on iOS
+
+inline high_precision_time_t high_precision_time ()
+{
+  static clock_serv_t clock_service = 0;
+
+  if (!clock_service)
+    host_get_clock_service (mach_host_self(), SYSTEM_CLOCK, &clock_service);
+
+  mach_timespec time;
+
+  if (clock_get_time (clock_service, &time) != 0)
+    return 0;
+
+  return high_precision_time_t (time.tv_nsec) + high_precision_time_t (time.tv_sec) * NANOSECONDS_PER_ONE_SECOND;
+}
+
+inline high_precision_time_t high_precision_time_frequency ()
+{
+  return NANOSECONDS_PER_ONE_SECOND;
+}
+
+#else
+
+inline high_precision_time_t high_precision_time ()
+{
+  return mach_absolute_time ();
+}
+
+inline high_precision_time_t high_precision_time_frequency ()
+{
+  mach_timebase_info_data_t timebase;
+
+  mach_timebase_info (&timebase);
+
+  return NANOSECONDS_PER_ONE_SECOND * timebase.numer / timebase.denom;
+}
+
+#endif
+
+#elif defined (BEAGLEBOARD) || defined (MEEGO)
 
 inline high_precision_time_t high_precision_time ()
 {
@@ -46,7 +88,7 @@ inline high_precision_time_t high_precision_time ()
   if (clock_gettime (CLOCK_MONOTONIC, &time) != 0)
     return 0;
 
-  return high_precision_time_t (time.tv_nsec) + high_precision_time (time.tv_sec) * NANOSECONDS_PER_ONE_SECOND;
+  return high_precision_time_t (time.tv_nsec) + high_precision_time_t (time.tv_sec) * NANOSECONDS_PER_ONE_SECOND;
 }
 
 inline high_precision_time_t high_precision_time_frequency ()
