@@ -5,4 +5,4 @@ TARGETS := DEMOS
 
 #Цель №1 - demos
 DEMOS.TYPE       := package
-DEMOS.COMPONENTS := water_slides render2d scene_input plarium marbles
+DEMOS.COMPONENTS := water_slides render2d scene_input marbles

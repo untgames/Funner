@@ -1,5 +1,0 @@
-Results of zlib_test:
-Buffer size for compression = 37
-Compressed size = 33
-Compressed size correct, compressed data correct - 'y'
-Decompression correct = 'y'

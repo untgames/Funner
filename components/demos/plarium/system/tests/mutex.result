@@ -1,8 +1,0 @@
-Results of mutex_test:
-create mutex
-lock mutex
-create thread
-another thread: lock mutex
-unlock mutex
-another thread: mutex locked
-exit

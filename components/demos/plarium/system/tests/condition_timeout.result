@@ -1,8 +1,0 @@
-Results of condition_signal_test:
-create mutex & condition
-create thread
-sleep
-wait started
-wait finished
-wake
-exit
