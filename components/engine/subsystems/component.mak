@@ -9,10 +9,10 @@ ENGINE.SUBSYSTEMS.SOURCES.NAME                    := funner.engine.subsystems
 ENGINE.SUBSYSTEMS.SOURCES.SOURCE_DIRS             := sources/common
 ENGINE.SUBSYSTEMS.SOURCES.IMPORTS                 := compile.engine.core compile.render.scene_render2d \
                                                      compile.input.manager compile.input.low_level \
-                                                     compile.sound.scene_player compile.system \
+                                                     compile.render.scene_render.client compile.sound.scene_player compile.system \
                                                      compile.script.core compile.media.rms \
                                                      compile.physics.manager
-ENGINE.SUBSYSTEMS.SOURCES.has_windows.IMPORTS     := compile.input.window_driver compile.render.mid_level.window_driver
+ENGINE.SUBSYSTEMS.SOURCES.has_windows.IMPORTS     := compile.input.window_driver compile.render.mid_level.window_driver compile.render.scene_render.server                                                
 ENGINE.SUBSYSTEMS.SOURCES.has_windows.SOURCE_DIRS := sources/window_manager
 ENGINE.SUBSYSTEMS.SOURCES.iphone.SOURCE_DIRS      := sources/iphone
 

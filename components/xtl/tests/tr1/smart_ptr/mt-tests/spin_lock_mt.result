@@ -1,0 +1,5 @@
+Results of spin_lock_mt_test:
+Using Windows threads: 16 threads, 1048576 iterations: 
+
+2.445 seconds.
+value is 16777216 required is 16777216

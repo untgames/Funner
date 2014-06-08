@@ -41,11 +41,13 @@
 #include <sg/input.h>
 #include <sg/light.h>
 #include <sg/listener.h>
+#include <sg/mesh.h>
 #include <sg/node_array.h>
 #include <sg/page_curl.h>
 #include <sg/particle_emitter.h>
 #include <sg/physics.h>
 #include <sg/scene.h>
+#include <sg/scissor.h>
 #include <sg/sound_emitter.h>
 #include <sg/sprite.h>
 #include <sg/text_line.h>

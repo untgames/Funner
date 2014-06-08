@@ -1,25 +1,26 @@
-struct RendererPrimitive;
+class DynamicPrimitiveEntityStorage;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Описание операции рендеринга
+///Информация о уровне детализации
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-struct RendererOperation
+struct EntityLodDesc
 {
-  EntityImpl*                     entity;                         //объект
-  render::low_level::IStateBlock* state_block;                    //блок состояний объекта
-  ProgramParametersLayout*        entity_parameters_layout;       //расположение параметров объекта
-  const RendererPrimitive*        primitive;                      //примитив
-  ShaderOptionsCache*             shader_options_cache;           //кэш опций шейдера
-  const RectAreaImpl*             scissor;                        //область отсечения (может быть null)
-};
+  RendererOperationList&         operations;                         //операции рендеринга
+  DynamicPrimitiveEntityStorage& dynamic_primitive_storage;          //хранилище динамических примитивов
+  bool                           has_frame_dependent_operations;     //есть ли операции зависящие от кадра
+  bool                           has_frame_independent_operations;   //есть ли операции не зависящие от кадра
+  bool                           has_entity_dependent_operations;    //есть ли операции зависящие от объекта
+  bool                           has_entity_independent_operations;  //есть ли операции не зависящие от объекта
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Описание списка операций
-///////////////////////////////////////////////////////////////////////////////////////////////////
-struct RendererOperationList
-{
-  size_t                   operations_count; //количество операций
-  const RendererOperation* operations;       //операции
+  EntityLodDesc (RendererOperationList& in_operations, DynamicPrimitiveEntityStorage& in_storage)
+    : operations (in_operations)
+    , dynamic_primitive_storage (in_storage)
+    , has_frame_dependent_operations ()
+    , has_frame_independent_operations ()
+    , has_entity_dependent_operations ()
+    , has_entity_independent_operations ()
+  {
+  }
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -40,6 +41,13 @@ class EntityImpl: public Object
     DynamicTextureEntityStorage& DynamicTextureStorage ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+///Матрица мировых преобразований
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void               SetWorldMatrix     (const math::mat4f&);
+    const math::mat4f& WorldMatrix        ();
+    const math::mat4f& InverseWorldMatrix ();
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Свойства рендеринга
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void                       SetProperties (const common::PropertyMap&);
@@ -49,7 +57,13 @@ class EntityImpl: public Object
 ///Макро-определения шейдера
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void                       SetShaderOptions (const common::PropertyMap&);
-    const common::PropertyMap& ShaderOptions    () const;    
+    const common::PropertyMap& ShaderOptions    ();
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Пользовательские данные
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void  SetUserData (void* data);
+    void* UserData    ();
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Работа с костями (для скиннинга)
@@ -79,21 +93,21 @@ class EntityImpl: public Object
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Точка в локальной системе координат объекта для расчёта удаленности от камеры
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-   void               SetLodPoint (const math::vec3f&);
-   const math::vec3f& LodPoint    ();
+    void               SetLodPoint (const math::vec3f&);
+    const math::vec3f& LodPoint    ();
    
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Управление областью отсечения объекта
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-   void            SetScissor      (const RectArea& scissor);
-   const RectArea& Scissor         ();
-   void            SetScissorState (bool state);
-   bool            ScissorState    ();
+    void            SetScissor      (const RectArea& scissor);
+    const RectArea& Scissor         ();
+    void            SetScissorState (bool state);
+    bool            ScissorState    ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Получение операций рендеринга
+///Получение информации об уровне детализации
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    const RendererOperationList& RendererOperations (size_t level_of_detail, bool find_nearest = false);
+    const EntityLodDesc& GetLod (size_t level_of_detail, bool find_nearest = false);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Управление кэшированием

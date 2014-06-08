@@ -1,6 +1,8 @@
 #ifndef RENDER_MANAGER_SHARED_HEADER
 #define RENDER_MANAGER_SHARED_HEADER
 
+#include <float.h>
+
 #include <stl/auto_ptr.h>
 #include <stl/hash_map>
 #include <stl/hash_set>
@@ -8,6 +10,7 @@
 #include <stl/string>
 #include <stl/vector>
 
+#include <xtl/type_traits>
 #include <xtl/bind.h>
 #include <xtl/common_exceptions.h>
 #include <xtl/intrusive_ptr.h>
@@ -16,6 +19,9 @@
 #include <xtl/shared_ptr.h>
 #include <xtl/signal.h>
 #include <xtl/trackable.h>
+#include <xtl/uninitialized_storage.h>
+
+#include <math/utility.h>
 
 #include <common/hash.h>
 #include <common/log.h>
@@ -39,10 +45,15 @@
 namespace render
 {
 
+namespace manager
+{
 
 //implementation forwards
+class BatchStateBlock;
+class BatchingManager;
 class CacheManager;
 class DeviceManager;
+class DynamicPrimitive;
 class DynamicTextureImpl;
 class Effect;
 class EffectLoaderLibrary;
@@ -50,25 +61,37 @@ class EffectManager;
 class EffectPass;
 class EffectRenderer;
 class MaterialManager;
+class NativeWindow;
 class PrimitiveManager;
 class Program;
 class ProgramManager;
 class ProgramParametersLayout;
 class PropertyCache;
 class RenderingContext;
+class RenderTargetMapImpl;
 class Settings;
 class ShaderOptionsCache;
 class TextureManager;
 class InstantiatedEffect;
 struct RendererOperationList;
+struct RendererPrimitive;
+struct RendererPrimitiveGroup;
 struct RenderTargetDesc;
 struct ShaderOptions;
+
+template <class T> class DynamicPrimitiveBuffer;
+
+typedef SimplePrimitiveListImpl<Line>   LineListImpl;
+typedef SimplePrimitiveListImpl<Sprite> SpriteListImpl;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Указатели на объекты рендера среднего уровня
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+typedef xtl::intrusive_ptr<BatchStateBlock>         BatchStateBlockPtr;
+typedef xtl::intrusive_ptr<BatchingManager>         BatchingManagerPtr;
 typedef xtl::intrusive_ptr<CacheManager>            CacheManagerPtr;
 typedef xtl::intrusive_ptr<DeviceManager>           DeviceManagerPtr;
+typedef xtl::intrusive_ptr<DynamicPrimitive>        DynamicPrimitivePtr;
 typedef xtl::intrusive_ptr<DynamicTextureImpl>      DynamicTexturePtr;
 typedef xtl::intrusive_ptr<EffectPass>              EffectPassPtr;
 typedef xtl::intrusive_ptr<Effect>                  EffectPtr;
@@ -77,8 +100,10 @@ typedef xtl::intrusive_ptr<EffectRenderer>          EffectRendererPtr;
 typedef xtl::intrusive_ptr<EntityImpl>              EntityPtr;
 typedef xtl::intrusive_ptr<FrameImpl>               FramePtr;
 typedef xtl::intrusive_ptr<InstantiatedEffect>      InstantiatedEffectPtr;
+typedef xtl::intrusive_ptr<LineListImpl>            LineListPtr;
 typedef xtl::intrusive_ptr<MaterialImpl>            MaterialPtr;
 typedef xtl::intrusive_ptr<MaterialManager>         MaterialManagerPtr;
+typedef xtl::intrusive_ptr<NativeWindow>            NativeWindowPtr;
 typedef xtl::intrusive_ptr<PrimitiveImpl>           PrimitivePtr;
 typedef xtl::intrusive_ptr<PrimitiveBuffersImpl>    PrimitiveBuffersPtr;
 typedef xtl::intrusive_ptr<PrimitiveManager>        PrimitiveManagerPtr;
@@ -90,7 +115,9 @@ typedef xtl::intrusive_ptr<RectAreaImpl>            RectAreaPtr;
 typedef xtl::intrusive_ptr<RenderManagerImpl>       RenderManagerPtr;
 typedef xtl::intrusive_ptr<RenderTargetImpl>        RenderTargetPtr;
 typedef xtl::intrusive_ptr<RenderTargetDesc>        RenderTargetDescPtr;
+typedef xtl::intrusive_ptr<RenderTargetMapImpl>     RenderTargetMapPtr;
 typedef xtl::intrusive_ptr<Settings>                SettingsPtr;
+typedef xtl::intrusive_ptr<SpriteListImpl>          SpriteListPtr;
 typedef xtl::intrusive_ptr<TextureImpl>             TexturePtr;
 typedef xtl::intrusive_ptr<TextureManager>          TextureManagerPtr;
 typedef xtl::intrusive_ptr<ViewportImpl>            ViewportPtr;
@@ -134,7 +161,7 @@ class Wrappers
     static Ret Wrap (T* ptr)
     {
       if (!ptr)
-        throw xtl::format_operation_exception ("render::Wrappers::Wrap", "Attempt to wrap null internal object for of type '%s'", typeid (T).name ());
+        throw xtl::format_operation_exception ("render::manager::Wrappers::Wrap", "Attempt to wrap null internal object for of type '%s'", typeid (T).name ());
     
       return Ret (ptr);
     }
@@ -143,7 +170,7 @@ class Wrappers
     static Ret Wrap (const xtl::intrusive_ptr<T>& ptr)
     {
       if (!ptr)
-        throw xtl::format_operation_exception ("render::Wrappers::Wrap", "Attempt to wrap null internal object for of type '%s'", typeid (T).name ());
+        throw xtl::format_operation_exception ("render::manager::Wrappers::Wrap", "Attempt to wrap null internal object for of type '%s'", typeid (T).name ());
     
       return Ret (ptr.get ());
     }
@@ -166,7 +193,7 @@ class DebugIdHolder: public xtl::noncopyable
       {
         --current_id;
 
-        throw xtl::format_operation_exception ("render::DebugIdHolder::DebugIdHolder", "Too many render objects");
+        throw xtl::format_operation_exception ("render::manager::DebugIdHolder::DebugIdHolder", "Too many render objects");
       }
     }
     
@@ -185,9 +212,14 @@ class DebugIdHolder: public xtl::noncopyable
 #include "log.h"
 #include "cache_holder.h"
 #include "resource_proxy.h"
+#include "renderer.h"
 
 #include "cache_manager.h"
 #include "cache_map.h"
+
+#include "batching_manager.h"
+#include "dynamic_primitive.h"
+#include "dynamic_primitive_buffer.h"
 #include "dynamic_texture.h"
 #include "effect.h"
 #include "effect_loader_library.h"
@@ -209,13 +241,17 @@ class DebugIdHolder: public xtl::noncopyable
 #include "property_cache.h"
 #include "rect_area.h"
 #include "render_target.h"
+#include "render_target_map.h"
 #include "rendering_context.h"
 #include "settings.h"
 #include "shader_options.h"
+#include "simple_primitive_list.h"
 #include "texture.h"
 #include "texture_manager.h"
 #include "viewport.h"
 #include "window.h"
+
+}
 
 }
 

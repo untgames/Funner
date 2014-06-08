@@ -5,7 +5,7 @@ using namespace render::low_level::opengl;
 namespace
 {
 
-#ifndef OPENGL_ES_SUPPORT
+#if !defined(OPENGL_ES_SUPPORT) && !defined(OPENGL_ES2_SUPPORT)
 
 /*
     Версии OpenGL
@@ -96,7 +96,7 @@ ContextCaps::ContextCaps ()
 
 void ContextCaps::Init (const ExtensionSet& available_extension_set, const ExtensionSet& enabled_extension_set, const ContextSettings& settings)
 {
-#ifndef OPENGL_ES_SUPPORT  
+#if !defined(OPENGL_ES_SUPPORT) && !defined(OPENGL_ES2_SUPPORT)
 
     //маркеры используемых расширений
 
@@ -191,9 +191,8 @@ void ContextCaps::Init (const ExtensionSet& available_extension_set, const Exten
   has_sgis_texture_lod               = ext.Get (SGIS_texture_lod);
   has_amd_compressed_atc_texture     = false;
 
-  if (has_arb_texture_rectangle) glGetIntegerv (GL_MAX_RECTANGLE_TEXTURE_SIZE_ARB, (GLint*)&max_rectangle_texture_size);
-  if (has_arb_texture_cube_map)  glGetIntegerv (GL_MAX_CUBE_MAP_TEXTURE_SIZE_ARB, (GLint*)&max_cube_map_texture_size);
-  if (has_ext_texture3d)         glGetIntegerv (GL_MAX_3D_TEXTURE_SIZE_EXT, (GLint*)&max_3d_texture_size);
+  if (has_arb_texture_rectangle)
+    glGetIntegerv (GL_MAX_RECTANGLE_TEXTURE_SIZE_ARB, (GLint*)&max_rectangle_texture_size);
 
   glActiveTexture_fn           = has_arb_multitexture ? (glActiveTexture ? glActiveTexture : glActiveTextureARB) : 0;
   glBindBuffer_fn              = has_arb_vertex_buffer_object ? (glBindBuffer ? glBindBuffer : glBindBufferARB) : 0;
@@ -221,7 +220,6 @@ void ContextCaps::Init (const ExtensionSet& available_extension_set, const Exten
     glRenderbufferStorage_fn                 = glRenderbufferStorageEXT;
     glGetRenderbufferParameteriv_fn          = glGetRenderbufferParameterivEXT;
     glIsFramebuffer_fn                       = glIsFramebufferEXT;
-    glBindFramebuffer_fn                     = glBindFramebufferEXT;
     glDeleteFramebuffers_fn                  = glDeleteFramebuffersEXT;
     glGenFramebuffers_fn                     = glGenFramebuffersEXT;
     glCheckFramebufferStatus_fn              = glCheckFramebufferStatusEXT;
@@ -256,58 +254,68 @@ void ContextCaps::Init (const ExtensionSet& available_extension_set, const Exten
     glUniformMatrix4fv_fn        = glUniformMatrix4fv ? glUniformMatrix4fv : glUniformMatrix4fvARB;
     glUseProgram_fn              = glUseProgram ? glUseProgram : (PFNGLUSEPROGRAMPROC)glUseProgramObjectARB;
   }
-
-  if (has_ffp)
-  {
-    if (has_arb_multitexture) glGetIntegerv (GL_MAX_TEXTURE_UNITS, (GLint*)&texture_units_count);
-    else                      texture_units_count = 1;
-  }
-  else
-  {
-    if (has_arb_vertex_shader)
-    {
-      int vertex_shader_texture_units_count, pixel_shader_texture_units_count;
-
-      glGetIntegerv (GL_MAX_VERTEX_TEXTURE_IMAGE_UNITS_ARB, (GLint*)&vertex_shader_texture_units_count);
-      glGetIntegerv (GL_MAX_TEXTURE_IMAGE_UNITS_ARB, (GLint*)&pixel_shader_texture_units_count);
-
-      texture_units_count = stl::min (vertex_shader_texture_units_count, pixel_shader_texture_units_count);
-    }
-    else
-      texture_units_count = 1;
-  }
   
 #else
-
   ExtensionSet ext = available_extension_set;
 
-  static Extension OES_blend_equation_separate    = "GL_OES_blend_equation_separate",
-                   OES_blend_func_separate        = "GL_OES_blend_func_separate",
-                   OES_blend_subtract             = "GL_OES_blend_subtract",
-                   OES_framebuffer_object         = "GL_OES_framebuffer_object",
-                   OES_texture_cube_map           = "GL_OES_texture_cube_map",
-                   OES_packed_depth_stencil       = "GL_OES_packed_depth_stencil",
+  static Extension OES_packed_depth_stencil       = "GL_OES_packed_depth_stencil",
                    EXT_texture_compression_s3tc   = "GL_EXT_texture_compression_s3tc",
 //                   EXT_texture_filter_anisotropic = "GL_EXT_texture_filter_anisotropic",
                    IMG_texture_compression_pvrtc  = "GL_IMG_texture_compression_pvrtc",
                    AMD_compressed_ATC_texture     = "GL_AMD_compressed_ATC_texture",
                    ATI_texture_compression_atitc  = "GL_ATI_texture_compression_atitc";
 
-  has_arb_multisample                = true;
   has_arb_multitexture               = true;
-  has_arb_texture_cube_map           = ext.Get (OES_texture_cube_map);
   has_arb_vertex_buffer_object       = true;
-  has_ext_blend_equation_separate    = ext.Get (OES_blend_equation_separate);
-  has_ext_blend_func_separate        = ext.Get (OES_blend_func_separate);
-  has_ext_blend_subtract             = ext.Get (OES_blend_subtract);
-  has_ext_framebuffer_object         = ext.Get (OES_framebuffer_object);
   has_ext_packed_depth_stencil       = ext.Get (OES_packed_depth_stencil);
   has_ext_texture_compression_s3tc   = ext.Get (EXT_texture_compression_s3tc);
   has_ext_texture_filter_anisotropic = false; //ext.Get (EXT_texture_filter_anisotropic);   //supported on Qualcomm Adreno 205 but generates error
   has_img_texture_compression_pvrtc  = ext.Get (IMG_texture_compression_pvrtc);
   has_amd_compressed_atc_texture     = ext.Get (AMD_compressed_ATC_texture) || ext.Get (ATI_texture_compression_atitc);
-  has_sgis_generate_mipmap           = true;
 
+#ifdef OPENGL_ES_SUPPORT
+  static Extension OES_blend_equation_separate = "GL_OES_blend_equation_separate",
+                   OES_blend_func_separate     = "GL_OES_blend_func_separate",
+                   OES_blend_subtract          = "GL_OES_blend_subtract",
+                   OES_framebuffer_object      = "GL_OES_framebuffer_object",
+                   OES_texture_cube_map        = "GL_OES_texture_cube_map";
+
+  has_arb_texture_cube_map           = ext.Get (OES_texture_cube_map);
+  has_ext_blend_equation_separate    = ext.Get (OES_blend_equation_separate);
+  has_ext_blend_func_separate        = ext.Get (OES_blend_func_separate);
+  has_ext_blend_subtract             = ext.Get (OES_blend_subtract);
+  has_ext_framebuffer_object         = ext.Get (OES_framebuffer_object);
+  has_sgis_generate_mipmap           = true;
+  has_arb_multisample                = true;
+#elif defined(OPENGL_ES2_SUPPORT)
+  has_arb_shading_language_100       = true;
+  has_arb_fragment_shader            = true;
+  has_arb_vertex_shader              = true;
+  has_arb_texture_cube_map           = true;
+  has_ext_framebuffer_object         = true;
+  has_arb_multisample                = false;
+  has_sgis_generate_mipmap           = false;
+  has_ext_texture3d                  = true;
+  has_ext_blend_equation_separate    = true;
+  has_ext_blend_func_separate        = true;
+  has_ext_blend_subtract             = true;
+  has_ati_separate_stencil           = true;
+  has_arb_texture_border_clamp       = ext.Get ("GL_NV_texture_border_clamp");
+  has_ext_shadow_funcs               = ext.Get ("GL_EXT_shadow_samplers");
+  glUniform1fv_fn                    = glUniform1fv;
+  glUniform1iv_fn                    = glUniform1iv;
+  glUniform2fv_fn                    = glUniform2fv;
+  glUniform2iv_fn                    = glUniform2iv;
+  glUniform3fv_fn                    = glUniform3fv;
+  glUniform3iv_fn                    = glUniform3iv;
+  glUniform4fv_fn                    = glUniform4fv;
+  glUniform4iv_fn                    = glUniform4iv;
+  glUniformMatrix2fv_fn              = glUniformMatrix2fv;
+  glUniformMatrix3fv_fn              = glUniformMatrix3fv;
+  glUniformMatrix4fv_fn              = glUniformMatrix4fv;
+  glUseProgram_fn                    = glUseProgram;
+  glGetUniformLocation_fn            = glGetUniformLocation;
+#endif
   glActiveTexture_fn           = glActiveTexture;
   glBindBuffer_fn              = glBindBuffer;
   glBlendEquation_fn           = has_ext_blend_subtract ? glBlendEquationOES : 0;
@@ -315,12 +323,14 @@ void ContextCaps::Init (const ExtensionSet& available_extension_set, const Exten
   glBlendFuncSeparate_fn       = has_ext_blend_func_separate ? glBlendFuncSeparateOES : 0;
   glBufferData_fn              = glBufferData;
   glBufferSubData_fn           = glBufferSubData;
-  glClientActiveTexture_fn     = glClientActiveTexture;
   glCompressedTexImage2D_fn    = glCompressedTexImage2D;
   glCompressedTexSubImage2D_fn = glCompressedTexSubImage2D;
   glDeleteBuffers_fn           = glDeleteBuffers;
   glGenBuffers_fn              = glGenBuffers;
-  
+#ifndef OPENGL_ES2_SUPPORT
+  glClientActiveTexture_fn = glClientActiveTexture;
+#endif
+
   if (has_ext_framebuffer_object)
   {
     glBindFramebuffer_fn                     = glBindFramebufferOES;
@@ -331,7 +341,6 @@ void ContextCaps::Init (const ExtensionSet& available_extension_set, const Exten
     glRenderbufferStorage_fn                 = glRenderbufferStorageOES;
     glGetRenderbufferParameteriv_fn          = glGetRenderbufferParameterivOES;
     glIsFramebuffer_fn                       = glIsFramebufferOES;
-    glBindFramebuffer_fn                     = glBindFramebufferOES;
     glDeleteFramebuffers_fn                  = glDeleteFramebuffersOES;
     glGenFramebuffers_fn                     = glGenFramebuffersOES;
     glCheckFramebufferStatus_fn              = glCheckFramebufferStatusOES;
@@ -341,40 +350,45 @@ void ContextCaps::Init (const ExtensionSet& available_extension_set, const Exten
     glGenerateMipmap_fn                      = glGenerateMipmapOES;
   }
 
-  glGetIntegerv (GL_MAX_TEXTURE_UNITS, (GLint*)&texture_units_count);  //has_arb_multitexture always true
-
 #endif
 
+#ifdef OPENGL_ES2_SUPPORT
+  has_ffp = false;
+#else
   has_ffp = settings.IsFfpAllowed ();
+#endif
 
   glGetIntegerv (GL_MAX_TEXTURE_SIZE, (GLint*)&max_texture_size);
+
+  if (has_arb_texture_cube_map) glGetIntegerv (GL_MAX_CUBE_MAP_TEXTURE_SIZE, (GLint*)&max_cube_map_texture_size);
+  if (has_ext_texture3d)        glGetIntegerv (GL_MAX_3D_TEXTURE_SIZE_EXT, (GLint*)&max_3d_texture_size);
 
   if (has_ext_texture_filter_anisotropic) glGetIntegerv (GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, (GLint*)&max_anisotropy);
   else                                    max_anisotropy = 1;
 
   if (has_ffp)
   {
+#ifndef OPENGL_ES2_SUPPORT
     if (has_arb_multitexture) glGetIntegerv (GL_MAX_TEXTURE_UNITS, (GLint*)&texture_units_count);
     else                      texture_units_count = 1;
+#endif
   }
 #ifndef OPENGL_ES_SUPPORT  
   else
   {
     if (has_arb_vertex_shader)
-    {
-      int vertex_shader_texture_units_count, pixel_shader_texture_units_count;
-      
-      glGetIntegerv (GL_MAX_VERTEX_TEXTURE_IMAGE_UNITS_ARB, (GLint*)&vertex_shader_texture_units_count);
-      glGetIntegerv (GL_MAX_TEXTURE_IMAGE_UNITS_ARB, (GLint*)&pixel_shader_texture_units_count);
-
-      texture_units_count = stl::min (vertex_shader_texture_units_count, pixel_shader_texture_units_count);
-    }
+      glGetIntegerv (GL_MAX_TEXTURE_IMAGE_UNITS, (GLint*)&texture_units_count);  //has_arb_multitexture always true
     else
       texture_units_count = 1;
   }
 
   if (has_arb_vertex_shader)
-  { 
+  {
+#ifdef OPENGL_ES2_SUPPORT
+    glVertexAttribPointer_fn       = glVertexAttribPointer;
+    glDisableVertexAttribArray_fn  = glDisableVertexAttribArray;
+    glEnableVertexAttribArray_fn   = glEnableVertexAttribArray;
+#else
     glVertexAttribPointer_fn       = glVertexAttribPointer ? glVertexAttribPointer : glVertexAttribPointerARB;
     glDisableVertexAttribArray_fn  = glDisableVertexAttribArray ? glDisableVertexAttribArray : glDisableVertexAttribArrayARB;
     glEnableVertexAttribArray_fn   = glEnableVertexAttribArray ? glEnableVertexAttribArray : glEnableVertexAttribArrayARB;
@@ -384,13 +398,13 @@ void ContextCaps::Init (const ExtensionSet& available_extension_set, const Exten
 
     if (ext.Get ("GL_ARB_vertex_attrib_64bit") || ext.Get ("GL_EXT_vertex_attrib_64bit"))
       glVertexAttribLPointer_fn  = glVertexAttribLPointer ? glVertexAttribLPointer : glVertexAttribLPointerEXT;
-  }
-
 #endif
-  
+  }
+#endif
+
   size_t settings_max_texture_size    = settings.GetInteger (ContextSettingsInteger_MaxTextureSize),
          settings_max_anisotropy      = settings.GetInteger (ContextSettingsInteger_MaxAnisotropy),
-         settings_texture_units_count = settings.GetInteger (ContextSettingsInteger_TextureUnitsCount);         
+         settings_texture_units_count = settings.GetInteger (ContextSettingsInteger_TextureUnitsCount);
 
   if (settings_max_texture_size)
   {
@@ -412,12 +426,12 @@ void ContextCaps::GetDeviceCaps (render::low_level::DeviceCaps& caps) const
 {
   memset (&caps, 0, sizeof (DeviceCaps));
   
-#ifndef OPENGL_ES_SUPPORT
+#if !defined(OPENGL_ES_SUPPORT) && !defined(OPENGL_ES2_SUPPORT)
   caps.has_texture1d = true;
 #else
   caps.has_texture1d = false;
-#endif  
-  
+#endif
+
   caps.max_texture_2d_size            = max_rectangle_texture_size > max_texture_size ? max_rectangle_texture_size : max_texture_size;
   caps.max_texture_1d_size            = caps.has_texture1d ? caps.max_texture_2d_size : 0;
   caps.max_texture_3d_size            = max_3d_texture_size;

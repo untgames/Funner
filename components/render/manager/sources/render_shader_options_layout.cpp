@@ -1,6 +1,6 @@
 #include "shared.h"
 
-using namespace render;
+using namespace render::manager;
 
 namespace
 {
@@ -157,7 +157,7 @@ ShaderOptionsLayout::ShaderOptionsLayout (const CacheManagerPtr& cache_manager)
   }
   catch (xtl::exception& e)
   {
-    e.touch ("render::ShaderOptionsLayout::ShaderOptionsLayout");
+    e.touch ("render::manager::ShaderOptionsLayout::ShaderOptionsLayout");
     throw;
   }
 }
@@ -251,7 +251,7 @@ void ShaderOptionsLayout::GetShaderOptions (const common::PropertyMap& defines, 
   }
   catch (xtl::exception& e)
   {
-    e.touch ("render::ShaderOptionsLayout::GetShaderOptions");
+    e.touch ("render::manager::ShaderOptionsLayout::GetShaderOptions");
     throw;
   }
 }
@@ -267,7 +267,7 @@ const ShaderOptions& ShaderOptionsLayout::GetDefaultShaderOptions ()
   }
   catch (xtl::exception& e)
   {
-    e.touch ("render::ShaderOptionsLayout::GetDefaultShaderOptions");
+    e.touch ("render::manager::ShaderOptionsLayout::GetDefaultShaderOptions");
     throw;
   }
 }
@@ -287,7 +287,7 @@ size_t ShaderOptionsLayout::Hash ()
   }
   catch (xtl::exception& e)
   {
-    e.touch ("render::ShaderOptionsLayout::Hash");
+    e.touch ("render::manager::ShaderOptionsLayout::Hash");
     throw;
   }
 }

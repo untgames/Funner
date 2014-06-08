@@ -1,6 +1,6 @@
 #include "shared.h"
 
-using namespace render;
+using namespace render::manager;
 
 /*
     Описание реализации инстанцированной эффекта
@@ -34,7 +34,7 @@ InstantiatedEffect::~InstantiatedEffect ()
 void InstantiatedEffect::SetTags (const char* tags)
 {
   if (!tags)
-    throw xtl::make_null_argument_exception ("render::InstantiatedEffect::SetTags", "tags");
+    throw xtl::make_null_argument_exception ("render::manager::InstantiatedEffect::SetTags", "tags");
 
   SetTags (common::split (tags, " ")); 
 }
@@ -61,7 +61,7 @@ size_t InstantiatedEffect::TagsCount ()
 const char* InstantiatedEffect::Tag (size_t index)
 {
   if (index >= impl->tags.Size ())
-    throw xtl::make_range_exception ("render::InstantiatedEffect::Tag", "index", index, impl->tags.Size ());
+    throw xtl::make_range_exception ("render::manager::InstantiatedEffect::Tag", "index", index, impl->tags.Size ());
     
   return impl->tags [index];
 }
@@ -69,7 +69,7 @@ const char* InstantiatedEffect::Tag (size_t index)
 size_t InstantiatedEffect::TagHash (size_t index)
 {
   if (index >= impl->tag_hashes.size ())
-    throw xtl::make_range_exception ("render::InstantiatedEffect::TagHash", "index", index, impl->tag_hashes.size ());
+    throw xtl::make_range_exception ("render::manager::InstantiatedEffect::TagHash", "index", index, impl->tag_hashes.size ());
     
   return impl->tag_hashes [index];
 }

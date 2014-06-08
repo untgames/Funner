@@ -58,6 +58,11 @@ struct PrimarySwapChain::Impl
 
     egl_config = ChooseConfig (desc);
 
+    if (!egl_config)
+      throw xtl::format_operation_exception ("", "Bad EGL configuration (RGB/A: %u/%u, D/S: %u/%u, Samples: %u)",
+        in_desc.frame_buffer.color_bits, in_desc.frame_buffer.alpha_bits, in_desc.frame_buffer.depth_bits,
+        in_desc.frame_buffer.stencil_bits, in_desc.samples_count);
+
     desc.frame_buffer.alpha_bits   = GetConfigAttribute (EGL_ALPHA_SIZE);
     desc.frame_buffer.color_bits   = GetConfigAttribute (EGL_BUFFER_SIZE) - desc.frame_buffer.alpha_bits;
     desc.frame_buffer.depth_bits   = GetConfigAttribute (EGL_DEPTH_SIZE);
@@ -66,11 +71,6 @@ struct PrimarySwapChain::Impl
     desc.buffers_count             = 2;
     desc.fullscreen                = false;
       
-    if (!egl_config)
-      throw xtl::format_operation_exception ("", "Bad EGL configuration (RGB/A: %u/%u, D/S: %u/%u, Samples: %u)",
-        in_desc.frame_buffer.color_bits, in_desc.frame_buffer.alpha_bits, in_desc.frame_buffer.depth_bits,
-        in_desc.frame_buffer.stencil_bits, in_desc.samples_count);
-
     EGLint format = 0;
         
     eglGetConfigAttrib (egl_display, egl_config, EGL_NATIVE_VISUAL_ID, &format);                
@@ -119,7 +119,9 @@ struct PrimarySwapChain::Impl
     {    
       DisplayLock lock (output->GetDisplay ());
 
+#ifdef ANDROID
       eglWaitGL ();
+#endif
     }
     catch (...)
     {
@@ -199,7 +201,10 @@ struct PrimarySwapChain::Impl
         //выбор формата
 
       if (formats.empty ())
+      {
+        log.Printf ("...no pixel formats found");
         return (EGLConfig)0;
+      }
 
       log.Printf ("...found %u pixel formats", formats.size ());
 

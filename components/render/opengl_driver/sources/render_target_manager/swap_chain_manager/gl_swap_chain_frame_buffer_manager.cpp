@@ -316,7 +316,7 @@ void SwapChainFrameBufferManager::SetFrameBuffer (ISwapChain* swap_chain, GLenum
 
     //установка текущего буфера чтени€ и отрисовки
     
-#ifndef OPENGL_ES_SUPPORT
+#if !defined(OPENGL_ES_SUPPORT) && !defined(OPENGL_ES2_SUPPORT)
   if (current_buffer_type != buffer_type)
   {
     glDrawBuffer (buffer_type);

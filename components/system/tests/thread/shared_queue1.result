@@ -1,0 +1,7 @@
+Results of shared_queue1:
+try push: false
+queue size: 3
+max queue size: 3
+queue empty: false
+items: 1 2 3
+try push: true

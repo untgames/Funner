@@ -235,28 +235,28 @@ class InputLayout: virtual public IInputLayout, public ContextObject
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 //”становка состо€ни€ в контекст OpenGL
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-   void Bind (size_t                     base_vertex,
-              size_t                     base_index,
-              BufferPtr*                 vertex_buffers,
-              VertexAttributeDictionary* dictionary,
-              Buffer*                    index_buffer,
-              IndicesLayout*             out_indices_layout);
+   void Bind (size_t                      base_vertex,
+              size_t                      base_index,
+              BufferPtr*                  vertex_buffers,
+              IVertexAttributeDictionary* dictionary,
+              Buffer*                     index_buffer,
+              IndicesLayout*              out_indices_layout);
 
   private:
     struct ShaderAttributeLayout;
 
     void                   BindVertexAttributes (size_t base_vertex, BufferPtr* vertex_buffers, ShaderAttributeLayout* shader_layout);
-    ShaderAttributeLayout& GetShaderLayout      (VertexAttributeDictionary& dictionary);
-    void                   RemoveShaderLayout   (size_t id);
+    ShaderAttributeLayout& GetShaderLayout      (IVertexAttributeDictionary& dictionary);
+    void                   RemoveShaderLayout   (IVertexAttributeDictionary*);
 
   private:
     struct GlVertexAttribute;
     struct GlVertexAttributeGroup;
 
-    typedef stl::vector<GlVertexAttribute>                  GlVertexAttributeArray;
-    typedef stl::vector<GlVertexAttributeGroup>             GlVertexAttributeGroupArray;
-    typedef xtl::intrusive_ptr<ShaderAttributeLayout>       ShaderAttributeLayoutPtr;
-    typedef stl::hash_map<size_t, ShaderAttributeLayoutPtr> ShaderAttributeLayoutMap;
+    typedef stl::vector<GlVertexAttribute>                                       GlVertexAttributeArray;
+    typedef stl::vector<GlVertexAttributeGroup>                                  GlVertexAttributeGroupArray;
+    typedef xtl::intrusive_ptr<ShaderAttributeLayout>                            ShaderAttributeLayoutPtr;
+    typedef stl::hash_map<IVertexAttributeDictionary*, ShaderAttributeLayoutPtr> ShaderAttributeLayoutMap;
 
   private:
     GlVertexAttributeArray      vertex_attributes;       //вершинные атрибуты

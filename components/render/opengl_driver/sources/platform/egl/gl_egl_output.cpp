@@ -64,6 +64,9 @@ struct Output::Impl
         raise_error ("::eglInitialize");        
 
       log.Printf ("...EGL intialized successfull (version %d.%d)", major_version, minor_version);      
+
+      if (!eglBindAPI (EGL_OPENGL_ES_API))
+        raise_error ("::eglBindAPI");
     }
     catch (...)
     {
@@ -82,7 +85,7 @@ struct Output::Impl
       eglTerminate (egl_display);
       
         //платформо-зависимое освобождение ресурсов
-      
+
       PlatformDone ();
     }
     catch (...)

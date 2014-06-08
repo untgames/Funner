@@ -4,6 +4,12 @@ using namespace render::low_level;
 using namespace render::low_level::opengl;
 using namespace common;
 
+//TODO check that there no duplicates in names
+
+#ifdef _MSC_VER
+  #pragma warning (disable : 4065) // switch statement contains 'default' but no 'case' labels
+#endif
+
 /*
     Константы
 */
@@ -29,10 +35,9 @@ struct InputLayout::GlVertexAttribute
 //группа вершинных атрибутов в интерпретации OpenGL
 struct InputLayout::GlVertexAttributeGroup
 {
-  size_t             slot;                     //номер слота с вершинным буфером
-  size_t             std_attributes_count;     //количество стандартных вершинных атрибутов
-  size_t             shader_attributes_count;  //количество шейдерных вершинных атрибутов
-  GlVertexAttribute* attributes;               //вершинные атрибуты
+  size_t             slot;             //номер слота с вершинным буфером
+  size_t             attributes_count; //количество вершинных атрибутов
+  GlVertexAttribute* attributes;       //вершинные атрибуты
 };
 
 /// Расположение шейдерных атрибутов
@@ -40,14 +45,16 @@ struct InputLayout::ShaderAttributeLayout: public xtl::reference_counter
 {
   typedef stl::vector<int> LocationArray;
 
-  LocationArray        locations;             //индексы шейдерных вершинных атрибутов
-  xtl::auto_connection on_dictionary_destroy; //соединение с обработчиком удаления словаря
-  size_t               hash;                  //хэш расположения
-  size_t               used_semantics_mask;   //маска использованных семантик
+  LocationArray        locations;                 //индексы шейдерных вершинных атрибутов
+  xtl::auto_connection on_dictionary_destroy;     //соединение с обработчиком удаления словаря
+  size_t               hash;                      //хэш расположения
+  size_t               used_semantics_mask;       //маска использованных семантик
+  size_t               std_ignore_semantics_mask; //маска игнорируемых стандартных семантик
 
 ///Конструктор
-  ShaderAttributeLayout (VertexAttributeDictionary& dictionary, size_t slots_count, const GlVertexAttributeGroup* groups, const common::StringArray& names)
+  ShaderAttributeLayout (IVertexAttributeDictionary& dictionary, size_t slots_count, const GlVertexAttributeGroup* groups, const common::StringArray& names)
     : used_semantics_mask ()
+    , std_ignore_semantics_mask ()
   {
     try
     {
@@ -55,12 +62,12 @@ struct InputLayout::ShaderAttributeLayout: public xtl::reference_counter
 
       const GlVertexAttributeGroup* group = groups;
 
-      size_t shader_attributes_count = 0;
+      size_t attributes_count = 0;
 
       for (size_t i=0; i<slots_count; i++, group++)
-        shader_attributes_count += group->shader_attributes_count;
+        attributes_count += group->attributes_count;
 
-      locations.reserve (shader_attributes_count);
+      locations.reserve (attributes_count);
 
         //построение списка шейдерных атрибутов
 
@@ -68,12 +75,9 @@ struct InputLayout::ShaderAttributeLayout: public xtl::reference_counter
 
       for (size_t i=0; i<slots_count; i++, group++)
       {      
-        if (!group->shader_attributes_count)
-          continue;
+        const GlVertexAttribute* attribute = group->attributes;
 
-        const GlVertexAttribute* attribute = group->attributes + group->std_attributes_count;
-
-        for (size_t j=0; j<group->shader_attributes_count; j++, attribute++)
+        for (size_t j=0; j<group->attributes_count; j++, attribute++)
         {
           int location = dictionary.FindAttribute (names [attribute->name_index]); //может быть -1
 
@@ -83,6 +87,9 @@ struct InputLayout::ShaderAttributeLayout: public xtl::reference_counter
               throw xtl::format_not_supported_exception ("", "Vertex attribute '%s' location %d is greater than available attributes count %d", names [attribute->name_index], location, MAX_SHADER_ATTRIBUTES_COUNT);
 
             used_semantics_mask |= 1 << location;
+
+            if (attribute->semantic >= 0)
+              std_ignore_semantics_mask |= 1 << attribute->semantic;            
           }
 
           locations.push_back (location);
@@ -256,30 +263,30 @@ InputLayout::~InputLayout ()
     Работа с расположениями вершинных атрибутов
 */
 
-InputLayout::ShaderAttributeLayout& InputLayout::GetShaderLayout (VertexAttributeDictionary& dictionary)
+InputLayout::ShaderAttributeLayout& InputLayout::GetShaderLayout (IVertexAttributeDictionary& dictionary)
 {
-  size_t id = dictionary.GetId ();
+//TODO: last used dictionary optimiziation without search in hash map
 
-  ShaderAttributeLayoutMap::iterator iter = shader_layouts.find (id);
+  ShaderAttributeLayoutMap::iterator iter = shader_layouts.find (&dictionary);
 
   if (iter != shader_layouts.end ())
     return *iter->second;
 
   ShaderAttributeLayoutPtr layout (new ShaderAttributeLayout (dictionary, vertex_attribute_groups.size (), &vertex_attribute_groups [0], shader_attribute_names), false);
 
-  layout->on_dictionary_destroy = dictionary.GetTrackable ().connect_tracker (xtl::bind (&InputLayout::RemoveShaderLayout, this, id));
+  layout->on_dictionary_destroy = dictionary.GetDictionaryTrackable ().connect_tracker (xtl::bind (&InputLayout::RemoveShaderLayout, this, &dictionary));
 
   if (shader_layouts.empty ())
     shader_layouts.resize (SHADER_LAYOUTS_TABLE_SIZE);
 
-  shader_layouts.insert_pair (id, layout);
+  shader_layouts.insert_pair (&dictionary, layout);
 
   return *layout;
 }
 
-void InputLayout::RemoveShaderLayout (size_t id)
+void InputLayout::RemoveShaderLayout (IVertexAttributeDictionary* dictionary)
 {
-  shader_layouts.erase (id);
+  shader_layouts.erase (dictionary);
 }
 
 /*
@@ -353,7 +360,7 @@ void InputLayout::SetDesc (const InputLayoutDesc& desc)
 
     va_ptrs.reserve (desc.vertex_attributes_count);
 
-    size_t shader_attributes_count = 0, shader_attribute_names_length = 0;
+    size_t attribute_names_length = 0;
 
     for (size_t i=0; i<desc.vertex_attributes_count; i++)
     {
@@ -369,13 +376,23 @@ void InputLayout::SetDesc (const InputLayoutDesc& desc)
 
         //проверка корректности вершинной семантики
 
+      if (!va.semantic)
+        throw xtl::format_exception<xtl::null_argument_exception> (METHOD_NAME, "Null vertex attribute #%u", i);
+
+#ifndef OPENGL_ES2_SUPPORT
       VertexAttributeSemantic semantic = get_semantic_by_name (va.semantic);
+#else
+      static const VertexAttributeSemantic semantic = (VertexAttributeSemantic)-1;
+#endif
+
+      attribute_names_length += strlen (va.semantic) + 1;
 
       if (semantic < 0)
       {
 #ifndef OPENGL_ES_SUPPORT
         switch (va.type)
         {
+#ifndef OPENGL_ES2_SUPPORT
           case InputDataType_Byte:
           case InputDataType_UByte:
           case InputDataType_Short:
@@ -384,7 +401,15 @@ void InputLayout::SetDesc (const InputLayoutDesc& desc)
           case InputDataType_UInt:
             if (!caps.glVertexAttribIPointer_fn)
               throw xtl::format_exception<xtl::not_supported_exception> (METHOD_NAME, "Integer vertex attribute '%s' is not supported (no GL_NV_vertex_program4 extension)", va.semantic);
-
+#else
+          case InputDataType_Byte:
+          case InputDataType_UByte:
+          case InputDataType_Short:
+          case InputDataType_UShort:
+          case InputDataType_Int:
+          case InputDataType_UInt:
+            throw xtl::format_exception<xtl::not_supported_exception> (METHOD_NAME, "Integer vertex attribute '%s' is not supported", va.semantic);
+#endif
           case InputDataType_Float:
             if (!caps.glVertexAttribPointer_fn)
               throw xtl::format_exception<xtl::not_supported_exception> (METHOD_NAME, "Vertex attribute '%s' is not supported (no GL_ARB_vertex_shader extension)", va.semantic);
@@ -393,14 +418,11 @@ void InputLayout::SetDesc (const InputLayoutDesc& desc)
           default:
             break; //exception will be thrown below
         }
-
-        shader_attributes_count++;
-        
-        shader_attribute_names_length += strlen (va.semantic) + 1;
 #else
         throw xtl::format_exception<xtl::not_supported_exception> (METHOD_NAME, "Vertex attribute '%s' is not supported", va.semantic);
 #endif
       }
+#ifndef OPENGL_ES2_SUPPORT
       else
       {
         switch (semantic)
@@ -433,53 +455,54 @@ void InputLayout::SetDesc (const InputLayoutDesc& desc)
           default:
             throw xtl::format_exception<xtl::bad_argument> (METHOD_NAME, "Invalid argument desc.vertex_attributes[%u].semantic=%s", i, va.semantic);
         }
-      }
-
-      new_semantics_mask |= 1 << semantic;
 
         //отсечение повторной установки вершинной семантики
 
-      if (semantic_attribute [semantic] != NO_ATTRIBUTE)
-        throw xtl::format_exception<xtl::bad_argument> (METHOD_NAME, "Invalid argument desc.vertex_attributes[%u].semantic=%s (semantic has been "
-          "already defined in attribute %u)", i, va.semantic, semantic_attribute [semantic]);
+        if (semantic_attribute [semantic] != NO_ATTRIBUTE)
+          throw xtl::format_exception<xtl::bad_argument> (METHOD_NAME, "Invalid argument desc.vertex_attributes[%u].semantic=%s (semantic has been "
+            "already defined in attribute %u)", i, va.semantic, semantic_attribute [semantic]);
 
-      semantic_attribute [semantic] = i;
+        semantic_attribute [semantic] = i;
 
-        //проверка корректности формата данных и типа элементов
+          //проверка корректности формата данных и типа элементов
 
-      switch (va.format)
-      {
-        case InputDataFormat_Value:
-        case InputDataFormat_Vector2:
-        case InputDataFormat_Vector3:
-        case InputDataFormat_Vector4:
-          if (!VertexAttributeSemanticTraits::IsCompatible (semantic, va.format))
-            throw xtl::format_exception<xtl::not_supported_exception> (METHOD_NAME, "Bad desc.vertex_attribute[%u] (semantic %s incompatible with format %s)", i,
-                                          va.semantic, get_name (va.format));
+        switch (va.format)
+        {
+          case InputDataFormat_Value:
+          case InputDataFormat_Vector2:
+          case InputDataFormat_Vector3:
+          case InputDataFormat_Vector4:
+            if (!VertexAttributeSemanticTraits::IsCompatible (semantic, va.format))
+              throw xtl::format_exception<xtl::not_supported_exception> (METHOD_NAME, "Bad desc.vertex_attribute[%u] (semantic %s incompatible with format %s)", i,
+                                            va.semantic, get_name (va.format));
 
-          break;
-        default:
-          throw xtl::format_exception<xtl::bad_argument> (METHOD_NAME, "Invalid argument desc.vertex_attributes[%u].format=%d", i, va.format);
+            break;
+          default:
+            throw xtl::format_exception<xtl::bad_argument> (METHOD_NAME, "Invalid argument desc.vertex_attributes[%u].format=%d", i, va.format);
+        }
+
+        switch (va.type)
+        {
+          case InputDataType_Byte:
+          case InputDataType_UByte:
+          case InputDataType_Short:
+          case InputDataType_UShort:
+          case InputDataType_Int:
+          case InputDataType_UInt:
+          case InputDataType_Float:
+            if (!VertexAttributeSemanticTraits::IsCompatible (semantic, va.type))
+              throw xtl::format_exception<xtl::not_supported_exception> (METHOD_NAME, "Bad desc.vertex_attribute[%u] (semantic %s incompatible with type %s)", i,
+                                            va.semantic, get_name (va.type));
+
+            break;
+          default:
+            throw xtl::format_exception<xtl::bad_argument> (METHOD_NAME, "Invalid argument desc.vertex_attributes[%u].type=%d", i, va.type);
+        }
+
+        new_semantics_mask |= 1 << semantic;
       }
-      
-      switch (va.type)
-      {
-        case InputDataType_Byte:
-        case InputDataType_UByte:
-        case InputDataType_Short:
-        case InputDataType_UShort:
-        case InputDataType_Int:
-        case InputDataType_UInt:
-        case InputDataType_Float:
-          if (!VertexAttributeSemanticTraits::IsCompatible (semantic, va.type))
-            throw xtl::format_exception<xtl::not_supported_exception> (METHOD_NAME, "Bad desc.vertex_attribute[%u] (semantic %s incompatible with type %s)", i,
-                                          va.semantic, get_name (va.type));
+#endif
 
-          break;
-        default:
-          throw xtl::format_exception<xtl::bad_argument> (METHOD_NAME, "Invalid argument desc.vertex_attributes[%u].type=%d", i, va.type);
-      }
-      
         //проверка корректности номера слота
 
       if (va.slot >= DEVICE_VERTEX_BUFFER_SLOTS_COUNT)
@@ -495,17 +518,23 @@ void InputLayout::SetDesc (const InputLayoutDesc& desc)
       
     size_t position_attribute = semantic_attribute [VertexAttributeSemantic_Position];
 
-    if (position_attribute == NO_ATTRIBUTE)
+    if (position_attribute != NO_ATTRIBUTE)
+    {
+        //сортировка вершинных атрибутов для оптимизации установки в контекст OpenGL
+
+      stl::sort (va_ptrs.begin (), va_ptrs.end (), VertexAttributeComparator (desc.vertex_attributes [position_attribute].slot));
+    }
+#ifdef OPENGL_ES_SUPPORT
+    else
+    {    
       throw xtl::format_exception<xtl::bad_argument> (METHOD_NAME, "Invalid argument desc.vertex_attributes. Attribute with semantic 'VertexAttributeSemantic_Position' not found");
-
-      //сортировка вершинных атрибутов для оптимизации установки в контекст OpenGL
-
-    stl::sort (va_ptrs.begin (), va_ptrs.end (), VertexAttributeComparator (desc.vertex_attributes [position_attribute].slot));
+    }
+#endif
 
       //преобразование вершинных атрибутов
 
-    new_names.Reserve (shader_attributes_count);
-    new_names.ReserveBuffer (shader_attribute_names_length);
+    new_names.Reserve (desc.vertex_attributes_count);
+    new_names.ReserveBuffer (attribute_names_length);
 
     new_vertex_attributes.resize (desc.vertex_attributes_count);
     new_vertex_attribute_groups.reserve (DEVICE_VERTEX_BUFFER_SLOTS_COUNT);
@@ -527,12 +556,11 @@ void InputLayout::SetDesc (const InputLayoutDesc& desc)
 
         GlVertexAttributeGroup& new_group = new_vertex_attribute_groups.back ();
         
-        new_group.slot                    = va.slot;
-        new_group.attributes              = &gl_va;
-        new_group.std_attributes_count    = 0;
-        new_group.shader_attributes_count = 0;
-        current_slot                      = va.slot;
-        current_group                     = &new_group;
+        new_group.slot             = va.slot;
+        new_group.attributes       = &gl_va;
+        new_group.attributes_count = 0;
+        current_slot               = va.slot;
+        current_group              = &new_group;
       }
 
         //преобразование вершинного атрибута
@@ -541,20 +569,11 @@ void InputLayout::SetDesc (const InputLayoutDesc& desc)
 
       gl_va.semantic = semantic;
 
-      if (semantic < 0)
-      {
-        new_names.Add (va.semantic);
+      new_names.Add (va.semantic);
 
-        gl_va.name_index = new_names.Size () - 1;
-       
-        current_group->shader_attributes_count++;
-      }
-      else
-      {
-        gl_va.name_index = 0;
+      gl_va.name_index = new_names.Size () - 1;       
 
-        current_group->std_attributes_count++;
-      }
+      current_group->attributes_count++;
 
       switch (va.format)
       {
@@ -638,6 +657,8 @@ void InputLayout::SetDesc (const InputLayoutDesc& desc)
     Установка состояния в контекст OpenGL
 */
 
+#ifndef OPENGL_ES2_SUPPORT
+
 namespace
 {
 
@@ -660,6 +681,8 @@ void set_client_capability (GLenum capability, size_t current_mask, size_t requi
 
 }
 
+#endif
+
 void InputLayout::BindVertexAttributes (size_t base_vertex, BufferPtr* vertex_buffers, ShaderAttributeLayout* shader_layout)
 {
   static const char* METHOD_NAME = "render::low_level::opengl::InputLayout::BindVertexAttributes";
@@ -671,16 +694,19 @@ void InputLayout::BindVertexAttributes (size_t base_vertex, BufferPtr* vertex_bu
   for (GlVertexAttributeGroupArray::iterator iter=vertex_attribute_groups.begin (), end=vertex_attribute_groups.end (); iter!=end; ++iter)
     if (!vertex_buffers [iter->slot])
       throw xtl::format_operation_exception (METHOD_NAME, "Null vertex buffer #%u", iter->slot);
+
+#ifndef OPENGL_ES2_SUPPORT
       
     //отключение неиспользуемых и включение используемых вершинных массивов
     
-  const size_t current_enabled_semantics_mask = GetContextCacheValue (CacheEntry_EnabledSemantics);
+  const size_t current_enabled_semantics_mask = GetContextCacheValue (CacheEntry_EnabledSemantics),
+               std_semantics_mask             = shader_layout ? used_semantics_mask & ~shader_layout->std_ignore_semantics_mask : used_semantics_mask;
 
-  if (current_enabled_semantics_mask != used_semantics_mask)
+  if (current_enabled_semantics_mask != std_semantics_mask)
   {
-    set_client_capability (GL_VERTEX_ARRAY, current_enabled_semantics_mask, used_semantics_mask, VertexAttributeSemantic_Position);
-    set_client_capability (GL_NORMAL_ARRAY, current_enabled_semantics_mask, used_semantics_mask, VertexAttributeSemantic_Normal);
-    set_client_capability (GL_COLOR_ARRAY,  current_enabled_semantics_mask, used_semantics_mask, VertexAttributeSemantic_Color);
+    set_client_capability (GL_VERTEX_ARRAY, current_enabled_semantics_mask, std_semantics_mask, VertexAttributeSemantic_Position);
+    set_client_capability (GL_NORMAL_ARRAY, current_enabled_semantics_mask, std_semantics_mask, VertexAttributeSemantic_Normal);
+    set_client_capability (GL_COLOR_ARRAY,  current_enabled_semantics_mask, std_semantics_mask, VertexAttributeSemantic_Color);
     
     if (caps.has_arb_multitexture)
     {
@@ -688,14 +714,14 @@ void InputLayout::BindVertexAttributes (size_t base_vertex, BufferPtr* vertex_bu
 
       for (size_t i=0; i<tex_units_count; i++, mask <<= 1)
       {
-        if (current_enabled_semantics_mask & ~used_semantics_mask & mask)
+        if (current_enabled_semantics_mask & ~std_semantics_mask & mask)
         {
           caps.glClientActiveTexture_fn (GL_TEXTURE0 + i);
           glDisableClientState          (GL_TEXTURE_COORD_ARRAY);
           continue;
         }
 
-        if (used_semantics_mask & ~current_enabled_semantics_mask & mask)
+        if (std_semantics_mask & ~current_enabled_semantics_mask & mask)
         {
           caps.glClientActiveTexture_fn (GL_TEXTURE0 + i);
           glEnableClientState           (GL_TEXTURE_COORD_ARRAY);
@@ -705,11 +731,13 @@ void InputLayout::BindVertexAttributes (size_t base_vertex, BufferPtr* vertex_bu
     }
     else
     {
-      set_client_capability (GL_TEXTURE_COORD_ARRAY,  current_enabled_semantics_mask, used_semantics_mask, VertexAttributeSemantic_TexCoord0);
+      set_client_capability (GL_TEXTURE_COORD_ARRAY,  current_enabled_semantics_mask, std_semantics_mask, VertexAttributeSemantic_TexCoord0);
     }    
 
-    SetContextCacheValue (CacheEntry_EnabledSemantics, used_semantics_mask);
+    SetContextCacheValue (CacheEntry_EnabledSemantics, std_semantics_mask);
   }
+
+#endif
 
 #ifndef OPENGL_ES_SUPPORT
   const size_t current_enabled_shader_semantics_mask = GetContextCacheValue (CacheEntry_EnabledShaderSemantics),
@@ -723,7 +751,7 @@ void InputLayout::BindVertexAttributes (size_t base_vertex, BufferPtr* vertex_bu
     {
       if (current_enabled_shader_semantics_mask & ~used_shader_semantics_mask & mask)
       {
-	caps.glDisableVertexAttribArray_fn (i);
+        caps.glDisableVertexAttribArray_fn (i);
         continue;
       }
 
@@ -754,17 +782,46 @@ void InputLayout::BindVertexAttributes (size_t base_vertex, BufferPtr* vertex_bu
     
       //настройка вершинных атрибутов
 
-    size_t attributes_count = group_iter->std_attributes_count + group_iter->shader_attributes_count;
+    const size_t attributes_count = group_iter->attributes_count;
       
     for (GlVertexAttribute *va_iter=group_iter->attributes, *va_end=va_iter+attributes_count; va_iter!=va_end; ++va_iter)
     {
-      const GlVertexAttribute& va     = *va_iter;
-      const void*              offset = base_offset + va.offset + base_vertex * va.stride; //расчёт начального смещения вершиных атрибутов
-      
+      const GlVertexAttribute& va       = *va_iter;
+      const void*              offset   = base_offset + va.offset + base_vertex * va.stride; //расчёт начального смещения вершинных атрибутов
+      const int                location = attribute_location ? *attribute_location++ : -1;
+
+      if (location >= 0)
+      {
+#ifndef OPENGL_ES_SUPPORT
+        switch (va.type)
+        {
+#ifndef OPENGL_ES2_SUPPORT
+          case GL_BYTE:
+          case GL_UNSIGNED_BYTE:
+          case GL_SHORT:
+          case GL_UNSIGNED_SHORT:
+          case GL_INT:
+          case GL_UNSIGNED_INT:
+            caps.glVertexAttribIPointer_fn ((GLuint)location, va.components, va.type, va.stride, offset);
+            break;
+          case GL_DOUBLE:
+            caps.glVertexAttribLPointer_fn ((GLuint)location, va.components, va.type, va.stride, offset);
+            break;
+#endif
+          default:
+            caps.glVertexAttribPointer_fn ((GLuint)location, va.components, va.type, GL_FALSE, va.stride, offset);
+            break;
+        }
+
+        continue;
+      }
+#endif
+
       switch (va.semantic)
       {
+#ifndef OPENGL_ES2_SUPPORT
         case VertexAttributeSemantic_Position:
-          glVertexPointer (va.components, va.type, va.stride, offset);          
+          glVertexPointer (va.components, va.type, va.stride, offset);
           break;
         case VertexAttributeSemantic_Normal:
           glNormalPointer (va.type, va.stride, offset);
@@ -791,50 +848,21 @@ void InputLayout::BindVertexAttributes (size_t base_vertex, BufferPtr* vertex_bu
           glTexCoordPointer (va.components, va.type, va.stride, offset);
           break;
         }
-        default:
-        {
-          if (va.semantic >= 0 || !attribute_location)
-            continue;
-
-          int location = *attribute_location++;
-
-          if (location < 0)
-            continue;
-
-#ifndef OPENGL_ES_SUPPORT
-          switch (va.type)
-          {
-            case GL_BYTE:
-            case GL_UNSIGNED_BYTE:
-            case GL_SHORT:
-            case GL_UNSIGNED_SHORT:
-            case GL_INT:
-            case GL_UNSIGNED_INT:
-              caps.glVertexAttribIPointer_fn ((GLuint)location, va.components, va.type, va.stride, offset);
-              break;
-            case GL_DOUBLE:
-              caps.glVertexAttribLPointer_fn ((GLuint)location, va.components, va.type, va.stride, offset);
-              break;
-            default:
-              caps.glVertexAttribPointer_fn ((GLuint)location, va.components, va.type, GL_FALSE, va.stride, offset);
-              break;
-          }
 #endif
-
+        default:
           break;
-        }
       }
     }
   }
 }
 
 void InputLayout::Bind
- (size_t                     base_vertex,
-  size_t                     base_index,
-  BufferPtr*                 vertex_buffers,
-  VertexAttributeDictionary* dictionary,
-  Buffer*                    index_buffer,
-  IndicesLayout*             out_indices_layout)
+ (size_t                      base_vertex,
+  size_t                      base_index,
+  BufferPtr*                  vertex_buffers,
+  IVertexAttributeDictionary* dictionary,
+  Buffer*                     index_buffer,
+  IndicesLayout*              out_indices_layout)
 {
   try
   {

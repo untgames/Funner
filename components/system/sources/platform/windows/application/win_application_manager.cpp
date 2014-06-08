@@ -349,3 +349,19 @@ bool WindowsApplicationManager::GetScreenSaverState ()
 {
   return ApplicationSingleton::Instance ()->GetScreenSaverState ();
 }
+
+/*
+    Обработка системных сообщений нити
+*/
+
+void WindowsApplicationManager::ProcessThreadMessages ()
+{
+  MSG msg;
+
+  while (::PeekMessageA (&msg, 0, 0, 0, PM_REMOVE))
+  {
+    TranslateMessage (&msg);
+    DispatchMessage  (&msg);
+    SetLastError     (0);  
+  }
+}

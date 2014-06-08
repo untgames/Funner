@@ -1,6 +1,12 @@
 #include "shared.h"
 
-using namespace render;
+using namespace render::manager;
+
+#ifdef _MSC_VER
+  #define VERTEX_OFFSETOF(X,Y) offsetof(X,Y)
+#else
+  #define VERTEX_OFFSETOF(X,Y) (reinterpret_cast<size_t> (&(static_cast<X*> (0)->*(&X::Y))))
+#endif
 
 namespace media
 {
@@ -26,17 +32,18 @@ typedef stl::hash_set<media::geometry::VertexFormat>  VertexFormatSet;
 
 struct InputLayoutManager::Impl
 {
-  LowLevelDevicePtr device;         //устройство отрисовки
-  InputLayoutMap    layouts;        //закэшированные лэйауты
-  VertexFormatSet   vertex_formats; //вершинные форматы
-  Log               log;            //протокол отладочных сообщений
-  SettingsPtr       settings;       //настройки менеджера рендеринга
+  LowLevelDevicePtr      device;                    //устройство отрисовки
+  InputLayoutMap         layouts;                   //закэшированные лэйауты
+  VertexFormatSet        vertex_formats;            //вершинные форматы
+  Log                    log;                       //протокол отладочных сообщений
+  SettingsPtr            settings;                  //настройки менеджера рендеринга
+  LowLevelInputLayoutPtr dynamic_primitives_layout; //лэйаут для спрайтов
   
   Impl (const LowLevelDevicePtr& in_device, const SettingsPtr& in_settings)
     : device (in_device)
     , settings (in_settings)
   {
-    static const char* METHOD_NAME = "render::InputLayoutManager::Impl";
+    static const char* METHOD_NAME = "render::manager::InputLayoutManager::Impl";
     
     if (!device)
       throw xtl::make_null_argument_exception (METHOD_NAME, "device");
@@ -51,8 +58,18 @@ struct InputLayoutManager::Impl
 */
 
 InputLayoutManager::InputLayoutManager (const LowLevelDevicePtr& device, const SettingsPtr& settings)
-  : impl (new Impl (device, settings))
 {
+  try
+  {
+    impl.reset (new Impl (device, settings));
+
+    InitDynamicPrimitivesLayout ();
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::manager::InputLayoutManager::InputLayoutManager");
+    throw;
+  }
 }
 
 InputLayoutManager::~InputLayoutManager ()
@@ -83,7 +100,7 @@ media::geometry::VertexFormat InputLayoutManager::Clone (const media::geometry::
   }
   catch (xtl::exception& e)
   {
-    e.touch ("render::InputLayoutManager::Clone");
+    e.touch ("render::manager::InputLayoutManager::Clone");
     throw;
   }
 }
@@ -172,7 +189,67 @@ LowLevelInputLayoutPtr InputLayoutManager::CreateInputLayout (size_t hash, const
   }
   catch (xtl::exception& e)
   {
-    e.touch ("render::InputLayoutManager::CreateInputLayout");
+    e.touch ("render::manager::InputLayoutManager::CreateInputLayout");
     throw;
   }
+}
+
+/*
+    Лэйауты для спрайтов и линий
+*/
+
+void InputLayoutManager::InitDynamicPrimitivesLayout ()
+{
+  try
+  {
+    static const render::low_level::VertexAttribute attributes [] = {
+      {impl->device->GetVertexAttributeSemanticName (render::low_level::VertexAttributeSemantic_Position),  render::low_level::InputDataFormat_Vector3, render::low_level::InputDataType_Float, 0, VERTEX_OFFSETOF (DynamicPrimitiveVertex, position),  sizeof (DynamicPrimitiveVertex)},
+      {impl->device->GetVertexAttributeSemanticName (render::low_level::VertexAttributeSemantic_Normal),    render::low_level::InputDataFormat_Vector3, render::low_level::InputDataType_Float, 0, VERTEX_OFFSETOF (DynamicPrimitiveVertex, normal),    sizeof (DynamicPrimitiveVertex)},
+      {impl->device->GetVertexAttributeSemanticName (render::low_level::VertexAttributeSemantic_Color),     render::low_level::InputDataFormat_Vector4, render::low_level::InputDataType_Float, 0, VERTEX_OFFSETOF (DynamicPrimitiveVertex, color),     sizeof (DynamicPrimitiveVertex)},
+      {impl->device->GetVertexAttributeSemanticName (render::low_level::VertexAttributeSemantic_TexCoord0), render::low_level::InputDataFormat_Vector2, render::low_level::InputDataType_Float, 0, VERTEX_OFFSETOF (DynamicPrimitiveVertex, tex_coord), sizeof (DynamicPrimitiveVertex)},
+    };
+
+    static const size_t attributes_count = sizeof (attributes) / sizeof (*attributes);
+
+    size_t attributes_hash = GetVertexAttributesHash (attributes_count, attributes);
+
+    render::low_level::InputLayoutDesc desc;
+
+    memset (&desc, 0, sizeof desc);
+
+    (void)xtl::compile_time_assert<xtl::type_traits::is_same<unsigned short, DynamicPrimitiveIndex>::value>::value;
+
+    desc.vertex_attributes_count = attributes_count;
+    desc.vertex_attributes       = &attributes [0];
+    desc.index_type              = render::low_level::InputDataType_UShort;
+    desc.index_buffer_offset     = 0;
+
+    impl->dynamic_primitives_layout = CreateInputLayout (attributes_hash, desc);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::manager::InputLayoutManager::InitDynamicPrimitivesLayout");
+    throw;
+  }
+}
+
+const LowLevelInputLayoutPtr& InputLayoutManager::DynamicPrimitivesInputLayout () const
+{
+  return impl->dynamic_primitives_layout;
+}
+
+/*
+    Получение хэша атрибутов
+*/
+
+size_t InputLayoutManager::GetVertexAttributesHash (size_t count, const render::low_level::VertexAttribute* attributes)
+{
+  size_t attributes_hash = 0xFFFFFFFF;
+
+  const render::low_level::VertexAttribute* attr = attributes;
+
+  for (size_t i=0; i<count; i++, attr++)
+    attributes_hash = common::crc32 ((char*)&attr->format, (char*)&attr [1] - (char*)&attr->format, attributes_hash);
+
+  return attributes_hash;
 }

@@ -1,6 +1,6 @@
 #include "shared.h"
 
-using namespace render;
+using namespace render::manager;
 
 /*
     Описание реализации хранилища динамических текстур объекта
@@ -58,7 +58,7 @@ void DynamicTextureEntityStorage::Update (const FramePtr& frame)
   }
   catch (xtl::exception& e)
   {
-    e.touch ("render::DynamicTextureEntityStorage::Update");
+    e.touch ("render::manager::DynamicTextureEntityStorage::Update");
     throw;
   }
 }
@@ -69,7 +69,7 @@ void DynamicTextureEntityStorage::Update (const FramePtr& frame)
 
 void DynamicTextureEntityStorage::AddTexture (const char* name, const DynamicTexturePtr& dynamic_texture)
 {
-  static const char* METHOD_NAME = "render::DynamicTextureEntityStorage::AddTexture";
+  static const char* METHOD_NAME = "render::manager::DynamicTextureEntityStorage::AddTexture";
   
   if (!name)
     throw xtl::make_null_argument_exception (METHOD_NAME, "name");

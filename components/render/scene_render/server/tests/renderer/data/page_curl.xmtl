@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<material_library>
+  <layouts/>
+  <texmaps/>
+  <materials>
+    <material id="page_1" name="page_1" program="flat" tags="solid">
+      <texmap semantic="diffuse" image="data/u1/texture0000.dds" sampler="default"/>
+    </material>
+    <material id="page_2" name="page_2" program="flat" tags="solid">
+      <texmap semantic="diffuse" image="data/u1/texture0001.dds" sampler="default"/>
+    </material>
+    <material id="page_3" name="page_3" program="flat" tags="solid">
+      <texmap semantic="diffuse" image="data/u1/texture0002.dds" sampler="default"/>
+    </material>
+    <material id="page_4" name="page_4" program="flat" tags="solid">
+      <texmap semantic="diffuse" image="data/u1/EnvGala_020_D.dds" sampler="default"/>
+    </material>
+  </materials>
+</material_library>

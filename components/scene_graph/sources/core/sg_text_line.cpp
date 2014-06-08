@@ -508,7 +508,7 @@ TextLineAlignment TextLine::HorizontalAlignment () const
 void TextLine::AcceptCore (Visitor& visitor)
 {
   if (!TryAccept (*this, visitor))
-    Entity::AcceptCore (visitor);
+    VisualModel::AcceptCore (visitor);
 }
 
 /*
@@ -517,7 +517,7 @@ void TextLine::AcceptCore (Visitor& visitor)
 
 void TextLine::BindProperties (common::PropertyBindingMap& bindings)
 {
-  Entity::BindProperties (bindings);
+  VisualModel::BindProperties (bindings);
 
   bindings.AddProperty ("Font", xtl::bind (&TextLine::Font, this), xtl::bind (&TextLine::SetFont, this, _1));
   bindings.AddProperty ("Color", xtl::bind (&TextLine::Color, this), xtl::bind (xtl::implicit_cast<void (TextLine::*)(const math::vec4f&)> (&TextLine::SetColor), this, _1));

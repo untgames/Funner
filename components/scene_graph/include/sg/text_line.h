@@ -2,7 +2,7 @@
 #define SCENE_GRAPH_TEXT_LINE_HEADER
 
 #include <stl/auto_ptr.h>
-#include <sg/entity.h>
+#include <sg/visual_model.h>
 
 namespace scene_graph
 {
@@ -25,7 +25,7 @@ enum TextLineAlignment
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Линия текста
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-class TextLine: public Entity
+class TextLine: public VisualModel
 {
   public:
     typedef xtl::com_ptr<TextLine>       Pointer;

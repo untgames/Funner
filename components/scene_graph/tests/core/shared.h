@@ -25,12 +25,14 @@
 #include <sg/input.h>
 #include <sg/light.h>
 #include <sg/listener.h>
+#include <sg/mesh.h>
 #include <sg/node.h>
 #include <sg/node_array.h>
 #include <sg/page_curl.h>
 #include <sg/particle_emitter.h>
 #include <sg/physics.h>
 #include <sg/scene.h>
+#include <sg/scissor.h>
 #include <sg/sound_emitter.h>
 #include <sg/sprite.h>
 #include <sg/text_line.h>
@@ -61,6 +63,21 @@ class TestEntity: public Entity
     {
       if (!TryAccept (*this, visitor))
         Entity::AcceptCore (visitor);
+    }
+};
+
+class TestVisualModel: public VisualModel
+{
+  public:
+    typedef xtl::com_ptr<TestVisualModel> Pointer;
+    
+    static Pointer Create () { return Pointer (new TestVisualModel, false); }
+    
+  protected:
+    void AcceptCore (Visitor& visitor)
+    {
+      if (!TryAccept (*this, visitor))
+        VisualModel::AcceptCore (visitor);
     }
 };
 

@@ -23,8 +23,8 @@ class Light;
 class DirectLight;
 class SpotLight;
 class PointLight;
-class VisualModel;
 class Sprite;
+class StaticMesh;
 class TextLine;
 class Listener;
 class SoundEmitter;
@@ -163,7 +163,7 @@ class XmlSceneParser: public ISceneParser
     void Parse (const common::ParseNode& decl, DirectLight& node, Node& parent, SceneContext& context);
     void Parse (const common::ParseNode& decl, SpotLight& node, Node& parent, SceneContext& context);
     void Parse (const common::ParseNode& decl, PointLight& node, Node& parent, SceneContext& context);
-    void Parse (const common::ParseNode& decl, VisualModel& node, Node& parent, SceneContext& context);
+    void Parse (const common::ParseNode& decl, StaticMesh& node, Node& parent, SceneContext& context);
     void Parse (const common::ParseNode& decl, TextLine& node, Node& parent, SceneContext& context);
     void Parse (const common::ParseNode& decl, Sprite& node, Node& parent, SceneContext& context);
     

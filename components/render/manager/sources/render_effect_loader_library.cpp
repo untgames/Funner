@@ -1,6 +1,6 @@
 #include "shared.h"
 
-using namespace render;
+using namespace render::manager;
 using namespace render::low_level;
 
 /*
@@ -57,7 +57,7 @@ size_t EffectLoaderLibrary::Library<Ptr>::Size ()
 template <class Ptr>
 void EffectLoaderLibrary::Library<Ptr>::Add (const char* id, const Item& item)
 {
-  static const char* METHOD_NAME = "render::EffectLoaderLibrary::Library<T>";
+  static const char* METHOD_NAME = "render::manager::EffectLoaderLibrary::Library<T>";
 
   if (!id)
     throw xtl::make_null_argument_exception (METHOD_NAME, "id");

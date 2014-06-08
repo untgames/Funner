@@ -1,5 +1,3 @@
-#ifndef OPENGL_ES_SUPPORT
-
 #include "shared.h"
 
 using namespace render::low_level;
@@ -31,6 +29,8 @@ void GlEntries::Init (ILibrary& library)
     //обнуление адресов точек входа
 
   memset (this, 0, sizeof (GlEntries));
+
+#if !defined(OPENGL_ES_SUPPORT) && !defined(OPENGL_ES2_SUPPORT)
   
     //получение адресов точек входа OpenGL 1.1
 
@@ -373,6 +373,307 @@ void GlEntries::Init (ILibrary& library)
   
     //получение адресов точек входа расширений OpenGL
 <<<GLINIT>>>
-}
+
+#elif defined (OPENGL_ES_SUPPORT)
+
+    //получение адресов точек входа OpenGL ES 1.1
+
+  init_entry (library, "glAlphaFunc", AlphaFunc);
+  init_entry (library, "glClearColor", ClearColor);
+  init_entry (library, "glClearDepthf", ClearDepthf);
+  init_entry (library, "glClipPlanef", ClipPlanef);
+  init_entry (library, "glColor4f", Color4f);
+  init_entry (library, "glDepthRangef", DepthRangef);
+  init_entry (library, "glFogf", Fogf);
+  init_entry (library, "glFogfv", Fogfv);
+  init_entry (library, "glFrustumf", Frustumf);
+  init_entry (library, "glGetClipPlanef", GetClipPlanef);
+  init_entry (library, "glGetFloatv", GetFloatv);
+  init_entry (library, "glGetLightfv", GetLightfv);
+  init_entry (library, "glGetMaterialfv", GetMaterialfv);
+  init_entry (library, "glGetTexEnvfv", GetTexEnvfv);
+  init_entry (library, "glGetTexParameterfv", GetTexParameterfv);
+  init_entry (library, "glLightModelf", LightModelf);
+  init_entry (library, "glLightModelfv", LightModelfv);
+  init_entry (library, "glLightf", Lightf);
+  init_entry (library, "glLightfv", Lightfv);
+  init_entry (library, "glLineWidth", LineWidth);
+  init_entry (library, "glLoadMatrixf", LoadMatrixf);
+  init_entry (library, "glMaterialf", Materialf);
+  init_entry (library, "glMaterialfv", Materialfv);
+  init_entry (library, "glMultMatrixf", MultMatrixf);
+  init_entry (library, "glMultiTexCoord4f", MultiTexCoord4f);
+  init_entry (library, "glNormal3f", Normal3f);
+  init_entry (library, "glOrthof", Orthof);
+  init_entry (library, "glPointParameterf", PointParameterf);
+  init_entry (library, "glPointParameterfv", PointParameterfv);
+  init_entry (library, "glPointSize", PointSize);
+  init_entry (library, "glPolygonOffset", PolygonOffset);
+  init_entry (library, "glRotatef", Rotatef);
+  init_entry (library, "glScalef", Scalef);
+  init_entry (library, "glTexEnvf", TexEnvf);
+  init_entry (library, "glTexEnvfv", TexEnvfv);
+  init_entry (library, "glTexParameterf", TexParameterf);
+  init_entry (library, "glTexParameterfv", TexParameterfv);
+  init_entry (library, "glTranslatef", Translatef);
+  init_entry (library, "glActiveTexture", ActiveTexture);
+  init_entry (library, "glAlphaFuncx", AlphaFuncx);
+  init_entry (library, "glBindBuffer", BindBuffer);
+  init_entry (library, "glBindTexture", BindTexture);
+  init_entry (library, "glBlendFunc", BlendFunc);
+  init_entry (library, "glBufferData", BufferData);
+  init_entry (library, "glBufferSubData", BufferSubData);
+  init_entry (library, "glClear", Clear);
+  init_entry (library, "glClearColorx", ClearColorx);
+  init_entry (library, "glClearDepthx", ClearDepthx);
+  init_entry (library, "glClearStencil", ClearStencil);
+  init_entry (library, "glClientActiveTexture", ClientActiveTexture);
+  init_entry (library, "glClipPlanex", ClipPlanex);
+  init_entry (library, "glColor4ub", Color4ub);
+  init_entry (library, "glColor4x", Color4x);
+  init_entry (library, "glColorMask", ColorMask);
+  init_entry (library, "glColorPointer", ColorPointer);
+  init_entry (library, "glCompressedTexImage2D", CompressedTexImage2D);
+  init_entry (library, "glCompressedTexSubImage2D", CompressedTexSubImage2D);
+  init_entry (library, "glCopyTexImage2D", CopyTexImage2D);
+  init_entry (library, "glCopyTexSubImage2D", CopyTexSubImage2D);
+  init_entry (library, "glCullFace", CullFace);
+  init_entry (library, "glDeleteBuffers", DeleteBuffers);
+  init_entry (library, "glDeleteTextures", DeleteTextures);
+  init_entry (library, "glDepthFunc", DepthFunc);
+  init_entry (library, "glDepthMask", DepthMask);
+  init_entry (library, "glDepthRangex", DepthRangex);
+  init_entry (library, "glDisable", Disable);
+  init_entry (library, "glDisableClientState", DisableClientState);
+  init_entry (library, "glDrawArrays", DrawArrays);
+  init_entry (library, "glDrawElements", DrawElements);
+  init_entry (library, "glEnable", Enable);
+  init_entry (library, "glEnableClientState", EnableClientState);
+  init_entry (library, "glFinish", Finish);
+  init_entry (library, "glFlush", Flush);
+  init_entry (library, "glFogx", Fogx);
+  init_entry (library, "glFogxv", Fogxv);
+  init_entry (library, "glFrontFace", FrontFace);
+  init_entry (library, "glFrustumx", Frustumx);
+  init_entry (library, "glGetBooleanv", GetBooleanv);
+  init_entry (library, "glGetBufferParameteriv", GetBufferParameteriv);
+  init_entry (library, "glGetClipPlanex", GetClipPlanex);
+  init_entry (library, "glGenBuffers", GenBuffers);
+  init_entry (library, "glGenTextures", GenTextures);
+  init_entry (library, "glGetError", GetError);
+  init_entry (library, "glGetFixedv", GetFixedv);
+  init_entry (library, "glGetIntegerv", GetIntegerv);
+  init_entry (library, "glGetLightxv", GetLightxv);
+  init_entry (library, "glGetMaterialxv", GetMaterialxv);
+  init_entry (library, "glGetPointerv", GetPointerv);
+  init_entry (library, "glGetString", GetString);
+  init_entry (library, "glGetTexEnviv", GetTexEnviv);
+  init_entry (library, "glGetTexEnvxv", GetTexEnvxv);
+  init_entry (library, "glGetTexParameteriv", GetTexParameteriv);
+  init_entry (library, "glGetTexParameterxv", GetTexParameterxv);
+  init_entry (library, "glHint", Hint);
+  init_entry (library, "glIsBuffer", IsBuffer);
+  init_entry (library, "glIsEnabled", IsEnabled);
+  init_entry (library, "glIsTexture", IsTexture);
+  init_entry (library, "glLightModelx", LightModelx);
+  init_entry (library, "glLightModelxv", LightModelxv);
+  init_entry (library, "glLightx", Lightx);
+  init_entry (library, "glLightxv", Lightxv);
+  init_entry (library, "glLineWidthx", LineWidthx);
+  init_entry (library, "glLoadIdentity", LoadIdentity);
+  init_entry (library, "glLoadMatrixx", LoadMatrixx);
+  init_entry (library, "glLogicOp", LogicOp);
+  init_entry (library, "glMaterialx", Materialx);
+  init_entry (library, "glMaterialxv", Materialxv);
+  init_entry (library, "glMatrixMode", MatrixMode);
+  init_entry (library, "glMultMatrixx", MultMatrixx);
+  init_entry (library, "glMultiTexCoord4x", MultiTexCoord4x);
+  init_entry (library, "glNormal3x", Normal3x);
+  init_entry (library, "glNormalPointer", NormalPointer);
+  init_entry (library, "glOrthox", Orthox);
+  init_entry (library, "glPixelStorei", PixelStorei);
+  init_entry (library, "glPointParameterx", PointParameterx);
+  init_entry (library, "glPointParameterxv", PointParameterxv);
+  init_entry (library, "glPointSizex", PointSizex);
+  init_entry (library, "glPolygonOffsetx", PolygonOffsetx);
+  init_entry (library, "glPopMatrix", PopMatrix);
+  init_entry (library, "glPushMatrix", PushMatrix);
+  init_entry (library, "glReadPixels", ReadPixels);
+  init_entry (library, "glRotatex", Rotatex);
+  init_entry (library, "glSampleCoverage", SampleCoverage);
+  init_entry (library, "glSampleCoveragex", SampleCoveragex);
+  init_entry (library, "glScalex", Scalex);
+  init_entry (library, "glScissor", Scissor);
+  init_entry (library, "glShadeModel", ShadeModel);
+  init_entry (library, "glStencilFunc", StencilFunc);
+  init_entry (library, "glStencilMask", StencilMask);
+  init_entry (library, "glStencilOp", StencilOp);
+  init_entry (library, "glTexCoordPointer", TexCoordPointer);
+  init_entry (library, "glTexEnvi", TexEnvi);
+  init_entry (library, "glTexEnvx", TexEnvx);
+  init_entry (library, "glTexEnviv", TexEnviv);
+  init_entry (library, "glTexEnvxv", TexEnvxv);
+  init_entry (library, "glTexImage2D", TexImage2D);
+  init_entry (library, "glTexParameteri", TexParameteri);
+  init_entry (library, "glTexParameterx", TexParameterx);
+  init_entry (library, "glTexParameteriv", TexParameteriv);
+  init_entry (library, "glTexParameterxv", TexParameterxv);
+  init_entry (library, "glTexSubImage2D", TexSubImage2D);
+  init_entry (library, "glTranslatex", Translatex);
+  init_entry (library, "glVertexPointer", VertexPointer);
+  init_entry (library, "glViewport", Viewport);
+//  init_entry (library, "glPointSizePointerOES", PointSizePointerOES);
+  
+    //получение адресов точек входа расширений OpenGL
+<<<GLESINIT>>>
+
+#elif defined (OPENGL_ES2_SUPPORT)
+
+  init_entry (library, "glActiveTexture", ActiveTexture);
+  init_entry (library, "glAttachShader", AttachShader);
+  init_entry (library, "glBindAttribLocation", BindAttribLocation);
+  init_entry (library, "glBindBuffer", BindBuffer);
+  init_entry (library, "glBindFramebuffer", BindFramebuffer);
+  init_entry (library, "glBindRenderbuffer", BindRenderbuffer);
+  init_entry (library, "glBindTexture", BindTexture);
+  init_entry (library, "glBlendColor", BlendColor);
+  init_entry (library, "glBlendEquation", BlendEquation);
+  init_entry (library, "glBlendEquationSeparate", BlendEquationSeparate);
+  init_entry (library, "glBlendFunc", BlendFunc);
+  init_entry (library, "glBlendFuncSeparate", BlendFuncSeparate);
+  init_entry (library, "glBufferData", BufferData);
+  init_entry (library, "glBufferSubData", BufferSubData);
+  init_entry (library, "glCheckFramebufferStatus", CheckFramebufferStatus);
+  init_entry (library, "glClear", Clear);
+  init_entry (library, "glClearColor", ClearColor);
+  init_entry (library, "glClearDepthf", ClearDepthf);
+  init_entry (library, "glClearStencil", ClearStencil);
+  init_entry (library, "glColorMask", ColorMask);
+  init_entry (library, "glCompileShader", CompileShader);
+  init_entry (library, "glCompressedTexImage2D", CompressedTexImage2D);
+  init_entry (library, "glCompressedTexSubImage2D", CompressedTexSubImage2D);
+  init_entry (library, "glCopyTexImage2D", CopyTexImage2D);
+  init_entry (library, "glCopyTexSubImage2D", CopyTexSubImage2D);
+  init_entry (library, "glCreateProgram", CreateProgram);
+  init_entry (library, "glCreateShader", CreateShader);
+  init_entry (library, "glCullFace", CullFace);
+  init_entry (library, "glDeleteBuffers", DeleteBuffers);
+  init_entry (library, "glDeleteFramebuffers", DeleteFramebuffers);
+  init_entry (library, "glDeleteProgram", DeleteProgram);
+  init_entry (library, "glDeleteRenderbuffers", DeleteRenderbuffers);
+  init_entry (library, "glDeleteShader", DeleteShader);
+  init_entry (library, "glDeleteTextures", DeleteTextures);
+  init_entry (library, "glDepthFunc", DepthFunc);
+  init_entry (library, "glDepthMask", DepthMask);
+  init_entry (library, "glDepthRangef", DepthRangef);
+  init_entry (library, "glDetachShader", DetachShader);
+  init_entry (library, "glDisable", Disable);
+  init_entry (library, "glDisableVertexAttribArray", DisableVertexAttribArray);
+  init_entry (library, "glDrawArrays", DrawArrays);
+  init_entry (library, "glDrawElements", DrawElements);
+  init_entry (library, "glEnable", Enable);
+  init_entry (library, "glEnableVertexAttribArray", EnableVertexAttribArray);
+  init_entry (library, "glFinish", Finish);
+  init_entry (library, "glFlush", Flush);
+  init_entry (library, "glFramebufferRenderbuffer", FramebufferRenderbuffer);
+  init_entry (library, "glFramebufferTexture2D", FramebufferTexture2D);
+  init_entry (library, "glFrontFace", FrontFace);
+  init_entry (library, "glGenBuffers", GenBuffers);
+  init_entry (library, "glGenerateMipmap", GenerateMipmap);
+  init_entry (library, "glGenFramebuffers", GenFramebuffers);
+  init_entry (library, "glGenRenderbuffers", GenRenderbuffers);
+  init_entry (library, "glGenTextures", GenTextures);
+  init_entry (library, "glGetActiveAttrib", GetActiveAttrib);
+  init_entry (library, "glGetActiveUniform", GetActiveUniform);
+  init_entry (library, "glGetAttachedShaders", GetAttachedShaders);
+  init_entry (library, "glGetAttribLocation", GetAttribLocation);
+  init_entry (library, "glGetBooleanv", GetBooleanv);
+  init_entry (library, "glGetBufferParameteriv", GetBufferParameteriv);
+  init_entry (library, "glGetError", GetError);
+  init_entry (library, "glGetFloatv", GetFloatv);
+  init_entry (library, "glGetFramebufferAttachmentParameteriv", GetFramebufferAttachmentParameteriv);
+  init_entry (library, "glGetIntegerv", GetIntegerv);
+  init_entry (library, "glGetProgramiv", GetProgramiv);
+  init_entry (library, "glGetProgramInfoLog", GetProgramInfoLog);
+  init_entry (library, "glGetRenderbufferParameteriv", GetRenderbufferParameteriv);
+  init_entry (library, "glGetShaderiv", GetShaderiv);
+  init_entry (library, "glGetShaderInfoLog", GetShaderInfoLog);
+  init_entry (library, "glGetShaderPrecisionFormat", GetShaderPrecisionFormat);
+  init_entry (library, "glGetShaderSource", GetShaderSource);
+  init_entry (library, "glGetString", GetString);
+  init_entry (library, "glGetTexParameterfv", GetTexParameterfv);
+  init_entry (library, "glGetTexParameteriv", GetTexParameteriv);
+  init_entry (library, "glGetUniformfv", GetUniformfv);
+  init_entry (library, "glGetUniformiv", GetUniformiv);
+  init_entry (library, "glGetUniformLocation", GetUniformLocation);
+  init_entry (library, "glGetVertexAttribfv", GetVertexAttribfv);
+  init_entry (library, "glGetVertexAttribiv", GetVertexAttribiv);
+  init_entry (library, "glGetVertexAttribPointerv", GetVertexAttribPointerv);
+  init_entry (library, "glHint", Hint);
+  init_entry (library, "glIsBuffer", IsBuffer);
+  init_entry (library, "glIsEnabled", IsEnabled);
+  init_entry (library, "glIsFramebuffer", IsFramebuffer);
+  init_entry (library, "glIsProgram", IsProgram);
+  init_entry (library, "glIsRenderbuffer", IsRenderbuffer);
+  init_entry (library, "glIsShader", IsShader);
+  init_entry (library, "glIsTexture", IsTexture);
+  init_entry (library, "glLineWidth", LineWidth);
+  init_entry (library, "glLinkProgram", LinkProgram);
+  init_entry (library, "glPixelStorei", PixelStorei);
+  init_entry (library, "glPolygonOffset", PolygonOffset);
+  init_entry (library, "glReadPixels", ReadPixels);
+  init_entry (library, "glReleaseShaderCompiler", ReleaseShaderCompiler);
+  init_entry (library, "glRenderbufferStorage", RenderbufferStorage);
+  init_entry (library, "glSampleCoverage", SampleCoverage);
+  init_entry (library, "glScissor", Scissor);
+  init_entry (library, "glShaderBinary", ShaderBinary);
+  init_entry (library, "glShaderSource", ShaderSource);
+  init_entry (library, "glStencilFunc", StencilFunc);
+  init_entry (library, "glStencilFuncSeparate", StencilFuncSeparate);
+  init_entry (library, "glStencilMask", StencilMask);
+  init_entry (library, "glStencilMaskSeparate", StencilMaskSeparate);
+  init_entry (library, "glStencilOp", StencilOp);
+  init_entry (library, "glStencilOpSeparate", StencilOpSeparate);
+  init_entry (library, "glTexImage2D", TexImage2D);
+  init_entry (library, "glTexParameterf", TexParameterf);
+  init_entry (library, "glTexParameterfv", TexParameterfv);
+  init_entry (library, "glTexParameteri", TexParameteri);
+  init_entry (library, "glTexParameteriv", TexParameteriv);
+  init_entry (library, "glTexSubImage2D", TexSubImage2D);
+  init_entry (library, "glUniform1f", Uniform1f);
+  init_entry (library, "glUniform1fv", Uniform1fv);
+  init_entry (library, "glUniform1i", Uniform1i);
+  init_entry (library, "glUniform1iv", Uniform1iv);
+  init_entry (library, "glUniform2f", Uniform2f);
+  init_entry (library, "glUniform2fv", Uniform2fv);
+  init_entry (library, "glUniform2i", Uniform2i);
+  init_entry (library, "glUniform2iv", Uniform2iv);
+  init_entry (library, "glUniform3f", Uniform3f);
+  init_entry (library, "glUniform3fv", Uniform3fv);
+  init_entry (library, "glUniform3i", Uniform3i);
+  init_entry (library, "glUniform3iv", Uniform3iv);
+  init_entry (library, "glUniform4f", Uniform4f);
+  init_entry (library, "glUniform4fv", Uniform4fv);
+  init_entry (library, "glUniform4i", Uniform4i);
+  init_entry (library, "glUniform4iv", Uniform4iv);
+  init_entry (library, "glUniformMatrix2fv", UniformMatrix2fv);
+  init_entry (library, "glUniformMatrix3fv", UniformMatrix3fv);
+  init_entry (library, "glUniformMatrix4fv", UniformMatrix4fv);
+  init_entry (library, "glUseProgram", UseProgram);
+  init_entry (library, "glValidateProgram", ValidateProgram);
+  init_entry (library, "glVertexAttrib1f", VertexAttrib1f);
+  init_entry (library, "glVertexAttrib1fv", VertexAttrib1fv);
+  init_entry (library, "glVertexAttrib2f", VertexAttrib2f);
+  init_entry (library, "glVertexAttrib2fv", VertexAttrib2fv);
+  init_entry (library, "glVertexAttrib3f", VertexAttrib3f);
+  init_entry (library, "glVertexAttrib3fv", VertexAttrib3fv);
+  init_entry (library, "glVertexAttrib4f", VertexAttrib4f);
+  init_entry (library, "glVertexAttrib4fv", VertexAttrib4fv);
+  init_entry (library, "glVertexAttribPointer", VertexAttribPointer);
+  init_entry (library, "glViewport", Viewport);
+
+    //получение адресов точек входа расширений OpenGL
+<<<GLES2INIT>>>
 
 #endif
+}

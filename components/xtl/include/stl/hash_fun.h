@@ -52,8 +52,10 @@ template <class T> size_t hash (const hash_key<T>&);
 
 size_t hash (int x);
 size_t hash (long x);
+size_t hash (long long x);
 size_t hash (unsigned int x);
 size_t hash (unsigned long x);
+size_t hash (unsigned long long x);
 size_t hash (const char*);
 size_t hash (const unsigned char*);
 size_t hash (const wchar_t*);

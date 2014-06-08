@@ -1,6 +1,6 @@
 #include "shared.h"
 
-using namespace render;
+using namespace render::manager;
 
 /*
      онструкторы / деструктор / присваивание
@@ -91,38 +91,22 @@ void PrimitiveBuffers::RemoveAll ()
     –езервирование вспомогательных примитивов
 */
 
-void PrimitiveBuffers::ReserveLines (size_t count)
+void PrimitiveBuffers::ReserveDynamicBuffers (size_t vertices_count, size_t indices_count)
 {
-  impl->ReserveLines (count);
+  if (!vertices_count && !indices_count)
+    return;
+
+  impl->BatchingManager ().ReserveDynamicBuffers (vertices_count, indices_count);
 }
 
-void PrimitiveBuffers::ReserveSprites (size_t count)
+size_t PrimitiveBuffers::DynamicVerticesCount () const
 {
-  impl->ReserveSprites (count);
+  return impl->HasBatchingManager () ? impl->BatchingManager ().DynamicVerticesCount () : 0;
 }
 
-size_t PrimitiveBuffers::LinesCapacity () const
+size_t PrimitiveBuffers::DynamicIndicesCount () const
 {
-  return impl->LinesCapacity ();
-}
-
-size_t PrimitiveBuffers::SpritesCapacity () const
-{
-  return impl->SpritesCapacity ();
-}
-
-/*
-    –ежим использовани€ буферов вспомогательных примитивов
-*/
-
-MeshBufferUsage PrimitiveBuffers::LinesBufferUsage () const
-{
-  return impl->LinesBufferUsage ();  
-}
-
-MeshBufferUsage PrimitiveBuffers::SpritesBufferUsage () const
-{
-  return impl->SpritesBufferUsage ();
+  return impl->HasBatchingManager () ? impl->BatchingManager ().DynamicIndicesCount () : 0;
 }
 
 /*
@@ -137,9 +121,14 @@ void PrimitiveBuffers::Swap (PrimitiveBuffers& buffers)
 namespace render
 {
 
+namespace manager
+{
+
 void swap (PrimitiveBuffers& buffers1, PrimitiveBuffers& buffers2)
 {
   buffers1.Swap (buffers2);
+}
+
 }
 
 }

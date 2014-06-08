@@ -214,12 +214,14 @@ int main ()
 
     memset (&sampler_desc, 0, sizeof sampler_desc);
 
-    sampler_desc.min_filter     = TexMinFilter_LinearMipLinear;
-    sampler_desc.max_anisotropy = 16;
-    sampler_desc.mag_filter     = TexMagFilter_Linear;
-    sampler_desc.wrap_u         = TexcoordWrap_Clamp;
-    sampler_desc.wrap_v         = TexcoordWrap_Clamp;
-    sampler_desc.wrap_w         = TexcoordWrap_Clamp;
+    sampler_desc.min_filter           = TexMinFilter_LinearMipLinear;
+    sampler_desc.max_anisotropy       = 16;
+    sampler_desc.mag_filter           = TexMagFilter_Linear;
+    sampler_desc.wrap_u               = TexcoordWrap_Clamp;
+    sampler_desc.wrap_v               = TexcoordWrap_Clamp;
+    sampler_desc.comparision_function = CompareMode_AlwaysPass;
+    sampler_desc.min_lod              = 0;
+    sampler_desc.max_lod              = FLT_MAX;    
 
     TexturePtr bump_texture (test.device->CreateTexture (texture_desc), false);
 

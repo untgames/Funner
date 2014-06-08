@@ -213,9 +213,15 @@ void GlslBindableProgram::Bind (ConstantBufferPtr* constant_buffers)
         case ProgramParameterType_Float3:   caps.glUniform3fv_fn       (parameter.location, parameter.count, (float*)parameter_data);    break;
         case ProgramParameterType_Int4:     caps.glUniform4iv_fn       (parameter.location, parameter.count, (GLint*)parameter_data);    break;
         case ProgramParameterType_Float4:   caps.glUniform4fv_fn       (parameter.location, parameter.count, (float*)parameter_data);    break;
+#ifndef OPENGL_ES2_SUPPORT
         case ProgramParameterType_Float2x2: caps.glUniformMatrix2fv_fn (parameter.location, parameter.count, GL_TRUE, (float*)parameter_data); break;
         case ProgramParameterType_Float3x3: caps.glUniformMatrix3fv_fn (parameter.location, parameter.count, GL_TRUE, (float*)parameter_data); break;
         case ProgramParameterType_Float4x4: caps.glUniformMatrix4fv_fn (parameter.location, parameter.count, GL_TRUE, (float*)parameter_data); break;
+#else
+        case ProgramParameterType_Float2x2: caps.glUniformMatrix2fv_fn (parameter.location, parameter.count, GL_FALSE, GetTransposedMatrixes<2> (parameter.count, (float*)parameter_data)); break;
+        case ProgramParameterType_Float3x3: caps.glUniformMatrix3fv_fn (parameter.location, parameter.count, GL_FALSE, GetTransposedMatrixes<3> (parameter.count, (float*)parameter_data)); break;
+        case ProgramParameterType_Float4x4: caps.glUniformMatrix4fv_fn (parameter.location, parameter.count, GL_FALSE, GetTransposedMatrixes<4> (parameter.count, (float*)parameter_data)); break;
+#endif
         default: break;
       }
     }
@@ -224,6 +230,24 @@ void GlslBindableProgram::Bind (ConstantBufferPtr* constant_buffers)
     //проверка ошибок
 
   CheckErrors (METHOD_NAME);
+}
+
+/*
+   Получение транспонированных матриц
+*/
+
+template <unsigned int Size>
+float* GlslBindableProgram::GetTransposedMatrixes (size_t count, float* data)
+{
+  float* buffer = (float*)GetContextManager ().GetTempBuffer (count * sizeof (math::matrix<float, Size>));
+
+  math::matrix<float, Size> *out_matrix = (math::matrix<float, Size>*)buffer,
+                            *in_matrix  = (math::matrix<float, Size>*)data;
+
+  for (size_t i = 0; i < count; i++, out_matrix++, in_matrix++)
+    *out_matrix = math::transpose (*in_matrix);
+
+  return buffer;
 }
 
 /*
@@ -238,13 +262,29 @@ void GlslBindableProgram::Validate ()
     
       //проверка состояния программы
 
-    if (glValidateProgram) glValidateProgram    (handle);
-    else                   glValidateProgramARB (handle);
+    if (glValidateProgram)
+    {
+      glValidateProgram (handle);
+    }
+#ifndef OPENGL_ES2_SUPPORT
+    else
+    {
+      glValidateProgramARB (handle);
+    }
+#endif
     
     GLint status = 0;
 
-    if (glGetProgramiv) glGetProgramiv            (handle, GL_OBJECT_VALIDATE_STATUS_ARB, &status);        
-    else                glGetObjectParameterivARB (handle, GL_OBJECT_VALIDATE_STATUS_ARB, &status);
+    if (glGetProgramiv)
+    {
+      glGetProgramiv (handle, GL_OBJECT_VALIDATE_STATUS_ARB, &status);
+    }
+#ifndef OPENGL_ES2_SUPPORT
+    else
+    {
+      glGetObjectParameterivARB (handle, GL_OBJECT_VALIDATE_STATUS_ARB, &status);
+    }
+#endif
     
       //проверка ошибок
     

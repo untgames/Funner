@@ -1,6 +1,6 @@
 #include "shared.h"
 
-using namespace render;
+using namespace render::manager;
 using namespace render::low_level;
 
 namespace
@@ -20,15 +20,17 @@ struct Texmap: public xtl::reference_counter, public CacheHolder
 {
   TextureProxy            texture;               //прокси текстуры
   SamplerProxy            sampler;               //сэмплер текстуры
-  bool                    is_dynamic;            //является ли текстура динамической  
+  bool                    is_dynamic;            //является ли текстура динамической
+  size_t                  semantic_hash;         //хеш имени семантики
   TexturePtr              cached_texture;        //закэшированная текстура
   LowLevelSamplerStatePtr cached_sampler;        //закэшированный сэмплер
   LowLevelTexturePtr      cached_device_texture; //закэшированная текстура
   
-  Texmap (CacheHolder& owner, const TextureProxy& in_texture_proxy, const SamplerProxy& in_sampler_proxy, bool in_is_dynamic)
+  Texmap (CacheHolder& owner, const TextureProxy& in_texture_proxy, const SamplerProxy& in_sampler_proxy, bool in_is_dynamic, const char* semantic)
     : texture (in_texture_proxy)
     , sampler (in_sampler_proxy)
     , is_dynamic (in_is_dynamic)
+    , semantic_hash (semantic ? common::strhash (semantic) : 0)
   {
     owner.AttachCacheSource (*this);
     
@@ -62,7 +64,7 @@ struct Texmap: public xtl::reference_counter, public CacheHolder
     }
     catch (xtl::exception& e)
     {
-      e.touch ("render::Texmap::UpdateCacheCore");
+      e.touch ("render::manager::Texmap::UpdateCacheCore");
       throw;
     }
   }
@@ -92,11 +94,11 @@ struct MaterialImpl::Impl: public CacheHolder, public DebugIdHolder
   PropertyBuffer             properties;                   //свойства материала
   ProgramParametersLayoutPtr material_properties_layout;   //расположение свойств материала
   TexmapArray                texmaps;                      //текстурные карты
-  bool                       has_dynamic_textures;         //есть ли в материале динамические текстуры  
+  bool                       has_dynamic_textures;         //есть ли в материале динамические текстуры
   size_t                     cached_state_block_mask_hash; //хэш закэшированной маски блока состояний материала
   ProgramPtr                 cached_program;               //закэшированная программа
   LowLevelStateBlockPtr      cached_state_block;           //закэшированный блок состояний
-  ProgramParametersLayoutPtr cached_properties_layout;     //расположение свойств материала и программы  
+  ProgramParametersLayoutPtr cached_properties_layout;     //расположение свойств материала и программы
   Log                        log;                          //протокол отладочных сообщений
   
 ///Конструктор
@@ -110,7 +112,7 @@ struct MaterialImpl::Impl: public CacheHolder, public DebugIdHolder
     , cached_state_block_mask_hash (0)
   {
     if (!in_name)
-      throw xtl::make_null_argument_exception ("render::MaterialImpl::Impl::Impl", "name");
+      throw xtl::make_null_argument_exception ("render::manager::MaterialImpl::Impl::Impl", "name");
       
     name = in_name;
     
@@ -123,7 +125,7 @@ struct MaterialImpl::Impl: public CacheHolder, public DebugIdHolder
 ///Деструктор
   ~Impl ()
   {
-      //предварительная очистка коллекция для возможности отслеживать порядок удаления объектов до и после удаления данного    
+      //предварительная очистка коллекция для возможности отслеживать порядок удаления объектов до и после удаления данного
       
     cached_program               = ProgramPtr ();
     cached_properties_layout     = ProgramParametersLayoutPtr ();
@@ -210,40 +212,64 @@ struct MaterialImpl::Impl: public CacheHolder, public DebugIdHolder
       mask.ss_constant_buffers [ProgramParametersSlot_Material] = true;
       mask.ss_constant_buffers [ProgramParametersSlot_Program]  = true;
 
-      for (size_t i=0, count=stl::min (texmaps.size (), DEVICE_SAMPLER_SLOTS_COUNT); i<count; i++)
+        //установка статических текстурных карт и их сэмплеров в контекст устройства отрисовки
+
+      if (cached_program)
       {
-        mask.ss_textures [i] = !texmaps [i]->is_dynamic;
-        mask.ss_samplers [i] = true;
+        const TexmapDesc* program_texmap = cached_program->Texmaps ();
+
+        for (size_t i = 0, count = cached_program->TexmapsCount (); i < count; i++, program_texmap++)
+        {
+          size_t channel = program_texmap->channel;
+
+          if (channel >= DEVICE_SAMPLER_SLOTS_COUNT)
+            continue;
+
+          Texmap* texmap = 0;
+
+          for (TexmapArray::iterator iter = texmaps.begin (), end = texmaps.end (); iter != end; ++iter)
+          {
+            if ((*iter)->semantic_hash == program_texmap->semantic_hash)
+            {
+              texmap = &**iter;
+              break;
+            }
+          }
+
+          mask.ss_textures [channel] = !texmap || !texmap->is_dynamic;
+          mask.ss_samplers [channel] = true;
+
+          if (texmap)
+          {
+            if (!texmap->cached_device_texture)
+              log.Printf ("Texmap[%u] in program '%s' for material '%s' will be ignored. Bad texture '%s'", channel, cached_program->Name (), name.c_str (), texmap->texture.Name ());
+
+            if (!texmap->cached_sampler)
+              log.Printf ("Texmap[%u] in program '%s' for material '%s' will be ignored. Bad sampler '%s'", channel, cached_program->Name (), name.c_str (), texmap->sampler.Name ());
+
+            context.SSSetTexture (channel, texmap->cached_device_texture.get ());
+            context.SSSetSampler (channel, texmap->cached_sampler.get ());
+          }
+          else
+          {
+            context.SSSetTexture (channel, 0);
+            context.SSSetSampler (channel, 0);
+          }
+        }
       }
 
         //проверка необходимости пересоздания блока состояний материала
-        
+
       size_t state_block_mask_hash = mask.Hash ();
-      
-      if (!cached_state_block || cached_state_block_mask_hash != state_block_mask_hash) 
+
+      if (!cached_state_block || cached_state_block_mask_hash != state_block_mask_hash)
       {
         if (has_debug_log)
           log.Printf ("...create state block for material");
-                
+
         cached_state_block           = LowLevelStateBlockPtr (device.CreateStateBlock (mask), false);
         cached_state_block_mask_hash = state_block_mask_hash;
         need_invalidate_deps         = true;
-      }
-      
-        //установка статических текстурных карт и их сэмплеров в контекст устройства отрисовки
-
-      for (size_t i=0, count=stl::min (texmaps.size (), DEVICE_SAMPLER_SLOTS_COUNT); i<count; i++)
-      {
-        Texmap& texmap = *texmaps [i];
-        
-        if (!texmap.cached_device_texture)        
-          log.Printf ("Texmap[%u] for material '%s' will be ignored. Bad texture '%s'", i, name.c_str (), texmap.texture.Name ());          
-
-        if (!texmap.cached_sampler)        
-          log.Printf ("Texmap[%u] for material '%s' will be ignored. Bad sampler '%s'", i, name.c_str (), texmap.sampler.Name ());
-        
-        context.SSSetTexture (i, texmap.cached_device_texture.get ());
-        context.SSSetSampler (i, texmap.cached_sampler.get ());
       }
 
         //сохранение состояния контекста устройства отрисовки
@@ -260,7 +286,7 @@ struct MaterialImpl::Impl: public CacheHolder, public DebugIdHolder
     }
     catch (xtl::exception& e)
     {
-      e.touch ("render::MaterialImpl::Impl::UpdateCacheCore");
+      e.touch ("render::manager::MaterialImpl::Impl::UpdateCacheCore");
       throw;
     }
   }
@@ -296,7 +322,7 @@ const char* MaterialImpl::Name ()
 void MaterialImpl::SetName (const char* name)
 {
   if (!name)
-    throw xtl::make_null_argument_exception ("render::MaterialImpl::SetName", "name");
+    throw xtl::make_null_argument_exception ("render::manager::MaterialImpl::SetName", "name");
     
   if (impl->device_manager->Settings ().HasDebugLog ())
     impl->log.Printf ("Material '%s' name changed to '%s' (id=%u)", impl->name.c_str (), name, impl->Id ());
@@ -357,7 +383,7 @@ size_t MaterialImpl::TexturesCount ()
 TexturePtr MaterialImpl::Texture (size_t index)
 {
   if (index >= impl->texmaps.size ())
-    throw xtl::make_range_exception ("render::MaterialImpl::Texture", "index", index, impl->texmaps.size ());
+    throw xtl::make_range_exception ("render::manager::MaterialImpl::Texture", "index", index, impl->texmaps.size ());
     
   Texmap& texmap = *impl->texmaps [index];  
   
@@ -369,7 +395,7 @@ TexturePtr MaterialImpl::Texture (size_t index)
 LowLevelTexturePtr MaterialImpl::DeviceTexture (size_t index)
 {
   if (index >= impl->texmaps.size ())
-    throw xtl::make_range_exception ("render::MaterialImpl::DeviceTexture", "index", index, impl->texmaps.size ());
+    throw xtl::make_range_exception ("render::manager::MaterialImpl::DeviceTexture", "index", index, impl->texmaps.size ());
     
   Texmap& texmap = *impl->texmaps [index];
     
@@ -381,7 +407,7 @@ LowLevelTexturePtr MaterialImpl::DeviceTexture (size_t index)
 const char* MaterialImpl::TextureName (size_t index)
 {
   if (index >= impl->texmaps.size ())
-    throw xtl::make_range_exception ("render::MaterialImpl::TextureName", "index", index, impl->texmaps.size ());
+    throw xtl::make_range_exception ("render::manager::MaterialImpl::TextureName", "index", index, impl->texmaps.size ());
     
   return impl->texmaps [index]->texture.Name ();
 }
@@ -389,7 +415,7 @@ const char* MaterialImpl::TextureName (size_t index)
 LowLevelSamplerStatePtr MaterialImpl::Sampler (size_t index)
 {
   if (index >= impl->texmaps.size ())
-    throw xtl::make_range_exception ("render::MaterialImpl::Sampler", "index", index, impl->texmaps.size ());
+    throw xtl::make_range_exception ("render::manager::MaterialImpl::Sampler", "index", index, impl->texmaps.size ());
     
   Texmap& texmap = *impl->texmaps [index];    
   
@@ -420,7 +446,7 @@ void MaterialImpl::Update (const media::rfx::Material& material)
     common::PropertyMap new_properties = material.Properties ();
     ProgramProxy        new_program    = impl->program_manager->GetProgramProxy (material.Program ());    
     
-      //создание текстурных карт      
+      //создание текстурных карт
     
     TexmapArray new_texmaps;
 
@@ -432,7 +458,7 @@ void MaterialImpl::Update (const media::rfx::Material& material)
     {
       const media::rfx::Texmap& texmap = material.Texmap (i);
       
-        //определение является ли текстура динамической производится по префиксу её имени и потому может быть выполнено однократно      
+        //определение является ли текстура динамической производится по префиксу её имени и потому может быть выполнено однократно
       
       bool is_dynamic_image = impl->texture_manager->IsDynamicTexture (texmap.Image ());
 
@@ -440,7 +466,7 @@ void MaterialImpl::Update (const media::rfx::Material& material)
         new_has_dynamic_textures = true;        
       
       TexmapPtr new_texmap (new Texmap (*impl, impl->texture_manager->GetTextureProxy (texmap.Image ()),
-        impl->texture_manager->GetSamplerProxy (texmap.Sampler ()), is_dynamic_image), false);
+        impl->texture_manager->GetSamplerProxy (texmap.Sampler ()), is_dynamic_image, texmap.Semantic ()), false);
 
       new_texmaps.push_back (new_texmap);
     }
@@ -475,13 +501,13 @@ void MaterialImpl::Update (const media::rfx::Material& material)
     impl->material_properties_layout = new_layout;
     impl->has_dynamic_textures       = new_has_dynamic_textures;
     
-      //обновление кэша с зависимостями (поскольку может измениться состояние тэгов и динамических текстур)    
+      //обновление кэша с зависимостями (поскольку может измениться состояние тэгов и динамических текстур)
       
     impl->InvalidateCache ();
   }
   catch (xtl::exception& e)
   {
-    e.touch ("render::MaterialImpl::Update");
+    e.touch ("render::manager::MaterialImpl::Update");
     throw;
   }
 }
@@ -500,7 +526,7 @@ ProgramParametersLayoutPtr MaterialImpl::ParametersLayout ()
   }
   catch (xtl::exception& e)
   {
-    e.touch ("render::MaterialImpl::ParametersLayout");
+    e.touch ("render::manager::MaterialImpl::ParametersLayout");
     throw;
   }
 }

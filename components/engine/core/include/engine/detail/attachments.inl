@@ -118,7 +118,7 @@ void IAttachmentRegistryListener<T>::OnUnregisterAttachmentCore (const char* nam
 */
 
 template <class T>
-inline void AttachmentRegistry::Register (const char* name, T& object)
+inline void AttachmentRegistry::Register (const char* name, const T& object)
 {
   RegisterCore (name, detail::make_attachment (object));
 }
@@ -130,7 +130,7 @@ inline void AttachmentRegistry::Unregister (const char* name)
 }
 
 template <class T>
-inline void AttachmentRegistry::Unregister (const char* name, T& object)
+inline void AttachmentRegistry::Unregister (const char* name, const T& object)
 {
   detail::IAttachment<T>* attachment = static_cast<detail::IAttachment<T>*> (FindCore (name, typeid (T), false));
   

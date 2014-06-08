@@ -108,7 +108,7 @@ struct PropertyMap::Impl: public xtl::reference_counter, public xtl::trackable
     for (size_t i=0, count=layout.Size (); i<count; i++, desc++)
     {
       if (desc->type == PropertyType_String)
-        *reinterpret_cast<size_t*> (buffer.data () + desc->offset) = strings.Add ("");
+        *reinterpret_cast<unsigned int*> (buffer.data () + desc->offset) = strings.Add ("");
     }
     
     Update ();
@@ -189,7 +189,7 @@ struct PropertyMap::Impl: public xtl::reference_counter, public xtl::trackable
         
         if (type == PropertyType_String)
         {
-          size_t& string_index = *reinterpret_cast<size_t*> (buffer.data () + old_buffer_size);
+          unsigned int& string_index = *reinterpret_cast<unsigned int*> (buffer.data () + old_buffer_size);
           
           string_index = strings.Add ("");
         }
@@ -509,7 +509,7 @@ struct PropertyMap::Impl: public xtl::reference_counter, public xtl::trackable
 
     xtl::to_string (s, values, values + elements_count, DEFAULT_VALUES_SEPARATOR);
 
-    size_t string_index = *reinterpret_cast<size_t*> (buffer.data () + desc.offset);
+    unsigned int string_index = *reinterpret_cast<unsigned int*> (buffer.data () + desc.offset);
 
     strings.Set (string_index, s.c_str ());
   }
@@ -534,7 +534,7 @@ struct PropertyMap::Impl: public xtl::reference_counter, public xtl::trackable
 
   void ReadValueToProperty (size_t, const char* const* values, const PropertyDesc& desc, PropertyTypeMap<PropertyType_String>)
   {
-    size_t string_index = *reinterpret_cast<size_t*> (buffer.data () + desc.offset);
+    unsigned int string_index = *reinterpret_cast<unsigned int*> (buffer.data () + desc.offset);
     
     strings.Set (string_index, values [0]);
   }
@@ -861,7 +861,7 @@ struct PropertyMap::Impl: public xtl::reference_counter, public xtl::trackable
     if (elements_count > 1)
       throw xtl::format_operation_exception (METHOD_NAME, "Internal error: property '%s' is string array with %u elements", desc.name, desc.elements_count);
       
-    size_t string_index = *reinterpret_cast<size_t*> (buffer.data () + desc.offset);
+    unsigned int string_index = *reinterpret_cast<unsigned int*> (buffer.data () + desc.offset);
     
     const char* string = strings [string_index];
 
@@ -888,7 +888,7 @@ struct PropertyMap::Impl: public xtl::reference_counter, public xtl::trackable
   
   void ReadValueFromProperty (size_t elements_count, stl::string* values, const PropertyDesc& desc, PropertyTypeMap<PropertyType_String>)
   {
-    size_t string_index = *reinterpret_cast<size_t*> (buffer.data () + desc.offset);
+    unsigned int string_index = *reinterpret_cast<unsigned int*> (buffer.data () + desc.offset);
 
     *values = strings [string_index];
   }  
@@ -932,7 +932,7 @@ struct PropertyMap::Impl: public xtl::reference_counter, public xtl::trackable
       
       if (desc.type == PropertyType_String)
       {
-        size_t string_index = *reinterpret_cast<size_t*> (buffer.data () + desc.offset);
+        unsigned int string_index = *reinterpret_cast<unsigned int*> (buffer.data () + desc.offset);
         
           //поиск дубликатов
         
@@ -943,7 +943,7 @@ struct PropertyMap::Impl: public xtl::reference_counter, public xtl::trackable
         for (size_t i=0, count=layout.Size (); i<count; i++, update_desc++)
           if (update_desc->type == PropertyType_String)
           {
-            size_t& update_string_index = *reinterpret_cast<size_t*> (buffer.data () + desc.offset);
+            unsigned int& update_string_index = *reinterpret_cast<unsigned int*> (buffer.data () + desc.offset);
             
             if (update_string_index == string_index)
               string_entries_count++;
@@ -959,7 +959,7 @@ struct PropertyMap::Impl: public xtl::reference_counter, public xtl::trackable
           {
             if (update_desc->type == PropertyType_String)
             {              
-              size_t& update_string_index = *reinterpret_cast<size_t*> (buffer.data () + desc.offset);
+              unsigned int& update_string_index = *reinterpret_cast<unsigned int*> (buffer.data () + desc.offset);
             
               if (update_string_index > string_index)
                 update_string_index--;
@@ -1052,7 +1052,7 @@ struct PropertyMap::Impl: public xtl::reference_counter, public xtl::trackable
         //добавление строки в случае необходимости
 
       if (type == PropertyType_String)
-        *reinterpret_cast<size_t*> (buffer.data () + desc.offset) = strings.Add ("");
+        *reinterpret_cast<unsigned int*> (buffer.data () + desc.offset) = strings.Add ("");
 
         //изменение типа в лэйауте
         
@@ -1065,8 +1065,8 @@ struct PropertyMap::Impl: public xtl::reference_counter, public xtl::trackable
       {
         case PropertyType_String:
         {
-          size_t      string_index = *reinterpret_cast<size_t*> (old_buffer.data () + old_offset);
-          const char* string       = strings [string_index];
+          unsigned int string_index = *reinterpret_cast<unsigned int*> (old_buffer.data () + old_offset);
+          const char*  string       = strings [string_index];
 
           SetProperty (index, 1, &string);
 
@@ -1143,7 +1143,7 @@ const char* PropertyMap::Impl::GetData (const char* method_name, size_t property
     if (desc.type != PropertyType_String)
       throw xtl::format_operation_exception ("", "Could not convert property '%s' from %s to %s", desc.name, get_name (desc.type), get_name (PropertyType_String));
 
-    size_t string_index = *reinterpret_cast<size_t*> (buffer.data () + desc.offset);
+    unsigned int string_index = *reinterpret_cast<unsigned int*> (buffer.data () + desc.offset);
 
     return strings [string_index];
   }
@@ -1853,6 +1853,47 @@ PropertyLayout PropertyMap::Layout () const
 }
 
 /*
+    Сброс лэйаута
+*/
+
+void PropertyMap::Reset (const PropertyLayout& in_layout)
+{
+  try
+  {
+    PropertyLayout layout (in_layout);
+
+    layout.Capture ();
+
+    StringArray strings;    
+    Buffer      buffer (layout.BufferSize ());
+
+    memset (buffer.data (), 0, buffer.size ());
+    
+    const PropertyDesc* desc = layout.Properties ();
+    
+    for (size_t i=0, count=layout.Size (); i<count; i++, desc++)
+    {
+      if (desc->type == PropertyType_String)
+        *reinterpret_cast<unsigned int*> (buffer.data () + desc->offset) = strings.Add ("");
+    }    
+
+    impl->layout      = layout;
+    impl->hash        = 0;
+    impl->need_update = true;
+    impl->strings     = strings;
+    
+    impl->buffer.swap (buffer);
+
+    impl->UpdateNotify ();
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("common::PropertyMap::Reset");
+    throw;
+  }
+}
+
+/*
     Работа с буфером
 */
 
@@ -1864,6 +1905,44 @@ const void* PropertyMap::BufferData () const
 size_t PropertyMap::BufferSize () const
 {
   return impl->buffer.size ();
+}
+
+/*
+    Обновление буфера
+*/
+
+void PropertyMap::SetBufferData (const void* source_data)
+{
+  try
+  {
+    if (!source_data)
+      throw xtl::make_null_argument_exception ("", "source_data");
+
+    const PropertyDesc* desc = impl->layout.Properties ();
+
+    if (impl->strings.Size ())
+    {    
+      for (size_t i=0, count=impl->layout.Size (); i<count; i++, desc++)
+      {
+        if (desc->type == PropertyType_String)
+        {
+          unsigned int string_index = *reinterpret_cast<const unsigned int*> (reinterpret_cast<const char*> (source_data) + desc->offset);
+
+          if (string_index >= impl->strings.Size ())
+            throw xtl::format_operation_exception ("", "Can't set buffer to the property map because property[%u] has string index %u which is large than strings count %u", i, string_index, impl->strings.Size ());
+        }
+      }
+    }
+
+    memcpy (impl->buffer.data (), source_data, impl->buffer.size ());
+
+    impl->UpdateNotify ();
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("common::PropertyMap::SetBufferData");
+    throw;
+  }
 }
 
 /*

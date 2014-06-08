@@ -1,6 +1,6 @@
 #include "shared.h"
 
-using namespace render;
+using namespace render::manager;
 
 namespace
 {
@@ -16,6 +16,9 @@ const char* LOG_NAME = "render.manager";
 namespace render
 {
 
+namespace manager
+{
+
 /*
     Описание реализации протокола
 */
@@ -27,6 +30,8 @@ class LogImpl: public xtl::reference_counter
 
     LogImpl (const char* log_name) : log (log_name) {}
 };
+
+}
 
 }
 

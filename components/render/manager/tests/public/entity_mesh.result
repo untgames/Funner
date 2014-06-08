@@ -4,7 +4,7 @@ render.manager: Create device manager (driver='*', adapter='*', init_string='')
 render.manager: ...device manager and swap chain have been successfully created
 render.manager: Initialize render targets for swap chain
 render.manager: ...render targets for swap chain created
-window 784x562 added
+window added
 render.manager: Primitive 'mesh1(data/test.xmesh)' created (id=1)
 render.manager: Mesh 'mesh1' created (id=2)
 render.manager: Mesh 'mesh1' primitive #0 created (id=3)
@@ -115,7 +115,7 @@ Entity created successfull
 render.manager: Entity lod destroyed (entity_id=22, id=24)
 render.manager: Entity destroyed (id=22)
 render.manager: Program parameters layout destroyed (id=23)
-window 784x562 removed
+window removed
 render.manager: Program 'helper' destroyed for options = '' (id=18)
 render.manager: Program 'helper' common data destroyed (id=19)
 render.manager: Program 'shadow_map' destroyed for options = '' (id=16)

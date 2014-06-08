@@ -1,6 +1,6 @@
 #include "shared.h"
 
-using namespace render;
+using namespace render::manager;
 
 /*
     Прямоугольная область
@@ -44,6 +44,9 @@ bool Rect::operator != (const Rect& area) const
 namespace render
 {
 
+namespace manager
+{
+
 const char* get_name (PixelFormat format)
 {
   switch (format)
@@ -69,8 +72,10 @@ const char* get_name (PixelFormat format)
     case PixelFormat_D32:         return "d32";
     case PixelFormat_S8:          return "s8";    
     default:
-      throw xtl::make_argument_exception ("render::get_name(render::PixelFormat)", "format", format);
+      throw xtl::make_argument_exception ("render::manager::get_name(render::manager::PixelFormat)", "format", format);
   }
+}
+
 }
 
 }

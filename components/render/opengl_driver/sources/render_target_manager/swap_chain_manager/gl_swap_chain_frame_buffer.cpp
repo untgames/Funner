@@ -388,7 +388,7 @@ void SwapChainFrameBuffer::UpdateRenderTargets ()
       
     GLenum tex_target = texture_desc.target;
 
-#ifndef OPENGL_ES_SUPPORT    
+#if !defined(OPENGL_ES_SUPPORT) && !defined(OPENGL_ES2_SUPPORT)
     switch (tex_target)
     {
       case GL_TEXTURE_1D:

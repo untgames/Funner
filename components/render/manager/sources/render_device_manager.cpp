@@ -1,6 +1,7 @@
 #include "shared.h"
 
 using namespace render;
+using namespace render::manager;
 
 /*
     Описание реализации менеджера устройства
@@ -8,14 +9,14 @@ using namespace render;
 
 struct DeviceManager::Impl
 {
-  LowLevelDeviceContextPtr         context;                    //непосредственный контекст отрисовки
-  LowLevelDevicePtr                device;                     //устройство визуализации
-  LowLevelDriverPtr                driver;                     //драйвер устройства визуализации  
-  CacheManagerPtr                  cache_manager;              //менеджер кэширования
-  render::InputLayoutManager       input_layout_manager;       //менеджер лэйаутов геометрии
-  render::ProgramParametersManager program_parameters_manager; //менеджер параметров программ шэйдинга  
-  SettingsPtr                      settings;                   //настройки менеджера рендеринга
-  low_level::DeviceCaps            device_caps;                //возможности устройства отрисовки
+  LowLevelDeviceContextPtr                  context;                    //непосредственный контекст отрисовки
+  LowLevelDevicePtr                         device;                     //устройство визуализации
+  LowLevelDriverPtr                         driver;                     //драйвер устройства визуализации
+  CacheManagerPtr                           cache_manager;              //менеджер кэширования
+  render::manager::InputLayoutManager       input_layout_manager;       //менеджер лэйаутов геометрии
+  render::manager::ProgramParametersManager program_parameters_manager; //менеджер параметров программ шэйдинга  
+  SettingsPtr                               settings;                   //настройки менеджера рендеринга
+  low_level::DeviceCaps                     device_caps;                //возможности устройства отрисовки
   
   Impl (const LowLevelDevicePtr& in_device, const LowLevelDriverPtr& in_driver, const SettingsPtr& in_settings, const CacheManagerPtr& in_cache_manager)
     : context (in_device->GetImmediateContext ())
@@ -54,7 +55,7 @@ DeviceManager::DeviceManager (const LowLevelDevicePtr& device, const LowLevelDri
   }
   catch (xtl::exception& e)
   {
-    e.touch ("render::DeviceManager::DeviceManager");
+    e.touch ("render::manager::DeviceManager::DeviceManager");
     throw;
   }
 }
@@ -95,7 +96,7 @@ const low_level::DeviceCaps& DeviceManager::DeviceCaps ()
     Менеджер кэширования
 */
 
-render::CacheManager& DeviceManager::CacheManager ()
+render::manager::CacheManager& DeviceManager::CacheManager ()
 {
   return *impl->cache_manager;
 }

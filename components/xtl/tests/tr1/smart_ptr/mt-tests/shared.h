@@ -5,10 +5,12 @@
 #pragma warning(disable: 4514)  // unreferenced inline removed
 #endif
 
-#include <xtl/shared_ptr.h>
 #include <xtl/bind.h>
-#include <xtl/reference_counter.h>
 #include <xtl/intrusive_ptr.h>
+#include <xtl/ref.h>
+#include <xtl/reference_counter.h>
+#include <xtl/shared_ptr.h>
+#include <xtl/spin_lock.h>
 
 #include <stl/vector>
 #include <stl/memory>

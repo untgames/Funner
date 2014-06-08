@@ -40,7 +40,7 @@ FboFrameBuffer::FboFrameBuffer (const FrameBufferManagerPtr& manager, View* colo
     
     frame_buffer_manager->SetFrameBuffer (id, GetId ());
     
-#ifndef OPENGL_ES_SUPPORT
+#if !defined(OPENGL_ES_SUPPORT) && !defined(OPENGL_ES2_SUPPORT)
     
       //установка активного буфера вывода и чтения
 
@@ -159,7 +159,7 @@ void FboFrameBuffer::SetAttachment (RenderTargetType target_type, View* view)
   throw xtl::format_operation_exception (METHOD_NAME, "%s has unknown texture type %s", target_name, view->GetTextureTypeName ());
 }
 
-#ifndef OPENGL_ES_SUPPORT
+#if !defined(OPENGL_ES_SUPPORT) && !defined(OPENGL_ES2_SUPPORT)
 
 void FboFrameBuffer::SetAttachment (GLenum attachment, GLenum textarget, size_t texture_id, const ViewDesc& view_desc)
 {

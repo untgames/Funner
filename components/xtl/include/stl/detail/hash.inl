@@ -1,5 +1,5 @@
 /*
-    Љ«оз ениЁа®ў ­Ёп
+    Ключ хэширования
 */
 
 template <class T>
@@ -26,7 +26,7 @@ inline bool hash_key<T>::operator != (const hash_key& key) const
 }
 
 /*
-    ”г­ЄжЁЁ ениЁа®ў ­Ёп
+    Функции хэширования
 */
 
 inline size_t hash (int x)
@@ -64,6 +64,18 @@ inline size_t hash (const unsigned char* s)
   return hash (reinterpret_cast<const char*> (s));
 }
 
+//TODO: hash for x86
+
+inline size_t hash (long long x)
+{
+  return static_cast<size_t> (x);
+}
+
+inline size_t hash (unsigned long long x)
+{
+  return static_cast<size_t> (x);
+}
+
 #ifndef __MYSTL_STANDALONE__
 
 inline size_t hash (const char* s)
@@ -98,14 +110,14 @@ inline size_t hash (const wchar_t* s)
 
 #endif
 
-//Ї®«гзҐ­ЁҐ Ї®б«Ґ¤®ў вҐ«м­®Ј® ени 
+//получение последовательного хэша
 template <class T>
 inline size_t hash (const T& object, size_t previous_hash)
 {
   return hash (object) ^ previous_hash;
 }
 
-//Ї®«гзҐ­ЁҐ ени  Ї ал
+//получение хэша пары
 template <class T1, class T2>
 inline size_t hash (const pair<T1, T2>& p)
 {

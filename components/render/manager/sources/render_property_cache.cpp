@@ -1,6 +1,6 @@
 #include "shared.h"
 
-using namespace render;
+using namespace render::manager;
 
 namespace
 {
@@ -20,8 +20,8 @@ const size_t MIN_BUFER_SIZE            = 64;
 struct BufferPoolEntry
 {
   LowLevelBufferPtr buffer;          //буфер данных
-  size_t            last_use_time;   //последнее время использования
-  size_t            last_use_frame;  //последний кадр использования
+  FrameTime         last_use_time;   //последнее время использования
+  FrameId           last_use_frame;  //последний кадр использования
 };
 
 typedef stl::vector<BufferPoolEntry> BufferArray;
@@ -42,7 +42,7 @@ struct BufferPool: public xtl::reference_counter, private Cache
     , settings (&device_manager->Settings ())
   {
     if (!settings)
-      throw xtl::make_null_argument_exception ("render::BufferPool::BufferPool", "settings");
+      throw xtl::make_null_argument_exception ("render::manager::BufferPool::BufferPool", "settings");
     
     buffers.reserve (RESERVED_BUFFER_POOL_SIZE);
     
@@ -107,10 +107,8 @@ struct BufferPool: public xtl::reference_counter, private Cache
     if (buffers.empty ())
       return;
     
-    size_t current_time  = CurrentTime (),
-           current_frame = CurrentFrame (),
-           time_delay    = TimeDelay (),
-           frame_delay   = FrameDelay ();
+    FrameTime current_time  = CurrentTime (), time_delay = TimeDelay ();
+    FrameId   current_frame = CurrentFrame (), frame_delay = FrameDelay ();
 
     for (BufferArray::iterator iter=buffers.end ()-1, end=buffers.begin ()-1; iter!=end; --iter)
       if (current_time - iter->last_use_time <= time_delay && current_frame - iter->last_use_frame <= frame_delay)
@@ -188,7 +186,7 @@ PropertyCache::PropertyCache (const DeviceManagerPtr& device_manager)
   }
   catch (xtl::exception& e)
   {
-    e.touch ("render::PropertyCache::PropertyCache");
+    e.touch ("render::manager::PropertyCache::PropertyCache");
     throw;
   }
 }
@@ -215,7 +213,7 @@ void PropertyCache::Convert (const common::PropertyMap& source_map, LowLevelBuff
       
     if (impl->last_hash != hash)
     {
-      impl->last_layout = impl->device_manager->ProgramParametersManager ().GetParameters (ProgramParametersSlot_FrameEntity, layout);
+      impl->last_layout = impl->device_manager->ProgramParametersManager ().GetParameters (ProgramParametersSlot_FrameEntity, layout, true);
       impl->last_hash   = hash;
     }    
     
@@ -254,7 +252,7 @@ void PropertyCache::Convert (const common::PropertyMap& source_map, LowLevelBuff
   }
   catch (xtl::exception& e)
   {
-    e.touch ("render::PropertyCache::Convert");
+    e.touch ("render::manager::PropertyCache::Convert");
     
     throw;
   }

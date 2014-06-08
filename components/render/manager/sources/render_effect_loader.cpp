@@ -1,8 +1,9 @@
 #include "shared.h"
 
 using namespace common;
-using namespace render::low_level;
 using namespace render;
+using namespace render::low_level;
+using namespace render::manager;
 
 namespace
 {
@@ -25,7 +26,7 @@ class EffectLoader
         ParseRoot (root);
 
         if (root.Log ().HasErrors ())
-          throw xtl::format_operation_exception ("render::EffectLoader::EffectLoader", "Error at parsing effect file '%s'", name);
+          throw xtl::format_operation_exception ("render::manager::EffectLoader::EffectLoader", "Error at parsing effect file '%s'", name);
       }
       catch (...)
       {
@@ -454,6 +455,17 @@ class EffectLoader
       return TexcoordWrap_Repeat;
     }
 
+///Разбор уровня детализацтии сэмплера
+    static float ParseSamplerLod (const ParseNode& node, const char* tag)
+    {
+      const char* value = get<const char*> (node, tag, "0");
+
+      if (!strcmp (value, "max"))
+        return FLT_MAX;
+
+      return get<float> (node, tag);
+    }
+
 ///Разбор состояния сэмплера
     void ParseSamplerState (Parser::Iterator iter)
     {
@@ -469,9 +481,9 @@ class EffectLoader
       desc.wrap_v               = ParseTexcoordWrap (iter->First ("wrap_v"));
       desc.wrap_w               = ParseTexcoordWrap (iter->First ("wrap_w"));
       desc.comparision_function = iter->First ("comparision_function") ? ParseCompareMode (iter->First ("comparision_function")) : CompareMode_AlwaysPass;
-      desc.mip_lod_bias         = get<float> (*iter, "mip_lod_bias", 0.0f);
-      desc.min_lod              = get<float> (*iter, "min_lod", 0.0f);
-      desc.max_lod              = get<float> (*iter, "max_lod", 0.0f);
+      desc.mip_lod_bias         = ParseSamplerLod (*iter, "mip_lod_bias");
+      desc.min_lod              = ParseSamplerLod (*iter, "min_lod");
+      desc.max_lod              = ParseSamplerLod (*iter, "max_lod");
       desc.max_anisotropy       = get<size_t> (*iter, "max_anisotropy", 1u);
       
       math::vec4f border_color = get<math::vec4f> (*iter, "border_color", math::vec4f (0.0f));
@@ -786,25 +798,25 @@ class EffectLoader
       return SortMode_Default;      
     }
     
-    static render::ClearFlag ParseClearFlags (const ParseNode& node, const char* node_name)
+    static render::manager::ClearFlag ParseClearFlags (const ParseNode& node, const char* node_name)
     {
-      size_t flags = render::ClearFlag_ViewportOnly;
+      size_t flags = render::manager::ClearFlag_ViewportOnly;
       
       for (Parser::AttributeIterator params_iter = make_attribute_iterator (node.First (node_name)); params_iter; ++params_iter)      
       {
-        if      (!xtl::xstrcmp (*params_iter, "render_targets"))       flags |= render::ClearFlag_RenderTarget;
-        else if (!xtl::xstrcmp (*params_iter, "depth_stencil_target")) flags |= render::ClearFlag_DepthStencil;
-        else if (!xtl::xstrcmp (*params_iter, "depth"))                flags |= render::ClearFlag_Depth;
-        else if (!xtl::xstrcmp (*params_iter, "stencil"))              flags |= render::ClearFlag_Stencil;
-        else if (!xtl::xstrcmp (*params_iter, "color"))                flags |= render::ClearFlag_RenderTarget;
-        else if (!xtl::xstrcmp (*params_iter, "all"))                  flags |= render::ClearFlag_All;
+        if      (!xtl::xstrcmp (*params_iter, "render_targets"))       flags |= render::manager::ClearFlag_RenderTarget;
+        else if (!xtl::xstrcmp (*params_iter, "depth_stencil_target")) flags |= render::manager::ClearFlag_DepthStencil;
+        else if (!xtl::xstrcmp (*params_iter, "depth"))                flags |= render::manager::ClearFlag_Depth;
+        else if (!xtl::xstrcmp (*params_iter, "stencil"))              flags |= render::manager::ClearFlag_Stencil;
+        else if (!xtl::xstrcmp (*params_iter, "color"))                flags |= render::manager::ClearFlag_RenderTarget;
+        else if (!xtl::xstrcmp (*params_iter, "all"))                  flags |= render::manager::ClearFlag_All;
         else
         {
           raise_parser_exception (node, "Unknown clear flag '%s'", *params_iter);
         }
       }
       
-      return (render::ClearFlag)flags;
+      return (render::manager::ClearFlag)flags;
     }
 
     void ParseNamedPass (Parser::Iterator iter)
@@ -822,18 +834,17 @@ class EffectLoader
     {
       try
       {
-        common::StringArray tags                     = ParseTags (*iter, "tags");
-        common::StringArray color_targets            = ParseTags (*iter, "color_targets", false);
-        SortMode            sort_mode                = ParseSortMode (*iter);
-        render::ClearFlag   clear_flags              = ParseClearFlags (*iter, "clear");        
-        const char*         depth_stencil_target     = get<const char*> (*iter, "depth_stencil_target", "null");
-        const char*         depth_stencil_state_name = get<const char*> (*iter, "depth_stencil_state", "");
-        const char*         blend_state_name         = get<const char*> (*iter, "blend_state", "");
-        const char*         rasterizer_state_name    = get<const char*> (*iter, "rasterizer_state", "");
-
-        LowLevelBlendStatePtr        blend_state         = *blend_state_name ? library.BlendStates ().Find (blend_state_name) : LowLevelBlendStatePtr ();
-        LowLevelDepthStencilStatePtr depth_stencil_state = *depth_stencil_state_name ? library.DepthStencilStates ().Find (depth_stencil_state_name) : LowLevelDepthStencilStatePtr ();
-        LowLevelRasterizerStatePtr   rasterizer_state    = *rasterizer_state_name ? library.RasterizerStates ().Find (rasterizer_state_name) : LowLevelRasterizerStatePtr ();
+        common::StringArray          tags                     = ParseTags (*iter, "tags");
+        common::StringArray          color_targets            = ParseTags (*iter, "color_targets", false);
+        SortMode                     sort_mode                = ParseSortMode (*iter);
+        render::manager::ClearFlag   clear_flags              = ParseClearFlags (*iter, "clear");        
+        const char*                  depth_stencil_target     = get<const char*> (*iter, "depth_stencil_target", "null");
+        const char*                  depth_stencil_state_name = get<const char*> (*iter, "depth_stencil_state", "");
+        const char*                  blend_state_name         = get<const char*> (*iter, "blend_state", "");
+        const char*                  rasterizer_state_name    = get<const char*> (*iter, "rasterizer_state", "");
+        LowLevelBlendStatePtr        blend_state              = *blend_state_name ? library.BlendStates ().Find (blend_state_name) : LowLevelBlendStatePtr ();
+        LowLevelDepthStencilStatePtr depth_stencil_state      = *depth_stencil_state_name ? library.DepthStencilStates ().Find (depth_stencil_state_name) : LowLevelDepthStencilStatePtr ();
+        LowLevelRasterizerStatePtr   rasterizer_state         = *rasterizer_state_name ? library.RasterizerStates ().Find (rasterizer_state_name) : LowLevelRasterizerStatePtr ();
         
         EffectPassPtr pass (new EffectPass (device_manager), false);
 
@@ -932,7 +943,7 @@ class EffectLoader
   private:
     common::ParseNode    root;           //корневой узел
     EffectLoaderLibrary& library;        //библиотека загрузки эффектов
-    render::Log          log;            //протокол рендера
+    render::manager::Log log;            //протокол рендера
     DeviceManagerPtr     device_manager; //менеджер устройства отрисовки
 };
 
@@ -941,9 +952,14 @@ class EffectLoader
 namespace render
 {
 
+namespace manager
+{
+
 void parse_effect_library (const DeviceManagerPtr& device_manager, const common::ParseNode& node, const char* name, EffectLoaderLibrary& library)
 {
   EffectLoader loader (device_manager, name, node, library);
+}
+
 }
 
 }

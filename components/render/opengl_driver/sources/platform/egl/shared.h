@@ -45,9 +45,9 @@
 #ifdef _WIN32
   #include <windows.h>
   
-  HDC WINAPI GetDC (HWND hwnd);  
-  int WINAPI ReleaseDC (HWND hwnd, HDC hdc);
-  int WINAPI GetWindowTextA (HWND hWnd, LPSTR lpString, int nMaxCount);
+//  HDC WINAPI GetDC (HWND hwnd);  
+//  int WINAPI ReleaseDC (HWND hwnd, HDC hdc);
+//  int WINAPI GetWindowTextA (HWND hWnd, LPSTR lpString, int nMaxCount);
 #endif
 
 #ifdef BADA
@@ -88,7 +88,13 @@
   #include <EGL/egl.h>
 #endif
 
-#include <GLES/gl.h>
+#ifdef OPENGL_ES_SUPPORT
+  #include <GLES/gl.h>
+#endif
+
+#ifdef OPENGL_ES2_SUPPORT
+  #include <GLES2/gl2.h>
+#endif
 
 namespace render
 {

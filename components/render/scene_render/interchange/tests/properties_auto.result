@@ -1,0 +1,17 @@
+Results of properties_auto_test:
+reader: update property map command received
+reader: update property map command received
+map has 2 properties:
+ #0: name='X', type=string, value='hello1'
+ #1: name='Y', type=integer, value='1'
+map has 2 properties:
+ #0: name='X', type=string, value='hello2'
+ #1: name='Y', type=integer, value='2'
+dummy update
+remove properties
+reader: remove property layout command received
+reader: remove property layout command received
+reader: remove property map command received
+reader: remove property map command received
+has properties: false false
+after exit from scope

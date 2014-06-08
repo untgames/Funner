@@ -160,4 +160,12 @@ void DefaultApplicationManager::GetSystemProperties (common::PropertyMap& proper
 #endif
 }
 
+/*
+    Обработка системных сообщений нити
+*/
+
+void DefaultApplicationManager::ProcessThreadMessages ()
+{
+}
+
 }

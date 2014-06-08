@@ -28,7 +28,7 @@ int main ()
     
     printf ("--- Create primitive & entity ---\n");
     
-    render::Primitive primitive = render_manager.CreateSharedPrimitive ("mesh2");
+    render::manager::Primitive primitive = render_manager.CreateSharedPrimitive ("mesh2");
 
     primitive.UpdateCache ();
     

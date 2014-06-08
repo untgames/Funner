@@ -1,6 +1,6 @@
 #include "shared.h"
 
-using namespace render;
+using namespace render::manager;
 using namespace render::low_level;
 
 /*
@@ -32,8 +32,6 @@ VertexBuffer::VertexBuffer (const media::geometry::VertexBuffer& source, Primiti
     
       //конвертация
 
-    attributes_hash = 0xFFFFFFFF;
-    
     for (size_t i=0, streams_count=source.StreamsCount (); i<streams_count; i++)
     {
       const media::geometry::VertexStream& vs = source.Stream (i);
@@ -41,9 +39,6 @@ VertexBuffer::VertexBuffer (const media::geometry::VertexBuffer& source, Primiti
       LowLevelBufferPtr vs_buffer = buffers.CreateVertexStream (vs, usage);
 
       media::geometry::VertexFormat vertex_format = Clone (layout_manager, vs.Format ());      
-      size_t                        vs_hash       = vertex_format.Hash ();
-
-      attributes_hash = common::crc32 (&vs_hash, sizeof (vs_hash), attributes_hash);
 
       for (size_t j=0, attr_count=vertex_format.AttributesCount (); j<attr_count; j++)
       {
@@ -54,7 +49,7 @@ VertexBuffer::VertexBuffer (const media::geometry::VertexBuffer& source, Primiti
 
         if (*src_va.name)
         {
-          dst_va.semantic = src_va.name; //can't be changed in futured, stored in internal InputLayoutManager cache and in this object
+          dst_va.semantic = src_va.name; //can't be changed in future, stored in internal InputLayoutManager cache and in this object
         }
         else
         {
@@ -127,10 +122,12 @@ VertexBuffer::VertexBuffer (const media::geometry::VertexBuffer& source, Primiti
 
       streams.push_back (vs_buffer);
     }
+
+    attributes_hash = InputLayoutManager::GetVertexAttributesHash (attributes.size (), &attributes [0]);
   }
   catch (xtl::exception& e)
   {
-    e.touch ("render::VertexBuffer::VertexBuffer");
+    e.touch ("render::manager::VertexBuffer::VertexBuffer");
     throw;
   }
 }
@@ -151,7 +148,7 @@ media::geometry::VertexFormat VertexBuffer::Clone (InputLayoutManager& manager, 
   }
   catch (xtl::exception& e)
   {
-    e.touch ("render::VertexBuffer::Clone");
+    e.touch ("render::manager::VertexBuffer::Clone");
     throw;
   }
 }
@@ -208,7 +205,7 @@ LowLevelInputLayoutPtr VertexBuffer::CreateInputLayout (InputLayoutManager& layo
   }
   catch (xtl::exception& e)
   {
-    e.touch ("render::VertexBuffer::CreateInputLayout");
+    e.touch ("render::manager::VertexBuffer::CreateInputLayout");
     throw;
   }
 }

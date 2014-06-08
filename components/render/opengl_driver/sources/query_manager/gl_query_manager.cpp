@@ -100,7 +100,7 @@ struct QueryManager::Impl: public ContextObject, public QueryManagerState
 
       MakeContextCurrent ();
       
-#ifndef OPENGL_ES_SUPPORT
+#if !defined(OPENGL_ES_SUPPORT) && !defined(OPENGL_ES2_SUPPORT)
 
         //получение количества битов в результате запроса
 

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding = "windows-1251"?>
+<?xml version="1.0" encoding = "utf-8"?>
 <TranslationTable>
   <Translation Event="'Axis1' * *" Replacement="Joystick {0} {1} {2}"/>
   <Translation Event="'Button1' *" Replacement="Joystick {0} {1}"/>

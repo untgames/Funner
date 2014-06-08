@@ -111,7 +111,7 @@ void VboBuffer::SetDataCore (size_t offset, size_t size, const void* data)
 
 void VboBuffer::GetDataCore (size_t offset, size_t size, void* data)
 {
-#ifndef OPENGL_ES_SUPPORT
+#if !defined(OPENGL_ES_SUPPORT) && !defined(OPENGL_ES2_SUPPORT)
 
   Bind ();  
 

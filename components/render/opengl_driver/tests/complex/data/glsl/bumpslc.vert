@@ -9,9 +9,14 @@
 
 varying vec3 lightDir; 	  // interpolated surface local coordinate light direction 
 varying vec3 viewDir;     // interpolated surface local coordinate view direction
+varying vec4 texcoord;
 
 uniform vec3 LightPosition;  // eye space position of light
 uniform mat4 Transform;
+
+attribute vec4 aVertex;
+attribute vec3 aNormal;
+attribute vec4 aColor;
 
 void main(void)
 {
@@ -25,15 +30,14 @@ void main(void)
 
     // Do standard vertex stuff
 
-//    gl_Position  = gl_ModelViewProjectionMatrix * Transform * gl_Vertex;
-    gl_Position  = gl_Vertex;
-//    gl_TexCoord[0] = gl_MultiTexCoord0;
-    gl_TexCoord[0] = vec4 (gl_Vertex.x + 1.0, gl_Vertex.y + 1.0, 0, 0) / 2.0;
+    gl_Position  = aVertex;
+
+    texcoord = vec4 (aVertex.x + 1.0, aVertex.y + 1.0, 0, 0) / 2.0;
 
     // Compute the binormal
 
-    n = normalize(gl_Normal);
-    t = normalize(vec3 (gl_Color));
+    n = normalize(aNormal);
+    t = normalize(vec3 (aColor));
     b = cross(n, t);
 
     // Transform light position into surface local coordinates
@@ -46,13 +50,11 @@ void main(void)
 
     lightDir = normalize(v);
 
-//    pos      = vec3 (gl_ModelViewMatrix * Transform * gl_Vertex);
-    pos      = gl_Vertex.xyz;
+    pos      = aVertex.xyz;
 
     v.x = dot(pos, t);
     v.y = dot(pos, b);
     v.z = dot(pos, n);
 
     viewDir = normalize(v);
-
 }

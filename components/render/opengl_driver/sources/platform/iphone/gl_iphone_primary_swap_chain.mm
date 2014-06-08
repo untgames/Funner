@@ -98,12 +98,24 @@ struct PrimarySwapChain::Impl : public IViewSizeChangeListener
   GLuint                 render_buffer;             //буфер рендеринга
   GLuint                 depth_buffer;              //буфер глубины
   GLuint                 stencil_buffer;            //буфер шаблона
+  GLuint                 sample_frame_buffer;       //буфер кадра для мультисэмплинга
+  GLuint                 sample_render_buffer;      //буфер рендеринга для мультисэмплинга
+  GLuint                 sample_depth_buffer;       //буфер глубины для мультисэмплинга
   ViewSizeChangeHandler* view_size_change_handler;  //обработчик изменения размеров view
 
 ///Конструктор
   Impl (const SwapChainDesc& in_desc, Adapter* in_adapter, ISwapChain *in_swap_chain)
-    : adapter (in_adapter), context (0), eagl_context (0), swap_chain (in_swap_chain), frame_buffer (0),
-      render_buffer (0), depth_buffer (0), stencil_buffer (0)
+    : adapter (in_adapter)
+    , context (0)
+    , eagl_context (0)
+    , swap_chain (in_swap_chain)
+    , frame_buffer (0)
+    , render_buffer (0)
+    , depth_buffer (0)
+    , stencil_buffer (0)
+    , sample_frame_buffer (0)
+    , sample_render_buffer (0)
+    , sample_depth_buffer (0)
   {
       //проверка корректности аргументов
 
@@ -124,7 +136,7 @@ struct PrimarySwapChain::Impl : public IViewSizeChangeListener
     desc.frame_buffer.alpha_bits   = 8;
     desc.frame_buffer.depth_bits   = in_desc.frame_buffer.depth_bits ? 16 : 0;
     desc.frame_buffer.stencil_bits = in_desc.frame_buffer.stencil_bits ? 8 : 0;
-    desc.samples_count             = 0;
+    desc.samples_count             = in_desc.samples_count;
     desc.buffers_count             = 2;
     desc.swap_method               = SwapMethod_Discard;
     desc.vsync                     = true;
@@ -217,6 +229,36 @@ struct PrimarySwapChain::Impl : public IViewSizeChangeListener
         glFramebufferRenderbufferOES (GL_FRAMEBUFFER_OES, GL_STENCIL_ATTACHMENT_OES, GL_RENDERBUFFER_OES, stencil_buffer);
       }
 
+      size_t samples_count = desc.samples_count;
+
+      if (samples_count > 1)
+      {
+        GLuint max_samples_count = 0;
+
+        glGetIntegerv (GL_MAX_SAMPLES_APPLE, (GLint*)&max_samples_count);
+
+        samples_count = stl::min ((GLuint)samples_count, max_samples_count);
+      }
+
+      if (samples_count > 1)
+      {
+        glGenFramebuffers (1, &sample_frame_buffer);
+        glBindFramebuffer (GL_FRAMEBUFFER, sample_frame_buffer);
+
+        glGenRenderbuffers (1, &sample_render_buffer);
+        glBindRenderbuffer (GL_RENDERBUFFER, sample_render_buffer);
+        glRenderbufferStorageMultisampleAPPLE (GL_RENDERBUFFER, samples_count, GL_RGBA8_OES, desc.frame_buffer.width, desc.frame_buffer.height);
+        glFramebufferRenderbuffer (GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, sample_render_buffer);
+
+        if (desc.frame_buffer.depth_bits)
+        {
+          glGenRenderbuffers (1, &sample_depth_buffer);
+          glBindRenderbuffer (GL_RENDERBUFFER, sample_depth_buffer);
+          glRenderbufferStorageMultisampleAPPLE (GL_RENDERBUFFER, samples_count, GL_DEPTH_COMPONENT16, desc.frame_buffer.width, desc.frame_buffer.height);
+          glFramebufferRenderbuffer (GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, sample_depth_buffer);
+        }
+      }
+
       GLenum status = glCheckFramebufferStatusOES (GL_FRAMEBUFFER_OES);
 
       CheckErrors (METHOD_NAME);
@@ -247,16 +289,28 @@ struct PrimarySwapChain::Impl : public IViewSizeChangeListener
     glDeleteFramebuffersOES  (1, &frame_buffer);
     glDeleteRenderbuffersOES (1, &render_buffer);
 
+    if (sample_frame_buffer)
+      glDeleteFramebuffersOES  (1, &sample_frame_buffer);
+
+    if (sample_render_buffer)
+      glDeleteRenderbuffersOES  (1, &sample_render_buffer);
+
     if (desc.frame_buffer.depth_bits)
       glDeleteRenderbuffersOES (1, &depth_buffer);
+
+    if (sample_depth_buffer)
+      glDeleteRenderbuffersOES  (1, &sample_depth_buffer);
 
     if (desc.frame_buffer.stencil_bits)
       glDeleteRenderbuffersOES (1, &stencil_buffer);
 
-    frame_buffer   = 0;
-    render_buffer  = 0;
-    depth_buffer   = 0;
-    stencil_buffer = 0;
+    frame_buffer         = 0;
+    render_buffer        = 0;
+    depth_buffer         = 0;
+    stencil_buffer       = 0;
+    sample_frame_buffer  = 0;
+    sample_render_buffer = 0;
+    sample_depth_buffer  = 0;
 
     CheckErrors ("render::low_level::opengl::iphone::PrimarySwapChain::Impl::DoneForContext");
   }
@@ -280,13 +334,30 @@ struct PrimarySwapChain::Impl : public IViewSizeChangeListener
     if (current_render_buffer != render_buffer)
     {
       glBindRenderbufferOES (GL_RENDERBUFFER_OES, render_buffer);
+
       CheckErrors (METHOD_NAME);
     }
 
     try
     {
+      if (sample_frame_buffer)
+      {
+        glBindFramebuffer (GL_DRAW_FRAMEBUFFER_APPLE, frame_buffer);
+        glBindFramebuffer (GL_READ_FRAMEBUFFER_APPLE, sample_frame_buffer);
+        glResolveMultisampleFramebufferAPPLE ();
+
+        CheckErrors (METHOD_NAME);
+      }
+
       if (![eagl_context presentRenderbuffer:GL_RENDERBUFFER_OES])
         throw xtl::format_operation_exception (METHOD_NAME, "Failed to swap renderbuffer");
+
+      if (sample_frame_buffer)
+      {
+        glBindFramebuffer (GL_FRAMEBUFFER, sample_frame_buffer);
+
+        CheckErrors (METHOD_NAME);
+      }
     }
     catch (...)
     {

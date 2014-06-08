@@ -1,7 +1,7 @@
 #ifndef SCENE_GRAPH_HELPER_HEADER
 #define SCENE_GRAPH_HELPER_HEADER
 
-#include <sg/entity.h>
+#include <sg/visual_model.h>
 
 namespace scene_graph
 {
@@ -12,11 +12,11 @@ namespace helpers
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Вспомогательный объект
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-class Helper: public Entity
+class Helper: public VisualModel
 {
   public:
-    typedef xtl::com_ptr <Helper> Pointer;
-    typedef xtl::com_ptr <const Helper> ConstPointer;    
+    typedef xtl::com_ptr<Helper>       Pointer;
+    typedef xtl::com_ptr<const Helper> ConstPointer;    
 
   protected:
 ///////////////////////////////////////////////////////////////////////////////////////////////////

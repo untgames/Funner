@@ -68,7 +68,7 @@ TextureCubemap::TextureCubemap  (const ContextManager& manager, const TextureDes
       break;    
   }
 
-#ifndef OPENGL_ES_SUPPORT
+#if !defined(OPENGL_ES_SUPPORT) && !defined(OPENGL_ES2_SUPPORT)
 
     //проверка возможности создания текстуры
 
@@ -90,7 +90,7 @@ TextureCubemap::TextureCubemap  (const ContextManager& manager, const TextureDes
 
   glPixelStorei (GL_UNPACK_ALIGNMENT,   1);    //выравнивание начала строк
 
-#ifndef OPENGL_ES_SUPPORT
+#if !defined(OPENGL_ES_SUPPORT) && !defined(OPENGL_ES2_SUPPORT)
 
   glPixelStorei (GL_UNPACK_SKIP_ROWS,   0);    //количество пропускаемых строк
   glPixelStorei (GL_UNPACK_SKIP_PIXELS, 0);    //количество пропускаемых пикселей
@@ -129,7 +129,7 @@ TextureCubemap::TextureCubemap  (const ContextManager& manager, const TextureDes
       }
       else
       {
-#ifndef OPENGL_ES_SUPPORT
+#if !defined(OPENGL_ES_SUPPORT) && !defined(OPENGL_ES2_SUPPORT)
 
         glPixelStorei (GL_UNPACK_ROW_LENGTH, level_desc.width); //длина строки в пикселях (для нулевого mip-уровня)
         
@@ -153,7 +153,7 @@ TextureCubemap::TextureCubemap  (const ContextManager& manager, const TextureDes
 
    //установка реального внутреннего формата хранения пикселей (связано с установкой сжатого формата)
 
-#ifndef OPENGL_ES_SUPPORT
+#if !defined(OPENGL_ES_SUPPORT) && !defined(OPENGL_ES2_SUPPORT)
 
   glGetTexLevelParameteriv (GL_TEXTURE_CUBE_MAP_POSITIVE_X, 0, GL_TEXTURE_INTERNAL_FORMAT, (GLint*)&gl_internal_format);
       

@@ -428,7 +428,7 @@ struct RenderTargetManager::Impl: public ContextObject, public RenderTargetManag
 
           glViewport (viewport.x, viewport.y, viewport.width, viewport.height);
 
-#ifndef OPENGL_ES_SUPPORT
+#if !defined(OPENGL_ES_SUPPORT) && !defined(OPENGL_ES2_SUPPORT)
           glDepthRange  (viewport.min_depth, viewport.max_depth);
 #else
           glDepthRangef (viewport.min_depth, viewport.max_depth);
@@ -525,7 +525,7 @@ struct RenderTargetManager::Impl: public ContextObject, public RenderTargetManag
           
           if (GetContextCacheValue (CacheEntry_ClearDepthHash) != clear_depth_hash)
           {
-#ifndef OPENGL_ES_SUPPORT
+#if !defined(OPENGL_ES_SUPPORT) && !defined(OPENGL_ES2_SUPPORT)
             glClearDepth (depth);
 #else
             glClearDepthf (depth);

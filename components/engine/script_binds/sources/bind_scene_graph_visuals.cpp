@@ -2,20 +2,26 @@
 
 using namespace scene_graph;
 
+template class engine::decl_sg_cast<SpriteModel, VisualModel>;
 template class engine::decl_sg_cast<SpriteModel, Entity>;
 template class engine::decl_sg_cast<SpriteModel, Node>;
 template class engine::decl_sg_cast<Sprite,      SpriteModel>;
+template class engine::decl_sg_cast<Sprite,      VisualModel>;
 template class engine::decl_sg_cast<Sprite,      Entity>;
 template class engine::decl_sg_cast<Sprite,      Node>;
 template class engine::decl_sg_cast<SpriteList,  SpriteModel>;
+template class engine::decl_sg_cast<SpriteList,  VisualModel>;
 template class engine::decl_sg_cast<SpriteList,  Entity>;
 template class engine::decl_sg_cast<SpriteList,  Node>;
+template class engine::decl_sg_cast<TextLine,    VisualModel>;
 template class engine::decl_sg_cast<TextLine,    Entity>;
 template class engine::decl_sg_cast<TextLine,    Node>;
+template class engine::decl_sg_cast<HeightMap,   VisualModel>;
 template class engine::decl_sg_cast<HeightMap,   Entity>;
 template class engine::decl_sg_cast<HeightMap,   Node>;
-template class engine::decl_sg_cast<VisualModel, Entity>;
-template class engine::decl_sg_cast<VisualModel, Node>;
+template class engine::decl_sg_cast<StaticMesh,  VisualModel>;
+template class engine::decl_sg_cast<StaticMesh,  Entity>;
+template class engine::decl_sg_cast<StaticMesh,  Node>;
 
 namespace engine
 {
@@ -47,7 +53,7 @@ void bind_sprite_model_library (Environment& environment)
 
     //наследование
 
-  lib.Register (environment, SCENE_ENTITY_LIBRARY);
+  lib.Register (environment, SCENE_VISUAL_MODEL_LIBRARY);
 
     //регистраци€ операций
 
@@ -125,7 +131,7 @@ void bind_text_line_library (Environment& environment)
 
     //наследование
 
-  lib.Register (environment, SCENE_ENTITY_LIBRARY);
+  lib.Register (environment, SCENE_VISUAL_MODEL_LIBRARY);
 
     //регистраци€ статических переменных
 
@@ -166,33 +172,33 @@ void bind_text_line_library (Environment& environment)
     —оздание модели
 */
 
-VisualModel::Pointer create_visual_model ()
+StaticMesh::Pointer create_static_mesh ()
 {
-  return VisualModel::Create ();
+  return StaticMesh::Create ();
 }
 
 /*
    –егистраци€ библиотеки работы с модел€ми
 */
 
-void bind_visual_model_library (Environment& environment)
+void bind_static_mesh_library (Environment& environment)
 {
-  InvokerRegistry lib = environment.CreateLibrary (SCENE_VISUAL_MODEL_LIBRARY);
+  InvokerRegistry lib = environment.CreateLibrary (SCENE_STATIC_MESH_LIBRARY);
 
     //наследование
 
-  lib.Register (environment, SCENE_ENTITY_LIBRARY);
+  lib.Register (environment, SCENE_VISUAL_MODEL_LIBRARY);
 
     //регистраци€ функций создани€
 
-  lib.Register ("Create", make_invoker (&create_visual_model));
+  lib.Register ("Create", make_invoker (&create_static_mesh));
 
     //регистраци€ операций
 
-  lib.Register ("set_MeshName", make_invoker (&VisualModel::SetMeshName));
-  lib.Register ("get_MeshName", make_invoker (&VisualModel::MeshName));
+  lib.Register ("set_MeshName", make_invoker (&StaticMesh::SetMeshName));
+  lib.Register ("get_MeshName", make_invoker (&StaticMesh::MeshName));
 
-  environment.RegisterType<VisualModel> (SCENE_VISUAL_MODEL_LIBRARY);
+  environment.RegisterType<StaticMesh> (SCENE_STATIC_MESH_LIBRARY);
 }
 
 /*
@@ -244,7 +250,7 @@ void bind_height_map_library (Environment& environment)
 
     //наследование
 
-  lib.Register (environment, SCENE_ENTITY_LIBRARY);
+  lib.Register (environment, SCENE_VISUAL_MODEL_LIBRARY);
 
     //регистраци€ функций создани€
 

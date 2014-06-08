@@ -28,6 +28,8 @@ const char* SCENE_NODE_PROPERTIES_LIBRARY                 = "Scene.NodePropertie
 const char* SCENE_NODE_ARRAY_LIBRARY                      = "Scene.NodeArray";
 const char* SCENE_CONTROLLER_LIBRARY                      = "Scene.Controller";
 const char* SCENE_ENTITY_LIBRARY                          = "Scene.Entity";
+const char* SCENE_VISUAL_MODEL_LIBRARY                    = "Scene.VisualModel";
+const char* SCENE_SCISSOR_LIBRARY                         = "Scene.Scissor";
 const char* SCENE_PERSPECTIVE_CAMERA_LIBRARY              = "Scene.PerspectiveCamera";
 const char* SCENE_ORTHO_CAMERA_LIBRARY                    = "Scene.OrthoCamera";
 const char* SCENE_LIGHT_LIBRARY                           = "Scene.Light";
@@ -40,7 +42,7 @@ const char* SCENE_SOUND_EMITTER_LIBRARY                   = "Scene.SoundEmitter"
 const char* SCENE_SPRITE_MODEL_LIBRARY                    = "Scene.SpriteModel";
 const char* SCENE_SPRITE_LIBRARY                          = "Scene.Sprite";
 const char* SCENE_TEXT_LINE_LIBRARY                       = "Scene.TextLine";
-const char* SCENE_VISUAL_MODEL_LIBRARY                    = "Scene.VisualModel";
+const char* SCENE_STATIC_MESH_LIBRARY                     = "Scene.StaticMesh";
 const char* SCENE_HEIGHT_MAP_LIBRARY                      = "Scene.HeightMap";
 const char* SCENE_INPUT_ZONE_NOTIFICATION_CONTEXT_LIBRARY = "Scene.InputZoneNotificationContext";
 const char* SCENE_INPUT_ZONE_MODEL_LIBRARY                = "Scene.InputZoneModel";
@@ -70,6 +72,8 @@ void bind_scene_graph_library (Environment& environment)
   bind_controller_owner_mode_library           (environment);
   bind_controller_library                      (environment);
   bind_entity_library                          (environment);
+  bind_visual_model_library                    (environment);
+  bind_scissor_library                         (environment);
   bind_perspective_camera_library              (environment);
   bind_ortho_camera_library                    (environment);
   bind_light_library                           (environment);
@@ -83,7 +87,7 @@ void bind_scene_graph_library (Environment& environment)
   bind_sprite_model_library                    (environment);
   bind_sprite_library                          (environment);
   bind_text_line_library                       (environment);
-  bind_visual_model_library                    (environment);
+  bind_static_mesh_library                     (environment);
   bind_height_map_library                      (environment);
   bind_controller_water_library                (environment);
   bind_controller_move_to_node_point_library   (environment);

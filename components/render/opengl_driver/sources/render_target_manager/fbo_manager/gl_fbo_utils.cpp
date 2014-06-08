@@ -26,9 +26,11 @@ void check_frame_buffer_status (const char* source, GLenum status)
       throw xtl::format_operation_exception (source, "OpenGL bad framebuffer status: missing attachment");
     case GL_FRAMEBUFFER_INCOMPLETE_DIMENSIONS:
       throw xtl::format_operation_exception (source, "OpenGL bad framebuffer status: attached images must have same dimensions");
+#ifndef OPENGL_ES2_SUPPORT
     case GL_FRAMEBUFFER_INCOMPLETE_FORMATS:
       throw xtl::format_operation_exception (source, "OpenGL bad framebuffer status: attached images must have same format");
-#ifndef OPENGL_ES_SUPPORT
+#endif
+#if !defined(OPENGL_ES_SUPPORT) && !defined(OPENGL_ES2_SUPPORT)
     case GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER:
       throw xtl::format_operation_exception (source, "OpenGL bad framebuffer status: missing draw buffer");
     case GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER:

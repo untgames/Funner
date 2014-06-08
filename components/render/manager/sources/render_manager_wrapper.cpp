@@ -1,6 +1,6 @@
 #include "shared.h"
 
-using namespace render;
+using namespace render::manager;
 
 RenderManager::RenderManager ()
   : impl (new RenderManagerImpl)
@@ -35,9 +35,24 @@ const char* RenderManager::Description () const
   return impl->Description ();
 }
 
+Window RenderManager::CreateWindow (INativeWindow* window, common::PropertyMap& properties)
+{
+  return Wrappers::Wrap<render::manager::Window> (impl->CreateWindow (window, properties));
+}
+
 Window RenderManager::CreateWindow (syslib::Window& window, common::PropertyMap& properties)
 {
-  return Wrappers::Wrap<render::Window> (impl->CreateWindow (window, properties));
+  try
+  {
+    xtl::com_ptr<INativeWindow> native_window (make_native_window (window), false);
+
+    return CreateWindow (native_window.get (), properties);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::manager::RenderManager::CreateWindow(syslib::Window&,common::PropertyMap&)");
+    throw;
+  }
 }
 
 size_t RenderManager::WindowsCount () const
@@ -47,12 +62,12 @@ size_t RenderManager::WindowsCount () const
 
 const Window RenderManager::Window (size_t index) const
 {
-  return Wrappers::Wrap<render::Window> (impl->Window (index));
+  return Wrappers::Wrap<render::manager::Window> (impl->Window (index));
 }
 
 Window RenderManager::Window (size_t index)
 {
-  return Wrappers::Wrap<render::Window> (impl->Window (index));
+  return Wrappers::Wrap<render::manager::Window> (impl->Window (index));
 }
 
 RenderTarget RenderManager::CreateRenderBuffer (size_t width, size_t height, PixelFormat format)
@@ -75,9 +90,9 @@ Primitive RenderManager::CreatePrimitive (const PrimitiveBuffers& buffers)
   return Wrappers::Wrap<Primitive> (impl->PrimitiveManager ().CreatePrimitive (Wrappers::Unwrap<PrimitiveBuffersImpl> (buffers)));
 }
 
-PrimitiveBuffers RenderManager::CreatePrimitiveBuffers (MeshBufferUsage lines_usage, MeshBufferUsage sprites_usage)
+PrimitiveBuffers RenderManager::CreatePrimitiveBuffers ()
 {
-  return Wrappers::Wrap<PrimitiveBuffers> (impl->PrimitiveManager ().CreatePrimitiveBuffers (lines_usage, sprites_usage));
+  return Wrappers::Wrap<PrimitiveBuffers> (impl->PrimitiveManager ().CreatePrimitiveBuffers ());
 }
 
 Entity RenderManager::CreateEntity ()
@@ -123,7 +138,7 @@ Texture RenderManager::CreateTexture2D (size_t width, size_t height, PixelFormat
   }
   catch (xtl::exception& e)
   {
-    e.touch ("render::RenderManager::CreateTexture2D");
+    e.touch ("render::manager::RenderManager::CreateTexture2D");
     throw;
   }
 }
@@ -136,7 +151,7 @@ Texture RenderManager::CreateTexture3D (size_t width, size_t height, size_t dept
   }
   catch (xtl::exception& e)
   {
-    e.touch ("render::RenderManager::CreateTexture3D");
+    e.touch ("render::manager::RenderManager::CreateTexture3D");
     throw;
   }
 }
@@ -149,7 +164,7 @@ Texture RenderManager::CreateTextureCubemap (size_t size, PixelFormat format, bo
   }
   catch (xtl::exception& e)
   {
-    e.touch ("render::RenderManager::CreateTextureCubemap");
+    e.touch ("render::manager::RenderManager::CreateTextureCubemap");
     throw;
   }  
 }
@@ -161,7 +176,7 @@ Material RenderManager::CreateMaterial ()
 
 Texture RenderManager::CreateSharedTexture (const char* name)
 {
-  static const char* METHOD_NAME = "render::RenderManager::CreateSharedTexture";
+  static const char* METHOD_NAME = "render::manager::RenderManager::CreateSharedTexture";
 
   if (!name)
     throw xtl::make_null_argument_exception (METHOD_NAME, "name");
@@ -176,7 +191,7 @@ Texture RenderManager::CreateSharedTexture (const char* name)
 
 Material RenderManager::CreateSharedMaterial (const char* name)
 {
-  static const char* METHOD_NAME = "render::RenderManager::CreateSharedMaterial";
+  static const char* METHOD_NAME = "render::manager::RenderManager::CreateSharedMaterial";
 
   if (!name)
     throw xtl::make_null_argument_exception (METHOD_NAME, "name");
@@ -191,7 +206,7 @@ Material RenderManager::CreateSharedMaterial (const char* name)
 
 Primitive RenderManager::CreateSharedPrimitive (const char* name)
 {
-  static const char* METHOD_NAME = "render::RenderManager::CreateSharedMaterial";
+  static const char* METHOD_NAME = "render::manager::RenderManager::CreateSharedMaterial";
 
   if (!name)
     throw xtl::make_null_argument_exception (METHOD_NAME, "name");
@@ -227,7 +242,7 @@ void RenderManager::ShareTexture (const char* name, const Texture& texture)
   }
   catch (xtl::exception& e)
   {
-    e.touch ("render::RenderManager::ShareTexture");
+    e.touch ("render::manager::RenderManager::ShareTexture");
     throw;
   }
 }
@@ -240,7 +255,7 @@ void RenderManager::ShareMaterial (const char* name, const Material& material)
   }
   catch (xtl::exception& e)
   {
-    e.touch ("render::RenderManager::ShareMaterial");
+    e.touch ("render::manager::RenderManager::ShareMaterial");
     throw;
   }
 }
@@ -253,7 +268,7 @@ void RenderManager::SharePrimitive (const char* name, const Primitive& primitive
   }
   catch (xtl::exception& e)
   {
-    e.touch ("render::RenderManager::SharePrimitive");
+    e.touch ("render::manager::RenderManager::SharePrimitive");
     throw;
   }  
 }
@@ -325,12 +340,12 @@ void RenderManager::SetCacheFrameDelay (size_t frames_count)
 
 size_t RenderManager::CacheTimeDelay () const
 {
-  return impl->CacheManager ().TimeDelay ();
+  return static_cast<size_t> (impl->CacheManager ().TimeDelay ());
 }
 
 size_t RenderManager::CacheFrameDelay () const
 {
-  return impl->CacheManager ().FrameDelay ();
+  return static_cast<size_t> (impl->CacheManager ().FrameDelay ());
 }
 
 void RenderManager::ChangeSettings (const common::PropertyMap& settings)
@@ -353,7 +368,7 @@ xtl::connection RenderManager::RegisterEventHandler (RenderManagerEvent event, c
   return impl->RegisterEventHandler (event, handler);
 }
 
-void RenderManager::SetLogLevel (render::LogLevel level)
+void RenderManager::SetLogLevel (render::manager::LogLevel level)
 {
   impl->Settings ().SetLogLevel (level);
 }
@@ -376,6 +391,9 @@ void RenderManager::Swap (RenderManager& manager)
 namespace render
 {
 
+namespace manager
+{
+
 void swap (RenderManager& manager1, RenderManager& manager2)
 {
   manager1.Swap (manager2);
@@ -384,6 +402,8 @@ void swap (RenderManager& manager1, RenderManager& manager2)
 xtl::trackable& get_trackable (const RenderManager& manager)
 {
   return manager.GetTrackable ();
+}
+
 }
 
 }

@@ -1,6 +1,6 @@
 #include "shared.h"
 
-using namespace render;
+using namespace render::manager;
 using namespace render::low_level;
 
 /*
@@ -70,42 +70,20 @@ typedef stl::hash_map<size_t, VertexBufferPtr>    CacheVertexBufferMap;
 
 struct PrimitiveBuffersImpl::Impl
 {
-  DeviceManagerPtr     device_manager;       //менеджер устройства отрисовки
-  MeshBufferUsage      lines_usage;          //режим использования буферов для линий
-  MeshBufferUsage      sprites_usage;        //режим использования буферов для спрайтов
-  VertexStreamMap      vertex_streams;       //вершинные потоки
-  VertexBufferMap      vertex_buffers;       //вершинные буферы
-  IndexBufferMap       index_buffers;        //индексные буферы
-  CacheBufferMap       vertex_streams_cache; //кэш вершинных потоков
-  CacheBufferMap       index_buffers_cache;  //кэш индексных буферов
-  CacheVertexBufferMap vertex_buffers_cache; //кэш вершинных буферов
-  bool                 cache_state;          //состояние кэша
+  DeviceManagerPtr                        device_manager;       //менеджер устройства отрисовки
+  VertexStreamMap                         vertex_streams;       //вершинные потоки
+  VertexBufferMap                         vertex_buffers;       //вершинные буферы
+  IndexBufferMap                          index_buffers;        //индексные буферы
+  CacheBufferMap                          vertex_streams_cache; //кэш вершинных потоков
+  CacheBufferMap                          index_buffers_cache;  //кэш индексных буферов
+  CacheVertexBufferMap                    vertex_buffers_cache; //кэш вершинных буферов
+  bool                                    cache_state;          //состояние кэша
+  stl::auto_ptr<manager::BatchingManager> batching_manager;     //менеджер пакетирования
   
-  Impl (const DeviceManagerPtr& in_device_manager, MeshBufferUsage in_lines_usage, MeshBufferUsage in_sprites_usage)
-    : device_manager (in_device_manager)
-    , lines_usage (in_lines_usage)
-    , sprites_usage (in_sprites_usage)
+  Impl (const DeviceManagerPtr& in_device_manager)
+    : device_manager (in_device_manager)   
     , cache_state (false)
   {
-    switch (lines_usage)
-    {
-      case MeshBufferUsage_Static:
-      case MeshBufferUsage_Dynamic:
-      case MeshBufferUsage_Stream:      
-        break;
-      default:
-        throw xtl::make_argument_exception ("", "lines_usage", lines_usage);
-    }
-    
-    switch (sprites_usage)
-    {
-      case MeshBufferUsage_Static:
-      case MeshBufferUsage_Dynamic:
-      case MeshBufferUsage_Stream:      
-        break;
-      default:
-        throw xtl::make_argument_exception ("", "sprites_usage", sprites_usage);
-    }    
   }
 };
 
@@ -113,8 +91,8 @@ struct PrimitiveBuffersImpl::Impl
     Конструкторы / деструктор / присваивание
 */
 
-PrimitiveBuffersImpl::PrimitiveBuffersImpl (const DeviceManagerPtr& device_manager, MeshBufferUsage lines_usage, MeshBufferUsage sprites_usage)
-  : impl (new Impl (device_manager, lines_usage, sprites_usage))
+PrimitiveBuffersImpl::PrimitiveBuffersImpl (const DeviceManagerPtr& device_manager)
+  : impl (new Impl (device_manager))
 {
 }
 
@@ -177,7 +155,7 @@ LowLevelBufferPtr PrimitiveBuffersImpl::CreateVertexStream (const media::geometr
   }
   catch (xtl::exception& e)
   {
-    e.touch ("render::PrimitiveBuffersImpl::CreateVertexStream");
+    e.touch ("render::manager::PrimitiveBuffersImpl::CreateVertexStream");
     throw;
   }
 }
@@ -208,7 +186,7 @@ VertexBufferPtr PrimitiveBuffersImpl::CreateVertexBuffer (const media::geometry:
   }
   catch (xtl::exception& e)
   {
-    e.touch ("render::PrimitiveBuffersImpl::CreateVertexBuffer");
+    e.touch ("render::manager::PrimitiveBuffersImpl::CreateVertexBuffer");
     throw;
   }
 }
@@ -264,7 +242,7 @@ LowLevelBufferPtr PrimitiveBuffersImpl::CreateIndexBuffer (const media::geometry
   }
   catch (xtl::exception& e)
   {
-    e.touch ("render::PrimitiveBuffersImpl::CreateIndexBuffer");
+    e.touch ("render::manager::PrimitiveBuffersImpl::CreateIndexBuffer");
     throw;
   }
 }
@@ -288,7 +266,7 @@ void PrimitiveBuffersImpl::Add (const media::geometry::VertexStream& vs, MeshBuf
   }
   catch (xtl::exception& e)
   {
-    e.touch ("render::PrimitiveBuffersImpl::Add(const VertexStream&,MeshBufferUsage)");
+    e.touch ("render::manager::PrimitiveBuffersImpl::Add(const VertexStream&,MeshBufferUsage)");
     throw;
   }
 }
@@ -308,7 +286,7 @@ void PrimitiveBuffersImpl::Add (const media::geometry::VertexBuffer& vb, MeshBuf
   }
   catch (xtl::exception& e)
   {
-    e.touch ("render::PrimitiveBuffersImpl::Add(const VertexBuffer&,MeshBufferUsage)");
+    e.touch ("render::manager::PrimitiveBuffersImpl::Add(const VertexBuffer&,MeshBufferUsage)");
     throw;
   }
 }
@@ -328,7 +306,7 @@ void PrimitiveBuffersImpl::Add (const media::geometry::IndexBuffer& ib, MeshBuff
   }
   catch (xtl::exception& e)
   {
-    e.touch ("render::PrimitiveBuffersImpl::Add(const IndexBuffer&,MeshBufferUsage)");
+    e.touch ("render::manager::PrimitiveBuffersImpl::Add(const IndexBuffer&,MeshBufferUsage)");
     throw;
   }
 }
@@ -358,7 +336,7 @@ void PrimitiveBuffersImpl::Update (const media::geometry::VertexStream& vs)
   }
   catch (xtl::exception& e)
   {
-    e.touch ("render::PrimitiveBuffersImpl::Update(const VertexStream&)");
+    e.touch ("render::manager::PrimitiveBuffersImpl::Update(const VertexStream&)");
     throw;
   }
 }
@@ -381,7 +359,7 @@ void PrimitiveBuffersImpl::Update (const media::geometry::IndexBuffer& ib)
   }
   catch (xtl::exception& e)
   {
-    e.touch ("render::PrimitiveBuffersImpl::Update(const IndexBuffer&)");
+    e.touch ("render::manager::PrimitiveBuffersImpl::Update(const IndexBuffer&)");
     throw;
   }
 }
@@ -413,41 +391,30 @@ void PrimitiveBuffersImpl::RemoveAll ()
 }
 
 /*
-    Резервирование вспомогательных примитивов
+    Менеджер пакетирования
 */
 
-void PrimitiveBuffersImpl::ReserveLines (size_t count)
+render::manager::BatchingManager& PrimitiveBuffersImpl::BatchingManager ()
 {
-  throw xtl::make_not_implemented_exception (__FUNCTION__);
+  try
+  {
+    if (impl->batching_manager)
+      return *impl->batching_manager;
+
+    impl->batching_manager.reset (new manager::BatchingManager (impl->device_manager));
+
+    return *impl->batching_manager;
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::manager::PrimitiveBuffersImpl::BatchingManager");
+    throw;
+  }
 }
 
-void PrimitiveBuffersImpl::ReserveSprites (size_t count)
+bool PrimitiveBuffersImpl::HasBatchingManager ()
 {
-  throw xtl::make_not_implemented_exception (__FUNCTION__);
-}
-
-size_t PrimitiveBuffersImpl::LinesCapacity ()
-{
-  throw xtl::make_not_implemented_exception (__FUNCTION__);
-}
-
-size_t PrimitiveBuffersImpl::SpritesCapacity ()
-{
-  throw xtl::make_not_implemented_exception (__FUNCTION__);
-}
-
-/*
-    Режим использования буферов вспомогательных примитивов
-*/
-
-MeshBufferUsage PrimitiveBuffersImpl::LinesBufferUsage ()
-{
-  return impl->lines_usage;
-}
-
-MeshBufferUsage PrimitiveBuffersImpl::SpritesBufferUsage ()
-{
-  return impl->sprites_usage;
+  return impl->batching_manager.get () != 0;
 }
 
 /*

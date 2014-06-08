@@ -1,6 +1,6 @@
 #include "shared.h"
 
-using namespace render;
+using namespace render::manager;
 
 /*
     Описание реализации настроек менеджера рендеринга
@@ -8,7 +8,7 @@ using namespace render;
 
 struct Settings::Impl
 {
-  render::LogLevel log_level; //уровень протоколирования
+  render::manager::LogLevel log_level; //уровень протоколирования
   
   Impl ()
     : log_level (LogLevel_Default)
@@ -33,7 +33,7 @@ Settings::~Settings ()
     Управление протоколированием
 */
 
-void Settings::SetLogLevel (render::LogLevel level)
+void Settings::SetLogLevel (render::manager::LogLevel level)
 {
   switch (level)
   {
@@ -41,7 +41,7 @@ void Settings::SetLogLevel (render::LogLevel level)
     case LogLevel_Debug:
       break;
     default:
-      throw xtl::make_argument_exception ("render::Settings::SetLogLevel", "level", level);
+      throw xtl::make_argument_exception ("render::manager::Settings::SetLogLevel", "level", level);
   }
   
   impl->log_level = level;

@@ -1,6 +1,7 @@
 #include "shared.h"
 
 using namespace render;
+using namespace render::manager;
 
 namespace
 {
@@ -51,7 +52,7 @@ struct ProgramCommonData: public xtl::reference_counter, public DebugIdHolder
     }
     catch (xtl::exception& e)
     {
-      e.touch ("render::ProgramCommonData::ProgramCommonData");
+      e.touch ("render::manager::ProgramCommonData::ProgramCommonData");
       throw;
     }
   }
@@ -88,7 +89,7 @@ struct ProgramCommonData: public xtl::reference_counter, public DebugIdHolder
         
         new_properties.SetProperty (desc.param_name.c_str (), (int)desc.channel);
       }
-      
+
       ProgramParametersLayoutPtr new_layout = device_manager->ProgramParametersManager ().GetParameters (ProgramParametersSlot_Program, new_properties.Layout ());
       
       properties.SetProperties (new_properties);
@@ -105,7 +106,7 @@ struct ProgramCommonData: public xtl::reference_counter, public DebugIdHolder
     }
     catch (xtl::exception& e)
     {
-      e.touch ("render::ProgramCommonData::Update");
+      e.touch ("render::manager::ProgramCommonData::Update");
       throw;
     }
   }
@@ -132,7 +133,7 @@ struct OptionsCacheCombinationKey
 struct OptionsCacheCombinationValue: public xtl::reference_counter
 {
   ShaderOptions options; //список опций программы
-  ProgramPtr    program; //программа    
+  ProgramPtr    program; //программа
 };
 
 size_t hash (const OptionsCacheCombinationKey& key)
@@ -182,7 +183,7 @@ struct Program::Impl: public DebugIdHolder
     }
     catch (xtl::exception& e)
     {
-      e.touch ("render::Program::Impl::Impl");
+      e.touch ("render::manager::Program::Impl::Impl");
       throw;
     }
   }
@@ -232,7 +233,7 @@ Program::Program (const DeviceManagerPtr& device_manager, const char* name, cons
   }
   catch (xtl::exception& e)
   {
-    e.touch ("render::Program::Program");
+    e.touch ("render::manager::Program::Program");
     throw;
   }
 }
@@ -244,6 +245,15 @@ Program::Program (Program& parent, const ShaderOptions& options)
 
 Program::~Program ()
 {
+}
+
+/*
+   Имя программы
+*/
+
+const char* Program::Name ()
+{
+  return impl->common_data->name.c_str ();
 }
 
 /*
@@ -318,7 +328,7 @@ bool Program::HasFramemaps ()
   }
   catch (xtl::exception& e)
   {
-    e.touch ("render::Program::HasFramemaps");
+    e.touch ("render::manager::Program::HasFramemaps");
     throw;
   }
 }
@@ -334,14 +344,33 @@ const TexmapDesc* Program::Texmaps ()
 const TexmapDesc& Program::Texmap (size_t index)
 {
   if (index >= impl->common_data->texmaps.size ())
-    throw xtl::make_range_exception ("render::Program::Texmap", "index", index, impl->common_data->texmaps.size ());
+    throw xtl::make_range_exception ("render::manager::Program::Texmap", "index", index, impl->common_data->texmaps.size ());
     
   return impl->common_data->texmaps [index];
 }
 
+const TexmapDesc* Program::FindTexmapBySemantic (size_t semantic_hash)
+{
+  for (TexmapDescArray::iterator iter = impl->common_data->texmaps.begin (), end = impl->common_data->texmaps.end (); iter != end; ++iter)
+  {
+    if (semantic_hash == iter->semantic_hash)
+      return &*iter;
+  }
+
+  return 0;
+}
+
+const TexmapDesc* Program::FindTexmapBySemantic (const char* semantic)
+{
+  if (!semantic)
+    return 0;
+
+  return FindTexmapBySemantic (common::strhash (semantic));
+}
+
 void Program::SetTexmap (size_t index, size_t channel, const char* semantic, const char* param_name, bool is_framemap)
 {
-  static const char* METHOD_NAME = "render::Program::SetTexmap";
+  static const char* METHOD_NAME = "render::manager::Program::SetTexmap";
 
   if (!semantic)
     throw xtl::make_null_argument_exception (METHOD_NAME, "semantic");
@@ -354,10 +383,11 @@ void Program::SetTexmap (size_t index, size_t channel, const char* semantic, con
     
   TexmapDesc& desc = impl->common_data->texmaps [index];
   
-  desc.channel     = channel;
-  desc.semantic    = semantic;
-  desc.param_name  = param_name;
-  desc.is_framemap = is_framemap;
+  desc.channel       = channel;
+  desc.semantic      = semantic;
+  desc.param_name    = param_name;
+  desc.is_framemap   = is_framemap;
+  desc.semantic_hash = common::strhash (semantic);
   
   impl->common_data->need_update = true;
 }
@@ -422,7 +452,7 @@ Program& Program::DerivedProgram (const ShaderOptions& options)
   }
   catch (xtl::exception& e)
   {
-    e.touch ("render::Program::DerivedProgram(const ShaderOptions&)");
+    e.touch ("render::manager::Program::DerivedProgram(const ShaderOptions&)");
     throw;
   }
 }
@@ -437,7 +467,7 @@ Program& Program::DerivedProgram (ShaderOptionsCache& cache)
   }
   catch (xtl::exception& e)
   {
-    e.touch ("render::Program::DerivedProgram(const ShaderOptionsCache&)");
+    e.touch ("render::manager::Program::DerivedProgram(const ShaderOptionsCache&)");
     throw;
   }
 }
@@ -489,7 +519,7 @@ Program& Program::DerivedProgram (ShaderOptionsCache& cache1, ShaderOptionsCache
   }
   catch (xtl::exception& e)
   {
-    e.touch ("render::Program::DerivedProgramShaderOptionsCache&,ShaderOptionsCache&)");
+    e.touch ("render::manager::Program::DerivedProgramShaderOptionsCache&,ShaderOptionsCache&)");
     throw;
   }
 }
@@ -593,7 +623,7 @@ const LowLevelProgramPtr& Program::LowLevelProgram ()
   }
   catch (xtl::exception& e)
   {
-    e.touch ("render::Program::LowLevelProgram");
+    e.touch ("render::manager::Program::LowLevelProgram");
     throw;
   }
 }
@@ -615,7 +645,7 @@ LowLevelStateBlockPtr Program::StateBlock ()
   }
   catch (xtl::exception& e)
   {
-    e.touch ("render::Program::StateBlock");
+    e.touch ("render::manager::Program::StateBlock");
     throw;
   }
 }
@@ -637,7 +667,7 @@ ProgramParametersLayoutPtr Program::ParametersLayout ()
   }
   catch (xtl::exception& e)
   {
-    e.touch ("render::Program::ParametersLayout");
+    e.touch ("render::manager::Program::ParametersLayout");
     throw;
   }
 }

@@ -1,30 +1,6 @@
 ///forward declarations
 class PrimitiveBuffersImpl;
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Описание примитива рендеринга
-///////////////////////////////////////////////////////////////////////////////////////////////////
-struct RendererPrimitive
-{
-  MaterialImpl*                    material;    //материал
-  render::low_level::IStateBlock*  state_block; //блок состояний примитива
-  bool                             indexed;     //является ли данный примитив индексированным или состоящим только из вершин без индексов
-  render::low_level::PrimitiveType type;        //тип примитива
-  size_t                           first;       //индекс первой вершины/индекса
-  size_t                           count;       //количество примитивов
-  size_t                           base_vertex; //индекс базовой вершины
-  size_t                           tags_count;  //количество тэгов материала
-  const size_t*                    tags;        //тэги материала
-};
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Описание группы примитивов рендеринга
-///////////////////////////////////////////////////////////////////////////////////////////////////
-struct RendererPrimitiveGroup
-{
-  size_t                   primitives_count; //количество примитивов в группе
-  const RendererPrimitive* primitives;       //примитивы
-};
+class SimplePrimitiveListImplBase;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Меш
@@ -60,38 +36,44 @@ class PrimitiveImpl: public Object, public CacheSource
     void   RemoveAllMeshes ();
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Работа с линиями
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    size_t LinesCount       ();
-    size_t AddLines         (size_t lines_count, const Line* lines, const MaterialPtr& material);
-    void   UpdateLines      (size_t first_lines, size_t lines_count, const Line* lines);
-    void   SetLinesMaterial (size_t first_lines, size_t lines_count, const MaterialPtr& material);
-    void   RemoveLines      (size_t first_lines, size_t lines_count);
-    void   RemoveAllLines   ();
-    void   ReserveLines     (size_t lines_count);
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Работа со спрайтами
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    size_t SpritesCount       ();
-    size_t AddSprites         (size_t sprites_count, const Sprite* sprites, const MaterialPtr& material);
-    void   UpdateSprites      (size_t first_sprite, size_t sprites_count, const Sprite* sprites);
-    void   SetSpritesMaterial (size_t first_sprite, size_t sprites_count, const MaterialPtr& material);
-    void   RemoveSprites      (size_t first_sprite, size_t sprites_count);
-    void   RemoveAllSprites   ();
-    void   ReserveSprites     (size_t sprites_count);
+    size_t        SpriteListsCount        ();
+    SpriteListPtr AddStandaloneSpriteList (SpriteMode mode, const math::vec3f& up, MeshBufferUsage vb_usage, MeshBufferUsage ib_usage);
+    SpriteListPtr AddBatchingSpriteList   (SpriteMode mode, const math::vec3f& up);
+    void          RemoveSpriteList        (const SpriteListPtr&);
+    void          RemoveAllSpriteLists    ();
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Работа с линиями
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    size_t      LineListsCount        ();
+    LineListPtr AddStandaloneLineList (MeshBufferUsage vb_usage, MeshBufferUsage ib_usage);
+    LineListPtr AddBatchingLineList   ();
+    void        RemoveLineList        (const LineListPtr&);
+    void        RemoveAllLineLists    ();
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Группы примитивов рендеринга
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     size_t                  RendererPrimitiveGroupsCount ();
     RendererPrimitiveGroup* RendererPrimitiveGroups      ();
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Получение динамических примитивов
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void FillDynamicPrimitiveStorage (DynamicPrimitiveEntityStorage&);
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Управление кэшированием
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     using CacheSource::UpdateCache;
     using CacheSource::ResetCache;
+
+  private:
+    void AddSimplePrimitiveList        (SimplePrimitiveListImplBase*, int type);
+    void RemoveSimplePrimitiveList     (SimplePrimitiveListImplBase*);
+    void RemoveAllSimplePrimitiveLists (int type);
       
   private:
     void UpdateCacheCore ();

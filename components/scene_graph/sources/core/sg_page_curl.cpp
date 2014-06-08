@@ -142,7 +142,6 @@ void PageCurl::SetSize (const math::vec2f& size)
 {
   impl->size = size;
 
-  UpdateNotify ();
   UpdateBoundsNotify ();
 }
 
@@ -223,7 +222,6 @@ void PageCurl::SetCurlRadius (float curl_radius)
 {
   impl->curl_radius = curl_radius;
 
-  UpdateNotify ();
   UpdateBoundsNotify ();
 }
 
@@ -391,5 +389,5 @@ void PageCurl::UpdateBoundsCore ()
 void PageCurl::AcceptCore (Visitor& visitor)
 {
   if (!TryAccept (*this, visitor))
-    Entity::AcceptCore (visitor);  
+    VisualModel::AcceptCore (visitor);  
 }

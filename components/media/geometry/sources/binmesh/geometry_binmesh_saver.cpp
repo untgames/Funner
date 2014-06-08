@@ -16,7 +16,7 @@ using namespace media::geometry;
  *
  * vertex_buffer_desc format: array<size_t> vertex_weigth_stream_id (0-1); array<size_t> vertex_stream_id;
  *
- * index_buffer format: array<unsigned int> indices
+ * index_buffer format: IndexType type, array<index_type> indices
  *
  * mesh format: array<char> name; array<size_t> index_buffer (0-1); array<size_t> vertex_buffers; array<primitive> primitives;
  *
@@ -34,7 +34,7 @@ namespace bin_mesh_saver
 */
 
 const char HEADER [4] = {'B', 'M', 'S', 'H'};
-const int VERSION = 2;
+const int VERSION = 3;
 
 void file_write (OutputFile& file, const void* data, size_t size)
 {
@@ -192,17 +192,17 @@ class BinMeshLibrarySaver
 
         //сохранение заголовка вершинного буфера
 
+      IndexType data_type = ib.DataType ();
+
+      file_write (result_file, &data_type, sizeof (data_type));
+
       size_t indices_count = ib.Size ();
 
       file_write (result_file, &indices_count, sizeof (indices_count));
       
-      IndexType data_type = ib.DataType ();
-      
-      file_write (result_file, &data_type, sizeof (data_type));
-
         //сохранение индексов
 
-      file_write (result_file, ib.Data (), sizeof (unsigned int) * indices_count);
+      file_write (result_file, ib.Data (), get_index_type_size (data_type) * indices_count);
 
         //добавление потока в список сохранённых
 

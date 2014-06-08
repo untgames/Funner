@@ -16,7 +16,7 @@ namespace
     Определение багов и несоответствий спецификации
 */
 
-#ifndef OPENGL_ES_SUPPORT
+#if !defined(OPENGL_ES_SUPPORT) && !defined(OPENGL_ES2_SUPPORT)
 
 /*//определение бага функции glGetTexImage при работе с 3D-текстурой
 bool detect_texture3d_bug ()

@@ -39,6 +39,12 @@ template <class T> matrix<T, 4> lookat    (const vector<T, 3>& pos, const vector
 template <class T, unsigned int Size>
 angle<T> find_angle (const vector<T, Size>& a, const vector<T, Size>& b, const T& eps = T (0));
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Афинная композиция и декомпозиция преобразований
+///////////////////////////////////////////////////////////////////////////////////////////////////
+void affine_compose (const math::vec3f& position, const math::quatf& orientation, const math::vec3f& scale, math::mat4f& tm);
+void affine_decompose (const math::mat4f& matrix, math::vec3f& position, math::quatf& rotation, math::vec3f& scale);
+
 #include <math/detail/utility.inl>
 
 }

@@ -1,14 +1,16 @@
 #include "shared.h"
 
-using namespace render;
+using namespace render::manager;
 
 /*
     Конструкторы
 */
 
-RenderingContext::RenderingContext (FrameImpl& in_frame, RenderingContext* in_previous)
+RenderingContext::RenderingContext (FrameImpl& in_frame, const math::mat4f& in_vp_tm, RenderingContext* in_previous)
   : frame (in_frame)
   , previous (in_previous)
+  , vp_tm (in_vp_tm)
+  , inv_vp_tm (math::inverse (vp_tm))
 {
 }
 
@@ -26,7 +28,7 @@ TexturePtr RenderingContext::FindLocalTexture (const char* name)
   if (texture)
     return texture;
   
-  if (!texture && previous)
+  if (previous)
     return previous->FindLocalTexture (name);
     
   return TexturePtr ();
@@ -36,13 +38,13 @@ RenderTargetDescPtr RenderingContext::FindRenderTarget (const char* name)
 {
   if (!name)
     return RenderTargetDescPtr ();
-    
-  RenderTargetDescPtr desc = frame.FindRenderTargetDesc (name);
-  
+
+  RenderTargetDescPtr desc = frame.RenderTargets ().FindRenderTargetDesc (name);
+
   if (desc)
     return desc;
   
-  if (!desc && previous)
+  if (previous)
     return previous->FindRenderTarget (name);
     
   return RenderTargetDescPtr ();

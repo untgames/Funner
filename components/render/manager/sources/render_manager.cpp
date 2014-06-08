@@ -1,6 +1,6 @@
 #include "shared.h"
 
-using namespace render;
+using namespace render::manager;
 using namespace render::low_level;
 
 namespace
@@ -42,26 +42,26 @@ struct RenderManagerImpl::Impl: public xtl::trackable, public IEffectManagerList
 ///Конструктор
   Impl (RenderManagerImpl* in_owner)
     : owner (in_owner)
-    , settings (new render::Settings, false)
-    , cache_manager (new render::CacheManager, false)
+    , settings (new render::manager::Settings, false)
+    , cache_manager (new render::manager::CacheManager, false)
   {
     windows.reserve (WINDOW_ARRAY_RESERVE_SIZE);
   }
   
 ///Получение менеджера устройства
-  render::DeviceManager& DeviceManager ()
+  render::manager::DeviceManager& DeviceManager ()
   {
     if (!device_manager)
-      throw xtl::format_operation_exception ("render::RenderManagerImpl::Impl::DeviceManager", "Device not initialized. Create rendering window first");
+      throw xtl::format_operation_exception ("render::manager::RenderManagerImpl::Impl::DeviceManager", "Device not initialized. Create rendering window first");
       
     return *device_manager;
   }
 
 ///Получение кэша буферов свойств
-  render::PropertyCache& PropertyCache ()
+  render::manager::PropertyCache& PropertyCache ()
   {
     if (!property_cache)
-      property_cache = PropertyCachePtr (new render::PropertyCache (&DeviceManager ()), false);
+      property_cache = PropertyCachePtr (new render::manager::PropertyCache (&DeviceManager ()), false);
 
     return *property_cache;
   }
@@ -74,7 +74,7 @@ struct RenderManagerImpl::Impl: public xtl::trackable, public IEffectManagerList
       {
         windows.erase (iter);
         
-        render::Window wrapped_window = Wrappers::Wrap<render::Window> (window);
+        render::manager::Window wrapped_window = Wrappers::Wrap<render::manager::Window> (window);
         
         WindowEventNotify (RenderManagerWindowEvent_OnRemoved, wrapped_window);
         
@@ -83,7 +83,7 @@ struct RenderManagerImpl::Impl: public xtl::trackable, public IEffectManagerList
   }
   
 ///Оконные оповещения
-  void WindowEventNotify (RenderManagerWindowEvent event, render::Window& window)
+  void WindowEventNotify (RenderManagerWindowEvent event, render::manager::Window& window)
   {
     if (window_signals [event].empty ())
       return;
@@ -96,11 +96,11 @@ struct RenderManagerImpl::Impl: public xtl::trackable, public IEffectManagerList
     }
     catch (std::exception& e)
     {
-      log.Printf ("%s\n    at render::RenderManagerImpl::Impl::WindowEventNotify", e.what ());
+      log.Printf ("%s\n    at render::manager::RenderManagerImpl::Impl::WindowEventNotify", e.what ());
     }
     catch (...)
     {
-      log.Printf ("unknown exception\n    at render::RenderManagerImpl::Impl::WindowEventNotify");
+      log.Printf ("unknown exception\n    at render::manager::RenderManagerImpl::Impl::WindowEventNotify");
     }
   }
   
@@ -118,11 +118,11 @@ struct RenderManagerImpl::Impl: public xtl::trackable, public IEffectManagerList
     }
     catch (std::exception& e)
     {
-      log.Printf ("%s\n    at render::RenderManagerImpl::Impl::OnConfigurationChanged", e.what ());
+      log.Printf ("%s\n    at render::manager::RenderManagerImpl::Impl::OnConfigurationChanged", e.what ());
     }
     catch (...)
     {
-      log.Printf ("unknown exception\n    at render::RenderManagerImpl::Impl::OnConfigurationChanged");
+      log.Printf ("unknown exception\n    at render::manager::RenderManagerImpl::Impl::OnConfigurationChanged");
     }    
   }
 };
@@ -146,7 +146,7 @@ RenderManagerImpl::RenderManagerImpl ()
   }
   catch (xtl::exception& e)
   {
-    e.touch ("render::RenderManagerImpl::RenderManagerImpl");
+    e.touch ("render::manager::RenderManagerImpl::RenderManagerImpl");
     throw;
   }
 }
@@ -183,13 +183,13 @@ TextureManager& RenderManagerImpl::TextureManager ()
   try
   {
     if (!impl->textures)
-      impl->textures = TextureManagerPtr (new render::TextureManager (&impl->DeviceManager ()), false);    
+      impl->textures = TextureManagerPtr (new render::manager::TextureManager (&impl->DeviceManager ()), false);    
 
     return *impl->textures;
   }
   catch (xtl::exception& e)
   {
-    e.touch ("render::RenderManagerImpl::TextureManager");
+    e.touch ("render::manager::RenderManagerImpl::TextureManager");
     throw;
   }
 }
@@ -199,13 +199,13 @@ ProgramManager& RenderManagerImpl::ProgramManager ()
   try
   {
     if (!impl->programs)
-      impl->programs = ProgramManagerPtr (new render::ProgramManager (), false);
+      impl->programs = ProgramManagerPtr (new render::manager::ProgramManager (), false);
 
     return *impl->programs;
   }
   catch (xtl::exception& e)
   {
-    e.touch ("render::RenderManagerImpl::ProgramManager");
+    e.touch ("render::manager::RenderManagerImpl::ProgramManager");
     throw;
   }
 }
@@ -215,13 +215,13 @@ MaterialManager& RenderManagerImpl::MaterialManager ()
   try
   {
     if (!impl->materials)
-      impl->materials = MaterialManagerPtr (new render::MaterialManager (&impl->DeviceManager (), &TextureManager (), &ProgramManager ()), false);
+      impl->materials = MaterialManagerPtr (new render::manager::MaterialManager (&impl->DeviceManager (), &TextureManager (), &ProgramManager ()), false);
 
     return *impl->materials;
   }
   catch (xtl::exception& e)
   {
-    e.touch ("render::RenderManagerImpl::MaterialManager");
+    e.touch ("render::manager::RenderManagerImpl::MaterialManager");
     throw;
   }
 }
@@ -231,13 +231,13 @@ PrimitiveManager& RenderManagerImpl::PrimitiveManager ()
   try
   {
     if (!impl->primitives)
-      impl->primitives = PrimitiveManagerPtr (new render::PrimitiveManager (&impl->DeviceManager (), &MaterialManager ()), false);    
+      impl->primitives = PrimitiveManagerPtr (new render::manager::PrimitiveManager (&impl->DeviceManager (), &MaterialManager ()), false);    
 
     return *impl->primitives;
   }
   catch (xtl::exception& e)
   {
-    e.touch ("render::RenderManagerImpl::PrimitiveManager");
+    e.touch ("render::manager::RenderManagerImpl::PrimitiveManager");
     throw;
   }
 }
@@ -247,13 +247,13 @@ EffectManager& RenderManagerImpl::EffectManager ()
   try
   {
     if (!impl->effects)
-      impl->effects = EffectManagerPtr (new render::EffectManager (&impl->DeviceManager (), &TextureManager (), &ProgramManager (), &*impl), false);
+      impl->effects = EffectManagerPtr (new render::manager::EffectManager (&impl->DeviceManager (), &TextureManager (), &ProgramManager (), &*impl), false);
 
     return *impl->effects;
   }
   catch (xtl::exception& e)
   {
-    e.touch ("render::RenderManagerImpl::EffectManager");
+    e.touch ("render::manager::RenderManagerImpl::EffectManager");
     throw;
   }
 }
@@ -262,11 +262,11 @@ EffectManager& RenderManagerImpl::EffectManager ()
     Создание окна рендеринга
 */
 
-WindowPtr RenderManagerImpl::CreateWindow (syslib::Window& sys_window, common::PropertyMap& properties)
+WindowPtr RenderManagerImpl::CreateWindow (INativeWindow* native_window, common::PropertyMap& properties)
 {
   try
   {
-    WindowPtr window (new WindowImpl (impl->device_manager, sys_window, properties, impl->settings, impl->cache_manager), false);
+    WindowPtr window (new WindowImpl (impl->device_manager, *native_window, properties, impl->settings, impl->cache_manager), false);
     
     window->connect_tracker (xtl::bind (&Impl::OnWindowDestroy, &*impl, &*window), *impl);
 
@@ -275,7 +275,7 @@ WindowPtr RenderManagerImpl::CreateWindow (syslib::Window& sys_window, common::P
     if (!impl->device_manager)
       impl->device_manager = window->DeviceManager ();
       
-    render::Window wrapped_window = Wrappers::Wrap<render::Window> (window);
+    render::manager::Window wrapped_window = Wrappers::Wrap<render::manager::Window> (window);
     
     impl->WindowEventNotify (RenderManagerWindowEvent_OnAdded, wrapped_window);
     
@@ -283,7 +283,7 @@ WindowPtr RenderManagerImpl::CreateWindow (syslib::Window& sys_window, common::P
   }
   catch (xtl::exception& e)
   {
-    e.touch ("render::RenderManagerImpl::CreateWindow");
+    e.touch ("render::manager::RenderManagerImpl::CreateWindow");
     throw;
   }
 }
@@ -300,7 +300,7 @@ size_t RenderManagerImpl::WindowsCount ()
 WindowPtr RenderManagerImpl::Window (size_t index)
 {
   if (index >= impl->windows.size ())    
-    throw xtl::make_range_exception ("render::RenderManagerImpl::Window", "index", index, impl->windows.size ());
+    throw xtl::make_range_exception ("render::manager::RenderManagerImpl::Window", "index", index, impl->windows.size ());
     
   return impl->windows [index];
 }
@@ -309,7 +309,7 @@ WindowPtr RenderManagerImpl::Window (size_t index)
     Создание целей рендеринга
 */
 
-RenderTargetPtr RenderManagerImpl::CreateRenderBuffer (size_t width, size_t height, render::PixelFormat format)
+RenderTargetPtr RenderManagerImpl::CreateRenderBuffer (size_t width, size_t height, render::manager::PixelFormat format)
 {
   try
   {
@@ -352,7 +352,7 @@ RenderTargetPtr RenderManagerImpl::CreateRenderBuffer (size_t width, size_t heig
   }
   catch (xtl::exception& e)
   {
-    e.touch ("render::RenderManagerImpl::CreateRenderBuffer");
+    e.touch ("render::manager::RenderManagerImpl::CreateRenderBuffer");
     throw;
   }
 }
@@ -380,7 +380,7 @@ RenderTargetPtr RenderManagerImpl::CreateDepthStencilBuffer (size_t width, size_
   }
   catch (xtl::exception& e)
   {
-    e.touch ("render::RenderManagerImpl::CreateDepthStencilBuffer");
+    e.touch ("render::manager::RenderManagerImpl::CreateDepthStencilBuffer");
     throw;
   }
 }
@@ -397,7 +397,7 @@ FramePtr RenderManagerImpl::CreateFrame ()
   }
   catch (xtl::exception& e)
   {
-    e.touch ("render::RenderManagerImpl::CreateFrame");
+    e.touch ("render::manager::RenderManagerImpl::CreateFrame");
     throw;
   }
 }
@@ -410,7 +410,7 @@ EntityPtr RenderManagerImpl::CreateEntity ()
   }
   catch (xtl::exception& e)
   {
-    e.touch ("render::RenderManagerImpl::CreateEntity");
+    e.touch ("render::manager::RenderManagerImpl::CreateEntity");
     throw;
   }
 }
@@ -426,25 +426,25 @@ void RenderManagerImpl::LoadResource (const char* resource_name)
     if (!resource_name)
       throw xtl::make_null_argument_exception ("", "resource_name");
     
-    if (render::TextureManager::IsTextureResource (resource_name))
+    if (render::manager::TextureManager::IsTextureResource (resource_name))
     {
       TextureManager ().LoadTexture (resource_name);
       return;
     }
     
-    if (render::PrimitiveManager::IsMeshLibraryResource (resource_name))
+    if (render::manager::PrimitiveManager::IsMeshLibraryResource (resource_name))
     {
       PrimitiveManager ().LoadMeshLibrary (resource_name);
       return;
     }
     
-    if (render::MaterialManager::IsMaterialLibraryResource (resource_name))
+    if (render::manager::MaterialManager::IsMaterialLibraryResource (resource_name))
     {
       MaterialManager ().LoadMaterialLibrary (resource_name);
       return;
     }    
     
-    if (render::EffectManager::IsEffectLibraryResource (resource_name))
+    if (render::manager::EffectManager::IsEffectLibraryResource (resource_name))
     {
       EffectManager ().LoadEffectLibrary (resource_name);
       return;
@@ -454,7 +454,7 @@ void RenderManagerImpl::LoadResource (const char* resource_name)
   }
   catch (xtl::exception& e)
   {
-    e.touch ("render::RenderManagerImpl::LoadResource(const char*)");
+    e.touch ("render::manager::RenderManagerImpl::LoadResource(const char*)");
     throw;
   }
 }
@@ -466,25 +466,25 @@ void RenderManagerImpl::UnloadResource (const char* resource_name)
     if (!resource_name)
       return;
     
-    if (render::TextureManager::IsTextureResource (resource_name))
+    if (render::manager::TextureManager::IsTextureResource (resource_name))
     {
       TextureManager ().UnloadTexture (resource_name);
       return;
     }
     
-    if (render::PrimitiveManager::IsMeshLibraryResource (resource_name))
+    if (render::manager::PrimitiveManager::IsMeshLibraryResource (resource_name))
     {
       PrimitiveManager ().UnloadMeshLibrary (resource_name);
       return;
     }
     
-    if (render::MaterialManager::IsMaterialLibraryResource (resource_name))
+    if (render::manager::MaterialManager::IsMaterialLibraryResource (resource_name))
     {
       MaterialManager ().UnloadMaterialLibrary (resource_name);
       return;
     }
     
-    if (render::EffectManager::IsEffectLibraryResource (resource_name))
+    if (render::manager::EffectManager::IsEffectLibraryResource (resource_name))
     {
       EffectManager ().UnloadEffectLibrary (resource_name);
       return;
@@ -492,7 +492,7 @@ void RenderManagerImpl::UnloadResource (const char* resource_name)
   }
   catch (xtl::exception& e)
   {
-    e.touch ("render::RenderManagerImpl::UnloadResource(const char*)");
+    e.touch ("render::manager::RenderManagerImpl::UnloadResource(const char*)");
     throw;
   } 
 }
@@ -505,7 +505,7 @@ void RenderManagerImpl::LoadResource (const media::rfx::MaterialLibrary& library
   }
   catch (xtl::exception& e)
   {
-    e.touch ("render::RenderManagerImpl::LoadResource(const media::rfx::MaterialLibrary&)");
+    e.touch ("render::manager::RenderManagerImpl::LoadResource(const media::rfx::MaterialLibrary&)");
     throw;
   }
 }
@@ -518,7 +518,7 @@ void RenderManagerImpl::UnloadResource (const media::rfx::MaterialLibrary& libra
   }
   catch (xtl::exception& e)
   {
-    e.touch ("render::RenderManagerImpl::UnloadResource(const media::rfx::MaterialLibrary&)");
+    e.touch ("render::manager::RenderManagerImpl::UnloadResource(const media::rfx::MaterialLibrary&)");
     throw;
   }
 }
@@ -531,7 +531,7 @@ void RenderManagerImpl::LoadResource (const media::geometry::MeshLibrary& librar
   }
   catch (xtl::exception& e)
   {
-    e.touch ("render::RenderManagerImpl::LoadResource(const media::geometry::MeshLibrary&)");
+    e.touch ("render::manager::RenderManagerImpl::LoadResource(const media::geometry::MeshLibrary&)");
     throw;
   }
 }
@@ -544,7 +544,7 @@ void RenderManagerImpl::UnloadResource (const media::geometry::MeshLibrary& libr
   }
   catch (xtl::exception& e)
   {
-    e.touch ("render::RenderManagerImpl::UnloadResource(const media::geometry::MeshLibrary&)");
+    e.touch ("render::manager::RenderManagerImpl::UnloadResource(const media::geometry::MeshLibrary&)");
     throw;
   }
 }
@@ -561,7 +561,7 @@ xtl::connection RenderManagerImpl::RegisterWindowEventHandler (RenderManagerWind
     case RenderManagerWindowEvent_OnRemoved:
       return impl->window_signals [event].connect (handler);
     default:
-      throw xtl::make_argument_exception ("render::RenderManagerImpl::RegisterWindowEventHandler", "event", event);
+      throw xtl::make_argument_exception ("render::manager::RenderManagerImpl::RegisterWindowEventHandler", "event", event);
   }
 }
 
@@ -572,7 +572,7 @@ xtl::connection RenderManagerImpl::RegisterEventHandler (RenderManagerEvent even
     case RenderManagerEvent_OnConfigurationChanged:
       return impl->signals [event].connect (handler);
     default:
-      throw xtl::make_argument_exception ("render::RenderManagerImpl::RegisterEventHandler", "event", event);
+      throw xtl::make_argument_exception ("render::manager::RenderManagerImpl::RegisterEventHandler", "event", event);
   }
 }
 
@@ -582,19 +582,19 @@ xtl::connection RenderManagerImpl::RegisterEventHandler (RenderManagerEvent even
 
 void RenderManagerImpl::UpdateCache ()
 {
-  throw xtl::make_not_implemented_exception ("render::RenderManagerImpl::UpdateCache");
+  throw xtl::make_not_implemented_exception ("render::manager::RenderManagerImpl::UpdateCache");
 }
 
 void RenderManagerImpl::ResetCache ()
 {
-  throw xtl::make_not_implemented_exception ("render::RenderManagerImpl::ResetCache");
+  throw xtl::make_not_implemented_exception ("render::manager::RenderManagerImpl::ResetCache");
 }
 
 /*
     Настройки менеджера рендеринга
 */
 
-render::Settings& RenderManagerImpl::Settings ()
+render::manager::Settings& RenderManagerImpl::Settings ()
 {
   return *impl->settings;
 }
