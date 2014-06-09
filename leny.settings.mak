@@ -1,3 +1,6 @@
+DIST_DIR_SHORT_NAME := dist/scene_render3d
+TMP_DIR_SHORT_NAME  := tmp/scene_render3d
+
 MINGW_DIR         := D:/studio/dev/mingw/4.3.0
 DOXYGEN_DIR       := D:/studio/dev/doxygen
 HHC_DIR           := C:/Program Files/HTML Help Workshop
