@@ -249,10 +249,11 @@ node 'sprite':
     integer Visible='1'
     string Scissor=''
     string Material='sprite_material'
-    float AlphaReference='0'
+    vector Up='0 0 1 0'
     vector Color='1 0 1 0.5'
     float Alpha='0.5'
-    integer Frame='1'
+    vector TexOffset='0 0 0 0'
+    vector TexSize='1 1 0 0'
 node 'text_line':
   parent: 'scene3'
   bindings:

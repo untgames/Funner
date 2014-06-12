@@ -13,9 +13,10 @@ struct Sprite::Impl: public xtl::instance_counter<Sprite>
   
   Impl ()
   {
-    sprite_desc.frame = 0;
-    sprite_desc.size  = vec2f (1.0f);
-    sprite_desc.color = vec4f (1.0f, 1.0f, 1.0f, 1.0f);
+    sprite_desc.size     = vec2f (1.0f);
+    sprite_desc.color    = vec4f (1.0f, 1.0f, 1.0f, 1.0f);
+    sprite_desc.tex_size = vec2f (1.0f);
+    sprite_desc.normal   = vec3f (0.0f, 0.0f, 1.0f);
   }
 };
 
@@ -40,22 +41,6 @@ Sprite::~Sprite ()
 Sprite::Pointer Sprite::Create ()
 {
   return Pointer (new Sprite, false);
-}
-
-/*
-   Установка номера кадра
-*/
-
-void Sprite::SetFrame (size_t frame)
-{
-  impl->sprite_desc.frame = frame;
-  
-  UpdateSpriteDescsNotify ();
-}
-
-size_t Sprite::Frame () const
-{
-  return impl->sprite_desc.frame;
 }
 
 /*
@@ -115,6 +100,34 @@ float Sprite::Alpha () const
 }
 
 /*
+    Текстурные координаты
+*/
+
+void Sprite::SetTexOffset (const math::vec2f& offset)
+{
+  impl->sprite_desc.tex_offset = offset;
+
+  UpdateSpriteDescsNotify ();
+}
+
+void Sprite::SetTexSize (const math::vec2f& size)
+{
+  impl->sprite_desc.tex_size = size;
+
+  UpdateSpriteDescsNotify ();
+}
+
+const math::vec2f& Sprite::TexOffset () const
+{
+  return impl->sprite_desc.tex_offset;
+}
+
+const math::vec2f& Sprite::TexSize () const
+{
+  return impl->sprite_desc.tex_size;
+}
+
+/*
     Метод, вызываемый при посещении объекта
 */
 
@@ -133,7 +146,7 @@ size_t Sprite::SpriteDescsCountCore ()
   return 1;
 }
 
-const SpriteModel::SpriteDesc* Sprite::SpriteDescsCore ()
+const SpriteDesc* Sprite::SpriteDescsCore ()
 {
   return &impl->sprite_desc;
 }
@@ -148,5 +161,6 @@ void Sprite::BindProperties (common::PropertyBindingMap& bindings)
 
   bindings.AddProperty ("Color", xtl::bind (&Sprite::Color, this), xtl::bind (xtl::implicit_cast<void (Sprite::*)(const math::vec4f&)> (&Sprite::SetColor), this, _1));
   bindings.AddProperty ("Alpha", xtl::bind (&Sprite::Alpha, this), xtl::bind (&Sprite::SetAlpha, this, _1));
-  bindings.AddProperty ("Frame", xtl::bind (&Sprite::Frame, this), xtl::bind (&Sprite::SetFrame, this, _1));
+  bindings.AddProperty ("TexOffset", xtl::bind (&Sprite::TexOffset, this), xtl::bind (&Sprite::SetTexOffset, this, _1));
+  bindings.AddProperty ("TexSize", xtl::bind (&Sprite::TexSize, this), xtl::bind (&Sprite::SetTexSize, this, _1));
 }

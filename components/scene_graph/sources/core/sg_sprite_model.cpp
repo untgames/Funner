@@ -12,10 +12,19 @@ typedef xtl::signal<void (SpriteModel& sender, SpriteModelEvent event_id)> Sprit
 struct SpriteModel::Impl: public xtl::instance_counter<SpriteModel>
 {
   stl::string       material;                       //имя материала
+  size_t            material_hash;                  //хэш имени материала
+  SpriteMode        mode;                           //режим спрайтов
+  SpriteUsage       usage;                          //режим использования спрайтов
+  math::vec3f       up;                             //вектор вверх
   SpriteModelSignal signals [SpriteModelEvent_Num]; //сигналы модели 
-  float             alpha_reference;                //параметр, используемый для альфа-теста
 
-  Impl () : alpha_reference (0.f) {}
+  Impl ()
+    : material_hash (0xffffffff)
+    , mode (SpriteMode_Default)
+    , usage (SpriteUsage_Default)
+    , up (0, 1.0f, 0)
+  {
+  }
 
     //оповещение о событии
   void Notify (SpriteModel& sender, SpriteModelEvent event_id)
@@ -56,7 +65,13 @@ void SpriteModel::SetMaterial (const char* in_material)
   if (!in_material)
     throw xtl::make_null_argument_exception ("scene_graph::SpriteModel::SetMaterial", "material");
 
-  impl->material = in_material;  
+  size_t hash = common::strhash (in_material);
+
+  if (hash == impl->material_hash)
+    return;
+
+  impl->material      = in_material;  
+  impl->material_hash = hash;
 
   UpdateNotify ();
 }
@@ -66,20 +81,93 @@ const char* SpriteModel::Material () const
   return impl->material.c_str ();
 }
 
+size_t SpriteModel::MaterialHash () const
+{
+  return impl->material_hash;
+}
+
 /*
-    Параметр, используемый для альфа-теста
+    Режим спрайтов
 */
 
-void SpriteModel::SetAlphaReference (float value)
+void SpriteModel::SetMode (SpriteMode mode)
 {
-  impl->alpha_reference = value;
-  
+  switch (mode)
+  {
+    case SpriteMode_Billboard:
+    case SpriteMode_Oriented:
+    case SpriteMode_OrientedBillboard:
+      break;
+    default:
+      throw xtl::make_argument_exception ("scene_graph::SpriteModel::SetMode", "mode", mode);
+  }
+
+  if (impl->mode == mode)
+    return;
+
+  impl->mode = mode;
+
+  impl->Notify (*this, SpriteModelEvent_AfterModeUsageUpUpdate);
+
   UpdateNotify ();
 }
 
-float SpriteModel::AlphaReference () const
+SpriteMode SpriteModel::Mode () const
 {
-  return impl->alpha_reference;
+  return impl->mode;
+}
+
+/*
+    Режим использования спрайтов
+*/
+
+void SpriteModel::SetUsage (SpriteUsage usage)
+{
+  switch (usage)
+  {
+    case SpriteUsage_Static:
+    case SpriteUsage_Dynamic:
+    case SpriteUsage_Stream:
+    case SpriteUsage_Batching:
+      break;
+    default:
+      throw xtl::make_argument_exception ("scene_graph::SpriteModel::SetUsage", "usage", usage);
+  }
+
+  if (impl->usage == usage)
+    return;
+
+  impl->usage = usage;
+
+  impl->Notify (*this, SpriteModelEvent_AfterModeUsageUpUpdate);
+
+  UpdateNotify ();
+}
+
+SpriteUsage SpriteModel::Usage () const
+{
+  return impl->usage;
+}
+
+/*
+    Вектор "вверх"
+*/
+
+void SpriteModel::SetOrtUp (const math::vec3f& up)
+{
+  if (up == impl->up)
+    return;
+
+  impl->up = up;
+
+  impl->Notify (*this, SpriteModelEvent_AfterModeUsageUpUpdate);  
+
+  UpdateNotify ();
+}
+
+const math::vec3f& SpriteModel::OrtUp () const
+{
+  return impl->up;
 }
 
 /*
@@ -91,7 +179,7 @@ size_t SpriteModel::SpriteDescsCount () const
   return const_cast<SpriteModel&> (*this).SpriteDescsCountCore ();
 }
 
-const SpriteModel::SpriteDesc* SpriteModel::SpriteDescs () const
+const SpriteDesc* SpriteModel::SpriteDescs () const
 {
   return const_cast<SpriteModel&> (*this).SpriteDescsCore ();
 }
@@ -115,6 +203,7 @@ xtl::connection SpriteModel::RegisterEventHandler (SpriteModelEvent event, const
   switch (event)
   {
     case SpriteModelEvent_AfterSpriteDescsUpdate:
+    case SpriteModelEvent_AfterModeUsageUpUpdate:
       break;
     default:
       throw xtl::make_argument_exception ("scene_graph::SpriteModel::RegisterEventHandler", "event", event);
@@ -143,5 +232,5 @@ void SpriteModel::BindProperties (common::PropertyBindingMap& bindings)
   VisualModel::BindProperties (bindings);
 
   bindings.AddProperty ("Material", xtl::bind (&SpriteModel::Material, this), xtl::bind (&SpriteModel::SetMaterial, this, _1));
-  bindings.AddProperty ("AlphaReference", xtl::bind (&SpriteModel::AlphaReference, this), xtl::bind (&SpriteModel::SetAlphaReference, this, _1));
+  bindings.AddProperty ("Up", xtl::bind (&SpriteModel::OrtUp, this), xtl::bind (&SpriteModel::SetOrtUp, this, _1));
 }

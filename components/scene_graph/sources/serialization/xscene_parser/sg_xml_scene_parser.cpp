@@ -56,6 +56,63 @@ template <class BaseIter> inline bool read (xtl::io::token_iterator<const char*,
   return false;
 }
 
+template <class BaseIter> inline bool read (xtl::io::token_iterator<const char*, BaseIter>& iter, SpriteMode& mode)
+{
+  if (!iter)
+    return false;
+
+  static const Tag2Value<SpriteMode> tags [] = {
+    {"billboard",          SpriteMode_Billboard},
+    {"oriented",           SpriteMode_Oriented},
+    {"oriented_billboard", SpriteMode_OrientedBillboard},
+  };
+  
+  static const size_t tags_count = sizeof (tags) / sizeof (*tags);
+  
+  const char* string = *iter;
+  
+  for (size_t i=0; i<tags_count; i++)
+    if (!strcmp (tags [i].tag, string))
+    {
+      mode = tags [i].value;
+
+      ++iter;
+      
+      return true; 
+    }
+    
+  return false;
+}
+
+template <class BaseIter> inline bool read (xtl::io::token_iterator<const char*, BaseIter>& iter, SpriteUsage& usage)
+{
+  if (!iter)
+    return false;
+
+  static const Tag2Value<SpriteUsage> tags [] = {
+    {"static",   SpriteUsage_Static},
+    {"dynamic",  SpriteUsage_Dynamic},
+    {"stream",   SpriteUsage_Stream},
+    {"batching", SpriteUsage_Batching},
+  };
+  
+  static const size_t tags_count = sizeof (tags) / sizeof (*tags);
+  
+  const char* string = *iter;
+  
+  for (size_t i=0; i<tags_count; i++)
+    if (!strcmp (tags [i].tag, string))
+    {
+      usage = tags [i].value;
+
+      ++iter;
+      
+      return true; 
+    }
+    
+  return false;
+}
+
 }
 
 namespace
@@ -202,10 +259,13 @@ struct SpriteDecl: public xtl::reference_counter
 {
   stl::string                 material;
   stl::auto_ptr<stl::string>  layout;
-  Param<float>                alpha_reference;
   Param<float>                alpha;
-  Param<size_t>               frame;
   Param<math::vec3f>          color;
+  Param<math::vec2f>          tex_offset;
+  Param<math::vec2f>          tex_size;
+  Param<math::vec3f>          up;
+  Param<SpriteMode>           mode;
+  Param<SpriteUsage>          usage;
 };
 
 ///Описание параметров текстовой строки
@@ -1270,8 +1330,9 @@ SpriteDeclPtr XmlSceneParser::Impl::PrepareSprite (const ParseNode& decl)
 
     node_decl->color.Parse (decl, "color");
     node_decl->alpha.Parse (decl, "alpha");
-    node_decl->alpha_reference.Parse (decl, "alpha_reference");
-    node_decl->frame.Parse (decl, "frame");
+    node_decl->mode.Parse (decl, "mode");
+    node_decl->usage.Parse (decl, "usage");
+    node_decl->up.Parse (decl, "up");
 
     node_decl->material = get<const char*> (decl, "material", "");
 
@@ -1303,10 +1364,13 @@ void XmlSceneParser::Parse (const ParseNode& decl, Sprite& node, Node& parent, S
 
     node.SetMaterial (node_decl->material.c_str ());
 
-    if (node_decl->color.state)           node.SetColor (node_decl->color.value);
-    if (node_decl->alpha.state)           node.SetAlpha (node_decl->alpha.value);
-    if (node_decl->alpha_reference.state) node.SetAlphaReference (node_decl->alpha_reference.value);
-    if (node_decl->frame.state)           node.SetFrame (node_decl->frame.value);
+    if (node_decl->color.state)      node.SetColor (node_decl->color.value);
+    if (node_decl->alpha.state)      node.SetAlpha (node_decl->alpha.value);
+    if (node_decl->tex_offset.state) node.SetTexOffset (node_decl->tex_offset.value);
+    if (node_decl->tex_size.state)   node.SetTexSize (node_decl->tex_size.value);
+    if (node_decl->up.state)         node.SetOrtUp (node_decl->up.value);
+    if (node_decl->mode.state)       node.SetMode (node_decl->mode.value);
+    if (node_decl->usage.state)      node.SetUsage (node_decl->usage.value);
 
       //разбор родительских параметров
       
