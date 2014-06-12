@@ -1,0 +1,8 @@
+Results of line1_test:
+Line '': 
+  material:        'material1'
+  usage:           batching
+  descs (count=1):
+    position: [0.00 0.00 0.00]      - [0.00 0.00 1.00]
+    color:    [1.00 1.00 1.00 0.50] - [1.00 1.00 1.00 0.50]
+    tex_offs: [0.50 0.50]           - [0.00 0.50]

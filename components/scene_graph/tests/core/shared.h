@@ -24,6 +24,7 @@
 #include <sg/height_map.h>
 #include <sg/input.h>
 #include <sg/light.h>
+#include <sg/line.h>
 #include <sg/listener.h>
 #include <sg/mesh.h>
 #include <sg/node.h>

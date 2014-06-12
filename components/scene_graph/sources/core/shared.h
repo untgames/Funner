@@ -40,6 +40,7 @@
 #include <sg/helper.h>
 #include <sg/input.h>
 #include <sg/light.h>
+#include <sg/line.h>
 #include <sg/listener.h>
 #include <sg/mesh.h>
 #include <sg/node_array.h>

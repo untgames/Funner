@@ -18,7 +18,7 @@ const char* get_string (SpriteUsage usage)
     case SpriteUsage_Static:   return "static";
     case SpriteUsage_Dynamic:  return "dynamic";
     case SpriteUsage_Stream:   return "stream";
-    case SpriteUsage_Batching: return "stream";
+    case SpriteUsage_Batching: return "batching";
     default:                   return "unknown";
   }
 }

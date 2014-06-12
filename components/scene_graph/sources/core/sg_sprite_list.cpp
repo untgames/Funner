@@ -89,9 +89,9 @@ SpriteDesc* SpriteList::Sprites ()
     Добавление спрайтов в массив
 */
 
-void SpriteList::Insert (const SpriteDesc& SpriteDesc)
+void SpriteList::Insert (const SpriteDesc& desc)
 {
-  Insert (1, &SpriteDesc);  
+  Insert (1, &desc);
 }
 
 void SpriteList::Insert (size_t items_count, const SpriteDesc* items)
