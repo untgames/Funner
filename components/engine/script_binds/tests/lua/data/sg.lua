@@ -599,13 +599,9 @@ function test_sprite ()
 
   sprite1.Material = "SettedMaterial"
   sprite1.Alpha    = 0.8
-  sprite1.Frame    = 9
-  sprite1.AlphaReference = 0.4
 
   print ("Alpha value = " .. tostring (sprite1.Alpha))
-  print ("Alpha reference = " .. tostring (sprite1.AlphaReference))
   print ("Material name = " .. sprite1.Material)
-  print ("Frame number = " .. tostring (sprite1.Frame))
    
   sprite1.Color    = vec4 (1, 0, 0, 0.7)
 
@@ -621,10 +617,10 @@ function test_sprite ()
   
 end
 
-function test_visual_model ()
-  print ("VisualModel test")
+function test_static_mesh ()
+  print ("StaticMesh test")
 
-  local visual_model1 = Scene.VisualModel.Create ()
+  local visual_model1 = Scene.StaticMesh.Create ()
 
   print ("Mesh name = " .. visual_model1.MeshName)
 
@@ -970,7 +966,7 @@ function test ()
 
   test_sound_emitter ()
 
-  test_visual_model ()
+  test_static_mesh ()
 
   test_sprite ()
 

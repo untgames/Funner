@@ -28,8 +28,8 @@ export.link.engine.subsystems.scene_player.LINK_INCLUDES := ScenePlayerSubsystem
 export.link.engine.subsystems.scene_player.IMPORTS       := link.engine.subsystems link.sound.scene_player link.media.sound
 
 # Link render exports
-export.link.engine.subsystems.scene_render.LINK_INCLUDES := SceneRenderSubsystem SceneRenderServerSubsystem SceneRenderClientSubsystem
-export.link.engine.subsystems.scene_render.IMPORTS       := link.engine.subsystems link.render.scene_render2d link.render.scene_render.server link.render.scene_render.client
+export.link.engine.subsystems.scene_render.LINK_INCLUDES := SceneRenderServerSubsystem SceneRenderClientSubsystem
+export.link.engine.subsystems.scene_render.IMPORTS       := link.engine.subsystems link.render.scene_render.server link.render.scene_render.client
 
 # Link scene manager exports
 export.link.engine.subsystems.scene_manager.LINK_INCLUDES := SceneManagerSubsystem
@@ -55,10 +55,6 @@ export.link.engine.subsystems.window_input_driver.IMPORTS       := link.engine.s
 # Link window manager exports
 export.link.engine.subsystems.window_manager.LINK_INCLUDES := WindowManagerSubsystem
 export.link.engine.subsystems.window_manager.IMPORTS       := link.engine.subsystems link.system link.media.rms
-
-# Link window renderer exports
-export.link.engine.subsystems.window_renderer.LINK_INCLUDES := WindowRendererSubsystem
-export.link.engine.subsystems.window_renderer.IMPORTS       := link.engine.subsystems link.render.mid_level.window_driver
 
 # Link physics manager exports
 export.link.engine.subsystems.physics_manager.LINK_INCLUDES := PhysicsManagerSubsystem

@@ -59,8 +59,6 @@ void bind_sprite_model_library (Environment& environment)
 
   lib.Register ("set_Material",       make_invoker (&SpriteModel::SetMaterial));
   lib.Register ("get_Material",       make_invoker (&SpriteModel::Material));
-  lib.Register ("set_AlphaReference", make_invoker (&SpriteModel::SetAlphaReference));
-  lib.Register ("get_AlphaReference", make_invoker (&SpriteModel::AlphaReference));
 
     //регистрация типов данных
 
@@ -87,10 +85,8 @@ void bind_sprite_library (Environment& environment)
 
   lib.Register ("set_Color",    make_invoker (implicit_cast<void (Sprite::*) (const vec4f&)> (&Sprite::SetColor)));
   lib.Register ("set_Alpha",    make_invoker (&Sprite::SetAlpha));
-  lib.Register ("set_Frame",    make_invoker (&Sprite::SetFrame));
   lib.Register ("get_Color",    make_invoker (&Sprite::Color));
   lib.Register ("get_Alpha",    make_invoker (&Sprite::Alpha));
-  lib.Register ("get_Frame",    make_invoker <int (Sprite&)> (&Sprite::Frame));
 
   lib.Register ("SetColor", make_invoker (make_invoker (implicit_cast<void (Sprite::*) (float, float, float, float)> (&Sprite::SetColor)),
                                           make_invoker (implicit_cast<void (Sprite::*) (float, float, float)>        (&Sprite::SetColor))));

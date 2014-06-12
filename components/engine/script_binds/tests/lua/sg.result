@@ -196,16 +196,14 @@ Gain = 0.69999998807907
 SoundEmitter sound declaration name = sound.snddecl
 PlayStartOffset = 0
 PlayStartOffset = 1
-VisualModel test
+StaticMesh test
 Mesh name = 
 Mesh name = mesh.xmesh
 Sprite test
 Color = 1 1 1 1
 Material name = 
 Alpha value = 0.80000001192093
-Alpha reference = 0.40000000596046
 Material name = SettedMaterial
-Frame number = 9
 Color = 1 0 0 0.7
 Color = 0 0 1 0.3
 Color = 0 1 0 0.3

@@ -6,11 +6,7 @@
 
 #include <sg/listener.h>
 
-#include <render/scene_render.h>
-
 #include <input/cursor.h>
-
-#include <render/scene_render.h>
 
 #include <syslib/window.h>
 
@@ -154,7 +150,6 @@ void bind_attachment_registry_library (Environment& environment)
   bind_attachment_methods<physics::PhysicsManager>   (environment, "PhysicsManagers");
   bind_attachment_methods<scene_graph::SceneManager> (environment, "SceneManagers");  
   bind_attachment_methods<scene_graph::controllers::AnimationManager> (environment, "AnimationManagers");    
-  bind_attachment_methods<render::obsolete::RenderTarget> (environment, "RenderTargets");
 }
 
 namespace
