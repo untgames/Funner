@@ -13,6 +13,17 @@ template class engine::decl_sg_cast<SpriteList,  SpriteModel>;
 template class engine::decl_sg_cast<SpriteList,  VisualModel>;
 template class engine::decl_sg_cast<SpriteList,  Entity>;
 template class engine::decl_sg_cast<SpriteList,  Node>;
+template class engine::decl_sg_cast<LineModel,   VisualModel>;
+template class engine::decl_sg_cast<LineModel,   Entity>;
+template class engine::decl_sg_cast<LineModel,   Node>;
+template class engine::decl_sg_cast<Line,        LineModel>;
+template class engine::decl_sg_cast<Line,        VisualModel>;
+template class engine::decl_sg_cast<Line,        Entity>;
+template class engine::decl_sg_cast<Line,        Node>;
+template class engine::decl_sg_cast<LineList,    LineModel>;
+template class engine::decl_sg_cast<LineList,    VisualModel>;
+template class engine::decl_sg_cast<LineList,    Entity>;
+template class engine::decl_sg_cast<LineList,    Node>;
 template class engine::decl_sg_cast<TextLine,    VisualModel>;
 template class engine::decl_sg_cast<TextLine,    Entity>;
 template class engine::decl_sg_cast<TextLine,    Node>;
@@ -47,9 +58,31 @@ SpriteList::Pointer create_sprite_list ()
      Регистрация библиотеки работы с спрайтовыми моделями
 */
 
+void bind_static_sprite_model_library (Environment& environment)
+{
+  InvokerRegistry sprite_mode_lib  = environment.CreateLibrary (SCENE_STATIC_SPRITE_MODE_LIBRARY);
+  InvokerRegistry sprite_usage_lib = environment.CreateLibrary (SCENE_STATIC_SPRITE_USAGE_LIBRARY);
+
+  sprite_mode_lib.Register ("get_Billboard",          make_const (SpriteMode_Billboard));
+  sprite_mode_lib.Register ("get_Oriented",           make_const (SpriteMode_Oriented));
+  sprite_mode_lib.Register ("get_OrientedBillboard",  make_const (SpriteMode_OrientedBillboard));
+
+  sprite_usage_lib.Register ("get_Static",   make_const (SpriteUsage_Static));
+  sprite_usage_lib.Register ("get_Dynamic",  make_const (SpriteUsage_Dynamic));
+  sprite_usage_lib.Register ("get_Stream",   make_const (SpriteUsage_Stream));
+  sprite_usage_lib.Register ("get_Batching", make_const (SpriteUsage_Batching));
+
+  environment.RegisterType<SpriteMode>  (SCENE_STATIC_SPRITE_MODE_LIBRARY);
+  environment.RegisterType<SpriteUsage> (SCENE_STATIC_SPRITE_USAGE_LIBRARY);
+}
+
 void bind_sprite_model_library (Environment& environment)
 {
   InvokerRegistry lib = environment.CreateLibrary (SCENE_SPRITE_MODEL_LIBRARY);
+
+    //регистрация статических библиотек
+
+  bind_static_sprite_model_library (environment);
 
     //наследование
 
@@ -57,8 +90,14 @@ void bind_sprite_model_library (Environment& environment)
 
     //регистрация операций
 
-  lib.Register ("set_Material",       make_invoker (&SpriteModel::SetMaterial));
-  lib.Register ("get_Material",       make_invoker (&SpriteModel::Material));
+  lib.Register ("set_Material", make_invoker (&SpriteModel::SetMaterial));
+  lib.Register ("get_Material", make_invoker (&SpriteModel::Material));
+  lib.Register ("set_Mode",     make_invoker (&SpriteModel::SetMode));
+  lib.Register ("get_Mode",     make_invoker (&SpriteModel::Mode));
+  lib.Register ("set_Usage",    make_invoker (&SpriteModel::SetUsage));
+  lib.Register ("get_Usage",    make_invoker (&SpriteModel::Usage));
+  lib.Register ("set_OrtUp",    make_invoker (&SpriteModel::SetOrtUp));
+  lib.Register ("get_OrtUp",    make_invoker (&SpriteModel::OrtUp));
 
     //регистрация типов данных
 
@@ -83,10 +122,14 @@ void bind_sprite_library (Environment& environment)
 
     //регистрация операций
 
-  lib.Register ("set_Color",    make_invoker (implicit_cast<void (Sprite::*) (const vec4f&)> (&Sprite::SetColor)));
-  lib.Register ("set_Alpha",    make_invoker (&Sprite::SetAlpha));
-  lib.Register ("get_Color",    make_invoker (&Sprite::Color));
-  lib.Register ("get_Alpha",    make_invoker (&Sprite::Alpha));
+  lib.Register ("set_TexOffset",  make_invoker (&Sprite::SetTexOffset));
+  lib.Register ("get_TexOffset",  make_invoker (&Sprite::TexOffset));
+  lib.Register ("set_TexSize",    make_invoker (&Sprite::SetTexSize));
+  lib.Register ("get_TexSize",    make_invoker (&Sprite::TexSize));
+  lib.Register ("set_Color",      make_invoker (implicit_cast<void (Sprite::*) (const vec4f&)> (&Sprite::SetColor)));
+  lib.Register ("set_Alpha",      make_invoker (&Sprite::SetAlpha));
+  lib.Register ("get_Color",      make_invoker (&Sprite::Color));
+  lib.Register ("get_Alpha",      make_invoker (&Sprite::Alpha));
 
   lib.Register ("SetColor", make_invoker (make_invoker (implicit_cast<void (Sprite::*) (float, float, float, float)> (&Sprite::SetColor)),
                                           make_invoker (implicit_cast<void (Sprite::*) (float, float, float)>        (&Sprite::SetColor))));
@@ -94,6 +137,99 @@ void bind_sprite_library (Environment& environment)
     //регистрация типов данных
 
   environment.RegisterType<Sprite> (SCENE_SPRITE_LIBRARY);
+}
+
+/*
+    Создание линии
+*/
+
+Line::Pointer create_line ()
+{
+  return Line::Create ();
+}
+
+LineList::Pointer create_line_list ()
+{
+  return LineList::Create ();
+}
+
+/*
+     Регистрация библиотеки работы с спрайтовыми моделями
+*/
+
+void bind_static_line_model_library (Environment& environment)
+{
+  InvokerRegistry line_usage_lib = environment.CreateLibrary (SCENE_STATIC_LINE_USAGE_LIBRARY);
+
+  line_usage_lib.Register ("get_Static",   make_const (LineUsage_Static));
+  line_usage_lib.Register ("get_Dynamic",  make_const (LineUsage_Dynamic));
+  line_usage_lib.Register ("get_Stream",   make_const (LineUsage_Stream));
+  line_usage_lib.Register ("get_Batching", make_const (LineUsage_Batching));
+
+  environment.RegisterType<LineUsage> (SCENE_STATIC_LINE_USAGE_LIBRARY);
+}
+
+void bind_line_model_library (Environment& environment)
+{
+  InvokerRegistry lib = environment.CreateLibrary (SCENE_LINE_MODEL_LIBRARY);
+
+    //регистрация статических библиотек
+
+  bind_static_line_model_library (environment);
+
+    //наследование
+
+  lib.Register (environment, SCENE_VISUAL_MODEL_LIBRARY);
+
+    //регистрация операций
+
+  lib.Register ("set_Material", make_invoker (&LineModel::SetMaterial));
+  lib.Register ("get_Material", make_invoker (&LineModel::Material));
+  lib.Register ("set_Usage",    make_invoker (&LineModel::SetUsage));
+  lib.Register ("get_Usage",    make_invoker (&LineModel::Usage));
+
+    //регистрация типов данных
+
+  environment.RegisterType<LineModel> (SCENE_LINE_MODEL_LIBRARY);
+}
+
+/*
+     Регистрация библиотеки работы с линиями
+*/
+
+void bind_line_library (Environment& environment)
+{
+  InvokerRegistry lib = environment.CreateLibrary (SCENE_LINE_LIBRARY);
+
+    //наследование
+
+  lib.Register (environment, SCENE_LINE_MODEL_LIBRARY);
+
+    //регистрация функций создания
+
+  lib.Register ("Create", make_invoker (&create_line));
+
+    //регистрация операций
+
+  lib.Register ("set_TexOffset",  make_invoker (&Line::SetTexOffset));
+  lib.Register ("get_TexOffset",  make_invoker (&Line::TexOffset));
+  lib.Register ("set_Color0",     make_invoker<void (Line*, const vec4f&)> (xtl::bind (implicit_cast<void (Line::*) (size_t, const vec4f&)> (&Line::SetColor), _1, 0, _2)));
+  lib.Register ("set_Alpha0",     make_invoker<void (Line*, float)> (xtl::bind (&Line::SetAlpha, _1, 0, _2)));
+  lib.Register ("get_Color0",     make_invoker<const vec4f& (const Line*)> (xtl::bind (&Line::Color, _1, 0)));
+  lib.Register ("get_Alpha0",     make_invoker<float (const Line*)> (xtl::bind (&Line::Alpha, _1, 0)));
+  lib.Register ("set_Color1",     make_invoker<void (Line*, const vec4f&)> (xtl::bind (implicit_cast<void (Line::*) (size_t, const vec4f&)> (&Line::SetColor), _1, 1, _2)));
+  lib.Register ("set_Alpha1",     make_invoker<void (Line*, float)> (xtl::bind (&Line::SetAlpha, _1, 1, _2)));
+  lib.Register ("get_Color1",     make_invoker<const vec4f& (const Line*)> (xtl::bind (&Line::Color, _1, 1)));
+  lib.Register ("get_Alpha1",     make_invoker<float (const Line*)> (xtl::bind (&Line::Alpha, _1, 1)));
+
+  lib.Register ("SetAlpha", make_invoker (&Line::SetAlpha));
+  lib.Register ("SetColor", make_invoker (make_invoker (implicit_cast<void (Line::*) (size_t, float, float, float, float)> (&Line::SetColor)),
+                                          make_invoker (implicit_cast<void (Line::*) (size_t, float, float, float)>        (&Line::SetColor)),
+                                          make_invoker (implicit_cast<void (Line::*) (size_t, const math::vec4f&)>         (&Line::SetColor))));
+
+    //регистрация типов данных
+
+  environment.RegisterType<Line> (SCENE_LINE_LIBRARY);
 }
 
 /*

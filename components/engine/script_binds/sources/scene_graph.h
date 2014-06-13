@@ -9,6 +9,7 @@
 #include <sg/helper.h>
 #include <sg/input.h>
 #include <sg/light.h>
+#include <sg/line.h>
 #include <sg/listener.h>
 #include <sg/mesh.h>
 #include <sg/node_array.h>
@@ -86,6 +87,9 @@ extern const char* SCENE_STATIC_NODE_ORT_LIBRARY;
 extern const char* SCENE_STATIC_NODE_EVENT_LIBRARY;
 extern const char* SCENE_STATIC_NODE_SUBTREE_EVENT_LIBRARY;
 extern const char* SCENE_STATIC_NODE_ARRAY_LINK_MODE_LIBRARY;
+extern const char* SCENE_STATIC_SPRITE_MODE_LIBRARY;
+extern const char* SCENE_STATIC_SPRITE_USAGE_LIBRARY;
+extern const char* SCENE_STATIC_LINE_USAGE_LIBRARY;
 extern const char* SCENE_STATIC_TEXT_LINE_ALIGNMENT_LIBRARY;
 extern const char* SCENE_STATIC_NODE_PROPERTY_TYPE_LIBRARY;
 extern const char* SCENE_STATIC_INPUT_ZONE_NOTIFICATION_LIBRARY;
@@ -109,6 +113,8 @@ extern const char* SCENE_LISTENER_LIBRARY;
 extern const char* SCENE_SOUND_EMITTER_LIBRARY;
 extern const char* SCENE_SPRITE_MODEL_LIBRARY;
 extern const char* SCENE_SPRITE_LIBRARY;
+extern const char* SCENE_LINE_MODEL_LIBRARY;
+extern const char* SCENE_LINE_LIBRARY;
 extern const char* SCENE_TEXT_LINE_LIBRARY;
 extern const char* SCENE_STATIC_MESH_LIBRARY;
 extern const char* SCENE_HEIGHT_MAP_LIBRARY;
@@ -140,6 +146,8 @@ void bind_page_curl_library                       (script::Environment&);
 void bind_sound_emitter_library                   (script::Environment&);
 void bind_sprite_model_library                    (script::Environment&);
 void bind_sprite_library                          (script::Environment&);
+void bind_line_model_library                      (script::Environment&);
+void bind_line_library                            (script::Environment&);
 void bind_text_line_library                       (script::Environment&);
 void bind_static_mesh_library                     (script::Environment&);
 void bind_height_map_library                      (script::Environment&);

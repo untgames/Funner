@@ -617,6 +617,35 @@ function test_sprite ()
   
 end
 
+function test_line ()
+  print ("Line test")
+
+  local line1 = Scene.Line.Create ()
+
+  print ("Color0 = " .. tostring (line1.Color0))
+  print ("Color1 = " .. tostring (line1.Color1))
+  print ("Material name = " .. line1.Material)
+
+  line1.Material = "SettedMaterial"
+  line1.Alpha0   = 0.8
+
+  print ("Alpha0 value = " .. tostring (line1.Alpha0))
+  print ("Material name = " .. line1.Material)
+   
+  line1.Color1    = vec4 (1, 0, 0, 0.7)
+
+  print ("Color1 = " .. tostring (line1.Color1))
+
+  line1:SetColor (0, 0, 0, 1, 0.3)
+
+  print ("Color0 = " .. tostring (line1.Color0))
+
+  line1:SetColor (1, 0, 1, 0)
+
+  print ("Color1 = " .. tostring (line1.Color1))
+  
+end
+
 function test_static_mesh ()
   print ("StaticMesh test")
 
@@ -969,6 +998,7 @@ function test ()
   test_static_mesh ()
 
   test_sprite ()
+  test_line ()
 
   test_scene ()
 

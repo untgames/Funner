@@ -207,6 +207,15 @@ Material name = SettedMaterial
 Color = 1 0 0 0.7
 Color = 0 0 1 0.3
 Color = 0 1 0 0.3
+Line test
+Color0 = 1 1 1 1
+Color1 = 1 1 1 1
+Material name = 
+Alpha0 value = 0.80000001192093
+Material name = SettedMaterial
+Color1 = 1 0 0 0.7
+Color0 = 0 0 1 0.3
+Color1 = 0 1 0 0.7
 Scene test
 Name = 
 Entities count = 0

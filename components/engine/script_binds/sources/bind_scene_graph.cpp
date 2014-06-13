@@ -21,6 +21,9 @@ const char* SCENE_STATIC_NODE_ARRAY_LINK_MODE_LIBRARY     = "Scene.NodeArrayLink
 const char* SCENE_STATIC_TEXT_LINE_ALIGNMENT_LIBRARY      = "Scene.TextLineAlignment";
 const char* SCENE_STATIC_NODE_PROPERTY_TYPE_LIBRARY       = "Scene.NodePropertyType";
 const char* SCENE_STATIC_INPUT_ZONE_NOTIFICATION_LIBRARY  = "Scene.InputZoneNotification";
+const char* SCENE_STATIC_SPRITE_MODE_LIBRARY              = "Scene.SpriteMode";
+const char* SCENE_STATIC_SPRITE_USAGE_LIBRARY             = "Scene.SpriteUsage";
+const char* SCENE_STATIC_LINE_USAGE_LIBRARY               = "Scene.LineUsage";
 const char* SCENE_CONTROLLER_OWNER_MODE_LIBRARY           = "Scene.ControllerOwnerMode";
 const char* SCENE_SCENE_LIBRARY                           = "Scene.Scene";
 const char* SCENE_NODE_LIBRARY                            = "Scene.Node";
@@ -41,6 +44,8 @@ const char* SCENE_LISTENER_LIBRARY                        = "Scene.Listener";
 const char* SCENE_SOUND_EMITTER_LIBRARY                   = "Scene.SoundEmitter";
 const char* SCENE_SPRITE_MODEL_LIBRARY                    = "Scene.SpriteModel";
 const char* SCENE_SPRITE_LIBRARY                          = "Scene.Sprite";
+const char* SCENE_LINE_MODEL_LIBRARY                      = "Scene.LineModel";
+const char* SCENE_LINE_LIBRARY                            = "Scene.Line";
 const char* SCENE_TEXT_LINE_LIBRARY                       = "Scene.TextLine";
 const char* SCENE_STATIC_MESH_LIBRARY                     = "Scene.StaticMesh";
 const char* SCENE_HEIGHT_MAP_LIBRARY                      = "Scene.HeightMap";
@@ -86,6 +91,8 @@ void bind_scene_graph_library (Environment& environment)
   bind_sound_emitter_library                   (environment);
   bind_sprite_model_library                    (environment);
   bind_sprite_library                          (environment);
+  bind_line_model_library                      (environment);
+  bind_line_library                            (environment);
   bind_text_line_library                       (environment);
   bind_static_mesh_library                     (environment);
   bind_height_map_library                      (environment);
