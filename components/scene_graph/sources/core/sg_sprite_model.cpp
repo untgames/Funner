@@ -171,12 +171,17 @@ const math::vec3f& SpriteModel::OrtUp () const
 }
 
 /*
-     оличество спрайтов / получение массива спрайтов
+     оличество спрайтов / размер буфера спрайтов / получение массива спрайтов
 */
 
 size_t SpriteModel::SpriteDescsCount () const
 {
   return const_cast<SpriteModel&> (*this).SpriteDescsCountCore ();
+}
+
+size_t SpriteModel::SpriteDescsCapacity () const
+{
+  return const_cast<SpriteModel&> (*this).SpriteDescsCapacityCore ();
 }
 
 const SpriteDesc* SpriteModel::SpriteDescs () const

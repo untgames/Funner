@@ -159,6 +159,11 @@ size_t Line::LineDescsCountCore ()
   return 1;
 }
 
+size_t Line::LineDescsCapacityCore ()
+{
+  return 1;
+}
+
 const LineDesc* Line::LineDescsCore ()
 {
   return &impl->line_desc;

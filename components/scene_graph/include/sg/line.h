@@ -56,10 +56,11 @@ class LineModel: public VisualModel
 {
   public:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Количество линий / получение массива линий
+///Количество линий / размер буфера линий / получение массива линий
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    size_t          LineDescsCount () const;
-    const LineDesc* LineDescs      () const;
+    size_t          LineDescsCount    () const;
+    size_t          LineDescsCapacity () const;
+    const LineDesc* LineDescs         () const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Материал
@@ -109,8 +110,9 @@ class LineModel: public VisualModel
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Реализация получения количества линий и массива линий
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    virtual size_t          LineDescsCountCore () = 0;
-    virtual const LineDesc* LineDescsCore      () = 0;
+    virtual size_t          LineDescsCountCore    () = 0;
+    virtual size_t          LineDescsCapacityCore () = 0;
+    virtual const LineDesc* LineDescsCore         () = 0;
     
   private:
     struct Impl;
@@ -168,8 +170,9 @@ class Line: public LineModel
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Реализация получения количества линий и массива линий
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    size_t          LineDescsCountCore ();
-    const LineDesc* LineDescsCore      ();        
+    size_t          LineDescsCountCore    ();
+    size_t          LineDescsCapacityCore ();
+    const LineDesc* LineDescsCore         ();        
 
   private:
     struct Impl;
@@ -239,8 +242,9 @@ class LineList: public LineModel
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Реализация получения количества линий и массива линий
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    size_t          LineDescsCountCore ();
-    const LineDesc* LineDescsCore      ();
+    size_t          LineDescsCountCore    ();
+    size_t          LineDescsCapacityCore ();
+    const LineDesc* LineDescsCore         ();
 
   private:
     struct Impl;

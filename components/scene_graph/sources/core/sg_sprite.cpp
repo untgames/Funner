@@ -146,6 +146,11 @@ size_t Sprite::SpriteDescsCountCore ()
   return 1;
 }
 
+size_t Sprite::SpriteDescsCapacityCore ()
+{
+  return 1;
+}
+
 const SpriteDesc* Sprite::SpriteDescsCore ()
 {
   return &impl->sprite_desc;

@@ -50,6 +50,11 @@ size_t LineList::LineDescsCountCore ()
   return impl->items.size ();
 }
 
+size_t LineList::LineDescsCapacityCore ()
+{
+  return impl->items.capacity ();
+}
+
 /*
     Изменение размера списка линий / резервирование места для хранения линий
 */

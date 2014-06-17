@@ -50,6 +50,11 @@ size_t SpriteList::SpriteDescsCountCore ()
   return impl->items.size ();
 }
 
+size_t SpriteList::SpriteDescsCapacityCore ()
+{
+  return impl->items.capacity ();
+}
+
 /*
     Изменение размера списка спрайтов / резервирование места для хранения спрайтов
 */

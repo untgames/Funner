@@ -115,12 +115,17 @@ LineUsage LineModel::Usage () const
 }
 
 /*
-    Количество линий / получение массива линий
+    Количество линий / размер буфера линий / получение массива линий
 */
 
 size_t LineModel::LineDescsCount () const
 {
   return const_cast<LineModel&> (*this).LineDescsCountCore ();
+}
+
+size_t LineModel::LineDescsCapacity () const
+{
+  return const_cast<LineModel&> (*this).LineDescsCapacityCore ();
 }
 
 const LineDesc* LineModel::LineDescs () const
