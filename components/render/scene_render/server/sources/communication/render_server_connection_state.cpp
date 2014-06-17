@@ -791,3 +791,107 @@ void ConnectionState::SetPageCurlParams (object_id_t id, const interchange::Page
     throw;
   }
 }
+
+void ConnectionState::SetSpriteListParams (object_id_t id, interchange::SpriteMode mode, interchange::PrimitiveUsage usage, const math::vec3f& up)
+{
+  try
+  {
+    throw xtl::make_not_implemented_exception (__FUNCTION__);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::scene::ConnectionState::SetSpriteListParams");
+    throw;
+  }
+}
+
+void ConnectionState::SetSpriteListMaterial (object_id_t id, const char* material)
+{
+  try
+  {
+    throw xtl::make_not_implemented_exception (__FUNCTION__);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::scene::ConnectionState::SetSpriteListMaterial");
+    throw;
+  }
+}
+
+void ConnectionState::SetSpriteListBuffer (object_id_t id, uint32 count, uint32 reserve_count)
+{
+  try
+  {
+    throw xtl::make_not_implemented_exception (__FUNCTION__);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::scene::ConnectionState::SetSpriteListBuffer");
+    throw;
+  }
+}
+
+void ConnectionState::SetSpriteListDescs (object_id_t id, uint32 first, interchange::RawArray<interchange::SpriteDesc> descs)
+{
+  try
+  {
+    throw xtl::make_not_implemented_exception (__FUNCTION__);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::scene::ConnectionState::SetSpriteListDescs");
+    throw;
+  }
+}
+
+void ConnectionState::SetLineListParams (object_id_t id, interchange::PrimitiveUsage usage)
+{
+  try
+  {
+    throw xtl::make_not_implemented_exception (__FUNCTION__);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::scene::ConnectionState::SetLineListParams");
+    throw;
+  }
+}
+
+void ConnectionState::SetLineListMaterial (object_id_t id, const char* material)
+{
+  try
+  {
+    throw xtl::make_not_implemented_exception (__FUNCTION__);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::scene::ConnectionState::SetLineListMaterial");
+    throw;
+  }
+}
+
+void ConnectionState::SetLineListBuffer (object_id_t id, uint32 count, uint32 reserve_count)
+{
+  try
+  {
+    throw xtl::make_not_implemented_exception (__FUNCTION__);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::scene::ConnectionState::SetLineListBuffer");
+    throw;
+  }
+}
+
+void ConnectionState::SetLineListDescs (object_id_t id, uint32 first, interchange::RawArray<interchange::LineDesc> descs)
+{
+  try
+  {
+    throw xtl::make_not_implemented_exception (__FUNCTION__);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::scene::ConnectionState::SetLineListDescs");
+    throw;
+  }
+}
