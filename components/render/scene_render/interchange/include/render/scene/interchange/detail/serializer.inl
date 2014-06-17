@@ -44,6 +44,14 @@ inline stl::string get_command_name(CommandId command_id)
     case CommandId_SetStaticMeshName: return "SetStaticMeshName";
     case CommandId_SetLightParams: return "SetLightParams";
     case CommandId_SetPageCurlParams: return "SetPageCurlParams";
+    case CommandId_SetSpriteListParams: return "SetSpriteListParams";
+    case CommandId_SetSpriteListMaterial: return "SetSpriteListMaterial";
+    case CommandId_SetSpriteListBuffer: return "SetSpriteListBuffer";
+    case CommandId_SetSpriteListDescs: return "SetSpriteListDescs";
+    case CommandId_SetLineListParams: return "SetLineListParams";
+    case CommandId_SetLineListMaterial: return "SetLineListMaterial";
+    case CommandId_SetLineListBuffer: return "SetLineListBuffer";
+    case CommandId_SetLineListDescs: return "SetLineListDescs";
     default: return common::format ("CommandId#%u", command_id);
   }
 }
@@ -810,6 +818,156 @@ inline void ClientToServerSerializer::SetPageCurlParams(object_id_t id, const Pa
   }
 }
 
+inline void ClientToServerSerializer::SetSpriteListParams(object_id_t id, SpriteMode mode, PrimitiveUsage usage, const math::vec3f& up)
+{
+  size_t saved_position = Position ();
+
+  try
+  {
+    BeginCommand(CommandId_SetSpriteListParams);
+    write(*this, id);
+    write(*this, mode);
+    write(*this, usage);
+    write(*this, up);
+    EndCommand();
+  }
+  catch (...)
+  {
+    SetPosition (saved_position);
+    throw;
+  }
+}
+
+inline void ClientToServerSerializer::SetSpriteListMaterial(object_id_t id, const char* material)
+{
+  size_t saved_position = Position ();
+
+  try
+  {
+    BeginCommand(CommandId_SetSpriteListMaterial);
+    write(*this, id);
+    write(*this, material);
+    EndCommand();
+  }
+  catch (...)
+  {
+    SetPosition (saved_position);
+    throw;
+  }
+}
+
+inline void ClientToServerSerializer::SetSpriteListBuffer(object_id_t id, uint32 count, uint32 reserve_count)
+{
+  size_t saved_position = Position ();
+
+  try
+  {
+    BeginCommand(CommandId_SetSpriteListBuffer);
+    write(*this, id);
+    write(*this, count);
+    write(*this, reserve_count);
+    EndCommand();
+  }
+  catch (...)
+  {
+    SetPosition (saved_position);
+    throw;
+  }
+}
+
+inline void ClientToServerSerializer::SetSpriteListDescs(object_id_t id, uint32 first, RawArray<SpriteDesc> descs)
+{
+  size_t saved_position = Position ();
+
+  try
+  {
+    BeginCommand(CommandId_SetSpriteListDescs);
+    write(*this, id);
+    write(*this, first);
+    write(*this, descs);
+    EndCommand();
+  }
+  catch (...)
+  {
+    SetPosition (saved_position);
+    throw;
+  }
+}
+
+inline void ClientToServerSerializer::SetLineListParams(object_id_t id, PrimitiveUsage usage)
+{
+  size_t saved_position = Position ();
+
+  try
+  {
+    BeginCommand(CommandId_SetLineListParams);
+    write(*this, id);
+    write(*this, usage);
+    EndCommand();
+  }
+  catch (...)
+  {
+    SetPosition (saved_position);
+    throw;
+  }
+}
+
+inline void ClientToServerSerializer::SetLineListMaterial(object_id_t id, const char* material)
+{
+  size_t saved_position = Position ();
+
+  try
+  {
+    BeginCommand(CommandId_SetLineListMaterial);
+    write(*this, id);
+    write(*this, material);
+    EndCommand();
+  }
+  catch (...)
+  {
+    SetPosition (saved_position);
+    throw;
+  }
+}
+
+inline void ClientToServerSerializer::SetLineListBuffer(object_id_t id, uint32 count, uint32 reserve_count)
+{
+  size_t saved_position = Position ();
+
+  try
+  {
+    BeginCommand(CommandId_SetLineListBuffer);
+    write(*this, id);
+    write(*this, count);
+    write(*this, reserve_count);
+    EndCommand();
+  }
+  catch (...)
+  {
+    SetPosition (saved_position);
+    throw;
+  }
+}
+
+inline void ClientToServerSerializer::SetLineListDescs(object_id_t id, uint32 first, RawArray<LineDesc> descs)
+{
+  size_t saved_position = Position ();
+
+  try
+  {
+    BeginCommand(CommandId_SetLineListDescs);
+    write(*this, id);
+    write(*this, first);
+    write(*this, descs);
+    EndCommand();
+  }
+  catch (...)
+  {
+    SetPosition (saved_position);
+    throw;
+  }
+}
+
 template <class Dispatcher> inline bool ClientToServerDeserializer::Deserialize(CommandId id, Dispatcher& dispatcher)
 {
   switch (id)
@@ -1189,6 +1347,84 @@ template <class Dispatcher> inline bool ClientToServerDeserializer::Deserialize(
       const char* arg6 = read(*this, xtl::type<const char* > ());
 
       dispatcher.SetPageCurlParams(arg1, arg2, arg3, arg4, arg5, arg6);
+
+      return true;
+    }
+    case CommandId_SetSpriteListParams:
+    {
+      object_id_t arg1 = read(*this, xtl::type<object_id_t > ());
+      SpriteMode arg2 = read(*this, xtl::type<SpriteMode > ());
+      PrimitiveUsage arg3 = read(*this, xtl::type<PrimitiveUsage > ());
+      const math::vec3f& arg4 = read(*this, xtl::type<const math::vec3f& > ());
+
+      dispatcher.SetSpriteListParams(arg1, arg2, arg3, arg4);
+
+      return true;
+    }
+    case CommandId_SetSpriteListMaterial:
+    {
+      object_id_t arg1 = read(*this, xtl::type<object_id_t > ());
+      const char* arg2 = read(*this, xtl::type<const char* > ());
+
+      dispatcher.SetSpriteListMaterial(arg1, arg2);
+
+      return true;
+    }
+    case CommandId_SetSpriteListBuffer:
+    {
+      object_id_t arg1 = read(*this, xtl::type<object_id_t > ());
+      uint32 arg2 = read(*this, xtl::type<uint32 > ());
+      uint32 arg3 = read(*this, xtl::type<uint32 > ());
+
+      dispatcher.SetSpriteListBuffer(arg1, arg2, arg3);
+
+      return true;
+    }
+    case CommandId_SetSpriteListDescs:
+    {
+      object_id_t arg1 = read(*this, xtl::type<object_id_t > ());
+      uint32 arg2 = read(*this, xtl::type<uint32 > ());
+      RawArray<SpriteDesc> arg3 = read(*this, xtl::type<RawArray<SpriteDesc> > ());
+
+      dispatcher.SetSpriteListDescs(arg1, arg2, arg3);
+
+      return true;
+    }
+    case CommandId_SetLineListParams:
+    {
+      object_id_t arg1 = read(*this, xtl::type<object_id_t > ());
+      PrimitiveUsage arg2 = read(*this, xtl::type<PrimitiveUsage > ());
+
+      dispatcher.SetLineListParams(arg1, arg2);
+
+      return true;
+    }
+    case CommandId_SetLineListMaterial:
+    {
+      object_id_t arg1 = read(*this, xtl::type<object_id_t > ());
+      const char* arg2 = read(*this, xtl::type<const char* > ());
+
+      dispatcher.SetLineListMaterial(arg1, arg2);
+
+      return true;
+    }
+    case CommandId_SetLineListBuffer:
+    {
+      object_id_t arg1 = read(*this, xtl::type<object_id_t > ());
+      uint32 arg2 = read(*this, xtl::type<uint32 > ());
+      uint32 arg3 = read(*this, xtl::type<uint32 > ());
+
+      dispatcher.SetLineListBuffer(arg1, arg2, arg3);
+
+      return true;
+    }
+    case CommandId_SetLineListDescs:
+    {
+      object_id_t arg1 = read(*this, xtl::type<object_id_t > ());
+      uint32 arg2 = read(*this, xtl::type<uint32 > ());
+      RawArray<LineDesc> arg3 = read(*this, xtl::type<RawArray<LineDesc> > ());
+
+      dispatcher.SetLineListDescs(arg1, arg2, arg3);
 
       return true;
     }

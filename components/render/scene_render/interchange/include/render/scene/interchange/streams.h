@@ -179,6 +179,8 @@ void write (OutputStream&, const char*);
 void write (OutputStream&, NodeType);
 void write (OutputStream&, const LightParams&);
 void write (OutputStream&, const PageCurlParams&);
+void write (OutputStream&, SpriteMode);
+void write (OutputStream&, PrimitiveUsage);
 
 template <class T, unsigned int Size> void write (OutputStream&, const math::vector<T, Size>&);
 template <class T, unsigned int Size> void write (OutputStream&, const math::matrix<T, Size>&);
@@ -206,6 +208,8 @@ const char*           read (InputStream&, xtl::type<const char*>);
 const NodeType&       read (InputStream&, xtl::type<NodeType>);
 const LightParams&    read (InputStream&, xtl::type<LightParams>);
 const PageCurlParams& read (InputStream&, xtl::type<PageCurlParams>);
+const SpriteMode&     read (InputStream&, xtl::type<SpriteMode>);
+const PrimitiveUsage& read (InputStream&, xtl::type<PrimitiveUsage>);
 
 template <class T, unsigned int Size> const math::vector<T, Size>& read (InputStream&, xtl::type<math::vector<T, Size> >);
 template <class T, unsigned int Size> const math::matrix<T, Size>& read (InputStream&, xtl::type<math::matrix<T, Size> >);

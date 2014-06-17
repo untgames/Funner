@@ -332,6 +332,8 @@ inline void write (OutputStream& s, float32 value)               { s.Write (valu
 inline void write (OutputStream& s, NodeType value)              { write (s, static_cast<int32> (value)); }
 inline void write (OutputStream& s, const LightParams& value)    { s.Write (value); }
 inline void write (OutputStream& s, const PageCurlParams& value) { s.Write (value); }
+inline void write (OutputStream& s, SpriteMode value)            { write (s, static_cast<int32> (value)); }
+inline void write (OutputStream& s, PrimitiveUsage value)        { write (s, static_cast<int32> (value)); }
 
 inline       bool            read (InputStream& s, xtl::type<bool>)           { return s.Read<bool8> () != 0; }
 inline const int64&          read (InputStream& s, xtl::type<int64>)          { return s.Read<int64> (); }
@@ -347,6 +349,8 @@ inline const Command&        read (InputStream& s, xtl::type<Command>)        { 
 inline const NodeType&       read (InputStream& s, xtl::type<NodeType>)       { return *reinterpret_cast<const NodeType*> (&read (s, xtl::type<int32> ())); }
 inline const LightParams&    read (InputStream& s, xtl::type<LightParams>)    { return s.Read<LightParams> (); }
 inline const PageCurlParams& read (InputStream& s, xtl::type<PageCurlParams>) { return s.Read<PageCurlParams> (); }
+inline const SpriteMode&     read (InputStream& s, xtl::type<SpriteMode>)     { return *reinterpret_cast<const SpriteMode*> (&read (s, xtl::type<int32> ())); }
+inline const PrimitiveUsage& read (InputStream& s, xtl::type<PrimitiveUsage>) { return *reinterpret_cast<const PrimitiveUsage*> (&read (s, xtl::type<int32> ())); }
 
 template <class T>
 inline const T& read (InputStream& s, xtl::type<T&>)
