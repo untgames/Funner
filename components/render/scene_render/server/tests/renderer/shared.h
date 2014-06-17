@@ -21,6 +21,7 @@
 #include <sg/mesh.h>
 #include <sg/page_curl.h>
 #include <sg/scene.h>
+#include <sg/sprite.h>
 
 #include <render/scene_render_client.h>
 #include <render/scene_render_server.h>

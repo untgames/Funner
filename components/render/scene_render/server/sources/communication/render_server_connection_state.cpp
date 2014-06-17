@@ -796,7 +796,7 @@ void ConnectionState::SetSpriteListParams (object_id_t id, interchange::SpriteMo
 {
   try
   {
-    throw xtl::make_not_implemented_exception (__FUNCTION__);
+    impl->server.SceneManager ().GetNode (id).Cast<SpriteList> ().SetParams (mode, usage, up);
   }
   catch (xtl::exception& e)
   {
@@ -809,7 +809,7 @@ void ConnectionState::SetSpriteListMaterial (object_id_t id, const char* materia
 {
   try
   {
-    throw xtl::make_not_implemented_exception (__FUNCTION__);
+    impl->server.SceneManager ().GetNode (id).Cast<SpriteList> ().SetMaterial (material);
   }
   catch (xtl::exception& e)
   {
@@ -822,7 +822,10 @@ void ConnectionState::SetSpriteListBuffer (object_id_t id, uint32 count, uint32 
 {
   try
   {
-    throw xtl::make_not_implemented_exception (__FUNCTION__);
+    SpriteList& list = impl->server.SceneManager ().GetNode (id).Cast<SpriteList> ();
+
+    list.Reserve (reserve_count);
+    list.Resize (count);
   }
   catch (xtl::exception& e)
   {
@@ -835,7 +838,7 @@ void ConnectionState::SetSpriteListDescs (object_id_t id, uint32 first, intercha
 {
   try
   {
-    throw xtl::make_not_implemented_exception (__FUNCTION__);
+    impl->server.SceneManager ().GetNode (id).Cast<SpriteList> ().SetDescs (first, descs.size, descs.data);
   }
   catch (xtl::exception& e)
   {

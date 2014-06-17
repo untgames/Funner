@@ -18,6 +18,7 @@
 #include <shared/sg/collection_visitor.h>
 #include <shared/sg/light.h>
 #include <shared/sg/page_curl.h>
+#include <shared/sg/sprite_list.h>
 #include <shared/sg/static_mesh.h>
 #include <shared/sg/traverse_result.h>
 #include <shared/sg/visual_model.h>
