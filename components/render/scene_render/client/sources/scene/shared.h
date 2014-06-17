@@ -49,6 +49,7 @@ Node* create_node (scene_graph::DirectLight&, SceneManager& scene_manager);
 Node* create_node (scene_graph::SpotLight&, SceneManager& scene_manager);
 Node* create_node (scene_graph::PageCurl&, SceneManager& scene_manager);
 Node* create_node (scene_graph::SpriteModel&, SceneManager& scene_manager);
+Node* create_node (scene_graph::LineModel&, SceneManager& scene_manager);
 
 }
 
