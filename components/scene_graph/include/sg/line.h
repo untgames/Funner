@@ -12,8 +12,8 @@ namespace scene_graph
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 enum LineModelEvent
 {
-  LineModelEvent_AfterLineDescsUpdate,   //срабатывает после изменения данных линий
-  LineModelEvent_AfterModeUsageUpUpdate, //срабатывает после изменения Mode/Usage/UpDirection параметров
+  LineModelEvent_AfterLineDescsUpdate,      //срабатывает после изменения данных линий
+  LineModelEvent_AfterCreationParamsUpdate, //срабатывает после изменения Usage/Batch параметров
 
   LineModelEvent_Num
 };

@@ -14,13 +14,12 @@ class SpriteList: public VisualModel
     SpriteList (scene_graph::SpriteModel& model, SceneManager& manager)
       : VisualModel (model, manager, interchange::NodeType_SpriteList)
       , on_update_descs_connection (model.RegisterEventHandler (scene_graph::SpriteModelEvent_AfterSpriteDescsUpdate, xtl::bind (&SpriteList::UpdateDescsNotify, this)))
-      , on_update_params_connection (model.RegisterEventHandler (scene_graph::SpriteModelEvent_AfterModeUsageUpUpdate, xtl::bind (&SpriteList::UpdateParamsNotify, this)))
+      , on_update_params_connection (model.RegisterEventHandler (scene_graph::SpriteModelEvent_AfterCreationParamsUpdate, xtl::bind (&SpriteList::UpdateParamsNotify, this)))
       , need_update_descs (true)
       , need_update_params (true)
       , cached_descs_count ()
       , cached_descs_capacity ()
       , material_name_hash ()
-      , batch_name_hash ()
     {
     }
 
@@ -36,16 +35,6 @@ class SpriteList: public VisualModel
         VisualModel::UpdateCore (context);
 
         scene_graph::SpriteModel& model = SourceNode ();
-
-        size_t model_batch_name_hash = model.BatchHash ();
-
-        if (batch_name_hash != model_batch_name_hash)
-        {
-          context.SetSpriteListBatch (Id (), model.Batch ());
-
-          need_update_descs = true;
-          batch_name_hash   = model_batch_name_hash;
-        }
 
         if (need_update_params)
         {
@@ -70,8 +59,9 @@ class SpriteList: public VisualModel
             case scene_graph::SpriteUsage_Batching: usage = interchange::PrimitiveUsage_Batching; break;
           }
 
-          context.SetSpriteListParams (Id (), mode, usage, model.OrtUp ());
+          context.SetSpriteListParams (Id (), mode, usage, model.OrtUp (), model.Batch ());
 
+          need_update_descs  = true;
           need_update_params = false;
         }
 
@@ -122,7 +112,6 @@ class SpriteList: public VisualModel
     size_t               cached_descs_count;
     size_t               cached_descs_capacity;
     size_t               material_name_hash;
-    size_t               batch_name_hash;
 };
 
 }

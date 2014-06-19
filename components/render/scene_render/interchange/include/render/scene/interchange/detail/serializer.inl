@@ -46,12 +46,10 @@ inline stl::string get_command_name(CommandId command_id)
     case CommandId_SetPageCurlParams: return "SetPageCurlParams";
     case CommandId_SetSpriteListParams: return "SetSpriteListParams";
     case CommandId_SetSpriteListMaterial: return "SetSpriteListMaterial";
-    case CommandId_SetSpriteListBatch: return "SetSpriteListBatch";
     case CommandId_SetSpriteListBuffer: return "SetSpriteListBuffer";
     case CommandId_SetSpriteListDescs: return "SetSpriteListDescs";
     case CommandId_SetLineListParams: return "SetLineListParams";
     case CommandId_SetLineListMaterial: return "SetLineListMaterial";
-    case CommandId_SetLineListBatch: return "SetLineListBatch";
     case CommandId_SetLineListBuffer: return "SetLineListBuffer";
     case CommandId_SetLineListDescs: return "SetLineListDescs";
     default: return common::format ("CommandId#%u", command_id);
@@ -820,7 +818,7 @@ inline void ClientToServerSerializer::SetPageCurlParams(object_id_t id, const Pa
   }
 }
 
-inline void ClientToServerSerializer::SetSpriteListParams(object_id_t id, SpriteMode mode, PrimitiveUsage usage, const math::vec3f& up)
+inline void ClientToServerSerializer::SetSpriteListParams(object_id_t id, SpriteMode mode, PrimitiveUsage usage, const math::vec3f& up, const char* batch)
 {
   size_t saved_position = Position ();
 
@@ -831,6 +829,7 @@ inline void ClientToServerSerializer::SetSpriteListParams(object_id_t id, Sprite
     write(*this, mode);
     write(*this, usage);
     write(*this, up);
+    write(*this, batch);
     EndCommand();
   }
   catch (...)
@@ -849,24 +848,6 @@ inline void ClientToServerSerializer::SetSpriteListMaterial(object_id_t id, cons
     BeginCommand(CommandId_SetSpriteListMaterial);
     write(*this, id);
     write(*this, material);
-    EndCommand();
-  }
-  catch (...)
-  {
-    SetPosition (saved_position);
-    throw;
-  }
-}
-
-inline void ClientToServerSerializer::SetSpriteListBatch(object_id_t id, const char* batch)
-{
-  size_t saved_position = Position ();
-
-  try
-  {
-    BeginCommand(CommandId_SetSpriteListBatch);
-    write(*this, id);
-    write(*this, batch);
     EndCommand();
   }
   catch (...)
@@ -914,7 +895,7 @@ inline void ClientToServerSerializer::SetSpriteListDescs(object_id_t id, uint32 
   }
 }
 
-inline void ClientToServerSerializer::SetLineListParams(object_id_t id, PrimitiveUsage usage)
+inline void ClientToServerSerializer::SetLineListParams(object_id_t id, PrimitiveUsage usage, const char* batch)
 {
   size_t saved_position = Position ();
 
@@ -923,6 +904,7 @@ inline void ClientToServerSerializer::SetLineListParams(object_id_t id, Primitiv
     BeginCommand(CommandId_SetLineListParams);
     write(*this, id);
     write(*this, usage);
+    write(*this, batch);
     EndCommand();
   }
   catch (...)
@@ -941,24 +923,6 @@ inline void ClientToServerSerializer::SetLineListMaterial(object_id_t id, const 
     BeginCommand(CommandId_SetLineListMaterial);
     write(*this, id);
     write(*this, material);
-    EndCommand();
-  }
-  catch (...)
-  {
-    SetPosition (saved_position);
-    throw;
-  }
-}
-
-inline void ClientToServerSerializer::SetLineListBatch(object_id_t id, const char* batch)
-{
-  size_t saved_position = Position ();
-
-  try
-  {
-    BeginCommand(CommandId_SetLineListBatch);
-    write(*this, id);
-    write(*this, batch);
     EndCommand();
   }
   catch (...)
@@ -1394,8 +1358,9 @@ template <class Dispatcher> inline bool ClientToServerDeserializer::Deserialize(
       SpriteMode arg2 = read(*this, xtl::type<SpriteMode > ());
       PrimitiveUsage arg3 = read(*this, xtl::type<PrimitiveUsage > ());
       const math::vec3f& arg4 = read(*this, xtl::type<const math::vec3f& > ());
+      const char* arg5 = read(*this, xtl::type<const char* > ());
 
-      dispatcher.SetSpriteListParams(arg1, arg2, arg3, arg4);
+      dispatcher.SetSpriteListParams(arg1, arg2, arg3, arg4, arg5);
 
       return true;
     }
@@ -1405,15 +1370,6 @@ template <class Dispatcher> inline bool ClientToServerDeserializer::Deserialize(
       const char* arg2 = read(*this, xtl::type<const char* > ());
 
       dispatcher.SetSpriteListMaterial(arg1, arg2);
-
-      return true;
-    }
-    case CommandId_SetSpriteListBatch:
-    {
-      object_id_t arg1 = read(*this, xtl::type<object_id_t > ());
-      const char* arg2 = read(*this, xtl::type<const char* > ());
-
-      dispatcher.SetSpriteListBatch(arg1, arg2);
 
       return true;
     }
@@ -1441,8 +1397,9 @@ template <class Dispatcher> inline bool ClientToServerDeserializer::Deserialize(
     {
       object_id_t arg1 = read(*this, xtl::type<object_id_t > ());
       PrimitiveUsage arg2 = read(*this, xtl::type<PrimitiveUsage > ());
+      const char* arg3 = read(*this, xtl::type<const char* > ());
 
-      dispatcher.SetLineListParams(arg1, arg2);
+      dispatcher.SetLineListParams(arg1, arg2, arg3);
 
       return true;
     }
@@ -1452,15 +1409,6 @@ template <class Dispatcher> inline bool ClientToServerDeserializer::Deserialize(
       const char* arg2 = read(*this, xtl::type<const char* > ());
 
       dispatcher.SetLineListMaterial(arg1, arg2);
-
-      return true;
-    }
-    case CommandId_SetLineListBatch:
-    {
-      object_id_t arg1 = read(*this, xtl::type<object_id_t > ());
-      const char* arg2 = read(*this, xtl::type<const char* > ());
-
-      dispatcher.SetLineListBatch(arg1, arg2);
 
       return true;
     }

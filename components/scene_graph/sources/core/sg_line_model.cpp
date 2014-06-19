@@ -102,6 +102,8 @@ void LineModel::SetBatch (const char* in_batch)
   impl->batch      = in_batch;  
   impl->batch_hash = hash;
 
+  impl->Notify (*this, LineModelEvent_AfterCreationParamsUpdate);
+
   UpdateNotify ();
 }
 
@@ -137,7 +139,7 @@ void LineModel::SetUsage (LineUsage usage)
 
   impl->usage = usage;
 
-  impl->Notify (*this, LineModelEvent_AfterModeUsageUpUpdate);
+  impl->Notify (*this, LineModelEvent_AfterCreationParamsUpdate);
 
   UpdateNotify ();
 }
@@ -185,7 +187,7 @@ xtl::connection LineModel::RegisterEventHandler (LineModelEvent event, const Eve
   switch (event)
   {
     case LineModelEvent_AfterLineDescsUpdate:
-    case LineModelEvent_AfterModeUsageUpUpdate:
+    case LineModelEvent_AfterCreationParamsUpdate:
       break;
     default:
       throw xtl::make_argument_exception ("scene_graph::LineModel::RegisterEventHandler", "event", event);

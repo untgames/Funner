@@ -792,11 +792,11 @@ void ConnectionState::SetPageCurlParams (object_id_t id, const interchange::Page
   }
 }
 
-void ConnectionState::SetSpriteListParams (object_id_t id, interchange::SpriteMode mode, interchange::PrimitiveUsage usage, const math::vec3f& up)
+void ConnectionState::SetSpriteListParams (object_id_t id, interchange::SpriteMode mode, interchange::PrimitiveUsage usage, const math::vec3f& up, const char* batch)
 {
   try
   {
-    impl->server.SceneManager ().GetNode (id).Cast<SpriteList> ().SetParams (mode, usage, up);
+    impl->server.SceneManager ().GetNode (id).Cast<SpriteList> ().SetParams (mode, usage, up, batch);
   }
   catch (xtl::exception& e)
   {
@@ -814,19 +814,6 @@ void ConnectionState::SetSpriteListMaterial (object_id_t id, const char* materia
   catch (xtl::exception& e)
   {
     e.touch ("render::scene::ConnectionState::SetSpriteListMaterial");
-    throw;
-  }
-}
-
-void ConnectionState::SetSpriteListBatch (object_id_t id, const char* batch)
-{
-  try
-  {
-    impl->server.SceneManager ().GetNode (id).Cast<SpriteList> ().SetBatch (batch);
-  }
-  catch (xtl::exception& e)
-  {
-    e.touch ("render::scene::ConnectionState::SetSpriteListBatch");
     throw;
   }
 }
@@ -860,11 +847,11 @@ void ConnectionState::SetSpriteListDescs (object_id_t id, uint32 first, intercha
   }
 }
 
-void ConnectionState::SetLineListParams (object_id_t id, interchange::PrimitiveUsage usage)
+void ConnectionState::SetLineListParams (object_id_t id, interchange::PrimitiveUsage usage, const char* batch)
 {
   try
   {
-    impl->server.SceneManager ().GetNode (id).Cast<LineList> ().SetParams (usage);
+    impl->server.SceneManager ().GetNode (id).Cast<LineList> ().SetParams (usage, batch);
   }
   catch (xtl::exception& e)
   {
@@ -882,19 +869,6 @@ void ConnectionState::SetLineListMaterial (object_id_t id, const char* material)
   catch (xtl::exception& e)
   {
     e.touch ("render::scene::ConnectionState::SetLineListMaterial");
-    throw;
-  }
-}
-
-void ConnectionState::SetLineListBatch (object_id_t id, const char* batch)
-{
-  try
-  {
-    impl->server.SceneManager ().GetNode (id).Cast<LineList> ().SetBatch (batch);
-  }
-  catch (xtl::exception& e)
-  {
-    e.touch ("render::scene::ConnectionState::SetLineListBatch");
     throw;
   }
 }

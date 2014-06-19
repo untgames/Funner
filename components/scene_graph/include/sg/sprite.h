@@ -12,8 +12,8 @@ namespace scene_graph
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 enum SpriteModelEvent
 {
-  SpriteModelEvent_AfterSpriteDescsUpdate, //срабатывает после изменения данных спрайтов
-  SpriteModelEvent_AfterModeUsageUpUpdate, //срабатывает после изменения Mode/Usage/UpDirection параметров
+  SpriteModelEvent_AfterSpriteDescsUpdate,    //срабатывает после изменения данных спрайтов
+  SpriteModelEvent_AfterCreationParamsUpdate, //срабатывает после изменения Mode/Usage/UpDirection/Batch параметров
 
   SpriteModelEvent_Num
 };

@@ -14,7 +14,6 @@ struct LineList::Impl
   RenderManager                      render_manager;        //менеджер рендеринга
   PrimitiveUsage                     usage;                 //режим использования
   stl::string                        batch_name;            //имя пакета
-  bool                               need_create_primitive; //требование пересоздать примитив
   stl::auto_ptr<manager::LineList>   list;                  //список спрайтов
   size_t                             descs_count;           //количество спрайтов
 
@@ -23,38 +22,15 @@ struct LineList::Impl
     : entity (in_entity)
     , render_manager (in_render_manager)
     , usage (interchange::PrimitiveUsage_Batching)
-    , need_create_primitive (true)
     , descs_count ()
   {
   }
 
-/// Сброс примитива
-  manager::Primitive GetPrimitive ()
-  {
-    try
-    {
-      if (!need_create_primitive)
-        return entity.Primitive ();
-
-      manager::PrimitiveBuffers buffers   = render_manager.BatchingManager ().GetBatch (batch_name.c_str ());
-      manager::Primitive        primitive = render_manager.Manager ().CreatePrimitive (buffers);
-
-      entity.SetPrimitive (primitive);
-
-      need_create_primitive = false;
-
-      return primitive;
-    }
-    catch (xtl::exception& e)
-    {
-      e.touch ("render::scene::server::LineList::Impl::GetPrimitive");
-      throw;
-    }
-  }
-
 /// Обновление списка спрайтов
-  void ResetLineList (PrimitiveUsage in_usage)
+  void ResetLineList (PrimitiveUsage in_usage, const char* batch_name)
   {
+    entity.ResetPrimitive ();
+
     size_t reserve_size = 0;
     
     stl::string material_name;
@@ -65,13 +41,17 @@ struct LineList::Impl
       material_name = list->Material ();
     }
 
-    manager::Primitive primitive = GetPrimitive ();
-
     switch (in_usage)
     {
       case interchange::PrimitiveUsage_Batching:
       {
+        manager::PrimitiveBuffers buffers   = render_manager.BatchingManager ().GetBatch (batch_name);
+        manager::Primitive        primitive = render_manager.Manager ().CreatePrimitive (buffers);
+
         list.reset (new manager::LineList (primitive.AddBatchingLineList ()));
+
+        entity.SetPrimitive (primitive);
+
         break;
       }
       case interchange::PrimitiveUsage_Static:
@@ -88,7 +68,11 @@ struct LineList::Impl
           case interchange::PrimitiveUsage_Stream:  usage = manager::MeshBufferUsage_Stream; break;
         }
 
+        manager::Primitive primitive = render_manager.Manager ().CreatePrimitive ();
+
         list.reset (new manager::LineList (primitive.AddStandaloneLineList (usage, usage)));
+
+        entity.SetPrimitive (primitive);
 
         break;
       }
@@ -100,11 +84,6 @@ struct LineList::Impl
       list->Reserve (reserve_size);
 
     list->SetMaterial (material_name.c_str ());
-  }
-
-  void ResetLineList ()
-  {
-    ResetLineList (usage);
   }
 };
 
@@ -134,13 +113,20 @@ LineList::~LineList ()
     Основные параметры
 */
 
-void LineList::SetParams (PrimitiveUsage in_usage)
+void LineList::SetParams (PrimitiveUsage in_usage, const char* batch)
 {
   try
   {
-    impl->ResetLineList (in_usage);
+    if (!batch)
+      throw xtl::make_null_argument_exception ("", "batch");
+
+    stl::string batch_str = batch;
+
+    impl->ResetLineList (in_usage, batch);
 
     impl->usage = in_usage;
+
+    stl::swap (batch_str, impl->batch_name);
   }
   catch (xtl::exception& e)
   {
@@ -152,6 +138,11 @@ void LineList::SetParams (PrimitiveUsage in_usage)
 PrimitiveUsage LineList::Usage () const
 {
   return impl->usage;
+}
+
+const char* LineList::Batch () const
+{
+  return impl->batch_name.c_str ();
 }
 
 /*
@@ -180,38 +171,6 @@ void LineList::SetMaterial (const char* name)
 const char* LineList::Material () const
 {
   return impl->list ? impl->list->Material () : "";
-}
-
-/*
-    Имя пакета
-*/
-
-void LineList::SetBatch (const char* name)
-{
-  try
-  {
-    if (!name)
-      throw xtl::make_null_argument_exception ("", "name");
-
-    impl->batch_name = name;
-
-    bool need_reset = !impl->need_create_primitive;
-
-    impl->need_create_primitive = true;
- 
-    if (need_reset)
-      impl->ResetLineList ();
-  }
-  catch (xtl::exception& e)
-  {
-    e.touch ("render::scene::server::LineList::SetMaterial");
-    throw;
-  }
-}
-
-const char* LineList::Batch () const
-{
-  return impl->batch_name.c_str ();
 }
 
 /*

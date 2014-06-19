@@ -16,7 +16,6 @@ struct SpriteList::Impl
   PrimitiveUsage                     usage;                 //режим использования
   math::vec3f                        up;                    //вектор "вверх"
   stl::string                        batch_name;            //имя пакета
-  bool                               need_create_primitive; //требование пересоздать примитив
   stl::auto_ptr<manager::SpriteList> list;                  //список спрайтов
   size_t                             descs_count;           //количество спрайтов
 
@@ -27,38 +26,15 @@ struct SpriteList::Impl
     , mode (interchange::SpriteMode_Billboard)
     , usage (interchange::PrimitiveUsage_Batching)
     , up (0, 1.0f, 0)
-    , need_create_primitive (true)
     , descs_count ()
   {
   }
 
-/// Сброс примитива
-  manager::Primitive GetPrimitive ()
-  {
-    try
-    {
-      if (!need_create_primitive)
-        return entity.Primitive ();
-
-      manager::PrimitiveBuffers buffers   = render_manager.BatchingManager ().GetBatch (batch_name.c_str ());
-      manager::Primitive        primitive = render_manager.Manager ().CreatePrimitive (buffers);
-
-      entity.SetPrimitive (primitive);
-
-      need_create_primitive = false;
-
-      return primitive;
-    }
-    catch (xtl::exception& e)
-    {
-      e.touch ("render::scene::server::SpriteList::Impl::GetPrimitive");
-      throw;
-    }
-  }
-
 /// Обновление списка спрайтов
-  void ResetSpriteList (SpriteMode in_mode, PrimitiveUsage in_usage, const math::vec3f& up)
+  void ResetSpriteList (SpriteMode in_mode, PrimitiveUsage in_usage, const math::vec3f& up, const char* batch_name)
   {
+    entity.ResetPrimitive ();
+
     size_t reserve_size = 0;
     
     stl::string material_name;
@@ -79,13 +55,17 @@ struct SpriteList::Impl
       default:                                        throw xtl::make_argument_exception ("", "mode", in_mode);
     }
 
-    manager::Primitive primitive = GetPrimitive ();
-
     switch (in_usage)
     {
       case interchange::PrimitiveUsage_Batching:
       {
+        manager::PrimitiveBuffers buffers   = render_manager.BatchingManager ().GetBatch (batch_name);
+        manager::Primitive        primitive = render_manager.Manager ().CreatePrimitive (buffers);
+
         list.reset (new manager::SpriteList (primitive.AddBatchingSpriteList (mode, up)));
+
+        entity.SetPrimitive (primitive);
+
         break;
       }
       case interchange::PrimitiveUsage_Static:
@@ -102,7 +82,11 @@ struct SpriteList::Impl
           case interchange::PrimitiveUsage_Stream:  usage = manager::MeshBufferUsage_Stream; break;
         }
 
+        manager::Primitive primitive = render_manager.Manager ().CreatePrimitive ();
+
         list.reset (new manager::SpriteList (primitive.AddStandaloneSpriteList (mode, up, usage, usage)));
+
+        entity.SetPrimitive (primitive);
 
         break;
       }
@@ -114,11 +98,6 @@ struct SpriteList::Impl
       list->Reserve (reserve_size);
 
     list->SetMaterial (material_name.c_str ());
-  }
-
-  void ResetSpriteList ()
-  {
-    ResetSpriteList (mode, usage, up);
   }
 };
 
@@ -148,15 +127,22 @@ SpriteList::~SpriteList ()
     Основные параметры
 */
 
-void SpriteList::SetParams (SpriteMode in_mode, PrimitiveUsage in_usage, const math::vec3f& up)
+void SpriteList::SetParams (SpriteMode in_mode, PrimitiveUsage in_usage, const math::vec3f& up, const char* batch)
 {
   try
   {
-    impl->ResetSpriteList (in_mode, in_usage, up);
+    if (!batch)
+      throw xtl::make_null_argument_exception ("", "batch");
+
+    stl::string batch_str = batch;
+
+    impl->ResetSpriteList (in_mode, in_usage, up, batch);
 
     impl->mode  = in_mode;
     impl->usage = in_usage;
     impl->up    = up;
+
+    stl::swap (batch_str, impl->batch_name);
   }
   catch (xtl::exception& e)
   {
@@ -178,6 +164,11 @@ PrimitiveUsage SpriteList::Usage () const
 const math::vec3f& SpriteList::OrtUp () const
 {
   return impl->up;
+}
+
+const char* SpriteList::Batch () const
+{
+  return impl->batch_name.c_str ();
 }
 
 /*
@@ -206,38 +197,6 @@ void SpriteList::SetMaterial (const char* name)
 const char* SpriteList::Material () const
 {
   return impl->list ? impl->list->Material () : "";
-}
-
-/*
-    Имя пакета
-*/
-
-void SpriteList::SetBatch (const char* name)
-{
-  try
-  {
-    if (!name)
-      throw xtl::make_null_argument_exception ("", "name");
-
-    impl->batch_name = name;
-
-    bool need_reset = !impl->need_create_primitive;
-
-    impl->need_create_primitive = true;
- 
-    if (need_reset)
-      impl->ResetSpriteList ();
-  }
-  catch (xtl::exception& e)
-  {
-    e.touch ("render::scene::server::SpriteList::SetMaterial");
-    throw;
-  }
-}
-
-const char* SpriteList::Batch () const
-{
-  return impl->batch_name.c_str ();
 }
 
 /*

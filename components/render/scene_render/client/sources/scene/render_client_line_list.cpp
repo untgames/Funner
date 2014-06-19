@@ -14,13 +14,12 @@ class LineList: public VisualModel
     LineList (scene_graph::LineModel& model, SceneManager& manager)
       : VisualModel (model, manager, interchange::NodeType_LineList)
       , on_update_descs_connection (model.RegisterEventHandler (scene_graph::LineModelEvent_AfterLineDescsUpdate, xtl::bind (&LineList::UpdateDescsNotify, this)))
-      , on_update_params_connection (model.RegisterEventHandler (scene_graph::LineModelEvent_AfterModeUsageUpUpdate, xtl::bind (&LineList::UpdateParamsNotify, this)))
+      , on_update_params_connection (model.RegisterEventHandler (scene_graph::LineModelEvent_AfterCreationParamsUpdate, xtl::bind (&LineList::UpdateParamsNotify, this)))
       , need_update_descs (true)
       , need_update_params (true)
       , cached_descs_count ()
       , cached_descs_capacity ()
       , material_name_hash ()
-      , batch_name_hash ()
     {
     }
 
@@ -37,16 +36,6 @@ class LineList: public VisualModel
 
         scene_graph::LineModel& model = SourceNode ();
 
-        size_t model_batch_name_hash = model.BatchHash ();
-
-        if (batch_name_hash != model_batch_name_hash)
-        {
-          context.SetLineListBatch (Id (), model.Batch ());
-
-          need_update_descs = true;
-          batch_name_hash   = model_batch_name_hash;
-        }
-
         if (need_update_params)
         {
           interchange::PrimitiveUsage usage;
@@ -60,8 +49,9 @@ class LineList: public VisualModel
             case scene_graph::LineUsage_Batching: usage = interchange::PrimitiveUsage_Batching; break;
           }
 
-          context.SetLineListParams (Id (), usage);
+          context.SetLineListParams (Id (), usage, model.Batch ());
 
+          need_update_descs  = true;
           need_update_params = false;
         }
 
@@ -112,7 +102,6 @@ class LineList: public VisualModel
     size_t               cached_descs_count;
     size_t               cached_descs_capacity;
     size_t               material_name_hash;
-    size_t               batch_name_hash;
 };
 
 }

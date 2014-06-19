@@ -106,6 +106,8 @@ void SpriteModel::SetBatch (const char* in_batch)
   impl->batch      = in_batch;  
   impl->batch_hash = hash;
 
+  impl->Notify (*this, SpriteModelEvent_AfterCreationParamsUpdate);
+
   UpdateNotify ();
 }
 
@@ -140,7 +142,7 @@ void SpriteModel::SetMode (SpriteMode mode)
 
   impl->mode = mode;
 
-  impl->Notify (*this, SpriteModelEvent_AfterModeUsageUpUpdate);
+  impl->Notify (*this, SpriteModelEvent_AfterCreationParamsUpdate);
 
   UpdateNotify ();
 }
@@ -172,7 +174,7 @@ void SpriteModel::SetUsage (SpriteUsage usage)
 
   impl->usage = usage;
 
-  impl->Notify (*this, SpriteModelEvent_AfterModeUsageUpUpdate);
+  impl->Notify (*this, SpriteModelEvent_AfterCreationParamsUpdate);
 
   UpdateNotify ();
 }
@@ -193,7 +195,7 @@ void SpriteModel::SetOrtUp (const math::vec3f& up)
 
   impl->up = up;
 
-  impl->Notify (*this, SpriteModelEvent_AfterModeUsageUpUpdate);  
+  impl->Notify (*this, SpriteModelEvent_AfterCreationParamsUpdate);  
 
   UpdateNotify ();
 }
@@ -241,7 +243,7 @@ xtl::connection SpriteModel::RegisterEventHandler (SpriteModelEvent event, const
   switch (event)
   {
     case SpriteModelEvent_AfterSpriteDescsUpdate:
-    case SpriteModelEvent_AfterModeUsageUpUpdate:
+    case SpriteModelEvent_AfterCreationParamsUpdate:
       break;
     default:
       throw xtl::make_argument_exception ("scene_graph::SpriteModel::RegisterEventHandler", "event", event);
