@@ -328,3 +328,5 @@ technique "default"
     effect "lighting"
   }
 }
+
+batch '*'

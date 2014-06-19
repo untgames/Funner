@@ -59,6 +59,8 @@ struct RenderManager::Impl: public ServerLog, public xtl::reference_counter
   {
     common::ParseNode configuration = render_manager.Configuration ();
 
+    batching_manager.ReloadConfiguration (configuration);
+
     for (ListenerArray::iterator iter=listeners.begin (), end=listeners.end (); iter!=end; ++iter)
     {
       try

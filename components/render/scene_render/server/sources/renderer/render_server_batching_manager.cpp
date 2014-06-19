@@ -4,6 +4,13 @@ using namespace render::scene::server;
 using namespace render::scene;
 
 /*
+    Константы
+*/
+
+const size_t DEFAULT_BATCH_VERTICES_COUNT = 8192;                             //резервируемое количество вершин в пакете
+const size_t DEFAULT_BATCH_INDICES_COUNT  = DEFAULT_BATCH_VERTICES_COUNT * 2; //резервируемое количество индексов в пакете
+
+/*
     Описание реализации менеджера пакетирования
 */
 
@@ -108,7 +115,7 @@ render::manager::PrimitiveBuffers BatchingManager::GetBatch (const char* name)
     if (iter != impl->batches.end ())
       return iter->second;
 
-    for (BatchGroupList::iterator iter=impl->batch_groups.begin (), end=impl->batch_groups.end (); iter!=end; ++iter)
+    for (BatchGroupList::reverse_iterator iter=impl->batch_groups.rbegin (), end=impl->batch_groups.rend (); iter!=end; ++iter)
     {
       BatchGroup& group = **iter;
 
@@ -154,4 +161,30 @@ void BatchingManager::Clear ()
 {
   RemoveAllBatchGroups ();
   RemoveAllBatches ();
+}
+
+/*
+    Перезагрузка конфигурации
+*/
+
+void BatchingManager::ReloadConfiguration (const common::ParseNode& node)
+{
+  try
+  {
+    for (common::ParseNamesakeIterator iter=node.First ("batch"); iter; ++iter)
+    {
+      common::Parser::AttributeIterator attr_iter = make_attribute_iterator (*iter);
+
+      const char* wildcard    = xtl::io::get<const char*> (attr_iter);
+      size_t      verts_count = xtl::io::get<size_t> (attr_iter, DEFAULT_BATCH_VERTICES_COUNT),
+                  inds_count  = xtl::io::get<size_t> (attr_iter, DEFAULT_BATCH_INDICES_COUNT);
+
+      AddBatchGroup (wildcard, verts_count, inds_count);
+    }
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::scene::server::BatchingManager::ReloadConfiguration");
+    throw;
+  }
 }

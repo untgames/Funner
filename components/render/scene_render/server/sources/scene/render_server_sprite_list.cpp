@@ -4,34 +4,121 @@ using namespace render;
 using namespace render::scene;
 using namespace render::scene::server;
 
-//TODO: add shared primitive buffers support
-
 /*
     Описание реализации списка спрайтов
 */
 
 struct SpriteList::Impl
 {
-  manager::Entity&                   entity;         //сущность
-  SpriteMode                         mode;           //режим спрайтов
-  PrimitiveUsage                     usage;          //режим использования
-  math::vec3f                        up;             //вектор "вверх"
-  manager::Primitive                 primitive;      //примитив рендеринга
-  stl::auto_ptr<manager::SpriteList> list;           //список спрайтов
-  size_t                             descs_count;    //количество спрайтов
+  manager::Entity&                   entity;                //сущность
+  RenderManager                      render_manager;        //менеджер рендеринга
+  SpriteMode                         mode;                  //режим спрайтов
+  PrimitiveUsage                     usage;                 //режим использования
+  math::vec3f                        up;                    //вектор "вверх"
+  stl::string                        batch_name;            //имя пакета
+  bool                               need_create_primitive; //требование пересоздать примитив
+  stl::auto_ptr<manager::SpriteList> list;                  //список спрайтов
+  size_t                             descs_count;           //количество спрайтов
 
 /// Конструктор
-  Impl (RenderManager& render_manager, manager::Entity& in_entity)
+  Impl (RenderManager& in_render_manager, manager::Entity& in_entity)
     : entity (in_entity)
+    , render_manager (in_render_manager)
     , mode (interchange::SpriteMode_Billboard)
     , usage (interchange::PrimitiveUsage_Batching)
     , up (0, 1.0f, 0)
-    , primitive (render_manager.Manager ().CreatePrimitive ()) //TODO: shared buffers
+    , need_create_primitive (true)
     , descs_count ()
   {
-    entity.SetPrimitive (primitive);
+  }
 
-    primitive.Buffers ().ReserveDynamicBuffers (8192, 8192); //TODO: remove after shared buffers implementation
+/// Сброс примитива
+  manager::Primitive GetPrimitive ()
+  {
+    try
+    {
+      if (!need_create_primitive)
+        return entity.Primitive ();
+
+      manager::PrimitiveBuffers buffers   = render_manager.BatchingManager ().GetBatch (batch_name.c_str ());
+      manager::Primitive        primitive = render_manager.Manager ().CreatePrimitive (buffers);
+
+      entity.SetPrimitive (primitive);
+
+      need_create_primitive = false;
+
+      return primitive;
+    }
+    catch (xtl::exception& e)
+    {
+      e.touch ("render::scene::server::SpriteList::Impl::GetPrimitive");
+      throw;
+    }
+  }
+
+/// Обновление списка спрайтов
+  void ResetSpriteList (SpriteMode in_mode, PrimitiveUsage in_usage, const math::vec3f& up)
+  {
+    size_t reserve_size = 0;
+    
+    stl::string material_name;
+
+    if (list)
+    {
+      reserve_size  = list->Capacity ();
+      material_name = list->Material ();
+    }
+
+    manager::SpriteMode mode;
+
+    switch (in_mode)
+    {
+      case interchange::SpriteMode_Billboard:         mode = manager::SpriteMode_Billboard; break;
+      case interchange::SpriteMode_Oriented:          mode = manager::SpriteMode_Oriented; break;
+      case interchange::SpriteMode_OrientedBillboard: mode = manager::SpriteMode_OrientedBillboard; break;
+      default:                                        throw xtl::make_argument_exception ("", "mode", in_mode);
+    }
+
+    manager::Primitive primitive = GetPrimitive ();
+
+    switch (in_usage)
+    {
+      case interchange::PrimitiveUsage_Batching:
+      {
+        list.reset (new manager::SpriteList (primitive.AddBatchingSpriteList (mode, up)));
+        break;
+      }
+      case interchange::PrimitiveUsage_Static:
+      case interchange::PrimitiveUsage_Dynamic:
+      case interchange::PrimitiveUsage_Stream:
+      {
+        manager::MeshBufferUsage usage;
+
+        switch (in_usage)
+        {
+          default:
+          case interchange::PrimitiveUsage_Static:  usage = manager::MeshBufferUsage_Static; break;
+          case interchange::PrimitiveUsage_Dynamic: usage = manager::MeshBufferUsage_Dynamic; break;
+          case interchange::PrimitiveUsage_Stream:  usage = manager::MeshBufferUsage_Stream; break;
+        }
+
+        list.reset (new manager::SpriteList (primitive.AddStandaloneSpriteList (mode, up, usage, usage)));
+
+        break;
+      }
+      default:
+        throw xtl::make_argument_exception ("", "usage", in_usage);
+    }
+
+    if (reserve_size)    
+      list->Reserve (reserve_size);
+
+    list->SetMaterial (material_name.c_str ());
+  }
+
+  void ResetSpriteList ()
+  {
+    ResetSpriteList (mode, usage, up);
   }
 };
 
@@ -65,44 +152,7 @@ void SpriteList::SetParams (SpriteMode in_mode, PrimitiveUsage in_usage, const m
 {
   try
   {
-    manager::SpriteMode mode;
-
-    switch (in_mode)
-    {
-      case interchange::SpriteMode_Billboard:         mode = manager::SpriteMode_Billboard; break;
-      case interchange::SpriteMode_Oriented:          mode = manager::SpriteMode_Oriented; break;
-      case interchange::SpriteMode_OrientedBillboard: mode = manager::SpriteMode_OrientedBillboard; break;
-      default:                                        throw xtl::make_argument_exception ("", "mode", in_mode);
-    }
-
-    switch (in_usage)
-    {
-      case interchange::PrimitiveUsage_Batching:
-      {
-        impl->list.reset (new manager::SpriteList (impl->primitive.AddBatchingSpriteList (mode, up)));
-        break;
-      }
-      case interchange::PrimitiveUsage_Static:
-      case interchange::PrimitiveUsage_Dynamic:
-      case interchange::PrimitiveUsage_Stream:
-      {
-        manager::MeshBufferUsage usage;
-
-        switch (in_usage)
-        {
-          default:
-          case interchange::PrimitiveUsage_Static:  usage = manager::MeshBufferUsage_Static; break;
-          case interchange::PrimitiveUsage_Dynamic: usage = manager::MeshBufferUsage_Dynamic; break;
-          case interchange::PrimitiveUsage_Stream:  usage = manager::MeshBufferUsage_Stream; break;
-        }
-
-        impl->list.reset (new manager::SpriteList (impl->primitive.AddStandaloneSpriteList (mode, up, usage, usage)));
-
-        break;
-      }
-      default:
-        throw xtl::make_argument_exception ("", "usage", in_usage);
-    }
+    impl->ResetSpriteList (in_mode, in_usage, up);
 
     impl->mode  = in_mode;
     impl->usage = in_usage;
@@ -164,12 +214,30 @@ const char* SpriteList::Material () const
 
 void SpriteList::SetBatch (const char* name)
 {
-  throw xtl::make_not_implemented_exception (__FUNCTION__);
+  try
+  {
+    if (!name)
+      throw xtl::make_null_argument_exception ("", "name");
+
+    impl->batch_name = name;
+
+    bool need_reset = !impl->need_create_primitive;
+
+    impl->need_create_primitive = true;
+ 
+    if (need_reset)
+      impl->ResetSpriteList ();
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::scene::server::SpriteList::SetMaterial");
+    throw;
+  }
 }
 
 const char* SpriteList::Batch () const
 {
-  throw xtl::make_not_implemented_exception (__FUNCTION__);
+  return impl->batch_name.c_str ();
 }
 
 /*

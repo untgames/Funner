@@ -37,6 +37,16 @@ class LineList: public VisualModel
 
         scene_graph::LineModel& model = SourceNode ();
 
+        size_t model_batch_name_hash = model.BatchHash ();
+
+        if (batch_name_hash != model_batch_name_hash)
+        {
+          context.SetLineListBatch (Id (), model.Batch ());
+
+          need_update_descs = true;
+          batch_name_hash   = model_batch_name_hash;
+        }
+
         if (need_update_params)
         {
           interchange::PrimitiveUsage usage;
@@ -62,15 +72,6 @@ class LineList: public VisualModel
           context.SetLineListMaterial (Id (), model.Material ());
 
           material_name_hash = model_material_name_hash;
-        }
-
-        size_t model_batch_name_hash = model.BatchHash ();
-
-        if (batch_name_hash != model_batch_name_hash)
-        {
-          context.SetLineListBatch (Id (), model.Batch ());
-
-          batch_name_hash = model_batch_name_hash;
         }
 
         if (need_update_descs)
