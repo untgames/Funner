@@ -32,6 +32,7 @@
 #include <shared/window_manager.h>
 
 #include <shared/sg/light.h>
+#include <shared/sg/line_list.h>
 #include <shared/sg/page_curl.h>
 #include <shared/sg/sprite_list.h>
 #include <shared/sg/static_mesh.h>

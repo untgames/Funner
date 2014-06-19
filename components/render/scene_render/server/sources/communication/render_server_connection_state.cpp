@@ -864,7 +864,7 @@ void ConnectionState::SetLineListParams (object_id_t id, interchange::PrimitiveU
 {
   try
   {
-    throw xtl::make_not_implemented_exception (__FUNCTION__);
+    impl->server.SceneManager ().GetNode (id).Cast<LineList> ().SetParams (usage);
   }
   catch (xtl::exception& e)
   {
@@ -877,7 +877,7 @@ void ConnectionState::SetLineListMaterial (object_id_t id, const char* material)
 {
   try
   {
-    throw xtl::make_not_implemented_exception (__FUNCTION__);
+    impl->server.SceneManager ().GetNode (id).Cast<LineList> ().SetMaterial (material);
   }
   catch (xtl::exception& e)
   {
@@ -890,7 +890,7 @@ void ConnectionState::SetLineListBatch (object_id_t id, const char* batch)
 {
   try
   {
-    throw xtl::make_not_implemented_exception (__FUNCTION__);
+    impl->server.SceneManager ().GetNode (id).Cast<LineList> ().SetBatch (batch);
   }
   catch (xtl::exception& e)
   {
@@ -903,7 +903,10 @@ void ConnectionState::SetLineListBuffer (object_id_t id, uint32 count, uint32 re
 {
   try
   {
-    throw xtl::make_not_implemented_exception (__FUNCTION__);
+    LineList& list = impl->server.SceneManager ().GetNode (id).Cast<LineList> ();
+
+    list.Reserve (reserve_count);
+    list.Resize (count);
   }
   catch (xtl::exception& e)
   {
@@ -916,7 +919,7 @@ void ConnectionState::SetLineListDescs (object_id_t id, uint32 first, interchang
 {
   try
   {
-    throw xtl::make_not_implemented_exception (__FUNCTION__);
+    impl->server.SceneManager ().GetNode (id).Cast<LineList> ().SetDescs (first, descs.size, descs.data);
   }
   catch (xtl::exception& e)
   {
