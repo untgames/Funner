@@ -11,6 +11,10 @@
 
 #include <common/action_queue.h>
 
+#ifdef GetFreeSpace
+#undef GetFreeSpace
+#endif
+
 namespace common
 {
 

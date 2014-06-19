@@ -64,7 +64,16 @@ int main ()
     for (size_t i = 0; i < SOURCE_IMAGE_WIDTH * SOURCE_IMAGE_HEIGHT; i++, image_pixel++)
       *image_pixel = image_color;
 
-    atlas_builder.Insert (image);
+    atlas_builder.Insert (image, AtlasBuilderInsertMode_Default, 1);
+
+    Image image2 (SOURCE_IMAGE_WIDTH, SOURCE_IMAGE_HEIGHT, 1, PixelFormat_RGB8);
+
+    ImagePixel *image2_pixel = (ImagePixel*)image2.Bitmap (), image2_color = {{0, 255, 0}};
+
+    for (size_t i = 0; i < SOURCE_IMAGE_WIDTH * SOURCE_IMAGE_HEIGHT; i++, image2_pixel++)
+      *image2_pixel = image2_color;
+
+    atlas_builder.Insert (image2.Width (), image2.Height (), image2.Format (), image2.Bitmap (), false, "data", 1);
 
     printf ("Atlases count = %u\n", atlas_builder.AtlasesCount ());
 
