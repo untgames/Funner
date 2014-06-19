@@ -770,7 +770,7 @@ class BatchingInstance: public DynamicPrimitive, private render::manager::Render
 
 /// Конструктор
     BatchingInstance (const PrototypePtr& in_prototype, render::low_level::PrimitiveType primitive_type, size_t flags = 0)
-      : DynamicPrimitive (*this, flags | DynamicPrimitiveFlag_EntityDependent)
+      : DynamicPrimitive (*this, flags)
       , prototype (in_prototype)
       , batching_manager (&prototype->BatchingManager ()) 
     {
@@ -1372,7 +1372,7 @@ class StandaloneBillboardSpriteList: public PrimitiveListStorage<Sprite, Standal
       }
       catch (xtl::exception& e)
       {
-        e.touch ("render::manager::BatchingBillboardSpriteList::CreateDynamicPrimitiveInstanceCore");
+        e.touch ("render::manager::StandaloneBillboardSpriteList::CreateDynamicPrimitiveInstanceCore");
         throw;
       }
     }
@@ -1507,7 +1507,7 @@ class BatchingBillboardSpriteList: public PrimitiveListStorage<Sprite, BatchingS
           }
           catch (xtl::exception& e)
           {
-            e.touch ("render::manager::BatchingLineAndOrientedSpriteList::Instance<T>::UpdateOnRenderCore");
+            e.touch ("render::manager::BatchingBillboardSpriteList::Instance<T>::UpdateOnRenderCore");
             throw;
           }
         }
