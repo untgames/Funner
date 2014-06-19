@@ -44,7 +44,7 @@ void idle (Test& test)
     
     float angle = common::milliseconds () / 100.0f;
     
-    test.line.SetWorldOrientation (math::degree (angle), 0.0f, 0.0f, 1.0f);        
+    test.line.SetWorldOrientation (math::degree (angle), math::degree (90.0f), math::degree (0.0f));
 
     test.target.Update ();      
   }
@@ -110,7 +110,8 @@ int main ()
     scene_graph::Line::Pointer line = scene_graph::Line::Create ();
     
     line->SetMaterial ("sprite_material");
-    line->SetScale (math::vec3f (10.0f));
+    line->SetScale (math::vec3f (1.0f, 1.0f, 10.0f));
+    line->SetWorldOrientation (math::degree (0.0f), math::degree (90.0f), math::degree (0.0f));
 
     line->BindToScene (scene);    
     
