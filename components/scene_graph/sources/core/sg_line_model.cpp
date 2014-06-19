@@ -13,11 +13,14 @@ struct LineModel::Impl: public xtl::instance_counter<LineModel>
 {
   stl::string     material;                     //имя материала
   size_t          material_hash;                //хэш имени материала
+  stl::string     batch;                        //имя пакета
+  size_t          batch_hash;                   //хэш имени пакета
   LineUsage       usage;                        //режим использования линий
   LineModelSignal signals [LineModelEvent_Num]; //сигналы модели 
 
   Impl ()
     : material_hash (0xffffffff)
+    , batch_hash (0xffffffff)
     , usage (LineUsage_Default)
   {
   }
@@ -80,6 +83,36 @@ const char* LineModel::Material () const
 size_t LineModel::MaterialHash () const
 {
   return impl->material_hash;
+}
+
+/*
+    Пакет
+*/
+
+void LineModel::SetBatch (const char* in_batch)
+{
+  if (!in_batch)
+    throw xtl::make_null_argument_exception ("scene_graph::LineModel::SetBatch", "batch");
+
+  size_t hash = common::strhash (in_batch);
+
+  if (hash == impl->batch_hash)
+    return;
+
+  impl->batch      = in_batch;  
+  impl->batch_hash = hash;
+
+  UpdateNotify ();
+}
+
+const char* LineModel::Batch () const
+{
+  return impl->batch.c_str ();
+}
+
+size_t LineModel::BatchHash () const
+{
+  return impl->batch_hash;
 }
 
 /*
@@ -181,4 +214,5 @@ void LineModel::BindProperties (common::PropertyBindingMap& bindings)
   VisualModel::BindProperties (bindings);
 
   bindings.AddProperty ("Material", xtl::bind (&LineModel::Material, this), xtl::bind (&LineModel::SetMaterial, this, _1));
+  bindings.AddProperty ("Batch", xtl::bind (&LineModel::Batch, this), xtl::bind (&LineModel::SetBatch, this, _1));
 }

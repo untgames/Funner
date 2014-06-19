@@ -249,6 +249,7 @@ node 'sprite':
     integer Visible='1'
     string Scissor=''
     string Material='sprite_material'
+    string Batch=''
     vector Up='0 0 1 0'
     vector Color='1 0 1 0.5'
     float Alpha='0.5'

@@ -13,6 +13,8 @@ struct SpriteModel::Impl: public xtl::instance_counter<SpriteModel>
 {
   stl::string       material;                       //имя материала
   size_t            material_hash;                  //хэш имени материала
+  stl::string       batch;                          //имя пакета
+  size_t            batch_hash;                     //хэш пакета
   SpriteMode        mode;                           //режим спрайтов
   SpriteUsage       usage;                          //режим использования спрайтов
   math::vec3f       up;                             //вектор вверх
@@ -20,6 +22,7 @@ struct SpriteModel::Impl: public xtl::instance_counter<SpriteModel>
 
   Impl ()
     : material_hash (0xffffffff)
+    , batch_hash (0xffffffff)
     , mode (SpriteMode_Default)
     , usage (SpriteUsage_Default)
     , up (0, 1.0f, 0)
@@ -84,6 +87,36 @@ const char* SpriteModel::Material () const
 size_t SpriteModel::MaterialHash () const
 {
   return impl->material_hash;
+}
+
+/*
+    Пакет
+*/
+
+void SpriteModel::SetBatch (const char* in_batch)
+{
+  if (!in_batch)
+    throw xtl::make_null_argument_exception ("scene_graph::SpriteModel::SetBatch", "batch");
+
+  size_t hash = common::strhash (in_batch);
+
+  if (hash == impl->batch_hash)
+    return;
+
+  impl->batch      = in_batch;  
+  impl->batch_hash = hash;
+
+  UpdateNotify ();
+}
+
+const char* SpriteModel::Batch () const
+{
+  return impl->batch.c_str ();
+}
+
+size_t SpriteModel::BatchHash () const
+{
+  return impl->batch_hash;
 }
 
 /*
@@ -237,5 +270,6 @@ void SpriteModel::BindProperties (common::PropertyBindingMap& bindings)
   VisualModel::BindProperties (bindings);
 
   bindings.AddProperty ("Material", xtl::bind (&SpriteModel::Material, this), xtl::bind (&SpriteModel::SetMaterial, this, _1));
+  bindings.AddProperty ("Batch", xtl::bind (&SpriteModel::Batch, this), xtl::bind (&SpriteModel::SetBatch, this, _1));
   bindings.AddProperty ("Up", xtl::bind (&SpriteModel::OrtUp, this), xtl::bind (&SpriteModel::SetOrtUp, this, _1));
 }

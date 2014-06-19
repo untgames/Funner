@@ -92,6 +92,8 @@ void bind_sprite_model_library (Environment& environment)
 
   lib.Register ("set_Material", make_invoker (&SpriteModel::SetMaterial));
   lib.Register ("get_Material", make_invoker (&SpriteModel::Material));
+  lib.Register ("set_Batch",    make_invoker (&SpriteModel::SetBatch));
+  lib.Register ("get_Batch",    make_invoker (&SpriteModel::Batch));
   lib.Register ("set_Mode",     make_invoker (&SpriteModel::SetMode));
   lib.Register ("get_Mode",     make_invoker (&SpriteModel::Mode));
   lib.Register ("set_Usage",    make_invoker (&SpriteModel::SetUsage));
@@ -185,6 +187,8 @@ void bind_line_model_library (Environment& environment)
 
   lib.Register ("set_Material", make_invoker (&LineModel::SetMaterial));
   lib.Register ("get_Material", make_invoker (&LineModel::Material));
+  lib.Register ("set_Batch",    make_invoker (&LineModel::SetBatch));
+  lib.Register ("get_Batch",    make_invoker (&LineModel::Batch));
   lib.Register ("set_Usage",    make_invoker (&LineModel::SetUsage));
   lib.Register ("get_Usage",    make_invoker (&LineModel::Usage));
 
