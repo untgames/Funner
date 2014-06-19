@@ -4,19 +4,22 @@ using namespace render;
 using namespace render::scene;
 using namespace render::scene::server;
 
-//TODO: update entity world matrix (from render::manager)
-
 /*
     Описание реализации отображаемой модели
 */
 
 struct VisualModel::Impl
 {
-  NodePtr         scissor; //область отсечения
-  manager::Entity entity;  //сущность
+  NodePtr         scissor;              //область отсечения
+  manager::Entity entity;               //сущность
+  bool            need_update_world_tm; //флаг необходимости обновления мировой матрицы
 
 /// Конструктор
-  Impl (manager::Entity& in_entity) : entity (in_entity) {}
+  Impl (manager::Entity& in_entity)
+    : entity (in_entity)
+    , need_update_world_tm (true)
+  {
+  }
 };
 
 /*
@@ -112,6 +115,15 @@ void VisualModel::VisitCore (ISceneVisitor& visitor)
 }
 
 /*
+    Оповещение об обновлении мировой матрицы
+*/
+
+void VisualModel::OnWorldMatrixUpdated ()
+{
+  impl->need_update_world_tm = true;
+}
+
+/*
     Отрисовка
 */
 
@@ -131,6 +143,13 @@ void VisualModel::Draw (RenderingContext& context, void* user_data)
 void VisualModel::DrawCore (RenderingContext& context, void* user_data)
 {
   //TODO: set scissor
+
+  if (impl->need_update_world_tm)
+  {
+    impl->entity.SetWorldMatrix (WorldMatrix ());
+
+    impl->need_update_world_tm = false;
+  }
 
   context.Frame ().AddEntity (impl->entity, user_data);
 }

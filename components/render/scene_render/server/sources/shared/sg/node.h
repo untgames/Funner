@@ -50,6 +50,12 @@ class Node: public xtl::reference_counter, public xtl::noncopyable
     template <class T> T& Cast () { return *static_cast<T*> (this); }
 
   private:
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Оповещение об обновлении мировой матрицы
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    virtual void OnWorldMatrixUpdated () {}
+
+  private:
     struct Impl;
     stl::auto_ptr<Impl> impl;
 };

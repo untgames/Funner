@@ -56,6 +56,8 @@ const char* Node::Name () const
 void Node::SetWorldMatrix (const math::mat4f& tm)
 {
   impl->world_tm = tm;
+
+  OnWorldMatrixUpdated ();
 }
 
 const math::mat4f& Node::WorldMatrix () const

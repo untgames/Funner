@@ -114,6 +114,8 @@ class DrawWithoutLights: public Technique
         {
           private_data.view_proj_tm             = parent_context.Camera ().ViewProjectionMatrix ();
           private_data.view_proj_transaction_id = parent_context.Camera ().ViewProjectionMatrixTransactionId ();
+
+          private_data.frame.SetViewProjectionMatrix (private_data.view_proj_tm);
         }
 
         if (private_data.view_transaction_id != parent_context.Camera ().ViewMatrixTransactionId ())
@@ -163,7 +165,7 @@ class DrawWithoutLights: public Technique
         return;
 
       const math::mat4f& object_tm = model.WorldMatrix ();
-      
+
       out_params.mvp_matrix = private_data.view_proj_tm * object_tm;
 
       properties.SetProperty (mv_matrix_property_index,  private_data.view_tm * object_tm);
