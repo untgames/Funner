@@ -38,14 +38,16 @@ typedef stl::vector<IRenderManagerListener*> ListenerArray;
 
 struct RenderManager::Impl: public ServerLog, public xtl::reference_counter
 {
-  manager::RenderManager render_manager;                   //менеджер рендеринга
-  TraverseResult         traverse_result_storage;          //хранилище результатов обхода сцены
-  xtl::auto_connection   configuration_changed_connection; //соединение с обработчиком изменения конфигурации
-  ListenerArray          listeners;                        //слушатели событий
+  manager::RenderManager  render_manager;                   //менеджер рендеринга
+  server::BatchingManager batching_manager;                 //менеджер пакетирования
+  TraverseResult          traverse_result_storage;          //хранилище результатов обхода сцены
+  xtl::auto_connection    configuration_changed_connection; //соединение с обработчиком изменения конфигурации
+  ListenerArray           listeners;                        //слушатели событий
 
 /// Конструктор
   Impl (const char* name)
     : ServerLog (name)
+    , batching_manager (render_manager, log)
   {
     configuration_changed_connection = render_manager.RegisterEventHandler (manager::RenderManagerEvent_OnConfigurationChanged, xtl::bind (&Impl::OnConfigurationChanged, this));
 
@@ -126,6 +128,15 @@ common::Log& RenderManager::Log ()
 render::manager::RenderManager& RenderManager::Manager ()
 {
   return impl->render_manager;
+}
+
+/*
+    Менеджер пакетирования
+*/
+
+BatchingManager& RenderManager::BatchingManager ()
+{
+  return impl->batching_manager;
 }
 
 /*
