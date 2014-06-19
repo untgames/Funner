@@ -8,10 +8,6 @@ TARGETS += MEDIA.RFX.DEFAULT_SERIALIZERS.TESTS
 TARGETS += MEDIA.RFX.MATERIALS_PROCESSOR.SOURCES
 TARGETS += MEDIA.RFX.MATERIALS_PROCESSOR.TESTS
 TARGETS += MEDIA.RFX.INFO
-TARGETS += MEDIA.RFX.OBSOLETE.SOURCES
-TARGETS += MEDIA.RFX.OBSOLETE.XMTL.SOURCES
-TARGETS += MEDIA.RFX.OBSOLETE.TESTS
-TARGETS += MEDIA.RFX.OBSOLETE.XMTL.TESTS
 
 #Цель - sources
 MEDIA.RFX.SOURCES.TYPE             := static-lib
@@ -52,25 +48,3 @@ MEDIA.RFX.INFO.TYPE        := doxygen-info
 MEDIA.RFX.INFO.CHM_NAME    := funner.media.rfx
 MEDIA.RFX.INFO.SOURCE_DIRS := include
 MEDIA.RFX.INFO.IMPORTS     := compile.media.rfx
-
-#Цель - sources (obsolete)
-MEDIA.RFX.OBSOLETE.SOURCES.TYPE             := static-lib
-MEDIA.RFX.OBSOLETE.SOURCES.NAME             := funner.media.rfx.obsolete
-MEDIA.RFX.OBSOLETE.SOURCES.SOURCE_DIRS      := sources/obsolete/core
-MEDIA.RFX.OBSOLETE.SOURCES.IMPORTS          := compile.media.rfx.obsolete compile.media.shared
-
-#Цель - XMTL serializer sources (obsolete)
-MEDIA.RFX.OBSOLETE.XMTL.SOURCES.TYPE             := static-lib
-MEDIA.RFX.OBSOLETE.XMTL.SOURCES.NAME             := funner.media.rfx.xmtl.obsolete
-MEDIA.RFX.OBSOLETE.XMTL.SOURCES.SOURCE_DIRS      := sources/obsolete/xmtl
-MEDIA.RFX.OBSOLETE.XMTL.SOURCES.IMPORTS          := compile.media.rfx.obsolete
-
-#Цель - tests (obsolete)
-MEDIA.RFX.OBSOLETE.TESTS.TYPE             := test-suite
-MEDIA.RFX.OBSOLETE.TESTS.SOURCE_DIRS      := tests/obsolete/core
-MEDIA.RFX.OBSOLETE.TESTS.IMPORTS          := link.media.rfx.obsolete compile.media.rfx.obsolete
-
-#Цель - XMTL tests (obsolete)
-MEDIA.RFX.OBSOLETE.XMTL.TESTS.TYPE             := test-suite
-MEDIA.RFX.OBSOLETE.XMTL.TESTS.SOURCE_DIRS      := tests/obsolete/xmtl
-MEDIA.RFX.OBSOLETE.XMTL.TESTS.IMPORTS          := link.media.rfx.xmtl.obsolete compile.media.rfx.obsolete

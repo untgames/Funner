@@ -1,6 +1,0 @@
-Results of driver1_test:
-TestDriver::TestDriver
-Attempt to create renderer 'Renderer #1'
-exception: Method 'TestDriver::CreateRenderer' doesn't implemented
-exit
-TestDriver::~TestDriver

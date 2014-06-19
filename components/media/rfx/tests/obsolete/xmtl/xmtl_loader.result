@@ -1,9 +1,0 @@
-Results of xmtl_loader_test:
-data/test.xmtl(3): error: node 'material': Unknown profile at load material 'test_material2'
-<?xml version="1.0" encoding="utf-8"?>
-<material_library>
-  <material id="sprite_material" name="sprite_material" sort_group="0">
-    <sprite_profile image="image1.tga" blend_mode="translucent" tiling="1" tile_offset_x="1" tile_offset_y="3" tile_width="10" tile_height="20"/>
-  </material>
-  <instance_material id="material2" source="sprite_material"/>
-</material_library>

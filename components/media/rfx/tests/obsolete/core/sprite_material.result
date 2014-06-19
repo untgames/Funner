@@ -1,6 +1,0 @@
-Results of sprite_material_test:
-Sprite material 'shader1'
-  blend_mode: additive
-  image: 'imag1.tga'
-  tiling: enabled
-  tile: 10x20
