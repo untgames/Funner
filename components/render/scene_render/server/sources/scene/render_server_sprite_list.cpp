@@ -159,6 +159,20 @@ const char* SpriteList::Material () const
 }
 
 /*
+    Имя пакета
+*/
+
+void SpriteList::SetBatch (const char* name)
+{
+  throw xtl::make_not_implemented_exception (__FUNCTION__);
+}
+
+const char* SpriteList::Batch () const
+{
+  throw xtl::make_not_implemented_exception (__FUNCTION__);
+}
+
+/*
     Количество спрайтов / размер буфера
 */
 

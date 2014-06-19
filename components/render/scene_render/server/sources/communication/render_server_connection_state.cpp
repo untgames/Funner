@@ -818,6 +818,19 @@ void ConnectionState::SetSpriteListMaterial (object_id_t id, const char* materia
   }
 }
 
+void ConnectionState::SetSpriteListBatch (object_id_t id, const char* batch)
+{
+  try
+  {
+    impl->server.SceneManager ().GetNode (id).Cast<SpriteList> ().SetBatch (batch);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::scene::ConnectionState::SetSpriteListBatch");
+    throw;
+  }
+}
+
 void ConnectionState::SetSpriteListBuffer (object_id_t id, uint32 count, uint32 reserve_count)
 {
   try
@@ -869,6 +882,19 @@ void ConnectionState::SetLineListMaterial (object_id_t id, const char* material)
   catch (xtl::exception& e)
   {
     e.touch ("render::scene::ConnectionState::SetLineListMaterial");
+    throw;
+  }
+}
+
+void ConnectionState::SetLineListBatch (object_id_t id, const char* batch)
+{
+  try
+  {
+    throw xtl::make_not_implemented_exception (__FUNCTION__);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::scene::ConnectionState::SetLineListBatch");
     throw;
   }
 }

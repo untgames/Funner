@@ -20,6 +20,7 @@ class LineList: public VisualModel
       , cached_descs_count ()
       , cached_descs_capacity ()
       , material_name_hash ()
+      , batch_name_hash ()
     {
     }
 
@@ -63,6 +64,15 @@ class LineList: public VisualModel
           material_name_hash = model_material_name_hash;
         }
 
+        size_t model_batch_name_hash = model.BatchHash ();
+
+        if (batch_name_hash != model_batch_name_hash)
+        {
+          context.SetLineListBatch (Id (), model.Batch ());
+
+          batch_name_hash = model_batch_name_hash;
+        }
+
         if (need_update_descs)
         {
           size_t count = model.LineDescsCount (), capacity = model.LineDescsCapacity ();
@@ -101,6 +111,7 @@ class LineList: public VisualModel
     size_t               cached_descs_count;
     size_t               cached_descs_capacity;
     size_t               material_name_hash;
+    size_t               batch_name_hash;
 };
 
 }

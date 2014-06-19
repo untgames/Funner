@@ -56,11 +56,13 @@ void SetPageCurlParams (object_id_t id, const PageCurlParams& params, const char
 
 void SetSpriteListParams (object_id_t id, SpriteMode mode, PrimitiveUsage usage, const math::vec3f& up);
 void SetSpriteListMaterial (object_id_t id, const char* material);
+void SetSpriteListBatch (object_id_t id, const char* batch);
 void SetSpriteListBuffer (object_id_t id, uint32 count, uint32 reserve_count);
 void SetSpriteListDescs (object_id_t id, uint32 first, RawArray<SpriteDesc> descs);
 
 void SetLineListParams (object_id_t id, PrimitiveUsage usage);
 void SetLineListMaterial (object_id_t id, const char* material);
+void SetLineListBatch (object_id_t id, const char* batch);
 void SetLineListBuffer (object_id_t id, uint32 count, uint32 reserve_count);
 void SetLineListDescs (object_id_t id, uint32 first, RawArray<LineDesc> descs);
 
