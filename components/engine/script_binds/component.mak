@@ -10,7 +10,7 @@ ENGINE.SCRIPT_BINDS.SOURCES.INCLUDE_DIRS := include
 ENGINE.SCRIPT_BINDS.SOURCES.SOURCE_DIRS  := sources
 ENGINE.SCRIPT_BINDS.SOURCES.IMPORTS      := compile.script.core compile.scene_graph.core compile.common \
                                             compile.system compile.input.manager \
-                                            compile.engine.core compile.media.rms compile.media.players \
+                                            compile.engine.core compile.media.rms compile.media.players compile.media.font \
                                             compile.math.curves compile.network compile.physics.scene_physics \
                                             compile.social.core compile.input.scene_input compile.store.core \
                                             compile.media.image compile.analytics.flurry \

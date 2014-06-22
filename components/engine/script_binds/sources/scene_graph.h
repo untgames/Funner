@@ -18,7 +18,7 @@
 #include <sg/scissor.h>
 #include <sg/sound_emitter.h>
 #include <sg/sprite.h>
-#include <sg/text_line.h>
+#include <sg/text.h>
 #include <sg/visual_model.h>
 
 #include <sg/controllers/acceleration_evaluators.h>

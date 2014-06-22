@@ -240,9 +240,9 @@ void bind_line_library (Environment& environment)
     Создание линии текста
 */
 
-TextLine::Pointer create_text_line ()
+TextLine::Pointer create_text_line (media::FontLibrary& font_library)
 {
-  return TextLine::Create ();
+  return TextLine::Create (font_library);
 }
 
 /*
