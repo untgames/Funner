@@ -17,6 +17,9 @@ class MyConnection: public scene::interchange::IConnection, public xtl::referenc
       response_connection = xtl::com_ptr<scene::interchange::IConnection> (scene::interchange::ConnectionManager::CreateConnection (response_connection_name, "initiator=MyConnection"), false);
     }
 
+///явл€етс€ ли соединение внутрипроцессным
+    bool IsInprocessed () { return true; }
+
 ///ќбработка входного потока данных
     void ProcessCommands (const scene::interchange::CommandBuffer& commands)
     {

@@ -114,6 +114,15 @@ Connection::~Connection ()
 }
 
 /*
+    явл€етс€ ли соединение внутрипроцессным
+*/
+
+bool Connection::IsInprocessed ()
+{
+  return true;
+}
+
+/*
     ќбработка входного потока данных
 */
 

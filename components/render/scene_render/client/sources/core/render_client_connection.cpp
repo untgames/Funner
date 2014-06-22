@@ -84,6 +84,9 @@ struct Connection::Impl: public xtl::reference_counter, public xtl::trackable
     public:
       ServerToClientConnection (const interchange::CommandQueue& in_queue) : queue (in_queue)  {}
 
+      ///явл€етс€ ли соединение внутрипроцессным
+      bool IsInprocessed () { return true; }
+
       ///ќбработка входного потока данных
       void ProcessCommands (const interchange::CommandBuffer& commands)
       {

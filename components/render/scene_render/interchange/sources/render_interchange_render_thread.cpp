@@ -54,6 +54,9 @@ struct RenderThread::Impl: public xtl::reference_counter
       ///  онструктор
       ProxyConnection (Impl* in_impl, IConnection* in_source_connection) : impl (in_impl), source_connection (in_source_connection) {}
 
+      /// явл€етс€ ли соединение внутрипроцессным
+      bool IsInprocessed () { return source_connection->IsInprocessed (); }
+
       /// ќбработка входного потока данных
       void ProcessCommands (const CommandBuffer& commands)
       {
@@ -209,6 +212,9 @@ class WaiterConnection: public IConnection, public xtl::reference_counter, publi
       }
     }
 
+    /// явл€етс€ ли соединение внутрипроцессным
+    bool IsInprocessed () { return true; }
+
     /// ќбработка входного потока данных
     void ProcessCommands (const CommandBuffer&) { }
 
@@ -295,6 +301,9 @@ class CreatorConnection: public IConnection, public xtl::reference_counter, publ
 
     ///  онструктор
     CreatorConnection (const ResultPtr& in_result, const CreatorFn& in_fn) : result (in_result), fn (in_fn) {}
+
+    /// явл€етс€ ли соединение внутрипроцессным
+    bool IsInprocessed () { return true; }
 
     /// ќбработка входного потока данных
     void ProcessCommands (const CommandBuffer&)

@@ -152,6 +152,8 @@ class Connection: public IConnection, private ProcessorHolder, public Context<Se
 
     Connection (const char* name) : ProcessorHolder (name), ConnectionContext (processor) { }
 
+    bool IsInprocessed () { return true; }
+
     void ProcessCommands (const CommandBuffer& commands)
     {
       ConnectionContext::ProcessCommands (commands);
