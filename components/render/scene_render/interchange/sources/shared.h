@@ -26,6 +26,7 @@
 #include <render/scene/interchange/command_buffer.h>
 #include <render/scene/interchange/command_queue.h>
 #include <render/scene/interchange/connection_manager.h>
+#include <render/scene/interchange/inprocess_exchange_storage.h>
 #include <render/scene/interchange/render_thread.h>
 #include <render/scene/interchange/property_synchronizer.h>
 #include <render/scene/interchange/serializer.h>
