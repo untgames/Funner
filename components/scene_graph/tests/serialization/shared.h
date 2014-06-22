@@ -9,6 +9,7 @@
 #include <common/property_binding_map.h>
 
 #include <media/rms/manager.h>
+#include <media/font_library.h>
 
 #include <sg/scene_manager.h>
 

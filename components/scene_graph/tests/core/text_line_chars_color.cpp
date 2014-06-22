@@ -56,7 +56,9 @@ int main ()
 {
   printf ("Results of text_line_chars_color_test:\n");
 
-  TextLine::Pointer text_line (TextLine::Create ());
+  media::FontLibrary font_library;
+
+  TextLine::Pointer text_line (TextLine::Create (font_library));
 
   printf ("TextLine color = [%.2f %.2f %.2f %.2f]\n", text_line->Color ().x, text_line->Color ().y, text_line->Color ().z, text_line->Color ().w);
 

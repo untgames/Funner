@@ -19,6 +19,8 @@
 #include <common/property_map.h>
 #include <common/property_binding_map.h>
 
+#include <media/font_library.h>
+
 #include <sg/camera.h>
 #include <sg/controller.h>
 #include <sg/height_map.h>
@@ -36,7 +38,7 @@
 #include <sg/scissor.h>
 #include <sg/sound_emitter.h>
 #include <sg/sprite.h>
-#include <sg/text_line.h>
+#include <sg/text.h>
 #include <sg/visual_model.h>
 
 using namespace scene_graph;

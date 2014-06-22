@@ -4,7 +4,7 @@ export.compile.scene_graph.core.IMPORTS      := compile.math.bound_volumes compi
 
 # Link exports
 export.link.scene_graph.core.LIBS     := funner.scene_graph.core
-export.link.scene_graph.core.IMPORTS  := link.common link.math.bound_volumes link.media.rms link.media.animation
+export.link.scene_graph.core.IMPORTS  := link.common link.math.bound_volumes link.media.rms link.media.animation link.media.font
 
 # XScene Link exports
 export.link.scene_graph.xscene.LIBS          := funner.scene_graph.xscene

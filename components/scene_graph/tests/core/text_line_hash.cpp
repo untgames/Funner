@@ -10,7 +10,9 @@ int main ()
 {
   printf ("Results of text_line_hash_test:\n");
 
-  TextLine::Pointer text_line (TextLine::Create ());
+  media::FontLibrary font_library;
+
+  TextLine::Pointer text_line (TextLine::Create (font_library));
 
   print_hashes (*text_line);
   

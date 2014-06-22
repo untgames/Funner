@@ -8,6 +8,7 @@ namespace scene_graph
 {
 
 template <> void XmlSceneParser::CreateNode<SoundEmitter> (const common::ParseNode& decl, Node& parent, SceneContext& context);
+template <> void XmlSceneParser::CreateNode<TextLine>     (const common::ParseNode& decl, Node& parent, SceneContext& context);
 
 }
 
@@ -1532,6 +1533,28 @@ template <> void XmlSceneParser::CreateNode<SoundEmitter> (const common::ParseNo
     throw;
   }
 }
+
+template <> void XmlSceneParser::CreateNode<TextLine> (const common::ParseNode& decl, Node& parent, SceneContext& context)
+{
+  try
+  {
+      //получение библиотеки шрифтов
+      
+    media::FontLibrary& font_library = context.Attachment<media::FontLibrary> ();
+    
+      //настройка узла
+
+    TextLine::Pointer node = TextLine::Create (font_library);
+    
+    Parse (decl, *node, parent, context);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("scene_graph::XmlSceneParser::CreateNode<SoundEmitter>");
+    throw;
+  }
+}
+
 
 void XmlSceneParser::Parse (const ParseNode& decl, SoundEmitter& node, Node& parent, SceneContext& context)
 {

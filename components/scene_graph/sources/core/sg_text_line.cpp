@@ -25,7 +25,45 @@ vec4f clamp (const vec4f& color)
   return vec4f (clamp (color.x), clamp (color.y), clamp (color.z), clamp (color.w));
 }
 
+//определение корректности кода символа
+inline bool is_symbol_valid (size_t symbol_code, size_t first_code, size_t last_code)
+{
+  return symbol_code >= first_code && symbol_code < last_code;
+}
+
 const math::vec4f DEFAULT_CHAR_COLOR_FACTOR = 1.f;
+const size_t      DEFAULT_FONT_SIZE         = 14;
+const size_t      DEFAULT_FONT_SIZE_EPS     = 2;
+const char*       DEFAULT_FONT_CHARSET      = "";
+
+//границы текста
+struct TextDimensions
+{
+  math::vec2f min;
+  math::vec2f max;
+};
+
+struct FontCreationParamsImpl: public media::FontCreationParams
+{
+  stl::string charset_name_string;
+
+  FontCreationParamsImpl ()
+  {
+    memset (static_cast<FontCreationParams*> (this), 0, sizeof (FontCreationParams));
+
+    font_size           = DEFAULT_FONT_SIZE;
+    font_size_eps       = DEFAULT_FONT_SIZE_EPS;
+    charset_name_string = DEFAULT_FONT_CHARSET;
+    charset_name        = charset_name_string.c_str ();
+  }
+
+  FontCreationParamsImpl (const media::FontCreationParams& src)
+    : FontCreationParams (src)
+    , charset_name_string (src.charset_name)
+  {
+    charset_name = charset_name_string.c_str ();
+  }
+};
 
 }
 
@@ -40,22 +78,24 @@ struct TextLine::Impl: public xtl::instance_counter<TextLine>
 {
   typedef stl::vector <math::vec4f> CharsColors;
 
-  stl::string       text_utf8;
-  Utf32Buffer       text_utf32;
-  size_t            length;
-  size_t            text_utf8_hash;
-  size_t            text_utf32_hash;
-  bool              text_utf8_need_update;
-  bool              text_utf32_need_update;
-  stl::string       font_name;
-  vec4f             color;
-  vec4f             last_asked_char_color;    //переменная для хранения возвращаемого значения
-  TextLineAlignment horizontal_alignment;
-  TextLineAlignment vertical_alignment;
-  CharsColors       chars_colors_factors;     //множители цвета букв
-  CharsColors       chars_colors;
-  bool              chars_colors_need_update;
-  float             spacing_multiplier;
+  stl::string                text_utf8;
+  Utf32Buffer                text_utf32;
+  size_t                     length;
+  size_t                     text_utf8_hash;
+  size_t                     text_utf32_hash;
+  bool                       text_utf8_need_update;
+  bool                       text_utf32_need_update;
+  stl::string                font_name;
+  FontCreationParamsImpl     font_creation_params;
+  stl::auto_ptr<media::Font> font;
+  vec4f                      color;
+  vec4f                      last_asked_char_color;    //переменная для хранения возвращаемого значения
+  TextLineAlignment          horizontal_alignment;
+  TextLineAlignment          vertical_alignment;
+  CharsColors                chars_colors_factors;     //множители цвета букв
+  CharsColors                chars_colors;
+  bool                       chars_colors_need_update;
+  float                      spacing_multiplier;
 
   Impl ()
    : length (0),
@@ -85,7 +125,7 @@ struct TextLine::Impl: public xtl::instance_counter<TextLine>
     for (size_t i = 0; i < chars_count; i++)
       chars_colors [i] = clamp (color * chars_colors_factors [i]);
 
-    chars_colors_need_update = true;
+    chars_colors_need_update = false;
   }
 };
 
@@ -93,8 +133,9 @@ struct TextLine::Impl: public xtl::instance_counter<TextLine>
     Конструктор / деструктор
 */
 
-TextLine::TextLine ()
-  : impl (new Impl)
+TextLine::TextLine (const media::FontLibrary& font_library)
+  : TextModel (font_library)
+  , impl (new Impl)
 {
 }
 
@@ -106,9 +147,9 @@ TextLine::~TextLine ()
     Создание линии текста
 */
 
-TextLine::Pointer TextLine::Create ()
+TextLine::Pointer TextLine::Create (const media::FontLibrary& font_library)
 {
-  return Pointer (new TextLine, false);
+  return Pointer (new TextLine (font_library), false);
 }
 
 /*
@@ -119,7 +160,7 @@ void TextLine::SetColor (const vec4f& color)
 {
   impl->color = clamp (color);
 
-  UpdateNotify ();
+  UpdateCharsNotify ();
 }
 
 void TextLine::SetColor (float red, float green, float blue, float alpha)
@@ -158,7 +199,7 @@ void TextLine::SetCharsColorFactors (size_t first, size_t count, const math::vec
 
   impl->chars_colors_need_update = true;
 
-  UpdateNotify ();
+  UpdateCharsNotify ();
 }
 
 const math::vec4f& TextLine::CharColorFactor (size_t index) const
@@ -250,7 +291,7 @@ void TextLine::SetTextUtf8 (const char* text)
 
   impl->OnTextChanged ();
 
-  UpdateNotify ();
+  UpdateCharsNotify ();
 }
 
 void TextLine::SetTextUtf32 (const unsigned int* text, size_t length)
@@ -284,7 +325,7 @@ void TextLine::SetTextUtf32 (const unsigned int* text, size_t length)
 
   impl->OnTextChanged ();
 
-  UpdateNotify ();
+  UpdateCharsNotify ();
 }
 
 const char* TextLine::TextUtf8 () const
@@ -422,17 +463,47 @@ size_t TextLine::TextUtf32Hash () const
 
 void TextLine::SetFont (const char* font_name)
 {
-  if (!font_name)
-    throw xtl::make_null_argument_exception ("scene_graph::TextLine::SetFont", "font_name");
+  try
+  {
+    if (!font_name)
+      throw xtl::make_null_argument_exception ("", "font_name");
 
-  impl->font_name = font_name;
+    impl->font_name = font_name;
 
-  UpdateNotify ();
+    impl->font.reset ();
+
+    UpdateCharsNotify ();
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("scene_graph::TextLine::SetFont");
+    throw;
+  }
 }
 
 const char* TextLine::Font () const
 {
   return impl->font_name.c_str ();
+}
+
+void TextLine::SetFontCreationParams (const media::FontCreationParams& params)
+{
+  if (!params.charset_name)
+    throw xtl::make_null_argument_exception ("scene_graph::TextLine::SetFontCreationParams", "params.charset_name");
+
+  impl->font.reset ();
+
+  static_cast<media::FontCreationParams&> (impl->font_creation_params) = params;
+
+  impl->font_creation_params.charset_name_string = params.charset_name;
+  impl->font_creation_params.charset_name        = impl->font_creation_params.charset_name_string.c_str ();
+
+  UpdateCharsNotify ();
+}
+
+const media::FontCreationParams& TextLine::FontCreationParams () const
+{
+  return impl->font_creation_params;
 }
 
 /*
@@ -443,7 +514,7 @@ void TextLine::SetSpacingMultiplier (float spacing_multiplier)
 {
   impl->spacing_multiplier = spacing_multiplier;
 
-  UpdateNotify ();
+  UpdateCharsNotify ();
 }
 
 float TextLine::SpacingMultiplier () const
@@ -468,7 +539,7 @@ void TextLine::SetAlignment (TextLineAlignment horizontal, TextLineAlignment ver
   impl->horizontal_alignment = horizontal;
   impl->vertical_alignment = vertical;
 
-  UpdateNotify ();
+  UpdateCharsNotify ();
 }
 
 void TextLine::SetHorizontalAlignment (TextLineAlignment alignment)
@@ -478,7 +549,7 @@ void TextLine::SetHorizontalAlignment (TextLineAlignment alignment)
 
   impl->horizontal_alignment = alignment;
 
-  UpdateNotify ();
+  UpdateCharsNotify ();
 }
 
 void TextLine::SetVerticalAlignment (TextLineAlignment alignment)
@@ -488,7 +559,7 @@ void TextLine::SetVerticalAlignment (TextLineAlignment alignment)
 
   impl->vertical_alignment = alignment;
 
-  UpdateNotify ();
+  UpdateCharsNotify ();
 }
 
 TextLineAlignment TextLine::VerticalAlignment () const
@@ -502,13 +573,189 @@ TextLineAlignment TextLine::HorizontalAlignment () const
 }
 
 /*
+    Перестроение таблицы символов
+*/
+
+void TextLine::RebuildCharsCore ()
+{
+  try
+  {
+    if (!impl->font)
+    {
+        //создание шрифта
+
+      impl->font.reset (new media::Font (FontLibrary ().CreateFont (impl->font_name.c_str (), impl->font_creation_params)));
+    }
+
+      //обновление цветов
+
+    if (impl->chars_colors_need_update)
+      impl->UpdateCharsColors ();
+
+      //обновление символов
+
+    size_t chars_count = TextLength ();
+
+    ResizeChars (0);
+    ResizeChars (chars_count);
+
+    media::Font&            font               = *impl->font;
+    const media::GlyphInfo* glyphs             = font.Glyphs ();
+    size_t                  glyphs_count       = font.GlyphsCount (),
+                            first_glyph_code   = font.FirstGlyphCode (),
+                            last_glyph_code    = first_glyph_code + glyphs_count;
+    float                   current_pen_x      = 0.0f,
+                            current_pen_y      = 0.0f,
+                            font_size          = (float)font.FontSize (),
+                            spacing_multiplier = SpacingMultiplier (),
+                            advance_multiplier = spacing_multiplier / font_size;
+    TextDimensions          text_dimensions;
+    const unsigned int*     src_char           = TextUtf32 ();
+    const math::vec4f*      colors             = impl->chars_colors.empty () ? (const math::vec4f*)0 : &impl->chars_colors [0],
+                            &default_color     = impl->color;
+    CharDesc                *dst_first_char    = CharsForUpdate (),
+                            *dst_char          = dst_first_char;
+    size_t                  prev_glyph_index   = 0;
+
+    for (size_t i=0; i<chars_count; i++, src_char++)
+    {
+        //проверка наличия кода символа в шрифте
+
+      size_t current_symbol_code = *src_char;
+
+      if (!is_symbol_valid (current_symbol_code, first_glyph_code, last_glyph_code))
+      {
+        if (!is_symbol_valid ('?', first_glyph_code, last_glyph_code))
+          continue;
+
+        current_symbol_code = '?';
+      }
+
+        //получение глифа
+
+      size_t                  glyph_index = current_symbol_code - first_glyph_code;
+      const media::GlyphInfo& glyph       = glyphs [glyph_index];
+
+        //перенос пера
+
+      if (dst_char != dst_first_char) //производится только если есть предыдущий символ
+      {
+        if (font.HasKerning (prev_glyph_index, glyph_index))
+        {
+          media::KerningInfo kerning_info = font.Kerning (prev_glyph_index, glyph_index);
+
+          current_pen_x += kerning_info.x_kerning / font_size;
+          current_pen_y += kerning_info.y_kerning / font_size;
+        }
+      }
+
+        //инициализация символа
+
+      float bearing_x = glyph.bearing_x / font_size,
+            bearing_y = glyph.bearing_y / font_size,
+            size_x    = glyph.width / font_size,
+            size_y    = glyph.height / font_size;
+
+      dst_char->code     = *src_char;
+      dst_char->font     = &font;
+      dst_char->position = math::vec3f (current_pen_x + bearing_x + size_x / 2.f, current_pen_y + bearing_y - size_y / 2.f, 0.f);
+      dst_char->size     = math::vec2f (size_x, size_y);
+      dst_char->color    = colors ? colors [i] : default_color;
+
+        //перенос пера
+
+      current_pen_x += glyph.advance_x * advance_multiplier;
+      current_pen_y += glyph.advance_y * advance_multiplier;
+
+        //корректировка границ текста
+
+      TextDimensions glyph_dimensions;
+
+      glyph_dimensions.min.x = dst_char->position.x - dst_char->size.x * 0.5f;
+      glyph_dimensions.min.y = dst_char->position.y - dst_char->size.y * 0.5f;
+      glyph_dimensions.max.x = glyph_dimensions.min.x + dst_char->size.x;
+      glyph_dimensions.max.y = glyph_dimensions.min.y + dst_char->size.y;
+
+      if (glyph_dimensions.min.x < text_dimensions.min.x) text_dimensions.min.x = glyph_dimensions.min.x;
+      if (glyph_dimensions.min.y < text_dimensions.min.y) text_dimensions.min.y = glyph_dimensions.min.y;
+      if (glyph_dimensions.max.x > text_dimensions.max.x) text_dimensions.max.x = glyph_dimensions.max.x;
+      if (glyph_dimensions.max.y > text_dimensions.max.y) text_dimensions.max.y = glyph_dimensions.max.y;
+
+        //переход к следующему символу
+
+      dst_char++;
+
+      prev_glyph_index = glyph_index;
+    }    
+
+      //корректировка количества символов
+
+    chars_count = dst_char - dst_first_char;
+
+    ResizeChars (chars_count);
+
+      //смещение в зависимости от выравнивания
+
+    if (impl->horizontal_alignment != TextLineAlignment_Left || impl->vertical_alignment != TextLineAlignment_Left)
+    {
+        //расчёт вектора смещения надписи
+
+      math::vec2f size = text_dimensions.max - text_dimensions.min;
+      math::vec3f offset (-text_dimensions.min.x, -text_dimensions.min.y, 0);
+
+      switch (impl->horizontal_alignment)
+      {
+        default:
+        case TextLineAlignment_Center:
+          offset.x -= 0.5f * size.x;
+          break;
+        case TextLineAlignment_Right:
+          offset.x -= size.x;
+          break;
+        case TextLineAlignment_BaseLine:
+          offset.x = 0.f;
+          break;
+        case TextLineAlignment_Left:
+          break;
+      }
+
+      switch (impl->vertical_alignment)
+      {
+        default:
+        case TextLineAlignment_Center:
+          offset.y -= 0.5f * size.y;
+          break;
+        case TextLineAlignment_Top:
+          offset.y -= size.y;
+          break;
+        case TextLineAlignment_BaseLine:
+          offset.y = 0.f;
+          break;
+        case TextLineAlignment_Bottom:
+          break;
+      }
+
+      dst_char = dst_first_char;
+
+      for (size_t i=0; i<chars_count; i++, dst_char++)
+        dst_char->position += offset; 
+    }
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("scene_graph::TextLine::RebuildCharsCore");
+    throw;
+  }
+}
+
+/*
     Метод, вызываемый при посещении объекта
 */
 
 void TextLine::AcceptCore (Visitor& visitor)
 {
   if (!TryAccept (*this, visitor))
-    VisualModel::AcceptCore (visitor);
+    TextModel::AcceptCore (visitor);
 }
 
 /*
@@ -517,7 +764,7 @@ void TextLine::AcceptCore (Visitor& visitor)
 
 void TextLine::BindProperties (common::PropertyBindingMap& bindings)
 {
-  VisualModel::BindProperties (bindings);
+  TextModel::BindProperties (bindings);
 
   bindings.AddProperty ("Font", xtl::bind (&TextLine::Font, this), xtl::bind (&TextLine::SetFont, this, _1));
   bindings.AddProperty ("Color", xtl::bind (&TextLine::Color, this), xtl::bind (xtl::implicit_cast<void (TextLine::*)(const math::vec4f&)> (&TextLine::SetColor), this, _1));
