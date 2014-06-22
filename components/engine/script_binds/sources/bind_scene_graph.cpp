@@ -46,6 +46,7 @@ const char* SCENE_SPRITE_MODEL_LIBRARY                    = "Scene.SpriteModel";
 const char* SCENE_SPRITE_LIBRARY                          = "Scene.Sprite";
 const char* SCENE_LINE_MODEL_LIBRARY                      = "Scene.LineModel";
 const char* SCENE_LINE_LIBRARY                            = "Scene.Line";
+const char* SCENE_TEXT_MODEL_LIBRARY                      = "Scene.TextModel";
 const char* SCENE_TEXT_LINE_LIBRARY                       = "Scene.TextLine";
 const char* SCENE_STATIC_MESH_LIBRARY                     = "Scene.StaticMesh";
 const char* SCENE_HEIGHT_MAP_LIBRARY                      = "Scene.HeightMap";
@@ -93,6 +94,7 @@ void bind_scene_graph_library (Environment& environment)
   bind_sprite_library                          (environment);
   bind_line_model_library                      (environment);
   bind_line_library                            (environment);
+  bind_text_model_library                      (environment);
   bind_text_line_library                       (environment);
   bind_static_mesh_library                     (environment);
   bind_height_map_library                      (environment);

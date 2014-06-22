@@ -26,6 +26,7 @@ int main ()
     env.BindLibraries ("Math");
     env.BindLibraries ("SceneGraph");
     env.BindLibraries ("SceneInput");
+    env.BindLibraries ("MediaFont");
   
     load_script (*script, SCRIPT_FILE_NAME);
     

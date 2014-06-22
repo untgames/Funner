@@ -24,6 +24,10 @@ template class engine::decl_sg_cast<LineList,    LineModel>;
 template class engine::decl_sg_cast<LineList,    VisualModel>;
 template class engine::decl_sg_cast<LineList,    Entity>;
 template class engine::decl_sg_cast<LineList,    Node>;
+template class engine::decl_sg_cast<TextModel,   VisualModel>;
+template class engine::decl_sg_cast<TextModel,   Entity>;
+template class engine::decl_sg_cast<TextModel,   Node>;
+template class engine::decl_sg_cast<TextLine,    TextModel>;
 template class engine::decl_sg_cast<TextLine,    VisualModel>;
 template class engine::decl_sg_cast<TextLine,    Entity>;
 template class engine::decl_sg_cast<TextLine,    Node>;
@@ -249,6 +253,28 @@ TextLine::Pointer create_text_line (media::FontLibrary& font_library)
    Регистрация библиотеки работы с текстом
 */
 
+void bind_text_model_library (Environment& environment)
+{
+  InvokerRegistry lib = environment.CreateLibrary (SCENE_TEXT_MODEL_LIBRARY);
+
+    //наследование
+
+  lib.Register (environment, SCENE_VISUAL_MODEL_LIBRARY);
+
+    //регистрация операций и свойств
+
+  lib.Register ("get_Material",        make_invoker (&TextModel::Material));
+  lib.Register ("set_Material",        make_invoker (&TextModel::SetMaterial));
+  lib.Register ("get_TextureSemantic", make_invoker (&TextModel::TextureSemantic));
+  lib.Register ("set_TextureSemantic", make_invoker (&TextModel::SetTextureSemantic));
+  lib.Register ("get_CharsCapacity",   make_invoker (&TextModel::CharsCapacity));
+  lib.Register ("set_CharsCapacity",   make_invoker (&TextModel::ReserveChars));
+
+    //регистрация типа
+
+  environment.RegisterType<TextModel> (SCENE_TEXT_MODEL_LIBRARY);
+}
+
 void bind_static_text_line_library (Environment& environment)
 {
   InvokerRegistry text_line_alignment_lib = environment.CreateLibrary (SCENE_STATIC_TEXT_LINE_ALIGNMENT_LIBRARY);
@@ -261,13 +287,18 @@ void bind_static_text_line_library (Environment& environment)
   text_line_alignment_lib.Register ("get_BaseLine", make_const (TextLineAlignment_BaseLine));
 }
 
+static void rebuild_chars (TextLine& text_line)
+{
+  text_line.RebuildChars ();
+}
+
 void bind_text_line_library (Environment& environment)
 {
   InvokerRegistry lib = environment.CreateLibrary (SCENE_TEXT_LINE_LIBRARY);
 
     //наследование
 
-  lib.Register (environment, SCENE_VISUAL_MODEL_LIBRARY);
+  lib.Register (environment, SCENE_TEXT_MODEL_LIBRARY);
 
     //регистрация статических переменных
 
@@ -284,6 +315,8 @@ void bind_text_line_library (Environment& environment)
   lib.Register ("get_TextLength",          make_invoker (&TextLine::TextLength));
   lib.Register ("set_Font",                make_invoker (&TextLine::SetFont));
   lib.Register ("get_Font",                make_invoker (&TextLine::Font));
+  lib.Register ("set_FontCreationParams",  make_invoker (&TextLine::SetFontCreationParams));
+  lib.Register ("get_FontCreationParams",  make_invoker (&TextLine::FontCreationParams));
   lib.Register ("set_Color",               make_invoker (implicit_cast<void (TextLine::*) (const vec4f&)> (&TextLine::SetColor)));
   lib.Register ("get_Color",               make_invoker (&TextLine::Color));
   lib.Register ("set_HorizontalAlignment", make_invoker (&TextLine::SetHorizontalAlignment));
@@ -300,6 +333,7 @@ void bind_text_line_library (Environment& environment)
   lib.Register ("CharColorFactor",      make_invoker (&TextLine::CharColorFactor));
 
   lib.Register ("SetAlignment", make_invoker (&TextLine::SetAlignment));
+  lib.Register ("RebuildChars", make_invoker (&rebuild_chars));
 
   environment.RegisterType<TextLine> (SCENE_TEXT_LINE_LIBRARY);
 }

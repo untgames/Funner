@@ -683,7 +683,9 @@ end
 function test_text_line ()
   print ("TextLine test")
 
-  local text_line1 = Scene.TextLine.Create ()
+  local font_library = Media.FontLibrary.Create ()
+
+  local text_line1 = Scene.TextLine.Create (font_library)
 
   print ("Text = " .. text_line1.Text)
   print ("Font = " .. text_line1.Font)
@@ -691,8 +693,13 @@ function test_text_line ()
   print ("Horizontal aligment = " .. get_name (text_line1.HorizontalAlignment) .. " vertical aligment = " .. get_name (text_line1.VerticalAlignment))
   print ("Spacing Multiplier = " .. text_line1.SpacingMultiplier)
 
+  local font_params = Media.FontCreationParams.Create ()
+
+  font_params.FontSize = 50
+
   text_line1.Text                = "text"
   text_line1.Font                = "font"
+  text_line1.FontCreationParams  = font_params
   text_line1.Color               = vec4 (0.1, 0.2, 0.3, 0.4)
   text_line1.HorizontalAlignment = Scene.TextLineAlignment.Center
   text_line1.VerticalAlignment   = Scene.TextLineAlignment.Bottom

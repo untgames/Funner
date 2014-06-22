@@ -29,4 +29,4 @@ ENGINE.SCRIPT_BINDS.TESTS.IMPORTS	  	:= compile.script.core compile.math.vecmath
                                          link.engine.script_binds.physics link.engine.script_binds.math.spline_loader \
                                          link.engine.script_binds.social link.scene_graph.xscene link.media.animation.xanim \
                                          link.engine.script_binds.debug link.engine.script_binds.scene_input link.common.aes \
-                                         link.engine.script_binds.media.image
+                                         link.engine.script_binds.media.image link.engine.script_binds.media.font

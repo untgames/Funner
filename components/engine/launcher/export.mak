@@ -24,7 +24,7 @@ export.link.engine.launcher_shared.IMPORTS := link.common.default_console_handle
                                 link.engine.script_binds.physics link.engine.script_binds.math.spline_loader \
                                 link.engine.script_binds.social link.engine.script_binds.debug \
                                 link.engine.script_binds.scene_input link.engine.script_binds.store \
-                                link.engine.script_binds.analytics.flurry \
+                                link.engine.script_binds.analytics.flurry link.engine.script_binds.media.font \
                                 link.engine.script_binds.push_notifications \
                                 link.sound.low_level.openal_driver run.sound.low_level.openal_driver \
                                 link.engine.subsystems.scene_render link.engine.subsystems.scene_player \

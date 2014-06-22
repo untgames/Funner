@@ -76,6 +76,10 @@ export.link.engine.script_binds.store.IMPORTS       := link.engine.script_binds 
 export.link.engine.script_binds.media.image.LINK_INCLUDES := MediaImageScriptBind
 export.link.engine.script_binds.media.image.IMPORTS       := link.engine.script_binds link.media.image
 
+# Link media font exports
+export.link.engine.script_binds.media.font.LINK_INCLUDES := MediaFontScriptBind
+export.link.engine.script_binds.media.font.IMPORTS       := link.engine.script_binds link.media.font
+
 # Link flurry analytics exports
 export.link.engine.script_binds.analytics.flurry.LINK_INCLUDES := FlurryAnalyticsScriptBind
 export.link.engine.script_binds.analytics.flurry.IMPORTS       := link.engine.script_binds link.analytics.flurry
