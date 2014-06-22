@@ -42,7 +42,7 @@ SCENE_GRAPH.CORE.TESTS.LIB_DIRS         :=
 SCENE_GRAPH.CORE.TESTS.LIBS             :=
 SCENE_GRAPH.CORE.TESTS.COMPILER_CFLAGS  :=
 SCENE_GRAPH.CORE.TESTS.COMPILER_DEFINES := 
-SCENE_GRAPH.CORE.TESTS.IMPORTS          := link.scene_graph.core compile.scene_graph.core compile.common link.media.animation.xanim compile.media.font
+SCENE_GRAPH.CORE.TESTS.IMPORTS          := link.scene_graph.core compile.scene_graph.core compile.common link.media.animation.xanim compile.media.font link.media.font.xfont
 
 #Цель - XScene tests
 SCENE_GRAPH.SERIALIZATION.TESTS.TYPE             := test-suite

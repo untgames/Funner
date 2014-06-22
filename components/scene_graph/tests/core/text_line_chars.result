@@ -1,0 +1,13 @@
+Results of text_line_chars_test:
+Text line has 11 chars:
+  code=072 font='Times New Roman Regular' position=[0.38 0.31 0.00] size=[0.76 0.70] color=[1.00 1.00 1.00 1.00]
+  code=101 font='Times New Roman Regular' position=[1.70 0.20 0.00] size=[0.44 0.52] color=[1.00 1.00 1.00 1.00]
+  code=108 font='Times New Roman Regular' position=[2.47 0.33 0.00] size=[0.26 0.74] color=[1.00 1.00 1.00 1.00]
+  code=108 font='Times New Roman Regular' position=[2.95 0.33 0.00] size=[0.26 0.74] color=[1.00 1.00 1.00 1.00]
+  code=111 font='Times New Roman Regular' position=[3.56 0.20 0.00] size=[0.48 0.52] color=[1.00 1.00 1.00 1.00]
+  code=032 font='Times New Roman Regular' position=[4.55 0.31 0.00] size=[0.38 0.74] color=[1.00 1.00 1.00 1.00]
+  code=119 font='Times New Roman Regular' position=[5.55 0.19 0.00] size=[0.78 0.50] color=[1.00 1.00 1.00 1.00]
+  code=111 font='Times New Roman Regular' position=[6.88 0.20 0.00] size=[0.48 0.52] color=[1.00 1.00 1.00 1.00]
+  code=114 font='Times New Roman Regular' position=[7.85 0.21 0.00] size=[0.38 0.50] color=[1.00 1.00 1.00 1.00]
+  code=108 font='Times New Roman Regular' position=[8.47 0.33 0.00] size=[0.26 0.74] color=[1.00 1.00 1.00 1.00]
+  code=100 font='Times New Roman Regular' position=[9.08 0.32 0.00] size=[0.52 0.76] color=[1.00 1.00 1.00 1.00]
