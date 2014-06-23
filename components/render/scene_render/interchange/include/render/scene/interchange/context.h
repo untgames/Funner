@@ -9,6 +9,7 @@
 
 #include <render/scene/interchange/command_buffer.h>
 #include <render/scene/interchange/connection.h>
+#include <render/scene/interchange/inprocess_exchange_storage.h>
 #include <render/scene/interchange/streams.h>
 
 namespace render

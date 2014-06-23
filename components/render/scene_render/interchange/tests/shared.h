@@ -6,6 +6,8 @@
 #include <xtl/intrusive_ptr.h>
 #include <xtl/reference_counter.h>
 
+#include <media/image.h>
+
 #include <render/scene/interchange/context.h>
 #include <render/scene/interchange/inprocess_exchange_storage.h>
 #include <render/scene/interchange/property_synchronizer.h>

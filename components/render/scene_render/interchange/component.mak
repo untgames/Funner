@@ -14,9 +14,9 @@ RENDER.SCENE_RENDER.INTERCHANGE.UTILS.SERIALIZER_GENERATOR.IMPORTS     := compil
 RENDER.SCENE_RENDER.INTERCHANGE.SOURCES.TYPE        := static-lib
 RENDER.SCENE_RENDER.INTERCHANGE.SOURCES.NAME        := funner.render.scene_render.interchange
 RENDER.SCENE_RENDER.INTERCHANGE.SOURCES.SOURCE_DIRS := sources
-RENDER.SCENE_RENDER.INTERCHANGE.SOURCES.IMPORTS     := compile.render.scene_render.interchange compile.common compile.system
+RENDER.SCENE_RENDER.INTERCHANGE.SOURCES.IMPORTS     := compile.render.scene_render.interchange compile.common compile.system compile.media.image
 
 #Цель - scene render interchange tests
 RENDER.SCENE_RENDER.INTERCHANGE.TESTS.TYPE        := test-suite
 RENDER.SCENE_RENDER.INTERCHANGE.TESTS.SOURCE_DIRS := tests
-RENDER.SCENE_RENDER.INTERCHANGE.TESTS.IMPORTS     := compile.render.scene_render.interchange link.render.scene_render.interchange
+RENDER.SCENE_RENDER.INTERCHANGE.TESTS.IMPORTS     := compile.render.scene_render.interchange compile.media.image link.render.scene_render.interchange

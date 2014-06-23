@@ -12,6 +12,14 @@
 
 #include <render/scene/interchange/command_buffer.h>
 
+namespace media
+{
+
+//forward declarations
+class Image;
+
+}
+
 namespace render
 {
 
@@ -81,6 +89,12 @@ class OutputStream
     void   SetPosition (size_t position);
     size_t Position    () const;
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Идентификатор владельца для внутрипроцессного обмена
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void        SetInprocessOwnerId (object_id_t id);
+    object_id_t InprocessOwnerId    () const;
+
   private:
     OutputStream (const OutputStream&); //no implementation
     OutputStream& operator = (const OutputStream&); //no implementation
@@ -88,11 +102,12 @@ class OutputStream
     void Resize (size_t size);
 
   private:
-    char*         command_start; //указатель на начало команды
-    char*         buffer_start;  //указатель на начало буфера
-    char*         buffer_end;    //указатель на конец буфера
-    char*         pos;           //позиция указателя записи
-    CommandBuffer buffer;        //буфер
+    char*         command_start;      //указатель на начало команды
+    char*         buffer_start;       //указатель на начало буфера
+    char*         buffer_end;         //указатель на конец буфера
+    char*         pos;                //позиция указателя записи
+    CommandBuffer buffer;             //буфер
+    object_id_t   inprocess_owner_id; //идентификатор владельца для внутрипроцессного обмена
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -181,6 +196,7 @@ void write (OutputStream&, const LightParams&);
 void write (OutputStream&, const PageCurlParams&);
 void write (OutputStream&, SpriteMode);
 void write (OutputStream&, PrimitiveUsage);
+void write (OutputStream&, const media::Image&);
 
 template <class T, unsigned int Size> void write (OutputStream&, const math::vector<T, Size>&);
 template <class T, unsigned int Size> void write (OutputStream&, const math::matrix<T, Size>&);
@@ -210,6 +226,7 @@ const LightParams&    read (InputStream&, xtl::type<LightParams>);
 const PageCurlParams& read (InputStream&, xtl::type<PageCurlParams>);
 const SpriteMode&     read (InputStream&, xtl::type<SpriteMode>);
 const PrimitiveUsage& read (InputStream&, xtl::type<PrimitiveUsage>);
+media::Image          read (InputStream&, xtl::type<media::Image>);
 
 template <class T, unsigned int Size> const math::vector<T, Size>& read (InputStream&, xtl::type<math::vector<T, Size> >);
 template <class T, unsigned int Size> const math::matrix<T, Size>& read (InputStream&, xtl::type<math::matrix<T, Size> >);

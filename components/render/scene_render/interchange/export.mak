@@ -4,4 +4,4 @@ export.compile.render.scene_render.interchange.IMPORTS      := compile.common co
 
 # Link exports
 export.link.render.scene_render.interchange.LIBS     := funner.render.scene_render.interchange
-export.link.render.scene_render.interchange.IMPORTS  := link.common link.system
+export.link.render.scene_render.interchange.IMPORTS  := link.common link.system link.media.image

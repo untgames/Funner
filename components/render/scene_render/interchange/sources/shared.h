@@ -18,6 +18,8 @@
 #include <common/singleton.h>
 #include <common/strlib.h>
 
+#include <media/image.h>
+
 #include <syslib/application.h>
 #include <syslib/semaphore.h>
 #include <syslib/shared_queue.h>

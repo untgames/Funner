@@ -18,12 +18,27 @@ inline RawArray<T>::RawArray (const T* in_data, size_t in_size)
 */
 
 inline OutputStream::OutputStream ()
+  : inprocess_owner_id ()
 {
   Reset (buffer);
 }
 
 inline OutputStream::~OutputStream ()
 {
+}
+
+/*
+    Идентификатор владельца для внутрипроцессного обмена
+*/
+
+inline void OutputStream::SetInprocessOwnerId (object_id_t id)
+{
+  inprocess_owner_id = id;
+}
+
+inline object_id_t OutputStream::InprocessOwnerId () const
+{
+  return inprocess_owner_id;
 }
 
 /*
