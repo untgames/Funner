@@ -314,6 +314,23 @@ Font FontLibrary::CreateFont (const char* name, const FontCreationParams& params
   }
 }
 
+bool FontLibrary::CanCreateFont (const char* name, const FontCreationParams& params) const
+{
+  try
+  {
+    if (!name)
+      return false;
+
+    FontDesc* desc = Find (name);
+
+    return desc && desc->CanCreateFont (params);
+  }
+  catch (...)
+  {
+    return false;
+  }
+}
+
 /*
    Управление параметрами кэширования
 */

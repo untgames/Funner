@@ -126,6 +126,25 @@ RasterizedFont Font::CreateRasterizedFont (const RasterizedFontCreationParams& p
 }
 
 /*
+    Получение объекта-события оповещения об удалении
+*/
+
+xtl::trackable& Font::GetTrackable () const
+{
+  return *impl;
+}
+
+namespace media
+{
+
+xtl::trackable& get_trackable (Font& font)
+{
+  return font.GetTrackable ();
+}
+
+}
+
+/*
    Обмен
 */
 
@@ -133,7 +152,6 @@ void Font::Swap (Font& source)
 {
   stl::swap (impl, source.impl);
 }
-
 
 namespace media
 {
