@@ -16,6 +16,7 @@ struct ServerImpl::Impl
   server::ScreenManager   screen_manager;   //менеджер экранов
   server::SceneManager    scene_manager;    //менеджер сцены
   server::ResourceManager resource_manager; //менеджер ресурсов
+  server::MaterialManager material_manager; //менеджер материалов
 
 /// Конструктор
   Impl (const char* name)
@@ -26,6 +27,7 @@ struct ServerImpl::Impl
     , screen_manager (window_manager, render_manager, viewport_manager)
     , scene_manager (render_manager)
     , resource_manager (render_manager)
+    , material_manager (render_manager)
   {
   }
 };
@@ -90,4 +92,9 @@ SceneManager& ServerImpl::SceneManager ()
 ResourceManager& ServerImpl::ResourceManager ()
 {
   return impl->resource_manager;
+}
+
+MaterialManager& ServerImpl::MaterialManager ()
+{
+  return impl->material_manager;
 }

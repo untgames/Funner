@@ -286,7 +286,7 @@ void ConnectionState::UpdateTexture (const char* texture_name, const media::Imag
 {
   try
   {
-    throw xtl::make_not_implemented_exception (__FUNCTION__);
+    impl->server.MaterialManager ().UpdateTexture (texture_name, image);
   }
   catch (xtl::exception& e)
   {
@@ -299,7 +299,7 @@ void ConnectionState::RemoveTexture (const char* texture_name)
 {
   try
   {
-    throw xtl::make_not_implemented_exception (__FUNCTION__);
+    impl->server.MaterialManager ().RemoveTexture (texture_name);
   }
   catch (xtl::exception& e)
   {
@@ -312,7 +312,7 @@ void ConnectionState::CloneMaterial (const char* material_name, const char* prot
 {
   try
   {
-    throw xtl::make_not_implemented_exception (__FUNCTION__);
+    impl->server.MaterialManager ().CloneMaterial (material_name, prototype_name);
   }
   catch (xtl::exception& e)
   {
@@ -325,7 +325,7 @@ void ConnectionState::SetMaterialTexmapImage (const char* material_name, const c
 {
   try
   {
-    throw xtl::make_not_implemented_exception (__FUNCTION__);
+    impl->server.MaterialManager ().SetMaterialTexmapImage (material_name, semantic, image_name);
   }
   catch (xtl::exception& e)
   {
@@ -338,7 +338,7 @@ void ConnectionState::SetMaterialTexmapSampler (const char* material_name, const
 {
   try
   {
-    throw xtl::make_not_implemented_exception (__FUNCTION__);
+    impl->server.MaterialManager ().SetMaterialTexmapSampler (material_name, semantic, sampler);
   }
   catch (xtl::exception& e)
   {
@@ -351,7 +351,7 @@ void ConnectionState::RemoveMaterial (const char* material_name)
 {
   try
   {
-    throw xtl::make_not_implemented_exception (__FUNCTION__);
+    impl->server.MaterialManager ().RemoveMaterial (material_name);
   }
   catch (xtl::exception& e)
   {

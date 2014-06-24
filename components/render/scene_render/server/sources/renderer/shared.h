@@ -16,6 +16,7 @@
 
 #include <shared/batching_manager.h>
 #include <shared/camera.h>
+#include <shared/material_manager.h>
 #include <shared/render_manager.h>
 #include <shared/render_target_map.h>
 #include <shared/resource_manager.h>
