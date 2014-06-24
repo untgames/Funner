@@ -345,27 +345,29 @@ inline void write (OutputStream& s, int8 value)                  { s.Write (valu
 inline void write (OutputStream& s, uint8 value)                 { s.Write (value); }
 inline void write (OutputStream& s, float32 value)               { s.Write (value); }
 inline void write (OutputStream& s, NodeType value)              { write (s, static_cast<int32> (value)); }
+inline void write (OutputStream& s, TextureDimension value)      { write (s, static_cast<int32> (value)); }
 inline void write (OutputStream& s, const LightParams& value)    { s.Write (value); }
 inline void write (OutputStream& s, const PageCurlParams& value) { s.Write (value); }
 inline void write (OutputStream& s, SpriteMode value)            { write (s, static_cast<int32> (value)); }
 inline void write (OutputStream& s, PrimitiveUsage value)        { write (s, static_cast<int32> (value)); }
 
-inline       bool            read (InputStream& s, xtl::type<bool>)           { return s.Read<bool8> () != 0; }
-inline const int64&          read (InputStream& s, xtl::type<int64>)          { return s.Read<int64> (); }
-inline const uint64&         read (InputStream& s, xtl::type<uint64>)         { return s.Read<uint64> (); }
-inline const int32&          read (InputStream& s, xtl::type<int32>)          { return s.Read<int32> (); }
-inline const uint32&         read (InputStream& s, xtl::type<uint32>)         { return s.Read<uint32> (); }
-inline const int16&          read (InputStream& s, xtl::type<int16>)          { return s.Read<int16> (); }
-inline const uint16&         read (InputStream& s, xtl::type<uint16>)         { return s.Read<uint16> (); }
-inline const int8&           read (InputStream& s, xtl::type<int8>)           { return s.Read<int8> (); }
-inline const uint8&          read (InputStream& s, xtl::type<uint8>)          { return s.Read<uint8> (); }
-inline const float32&        read (InputStream& s, xtl::type<float32>)        { return s.Read<float32> (); }
-inline const Command&        read (InputStream& s, xtl::type<Command>)        { return s.Read<Command> (); }
-inline const NodeType&       read (InputStream& s, xtl::type<NodeType>)       { return *reinterpret_cast<const NodeType*> (&read (s, xtl::type<int32> ())); }
-inline const LightParams&    read (InputStream& s, xtl::type<LightParams>)    { return s.Read<LightParams> (); }
-inline const PageCurlParams& read (InputStream& s, xtl::type<PageCurlParams>) { return s.Read<PageCurlParams> (); }
-inline const SpriteMode&     read (InputStream& s, xtl::type<SpriteMode>)     { return *reinterpret_cast<const SpriteMode*> (&read (s, xtl::type<int32> ())); }
-inline const PrimitiveUsage& read (InputStream& s, xtl::type<PrimitiveUsage>) { return *reinterpret_cast<const PrimitiveUsage*> (&read (s, xtl::type<int32> ())); }
+inline       bool              read (InputStream& s, xtl::type<bool>)             { return s.Read<bool8> () != 0; }
+inline const int64&            read (InputStream& s, xtl::type<int64>)            { return s.Read<int64> (); }
+inline const uint64&           read (InputStream& s, xtl::type<uint64>)           { return s.Read<uint64> (); }
+inline const int32&            read (InputStream& s, xtl::type<int32>)            { return s.Read<int32> (); }
+inline const uint32&           read (InputStream& s, xtl::type<uint32>)           { return s.Read<uint32> (); }
+inline const int16&            read (InputStream& s, xtl::type<int16>)            { return s.Read<int16> (); }
+inline const uint16&           read (InputStream& s, xtl::type<uint16>)           { return s.Read<uint16> (); }
+inline const int8&             read (InputStream& s, xtl::type<int8>)             { return s.Read<int8> (); }
+inline const uint8&            read (InputStream& s, xtl::type<uint8>)            { return s.Read<uint8> (); }
+inline const float32&          read (InputStream& s, xtl::type<float32>)          { return s.Read<float32> (); }
+inline const Command&          read (InputStream& s, xtl::type<Command>)          { return s.Read<Command> (); }
+inline const NodeType&         read (InputStream& s, xtl::type<NodeType>)         { return *reinterpret_cast<const NodeType*> (&read (s, xtl::type<int32> ())); }
+inline const TextureDimension& read (InputStream& s, xtl::type<TextureDimension>) { return *reinterpret_cast<const TextureDimension*> (&read (s, xtl::type<int32> ())); }
+inline const LightParams&      read (InputStream& s, xtl::type<LightParams>)      { return s.Read<LightParams> (); }
+inline const PageCurlParams&   read (InputStream& s, xtl::type<PageCurlParams>)   { return s.Read<PageCurlParams> (); }
+inline const SpriteMode&       read (InputStream& s, xtl::type<SpriteMode>)       { return *reinterpret_cast<const SpriteMode*> (&read (s, xtl::type<int32> ())); }
+inline const PrimitiveUsage&   read (InputStream& s, xtl::type<PrimitiveUsage>)   { return *reinterpret_cast<const PrimitiveUsage*> (&read (s, xtl::type<int32> ())); }
 
 template <class T>
 inline const T& read (InputStream& s, xtl::type<T&>)

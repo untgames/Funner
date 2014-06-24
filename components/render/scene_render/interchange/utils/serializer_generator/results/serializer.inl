@@ -5,6 +5,7 @@ inline stl::string get_command_name(CommandId command_id)
     case CommandId_LoadResource: return "LoadResource";
     case CommandId_UnloadResource: return "UnloadResource";
     case CommandId_SetMaxDrawDepth: return "SetMaxDrawDepth";
+    case CommandId_CreateTexture: return "CreateTexture";
     case CommandId_UpdateTexture: return "UpdateTexture";
     case CommandId_RemoveTexture: return "RemoveTexture";
     case CommandId_CloneMaterial: return "CloneMaterial";
@@ -108,6 +109,26 @@ inline void ClientToServerSerializer::SetMaxDrawDepth(uint32 depth)
   {
     BeginCommand(CommandId_SetMaxDrawDepth);
     write(*this, depth);
+    EndCommand();
+  }
+  catch (...)
+  {
+    SetPosition (saved_position);
+    throw;
+  }
+}
+
+inline void ClientToServerSerializer::CreateTexture(const char* texture_name, media::Image image, TextureDimension dimension, bool8 create_mipmaps)
+{
+  size_t saved_position = Position ();
+
+  try
+  {
+    BeginCommand(CommandId_CreateTexture);
+    write(*this, texture_name);
+    write(*this, image);
+    write(*this, dimension);
+    write(*this, create_mipmaps);
     EndCommand();
   }
   catch (...)
@@ -1109,6 +1130,17 @@ template <class Dispatcher> inline bool ClientToServerDeserializer::Deserialize(
       uint32 arg1 = read(*this, xtl::type<uint32 > ());
 
       dispatcher.SetMaxDrawDepth(arg1);
+
+      return true;
+    }
+    case CommandId_CreateTexture:
+    {
+      const char* arg1 = read(*this, xtl::type<const char* > ());
+      media::Image arg2 = read(*this, xtl::type<media::Image > ());
+      TextureDimension arg3 = read(*this, xtl::type<TextureDimension > ());
+      bool8 arg4 = read(*this, xtl::type<bool8 > ());
+
+      dispatcher.CreateTexture(arg1, arg2, arg3, arg4);
 
       return true;
     }

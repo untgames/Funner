@@ -50,7 +50,7 @@ MaterialManager::~MaterialManager ()
     Управление текстурами
 */
 
-void MaterialManager::UpdateTexture (const char* texture_name, const media::Image& image)
+void MaterialManager::CreateTexture (const char* texture_name, const media::Image& image, manager::TextureDimension dimension, bool create_mips)
 {
   try
   {
@@ -60,17 +60,34 @@ void MaterialManager::UpdateTexture (const char* texture_name, const media::Imag
     TextureMap::iterator iter = impl->textures.find (texture_name);
 
     if (iter != impl->textures.end ())
-    {
-      iter->second.Update (image);
+      throw xtl::make_argument_exception ("", "texture_name", texture_name, "Texture has been already created");
 
-      return;
-    }
-
-    manager::Texture texture = impl->render_manager.Manager ().CreateTexture (image, manager::TextureDimension_2D, true); //TODO: pass params from scene render client
+    manager::Texture texture = impl->render_manager.Manager ().CreateTexture (image, dimension, create_mips);
 
     impl->textures.insert_pair (texture_name, texture);
 
     impl->render_manager.Manager ().ShareTexture (texture_name, texture);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::scene::server::MaterialManager::CreateTexture");
+    throw;
+  }
+}
+
+void MaterialManager::UpdateTexture (const char* texture_name, const media::Image& image)
+{
+  try
+  {
+    if (!texture_name)
+      throw xtl::make_null_argument_exception ("", "texture_name");
+
+    TextureMap::iterator iter = impl->textures.find (texture_name);
+
+    if (iter == impl->textures.end ())
+      throw xtl::make_argument_exception ("", "texture_name", texture_name, "Texture has not been created");
+
+    iter->second.Update (image);
   }
   catch (xtl::exception& e)
   {

@@ -56,7 +56,20 @@ TexturePtr MaterialManager::CreateTexture (const char* name, bool remove_on_dest
   }
   catch (xtl::exception& e)
   {
-    e.touch ("render::scene::client::MaterialManager::CreateTexture");
+    e.touch ("render::scene::client::MaterialManager::CreateTexture(const char*,bool)");
+    throw;
+  }
+}
+
+TexturePtr MaterialManager::CreateTexture (const char* name, const media::Image& image, render::scene::interchange::TextureDimension dimension, bool create_mipmaps, bool remove_on_destroy)
+{
+  try
+  {
+    return TexturePtr (new Texture (impl->context, name, image, dimension, create_mipmaps, remove_on_destroy), false);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::scene::client::MaterialManager::CreateTexture(const char*,const media::Image&,render::scene::interchange::TextureDimension,bool)");
     throw;
   }
 }

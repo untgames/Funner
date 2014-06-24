@@ -29,6 +29,7 @@ class MaterialManager
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Управление текстурами
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+    void CreateTexture (const char* texture_name, const media::Image& image, manager::TextureDimension dimension, bool create_mips);
     void UpdateTexture (const char* texture_name, const media::Image& image);
     void RemoveTexture (const char* texture_name);
 

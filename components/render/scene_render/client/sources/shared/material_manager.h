@@ -57,6 +57,7 @@ class Texture: public xtl::reference_counter, public xtl::noncopyable
 ///Конструктор / деструктор
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     Texture  (Context& context, const char* name, bool remove_on_destroy);
+    Texture  (Context& context, const char* name, const media::Image& image, interchange::TextureDimension dimension, bool create_mipmaps, bool remove_on_destroy);
     ~Texture ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -93,6 +94,7 @@ class MaterialManager: public xtl::noncopyable
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     MaterialPtr CreateMaterial (const char* name, const char* prototype, bool remove_on_destroy = true);    
     TexturePtr  CreateTexture  (const char* name, bool remove_on_destroy = true);
+    TexturePtr  CreateTexture  (const char* name, const media::Image& image, interchange::TextureDimension dimension, bool create_mipmaps, bool remove_on_destroy = true);
 
   private:
     struct Impl;

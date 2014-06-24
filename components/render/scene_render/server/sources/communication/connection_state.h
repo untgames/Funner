@@ -30,6 +30,7 @@ class ConnectionState: public xtl::noncopyable
 
     void SetMaxDrawDepth (uint32 depth);
 
+    void CreateTexture(const char* texture_name, const media::Image& image, interchange::TextureDimension dimension, bool8 create_mips);
     void UpdateTexture(const char* texture_name, const media::Image& image);
     void RemoveTexture(const char* texture_name);
 

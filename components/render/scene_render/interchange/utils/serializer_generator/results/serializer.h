@@ -22,6 +22,7 @@ enum CommandId
   CommandId_LoadResource,
   CommandId_UnloadResource,
   CommandId_SetMaxDrawDepth,
+  CommandId_CreateTexture,
   CommandId_UpdateTexture,
   CommandId_RemoveTexture,
   CommandId_CloneMaterial,
@@ -93,6 +94,7 @@ class ClientToServerSerializer: public OutputStream
     void LoadResource(const char* name);
     void UnloadResource(const char* name);
     void SetMaxDrawDepth(uint32 depth);
+    void CreateTexture(const char* texture_name, media::Image image, TextureDimension dimension, bool8 create_mipmaps);
     void UpdateTexture(const char* texture_name, media::Image image);
     void RemoveTexture(const char* texture_name);
     void CloneMaterial(const char* material_name, const char* prototype_name);

@@ -5,6 +5,7 @@ void UnloadResource (const char* name);
 
 void SetMaxDrawDepth (uint32 depth);
 
+void CreateTexture (const char* texture_name, media::Image image, TextureDimension dimension, bool8 create_mipmaps);
 void UpdateTexture (const char* texture_name, media::Image image);
 void RemoveTexture (const char* texture_name);
 

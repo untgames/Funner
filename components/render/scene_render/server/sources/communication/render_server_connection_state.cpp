@@ -282,6 +282,29 @@ void ConnectionState::SetMaxDrawDepth (uint32 depth)
     Работа с ресурсами
 */
 
+void ConnectionState::CreateTexture (const char* texture_name, const media::Image& image, interchange::TextureDimension in_dimension, bool8 create_mips)
+{
+  try
+  {
+    render::manager::TextureDimension dimension;
+
+    switch (in_dimension)
+    {
+      case interchange::TextureDimension_2D:      dimension = manager::TextureDimension_2D; break;
+      case interchange::TextureDimension_3D:      dimension = manager::TextureDimension_3D; break;
+      case interchange::TextureDimension_Cubemap: dimension = manager::TextureDimension_Cubemap; break;
+      default:                                    throw xtl::make_argument_exception ("", "dimension", in_dimension);
+    }
+
+    impl->server.MaterialManager ().CreateTexture (texture_name, image, dimension, create_mips != 0);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::scene::ConnectionState::CreateTexture");
+    throw;
+  }
+}
+
 void ConnectionState::UpdateTexture (const char* texture_name, const media::Image& image)
 {
   try

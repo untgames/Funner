@@ -40,6 +40,24 @@ Texture::Texture (Context& context, const char* name, bool remove_on_destroy)
   }
 }
 
+Texture::Texture (Context& context, const char* name, const media::Image& image, render::scene::interchange::TextureDimension dimension, bool create_mipmaps, bool remove_on_destroy)
+{
+  try
+  {
+    if (!name)
+      throw xtl::make_null_argument_exception ("", "name");
+
+    impl.reset (new Impl (context, name, remove_on_destroy));
+
+    context.CreateTexture (name, image, dimension, create_mipmaps);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::scene::client::Texture::Texture");
+    throw;
+  }
+}
+
 Texture::~Texture ()
 {
   try
