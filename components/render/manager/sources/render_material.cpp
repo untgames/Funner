@@ -37,6 +37,18 @@ struct Texmap: public xtl::reference_counter, public CacheHolder
     texture.AttachCacheHolder (*this);
     sampler.AttachCacheHolder (*this);
   }
+
+  Texmap (CacheHolder& owner, const Texmap& texmap)
+    : texture (texmap.texture)
+    , sampler (texmap.sampler)
+    , is_dynamic (texmap.is_dynamic)
+    , semantic_hash (texmap.semantic_hash)
+  {
+    owner.AttachCacheSource (*this);
+    
+    texture.AttachCacheHolder (*this);
+    sampler.AttachCacheHolder (*this);
+  }
   
   void ResetCacheCore ()
   {
@@ -119,8 +131,47 @@ struct MaterialImpl::Impl: public CacheHolder, public DebugIdHolder
     AttachCacheSource (properties);
     
     if (device_manager->Settings ().HasDebugLog ())
-      log.Printf ("Material '%s' created (id=%u)", name.c_str (), Id ());
+      log.Printf ("Material '%s' has been created (id=%u)", name.c_str (), Id ());
   }
+
+///Конструктор копирования
+  Impl (Impl& impl)
+    : device_manager (impl.device_manager)
+    , texture_manager (impl.texture_manager)
+    , program_manager (impl.program_manager)
+    , name (impl.name)
+    , tags (impl.tags)
+    , program (impl.program)
+    , properties (device_manager)
+    , material_properties_layout (impl.material_properties_layout)
+    , has_dynamic_textures (impl.has_dynamic_textures)
+    , cached_state_block_mask_hash (0)
+  {
+    try
+    {
+      AttachCacheSource (properties);    
+
+      program.AttachCacheHolder (*this);
+
+      properties.SetProperties (impl.properties.Properties ());
+
+      texmaps.reserve (impl.texmaps.size ());
+
+      for (TexmapArray::iterator iter=impl.texmaps.begin (), end=impl.texmaps.end (); iter!=end; ++iter)
+        texmaps.push_back (TexmapPtr (new Texmap (*this, **iter), false));
+      
+      if (tags.empty ())
+        log.Printf ("Warning: material '%s' has no tags. Will not be displayed", name.c_str ());
+
+      if (device_manager->Settings ().HasDebugLog ())
+        log.Printf ("Material '%s' copy has been created (id=%u)", name.c_str (), Id ());
+    }
+    catch (xtl::exception& e)
+    {
+      e.touch ("render::manager::MaterialImpl::Impl::Impl(const Impl&)");
+      throw;
+    }    
+  }  
   
 ///Деструктор
   ~Impl ()
@@ -133,7 +184,7 @@ struct MaterialImpl::Impl: public CacheHolder, public DebugIdHolder
     cached_state_block_mask_hash = 0;
     
     if (device_manager->Settings ().HasDebugLog ())
-      log.Printf ("Material '%s' destroyed (id=%u)", name.c_str (), Id ());
+      log.Printf ("Material '%s' has been destroyed (id=%u)", name.c_str (), Id ());
   }
   
 ///Работа с кэшем
@@ -290,6 +341,21 @@ struct MaterialImpl::Impl: public CacheHolder, public DebugIdHolder
       throw;
     }
   }
+
+/// Поиск карты по семантике
+  TexmapPtr FindTexmapBySemantic (const char* semantic)
+  {
+    if (!semantic)
+      return TexmapPtr ();
+
+    size_t semantic_hash = common::strhash (semantic);
+
+    for (TexmapArray::iterator iter=texmaps.begin (), end=texmaps.end (); iter!=end; ++iter)
+      if ((*iter)->semantic_hash == semantic_hash)
+        return *iter;
+
+    return TexmapPtr ();
+  }
   
   using CacheHolder::UpdateCache;  
   using CacheHolder::ResetCache;
@@ -302,6 +368,12 @@ struct MaterialImpl::Impl: public CacheHolder, public DebugIdHolder
 
 MaterialImpl::MaterialImpl (const DeviceManagerPtr& device_manager, const TextureManagerPtr& texture_manager, const ProgramManagerPtr& program_manager, const char* name)
   : impl (new Impl (device_manager, texture_manager, program_manager, name))
+{
+  AttachCacheSource (*impl);
+}
+
+MaterialImpl::MaterialImpl (const MaterialImpl& material)
+  : impl (new Impl (*material.impl))
 {
   AttachCacheSource (*impl);
 }
@@ -510,6 +582,107 @@ void MaterialImpl::Update (const media::rfx::Material& material)
     e.touch ("render::manager::MaterialImpl::Update");
     throw;
   }
+}
+
+/*
+    Обновление отдельных текстур
+*/
+
+void MaterialImpl::SetTexmap (const char* semantic, const char* image_name, const char* sampler)
+{
+  try
+  {
+    if (!semantic)
+      throw xtl::make_null_argument_exception ("", "semantic");
+
+    size_t semantic_hash = common::strhash (semantic);
+
+    if (!sampler && !image_name)
+    {
+      for (TexmapArray::iterator iter=impl->texmaps.begin (), end=impl->texmaps.end (); iter!=end; ++iter)
+        if ((*iter)->semantic_hash == semantic_hash)
+        {
+          impl->texmaps.erase (iter);
+          break;
+        }
+
+      return;
+    }
+
+    if (!sampler)
+    {
+      TexmapPtr texmap = impl->FindTexmapBySemantic (semantic);
+
+      if (!texmap)
+        throw xtl::make_null_argument_exception ("", "sampler");
+
+      sampler = texmap->sampler.Name ();
+    }
+
+    if (!image_name)
+    {
+      TexmapPtr texmap = impl->FindTexmapBySemantic (semantic);
+
+      if (!texmap)
+        throw xtl::make_null_argument_exception ("", "image_name");
+
+      image_name = texmap->texture.Name ();
+    }
+
+      //пересоздание карты
+
+    bool is_dynamic_image = impl->texture_manager->IsDynamicTexture (image_name);
+    
+    TexmapPtr new_texmap (new Texmap (*impl, impl->texture_manager->GetTextureProxy (image_name), impl->texture_manager->GetSamplerProxy (sampler), is_dynamic_image, semantic), false);
+
+      //обновление массива карт
+
+    bool found = false;
+
+    for (TexmapArray::iterator iter=impl->texmaps.begin (), end=impl->texmaps.end (); iter!=end; ++iter)
+      if ((*iter)->semantic_hash == semantic_hash)
+      {
+        *iter = new_texmap;
+        found = true;
+
+        break;
+      }
+
+    if (!found)
+      impl->texmaps.push_back (new_texmap);    
+
+      //обновление кэша с зависимостями (поскольку может измениться состояние тэгов и динамических текстур)
+
+    if (is_dynamic_image)
+      impl->has_dynamic_textures = true;
+      
+    impl->InvalidateCache ();
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::manager::MaterialImpl::SetTexmap");
+    throw;
+  }
+}
+
+const char* MaterialImpl::TexmapImage (const char* semantic)
+{
+  TexmapPtr texmap = impl->FindTexmapBySemantic (semantic);
+
+  if (!texmap)
+    return 0;
+
+  return texmap->texture.Name ();
+}
+
+const char* MaterialImpl::TexmapSampler (const char* semantic)
+{
+  TexmapPtr texmap = impl->FindTexmapBySemantic (semantic);
+
+  if (!texmap)
+    return 0;
+
+  return texmap->sampler.Name ();
 }
 
 /*
