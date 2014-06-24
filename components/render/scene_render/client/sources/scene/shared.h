@@ -10,6 +10,8 @@
 #include <common/property_map.h>
 #include <common/strlib.h>
 
+#include <media/image.h>
+
 #include <sg/light.h>
 #include <sg/line.h>
 #include <sg/mesh.h>

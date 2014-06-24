@@ -12,6 +12,8 @@
 #include <common/property_map.h>
 #include <common/strlib.h>
 
+#include <media/image.h>
+
 #include <syslib/semaphore.h>
 #include <syslib/thread.h>
 

@@ -10,7 +10,7 @@ RENDER.SCENE_RENDER.SERVER.SOURCES.NAME         := funner.render.scene_render.se
 RENDER.SCENE_RENDER.SERVER.SOURCES.INCLUDE_DIRS := sources
 RENDER.SCENE_RENDER.SERVER.SOURCES.SOURCE_DIRS  := sources/communication sources/renderer sources/scene sources/techniques
 RENDER.SCENE_RENDER.SERVER.SOURCES.IMPORTS      := compile.render.scene_render.server compile.render.scene_render.interchange compile.common compile.system compile.render.manager \
-                                                   compile.math.bound_volumes
+                                                   compile.math.bound_volumes compile.media.image
 
 #Цель - scene render server tests
 RENDER.SCENE_RENDER.SERVER.TESTS.TYPE        := test-suite

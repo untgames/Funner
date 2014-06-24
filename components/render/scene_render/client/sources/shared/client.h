@@ -17,6 +17,7 @@ namespace client
 {
 
 class SceneManager;
+class MaterialManager;
 
 typedef interchange::PropertyMapAutoWriter::Synchronizer PropertyMapSynchronizer;
 
@@ -76,7 +77,8 @@ class ClientImpl: public xtl::noncopyable
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Менеджеры
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    client::SceneManager& SceneManager ();
+    client::SceneManager&    SceneManager    ();
+    client::MaterialManager& MaterialManager ();
 
   private:
     struct Impl;

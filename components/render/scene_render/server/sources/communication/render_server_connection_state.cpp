@@ -279,6 +279,88 @@ void ConnectionState::SetMaxDrawDepth (uint32 depth)
 }
 
 /*
+    Работа с ресурсами
+*/
+
+void ConnectionState::UpdateTexture (const char* texture_name, const media::Image& image)
+{
+  try
+  {
+    throw xtl::make_not_implemented_exception (__FUNCTION__);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::scene::ConnectionState::UpdateTexture");
+    throw;
+  }
+}
+
+void ConnectionState::RemoveTexture (const char* texture_name)
+{
+  try
+  {
+    throw xtl::make_not_implemented_exception (__FUNCTION__);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::scene::ConnectionState::RemoveTexture");
+    throw;
+  }
+}
+
+void ConnectionState::CloneMaterial (const char* material_name, const char* prototype_name)
+{
+  try
+  {
+    throw xtl::make_not_implemented_exception (__FUNCTION__);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::scene::ConnectionState::CloneMaterial");
+    throw;
+  }
+}
+
+void ConnectionState::SetMaterialTexmapImage (const char* material_name, const char* semantic, const char* image_name)
+{
+  try
+  {
+    throw xtl::make_not_implemented_exception (__FUNCTION__);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::scene::ConnectionState::SetMaterialTexmapImage");
+    throw;
+  }
+}
+
+void ConnectionState::SetMaterialTexmapSampler (const char* material_name, const char* semantic, const char* sampler)
+{
+  try
+  {
+    throw xtl::make_not_implemented_exception (__FUNCTION__);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::scene::ConnectionState::SetMaterialTexmapSampler");
+    throw;
+  }
+}
+
+void ConnectionState::RemoveMaterial (const char* material_name)
+{
+  try
+  {
+    throw xtl::make_not_implemented_exception (__FUNCTION__);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::scene::ConnectionState::RemoveMaterial");
+    throw;
+  }
+}
+
+/*
     Команды клиента: области вывода и цели рендеринга
 */
 

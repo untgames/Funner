@@ -8,13 +8,31 @@ using namespace render::scene::client;
 
 typedef xtl::array<render::scene::interchange::object_id_t, ObjectType_Num> IdArray;
 
+namespace
+{
+
+/// Хрнилище менеджеров
+struct ManagersHolder
+{
+  SceneManager    scene_manager;
+  MaterialManager material_manager;
+
+  ManagersHolder (ClientImpl& client, Context& context)
+    : scene_manager (client, context)
+    , material_manager (client, context)
+  {
+  }
+};
+
+}
+
 struct ClientImpl::Impl
 {
   client::Context*                    context;            //контекст (получать только через вызов Context ())
   IdArray                             id_pool;            //пул идентификаторов
   interchange::PropertyMapAutoWriter  properties_writer;  //синхронизатор свойств (запись на сервер)
   interchange::PropertyMapReader      properties_reader;  //синхронизатор свойств (чтение с сервера)
-  stl::auto_ptr<client::SceneManager> scene_manager;      //менеджер сцен
+  stl::auto_ptr<ManagersHolder>       managers;           //менеджеры
 
 /// Конструктор
   Impl ()
@@ -58,12 +76,10 @@ void ClientImpl::SetContext (Context* context)
 
     try
     {
-      impl->scene_manager.reset ();
+      impl->managers.reset ();
 
       if (context)
-      {
-        impl->scene_manager.reset (new client::SceneManager (*this, *context));
-      }
+        impl->managers.reset (new ManagersHolder (*this, *context));
     }
     catch (...)
     {
@@ -88,8 +104,8 @@ void ClientImpl::Synchronize ()
   {
     impl->properties_writer.Write (impl->Context ());
 
-    if (impl->scene_manager)
-      impl->scene_manager->Update ();
+    if (impl->managers)
+      impl->managers->scene_manager.Update ();
   }
   catch (xtl::exception& e)
   {
@@ -181,7 +197,7 @@ void ClientImpl::UpdatePropertyMap (render::scene::interchange::InputStream& str
 }
 
 /*
-    Менеджер сцены
+    Менеджеры
 */
 
 SceneManager& ClientImpl::SceneManager ()
@@ -189,5 +205,13 @@ SceneManager& ClientImpl::SceneManager ()
   if (!impl->context)
     throw xtl::format_operation_exception ("render::scene::client::ClientImpl::SceneManager", "Can't return SceneManger: context is null");
 
-  return *impl->scene_manager;
+  return impl->managers->scene_manager;
+}
+
+MaterialManager& ClientImpl::MaterialManager ()
+{
+  if (!impl->context)
+    throw xtl::format_operation_exception ("render::scene::client::ClientImpl::MaterialManager", "Can't return MaterialManger: context is null");
+
+  return impl->managers->material_manager;
 }

@@ -22,6 +22,12 @@ enum CommandId
   CommandId_LoadResource,
   CommandId_UnloadResource,
   CommandId_SetMaxDrawDepth,
+  CommandId_UpdateTexture,
+  CommandId_RemoveTexture,
+  CommandId_CloneMaterial,
+  CommandId_SetMaterialTexmapImage,
+  CommandId_SetMaterialTexmapSampler,
+  CommandId_RemoveMaterial,
   CommandId_SetViewportArea,
   CommandId_SetViewportZOrder,
   CommandId_SetViewportActive,
@@ -87,6 +93,12 @@ class ClientToServerSerializer: public OutputStream
     void LoadResource(const char* name);
     void UnloadResource(const char* name);
     void SetMaxDrawDepth(uint32 depth);
+    void UpdateTexture(const char* texture_name, media::Image image);
+    void RemoveTexture(const char* texture_name);
+    void CloneMaterial(const char* material_name, const char* prototype_name);
+    void SetMaterialTexmapImage(const char* material_name, const char* semantic, const char* image_name);
+    void SetMaterialTexmapSampler(const char* material_name, const char* semantic, const char* sampler);
+    void RemoveMaterial(const char* material_name);
     void SetViewportArea(object_id_t id, int32 left, int32 top, int32 width, int32 height);
     void SetViewportZOrder(object_id_t id, int32 zorder);
     void SetViewportActive(object_id_t id, bool8 is_active);

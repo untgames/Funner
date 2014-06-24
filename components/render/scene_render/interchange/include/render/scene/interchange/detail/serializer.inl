@@ -5,6 +5,12 @@ inline stl::string get_command_name(CommandId command_id)
     case CommandId_LoadResource: return "LoadResource";
     case CommandId_UnloadResource: return "UnloadResource";
     case CommandId_SetMaxDrawDepth: return "SetMaxDrawDepth";
+    case CommandId_UpdateTexture: return "UpdateTexture";
+    case CommandId_RemoveTexture: return "RemoveTexture";
+    case CommandId_CloneMaterial: return "CloneMaterial";
+    case CommandId_SetMaterialTexmapImage: return "SetMaterialTexmapImage";
+    case CommandId_SetMaterialTexmapSampler: return "SetMaterialTexmapSampler";
+    case CommandId_RemoveMaterial: return "RemoveMaterial";
     case CommandId_SetViewportArea: return "SetViewportArea";
     case CommandId_SetViewportZOrder: return "SetViewportZOrder";
     case CommandId_SetViewportActive: return "SetViewportActive";
@@ -102,6 +108,114 @@ inline void ClientToServerSerializer::SetMaxDrawDepth(uint32 depth)
   {
     BeginCommand(CommandId_SetMaxDrawDepth);
     write(*this, depth);
+    EndCommand();
+  }
+  catch (...)
+  {
+    SetPosition (saved_position);
+    throw;
+  }
+}
+
+inline void ClientToServerSerializer::UpdateTexture(const char* texture_name, media::Image image)
+{
+  size_t saved_position = Position ();
+
+  try
+  {
+    BeginCommand(CommandId_UpdateTexture);
+    write(*this, texture_name);
+    write(*this, image);
+    EndCommand();
+  }
+  catch (...)
+  {
+    SetPosition (saved_position);
+    throw;
+  }
+}
+
+inline void ClientToServerSerializer::RemoveTexture(const char* texture_name)
+{
+  size_t saved_position = Position ();
+
+  try
+  {
+    BeginCommand(CommandId_RemoveTexture);
+    write(*this, texture_name);
+    EndCommand();
+  }
+  catch (...)
+  {
+    SetPosition (saved_position);
+    throw;
+  }
+}
+
+inline void ClientToServerSerializer::CloneMaterial(const char* material_name, const char* prototype_name)
+{
+  size_t saved_position = Position ();
+
+  try
+  {
+    BeginCommand(CommandId_CloneMaterial);
+    write(*this, material_name);
+    write(*this, prototype_name);
+    EndCommand();
+  }
+  catch (...)
+  {
+    SetPosition (saved_position);
+    throw;
+  }
+}
+
+inline void ClientToServerSerializer::SetMaterialTexmapImage(const char* material_name, const char* semantic, const char* image_name)
+{
+  size_t saved_position = Position ();
+
+  try
+  {
+    BeginCommand(CommandId_SetMaterialTexmapImage);
+    write(*this, material_name);
+    write(*this, semantic);
+    write(*this, image_name);
+    EndCommand();
+  }
+  catch (...)
+  {
+    SetPosition (saved_position);
+    throw;
+  }
+}
+
+inline void ClientToServerSerializer::SetMaterialTexmapSampler(const char* material_name, const char* semantic, const char* sampler)
+{
+  size_t saved_position = Position ();
+
+  try
+  {
+    BeginCommand(CommandId_SetMaterialTexmapSampler);
+    write(*this, material_name);
+    write(*this, semantic);
+    write(*this, sampler);
+    EndCommand();
+  }
+  catch (...)
+  {
+    SetPosition (saved_position);
+    throw;
+  }
+}
+
+inline void ClientToServerSerializer::RemoveMaterial(const char* material_name)
+{
+  size_t saved_position = Position ();
+
+  try
+  {
+    BeginCommand(CommandId_RemoveMaterial);
+    write(*this, material_name);
     EndCommand();
   }
   catch (...)
@@ -995,6 +1109,60 @@ template <class Dispatcher> inline bool ClientToServerDeserializer::Deserialize(
       uint32 arg1 = read(*this, xtl::type<uint32 > ());
 
       dispatcher.SetMaxDrawDepth(arg1);
+
+      return true;
+    }
+    case CommandId_UpdateTexture:
+    {
+      const char* arg1 = read(*this, xtl::type<const char* > ());
+      media::Image arg2 = read(*this, xtl::type<media::Image > ());
+
+      dispatcher.UpdateTexture(arg1, arg2);
+
+      return true;
+    }
+    case CommandId_RemoveTexture:
+    {
+      const char* arg1 = read(*this, xtl::type<const char* > ());
+
+      dispatcher.RemoveTexture(arg1);
+
+      return true;
+    }
+    case CommandId_CloneMaterial:
+    {
+      const char* arg1 = read(*this, xtl::type<const char* > ());
+      const char* arg2 = read(*this, xtl::type<const char* > ());
+
+      dispatcher.CloneMaterial(arg1, arg2);
+
+      return true;
+    }
+    case CommandId_SetMaterialTexmapImage:
+    {
+      const char* arg1 = read(*this, xtl::type<const char* > ());
+      const char* arg2 = read(*this, xtl::type<const char* > ());
+      const char* arg3 = read(*this, xtl::type<const char* > ());
+
+      dispatcher.SetMaterialTexmapImage(arg1, arg2, arg3);
+
+      return true;
+    }
+    case CommandId_SetMaterialTexmapSampler:
+    {
+      const char* arg1 = read(*this, xtl::type<const char* > ());
+      const char* arg2 = read(*this, xtl::type<const char* > ());
+      const char* arg3 = read(*this, xtl::type<const char* > ());
+
+      dispatcher.SetMaterialTexmapSampler(arg1, arg2, arg3);
+
+      return true;
+    }
+    case CommandId_RemoveMaterial:
+    {
+      const char* arg1 = read(*this, xtl::type<const char* > ());
+
+      dispatcher.RemoveMaterial(arg1);
 
       return true;
     }

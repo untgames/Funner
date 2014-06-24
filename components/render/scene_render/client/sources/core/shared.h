@@ -24,6 +24,7 @@
 
 #include <shared/client.h>
 #include <shared/scene_manager.h>
+#include <shared/material_manager.h>
 
 namespace render
 {
