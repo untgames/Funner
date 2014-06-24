@@ -28,12 +28,12 @@ void print_arguments_count_comment (size_t arguments_count)
   }
 }
 
-void generate_signature_description (size_t arguments_count,bool eclipsis)
+void generate_signature_description (size_t arguments_count,bool ellipses)
 {
   printf ("//специализация для сигнатуры ");
   print_arguments_count_comment (arguments_count);
   
-  if (eclipsis)
+  if (ellipses)
     printf (" и многоточием");
   
   printf ("\ntemplate <");
@@ -49,17 +49,17 @@ void generate_signature_description (size_t arguments_count,bool eclipsis)
 
     printf ("Arg%u",arguments_count);
     
-    if (eclipsis)
+    if (ellipses)
       printf (", ");
   }
   
-  if (eclipsis)
+  if (ellipses)
     printf ("...");
 
   printf (")>: public ");
   
-  if (eclipsis)
-    printf ("eclipsis_functional_traits<");
+  if (ellipses)
+    printf ("ellipses_functional_traits<");
   
   printf ("signature_arguments_traits<%u, Ret", arguments_count);
   
@@ -67,18 +67,18 @@ void generate_signature_description (size_t arguments_count,bool eclipsis)
 
   printf (">");
   
-  if (eclipsis)
+  if (ellipses)
     printf (" >");
     
   printf (" { };\n\n");
 }
 
-void generate_ptrfun_description (size_t arguments_count,bool eclipsis,const char* modifier="")
+void generate_ptrfun_description (size_t arguments_count,bool ellipses,const char* modifier="")
 {
   printf ("//специализация для указателя на функцию ");
   print_arguments_count_comment (arguments_count);
   
-  if (eclipsis)
+  if (ellipses)
     printf (" и многоточием");
 
   printf ("\ntemplate <");
@@ -94,17 +94,17 @@ void generate_ptrfun_description (size_t arguments_count,bool eclipsis,const cha
 
     printf ("Arg%u",arguments_count);
     
-    if (eclipsis)
+    if (ellipses)
       printf (", ");
   }
   
-  if (eclipsis)
+  if (ellipses)
     printf ("...");
 
   printf (")>: public ");
   
-  if (eclipsis)
-    printf ("eclipsis_functional_traits<");
+  if (ellipses)
+    printf ("ellipses_functional_traits<");
 
   printf ("ptrfun_arguments_traits<%u, Ret", arguments_count);
   
@@ -112,18 +112,18 @@ void generate_ptrfun_description (size_t arguments_count,bool eclipsis,const cha
 
   printf ("> ");
   
-  if (eclipsis)
+  if (ellipses)
     printf (">");
   
   printf (" { };\n\n");
 }
 
-void generate_memfun_description (size_t arguments_count,bool eclipsis,const char* qualifier,const char* modifier="")
+void generate_memfun_description (size_t arguments_count,bool ellipses,const char* qualifier,const char* modifier="")
 {
   printf ("//специализация для указателя на функцию-член класса %s%sT ",qualifier,*qualifier?" ":"");
   print_arguments_count_comment (arguments_count);
   
-  if (eclipsis)
+  if (ellipses)
     printf (" и многоточием");
 
   printf ("\ntemplate <class T,");
@@ -139,17 +139,17 @@ void generate_memfun_description (size_t arguments_count,bool eclipsis,const cha
 
     printf ("Arg%u",arguments_count);
     
-    if (eclipsis)
+    if (ellipses)
       printf (", ");
   }
 
-  if (eclipsis)
+  if (ellipses)
     printf ("...");
 
   printf (")%s%s>: public ",*qualifier?" ":"",qualifier);
   
-  if (eclipsis)
-    printf ("eclipsis_functional_traits<");
+  if (ellipses)
+    printf ("ellipses_functional_traits<");
   
   printf ("memfun_arguments_traits<%u, %s%sT, Ret",arguments_count,qualifier,*qualifier?" ":"");
   
@@ -157,7 +157,7 @@ void generate_memfun_description (size_t arguments_count,bool eclipsis,const cha
 
   printf ("> ");
   
-  if (eclipsis)
+  if (ellipses)
     printf ("> ");
   
   printf ("{ };\n\n");
@@ -200,7 +200,7 @@ void generate_base_types ()
 {
   print_block_comment ("Таблица конфигурации функционального объекта");
   printf ("template <class Fn> struct functional_traits\n{\n");
-  printf ("  enum {\n    is_function  = false,\n    is_memfun    = false,\n    is_ptrfun    = false,\n    has_eclipsis = false\n  };\n};\n\n");
+  printf ("  enum {\n    is_function  = false,\n    is_memfun    = false,\n    is_ptrfun    = false,\n    has_ellipses = false\n  };\n};\n\n");
   
   print_block_comment ("Специализации для различных видов квалификаторов");
   
@@ -214,8 +214,8 @@ void generate_base_types ()
   printf ("struct void_argument {};\n\n");
   
   printf ("//обёртка указывающая на наличие многоточия в списке аргументов функции\n");
-  printf ("template <class Traits>\nstruct eclipsis_functional_traits: public Traits\n{\n");      
-  printf ("  enum { has_eclipsis = true };\n};\n\n");
+  printf ("template <class Traits>\nstruct ellipses_functional_traits: public Traits\n{\n");      
+  printf ("  enum { has_ellipses = true };\n};\n\n");
   
   printf ("//таблица конфигурации для сигнатур на функции\n");
   printf ("template <size_t ArgumentsCount, class Ret");
@@ -238,7 +238,7 @@ void generate_base_types ()
   printf ("  public:\n");
     
   printf ("    enum {\n      is_function     = true,\n      is_ptrfun       = false,\n"
-         "      is_memfun       = false,\n      has_eclipsis    = false,\n      arguments_count = ArgumentsCount\n    };\n\n");
+         "      is_memfun       = false,\n      has_ellipses    = false,\n      arguments_count = ArgumentsCount\n    };\n\n");
   printf ("    typedef Ret result_type;\n\n");    
   
   printf ("    template <size_t number> struct argument {\n");
