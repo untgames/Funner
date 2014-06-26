@@ -14,6 +14,7 @@ struct Font::Impl
   TextureArray textures;         //текстуры
   GlyphArray   glyphs;           //глифы
   size_t       first_glyph_code; //код первого глифа
+  stl::string  name;             //имя шрифта
     
   Impl () : first_glyph_code () {}
 };
@@ -27,6 +28,10 @@ Font::Font (MaterialManager& material_manager, const media::Font& font, const me
 {
   try
   {
+      //сохранение имени
+
+    impl->name = font.Name ();
+
       //растеризация
 
     media::RasterizedFont rasterized_font = font.CreateRasterizedFont (creation_params);
@@ -48,7 +53,7 @@ Font::Font (MaterialManager& material_manager, const media::Font& font, const me
     {
       rasterized_font.BuildImage (i, image);
 
-      TexturePtr texture = material_manager.CreateTexture (common::format ("font_textures.%s.font%08u.image%u", font.Name (), font.Id (), i).c_str (),
+      TexturePtr texture = material_manager.CreateTexture (common::format ("font_textures.%s.font%08u.image%02u", font.Name (), font.Id (), i).c_str (),
         image, interchange::TextureDimension_2D, true);
 
       impl->textures.push_back (texture);
@@ -73,9 +78,9 @@ Font::Font (MaterialManager& material_manager, const media::Font& font, const me
       {
         const math::vec2f& size = sizes [src_glyph->image_index];
 
-        dst_glyph->texture_index = src_glyph->image_index;
-        dst_glyph->tex_offset    = math::vec2f (src_glyph->x_pos / size.x, src_glyph->y_pos / size.y);
-        dst_glyph->tex_size      = math::vec2f (src_glyph->width / size.x, src_glyph->height / size.y);
+        dst_glyph->image_index = src_glyph->image_index;
+        dst_glyph->tex_offset  = math::vec2f (src_glyph->x_pos / size.x, src_glyph->y_pos / size.y);
+        dst_glyph->tex_size    = math::vec2f (src_glyph->width / size.x, src_glyph->height / size.y);
       }
     }
   }
@@ -88,6 +93,15 @@ Font::Font (MaterialManager& material_manager, const media::Font& font, const me
 
 Font::~Font ()
 {
+}
+
+/*
+    Имя шрифта
+*/
+
+const char* Font::Name ()
+{
+  return impl->name.c_str ();
 }
 
 /*
