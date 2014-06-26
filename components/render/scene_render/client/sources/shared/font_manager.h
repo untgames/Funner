@@ -9,6 +9,7 @@ namespace media
 //forward declarations
 class  Font;
 struct FontCreationParams;
+struct RasterizedFontCreationParams;
 
 }
 
@@ -29,9 +30,9 @@ class MaterialManager;
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 struct RasterizedGlyphInfo
 {
-  unsigned short material_index; //индекс материала в шрифте
-  math::vec2f    tex_offset;     //смещение в текстуре
-  math::vec2f    tex_size;       //размер в текстуре
+  unsigned short texture_index; //индекс текстуры в шрифте
+  math::vec2f    tex_offset;    //смещение в текстуре
+  math::vec2f    tex_size;      //размер в текстуре
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -43,7 +44,7 @@ class Font: public xtl::reference_counter, public xtl::noncopyable
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструктор / деструктор
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    Font  (const media::Font& font, const RasterizedFontCreationParams& creation_params);
+    Font  (MaterialManager& material_manager, const media::Font& font, const media::RasterizedFontCreationParams& creation_params);
     ~Font ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -62,14 +63,14 @@ class Font: public xtl::reference_counter, public xtl::noncopyable
     const RasterizedGlyphInfo* RasterizedGlyphs ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Количество материалов
+///Количество текстур
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    size_t MaterialsCount ();
+    size_t TexturesCount ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Получение материала
+///Получение имени текстуры
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    const char* MaterialName (size_t material_index);
+    const char* TextureName (size_t texture_index);
 
   private:
     struct Impl;

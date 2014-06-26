@@ -31,6 +31,15 @@ Font& Font::operator = (const Font& source)
 }
 
 /*
+    Идентификатор
+*/
+
+size_t Font::Id () const
+{
+  return reinterpret_cast<size_t> (impl);
+}
+
+/*
    Имя файла
 */
 
