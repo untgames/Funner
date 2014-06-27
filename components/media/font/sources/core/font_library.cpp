@@ -112,6 +112,15 @@ FontLibrary& FontLibrary::operator = (const FontLibrary& source)
 }
 
 /*
+    Идентификатор
+*/
+
+size_t FontLibrary::Id () const
+{
+  return reinterpret_cast<size_t> (impl);
+}
+
+/*
    Имя библиотеки
 */
 

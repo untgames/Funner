@@ -11,7 +11,7 @@
 
 #include <common/strlib.h>
 
-#include <media/font.h>
+#include <media/font_library.h>
 #include <media/image.h>
 #include <media/rasterized_font.h>
 

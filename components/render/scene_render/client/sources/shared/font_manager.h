@@ -146,7 +146,9 @@ class FontManager: public xtl::noncopyable
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Предварительный рендеринг шрифтов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void PrefetchFont (const char* name, const media::FontCreationParams& params, const char* material, const char* semantic);
+    void LoadFont   (const char* id, const char* name, const media::FontCreationParams& params, const char* material, const char* semantic);
+    void LoadFont   (const char* init_string);
+    void UnloadFont (const char* id);
 
   private:
     struct Impl;

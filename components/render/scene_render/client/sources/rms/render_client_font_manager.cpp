@@ -2,8 +2,6 @@
 
 using namespace render::scene::client;
 
-//TODO: add prefetch parse params from string
-
 /*
     Константы
 */
@@ -59,14 +57,32 @@ struct FontMaterialDesc
 };
 
 typedef stl::hash_map<size_t, FontMaterialDesc> FontMaterialMap;
+typedef stl::list<media::FontLibrary>           FontLibraryList;
+
+/// Кэш материалов шрифтов
+struct FontMaterialCacheEntry
+{
+  media::Font     font;          //базовый шрифт
+  FontMaterialPtr font_material; //материал шрифта
+
+  FontMaterialCacheEntry (const media::Font& in_font, const FontMaterialPtr& in_font_material)
+    : font (in_font)
+    , font_material (in_font_material)
+  {
+  }
+};
+
+typedef stl::hash_map<stl::hash_key<const char*>, FontMaterialCacheEntry> FontMaterialCache;
 
 }
 
 struct FontManager::Impl
 {
-  MaterialManager& material_manager; //менеджер материалов
-  FontMap          fonts;            //шрифты
-  FontMaterialMap  font_materials;   //материалы шрифтов
+  MaterialManager&  material_manager;    //менеджер материалов
+  FontMap           fonts;               //шрифты
+  FontMaterialMap   font_materials;      //материалы шрифтов
+  FontLibraryList   font_libraries;      //библиотеки шрифтов
+  FontMaterialCache font_material_cache; //кэш шрифтов
 
   Impl (MaterialManager& in_material_manager) : material_manager (in_material_manager) {}
 
@@ -178,26 +194,176 @@ FontMaterialPtr FontManager::CreateFontMaterial (const media::Font& font, const 
     Присоединение библиотеки шрифтов
 */
 
-void FontManager::AttachFontLibrary (const media::FontLibrary&)
+void FontManager::AttachFontLibrary (const media::FontLibrary& library)
 {
-  throw xtl::make_not_implemented_exception (__FUNCTION__);
+  try
+  {
+    size_t id = library.Id ();
+
+    for (FontLibraryList::iterator iter=impl->font_libraries.begin (), end=impl->font_libraries.end (); iter!=end; ++iter)
+      if (id == iter->Id ())
+        throw xtl::format_operation_exception ("", "Font library '%s' (with id %u) has been already defined", library.Name (), library.Id ());
+
+    impl->font_libraries.push_back (library);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::scene::client::FontManager::AttachFontLibrary");
+    throw;
+  }
 }
 
-void FontManager::DetachFontLibrary (const media::FontLibrary&)
+void FontManager::DetachFontLibrary (const media::FontLibrary& library)
 {
-  throw xtl::make_not_implemented_exception (__FUNCTION__);
+  size_t id = library.Id ();
+
+  for (FontLibraryList::iterator iter=impl->font_libraries.begin (), end=impl->font_libraries.end (); iter!=end; ++iter)
+    if (id == iter->Id ())
+    {
+      impl->font_libraries.erase (iter);
+      break;
+    }
 }
 
 void FontManager::DetachAllFontLibraries ()
 {
-  throw xtl::make_not_implemented_exception (__FUNCTION__);
+  impl->font_libraries.clear ();
 }
 
 /*
     Предварительный рендеринг шрифтов
 */
 
-void FontManager::PrefetchFont (const char* name, const media::FontCreationParams& params, const char* material, const char* semantic)
+void FontManager::LoadFont (const char* id, const char* name, const media::FontCreationParams& params, const char* material, const char* semantic)
 {
-  throw xtl::make_not_implemented_exception (__FUNCTION__);
+  try
+  {
+    if (!id)
+      throw xtl::format_operation_exception ("", "id");
+
+    if (!name)
+      throw xtl::format_operation_exception ("", "name");
+
+      //проверка повторной регистрации
+
+    FontMaterialCache::iterator iter = impl->font_material_cache.find (id);
+
+    if (iter != impl->font_material_cache.end ())
+      throw xtl::make_argument_exception ("", "Font '%s' has been already loaded", id);
+
+      //создание шрифта
+
+    for (FontLibraryList::iterator iter=impl->font_libraries.begin (), end=impl->font_libraries.end (); iter!=end; ++iter)
+    {
+      media::FontLibrary& library = *iter;
+
+      if (!library.CanCreateFont (name, params))
+        continue;
+
+      media::Font font = library.CreateFont (name, params);
+
+        //создание материала шрифтов
+
+      FontMaterialPtr font_material = CreateFontMaterial (font, material, semantic);
+
+        //регистрация записи в кэше
+
+      impl->font_material_cache.insert_pair (id, FontMaterialCacheEntry (font, font_material));
+
+      return;
+    }
+
+    throw xtl::format_operation_exception ("", "Can't create font with id '%s'. None of attached font libraries can do this", id);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::scene::client::FontManager::LoadFont(const char*,const char*,const media::FontCreationParams&,const char*, const char*)");
+    throw;
+  }
+}
+
+namespace
+{
+
+inline const char* get_string (const common::PropertyMap& properties, const char* name)
+{
+  return properties.GetString (name);
+}
+
+inline const char* get_string (const common::PropertyMap& properties, const char* name, const char* default_value)
+{
+  int index = properties.IndexOf (name);
+
+  if (index == -1)
+    return default_value;
+
+  return properties.GetString ((size_t)index);
+}
+
+inline int get_int (const common::PropertyMap& properties, const char* name)
+{
+  return properties.GetInteger (name);
+}
+
+inline int get_int (const common::PropertyMap& properties, const char* name, int default_value)
+{
+  int index = properties.IndexOf (name);
+
+  if (index == -1)
+    return default_value;
+
+  return properties.GetInteger ((size_t)index);
+}
+
+}
+
+void FontManager::LoadFont (const char* init_string)
+{
+  try
+  {
+    if (!init_string)
+      throw xtl::format_operation_exception ("", "init_string");
+
+      //разбор строки инициализации
+
+    common::PropertyMap properties = common::parse_init_string (init_string);
+
+    const char* font_name = get_string (properties, "font_name");
+    const char* material  = get_string (properties, "material");
+    const char* semantic  = get_string (properties, "semantic", "");
+
+    media::FontCreationParams creation_params;
+
+    memset (&creation_params, 0, sizeof (creation_params));
+
+    creation_params.font_size     = (size_t)get_int (properties, "font_size");
+    creation_params.font_size_eps = (size_t)get_int (properties, "font_size_eps", 0);
+    creation_params.weight        = (size_t)get_int (properties, "weight", 0);
+    creation_params.escapement    = (size_t)get_int (properties, "escapement", 0);
+    creation_params.bold          = get_int (properties, "bold", 0) != 0;
+    creation_params.italic        = get_int (properties, "italic", 0) != 0;
+    creation_params.underlined    = get_int (properties, "underlined", 0) != 0;
+    creation_params.striked       = get_int (properties, "striked", 0) != 0;
+    creation_params.stroke_size   = (size_t)get_int (properties, "stroke_size", 0);
+    creation_params.charset_name  = get_string (properties, "charset_name", "");
+
+      //TODO: horizontal & vertical DPI support
+    
+      //загрузка шрифта
+
+    LoadFont (init_string, font_name, creation_params, material, semantic);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::scene::client::FontManager::LoadFont(const char* init_string = '%s')", init_string ? init_string : "");
+    throw;
+  }
+}
+
+void FontManager::UnloadFont (const char* id)
+{
+  if (!id)
+    return;
+
+  impl->font_material_cache.erase (id);
 }
