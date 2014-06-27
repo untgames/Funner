@@ -9,7 +9,10 @@ using namespace render::scene::client;
 namespace
 {
 
-const char* DEFAULT_SEMANTIC = "font_mask"; //имя семантики по умолчанию
+const char*  DEFAULT_SEMANTIC            = "font_mask"; //имя семантики по умолчанию
+const char*  FONT_RESOURCE_PREFIX        = "font:";     //префикс имени шрифта
+const char*  FONT_RESOURCE_WILDCARD      = "font:*";    //маска имени шрифта
+const size_t FONT_RESOURCE_PREFIX_LENGTH = strlen (FONT_RESOURCE_PREFIX); //длина префикса шрифта
 
 struct RasterizedFontCreationParamsImpl: public media::RasterizedFontCreationParams
 {
@@ -324,6 +327,9 @@ void FontManager::LoadFont (const char* init_string)
     if (!init_string)
       throw xtl::format_operation_exception ("", "init_string");
 
+    if (!strncmp (FONT_RESOURCE_PREFIX, init_string, FONT_RESOURCE_PREFIX_LENGTH))
+      init_string += FONT_RESOURCE_PREFIX_LENGTH;
+
       //разбор строки инициализации
 
     common::PropertyMap properties = common::parse_init_string (init_string);
@@ -365,5 +371,17 @@ void FontManager::UnloadFont (const char* id)
   if (!id)
     return;
 
+  if (!strncmp (FONT_RESOURCE_PREFIX, id, FONT_RESOURCE_PREFIX_LENGTH))
+    id += FONT_RESOURCE_PREFIX_LENGTH;
+
   impl->font_material_cache.erase (id);
+}
+
+/*
+    Проверка соответствия имени ресурса параметрам настройки кэша шрифтов
+*/
+
+bool FontManager::IsFontParams (const char* resource)
+{
+  return resource && common::wcmatch (FONT_RESOURCE_WILDCARD, resource);
 }

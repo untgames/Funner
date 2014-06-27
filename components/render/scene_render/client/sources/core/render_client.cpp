@@ -145,6 +145,12 @@ void Client::LoadResource (const char* file_name)
     if (!file_name)
       throw xtl::make_null_argument_exception ("", "file_name");
 
+    if (FontManager::IsFontParams (file_name))
+    {
+      impl->connection->Client ().FontManager ().LoadFont (file_name);
+      return;
+    }
+
     impl->connection->Context ().LoadResource (file_name);
   }
   catch (xtl::exception& e)
@@ -160,6 +166,12 @@ void Client::UnloadResource (const char* file_name)
   {
     if (!file_name)
       throw xtl::make_null_argument_exception ("", "file_name");
+
+    if (FontManager::IsFontParams (file_name))
+    {
+      impl->connection->Client ().FontManager ().UnloadFont (file_name);
+      return;
+    }
 
     impl->connection->Context ().UnloadResource (file_name);
   }

@@ -150,6 +150,11 @@ class FontManager: public xtl::noncopyable
     void LoadFont   (const char* init_string);
     void UnloadFont (const char* id);
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Проверка соответствия имени ресурса параметрам настройки кэша шрифтов
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    static bool IsFontParams (const char* resource);    
+
   private:
     struct Impl;
     stl::auto_ptr<Impl> impl;
