@@ -17,6 +17,9 @@ Node* SceneFactory::Create (scene_graph::Node& src_node, SceneManager& scene_man
   if (scene_graph::LineModel* node = dynamic_cast<scene_graph::LineModel*> (&src_node))
     return create_node (*node, scene_manager);
 
+  if (scene_graph::TextModel* node = dynamic_cast<scene_graph::TextModel*> (&src_node))
+    return create_node (*node, scene_manager);
+
   if (scene_graph::SpotLight* node = dynamic_cast<scene_graph::SpotLight*> (&src_node))
     return create_node (*node, scene_manager);
 

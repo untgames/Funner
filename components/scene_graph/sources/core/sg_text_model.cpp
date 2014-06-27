@@ -208,12 +208,24 @@ xtl::connection TextModel::RegisterEventHandler (TextModelEvent event, const Eve
   switch (event)
   {
     case TextModelEvent_AfterCharDescsUpdate:
+    case TextModelEvent_AfterFontsUpdate:
       break;
     default:
       throw xtl::make_argument_exception ("scene_graph::TextModel::RegisterEventHandler", "event", event);
   }
   
   return impl->signals [event].connect (handler);
+}
+
+/*
+    Оповещение о необходимости перестроения шрифтов
+*/
+
+void TextModel::UpdateFontsNotify ()
+{
+  impl->Notify (*this, TextModelEvent_AfterFontsUpdate);
+
+  UpdateNotify ();
 }
 
 /*

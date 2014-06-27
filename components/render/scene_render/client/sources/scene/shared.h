@@ -18,6 +18,7 @@
 #include <sg/page_curl.h>
 #include <sg/scissor.h>
 #include <sg/sprite.h>
+#include <sg/text.h>
 
 #include <shared/client.h>
 #include <shared/scene_manager.h>
@@ -52,6 +53,7 @@ Node* create_node (scene_graph::SpotLight&, SceneManager& scene_manager);
 Node* create_node (scene_graph::PageCurl&, SceneManager& scene_manager);
 Node* create_node (scene_graph::SpriteModel&, SceneManager& scene_manager);
 Node* create_node (scene_graph::LineModel&, SceneManager& scene_manager);
+Node* create_node (scene_graph::TextModel&, SceneManager& scene_manager);
 
 }
 

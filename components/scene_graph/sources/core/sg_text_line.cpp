@@ -468,9 +468,14 @@ void TextLine::SetFont (const char* font_name)
     if (!font_name)
       throw xtl::make_null_argument_exception ("", "font_name");
 
+    if (impl->font_name == font_name)
+      return;
+
     impl->font_name = font_name;
 
     impl->font.reset ();
+
+    UpdateFontsNotify ();
 
     UpdateCharsNotify ();
   }
