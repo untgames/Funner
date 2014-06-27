@@ -23,8 +23,9 @@
 #include <render/scene/interchange/connection_manager.h>
 
 #include <shared/client.h>
-#include <shared/scene_manager.h>
+#include <shared/font_manager.h>
 #include <shared/material_manager.h>
+#include <shared/scene_manager.h>
 
 namespace render
 {

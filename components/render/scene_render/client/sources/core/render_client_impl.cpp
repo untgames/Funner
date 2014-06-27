@@ -16,10 +16,12 @@ struct ManagersHolder
 {
   SceneManager    scene_manager;
   MaterialManager material_manager;
+  FontManager     font_manager;
 
   ManagersHolder (ClientImpl& client, Context& context)
     : scene_manager (client, context)
     , material_manager (client, context)
+    , font_manager (material_manager)
   {
   }
 };
@@ -214,4 +216,13 @@ MaterialManager& ClientImpl::MaterialManager ()
     throw xtl::format_operation_exception ("render::scene::client::ClientImpl::MaterialManager", "Can't return MaterialManger: context is null");
 
   return impl->managers->material_manager;
+}
+
+FontManager& ClientImpl::FontManager ()
+{
+  if (!impl->context)
+    throw xtl::format_operation_exception ("render::scene::client::ClientImpl::MaterialManager", "Can't return FontManger: context is null");
+
+  return impl->managers->font_manager;
+
 }

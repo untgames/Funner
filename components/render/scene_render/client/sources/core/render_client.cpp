@@ -171,6 +171,49 @@ void Client::UnloadResource (const char* file_name)
 }
 
 /*
+    Присоединение библиотеки шрифтов
+*/
+
+void Client::AttachFontLibrary (const media::FontLibrary& library)
+{
+  try
+  {
+    impl->connection->Client ().FontManager ().AttachFontLibrary (library);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::scene::client::Client::AttachFontLibrary");
+    throw;
+  }
+}
+
+void Client::DetachFontLibrary (const media::FontLibrary& library)
+{
+  try
+  {
+    impl->connection->Client ().FontManager ().DetachFontLibrary (library);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::scene::client::Client::DetachFontLibrary");
+    throw;
+  }
+}
+
+void Client::DetachAllFontLibraries ()
+{
+  try
+  {
+    impl->connection->Client ().FontManager ().DetachAllFontLibraries ();
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::scene::client::Client::DetachAllFontLibraries");
+    throw;
+  }
+}
+
+/*
     Обмен
 */
 
