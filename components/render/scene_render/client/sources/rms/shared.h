@@ -1,6 +1,7 @@
 #ifndef RENDER_SCENE_CLIENT_IMPL_RMS_SHARED_HEADER
 #define RENDER_SCENE_CLIENT_IMPL_RMS_SHARED_HEADER
 
+#include <stl/hash_map>
 #include <stl/vector>
 
 #include <xtl/bind.h>

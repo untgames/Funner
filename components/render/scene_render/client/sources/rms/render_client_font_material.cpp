@@ -3,17 +3,6 @@
 using namespace render::scene::client;
 
 /*
-    Константы
-*/
-
-namespace
-{
-
-const char* DEFAULT_SEMANTIC = "font_mask"; //имя семантики по умолчанию
-
-}
-
-/*
     Описание реализации материала шрифта
 */
 
@@ -39,9 +28,6 @@ FontMaterial::FontMaterial (MaterialManager& material_manager, const FontPtr& fo
 
     if (!semantic)
       throw xtl::make_null_argument_exception ("", "semantic");
-
-    if (!*semantic)
-      semantic = DEFAULT_SEMANTIC;
 
     if (!font)
       throw xtl::make_null_argument_exception ("", "font");
