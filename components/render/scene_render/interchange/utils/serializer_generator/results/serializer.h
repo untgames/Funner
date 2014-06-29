@@ -68,7 +68,9 @@ enum CommandId
   CommandId_SetStaticMeshName,
   CommandId_SetLightParams,
   CommandId_SetPageCurlParams,
-  CommandId_SetSpriteListParams,
+  CommandId_ReserveSpriteLists,
+  CommandId_CreateSpriteList,
+  CommandId_RemoveSpriteList,
   CommandId_SetSpriteListMaterial,
   CommandId_SetSpriteListBuffer,
   CommandId_SetSpriteListDescs,
@@ -140,10 +142,12 @@ class ClientToServerSerializer: public OutputStream
     void SetStaticMeshName(object_id_t id, const char* mesh_name);
     void SetLightParams(object_id_t id, const LightParams& params);
     void SetPageCurlParams(object_id_t id, const PageCurlParams& params, const char* front_left_material, const char* front_right_material, const char* back_left_material, const char* back_right_material);
-    void SetSpriteListParams(object_id_t id, SpriteMode mode, PrimitiveUsage usage, const math::vec3f& up, const char* batch);
-    void SetSpriteListMaterial(object_id_t id, const char* material);
-    void SetSpriteListBuffer(object_id_t id, uint32 count, uint32 reserve_count);
-    void SetSpriteListDescs(object_id_t id, uint32 first, RawArray<SpriteDesc> descs);
+    void ReserveSpriteLists(object_id_t id, uint32 list_subids_count);
+    void CreateSpriteList(object_id_t id, uint32 list_subid, SpriteMode mode, PrimitiveUsage usage, const math::vec3f& up, const char* batch);
+    void RemoveSpriteList(object_id_t id, uint32 list_subid);
+    void SetSpriteListMaterial(object_id_t id, uint32 list_subid, const char* material);
+    void SetSpriteListBuffer(object_id_t id, uint32 list_subid, uint32 count, uint32 reserve_count);
+    void SetSpriteListDescs(object_id_t id, uint32 list_subid, uint32 first, RawArray<SpriteDesc> descs);
     void SetLineListParams(object_id_t id, PrimitiveUsage usage, const char* batch);
     void SetLineListMaterial(object_id_t id, const char* material);
     void SetLineListBuffer(object_id_t id, uint32 count, uint32 reserve_count);

@@ -5,99 +5,74 @@ using namespace render::scene;
 using namespace render::scene::server;
 
 /*
+    Константы
+*/
+
+const size_t RESERVE_SUBLIST_COUNT = 4; //резервируемое количество вложенных списков
+
+/*
     Описание реализации списка спрайтов
 */
 
+namespace
+{
+
+/// Вложенный список спрайтов
+struct Sublist: public xtl::reference_counter
+{
+  SpriteMode          mode;         //режим спрайтов
+  PrimitiveUsage      usage;        //режим использования
+  math::vec3f         up;           //вектор "вверх"
+  stl::string         batch_name;   //имя пакета
+  size_t              descs_count;  //количество спрайтов
+  manager::SpriteList sprites;      //спрайты  
+
+/// Конструктор
+  Sublist (SpriteMode in_mode, PrimitiveUsage in_usage, const char* in_batch_name, const manager::SpriteList& in_sprites)
+    : mode (in_mode)
+    , usage (in_usage)
+    , batch_name (in_batch_name)
+    , descs_count ()
+    , sprites (in_sprites)
+  {
+  }
+};
+
+typedef xtl::intrusive_ptr<Sublist> SublistPtr;
+typedef stl::vector<SublistPtr>     SublistArray;
+
+}
+
 struct SpriteList::Impl
 {
-  manager::Entity&                   entity;                //сущность
-  RenderManager                      render_manager;        //менеджер рендеринга
-  SpriteMode                         mode;                  //режим спрайтов
-  PrimitiveUsage                     usage;                 //режим использования
-  math::vec3f                        up;                    //вектор "вверх"
-  stl::string                        batch_name;            //имя пакета
-  stl::auto_ptr<manager::SpriteList> list;                  //список спрайтов
-  size_t                             descs_count;           //количество спрайтов
+  manager::Entity&  entity;                //сущность
+  RenderManager     render_manager;        //менеджер рендеринга
+  SublistArray      sublists;              //вложенные списки
+  size_t            active_sublists_count; //количество активных списков
 
 /// Конструктор
   Impl (RenderManager& in_render_manager, manager::Entity& in_entity)
     : entity (in_entity)
     , render_manager (in_render_manager)
-    , mode (interchange::SpriteMode_Billboard)
-    , usage (interchange::PrimitiveUsage_Batching)
-    , up (0, 1.0f, 0)
-    , descs_count ()
+    , active_sublists_count ()
   {
+    sublists.reserve (RESERVE_SUBLIST_COUNT);
   }
 
-/// Обновление списка спрайтов
-  void ResetSpriteList (SpriteMode in_mode, PrimitiveUsage in_usage, const math::vec3f& up, const char* batch_name)
+/// Получение вложенного списка
+  Sublist& Item (subid_t subid, const char* source = "")
   {
-    entity.ResetPrimitive ();
-
-    size_t reserve_size = 0;
-    
-    stl::string material_name;
-
-    if (list)
+    if (subid < sublists.size ())
     {
-      reserve_size  = list->Capacity ();
-      material_name = list->Material ();
+      SublistPtr& list = sublists [subid];
+
+      if (list)
+        return *list;
+
+      throw xtl::format_operation_exception ("", "Sublist with subid %u has not been initialized", subid);
     }
 
-    manager::SpriteMode mode;
-
-    switch (in_mode)
-    {
-      case interchange::SpriteMode_Billboard:         mode = manager::SpriteMode_Billboard; break;
-      case interchange::SpriteMode_Oriented:          mode = manager::SpriteMode_Oriented; break;
-      case interchange::SpriteMode_OrientedBillboard: mode = manager::SpriteMode_OrientedBillboard; break;
-      default:                                        throw xtl::make_argument_exception ("", "mode", in_mode);
-    }
-
-    switch (in_usage)
-    {
-      case interchange::PrimitiveUsage_Batching:
-      {
-        manager::PrimitiveBuffers buffers   = render_manager.BatchingManager ().GetBatch (batch_name);
-        manager::Primitive        primitive = render_manager.Manager ().CreatePrimitive (buffers);
-
-        list.reset (new manager::SpriteList (primitive.AddBatchingSpriteList (mode, up)));
-
-        entity.SetPrimitive (primitive);
-
-        break;
-      }
-      case interchange::PrimitiveUsage_Static:
-      case interchange::PrimitiveUsage_Dynamic:
-      case interchange::PrimitiveUsage_Stream:
-      {
-        manager::MeshBufferUsage usage;
-
-        switch (in_usage)
-        {
-          default:
-          case interchange::PrimitiveUsage_Static:  usage = manager::MeshBufferUsage_Static; break;
-          case interchange::PrimitiveUsage_Dynamic: usage = manager::MeshBufferUsage_Dynamic; break;
-          case interchange::PrimitiveUsage_Stream:  usage = manager::MeshBufferUsage_Stream; break;
-        }
-
-        manager::Primitive primitive = render_manager.Manager ().CreatePrimitive ();
-
-        list.reset (new manager::SpriteList (primitive.AddStandaloneSpriteList (mode, up, usage, usage)));
-
-        entity.SetPrimitive (primitive);
-
-        break;
-      }
-      default:
-        throw xtl::make_argument_exception ("", "usage", in_usage);
-    }
-
-    if (reserve_size)    
-      list->Reserve (reserve_size);
-
-    list->SetMaterial (material_name.c_str ());
+    throw xtl::make_range_exception (source, "subid", subid, sublists.size ());
   }
 };
 
@@ -124,68 +99,165 @@ SpriteList::~SpriteList ()
 }
 
 /*
-    Основные параметры
+    Создание / удаление списка
 */
 
-void SpriteList::SetParams (SpriteMode in_mode, PrimitiveUsage in_usage, const math::vec3f& up, const char* batch)
+void SpriteList::CreateList (subid_t subid, SpriteMode in_mode, PrimitiveUsage in_usage, const math::vec3f& up, const char* batch)
 {
   try
   {
     if (!batch)
       throw xtl::make_null_argument_exception ("", "batch");
 
-    stl::string batch_str = batch;
+    bool need_create_primitive = !impl->entity.HasPrimitive ();
 
-    impl->ResetSpriteList (in_mode, in_usage, up, batch);
+    for (SublistArray::iterator begin=impl->sublists.begin (), iter=begin, end=impl->sublists.end (); iter!=end; ++iter)
+      if (iter-begin != subid && *iter && (*iter)->batch_name != batch)
+        throw xtl::format_operation_exception ("", "Attempt to add sublist with batch '%s' to sprite list with batch '%s'", batch, (*iter)->batch_name.c_str ());
 
-    impl->mode  = in_mode;
-    impl->usage = in_usage;
-    impl->up    = up;
+    if (subid >= impl->sublists.size ())
+      impl->sublists.resize (subid + 1);
 
-    stl::swap (batch_str, impl->batch_name);
+    SublistPtr& list = impl->sublists [subid];
+
+    bool is_active = list != SublistPtr ();
+
+    manager::SpriteMode mode;
+
+    switch (in_mode)
+    {
+      case interchange::SpriteMode_Billboard:         mode = manager::SpriteMode_Billboard; break;
+      case interchange::SpriteMode_Oriented:          mode = manager::SpriteMode_Oriented; break;
+      case interchange::SpriteMode_OrientedBillboard: mode = manager::SpriteMode_OrientedBillboard; break;
+      default:                                        throw xtl::make_argument_exception ("", "mode", in_mode);
+    }
+
+    switch (in_usage)
+    {
+      case interchange::PrimitiveUsage_Batching:
+      {
+        if (need_create_primitive)
+        {      
+          manager::PrimitiveBuffers buffers   = impl->render_manager.BatchingManager ().GetBatch (batch);
+          manager::Primitive        primitive = impl->render_manager.Manager ().CreatePrimitive (buffers);
+
+          SublistPtr new_list (new Sublist (in_mode, in_usage, batch, primitive.AddBatchingSpriteList (mode, up)), false);
+
+          impl->entity.SetPrimitive (primitive);
+
+          list = new_list;
+        }
+        else
+        {
+          list = SublistPtr (new Sublist (in_mode, in_usage, batch, impl->entity.Primitive ().AddBatchingSpriteList (mode, up)), false);
+        }
+
+        break;
+      }
+      case interchange::PrimitiveUsage_Static:
+      case interchange::PrimitiveUsage_Dynamic:
+      case interchange::PrimitiveUsage_Stream:
+      {
+        manager::MeshBufferUsage usage;
+
+        switch (in_usage)
+        {
+          default:
+          case interchange::PrimitiveUsage_Static:  usage = manager::MeshBufferUsage_Static; break;
+          case interchange::PrimitiveUsage_Dynamic: usage = manager::MeshBufferUsage_Dynamic; break;
+          case interchange::PrimitiveUsage_Stream:  usage = manager::MeshBufferUsage_Stream; break;
+        }
+
+        if (need_create_primitive)
+        {
+          manager::Primitive primitive = impl->render_manager.Manager ().CreatePrimitive ();
+
+          SublistPtr new_list (new Sublist (in_mode, in_usage, batch, primitive.AddStandaloneSpriteList (mode, up, usage, usage)), false);
+
+          impl->entity.SetPrimitive (primitive);
+
+          list = new_list;
+        }
+        else
+        {
+          list = SublistPtr (new Sublist (in_mode, in_usage, batch, impl->entity.Primitive ().AddStandaloneSpriteList (mode, up, usage, usage)), false);
+        }
+
+        break;
+      }
+      default:
+        throw xtl::make_argument_exception ("", "usage", in_usage);
+    }
+
+    if (!is_active)
+      impl->active_sublists_count++;
   }
   catch (xtl::exception& e)
   {
-    e.touch ("render::scene::server::SpriteList::SetParams");
+    e.touch ("render::scene::server::SpriteList::CreateList");
     throw;
   }
 }
 
-SpriteMode SpriteList::Mode () const
+void SpriteList::RemoveList (subid_t subid)
 {
-  return impl->mode;
+  if (subid >= impl->sublists.size ())
+    return;
+
+  SublistPtr& list = impl->sublists [subid];
+
+  bool is_active = list != SublistPtr ();
+
+  list = SublistPtr ();
+
+  if (is_active)
+    impl->active_sublists_count--;
+
+  if (!impl->active_sublists_count)
+    impl->entity.ResetPrimitive ();
 }
 
-PrimitiveUsage SpriteList::Usage () const
+void SpriteList::ReserveLists (subid_t count)
 {
-  return impl->usage;
+  impl->sublists.reserve (count);
 }
 
-const math::vec3f& SpriteList::OrtUp () const
+/*
+    Основные параметры
+*/
+
+SpriteMode SpriteList::Mode (subid_t subid) const
 {
-  return impl->up;
+  return impl->Item (subid, "render::scene::server::SpriteList::Mode").mode;
 }
 
-const char* SpriteList::Batch () const
+PrimitiveUsage SpriteList::Usage (subid_t subid) const
 {
-  return impl->batch_name.c_str ();
+  return impl->Item (subid, "render::scene::server::SpriteList::Usage").usage;
+}
+
+const math::vec3f& SpriteList::OrtUp (subid_t subid) const
+{
+  return impl->Item (subid, "render::scene::server::SpriteList::OrtUp").up;
+}
+
+const char* SpriteList::Batch (subid_t subid) const
+{
+  return impl->Item (subid, "render::scene::server::SpriteList::Batch").batch_name.c_str ();
 }
 
 /*
     Имя материала
 */
 
-void SpriteList::SetMaterial (const char* name)
+void SpriteList::SetMaterial (subid_t subid, const char* name)
 {
   try
   {
     if (!name)
       throw xtl::make_null_argument_exception ("", "name");
 
-    if (!impl->list)
-      throw xtl::format_operation_exception ("", "Can't set material for sprite list '%s'. Call SetParams first", Name ());
-
-    impl->list->SetMaterial (name);
+    impl->Item (subid).sprites.SetMaterial (name);
   }
   catch (xtl::exception& e)
   {
@@ -194,40 +266,39 @@ void SpriteList::SetMaterial (const char* name)
   }
 }
 
-const char* SpriteList::Material () const
+const char* SpriteList::Material (subid_t subid) const
 {
-  return impl->list ? impl->list->Material () : "";
+  return impl->Item (subid, "render::scene::server::SpriteList::Material").sprites.Material ();
 }
 
 /*
     Количество спрайтов / размер буфера
 */
 
-size_t SpriteList::Size () const
+size_t SpriteList::Size (subid_t subid) const
 {
-  return impl->descs_count;
+  return impl->Item (subid, "render::scene::server::SpriteList::Size").descs_count;
 }
 
-size_t SpriteList::Capacity () const
+size_t SpriteList::Capacity (subid_t subid) const
 {
-  return impl->list ? impl->list->Capacity () : 0;
+  return impl->Item (subid, "render::scene::server::SpriteList::Capacity").sprites.Capacity ();
 }
 
 /*
     Изменение размера списка спрайтов / резервирование места для хранения спрайтов
 */
 
-void SpriteList::Resize (size_t count)
+void SpriteList::Resize (subid_t subid, size_t count)
 {
   try
   {
-    if (!impl->list)
-      throw xtl::format_operation_exception ("", "Can't resize/reserve for sprite list '%s'. Call SetParams first", Name ());
+    Sublist& list = impl->Item (subid);
 
-    if (count < impl->list->Size ())
-      impl->list->Remove (count, impl->list->Size () - count);
+    if (count < list.sprites.Size ())
+      list.sprites.Remove (count, list.sprites.Size () - count);
 
-    impl->descs_count = count;
+    list.descs_count = count;
   }
   catch (xtl::exception& e)
   {
@@ -236,14 +307,13 @@ void SpriteList::Resize (size_t count)
   }
 }
 
-void SpriteList::Reserve (size_t count)
+void SpriteList::Reserve (subid_t subid, size_t count)
 {
   try
   {
-    if (!impl->list)
-      throw xtl::format_operation_exception ("", "Can't resize/reserve for sprite list '%s'. Call SetParams first", Name ());
+    Sublist& list = impl->Item (subid);
 
-    impl->list->Reserve (count);
+    list.sprites.Reserve (count);
   }
   catch (xtl::exception& e)
   {
@@ -256,30 +326,29 @@ void SpriteList::Reserve (size_t count)
     Обновление дескрипторов спрайтов
 */
 
-void SpriteList::SetDescs (size_t first, size_t count, const SpriteDesc* descs)
+void SpriteList::SetDescs (subid_t subid, size_t first, size_t count, const SpriteDesc* descs)
 {
   try
   {
-    if (!impl->list)
-      throw xtl::format_operation_exception ("", "Can't set descs for sprite list '%s'. Call SetParams first", Name ());
+    Sublist& list = impl->Item (subid);
 
-    if (first >= impl->descs_count)
-      throw xtl::make_range_exception ("", "first", first, impl->descs_count);
+    if (first >= list.descs_count)
+      throw xtl::make_range_exception ("", "first", first, list.descs_count);
 
-    if (first + count > impl->descs_count)
-      throw xtl::make_range_exception ("", "count", count, impl->descs_count);
+    if (first + count > list.descs_count)
+      throw xtl::make_range_exception ("", "count", count, list.descs_count);
 
-    size_t real_count   = impl->list->Size (),
+    size_t real_count   = list.sprites.Size (),
            update_count = real_count >= first ? real_count - first : 0,
            add_count    = count - update_count;
 
     static const int ct_check = xtl::compile_time_assert<sizeof (manager::Sprite) == sizeof (interchange::SpriteDesc)>::value;
 
     if (update_count)
-      impl->list->Update (first, update_count, reinterpret_cast<const manager::Sprite*> (descs));
+      list.sprites.Update (first, update_count, reinterpret_cast<const manager::Sprite*> (descs));
 
     if (add_count)
-      impl->list->Add (add_count, reinterpret_cast<const manager::Sprite*> (descs) + update_count);
+      list.sprites.Add (add_count, reinterpret_cast<const manager::Sprite*> (descs) + update_count);
   }
   catch (xtl::exception& e)
   {

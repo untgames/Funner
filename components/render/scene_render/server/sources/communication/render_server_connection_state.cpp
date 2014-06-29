@@ -897,24 +897,50 @@ void ConnectionState::SetPageCurlParams (object_id_t id, const interchange::Page
   }
 }
 
-void ConnectionState::SetSpriteListParams (object_id_t id, interchange::SpriteMode mode, interchange::PrimitiveUsage usage, const math::vec3f& up, const char* batch)
+void ConnectionState::CreateSpriteList (object_id_t id, uint32 list_subid, interchange::SpriteMode mode, interchange::PrimitiveUsage usage, const math::vec3f& up, const char* batch)
 {
   try
   {
-    impl->server.SceneManager ().GetNode (id).Cast<SpriteList> ().SetParams (mode, usage, up, batch);
+    impl->server.SceneManager ().GetNode (id).Cast<SpriteList> ().CreateList (list_subid, mode, usage, up, batch);
   }
   catch (xtl::exception& e)
   {
-    e.touch ("render::scene::ConnectionState::SetSpriteListParams");
+    e.touch ("render::scene::ConnectionState::CreateSpriteList");
     throw;
   }
 }
 
-void ConnectionState::SetSpriteListMaterial (object_id_t id, const char* material)
+void ConnectionState::RemoveSpriteList (object_id_t id, uint32 list_subid)
 {
   try
   {
-    impl->server.SceneManager ().GetNode (id).Cast<SpriteList> ().SetMaterial (material);
+    impl->server.SceneManager ().GetNode (id).Cast<SpriteList> ().RemoveList (list_subid);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::scene::ConnectionState::RemoveSpriteList");
+    throw;
+  }
+}
+
+void ConnectionState::ReserveSpriteLists (object_id_t id, uint32 count)
+{
+  try
+  {
+    impl->server.SceneManager ().GetNode (id).Cast<SpriteList> ().ReserveLists (count);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::scene::ConnectionState::ReserveSpriteList");
+    throw;
+  }
+}
+
+void ConnectionState::SetSpriteListMaterial (object_id_t id, uint32 list_subid, const char* material)
+{
+  try
+  {
+    impl->server.SceneManager ().GetNode (id).Cast<SpriteList> ().SetMaterial (list_subid, material);
   }
   catch (xtl::exception& e)
   {
@@ -923,14 +949,14 @@ void ConnectionState::SetSpriteListMaterial (object_id_t id, const char* materia
   }
 }
 
-void ConnectionState::SetSpriteListBuffer (object_id_t id, uint32 count, uint32 reserve_count)
+void ConnectionState::SetSpriteListBuffer (object_id_t id, uint32 list_subid, uint32 count, uint32 reserve_count)
 {
   try
   {
     SpriteList& list = impl->server.SceneManager ().GetNode (id).Cast<SpriteList> ();
 
-    list.Reserve (reserve_count);
-    list.Resize (count);
+    list.Reserve (list_subid, reserve_count);
+    list.Resize (list_subid, count);
   }
   catch (xtl::exception& e)
   {
@@ -939,11 +965,11 @@ void ConnectionState::SetSpriteListBuffer (object_id_t id, uint32 count, uint32 
   }
 }
 
-void ConnectionState::SetSpriteListDescs (object_id_t id, uint32 first, interchange::RawArray<interchange::SpriteDesc> descs)
+void ConnectionState::SetSpriteListDescs (object_id_t id, uint32 list_subid, uint32 first, interchange::RawArray<interchange::SpriteDesc> descs)
 {
   try
   {
-    impl->server.SceneManager ().GetNode (id).Cast<SpriteList> ().SetDescs (first, descs.size, descs.data);
+    impl->server.SceneManager ().GetNode (id).Cast<SpriteList> ().SetDescs (list_subid, first, descs.size, descs.data);
   }
   catch (xtl::exception& e)
   {

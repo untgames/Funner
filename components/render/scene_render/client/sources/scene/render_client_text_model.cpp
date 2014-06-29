@@ -3,6 +3,7 @@
 using namespace render::scene;
 using namespace render::scene::client;
 
+#if 0
 namespace
 {
 
@@ -12,7 +13,7 @@ class TextModel: public VisualModel
   public:
 ///Конструктор
     TextModel (scene_graph::TextModel& model, SceneManager& manager)
-      : VisualModel (model, manager, interchange::NodeType_SpriteList)
+      : VisualModel (model, manager, interchange::NodeType_SpriteList) ///???not one object???
       , on_update_fonts_connection (model.RegisterEventHandler (scene_graph::TextModelEvent_AfterFontsUpdate, xtl::bind (&TextModel::UpdateFontsNotify, this)))
       , on_update_descs_connection (model.RegisterEventHandler (scene_graph::TextModelEvent_AfterCharDescsUpdate, xtl::bind (&TextModel::UpdateDescsNotify, this)))
       , need_update_fonts (true)
@@ -56,13 +57,16 @@ class TextModel: public VisualModel
 
 }
 
+#endif
+
 namespace render {
 namespace scene {
 namespace client {
 
 Node* create_node (scene_graph::TextModel& model, SceneManager& scene_manager)
 {
-  return new TextModel (model, scene_manager);
+  throw xtl::make_not_implemented_exception (__FUNCTION__);
+//  return new TextModel (model, scene_manager);
 }
 
 }}}

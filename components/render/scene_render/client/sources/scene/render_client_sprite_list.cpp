@@ -59,7 +59,7 @@ class SpriteList: public VisualModel
             case scene_graph::SpriteUsage_Batching: usage = interchange::PrimitiveUsage_Batching; break;
           }
 
-          context.SetSpriteListParams (Id (), mode, usage, model.OrtUp (), model.Batch ());
+          context.CreateSpriteList (Id (), 0, mode, usage, model.OrtUp (), model.Batch ());
 
           need_update_descs  = true;
           need_update_params = false;
@@ -69,7 +69,7 @@ class SpriteList: public VisualModel
 
         if (material_name_hash != model_material_name_hash)
         {
-          context.SetSpriteListMaterial (Id (), model.Material ());
+          context.SetSpriteListMaterial (Id (), 0, model.Material ());
 
           material_name_hash = model_material_name_hash;
         }
@@ -80,7 +80,7 @@ class SpriteList: public VisualModel
 
           if (count != cached_descs_count || capacity != cached_descs_capacity)
           {
-            context.SetSpriteListBuffer (Id (), uint32 (count), uint32 (capacity));
+            context.SetSpriteListBuffer (Id (), 0, uint32 (count), uint32 (capacity));
 
             cached_descs_count    = count;
             cached_descs_capacity = capacity;
@@ -88,7 +88,7 @@ class SpriteList: public VisualModel
 
           static const int ct_check = xtl::compile_time_assert<sizeof (scene_graph::SpriteDesc) == sizeof (interchange::SpriteDesc)>::value;
 
-          context.SetSpriteListDescs (Id (), 0, interchange::RawArray<interchange::SpriteDesc> (reinterpret_cast<const interchange::SpriteDesc*> (model.SpriteDescs ()), uint32 (count)));
+          context.SetSpriteListDescs (Id (), 0, 0, interchange::RawArray<interchange::SpriteDesc> (reinterpret_cast<const interchange::SpriteDesc*> (model.SpriteDescs ()), uint32 (count)));
                                                                                                                                                                                  
           need_update_descs = false;
         }

@@ -88,10 +88,12 @@ class ConnectionState: public xtl::noncopyable
 
     void SetPageCurlParams(object_id_t id, const interchange::PageCurlParams& params, const char* front_left_material, const char* front_right_material, const char* back_left_material, const char* back_right_material);
 
-    void SetSpriteListParams (object_id_t id, interchange::SpriteMode mode, interchange::PrimitiveUsage usage, const math::vec3f& up, const char* batch);
-    void SetSpriteListMaterial (object_id_t id, const char* material);
-    void SetSpriteListBuffer (object_id_t id, uint32 count, uint32 reserve_count);
-    void SetSpriteListDescs (object_id_t id, uint32 first, interchange::RawArray<interchange::SpriteDesc> descs);
+    void ReserveSpriteLists (object_id_t id, uint32 list_subids_count);
+    void CreateSpriteList (object_id_t id, uint32 list_subid, interchange::SpriteMode mode, interchange::PrimitiveUsage usage, const math::vec3f& up, const char* batch);
+    void RemoveSpriteList (object_id_t id, uint32 list_subid);
+    void SetSpriteListMaterial (object_id_t id, uint32 list_subid, const char* material);
+    void SetSpriteListBuffer (object_id_t id, uint32 list_subid, uint32 count, uint32 reserve_count);
+    void SetSpriteListDescs (object_id_t id, uint32 list_subid, uint32 first, interchange::RawArray<interchange::SpriteDesc> descs);
 
     void SetLineListParams (object_id_t id, interchange::PrimitiveUsage usage, const char* batch);
     void SetLineListMaterial (object_id_t id, const char* material);
