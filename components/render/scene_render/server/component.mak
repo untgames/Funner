@@ -18,4 +18,4 @@ RENDER.SCENE_RENDER.SERVER.TESTS.SOURCE_DIRS := tests/communication tests/render
 RENDER.SCENE_RENDER.SERVER.TESTS.IMPORTS     := compile.render.scene_render.server link.render.scene_render.server compile.render.scene_render.client \
                                                 link.render.scene_render.client compile.common compile.system link.render.low_level.opengl_driver \
                                                 run.render.low_level.opengl_driver link.media.image.dds link.media.rfx.default_serializers \
-                                                link.media.geometry.binmesh link.media.geometry.xmesh
+                                                link.media.geometry.binmesh link.media.geometry.xmesh compile.media.font link.media.font.xfont

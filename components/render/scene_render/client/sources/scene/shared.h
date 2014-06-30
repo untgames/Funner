@@ -6,6 +6,7 @@
 #include <xtl/bind.h>
 #include <xtl/common_exceptions.h>
 #include <xtl/function.h>
+#include <xtl/uninitialized_storage.h>
 
 #include <common/property_map.h>
 #include <common/strlib.h>

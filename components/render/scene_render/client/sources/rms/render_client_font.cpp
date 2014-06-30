@@ -47,10 +47,12 @@ Font::Font (MaterialManager& material_manager, const media::Font& font, const me
     impl->textures.reserve (images_count);
     sizes.reserve (images_count);
 
-    media::Image image;
+//    media::Image image;
 
     for (size_t i=0; i<images_count; i++)
     {
+      media::Image image;
+
       rasterized_font.BuildImage (i, image);
 
       TexturePtr texture = material_manager.CreateTexture (common::format ("font_textures.%s.font%08u.image%02u", font.Name (), font.Id (), i).c_str (),

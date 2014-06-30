@@ -14,6 +14,8 @@
 #include <common/property_map.h>
 #include <common/time.h>
 
+#include <media/font_library.h>
+
 #include <syslib/application.h>
 #include <syslib/window.h>
 
@@ -23,6 +25,7 @@
 #include <sg/page_curl.h>
 #include <sg/scene.h>
 #include <sg/sprite.h>
+#include <sg/text.h>
 
 #include <render/scene_render_client.h>
 #include <render/scene_render_server.h>
