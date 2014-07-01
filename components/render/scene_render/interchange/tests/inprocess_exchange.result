@@ -1,0 +1,20 @@
+Results of inprocess_exchange_test:
+before attach
+A::A(1)
+A::~A(1)
+check: id=1
+before detach
+A::~A(1)
+check: not exist
+before attach x 3
+A::A(2)
+A::~A(2)
+A::A(3)
+A::~A(3)
+A::A(4)
+A::~A(4)
+before detach x 2
+A::~A(2)
+A::~A(3)
+exit
+A::~A(4)

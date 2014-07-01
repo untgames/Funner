@@ -1,0 +1,15 @@
+Results of visual_model_shader_properties_test:
+node has no static shader properties
+node has no dynamic shader properties
+create properties
+node has no static shader properties
+node has 0 dynamic shader properties (hash=ffffffff, structure_hash=ffffffff):
+add dynamic properties
+node has no static shader properties
+node has 1 dynamic shader properties (hash=54a83a00, structure_hash=7d77abc3):
+ #0: name='X', type=string, value='1'
+add static properties
+node has 1 static shader properties (hash=b789e995, structure_hash=7e869928):
+ #0: name='Y', type=string, value='2'
+node has 1 dynamic shader properties (hash=54a83a00, structure_hash=7d77abc3):
+ #0: name='X', type=string, value='1'

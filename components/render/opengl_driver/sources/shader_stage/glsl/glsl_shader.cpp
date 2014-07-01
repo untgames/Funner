@@ -3,6 +3,15 @@
 using namespace render::low_level;
 using namespace render::low_level::opengl;
 
+namespace
+{
+
+//Константы
+const char*  DEFINE_TEXT              = "#define ";
+const size_t DEFINE_ADDITIONAL_LENGTH = xtl::xstrlen (DEFINE_TEXT) + 1;
+
+}
+
 /*
     Конструктор
 */
@@ -39,8 +48,16 @@ GlslShader::GlslShader (const ContextManager& manager, GLenum type, const Shader
 
       //создание шейдера
 
-    if (glCreateShader) handle = glCreateShader (type);
-    else                handle = glCreateShaderObjectARB (type);
+    if (glCreateShader)
+    {
+      handle = glCreateShader (type);
+    }
+#ifndef OPENGL_ES2_SUPPORT
+    else
+    {
+      handle = glCreateShaderObjectARB (type);
+    }
+#endif
 
     if (!handle)
       RaiseError (METHOD_NAME);
@@ -49,21 +66,76 @@ GlslShader::GlslShader (const ContextManager& manager, GLenum type, const Shader
 
     GLint compile_status = 0;
 
-    if (glShaderSource) glShaderSource    (handle, 1, (const char**)&desc.source_code, (GLint*)&desc.source_code_size);
-    else                glShaderSourceARB (handle, 1, (const char**)&desc.source_code, (GLint*)&desc.source_code_size);
+    common::StringArray defines = common::split (desc.options);
 
-    if (glCompileShader) glCompileShader    (handle);
-    else                 glCompileShaderARB (handle);
+    stl::string defines_string;
 
-    if (glGetShaderiv) glGetShaderiv             (handle, GL_COMPILE_STATUS, &compile_status);
-    else               glGetObjectParameterivARB (handle, GL_COMPILE_STATUS, &compile_status);
+#ifdef OPENGL_ES2_SUPPORT
+    defines_string = "#define OPENGL_ES2_SUPPORT\n";
+#endif
+
+    defines_string.reserve (defines_string.length () + xtl::xstrlen (desc.options) + defines.Size () * DEFINE_ADDITIONAL_LENGTH);
+
+    for (size_t i = 0, count = defines.Size (); i < count; i++)
+      defines_string += common::format ("%s %s\n", DEFINE_TEXT, defines [i]);
+
+      //replace '=' with ' '
+    for (char* current_symbol = defines_string.begin (); *current_symbol; current_symbol++)
+    {
+      if (*current_symbol == '=')
+        *current_symbol = ' ';
+    }
+
+    const char* source_codes []       = { defines_string.c_str (), desc.source_code };
+    GLint       source_codes_sizes [] = { defines_string.length (), desc.source_code_size };
+
+    if (glShaderSource)
+    {
+      glShaderSource (handle, 2, source_codes, source_codes_sizes);
+    }
+#ifndef OPENGL_ES2_SUPPORT
+    else
+    {
+      glShaderSourceARB (handle, 2, source_codes, source_codes_sizes);
+    }
+#endif
+
+    if (glCompileShader)
+    {
+      glCompileShader (handle);
+    }
+#ifndef OPENGL_ES2_SUPPORT
+    else
+    {
+      glCompileShaderARB (handle);
+    }
+#endif
+
+    if (glGetShaderiv)
+    {
+      glGetShaderiv (handle, GL_COMPILE_STATUS, &compile_status);
+    }
+#ifndef OPENGL_ES2_SUPPORT
+    else
+    {
+      glGetObjectParameterivARB (handle, GL_COMPILE_STATUS, &compile_status);
+    }
+#endif
 
       //протоколирование ошибок компиляции
 
     GLint log_length = 0;
 
-    if (glGetShaderiv) glGetShaderiv             (handle, GL_INFO_LOG_LENGTH, &log_length);
-    else               glGetObjectParameterivARB (handle, GL_INFO_LOG_LENGTH, &log_length);
+    if (glGetShaderiv)
+    {
+      glGetShaderiv (handle, GL_INFO_LOG_LENGTH, &log_length);
+    }
+#ifndef OPENGL_ES2_SUPPORT
+    else
+    {
+      glGetObjectParameterivARB (handle, GL_INFO_LOG_LENGTH, &log_length);
+    }
+#endif
 
     if (log_length)
     {
@@ -73,8 +145,16 @@ GlslShader::GlslShader (const ContextManager& manager, GLenum type, const Shader
 
       GLsizei getted_log_size = 0;
 
-      if (glGetShaderInfoLog) glGetShaderInfoLog (handle, log_length, &getted_log_size, &log_buffer [0]);
-      else                    glGetInfoLogARB    (handle, log_length, &getted_log_size, &log_buffer [0]);
+      if (glGetShaderInfoLog)
+      {
+        glGetShaderInfoLog (handle, log_length, &getted_log_size, &log_buffer [0]);
+      }
+#ifndef OPENGL_ES2_SUPPORT
+      else
+      {
+        glGetInfoLogARB (handle, log_length, &getted_log_size, &log_buffer [0]);
+      }
+#endif
 
       if (getted_log_size)
         log_buffer.resize (getted_log_size - 1);
@@ -135,8 +215,16 @@ void GlslShader::DeleteShader ()
 
     //удаление шейдера
 
-  if (glDeleteShader) glDeleteShader    (handle);
-  else                glDeleteObjectARB (handle);
+  if (glDeleteShader)
+  {
+    glDeleteShader (handle);
+  }
+#ifndef OPENGL_ES2_SUPPORT
+  else
+  {
+    glDeleteObjectARB (handle);
+  }
+#endif
 
     //проверка ошибок
 

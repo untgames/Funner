@@ -8,6 +8,7 @@ class MaterialImpl: public Object, public CacheSource
 ///Конструктор / деструктор
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     MaterialImpl  (const DeviceManagerPtr&, const TextureManagerPtr&, const ProgramManagerPtr&, const char* name = "");
+    MaterialImpl  (const MaterialImpl&);
     ~MaterialImpl ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -39,6 +40,13 @@ class MaterialImpl: public Object, public CacheSource
     LowLevelTexturePtr       DeviceTexture (size_t index); //может вернуть 0 в случае динамической текстуры
     const char*              TextureName   (size_t index);
     LowLevelSamplerStatePtr  Sampler       (size_t index);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Обновление отдельных текстур
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void        SetTexmap     (const char* semantic, const char* name, const char* sampler); //name == null && sampler == null -> remove
+    const char* TexmapImage   (const char* semantic); //null if not exist
+    const char* TexmapSampler (const char* semantic); //null if not exist
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Тэги

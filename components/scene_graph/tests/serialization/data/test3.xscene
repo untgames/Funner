@@ -7,7 +7,7 @@
     <spot_light id="spot_light" range="10" light_color="1;0;1" exponent="1.2" angle="60"/>
     <point_light id="point_light" range="10" light_color="1;0;1" attenuation="1;2;3"/>
     <mesh id="mesh" source="1.mesh" min_bound="-10;-20;-30"/>
-    <sprite id="sprite" material="sprite_material" color="1;0;1" alpha="0.5" frame="1"/>
+    <sprite id="sprite" material="sprite_material" color="1;0;1" alpha="0.5" up="0;0;1" mode="oriented" usage="batching" tex_size="0.5;1"/>
     <text_line id="text_line" text="Hello world" font="my_font" color="1;1;1" alpha="0.5" horizontal_alignment="center" vertical_alignment="baseline"/>
     <sound id="sound" source="my_sound" gain="0.5"/>
   </scene>

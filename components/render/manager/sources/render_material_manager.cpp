@@ -1,6 +1,6 @@
 #include "shared.h"
 
-using namespace render;
+using namespace render::manager;
 
 /*
     Описание реализации менеджера материалов
@@ -75,7 +75,7 @@ struct MaterialManager::Impl
         
       MaterialLibraryEntryPtr entry (new MaterialLibraryEntry, false);
       
-      entry->source_library = &library;
+      entry->source_library = name ? (media::rfx::MaterialLibrary*)0 : &library;
       entry->resource_name  = name;
       
       entry->materials.reserve (library.Size ());
@@ -103,7 +103,7 @@ struct MaterialManager::Impl
     }
     catch (xtl::exception& e)
     {
-      e.touch ("render::MaterialManager::LoadMaterialLibrary");
+      e.touch ("render::manager::MaterialManager::LoadMaterialLibrary");
       throw;
     }
   }
@@ -154,7 +154,7 @@ MaterialPtr MaterialManager::CreateMaterial ()
   }
   catch (xtl::exception& e)
   {
-    e.touch ("render::MaterialManager::CreateMaterial()");
+    e.touch ("render::manager::MaterialManager::CreateMaterial()");
     throw;
   }
 }
@@ -185,7 +185,7 @@ void MaterialManager::LoadMaterialLibrary (const char* name)
   }
   catch (xtl::exception& e)
   {
-    e.touch ("render::MaterialManager::LoadMaterialLibrary(const char*)");
+    e.touch ("render::manager::MaterialManager::LoadMaterialLibrary(const char*)");
     throw;
   }
 }
@@ -198,7 +198,7 @@ void MaterialManager::LoadMaterialLibrary (const media::rfx::MaterialLibrary& li
   }
   catch (xtl::exception& e)
   {
-    e.touch ("render::MaterialManager::LoadMaterialLibrary(const media::rfx::MaterialLibrary&)");
+    e.touch ("render::manager::MaterialManager::LoadMaterialLibrary(const media::rfx::MaterialLibrary&)");
     throw;
   }
 }
@@ -243,7 +243,7 @@ void MaterialManager::ShareMaterial (const char* name, const MaterialPtr& materi
   }
   catch (xtl::exception& e)
   {
-    e.touch ("render::MaterialManager::ShareMaterial");
+    e.touch ("render::manager::MaterialManager::ShareMaterial");
     throw;
   }
 }
@@ -294,4 +294,13 @@ void MaterialManager::SetDefaultMaterial (const MaterialPtr& material)
 MaterialPtr MaterialManager::DefaultMaterial ()
 {
   return impl->proxy_manager.DefaultResource ();
+}
+
+/*
+    Ссылка на менеджер устройства
+*/
+
+render::manager::DeviceManager& MaterialManager::DeviceManager ()
+{
+  return *impl->device_manager;
 }

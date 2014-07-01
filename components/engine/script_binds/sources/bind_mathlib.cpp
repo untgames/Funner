@@ -566,10 +566,12 @@ void bind_math_utility_library (InvokerRegistry& lib)
     make_invoker (&angle_axis_to_quat<T>),
     make_invoker (xtl::implicit_cast<quat<T> (*) (const matrix<T, 4>&)> (to_quat))
   ));
-  lib.Register ("translate", make_invoker (&translate<T>));
-  lib.Register ("scale",     make_invoker (&scale<T>));
-  lib.Register ("rotate",    make_invoker (&rotate_angle_axis<T>));
-  lib.Register ("lookat",    make_invoker (&lookat<T>));
+  lib.Register ("translate",        make_invoker (&translate<T>));
+  lib.Register ("scale",            make_invoker (&scale<T>));
+  lib.Register ("rotate",           make_invoker (&rotate_angle_axis<T>));
+  lib.Register ("lookat",           make_invoker (&lookat<T>));
+  lib.Register ("affine_compose",   make_invoker (&affine_compose));   //TODO make template
+  lib.Register ("affine_decompose", make_invoker (&affine_decompose)); //TODO make template
 }
 
 /*

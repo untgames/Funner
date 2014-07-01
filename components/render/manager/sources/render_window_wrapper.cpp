@@ -1,6 +1,6 @@
 #include "shared.h"
 
-using namespace render;
+using namespace render::manager;
 
 Window::Window (WindowImpl* in_impl)
   : impl (in_impl)
@@ -73,9 +73,14 @@ void Window::Swap (Window& window)
 namespace render
 {
 
+namespace manager
+{
+
 void swap (Window& window1, Window& window2)
 {
   window1.Swap (window2);
+}
+
 }
 
 }

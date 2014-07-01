@@ -1,13 +1,13 @@
 #include "shared.h"
 
-using namespace render;
+using namespace render::manager;
 
 RectArea::RectArea ()
   : impl (new RectAreaImpl)
 {
 }
 
-RectArea::RectArea (const render::Rect& in_rect)
+RectArea::RectArea (const render::manager::Rect& in_rect)
   : impl (new RectAreaImpl (in_rect))
 {
 }
@@ -30,17 +30,17 @@ RectArea& RectArea::operator = (const RectArea& area)
   return *this;
 }
 
-void RectArea::SetRect (const render::Rect& rect)
+void RectArea::SetRect (const render::manager::Rect& rect)
 {
   impl->SetRect (rect);
 }
 
 void  RectArea::SetRect (int x, int y, size_t width, size_t height)
 {
-  impl->SetRect (render::Rect (x, y, width, height));
+  impl->SetRect (render::manager::Rect (x, y, width, height));
 }
 
-const render::Rect& RectArea::Rect () const
+const render::manager::Rect& RectArea::Rect () const
 {
   return impl->Rect ();
 }
@@ -73,9 +73,14 @@ void RectArea::Swap (RectArea& area)
 namespace render
 {
 
+namespace manager
+{
+
 void swap (RectArea& area1, RectArea& area2)
 {
   area1.Swap (area2);
+}
+
 }
 
 }

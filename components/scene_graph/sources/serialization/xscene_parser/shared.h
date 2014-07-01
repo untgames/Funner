@@ -23,16 +23,17 @@
 #include <common/strlib.h>
 
 #include <media/rms/manager.h>
+#include <media/font_library.h>
 
 #include <sg/camera.h>
 #include <sg/light.h>
 #include <sg/listener.h>
+#include <sg/mesh.h>
 #include <sg/scene_manager.h>
 #include <sg/scene_parser.h>
 #include <sg/sound_emitter.h>
 #include <sg/sprite.h>
-#include <sg/text_line.h>
-#include <sg/visual_model.h>
+#include <sg/text.h>
 
 namespace scene_graph
 {

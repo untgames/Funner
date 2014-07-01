@@ -1,7 +1,10 @@
 #include "shared.h"
 
-using namespace render;
+using namespace render::manager;
 using namespace render::low_level;
+
+//TODO: расчет вершинного буфера для спрайтов для каждого кадра
+//TODO: реакция отдельных спрайтов на события материала
 
 /*
     Описание реализации примитива
@@ -21,7 +24,7 @@ struct MeshCommonData
     : device_manager (in_device_manager)
   {
     if (!device_manager)
-      throw xtl::make_null_argument_exception ("render::MeshCommonData::MeshCommonData", "device_manager");
+      throw xtl::make_null_argument_exception ("render::manager::MeshCommonData::MeshCommonData", "device_manager");
   }
 };
 
@@ -151,15 +154,15 @@ struct MeshPrimitive: public xtl::reference_counter, public CacheHolder, public 
       
         //кэширование параметров примитива для отрисовки
       
-      cached_primitive.material    = cached_material.get ();
-      cached_primitive.state_block = cached_state_block.get ();
-      cached_primitive.indexed     = common_data.index_buffer != LowLevelBufferPtr ();
-      cached_primitive.type        = type;
-      cached_primitive.first       = first;
-      cached_primitive.count       = count;
-      cached_primitive.base_vertex = base_vertex;
-      cached_primitive.tags_count  = cached_material ? cached_material->TagsCount () : 0;
-      cached_primitive.tags        = cached_material ? cached_material->Tags () : (const size_t*)0;
+      cached_primitive.material      = cached_material.get ();
+      cached_primitive.state_block   = cached_state_block.get ();
+      cached_primitive.indexed       = common_data.index_buffer != LowLevelBufferPtr ();
+      cached_primitive.type          = type;
+      cached_primitive.first         = first;
+      cached_primitive.count         = count;
+      cached_primitive.base_vertex   = base_vertex;
+      cached_primitive.tags_count    = cached_material ? cached_material->TagsCount () : 0;
+      cached_primitive.tags          = cached_material ? cached_material->Tags () : (const size_t*)0;
       
         //обновление зависимостей всегда, поскольку любые изменения материала/примитива должны быть отображены на зависимые кэши
         
@@ -170,7 +173,7 @@ struct MeshPrimitive: public xtl::reference_counter, public CacheHolder, public 
     }
     catch (xtl::exception& e)
     {
-      e.touch ("render::MeshPrimitive::UpdateCacheCore");
+      e.touch ("render::manager::MeshPrimitive::UpdateCacheCore");
       throw;
     }
   }
@@ -196,7 +199,7 @@ struct Mesh: public xtl::reference_counter, public MeshCommonData, public CacheH
     : MeshCommonData (device_manager)    
   {
     if (!in_name)
-      throw xtl::make_null_argument_exception ("render::Mesh::Mesh", "name");
+      throw xtl::make_null_argument_exception ("render::manager::Mesh::Mesh", "name");
 
     name = in_name;
     
@@ -268,7 +271,7 @@ struct Mesh: public xtl::reference_counter, public MeshCommonData, public CacheH
     }
     catch (xtl::exception& e)
     {
-      e.touch ("render::Mesh::UpdateCacheCore");
+      e.touch ("render::manager::Mesh::UpdateCacheCore");
       throw;
     }
   }  
@@ -277,29 +280,60 @@ struct Mesh: public xtl::reference_counter, public MeshCommonData, public CacheH
   using CacheHolder::ResetCache;
 };
 
-typedef xtl::intrusive_ptr<Mesh>            MeshPtr;
-typedef stl::vector<MeshPtr>                MeshArray;
-typedef stl::vector<RendererPrimitiveGroup> RenderPrimitiveGroupsArray;
+typedef xtl::intrusive_ptr<Mesh>                        MeshPtr;
+typedef stl::vector<MeshPtr>                            MeshArray;
+typedef stl::vector<RendererPrimitiveGroup>             RenderPrimitiveGroupsArray;
+typedef xtl::intrusive_ptr<SimplePrimitiveListImplBase> SimplePrimitiveListPtr;
+
+enum SimplePrimitiveListType
+{
+  SimplePrimitiveListType_Sprite,
+  SimplePrimitiveListType_Line,
+};
+
+struct SimplePrimitiveListDesc
+{
+  SimplePrimitiveListPtr  list;
+  SimplePrimitiveListType type;
+  RendererPrimitive*      primitive;
+
+  SimplePrimitiveListDesc (const SimplePrimitiveListPtr& in_list, SimplePrimitiveListType in_type, RendererPrimitive* in_primitive)
+    : list (in_list)
+    , type (in_type)
+    , primitive (in_primitive)
+  {
+  }
+};
+
+
+typedef stl::vector<SimplePrimitiveListDesc> SimplePrimitiveListArray;
 
 }
 
 struct PrimitiveImpl::Impl: public DebugIdHolder
 {
-  DeviceManagerPtr           device_manager;   //менеджер устройства
-  MaterialManagerPtr         material_manager; //менеджер материалов
-  BuffersPtr                 buffers;          //буферы примитива
-  MeshArray                  meshes;           //меши
-  stl::string                name;             //имя примитива
-  RenderPrimitiveGroupsArray render_groups;    //группы  
-  Log                        log;              //поток протоколирования
+  DeviceManagerPtr           device_manager;                               //менеджер устройства
+  MaterialManagerPtr         material_manager;                             //менеджер материалов
+  BuffersPtr                 buffers;                                      //буферы примитива
+  MeshArray                  meshes;                                       //меши
+  SimplePrimitiveListArray   entity_independent_dynamic_primitive_lists;   //списки динамических примитивов
+  SimplePrimitiveListArray   entity_dependent_dynamic_primitive_lists;     //списки динамических примитивов
+  RendererPrimitiveArray     cached_entity_independent_dynamic_primitives; //закэшированные динамические примитивы не зависящие от объекта
+  size_t                     line_lists_count;                             //количество списков с линиями
+  size_t                     sprite_lists_count;                           //количество списков со спрайтами
+  stl::string                name;                                         //имя примитива
+  RenderPrimitiveGroupsArray render_groups;                                //группы
+  Log                        log;                                          //поток протоколирования
 
 ///Конструктор
   Impl (const DeviceManagerPtr& in_device_manager, const MaterialManagerPtr& in_material_manager, const BuffersPtr& in_buffers, const char* in_name)
     : device_manager (in_device_manager)
     , material_manager (in_material_manager)
     , buffers (in_buffers)
+    , line_lists_count ()
+    , sprite_lists_count ()
   {
-    static const char* METHOD_NAME = "render::PrimitiveImpl::Impl::Impl";
+    static const char* METHOD_NAME = "render::manager::PrimitiveImpl::Impl::Impl";
     
     if (!device_manager)
       throw xtl::format_operation_exception (METHOD_NAME, "No DeviceManager binded");
@@ -341,7 +375,7 @@ PrimitiveImpl::PrimitiveImpl (const DeviceManagerPtr& device_manager, const Mate
   }
   catch (xtl::exception& e)
   {
-    e.touch ("render::PrimitiveImpl::PrimitiveImpl");
+    e.touch ("render::manager::PrimitiveImpl::PrimitiveImpl");
     throw;
   }
 }
@@ -362,7 +396,7 @@ const char* PrimitiveImpl::Name ()
 void PrimitiveImpl::SetName (const char* name)
 {
   if (!name)
-    throw xtl::make_null_argument_exception ("render::PrimitiveImpl::SetName", "name");
+    throw xtl::make_null_argument_exception ("render::manager::PrimitiveImpl::SetName", "name");
     
   if (impl->device_manager->Settings ().HasDebugLog ())
     impl->log.Printf ("Primitive '%s' name changed to '%s' (id=%u)", impl->name.c_str (), name, impl->Id ());
@@ -486,7 +520,7 @@ size_t PrimitiveImpl::AddMesh (const media::geometry::Mesh& source, MeshBufferUs
   }
   catch (xtl::exception& e)
   {
-    e.touch ("render::PrimitiveImpl::AddMesh");
+    e.touch ("render::manager::PrimitiveImpl::AddMesh");
     throw;
   }
 }
@@ -512,81 +546,167 @@ void PrimitiveImpl::RemoveAllMeshes ()
 }
 
 /*
-    Работа с линиями
-*/
-
-size_t PrimitiveImpl::LinesCount ()
-{
-  throw xtl::make_not_implemented_exception ("render::PrimitiveImpl::LinesCount");
-}
-
-size_t PrimitiveImpl::AddLines (size_t lines_count, const Line* lines, const MaterialPtr& material)
-{
-  throw xtl::make_not_implemented_exception ("render::PrimitiveImpl::AddLines");
-}
-
-void PrimitiveImpl::UpdateLines (size_t first_lines, size_t lines_count, const Line* Lines)
-{
-  throw xtl::make_not_implemented_exception ("render::PrimitiveImpl::UpdateLines");
-}
-
-void PrimitiveImpl::SetLinesMaterial (size_t first_lines, size_t lines_count, const MaterialPtr& material)
-{
-  throw xtl::make_not_implemented_exception ("render::PrimitiveImpl::SetLinesMaterial");
-}
-
-void PrimitiveImpl::RemoveLines (size_t first_lines, size_t lines_count)
-{
-  throw xtl::make_not_implemented_exception ("render::PrimitiveImpl::ReserveLines");
-}
-
-void PrimitiveImpl::RemoveAllLines ()
-{
-  throw xtl::make_not_implemented_exception ("render::PrimitiveImpl::ReserveAllLines");
-}
-
-void PrimitiveImpl::ReserveLines (size_t lines_count)
-{
-  throw xtl::make_not_implemented_exception ("render::PrimitiveImpl::ReserveLines");
-}
-
-/*
     Работа со спрайтами
 */
 
-size_t PrimitiveImpl::SpritesCount ()
+size_t PrimitiveImpl::SpriteListsCount ()
 {
-  throw xtl::make_not_implemented_exception ("render::PrimitiveImpl::SpritesCount");
+  return impl->sprite_lists_count;
 }
 
-size_t PrimitiveImpl::AddSprites (size_t sprites_count, const Sprite* sprites, const MaterialPtr& material)
+SpriteListPtr PrimitiveImpl::AddStandaloneSpriteList (SpriteMode mode, const math::vec3f& up, MeshBufferUsage vb_usage, MeshBufferUsage ib_usage)
 {
-  throw xtl::make_not_implemented_exception ("render::PrimitiveImpl::AddSprites");
+  try
+  {
+    switch (vb_usage)
+    {
+      case MeshBufferUsage_Static:
+      case MeshBufferUsage_Dynamic:
+      case MeshBufferUsage_Stream:
+        break;
+      default:
+        throw xtl::make_argument_exception ("", "vb_usage", vb_usage);
+    }
+
+    switch (ib_usage)
+    {
+      case MeshBufferUsage_Static:
+      case MeshBufferUsage_Dynamic:
+      case MeshBufferUsage_Stream:
+        break;
+      default:
+        throw xtl::make_argument_exception ("", "ib_usage", ib_usage);
+    }
+
+    switch (mode)
+    {
+      case SpriteMode_Billboard:
+      case SpriteMode_Oriented:
+      case SpriteMode_OrientedBillboard:
+        break;
+      default:
+        throw xtl::make_argument_exception ("", "mode", mode);
+    }
+
+    SpriteListPtr list (create_standalone_sprite_list (impl->material_manager, mode, up, vb_usage, ib_usage), false);
+
+    AddSimplePrimitiveList (list.get (), SimplePrimitiveListType_Sprite);
+
+    return list;
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::manager::PrimitiveImpl::AddStandaloneSpriteList");
+    throw;
+  }
 }
 
-void PrimitiveImpl::UpdateSprites (size_t first_sprite, size_t sprites_count, const Sprite* sprites)
+SpriteListPtr PrimitiveImpl::AddBatchingSpriteList (SpriteMode mode, const math::vec3f& up)
 {
-  throw xtl::make_not_implemented_exception ("render::PrimitiveImpl::UpdateSprites");
+  try
+  {
+    switch (mode)
+    {
+      case SpriteMode_Billboard:
+      case SpriteMode_Oriented:
+      case SpriteMode_OrientedBillboard:
+        break;
+      default:
+        throw xtl::make_argument_exception ("", "mode", mode);
+    }
+
+    SpriteListPtr list (create_batching_sprite_list (&impl->buffers->BatchingManager (), impl->material_manager, mode, up), false);
+
+    AddSimplePrimitiveList (list.get (), SimplePrimitiveListType_Sprite);
+
+    return list;
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::manager::PrimitiveImpl::AddBatchingSpriteList");
+    throw;
+  }
 }
 
-void PrimitiveImpl::SetSpritesMaterial (size_t first_sprite, size_t sprites_count, const MaterialPtr& material)
+void PrimitiveImpl::RemoveSpriteList (const SpriteListPtr& list)
 {
-  throw xtl::make_not_implemented_exception ("render::PrimitiveImpl::SetSpritesMaterial");
+  RemoveSimplePrimitiveList (list.get ());
 }
 
-void PrimitiveImpl::RemoveSprites (size_t first_sprite, size_t sprites_count)
+void PrimitiveImpl::RemoveAllSpriteLists ()
 {
-  throw xtl::make_not_implemented_exception ("render::PrimitiveImpl::RemoveSprites");
+  RemoveAllSimplePrimitiveLists (SimplePrimitiveListType_Sprite);
 }
 
-void PrimitiveImpl::RemoveAllSprites ()
+/*
+    Работа с линиями
+*/
+
+size_t PrimitiveImpl::LineListsCount ()
 {
-  throw xtl::make_not_implemented_exception ("render::PrimitiveImpl::RemoveAllSprites");
+  return impl->line_lists_count;
 }
 
-void PrimitiveImpl::ReserveSprites (size_t sprites_count)
+LineListPtr PrimitiveImpl::AddStandaloneLineList (MeshBufferUsage vb_usage, MeshBufferUsage ib_usage)
 {
-  throw xtl::make_not_implemented_exception ("render::PrimitiveImpl::ReserveSprites");
+  try
+  {
+    switch (vb_usage)
+    {
+      case MeshBufferUsage_Static:
+      case MeshBufferUsage_Dynamic:
+      case MeshBufferUsage_Stream:
+      default:
+        throw xtl::make_argument_exception ("", "vb_usage", vb_usage);
+    }
+
+    switch (ib_usage)
+    {
+      case MeshBufferUsage_Static:
+      case MeshBufferUsage_Dynamic:
+      case MeshBufferUsage_Stream:
+      default:
+        throw xtl::make_argument_exception ("", "ib_usage", ib_usage);
+    }
+
+    LineListPtr list (create_standalone_line_list (impl->material_manager, vb_usage, ib_usage), false);
+
+    AddSimplePrimitiveList (list.get (), SimplePrimitiveListType_Line);
+
+    return list;
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::manager::PrimitiveImpl::AddStandaloneLineList");
+    throw;
+  }
+}
+
+LineListPtr PrimitiveImpl::AddBatchingLineList ()
+{
+  try
+  {
+    LineListPtr list (create_batching_line_list (&impl->buffers->BatchingManager (), impl->material_manager), false);
+
+    AddSimplePrimitiveList (list.get (), SimplePrimitiveListType_Line);
+
+    return list;
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::manager::PrimitiveImpl::AddBatchingLineList");
+    throw;
+  }
+}
+
+void PrimitiveImpl::RemoveLineList (const LineListPtr& list)
+{
+  RemoveSimplePrimitiveList (list.get ());
+}
+
+void PrimitiveImpl::RemoveAllLineLists ()
+{
+  RemoveAllSimplePrimitiveLists (SimplePrimitiveListType_Line);
 }
 
 /*
@@ -611,6 +731,127 @@ RendererPrimitiveGroup* PrimitiveImpl::RendererPrimitiveGroups ()
 }
 
 /*
+    Получение динамических примитивов
+*/
+
+void PrimitiveImpl::FillDynamicPrimitiveStorage (DynamicPrimitiveEntityStorage& storage)
+{
+  try
+  {
+    for (SimplePrimitiveListArray::iterator iter=impl->entity_dependent_dynamic_primitive_lists.begin (), end=impl->entity_dependent_dynamic_primitive_lists.end (); iter!=end; ++iter)
+    {
+      SimplePrimitiveListImplBase& list = *iter->list;
+
+      if (DynamicPrimitivePtr primitive = storage.FindPrimitive (&list, true))
+      {
+        primitive->UpdateCache ();
+        continue;
+      }
+
+      DynamicPrimitivePtr primitive (list.CreateDynamicPrimitiveInstanceCore (), false);
+
+      primitive->UpdateCache ();
+
+      storage.AddPrimitive (primitive, &list);
+    }
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::manager::PrimitiveImpl::FillDynamicPrimitiveStorage");
+    throw;
+  }
+}
+
+/*
+    Регистрация динамических примитивов
+*/
+
+void PrimitiveImpl::AddSimplePrimitiveList (SimplePrimitiveListImplBase* list, int type)
+{
+  RendererPrimitive* primitive = list->StandaloneRendererPrimitive ();
+
+  if (primitive) impl->entity_independent_dynamic_primitive_lists.push_back (SimplePrimitiveListDesc (list, (SimplePrimitiveListType)type, primitive));
+  else           impl->entity_dependent_dynamic_primitive_lists.push_back (SimplePrimitiveListDesc (list, (SimplePrimitiveListType)type, primitive));
+
+  AttachCacheSource (*list);
+
+  switch (type)
+  {
+    case SimplePrimitiveListType_Sprite:
+      impl->sprite_lists_count++;
+      break;
+    case SimplePrimitiveListType_Line:
+      impl->line_lists_count++;
+      break;
+    default:
+      break;
+  }
+}
+
+void PrimitiveImpl::RemoveSimplePrimitiveList (SimplePrimitiveListImplBase* list)
+{
+  if (!list)
+    return;
+
+  SimplePrimitiveListArray* arrays [2] = {&impl->entity_dependent_dynamic_primitive_lists, &impl->entity_independent_dynamic_primitive_lists};
+
+  for (size_t i=0; i<sizeof (arrays) / sizeof (*arrays); i++)
+  {
+    SimplePrimitiveListArray& lists = *arrays [i];
+
+    for (SimplePrimitiveListArray::iterator iter=lists.begin (), end=lists.end (); iter!=end; ++iter)
+      if (iter->list == list)
+      {
+        switch (iter->type)
+        {
+          case SimplePrimitiveListType_Sprite:
+            impl->sprite_lists_count--;
+            break;
+          case SimplePrimitiveListType_Line:
+            impl->line_lists_count--;
+            break;
+          default:
+            break;
+        }
+
+        DetachCacheSource (*list);
+
+        lists.erase (iter);
+
+        return;
+      }
+  }
+}
+
+void PrimitiveImpl::RemoveAllSimplePrimitiveLists (int type)
+{
+  switch (type)
+  {
+    case SimplePrimitiveListType_Sprite:
+    case SimplePrimitiveListType_Line:
+      break;
+    default:
+      return;
+  }
+
+  SimplePrimitiveListArray* arrays [2] = {&impl->entity_dependent_dynamic_primitive_lists, &impl->entity_independent_dynamic_primitive_lists};
+
+  for (size_t i=0; i<sizeof (arrays) / sizeof (*arrays); i++)
+  {
+    SimplePrimitiveListArray& lists = *arrays [i];
+
+    for (SimplePrimitiveListArray::iterator iter=lists.begin (); iter!=lists.end ();)
+      if (iter->type == type)
+      {
+        DetachCacheSource (*iter->list);
+
+        lists.erase (iter);
+      }
+      else ++iter;
+  }  
+}
+
+/*
     Управление кэшированием
 */
 
@@ -624,7 +865,10 @@ void PrimitiveImpl::UpdateCacheCore ()
       impl->log.Printf ("Update primitive '%s' cache (id=%u)", impl->name.c_str (), impl->Id ());    
     
     impl->render_groups.clear ();
-    impl->render_groups.reserve (impl->meshes.size ());
+    impl->render_groups.reserve (impl->meshes.size () + 1);
+
+    impl->cached_entity_independent_dynamic_primitives.clear ();
+    impl->cached_entity_independent_dynamic_primitives.reserve (impl->entity_independent_dynamic_primitive_lists.size ());
     
     for (MeshArray::iterator iter=impl->meshes.begin (), end=impl->meshes.end (); iter!=end; ++iter)
     {
@@ -635,6 +879,27 @@ void PrimitiveImpl::UpdateCacheCore ()
 
       impl->render_groups.push_back (mesh.cached_group);
     }
+
+    for (SimplePrimitiveListArray::iterator iter=impl->entity_independent_dynamic_primitive_lists.begin (), end=impl->entity_independent_dynamic_primitive_lists.end (); iter!=end; ++iter)
+    {
+      SimplePrimitiveListImplBase& list             = *iter->list;
+      RendererPrimitive*           cached_primitive = iter->primitive;
+
+      if (!cached_primitive)
+        continue;
+
+      impl->cached_entity_independent_dynamic_primitives.push_back (*cached_primitive);
+    }
+
+    if (!impl->cached_entity_independent_dynamic_primitives.empty ())
+    {
+      RendererPrimitiveGroup group;
+
+      group.primitives_count = impl->cached_entity_independent_dynamic_primitives.size ();
+      group.primitives       = &impl->cached_entity_independent_dynamic_primitives [0];
+
+      impl->render_groups.push_back (group);
+    }
     
     InvalidateCacheDependencies ();
     
@@ -643,7 +908,7 @@ void PrimitiveImpl::UpdateCacheCore ()
   }
   catch (xtl::exception& e)
   {
-    e.touch ("render::PrimitiveImpl::UpdateCacheCore");
+    e.touch ("render::manager::PrimitiveImpl::UpdateCacheCore");
     throw;
   }
 }

@@ -1,6 +1,7 @@
 #include "shared.h"
 
 using namespace render;
+using namespace render::manager;
 using namespace render::low_level;
 
 namespace
@@ -39,7 +40,7 @@ render::low_level::PixelFormat get_compressed_pixel_format (const char* name)
   else if (!strcmp (name, "dxt3"))        return render::low_level::PixelFormat_DXT3;
   else if (!strcmp (name, "dxt5"))        return render::low_level::PixelFormat_DXT5;
 
-  throw xtl::format_not_supported_exception ("render::get_pixel_format", "Unsupported compression format '%s'", name);
+  throw xtl::format_not_supported_exception ("render::manager::get_pixel_format", "Unsupported compression format '%s'", name);
 }
 
 }
@@ -53,7 +54,7 @@ struct TextureImpl::Impl: public DebugIdHolder
   DeviceManagerPtr               device_manager; //менеджер устройства
   LowLevelTexturePtr             texture;        //текстура
   TextureDimension               dimension;      //размерность текстуры
-  render::PixelFormat            format;         //формат текстуры
+  render::manager::PixelFormat   format;         //формат текстуры
   render::low_level::PixelFormat target_format;  //целевой формат текстуры
   size_t                         width;          //ширина текстуры
   size_t                         height;         //высота текстуры
@@ -72,7 +73,7 @@ struct TextureImpl::Impl: public DebugIdHolder
     , depth (0)
   {
     if (!in_name)
-      throw xtl::make_null_argument_exception ("render::TextureImpl::Impl::Impl", "name");
+      throw xtl::make_null_argument_exception ("render::manager::TextureImpl::Impl::Impl", "name");
       
     name = in_name;
     
@@ -111,14 +112,14 @@ struct TextureImpl::Impl: public DebugIdHolder
 */
 
 TextureImpl::TextureImpl 
- (const DeviceManagerPtr&  device_manager,
-  render::TextureDimension dimension,
-  size_t                   width,
-  size_t                   height,
-  size_t                   depth,
-  render::PixelFormat      format,
-  bool                     generate_mips_enable,
-  const char*              name)
+ (const DeviceManagerPtr&           device_manager,
+  render::manager::TextureDimension dimension,
+  size_t                            width,
+  size_t                            height,
+  size_t                            depth,
+  render::manager::PixelFormat      format,
+  bool                              generate_mips_enable,
+  const char*                       name)
 {
   try
   {
@@ -200,7 +201,7 @@ TextureImpl::TextureImpl
   }
   catch (xtl::exception& e)
   {
-    e.touch ("render::TextureImpl::TextureImpl(const DeviceManagerPtr&,render::TextureDimension,size_t,size_t,size_t,render::PixelFormat,bool,const char*)");
+    e.touch ("render::manager::TextureImpl::TextureImpl(const DeviceManagerPtr&,render::manager::TextureDimension,size_t,size_t,size_t,render::manager::PixelFormat,bool,const char*)");
     throw;
   }
 }
@@ -279,12 +280,12 @@ TextureImpl::TextureImpl
   }
   catch (xtl::exception& e)
   {
-    e.touch ("render::TextureImpl::TextureImpl(const DeviceManagerPtr&,const render::low_level::TextureDesc&,const char*)");
+    e.touch ("render::manager::TextureImpl::TextureImpl(const DeviceManagerPtr&,const render::low_level::TextureDesc&,const char*)");
     throw;
   }
 }
 
-TextureImpl::TextureImpl (const DeviceManagerPtr& device_manager, render::TextureDimension dimension, const media::CompressedImage& image, const char* name)
+TextureImpl::TextureImpl (const DeviceManagerPtr& device_manager, render::manager::TextureDimension dimension, const media::CompressedImage& image, const char* name)
 {
   try
   {
@@ -344,16 +345,16 @@ TextureImpl::TextureImpl (const DeviceManagerPtr& device_manager, render::Textur
     
     switch (target_format)
     {
-      case render::low_level::PixelFormat_DXT1:        format = PixelFormat_DXT1; break;
-      case render::low_level::PixelFormat_DXT3:        format = PixelFormat_DXT3; break;
-      case render::low_level::PixelFormat_DXT5:        format = PixelFormat_DXT5; break;
+      case render::low_level::PixelFormat_DXT1:                            format = PixelFormat_DXT1; break;
+      case render::low_level::PixelFormat_DXT3:                            format = PixelFormat_DXT3; break;
+      case render::low_level::PixelFormat_DXT5:                            format = PixelFormat_DXT5; break;
       case render::low_level::PixelFormat_ATC_RGB_AMD:                     format = PixelFormat_ATC_RGB_AMD; break;
       case render::low_level::PixelFormat_ATC_RGBA_EXPLICIT_ALPHA_AMD:     format = PixelFormat_ATC_RGBA_EXPLICIT_ALPHA_AMD; break;
       case render::low_level::PixelFormat_ATC_RGBA_INTERPOLATED_ALPHA_AMD: format = PixelFormat_ATC_RGBA_INTERPOLATED_ALPHA_AMD; break;
-      case render::low_level::PixelFormat_RGB_PVRTC2:  format = PixelFormat_RGB_PVRTC2; break;
-      case render::low_level::PixelFormat_RGB_PVRTC4:  format = PixelFormat_RGB_PVRTC4; break;
-      case render::low_level::PixelFormat_RGBA_PVRTC2: format = PixelFormat_RGBA_PVRTC2; break;
-      case render::low_level::PixelFormat_RGBA_PVRTC4: format = PixelFormat_RGBA_PVRTC4; break;
+      case render::low_level::PixelFormat_RGB_PVRTC2:                      format = PixelFormat_RGB_PVRTC2; break;
+      case render::low_level::PixelFormat_RGB_PVRTC4:                      format = PixelFormat_RGB_PVRTC4; break;
+      case render::low_level::PixelFormat_RGBA_PVRTC2:                     format = PixelFormat_RGBA_PVRTC2; break;
+      case render::low_level::PixelFormat_RGBA_PVRTC4:                     format = PixelFormat_RGBA_PVRTC4; break;
       default:
         throw xtl::format_operation_exception ("", "Wrong compressed image pixel format %s", get_name (target_format));
     }    
@@ -367,7 +368,7 @@ TextureImpl::TextureImpl (const DeviceManagerPtr& device_manager, render::Textur
   }
   catch (xtl::exception& e)
   {
-    e.touch ("render::TextureImpl::TextureImpl(const DeviceManagerPtr&,render::TextureDimension,const media::CompressedImage&,const char*)");
+    e.touch ("render::manager::TextureImpl::TextureImpl(const DeviceManagerPtr&,render::manager::TextureDimension,const media::CompressedImage&,const char*)");
     throw;
   }
 }
@@ -388,7 +389,7 @@ const char* TextureImpl::Name ()
 void TextureImpl::SetName (const char* name)
 {
   if (!name)
-    throw xtl::make_null_argument_exception ("render::TextureImpl::SetName", "name");
+    throw xtl::make_null_argument_exception ("render::manager::TextureImpl::SetName", "name");
     
   if (impl->device_manager->Settings ().HasDebugLog ())
     Log ().Printf ("Texture '%s' name changed to '%s' (id=%u)", impl->name.c_str (), name, impl->Id ());  
@@ -409,7 +410,7 @@ LowLevelTexturePtr TextureImpl::DeviceTexture ()
     Размерность
 */
 
-render::TextureDimension TextureImpl::Dimension ()
+render::manager::TextureDimension TextureImpl::Dimension ()
 {
   return impl->dimension;
 }
@@ -418,7 +419,7 @@ render::TextureDimension TextureImpl::Dimension ()
     Формат и размеры
 */
 
-render::PixelFormat TextureImpl::Format ()
+render::manager::PixelFormat TextureImpl::Format ()
 {
   return impl->format;
 }
@@ -450,7 +451,7 @@ RenderTargetPtr TextureImpl::RenderTarget (size_t layer, size_t mip_level)
   }
   catch (xtl::exception& e)
   {
-    e.touch ("render::TextureImpl::RenderTarget");
+    e.touch ("render::manager::TextureImpl::RenderTarget");
     throw;
   }
 }
@@ -475,7 +476,7 @@ void TextureImpl::Update (const media::Image& image)
       throw xtl::format_operation_exception ("", "Image depth %u mismatch texture depth %u", image.Depth (), impl->depth);
       
     low_level::PixelFormat source_format;
-    
+
     switch (image.Format ())
     {
       case media::PixelFormat_RGB8:
@@ -535,7 +536,7 @@ void TextureImpl::Update (const media::Image& image)
   }
   catch (xtl::exception& e)
   {
-    e.touch ("render::TextureImpl::Update");
+    e.touch ("render::manager::TextureImpl::Update");
     throw;
   }
 }
@@ -548,17 +549,17 @@ namespace
 {
 
 //получение формата пикселей для изображения
-media::PixelFormat get_format (render::PixelFormat format)
+media::PixelFormat get_format (render::manager::PixelFormat format)
 {
   switch (format)
   {
-    case render::PixelFormat_RGB8:  return media::PixelFormat_RGB8;
-    case render::PixelFormat_RGBA8: return media::PixelFormat_RGBA8;
-    case render::PixelFormat_L8:    return media::PixelFormat_L8;
-    case render::PixelFormat_A8:    return media::PixelFormat_A8;
-    case render::PixelFormat_LA8:   return media::PixelFormat_LA8;
+    case render::manager::PixelFormat_RGB8:  return media::PixelFormat_RGB8;
+    case render::manager::PixelFormat_RGBA8: return media::PixelFormat_RGBA8;
+    case render::manager::PixelFormat_L8:    return media::PixelFormat_L8;
+    case render::manager::PixelFormat_A8:    return media::PixelFormat_A8;
+    case render::manager::PixelFormat_LA8:   return media::PixelFormat_LA8;
     default:
-      throw xtl::format_not_supported_exception ("render::get_format(render::PixelFormat)", "Format '%s' not supported", get_name (format));
+      throw xtl::format_not_supported_exception ("render::manager::get_format(render::manager::PixelFormat)", "Format '%s' not supported", get_name (format));
   }
 }
 
@@ -578,7 +579,7 @@ void TextureImpl::Capture (size_t layer, size_t mip_level, media::Image& image)
   }
   catch (xtl::exception& e)
   {
-    e.touch ("render::TextureImpl::Capture(size_t,size_t,media::Image&)");
+    e.touch ("render::manager::TextureImpl::Capture(size_t,size_t,media::Image&)");
     throw;
   }
 }
@@ -607,7 +608,7 @@ void TextureImpl::Capture (size_t mip_level, media::Image& image)
   }
   catch (xtl::exception& e)
   {
-    e.touch ("render::TextureImpl::Capture(size_t,media::Image&)");
+    e.touch ("render::manager::TextureImpl::Capture(size_t,media::Image&)");
     throw;
   }
 }

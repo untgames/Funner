@@ -68,8 +68,8 @@ class EffectPass: public Object
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Тип сортировки примитивов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void             SetSortMode (render::SortMode mode);
-    render::SortMode SortMode    ();
+    void                      SetSortMode (render::manager::SortMode mode);
+    render::manager::SortMode SortMode    ();
 
   private:
     struct Impl;
@@ -152,7 +152,7 @@ class EffectRenderer: public Object
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструктор / деструктор
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    EffectRenderer  (const EffectPtr& effect, const DeviceManagerPtr& device_manager, ProgramParametersLayout* parent_layout = 0);
+    EffectRenderer  (const EffectPtr& effect, const DeviceManagerPtr& device_manager, FrameImpl& frame, ProgramParametersLayout* parent_layout = 0);
     ~EffectRenderer ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -162,7 +162,9 @@ class EffectRenderer: public Object
                         size_t                       eye_distance,
                         const math::mat4f&           mvp_matrix,
                         render::low_level::IBuffer*  property_buffer = 0,
-                        ProgramParametersLayout*     property_layour= 0);
+                        ProgramParametersLayout*     property_layour = 0,
+                        render::low_level::IBuffer*  entity_independent_property_buffer = 0,
+                        ProgramParametersLayout*     entity_independent_property_layour = 0);
     void AddOperations (FrameImpl& frame);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

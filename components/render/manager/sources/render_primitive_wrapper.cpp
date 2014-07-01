@@ -1,6 +1,6 @@
 #include "shared.h"
 
-using namespace render;
+using namespace render::manager;
 
 Primitive::Primitive (PrimitiveImpl* in_impl)
   : impl (in_impl)
@@ -60,78 +60,58 @@ void Primitive::RemoveAllMeshes ()
   impl->RemoveAllMeshes ();
 }
 
-size_t Primitive::LinesCount () const
+size_t Primitive::SpriteListsCount () const
 {
-  return impl->LinesCount ();
+  return impl->SpriteListsCount ();
 }
 
-size_t Primitive::AddLines (size_t lines_count, const Line* lines, const Material& material)
+SpriteList Primitive::AddStandaloneSpriteList (SpriteMode mode, const math::vec3f& up, MeshBufferUsage vb_usage, MeshBufferUsage ib_usage)
 {
-  return impl->AddLines (lines_count, lines, Wrappers::Unwrap<MaterialImpl> (material));
+  return Wrappers::Wrap<SpriteList> (impl->AddStandaloneSpriteList (mode, up, vb_usage, ib_usage));
 }
 
-void Primitive::UpdateLines (size_t first_lines, size_t lines_count, const Line* lines)
+SpriteList Primitive::AddBatchingSpriteList (SpriteMode mode, const math::vec3f& up)
 {
-  impl->UpdateLines (first_lines, lines_count, lines);
+  return Wrappers::Wrap<SpriteList> (impl->AddBatchingSpriteList (mode, up));
 }
 
-void Primitive::SetLinesMaterial (size_t first_lines, size_t lines_count, const Material& material)
+void Primitive::RemoveSpriteList (SpriteList& list)
 {
-  impl->SetLinesMaterial (first_lines, lines_count, Wrappers::Unwrap<MaterialImpl> (material));
+  impl->RemoveSpriteList (Wrappers::Unwrap<SpriteListImpl> (list));
 }
 
-void Primitive::RemoveLines (size_t first_lines, size_t lines_count)
+void Primitive::RemoveAllSpriteLists ()
 {
-  impl->RemoveLines (first_lines, lines_count);
+  impl->RemoveAllSpriteLists ();
 }
 
-void Primitive::RemoveAllLines ()
+size_t Primitive::LineListsCount () const
 {
-  impl->RemoveAllLines ();
+  return impl->LineListsCount ();
 }
 
-void Primitive::ReserveLines (size_t lines_count)
+LineList Primitive::AddStandaloneLineList (MeshBufferUsage vb_usage, MeshBufferUsage ib_usage)
 {
-  impl->ReserveLines (lines_count);
+  return Wrappers::Wrap<LineList> (impl->AddStandaloneLineList (vb_usage, ib_usage));
 }
 
-size_t Primitive::SpritesCount () const
+LineList Primitive::AddBatchingLineList ()
 {
-  return impl->SpritesCount ();
+  return Wrappers::Wrap<LineList> (impl->AddBatchingLineList ());
 }
 
-size_t Primitive::AddSprites (size_t sprites_count, const Sprite* sprites, const Material& material)
+void Primitive::RemoveLineList (LineList& list)
 {
-  return impl->AddSprites (sprites_count, sprites, Wrappers::Unwrap<MaterialImpl> (material));
+  impl->RemoveLineList (Wrappers::Unwrap<LineListImpl> (list));
 }
 
-void Primitive::UpdateSprites (size_t first_sprite, size_t sprites_count, const Sprite* sprites)
+void Primitive::RemoveAllLineLists ()
 {
-  impl->UpdateSprites (first_sprite, sprites_count, sprites);
-}
-
-void Primitive::SetSpritesMaterial (size_t first_sprite, size_t sprites_count, const Material& material)
-{
-  impl->SetSpritesMaterial (first_sprite, sprites_count, Wrappers::Unwrap<MaterialImpl> (material));
-}
-
-void Primitive::RemoveSprites (size_t first_sprite, size_t sprites_count)
-{
-  impl->RemoveSprites (first_sprite, sprites_count);
-}
-
-void Primitive::RemoveAllSprites ()
-{
-  impl->RemoveAllSprites ();
-}
-
-void Primitive::ReserveSprites (size_t sprites_count)
-{
-  impl->ReserveSprites (sprites_count);
+  impl->RemoveAllLineLists ();
 }
 
 /*
-    Управление кэшированием
+    ╙яЁртыхэшх ъ¤°шЁютрэшхь
 */
 
 void Primitive::UpdateCache ()
@@ -152,9 +132,14 @@ void Primitive::Swap (Primitive& primitive)
 namespace render
 {
 
+namespace manager
+{
+
 void swap (Primitive& primitive1, Primitive& primitive2)
 {
   primitive1.Swap (primitive2);
+}
+
 }
 
 }

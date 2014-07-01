@@ -13,8 +13,8 @@ export.link.engine.script_binds.common.IMPORTS       := link.engine.script_binds
 
 # Link engine exports
 export.link.engine.script_binds.engine.LINK_INCLUDES := EngineScriptBind
-export.link.engine.script_binds.engine.IMPORTS       := link.engine.script_binds link.engine.core link.scene_graph.core link.render.scene_render2d \
-                                                        link.input.manager link.render.scene_render2d link.physics.manager
+export.link.engine.script_binds.engine.IMPORTS       := link.engine.script_binds link.engine.core link.scene_graph.core \
+                                                        link.input.manager link.physics.manager
 
 # Link input exports
 export.link.engine.script_binds.input.LINK_INCLUDES := InputScriptBind
@@ -76,9 +76,9 @@ export.link.engine.script_binds.store.IMPORTS       := link.engine.script_binds 
 export.link.engine.script_binds.media.image.LINK_INCLUDES := MediaImageScriptBind
 export.link.engine.script_binds.media.image.IMPORTS       := link.engine.script_binds link.media.image
 
-# Link render exports
-export.link.engine.script_binds.render.scene_render2d.LINK_INCLUDES := RenderScriptBind
-export.link.engine.script_binds.render.scene_render2d.IMPORTS       := link.engine.script_binds link.render.scene_render2d
+# Link media font exports
+export.link.engine.script_binds.media.font.LINK_INCLUDES := MediaFontScriptBind
+export.link.engine.script_binds.media.font.IMPORTS       := link.engine.script_binds link.media.font
 
 # Link flurry analytics exports
 export.link.engine.script_binds.analytics.flurry.LINK_INCLUDES := FlurryAnalyticsScriptBind

@@ -2,16 +2,20 @@
 
 using namespace scene_graph;
 
+template class engine::decl_sg_cast<Light,       VisualModel>;
 template class engine::decl_sg_cast<Light,       Entity>;
 template class engine::decl_sg_cast<Light,       Node>;
 template class engine::decl_sg_cast<DirectLight, Light>;
 template class engine::decl_sg_cast<DirectLight, Entity>;
+template class engine::decl_sg_cast<DirectLight, VisualModel>;
 template class engine::decl_sg_cast<DirectLight, Node>;
 template class engine::decl_sg_cast<PointLight,  Light>;
 template class engine::decl_sg_cast<PointLight,  Entity>;
+template class engine::decl_sg_cast<PointLight,  VisualModel>;
 template class engine::decl_sg_cast<PointLight,  Node>;
 template class engine::decl_sg_cast<SpotLight,   Light>;
 template class engine::decl_sg_cast<SpotLight,   Entity>;
+template class engine::decl_sg_cast<SpotLight,   VisualModel>;
 template class engine::decl_sg_cast<SpotLight,   Node>;
 
 namespace engine
@@ -112,7 +116,7 @@ void bind_light_library (Environment& environment)
 
     //наследование
 
-  lib.Register (environment, SCENE_ENTITY_LIBRARY);
+  lib.Register (environment, SCENE_VISUAL_MODEL_LIBRARY);
 
     //регистрация операций
 

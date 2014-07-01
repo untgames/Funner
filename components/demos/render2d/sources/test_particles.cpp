@@ -73,15 +73,13 @@ struct TestScene
 
     for (size_t i=0; i<PARTICLES_COUNT; i++)
     {
-      SpriteModel::SpriteDesc sprite;
+      SpriteDesc sprite;
 
       float scale = frand (2, 8);
 
       sprite.position = math::vec3f (frand (-10, 10), frand (-10, 10), frand (-10, 10));
       sprite.size     = scale;
       sprite.color    = math::vec4f (1, 1, 1, 1);
-
-      sprite.frame    = rand ();
 
       sprite_list->Insert (sprite);
     }
@@ -112,7 +110,7 @@ void idle (TestApplication& app, TestScene& scene)
       if (scene.particle_system.frames.empty ())
         return;
 
-      SpriteModel::SpriteDesc* sprite = scene.sprite_list->Sprites ();
+      SpriteDesc* sprite = scene.sprite_list->Sprites ();
       ParticleFrame& particle_frame   = *scene.particle_system.frames [scene.current_particle_frame];
 
       for (ParticleArray::iterator  pos_iter = particle_frame.particles.begin (); pos_iter!=particle_frame.particles.end (); ++pos_iter, ++sprite)
@@ -132,11 +130,8 @@ void idle (TestApplication& app, TestScene& scene)
 
     if (common::milliseconds () - last_frame_update >= 50)
     {
-      SpriteModel::SpriteDesc* sprite         = scene.sprite_list->Sprites ();
-      size_t                   sprites_count  = scene.sprite_list->SpritesCount ();
-
-      for (size_t i=0; i<sprites_count; i++, sprite++)
-        sprite->frame++;
+      SpriteDesc* sprite         = scene.sprite_list->Sprites ();
+      size_t      sprites_count  = scene.sprite_list->SpritesCount ();
 
       scene.sprite_list->Invalidate ();
 

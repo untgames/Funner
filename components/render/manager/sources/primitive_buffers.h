@@ -7,7 +7,7 @@ class PrimitiveBuffersImpl: public Object
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструкторы / деструктор
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    PrimitiveBuffersImpl  (const DeviceManagerPtr&, MeshBufferUsage lines_usage, MeshBufferUsage sprites_usage);
+    PrimitiveBuffersImpl  (const DeviceManagerPtr&);
     ~PrimitiveBuffersImpl ();
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -46,20 +46,12 @@ class PrimitiveBuffersImpl: public Object
     void Remove    (const media::geometry::VertexBuffer& buffer);    
     void Remove    (const media::geometry::IndexBuffer& buffer);
     void RemoveAll ();
-    
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Резервирование вспомогательных примитивов
+///Менеджер пакетирования
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void   ReserveLines    (size_t count);
-    void   ReserveSprites  (size_t count);
-    size_t LinesCapacity   ();
-    size_t SpritesCapacity ();
-    
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Режим использования буферов вспомогательных примитивов
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    MeshBufferUsage LinesBufferUsage   ();
-    MeshBufferUsage SpritesBufferUsage ();
+    manager::BatchingManager& BatchingManager    ();
+    bool                      HasBatchingManager ();
 
   private:
     struct Impl;

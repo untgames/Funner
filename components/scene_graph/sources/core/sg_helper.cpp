@@ -3,11 +3,11 @@
 using namespace scene_graph::helpers;
 
 /*
-    Метод, вызываемый при посещении данного объекта
+    ╠хЄюф, т√ч√трхь√щ яЁш яюёх∙хэшш фрээюую юс·хъЄр
 */
 
 void Helper::AcceptCore (Visitor& visitor)
 {
   if (!TryAccept (*this, visitor))
-    Entity::AcceptCore (visitor);    
+    VisualModel::AcceptCore (visitor);    
 }

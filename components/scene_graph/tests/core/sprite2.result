@@ -4,12 +4,18 @@ update node 'Sprite1'
 update sprite 'Sprite1' descs (count=1):
     position: [0.00 0.00 0.00]
     size:     [1.00 1.00]
-    frame:    12
-    color:    [1.00 1.00 1.00 1.00]
+    color:    [1.00 1.00 1.00 0.50]
+    tex_offs: [0.00 0.00]
+    tex_size: [1.00 1.00]
+    normal:   [0.00 0.00 1.00]
+    angle:    0.00 deg
 update node 'Sprite1'
 update sprite 'Sprite1' descs (count=1):
     position: [0.00 0.00 0.00]
     size:     [1.00 1.00]
-    frame:    12
     color:    [1.00 1.00 1.00 0.50]
+    tex_offs: [0.50 0.50]
+    tex_size: [1.00 1.00]
+    normal:   [0.00 0.00 1.00]
+    angle:    0.00 deg
 update node 'Sprite1'

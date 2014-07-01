@@ -3,6 +3,6 @@ Results of xatlas1 test:
 <Atlas>
   <Image Name="texture.tga" Width="256" Height="256">
     <Tile Name="wood" Left="0" Bottom="0" Width="64" Height="64"/>
-    <Tile Name="stone" Left="0" Bottom="64" Width="64" Height="64"/>
+    <Tile Name="stone" Left="0" Bottom="64" Width="64" Height="64" Tag="1"/>
   </Image>
 </Atlas>

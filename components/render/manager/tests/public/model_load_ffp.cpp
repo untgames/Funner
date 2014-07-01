@@ -119,7 +119,8 @@ int main ()
     entity.SetPrimitive ("spy_body");
     
     Frame frame = render_manager.CreateFrame ();
-            
+
+    frame.DisableAutoCleanup ();            
     frame.SetRenderTarget ("main_color_target", test.Window ().ColorBuffer ());
     frame.SetRenderTarget ("main_depth_stencil_target", test.Window ().DepthStencilBuffer ());
     frame.SetEffect ("main");

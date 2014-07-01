@@ -157,3 +157,20 @@ void WindowsThreadManager::SetThreadPriority (thread_t thread, ThreadPriority th
     throw;
   }
 }
+
+void WindowsThreadManager::SetThreadAffinity (thread_t thread, size_t affinity)
+{
+  try
+  {
+    if (!thread || !thread->thread)
+      throw xtl::make_null_argument_exception ("", "thread");
+
+    if (!::SetThreadAffinityMask ((HANDLE)thread->thread, (DWORD_PTR)affinity))
+      raise_error ("::SetThreadAffinityMask");
+  }
+  catch (xtl::exception& exception)
+  {
+    exception.touch ("syslib::WindowsThreadManager::SetThreadAffinity");
+    throw;
+  }
+}

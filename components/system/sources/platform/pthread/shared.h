@@ -2,6 +2,7 @@
   #include <sys/time.h>
 #endif
 
+#include <limits.h>
 #include <errno.h>
 #include <pthread.h>
 #include <semaphore.h>

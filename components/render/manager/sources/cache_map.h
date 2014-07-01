@@ -58,8 +58,8 @@ class CacheMap: public Cache
     
     struct Item: public Value
     {
-      size_t                      last_use_frame; //кадр последнего использования элемента
-      size_t                      last_use_time;  //время последнего использования элемента
+      FrameId                     last_use_frame; //кадр последнего использования элемента
+      FrameTime                   last_use_time;  //время последнего использования элемента
       typename ItemList::iterator position;       //положение в списке элементов      
     };        
 
@@ -144,7 +144,7 @@ Value& CacheMap<Key, Value>::AddCore (const Key& key, const Value& value)
   stl::pair<typename ItemMap::iterator, bool> result = item_map.insert_pair (key, item);
   
   if (!result.second)
-    throw xtl::make_argument_exception ("render::CacheMap<Key, Value>::Add", "Internal error: item with specified key/value has been already inserted");    
+    throw xtl::make_argument_exception ("render::manager::CacheMap<Key, Value>::Add", "Internal error: item with specified key/value has been already inserted");    
     
   try
   {
@@ -167,7 +167,7 @@ void CacheMap<Key, Value>::Add (const Key& key, const Value& value)
   typename ItemMap::iterator iter = item_map.find (key);
   
   if (iter != item_map.end ())
-    throw xtl::make_argument_exception ("render::CacheMap<Key, Value>::Add", "Item with specified key/value has been already inserted");
+    throw xtl::make_argument_exception ("render::manager::CacheMap<Key, Value>::Add", "Item with specified key/value has been already inserted");
     
   AddCore (key, value);
 }
@@ -213,10 +213,8 @@ void CacheMap<Key, Value>::ForEach (Fn fn)
 template <class Key, class Value>
 void CacheMap<Key, Value>::FlushCache ()
 {
-  size_t current_time  = CurrentTime (),
-         current_frame = CurrentFrame (),
-         time_delay    = TimeDelay (),
-         frame_delay   = FrameDelay ();
+  FrameTime current_time  = CurrentTime (), time_delay = TimeDelay ();
+  FrameId   current_frame = CurrentFrame (), frame_delay = FrameDelay ();
 
   while (!item_list.empty ())
   {

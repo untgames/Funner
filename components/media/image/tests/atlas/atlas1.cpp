@@ -9,6 +9,7 @@ void print (const Tile& tile)
   printf ("Tile image is '%s'\n", tile.image);
   printf ("Tile origin is %ux%u\n", tile.origin.x, tile.origin.y);
   printf ("Tile size is %ux%u\n", tile.size.x, tile.size.y);
+  printf ("Tile tag is %lu\n", tile.tag);
 }
 
 int main ()
@@ -27,6 +28,7 @@ int main ()
     new_tile.image  = "atlas_image.tga";
     new_tile.origin = vec2ui (16, 8);
     new_tile.size   = vec2ui (8, 8);
+    new_tile.tag    = 1;
 
     atlas.Insert (new_tile);
     atlas.Insert ("tile2", "atlas_image2.tga", vec2ui (8, 8), vec2ui (16, 16));
@@ -47,6 +49,7 @@ int main ()
     new_tile.name   = "tilex";
     new_tile.origin = vec2ui (24, 16);
     new_tile.size   = vec2ui (4, 4);
+    new_tile.tag    = 2;
 
     atlas.Set (0, new_tile);
     atlas.Set (1, "tilexx", "atlas_imagexx.tga", vec2ui (18, 18), vec2ui (6, 6));

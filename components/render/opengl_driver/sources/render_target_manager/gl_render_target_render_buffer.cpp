@@ -16,13 +16,13 @@ const GLenum MODE_NAMES [] = {
   GL_DEPTH_TEST,
   GL_STENCIL_TEST,
   GL_SCISSOR_TEST,
-  GL_FOG,
   GL_TEXTURE_2D,
-#ifndef OPENGL_ES_SUPPORT
+#if !defined(OPENGL_ES_SUPPORT) && !defined(OPENGL_ES2_SUPPORT)
   GL_TEXTURE_1D,
   GL_TEXTURE_3D,
   GL_TEXTURE_CUBE_MAP,
-  GL_TEXTURE_RECTANGLE_ARB
+  GL_TEXTURE_RECTANGLE_ARB,
+  GL_FOG,
 #endif
 };
                               
@@ -276,7 +276,7 @@ GLenum get_glformat (PixelFormat format, const char* source, const char* param)
 
 }
 
-#ifndef OPENGL_ES_SUPPORT
+#if !defined(OPENGL_ES_SUPPORT) && !defined(OPENGL_ES2_SUPPORT)
 
 void RenderBuffer::SetData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height, PixelFormat source_format, const void* buffer, IDeviceContext* context)
 {
@@ -441,7 +441,7 @@ void RenderBuffer::SetData (size_t layer, size_t mip_level, size_t x, size_t y, 
   CheckErrors (METHOD_NAME);  
 }
 
-#else //OPENGL_ES_SUPPORT
+#else //OPENGL_ES_SUPPORT & OPENGL_ES2_SUPPORT
 
 void RenderBuffer::SetData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height, PixelFormat source_format, const void* buffer, IDeviceContext* context)
 {
@@ -476,7 +476,7 @@ void RenderBuffer::GetData (size_t layer, size_t mip_level, size_t x, size_t y, 
 
   Bind ();
   
-#ifndef OPENGL_ES_SUPPORT
+#if !defined(OPENGL_ES_SUPPORT) && !defined(OPENGL_ES2_SUPPORT)
 
     //настройка параметров расположения данных в буфере
 
@@ -501,7 +501,7 @@ void RenderBuffer::GetData (size_t layer, size_t mip_level, size_t x, size_t y, 
 
       break;
     }
-#ifndef OPENGL_ES_SUPPORT
+#if !defined(OPENGL_ES_SUPPORT) && !defined(OPENGL_ES2_SUPPORT)
     case RenderTargetType_DepthStencil:
     {
       switch (target_format)

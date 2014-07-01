@@ -12,6 +12,7 @@ const char* SCENE_STATIC_PAGE_CURL_MODE_LIBRARY       = "Scene.PageCurlMode";
 
 }
 
+template class engine::decl_sg_cast<PageCurl, VisualModel>;
 template class engine::decl_sg_cast<PageCurl, Entity>;
 template class engine::decl_sg_cast<PageCurl, Node>;
 
@@ -74,7 +75,7 @@ void bind_page_curl_library (Environment& environment)
 
     //наследование
 
-  lib.Register (environment, SCENE_ENTITY_LIBRARY);
+  lib.Register (environment, SCENE_VISUAL_MODEL_LIBRARY);
 
     //регистрация функций создания
 

@@ -1,6 +1,6 @@
 #include "shared.h"
 
-using namespace render;
+using namespace render::manager;
 using namespace common;
 
 /*
@@ -97,7 +97,7 @@ const LowLevelBufferPtr& PropertyBuffer::Buffer ()
   }
   catch (xtl::exception& e)
   {
-    e.touch ("render::PropertyBuffer::Buffer");
+    e.touch ("render::manager::PropertyBuffer::Buffer");
     throw;
   }
 }
@@ -142,7 +142,7 @@ void PropertyBuffer::UpdateCacheCore ()
   }
   catch (xtl::exception& e)
   {
-    e.touch ("render::PropertyBuffer::UpdateCacheCore");
+    e.touch ("render::manager::PropertyBuffer::UpdateCacheCore");
     throw;
   }
 }

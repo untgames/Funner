@@ -21,7 +21,7 @@ size_t get_size (PropertyType type)
 {
   switch (type)
   {
-    case PropertyType_String:  return sizeof (size_t);
+    case PropertyType_String:  return sizeof (unsigned int);
     case PropertyType_Integer: return sizeof (int);
     case PropertyType_Float:   return sizeof (float);
     case PropertyType_Vector:  return sizeof (math::vec4f);

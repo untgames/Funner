@@ -15,7 +15,7 @@ namespace low_level
 namespace opengl
 {
 
-#ifndef OPENGL_ES_SUPPORT
+#if !defined(OPENGL_ES_SUPPORT) && !defined(OPENGL_ES2_SUPPORT)
 
 //преобразование формата хранения пикселей к внутреннему формату OpenGL
 GLint get_gl_internal_format (PixelFormat format)

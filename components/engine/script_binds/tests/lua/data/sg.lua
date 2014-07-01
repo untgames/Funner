@@ -599,13 +599,9 @@ function test_sprite ()
 
   sprite1.Material = "SettedMaterial"
   sprite1.Alpha    = 0.8
-  sprite1.Frame    = 9
-  sprite1.AlphaReference = 0.4
 
   print ("Alpha value = " .. tostring (sprite1.Alpha))
-  print ("Alpha reference = " .. tostring (sprite1.AlphaReference))
   print ("Material name = " .. sprite1.Material)
-  print ("Frame number = " .. tostring (sprite1.Frame))
    
   sprite1.Color    = vec4 (1, 0, 0, 0.7)
 
@@ -621,10 +617,39 @@ function test_sprite ()
   
 end
 
-function test_visual_model ()
-  print ("VisualModel test")
+function test_line ()
+  print ("Line test")
 
-  local visual_model1 = Scene.VisualModel.Create ()
+  local line1 = Scene.Line.Create ()
+
+  print ("Color0 = " .. tostring (line1.Color0))
+  print ("Color1 = " .. tostring (line1.Color1))
+  print ("Material name = " .. line1.Material)
+
+  line1.Material = "SettedMaterial"
+  line1.Alpha0   = 0.8
+
+  print ("Alpha0 value = " .. tostring (line1.Alpha0))
+  print ("Material name = " .. line1.Material)
+   
+  line1.Color1    = vec4 (1, 0, 0, 0.7)
+
+  print ("Color1 = " .. tostring (line1.Color1))
+
+  line1:SetColor (0, 0, 0, 1, 0.3)
+
+  print ("Color0 = " .. tostring (line1.Color0))
+
+  line1:SetColor (1, 0, 1, 0)
+
+  print ("Color1 = " .. tostring (line1.Color1))
+  
+end
+
+function test_static_mesh ()
+  print ("StaticMesh test")
+
+  local visual_model1 = Scene.StaticMesh.Create ()
 
   print ("Mesh name = " .. visual_model1.MeshName)
 
@@ -658,7 +683,9 @@ end
 function test_text_line ()
   print ("TextLine test")
 
-  local text_line1 = Scene.TextLine.Create ()
+  local font_library = Media.FontLibrary.Create ()
+
+  local text_line1 = Scene.TextLine.Create (font_library)
 
   print ("Text = " .. text_line1.Text)
   print ("Font = " .. text_line1.Font)
@@ -666,8 +693,13 @@ function test_text_line ()
   print ("Horizontal aligment = " .. get_name (text_line1.HorizontalAlignment) .. " vertical aligment = " .. get_name (text_line1.VerticalAlignment))
   print ("Spacing Multiplier = " .. text_line1.SpacingMultiplier)
 
+  local font_params = Media.FontCreationParams.Create ()
+
+  font_params.FontSize = 50
+
   text_line1.Text                = "text"
   text_line1.Font                = "font"
+  text_line1.FontCreationParams  = font_params
   text_line1.Color               = vec4 (0.1, 0.2, 0.3, 0.4)
   text_line1.HorizontalAlignment = Scene.TextLineAlignment.Center
   text_line1.VerticalAlignment   = Scene.TextLineAlignment.Bottom
@@ -970,9 +1002,10 @@ function test ()
 
   test_sound_emitter ()
 
-  test_visual_model ()
+  test_static_mesh ()
 
   test_sprite ()
+  test_line ()
 
   test_scene ()
 

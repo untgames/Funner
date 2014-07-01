@@ -1,6 +1,6 @@
 #include "shared.h"
 
-using namespace render;
+using namespace render::manager;
 
 /*
     Описание реализации
@@ -43,7 +43,7 @@ struct DynamicTextureImpl::Impl
     }
     catch (xtl::exception& e)
     {
-      e.touch ("render::DynamicTextureImpl::Impl::Impl");
+      e.touch ("render::manager::DynamicTextureImpl::Impl::Impl");
       throw;
     }
   }
@@ -102,7 +102,7 @@ void DynamicTextureImpl::Update (const FramePtr& frame)
   }
   catch (xtl::exception& e)
   {
-    e.touch ("render::DynamicTextureImpl::Update");
+    e.touch ("render::manager::DynamicTextureImpl::Update");
     throw;
   }
 }

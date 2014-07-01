@@ -6376,7 +6376,7 @@ void __stdcall glUniformMatrix4fv(GLint location, GLsizei count, GLboolean trans
 
     try
     {
-        if (count < 0 || transpose != GL_FALSE)
+        if (count < 0)
         {
             return error(GL_INVALID_VALUE);
         }
@@ -6394,6 +6394,17 @@ void __stdcall glUniformMatrix4fv(GLint location, GLsizei count, GLboolean trans
             if (!programBinary)
             {
                 return error(GL_INVALID_OPERATION);
+            }
+
+            GLfloat transposedValue [4][4];
+
+            if (transpose)
+            {              
+              for (int i=0; i<4; i++)
+                for (int j=0; j<4; j++, value++)
+                  transposedValue [j][i] = *value;
+
+              value = &transposedValue [0][0];
             }
 
             if (!programBinary->setUniformMatrix4fv(location, count, value))

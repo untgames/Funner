@@ -3,6 +3,8 @@
 
 #include <cstddef>
 
+#include <stl/auto_ptr.h>
+
 namespace syslib
 {
 

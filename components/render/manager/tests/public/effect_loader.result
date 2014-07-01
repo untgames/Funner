@@ -1,10 +1,19 @@
 Results of effect_loader_test:
 render.manager: Creating render window
 render.manager: Create device manager (driver='*', adapter='*', init_string='')
+render.manager: Create input layout:
+render.manager: ...index type: InputDataType_UShort
+render.manager: ...index buffer offset: 0
+render.manager: ...4 vertex attributes:
+render.manager: ......semantic=gl_Position, type=float3, slot=0, offset=0, stride=48
+render.manager: ......semantic=gl_Normal, type=float3, slot=0, offset=12, stride=48
+render.manager: ......semantic=gl_Color, type=float4, slot=0, offset=24, stride=48
+render.manager: ......semantic=gl_TexCoord0, type=float2, slot=0, offset=40, stride=48
+render.manager: ...layout created (hash=7d6ae830)
 render.manager: ...device manager and swap chain have been successfully created
 render.manager: Initialize render targets for swap chain
 render.manager: ...render targets for swap chain created
-window 784x562 added
+window added
 render.manager: Effect blend state 'solid' loaded
 render.manager: Effect blend state 'transparent' loaded
 render.manager: Effect blend state 'additive' loaded
@@ -33,7 +42,7 @@ render.manager: Effect 'main' loaded
 render.manager: Effect 'shadow' loaded
 render.manager: Effect 'lighting' loaded
 Effects loaded
-window 784x562 removed
+window removed
 render.manager: Program 'helper' destroyed for options = '' (id=5)
 render.manager: Program 'helper' common data destroyed (id=6)
 render.manager: Program 'shadow_map' destroyed for options = '' (id=3)

@@ -1,6 +1,6 @@
 #include "shared.h"
 
-using namespace render;
+using namespace render::manager;
 using namespace render::low_level;
 
 /*
@@ -44,7 +44,7 @@ RenderTargetImpl::RenderTargetImpl (const DeviceManagerPtr& device_manager, rend
   }
   catch (xtl::exception& e)
   {
-    e.touch ("render::RenderTargetImpl::RenderTargetImpl");
+    e.touch ("render::manager::RenderTargetImpl::RenderTargetImpl");
     throw;
   }
 }
@@ -60,7 +60,7 @@ RenderTargetImpl::~RenderTargetImpl ()
 render::low_level::IView& RenderTargetImpl::View ()
 {
   if (!impl->view)
-    throw xtl::format_operation_exception ("render::mip_level::RenderTargetImpl::View", "No view binded");
+    throw xtl::format_operation_exception ("render::manager::RenderTargetImpl::View", "No view binded");
     
   return *impl->view;
 }
@@ -103,7 +103,7 @@ void RenderTargetImpl::SetTarget (render::low_level::ITexture* texture, size_t l
   }
   catch (xtl::exception& e)
   {
-    e.touch ("render::mip_level::RenderTargetImpl::SetTarget");
+    e.touch ("render::manager::RenderTargetImpl::SetTarget");
     throw;
   }
 }
@@ -179,7 +179,7 @@ void RenderTargetImpl::Capture (media::Image& image)
   }
   catch (xtl::exception& e)
   {
-    e.touch ("render::RenderTargetImpl::Capture");
+    e.touch ("render::manager::RenderTargetImpl::Capture");
     throw;
   }
 }

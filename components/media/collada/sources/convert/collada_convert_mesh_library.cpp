@@ -29,112 +29,112 @@ struct Binormal: public media::geometry::CustomAttribute<math::vec3f>
 template <size_t Channel> struct TexTangent;
 template <size_t Channel> struct TexBinormal;
 
-template <> struct TexTangent<0>: public media::geometry::CustomAttribute<math::vec3f, media::geometry::VertexAttributeSemantic_TexCoord0>
+template <> struct TexTangent<0>: public media::geometry::CustomAttribute<math::vec3f, media::geometry::VertexAttributeSemantic_Custom>
 {
   static const char* name () { return "textangent0"; }
 
   math::vec3f textangent0;
 };
 
-template <> struct TexTangent<1>: public media::geometry::CustomAttribute<math::vec3f, media::geometry::VertexAttributeSemantic_TexCoord1>
+template <> struct TexTangent<1>: public media::geometry::CustomAttribute<math::vec3f, media::geometry::VertexAttributeSemantic_Custom>
 {
   static const char* name () { return "textangent1"; }
 
   math::vec3f textangent1;
 };
 
-template <> struct TexTangent<2>: public media::geometry::CustomAttribute<math::vec3f, media::geometry::VertexAttributeSemantic_TexCoord2>
+template <> struct TexTangent<2>: public media::geometry::CustomAttribute<math::vec3f, media::geometry::VertexAttributeSemantic_Custom>
 {
   static const char* name () { return "textangent2"; }
 
   math::vec3f textangent2;
 };
 
-template <> struct TexTangent<3>: public media::geometry::CustomAttribute<math::vec3f, media::geometry::VertexAttributeSemantic_TexCoord3>
+template <> struct TexTangent<3>: public media::geometry::CustomAttribute<math::vec3f, media::geometry::VertexAttributeSemantic_Custom>
 {
   static const char* name () { return "textangent3"; }
 
   math::vec3f textangent3;
 };
 
-template <> struct TexTangent<4>: public media::geometry::CustomAttribute<math::vec3f, media::geometry::VertexAttributeSemantic_TexCoord4>
+template <> struct TexTangent<4>: public media::geometry::CustomAttribute<math::vec3f, media::geometry::VertexAttributeSemantic_Custom>
 {
   static const char* name () { return "textangent4"; }
 
   math::vec3f textangent4;
 };
 
-template <> struct TexTangent<5>: public media::geometry::CustomAttribute<math::vec3f, media::geometry::VertexAttributeSemantic_TexCoord5>
+template <> struct TexTangent<5>: public media::geometry::CustomAttribute<math::vec3f, media::geometry::VertexAttributeSemantic_Custom>
 {
   static const char* name () { return "textangent5"; }
 
   math::vec3f textangent5;
 };
 
-template <> struct TexTangent<6>: public media::geometry::CustomAttribute<math::vec3f, media::geometry::VertexAttributeSemantic_TexCoord6>
+template <> struct TexTangent<6>: public media::geometry::CustomAttribute<math::vec3f, media::geometry::VertexAttributeSemantic_Custom>
 {
   static const char* name () { return "textangent6"; }
 
   math::vec3f textangent6;
 };
 
-template <> struct TexTangent<7>: public media::geometry::CustomAttribute<math::vec3f, media::geometry::VertexAttributeSemantic_TexCoord7>
+template <> struct TexTangent<7>: public media::geometry::CustomAttribute<math::vec3f, media::geometry::VertexAttributeSemantic_Custom>
 {
   static const char* name () { return "textangent7"; }
 
   math::vec3f textangent7;
 };
 
-template <> struct TexBinormal<0>: public media::geometry::CustomAttribute<math::vec3f, media::geometry::VertexAttributeSemantic_TexCoord0>
+template <> struct TexBinormal<0>: public media::geometry::CustomAttribute<math::vec3f, media::geometry::VertexAttributeSemantic_Custom>
 {
   static const char* name () { return "texbinormal0"; }
 
   math::vec3f texbinormal0;
 };
 
-template <> struct TexBinormal<1>: public media::geometry::CustomAttribute<math::vec3f, media::geometry::VertexAttributeSemantic_TexCoord1>
+template <> struct TexBinormal<1>: public media::geometry::CustomAttribute<math::vec3f, media::geometry::VertexAttributeSemantic_Custom>
 {
   static const char* name () { return "texbinormal1"; }
 
   math::vec3f texbinormal1;
 };
 
-template <> struct TexBinormal<2>: public media::geometry::CustomAttribute<math::vec3f, media::geometry::VertexAttributeSemantic_TexCoord2>
+template <> struct TexBinormal<2>: public media::geometry::CustomAttribute<math::vec3f, media::geometry::VertexAttributeSemantic_Custom>
 {
   static const char* name () { return "texbinormal2"; }
 
   math::vec3f texbinormal2;
 };
 
-template <> struct TexBinormal<3>: public media::geometry::CustomAttribute<math::vec3f, media::geometry::VertexAttributeSemantic_TexCoord3>
+template <> struct TexBinormal<3>: public media::geometry::CustomAttribute<math::vec3f, media::geometry::VertexAttributeSemantic_Custom>
 {
   static const char* name () { return "texbinormal3"; }
 
   math::vec3f texbinormal3;
 };
 
-template <> struct TexBinormal<4>: public media::geometry::CustomAttribute<math::vec3f, media::geometry::VertexAttributeSemantic_TexCoord4>
+template <> struct TexBinormal<4>: public media::geometry::CustomAttribute<math::vec3f, media::geometry::VertexAttributeSemantic_Custom>
 {
   static const char* name () { return "texbinormal4"; }
 
   math::vec3f texbinormal4;
 };
 
-template <> struct TexBinormal<5>: public media::geometry::CustomAttribute<math::vec3f, media::geometry::VertexAttributeSemantic_TexCoord5>
+template <> struct TexBinormal<5>: public media::geometry::CustomAttribute<math::vec3f, media::geometry::VertexAttributeSemantic_Custom>
 {
   static const char* name () { return "texbinormal5"; }
 
   math::vec3f texbinormal5;
 };
 
-template <> struct TexBinormal<6>: public media::geometry::CustomAttribute<math::vec3f, media::geometry::VertexAttributeSemantic_TexCoord6>
+template <> struct TexBinormal<6>: public media::geometry::CustomAttribute<math::vec3f, media::geometry::VertexAttributeSemantic_Custom>
 {
   static const char* name () { return "texbinormal6"; }
 
   math::vec3f texbinormal6;
 };
 
-template <> struct TexBinormal<7>: public media::geometry::CustomAttribute<math::vec3f, media::geometry::VertexAttributeSemantic_TexCoord7>
+template <> struct TexBinormal<7>: public media::geometry::CustomAttribute<math::vec3f, media::geometry::VertexAttributeSemantic_Custom>
 {
   static const char* name () { return "texbinormal7"; }
 
@@ -628,6 +628,20 @@ class Converter
 
       for (size_t i=0; i<src_mesh.Surfaces ().Size (); i++)
         ConvertSurface (src_mesh.Surfaces () [i], *dst_mesh);
+
+        //Преобразование индексов в минимально возможный тип данных
+      unsigned int max_index_value = 0;
+      unsigned int *current_index  = dst_mesh->index_buffer.Data<unsigned int> ();
+
+      for (size_t i = 0, size = dst_mesh->index_buffer.Size (); i < size; i++, current_index++)
+      {
+        max_index_value = stl::max (max_index_value, *current_index);
+      }
+
+      if (max_index_value <= 0xff)
+        dst_mesh->index_buffer.SetDataType (media::geometry::IndexType_UInt8);
+      else if (max_index_value <= 0xffff)
+        dst_mesh->index_buffer.SetDataType (media::geometry::IndexType_UInt16);
 
         //регистрация меша
 

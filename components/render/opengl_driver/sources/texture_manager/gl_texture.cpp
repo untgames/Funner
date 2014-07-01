@@ -4,12 +4,16 @@ using namespace render::low_level;
 using namespace render::low_level::opengl;
 using namespace common;
 
+namespace
+{
+
 /*
     Константы
 */
 
-const size_t DXT_EDGE_SIZE  = 4;                             //размер стороны блока DXT-сжатия
-const size_t DXT_BLOCK_SIZE = DXT_EDGE_SIZE * DXT_EDGE_SIZE; //размер блока DXT-сжатия
+const size_t DXT_EDGE_SIZE  = 4;  //размер стороны блока DXT-сжатия
+
+}
 
 /*
    Конструктор / деструктор
@@ -113,12 +117,14 @@ Texture::Texture
   {
     Bind ();
 
-#ifndef OPENGL_ES_SUPPORT
+#if !defined(OPENGL_ES_SUPPORT) && !defined(OPENGL_ES2_SUPPORT)
     glTexParameteri (target, GL_TEXTURE_MAX_LEVEL, mips_count - 1);
 #endif
 
+#ifndef OPENGL_ES2_SUPPORT
     if (desc.generate_mips_enable && GetCaps ().has_sgis_generate_mipmap)
       glTexParameteri (target, GL_GENERATE_MIPMAP, GL_TRUE);
+#endif
   }
 
     //проверка ошибок
@@ -206,8 +212,9 @@ void Texture::Bind ()
 {
     //получение кэш-переменных
 
-  const size_t current_active_slot = GetContextCacheValue (CacheEntry_ActiveTextureSlot),
-               current_texture_id  = GetContextCacheValue (CacheEntry_TextureId0 + current_active_slot);
+  size_t current_active_slot     = GetContextCacheValue (CacheEntry_ActiveTextureSlot),
+         &current_texture_id     = GetContextCache () [CacheEntry_TextureId0 + current_active_slot],
+         &current_texture_target = GetContextCache () [CacheEntry_TextureTarget0 + current_active_slot];
 
     //проверка необходимости биндинга текстуры
 
@@ -228,7 +235,8 @@ void Texture::Bind ()
 
     //обновление кэш-переменных
 
-  SetContextCacheValue (CacheEntry_TextureId0 + current_active_slot, GetId ());
+  current_texture_id     = GetId ();
+  current_texture_target = target;
   
     //оповещение о необходимости ребиндинга уровня
     
@@ -311,7 +319,7 @@ void Texture::BuildMipmaps
     x               /= 2;
     y               /= 2;    
     
-#ifndef OPENGL_ES_SUPPORT
+#if !defined(OPENGL_ES_SUPPORT) && !defined(OPENGL_ES2_SUPPORT)
 
     if (target != GL_TEXTURE_CUBE_MAP)
       z /= 2;
@@ -410,7 +418,7 @@ void Texture::SetData
 
   Bind ();  
   
-#ifndef OPENGL_ES_SUPPORT
+#if !defined(OPENGL_ES_SUPPORT) && !defined(OPENGL_ES2_SUPPORT)
 
     //настройка параметров расположения данных в буфере
 
@@ -565,7 +573,7 @@ void Texture::SetData
 }
 
 
-#ifndef OPENGL_ES_SUPPORT
+#if !defined(OPENGL_ES_SUPPORT) && !defined(OPENGL_ES2_SUPPORT)
 
 void Texture::GetData
  (size_t          layer,

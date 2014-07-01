@@ -82,7 +82,11 @@ Context::Context (ISwapChain* in_swap_chain, Library* library)
 
       //создание контекста
 
+#ifdef OPENGL_ES2_SUPPORT
+    impl->context = [[EAGLContext alloc] initWithAPI:kEAGLRenderingAPIOpenGLES2];
+#else
     impl->context = [[EAGLContext alloc] initWithAPI:kEAGLRenderingAPIOpenGLES1];
+#endif
 
     impl->log.Printf ("Create context (id=%u)...", GetId ());
 

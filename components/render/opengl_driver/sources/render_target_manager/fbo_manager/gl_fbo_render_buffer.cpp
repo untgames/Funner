@@ -11,7 +11,7 @@ using namespace common;
 namespace
 {
 
-#ifndef OPENGL_ES_SUPPORT
+#if !defined(OPENGL_ES_SUPPORT) && !defined(OPENGL_ES2_SUPPORT)
 
 //определение типа буфера рендеринга
 GLenum get_render_buffer_format (PixelFormat format, const char* source, const char* param)
@@ -222,7 +222,7 @@ size_t FboRenderBuffer::GetFrameBufferId ()
         break;
     }
     
-#ifndef OPENGL_ES_SUPPORT
+#if !defined(OPENGL_ES_SUPPORT) && !defined(OPENGL_ES2_SUPPORT)
 
       //настройка буферов рисования и чтения      
     

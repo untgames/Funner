@@ -217,6 +217,7 @@ node 'mesh':
     integer InfiniteBounds='0'
     vector WireColor='0 0 0 0'
     integer Visible='1'
+    string Scissor=''
     string Mesh='1.mesh'
 node 'sprite':
   parent: 'scene3'
@@ -246,11 +247,14 @@ node 'sprite':
     integer InfiniteBounds='0'
     vector WireColor='0 0 0 0'
     integer Visible='1'
+    string Scissor=''
     string Material='sprite_material'
-    float AlphaReference='0'
+    string Batch=''
+    vector Up='0 0 1 0'
     vector Color='1 0 1 0.5'
     float Alpha='0.5'
-    integer Frame='1'
+    vector TexOffset='0 0 0 0'
+    vector TexSize='1 1 0 0'
 node 'text_line':
   parent: 'scene3'
   bindings:
@@ -279,6 +283,7 @@ node 'text_line':
     integer InfiniteBounds='1'
     vector WireColor='0 0 0 0'
     integer Visible='1'
+    string Scissor=''
     string Font='my_font'
     vector Color='1 1 1 0.5'
     string TextUtf8='Hello world'

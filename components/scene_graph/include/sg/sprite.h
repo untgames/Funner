@@ -2,7 +2,7 @@
 #define SCENE_GRAPH_SPRITE_HEADER
 
 #include <stl/auto_ptr.h>
-#include <sg/entity.h>
+#include <sg/visual_model.h>
 
 namespace scene_graph
 {
@@ -12,45 +12,95 @@ namespace scene_graph
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 enum SpriteModelEvent
 {
-  SpriteModelEvent_AfterSpriteDescsUpdate, //срабатывает после изменени€ данных спрайтов
+  SpriteModelEvent_AfterSpriteDescsUpdate,    //срабатывает после изменени€ данных спрайтов
+  SpriteModelEvent_AfterCreationParamsUpdate, //срабатывает после изменени€ Mode/Usage/UpDirection/Batch параметров
 
   SpriteModelEvent_Num
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///ћодель, состо€ща€ из спрайтов
+///–ежим использовани€ спрайтов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-class SpriteModel: public Entity
+enum SpriteUsage
 {
-  public:
+  SpriteUsage_Static,   //не обновл€ема€ модель
+  SpriteUsage_Dynamic,  //обновл€ема€ модель
+  SpriteUsage_Stream,   //часто обновл€ема€ модель (каждый кадр)
+  SpriteUsage_Batching, //пакетирование
+  
+  SpriteUsage_Default = SpriteUsage_Batching
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///–ежим спрайтов
+///////////////////////////////////////////////////////////////////////////////////////////////////
+enum SpriteMode
+{
+  SpriteMode_Billboard         = 1,                                          //up vector is view up,  normal & rotation is ignored
+  SpriteMode_Oriented          = 2,                                          //up vector is local up, normal & rotation is used
+  SpriteMode_OrientedBillboard = SpriteMode_Billboard | SpriteMode_Oriented, //up vector is view up,  normal & rotation is used
+
+  SpriteMode_Default = SpriteMode_Billboard
+};
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///ƒескриптор спрайта
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    struct SpriteDesc
-    {
-      math::vec3f position; //положение в системе координат SpriteList
-      math::vec2f size;     //размер спрайта
-      math::vec4f color;    //цвет спрайта
-      size_t      frame;    //номер кадра
-    };
-    
+struct SpriteDesc
+{
+  math::vec3f  position;   //положение центра спрайта
+  math::vec2f  size;       //размер спрайта
+  math::vec4f  color;      //цвет спрайта
+  math::vec2f  tex_offset; //смещение начала спрайта в текстуре [0;1]
+  math::vec2f  tex_size;   //размер спрайта в текстуре [0;1]
+  math::vec3f  normal;     //нормаль
+  math::anglef rotation;   //поворот относительно нормали
+};
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-/// оличество спрайтов / получение массива спрайтов
+///ћодель, состо€ща€ из простейших примитивов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    size_t            SpriteDescsCount () const;
-    const SpriteDesc* SpriteDescs      () const;
+class SpriteModel: public VisualModel
+{
+  public:
+///////////////////////////////////////////////////////////////////////////////////////////////////
+/// оличество спрайтов / размер буфера линий / получение массива спрайтов
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    size_t            SpriteDescsCount    () const;
+    size_t            SpriteDescsCapacity () const;
+    const SpriteDesc* SpriteDescs         () const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///ћатериал
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void        SetMaterial (const char* material);
-    const char* Material    () const;
+    void        SetMaterial  (const char* material);
+    const char* Material     () const;
+    size_t      MaterialHash () const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///ѕараметр, используемый дл€ альфа-теста
+///ѕакет
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void  SetAlphaReference (float value);
-    float AlphaReference    () const;
+    void        SetBatch  (const char* name);
+    const char* Batch     () const;
+    size_t      BatchHash () const;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///–ежим спрайтов
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void       SetMode (SpriteMode mode);
+    SpriteMode Mode    () const;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///–ежим использовани€ спрайтов
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void        SetUsage (SpriteUsage usage);
+    SpriteUsage Usage    () const;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///¬ектор "вверх"
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void               SetOrtUp (const math::vec3f& up);
+    const math::vec3f& OrtUp    () const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///ѕодписка на событи€ модели
@@ -59,7 +109,7 @@ class SpriteModel: public Entity
 
     xtl::connection RegisterEventHandler (SpriteModelEvent event_id, const EventHandler& event_handler);
     
-    using Entity::RegisterEventHandler;
+    using VisualModel::RegisterEventHandler;
 
   protected:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -87,8 +137,9 @@ class SpriteModel: public Entity
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///–еализаци€ получени€ количества спрайтов и массива спрайтов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    virtual size_t            SpriteDescsCountCore () = 0;
-    virtual const SpriteDesc* SpriteDescsCore      () = 0;
+    virtual size_t            SpriteDescsCountCore    () = 0;
+    virtual size_t            SpriteDescsCapacityCore () = 0;
+    virtual const SpriteDesc* SpriteDescsCore         () = 0;
     
   private:
     struct Impl;
@@ -120,11 +171,13 @@ class Sprite: public SpriteModel
     float              Alpha    () const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///”становка номера кадра
+///“екстурные координаты
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void   SetFrame (size_t frame);
-    size_t Frame    () const;
-    
+    void               SetTexOffset (const math::vec2f&);
+    void               SetTexSize   (const math::vec2f&);
+    const math::vec2f& TexOffset    () const;
+    const math::vec2f& TexSize      () const;
+
   protected:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 /// онструктор / деструктор
@@ -146,8 +199,9 @@ class Sprite: public SpriteModel
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///–еализаци€ получени€ количества спрайтов и массива спрайтов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    size_t            SpriteDescsCountCore ();
-    const SpriteDesc* SpriteDescsCore      ();        
+    size_t            SpriteDescsCountCore    ();
+    size_t            SpriteDescsCapacityCore ();
+    const SpriteDesc* SpriteDescsCore         ();        
 
   private:
     struct Impl;
@@ -217,8 +271,9 @@ class SpriteList: public SpriteModel
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///–еализаци€ получени€ количества спрайтов и массива спрайтов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    size_t            SpriteDescsCountCore ();
-    const SpriteDesc* SpriteDescsCore      ();
+    size_t            SpriteDescsCountCore    ();
+    size_t            SpriteDescsCapacityCore ();
+    const SpriteDesc* SpriteDescsCore         ();
 
   private:
     struct Impl;

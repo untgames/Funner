@@ -74,10 +74,12 @@ const plane_listf& Camera::Frustum () const
     Сигнал обновления матрицы
 */
 
-void Camera::UpdateNotify ()
+void Camera::UpdateCameraNotify ()
 {
   impl->dirty_pm      = true;
   impl->dirty_frustum = true;
+
+  UpdateNotify ();
 }
 
 void Camera::AfterUpdateWorldTransformEvent ()

@@ -7,7 +7,7 @@ using namespace math;
     Описание реализации списка спрайтов
 */
 
-typedef xtl::uninitialized_storage<SpriteModel::SpriteDesc> SpriteDescArray;
+typedef xtl::uninitialized_storage<SpriteDesc> SpriteDescArray;
 
 struct SpriteList::Impl: public xtl::instance_counter<SpriteList>
 {
@@ -50,6 +50,11 @@ size_t SpriteList::SpriteDescsCountCore ()
   return impl->items.size ();
 }
 
+size_t SpriteList::SpriteDescsCapacityCore ()
+{
+  return impl->items.capacity ();
+}
+
 /*
     Изменение размера списка спрайтов / резервирование места для хранения спрайтов
 */
@@ -70,17 +75,17 @@ void SpriteList::Reserve (size_t count)
     Массив спрайтов
 */
 
-const SpriteModel::SpriteDesc* SpriteList::Sprites () const
+const SpriteDesc* SpriteList::Sprites () const
 {
   return impl->items.data ();
 }
 
-const SpriteModel::SpriteDesc* SpriteList::SpriteDescsCore ()
+const SpriteDesc* SpriteList::SpriteDescsCore ()
 {
   return impl->items.data ();
 }
 
-SpriteModel::SpriteDesc* SpriteList::Sprites ()
+SpriteDesc* SpriteList::Sprites ()
 {
   return const_cast<SpriteDesc*> (const_cast<const SpriteList&> (*this).Sprites ());
 }
@@ -89,9 +94,9 @@ SpriteModel::SpriteDesc* SpriteList::Sprites ()
     Добавление спрайтов в массив
 */
 
-void SpriteList::Insert (const SpriteDesc& SpriteDesc)
+void SpriteList::Insert (const SpriteDesc& desc)
 {
-  Insert (1, &SpriteDesc);  
+  Insert (1, &desc);
 }
 
 void SpriteList::Insert (size_t items_count, const SpriteDesc* items)

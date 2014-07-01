@@ -4,7 +4,7 @@ render.manager: Create device manager (driver='*', adapter='*', init_string='')
 render.manager: ...device manager and swap chain have been successfully created
 render.manager: Initialize render targets for swap chain
 render.manager: ...render targets for swap chain created
-window 784x562 added
+window added
 render.manager: Loading material library 'data/test.xmtl' with 4 materials
 render.manager: ...loading material 'canyon.archway_1'
 render.manager: Material 'canyon.archway_1' created (id=1)
@@ -29,7 +29,7 @@ render.manager: Material 'canyon.stn_2' created (id=4)
 render.manager: ...loading material 'canyon.Material__195'
 render.manager: Material 'canyon.Material__195' created (id=5)
 Material library loaded
-window 784x562 removed
+window removed
 render.manager: Material 'canyon.Material__195' destroyed (id=5)
 render.manager: Material 'canyon.stn_2' destroyed (id=4)
 render.manager: Material 'canyon.stn_1' destroyed (id=3)

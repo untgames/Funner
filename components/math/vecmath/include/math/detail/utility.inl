@@ -368,3 +368,62 @@ angle<T> find_angle (const vector<T, Size>& a, const vector<T, Size>& b, const T
 
   return radian (T (acos (angle_cos)));
 }
+
+/*
+    Композиция аффинных преобразований
+*/
+
+//композиция преобразований
+inline void affine_compose (const vec3f& position, const quatf& orientation, const vec3f& scale, mat4f& tm)
+{
+  tm = math::translate (position) * to_matrix (orientation) * math::scale (scale);
+}
+
+//декомпозиция аффинных преобразований из матрицы преобразований
+inline void affine_decompose (const math::mat4f& matrix, math::vec3f& position, math::quatf& rotation, math::vec3f& scale)
+{
+  math::mat4f local_matrix (transpose (matrix)); //копия матрицы преобразований
+
+  //выделение преобразования переноса  
+  for (size_t i = 0; i < 3; i++)
+  {
+    position [i] = local_matrix [3][i];
+    local_matrix [3][i] = 0;
+  }
+
+  //выделение преобразования масштабирования
+  for (size_t i = 0; i < 3; i++)
+  {
+    //определение длины вектора-столбца преобразований
+    float square_length = 0;
+
+    for (size_t j = 0; j < 3; j++)
+      square_length += local_matrix [i][j] * local_matrix [i][j];
+
+    scale [i] = sqrt (square_length);
+
+    //нормирование
+    for (size_t j = 0; j < 3; j++)
+      local_matrix [i][j] /= scale [i];
+  }
+
+  math::vec3f temp_z = math::cross (math::vec3f (local_matrix [0][0], local_matrix [0][1], local_matrix [0][2]),
+      math::vec3f (local_matrix [1][0], local_matrix [1][1], local_matrix [1][2]));
+
+  if (math::dot (temp_z, math::vec3f (local_matrix [2][0], local_matrix [2][1], local_matrix [2][2])) < 0)
+  {
+    scale.x = -scale.x;
+
+    for (size_t j=0; j<3; j++)
+      local_matrix [0][j] = -local_matrix [0][j];
+  }
+
+//  rotation = to_quat (transpose (local_matrix));
+  math::mat4f m = transpose (local_matrix);
+
+  m [0] = normalize (m [0]);
+  m [2] = normalize (cross (m [0], m [1]));
+  m [1] = normalize (cross (m [2], m [0]));
+
+  rotation = normalize (to_quat (m));
+}

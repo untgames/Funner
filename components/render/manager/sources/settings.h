@@ -13,9 +13,9 @@ class Settings: public Object
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Уровень протоколирования
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void             SetLogLevel (render::LogLevel level);
-    render::LogLevel LogLevel    ();
-    bool             HasDebugLog () { return LogLevel () >= LogLevel_Debug; }
+    void                      SetLogLevel (render::manager::LogLevel level);
+    render::manager::LogLevel LogLevel    ();
+    bool                      HasDebugLog () { return LogLevel () >= LogLevel_Debug; }
 
   private:
     struct Impl;

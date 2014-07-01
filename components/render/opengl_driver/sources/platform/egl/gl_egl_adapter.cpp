@@ -167,7 +167,7 @@ inline EGLint get_config_attribute (EGLDisplay egl_display, EGLConfig egl_config
   EGLint value = 0;
   
   if (!eglGetConfigAttrib (egl_display, egl_config, attribute, &value))
-    raise_error ("::eglGetConfigAttrib");
+    raise_error (common::format ("::eglGetConfigAttrib(attribute=0x%04x)", attribute).c_str ());
     
   return value;
 }
@@ -191,20 +191,38 @@ void Adapter::EnumPixelFormats (EGLDisplay display, PixelFormatArray& pixel_form
     {
       EGLConfig config = configs [i];
 
+#ifndef OPENGL_ES2_SUPPORT
       if (get_config_attribute (display, config, EGL_COLOR_BUFFER_TYPE) != EGL_RGB_BUFFER)
         continue;
+#endif
 
       if (!(get_config_attribute (display, config, EGL_SURFACE_TYPE) & EGL_WINDOW_BIT))
         continue;
 
+#ifdef OPENGL_ES_SUPPORT
       if (!(get_config_attribute (display, config, EGL_RENDERABLE_TYPE) & EGL_OPENGL_ES_BIT))
         continue;
+#endif
 
+#ifdef OPENGL_ES2_SUPPORT
+      if (!(get_config_attribute (display, config, EGL_RENDERABLE_TYPE) & EGL_OPENGL_ES2_BIT))
+        continue;
+#endif
+
+#ifndef OPENGL_ES2_SUPPORT
       if (get_config_attribute (display, config, EGL_LEVEL) != 0)
         continue;
+#endif
 
+#ifdef OPENGL_ES_SUPPORT
       if (!(get_config_attribute (display, config, EGL_CONFORMANT) & EGL_OPENGL_ES_BIT))
         continue;
+#endif
+
+#ifdef OPENGL_ES2_SUPPORT
+      if (!(get_config_attribute (display, config, EGL_CONFORMANT) & EGL_OPENGL_ES2_BIT))
+        continue;
+#endif
 
       PixelFormatDesc desc;
 

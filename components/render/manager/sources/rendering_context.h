@@ -7,7 +7,7 @@ class RenderingContext: public xtl::noncopyable
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструктор
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    RenderingContext (FrameImpl& frame, RenderingContext* previous = 0);
+    RenderingContext (FrameImpl& frame, const math::mat4f& vp_tm, RenderingContext* previous = 0);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Поиск локальных объектов
@@ -20,7 +20,15 @@ class RenderingContext: public xtl::noncopyable
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     FrameImpl& Frame () { return frame; }
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Матрицы преобразований
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    const math::mat4f& ViewProjectionMatrix        () { return vp_tm; }
+    const math::mat4f& InverseViewProjectionMatrix () { return inv_vp_tm; }
+
   private:
-    FrameImpl&        frame;    //кадр
-    RenderingContext* previous; //предыдущий контекст
+    FrameImpl&         frame;     //кадр
+    RenderingContext*  previous;  //предыдущий контекст
+    const math::mat4f& vp_tm;     //матрица view-projection
+    math::mat4f        inv_vp_tm; //обратная матрица view-projection
 };

@@ -92,7 +92,7 @@ struct Test
 
     vp1.SetName            ("Viewport1");
     vp1.SetZOrder          (0);
-    vp1.SetTechnique       ("Render2d");
+    vp1.SetTechnique       ("default");
     vp1.SetCamera          (camera [0].get ());
     vp1.SetDepthRange      (0, 0.5f);
     
@@ -104,7 +104,7 @@ struct Test
 
     vp2.SetName            ("Viewport2");
     vp2.SetZOrder          (1);
-    vp2.SetTechnique       ("Render2d");
+    vp2.SetTechnique       ("default");
     vp2.SetCamera          (camera [1].get ());
     vp2.SetDepthRange      (0.5f, 1.0f);    
     

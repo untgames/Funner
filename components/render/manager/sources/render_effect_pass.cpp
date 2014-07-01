@@ -1,6 +1,6 @@
 #include "shared.h"
 
-using namespace render;
+using namespace render::manager;
 
 /*
     Описание реализации
@@ -13,7 +13,7 @@ struct EffectPass::Impl
   DeviceManagerPtr             device_manager;           //менеджер устройства отрисовки
   common::StringArray          color_targets;            //целевые буферы цвета
   stl::string                  depth_stencil_target;     //целевой буфер глубины
-  render::SortMode             sort_mode;                //режим сортировки
+  render::manager::SortMode    sort_mode;                //режим сортировки
   LowLevelDepthStencilStatePtr depth_stencil_state;      //состояние уровня отсечения
   LowLevelBlendStatePtr        blend_state;              //состояние уровня смешивания цветов
   LowLevelRasterizerStatePtr   rasterizer_state;         //состояние уровня растеризации  
@@ -48,7 +48,7 @@ struct EffectPass::Impl
     }
     catch (xtl::exception& e)
     {
-      e.touch ("render::EffectPass::EffectPass");
+      e.touch ("render::manager::EffectPass::EffectPass");
       throw;
     }
   }
@@ -79,7 +79,7 @@ void EffectPass::SetColorTargets (const common::StringArray& targets)
 void EffectPass::SetDepthStencilTarget (const char* name)
 {
   if (!name)
-    throw xtl::make_null_argument_exception ("render::EffectPass::SetDepthStencilTarget", "name");
+    throw xtl::make_null_argument_exception ("render::manager::EffectPass::SetDepthStencilTarget", "name");
     
   impl->depth_stencil_target = name;
 }
@@ -169,7 +169,7 @@ LowLevelStateBlockPtr EffectPass::StateBlock (bool scissor_enable)
   }
   catch (xtl::exception& e)
   {
-    e.touch ("render::EffectPass::StateBlock");
+    e.touch ("render::manager::EffectPass::StateBlock");
     throw;
   }
 }
@@ -181,7 +181,7 @@ LowLevelStateBlockPtr EffectPass::StateBlock (bool scissor_enable)
 void EffectPass::SetTags (const char* tags)
 {
   if (!tags)
-    throw xtl::make_null_argument_exception ("render::EffectPass::SetTags", "tags");
+    throw xtl::make_null_argument_exception ("render::manager::EffectPass::SetTags", "tags");
 
   SetTags (common::split (tags, " ")); 
 }
@@ -208,7 +208,7 @@ size_t EffectPass::TagsCount ()
 const char* EffectPass::Tag (size_t index)
 {
   if (index >= impl->tags.Size ())
-    throw xtl::make_range_exception ("render::EffectPass::Tag", "index", index, impl->tags.Size ());
+    throw xtl::make_range_exception ("render::manager::EffectPass::Tag", "index", index, impl->tags.Size ());
     
   return impl->tags [index];
 }
@@ -216,7 +216,7 @@ const char* EffectPass::Tag (size_t index)
 size_t EffectPass::TagHash (size_t index)
 {
   if (index >= impl->tag_hashes.size ())
-    throw xtl::make_range_exception ("render::EffectPass::TagHash", "index", index, impl->tag_hashes.size ());
+    throw xtl::make_range_exception ("render::manager::EffectPass::TagHash", "index", index, impl->tag_hashes.size ());
     
   return impl->tag_hashes [index];
 }
@@ -241,7 +241,7 @@ const size_t* EffectPass::TagHashes ()
     Тип сортировки примитивов
 */
 
-void EffectPass::SetSortMode (render::SortMode mode)
+void EffectPass::SetSortMode (render::manager::SortMode mode)
 {
   switch (mode)
   {
@@ -250,7 +250,7 @@ void EffectPass::SetSortMode (render::SortMode mode)
     case SortMode_StateSwitch:
       break;
     default:
-      throw xtl::make_argument_exception ("render::EffectPass::SetSortMode", "mode", mode);
+      throw xtl::make_argument_exception ("render::manager::EffectPass::SetSortMode", "mode", mode);
   }
   
   impl->sort_mode = mode;

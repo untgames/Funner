@@ -160,7 +160,7 @@ struct TextureManager::Impl: public ContextObject
       texture_manager (in_texture_manager),
       state (this)
     {
-#ifndef OPENGL_ES_SUPPORT
+#if !defined(OPENGL_ES_SUPPORT) && !defined(OPENGL_ES2_SUPPORT)
       //выбор текущего контекста
 
       MakeContextCurrent ();
@@ -202,7 +202,7 @@ struct TextureManager::Impl: public ContextObject
 
       const ContextCaps& caps     = GetCaps ();
       SamplerSlot*       samplers = state.GetSlots ();
-      
+
       for (size_t i = 0, count = stl::min (caps.texture_units_count, DEVICE_SAMPLER_SLOTS_COUNT); i < count; i++)
       {
         BindableTexture* texture        = samplers [i].texture.get ();
@@ -258,8 +258,32 @@ struct TextureManager::Impl: public ContextObject
 
         if (need_change_mode)
         {
-          if (current_texture_target [i]) glDisable (current_texture_target [i]);
-          if (texture_target)             glEnable  (texture_target);
+          if (caps.has_ffp)
+          {
+            if (current_texture_target [i])
+              glDisable (current_texture_target [i]);
+
+            if (texture_target)
+            {
+              glEnable (texture_target);
+            }
+            else
+            {
+              if (current_texture_target [i])
+              {
+                current_texture_id [i] = 0;
+                glBindTexture (current_texture_target [i], 0);
+              }
+            }
+          }
+          else
+          {
+            if (current_texture_target [i] && !texture_target)
+            {
+              current_texture_id [i] = 0;
+              glBindTexture (current_texture_target [i], 0);
+            }
+          }
 
           current_texture_target [i] = texture_target;
         }
@@ -406,17 +430,17 @@ struct TextureManager::Impl: public ContextObject
 
       if (is_pot || caps.has_arb_texture_non_power_of_two)
       {
-#ifndef OPENGL_ES_SUPPORT        
+#if !defined(OPENGL_ES_SUPPORT) && !defined(OPENGL_ES2_SUPPORT)
         static Extension BUG_texture_no_subimage = "GLBUG_texture_no_subimage";
 
         if (IsSupported (BUG_texture_no_subimage))
-          return new Texture2DNoSubimage (GetContextManager (), desc, data); //создание текстуры в режиме эмуляции          
+          return new Texture2DNoSubimage (GetContextManager (), desc, data); //создание текстуры в режиме эмуляции
 #endif
 
         return new Texture2D (GetContextManager (), desc, data);
       }      
       
-#ifndef OPENGL_ES_SUPPORT      
+#if !defined(OPENGL_ES_SUPPORT) && !defined(OPENGL_ES2_SUPPORT)
 
       if (caps.has_arb_texture_rectangle && !is_compressed (desc.format) && !desc.generate_mips_enable)
       {
@@ -469,7 +493,7 @@ struct TextureManager::Impl: public ContextObject
       return new ScaledTexture (GetContextManager (), texture_manager, desc, data);
     }              
     
-#ifndef OPENGL_ES_SUPPORT
+#if !defined(OPENGL_ES_SUPPORT) && !defined(OPENGL_ES2_SUPPORT)
 
       //создание одномерной текстуры
     ITexture* CreateTexture1D (const TextureDesc& in_desc, const TextureData* data)

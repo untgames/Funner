@@ -109,10 +109,10 @@ struct Test
     memset (&desc, 0, sizeof (desc));
 
     desc.frame_buffer.color_bits   = 16;
-//    desc.frame_buffer.alpha_bits   = 8;
     desc.frame_buffer.depth_bits   = 16;
-//    desc.frame_buffer.stencil_bits = 8;
     desc.buffers_count             = 2;
+//    desc.frame_buffer.alpha_bits   = 8;
+//    desc.frame_buffer.stencil_bits = 8;
 //    desc.samples_count             = 4;
     desc.swap_method               = SwapMethod_Discard;
     desc.vsync                     = false;
@@ -150,14 +150,14 @@ struct Test
       
       device->GetCaps (caps);
       
-      if (caps.has_right_hand_viewport)
-        vp.y = window.Height () - vp.height - vp.y;
+//      if (caps.has_right_hand_viewport)
+//        vp.y = window.Height () - vp.height - vp.y;
 
       device->GetImmediateContext ()->RSSetViewport (0, vp);
     }
     catch (std::exception& e)
     {
-      printf ("resize exception: %s\n", e.what ());
+      printf ("resize exception: %s\n", e.what ()); fflush (stdout);
     }
   }
 
@@ -185,7 +185,7 @@ struct Test
     }
     catch (std::exception& e)
     {
-      printf ("redraw exception: %s\n", e.what ());
+      printf ("redraw exception: %s\n", e.what ()); fflush (stdout);
     }
   }
 

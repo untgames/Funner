@@ -35,14 +35,13 @@ struct Test
 
     for (size_t i=0; i<SPRITES_COUNT; i++)
     {
-      SpriteModel::SpriteDesc sprite;
+      SpriteDesc sprite;
 
       float scale = frand (1, 4);
 
       sprite.position = math::vec3f (frand (-10, 10), frand (-10, 10), frand (-10, 10));
       sprite.size     = scale;
       sprite.color    = math::vec4f (frand (), frand (), frand (), frand ());
-      sprite.frame    = rand ();
 
       sprite_list->Insert (sprite);
     }
@@ -87,7 +86,7 @@ struct Test
 
     application.Render ().SetMaxDrawDepth (3);
 
-    application.Render ().RegisterQueryHandler ("test_query", xtl::bind (&Test::SetupDynamicRenderTarget, this, _1, _2));
+//    application.Render ().RegisterQueryHandler ("test_query", xtl::bind (&Test::SetupDynamicRenderTarget, this, _1, _2));
 
       //загрузка ресурсов
 
@@ -113,11 +112,8 @@ struct Test
 
       if (common::milliseconds () - last_update >= 40)
       {
-        SpriteModel::SpriteDesc* sprite        = sprite_list->Sprites ();
-        size_t                   sprites_count = sprite_list->SpritesCount ();
-
-        for (size_t i=0; i<sprites_count; i++, sprite++)
-          sprite->frame++;
+        SpriteDesc* sprite        = sprite_list->Sprites ();
+        size_t      sprites_count = sprite_list->SpritesCount ();
 
         sprite_list->Invalidate ();
 

@@ -1,6 +1,6 @@
 #include "shared.h"
 
-using namespace render;
+using namespace render::manager;
 
 namespace
 {
@@ -52,7 +52,7 @@ struct ProgramParametersLayout::Impl: public CacheHolder, public DebugIdHolder
     , device (in_device)
     , settings (in_settings)
   {
-    static const char* METHOD_NAME = "render::ProgramParametersLayout::Impl::Impl";
+    static const char* METHOD_NAME = "render::manager::ProgramParametersLayout::Impl::Impl";
     
     if (!device)
       throw xtl::make_null_argument_exception (METHOD_NAME, "device");
@@ -175,7 +175,7 @@ struct ProgramParametersLayout::Impl: public CacheHolder, public DebugIdHolder
               parameter.type = render::low_level::ProgramParameterType_Float4x4;
               break;            
             default:
-              throw xtl::format_operation_exception ("render::ProgramParametersLayout", "Unexpected property[%u] '%s' type %s at parsing", j, parameter.name, get_name (property->type));
+              throw xtl::format_operation_exception ("render::manager::ProgramParametersLayout", "Unexpected property[%u] '%s' type %s at parsing", j, parameter.name, get_name (property->type));
           }
           
           if (has_debug_log)
@@ -290,7 +290,7 @@ size_t ProgramParametersLayout::Id () const
 void ProgramParametersLayout::SetSlot (ProgramParametersSlot slot, const common::PropertyLayout& layout)
 {
   if (slot < 0 || slot >= ProgramParametersSlot_Num)
-    throw xtl::make_range_exception ("render::ProgramParametersLayout::SetSlot", "slot", slot, 0, ProgramParametersSlot_Num);
+    throw xtl::make_range_exception ("render::manager::ProgramParametersLayout::SetSlot", "slot", slot, 0, ProgramParametersSlot_Num);
     
   impl->slots [slot].layout      = layout;
   impl->slots [slot].layout_hash = layout.Hash ();
@@ -305,7 +305,7 @@ void ProgramParametersLayout::SetSlot (ProgramParametersSlot slot, const common:
 void ProgramParametersLayout::AttachSlot (ProgramParametersSlot slot, const common::PropertyMap& map)
 {
   if (slot < 0 || slot >= ProgramParametersSlot_Num)
-    throw xtl::make_range_exception ("render::ProgramParametersLayout::AttachSlot", "slot", slot, 0, ProgramParametersSlot_Num);
+    throw xtl::make_range_exception ("render::manager::ProgramParametersLayout::AttachSlot", "slot", slot, 0, ProgramParametersSlot_Num);
 
   impl->slots [slot].layout      = map.Layout ();
   impl->slots [slot].layout_hash = map.Layout ().Hash ();
@@ -318,7 +318,7 @@ void ProgramParametersLayout::AttachSlot (ProgramParametersSlot slot, const comm
 void ProgramParametersLayout::ResetSlot (ProgramParametersSlot slot)
 {
   if (slot < 0 || slot >= ProgramParametersSlot_Num)
-    throw xtl::make_range_exception ("render::ProgramParametersLayout::ResetSlot", "slot", slot, 0, ProgramParametersSlot_Num);
+    throw xtl::make_range_exception ("render::manager::ProgramParametersLayout::ResetSlot", "slot", slot, 0, ProgramParametersSlot_Num);
     
   impl->slots [slot].layout_hash = 0;
 
@@ -367,7 +367,7 @@ void ProgramParametersLayout::Attach (const ProgramParametersLayout& layout)
   }
   catch (xtl::exception& e)
   {
-    e.touch ("render::ProgramParametersLayout::Attach");
+    e.touch ("render::manager::ProgramParametersLayout::Attach");
     throw;
   }
 }
@@ -417,7 +417,7 @@ LowLevelProgramParametersLayoutPtr& ProgramParametersLayout::DeviceLayout ()
   }
   catch (xtl::exception& e)
   {
-    e.touch ("render::ProgramParametersLayout::DeviceLayout");
+    e.touch ("render::manager::ProgramParametersLayout::DeviceLayout");
     throw;
   }      
 }

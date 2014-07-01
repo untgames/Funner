@@ -167,6 +167,25 @@ class DriverManagerImpl
       return driver->CreateSwapChain (adapters.size (), &adapters [0], swap_chain_desc);
     }
 
+    ISwapChain* CreateSwapChain
+     (IDriver*             driver,          //драйвер
+      const char*          adapter_mask,    //маска имени адаптера
+      const SwapChainDesc& swap_chain_desc) //дескриптор цепочки обмена
+    {
+      if (!driver)
+        throw xtl::make_null_argument_exception ("render::low_level::DriverManager::CreateSwapChain(IDriver*,const char*, const SwapChainDesc&)", "driver");
+
+        //поиск адаптеров
+        
+      AdapterArray adapters;        
+
+      FillAdapters (*driver, adapter_mask, adapters);
+
+        //создание SwapChain и устройства отрисовки
+
+      return driver->CreateSwapChain (adapters.size (), &adapters [0], swap_chain_desc);
+    }
+
 ///Создание устройства отрисовки
     void CreateSwapChainAndDevice
      (const char*               driver_mask,     //маска имени драйвера
@@ -238,6 +257,29 @@ class DriverManagerImpl
       return -1;
     }
 
+///Заполенение таблицы адаптеров
+    void FillAdapters (IDriver& driver, const char* adapter_mask, AdapterArray& adapters)
+    {
+        //поиск предпочтительных адаптеров            
+
+      adapters.clear   ();
+      adapters.reserve (driver.GetAdaptersCount ());
+
+      for (size_t i=0, count=driver.GetAdaptersCount (); i<count; i++)
+      {
+        IAdapter*   adapter      = driver.GetAdapter (i);
+        const char* adapter_name = "";
+
+        if (!adapter || !(adapter_name = adapter->GetName ()))
+          continue; //проверка корректности параметров адаптера
+          
+        if (!wcimatch (adapter_name, adapter_mask))
+          continue;
+          
+        adapters.push_back (adapter);
+      }
+    }
+
 ///Получение драйвера
     IDriver* GetDriver (const char* driver_mask, const char* adapter_mask, AdapterArray& adapters)
     {
@@ -260,24 +302,7 @@ class DriverManagerImpl
         {
           IDriver* driver = iter->driver.get ();
           
-            //поиск предпочтительных адаптеров            
-
-          adapters.clear   ();
-          adapters.reserve (driver->GetAdaptersCount ());
-
-          for (size_t i=0, count=driver->GetAdaptersCount (); i<count; i++)
-          {
-            IAdapter*   adapter      = driver->GetAdapter (i);
-            const char* adapter_name = "";
-
-            if (!adapter || !(adapter_name = adapter->GetName ()))
-              continue; //проверка корректности параметров адаптера
-              
-            if (!wcimatch (adapter_name, adapter_mask))
-              continue;
-              
-            adapters.push_back (adapter);
-          }          
+          FillAdapters (*driver, adapter_mask, adapters);          
           
           if (!adapters.empty ())
             return driver;
@@ -370,6 +395,14 @@ ISwapChain* DriverManager::CreateSwapChain
   const SwapChainDesc& swap_chain_desc)
 {
   return DriverManagerSingleton::Instance ()->CreateSwapChain (driver_mask, adapter_mask, swap_chain_desc);
+}
+
+ISwapChain* DriverManager::CreateSwapChain
+ (IDriver*             driver,
+  const char*          adapter_mask,
+  const SwapChainDesc& swap_chain_desc)
+{
+  return DriverManagerSingleton::Instance ()->CreateSwapChain (driver, adapter_mask, swap_chain_desc);
 }
 
 void DriverManager::CreateSwapChainAndDevice

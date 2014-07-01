@@ -1,0 +1,9 @@
+Results of context1_test:
+ServerProcessor::LoadResource('resource1')
+ServerProcessor::SetImage(4x4x1xl8)
+ClientProcessor::Dummy(1, 2)
+ServerProcessor::~Processor()
+ClientProcessor::~Processor()
+ServerRemoteProcessor::SetImage(4x4x1xl8)
+ServerRemoteProcessor::~Processor()
+ClientRemoteProcessor::~Processor()

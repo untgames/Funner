@@ -1,6 +1,6 @@
 #include "shared.h"
 
-using namespace render;
+using namespace render::manager;
 
 Frame::Frame (FrameImpl* in_impl)
   : impl (in_impl)
@@ -25,49 +25,107 @@ Frame& Frame::operator = (const Frame& frame)
   return *this;
 }
 
-void Frame::SetRenderTarget (const char* name, const render::RenderTarget& target)
+void Frame::SetRenderTargets (const RenderTargetMap& map)
 {
-  impl->SetRenderTarget (name, Wrappers::Unwrap<RenderTargetImpl> (target));
+  impl->SetRenderTargets (*Wrappers::Unwrap<RenderTargetMapImpl> (map));
 }
 
-void Frame::SetRenderTarget (const char* name, const render::RenderTarget& target, const render::Viewport& viewport)
+RenderTargetMap Frame::RenderTargets () const
 {
-  impl->SetRenderTarget (name, Wrappers::Unwrap<RenderTargetImpl> (target), Wrappers::Unwrap<ViewportImpl> (viewport));
+  return Wrappers::Wrap<RenderTargetMap> (&impl->RenderTargets ());
 }
 
-void Frame::SetRenderTarget (const char* name, const render::RenderTarget& target, const render::Viewport& viewport, const RectArea& scissor)
+void Frame::SetRenderTarget (const char* name, const render::manager::RenderTarget& target)
 {
-  impl->SetRenderTarget (name, Wrappers::Unwrap<RenderTargetImpl> (target), Wrappers::Unwrap<ViewportImpl> (viewport), Wrappers::Unwrap<RectAreaImpl> (scissor));
+  try
+  {
+    impl->RenderTargets ().SetRenderTarget (name, Wrappers::Unwrap<RenderTargetImpl> (target));
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::manager::Frame::SetRenderTarget(const char*,const RenderTarget&)");
+    throw;
+  }
+}
+
+void Frame::SetRenderTarget (const char* name, const render::manager::RenderTarget& target, const render::manager::Viewport& viewport)
+{
+  try
+  {
+    impl->RenderTargets ().SetRenderTarget (name, Wrappers::Unwrap<RenderTargetImpl> (target), Wrappers::Unwrap<ViewportImpl> (viewport));
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::manager::Frame::SetRenderTarget(const char*,const RenderTarget&,const Viewport&)");
+    throw;
+  }
+}
+
+void Frame::SetRenderTarget (const char* name, const render::manager::RenderTarget& target, const render::manager::Viewport& viewport, const RectArea& scissor)
+{
+  try
+  {
+    impl->RenderTargets ().SetRenderTarget (name, Wrappers::Unwrap<RenderTargetImpl> (target), Wrappers::Unwrap<ViewportImpl> (viewport), Wrappers::Unwrap<RectAreaImpl> (scissor));
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::manager::Frame::SetRenderTarget(const char*,const RenderTarget&,const Viewport&,const RectArea&)");
+    throw;
+  }
 }
 
 void Frame::RemoveRenderTarget (const char* name)
 {
-  impl->RemoveRenderTarget (name);
+  impl->RenderTargets ().RemoveRenderTarget (name);
 }
 
 void Frame::RemoveAllRenderTargets ()
 {
-  impl->RemoveAllRenderTargets ();
+  impl->RenderTargets ().RemoveAllRenderTargets ();
 }
 
 bool Frame::HasRenderTarget (const char* name) const
 {
-  return impl->FindRenderTarget (name) != RenderTargetPtr ();
+  return impl->RenderTargets ().FindRenderTarget (name) != RenderTargetPtr ();
 }
 
 RenderTarget Frame::RenderTarget (const char* name) const
 {
-  return Wrappers::Wrap<render::RenderTarget> (impl->RenderTarget (name));
+  try
+  {
+    return Wrappers::Wrap<render::manager::RenderTarget> (impl->RenderTargets ().RenderTarget (name));
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::manager::Frame::RenderTarget");
+    throw;
+  }
 }
 
 Viewport Frame::Viewport (const char* name) const
 {
-  return Wrappers::Wrap<render::Viewport> (impl->Viewport (name));
+  try
+  {
+    return Wrappers::Wrap<render::manager::Viewport> (impl->RenderTargets ().Viewport (name));
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::manager::Frame::Viewport");
+    throw;
+  }
 }
 
 RectArea Frame::Scissor (const char* name) const
 {
-  return Wrappers::Wrap<RectArea> (impl->Scissor (name));
+  try
+  {
+    return Wrappers::Wrap<RectArea> (impl->RenderTargets ().Scissor (name));
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::manager::Frame::Scissor");
+    throw;
+  }
 }
 
 void Frame::SetScissorState (bool state)
@@ -120,7 +178,7 @@ unsigned char Frame::ClearStencilIndex () const
   return impl->ClearStencilIndex ();
 }
 
-void Frame::SetLocalTexture (const char* name, const render::Texture& texture)
+void Frame::SetLocalTexture (const char* name, const render::manager::Texture& texture)
 {
   impl->SetLocalTexture (name, Wrappers::Unwrap<TextureImpl> (texture));
 }
@@ -180,9 +238,9 @@ size_t Frame::EntitiesCount () const
   return impl->EntitiesCount ();
 }
 
-void Frame::AddEntity (const Entity& entity)
+void Frame::AddEntity (const Entity& entity, void* user_data)
 {
-  impl->AddEntity (Wrappers::Unwrap<EntityImpl> (entity));
+  impl->AddEntity (Wrappers::Unwrap<EntityImpl> (entity), user_data);
 }
 
 void Frame::RemoveAllEntities ()
@@ -211,6 +269,16 @@ void Frame::RemoveAllFramesAndEntities ()
   impl->RemoveAllEntities ();
 }
 
+void Frame::SetAutoCleanup (bool state)
+{
+  impl->SetAutoCleanup (state);
+}
+
+bool Frame::IsAutoCleanupEnabled () const
+{
+  return impl->IsAutoCleanupEnabled ();
+}
+
 void Frame::SetEntityDrawHandler (const EntityDrawFunction& handler)
 {
   impl->SetEntityDrawHandler (handler);
@@ -221,14 +289,30 @@ const Frame::EntityDrawFunction& Frame::EntityDrawHandler () const
   return impl->EntityDrawHandler ();
 }
 
+void Frame::SetEntityDependentProperties (const common::PropertyMap& properties)
+{
+  impl->SetEntityDependentProperties (properties);
+}
+
+const common::PropertyMap& Frame::EntityDependentProperties () const
+{
+  return impl->EntityDependentProperties ();
+}
+
+void Frame::SetViewProjectionMatrix (const math::mat4f& tm)
+{
+  impl->SetViewProjectionMatrix (tm);
+}
+
+const math::mat4f& Frame::ViewProjectionMatrix () const
+{
+  return impl->ViewProjectionMatrix ();
+}
+
 void Frame::Draw ()
 {
   impl->Draw ();
 }
-
-/*
-    Управление кэшированием
-*/
 
 void Frame::UpdateCache ()
 {
@@ -248,9 +332,14 @@ void Frame::Swap (Frame& frame)
 namespace render
 {
 
+namespace manager
+{
+
 void swap (Frame& frame1, Frame& frame2)
 {
   frame1.Swap (frame2);
+}
+
 }
 
 }

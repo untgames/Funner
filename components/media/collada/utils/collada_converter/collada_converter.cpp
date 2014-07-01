@@ -1039,15 +1039,17 @@ void save_materials (const Params& params, const Model& model, ImagesMap& images
 
   media::rfx::MaterialLibrary material_library;
 
-  for (EffectLibrary::ConstIterator i = model.Effects ().CreateIterator (); i; ++i)
+  for (MaterialLibrary::ConstIterator i = model.Materials ().CreateIterator (); i; ++i)
   {
+    const Effect& effect = model.Effects () [i->Effect ()];
+
     media::rfx::Material material;
 
     stl::string id = params.output_resources_namespace.empty () ? i->Id () : common::format ("%s.%s", params.output_resources_namespace.c_str (), i->Id ());
 
     material.SetName (i->Id ());
 
-    switch (i->ShaderType ())
+    switch (effect.ShaderType ())
     {
       case ShaderType_Constant:
         material.SetProgram ("constant");
@@ -1062,31 +1064,31 @@ void save_materials (const Params& params, const Model& model, ImagesMap& images
         material.SetProgram ("blinn");
         break;
       default:
-        throw xtl::format_operation_exception ("save_materials", "Effect '%s' has unknown shader type", i->Id ());
+        throw xtl::format_operation_exception ("save_materials", "Effect '%s' has unknown shader type", effect.Id ());
     }
 
     common::PropertyMap& properties = material.Properties ();
 
-    properties.SetProperty ("Reflectivity", i->Param (EffectParam_Reflectivity));
-    properties.SetProperty ("Transparency", i->Param (EffectParam_Transparency));
-    properties.SetProperty ("Shininess",    i->Param (EffectParam_Shininess));
-    properties.SetProperty ("Diffuse",      i->MapColor (TextureMap_Diffuse));
-    properties.SetProperty ("Ambient",      i->MapColor (TextureMap_Ambient));
-    properties.SetProperty ("Specular",     i->MapColor (TextureMap_Specular));
-    properties.SetProperty ("Emission",     i->MapColor (TextureMap_Emission));
+    properties.SetProperty ("Reflectivity", effect.Param (EffectParam_Reflectivity));
+    properties.SetProperty ("Transparency", effect.Param (EffectParam_Transparency));
+    properties.SetProperty ("Shininess",    effect.Param (EffectParam_Shininess));
+    properties.SetProperty ("Diffuse",      effect.MapColor (TextureMap_Diffuse));
+    properties.SetProperty ("Ambient",      effect.MapColor (TextureMap_Ambient));
+    properties.SetProperty ("Specular",     effect.MapColor (TextureMap_Specular));
+    properties.SetProperty ("Emission",     effect.MapColor (TextureMap_Emission));
 
-    if (i->HasTexture (TextureMap_Bump))
+    if (effect.HasTexture (TextureMap_Bump))
     {
-      const Texture& texture = i->Texture (TextureMap_Bump);
+      const Texture& texture = effect.Texture (TextureMap_Bump);
 
       properties.SetProperty ("BumpAmount", texture.Amount ());
     }
 
-    if (i->HasTexture (TextureMap_Transparent))
+    if (effect.HasTexture (TextureMap_Transparent))
       properties.SetProperty ("BlendMode", "translucent");
 
     for (size_t j = 0; j < TextureMap_Num; j++)
-      add_texmap (params, *i, (TextureMap)j, images_map, material);
+      add_texmap (params, effect, (TextureMap)j, images_map, material);
 
     material_library.Attach (id.c_str (), material);
   }

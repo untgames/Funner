@@ -231,8 +231,33 @@ const char* Thread::Name () const
 */
 
 void Thread::SetPriority (ThreadPriority thread_priority)
+{  
+  try
+  {
+    Platform::SetThreadPriority (impl->handle, thread_priority);
+  }
+  catch (xtl::exception& exception)
+  {
+    exception.touch ("syslib::Thread::SetThreadPriority");
+    throw;
+  }
+}
+
+/*
+    Установка маски процессоров
+*/
+
+void Thread::SetAffinity (size_t affinity)
 {
-  Platform::SetThreadPriority (impl->handle, thread_priority);
+  try
+  {
+    Platform::SetThreadAffinity (impl->handle, affinity);
+  }
+  catch (xtl::exception& exception)
+  {
+    exception.touch ("syslib::Thread::SetThreadAffinity");
+    throw;
+  }
 }
 
 /*

@@ -12,7 +12,7 @@ export.link.render.low_level.opengl_driver.linux.IMPORTS       := link.system
 export.link.render.low_level.opengl_driver.beagleboard.IMPORTS := link.extern.beagleboard
 export.link.render.low_level.opengl_driver.meego_ia32.IMPORTS  := link.extern.meego_ia32
 export.link.render.low_level.opengl_driver.beagleboard.LIBS    := EGL GLES_CM srv_um IMGegl
-export.link.render.low_level.opengl_driver.android.LIBS        := EGL GLESv1_CM
+export.link.render.low_level.opengl_driver.android.LIBS        := EGL GLESv2
 export.link.render.low_level.opengl_driver.tabletos.LIBS       := EGL GLESv1_CM
 
 ifneq (meego-ia32,$(TOOLSET))
@@ -27,4 +27,9 @@ ifneq (,$(filter gles,$(PROFILES)))
 export.link.render.low_level.opengl_driver.win32.IMPORTS := link.extern.gles_win32
 export.run.render.low_level.opengl_driver.win32.IMPORTS  := run.extern.gles_win32
 export.link.render.low_level.opengl_driver.wince.IMPORTS := link.extern.gles_wince
+endif
+
+ifneq (,$(filter gles2,$(PROFILES)))
+export.link.render.low_level.opengl_driver.win32.IMPORTS := link.extern.angle
+export.run.render.low_level.opengl_driver.win32.IMPORTS  := run.extern.angle
 endif

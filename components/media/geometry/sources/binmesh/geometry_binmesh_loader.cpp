@@ -16,7 +16,7 @@ using namespace common;
  *
  * vertex_buffer_desc format: array<size_t> vertex_weigth_stream_id (0-1); array<size_t> vertex_stream_id;
  *
- * index_buffer format: array<unsigned int> indices
+ * index_buffer format: IndexType type, array<index_type> indices
  *
  * mesh format: array<char> name; array<size_t> index_buffer (0-1); array<size_t> vertex_buffers; array<primitive> primitives;
  *
@@ -34,7 +34,7 @@ namespace bin_mesh_loader
 */
 
 const char HEADER [4] = {'B', 'M', 'S', 'H'};
-const int VERSION = 2;
+const int VERSION = 3;
 
 void file_read (InputFile& file, void* data, size_t size)
 {
@@ -227,21 +227,21 @@ class BinMeshLibraryLoader
       //чтение индексного буфера
     void ReadIndexBuffer (size_t id)
     {
+      IndexType data_type = IndexType_Default;
+
+      file_read (input_file, (int*)&data_type, sizeof (data_type));
+
       size_t indices_count;
 
       file_read (input_file, &indices_count, sizeof (indices_count));
       
-      IndexType data_type = IndexType_Default;
-      
-      file_read (input_file, (int*)&data_type, sizeof (data_type));
-
         //создание буфера
 
       IndexBuffer ib (indices_count, data_type);
 
         //чтение индексов
 
-      file_read (input_file, ib.Data (), indices_count * sizeof (unsigned int));
+      file_read (input_file, ib.Data (), indices_count * get_index_type_size (data_type));
 
         //регистрация потока
 

@@ -1,0 +1,40 @@
+Results of properties_test:
+reader: update property map command received
+initial sync
+map has 2 properties:
+ #0: name='X', type=string, value='hello'
+ #1: name='Y', type=integer, value='13'
+sync two maps with same layout
+reader: update property map command received
+properties2:
+map has 2 properties:
+ #0: name='X', type=string, value='hello'
+ #1: name='Y', type=integer, value='13'
+properties4:
+map has 2 properties:
+ #0: name='X', type=string, value='hello2'
+ #1: name='Y', type=integer, value='14'
+sync after layout change
+reader: update property map command received
+properties2:
+map has 3 properties:
+ #0: name='X', type=string, value='hello'
+ #1: name='Y', type=integer, value='13'
+ #2: name='Z', type=string, value='hello1'
+properties4:
+map has 2 properties:
+ #0: name='X', type=string, value='hello2'
+ #1: name='Y', type=integer, value='14'
+sync without layout change:
+reader: update property map command received
+map has 3 properties:
+ #0: name='X', type=string, value='hello'
+ #1: name='Y', type=integer, value='15'
+ #2: name='Z', type=string, value='hello3'
+empty update
+before exit from scope
+PropertyMapWriterListener::OnPropertyLayoutRemoved
+PropertyMapWriterListener::OnPropertyMapRemoved
+PropertyMapWriterListener::OnPropertyLayoutRemoved
+PropertyMapWriterListener::OnPropertyMapRemoved
+after exit from scope

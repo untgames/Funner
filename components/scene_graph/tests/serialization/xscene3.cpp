@@ -21,6 +21,10 @@ int main ()
     manager.LoadScene ("data/test3.xscene", "", &print_log);
     
     SceneContext context;
+
+    media::FontLibrary font_library;
+
+    context.Attach (font_library);
     
     context.SetLogHandler (&print_log);
     

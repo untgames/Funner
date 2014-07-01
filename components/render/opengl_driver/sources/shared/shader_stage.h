@@ -18,6 +18,9 @@ namespace low_level
 namespace opengl
 {
 
+//forward declarations
+class IVertexAttributeDictionary;
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Shader-stage
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -56,9 +59,10 @@ class ShaderStage
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Получение состояния, вьюпорта и отсечения
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    IProgramParametersLayout* GetProgramParametersLayout () const;
-    IProgram*                 GetProgram                () const;
-    IBuffer*                  GetConstantBuffer         (size_t buffer_slot) const;
+    IProgramParametersLayout*   GetProgramParametersLayout   () const;
+    IProgram*                   GetProgram                   () const;
+    IBuffer*                    GetConstantBuffer            (size_t buffer_slot) const;
+    IVertexAttributeDictionary* GetVertexAttributeDictionary () const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Получение строки поддерживаемых контекстом профилей шейдеров

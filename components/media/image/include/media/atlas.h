@@ -21,6 +21,7 @@ struct Tile
   const char*  image;
   math::vec2ui origin;
   math::vec2ui size;
+  size_t       tag;
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -67,13 +68,13 @@ class Atlas
 ///Добавление тайла
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     size_t Insert (const media::Tile& new_tile);
-    size_t Insert (const char* name, const char* image, const math::vec2ui& origin, const math::vec2ui& size);
+    size_t Insert (const char* name, const char* image, const math::vec2ui& origin, const math::vec2ui& size, size_t tag = 0);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Изменение тайла
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void Set (size_t tile_index, const media::Tile& new_tile);
-    void Set (size_t tile_index, const char* name, const char* image, const math::vec2ui& origin, const math::vec2ui& size);
+    void Set (size_t tile_index, const char* name, const char* image, const math::vec2ui& origin, const math::vec2ui& size, size_t tag = 0);
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Удаление тайла

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<material_library>
+  <layouts/>
+  <texmaps/>
+  <materials>
+    <material id="text_material" program="text" tags="transparent">
+      <property name="DiffuseColor" type="vector">
+        0 0 0 0
+      </property>
+      <texmap semantic="font_mask" image="" sampler="default"/>
+    </material>
+  </materials>
+</material_library>

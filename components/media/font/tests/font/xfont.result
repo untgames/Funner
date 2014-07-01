@@ -1,0 +1,229 @@
+Results of xfont test:
+Loaded fonts:
+  Times New Roman - Regular
+    source            = 'data/times.xfont'
+    name              = 'Times New Roman Regular'
+    family name       = 'Times New Roman'
+    style name        = 'Regular'
+    glyphs count      = 75
+    first glyph code  = 48
+    font size         = 50
+    glyphs:
+      '0' = w = 23.00 h = 35.00 bx = 2.00 by = 33.00 ax = 25.00 ay = 0.00
+      '1' = w = 16.00 h = 35.00 bx = 6.00 by = 33.00 ax = 25.00 ay = 0.00
+      '2' = w = 24.00 h = 35.00 bx = 1.00 by = 33.00 ax = 25.00 ay = 0.00
+      '3' = w = 21.00 h = 35.00 bx = 2.00 by = 33.00 ax = 25.00 ay = 0.00
+      '4' = w = 24.00 h = 35.00 bx = 1.00 by = 33.00 ax = 25.00 ay = 0.00
+      '5' = w = 20.00 h = 35.00 bx = 3.00 by = 33.00 ax = 25.00 ay = 0.00
+      '6' = w = 23.00 h = 35.00 bx = 2.00 by = 33.00 ax = 25.00 ay = 0.00
+      '7' = w = 25.00 h = 35.00 bx = 2.00 by = 33.00 ax = 25.00 ay = 0.00
+      '8' = w = 21.00 h = 35.00 bx = 3.00 by = 33.00 ax = 25.00 ay = 0.00
+      '9' = w = 23.00 h = 35.00 bx = 2.00 by = 33.00 ax = 25.00 ay = 0.00
+      ':' = w = 19.00 h = 37.00 bx = 2.00 by = 34.00 ax = 21.00 ay = 0.00
+      ';' = w = 19.00 h = 37.00 bx = 2.00 by = 34.00 ax = 21.00 ay = 0.00
+      '<' = w = 19.00 h = 37.00 bx = 2.00 by = 34.00 ax = 21.00 ay = 0.00
+      '=' = w = 19.00 h = 37.00 bx = 2.00 by = 34.00 ax = 21.00 ay = 0.00
+      '>' = w = 19.00 h = 37.00 bx = 2.00 by = 34.00 ax = 21.00 ay = 0.00
+      '?' = w = 19.00 h = 37.00 bx = 2.00 by = 34.00 ax = 21.00 ay = 0.00
+      '@' = w = 19.00 h = 37.00 bx = 2.00 by = 34.00 ax = 21.00 ay = 0.00
+      'A' = w = 38.00 h = 36.00 bx = 0.00 by = 34.00 ax = 35.00 ay = 0.00
+      'B' = w = 32.00 h = 35.00 bx = 0.00 by = 33.00 ax = 33.00 ay = 0.00
+      'C' = w = 31.00 h = 37.00 bx = 2.00 by = 34.00 ax = 33.00 ay = 0.00
+      'D' = w = 36.00 h = 35.00 bx = 0.00 by = 33.00 ax = 36.00 ay = 0.00
+      'E' = w = 32.00 h = 35.00 bx = 0.00 by = 33.00 ax = 31.00 ay = 0.00
+      'F' = w = 27.00 h = 35.00 bx = 0.00 by = 33.00 ax = 27.00 ay = 0.00
+      'G' = w = 37.00 h = 37.00 bx = 2.00 by = 34.00 ax = 36.00 ay = 0.00
+      'H' = w = 38.00 h = 35.00 bx = 0.00 by = 33.00 ax = 36.00 ay = 0.00
+      'I' = w = 17.00 h = 35.00 bx = 1.00 by = 33.00 ax = 17.00 ay = 0.00
+      'J' = w = 20.00 h = 36.00 bx = 1.00 by = 33.00 ax = 19.00 ay = 0.00
+      'K' = w = 37.00 h = 35.00 bx = 0.00 by = 33.00 ax = 35.00 ay = 0.00
+      'L' = w = 32.00 h = 35.00 bx = 0.00 by = 33.00 ax = 30.00 ay = 0.00
+      'M' = w = 46.00 h = 35.00 bx = 0.00 by = 33.00 ax = 44.00 ay = 0.00
+      'N' = w = 39.00 h = 36.00 bx = -1.00 by = 33.00 ax = 36.00 ay = 0.00
+      'O' = w = 34.00 h = 37.00 bx = 2.00 by = 34.00 ax = 36.00 ay = 0.00
+      'P' = w = 28.00 h = 35.00 bx = 0.00 by = 33.00 ax = 28.00 ay = 0.00
+      'Q' = w = 34.00 h = 45.00 bx = 2.00 by = 34.00 ax = 36.00 ay = 0.00
+      'R' = w = 37.00 h = 35.00 bx = 0.00 by = 33.00 ax = 33.00 ay = 0.00
+      'S' = w = 23.00 h = 37.00 bx = 4.00 by = 34.00 ax = 28.00 ay = 0.00
+      'T' = w = 29.00 h = 35.00 bx = 2.00 by = 33.00 ax = 31.00 ay = 0.00
+      'U' = w = 38.00 h = 36.00 bx = 0.00 by = 33.00 ax = 36.00 ay = 0.00
+      'V' = w = 38.00 h = 36.00 bx = 0.00 by = 33.00 ax = 36.00 ay = 0.00
+      'W' = w = 50.00 h = 36.00 bx = -1.00 by = 33.00 ax = 46.00 ay = 0.00
+      'X' = w = 39.00 h = 35.00 bx = 0.00 by = 33.00 ax = 36.00 ay = 0.00
+      'Y' = w = 38.00 h = 35.00 bx = 0.00 by = 33.00 ax = 36.00 ay = 0.00
+      'Z' = w = 31.00 h = 35.00 bx = 0.00 by = 33.00 ax = 30.00 ay = 0.00
+      '[' = w = 19.00 h = 37.00 bx = 2.00 by = 34.00 ax = 21.00 ay = 0.00
+      '\' = w = 19.00 h = 37.00 bx = 2.00 by = 34.00 ax = 21.00 ay = 0.00
+      ']' = w = 19.00 h = 37.00 bx = 2.00 by = 34.00 ax = 21.00 ay = 0.00
+      '^' = w = 19.00 h = 37.00 bx = 2.00 by = 34.00 ax = 21.00 ay = 0.00
+      '_' = w = 19.00 h = 37.00 bx = 2.00 by = 34.00 ax = 21.00 ay = 0.00
+      '`' = w = 19.00 h = 37.00 bx = 2.00 by = 34.00 ax = 21.00 ay = 0.00
+      'a' = w = 22.00 h = 26.00 bx = 2.00 by = 23.00 ax = 22.00 ay = 0.00
+      'b' = w = 25.00 h = 38.00 bx = 0.00 by = 35.00 ax = 24.00 ay = 0.00
+      'c' = w = 22.00 h = 26.00 bx = 2.00 by = 23.00 ax = 22.00 ay = 0.00
+      'd' = w = 26.00 h = 38.00 bx = 1.00 by = 35.00 ax = 25.00 ay = 0.00
+      'e' = w = 22.00 h = 26.00 bx = 2.00 by = 23.00 ax = 22.00 ay = 0.00
+      'f' = w = 22.00 h = 37.00 bx = 1.00 by = 35.00 ax = 15.00 ay = 0.00
+      'g' = w = 25.00 h = 36.00 bx = 1.00 by = 23.00 ax = 25.00 ay = 0.00
+      'h' = w = 26.00 h = 37.00 bx = 1.00 by = 35.00 ax = 24.00 ay = 0.00
+      'i' = w = 13.00 h = 37.00 bx = 1.00 by = 35.00 ax = 12.00 ay = 0.00
+      'j' = w = 14.00 h = 48.00 bx = -4.00 by = 35.00 ax = 12.00 ay = 0.00
+      'k' = w = 27.00 h = 37.00 bx = 1.00 by = 35.00 ax = 25.00 ay = 0.00
+      'l' = w = 13.00 h = 37.00 bx = 1.00 by = 35.00 ax = 12.00 ay = 0.00
+      'm' = w = 39.00 h = 25.00 bx = 1.00 by = 23.00 ax = 37.00 ay = 0.00
+      'n' = w = 26.00 h = 25.00 bx = 1.00 by = 23.00 ax = 24.00 ay = 0.00
+      'o' = w = 24.00 h = 26.00 bx = 2.00 by = 23.00 ax = 26.00 ay = 0.00
+      'p' = w = 25.00 h = 36.00 bx = 1.00 by = 23.00 ax = 25.00 ay = 0.00
+      'q' = w = 24.00 h = 36.00 bx = 2.00 by = 23.00 ax = 25.00 ay = 0.00
+      'r' = w = 19.00 h = 25.00 bx = 1.00 by = 23.00 ax = 17.00 ay = 0.00
+      's' = w = 17.00 h = 26.00 bx = 3.00 by = 23.00 ax = 19.00 ay = 0.00
+      't' = w = 16.00 h = 32.00 bx = 0.00 by = 29.00 ax = 15.00 ay = 0.00
+      'u' = w = 27.00 h = 25.00 bx = 0.00 by = 22.00 ax = 25.00 ay = 0.00
+      'v' = w = 28.00 h = 25.00 bx = -1.00 by = 22.00 ax = 24.00 ay = 0.00
+      'w' = w = 39.00 h = 25.00 bx = 0.00 by = 22.00 ax = 36.00 ay = 0.00
+      'x' = w = 26.00 h = 24.00 bx = 0.00 by = 22.00 ax = 24.00 ay = 0.00
+      'y' = w = 27.00 h = 35.00 bx = -1.00 by = 22.00 ax = 23.00 ay = 0.00
+      'z' = w = 22.00 h = 24.00 bx = 1.00 by = 22.00 ax = 22.00 ay = 0.00
+    kernings:
+      kerning '1' - '1' = -1.86 0.00
+      kerning 'A' - 'T' = -5.55 0.00
+      kerning 'A' - 'V' = -6.45 0.00
+      kerning 'A' - 'W' = -4.00 0.00
+      kerning 'A' - 'Y' = -4.59 0.00
+      kerning 'A' - 'v' = -3.72 0.00
+      kerning 'A' - 'w' = -4.59 0.00
+      kerning 'A' - 'y' = -4.59 0.00
+      kerning 'F' - 'A' = -3.72 0.00
+      kerning 'L' - 'T' = -4.59 0.00
+      kerning 'L' - 'V' = -4.59 0.00
+      kerning 'L' - 'W' = -3.72 0.00
+      kerning 'L' - 'Y' = -5.00 0.00
+      kerning 'L' - 'y' = -2.77 0.00
+      kerning 'P' - 'A' = -4.59 0.00
+      kerning 'R' - 'T' = -3.00 0.00
+      kerning 'R' - 'V' = -4.00 0.00
+      kerning 'R' - 'W' = -2.77 0.00
+      kerning 'R' - 'Y' = -2.77 0.00
+      kerning 'R' - 'y' = -2.00 0.00
+      kerning 'T' - 'A' = -4.00 0.00
+      kerning 'T' - 'O' = -0.91 0.00
+      kerning 'T' - 'a' = -3.48 0.00
+      kerning 'T' - 'c' = -3.48 0.00
+      kerning 'T' - 'e' = -3.48 0.00
+      kerning 'T' - 'i' = -1.77 0.00
+      kerning 'T' - 'o' = -3.48 0.00
+      kerning 'T' - 'r' = -1.77 0.00
+      kerning 'T' - 's' = -3.48 0.00
+      kerning 'T' - 'u' = -1.77 0.00
+      kerning 'T' - 'w' = -3.48 0.00
+      kerning 'T' - 'y' = -3.48 0.00
+      kerning 'V' - 'A' = -6.45 0.00
+      kerning 'V' - 'a' = -5.55 0.00
+      kerning 'V' - 'e' = -5.55 0.00
+      kerning 'V' - 'i' = -3.00 0.00
+      kerning 'V' - 'o' = -6.45 0.00
+      kerning 'V' - 'r' = -3.00 0.00
+      kerning 'V' - 'u' = -3.00 0.00
+      kerning 'V' - 'y' = -5.55 0.00
+      kerning 'W' - 'A' = -5.55 0.00
+      kerning 'W' - 'a' = -4.00 0.00
+      kerning 'W' - 'e' = -4.00 0.00
+      kerning 'W' - 'i' = -2.00 0.00
+      kerning 'W' - 'o' = -4.00 0.00
+      kerning 'W' - 'r' = -2.00 0.00
+      kerning 'W' - 'u' = -2.00 0.00
+      kerning 'W' - 'y' = -3.00 0.00
+      kerning 'Y' - 'A' = -5.55 0.00
+      kerning 'Y' - 'a' = -5.00 0.00
+      kerning 'Y' - 'e' = -5.00 0.00
+      kerning 'Y' - 'i' = -2.77 0.00
+      kerning 'Y' - 'o' = -5.00 0.00
+      kerning 'Y' - 'p' = -4.59 0.00
+      kerning 'Y' - 'q' = -5.55 0.00
+      kerning 'Y' - 'u' = -5.55 0.00
+      kerning 'Y' - 'v' = -5.00 0.00
+      kerning 'f' - 'f' = -0.91 0.00
+      kerning 'r' - 'g' = -0.91 0.00
+    images count = 2
+    rasterized glyphs:
+      '0' = image = 1 x = 37 y = 35 w = 23 h = 35
+      '1' = image = 1 x = 137 y = 81 w = 16 h = 35
+      '2' = image = 1 x = 35 y = 80 w = 24 h = 35
+      '3' = image = 1 x = 69 y = 125 w = 21 h = 35
+      '4' = image = 1 x = 35 y = 125 w = 24 h = 35
+      '5' = image = 1 x = 100 y = 47 w = 20 h = 35
+      '6' = image = 1 x = 67 y = 170 w = 23 h = 35
+      '7' = image = 1 x = 0 y = 172 w = 25 h = 35
+      '8' = image = 1 x = 69 y = 80 w = 21 h = 35
+      '9' = image = 1 x = 67 y = 215 w = 23 h = 35
+      ':' = image = 1 x = 100 y = 0 w = 19 h = 37
+      ';' = image = 1 x = 100 y = 0 w = 19 h = 37
+      '<' = image = 1 x = 100 y = 0 w = 19 h = 37
+      '=' = image = 1 x = 100 y = 0 w = 19 h = 37
+      '>' = image = 1 x = 100 y = 0 w = 19 h = 37
+      '?' = image = 1 x = 100 y = 0 w = 19 h = 37
+      '@' = image = 1 x = 100 y = 0 w = 19 h = 37
+      'A' = image = 0 x = 49 y = 137 w = 38 h = 36
+      'B' = image = 0 x = 108 y = 0 w = 32 h = 35
+      'C' = image = 0 x = 144 y = 90 w = 31 h = 37
+      'D' = image = 0 x = 105 y = 45 w = 36 h = 35
+      'E' = image = 0 x = 150 y = 0 w = 32 h = 35
+      'F' = image = 0 x = 229 y = 0 w = 27 h = 35
+      'G' = image = 0 x = 0 y = 192 w = 37 h = 37
+      'H' = image = 0 x = 92 y = 91 w = 38 h = 35
+      'I' = image = 1 x = 129 y = 0 w = 17 h = 35
+      'J' = image = 1 x = 70 y = 0 w = 20 h = 36
+      'K' = image = 0 x = 95 y = 183 w = 37 h = 35
+      'L' = image = 0 x = 151 y = 45 w = 32 h = 35
+      'M' = image = 0 x = 0 y = 46 w = 46 h = 35
+      'N' = image = 0 x = 0 y = 146 w = 39 h = 36
+      'O' = image = 0 x = 142 y = 181 w = 34 h = 37
+      'P' = image = 0 x = 223 y = 180 w = 28 h = 35
+      'Q' = image = 0 x = 0 y = 91 w = 34 h = 45
+      'R' = image = 0 x = 97 y = 136 w = 37 h = 35
+      'S' = image = 1 x = 34 y = 217 w = 23 h = 37
+      'T' = image = 0 x = 185 y = 135 w = 29 h = 35
+      'U' = image = 0 x = 44 y = 91 w = 38 h = 36
+      'V' = image = 0 x = 47 y = 192 w = 38 h = 36
+      'W' = image = 0 x = 0 y = 0 w = 50 h = 36
+      'X' = image = 0 x = 56 y = 46 w = 39 h = 35
+      'Y' = image = 0 x = 60 y = 0 w = 38 h = 35
+      'Z' = image = 0 x = 185 y = 90 w = 31 h = 35
+      '[' = image = 1 x = 100 y = 0 w = 19 h = 37
+      '\' = image = 1 x = 100 y = 0 w = 19 h = 37
+      ']' = image = 1 x = 100 y = 0 w = 19 h = 37
+      '^' = image = 1 x = 100 y = 0 w = 19 h = 37
+      '_' = image = 1 x = 100 y = 0 w = 19 h = 37
+      '`' = image = 1 x = 100 y = 0 w = 19 h = 37
+      'a' = image = 1 x = 136 y = 161 w = 22 h = 26
+      'b' = image = 0 x = 226 y = 130 w = 25 h = 38
+      'c' = image = 1 x = 130 y = 45 w = 22 h = 26
+      'd' = image = 0 x = 193 y = 0 w = 26 h = 38
+      'e' = image = 1 x = 134 y = 220 w = 22 h = 26
+      'f' = image = 1 x = 35 y = 170 w = 22 h = 37
+      'g' = image = 1 x = 0 y = 80 w = 25 h = 36
+      'h' = image = 0 x = 226 y = 83 w = 26 h = 37
+      'i' = image = 1 x = 166 y = 197 w = 13 h = 37
+      'j' = image = 1 x = 100 y = 127 w = 14 h = 48
+      'k' = image = 0 x = 186 y = 180 w = 27 h = 37
+      'l' = image = 1 x = 163 y = 76 w = 13 h = 37
+      'm' = image = 1 x = 0 y = 0 w = 39 h = 25
+      'n' = image = 1 x = 100 y = 185 w = 26 h = 25
+      'o' = image = 1 x = 100 y = 220 w = 24 h = 26
+      'p' = image = 1 x = 0 y = 126 w = 25 h = 36
+      'q' = image = 1 x = 0 y = 217 w = 24 h = 36
+      'r' = image = 1 x = 160 y = 126 w = 19 h = 25
+      's' = image = 1 x = 168 y = 161 w = 17 h = 26
+      't' = image = 1 x = 162 y = 34 w = 16 h = 32
+      'u' = image = 1 x = 100 y = 92 w = 27 h = 25
+      'v' = image = 0 x = 144 y = 137 w = 28 h = 25
+      'w' = image = 0 x = 193 y = 48 w = 39 h = 25
+      'x' = image = 1 x = 124 y = 127 w = 26 h = 24
+      'y' = image = 1 x = 0 y = 35 w = 27 h = 35
+      'z' = image = 1 x = 156 y = 0 w = 22 h = 24
+Image 0 hash = e05f96c9
+Image 1 hash = dadd07bb
+exception: data/bad_font.xfont(4): error: unclosed string
+    at media::xfont::XFontFontDesc::XFontFontDesc
+    at media::xfont_load
+    at media::FontLibrary::LoadFont ('data/bad_font.xfont')

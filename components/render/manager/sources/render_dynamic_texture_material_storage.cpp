@@ -1,6 +1,6 @@
 #include "shared.h"
 
-using namespace render;
+using namespace render::manager;
 using namespace render::low_level;
 
 //TODO: optimize perfomance of UpdateCacheCore
@@ -41,7 +41,7 @@ struct DynamicTextureMaterialStorage::Impl
     , owner (in_owner)
     , material (in_material)    
   {
-    static const char* METHOD_NAME = "render::DynamicTextureMaterialStorage::Impl::Impl";
+    static const char* METHOD_NAME = "render::manager::DynamicTextureMaterialStorage::Impl::Impl";
     
     if (!material)
       throw xtl::make_null_argument_exception (METHOD_NAME, "material");
@@ -79,7 +79,7 @@ void DynamicTextureMaterialStorage::UpdateMask (render::low_level::StateBlockMas
   }
   catch (xtl::exception& e)
   {
-    e.touch ("render::DynamicTextureMaterialStorage::UpdateMask");
+    e.touch ("render::manager::DynamicTextureMaterialStorage::UpdateMask");
     throw;
   }
 }
@@ -107,7 +107,7 @@ void DynamicTextureMaterialStorage::Apply (render::low_level::IDeviceContext& co
   }
   catch (xtl::exception& e)
   {
-    e.touch ("render::DynamicTextureMaterialStorage::Apply");
+    e.touch ("render::manager::DynamicTextureMaterialStorage::Apply");
     throw;
   }
 }
@@ -184,7 +184,7 @@ void DynamicTextureMaterialStorage::UpdateCacheCore ()
   }
   catch (xtl::exception& e)
   {
-    e.touch ("render::DynamicTextureMaterialStorage::UpdateCacheCore");
+    e.touch ("render::manager::DynamicTextureMaterialStorage::UpdateCacheCore");
     throw;
   }
 }

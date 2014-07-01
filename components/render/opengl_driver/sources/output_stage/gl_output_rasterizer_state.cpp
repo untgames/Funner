@@ -79,7 +79,7 @@ void RasterizerState::SetDesc (const RasterizerDesc& in_desc)
     
     //проверка корректности аргументов и преобразование дескриптора
     
-#ifndef OPENGL_ES_SUPPORT
+#if !defined(OPENGL_ES_SUPPORT) && !defined(OPENGL_ES2_SUPPORT)
 
   GLenum gl_fill_mode;
 
@@ -126,7 +126,7 @@ void RasterizerState::SetDesc (const RasterizerDesc& in_desc)
     
   CommandListBuilder cmd_list;
   
-#ifndef OPENGL_ES_SUPPORT
+#if !defined(OPENGL_ES_SUPPORT) && !defined(OPENGL_ES2_SUPPORT)
 
   cmd_list.Add (glPolygonMode, GL_FRONT_AND_BACK, gl_fill_mode);
   
@@ -149,9 +149,9 @@ void RasterizerState::SetDesc (const RasterizerDesc& in_desc)
       break;
   }
 
-  cmd_list.Add (glFrontFace, in_desc.front_counter_clockwise ? GL_CW : GL_CCW);
+  cmd_list.Add (glFrontFace, in_desc.front_counter_clockwise ? GL_CCW : GL_CW);
 
-#ifndef OPENGL_ES_SUPPORT
+#if !defined(OPENGL_ES_SUPPORT) && !defined(OPENGL_ES2_SUPPORT)
 
   if (in_desc.depth_bias)
   {
@@ -174,29 +174,35 @@ void RasterizerState::SetDesc (const RasterizerDesc& in_desc)
 
   if (in_desc.antialiased_line_enable && !in_desc.multisample_enable)
   {
+#ifndef OPENGL_ES2_SUPPORT
     cmd_list.Add (glEnable, GL_POINT_SMOOTH);
     cmd_list.Add (glEnable, GL_LINE_SMOOTH);
+#endif
     
-#ifndef OPENGL_ES_SUPPORT
-    cmd_list.Add (glEnable, GL_POLYGON_SMOOTH);    
+#if !defined(OPENGL_ES_SUPPORT) && !defined(OPENGL_ES2_SUPPORT)
+    cmd_list.Add (glEnable, GL_POLYGON_SMOOTH);
 #endif
   }
   else
   {
+#ifndef OPENGL_ES2_SUPPORT
     cmd_list.Add (glDisable, GL_POINT_SMOOTH);
     cmd_list.Add (glDisable, GL_LINE_SMOOTH);
+#endif
 
-#ifndef OPENGL_ES_SUPPORT    
+#if !defined(OPENGL_ES_SUPPORT) && !defined(OPENGL_ES2_SUPPORT)
     cmd_list.Add (glDisable, GL_POLYGON_SMOOTH);
 #endif
   }
 
   if (caps.has_arb_multisample && in_desc.multisample_enable)
   {
+#ifndef OPENGL_ES2_SUPPORT
 #ifndef OPENGL_ES_SUPPORT
     cmd_list.Add (glEnable, GL_MULTISAMPLE_ARB);
 #else
     cmd_list.Add (glEnable, GL_MULTISAMPLE);
+#endif
 #endif
   }
     

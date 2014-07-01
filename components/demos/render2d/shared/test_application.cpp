@@ -9,11 +9,13 @@
 
 #include <syslib/application.h>
 
-#include <render/mid_level/window_driver.h>
+#include <render/scene_render_client.h>
+#include <render/scene_render_server.h>
 
 #include "shared.h"
 
 using namespace common;
+using namespace render;
 
 namespace
 {
@@ -23,19 +25,18 @@ namespace
 */
 
 const char* CONFIGURATION_FILE_NAME   = "media/config.xml"; //имя файла конфигурации
-const char* MID_LEVEL_RENDERER_NAME   = "MyRenderer"; //имя системы визуализации среднего уровня
+const char* SERVER_NAME               = "MyServer";         //имя сервера рендеринга
 const char* MATERIAL_LIB_FILE_NAME    = "media/materials.xmtl"; //имя файла с материалами
 
 const size_t DEFAULT_WINDOW_WIDTH  = 400;             //начальная ширина окна
 const size_t DEFAULT_WINDOW_HEIGHT = 300;             //начальная высота окна
 const char*  DEFAULT_WINDOW_TITLE  = "Render2d test"; //заголовок окна
 
-const size_t DEFAULT_FB_COLOR_BITS    = 24; //глубина буфера цвета
-const size_t DEFAULT_FB_ALPHA_BITS    = 8;  //глубина альфа-буфера
-const size_t DEFAULT_FB_DEPTH_BITS    = 24; //глубина z-buffer'а
-const size_t DEFAULT_FB_STENCIL_BITS  = 8;  //глубина буфера трафарета
-const size_t DEFAULT_FB_BUFFERS_COUNT = 2;  //количество буферов в цепочке обмена
-const size_t DEFAULT_FB_FULL_SCREEN_STATE = 0; //fullscreen по умолчанию
+const size_t DEFAULT_FB_COLOR_BITS         = 24; //глубина буфера цвета
+const size_t DEFAULT_FB_ALPHA_BITS         = 8;  //глубина альфа-буфера
+const size_t DEFAULT_FB_DEPTH_BITS         = 24; //глубина z-buffer'а
+const size_t DEFAULT_FB_STENCIL_BITS       = 8;  //глубина буфера трафарета
+const bool   DEFAULT_FB_FULL_SCREEN_STATE  = 0;  //состояние full screen
 
 /*
     Утилиты
@@ -61,14 +62,19 @@ struct TestApplication::Impl
 {
   stl::auto_ptr<syslib::Window>  window;              //главное окно приложения
   xtl::auto_connection           app_idle_connection; //соединение сигнала обработчика холостого хода приложения
-  SceneRender                    render;              //рендер сцены
-  render::obsolete::RenderTarget render_target;       //цель рендеринга
+  scene::server::Server          render_server;       //сервер рендера сцены
+  scene::client::Client          render_client;       //клиент рендера сцены
+  scene::client::RenderTarget    render_target;       //цель рендеринга
+
+  Impl ()
+    : render_server (SERVER_NAME)
+    , render_client (SERVER_NAME)
+  {
+  }
   
   void OnClose ()
   {
     syslib::Application::Exit (0);
-
-    render.ResetRenderer ();
 
     app_idle_connection.disconnect ();
   }
@@ -142,16 +148,18 @@ TestApplication::TestApplication ()
 
       //инициализация системы рендеринга
 
-    render::mid_level::WindowDriver::RegisterRenderer (MID_LEVEL_RENDERER_NAME, cfg_root);
-    render::mid_level::WindowDriver::RegisterWindow (MID_LEVEL_RENDERER_NAME, *impl->window, cfg_root);
+    common::PropertyMap window_properties;
+    
+    window_properties.SetProperty ("ColorBits", get<int> (cfg_root, "ColorBits", DEFAULT_FB_COLOR_BITS));
+    window_properties.SetProperty ("DepthBits", get<int> (cfg_root, "DepthBits", DEFAULT_FB_DEPTH_BITS));
+    window_properties.SetProperty ("AlphaBits", get<int> (cfg_root, "AlphaBits", DEFAULT_FB_ALPHA_BITS));
+    window_properties.SetProperty ("AlphaBits", get<int> (cfg_root, "StencilBits", DEFAULT_FB_STENCIL_BITS));
+
+    impl->render_server.AttachWindow ("my_window", *impl->window, window_properties);
 
       //инициализация рендера
 
-    impl->render.SetLogHandler (&log_print);
-    impl->render.SetRenderer   (render::mid_level::WindowDriver::Name (), MID_LEVEL_RENDERER_NAME);
-//    impl->render.SetRenderer ("Debug", "Renderer2d");
-
-    impl->render_target = impl->render.RenderTarget (0);
+    impl->render_target = impl->render_client.CreateRenderTarget ("my_window");
   }
   catch (xtl::exception& exception)
   {
@@ -168,9 +176,9 @@ TestApplication::~TestApplication ()
     Получение объектов приложения
 */
 
-SceneRender& TestApplication::Render ()
+scene::client::Client& TestApplication::Render ()
 {
-  return impl->render;
+  return impl->render_client;
 }
 
 /*
@@ -179,7 +187,7 @@ SceneRender& TestApplication::Render ()
 
 void TestApplication::LoadResources ()
 {
-  impl->render.LoadResource (MATERIAL_LIB_FILE_NAME);
+  impl->render_client.LoadResource (MATERIAL_LIB_FILE_NAME);
 }
 
 /*
@@ -195,7 +203,7 @@ syslib::Window& TestApplication::Window ()
     Получение цели рендеринга
 */
 
-RenderTarget& TestApplication::RenderTarget ()
+scene::client::RenderTarget& TestApplication::RenderTarget ()
 {
   return impl->render_target;
 }

@@ -74,7 +74,7 @@ struct Test
 
     application.Render ().SetMaxDrawDepth (3);
 
-    application.Render ().RegisterQueryHandler ("test_query", xtl::bind (&Test::SetupDynamicRenderTarget, this, _1, _2));
+//    application.Render ().RegisterQueryHandler ("test_query", xtl::bind (&Test::SetupDynamicRenderTarget, this, _1, _2));
 
       //загрузка ресурсов
 

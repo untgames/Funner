@@ -9,8 +9,6 @@
 #include <syslib/application.h>
 #include <syslib/window.h>
 
-#include <render/scene_render.h>
-
 #include <engine/attachments.h>
 #include <engine/subsystem_manager.h>
 

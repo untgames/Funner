@@ -230,6 +230,11 @@ class FfpProgram: virtual public ICompiledProgram, virtual public IShader, publi
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     IBindableProgram* CreateBindableProgram (ProgramParametersLayout* layout);
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Получение словаря атрибутов
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    IVertexAttributeDictionary* GetVertexAttributeDictionary () { return 0; }
+
   private:
     FfpState               base_state;         //базовое состояние фиксированной программы шейдинга
     FfpDynamicParameterMap dynamic_parameters; //массив динамических параметров

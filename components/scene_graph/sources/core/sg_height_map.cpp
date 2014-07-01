@@ -241,5 +241,5 @@ xtl::connection HeightMap::RegisterEventHandler (HeightMapEvent event, const Eve
 void HeightMap::AcceptCore (Visitor& visitor)
 {
   if (!TryAccept (*this, visitor))
-    Entity::AcceptCore (visitor);
+    VisualModel::AcceptCore (visitor);
 }

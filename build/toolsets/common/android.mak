@@ -28,7 +28,7 @@ endif
 ###################################################################################################
 #Константы
 ###################################################################################################
-PROFILES                   += android no_dll unistd egl gles has_windows
+PROFILES                   += android no_dll unistd egl gles2 has_windows
 SDCARD_DIR                 := //mnt/sdcard
 REMOTE_DEBUG_DIR           ?= $(SDCARD_DIR)/funner
 EXE_SUFFIX                 :=

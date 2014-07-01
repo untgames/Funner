@@ -8,14 +8,14 @@ class RectAreaImpl: public Object
 ///Конструкторы
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     RectAreaImpl ();
-    RectAreaImpl (const render::Rect&);
+    RectAreaImpl (const render::manager::Rect&);
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Размеры области
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void                SetRect (const render::Rect& rect);
-    const render::Rect& Rect    () const { return rect; }
+    void                         SetRect (const render::manager::Rect& rect);
+    const render::manager::Rect& Rect    () const { return rect; }
         
   private:
-    render::Rect rect;
+    render::manager::Rect rect;
 };

@@ -212,3 +212,36 @@ void PThreadManager::SetThreadPriority (thread_t thread, ThreadPriority thread_p
     throw;
   }
 }
+
+void PThreadManager::SetThreadAffinity (thread_t thread, size_t affinity)
+{
+#ifdef __APPLE__
+  throw xtl::format_not_supported_exception ("syslib::PThreadManager::SetThreadAffinity");
+#else
+  try
+  {
+    if (!thread || !thread->thread)
+      throw xtl::make_null_argument_exception ("", "thread");
+
+    cpu_set_t cpuset;
+
+    CPU_ZERO (&cpuset);
+
+    size_t mask = 1;
+
+    for (int i=0; i<sizeof (affinity) * CHAR_BIT; i++, mask <<= 1)
+      if (affinity & mask)
+        CPU_SET (i, &cpuset);
+
+    int status = pthread_setaffinity_np ((pthread_t)thread->thread, sizeof (cpu_set_t), &cpuset);
+
+    if (status)
+      pthread_raise_error ("::pthread_setaffinity_np", status);
+  }
+  catch (xtl::exception& exception)
+  {
+    exception.touch ("syslib::PThreadManager::SetThreadAffinity");
+    throw;
+  }
+#endif
+}

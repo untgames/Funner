@@ -4,8 +4,10 @@ using namespace scene_graph;
 
 template class engine::decl_sg_cast<SoundEmitter, Node>;
 template class engine::decl_sg_cast<SoundEmitter, Entity>;
+template class engine::decl_sg_cast<SoundEmitter, VisualModel>;
 template class engine::decl_sg_cast<Listener,     Node>;
 template class engine::decl_sg_cast<Listener,     Entity>;
+template class engine::decl_sg_cast<Listener,     VisualModel>;
 
 namespace engine
 {
@@ -32,7 +34,7 @@ void bind_listener_library (Environment& environment)
 
     //наследование
 
-  lib.Register (environment, SCENE_ENTITY_LIBRARY);
+  lib.Register (environment, SCENE_VISUAL_MODEL_LIBRARY);
 
     //регистрация функций создания
 
@@ -67,7 +69,7 @@ void bind_sound_emitter_library (Environment& environment)
 
     //наследование
 
-  lib.Register (environment, SCENE_ENTITY_LIBRARY);
+  lib.Register (environment, SCENE_VISUAL_MODEL_LIBRARY);
 
     //регистрация функций создания
 

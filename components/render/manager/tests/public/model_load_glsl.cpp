@@ -19,7 +19,7 @@ math::mat4f get_ortho_proj (float left, float right, float bottom, float top, fl
   return proj_matrix;
 }
 
-void update_entity_frame_transformations (Frame& frame, Entity& entity, EntityDrawParams& out_params)
+void update_entity_frame_transformations (Frame& frame, Entity& entity, void* user_data, EntityDrawParams& out_params)
 {
   PropertyMap properties = out_params.properties;
   
@@ -96,7 +96,8 @@ int main ()
     entity.SetPrimitive ("u1.polySurface2.mesh#0");
     
     Frame frame = render_manager.CreateFrame ();
-           
+
+    frame.DisableAutoCleanup ();           
     frame.SetRenderTarget ("main_color_target", test.Window ().ColorBuffer ());
     frame.SetRenderTarget ("main_depth_stencil_target", test.Window ().DepthStencilBuffer ());
     frame.SetEffect ("main");

@@ -34,21 +34,26 @@
 
 #include <bv/axis_aligned_box.h>
 
+#include <media/font_library.h>
+
 #include <sg/camera.h>
 #include <sg/controller.h>
 #include <sg/height_map.h>
 #include <sg/helper.h>
 #include <sg/input.h>
 #include <sg/light.h>
+#include <sg/line.h>
 #include <sg/listener.h>
+#include <sg/mesh.h>
 #include <sg/node_array.h>
 #include <sg/page_curl.h>
 #include <sg/particle_emitter.h>
 #include <sg/physics.h>
 #include <sg/scene.h>
+#include <sg/scissor.h>
 #include <sg/sound_emitter.h>
 #include <sg/sprite.h>
-#include <sg/text_line.h>
+#include <sg/text.h>
 #include <sg/visual_model.h>
 
 #include "scene_object.h"

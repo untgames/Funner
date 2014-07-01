@@ -1,6 +1,6 @@
 #include "shared.h"
 
-using namespace render;
+using namespace render::manager;
 
 RenderTarget::RenderTarget (RenderTargetImpl* in_impl)
   : impl (in_impl)
@@ -48,9 +48,14 @@ void RenderTarget::Swap (RenderTarget& render_target)
 namespace render
 {
 
+namespace manager
+{
+
 void swap (RenderTarget& render_target1, RenderTarget& render_target2)
 {
   render_target1.Swap (render_target2);
+}
+
 }
 
 }

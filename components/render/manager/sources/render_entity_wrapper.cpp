@@ -1,6 +1,6 @@
 #include "shared.h"
 
-using namespace render;
+using namespace render::manager;
 
 Entity::Entity (EntityImpl* in_impl)
   : impl (in_impl)
@@ -25,6 +25,21 @@ Entity& Entity::operator = (const Entity& entity)
   return *this;
 }
 
+void Entity::SetWorldMatrix (const math::mat4f& tm)
+{
+  impl->SetWorldMatrix (tm);
+}
+
+const math::mat4f& Entity::WorldMatrix () const
+{
+  return impl->WorldMatrix ();
+}
+
+const math::mat4f& Entity::InverseWorldMatrix () const
+{
+  return impl->InverseWorldMatrix ();
+}
+
 void Entity::SetProperties (const common::PropertyMap& properties)
 {
   return impl->SetProperties (properties);  
@@ -43,6 +58,16 @@ void Entity::SetShaderOptions (const common::PropertyMap& defines)
 const common::PropertyMap& Entity::ShaderOptions () const
 {
   return impl->ShaderOptions ();
+}
+
+void Entity::SetUserData (void* data)
+{
+  impl->SetUserData (data);
+}
+
+void* Entity::UserData () const
+{
+  return impl->UserData ();
 }
 
 void Entity::SetJointsCount (size_t count)
@@ -72,7 +97,7 @@ size_t Entity::LodsCount () const
 
 Primitive Entity::Primitive (size_t level_of_detail) const
 {
-  return Wrappers::Wrap<render::Primitive> (impl->Primitive (level_of_detail));
+  return Wrappers::Wrap<render::manager::Primitive> (impl->Primitive (level_of_detail));
 }
 
 const char* Entity::PrimitiveName (size_t level_of_detail) const
@@ -80,7 +105,7 @@ const char* Entity::PrimitiveName (size_t level_of_detail) const
   return impl->PrimitiveName (level_of_detail);
 }
 
-void Entity::SetPrimitive (const render::Primitive& primitive, size_t level_of_detail)
+void Entity::SetPrimitive (const render::manager::Primitive& primitive, size_t level_of_detail)
 {
   impl->SetPrimitive (Wrappers::Unwrap<PrimitiveImpl> (primitive), level_of_detail);
 }
@@ -143,9 +168,14 @@ void Entity::Swap (Entity& entity)
 namespace render
 {
 
+namespace manager
+{
+
 void swap (Entity& entity1, Entity& entity2)
 {
   entity1.Swap (entity2);
+}
+
 }
 
 }
