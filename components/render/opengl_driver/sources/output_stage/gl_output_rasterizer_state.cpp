@@ -149,7 +149,7 @@ void RasterizerState::SetDesc (const RasterizerDesc& in_desc)
       break;
   }
 
-  cmd_list.Add (glFrontFace, in_desc.front_counter_clockwise ? GL_CW : GL_CCW);
+  cmd_list.Add (glFrontFace, in_desc.front_counter_clockwise ? GL_CCW : GL_CW);
 
 #if !defined(OPENGL_ES_SUPPORT) && !defined(OPENGL_ES2_SUPPORT)
 

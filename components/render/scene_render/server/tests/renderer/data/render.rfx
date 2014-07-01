@@ -75,36 +75,36 @@ depth_stencil "stencil-test"
 //default rasterizer stage settings
 rasterizer "default"
 {
-  fill_mode         solid  //draw geometry as solid (filled) triangles
-  front_clock_wise  true   //front faces is described as clockwise
-  cull_mode         back   //cull back faces
-  depth_bias        0      //depth bias (offset for each depth value on rendering)
-  multisample       true   //multisampling is enabled
-  line_antialiasing false  //antialiasing for lines is disabled
+  fill_mode                solid  //draw geometry as solid (filled) triangles
+  front_counter_clockwise  true   //front faces is described as clockwise
+  cull_mode                back   //cull back faces
+  depth_bias               0      //depth bias (offset for each depth value on rendering)
+  multisample              true   //multisampling is enabled
+  line_antialiasing        false  //antialiasing for lines is disabled
     //scissor settings are described in frame
 }
 
 //default rasterizer stage settings
 rasterizer "wireframe"
 {
-  fill_mode         wireframe //draw geometry as wireframe triangles (only edges)
-  front_clock_wise  true      //front faces is described as clockwise
-  cull_mode         none      //no face culling
-  depth_bias        0         //depth bias (offset for each depth value on rendering)
-  multisample       false     //multisampling is disabled
-  line_antialiasing true      //antialiasing for lines is enabled
+  fill_mode                wireframe //draw geometry as wireframe triangles (only edges)
+  front_counter_clockwise  true      //front faces is described as clockwise
+  cull_mode                none      //no face culling
+  depth_bias               0         //depth bias (offset for each depth value on rendering)
+  multisample              false     //multisampling is disabled
+  line_antialiasing        true      //antialiasing for lines is enabled
     //scissor settings are described in frame
 }
 
 //rasterizer stage settings for overlays
 rasterizer "overlays"
 {
-  fill_mode         solid     //draw geometry as solid (filled) triangles
-  front_clock_wise  true      //front faces is described as clockwise
-  cull_mode         back      //back face culling
-  depth_bias        1         //depth bias for overlays
-  multisample       true      //multisampling is enabled
-  line_antialiasing false     //antialiasing for lines is enabled
+  fill_mode               solid     //draw geometry as solid (filled) triangles
+  front_counter_clockwise true      //front faces is described as clockwise
+  cull_mode               back      //back face culling
+  depth_bias              1         //depth bias for overlays
+  multisample             true      //multisampling is enabled
+  line_antialiasing       false     //antialiasing for lines is enabled
     //scissor settings are described in frame
 }
 

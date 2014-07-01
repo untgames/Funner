@@ -108,8 +108,7 @@ int main ()
     camera->SetZFar   (1000.0f);    
 
     camera->SetPosition (0, 0.0f, 1.0f);
-    camera->SetOrientation (math::degree (180.0f), 0, 1.0f, 0);
-//    camera->LookTo (math::vec3f (0.0f), math::vec3f (0, 1.0f, 0), scene_graph::NodeTransformSpace_World);
+    camera->LookTo (math::vec3f (0.0f), math::vec3f (0, 1.0f, 0), scene_graph::NodeTransformSpace_World);
 
     scene_graph::Scene scene;
     
