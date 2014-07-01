@@ -44,7 +44,7 @@ void idle (Test& test)
     
     float angle = common::milliseconds () / 100.0f;
     
-//    test.text_line.SetWorldOrientation (math::degree (angle), 0.0f, 0.0f, 1.0f);        
+    test.text_line.SetWorldOrientation (math::degree (angle), 0.0f, 0.0f, 1.0f);        
 
     test.target.Update ();      
   }
@@ -120,11 +120,11 @@ int main ()
 
     creation_params.font_size = 50;
 
-    text_line->SetTextUtf8 ("ABCDEFGH");
+    text_line->SetTextUtf8 ("Hello world!");
     text_line->SetFont  ("Times New Roman");
     text_line->SetFontCreationParams (creation_params);
     text_line->SetScale (math::vec3f (1.2f));
-//    text_line->SetHorizontalAlignment (scene_graph::TextLineAlignment_Center);
+    text_line->SetHorizontalAlignment (scene_graph::TextLineAlignment_Center);
     
     text_line->SetMaterial ("text_material");
 

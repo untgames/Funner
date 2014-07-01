@@ -228,7 +228,7 @@ class TextModel: public VisualModel
 
           for (size_t i=0; i<derived_materials_count; i++)
           {
-            context.CreateSpriteList      (id, base_index + i, interchange::SpriteMode_Billboard, interchange::PrimitiveUsage_Batching, math::vec3f (0, 1.0f, 0), DEFAULT_BATCH_NAME);
+            context.CreateSpriteList      (id, base_index + i, interchange::SpriteMode_Oriented, interchange::PrimitiveUsage_Batching, math::vec3f (0, 1.0f, 0), DEFAULT_BATCH_NAME);
             context.SetSpriteListMaterial (id, base_index + i, font_material->MaterialName (i));
           }
 
