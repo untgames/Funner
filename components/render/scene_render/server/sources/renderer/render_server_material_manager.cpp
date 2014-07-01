@@ -1,5 +1,7 @@
 #include "shared.h"
 
+#include <media/image.h>
+
 using namespace render;
 using namespace render::scene::server;
 
@@ -128,7 +130,9 @@ void MaterialManager::CloneMaterial (const char* material_name, const char* prot
     if (impl->materials.find (material_name) != impl->materials.end ())
       throw xtl::make_argument_exception ("", "material_name", material_name, "Material has been already cloned");
 
-    manager::Material material = impl->render_manager.Manager ().CreateSharedMaterial (prototype_name);
+    manager::Material material = impl->render_manager.Manager ().CreateSharedMaterial (prototype_name).Clone ();
+
+    material.SetName (material_name);
 
     impl->materials.insert_pair (material_name, material);
 
@@ -153,7 +157,7 @@ void MaterialManager::SetMaterialTexmapImage (const char* material_name, const c
 
     if (!image_name)
       throw xtl::make_null_argument_exception ("", "image_name");
-    
+
     MaterialMap::iterator iter = impl->materials.find (material_name);
 
     if (iter == impl->materials.end ())

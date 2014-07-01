@@ -4,21 +4,10 @@
   <texmaps/>
   <materials>
     <material id="text_material" program="text" tags="transparent">
-      <property name="Reflectivity" type="float" value="0.4"/>
-      <property name="Transparency" type="float" value="1"/>
-      <property name="Shininess" type="float" value="20"/>
       <property name="DiffuseColor" type="vector">
         0 0 0 0
       </property>
-      <property name="AmbientColor" type="vector">
-        0 0 0 1
-      </property>
-      <property name="SpecularColor" type="vector">
-        0 0 0 0
-      </property>
-      <property name="EmissionColor" type="vector">
-        0 0 0 1
-      </property>
+      <texmap semantic="font_mask" image="" sampler="default"/>
     </material>
   </materials>
 </material_library>

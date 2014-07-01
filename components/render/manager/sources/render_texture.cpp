@@ -476,7 +476,7 @@ void TextureImpl::Update (const media::Image& image)
       throw xtl::format_operation_exception ("", "Image depth %u mismatch texture depth %u", image.Depth (), impl->depth);
       
     low_level::PixelFormat source_format;
-    
+
     switch (image.Format ())
     {
       case media::PixelFormat_RGB8:

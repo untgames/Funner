@@ -212,8 +212,9 @@ void Texture::Bind ()
 {
     //получение кэш-переменных
 
-  const size_t current_active_slot = GetContextCacheValue (CacheEntry_ActiveTextureSlot),
-               current_texture_id  = GetContextCacheValue (CacheEntry_TextureId0 + current_active_slot);
+  size_t current_active_slot     = GetContextCacheValue (CacheEntry_ActiveTextureSlot),
+         &current_texture_id     = GetContextCache () [CacheEntry_TextureId0 + current_active_slot],
+         &current_texture_target = GetContextCache () [CacheEntry_TextureTarget0 + current_active_slot];
 
     //проверка необходимости биндинга текстуры
 
@@ -234,7 +235,8 @@ void Texture::Bind ()
 
     //обновление кэш-переменных
 
-  SetContextCacheValue (CacheEntry_TextureId0 + current_active_slot, GetId ());
+  current_texture_id     = GetId ();
+  current_texture_target = target;
   
     //оповещение о необходимости ребиндинга уровня
     

@@ -43,6 +43,8 @@ FontMaterial::FontMaterial (MaterialManager& material_manager, const FontPtr& fo
       MaterialPtr material = material_manager.CreateMaterial (common::format ("font_material.%s(%s=%s.font%08u.image%02u)", material_name, semantic, font->Name (), &*font, i).c_str (),
         material_name);
 
+      material->SetTexmapImage (semantic, font->TextureName (i));
+
       impl->materials.push_back (material);
     }
   }

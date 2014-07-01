@@ -47,8 +47,6 @@ Font::Font (MaterialManager& material_manager, const media::Font& font, const me
     impl->textures.reserve (images_count);
     sizes.reserve (images_count);
 
-//    media::Image image;
-
     for (size_t i=0; i<images_count; i++)
     {
       media::Image image;

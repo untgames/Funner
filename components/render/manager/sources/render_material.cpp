@@ -64,14 +64,14 @@ struct Texmap: public xtl::reference_counter, public CacheHolder
       TexturePtr              new_cached_texture        = is_dynamic ? TexturePtr () : texture.Resource ();                         
       LowLevelSamplerStatePtr new_cached_sampler        = sampler.Resource ();
       LowLevelTexturePtr      new_cached_device_texture = new_cached_texture ? new_cached_texture->DeviceTexture () : LowLevelTexturePtr ();
-      
+
       if (new_cached_texture == cached_texture && new_cached_sampler == cached_sampler && new_cached_device_texture == cached_device_texture)
         return;                      
       
       cached_texture        = new_cached_texture;
       cached_device_texture = new_cached_device_texture;      
       cached_sampler        = new_cached_sampler;
-      
+     
       InvalidateCache ();
     }
     catch (xtl::exception& e)
@@ -632,7 +632,7 @@ void MaterialImpl::SetTexmap (const char* semantic, const char* image_name, cons
       //пересоздание карты
 
     bool is_dynamic_image = impl->texture_manager->IsDynamicTexture (image_name);
-    
+
     TexmapPtr new_texmap (new Texmap (*impl, impl->texture_manager->GetTextureProxy (image_name), impl->texture_manager->GetSamplerProxy (sampler), is_dynamic_image, semantic), false);
 
       //обновление массива карт
@@ -649,7 +649,7 @@ void MaterialImpl::SetTexmap (const char* semantic, const char* image_name, cons
       }
 
     if (!found)
-      impl->texmaps.push_back (new_texmap);    
+      impl->texmaps.push_back (new_texmap);
 
       //обновление кэша с зависимостями (поскольку может измениться состояние тэгов и динамических текстур)
 
