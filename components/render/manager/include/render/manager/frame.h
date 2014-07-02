@@ -3,7 +3,6 @@
 
 #include <math/matrix.h>
 
-#include <render/manager/common.h>
 #include <render/manager/entity.h>
 #include <render/manager/render_target.h>
 

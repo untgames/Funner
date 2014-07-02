@@ -35,7 +35,7 @@ void RectArea::SetRect (const render::manager::Rect& rect)
   impl->SetRect (rect);
 }
 
-void  RectArea::SetRect (int x, int y, size_t width, size_t height)
+void RectArea::SetRect (int x, int y, size_t width, size_t height)
 {
   impl->SetRect (render::manager::Rect (x, y, width, height));
 }

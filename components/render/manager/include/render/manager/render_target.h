@@ -3,7 +3,7 @@
 
 #include <cstddef>
 
-#include <render/manager/common.h>
+#include <render/manager/bounds.h>
 
 namespace media
 {

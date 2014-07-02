@@ -3,7 +3,7 @@
 
 #include <xtl/functional_fwd>
 
-#include <render/manager/common.h>
+#include <render/manager/bounds.h>
 #include <render/manager/render_target.h>
 
 namespace syslib

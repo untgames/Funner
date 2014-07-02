@@ -1,7 +1,6 @@
 #ifndef RENDER_MANAGER_TEXTURE_HEADER
 #define RENDER_MANAGER_TEXTURE_HEADER
 
-#include <render/manager/common.h>
 #include <render/manager/render_target.h>
 
 namespace render
@@ -25,6 +24,40 @@ enum TextureDimension
   
   TextureDimension_Num
 };
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Формат пикселей
+///////////////////////////////////////////////////////////////////////////////////////////////////
+enum PixelFormat
+{
+  PixelFormat_RGB8,
+  PixelFormat_RGBA8,
+  PixelFormat_L8,
+  PixelFormat_A8,
+  PixelFormat_LA8,
+  PixelFormat_DXT1,
+  PixelFormat_DXT3,
+  PixelFormat_DXT5,
+  PixelFormat_RGB_PVRTC2,
+  PixelFormat_RGB_PVRTC4,
+  PixelFormat_RGBA_PVRTC2,
+  PixelFormat_RGBA_PVRTC4,
+  PixelFormat_ATC_RGB_AMD,
+  PixelFormat_ATC_RGBA_EXPLICIT_ALPHA_AMD,
+  PixelFormat_ATC_RGBA_INTERPOLATED_ALPHA_AMD,
+  PixelFormat_D16,
+  PixelFormat_D24X8,
+  PixelFormat_D24S8,
+  PixelFormat_D32,
+  PixelFormat_S8,
+
+  PixelFormat_Num
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Утилиты
+///////////////////////////////////////////////////////////////////////////////////////////////////
+const char* get_name (PixelFormat); //получение имени формата
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Текстура

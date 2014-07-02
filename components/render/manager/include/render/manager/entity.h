@@ -5,6 +5,7 @@
 
 #include <math/matrix.h>
 
+#include <render/manager/bounds.h>
 #include <render/manager/primitive.h>
 
 namespace render

@@ -89,6 +89,7 @@ typedef SimplePrimitiveListImpl<Sprite> SpriteListImpl;
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 typedef xtl::intrusive_ptr<BatchStateBlock>         BatchStateBlockPtr;
 typedef xtl::intrusive_ptr<BatchingManager>         BatchingManagerPtr;
+typedef xtl::intrusive_ptr<BoxAreaImpl>             BoxAreaPtr;
 typedef xtl::intrusive_ptr<CacheManager>            CacheManagerPtr;
 typedef xtl::intrusive_ptr<DeviceManager>           DeviceManagerPtr;
 typedef xtl::intrusive_ptr<DynamicPrimitive>        DynamicPrimitivePtr;
@@ -240,6 +241,7 @@ class DebugIdHolder: public xtl::noncopyable
 #include "property_buffer.h"
 #include "property_cache.h"
 #include "rect_area.h"
+#include "box_area.h"
 #include "render_target.h"
 #include "render_target_map.h"
 #include "rendering_context.h"
