@@ -3,6 +3,8 @@
 
 #include <stl/auto_ptr.h>
 
+#include <xtl/shared_ptr.h>
+
 namespace media
 {
 
@@ -23,7 +25,8 @@ namespace client
 {
 
 //forward declarations
-class MaterialManager;
+class  MaterialManager;
+struct FontRenderingTempCache;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Информация о растеризованном глифе
@@ -116,7 +119,8 @@ class FontMaterial: public xtl::reference_counter, public xtl::trackable
     stl::auto_ptr<Impl> impl;
 };
 
-typedef xtl::intrusive_ptr<FontMaterial> FontMaterialPtr;
+typedef xtl::intrusive_ptr<FontMaterial>        FontMaterialPtr;
+typedef xtl::shared_ptr<FontRenderingTempCache> FontRenderingTempCachePtr;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Менеджер шрифтов
@@ -153,7 +157,13 @@ class FontManager: public xtl::noncopyable
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Проверка соответствия имени ресурса параметрам настройки кэша шрифтов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    static bool IsFontParams (const char* resource);    
+    static bool IsFontParams (const char* resource);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Кэш рендеринга шрифтов
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void                             SetFontRenderingTempCache (const FontRenderingTempCachePtr&);
+    const FontRenderingTempCachePtr& FontRenderingTempCache    () const;
 
   private:
     struct Impl;

@@ -81,11 +81,12 @@ typedef stl::hash_map<stl::hash_key<const char*>, FontMaterialCacheEntry> FontMa
 
 struct FontManager::Impl
 {
-  MaterialManager&  material_manager;    //менеджер материалов
-  FontMap           fonts;               //шрифты
-  FontMaterialMap   font_materials;      //материалы шрифтов
-  FontLibraryList   font_libraries;      //библиотеки шрифтов
-  FontMaterialCache font_material_cache; //кэш шрифтов
+  MaterialManager&          material_manager;     //менеджер материалов
+  FontMap                   fonts;                //шрифты
+  FontMaterialMap           font_materials;       //материалы шрифтов
+  FontLibraryList           font_libraries;       //библиотеки шрифтов
+  FontMaterialCache         font_material_cache;  //кэш шрифтов
+  FontRenderingTempCachePtr font_rendering_cache; //кэш рендеринга шрифтов
 
   Impl (MaterialManager& in_material_manager) : material_manager (in_material_manager) {}
 
@@ -384,4 +385,18 @@ void FontManager::UnloadFont (const char* id)
 bool FontManager::IsFontParams (const char* resource)
 {
   return resource && common::wcmatch (FONT_RESOURCE_WILDCARD, resource);
+}
+
+/*
+    Кэш рендеринга шрифтов
+*/
+
+void FontManager::SetFontRenderingTempCache (const FontRenderingTempCachePtr& cache)
+{
+  impl->font_rendering_cache = cache;
+}
+
+const FontRenderingTempCachePtr& FontManager::FontRenderingTempCache () const
+{
+  return impl->font_rendering_cache;
 }

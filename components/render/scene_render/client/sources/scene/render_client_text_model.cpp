@@ -7,6 +7,50 @@
 using namespace render::scene;
 using namespace render::scene::client;
 
+/*
+    Константы
+*/
+
+const size_t INVALID_INDEX = ~0u;
+
+namespace render {
+namespace scene {
+namespace client {
+
+/*
+    Кэш рендеринга шрифтов
+*/
+
+/// Дескриптор ссылки на символ
+struct CharDescRef
+{
+  const scene_graph::CharDesc* desc;             //дескриптор символа
+  const RasterizedGlyphInfo*   rasterized_glyph; //растеризованный глиф
+  size_t                       image_index; //индекс текстового блока
+
+  CharDescRef (const scene_graph::CharDesc& in_desc) : desc (&in_desc), rasterized_glyph (), image_index (INVALID_INDEX) {}
+
+  CharDescRef& operator = (const scene_graph::CharDesc& in_desc)
+  {
+    desc             = &in_desc;
+    rasterized_glyph = 0;
+    image_index      = INVALID_INDEX;
+
+    return *this;
+  }
+};
+
+typedef xtl::uninitialized_storage<interchange::SpriteDesc> SpriteBuffer;
+typedef stl::vector<CharDescRef>                            CharArray;
+
+struct FontRenderingTempCache
+{
+  SpriteBuffer sprites;
+  CharArray    chars;
+};
+
+}}}
+
 namespace
 {
 
@@ -35,6 +79,9 @@ class TextModel: public VisualModel
       , need_update_descs (true)
       , material_name_hash ()
       , texture_semantic_hash ()
+      , cache (GetRenderingCache (manager))
+      , sprites (cache->sprites)
+      , chars (cache->chars)
     {
       font_text_blocks.reserve (DEFAULT_RESERVED_FONT_TEXT_BLOCKS);
     }
@@ -115,29 +162,8 @@ class TextModel: public VisualModel
       size_t          reserved_sprites_count; //резервируемое количество спрайтов в блоке
     };
 
-/// Дескриптор ссылки на символ
-    struct CharDescRef
-    {
-      const scene_graph::CharDesc* desc;             //дескриптор символа
-      const RasterizedGlyphInfo*   rasterized_glyph; //растеризованный глиф
-      size_t                       image_index; //индекс текстового блока
-
-      CharDescRef (const scene_graph::CharDesc& in_desc) : desc (&in_desc), rasterized_glyph (), image_index (INVALID_INDEX) {}
-
-      CharDescRef& operator = (const scene_graph::CharDesc& in_desc)
-      {
-        desc             = &in_desc;
-        rasterized_glyph = 0;
-        image_index      = INVALID_INDEX;
-
-        return *this;
-      }
-    };
-
-    typedef xtl::intrusive_ptr<FontTextBlock>                   FontTextBlockPtr;
-    typedef stl::vector<FontTextBlockPtr>                       FontTextBlockArray;
-    typedef xtl::uninitialized_storage<interchange::SpriteDesc> SpriteBuffer;
-    typedef stl::vector<CharDescRef>                            CharArray;
+    typedef xtl::intrusive_ptr<FontTextBlock> FontTextBlockPtr;
+    typedef stl::vector<FontTextBlockPtr>     FontTextBlockArray;
 
   private:
     struct CharSorterByFont       { bool operator () (const CharDescRef& char1, const CharDescRef& char2) const { return char1.desc->font < char2.desc->font; } };
@@ -147,7 +173,30 @@ class TextModel: public VisualModel
     void UpdateDescsNotify () { need_update_descs = true; }
     void UpdateFontsNotify () { need_update_fonts = true; }
 
-    static const size_t INVALID_INDEX = ~0u;
+/// Инициализация кэша
+    static FontRenderingTempCachePtr GetRenderingCache (SceneManager& manager)
+    {
+      try
+      {
+        FontManager& font_manager = manager.Client ().FontManager ();
+
+        FontRenderingTempCachePtr cache = font_manager.FontRenderingTempCache ();
+
+        if (cache)
+          return cache;
+
+        cache = FontRenderingTempCachePtr (new FontRenderingTempCache);
+
+        font_manager.SetFontRenderingTempCache (cache);
+
+        return cache;
+      }
+      catch (xtl::exception& e)
+      {
+        e.touch ("render::scene::client::GetRenderingCache");
+        throw;
+      }
+    }
 
 /// Поиск текстового блока
     size_t FindFontTextBlock (const media::Font& font)
@@ -461,9 +510,6 @@ class TextModel: public VisualModel
         sprite->normal     = math::vec3f (0, 0, 1.0f);
         sprite->rotation   = math::anglef ();
 
-printf ("char %u img=%u mtl='%s' offs=[%.2f %.2f] size=[%.2f %.2f]\n", sg_char_desc.code, rasterized_glyph.image_index,
-  text_block.font_material->MaterialName (rasterized_glyph.image_index), sprite->tex_offset.x, sprite->tex_offset.y, sprite->tex_size.x, sprite->tex_size.y);
-
         sprite++;
       }
 
@@ -490,16 +536,17 @@ printf ("char %u img=%u mtl='%s' offs=[%.2f %.2f] size=[%.2f %.2f]\n", sg_char_d
     }
 
   private:
-    FontManager&         font_manager;
-    xtl::auto_connection on_update_fonts_connection;
-    xtl::auto_connection on_update_descs_connection;
-    bool                 need_update_fonts;
-    bool                 need_update_descs;
-    size_t               material_name_hash;
-    size_t               texture_semantic_hash;
-    FontTextBlockArray   font_text_blocks;
-    SpriteBuffer         sprites; //TODO: common for all text models (move to fontmanager)
-    CharArray            chars; //TODO: common for all text models
+    FontManager&              font_manager;
+    xtl::auto_connection      on_update_fonts_connection;
+    xtl::auto_connection      on_update_descs_connection;
+    bool                      need_update_fonts;
+    bool                      need_update_descs;
+    size_t                    material_name_hash;
+    size_t                    texture_semantic_hash;
+    FontTextBlockArray        font_text_blocks;
+    FontRenderingTempCachePtr cache;
+    SpriteBuffer&             sprites;
+    CharArray&                chars;
 };
 
 }
