@@ -97,17 +97,17 @@ inline Context<Serializer, Deserializer>::~Context ()
 template <class Serializer, class Deserializer>
 inline void Context<Serializer, Deserializer>::SetCounterparty (IConnection* in_connection)
 {
-  if (InprocessOwnerId ())
+  if (OutputStream::InprocessOwnerId ())
   {
-    InprocessExchangeStorage::DeallocateOwnerId (InprocessOwnerId ());
+    InprocessExchangeStorage::DeallocateOwnerId (OutputStream::InprocessOwnerId ());
 
-    SetInprocessOwnerId (0);
+    OutputStream::SetInprocessOwnerId (0);
   }
 
   connection = in_connection;
 
   if (connection && connection->IsInprocessed ())
-    SetInprocessOwnerId (InprocessExchangeStorage::AllocateOwnerId ());
+    OutputStream::SetInprocessOwnerId (InprocessExchangeStorage::AllocateOwnerId ());
 }
 
 template <class Serializer, class Deserializer>
