@@ -53,15 +53,19 @@ void idle (Test& test, Entity& entity, Frame& frame)
     }    
     
     frames_count++;
+
+    common::PropertyMap entity_dependent_properties = frame.EntityDependentProperties ();
+
+    entity_dependent_properties.SetProperty ("myObjectMatrix", math::mat4f (1.0f));
     
     common::PropertyMap frame_properties = frame.Properties ();
     common::PropertyMap entity_properties = entity.Properties ();  
 
     float angle = t * 3.1415926f / 4.0f;
     
-//    entity.SetWorldMatrix (math::rotate (math::radian (angle), math::vec3f (0, 0, 1)));
-    entity.SetWorldMatrix (math::rotate (math::radian (angle), math::vec3f (0, 0, 1)) *
-      math::rotate (math::radian (angle*0.2f), math::vec3f (1, 0, 0)));
+////    entity.SetWorldMatrix (math::rotate (math::radian (angle), math::vec3f (0, 0, 1)));
+//    entity.SetWorldMatrix (math::rotate (math::radian (angle), math::vec3f (0, 0, 1)) *
+//      math::rotate (math::radian (angle*0.2f), math::vec3f (1, 0, 0)));
 
     frame.Draw ();
       
@@ -96,7 +100,7 @@ int main ()
 //    SpriteList sprites   = primitive.AddStandaloneSpriteList (SpriteMode_Oriented, math::vec3f (0, 1.0f, 0));
 //    SpriteList sprites   = primitive.AddStandaloneSpriteList (SpriteMode_Billboard, math::vec3f (0, 1.0f, 0));
 //    SpriteList sprites   = primitive.AddBatchingSpriteList (SpriteMode_Oriented, math::vec3f (0, 1.0f, 0));
-    SpriteList sprites   = primitive.AddBatchingSpriteList (SpriteMode_OrientedBillboard, math::vec3f (0, 1.0f, 0));
+    SpriteList sprites   = primitive.AddBatchingSpriteList (SpriteMode_Oriented, math::vec3f (0, 1.0f, 0));
     Sprite     sprite;
 
     primitive.Buffers ().ReserveDynamicBuffers (8192, 8192);
@@ -113,6 +117,8 @@ int main ()
     sprites.Add (1, &sprite);
 
     entity.SetPrimitive (primitive);
+
+    entity.SetWorldMatrix (math::rotate (math::degree (45.0f), math::vec3f (0, 0, 1)));
     
     Frame frame = render_manager.CreateFrame ();
 
