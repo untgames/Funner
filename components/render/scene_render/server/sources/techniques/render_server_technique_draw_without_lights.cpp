@@ -74,17 +74,17 @@ class DrawWithoutLights: public Technique
 
           //задание начальных свойств для пар frame-entity
 
-        common::PropertyMap properties;
+        frame_entity_properties = common::PropertyMap ();
 
-        properties.SetProperty ("ModelViewMatrix",           math::mat4f (1.0f));
-        properties.SetProperty ("ModelViewProjectionMatrix", math::mat4f (1.0f));
-        properties.SetProperty ("ObjectMatrix",              math::mat4f (1.0f));
+        frame_entity_properties.SetProperty ("ModelViewMatrix",           math::mat4f (1.0f));
+        frame_entity_properties.SetProperty ("ModelViewProjectionMatrix", math::mat4f (1.0f));
+        frame_entity_properties.SetProperty ("ObjectMatrix",              math::mat4f (1.0f));
 
-        mv_matrix_property_index     = properties.IndexOf ("ModelViewMatrix");
-        mvp_matrix_property_index    = properties.IndexOf ("ModelViewProjectionMatrix");
-        object_matrix_property_index = properties.IndexOf ("ObjectMatrix");
+        mv_matrix_property_index     = frame_entity_properties.IndexOf ("ModelViewMatrix");
+        mvp_matrix_property_index    = frame_entity_properties.IndexOf ("ModelViewProjectionMatrix");
+        object_matrix_property_index = frame_entity_properties.IndexOf ("ObjectMatrix");
 
-        frame.SetEntityDependentProperties (properties);
+        frame.SetEntityDependentProperties (frame_entity_properties);
         frame.SetEntityDrawHandler (xtl::bind (&DrawWithoutLights::EntityDrawHandler, this, _1, _2, _3, _4));
 
           //задание свойств фрейма
@@ -132,6 +132,12 @@ class DrawWithoutLights: public Technique
 
           frame_properties.SetProperty (proj_matrix_property_index, parent_context.Camera ().ProjectionMatrix ());
         }
+          
+          //обновление свойств объект-кадр (для рендеринга спрайтов)
+
+        frame_entity_properties.SetProperty (mv_matrix_property_index,  private_data.view_proj_tm);
+        frame_entity_properties.SetProperty (mvp_matrix_property_index, private_data.view_proj_tm);
+        frame_entity_properties.SetProperty (object_matrix_property_index, math::mat4f (1.0f));
 
           //построение списка моделей на отрисовку
 
@@ -183,6 +189,7 @@ class DrawWithoutLights: public Technique
     RenderManager       manager;                      //менеджер рендеринга
     stl::string         effect_name;                  //имя эффекта
     common::PropertyMap frame_properties;             //свойства кадра
+    common::PropertyMap frame_entity_properties;      //свойства кадр-объект
     size_t              mv_matrix_property_index;     //индекс свойства матрицы ModelView
     size_t              mvp_matrix_property_index;    //индекс свойства матрицы ModelViewProjection
     size_t              object_matrix_property_index; //индекс свойства матрицы ObjectMatrix
