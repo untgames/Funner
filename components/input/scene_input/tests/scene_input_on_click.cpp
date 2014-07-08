@@ -29,8 +29,8 @@ int main ()
     
     OrthoCamera::Pointer camera = OrthoCamera::Create ();
     
-    camera->SetLeft (0);
-    camera->SetRight (100);
+    camera->SetLeft (100);
+    camera->SetRight (0);
     camera->SetTop (0);
     camera->SetBottom (-100);
     camera->SetZNear (-1);

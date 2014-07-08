@@ -1,0 +1,340 @@
+//TODO: techniques / condition passes/subframes
+//TODO: templates for all states/program/frames/passes (general implementation)
+
+library "media/shaders/*"
+
+//blend stage state for rendering solid (non transaparent) geometry
+blend "solid"
+{
+  blend_enable     false //blending is disabled
+  color_write_mask rgba  //write color to all color planes
+}
+
+//blend stage state for rendering tranparent geometry
+blend "transparent"
+{
+  blend_enable      true                        //blending is enabled
+  alpha_to_coverage false                       //alpha to coverage is enabled
+  blend_color       add src_alpha inv_src_alpha //blend mode for alpha-blending
+  blend_alpha       add src_alpha inv_src_alpha //blend mode for alpha-blending
+  color_write_mask  rgba                        //write color to all color planes
+}
+
+//blend stage state for additive rendering of transparent geometry (effects, particles, etc.)
+blend "additive"
+{
+  blend_enable     true          //blending is enabled
+  blend_color      add one one   //blend mode for additive blending
+  blend_alpha      add one one   //blend mode for additive blending
+  color_write_mask rgba          //write color to all color planes
+}
+
+//depth stencil stage state for rendering solid (non transparent) geometry
+depth_stencil "solid"
+{
+  depth_test   true     //z-test is enabled
+  depth_write  true     //write to z-buffer is enabled
+  stencil_test false    //stencil test is disabled
+}
+
+//depth stencil stage state for rendering
+depth_stencil "ztest_without_write"
+{
+  depth_test   true    //z-test is enabled
+  depth_write  false   //write to z-buffer is disabled
+}
+
+//depth stencil stage state (only for testing)
+depth_stencil "stencil-test"
+{
+  depth_test         true //z-test is enabled
+  depth_write        true //write to z-buffer is enabled
+  depth_compare_mode less //comparision mode for z-buffer
+  stencil_test       true //stencil test is enabled
+  stencil_read       0xf  //stencil mask for each stencil reading
+  stencil_write      0xf  //stencil mask for each stencil writing
+  
+  //stencil settings for front faces (possible head attributes: front, back, front_and_back - default)
+  stencil front
+  {
+    stencil_compare_mode   less  //comparision mode for stencil values
+    depth_fail_operation   keep  //operation that performed if depth test is failed    
+    stencil_fail_operation keep  //operation that performed if stencil test is failed
+    stencil_pass_opertion  keep  //operation that performed if stencil test is passed
+  }
+  
+  stencil back
+  {
+    stencil_compare_mode   greater  //comparision mode for stencil values
+    depth_fail_operation   keep     //operation that performed if depth test is failed    
+    stencil_fail_operation keep     //operation that performed if stencil test is failed
+    stencil_pass_opertion  invert   //operation that performed if stencil test is passed  
+  }
+}
+
+//default rasterizer stage settings
+rasterizer "default"
+{
+  fill_mode                solid  //draw geometry as solid (filled) triangles
+  front_counter_clockwise  true   //front faces is described as clockwise
+  cull_mode                none   //cull back faces
+  depth_bias               0      //depth bias (offset for each depth value on rendering)
+  multisample              true   //multisampling is enabled
+  line_antialiasing        false  //antialiasing for lines is disabled
+    //scissor settings are described in frame
+}
+
+//default rasterizer stage settings
+rasterizer "wireframe"
+{
+  fill_mode                wireframe //draw geometry as wireframe triangles (only edges)
+  front_counter_clockwise  true      //front faces is described as clockwise
+  cull_mode                none      //no face culling
+  depth_bias               0         //depth bias (offset for each depth value on rendering)
+  multisample              false     //multisampling is disabled
+  line_antialiasing        true      //antialiasing for lines is enabled
+    //scissor settings are described in frame
+}
+
+//rasterizer stage settings for overlays
+rasterizer "overlays"
+{
+  fill_mode               solid     //draw geometry as solid (filled) triangles
+  front_counter_clockwise true      //front faces is described as clockwise
+  cull_mode               back      //back face culling
+  depth_bias              1         //depth bias for overlays
+  multisample             true      //multisampling is enabled
+  line_antialiasing       false     //antialiasing for lines is enabled
+    //scissor settings are described in frame
+}
+
+//texture sampler description
+sampler "default"
+{
+  min_filter      linear_mip_linear //use trilinear filtering for minification
+  mag_filter      linear            //use linear filtering for magnitude
+  wrap_uvw        clamp_to_border   //wrap all textue coordinates to border color
+  comparision     always            //always pass texture comparision test
+  mip_lod_bias    0                 //don't bias texture lod levels
+  min_lod         0                 //use 0 as start mip level
+  max_lod         max               //use max possible mip level
+  max_anisotropy  16                //texture anisotroping filtering constant
+  border_color    0 0 0 0           //color of texture's border
+}
+
+//texture sampler description for repeated textures
+sampler "repeat"
+{
+  min_filter      linear_mip_linear //use trilinear filtering for minification
+  mag_filter      linear            //use linear filtering for magnitude
+  wrap_uvw        repeat            //repeat texture coordinates
+  comparision     always            //always pass texture comparision test
+  mip_lod_bias    0                 //don't bias texture lod levels
+  min_lod         0                 //use 0 as start mip level
+  max_lod         max               //use max possible mip level
+  max_anisotropy  16                //texture anisotroping filtering constant
+  border_color    0 0 0 0           //color of texture's border
+}
+
+//program instance for phong program, specified by (material, entity, frame)
+program "phong"
+{
+  defines "SpecularMultiplier=0.8"
+  options "PointLightCount DirectLightCount SpotLightCount"
+  shader "phong" "glsl.vs" "glsl.ps" //reference to shader source
+
+  texmap   "diffuse"  "DiffuseTexture"
+  texmap   "specular" "SpecularTexture"
+  texmap   "bump"     "BumpTexture"
+  texmap   "reflection"  "ReflectionTexture"
+  texmap   "ambient"  "AmbientTexture"
+  texmap   "emission" "EmissionTexture"
+  framemap "shadow"   "ShadowTexture"
+}
+
+//program instance for flat program, specified by (material, entity, frame)
+program "flat"
+{
+  shader "flat" "glsl.vs" "glsl.ps" //reference to shader source
+
+  texmap "diffuse"  "DiffuseTexture"
+}
+
+//program instance for font rendering program, specified by (material, entity, frame)
+program "text"
+{
+  shader "text" "glsl.vs" "glsl.ps" //reference to shader source
+
+  texmap "font_mask"  "FontTexture"
+}
+
+//shading instance for rendering shadow maps
+program "shadow_map"
+{
+  shader  "shadow" "glsl.vs" "glsl.ps"
+}
+
+//shading instance for rendering helper geometry
+program "helper"
+{
+  shader  "debug" "glsl.vs" "glsl.ps" //reference to shader source
+}
+
+//auxilary texture description for mirror texture
+texture "mirror"
+{
+  dimension            auto                     //possible values: texture2d, texture3d, cubemap, auto
+  size                 2048 2048                //texture sizes
+  format               rgba8                    //pixel format
+  generate_mips_enable false                    //is mips generation enabled
+  bind_flags           texture render_target    //list of flags: texture, render_target, depth_stencil
+}
+
+//auxilary texture description for shadow texture
+texture "shadow_map"
+{
+  size       2048 2048
+  format     d32
+  bind_flags texture depth_stencil
+}
+
+//auxilary texture description for depth-stencil buffer
+texture "depth_stencil_render_buffer"
+{
+  size       2048 2048
+  format     rgba8
+  bind_flags depth_stencil
+}
+
+//description of effects rendering
+effect "main"
+{
+  tags "main_effect_tag" //list of tags for this effect (used in effect_group)
+
+  effect_group "main_effect_tag" //recursive possibility to render child effects with same structure  
+
+  //description of child effects rendering: rendering shadow maps
+  effect_group "shadow" //list of effect tags which will be added to this subeffects loop
+
+  effect_group "clearing"        //clear frame
+
+  //rendering of geometry without lighting (for early z-test)
+  pass
+  {
+    tags                  "solid"                 //render only non-transaparent geometry
+    sort                  front_to_back           //sort geometry in front-to-back order
+    color_targets         null                    //no color rendering needed
+    depth_stencil_target  "default_depth_stencil" //render to z-buffer only
+    depth_stencil_state   "solid"                 //use z-test and write to z-buffer
+    rasterizer_state      "default"               //use default rasterizer settings
+  }
+
+  //child effects for rendering geometry in selected light
+  effect_group "lighting" //use only effects with tag 'lighting'
+  
+  //render overlays
+  pass
+  {
+    tags                  "overlay"                 //render only overlays: monitors, UI
+    color_targets         "default_color"           //render to effect color buffer
+    depth_stencil_target  "default_depth_stencil"   //render to effect depth stencil buffer
+    blend_state           "transparent"             //use blend stage settings for transaparent geometry
+    depth_stencil_state   "ztest_without_write"     //use depth stencil stage settings for transaparent geometry
+    rasterizer_state      "overlays"                //use rasterizer stage settings for overlays
+  }
+  
+  //render decals
+  pass
+  {
+    tags                  "decal"                   //render only decals: blood, watermatks, etc.
+    color_targets         "default_color"           //render to effect color buffer
+    depth_stencil_target  "default_depth_stencil"   //render to effect depth stencil buffer
+    blend_state           "additive"                //use additive blend state settings
+    depth_stencil_state   "ztest_without_write"     //use depth stencil stage settings for transaparent geometry
+    rasterizer_state      "overlays"                //use rasterizer stage settings for overlays
+  }
+  
+//  pass "dof" //???
+
+  //render helper geometry
+  pass
+  {
+    tags                  "helper"                  //render only geometry with 'helper' material tag
+    color_targets         "default_color"           //render to effect color buffer
+    depth_stencil_target  "default_depth_stencil"   //render to effect depth stencil buffer
+    blend_state           "solid"                   //use blend stage settings for solid geometry
+    depth_stencil_state   "solid"                   //use depth stencil stage settings for solid geometry
+    rasterizer_state      "wireeffect"              //use rasterizer for helpers
+    program               "helper"                  //this program overrides material programs
+  }
+}
+
+effect "shadow"
+{
+  tags "shadow_map"
+
+  pass
+  {
+    tags                  "solid"       //tags for material of each primitive
+    color_targets         null          //render target for color buffer - not needed for rendering of shadow maps
+    depth_stencil_target  "shadow_map"  //render target for depth stencil buffer
+    depth_stencil_state   "solid"       //depth stencil stage settings
+    rasterizer_state      "default"     //rasterizer stage settings
+    program               "shadow_map"  //this program overrides material programs
+  }
+}
+
+effect "lighting"
+{
+  tags "lighting"
+
+  //render solid (non-transaparent) geometry
+  pass
+  {
+    tags                  "solid"                   //render only non-transparent geometry
+    sort                  states                    //sort geometry for decrease state switches
+    color_targets         "default_color"           //render to effect color buffer
+    depth_stencil_target  "default_depth_stencil"   //render to effect depth stencil buffer
+    blend_state           "solid"                   //use blend stage settings for solid geometry
+    depth_stencil_state   "solid"                   //use depth stencil stage settings for solid geometry
+    rasterizer_state      "default"                 //use default rasterizer
+    texmap                "shadow" "default"        //define texture for framemap "shadow" with "default" sampler
+  }
+  
+  //render transparent geometry
+  pass
+  {
+    tags                  "transparent"             //render only transparent geometry
+    sort                  back_to_front             //sort geometry in back-to-front order for correct transaparent rendering
+    color_targets         "default_color"           //render to effect color buffer
+    depth_stencil_target  "default_depth_stencil"   //render to effect depth stencil buffer
+    blend_state           "transparent"             //use blend stage settings for transaparent geometry
+    depth_stencil_state   "ztest_without_write"     //use depth stencil stage settings for transaparent geometry
+    rasterizer_state      "default"                 //use default rasterizer
+    texmap                "shadow" "default"        //define texture for framemap "shadow" with "default" sampler
+  }
+}
+
+effect "clearing"
+{
+  tags "clearing"
+
+  pass
+  {
+    tags                  ""
+    clear                 all
+    color_targets         "default_color"
+    depth_stencil_target  "default_depth_stencil"
+  }
+}
+
+technique "default"
+{
+  effect  "main"                    //name of the root effect for this technique
+  program "draw_without_lights"     //name of the builtin program for scene enumeration
+  {
+    effect "lighting"
+  }
+}
+
+batch '*'

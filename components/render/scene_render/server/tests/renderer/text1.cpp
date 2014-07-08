@@ -44,7 +44,7 @@ void idle (Test& test)
     
     float angle = common::milliseconds () / 100.0f;
     
-    test.text_line.SetWorldOrientation (math::degree (angle), 0.0f, 0.0f, 1.0f);        
+//    test.text_line.SetWorldOrientation (math::degree (angle), 0.0f, 0.0f, 1.0f);        
 
     test.target.Update ();      
   }
@@ -100,15 +100,15 @@ int main ()
 
     scene_graph::OrthoCamera::Pointer camera = scene_graph::OrthoCamera::Create ();
     
-    camera->SetLeft   (-10.0f);
-    camera->SetRight  (10.0f);
+    camera->SetLeft   (10.0f);
+    camera->SetRight  (-10.0f);
     camera->SetBottom (-10.0f);
     camera->SetTop    (10.0f);
     camera->SetZNear  (0.0f);
     camera->SetZFar   (1000.0f);    
 
-    camera->SetPosition (0, 0.0f, 1.0f);
-    camera->LookTo (math::vec3f (0.0f), math::vec3f (0, 1.0f, 0), scene_graph::NodeTransformSpace_World);
+//    camera->SetPosition (0, 0.0f, 1.0f);
+//    camera->LookTo (math::vec3f (0.0f), math::vec3f (0, 1.0f, 0), scene_graph::NodeTransformSpace_World);
 
     scene_graph::Scene scene;
     
@@ -125,6 +125,7 @@ int main ()
     text_line->SetFontCreationParams (creation_params);
     text_line->SetScale (math::vec3f (1.2f));
     text_line->SetHorizontalAlignment (scene_graph::TextLineAlignment_Center);
+    text_line->SetPosition (math::vec3f (0, 0, 1.0f));
     
     text_line->SetMaterial ("text_material");
 

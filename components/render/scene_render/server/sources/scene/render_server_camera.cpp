@@ -127,16 +127,7 @@ size_t Camera::ViewMatrixTransactionId () const
 
 void Camera::SetProjectionMatrix (const math::mat4f& tm)
 {
-  static float inv_ortx_tm_array [4][4] = {
-    {-1, 0, 0, 0},
-    { 0, 1, 0, 0},
-    { 0, 0, 1, 0},
-    { 0, 0, 0, 1},
-  };
-
-  static math::mat4f inv_ortx_tm (&inv_ortx_tm_array [0][0]);
-
-  impl->proj_tm                  = inv_ortx_tm * tm;
+  impl->proj_tm                  = tm;
   impl->need_update_view_proj_tm = true;
   impl->need_update_frustum      = true;
 

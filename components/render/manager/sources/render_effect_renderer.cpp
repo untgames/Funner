@@ -722,7 +722,7 @@ struct RenderOperationsExecutor
       viewport_desc.height    = target_height;
       viewport_desc.min_depth = 0.0f;
       viewport_desc.max_depth = 1.0f;
-      
+
       device_context.RSSetViewport (0, viewport_desc);
     }
 

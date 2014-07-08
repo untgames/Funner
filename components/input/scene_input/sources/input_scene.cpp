@@ -187,6 +187,7 @@ struct TouchTraverser: public INodeTraverser
       
       min_distance                  = ray_intersection_distance;
       input_zone                    = zone;
+      input_zone_index              = zone_index;
       input_zone_intersection_point = intersection_point;
       zone_offset                   = math::vec3f (0.0f);
     }
@@ -208,7 +209,7 @@ struct TouchTraverser: public INodeTraverser
       }
       
       math::vec3f nearest_point = touch_world_position + touch_world_direction * ray_intersection_distance + ray_to_zone_offset;
-      
+
       if (!contains (touch_frustum, nearest_point)) //check if nearest point to ray is in frustum
         return;
 
@@ -231,7 +232,7 @@ void InputScene::FindTouch (InputPort& input_port, const math::vec3f& touch_worl
       return;
    
       //поиск зоны, пересекаемой областью луча      
-    
+
     TouchTraverser traverser (*this, touch_world_position, touch_world_direction, touch_frustum);
   
     scene.Traverse (touch_frustum, traverser);
@@ -239,7 +240,7 @@ void InputScene::FindTouch (InputPort& input_port, const math::vec3f& touch_worl
     if (!traverser.input_zone)
       return;
             
-    if (traverser.intersected)    
+    if (traverser.intersected)
     {
       touch_context.touch_catched = true;
     }
