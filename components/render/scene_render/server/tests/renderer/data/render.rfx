@@ -77,7 +77,7 @@ rasterizer "default"
 {
   fill_mode                solid  //draw geometry as solid (filled) triangles
   front_counter_clockwise  true   //front faces is described as clockwise
-  cull_mode                back   //cull back faces
+  cull_mode                none   //cull back faces
   depth_bias               0      //depth bias (offset for each depth value on rendering)
   multisample              true   //multisampling is enabled
   line_antialiasing        false  //antialiasing for lines is disabled

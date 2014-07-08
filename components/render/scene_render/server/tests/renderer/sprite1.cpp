@@ -44,7 +44,7 @@ void idle (Test& test)
     
     float angle = common::milliseconds () / 100.0f;
     
-    test.sprite.SetWorldOrientation (math::degree (angle), 0.0f, 0.0f, 1.0f);        
+//    test.sprite.SetWorldOrientation (math::degree (angle), 0.0f, 0.0f, 1.0f);        
 
     test.target.Update ();      
   }
@@ -93,11 +93,11 @@ int main ()
 
     scene_graph::OrthoCamera::Pointer camera = scene_graph::OrthoCamera::Create ();
     
-    camera->SetLeft   (-10.0f);
-    camera->SetRight  (10.0f);
+    camera->SetLeft   (10.0f);
+    camera->SetRight  (-10.0f);
     camera->SetBottom (-10.0f);
     camera->SetTop    (10.0f);
-    camera->SetZNear  (-1000.0f);
+    camera->SetZNear  (0.0f);
     camera->SetZFar   (1000.0f);    
 
     camera->SetPosition (0, 0.0f, 1.0f);
@@ -111,6 +111,7 @@ int main ()
     
     sprite->SetMaterial ("sprite_material");
     sprite->SetScale (math::vec3f (10.0f));
+    sprite->SetWorldOrientation (math::degree (45.0f), 0.0f, 0.0f, 1.0f);        
 
     sprite->BindToScene (scene);    
     

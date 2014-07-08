@@ -132,7 +132,7 @@ void InputEntity::OnTouch (InputPort& input_port, const TouchEvent& event, const
     InputEntityPtr self_lock (this);
 
     xtl::com_ptr<const scene_graph::InputZoneModel> zone_lock (&zone);
-    
+
       //формирование контекста события
       
     const InputZoneModel::ZoneDesc& desc = zone.ZoneDescs ()[zone_index];
@@ -146,7 +146,7 @@ void InputEntity::OnTouch (InputPort& input_port, const TouchEvent& event, const
     context.button               = event.button;
     context.touch_world_position = touch_world_position;
     context.touch_local_position = desc.position + touch_local_position.x * desc.axis_x + touch_local_position.y * desc.axis_y;
-    
+
       //проверка: зафиксировано ли нажатие на зону
 
     TouchDesc* touch_desc = FindTouch (input_port, event.touch, event.button);    

@@ -18,8 +18,9 @@ struct Test
     sprite [0]->SetMaterial ("sprite_material");
     sprite [0]->SetScale (10.0f, 10.0f, 1.0f);        
     sprite [0]->SetPosition (-3.0f, -3.0f, 0.5f);                
-    sprite [0]->Rotate (math::anglef (), math::anglef (), math::degree (45.0f));
+    sprite [0]->Rotate (math::anglef (), math::anglef (), math::degree (22.5f));
     sprite [0]->SetColor (1.0f, 1.0f, 0.0f);
+    sprite [0]->SetMode (SpriteMode_Oriented);
     
     sprite [0]->BindToScene (scene);
     
@@ -27,8 +28,9 @@ struct Test
     
     sprite [1]->SetMaterial ("sprite_material");
     sprite [1]->SetScale (10.0f, 10.0f, 1.0f);        
-    sprite [1]->SetPosition (3.0f, 3.0f, 0.0f);            
+    sprite [1]->SetPosition (3.0f, 3.0f, 0.1f);            
     sprite [1]->SetColor (1.0f, 0.0f, 1.0f);
+    sprite [1]->SetMode (SpriteMode_Oriented);
     
     sprite [1]->BindToScene (scene);
     
@@ -38,9 +40,10 @@ struct Test
     sprite [2]->SetScale (10.0f, 10.0f, 1.0f);
     sprite [2]->SetPosition (3.0f, -1.5f, 0.75f); 
     sprite [2]->SetColor (0.0f, 1.0f, 1.0f);
+    sprite [2]->SetMode (SpriteMode_Oriented);
     
     sprite [2]->BindToScene (scene);        
-    
+
     input_zone [0] = InputZone::Create ();
 
     input_zone [0]->SetName      ("zone1");
@@ -67,8 +70,8 @@ struct Test
     camera [0]->BindToScene (scene);
     camera [0]->SetName     ("Camera1");
     camera [0]->SetPosition (0, 0, 0);
-    camera [0]->SetLeft     (-10);
-    camera [0]->SetRight    (10);
+    camera [0]->SetLeft     (10);
+    camera [0]->SetRight    (-10);
     camera [0]->SetTop      (10);
     camera [0]->SetBottom   (-10);
     camera [0]->SetZNear    (0);
@@ -79,8 +82,8 @@ struct Test
     camera [1]->BindToScene (scene);
     camera [1]->SetName     ("Camera2");
     camera [1]->SetPosition (0, 0, 0);
-    camera [1]->SetLeft     (-10);
-    camera [1]->SetRight    (10);
+    camera [1]->SetLeft     (10);
+    camera [1]->SetRight    (-10);
     camera [1]->SetTop      (10);
     camera [1]->SetBottom   (-10);
     camera [1]->SetZNear    (0.7f);
