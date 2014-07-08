@@ -387,11 +387,15 @@ void ConnectionState::RemoveMaterial (const char* material_name)
      оманды клиента: области вывода и цели рендеринга
 */
 
-void ConnectionState::SetViewportArea (object_id_t id, int32 left, int32 top, int32 width, int32 height)
+void ConnectionState::SetViewportArea (object_id_t id, int32 left, int32 top, int32 width, int32 height, float32 min_depth, float32 max_depth)
 {
   try
   {
-    impl->server.ScreenManager ().GetViewport (id).SetArea (Rect (left, top, width, height));
+    Viewport& viewport = impl->server.ScreenManager ().GetViewport (id);
+
+    viewport.SetArea     (Rect (left, top, width, height));
+    viewport.SetMinDepth (min_depth);
+    viewport.SetMaxDepth (max_depth);
   }
   catch (xtl::exception& e)
   {

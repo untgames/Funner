@@ -29,6 +29,7 @@ struct RenderableView::Impl: public scene_graph::IViewportListener
   bool                    need_update_activity;         //требуется обновление активности области вывода
   bool                    need_update_name;             //требуется обновление имени
   bool                    need_update_area;             //требуется обновление области вывода
+  bool                    need_update_zorder;           //требуется обновление порядка вывода
 
 /// Конструктор
   Impl (const ConnectionPtr& in_connection, scene_graph::Viewport& in_viewport, object_id_t in_render_target_id)
@@ -49,6 +50,7 @@ struct RenderableView::Impl: public scene_graph::IViewportListener
     , need_update_activity (true)
     , need_update_name (true)
     , need_update_area (true)
+    , need_update_zorder (true)
   {
     if (!connection)
       throw xtl::make_null_argument_exception ("", "connection");
@@ -97,6 +99,13 @@ struct RenderableView::Impl: public scene_graph::IViewportListener
   {
     need_reconfiguration = true;
     need_update_area     = true;
+  }
+
+///Порядок вывода обновлен
+  void OnViewportChangeZOrder (int)
+  {
+    need_reconfiguration = true;
+    need_update_zorder   = true;
   }
 
 ///Имя обновлено
@@ -249,7 +258,18 @@ struct RenderableView::Impl: public scene_graph::IViewportListener
       {
         const scene_graph::Rect& r = viewport.Area ();
 
-        context.SetViewportArea (id, r.x, r.y, r.width, r.height);
+        context.SetViewportArea (id, r.x, r.y, r.width, r.height, viewport.MinDepth (), viewport.MaxDepth ());
+
+        need_update_area = false;
+      }
+
+        //переконфигурация порядка вывода
+
+      if (need_update_zorder)
+      {
+        context.SetViewportZOrder (id, viewport.ZOrder ());
+
+        need_update_zorder = false;
       }
 
         //переконфигурация рендера

@@ -248,7 +248,7 @@ inline void ClientToServerSerializer::RemoveMaterial(const char* material_name)
   }
 }
 
-inline void ClientToServerSerializer::SetViewportArea(object_id_t id, int32 left, int32 top, int32 width, int32 height)
+inline void ClientToServerSerializer::SetViewportArea(object_id_t id, int32 left, int32 top, int32 width, int32 height, float32 min_depth, float32 max_depth)
 {
   size_t saved_position = Position ();
 
@@ -260,6 +260,8 @@ inline void ClientToServerSerializer::SetViewportArea(object_id_t id, int32 left
     write(*this, top);
     write(*this, width);
     write(*this, height);
+    write(*this, min_depth);
+    write(*this, max_depth);
     EndCommand();
   }
   catch (...)
@@ -1247,8 +1249,10 @@ template <class Dispatcher> inline bool ClientToServerDeserializer::Deserialize(
       int32 arg3 = read(*this, xtl::type<int32 > ());
       int32 arg4 = read(*this, xtl::type<int32 > ());
       int32 arg5 = read(*this, xtl::type<int32 > ());
+      float32 arg6 = read(*this, xtl::type<float32 > ());
+      float32 arg7 = read(*this, xtl::type<float32 > ());
 
-      dispatcher.SetViewportArea(arg1, arg2, arg3, arg4, arg5);
+      dispatcher.SetViewportArea(arg1, arg2, arg3, arg4, arg5, arg6, arg7);
 
       return true;
     }

@@ -39,7 +39,7 @@ class ConnectionState: public xtl::noncopyable
     void SetMaterialTexmapSampler(const char* material_name, const char* semantic, const char* sampler);
     void RemoveMaterial(const char* material_name);
 
-    void SetViewportArea (object_id_t id, int32 left, int32 top, int32 width, int32 height);
+    void SetViewportArea (object_id_t id, int32 left, int32 top, int32 width, int32 height, float32 min_depth, float32 max_depth);
     void SetViewportZOrder (object_id_t id, int32 zorder);
     void SetViewportActive (object_id_t id, bool8 is_active);
     void SetViewportName (object_id_t id, const char* name);
