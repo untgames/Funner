@@ -40,7 +40,7 @@ enum SpriteMode
   SpriteMode_Oriented          = 2,                                          //up vector is local up, normal & rotation is used
   SpriteMode_OrientedBillboard = SpriteMode_Billboard | SpriteMode_Oriented, //up vector is view up,  normal & rotation is used
 
-  SpriteMode_Default = SpriteMode_Billboard
+  SpriteMode_Default = SpriteMode_Oriented
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
