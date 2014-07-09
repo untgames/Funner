@@ -92,8 +92,8 @@ class Entity
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///”правление областью отсечени€ объекта
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-   void           SetScissor      (const BoxArea& scissor);
-   const BoxArea& Scissor         () const;
+   void           SetWorldScissor (const BoxArea& scissor);
+   const BoxArea& WorldScissor    () const;
    void           SetScissorState (bool state);
    void           EnableScissor   () { SetScissorState (true); }
    void           DisableScissor  () { SetScissorState (false); }

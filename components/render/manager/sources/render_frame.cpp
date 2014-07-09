@@ -654,7 +654,7 @@ void FrameImpl::Prerender (EntityDrawFunction entity_draw_handler)
 
       //добавление операций рендеринга
 
-    renderer.AddOperations (lod_desc.operations, eye_distance, entity_draw_params.mvp_matrix, desc.property_buffer.get (), desc.layout.get (),
+    renderer.AddOperations (lod_desc.operations, eye_distance, impl->view_proj_tm, entity_draw_params.mvp_matrix, desc.property_buffer.get (), desc.layout.get (),
       entity_independent_property_buffer.get (), entity_independent_layout.get ());
   }
 

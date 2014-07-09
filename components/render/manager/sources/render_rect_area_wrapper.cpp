@@ -12,6 +12,12 @@ RectArea::RectArea (const render::manager::Rect& in_rect)
 {
 }
 
+RectArea::RectArea (const RectArea& area)
+  : impl (area.impl)
+{
+  addref (impl);
+}
+
 RectArea::RectArea (RectAreaImpl* in_impl)
   : impl (in_impl)
 {

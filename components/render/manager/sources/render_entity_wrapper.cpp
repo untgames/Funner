@@ -140,14 +140,14 @@ const math::vec3f& Entity::LodPoint () const
   return impl->LodPoint ();
 }
 
-void Entity::SetScissor (const BoxArea& scissor)
+void Entity::SetWorldScissor (const BoxArea& scissor)
 {
-  impl->SetScissor (scissor);
+  impl->SetWorldScissor (scissor);
 }
 
-const BoxArea& Entity::Scissor () const
+const BoxArea& Entity::WorldScissor () const
 {
-  return impl->Scissor ();
+  return impl->WorldScissor ();
 }
 
 void Entity::SetScissorState (bool state)

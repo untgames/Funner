@@ -223,13 +223,16 @@ struct NormalizedScissor
   const BoxAreaImpl* scissor; //ссылка на объект-контейнер
 
 ///Конструкторы
-  NormalizedScissor (const BoxAreaImpl* in_scissor, const math::mat4f& mvp_matrix)
+  NormalizedScissor (const BoxAreaImpl* in_scissor, const math::mat4f& vp_matrix)
     : scissor (in_scissor)
   {
-    math::vec3f vmin = mvp_matrix * scissor->Box ().min_extent,
-                vmax = mvp_matrix * scissor->Box ().max_extent;
+    math::vec4f vmin = vp_matrix * math::vec4f (scissor->Box ().min_extent, 1.0f),
+                vmax = vp_matrix * math::vec4f (scissor->Box ().max_extent, 1.0f);
 
-    rect = rectf (vmin.x, vmin.y, vmax.x - vmin.x, vmax.y - vmin.y);
+    vmin  = (vmin / vmin.w + math::vec2f (1.0f)) * math::vec3f (0.5f, 0.5f, 0.5f);
+    vmax  = (vmax / vmax.w + math::vec2f (1.0f)) * math::vec3f (0.5f, 0.5f, 0.5f);
+
+    rect = rectf (vmin.x, 1.0f - vmax.y, vmax.x - vmin.x, vmax.y - vmin.y);
   }
 };
 
@@ -384,6 +387,7 @@ EffectRenderer::~EffectRenderer ()
 void EffectRenderer::AddOperations
  (const RendererOperationList& operations_desc,
   size_t                       eye_distance,
+  const math::mat4f&           vp_matrix,
   const math::mat4f&           mvp_matrix,
   render::low_level::IBuffer*  entity_dependent_property_buffer,
   ProgramParametersLayout*     entity_dependent_property_layout,
@@ -504,7 +508,7 @@ void EffectRenderer::AddOperations
           {
             normalized_scissor_index = impl->normalized_scissors.size ();
 
-            impl->normalized_scissors.push_back (NormalizedScissor (operation->scissor, mvp_matrix));
+            impl->normalized_scissors.push_back (NormalizedScissor (operation->scissor, vp_matrix));
           }
         }
           
@@ -885,7 +889,7 @@ struct RenderOperationsExecutor
 
       result.width  = size_t (right - result.x);
       result.height = size_t (bottom - result.y);
-        
+
       SetScissorRect (i, result);
     }
   }

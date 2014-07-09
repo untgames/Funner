@@ -160,6 +160,7 @@ class EffectRenderer: public Object
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void AddOperations (const RendererOperationList& operations,
                         size_t                       eye_distance,
+                        const math::mat4f&           vp_matrix,
                         const math::mat4f&           mvp_matrix,
                         render::low_level::IBuffer*  property_buffer = 0,
                         ProgramParametersLayout*     property_layour = 0,

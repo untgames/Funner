@@ -845,17 +845,19 @@ class EffectLoader
         LowLevelBlendStatePtr        blend_state              = *blend_state_name ? library.BlendStates ().Find (blend_state_name) : LowLevelBlendStatePtr ();
         LowLevelDepthStencilStatePtr depth_stencil_state      = *depth_stencil_state_name ? library.DepthStencilStates ().Find (depth_stencil_state_name) : LowLevelDepthStencilStatePtr ();
         LowLevelRasterizerStatePtr   rasterizer_state         = *rasterizer_state_name ? library.RasterizerStates ().Find (rasterizer_state_name) : LowLevelRasterizerStatePtr ();
+        LowLevelRasterizerStatePtr   rasterizer_scissor_state = *rasterizer_state_name ? library.RasterizerScissorStates ().Find (rasterizer_state_name) : LowLevelRasterizerStatePtr ();
         
         EffectPassPtr pass (new EffectPass (device_manager), false);
 
-        pass->SetColorTargets       (color_targets);
-        pass->SetDepthStencilTarget (depth_stencil_target);
-        pass->SetTags               (tags);
-        pass->SetSortMode           (sort_mode);
-        pass->SetBlendState         (blend_state);
-        pass->SetDepthStencilState  (depth_stencil_state);
-        pass->SetRasterizerState    (rasterizer_state);
-        pass->SetClearFlags         (clear_flags);
+        pass->SetColorTargets           (color_targets);
+        pass->SetDepthStencilTarget     (depth_stencil_target);
+        pass->SetTags                   (tags);
+        pass->SetSortMode               (sort_mode);
+        pass->SetBlendState             (blend_state);
+        pass->SetDepthStencilState      (depth_stencil_state);
+        pass->SetRasterizerState        (rasterizer_state);
+        pass->SetRasterizerScissorState (rasterizer_scissor_state);
+        pass->SetClearFlags             (clear_flags);
         
         return pass;
       }

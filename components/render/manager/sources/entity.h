@@ -99,8 +99,8 @@ class EntityImpl: public Object
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///”правление областью отсечени€ объекта
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void           SetScissor      (const BoxArea& scissor);
-    const BoxArea& Scissor         ();
+    void           SetWorldScissor (const BoxArea& scissor);
+    const BoxArea& WorldScissor    ();
     void           SetScissorState (bool state);
     bool           ScissorState    ();
 

@@ -12,6 +12,12 @@ BoxArea::BoxArea (const render::manager::Box& in_box)
 {
 }
 
+BoxArea::BoxArea (const BoxArea& area)
+  : impl (area.impl)
+{
+  addref (impl);
+}
+
 BoxArea::BoxArea (BoxAreaImpl* in_impl)
   : impl (in_impl)
 {

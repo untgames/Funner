@@ -105,7 +105,7 @@ int main ()
 
     primitive.Buffers ().ReserveDynamicBuffers (8192, 8192);
 
-    entity.SetScissor (Box (math::vec3f (0.0f), math::vec3f (1.0f)));
+    entity.SetWorldScissor (Box (math::vec3f (0.0f), math::vec3f (1.0f)));
     entity.EnableScissor ();
 
     sprite.position   = math::vec3f (0.0f);

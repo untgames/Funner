@@ -162,14 +162,14 @@ class EntityLodCommonData: public CacheHolder, public DebugIdHolder
     bool ScissorState () { return scissor_state; }
     
 ///Область отсечения
-    void SetScissor (const BoxArea& rect)
+    void SetWorldScissor (const BoxArea& rect)
     {
       scissor_rect = rect;
       
       InvalidateCache (false);
     }
     
-    const BoxArea& Scissor () { return scissor_rect; }
+    const BoxArea& WorldScissor () { return scissor_rect; }
 
 ///Матрица мировых преобразований
     void SetWorldMatrix (const math::mat4f& tm)
@@ -473,7 +473,7 @@ struct EntityLod: public xtl::reference_counter, public EntityLodDesc, public Ca
       cached_operations.clear ();
       cached_operations.reserve (operations_count);
       
-      const BoxAreaImpl* scissor = common_data.ScissorState () ? Wrappers::Unwrap<BoxAreaImpl> (common_data.Scissor ()).get () : (const BoxAreaImpl*)0;
+      const BoxAreaImpl* scissor = common_data.ScissorState () ? Wrappers::Unwrap<BoxAreaImpl> (common_data.WorldScissor ()).get () : (const BoxAreaImpl*)0;
       
         //построение списка операций рендеринга статических примитивов
 
@@ -896,14 +896,14 @@ const math::vec3f& EntityImpl::LodPoint ()
     Управление областью отсечения объекта
 */
 
-void EntityImpl::SetScissor (const BoxArea& scissor)
+void EntityImpl::SetWorldScissor (const BoxArea& scissor)
 {
-  impl->SetScissor (scissor);
+  impl->SetWorldScissor (scissor);
 }
 
-const BoxArea& EntityImpl::Scissor ()
+const BoxArea& EntityImpl::WorldScissor ()
 {
-  return impl->Scissor ();
+  return impl->WorldScissor ();
 }
 
 void EntityImpl::SetScissorState (bool state)
