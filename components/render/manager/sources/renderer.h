@@ -81,7 +81,7 @@ struct RendererOperation
   const RendererPrimitive*        primitive;                      //примитив
   DynamicPrimitive*               dynamic_primitive;              //динамический примитив, соответствующий операции (может быть 0)
   ShaderOptionsCache*             shader_options_cache;           //кэш опций шейдера
-  const RectAreaImpl*             scissor;                        //область отсечения (может быть null)
+  const BoxAreaImpl*              scissor;                        //область отсечения (может быть null)
   size_t                          batching_hash;                  //хэш пакета
 };
 

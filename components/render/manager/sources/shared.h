@@ -18,6 +18,7 @@
 #include <xtl/ref.h>
 #include <xtl/shared_ptr.h>
 #include <xtl/signal.h>
+#include <xtl/rect.h>
 #include <xtl/trackable.h>
 #include <xtl/uninitialized_storage.h>
 

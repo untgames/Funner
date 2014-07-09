@@ -140,12 +140,12 @@ const math::vec3f& Entity::LodPoint () const
   return impl->LodPoint ();
 }
 
-void Entity::SetScissor (const RectArea& scissor)
+void Entity::SetScissor (const BoxArea& scissor)
 {
   impl->SetScissor (scissor);
 }
 
-const RectArea& Entity::Scissor () const
+const BoxArea& Entity::Scissor () const
 {
   return impl->Scissor ();
 }

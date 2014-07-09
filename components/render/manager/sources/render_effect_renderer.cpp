@@ -2,7 +2,7 @@
 
 using namespace render::manager;
 
-//TODO: shared EffectRenderer buffers (operations, passes, etc)
+//TODO: shared EffectRenderer buffers (operations, passes, mvp_matrices, normalized_scissors, etc)
 //TODO: program/parameters_layout/local_textures FIFO cache
 
 /*
@@ -15,14 +15,17 @@ using namespace render::manager;
 namespace
 {
 
+using render::low_level::DEVICE_RENDER_TARGET_SLOTS_COUNT;
+
 /*
     Константы
 */
 
-const size_t RESERVE_OPERATION_ARRAY  = 512; //резервируемое число операций в массиве операций прохода
-const size_t RESERVE_FRAME_ARRAY      = 32;  //резервируемое число вложенных фреймов в эффекте
-const size_t RESERVE_MVP_MATRIX_ARRAY = 512; //резервируемое число матриц MVP (для динамических примитивов)
-const size_t RESERVE_BATCHES_ARRAY    = 128; //резервируемое количество пакетов
+const size_t RESERVE_OPERATION_ARRAY          = 512; //резервируемое число операций в массиве операций прохода
+const size_t RESERVE_FRAME_ARRAY              = 32;  //резервируемое число вложенных фреймов в эффекте
+const size_t RESERVE_MVP_MATRIX_ARRAY         = 512; //резервируемое число матриц MVP (для динамических примитивов)
+const size_t RESERVE_BATCHES_ARRAY            = 128; //резервируемое количество пакетов
+const size_t RESERVE_NORMALIZED_SCISSOR_ARRAY = 16;  //резервируемое количество областей отсечения
 
 /*
     Вспомогательные структуры
@@ -35,18 +38,21 @@ struct PassOperation: public RendererOperation
   render::low_level::IBuffer*  frame_entity_parameters_buffer; //буфер параметров пары фрейм-объект
   size_t                       eye_distance;                   //расстояние от z-near
   int                          mvp_matrix_index;               //ссылка на матрицу Model-View-Projection
+  int                          normalized_scissor_index;       //ссылка на область отсечения в относительных координатах
   
 ///Конструктор
   PassOperation (const RendererOperation&    base,
                  ProgramParametersLayout*    in_frame_entity_parameters_layout,
                  render::low_level::IBuffer* in_frame_entity_parameters_buffer,
                  size_t                      in_eye_distance,
-                 int                         in_mvp_matrix_index)
+                 int                         in_mvp_matrix_index,
+                 int                         in_normalized_scissor_index)
     : RendererOperation (base)
     , frame_entity_parameters_layout (in_frame_entity_parameters_layout)
     , frame_entity_parameters_buffer (in_frame_entity_parameters_buffer)
     , eye_distance (in_eye_distance)
     , mvp_matrix_index (in_mvp_matrix_index)
+    , normalized_scissor_index (in_normalized_scissor_index)
   {
       //обновление хэша
 
@@ -208,12 +214,32 @@ struct RenderEffectOperation: public xtl::reference_counter
   RenderEffectOperation (const RenderInstantiatedEffectPtr& in_effect) : effect (in_effect) {}
 };
 
+typedef xtl::rect<float> rectf;
+
+///Область отсечения в нормированных координатах [0;1]
+struct NormalizedScissor
+{
+  rectf              rect;    //область отсечения
+  const BoxAreaImpl* scissor; //ссылка на объект-контейнер
+
+///Конструкторы
+  NormalizedScissor (const BoxAreaImpl* in_scissor, const math::mat4f& mvp_matrix)
+    : scissor (in_scissor)
+  {
+    math::vec3f vmin = mvp_matrix * scissor->Box ().min_extent,
+                vmax = mvp_matrix * scissor->Box ().max_extent;
+
+    rect = rectf (vmin.x, vmin.y, vmax.x - vmin.x, vmax.y - vmin.y);
+  }
+};
+
 typedef xtl::intrusive_ptr<RenderEffectOperation>             RenderEffectOperationPtr;
 typedef stl::hash_multimap<size_t, RenderPass*>               RenderPassMap;
 typedef stl::hash_multimap<size_t, RenderInstantiatedEffect*> RenderInstantiatedEffectMap;
 typedef stl::vector<RenderEffectOperationPtr>                 RenderEffectOperationArray;
 typedef stl::vector<size_t>                                   TagHashArray;
 typedef stl::vector<math::mat4f>                              MatrixArray;
+typedef stl::vector<NormalizedScissor>                        NormalizedScissorArray;
 
 }
 
@@ -229,6 +255,7 @@ struct EffectRenderer::Impl
   RenderInstantiatedEffectMap effects;             //инстанцированные эффекты
   RenderEffectOperationArray  operations;          //операции рендеринга
   MatrixArray                 mvp_matrices;        //матрицы
+  NormalizedScissorArray      normalized_scissors; //нормированные области вывода
   BatchingManagerArray        batching_managers;   //менеджеры пакетирования
   bool                        right_hand_viewport; //является ли область вывода правосторонней
   
@@ -236,6 +263,8 @@ struct EffectRenderer::Impl
     : device_manager (in_device_manager)
     , right_hand_viewport (false)
   {
+    mvp_matrices.reserve (RESERVE_MVP_MATRIX_ARRAY);
+    normalized_scissors.reserve (RESERVE_NORMALIZED_SCISSOR_ARRAY);
     batching_managers.reserve (RESERVE_BATCHES_ARRAY);
   }
 };
@@ -265,10 +294,6 @@ EffectRenderer::EffectRenderer (const EffectPtr& effect, const DeviceManagerPtr&
       
     if (effect->TagsCount ())
       impl->effect_tags.assign (effect->TagHashes (), effect->TagHashes () + effect->TagsCount ());
-
-      //резервирование места для массива матриц
-
-    impl->mvp_matrices.reserve (RESERVE_MVP_MATRIX_ARRAY);
       
       //построение структуры диспетчеризации операций рендеринга
 
@@ -459,10 +484,33 @@ void EffectRenderer::AddOperations
         
         if (pass.last_operation == operation)
           continue;
+
+          //обновление области отсечения
+
+        int normalized_scissor_index = -1;
+
+        if (operation->scissor)
+        {
+          NormalizedScissorArray::iterator iter = impl->normalized_scissors.begin (), end = impl->normalized_scissors.end ();
+
+          for (; iter!=end; ++iter)
+            if (iter->scissor == operation->scissor)
+            {
+              normalized_scissor_index = iter - impl->normalized_scissors.begin ();
+              break;
+            }
+
+          if (iter == end)
+          {
+            normalized_scissor_index = impl->normalized_scissors.size ();
+
+            impl->normalized_scissors.push_back (NormalizedScissor (operation->scissor, mvp_matrix));
+          }
+        }
           
           //добавление операции к списку операций прохода
 
-        pass.operations.push_back (PassOperation (*operation, property_layout, property_buffer, eye_distance, mvp_matrix_index));
+        pass.operations.push_back (PassOperation (*operation, property_layout, property_buffer, eye_distance, mvp_matrix_index, normalized_scissor_index));
 
         PassOperation& result_operation = pass.operations.back ();
 
@@ -548,6 +596,8 @@ void EffectRenderer::RemoveAllOperations ()
 
   impl->mvp_matrices.clear ();
 
+  impl->normalized_scissors.clear ();
+
   impl->batching_managers.clear ();
 }
 
@@ -557,6 +607,23 @@ void EffectRenderer::RemoveAllOperations ()
 
 namespace
 {
+
+///Контекст целевых буферов рендеринга
+struct RenderTargetContext
+{
+  size_t        targets_count;
+  const rectf*  current_local_scissor;
+  bool          has_scissors;
+  Rect          viewport_rects [DEVICE_RENDER_TARGET_SLOTS_COUNT];
+  RectAreaImpl* scissors [DEVICE_RENDER_TARGET_SLOTS_COUNT];
+
+  RenderTargetContext ()
+    : targets_count ()
+    , current_local_scissor ()
+    , has_scissors ()
+  {  
+  }
+};
 
 ///Обобщение алгоритма рендеринга операций
 struct RenderOperationsExecutor
@@ -570,11 +637,12 @@ struct RenderOperationsExecutor
   ShaderOptionsCache&                frame_shader_options_cache; //кэш опций шейдеров для кадра
   LowLevelBufferPtr                  frame_property_buffer;      //буфер параметров кадра
   const MatrixArray&                 mvp_matrices;               //массив матриц Model-View-Projection
+  const NormalizedScissorArray&      normalized_scissors;        //нормированные области отсечения
   BatchingManagerArray&              batching_managers;          //менеджеры пакетирования
   bool                               right_hand_viewport;        //является ли область вывода правосторонней
   
 ///Конструктор
-  RenderOperationsExecutor (RenderingContext& in_context, DeviceManager& in_device_manager, const MatrixArray& in_mvp_matrices, BatchingManagerArray& in_batching_managers, bool in_right_hand_viewport)
+  RenderOperationsExecutor (RenderingContext& in_context, DeviceManager& in_device_manager, const MatrixArray& in_mvp_matrices, const NormalizedScissorArray& in_normalized_scissors, BatchingManagerArray& in_batching_managers, bool in_right_hand_viewport)
     : context (in_context)
     , device_manager (in_device_manager)
     , device (device_manager.Device ())
@@ -584,6 +652,7 @@ struct RenderOperationsExecutor
     , frame_shader_options_cache (frame.ShaderOptionsCache ())
     , frame_property_buffer (frame.DevicePropertyBuffer ())
     , mvp_matrices (in_mvp_matrices)
+    , normalized_scissors (in_normalized_scissors)
     , batching_managers (in_batching_managers)
     , right_hand_viewport (in_right_hand_viewport)
   {
@@ -620,120 +689,133 @@ struct RenderOperationsExecutor
   }
   
 ///Настройка целевых буферов отрисовки
-  void SetRenderTargets (RenderPass& pass, RectAreaPtr& scissor)
+  void SetRenderTargets (RenderPass& pass, RenderTargetContext& render_target_context)
   {
-    if (pass.color_targets.Size () > 1)
-      throw xtl::format_not_supported_exception ("", "MRT not supported");
-      
-    render::low_level::IView *render_target_view = 0, *depth_stencil_view = 0;
-    ViewportPtr              viewport;
-    size_t                   target_width = 0, target_height = 0;
-    math::vec2ui             viewport_offset;
-    
-      //получение информации о буфере цвета
+    render::low_level::IView* depth_stencil_view  = 0;
+    size_t                    depth_stencil_width = 0, depth_stencil_height = 0;
 
-    if (!pass.color_targets.IsEmpty ())        
-    {
-      RenderTargetDescPtr desc = context.FindRenderTarget (pass.color_targets [0]);
-      
-      if (desc && desc->render_target)
-      {
-        render_target_view = &desc->render_target->View ();
-        viewport           = desc->viewport;
-        scissor            = desc->scissor;
-        target_width       = desc->render_target->Width ();
-        target_height      = desc->render_target->Height ();
-        viewport_offset    = desc->render_target->ViewportOffset ();
-      }
-    }
-    
       //получение информации о буфере отсечения
-    
+
     if (!pass.depth_stencil_target.empty ())
     {
-      RenderTargetDescPtr desc = context.FindRenderTarget (pass.depth_stencil_target.c_str ());      
-      
+      RenderTargetDescPtr desc = context.FindRenderTarget (pass.depth_stencil_target.c_str ());
+
       if (desc && desc->render_target)
       {
-        depth_stencil_view = &desc->render_target->View ();
-        
-          //проверка совместимости буфера цвета и буфера отсечения
-        
-        if (desc->viewport && viewport && viewport->Area ().Rect () != desc->viewport->Area ().Rect ())
-          throw xtl::format_operation_exception ("", "Different viewport rect areas for color target and depth-stencil target");
-          
-        if (!viewport && desc->viewport)
-          viewport = desc->viewport;
+        if (desc->viewport)
+          throw xtl::format_operation_exception ("", "Depth-stencil target should not has a viewport");
 
-        if (desc->scissor && scissor && scissor->Rect () != desc->scissor->Rect ())
-          throw xtl::format_operation_exception ("", "Different scissor rect areas for color target and depth-stencil target");              
-          
-        if (!scissor && desc->scissor)
-          scissor = desc->scissor;          
-          
-        if (render_target_view)
-        {
-          if (desc->render_target->Width () != target_width || desc->render_target->Height () != target_height)
-            throw xtl::format_operation_exception ("", "Different render target sizes: render target sizes (%u, %u) mismatch depth-stencil sizes (%u, %u)",
-              target_width, target_height, desc->render_target->Width (), desc->render_target->Height ());
+        if (desc->scissor)
+          throw xtl::format_operation_exception ("", "Depth-stencil target should not has a scissor");
 
-          if (viewport_offset != desc->render_target->ViewportOffset ())
-            throw xtl::format_operation_exception ("", "Different viewport offsets: render target offset (%u, %u) mismatch depth-stencil offset (%u, %u)",
-              viewport_offset.x, viewport_offset.y, desc->render_target->ViewportOffset ().x, desc->render_target->ViewportOffset ().y);
-        }
-      }                    
+        depth_stencil_view   = &desc->render_target->View (); 
+        depth_stencil_width  = desc->render_target->Width ();
+        depth_stencil_height = desc->render_target->Height ();
+      }
     }
-    
-      //установка целевых буферов отрисовки
 
-    device_context.OSSetRenderTargetView (0, render_target_view);
-    device_context.OSSetDepthStencilView (depth_stencil_view);
+      //получение информации о буфера цвета
 
-      //настройка области вывода                
+    render::low_level::IView*   render_target_views [DEVICE_RENDER_TARGET_SLOTS_COUNT];
+    render::low_level::Viewport viewports [DEVICE_RENDER_TARGET_SLOTS_COUNT];
 
-    if (viewport)
-    {      
-      render::low_level::Viewport viewport_desc;
-      const Rect&                 rect = viewport->Area ().Rect ();
-      
-      memset (&viewport_desc, 0, sizeof (viewport_desc));
-      
-      viewport_desc.x         = rect.x + viewport_offset.x;
-      viewport_desc.y         = rect.y + viewport_offset.y;
-      viewport_desc.width     = rect.width;
-      viewport_desc.height    = rect.height;
-      viewport_desc.min_depth = viewport->MinDepth ();
-      viewport_desc.max_depth = viewport->MaxDepth ();
+    size_t target_width       = 0, target_height = 0;
+    bool   target_initialized = false;
 
-      if (right_hand_viewport)
-        viewport_desc.y = target_height - viewport_desc.height - viewport_desc.y;
+    const char** color_target_names = pass.color_targets.Data ();
 
-      device_context.RSSetViewport (0, viewport_desc);
-    }
-    else
+    render_target_context.targets_count = stl::min (pass.color_targets.Size (), DEVICE_RENDER_TARGET_SLOTS_COUNT);
+
+    for (size_t i=0; i<render_target_context.targets_count; i++)
     {
-      render::low_level::Viewport viewport_desc;
-      
-      memset (&viewport_desc, 0, sizeof (viewport_desc));
-      
-      viewport_desc.x         = viewport_offset.x;
-      viewport_desc.y         = viewport_offset.y;
-      viewport_desc.width     = target_width;
-      viewport_desc.height    = target_height;
-      viewport_desc.min_depth = 0.0f;
-      viewport_desc.max_depth = 1.0f;
+      const char* target_name = color_target_names [i];
 
-      device_context.RSSetViewport (0, viewport_desc);
+      RenderTargetDescPtr desc = context.FindRenderTarget (target_name);
+
+      if (!desc || !desc->render_target)
+      {
+        render_target_views [i]                  = 0;
+        render_target_context.scissors [i]       = 0;
+        render_target_context.viewport_rects [i] = Rect ();
+
+        continue;
+      }
+
+      ViewportImpl*       viewport        = &*desc->viewport;
+      const math::vec2ui& viewport_offset = desc->render_target->ViewportOffset ();
+      size_t              width           = desc->render_target->Width (),
+                          height          = desc->render_target->Height ();
+
+      render_target_views [i]            = &desc->render_target->View ();
+      render_target_context.scissors [i] = &*desc->scissor;      
+
+      if (desc->scissor)
+        render_target_context.has_scissors = true;
+
+      render::low_level::Viewport& viewport_desc = viewports [i];
+
+      memset (&viewport_desc, 0, sizeof (viewport_desc));
+
+      if (viewport)
+      {      
+        const Rect& rect = viewport->Area ().Rect ();
+        
+        viewport_desc.x         = rect.x + viewport_offset.x;
+        viewport_desc.y         = rect.y + viewport_offset.y;
+        viewport_desc.width     = rect.width;
+        viewport_desc.height    = rect.height;
+        viewport_desc.min_depth = viewport->MinDepth ();
+        viewport_desc.max_depth = viewport->MaxDepth ();
+
+        if (right_hand_viewport)
+          viewport_desc.y = height - viewport_desc.height - viewport_desc.y;
+      }
+      else
+      {
+        viewport_desc.x         = viewport_offset.x;
+        viewport_desc.y         = viewport_offset.y;
+        viewport_desc.width     = width;
+        viewport_desc.height    = height;
+        viewport_desc.min_depth = 0.0f;
+        viewport_desc.max_depth = 1.0f;
+      }
+
+      render_target_context.viewport_rects [i] = Rect (viewport_desc.x, viewport_desc.y, viewport_desc.width, viewport_desc.height);
+
+      if (target_initialized)
+      {
+        if (target_width != viewport_desc.width || target_height != viewport_desc.height)
+          throw xtl::format_operation_exception ("", "Render target %s sizes mismatch (%u, %u) with (%u, %u)", target_name, viewport_desc.width, viewport_desc.height, target_width, target_height);
+      }
+      else
+      {
+        target_width       = width;
+        target_height      = height;
+        target_initialized = true;
+      }      
     }
 
-      //настройка области отсечения
-      
-    if (scissor)
-      SetScissorRect (0, scissor->Rect ());
+      //проверка совместимости буфера глубины и цвета
+
+    if (target_initialized && depth_stencil_view && (depth_stencil_width != target_width || depth_stencil_height != target_height))
+      throw xtl::format_operation_exception ("", "Different render target sizes: render target sizes (%u, %u) mismatch depth-stencil sizes (%u, %u)",
+        target_width, target_height, depth_stencil_width, depth_stencil_height);
+
+      //установка целей и областей вывода
+
+    device_context.OSSetRenderTargets (render_target_context.targets_count, render_target_views, depth_stencil_view);
+
+    for (size_t i=0; i<render_target_context.targets_count; i++)
+      device_context.RSSetViewport (i, viewports [i]);
+
+      //установка областей отсечения
+
+    if (render_target_context.has_scissors)
+      SetScissorRects (render_target_context, 0);
   }
   
 ///Очистка целевых буферов
-  void ClearViews (RenderPass& pass)
+  void ClearViews (RenderPass& pass, const RenderTargetContext& render_target_context)
   {
     size_t src_clear_flags = frame.ClearFlags () & pass.clear_flags, dst_clear_flags = 0;
     
@@ -744,9 +826,16 @@ struct RenderOperationsExecutor
     
     if (dst_clear_flags)
     {
-      size_t rt_index = 0;
+      size_t                     indices [DEVICE_RENDER_TARGET_SLOTS_COUNT];
+      render::low_level::Color4f colors [DEVICE_RENDER_TARGET_SLOTS_COUNT], &color = (render::low_level::Color4f&)frame.ClearColor ();
 
-      device_context.ClearViews (dst_clear_flags, 1, &rt_index, &(render::low_level::Color4f&)frame.ClearColor (), frame.ClearDepthValue (), frame.ClearStencilIndex ());    
+      for (size_t i=0; i<render_target_context.targets_count; i++)
+      {
+        indices [i] = i;
+        colors [i]  = color;
+      }
+
+      device_context.ClearViews (dst_clear_flags, render_target_context.targets_count, indices, colors, frame.ClearDepthValue (), frame.ClearStencilIndex ());    
     }
   }
   
@@ -765,6 +854,42 @@ struct RenderOperationsExecutor
     }    
   }
   
+  void SetScissorRects (const RenderTargetContext& render_target_context, const rectf* operation_scissor)
+  {
+    for (size_t i=0; i<render_target_context.targets_count; i++)
+    {
+      const Rect& common_scissor_rect = render_target_context.scissors [i] ? render_target_context.scissors [i]->Rect () : render_target_context.viewport_rects [i];
+
+      if (!operation_scissor)
+      {
+        SetScissorRect (i, common_scissor_rect);
+
+        continue;
+      }
+
+      const Rect& viewport_rect = render_target_context.viewport_rects [i];
+      Rect        operation_scissor_rect;
+
+      operation_scissor_rect.x      = int (operation_scissor->x * viewport_rect.width);
+      operation_scissor_rect.y      = int (operation_scissor->y * viewport_rect.height);
+      operation_scissor_rect.width  = size_t (operation_scissor->width * viewport_rect.width);
+      operation_scissor_rect.height = size_t (operation_scissor->height * viewport_rect.height);
+
+      Rect result;
+      
+      result.x = stl::max (common_scissor_rect.x, operation_scissor_rect.x);
+      result.y = stl::max (common_scissor_rect.y, operation_scissor_rect.y);
+      
+      int right  = stl::min (common_scissor_rect.x + common_scissor_rect.width, operation_scissor_rect.x + operation_scissor_rect.width),
+          bottom = stl::min (common_scissor_rect.y + common_scissor_rect.height, operation_scissor_rect.y + operation_scissor_rect.height);
+
+      result.width  = size_t (right - result.x);
+      result.height = size_t (bottom - result.y);
+        
+      SetScissorRect (i, result);
+    }
+  }
+
   void SetScissorRect (size_t rt_index, const Rect& src_rect)
   {
     render::low_level::Rect dst_rect;
@@ -856,19 +981,18 @@ struct RenderOperationsExecutor
     pass.Sort ();
 
       //установка целевых буферов отрисовки
-      
-    RectAreaPtr         scissor;
-    const RectAreaImpl* current_local_scissor = 0;
     
-    SetRenderTargets (pass, scissor);
+    RenderTargetContext render_target_context;  
+    
+    SetRenderTargets (pass, render_target_context);
           
       //применение состояния прохода
       
-    SetScissorState (pass, scissor);
+    SetScissorState (pass, render_target_context.has_scissors);
     
       //очистка экрана
       
-    ClearViews (pass);
+    ClearViews (pass, render_target_context);
       
       //установка константного буфера кадра
 
@@ -877,16 +1001,16 @@ struct RenderOperationsExecutor
       //выполнение операций                    
 
     for (OperationPtrArray::iterator iter=pass.operation_ptrs.begin (), end=pass.operation_ptrs.end (); iter!=end; ++iter)
-      DrawPassOperation (pass, iter, end, scissor ? &*scissor : (RectAreaImpl*)0, current_local_scissor);
+      DrawPassOperation (pass, iter, end, render_target_context);
   }
   
 ///Выполнение операции прохода рендеринга
-  void DrawPassOperation (RenderPass& pass, OperationPtrArray::iterator& operation_iter, OperationPtrArray::iterator operation_end, RectAreaImpl* common_scissor, const RectAreaImpl*& current_local_scissor)
+  void DrawPassOperation (RenderPass& pass, OperationPtrArray::iterator& operation_iter, OperationPtrArray::iterator operation_end, RenderTargetContext& render_target_context)
   {
     const PassOperation&     operation                   = **operation_iter;
     const RendererPrimitive& primitive                   = *operation.primitive;
     ShaderOptionsCache&      entity_shader_options_cache = *operation.shader_options_cache;
-    const RectAreaImpl*      operation_scissor           = operation.scissor;
+    const rectf*             operation_scissor           = operation.normalized_scissor_index != -1 ? &normalized_scissors [operation.normalized_scissor_index].rect : (const rectf*)0;
 
     if (!primitive.count)
       return;
@@ -911,56 +1035,16 @@ struct RenderOperationsExecutor
 
       //обработка области отсечения объекта
 
-    if (operation_scissor != current_local_scissor)
+    if (operation_scissor != render_target_context.current_local_scissor)
     {
-      bool scissor_state = true;
-      
-      if (operation_scissor)
-      {
-        if (common_scissor)
-        {
-            //обе области отсечения присутствуют
-            
-          const Rect &rect1 = common_scissor->Rect (), &rect2 = operation_scissor->Rect ();
-          Rect result;
-          
-          result.x = stl::max (rect1.x, rect2.x);
-          result.y = stl::max (rect1.y, rect2.y);
-          
-          int right  = stl::min (rect1.x + rect1.width, rect2.x + rect2.width),
-              bottom = stl::min (rect1.y + rect1.height, rect2.y + rect2.height);
+      bool scissor_state = render_target_context.has_scissors || operation_scissor;
 
-          result.width  = size_t (right - result.x);
-          result.height = size_t (bottom - result.y);
-            
-          SetScissorRect (0, result);
-        }
-        else
-        {
-            //присутствует только локальная область отсечения
-            
-          SetScissorRect (0, operation_scissor->Rect ());
-        }
-      }
-      else
-      {
-        if (common_scissor)
-        {
-            //присутствует только область отсечения фрейма
-
-          SetScissorRect (0, common_scissor->Rect ());
-        }
-        else
-        {
-            //обе области отсечения отсутствуют                    
-            
-          scissor_state = false;
-        }        
-      }
-      
       SetScissorState (pass, scissor_state);
+
+      if (scissor_state)
+        SetScissorRects (render_target_context, operation_scissor);
       
-      current_local_scissor = operation_scissor;
+      render_target_context.current_local_scissor = operation_scissor;
     }
     
       //установка локальных текстур
@@ -1062,7 +1146,7 @@ void EffectRenderer::ExecuteOperations (RenderingContext& context)
   {
       //исполнение операций
 
-    RenderOperationsExecutor executor (context, *impl->device_manager, impl->mvp_matrices, impl->batching_managers, impl->right_hand_viewport);
+    RenderOperationsExecutor executor (context, *impl->device_manager, impl->mvp_matrices, impl->normalized_scissors, impl->batching_managers, impl->right_hand_viewport);
 
     executor.Draw (impl->operations);
   }

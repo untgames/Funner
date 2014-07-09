@@ -105,6 +105,9 @@ int main ()
 
     primitive.Buffers ().ReserveDynamicBuffers (8192, 8192);
 
+    entity.SetScissor (Box (math::vec3f (0.0f), math::vec3f (1.0f)));
+    entity.EnableScissor ();
+
     sprite.position   = math::vec3f (0.0f);
     sprite.size       = math::vec2f (1.0f);
     sprite.color      = math::vec4f (1.0f);

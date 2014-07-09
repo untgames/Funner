@@ -92,12 +92,12 @@ class Entity
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Управление областью отсечения объекта
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-   void            SetScissor      (const RectArea& scissor);
-   const RectArea& Scissor         () const;
-   void            SetScissorState (bool state);
-   void            EnableScissor   () { SetScissorState (true); }
-   void            DisableScissor  () { SetScissorState (false); }
-   bool            ScissorState    () const;
+   void           SetScissor      (const BoxArea& scissor);
+   const BoxArea& Scissor         () const;
+   void           SetScissorState (bool state);
+   void           EnableScissor   () { SetScissorState (true); }
+   void           DisableScissor  () { SetScissorState (false); }
+   bool           ScissorState    () const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Управление кэшированием

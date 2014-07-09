@@ -162,14 +162,14 @@ class EntityLodCommonData: public CacheHolder, public DebugIdHolder
     bool ScissorState () { return scissor_state; }
     
 ///Область отсечения
-    void SetScissor (const RectArea& rect)
+    void SetScissor (const BoxArea& rect)
     {
       scissor_rect = rect;
       
       InvalidateCache (false);
     }
     
-    const RectArea& Scissor () { return scissor_rect; }
+    const BoxArea& Scissor () { return scissor_rect; }
 
 ///Матрица мировых преобразований
     void SetWorldMatrix (const math::mat4f& tm)
@@ -353,7 +353,7 @@ class EntityLodCommonData: public CacheHolder, public DebugIdHolder
     DynamicTextureEntityStorage          dynamic_textures;         //хранилище динамических текстур объекта рендеринга
     render::manager::ShaderOptionsCache  shader_options_cache;     //кэш опций шейдера
     bool                                 scissor_state;            //состояние режима отсечения
-    RectArea                             scissor_rect;             //область отсечения
+    BoxArea                              scissor_rect;             //область отсечения
     LowLevelStateBlockPtr                default_state_block;      //блок состояний по умолчанию
     math::mat4f                          world_tm;                 //мировая матрица преобразований
     math::mat4f                          inv_world_tm;             //инверсная матрица преобразований
@@ -473,7 +473,7 @@ struct EntityLod: public xtl::reference_counter, public EntityLodDesc, public Ca
       cached_operations.clear ();
       cached_operations.reserve (operations_count);
       
-      const RectAreaImpl* scissor = common_data.ScissorState () ? Wrappers::Unwrap<RectAreaImpl> (common_data.Scissor ()).get () : (const RectAreaImpl*)0;
+      const BoxAreaImpl* scissor = common_data.ScissorState () ? Wrappers::Unwrap<BoxAreaImpl> (common_data.Scissor ()).get () : (const BoxAreaImpl*)0;
       
         //построение списка операций рендеринга статических примитивов
 
@@ -501,7 +501,7 @@ struct EntityLod: public xtl::reference_counter, public EntityLodDesc, public Ca
     }
   }  
 
-  void BuildRendererOperations (const RendererPrimitiveGroup& group, const RectAreaImpl* scissor, DynamicPrimitive* dynamic_primitive)
+  void BuildRendererOperations (const RendererPrimitiveGroup& group, const BoxAreaImpl* scissor, DynamicPrimitive* dynamic_primitive)
   {
     const RendererPrimitive* primitives       = group.primitives;        
     size_t                   primitives_count = group.primitives_count;
@@ -896,12 +896,12 @@ const math::vec3f& EntityImpl::LodPoint ()
     Управление областью отсечения объекта
 */
 
-void EntityImpl::SetScissor (const RectArea& scissor)
+void EntityImpl::SetScissor (const BoxArea& scissor)
 {
   impl->SetScissor (scissor);
 }
 
-const RectArea& EntityImpl::Scissor ()
+const BoxArea& EntityImpl::Scissor ()
 {
   return impl->Scissor ();
 }
