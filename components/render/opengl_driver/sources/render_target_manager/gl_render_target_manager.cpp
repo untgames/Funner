@@ -439,9 +439,10 @@ struct RenderTargetManager::Impl: public ContextObject, public RenderTargetManag
         
         if (current_scissor_hash != scissor_hash)
         {        
-          const Rect& scissor = GetScissor (render_target_slot);
+          const Rect&     scissor  = GetScissor (render_target_slot);
+          const Viewport& viewport = GetViewport (render_target_slot);
           
-          glScissor (scissor.x >= 0 ? scissor.x : 0, scissor.y >= 0 ? scissor.y : 0, scissor.width, scissor.height);
+          glScissor (scissor.x >= 0 ? scissor.x : 0, scissor.y >= 0 ? viewport.height - scissor.y - scissor.height: 0, scissor.width, scissor.height);
 
           SetContextCacheValue (CacheEntry_ScissorHash0 + render_target_slot, scissor_hash);
         }
