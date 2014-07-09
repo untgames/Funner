@@ -229,10 +229,13 @@ struct NormalizedScissor
     math::vec4f vmin = vp_matrix * math::vec4f (scissor->Box ().min_extent, 1.0f),
                 vmax = vp_matrix * math::vec4f (scissor->Box ().max_extent, 1.0f);
 
-    vmin  = (vmin / vmin.w + math::vec2f (1.0f)) * math::vec3f (0.5f, 0.5f, 0.5f);
-    vmax  = (vmax / vmax.w + math::vec2f (1.0f)) * math::vec3f (0.5f, 0.5f, 0.5f);
+    vmin  = max (math::vec4f (0.0f), min (math::vec4f (1.0f), (vmin / vmin.w + math::vec4f (1.0f)) * math::vec4f (0.5f, 0.5f, 0.5f, 1.0f)));
+    vmax  = max (math::vec4f (0.0f), min (math::vec4f (1.0f), (vmax / vmax.w + math::vec4f (1.0f)) * math::vec4f (0.5f, 0.5f, 0.5f, 1.0f)));
 
-    rect = rectf (vmin.x, 1.0f - vmax.y, vmax.x - vmin.x, vmax.y - vmin.y);
+    float min_x = vmin.x < vmax.x ? vmin.x : vmax.x,
+          max_y = vmin.y > vmax.y ? vmin.y : vmax.y;
+
+    rect = rectf (min_x, 1.0f - max_y, fabs (vmax.x - vmin.x), fabs (vmax.y - vmin.y));
   }
 };
 
@@ -706,11 +709,11 @@ struct RenderOperationsExecutor
 
       if (desc && desc->render_target)
       {
-        if (desc->viewport)
-          throw xtl::format_operation_exception ("", "Depth-stencil target should not has a viewport");
+//        if (desc->viewport)
+//          throw xtl::format_operation_exception ("", "Depth-stencil target should not has a viewport");
 
-        if (desc->scissor)
-          throw xtl::format_operation_exception ("", "Depth-stencil target should not has a scissor");
+//        if (desc->scissor)
+//          throw xtl::format_operation_exception ("", "Depth-stencil target should not has a scissor");
 
         depth_stencil_view   = &desc->render_target->View (); 
         depth_stencil_width  = desc->render_target->Width ();

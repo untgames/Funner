@@ -23,6 +23,7 @@
 #include <sg/line.h>
 #include <sg/mesh.h>
 #include <sg/page_curl.h>
+#include <sg/scissor.h>
 #include <sg/scene.h>
 #include <sg/sprite.h>
 #include <sg/text.h>

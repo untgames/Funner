@@ -5,7 +5,7 @@
 
 #include <xtl/rect.h>
 
-#include <render/manager/common.h>
+#include <render/manager/bounds.h>
 
 #include <render/scene/interchange/types.h>
 

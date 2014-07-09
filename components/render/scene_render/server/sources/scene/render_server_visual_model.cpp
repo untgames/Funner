@@ -8,9 +8,11 @@ using namespace render::scene::server;
     Описание реализации отображаемой модели
 */
 
+typedef xtl::intrusive_ptr<Scissor> ScissorPtr;
+
 struct VisualModel::Impl
 {
-  NodePtr         scissor;              //область отсечения
+  ScissorPtr      scissor;              //область отсечения
   manager::Entity entity;               //сущность
   bool            need_update_world_tm; //флаг необходимости обновления мировой матрицы
 
@@ -57,12 +59,15 @@ VisualModel::~VisualModel ()
     Область отсечения
 */
 
-void VisualModel::SetScissor (Node* node)
+void VisualModel::SetScissor (render::scene::server::Scissor* node)
 {
   impl->scissor = node;
+
+  if (node)
+    impl->entity.SetWorldScissor (node->Area ());
 }
 
-Node* VisualModel::Scissor () const
+Scissor* VisualModel::Scissor () const
 {
   return impl->scissor.get ();
 }
@@ -142,7 +147,13 @@ void VisualModel::Draw (RenderingContext& context, void* user_data)
 
 void VisualModel::DrawCore (RenderingContext& context, void* user_data)
 {
-  //TODO: set scissor
+  if (impl->scissor)
+  {
+    bool visible = impl->scissor->IsVisible ();
+
+    if (impl->entity.ScissorState () != visible)
+      impl->entity.SetScissorState (visible);
+  }
 
   if (impl->need_update_world_tm)
   {

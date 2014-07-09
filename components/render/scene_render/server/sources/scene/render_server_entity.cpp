@@ -75,6 +75,8 @@ void Entity::SetBounds (bool is_infinite, const bound_volumes::aaboxf& box)
 {
   impl->is_infinite = true;
   impl->bound_box   = box;
+
+  OnUpdateBounds ();
 }
 
 bool Entity::IsInfiniteBounds () const
@@ -99,6 +101,14 @@ void Entity::SetVisible (bool state)
 bool Entity::IsVisible () const
 {
   return impl->is_visible;
+}
+
+/*
+    ќповещение об обновлении ограничивающего тела
+*/
+
+void Entity::OnUpdateBounds ()
+{
 }
 
 /*

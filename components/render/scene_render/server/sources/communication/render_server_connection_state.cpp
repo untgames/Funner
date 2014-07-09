@@ -825,7 +825,7 @@ void ConnectionState::SetVisualModelScissor (object_id_t id, object_id_t scissor
 {
   try
   {
-    impl->server.SceneManager ().GetNode (id).Cast<VisualModel> ().SetScissor (scissor_id ? &impl->server.SceneManager ().GetNode (scissor_id) : static_cast<Node*> (0));
+    impl->server.SceneManager ().GetNode (id).Cast<VisualModel> ().SetScissor (scissor_id ? &impl->server.SceneManager ().GetNode (scissor_id).Cast<Scissor> () : static_cast<Scissor*> (0));
   }
   catch (xtl::exception& e)
   {

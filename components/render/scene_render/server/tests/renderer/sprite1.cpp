@@ -100,18 +100,24 @@ int main ()
     camera->SetZNear  (0.0f);
     camera->SetZFar   (1000.0f);    
 
-    camera->SetPosition (0, 0.0f, 1.0f);
-    camera->LookTo (math::vec3f (0.0f), math::vec3f (0, 1.0f, 0), scene_graph::NodeTransformSpace_World);
+    camera->SetPosition (0, 0.0f, -1.0f);
+//    camera->LookTo (math::vec3f (0.0f), math::vec3f (0, 1.0f, 0), scene_graph::NodeTransformSpace_World);
 
     scene_graph::Scene scene;
     
     camera->BindToScene (scene);
     
     scene_graph::Sprite::Pointer sprite = scene_graph::Sprite::Create ();
+    scene_graph::Scissor::Pointer scissor = scene_graph::Scissor::Create ();
+
+    scissor->BindToScene (scene);
+    scissor->SetScale (math::vec3f (5.0f));
+    scissor->SetPosition (math::vec3f (2.5f, 2.5f, 0));
     
     sprite->SetMaterial ("sprite_material");
     sprite->SetScale (math::vec3f (10.0f));
     sprite->SetWorldOrientation (math::degree (45.0f), 0.0f, 0.0f, 1.0f);        
+    sprite->SetScissor (&*scissor);
 
     sprite->BindToScene (scene);    
     

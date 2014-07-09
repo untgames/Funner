@@ -1,7 +1,7 @@
 #ifndef RENDER_SCENE_SERVER_RENDER_TARGET_MAP_SHARED_HEADER
 #define RENDER_SCENE_SERVER_RENDER_TARGET_MAP_SHARED_HEADER
 
-#include <render/manager/common.h>
+#include <render/manager/bounds.h>
 
 namespace render
 {
