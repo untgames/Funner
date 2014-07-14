@@ -33,7 +33,7 @@ export.link.engine.subsystems.scene_render.IMPORTS       := link.engine.subsyste
 
 # Link scene manager exports
 export.link.engine.subsystems.scene_manager.LINK_INCLUDES := SceneManagerSubsystem
-export.link.engine.subsystems.scene_manager.IMPORTS       := link.engine.subsystems link.scene_graph.core
+export.link.engine.subsystems.scene_manager.IMPORTS       := link.engine.subsystems link.scene_graph.core link.media.font
 
 # Link shell exports
 export.link.engine.subsystems.shell.LINK_INCLUDES := ShellSubsystem

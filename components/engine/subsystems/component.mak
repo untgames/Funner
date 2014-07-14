@@ -11,7 +11,7 @@ ENGINE.SUBSYSTEMS.SOURCES.IMPORTS                 := compile.engine.core \
                                                      compile.input.manager compile.input.low_level \
                                                      compile.render.scene_render.client compile.sound.scene_player compile.system \
                                                      compile.script.core compile.media.rms \
-                                                     compile.physics.manager
+                                                     compile.physics.manager compile.media.font
 ENGINE.SUBSYSTEMS.SOURCES.has_windows.IMPORTS     := compile.input.window_driver compile.render.scene_render.server                                                
 ENGINE.SUBSYSTEMS.SOURCES.has_windows.SOURCE_DIRS := sources/window_manager
 ENGINE.SUBSYSTEMS.SOURCES.iphone.SOURCE_DIRS      := sources/iphone

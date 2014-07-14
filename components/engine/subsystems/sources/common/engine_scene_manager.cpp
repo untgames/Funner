@@ -1,3 +1,5 @@
+#include <media/font_library.h>
+
 #include <sg/scene_manager.h>
 #include <sg/controllers/animation.h>
 
@@ -131,6 +133,99 @@ class AnimationManagerSubsystem: public ISceneManagerSubsystem, public media::rm
     stl::string                                      attachment_name;  //имя менеджера анимаций
 };
 
+///Менеджер шрифтов
+class FontManagerSubsystem: public ISceneManagerSubsystem, public media::rms::ICustomServer
+{
+  public:
+///Конструктор
+    FontManagerSubsystem (const common::ParseNode& node, const common::Log& in_log)
+      : log (in_log)
+    {
+      try
+      {
+        attachment_name = get<const char*> (node, "AttachmentName", "");
+
+        resource_server = new media::rms::ServerGroupAttachment (get<const char*> (node, "ResourceServer", SUBSYSTEM_NAME), *this);
+
+        if (!attachment_name.empty ())
+          AttachmentRegistry::Register (attachment_name.c_str (), xtl::make_const_ref (xtl::ref (library)));
+      }
+      catch (xtl::exception& e)
+      {
+        e.touch ("engine::subsystems::FontManagerSubsystem");
+        throw;
+      }
+    }
+    
+///Деструктор
+    ~FontManagerSubsystem ()
+    {
+      if (!attachment_name.empty ())
+        AttachmentRegistry::Unregister (attachment_name.c_str (), xtl::make_const_ref (xtl::ref (library)));      
+      
+      resource_server = 0;
+    }
+    
+///Управление ресурсами
+    void PrefetchResource (const char* resource_name)
+    {
+    }
+
+    void LoadResource (const char* resource_name)
+    {
+      static const char* METHOD_NAME = "engine::subsystems::FontManagerSubsystem::LoadResource";
+
+      if (!resource_name)
+        throw xtl::make_null_argument_exception (METHOD_NAME, "resource_name");
+
+      try
+      {
+        library.LoadFonts (resource_name);
+      }
+      catch (xtl::exception& exception)
+      {
+        log.Printf ("Can't load resource '%s', exception: %s", resource_name, exception.what ());
+
+        exception.touch (METHOD_NAME);
+
+        throw;
+      }
+    }
+
+    void UnloadResource (const char* resource_name)
+    {
+      static const char* METHOD_NAME = "engine::subsystems::FontManagerSubsystem::UnloadResource";
+
+      if (!resource_name)
+        throw xtl::make_null_argument_exception (METHOD_NAME, "resource_name");
+
+      try
+      {
+        library.UnloadFonts (resource_name);
+      }
+      catch (xtl::exception& exception)
+      {
+        log.Printf ("Can't unload resource '%s', exception: %s", resource_name, exception.what ());
+
+        exception.touch (METHOD_NAME);
+
+        throw;
+      }
+    }    
+    
+///Регистрация в контексте сцены
+    void OnSceneContextCreated (scene_graph::SceneContext& context)
+    {
+      context.Attach (library);
+    }
+
+  private:
+    common::Log                                      log;              //поток протоколирования
+    media::FontLibrary                               library;          //библиотека шрифтов
+    stl::auto_ptr<media::rms::ServerGroupAttachment> resource_server;  //сервер ресурсов рендеринга    
+    stl::string                                      attachment_name;  //имя менеджера анимаций
+};
+
 }
 
 /*
@@ -164,10 +259,16 @@ class SceneManagerSubsystem : public ISubsystem, public media::rms::ICustomServe
         for (common::Parser::Iterator iter=node.First (); iter; ++iter)
         {
           SubsystemPtr subsystem;
+
+          const char* subsystem_name = iter->Name ();
           
-          if (!strcmp (iter->Name (), "AnimationManager"))
+          if (!strcmp (subsystem_name, "AnimationManager"))
           {
             subsystem = SubsystemPtr (new AnimationManagerSubsystem (*iter, log), false);
+          }
+          else if (!strcmp (subsystem_name, "FontLibrary"))
+          {
+            subsystem = SubsystemPtr (new FontManagerSubsystem (*iter, log), false);
           }
 
           if (subsystem)

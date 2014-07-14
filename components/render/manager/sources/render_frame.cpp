@@ -44,6 +44,18 @@ struct EffectHolder: public CacheSource
     effect.AttachCacheHolder (*this);
   }
   
+///Установка эффекта
+  void SetEffect (const char* name)
+  {
+    effect.DetachCacheHolder (*this);
+
+    effect = effect_manager->GetEffectProxy (name);
+
+    effect.AttachCacheHolder (*this);
+
+    InvalidateCache ();
+  }
+
 ///Работа с кэшем
   void ResetCacheCore ()
   {
@@ -140,7 +152,7 @@ struct FrameImpl::Impl: public CacheHolder
   {
     AttachCacheSource (*effect_holder);
     AttachCacheSource (properties);
-    
+
     effect_holder->properties_layout.AttachSlot (ProgramParametersSlot_Frame, properties.Properties ());
     
     entities.reserve (RESERVED_ENTITIES_COUNT);
@@ -376,9 +388,7 @@ void FrameImpl::SetEffect (const char* name)
     if (!strcmp (impl->effect_holder->effect.Name (), name))
       return;
 
-    impl->effect_holder->effect = impl->effect_holder->effect_manager->GetEffectProxy (name);    
-    
-    impl->effect_holder->InvalidateCache ();
+    impl->effect_holder->SetEffect (name);
   }
   catch (xtl::exception& e)
   {

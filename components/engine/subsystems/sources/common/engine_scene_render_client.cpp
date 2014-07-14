@@ -1,4 +1,5 @@
 #include <stl/hash_map>
+#include <stl/hash_set>
 
 #include <xtl/connection.h>
 #include <xtl/iterator.h>
@@ -34,7 +35,7 @@ const size_t DEFAULT_IDLE_RENDER_COUNT = 8;                                     
    Подсистема рендера сцены
 */
 
-class SceneRenderClientSubsystem : public ISubsystem, public IAttachmentRegistryListener<scene_graph::Screen>,
+class SceneRenderClientSubsystem : public ISubsystem, public IAttachmentRegistryListener<scene_graph::Screen>, public IAttachmentRegistryListener<media::FontLibrary>,
   public media::rms::ICustomServer, public xtl::reference_counter
 {
   public:
@@ -78,14 +79,31 @@ class SceneRenderClientSubsystem : public ISubsystem, public IAttachmentRegistry
             RenderTargetPtr target (new RenderTargetDesc (client.CreateRenderTarget (target_attachment, init_string), update_frequency, on_before_update, on_after_update, target_attachment), false);
 
             idle_render_targets.push_back (target);
-          }          
+          }
+
+          for (Parser::NamesakeIterator iter=node.First ("FontLibrary"); iter; ++iter)
+          {
+            const char* name = get<const char*> (*iter, "Id");
+
+            font_libraries.insert (name);
+          }
         }
 
         AttachmentRegistry::Attach<scene_graph::Screen> (this, AttachmentRegistryAttachMode_ForceNotify);
-        
+
         try
         {
-          resource_server = new media::rms::ServerGroupAttachment (get<const char*> (node, "ResourceServer", SUBSYSTEM_NAME), *this);
+          AttachmentRegistry::Attach<media::FontLibrary> (this, AttachmentRegistryAttachMode_ForceNotify);
+          
+          try
+          {
+            resource_server = new media::rms::ServerGroupAttachment (get<const char*> (node, "ResourceServer", SUBSYSTEM_NAME), *this);
+          }
+          catch (...)
+          {
+            AttachmentRegistry::Detach<media::FontLibrary> (this, AttachmentRegistryAttachMode_ForceNotify);
+            throw;
+          }
         }
         catch (...)
         {
@@ -104,7 +122,8 @@ class SceneRenderClientSubsystem : public ISubsystem, public IAttachmentRegistry
     ~SceneRenderClientSubsystem ()
     {
       resource_server = 0;      
-      
+
+      AttachmentRegistry::Detach<media::FontLibrary> (this, AttachmentRegistryAttachMode_ForceNotify);      
       AttachmentRegistry::Detach<scene_graph::Screen> (this, AttachmentRegistryAttachMode_ForceNotify);
     }
 
@@ -131,6 +150,23 @@ class SceneRenderClientSubsystem : public ISubsystem, public IAttachmentRegistry
       RenderTarget& render_target = idle_render_targets [iter->second]->target;
 
       render_target.SetScreen (0);
+    }
+
+/// События установки/удаления библиотеки шрифтов
+    void OnRegisterAttachment (const char* name, media::FontLibrary& library)
+    {
+      if (!font_libraries.count (name))
+        return;
+
+      client.AttachFontLibrary (library);
+    }
+
+    void OnUnregisterAttachment (const char* name, media::FontLibrary& library)
+    {
+      if (!font_libraries.count (name))
+        return;
+
+      client.DetachFontLibrary (library);
     }
 
 ///Управление ресурсами
@@ -287,7 +323,8 @@ class SceneRenderClientSubsystem : public ISubsystem, public IAttachmentRegistry
           AttachmentRegistry::Unregister (target_attachment.c_str (), target);
       }
     };
-  
+
+    typedef stl::hash_set<stl::hash_key<const char*> >        FontLibrarySet;
     typedef stl::hash_map<stl::hash_key<const char*>, size_t> ScreenMap;
     typedef xtl::intrusive_ptr<RenderTargetDesc>              RenderTargetPtr;
     typedef stl::vector<RenderTargetPtr>                      RenderTargetArray;
@@ -297,6 +334,7 @@ class SceneRenderClientSubsystem : public ISubsystem, public IAttachmentRegistry
     Client                                           client;                   //клиент рендеринга
     stl::auto_ptr<media::rms::ServerGroupAttachment> resource_server;          //сервер ресурсов рендеринга
     ScreenMap                                        screen_map;               //соответствие экранов и рендер-таргетов
+    FontLibrarySet                                   font_libraries;           //библиотеки шрифтов
     xtl::auto_connection                             idle_connection;          //соединение обновления рендер-таргетов
     xtl::auto_connection                             on_app_pause_connection;  //соединение паузы приложения
     xtl::auto_connection                             on_app_resume_connection; //соединение восстановления приложения
