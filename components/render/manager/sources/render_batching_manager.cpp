@@ -202,9 +202,6 @@ template <class T> class Pool: public xtl::noncopyable
       return true;
     }
 
-/// Размер в байтах
-    size_t SizeInBytes () { return (unsigned char*)pos - (unsigned char*)start; }
-
   private:
     T* start;
     T* pos;
@@ -378,7 +375,7 @@ DynamicPrimitiveVertex* BatchingManager::AllocateDynamicVertices (size_t count, 
 
   if (result)
   {
-    impl->dynamic_vb.Resize (impl->dynamic_vertex_pool.SizeInBytes ());
+    impl->dynamic_vb.Resize (impl->dynamic_vertex_pool.Size ());
 
     if (out_base_vertex_index)
       *out_base_vertex_index = result - impl->dynamic_vb.Data ();
@@ -401,7 +398,7 @@ DynamicPrimitiveIndex* BatchingManager::AllocateDynamicIndices (IndexPoolType po
 
       if (result)
       {
-        impl->dynamic_ib.Resize (impl->dynamic_index_pool.SizeInBytes ());
+        impl->dynamic_ib.Resize (impl->dynamic_index_pool.Size ());
         return result;
       }
 
@@ -465,7 +462,7 @@ void BatchingManager::SetAllocatedDynamicVerticesCount (size_t count)
   if (impl->dynamic_vertex_pool.SetSize (count))
     return;
 
-  impl->dynamic_vb.Resize (impl->dynamic_vertex_pool.SizeInBytes ());
+  impl->dynamic_vb.Resize (impl->dynamic_vertex_pool.Size ());
 
   throw xtl::format_operation_exception ("render::manager::BatchingManager::SetAllocatedDynamicVerticesCount", "Can't change dynamic vertex pool size to %u", count);  
 }
