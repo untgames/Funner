@@ -181,6 +181,18 @@ struct RenderPass: public xtl::reference_counter
   {
     stl::sort (operation_ptrs.begin (), operation_ptrs.end (), fn);
   }
+
+  void UpdateOperationPointers ()
+  {
+    if (operations.empty ())
+      return;
+
+    PassOperation*  op     = &operations [0];
+    PassOperation** op_ptr = &operation_ptrs [0];
+
+    for (size_t i=0, count=operations.size (); i<count; i++, op++, op_ptr++)
+      *op_ptr = op;
+  }
 };
 
 typedef stl::vector<FrameImpl*> FrameArray;
@@ -521,7 +533,7 @@ void EffectRenderer::AddOperations
 
         PassOperation& result_operation = pass.operations.back ();
 
-        pass.operation_ptrs.push_back (&result_operation);        
+        pass.operation_ptrs.push_back (0);
         
           //запоминание последней добавленной операции для обработки частного случая добавления операции в один и тот же проход несколько раз
 
@@ -979,6 +991,10 @@ struct RenderOperationsExecutor
 ///Рендеринг прохода
   void DrawPass (RenderPass& pass)
   {
+      //обновление указателей операций
+
+    pass.UpdateOperationPointers ();
+
       //обновление динамических примитивов
  
     UpdateDynamicPrimitives (pass); 
@@ -992,15 +1008,15 @@ struct RenderOperationsExecutor
     RenderTargetContext render_target_context;  
     
     SetRenderTargets (pass, render_target_context);
-          
+
       //применение состояния прохода
       
     SetScissorState (pass, render_target_context.has_scissors);
-    
+
       //очистка экрана
       
     ClearViews (pass, render_target_context);
-      
+
       //установка константного буфера кадра
 
     device_context.SSSetConstantBuffer (ProgramParametersSlot_Frame, frame_property_buffer.get ());
@@ -1053,7 +1069,7 @@ struct RenderOperationsExecutor
       
       render_target_context.current_local_scissor = operation_scissor;
     }
-    
+
       //установка локальных текстур
     
     if (program->HasFramemaps ())
