@@ -6,6 +6,8 @@
 
 #include <syslib/application.h>
 
+#include <media/font_library.h>
+
 #include <render/scene_render_client.h>
 
 #include "shared.h"
