@@ -20,8 +20,8 @@ struct Scene::Impl: public xtl::reference_counter
 /// Деструктор
   ~Impl ()
   {
-    for (EntityList::iterator iter=entity_list.begin (), end=entity_list.end (); iter!=end; ++iter)
-      (*iter)->SetSceneOwner (0);
+    while (!entity_list.empty ())
+      entity_list.back ()->SetSceneOwner ( 0 );
 
     entity_map.clear ();
     entity_list.clear ();
