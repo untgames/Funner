@@ -216,18 +216,21 @@ void RenderTargetImpl::SetScreen (scene_graph::Screen* screen)
 
     impl->screen = screen;
 
-    try
-    {      
-      impl->Initialize ();
-
-      impl->screen->AttachListener (&*impl);
-    }
-    catch (...)
+    if (screen)
     {
-      impl->Destroy ();
+      try
+      {      
+        impl->Initialize ();
 
-      impl->screen = 0;
-      throw;
+        impl->screen->AttachListener (&*impl);
+      }
+      catch (...)
+      {
+        impl->Destroy ();
+
+        impl->screen = 0;
+        throw;
+      }
     }
   }
   catch (xtl::exception& e)
