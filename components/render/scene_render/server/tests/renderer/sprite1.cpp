@@ -79,7 +79,7 @@ int main ()
     server.AttachWindow ("my_window", window, window_properties);
 
     client.LoadResource ("data/render.rfx");
-    client.LoadResource ("data/u1/texture0000.dds");
+    client.LoadResource ("data/bottom.jpg");
     client.LoadResource ("data/sprite.xmtl");
 
     RenderTarget target = client.CreateRenderTarget ("my_window");
