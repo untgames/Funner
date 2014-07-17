@@ -122,6 +122,7 @@ void bind_node_library (Environment& environment)
     //регистрация операций
 
   lib.Register ("get_Id",                   make_invoker (&get_node_id));
+  lib.Register ("get_Scene",                make_invoker (implicit_cast<Scene* (Node::*) ()> (&Node::Scene)));
   lib.Register ("set_Name",                 make_invoker (&Node::SetName));
   lib.Register ("set_Properties",           make_invoker (&set_node_properties));
   lib.Register ("get_Properties",           make_invoker (&get_node_properties));
