@@ -34,6 +34,8 @@ struct Node::Impl
     , need_update_scene (true)
   {
     scene_manager.Context ().CreateNode (id, node_type);
+
+    OnSceneChanged ();
   }
 
 /// Деструктор
@@ -52,6 +54,8 @@ struct Node::Impl
   void UpdateWorldMatrixNotify ()
   {
     need_update_world_tm = true;
+
+    owner.UpdateNotify ();
   }
 
 /// Изменение сцены

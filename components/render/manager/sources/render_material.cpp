@@ -216,7 +216,7 @@ struct MaterialImpl::Impl: public CacheHolder, public DebugIdHolder
 
       cached_program       = program.Resource ();
       need_invalidate_deps = need_invalidate_deps || old_program != cached_program;
-      
+
       if (cached_program)
       {
         ProgramParametersLayoutPtr old_layout = cached_properties_layout;
@@ -224,7 +224,7 @@ struct MaterialImpl::Impl: public CacheHolder, public DebugIdHolder
         cached_properties_layout = device_manager->ProgramParametersManager ().GetParameters (&*material_properties_layout, &*cached_program->ParametersLayout (), 0);
         need_invalidate_deps     = need_invalidate_deps || old_layout != cached_properties_layout;
       }
-      else throw xtl::format_operation_exception ("", "Null program for material '%s' (id=%u)", name.c_str (), Id ());
+      else throw xtl::format_operation_exception ("", "Null program '%s' for material '%s' (id=%u)", program.Name (), name.c_str (), Id ());
       
         //кэширование константного буфера материала
       
