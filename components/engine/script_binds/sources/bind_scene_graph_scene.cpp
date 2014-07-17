@@ -113,6 +113,11 @@ void bind_visual_model_library (Environment& environment)
   environment.RegisterType<VisualModel> (SCENE_VISUAL_MODEL_LIBRARY);
 }
 
+Scissor::Pointer create_scissor ()
+{
+  return Scissor::Create ();
+}
+
 void bind_scissor_library (Environment& environment)
 {
   InvokerRegistry lib = environment.CreateLibrary (SCENE_SCISSOR_LIBRARY);
@@ -121,9 +126,13 @@ void bind_scissor_library (Environment& environment)
 
   lib.Register (environment, SCENE_ENTITY_LIBRARY);
 
+    //регистрация функций создания
+
+  lib.Register ("Create", make_invoker (&create_scissor));
+
     //регистрация типов данных
 
-  environment.RegisterType<VisualModel> (SCENE_SCISSOR_LIBRARY);
+  environment.RegisterType<Scissor> (SCENE_SCISSOR_LIBRARY);
 }
 
 }
