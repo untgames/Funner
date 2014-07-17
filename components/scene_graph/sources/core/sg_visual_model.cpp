@@ -119,7 +119,7 @@ void VisualModel::SetScissor (scene_graph::Scissor* scissor, NodeBindMode mode)
   impl->scissor                       = scissor;
   impl->on_scissor_destroy_connection = on_destroy;
 
-  on_destroy.disconnect ();
+  xtl::connection ().swap (on_destroy);
 
   if (scissor)
   {  
