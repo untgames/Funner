@@ -90,6 +90,11 @@ void bind_entity_library (Environment& environment)
   environment.RegisterType<Entity> (SCENE_ENTITY_LIBRARY);
 }
 
+void set_entity_scissor (VisualModel& model, Scissor* scissor)
+{
+  model.SetScissor (scissor, NodeBindMode_AddRef);
+}
+
 void bind_visual_model_library (Environment& environment)
 {
   InvokerRegistry lib = environment.CreateLibrary (SCENE_VISUAL_MODEL_LIBRARY);
@@ -100,7 +105,7 @@ void bind_visual_model_library (Environment& environment)
 
     //регистрация операций
 
-  lib.Register ("set_Scissor", make_invoker (&VisualModel::SetScissor));
+  lib.Register ("set_Scissor", make_invoker (&set_entity_scissor));
   lib.Register ("get_Scissor", make_invoker (implicit_cast<Scissor* (VisualModel::*)()> (&VisualModel::Scissor)));
 
     //регистрация типов данных
