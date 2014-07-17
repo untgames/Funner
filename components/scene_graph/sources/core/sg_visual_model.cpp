@@ -16,7 +16,7 @@ struct VisualModel::Impl: public xtl::instance_counter<VisualModel>
   xtl::auto_connection  on_scissor_destroy_connection;  //соединение с событием удаления области отсечения
   PropertyMapPtr        dynamic_shader_properties;      //динамические свойства шейдера
   PropertyMapPtr        static_shader_properties;       //статические свойства шейдера
-  VisualModelSignal     signals [VisualModelEvent_Num]; //сигналы модели 
+  VisualModelSignal     signals [VisualModelEvent_Num]; //сигналы модели
   bool                  need_release_scissor;           //нужно ли освобождать область отсечения
 
   Impl () : scissor (), need_release_scissor () {}
@@ -100,7 +100,7 @@ void VisualModel::SetScissor (scene_graph::Scissor* scissor, NodeBindMode mode)
 
   scene_graph::Scissor* old_scissor = impl->scissor;
 
-    //установка области отсечения  
+    //установка области отсечения
 
   xtl::auto_connection on_destroy;
 
@@ -119,7 +119,7 @@ void VisualModel::SetScissor (scene_graph::Scissor* scissor, NodeBindMode mode)
   impl->scissor                       = scissor;
   impl->on_scissor_destroy_connection = on_destroy;
 
-  xtl::connection ().swap (on_destroy);
+  on_destroy.disconnect ();
 
   if (scissor)
   {  
