@@ -6,7 +6,7 @@ namespace
 class VisualModelTest: public VisualModel
 {
   public:
-    static Pointer Create () { return new VisualModelTest; }
+    static Pointer Create () { return Pointer (new VisualModelTest, false); }
 };
 
 }
