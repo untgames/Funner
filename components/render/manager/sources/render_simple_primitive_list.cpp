@@ -177,7 +177,7 @@ class OrientedSpriteGenerator: public SpriteGenerator
     }
 
   private:
-    const math::vec3f& up;    
+    math::vec3f up;    
 };
 
 class OrientedBillboardSpriteGenerator: public SpriteGenerator
