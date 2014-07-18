@@ -35,7 +35,7 @@ int main ()
       {
         xtl::auto_connection connection1 = signal.connect (&handler);
 
-        connection2 = connection1;
+        connection2 = static_cast<xtl::connection&> (connection1);
 
         xtl::connection ().swap (connection1);
       }

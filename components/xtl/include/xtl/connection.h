@@ -85,7 +85,8 @@ class auto_connection: public connection
     auto_connection  () {}
     auto_connection  (const connection&);    
     ~auto_connection ();
-    
+
+    auto_connection& operator = (const auto_connection&);    
     auto_connection& operator = (const connection&);
 };
 

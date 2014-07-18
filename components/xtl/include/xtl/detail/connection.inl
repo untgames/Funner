@@ -166,3 +166,10 @@ inline auto_connection& auto_connection::operator = (const connection& c)
   
   return *this;
 }
+
+inline auto_connection& auto_connection::operator = (const auto_connection& c)
+{
+  auto_connection (c).swap (*this);
+  
+  return *this;
+}
