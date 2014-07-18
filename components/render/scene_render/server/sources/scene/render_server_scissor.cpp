@@ -52,5 +52,5 @@ void Scissor::OnUpdateBounds ()
 {
   const bound_volumes::aaboxf& box = BoundBox ();
 
-  impl->area = manager::BoxArea (manager::Box (box.minimum (), box.maximum ()));
+  impl->area.SetBox (box.minimum (), box.maximum ());
 }
