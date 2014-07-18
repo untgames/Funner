@@ -114,13 +114,23 @@ int main ()
     camera->BindToScene (scene);
 
     scene_graph::Sprite::Pointer sprite = scene_graph::Sprite::Create ();
-    
-    sprite->SetMaterial ("sprite_material");
-    sprite->SetScale (math::vec3f (10.0f));
-    sprite->SetWorldOrientation (math::degree (45.0f), 0.0f, 0.0f, 1.0f);        
 
-    sprite->BindToScene (scene);    
-    
+    sprite->SetMaterial ("sprite_material");
+    sprite->SetPosition (math::vec3f (0.0f, 0.f, 1.f));
+    sprite->SetScale (math::vec3f (10.0f));
+    sprite->SetWorldOrientation (math::degree (45.0f), 0.0f, 0.0f, 1.0f);
+
+    sprite->BindToScene (scene);
+
+    scene_graph::Sprite::Pointer sprite2 = scene_graph::Sprite::Create ();
+
+    sprite2->SetMaterial ("sprite_material");
+    sprite2->SetPosition (math::vec3f (0.0f, 0.f, 2.f));
+    sprite2->SetScale (math::vec3f (5.0f));
+    sprite2->SetWorldOrientation (math::degree (45.0f), 0.0f, 0.0f, 1.0f);
+
+    sprite2->BindToScene (scene, scene_graph::NodeBindMode_AddRef);
+
       //настройка области вывода
 
     scene_graph::Viewport vp;
