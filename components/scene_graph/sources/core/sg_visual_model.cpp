@@ -130,6 +130,8 @@ void VisualModel::SetScissor (scene_graph::Scissor* scissor, NodeBindMode mode)
   }
 
   impl->Notify (*this, VisualModelEvent_AfterScissorUpdate);
+
+  UpdateNotify ();
 }
 
 Scissor* VisualModel::Scissor ()
