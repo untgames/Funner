@@ -7,8 +7,7 @@ using namespace render::scene;
     Описание реализации сцены
 */
 
-typedef xtl::intrusive_ptr<Entity>                 EntityPtr;
-typedef stl::list<EntityPtr>                       EntityList;
+typedef stl::list<Entity*>                         EntityList;
 typedef stl::hash_map<Node*, EntityList::iterator> EntityMap;
 
 struct Scene::Impl: public xtl::reference_counter
@@ -21,7 +20,7 @@ struct Scene::Impl: public xtl::reference_counter
   ~Impl ()
   {
     while (!entity_list.empty ())
-      entity_list.back ()->SetSceneOwner ( 0 );
+      entity_list.back ()->SetSceneOwner (0);
 
     entity_map.clear ();
     entity_list.clear ();
@@ -78,7 +77,7 @@ const char* Scene::Name () const
     Присоединение узла
 */
 
-void Scene::AttachNode (const EntityPtr& node)
+void Scene::AttachNode (Entity* node)
 {
   try
   {
@@ -90,7 +89,7 @@ void Scene::AttachNode (const EntityPtr& node)
     if (map_iter != impl->entity_map.end ())
       throw xtl::make_argument_exception ("", "node", node->Name (), "This node has been already added to scene");
 
-    EntityList::iterator list_iter = impl->entity_list.insert (impl->entity_list.end (), node);
+    EntityList::iterator list_iter = impl->entity_list.insert (impl->entity_list.end (), &*node);
 
     try
     {
@@ -109,7 +108,7 @@ void Scene::AttachNode (const EntityPtr& node)
   }
 }
 
-void Scene::DetachNode (const EntityPtr& node)
+void Scene::DetachNode (Entity* node)
 {
   if (!node)
     return;
