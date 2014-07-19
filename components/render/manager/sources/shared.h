@@ -23,6 +23,7 @@
 #include <xtl/uninitialized_storage.h>
 
 #include <math/utility.h>
+#include <bv/axis_aligned_box.h>
 
 #include <common/hash.h>
 #include <common/log.h>

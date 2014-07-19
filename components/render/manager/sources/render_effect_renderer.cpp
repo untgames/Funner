@@ -238,11 +238,18 @@ struct NormalizedScissor
   NormalizedScissor (const BoxAreaImpl* in_scissor, const math::mat4f& vp_matrix)
     : scissor (in_scissor)
   {
-    math::vec4f vmin = vp_matrix * math::vec4f (scissor->Box ().min_extent, 1.0f),
-                vmax = vp_matrix * math::vec4f (scissor->Box ().max_extent, 1.0f);
+    bound_volumes::aaboxf box;
 
-    vmin  = max (math::vec4f (0.0f), min (math::vec4f (1.0f), (vmin / vmin.w + math::vec4f (1.0f)) * math::vec4f (0.5f, 0.5f, 0.5f, 1.0f)));
-    vmax  = max (math::vec4f (0.0f), min (math::vec4f (1.0f), (vmax / vmax.w + math::vec4f (1.0f)) * math::vec4f (0.5f, 0.5f, 0.5f, 1.0f)));
+    {
+      math::vec4f vmin = vp_matrix * math::vec4f (scissor->Box ().min_extent, 1.0f),
+                  vmax = vp_matrix * math::vec4f (scissor->Box ().max_extent, 1.0f);
+
+      box += math::vec3f (vmin / vmin.w);
+      box += math::vec3f (vmax / vmax.w);
+    }
+
+    math::vec3f vmin = max (math::vec3f (0.0f), min (math::vec3f (1.0f), (box.minimum () + math::vec4f (1.0f)) * math::vec4f (0.5f, 0.5f, 0.5f, 1.0f))),
+                vmax = max (math::vec3f (0.0f), min (math::vec3f (1.0f), (box.maximum () + math::vec4f (1.0f)) * math::vec4f (0.5f, 0.5f, 0.5f, 1.0f)));
 
     float min_x = vmin.x < vmax.x ? vmin.x : vmax.x,
           max_y = vmin.y > vmax.y ? vmin.y : vmax.y;

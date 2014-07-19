@@ -8,7 +8,7 @@ RENDER.MANAGER.SOURCES.TYPE                 := static-lib
 RENDER.MANAGER.SOURCES.NAME                 := funner.render.manager
 RENDER.MANAGER.SOURCES.SOURCE_DIRS          := sources
 RENDER.MANAGER.SOURCES.IMPORTS              := compile.render.manager compile.media.image compile.media.geometry \
-                                               compile.media.rfx compile.system compile.render.low_level
+                                               compile.media.rfx compile.system compile.render.low_level compile.math.bound_volumes
 RENDER.MANAGER.SOURCES.msvc.COMPILER_CFLAGS := -wd4503                                               
 
 #Öåëü ¹2 - RENDER system tests
