@@ -9,7 +9,7 @@ using namespace render::scene::client;
 struct RenderableView::Impl: public scene_graph::IViewportListener
 {
   ConnectionPtr           connection;                   //соединение
-  scene_graph::Viewport&  viewport;                     //ссылка на область вывода
+  scene_graph::Viewport   viewport;                     //ссылка на область вывода
   PropertyMapSynchronizer properties_sync;              //синхронизатор свойств
   object_id_t             render_target_id;             //идентификатор цели рендеринга
   object_id_t             id;                           //идентификатор области вывода
