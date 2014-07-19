@@ -34,8 +34,8 @@ void idle (Test& test)
     {
       if (test.sprite)
       {
-        test.sprite->Unbind ();
-        test.sprite = 0;
+//        test.sprite->Unbind ();
+//        test.sprite = 0;
       }
 
       printf ("FPS: %.2f\n", float (frames_count)/float (common::milliseconds () - last_fps)*1000.f);
@@ -120,8 +120,6 @@ int main ()
     sprite->SetScale (math::vec3f (10.0f));
     sprite->SetWorldOrientation (math::degree (45.0f), 0.0f, 0.0f, 1.0f);
 
-    sprite->BindToScene (scene);
-
     scene_graph::Sprite::Pointer sprite2 = scene_graph::Sprite::Create ();
 
     sprite2->SetMaterial ("sprite_material");
@@ -129,6 +127,7 @@ int main ()
     sprite2->SetScale (math::vec3f (5.0f));
     sprite2->SetWorldOrientation (math::degree (45.0f), 0.0f, 0.0f, 1.0f);
 
+    sprite->BindToScene (scene);
     sprite2->BindToScene (scene, scene_graph::NodeBindMode_AddRef);
 
       //настройка области вывода

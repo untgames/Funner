@@ -639,8 +639,9 @@ void FrameImpl::Prerender (EntityDrawFunction entity_draw_handler)
             
         //расчёт расстояния от z-near до объекта        
         
-      math::vec4f mvp_lod_point = entity_draw_params.mvp_matrix * math::vec4f (desc.entity->LodPoint (), 1.0f); 
-      double      distance      = stl::min (stl::max (mvp_lod_point.z / mvp_lod_point.w, 1.0f), 0.0f) * ~0u;
+      math::vec4f mvp_lod_point       = entity_draw_params.mvp_matrix * math::vec4f (desc.entity->LodPoint (), 1.0f); 
+      double      normalized_distance = (stl::max (stl::min (mvp_lod_point.z / mvp_lod_point.w, 1.0f), -1.0f) + 1.0f) * 0.5f,
+                  distance            = normalized_distance * ~0u;
       
       eye_distance = size_t (distance);
       lod          = impl->GetLod (distance);

@@ -552,20 +552,16 @@ typedef stl::vector<EntityLodPtr>     EntityLodArray;
 
 struct EntityLodLess
 {
-  bool operator () (const EntityLodPtr& lod1, const EntityLodPtr& lod2) const
-  {
-    return lod1->level_of_detail < lod2->level_of_detail;
-  }
-  
-  bool operator () (const EntityLodPtr& lod, size_t level_of_detail) const
-  {
-    return lod->level_of_detail < level_of_detail;
-  }    
-  
-  bool operator () (size_t level_of_detail, const EntityLodPtr& lod) const
-  {
-    return level_of_detail < lod->level_of_detail;
-  }  
+  bool operator () (const EntityLodPtr& lod1, const EntityLodPtr& lod2) const { return lod1->level_of_detail < lod2->level_of_detail; }
+  bool operator () (const EntityLodPtr& lod, size_t level_of_detail) const    { return lod->level_of_detail < level_of_detail; }    
+  bool operator () (size_t level_of_detail, const EntityLodPtr& lod) const    { return level_of_detail < lod->level_of_detail; }  
+};
+
+struct EntityLodGreater
+{
+  bool operator () (const EntityLodPtr& lod1, const EntityLodPtr& lod2) const { return lod1->level_of_detail > lod2->level_of_detail; }
+  bool operator () (const EntityLodPtr& lod, size_t level_of_detail) const    { return lod->level_of_detail > level_of_detail; }    
+  bool operator () (size_t level_of_detail, const EntityLodPtr& lod) const    { return level_of_detail > lod->level_of_detail; }  
 };
 
 }
@@ -602,10 +598,10 @@ struct EntityImpl::Impl: public EntityLodCommonData
       
       need_resort = false;
     }
-    
-    EntityLodArray::iterator iter = find_nearest ? stl::lower_bound (lods.begin (), lods.end (), index, EntityLodLess ()) : 
+
+    EntityLodArray::iterator iter = find_nearest ? stl::lower_bound (lods.begin (), lods.end (), index, EntityLodGreater ()) : 
       stl::equal_range (lods.begin (), lods.end (), index, EntityLodLess ()).first;
-    
+
     if (iter != lods.end ())
       return iter - lods.begin ();
       
