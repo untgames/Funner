@@ -133,7 +133,7 @@ void InputPort::Update ()
     math::vec3f viewport_offset (float (viewport_rect.left ()), float (viewport_rect.top ()), 0.0f),
                 viewport_scale (1.0f / float (viewport_rect.right () - viewport_rect.left ()), 1.0f / float (viewport_rect.bottom () - viewport_rect.top ()), 1.0f);
                 
-    view_proj_tm           = math::scale (math::vec3f (1.0f, 1.0f, -1.0f)) * camera->ProjectionMatrix () * math::inverse (camera->WorldTM ());                
+    view_proj_tm           = camera->ProjectionMatrix () * math::inverse (camera->WorldTM ());                
     inv_view_proj_tm       = math::inverse (view_proj_tm);
     normalized_position_tm = math::scale (math::vec3f (1.0f, -1.0f, 1.0f)) * math::translate (math::vec3f (-1.0f)) * math::scale (2.0f * viewport_scale) * math::translate (-viewport_offset);
     position_tm            = inv_view_proj_tm * normalized_position_tm;
