@@ -243,6 +243,7 @@ struct BatchingManager::Impl: public Cache
   DynamicIndexPool                      temp_index_pool;      //пул динамических индексов дл€ построени€ примитивов
   StateBlockMap                         state_blocks;         //блоки состо€ний
   const void*                           pass_tag;             //тэг прохода
+  size_t                                pass_first_index;     //первый индекс в проходе
   FrameId                               active_frame;         //номер активного кадра
 
 ///  онструктор
@@ -252,6 +253,7 @@ struct BatchingManager::Impl: public Cache
     , dynamic_vb (render::low_level::UsageMode_Stream, render::low_level::BindFlag_VertexBuffer)
     , dynamic_ib (render::low_level::UsageMode_Stream, render::low_level::BindFlag_IndexBuffer)
     , pass_tag ()
+    , pass_first_index ()
     , active_frame ()
   {
   }
@@ -402,7 +404,7 @@ DynamicPrimitiveIndex* BatchingManager::AllocateDynamicIndices (IndexPoolType po
         return result;
       }
 
-      throw xtl::format_operation_exception (METHOD_NAME, "Can't allocate %u indices in dynamic linear index buffer", count);
+      return 0; //null is indicator for effect renderer
     }
     case IndexPoolType_Temporary: 
     {
@@ -518,6 +520,16 @@ void BatchingManager::SetPassUserData (const void* tag)
 const void* BatchingManager::PassUserData ()
 {
   return impl->pass_tag;
+}
+
+void BatchingManager::SetPassFirstIndex (size_t first)
+{
+  impl->pass_first_index = first;
+}
+
+size_t BatchingManager::PassFirstIndex ()
+{
+  return impl->pass_first_index;
 }
 
 /*

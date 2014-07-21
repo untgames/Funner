@@ -994,6 +994,87 @@ struct RenderOperationsExecutor
       throw;
     }    
   }
+
+///Подготовка динамических индексных буферов для пакетной отрисовки
+  OperationPtrArray::iterator PrepareBatchingDynamicIndexBuffers (OperationPtrArray::iterator operation_iter, OperationPtrArray::iterator operation_end)
+  {
+      //заполнение индексных буферов
+
+    bool force_stop = false;
+
+    while (operation_iter != operation_end || force_stop)
+    {
+      const PassOperation& operation = **operation_iter;
+
+      if (!operation.batching_hash)
+      {
+        operation_iter++;
+        continue;
+      }
+
+      size_t           batching_hash    = operation.batching_hash;
+      BatchingManager* batching_manager = operation.primitive->batching_manager;
+
+      if (batching_manager && batching_manager->PassUserData () != this)
+      {
+        batching_managers.push_back (batching_manager);
+
+        batching_manager->SetPassUserData (this);
+      }
+
+        //определение границ пакета и копирование индексов в линейный буфер
+
+      for (;operation_iter!=operation_end && (*operation_iter)->batching_hash == batching_hash; ++operation_iter)
+      {
+        const RendererPrimitive&     primitive   = *(*operation_iter)->primitive;
+        const DynamicPrimitiveIndex* src_indices = *primitive.dynamic_indices + primitive.first;
+        DynamicPrimitiveIndex*       dst_indices = batching_manager->AllocateDynamicIndices (IndexPoolType_Linear, primitive.count);
+
+        if (!dst_indices)
+        {
+          force_stop = true;
+          break;
+        }
+
+        memcpy (dst_indices, src_indices, primitive.count * sizeof (DynamicPrimitiveIndex));
+      }
+    }
+
+      //синхронизация буферов
+
+    try
+    {
+      for (BatchingManagerArray::iterator iter=batching_managers.begin (), end=batching_managers.end (); iter!=end; ++iter)
+      {
+        BatchingManager& batching_manager = *iter->manager;
+
+        batching_manager.DynamicIndexBuffer ().SyncBuffers (device);
+
+        batching_manager.ResetLinearIndexBuffer ();
+        batching_manager.SetPassUserData        (0);
+        batching_manager.SetPassFirstIndex      (0);
+      }
+
+      batching_managers.clear ();
+
+      return operation_iter;
+    }
+    catch (...)
+    {
+      for (BatchingManagerArray::iterator iter=batching_managers.begin (), end=batching_managers.end (); iter!=end; ++iter)
+      {
+        BatchingManager& batching_manager = *iter->manager;
+
+        batching_manager.ResetLinearIndexBuffer ();
+        batching_manager.SetPassUserData        (0);
+        batching_manager.SetPassFirstIndex      (0);
+      }
+
+      batching_managers.clear ();
+
+      throw;
+    }
+  }
   
 ///Рендеринг прохода
   void DrawPass (RenderPass& pass)
@@ -1030,8 +1111,13 @@ struct RenderOperationsExecutor
 
       //выполнение операций                    
 
-    for (OperationPtrArray::iterator iter=pass.operation_ptrs.begin (), end=pass.operation_ptrs.end (); iter!=end; ++iter)
-      DrawPassOperation (pass, iter, end, render_target_context);
+    for (OperationPtrArray::iterator iter=pass.operation_ptrs.begin (), end=pass.operation_ptrs.end (); iter!=end;)
+    {
+      OperationPtrArray::iterator temp_end = PrepareBatchingDynamicIndexBuffers (iter, end);
+
+      for (;iter!=temp_end; ++iter)
+        DrawPassOperation (pass, iter, temp_end, render_target_context);
+    }
   }
   
 ///Выполнение операции прохода рендеринга
@@ -1112,39 +1198,28 @@ struct RenderOperationsExecutor
       if (operation.batching_hash)
       {
         size_t           batching_hash    = operation.batching_hash;
-        BatchingManager* batching_manager = operation.primitive->batching_manager;
-
-          //сброс текущего пакета
-
-        batching_manager->ResetLinearIndexBuffer ();
+        BatchingManager& batching_manager = *operation.primitive->batching_manager;
 
           //определение границ пакета и копирование индексов в линейный буфер
 
         OperationPtrArray::iterator iter = operation_iter;
 
-        size_t indices_count = 0;
+        size_t indices_count = 0, first = batching_manager.PassFirstIndex ();
 
         for (;iter!=operation_end && (*iter)->batching_hash == batching_hash; ++iter)
         {
           const RendererPrimitive& primitive = *(*iter)->primitive;
-
-          const DynamicPrimitiveIndex* src_indices = *primitive.dynamic_indices + primitive.first;
-          DynamicPrimitiveIndex*       dst_indices = batching_manager->AllocateDynamicIndices (IndexPoolType_Linear, primitive.count);
-
-          memcpy (dst_indices, src_indices, primitive.count * sizeof (DynamicPrimitiveIndex));
 
           indices_count += primitive.count;
         }
 
         operation_iter = iter - 1;
 
-          //синхронизация буферов
-
-        batching_manager->DynamicIndexBuffer ().SyncBuffers (device);
-
           //рисование
 
-        device_context.DrawIndexed (primitive.type, 0, indices_count, 0);
+        device_context.DrawIndexed (primitive.type, first, indices_count, 0);
+
+        batching_manager.SetPassFirstIndex (first + indices_count);
       }
       else
       {
