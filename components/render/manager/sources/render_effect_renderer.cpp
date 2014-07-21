@@ -77,24 +77,6 @@ typedef stl::vector<PassOperation*>      OperationPtrArray;
 typedef stl::vector<PassOperation>       OperationArray;
 typedef stl::vector<BatchingManagerDesc> BatchingManagerArray;
 
-///Компаратор от наиболее близкого объекта к наиболее удаленному
-struct FrontToBackComparator
-{
-  bool operator () (const PassOperation* op1, const PassOperation* op2) const
-  {
-    return op1->eye_distance < op2->eye_distance;
-  }
-};
-
-///Компаратор от наиболее удаленного объекта к наиболее близкому
-struct BackToFrontComparator
-{
-  bool operator () (const PassOperation* op1, const PassOperation* op2) const
-  {
-    return op1->eye_distance > op2->eye_distance;
-  }
-};
-
 ///Компаратор по кэшированию состояний
 struct StateSwitchComparator
 {
@@ -127,6 +109,30 @@ struct StateSwitchComparator
       return result;    
 
     return false;    
+  }
+};
+
+///Компаратор от наиболее близкого объекта к наиболее удаленному
+struct FrontToBackComparator
+{
+  bool operator () (const PassOperation* op1, const PassOperation* op2) const
+  {
+    if (op1->eye_distance == op2->eye_distance)
+      return StateSwitchComparator ()(op1, op2);
+
+    return op1->eye_distance < op2->eye_distance;
+  }
+};
+
+///Компаратор от наиболее удаленного объекта к наиболее близкому
+struct BackToFrontComparator
+{
+  bool operator () (const PassOperation* op1, const PassOperation* op2) const
+  {
+    if (op1->eye_distance == op2->eye_distance)
+      return StateSwitchComparator ()(op1, op2);
+
+    return op1->eye_distance > op2->eye_distance;
   }
 };
 
