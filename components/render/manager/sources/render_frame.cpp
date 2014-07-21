@@ -700,11 +700,11 @@ void FrameImpl::Draw (RenderingContext* previous_context)
       
       if (!impl->effect_holder->effect_renderer)
         throw xtl::format_operation_exception ("", "No effect assigned");
-        
+
         //построение списка операций
         
       Prerender (impl->entity_draw_handler);
-        
+
         //выполнение операций рендеринга
 
       impl->effect_holder->effect_renderer->ExecuteOperations (context);

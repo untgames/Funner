@@ -1,7 +1,15 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+///Предикат необходимости удаления
+///////////////////////////////////////////////////////////////////////////////////////////////////
+struct CacheMapDefaultRemovePred
+{
+  template <class T> bool operator () (const T&) const { return true; }
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Кэшированное отображение (стратегия кэширования - LRU)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-template <class Key, class Value>
+template <class Key, class Value, class RemovePred = CacheMapDefaultRemovePred>
 class CacheMap: public Cache
 {
   public:
@@ -64,8 +72,9 @@ class CacheMap: public Cache
     };        
 
   private:
-    ItemMap  item_map;
-    ItemList item_list;
+    ItemMap    item_map;
+    ItemList   item_list;
+    RemovePred remove_pred;
 };
 
 /*
@@ -76,8 +85,8 @@ class CacheMap: public Cache
     Конструктор
 */
 
-template <class Key, class Value>
-CacheMap<Key, Value>::CacheMap (const CacheManagerPtr& manager)
+template <class Key, class Value, class RemovePred>
+CacheMap<Key, Value, RemovePred>::CacheMap (const CacheManagerPtr& manager)
   : Cache (manager)
 {
 }
@@ -86,14 +95,14 @@ CacheMap<Key, Value>::CacheMap (const CacheManagerPtr& manager)
     Количество элементов / проверка на пустоту
 */
 
-template <class Key, class Value>
-size_t CacheMap<Key, Value>::Size ()
+template <class Key, class Value, class RemovePred>
+size_t CacheMap<Key, Value, RemovePred>::Size ()
 {
   return item_map.size ();
 }
 
-template <class Key, class Value>
-bool CacheMap<Key, Value>::IsEmpty ()
+template <class Key, class Value, class RemovePred>
+bool CacheMap<Key, Value, RemovePred>::IsEmpty ()
 {
   return item_map.empty ();
 }
@@ -102,8 +111,8 @@ bool CacheMap<Key, Value>::IsEmpty ()
     Поиск элемента
 */
 
-template <class Key, class Value>
-Value* CacheMap<Key, Value>::Find (const Key& key)
+template <class Key, class Value, class RemovePred>
+Value* CacheMap<Key, Value, RemovePred>::Find (const Key& key)
 {
   typename ItemMap::iterator iter = item_map.find (key);
   
@@ -118,8 +127,8 @@ Value* CacheMap<Key, Value>::Find (const Key& key)
   return &iter->second;
 }
 
-template <class Key, class Value>
-Value& CacheMap<Key, Value>::Get (const Key& key)
+template <class Key, class Value, class RemovePred>
+Value& CacheMap<Key, Value, RemovePred>::Get (const Key& key)
 {
   if (Value* result = Find (key))
     return *result;
@@ -131,8 +140,8 @@ Value& CacheMap<Key, Value>::Get (const Key& key)
     Вставка и удаление элемента
 */
 
-template <class Key, class Value>
-Value& CacheMap<Key, Value>::AddCore (const Key& key, const Value& value)
+template <class Key, class Value, class RemovePred>
+Value& CacheMap<Key, Value, RemovePred>::AddCore (const Key& key, const Value& value)
 {
   Item item;
   
@@ -144,7 +153,7 @@ Value& CacheMap<Key, Value>::AddCore (const Key& key, const Value& value)
   stl::pair<typename ItemMap::iterator, bool> result = item_map.insert_pair (key, item);
   
   if (!result.second)
-    throw xtl::make_argument_exception ("render::manager::CacheMap<Key, Value>::Add", "Internal error: item with specified key/value has been already inserted");    
+    throw xtl::make_argument_exception ("render::manager::CacheMap<Key, Value, RemovePred>::Add", "Internal error: item with specified key/value has been already inserted");    
     
   try
   {
@@ -161,19 +170,19 @@ Value& CacheMap<Key, Value>::AddCore (const Key& key, const Value& value)
   }
 }
 
-template <class Key, class Value>
-void CacheMap<Key, Value>::Add (const Key& key, const Value& value)
+template <class Key, class Value, class RemovePred>
+void CacheMap<Key, Value, RemovePred>::Add (const Key& key, const Value& value)
 {
   typename ItemMap::iterator iter = item_map.find (key);
   
   if (iter != item_map.end ())
-    throw xtl::make_argument_exception ("render::manager::CacheMap<Key, Value>::Add", "Item with specified key/value has been already inserted");
+    throw xtl::make_argument_exception ("render::manager::CacheMap<Key, Value, RemovePred>::Add", "Item with specified key/value has been already inserted");
     
   AddCore (key, value);
 }
 
-template <class Key, class Value>
-void CacheMap<Key, Value>::Remove (const Key& key)
+template <class Key, class Value, class RemovePred>
+void CacheMap<Key, Value, RemovePred>::Remove (const Key& key)
 {
   typename ItemMap::iterator iter = item_map.find (key);
   
@@ -188,8 +197,8 @@ void CacheMap<Key, Value>::Remove (const Key& key)
     Очистка
 */
 
-template <class Key, class Value>
-void CacheMap<Key, Value>::Clear ()
+template <class Key, class Value, class RemovePred>
+void CacheMap<Key, Value, RemovePred>::Clear ()
 {
   item_map.clear ();
   item_list.clear ();
@@ -199,8 +208,8 @@ void CacheMap<Key, Value>::Clear ()
     Итераторы
 */
 
-template <class Key, class Value> template <class Fn>
-void CacheMap<Key, Value>::ForEach (Fn fn)
+template <class Key, class Value, class RemovePred> template <class Fn>
+void CacheMap<Key, Value, RemovePred>::ForEach (Fn fn)
 {
   for (typename ItemMap::iterator iter=item_map.begin (); iter!=item_map.end (); ++iter)
     fn (iter->first, iter->second);
@@ -210,20 +219,33 @@ void CacheMap<Key, Value>::ForEach (Fn fn)
     Сброс закэшированных элементов которые не использовались с кадра min_frame или времени min_time
 */
 
-template <class Key, class Value>
-void CacheMap<Key, Value>::FlushCache ()
+template <class Key, class Value, class RemovePred>
+void CacheMap<Key, Value, RemovePred>::FlushCache ()
 {
   FrameTime current_time  = CurrentTime (), time_delay = TimeDelay ();
   FrameId   current_frame = CurrentFrame (), frame_delay = FrameDelay ();
 
-  while (!item_list.empty ())
+  typename ItemList::iterator iter = item_list.end ();
+
+  while (!item_list.empty () && iter != item_list.begin ())
   {
-    Item& item = item_list.back ()->second;
+    --iter;
+
+    Item& item = (*iter)->second;
     
     if (current_time - item.last_use_time <= time_delay && current_frame - item.last_use_frame <= frame_delay)
-      return;      
-      
-    item_map.erase (item_list.back ());
-    item_list.pop_back ();
+      return;  
+
+    if (remove_pred (item))
+    {
+      typename ItemList::iterator next = iter;
+
+      ++next;
+        
+      item_map.erase (*iter);
+      item_list.erase (iter);
+
+      iter = next;
+    }
   }
 }

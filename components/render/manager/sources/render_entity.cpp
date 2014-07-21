@@ -38,6 +38,9 @@ class EntityLodCommonData: public CacheHolder, public DebugIdHolder
       , inv_world_tm (1.0f)
       , need_update_inv_world_tm (false)
     {
+      AttachCacheSource (shader_options_cache);
+      AttachCacheSource (properties);
+
       StateBlockMask mask;
       
       mask.ss_constant_buffers [ProgramParametersSlot_Entity] = true;
@@ -75,76 +78,70 @@ class EntityLodCommonData: public CacheHolder, public DebugIdHolder
 ///ƒинамические текстуры
     DynamicTextureEntityStorage& DynamicTextures () { return dynamic_textures; }
     
-///ѕоиск состо€ни€
-    LowLevelStateBlockPtr FindStateBlock (MaterialImpl* material)
+///ѕоиск состо€ни€    
+    struct MaterialStateDesc
     {
-      StateMap::iterator iter = states.find (material);
-      
-      if (iter == states.end ())
-        return LowLevelStateBlockPtr ();
-        
-      MaterialState& state = *iter->second;
-        
-      state.UpdateCache ();
-        
-      return state.state_block;
-    }
-    
-    LowLevelStateBlockPtr GetStateBlock (MaterialImpl* material)
-    {
-      if (!material)
-        return LowLevelStateBlockPtr ();        
-      
-      LowLevelStateBlockPtr result = FindStateBlock (material);
-      
-      if (result)
-        return result;
+      low_level::IStateBlock*  state_block;
+      Program*                 program;
+      ProgramParametersLayout* parameters_layout;
+    };
 
-      if (!material->HasDynamicTextures ())
-      {        
-        if (properties.Properties ().Size () == 0)
-          return LowLevelStateBlockPtr ();
-          
-        return default_state_block;
+    void GetMaterialStateDesc (MaterialImpl* material, MaterialStateDesc& out_desc)
+    {
+        //обработка частного случа€ отсутстви€ материала
+
+      if (!material)
+      {
+        out_desc.state_block       = 0;
+        out_desc.program           = 0;
+        out_desc.parameters_layout = 0;
+
+        return;
       }
-        
+
+        //поиск состо€ни€ по материалу
+
+      StateMap::iterator iter = states.find (material);
+            
+      if (iter != states.end ())
+      {
+        MaterialState& state = *iter->second;
+
+          //обновление кэша существующего состо€ни€
+
+        state.UpdateCache ();
+
+        out_desc.state_block       = &*state.state_block;
+        out_desc.program           = &*state.program;
+        out_desc.parameters_layout = &*state.parameters_layout;
+
+        return;
+      }
+
+        //обработка частного случаев без создани€ MaterialState
+
+      if (!properties.Properties ().Size () && !material->HasDynamicTextures () && !shader_options_cache.Properties ().Size ())
+      {
+        out_desc.state_block       = 0;
+        out_desc.parameters_layout = &*material->ParametersLayout ();
+        out_desc.program           = &*material->Program ();
+
+        return;
+      }
+
+        //создание нового состо€ни€
+
       StatePtr state (new MaterialState (*this, material), false);
       
       states.insert_pair (material, state);
       
       state->UpdateCache ();
-      
-      return state->state_block;
+
+      out_desc.state_block       = &*state->state_block;
+      out_desc.program           = &*state->program;
+      out_desc.parameters_layout = &*state->parameters_layout;
     }
-    
-    ProgramParametersLayoutPtr GetProgramParametersLayout (MaterialImpl* material)
-    {
-      if (!material)
-        return ProgramParametersLayoutPtr ();
         
-      StateMap::iterator iter = states.find (material);
-      
-      if (iter == states.end ())
-      {
-        if (properties.Properties ().Size () == 0)
-          return material->ParametersLayout ();
-
-        StatePtr state (new MaterialState (*this, material), false);
-        
-        states.insert_pair (material, state);
-        
-        state->UpdateCache ();
-
-        return state->parameters_layout;        
-      }
-        
-      MaterialState& state = *iter->second;
-
-      state.UpdateCache ();      
-
-      return state.parameters_layout;
-    }
-    
 /// эш опций шейдера
     render::manager::ShaderOptionsCache& ShaderOptionsCache () { return shader_options_cache; }
     
@@ -156,7 +153,7 @@ class EntityLodCommonData: public CacheHolder, public DebugIdHolder
       
       scissor_state = state;
       
-      InvalidateCache (false);
+      InvalidateCache ();
     }
     
     bool ScissorState () { return scissor_state; }
@@ -166,7 +163,7 @@ class EntityLodCommonData: public CacheHolder, public DebugIdHolder
     {
       scissor_rect = rect;
       
-      InvalidateCache (false);
+      InvalidateCache ();
     }
     
     const BoxArea& WorldScissor () { return scissor_rect; }
@@ -244,30 +241,33 @@ class EntityLodCommonData: public CacheHolder, public DebugIdHolder
         throw;
       }
     }    
-    
+
   private:
     struct MaterialState: public xtl::reference_counter, public CacheHolder, public DebugIdHolder
     {
+      LowLevelStateBlockPtr         state_block;
+      ProgramPtr                    program;
+      ProgramParametersLayoutPtr    parameters_layout;
       EntityLodCommonData&          common_data;
       MaterialPtr                   material;
-      ProgramParametersLayoutPtr    parameters_layout;
       size_t                        state_block_mask_hash;
-      LowLevelStateBlockPtr         state_block;
       DynamicTextureMaterialStorage dynamic_textures;
       
       MaterialState (EntityLodCommonData& in_common_data, MaterialImpl* in_material)
         : common_data (in_common_data)
         , material (in_material)
-        , parameters_layout (new ProgramParametersLayout (&common_data.DeviceManager ()->Device (), &common_data.DeviceManager ()->Settings ()), false)
         , state_block_mask_hash (0)
         , dynamic_textures (common_data.TextureManager (), in_material, common_data.Entity ())
       {
         if (!material)
           throw xtl::make_null_argument_exception ("render::manager::EntityLodCommonData::MaterialState::MaterialState", "material");
+
+        parameters_layout = ProgramParametersLayoutPtr (new ProgramParametersLayout (&common_data.DeviceManager ()->Device (), &common_data.DeviceManager ()->Settings ()), false);
           
         common_data.AttachCacheSource (*this);
         
         AttachCacheSource (common_data.properties);
+        AttachCacheSource (common_data.shader_options_cache);
         AttachCacheSource (dynamic_textures);        
         
         if (common_data.DeviceManager ()->Settings ().HasDebugLog ())
@@ -325,6 +325,11 @@ class EntityLodCommonData: public CacheHolder, public DebugIdHolder
           parameters_layout->DetachAll ();
           parameters_layout->Attach (*material->ParametersLayout ());
           parameters_layout->Attach (common_data.entity_parameters_layout);
+
+          program = material->Program ();
+
+          if (program && common_data.shader_options_cache.Properties ().Size ())
+            program = &program->DerivedProgram (common_data.shader_options_cache);
         }
         catch (xtl::exception& e)
         {
@@ -435,7 +440,7 @@ struct EntityLod: public xtl::reference_counter, public EntityLodDesc, public Ca
 
       if (common_data.DeviceManager ()->Settings ().HasDebugLog ())
         Log ().Printf ("Update entity lod cache (entity_id=%u, id=%u)", common_data.Id (), Id ());
-            
+
       cached_primitive = primitive.Resource ();
 
       if (!cached_primitive)
@@ -474,7 +479,7 @@ struct EntityLod: public xtl::reference_counter, public EntityLodDesc, public Ca
       cached_operations.reserve (operations_count);
       
       const BoxAreaImpl* scissor = common_data.ScissorState () ? Wrappers::Unwrap<BoxAreaImpl> (common_data.WorldScissor ()).get () : (const BoxAreaImpl*)0;
-      
+
         //построение списка операций рендеринга статических примитивов
 
       const RendererPrimitiveGroup* group = groups;
@@ -488,7 +493,7 @@ struct EntityLod: public xtl::reference_counter, public EntityLodDesc, public Ca
 
       for (size_t i=0; i<dynamic_groups_count; i++, dynamic_group++)
         BuildRendererOperations (*dynamic_group, scissor, dynamic_group->dynamic_primitive);
-        
+
       cached_operation_list.operations_count = cached_operations.size ();
       cached_operation_list.operations       = cached_operations.empty () ? (RendererOperation*)0 : &cached_operations [0];
       
@@ -528,9 +533,13 @@ struct EntityLod: public xtl::reference_counter, public EntityLodDesc, public Ca
 
       MaterialImpl* material = renderer_primitive.material;
 
-      operation.state_block              = common_data.GetStateBlock (material).get ();
-      operation.entity_parameters_layout = common_data.GetProgramParametersLayout (material).get ();
-      operation.shader_options_cache     = &common_data.ShaderOptionsCache ();
+      EntityLodCommonData::MaterialStateDesc material_state;
+
+      common_data.GetMaterialStateDesc (material, material_state);
+
+      operation.state_block              = material_state.state_block;
+      operation.entity_parameters_layout = material_state.parameters_layout;
+      operation.program                  = material_state.program;
       operation.scissor                  = scissor;
       operation.batching_hash            = get_batching_hash (operation);
 
@@ -947,7 +956,7 @@ void EntityImpl::UpdateCache ()
   impl->Properties ().UpdateCache ();
 
   impl->UpdateCache ();
-  
+
   for (EntityLodArray::iterator iter=impl->lods.begin (), end=impl->lods.end (); iter!=end; ++iter)
     (*iter)->UpdateCache ();
 }

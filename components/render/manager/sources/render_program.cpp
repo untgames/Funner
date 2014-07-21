@@ -3,6 +3,9 @@
 using namespace render;
 using namespace render::manager;
 
+//TODO: optimize program creation with different options order (different order same options)
+//TODO: minimize derived programs count according to different options order
+
 namespace
 {
 
@@ -10,24 +13,48 @@ namespace
     Общие данные программы
 */
 
-typedef stl::vector<media::rfx::Shader> ShaderArray;
-typedef stl::vector<TexmapDesc>         TexmapDescArray;
+struct OptionsCacheCombinationKey                                                                      
+{                                                                                                      
+  size_t hash1, hash2;                                                                                 
+                                                                                                       
+  OptionsCacheCombinationKey (size_t in_hash1, size_t in_hash2) : hash1 (in_hash1), hash2 (in_hash2) {}
+                                                                                                       
+  bool operator == (const OptionsCacheCombinationKey& key) const                                       
+  {                                                                                                    
+    return hash1 == key.hash1 && hash2 == key.hash2;                                                   
+  }                                                                                                    
+};
+
+inline size_t hash (const OptionsCacheCombinationKey& key)
+{                                                  
+  return key.hash1 * key.hash2;                    
+}                       
+
+struct RemovePred
+{
+  bool operator () (const ProgramPtr& program) const { return program->use_count () == 1; }
+};                           
+                                                                                                     
+typedef stl::vector<media::rfx::Shader>                               ShaderArray;
+typedef stl::vector<TexmapDesc>                                       TexmapDescArray;
+typedef CacheMap<OptionsCacheCombinationKey, ProgramPtr, RemovePred>  ProgramMap;
 
 struct ProgramCommonData: public xtl::reference_counter, public DebugIdHolder
 {
-  DeviceManagerPtr           device_manager;         //менеджер устройства отрисовки
-  stl::string                name;                   //имя программы
-  ShaderArray                shaders;                //шейдеры
-  TexmapDescArray            texmaps;                //текстурные карты
-  stl::string                static_options;         //статические опции компиляции шейдеров
-  stl::string                dynamic_options;        //имена динамических опций
-  ShaderOptionsLayout        dynamic_options_layout; //расположение динамических опций
-  Log                        log;                    //протокол
-  bool                       need_update;            //необходимо обновление внутрених данных
-  bool                       has_framemaps;          //программа ссылается на контекстные карты кадра
-  ProgramParametersLayoutPtr parameters_layout;      //расположение параметров программы
-  PropertyBuffer             properties;             //свойства программы
-  LowLevelStateBlockPtr      state_block;            //блок данных параметров
+  DeviceManagerPtr            device_manager;         //менеджер устройства отрисовки
+  stl::string                 name;                   //имя программы
+  ShaderArray                 shaders;                //шейдеры
+  TexmapDescArray             texmaps;                //текстурные карты
+  stl::string                 static_options;         //статические опции компиляции шейдеров
+  stl::string                 dynamic_options;        //имена динамических опций
+  ShaderOptionsLayout         dynamic_options_layout; //расположение динамических опций
+  Log                         log;                    //протокол
+  bool                        need_update;            //необходимо обновление внутрених данных
+  bool                        has_framemaps;          //программа ссылается на контекстные карты кадра
+  ProgramParametersLayoutPtr  parameters_layout;      //расположение параметров программы
+  PropertyBuffer              properties;             //свойства программы
+  LowLevelStateBlockPtr       state_block;            //блок данных параметров
+  ProgramMap                  derived_programs;       //производные программы
   
 ///Конструктор
   ProgramCommonData (const DeviceManagerPtr& in_device_manager, const char* in_name)
@@ -36,6 +63,7 @@ struct ProgramCommonData: public xtl::reference_counter, public DebugIdHolder
     , need_update (true)
     , has_framemaps (false)
     , properties (in_device_manager)
+    , derived_programs (&device_manager->CacheManager ())
   {
     try
     {        
@@ -114,55 +142,20 @@ struct ProgramCommonData: public xtl::reference_counter, public DebugIdHolder
 
 typedef xtl::intrusive_ptr<ProgramCommonData> ProgramCommonDataPtr;
 
-/*
-    Программа, соответствующая паре кэшей
-*/
-
-struct OptionsCacheCombinationKey
-{
-  size_t hash1, hash2;
-  
-  OptionsCacheCombinationKey (size_t in_hash1, size_t in_hash2) : hash1 (in_hash1), hash2 (in_hash2) {}
-  
-  bool operator == (const OptionsCacheCombinationKey& key) const
-  {
-    return hash1 == key.hash1 && hash2 == key.hash2;
-  }
-};
-
-struct OptionsCacheCombinationValue: public xtl::reference_counter
-{
-  ShaderOptions options; //список опций программы
-  ProgramPtr    program; //программа
-};
-
-size_t hash (const OptionsCacheCombinationKey& key)
-{
-  return key.hash1 * key.hash2;
-}
-
-typedef xtl::intrusive_ptr<OptionsCacheCombinationValue>                      OptionsCacheCombinationValuePtr;
-typedef CacheMap<OptionsCacheCombinationKey, OptionsCacheCombinationValuePtr> OptionsCacheCombinationMap;
-
 }
 
 /*
     Описание реализации программы
 */
 
-typedef stl::hash_map<size_t, ProgramPtr> ProgramMap;
-
 struct Program::Impl: public DebugIdHolder
 {
-  ProgramCommonDataPtr        common_data;                //общие данные программы
-  ShaderOptions               options;                    //опции данного экземпляра программы
-  ProgramMap                  derived_programs;           //производные программы
-  OptionsCacheCombinationMap  options_cache_combinations; //комбинации кэшей опций
-  LowLevelProgramPtr          low_level_program;          //низкоуровневая программа
+  ProgramCommonDataPtr common_data;       //общие данные программы
+  ShaderOptions        options;           //опции данного экземпляра программы
+  LowLevelProgramPtr   low_level_program; //низкоуровневая программа
   
 ///Конструктор
   Impl (const DeviceManagerPtr& device_manager, const char* name, const char* static_options, const char* dynamic_options)
-    : options_cache_combinations (&device_manager->CacheManager ())
   {
     try
     {
@@ -191,7 +184,6 @@ struct Program::Impl: public DebugIdHolder
   Impl (const Impl& impl, const ShaderOptions& in_options)
     : common_data (impl.common_data)
     , options (impl.options)
-    , options_cache_combinations (&common_data->device_manager->CacheManager ())
   {
     options.options      += " ";
     options.options      += in_options.options;
@@ -438,15 +430,17 @@ Program& Program::DerivedProgram (const ShaderOptions& options)
   {
     if (options.options.empty ())
       return *this;
+
+    OptionsCacheCombinationKey key (impl->options.options_hash, options.options_hash);
+
+    ProgramMap& derived_programs = impl->common_data->derived_programs;
       
-    ProgramMap::iterator iter = impl->derived_programs.find (options.options_hash);
-    
-    if (iter != impl->derived_programs.end ())
-      return *iter->second;
+    if (ProgramPtr* program = derived_programs.Find (key))
+      return **program;
       
     ProgramPtr program (new Program (*this, options), false);
     
-    impl->derived_programs.insert_pair (options.options_hash, program);
+    derived_programs.Add (key, program);
     
     return *program;
   }
@@ -468,58 +462,6 @@ Program& Program::DerivedProgram (ShaderOptionsCache& cache)
   catch (xtl::exception& e)
   {
     e.touch ("render::manager::Program::DerivedProgram(const ShaderOptionsCache&)");
-    throw;
-  }
-}
-
-Program& Program::DerivedProgram (ShaderOptionsCache& cache1, ShaderOptionsCache& cache2)
-{
-  try
-  {
-    size_t options_count1 = cache1.Properties ().Size (),
-           options_count2 = cache2.Properties ().Size ();
-
-      //обработка частных случаев
-
-    if (!options_count1 && options_count2)
-      return *this;
-
-    if (!options_count1)
-      return DerivedProgram (cache2);
-
-    if (!options_count2)
-      return DerivedProgram (cache1);
-
-      //обработка общего случая
-      
-    const ShaderOptions& options1 = cache1.GetShaderOptions (impl->common_data->dynamic_options_layout);
-    const ShaderOptions& options2 = cache2.GetShaderOptions (impl->common_data->dynamic_options_layout);    
-
-    OptionsCacheCombinationKey key (options1.options_hash, options2.options_hash);
-
-    if (OptionsCacheCombinationValuePtr* result = impl->options_cache_combinations.Find (key))
-      return *(*result)->program;
-
-    if (impl->common_data->device_manager->Settings ().HasDebugLog ())
-      impl->common_data->log.Printf ("Create derived program '%s' for options '%s' + '%s'", impl->common_data->name.c_str (), options1.options.c_str (), options2.options.c_str ());
-
-    ShaderOptions derived_options;
-    
-    derived_options.options      = options1.options + " " + options2.options;
-    derived_options.options_hash = common::strhash (derived_options.options.c_str ());
-
-    OptionsCacheCombinationValuePtr value (new OptionsCacheCombinationValue, false);
-
-    value->options = derived_options;
-    value->program = &DerivedProgram (derived_options);
-
-    impl->options_cache_combinations.Add (key, value);
-
-    return *value->program;
-  }
-  catch (xtl::exception& e)
-  {
-    e.touch ("render::manager::Program::DerivedProgramShaderOptionsCache&,ShaderOptionsCache&)");
     throw;
   }
 }

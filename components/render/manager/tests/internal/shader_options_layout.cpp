@@ -41,9 +41,6 @@ int main ()
     
     printf ("Options: '%s' (hash=%08x)\n", options.options.c_str (), options.options_hash);        
     
-    options = list.GetDefaultShaderOptions ();
-    
-    printf ("Default options: '%s' (hash=%08x)\n", options.options.c_str (), options.options_hash);
     printf ("Builders count: %u\n", list.CachedShaderBuildersCount ());
   }
   catch (std::exception& e)

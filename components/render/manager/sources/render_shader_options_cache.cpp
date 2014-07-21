@@ -12,9 +12,9 @@ namespace
 ///Элемент кэша опций шейдера
 struct ShaderOptionsCacheEntry: public ShaderOptions, public xtl::reference_counter
 {
-  size_t layout_hash;   //закэшированный хэш расположения свойств
-  size_t options_count; //закэшированное количество опций
-  bool   is_valid;      //является ли данный элемент корректным
+  size_t layout_hash;    //закэшированный хэш расположения свойств
+  size_t options_count;  //закэшированное количество опций
+  bool   is_valid;       //является ли данный элемент корректным
   
 ///Конструктор
   ShaderOptionsCacheEntry () : layout_hash (0xffffffff), options_count (0), is_valid (false) {}
@@ -44,6 +44,7 @@ typedef CacheMap<ShaderOptionsLayout*, ShaderOptionsCacheEntryPtr> ShaderOptions
 
 struct ShaderOptionsCache::Impl: public xtl::trackable
 {
+  ShaderOptionsCache&               owner;
   common::PropertyMap               properties;                //полный список опций
   common::PropertyMap::EventHandler properties_update_handler; //обработчик события обновления свойств
   xtl::auto_connection              on_properties_update;      //соединение с обработчиком обновления свойств
@@ -51,8 +52,9 @@ struct ShaderOptionsCache::Impl: public xtl::trackable
   bool                              need_invalidate_cache;     //кэш требуется обновить
   
 ///Конструктор
-  Impl (const CacheManagerPtr& cache_manager)
-    : properties_update_handler (xtl::bind (&Impl::OnPropertiesUpdate, this))
+  Impl (ShaderOptionsCache& in_owner, const CacheManagerPtr& cache_manager)
+    : owner (in_owner)
+    , properties_update_handler (xtl::bind (&Impl::OnPropertiesUpdate, this))
     , cache (cache_manager)
     , need_invalidate_cache (false)
   {
@@ -63,6 +65,8 @@ struct ShaderOptionsCache::Impl: public xtl::trackable
   void OnPropertiesUpdate ()
   {
     need_invalidate_cache = true;
+
+    owner.InvalidateCache ();
   }
   
 ///Обработчик события удаления расположения опций шейдера
@@ -77,7 +81,7 @@ struct ShaderOptionsCache::Impl: public xtl::trackable
 */
 
 ShaderOptionsCache::ShaderOptionsCache (const CacheManagerPtr& cache_manager)
-  : impl (new Impl (cache_manager))
+  : impl (new Impl (*this, cache_manager))
 {
 }
 
@@ -134,7 +138,7 @@ const ShaderOptions& ShaderOptionsCache::GetShaderOptions (ShaderOptionsLayout& 
       //обработка частного случая - отсутствия свойств
       
     if (impl->properties.Size () == 0 || layout.Size () == 0)
-      return layout.GetDefaultShaderOptions ();
+      return xtl::singleton_default<ShaderOptions>::instance ();
     
       //обновление флагов кэширования
     

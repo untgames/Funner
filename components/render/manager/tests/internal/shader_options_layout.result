@@ -2,5 +2,4 @@ Results of shader_options_layout_test:
 Options: 'DefineA=1 DefineC=test' (hash=7618c134)
 Options: 'DefineB=3.14 DefineC=1 2 3 4' (hash=1ceabda0)
 Options: 'DefineA=2 DefineC=test2' (hash=f868d78d)
-Default options: 'DefineA DefineB DefineC' (hash=907fae95)
 Builders count: 2

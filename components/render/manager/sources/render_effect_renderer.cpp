@@ -1037,22 +1037,21 @@ struct RenderOperationsExecutor
 ///Выполнение операции прохода рендеринга
   void DrawPassOperation (RenderPass& pass, OperationPtrArray::iterator& operation_iter, OperationPtrArray::iterator operation_end, RenderTargetContext& render_target_context)
   {
-    const PassOperation&     operation                   = **operation_iter;
-    const RendererPrimitive& primitive                   = *operation.primitive;
-    ShaderOptionsCache&      entity_shader_options_cache = *operation.shader_options_cache;
-    const rectf*             operation_scissor           = operation.normalized_scissor_index != -1 ? &normalized_scissors [operation.normalized_scissor_index].rect : (const rectf*)0;
+    const PassOperation&     operation         = **operation_iter;
+    const RendererPrimitive& primitive         = *operation.primitive;
+    const rectf*             operation_scissor = operation.normalized_scissor_index != -1 ? &normalized_scissors [operation.normalized_scissor_index].rect : (const rectf*)0;
 
     if (!primitive.count)
       return;
 
       //поиск программы (TODO: кэширование поиска по адресам кэшей, FIFO)
       
-    Program* program = &*primitive.material->Program ();
+    Program* program = operation.program;
 
     if (!program)
       return;
       
-    program = &program->DerivedProgram (frame_shader_options_cache, entity_shader_options_cache);
+    program = &program->DerivedProgram (frame_shader_options_cache);
 
     device_context.SSSetProgram (program->LowLevelProgram ().get ());
 
@@ -1162,7 +1161,7 @@ struct RenderOperationsExecutor
   void DrawEffect (RenderInstantiatedEffect& effect)
   {
       //рисование вложенных кадров
-    
+
     for (FrameArray::iterator iter=effect.frames.begin (), end=effect.frames.end (); iter!=end; ++iter)
       (*iter)->Draw (&context);
   }

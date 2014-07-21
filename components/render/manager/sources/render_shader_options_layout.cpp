@@ -13,17 +13,19 @@ struct ShaderOptionsBuilder: public xtl::reference_counter
 {
   struct OptionDesc
   {
-    stl::string          name;  //имя свойства
+    const char*          name;  //имя свойства
     int                  index; //индекс свойства в карте свойств
     common::PropertyType type;  //тип свойства
   };
   
   typedef stl::vector<OptionDesc> OptionDescArray;
   
-  OptionDescArray option_descs; //список опций
+  common::StringArray defines;      //строки с именами опций
+  OptionDescArray     option_descs; //список опций
   
 ///Конструктор
-  ShaderOptionsBuilder (const common::PropertyLayout& layout, const common::StringArray& defines)
+  ShaderOptionsBuilder (const common::PropertyLayout& layout, const common::StringArray& in_defines)
+    : defines (in_defines.Clone ())
   {
     option_descs.reserve (defines.Size ());
     
@@ -46,25 +48,28 @@ struct ShaderOptionsBuilder: public xtl::reference_counter
   void GetShaderOptions (const common::PropertyMap& properties, ShaderOptions& out_options, stl::string& value_buffer)
   {
     out_options.options.clear ();
+
+    bool need_add_space = false;
     
     for (OptionDescArray::iterator iter=option_descs.begin (), end=option_descs.end (); iter!=end; ++iter)
     {
       const OptionDesc& option_desc = *iter;
+
+      if (option_desc.index == -1)
+        continue;
       
-      if (iter != option_descs.begin ())
+      if (need_add_space)
         out_options.options += ' ';
+
+        //TODO: сделать формирование массивов свойств (в зависимости от типа)
+
+      need_add_space       = true;
+      out_options.options += option_desc.name;     
       
-      out_options.options += option_desc.name;
+      properties.GetProperty (option_desc.index, value_buffer);
       
-      if (option_desc.index != -1)
-      {
-          //TODO: сделать формирование массивов свойств (в зависимости от типа)
-        
-        properties.GetProperty (option_desc.index, value_buffer);
-        
-        out_options.options += '=';
-        out_options.options += value_buffer;
-      }
+      out_options.options += '=';
+      out_options.options += value_buffer;
     }
     
     out_options.options_hash = common::strhash (out_options.options.c_str ());
@@ -109,16 +114,17 @@ typedef CacheMap<ShaderOptionsBuilderKey, ShaderOptionsBuilderPtr> ShaderOptions
 
 struct ShaderOptionsLayout::Impl: public xtl::trackable
 {
-  common::StringArray     defines;         //список названий макро-определений
-  ShaderOptionsBuilderMap builders;        //генераторы опций шейдера
-  stl::string             value_buffer;    //временный буфер для формирования опций
-  ShaderOptions           default_options; //опции по умолчанию
-  bool                    need_flush;      //кэш требуется сбросить
+  common::StringArray     defines;      //список названий макро-определений
+  ShaderOptionsBuilderMap builders;     //генераторы опций шейдера
+  stl::string             value_buffer; //временный буфер для формирования опций
+  bool                    need_flush;   //кэш требуется сбросить
+  size_t                  hash;         //хэш лэйаута
   
 ///Конструктор
   Impl (const CacheManagerPtr& cache_manager)
     : builders (cache_manager)
     , need_flush (false)
+    , hash (0xffffffff)
   {
   }
   
@@ -126,20 +132,18 @@ struct ShaderOptionsLayout::Impl: public xtl::trackable
   void FlushCache ()
   {
     builders.Clear ();
-    
-    default_options.options.clear ();
-    
+
+    hash = 0xffffffff;
+
     const char** define_names = defines.Data ();
 
     for (size_t i=0, count=defines.Size (); i<count; i++)
     {
       if (i)
-        default_options.options += ' ';
+        hash = common::strhash (" ", hash);
       
-      default_options.options += define_names [i];
+      hash = common::strhash (define_names [i], hash);
     }
-    
-    default_options.options_hash = common::strhash (default_options.options.c_str ());
     
     need_flush = false;
   }
@@ -206,7 +210,7 @@ void ShaderOptionsLayout::Remove (const char* name)
   const char** defines = impl->defines.Data ();
 
   for (size_t i=0, count=impl->defines.Size (); i<count; i++)
-    if (strcmp (defines [i], name))
+    if (!strcmp (defines [i], name))
     {
       impl->defines.Remove (i);
       
@@ -256,22 +260,6 @@ void ShaderOptionsLayout::GetShaderOptions (const common::PropertyMap& defines, 
   }
 }
 
-const ShaderOptions& ShaderOptionsLayout::GetDefaultShaderOptions ()
-{
-  try
-  {
-    if (impl->need_flush)
-      impl->FlushCache ();
-      
-    return impl->default_options;
-  }
-  catch (xtl::exception& e)
-  {
-    e.touch ("render::manager::ShaderOptionsLayout::GetDefaultShaderOptions");
-    throw;
-  }
-}
-
 /*
     Хэш
 */
@@ -283,7 +271,7 @@ size_t ShaderOptionsLayout::Hash ()
     if (impl->need_flush)
       impl->FlushCache ();
     
-    return impl->default_options.options_hash;
+    return impl->hash;
   }
   catch (xtl::exception& e)
   {
