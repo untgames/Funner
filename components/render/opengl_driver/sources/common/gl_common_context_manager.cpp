@@ -34,6 +34,7 @@ class ContextImpl: public xtl::reference_counter, private IContextListener
 ///Конструктор
     ContextImpl (ISwapChain* swap_chain, const ContextSettings& context_settings)
       : need_check_errors (context_settings.IsNeedCheckErrors ())
+      , need_validate_programs (context_settings.IsNeedValidatePrograms ())
     {
       try
       {
@@ -201,6 +202,9 @@ class ContextImpl: public xtl::reference_counter, private IContextListener
 ///Нужно ли проверять ошибки
     bool IsNeedCheckErrors () { return need_check_errors; }
 
+///Нужно ли валидировать программы
+    bool IsNeedValidatePrograms () { return need_validate_programs; }
+
 ///Получение информации о реализации OpenGL
     const char* GetExtensionsString () { return extensions_string.c_str (); }
     const char* GetVersionString    () { return version_string.c_str (); }
@@ -235,16 +239,17 @@ class ContextImpl: public xtl::reference_counter, private IContextListener
     typedef xtl::array<size_t, CacheEntry_Num> ContextCache;
     
   private:
-    ContextPtr   context;            //контекст OpenGL
-    GlEntries    gl_entries;         //таблица точек входа OpenGL 1.1
-    ExtensionSet extensions;         //флаги поддерживаемых исключений
-    stl::string  extensions_string;  //строка поддерживаемых расширений
-    stl::string  version_string;     //версия OpenGL
-    stl::string  vendor_string;      //производитель реализации OpenGL
-    stl::string  renderer_string;    //имя устройства отрисовки OpenGL
-    ContextCache context_cache;      //кэш состояния контекста
-    ContextCaps  context_caps;       //аппаратно поддерживаемые возможности контекста
-    bool         need_check_errors;  //нужно ли проверять ошибки
+    ContextPtr   context;                //контекст OpenGL
+    GlEntries    gl_entries;             //таблица точек входа OpenGL 1.1
+    ExtensionSet extensions;             //флаги поддерживаемых исключений
+    stl::string  extensions_string;      //строка поддерживаемых расширений
+    stl::string  version_string;         //версия OpenGL
+    stl::string  vendor_string;          //производитель реализации OpenGL
+    stl::string  renderer_string;        //имя устройства отрисовки OpenGL
+    ContextCache context_cache;          //кэш состояния контекста
+    ContextCaps  context_caps;           //аппаратно поддерживаемые возможности контекста
+    bool         need_check_errors;      //нужно ли проверять ошибки
+    bool         need_validate_programs; //нужно ли валидировать программу
 
   private:
     static ContextImpl* current_context; //указатель на текущий контекст
@@ -749,6 +754,15 @@ void ContextManager::ResetRebindNotifications ()
 bool ContextManager::NeedStageRebind (Stage stage) const
 {
   return impl->NeedStageRebind (stage);
+}
+
+/*
+    Нужно ли валидировать программы
+*/
+
+bool ContextManager::NeedValidatePrograms () const
+{
+  return impl->GetContext ().IsNeedValidatePrograms ();
 }
 
 namespace render

@@ -17,7 +17,8 @@ Device::Device (ISwapChain* swap_chain, const char* init_string)
     shader_stage (context_manager),
     query_manager (context_manager),
     cached_base_vertex (~0),
-    cached_base_index (~0)
+    cached_base_index (~0),
+    need_validate_programs (context_manager.NeedValidatePrograms ())
 {  
     //инициализация кэша
     
@@ -770,7 +771,7 @@ void Device::Bind (size_t base_vertex, size_t base_index, IndicesLayout* out_ind
     
       //валидация текущей программы
       
-    if (is_program_validate_needed)
+    if (need_validate_programs && is_program_validate_needed)
       shader_stage.ValidateBindedProgram ();
   }
   catch (xtl::exception& exception)

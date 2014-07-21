@@ -287,6 +287,7 @@ class Device: virtual public IDevice, virtual public IDeviceContext, public Obje
     size_t              cached_base_vertex;     //кэшированный индекс базовой вершины
     size_t              cached_base_index;      //кэшированный индекс базового индекса
     IndicesLayout       cached_indices_layout;  //кэшированное расположение индексов
+    bool                need_validate_programs; //нужно ли валидировать программы
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

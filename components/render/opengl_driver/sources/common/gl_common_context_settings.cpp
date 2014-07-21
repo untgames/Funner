@@ -13,12 +13,15 @@ struct ContextSettings::Impl
   Version      min_version;                               //минимальная требуемая версии OpenGL
   Version      max_version;                               //максимальная необходимая версия OpenGL
   bool         need_check_errors;                         //нужно ли проверять ошибки
+  bool         need_validate_programs;                    //нужно ли валидировать программы
   size_t       int_settings [ContextSettingsInteger_Num]; //целочисленные настройки контекста
   bool         is_ffp_allowed;                          //поддерживается ли ffp
   
 ///Конструктор
   Impl (const char* init_string)
-    : need_check_errors (true), is_ffp_allowed (true)
+    : need_check_errors (true)
+    , need_validate_programs (false)
+    , is_ffp_allowed (true)
   {
       //проверка корректности аргументов
     
@@ -129,6 +132,12 @@ struct ContextSettings::Impl
       need_check_errors = atoi (value) != 0;
       return;
     }
+
+    if (!xtl::xstricmp (name, "validate_programs"))
+    {
+      need_validate_programs = atoi (value) != 0;
+      return;
+    }
   }    
 };
 
@@ -168,6 +177,11 @@ const ExtensionSet& ContextSettings::EnabledExtensions () const
 bool ContextSettings::IsNeedCheckErrors () const
 {
   return impl->need_check_errors;
+}
+
+bool ContextSettings::IsNeedValidatePrograms () const
+{
+  return impl->need_validate_programs;
 }
 
 /*
