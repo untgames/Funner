@@ -16,6 +16,24 @@ struct CommandBuffer::Impl: public xtl::reference_counter
   {
     return &xtl::singleton_default<Impl, true>::instance ();
   }
+
+  void Reserve (size_t new_size, bool copy_data)
+  {
+    if (new_size <= buffer.capacity ())
+      return;
+
+    size_t new_up_size = buffer.capacity () * 2;
+
+    if (new_up_size > new_size)
+      new_size = new_up_size;
+
+    static const size_t MAX_SIZE = ~0u;
+
+    if (new_size < buffer.capacity ())
+      new_size = MAX_SIZE;
+
+    buffer.reserve (new_size, copy_data);
+  }
 };
 
 /*
@@ -87,6 +105,8 @@ void CommandBuffer::Resize (size_t new_size, bool copy_data)
   if (impl == Impl::GetDefault ())
     impl = new Impl;
 
+  impl->Reserve (new_size, copy_data);  
+
   impl->buffer.resize (new_size, copy_data);
 }
 
@@ -104,7 +124,7 @@ void CommandBuffer::Reserve (size_t new_size)
   if (impl == Impl::GetDefault ())
     impl = new Impl;
 
-  impl->buffer.reserve (new_size);
+  impl->Reserve (new_size, true);
 }
 
 /*

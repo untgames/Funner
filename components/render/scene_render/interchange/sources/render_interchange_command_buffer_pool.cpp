@@ -9,8 +9,8 @@ namespace
     Константы
 */
 
-size_t DEFAULT_BUFFER_SIZE   = 65536; //размер буфера по умолчанию
-size_t DEFAULT_BUFFERS_COUNT = 8;     //резервируемое количество буферов
+size_t DEFAULT_BUFFER_SIZE   = 2 * 1024 * 1024; //размер буфера по умолчанию
+size_t DEFAULT_BUFFERS_COUNT = 2;               //резервируемое количество буферов
 
 }
 
