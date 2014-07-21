@@ -77,7 +77,7 @@ void Material::SetTexmapImage (const char* semantic, const char* image_name)
 
     if (!image_name)
       throw xtl::make_null_argument_exception ("", "image_name");
-printf ("%s(%u)\n", __FUNCTION__, __LINE__); fflush (stdout);
+
     impl->context.SetMaterialTexmapImage (impl->name.c_str (), semantic, image_name);
   }
   catch (xtl::exception& e)
