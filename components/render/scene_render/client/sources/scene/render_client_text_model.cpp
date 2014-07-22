@@ -58,7 +58,7 @@ namespace
     Константы
 */
 
-const char*  DEFAULT_BATCH_NAME                = "text"; //имя пакета для рендеринга текста по умолчанию
+const char*  DEFAULT_BATCH_NAME                = "";     //имя пакета для рендеринга текста по умолчанию
 const size_t DEFAULT_RESERVED_SPRITES_COUNT    = 32;     //резервируемое количество спрайтов по умолчанию
 const size_t DEFAULT_RESERVED_FONT_TEXT_BLOCKS = 4;      //резервируемое количество текстовых блоков
 

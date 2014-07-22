@@ -124,7 +124,7 @@ void XFontFontRasterizer::BuildImage (size_t image_index, media::Image& out_imag
 
     if (out_image.Format () != impl->params.image_format && impl->params.image_format != media::PixelFormat_Default)
     {
-      common::Log (LOG_NAME).Printf ("Requested pixel format '%s' requires image convertation from '%s'", impl->params.image_format, out_image.Format ());
+      common::Log (LOG_NAME).Printf ("Requested pixel format '%s' requires image convertation from '%s'", get_format_name (impl->params.image_format), get_format_name (out_image.Format ()));
       out_image.Convert (impl->params.image_format);
     }
   }

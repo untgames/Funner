@@ -9,7 +9,7 @@ using namespace render::scene::client;
 namespace
 {
 
-const char*  DEFAULT_SEMANTIC            = "font_mask"; //имя семантики по умолчанию
+const char*  DEFAULT_SEMANTIC            = "image";     //имя семантики по умолчанию
 const char*  FONT_RESOURCE_PREFIX        = "font:";     //префикс имени шрифта
 const char*  FONT_RESOURCE_WILDCARD      = "font:*";    //маска имени шрифта
 const size_t FONT_RESOURCE_PREFIX_LENGTH = strlen (FONT_RESOURCE_PREFIX); //длина префикса шрифта
@@ -21,7 +21,7 @@ struct RasterizedFontCreationParamsImpl: public media::RasterizedFontCreationPar
     max_image_size = 2048;
     pot            = true;
     glyph_margin   = 4;
-    image_format   = media::PixelFormat_L8;
+    image_format   = media::PixelFormat_RGBA8;
   }
 };
 
