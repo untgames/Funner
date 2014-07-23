@@ -26,6 +26,13 @@ render::low_level::UsageMode get_mode (MeshBufferUsage usage)
   }
 }
 
+inline math::vec4ub convert_color (const math::vec4f& src_color)
+{
+  math::vec4f color = 255.0f * src_color;
+
+  return math::vec4ub (unsigned char (color.x), unsigned char (color.y), unsigned char (color.z), unsigned char (color.w));
+}
+
 /*
 ===================================================================================================
     Generators
@@ -53,9 +60,9 @@ struct LineGenerator
     for (size_t i=0; i<VERTICES_PER_PRIMITIVE; i++, dst_vertex++, src_point++)
     {
       dst_vertex->position  = src_point->position;
-      dst_vertex->color     = src_point->color;
-      dst_vertex->tex_coord = src_point->tex_offset;
       dst_vertex->normal    = math::vec3f (0, 0, 1.0f);
+      dst_vertex->tex_coord = src_point->tex_offset;
+      dst_vertex->color     = convert_color (src_point->color);
     }
   }
 
@@ -83,9 +90,11 @@ struct SpriteGenerator
   {
     DynamicPrimitiveVertex* dst_vertex = dst_vertices;
 
+    math::vec4ub color = convert_color (src_sprite.color);
+
     for (size_t i=0; i<VERTICES_PER_PRIMITIVE; i++, dst_vertex++)
     {
-      dst_vertex->color  = src_sprite.color;
+      dst_vertex->color  = color;
       dst_vertex->normal = normal;
     }
 
@@ -1150,8 +1159,8 @@ class BatchingLineAndOrientedSpriteList: public BatchingStateBlockHolder, public
             {             
               dst_vert->position  = world_tm * src_vert->position;
               dst_vert->normal    = world_tm * math::vec4f (src_vert->normal, 0.0f);
-              dst_vert->color     = src_vert->color;
               dst_vert->tex_coord = src_vert->tex_coord;
+              dst_vert->color     = src_vert->color;
             }
           }
           catch (xtl::exception& e)

@@ -13,10 +13,10 @@ template <class T> class DynamicPrimitiveBuffer;
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 struct DynamicPrimitiveVertex
 {
-  math::vec3f position;
-  math::vec3f normal;
-  math::vec4f color;
-  math::vec2f tex_coord;
+  math::vec3f  position;
+  math::vec3f  normal;
+  math::vec2f  tex_coord;
+  math::vec4ub color;
 };
 
 typedef unsigned short                                 DynamicPrimitiveIndex;

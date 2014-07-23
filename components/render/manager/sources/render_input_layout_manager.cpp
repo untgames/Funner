@@ -205,8 +205,8 @@ void InputLayoutManager::InitDynamicPrimitivesLayout ()
     static const render::low_level::VertexAttribute attributes [] = {
       {impl->device->GetVertexAttributeSemanticName (render::low_level::VertexAttributeSemantic_Position),  render::low_level::InputDataFormat_Vector3, render::low_level::InputDataType_Float, 0, VERTEX_OFFSETOF (DynamicPrimitiveVertex, position),  sizeof (DynamicPrimitiveVertex)},
       {impl->device->GetVertexAttributeSemanticName (render::low_level::VertexAttributeSemantic_Normal),    render::low_level::InputDataFormat_Vector3, render::low_level::InputDataType_Float, 0, VERTEX_OFFSETOF (DynamicPrimitiveVertex, normal),    sizeof (DynamicPrimitiveVertex)},
-      {impl->device->GetVertexAttributeSemanticName (render::low_level::VertexAttributeSemantic_Color),     render::low_level::InputDataFormat_Vector4, render::low_level::InputDataType_Float, 0, VERTEX_OFFSETOF (DynamicPrimitiveVertex, color),     sizeof (DynamicPrimitiveVertex)},
       {impl->device->GetVertexAttributeSemanticName (render::low_level::VertexAttributeSemantic_TexCoord0), render::low_level::InputDataFormat_Vector2, render::low_level::InputDataType_Float, 0, VERTEX_OFFSETOF (DynamicPrimitiveVertex, tex_coord), sizeof (DynamicPrimitiveVertex)},
+      {impl->device->GetVertexAttributeSemanticName (render::low_level::VertexAttributeSemantic_Color),     render::low_level::InputDataFormat_Vector4, render::low_level::InputDataType_UByte, 0, VERTEX_OFFSETOF (DynamicPrimitiveVertex, color),     sizeof (DynamicPrimitiveVertex)},
     };
 
     static const size_t attributes_count = sizeof (attributes) / sizeof (*attributes);
