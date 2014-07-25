@@ -1,11 +1,16 @@
 uniform mat4 ModelViewProjectionMatrix;
 
-varying vec4 DiffuseTexcoord;
+varying vec2 TexCoord;
+varying vec4 VertexColor;
+
+attribute vec4 aVertex;
+attribute vec4 aColor;
+attribute vec3 aTexCoord0;
 
 void main(void)
 {
-  DiffuseTexcoord = gl_MultiTexCoord0;
+  TexCoord    = aTexCoord0.xy;
+  VertexColor = aColor;
 
-  gl_FrontColor  = gl_Color;
-  gl_Position    = ModelViewProjectionMatrix * gl_Vertex;
+  gl_Position = ModelViewProjectionMatrix * aVertex;
 }                

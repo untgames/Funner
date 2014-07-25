@@ -165,7 +165,7 @@ program "text"
 {
   shader "text" "glsl.vs" "glsl.ps" //reference to shader source
 
-  texmap "font_mask"  "FontTexture"
+  texmap "image"  "FontTexture"
 }
 
 //shading instance for rendering shadow maps

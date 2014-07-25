@@ -7,7 +7,7 @@
       <property name="DiffuseColor" type="vector">
         0 0 0 0
       </property>
-      <texmap semantic="font_mask" image="" sampler="default"/>
+      <texmap semantic="image" image="" sampler="default"/>
     </material>
   </materials>
 </material_library>

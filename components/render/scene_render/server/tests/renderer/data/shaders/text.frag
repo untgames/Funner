@@ -1,12 +1,16 @@
-uniform vec4 DiffuseColor;
+#ifdef OPENGL_ES2_SUPPORT
+precision highp float;
+precision highp sampler2D;
+#endif
 
 uniform sampler2D FontTexture;
 
-varying vec4 DiffuseTexcoord;
+varying vec2 TexCoord;
+varying vec4 VertexColor;
 
 void main (void)
 {
-  vec3 font_color = texture2D (FontTexture, DiffuseTexcoord.xy).xyz;
+  vec4 font_color = texture2D (FontTexture, TexCoord.xy);
    
-  gl_FragColor = vec4 (DiffuseColor.xyz, font_color.x);
+  gl_FragColor = font_color * VertexColor;
 }

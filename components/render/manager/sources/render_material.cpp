@@ -614,7 +614,7 @@ void MaterialImpl::SetTexmap (const char* semantic, const char* image_name, cons
       TexmapPtr texmap = impl->FindTexmapBySemantic (semantic);
 
       if (!texmap)
-        throw xtl::make_null_argument_exception ("", "sampler");
+        throw xtl::format_operation_exception ("", "Sampler not found for semantic '%s'", semantic);
 
       sampler = texmap->sampler.Name ();
     }
@@ -624,7 +624,7 @@ void MaterialImpl::SetTexmap (const char* semantic, const char* image_name, cons
       TexmapPtr texmap = impl->FindTexmapBySemantic (semantic);
 
       if (!texmap)
-        throw xtl::make_null_argument_exception ("", "image_name");
+        throw xtl::format_operation_exception ("", "Image not found for semantic '%s'", semantic);
 
       image_name = texmap->texture.Name ();
     }
