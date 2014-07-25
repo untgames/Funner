@@ -392,24 +392,12 @@ void InputLayout::SetDesc (const InputLayoutDesc& desc)
 #ifndef OPENGL_ES_SUPPORT
         switch (va.type)
         {
-#ifndef OPENGL_ES2_SUPPORT
           case InputDataType_Byte:
           case InputDataType_UByte:
           case InputDataType_Short:
           case InputDataType_UShort:
           case InputDataType_Int:
           case InputDataType_UInt:
-            if (!caps.glVertexAttribIPointer_fn)
-              throw xtl::format_exception<xtl::not_supported_exception> (METHOD_NAME, "Integer vertex attribute '%s' is not supported (no GL_NV_vertex_program4 extension)", va.semantic);
-#else
-          case InputDataType_Byte:
-          case InputDataType_UByte:
-          case InputDataType_Short:
-          case InputDataType_UShort:
-          case InputDataType_Int:
-          case InputDataType_UInt:
-            throw xtl::format_exception<xtl::not_supported_exception> (METHOD_NAME, "Integer vertex attribute '%s' is not supported", va.semantic);
-#endif
           case InputDataType_Float:
             if (!caps.glVertexAttribPointer_fn)
               throw xtl::format_exception<xtl::not_supported_exception> (METHOD_NAME, "Vertex attribute '%s' is not supported (no GL_ARB_vertex_shader extension)", va.semantic);
@@ -802,7 +790,9 @@ void InputLayout::BindVertexAttributes (size_t base_vertex, BufferPtr* vertex_bu
           case GL_UNSIGNED_SHORT:
           case GL_INT:
           case GL_UNSIGNED_INT:
-            caps.glVertexAttribIPointer_fn ((GLuint)location, va.components, va.type, va.stride, offset);
+            if (caps.glVertexAttribIPointer_fn) caps.glVertexAttribIPointer_fn ((GLuint)location, va.components, va.type, va.stride, offset);
+            else                                caps.glVertexAttribPointer_fn ((GLuint)location, va.components, va.type, GL_FALSE, va.stride, offset);
+
             break;
           case GL_DOUBLE:
             caps.glVertexAttribLPointer_fn ((GLuint)location, va.components, va.type, va.stride, offset);
